@@ -1,0 +1,1020 @@
+
+
+---PAGE-1---
+
+
+
+
+
+---PAGE-2---
+
+
+
+AN INTRODUCTION TO
+
+# COASTAL ENGINEERING
+
+##### PROCESSES, THEORY, HAZARDS AND DESIGN PRACTICE
+
+###### J. J. WIJETUNGE
+
+Faculty of Engineering, University of Peradeniya, Sri Lanka
+
+###### GODAGE INTERNATIONAL PUBLISHERS
+
+Colombo, Sri Lanka
+
+
+
+---PAGE-3---
+
+
+
+Published by Godage International Publishers 661 Maradana Road, Colombo 10
+
+An Introduction to Coastal Engineering Processes, Theory, Hazards and Design Practice © 2013 J. J. Wijetunge
+
+All rights reserved. This book, or parts thereof, may not be reproduced in any form or by any means without written permission from the author.
+
+ISBN 978-955-44714-0-5
+
+Cover photo: Dikkowita Fishery Harbour: breakwaters during construction.
+
+
+
+---PAGE-4---
+
+
+
+## Contents
+
+Preface v
+
+###### 1. Introduction 1
+
+- 1.1 General background 1
+- 1.2 Basic definitions and concepts 2
+- 1.3 Coastal zone management in Sri Lanka 7
+
+
+###### 2. Mathematical Description of Wave Motion 11
+
+- 2.1 Water wave problem 11
+- 2.2 Boundary conditions for water wave problem 14
+- 2.3 Solution of linearised water wave problem 17
+- 2.4 Deep and shallow water waves 19
+- 2.5 A closer look at L = (gT 2/2π) tanh(kh) 20
+- 2.6 Water particle kinematics for progressive waves 24
+- 2.7 Pressure field under a progressive wave 31
+- 2.8 Wave energy 32
+- 2.9 Further worked examples 34
+
+
+###### 3. Coastal Processes 40
+
+- 3.1 Transformation of waves entering shallow water 40
+- 3.2 Nearshore currents 56
+- 3.3 Coastal sediment transport 59
+- 3.4 Further worked examples 62
+
+
+###### 4. Coastal Structures 69
+
+- 4.1 Introduction 69
+- 4.2 Erosion mitigation structures 70
+- 4.3 Inlet stabilisation structures 79
+- 4.4 Flood protection structures 81
+- 4.5 Harbour structures 81
+- 4.6 Design of rubble-mound structures 89
+- 4.7 Other types 100
+
+
+
+
+---PAGE-5---
+
+
+
+###### 5. Coastal Hazards 103
+
+- 5.1 Basic concepts in disaster management 103
+- 5.2 Tsunami 108
+- 5.3 Cyclone-induced storm surges 135
+- 5.4 Sea level rise 147
+- 5.5 Coastal erosion 151
+
+
+- Appendix A. Notation 155
+- Appendix B. Abbreviations 157
+- Appendix C. Bernoulli equation for unsteady flow 158
+- Appendix D. Solution of linearised water wave problem 159
+- Appendix E. A note on group velocity of progressive water waves 162 References 164 Index 168
+
+
+
+
+---PAGE-6---
+
+
+
+## Preface
+
+The objective of this book is to provide senior undergraduate and graduate students with an introduction to the field of coastal engineering. The book will also be a useful reference for engineers and scientists working in areas related to coastal engineering, coastal zone management as well as management of the risk of coastal hazards such as tsunami, storm surges, beach erosion and sea level rise.
+
+The book is based on over 20 years of author’s experience in teaching, research and consultancy work in the field of coastal engineering. The lecture notes prepared to teach coastal engineering and coastal hazards to undergraduate and graduate students have been the initial basis in compiling this book. Worked examples have also been incorporated where applicable in order to further reinforce the readers’ grasp of the concepts and theory presented in the book.
+
+Coastal engineering and management is a highly interdisciplinary field. Engineers, geologists, geographers, oceanographers, earth scientists and disaster managers all have an interest in various aspects of the topics discussed in this book. All have different requirements about the choice and presentation of these topics, thus some degree of compromise is inevitable.
+
+The coastal zone is a highly complex and dynamic natural environment in a delicate balance. Coastal engineers and scientists should, therefore, strive to find optimum ways to interact with the coastal zone with the least disturbance to the prevailing natural equilibrium. This requires, first of all a good understanding of what is going on in a particular coastal zone, and then, the development of appropriate and sustainable engineering solutions and designs that are holistic in approach.
+
+Finally, I should like to thank all authors and institutions who have kindly allowed the use of some of the figures from their publications.
+
+Peradeniya June 2013
+
+J. J. WIJETUNGE
+
+v
+
+
+
+---PAGE-7---
+
+
+
+Chapter 1
+
+## Introduction
+
+###### 1.1 General background
+
+Coastlines, the narrow corridor between the land and the sea, have always been a favoured location for human settlements as well as for various activities ranging from industrial to recreational. Coastal areas also provide habitat to many animal, bird and plant species and nurture vital eco-systems such as mangrove forests and coral reefs.
+
+However, as the transition zone between the land and the sea, coastlines constitute a highly dynamic environment with constant change. The natural physical processes that take place in this environment include the waves generated by the wind blowing over the surface of the ocean; the fluctuating water levels due to the tide caused by the gravitational and rotational effects of the Earth, the Moon and the Sun; as well as the currents generated by the waves and the tide. These hydrodynamic forces and the wind interact with the geomorphological structure of the coastal zone leading to processes of erosion, transport and deposition of beach sediment.
+
+Such wave- and current-induced hydrodynamic forcing on the coast, particularly during storm events, could also cause excessive erosion resulting in loss of beach-front property. Furthermore, extreme events capable of causing coastal flooding such as cyclone-induced sea surges and seismically-generated tsunami pose a threat to the people’s lives and their property in some coastlines around the world including in Sri Lanka.
+
+Nevertheless, human settlements as well as activities and interventions in or near the coasts have continued to increase with rapid population growth, particularly during the last several decades. Moreover, unfortunately, there have also been instances of such interventions adversely affecting the prevailing dynamic equilibrium in the coastal zone leading to undesirable consequences such as excessive erosion in adjacent stretches.
+
+Coastal engineering thus involves finding optimum ways to interact with the coastal zone with the least disturbance to the prevailing natural equilibrium whilst also giving due consideration to potential impacts of natural hazards. This requires, first of all a good understanding of what is going on in a particular coastal zone, and then, the development of appropriate and sustainable engineering solutions and designs that are holistic in approach.
+
+Accordingly, the primary objective of this book is to provide senior undergraduate and graduate students with a basic understanding of the behaviour of water waves as well as related physical processes particularly in regard to the nearshore sea. The book also provides the reader with information on different types of coastal structures and potential natural hazards in coastal regions.
+
+
+
+---PAGE-8---
+
+
+
+First of all, some introductory remarks on the water waves and the tide as well as a brief discussion of the issues, concerns and strategies in regard to the management of the coastal zone with particular emphasis on Sri Lanka are given in the remainder of this chapter.
+
+- Chapter 2 develops a versatile mathematical tool in order to be able to understand as well as predict the behaviour of water waves. Various wave, current and sediment transport processes of importance to the coastal engineer are discussed, and where applicable, necessary analytical formulae developed in Chapter 3. Chapter 4 identifies and briefly describes the functional, structural and construction aspects of different types of coastal structures. The origin, occurrence and mitigation of several coastal hazards, particularly with regard to the coastline of Sri Lanka, are discussed in Chapter 5.
+
+
+###### 1.2 Basic definitions and concepts
+
+- 1.2.1 Wave parameters First of all, it is helpful to identify the basic physical parameters of a travelling surface wave, as sketched in Fig. 1.1. The Mean Water Level (MWL) would be the still water position if there were no waves. The water depth, h, is measured from MWL down to the sea bed.
+
+
+Clearly, a wave has a high point and a low point: the highest point of the wave is known as the crest and the lowest point the trough. Moreover, that part of the wave that is above the Mean Water Level may be identified as the positive half of the wave and that below as the negative half.
+
+The spatial dimensions of the wave may be quantified by two basic parameters: the wave height (H) which is the vertical distance between a crest and a trough of a wave; and the wave length (L) which is the horizontal distance between successive wave crests or wave troughs. Wave is periodic in time and space, so another important parameter is the wave period (T) that quantifies the time required for two successive wave crests to pass a fixed point in space. It follows, therefore, that a wave moves a distance L in the time T. So, the speed of propagation of waves (also known as phase velocity or wave celerity) is given by, c = L/T. The inverse of the wave period gives the number of waves per unit time, i.e., the wave frequency, f =1/T.
+
+We also identify two parameters that are directly related to the wave length (L) and the wave period (T), namely, the wave number (k) and the wave angular frequency (ω), respectively:
+
+k =2π/L andω =2π/T.
+
+Fig. 1.1 Basic physical parameters of a surface wave.
+
+
+
+---PAGE-9---
+
+
+
+Table 1.1 Types of waves on the surface of the ocean.
+
+Category
+
+Type Description and cause Wave period
+
+Sea Waves propagating in an area under the direct influence of the wind.
+
+Typically, 3–25 s
+
+Short-period
+
+waves
+
+Swell Waves that have travelled out of the wind field or the wind has ceased.
+
+Typically, 10–40 s
+
+Tide Periodic fluctuations (rise and fall) of water level in oceans caused by the interaction of gravitational and centripetal forces mainly between the Earth, the Moon and the Sun.
+
+Approx., 12 h or 24 h
+
+Long-period
+
+Tsunami Due to submarine (under-sea) earthquakes, landslides and volcanic eruptions.
+
+5–60 min.
+
+waves
+
+Seiches Resonance of long-period wave components on lakes, bays and harbour basins, often induced by the wind.
+
+1–30 min.
+
+Surf-beat Periodic fluctuations in water level at the coast due to arrival of wave groups.
+
+0.5–5 min.
+
+###### 1.2.2 Waves on the surface of the ocean
+
+Waves are carriers of energy across a medium through particle oscillations. In a longitudinal wave (e.g., sound waves) the particle displacement is parallel to the direction of wave propagation. On the other hand, in a transverse wave (e.g., light waves) the particle displacement is perpendicular to the direction of wave propagation. Water waves are an example of waves that involve a combination of both longitudinal and transverse motions.
+
+Several types of waves can be seen on the surface of the ocean (Table 1.1). These may be broadly classified as short-period waves (sea and swell) and long-period waves (e.g., the tide, tsunami, seiches and surf-beat) based on the wave period. The time-scale of short-period waves is several seconds whilst that of long-period waves varies from a few minutes to several hours.
+
+###### Sea and swell
+
+A typical record of the water level oscillations due to short-period waves on the sea surface is shown in Fig. 1.2. Waves of irregular form with different heights and periods can be seen in this record of the natural sea state which usually comprises waves arriving from different directions. In natural sea, wave parameters such as wave height (H) and the wave period (T) vary randomly in space and time, so statistical quantities of such parameters ought to be employed to describe them. For example, mean values of the wave height and the wave period, respectively, can be computed by taking the average of all wave heights and wave periods in a record of sufficient length. However, the mean value of the wave heights is usually not used in the design of coastal structures since the mean is likely to be exceeded, on
+
+
+
+---PAGE-10---
+
+
+
+Fig. 1.2 Irregular wave form depicting the natural sea state which usually comprises waves arriving from different directions (modified from an image courtesy of Prentice-Hall).
+
+average, 50% of the time during the design storm event. Therefore, in coastal engineering practice, it is more common to use the significant wave height (Hs) which is the average of the highest one-third of all wave heights in a record (arrange the wave heights in descending order and then take the mean of the top one-third of wave heights). Similarly, we can compute the ‘10% wave height’ (H10%) by taking the average of the highest one-tenth of all wave heights in a record, and also, the ‘2% wave height’ (H2%) by taking the average of the highest 2% of all wave heights in the record. For instance, if we use H2% as the design wave height corresponding to a storm event lasting 3 hours to design a coastal structure, then the design wave height is likely to be exceeded only 2% of the time during the design storm. On the other hand, if significant wave height (Hs) is chosen, the design wave height will be exceeded, on average, 33.3% of the time during the design storm event.
+
+Tide
+
+Of the long-period oscillations on the sea surface, the tide is always present everywhere in the ocean. Tides are the periodic fluctuations (rise and fall) of the water level in oceans caused by the interaction of gravitational and centrifugal forces mainly between the Earth, the Moon and the Sun.
+
+(b) Diurnal tide
+
+(c) Mixed semi-diurnal tide
+
+(a) Semi-diurnal tide High Tides
+
+High Tides
+
+3 2 1 0
+
+3 2 1 0
+
+Height(m)
+
+Height(m)
+
+Height(m)
+
+High Tide
+
+- - - -
+
+3 2 1 0
+
+- -1
+
+
+-1 12 24 12 24 12 24 Low Tides
+
+-1
+
+Low Tide Low Tides
+
+Time (hours)
+
+Time (hours)
+
+Time (hours)
+
+Fig. 1.3 The types of tides: (a) semi-diurnal, (b) diurnal, and (c) mixed semi-diurnal.
+
+
+
+---PAGE-11---
+
+
+
+Height(m)
+
+Fig. 1.4 Typical monthly variation of the tide at Colombo, Sri Lanka.
+
+In most places, the tide rises and falls twice a day, reaching a maximum elevation called high tide on each rise and a minimum level called low tide on each fall. Such a tide with two highs and two lows of approximately equal size is termed a semi-diurnal tide and the complete cycle takes 12 hours and 25 minutes (Fig. 1.3a). However, in some parts of the world, there is only one complete cycle in a day and such tides are termed diurnal (Fig. 1.3b). A transitional tide known as the mixed tide occurs between areas of semi-diurnal and diurnal tides: a mixed tide with two high and two low tides of different size is termed a mixed semi-diurnal tide (Fig. 1.3c). Water moves landward (flood current) during high tide and flows seaward (ebb current) during low tide. This periodic water exchange is more noticeable at tidal inlets such
+
+- as estuaries, lagoons and bays. All three types of the tide occur in the Indian Ocean although the semi-diurnal type is
+
+more predominant. The tide around Sri Lanka is mixed semi-diurnal with two high waters and two low waters occurring in a day. Fig. 1.4 shows the typical monthly variation of the tide
+
+- at Colombo, Sri Lanka. The spring tides are the low and high tides each month with the highest range and coincide with the full and new moons. On the other hand, the neap tides are the low and high tides each month with the lowest range and coincide with the first and last quarter moons. Tidal flats (intertidal zones) are sandy or muddy coastal areas that are alternately submerged and exposed to the air as the tide rises and falls. They are neither terrestrial nor aquatic but fall somewhere in between, and are harsh, unpredictable environments.
+
+
+###### Tidal datums
+
+A tidal datum is a reference level based on a certain phase of the tide and is derived from long-term sea surface elevation measurements. The sea surface elevation is usually recorded hourly by tide gauges that are installed in stilling wells to filter out wave effects. Commonly used tidal datums refer to the high water and low water levels as well as their mean. Mean High Water Level (MHWL) is the average of all the high water heights observed over a period of time (usually over 19 years) at a certain location. Similarly, Mean Low Water Level (MLWL) is the average of all the low water levels over a time-period. Mean tidal level or the Mean Sea Level (MSL) is therefore the average of sea surface elevations over a period of time.
+
+###### 1.2.3 Coastal zone
+
+Coastal zone is the region where the land meets the sea. It is a transition region of indefinite width and extends both landward and seaward from the waterline. Landward, the coastal zone extends from the waterline at the beach to the first major change in the physical features of the land or to the point where permanent vegetation is established, whilst seaward, it extends from the waterline to just beyond the region in which waves begin to break (Fig. 1.5).
+
+
+
+---PAGE-12---
+
+
+
+Fig. 1.5 A typical beach profile and related terminology (modified after CEM1).
+
+As demarcated in Fig. 1.5, the shore extends from the low-water line to the normal landward limit of storm wave effects, i.e., the coastline. Where beaches occur, the shore can be divided into two zones: foreshore and backshore. The foreshore is that part of the beach that is alternately wet or dry as the waves rush up and down, so it extends from the low-tide waterline to the limit of wave uprush at high tide, i.e., the shoreline. Accordingly, the backshore is the usually dry and relatively flat upper portion of the beach between the shoreline and the coastline. The coast is the region inland from the coastline to the first major change in features of the terrain from coastal (e.g., sand dunes) to terrestrial; further landward is the coastal hinterland.1
+
+The narrow band of shallow coastal waters where waves break, dissipate energy and rush up the beach face is a region of great significance in relation to many coastal processes. This strip of area extending from the shoreline to the seaward edge of start of wave breaking is known as the breaker zone or the surf zone.
+
+The coastal zone with respect to the vast ocean beyond is identified in Fig. 1.6. The gently sloping (<1°) platform at the edge of the continental landmass is termed continental shelf. The average water depth on the shelf is about 75 m, varying from zero at the shoreline to about 150–200 m near its edge. A typical continental shelf is about 50 km wide, however, it could range from less than a few kilometres to more than 100 km. The continental slope marks the transition between the shelf and deep ocean floor. It has an average slope of 3–6°, which does not sound like much but typically over a distance of 100 km the water depth increases from 200 m to 4000 m.
+
+Fig. 1.6 Schematic of coastal zone in relation to continental shelf and slope (note that the vertical scale is exaggerated) (modified from an image courtesy of Precision Graphics).
+
+
+
+---PAGE-13---
+
+
+
+###### 1.3 Coastal zone management in Sri Lanka
+
+- 1.3.1 Background The coastal areas bordering the 1585 km long coastline of Sri Lanka are generally low-lying and consist of bays, lagoons, headlands, marshes and dunes. The strip of land along the coastline is a place of natural dynamism where waves release loads of energy. Moreover, the coastal belt is a place of primary interest to the people, to the economy, to the military, and to a variety of industries. On the other hand, it provides habitat to vital eco-systems such as mangrove forests and coral reefs.
+
+Box 1.1 lists the primary stakeholders of the coastal zone, i.e., those who have an interest of what is happening in the coastal zone. As identified in Box 1.1, not only people but animal, bird and plant species who have their habitat in the coastal zone are also important stakeholders. Therefore, engineers tasked with development activities or other engineering interventions in the coastal zone should always be mindful of possible adverse implications of their actions on all of these stakeholders.
+
+In Sri Lanka, coastal regions are defined as Divisional Secretariat (DS) divisions with a coastal boundary. Accordingly, 22% of the total land area and 32% of the population of Sri Lanka belong to coastal regions. Moreover, coastal regions of Sri Lanka account for 65% of urban areas, over 80% of tourist hotel rooms as well as two-thirds of all industrial production. The situation world over is no different with two-thirds of the world’s population living near the coast.
+
+Many human activities and interventions in the coastal areas, such as urban and industrial development, harbour development, river outlet works, discharge of industrial effluent, sewage outfalls, tourism development, sand and coral mining, have all had considerable impact on the fragile coastal environment leading to its deterioration. Clearly, this ‘linear’ corridor or the narrow strip of land along the coast has been subjected to tremendous pressure due to increasing overuse of limited resources by a rapidly increasing population as well as numerous human activities outlined earlier, especially during the last five decades. The situation in Sri Lanka has been further aggravated by beach erosion, particularly in the south, southwest and west coasts of the country.
+
+- 1.3.2 Management strategy In the backdrop of issues and concerns outlined above, the management of the coastal zone of Sri Lanka involved erosion mitigation, pollution control, biodiversity maintenance, marsh land protection, and environmental assessment, among many. But, in the past, prior to the eighties, these programmes were handled by a variety of agencies and were uncoordinated, with the result that each agency went its own way disregarding the others. The failure of this traditional sectoral approach to management convinced the planners of the need to develop an
+
+
+|Box 1.1. Who are the stakeholders of the coastal zone?<br><br>• People who are dependent on the coastal zone for their living, income and other activities,<br>• Animal and bird species (fauna) that have their habitat in the coastal zone (e.g., Fish, Turtles, Coral), and<br>• Plant species (flora) that have their habitat in the coastal zone (e.g., mangrove, seagrass).<br>|
+|---|
+
+
+
+
+---PAGE-14---
+
+
+
+integrated approach to the management of the coastal zone of the country. Accordingly, Sri Lanka launched a centrally operated coastal zone management programme in 1982, with the Coast Conservation Department (CCD) as the lead agency. Subsequently, the CCD with external technical assistance prepared a full-scale Integrated Coastal Zone Management (ICZM) Plan2, which was officially approved in 1990. The ICZM is the strategy that is used to deal with the many disciplines involved with the coast, i.e., physical, environmental and biological as well as various laws and regulations governing the use of the coastal zone.
+
+- 1.3.3 Salient features of ICZM plan The ICZM plan of 1990 for Sri Lanka primarily deals with the management of lands, water bodies and eco-systems in the coastal zone, as outlined in Box 1.2.
+
+
+Priority areas
+
+When there are many issues and concerns, it is often necessary to identify areas that require the most immediate attention. Accordingly, the ICZM plan of 1990 identified four priority areas, namely,
+
+- • Erosion management and land use,
+- • Cessation of coral mining and control of sand mining,
+- • Prevention of loss and degradation of coastal natural habitats, and
+- • Protection of scenic areas and cultural, religious and historical sites.
+
+
+Of these, the first two are related as sand and coral mining are causes of erosion. Accordingly, the erosion management strategy outlined in the ICZM plan also includes: (a) a public education campaign targeted at coral and sand miners about the impact of their activities, (b) a programme to identify alternative employment for displaced coral miners, and (c) a research effort to identify alternative sources of lime for the building industry. Complementing these management efforts is a programme to build coast protection works in appropriate areas.
+
+Regulatory mechanism
+
+The regulatory measures in the ICZM plan include a designated setback line to ensure that structures are not sited so close to the shoreline that they contribute to or are affected by erosion, and also to ensure public access to the sea including visual access. There is a general setback 60 m wide, but the demands of development and land ownership patterns in the coastal zone do not always permit reserving a 60 m wide setback, so there are variations according to the physical features of the coast, besides some exceptions. Further, setbacks for some water-dependent activities such as hatcheries for aquaculture and boatyards are determined on a case-by-case basis.
+
+|Box 1.2 The ICZM plan of 1990 for Sri Lanka includes:<br><br>• Management of coastal lands: protection of land against erosion.<br>• Management of coastal waters: fresh water is a precious resource in a coastal region; however unfortunately, coastal waters have traditionally been used for disposal of sewage and industrial effluent.<br>• Management of coastal eco-systems: environmental sensitivities are concerned with preservation of habitat and its diversity, which is essential to accommodate many species.<br>|
+|---|
+
+
+
+
+---PAGE-15---
+
+
+
+Fig. 1.7 The official boundary limits of the coastal zone of Sri Lanka3.
+
+The primary mechanism for implementing the ICZM programme in Sri Lanka is a permit system for development activities in the 300 m wide coastal zone (Fig. 1.7). The coastal zone is defined in the Sri Lanka Coast Conservation Act No. 57 of 19813 as “That area lying within a limit of 300 m landward of the Mean High Water Line and a limit of 2 km seaward of the Mean Low Water Line, and in the case of rivers, streams, lagoons, or any other body of water connected to the sea either permanently or periodically, the landward boundary shall extend to a limit of 2 km measured perpendicular to the straight baseline drawn between the natural entrance points (defined by the mean low water line) thereof and shall include waters of such rivers, streams and lagoons or any other body of water so connected to the sea.”
+
+Any person wishing to engage in a development activity within the coastal zone is required to obtain a permit issued by the CCD prior to commencing the activity. A permit may be issued if: (i) The activity is consistent with management policies, (ii) The activity is not prohibited by the ICZM plan, (iii) The activity is located outside the designated setback lines, and (iv) The national standards for the relevant environmental requirements are met.
+
+Examples of development types requiring permits include: residential buildings; commercial and industrial structures; recreational facilities; public roads, bridges and railway; sewage treatment facilities; waste and wastewater discharge facilities; harbours and navigation channels; aquaculture facilities; dredging, filling and mining; removal of sand/shells; removal of vegetation; and breaching of sand bars.
+
+The following activities are prohibited within the coastal zone, so no permit is issued: removal of coral other than for research purposes, mining of sand except in areas identified by the CCD, development within 200 m of designated archeological sites, and any development activity that will significantly degrade the quality of the officially designated natural areas.
+
+Activities that may be engaged in without a permit within the coastal zone include: fishing, cultivation of crops, planting of trees and other vegetation, as well as construction and maintenance of coast protection works by the CCD in accordance with the Master Plan for Coast Erosion.
+
+
+
+---PAGE-16---
+
+
+
+###### 1.3.4 Updates and revisions
+
+The Coast Conservation Act requires the revision of the original ICZM plan of 1990 every four years. The first such revision was done in 1997 followed by in 2004. Recall from our preceding discussion that the 1990 plan addressed issues and concerns relating to coastal erosion, coastal habitat management as well as management of areas of archaeological, cultural and historical significance. The scope of the priority areas has been broadened in the revised plan of 19974 to include control of coastal water pollution and special area management whilst the issue of integrating coastal fisheries and aquaculture has also been incorporated in the 2004 revision5. The chapters on the existing priority issues have also been updated in the revised plan of 2004. The pollution of coastal waters has been mainly due to the release of untreated or partially treated wastewater and toxic substances from industries, tourist resorts and shrimp farms; the dumping of solid waste in coastal areas; the receipt of raw sewage; and contamination with waste oil released from fishing crafts, coastal service stations as well as oil spills. Coastal waters also receive fertilizer and agro-chemical run-off from agricultural lands, and waste from squatter settlements and other domestic sources4.
+
+The establishment of Special Area Management (SAM) plans was in recognition of the limitations of the CCD permit system for dealing with issues related to coastal resource use that occur outside as well as within the coastal zone at specific sites. The SAM is a collaborative management strategy in which local communities and administrators in a geographic area are provided with the necessary technical and financial support to develop and implement site specific plans to manage their own natural resources in a sustainable manner. Twenty three sites have been identified and ranked in terms of the severity of resource management issues, biodiversity, viability and economic significance. Based on the above ranking, eight sites with high priority have been identified and are as follows: Arugam Bay, Batticaloa Lagoon, Bar Reef off Kalpitiya, Chilaw, Beruwala/Bentota, Hikkaduwa Town and Sanctuary, Negombo Lagoon, Rekawa Lagoon, and Unawatuna Bay. Of these, three sites, namely, Rekawa Lagoon, Hikkaduwa, and Negombo Lagoon/Muthurajawela Wetlands have been selected for implementation as pilot projects.5
+
+The new chapter on integrating coastal fisheries and aquaculture with coastal zone management in the revised plan of 2004 deals with the requirement to reduce the impact of coastal capture fishery and aquaculture on the coastal zone as well as to identify and regulate activities in the coastal zone that have an adverse impact on fishery productivity.
+
+Further, in the immediate aftermath of the tsunami disaster in December 2004, the Government of Sri Lanka declared buffer zones (‘no-build’ zones) along the coastline. The width of the buffer zone along the coast was 100 m in the south and west, and 200 m in the north and east. However, considering the socio-economic implications of large-scale resettlement of people as well as the scarcity of land outside of the buffer zone, the government subsequently decided in December 2005 to revert back to the setback distances stipulated in the ICZM plan of 1997, which vary from 35 m to 125 m.
+
+|Box 1.3 Key issues and areas identified in revised ICZM plan of 2004:<br><br>• Management of coastal erosion,<br>• Conservation of coastal habitats,<br>• Control of coastal water pollution,<br>• Management of sites of special significance, and public access,<br>• Integration of coastal fisheries and aquaculture, and<br>• Special Area Management.<br>|
+|---|
+
+
+
+
+---PAGE-17---
+
+
+
+Chapter 2
+
+## Mathematical Description of Wave Motion
+
+An understanding of the behaviour of water waves and the ability to analyse and predict their effects on beaches and structures are essential in carrying out coastal engineering studies and designs. For example, coastal engineers often need to estimate the wave conditions at a given location, the velocity of water particles and the pressure beneath a wave as well as the forces and the moments generated due to wave action. A mathematical framework that can describe the wave motion is therefore necessary. We see in the following that the potential flow concept provides a useful theoretical framework to derive a beautiful mathematical expression capable of describing the motion of water waves. However, as in many mathematical analyses of natural situations, certain simplifying assumptions are inevitable.
+
+###### 2.1 Water wave problem
+
+A sketch of a real sea is shown in Fig. 2.1(a). The Cartesian coordinate system that we adopt throughout this book is also shown alongside. Note that, the origin of the coordinate system is at the mean (still) level of the sea-surface with the x-axis in the direction of wave propagation and the z-axis vertically upwards. The water particle velocity components in x, y and z directions are u, v and w, respectively. The wave motion is unsteady, so the time (t) is the fourth independent variable related to the present problem, besides x, y and z.
+
+Fig. 2.1(a) indicates that, typically, both the water surface and the sea bottom are irregular and three-dimensional in space. The water surface also changes in time, so it is unsteady as well. Moreover, the sea bed is usually permeable and movable. However, the solution of the real three-dimensional problem of irregular waves over permeable and movable sea bed is quite complex. Therefore, it is necessary to make some approximations and assumptions before we begin our analysis of the wave problem. First of all, we limit our analysis to twodimensional wave motion, i.e., wave motion in (x,z)-plane only. This means that, in the present analysis, any flow parameter due to wave motion (e.g., velocity, pressure) is, in general, a function of (x,z,t) only. We assume that the fluid (water) is incompressible, which is a good approximation. However, the next assumption: that the sea bed is horizontal, impermeable and stationary (i.e., bed material is not movable), is not quite true in nature. The above simplifications lead us to an intermediate stage shown in Fig. 2.1(b).
+
+11
+
+
+
+---PAGE-18---
+
+
+
+- (a) Real 3D sea state with irregular waves over permeable and movable sea bed.
+
+- (b) Real sea state is simplified to a 2D wave problem with regular waves on impermeable and stationary sea bed.
+
+- (c) The thin, viscous wave boundary layer is ignored and only the much thicker inviscid main flow under wave motion is considered in the mathematical analysis.
+
+
+Fig. 2.1 Simplification of water wave problem prior to mathematical analysis.
+
+
+
+---PAGE-19---
+
+
+
+- Chapter 3
+
+
+## Coastal Processes
+
+Waves, as they approach a coast, undergo various physical processes resulting in transformation of their spatial dimensions, the direction of propagation as well as the wave form. Besides these wave processes, there are also hydrodynamic processes involving water level fluctuations and currents. The coexisting waves and currents in turn, through shear stresses in the bottom boundary layer, act on the movable sea bed leading to sediment transport and morphological processes. In this chapter, we discuss various processes that the waves may undergo during their journey from deep sea into shallow coastal waters. We also touch on the nearshore current systems and coastal sediment transport processes.
+
+###### 3.1 Transformation of waves entering shallow water
+
+We all have seen whilst standing on a beach that the waves approaching the coast change or transform themselves. For example, waves gain height and steepen before breaking eventually, and then the broken waves run up on the beach face, wet our feet and retreat back to the sea. Several physical processes are responsible for these transformations which affect the height, the length and the direction of propagation of waves, among other parameters.
+
+Various physical processes that can affect a wave as it propagates from the deep ocean into shallow coastal waters are listed in the following.
+
+- • Breaking,
+- • Additional growth due to the wind,
+- • Interaction with structures,
+- • Interaction with currents, and
+- • Wave-wave interaction.
+
+
+- • Shoaling,
+- • Refraction,
+- • Diffraction,
+- • Dissipation due to bed friction,
+- • Dissipation due to percolation,
+
+
+The first two processes, i.e., wave shoaling and refraction, are caused primarily by the topography of the sea bed, i.e., the bathymetry. Diffraction occurs when sea waves pass through an opening or encounter an obstacle, the size of which is comparable or larger than the wave length. Both friction and percolation at the bottom extract wave energy resulting in waves losing height. On the other hand, the wind, if present, will cause further growth of the waves.
+
+40
+
+
+
+---PAGE-20---
+
+
+
+Coastal Processes 41
+
+On approaching a coast, waves eventually break due to limited water depth, and in the process, lose bulk of their energy. Engineers are also concerned with the hydraulic responses and loading when waves interact with coastal and offshore structures. Moreover, waves interact non-linearly with currents as well as with waves of different frequencies.
+
+A brief description as well as the mathematical analysis of each of these processes is given in the following sub-sections.
+
+- 3.1.1 Wave shoaling Let us first note that the lines that may be drawn perpendicular to the wave crests (H = constant lines) indicating the direction of propagation of waves are called wave orthogonal or wave rays (Fig. 3.1).
+
+
+Now, consider a series of waves approaching perpendicular to a straight coastline with parallel bottom contours (Fig. 3.2). Whilst propagating towards the shoreline, both the wave length and the wave height change due to change in the water depth, and this process is known as wave shoaling.
+
+Fig. 3.1 Wave crests and rays.
+
+Our objective here is to derive an expression to quantify the change in wave height due to shoaling. Consider the wave crest of width b moving from section (1) to (2), in Fig. 3.2. Assuming that there is no loss of energy laterally and waves do not break, whilst neglecting bed friction, for conservation of energy:
+
+Mean energy flux through section (1) = Mean energy flux through section (2)
+
+bP1 =bP2
+
+### ( ) ( )
+
+i.e., b Enc = b Enc
+
+1 2
+
+1 2 Substituting using (2.52)
+
+E = ρgH
+
+8
+
+2 2
+
+###### H1n c1 1 = H2n2c2
+
+H n c H n c
+
+2 1 1 1 2 2
+
+= (3.1)
+
+Wave crests parallel to sea bed contours
+
+b
+
+- h1
+- h2
+
+
+Sea bed contours
+
+b
+
+Shoreline
+
+Fig. 3.2 Definition sketch for wave shoaling.
+
+
+
+---PAGE-21---
+
+
+
+Chapter 4
+
+## Coastal Structures
+
+Coastal structures include those built to facilitate fishing and maritime activities, to protect coastal settlements and infrastructure from flooding, and to save the coast itself from erosion. The functional, structural and construction aspects of different types of such structures used for a variety of purposes in the coastal zone are described in this chapter. The design of rubble-mound structures in particular is also discussed since structures built of rock are widely used in Sri Lanka for shore protection and in the construction of harbours.
+
+###### 4.1 Introduction
+
+Early civilizations in Europe, the Mediterranean and Asia built many harbours and ports to accommodate merchant ships or fleets of warships. Whilst most ancient ports were located in naturally sheltered sites, some had to be built in more challenging environments. For example, over 2000 years ago, Roman engineers developed a method to cast concrete underwater in order to build breakwaters for harbours in more harsh, open coastal areas. Moreover, a Roman built harbour in the Mediterranean during the same era had a submerged reef type breakwater just seaward of the main breakwater to cause waves to break and dissipate energy before reaching the main breakwater22. Besides harbours, structures were also built along coasts for flood protection, for example, Venetians and the Dutch built dikes along their vulnerable coasts over one thousand years ago1.
+
+In more recent times, rapidly increasing use of the coastal areas for a variety of purposes ranging from residential to industrial stretched city development right up to the ocean-front, often encroaching and disturbing the sensitive and dynamic overlap between the land and the ocean. The highly dynamic nature of the land-sea boundary, particularly during extreme events, necessitated the construction of structures to protect shore-front developments against coastal hazards. However, construction of such structures on the beach often further disturbed the prevailing nearshore sediment dynamics resulting in beach erosion in adjacent areas as well, thus requiring more structures to control downcoast erosion. Meantime, as mentioned at the outset, various uses of the coast also required building of necessary infrastructure such as harbours, anchorages, landing jetties, etc, in coastal waters. Such
+
+69
+
+
+
+---PAGE-22---
+
+
+
+70 Coastal Engineering
+
+structures in some locations on the coast have also resulted in excessive erosion or sedimentation at the site or in the neighbouring areas.
+
+In summary, engineering interventions in the coast have been for a variety of purposes including the following: to mitigate beach erosion, to stabilise coastal inlets for water exchange and navigation, to protect onshore developments against coastal flooding due to tsunami and storm surges, to provide shelter for harbours, to provide access to marine vessels, and to dispose waste and sewage.
+
+Accordingly, several primary types of coastal structures may be identified as in the following:
+
+- • Erosion mitigation structures,
+- • Harbour structures,
+- • Flood protection structures,
+- • Inlet stabilisation structures, and
+- • Piles, pipelines and cables.
+
+
+###### 4.2 Erosion mitigation structures
+
+- 4.2.1 Introduction The action of waves and currents on a beach, particularly during storms, is usually the primary cause for erosion. Therefore, one thing that could be done to mitigate erosion is to shield the coastline, fully or partially, from being exposed to the direct action of waves and currents by providing a front-line defence. Armouring of the coast by placing large boulders on the beach face or by building a wall-like barrier along the shoreline may almost completely shield beach material from waves and currents.
+
+
+Such an array of boulders placed on the beach for shore protection is termed a revetment whilst a barrier built along the shore is called a seawall. Alternatively, limited or partial shielding of the beach from waves may be achieved by constructing a shore-parallel barrier in shallow water just offshore of the eroding beach so that most of the wave energy is dissipated and reflected back upon striking the barrier, and consequently, only a reduced amount of energy reaching the beach. Such a structure is known as an offshore breakwater.
+
+Construction of such wave shields or barriers to protect an eroding beach is likely to lessen the problem of erosion at that location, but will there be any adverse impacts, particularly on the adjacent unprotected beaches? Engineers designing these structures should therefore be concerned not only with the stability of the structure but also its potential impact on shoreline morphology, at the site as well as in the neighbourhood.
+
+None of the hard shore protection structures adds sand to the beach system to compensate for natural loss through erosion. Clearly, hard mitigation practices address issues specific to local level erosion problem rather than their underlying systemic causes. In contrast, beach nourishment is the only engineered erosion mitigation alternative that directly addresses the problem of a sand budget deficit, since it brings sand from sources outside of the eroding system.
+
+In recent times, there has been a shift from hard engineering practices to soft engineering options in relation to beach erosion management. An integrated response comprising both hard and soft structures may probably be more desirable in most situations.
+
+The structural and non-structural interventions outlined above to mitigate coastal erosion are listed in Box 4.1. The functional, structural and construction aspects of each of these erosion mitigation methods are discussed further in the following sections.
+
+
+
+---PAGE-23---
+
+
+
+Chapter 5
+
+## Coastal Hazards
+
+Coastal areas around the world are exposed to a variety of hazards, both natural and man-made. The coastline of Sri Lanka is vulnerable to four natural hazards, namely, tsunami, storm surges, coastal erosion and sea level rise, besides the man-made hazards. The origin, occurrence and mitigation of each of these natural hazards are discussed in this chapter. We, however, first review some of the basic ideas and concepts of disaster management as familiarity with such terminology is required to understand the methods of mitigation of the risk of hazards.
+
+###### 5.1 Basic concepts in disaster management
+
+In the following, let us briefly review some of the basic terminology and concepts employed in disaster risk mitigation and management.
+
+###### Hazard
+
+In simple terms, a hazard is a ‘disaster waiting to happen’ (Fig. 5.1). However, a better description is: ‘A hazard is an event or occurrence that has the potential for causing injuries to life, and damage to property and the environment’. Note that, a hazard only has the potential, and need not necessarily lead to a disaster.
+
+Now, a more precise definition for technical purposes, particularly in terms of how we evaluate a hazard, would be: ‘A hazard is the probability of occurrence of a potentially damaging phenomenon within a specified period of time and within a given area’.34 For example, one can say that ‘there is a 40% probability of a magnitude 7.5 earthquake occurring in the Andaman-Sumatra subduction zone in the next 50 years’. In the above statement, note that the probability of occurrence, the magnitude, the location and the time period concerned are all specified.
+
+Hazards are either natural or man-made. Natural hazards may be categorized based on their origin and mechanism of occurrence as: geological hazards (earthquakes, landsides, volcanic eruptions, etc.); coastal hazards (tsunami, storm surges, sea level rise, erosion, sedimentation, etc.); hydro-meteorological hazards (floods, storms, tornadoes, cyclones, drought, lightning, etc.); and wild fire (forest fire, bush fire, grass fire, etc.). On the other
+
+103
+
+
+
+---PAGE-24---
+
+
+
+104 An Introduction to Coastal Engineering
+
+Fig. 5.1 A hazard has the potential for causing injuries to life, and damage to property and the environment (modified from an image courtesy of ADPC).
+
+hand, man-made hazards (also referred to as anthropogenic hazards) include industrial hazards such as oil and toxic material spills; pollution of water, air and soil; nuclear hazards; terrorism; overpopulation; and possibly, climate change and global warming.
+
+Hazards may also be grouped as rapid onset and slow onset hazards. Rapid onset hazards arrive suddenly, and therefore, their occurrence cannot be predicted far in advance. By contrast, slow onset hazards unfold over a time-scale of months to years. Rapid onset hazards include earthquakes, landslides, lightening, floods, tsunami and cyclones. Examples of slow onset (progressive) hazards are drought, epidemics and civil wars. Clearly, slow onset makes adequate early warning feasible and effective.
+
+|Box 5.1 Types of coastal hazards<br><br>• Natural hazards<br><br>- Tsunami<br>- Storm surges<br>- Sea level rise<br>- Coastal erosion<br><br><br>• Man-made hazards<br>|
+|---|
+
+
+This chapter is primarily concerned with four natural hazards that the coastal areas of Sri Lanka are exposed to, namely, tsunami, storm surges, sea level rise and beach erosion (Box 5.1).
+
+Vulnerability
+
+Vulnerability is the reduced capacity of an individual or a group to anticipate, cope with, resist and recover from the impact of a hazard. For the same hazard, some may be more vulnerable than others. For example, in the case of tsunami hazard, the elderly, women and children are more vulnerable to inundation flow because they have less physical strength than men. Nevertheless, in many societies, women are more resilient than men and play a crucial role in the recovery.
+
+Now, a more formal definition of vulnerability would be: ‘Vulnerability is a condition or set of conditions that reduces people’s ability to prepare for, withstand or respond to a hazard’.35 Different facets of vulnerability may be categorised as physical (e.g., potential loss of housing); social (e.g., age, gender, poverty); economic (e.g., potential loss of business, investment); and environmental (e.g., location).
+
+Vulnerability may be reduced by means of either structural or non-structural measures. A few examples of structural mitigation measures are, construction of flood protection dikes along river banks, use of building codes and appropriate material specifications in the design
+
+
+
+---PAGE-25---
+
+
+
+#### Appendices
+
+###### A. Notation
+
+- a amplitude Ae eroded cross-sectional area
+- b wave orthogonal spacing, shape factor
+
+- b0 wave orthogonal spacing in deep water
+
+B crest width of structure
+
+- c wave celerity (phase velocity)
+
+
+- c0 wave celerity in deep water Cf wind friction coefficient Cg group velocity Ct wave transmission coefficient
+
+
+- D damage level (to a sloping-mound breakwater) Dn50 median grain diameter, equivalent cube length of median rock Df, Dp mean rate of wave energy dissipation due to bed friction, percolation Ei,Ed,Er,Et incident, dissipated, reflected, transmitted wave energy
+
+- E specific energy (energy density) of a wave fc Coriolis parameter
+
+
+- g acceleration due to gravity
+- h water depth hs water depth at the toe of the structure H wave height Hb breaking wave height Hd,Hi,Hr diffracted, incident, refracted wave height Hs significant wave height Ho wave height in deep water H2% highest 2% of all wave heights in a record H10% highest one-tenth of all wave heights in a record Il submerged weight of sediment transported k wave number ks surface roughness
+
+
+155
+
+
+
+---PAGE-26---
+
+
+
+156 An Introduction to Coastal Engineering
+
+kt layer coefficient
+
+- K coefficient in sediment transport equation Kd wave diffraction coefficient KD armor unit stability coefficient Kp pressure response factor
+
+- Kr refraction coefficient
+- Ks shoaling coefficient
+
+
+- L wave length L0 wave length in deep water M50 median mass of rocks n ratio of wave group velocity to phase velocity, sediment porosity Ns armor unit stability number
+
+
+- p pressure pc central pressure in a tropical cyclone pd dynamic (wave induced) pressure pn neutral pressure (ambient atmospheric pressure away from cyclone)
+
+- P wave power per unit crest width; notional permeability Pl longshore component of wave power
+
+q average overtopping discharge per unit length
+
+- Q✳ dimensionless average overtopping discharge per unit length
+
+r radius
+
+- R beach retreat due to sea level rise, radius of maximum wind Rc crest freeboard Ru, Rd run-up, run-down
+
+Rc∗ dimensionless crest freeboard s wave steepness (=H/L)
+
+- S sea level rise, relative eroded area Sxx, Syy radiation stress components
+
+t time
+
+- T wave period Tm mean wave period Tp peak wave period
+
+u, v, w velocity components in x-, y- and z- directions
+
+- U, V depth-averaged velocities in x- and y-directions Vl velocity of longshore current W wind velocity, weight of individual stones in a sloping mound x, y, z Cartesian coordinates
+
+
+
+
+α angle between wave crests and bottom contours; structure slope angle β beach slope angle
+
+γb wave breaker index γa specific gravity of armour unit material
+
+
+
+---PAGE-27---
+
+
+
+Appendices 157
+
+γr surface roughness reduction factor ζ vertical component of water particle displacement
+
+η surface elevation above still water level θ average slope of active beach profile κ coefficient of permeability ξ breaker parameter (surf similarity parameter); horizontal component of
+
+water particle displacement ξm breaker parameter based on mean wave period ξmc critical breaker parameter based on mean wave period ρ density of sediment
+
+ρa density of armour unit material ρair density of the air ρw density of water or sea water τb bottom shear stress τs surface shear stress τx,τy shear stresses in x- and y- directions ϕ velocity potential
+
+ϕwave velocity potential for wave motion φ latitude on the surface of the Earth ω wave angular frequency; rotational speed of the Earth
+
+###### B. Abbreviations
+
+ADPC Asian Disaster Preparedness Centre BBC Bottom Boundary Condition CCD Coast Conservation Department CEM Coastal Engineering Manual DFSBC Dynamic Free Surface Boundary Condition DHWL Design High Water Level DMC Disaster Management Centre DS Divisional Secretariat DTHA Deterministic Tsunami Hazard Assessment GIS Geographical Information Systems ICZM Integrated Coastal Zone Management KE, PE,TE Kinetic, Potential, Total Energy KFSBC Kinematic Free Surface Boundary Condition MHWL Mean High Water Level MLWL Mean Low Water Level MSL Mean Sea Level MWL Mean Water Level PLBC Periodic Lateral Boundary Condition
+
+
+
+---PAGE-28---
+
+
+
+#### References
+
+- 1. U.S. Army Corps of Engineers, “Coastal Engineering Manual,” Engineer Manual 1110-2-1100, U.S. Army Corps of Engineers, Washington, D.C., 2002 (in 6 volumes).
+- 2. Coast Conservation Department. “Coastal Zone Management Plan-Sri Lanka,” Coast Conservation Department, Colombo, Sri Lanka, 1990.
+- 3. The Government of Sri Lanka, “Coast Conservation Act, No.57 of 1981,” The Government of Sri Lanka, 1981.
+- 4. Coast Conservation Department. “Revised Coastal Zone Management Plan-Sri Lanka,” Coast Conservation Department, Colombo, Sri Lanka, 1997.
+- 5. The Government of Sri Lanka, “Sri Lanka Coastal Zone Management Plan-2004,” Gazette Extra Ordinary No.1429/11, The Government of Sri Lanka, 2006.
+- 6. L. Prandtl, in Verhandlungen des dritten internationalen Mathematiker-Kongresses in Heidelberg 1904, A. Krazer, ed.,Teubner, Leipzig, Germany, 1905, p. 484. English trans. In Early Developments of Modern Aerodynamics, J. A. K. Ackroyd, B. P. Axcell, A. I. Ruban, eds., ButterworthHeinemann, Oxford, UK, 2001, p. 77.
+- 7. H. Schlichting, Boundary-Layer Theory, 7th ed., McGraw-Hill, New York, 1979.
+- 8. H. Lamb, Hydrodynamics, 6th ed., Cambridge Univ. Press, 1932.
+- 9. R. Dean and R. Dalrymple, Water Wave Mechanics for Engineers and Scientists, World Scientific, Singapore, 1984.
+- 10. H. V. Thurman, Introductory Oceanography. 4th ed., Columbus: Charles E. Merrill Publishing Company, 1985.
+- 11. Ib A. Svendsen and Ivar G. Jonsson, Hydrodynamics of Coastal Regions, Den Private Ingeniørfond, Denmark, 1982.
+- 12. J. McCowan, “On the Highest Wave of Permanent type,” Phil. Mag. J. Sci. 38 (1894), pp. 351-358.
+- 13. M. S. Longuet-Higgins and R. W. Stewart, “Radiation stresses in water waves; a physical discussion, with applications.” Deep-Sea Res. 2 (1964), pp. 529- 562.
+- 14. CIRIA, “The Rock Manual, The use of rock in hydraulic engineering,” 2nd ed., C683, CIRIA, London, 2007.
+- 15. J.W.Van der Meer, “Conceptual design of rubble mound breakwaters”, pp. 221-315, in Philip L.-F. Liu, Advances in Coastal and Ocean Engineering, Vol. 2, World Scientific, 1996.
+- 16. J. J. Wijetunge, “Large-scale wave run-up and overtopping measurements over a straight rubblemound breakwater without a crown wall,” in Proc. ASCE 5th Coastal Structures International Conference, Venice, Italy, Vol. 2, pp. 1285–1296, World Scientific, 2007.
+- 17. J.P. Ahrens, “Irregular wave run-up on smooth slopes,” Tech. Aid No. 81-17, Coastal Engineering Research Centre, Waterways Experiment Station, Vicksburg, Miss., 1981.
+- 18. M. W. Owen, “Design of Seawalls Allowing for Wave Overtopping,” Report No. 924, Hydraulics Research Station, Wallingford, UK, 1980.
+- 19. P. D. Komar and D. L. Inman, “Longshore Sand Transport on Beaches”, J. Geophys. Res. 75 (30)
+
+(1970), pp. 5914-5927.
+
+- 20. A. D. Short, Handbook of Beach and Shoreface Morphodynamics, John Willey and Sons, p. 379, 1999.
+- 21. CERC, “Shore Protection Manual,” U.S. Army Corps of Engineers, Coastal Engineering Research Center. U.S. Government Printing Office, Washington. D.C., 1984.
+
+
+164
+
+
+
+---PAGE-29---
+
+
+
+- 22. D. L. Inman, “History of Early Breakwaters,” Association of Coastal Engineers Newsletter, Alexandria, VA, 2001.
+- 23. National Research Council, Beach Nourishment and Protection, National Academy Press, Washington D.C., 1995.
+- 24. Robert G. Dean, Beach Noursihment: Theory and Practice. World Scientific, Singapore, 2002.
+- 25. US Army Corps of Engineers, “Coastal shore protection structures and techniques,” Coastal & Hydraulics Laboratory, US Army Corps of Engineers, http://chl.erdc.usace.army.mil.
+- 26. PIANC, “Criteria for Movements of Moored Ships in Harbours – a Practical Guide,” PIANC (Permanent International Association of Navigation Congresses) – Supplement to Bulletin No: 88, 1995.
+- 27. J. A. Sciortino, “Fishing harbour planning construction and management,” FAO Fisheries and Aquaculture Technical Paper No. 539, Food and Agriculture Organization of the United Nations, Rome, 2010.
+- 28. Y. Goda, Random Seas and Design of Maritime Structures, Advanced Series on Ocean Engineering, Vol. 15, World Scientific, Singapore, 1985.
+- 29. R. Y. Hudson, “Wave forces on breakwaters,” in Transactions ASCE 118, pp 653-674, ASCE New York, USA, 1953.
+- 30. J. W. Van der Meer, “Rock Slopes and Gravel Beaches Under Wave Attack,” Ph.D. diss., Delft University of Technology, The Netherlands, 1988. (Also Delft Hydraulics Publication No. 396).
+- 31. M. R. A. Van Gent, A. J. Smale and C. Kuiper, “Stability of rock slopes with shallow foreshores,” in Proc. 4th Int. Coastal Structures Conf. Portland, USA, ASCE, 2004.
+- 32. Robert M. Sorensen, Basic Coastal Engineering, 3rd ed., Springer, 2006.
+- 33. L. Z. Hales, “Floating Breakwaters: State-of-the-Art Literature Review,” Technical Report 81-1, U.S. Army Coastal Engineering Research Center, Ft. Belvoir, VA, 1981.
+- 34. D. J. Varnes, “Landslide hazard zonation: a review of principles and practice,” Natural Hazards No. 3, 61 pp., Commission of Landslides of the IAEG, UNESCO, 1984.
+- 35. V. Warmington, “Disaster Reduction: A review of Disaster Prevention, Mitigation and preparedness, Ottawa,” Reconstruction and Rehabilitation fund of the Canadian Council for International Co-operation, 1995.
+- 36. UNDRO, “Natural Disasters and Vulnerability Analysis,” Report of Expert Group Meeting. Geneva: Office of the United Nations Disaster Relief Coordinator, 1979.
+- 37. UNISDR, “Terminology on Disaster Risk Reduction,” United Nations International Strategy for Disaster Reduction, Geneva, Switzerland, 2009.
+- 38. Department of Census and Statistics, “Atlas on the buildings affected by the tsunami – 2004, and Tsunami census 2004/2005 – Final Report,” Department of Census and Statistics, The Government of Sri Lanka, 2005.
+- 39. National Geophysical Data Center (NGDC/WDS). (2011, June 1). Global Historical Tsunami Database, [Online] Available: http://www.ngdc.noaa.gov/hazard/tsu_db.shtml
+- 40. H. F. Reid, “The Mechanics of the Earthquake, The California Earthquake of April 18, 1906,” Report of the State Investigation Commission, Vol 2, Carnegie Institution of Washington, Washington, D.C., 1910.
+- 41. T. Kusky, Tsunamis: Giant Waves from the Sea, Facts on File Inc, New York, 2008.
+- 42. J. J. Wijetunge, “Tsunami on 26 December 2004: Spatial distribution of tsunami height and the extent of inundation in Sri Lanka,” Sci. Tsunami Haz. 24 (3) (2006), pp. 225– 239.
+- 43. S. Okada, “Surface displacement due to shear and tensile faults in a half-space,” Bull. Seism. Soc. Amer. 75 (1985), pp.1135–1154.
+- 44. L. Mansinha and D. E. Smylie, “The Displacement Field of Inclined Faults,” Bull. Seismol. Soc. Am. 61(5) (1971), pp. 1433–1440.
+- 45. J. J. Wijetunge, X. Wang and P. L. –F. Liu, “Indian Ocean Tsunami on 26 December 2004: Numerical modelling of inundation in three cities on the south coast of Sri Lanka,” J. Earthquake Tsunami 2 (2) (2008), pp. 133–155.
+
+
+
+
+---PAGE-30---
+
+
+
+166 An Introduction to Coastal Engineering
+
+- 46. Tsunami Pilot Study Working Group, “Seaside, Oregon Tsunami Pilot Study-Modernization of FEMA flood hazard maps,” NOAA OAR Special Report, NOAA/OAR/PMEL,Seattle, WA, 94 pp. + 7 appendices, 2006.
+- 47. The Government of Sri Lanka, “Sri Lanka Disaster Management Act, No.13 of 2005,” The Government of Sri Lanka, 2005.
+- 48. D. A. Wiens et al. “A diffuse plate boundary model for Indian Ocean tectonics,” Geophys. Res. Lett. 12 (7) (1985), pp. 429-432.
+- 49. D. Dominey-Howes, P. Cummins and D. Burbidge, “Historic records of teletsunami in the Indian Ocean and insights from numerical modelling,” Nat. Hazards 42 (1) (2007), pp. 1-17.
+- 50. W. Geiger (Translator), The Mahawamsa (The Great Chronicle of Ceylon–Sri Lanka). Oxford University Press, London, 1934 (In Sinhala; originally composed in Pali by Mahanama Thera in the 5th century AD).
+- 51. B. Gunasekera, Rajavaliya (Line of Kings) — A historical narrative of Singhalese Kings, Asian Educational Services, New Delhi, 1995. (Originally composed in Pali in the 17th century AD).
+- 52. W. H. Berninghausen, “Tsunamis and seismic seiches reported from regions adjacent to the Indian Ocean,” Bull. Seism. Soc. Am. 56 (1) (1966), pp. 69-74.
+- 53. N. H. Heck, “List of seismic sea waves,” Bull. Seism. Soc. Am. 37 (4) (1947), pp. 269-286.
+- 54. T. Marsh, A Naval History on the East Indies Station, 1937 (Extracts available at: http://www.btinternet.com/~initiative.cafe/ThomasMarsh.pdf)
+- 55. The Weekly Ceylon Observer – An English language newspaper, 28 August 1883 (also reproduced in Ceylon Daily News of 21 January 2005, Associated Newspapers of Ceylon Ltd.)
+- 56. P. L.-F. Liu et al., “Observations by the international tsunami survey team in Sri Lanka,” Science, 308 (2005), p. 1595.
+- 57. J. J. Wijetunge, “Field measurements and numerical simulations of the 2004 tsunami impact on the south coast of Sri Lanka,” Ocean Engrg. 36 (2009), pp. 960 – 973.
+- 58. J. J. Wijetunge, “Field measurements and numerical simulations of the 2004 tsunami impact on the east coast of Sri Lanka,” Pure Appl. Geophys. 166 (4) (2009), pp. 593 – 622.
+- 59. T. Tomita, F. Imamura, T. Arikawa, T. Yasuda and Y. Kawata, “Damage caused by the 2004 Indian Ocean tsunami on the southwestern coast of Sri Lanka,” Coastal Engrg. Journal 48 (2) (2007), pp. 99-116.
+- 60. UHSLC. [2011, November 20]. University of Hawaii Sea Level Centre [Online]. Available: http://uhslc.soest.hawaii.edu/.
+- 61. E. A. Okal and C. E. Synolakis, “Far-field tsunami hazard from mega-thrust earthquakes in the Indian Ocean,” Geophys. J. Int. 172 (2008), pp. 995–1015.
+- 62. J. J. Wijetunge, “Nearshore tsunami amplitudes off Sri Lanka due to probable worst-case seismic scenarios in the Indian Ocean,” Coastal Engrg. 64 (2012), pp. 47-56.
+- 63. M. Ioualalen, W. Rentería, K. Ilayaraja, M. Chlieh and P. Arreaga-Vargas, “Case study of impact of the 26th December 2004 Indian Ocean Tsunami on the coast of Sri Lanka.” Environ. Model. Softw. 25 (2010), pp. 1874–1880.
+- 64. WMO, “Tropical Cyclone Operational Plan for the Bay of Bengal and the Arabian Sea,” World Meteorological Organization Technical Document No. 84, World Meteorological Organization, Geneva, Switzerland, 2011.
+- 65. SMRC, “The impact of tropical cyclones on the coastal regions of SAARC countries and their influence in the region,” SAARC Meteorological Research Centre Publication No. 1, SAARC Meteorological Research Centre (SMRC), Bangladesh, 1998.
+- 66. Richard P. Dunne, Susana M. Barbosa, Philip L. Woodworth, “Contemporary sea level in the Chagos Archipelago, central Indian Ocean,” Global and Planetary Change, 82–83 (2012), pp. 2537.
+- 67. P. Chittibabu, S. K. Dube, P. C. Sinha, A. D. Rao and T. S. Murty, “Numerical Simulation of Extreme Sea Levels for the Tamil Nadu (India) and Sri Lankan Coasts,” Mar. Geod. 25 (3) (2002), pp. 235-244.
+
+
+
+
+---PAGE-31---
+
+
+
+- 68. S. M. Kulshrestha and M. G. Gupta, “Satellite study of the Rameswaram cyclonic storm of 20-23 December 1964,” J. Appl. Meteorol. 5 (3) (1966), pp. 373-376.
+- 69. CDM, Ceylon Daily Mirror Newspaper of 29 December 1964, Times of Ceylon, Colombo, 1964.
+- 70. DMSL. (2012, February 15). ‘Tropical cyclones; Cyclone events 1900-2000,” Department of Meteorology, Government of Sri Lanka [Online]. Available: http://www.meteo.gov.lk/
+- 71. G. J. Holland, “An analytic model of the wind and pressure profiles in hurricanes,” Mon. Weather Rev. 108 (1980), pp. 1212–1218.
+- 72. J. J. Wijetunge, “A Multi-Scenario Analysis of the Storm Surge Hazard for Sri Lanka,” Proc. 35th IAHR Congress, Tsinghua University Press, Beijing, 2013.
+- 73. Bruce C. Douglas, “Global Sea Rise: A Redetermination,” Surv. Geophys. 18 (1997), pp. 279-292.
+- 74. R. S. Nerem, D. Chambers, C. Choe, and G. T. Mitchum, “Estimating Mean Sea Level Change from the TOPEX and Jason Altimeter Missions,” Mar. Geod. 33 (1) supp 1 (2010), p. 435.
+- 75. IPCC, “IPCC Fourth Assessment Report: Climate Change 2007,” Intergovernmental Panel on Climate Change (IPCC), Geneva, Switzerland, 2007.
+- 76. Weiqing Han et al., “Patterns of Indian Ocean sea-level change in a warming climate,” Nature Geosci. 3 (2010), pp. 546–550.
+- 77. P. Bruun, “Sea level rise as a cause of shore erosion.” J. Wtrwy. & Harb. Div., 88 (1-3) (1962), pp. 117-130.
+- 78. M. Marchand (Ed.), “Concepts and Science for Coastal Erosion Management,” Concise report for policy makers. Deltares, Delft, 2010.
+- 79. CCD-GTZ, “Sediment transport study for the southwest coast of Sri Lanka,” CCD-GTZ Coast Conservation Project, Coast Conservation Department, Colombo, Sri Lanka, 1992.
+
+
+
+
+---PAGE-32---
+
+
+
+#### Index
+
+amplitude, 25, 37, 66, 134-135, 162 armour units, 84-85, 86-87, 89-92, 95
+
+stability, 85, 87, 91-92, 94 weight, 91-94
+
+backshore, 6 beach drift, 59 beach nourishment, 70-71, 74-75, 77-78, 153 Bernoulli equation, 14-15, 31, 158-159 boundary conditions, 13-18, 159 breakwaters
+
+berm, 84 composite, 84 curtain wall and pile, 102 detached, 75, 83, floating, 100-101 offshore, 70-71, 75-76 rubble-mound, 85-99 submerged, reef, 76-77, 84 vertical wall, 81, 83-84, 87
+
+bulkheads, 100 coastal cells, 152-153 coastal zone
+
+management, 7-10 regulations, 8-9 stakeholders, 7 terminology, 6
+
+coastal erosion management, 70, 152-154 mitigation, 7, 70-79
+
+coastal vegetation, 71, 79, 154 continental shelf, slope, 6, 111, 113-114, 146, Coriolis acceleration, 13, 56, 138, 141-144 Coriolis tide, 141 currents
+
+longshore, 56-57, 59-60, 74-75, 141 rip, 56-58, 75 tidal, 56
+
+168
+
+cyclones formation, 135-136, 138-139 landfall in Sri Lanka, 139-140 numerical modelling, 142-144 pressure distribution, 137, 142-143 structure, 137-138 wind speed distribution, 137, 142-143
+
+design storm, 89, 90, 92, 95, 98 disasters, 103, 105-107 dispersion relationship, 18, 29, 31, 163
+
+earthquakes, tsunamigenic fault types, 108-109 generation, 108-109 scenarios, 131-132 subduction, 129-131
+
+flood protection structures, coastal, 81 foreshore, 6, 51, 93
+
+group velocity, 34, 162-163 groynes, 58, 71, 74-75, 154
+
+hazards coastal, 1-2, 69, 103-104 definition, 103-104
+
+Hudson equation, 91-97, 99 inlet
+
+hydrodynamics, 79, stabilisation structures, 79-80
+
+Iribarren number, 49 jetty, 79-80 landslides, submarine, 104, 108, 110 Laplace equation, 13, 16-17, 159-160 littoral drift, 59 long wave equations, 116, 143
+
+
+
+---PAGE-33---
+
+
+
+Index 169
+
+Navier-Stokes equations, 158
+
+particle accelerations, 26 displacement, 28-29 orbit, trajectory, 29-30 velocity, 24-26
+
+radiation stresses, 50, 56 relative depth, 19-20, 42, 112 return period, recurrence interval, 89, 95, 122123, 145-146 revetments, 52-53, 66-67, 70-73, 153-154 risk, disaster, 105-106
+
+salient, 76 sediment
+
+budget, 152 bypassing, 74-75, 80
+
+sediment transport CERC formula, 60-61 cross-shore, 59, 61, 75-76, 152 longshore, 59-61, 74-76, 80, 83, 151-152
+
+sea level rise implications, 149-150 mitigation, 151 rates, 147-149
+
+seawalls, 71, 73, 81, 118, 153-154 shallow water equations, 116-117, 132 Snell’s law, 44 storm surges
+
+barriers, 81, 144-145 coastal flooding, 1, 70, 81, 100, 147, 149-150 generation, 140-142 hazard mitigation, 144-145 interaction with tide, 141 inundation, 135, 137, 140, 142, 147, 151 numerical modelling, 142-144
+
+surf similarity parameter, 49 surf zone, 6, 56-57, 75, 141 swash, 59 swell, 3, 61, 76 tidal datum, 5 tide
+
+astronomical, 1-6, 144-145 diurnal, 4-5 mixed, 4-5 neap, 5 semidiurnal, 4-5, 144 spring, 5 tombolo, 76
+
+tsunami arrival time, 112, 132-135, detection, 122, 124 early warning, 113, 118, 122, 124-126, 132 evacuation maps, 125-126 generation, 108-111 hazard mitigation, 117-129, 131-135 hazard maps, 120-121, 123 inundation, 125-126, 128, 131, 147 inundation distance, 115 numerical modelling, 115-117 propagation, 111-114 run-up, 114-115 submarine landslide generated, 110 volcanogenic, 110-111
+
+undertow, 56, 58 Van der Meer equation
+
+run-up, 50-52, 90 armour unit stability, 91-93
+
+velocity potential, 13, 17, 19, 24, 26, 159-162 vulnerability, 104-105, 107, 115, 118, 120, 145
+
+wave boundary layer, 12-14 wave breaking
+
+breaker criterion, index, 49, 60 breaker type, 49-50
+
+wave celerity, 2 wave classification, 3-5 wave, design, 4, 74-76, 89-91, 95-96, 99 wave diffraction, 40, 46-48
+
+coefficient, 47
+
+wave energy energy density, 33 energy dissipation, 48, 118 kinetic, 32-33, 50 potential, 32-33, 50
+
+wave frequency, angular, 2 wave height, definition, 2 wave-induced pressure, 31, 33, 39 wave length, definition, 2 wave number, 2 wave orthogonal, rays, 41 wave period, definition, 2 wave power, energy, 33-34, 39, 60-61 wave reflection, 50-51, 55, 71, 84-85
+
+coefficient, 55 wave refraction, 40, 43-45,
+
+coefficient, 44 wave run-up, run-down, 50-51 wave set-up, 58, 141
+
+
+
+---PAGE-34---
+
+
+
+170 waves, shallow water, 19-21, 26-28, 30, 39, 112113, 116 wave shoaling, 41-43
+
+coefficient, 42 wave-structure interaction, 50-55 wave surface profile, 25-26, 34 wave table, 21-24, 34, 39, 42, 45, 62-68 wave theory
+
+linear, 14-19 small amplitude, 17-18, 112, 117 Stokes, 18
+
+wave transformation, 40-41 wave transmission, 50, 54-55, 101 wave overtopping, 53-54
+
+allowable, 53 measurements, 53-54 Owen’s formula, 53-54
+
+wind shear stress, 143-144
+

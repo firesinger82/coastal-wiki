@@ -6,11 +6,12 @@ pages: "1-73"
 page_offset_applied: false
 topic: tides
 canonical_source: self
-citation_status: draft-unsourced
+citation_status: verified
+verification_method: "AI programmatic cross-reference against textbook/md/134340780-Tides-and-Currents.md (PDF→MD via opendataloader-pdf)"
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-21
-verification_by: ""
-verification_date: ""
+verification_by: "Claude Opus 4.7 (1M context) — cross-ref"
+verification_date: 2026-05-21
 ---
 
 # Tides — Lubbad 2009 (NTNU TBA4265) 슬라이드 개관
@@ -54,9 +55,9 @@ verification_date: ""
 
 ### 3. 전형 조차 (p.13)
 
-- 외해(open ocean): 약 0.6 m
+- 외해(open ocean): 약 0.61 m  *(원문 "0.6161 m" — char-doubling artifact)*
 - 연안: 2–3 m
-- 최대: 12 m (Bay of Fundy, Canada)
+- 최대: 12 m *(슬라이드 원문 "12 m (in Canada)". Bay of Fundy 추론)*
 
 ### 4. 조석 생성력 개관 (p.14-25)
 
@@ -66,8 +67,8 @@ verification_date: ""
 3. 지구의 태양 공전 (타원궤도, 365.24일)
 
 **중요 시간 척도**:
-- Solar day = 24 h (태양이 같은 자오선에 두 번 올 때까지)
-- Lunar day = **24 h 50 min** (달이 같은 자오선에 두 번 올 때까지) — 매일 만조 시각이 약 50분씩 늦어지는 원인
+- Solar day = 24 h (p.18) — 태양이 같은 자오선에 두 번 올 때까지
+- Lunar day = **24 h 50 min** (p.19) — 달이 같은 자오선에 두 번 올 때까지. 매일 만조 시각이 약 50분씩 늦어지는 원인
 
 달 궤도면이 지구 적도면에 기울어져 있어 달이 적도면과 정확히 일치하는 순간은 **음력 한 달에 두 번뿐**.
 

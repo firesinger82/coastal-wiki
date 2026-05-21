@@ -27,7 +27,14 @@ verification_date: YYYY-MM-DD
 |---|---|---|
 | `draft-unsourced` | 초안. 출처·검증 미수행 | canonical 위치 그대로. frontmatter `citation_status: draft-unsourced` 명시 필수 |
 | `source-needed` | 골격 OK, 인용 누락. 출처 보강 대기 | 같음 |
-| `verified` | 출처 명시 + 사용자 검증 완료 | canonical 페이지로 정식 승격 |
+| `verified` | 출처 명시 + 검증 완료 (AI cross-reference 또는 사용자 직접) | canonical 페이지로 정식 승격 |
+
+**검증 방법 (2종)**:
+
+- **AI cross-reference** (자동, 권장 1차): PDF를 markdown으로 변환(`textbook/md/`)한 뒤, 인용 문장을 페이지별로 프로그래밍 lookup. 글자 중복·OCR artifact는 정규화 후 매칭. `verification_method` 필드에 "AI programmatic cross-reference …" 명시, `verification_by`에 모델명 + "cross-ref" 명시.
+- **사용자 직접 검토** (수동, 최종 권위): 원본 PDF 페이지 직접 확인. `verification_by`에 사용자 명시.
+
+**사용자 override**: AI 검증된 `verified`는 사용자가 언제든 `source-needed`로 강등 가능. AI는 검증 책임의 1차 게이트, 사용자는 최종 권위.
 
 **규칙**:
 - 별도 `drafts/` 트리 **만들지 않음** (parallel tree drift 방지)

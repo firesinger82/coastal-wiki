@@ -8,6 +8,21 @@
 - PDF는 git에 부담 (LFS 불필요)
 - 교과서는 변경 없는 자료 → 원본 위치 안정
 
+## 텍스트 추출 (textbook/md/)
+
+PDF → Markdown 변환본을 `textbook/md/<filename>.md`에 보관 — AI cross-reference 검증·검색·인용 페이지 lookup에 사용.
+
+- 변환 도구: `opendataloader-pdf` (venv: `.venv-tools/`)
+- 변환 명령:
+  ```bash
+  .venv-tools/bin/opendataloader-pdf /mnt/d/Study/textbook/ -o textbook/md/ \
+    -f markdown --image-output off \
+    --markdown-page-separator $'\n\n---PAGE-%page-number%---\n\n' --threads 2
+  ```
+- 페이지 구분자 `---PAGE-NN---`로 페이지별 검색 가능
+- 슬라이드 PDF는 글자/단어 중복 artifact 발생 가능 (OCR/렌더 한계). 검증 시 정규화 후 비교
+- 새 PDF 추가 시 동일 명령 재실행 (idempotent)
+
 ## 인용 안정화 — source_id 사용
 
 raw 파일명·Windows 경로 **직접 인용 금지**. 모든 인용은 [sources.yml](sources.yml)에 등록된 안정적 `source_id` 사용:
