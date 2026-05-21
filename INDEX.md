@@ -6,7 +6,7 @@
 
 | 토픽 | 상태 | 비고 |
 |---|---|---|
-| [tides](concepts/tides/) | **WIP** (01·02·03 verified) | 조석 — 01·02·03 verified (AI cross-ref). 04 code-and-tools 다음 |
+| [tides](concepts/tides/) | **WIP** (01·02·03·04 verified) | 조석 — 4 파일 verified (AI cross-ref + WebSearch). 05 examples 또는 06 model-app 다음 |
 | [waves](concepts/waves/) | TBD | 파랑 |
 | [sediment-transport](concepts/sediment-transport/) | TBD | 표사이동 |
 | [currents](concepts/currents/) | TBD | 흐름 |
