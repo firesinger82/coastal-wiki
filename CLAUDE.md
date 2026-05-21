@@ -10,9 +10,11 @@
 
 1. **객관 레이어가 먼저**. `concepts/`와 `models/` 안의 단언은 **모두 출처 인용** 필수 (소스코드 file:line, 메뉴얼 페이지, 논문 인용, 교과서 챕터).
 2. **개인 경험은 `experience/`에만**. 그것도 (a) 반복 관찰 (b) 객관 데이터 근거 (c) 다른 곳에서 재현 가능 — 세 조건 모두 만족 시.
-3. **AI 요약은 원본과 명확히 구분**. 요약 노트 상단에 원본 위치 링크 + 요약 작성자(AI 모델명, 날짜) 기록.
+3. **AI 요약은 원본과 명확히 구분**. frontmatter `citation_status` 필드 ([CONVENTIONS.md](CONVENTIONS.md) §2) — `draft-unsourced` / `source-needed` / `verified`.
 4. **모델 적용 케이스는 객관 가능한 것만**. "내가 해보니" 화법 금지 (`experience/`로 이동).
 5. **단일 writer**. 다른 PC에서는 절대 수정 금지(읽기 전용). 동시 편집 conflict 방지.
+6. **Canonical source 분리** ([CONVENTIONS.md](CONVENTIONS.md) §3): 모델 메커닉 → `models/<model>/`, 도메인 개념 → `concepts/<topic>/`. 다른 곳에는 요약 + 링크만.
+7. **textbook 인용은 `source_id` 기반**. raw 파일명·Windows 경로 직접 사용 금지. 매니페스트는 [textbook/sources.yml](textbook/sources.yml).
 
 ## 디렉토리 책임
 
@@ -26,18 +28,17 @@
 | `examples/` | 개념을 가로지르는 실습 (재현 가능 코드/데이터) | 특정 프로젝트 산출물 |
 | `experience/` | 위 3조건 통과한 검증 경험 | 미검증 직관 |
 
-## 새 토픽 생성 워크플로
+## 새 토픽 생성 워크플로 (최소 시작)
 
-1. `concepts/_template/` 디렉토리 통째로 복사해 `concepts/<topic>/`로 이름 변경
-2. 6개 단계 파일 채우기:
-   - `01-concept.md` — 정의·맥락
-   - `02-theory.md` — 일반 이론·지배방정식
-   - `03-analysis-methods.md` — 분석법·통계량
-   - `04-code-and-tools.md` — 관련 코드·툴 (소스 위치, 입출력)
-   - `05-examples.md` — 학습 예제
-   - `06-model-application.md` — `models/<model>/`로 링크 + 적용 케이스
-3. 관련 textbook 챕터는 `textbook/notes/<topic>-<source>-chN.md`로 발췌
-4. `INDEX.md`에 토픽 등록
+[CONVENTIONS.md](CONVENTIONS.md) §8 — 6파일 전체 생성 강제하지 않음.
+
+1. `concepts/<topic>/` 디렉토리 생성
+2. **최소 필수 2 파일**: `README.md` + `01-concept.md` (frontmatter `citation_status` 명시)
+3. 나머지 (02~06)는 sourced claim이 생기면 그때 생성
+4. 관련 textbook 챕터는 `textbook/notes/<topic>-<source_id>-chN.md`로 발췌 (인용은 [textbook/sources.yml](textbook/sources.yml)의 `source_id` 사용)
+5. `INDEX.md`에 토픽 등록 (미생성 섹션 컬럼으로 진척 추적)
+
+전체 6파일 템플릿이 필요하면 `concepts/_template/`에서 골라 복사.
 
 ## 새 모델 추가 워크플로
 
@@ -51,8 +52,11 @@
 
 1. [README.md](README.md) — 전반
 2. [INDEX.md](INDEX.md) — 현재 채워진 항목 맵
-3. [textbook/POLICY.md](textbook/POLICY.md) — textbook 통합 규칙
-4. [plan.md](plan.md) — 초기 구조 결정 기록
+3. [CONVENTIONS.md](CONVENTIONS.md) — 작성 규약 (frontmatter, citation_status, canonical source)
+4. [BOUNDARY.md](BOUNDARY.md) — modeling-wiki와의 경계
+5. [textbook/POLICY.md](textbook/POLICY.md) — textbook 통합 규칙
+6. [textbook/sources.yml](textbook/sources.yml) — source_id 매니페스트
+7. [plan.md](plan.md) — 결정 기록 (Governance Decisions G1-G7 포함)
 
 ## 검색
 

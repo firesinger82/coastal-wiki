@@ -1,5 +1,7 @@
 # models/_template/
 
+> **Canonical source**: 이 디렉토리(`models/<model>/`)가 해당 모델의 구현·메커닉에 대한 진실의 원천. `concepts/<topic>/06-model-application.md`는 여기로의 링크만 가짐.
+
 새 모델 정리용 템플릿. 사용:
 
 ```bash

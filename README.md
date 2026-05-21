@@ -14,9 +14,11 @@
 
 1. **객관 레이어 우선**. 개인 경험은 `experience/`에만, 그것도 통과 기준 만족 후.
 2. **모든 단언은 출처 명시** (소스코드 라인, 메뉴얼 페이지, 논문 인용, 교과서 챕터).
-3. **AI 요약은 검증된 요약만**. 원본·요약 구분 명확화. 원본 위치 링크 필수.
-4. **단일 writer**. 이 PC가 작성자, 다른 PC는 read-only.
-5. **수정 이력은 git이 책임진다**. 임의 삭제·재구성 시 reasoning을 커밋 메시지에 기록.
+3. **AI 요약은 frontmatter `citation_status`로 추적** ([CONVENTIONS.md](CONVENTIONS.md) §2). `verified` 승격 책임자 = 사용자.
+4. **Canonical source 분리**: 모델 메커닉 → `models/`, 도메인 개념 → `concepts/`. 다른 곳은 요약 + 링크만.
+5. **textbook 인용은 `source_id`만**. raw 파일명·Windows 경로 직접 인용 금지 ([textbook/sources.yml](textbook/sources.yml)).
+6. **단일 writer**. 이 PC가 작성자, 다른 PC는 read-only.
+7. **수정 이력은 git이 책임진다**. 임의 삭제·재구성 시 reasoning을 커밋 메시지에 기록.
 
 ## 디렉토리
 
@@ -45,5 +47,7 @@
 - [CLAUDE.md](CLAUDE.md) — Claude 진입점
 - [AGENTS.md](AGENTS.md) — Codex 진입점
 - [INDEX.md](INDEX.md) — 전체 맵
-- [plan.md](plan.md) — 초기 구조 결정 기록
-- [textbook/POLICY.md](textbook/POLICY.md) — textbook 통합 정책
+- [CONVENTIONS.md](CONVENTIONS.md) — 작성 규약 (frontmatter, citation_status, canonical source)
+- [BOUNDARY.md](BOUNDARY.md) — modeling-wiki와의 경계 정책
+- [plan.md](plan.md) — 결정 기록 (Governance Decisions G1-G7 포함)
+- [textbook/POLICY.md](textbook/POLICY.md), [textbook/sources.yml](textbook/sources.yml) — textbook 통합 정책 + 매니페스트

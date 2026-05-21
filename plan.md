@@ -67,13 +67,68 @@ coastal-wiki/
 
 큰 변경 시: `plan.md` 작성 → `/codex:adversarial-review` → 반영 → 구현 → `/codex:review`
 
+## Governance Decisions (Codex MODIFY 검토 반영, 2026-05-21)
+
+Codex adversarial review가 HIGH 4 + MID 6 위험 지적. 다음 결정으로 처리.
+
+### G1. concepts ↔ models 소유권 규칙
+
+- **모델 메커닉(어떻게 구현됐는가)** → `models/<model>/`이 **canonical source**
+- **도메인 개념(무엇인가)** → `concepts/<topic>/`이 **canonical source**
+- `concepts/<topic>/06-model-application.md`는 **요약 + `models/<model>/` 링크**만 가짐. 구현 디테일 복제 금지
+- 모든 모델 적용 문서 상단에 `Canonical source: models/<model>/<file>` 블록 명시
+
+### G2. textbook 매니페스트 + 인용 안정화
+
+- `textbook/sources.yml` 도입 — 각 PDF에 `source_id`(stable), `filename`, `edition`, `sha256`, `page_offset` 기록
+- 인용은 `(source_id, page)` 페어 사용. Windows 경로 직접 인용 금지
+- 파일 이동·교체·손상 시 `sources.yml`만 갱신하면 전 인용 일관성 유지
+
+### G3. 인용 상태 워크플로
+
+frontmatter `citation_status` 필드 도입:
+
+| 값 | 의미 | 위치 허용 |
+|---|---|---|
+| `draft-unsourced` | 초안, 출처 미정 | `drafts/` 또는 `concepts/<topic>/`의 frontmatter에 명시 |
+| `source-needed` | 구조는 OK, 인용 보완 필요 | 같음 |
+| `verified` | 출처 명시·검증 완료 | canonical 페이지 승격 가능 |
+
+`INDEX.md`에 비-`verified` 항목 표시.
+
+### G4. modeling-wiki 경계 정책
+
+- `D:\modeling-wiki/` = 경험·실험 로그 (experience 레이어 prototype)
+- `~/coastal-wiki/` = 객관 + experience 통합 우산
+- 마이그레이션: `modeling-wiki/knowledge/`의 검증된 항목 → `coastal-wiki/experience/` (분기 미정, 별도 의사결정 필요)
+- 새 객관 자료는 **coastal-wiki에만** 작성 (modeling-wiki에 새 객관 노트 금지)
+- 별도 BOUNDARY.md에 상세
+
+### G5. 라이선스
+
+- 콘텐츠 라이선스: **본인용 비공개** (당분간 private repo). 외부 공개 시점에 CC BY-NC-SA 등 재결정
+- textbook 인용은 fair use 범위 (요약·발췌·교육 목적). 본문 대량 복붙 금지
+- 코드 스니펫: 원본 라이선스 명시, 인용
+
+### G6. 검색 인덱싱
+
+- 인덱스 재빌드: **수동**, 큰 변경 후 (`qmd embed` 또는 `mcp__qmd__` 도구). 정기 cron 불필요
+- 일상 검색: `rg`/grep으로 충분
+- frontmatter `topic`, `citation_status`, `model` 필드 기반 필터링 우선
+
+### G7. AI 노트 검증 책임
+
+- AI 초안 작성자 = 모델명 + 날짜 명시 (이미 POLICY.md에 있음)
+- 검증 책임자 = **사용자** (firesinger). 다른 AI 모델이 spot-check 가능하지만 최종 `verified` 승격은 사용자 검토 후
+- AI 간 cross-verification (Claude → Codex review)은 보조 도구. 책임은 사용자
+
 ## 미결 사항
 
 - textbook 자료 13권 중 어느 것부터 노트화할지 우선순위
 - private repo 호스팅(GitHub/GitLab/self-hosted) 결정
-- experience/ 레이어 도입 시점 (객관 레이어가 얼마나 채워진 후)
-- modeling-wiki 통합 여부
+- modeling-wiki → coastal-wiki/experience/ 마이그레이션 시점 결정
+- experience/ 레이어 실작성 시점 (객관 레이어가 얼마나 채워진 후)
 
-## 검증 권장
+## 검증 이력
 
-다음 단계: `/codex:adversarial-review`로 이 구조 비판 검토.
+- 2026-05-21: 초기 plan → Codex adversarial review → MODIFY 판정 → Governance Decisions 추가 (위 G1-G7)
