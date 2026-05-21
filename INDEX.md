@@ -7,7 +7,7 @@
 | 토픽 | 상태 | 비고 |
 |---|---|---|
 | [tides](concepts/tides/) | **DRAFT** (01-05 verified, 06 source-needed) | 조석 — 5/6 verified. 06은 `models/<model>/` 작성 후 verified 가능 |
-| [waves](concepts/waves/) | TBD | 파랑 |
+| [waves](concepts/waves/) | **WIP** (01 verified, 02-06 TBD) | 파랑 — 01 완성. Holthuijsen 2007 + SWAN library + MPT 74정점 통합 진행 중 |
 | [sediment-transport](concepts/sediment-transport/) | TBD | 표사이동 |
 | [currents](concepts/currents/) | **DRAFT** (01-05 verified, 06 source-needed) | 조류 — 5/6 verified (UTide 2D + 수치조류도 + KHOA 60+ 용어). 동해 수치조류도 미커버 명시 |
 | [littoral-drift](concepts/littoral-drift/) | TBD | 연안표사 |
@@ -18,6 +18,7 @@
 | 모델 | 상태 | 비고 |
 |---|---|---|
 | [EFDC](models/EFDC/) | TBD | 사용자 주력 모델 |
+| [SWAN](models/SWAN/) | **STUB** (README 완료, 하위 작성 예정) | 천해 풍파 spectral · Holthuijsen 공동개발 · WINK 패턴 |
 | [ADCIRC](models/ADCIRC/) | TBD | |
 | [XBeach](models/XBeach/) | TBD | |
 | [Delft3D](models/Delft3D/) | TBD | |

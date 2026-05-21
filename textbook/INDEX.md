@@ -64,6 +64,7 @@
 | [notes/tides-foreman1977-appendix.md](notes/tides-foreman1977-appendix.md) | tidal-heights-manual | tides | verified (appendix only, 본문 p.1-47 OCR 보강 대기) |
 | [notes/tides-khoa-nonharmonic-research.md](notes/tides-khoa-nonharmonic-research.md) | dashboard-khoa-data | tides | verified (부산항 검증 완료, 인천 데이터 발췌 포함) |
 | [notes/tides-khoa-cross-verification.md](notes/tides-khoa-cross-verification.md) | khoa-tide-model | tides | verified (3개 source 산재값 cross-verification 보고서) |
+| [notes/waves-holthuijsen-toc.md](notes/waves-holthuijsen-toc.md) | holthuijsen2007 | waves | verified (Ch.1-9 + Appendix TOC, Ch.9 SWAN canonical) |
 
 용어집:
 - [`khoa-portcals-glossary`](sources.yml) — `/mnt/d/wsl_env/maritime-glossary-mcp/glossary.json` (3055 entries, KHOA + PORTCALS). 인용 `([KHOA] 용어)` 또는 `([PORTCALS] 용어)`.
