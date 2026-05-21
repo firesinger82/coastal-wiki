@@ -53,6 +53,20 @@
 - `coastal-wiki/experience/<항목>.md`에서 원본 `modeling-wiki/...` 위치를 frontmatter `origin:` 필드로 기록
 - 반대 방향 (`modeling-wiki`에서 `coastal-wiki` 참조)는 본문 내 텍스트 링크로 자유
 
+## 외부 편집 인테이크 (단일 writer 정책 예외 처리)
+
+다른 PC에서 오류·추가 항목 발견 시 우회 워크플로 (read-only 원칙 유지하면서):
+
+1. **메모 적기**: 다른 PC에서 발견한 수정 사항을 `~/coastal-wiki-intake.txt` 같은 임시 파일에 기록 (이 wiki 외부)
+2. **patch 파일 생성** (선택): 사소한 typo면 `git diff > intake.patch`를 메모 첨부
+3. **writer PC에서 처리**: writer PC로 돌아와 sync 후 직접 편집·커밋
+4. **issue tracker 대체**: GitHub repo 호스팅 후엔 Issues 활용 가능
+
+**금지**:
+- reader PC에서 직접 commit
+- reader PC와 writer PC에서 동시 편집
+- 다른 PC의 로컬 staging area에 변경 유지 (sync 충돌 원인)
+
 ## 통합 결정 시점
 
 다음 트리거 중 하나 발생 시 두 wiki 통합 재검토:

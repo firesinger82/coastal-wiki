@@ -25,12 +25,26 @@ verification_date: YYYY-MM-DD
 
 | 상태 | 의미 | 허용 위치 |
 |---|---|---|
-| `draft-unsourced` | 초안. 출처·검증 미수행 | `drafts/`, 또는 어디든 frontmatter에 표시 |
+| `draft-unsourced` | 초안. 출처·검증 미수행 | canonical 위치 그대로. frontmatter `citation_status: draft-unsourced` 명시 필수 |
 | `source-needed` | 골격 OK, 인용 누락. 출처 보강 대기 | 같음 |
-| `verified` | 출처 명시 + 사용자 검증 완료 | canonical 페이지로 승격 가능 |
+| `verified` | 출처 명시 + 사용자 검증 완료 | canonical 페이지로 정식 승격 |
 
-- `INDEX.md`는 verified 외 상태를 **별도 컬럼/플래그**로 표시
-- `concepts/<topic>/` canonical 페이지는 **verified만**. 미검증은 `concepts/<topic>/drafts/`에 격리
+**규칙**:
+- 별도 `drafts/` 트리 **만들지 않음** (parallel tree drift 방지)
+- 미검증 노트도 canonical 위치(`concepts/<topic>/01-concept.md` 등)에 둠. frontmatter 상태가 진실
+- `INDEX.md`는 비-`verified` 항목을 **상태 컬럼**으로 표시
+- `concepts/<topic>/`에서 다른 노트 인용 시 그 노트의 `citation_status`가 `verified`가 아니면 인용하는 쪽도 `source-needed`로 강등
+
+## 2.1 Governance 문서의 frontmatter 예외
+
+다음 문서는 정책·메타 성격이라 frontmatter 의무 면제:
+
+- `README.md`, `CLAUDE.md`, `AGENTS.md`, `INDEX.md`, `plan.md`, `CONVENTIONS.md`, `BOUNDARY.md`
+- 각 디렉토리의 `README.md`
+- `_template/` 내 파일
+- `textbook/POLICY.md`, `textbook/INDEX.md`, `textbook/sources.yml`
+
+이 파일들은 콘텐츠가 아닌 거버넌스 layer. 변경 이력은 git이 책임.
 
 ## 3. Canonical Source 규칙
 

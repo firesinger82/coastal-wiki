@@ -16,10 +16,13 @@
 #   notes          비고
 #
 # 파일 교체 시 갱신 절차:
-# 1) 새 PDF의 sha256, bytes 재계산
-# 2) sources.yml에서 해당 source_id 항목의 sha256/bytes 갱신
-# 3) page_offset 변경 여부 확인 (판이 바뀌었으면 인용 페이지 재확인 필요)
-# 4) commit message: "textbook: update <source_id> source (edition X → Y)"
+# 1) 새 PDF의 sha256, bytes 재계산 → sources.yml 갱신
+# 2) edition·year 변경 여부 확인. 변경됐으면 edition/year 갱신
+# 3) page_offset 재확인 — 판이 바뀐 경우 페이지 번호가 이동했을 수 있음
+# 4) **기존 인용의 페이지 검증**: 이 source_id를 인용한 모든 노트 (`rg "source_id: <id>" ~/coastal-wiki/textbook/notes/`)의 frontmatter `citation_status`를 `source-needed`로 강등 → 사용자가 페이지 재대조 후 `verified`로 복원
+# 5) commit message: "textbook: update <source_id> source (edition X → Y, citations need re-verify)"
+#
+# 즉 "sources.yml만 갱신하면 끝"이 아님. 판이 바뀌면 인용 재검증 의무.
 
 sources:
   - source_id: tides-and-currents

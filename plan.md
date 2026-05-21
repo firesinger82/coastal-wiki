@@ -45,7 +45,8 @@ coastal-wiki/
 ### 3. textbook 통합: 원본은 D:\Study\textbook 유지, wiki는 노트만
 
 - 이유: PDF는 git에 부담 (LFS 도입 회피). 교과서 자료는 변경 없음 → 원본 위치 안정.
-- 방식: `textbook/notes/<topic>-<source>-chN.md` 형식으로 챕터별 발췌·요약. 상단에 `Source: D:\Study\textbook\<file> p.NN` 명시.
+- 방식: `textbook/notes/<topic>-<source_id>-chN.md` 형식으로 챕터별 발췌. raw 파일명·Windows 경로 직접 인용 **금지** — 안정적 `source_id`(예: `holthuijsen2007`) 페어 사용. 매니페스트는 `textbook/sources.yml`.
+- 갱신 규칙은 [G2](#g2-textbook-매니페스트--인용-안정화)에서 상세.
 
 ### 4. 파일·디렉토리 명: 영문, 본문: 한·영 자유
 

@@ -32,11 +32,13 @@
 
 ## 진입 순서
 
-새 토픽 작업 시:
-1. `concepts/_template/` 복제해 `concepts/<topic>/` 생성
-2. 해당 토픽 관련 textbook 참조를 `textbook/notes/`에 추출
-3. 관련 모델 항목은 `models/<model>/`에 객관 분석을 두고 `concepts/<topic>/06-model-application.md`에서 링크
-4. 예제는 `examples/<scenario>/`에 둠
+새 토픽 작업 시 (최소 시작, [CONVENTIONS.md](CONVENTIONS.md) §8):
+1. `concepts/<topic>/` 디렉토리 생성
+2. **2 파일 우선 작성**: `README.md` + `01-concept.md` (frontmatter `citation_status` 명시)
+3. 해당 토픽 관련 textbook 참조를 `textbook/notes/`에 추출 (`source_id` 페어 사용)
+4. 02~06 단계 파일은 sourced claim이 쌓이면 생성 (전체 템플릿은 `concepts/_template/`에서 골라 복사)
+5. 관련 모델 객관 분석은 `models/<model>/`에 두고 `concepts/<topic>/06-model-application.md`에서 링크
+6. 예제는 `examples/<scenario>/`에 둠
 
 ## 동기화
 

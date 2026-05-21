@@ -60,9 +60,10 @@
 
 ## 검색
 
-- `mcp__qmd__query` (현 환경 설치됨) — BM25/시맨틱
-- 빠른 키워드: `grep -r "키워드" ~/coastal-wiki/concepts/`
-- 큰 출력은 `ctx_execute(language: "shell", code: "grep ...")` 경유
+- `mcp__qmd__query` — BM25/시맨틱 (수동 인덱스 빌드 필요, [plan.md G6](plan.md))
+- 빠른 키워드: `rg "키워드" ~/coastal-wiki -g "*.md" -g "*.yml"` — 전체 트리 스코프 (concepts/models/textbook/examples/experience/governance 문서 포함)
+- 토픽·상태 필터: frontmatter 검색 — `rg "citation_status: verified" -l ~/coastal-wiki`
+- 큰 출력은 `ctx_execute(language: "shell", code: "rg ...")` 경유
 
 ## 사용자 워크플로 (santa-method)
 
