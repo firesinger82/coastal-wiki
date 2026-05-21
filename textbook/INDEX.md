@@ -59,4 +59,8 @@
 
 | 노트 파일 | source_id | 토픽 | 상태 |
 |---|---|---|---|
-| `notes/tides-lubbad2009-overview.md` | lubbad2009-tides-slides | tides | draft-unsourced (사용자 verified 대기) |
+| [notes/tides-lubbad2009-overview.md](notes/tides-lubbad2009-overview.md) | lubbad2009-tides-slides | tides | verified |
+| [notes/tides-stewart-ch17.md](notes/tides-stewart-ch17.md) | stewart-physical-ocean | tides | verified |
+
+용어집:
+- [`khoa-portcals-glossary`](sources.yml) — `/mnt/d/wsl_env/maritime-glossary-mcp/glossary.json` (3055 entries, KHOA + PORTCALS). 인용 `([KHOA] 용어)` 또는 `([PORTCALS] 용어)`.

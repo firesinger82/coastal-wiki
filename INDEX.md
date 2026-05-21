@@ -6,7 +6,7 @@
 
 | 토픽 | 상태 | 비고 |
 |---|---|---|
-| [tides](concepts/tides/) | **WIP** (01 draft-unsourced) | 조석 — 01-concept.md 초안 완료, 사용자 verify 대기 |
+| [tides](concepts/tides/) | **WIP** (01 + 02 verified) | 조석 — 01-concept.md + 02-theory.md verified (AI cross-ref). 03 분석법 다음 |
 | [waves](concepts/waves/) | TBD | 파랑 |
 | [sediment-transport](concepts/sediment-transport/) | TBD | 표사이동 |
 | [currents](concepts/currents/) | TBD | 흐름 |
