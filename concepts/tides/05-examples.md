@@ -236,7 +236,15 @@ NOAA verified (실측)와의 잔차는 기상·storm surge 등 비-천문조 변
 
 (`dashboard-khoa-data`/`data/조석/조위관측소_조화상수.csv`, [tides-khoa-nonharmonic-research.md](../../textbook/notes/tides-khoa-nonharmonic-research.md) §7)
 
-| 분조 | 진폭 (cm) | 위상 GMT (°) | 위상 KST (°) |
+> **위상 기준 주의** ([02-theory.md §8.3.1](02-theory.md) 변도성 2007):
+> - GMT (G) = 그리니치 자오선 기준
+> - KST (g) = 135°E 자오선 기준
+> - 변환: g = G + 9·a_M2 = G + 260.857° (mod 360)
+> - 인천 M2 검증: 228.79 + 260.857 = 489.647 → **129.647°** ≈ 129.79 ✓
+>
+> `tide_model` 통합 DB의 m2_pha_g는 인천에서 137.463°로 잘못 계산 — 인용 시 본 표(DASHBOARD 조위관측소 원본) 우선. 상세 [tides-khoa-cross-verification.md](../../textbook/notes/tides-khoa-cross-verification.md) §3.
+
+| 분조 | 진폭 (cm) | 위상 GMT G (°) | 위상 KST g (°) |
 |---|---|---|---|
 | **M₂** | 284.525 | 228.79 | 129.79 |
 | **S₂** | 114.625 | 276.91 | 186.91 |

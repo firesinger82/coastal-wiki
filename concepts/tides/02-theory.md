@@ -332,18 +332,37 @@ DL을 0으로 설정하면 MSL = Z₀ (DL 기준 표기).
 
 ### 8.3 한국 4대분조 각속도 (국립해양조사원고시 제2021-7호)
 
-| 분조 | 각속도 (°/hr) | 주기 (h) |
-|---|---|---|
-| **M₂** | 28.9841042 | 12.4206 |
-| **S₂** | 30.0000000 | 12.0000 |
-| **K₁** | 15.0410686 | 23.9344 |
-| **O₁** | 13.9430356 | 25.8194 |
+| 분조 | 각속도 (°/hr, **9자리 정밀**) | 주기 (h) | 9·a (KST offset) |
+|---|---|---|---|
+| **M₂** | 28.984104156 | 12.4206 | 260.857° |
+| **S₂** | 30.000000000 | 12.0000 | 270.000° |
+| **K₁** | 15.041068639 | 23.9344 | 135.370° |
+| **O₁** | 13.943035584 | 25.8194 | 125.487° |
 
-→ Stewart Table 17.2 (§4.2) 값과 정합.
+→ Stewart Table 17.2 (§4.2) 값과 정합. 9자리 정밀값은 `khoa-tide-model` skill.md 인용 ([tides-khoa-cross-verification.md](../../textbook/notes/tides-khoa-cross-verification.md) §2 검증).
+
+### 8.3.1 위상 기준 (G / g / κ) — 변도성 2007
+
+한국에서 사용되는 3가지 조석 지각 기준:
+
+| 기준 | 정의 | 사용처 |
+|---|---|---|
+| **G (Greenwich)** | 그리니치 자오선 (경도 0°) 기준 지각 | 국제 표준, **FES2022·EFDC**, UTide UTC 출력 |
+| **g (135°E / KST)** | 한국 표준시 자오선 (135°E) 기준 지각 | **KHOA 보고서·조석표**, UTide KST 출력 |
+| **κ (kappa)** | 관측 지점 경도 기준 local 지각 | 한국 일부 오래된 연구 |
+
+**변환 공식** (변도성 2007):
+```
+g = G + 9·a    (mod 360)
+G = g - 9·a    (mod 360)
+```
+여기서 9는 9시간(KST = UTC+9), a는 분조 각속도 (°/hr).
+
+> 통합 DB·자료원 사용 시 G/g 어느 기준인지 **반드시 확인**. tide_model 통합 DB의 g 컬럼에 일부 정점 변환 오차 발견 — 인용 시 DASHBOARD 조위관측소_조화상수.csv (검증된 정확값) 우선 ([tides-khoa-cross-verification.md](../../textbook/notes/tides-khoa-cross-verification.md) §3).
 
 ### 8.4 비조화상수 — 부산항 검증된 공식
 
-비조화상수는 **모두 DL 기준** (`tides-khoa-nonharmonic-research.md` §3, 부산항 KHOA 공식값과 정확히 일치 검증):
+비조화상수는 **모두 DL 기준** (`tides-khoa-nonharmonic-research.md` §3 — 사용자 연구가 **KHOA 부산항 조석표 공시값**과 정확히 일치 검증; H_M2=40 cm는 조석표 공시 정점값. DT_0005 부산 (38.23 cm)·다대포항 (42.6 cm) 등 sub-stations 별도, [tides-khoa-cross-verification.md](../../textbook/notes/tides-khoa-cross-verification.md) §4):
 
 | 비조화상수 | 한국어 | 공식 | 부산항 (cm) |
 |---|---|---|---|
@@ -355,8 +374,8 @@ DL을 0으로 설정하면 MSL = Z₀ (DL 기준 표기).
 | 평균조차 | Mean Range | 2 × H_M2 | 80.0 |
 | 대조차 | Spring Range | 2 × (H_M2 + H_S2) | 117.8 |
 | 소조차 | Neap Range | 2 × (H_M2 - H_S2) | 42.2 |
-| HWI(g) | 평균고조간격(Greenwich) | g_M2 / 28.9841042 (시간) | 8h 07m |
-| HWI(κ) | 평균고조간격(local) | κ_M2 / 28.9841042 (시간) | 8h 02m |
+| HWI(g) | 평균고조간격(KST g) | g_M2 / 28.984104156 (시간) | 8h 07m |
+| HWI(κ) | 평균고조간격(local κ) | κ_M2 / 28.984104156 (시간) | 8h 02m |
 
 > **"조승" ≠ "조차" — 혼동 금지**
 > 조승 = DL 기준 **높이** (m above DL).
