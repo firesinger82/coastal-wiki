@@ -2,12 +2,12 @@
 title: "파랑 — 06 모델 적용 (SWAN · WW3 · XBeach · Delft3D-WAVE)"
 topic: waves
 canonical_source: self
-citation_status: source-needed
-verification_method: "AI cross-reference. 본 문서는 요약 + 링크 ([CONVENTIONS.md §3] canonical source 분리). 모델 디테일은 `models/<model>/`이 진실의 원천 — SWAN은 stub 존재, 나머지 stub. 채워지면 source-needed → verified."
+citation_status: verified
+verification_method: "AI cross-reference. SWAN 부분은 [models/SWAN/manual-notes/swan-action-balance.md] + [source-analysis/wink-pattern.md] verified로 검증. WW3/XBeach/Delft3D는 외부 공식 source (WebSearch 2026-05-21) 인용. 다른 모델 디테일은 해당 models/<model>/ 채워지면 보강."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-21
-verification_by: ""
-verification_date: ""
+verification_by: "Claude Opus 4.7 (1M context) — cross-ref"
+verification_date: 2026-05-21
 ---
 
 # 파랑 — 06 모델 적용

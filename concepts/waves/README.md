@@ -12,7 +12,7 @@
 | `03-analysis-methods.md` | **verified** | 스펙트럼·통계·JONSWAP·PM (Holthuijsen Ch.3,4) |
 | `04-code-and-tools.md` | **verified** | SWAN/WW3/XBeach + WINK·spectrum_archive |
 | `05-examples.md` | **verified** | 한국 MPT 74정점 분석 frame + 축산항 사례 |
-| `06-model-application.md` | `source-needed` | SWAN canonical, `models/SWAN/` 채워지면 verified |
+| `06-model-application.md` | **verified** | SWAN canonical (`models/SWAN/` 2 노트 verified) + WW3/XBeach 외부 인용 |
 
 ## 사용된 source_id
 
