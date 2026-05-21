@@ -8,11 +8,11 @@
 |---|---|---|
 | `README.md` | self (governance) | 이 파일 |
 | `01-concept.md` | **verified** | 정의·풍파vs너울·파라미터·관측·KHOA 용어 |
-| `02-theory.md` | TBD | linear theory·분산 관계·energy (Holthuijsen Ch.5, Ch.7) |
-| `03-analysis-methods.md` | TBD | 스펙트럼·통계 (Holthuijsen Ch.3 §3.5, Ch.4) |
-| `04-code-and-tools.md` | TBD | SWAN·WAVEWATCH III·XBeach (Holthuijsen Ch.9) |
-| `05-examples.md` | TBD | DASHBOARD MPT 74정점 실측 |
-| `06-model-application.md` | source-needed | `models/SWAN/` canonical |
+| `02-theory.md` | **verified** | linear theory·분산관계·energy·천해변형 (Holthuijsen Ch.5,7) |
+| `03-analysis-methods.md` | **verified** | 스펙트럼·통계·JONSWAP·PM (Holthuijsen Ch.3,4) |
+| `04-code-and-tools.md` | **verified** | SWAN/WW3/XBeach + WINK·spectrum_archive |
+| `05-examples.md` | **verified** | 한국 MPT 74정점 분석 frame + 축산항 사례 |
+| `06-model-application.md` | `source-needed` | SWAN canonical, `models/SWAN/` 채워지면 verified |
 
 ## 사용된 source_id
 
