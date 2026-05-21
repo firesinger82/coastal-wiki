@@ -209,13 +209,18 @@ NOAA prediction과 Pytides prediction의 차이는:
 
 NOAA verified (실측)와의 잔차는 기상·storm surge 등 비-천문조 변동.
 
-## 3. 한국 KHOA 정점 — Template
+## 3. 한국 KHOA 정점 — 인천 (DT_0001) 실측 데이터 적용
 
-> **상태**: 코드 골격만. 실제 KHOA 데이터 다운로드·실행·검증은 보강 대기 (source-needed). 본 예제를 `verified`로 가려면 KHOA API/포털 사용 + 실측 검증 + 4대분조 비교 필요.
+> **상태**: 인천 4대분조·천해 분조 진폭은 KHOA 공식 조화상수 (`dashboard-khoa-data` source, [tides-khoa-nonharmonic-research.md](../../textbook/notes/tides-khoa-nonharmonic-research.md) §7 인용). UTide·pytides 실제 실행은 KHOA 시계열 다운로드 후 — `experience/`에서 추가 검증 권장.
 
-### 3.1 데이터 출처 (검증 필요)
+### 3.1 데이터 출처
 
-- KHOA 국가해양관측망: [http://www.khoa.go.kr/oceangrid/khoa/](http://www.khoa.go.kr/oceangrid/khoa/) (acc. 2026-05-21 — 정확한 다운로드 경로는 별도 확인)
+- KHOA 바다누리 OpenAPI: [https://www.khoa.go.kr/oceangrid/khoa/takepart/openapi/openApiObsTideHarDataInfo.do](https://www.khoa.go.kr/oceangrid/khoa/takepart/openapi/openApiObsTideHarDataInfo.do)
+- 엔드포인트:
+  - 조화상수: `/api/oceangrid/tideObsHarmo/search.do`
+  - 실측조위: `/api/oceangrid/tideObsReal/search.do`
+  - 예측조위: `/api/oceangrid/tideObsPre/search.do`
+- 인천 정점: **DT_0001** (`data/조석/조위관측소_조화상수.csv` `dashboard-khoa-data`)
 - 주요 정점:
 
 | 영역 | 정점 후보 | 예상 조차 | 우세 분조 |
@@ -227,7 +232,41 @@ NOAA verified (실측)와의 잔차는 기상·storm surge 등 비-천문조 변
 
 > 위 표의 조차·분조 특성 분류는 일반 통설. 정점별 정확 값은 KHOA 자체 자료 필요.
 
-### 3.2 코드 골격 (한국 인천 정점, 예시)
+### 3.2 인천 (DT_0001) 조화상수 — 실측
+
+(`dashboard-khoa-data`/`data/조석/조위관측소_조화상수.csv`, [tides-khoa-nonharmonic-research.md](../../textbook/notes/tides-khoa-nonharmonic-research.md) §7)
+
+| 분조 | 진폭 (cm) | 위상 GMT (°) | 위상 KST (°) |
+|---|---|---|---|
+| **M₂** | 284.525 | 228.79 | 129.79 |
+| **S₂** | 114.625 | 276.91 | 186.91 |
+| **K₁** | 38.914 | 168.05 | 303.05 |
+| **O₁** | 28.712 | 138.69 | 263.69 |
+| N₂ | 53.327 | 214.10 | 110.10 |
+| K₂ | 30.863 | 269.97 | 180.97 |
+| P₁ | 11.534 | 161.75 | 296.75 |
+| **M₄** (천해) | 6.294 | 329.51 | 131.51 |
+| **MS₄** (천해) | 6.093 | 23.63 | 194.63 |
+| M₆ (천해) | 3.052 | 5.49 | 68.49 |
+
+**비조화상수 계산** (`02-theory.md` §8 공식 적용):
+
+```
+Z₀ = 284.525 + 114.625 + 38.914 + 28.712 = 466.776 cm ≈ 4.67 m
+MSL = Z₀ = 4.67 m (DL 기준)
+약최고고조면 = 2·Z₀ = 9.34 m (DL 기준)
+대조승 = 2·H_M2 + 2·H_S2 + H_K1 + H_O1 = 8.66 m
+소조승 = 2·H_M2 + H_K1 + H_O1 = 6.37 m
+대조차 = 2·(H_M2 + H_S2) = 7.98 m
+소조차 = 2·(H_M2 - H_S2) = 3.40 m
+F = (38.914 + 28.712) / (284.525 + 114.625) = 0.169 → 반일주조형
+HWI(g) = 228.79° / 28.9841042 = 7.894 h ≈ 7h 53m
+```
+
+천해 비선형 강도:
+- M₄/M₂ = 2.21%, MS₄/M₂ = 2.14%, M₆/M₂ = 1.07% — 서해 천해 비선형 effect 명확.
+
+### 3.3 코드 — UTide로 인천 시계열 분석
 
 ```python
 import pandas as pd
@@ -274,14 +313,24 @@ df_obs_2025 = pd.read_csv("incheon_2025_hourly.csv", parse_dates=["t_kst"])
 # RMS 잔차 계산 — 천문조 정확도 평가
 ```
 
-### 3.3 보강 필요
+### 3.4 검증 기준 (실행 시)
 
-`verified`로 승격하려면:
-- [ ] KHOA에서 실제 인천 2024년 시계열 다운로드 (CSV 포맷·URL 확인)
-- [ ] 코드 실제 실행 → `M₂` 진폭 실측값 (예: 2.0-2.5 m for 인천 추정)
-- [ ] 약최저저조위 산출값을 KHOA 공식 인천 약최저저조위와 비교 (오차 cm 단위 확인)
-- [ ] 4대분조 외 천해 분조 (M₄ 등) 진폭이 서해 typical 값과 정합
-- [ ] 검증 결과 commit 시 `experience/` 또는 본 §의 frontmatter `verified`로 승격
+UTide 분석 결과는 §3.2의 KHOA 공식값과 다음 오차 범위 내여야 함:
+- M₂ 진폭: 284.525 cm ± 시계열 길이 영향 (1년 = 약 ±1-2%)
+- S₂ 진폭: 114.625 cm ± 동일
+- K₁, O₁: 38.914 / 28.712 cm
+- 산출된 Z₀, 약최고고조면, 대조승·소조승은 §3.2 계산값과 cm 단위 일치
+
+오차 발생 시:
+- 시계열에 storm surge·기상조 영향 → `method='robust'` 사용
+- 시계열 < 1년 → nodal correction 적용 (`nodal=True`)
+- 시계열 < 14.77일 → M₂·S₂ Rayleigh 미분리 (§3 분석 자체 불가)
+
+`experience/`로 승격 조건 ([CONVENTIONS.md §2](../../CONVENTIONS.md), [BOUNDARY.md](../../BOUNDARY.md)):
+- [ ] 실제 인천 KHOA 시계열 (예: 2024년 시간별) 다운로드·실행
+- [ ] UTide 결과 ↔ §3.2 KHOA 공식값 ±2% 이내 일치 확인
+- [ ] 약최저저조위 산출값을 KHOA 공식 인천 약최저저조위와 비교
+- [ ] 두 차례 이상 독립 검증 (다른 연도 시계열)
 
 ## 4. 글로벌 모델 적용 (pyTMD) — 외부 정점 추출
 

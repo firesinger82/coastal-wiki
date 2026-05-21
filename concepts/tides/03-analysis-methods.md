@@ -156,31 +156,74 @@ Foreman 1977 appendix는 천해 비선형 분조 (M3, M4, MK3, MN4, M6, M8, M10,
 
 > **정의 (한국)**: 조위 관측 자료를 조화분해하여 산출한 조화상수로부터 **일정 공식**에 따라 계산한 조석 상수. 항만 설계에 사용하는 조석 제원 (조차·조위·조시 간격 등). ([PORTCALS] 비조화상수)
 
-### 4.1 산출 공식 일부 ([KHOA] 비조화상수)
+### 4.1 한국 공식 — 국립해양조사원고시 제2021-7호 (검증된 공식 전체)
+
+상세 유도·부산항 검증은 [tides-khoa-nonharmonic-research.md](../../textbook/notes/tides-khoa-nonharmonic-research.md) (`dashboard-khoa-data` source). 결과 공식 요약:
 
 ```
-평균 고조 간격 MHWI = g_m / 28.98
+Z₀         = H_M2 + H_S2 + H_K1 + H_O1     # 4대분조 반조차합
+
+MSL        = DL + Z₀ = Z₀  (DL 기준)
+HHWL       = MSL + Z₀ = 2·Z₀  (DL 기준)
+DL (A.L.L.W) = 0  (해도 datum 기준점)
+
+대조승      = 2·H_M2 + 2·H_S2 + H_K1 + H_O1   = Z₀ + H_M2 + H_S2
+소조승      = 2·H_M2 + H_K1 + H_O1            = Z₀ + H_M2 - H_S2
+평균조차    = 2·H_M2
+대조차      = 2·(H_M2 + H_S2)
+소조차      = 2·(H_M2 - H_S2)
+
+HWI(g)     = g_M2 / 28.9841042  (Greenwich 지각, 시간)
+HWI(κ)     = κ_M2 / 28.9841042  (local 지각, 시간)
+
+F (Form)   = (H_K1 + H_O1) / (H_M2 + H_S2)
 ```
 
-여기서 g_m은 M₂의 지각.
+> **"조승" vs "조차" 혼동 금지**:
+> - 조승 = DL 기준 **높이** (m above DL)
+> - 조차 = 고저조 **차이** (m, range)
+> KHOA "대조승" 공시값은 DL 기준 높이임 (range 아님).
 
-KHOA는 평균 저조 간격 MLWI 등 추가 공식도 명시하나 [KHOA] 비조화상수 항목에서 본 추출은 일부만 — 별도 KHOA 매뉴얼 인용 필요 (보강).
+> **분 계산**: KHOA는 HWI 분 계산 시 **floor (내림)** 적용으로 관측됨 — 0~1분 오차 가능.
 
-### 4.2 주요 비조화 상수 ([KHOA] 비조화상수)
+### 4.2 주요 비조화 상수 — KHOA 표기 ([KHOA] 비조화상수)
 
 조화상수 → 비조화상수 변환으로 얻는 항만 설계 제원:
 
-- 약최고고조위 (A.H.H.W)
-- 대조 평균 고조위
+- 약최고고조위 (A.H.H.W) = HHWL = 2·Z₀
+- 대조 평균 고조위 (HWOST) = 대조승
 - 평균 고조위 (MHW)
-- 소조 평균 고조위
-- **평균 해면 (MSL)**
+- 소조 평균 고조위 = 소조승
+- **평균 해면 (MSL)** = Z₀ (DL 기준)
 - 소조 평균 저조위
 - 평균 저조위 (MLW)
 - 대조 평균 저조위
-- **약최저저조위 (A.L.L.W)** — 한국 해도 datum
+- **약최저저조위 (A.L.L.W) = DL** — 한국 해도 datum
 
-`02-theory.md` §8에서 약최저저조위 = MSL − Σ(M₂+S₂+K₁+O₁ 반조차) 공식 인용.
+### 4.3 부산항 검증 (대시보드 연구 §3)
+
+조화상수 (KHOA): H_M2=40.0 cm, H_S2=18.9 cm, H_K1=4.4 cm, H_O1=1.6 cm, g_M2=235.6°, κ_M2=232.8°.
+
+공식 적용 → KHOA 공시 비조화상수와 **모두 일치** (HWI(κ)만 floor 반올림 차이 0.86분):
+- Z₀ = 64.9 cm, MSL = 64.9, 약최고고조면 = 129.8
+- 대조승 = 123.8, 소조승 = 86.0, 대조차 = 117.8, 소조차 = 42.2
+- HWI(g) = 8h 07m, HWI(κ) = 8h 01m (KHOA 8h 02m)
+- F = 0.102 → 반일주조형
+
+상세 표는 [tides-khoa-nonharmonic-research.md](../../textbook/notes/tides-khoa-nonharmonic-research.md) §4.
+
+### 4.4 KHOA OpenAPI
+
+| API | 엔드포인트 |
+|---|---|
+| 조화상수 | `/api/oceangrid/tideObsHarmo/search.do` |
+| 실측조위 | `/api/oceangrid/tideObsReal/search.do` |
+| 예측조위 | `/api/oceangrid/tideObsPre/search.do` |
+| 조석예보 | `/api/oceangrid/tideObsPreTab/search.do` |
+
+**중요**: KHOA OpenAPI는 **조화상수만 제공**. **비조화상수는 §4.1 공식으로 계산 필요**.
+
+API 키 체계: `khoa.go.kr` (바다누리 전용) vs `data.go.kr` (공공데이터포털) — 두 키는 비호환.
 
 ## 5. 분석 출력
 

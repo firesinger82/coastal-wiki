@@ -17,7 +17,8 @@
 - `lubbad2009-tides-slides` — [`textbook/notes/tides-lubbad2009-overview.md`](../../textbook/notes/tides-lubbad2009-overview.md)
 - `stewart-physical-ocean` — [`textbook/notes/tides-stewart-ch17.md`](../../textbook/notes/tides-stewart-ch17.md)
 - `tidal-heights-manual` — [`textbook/notes/tides-foreman1977-appendix.md`](../../textbook/notes/tides-foreman1977-appendix.md) (appendix only, 본문 OCR 보강 대기)
-- `khoa-portcals-glossary` — [`/mnt/d/wsl_env/maritime-glossary-mcp/glossary.json`](../../textbook/sources.yml) (직접 lookup, 페이지 없음)
+- `khoa-portcals-glossary` — [`/mnt/d/wsl_env/maritime-glossary-mcp/glossary.json`](../../textbook/sources.yml) (직접 lookup)
+- `dashboard-khoa-data` — [`textbook/notes/tides-khoa-nonharmonic-research.md`](../../textbook/notes/tides-khoa-nonharmonic-research.md) (사용자 본인 KHOA 데이터·연구, 부산항 검증)
 
 ## 작업 계획
 
