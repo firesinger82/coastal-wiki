@@ -6,7 +6,7 @@
 
 | 토픽 | 상태 | 비고 |
 |---|---|---|
-| [tides](concepts/tides/) | TBD | 조석 — 사용자 우선 예시 |
+| [tides](concepts/tides/) | **WIP** (01 draft-unsourced) | 조석 — 01-concept.md 초안 완료, 사용자 verify 대기 |
 | [waves](concepts/waves/) | TBD | 파랑 |
 | [sediment-transport](concepts/sediment-transport/) | TBD | 표사이동 |
 | [currents](concepts/currents/) | TBD | 흐름 |
@@ -24,11 +24,12 @@
 
 ## textbook/ (교과서 통합)
 
-| 노트 | 출처 (`D:\Study\textbook\...`) | 상태 |
+| 노트 | source_id | 상태 |
 |---|---|---|
-| (없음) | | |
+| [tides-lubbad2009-overview.md](textbook/notes/tides-lubbad2009-overview.md) | lubbad2009-tides-slides | draft-unsourced |
 
-원본 PDF 목록: [textbook/INDEX.md](textbook/INDEX.md) 참조.
+원본 PDF 매니페스트: [textbook/sources.yml](textbook/sources.yml).
+토픽별 분류: [textbook/INDEX.md](textbook/INDEX.md).
 
 ## examples/ (통합 실습)
 
@@ -45,7 +46,9 @@
 ## 상태 표기
 
 - `TBD` — 디렉토리만 존재, 내용 없음
-- `WIP` — 작성 중
-- `DRAFT` — 초안 완료, 검토 대기
-- `STABLE` — 검토·인용 점검 완료
+- `WIP` — 작성 중 (citation_status가 draft-unsourced/source-needed 혼재 또는 일부 파일만 작성)
+- `DRAFT` — 초안 완료, 사용자 verify 대기
+- `STABLE` — 모든 frontmatter `citation_status: verified`
 - `DEPRECATED` — 보존하되 새 작업 금지
+
+상세 인용 상태는 각 파일 frontmatter의 `citation_status` 참조 ([CONVENTIONS.md §2](CONVENTIONS.md)).

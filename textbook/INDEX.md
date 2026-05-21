@@ -7,11 +7,12 @@
 
 ### 조석 (tides)
 
-| 파일 | 비고 |
-|---|---|
-| `134340780-Tides-and-Currents.pdf` | 핵심 |
-| `Manual_for_Tidal_Heights_Analysis_and_Pr.pdf` | 조위 분석 매뉴얼 |
-| `sea-level.pdf` | 해수면 |
+| source_id | 파일 | 비고 |
+|---|---|---|
+| `lubbad2009-tides-slides` | `134340780-Tides-and-Currents.pdf` | NTNU 강의 슬라이드. 입문 개관 적합 |
+| `tidal-heights-manual` | `Manual_for_Tidal_Heights_Analysis_and_Pr.pdf` | 조위 분석 매뉴얼 |
+| `sea-level` | `sea-level.pdf` | 해수면 |
+| `stewart-physical-ocean` | `stewart_textbook.pdf` | 깊은 이론·물리해양 (Stewart) — 보강용 |
 
 ### 파랑 (waves)
 
@@ -56,4 +57,6 @@
 
 ## 노트 진척 상황
 
-(현재 노트 없음. 토픽 작업 시작 시 해당 PDF부터 챕터 단위로 추출.)
+| 노트 파일 | source_id | 토픽 | 상태 |
+|---|---|---|---|
+| `notes/tides-lubbad2009-overview.md` | lubbad2009-tides-slides | tides | draft-unsourced (사용자 verified 대기) |

@@ -2,24 +2,25 @@
 
 ## 상태
 
-`TBD` — 디렉토리 생성됨, 내용 미작성.
+| 파일 | 상태 | 비고 |
+|---|---|---|
+| `README.md` | self (governance) | 이 파일 |
+| `01-concept.md` | `draft-unsourced` → 사용자 verify 대기 | 정의·용어·전형값 |
+| `02-theory.md` | 미생성 | 생성력·평형조석 — `stewart-physical-ocean` 보강 필요 |
+| `03-analysis-methods.md` | 미생성 | 조화 분해 — `tidal-heights-manual` 활용 |
+| `04-code-and-tools.md` | 미생성 | UTide(Python) / t_tide(MATLAB) / pytides |
+| `05-examples.md` | 미생성 | 실습 |
+| `06-model-application.md` | 미생성 | EFDC/ADCIRC 조석 forcing |
 
-## 작성 우선순위 (사용자 우선 예시 토픽)
+## 사용된 source_id
 
-1. `01-concept.md` — 조석의 정의, 천체역학적 원인, 분조의 개념
-2. 관련 textbook 노트 추출:
-   - `134340780-Tides-and-Currents.pdf` → `textbook/notes/tides-tides-and-currents-chN.md`
-   - `Manual_for_Tidal_Heights_Analysis_and_Pr.pdf` → 조위 분석 매뉴얼
-3. `02-theory.md` — 평형조석 이론, Laplace 조석방정식, 분조
-4. `03-analysis-methods.md` — 조화분해, t_tide, UTide, 비조화 분석
-5. `04-code-and-tools.md` — t_tide(MATLAB), UTide(Python), pytides
-6. `06-model-application.md` — EFDC tidal forcing (`models/EFDC/`), ADCIRC tidal db
+- `lubbad2009-tides-slides` — [`textbook/notes/tides-lubbad2009-overview.md`](../../textbook/notes/tides-lubbad2009-overview.md)
 
-## 작업 시작
+## 작업 계획
 
-```bash
-cp -r ../_template/* .
-rm README.md  # 또는 이 README는 자동 채워질 때까지 보존
-```
+[plan.md](../../plan.md), [CONVENTIONS.md §8](../../CONVENTIONS.md) — 최소 2파일(README + 01-concept)로 시작. 02~06은 sourced claim 누적되면 생성.
 
-세부 절차는 [../_template/README.md](../_template/README.md) 참조.
+다음 단계:
+1. 사용자가 `01-concept.md` `draft-unsourced` → `verified` 검증 (페이지 대조)
+2. 보강 source 확보 후 `02-theory.md` 작성 (`stewart-physical-ocean` 또는 `tidal-heights-manual`)
+3. `04-code-and-tools.md`에 UTide(Python)·t_tide(MATLAB) 정리 — 공식 GitHub repo/논문 인용
