@@ -41,7 +41,7 @@
 
 | 항목 | 통과 기준 | 상태 |
 |---|---|---|
-| (없음 — 객관 레이어 확립 후 시작) | | |
+| [KHOA 15정점 1년 조위 UTide 검증](experience/khoa-multi-station-tide-validation-2026.md) | 3조건 통과 (15정점 독립 / KHOA 공식값 ±0.1% / fetch+analyze 스크립트 재현 가능) | **verified** |
 
 ## 상태 표기
 
