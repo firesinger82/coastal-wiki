@@ -9,12 +9,14 @@
 
 ## 결정사항
 
-### 1. 위치: `D:\coastal-wiki` 신규
+### 1. 위치: `~/coastal-wiki` (WSL2 ext4)
 
-- 이유: 기존 `D:\modeling-wiki`는 경험 로그 구조(experiments/knowledge/failure-patterns/)로 이미 작성됨. 객관 레이어 우선 목표와 축이 다름. 별개로 두고 추후 통합 여부 결정.
+- 초기에 `D:\coastal-wiki`(=`/mnt/d/coastal-wiki`)로 생성했으나 2026-05-21 WSL ext4(`/home/firesinger/coastal-wiki`)로 이전.
+- 이유: I/O 성능 (git/grep 5~10배), AI 주 작성자 워크플로 적합. Windows 앱(Obsidian 등)은 `\\wsl$\Ubuntu\home\firesinger\coastal-wiki`로 접근.
 - 대안 검토:
-  - (A) modeling-wiki 안에 새 디렉토리 추가 — 거부. 두 축이 한 폴더에 섞이면 의도 흐려짐.
-  - (B) modeling-wiki를 coastal-wiki/experience/로 이전 — 보류. 객관 레이어 자리 잡은 후 결정.
+  - (A) `/mnt/d/coastal-wiki` 유지 — 거부. 9P 프로토콜 오버헤드 + AI 워크플로 효율 손실.
+  - (B) modeling-wiki 안에 신규 디렉토리 — 거부. 객관/경험 축 분리 흐려짐.
+  - (C) modeling-wiki를 coastal-wiki/experience/로 이전 — 보류. 객관 레이어 자리 잡은 후 결정.
 
 ### 2. 구조: concepts 중심, models 부축
 
@@ -57,7 +59,7 @@ coastal-wiki/
 
 ### 6. 동기화: git + 단일 writer
 
-- writer = 이 PC (`/mnt/d/coastal-wiki`)
+- writer = 이 PC (`~/coastal-wiki` = WSL2 ext4. Windows 접근: `\\wsl$\Ubuntu\home\firesinger\coastal-wiki`)
 - reader = 다른 PC (git clone 후 pull)
 - private repo로 push (GitHub/GitLab) — 다음 단계에서 결정
 

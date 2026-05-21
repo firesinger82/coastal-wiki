@@ -57,7 +57,7 @@
 ## 검색
 
 - `mcp__qmd__query` (현 환경 설치됨) — BM25/시맨틱
-- 빠른 키워드: `grep -r "키워드" /mnt/d/coastal-wiki/concepts/`
+- 빠른 키워드: `grep -r "키워드" ~/coastal-wiki/concepts/`
 - 큰 출력은 `ctx_execute(language: "shell", code: "grep ...")` 경유
 
 ## 사용자 워크플로 (santa-method)
@@ -73,6 +73,7 @@
 
 ## 동기화
 
-- writer = 이 PC (WSL2, `/mnt/d/coastal-wiki`)
+- writer = 이 PC (WSL2 ext4, `~/coastal-wiki`)
+  - Windows 측 접근: `\\wsl$\Ubuntu\home\firesinger\coastal-wiki` (Obsidian 등 Windows 앱)
 - reader = 다른 PC (git clone 후 git pull)
 - 작업 후 항상 `git commit && git push`
