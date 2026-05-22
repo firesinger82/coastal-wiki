@@ -227,6 +227,10 @@ F (Form)   = (H_K1 + H_O1) / (H_M2 + H_S2)
 
 API 키 체계: `khoa.go.kr` (바다누리 전용) vs `data.go.kr` (공공데이터포털) — 두 키는 비호환.
 
+### 4.5 KHOA 표준 — 62개 조화상수
+
+KHOA 각 정점은 **62개 조화상수**를 표준으로 산출 (Annual Report 2025 `<표 3-31>` 등 인용, `khoa-annual-reports`). 주요 4대분조 (M₂·S₂·K₁·O₁) + 다양한 satellite·천해 비선형 분조 포함. Foreman 1977 appendix의 146개 분조 ([tides-foreman1977-appendix.md](../../textbook/notes/tides-foreman1977-appendix.md))의 부분집합.
+
 ## 5. 분석 출력
 
 조화분해 결과 일반 형식:

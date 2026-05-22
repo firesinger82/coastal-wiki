@@ -387,14 +387,18 @@ G = g - 9·a    (mod 360)
 F = (H_K1 + H_O1) / (H_M2 + H_S2)
 ```
 
-| F 범위 | 분류 |
-|---|---|
-| < 0.25 | 반일주조 (semidiurnal) |
-| 0.25 – 1.5 | 혼합조 (mainly semidiurnal) |
-| 1.5 – 3.0 | 혼합조 (mainly diurnal) |
-| ≥ 3.0 | 일주조 (diurnal) |
+**한국 KHOA 공식 분류** (`khoa-annual-reports` Annual Report 2025 인용):
 
-부산항: F = 0.102 → 반일주조형.
+| F 범위 | 한국 KHOA 명칭 | 영문 |
+|---|---|---|
+| **0 – 0.25** | **반일주조형** | semidiurnal |
+| **0.25 – 1.50** | **반일주조가 우세한 혼합형** | mixed (mainly semidiurnal) |
+| **1.50 – 3.00** | **일주조가 우세한 혼합형** | mixed (mainly diurnal) |
+| **≥ 3.00** | **일주조형** | diurnal |
+
+> KHOA 2025 Annual Report §3.1 인용. 본 분류는 NOAA 등 국제 통용 기준과 일치하나 **한국 공식 명칭 한국어 표기는 위와 같음**.
+
+부산항: F = 0.102 → 반일주조형. 인천 (DT_0001): F = 0.169 → 반일주조형.
 
 ## 9. 보강 필요·미해결
 

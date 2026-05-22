@@ -35,6 +35,7 @@ verification_date: 2026-05-21
 | **ADCP** | Acoustic Doppler Current Profiler | 음파 도플러, **층별 동시 측정** |
 | RCM-9 | 음파 유속계 | KHOA 사용 |
 | RDCP-600 | 음파 유속계 | KHOA 사용 |
+| **HF-Radar** | High Frequency Radar 해수유동관측소 | **광역 표층 흐름** 관측 (km 단위 격자). KHOA Annual Report 2025 `khoa-annual-reports` §1.4에 정점 list |
 
 ## 2. 두 관측 방식 (KHOA glossary)
 

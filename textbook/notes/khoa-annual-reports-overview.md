@@ -76,9 +76,30 @@ verification_date: 2026-05-23
 | 소조차 | Neap Range | 2·(H_M2 − H_S2) |
 | **약최저저조면** | **Approx. Lowest Low Water** | MSL − Z₀ |
 | 조석형태수 | Form Factor | (H_K1 + H_O1)/(H_M2 + H_S2) |
-| (별도) | | F ≥ 3.00 → 일주조형 |
 
-→ DASHBOARD research doc (`tides-khoa-nonharmonic-research.md`) 의 공식과 **완전 일치**. 또 하나의 KHOA 공식 source 확보.
+### 3.1 조석형태수 — 한국 공식 분류 (KHOA 2025 인용)
+
+> **0 – 0.25**: 반일주조형 (semidiurnal)
+> **0.25 – 1.50**: 반일주조가 우세한 혼합형 (mixed mainly semidiurnal)
+> **1.50 – 3.00**: 일주조가 우세한 혼합형 (mixed mainly diurnal)
+> **3.00 이상**: 일주조형 (diurnal)
+
+→ DASHBOARD research doc 의 공식과 **완전 일치**. 또 하나의 KHOA 공식 source 확보.
+
+### 3.2 KHOA 표준 — 62개 조화상수
+
+각 정점 분석은 **62개 조화상수**를 표준으로 산출 (Annual Report 2025 §3.1 표 3-25, 3-28, 3-31 등에서 확인). 주요 4대분조 + satellite·천해 비선형 분조 다수. Foreman 1977 appendix (146 분조)의 부분집합.
+
+## 4. 2025년 한국 wave climate (Annual Report §3.19 발췌)
+
+| 통계 | 값 (m) | 비고 |
+|---|---|---|
+| 월별 최대 유의파고 평균 | **3월 3.97 m** | 전 해역 평균 |
+| 해역별 최대 (3월) | **동해안 4.55 m** | |
+| 누년 편차 (2025 − 누년) | 전반적 음의 편차 | 2025 = lower wave activity year |
+| 가장 큰 음의 편차 | **9월 −4.37 m** | 태풍 시즌 |
+
+→ 14년 시계열 추적 시 한국 wave climate change 정량 가능.
 
 ## 4. 활용 — 각 토픽별
 
