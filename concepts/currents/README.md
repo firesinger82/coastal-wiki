@@ -21,6 +21,7 @@
 - `dashboard-khoa-data` — 4대분조 정밀값 (조류 분조 분해에도 적용)
 - `stewart-physical-ocean` — tidal currents 일반 (§17.4 도입부, p.313)
 - `lubbad2009-tides-slides` — tidal currents in inlets/bays (p.50)
+- `khoa-annual-reports` — [`textbook/notes/khoa-annual-reports-overview.md`](../../textbook/notes/khoa-annual-reports-overview.md) (15권 2012-2025, HF-Radar 해수유동 통계)
 
 ## tides 토픽과의 관계
 

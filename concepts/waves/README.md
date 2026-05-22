@@ -22,6 +22,7 @@
 - `swan-library-firesinger` — 사용자 본인 SWAN library (`D:\Numerical_models\01_Models\swan\Fin\07_SWAN_LIBRARY\`)
 - `hudspeth2005-wave-forces` — 파력 (TBD)
 - `water-wave-mechanics` — 수파역학 (TBD)
+- `khoa-annual-reports` — [`textbook/notes/khoa-annual-reports-overview.md`](../../textbook/notes/khoa-annual-reports-overview.md) (15권 2012-2025, MPT 정점·유의파 통계)
 
 ## tides 토픽과의 차이
 
