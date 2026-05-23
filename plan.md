@@ -514,3 +514,466 @@ cd "$WIKI/models/ADCIRC/raw/source_code/adcirc-testsuite" \
   - **Scope 명시**: 스크립트 docstring 에 "conservative policy scanner, not CommonMark parser. 일반 실수·흔한 변형 케이스 cover. spec-pathological 변형은 의도적으로 cover 안 함 — multi-defense (사용자 review + ultrareview) 로 처리." 명시.
 - **2026-05-23 6차 (I1~I2 + scope docs 적용 후)**: verdict **`approve`**. No material findings. ✅ Migration may proceed.
   > "Ship. I1 and I2 are closed: multi-line refdefs are detected while blank-line-separated destinations are rejected, unquoted href/src is detected, and data-href/data-src/x-href false positives are blocked. The 42 regression tests pass, the working-tree validator passes, and the docstring explicitly scopes this as a conservative policy scanner rather than a CommonMark parser. Migration may proceed at this point."
+
+---
+
+# Phase 2 Plan (2026-05-23 후속, v8 — codex review 1~7차 반영) — deterministic codex archive + mandatory evidence sha256 + raw_path resolution
+
+> v8 변경 사항 (codex review 7차 3 findings 반영):
+> - **O1**: codex archive naming deterministic — extract session_id 후 `<session_id>.output` 정규 이름으로 copy. `.log` 등 비일관 형식 reject
+> - **O2**: manifest schema 14 → **15 컬럼** — `codex_evidence_sha256` **mandatory** (codex-review row). archived file + sums.txt 둘 다 match
+> - **O3**: marker 에 `raw_path` 추가 또는 inline citation 의 `source_id` → `textbook/sources.yml` resolve → manifest 의 `raw_path` 자동 일치 확인
+>
+> v7 변경 사항 (codex review 6차 3 findings 반영):
+> - **N1**: post-archive set equality 정확 정의 — `actual = find archive_root -type f`, `expected = {archive_path_for(row) for row in manifest}`, `expected == actual` + per-file sha256
+> - **N2**: codex-review evidence durable archive — `_archive/codex-reviews/<session_id>.output` 으로 copy + sha256, ephemeral path 거부
+> - **N3**: self-cited-line — exact citation marker (`<!-- cite:source_id=...,raw_path=...,line=... -->`) 또는 structured field. ±3 proximity false-positive 차단
+>
+> v6 변경 사항 (codex review 5차 2 findings 반영):
+> - **M1**: Rule A condition 6 의 semantic validation 강화 — regex 만으론 부족, validator 가 각 form 의 실제 의미 검증 (date parseable, codex review file 존재, self-cited-line 파일·라인 매핑)
+> - **M2**: 2a.7 post-archive integrity — **모든 50 rows** (skip-readme + 46 content) 의 archive path 존재 + sha256 == sha256_before set equality 검증
+>
+> v5 변경 사항 (codex review 4차 2 findings 반영):
+> - **L1**: manifest 13 → 14 컬럼 (`claim_mapping_verified_by` 추가) + Rule A condition 6 의 machine-enforceable 형태 명시 + `tools/validate-phase2a-manifest.sh` 작성 명세 + regression fixtures
+> - **L2**: inventory 정정 — **실제 50 files = 46 content + 4 README** (adcirc-sources/xbeach-sources README 없음). P1 listing count 11 정정. skip-readme validation order (pre-archive vs post-archive) explicit
+>
+> v4 변경 사항 (codex review 3차 3 findings 반영):
+> - **K1**: dest 파일 frontmatter `citation_status` ↔ manifest `citation_status_target` cross-check 강제 (Phase 2a validator rule)
+> - **K2**: README explicit disposition — `classification=skip-readme` enum 추가
+> - **K3**: D5 의 partial-verified 표시 제거 — Option A 일관성 유지
+> 
+> v3 변경 사항 (codex review 2차 5 findings 반영):
+> - **J1**: manifest schema 8 → 13 컬럼 + verified 강제 enforcement rule
+> - **J2**: 2a step 순서 재정렬 — link rewrite **먼저**, validate, archive, final delete
+> - **J3**: storm-surge/05 target = `source-needed` (KHOA 페이지 직접 인용 전까지)
+> - **J4**: manifest inventory `find _staging/...` 자동 생성, set equality gate
+> - **J5 (Option A)**: **`partial-verified` 도입 보류**, wrapper-only 페이지 = `source-needed` 유지. CONVENTIONS·validator·INDEX semantics 변경 없음.
+
+## 컨텍스트
+
+[Phase 1 (modeling-wiki 통합)](#통합-결정-2026-05-23--modeling-wiki--coastal-wiki) 완료 후 6 commit 점진적 진척:
+- methods 107 노트 → models/<M>/source-analysis/ promote (D 작업)
+- SST 토픽 5/6 verified · storm-surge 3/6 · sediment-transport 5/6 · littoral-drift 1/2 verified
+- experience 5 노트 (KHOA tide·SLR·SST·SST-global·NIFS-vertical)
+
+남은 영역:
+- `_staging/from-modeling-wiki/knowledge/` 잔존 ~46 항목
+- concepts source-needed: tides/06 · sediment-transport/05 · currents/06 · sst/06 · storm-surge/{03·05·06 미생성} · littoral-drift/{02·03·04·05·06 미생성}
+- experience 확장 후보
+
+## Phase 2 v1 → v2 — codex review 6 findings 반영
+
+**v1 (2026-05-23 작성, codex review 1차)**: verdict `needs-attention` — 6 findings. v2 에서 다음 반영:
+
+| Finding | 반영 |
+|---|---|
+| H1 P3/B 수치 모순 + 우발적 verified | §B 의 single canonical table 도입, 각 file 별 source_id·claim scope·target status 명시 |
+| H2 manual catalog artifact gate 부재 | §2a 의 catalog promote 시 raw artifact 존재 확인·source_id 부착, 부재 시 citation_status: source-needed 유지 |
+| H3 Phase A copy-verify-archive 명목뿐 | §2a 의 migration manifest schema 도입, copy → validate → archive → separate final delete 분리 |
+| M1 failure/heuristic mixed default | §P1 의 triage checklist + **mixed 시 default = experience/ + source-needed** |
+| M2 Chuksan 정량 verified gate | §C 의 efdc-chuksan-sediment.md 강제 citation_status: source-needed, 수치 "anecdotal" 라벨 |
+| M3 scope creep | Phase 2 → **2a/2b/2c/2d 분리**, 각 sub-phase 별 독립 review·commit·codex check |
+
+## Sub-phase 분리
+
+| Sub-phase | 범위 | 분량 | 의존성 |
+|---|---|---|---|
+| **2a** | _staging 잔존 promote (manifest + copy + verify + archive + final delete) | 한 세션 | 단독 |
+| **2b** | concepts 갭 보강 (canonical table 기반) | 한 세션 | 2a (manual-notes 안정화) |
+| **2c** | experience 3 신규 (chuksan source-needed 강제) | 한 세션 | 2b 일부 |
+| **2d** | 정책·도구 정리 (sources.yml·BOUNDARY·INDEX 최종) | 짧음 | 2a-2c |
+
+각 sub-phase 마다 commit + push + (선택) codex:review.
+
+---
+
+## Sub-phase 2a — _staging 잔존 promote (manifest 기반)
+
+### P1. failure-patterns / heuristics / playbooks 분류 (M1 반영)
+
+#### 분류 triage checklist
+
+각 노트에 다음 질문 순서로 적용:
+
+1. **"본 노트가 모델 source-code line·equation·algorithm 을 인용하는가?"**
+   - YES → 다음 질문
+   - NO → **`experience/` + citation_status: source-needed** (mixed default)
+2. **"인용된 모델 메커닉이 노트의 main claim 인가, 보조 reference 인가?"**
+   - main → `models/<MODEL>/source-analysis/{failure-patterns,heuristics,playbooks}/`
+   - 보조 → split: source-analysis fragment (cited) + experience fragment (operational)
+3. **모호 시** → **default = `experience/` + source-needed** (objective layer 보호)
+
+#### 대상 노트 (11개, L2 정정 — 4+3+4=11, 이전 10 표기 정정)
+
+`_staging/from-modeling-wiki/knowledge/`:
+- `failure-patterns/`: adcirc-wide6-provenance-gap.md, efdc-water-level-good-current-bad.md, efdc-wetdry-connectivity-bias.md, xbeach-morphology-interpretation-drift.md
+- `heuristics/`: adcirc-baseline-before-tool-revalidation.md, efdc-check-comparison-basis-before-friction-tuning.md, xbeach-validate-hydrodynamics-before-trusting-morphology.md
+- `playbooks/`: adcirc-wide6-reconstruction-checklist.md, efdc-boundary-forcing-checklist.md, efdc-tidal-calibration-order.md, xbeach-first-storm-baseline-checklist.md
+
+각 노트는 위 checklist 적용해 manifest 의 classification 컬럼 기록.
+
+### P2. methods/<model>-sources/ catalog (H2 반영)
+
+`adcirc-sources/` 32 + `xbeach-sources/` 3 = 35 catalog 노트.
+
+#### 분리 정책
+
+각 노트를 두 layer 로 분리:
+- **Raw artifact index** → `models/<MODEL>/manual-notes/index/<##>-<topic>.md`. citation_status: verified — 단 raw artifact (manuals/PDF, github URL, examples) 가 `models/<MODEL>/raw/` 또는 외부 URL 로 검증 가능할 때만.
+- **Interpretive note** (사용자 분석·요약) → 동일 파일 안 §해석 섹션, 또는 별도 `manual-notes/notes/<##>-<topic>.md` (citation_status: verified 단 source-analysis 기반)
+
+#### 각 노트의 manifest 필드
+
+| 필드 | 의미 |
+|---|---|
+| `source_id` | textbook/sources.yml 등록명 (없으면 신규 추가) |
+| `raw_path` | `models/<M>/raw/manuals/<file>` 또는 외부 URL |
+| `raw_sha256` | (raw 가 본 위키 내 파일이면) — 없으면 null |
+| `captured_date` | acquired 일자 |
+| `audit_status` | `audited` (raw 확인 + claim ↔ raw 매핑 가능) / `unaudited` (raw 없거나 매핑 안 됨) |
+| `citation_status` | audited=verified, unaudited=source-needed |
+
+→ **raw artifact 부재 시 verified 금지**.
+
+### 2a Migration manifest schema (H3+J1+K1+L1 반영) — 14 컬럼
+
+`_staging/manifests/phase2a-manifest.csv`:
+
+| 컬럼 | 의미 |
+|---|---|
+| `source_path` | _staging 안 원본 경로 |
+| `dest_path` | 목표 위치 (skip-readme 의 경우 `_archive/.../<orig>` 또는 empty) |
+| `sha256_before` | promote 전 source 파일 sha256 |
+| `classification` | P1 checklist 결과: source-analysis / experience-mixed / experience-only / manual-notes-catalog / **skip-readme** |
+| `citation_status_target` | verified / source-needed (skip-readme 의 경우 `n/a`) |
+| `audit_status` | audited / unaudited (catalog 노트 한정, 그 외 empty) |
+| `source_id` | textbook/sources.yml 등록명 (catalog 노트 한정) |
+| `raw_path` | catalog raw artifact 경로 또는 URL |
+| `raw_sha256` | raw artifact 가 본 위키 내 파일이면 sha256 |
+| `captured_date` | raw artifact acquired 일자 |
+| **`claim_mapping_verified_by`** | (L1 신규) verified 인 row 의 claim ↔ raw artifact 매핑을 누가·언제 확인했는지. 허용 값: `user-<name>-<YYYYMMDD>`, `codex-review-<session_id>`, `self-cited-line-<file>:<line>` (본 위키 내 노트가 src code line 직접 인용 시) |
+| **`codex_evidence_sha256`** | (O2 신규) `claim_mapping_verified_by = codex-review-*` 인 row 만 사용. `_archive/codex-reviews/<session_id>.output` 의 sha256 hash. validator 가 archive 파일의 실제 sha256 + `_archive/codex-reviews/sha256sums.txt` 의 hash 둘 다 매치 확인. 다른 form (user-, self-cited-line-) 인 row 는 empty 허용 |
+| `link_rewrite_needed` | 본문 안 `_staging/...` 참조 검출 시 갱신 필요 (true/false) |
+| `validator_passed` | validate-research-isolation.sh + validate-phase2a-manifest.sh 통과 (true/false) |
+| `notes` | 분류·결정의 짧은 사유 (free-form) |
+
+### Enforcement rule (J1+K1 반영)
+
+#### Rule A — manifest row의 verified 강제 조건 (J1+L1)
+
+`citation_status_target = verified` 는 다음 모두 충족 시에만 허용:
+1. `audit_status = audited` (catalog 노트의 경우; 그 외 empty 허용)
+2. `source_id` 가 textbook/sources.yml 에 등록됨 (또는 본 위키 내부 reference)
+3. `raw_path` nonempty
+4. `raw_path` 가 local 파일이면 그 파일 존재 + 계산한 sha256 == `raw_sha256`
+5. `raw_path` 가 외부 URL 이면 `captured_date` 명시
+6. **`claim_mapping_verified_by` nonempty + semantic validation 통과** (L1+M1 반영)
+   - 1차: regex `^(user-\S+-\d{8}|codex-review-019e[0-9a-f-]+|self-cited-line-.+:\d+)$` 매치
+   - 2차: **semantic validation** (M1 반영) — form 별 추가 check:
+     - `user-<name>-<YYYYMMDD>`:
+       - YYYYMMDD 가 valid date (datetime.strptime 성공) + 2024-01-01 ≤ date ≤ today
+       - `<name>` 가 `tools/manifests/reviewer-allowlist.txt` 또는 본 위키의 git config user.email base 와 매치
+     - `codex-review-<session_id>` (N2+O1+O2 강화):
+       - **반드시** `_archive/codex-reviews/<session_id>.output` 에 사전 copy 되어있어야 함 (durable). 파일명은 deterministic — session_id 외 prefix/extension 추가 금지 (O1)
+       - manifest 의 **`codex_evidence_sha256` 필수** (O2) — empty 시 fail
+       - validator check (3 단계, 모두 통과 필수):
+         1. `_archive/codex-reviews/<session_id>.output` 파일 존재
+         2. 그 파일의 실제 sha256 == manifest 의 `codex_evidence_sha256` (O2 manifest match)
+         3. `_archive/codex-reviews/sha256sums.txt` 안 같은 `<session_id>.output` 줄의 hash 도 manifest 와 match (O2 cross-check, 동시 변조 방지)
+       - **ephemeral path** (`/tmp/claude-*`, `~/.claude/plugins/.../jobs/...`) 만으로는 verified 거부 — durable archive 필수
+       - validator 가 1·2·3 중 하나라도 fail 시 row reject
+     - `self-cited-line-<file>:<line>` (N3+O3 강화):
+       - `<file>` 가 repo 내 실제 존재
+       - `<line>` 이 valid (1 ≤ line ≤ wc -l file)
+       - **해당 line 자체** 에 다음 중 하나의 explicit citation marker 가 있어야 함:
+         - **HTML comment** (가장 명시적): `<!-- cite:source_id=<id>,raw_path=<path>[,page=<N>] -->` — `source_id` + `raw_path` 모두 명시
+         - **Inline citation**: `(<source_id> [§/p.] ...)` 또는 `(<source_id>, ...)` — `source_id` 만 명시. **validator 가 sources.yml 의 `<source_id>` entry 의 `filename` 또는 `raw_path` 를 resolve 해서 manifest 의 `raw_path` 와 일치 확인** (O3 반영)
+         - **Source-code reference**: `<file_path_pattern>:<LN>` 또는 `<basename>:<LN>` (예: `wind.F:5798`, `models/ADCIRC/raw/source_code/adcirc/src/wind.F:5798`) — manifest 의 `raw_path` basename 과 매치
+       - ~±3 line proximity 만 통과는 거부~ — exact line 의 marker 필수
+       - validator 의 각 marker form 별 raw_path 일치 확인 절차:
+         - HTML comment: marker 의 `raw_path` 값 == manifest `raw_path` 직접 비교
+         - Inline citation: `source_id` 로 sources.yml lookup → `filename` 또는 entry 의 raw_path field 가 manifest `raw_path` 와 prefix-match 또는 equality
+         - Source-code reference: marker 의 file:LN 의 file part 가 manifest `raw_path` 의 basename 또는 path 와 매치
+       - **모든 marker form 이 raw_path 와 mapping 가능** — O3 reject false-negative 방지
+   - 1차 또는 2차 fail 시 → row 의 `validator_passed = false`, Rule A 미통과
+
+위 6 조건 중 하나라도 미충족 → `citation_status_target = source-needed` 강제.
+
+#### Rule B — dest 파일 frontmatter ↔ manifest cross-check (K1+L2 skip-readme order)
+
+Phase 2a validator (`tools/validate-phase2a-manifest.sh` 신설) 의 mandatory check:
+
+1. manifest 의 모든 content row (classification ≠ skip-readme) 에 대해 `dest_path` 파일 존재 확인
+2. content row 의 `dest_path` frontmatter 파싱 → `citation_status` 추출
+3. **`citation_status (dest frontmatter) == citation_status_target (manifest)` 강제**. 불일치 시 fail.
+4. dest frontmatter 가 `verified` 인데 manifest Rule A 6 조건 미통과 → fail.
+5. **skip-readme row 의 validation order** (L2 반영):
+   - **Pre-archive** (2a.6 시점): dest_path 가 empty 이거나 archive 위치 — frontmatter check **skip**. Rule B 의 1-4 적용 안 함.
+   - **Post-archive** (2a.7 이후): archived path (`_archive/.../<orig>`) 존재 확인 + 원본 sha256 (manifest 의 `sha256_before`) 와 archive 의 현재 sha256 일치 확인.
+
+→ copy 단계 (2a.4) 의 template 실수로 verified 인 frontmatter 가 dest 에 들어가도 validator (2a.6) 가 catch.
+
+#### Validator script 명세 (`tools/validate-phase2a-manifest.sh`, L1+M1+M2 반영)
+
+작성 위치: `tools/validate-phase2a-manifest.sh` (thin bash entry) + `tools/validate-phase2a-manifest.py` (Python 본체, validate-research-isolation 과 같은 pattern).
+
+구현 작업 (2a.0 사전 단계):
+
+- (a) python script 가 manifest CSV 파싱 + 모든 row 에 대해 Rule A·B 적용
+- (b) **regression fixtures `tools/test_validate_phase2a.py`** — 최소 22 case (M1+M2+N1+N2+N3+O1+O2+O3):
+  1. verified pass (모든 조건 + 모든 marker form 합법)
+  2. verified fail — `claim_mapping_verified_by` empty
+  3. verified fail — `user-fake-20260523` regex OK 인데 date out of range (M1)
+  4. verified fail — `codex-review-019e...` archive 부재 (N2)
+  5. verified fail — `self-cited-line-fake.md:999` file 존재 X (M1)
+  6. verified fail — `self-cited-line-real.md:5` ±3 line 안 source_id 있지만 cited line 에 marker 없음 (N3)
+  7. verified fail — sha256_before mismatch
+  8. verified fail — dest frontmatter `verified` vs manifest target `source-needed` (Rule B)
+  9. source-needed pass
+  10. skip-readme pre-archive
+  11. skip-readme post-archive
+  12. post-archive content row sha256 mismatch (M2)
+  13. post-archive set equality fail — missing in archive (N1)
+  14. post-archive set equality fail — extra in archive (N1)
+  15. N2 ephemeral-only evidence rejection
+  16. N2 archived codex output hash mismatch
+  17. N3 self-cited-line HTML comment marker pass
+  18. N3 false-positive proximity but no marker
+  19. **O1 codex archive non-deterministic naming rejected** — `cp $log $(basename $log)` 결과 `.log` 확장자 그대로 → validator reject. Normalized `<session_id>.output` 만 accept
+  20. **O2 codex_evidence_sha256 missing fail** — manifest row 의 codex-review row 에서 컬럼 empty → fail
+  21. **O3 inline citation marker raw_path resolution pass** — `(pugh-sea-level §6:3 p.194)` 의 source_id 가 sources.yml 의 raw_path 와 일치 + manifest raw_path 와 매치
+  22. **O3 inline citation raw_path resolution fail** — sources.yml entry 없음, 또는 sources.yml 의 filename 이 manifest raw_path 와 불일치
+- (c) exit codes: 0 (all pass), 1 (Rule A fail), 2 (Rule B fail), 3 (Rule A+B fail), 4 (inventory set equality fail), 5 (post-archive set equality fail — N1), 6 (post-archive sha256 mismatch — M2), 7 (codex evidence archive missing/mismatch — N2+O2), 8 (codex archive naming non-deterministic — O1), 9 (marker raw_path resolution fail — O3)
+- (d) 2a 작업 시작 전 위 script + fixtures 모두 작성·통과 확인 → **2a.0 gate**
+
+#### Post-archive integrity check (M2+N1 반영)
+
+2a.7 (archive 후) 별도 mandatory gate. **filesystem set 과 manifest set 양방향 비교**:
+
+```python
+# 명확한 pseudo-code (N1 반영)
+ARCHIVE_ROOT = Path("_archive/from-modeling-wiki-knowledge-phase2a-2026-05-23")
+
+def archive_path_for(source_path):
+    """manifest source_path → expected archive path"""
+    return str(ARCHIVE_ROOT / Path(source_path).relative_to(
+        "_staging/from-modeling-wiki/knowledge"))
+
+# Set 1: manifest 가 예상하는 archive paths (expected)
+expected = {archive_path_for(row['source_path']) for row in manifest}
+
+# Set 2: 실제 filesystem 의 archive 내 모든 파일 (actual)
+actual = {str(p) for p in ARCHIVE_ROOT.rglob("*") if p.is_file()}
+
+# Set equality: 누락도 잉여도 없음
+missing_in_archive = expected - actual    # manifest 가 기대했는데 없는 파일
+extra_in_archive = actual - expected      # archive 에 있는데 manifest 모르는 파일
+assert missing_in_archive == set(), f"Missing: {missing_in_archive}"
+assert extra_in_archive == set(), f"Extra: {extra_in_archive}"
+
+# Per-file sha256 일치
+for row in manifest:
+    ap = archive_path_for(row['source_path'])
+    assert sha256(ap) == row['sha256_before'], f"sha256 mismatch: {ap}"
+```
+
+→ **모든 50 rows** (46 content + 4 skip-readme) 의 archive integrity 확인. content row 누락 / archive 에 stale extra file / sha256 변형 모두 catch.
+
+#### codex-review evidence durable archive (N2+O1 정정)
+
+verified row 중 `claim_mapping_verified_by = codex-review-<session_id>` 인 경우:
+
+```bash
+# 2a.0 사전 작업: codex output 을 deterministic naming 으로 durable archive 로 copy
+mkdir -p _archive/codex-reviews
+
+# Session ID 추출 패턴 (O1 deterministic):
+#   /tmp/claude-*/tasks/<id>.output  → id 추출
+#   ~/.claude/plugins/data/codex-openai-codex/state/*/jobs/review-<id>.log → review-<id> 추출
+extract_session_id() {
+    local path="$1"
+    local base
+    base=$(basename "$path")
+    # tasks/*.output: id 가 그대로 basename without .output
+    if [[ "$path" == */tasks/*.output ]]; then
+        echo "${base%.output}"
+    # jobs/review-*.log: review-<id> prefix 유지
+    elif [[ "$path" == */jobs/*.log ]]; then
+        echo "${base%.log}"
+    else
+        return 1  # unsupported format, reject
+    fi
+}
+
+for log in /tmp/claude-*/tasks/*.output ~/.claude/plugins/data/codex-openai-codex/state/*/jobs/*.log; do
+    [ -f "$log" ] || continue
+    session_id=$(extract_session_id "$log") || { echo "skip unparseable: $log"; continue; }
+    # deterministic name (O1)
+    cp "$log" "_archive/codex-reviews/${session_id}.output"
+done
+
+# sha256sums 만 normalized filename 으로 (O1)
+(cd _archive/codex-reviews && sha256sum *.output > sha256sums.txt)
+git add _archive/codex-reviews/ && git commit -m "archive: codex review outputs for phase 2a evidence (deterministic naming)"
+```
+
+manifest CSV 의 `codex-review-<session_id>` row 작성 시:
+- `claim_mapping_verified_by = codex-review-<session_id>` (extract_session_id 결과 사용)
+- `codex_evidence_sha256 = <sha256 of _archive/codex-reviews/<session_id>.output>` (O2 mandatory)
+
+validator 가 위 3 check (file exists, sha256 match, sums.txt cross-check) 자동 수행.
+
+2a 의 step table 에 2a.0 추가 + 2a.7 의 게이트 확장 (다음 §).
+
+### 2a Inventory generation (J4+K2 반영)
+
+```bash
+# manifest 의 source_path 컬럼 자동 생성
+find _staging/from-modeling-wiki/knowledge -type f > /tmp/phase2a-source-files.txt
+# CSV 의 source_path set 과 동일성 확인
+diff <(sort /tmp/phase2a-source-files.txt) <(cut -d, -f1 _staging/manifests/phase2a-manifest.csv | tail -n +2 | sort)
+# diff 비어있어야 2a.1 gate 통과
+```
+
+→ 모든 파일 (README 포함) include/exclude 명시, skip 불가.
+
+#### README 4 disposition (K2+L2 정정)
+
+**실제 inventory** (`find _staging/from-modeling-wiki/knowledge -type f | wc -l`): **50 files = 46 content + 4 README**. adcirc-sources/xbeach-sources 디렉토리 안 README 없음 (4차 codex 확인).
+
+| README | classification | dest_path |
+|---|---|---|
+| `_staging/from-modeling-wiki/knowledge/failure-patterns/README.md` | skip-readme | `_archive/from-modeling-wiki-knowledge-phase2a-2026-05-23/failure-patterns/README.md` |
+| `_staging/from-modeling-wiki/knowledge/heuristics/README.md` | skip-readme | `_archive/.../heuristics/README.md` |
+| `_staging/from-modeling-wiki/knowledge/playbooks/README.md` | skip-readme | `_archive/.../playbooks/README.md` |
+| `_staging/from-modeling-wiki/knowledge/methods/README.md` | skip-readme | `_archive/.../methods/README.md` |
+
+`skip-readme` row 의 manifest 처리:
+- `classification = skip-readme`
+- `dest_path` = `_archive/.../<orig>` (post-archive path, pre-archive 에는 존재 안 함)
+- `citation_status_target = n/a`
+- `audit_status`, `source_id`, `raw_path`, `raw_sha256`, `captured_date`, `claim_mapping_verified_by` = empty
+- `link_rewrite_needed` = false (README 안 본문 참조 없음을 grep 으로 사전 확인)
+- `validator_passed` = manual confirmation + post-archive 의 sha256 check
+
+#### 콘텐츠 inventory (L2 정정)
+
+**46 content** 의 카테고리 별 정확한 분포:
+
+| 카테고리 | 개수 |
+|---|---:|
+| `failure-patterns/<adcirc-wide6, efdc-water-level, efdc-wetdry, xbeach-morphology>` | 4 |
+| `heuristics/<adcirc-baseline, efdc-friction, xbeach-hydro>` | 3 |
+| `playbooks/<adcirc-wide6-reconstruction, efdc-boundary-forcing, efdc-tidal-calibration, xbeach-first-storm>` | 4 |
+| `methods/adcirc-sources/01..32` | 32 |
+| `methods/xbeach-sources/01..03` | 3 |
+| **총** | **46** |
+
+P1 의 failure+heuristic+playbook listing = **11** content (4+3+4), 35 catalog (32+3). 총 46 content + 4 README = 50. v4 의 "45 content + 5 README" 정정.
+
+### 2a 진행 단계 (gated, J2+L1 반영 — validator script 사전 작성)
+
+| Step | 작업 | 게이트 |
+|---|---|---|
+| **2a.0** | **Validator script + fixtures 작성** — `tools/validate-phase2a-manifest.{sh,py}` + `tools/test_validate_phase2a.py` (6+ regression case). 작성 + 모두 pass 확인 | test EXIT=0 |
+| 2a.1 | **Inventory** — `find` 로 source_path 자동 생성, manifest 의 source_path 컬럼과 set equality 확인. README 포함 모든 파일 include/exclude 결정 명시 | diff 비어있음 |
+| 2a.2 | manifest 의 `classification`, `citation_status_target`, `claim_mapping_verified_by` 채우기 (P1 checklist + P2 raw artifact gate + L1 evidence) | all content rows 채워짐 |
+| 2a.3 | `sha256_before` 계산 (`sha256sum` 일괄) | manifest 의 sha256_before 모두 nonempty |
+| 2a.4 | **Copy** (rsync) — `_staging/` 에 원본 유지하면서 dest 에 복제 + frontmatter 추가 (citation_status = manifest target 과 일치하게) | dest 파일 모두 존재, 별도 sha256 verify |
+| 2a.5 | **Link rewrite** — 본문 (concepts/·models/·experience/·tools/) 에서 `_staging/from-modeling-wiki/knowledge/...` 참조 grep → 새 경로로 일괄 replace | grep 후 매치 0 |
+| 2a.6 | **Validate** — tools/validate-research-isolation.sh + `tools/validate-phase2a-manifest.sh` (Rule A + Rule B) | EXIT=0 모두 |
+| 2a.7 | **Archive** — `_staging/from-modeling-wiki/knowledge/` 전체를 `_archive/from-modeling-wiki-knowledge-phase2a-2026-05-23/` 로 atomic mv | rename 성공 + **모든 50 rows** (46 content + 4 skip-readme) 의 archive path 존재 + sha256 == sha256_before (M2 반영) |
+| 2a.8 | **Repo-wide link check (post-archive)** — 본문에서 `_staging/from-modeling-wiki/knowledge/` 참조 (구 경로) 검출 시 fail | grep 매치 0 |
+| 2a.9 | **(별도 게이트)** Final delete `_archive/.../knowledge/` — 사용자 명시 OK + 1~2개월 유예 | 2a.7 commit + push 성공 + 시간 경과 |
+
+→ **각 step 실패 시 rollback** (2a.7 까지는 _staging archive 보존).
+→ **2a.9 는 별도 의사결정 게이트** — phase 마무리에 포함 안 함, plan 의 phase 6 와 동일.
+
+---
+
+## Sub-phase 2b — concepts 갭 보강 (canonical table, H1 반영)
+
+### 단일 canonical table — 모든 후보 파일
+
+`source_needed` 또는 `미생성` 각 파일별 정확한 결정. **J5 반영**: wrapper-only 페이지는 `source-needed` 유지 (partial-verified 도입 보류).
+
+| File | 현재 | source_id / 근거 | claim scope | target |
+|---|---|---|---|---|
+| `concepts/tides/06-model-application.md` | source-needed | models/ADCIRC + Delft3D source-analysis | **wrapper-only** — 각 모델별 1-2문단 요약 + source-analysis 링크. equation·detail 은 source-analysis 가 canonical | **`source-needed` 유지** (wrapper-only) |
+| `concepts/currents/06-model-application.md` | source-needed | 동상 | 동상 | **`source-needed` 유지** |
+| `concepts/sst/06-model-application.md` | source-needed | EFDC heat module + Delft3D thermal source-analysis + concepts/sst/02-theory §3 인용 | wrapper + heat budget bulk flux 식 직접 인용 (02 verified 의 인용) | **`source-needed`** (전체 verified 가 안 되므로) |
+| `concepts/storm-surge/03-analysis-methods.md` | 미생성 | Pugh §7:8 tide-surge separation + Mann-Kendall (concepts/sst/03 공유) | tide-surge separation 식 (Pugh 직접) + return period (joint Pugh §8:3:3) | `verified` |
+| `concepts/storm-surge/05-examples.md` | 미생성 | KHOA Annual Report 2003·2012·2019·2022 §3 — **사용자가 PDF 페이지·표 번호 확인 후 row 별 source_id+page 명시 필요** | KHOA 보고 surge 값 + 본 위키 storm-surge/04 의 코드 인용 | **`source-needed`** (J3 반영, 실 페이지 인용 확보 후 verified) |
+| `concepts/storm-surge/06-model-application.md` | 미생성 | 04 wrapper + models/ADCIRC/source-analysis/storm-surge/ 7 노트 인용 | wrapper-only | **`source-needed`** (wrapper-only) |
+| `concepts/sediment-transport/05-examples.md` | source-needed | experience/efdc-chuksan-sediment.md (2c) → 분리 | **delegated to experience/** | `source-needed` 유지 (experience 작성 후 본 파일에 인용만 추가) |
+| `concepts/littoral-drift/02-theory.md` | 미생성 | textbook/md/Waves-Holthuijsen2007.md Ch 8 radiation stress + Bowen 1969 + Battjes 1974 | radiation stress 직접 인용 (Longuet-Higgins-Stewart 1964) + longshore current 식 | `verified` |
+| `concepts/littoral-drift/03-analysis-methods.md` | 미생성 | concepts/sediment-transport/03 + CERC SPM 1984 + Komar-Inman 1970 | tracer experiments, beach profile survey, budget control volume | `source-needed` (학회 자료·CERC PDF 확보 후 verified) |
+| `concepts/littoral-drift/04-code-and-tools.md` | 미생성 | models/XBeach/source-analysis + GENESIS 외부 + UNIBEST-LT 외부 | XBeach 인용 + GENESIS·UNIBEST 외부 reference | **`source-needed`** (외부 GENESIS/UNIBEST 인용 cite 전까지) |
+| `concepts/littoral-drift/05-examples.md` | 미생성 | 한국 안목항·울산항·태안 — 학회·KMOU 보고서 | 한국 case | `source-needed` |
+| `concepts/littoral-drift/06-model-application.md` | 미생성 | XBeach + EFDC SED 인접 | wrapper-only | **`source-needed`** (wrapper-only) |
+
+→ v3 의 verified target = **2 파일만** (storm-surge/03 + littoral-drift/02). 나머지 wrapper-only 또는 외부 source 미확보 = `source-needed`. 정직성 우선.
+
+### 2b 진행 단계
+
+1. canonical table 의 file 별로:
+   - 현재 frontmatter 의 `citation_status` 확인
+   - 본문 작성·갱신
+   - target `citation_status` 부여 (source-needed 또는 verified)
+2. INDEX.md 갱신 — 토픽별 (verified/source-needed/미생성) 카운트 갱신
+3. CONVENTIONS.md / validate 스크립트 / templates **변경 없음** (J5 Option A 반영 — partial-verified 보류)
+
+---
+
+## Sub-phase 2c — experience 3 신규 노트
+
+### 표
+
+| File | citation_status (강제) | 근거 source | 비고 |
+|---|---|---|---|
+| `experience/khoa-2024-mhw-extreme.md` | **verified** | data/sst-global/mhw/daily_2024_*.csv (본 위키 fetch + Hobday 알고리즘 검증) | 본 분석 직접, raw 데이터 본 위키 안 |
+| `experience/efdc-chuksan-sediment.md` | **source-needed** (M2 강제) | 사용자 메모리 ID 1215 + EFDC source-analysis | 수치 (±1.5 cm/yr, 15년 ±22 cm) 는 **"user memory / anecdotal"** 라벨. raw run outputs 없으면 verified 금지. |
+| `experience/khoa-tide-surge-coupling.md` | **verified** (단 KHOA OpenAPI 실 fetch 후) | Hinnamnor 2022 + 다른 한국 태풍의 KHOA `surveyTideLevel` 직접 fetch | tide 예측 (`bscTdlvHgt`) vs 실측 (`tdlvHgt`) residual 분석 |
+
+### 2c 진행 단계
+
+1. C1 (`khoa-2024-mhw-extreme.md`) — daily_2024_events.csv 인용 + KHOA Annual Report 2024 보고 cross-check
+2. C2 (`efdc-chuksan-sediment.md`) — **source-needed** 강제, "user memory" 라벨, raw 추가 시 verified
+3. C3 (`khoa-tide-surge-coupling.md`) — KHOA OpenAPI 직접 fetch (Hinnamnor 2022-09-06 인천 등 10분 시계열) + 본 위키 storm-surge/02 의 식 검증
+
+---
+
+## Sub-phase 2d — 정책·도구 최종 정리
+
+| # | 작업 |
+|---|---|
+| D1 | `textbook/sources.yml` 신규 등록: `pugh-sea-level`, `cerc-spm-1984`, `komar-inman-1970`, 기타 source-needed → verified 승격 시 발견된 것 |
+| D2 | `tools/sst-cross-check/README.md` — 모든 스크립트 (fetch 4 + analyze 3 + identify 2) 통합 안내 |
+| D3 | `_staging/from-modeling-wiki/` 가 비워졌으면 → 디렉토리 삭제, `_archive/` 의 phase2a manifest 만 보존 |
+| D4 | `BOUNDARY.md` 상단에 "M4 마이그레이션 완료 (2026-05-23 Phase 1 + 2a-2d)" 헤더 |
+| D5 | `INDEX.md` 최종 정리 — 모든 토픽·모델 상태 갱신. 기존 3-tier (draft/source-needed/verified) 만 사용. **partial-verified 표시 제거** (K3 반영, Option A 일관성) |
+| D6 | ~~`CONVENTIONS.md §2` 에 `partial-verified` 정책 명시~~ — **Option A 적용으로 skip** (K3 반영). 미래 schema change 시 별도 phase 로 분리 |
+
+---
+
+## 위험·우려 (v3 갱신)
+
+1. ~~`partial-verified` 새 status~~ → **보류** (J5 Option A). 4-tier 도입 회피, wrapper = source-needed.
+2. **manifest CSV 작성 비용** — 50 노트 × 13 컬럼 = 650 cells. find 자동 inventory + sha256sum 자동 + classification 만 수동.
+3. **link rewrite scope** (J2 반영) — 본문 안 `_staging/from-modeling-wiki/knowledge/...` 참조 검출 grep:
+   ```bash
+   rg -l "_staging/from-modeling-wiki/knowledge/" concepts/ models/ experience/ tools/ INDEX.md
+   ```
+   현재 알려진: concepts/storm-surge/01-concept.md, 02-theory.md, concepts/sediment-transport/06-model-application.md.
+4. **2c C3 KHOA OpenAPI archive 한계** — `surveyTideLevel` (조위) 의 archive 범위 미확인 (SST 와 다를 수 있음). 2c 시작 시 1차 fetch 시도 → archive 한계 시 대안 (KHOA 백서 직접 인용) 명시.
+5. **2a 별도 final delete (2a.9)** — phase 마무리 안 포함, plan Phase 6 와 동일 정책 (1-2개월 유예).
+6. **2b verified target 축소** — v2 의 8 verified → v3 의 2 verified (storm-surge/03 + littoral-drift/02). 나머지 6 source-needed 유지. **정직성 vs 진척 속도 trade-off** — v3 가 보수적이지만 코드inference 무결성 우선.
+
+## 검증 대기
+
+이 v8 plan 은 `/codex:adversarial-review` 8차 대기 중. approve 또는 minor-only 받으면 2a 부터 진행.
+
+추이: 1차 6 (high 4) → 2차 5 → 3차 3 → 4차 2 → 5차 2 → 6차 3 → 7차 3 (**high 0**) → **8차 ?**
+
+7차에서 high 사라짐. 8차에서 medium 도 사라지거나 approve 기대.
+
