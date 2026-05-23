@@ -1,3 +1,19 @@
+---
+title: "ADCIRC Storm Surge — NWS family 비교 (NWS=12/13/14/19/20)"
+topic: storm-surge
+canonical_source: self
+citation_status: verified
+verification_method: "ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/adcirc/src/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-storm-surge-nws-families.md (modeling-wiki 4월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
+note_author: "사용자 + codex source-code 분석 (2026-04 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
+note_date: 2026-04 (original) / 2026-05-23 (promote)
+verification_by: "사용자 + codex source-code analysis"
+verification_date: 2026-04
+related:
+  - concepts/storm-surge/01-concept.md
+  - concepts/storm-surge/02-theory.md
+  - models/ADCIRC/raw/source_code/adcirc/src/
+---
+
 # ADCIRC Storm Surge NWS Families
 
 Date: 2026-04-12

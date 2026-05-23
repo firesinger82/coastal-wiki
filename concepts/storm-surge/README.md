@@ -17,7 +17,7 @@
 - `pugh-sea-level` — [`textbook/md/sea-level.md`](../../textbook/md/sea-level.md) (Pugh "Tides, Surges and Mean Sea-Level" Ch 6 직접)
 - `adcirc-theory` — [`models/ADCIRC/raw/manuals/pdfs/adcirc_theory_2004_12_08.pdf`](../../models/ADCIRC/raw/manuals/) (Luettich & Westerink ADCIRC Theory)
 - `khoa-annual-reports` — [`textbook/notes/khoa-annual-reports-overview.md`](../../textbook/notes/khoa-annual-reports-overview.md) (한국 태풍·이상조위 자료)
-- `adcirc-storm-surge-staging` — [`_staging/from-modeling-wiki/knowledge/methods/adcirc-storm-surge.md`](../../_staging/from-modeling-wiki/knowledge/methods/adcirc-storm-surge.md) (NWS=19/20/29/30 mode 분석, source-code level)
+- `adcirc-source-analysis-storm-surge` — [`models/ADCIRC/source-analysis/storm-surge/`](../../models/ADCIRC/source-analysis/storm-surge/) (7개 노트, source-code level NWS=12-30 분석 — promote 완료 2026-05-23)
 
 ## 연결
 
@@ -27,7 +27,7 @@
 - `experience/khoa-annual-climate-trend.md` — SLR + 태풍 빈도 trend
 - `experience/khoa-sst-warming-trend.md` — Kuroshio/marine heatwave (태풍 강도화 동인)
 - `models/ADCIRC/` — primary storm surge 모델
-- `_staging/from-modeling-wiki/knowledge/methods/adcirc-storm-surge*.md` (7개) — ADCIRC NWS 분석, promote 후보
+- `models/ADCIRC/source-analysis/storm-surge/` (7개, promote 완료) — ADCIRC NWS source-code 분석
 
 ## 작업 계획
 
@@ -38,4 +38,4 @@
 2. `02-theory.md` — Pugh §6:3 inverse-barometer + §6:4 wind stress + §7:8 tide-surge interaction 정형 인용
 3. `04-code-and-tools.md` — ADCIRC NWS modes·OWI format·KHOA 이상조위 observation
 4. `05-examples.md` — 한국 태풍 case (Maemi 2003 / Bolaven 2012 / Hinnamnor 2022) — KHOA 백서 직접 인용
-5. `_staging/from-modeling-wiki/knowledge/methods/adcirc-storm-surge*.md` 7개 promote 후 `models/ADCIRC/source-analysis/` 또는 `06-model-application.md` 로
+5. ✅ `_staging adcirc-storm-surge*.md` 7개 → `models/ADCIRC/source-analysis/storm-surge/` promote 완료 (2026-05-23). 추후 `06-model-application.md` 에서 본 노트들 인용

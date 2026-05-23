@@ -151,7 +151,7 @@ $$\frac{\partial u}{\partial t} - fv = \cdots, \quad f = 2\Omega \sin\phi$$
 | Delft3D-FLOW | [`models/Delft3D/`](../../models/Delft3D/) | 3D + sediment 결합 가능 |
 | SCHISM | 미설치 | unstructured grid, ADCIRC 대안 |
 
-ADCIRC 의 storm surge 적용 — `_staging/from-modeling-wiki/knowledge/methods/adcirc-storm-surge*.md` 의 7개 노트 (NWS=12/13/14/19/20/29/30 wind input modes 분석, source-code level) → [`models/ADCIRC/source-analysis/`](../../models/ADCIRC/) 로 promote 후 인용.
+ADCIRC 의 storm surge 적용 — `models/ADCIRC/source-analysis/storm-surge/*.md` 의 7개 노트 (NWS=12/13/14/19/20/29/30 wind input modes 분석, source-code level) → [`models/ADCIRC/source-analysis/`](../../models/ADCIRC/) 로 promote 후 인용.
 
 ### 4.2 Wave coupling
 
@@ -174,7 +174,7 @@ ADCIRC + SWAN coupled (한국 적용): wave setup + surge 동시 계산 → ADCI
 |---|---|
 | SLR + storm surge 위험 누적 | `experience/khoa-annual-climate-trend.md` (해수면 상승 → surge baseline 상승) |
 | SST 가속 → 태풍 강도 | `experience/khoa-sst-warming-trend.md` §7 marine heatwave |
-| ADCIRC NWS 모드 (source-code level) | `_staging/from-modeling-wiki/knowledge/methods/adcirc-storm-surge*.md` (7개, promote 대기) |
+| ADCIRC NWS 모드 (source-code level) | `models/ADCIRC/source-analysis/storm-surge/` (7개, promote 완료) |
 | KHOA 정점 surge 관측 | `concepts/tides/04-code-and-tools.md` §3 KHOA OpenAPI |
 
 ## 7. 인용 정형 ex
@@ -195,4 +195,4 @@ source_id 매니페스트: [`textbook/sources.yml`](../../textbook/sources.yml) 
 - 외부:
   - [`textbook/md/sea-level.md`](../../textbook/md/sea-level.md) — Pugh full book
   - [`models/ADCIRC/raw/manuals/pdfs/`](../../models/ADCIRC/raw/manuals/) — ADCIRC theory + user docs
-  - [`_staging/from-modeling-wiki/knowledge/methods/adcirc-storm-surge*.md`](../../_staging/from-modeling-wiki/knowledge/methods/) — 7개 NWS 분석 (promote 대기)
+  - [`models/ADCIRC/source-analysis/storm-surge/`](../../models/ADCIRC/source-analysis/storm-surge/) — 7개 NWS source-code 분석 (promote 완료 2026-05-23)
