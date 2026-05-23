@@ -12,7 +12,7 @@
 | [currents](concepts/currents/) | **DRAFT** (01-05 verified, 06 source-needed) | 조류 — 5/6 verified (UTide 2D + 수치조류도 + KHOA 60+ 용어). 동해 수치조류도 미커버 명시 |
 | [sst](concepts/sst/) | **STABLE** (01·02·03·04 verified, 05·06 source-needed) | 해수면 수온 — 4/6 verified. 01 정의, 02 heat budget, 03 회귀·MHW·climatology, 04 5 데이터셋 운영. experience/ 4건 (warming-trend, global-crosscheck, vertical-trends, annual-climate) 연결 |
 | [littoral-drift](concepts/littoral-drift/) | TBD | 연안표사 |
-| [storm-surge](concepts/storm-surge/) | TBD | 폭풍해일 |
+| [storm-surge](concepts/storm-surge/) | **MINIMAL** (01 verified) | 폭풍해일 — 1/6 verified (정의·5 인자·한국 적용, Pugh 1987 Ch 6 + ADCIRC + KHOA). _staging adcirc-storm-surge 7개 promote 후 04/05/06 작성 |
 
 ## models/ (모델별 객관 자료)
 
