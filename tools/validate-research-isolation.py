@@ -52,6 +52,16 @@ os.chdir(WIKI_ROOT)
 
 TARGET_ROOTS = ("concepts", "models", "experience")
 GOVERNANCE_EXEMPT = {"research/README.md", "research/manifest.md"}
+# research/prompts/ 는 Hermes 운영 자산 (cron 등록용 prompt 파일).
+# 본문성 아닌 governance 라서 frontmatter 면제. 정책: research/README.md §역할.
+GOVERNANCE_EXEMPT_PREFIXES = ("research/prompts/",)
+
+
+def is_governance_exempt(path: str) -> bool:
+    """research/ 안의 governance 성격 파일 여부 (frontmatter 면제 대상)."""
+    if path in GOVERNANCE_EXEMPT:
+        return True
+    return any(path.startswith(p) for p in GOVERNANCE_EXEMPT_PREFIXES)
 
 URL_SCHEME_RE = re.compile(r"^[a-zA-Z][a-zA-Z0-9+.\-]*:")
 INLINE_LINK_RE = re.compile(r"\]\(([^)\s]+)")
@@ -209,7 +219,7 @@ def main() -> int:
     print("[2/2] research/ 내부 .md frontmatter 검사…")
     fm_violations: list[str] = []
     for f in research_files:
-        if f in GOVERNANCE_EXEMPT:
+        if is_governance_exempt(f):
             continue
         content = reader(f)
         if not content:

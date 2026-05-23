@@ -80,6 +80,26 @@ PINN "shallow water equations"
 - 주간 digest: `research/digests/YYYY-WW-coastal-modeling.md`
 - 월간 digest: `research/digests/YYYY-MM-coastal-modeling.md`
 - 추적 대상: `research/watchlist/*.md`
+- prompt 파일(governance): `research/prompts/*.md`
+
+## 운영 빈도
+
+- **주간 자동 수집**: cron 매주 월요일 09:00 KST.
+  - prompt: `research/prompts/weekly-collection.md`
+  - 산출: `research/inbox/YYYY-MM-DD-*.md` + `research/digests/YYYY-WW-coastal-modeling.md`
+- **단발 주제 탐색**: `research/prompts/<topic>-deep-dive.md`, 수동 실행.
+- **watchlist 등록·갱신**: `research/prompts/register-watchlist.md`, 수동 실행.
+- **inbox 90일 체류 추적**: 주간 digest 안에 90일 초과 항목 별도 섹션 (promote/discard 결정 촉구).
+
+## arXiv 카테고리 권장
+
+자동 수집 prompt 에서 다음 카테고리 우선:
+
+- `physics.ao-ph` (Atmospheric and Oceanic Physics) — 1차
+- `physics.flu-dyn` (Fluid Dynamics) — 1차
+- `cs.LG` (Machine Learning) — ML/PINN 계열 보강
+- `physics.geo-ph` (Geophysics) — 퇴적·해저 지형 관련
+- `physics.comp-ph` (Computational Physics) — 수치기법 보강
 
 ## Promote 정책
 

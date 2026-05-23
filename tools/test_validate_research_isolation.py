@@ -323,6 +323,31 @@ def run_link_tests() -> tuple[int, int]:
     return passed, failed
 
 
+# (filepath, expected_is_governance, description)
+GOV_CASES: list[tuple[str, bool, str]] = [
+    ("research/README.md", True, "README is governance"),
+    ("research/manifest.md", True, "manifest is governance"),
+    ("research/prompts/00-initial-context.md", True, "prompts/ subdir is governance"),
+    ("research/prompts/weekly-collection.md", True, "prompts/ weekly is governance"),
+    ("research/prompts/sub/nested.md", True, "prompts/ nested is governance"),
+    ("research/inbox/2026-05-23-foo.md", False, "inbox is NOT governance"),
+    ("research/digests/2026-W21-x.md", False, "digests is NOT governance"),
+    ("research/watchlist/author-roelvink.md", False, "watchlist is NOT governance"),
+]
+
+
+def run_gov_tests() -> tuple[int, int]:
+    passed = failed = 0
+    for filepath, expected, desc in GOV_CASES:
+        got = vri.is_governance_exempt(filepath)
+        if got == expected:
+            passed += 1
+        else:
+            failed += 1
+            print(f"  FAIL [gov] {desc}: {filepath} expected={expected} got={got}")
+    return passed, failed
+
+
 def run_fm_tests() -> tuple[int, int]:
     passed = failed = 0
     for filepath, content, expected, desc in FM_CASES:
@@ -348,8 +373,12 @@ def main() -> int:
     fp, ff = run_fm_tests()
     print(f"  {fp} passed, {ff} failed")
 
-    total_failed = lf + ff
-    total_passed = lp + fp
+    print("[governance-exempt tests]")
+    gp, gf = run_gov_tests()
+    print(f"  {gp} passed, {gf} failed")
+
+    total_failed = lf + ff + gf
+    total_passed = lp + fp + gp
     print()
     if total_failed == 0:
         print(f"ALL {total_passed} TESTS PASS")

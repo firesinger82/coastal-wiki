@@ -6,10 +6,12 @@
 
 ## 역할
 
-- `inbox/`: 새로 발견한 후보 항목. X 포스트, 논문, 블로그, 툴 릴리스, 계정, 데이터셋 등.
-- `digests/`: Hermes가 만든 주간·월간 트렌드 요약.
-- `watchlist/`: 모니터링 대상 키워드, 계정, 저자, 기관, 저장소, 저널.
-- `manifest.md`: Hermes 프로필 운영 기록, 수집 방법, 쿼리 세트, 한계.
+- `inbox/`: 새로 발견한 후보 항목. X 포스트, 논문, 블로그, 툴 릴리스, 계정, 데이터셋 등. (Hermes write)
+- `digests/`: Hermes가 만든 주간·월간 트렌드 요약. (Hermes write)
+- `watchlist/`: 모니터링 대상 키워드, 계정, 저자, 기관, 저장소, 저널. (Hermes write)
+- `prompts/`: Hermes 호출용 prompt 파일 (cron 등록 + 단발 실행). **governance** — frontmatter 면제, validator 검사 제외.
+- `manifest.md`: Hermes 프로필 운영 기록, 수집 방법, 쿼리 세트, 한계, 운영 빈도. **governance**.
+- `README.md`: 이 파일. **governance**.
 
 ## 핵심 원칙
 
