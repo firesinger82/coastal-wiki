@@ -52,15 +52,38 @@ mkdir -p data
 
 raw CSV는 `.gitignore` 처리. 분석 결과(`results/`)는 이미 포함됨.
 
-### 2.4 Claude 세션 이어가기 (선택)
+### 2.4 OneDrive 분리 파일 복원 (선택)
 
-writer PC의 `~/.claude/session-data/2026-05-23-coastal-wiki-build-session.tmp` 를 reader PC의 같은 경로로 복사 (예: USB 또는 별도 cloud sync). 이후:
+git에 포함하지 않은 파일들 — **OneDrive `coastal-wiki-sync/`** 에 자동 동기화:
 
+| 파일 | 사유 | OneDrive 위치 |
+|---|---|---|
+| Session .tmp | 다른 프로젝트 세션 포함 가능 | `coastal-wiki-sync/session-data/` |
+| KHOA API key | 평문 노출 위험 | `coastal-wiki-sync/secrets/khoa-api-key.txt` |
+| Raw KHOA CSV (~7.7MB) | OpenAPI 재다운 가능 | `coastal-wiki-sync/raw-data/khoa-validation-2026/` |
+
+OneDrive 동기화된 다른 PC에서:
+
+```bash
+ONEDRIVE=/mnt/c/Users/firesinger/OneDrive
+
+# 1. 세션 파일
+mkdir -p ~/.claude/session-data
+cp $ONEDRIVE/coastal-wiki-sync/session-data/*.tmp ~/.claude/session-data/
+
+# 2. KHOA API key — ~/.bashrc 또는 ~/.zshrc에 등록
+echo "export KHOA_API_KEY=$(grep -oP '^KHOA_API_KEY=\K.*' $ONEDRIVE/coastal-wiki-sync/secrets/khoa-api-key.txt)" >> ~/.bashrc
+source ~/.bashrc
+
+# 3. (선택) Raw CSV — validation 재실행하지 않을 거면 생략
+mkdir -p ~/coastal-wiki/tools/khoa-validation/data
+cp $ONEDRIVE/coastal-wiki-sync/raw-data/khoa-validation-2026/*.csv ~/coastal-wiki/tools/khoa-validation/data/
+
+# 4. Claude 세션 이어가기
+#    Claude Code 진입 후: /resume-session 2026-05-23
 ```
-> /resume-session 2026-05-23
-```
 
-세션 파일은 **민감 정보 가능성** (다른 프로젝트 세션도 포함)으로 git에 포함하지 않음. 별도 동기화 권장.
+자세한 내용: `$ONEDRIVE/coastal-wiki-sync/README.md`
 
 ## 3. 일상 워크플로 — 같은 PC에서 계속
 
