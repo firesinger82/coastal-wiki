@@ -1,27 +1,27 @@
 ---
-title: "KHOA 9년 해수온(SST) 상승 추세 — 한국 연안 2017-2025"
+title: "KHOA 9년 해수온(SST) 상승 추세 — 한국 연안 2017-2025 (+ 1968-2012 장기 비교)"
 topic: khoa-sst-warming
 canonical_source: self
 citation_status: verified
-verification_method: "KHOA Annual Report 2019-2025 표 3-14/3-23/3-25 (국가해양관측망 관측시설별 월별 평균수온) 자동 추출 + 2017-2018 정점별 월통계 테이블 (수온 행) 추출. 13정점 9년 시계열 (2017-2025) 선형회귀 자체 계산. 2012-2016 보고서 포맷 변동으로 자동 추출 일부 제한. 2025 표 3-15 (편차) cross-check (인천 누년 inferred 14.65℃ vs trend 추정값 일치)."
+verification_method: "KHOA Annual Report 2019-2025 표 3-14/3-23/3-25 (국가해양관측망 관측시설별 월별 평균수온) 자동 추출 + 2017-2018 정점별 월통계 테이블 (수온 행) 추출. 13정점 9년 시계열 (2017-2025) 선형회귀 자체 계산. 2012-2016 보고서 포맷 변동으로 자동 추출 일부 제한. 2025 표 3-15 (편차) cross-check (인천 누년 inferred 14.65℃ vs trend 추정값 일치). **2026-05-23 보강**: Annual Report 2012 vol.2 §3.1 표 3-1 (해역별 장기 관측 수온의 연간 변화율) 직접 추출 — KHOA 공식 1968-2012 정점별 장기 trend (0.0038-0.241 °C/year). 우리 9년과 직접 비교 가능."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-23
-verification_by: "Claude Opus 4.7 (1M context) — KHOA Annual Report 직접 추출 + 회귀 + anomaly cross-check"
+verification_by: "Claude Opus 4.7 (1M context) — KHOA Annual Report 직접 추출 + 회귀 + anomaly cross-check + 1968-2012 공식 reference 보강"
 verification_date: 2026-05-23
 related_experience:
   - khoa-annual-climate-trend (SLR — 정합성 비교)
   - khoa-multi-station-tide-validation-2026
 data_sources:
-  - khoa-annual-reports (Annual Report 2017-2025 9권)
+  - khoa-annual-reports (Annual Report 2017-2025 9권 + 2012 vol.2 §3.1 표 3-1)
 analysis_files:
   - /tmp/khoa_sst_phase1.json (2019-2025 raw monthly)
   - /tmp/khoa_sst_phase2.json (2017-2018 raw monthly)
   - /tmp/khoa_sst_merged.json (전체 merged annual)
   - /tmp/khoa_sst_trends_clean.json (regression results)
 caveats:
-  - "9년 시계열은 단기 — PDO/ENSO 등 long-term variability 영향 배제 어려움. KHOA 1968-2024 50+년 분석 결과(~0.4-0.6 °C/decade)와 단순 비교 불가."
-  - "2012-2016은 보고서 포맷 차이로 자동 추출 곤란. 향후 KHOA OpenAPI 직접 다운로드로 보강."
-  - "단기 강한 trend (남해 1.74 °C/decade)는 PDO 위상 등에 영향받음. 30년 trend로 재검증 필요."
+  - "9년 시계열은 단기 — PDO/ENSO 등 long-term variability 영향 배제 어려움. **KHOA 공식 1968-2012 trend(0.123 °C/decade 전국 평균)와 본 분석 1.39 °C/decade는 약 11배 차이** — §3.2에 상세."
+  - "2012-2016 보강 시도 결과 (2026-05-23): KHOA OpenAPI `surveyWaterTemp` 서비스 archive는 2025-01 이후만 가용 (서비스 2025-03-14 배포). 2012-2024 기간은 본 endpoint로 추가 fetch 불가. **백서 2012 vol.2 §3.1 표 3-1**(1968-2012 정점별 장기)을 alternative reference로 통합."
+  - "단기 강한 trend (남해 1.74 °C/decade)는 PDO 위상·2023-2025 marine heatwave 영향. KHOA 1968-2012 남해 평균 0.223 °C/decade와 직접 비교 시 약 8배 가속."
 ---
 
 # KHOA 9년 해수온(SST) 상승 추세 — 한국 연안 2017-2025
@@ -75,19 +75,61 @@ caveats:
 
 → 단순 산술 비교 시 한국 연안 SST trend는 글로벌 평균의 **~8배**. 그러나 **9년 시계열**은 단기 — long-term variability (PDO 위상 전환, ENSO 등) 영향 배제 어려움. 30년+ trend (예: KHOA 1968-2024 ~0.4-0.6 °C/decade)와 직접 비교는 부적절.
 
-### 3.2 한국 SST 가속화 가능성
+### 3.2 한국 SST 가속화 — KHOA 공식 장기 데이터와의 정량 비교
 
-기존 KHOA 발표 (1968-2024 약 56년):
-- 한국 연안 평균 SST 상승: ~0.34 °C/decade (한국해양과학기술원 분석)
-- 동해: ~0.25 °C/decade
-- 남해: ~0.30 °C/decade
-- 서해: ~0.20 °C/decade
+**Annual Report 2012 vol.2 §3.1 표 3-1** (해역별 장기 관측 수온의 연간 변화율) 직접 인용:
 
-본 분석 (2017-2025, 9년)의 1.39 °C/decade는 **현저히 큰 값**. 두 가지 가능성:
-1. **단기 가속화** — 2017-2025 기간이 다른 기간보다 빠르게 가온 (특히 2023-2025 marine heatwave 영향)
-2. **단기 변동성** — 9년은 trend로 단정하기에 너무 짧음
+| 해역 | 평균 (°C/yr) | 평균 (°C/decade) | n 정점 |
+|---|---:|---:|---:|
+| 서해 | 0.0107 | 0.107 | 14 |
+| 남해 | 0.0223 | 0.223 | 14 |
+| 동해 | 0.0038 | 0.038 | 6 |
+| **전국 평균** | **0.0123** | **0.123** | 34 |
 
-→ 본 분석 결과는 **caveat 포함**해 사용. SLR(19년, R² 강함)과 달리 SST trend는 단기 잡음 영향이 큼.
+> 인용: "우리나라 수온은 0.0123℃/year로 서해, 남해, 동해 모두 상승하는 경향이 나타났다. 해역별로는 남해에서 0.0223℃/year로 연간 변화율의 최대값이 나타나며, 서해에서 0.0107℃/year로 상승하는 경향이 나타났다. 동해에서는 0.0038℃/year로 상승하는 경향이 나타났다." (KHOA Annual Report 2012 vol.2, p. 본 §3.1)
+
+본 분석(2017-2025, 9년) **1.39 °C/decade** vs KHOA 1968-2012 (대부분 30-49년 장기) **0.123 °C/decade** → **약 11.3배 차이**.
+
+해역별 가속비:
+
+| 해역 | KHOA 1968-2012 (°C/decade) | 본 9년 (°C/decade) | 비율 |
+|---|---:|---:|---:|
+| 서해 | 0.107 | 1.61 | **15×** |
+| 남해 | 0.223 | 1.74 | **7.8×** |
+| 동해 | 0.038 | 0.69 | **18×** |
+| 전국 | 0.123 | 1.39 | **11×** |
+
+#### 정점 매칭 비교 (장기 관측 50년 가까운 정점 중심)
+
+| 정점 | KHOA 1968-2012 (n년) | KHOA 1968-2012 (°C/decade) | 본 9년 (°C/decade) | 가속비 |
+|---|---:|---:|---:|---:|
+| 인천 | 49 | 0.02 | 1.30 | **65×** |
+| 목포 | 49 | 0.03 | 1.53 | **51×** |
+| 제주 | 49 | 0.03 | 2.39 | **80×** |
+| 묵호 | 49 | 0.02 | 0.79 | **40×** |
+| 여수 | 47 | 0.00 | 0.93 | ∞ |
+| 울릉도 (대비) | 47 | 0.01 | n/a | — |
+| 포항 | 40 | 0.02 | 1.50 | **75×** |
+| 속초 | 38 | 0.03 | 0.88 | **29×** |
+| 울산 | 37 | 0.02 | -0.39 | (음) |
+| 거문도 | 30 | 0.02 | 1.23 | **62×** |
+| 서귀포 | 27 | 0.06 | 1.85 | **31×** |
+
+→ 30년+ 정점 평균 약 **50배 가속**. 9년 시계열의 단기 잡음을 인정하더라도 1968-2012 와의 격차가 너무 큼.
+
+#### 가능한 원인
+
+1. **2017-2025 가속화** — 21세기 후반 marine heatwave 빈도·강도 증가. 특히 2023-2025 globally hottest years on record.
+2. **PDO/ENSO 위상** — 2013-2019 PDO warm phase + 2023-2024 El Niño 누적 영향
+3. **단기 sampling bias** — 9년은 한 PDO 주기(20-30년) 미만이라 cycle 일부만 cover
+4. **Kuroshio 강화** — 한국 남해·동중국해 영향 정점 (제주·서귀포)에서 두드러진 R² (0.74-0.76)
+
+#### 결론 (잠정)
+
+- 본 9년 trend는 단순 연장 시 비현실적 (2070년 한국 평균 SST = +12°C 가온)
+- **단기 추세를 그대로 climate 시그널로 채택 금지**
+- 그러나 동시에, 2017-2025 가 KHOA 1968-2012 장기 추세를 **명확히 초과**하는 것은 자료가 확실히 보여줌
+- 10년+ 후 재검증 시점 명시: 2017-2035 (18년 시계열) → 본 결과와 KHOA 1968-2012 사이 어느 지점에 수렴할 것으로 예상
 
 ## 4. SLR과의 정합성 cross-check
 
@@ -186,11 +228,26 @@ KHOA Annual Report 2025 §3.1 표 3-15 (정점별 월별 평균수온 편차) �
 
 ## 9. 보강·미해결
 
-- 2012-2016 SST 추출 — KHOA OpenAPI [http://www.khoa.go.kr/oceangrid/khoa/](http://www.khoa.go.kr/oceangrid/khoa/)에서 직접 다운로드
-- KHOA 정식 발표값(1968-2024 ~0.34 °C/decade)과 직접 비교 — 30년+ 시계열 추세 vs 본 분석 9년 단기 차이 정량
-- 해역별 부영양화 model 입력 데이터 업데이트
+### 9.1 완료된 보강 (2026-05-23)
+
+- ~~2012-2016 SST 추출 — KHOA OpenAPI 직접 다운로드~~ → **차단**: `surveyWaterTemp` 서비스 (data.go.kr 1192136) 는 2025-01 이후만 archive. 2012-2024 보강 불가.
+- ✅ KHOA 1968-2012 공식 trend (Annual Report 2012 vol.2 §3.1 표 3-1) 통합 — §3.2 에서 약 11배 가속 정량 비교
+
+### 9.2 남은 미해결
+
+- 본 분석 9년 trend의 단기 한계 — 2017-2035 재검증 시점 명시
 - 동해 SST 단기 변동성 origin (PDO? ENSO? 일본 동안 해류 dynamics?) — 별도 분석
-- 표층 vs 50m·100m 수온 trend 차이 (이는 KHOA 자료 외 추가 source 필요)
+- 해역별 부영양화 model 입력 데이터 업데이트
+- 표층 vs 50m·100m 수온 trend 차이 (이는 KHOA 자료 외 추가 source 필요 — 예: NIFS 수치모델, 한국해양과학기술원)
+- 글로벌 SST 데이터셋 (NOAA ERSST, HadSST) 의 한국 인근 격자와 cross-check — `experience/khoa-sst-warming-trend-global-crosscheck.md` (예정, 별도 노트)
+
+### 9.3 OpenAPI 환경 (참고)
+
+- 서비스 URL: `https://apis.data.go.kr/1192136/surveyWaterTemp/GetSurveyWaterTempApiService`
+- 핵심 파라미터: `obsCode` (DT_xxxx), `reqDate` (YYYYMMDD), `min` (시간 간격, 최대 60), `type=json`, `serviceKey` (**URL-decoded 형식**)
+- 응답 필드: `obsvtrNm`, `lat`, `lot`, `obsrvnDt`, `wtem` (수온 °C, numeric)
+- Archive 범위: **2025-01-01 이후만** (서비스 배포 2025-03-14). 2024 이전 → NODATA_ERROR
+- 활용: 2025+ 신규 데이터 자동 수집·매월 보강 가능 (cron job 형태)
 
 ## 10. 연결
 
