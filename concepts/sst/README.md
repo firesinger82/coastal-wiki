@@ -7,10 +7,10 @@
 | `README.md` | self (governance) | 이 파일 |
 | `01-concept.md` | **verified** | 정의·측정 정형화·시공간 스케일·한국 인프라 (Stewart §5-6 + KHOA Annual Reports) |
 | `02-theory.md` | **verified** | 해양 열수지·열팽창·해류 forcing — Stewart §5 eq. 5.1-5.6 정형 인용 |
-| `03-analysis-methods.md` | (미생성) | 시계열 회귀·climatology·anomaly·spectral |
+| `03-analysis-methods.md` | **verified** | 시계열 회귀·Mann-Kendall·Sen's slope·climatology·anomaly·MHW (Hobday 2016)·spectral |
 | `04-code-and-tools.md` | **verified** | KHOA OpenAPI + NOAA OISST + UKMO HadISST + JMA COBE-SST2 + NIFS KODC 운영 정리 |
-| `05-examples.md` | (미생성) | 한국 정점 9년 trend (experience/ 인용) · MHW 식별 |
-| `06-model-application.md` | (미생성) | EFDC/Delft3D/ROMS boundary condition·thermal forcing |
+| `05-examples.md` | source-needed | trend 재현 + MHW 식별 (Hobday algorithm). MHW 실행 검증 대기 |
+| `06-model-application.md` | source-needed | EFDC/Delft3D/ROMS heat module 골격. models/<MODEL>/manual-notes/ 작업 후 verified |
 
 ## 사용된 source_id
 

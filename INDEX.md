@@ -10,7 +10,7 @@
 | [waves](concepts/waves/) | **STABLE** (01-06 verified) | 파랑 — 6/6 verified. Holthuijsen 2007 + KHOA 284 용어 + SWAN library + MPT 74정점 |
 | [sediment-transport](concepts/sediment-transport/) | **DRAFT** (01-04 verified, 05·06 source-needed) | 표사이동 — Soulsby 1997 + KHOA 113 용어. EFDC SED 사용자 주력 |
 | [currents](concepts/currents/) | **DRAFT** (01-05 verified, 06 source-needed) | 조류 — 5/6 verified (UTide 2D + 수치조류도 + KHOA 60+ 용어). 동해 수치조류도 미커버 명시 |
-| [sst](concepts/sst/) | **DRAFT** (01·02·04 verified) | 해수면 수온 — 3/6 verified. 01 정의·측정, 02 Stewart §5 heat budget, 04 KHOA+OISST+HadISST+COBE2+NIFS 운영. experience/ 3건 (warming-trend, global-crosscheck, annual-climate) 연결 |
+| [sst](concepts/sst/) | **STABLE** (01·02·03·04 verified, 05·06 source-needed) | 해수면 수온 — 4/6 verified. 01 정의, 02 heat budget, 03 회귀·MHW·climatology, 04 5 데이터셋 운영. experience/ 4건 (warming-trend, global-crosscheck, vertical-trends, annual-climate) 연결 |
 | [littoral-drift](concepts/littoral-drift/) | TBD | 연안표사 |
 | [storm-surge](concepts/storm-surge/) | TBD | 폭풍해일 |
 

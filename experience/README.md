@@ -7,7 +7,8 @@
 | `khoa-multi-station-tide-validation-2026.md` | UTide 15정점 1년 조화분해 검증 (median 0.057%, max 0.30%) | 2026-05-21 |
 | `khoa-annual-climate-trend.md` | KHOA 14년 백서 → 한국 연안 SLR 2007-2025 (한국 평균 3.94 mm/yr, 서귀포 5.42 max) | 2026-05-23 |
 | `khoa-sst-warming-trend.md` | KHOA 9년 SST trend 2017-2025 (한국 평균 1.39 °C/decade, 서귀포·제주 max) + SLR 정합성 + 1968-2012 KHOA 공식 reference (11× 가속) | 2026-05-23 |
-| `khoa-sst-global-crosscheck.md` | OISST v2.1 + HadISST + NIFS published vs KHOA 13정점 (2017-2025 ~1.1 °C/dec 3-dataset 일치, 1968-2022 HadISST 0.27 ≈ NIFS 0.25, 156년 baseline 0.10) | 2026-05-23 |
+| `khoa-sst-global-crosscheck.md` | OISST v2.1 + HadISST + COBE-SST2 + NIFS KODC raw vs KHOA — 5-source cross-check. 2017-2025 ~1.25 °C/dec 일치, 1968-2022 HadISST 0.27 ≈ NIFS raw 0.19, 1850-2025 baseline 0.064 | 2026-05-23 |
+| `nifs-vertical-sst-trends.md` | NIFS 다층 수온 trend 1968-2025 (surface +0.30, 100m +0.13, 200m -0.59 °C/dec) + 동해 100m cooling 신호 + thermosteric SLR ~10% | 2026-05-23 |
 
 ## 들어가는 것
 
