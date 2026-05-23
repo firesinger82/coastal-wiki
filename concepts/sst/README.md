@@ -6,9 +6,9 @@
 |---|---|---|
 | `README.md` | self (governance) | 이 파일 |
 | `01-concept.md` | **verified** | 정의·측정 정형화·시공간 스케일·한국 인프라 (Stewart §5-6 + KHOA Annual Reports) |
-| `02-theory.md` | (미생성) | 열팽창·heat budget·해류 forcing — Stewart §5 상세 |
+| `02-theory.md` | **verified** | 해양 열수지·열팽창·해류 forcing — Stewart §5 eq. 5.1-5.6 정형 인용 |
 | `03-analysis-methods.md` | (미생성) | 시계열 회귀·climatology·anomaly·spectral |
-| `04-code-and-tools.md` | (미생성) | KHOA API · NOAA OISST · HadSST 등 |
+| `04-code-and-tools.md` | **verified** | KHOA OpenAPI + NOAA OISST + UKMO HadISST + JMA COBE-SST2 + NIFS KODC 운영 정리 |
 | `05-examples.md` | (미생성) | 한국 정점 9년 trend (experience/ 인용) · MHW 식별 |
 | `06-model-application.md` | (미생성) | EFDC/Delft3D/ROMS boundary condition·thermal forcing |
 

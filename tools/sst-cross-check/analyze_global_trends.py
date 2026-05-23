@@ -32,6 +32,7 @@ WINDOWS = [
     ("1968-2022", 1968, 2022),  # NIFS published
     ("1968-2012", 1968, 2012),  # KHOA 1968-2012 ref
     ("1870-2025", 1870, 2025),  # HadISST 최장
+    ("1850-2025", 1850, 2025),  # COBE-SST2 최장 (176년)
 ]
 
 
@@ -113,14 +114,19 @@ def analyze(annual_df: pd.DataFrame, label: str, win_start: int, win_end: int) -
 def main() -> int:
     oisst = pd.read_csv(DATA_DIR / "oisst_v21_13stations_monthly.csv")
     hadisst = pd.read_csv(DATA_DIR / "hadisst_13stations_monthly.csv")
+    cobe2_path = DATA_DIR / "cobe2_13stations_monthly.csv"
+    cobe2 = pd.read_csv(cobe2_path) if cobe2_path.exists() else None
 
     oisst_annual = annualize(oisst)
     hadisst_annual = annualize(hadisst)
+    cobe2_annual = annualize(cobe2) if cobe2 is not None else None
 
     print(f"OISST annual rows: {len(oisst_annual)}, year range {oisst_annual['year'].min()}~{oisst_annual['year'].max()}")
     print(f"HadISST annual rows: {len(hadisst_annual)}, year range {hadisst_annual['year'].min()}~{hadisst_annual['year'].max()}")
+    if cobe2_annual is not None:
+        print(f"COBE2 annual rows: {len(cobe2_annual)}, year range {cobe2_annual['year'].min()}~{cobe2_annual['year'].max()}")
 
-    summary = {"oisst": {}, "hadisst": {}}
+    summary = {"oisst": {}, "hadisst": {}, "cobe2": {}}
     for label, ys, ye in WINDOWS:
         # OISST 는 1982+ 데이터만
         if ye >= 1982:
@@ -129,18 +135,19 @@ def main() -> int:
                 summary["oisst"][label] = r
                 print(f"\n[OISST {label}] n_stations={r.get('n_stations_used')}, "
                       f"national mean = {r.get('national_mean_slope_per_decade'):.3f} °C/decade")
-                for st, d in r["stations"].items():
-                    if d.get("slope_per_decade") is not None:
-                        print(f"  {st:6s} ({d.get('region')}): {d['slope_per_decade']:+.3f} °C/dec  R²={d.get('r2'):.3f}  n={d.get('n')}")
         # HadISST 전 기간
         r = analyze(hadisst_annual, "hadisst", ys, ye)
         if r:
             summary["hadisst"][label] = r
             print(f"\n[HadISST {label}] n_stations={r.get('n_stations_used')}, "
                   f"national mean = {r.get('national_mean_slope_per_decade'):.3f} °C/decade")
-            for st, d in r["stations"].items():
-                if d.get("slope_per_decade") is not None:
-                    print(f"  {st:6s} ({d.get('region')}): {d['slope_per_decade']:+.3f} °C/dec  R²={d.get('r2'):.3f}  n={d.get('n')}")
+        # COBE-SST2
+        if cobe2_annual is not None:
+            r = analyze(cobe2_annual, "cobe2", ys, ye)
+            if r:
+                summary["cobe2"][label] = r
+                print(f"[COBE2  {label}] n_stations={r.get('n_stations_used')}, "
+                      f"national mean = {r.get('national_mean_slope_per_decade'):.3f} °C/decade")
 
     # 요약 저장
     out_path = DATA_DIR / "trends_global_summary.json"

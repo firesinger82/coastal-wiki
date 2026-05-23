@@ -1,9 +1,9 @@
 ---
-title: "한국 13정점 SST trend — 글로벌 데이터셋 cross-check (OISST + HadISST + NIFS published)"
+title: "한국 13정점 SST trend — 글로벌 데이터셋 cross-check (OISST + HadISST + COBE-SST2 + NIFS published)"
 topic: khoa-sst-warming
 canonical_source: self
 citation_status: verified
-verification_method: "NOAA OISST v2.1 monthly mean (1981.09 ~ 2026.04, 0.25° daily → monthly) 및 HadISST v1.1 (1870.01 ~ 2025.12, 1° monthly) NetCDF 직접 다운로드 (NOAA PSL, UK MetOffice). 13 KHOA 정점 좌표에서 nearest-ocean fallback (육지 픽셀 검출 시 spiral 외삽) 으로 SST 추출. 5개 시간 윈도우 (2017-2025, 1982-2025, 1968-2022, 1968-2012, 1870-2025) 선형회귀. NIFS published 값은 Fish Aquat Sci 2023 (DOI 10.47853/FAS.2023.e54) 직접 인용."
+verification_method: "NOAA OISST v2.1 (1981.09~2026.04, 0.25° monthly), HadISST v1.1 (1870.01~2025.12, 1° monthly), JMA COBE-SST2 (1850.01~2026.04, 1° monthly) NetCDF 직접 다운로드 (NOAA PSL, UK MetOffice). 13 KHOA 정점 좌표에서 nearest-ocean fallback 으로 SST 추출. 6개 시간 윈도우 (2017-2025, 1982-2025, 1968-2022, 1968-2012, 1870-2025, 1850-2025) 선형회귀. NIFS published 값은 Fish Aquat Sci 2023 (DOI 10.47853/FAS.2023.e54) 직접 인용."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-23
 verification_by: "Claude Opus 4.7 (1M context) — OISST/HadISST NetCDF 직접 추출 + 회귀 + 3-dataset cross-check"
@@ -14,12 +14,14 @@ related_experience:
 data_sources:
   - NOAA OISST v2.1 (https://downloads.psl.noaa.gov/Datasets/noaa.oisst.v2.highres/sst.mon.mean.nc)
   - HadISST v1.1 (https://www.metoffice.gov.uk/hadobs/hadisst/data/HadISST_sst.nc.gz)
+  - JMA COBE-SST2 (https://downloads.psl.noaa.gov/Datasets/COBE2/sst.mon.mean.nc, PSL 미러)
   - NIFS published (Fish Aquat Sci 2023; e-fas.org/archive/view_article?pid=fas-26-11-639)
   - KHOA Annual Report 2012-2025 (본 분석 [khoa-sst-warming-trend.md])
 analysis_files:
   - data/sst-global/oisst_v21_13stations_monthly.csv (6968 rows)
   - data/sst-global/hadisst_13stations_monthly.csv (24336 rows)
-  - data/sst-global/trends_global_summary.json (5 windows × 2 datasets × 13 stations)
+  - data/sst-global/cobe2_13stations_monthly.csv (27508 rows, 1850-2026.04)
+  - data/sst-global/trends_global_summary.json (6 windows × 3 datasets × 13 stations)
 caveats:
   - "OISST 0.25° + HadISST 1° 격자가 한국 정점에 비해 굵음 — 일부 정점은 인근 ocean pixel 로 fallback. 정점 간 변별력은 KHOA in-situ 보다 떨어짐 (예: HadISST 1°에서 거제도/여수/거문도 모두 같은 격자에 들어감)."
   - "OISST 는 1981.09 부터 — 1981년 이전 분석에는 HadISST 만 사용 가능."
@@ -67,24 +69,26 @@ References (대표 논문):
 - `fetch_hadisst.py` — `.nc.gz` download + unpack + 13정점 추출 (~3분)
 - `analyze_global_trends.py` — 5 윈도우 × 2 dataset × 13 정점 회귀
 
-## 2. 한국 평균 trend — 4-dataset 종합
+## 2. 한국 평균 trend — 5-dataset 종합
 
-| 시간 윈도우 | OISST (°C/decade) | HadISST (°C/decade) | KHOA 본 분석 (°C/decade) | NIFS published (°C/decade) |
-|---|---:|---:|---:|---:|
-| **2017-2025** (9년) | **1.11** | **1.10** | **1.39** | — |
-| 1982-2025 (44년) | 0.19 | 0.25 | — | — |
-| **1968-2022** (55년) | 0.14¹ | 0.27 | — | **0.25** |
-| 1968-2012 (45년) | 0.16¹ | 0.31 | (단기, KHOA only) | — |
-| 1870-2025 (156년) | — | **0.10** | — | — |
+| 시간 윈도우 | OISST (°C/decade) | HadISST (°C/decade) | COBE-SST2 (°C/decade) | KHOA 본 분석 (°C/decade) | NIFS published (°C/decade) |
+|---|---:|---:|---:|---:|---:|
+| **2017-2025** (9년) | **1.11** | **1.10** | **1.47** | **1.39** | — |
+| 1982-2025 (44년) | 0.19 | 0.25 | 0.18 | — | — |
+| **1968-2022** (55년) | 0.14¹ | 0.27 | 0.11 | — | **0.25** |
+| 1968-2012 (45년) | 0.16¹ | 0.31 | 0.08 | (단기, KHOA only) | — |
+| 1870-2025 (156년) | — | **0.10** | 0.08 | — | — |
+| **1850-2025** (176년) | — | — | **0.064** | — | — |
 
 ¹ OISST 는 1981.09 부터 → 1968-1981 구간은 NaN, 1982년부터의 데이터로 회귀.
 
 ### 2.1 핵심 관찰
 
-1. **2017-2025 가속은 3-dataset 일치** — KHOA 1.39, OISST 1.11, HadISST 1.10. 약 20-25% 차이는 in-situ (연안, ~1 m bulk) vs satellite blend (격자 평균, foundation/skin mix) 의 자연스러운 bias. **2017-2025 가속이 실제 climate signal** 임을 강하게 지지.
-2. **1968-2022 NIFS published (0.25) ≈ HadISST (0.27)** — 차이 8% 이내. NIFS 의 0.025 °C/yr (1968-2022 한국 평균) 값이 HadISST 와 독립적으로 검증.
-3. **OISST 의 1968-2022 (1982-2022만 cover) = 0.14** — 1982년부터의 hiatus 기간이 포함되어 NIFS/HadISST 전체 55년보다 낮음. 1980-90 년대 PDO cool phase 영향.
-4. **HadISST 156년 = 0.10 °C/decade** — IPCC AR6 글로벌 평균 (0.13-0.18 °C/decade, 1971-2024) 보다 약간 낮음. **한국이 글로벌 평균과 비슷한 수준의 long-term climate trend**, 단기는 매우 가속.
+1. **2017-2025 가속은 4-dataset 모두 일치** — KHOA 1.39, OISST 1.11, HadISST 1.10, COBE2 1.47. 평균 ~1.27. 차이는 in-situ (연안, ~1 m bulk) vs satellite/reanalysis blend 의 자연스러운 bias. **2017-2025 가속이 실제 climate signal** 임을 강하게 지지.
+2. **1968-2022 reanalysis 의 분기**: HadISST 0.27 ≈ NIFS 0.25 vs COBE2 0.11. 두 reanalysis 가 같은 기간에서 2.5배 차이 → blending method (HadISST: COADS + reconstruction, COBE2: 추가 satellite cleanup) 영향. NIFS in-situ 는 HadISST 와 더 일관.
+3. **OISST 의 1968-2022 (1982-2022만 cover) = 0.14** — 1980-90 년대 PDO cool phase 영향.
+4. **HadISST 156년 0.10, COBE2 176년 0.064** — 둘 다 IPCC AR6 글로벌 평균 (0.13-0.18 °C/decade, 1971-2024) 보다 낮음. 한국 long-term climate trend (이전 1세기) 는 글로벌 평균 수준에서 약간 낮음, 그러나 **최근 9년 가속이 매우 두드러짐**.
+5. **COBE2 의 1850-2025 176년 = 0.064 °C/decade** — 매우 안정한 baseline. **2017-2025 (1.47) 가 이 baseline 의 약 23×**.
 
 ### 2.2 해역별 (HadISST 1968-2022, 55년)
 
@@ -181,11 +185,12 @@ References (대표 논문):
 
 | 발견 | 의미 |
 |---|---|
-| **2017-2025 가속 (1.1 °C/decade) 은 KHOA·OISST·HadISST 모두 일치** | 진짜 climate signal, in-situ artifact 아님 |
+| **2017-2025 가속 (~1.27 °C/decade 평균) 은 4-dataset 모두 일치** | 진짜 climate signal, in-situ artifact 아님 |
 | **HadISST 1968-2022 (0.27) ≈ NIFS published (0.25)** | NIFS 가 한국 in-situ primary 인 이유 — 글로벌 reanalysis 와 일관 |
-| **HadISST 156년 (0.10) ≈ IPCC AR6 글로벌 평균** | 한국 long-term climate trend 는 글로벌 평균과 유사 |
-| **2017-2025 가 156년 평균의 11×** | 최근 9년은 단기·자연 변동성으로 설명 어려운 가속 |
+| **HadISST 156년 (0.10), COBE-SST2 176년 (0.064)** | 한국 long-term climate trend, IPCC AR6 글로벌 (0.13~0.18) 과 비슷 또는 약간 낮음 |
+| **2017-2025 가 176년 평균(COBE2)의 ~23×** | 최근 9년은 단기·자연 변동성으로 설명 어려운 가속 |
 | **서귀포·제주가 모든 윈도우에서 max** | Kuroshio 영향권 일관 — 한국 SST 가속의 main source |
+| **HadISST vs COBE2 분기 (1968-2022 0.27 vs 0.11)** | 두 reanalysis 가 동일 기간에 2.5× 차이 — blending method 의존성 — 단일 dataset 의존 risk |
 
 ## 7. 보강·미해결
 
@@ -213,6 +218,7 @@ References (대표 논문):
 cd ~/coastal-wiki
 uv run python tools/sst-cross-check/fetch_oisst_monthly.py   # ~3분 (download + extract)
 uv run python tools/sst-cross-check/fetch_hadisst.py         # ~3분
+uv run python tools/sst-cross-check/fetch_cobe2.py           # ~3분 (523 MB)
 uv run python tools/sst-cross-check/analyze_global_trends.py # <10초
 ```
 
