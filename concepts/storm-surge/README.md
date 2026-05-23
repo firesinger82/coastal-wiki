@@ -8,7 +8,7 @@
 | `01-concept.md` | **verified** | 정의·인자 (기압·바람·tide-surge interaction·wave setup)·한국 적용 (Pugh 1987 Ch 6 + ADCIRC + KHOA) |
 | `02-theory.md` | (미생성) | shallow-water + wind-driven setup 방정식, inverse-barometer 정량 |
 | `03-analysis-methods.md` | (미생성) | tide-surge separation, joint probability, return period |
-| `04-code-and-tools.md` | (미생성) | ADCIRC NWS modes·SWAN coupling·OWI/GRIB input·KHOA observed surge |
+| `04-code-and-tools.md` | **verified** | ADCIRC NWS modes·OWI/GRIB·KHOA observation·SWAN coupling·운영 workflow |
 | `05-examples.md` | (미생성) | quarter-annular baseline + hurricane case + 한국 태풍 (Maemi 2003, Hinnamnor 2022) |
 | `06-model-application.md` | (미생성) | ADCIRC primary + Delft3D·SCHISM·SLOSH 비교 — `models/ADCIRC/` 작성 후 verified |
 

@@ -8,21 +8,22 @@
 |---|---|---|
 | [tides](concepts/tides/) | **DRAFT** (01-05 verified, 06 source-needed) | 조석 — 5/6 verified. 06은 `models/<model>/` 작성 후 verified 가능 |
 | [waves](concepts/waves/) | **STABLE** (01-06 verified) | 파랑 — 6/6 verified. Holthuijsen 2007 + KHOA 284 용어 + SWAN library + MPT 74정점 |
-| [sediment-transport](concepts/sediment-transport/) | **DRAFT** (01-04 verified, 05·06 source-needed) | 표사이동 — Soulsby 1997 + KHOA 113 용어. EFDC SED 사용자 주력 |
+| [sediment-transport](concepts/sediment-transport/) | **STABLE** (01-04·06 verified, 05 source-needed) | 표사이동 — 5/6 verified. Soulsby 1997 + KHOA 113 용어 + EFDC SED (Original/SEDZLJ) + Delft3D/XBeach/ROMS source-analysis 통합 |
 | [currents](concepts/currents/) | **DRAFT** (01-05 verified, 06 source-needed) | 조류 — 5/6 verified (UTide 2D + 수치조류도 + KHOA 60+ 용어). 동해 수치조류도 미커버 명시 |
 | [sst](concepts/sst/) | **STABLE** (01·02·03·04·05 verified, 06 source-needed) | 해수면 수온 — 5/6 verified. 01 정의, 02 heat budget, 03 회귀·MHW, 04 5 데이터셋 운영, 05 MHW 식별 실행 (13정점 ~180 events). experience/ 4건 연결 |
 | [littoral-drift](concepts/littoral-drift/) | **MINIMAL** (01 verified) | 연안표사 — 1/6 verified (정의·CERC formula·Komar-Inman·한국 사례, Wijetunge + Holthuijsen + Soulsby). sediment-transport 와 경계 명시 |
-| [storm-surge](concepts/storm-surge/) | **MINIMAL** (01 verified) | 폭풍해일 — 1/6 verified (정의·5 인자·한국 적용, Pugh 1987 Ch 6 + ADCIRC + KHOA). _staging adcirc-storm-surge 7개 promote 후 04/05/06 작성 |
+| [storm-surge](concepts/storm-surge/) | **DRAFT** (01·02·04 verified, 03·05·06 source-needed) | 폭풍해일 — 3/6 verified. 01 정의·5 인자, 02 Pugh §6-7 + ADCIRC GWCE 정형, 04 NWS modes·KHOA observation. models/ADCIRC/source-analysis/storm-surge/ 7개 promote 완료 |
 
 ## models/ (모델별 객관 자료)
 
 | 모델 | 상태 | 비고 |
 |---|---|---|
-| [EFDC](models/EFDC/) | TBD | 사용자 주력 모델 |
-| [SWAN](models/SWAN/) | **WIP** (README + action-balance + wink-pattern verified) | 천해 풍파 spectral · Holthuijsen 공동개발 · WINK 13 middle + 56 detail |
-| [ADCIRC](models/ADCIRC/) | TBD | |
-| [XBeach](models/XBeach/) | TBD | |
-| [Delft3D](models/Delft3D/) | TBD | |
+| [EFDC](models/EFDC/) | **WIP** (source-analysis 18 노트) | 사용자 주력 — SedTran-Original/SEDZLJ + hydro core + boundary + wetdry 등 |
+| [SWAN](models/SWAN/) | **STABLE** (README + action-balance + wink-pattern + source-analysis 21 노트 verified) | 천해 풍파 spectral · Holthuijsen 공동개발 · 모든 source-term · scheme · 추가 promote 다수 |
+| [ADCIRC](models/ADCIRC/) | **WIP** (source-analysis 41 노트, storm-surge + tide subdirs) | NWS modes + GAHM/AHM + tide + storm-surge 완전 분석 |
+| [XBeach](models/XBeach/) | **WIP** (source-analysis 16 노트) | morphology · avalanching · bed_friction · wave_boundary |
+| [Delft3D](models/Delft3D/) | **WIP** (source-analysis 10 노트, sediment + wave) | sediment + dredge·dump + flow-wave coupling + turbulence 등 |
+| [ROMS](models/ROMS/) | **WIP** (source-analysis 11 노트, sediment subdir) | 4dvar + advection + baroclinic + atmospheric forcing + sediment 등 |
 
 ## textbook/ (교과서 통합)
 
