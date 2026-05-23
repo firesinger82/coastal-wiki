@@ -46,6 +46,16 @@
 | [KHOA 14년 기후 추세 — 한국 연안 SLR 2007-2025](experience/khoa-annual-climate-trend.md) | 3조건 통과 (13정점 19년 / KHOA Annual Report 직접 데이터 / 선형회귀 재현 가능) | **verified** |
 | [KHOA 9년 SST 가온 추세 — 한국 연안 2017-2025](experience/khoa-sst-warming-trend.md) | 3조건 통과 (13정점 9년 / KHOA Annual Report 직접 데이터 / 회귀+SLR 정합성 cross-check) | **verified** (단기 caveat 명시) |
 
+## research/ (Hermes coastal-research 워크벤치)
+
+| 영역 | 역할 | 상태 |
+|---|---|---|
+| [research/README.md](research/README.md) | inbox 정책, promote 규칙, frontmatter 표준 | active |
+| [research/manifest.md](research/manifest.md) | Hermes 프로필 운영 기록, 수집 방법, 쿼리 세트, 한계 | active |
+| [research/inbox/](research/inbox/) | X·arXiv·블로그·툴 신규 후보 | empty |
+| [research/digests/](research/digests/) | 주간·월간 Hermes 요약 | empty |
+| [research/watchlist/](research/watchlist/) | 모니터링 대상 계정·저자·기관·repo·키워드 | empty |
+
 ## 상태 표기
 
 - `TBD` — 디렉토리만 존재, 내용 없음

@@ -42,7 +42,7 @@ verification_date: YYYY-MM-DD
 - `INDEX.md`는 비-`verified` 항목을 **상태 컬럼**으로 표시
 - `concepts/<topic>/`에서 다른 노트 인용 시 그 노트의 `citation_status`가 `verified`가 아니면 인용하는 쪽도 `source-needed`로 강등
 
-## 2.1 Governance 문서의 frontmatter 예외
+## 2.1 Governance · Raw 문서의 frontmatter 예외
 
 다음 문서는 정책·메타 성격이라 frontmatter 의무 면제:
 
@@ -52,6 +52,16 @@ verification_date: YYYY-MM-DD
 - `textbook/POLICY.md`, `textbook/INDEX.md`, `textbook/sources.yml`
 
 이 파일들은 콘텐츠가 아닌 거버넌스 layer. 변경 이력은 git이 책임.
+
+### Vendor 원본 (raw) 예외 — D4 (2026-05-23)
+
+다음은 우리 위키의 authored 콘텐츠가 아니라 외부 vendor 원본이라 frontmatter 규약을 적용하지 않는다:
+
+- `models/*/raw/**` — 모델 공식 GitHub repo clone, 공식 PDF·website·wiki 다운로드
+- `_staging/from-modeling-wiki/**` — 흡수 대기 자산 (promote 시 frontmatter 부여)
+- `_archive/**` — 통합 이전 자산 보존본
+
+이 트리는 또한 `.gitignore` 대상이거나(`models/*/raw/source_code/`, `models/*/raw/manuals/`) 일시 staging 이다. authored 노트(`source-analysis/`, `manual-notes/`, `web-refs/`, `manifest.md`, `README.md`)에서만 인용된다.
 
 ## 3. Canonical Source 규칙
 
@@ -91,6 +101,7 @@ verification_date: YYYY-MM-DD
 |---|---|
 | `concepts/`, `models/` | 객관 (3인칭, 출처 기반). "내가 해보니", "경험상" 금지 |
 | `experience/` | 객관화 시도 (반복 관찰·재현 가능 명시) |
+| `research/` | 후보·digest·watchlist. 검색 샘플과 AI 요약임을 명시. 본문에서 직접 인용 금지 |
 | `drafts/` | 자유 (단 frontmatter `citation_status: draft-unsourced` 명시) |
 
 ## 7. 변경 이력
@@ -105,9 +116,18 @@ verification_date: YYYY-MM-DD
 - 나머지 (02~06)는 sourced claim이 생기면 생성
 - `INDEX.md`에 "미생성 섹션" 컬럼으로 진척 추적
 
+## 9. 위키 무결성 검증 도구
+
+`research/` 격리 enforce 와 본문 무결성 검증은 다음 스크립트로 수행 (정책 출처: [plan.md](plan.md) D3, M10):
+
+- `tools/validate-research-isolation.sh` — concepts/, models/, experience/ 가 research/ 를 직접 참조하는지 + research/ 내 .md 가 `citation_status: draft-unsourced` 인지 검증. exit 0/1/2/3.
+- `tools/install-hooks.sh` — `.git/hooks/pre-commit` 에 위 스크립트를 등록. 한 번 실행하면 commit마다 자동 검증.
+
+새 PC 에서 clone 후: `bash tools/install-hooks.sh` 한 번 실행.
+
 ## 관련 문서
 
-- [plan.md](plan.md) — 결정 기록 (G1-G7)
-- [BOUNDARY.md](BOUNDARY.md) — modeling-wiki와의 경계
+- [plan.md](plan.md) — 결정 기록 (G1-G7, M1-M10, D1-D4)
+- [BOUNDARY.md](BOUNDARY.md) — modeling-wiki와의 경계 (통합 이전 정책의 역사적 기록)
 - [textbook/POLICY.md](textbook/POLICY.md) — textbook 통합 정책
 - [textbook/sources.yml](textbook/sources.yml) — source_id 매니페스트

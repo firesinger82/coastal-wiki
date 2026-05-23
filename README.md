@@ -26,9 +26,10 @@
 |---|---|
 | `concepts/<토픽>/` | 도메인 개념 (1차 축). `_template/` 복제해서 새 토픽 생성 |
 | `models/<모델>/` | 모델별 객관 자료 (2차 축). `source-analysis/`, `manual-notes/`, `web-refs/` |
-| `textbook/` | `D:\Study\textbook` 통합 노트와 인용. 원본 PDF는 wiki에 복사 안 함 |
+| `textbook/` | `D:\\Study\\textbook` 통합 노트와 인용. 원본 PDF는 wiki에 복사 안 함 |
 | `examples/` | 개념을 가로지르는 실습 |
-| `experience/` | 객관화 통과한 경험 (지금은 비어 있음, 정책 문서만) |
+| `experience/` | 객관화 통과한 경험 |
+| `research/` | Hermes `coastal-research` 워크벤치. X·arXiv·블로그·툴 후보 수집, digest, watchlist. 본문에서 직접 인용 금지 |
 
 ## 진입 순서
 
