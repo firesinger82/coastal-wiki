@@ -1,6 +1,12 @@
 # experience/
 
-**현재 비어 있음.** 객관 레이어(`concepts/`, `models/`, `textbook/`)가 자리잡은 후 추가.
+## 현재 항목 (verified)
+
+| 파일 | 주제 | 검증일 |
+|---|---|---|
+| `khoa-multi-station-tide-validation-2026.md` | UTide 15정점 1년 조화분해 검증 (median 0.057%, max 0.30%) | 2026-05-21 |
+| `khoa-annual-climate-trend.md` | KHOA 14년 백서 → 한국 연안 SLR 2007-2025 (한국 평균 3.94 mm/yr, 서귀포 5.42 max) | 2026-05-23 |
+| `khoa-sst-warming-trend.md` | KHOA 9년 SST trend 2017-2025 (한국 평균 1.39 °C/decade, 서귀포·제주 max) + SLR 정합성 | 2026-05-23 |
 
 ## 들어가는 것
 
