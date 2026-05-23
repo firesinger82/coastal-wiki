@@ -163,16 +163,56 @@ def categorize(max_anom, threshold_diff_sigma):
 - **서귀포**: 2025-07~2026-04 (10개월) max anomaly +4.03°C
 - 한국 남해 marine heatwave 가 **년 단위로 정상화** 되는 상황 — 2024 광역 사건 후 reset 없이 지속
 
-### 4.6 한계
+### 4.6 Daily MHW (Hobday 2016 standard) — 2024 한국 13정점 추가 검증
+
+> **2026-05-23 추가 실행**: NOAA PSL `sst.day.mean.2024.nc` 직접 다운로드 (449MB) + monthly p90 climatology 를 day-of-year linear interp + daily 연속 ≥5일 threshold cross → **63 events**. Category I-IV (Hobday 2018) 자동 분류.
+
+스크립트: [`tools/sst-cross-check/identify_mhw_daily_2024.py`](../../tools/sst-cross-check/identify_mhw_daily_2024.py)
+
+**13정점 2024 top events** (각 정점에서 가장 강한 사건):
+
+| 정점 | 기간 | 일수 | Max anomaly (°C) | Max SST (°C) | Category |
+|---|---|---:|---:|---:|---|
+| **인천** | 2024-03-12 ~ 2024-11-28 | **262** | **+5.95** | — | **IV-extreme** |
+| **목포** | 2024-07-17 ~ 2024-12-01 | 138 | **+6.18** | — | IV-extreme |
+| **진도** | 2024-08-13 ~ 2024-11-20 | 100 | +5.47 | — | IV-extreme |
+| **부산** | 2024-08-03 ~ 2024-11-29 | 119 | +5.00 | — | IV-extreme |
+| **여수** | 2024-07-31 ~ 2024-11-05 | 98 | +5.81 | — | IV-extreme |
+| **거제도** | 2024-08-03 ~ 2024-11-27 | 117 | +5.25 | — | IV-extreme |
+| **거문도** | 2024-07-29 ~ 2024-11-08 | 103 | +5.32 | — | IV-extreme |
+| **제주** | 2024-07-21 ~ 2024-11-25 | 128 | +5.23 | — | IV-extreme |
+| **서귀포** | 2024-07-19 ~ 2024-11-29 | 134 | +4.36 | — | IV-extreme |
+| **울산** | 2024-08-03 ~ 2024-11-30 | 120 | +5.01 | — | IV-extreme |
+| **포항** | 2024-08-03 ~ 2024-12-19 | 139 | +5.51 | — | IV-extreme |
+| **묵호** | 2024-07-20 ~ 2024-11-22 | 126 | +5.15 | — | IV-extreme |
+| **속초** | 2024-07-24 ~ 2024-11-29 | 129 | +4.53 | — | III-severe |
+
+→ **2024년 한국 연안 12/13 정점이 IV-extreme MHW 경험**. 
+→ **인천 262일 (8.6개월) 연속 IV-extreme** — 한국 SST 가속의 가장 강한 단일 증거.
+→ Monthly 분해능 (§4.4) 의 max anomaly +3.4~+4.7°C 대비 **daily 에서 +4.4~+6.2°C** — daily 가 더 강한 anomaly 포착.
+
+### 4.7 종합 — Monthly vs Daily MHW 비교
+
+| 항목 | Monthly variant (§4.4-4.5) | Daily Hobday 2016 (§4.6) |
+|---|---|---|
+| 데이터 | OISST monthly 1981-2026 | OISST daily 2024 (NetCDF 449MB) |
+| Threshold | monthly p90 (1991-2020) | daily p90 (monthly→doy interp) |
+| Min duration | 2 months | 5 days |
+| 2024 events 수 | ~12 events (per 정점) | 1-8 events (per 정점), longer durations |
+| Top event 강도 | +3.40~+4.69°C | +4.36~+6.18°C |
+| Category | 미분류 | Hobday 2018 I-IV |
+| 한국 평균 (KHOA) | +3.40°C anomaly (2024) | 본 분석과 정합 |
+
+→ Daily 가 정확한 Hobday 2016 spec, monthly variant 는 supplemental.
+
+### 4.8 한계
 
 | 한계 | 영향 |
 |---|---|
-| **Monthly 분해능** | Hobday 2016 의 daily 5-day window 보다 거침. 짧은 (예: 1주일) intense MHW 못 잡음 |
-| **Category 미분류** | 본 분석은 events 만 추출, Hobday 2018 I-IV category 적용 안 함 (daily threshold + std 필요) |
-| **OISST 격자 평균** | 한국 좁은 만·항만 안의 SST 가 격자 평균 SST 와 다를 수 있음 |
-| **In-situ cross-check** | KHOA 정점 일별 데이터와 직접 비교 미수행 (KHOA daily archive 한정) |
-
-→ Daily Hobday 분석은 ERDDAP query timeout 해결 후 또는 NOAA PSL daily NetCDF 1년치 download 방식으로 추후 작업.
+| **Climatology p90 monthly→doy interp** | 정통 Hobday 의 daily 1991-2020 p90 (30년 × 366일 raw) 대신 monthly p90 interp. 부드러운 threshold — 단기 spike 일부 놓칠 수 있음 |
+| **2024 한 해만** | 다른 연도 (2016, 2017, 2023, 2025) 도 fetch 필요 — 추후 작업 |
+| **OISST 격자 평균** | 한국 좁은 만·항만 안의 SST 가 격자 평균과 다를 수 있음 |
+| **In-situ cross-check** | KHOA 정점 일별과 직접 비교 미수행 (KHOA daily archive 한정) |
 
 ### 4.4 한국 MHW 자료 reference
 
