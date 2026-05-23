@@ -1,0 +1,44 @@
+[2026-05-23T13:43:37.770Z] Starting Codex Adversarial Review.
+[2026-05-23T13:43:37.956Z] Starting Codex task thread.
+[2026-05-23T13:43:38.388Z] Thread ready (019e5513-c074-7563-8e89-48995bd8404e).
+[2026-05-23T13:43:38.408Z] Turn started (019e5513-c0a5-7272-a63a-f56a37b0e034).
+[2026-05-23T13:43:50.038Z] Running command: /bin/bash -lc "nl -ba plan.md | sed -n '515,760p'"
+[2026-05-23T13:43:50.050Z] Command completed: /bin/bash -lc "nl -ba plan.md | sed -n '515,760p'" (exit 0)
+[2026-05-23T13:43:50.050Z] Running command: /bin/bash -lc "rg -n \"D2|final delete|_archive|2a\\.9|partial-verified|validate-research-iso...
+[2026-05-23T13:43:50.063Z] Command completed: /bin/bash -lc "rg -n \"D2|final delete|_archive|2a\\.9|partial-verified|validate-research-iso... (exit 0)
+[2026-05-23T13:43:50.063Z] Running command: /bin/bash -lc "rg --files _staging/from-modeling-wiki/knowledge | wc -l && rg --files _stagin...
+[2026-05-23T13:43:50.076Z] Command completed: /bin/bash -lc "rg --files _staging/from-modeling-wiki/knowledge | wc -l && rg --files _stagin... (exit 0)
+[2026-05-23T13:44:04.817Z] Running command: /bin/bash -lc "sed -n '1,240p' tools/validate-research-isolation.sh"
+[2026-05-23T13:44:04.828Z] Command completed: /bin/bash -lc "sed -n '1,240p' tools/validate-research-isolation.sh" (exit 0)
+[2026-05-23T13:44:04.828Z] Running command: /bin/bash -lc "rg -n \"citation_status|source-needed|verified|partial-verified\" tools CONVEN...
+[2026-05-23T13:44:04.840Z] Command completed: /bin/bash -lc "rg -n \"citation_status|source-needed|verified|partial-verified\" tools CONVEN... (exit 0)
+[2026-05-23T13:44:04.933Z] Running command: /bin/bash -lc "find . -maxdepth 3 -type f \\( -name '*manifest*' -o -name '*validate*' \\) | ...
+[2026-05-23T13:44:04.944Z] Command completed: /bin/bash -lc "find . -maxdepth 3 -type f \\( -name '*manifest*' -o -name '*validate*' \\) | ... (exit 0)
+[2026-05-23T13:44:38.825Z] Assistant message captured: {"verdict":"needs-attention","summary":"No-ship for 2a migration. v3 fixes several stated dec...
+
+[2026-05-23T13:44:38.825Z] Assistant message
+{"verdict":"needs-attention","summary":"No-ship for 2a migration. v3 fixes several stated decisions, but the verified gate is still not a complete safety gate and the 50-file inventory has an uncovered README path class.","findings":[{"severity":"high","title":"Verified enforcement does not bind copied file frontmatter to the manifest decision","body":"The plan defines `citation_status_target` and the 6-condition rule for manifest rows, but the copy step separately adds frontmatter and the validate step only names `validate-research-isolation.sh` plus a manifest validator. There is no explicit gate that reads every destination file and fails if its frontmatter `citation_status` differs from the manifest target. A bad copy/template can still create `citation_status: verified` while the manifest row says `source-needed`; the manifest rule would not catch that unless this cross-check is specified. Impact: accidental verified promotion remains possible, including the exact class J1/J3/J5 were trying to prevent.","file":"plan.md","line_start":635,"line_end":668,"confidence":0.86,"recommendation":"Add a mandatory Phase 2a validator rule: for every manifest row, parse `dest_path` frontmatter and require `citation_status == citation_status_target`; also fail if any promoted destination has `verified` without passing the 6-condition row checks."},{"severity":"medium","title":"Auto inventory covers 50 files, but only 45 have a defined disposition","body":"The repository currently has 50 files under `_staging/from-modeling-wiki/knowledge`, including five README files. The plan enumerates 10 failure/heuristic/playbook notes and 35 catalog notes, and the classification enum only allows source-analysis, experience-mixed, experience-only, or manual-notes-catalog. It says README files must be included/excluded, but does not define a classification, destination, or skip mechanism for them. Impact: 2a.1 can pass set equality while 2a.2 either stalls or forces README rows into an incorrect promoted layer.","file":"plan.md","line_start":583,"line_end":657,"confidence":0.91,"recommendation":"Add an explicit README disposition before migration, e.g. `classification=skip-readme` with empty dest and archived-only handling, or concrete destination paths for each README. Then require the manifest validator to verify all 50 rows have an allowed disposition."},{"severity":"medium","title":"Option A is contradicted by an unconditional partial-verified INDEX task","body":"v3 states `partial-verified` is deferred and CONVENTIONS/validator/INDEX semantics remain unchanged, but the 2d table still says `INDEX.md` final cleanup should add `partial-verified` 표시. D6 is conditional, but D5 is not. Impact: a later cleanup step can reintroduce the schema/semantics drift J5 was supposed to avoid, leaving INDEX semantics inconsistent with unchanged validator and conventions.","file":"plan.md","line_start":734,"line_end":739,"confidence":0.78,"recommendation":"Change D5 to remove `partial-verified` entirely under Option A, or make it explicitly conditional on a future separate schema change that updates CONVENTIONS, templates, validators, and INDEX semantics together."}],"next_steps":["Do not start 2a migration until the manifest validator contract includes destination frontmatter equality and the README disposition is explicit.","Patch the 2d table so Option A cannot accidentally reintroduce `partial-verified`."]}
+[2026-05-23T13:44:38.862Z] Turn completed.
+
+[2026-05-23T13:44:38.872Z] Final output
+# Codex Adversarial Review
+
+Target: working tree diff
+Verdict: needs-attention
+
+No-ship for 2a migration. v3 fixes several stated decisions, but the verified gate is still not a complete safety gate and the 50-file inventory has an uncovered README path class.
+
+Findings:
+- [high] Verified enforcement does not bind copied file frontmatter to the manifest decision (plan.md:635-668)
+  The plan defines `citation_status_target` and the 6-condition rule for manifest rows, but the copy step separately adds frontmatter and the validate step only names `validate-research-isolation.sh` plus a manifest validator. There is no explicit gate that reads every destination file and fails if its frontmatter `citation_status` differs from the manifest target. A bad copy/template can still create `citation_status: verified` while the manifest row says `source-needed`; the manifest rule would not catch that unless this cross-check is specified. Impact: accidental verified promotion remains possible, including the exact class J1/J3/J5 were trying to prevent.
+  Recommendation: Add a mandatory Phase 2a validator rule: for every manifest row, parse `dest_path` frontmatter and require `citation_status == citation_status_target`; also fail if any promoted destination has `verified` without passing the 6-condition row checks.
+- [medium] Auto inventory covers 50 files, but only 45 have a defined disposition (plan.md:583-657)
+  The repository currently has 50 files under `_staging/from-modeling-wiki/knowledge`, including five README files. The plan enumerates 10 failure/heuristic/playbook notes and 35 catalog notes, and the classification enum only allows source-analysis, experience-mixed, experience-only, or manual-notes-catalog. It says README files must be included/excluded, but does not define a classification, destination, or skip mechanism for them. Impact: 2a.1 can pass set equality while 2a.2 either stalls or forces README rows into an incorrect promoted layer.
+  Recommendation: Add an explicit README disposition before migration, e.g. `classification=skip-readme` with empty dest and archived-only handling, or concrete destination paths for each README. Then require the manifest validator to verify all 50 rows have an allowed disposition.
+- [medium] Option A is contradicted by an unconditional partial-verified INDEX task (plan.md:734-739)
+  v3 states `partial-verified` is deferred and CONVENTIONS/validator/INDEX semantics remain unchanged, but the 2d table still says `INDEX.md` final cleanup should add `partial-verified` 표시. D6 is conditional, but D5 is not. Impact: a later cleanup step can reintroduce the schema/semantics drift J5 was supposed to avoid, leaving INDEX semantics inconsistent with unchanged validator and conventions.
+  Recommendation: Change D5 to remove `partial-verified` entirely under Option A, or make it explicitly conditional on a future separate schema change that updates CONVENTIONS, templates, validators, and INDEX semantics together.
+
+Next steps:
+- Do not start 2a migration until the manifest validator contract includes destination frontmatter equality and the README disposition is explicit.
+- Patch the 2d table so Option A cannot accidentally reintroduce `partial-verified`.

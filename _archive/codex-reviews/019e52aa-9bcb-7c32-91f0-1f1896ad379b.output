@@ -1,0 +1,63 @@
+[2026-05-23T02:29:33.084Z] Starting Codex Adversarial Review.
+[2026-05-23T02:29:33.242Z] Starting Codex task thread.
+[2026-05-23T02:29:33.301Z] Thread ready (019e52aa-9bcb-7c32-91f0-1f1896ad379b).
+[2026-05-23T02:29:33.318Z] Turn started (019e52aa-9c04-7092-b141-2803cbc804ee).
+[2026-05-23T02:29:40.132Z] Assistant message captured: {"verdict":"needs-attention","summary":"Inspecting the working tree diff and validator implem...
+
+[2026-05-23T02:29:40.132Z] Assistant message
+{"verdict":"needs-attention","summary":"Inspecting the working tree diff and validator implementation before issuing the adversarial verdict.","findings":[],"next_steps":[]}
+[2026-05-23T02:29:44.310Z] Running command: /bin/bash -lc 'nl -ba tools/test_validate_research_isolation.py'
+[2026-05-23T02:29:44.323Z] Running command: /bin/bash -lc 'nl -ba tools/validate-research-isolation.py'
+[2026-05-23T02:29:44.335Z] Running command: /bin/bash -lc 'git diff -- tools/validate-research-isolation.py tools/test_validate_research_...
+[2026-05-23T02:29:44.335Z] Command completed: /bin/bash -lc 'nl -ba tools/test_validate_research_isolation.py' (exit 0)
+[2026-05-23T02:29:44.347Z] Command completed: /bin/bash -lc 'nl -ba tools/validate-research-isolation.py' (exit 0)
+[2026-05-23T02:29:44.359Z] Command completed: /bin/bash -lc 'git diff -- tools/validate-research-isolation.py tools/test_validate_research_... (exit 0)
+[2026-05-23T02:29:51.360Z] Assistant message captured: {"verdict":"needs-attention","summary":"The diff shows the G1/G2 logic directly in the valida...
+
+[2026-05-23T02:29:51.360Z] Assistant message
+{"verdict":"needs-attention","summary":"The diff shows the G1/G2 logic directly in the validator. I am now testing the stated fixtures and probing likely Markdown edge cases around tabs, autolinks, and staged-file behavior.","findings":[],"next_steps":[]}
+[2026-05-23T02:29:51.415Z] Running command: /bin/bash -lc 'python3 tools/test_validate_research_isolation.py'
+[2026-05-23T02:29:51.427Z] Command completed: /bin/bash -lc 'python3 tools/test_validate_research_isolation.py' (exit 0)
+[2026-05-23T02:29:51.427Z] Running command: /bin/bash -lc 'bash tools/validate-research-isolation.sh'
+[2026-05-23T02:29:51.439Z] Command completed: /bin/bash -lc 'bash tools/validate-research-isolation.sh' (exit 0)
+[2026-05-23T02:29:51.530Z] Running command: /bin/bash -lc "rg -n \"research/|/research|\\.\\./research|\\.\\./\\.\\./research\" concepts ...
+[2026-05-23T02:29:51.542Z] Command completed: /bin/bash -lc "rg -n \"research/|/research|\\.\\./research|\\.\\./\\.\\./research\" concepts ... (exit 0)
+[2026-05-23T02:30:28.428Z] Running command: /bin/bash -lc "rg -n \"\\[\\[|<a\\s+href=|href=|src=\" concepts models experience | head -100"
+[2026-05-23T02:30:28.428Z] Command completed: /bin/bash -lc "rg -n \"\\[\\[|<a\\s+href=|href=|src=\" concepts models experience | head -100" (exit 0)
+[2026-05-23T02:30:28.447Z] Running command: /bin/bash -lc "python3 - <<'PY' import importlib.util spec=importlib.util.spec_from_file_loca...
+[2026-05-23T02:30:28.467Z] Command completed: /bin/bash -lc "python3 - <<'PY' import importlib.util spec=importlib.util.spec_from_file_loca... (exit 0)
+[2026-05-23T02:30:28.531Z] Running command: /bin/bash -lc "find concepts models experience -name '*.md' -type f | wc -l && find research ...
+[2026-05-23T02:30:28.544Z] Command completed: /bin/bash -lc "find concepts models experience -name '*.md' -type f | wc -l && find research ... (exit 0)
+[2026-05-23T02:30:59.767Z] Running command: /bin/bash -lc "python3 - <<'PY' import importlib.util spec=importlib.util.spec_from_file_loca...
+[2026-05-23T02:30:59.780Z] Command completed: /bin/bash -lc "python3 - <<'PY' import importlib.util spec=importlib.util.spec_from_file_loca... (exit 0)
+[2026-05-23T02:31:05.831Z] Searching:
+[2026-05-23T02:31:37.538Z] Assistant message captured: {"verdict":"needs-attention","summary":"Do not ship yet. G2's single-slash root-relative norm...
+
+[2026-05-23T02:31:37.538Z] Assistant message
+{"verdict":"needs-attention","summary":"Do not ship yet. G2's single-slash root-relative normalization looks defensible for repo-root semantics, and the 25 fixtures pass, but G1 is not fully closed: the reference-definition parser still misses a valid CommonMark form and also encodes a tab-indentation false positive. Migration should wait for those parser/test fixes.","findings":[{"severity":"high","title":"Valid no-space reference definitions bypass the research guard","body":"`REF_DEF_RE` requires whitespace after the colon via `:\\s+`, but CommonMark link reference definitions allow optional spaces/tabs after the colon. A body file can use `[r]:../research/inbox/x.md` plus `[text][r]`; the current extractor returns no target, so a direct research reference can be committed. This is directly contrary to the isolation invariant. CommonMark source: https://spec.commonmark.org/0.30/#link-reference-definitions","file":"tools/validate-research-isolation.py","line_start":43,"line_end":43,"confidence":0.96,"recommendation":"Replace the regex with a small line parser or a corrected regex that allows zero post-colon whitespace and the optional one-line continuation permitted by CommonMark. Add fixtures for `[r]:../research/x.md`, `[r]:\n ../research/x.md`, and title-bearing definitions."},{"severity":"medium","title":"Tab-indented reference definitions are treated as CommonMark-valid when they are code blocks","body":"The new pattern allows a leading tab in `[ \\t]{0,3}` and the tests expect `\\t[x]: ../research/y.md` to be detected. CommonMark indentation is column-based; a leading tab advances to a code-block indentation, not a 1-character indentation. This creates false positives in pre-commit for tab-indented code examples and means the G1 CommonMark claim is inaccurate.","file":"tools/validate-research-isolation.py","line_start":42,"line_end":43,"confidence":0.9,"recommendation":"Measure indentation after tab expansion instead of counting raw characters, or restrict the refdef prefix to spaces only. Update the tab-indented fixture to expect no violation, and add cases like ` \\t[x]: ...` that also expand to code indentation."},{"severity":"medium","title":"Raw HTML links can still point into research without detection","body":"`extract_link_targets` only scans markdown inline, angle, and reference-style patterns. CommonMark permits raw HTML, so `<a href=\"../research/inbox/x.md\">draft</a>` or `<img src=\"/research/foo.png\">` renders as a direct reference while producing no detected research target. This is a real bypass if the invariant is '본문에서 research/ 직접 참조 금지', not merely 'three markdown syntaxes only'.","file":"tools/validate-research-isolation.py","line_start":85,"line_end":93,"confidence":0.78,"recommendation":"Either explicitly ban raw HTML in target roots or extract and normalize `href`/`src` attributes from raw HTML blocks/inlines. Add fixtures for double-quoted, single-quoted, and root-relative HTML attributes."}],"next_steps":["Fix the reference-definition parser before migration.","Expand the 25 fixtures with no-space refdefs, tab-expanded indentation, tilde/indented code blocks, and raw HTML href/src cases.","Re-run `python3 tools/test_validate_research_isolation.py` and `bash tools/validate-research-isolation.sh` after the parser changes."]}
+[2026-05-23T02:31:37.710Z] Turn completed.
+
+[2026-05-23T02:31:37.720Z] Final output
+# Codex Adversarial Review
+
+Target: working tree diff
+Verdict: needs-attention
+
+Do not ship yet. G2's single-slash root-relative normalization looks defensible for repo-root semantics, and the 25 fixtures pass, but G1 is not fully closed: the reference-definition parser still misses a valid CommonMark form and also encodes a tab-indentation false positive. Migration should wait for those parser/test fixes.
+
+Findings:
+- [high] Valid no-space reference definitions bypass the research guard (tools/validate-research-isolation.py:43)
+  `REF_DEF_RE` requires whitespace after the colon via `:\s+`, but CommonMark link reference definitions allow optional spaces/tabs after the colon. A body file can use `[r]:../research/inbox/x.md` plus `[text][r]`; the current extractor returns no target, so a direct research reference can be committed. This is directly contrary to the isolation invariant. CommonMark source: https://spec.commonmark.org/0.30/#link-reference-definitions
+  Recommendation: Replace the regex with a small line parser or a corrected regex that allows zero post-colon whitespace and the optional one-line continuation permitted by CommonMark. Add fixtures for `[r]:../research/x.md`, `[r]:
+ ../research/x.md`, and title-bearing definitions.
+- [medium] Tab-indented reference definitions are treated as CommonMark-valid when they are code blocks (tools/validate-research-isolation.py:42-43)
+  The new pattern allows a leading tab in `[ \t]{0,3}` and the tests expect `\t[x]: ../research/y.md` to be detected. CommonMark indentation is column-based; a leading tab advances to a code-block indentation, not a 1-character indentation. This creates false positives in pre-commit for tab-indented code examples and means the G1 CommonMark claim is inaccurate.
+  Recommendation: Measure indentation after tab expansion instead of counting raw characters, or restrict the refdef prefix to spaces only. Update the tab-indented fixture to expect no violation, and add cases like ` \t[x]: ...` that also expand to code indentation.
+- [medium] Raw HTML links can still point into research without detection (tools/validate-research-isolation.py:85-93)
+  `extract_link_targets` only scans markdown inline, angle, and reference-style patterns. CommonMark permits raw HTML, so `<a href="../research/inbox/x.md">draft</a>` or `<img src="/research/foo.png">` renders as a direct reference while producing no detected research target. This is a real bypass if the invariant is '본문에서 research/ 직접 참조 금지', not merely 'three markdown syntaxes only'.
+  Recommendation: Either explicitly ban raw HTML in target roots or extract and normalize `href`/`src` attributes from raw HTML blocks/inlines. Add fixtures for double-quoted, single-quoted, and root-relative HTML attributes.
+
+Next steps:
+- Fix the reference-definition parser before migration.
+- Expand the 25 fixtures with no-space refdefs, tab-expanded indentation, tilde/indented code blocks, and raw HTML href/src cases.
+- Re-run `python3 tools/test_validate_research_isolation.py` and `bash tools/validate-research-isolation.sh` after the parser changes.

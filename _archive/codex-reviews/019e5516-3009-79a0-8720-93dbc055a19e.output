@@ -1,0 +1,38 @@
+[2026-05-23T13:46:17.821Z] Starting Codex Adversarial Review.
+[2026-05-23T13:46:17.977Z] Starting Codex task thread.
+[2026-05-23T13:46:18.024Z] Thread ready (019e5516-3009-79a0-8720-93dbc055a19e).
+[2026-05-23T13:46:18.040Z] Turn started (019e5516-3035-7030-8e45-f0d63e9012f9).
+[2026-05-23T13:46:26.545Z] Running command: /bin/bash -lc "nl -ba plan.md | sed -n '560,710p'"
+[2026-05-23T13:46:26.558Z] Command completed: /bin/bash -lc "nl -ba plan.md | sed -n '560,710p'" (exit 0)
+[2026-05-23T13:46:31.722Z] Running command: /bin/bash -lc "nl -ba plan.md | sed -n '710,805p'"
+[2026-05-23T13:46:31.722Z] Command completed: /bin/bash -lc "nl -ba plan.md | sed -n '710,805p'" (exit 0)
+[2026-05-23T13:46:42.358Z] Running command: /bin/bash -lc 'find _staging/from-modeling-wiki/knowledge -type f | sort'
+[2026-05-23T13:46:42.358Z] Command completed: /bin/bash -lc 'find _staging/from-modeling-wiki/knowledge -type f | sort' (exit 0)
+[2026-05-23T13:46:45.270Z] Running command: /bin/bash -lc 'find _staging/from-modeling-wiki/knowledge -type f | wc -l'
+[2026-05-23T13:46:45.270Z] Command completed: /bin/bash -lc 'find _staging/from-modeling-wiki/knowledge -type f | wc -l' (exit 0)
+[2026-05-23T13:47:33.399Z] Assistant message captured: {"verdict":"needs-attention","summary":"No-ship for 2a. K3 looks consistent, but K1 is not ac...
+
+[2026-05-23T13:47:33.399Z] Assistant message
+{"verdict":"needs-attention","summary":"No-ship for 2a. K3 looks consistent, but K1 is not actually enforceable yet and K2 still has an inventory/disposition mismatch that can either miss a content file or break the gate. Do not start migration until these are fixed.","findings":[{"severity":"high","title":"Rule A condition 6 is not machine-enforceable","body":"The plan says `tools/validate-phase2a-manifest.sh` will enforce all six verified conditions, including claim-to-raw-artifact mapping. But the manifest schema has no dedicated, structured field for that evidence or reviewer confirmation; only free-form `notes` exists, and the working-tree diff does not add the validator script. Inference from the provided diff: a row can satisfy `audit_status`, `source_id`, `raw_path`, hash/date checks, and still carry no defensible claim mapping while the validator has nothing deterministic to fail on. That leaves objective-layer files able to ship as `verified` without the K1 protection actually holding.","file":"plan.md","line_start":644,"line_end":650,"confidence":0.86,"recommendation":"Before 2a, add the actual `tools/validate-phase2a-manifest.sh` plus a structured manifest field such as `claim_mapping_verified_by` or `claim_mapping_evidence`, and make verified rows fail unless that field is nonempty and matches an allowed value. Include regression fixtures for verified/pass and verified/fail cases."},{"severity":"high","title":"README disposition count is wrong against the real inventory","body":"The plan asserts `50 files = 45 content + 5 READMEs`, but `find _staging/from-modeling-wiki/knowledge -type f` in the current tree returns 50 files made up of 46 content files and 4 READMEs. The fifth README row is conditional (`adcirc-sources/README.md` or `xbeach-sources/README.md`) and neither appears in the current inventory. This is reinforced by P1 saying 10 target notes while listing 11. If the manifest is filled from this plan, the claimed 50/50 disposition can be achieved only by inventing a non-existent README row or misclassifying one real content note. The skip-readme handling also conflicts with the order: `dest_path` may be empty or archive-only, but validation runs before archive, while Rule B says every row's dest must exist.","file":"plan.md","line_start":680,"line_end":692,"confidence":0.94,"recommendation":"Regenerate the exact inventory in the plan: 46 content + 4 README rows, enumerate only the four existing README paths, and add validator checks for source-path set equality plus classification counts. Define `skip-readme` validation separately: pre-archive it should require no dest frontmatter check; post-archive it should verify the archived README path and original checksum."}],"next_steps":["Block Phase 2a migration until the validator script and manifest evidence fields exist.","Correct the README/content inventory counts and make skip-readme validation order explicit.","After those fixes, rerun adversarial review on the revised plan before proceeding."]}
+[2026-05-23T13:47:33.431Z] Turn completed.
+
+[2026-05-23T13:47:33.442Z] Final output
+# Codex Adversarial Review
+
+Target: working tree diff
+Verdict: needs-attention
+
+No-ship for 2a. K3 looks consistent, but K1 is not actually enforceable yet and K2 still has an inventory/disposition mismatch that can either miss a content file or break the gate. Do not start migration until these are fixed.
+
+Findings:
+- [high] Rule A condition 6 is not machine-enforceable (plan.md:644-650)
+  The plan says `tools/validate-phase2a-manifest.sh` will enforce all six verified conditions, including claim-to-raw-artifact mapping. But the manifest schema has no dedicated, structured field for that evidence or reviewer confirmation; only free-form `notes` exists, and the working-tree diff does not add the validator script. Inference from the provided diff: a row can satisfy `audit_status`, `source_id`, `raw_path`, hash/date checks, and still carry no defensible claim mapping while the validator has nothing deterministic to fail on. That leaves objective-layer files able to ship as `verified` without the K1 protection actually holding.
+  Recommendation: Before 2a, add the actual `tools/validate-phase2a-manifest.sh` plus a structured manifest field such as `claim_mapping_verified_by` or `claim_mapping_evidence`, and make verified rows fail unless that field is nonempty and matches an allowed value. Include regression fixtures for verified/pass and verified/fail cases.
+- [high] README disposition count is wrong against the real inventory (plan.md:680-692)
+  The plan asserts `50 files = 45 content + 5 READMEs`, but `find _staging/from-modeling-wiki/knowledge -type f` in the current tree returns 50 files made up of 46 content files and 4 READMEs. The fifth README row is conditional (`adcirc-sources/README.md` or `xbeach-sources/README.md`) and neither appears in the current inventory. This is reinforced by P1 saying 10 target notes while listing 11. If the manifest is filled from this plan, the claimed 50/50 disposition can be achieved only by inventing a non-existent README row or misclassifying one real content note. The skip-readme handling also conflicts with the order: `dest_path` may be empty or archive-only, but validation runs before archive, while Rule B says every row's dest must exist.
+  Recommendation: Regenerate the exact inventory in the plan: 46 content + 4 README rows, enumerate only the four existing README paths, and add validator checks for source-path set equality plus classification counts. Define `skip-readme` validation separately: pre-archive it should require no dest frontmatter check; post-archive it should verify the archived README path and original checksum.
+
+Next steps:
+- Block Phase 2a migration until the validator script and manifest evidence fields exist.
+- Correct the README/content inventory counts and make skip-readme validation order explicit.
+- After those fixes, rerun adversarial review on the revised plan before proceeding.

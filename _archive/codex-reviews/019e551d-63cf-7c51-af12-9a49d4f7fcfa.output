@@ -1,0 +1,53 @@
+[2026-05-23T13:54:09.840Z] Starting Codex Adversarial Review.
+[2026-05-23T13:54:09.982Z] Starting Codex task thread.
+[2026-05-23T13:54:10.029Z] Thread ready (019e551d-63cf-7c51-af12-9a49d4f7fcfa).
+[2026-05-23T13:54:10.048Z] Turn started (019e551d-63fc-7172-9753-2d2bf9aab6c5).
+[2026-05-23T13:54:20.789Z] Running command: /bin/bash -lc "nl -ba plan.md | sed -n '540,850p'"
+[2026-05-23T13:54:20.802Z] Command completed: /bin/bash -lc "nl -ba plan.md | sed -n '540,850p'" (exit 0)
+[2026-05-23T13:54:20.802Z] Running command: /bin/bash -lc 'rg -n "reviewer-allowlist|codex-review|self-cited-line|post-archive|set equali...
+[2026-05-23T13:54:20.814Z] Command completed: /bin/bash -lc 'rg -n "reviewer-allowlist|codex-review|self-cited-line|post-archive|set equali... (exit 0)
+[2026-05-23T13:54:20.930Z] Running command: /bin/bash -lc "find . -path './.git' -prune -o -path './tools/*' -maxdepth 3 -type f -print |...
+[2026-05-23T13:54:20.943Z] Command completed: /bin/bash -lc "find . -path './.git' -prune -o -path './tools/*' -maxdepth 3 -type f -print |... (exit 0)
+[2026-05-23T13:54:33.489Z] Running command: /bin/bash -lc 'find _staging/from-modeling-wiki/knowledge -type f | sort'
+[2026-05-23T13:54:33.489Z] Command completed: /bin/bash -lc 'find _staging/from-modeling-wiki/knowledge -type f | sort' (exit 0)
+[2026-05-23T13:54:33.489Z] Running command: /bin/bash -lc 'find _staging/from-modeling-wiki/knowledge -type f | wc -l'
+[2026-05-23T13:54:33.489Z] Command completed: /bin/bash -lc 'find _staging/from-modeling-wiki/knowledge -type f | wc -l' (exit 0)
+[2026-05-23T13:54:33.493Z] Running command: /bin/bash -lc 'find tools -maxdepth 2 -type d -print | sort'
+[2026-05-23T13:54:33.494Z] Command completed: /bin/bash -lc 'find tools -maxdepth 2 -type d -print | sort' (exit 0)
+[2026-05-23T13:54:33.515Z] Running command: /bin/bash -lc 'rg -n "''^source_path|phase2a-manifest|classification = skip-readme|raw_path|c...
+[2026-05-23T13:54:33.515Z] Command completed: /bin/bash -lc 'rg -n "''^source_path|phase2a-manifest|classification = skip-readme|raw_path|c... (exit 0)
+[2026-05-23T13:55:13.752Z] Running command: /bin/bash -lc 'ls -la tools/manifests 2>/dev/null || true'
+[2026-05-23T13:55:13.752Z] Command completed: /bin/bash -lc 'ls -la tools/manifests 2>/dev/null || true' (exit 0)
+[2026-05-23T13:55:13.752Z] Running command: /bin/bash -lc 'git config --get user.email || true'
+[2026-05-23T13:55:13.752Z] Command completed: /bin/bash -lc 'git config --get user.email || true' (exit 0)
+[2026-05-23T13:55:13.753Z] Running command: /bin/bash -lc "find _archive -maxdepth 3 -type d -o -type f | sort | sed -n '1,120p'"
+[2026-05-23T13:55:13.754Z] Command completed: /bin/bash -lc "find _archive -maxdepth 3 -type d -o -type f | sort | sed -n '1,120p'" (exit 0)
+[2026-05-23T13:55:44.222Z] Assistant message captured: {"verdict":"needs-attention","summary":"No-ship for 2a migration yet. v6 closes the obvious M...
+
+[2026-05-23T13:55:44.223Z] Assistant message
+{"verdict":"needs-attention","summary":"No-ship for 2a migration yet. v6 closes the obvious M1/M2 gaps on paper, but the proposed validator still allows non-reproducible review evidence, weak self-citation matches, and an underspecified post-archive set check that can miss exactly the integrity failures this phase is trying to prevent.","findings":[{"severity":"medium","title":"codex-review evidence can be ephemeral and non-reproducible","body":"Rule A accepts `/tmp/claude-*` and `~/.claude/...` job logs as sufficient proof for `codex-review-<session_id>`. Those paths are outside the repo, mutable, and may disappear or rotate after the migration. A manifest row can pass as `verified` during 2a, then become impossible to revalidate later, or pass against an unrelated local file whose name happens to contain the session id. That weakens the claim-mapping evidence for objective-layer promotion.","file":"plan.md","line_start":665,"line_end":667,"confidence":0.86,"recommendation":"Require every `codex-review-*` attestation to be copied into `_archive/codex-reviews/<session_id>.output` before the validator passes, record and verify its sha256, and add fixtures for ephemeral-only evidence rejection plus archived-output hash mismatch."},{"severity":"medium","title":"self-cited-line validation proves proximity, not claim mapping","body":"The M1 semantic check accepts a `self-cited-line` when the target line or ±3 lines contain `source_id` or the raw basename as a substring. That can pass when the source id appears in a nearby bibliography, heading, unrelated paragraph, or a common basename, without proving the cited line supports the migrated claim. This is a real false-positive path to `citation_status_target=verified`.","file":"plan.md","line_start":668,"line_end":671,"confidence":0.82,"recommendation":"Make `self-cited-line` require an exact citation marker on the cited line or a structured field tying `source_path`, `dest_path`, `source_id`, and line number together. Add a regression fixture where the source id appears within ±3 lines but the cited line does not contain the citation marker, and require failure."},{"severity":"high","title":"post-archive set equality is not defined against the archive filesystem","body":"The M2 pseudocode checks each manifest row by deriving an archive path, but the set-equality assertion compares manifest `source_path` values to an undefined `set of expected archive paths`. It does not explicitly enumerate `find _archive/from-modeling-wiki-knowledge-phase2a-2026-05-23 -type f` and compare that actual set to the manifest-derived archive paths. If implemented literally it compares different path namespaces; if implemented loosely it can miss extra, misplaced, or stale archive files. That leaves a data-loss risk before the delayed final delete gate.","file":"plan.md","line_start":719,"line_end":726,"confidence":0.9,"recommendation":"Specify the exact check as `expected={archive_path_for(row) for row in manifest}` and `actual=set(find archive_root -type f)`, then require `expected == actual` plus per-file sha256 equality. Add fixtures for missing archive file, extra archive file, and manifest row omission."}],"next_steps":["Do not start 2a migration until these validator semantics are tightened.","Expand the 12 fixtures with durable codex evidence, self-cited-line false-positive, and actual archive filesystem set-equality cases.","After those changes, the remaining issues should be reviewable as minor-only if the fixtures pass."]}
+[2026-05-23T13:55:44.265Z] Turn completed.
+
+[2026-05-23T13:55:44.276Z] Final output
+# Codex Adversarial Review
+
+Target: working tree diff
+Verdict: needs-attention
+
+No-ship for 2a migration yet. v6 closes the obvious M1/M2 gaps on paper, but the proposed validator still allows non-reproducible review evidence, weak self-citation matches, and an underspecified post-archive set check that can miss exactly the integrity failures this phase is trying to prevent.
+
+Findings:
+- [high] post-archive set equality is not defined against the archive filesystem (plan.md:719-726)
+  The M2 pseudocode checks each manifest row by deriving an archive path, but the set-equality assertion compares manifest `source_path` values to an undefined `set of expected archive paths`. It does not explicitly enumerate `find _archive/from-modeling-wiki-knowledge-phase2a-2026-05-23 -type f` and compare that actual set to the manifest-derived archive paths. If implemented literally it compares different path namespaces; if implemented loosely it can miss extra, misplaced, or stale archive files. That leaves a data-loss risk before the delayed final delete gate.
+  Recommendation: Specify the exact check as `expected={archive_path_for(row) for row in manifest}` and `actual=set(find archive_root -type f)`, then require `expected == actual` plus per-file sha256 equality. Add fixtures for missing archive file, extra archive file, and manifest row omission.
+- [medium] codex-review evidence can be ephemeral and non-reproducible (plan.md:665-667)
+  Rule A accepts `/tmp/claude-*` and `~/.claude/...` job logs as sufficient proof for `codex-review-<session_id>`. Those paths are outside the repo, mutable, and may disappear or rotate after the migration. A manifest row can pass as `verified` during 2a, then become impossible to revalidate later, or pass against an unrelated local file whose name happens to contain the session id. That weakens the claim-mapping evidence for objective-layer promotion.
+  Recommendation: Require every `codex-review-*` attestation to be copied into `_archive/codex-reviews/<session_id>.output` before the validator passes, record and verify its sha256, and add fixtures for ephemeral-only evidence rejection plus archived-output hash mismatch.
+- [medium] self-cited-line validation proves proximity, not claim mapping (plan.md:668-671)
+  The M1 semantic check accepts a `self-cited-line` when the target line or ±3 lines contain `source_id` or the raw basename as a substring. That can pass when the source id appears in a nearby bibliography, heading, unrelated paragraph, or a common basename, without proving the cited line supports the migrated claim. This is a real false-positive path to `citation_status_target=verified`.
+  Recommendation: Make `self-cited-line` require an exact citation marker on the cited line or a structured field tying `source_path`, `dest_path`, `source_id`, and line number together. Add a regression fixture where the source id appears within ±3 lines but the cited line does not contain the citation marker, and require failure.
+
+Next steps:
+- Do not start 2a migration until these validator semantics are tightened.
+- Expand the 12 fixtures with durable codex evidence, self-cited-line false-positive, and actual archive filesystem set-equality cases.
+- After those changes, the remaining issues should be reviewable as minor-only if the fixtures pass.

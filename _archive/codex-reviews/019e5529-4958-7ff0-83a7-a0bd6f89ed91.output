@@ -1,0 +1,51 @@
+[2026-05-23T14:07:09.089Z] Starting Codex Adversarial Review.
+[2026-05-23T14:07:09.248Z] Starting Codex task thread.
+[2026-05-23T14:07:09.692Z] Thread ready (019e5529-4958-7ff0-83a7-a0bd6f89ed91).
+[2026-05-23T14:07:09.712Z] Turn started (019e5529-498c-72a2-860c-800850f9ba76).
+[2026-05-23T14:07:19.269Z] Assistant message captured: {"verdict":"needs-attention","summary":"Placeholder","findings":[],"next_steps":[]}
+
+[2026-05-23T14:07:19.269Z] Assistant message
+{"verdict":"needs-attention","summary":"Placeholder","findings":[],"next_steps":[]}
+[2026-05-23T14:07:21.275Z] Running command: /bin/bash -lc "nl -ba plan.md | sed -n '514,900p'"
+[2026-05-23T14:07:21.289Z] Command completed: /bin/bash -lc "nl -ba plan.md | sed -n '514,900p'" (exit 0)
+[2026-05-23T14:07:46.104Z] Running command: /bin/bash -lc 'find _staging/from-modeling-wiki/knowledge -type f | wc -l && find _staging/fr...
+[2026-05-23T14:07:46.105Z] Command completed: /bin/bash -lc 'find _staging/from-modeling-wiki/knowledge -type f | wc -l && find _staging/fr... (exit 0)
+[2026-05-23T14:07:46.106Z] Running command: /bin/bash -lc 'rg -n "filename:|raw_path:|pugh-sea-level|sources.yml" textbook/sources.yml pl...
+[2026-05-23T14:07:46.106Z] Command completed: /bin/bash -lc 'rg -n "filename:|raw_path:|pugh-sea-level|sources.yml" textbook/sources.yml pl... (exit 0)
+[2026-05-23T14:07:52.926Z] Running command: /bin/bash -lc "nl -ba plan.md | sed -n '894,970p'"
+[2026-05-23T14:07:52.927Z] Command completed: /bin/bash -lc "nl -ba plan.md | sed -n '894,970p'" (exit 0)
+[2026-05-23T14:08:01.985Z] Running command: /bin/bash -lc "sed -n '1,110p' textbook/sources.yml"
+[2026-05-23T14:08:01.985Z] Command completed: /bin/bash -lc "sed -n '1,110p' textbook/sources.yml" (exit 0)
+[2026-05-23T14:08:06.544Z] Running command: /bin/bash -lc "find models -type f -name 'wind.F' -o -name '*.F' | sed 's#"'^.*/##'"' | sort ...
+[2026-05-23T14:08:06.544Z] Command completed: /bin/bash -lc "find models -type f -name 'wind.F' -o -name '*.F' | sed 's#"'^.*/##'"' | sort ... (exit 0)
+[2026-05-23T14:08:10.820Z] Running command: /bin/bash -lc "find models -type f -name 'wind.F' -print"
+[2026-05-23T14:08:10.820Z] Command completed: /bin/bash -lc "find models -type f -name 'wind.F' -print" (exit 0)
+[2026-05-23T14:08:55.260Z] Assistant message captured: {"verdict":"needs-attention","summary":"No ship yet. v8 closes the prior happy paths, but O1 ...
+
+[2026-05-23T14:08:55.260Z] Assistant message
+{"verdict":"needs-attention","summary":"No ship yet. v8 closes the prior happy paths, but O1 and O3 still have validator-spec holes that can either block legitimate evidence or let the wrong raw source pass. 2a should not start until those are tightened and fixture-expanded.","findings":[{"severity":"medium","title":"Codex archive ID canonicalization is inconsistent","body":"O1 still has an end-to-end mismatch: the extractor keeps the `review-` prefix for `jobs/review-<id>.log`, but the Rule A regex only accepts `codex-review-019e...`, and the manifest instruction later says to write `codex-review-<session_id>`. For a supported job log this produces `session_id=review-019e...`, archive path `_archive/codex-reviews/review-019e....output`, and likely claim value `codex-review-review-019e...`, which the regex rejects. That is a real false-negative for one of the two documented archive input forms, and it invites manual renaming/workaround drift.","file":"plan.md","line_start":790,"line_end":803,"confidence":0.88,"recommendation":"Define one canonical session-id grammar and use it everywhere. Either strip `review-` during extraction or allow it consistently in the regex, manifest value, archive path, and sha256sums lookup. Add an end-to-end fixture for `~/.claude/.../jobs/review-019e....log` that validates the generated claim value and archive filename."},{"severity":"medium","title":"Basename-only source-code markers can verify the wrong raw file","body":"O3 allows source-code references to pass when the marker file part matches only the manifest raw_path basename. This repository already has duplicate raw source basenames, including `models/ADCIRC/raw/source_code/asgs/output/wind.F` and `models/ADCIRC/raw/source_code/adcirc/src/wind.F`. A marker like `wind.F:5798` can therefore satisfy a manifest row for the wrong file/version. That is a false-positive in the exact trust boundary O3 is meant to close.","file":"plan.md","line_start":691,"line_end":696,"confidence":0.91,"recommendation":"Require repo-relative raw paths for source-code markers, or allow basename matching only after validator proves the basename is globally unique under the relevant raw source root. Add a failing fixture with two files sharing `wind.F` and a marker that would currently pass by basename."},{"severity":"medium","title":"Codex evidence hash cross-check is consistency, not tamper resistance","body":"The O2 check compares the archived output hash against both the manifest field and `sha256sums.txt`, but all three artifacts live in the same mutable repository state. If the archived output is replaced and both hash records are updated together, the validator still passes. This does not substantiate the stated source-modification defense; it only catches partial drift or accidental mismatch.","file":"plan.md","line_start":679,"line_end":683,"confidence":0.74,"recommendation":"Anchor codex evidence to an immutable or prior state. For example, require `_archive/codex-reviews/<session_id>.output` and `sha256sums.txt` to be committed before dependent manifest rows, record that evidence commit SHA in the manifest, and have the validator verify the archived blob hash from that commit or fail if evidence files are modified in the same validation diff."}],"next_steps":["Fix O1 canonical session-id handling and add the jobs-log end-to-end fixture.","Tighten O3 source-code marker matching to full path or uniqueness-checked basename, then add duplicate-basename fixtures.","Downgrade O2 wording to consistency checking or add a prior-commit/immutable-anchor validation step before approving 2a migration."]}
+[2026-05-23T14:08:55.294Z] Turn completed.
+
+[2026-05-23T14:08:55.304Z] Final output
+# Codex Adversarial Review
+
+Target: working tree diff
+Verdict: needs-attention
+
+No ship yet. v8 closes the prior happy paths, but O1 and O3 still have validator-spec holes that can either block legitimate evidence or let the wrong raw source pass. 2a should not start until those are tightened and fixture-expanded.
+
+Findings:
+- [medium] Codex archive ID canonicalization is inconsistent (plan.md:790-803)
+  O1 still has an end-to-end mismatch: the extractor keeps the `review-` prefix for `jobs/review-<id>.log`, but the Rule A regex only accepts `codex-review-019e...`, and the manifest instruction later says to write `codex-review-<session_id>`. For a supported job log this produces `session_id=review-019e...`, archive path `_archive/codex-reviews/review-019e....output`, and likely claim value `codex-review-review-019e...`, which the regex rejects. That is a real false-negative for one of the two documented archive input forms, and it invites manual renaming/workaround drift.
+  Recommendation: Define one canonical session-id grammar and use it everywhere. Either strip `review-` during extraction or allow it consistently in the regex, manifest value, archive path, and sha256sums lookup. Add an end-to-end fixture for `~/.claude/.../jobs/review-019e....log` that validates the generated claim value and archive filename.
+- [medium] Basename-only source-code markers can verify the wrong raw file (plan.md:691-696)
+  O3 allows source-code references to pass when the marker file part matches only the manifest raw_path basename. This repository already has duplicate raw source basenames, including `models/ADCIRC/raw/source_code/asgs/output/wind.F` and `models/ADCIRC/raw/source_code/adcirc/src/wind.F`. A marker like `wind.F:5798` can therefore satisfy a manifest row for the wrong file/version. That is a false-positive in the exact trust boundary O3 is meant to close.
+  Recommendation: Require repo-relative raw paths for source-code markers, or allow basename matching only after validator proves the basename is globally unique under the relevant raw source root. Add a failing fixture with two files sharing `wind.F` and a marker that would currently pass by basename.
+- [medium] Codex evidence hash cross-check is consistency, not tamper resistance (plan.md:679-683)
+  The O2 check compares the archived output hash against both the manifest field and `sha256sums.txt`, but all three artifacts live in the same mutable repository state. If the archived output is replaced and both hash records are updated together, the validator still passes. This does not substantiate the stated source-modification defense; it only catches partial drift or accidental mismatch.
+  Recommendation: Anchor codex evidence to an immutable or prior state. For example, require `_archive/codex-reviews/<session_id>.output` and `sha256sums.txt` to be committed before dependent manifest rows, record that evidence commit SHA in the manifest, and have the validator verify the archived blob hash from that commit or fail if evidence files are modified in the same validation diff.
+
+Next steps:
+- Fix O1 canonical session-id handling and add the jobs-log end-to-end fixture.
+- Tighten O3 source-code marker matching to full path or uniqueness-checked basename, then add duplicate-basename fixtures.
+- Downgrade O2 wording to consistency checking or add a prior-commit/immutable-anchor validation step before approving 2a migration.

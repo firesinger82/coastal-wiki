@@ -1,0 +1,61 @@
+[2026-05-23T02:40:48.497Z] Starting Codex Adversarial Review.
+[2026-05-23T02:40:48.658Z] Starting Codex task thread.
+[2026-05-23T02:40:48.882Z] Thread ready (019e52b4-ead0-78d2-800e-31f8da7a01e8).
+[2026-05-23T02:40:48.900Z] Turn started (019e52b4-eb02-74c1-94fc-9044dc214e1e).
+[2026-05-23T02:40:56.999Z] Assistant message captured: {"verdict":"needs-attention","summary":"I’m going to verify the actual working-tree diff and ...
+
+[2026-05-23T02:40:56.999Z] Assistant message
+{"verdict":"needs-attention","summary":"I’m going to verify the actual working-tree diff and the validator behavior against the claimed CommonMark/HTML cases, then return only the requested JSON review result.","findings":[],"next_steps":[]}
+[2026-05-23T02:41:02.536Z] Running command: /bin/bash -lc "nl -ba tools/validate-research-isolation.py | sed -n '1,240p'"
+[2026-05-23T02:41:02.549Z] Running command: /bin/bash -lc 'git diff -- tools/validate-research-isolation.py tools/test_validate_research_...
+[2026-05-23T02:41:02.549Z] Command completed: /bin/bash -lc 'git diff -- tools/validate-research-isolation.py tools/test_validate_research_... (exit 0)
+[2026-05-23T02:41:02.549Z] Command completed: /bin/bash -lc "nl -ba tools/validate-research-isolation.py | sed -n '1,240p'" (exit 0)
+[2026-05-23T02:41:02.659Z] Running command: /bin/bash -lc "nl -ba tools/test_validate_research_isolation.py | sed -n '1,260p'"
+[2026-05-23T02:41:02.671Z] Command completed: /bin/bash -lc "nl -ba tools/test_validate_research_isolation.py | sed -n '1,260p'" (exit 0)
+[2026-05-23T02:41:02.671Z] Running command: /bin/bash -lc 'git diff --stat && git status --short'
+[2026-05-23T02:41:02.671Z] Command completed: /bin/bash -lc 'git diff --stat && git status --short' (exit 0)
+[2026-05-23T02:41:15.923Z] Assistant message captured: {"verdict":"needs-attention","summary":"I’ve read the validator and fixtures. The main thing ...
+
+[2026-05-23T02:41:15.923Z] Assistant message
+{"verdict":"needs-attention","summary":"I’ve read the validator and fixtures. The main thing I’m stress-testing now is whether the regexes can be bypassed by valid Markdown/HTML forms, not just whether the named regression cases pass.","findings":[],"next_steps":[]}
+[2026-05-23T02:41:16.784Z] Searching:
+[2026-05-23T02:41:22.282Z] Searching:
+[2026-05-23T02:41:25.062Z] Searching:
+[2026-05-23T02:41:49.234Z] Assistant message captured: {"verdict":"needs-attention","summary":"The cited CommonMark text confirms the no-space colon...
+
+[2026-05-23T02:41:49.234Z] Assistant message
+{"verdict":"needs-attention","summary":"The cited CommonMark text confirms the no-space colon and 0-3-space indent parts, but it also exposes gaps: reference destinations can appear after one line ending, and raw HTML attributes can be unquoted. I’m checking whether those are real bypasses in this repo’s implementation.","findings":[],"next_steps":[]}
+[2026-05-23T02:41:49.313Z] Running command: /bin/bash -lc 'python3 tools/test_validate_research_isolation.py'
+[2026-05-23T02:41:49.325Z] Running command: /bin/bash -lc "python3 - <<'PY' import importlib.util from pathlib import Path spec=importlib...
+[2026-05-23T02:41:49.338Z] Command completed: /bin/bash -lc "python3 - <<'PY' import importlib.util from pathlib import Path spec=importlib... (exit 0)
+[2026-05-23T02:41:49.338Z] Command completed: /bin/bash -lc 'python3 tools/test_validate_research_isolation.py' (exit 0)
+[2026-05-23T02:41:49.413Z] Running command: /bin/bash -lc "rg -n \"href=|src=|data-href|\\[["'^]]+'"\\]:"'$|research/" concepts models ex...
+[2026-05-23T02:41:49.413Z] Command completed: /bin/bash -lc "rg -n \"href=|src=|data-href|\\[["'^]]+'"\\]:"'$|research/" concepts models ex... (exit 0)
+[2026-05-23T02:41:52.666Z] Searching:
+[2026-05-23T02:41:56.084Z] Searching:
+[2026-05-23T02:42:00.175Z] Searching:
+[2026-05-23T02:42:24.933Z] Assistant message captured: {"verdict":"needs-attention","summary":"No-ship for migration yet. The claimed H1/H2 cases pa...
+
+[2026-05-23T02:42:24.933Z] Assistant message
+{"verdict":"needs-attention","summary":"No-ship for migration yet. The claimed H1/H2 cases pass, but the detector is still not spec-complete for policy-relevant Markdown/HTML forms, so a direct research/ reference can bypass the pre-commit guard. Parser avoidance is acceptable only if the tool explicitly defines and tests a narrower subset; it is not acceptable while claiming CommonMark/raw-HTML coverage.","findings":[{"severity":"high","title":"Reference definitions with newline-separated destinations bypass the guard","body":"`REF_DEF_RE` handles no-space-after-colon and 0-3 leading spaces correctly, but it is not CommonMark-complete. CommonMark 0.31.2 allows optional spaces/tabs including up to one line ending between the colon and link destination: https://spec.commonmark.org/0.31.2/#link-reference-definitions. A valid definition such as `[r]:\\n  ../research/inbox/x.md` is rendered as a reference destination but `extract_link_targets()` returns no target, allowing body pages to cite `research/` through reference-style links without detection. The 33 fixtures do not cover this spec case.","file":"tools/validate-research-isolation.py","line_start":45,"line_end":45,"confidence":0.93,"recommendation":"Either use a CommonMark parser/link extractor, or extend the reference-definition scanner to handle the optional single line ending before the destination and add fixtures for CommonMark example-style multiline reference definitions and titles."},{"severity":"high","title":"Raw HTML href/src detection misses valid unquoted links and can flag non-link attributes","body":"`HTML_HREF_RE` only extracts double/single-quoted `href` and `src`, and it is not constrained to actual attribute-name boundaries. CommonMark raw HTML follows HTML attribute syntax, where unquoted attribute values are valid; see https://spec.commonmark.org/0.31.2/#raw-html. A valid `<a href=/research/inbox/x.md>` or `<img src=../research/inbox/x.png>` bypasses the policy guard, while `<div data-href=\"../research/inbox/x.md\">` is flagged even though `data-href` is not a navigation/source attribute. That means both false negatives and false positives remain in the H3 closure claim.","file":"tools/validate-research-isolation.py","line_start":47,"line_end":55,"confidence":0.91,"recommendation":"Parse raw HTML attributes with an HTML parser, or at minimum restrict matches to real attribute boundaries inside tags and support quoted plus unquoted values. Add regression fixtures for unquoted href/src, data-href false positives, uppercase unquoted attributes, and data: URI non-violations."}],"next_steps":["Block migration until the two bypasses above are fixed and covered by tests.","After the fix, parser-free implementation is acceptable for a non-public single-writer wiki if documented as a conservative policy scanner rather than exact CommonMark compliance."]}
+[2026-05-23T02:42:25.090Z] Turn completed.
+
+[2026-05-23T02:42:25.100Z] Final output
+# Codex Adversarial Review
+
+Target: working tree diff
+Verdict: needs-attention
+
+No-ship for migration yet. The claimed H1/H2 cases pass, but the detector is still not spec-complete for policy-relevant Markdown/HTML forms, so a direct research/ reference can bypass the pre-commit guard. Parser avoidance is acceptable only if the tool explicitly defines and tests a narrower subset; it is not acceptable while claiming CommonMark/raw-HTML coverage.
+
+Findings:
+- [high] Reference definitions with newline-separated destinations bypass the guard (tools/validate-research-isolation.py:45)
+  `REF_DEF_RE` handles no-space-after-colon and 0-3 leading spaces correctly, but it is not CommonMark-complete. CommonMark 0.31.2 allows optional spaces/tabs including up to one line ending between the colon and link destination: https://spec.commonmark.org/0.31.2/#link-reference-definitions. A valid definition such as `[r]:\n  ../research/inbox/x.md` is rendered as a reference destination but `extract_link_targets()` returns no target, allowing body pages to cite `research/` through reference-style links without detection. The 33 fixtures do not cover this spec case.
+  Recommendation: Either use a CommonMark parser/link extractor, or extend the reference-definition scanner to handle the optional single line ending before the destination and add fixtures for CommonMark example-style multiline reference definitions and titles.
+- [high] Raw HTML href/src detection misses valid unquoted links and can flag non-link attributes (tools/validate-research-isolation.py:47-55)
+  `HTML_HREF_RE` only extracts double/single-quoted `href` and `src`, and it is not constrained to actual attribute-name boundaries. CommonMark raw HTML follows HTML attribute syntax, where unquoted attribute values are valid; see https://spec.commonmark.org/0.31.2/#raw-html. A valid `<a href=/research/inbox/x.md>` or `<img src=../research/inbox/x.png>` bypasses the policy guard, while `<div data-href="../research/inbox/x.md">` is flagged even though `data-href` is not a navigation/source attribute. That means both false negatives and false positives remain in the H3 closure claim.
+  Recommendation: Parse raw HTML attributes with an HTML parser, or at minimum restrict matches to real attribute boundaries inside tags and support quoted plus unquoted values. Add regression fixtures for unquoted href/src, data-href false positives, uppercase unquoted attributes, and data: URI non-violations.
+
+Next steps:
+- Block migration until the two bypasses above are fixed and covered by tests.
+- After the fix, parser-free implementation is acceptable for a non-public single-writer wiki if documented as a conservative policy scanner rather than exact CommonMark compliance.
