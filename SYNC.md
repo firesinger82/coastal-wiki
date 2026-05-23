@@ -16,12 +16,12 @@ gh repo create coastal-wiki --private --description "Coastal engineering domain 
 
 ```bash
 cd ~/coastal-wiki
-git remote add origin git@github.com:<USERNAME>/coastal-wiki.git
+git remote add origin git@github.com:firesinger82/coastal-wiki.git
 git branch -M main
 git push -u origin main
 ```
 
-(또는 HTTPS: `https://github.com/<USERNAME>/coastal-wiki.git`. SSH 권장)
+(또는 HTTPS: `https://github.com/firesinger82/coastal-wiki.git`. SSH 권장)
 
 ## 2. 다른 PC에서 처음 받기
 
@@ -37,7 +37,7 @@ git push -u origin main
 ```bash
 # WSL2 ext4 위치 권장 (속도 5-10x)
 cd ~
-git clone git@github.com:<USERNAME>/coastal-wiki.git
+git clone git@github.com:firesinger82/coastal-wiki.git
 cd coastal-wiki
 ```
 
