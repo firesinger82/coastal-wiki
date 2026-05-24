@@ -3,7 +3,7 @@ title: "폭풍해일 (Storm Surge) — 정의·결정 인자·한국 영향"
 topic: storm-surge
 canonical_source: self
 citation_status: verified
-verification_method: "Pugh 'Tides, Surges and Mean Sea-Level' Ch 6 Storm Surges (textbook/md/sea-level.md, p.184-230) 직접 인용 + ADCIRC theory report (Luettich & Westerink 2004) + _staging/from-modeling-wiki/knowledge/methods/adcirc-storm-surge-foundation.md (이미 source-code 기반 분석). 한국 적용은 KHOA Annual Report 2012-2025 의 이상조위 분석 + 본 위키 experience/khoa-annual-climate-trend.md SLR cross-reference."
+verification_method: "Pugh 'Tides, Surges and Mean Sea-Level' Ch 6 Storm Surges (textbook/md/sea-level.md, p.184-230) 직접 인용 + ADCIRC theory report (Luettich & Westerink 2004) + _staging/from-modeling-wiki/knowledge/methods/adcirc-storm-surge-foundation.md (at commit a9618df^) (이미 source-code 기반 분석). 한국 적용은 KHOA Annual Report 2012-2025 의 이상조위 분석 + 본 위키 experience/khoa-annual-climate-trend.md SLR cross-reference."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-23
 verification_by: "Claude Opus 4.7 (1M context) — Pugh Ch 6 + ADCIRC + KHOA cross-ref"

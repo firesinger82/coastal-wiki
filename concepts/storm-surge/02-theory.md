@@ -160,7 +160,7 @@ $$\Delta\eta_{wind} = \frac{540{,}000}{10{,}056{,}717} \approx 0.054 \text{ m} =
 | 29 | AHM + OWI | hybrid (vortex + background) |
 | 30 | GAHM + OWI | 동일, GAHM 사용 |
 
-상세 분석 — `_staging/from-modeling-wiki/knowledge/methods/adcirc-storm-surge.md` (source-code level, NWS 모든 모드 + Holland B + ATCF Best Track + IB suppression `NOIVB`).
+상세 분석 — `_staging/from-modeling-wiki/knowledge/methods/adcirc-storm-surge.md (at commit a9618df^)` (source-code level, NWS 모든 모드 + Holland B + ATCF Best Track + IB suppression `NOIVB`).
 
 ## 4. Tide-Surge Interaction (Pugh §7:8)
 
@@ -247,4 +247,4 @@ ADCIRC outputs:
 - [`03-analysis-methods.md`](03-analysis-methods.md) (예정) — tide-surge separation algorithm, joint probability
 - [`04-code-and-tools.md`](04-code-and-tools.md) (예정) — ADCIRC NWS 운영
 - [`concepts/tides/02-theory.md`](../tides/02-theory.md) §8.6 — SLR + storm surge baseline
-- [`_staging/from-modeling-wiki/knowledge/methods/adcirc-storm-surge*.md`](../../_staging/from-modeling-wiki/knowledge/methods/) — 7개 NWS source-code 분석 (promote 대기)
+- [`models/ADCIRC/source-analysis/storm-surge/`](../../models/ADCIRC/source-analysis/storm-surge/) — 7개 NWS source-code 분석 (promote 완료 commit a9618df)

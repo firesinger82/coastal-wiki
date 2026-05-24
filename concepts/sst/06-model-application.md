@@ -131,7 +131,7 @@ ROMS 는 **COARE 3.0 algorithm** (Fairall et al. 1996) 사용:
 
 ### 5.3 한국 적용
 
-- _staging/from-modeling-wiki/knowledge/methods/roms_atmospheric_forcing.md (modeling-wiki 흡수) — ROMS forcing 일반론
+- _staging/from-modeling-wiki/knowledge/methods/roms_atmospheric_forcing.md (at commit a9618df^) (modeling-wiki 흡수) — ROMS forcing 일반론
 - ROMS 한국 동해 모델 (NIFS 동해예측시스템 KOOS-EJS 기반) — citation TODO
 
 ## 6. ADCIRC 의 SST 처리
