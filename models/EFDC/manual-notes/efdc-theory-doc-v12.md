@@ -194,7 +194,7 @@ Hg·PCB·toxics 의 sorption + degradation. 한국 산업 폐기물 분석에 �
 
 본 노트는 **TOC + Acknowledgement + 챕터 nav** 수준. 깊이별 후속 노트 후보:
 
-- `efdc-theory-v12-ch2-hydrodynamics.md` — §2.1-2.7 equation level (gov eq + numerical scheme + SIG/SGZ)
+- ✅ [[efdc-theory-v12-ch2-hydrodynamics]] — §2.1-2.7 equation level (gov eq + numerical scheme + SIG/SGZ) — 2026-05-24 작성
 - `efdc-theory-v12-ch5-temperature.md` — §5.1-5.5 (COARE 3.6 + ice + light attenuation)
 - `efdc-theory-v12-ch6-sediment.md` — §6.3 SedTran + §6.4 SEDZLJ equation level cross-walk
 - `efdc-sedzlj-vs-sedtran-comparison.md` — 두 모듈의 알고리즘 1:1 매핑
