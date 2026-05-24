@@ -28,7 +28,7 @@
 |---|---:|---|---|
 | `source-analysis/` | 11 verified | **sparse** | 4dvar · advection · baroclinic · atmospheric forcing · sediment (subdir). 1373 Fortran 대비 매우 얕음 (M-D) |
 | `manual-notes/` | **0** | **미개시** | 1161 wiki HTML mirror 보유했으나 정리 노트 없음 (M-C) |
-| `web-refs/` | 0 | **미개시** | myroms.org 핵심 페이지·Shchepetkin & McWilliams 2005·CSTMS 논문 큐레이션 필요 (M-E) |
+| `web-refs/` | 1 verified | **신설 2026-05-24** | roms-official-resources.md — myroms.org·forum·GitHub myroms/roms·myroms/roms-jedi·핵심 논문 (Shchepetkin-McWilliams 2005·Haidvogel 2008·Warner 2008 CSTMS·Large 1994 KPP) |
 | `raw/` | 1221 .md + 10 pdf + 1373 fortran (583 MB) | archive | roms 본체 + 6 variants + WRF coupling |
 
 ## 본 위키에서의 핵심 활용

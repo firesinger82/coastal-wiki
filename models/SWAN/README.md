@@ -19,7 +19,7 @@
 |---|---|
 | `manual-notes/` | 공식 메뉴얼 발췌·정리 (TBD) |
 | `source-analysis/` | 소스코드·알고리즘 분석. WINK 패턴 등 사용자 SWAN library 발췌 |
-| `web-refs/` | 공식 사이트·논문·기술 자료 |
+| `web-refs/` | swan-official-resources.md (verified 2026-05-24) — sourceforge·공식 매뉴얼·핵심 논문 (Booij-Ris-Holthuijsen 1999·Zijlema 2010·Rogers 2003·Dietrich 2011 SWAN+ADCIRC) |
 
 ## 사용자 SWAN library 통합
 

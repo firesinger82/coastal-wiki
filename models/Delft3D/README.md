@@ -30,7 +30,7 @@
 |---|---:|---|---|
 | `source-analysis/` | 10 verified | **sparse** | sediment + dredge·dump + flow-wave coupling + turbulence. 4795 Fortran 대비 매우 얕음 — M-D 보강 후보 |
 | `manual-notes/` | **0** | **미개시** | 53 PDFs 보유했으나 정리 노트 없음 (M-C 보강 후보) |
-| `web-refs/` | 0 | **미개시** | Deltares·논문 큐레이션 필요 (M-E) |
+| `web-refs/` | 1 verified | **신설 2026-05-24** | delft3d-official-resources.md — Deltares OSS·GitHub Deltares/delft3d·Delft-FIAT·hydromt_delft3dfm·핵심 논문 (Lesser 2004·Stelling-Duinmeijer 2003·Kernkamp 2011·van der Wegen 2008) |
 | `raw/` | 56 .md + 53 pdf + 4795 fortran (1.5 GB) | archive | Delft3D + Delft-FIAT + hydromt_delft3dfm |
 
 ## 본 위키에서의 핵심 활용

@@ -28,7 +28,7 @@
 |---|---:|---|---|
 | `source-analysis/` | 16 verified | 안정 | morphology · avalanching · bed_friction · wave_boundary · single_dir · q3d · mode_dispatch · groundwater · output · output · vegetation · SWAN handoff |
 | `manual-notes/` | 3 source-needed | **P2 catalog** | phase 2a bulk promote, 페이지 인용 audit 보류 (M-B) |
-| `web-refs/` | 0 | **미개시** | Deltares 공식·OpenEarth wiki·논문 큐레이션 필요 (M-E) |
+| `web-refs/` | 1 verified | **신설 2026-05-24** | xbeach-official-resources.md — Deltares OSS·OpenEarth·xbeach.readthedocs.io·핵심 논문 (Roelvink 2009·McCall 2010·Smit 2010·van Dongeren 2013) |
 | `raw/` | 17 .md + 9 pdf + 90 fortran (162 MB) | archive | trunk source + manuals + reports |
 
 ## 본 위키에서의 핵심 활용
