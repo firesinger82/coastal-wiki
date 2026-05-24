@@ -22,8 +22,8 @@
 | [SWAN](models/SWAN/) | **STABLE** (README + action-balance + wink-pattern + source-analysis 21 노트 verified) | 천해 풍파 spectral · Holthuijsen 공동개발 · 모든 source-term · scheme · 추가 promote 다수 |
 | [ADCIRC](models/ADCIRC/) | **WIP** (source-analysis 41 + manual-notes 21 verified + 11 local-workflow) | NWS modes + GAHM/AHM + tide + storm-surge. manual-notes M-B audit (2026-05-24): 21 외부 docs catalog verified, 11 local user-workflow 재분류 |
 | [XBeach](models/XBeach/) | **WIP** (source-analysis 16 노트) | morphology · avalanching · bed_friction · wave_boundary |
-| [Delft3D](models/Delft3D/) | **WIP** (source-analysis 10 노트, sediment + wave) | sediment + dredge·dump + flow-wave coupling + turbulence 등 |
-| [ROMS](models/ROMS/) | **WIP** (source-analysis 11 노트, sediment subdir) | 4dvar + advection + baroclinic + atmospheric forcing + sediment 등 |
+| [Delft3D](models/Delft3D/) | **WIP** (source-analysis 12 + web-refs 1) | sediment + dredge·dump + flow-wave coupling + turbulence + 신설 engines_overview·flow2d3d_dispatcher (M-D 1차) |
+| [ROMS](models/ROMS/) | **WIP** (source-analysis 13 + web-refs 1) | 4dvar + advection + baroclinic + atmospheric forcing + sediment + 신설 main_driver_dispatch·nonlinear_physics_modules (M-D 1차) |
 
 ## textbook/ (교과서 통합)
 

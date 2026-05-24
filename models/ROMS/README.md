@@ -26,7 +26,7 @@
 
 | 경로 | 노트 수 | 상태 | 비고 |
 |---|---:|---|---|
-| `source-analysis/` | 11 verified | **sparse** | 4dvar · advection · baroclinic · atmospheric forcing · sediment (subdir). 1373 Fortran 대비 매우 얕음 (M-D) |
+| `source-analysis/` | 13 verified | **sparse (M-D 1차 진행)** | 기존 11 + 신설 2 (main_driver_dispatch·nonlinear_physics_modules). 1373 Fortran 대비 여전히 sparse — M-D 2차 후속 (main3d_loop·CPP options·bulk_flux COARE·BBL wave-current) |
 | `manual-notes/` | **0** | **미개시** | 1161 wiki HTML mirror 보유했으나 정리 노트 없음 (M-C) |
 | `web-refs/` | 1 verified | **신설 2026-05-24** | roms-official-resources.md — myroms.org·forum·GitHub myroms/roms·myroms/roms-jedi·핵심 논문 (Shchepetkin-McWilliams 2005·Haidvogel 2008·Warner 2008 CSTMS·Large 1994 KPP) |
 | `raw/` | 1221 .md + 10 pdf + 1373 fortran (583 MB) | archive | roms 본체 + 6 variants + WRF coupling |
