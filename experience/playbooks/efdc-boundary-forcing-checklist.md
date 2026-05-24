@@ -1,6 +1,6 @@
 ---
 citation_status: source-needed
-origin: _staging/from-modeling-wiki/knowledge/playbooks/efdc-boundary-forcing-checklist.md
+origin: _archive/from-modeling-wiki-knowledge-phase2a-2026-05-23/playbooks/efdc-boundary-forcing-checklist.md
 promoted_date: 2026-05-24
 promote_phase: 2a
 classification: experience-only

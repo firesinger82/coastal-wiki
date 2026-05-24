@@ -1,6 +1,6 @@
 ---
 citation_status: source-needed
-origin: _staging/from-modeling-wiki/knowledge/failure-patterns/adcirc-wide6-provenance-gap.md
+origin: _archive/from-modeling-wiki-knowledge-phase2a-2026-05-23/failure-patterns/adcirc-wide6-provenance-gap.md
 promoted_date: 2026-05-24
 promote_phase: 2a
 classification: experience-only

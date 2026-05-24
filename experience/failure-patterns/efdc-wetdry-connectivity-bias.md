@@ -1,6 +1,6 @@
 ---
 citation_status: source-needed
-origin: _staging/from-modeling-wiki/knowledge/failure-patterns/efdc-wetdry-connectivity-bias.md
+origin: _archive/from-modeling-wiki-knowledge-phase2a-2026-05-23/failure-patterns/efdc-wetdry-connectivity-bias.md
 promoted_date: 2026-05-24
 promote_phase: 2a
 classification: experience-only

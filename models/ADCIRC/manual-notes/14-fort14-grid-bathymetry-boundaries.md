@@ -1,6 +1,6 @@
 ---
 citation_status: source-needed
-origin: _staging/from-modeling-wiki/knowledge/methods/adcirc-sources/14-fort14-grid-bathymetry-boundaries.md
+origin: _archive/from-modeling-wiki-knowledge-phase2a-2026-05-23/methods/adcirc-sources/14-fort14-grid-bathymetry-boundaries.md
 promoted_date: 2026-05-24
 promote_phase: 2a
 classification: manual-notes-catalog
