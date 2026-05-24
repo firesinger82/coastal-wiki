@@ -47,6 +47,7 @@
 | [KHOA 15정점 1년 조위 UTide 검증](experience/khoa-multi-station-tide-validation-2026.md) | 3조건 통과 (15정점 독립 / KHOA 공식값 ±0.1% / fetch+analyze 스크립트 재현 가능) | **verified** |
 | [KHOA 14년 기후 추세 — 한국 연안 SLR 2007-2025](experience/khoa-annual-climate-trend.md) | 3조건 통과 (13정점 19년 / KHOA Annual Report 직접 데이터 / 선형회귀 재현 가능) | **verified** |
 | [KHOA 9년 SST 가온 추세 — 한국 연안 2017-2025](experience/khoa-sst-warming-trend.md) | 3조건 통과 (13정점 9년 / KHOA Annual Report 직접 데이터 / 회귀+SLR 정합성 cross-check) | **verified** (단기 caveat 명시) |
+| [한국 연안 2024 광역 MHW — daily Hobday 13정점](experience/khoa-2024-mhw-extreme.md) | 3조건 통과 (13정점 daily OISST / 63 events 객관 집계 / KHOA 2024 §3.1 cross-check) | **verified** |
 
 ## research/ (Hermes coastal-research 워크벤치)
 

@@ -9,6 +9,7 @@
 | `khoa-sst-warming-trend.md` | KHOA 9년 SST trend 2017-2025 (한국 평균 1.39 °C/decade, 서귀포·제주 max) + SLR 정합성 + 1968-2012 KHOA 공식 reference (11× 가속) | 2026-05-23 |
 | `khoa-sst-global-crosscheck.md` | OISST v2.1 + HadISST + COBE-SST2 + NIFS KODC raw vs KHOA — 5-source cross-check. 2017-2025 ~1.25 °C/dec 일치, 1968-2022 HadISST 0.27 ≈ NIFS raw 0.19, 1850-2025 baseline 0.064 | 2026-05-23 |
 | `nifs-vertical-sst-trends.md` | NIFS 다층 수온 trend 1968-2025 (surface +0.30, 100m +0.13, 200m -0.59 °C/dec) + 동해 100m cooling 신호 + thermosteric SLR ~10% | 2026-05-23 |
+| `khoa-2024-mhw-extreme.md` | 2024 한국 13정점 daily MHW (Hobday 2016) — 12/13 IV-extreme, 인천 262일 연속, 목포 +6.18 °C max anomaly, 63 events. KHOA Annual Report 2024 §3.1 +3.40 °C cross-check | 2026-05-24 |
 
 ## 들어가는 것
 
