@@ -3,9 +3,9 @@ citation_status: source-needed
 origin: _archive/from-modeling-wiki-knowledge-phase2a-2026-05-23/methods/adcirc-sources/31-wide6-fort14-structural-check.md
 promoted_date: 2026-05-24
 promote_phase: 2a
-classification: manual-notes-catalog
+classification: local-workflow-notes
 source_id: models/ADCIRC
-notes: P2 catalog (audit deferred to per-note verification)
+notes: "local user workflow (E:\\ paths) — not external doc catalog. source-needed retained; verified status requires raw file presence audit. Future home may be experience/ or source-analysis/."
 ---
 # wide6 fort.14 Structural Check
 

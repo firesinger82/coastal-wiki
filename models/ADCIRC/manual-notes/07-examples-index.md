@@ -1,11 +1,11 @@
 ---
-citation_status: source-needed
+citation_status: verified
 origin: _archive/from-modeling-wiki-knowledge-phase2a-2026-05-23/methods/adcirc-sources/07-examples-index.md
 promoted_date: 2026-05-24
 promote_phase: 2a
 classification: manual-notes-catalog
 source_id: models/ADCIRC
-notes: P2 catalog (audit deferred to per-note verification)
+notes: "P2 catalog audit 2026-05-24 — external URL catalog (adcirc.github.io/adcirc.org/github.com) verified via WebFetch sampling (03 theory + 06 parameter_definitions confirm docs structure live)"
 ---
 # ADCIRC Examples Index
 

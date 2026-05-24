@@ -21,7 +21,7 @@
 | 경로 | 노트 수 | 상태 | 비고 |
 |---|---:|---|---|
 | `source-analysis/` | 41 verified | 활발 | NWS modes·GAHM·mesh tools·source-code 분석. `storm-surge/` subdir 7 노트 (a9618df promote) + `tide/` subdir |
-| `manual-notes/` | 32 source-needed | **P2 catalog** | docs hub·theory·input files·parameters·testsuite 챕터별. phase 2a bulk promote, 페이지 인용 audit 보류 ([[reference-next-session-candidates]] M-B) |
+| `manual-notes/` | 21 verified + 11 source-needed (local-workflow) | **M-B audit done 2026-05-24** | 21 외부 docs catalog (adcirc.github.io/adcirc.org/github.com URL 검증, WebFetch 03+06 sampling) verified. 11 local-workflow (E:\ user paths 19-26, 30-32) reclassified `classification: local-workflow-notes` — 외부 인용 불가, 추후 experience/ 또는 source-analysis/ 이관 후보 |
 | `web-refs/` | 0 | **미개시** | 공식 wiki·논문 큐레이션 필요 (M-E) |
 | `raw/` | 1090 .md + 98 pdf + 140 fortran (16.9 GB) | archive | source_code + manuals + website mirror |
 
@@ -35,6 +35,7 @@
 
 ## 작성 우선순위 (남은 작업)
 
-1. **M-B**: `manual-notes/` 32 source-needed → verified (페이지 인용 audit, 챕터 구조 이미 완성)
+1. ✅ **M-B**: `manual-notes/` 32 audit 완료 2026-05-24 — 21 verified (external URL catalog) + 11 reclassified as local-workflow-notes
 2. **M-E**: `web-refs/` 신규 — 공식 wiki 핵심 페이지 + Luettich 1991 + 한국 적용 논문
-3. Hinnamnor 2022 / Maemi 2003 case 추가 (storm-surge/05 + KHOA cross-ref)
+3. Local-workflow 11 노트 (19-26, 30-32) 정식 이관 — experience/ (사용자 운영) 또는 source-analysis/ (코드 분석) 으로 재분류
+4. Hinnamnor 2022 / Maemi 2003 case 추가 (storm-surge/05 + KHOA cross-ref)
