@@ -128,7 +128,7 @@ $$\frac{\partial u}{\partial t} - fv = \cdots, \quad f = 2\Omega \sin\phi$$
 | Lingling (링링) | 2019 | 서해 북상 | ~1.0 m 인천 |
 | Hinnamnor (힌남노) | 2022 | 동해 남부 | ~1.5 m 포항·울산 |
 
-(정확 값은 KHOA Annual Report 해당 연도 §3.x 인용 필요 — TODO)
+(정확 값은 KHOA Annual Report 해당 연도 §3.x 인용 필요 — TODO. Maemi 2003 + Hinnamnor 2022 의 case-별 cross-ref + IB 계산 + workflow 매핑은 [`05-examples.md`](05-examples.md) 참조)
 
 ### 3.3 SLR + SST 강화 + storm surge 의 climate cascade
 
@@ -190,7 +190,7 @@ source_id 매니페스트: [`textbook/sources.yml`](../../textbook/sources.yml) 
 
 - [`02-theory.md`](02-theory.md) (예정) — equations 정형 (Pugh §6:3~6:4)
 - [`04-code-and-tools.md`](04-code-and-tools.md) (예정) — ADCIRC NWS 모드 + KHOA observation API
-- [`05-examples.md`](05-examples.md) (예정) — 한국 태풍 case (Maemi, Hinnamnor)
+- [`05-examples.md`](05-examples.md) — 한국 태풍 case (Maemi 2003 + Hinnamnor 2022) cross-ref + IB 계산 + ADCIRC workflow 매핑 (source-needed: 외부 실측은 KHOA Annual Report fetch 후 verified)
 - [`06-model-application.md`](06-model-application.md) (예정) — ADCIRC primary, Delft3D·SCHISM 비교
 - 외부:
   - [`textbook/md/sea-level.md`](../../textbook/md/sea-level.md) — Pugh full book

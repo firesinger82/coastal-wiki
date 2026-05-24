@@ -6,10 +6,10 @@
 |---|---|---|
 | `README.md` | self (governance) | 이 파일 |
 | `01-concept.md` | **verified** | 정의·인자 (기압·바람·tide-surge interaction·wave setup)·한국 적용 (Pugh 1987 Ch 6 + ADCIRC + KHOA) |
-| `02-theory.md` | (미생성) | shallow-water + wind-driven setup 방정식, inverse-barometer 정량 |
+| `02-theory.md` | **verified** | shallow-water + wind-driven setup 방정식, inverse-barometer 정량 |
 | `03-analysis-methods.md` | **verified** | tide-surge separation (Pugh §6:1) + interaction 진단 (§7:8) + Mann-Kendall trend (sst/03 canonical) + return period annual maxima (§8:3:2) + joint probability convolution (§8:3:3) |
 | `04-code-and-tools.md` | **verified** | ADCIRC NWS modes·OWI/GRIB·KHOA observation·SWAN coupling·운영 workflow |
-| `05-examples.md` | (미생성) | quarter-annular baseline + hurricane case + 한국 태풍 (Maemi 2003, Hinnamnor 2022) |
+| `05-examples.md` | **source-needed** | Maemi 2003 + Hinnamnor 2022 case cross-ref (본 위키 내부 verified · 외부 실측 surge 수치 KHOA Annual Report fetch 필요) — 2026-05-24 |
 | `06-model-application.md` | (미생성) | ADCIRC primary + Delft3D·SCHISM·SLOSH 비교 — `models/ADCIRC/` 작성 후 verified |
 
 ## 사용된 source_id
@@ -38,5 +38,5 @@
 2. ✅ `02-theory.md` verified (2026-05-23) — Pugh §6:3 IB + §6:4 wind stress + §7:8 tide-surge interaction
 3. ✅ `03-analysis-methods.md` verified (2026-05-24) — Pugh §6:1, §7:8, §8:3:2-3 + Mann-Kendall (sst/03 cross-ref)
 4. ✅ `04-code-and-tools.md` verified — ADCIRC NWS modes·OWI format·KHOA observation
-5. `05-examples.md` — 한국 태풍 case (Maemi 2003 / Bolaven 2012 / Hinnamnor 2022) — KHOA 백서 직접 인용
+5. ✅ `05-examples.md` source-needed (2026-05-24) — Maemi 2003 + Hinnamnor 2022 cross-ref. 위키 내부 자료 verified, 외부 실측 KHOA Annual Report·KMA/JMA Best Track fetch 후 verified 승격. Bolaven 2012 등은 별도 sub-노트 후보.
 6. ✅ `_staging adcirc-storm-surge*.md` 7개 → `models/ADCIRC/source-analysis/storm-surge/` promote 완료 (2026-05-23). 추후 `06-model-application.md` 에서 본 노트들 인용
