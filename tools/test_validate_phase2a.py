@@ -1095,6 +1095,67 @@ def fx_37_null_literal_normalised(td: Path) -> tuple[int, dict]:
 
 
 # ------------------------------------------------------------------
+# Codex review 8e70e38 3차 — 3 new fixtures (R3-1 source_id containment)
+# ------------------------------------------------------------------
+
+
+def _r3_baseline_verified_row(td: Path, source_id: str) -> dict[str, str]:
+    """공통: R3-1 fixture 용 verified row 빌더 (source_id 만 변경)."""
+    baseline_setup(td)
+    raw_sha = write_file(td / "textbook" / "raw" / "pugh.pdf", "fake")
+    src_sha = write_file(td / "_staging" / "from-modeling-wiki" / "knowledge" / "foo.md", "src")
+    write_dest(td, "concepts/x/foo.md", "verified")
+    return {
+        "source_path": "_staging/from-modeling-wiki/knowledge/foo.md",
+        "dest_path": "concepts/x/foo.md",
+        "sha256_before": src_sha,
+        "classification": "source-analysis",
+        "citation_status_target": "verified",
+        "source_id": source_id,
+        "raw_path": "textbook/raw/pugh.pdf",
+        "raw_sha256": raw_sha,
+        "claim_mapping_verified_by": "user-firesinger-20260524",
+    }
+
+
+def fx_38_source_id_traversal(td: Path) -> tuple[int, dict]:
+    """Fixture 38 (R3-1): source_id 가 prefix 후 .. traversal → exit 1."""
+    row = _r3_baseline_verified_row(td, "models/../research/foo")
+    # research/foo 디렉토리 만들어도 source_id 자체가 traversal 이라 reject
+    write_file(td / "research" / "foo" / "raw.md", "data")
+    (td / "models" / "DUMMY").mkdir(parents=True, exist_ok=True)
+    write_manifest(td, [row])
+    return EXIT_RULE_A, {}
+
+
+def fx_39_source_id_absolute(td: Path) -> tuple[int, dict]:
+    """Fixture 39 (R3-1): source_id 가 / 로 시작 absolute path → exit 1.
+
+    실제로 absolute path 는 INTERNAL_SOURCE_ID_PREFIXES 중 어느 것에도 매치 안 되므로
+    is_registered_source_id 가 false 반환 — 동일하게 reject."""
+    row = _r3_baseline_verified_row(td, "/abs/models/foo")
+    write_manifest(td, [row])
+    return EXIT_RULE_A, {}
+
+
+def fx_40_source_id_symlink_escape(td: Path) -> tuple[int, dict]:
+    """Fixture 40 (R3-1): source_id 가 repo 밖 symlink → resolve containment 위반 → exit 1."""
+    row = _r3_baseline_verified_row(td, "models/link-outside")
+    # td 밖 실제 디렉토리 생성
+    outside = td.parent / f"r3-outside-{td.name}"
+    outside.mkdir(parents=True, exist_ok=True)
+    (outside / "raw.md").write_text("escape target")
+    # td/models/link-outside → outside (repo escape)
+    (td / "models").mkdir(parents=True, exist_ok=True)
+    link = td / "models" / "link-outside"
+    if link.exists() or link.is_symlink():
+        link.unlink()
+    link.symlink_to(outside)
+    write_manifest(td, [row])
+    return EXIT_RULE_A, {}
+
+
+# ------------------------------------------------------------------
 # Runner
 # ------------------------------------------------------------------
 
@@ -1140,6 +1201,10 @@ FIXTURES: list[tuple[str, Callable[[Path], tuple[int, dict]]]] = [
     ("35 F2-2 internal-ref source_id path missing", fx_35_internal_ref_path_missing),
     ("36 F2-2 dropped prefix research/ rejected", fx_36_dropped_prefix_research),
     ("37 F2-3 manifest 'null' literal normalised to empty", fx_37_null_literal_normalised),
+    # codex review 8e70e38 3차 follow-up
+    ("38 R3-1 source_id traversal (models/../research/foo) rejected", fx_38_source_id_traversal),
+    ("39 R3-1 source_id absolute path (/abs/models/foo) rejected", fx_39_source_id_absolute),
+    ("40 R3-1 source_id symlink-escape (resolve outside root) rejected", fx_40_source_id_symlink_escape),
 ]
 
 

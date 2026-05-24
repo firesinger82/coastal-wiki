@@ -369,20 +369,28 @@ def is_registered_source_id(
     sources: dict[str, dict[str, str]],
     root: Path,
 ) -> bool:
-    """H1+F2-2: source_id 가 sources.yml 에 등록 OR internal-ref prefix 인지.
+    """H1+F2-2+R3-1: source_id 가 sources.yml 에 등록 OR internal-ref prefix 인지.
 
     internal: prefix 는 existence check 면제 (escape hatch). 다른 prefix
-    (models/, concepts/, …) 는 root/<sid> 가 실제 존재해야 함 (F2-2).
+    (models/, concepts/, …) 는 root/<sid> 가 실제 존재 + repo 안 (containment).
+
+    R3-1 (codex review 8e70e38 3차): existence check 만으론 `models/../research/foo`
+    traversal 이나 `models/link-outside` repo escape symlink 우회 가능. resolve()
+    후 root 안인지 강제.
     """
     if not sid:
         return False
     if sid in sources:
         return True
     for p in INTERNAL_SOURCE_ID_PREFIXES:
-        if sid.startswith(p):
-            if p in INTERNAL_PREFIX_EXEMPT_EXISTENCE:
-                return True
-            return (root / sid).exists()
+        if not sid.startswith(p):
+            continue
+        if p in INTERNAL_PREFIX_EXEMPT_EXISTENCE:
+            return True
+        # path-like prefix: traversal/abs/symlink-escape 모두 차단 후 existence
+        if not _is_repo_relative_path(sid, root):
+            return False
+        return (root / sid).exists()
     return False
 
 
