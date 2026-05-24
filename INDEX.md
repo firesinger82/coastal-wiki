@@ -18,7 +18,7 @@
 
 | 모델 | 상태 | 비고 |
 |---|---|---|
-| [EFDC](models/EFDC/) | **WIP** (source-analysis 18 노트) | 사용자 주력 — SedTran-Original/SEDZLJ + hydro core + boundary + wetdry 등 |
+| [EFDC](models/EFDC/) | **WIP** (source-analysis 18 + manual-notes 4) | 사용자 주력 — SedTran-Original/SEDZLJ + hydro core + boundary + wetdry. manual-notes: overview + user r850 + theory v12 + sediment 2003 |
 | [SWAN](models/SWAN/) | **STABLE** (README + action-balance + wink-pattern + source-analysis 21 노트 verified) | 천해 풍파 spectral · Holthuijsen 공동개발 · 모든 source-term · scheme · 추가 promote 다수 |
 | [ADCIRC](models/ADCIRC/) | **WIP** (source-analysis 41 노트, storm-surge + tide subdirs) | NWS modes + GAHM/AHM + tide + storm-surge 완전 분석 |
 | [XBeach](models/XBeach/) | **WIP** (source-analysis 16 노트) | morphology · avalanching · bed_friction · wave_boundary |

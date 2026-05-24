@@ -27,7 +27,7 @@
 | 경로 | 노트 수 | 상태 | 비고 |
 |---|---:|---|---|
 | `source-analysis/` | 18 verified | 안정 | SedTran-Original / SEDZLJ 양 분기 + hydro core + boundary + wetdry + MPI 등 |
-| `manual-notes/` | **0** | **미개시** | 6 PDFs 보유했으나 정리 노트 없음 — 사용자 주력 모델 갭 (M-C 최우선) |
+| `manual-notes/` | 4 verified | **신설 2026-05-24** | overview (6 manuals 인덱스) + user-manual-r850 (DSI 2021 운영) + theory-doc-v12 (DSI 2024 이론) + sediment-theory-2003 (Tetra Tech legacy) |
 | `web-refs/` | 0 | **미개시** | DSI 사이트·EFDC+ 릴리스 노트·논문 큐레이션 필요 (M-E) |
 | `raw/` | 726 .md + 6 pdf + 257 fortran (2.2 GB) | archive | EFDCPlus_Stable + EFDC-GVC 두 분기 |
 
@@ -40,9 +40,7 @@
 
 ## 작성 우선순위 (남은 작업)
 
-1. **M-C 최우선**: `manual-notes/` 6 PDF 챕터별 발췌 (사용자 주력 모델 진입 장벽 해소)
-   - `efdc-theory-ver12-overview.md` (Theory Document)
-   - `efdc-implementation-guide.md`
-   - `efdc-sediment-theory-2003.md` (EFDC Theory Tech Aspects of Sed Trans 2003)
-2. **M-E**: `web-refs/` — DSI 사이트·EFDC+ 릴리스·핵심 논문 (Hamrick 1992 등)
-3. 추가 source-analysis: ssedtox.f90 dispatch 상세, MPI decomposition 운영 매뉴얼
+1. ✅ **M-C 1차**: `manual-notes/` 4 노트 (overview + r850 + v12 + 2003) — DONE 2026-05-24
+2. **M-C 2차**: Theory v12 챕터별 deep notes (Ch 2 hydro·Ch 5 temperature·Ch 6 sediment) + r850 §1.3.1 Primary Run Control 51p input card family + SedTran↔SEDZLJ algorithm cross-walk
+3. **M-E**: `web-refs/` — DSI 사이트·EFDC+ 릴리스·핵심 논문 (Hamrick 1992 등)
+4. 추가 source-analysis: ssedtox.f90 dispatch 상세, MPI decomposition 운영 매뉴얼
