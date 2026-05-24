@@ -25,6 +25,15 @@
   HTML 의 모든 spec 변형을 cover 하지 않음. 일반 manifest 작성 실수 + plan v8 의
   명시 위반 형태 catch 가 1차 목표. 의심 시 사용자 + ultrareview multi-defense.
 
+  의도적 scope 제외 (codex review f497ad6 1차 명시):
+    - archive 트리의 symlink: expected/actual set 둘 다 .resolve() 로 follow target.
+      symlink 로 다른 파일 대체 시 catch 안 됨. 1회성 migration 후 archive 트리는
+      외부 수정 게이트 (사용자 명시 OK) 로 관리.
+    - manifest 의 literal "null" 값 normalisation: 빈 문자열로 변환 안 함.
+      manifest 작성 시 "null" 대신 빈 값 사용 (CSV convention).
+    - Unicode NFC/NFD 경로 정규화: macOS NFD vs Linux NFC 경계 케이스 미커버.
+      WSL2 ext4 단일 환경 가정.
+
 사용:
   python3 tools/validate-phase2a-manifest.py --manifest <csv>
       [--mode pre-archive|post-archive] [--root <dir>] [--archive-root <dir>]
@@ -113,6 +122,20 @@ VALID_CLASSIFICATIONS = {
 }
 
 VALID_TARGETS = {"verified", "source-needed", "n/a"}
+
+# H1 (codex review f497ad6 1차): source_id 가 sources.yml 미등록 일 때 허용되는
+# internal-reference prefix. 위키 내부 자료 (model raw, 도메인 노트, experience, 데이터,
+# 도구·연구 워크벤치) 를 가리키는 path-like source_id 만 통과.
+INTERNAL_SOURCE_ID_PREFIXES = (
+    "internal:",
+    "models/",
+    "concepts/",
+    "experience/",
+    "data/",
+    "tools/",
+    "research/",
+    "textbook/",
+)
 
 # ------------------------------------------------------------------
 # Regexes
@@ -319,6 +342,41 @@ def verify_codex_form(
     return EXIT_OK, ""
 
 
+def is_registered_source_id(
+    sid: str, sources: dict[str, dict[str, str]]
+) -> bool:
+    """H1: source_id 가 sources.yml 등록되었거나 internal-ref prefix 인지."""
+    if not sid:
+        return False
+    if sid in sources:
+        return True
+    return any(sid.startswith(p) for p in INTERNAL_SOURCE_ID_PREFIXES)
+
+
+def _is_repo_relative_path(file_rel: str, wiki_root: Path) -> bool:
+    """H3: file_rel 이 wiki_root 안 (no traversal) repo-relative 경로인지.
+
+    거부: 절대 경로, '..' 세그먼트 포함, resolve 결과가 wiki_root 밖.
+    """
+    if not file_rel:
+        return False
+    if file_rel.startswith("/") or file_rel.startswith("\\"):
+        return False
+    parts = file_rel.replace("\\", "/").split("/")
+    if any(seg == ".." for seg in parts):
+        return False
+    try:
+        abs_root = wiki_root.resolve()
+        abs_target = (wiki_root / file_rel).resolve()
+    except (OSError, RuntimeError):
+        return False
+    try:
+        abs_target.relative_to(abs_root)
+    except ValueError:
+        return False
+    return True
+
+
 def _matches_raw_path(yaml_value: str, manifest_raw_path: str) -> bool:
     """sources.yml 의 filename/raw_path 값과 manifest 의 raw_path 의 호환성 판정.
 
@@ -354,6 +412,13 @@ def verify_self_cited_line(
     file_rel = m.group("file")
     line_no = int(m.group("line"))
 
+    # H3 (codex review f497ad6 1차): repo-relative 강제 (no abs / no traversal)
+    if not _is_repo_relative_path(file_rel, wiki_root):
+        return (
+            EXIT_RULE_A,
+            f"self-cited-line 경로가 repo-relative 아님 (abs/'..'/escape): {file_rel}",
+        )
+
     file_path = wiki_root / file_rel
     if not file_path.is_file():
         return EXIT_RULE_A, f"self-cited-line 파일 부재: {file_rel}"
@@ -370,33 +435,27 @@ def verify_self_cited_line(
     cited = lines[line_no - 1]
 
     # 1. HTML comment marker (가장 명시적)
+    # 정책 출처: plan.md §688-§695. raw_path 필수 + 직접 equality.
     html_hits = list(HTML_CITE_MARKER_RE.finditer(cited))
     if html_hits:
         for mh in html_hits:
             sid = mh.group("sid")
             raw = mh.group("raw")
-            if raw:
-                if raw == manifest_raw_path or _matches_raw_path(raw, manifest_raw_path):
-                    return EXIT_OK, ""
+            # codex review f497ad6 1차: HTML marker 의 raw_path 필수 (spec)
+            if not raw:
                 return (
                     EXIT_MARKER_RESOLVE,
-                    f"HTML marker raw_path={raw} != manifest raw_path={manifest_raw_path} (O3)",
+                    f"HTML marker sid={sid} 에 raw_path 누락 — "
+                    f"plan §690 의 HTML form 은 source_id+raw_path 모두 명시 필수 (O3)",
                 )
-            # raw 없으면 source_id 로 sources.yml lookup
-            entry = sources.get(sid)
-            if not entry:
-                return (
-                    EXIT_MARKER_RESOLVE,
-                    f"HTML marker sid={sid} sources.yml 에 없음 (O3)",
-                )
-            yaml_path = entry.get("raw_path") or entry.get("filename")
-            if not _matches_raw_path(yaml_path or "", manifest_raw_path):
-                return (
-                    EXIT_MARKER_RESOLVE,
-                    f"HTML marker sid={sid} → {yaml_path} 가 manifest "
-                    f"raw_path={manifest_raw_path} 와 불일치 (O3)",
-                )
-            return EXIT_OK, ""
+            # codex review f497ad6 1차: HTML marker 는 직접 equality 만 (suffix/basename 금지)
+            if raw == manifest_raw_path:
+                return EXIT_OK, ""
+            return (
+                EXIT_MARKER_RESOLVE,
+                f"HTML marker raw_path={raw} != manifest raw_path={manifest_raw_path} "
+                f"(plan §693 의 HTML form 은 직접 equality; O3)",
+            )
 
     # 2. Inline citation: (source_id [§/p./,/space/)] ...)
     #    O3: sid 로 sources.yml lookup → manifest raw_path 와 일치 확인
@@ -469,9 +528,18 @@ def check_rule_a(
                 )
             )
 
-    # Condition 2: source_id non-empty
+    # Condition 2: source_id non-empty + sources.yml 등록 또는 internal-ref prefix
+    # H1 (codex review f497ad6 1차): non-empty 만으론 typo (`pugh-sealevel`) 통과
     if not row["source_id"]:
         fails.append((EXIT_RULE_A, "source_id empty"))
+    elif not is_registered_source_id(row["source_id"], ctx["sources"]):
+        fails.append(
+            (
+                EXIT_RULE_A,
+                f"source_id '{row['source_id']}' 가 textbook/sources.yml 미등록 + "
+                f"internal-ref prefix ({', '.join(INTERNAL_SOURCE_ID_PREFIXES)}) 아님",
+            )
+        )
 
     # Condition 3: raw_path non-empty
     if not row["raw_path"]:
@@ -495,16 +563,26 @@ def check_rule_a(
                 fails.append(
                     (EXIT_RULE_A, f"raw_path local 파일 부재: {raw_path_val}")
                 )
-            elif row["raw_sha256"]:
-                actual = sha256_of(local)
-                if actual != row["raw_sha256"]:
+            else:
+                # H2 (codex review f497ad6 1차): local raw_path 는 raw_sha256 필수
+                if not row["raw_sha256"]:
                     fails.append(
                         (
                             EXIT_RULE_A,
-                            f"raw_sha256 mismatch for {raw_path_val}: "
-                            f"actual {actual[:16]}… != manifest {row['raw_sha256'][:16]}…",
+                            f"local raw_path '{raw_path_val}' 인데 raw_sha256 empty "
+                            f"(verified row 의 raw artifact hash 미기재)",
                         )
                     )
+                else:
+                    actual = sha256_of(local)
+                    if actual != row["raw_sha256"]:
+                        fails.append(
+                            (
+                                EXIT_RULE_A,
+                                f"raw_sha256 mismatch for {raw_path_val}: "
+                                f"actual {actual[:16]}… != manifest {row['raw_sha256'][:16]}…",
+                            )
+                        )
 
     # source_path 의 sha256_before sanity check (pre-archive 한정)
     if (
@@ -732,8 +810,18 @@ def check_post_archive(
         )
 
     # Per-file sha256
+    # codex review f497ad6 1차: plan §780 "모든 50 rows" 강제 — empty sha256_before 도 fail
     for row in rows:
-        if not row["source_path"] or not row["sha256_before"]:
+        if not row["source_path"]:
+            continue
+        if not row["sha256_before"]:
+            sha_fails.append(
+                (
+                    EXIT_POST_SHA,
+                    f"row {row['source_path']}: post-archive mode 인데 "
+                    f"sha256_before empty (plan §780 의 'all 50 rows' 강제)",
+                )
+            )
             continue
         ap = archive_path_for(row["source_path"], abs_archive)
         if not ap.is_file():
@@ -760,7 +848,16 @@ def check_post_archive(
 def check_row_shape(row: dict[str, str], row_num: int) -> list[tuple[int, str]]:
     fails: list[tuple[int, str]] = []
     cls = row["classification"]
-    if cls and cls not in VALID_CLASSIFICATIONS:
+    # codex review f497ad6 1차: empty classification 도 fail (schema 강제)
+    if not cls and row.get("source_path"):
+        fails.append(
+            (
+                EXIT_RULE_A,
+                f"row {row_num}: classification empty (one of "
+                f"{sorted(VALID_CLASSIFICATIONS)} 필요)",
+            )
+        )
+    elif cls and cls not in VALID_CLASSIFICATIONS:
         fails.append(
             (
                 EXIT_RULE_A,

@@ -154,11 +154,23 @@ def write_codex_archive_named(
 
 
 def baseline_setup(td: Path) -> None:
-    """Common setup: allowlist + minimal sources.yml (empty list)."""
+    """Common setup: allowlist + sources.yml with default test source_ids.
+
+    f497ad6 1차 codex review 의 H1 fix 이후 source_id 는 sources.yml 등록 또는
+    internal-ref prefix 필요. 기본으로 `pugh-sea-level` 등록해 다른 fixture 의
+    cross-talk 방지. 특수 케이스 fixture 는 자체 write_sources_yaml 로 덮어쓰기.
+    """
     write_allowlist(td)
-    # empty sources.yml
-    (td / "textbook").mkdir(parents=True, exist_ok=True)
-    (td / "textbook" / "sources.yml").write_text("sources:\n", encoding="utf-8")
+    write_sources_yaml(
+        td,
+        [
+            {
+                "source_id": "pugh-sea-level",
+                "filename": "pugh.pdf",
+                "raw_path": "textbook/raw/pugh.pdf",
+            }
+        ],
+    )
 
 
 def run_validator(
@@ -756,7 +768,7 @@ def fx_23_self_cite_src_code_ref(td: Path) -> tuple[int, dict]:
         "sha256_before": src_sha,
         "classification": "source-analysis",
         "citation_status_target": "verified",
-        "source_id": "adcirc-source",
+        "source_id": "models/ADCIRC",   # H1: internal-ref prefix
         "raw_path": "models/ADCIRC/raw/source_code/wind.F",
         "raw_sha256": raw_sha,
         "claim_mapping_verified_by": "self-cited-line-concepts/x/sample.md:1",
@@ -806,6 +818,189 @@ def fx_25_inventory_diff(td: Path) -> tuple[int, dict]:
 
 
 # ------------------------------------------------------------------
+# Codex review f497ad6 1차 — 8 new fixtures (H1/H2/H3 + spec-deviation)
+# ------------------------------------------------------------------
+
+
+def fx_26_source_id_typo(td: Path) -> tuple[int, dict]:
+    """Fixture 26 (H1): source_id 가 sources.yml 미등록 + internal-ref 아님 → exit 1."""
+    baseline_setup(td)
+    raw_sha = write_file(td / "textbook" / "raw" / "pugh.pdf", "fake")
+    src_sha = write_file(td / "_staging" / "from-modeling-wiki" / "knowledge" / "foo.md", "src")
+    write_dest(td, "concepts/x/foo.md", "verified")
+    row = {
+        "source_path": "_staging/from-modeling-wiki/knowledge/foo.md",
+        "dest_path": "concepts/x/foo.md",
+        "sha256_before": src_sha,
+        "classification": "source-analysis",
+        "citation_status_target": "verified",
+        "source_id": "pugh-sealevel",   # typo: missing hyphen, not in sources.yml
+        "raw_path": "textbook/raw/pugh.pdf",
+        "raw_sha256": raw_sha,
+        "claim_mapping_verified_by": "user-firesinger-20260524",
+    }
+    write_manifest(td, [row])
+    return EXIT_RULE_A, {}
+
+
+def fx_27_source_id_internal_pass(td: Path) -> tuple[int, dict]:
+    """Fixture 27 (H1): source_id 가 internal-ref prefix (experience/) → pass."""
+    baseline_setup(td)
+    raw_sha = write_file(
+        td / "experience" / "khoa-tide" / "raw.md", "internal raw data"
+    )
+    src_sha = write_file(td / "_staging" / "from-modeling-wiki" / "knowledge" / "foo.md", "src")
+    write_dest(td, "concepts/x/foo.md", "verified")
+    row = {
+        "source_path": "_staging/from-modeling-wiki/knowledge/foo.md",
+        "dest_path": "concepts/x/foo.md",
+        "sha256_before": src_sha,
+        "classification": "source-analysis",
+        "citation_status_target": "verified",
+        "source_id": "experience/khoa-tide",   # internal-ref prefix
+        "raw_path": "experience/khoa-tide/raw.md",
+        "raw_sha256": raw_sha,
+        "claim_mapping_verified_by": "user-firesinger-20260524",
+    }
+    write_manifest(td, [row])
+    return EXIT_OK, {}
+
+
+def fx_28_local_raw_empty_sha(td: Path) -> tuple[int, dict]:
+    """Fixture 28 (H2): local raw_path 존재 + raw_sha256 empty → exit 1."""
+    baseline_setup(td)
+    write_file(td / "textbook" / "raw" / "pugh.pdf", "fake")
+    src_sha = write_file(td / "_staging" / "from-modeling-wiki" / "knowledge" / "foo.md", "src")
+    write_dest(td, "concepts/x/foo.md", "verified")
+    row = {
+        "source_path": "_staging/from-modeling-wiki/knowledge/foo.md",
+        "dest_path": "concepts/x/foo.md",
+        "sha256_before": src_sha,
+        "classification": "source-analysis",
+        "citation_status_target": "verified",
+        "source_id": "pugh-sea-level",
+        "raw_path": "textbook/raw/pugh.pdf",
+        "raw_sha256": "",   # H2 violation
+        "claim_mapping_verified_by": "user-firesinger-20260524",
+    }
+    write_manifest(td, [row])
+    return EXIT_RULE_A, {}
+
+
+def fx_29_self_cite_path_traversal(td: Path) -> tuple[int, dict]:
+    """Fixture 29 (H3): self-cited-line 의 path 가 .. 으로 wiki escape → exit 1."""
+    baseline_setup(td)
+    raw_sha = write_file(td / "textbook" / "raw" / "pugh.pdf", "fake")
+    src_sha = write_file(td / "_staging" / "from-modeling-wiki" / "knowledge" / "foo.md", "src")
+    write_dest(td, "concepts/x/foo.md", "verified")
+    row = {
+        "source_path": "_staging/from-modeling-wiki/knowledge/foo.md",
+        "dest_path": "concepts/x/foo.md",
+        "sha256_before": src_sha,
+        "classification": "source-analysis",
+        "citation_status_target": "verified",
+        "source_id": "pugh-sea-level",
+        "raw_path": "textbook/raw/pugh.pdf",
+        "raw_sha256": raw_sha,
+        # path traversal — 상위 디렉토리 escape
+        "claim_mapping_verified_by": "self-cited-line-../outside.md:1",
+    }
+    write_manifest(td, [row])
+    return EXIT_RULE_A, {}
+
+
+def fx_30_html_missing_raw_path(td: Path) -> tuple[int, dict]:
+    """Fixture 30: HTML cite marker 에 raw_path 누락 → exit 9 (plan §690 spec)."""
+    baseline_setup(td)
+    raw_sha = write_file(td / "textbook" / "raw" / "pugh.pdf", "fake")
+    src_sha = write_file(td / "_staging" / "from-modeling-wiki" / "knowledge" / "foo.md", "src")
+    write_dest(td, "concepts/x/foo.md", "verified")
+    sample = (
+        "line1\n"
+        "<!-- cite:source_id=pugh-sea-level -->\n"  # raw_path 없음
+        "line3\n"
+    )
+    write_file(td / "concepts" / "x" / "sample.md", sample)
+    row = {
+        "source_path": "_staging/from-modeling-wiki/knowledge/foo.md",
+        "dest_path": "concepts/x/foo.md",
+        "sha256_before": src_sha,
+        "classification": "source-analysis",
+        "citation_status_target": "verified",
+        "source_id": "pugh-sea-level",
+        "raw_path": "textbook/raw/pugh.pdf",
+        "raw_sha256": raw_sha,
+        "claim_mapping_verified_by": "self-cited-line-concepts/x/sample.md:2",
+    }
+    write_manifest(td, [row])
+    return EXIT_MARKER_RESOLVE, {}
+
+
+def fx_31_html_basename_only(td: Path) -> tuple[int, dict]:
+    """Fixture 31: HTML cite marker raw_path 가 basename 만 → 직접 equality 실패 → exit 9."""
+    baseline_setup(td)
+    raw_sha = write_file(td / "textbook" / "raw" / "pugh.pdf", "fake")
+    src_sha = write_file(td / "_staging" / "from-modeling-wiki" / "knowledge" / "foo.md", "src")
+    write_dest(td, "concepts/x/foo.md", "verified")
+    sample = (
+        "line1\n"
+        "<!-- cite:source_id=pugh-sea-level,raw_path=pugh.pdf -->\n"  # basename only
+        "line3\n"
+    )
+    write_file(td / "concepts" / "x" / "sample.md", sample)
+    row = {
+        "source_path": "_staging/from-modeling-wiki/knowledge/foo.md",
+        "dest_path": "concepts/x/foo.md",
+        "sha256_before": src_sha,
+        "classification": "source-analysis",
+        "citation_status_target": "verified",
+        "source_id": "pugh-sea-level",
+        "raw_path": "textbook/raw/pugh.pdf",   # 전체 경로
+        "raw_sha256": raw_sha,
+        "claim_mapping_verified_by": "self-cited-line-concepts/x/sample.md:2",
+    }
+    write_manifest(td, [row])
+    return EXIT_MARKER_RESOLVE, {}
+
+
+def fx_32_empty_classification(td: Path) -> tuple[int, dict]:
+    """Fixture 32: classification empty → exit 1 (schema)."""
+    baseline_setup(td)
+    src_sha = write_file(td / "_staging" / "from-modeling-wiki" / "knowledge" / "foo.md", "x")
+    write_dest(td, "concepts/x/foo.md", "source-needed")
+    row = {
+        "source_path": "_staging/from-modeling-wiki/knowledge/foo.md",
+        "dest_path": "concepts/x/foo.md",
+        "sha256_before": src_sha,
+        "classification": "",   # empty
+        "citation_status_target": "source-needed",
+    }
+    write_manifest(td, [row])
+    return EXIT_RULE_A, {}
+
+
+def fx_33_postarchive_empty_sha_before(td: Path) -> tuple[int, dict]:
+    """Fixture 33: post-archive 시 row 의 sha256_before empty → exit 6 (plan §780)."""
+    baseline_setup(td)
+    write_file(td / "_staging" / "from-modeling-wiki" / "knowledge" / "foo.md", "x")
+    write_dest(td, "experience/foo.md", "source-needed")
+    # archive 파일은 존재 (set equality 통과)
+    write_file(
+        td / "_archive" / "from-modeling-wiki-knowledge-phase2a-2026-05-23" / "foo.md",
+        "x",
+    )
+    row = {
+        "source_path": "_staging/from-modeling-wiki/knowledge/foo.md",
+        "dest_path": "experience/foo.md",
+        "sha256_before": "",   # plan §780 위반
+        "classification": "experience-only",
+        "citation_status_target": "source-needed",
+    }
+    write_manifest(td, [row])
+    return EXIT_POST_SHA, {"mode": "post-archive"}
+
+
+# ------------------------------------------------------------------
 # Runner
 # ------------------------------------------------------------------
 
@@ -837,6 +1032,15 @@ FIXTURES: list[tuple[str, Callable[[Path], tuple[int, dict]]]] = [
     ("23 self-cited-line + source-code ref (extra)", fx_23_self_cite_src_code_ref),
     ("24 user-firesinger-20260524 pass (extra)", fx_24_user_form_pass),
     ("25 inventory set equality diff (extra)", fx_25_inventory_diff),
+    # codex review f497ad6 1차 follow-up
+    ("26 H1 source_id typo not in sources.yml + not internal", fx_26_source_id_typo),
+    ("27 H1 source_id internal-ref prefix (experience/) pass", fx_27_source_id_internal_pass),
+    ("28 H2 local raw_path + raw_sha256 empty", fx_28_local_raw_empty_sha),
+    ("29 H3 self-cited-line path traversal (../) rejected", fx_29_self_cite_path_traversal),
+    ("30 HTML cite marker missing raw_path (spec §690)", fx_30_html_missing_raw_path),
+    ("31 HTML cite marker raw_path basename-only mismatch (spec §693)", fx_31_html_basename_only),
+    ("32 empty classification rejected (schema)", fx_32_empty_classification),
+    ("33 post-archive sha256_before empty (spec §780)", fx_33_postarchive_empty_sha_before),
 ]
 
 
