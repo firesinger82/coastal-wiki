@@ -223,11 +223,13 @@ ADCIRC 가 한국 storm-surge 의 primary unstructured 모델이라면, **EFDC+ 
 
 1. **KMA·JMA RSMC Best Track 직접 fetch** — Maemi 2003 + Hinnamnor 2022 의 트랙·시간별 중심기압·풍속·반경 → [02-theory.md §2.2 표](02-theory.md#22-한국-적용--태풍-ib-surge) 의 950 mb / 920 mb 검증
 2. **KHOA Annual Report 2003 + 2022 §3.x 직접 인용** — 관측 surge peak 수치 (마산 ~2.4 m, 포항·울산 ~1.5 m) verified 검증
-3. **KHOA OpenAPI 직접 fetch** — Hinnamnor 시기 (2022-09-06) 10분 시계열 residual 분석 → [[experience-khoa-tide-surge-coupling]] (C3) 직접 진행
+3. ~~**KHOA OpenAPI 직접 fetch**~~ — ❌ **불가 (verified 2026-05-24)**. [`04-code-and-tools.md §4.1 Archive 한계`](04-code-and-tools.md#41-실시간-조위-관측) 의 measurement — `surveyTideLevel` 의 retention 이 약 1년 (cut-off 2024-12-31 NODATA / 2025-01-01 OK). Hinnamnor 2022 + Maemi 2003 모두 archive 밖. → **2 (KHOA Annual Report PDF 직접)** 로 대체 필수.
 4. **Maemi hindcast 학술 논문 인용 보강** — Kang et al. 2009, Kim et al. 등 standard reference (web-refs 확보)
 5. **Hinnamnor 사후 분석 논문** — 2023-2024 출판 논문 (KMOU·KIOST·국립해양조사원)
 
-→ 우선 진행 권장: **3 (KHOA fetch)** — [[reference-next-session-candidates]] C3 [[experience-khoa-tide-surge-coupling]] 와 직접 연결.
+→ **우선 진행 권장 재조정 (2026-05-24)**: **2 (KHOA Annual Report PDF download)** — 3번이 archive 한계로 불가하므로 official report 가 유일한 verified 경로. 1 (Best Track) 은 KMA·JMA 공식 archive 가 영구 보존이므로 동시 진행 가능.
+
+> **note**: [[experience-khoa-tide-surge-coupling]] ([[reference-next-session-candidates]] C3) 는 **archive 한계로 1년 이내 storm event 만 verified 가능**. Hinnamnor 2022 verification 은 KHOA Annual Report PDF 인용 경로로 변경 필요.
 
 ---
 

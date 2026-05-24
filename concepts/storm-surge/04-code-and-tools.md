@@ -119,13 +119,13 @@ import os, requests
 from urllib.parse import unquote
 key = unquote(os.environ['KHOA_API_KEY'])
 
-# 인천 (DT_0001), Hinnamnor 2022-09-06 직접 영향 시점
+# 인천 (DT_0001), 최근 1년 안 surge 분석 시점 (예: 2025-09-01)
 url = "https://apis.data.go.kr/1192136/surveyTideLevel/GetSurveyTideLevelApiService"
 params = {
     "serviceKey": key,
     "type": "json",
     "obsCode": "DT_0001",
-    "reqDate": "20220906",
+    "reqDate": "20250901",
     "min": 10,  # 10분 단위
     "numOfRows": 144,  # 24시간 × 6 = 144
 }
@@ -133,7 +133,24 @@ r = requests.get(url, params=params, timeout=20)
 data = r.json()
 # data['body']['items']['item'] 의 tdlvHgt (실측) vs bscTdlvHgt (예측)
 # surge = tdlvHgt - bscTdlvHgt
+# 주의: 일부 record 에 tdlvHgt or bscTdlvHgt 가 None — 안전한 None 체크 필요
 ```
+
+#### **Archive 한계 (verified 측정 2026-05-24)** ⚠️
+
+KHOA OpenAPI `surveyTideLevel` 의 retention 은 **약 1년 rolling**:
+
+| 측정 시각 (KST) | reqDate=20241231 | reqDate=20250101 |
+|---|---|---|
+| 2026-05-24 | `NODATA_ERROR` | `NORMAL_SERVICE` |
+
+→ **과거 storm event (Hinnamnor 2022-09, Maemi 2003-09, Bolaven 2012-08 등) 의 OpenAPI 직접 fetch 불가**. 1년 이전 storm-surge case 분석은 KHOA **Annual Report PDF** 또는 KMA·KIOST 별도 archive 인용 필요.
+
+verified procedure (2026-05-24 firesinger@coastal-wiki 측정):
+- 인천 (DT_0001) reqDate=20240810 / 20240101 / 20221231 / 20220906 / 20220101 모두 `NODATA_ERROR`
+- 인천 reqDate=20250101 / 20250901 / 20260101 모두 `NORMAL_SERVICE`
+- 포항 (DT_0091, lat 36.05 lon 129.38) 응답 정상 동작 (어제 fetch verified)
+- 정확한 cut-off boundary: 2024-12-31 (NODATA) / 2025-01-01 (OK) — 측정 시점 기준 1년 retention 일관
 
 ### 4.2 한국 정점 surge 분리 (residual)
 
@@ -147,13 +164,19 @@ KHOA OpenAPI 가 둘 다 제공 (`tdlvHgt` 실측, `bscTdlvHgt` 예측). 차이�
 
 [`concepts/sst/04-code-and-tools.md`](../sst/04-code-and-tools.md) §2.5 의 표 동일 — KHOA SST 와 같은 정점들의 tide gauge.
 
-| code | 정점 | 해역 |
-|---|---|---|
-| DT_0001 | 인천 | 서해 |
-| DT_0005 | 부산 | 남해 |
-| DT_0004 | 제주 | 남해 |
-| DT_0010 | 서귀포 | 남해 |
-| ... 외 9개 ... | | |
+| code | 정점 | 해역 | 좌표 (lat, lon) |
+|---|---|---|---|
+| DT_0001 | 인천 | 서해 | 37.452, 126.592 (verified API 응답) |
+| DT_0005 | 부산 | 남해 | — |
+| DT_0006 | 묵호 | 동해 | — |
+| DT_0007 | 목포 | 서해 | — |
+| DT_0014 | 통영 | 남해 | — |
+| DT_0018 | 군산 | 서해 | — |
+| DT_0020 | 울산 | 남해 동부 | — |
+| DT_0091 | 포항 | 동해 | 36.052, 129.376 (verified API 응답) |
+| ... 외 다수 ... | | | |
+
+→ 정점 코드 전체 표는 [`experience/khoa-multi-station-tide-validation-2026.md`](../../experience/khoa-multi-station-tide-validation-2026.md) §1 참조 (15정점, 본 위키 verified).
 
 ## 5. NWP (Numerical Weather Prediction) forcing 데이터
 
