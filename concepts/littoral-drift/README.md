@@ -8,7 +8,7 @@
 |---|---|---|
 | `README.md` | self (governance) | 이 파일 |
 | `01-concept.md` | **verified** | 정의·driver (radiation stress·longshore current)·empirical formula (CERC/Komar)·budget·한국 적용 |
-| `02-theory.md` | (미생성) | radiation stress 유도, longshore current Battjes/Bowen 식, breaker line dynamics |
+| `02-theory.md` | **verified** | radiation stress 유도 (Holthuijsen §7.4.2 eq 7.4.1-9) + set-down/set-up (§7.4.3 eq 7.4.22-27) + longshore current 유도 (Bowen 1969 + Battjes 1974 quadratic friction 확장) |
 | `03-analysis-methods.md` | (미생성) | sediment budget (control volume), tracer 실험, beach profile survey |
 | `04-code-and-tools.md` | (미생성) | XBeach + Delft3D-SED + UNIBEST-LT (1D longshore) + GENESIS |
 | `05-examples.md` | (미생성) | 한국 안목항·울산항·태안 longshore drift 사례 |
@@ -49,7 +49,7 @@
 
 다음 단계 후보:
 1. ✅ `01-concept.md` verified (2026-05-23)
-2. `02-theory.md` — radiation stress 유도 (Longuet-Higgins-Stewart 1964) + longshore current Battjes 1974, Bowen 1969
+2. ✅ `02-theory.md` verified (2026-05-24) — Holthuijsen §7.4.2-3 직접 인용 + Bowen 1969 / Battjes 1974 외부 paper reference
 3. `04-code-and-tools.md` — XBeach surf zone module + GENESIS shoreline change
 4. `05-examples.md` — 한국 안목항·울산항·태안 longshore drift survey 사례
 5. CERC SPM 1984 source_id 등록 + Komar-Inman 1970 paper citation 추가
