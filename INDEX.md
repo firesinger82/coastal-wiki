@@ -22,8 +22,8 @@
 | [SWAN](models/SWAN/) | **STABLE** (README + action-balance + wink-pattern + source-analysis 21 노트 verified) | 천해 풍파 spectral · Holthuijsen 공동개발 · 모든 source-term · scheme · 추가 promote 다수 |
 | [ADCIRC](models/ADCIRC/) | **WIP** (source-analysis 41 + local-workflow 11 + manual-notes 21 verified + web-refs 1) | NWS modes + GAHM/AHM + tide + storm-surge. manual-notes 21 verified (M-B audit), local-workflow 11 → source-analysis/local-workflow/ 이관 (2026-05-24) |
 | [XBeach](models/XBeach/) | **WIP** (source-analysis 16 + manual-notes 3 verified + web-refs 1) | morphology · avalanching · bed_friction · wave_boundary. manual-notes 3 verified 2026-05-24 (xbeach.readthedocs.io examples audit) |
-| [Delft3D](models/Delft3D/) | **WIP** (source-analysis 12 + web-refs 1) | sediment + dredge·dump + flow-wave coupling + turbulence + 신설 engines_overview·flow2d3d_dispatcher (M-D 1차) |
-| [ROMS](models/ROMS/) | **WIP** (source-analysis 13 + web-refs 1) | 4dvar + advection + baroclinic + atmospheric forcing + sediment + 신설 main_driver_dispatch·nonlinear_physics_modules (M-D 1차) |
+| [Delft3D](models/Delft3D/) | **WIP** (source-analysis 12 + manual-notes 2 + web-refs 1) | sediment·dredge·flow-wave·turbulence + engines_overview·flow2d3d_dispatcher (M-D 1차) + manuals-overview·flow-user-manual v4.07.01 (M-C 2차) |
+| [ROMS](models/ROMS/) | **WIP** (source-analysis 13 + manual-notes 2 + web-refs 1) | 4dvar·advection·baroclinic·sediment + main_driver_dispatch·nonlinear_physics_modules (M-D 1차) + wiki-overview 326 pages·wiki-getting-started (M-C 2차) |
 
 ## textbook/ (교과서 통합)
 

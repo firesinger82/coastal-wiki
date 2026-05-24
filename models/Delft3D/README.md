@@ -29,7 +29,7 @@
 | 경로 | 노트 수 | 상태 | 비고 |
 |---|---:|---|---|
 | `source-analysis/` | 12 verified | **sparse (M-D 1차 진행)** | 기존 10 + 신설 2 (engines_overview·flow2d3d_dispatcher). 4795 Fortran 대비 여전히 sparse — M-D 2차 후속 (dflowfm·dimr·flow2d3d_kernel walkthrough) |
-| `manual-notes/` | **0** | **미개시** | 53 PDFs 보유했으나 정리 노트 없음 (M-C 보강 후보) |
+| `manual-notes/` | 2 verified | **신설 2026-05-24 (M-C 2차)** | overview (53 PDFs 인덱스) + flow-user-manual (FLOW v4.07.01 TOC + MDF 12 input family). WAVE·WAQ 후속 |
 | `web-refs/` | 1 verified | **신설 2026-05-24** | delft3d-official-resources.md — Deltares OSS·GitHub Deltares/delft3d·Delft-FIAT·hydromt_delft3dfm·핵심 논문 (Lesser 2004·Stelling-Duinmeijer 2003·Kernkamp 2011·van der Wegen 2008) |
 | `raw/` | 56 .md + 53 pdf + 4795 fortran (1.5 GB) | archive | Delft3D + Delft-FIAT + hydromt_delft3dfm |
 
