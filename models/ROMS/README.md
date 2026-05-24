@@ -26,8 +26,8 @@
 
 | 경로 | 노트 수 | 상태 | 비고 |
 |---|---:|---|---|
-| `source-analysis/` | 13 verified | **sparse (M-D 1차 진행)** | 기존 11 + 신설 2 (main_driver_dispatch·nonlinear_physics_modules). 1373 Fortran 대비 여전히 sparse — M-D 2차 후속 (main3d_loop·CPP options·bulk_flux COARE·BBL wave-current) |
-| `manual-notes/` | 2 verified | **신설 2026-05-24 (M-C 2차)** | wiki-overview (326 pages 인덱스·토픽 클러스터) + wiki-getting-started (Getting_Started.md 본문 + 디렉토리 구조). cppdefs·vertical-mixing 후속 |
+| `source-analysis/` | 14 verified | **M-D 1차+2차 진행** | 기존 11 + M-D 1차 2 (main_driver_dispatch·nonlinear_physics_modules) + M-D 2차 1 (bulk_flux_coare 1623 lines Fairall 1996/2003·Edson 2013). 1373 Fortran 대비 여전히 sparse — main3d_loop·KPP walkthrough 후속 |
+| `manual-notes/` | 3 verified | **M-C 2차 진행** | wiki-overview (326 pages 인덱스) + wiki-getting-started (디렉토리 구조) + wiki-cppdefs-options (32 CPP category 운영 결정 매트릭스). vertical-mixing·tidal-forcing 후속 |
 | `web-refs/` | 1 verified | **신설 2026-05-24** | roms-official-resources.md — myroms.org·forum·GitHub myroms/roms·myroms/roms-jedi·핵심 논문 (Shchepetkin-McWilliams 2005·Haidvogel 2008·Warner 2008 CSTMS·Large 1994 KPP) |
 | `raw/` | 1221 .md + 10 pdf + 1373 fortran (583 MB) | archive | roms 본체 + 6 variants + WRF coupling |
 
