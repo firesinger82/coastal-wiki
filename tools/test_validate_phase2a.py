@@ -1001,6 +1001,100 @@ def fx_33_postarchive_empty_sha_before(td: Path) -> tuple[int, dict]:
 
 
 # ------------------------------------------------------------------
+# Codex review dbc8946 2차 — 4 new fixtures (F2-1/F2-2/F2-3)
+# ------------------------------------------------------------------
+
+
+def fx_34_postarchive_source_outside_staging(td: Path) -> tuple[int, dict]:
+    """Fixture 34 (F2-1): post-archive 시 source_path 가 staging prefix 밖 → exit 5."""
+    baseline_setup(td)
+    # 잘못된 source_path (staging prefix 없음)
+    write_file(td / "elsewhere" / "foo.md", "x")
+    write_dest(td, "experience/foo.md", "source-needed")
+    src_sha = sha256_bytes(b"x")
+    # archive 디렉토리 자체는 존재
+    (td / "_archive" / "from-modeling-wiki-knowledge-phase2a-2026-05-23").mkdir(
+        parents=True, exist_ok=True
+    )
+    row = {
+        "source_path": "elsewhere/foo.md",   # F2-1 violation: not in staging
+        "dest_path": "experience/foo.md",
+        "sha256_before": src_sha,
+        "classification": "experience-only",
+        "citation_status_target": "source-needed",
+    }
+    write_manifest(td, [row])
+    return EXIT_POST_SET, {"mode": "post-archive"}
+
+
+def fx_35_internal_ref_path_missing(td: Path) -> tuple[int, dict]:
+    """Fixture 35 (F2-2): internal-ref source_id 인데 root/<sid> 미존재 → exit 1."""
+    baseline_setup(td)
+    raw_sha = write_file(td / "textbook" / "raw" / "pugh.pdf", "fake")
+    src_sha = write_file(td / "_staging" / "from-modeling-wiki" / "knowledge" / "foo.md", "src")
+    write_dest(td, "concepts/x/foo.md", "verified")
+    # models/NOTEXIST 디렉토리 의도적으로 생성 안 함
+    row = {
+        "source_path": "_staging/from-modeling-wiki/knowledge/foo.md",
+        "dest_path": "concepts/x/foo.md",
+        "sha256_before": src_sha,
+        "classification": "source-analysis",
+        "citation_status_target": "verified",
+        "source_id": "models/NOTEXIST",   # F2-2 violation
+        "raw_path": "textbook/raw/pugh.pdf",
+        "raw_sha256": raw_sha,
+        "claim_mapping_verified_by": "user-firesinger-20260524",
+    }
+    write_manifest(td, [row])
+    return EXIT_RULE_A, {}
+
+
+def fx_36_dropped_prefix_research(td: Path) -> tuple[int, dict]:
+    """Fixture 36 (F2-2): research/ prefix 가 INTERNAL_SOURCE_ID_PREFIXES 에서 제거되었으므로
+    `research/foo` source_id 는 sources.yml 등록 없으면 reject → exit 1."""
+    baseline_setup(td)
+    raw_sha = write_file(td / "textbook" / "raw" / "pugh.pdf", "fake")
+    src_sha = write_file(td / "_staging" / "from-modeling-wiki" / "knowledge" / "foo.md", "src")
+    write_dest(td, "concepts/x/foo.md", "verified")
+    # research/foo 디렉토리 만들어도 prefix 자체가 dropped 라서 reject 되어야 함
+    write_file(td / "research" / "foo" / "raw.md", "data")
+    row = {
+        "source_path": "_staging/from-modeling-wiki/knowledge/foo.md",
+        "dest_path": "concepts/x/foo.md",
+        "sha256_before": src_sha,
+        "classification": "source-analysis",
+        "citation_status_target": "verified",
+        "source_id": "research/foo",   # F2-2: dropped prefix
+        "raw_path": "textbook/raw/pugh.pdf",
+        "raw_sha256": raw_sha,
+        "claim_mapping_verified_by": "user-firesinger-20260524",
+    }
+    write_manifest(td, [row])
+    return EXIT_RULE_A, {}
+
+
+def fx_37_null_literal_normalised(td: Path) -> tuple[int, dict]:
+    """Fixture 37 (F2-3): manifest 의 literal 'null' 값이 empty 로 정규화 → empty source_id → exit 1."""
+    baseline_setup(td)
+    raw_sha = write_file(td / "textbook" / "raw" / "pugh.pdf", "fake")
+    src_sha = write_file(td / "_staging" / "from-modeling-wiki" / "knowledge" / "foo.md", "src")
+    write_dest(td, "concepts/x/foo.md", "verified")
+    row = {
+        "source_path": "_staging/from-modeling-wiki/knowledge/foo.md",
+        "dest_path": "concepts/x/foo.md",
+        "sha256_before": src_sha,
+        "classification": "source-analysis",
+        "citation_status_target": "verified",
+        "source_id": "null",   # F2-3: literal 'null' → empty 로 정규화 → condition 2 fail
+        "raw_path": "textbook/raw/pugh.pdf",
+        "raw_sha256": raw_sha,
+        "claim_mapping_verified_by": "user-firesinger-20260524",
+    }
+    write_manifest(td, [row])
+    return EXIT_RULE_A, {}
+
+
+# ------------------------------------------------------------------
 # Runner
 # ------------------------------------------------------------------
 
@@ -1041,6 +1135,11 @@ FIXTURES: list[tuple[str, Callable[[Path], tuple[int, dict]]]] = [
     ("31 HTML cite marker raw_path basename-only mismatch (spec §693)", fx_31_html_basename_only),
     ("32 empty classification rejected (schema)", fx_32_empty_classification),
     ("33 post-archive sha256_before empty (spec §780)", fx_33_postarchive_empty_sha_before),
+    # codex review dbc8946 2차 follow-up
+    ("34 F2-1 post-archive source_path outside staging prefix", fx_34_postarchive_source_outside_staging),
+    ("35 F2-2 internal-ref source_id path missing", fx_35_internal_ref_path_missing),
+    ("36 F2-2 dropped prefix research/ rejected", fx_36_dropped_prefix_research),
+    ("37 F2-3 manifest 'null' literal normalised to empty", fx_37_null_literal_normalised),
 ]
 
 

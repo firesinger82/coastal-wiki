@@ -25,14 +25,16 @@
   HTML 의 모든 spec 변형을 cover 하지 않음. 일반 manifest 작성 실수 + plan v8 의
   명시 위반 형태 catch 가 1차 목표. 의심 시 사용자 + ultrareview multi-defense.
 
-  의도적 scope 제외 (codex review f497ad6 1차 명시):
+  의도적 scope 제외 (codex review f497ad6 1차 + dbc8946 2차 명시):
     - archive 트리의 symlink: expected/actual set 둘 다 .resolve() 로 follow target.
       symlink 로 다른 파일 대체 시 catch 안 됨. 1회성 migration 후 archive 트리는
       외부 수정 게이트 (사용자 명시 OK) 로 관리.
-    - manifest 의 literal "null" 값 normalisation: 빈 문자열로 변환 안 함.
-      manifest 작성 시 "null" 대신 빈 값 사용 (CSV convention).
     - Unicode NFC/NFD 경로 정규화: macOS NFD vs Linux NFC 경계 케이스 미커버.
-      WSL2 ext4 단일 환경 가정.
+      WSL2 ext4 단일 환경 가정. manifest 작성자가 NFC 만 사용 의무.
+    - HTML cite marker 의 raw_path 매칭은 byte-exact 직접 equality (plan §693).
+      canonical forward slash, no leading `./`, no Windows separators. 위
+      형식 위반 시 reject (false-positive 처럼 보이지만 spec 강제).
+    (F2-3 의 "null" literal 은 load_manifest 에서 empty 로 정규화하므로 scope 안)
 
 사용:
   python3 tools/validate-phase2a-manifest.py --manifest <csv>
@@ -123,9 +125,14 @@ VALID_CLASSIFICATIONS = {
 
 VALID_TARGETS = {"verified", "source-needed", "n/a"}
 
-# H1 (codex review f497ad6 1차): source_id 가 sources.yml 미등록 일 때 허용되는
-# internal-reference prefix. 위키 내부 자료 (model raw, 도메인 노트, experience, 데이터,
-# 도구·연구 워크벤치) 를 가리키는 path-like source_id 만 통과.
+# H1 (codex review f497ad6 1차) + F2-2 (codex review dbc8946 2차):
+# sources.yml 미등록 source_id 의 허용 prefix.
+# - `internal:` = explicit escape hatch (existence check 면제)
+# - 나머지 prefix = wiki layer 의 path-like source_id, 실제 `root/<sid>` 존재 강제
+#
+# 의도적 제외:
+#   `research/` — workbench 영역. promote 후만 canonical, source_id 로 직접 인용 금지
+#   `textbook/` — 모든 textbook 인용은 sources.yml 의 source_id 기반 (canonical)
 INTERNAL_SOURCE_ID_PREFIXES = (
     "internal:",
     "models/",
@@ -133,9 +140,8 @@ INTERNAL_SOURCE_ID_PREFIXES = (
     "experience/",
     "data/",
     "tools/",
-    "research/",
-    "textbook/",
 )
+INTERNAL_PREFIX_EXEMPT_EXISTENCE = ("internal:",)
 
 # ------------------------------------------------------------------
 # Regexes
@@ -236,6 +242,20 @@ def load_reviewer_allowlist(path: Path) -> set[str]:
     return names
 
 
+_NULL_LITERALS = {"null", "none"}
+
+
+def _normalise_cell(val: str | None) -> str:
+    """F2-3 (codex review dbc8946 2차): literal 'null'/'none' (case-insensitive)
+    을 empty 로 정규화. CSV 작성 시 빈 값을 'null' 로 잘못 쓴 경우의 우회 차단."""
+    if val is None:
+        return ""
+    s = val.strip()
+    if s.lower() in _NULL_LITERALS:
+        return ""
+    return s
+
+
 def load_manifest(path: Path) -> list[dict[str, str]]:
     with path.open("r", encoding="utf-8", newline="") as f:
         reader = csv.DictReader(f)
@@ -248,8 +268,10 @@ def load_manifest(path: Path) -> list[dict[str, str]]:
             )
         rows: list[dict[str, str]] = []
         for row in reader:
-            # Normalise: strip + treat missing as empty string
-            normalised = {col: (row.get(col) or "").strip() for col in EXPECTED_COLUMNS}
+            # Normalise: strip + treat missing as empty + null/none literal → empty
+            normalised = {
+                col: _normalise_cell(row.get(col)) for col in EXPECTED_COLUMNS
+            }
             rows.append(normalised)
         return rows
 
@@ -343,14 +365,25 @@ def verify_codex_form(
 
 
 def is_registered_source_id(
-    sid: str, sources: dict[str, dict[str, str]]
+    sid: str,
+    sources: dict[str, dict[str, str]],
+    root: Path,
 ) -> bool:
-    """H1: source_id 가 sources.yml 등록되었거나 internal-ref prefix 인지."""
+    """H1+F2-2: source_id 가 sources.yml 에 등록 OR internal-ref prefix 인지.
+
+    internal: prefix 는 existence check 면제 (escape hatch). 다른 prefix
+    (models/, concepts/, …) 는 root/<sid> 가 실제 존재해야 함 (F2-2).
+    """
     if not sid:
         return False
     if sid in sources:
         return True
-    return any(sid.startswith(p) for p in INTERNAL_SOURCE_ID_PREFIXES)
+    for p in INTERNAL_SOURCE_ID_PREFIXES:
+        if sid.startswith(p):
+            if p in INTERNAL_PREFIX_EXEMPT_EXISTENCE:
+                return True
+            return (root / sid).exists()
+    return False
 
 
 def _is_repo_relative_path(file_rel: str, wiki_root: Path) -> bool:
@@ -532,12 +565,15 @@ def check_rule_a(
     # H1 (codex review f497ad6 1차): non-empty 만으론 typo (`pugh-sealevel`) 통과
     if not row["source_id"]:
         fails.append((EXIT_RULE_A, "source_id empty"))
-    elif not is_registered_source_id(row["source_id"], ctx["sources"]):
+    elif not is_registered_source_id(
+        row["source_id"], ctx["sources"], ctx["root"]
+    ):
         fails.append(
             (
                 EXIT_RULE_A,
                 f"source_id '{row['source_id']}' 가 textbook/sources.yml 미등록 + "
-                f"internal-ref prefix ({', '.join(INTERNAL_SOURCE_ID_PREFIXES)}) 아님",
+                f"허용된 internal-ref prefix ({', '.join(INTERNAL_SOURCE_ID_PREFIXES)}) "
+                f"가 아니거나 path-like prefix 일 때 root/<sid> 미존재",
             )
         )
 
@@ -750,14 +786,16 @@ def check_inventory(
 STAGING_PREFIX = "_staging/from-modeling-wiki/knowledge"
 
 
-def archive_path_for(source_path: str, archive_root: Path) -> Path:
-    """source_path 가 _staging/from-modeling-wiki/knowledge/... 면 그 아래 relative 를
-    archive_root 와 결합. 그 외 source_path 는 그대로 archive_root / basename."""
+def archive_path_for(source_path: str, archive_root: Path) -> Path | None:
+    """source_path 가 _staging/from-modeling-wiki/knowledge/... 안이면 archive_root
+    아래로 매핑. 그 외에는 None — F2-1 (codex review dbc8946 2차): plan §757
+    의 `relative_to(...)` 는 staging prefix 밖이면 ValueError 발생, 즉 spec 은
+    non-staging source_path 를 reject.
+    """
     if source_path.startswith(STAGING_PREFIX + "/"):
         rel = source_path[len(STAGING_PREFIX) + 1 :]
         return archive_root / rel
-    # fallback: 마지막 path component 만
-    return archive_root / Path(source_path).name
+    return None
 
 
 def check_post_archive(
@@ -781,6 +819,16 @@ def check_post_archive(
         if not row["source_path"]:
             continue
         ap = archive_path_for(row["source_path"], abs_archive)
+        if ap is None:
+            # F2-1: staging prefix 밖 source_path 는 spec 위반
+            set_fails.append(
+                (
+                    EXIT_POST_SET,
+                    f"source_path '{row['source_path']}' 가 staging prefix "
+                    f"({STAGING_PREFIX}) 밖 — plan §757 의 relative_to 위반",
+                )
+            )
+            continue
         expected.add(ap.resolve())
 
     actual: set[Path] = {p.resolve() for p in abs_archive.rglob("*") if p.is_file()}
@@ -824,8 +872,8 @@ def check_post_archive(
             )
             continue
         ap = archive_path_for(row["source_path"], abs_archive)
-        if not ap.is_file():
-            continue  # already in missing
+        if ap is None or not ap.is_file():
+            continue  # already in missing/set_fails
         actual_sha = sha256_of(ap)
         if actual_sha != row["sha256_before"]:
             sha_fails.append(
