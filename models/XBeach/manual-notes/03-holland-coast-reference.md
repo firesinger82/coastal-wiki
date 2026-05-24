@@ -1,11 +1,11 @@
 ---
-citation_status: source-needed
+citation_status: verified
 origin: _archive/from-modeling-wiki-knowledge-phase2a-2026-05-23/methods/xbeach-sources/03-holland-coast-reference.md
 promoted_date: 2026-05-24
 promote_phase: 2a
 classification: manual-notes-catalog
 source_id: models/XBeach
-notes: P2 catalog (audit deferred to per-note verification)
+notes: "P2 catalog audit 2026-05-24 — xbeach.readthedocs.io 공식 docs URL audit confirmed via WebFetch (examples.html: DELILAH 2D directional spreading + Holland Coast 1976 storm morfac=1 모두 local note 인용과 일치). Mixed local /mnt/e/ + 외부 공식 URL — primary citation = readthedocs"
 ---
 # XBeach Holland Coast Reference Note
 

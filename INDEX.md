@@ -20,8 +20,8 @@
 |---|---|---|
 | [EFDC](models/EFDC/) | **WIP** (source-analysis 18 + manual-notes 4) | 사용자 주력 — SedTran-Original/SEDZLJ + hydro core + boundary + wetdry. manual-notes: overview + user r850 + theory v12 + sediment 2003 |
 | [SWAN](models/SWAN/) | **STABLE** (README + action-balance + wink-pattern + source-analysis 21 노트 verified) | 천해 풍파 spectral · Holthuijsen 공동개발 · 모든 source-term · scheme · 추가 promote 다수 |
-| [ADCIRC](models/ADCIRC/) | **WIP** (source-analysis 41 + manual-notes 21 verified + 11 local-workflow) | NWS modes + GAHM/AHM + tide + storm-surge. manual-notes M-B audit (2026-05-24): 21 외부 docs catalog verified, 11 local user-workflow 재분류 |
-| [XBeach](models/XBeach/) | **WIP** (source-analysis 16 노트) | morphology · avalanching · bed_friction · wave_boundary |
+| [ADCIRC](models/ADCIRC/) | **WIP** (source-analysis 41 + local-workflow 11 + manual-notes 21 verified + web-refs 1) | NWS modes + GAHM/AHM + tide + storm-surge. manual-notes 21 verified (M-B audit), local-workflow 11 → source-analysis/local-workflow/ 이관 (2026-05-24) |
+| [XBeach](models/XBeach/) | **WIP** (source-analysis 16 + manual-notes 3 verified + web-refs 1) | morphology · avalanching · bed_friction · wave_boundary. manual-notes 3 verified 2026-05-24 (xbeach.readthedocs.io examples audit) |
 | [Delft3D](models/Delft3D/) | **WIP** (source-analysis 12 + web-refs 1) | sediment + dredge·dump + flow-wave coupling + turbulence + 신설 engines_overview·flow2d3d_dispatcher (M-D 1차) |
 | [ROMS](models/ROMS/) | **WIP** (source-analysis 13 + web-refs 1) | 4dvar + advection + baroclinic + atmospheric forcing + sediment + 신설 main_driver_dispatch·nonlinear_physics_modules (M-D 1차) |
 
@@ -47,6 +47,8 @@
 | [KHOA 15정점 1년 조위 UTide 검증](experience/khoa-multi-station-tide-validation-2026.md) | 3조건 통과 (15정점 독립 / KHOA 공식값 ±0.1% / fetch+analyze 스크립트 재현 가능) | **verified** |
 | [KHOA 14년 기후 추세 — 한국 연안 SLR 2007-2025](experience/khoa-annual-climate-trend.md) | 3조건 통과 (13정점 19년 / KHOA Annual Report 직접 데이터 / 선형회귀 재현 가능) | **verified** |
 | [KHOA 9년 SST 가온 추세 — 한국 연안 2017-2025](experience/khoa-sst-warming-trend.md) | 3조건 통과 (13정점 9년 / KHOA Annual Report 직접 데이터 / 회귀+SLR 정합성 cross-check) | **verified** (단기 caveat 명시) |
+| [KHOA SST 5-source global cross-check](experience/khoa-sst-global-crosscheck.md) | 3조건 통과 (OISST v2.1 + HadISST + COBE-SST2 + NIFS KODC vs KHOA 5-way / 2017-2025 ~1.25 °C/dec 일치 + 1968-2022 0.27/0.19 + 1850-2025 0.064) | **verified** |
+| [NIFS 다층 수온 trend 1968-2025](experience/nifs-vertical-sst-trends.md) | 3조건 통과 (NIFS 다층 surface +0.30 / 100m +0.13 / 200m -0.59 °C/dec + 동해 100m cooling + thermosteric ~10% SLR) | **verified** |
 | [한국 연안 2024 광역 MHW — daily Hobday 13정점](experience/khoa-2024-mhw-extreme.md) | 3조건 통과 (13정점 daily OISST / 63 events 객관 집계 / KHOA 2024 §3.1 cross-check) | **verified** |
 
 ## research/ (Hermes coastal-research 워크벤치)

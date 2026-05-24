@@ -20,8 +20,8 @@
 
 | 경로 | 노트 수 | 상태 | 비고 |
 |---|---:|---|---|
-| `source-analysis/` | 41 verified | 활발 | NWS modes·GAHM·mesh tools·source-code 분석. `storm-surge/` subdir 7 노트 (a9618df promote) + `tide/` subdir |
-| `manual-notes/` | 21 verified + 11 source-needed (local-workflow) | **M-B audit done 2026-05-24** | 21 외부 docs catalog (adcirc.github.io/adcirc.org/github.com URL 검증, WebFetch 03+06 sampling) verified. 11 local-workflow (E:\ user paths 19-26, 30-32) reclassified `classification: local-workflow-notes` — 외부 인용 불가, 추후 experience/ 또는 source-analysis/ 이관 후보 |
+| `source-analysis/` | 41 + 11 local-workflow source-needed | 활발 | NWS modes·GAHM·mesh tools·source-code 분석. `storm-surge/` subdir 7 노트 + `tide/` subdir + **신설 `local-workflow/` 11 노트** (2026-05-24 manual-notes/ 에서 이관) |
+| `manual-notes/` | 21 verified | **M-B audit done 2026-05-24** + local 11 이관 완료 | 21 외부 docs catalog (adcirc.github.io/adcirc.org/github.com URL 검증, WebFetch 03+06 sampling) verified. 11 local-workflow 는 `source-analysis/local-workflow/` 로 이관 (디렉토리 의미 정합성) |
 | `web-refs/` | 1 verified | **신설 2026-05-24** | adcirc-official-resources.md — 공식 사이트·GitHub repos (adcirc/adcirc·adcircpy·gahm·asgs·OceanMesh2D)·핵심 논문 (Luettich 1991-92·Westerink 1992·Dietrich 2010-11·Holland 1980) |
 | `raw/` | 1090 .md + 98 pdf + 140 fortran (16.9 GB) | archive | source_code + manuals + website mirror |
 
@@ -36,6 +36,7 @@
 ## 작성 우선순위 (남은 작업)
 
 1. ✅ **M-B**: `manual-notes/` 32 audit 완료 2026-05-24 — 21 verified (external URL catalog) + 11 reclassified as local-workflow-notes
-2. **M-E**: `web-refs/` 신규 — 공식 wiki 핵심 페이지 + Luettich 1991 + 한국 적용 논문
-3. Local-workflow 11 노트 (19-26, 30-32) 정식 이관 — experience/ (사용자 운영) 또는 source-analysis/ (코드 분석) 으로 재분류
+2. ✅ **M-E**: `web-refs/` 신설 2026-05-24 — adcirc-official-resources.md
+3. ✅ Local-workflow 11 노트 (19-26, 30-32) 이관 완료 2026-05-24 → `source-analysis/local-workflow/` ([README](source-analysis/local-workflow/README.md))
 4. Hinnamnor 2022 / Maemi 2003 case 추가 (storm-surge/05 + KHOA cross-ref)
+5. Local-workflow 11 노트 일부 (wide6 mesh evidence 등) experience/ 정식 승격 후보 — raw 파일 일부 본 위키 이관 후
