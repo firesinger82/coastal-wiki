@@ -7,6 +7,7 @@
 ## 역할
 
 - `inbox/`: 새로 발견한 후보 항목. X 포스트, 논문, 블로그, 툴 릴리스, 계정, 데이터셋 등. (Hermes write)
+- `inbox/_archive/YYYY/`: 트리아지로 promote 후보 아님 판정된 보존가치 항목 (arxiv·paper·github·documentation·dataset). 재참조·중복감지용. (트리아지 시 mv)
 - `digests/`: Hermes가 만든 주간·월간 트렌드 요약. (Hermes write)
 - `watchlist/`: 모니터링 대상 키워드, 계정, 저자, 기관, 저장소, 저널. (Hermes write)
 - `prompts/`: Hermes 호출용 prompt 파일 (cron 등록 + 단발 실행). **governance** — frontmatter 면제, validator 검사 제외.
@@ -41,13 +42,44 @@ promote_candidate: concepts | models | experience | watchlist | discard | undeci
 
 `source_url`이 여러 개이면 본문 `## Sources` 섹션에 목록으로 둔다.
 
-## 체류 기간
+## 운영 워크플로 (2026-05-26 결정)
+
+### 커밋 주체
+
+- **Hermes 주간 수집물은 Hermes 자체가 자동 커밋**한다 (별도 commit, format: `chore(research): YYYY-WW hermes ingest`).
+  - 대상: `research/inbox/YYYY-MM-DD-*.md` + `research/digests/YYYY-WW-*.md` 동일 cron 산출물.
+  - 위치: 매주 월 09:00 KST cron 직후. working tree 가 깨끗하게 유지되어야 사람 작업과 분리됨.
+  - cron 실패 시 다음 세션에서 Claude/사용자가 backfill chore commit 으로 정리.
+- 사용자·Claude 의 수동 수정 (트리아지·promote·수정·archive 이동) 은 **별도 commit** (chore·refactor·move 등 적절한 type).
+
+### 트리아지 시점
+
+- **Claude 가 세션 시작 시 inbox 나이 체크** — `find research/inbox -maxdepth 1 -name "*.md" -mtime +30` 으로 30일+ 항목 있거나 새 digest 가 미트리아지면 "트리아지 할까요?" 1회 제안. 거절 시 다시 묻지 않음.
+- 사용자가 명시적으로 "research 정리하자" 등 요청하면 즉시 일괄 트리아지.
+- 트리아지 = 각 inbox 항목 frontmatter `promote_candidate` 갱신 + 결정에 따라 promote/archive/delete.
+
+## 체류 및 폐기 정책 (Hybrid)
 
 - `inbox/` 항목은 발견 후 90일 안에 다음 중 하나로 처리한다.
-  - promote 후보로 본문 검증 작업에 넘김
-  - `watchlist/`로 이동
-  - digest에만 반영하고 archive/discard
-- 90일 이상 방치된 항목은 기본적으로 archive 또는 폐기 후보로 본다.
+  - **promote**: 본문 검증 작업으로 넘김 (`concepts/`·`models/`·`experience/`).
+  - **watchlist 이동**: `research/watchlist/` 로 (계정·저자·기관·repo 추적 가치).
+  - **archive** (`research/inbox/_archive/YYYY/` mv): 보존가치 있으나 promote 안함.
+  - **delete** (`git rm`): 보존가치 낮음. 노이즈.
+
+### archive vs delete 분기 — source_type 기준
+
+| source_type | 기본 처리 | 이유 |
+|---|---|---|
+| `arxiv`, `paper` | **archive** | DOI/arXiv ID 로 재참조 가능, 중복감지 가치 |
+| `github` | **archive** | issue/PR 번호로 재참조, 모델 변경 이력 추적 |
+| `documentation`, `tool`, `dataset` | **archive** | 공식 자료 — promote 안 되어도 reference 가치 |
+| `blog`, `x`, `mixed`, `account` | **delete** 기본 | 스니펫·홍보·일과성 — 재참조 가치 낮음 |
+
+예외: `blog`/`x` 라도 공식기관(NOAA/USGS/KHOA 등) 또는 핵심 저자 글이면 `archive`. 트리아지 시 명시.
+
+### 90일 자동 archive (fallback)
+
+90일 초과로 트리아지 안 된 항목은 자동으로 archive 후보 (delete 아님 — 데이터 손실 방지). 주간 digest 의 "inbox 90일 초과 항목" 섹션에 노출.
 
 ## Promote 경로
 

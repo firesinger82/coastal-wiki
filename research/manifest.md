@@ -87,9 +87,11 @@ PINN "shallow water equations"
 - **주간 자동 수집**: cron 매주 월요일 09:00 KST.
   - prompt: `research/prompts/weekly-collection.md`
   - 산출: `research/inbox/YYYY-MM-DD-*.md` + `research/digests/YYYY-WW-coastal-modeling.md`
+  - **자동 커밋** (2026-05-26 결정): Hermes 가 수집 직후 `chore(research): YYYY-WW hermes ingest` 단일 commit. cron 실패 시 다음 세션에서 backfill.
 - **단발 주제 탐색**: `research/prompts/<topic>-deep-dive.md`, 수동 실행.
 - **watchlist 등록·갱신**: `research/prompts/register-watchlist.md`, 수동 실행.
-- **inbox 90일 체류 추적**: 주간 digest 안에 90일 초과 항목 별도 섹션 (promote/discard 결정 촉구).
+- **inbox 트리아지** (2026-05-26 결정): Claude 세션 시작 시 30일+ 항목 또는 신규 digest 감지하면 트리아지 제안. 사용자 명시 요청 시 즉시. 트리아지 = `promote_candidate` 갱신 + promote/archive/delete 분기 (정책: `research/README.md §체류 및 폐기 정책 (Hybrid)`).
+- **inbox 90일 체류 추적**: 주간 digest 안에 90일 초과 항목 별도 섹션. 90일 초과 미트리아지 = 자동 archive 후보 (delete 아님).
 
 ## arXiv 카테고리 권장
 
