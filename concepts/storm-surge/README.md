@@ -11,6 +11,7 @@
 | `04-code-and-tools.md` | **verified** | ADCIRC NWS modes·OWI/GRIB·KHOA observation·SWAN coupling·운영 workflow |
 | `05-examples.md` | **source-needed** | Maemi 2003 + Hinnamnor 2022 case cross-ref (본 위키 내부 verified · 외부 실측 surge 수치 KHOA Annual Report fetch 필요) — 2026-05-24 |
 | `06-model-application.md` | (미생성) | ADCIRC primary + Delft3D·SCHISM·SLOSH 비교 — `models/ADCIRC/` 작성 후 verified |
+| `07-ml-emulators.md` | **verified** | ML/surrogate storm-surge — PACT (Liu et al. 2026, arxiv:2605.09036) entry. abstract 직접 fetch (2026-05-26), full PDF read 후 §2 보강 가능 |
 
 ## 사용된 source_id
 
@@ -40,3 +41,4 @@
 4. ✅ `04-code-and-tools.md` verified — ADCIRC NWS modes·OWI format·KHOA observation
 5. ✅ `05-examples.md` source-needed (2026-05-24) — Maemi 2003 + Hinnamnor 2022 cross-ref. 위키 내부 자료 verified, 외부 실측 KHOA Annual Report·KMA/JMA Best Track fetch 후 verified 승격. Bolaven 2012 등은 별도 sub-노트 후보.
 6. ✅ `_staging adcirc-storm-surge*.md` 7개 → `models/ADCIRC/source-analysis/storm-surge/` promote 완료 (2026-05-23). 추후 `06-model-application.md` 에서 본 노트들 인용
+7. ✅ `07-ml-emulators.md` verified (2026-05-26) — PACT (arxiv:2605.09036) promote from research/inbox/_archive. abstract 직접 fetch + author/date/category 확인. Training data hindcast 모델·구체 RMSE 수치·CMIP6 model 명 등은 full PDF read 후 보강.
