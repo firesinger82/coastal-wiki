@@ -7,6 +7,8 @@ source_type: arxiv
 query: "arXiv advanced search: coastal; recent 30 days; categories=physics.ao-ph,physics.flu-dyn,cs.LG,physics.geo-ph,physics.comp-ph"
 citation_status: draft-unsourced
 promote_candidate: concepts
+promoted_to: concepts/storm-surge/02-theory.md
+promoted_date: 2026-05-26
 ---
 
 ## 한 줄 요약

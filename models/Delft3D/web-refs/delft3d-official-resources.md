@@ -87,3 +87,20 @@ related:
 - [`concepts/littoral-drift/`](../../../concepts/littoral-drift/) — surf zone + cross-shore profile
 - [`models/Delft3D/source-analysis/`](../source-analysis/) — 10 verified 노트 (sparse, M-D 보강 후보)
 - [`models/SWAN/`](../../SWAN/) — Delft3D-WAVE 의 backend (관련 모델)
+
+## 8. Recent releases & updates (citation_status: source-needed)
+
+W22 Hermes ingest (2026-05-25) 발견 항목 — promote 시 archive 본문 발췌 그대로 인용. 본 §의 verified 승격은 release notes 또는 PR 코드 직접 확인 후.
+
+### 8.1 Delft3D 2026.02 release (2026-04-28)
+
+- 출처: [github.com/Deltares/Delft3D/releases/tag/DIMRset_2026.02](https://github.com/Deltares/Delft3D/releases/tag/DIMRset_2026.02) (github release)
+- 요약: DIMRset 2026.02 release. release notes 본문 미발췌 (Hermes ingest 가 release notes detail fetch 안 함).
+- **인용 검증 TODO**: release notes 직접 fetch → 주요 변경 (DFLOWFM, DIMR coupling, SED, WAVE 등) 발췌 + 본 위키 source-analysis/dflowfm·dimr-coupling 또는 manual-notes 의 영향 항목 명시.
+
+### 8.2 PR #900 — UNST-9952 mdu time read order fix (2026-05-22)
+
+- 출처: [github.com/Deltares/Delft3D/pull/900](https://github.com/Deltares/Delft3D/pull/900) (github PR)
+- 요약 (PR description 발췌): "Moved the [time] read block in readMDU up in the routine, behind the geometry block. Some output fields use tstart_user and tstop_user, which was modified by the [time] read after fields were already set based on the m_flowtimes defaults."
+- 영향: `.mdu` (Master Definition Unstructured) 파일의 `[time]` 블록 → output fields 초기화 순서 버그. DFLOWFM input parsing 변경 — 기존 모델 셋업 재현 시 output time 처리 차이 가능.
+- **인용 검증 TODO**: PR 의 변경 파일 (`readMDU.f90` 등) 직접 확인 후 source-analysis/dflowfm 의 input parsing 노트에 cross-ref 추가.

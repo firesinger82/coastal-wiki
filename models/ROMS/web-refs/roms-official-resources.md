@@ -98,3 +98,15 @@ related:
 - [[../../../experience/nifs-vertical-sst-trends]] — NIFS 다층 수온 + ROMS forcing 정합성
 - [`models/ROMS/source-analysis/`](../source-analysis/) — 11 verified 노트 (sparse, M-D 보강 후보)
 - [`models/ROMS/source-analysis/roms_atmospheric_forcing.md`](../source-analysis/roms_atmospheric_forcing.md) — 대기 forcing 일반론 (a9618df promote)
+
+## 8. Recent updates (citation_status: source-needed)
+
+W22 Hermes ingest (2026-05-25) 발견 항목 — promote 시 PR/issue 본문 발췌 그대로 인용. 본 §의 verified 승격은 코드 변경 직접 확인 후.
+
+### 8.1 PR #75 — MULTI_SCALE_B 4D-Var background error operator (2026-05-22)
+
+- 출처: [github.com/myroms/roms/pull/75](https://github.com/myroms/roms/pull/75) (github PR)
+- 요약 (PR description 발췌): "This PR implements a multi-scale background error covariance (**B**) operator into **ROMS 4D-Var**. It is based on the formulation of Weaver et al. (2013, 2016, 2018). It is activated with the **`MULTI_SCALE_B`** option. The new formulation uses a normalized implicit diffusion ope[rator...]"
+- 새 CPP option: `MULTI_SCALE_B` (4D-Var background error covariance 다중 스케일 분해).
+- 이론 출처: Weaver et al. (2013, 2016, 2018) — multi-scale B 의 분해 공식. ROMS 4D-Var (Moore et al. 2011 IS4DVAR) 의 standard B 를 다중 스케일 분해로 확장.
+- **인용 검증 TODO**: Weaver 2013/2016/2018 인용 정확화 (저널·DOI) + PR 의 변경 파일 (4dvar driver, B operator routine) 직접 확인 후 source-analysis/4dvar/ 노트에 cross-ref 추가. 다중 스케일 B 의 한국 동해 NIFS KOOS-EJS (`../../../experience/nifs-vertical-sst-trends`) 적용 가능성 평가.

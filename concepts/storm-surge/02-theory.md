@@ -162,6 +162,16 @@ $$\Delta\eta_{wind} = \frac{540{,}000}{10{,}056{,}717} \approx 0.054 \text{ m} =
 
 상세 분석 — `_staging/from-modeling-wiki/knowledge/methods/adcirc-storm-surge.md (at commit a9618df^)` (source-code level, NWS 모든 모드 + Holland B + ATCF Best Track + IB suppression `NOIVB`).
 
+### 3.4 Hurricane PBL height scaling — TBL 2026 (citation_status: source-needed)
+
+§3.1 의 bulk drag 는 surface (10 m) wind 기준 $\tau_w = \rho_a C_d U_{10}^2$. 그러나 hurricane wind profile 은 surface 부터 PBL top 까지 빠르게 변하며, **PBL height** $h_{BL}$ 가 wind drag · momentum exchange 의 scale 을 결정한다 (§3.3 의 AHM/GAHM BL Vmax → 10-m surface wind 환산도 영향).
+
+- **Turbulent Boundary Layer Height Scales in Hurricanes** (arXiv:2605.03933, 2026-05) — 기존 constant eddy viscosity 가정 PBL height scaling 의 한계 지적, 새 expression 제안.
+- abstract (verbatim 일부): "Boundary layer processes drive the air-sea exchange of momentum, heat, and moisture that powers and shapes hurricanes. The height of the boundary layer is a critical parameter in engineering and meteorological models of hurricane wind speed, turbulence intensity, and storm strength. Existing models rely on a height scale derived with the assumption of a constant eddy viscosity, a strong [...] expressions offer a practical basis for interpreting observational data, informing mesoscale simulations, and specifying turbulent flow statistics in wind engineering and coastal resilience."
+- 출처: [arxiv.org/abs/2605.03933](https://arxiv.org/abs/2605.03933) (arxiv, discovered 2026-05-25, hermes-coastal-research)
+- **인용 검증 TODO** (verified 승격 조건): full PDF fetch 후 (1) 새 PBL height expression 의 정식 식, (2) 기존 constant-eddy-viscosity scaling 과의 비교 정량치, (3) coastal resilience 적용 사례, (4) ADCIRC GAHM (NWS=20) 의 BL Vmax 환산식과의 연결 가능성.
+- **개념적 위치**: §3.1 bulk drag $C_d(U_{10})$ 의 가정 (10-m wind 와 PBL 위 wind 의 ratio) 보강 후보. ADCIRC GAHM 의 quadrant-dependent B + BL Vmax → 10-m surface wind 환산 (Powell 2003 reduction factor) 의 후속 개선 방향.
+
 ## 4. Tide-Surge Interaction (Pugh §7:8)
 
 ### 4.1 비선형 결합 원인

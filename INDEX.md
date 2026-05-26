@@ -12,7 +12,7 @@
 | [currents](concepts/currents/) | **DRAFT** (01-05 verified, 06 source-needed) | 조류 — 5/6 verified (UTide 2D + 수치조류도 + KHOA 60+ 용어). 동해 수치조류도 미커버 명시 |
 | [sst](concepts/sst/) | **STABLE** (01·02·03·04·05 verified, 06 source-needed) | 해수면 수온 — 5/6 verified. 01 정의, 02 heat budget, 03 회귀·MHW, 04 5 데이터셋 운영, 05 MHW 식별 실행 (13정점 ~180 events). experience/ 4건 연결 |
 | [littoral-drift](concepts/littoral-drift/) | **DRAFT** (01·02 verified) | 연안표사 — 2/6 verified. 01 정의·CERC·Komar-Inman, 02 Holthuijsen §7.4.2-3 radiation stress + Bowen 1969 / Battjes 1974 longshore current 유도 |
-| [storm-surge](concepts/storm-surge/) | **DRAFT** (01·02·03·04·07 verified, 05 partial Bolaven 2012, 06 미생성) | 폭풍해일 — 5/7 verified + 1/7 partial. 01 정의, 02 Pugh §6-7 + ADCIRC GWCE, 03 separation·MK trend·return period (Pugh §6:1 §7:8 §8:3:2-3), 04 NWS modes·KHOA + **archive ~1년 verified**, 05 Maemi/Hinnamnor cross-ref + **Bolaven 2012 군산외해 ADCP 잔차 verified** ([[khoa-annual-2012-bolaven-surge]]), **07 ML emulators — PACT (Liu et al. 2026 arxiv:2605.09036) verified entry, abstract 직접 fetch**. ADCIRC source-analysis/storm-surge/ 7개 promote 완료 |
+| [storm-surge](concepts/storm-surge/) | **DRAFT** (01·02·03·04·07 verified, 02 §3.4 source-needed, 05 partial Bolaven 2012, 06 미생성) | 폭풍해일 — 5/7 verified + 1/7 partial. 01 정의, 02 Pugh §6-7 + ADCIRC GWCE + **§3.4 hurricane PBL TBL 2026 source-needed (W22 promote)**, 03 separation·MK trend·return period (Pugh §6:1 §7:8 §8:3:2-3), 04 NWS modes·KHOA + **archive ~1년 verified**, 05 Maemi/Hinnamnor cross-ref + **Bolaven 2012 군산외해 ADCP 잔차 verified** ([[khoa-annual-2012-bolaven-surge]]), **07 ML emulators — PACT (Liu et al. 2026 arxiv:2605.09036) verified entry, abstract 직접 fetch**. ADCIRC source-analysis/storm-surge/ 7개 promote 완료 |
 
 ## models/ (모델별 객관 자료)
 
@@ -22,8 +22,8 @@
 | [SWAN](models/SWAN/) | **STABLE** (README + action-balance + wink-pattern + source-analysis 21 노트 verified) | 천해 풍파 spectral · Holthuijsen 공동개발 · 모든 source-term · scheme · 추가 promote 다수 |
 | [ADCIRC](models/ADCIRC/) | **WIP** (source-analysis 41 + local-workflow 11 + manual-notes 21 verified + web-refs 1) | NWS modes + GAHM/AHM + tide + storm-surge. manual-notes 21 verified (M-B audit), local-workflow 11 → source-analysis/local-workflow/ 이관 (2026-05-24) |
 | [XBeach](models/XBeach/) | **WIP** (source-analysis 16 + manual-notes 3 verified + web-refs 1) | morphology · avalanching · bed_friction · wave_boundary. manual-notes 3 verified 2026-05-24 (xbeach.readthedocs.io examples audit) |
-| [Delft3D](models/Delft3D/) | **WIP** (source-analysis 14 + manual-notes 2 + web-refs 1) | sediment·dredge·flow-wave·turbulence + M-D 1차 (engines·flow2d3d_dispatcher) + **M-D 2차 (dflowfm·dimr coupling BMI)** + M-C 2차 (manuals·FLOW v4.07.01) |
-| [ROMS](models/ROMS/) | **WIP** (source-analysis 14 + manual-notes 3 + web-refs 1) | 4dvar·advection·baroclinic + M-D 1차 (driver·nonlinear) + **M-D 2차 (bulk_flux COARE)** + M-C 2차 (wiki-overview·getting-started·**cppdefs-options 32 cat**) |
+| [Delft3D](models/Delft3D/) | **WIP** (source-analysis 14 + manual-notes 2 + web-refs 1 + W22 §8 source-needed) | sediment·dredge·flow-wave·turbulence + M-D 1차 (engines·flow2d3d_dispatcher) + **M-D 2차 (dflowfm·dimr coupling BMI)** + M-C 2차 (manuals·FLOW v4.07.01) + **web-refs §8 Recent releases — 2026.02 release + PR #900 mdu time read fix source-needed (W22 promote)** |
+| [ROMS](models/ROMS/) | **WIP** (source-analysis 14 + manual-notes 3 + web-refs 1 + W22 §8 source-needed) | 4dvar·advection·baroclinic + M-D 1차 (driver·nonlinear) + **M-D 2차 (bulk_flux COARE)** + M-C 2차 (wiki-overview·getting-started·**cppdefs-options 32 cat**) + **web-refs §8 Recent updates — PR #75 MULTI_SCALE_B 4D-Var source-needed (W22 promote, Weaver 2013/2016/2018)** |
 
 ## textbook/ (교과서 통합)
 

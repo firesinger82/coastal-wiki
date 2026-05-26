@@ -7,6 +7,8 @@ source_type: github
 query: "GitHub API myroms/roms issues since 2026-05-18; ADCIRC/Delft3D/EFDC/ROMS/SWAN/XBeach"
 citation_status: draft-unsourced
 promote_candidate: models
+promoted_to: models/ROMS/web-refs/roms-official-resources.md
+promoted_date: 2026-05-26
 ---
 
 ## 한 줄 요약
