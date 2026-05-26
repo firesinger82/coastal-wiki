@@ -3,11 +3,11 @@ title: "Storm Surge 이론 — shallow water + IB + wind stress + tide-surge int
 topic: storm-surge
 canonical_source: self
 citation_status: verified
-verification_method: "Pugh 'Tides, Surges and Mean Sea-Level' Ch 6 (textbook/md/sea-level.md p.184-230) 직접 인용 — §6:1 Weather effects, §6:3 Atmospheric pressure (eq. 6:5), §6:4 Wind stress, §6:5 Numerical modelling, §7:8 Tide-surge interaction. ADCIRC Theory (Luettich & Westerink 2004) GWCE form. textbook/md/sea-level.md line 7370 ('one millibar will produce a decrease in sea-level of one centimetre') + line 7374 (Proudman shelf model amplification) 직접 인용."
+verification_method: "Pugh 'Tides, Surges and Mean Sea-Level' Ch 6 (textbook/md/sea-level.md p.184-230) 직접 인용 — §6:1 Weather effects, §6:3 Atmospheric pressure (eq. 6:5), §6:4 Wind stress, §6:5 Numerical modelling, §7:8 Tide-surge interaction. ADCIRC Theory (Luettich & Westerink 2004) GWCE form. textbook/md/sea-level.md line 7370 ('one millibar will produce a decrease in sea-level of one centimetre') + line 7374 (Proudman shelf model amplification) 직접 인용. §3.4 추가 (2026-05-26): arXiv:2605.03933v1 (Sathia & Giometto 2026, 제출일 2026-05-05, 카테고리 physics.flu-dyn) abstract 직접 fetch (WebFetch 2026-05-26) — 새 PBL height scaling 두 식 u_*/β (neutral) + u_*/√(βN) (stable) + 평균 2.5% relative error verbatim 인용. ADCIRC GAHM BL Vmax 환산 cross-ref 와 한국 태풍 적용 검토는 자체 분석."
 note_author: "Claude Opus 4.7 (1M context)"
-note_date: 2026-05-23
-verification_by: "Claude Opus 4.7 (1M context) — Pugh 본문 직접 인용 + ADCIRC theory 매핑"
-verification_date: 2026-05-23
+note_date: 2026-05-26
+verification_by: "Claude Opus 4.7 (1M context) — Pugh 본문 직접 인용 + ADCIRC theory 매핑 + §3.4 arxiv abs 직접 fetch"
+verification_date: 2026-05-26
 related:
   - concepts/storm-surge/01-concept.md
   - concepts/tides/02-theory.md
@@ -162,15 +162,74 @@ $$\Delta\eta_{wind} = \frac{540{,}000}{10{,}056{,}717} \approx 0.054 \text{ m} =
 
 상세 분석 — `_staging/from-modeling-wiki/knowledge/methods/adcirc-storm-surge.md (at commit a9618df^)` (source-code level, NWS 모든 모드 + Holland B + ATCF Best Track + IB suppression `NOIVB`).
 
-### 3.4 Hurricane PBL height scaling — TBL 2026 (citation_status: source-needed)
+### 3.4 Hurricane PBL height scaling — Sathia & Giometto 2026 (arXiv:2605.03933)
 
-§3.1 의 bulk drag 는 surface (10 m) wind 기준 $\tau_w = \rho_a C_d U_{10}^2$. 그러나 hurricane wind profile 은 surface 부터 PBL top 까지 빠르게 변하며, **PBL height** $h_{BL}$ 가 wind drag · momentum exchange 의 scale 을 결정한다 (§3.3 의 AHM/GAHM BL Vmax → 10-m surface wind 환산도 영향).
+§3.1 bulk drag 는 surface (10 m) wind 기준 $\tau_w = \rho_a C_d U_{10}^2$. 그러나 hurricane wind profile 은 surface 부터 PBL top 까지 빠르게 변하며, **PBL height** $h_{BL}$ 가 wind drag · momentum exchange 의 scale 을 결정한다. ADCIRC AHM/GAHM (§3.3, NWS=19/20) 의 BL Vmax → 10-m surface wind 환산도 PBL 의 vertical structure 가정에 의존한다.
 
-- **Turbulent Boundary Layer Height Scales in Hurricanes** (arXiv:2605.03933, 2026-05) — 기존 constant eddy viscosity 가정 PBL height scaling 의 한계 지적, 새 expression 제안.
-- abstract (verbatim 일부): "Boundary layer processes drive the air-sea exchange of momentum, heat, and moisture that powers and shapes hurricanes. The height of the boundary layer is a critical parameter in engineering and meteorological models of hurricane wind speed, turbulence intensity, and storm strength. Existing models rely on a height scale derived with the assumption of a constant eddy viscosity, a strong [...] expressions offer a practical basis for interpreting observational data, informing mesoscale simulations, and specifying turbulent flow statistics in wind engineering and coastal resilience."
-- 출처: [arxiv.org/abs/2605.03933](https://arxiv.org/abs/2605.03933) (arxiv, discovered 2026-05-25, hermes-coastal-research)
-- **인용 검증 TODO** (verified 승격 조건): full PDF fetch 후 (1) 새 PBL height expression 의 정식 식, (2) 기존 constant-eddy-viscosity scaling 과의 비교 정량치, (3) coastal resilience 적용 사례, (4) ADCIRC GAHM (NWS=20) 의 BL Vmax 환산식과의 연결 가능성.
-- **개념적 위치**: §3.1 bulk drag $C_d(U_{10})$ 의 가정 (10-m wind 와 PBL 위 wind 의 ratio) 보강 후보. ADCIRC GAHM 의 quadrant-dependent B + BL Vmax → 10-m surface wind 환산 (Powell 2003 reduction factor) 의 후속 개선 방향.
+#### 3.4.1 새 scaling 공식 — Sathia & Giometto 2026
+
+저자 주장 (verbatim, arXiv:2605.03933v1 abstract):
+
+> "Existing models rely on a height scale derived with the assumption of a constant eddy viscosity, a strong simplification that limits physical accuracy."
+
+저자 제안 (hurricane outside the eyewall):
+
+| 성층 | PBL height scaling |
+|---|---|
+| **Neutral stratification** | $h_{BL} \sim u_\star / \beta$ |
+| **Stable stratification** | $h_{BL} \sim u_\star / \sqrt{\beta N}$ |
+
+기호 (verbatim):
+
+- $u_\star$ = friction velocity (m/s)
+- $\beta$ = **absolute fluid vorticity** (planetary $f$ + relative vorticity; hurricane core 에서 크게 증가)
+- $N$ = Brunt-Väisälä frequency of the background stratification ($s^{-1}$)
+
+저자 의의 (verbatim):
+
+> "These scalings are analogous to those used in the literature for neutrally and stably stratified turbulent atmospheric boundary layers."
+
+→ ABL (atmospheric boundary layer) scaling 의 hurricane outside-eyewall 적용. constant eddy viscosity 가정 회피.
+
+#### 3.4.2 Validation 정확도 (verbatim)
+
+저자 보고 (arXiv:2605.03933v1 abstract):
+
+> "The formulae are backed by analytical derivation and validated against velocity profiles from large-eddy simulations and field observations. They are predictive to within 2.5% relative error on average and yield a good collapse of the simulated and observational velocity profiles away from the surface."
+
+요약:
+
+- 검증 자료: LES (large-eddy simulations) + field observations
+- 평균 상대오차: **2.5%** (eyewall 외부)
+- 적용 범위: "away from the surface" 영역에서 velocity profile collapse
+
+#### 3.4.3 본 위키 적용 — ADCIRC GAHM 와의 연결
+
+ADCIRC GAHM (§3.3, NWS=20) 의 wind profile 환산 단계:
+
+- **GAHM 출력**: cyclone boundary layer 평균 Vmax (Holland 1980 + quadrant-dependent B)
+- **ADCIRC 입력**: 10-m surface wind ($\tau_w$ 계산용)
+- **환산**: BL Vmax → 10-m wind reduction factor — **PBL 의 vertical structure 가정 필요**
+  - 현재 일반적: Powell et al. 2003 reduction factor ~0.85 (`models/ADCIRC/raw/manuals/`)
+  - reduction factor 의 height-dependence 는 $h_{BL}$ 가정에 의존
+
+따라서 Sathia & Giometto (2026) 의 새 $h_{BL}$ scaling 의 의의:
+
+1. **GAHM-derived BL Vmax → 10-m wind 환산의 height-dependent reduction factor 개선 후보** — 현재 constant eddy viscosity 기반 가정을 $u_\star/\beta$ (neutral) 또는 $u_\star/\sqrt{\beta N}$ (stable) 로 대체
+2. 한국 태풍 (Maemi 2003, Hinnamnor 2022 — `05-examples.md` §1·§2; Bolaven 2012 — `05-examples.md` §3) 의 **eyewall 외부 surge response** 정확화
+3. ADCIRC 의 wind input 단계 (`fort.22` AHM/GAHM record) 후속 개선 — paper 가 최근 (2026-05-05 제출) 이라 직접 적용 사례 아직 없음
+
+#### 3.4.4 한계 (verified 범위 명시)
+
+본 §3.4 는 **arXiv:2605.03933v1 abstract 직접 인용** 수준. 다음은 abstract 미명시이며 full PDF read 후 보강 가능:
+
+- analytical derivation 의 정식 length scale 유도 단계
+- LES setup (격자, $Re_\tau$, 모델 풍속 범위, 강제 hurricane)
+- 비교한 기존 expressions 의 구체명 (Garratt 1992? Zilitinkevich 1972? Rotunno & Bryan 2012?)
+- eyewall **내부** 적용 가능성 — abstract 는 명시적으로 "outside the eyewall" 만
+- coastal resilience / wind engineering 적용 구체 사례
+
+ADCIRC source code 변경은 아직 없음 — paper 의 reduction factor 통합은 후속 연구 가능성.
 
 ## 4. Tide-Surge Interaction (Pugh §7:8)
 
