@@ -75,6 +75,9 @@ source_type: x | arxiv | paper | blog | github | documentation | tool | account 
 query: "<사용한 검색어 또는 watchlist 항목 slug>"
 citation_status: draft-unsourced
 promote_candidate: undecided
+suggested_destination: "<promote 대상 파일 path 또는 null>"
+suggested_section: "<해당 파일 안 어느 절·entry 또는 null>"
+classification_confidence: high | medium | low | null
 ---
 ```
 
@@ -116,6 +119,43 @@ promote_candidate: undecided
 
 공통 마지막 `## 주의`: 검증되지 않은 draft-unsourced + 검색 노출 기반 명시.
 
+## 분류 추천 (Hermes 작성, Claude promote 입력)
+
+각 inbox 항목 작성 직후 (그리고 archive 이동 시), 본문 메타데이터 (title·abstract·발췌·키워드) + `INDEX.md` 의 현재 토픽·모델 상태를 보고 frontmatter 의 `suggested_destination` · `suggested_section` · `classification_confidence` 3 필드를 채운다.
+
+**write 격리 정책 그대로** — 본문 영역 (`concepts/` · `models/` · `experience/`) 에는 절대 쓰지 않음. `inbox/` 와 `inbox/_archive/` 파일의 frontmatter 만 수정.
+
+### 분류 룰
+
+| 입력 패턴 | suggested_destination |
+|---|---|
+| `source_type: github` + repo가 모델 공식 (`adcirc/adcirc`, `Deltares/Delft3D`, `myroms/roms`, `openearth/xbeach`, `NOAA-EMC/WW3`, `dsi-llc/EFDC`, `SCHISM-Dev/schism`) | `models/<MODEL>/web-refs/<feature-or-issue-slug>.md` |
+| `source_type: arxiv\|paper` + 키워드 "storm surge" "surge emulation" "ML emulator" | `concepts/storm-surge/07-ml-emulators.md` (또는 `05-examples.md`) |
+| `source_type: arxiv\|paper` + "wave" "spectral" | `concepts/waves/04-code-and-tools.md` |
+| `source_type: arxiv\|paper` + "sediment" "morphology" | `concepts/sediment-transport/04-code-and-tools.md` |
+| `source_type: arxiv\|paper` + "SST" "ocean temperature" "MHW" | `concepts/sst/<적절 0X>` |
+| `source_type: arxiv\|paper` + "tide" | `concepts/tides/<적절 0X>` |
+| `source_type: arxiv\|paper` + "current" "circulation" | `concepts/currents/<적절 0X>` |
+| `source_type: arxiv\|paper` + "longshore" "littoral" | `concepts/littoral-drift/<적절 0X>` |
+| `source_type: blog` + 공식기관 (NOAA/USGS/KHOA/Deltares/JMA) + 도메인 적합 | `concepts/<topic>/04-code-and-tools.md` 의 web-refs 절 |
+| `source_type: blog` + landing page (evergreen) | null + `promote_candidate: watchlist` 권고 |
+| 매칭 불가 | null + `classification_confidence: low` |
+
+### confidence 기준
+
+- **high**: 키워드 명확 + destination 파일 존재 + 동일 series entry 이미 등재
+- **medium**: 키워드 명확하나 destination 신규 생성 필요, 또는 borderline 토픽
+- **low**: undecided, 또는 토픽 후보 2개 이상 동률, 또는 blog 메타 부족
+
+### 중복 충돌
+
+- `source_url` 이 이미 archive 의 어느 `promoted_to` 필드와 매칭되면 분류 추천 skip 하고 digest 에 "이미 promote 완료 (중복)" 으로 보고.
+
+### citation_status 보존
+
+- `citation_status: draft-unsourced` 는 그대로. Hermes 가 verified 부여 금지 (CLAUDE.md 절대규칙 #3).
+- `suggested_destination` 은 추천일 뿐. Claude (사용자) 측 `coastal-promote` skill 이 INDEX·중복 체크로 재검증 후 본문 edit 실행.
+
 ## Digest
 
 - 위치: `research/digests/`
@@ -127,6 +167,7 @@ promote_candidate: undecided
   - 모델별 관련 항목
   - **watchlist 항목별 hit 카운트** (NEW — 이번 주 수집이 watchlist 의 어느 entry 와 매칭되었는지)
   - promote_candidate 후보별 분류
+  - **promote 분류 추천 (NEW)** — `suggested_destination` 별 hit count + `classification_confidence` (high/medium/low) 별 hit count + 신규 destination 생성 후보 list (Claude 우선 검토) + null (분류 불가) 항목 사유
   - 다음에 깊이 탐색할 만한 후보
   - 검증 필요 항목 (외부 도구 실패 명시 — Grok 인증, arxiv API 등)
   - **중복 skip 항목** (NEW — source_url + 기존 archive 위치)
