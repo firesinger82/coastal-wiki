@@ -3,7 +3,7 @@ title: "Storm Surge 한국 case — Maemi 2003 + Hinnamnor 2022 cross-reference"
 topic: storm-surge
 canonical_source: self
 citation_status: source-needed
-verification_method: "본 위키 내 cross-reference 만 verified — 02-theory.md (Pugh §6:3 IB 식, Maemi 950 mb / Hinnamnor 920 mb 중심기압 인용) + 04-code-and-tools.md (NWS 모드·KHOA OpenAPI) + models/ADCIRC/source-analysis/storm-surge/ 7개 노트 (NWS=13 JMA-MSM + GAHM Best Track + fort.15 운영 규칙). KMA·JMA RSMC Best Track 의 트랙·중심기압 절대수치, KHOA Annual Report §3.x 의 관측 surge peak 수치는 본 위키가 직접 fetch 미실시 — source-needed 마크. 본 노트는 case 별 시나리오·워크플로 매핑 + 본 위키 자료의 사용 가이드 역할."
+verification_method: "본 위키 내 cross-reference 만 verified — 02-theory.md (Pugh §6:3 IB 식, Maemi 950 mb / Hinnamnor 920 mb 중심기압 인용) + 04-code-and-tools.md (NWS 모드·KHOA OpenAPI + archive 한계 verified) + models/ADCIRC/source-analysis/storm-surge/ 7개 노트 (NWS=13 JMA-MSM + GAHM Best Track + fort.15 운영 규칙). §1 Maemi + §2 Hinnamnor 의 중심기압·관측 surge 절대수치는 본 위키가 직접 fetch 미실시 — source-needed. **§4.1 Bolaven 2012 는 KHOA Annual Report 2012 vol.1 §7.3 직접 인용으로 verified** (별도 노트 [[khoa-annual-2012-bolaven-surge]] 분리)."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-24
 verification_by: "Claude Opus 4.7 (1M context) — 위키 내부 cross-ref만 verified, 외부 실측 수치는 source-needed 분리"
@@ -205,15 +205,34 @@ ADCIRC 가 한국 storm-surge 의 primary unstructured 모델이라면, **EFDC+ 
 
 | 태풍 | 연 | 한국 경로 | 관측 surge | 본 case 와 관계 |
 |---|---|---|---|---|
-| **Maemi (매미)** | 2003 | 마산만 직격 | ~2.4 m 마산 | **본 노트 §1** |
-| Sanba (산바) | 2012 | 남해 동부 | ~1.5 m 부산 | Hinnamnor 와 유사 magnitude |
-| Bolaven (볼라벤) | 2012 | 서해 종단 | ~1.2 m 인천 | 서해 천해 + 북서풍 case |
-| Lingling (링링) | 2019 | 서해 북상 | ~1.0 m 인천 | 서해 storm-surge baseline |
-| **Hinnamnor (힌남노)** | 2022 | 동해 남부 | ~1.5 m 포항·울산 | **본 노트 §2** |
+| **Maemi (매미)** | 2003 | 마산만 직격 | ~2.4 m 마산 (source-needed) | **본 노트 §1** |
+| Sanba (산바) | 2012 | 남해 동부 | ~1.5 m 부산 (source-needed) | Hinnamnor 와 유사 magnitude |
+| **Bolaven (볼라벤)** | **2012-08-29** | 서해 종단 | ~1.2 m 인천 (source-needed) + **군산 외해 ADCP 잔차류 verified** | **§4.1 보강 (verified case)** |
+| Lingling (링링) | 2019 | 서해 북상 | ~1.0 m 인천 (source-needed) | 서해 storm-surge baseline |
+| **Hinnamnor (힌남노)** | 2022 | 동해 남부 | ~1.5 m 포항·울산 (source-needed) | **본 노트 §2** |
 
-→ 본 노트 외 case 별 deep 작성 (별도 sub-노트 가능):
-- `concepts/storm-surge/05-examples-bolaven-2012.md` — 서해 종단 + 북서풍 변종
-- `concepts/storm-surge/05-examples-sanba-2012.md` — 남해 동부 case
+### 4.1 Bolaven 2012 verified — 군산 외해 ADCP 잔차 조류
+
+⭐ **유일 verified case** (외부 실측 직접 인용): KHOA Annual Report 2012 vol.1 §7.3.
+
+상세는 [`textbook/notes/khoa-annual-2012-bolaven-surge.md`](../../textbook/notes/khoa-annual-2012-bolaven-surge.md) — 군산 외해 5 ADCP 정점 (C3·C4·C5·C6) 좌표·관측기간·잔차류 시계열 (그림 7-64·7-81 직접) verified.
+
+| 항목 | 값 | 인용 |
+|---|---|---|
+| 태풍 | Bolaven (제15호) | KHOA Annual 2012 vol.1 line 8165 |
+| 통과 | **2012-08-29** | 동 line 8165 |
+| C4 정점 (36°00'N, 125°40'E, 65 m) 표층 잔차류 | 통과 시 강한 북향 sub-tidal current | 그림 7-64 |
+| C6(2nd) 정점 (36°00'57"N, 125°17'E, 45 m) 저층 잔차류 | 통과 시 북향 잔차 | 그림 7-81 |
+| 결론 | "해수면 변화 및 유속의 증가가 발생" (직접 인용) | line 9208 |
+
+→ **sea-level surge 직접 표는 본 보고서 vol.1·vol.2 검색에서 미발견** — KHOA Annual Report 2012 의 §3 조위 분석 챕터 또는 다른 출판물에서 보강 가능 (보강 우선순위 §5.2).
+
+→ 본 위키 [`02-theory.md §2.2 wind stress`](02-theory.md#22-한국-적용--태풍-ib-surge) 의 wind set-up 메커니즘이 잔차 조류 형태로 verified 됨. ADCIRC NWS=20 GAHM hindcast 의 검증 대상으로 활용 가능.
+
+### 4.2 추가 sub-노트 후보
+
+- `concepts/storm-surge/05-examples-sanba-2012.md` — 남해 동부 case (KHOA Annual 2012 vol.1 § 부산·여수 정점 자료 확인 필요)
+- `concepts/storm-surge/05-examples-lingling-2019.md` — 서해 북상 case (KHOA Annual 2019 markdown 변환 후)
 
 ---
 

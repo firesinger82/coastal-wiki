@@ -12,7 +12,7 @@
 | [currents](concepts/currents/) | **DRAFT** (01-05 verified, 06 source-needed) | 조류 — 5/6 verified (UTide 2D + 수치조류도 + KHOA 60+ 용어). 동해 수치조류도 미커버 명시 |
 | [sst](concepts/sst/) | **STABLE** (01·02·03·04·05 verified, 06 source-needed) | 해수면 수온 — 5/6 verified. 01 정의, 02 heat budget, 03 회귀·MHW, 04 5 데이터셋 운영, 05 MHW 식별 실행 (13정점 ~180 events). experience/ 4건 연결 |
 | [littoral-drift](concepts/littoral-drift/) | **DRAFT** (01·02 verified) | 연안표사 — 2/6 verified. 01 정의·CERC·Komar-Inman, 02 Holthuijsen §7.4.2-3 radiation stress + Bowen 1969 / Battjes 1974 longshore current 유도 |
-| [storm-surge](concepts/storm-surge/) | **DRAFT** (01·02·03·04 verified, 05 source-needed, 06 미생성) | 폭풍해일 — 4/6 verified + 1/6 source-needed. 01 정의, 02 Pugh §6-7 + ADCIRC GWCE, 03 separation·MK trend·return period (Pugh §6:1 §7:8 §8:3:2-3), 04 NWS modes·KHOA, **05 Maemi 2003 + Hinnamnor 2022 cross-ref (외부 실측 KHOA Annual Report fetch 후 verified 승격)**. ADCIRC source-analysis/storm-surge/ 7개 promote 완료 |
+| [storm-surge](concepts/storm-surge/) | **DRAFT** (01·02·03·04 verified, 05 source-needed + Bolaven 2012 partial verified, 06 미생성) | 폭풍해일 — 4/6 verified + 1/6 partial. 01 정의, 02 Pugh §6-7 + ADCIRC GWCE, 03 separation·MK trend·return period (Pugh §6:1 §7:8 §8:3:2-3), 04 NWS modes·KHOA + **archive ~1년 verified**, 05 Maemi/Hinnamnor cross-ref + **Bolaven 2012 군산외해 ADCP 잔차 verified** ([[khoa-annual-2012-bolaven-surge]]). ADCIRC source-analysis/storm-surge/ 7개 promote 완료 |
 
 ## models/ (모델별 객관 자료)
 
