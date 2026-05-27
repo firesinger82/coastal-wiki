@@ -50,6 +50,7 @@
 | [KHOA SST 5-source global cross-check](experience/khoa-sst-global-crosscheck.md) | 3조건 통과 (OISST v2.1 + HadISST + COBE-SST2 + NIFS KODC vs KHOA 5-way / 2017-2025 ~1.25 °C/dec 일치 + 1968-2022 0.27/0.19 + 1850-2025 0.064) | **verified** |
 | [NIFS 다층 수온 trend 1968-2025](experience/nifs-vertical-sst-trends.md) | 3조건 통과 (NIFS 다층 surface +0.30 / 100m +0.13 / 200m -0.59 °C/dec + 동해 100m cooling + thermosteric ~10% SLR) | **verified** |
 | [한국 연안 2024 광역 MHW — daily Hobday 13정점](experience/khoa-2024-mhw-extreme.md) | 3조건 통과 (13정점 daily OISST / 63 events 객관 집계 / KHOA 2024 §3.1 cross-check) | **verified** |
+| [KHOA 49정점 16년 UTide 분석 (2010-2025) — 천해분조·nodal·폭풍해일](experience/khoa-49-station-16yr-utide-2026.md) | 3조건 통과 (49정점 × 평균 14년 ZIP / KHOA 공시 HC + nodal 7.4% + 5 태풍 surge cross-ref / utide_validation/*.py 재현) | **verified** |
 
 ## research/ (Hermes coastal-research 워크벤치)
 
