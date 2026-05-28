@@ -3,11 +3,11 @@ title: "adcirc swan coupling"
 topic: general
 canonical_source: self
 citation_status: verified
-verification_method: "ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-swan-coupling.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
-note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
-note_date: 2026-04~05 (original) / 2026-05-23 (promote)
-verification_by: "사용자 + codex source-code analysis"
-verification_date: 2026-04
+verification_method: "ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-swan-coupling.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시. **SWAN Temporal Controls (PR #498) 절 추가 (2026-05-28)**: GitHub API `gh pr view 498 -R adcirc/adcirc` + `gh pr diff 498` 직접 fetch — PR body verbatim 인용 (SWANTimeControl namelist + RunStartDateTime + fort.26 COMPUTE 카드) + presizes.F / prep.F / couple2swan.F diff hunk 직접 인용 (SwanTimeStep offset 계산 + [1, SWAN_MTC] range gate + sentinel/radiation-stress fallback)."
+note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23 + SWAN Temporal Controls 절 2026-05-28"
+note_date: 2026-04~05 (original) / 2026-05-23 (promote) / 2026-05-28 (PR #498 절)
+verification_by: "사용자 + codex source-code analysis + Claude Opus 4.7 (1M context) — PR #498 GitHub API 직접 fetch"
+verification_date: 2026-04 (base) / 2026-05-28 (PR #498)
 ---
 
 ## Scope
@@ -173,17 +173,86 @@ SWAN spectral hot-start is **separate**:
 - ▢ Met forcing time alignment — `STATIM/REFTIM` apply to ADCIRC; SWAN reads `INPGRID` time block independently. Match epochs.
 - ▢ NetCDF restart with `NRS=3` — possible bug at `netcdfio.F90:8017-8085` (`hs%rs1/rs2` vs `hs%swan_rs*`); test on small case before production.
 
+## SWAN Temporal Controls (PR #498, phase 1 of 2)
+
+PR [#498](https://github.com/adcirc/adcirc/pull/498) (OPEN, branch `Spatial-and-Temporal-Controls`, +274 -30, 17 files). 사용자가 ADCIRC+SWAN coupled simulation 의 SWAN computation 시간을 storm landfall 즈음으로 제한 가능 → 전체 mesh + 전체 timeframe SWAN 호출 회피로 wall-clock 절감. Spatial controls 은 phase 2 예정. 외부 docs: [CCHT-NCSU/Spatial-Temporal-Controls](https://github.com/ccht-ncsu/Spatial-Temporal-Controls).
+
+### 사용자 입력 (PR body verbatim)
+
+- **fort.15 (ADCIRC)** 끝에 namelist 추가:
+  ```
+  &SWANTimeControl RunStartDateTime='YYYYMMDD.HHMMSS' /
+  ```
+  `RunStartDateTime` 은 현 ADCIRC 시뮬레이션의 시작 시각
+
+- **fort.26 (SWAN)** 의 `COMPUTE` 카드를 desired range 로 변경:
+  ```
+  COMPUTE YYYYMMDD.HHMMSS 1200 SEC YYYYMMDD.HHMMSS
+  ```
+
+→ namelist 없거나 `RunStartDateTime` 에 `-` 포함 (default sentinel `"-99999"`) 시 **기존 동작 그대로 (전체 시간 SWAN)**. backward-compat.
+
+### 코드 변경 (PR diff 직접 fetch 2026-05-28)
+
+| 파일 | 변경 | 역할 |
+|---|---|---|
+| `prep/presizes.F` | +RunStartDateTime 변수 + SWANTimeControl namelist + SIZEUP15 read with default `"-99999"` | namelist 정의 + fort.15 parse |
+| `prep/prep.F` | `PREP15` 에서 `SWANTimeControl` namelist write | 파티션 prep 단계 출력 보존 |
+| `src/couple2swan.F` | `SwanTimeStep` 초기값 = 0 명시; `PADCSWAN_INIT` 에서 `RunStartDateTime` 파싱 → `SwanTimeStep = NINT((AdcircStartTime - SWAN_TINIC) / SWAN_DT)`; `PADCSWAN_RUN` 에서 `[1, SWAN_MTC]` 범위 밖이면 `SWMAIN` skip + wave output sentinel + radiation stress 0 | 핵심 coupling 제어 |
+| 그 외 14 files | (테스트 / build / docs) | (본 노트 scope 밖) |
+
+### Algorithm 요점 (couple2swan.F PADCSWAN_INIT/RUN)
+
+```fortran
+! INIT: SWAN timestep offset 결정
+IF( INDEX( RunStartDateTime, "-") .GT. 0 ) THEN  ! default sentinel
+   SwanTimeStep = 0   ! 기존 동작 (전체 시간 SWAN)
+ELSE
+   CALL DTRETI( RunStartDateTime, 1, AdcircStartTime )
+   SwanTimeStep = NINT( ( AdcircStartTime - SWAN_TINIC ) / SWAN_DT )
+ENDIF
+
+! RUN: 매 ADCIRC time step
+SwanTimeStep = SwanTimeStep + 1
+IF((SwanTimeStep.GE.1).AND.(SwanTimeStep.LE.SWAN_MTC))THEN
+   CALL SWMAIN(ITIME,SwanTimeStep)        ! SWAN 실제 호출
+ENDIF
+IF((SwanTimeStep.LT.1).OR.(SwanTimeStep.GT.SWAN_MTC))THEN
+   ! SWAN 호출 skip 한 시점: output 변수 sentinel + radiation stress 0
+   Swan_HSOut(:) = -99999.D0  ! 등 6개 출력 sentinel
+   ADCIRC_SXX/SXY/SYY(:,:) = 0.D0  ! radiation stress 0 → 파-induced 응력 없음
+ENDIF
+```
+
+→ 핵심 `SWAN_MTC` 는 SWAN 측 (fort.26) `COMPUTE` 카드로부터 도출되는 MTC (Maximum Time-step Counter). 사용자 fort.26 의 COMPUTE range 가 짧을수록 `SWAN_MTC` 작음 → SWAN 호출 시간 윈도우 짧음.
+
+### 의의 + 한계
+
+- **속도 절감**: storm landfall 시간 (~24-72h) 만 SWAN 실행, 그 외 시간 ADCIRC 만 → 전체 wall-clock 큰 폭 감소 (PR body 명시: "yielded faster run times and similar accuracies")
+- **정확성**: storm 외 시간의 wave-induced radiation stress 가 0 으로 설정 → tide-driven 일반 시간 surge response 만 평가. ADCIRC-only 시뮬레이션 효과 (해당 시간 window 에서)
+- **Backward compat**: namelist 미지정 시 동작 동일
+- **Spatial control 은 phase 2 예정** — landfall 인근 mesh 영역에만 SWAN compute 제한 가능 예정
+
+### 운영 권고
+
+- 사용 시 storm landfall 시각 (best track / fort.22 GAHM record) 으로부터 적절한 buffer (예: ±24h) 잡고 `COMPUTE` 카드 범위 설정
+- buffer 너무 좁으면 long-period swell 의 영향 미흡 가능 (off-landfall arrival)
+- 검증: 동일 fort.15 + 동일 SWAN COMPUTE 전체 vs 일부 두 run 비교 후 peak surge / wave height 차이 정량화 (PR body 가 명시: latest source code 로 default 시간 frame 동일 시 차이 없음)
+
 ## Next expansion
 
 - Build recipe for `padcswan` on Linux/Intel.
 - COUPWIND vs separate SWAN met forcing recipe.
 - NetCDF hot-start verification test.
 - Comparison vs older NWS=83 (legacy) coupling.
+- Spatial controls (PR phase 2) 가 merge 되면 본 노트 보강.
 
 ## References
 
 - Dietrich et al. 2011 (ADCIRC+SWAN unstructured coupling).
 - Booij et al. 1999 (SWAN baseline).
+- PR #498 <https://github.com/adcirc/adcirc/pull/498> (OPEN 2026-05-18 update).
+- CCHT-NCSU temporal/spatial controls docs <https://github.com/ccht-ncsu/Spatial-Temporal-Controls>.
 - Source: paths above.
 
 ## Provenance
