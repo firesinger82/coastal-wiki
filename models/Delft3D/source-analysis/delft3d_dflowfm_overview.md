@@ -97,7 +97,7 @@ dflowfm 는 dimr framework 와 native 결합 → [[delft3d_dimr_coupling]] (신�
 ## 8. 작성 우선순위 (남은 M-D)
 
 - `delft3d_dflowfm_kernel_scheme.md` — Stelling-Duinmeijer + Kernkamp scheme equation level
-- `delft3d_dflowfm_mdu_input.md` — MDU file 카드 family (FM의 MDF 대체)
+- ✅ [`delft3d_dflowfm_mdu_input.md`](delft3d_dflowfm_mdu_input.md) — MDU file `readMDUFile` 함수 + `[Time]` block + PR #900 fix (2026-05-28 verified). 나머지 block (`[geometry]` / `[hydrology]` 등) 은 후속
 - `delft3d_hydromt_dflowfm.md` — Python automation framework
 
 ## 9. 관련 자료

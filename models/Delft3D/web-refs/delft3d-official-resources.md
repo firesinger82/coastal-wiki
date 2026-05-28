@@ -184,4 +184,4 @@ GitHub API 직접 fetch (`gh release view` + `gh api compare` + `gh pr view`, 20
 #### 8.2.4 검증 한계
 
 - PR open 상태 — 최종 merge 형식 변경 가능 (squash · 추가 commit 등)
-- `unstruc_model.f90` +113 -112 의 정확한 reorder 위치는 diff 직접 read 후 추가 보강 가능 — `source-analysis/dflowfm` input parsing 노트에 cross-ref 추가 후속
+- ✅ `unstruc_model.f90` +113 -112 diff 직접 read 완료 (2026-05-28) → [`source-analysis/delft3d_dflowfm_mdu_input.md`](../source-analysis/delft3d_dflowfm_mdu_input.md). `[Time]` block 18 파라미터 verbatim + reorder 위치 (line 1045 ↔ line 1768) + m_flowtimes lifecycle 도해 정리
