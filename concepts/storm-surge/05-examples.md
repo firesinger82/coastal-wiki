@@ -2,8 +2,8 @@
 title: "Storm Surge 한국 case — Maemi 2003 + Hinnamnor 2022 cross-reference"
 topic: storm-surge
 canonical_source: self
-citation_status: source-needed
-verification_method: "본 위키 내 cross-reference 만 verified — 02-theory.md (Pugh §6:3 IB 식, Maemi 950 mb / Hinnamnor 920 mb 중심기압 인용) + 04-code-and-tools.md (NWS 모드·KHOA OpenAPI + archive 한계 verified) + models/ADCIRC/source-analysis/storm-surge/ 7개 노트 (NWS=13 JMA-MSM + GAHM Best Track + fort.15 운영 규칙). §1 Maemi + §2 Hinnamnor 의 중심기압·관측 surge 절대수치는 본 위키가 직접 fetch 미실시 — source-needed. **§4.1 Bolaven 2012 는 KHOA Annual Report 2012 vol.1 §7.3 직접 인용으로 verified** (별도 노트 [[khoa-annual-2012-bolaven-surge]] 분리)."
+citation_status: partial-verified
+verification_method: "본 위키 내 cross-reference 만 verified — 02-theory.md (Pugh §6:3 IB 식, Maemi 950 mb / Hinnamnor 920 mb 중심기압 인용) + 04-code-and-tools.md (NWS 모드·KHOA OpenAPI + archive 한계 verified) + models/ADCIRC/source-analysis/storm-surge/ 7개 노트 (NWS=13 JMA-MSM + GAHM Best Track + fort.15 운영 규칙). **§2 Hinnamnor 2022 는 KHOA Annual Report 2022 §3 직접 인용으로 verified** (별도 노트 [[khoa-annual-2022-hinnamnor-surge]] 분리, 2026-05-28). §1 Maemi 2003 의 중심기압·관측 surge 절대수치는 KHOA Annual Report 2003 부재 (백서 변환 2012 시작) — source-needed. **§4.1 Bolaven 2012 는 KHOA Annual Report 2012 vol.1 §7.3 직접 인용으로 verified** (별도 노트 [[khoa-annual-2012-bolaven-surge]] 분리)."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-24
 verification_by: "Claude Opus 4.7 (1M context) — 위키 내부 cross-ref만 verified, 외부 실측 수치는 source-needed 분리"
@@ -92,18 +92,28 @@ IM = 0              ! Garratt drag (Table 2.2 [[efdc-theory-v12-ch2-hydrodynamic
 
 ---
 
-## 2. Case B — Hinnamnor 2022 (힌남노, 2211호)
+## 2. Case B — Hinnamnor 2022 (힌남노, 2211호) — **verified**
 
-### 2.1 Case 개요 (source-needed)
+> 본 §는 [[khoa-annual-2022-hinnamnor-surge]] (KHOA Annual Report 2022 §3 직접 인용) 으로 verified 승격됨 (2026-05-28).
 
-| 항목 | 값 | 출처·검증 상태 |
+### 2.1 Case 개요 (verified — KHOA Annual Report 2022)
+
+| 항목 | 값 | 출처·검증 |
 |---|---|---|
-| 시기 | 2022-09-06 ~ 07 | KMA·JMA RSMC Best Track — fetch 필요 |
-| 한국 경로 | 동해 남부, 포항·울산·부산 영향 | KMA Best Track 트랙 — fetch 필요 |
-| 중심기압 (최저, 전체) | 920 mb | 본 위키 [02-theory.md §2.2 표](02-theory.md#22-한국-적용--태풍-ib-surge) 인용 (JMA RSMC 원본 fetch 필요, 한반도 접근 시 약화될 수 있음) |
-| 최대 surge | ~1.5 m 포항·울산 | 본 위키 [01-concept.md §3.2 표](01-concept.md#32-한국-주요-태풍-storm-surge-case-khoa-annual-report-인용) 인용 (KHOA Annual Report 2022 §3.x fetch 필요) |
+| 시기 | 2022-09-06 ~ 07 (한반도 상륙) | KHOA 2022 line 3350, 4486 ✓ |
+| 한국 경로 | **남동해안 직격** — 포항·울산이 주 영향 | KHOA 2022 line 3350 ✓ |
+| 중심기압 (최저, 전체) | 920 mb (한반도 접근 시 약화) | 본 위키 [02-theory.md §2.2 표](02-theory.md#22-한국-적용--태풍-ib-surge) (JMA RSMC 원본 fetch 필요) — partial |
+| **포항 최대 surge peak** | **137.0 cm** (2022-09, 19년 최대치) | KHOA 2022 표 3-258·3-259 ✓ |
+| 포항 9월 편차 (누년대비) | **+36 cm** | KHOA 2022 표 3-259 ✓ |
+| 울산 최대 (9월) | 124.0 cm (+5 cm 편차) | KHOA 2022 표 3-253·3-254 ✓ |
+| 마산 (영향 없음 확인) | 227 cm (누년대비 **-38 cm**) | KHOA 2022 표 3-223·3-224 ✓ |
+| 통영 (영향 없음 확인) | 302 cm (누년대비 -55 cm) | KHOA 2022 표 3-213·3-214 ✓ |
+| 생일도 부이 최대 유의파고 | **5.81 m** | KHOA 2022 line 4486 ✓ |
+| 9월 월평균 풍속 (전국) | **18.6 m/s** (월별 최고) | KHOA 2022 line 4212 ✓ |
 | 침수 피해 | 포항 일대 침수 (제철소 등) | 언론·KMA 사후 보고 — fetch 필요 |
-| 분류 | recent extreme TC | 한국 동해안 storm-surge 의 최근 reference case |
+| 분류 | recent extreme TC, 동해 직격 | 한국 동해안 storm-surge 의 최근 reference case |
+
+핵심 정량 finding: **동해 직격 경로** → 포항만 +36 cm 양의 spike, 남해안 (마산·통영)은 누년 9월보다 30-55 cm 낮음. Hinnamnor 2022 ≠ Maemi 2003 (남해 직격) pattern. 상세 정점별 데이터 + 해역 평균 표 + Bolaven 2012 대비는 [[khoa-annual-2022-hinnamnor-surge]] §2-3.
 
 ### 2.2 본 위키 도구로 풀어보기 — Hinnamnor hindcast workflow (verified)
 
@@ -113,7 +123,11 @@ IM = 0              ! Garratt drag (Table 2.2 [[efdc-theory-v12-ch2-hydrodynamic
 
 $$\eta_{IB} = -\frac{(920 - 1013)}{1025 \times 0.0981} \approx +0.93 \text{ m}$$
 
-→ 정적 IB 만 +93 cm. 관측 ~1.5 m 와 비교 → 나머지 ~0.6 m 는 wind set-up + tide-surge + wave setup. **Maemi 대비 동해 (수심 ↑) 라 wind set-up 작은 것이 일관** (Pugh §6:4 의 $\tau_w / \rho g H$ 식 — $H$ 클수록 set-up 작음, [02-theory.md §3](02-theory.md)).
+→ 정적 IB 만 +93 cm. 관측 **포항 137 cm** (KHOA 2022 verified) 와 비교 → IB 가 대부분 + wind set-up·tide-surge·wave setup ~44 cm 추가 기여 추정.
+
+**주의**: 920 mb 는 Hinnamnor 의 전체 trajectory 최저값. 한반도 접근 시 약화되었을 가능성 — 정확한 한반도 접근 시 중심기압은 KMA·JMA Best Track 직접 fetch 필요 (partial verified, [[khoa-annual-2022-hinnamnor-surge]] §6).
+
+**Maemi 대비 동해 (수심 ↑) 라 wind set-up 작은 것이 일관** (Pugh §6:4 의 $\tau_w / \rho g H$ 식 — $H$ 클수록 set-up 작음, [02-theory.md §3](02-theory.md)) — 포항 +36 cm 편차는 만 안쪽이라 wind set-up 일부 발달, 마산 -38 cm 는 직격 경로 밖.
 
 #### Step 2: ADCIRC NWS 모드 선택 (verified)
 
@@ -133,22 +147,23 @@ RampMete = 86400
 WTIMINC = 3600     ! JMA-MSM 의 1 h
 ```
 
-#### Step 4: KHOA 정점 검증 (verified)
+#### Step 4: KHOA 정점 검증 — **KHOA Annual Report 2022 경로** (verified)
 
-[04-code-and-tools.md §4.1](04-code-and-tools.md#41-실시간-조위-관측) workflow — 2022-09-06 인천·포항·울산·부산 fetch (KHOA OpenAPI archive 가 2022 까지 안정 확보):
+KHOA OpenAPI `surveyTideLevel` 은 archive **~1년 rolling** ([04-code-and-tools.md §4.1 Archive 한계](04-code-and-tools.md#41-실시간-조위-관측)) → 2026 시점에서 Hinnamnor 2022 자료 fetch 불가. **KHOA Annual Report 2022 PDF (markdown 변환) 가 verified source**:
 
-```python
-# 본 위키 04-code-and-tools.md §4.1 의 패턴 — Hinnamnor 시점
-params = {
-    "obsCode": "DT_0001",  # 인천, 또는 포항·울산 정점 코드
-    "reqDate": "20220906",
-    "min": 10,
-    "numOfRows": 144,
-}
-# residual = tdlvHgt - bscTdlvHgt
-```
+| 정점 | 2022 9월 고극조위 | 누년대비 편차 | 출처 |
+|---|---|---|---|
+| **포항** | **137.0 cm** | **+36 cm** (양의 최대) | KHOA 2022 표 3-258·3-259 |
+| 울산 | 124.0 cm | +5 cm | KHOA 2022 표 3-253·3-254 |
+| 마산 | 227 cm | -38 cm (영향 없음) | KHOA 2022 표 3-223·3-224 |
+| 통영 | 302 cm | -55 cm (영향 없음) | KHOA 2022 표 3-213·3-214 |
+| 동해안 평균 | 92.6 cm | -0.6 cm | KHOA 2022 표 3-5 |
+| 서해안 평균 | 747.2 cm | -25.2 cm | KHOA 2022 표 3-5 |
+| 남해안 평균 | 312.8 cm | -25.5 cm | KHOA 2022 표 3-5 |
 
-→ [[experience-khoa-tide-surge-coupling]] ([[reference-next-session-candidates]] C3) 의 candidate 케이스로 직접 fetch 가치 큼.
+→ **동해안만 누년 수준 유지 (편차 -0.6 cm)**. 다른 해역은 -25 cm. Hinnamnor 동해 직격 정량 입증.
+
+상세는 [[khoa-annual-2022-hinnamnor-surge]] §2.
 
 ### 2.3 본 위키 안 cross-reference
 
@@ -169,15 +184,16 @@ params = {
 
 | 항목 | Maemi 2003 | Hinnamnor 2022 | 본 위키 식·도구 |
 |---|---|---|---|
-| **경로** | 남해 직격 (마산) | 동해 남부 통과 | KMA Best Track — fetch 필요 |
-| **중심기압** | 950 mb | 920 mb | [02-theory.md §2.2](02-theory.md) — source-needed |
-| **IB 정적 (계산)** | +0.63 m | +0.93 m | Pugh §6:3, [02-theory.md §2 Eq](02-theory.md) — verified 계산 |
-| **관측 surge peak** | ~2.4 m 마산 | ~1.5 m 포항·울산 | [01-concept.md §3.2](01-concept.md) — source-needed |
-| **IB / 관측 비** | 0.26 | 0.62 | wind set-up + tide-surge 의 상대 기여 추정 |
-| **주된 비-IB 기여** | wind set-up + tide-surge interaction (마산만 천해·tide ↑) | wind set-up (동해 깊은 수심에서 작음) | Pugh §6:4, §7:8 |
+| **경로** | 남해 직격 (마산) | **남동해안 직격** (포항·울산) | KMA Best Track / KHOA 2022 line 3350 ✓ |
+| **중심기압 (trajectory 최저)** | 950 mb | 920 mb | [02-theory.md §2.2](02-theory.md) — partial |
+| **IB 정적 (계산)** | +0.63 m | +0.93 m | Pugh §6:3 verified 계산 |
+| **관측 surge peak** | ~2.4 m 마산 (source-needed) | **포항 137 cm = +36 cm 누년편차** ✓ | KHOA 2022 표 3-258 |
+| **반대 해역 영향** | (자료 미)  | 마산 -38 cm, 통영 -55 cm 누년편차 (영향 없음) ✓ | KHOA 2022 표 3-223·3-213 |
+| **IB / 관측 비** | 0.26 | **0.68** (0.93 / 1.37) | wind set-up + tide-surge 의 상대 기여 추정 |
+| **주된 비-IB 기여** | wind set-up + tide-surge interaction (마산만 천해·tide ↑) | wind set-up (동해 깊은 수심에서 작음, 만 안쪽 일부) | Pugh §6:4, §7:8 |
 | **표준 NWS 모드 (학술)** | NWS=20 GAHM + KMA Best Track | NWS=13 JMA-MSM (5 km) + GAHM 비교 | [04-code-and-tools.md §1](04-code-and-tools.md) |
-| **KHOA archive** | 2003 — 한계 가능 (PDF fallback) | 2022 — 안정 fetch 가능 | [04-code-and-tools.md §4](04-code-and-tools.md) |
-| **wave coupling 권장** | ADCIRC + SWAN (마산만 천해 wave setup ↑) | ADCIRC + SWAN (동해 deep, wave setup 중간) | [04-code-and-tools.md §3](04-code-and-tools.md) |
+| **KHOA archive** | 2003 — 부재 (백서 2012부터) | 2022 — OpenAPI 1년 한계 → **KHOA Annual 2022 PDF verified** ✓ | [04-code-and-tools.md §4](04-code-and-tools.md), [[khoa-annual-2022-hinnamnor-surge]] |
+| **wave coupling 권장** | ADCIRC + SWAN (마산만 천해 wave setup ↑) | ADCIRC + SWAN (생일도 부이 H_s = 5.81 m verified ✓) | [04-code-and-tools.md §3](04-code-and-tools.md) + KHOA 2022 line 4486 |
 
 ### 3.2 한국 storm-surge 의 climate cascade 관점
 
@@ -209,7 +225,7 @@ ADCIRC 가 한국 storm-surge 의 primary unstructured 모델이라면, **EFDC+ 
 | Sanba (산바) | 2012 | 남해 동부 | ~1.5 m 부산 (source-needed) | Hinnamnor 와 유사 magnitude |
 | **Bolaven (볼라벤)** | **2012-08-29** | 서해 종단 | ~1.2 m 인천 (source-needed) + **군산 외해 ADCP 잔차류 verified** | **§4.1 보강 (verified case)** |
 | Lingling (링링) | 2019 | 서해 북상 | ~1.0 m 인천 (source-needed) | 서해 storm-surge baseline |
-| **Hinnamnor (힌남노)** | 2022 | 동해 남부 | ~1.5 m 포항·울산 (source-needed) | **본 노트 §2** |
+| **Hinnamnor (힌남노)** | 2022 | **남동해안 직격** | **포항 137 cm verified ✓** (KHOA 2022) | **본 노트 §2** ([[khoa-annual-2022-hinnamnor-surge]]) |
 
 ### 4.1 Bolaven 2012 verified — 군산 외해 ADCP 잔차 조류
 
@@ -238,15 +254,16 @@ ADCIRC 가 한국 storm-surge 의 primary unstructured 모델이라면, **EFDC+ 
 
 ## 5. Source-needed 보강 우선순위
 
-본 노트의 verified 승격 (citation_status: source-needed → verified) 위한 작업 큐:
+본 노트의 verified 승격 (partial-verified → verified) 위한 잔여 작업:
 
-1. **KMA·JMA RSMC Best Track 직접 fetch** — Maemi 2003 + Hinnamnor 2022 의 트랙·시간별 중심기압·풍속·반경 → [02-theory.md §2.2 표](02-theory.md#22-한국-적용--태풍-ib-surge) 의 950 mb / 920 mb 검증
-2. **KHOA Annual Report 2003 + 2022 §3.x 직접 인용** — 관측 surge peak 수치 (마산 ~2.4 m, 포항·울산 ~1.5 m) verified 검증
-3. ~~**KHOA OpenAPI 직접 fetch**~~ — ❌ **불가 (verified 2026-05-24)**. [`04-code-and-tools.md §4.1 Archive 한계`](04-code-and-tools.md#41-실시간-조위-관측) 의 measurement — `surveyTideLevel` 의 retention 이 약 1년 (cut-off 2024-12-31 NODATA / 2025-01-01 OK). Hinnamnor 2022 + Maemi 2003 모두 archive 밖. → **2 (KHOA Annual Report PDF 직접)** 로 대체 필수.
-4. **Maemi hindcast 학술 논문 인용 보강** — Kang et al. 2009, Kim et al. 등 standard reference (web-refs 확보)
-5. **Hinnamnor 사후 분석 논문** — 2023-2024 출판 논문 (KMOU·KIOST·국립해양조사원)
+1. ~~**KHOA Annual Report 2022 §3.x 직접 인용 (Hinnamnor)**~~ — ✅ **완료 (2026-05-28)**. [[khoa-annual-2022-hinnamnor-surge]] 노트로 분리, 포항 137 cm / 울산 124 cm / 마산 227 cm / 통영 302 cm + 9월 편차 + 풍속 18.6 m/s + 파고 5.81 m verified.
+2. **KMA·JMA RSMC Best Track 직접 fetch** — Maemi 2003 + Hinnamnor 2022 의 트랙·시간별 중심기압·풍속·반경 → [02-theory.md §2.2 표](02-theory.md#22-한국-적용--태풍-ib-surge) 의 950 mb / 920 mb (특히 한반도 접근 시) 검증
+3. **KHOA Annual Report 2003 부재 (백서 변환 2012부터)** — Maemi 2003 verified 경로 불가. 대체 source 후보: KMA Best Track + Kang et al. 2009 / Kim et al. 학술 논문 + 마산 해양조사사무소 별도 출판물
+4. ~~**KHOA OpenAPI 직접 fetch**~~ — ❌ **불가 (verified 2026-05-24)**. [`04-code-and-tools.md §4.1 Archive 한계`](04-code-and-tools.md#41-실시간-조위-관측) 의 measurement — `surveyTideLevel` 의 retention 이 약 1년. Hinnamnor 2022 + Maemi 2003 모두 archive 밖. → **1 (KHOA Annual Report PDF 직접)** 로 대체.
+5. **Maemi hindcast 학술 논문 인용 보강** — Kang et al. 2009, Kim et al. 등 standard reference (web-refs 확보)
+6. **Hinnamnor 사후 분석 논문** — 2023-2024 출판 논문 (KMOU·KIOST·국립해양조사원)
 
-→ **우선 진행 권장 재조정 (2026-05-24)**: **2 (KHOA Annual Report PDF download)** — 3번이 archive 한계로 불가하므로 official report 가 유일한 verified 경로. 1 (Best Track) 은 KMA·JMA 공식 archive 가 영구 보존이므로 동시 진행 가능.
+→ **남은 진행 권장**: **3 (Maemi 2003 대체 source)** + **2 (KMA Best Track 직접)** — Hinnamnor §2 는 verified 완료, Maemi §1 만 source-needed 유지.
 
 > **note**: [[experience-khoa-tide-surge-coupling]] ([[reference-next-session-candidates]] C3) 는 **archive 한계로 1년 이내 storm event 만 verified 가능**. Hinnamnor 2022 verification 은 KHOA Annual Report PDF 인용 경로로 변경 필요.
 
