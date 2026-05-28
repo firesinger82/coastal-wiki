@@ -3,10 +3,10 @@ title: "Storm Surge 이론 — shallow water + IB + wind stress + tide-surge int
 topic: storm-surge
 canonical_source: self
 citation_status: verified
-verification_method: "Pugh 'Tides, Surges and Mean Sea-Level' Ch 6 (textbook/md/sea-level.md p.184-230) 직접 인용 — §6:1 Weather effects, §6:3 Atmospheric pressure (eq. 6:5), §6:4 Wind stress, §6:5 Numerical modelling, §7:8 Tide-surge interaction. ADCIRC Theory (Luettich & Westerink 2004) GWCE form. textbook/md/sea-level.md line 7370 ('one millibar will produce a decrease in sea-level of one centimetre') + line 7374 (Proudman shelf model amplification) 직접 인용. §3.4 추가 (2026-05-26): arXiv:2605.03933v1 (Sathia & Giometto 2026, 제출일 2026-05-05, 카테고리 physics.flu-dyn) abstract 직접 fetch (WebFetch 2026-05-26) — 새 PBL height scaling 두 식 u_*/β (neutral) + u_*/√(βN) (stable) + 평균 2.5% relative error verbatim 인용. ADCIRC GAHM BL Vmax 환산 cross-ref 와 한국 태풍 적용 검토는 자체 분석."
+verification_method: "Pugh 'Tides, Surges and Mean Sea-Level' Ch 6 (textbook/md/sea-level.md p.184-230) 직접 인용 — §6:1 Weather effects, §6:3 Atmospheric pressure (eq. 6:5), §6:4 Wind stress, §6:5 Numerical modelling, §7:8 Tide-surge interaction. ADCIRC Theory (Luettich & Westerink 2004) GWCE form. textbook/md/sea-level.md line 7370 ('one millibar will produce a decrease in sea-level of one centimetre') + line 7374 (Proudman shelf model amplification) 직접 인용. §3.4 추가 (2026-05-26): arXiv:2605.03933v1 (Sathia & Giometto 2026, 제출일 2026-05-05, 카테고리 physics.flu-dyn) abstract 직접 fetch (WebFetch 2026-05-26) — 새 PBL height scaling 두 식 u_*/β (neutral) + u_*/√(βN) (stable) + 평균 2.5% relative error verbatim 인용. ADCIRC GAHM BL Vmax 환산 cross-ref 와 한국 태풍 적용 검토는 자체 분석. **§3.4.4~3.4.8 추가 (2026-05-28)**: arXiv:2605.03933v1 **full PDF 34p 직접 fetch** (curl + Read tool) — derivation eq 5-32 (Pollard 1973 P73 응용 + slab model + Ri_b closure) + LES setup Appendix A (256×256×512 grid, Bou-Zeid Smagorinsky, CFL=0.075) + Table A1 216 stratified sims + Appendix B 16 neutral/mild (Set A C_R=0.58, avg 6% error / R²=0.99 / RMSE=6.92m) + parity plot stable C_S=1.2 (R²=0.99 / bias=1.04m / RMSE=23.5m) + characteristic heights (v_max 65-85% / inflow peak 6-20% of h) + eq 41-43 R-scaling h~R^((1-n)/2) + eq 44 K_m~R^(-2n) + combined formula B1 p=4 (vs ABL p=2). Wind engineering / coastal resilience 응용 명시. 비교 expressions 구체화 (Meng 1995 / Kepert 2001 / Pollard 1973 / Sous 2013 / Zilitinkevich 2007 외 closure model papers)."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-26
-verification_by: "Claude Opus 4.7 (1M context) — Pugh 본문 직접 인용 + ADCIRC theory 매핑 + §3.4 arxiv abs 직접 fetch"
+verification_by: "Claude Opus 4.7 (1M context) — Pugh 본문 직접 인용 + ADCIRC theory 매핑 + §3.4 arxiv abs 직접 fetch + §3.4.4~3.4.8 PDF 34p full read (2026-05-28)"
 verification_date: 2026-05-26
 related:
   - concepts/storm-surge/01-concept.md
@@ -219,17 +219,121 @@ ADCIRC GAHM (§3.3, NWS=20) 의 wind profile 환산 단계:
 2. 한국 태풍 (Maemi 2003, Hinnamnor 2022 — `05-examples.md` §1·§2; Bolaven 2012 — `05-examples.md` §3) 의 **eyewall 외부 surge response** 정확화
 3. ADCIRC 의 wind input 단계 (`fort.22` AHM/GAHM record) 후속 개선 — paper 가 최근 (2026-05-05 제출) 이라 직접 적용 사례 아직 없음
 
-#### 3.4.4 한계 (verified 범위 명시)
+#### 3.4.4 Analytical derivation (PDF §2, full PDF 인용)
 
-본 §3.4 는 **arXiv:2605.03933v1 abstract 직접 인용** 수준. 다음은 abstract 미명시이며 full PDF read 후 보강 가능:
+PDF §2.a Background + §2.b Derivation 직접 인용 (2026-05-28 full PDF fetch).
 
-- analytical derivation 의 정식 length scale 유도 단계
-- LES setup (격자, $Re_\tau$, 모델 풍속 범위, 강제 hurricane)
-- 비교한 기존 expressions 의 구체명 (Garratt 1992? Zilitinkevich 1972? Rotunno & Bryan 2012?)
-- eyewall **내부** 적용 가능성 — abstract 는 명시적으로 "outside the eyewall" 만
-- coastal resilience / wind engineering 적용 구체 사례
+**Naive mixing-length argument**:
 
-ADCIRC source code 변경은 아직 없음 — paper 의 reduction factor 통합은 후속 연구 가능성.
+- Time-averaged linearized HBL eq (Kepert 2001, Sathia & Giometto 2025): $\alpha(V_g-v) = d\tau_{xz}/dz$ (eq 5), $\beta u = d\tau_{yz}/dz$ (eq 6)
+- $\alpha = f + 2V_g/R$ (twice absolute angular velocity), $\beta = f + (1-n)V_g/R$ (absolute fluid vorticity, Smith & Montgomery 2020) — eq 7
+- $K_m \sim u_* l_T$, mixing length $l_T = h$ (neutral) or $l_T = u_*/N$ (stable, Zilitinkevich 2007)
+- **Naive 결과**: $h \sim u_*/I$ (neutral), $h \sim u_*/\sqrt{IN}$ (stable), where $I = \sqrt{\alpha\beta}$ (inertial freq, eq 10)
+- 저자 결론: naive 식은 **LES와 inconsistent**
+
+**제안된 식 (eq 11, 12)** — $I$ 가 아닌 $\beta$ 가 분모:
+
+$$h = C_R\,\frac{u_*}{\beta}\,(\text{neutral}), \qquad h = C_S\,\frac{u_*}{\sqrt{\beta N}}\,(\text{stable})$$
+
+**Stable case derivation (Pollard et al. 1973 응용)**:
+
+1. Slab model 적분 with Leibniz rule (eq 15-17)
+2. Surface drag $\tau_{xz}|_0 = C_D \bar{u}\sqrt{\bar{u}^2+\bar{v}^2}$, linearize → drop Rayleigh damping (eq 22)
+3. Top stress zero (Haiden & Whiteman 2005, eq 23)
+4. Solve $\tilde{u}=\tilde{v}=0$ IC → $h\bar{u}(t) = -\sqrt{\alpha/\beta}\,(C_D V_g^2/I)(1-\cos(It))$ (eq 26), $h(\bar{v}-V_g)(t) = -(C_D V_g^2/I)\sin(It)$ (eq 27)
+5. Bulk Richardson closure $Ri_b = Ri_c$ (eq 28-29) → eq 30
+6. Maximum at $It=\pi$ → eq 31, 사용 $C_D V_g^2 = u_*^2$ → **eq 32**
+
+$R \to \infty$ 시 $\beta \to f$ → $u_*/\sqrt{fN}$ = stratified ABL 표준 (Pollard 1973, Zilitinkevich 2007). **Neutral case** 는 derivation 없이 LES + Sous et al. 2013 (rotating tank spin-down) empirical 영감.
+
+#### 3.4.5 LES setup + Database (PDF §3 + Appendix A/B)
+
+**LES setup** (Appendix A — verified):
+
+- 도메인 $(2\pi \times 2\pi \times 2.5) \times 1000$ km, 격자 **256 × 256 × 512** (radial × tangential × vertical)
+- Solver: Albertson & Parlange (1999a,b) base. Pseudo-spectral collocation (Orszag 1969, 1970) horizontal + 2nd-order centered FD vertical (staggered)
+- SGS: **scale-dependent Lagrangian dynamic Smagorinsky** (Bou-Zeid et al. 2005)
+- Time stepping: explicit 2nd-order Adams-Bashforth + fractional step (Chorin 1968, Kim & Moin 1985), CFL = 0.075
+- Sponge layer 2000 m 위 (Rayleigh damping 0.01 s⁻¹)
+- 3/2 dealiasing rule (Kravchenko & Moin 1997)
+- $\theta_r = 300 + 0.005z$ K nudging (τ_r = 1 min, Chen et al. 2021a)
+- 1.5 inertial periods $T_I = 2\pi/I$ 실행, 0.5 $T_I$ skip 후 1000 snapshots
+- BC: lateral periodic, top free-lid, bottom wall-layer (Chester 2007a algebraic log-law)
+
+**216 stratified simulations (Table A1)**:
+
+| Param | Values | n |
+|---|---|---|
+| $V_g$ (m/s) | 30, 45, 60 | 3 |
+| $n$ (radial gradient) | 0.25, 0.5 | 2 |
+| $G_z$ (s⁻¹) | -0.02, -0.04 | 2 |
+| $f$ (s⁻¹) | 5×10⁻⁵, 1×10⁻⁴ | 2 |
+| $R$ (km) | 40, 80, 120 | 3 |
+| $z_0$ (m) | 10⁻³, 10⁻², 10⁻¹ (ocean/intermediate/land) | 3 |
+| **Total** | | **216** |
+
+Database: NSF DesignSafe Data Depot (Sathia & Giometto 2026, DOI:10.17603/DS2-5TC9-XR68).
+
+**16 추가 neutral + mildly stratified (Table B1)**: Set A (8 neutral runs, $G=45/60$, $R=30/35$, $n=0/0.25$) + Set B (8 with $N$ in geometric progression $10^{-4}$ → $10^{-2}$).
+
+#### 3.4.6 Validation results (PDF §3 + Appendix B)
+
+**Stable (eq 32)** — $C_S$ 결정:
+
+- LES (216 runs): $C_S = 1.2$, average relative error $\sim 2.5\%$, **bias = 1.04 m, RMSE = 23.5 m, $R^2 = 0.99$** (Fig 5 parity plot)
+- Observation fit (5 cases Table 1: Chen V25/V35/V45 + Bryan V40/V60): $C_S = 1.44$ (slightly higher)
+
+**Neutral (eq 11)** — $C_R$ 결정 (Appendix B Set A 8 runs):
+
+- $C_R = 0.58$, average error $6\%$, **bias = 2.93 m, RMSE = 6.92 m, $R^2 = 0.99$** (Fig B2)
+
+**Combined formula (eq B1)** — neutral + stable transition:
+
+$$\left(\frac{1}{h}\right)^p = \left(\frac{\beta}{C_R\,u_*}\right)^p + \left(\frac{\sqrt{\beta N}}{C_S\,u_*}\right)^p$$
+
+- Zilitinkevich (2007) 은 ABL 에 $p=2$ 추천. 저자: HBL 은 **$p=4$ 더 좋음** ($f \ll N$ 이고 $\beta$ 가 $N$ 과 비교 가능한 magnitude)
+
+**Characteristic heights (PDF §4)** — 다른 BL 길이 scale 도 $h$ 의 fraction:
+
+| Quantity | Fraction of $h$ |
+|---|---|
+| Tangential velocity peak ($v_{max}$) | 65-85% ($\sim$80% 정점, Zhang 2011 정합) |
+| Radial inflow peak | 6-20% (정점 $\sim$10%) |
+| Inflow depth (first $u>0$) | 86-98% |
+| Tangential depth (first $v<G$) | 108-111% |
+
+#### 3.4.7 Scaling with radius (PDF §4)
+
+$f$ 무시 + $N, n$ 상수 가정 + $G \sim R^{-n}$ (Bryan 2017b) 가정 시 (eq 41-43):
+
+$$h \sim u_* \sqrt{R/G} \sim R^{(1-n)/2} \quad (\text{stable})$$
+
+vs **neutral**: $h \sim u_*/\beta \sim R$ (linear).
+
+Eddy viscosity 변화 (eq 44):
+
+| Stratification | $K_m$ scaling |
+|---|---|
+| Stable | $K_m \sim u_*^2/N \sim G^2 \sim R^{-2n}$ (radial decrease, twice gradient wind 속도) |
+| Neutral | $K_m \sim u_* h \sim G^2/\beta \sim R^{1-n}$ (radial increase) |
+
+Stern & Nolan (2009), Zhang & Drennan (2012) 관측: $K_m$ near eyewall 크고 멀어질수록 감소 → **stratification scaling 과 정합** (neutral 식은 반대 부호라 inconsistent).
+
+#### 3.4.8 한계 + 후속 (verified 범위 명시 — 2026-05-28 update)
+
+기존 §3.4.4 한계 항목 (2026-05-26) 모두 PDF 본문 인용으로 해소:
+
+- ✅ analytical derivation → §3.4.4 (Pollard 1973 응용)
+- ✅ LES setup → §3.4.5 (216 sims, 256×256×512 grid, Bou-Zeid Smagorinsky)
+- ✅ 비교한 expressions → Meng 1995, Kepert 2001, Sathia & Giometto 2025 (constant eddy viscosity $\sqrt{2K/I}$) / Zilitinkevich 2007 (ABL) / Pollard 1973 (P73 ocean mixed layer) / Sous 2013 (rotating tank) / 외 closure papers (Foster 2009, Nolan 2009, Kepert 2012, Gopalakrishnan 2013/2021, Zhang 2015/2017, Chen 2021-2023, Romdhani 2022, Matak & Momen 2023, Vickery 2009 wind engineering)
+- ⚠ **eyewall 적용 가능성**: V45 (Chen 2021a) 의 nose feature 가 eyewall proximate regime 이지만, 본 derivation 가정 (avg vertical advection 무시 + 도메인 < R) 밖. 그럼에도 outer region collapse 가 양호하다는 partial evidence (PDF §3c 직접 인용): "the profile nevertheless collapses satisfactorily with the others, and the proposed scaling continues to perform well". eyewall **내부** 명시적 적용은 제외
+- ✅ Wind engineering / coastal resilience 응용: turbulent inflow generators (tall building + wind turbine 풍하중), reduced-order surrogate model uncertainty 감소 (wind energy + coastal hazard analysis). NIST 자금 Grant 70NANB22H057, Anvil (Purdue) ATM180022
+
+**ADCIRC 통합 후속** (위키 자체 분석):
+
+- ADCIRC source code 의 reduction factor 가 새 $h \sim u_*/\sqrt{\beta N}$ scaling 기반으로 갱신 가능
+- 한국 태풍 hindcast (Maemi 2003, Hinnamnor 2022 → `05-examples.md` §1·§2; Bolaven 2012 → §3) 의 eyewall 외 surge response 검증 case 후보
+- Paper 가 신규 (2026-05 제출) — 코드 통합 사례 아직 없음. 향후 ADCIRC PR / NIFS KOOS workflow 채택 시 추적
 
 ## 4. Tide-Surge Interaction (Pugh §7:8)
 
