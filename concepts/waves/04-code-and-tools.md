@@ -3,10 +3,10 @@ title: "파랑 — 04 코드와 도구 (SWAN·WAVEWATCH III·XBeach)"
 topic: waves
 canonical_source: self
 citation_status: verified
-verification_method: "AI cross-reference: textbook/md/Waves-Holthuijsen2007.md Ch.9 (SWAN canonical) + WebSearch acc. 2026-05-21 (WW3 NOAA, XBeach Deltares) + swan-library-firesinger 사용자 자료."
+verification_method: "AI cross-reference: textbook/md/Waves-Holthuijsen2007.md Ch.9 (SWAN canonical) + WebSearch acc. 2026-05-21 (WW3 NOAA, XBeach Deltares) + swan-library-firesinger 사용자 자료. §3.4 추가 (2026-05-28): NOAA-EMC/WW3 Issue #1600 (UK Met Office ukmo-rwdavies, OPEN 2026-05-20) GitHub Issues API 직접 fetch — bug body verbatim 인용 (SMC nested grid boundary point mismatch → coastline spurious wave energy), 재현 절차 + 한국 SWAN nested 흐름 영향 자체 분석. Fix PR 제출 예정 (status tracking)."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-21
-verification_by: "Claude Opus 4.7 (1M context) — cross-ref + WebSearch"
+verification_by: "Claude Opus 4.7 (1M context) — cross-ref + WebSearch + WW3 Issue #1600 GitHub API 직접 fetch (2026-05-28)"
 verification_date: 2026-05-21
 ---
 
@@ -104,6 +104,40 @@ Source terms (Holthuijsen Ch.9 §9.3):
 | 한국 사용 | 사용자 WINK 패턴 | 외해 일반 (NOAA 기반) |
 
 → 한국 외해 풍파 forcing은 WW3 글로벌 hindcast (예: NOAA/IOWAGA) → SWAN nested run의 표준 흐름.
+
+### 3.4 SMC nested grid boundary issue ([Issue #1600](https://github.com/NOAA-EMC/WW3/issues/1600), OPEN 2026-05-20)
+
+WW3 SMC (Spherical Multi-Cell) nested grid 운영 시 boundary point mismatch 로 인한 spurious energy bug — UK Met Office 발견 (`ukmo-rwdavies`, 2026-05-20 issue 등록, fix PR 예정). GitHub Issues API 직접 fetch (2026-05-28).
+
+**Bug 메커니즘** (issue body verbatim):
+
+> "Wave energy has been seen to be added along all coastlines of a nested SMC grid model. This has occurred in cases where a boundary point at which lateral boundary conditions are supplied by an outer (e.g. Global) model is not matched with a sea-point within a nested grid."
+
+**재현 절차**:
+
+1. WW3 simulation with outer (e.g. Global) + nested SMC (e.g. regional) model
+2. Outer 의 `ww3_grid.nml` 의 `&OUTBND_LINE_NML` namelist 에 boundary output points 지정
+3. **그 중 최소 1개 point 가 nested model 의 sea (wet) cells 외 위치**
+4. Nested model 을 **quiescent IC + no wind input** (lateral boundary forcing 만)
+5. 시뮬레이션 진행 시 모든 coastline cells 에서 매 time-step spurious wave energy 누적
+
+**증상**:
+
+- 모든 coastline cell 에서 동일한 magnitude · direction 의 spurious wave energy
+- Boundary 에서 domain interior 로 전파
+- T+12h 시점 Hs 의 colorbar cap (≤ 1m) 적용해도 coast 인근 spurious signal 명확 (issue 첨부 screenshot)
+- 비교: boundary point 모두 sea cell 매치 시 spurious signal 없음
+
+**한국 적용 영향**:
+
+- 한국은 WW3 글로벌 → SWAN nested 흐름 (§3.3 line 106) — SWAN nested 시 boundary points 모두 sea cell 매치 검증 필요
+- NOAA WW3 글로벌 hindcast → 한국 SMC nested (또는 SWAN nested) 시점에 boundary mismatch 검증 권장
+
+**Status (2026-05-28)**:
+
+- Issue OPEN, mingchen-NOAA collaborator confirmed (2026-05-20)
+- UK Met Office 의 fix PR 제출 예정 ("This issue will be addressed by the UK Met Office and a pull request will follow")
+- Fix merge 후 본 §3.4 본문 갱신 + WW3 release note 추적
 
 ## 4. XBeach
 

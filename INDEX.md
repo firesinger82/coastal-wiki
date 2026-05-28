@@ -7,7 +7,7 @@
 | 토픽 | 상태 | 비고 |
 |---|---|---|
 | [tides](concepts/tides/) | **DRAFT** (01-05 verified, 06 source-needed) | 조석 — 5/6 verified. 06은 `models/<model>/` 작성 후 verified 가능 |
-| [waves](concepts/waves/) | **STABLE** (01-06 verified) | 파랑 — 6/6 verified. Holthuijsen 2007 + KHOA 284 용어 + SWAN library + MPT 74정점 |
+| [waves](concepts/waves/) | **STABLE** (01-06 verified + 04 §3.4 WW3 SMC boundary issue verified) | 파랑 — 6/6 verified. Holthuijsen 2007 + KHOA 284 용어 + SWAN library + MPT 74정점 + **04 §3.4 WW3 SMC nested grid boundary mismatch spurious energy bug (Issue #1600 OPEN, UK Met Office, 2026-05-28 GitHub API verbatim)** |
 | [sediment-transport](concepts/sediment-transport/) | **STABLE** (01-04·06 verified, 05 source-needed) | 표사이동 — 5/6 verified. Soulsby 1997 + KHOA 113 용어 + EFDC SED (Original/SEDZLJ) + Delft3D/XBeach/ROMS source-analysis 통합 |
 | [currents](concepts/currents/) | **DRAFT** (01-05 verified, 06 source-needed) | 조류 — 5/6 verified (UTide 2D + 수치조류도 + KHOA 60+ 용어). 동해 수치조류도 미커버 명시 |
 | [sst](concepts/sst/) | **STABLE** (01·02·03·04·05 verified, 06 source-needed) | 해수면 수온 — 5/6 verified. 01 정의, 02 heat budget, 03 회귀·MHW, 04 5 데이터셋 운영, 05 MHW 식별 실행 (13정점 ~180 events). experience/ 4건 연결 |
