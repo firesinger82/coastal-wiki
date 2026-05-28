@@ -12,7 +12,7 @@ verification_date: 2026-04
 
 ## Scope
 
-How EFDC+ runs the original Mellor-Yamada 2.5 closure (CALQQ1 / CALQQ2T + CALAVB), how `ISTOPT(0)` selects Galperin / Kantha-Clayson / Kantha 2003 stability functions, how the modern GOTM_Turbulence module replaces it when `ISGOTM > 0`, and how `q²` and `q²L` boundary conditions are imposed at surface and bottom. Use this when picking a closure, swapping in GOTM, or interpreting `AV/AB/AQ` output.
+How EFDC+ runs the original Mellor-Yamada 2.5 closure (CALQQ1 / CALQQ2T + CALAVB), how `ISTOPT(0)` selects Galperin / Kantha-Clayson / Kantha 2003 stability functions, how the modern GOTM_Turbulence module replaces it when `ISGOTM > 0`, and how `q²` and `q²L` boundary conditions are imposed at surface and bottom. Use this when picking a closure, swapping in GOTM, or interpreting `AV/AB/AQ` output. **수평 운동량 확산 (HMD, Smagorinsky)은 본 노트 범위 밖** — [[efdc_dispersion]] 참조.
 
 ## Source basis
 

@@ -30,6 +30,7 @@ How EFDC+ assembles momentum and continuity, splits external (depth-integrated 2
 - Coriolis + curvature: `CAC = FCORC + metric + HP` (`calexp.f90:571`); `FCAX/FCAY` (`:620-621`).
 - Vertical sums to depth-integrated `FCAXE/FCAYE`, `FXE/FYE` (`calexp.f90:1133-1136`; `calexp2t.f90:1053-1056`).
 - Wind / bottom / pressure enter in **CALPUV**, not CALEXP: `FUHDYE/FVHDXE = old_flow − pressure_grad + DELT*(wind − bottom + Coriolis + buoyancy − advection)` at `calpuv9c.f90:256-257` (3TL), `calpuv2c.f90:224-226` (2TL).
+- Horizontal momentum diffusion (`FMDUX/FMDUY/FMDVY/FMDVX`)은 `CALHDMF`(2TL) 또는 `CALHDMF3`(3TL) 에서 계산되어 CALEXP의 viscous flux divergence 항으로 합산 — 상세는 [[efdc_dispersion]] (Smagorinsky + AHO).
 - Implicit bottom/vegetation drag coefficients `RCX/RCY` at `calpuv9c.f90:269-270`, applied at `:287-288`.
 
 ## B. External continuity (CALPUV9C / CALPUV2C)
