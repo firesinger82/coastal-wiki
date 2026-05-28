@@ -53,8 +53,9 @@ os.chdir(WIKI_ROOT)
 TARGET_ROOTS = ("concepts", "models", "experience")
 GOVERNANCE_EXEMPT = {"research/README.md", "research/manifest.md"}
 # research/prompts/ 는 Hermes 운영 자산 (cron 등록용 prompt 파일).
-# 본문성 아닌 governance 라서 frontmatter 면제. 정책: research/README.md §역할.
-GOVERNANCE_EXEMPT_PREFIXES = ("research/prompts/",)
+# research/seeds/ 는 Hermes literature-monitoring skill 의 검색 seed keyword 정의.
+# 둘 다 본문성 아닌 governance 라서 frontmatter 면제. 정책: research/manifest.md §역할 분리.
+GOVERNANCE_EXEMPT_PREFIXES = ("research/prompts/", "research/seeds/")
 
 
 def is_governance_exempt(path: str) -> bool:

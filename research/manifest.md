@@ -80,7 +80,14 @@ PINN "shallow water equations"
 - 주간 digest: `research/digests/YYYY-WW-coastal-modeling.md`
 - 월간 digest: `research/digests/YYYY-MM-coastal-modeling.md`
 - 추적 대상: `research/watchlist/*.md`
+- 검색 seed 키워드: `research/seeds/keywords.md`
 - prompt 파일(governance): `research/prompts/*.md`
+
+### `seeds/` vs `watchlist/` 역할 분리 (2026-05-28 명시)
+
+- **`seeds/keywords.md`**: literature monitoring skill (Hermes `coastal-research`) 의 **일반 검색 쿼리 키워드**. 모델명·기관·현상 등 generic 검색어. 수집 파이프라인 입력.
+- **`watchlist/`**: **특정 추적 대상** (저자·기관·repo·저널 individual entity). 파일 단위 (author-*.md / institution-*.md / journal-*.md / repo-*.md). 신규 발견 entity 가 반복 등장 시 watchlist 등록.
+- 둘은 통합하지 않는다. seed 는 검색 *입력*, watchlist 는 모니터링 *대상*.
 
 ## 운영 빈도
 
