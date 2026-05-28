@@ -48,6 +48,8 @@ Runtime dispatch in `SSEDTOX`:
 
 ## B. SEDZLJ active-layer / multi-bed model
 
+> 본 §는 dispatch + 핵심 변수 overview. **SEDZLJ_MAIN/SEDZLJ/SEDZLJ_SHEAR/SEDZLJ_SLOPE/BEDLOADJ 의 sub-routine deep coverage 는 [[efdc_sedzlj]]** (Christoffersen-Jonsson 1985 wave-current, Gessler 1965 / Krone deposition probability, Sedflume erosion rate, Van Rijn 1981 bedload, Lick 2009 slope correction).
+
 SEDZLJ-specific arrays allocated under `if( LSEDZLJ )`: `BULKDENS, D50, LAYERACTIVE, PERSED, TAU, TAUCOR, TSED, TSED0, ...` (`varalloc.f90:1119-1156`).
 
 Core / layer input arrays in `SEDIC`: `ERATE, PNEW, TAUTEMP, TSED0S, ...` (`SedTran-SEDZLJ/s_sedic.f90:226-236`).
