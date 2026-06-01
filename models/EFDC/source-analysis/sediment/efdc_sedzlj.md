@@ -427,9 +427,59 @@ C36 | ISEDINT | ISEDBINT | NSEDFLUME | ISMUD | ISNDWC | ISEDVW | ISNDVW | KB | I
 
 ## 10. 미해결 / 추가 보강 후보
 
-- `s_sedic.f90` (769 lines) — bed initial-condition reader (SEDB.INP / BEDLAY.INP / SEDFLUME experimental data). 별도 노트 [[efdc-sedzlj-initialization]] 후보.
+- ~~`s_sedic.f90` (769 lines) — bed initial-condition reader.~~ **§11 partial verified (2026-06-01) — line 1-120 compact. SEDB.INP/BEDLAY.INP variable bed read 부분 + Sedflume table read 부분 별도.**
 - `s_tecplot.f90` (310 lines) — SEDZLJ Tecplot 출력 — 분석 측면에서 별도 노트 필요 시.
 - Propwash 연동 (`Variables_Propwash` use, line 27) — `s_sedzlj.f90:135-180, 559-617` 의 `PROP_ERO(L,1:NSEDS)` 처리. [[efdc-propwash]] (별도 노트) 후보.
 - Mass erosion fast class (`NSEDS2 > NSEDS`, `s_sedzlj.f90:165-180, 604-617`) — propwash 시 fast/normal 분리 동작.
-- Toxics linkage (`NSEDFLUME = 99`) — `s_main.f90:1` change record 의 "Toxics and bedload mass balance updates" — `caltox*.f90` 와 통합 추적.
+- Toxics linkage (`NSEDFLUME = 99`) — **deprecated 2016-12 ([[efdc_sedzlj]] §11.4)**. 매뉴얼 Card C36 의 NSEDFLUME=99 표기는 stale → ISTRAN(5)>0 가 현행.
 - Wave-current 식 번호와 Christoffersen-Jonsson 1985 원논문 페이지 cross-check (현재는 코드 코멘트 기준 인용).
+
+## 11. SEDIC initialization (`s_sedic.f90`, 769 lines, line 1-120 verified 2026-06-01)
+
+§10 후보 중 SEDIC 첫 120 라인 compact verified.
+
+### 11.1 Subroutine 호출 + 입력 파일 (line 53-58, master process)
+
+```fortran
+open(UNIT = 10, FILE = 'erate.sdf')   ! line 57 - Sedflume erosion rate table + TACTM
+open(UNIT = 30, FILE = 'bed.sdf')     ! line 58 - bed parameters + size class
+```
+
+### 11.2 bed.sdf 입력 (line 63-96)
+
+```fortran
+read(30,*) VAR_BED, KB, ICALC_BL, SEDSTEP, SEDSTART, IHTSTRT, IMORPH, ISWNWAVE, MAXDEPLIMIT, HPMIN
+if( HPMIN < 0.003 .or. HPMIN >= 1.0 ) HPMIN = 0.25                  ! line 65 fallback
+if( SEDSTEP < TIDALP/REAL(NTSPTC) ) SEDSTEP = TIDALP/REAL(NTSPTC)    ! line 67
+
+read(30,*) ZBSKIN, TAUCONST, ISSLOPE, BEDLOAD_CUTOFF                 ! line 80
+read(30,*) (D50(K), K=1,NSEDS)                                       ! line 84 - 중앙 입경
+read(30,*) (TCRE(K), K=1,NSEDS)                                      ! line 88 - 침식 임계
+read(30,*) (TCRSUS(K), K=1,NSEDS)                                    ! line 92 - 부유 임계
+read(30,*) (DWSIN(K), K=1,NSEDS)                                     ! line 96 - 침강속도 입력
+```
+
+매핑:
+- `VAR_BED` = 1 → spatially varying bed
+- `KB` = max bed layer (Card C36 일치)
+- `HPMIN` = SEDZLJ 활성 최소 수심 (m), [0.003, 1.0] 외 시 0.25 fallback
+- `ZBSKIN` = bed skin friction roughness ([[efdc_sedzlj]] §3.2 s_shear:243)
+- `TAUCONST` > 0 → spatial constant shear ([[efdc_sedzlj]] §3.6)
+- `ISSLOPE` = bed slope correction 활성 ([[efdc_sedzlj]] §4)
+- `BEDLOAD_CUTOFF` = D50 임계 (Krone vs Gessler dispatch, [[efdc_sedzlj]] §2.1)
+
+### 11.3 erate.sdf (line 112-113)
+
+```fortran
+read(10,*) TACTM   ! active layer thickness multiplier — [[efdc_sedzlj]] §2.4 핵심 식 입력
+```
+
+### 11.4 NSEDFLUME = 99 deprecated note (line 47-50, 정확 인용)
+
+> "2016-12 — Rearranged SEDZLJ initialization and added parameters for better toxics simulations. **Deprecated NSEDFLUME = 99 (i.e. SEDZLJ toxics) Toxics are handled by ISTRAN(5)>0. NEQUIL no longer used**. Paul M. Craig"
+
+→ §6.1 Card C36 매뉴얼 (2018-01-08) 의 "NSEDFLUME = 99" 표기는 **stale** — 현행 ISTRAN(5)>0.
+
+### 11.5 MPI broadcast (line 117-)
+
+Master only read, 그 후 `Broadcast_Scalar/Array` 분배. `mod_var_global.f90` SEDZLJ 변수 전체.
