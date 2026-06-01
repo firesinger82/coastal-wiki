@@ -3,7 +3,7 @@ title: "Storm Surge 한국 case — Maemi 2003 + Hinnamnor 2022 cross-reference"
 topic: storm-surge
 canonical_source: self
 citation_status: partial-verified
-verification_method: "본 위키 내 cross-reference 만 verified — 02-theory.md (Pugh §6:3 IB 식, Maemi 950 mb / Hinnamnor 920 mb 중심기압 인용) + 04-code-and-tools.md (NWS 모드·KHOA OpenAPI + archive 한계 verified) + models/ADCIRC/source-analysis/storm-surge/ 7개 노트 (NWS=13 JMA-MSM + GAHM Best Track + fort.15 운영 규칙). **§2 Hinnamnor 2022 는 KHOA Annual Report 2022 §3 직접 인용으로 verified** (별도 노트 [[khoa-annual-2022-hinnamnor-surge]] 분리, 2026-05-28). §1 Maemi 2003 의 중심기압·관측 surge 절대수치는 KHOA Annual Report 2003 부재 (백서 변환 2012 시작) — source-needed. **§4.1 Bolaven 2012 는 KHOA Annual Report 2012 vol.1 §7.3 직접 인용으로 verified** (별도 노트 [[khoa-annual-2012-bolaven-surge]] 분리)."
+verification_method: "본 위키 내 cross-reference 만 verified — 02-theory.md (Pugh §6:3 IB 식, Maemi 950 mb / Hinnamnor 920 mb 중심기압 인용) + 04-code-and-tools.md (NWS 모드·KHOA OpenAPI + archive 한계 verified) + models/ADCIRC/source-analysis/storm-surge/ 7개 노트 (NWS=13 JMA-MSM + GAHM Best Track + fort.15 운영 규칙). **§2 Hinnamnor 2022 는 KHOA Annual Report 2022 §3 직접 인용으로 verified** (별도 노트 [[khoa-annual-2022-hinnamnor-surge]] 분리, 2026-05-28). **§1 Maemi 2003 §1.1.1 partial-verified (2026-06-01) — Wikipedia + Park et al. JCR SI65 doi:10.2112/SI65-067.1 + eSurge + WebSearch 직접 인용. peak 910 hPa (JMA) / 885 hPa (JTWC) / Jeju national record 950 hPa / 마산 1.40 m 1403 mm / 사망 120명 / ₩5.52 trillion 손실 확보**. KHOA Annual Report 2003 부재 (백서 변환 2012 시작) — KHOA 직접 fetch source-needed. **§4.1 Bolaven 2012 는 KHOA Annual Report 2012 vol.1 §7.3 직접 인용으로 verified** (별도 노트 [[khoa-annual-2012-bolaven-surge]] 분리)."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-24
 verification_by: "Claude Opus 4.7 (1M context) — 위키 내부 cross-ref만 verified, 외부 실측 수치는 source-needed 분리"
@@ -38,6 +38,35 @@ related:
 | 최대 surge | ~2.4 m 마산 | 본 위키 [01-concept.md §3.2 표](01-concept.md#32-한국-주요-태풍-storm-surge-case-khoa-annual-report-인용) 인용 (KHOA Annual Report 2003 §3.x fetch 필요) |
 | 침수 피해 | 마산항 주변 광범위 침수 | 언론·공식 보고 — fetch 필요 |
 | 분류 | benchmark TC | 한국 storm-surge 연구의 historical reference case |
+
+#### 1.1.1 추가 verified 항목 (2026-06-01 partial-verified)
+
+WebSearch + Wikipedia + Park et al. JCR 직접 fetch:
+
+| 항목 | 값 | 출처 |
+|---|---|---|
+| Peak 시점 | 2003-09-10 1200 UTC | JMA RSMC Tokyo Annual Report 2003 (via Wikipedia) ✓ |
+| 한국 상륙 | **2003-09-12 부산 서쪽** | Wikipedia + WebSearch ✓ |
+| 중심기압 trajectory peak (JMA 10-min) | **910 hPa** | Wikipedia (JMA Best Track) ✓ |
+| 중심기압 (JTWC 1-min) | **885 hPa** | Wikipedia (JTWC 15W report) ✓ |
+| **중심기압 한반도 영향 시 (Jeju)** | **950 hPa** (national record) | Wikipedia ✓ |
+| 최대 풍속 peak (10-min, JMA) | 195 km/h (120 mph) | Wikipedia ✓ |
+| 최대 풍속 peak (1-min, JTWC) | 280 km/h (175 mph), Cat 5 | Wikipedia ✓ |
+| 풍속 한반도 상륙 시 | 140 km/h (JMA) / 165 km/h (JTWC) | Wikipedia ✓ |
+| **마산만 surge** | **1.40 m (1403 mm) on 2003-09-12, recurrence ~98 yr** | eSurge / Park et al. JCR SI 65, 2013 doi:10.2112/SI65-067.1 ✓ |
+| 사망자 | 117 (한국) + 3 (일본) = **120** | Wikipedia ✓ |
+| 한국 경제 손실 | **₩5.52 trillion** (~US$4.8B 2003) | Wikipedia ✓ |
+| Homeless / 가옥 파괴 | 25,000 / ~5,000 | Wikipedia ✓ |
+
+**Note: 본 위키 외부 실측 surge 와 추정 차이**:
+- WebSearch/eSurge/Park et al.: **마산 1.40 m (residual or selected datum)**
+- 본 위키 [01-concept.md §3.2](01-concept.md#32-한국-주요-태풍-storm-surge-case-khoa-annual-report-인용) 기존 표기: **~2.4 m**
+- 차이 가능성: (a) 1.40 m = 잔차 (residual) vs 2.4 m = 절대 해수면 above MSL (천문조 + surge 합산), (b) 측정 정점 차이 (마산 조위관측소 vs 마산만 head), (c) 자료원 차이 (KHOA 직접 측정 vs 사후 hindcast 표시). KHOA Annual Report 2003 부재로 직접 비교 불가 — **§5 보강 우선순위 2 유지**.
+
+**Maemi vs Hinnamnor 한반도 영향 시 비교**:
+- Maemi: **910 hPa peak → 950 hPa (Jeju, 한반도 영향 시)** (Wikipedia ✓)
+- Hinnamnor 2022 ([[khoa-annual-2022-hinnamnor-surge]]): trajectory peak 920 hPa → 영향 시 더 약화. 마산 영향 없음 (KHOA 2022 §3 직접: 마산 -38 cm 누년대비)
+- **Maemi 가 한반도 직격·강도 모두 더 강함**. 02-theory.md §2.2 표의 Hinnamnor "920 mb" 는 trajectory peak 기준임을 명시 필요 (한반도 접근 시는 더 약화).
 
 ### 1.2 본 위키 도구로 풀어보기 — Maemi hindcast workflow (verified)
 
