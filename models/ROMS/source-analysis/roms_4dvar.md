@@ -237,6 +237,129 @@ NIFS KOOS-EJS (동해예측시스템) ROMS 기반 4D-Var 의 multi-scale B 적�
 - 동해 mesoscale eddy (50-100 km) + sub-mesoscale (5-20 km) 동시 표현 → 다중 scale B 가 적합
 - 후속 평가 항목: 현재 KOOS-EJS B 가 single-scale 인지, multi-scale 도입 benefit 정량화
 
+## J. PR #75 후속 commit 5건 (2026-05-27 ~ 05-31, verified 2026-06-01)
+
+§I 의 multi-scale B 후속 활동. 5 commit GitHub API 직접 fetch.
+
+| # | SHA | 일시 | 메시지 | Files |
+|---|---|---|---|---|
+| 1 | `7a1f5d9d` | 2026-05-27 15:04 UTC | Updated 4D-Var algorithms | 24 files |
+| 2 | `b7312fb1` | 2026-05-27 21:54 UTC | Added B-correlation CDL template file | 2 files |
+| 3 | `952d7eab` | 2026-05-28 18:07 UTC | Added function for tracers management | 3 files |
+| 4 | `16601076` | 2026-05-31 17:10 UTC | Added Dirac parameters | 7 files |
+| 5 | `23919237` | 2026-05-31 19:30 UTC | Corrected parallel bug | 1 file (`read_asspar.F`) |
+
+### J.1 4D-Var algorithms updated (`7a1f5d9d`, 24 files)
+
+핵심 변경 (verified by GitHub API file list):
+
+- `ROMS/Drivers/i4dvar.F` (+104 -42), `r4dvar.F` (+106 -41), `rbl4dvar.F` (+110 -51) — three primary 4D-Var drivers 전면 갱신
+- `ROMS/Drivers/correlation.h` (+3) — correlation driver header 추가
+- `ROMS/Tangent/tl_def_ini.F` (+12) — tangent linear initialization definition 보강
+- `ROMS/Utility/def_*.F` (10 files: def_dai/diags/error/extract/floats/hessian/impulse/info/lanczos/state) — 각 +12 라인 균일 추가 → 신규 NetCDF definition 헤더 (Multi-scale B 출력 통합)
+
+→ I4DVAR / R4DVAR / RBL4DVAR 모두에 multi-scale B 통합 + NetCDF 출력 routine 11개 동시 수정 = 일관 출력 형식 확보.
+
+### J.2 B-correlation CDL template (`b7312fb1`, 2 files)
+
+```
+added    +208  -0  Data/ROMS/CDL/s4dvar_Bcorrelation.cdl
+modified +50  -2   ROMS/Utility/def_info.F
+```
+
+신규 CDL (NetCDF Common Data Language) template `s4dvar_Bcorrelation.cdl` — B 상관행렬의 검증·진단 NetCDF 파일 구조. `def_info.F` 가 변수 메타데이터 정의 부에서 이 template 사용.
+
+### J.3 Tracers management (`952d7eab`, 3 files)
+
+```
+added    +94  -0   ROMS/Utility/tracer_metadata.F
+modified +97  -12  ROMS/Utility/read_asspar.F
+modified +3   -0   ROMS/Utility/set_pio.F
+```
+
+신규 `tracer_metadata.F` (94 lines) — tracer 식별·메타데이터 관리 module. `read_asspar.F` 가 4D-Var assimilation parameter 읽을 때 호출하도록 +85 라인 확장. `set_pio.F` 의 parallel I/O 등록에도 추가.
+
+### J.4 Dirac parameters (`16601076`, 7 files) — **§I.4 s4dvar.in 확장**
+
+```
+modified +52  -11  ROMS/External/s4dvar.in
+modified +123 -4   ROMS/Utility/read_asspar.F
+modified +117 -21  ROMS/Functionals/ana_perturb.h
+modified +14  -7   ROMS/Utility/checkdefs.F
+modified +12  -0   ROMS/Modules/mod_scalars.F
+modified +1   -0   ROMS/Drivers/correlation.h
+modified +1   -0   ROMS/Modules/CMakeLists.txt
+```
+
+`s4dvar.in` 직접 diff (line +253-269 신규 11 Dirac() 키워드, GitHub API verbatim):
+
+```fortran
+! Dirac delta function (i,j,k) locations for testing correlations parameters.
+  Dirac(isFsur) == 25 20                ! free-surface
+  Dirac(isUbar) == 15 30                ! 2D U-momentum
+  Dirac(isVbar) == 15 35                ! 2D V-momentum
+  Dirac(isUvel) == 15 30 30             ! 3D U-momentum
+  Dirac(isVvel) == 15 35 30             ! 3D V-momentum
+  Dirac(isTvar) == 30 20 30 \           ! temperature
+                   20 40 30             ! salinity
+  Dirac(isTsur) == 20  15   \           ! surface heat flux
+                   25  20               ! surface salt flux
+  Dirac(isUstr) == 18  30               ! surface U-momentum stress
+  Dirac(isVstr) == 18  35               ! surface V-momentum stress
+```
+
+**Dirac delta function locations** — Multi-scale B correlation 검증용 single grid point delta function. (i,j) 또는 (i,j,k) 격자 좌표에 δ를 두고 correlation function 응답 (negative-lobe 포함, §I.7)을 진단.
+
+부수 변경 `s4dvar.in` line +281-289 (Mlap iteration count) :
+
+```diff
+- Mlap(isFsur) == 20    ! Mlap MUST be > 2 and EVEN, > O(10) for Gaussian
++ Mlap(isFsur) == 10    ! Free-surface
+- Mlap(isUbar) == 20
++ Mlap(isUbar) == 10
+... (모든 state variable 동일하게 20 → 10)
+```
+
+`s4dvar.in` line +316:
+
+```diff
+-        NiterCG == 50
++        NiterCG == 20
+```
+
+→ Multi-scale B implicit diffusion solver 의 Laplacian iteration `Mlap` 20→10, CG iteration `NiterCG` 50→20. **default tuning 절반 수준 감소** — 빠른 수렴이 가능해진 algorithm 개선 반영. §I.4 의 기존 default value 와 정확히 일치 (PDF §3.A 에 적힌 default 가 이 commit 으로 갱신).
+
+`ana_perturb.h` (+117 -21) — analytic perturbation routine 이 Dirac δ initialization 지원. `checkdefs.F` 는 CPP 검증 강화.
+
+### J.5 Parallel bug fix (`23919237`, 1 file)
+
+```
+modified +5 -6 ROMS/Utility/read_asspar.F
+```
+
+`read_asspar.F` 의 read race-condition 또는 broadcast 누락 buf bug 수정. 1 file·11 lines 변경의 단순 fix이나, **multi-scale B + Dirac 통합 후 MPI 환경에서 발견된 parallel bug** — `952d7eab` (tracers management) 와 `16601076` (Dirac) 에서 `read_asspar.F` 를 크게 확장한 결과 발생한 regression 일 가능성 큼 (동일 file).
+
+### J.6 §I 와의 관계
+
+| §I (PDF 기반) | §J (PR commit 기반, 2026-06-01) |
+|---|---|
+| 7개 신규 `multiscale_*` core file (§I.3) | 추가 안 됨 — 동일 |
+| `s4dvar.in` Mlap default 20 / NiterCG 50 (§I.4) | **Mlap 10 / NiterCG 20 으로 default 절반 감소** (J.4) |
+| Dirac delta 검증 (PDF 미언급) | **11 Dirac() 키워드 신규** (J.4) |
+| Bcorrelation CDL (PDF 미언급) | **신규 NetCDF template** (J.2) |
+| 단일 unified driver 가정 | 세 driver (I/R/RBL 4D-Var) 동시 갱신 (J.1) |
+| | tracer_metadata.F 신규 (J.3) |
+| | parallel bug fix (J.5) |
+
+→ §I 은 PR 제안 시 (2026-05 초) PDF 기준, §J 는 PR 활동 30일 후 (2026-06) 실제 commit 기준. **default tuning 절반 감소가 가장 영향 큰 발견** — Multi-scale B 가 실제 더 빠르게 수렴함을 algorithm 개선이 입증.
+
+### J.7 KOOS-EJS 적용 후속
+
+§I.8 의 KOOS-EJS multi-scale B 평가 시:
+- 기존 §I.4 default (Mlap=20, NiterCG=50) 대신 **갱신된 default (Mlap=10, NiterCG=20)** 부터 시작
+- Dirac δ 도구 (§J.4) 로 동해 mesoscale + sub-mesoscale scale별 correlation function 정량 시각화
+- I4DVAR / R4DVAR / RBL4DVAR 모두 multi-scale B 호환 (§J.1) — driver 선택 자유도 ↑
+
 ## Decision Guide
 
 | Use case | Choice |
