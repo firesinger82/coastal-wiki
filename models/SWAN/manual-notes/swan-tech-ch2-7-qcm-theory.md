@@ -111,7 +111,7 @@ $$S_{\text{qc}} = -\mathrm{i}\int\Delta\hat{\omega}(\vec{x},\vec{q},\vec{k})\Big
 ## 5. 한계
 
 - §2.7.2 Weyl/BCH/Taylor 유도식(HTML 2.204-2.216)·§2.7.3 도출(HTML 2.221-2.228): **PDF 무번호** → 본 노트 핵심 milestone(2.146-2.155)만 PDF 번호 전사.
-- (2.151)·(2.152)·(2.153)·(2.155)의 연산자/convolution 세부: alt-text truncated("$\cdots$") → 정밀식 swantech.pdf p.60-68 또는 **Smit-Janssen 2013 (JFM) / Akrish 2020 원논문**.
+- (2.151)·(2.152)·(2.153)·(2.155)의 연산자/convolution 세부: alt-text truncated("$\cdots$") → 정밀식 swantech.pdf p.60-68 또는 **Smit-Janssen 2013 (JPO 43(8):1741-1758, doi:10.1175/JPO-D-13-046.1; ⚠ JFM 아님) / Akrish 2020 (JFM 891:A2) 원논문** ([[swan-foundational-papers]]).
 - **[[swan-tech-ch3-qc-curvilinear]] §3.9 노트의 "Eq 2.225-2.230" 은 HTML 번호** — 본 PDF 기준은 2.150-2.155 (cross-ref 보정 필요).
 
 ## 6. 연결
