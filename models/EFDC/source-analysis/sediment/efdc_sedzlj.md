@@ -427,16 +427,16 @@ C36 | ISEDINT | ISEDBINT | NSEDFLUME | ISMUD | ISNDWC | ISEDVW | ISNDVW | KB | I
 
 ## 10. 미해결 / 추가 보강 후보
 
-- ~~`s_sedic.f90` (769 lines) — bed initial-condition reader.~~ **§11 partial verified (2026-06-01) — line 1-120 compact. SEDB.INP/BEDLAY.INP variable bed read 부분 + Sedflume table read 부분 별도.**
+- ~~`s_sedic.f90` (769 lines) — bed initial-condition reader.~~ **§11 verified line 1-380 (2026-06-01 §11.1-5 + 2026-06-02 §11.6-8 deep: VAR_BED NCORENO core map + Sedflume core read + core→cell 매핑 + 층질량/LAYERACTIVE 초기화). 잔여: line 380-769 (HBED·HBED1 IC + bedload IC + morph 후처리) 별도.**
 - `s_tecplot.f90` (310 lines) — SEDZLJ Tecplot 출력 — 분석 측면에서 별도 노트 필요 시.
 - Propwash 연동 (`Variables_Propwash` use, line 27) — `s_sedzlj.f90:135-180, 559-617` 의 `PROP_ERO(L,1:NSEDS)` 처리. [[efdc-propwash]] (별도 노트) 후보.
 - Mass erosion fast class (`NSEDS2 > NSEDS`, `s_sedzlj.f90:165-180, 604-617`) — propwash 시 fast/normal 분리 동작.
 - Toxics linkage (`NSEDFLUME = 99`) — **deprecated 2016-12 ([[efdc_sedzlj]] §11.4)**. 매뉴얼 Card C36 의 NSEDFLUME=99 표기는 stale → ISTRAN(5)>0 가 현행.
 - Wave-current 식 번호와 Christoffersen-Jonsson 1985 원논문 페이지 cross-check (현재는 코드 코멘트 기준 인용).
 
-## 11. SEDIC initialization (`s_sedic.f90`, 769 lines, line 1-120 verified 2026-06-01)
+## 11. SEDIC initialization (`s_sedic.f90`, 769 lines, line 1-380 verified — §11.1-5 2026-06-01, §11.6-8 deep 2026-06-02)
 
-§10 후보 중 SEDIC 첫 120 라인 compact verified.
+SEDZLJ bed 초기화: 입력 read(bed.sdf/erate.sdf) → VAR_BED core map(NCORENO) → Sedflume core data → core→cell 매핑 → 층질량/LAYERACTIVE 초기화.
 
 ### 11.1 Subroutine 호출 + 입력 파일 (line 53-58, master process)
 
@@ -483,3 +483,29 @@ read(10,*) TACTM   ! active layer thickness multiplier — [[efdc_sedzlj]] §2.4
 ### 11.5 MPI broadcast (line 117-)
 
 Master only read, 그 후 `Broadcast_Scalar/Array` 분배. `mod_var_global.f90` SEDZLJ 변수 전체.
+
+### 11.6 VAR_BED core map (line 142-210) — deep 2026-06-02
+
+`VAR_BED >= 1` (spatially variable bed) → **NCORENO(I,J) core 번호 맵** 읽기 (unit 20):
+- **DSI standard**: `I2D_Global(I,J) = CORE` (cell별 core 번호)
+- **SNL standard**: `read(20,'(120(I1,1X))')(I2D_Global(I,J), I=1,IC)` (J행별 1-digit core)
+- local domain 매핑(MPI). VAR_BED=0 시 단일 core 전역.
+
+### 11.7 Sedflume core data read (line 255-302) — deep
+
+각 core (unit 10, NCORENO 가 참조):
+- `TSED0S(K,CORE)` 층두께 + `BDEN(CORE,K)` bulk density + `WATERDENS, SEDDENS(CORE)` (물·sediment solid 밀도) + `PNEW(CORE,K,NS)` 층별 size fraction(%)
+- **erosion data (NSEDFLUME 분기)**:
+  - **NSEDFLUME==1** (Sedflume 측정): `TAULOC(M)` shear 카테고리(ITBM개) + `ERATETEMP(CORE,K,M)` 층·shear별 침식률
+  - **NSEDFLUME==2** (power-law): `TAULOC=[0, 1000]` + `EA(CORE,K), EN(CORE,K), MAXRATE(CORE,K)` (A·τ^N, [[efdc_sedzlj]] §2.2). `MAXRATE` cm/s → g/m²/s `×BDEN` (dry bulk density)
+
+### 11.8 core→cell 매핑 + 초기화 (line 306-380) — deep
+
+`NCORENO(I,J)>0` 인 cell L 에 core 값 할당:
+- `TAUCOR(K,L) = TAUTEMP(CORE,K)` (층별 critical shear) + `ERATE(K,L,M) = ERATETEMP` (NSEDFLUME=1)
+- `PERSED(NS,K,L) = PNEW/100` (mass fraction, `/DTOTAL` 정규화 mass balance)
+- **porosity·bulk density**: dry density 입력 시 `PORBED = 1 - BDEN/SEDDENS`, `BULKDENS = BDEN`; wet 시 별식. BULKDENS≤0 → STOPP
+- **Non-cohesive 비활성**: `SNDBT=0`, `ISTRAN(7)=0` (SEDZLJ 가 cohesive+noncohesive 내부 CALTRAN 처리)
+- **초기 층질량** (NSEDFLUME≠3): `LAYERACTIVE = 2`(in-place, TSED0S>0) 또는 `0`; `TSED = TSED0 = TSED0S × BULKDENS` (g/cm²)
+- **post-process**: `TSED0/BULKDENS < 1e-8` 또는 `K≤2`(active layer) → `HBED=TSED=TSED0=0`, `TAUCOR=1000` (무침식)
+> §3 s_shear·§2 s_sedzlj 가 사용하는 bed state (TAUCOR/ERATE/PERSED/TSED/LAYERACTIVE/BULKDENS)를 모두 SEDIC 가 초기화.
