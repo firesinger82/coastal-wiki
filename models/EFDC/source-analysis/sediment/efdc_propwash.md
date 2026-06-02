@@ -4,7 +4,7 @@ topic: sediment-transport
 canonical_source: external
 external_source: "EFDC+ source_code/EFDCPlus_Stable/EFDC/Propwash/ (17 files 3507 lines: Propwash_Calc_Sequence.f90 + Variables_Propwash.f90 + Calc_Prop_Erosion.f90 707 + Mod_Active_Ship.f90 1269 + Mod_Read_Propwash.f90 501 등) + EFDC+_Propwash_WhitePaper.pdf (DSI LLC, 2021-08-17, 93p) Ch 1-3 (Eq 2.4-2.15, 3.1-3.2). 저자 Paul M. Craig + Zander Mausolff + Luis Bastidas."
 citation_status: verified
-verification_method: "source_code 직접 read (Propwash_Calc_Sequence 130줄 + mod_Variables_Propwash 70줄 + Calc_Prop_Erosion 230줄 + change record) + WhitePaper.pdf p.1-3장 직접 read (Abstract·Ch1 Introduction·Ch2 Theoretical Approach Eq 2.4-2.15·Ch3 Algorithm Implementation 11-step + Eq 3.1-3.2 Maynord shear). 식·계수·zone 경계 verbatim."
+verification_method: "source_code 직접 read (Propwash_Calc_Sequence 130줄 + mod_Variables_Propwash 70줄 + Calc_Prop_Erosion 230줄 + **Mod_Active_Ship 1269줄 deep: calc_velocity 801-927·calc_erosive_flux 935-1203·setup_mesh 361-450 verbatim**) + WhitePaper.pdf p.1-3장 직접 read (Abstract·Ch1·Ch2 Eq 2.4-2.15·Ch3 11-step + Eq 3.1-3.2 Maynord shear). 식·계수·zone 경계 verbatim. **code≠WhitePaper 차이 7건 식별** (§6.6: Jiang2019 efflux·Toutant thrust·B' P'^-1·Hashmi1993 fallback·zone1 3.5·ambient 무시·13° cone)."
 note_author: "Claude Opus 4.8 (1M context) raw source + PDF direct read"
 note_date: 2026-06-02
 verification_by: "Claude Opus 4.8 (1M context) — Eq 2.4-2.15·3.1-3.2 + zone 경계(0.35/3.25/50) + 계수 verbatim"
@@ -124,11 +124,56 @@ $$C_f = 0.01 \times \frac{D_p}{H_p} \quad \text{(3.2)}$$
 - erosion rate: `NSEDFLUME==1` Sedflume `ERATE` shear+depth 이중보간 (LAYERACTIVE==2 deeper) + `SH_SCALE`(Lick 2009 slope) — **SEDZLJ 와 동일 식**, 입력만 propwash shear
 > Original-EFDC(van Rijn)용 별도 분기도 존재 (note: SEDZLJ variant 만 상세 read).
 
-### 3.4 기타 source (요약)
+### 3.4 Mod_Active_Ship.f90 (1269줄, deep — 제트식·shear·mesh 코드 구현) ★
+
+`active_ship` 객체 (type-bound: constructor·interp_track·det_if_in_track·det_pos_in_track·setup_mesh·interp_depth_elev·interp_bot_vel·**calc_velocity**·**calc_erosive_flux**·write_xyz). Paul Craig + Luis Bastidas + Zander Mausolff.
+
+#### 3.4.1 `calc_velocity(ax, radius, bot_velocity, ieffluxonly)` — Ch 2 식 코드 매핑 (801-927)
+
+**Efflux velocity** (Eq 2.4-2.5 구현, 단 코드 ≠ WhitePaper 일부):
+- **rps 기반** (rps≥0): `efflux_vel = 1.59*rps*prop_diam*sqrt(thrust_coeff)` — **Jiang et al. 2019** 채택 (Hamill 1987 `1.33*` + Hamill-Kee 2016 `1.22*rps^1.01*D^0.84*C_t^0.62` 는 **주석처리**; ⚠ WhitePaper Fig 3.4 는 1.33 표기)
+- **power 기반** (rps<0): power = ship power/num_props (단일 prop 가정). **Toutant thrust** EP[lbf]:
+  - open: `EP = 23.57*power^0.974 - 2.3*(speed*2.237)²*sqrt(power)`, C1=0.71
+  - ducted: `EP = 31.82*power^0.974 - 5.4*(speed*2.237)²*sqrt(power)`, C1=1.0
+  - `EP = max(EP, power)` (Toutant high-speed/low-power 붕괴 방지), `EP = 4.448*EP` (lbf→N)
+  - `efflux_vel = 1.13/C1/prop_diam*sqrt(EP/rho)` (Eq 2.5, **C1 = D_0/D_p contraction**, rho = RHOW or 999.82)
+- `self.efflux_vel = efflux_vel * efflux_mag_mult` (0.75, subgrid turbulent loss). `ieffluxonly>0` → efflux 만 return (momentum field 용)
+
+**Zone 분기** (cutoff: `zone0 = efflux_zone_mult(0.35)*D_p`, `zone1 = flow_est_zone1_mult(3.5)*D_p` — ⚠ WhitePaper 는 3.25):
+- **Efflux** (ax≤zone0): vel_max = efflux_vel; radial: `radius ≤ 0.75*D_p` → bot_velocity = efflux_vel
+- **Flow establishment** (zone0<ax<zone1): `vel_max_ax = efflux_vel*(1.51 - 0.175*(ax/D_p) - 0.46*pitch_ratio)` (Eq 2.6). `R_m0 = 0.67*(0.5*D_p - 0.5*hub_diam)` (Eq 2.9). σ: `ax<R_p` → `0.5*R_m0` else `0.5*R_m0 + 0.075*(ax - R_p)` (Eq 2.8, ⚠ 코드 `(ax-radius_prop)` vs WhitePaper `(x+0.5D_p)`). `bot_velocity = vel_max_ax*exp(-0.5*(radius-R_m0)²/σ²)` (Eq 2.7 twin-peak)
+- **Established flow** (ax≥zone1): `A' = -11.4*C_t + 6.65*BAR + 2.16*pitch_ratio` (Eq 2.11, code "eqn 2.32"). **A'>1 시**: `B' = -(C_t^-0.216)*BAR^1.024/pitch_ratio` (⚠ 코드 `P'^(-1)` vs WhitePaper Eq 2.12 `P'^(-1.87)`), `vel_max = efflux_vel*A'*(ax/D_p)^B'` (Eq 2.10). **A'≤1 또는 BAR 미상 시 fallback = Hashmi 1993**: `vel_max = efflux_vel*0.638*exp(-0.097*(ax/D_p))`. radial: `bot_velocity = vel_max*exp(-22.2*(radius/ax)²)` (Eq 2.13)
+- `bot_velocity < epsilon(1e-3)` → 0
+
+#### 3.4.2 `calc_erosive_flux(debug_)` — shear + erosion + aggregation (935-1203)
+
+- **Maynord c_f** (Eq 3.2): `d2 = w_depth - draft` (max with prop_radius, = **H_p** prop축→bed), `c_f = 0.01*prop_diam/d2` (선박당 상수, 2021-06-28)
+- **OMP PARALLEL** over `num_axial_elems` × `num_radial_elems` sub-grid:
+  - `interp_depth_elev` → z_bed, w_depth; `d2 = w_depth - draft`
+  - **multi-prop superposition** (Eq 3.5): `prop_off = -0.5*dist_between_props*(num_props-1)`, prop loop: `d1 = horizontal dist`, **`radius = sqrt(d1² + d2²)`** (Eq 2.15 r=√(Y_p²+H_p²)), `calc_velocity(ax, radius, vel2)` → `bot_velocity += vel2`
+  - **Maynord shear** (Eq 3.1): `bot_velocity > 1e-2` 시 `shear = 0.5*RHOW*c_f*vel2²` [N/m²]. ⚠ **ambient velocity 무시** (analytical solution, 2021-11-10; ordinary sediment transport 에선 사용)
+  - **erosion** (ISTRAN(6)+ISTRAN(7)>0, LBED hard-bottom bypass):
+    - `LSEDZLJ` → `Calc_Prop_Erosion_SEDZLJ(cell, shear, elay, isurf)` → `elay*area` = mass(g)
+    - else → `Calc_Prop_Erosion_Original(cell, shear*0.001, elay, ebld)` (van Rijn, density-normalized m²/s²): `elay*area + ebld*width*DTSEDJ`
+- **accumulate** (OMP 밖, race 방지): `prop_ero(cell,1:NSEDS) += subgrid.ero`
+- `self.max_bot_vel = 0.25*vb_max` (ISPROPWASH=2 momentum double-counting 방지)
+- **pw_mesh_<MMSI>.out** binary 출력 (`freq_out` 주기): x/y/z + var(1)=velocity, var(2)=shear[Pa], var(3)=erosion rate(LSEDZLJ g/cm²/s / Orig g/m²/s)
+
+#### 3.4.3 `setup_mesh(debug_)` — sub-grid 생성 (361-586)
+
+- radial 범위: `±0.5*mesh_width(30)*(prop_diam + 0.5*width_propellers)`. axial: `0.5*efflux_zone_mult*D_p` ~ `mesh_length(60)*D_p`
+- `area = width*length*10000` (cm², SEDZLJ) / `width*length` (m², Original)
+- **13° spreading cone**: `tan13 = 0.23087`, `cone_max = tan13*y_pos + width_propellers`; cone 밖 점 비활성화 (x_pos=-9999, area=0) — 프로펠러 wash 확산각
+- bottom elevation: `interp_depth_elev` (model cell **inverse distance squared** 보간, WhitePaper Step 4)
+
+#### 3.4.4 `interp_track` (134-250)
+
+AIS/user track 의 시간 보간 (prev/next track 위치 사이 선형) → ship position·heading·speed·power. `det_if_in_track`(시간 ∈ track?) + `det_pos_in_track`(track 내 위치 index).
+
+### 3.5 기타 source (요약)
 
 | 파일 | 줄 | 역할 |
 |---|---|---|
-| `Mod_Active_Ship.f90` | 1269 | active ship 객체 (`calc_velocity`·`calc_erosive_flux`·`setup_mesh`·`interp_track`) — **제트 속도장 핵심** |
 | `Mod_Read_Propwash.f90` | 501 | propwash_config/ships/tracks.jnp 입력 |
 | `mod_Setup_Ships.f90` | 245 | 선박 초기화 |
 | `Mod_Ship.f90` | 118 | ship base type |
@@ -157,10 +202,20 @@ $$C_f = 0.01 \times \frac{D_p}{H_p} \quad \text{(3.2)}$$
 3. **efflux momentum→3D flow** (2021-12) = 단순 침식 source 넘어 hydro 결합 (기존 모델 한계 극복).
 4. **toxics 결합** (2020-12): 오염 sediment 재부유 → Superfund remediation 평가 (San Diego/Duwamish/Portland Harbor).
 5. Maynord(2000): efflux velocity(2.5) + bed shear(3.1-3.2) 둘 다 → propwash 의 핵심 reference.
+6. **★ code ≠ WhitePaper(2021-08) 차이 (Mod_Active_Ship deep, §3.4)** — 실 구현이 매뉴얼보다 갱신됨:
+   - efflux rps-기반: 코드 **Jiang et al. 2019 (1.59)** (Hamill 1987 1.33·Hamill-Kee 2016 주석처리; WhitePaper Fig 3.4는 1.33)
+   - power-기반: **Toutant thrust** EP(open 23.57·P^0.974 / ducted 31.82, max(EP,power) 보정) — WhitePaper Ch 2는 generic
+   - B' 지수: 코드 `P'^(-1)` vs WhitePaper Eq 2.12 `P'^(-1.87)`
+   - A'≤1/BAR 미상 fallback: **Hashmi 1993** `0.638·exp(-0.097 x/D_p)` (WhitePaper 무)
+   - zone1 cutoff: 코드 `flow_est_zone1_mult=3.5` vs WhitePaper 3.25
+   - **ambient velocity**: propwash analytical shear서 **무시** (2021-11-10) — WhitePaper Abstract "including ambient currents"와 뉘앙스 차 (ordinary sediment transport엔 반영)
+   - 13° spreading cone (tan13=0.23087)로 sub-grid 점 필터 (WhitePaper 미명시)
+   - 코드 주석 식번호("eqn 2.32/2.33")가 WhitePaper(2.11/2.12)와 달라 → **별도/갱신 doc 버전** 존재 시사
 
 ## 7. 한계
 
-- `Mod_Active_Ship.f90` (1269줄, calc_velocity 제트식 구현)·van Rijn 분기 미상세 read — Ch 2 식의 코드 매핑은 WhitePaper 기준.
+- ✅ `Mod_Active_Ship.f90` (1269줄) deep read 완료 (§3.4) — calc_velocity·calc_erosive_flux·setup_mesh·interp_track. **code ≠ WhitePaper 차이 발견** (§6.6).
+- `Calc_Prop_Erosion_Original` (van Rijn 분기) 미상세 read — SEDZLJ variant 만 §3.3 상세.
 - WhitePaper Ch 4(입력 detail)·Ch 5(검증 정량값) full read 안 함 — TOC + Fig 목록 기준 요약.
 - toxics linkage(caltox) 코드 미read — [[efdc-toxics]] 별도 후속.
 
