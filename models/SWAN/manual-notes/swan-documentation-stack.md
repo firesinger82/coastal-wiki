@@ -81,7 +81,7 @@ User Manual Chapter 1 (p.1) verbatim:
 - **Bibliography** (p.145)
 - **Index** (p.146)
 
-→ **57 commands** 식별 (PROJECT…STOP). **Physics command (§4.5.4) deep**: [[swan-command-physics-reference]] (GEN/WCAPPING/QUADRUPL/BREAKING/FRICTION/TRIAD 구문·default verbatim). 나머지 start-up/grid/output command 는 후속.
+→ **57 commands** 식별 (PROJECT…STOP). **§4 command reference 3노트 완성 (deep, 구문·default verbatim)**: [[swan-command-setup-grid-reference]] (§4.4-4.5.3 PROJECT/SET/MODE/COORD/CGRID/READGRID/INPGRID/READINP/WIND/BOUND/INITIAL) + [[swan-command-physics-reference]] (§4.5.4 GEN/WCAPPING/QUADRUPL/BREAKING/FRICTION/TRIAD/VEGETATION) + [[swan-command-numerics-output-reference]] (§4.5.5-4.7 PROP/NUMERIC/FRAME/BLOCK/TABLE/QUANTITY/SPECOUT/COMPUTE/HOTFILE/STOP).
 
 ## 3. Scientific/Technical (swantech.pdf) TOC verbatim
 
