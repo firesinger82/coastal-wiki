@@ -122,7 +122,19 @@ $$C_f = 0.01 \times \frac{D_p}{H_p} \quad \text{(3.2)}$$
 - `D50AVGL` 표면 d50 → `TAUCRIT` 보간 (`TAUCRITE`, in-place는 `TAUCOR`)
 - **active layer** `TACT = TACTM*D50AVGL*(TAUDYNE/TAUCRIT)*(BULKDENS/10000)` ([[efdc_sedzlj]] Eq 동일)
 - erosion rate: `NSEDFLUME==1` Sedflume `ERATE` shear+depth 이중보간 (LAYERACTIVE==2 deeper) + `SH_SCALE`(Lick 2009 slope) — **SEDZLJ 와 동일 식**, 입력만 propwash shear
-> Original-EFDC(van Rijn)용 별도 분기도 존재 (note: SEDZLJ variant 만 상세 read).
+**`Calc_Prop_Erosion_Original(L, TAUP, ELAY, EBLD)`** (309-598) — Original EFDC SedTran(van Rijn) 침식머신 재사용 (TAUP = density-normalized shear m²/s², Mod_Active_Ship서 shear×0.001):
+- **cohesive** (ISTRAN6): mass/bulk erosion(TAUP>TAURB → `WRSPB·VFRBED`) vs surface erosion(TAUP>TAURS → `WESE = hiding·WRSPS·VFRBED·(TAUE^TEXP)`, `TAUE=(TAUP-TAURS)/TAURTMP`). IWRSP 옵션(Hwang-Mehta / Hamrick-Sanford-Maa / site-specific SSCOHSEDPMAP)
+- **non-cohesive** (ISTRAN7): Rouse `ROUSEP=WSETA/(VKC·USTAR)` + FSEDMODE bedload/suspended 분리 + 평형농도 `CSNDZEQ`/`CSNDEQC`(Garcia-Parker ZEQ=0.05 / van Rijn, ISNDEQ) + critical Shields `TCSHIELDS` + cohesive fraction 보정(ISEDEFF)
+> → **SEDZLJ·Original 둘 다 propwash shear 로 native 침식머신 구동** (동일 설계 패턴). ELAY=suspension(g/m²), EBLD=bedload(g/m²).
+
+### 3.4b add_ship_momentum (603-705) — efflux 운동량 주입 (2021-12)
+
+`add_ship_momentum(FUHJ, FVHJ)` — WhitePaper Fig 3.1 "(Optional) Add Efflux Momentum to Flow Field" 구현. 프로펠러 jet 운동량을 EFDC 3D 운동량식에 body force 로 주입:
+- efflux 속도 성분 `UHC=efflux_vel·cos(ang)`, `VHB=efflux_vel·sin(ang)` (ang=heading−π/2), 곡선격자 회전(CVN/CVE/CUN/CUE)
+- 프로펠러 area `PAREA`(jet contraction 반영), 연직 span `PTOP=draft−prop_radius` ~ `PBOT=PTOP+prop_diam`
+- **연직층 분배**: K loop(KC→KSZ), 프로펠러 깊이대와 층 겹침 RATIO(top/middle/bottom fraction)로 운동량 split
+- **face momentum**: `UHC2 = −RATIO·|UHC1·PAREA|·UHC1` (∝V²·area), east/west face `FUHJ` + north/south `FVHJ` (방향부호 + SUB/SVB open-face, σ-z metric PSGZU=1/SGZU). `num_fixed_cells` 시 `fixed_frac` 분배
+> ISPROPWASH=2 시 활성 (efflux momentum). Mod_Active_Ship `max_bot_vel×0.25` 가 erosion-momentum double-counting 방지.
 
 ### 3.4 Mod_Active_Ship.f90 (1269줄, deep — 제트식·shear·mesh 코드 구현) ★
 
@@ -215,7 +227,8 @@ AIS/user track 의 시간 보간 (prev/next track 위치 사이 선형) → ship
 ## 7. 한계
 
 - ✅ `Mod_Active_Ship.f90` (1269줄) deep read 완료 (§3.4) — calc_velocity·calc_erosive_flux·setup_mesh·interp_track. **code ≠ WhitePaper 차이 발견** (§6.6).
-- `Calc_Prop_Erosion_Original` (van Rijn 분기) 미상세 read — SEDZLJ variant 만 §3.3 상세.
+- ✅ `Calc_Prop_Erosion_Original`(van Rijn) + `add_ship_momentum`(efflux 운동량) deep read 완료 (§3.3).
+- `FSEDMODE`/`CSNDZEQ`/`CSNDEQC` 등 Original SedTran 외부함수 본문은 [[efdc_sedzlj]] 외 별도 (van Rijn 식 detail).
 - WhitePaper Ch 4(입력 detail)·Ch 5(검증 정량값) full read 안 함 — TOC + Fig 목록 기준 요약.
 - toxics linkage(caltox) 코드 미read — [[efdc-toxics]] 별도 후속.
 

@@ -4,7 +4,7 @@ topic: sediment-transport
 canonical_source: external
 external_source: "EFDC+ source_code/EFDCPlus_Stable/EFDC/ChemFate/ (caltox.f90 1390 + caltoxb.f90 490 + caltox_kinetics.f90 287 + partmix.f90 + setfpocb.f90) + SedTran-Original/ssedtox.f90 (driver). 저자 Paul M. Craig 외. Housatonic River fPOC = HydroQual 2003-03-17."
 citation_status: verified
-verification_method: "source 직접 read: caltox.f90 (partition 100-275 + 정규화 283-330 + settling/bed flux 346-412) + caltox_kinetics.f90 전체(287, ITOXKIN 6 process + ViscosityW) + caltoxb/partmix/setfpocb header + ssedtox 호출. TOXPFW/TOXF/ITOXKIN/ISTOC/ITXPARW 식·flag verbatim."
+verification_method: "source 직접 read: caltox.f90 (partition 100-275 + 정규화 283-330 + settling/bed flux 346-412) + caltox_kinetics.f90 전체(287, ITOXKIN 6 process + ViscosityW) + **caltoxb.f90 bed tri-diagonal solver 143-282 + Transport/calvolterm.f90 전체(two-film) + partmix.f90 PMXDEPTH/PMXCOEF** + setfpocb header + ssedtox 호출. TOXPFW/TOXF/ITOXKIN/ISTOC/ITXPARW/PARTDIF/DIFTOX/K_V 식·flag verbatim."
 note_author: "Claude Opus 4.8 (1M context) raw source direct read"
 note_date: 2026-06-02
 verification_by: "Claude Opus 4.8 (1M context) — partition/flux/kinetics 식 + flag verbatim"
@@ -74,9 +74,18 @@ $$\text{TOXF}(L,K,NT) \mathrel{+}= \text{SEDF}(L,K,NS) \times \text{STFPOCW} \ti
 
 ## 3. Bed (CALTOXB) + bioturbation
 
-- **CALTOXB**: bed layer 별 분배(`TOXPFB`/`TOXPFTB` 동일 Kd/fPOC 체계) + **pore water** dissolved + sediment/water interface diffusive flux. Original·SEDZLJ 공용 (2017-05).
-- **PARTMIX(NT)**: top bed layer [`PMXDEPTH`] 의 **particle mixing(bioturbation)** — 생물교란으로 오염물 연직 재분배.
-- **SETFPOCB**: bed 조성 기반 fPOC 함수 (Housatonic River 사례, HydroQual 2003-03-17 — % → fraction 변환).
+**CALTOXB** (490, Original·SEDZLJ 공용 2017-05): bed column 의 **1D 연직 확산-이류 implicit(tri-diagonal) solver** — bed layer + 바닥 water layer 결합 → bed↔water 순flux. `TOXSTEPB` 간격.
+
+- bed 분배 `TOXPFB`/`TOXPFTB` (동일 Kd/fPOC 체계). **dissolved 만 확산** (행렬 계수에 `1/(1-TOXPFTB)`)
+- **3 transport 항** (m/s 계수):
+  - **DIFTOX** = pore water (dissolved) 분자확산, `×(PORBED_k + PORBED_km)/(HBED_k + HBED_km)` (porosity·층두께 가중)
+  - **PARTDIF** = particle mixing(bioturbation), `2·PDIFTOX/(2 - TOXPFTB_k - TOXPFTB_km)`, **mixing depth `DPDIFTOX` 이내만** (partmix 가 깊이프로파일 공급)
+  - **QWTRBED** = pore water advection (>0 상향/<0 하향, upwelling/downwelling)
+  - **DIFTOXBW** = bed-water 표면 확산, `DIFBWFAC=2/HBED` (또는 ISDIFBW=1 시 surface flux rate)
+- **groundwater**: `QWTRBED(L,0)·CONGW` 바닥층 유입 (외부 mass loading)
+- tri-diagonal (Thomas): CUPP(상)/ALOW(하)/BMNN(주대각)/RRHS(우변, mg/m²/s). 풀이 후 **mass balance 보정**(ERRT) → bed/water 배분(ERRB/ERRW)
+- **PARTMIX(NT)** (partmix.f90): `PARTMIXZ(L,K)` = 깊이의존 particle mixing 계수 — `PMXDEPTH(NP,LZ)` 프로파일 점들 사이 `PMXCOEF` 선형보간 (zone `LPMXZ`별, `ISPMXZ` 옵션). CALTOXB 의 PARTDIF 입력.
+- **SETFPOCB**: bed 조성 기반 fPOC 함수 (Housatonic River, HydroQual 2003-03-17, % → fraction).
 
 ## 4. 화학 kinetics (CALTOX_KINETICS, 287)
 
@@ -96,11 +105,16 @@ $$\text{TOXF}(L,K,NT) \mathrel{+}= \text{SEDF}(L,K,NS) \times \text{STFPOCW} \ti
 - **Bulk decay**: `TOX = TOX·(1 - TOXTIME·CDECAYW)` (water), `TOXB = TOXB·(1 - TOXTIME·CDECAYB)` (bed)
 - **Biodegradation Q10** (water): `COEFF = BIO_KW · BIO_Q10W^(0.1·(TEM - BIO_TW))` (CDECAYW 누적). bed: BIO_KB·Q10B^(0.1·(TEMB - BIO_TB)), depth≤BIO_MXD. bed 온도 simulated 시 TEMB, else 바닥층 water 온도.
 
-### 4.2 Volatilization (two-film, KL_OPT>0)
+### 4.2 Volatilization — two-film (CALVOLTERM, Transport/calvolterm.f90)
 
-상층(KC)만, `CALVOLTERM(...)` — 수면 two-film: 액상 $K_L$ + 기상 $K_G$, Henry's law `VOL.HE`, wind(WINDST), Schmidt 수(점성 `ViscosityW = 2.414e-5·10^(247.8/(TK-140))` Pa·s), 분자량 `TOXMW = 1/MW^0.667`. `TOX(KC) -= VOLTERM·TOXTIME`. **PFTWC(sorbed fraction)로 dissolved 만 휘발** (particulate 비휘발).
-- 기체상수 `RCONST = 8.206e-5` atm·m³/mol·K
-- toxic step `TOXSTEPW` 간격 (sediment substep)
+상층(KC)만 `CALVOLTERM(...)`. **two-film 직렬저항** (액상 $K_L$ + 기상 $K_G$):
+$$K_V = \frac{1}{1/K_L + 1/(K_G\cdot H_e)},\qquad H_e = \frac{C_{He}}{R\,T_{Ka}}\ (\text{dimensionless})$$
+$$\text{VOLTERM} = \text{MULT}\cdot K_V\cdot \text{HPKCI}\cdot(C_{\text{dis}} - \text{AIRCON}\cdot10^{-3}),\qquad C_{\text{dis}} = \text{WCCON}\cdot\frac{1}{1+\text{PFTW}}$$
+- **dissolved 만 휘발** (DISFRAC=1/(1+PFTW), particulate 비휘발). $K_V$ 에 온도보정 `×TCOEFF^(T-20)`. $D_w = 22\times10^{-9}/MW^{0.667}$, $D_a = 1.9\times10^{-4}/MW^{0.667}$
+- **2 regime** (VEL_AVG>VEL_MAX 또는 HP<DEP_MIN → river; else lake):
+  - **River/stream** (water turbulence 지배 $K_L$, reaeration): HP<0.61 **Owens** $K_L=5.35V^{0.667}H^{-1.85}$ / HP>HPU(=3.45V^2.5) **O'Connor-Dobbins** $K_L=(D_w V)^{0.5}H^{-1.5}$ / else **Churchill** $5.026V^{0.969}H^{-1.673}$. $K_G$=0.0011574 m/s
+  - **Lake/quiescent** (air turbulence 지배): Schmidt 수($SC_w=\nu_w/D_w$, $SC_a$), wind drag $C_D=(6.1+0.63W)\times10^{-4}$, $U_*=W\sqrt{C_D}$. **KL_OPT=2 Mackay-Yeun(1983)** $K_L=0.0144U_*^{2.2}/\sqrt{SC_w}$($U_*$<0.3) / **KL_OPT=1 O'Connor** $K_L=0.0462U_*(\rho_a/\rho_w)^{0.5}/SC_w^{0.667}$; $K_G=0.0462U_*/SC_a^{0.667}$
+- 점성 `ViscosityW = 2.414e-5·10^(247.8/(TK-140))` Pa·s, 공기점성 $1.458\times10^{-6}T^{1.5}/(T+110.4)$. $R$=8.206e-5 atm·m³/mol·K. toxic step `TOXSTEPW`.
 
 ## 5. Propwash 연계
 
@@ -116,10 +130,9 @@ $$\text{TOXF}(L,K,NT) \mathrel{+}= \text{SEDF}(L,K,NS) \times \text{STFPOCW} \ti
 
 ## 7. 한계
 
-- `caltoxb.f90`(490)·`partmix.f90` 본문 식 미상세 read — header + 역할만 (bed 분배는 water 동일 체계 추정).
-- `CALVOLTERM` 함수 본문(two-film K_L/K_G 식) 미read — ChemFate 별 파일 추정.
-- ssedtox.f90 driver 전체 흐름(toxic substep·SEDF 연계 순서) 미상세 — 호출만 확인.
-- foodchain(ISFDCH)·time-series(TMSR) 후처리 미커버.
+- ✅ `caltoxb.f90`(490, tri-diagonal solver §3)·`partmix.f90`(PMXDEPTH/PMXCOEF §3)·`CALVOLTERM`(two-film §4.2, Transport/calvolterm.f90) deep read 완료.
+- ssedtox.f90 driver 전체 흐름(toxic substep·SEDF 연계 순서) 미상세 — CALTOX/CALTOXB/CALTOX_KINETICS 호출만 확인.
+- foodchain(ISFDCH)·time-series(TMSR) 후처리 미커버. FUNDEN(밀도)·DIFFUSER_MODULE 외부 함수 미read.
 
 ## 8. 연결
 
