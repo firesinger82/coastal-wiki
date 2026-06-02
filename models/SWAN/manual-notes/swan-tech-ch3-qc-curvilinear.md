@@ -24,7 +24,7 @@ related:
 
 ## 1. §3.9 QC approximation 구현 (Eq 3.44-3.45)
 
-§2.7 phase-space 식(Eq 2.225-2.230)은 $(\vec{x},\vec{k})$ 공간, SWAN 은 $(\sigma,\theta)$. 전략: **$(\sigma,\theta)$서 Wigner 정의 → $\vec{k}$ 변환 → phase space서 scattering → $(\sigma,\theta)$ 역변환** (Smit 2015a / Akrish 2020 은 $\vec{k}$ 고수).
+§2.7 phase-space 식(PDF Eq 2.146-2.155, [[swan-tech-ch2-7-qcm-theory]]; HTML 번호 2.225-2.230)은 $(\vec{x},\vec{k})$ 공간, SWAN 은 $(\sigma,\theta)$. 전략: **$(\sigma,\theta)$서 Wigner 정의 → $\vec{k}$ 변환 → phase space서 scattering → $(\sigma,\theta)$ 역변환** (Smit 2015a / Akrish 2020 은 $\vec{k}$ 고수).
 
 $$\frac{\partial W}{\partial t} + \nabla_{\vec{x}}\cdot[(\vec{c}_g + \vec{u})W] = J^{-1}S_{\text{qc}} \quad \text{(3.44)}$$
 - $W(\vec{x},t;\sigma,\theta)$ = Wigner 분포, $J = |\vec{c}_g|/|\vec{k}|$ = Jacobian. $S_{\text{qc}}$ 평가 전 $W(\vec{x},t;\vec{k}) = J\,W(\vec{x},t;\sigma,\theta)$ 필요
