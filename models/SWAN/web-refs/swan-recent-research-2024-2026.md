@@ -31,6 +31,8 @@ swantech §2.3.3 의 ST6([[swan-tech-ch2-dissipation-detailed]] §4) 가 최근 
 
 ## 2. ML/DL 하이브리드 SWH 예측 (SWAN 데이터 학습)
 
+> **상세는 [[swan-ml-surrogate-models]] 별도** (surrogate DELWAVE/DeepONet/FNO/GNN + forecasting transformer/LSTM + hybrid PINO + review).
+
 SWAN numerical 출력을 학습데이터로 한 **hybrid (numerical + data-driven)** SWH 예측이 급증.
 
 - **"Enhancing significant wave height prediction based on numerical SWAN and Crossformer models with adaptive decomposition"**, *Expert Systems with Applications* (2025). [S0957417425021426] — SWAN + **Crossformer** + adaptive decomposition.
