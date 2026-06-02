@@ -81,7 +81,7 @@ User Manual Chapter 1 (p.1) verbatim:
 - **Bibliography** (p.145)
 - **Index** (p.146)
 
-→ **57 commands** 식별 (PROJECT…STOP). 본 위키 [[swan-command-file-reference]] 의 매핑 검증 가능.
+→ **57 commands** 식별 (PROJECT…STOP). **Physics command (§4.5.4) deep**: [[swan-command-physics-reference]] (GEN/WCAPPING/QUADRUPL/BREAKING/FRICTION/TRIAD 구문·default verbatim). 나머지 start-up/grid/output command 는 후속.
 
 ## 3. Scientific/Technical (swantech.pdf) TOC verbatim
 
