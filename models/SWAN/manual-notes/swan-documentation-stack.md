@@ -179,7 +179,19 @@ User Manual Chapter 1 (p.1) verbatim:
 | 5 | Run instructions | 25 |
 | 6 | Testing SWAN | 29 |
 
-→ 본 위키 [[swan-parallel-implementation]] §MPI 와 cross-link. CMake build 신규 발견.
+→ **deep note 완성**: [[swan-implementation-manual]] verified (2026-06-03) — node1-21 직접 read. source file 인벤토리(§2, [[swan-source-coverage-audit]] 1차 출처) + GNU make(`make config/ser/omp/mpi`) + `switch.pl` 14 옵션(block Jacobi/wavefront) + MPI/Metis(41.45A multilevel k-way)/netCDF(40.91A) + **CMake(41.41+, Ninja, `-DMPI/OPENMP/METIS/NETCDF`)** + swaninit(version 4, time coding 6옵션, processor speed 부하분배) + swanrun + hcat. [[swan-parallel-implementation]] §MPI 와 cross-link.
+
+## 4.1 Programming Rules (swanpgr v1.3) TOC + deep note
+
+| Ch | 제목 |
+|---|---|
+| 1-2 | Introduction / FORTRAN 90 standards |
+| 3-5 | Control statements / Use of modules / Program layout |
+| 6-8 | Input-output / Error messages / Pseudo code |
+| 9-12 | Performance / Machine dependency / Exceptions / Names |
+| 13 | Examples (subroutine·module templates) + Bibliography + Log sheet |
+
+→ **deep note 완성**: [[swan-programming-rules]] verified (2026-06-03) — node1-18 직접 read. ANSI F90 규칙(IMPLICIT NONE+관례 i-n=int, common 금지, allocatable 우선, obsolete F77 금지, GOTO/STOP/WHERE/BLAS 제한) + control 3구조 + module(data hiding, default PRIVATE) + **13-section 주석블록 layout(0.Authors…13.Source text)** + **subroutine template(`SAVE IENT`/`STRACE` trace)** + naming(`sw`/`swmod`). source-analysis 의 서브루틴 주석블록 구조 1차 출처. ※ swanpgr 는 **v1.3(2006-03-22) 이후 미갱신**(swanimp/use/tech 41.51 과 대조).
 
 ## 5. 본 위키 매핑 + 후속 보강
 
