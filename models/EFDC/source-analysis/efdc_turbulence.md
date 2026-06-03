@@ -47,8 +47,18 @@ Stability functions live in **CALAVB**, not in `CALQQ*`. `ISTOPT(0)` selects:
 
 Richardson-number form:
 - `RIQ = −GP * HP * DML² * DZIG * (B(k+1) − B(k)) / QQ` (clamped) (`:150-152`).
-- `SFAV = SFAV0 * (1 + SFAV1*RIQ) / ((1 + SFAV2*RIQ)*(1 + SFAV3*RIQ))` (`:153`).
-- `SFAB = SFAB0 / (1 + SFAB1*RIQ)` (`:154`).
+- `SFAV = SFAV0 * (1 + SFAV1*RIQ) / ((1 + SFAV2*RIQ)*(1 + SFAV3*RIQ))` (`:153`) — momentum stability φ_A (theory Eq 2.15).
+- `SFAB = SFAB0 / (1 + SFAB1*RIQ)` (`:154`) — scalar/buoyancy stability ρ_K.
+
+Stability-function constant values (verified 2026-06-03, `calavb.f90:44-73`; `SFAV0=0.392010` common):
+
+| `ISTOPT(0)` | formulation | SFAV1(R₁⁻¹) | SFAV2(R₂⁻¹) | SFAV3(R₃⁻¹) | SFAB0(K₀) | SFAB1 |
+|---|---|---|---|---|---|---|
+| 0/1 default | Galperin et al. 1988 | 7.760050 | 34.676440 | 6.127200 | 0.493928 | 34.676440 |
+| `2` | Kantha-Clayson 1994 | 8.679790 | 30.192000 | 6.127200 | 0.493928 | 30.192000 |
+| `3` | Kantha 2003 | 14.509100 | 24.388300 | 3.236400 | 0.490025 | 24.388300 |
+
+→ 상수 = [[efdc-theory-v12-ch2-hydrodynamics]] §2.1.4 **Table 2.1** 와 정합. **★ code ≠ theory**: Table 2.1 은 **4 옵션**(Mellor-Yamada 1982 R₁⁻¹=**7.846436** 포함)을 나열하나, `calavb.f90` 은 `ISTOPT(0)==2/3` 만 분기하고 기본(0·1)=Galperin → **MY1982 원본 상수는 이 EFDC+ build 에서 선택 불가**(실질 3 옵션). RIQ clamp: `RIQMIN=-0.999/SFAB1`, `RIQMAXX=RIQMAX if ISLLIM≥1`(Galperin √R_q<0.53 length limit, `:76`) else 1e32. 시간필터 `ISFAVB`: 0 none / 1 산술평균 / 2 기하평균(`:100-208`).
 
 Then:
 - `AB = SFAB * DML * HP * sqrt(QQ) + AVBXY` (`:155`).
