@@ -290,7 +290,7 @@ EE12 GUI에서 polygon 영역별 AHO/AHD 할당 → 저장 시 `AHMAP.INP` 자�
 
 ## 8. 미해결 / 추가 보강 후보
 
-- `caldisp2.for`·`caldisp3.for` (GVC, 각 336·557 lines) — Taylor dispersion **사후처리** 도구 (DISTEN.OUT, UVTSC.OUT 등 시간-평균 분산 계수 출력). 본 HMD subroutine 과 무관하지만 EFDC 진단 도구로 별도 노트 가능 ([[caldisp-postprocess]] 후속).
+- ~~`caldisp2.for`·`caldisp3.for` (GVC, 각 336·557 lines) — Taylor dispersion **사후처리** 도구.~~ **✅ 신설 완료**: [[efdc_caldisp_postprocess]] verified (2026-06-03) — 연직 전단×연직혼합 → 잔차(조석평균) dispersion 텐서 D_xx/xy/yx/yy. ISDISP=2(SVD)/3(LU+DISDIA 이상치 평활), N≥NDISP 마지막 조석주기 누적, /HLPF·TPN 정규화. DISTEN/UVTSC/UVERV/SINVAL/DISDIA.OUT. 본 HMD(main loop)와 별개 진단.
 - `calhdmf.for` (GVC) line 245-255, 300-304, 418-433의 `AHSXY.DIA / AHNN.DIA / AHDIFF.DIA / AHD2.DIA` 디버그 출력 — EFDC+에서 제거되었으나 GVC 사용 시 진단 가치.
 - ISHDMFILTER 활성 조건 (`NITER > 100 or restart` `calhdmf.f90:338`)의 25% growth limiter — 어떤 시나리오에서 numerical instability 흡수에 효과적인지 사용자 사례 누적 필요 ([[experience]] 후보).
 - `LHDMF(L,K)` 및 `LKHDMF/LLHDMF` masking 로직 (계산되는 wet HMD 셀 식별, `calhdmf.f90:89-105`) — 부분-건조 셀 처리.
