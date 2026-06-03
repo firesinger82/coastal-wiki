@@ -237,7 +237,8 @@ User Manual Chapter 1 (p.1) verbatim:
 - TOC + Ch 1 만 verified. **Ch 2-8 본문 식 정확 인용은 추후 chapter별 deep notes 필요**.
 - Bibliography (Tech p.149 + User p.145) full list 미포함.
 - ✅ Appendix A "Definitions of variables" (User p.115-120) — **deep note 완성**: [[swan-output-variable-definitions]] verified (2026-06-03). HSIGN/TM01·02/TMM10/DIR/DSPR/QP/BFI/FORCE 적분식 verbatim + MS↔DSPR Table A.1 + Cartesian/Nautical convention. 이론 Eq(2.11-12·3.59-61) ↔ output quantity 정합.
-- Appendix C "swan.edt" (User p.127) — SWAN command file editor template, [[swan-command-file-reference]] 와 cross-walk 가치.
+- ✅ Appendix D "Spectrum files" (User p.137) — **deep note 완성**: [[swan-spectral-file-format]] verified (2026-06-03). BOUNDSPEC/SPECOUT/NESTOUT 파일구조(SWAN version·TIME·LOCATIONS/LONLAT·RFREQ/AFREQ·CDIR/NDIR·QUANT·FACTOR/ZERO/NODATA) + 1D 3-quantity/2D 1-quantity + exception value verbatim.
+- Appendix C "swan.edt" (User p.127) — SWAN command file editor template, [[swan-command-file-reference]] 와 cross-walk 가치 (command 3노트로 대부분 커버됨, 잔여 가치 낮음).
 
 ## 8. 연결
 
