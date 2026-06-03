@@ -25,6 +25,8 @@ XBeach output system: `tintg/tintp/tintm` time intervals, `outputformat=fortran/
 - `timestep.F90:181-742` — output timing, snap.
 - `initialize.F90:1697-1853` — point snap, hotstart read.
 - `variables.def:47-198` — variable metadata.
+- `varoutput.F90` — 출력 변수 registry/선택 (xpoints/ypoints, Avarpoint/Avarcross 점·cross-section별 출력변수 index, mnemmodule mnemonic). 전역/점/단면 출력변수 관리 (2026-06-03).
+- `postprocess.F90` — `postprocessvar_r2`: 출력 직전 변수별(mnemonic) fill-value/wetz masking 적용 (dry cell fill). 출력 변수 후처리 (2026-06-03).
 
 ## A. params.txt output keys
 
