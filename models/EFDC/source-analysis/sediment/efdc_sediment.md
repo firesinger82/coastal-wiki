@@ -100,6 +100,55 @@ Suspended-load:
 - `CSNDZEQ` Van Rijn Part II citation + formula (`:46-61`).
 - `CSNDEQC` Van Rijn Part II concentration formula (`:72-88`).
 
+### D.1 Noncohesive 외부함수 3종 detail (verified 2026-06-03) ★
+
+`calsnd.f90`(부유) + `bedload.f90` 가 호출하는 3 external function (모두 `SedTran-Original/`, EFDC+ DSI 2021-24). `ISNDEQ(NS)` = reference-concentration option, `ISBDLD/ISNDM1/2` = mode. 호출 (calsnd.f90:426/446/455):
+```fortran
+FACSUSL = FSEDMODE(WSETA, USTAR, USTARSND, RSNDM(NX), ISNDM1(NX), ISNDM2(NX), 2)
+ZEQ     = CSNDZEQ(ISNDEQ(NS), DIASED, GPDIASED, TAUR, TAUBSND, SEDDIA50, HP, SSG, WSETA)
+SNDEQB  = CSNDEQC(ISNDEQ(NS), DIASED, SSG, WSETA, TAUR, TAUBSND, SEDDIA50, SIGP, ZEQ, VDRBED, ISNDAL)
+```
+
+**(1) `FSEDMODE(...,IMODE)` — bedload(IMODE=1)/suspended(IMODE=2) 분배 (무차원)** `fsedmode.f90`:
+- `US = ISNDM2==0 ? USTOT : USGRN` (total vs grain shear velocity 선택), `USDWS = U*/W_s`. `WS==0 → 0`.
+- `ISNDM1` 5 모드:
+
+| ISNDM1 | bedload(IMODE=1) | suspended(IMODE=2) |
+|---|---|---|
+| `0` | 1.0 | 1.0 (둘 다 활성) |
+| `1` | 1.0 | binary: `U*/W_s ≥ RSNDM` → 1 |
+| `2` | 1.0 | linear: `(U*/W_s − 0.4)/9.6` clamp[0,1] |
+| `3` | binary: `U*/W_s < RSNDM` → 1 | binary: `≥ RSNDM` → 1 |
+| `4` | linear: `1 − TMPVAL` | linear: `TMPVAL=(U*/W_s−0.4)/9.6` |
+
+→ `RSNDM` = U*/W_s 임계(이송 mode 전환). linear 식의 0.4·9.6 은 van Rijn suspension 개시(U*/W_s≈0.4)~full suspension 범위.
+
+**(2) `CSNDZEQ(IOPT,...)` — 기준농도 reference height z_eq/H (무차원)** `csndzeq.f90`:
+
+| IOPT | 출처 | z_eq |
+|---|---|---|
+| `1` | Garcia-Parker 1991 (JHE 117:414) | **0.05** (상수) |
+| `2` | Smith-McLean 1977 (JGR 82:1735) | `26.3·D_max·(τ_b−τ_r)/g'd · (D/D_max)/DEP`, min 0.01 |
+| `3` | **van Rijn 1984 Part II** (JHE 110:1623) | `0.5·0.11·(1−e^{−0.5T})·(25−T)·DEP^{0.7}·D_max^{0.3}/DEP`, min 0.01 (T=τ_b/τ_rs−1) |
+| `4/5` | Hamrick Sedflume | **0.01** (상수) |
+
+**(3) `CSNDEQC(IOPT,...)` — near-bed 평형 기준농도 (noncohesive)** `csndeqc.f90`:
+- **공통 gate**: `U*=√τ_b`; **`U* < W_s → C=0`** (Hamrick: U*<W_s 면 bedload 만, calsnd 부유 0).
+
+| IOPT | 출처 | 식 핵심 |
+|---|---|---|
+| `1` | **Garcia-Parker 1991** | `Z = D_fac·λ·Re^{0.6}·U*/W_s` (Re Eq42, λ=1−0.29σ_φ Eq51, D_fac=(d/D50)^0.2 if ISNDAL≥1), `c=1.3e-7·Z^5/(1+3.33·Z^5)` (Eq45), ×1e6·SSG |
+| `2` | **Smith-McLean 1977** | `γ=2.4e-3(τ_b/τ_r−1)`, `c=0.65γ/(1+γ)`, ×1e6·SSG |
+| `3` | **van Rijn 1984 Part II** | `c = 0.015·(d/3D_max)·T^{1.5}/Re^{0.3}`, T=τ_b/τ_rs−1, ×1e6·SSG |
+| `4` | Hamrick Sedflume (no crit) | `c = 4e-9·(Re^{1.333}·U*/W_s − 1)^5/(1+e)·SSG·1e6` |
+| `5` | Hamrick Sedflume (with crit) | IOPT4 + `TMPVAL>1` gate (임계 이하 0) |
+
+- **τ_rs** (IOPT3 critical, csndzeq·csndeqc 공통): `Re≤10 → (4W_s/Re)²` / `Re>10 → 0.16·W_s²`. **2021-06 0.016→0.16 정정** (0.16=0.4², van Rijn 1984). ★ 수정 이력.
+- `Re = 1e4·d·(9.8(SSG−1))^{0.333}` (van Rijn grain Reynolds), `SIGPHI`=φ 표준편차, `SNDDMX`=D90/Dmax, `VDR`=void ratio.
+- bad option → `STOPP`.
+
+→ Original noncohesive 의 **van Rijn(IOPT3)·Garcia-Parker(1)·Smith-McLean(2)·Hamrick Sedflume(4/5)** 4계열. SEDZLJ([[efdc_sedzlj]])는 이 reference-concentration 대신 Sedflume erosion rate 직접 사용 — 두 모델의 noncohesive 부유 기원 차이.
+
 ## E. Bed update per timestep
 
 `CALCONC` calls `SSEDTOX` when sediment is active and sediment time has accumulated:
