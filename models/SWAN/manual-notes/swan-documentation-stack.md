@@ -236,7 +236,7 @@ User Manual Chapter 1 (p.1) verbatim:
 
 - TOC + Ch 1 만 verified. **Ch 2-8 본문 식 정확 인용은 추후 chapter별 deep notes 필요**.
 - Bibliography (Tech p.149 + User p.145) full list 미포함.
-- Appendix A "Definitions of variables" (User p.115-120) — 정확한 SWAN output variable 정의 목록, [[swan-output-formats]] 와 cross-walk 가치.
+- ✅ Appendix A "Definitions of variables" (User p.115-120) — **deep note 완성**: [[swan-output-variable-definitions]] verified (2026-06-03). HSIGN/TM01·02/TMM10/DIR/DSPR/QP/BFI/FORCE 적분식 verbatim + MS↔DSPR Table A.1 + Cartesian/Nautical convention. 이론 Eq(2.11-12·3.59-61) ↔ output quantity 정합.
 - Appendix C "swan.edt" (User p.127) — SWAN command file editor template, [[swan-command-file-reference]] 와 cross-walk 가치.
 
 ## 8. 연결
