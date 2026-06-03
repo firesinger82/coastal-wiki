@@ -3,7 +3,7 @@ title: "ADCIRC GWCE 선형solver — ITPACKV 2D JCG(Jacobi Conjugate Gradient): 
 topic: adcirc
 canonical_source: self
 citation_status: verified
-verification_method: "models/ADCIRC/raw/source_code/adcirc/src/itpackv.F (2942) 직접 read — jcg(63 driver) + itjcg(459 1-iteration) + pjac(1932 Jacobi precond) + pmult(1970 matvec) + parcon/chgcon(1774/893 가속 param) + pstop(721 수렴) + zbrent/eqrt1s(2521/1402 고유값) + dfault(1071). gwce.F:2003 CALL JCG + IPARM/RPARM(145-151) 인터페이스 file:line 인용. ITPACKV = Kincaid-Young-Grimes(UT Austin)."
+verification_method: "models/ADCIRC/raw/source_code/adcirc/src/itpackv.F (2942) 직접 read — jcg(63 driver) + itjcg(459 1-iteration) + pjac(1932 Jacobi precond) + pmult(1970 matvec) + parcon/chgcon(1774/893 가속 param) + pstop(721 수렴) + zbrent/eqrt1s(2521/1402 고유값) + dfault(1071). gwce.F:2003 CALL JCG + IPARM/RPARM(145-151) 인터페이스 file:line 인용. 원본 ITPACKV 2D(1990-01) = Kincaid·Grimes·Respess, UT Austin Center for Numerical Analysis(:41-43); ADCIRC에 MODULE ITPACKV로 편입(vjp 1999)·MPI 적응·LGPL."
 note_author: "Claude Opus 4.8 (1M context) source-code direct read"
 note_date: 2026-06-03
 verification_by: "Claude Opus 4.8 (1M context) — JCG 알고리즘·전처리·adaptive·인터페이스 verbatim"
@@ -16,7 +16,7 @@ related:
 
 # ADCIRC GWCE 선형 solver — ITPACKV JCG
 
-> `src/itpackv.F`(2942) 직접 read. [[adcirc-gwce-implementation]] §C 가 인터페이스(ITMAX/CONVCR/NUMITR)를 다뤘고, 본 노트는 **solver 내부 알고리즘**. GWCE 의 consistent-mass(`ILump=0`) 대칭 SPD 행렬을 **ITPACKV 2D 의 JCG(Jacobi Conjugate Gradient)** 로 해. ITPACKV = 벡터화 ITPACK(Kincaid·Young·Grimes, UT Austin). (third-party 라이브러리 — ADCIRC 가 내장 포함)
+> `src/itpackv.F`(2942) 직접 read. [[adcirc-gwce-implementation]] §C 가 인터페이스(ITMAX/CONVCR/NUMITR)를 다뤘고, 본 노트는 **solver 내부 알고리즘**. GWCE 의 consistent-mass(`ILump=0`) 대칭 SPD 행렬을 **ITPACKV 2D 의 JCG(Jacobi Conjugate Gradient)** 로 해. **`itpackv.F` 출처**(헤더 정확): 원본 ITPACKV 2D 코드(1990-01)는 **David Kincaid·Roger Grimes·John Respess, University of Texas Center for Numerical Analysis** 작성(:41-43). 외부 링크 라이브러리가 아니라 **ADCIRC 소스트리에 `MODULE ITPACKV` 로 편입**(vjp 1999)되어 ADCIRC LGPL 저작권을 달고 **MPI 적응(`USE MESSENGER`)·컴파일러 수정**(vjp/jjw)을 받음. = 외부 기원(ITPACK) + ADCIRC 편입·적응.
 
 ## 1. 호출 인터페이스 (gwce.F:2003)
 
@@ -63,11 +63,11 @@ Chebyshev/CG 가속 parameter 를 위해 행렬 spectrum 추정:
 
 - GWCE 가 SPD 대칭(consistent mass + tau0 primitive weighting)이라 **JCG 가 적합**(대칭계 CG 수렴 보장). 비대칭이면 발산 가능.
 - **MPI**: 각 subdomain 이 자기 JCG 를 풀고, `pmult` 의 matvec 에 halo 교환 필요([[adcirc-parallel-implementation]] UPDATER) — 도메인 분할이 수렴/반복수에 영향.
-- third-party 라이브러리라 ADCIRC 개발자가 수정 거의 안 함(v41.09 이후 안정). 실무 튜닝은 IPARM/RPARM(ITMAX/CONVCR)만.
+- ITPACK 알고리즘 코어는 안정(외부 기원·검증된 라이브러리)이나 ADCIRC 편입 시 MODULE화·MPI·컴파일러 수정을 받음(v41.09 이후 코어 안정). 실무 튜닝은 IPARM/RPARM(ITMAX/CONVCR)만.
 
 ## 7. 연결
 
 - [[adcirc-gwce-implementation]] §C — solver 인터페이스(IPARM/RPARM, lumped 우회), 본 노트가 그 내부
 - [[adcirc-timestep-orchestration]] — solveGWCE → GWCE_New 내부에서 JCG 호출
 - [[adcirc-parallel-implementation]] — pmult matvec 의 MPI halo
-- ITPACK: Kincaid, Young, Grimes (UT Austin) — Jacobi/SOR/SSOR/CG iterative solver 라이브러리
+- ITPACKV 2D (1990-01): David Kincaid, Roger Grimes, John Respess — UT Austin Center for Numerical Analysis. Jacobi/SOR/SSOR/CG adaptive iterative solver. (D.M. Young 의 ITPACK 계보; 본 파일 attribution 은 Kincaid/Grimes/Respess)
