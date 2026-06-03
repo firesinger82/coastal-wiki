@@ -427,14 +427,14 @@ C36 | ISEDINT | ISEDBINT | NSEDFLUME | ISMUD | ISNDWC | ISEDVW | ISNDVW | KB | I
 
 ## 10. 미해결 / 추가 보강 후보
 
-- ~~`s_sedic.f90` (769 lines) — bed initial-condition reader.~~ **§11 verified line 1-380 (2026-06-01 §11.1-5 + 2026-06-02 §11.6-8 deep: VAR_BED NCORENO core map + Sedflume core read + core→cell 매핑 + 층질량/LAYERACTIVE 초기화). 잔여: line 380-769 (HBED·HBED1 IC + bedload IC + morph 후처리) 별도.**
+- ~~`s_sedic.f90` (769 lines) — bed initial-condition reader.~~ **§11 完 verified line 1-769 (2026-06-01 §11.1-5 + 2026-06-02 §11.6-8 + 2026-06-03 §11.9-14: hard-bottom ZELBEDA·KBT + 신규퇴적 ERATEND/TAUCRITE·ACTDEP power-law + Cheng1998 settling + IHTSTRT hotstart SEDBED_HOT.SDF restore + fetch/STWAVE wave 입력 + toxics용 SEDB/SEDBT/VDRBED + WSEDO/SEDDIA 단위변환 + empty-layer collapse).**
 - `s_tecplot.f90` (310 lines) — SEDZLJ Tecplot 출력 — 분석 측면에서 별도 노트 필요 시.
 - Propwash 연동 (`Variables_Propwash` use, line 27) — `s_sedzlj.f90:135-180, 559-617` 의 `PROP_ERO(L,1:NSEDS)` 처리. [[efdc-propwash]] (별도 노트) 후보.
 - Mass erosion fast class (`NSEDS2 > NSEDS`, `s_sedzlj.f90:165-180, 604-617`) — propwash 시 fast/normal 분리 동작.
 - Toxics linkage (`NSEDFLUME = 99`) — **deprecated 2016-12 ([[efdc_sedzlj]] §11.4)**. 매뉴얼 Card C36 의 NSEDFLUME=99 표기는 stale → ISTRAN(5)>0 가 현행.
 - Wave-current 식 번호와 Christoffersen-Jonsson 1985 원논문 페이지 cross-check (현재는 코드 코멘트 기준 인용).
 
-## 11. SEDIC initialization (`s_sedic.f90`, 769 lines, line 1-380 verified — §11.1-5 2026-06-01, §11.6-8 deep 2026-06-02)
+## 11. SEDIC initialization (`s_sedic.f90`, 769 lines 全 verified — §11.1-5 2026-06-01, §11.6-8 deep 2026-06-02, §11.9-14 line 380-769 deep 2026-06-03)
 
 SEDZLJ bed 초기화: 입력 read(bed.sdf/erate.sdf) → VAR_BED core map(NCORENO) → Sedflume core data → core→cell 매핑 → 층질량/LAYERACTIVE 초기화.
 
@@ -509,3 +509,84 @@ Master only read, 그 후 `Broadcast_Scalar/Array` 분배. `mod_var_global.f90` 
 - **초기 층질량** (NSEDFLUME≠3): `LAYERACTIVE = 2`(in-place, TSED0S>0) 또는 `0`; `TSED = TSED0 = TSED0S × BULKDENS` (g/cm²)
 - **post-process**: `TSED0/BULKDENS < 1e-8` 또는 `K≤2`(active layer) → `HBED=TSED=TSED0=0`, `TAUCOR=1000` (무침식)
 > §3 s_shear·§2 s_sedzlj 가 사용하는 bed state (TAUCOR/ERATE/PERSED/TSED/LAYERACTIVE/BULKDENS)를 모두 SEDIC 가 초기화.
+
+### 11.9 Hard-bottom 표고 + KBT (line 392-405) — deep 2026-06-03
+
+cold-start(IHTSTRT==0) cell별 bed 기하 계산:
+```fortran
+KBT(L) = -1                                ! line 396 - 질량 있는 첫 층
+do K = 1,KB                                ! topdown
+  if( TSED0(K,L)>0. .and. KBT(L)==-1 .and. K>2 ) KBT(L) = K     ! line 398
+  TSET0T(L) = TSET0T(L) + TSED0(K,L)/BULKDENS(K,L)              ! 총 sediment 두께 누적
+  HBED(L,K) = 0.01*TSED(K,L)/BULKDENS(K,L)                      ! line 400 - 층두께 (cm→m)
+  HBEDA(L)  = HBEDA(L) + HBED(L,K)
+enddo
+if( KBT(L)==-1 ) KBT(L) = KB
+ZELBEDA(L) = BELV(L) - HBEDA(L)            ! line 404 - Hard Bottom Elevation
+```
+- **KBT(L)** = top active layer index (질량 있는 최상위 층, K>2 parent layer 부터). 질량 전무 시 KB.
+- **HBED(L,K)** = `0.01·TSED/BULKDENS` (TSED g/cm² → m). **HBEDA** = 전층 누적 = 총 bed 두께.
+- **ZELBEDA = BELV − HBEDA** = hard-bottom 표고(bed 아래 불침식 기반). §3 s_shear 의 morphology 기준면.
+
+### 11.10 Newly-deposited sediment: ERATEND + TAUCRITE (line 408-436) — deep
+
+bed.sdf 후반부 — **신규 퇴적층(deposited)** 의 침식 파라미터 (NSICM = size-class-for-initial-condition 개수):
+```fortran
+read(30,*) (SCND(NSC),NSC=1,NSICM)         ! line 413 - size class 입경 (micron)
+read(30,*) (TAUCRITE(NSC),NSC=1,NSICM)     ! line 415 - size별 침식 임계 (dynes/cm²)
+if( NSEDFLUME==1 )then
+  do NSC=1,NSICM; read(30,*)(ERATEND(NSC,M),M=1,ITBM); enddo   ! Sedflume 측정 침식률 table
+else
+  do NS=1,NSICM; read(30,*) ACTDEPA(NS),ACTDEPN(NS),ACTDEPMAX(NS); enddo  ! power-law E=A·τ^N
+endif
+```
+- **SCND** = initial-condition size class 입경 (in-place core 의 D50 와 별개; **deposited sediment** 의 분류). 정밀도 offset `SCND(1)-=1e-6`, `SCND(NSICM)+=1e-6` (line 679-680).
+- **TAUCRITE** = size class별 신규퇴적 erosion 임계 shear.
+- **ERATEND(NSC,M)** (NSEDFLUME=1) = size·shear-category별 침식률 (in-place 의 ERATETEMP 대응, §11.7).
+- **ACTDEPA/N/MAX** (NSEDFLUME=2) = 신규퇴적층 power-law `A·τ^N` 계수 + 상한 ([[efdc_sedzlj]] §2.2 in-place EA/EN/MAXRATE 대응). §2.4 active layer 가 이 deposited 파라미터로 침식.
+
+### 11.11 DISTAR + settling velocity (Cheng 1998) (line 438-450) — deep
+
+```fortran
+DISTAR(K) = D50(K)/10000.*(((SEDDENS(1)/WATERDENS)-1.)*980./0.01**2)**(1./3.)   ! line 439
+if( DWSIN(K) == -1 )then     ! DWS 미입력 → Cheng(1998)
+  DWS(K) = 0.01/(D50(K)*0.0001)*(SQRT(25.+1.2*DISTAR(K)**2)-5.)**1.5            ! cm/s
+else
+  DWS(K) = DWSIN(K)          ! 직접 입력
+endif
+```
+- **DISTAR** = dimensionless grain size $D_* = D_{50}\left[\frac{(s-1)g}{\nu^2}\right]^{1/3}$ (CGS: $\nu=0.01$ cm²/s, $g=980$). §11.2 의 `DWSIN(K)=-1` 시 settling 자동 계산.
+- **Cheng 1998** model: $w_s=\frac{\nu}{d}(\sqrt{25+1.2D_*^2}-5)^{1.5}$ (cm/s). §11.2 에서 `DWSIN` 음수면 여기서 산출.
+
+### 11.12 IHTSTRT > 0 — hotstart restart `SEDBED_HOT.SDF` (line 452-566) — deep
+
+cold-start 대신 이전 run 의 bed state 복원:
+- **version 체크** (line 458-469): 첫 줄 `TBEGINSEDZLJ, VER`. `VER<1240` → 파일 reset(구버전 헤더 없음).
+- **read (global, master)**: `LAYERACTIVE`(8I8) / `KBT` / `D50AVG`(E17.9) / `BULKDENS` / `TSED` / `TSED0`(VER≥1240) / `PERSED` (6E17.9). broadcast → `Map2Local` local 매핑.
+- **PERSED 정규화** (line 504-509): `DTOTAL=SUM(PERSED)`, `/DTOTAL` mass-balance 정밀도 보장.
+- **bedload restart** (line 514-540): `ICALC_BL>0 & Restart_In_Ver>1000` → `CBL`(bedload 농도) read; `ISTRAN(5)>0` → `CBLTOX`(bedload toxics) read. ([[efdc_toxics]] 연계)
+- **hard-bottom cell** (line 542-556): `LBED(L)` true → `LAYERACTIVE=0, TSED=TSED0=0, PORBED=BEDPORC`; else `PORBED=1−BULKDENS/SEDDENS(CORE)`.
+- format: `34567 E17.9` / `34568 6E17.9` / `34569 8I8`.
+
+### 11.13 Wave 입력 (line 570-607)
+
+`ISWNWAVE` (§11.2 bed.sdf 입력) 분기:
+- **==1** `fetch.inp`: `FWDIR(L,FDIR)` 8방위 wave fetch (내부 wind-wave 생성용).
+- **==2** `stwave.inp`: STWAVE 결합 — `STWVHT`(파고)/`STWVTP`(주기)/`STWVDR`(방향) per cell, `STWVNUM` 데이터셋 × `STWVTIM` 간격. §3 s_shear 의 wave-current bed shear (Christoffersen-Jonsson) 입력.
+
+### 11.14 Toxics용 bed array 초기화 + 단위 변환 (line 678-763) — deep ★
+
+```fortran
+WSEDO(1:NSEDS)  = DWS(1:NSEDS)/100.0      ! line 696 - 침강속도 cm/s → m/s (SEDZLJ 외부용)
+SEDDIA(1:NSEDS) = D50(1:NSEDS)/1.d6        ! line 697 - 입경 micron → m
+if( BEDLOAD_CUTOFF < 10. ) BEDLOAD_CUTOFF = 64.   ! line 701 - bedload 입경 임계 default 64 micron
+```
+- **SEDZLJ 는 consolidation 없음** → `PORBED/PORBED1/VDRBED` 시간 불변 (line 704 주석).
+- **toxics-용 bed array** (CALTOX/CALTOXB 가 사용, [[efdc_toxics]]):
+  - `SEDBT(L,K) = TSED·10000` (g/cm²→g/m²), `SEDB(L,K,NS) = SEDBT·PERSED` (class별 질량), `SEDDIA50` 층 D50, `VDRBED=PORBED/(1−PORBED)` void ratio.
+  - prev-timestep copy: `HBED1/PORBED1/VDRBED1/SEDB1`.
+- **D50AVG** (line 682-693, cold-start): bed 표면 질량층의 `SUM(PERSED·D50)`, 최소 `D50(1)`.
+- **empty-layer collapse** (line 727-760, IHTSTRT>0): active(1)+deposition(2) 층을 KBT 로 합치고 그 사이/위 빈 층 0. restart 후 층 구조 정돈.
+- 종료: `SNDVDRD=BEDPORC/(1−BEDPORC)`(non-cohesive void ratio, SEDZLJ 미사용) + `deallocate(TAUTEMP,BDEN,PNEW)` (임시 core 배열 해제).
+
+> **§11 완결 (line 1-769 전체 verified)**: SEDIC 가 §2 s_sedzlj·§3 s_shear 의 in-place/deposited bed state + §11.14 toxics(CALTOX/CALTOXB) bed array + WSEDO/SEDDIA 단위까지 모두 초기화. cold-start(core map→Sedflume→층질량) vs hotstart(SEDBED_HOT.SDF restore) 두 경로.
