@@ -92,9 +92,20 @@ Bedload option dispatch in `bedload.f90`:
 | `1` | Van Rijn 1984 | `:118-163` |
 | `2` | Engelund-Hansen | `:166-200` |
 
-`FSBDLD` documents `ISOPT=1: Van Rijn (1984)`:
-- Coefficient form: `FSBDLD = 0.053*RD/(CSHIELDS^2.1)` (`fsbdld.f90:11-37`).
-- `ISOPT=2`: modified Engelund-Hansen (`:39-44`).
+### D.0 `FSBDLD` — 무차원 bedload 수송계수 Φ 4 옵션 (verified 2026-06-03) ★
+
+`fsbdld.f90`(54): bedload 수송률 `Q_b ∝ Φ·√(g'·d³)` 의 **무차원 계수 Φ** 산출. `ISBDLD(NS)`(=ISOPT) 선택:
+
+| ISOPT | 출처 | Φ 식 |
+|---|---|---|
+| `0` | user 상수 | `Φ = SBDLDP` (입력값) |
+| `1` | **van Rijn 1984 Part I** (Bed Load, JHE 110:1431) | `RD = (1/(d·√(g'd)·1e6))^0.2`; `Φ = 0.053·RD/θ_cr^{2.1}` (θ_cr=CSHIELDS critical Shields) |
+| `2` | modified Engelund-Hansen | `Φ = 2.0367·(DEP/D50)^{0.333}·(PEXP/PHID)^{1.125}` |
+| `3` | **Wu, Wang & Jia 2000** (J Hydr Res 38) | `Φ = 0.0053/(0.03·(PHID/PEXP)^{0.6})^{2.2}` |
+
+- **PEXP/PHID** = hiding-exposure probability(노출/은폐) — multi-class 상호작용. ISOPT 2/3 은 `(PEXP/PHID)` 비로 mixture 보정(coarse 노출↑·fine 은폐↑). ISOPT1 은 단일 D50 의 critical-Shields 의존.
+- `g'd = GPDIASED` = (s−1)g·d (수중 중력 가속), `θ_cr` = [[efdc_sedzlj]] §3 Shields와 동일 critical.
+- ISBDLD(NS) dispatch: `bedload.f90:118-163`(van Rijn) / `:166-200`(Engelund-Hansen). FSBDLD = Φ 만; 수송률·방향·slope 보정은 `bedload.f90`.
 
 Suspended-load:
 - `CSNDZEQ` Van Rijn Part II citation + formula (`:46-61`).
