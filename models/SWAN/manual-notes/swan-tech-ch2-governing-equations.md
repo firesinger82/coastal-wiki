@@ -163,6 +163,16 @@ $$\frac{\partial E}{\partial t} + \nabla_{\vec{x}} \cdot (\vec{c}_g E) = S_{\tex
 
 → **wave packet ray equation** along wave ray. Source/sink 없으면 energy conserved.
 
+## 2b. §2.4 The influence of ambient current on waves (node24, 서술)
+
+> swantech §2.4 직접 read — action balance 채택의 **물리적 정당화**.
+
+Ambient current(tidal·ocean·wind-generated·river·wave-generated)은 wave growth/decay 에 영향 (Yu 1952, Hedges 1985, Lia 1989). **강한 역류**서:
+- wave steepness·height **급증**, **wave blocking** (current 가 군속도 접근) + current-induced **whitecapping·reflection**
+- **blocking frequency**서 action 이 nonlinear wave-wave interaction 으로 고/저주파로 부분 전이 (Ris 1997)
+
+이론적 기반: **Longuet-Higgins-Stewart (1960, 1961, 1962)**. **핵심**: current 존재 시 **action density 보존, energy density 비보존** (Eq 2.16의 $N=E/\sigma$ 이유) → SWAN 이 energy balance 아닌 **action balance** 채택. (Eq 2.16 §2.2 + [[swan-tech-ch3-refraction-limiter]] §3.8 current refraction.)
+
 ## 3. 핵심 references (Ch 2 인용)
 
 - **Whitham 1974** — Linear and Nonlinear Waves (Wiley) — wave kinematics 원전, action density conservation 증명

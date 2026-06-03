@@ -22,6 +22,14 @@ related:
 >
 > **식 번호 주의**: Ch 3도 PDF↔online HTML offset (Eq 3.1-3.10 일치, hybrid scheme부터 HTML이 GSE 계수·refraction 예시식 추가번호 → +6). 본 노트는 **PDF 번호** 사용, GSE 계수식·refraction 예시식은 PDF 무번호.
 
+## §3.1 설계 원칙 (node36, 서술)
+
+SWAN 1993 (Holthuijsen·Booij·Ris, Booij 1999) 수치 설계 원칙:
+- **nearshore + oceanic** 모두 (deep+shallow process, **flexible mesh curvilinear·triangular, 격자 20 m ~ 100 km** — 해저 세부 ~ hurricane wind). Cartesian/spherical 좌표
+- 이산화는 **simple·robust·accurate·economical** → **finite difference + method of lines** (시간적분 ↔ 공간이산화 독립 선택)
+- **fully implicit 시간적분** → Von Neumann 안정 (임의 time step). **sweeping algorithm** (causality rule 준수)
+- limiter: action density limiter·frequency-dependent under-relaxation·refraction limiter·Patankar (이하 §3.7-3.8)
+
 ## 0. 시간 + 4D 이산화 (Eq 3.1-3.2)
 
 Action balance (Eq 2.19) homogeneous part:
