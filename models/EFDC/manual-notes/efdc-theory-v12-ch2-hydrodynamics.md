@@ -177,6 +177,8 @@ $$R_q = \frac{gH}{q^2} \cdot \frac{l^2}{H^2} \cdot \frac{\partial b}{\partial z}
 
 — EFDC+ user 가 선택. Mellor-Yamada 1982 의 base constants: $A_1 = 0.92, B_1 = 16.6, C_1 = 0.08, A_2 = 0.74, B_2 = 10.1$.
 
+> **구현 확인** ([[efdc_vertical_turbulence]] verified 2026-06-03): `calavb.f90` 의 `ISTOPT(0)` 는 **2(Kantha-Clayson)·3(Kantha)** 만 분기하고 기본(0/1)=**Galperin** → **MY1982 원본 상수(R₁⁻¹=7.846436)는 이 EFDC+ build 에서 선택 불가**(실질 3 옵션). 별도로 `ISGOTM>0` 시 GOTM(k-ε/MY/GLS 10 length-scale 옵션)으로 대체.
+
 #### (d) $q^2$ + $q^2 l$ prognostic equations (Eq 2.24·2.25):
 
 $$\partial_t(mHq^2) + \partial_x(Pq^2) + \partial_y(Qq^2) + \partial_z(mwq^2)$$
