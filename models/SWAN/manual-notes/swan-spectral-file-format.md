@@ -78,3 +78,4 @@ energy 또는 variance density. 이름: **`EnDens`**(true energy density) / **`V
 - [[swan-nesting-io-implementation]] — NESTOUT→BOUNDNEST nesting 이 이 spectral 파일로 parent→child 전달
 - [[swan-output-variable-definitions]] — EnDens/VaDens/CDIR·NDIR/DSPR quantity 의 적분 정의 (Appendix A)
 - [[swan-documentation-stack]] §7 한계의 swanuse Appendix 잔여(D) 충족
+- **downstream 소비자(model coupling)**: 이 SWAN spectral 출력을 외부 surfzone 모델이 offshore 파랑 경계로 읽음 — [[xbeach_swan_handoff]](XBeach `read_swan_file`)·[[xbeach_wave_boundary_generation]](→ bound IG) + EFDC [[efdc_waves]](GETSWAN). one-way nesting SWAN→XBeach/EFDC.
