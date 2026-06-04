@@ -32,7 +32,7 @@ related:
 
 ## 4. MPI halo 교환 — exchange_2d/3d/4d.F
 
-- `exchange_*`(2d/3d/4d + _xtr extended): **tile boundary halo 교환**(periodic·MPI subdomain). 모든 tiled 변수의 ghost point 갱신. [[roms_main_driver_dispatch]] tiling 의 통신 primitive. (`mp_exchange` 와 연계).
+- `exchange_2d` / `exchange_3d` / `exchange_4d`(+ `exchange_2d_xtr`/`exchange_3d_xtr` extended-range): **tile boundary halo 교환**(periodic·MPI subdomain). 변수 rank(2d 수위·3d 운동량/tracer·4d bio multi-class)별 ghost point 갱신. [[roms_main_driver_dispatch]] tiling 의 통신 primitive(`mp_exchange` 연계). `_xtr` = 확장 stencil(고차 advection·biharmonic).
 
 ## 5. 초기화 — ini_fields/set_zeta/post_initial/get_idata
 
