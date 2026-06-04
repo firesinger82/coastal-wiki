@@ -37,4 +37,5 @@ related:
 
 - [[xbeach_morphology]] — bathymetry 갱신(이쪽은 관측 동화, morphology 는 sediment 역학)
 - [[xbeach-morphology-foundation]] — bathymetry 입력
+- [[roms_adjoint_framework]] §4 — 모델별 DA 비교(Beach Wizard = XBeach 의 관측 동화 DA 사례)
 - Aarninkhof / Holman (Argus video) / van Dongeren et al.(Beach Wizard) 계열

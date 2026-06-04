@@ -49,6 +49,7 @@ related:
 ## 7. BMI — xbeach_bmi.f90 / libxbeach / iso_c_utils
 
 - **BMI(Basic Model Interface)**: `initialize(configfile)`/`update(dt)`/`get_var`/`set_var`/`finalize` C-bindable(`bind(C)`) interface(:43-62) — XBeach 를 외부(Python BMI·coupling framework·BMI-OpenEarth)에서 제어. `libxbeach`(dynamic library) + `iso_c_utils`(C interop 문자열). 모델 결합·실시간 제어용.
+- **자료동화(DA)**: 이 BMI(`get_var`/`set_var`)가 **OpenDA**(EnKF/DUD black-box) 결합점 — XBeach 는 native adjoint 없이 BMI 로 DA. 관측 동화 bathymetry 는 [[xbeach_beachwizard]]. ★ 모델별 DA framework 비교는 [[roms_adjoint_framework]] §4(ROMS=native 변분 / XBeach·Delft3D=OpenDA / ADCIRC=외부 ensemble).
 
 ## 8. 연결
 

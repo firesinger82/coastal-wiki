@@ -91,6 +91,8 @@ Time-window length: each phase takes `RunInterval` (`i4dvar.F:791-792`, `rbl4dva
 
 ## E. Tangent linear model (TLM)
 
+> **본 노트 = 4D-Var 알고리즘**(dispatch·cost·minimization). TLM/ADM/RPM **모델 구조**(각 NL 커널의 tl_/ad_/rp_ exact transpose) + 모델별 DA 비교는 [[roms_adjoint_framework]]. 둘이 ROMS DA 의 짝.
+
 - Main TLM kernel: `tl_main3d.F:3` (`SUBROUTINE tl_main3d`).
 - Forward stepping at `:185`; data ingestion `tl_get_data` at `:210`.
 - BASIC STATE fields (`set_depth/set_massflux`) processed at `:229-247`.
