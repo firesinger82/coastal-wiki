@@ -140,3 +140,11 @@ Tech §8.1 + 본 module: **action density `ac2` 는 vertex 에 저장** (cell-ce
 - OpenMP parallelization (41.10) 의 PRIVATE/SHARED 변수 별도.
 - QC surf breaking (41.91) 가 [[swan-quasi-coherent]] 의 SWQCSURF 와 어떻게 결합되는지 cross-walk 별도.
 - Casey Dietrich 41.20 ADCIRC integration 의 정확한 변경 부분 (line range) 식별 별도.
+
+## 8. 관련 unstructured compute 보조 routine (전소스 커버, 2026-06-04)
+
+본 `SwanCompUnstruc` 가 호출하는 vertex-based 보조 (swanimp Material 의 unstructured routine 군):
+- **`SwanTranspX.ftn90`** — vertex 간 geographic(x) 공간 transport(action flux). `SwanTranspAc`(spectral σ,θ transport)의 공간 대응. N-scheme/BSBT([[swan-tech-ch8-unstructured-grid-scheme]] §8.3 Eq 8.14-16).
+- **`SwanInterpolateAc.ftn90`** — action density `N(σ,θ)` 를 vertex↔점 보간(출력/nesting 용). spectra interpolation 의 비정형 버전([[swan-tech-ch3-obstacles-spectral-ops]]).
+- **`SwanInterpolateOutput.ftn90`** — 출력 위치(FRAME/POINTS)로의 비정형 보간([[swan-output-formats]] 의 unstructured 출력).
+→ 모두 `SwanCompUnstruc` time-step loop 또는 출력 단계의 보조. 이론은 [[swan-tech-ch8-unstructured-grid-scheme]]/[[swan-tech-ch8-unstructured-ops]].
