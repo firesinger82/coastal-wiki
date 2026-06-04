@@ -10,6 +10,8 @@ verification_by: "사용자 + codex source-code analysis"
 verification_date: 2026-04
 ---
 
+> **canonical 역할 (2026-06-04 중복 정리)**: 본 노트 = `single_dir=1` **모드**(instationary 를 1 bin 으로 축약 + stationary directional 보정). 정상상태 파작용 **solver 자체**는 [[xbeach_wave_stationary]](wave_stationary/wave_stationary_directions), 시간전진 파작용은 [[xbeach_wave_action_balance]] 가 canonical.
+
 ## Scope
 
 `single_dir=1` activation (surfbeat-only, default 1 in 2D, 0 in 1D), the mechanism: full multi-direction stationary directional update at `wavint`, but instationary action collapsed to **one representative direction bin** (`s%ntheta=1`) every step. Cost saving (instationary loops over 1 bin instead of `ntheta`), refraction+shoaling carried by stationary solve over `ntheta_s`, accuracy trade-off (loses directional spreading + per-bin refraction in surfbeat). Use this when sea state is narrow in direction and local mean direction is good representative.

@@ -14,6 +14,8 @@ verification_date: 2026-04
 
 Date: 2026-04-30
 
+> **canonical 안내 (2026-06-04 중복 정리)**: 본 노트는 **초기 orientation/setup-vocabulary**(first-use). 이후 deep 노트로 세분됨 — flow 경계조건 상세 **[[xbeach_flow_boundary_conditions]]**(abs_2d Van Dongeren Riemann), 파 경계 spectrum/config **[[xbeach_wave_boundary]]**, 파 경계 **생성 알고리즘**(bound IG Herbers/Van Dongeren)+SWAN 연동 **[[xbeach_wave_boundary_generation]]** 가 canonical. 본 노트는 설정 어휘·모드 선택 입문용으로 유지.
+
 This note captures the first boundary and wave-setup foundation for XBeach in this wiki.
 
 Scope note:

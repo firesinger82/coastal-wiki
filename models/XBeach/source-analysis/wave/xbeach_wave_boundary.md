@@ -10,6 +10,8 @@ verification_by: "사용자 + codex source-code analysis"
 verification_date: 2026-04
 ---
 
+> **canonical 역할 (2026-06-04 중복 정리)**: 본 노트 = 파 경계 **type/config·spectrum 파일·datastore**(wbctype·JONSWAP·BCF). **생성 알고리즘**(랜덤위상 단파 train→bound IG, Herbers/Van Dongeren)은 [[xbeach_wave_boundary_generation]], **flow 경계조건**(abs_2d 등)은 [[xbeach_flow_boundary_conditions]] 가 canonical. SWAN 입력 읽기는 [[xbeach_swan_handoff]].
+
 ## Scope
 
 How XBeach selects a wave-boundary type via `wbctype`, how JONSWAP spectra are generated (legacy `waveparams.F90` vs newer `waveparamsnew.F90`), how BCF files are written and time-interpolated, the role of `wave_bc_nextgen.f90` (scaffold), how directional spreading uses exponent `s`, what the `wave_boundary_datastore.F90` persists, and the front/back boundary options including nonh BC. Use this when configuring incident waves, debugging spectral file structure, or wiring a custom BC time series.
