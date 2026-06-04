@@ -39,7 +39,7 @@ related:
 
 ## 5. 서브디렉토리 모듈 (Transport/ · Utilities/)
 
-- **`Transport/coare36.f90`**(639): **COARE 3.6 bulk flux 알고리즘**(Fairall et al.) — 풍속·기온·습도·SST 로 air-sea 운동량(wind stress)·잠열·현열 flux 계산. ROMS [[roms_bulk_flux_coare]] 와 동일 계열. [[efdc_heat]] heat budget 의 표면 flux 산출.
+- **`Transport/coare36.f90`**(639): **COARE 3.6 bulk flux 알고리즘**(Fairall et al.) — 풍속·기온·습도·SST 로 air-sea 운동량(wind stress)·잠열·현열 flux 계산. ROMS [[../../ROMS/source-analysis/roms_bulk_flux_coare]] 와 동일 계열. EFDC heat budget(temperature 모듈, raw manual `Surface_Heat_Exchange`)의 표면 flux 산출 — heat 전용 source-analysis 노트 미작성(후속).
 - **`Transport/mod_diffuser.f90`**(1780): **diffuser/outfall(점 배출구) 모델** — 산업·하수 방류 diffuser 의 jet momentum·부력 plume → 운동량/scalar source. near-field 희석.
 - **`Transport/calsft.f90`**(351): surface flux 시계열(scalar 표면 flux 입력).
 - **`Utilities/mod_xyijconv.f90`**(491): **xy(물리좌표)↔ij(격자 index) 변환** — 관측위치·track·diffuser 위치를 격자 cell 로 매핑(좌표 변환 유틸).
@@ -48,5 +48,5 @@ related:
 
 - [[efdc_hydro_core]] — calstepd dynamic dt, mod_fields 자료구조
 - [[efdc_wetdry]] — negdep·cellmask wet/dry
-- [[efdc_heat]] — coare36 air-sea flux
+- coare36 air-sea flux → EFDC temperature/heat 모듈(전용 source-analysis 노트 미작성, raw manual `Surface_Heat_Exchange`)
 - [[efdc_vertical_turbulence]] / [[efdc_external_mode_solver]] — 본 보조가 지원하는 핵심 solver
