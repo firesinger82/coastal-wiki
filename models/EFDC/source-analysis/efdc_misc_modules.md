@@ -49,4 +49,4 @@ related:
 - [[efdc_hydro_core]] — calstepd dynamic dt, mod_fields 자료구조
 - [[efdc_wetdry]] — negdep·cellmask wet/dry
 - coare36 air-sea flux → EFDC temperature/heat 모듈(전용 source-analysis 노트 미작성, raw manual `Surface_Heat_Exchange`)
-- [[efdc_vertical_turbulence]] / [[efdc_external_mode_solver]] — 본 보조가 지원하는 핵심 solver
+- [[efdc_turbulence]] / [[efdc_external_mode_solver]] — 본 보조가 지원하는 핵심 solver

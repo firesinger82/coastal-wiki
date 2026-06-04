@@ -230,7 +230,7 @@ AIS/user track 의 시간 보간 (prev/next track 위치 사이 선형) → ship
 - ✅ `Calc_Prop_Erosion_Original`(van Rijn) + `add_ship_momentum`(efflux 운동량) deep read 완료 (§3.3).
 - `FSEDMODE`/`CSNDZEQ`/`CSNDEQC` 등 Original SedTran 외부함수 본문은 [[efdc_sedzlj]] 외 별도 (van Rijn 식 detail).
 - WhitePaper Ch 4(입력 detail)·Ch 5(검증 정량값) full read 안 함 — TOC + Fig 목록 기준 요약.
-- toxics linkage(caltox) 코드 미read — [[efdc-toxics]] 별도 후속.
+- toxics linkage(caltox) 코드 미read — [[efdc_toxics]] 별도 후속.
 
 ## 8. 연결
 

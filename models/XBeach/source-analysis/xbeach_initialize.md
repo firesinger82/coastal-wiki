@@ -34,7 +34,7 @@ related:
 ## 2. grid_bathy
 
 - 격자 좌표(`x/y` corner, `xz/yz` cell-center, `xu/yu`/`xv/yv` u·v-point) + metric. 1D/2D/curvilinear.
-- bathymetry `zb`(+`zb0` 초기 보존, morphology 비교용), 경사 `dzbdx/dzbdy`([[xbeach_morphology]] avalanching·bed-slope). 입력은 [[xbeach-bathymetry-input-foundation]].
+- bathymetry `zb`(+`zb0` 초기 보존, morphology 비교용), 경사 `dzbdx/dzbdy`([[xbeach_morphology]] avalanching·bed-slope). 입력은 [[xbeach-morphology-foundation]].
 
 ## 3. 서브시스템 초기화
 
@@ -46,5 +46,5 @@ related:
 ## 4. 연결
 
 - [[xbeach_flow_solver]] / [[xbeach_wave_action_balance]] / [[xbeach_morphology]] — 초기화하는 상태배열의 solver
-- [[xbeach-bathymetry-input-foundation]] — bathymetry 입력 형식
+- [[xbeach-morphology-foundation]] — bathymetry 입력 형식
 - params.F90 — 파라미터 읽기(초기화 선행)

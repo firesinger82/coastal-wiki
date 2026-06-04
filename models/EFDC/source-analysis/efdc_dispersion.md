@@ -282,7 +282,7 @@ EE12 GUI에서 polygon 영역별 AHO/AHD 할당 → 저장 시 `AHMAP.INP` 자�
 
 - **운동량 방정식 통합**: [[efdc_hydro_core]] `CALEXP/CALEXP2T` 가 `FMDUX/FMDUY/FMDVY/FMDVX` flux를 momentum balance에 합산.
 - **Vertical diffusion 별개**: [[efdc_turbulence]] — Mellor-Yamada 2.5 / Galperin / Kantha-Clayson / Kantha 2003 / GOTM (vertical `AV`, `AB`).
-- **Wave coupling**: [[efdc_wave]] (있다면) — `ISWAVE == 2/4` + `WV.DISSIPA(K)` 로 wave-breaking dispersion 가산.
+- **Wave coupling**: [[efdc_waves]] (있다면) — `ISWAVE == 2/4` + `WV.DISSIPA(K)` 로 wave-breaking dispersion 가산.
 - **Scalar 확산**: GVC `caldiff.for` ↔ EFDC+ `caltran.f90` (별도 노트 필요 시).
 - **Theory 식**: [[efdc-theory-v12-ch2-hydrodynamics]] §2.1.5 Eq 2.27 (p.16).
 - **Card C12 매뉴얼**: `models/EFDC/raw/manuals/confluence/spaces/ECIG/pages/Overview/EFDC_Cards/Card_Image_12.md`.

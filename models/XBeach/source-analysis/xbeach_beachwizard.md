@@ -36,5 +36,5 @@ related:
 ## 4. 연결
 
 - [[xbeach_morphology]] — bathymetry 갱신(이쪽은 관측 동화, morphology 는 sediment 역학)
-- [[xbeach-bathymetry-input-foundation]] — bathymetry 입력
+- [[xbeach-morphology-foundation]] — bathymetry 입력
 - Aarninkhof / Holman (Argus video) / van Dongeren et al.(Beach Wizard) 계열

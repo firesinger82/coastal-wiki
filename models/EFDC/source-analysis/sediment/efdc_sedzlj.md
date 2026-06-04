@@ -429,7 +429,7 @@ C36 | ISEDINT | ISEDBINT | NSEDFLUME | ISMUD | ISNDWC | ISEDVW | ISNDVW | KB | I
 
 - ~~`s_sedic.f90` (769 lines) — bed initial-condition reader.~~ **§11 完 verified line 1-769 (2026-06-01 §11.1-5 + 2026-06-02 §11.6-8 + 2026-06-03 §11.9-14: hard-bottom ZELBEDA·KBT + 신규퇴적 ERATEND/TAUCRITE·ACTDEP power-law + Cheng1998 settling + IHTSTRT hotstart SEDBED_HOT.SDF restore + fetch/STWAVE wave 입력 + toxics용 SEDB/SEDBT/VDRBED + WSEDO/SEDDIA 단위변환 + empty-layer collapse).**
 - `s_tecplot.f90` (310 lines) — SEDZLJ Tecplot 출력 — 분석 측면에서 별도 노트 필요 시.
-- Propwash 연동 (`Variables_Propwash` use, line 27) — `s_sedzlj.f90:135-180, 559-617` 의 `PROP_ERO(L,1:NSEDS)` 처리. [[efdc-propwash]] (별도 노트) 후보.
+- Propwash 연동 (`Variables_Propwash` use, line 27) — `s_sedzlj.f90:135-180, 559-617` 의 `PROP_ERO(L,1:NSEDS)` 처리. [[efdc_propwash]] (별도 노트) 후보.
 - Mass erosion fast class (`NSEDS2 > NSEDS`, `s_sedzlj.f90:165-180, 604-617`) — propwash 시 fast/normal 분리 동작.
 - Toxics linkage (`NSEDFLUME = 99`) — **deprecated 2016-12 ([[efdc_sedzlj]] §11.4)**. 매뉴얼 Card C36 의 NSEDFLUME=99 표기는 stale → ISTRAN(5)>0 가 현행.
 - Wave-current 식 번호와 Christoffersen-Jonsson 1985 원논문 페이지 cross-check (현재는 코드 코멘트 기준 인용).
