@@ -46,7 +46,7 @@ TIP2(I) += SALTMUL * SALTAMP(J,I) * COS(ARGT - SALTPHA(J,I))    ! SALTMUL=RampTi
 ## 3. 직접 luni-solar ephemeris (astronomic/ephemerides/moon.F90)
 
 `tidePotential%active()` 시 constituent 합 대신 **천체력 직접 계산**(timestep.F:162 "full luni-solar tidal potential"):
-- `moon.F90`(602)/`ephemerides.F90`(438)/`astronomic.F90`(460) = 달·태양 위치(적위·거리) 시계열 → 시변 tidal potential 직접. constituent truncation 없이 모든 조석 성분 포함(장기·비선형 조석 모사).
+- `moon.F90`(602)/`ephemerides.F90`(438)/`astronomic.F90`(460) + **`sun.F90`·`sun_moon_system.F90`**(태양 위치·해-달 천체계) = 달·태양 위치(적위·거리) 시계열 → 시변 tidal potential 직접. constituent truncation 없이 모든 조석 성분 포함(장기·비선형 조석 모사). VSOP/ELP 류 천체력.
 - 이 경우 SAL 만 constituent 방식(`SALTAMP`)으로 더해짐(timestep.F:1543-1547).
 
 ## 4. Internal tide wave drag (internaltide.F90, 249)

@@ -45,6 +45,12 @@ Where ADCIRC reads wind/pressure forcing, how `NWS` selects format, exact reader
 | ±14 | -- | `wind.F:2937-3027` | `read_input.F:2033-2058` |
 | ±15 | -- | `wind.F:3071-3096` | `read_input.F:2059-2069, 2767-2774` |
 
+## A2. NWS=8 (parametric vortex, mod_nws08) — verified 2026-06-04
+
+- `nws08.F90`(1600, module `mod_nws08`): **parametric 태풍 vortex** wind — best-track(중심위치·중심기압·Rmax)으로 wind/pressure 격자장 합성. `&nws08Control` namelist.
+- **2 vortex 모델**: `vortexModel="Holland"`(Holland 1980 gradient wind) 또는 **`"CLE15"`**(Chavas-Lin-Emanuel 2015, outer-region radial structure). `backgroundWindModel`: `radialVelocityWeighted` 또는 `LC12`(Lin-Chavas 2012 이동 비대칭). `windspeed_averaging_minute`(1/10), `WindMultiplier`.
+- EFDC [[efdc_cyclone_wind]](Holland/Hubbert/McConochie/Willoughby)와 같은 계열 — ADCIRC 측 symmetric parametric TC. GAHM/AHM(asymmetric, 별도)과 구분. storm-surge 직결.
+
 ## B. NWS=2 (single-grid wind/pressure file)
 
 - Reader inline in `hotStartMeteorologicalForcing`: `wind.F:2170-2201` (NWS=2), `wind.F:2203-2217` (NWS=-2)

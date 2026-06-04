@@ -96,6 +96,12 @@ So `maxele.63.nc` and `maxvel.63.nc` only get written at the very end of the run
 - Compile-time `ADCNETCDF` guard required
 - File naming: base `file_name` no extension at `[file=src/write_output.F line=1572-1580]`; NetCDF treated as `file_name + '.nc'` at `[file=src/write_output.F line=1691-1693]`
 
+## G2. XDMF 출력 + 보조 모듈 (전소스 커버, 2026-06-04)
+
+- **`xdmfio.F90`**(1186): **XDMF**(eXtensible Data Model and Format, HDF5 기반) 출력 — ParaView/VisIt 호환 대용량 병렬 출력(NetCDF·ASCII 대안). 비정형 mesh 시각화.
+- **`netcdf_error.F90`**: NetCDF 호출 에러 핸들링(nf90 상태 체크). `xdmfio`/NetCDF writer 보조.
+- **`hashtable.F90`**: 해시테이블 자료구조(노드/요소 lookup 가속). `subgridLookup.F90`: subgrid correction lookup(부분침수 보정). `gl2loc_mapping.F90`: global↔local 노드 매핑([[adcirc-parallel-implementation]] MPI). `terminate.F90`: 정상/이상 종료. `vew1d.F90`: vertical element wall 1D channel([[adcirc-weir-boundary]] IBTYPE 64 관련).
+
 ## H. Post-merge (parallel)
 
 - Per-PE files: `PE0000/fort.6X` etc.
