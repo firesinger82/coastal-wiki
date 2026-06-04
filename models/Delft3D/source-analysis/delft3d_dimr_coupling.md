@@ -70,8 +70,8 @@ DIMR 가 **orchestrator** 로 각 엔진에 BMI 호출 → 시간 동기화 + �
 
 Delft3D 는 **native adjoint/4D-Var 가 없고**, BMI 를 통해 **OpenDA**(`third_party_open/openda`)로 black-box DA:
 - **EnKF**(Ensemble Kalman Filter)·**DUD**(calibration)·particle filter 등 — 모델을 수정하지 않고 `get_variable`/`set_variable`(BMI §4)로 상태/파라미터 보정.
-- ensemble 기반 → adjoint(ROMS native [[../ROMS/source-analysis/roms_adjoint_framework]]) 불필요. 모델 비침습(black-box).
-- ★ **모델별 DA 비교**: ROMS=native exact-adjoint 변분 / **Delft3D·XBeach=OpenDA(BMI black-box)** / ADCIRC=외부 ensemble / SWAN·EFDC=없음. 상세 [[../ROMS/source-analysis/roms_adjoint_framework]] §4.
+- ensemble 기반 → adjoint(ROMS native [[roms_adjoint_framework]]) 불필요. 모델 비침습(black-box).
+- ★ **모델별 DA 비교**: ROMS=native exact-adjoint 변분 / **Delft3D·XBeach=OpenDA(BMI black-box)** / ADCIRC=외부 ensemble / SWAN·EFDC=없음. 상세 [[roms_adjoint_framework]] §4.
 
 ## 5. dimr_config.xml — 운영 설정
 

@@ -32,7 +32,7 @@ related:
 
 - **structure_parameters.f90**(1052): 구조물 파라미터(weir·gate·pump·culvert·bridge 일반 프레임).
 - **m_longculverts.f90**(1654): **long culvert**(긴 암거, 마찰 포함 1D 관로) — 구조물 간 연결.
-- **m_dambreak_breach_submodule.f90**(1304): **dam break / breach** — 제방·댐 붕괴 시변 개구부(breach growth) → 범람. ADCIRC TVW weir([[../ADCIRC/source-analysis/adcirc-weir-boundary]] §4)와 유사.
+- **m_dambreak_breach_submodule.f90**(1304): **dam break / breach** — 제방·댐 붕괴 시변 개구부(breach growth) → 범람. ADCIRC TVW weir([[adcirc-weir-boundary]] §4)와 유사.
 
 ## 4. 난류·기타
 
@@ -44,4 +44,4 @@ related:
 
 - [[delft3d_dflowfm_kernel_scheme]] — furu/s1nod/step_reduce 코어(본 보조: advec→ru, sethu→hu, volume_table→Nested Newton)
 - [[delft3d_dflowfm_overview]] — FM 엔진 개관
-- [[../ADCIRC/source-analysis/adcirc-weir-boundary]] — dam break/weir 대응
+- [[adcirc-weir-boundary]] — dam break/weir 대응

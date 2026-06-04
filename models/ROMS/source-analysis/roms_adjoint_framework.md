@@ -53,7 +53,7 @@ DA 가 조정하는 control: 초기조건(IC) + **boundary**(`obc_adjust`)·**su
 |---|---|---|
 | **ROMS** | **native 변분(I4D/R4D/RBL4D-Var)** + exact ADM/TLM/RPM | 본 노트 (Adjoint/Tangent/Representer 158 .F) |
 | **Delft3D** | **OpenDA**(외부, black-box) — EnKF/DUD ensemble·calibration | `third_party_open/openda` ([[delft3d_dflowfm_kernel_scheme]] BMI) |
-| **XBeach** | **OpenDA**(BMI interface, [[../XBeach/source-analysis/xbeach_infrastructure]] §7) + Beach Wizard(관측 동화 bathymetry [[../XBeach/source-analysis/xbeach_beachwizard]]) | black-box ensemble |
+| **XBeach** | **OpenDA**(BMI interface, [[xbeach_infrastructure]] §7) + Beach Wizard(관측 동화 bathymetry [[xbeach_beachwizard]]) | black-box ensemble |
 | **ADCIRC** | **외부 ensemble**(ASGS, no built-in adjoint) — Kalman/ensemble surge | wgrib2 Ensemble util 만 |
 | **SWAN** | 외부(없음, native DA 부재) | — |
 | **EFDC** | 외부(없음) | — |
@@ -65,5 +65,5 @@ DA 가 조정하는 control: 초기조건(IC) + **boundary**(`obc_adjust`)·**su
 - [[roms_4dvar]] — 변분 알고리즘(B-precond·multiscale·CG)이 본 framework 의 inner loop
 - [[roms_support_modules]] — obc_adjust/frc_adjust(control), exchange
 - [[roms_baroclinic_3d]] — NLM 커널(TLM/ADM 의 선형화 대상)
-- [[../XBeach/source-analysis/xbeach_beachwizard]] / [[delft3d_dflowfm_kernel_scheme]] — 타 모델 DA(OpenDA)
+- [[xbeach_beachwizard]] / [[delft3d_dflowfm_kernel_scheme]] — 타 모델 DA(OpenDA)
 - Moore et al. 2011 (ROMS 4D-Var system) / Courtier 1997(incremental) / Bennett(representer)

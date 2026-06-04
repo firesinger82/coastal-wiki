@@ -31,7 +31,7 @@ related:
 
 ## 3. 수평 난류 — tur2d (HLES)
 
-- **tur2d.f90**(823): **HLES**(Horizontal Large Eddy Simulation) — 2D 수평 난류(sub-grid horizontal eddy viscosity, Uittenbogaard). ROMS hmixing([[../ROMS/source-analysis/roms_horizontal_mixing]] Smagorinsky)·연직 [[delft3d_turbulence]]와 별개.
+- **tur2d.f90**(823): **HLES**(Horizontal Large Eddy Simulation) — 2D 수평 난류(sub-grid horizontal eddy viscosity, Uittenbogaard). ROMS hmixing([[roms_horizontal_mixing]] Smagorinsky)·연직 [[delft3d_turbulence]]와 별개.
 
 ## 4. Z-layer compute (z_*)
 
@@ -52,4 +52,4 @@ related:
 - [[delft3d_adi_solver]] — ADI 코어(본 보조가 지원: calbf→taubot, sourmu→운동량, adv2d/z_uzd)
 - [[delft3d_turbulence]] — 연직 난류(tur2d=수평 별개)
 - [[delft3d_sigma_z]] — Z-layer(z_* compute)
-- [[../ROMS/source-analysis/roms_horizontal_mixing]] — tur2d HLES 대응
+- [[roms_horizontal_mixing]] — tur2d HLES 대응

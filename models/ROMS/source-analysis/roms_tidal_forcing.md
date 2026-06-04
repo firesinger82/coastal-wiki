@@ -15,7 +15,7 @@ related:
 
 # ROMS 조석 forcing (set_tides.F)
 
-> `set_tides.F`(645, module `set_tides_mod`) 직접 read. ROMS 의 **조석 강제** — 경계/body 에 **조위(SSH_TIDES)·조류(UV_TIDES)** 추가. `SSH_TIDES || UV_TIDES` CPP 활성. ADCIRC 의 tidal potential body-force([[../ADCIRC/source-analysis/adcirc-tidal-forcing]])와 달리 ROMS 는 주로 **경계 조석**(외부 조화상수 → 경계 조위/조류).
+> `set_tides.F`(645, module `set_tides_mod`) 직접 read. ROMS 의 **조석 강제** — 경계/body 에 **조위(SSH_TIDES)·조류(UV_TIDES)** 추가. `SSH_TIDES || UV_TIDES` CPP 활성. ADCIRC 의 tidal potential body-force([[adcirc-tidal-forcing]])와 달리 ROMS 는 주로 **경계 조석**(외부 조화상수 → 경계 조위/조류).
 
 ## 1. 조석 추가 (set_tides.F:12)
 
@@ -31,7 +31,7 @@ related:
 
 ## 3. AVERAGES_DETIDE — de-tiding (set_tides.F:32-48)
 
-- `AVERAGES_DETIDE`: 출력 시 **조석 성분 제거**(harmonic 누적으로 조석 분리) → 잔차(residual/subtidal) 순환만 출력. `itide` 분조별 누적. 조석평균 흐름 분석(ADCIRC harmonic analysis [[../ADCIRC/source-analysis/adcirc-tidal-forcing]] §5 와 유사 목적, 반대 방향=제거).
+- `AVERAGES_DETIDE`: 출력 시 **조석 성분 제거**(harmonic 누적으로 조석 분리) → 잔차(residual/subtidal) 순환만 출력. `itide` 분조별 누적. 조석평균 흐름 분석(ADCIRC harmonic analysis [[adcirc-tidal-forcing]] §5 와 유사 목적, 반대 방향=제거).
 
 ## 4. 위치
 
@@ -42,5 +42,5 @@ related:
 
 - [[roms_open_boundaries]] — 경계 조위/조류 BC(set_tides 가 공급)
 - [[roms_barotropic_2d]] — barotropic 조석 흐름
-- [[../ADCIRC/source-analysis/adcirc-tidal-forcing]] — ADCIRC tidal potential(전영역, 대비)
+- [[adcirc-tidal-forcing]] — ADCIRC tidal potential(전영역, 대비)
 - TPXO/FES/OTPS(외부 조화상수) / Foreman(nodal correction)
