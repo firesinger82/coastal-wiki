@@ -30,6 +30,7 @@ ROMS 의 모든 NL 커널은 **3종 대응물**을 가짐:
 
 - **각 물리 커널마다** 대응: `ad_step2d`/`ad_step3d_t`/`ad_step3d_uv`/`ad_prsgrd`/`ad_rho_eos`/`ad_uv3dmix`… (NL의 prsgrd·rho_eos·advection 모두 손으로 adjoint coding). ad_main2d/3d = adjoint 시간역행 driver.
 - **exact adjoint**: TLM 의 정확한 수치 transpose(자동미분 아닌 hand-coded) → gradient 가 cost function 과 정확히 일치(검증된 J↔∇J). ROMS DA 정확도의 핵심.
+- **전소스 커버 방식**: `Adjoint/`(81)·`Tangent/`(70)·`Representer/`(55)의 개별 `ad_*`/`tl_*`/`rp_*` 파일은 **각 NL 커널의 1:1 transpose** 라 위 패턴으로 **class 특성화**(개별 file 노트는 반복적이라 미작성; NL 물리 자체는 [[roms_baroclinic_3d]]·[[roms_advection]] 등 covered). 단 `Drivers/`의 **GST(stability)·observation sensitivity** 는 별개 기능 → [[roms_stability_gst]].
 
 ## 2. 변분 driver (Drivers/) — 3 방법
 
@@ -63,6 +64,7 @@ DA 가 조정하는 control: 초기조건(IC) + **boundary**(`obc_adjust`)·**su
 ## 5. 연결
 
 - [[roms_4dvar]] — 변분 알고리즘(B-precond·multiscale·CG)이 본 framework 의 inner loop
+- [[roms_stability_gst]] — GST(singular vector·optimal pert·stochastic optimal)·obs sensitivity(TLM/ADM 의 DA 외 사용)
 - [[roms_support_modules]] — obc_adjust/frc_adjust(control), exchange
 - [[roms_baroclinic_3d]] — NLM 커널(TLM/ADM 의 선형화 대상)
 - [[xbeach_beachwizard]] / [[delft3d_dflowfm_kernel_scheme]] — 타 모델 DA(OpenDA)
