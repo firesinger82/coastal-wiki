@@ -55,7 +55,7 @@ DA 가 조정하는 control: 초기조건(IC) + **boundary**(`obc_adjust`)·**su
 | **ROMS** | **native 변분(I4D/R4D/RBL4D-Var)** + exact ADM/TLM/RPM | 본 노트 (Adjoint/Tangent/Representer 158 .F) |
 | **Delft3D** | **OpenDA**(외부, black-box) — EnKF/DUD ensemble·calibration | `third_party_open/openda` ([[delft3d_dflowfm_kernel_scheme]] BMI) |
 | **XBeach** | **OpenDA**(BMI interface, [[xbeach_infrastructure]] §7) + Beach Wizard(관측 동화 bathymetry [[xbeach_beachwizard]]) | black-box ensemble |
-| **ADCIRC** | **외부 ensemble**(ASGS, no built-in adjoint) — Kalman/ensemble surge | wgrib2 Ensemble util 만 |
+| **ADCIRC** | **외부 ensemble**(ASGS, **built-in DA/adjoint 전무**) — Kalman/ensemble surge 는 외부 wrapper | src/ 55 .F 중 adjoint/variational/ensemble 0개(2026-06-10 전수 확인). `thirdparty/wgrib2/Ensemble.c`는 GRIB2 유틸(무관) |
 | **SWAN** | 외부(없음, native DA 부재) | — |
 | **EFDC** | 외부(없음) | — |
 
