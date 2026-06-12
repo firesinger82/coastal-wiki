@@ -2,7 +2,7 @@
 
 > **Canonical source**: 이 디렉토리(`models/FUNWAVE/`)가 FUNWAVE 모델의 구현·메커닉에 대한 진실의 원천. `concepts/waves/06-model-application.md` 등은 여기로의 링크만 가짐.
 >
-> ⚠️ **현재 상태(2026-06-12 신설)**: source-analysis·manual-notes 미작성 — **본 위키에 소스/메뉴얼 미확보**. README 정체카드 + web-refs(공식 GitHub·논문)는 verified(공개 출처 인용), 내부 알고리즘 file:line 분석은 소스 확보 후.
+> **상태(2026-06-12)**: ✅ **소스 clone + CPU/GPU 빌드+런 검증 완료** — [`source-analysis/funwave-build-and-blackwell-port.md`](source-analysis/funwave-build-and-blackwell-port.md) (FUNWAVE-TVD gfortran+MPI / FUNWAVE-GPU nvfortran cc120 **RTX 5070 Blackwell**, ★cuSPARSE v2 포팅). physics source-analysis(Boussinesq 항·TVD·dispersion) 후속. 소스는 `raw/source_code/`(gitignore 로컬).
 
 ## 정체 카드
 
@@ -12,7 +12,7 @@
 - **공식 문서**: [fengyanshi.github.io/build/html](http://fengyanshi.github.io/build/html/index.html) (USACE version)
 - **GitHub**: [fengyanshi/FUNWAVE-TVD](https://github.com/fengyanshi/FUNWAVE-TVD) (Fortran ~69%, MPI; v3.6 2021-06)
 - **GPU 버전**: [dryuanye/FUNWAVE-GPU](https://github.com/dryuanye/FUNWAVE-GPU) — FUNWAVE-TVD v3.3의 **multi-GPU(CUDA Fortran + MPI)** 이식 (Yuan et al. 2020 JAMES)
-- **소스 위치 (본 위키)**: ❌ 미확보 (`raw/source_code/` 없음 — 향후 GitHub clone 필요)
+- **소스 위치 (본 위키)**: ✅ `raw/source_code/{FUNWAVE-TVD, FUNWAVE-GPU}/` (clone됨, gitignore 로컬). 빌드 검증 [`source-analysis/funwave-build-and-blackwell-port.md`](source-analysis/funwave-build-and-blackwell-port.md)
 - **사용 도메인**: 위상해상(phase-resolving) **nearshore Boussinesq** — 쇄파·연안침수(runup)·wave-induced current·harbor·**tsunami**(2011 Tohoku 등)
 - **격자**: structured, **Cartesian + spherical** 좌표
 - **수치 기법**: 완전비선형 Boussinesq + **TVD shock-capturing**(쇄파를 bore로 처리, hybrid FV/FD), 고차 adaptive time-stepping(Runge-Kutta), MPI 병렬
@@ -33,7 +33,7 @@ SWAN(위상평균 spectral, [`models/SWAN/`](../SWAN/))과 **다른 class**: FUN
 
 | 경로 | 상태 | 비고 |
 |---|---|---|
-| `source-analysis/` | ❌ 미작성 | 소스 미확보 — GitHub clone 후 작성 |
+| `source-analysis/` | ✅ 1 (build note) | funwave-build-and-blackwell-port (CPU/GPU 빌드·Blackwell 포팅 검증). physics 분석 후속 |
 | `manual-notes/` | ❌ 미작성 | fengyanshi.github.io 문서 발췌 후보 |
 | `web-refs/` | ✅ 1 verified | funwave-official-resources (GitHub·docs·논문) |
 
