@@ -36,6 +36,8 @@ verification_date: 2026-05-21
 
 → 위상해상 Boussinesq의 **"정온도 다수 케이스 × 케이스당 느림" 곱셈 비용**을 **GPU가 상쇄**: [`models/FUNWAVE/`](../../models/FUNWAVE/) **FUNWAVE-GPU**(36-core 대비 4-10×) · [`models/Celeris/`](../../models/Celeris/) **real-time interactive**(항만 배치 탐색에 강함). **실무 권장**: 빠른 1차 스크리닝은 mild-slope(**ARTEMIS** open), 비선형·IG·공진 정밀 검증은 **GPU Boussinesq** — 상보적. (출처: ARTEMIS = openTELEMAC GPLv3 Berkhoff/harbor agitation [opentelemac.org]; FUNWAVE/Celeris = `models/`; 정온도 다중조건 = 항만 설계 practice)
 
+→ **한국 설계 표준 정량값**(KDS 64 구조물 반사율·정온 기준파고 + 표준 SWAN nesting 워크플로): [`harbor-tranquility-kds64.md`](harbor-tranquility-kds64.md) ★. 실무는 SWAN이 표준(인허가), FUNWAVE/Celeris는 공진·정밀 검증 티어.
+
 ## 2. 한국 적용 표준 흐름 — Nested SWAN
 
 (`swan-library-firesinger` WINK 패턴, [`04-code-and-tools.md` §2.4](04-code-and-tools.md))
