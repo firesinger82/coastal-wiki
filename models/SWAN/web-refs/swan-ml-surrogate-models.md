@@ -45,9 +45,13 @@ related:
 - **CNN regional wind-wave surrogate** (*Coastal Eng/Applied Ocean Res* S0141118722002218)
 - **PINO (Physics-Informed Neural Operator)**: nonlinear wavefield reconstruction real-time (arxiv:2508.03315) — physics loss 로 순수 data-driven 한계 극복
 
-### A.4 Wave hydrodynamics surrogate on evolving landscapes (abstract-level, source-needed)
+### A.4 Wave hydrodynamics surrogate on evolving landscapes ★ (verified, PDF read 2026-06-12)
 
-- **Gharehtoragh & Johnson 2026** (arxiv:2510.12986) — TC 앙상블 × **진화하는 landscape**(제방 유무·SLR·지반침하 시나리오)에서 wave hydrodynamics 를 대체하는 surrogate. probabilistic flood risk 평가의 wave overtopping 기여를 저비용 산출(budget-constrained planning). 동일 Johnson group 의 surge 측 regional surrogate(arxiv:2511.07269, [[../../../concepts/storm-surge/07-ml-emulators]] §7)와 **wave↔surge 대칭** — coupled ML emulation 후보. `citation_status: source-needed` (full read 후 정량 보강).
+- **Gharehtoragh & Johnson 2026** (arxiv:2510.12986, **Purdue Univ**) — TC 앙상블 × **진화하는 landscape**(제방·해벽 유무·SLR·지반침하·식생손실 시나리오)에서 **SWAN** 의 유의파고 Hs 를 대체하는 deep-learning surrogate.
+- **아키텍처**: CNN(여러 convolutional + pooling + dropout + ReLU) → multiple dense layers. 입력 특징 = landscape 형태요소 + TC 인자 + **surge surrogate 출력을 입력 feature 로 사용**(surge→wave 결합).
+- **정량**: SWAN 대비 surrogate 예측이 grid cell·landscape 의 **~89%** 에서 two-sided equivalence test 통과, 평균 **RMSE 0.05–0.06 m**.
+- **응용**: 제방·floodwall **wave overtopping** 기여를 저비용 산출 → budget-constrained probabilistic flood risk 계획.
+- 동일 **Johnson group 의 surge 측 regional surrogate**(arxiv:2511.07269, [[../../../concepts/storm-surge/07-ml-emulators]] §7.4)와 **wave↔surge 대칭 + surge→wave 입력 연쇄** = 차세대 **coupled ML emulation** 의 구체 사례.
 
 ## B. Forecasting (SWAN/WW3 데이터 → 시계열 DL)
 

@@ -424,11 +424,25 @@ arxiv:2603.06649 (2026-02-27). **TimeGAN**(time-series GAN)으로 ADCIRC 의 sys
 - 결과: 외삽 target 위치서 low RMSE, ADCIRC 수위에 보정 적용 시 다수 test gauge 에서 예측 개선.
 - 코드: <https://github.com/NoujoudNader/Extrapolation_GAN> · Zenodo doi:10.5281/zenodo.15634528.
 
-### 7.3 미트리아지 / placeholder
+### 7.3 Regional surge surrogate — 효율적 학습전략 (Liu·Johnson et al. 2025, Purdue) ★ (verified, PDF read 2026-06-12)
 
-- 데이터 기반 limited-area surge model — `flo` (2601.02090, source-needed)
-- Neural operator (DeepONet/FNO) — `operator-learning` (2604.06433, 동일 논문 [`../../models/SWAN/web-refs/swan-ml-surrogate-models.md`] §A.2 DeepONet)
-- 효율적 regional surrogate (진화 landscape·기후) — `an-efficient-regional-surrogate` (2511.07269)
+arxiv:2511.07269. **진화 landscape + climate 시나리오** 하 surge surrogate 학습. 핵심 기여 = **학습 효율화 전략** — 비싼 ADCIRC 시나리오 run 수를 줄이며 surrogate 정확도 유지:
+
+- **clustering(k-medoids) + variance-based adaptive sampling(= active learning)** 으로 storm/시나리오 부분집합 선별(예: 90개 subset) → 수치모의 비용 대폭 절감.
+- hazard curve 정량 = surrogate × JPM integral(Nadal-Caraballo 2022) 또는 surrogate 직접.
+- **§A.4 wave surrogate(2510.12986)와 동일 Purdue Johnson group** — surge surrogate 출력이 wave surrogate 입력으로 연쇄(**surge→wave coupled emulation**). [[../../models/SWAN/web-refs/swan-ml-surrogate-models]] §A.4.
+
+### 7.4 FLO — data-driven LAM surge (Norwegian Met Institute 2026) ★ (verified, PDF read 2026-06-12)
+
+arxiv:2601.02090 (Kristensen·Matuszak·Tedesco·Kullmann·Röhrs). **North/Norwegian/Barents Sea** data-driven storm surge model:
+
+- **Anemoi framework**(ECMWF ML weather-forecasting 프레임워크) + **graph neural network(GNN)** 기반 **limited-area model(LAM)**.
+- 학습: 43년 **NORA(3km Norwegian Reanalysis) + NORA-Surge hindcast**(DA 미적용). >90 유럽 연안 조위 gauge + NORA-Surge 검증, 수치모델과 comparable 정확도.
+- 저자 솔직 평가: "forecast skill 큰 향상은 아니나, surge 예보를 **수치 → ML 기반으로 전환**하는 발판" = 향후 obs/DA 통합 유연성. StormNet/HURRI-GAN(post-process)과 달리 **GNN 직접 emulator**.
+
+### 7.5 미트리아지 / placeholder
+
+- Neural operator (DeepONet/FNO) — `operator-learning` (2604.06433, [[../../models/SWAN/web-refs/swan-ml-surrogate-models]] §A.2 DeepONet 에 **verified**)
 - LSTM / sequence model station-level surge (StormNet baseline 류, Tiggeloven et al. 미확인)
 - PINN (physics-informed) for SWE / ensemble downscaling(GCM→local) / storm-track conditioned(GAHM→ML)
 
