@@ -63,6 +63,10 @@ related:
 - **WRF + ROMS coupling** — 본 위키 `raw/source_code/WRF/` 참조
 - **KOOS-EJS (NIFS 동해예측시스템)** — 한국 국립수산과학원 동해 ROMS 운영 시스템 (별도 한국 paper 큐레이션 필요)
 
+### 3.6 Regional review — COAWST 적용 (abstract-level, source-needed)
+
+- **Carniel, Russo, Benetazzo 2013** (arxiv:1309.7600) — Adriatic Sea 에서 ROMS(순수 hydrodynamic)→**COAWST**(Coupled Ocean-Atmosphere-Wave-Sediment Transport) 적용 진화 review. Gulf of Venice 일일 운영, ICZM/MSP 지원 다중 시공간 규모. COAWST 결합 체계(§3.5)의 실제 지역 적용 사례 큐레이션. `citation_status: source-needed` (abstract-level; full read 후 §3.3 sediment/§3.4 mixing 와 cross-link 가능).
+
 ## 4. 핵심 모듈
 
 | 모듈 | 활용 | 본 위키 cross-ref |

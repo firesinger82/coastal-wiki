@@ -45,6 +45,10 @@ related:
 - **CNN regional wind-wave surrogate** (*Coastal Eng/Applied Ocean Res* S0141118722002218)
 - **PINO (Physics-Informed Neural Operator)**: nonlinear wavefield reconstruction real-time (arxiv:2508.03315) — physics loss 로 순수 data-driven 한계 극복
 
+### A.4 Wave hydrodynamics surrogate on evolving landscapes (abstract-level, source-needed)
+
+- **Gharehtoragh & Johnson 2026** (arxiv:2510.12986) — TC 앙상블 × **진화하는 landscape**(제방 유무·SLR·지반침하 시나리오)에서 wave hydrodynamics 를 대체하는 surrogate. probabilistic flood risk 평가의 wave overtopping 기여를 저비용 산출(budget-constrained planning). 동일 Johnson group 의 surge 측 regional surrogate(arxiv:2511.07269, [[../../../concepts/storm-surge/07-ml-emulators]] §7)와 **wave↔surge 대칭** — coupled ML emulation 후보. `citation_status: source-needed` (full read 후 정량 보강).
+
 ## B. Forecasting (SWAN/WW3 데이터 → 시계열 DL)
 
 - **Crossformer + SWAN** adaptive decomposition Hs (*Expert Systems with Applications* 2025, S0957417425021426) — [[swan-recent-research-2024-2026]] §2

@@ -391,10 +391,15 @@ PACT·StormNet·Global LI 모두 한국 미학습. 한국 적용 시 공통 고�
 
 본 §는 ML emulator 입문점. 향후 cataloged 될 후보 카테고리 (Global LI §4 = 전지구 peak emulator 항목 catalog 됨, 2026-06-11):
 
+**신규 cataloged (2026-06-12, abstract-level / `citation_status: source-needed` — full read 후 정식 §화 가능):**
+- **HURRI-GAN** (Nader·Dawson et al. 2026, arxiv:2603.06649) — GAN 으로 hurricane surge/wind 을 **gauge station 밖 공간으로 bias-correction**. StormNet(§3) 동일 그룹(Dawson/Kaiser)의 공간확장 후속. ADCIRC 고해상도 비용 우회 동기.
+- **Projecting U.S. coastal surge with deep learning** (Rice·Balaguru·Leung et al., PNNL, arxiv:2506.13963) — DL surge model 로 **900,000 synthetic TC** + SLR 반영 100년 surge risk 추정. historical 100-yr 가 관측·타 모델과 정합. 기후투영 결합(§2.12 PACT climate transfer 와 대비).
+- 데이터 기반 limited-area surge model — `flo` (2601.02090, promoted §catalog)
+- Neural operator (DeepONet/FNO) — `operator-learning` (2604.06433, 동일 논문 [`../../models/SWAN/web-refs/swan-ml-surrogate-models.md`] §A.2 DeepONet)
+- 효율적 regional surrogate (진화 landscape·기후) — `an-efficient-regional-surrogate` (2511.07269)
+
+기타 카테고리 (미수집/placeholder):
 - LSTM / sequence model station-level surge (StormNet baseline 류, Tiggeloven et al. 미확인)
-- Neural operator (DeepONet, FNO) for shallow-water — inbox `operator-learning-for-surrogate-modeling-of-wave-induced-for` (2604.06433) 등 미트리아지
-- 데이터 기반 limited-area surge model — inbox `flo--a-data-driven-limited-area-storm-surge-model` (2601.02090) 미트리아지
-- 효율적 regional surrogate 학습 (진화 landscape·기후) — inbox `an-efficient-regional-storm-surge-surrogate` (2511.07269) 미트리아지
 - PINN (physics-informed) for SWE
 - ensemble downscaling surrogate (GCM → local surge)
 - Storm-track conditioned emulator (GAHM 입력 → ML surge)
