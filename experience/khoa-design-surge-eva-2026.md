@@ -3,7 +3,7 @@ title: "KHOA 장기관측 100년 폭풍해일고 EVA — 해수부(2022) 설계�
 topic: storm-surge
 canonical_source: self
 citation_status: verified
-verification_method: "AI programmatic pipeline: (1) KHOA distribution.do ZIP 과거자료 확장 다운로드 1956-2025 (49정점, 신규 832 연도, fetch_history.py — 무자료=HTTP500+html 즉시마킹, setsid 백그라운드) (2) 정점·연도별 utide(OLS, nodal) 잔차=폭풍해일 → 연최대치·POT 디클러스터 캐시 (3) 극치분석 4법: Gumbel/GEV(L-moment Hosking) 연최대 + POT/GPD(genpareto) + 지역빈도 RFA(지수홍수) + 부트스트랩 CI (4) 해수부 2022 보고서 100년 설계 폭풍해일고 21항만 대조 (5) 정의확인: 서승원·이화영 2012(목포 pADCIRC+unSWAN 100년 가상태풍) + Pugh 교과서(concepts/storm-surge) (6) MSL 추세 vs KHOA 보도자료 2025-12-28 동일기간 1989-2024 (7) datum 동질화 Pettitt 변화점 (8) joint tide-surge probability 총수위 분해 MC. 실행 py=coastal-wiki/.venv(utide 0.3.1·scipy 1.17.1). 도구·산출: /home/firesinger/khoa_tide/utide_validation/{analyze_surge_return_level,analyze_regional_eva,build_eva_cache,analyze_utilization,build_msl_cache,analyze_twl_trend,homogenize_datum,analyze_joint_probability}.py + extensions/6_*~16_*. [2026-06-12 Fable 5 재검토 후 정정: §2 표를 최종 10_design_audit.csv 단일 run 기준으로 재생성(이전 6_surge_return_level.csv 구버전 혼입 제거, 보령 Gumbel>GEV 역전 반영)·§3 CI 분모규칙(22→장항제외 21)·동해항 CI과대 추가·CI기준 vs RFA기준 플래그 분리 명시·해수부2022 서지 보강·reproducible 로컬한정 명시.]"
+verification_method: "AI programmatic pipeline: (1) KHOA distribution.do ZIP 과거자료 확장 다운로드 1956-2025 (49정점, 신규 832 연도, fetch_history.py — 무자료=HTTP500+html 즉시마킹, setsid 백그라운드) (2) 정점·연도별 utide(OLS, nodal) 잔차=폭풍해일 → 연최대치·POT 디클러스터 캐시 (3) 극치분석 4법: Gumbel/GEV(L-moment Hosking) 연최대 + POT/GPD(genpareto) + 지역빈도 RFA(지수홍수) + 부트스트랩 CI (4) 해수부 2022 보고서 100년 설계 폭풍해일고 21항만 대조 (5) 정의확인: 서승원·이화영 2012(목포 pADCIRC+unSWAN 100년 가상태풍) + Pugh 교과서(concepts/storm-surge) (6) MSL 추세 vs KHOA 보도자료 2025-12-28 동일기간 1989-2024 (7) datum 동질화 Pettitt 변화점 (8) joint tide-surge probability 총수위 분해 MC. 실행 py=coastal-wiki/.venv(utide 0.3.1·scipy 1.17.1). 도구·산출: /home/firesinger/khoa_tide/utide_validation/{analyze_surge_return_level,analyze_regional_eva,build_eva_cache,analyze_utilization,build_msl_cache,analyze_twl_trend,homogenize_datum,analyze_joint_probability}.py + extensions/6_*~16_*. [2026-06-12 Fable 5 재검토 후 정정: §2 표를 최종 10_design_audit.csv 단일 run 기준으로 재생성(이전 6_surge_return_level.csv 구버전 혼입 제거, 보령 Gumbel>GEV 역전 반영)·§3 CI 분모규칙(22→장항제외 21)·동해항 CI과대 추가·CI기준 vs RFA기준 플래그 분리 명시·해수부2022 서지 보강·reproducible 로컬한정 명시.] [2026-06-12 통영 추가: §7 joint MC 4정점(보령·광양·목포+**통영** 167.4) — 통영 AHHW300/Z100obs347/설계468/+120cm 여유·만조해일억제 σ10.8→9.6. **convolution 정식법 시도(analyze_joint_convolution.py)→과대추정(+53~116cm) 확인, §9에 MC 적정 결론 기록**.]"
 note_author: "Claude Opus 4.8 (1M context) + 사용자 합의"
 note_date: 2026-06-03
 verification_by: "Claude Opus 4.8 (1M context) — 다중 cross-ref (독립 ADCIRC+SWAN 모델값 + KHOA 공식 SLR 발표 + Pugh 교과서 + 자기일관성)"
@@ -79,8 +79,9 @@ experience_evidence:
 | 목포(검증) | 494 | 641 | 636 | **−5** ✓ |
 | 보령 | 780 | 873 | 1004 | +131 |
 | 광양 | 410 | 475 | 659 | +184 |
+| 통영 | 300 | 347 | 468 | +120 |
 
-→ **목포 설계 총수위 ≈ 관측 100년 침수위(오차 5cm)로 프레임워크 검증**(낮은 해일이 조위·interaction으로 보정; 목포 만조시 해일억제 σ24.7→18.5). 보령+131/광양+184는 침수척도에서도 큰 설계여유 = 높은 설계해일 + 최악조위·최악해일 비동시조합 보수성 + SLR여유고(적정). 보고서가 낮은 목포는 총수위로 보면 실제와 정합(과소 재해석).
+→ **목포 설계 총수위 ≈ 관측 100년 침수위(오차 5cm)로 프레임워크 검증**(낮은 해일이 조위·interaction으로 보정; 목포 만조시 해일억제 σ24.7→18.5). 보령+131/광양+184/통영+120은 침수척도에서도 큰 설계여유 = 높은 설계해일 + 최악조위·최악해일 비동시조합 보수성 + SLR여유고(적정). 보고서가 낮은 목포는 총수위로 보면 실제와 정합(과소 재해석). **통영(남해, n=50)**: 만조시 해일억제(σ10.8→9.6)로 interaction +20cm(목포처럼 관측<독립), 설계여유 +120cm = 보령·광양 계열 보수성.
 
 ## 8. 종합 결론
 
@@ -94,7 +95,7 @@ experience_evidence:
 
 - 보령·광양 공개 설계모델값 탐색 완료 → **미발견**(관측감사가 유일 독립검증). 단서: 연안빅데이터플랫폼 bigdata-coast.kr "빈도별 해일고 데이터셋"(1km격자, 동해안 공개; 서남해판 있으면 좌표값 추출 가능). wave setup 기여 SWAN 정량.
 - 빈도증폭에 IPCC 가속(SSP) 반영(선형투영은 보수적 과소). VLM(목포 침하) GNSS/위성고도계 분리.
-- joint tide-surge probability를 Pugh §8:3:3 convolution(정식)으로 격상.
+- ~~joint tide-surge를 Pugh §8:3:3 convolution으로 격상~~ → **시도 완료(2026-06-12)**: 단순 f_T⊛f_S + 연최대 F_Z^{N_eff} convolution은 **결정론적·주기적 조석을 독립 난수표본으로 취급**해 과대추정(MC/관측 대비 **+53~116cm**, 4정점 모두) → **MC가 적정**(rep_tide 실조석곡선 보존, MC≈관측). §7 MC 유지. 정식 Pugh법 구현엔 고조(high-water)분포 기반 event-counting 필요(후속). 스크립트 `analyze_joint_convolution.py`.
 - 장항 스파이크 완전제외 후 감사 갱신.
 
 ## 10. 연결
