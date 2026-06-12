@@ -22,8 +22,19 @@ verification_date: 2026-05-21
 | 한국 연안 spectral (천해) | **SWAN** | [`models/SWAN/`](../../models/SWAN/) ← STUB |
 | 천해 + 흐름 결합 (조류 영향) | SWAN with currents | 같음 |
 | 폭풍 침식·범람 | **XBeach** | [`models/XBeach/`](../../models/XBeach/) (stub) |
-| 항만 공명·다중 반사 | Boussinesq (Funwave 등) | (별도 모델 추가 검토) |
+| 항만 정온도·공명·다중반사 | 위상해상 Boussinesq (**FUNWAVE**·**Celeris**) / mild-slope (**ARTEMIS**) | [`models/FUNWAVE/`](../../models/FUNWAVE/) · [`models/Celeris/`](../../models/Celeris/) — §1.1 |
 | 통합 풍파·조석·표사 시뮬 | Delft3D-WAVE + FLOW | [`models/Delft3D/`](../../models/Delft3D/) (stub) |
+
+### 1.1 항만 정온도 (harbor agitation/tranquility) — 모델 선택 trade-off
+
+**정온도 분석** = 다양한 입사조건(파향 × 주기 × 재현빈도 × 조위)에서 항내 파고를 평가(가동률·downtime, 항만 설계 표준 절차). 회절·반사·**공진(resonance)**을 해상해야 하므로 phase-resolving 또는 mild-slope 모델이 필요. **케이스 폭증 × 케이스당 비용**이 핵심 제약:
+
+| 접근 | 모델 | 특성 | 라이선스 |
+|---|---|---|---|
+| **위상해상 Boussinesq** | FUNWAVE · Celeris · MIKE 21 BW | 비선형·IG파·공진 정확하나 **시간진행**으로 정상상태까지 반복 → **느림** | FUNWAVE/Celeris **open** / MIKE 21 BW **상용(DHI)** |
+| **타원형 mild-slope** | ARTEMIS · CGWAVE | Berkhoff(mild-slope) **정상 조화해 직접**(시간진행 불요) → 케이스당 빠름, 단 선형·(준)단색파 | **ARTEMIS open**(GPLv3 openTELEMAC, harbor agitation 특화) / CGWAVE USACE-ERDC·**SMS 상용 GUI** 경유 |
+
+→ 위상해상 Boussinesq의 **"정온도 다수 케이스 × 케이스당 느림" 곱셈 비용**을 **GPU가 상쇄**: [`models/FUNWAVE/`](../../models/FUNWAVE/) **FUNWAVE-GPU**(36-core 대비 4-10×) · [`models/Celeris/`](../../models/Celeris/) **real-time interactive**(항만 배치 탐색에 강함). **실무 권장**: 빠른 1차 스크리닝은 mild-slope(**ARTEMIS** open), 비선형·IG·공진 정밀 검증은 **GPU Boussinesq** — 상보적. (출처: ARTEMIS = openTELEMAC GPLv3 Berkhoff/harbor agitation [opentelemac.org]; FUNWAVE/Celeris = `models/`; 정온도 다중조건 = 항만 설계 practice)
 
 ## 2. 한국 적용 표준 흐름 — Nested SWAN
 

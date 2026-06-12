@@ -38,6 +38,7 @@
 
 ## 본 위키에서의 핵심 활용
 
+- **사용 동기 — 항만 정온도**: real-time interactive GPU라 정온도 항만 배치 **탐색·스크리닝**에 강함(돌리며 관찰 → 유망안만 설계 케이스 배치). [`concepts/waves/06-model-application.md §1.1`](../../concepts/waves/06-model-application.md)
 - [`models/FUNWAVE/`](../FUNWAVE/) — 동일 위상해상 Boussinesq(배치 vs 실시간 운용 대비)
 - [`concepts/waves/`](../../concepts/waves/) — phase-resolving Boussinesq(SWAN 위상평균 대비)
 - [`models/XBeach/source-analysis/xbeach_nonh.md`](../XBeach/source-analysis/xbeach_nonh.md) — Boussinesq-type 계열

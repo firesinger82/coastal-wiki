@@ -39,6 +39,7 @@ SWAN(위상평균 spectral, [`models/SWAN/`](../SWAN/))과 **다른 class**: FUN
 
 ## 본 위키에서의 핵심 활용
 
+- **사용 동기 — 항만 정온도**: phase-resolving이라 정온도(다파향·주기·재현빈도 다수 케이스 × 정상상태 반복)에 **느림**이 약점 → **GPU(FUNWAVE-GPU)가 그 비용을 상쇄**하는 게 핵심 동기. [`concepts/waves/06-model-application.md §1.1`](../../concepts/waves/06-model-application.md)
 - [`concepts/waves/`](../../concepts/waves/) — 위상해상 Boussinesq(SWAN 위상평균과 대비)
 - [`models/XBeach/source-analysis/xbeach_nonh.md`](../XBeach/source-analysis/xbeach_nonh.md) — 동일 Boussinesq-type 계열(비교)
 - tsunami·runup — 천수 SWE([`models/ADCIRC/`](../ADCIRC/)) 대비 분산성 보존
