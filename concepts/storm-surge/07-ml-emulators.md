@@ -404,22 +404,33 @@ PACT·StormNet·Global LI 모두 한국 미학습. 한국 적용 시 공통 고�
 
 → 한국 적용 경로 우선순위 (현실적): **Global LI zero-shot sanity check (즉시, 공개 model inference — WP basin 포함 확정)** → **StormNet 류 bias correction (단기, ADCIRC 운영체계 위에 얹기)** → PACT 류 direct emulator (장기, 한국 학습 hindcast 셋 구축 후).
 
-## 7. 추가 검토 후보 (placeholder — 향후 채워나갈 영역)
+## 7. 추가 ML surge 모델 카탈로그
 
-본 §는 ML emulator 입문점. 향후 cataloged 될 후보 카테고리 (Global LI §4 = 전지구 peak emulator 항목 catalog 됨, 2026-06-11):
+§2-4 가 deep-dive 3종(PACT·StormNet·Global LI)이라면, 본 §는 그 외 ML surge 모델 카탈로그.
 
-**신규 cataloged (2026-06-12, abstract-level / `citation_status: source-needed` — full read 후 정식 §화 가능):**
-- **HURRI-GAN** (Nader·Dawson et al. 2026, arxiv:2603.06649) — GAN 으로 hurricane surge/wind 을 **gauge station 밖 공간으로 bias-correction**. StormNet(§3) 동일 그룹(Dawson/Kaiser)의 공간확장 후속. ADCIRC 고해상도 비용 우회 동기.
-- **Projecting U.S. coastal surge with deep learning** (Rice·Balaguru·Leung et al., PNNL, arxiv:2506.13963) — DL surge model 로 **900,000 synthetic TC** + SLR 반영 100년 surge risk 추정. historical 100-yr 가 관측·타 모델과 정합. 기후투영 결합(§2.12 PACT climate transfer 와 대비).
-- 데이터 기반 limited-area surge model — `flo` (2601.02090, promoted §catalog)
+### 7.1 DeepSurge (Rice·Balaguru·Leung et al. 2025, PNNL) — RNN 전역 surge + climate risk (verified, PDF read 2026-06-12)
+
+arxiv:2506.13963 (2025-06-16). DeepSurge = **convolutional + recurrent** 신경망으로 **North Atlantic basin 임의 위치**의 peak surge 예측 (기존의 단일 bay/지점별 학습 한계 탈피 — "any given location" 일반화).
+
+- 학습/검증: ADCIRC 출력. out-of-sample **R² 81.5% / MAE 0.25m**, ADCIRC 대비 **최대 96× 가속**. NOAA 조위 독립검증서 ADCIRC 와 comparable skill.
+- risk: **RAFT**(Risk Analysis Framework for TCs, Xu 2024)로 **900,000 synthetic TC** 생성(기존 최대 규모) → DeepSurge 로 미국 연안 100년 surge risk + **TC 거동·해수면 변화(세기말)** 투영, inundation model 결합.
+- PACT(§2) 와 대비: 둘 다 direct emulator 이나 DeepSurge 는 NA-wide 위치유연 RNN + 대규모 synthetic risk(900k), PACT 는 graph-transformer + CMIP6 downscale.
+
+### 7.2 HURRI-GAN (Nader·Dawson et al. 2026) — TimeGAN 공간 bias 외삽 (verified, PDF read 2026-06-12)
+
+arxiv:2603.06649 (2026-02-27). **TimeGAN**(time-series GAN)으로 ADCIRC 의 systemic bias 를 보정하되, 핵심 novelty = **water-level gauge station 밖 공간 위치로 bias correction 을 외삽**.
+
+- StormNet(§3, 동일 Dawson/Kaiser 그룹)의 **시간축** offset 예측에 대한 **공간축 짝** — 둘 결합 시 full spatiotemporal bias correction. ADCIRC mesh 해상도/runtime 절감 동기(정확도 손실 없이).
+- 결과: 외삽 target 위치서 low RMSE, ADCIRC 수위에 보정 적용 시 다수 test gauge 에서 예측 개선.
+- 코드: <https://github.com/NoujoudNader/Extrapolation_GAN> · Zenodo doi:10.5281/zenodo.15634528.
+
+### 7.3 미트리아지 / placeholder
+
+- 데이터 기반 limited-area surge model — `flo` (2601.02090, source-needed)
 - Neural operator (DeepONet/FNO) — `operator-learning` (2604.06433, 동일 논문 [`../../models/SWAN/web-refs/swan-ml-surrogate-models.md`] §A.2 DeepONet)
 - 효율적 regional surrogate (진화 landscape·기후) — `an-efficient-regional-surrogate` (2511.07269)
-
-기타 카테고리 (미수집/placeholder):
 - LSTM / sequence model station-level surge (StormNet baseline 류, Tiggeloven et al. 미확인)
-- PINN (physics-informed) for SWE
-- ensemble downscaling surrogate (GCM → local surge)
-- Storm-track conditioned emulator (GAHM 입력 → ML surge)
+- PINN (physics-informed) for SWE / ensemble downscaling(GCM→local) / storm-track conditioned(GAHM→ML)
 
 추적: `research/watchlist/` 에 ML emulator author + arxiv cs.LG ∩ physics.ao-ph 카테고리 등록 후보. 현재 [[../../research/watchlist/repo-myroms-roms]] · [[../../research/watchlist/repo-noaa-emc-ww3]] 등 model repo 위주 — `topic-ml-storm-surge-emulators.md` 신설은 [[reference-next-session-candidates]] 우선순위 3 옵션.
 
