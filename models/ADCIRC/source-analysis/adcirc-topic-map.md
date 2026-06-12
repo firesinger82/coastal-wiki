@@ -46,10 +46,10 @@ For each topic, the immediate goal is to capture:
 - purpose: stabilize the mesh, bathymetry, boundary, and forcing pipeline before project-specific setup
 - current notes:
   - `adcirc-preprocessing-foundation.md`
-  - `adcirc-mesh-tool-selection.md`
+  - `local-workflow/adcirc-mesh-tool-selection.md`
   - `adcirc-bathymetry-input-foundation.md`
   - `adcirc-forcing-input-foundation.md`
-  - `adcirc-information-gaps.md`
+  - `local-workflow/adcirc-information-gaps.md`
 
 ### 3. Storm Surge
 

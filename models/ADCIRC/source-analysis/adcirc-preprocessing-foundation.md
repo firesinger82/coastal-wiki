@@ -55,7 +55,7 @@ Primary outputs:
 - sometimes helper geometry, GIS, or project files outside ADCIRC itself
 
 Primary note:
-- `adcirc-mesh-tool-selection.md`
+- `local-workflow/adcirc-mesh-tool-selection.md`
 
 ### 2. Bathymetry And Topography Assembly
 
@@ -127,8 +127,8 @@ This note does not yet decide:
 
 ## Next Notes To Keep Linked
 
-- `adcirc-mesh-tool-selection.md`
-- `adcirc-mesh-revalidation-principles.md`
+- `local-workflow/adcirc-mesh-tool-selection.md`
+- `local-workflow/adcirc-mesh-revalidation-principles.md`
 - `adcirc-bathymetry-input-foundation.md`
 - `adcirc-forcing-input-foundation.md`
-- `adcirc-information-gaps.md`
+- `local-workflow/adcirc-information-gaps.md`
