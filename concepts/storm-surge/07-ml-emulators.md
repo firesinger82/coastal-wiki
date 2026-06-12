@@ -3,7 +3,7 @@ title: "Storm Surge ML Emulators — surrogate models for hydrodynamic storm-sur
 topic: storm-surge
 canonical_source: self
 citation_status: verified
-verification_method: "arxiv:2605.09036 직접 fetch (WebFetch 2026-05-26) — abstract + 메타데이터 (authors, 제출일 2026-05-09, 카테고리 cs.LG) 직접 인용. 본문 §2 의 architecture 디테일·peak-aware loss·결과·한계는 전부 abstract 인용 기반. 정량 RMSE/MAE 수치, training hindcast 모델 (ADCIRC/Delft3D/etc.), CMIP6 5개 model 구체명, US Northeast 정점 좌표/개수 등은 abstract 미명시 — full PDF read 후 보강 가능. §3 추가 (2026-05-26): arxiv:2604.20688v2 (Nader·Giaremis·Dawson·Kaiser·Mohammadiporshokooh·Kaiser 2026, 제출일 2026-04-22 v1 / 2026-04-23 v2, 카테고리 cs.LG/cs.AI, 51p) abstract 직접 fetch — GCN+GAT+LSTM bias-correction architecture · US Gulf Coast 학습 · Hurricane Idalia (2023) test · RMSE 감소율 (48h >70% / 72h >50%) verbatim 인용. §4 cross-ref 표 + §5 한국 적용 검토 (StormNet bias-correction 접근이 한국 우선) 자체 분석 [2026-06-11 재번호 후 현 §5 관계표·§6 한국적용]. **§2.6~2.16 추가 (2026-05-28)**: arxiv:2605.09036v1 **full PDF 41p 직접 fetch** (curl + Read tool) — Table 1 5 CMIP6 모델 (AWI-CM-1-1-MR / CNRM-CM6-1 / EC-Earth3 / MPI-ESM1-2-HR / MRI-ESM2-0) + Table 2 4-station RMSE/MAE (Battery 0.0337/0.0246 / Boston 0.0274/0.0203 / Lewes 0.0276/0.0208 / CBBT 0.0306/0.0235) + Table 3 5% peak (PACT vs ST-GNN ~53% reduction) + Table 4 inference 3.4-3.6s vs ADCIRC 4.5-7h + Table 7/8 cross-dataset (NCEP→GCM 0.14-0.18m vs GCM↔GCM 0.04-0.09m reanalysis-GCM gap) + Appendix A ST-GNN baseline + Appendix C peak-aware ablation. ADCIRC 모델 + TPXO9 + 4 station 좌표 + 학습 config (4×H100 batch 256 lr 0.005 300 epochs Adam wd 10^-5) + GraphSAGE + cross-attention + Transformer + horizon-query + dual-head + L_PeakAware (eq 35) verbatim 인용. Charbonnier slope loss + ρ=0.05 tail fraction 등 hyperparameter 명시. ✅ 기존 §2.6 미보강 6개 항목 모두 해소 (code/data 공개 1건만 ⚠ — corresponding author 요청 필요). **§4 추가 (2026-06-11)**: arxiv:2603.25978v1 (Pachev·Arora·Zhao·Valseth, 2026-03-26) **abstract 직접 인용** (inbox markdown) — 전지구 학습 데이터셋(ADCIRC peak surge 15,000+ landfalling synthetic storm) + CV architecture peak emulator + location-invariance + dataset/model 공개. verbatim 2 인용. CV backbone 구체·basin 분포(서태평양 typhoon 포함 여부)·정량 RMSE·location-invariance 구현은 abstract 미명시 — full PDF read 후 §4 보강. 섹션 재번호 동반: 기존 §4→§5(관계표)·§5→§6(한국적용)·§6→§7(후보)·§7→§8(연결)."
+verification_method: "arxiv:2605.09036 직접 fetch (WebFetch 2026-05-26) — abstract + 메타데이터 (authors, 제출일 2026-05-09, 카테고리 cs.LG) 직접 인용. 본문 §2 의 architecture 디테일·peak-aware loss·결과·한계는 전부 abstract 인용 기반. 정량 RMSE/MAE 수치, training hindcast 모델 (ADCIRC/Delft3D/etc.), CMIP6 5개 model 구체명, US Northeast 정점 좌표/개수 등은 abstract 미명시 — full PDF read 후 보강 가능. §3 추가 (2026-05-26): arxiv:2604.20688v2 (Nader·Giaremis·Dawson·Kaiser·Mohammadiporshokooh·Kaiser 2026, 제출일 2026-04-22 v1 / 2026-04-23 v2, 카테고리 cs.LG/cs.AI, 51p) abstract 직접 fetch — GCN+GAT+LSTM bias-correction architecture · US Gulf Coast 학습 · Hurricane Idalia (2023) test · RMSE 감소율 (48h >70% / 72h >50%) verbatim 인용. §4 cross-ref 표 + §5 한국 적용 검토 (StormNet bias-correction 접근이 한국 우선) 자체 분석 [2026-06-11 재번호 후 현 §5 관계표·§6 한국적용]. **§2.6~2.16 추가 (2026-05-28)**: arxiv:2605.09036v1 **full PDF 41p 직접 fetch** (curl + Read tool) — Table 1 5 CMIP6 모델 (AWI-CM-1-1-MR / CNRM-CM6-1 / EC-Earth3 / MPI-ESM1-2-HR / MRI-ESM2-0) + Table 2 4-station RMSE/MAE (Battery 0.0337/0.0246 / Boston 0.0274/0.0203 / Lewes 0.0276/0.0208 / CBBT 0.0306/0.0235) + Table 3 5% peak (PACT vs ST-GNN ~53% reduction) + Table 4 inference 3.4-3.6s vs ADCIRC 4.5-7h + Table 7/8 cross-dataset (NCEP→GCM 0.14-0.18m vs GCM↔GCM 0.04-0.09m reanalysis-GCM gap) + Appendix A ST-GNN baseline + Appendix C peak-aware ablation. ADCIRC 모델 + TPXO9 + 4 station 좌표 + 학습 config (4×H100 batch 256 lr 0.005 300 epochs Adam wd 10^-5) + GraphSAGE + cross-attention + Transformer + horizon-query + dual-head + L_PeakAware (eq 35) verbatim 인용. Charbonnier slope loss + ρ=0.05 tail fraction 등 hyperparameter 명시. ✅ 기존 §2.6 미보강 6개 항목 모두 해소 (code/data 공개 1건만 ⚠ — corresponding author 요청 필요). **§4 추가 (2026-06-11) → full PDF 격상 (2026-06-12)**: arxiv:2603.25978v1 (Pachev·Arora·Zhao·Valseth, 2026-03-26 [cs.CE]) — 초판 abstract-level 후 **full PDF 직접 read(pdftotext, /tmp/globalLI.txt)** 로 §4.1-4.7 verified 격상. 확정: 6 IBTrACS basin(NA/EP/NI/SI/**WP**/SP — 서태평양 한국 basin 포함) / STORM×IBTrACS→ADCIRC symmetric Holland / NOAA STOFS-2D-Global mesh(12.8M node) / storm packing 15000→3000 / landfall-중심 2.5°×2.5° 128×128 grid(location-invariance 기제) / 41 입력채널(13 pres+13 wind×2+bathy+landmask) / **UNet-5** encoder-decoder C0=64 / Table 3 basin별 RMSE(WP global 연안0.34·전점0.27m) / 실태풍 NA 67 hurricane per-point ADCIRC0.22 vs UNet0.37m / code github UT-CHG/adcirc-rom + DesignSafe 공개. 섹션 재번호 동반: 기존 §4→§5(관계표)·§5→§6(한국적용)·§6→§7(후보)·§7→§8(연결)."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-26
 verification_by: "Claude Opus 4.7 (1M context) — arxiv abs 페이지 직접 fetch + author/date/category/abstract 직접 인용 (PACT + StormNet) + PACT full PDF 41p read (2026-05-28)"
@@ -312,55 +312,72 @@ abstract 만으로는 확인 불가 (51 pages full paper 에 명시 추정):
 
 → full paper PDF (<https://arxiv.org/pdf/2604.20688v2>) read 후 본 §3 update 권장.
 
-## 4. Global Location-Invariant Peak Surge (Pachev, Valseth et al. 2026) — 전지구 CV emulator
+## 4. Global Location-Invariant Peak Surge (Pachev, Valseth et al. 2026) — 전지구 UNet emulator
 
-### 4.1 기본 정보 (inbox markdown abstract-level, 수집 2026-06-06)
+### 4.1 기본 정보 (verified — full PDF read 2026-06-12)
 
 | 항목 | 값 |
 |---|---|
-| arxiv ID | **2603.25978v1** (2026-03-26) |
+| arxiv ID | **2603.25978v1** [cs.CE] (2026-03-26) |
 | 제목 | "Global Location-Invariant Peak Storm Surge Prediction" |
-| 저자 | Benjamin Pachev, Prateek Arora, Jinpai Zhao, **Eirik Valseth** |
-| seed (inbox 메타) | ADCIRC |
+| 저자·소속 | Benjamin Pachev (UMass Amherst), Prateek Arora (UC Berkeley), Jinpai Zhao (UT Austin Oden Inst.), **Eirik Valseth** (Norwegian Univ Life Sciences + Simula, Oslo) |
+| 코드 | <https://github.com/UT-CHG/adcirc-rom> (UT Computational Hydraulics Group) |
+| 데이터·모델 | DesignSafe 플랫폼 공개 |
 | URL | <https://arxiv.org/abs/2603.25978> |
-| 소속 | abstract 미명시 (저자 Pachev·Valseth = ADCIRC 계열 surrogate 연구 — abstract 가 ADCIRC 출력 학습 명시) |
 
-### 4.2 핵심 기여 (abstract 직접)
-
-기존 surrogate 데이터셋의 **지리적 편중** (대부분 CONUS·중국 한정) 을 정면으로 겨냥. 두 산출물(데이터셋·모델) + 공개:
-
-1. **전지구 학습 데이터셋** — ADCIRC peak surge 출력, 전세계에 분포한 **15,000+ landfalling synthetic storm**. abstract verbatim:
-   > "the largest dataset of its kind ever assembled, and is unique in its global scope."
-2. **CV 기반 ML 모델** — computer vision architecture 기반 peak surge 모델, 전지구 데이터셋 학습. abstract verbatim:
-   > "can accurately predict maximum storm surge in disparate geographical regions - including those for which few or no surrogate models exist."
-3. dataset·model 모두 **공개** ("publicly available").
-
-→ 핵심 novelty = **location-invariance**: 학습 지역 밖에서 무력해지는 기존 emulator 의 한계를, 전지구 데이터로 일반화하여 돌파.
-
-### 4.3 PACT(§2)·StormNet(§3) 대비 — 3 ML surge 패러다임
+### 4.2 PACT(§2)·StormNet(§3) 대비 — 3 ML surge 패러다임
 
 | 축 | PACT (§2) | StormNet (§3) | Global LI (§4) |
 |---|---|---|---|
-| 예측 대상 | full surge time series (direct emulate) | ADCIRC offset (bias correction) | **peak surge only** (maxele 류 — abstract 추론) |
-| 아키텍처 | graph transformer (cross-attention) | GCN+GAT+LSTM | **computer vision architecture** (backbone abstract 미상세) |
-| 지리 범위 | US Northeast + CMIP6 downscale | US Gulf Coast | **global (15,000+ storm 전세계)** |
+| 예측 대상 | full surge time series (direct emulate) | ADCIRC offset (bias correction) | **peak surge only** (maxele 128×128 장) |
+| 아키텍처 | graph transformer (cross-attention) | GCN+GAT+LSTM | **UNet-5** (fully-conv encoder-decoder) |
+| 지리 범위 | US Northeast + CMIP6 downscale | US Gulf Coast | **global 6 basin (15,000+ storm, WP 포함)** |
 | 핵심 강점 | peak-aware loss + CMIP6 적용 (단 reanalysis→GCM gap §2.12) | real-time post-process | **location-invariance — 미보유 지역 일반화** |
-| 학습 원천 | ADCIRC/reanalysis | ADCIRC hindcast | **ADCIRC synthetic storm suite** |
+| 학습 원천 | ADCIRC/reanalysis | ADCIRC hindcast | **ADCIRC synthetic storm suite (STORM×IBTrACS)** |
 
-→ 세 패러다임 상보적: direct emulator(PACT) / bias corrector(StormNet) / **global peak-surge generalizer(Global LI)**. 한국처럼 표준 surrogate 학습셋이 없는 지역(§6)에 **직접 transfer 가능성** = 가장 주목할 후보 (단 서태평양 basin 포함 여부 확인 전제 — §4.4).
+→ 세 패러다임 상보적: direct emulator(PACT) / bias corrector(StormNet) / **global peak-surge generalizer(Global LI)**. 한국처럼 표준 surrogate 학습셋이 없는 지역(§6)에 **직접 transfer 가능성** = 가장 주목할 후보 (서태평양 WP basin 포함 확정 — §4.3).
 
-### 4.4 본 위키 미보강 (full PDF read 시 보강 가능)
+### 4.3 데이터셋 — 전지구 ADCIRC synthetic suite (PDF §2)
 
-abstract 만으로 확인 불가 (정량·구조는 본문 명시 추정):
+- **STORM × IBTrACS** synthetic TC track → ADCIRC(symmetric Holland) 변환. >15,000 landfalling moderate-severe TC.
+- **6 IBTrACS ocean basin 전부**: NA(North Atlantic)·EP(East Pacific)·NI(North Indian)·SI(South Indian)·**WP(West Pacific)**·SP(South Pacific). → **★서태평양(WP) 포함 = 한국·일본 태풍 basin 학습됨** (§4.7·§6.6 직결).
+- 메시: NOAA **STOFS-2D-Global** (12.8M nodes / 24.9M triangular elements) 단일 전지구 메시.
+- **Storm packing**: basin당 1 cyclone 씩 multi-storm run (ADCIRC symmetric-Holland multi-storm 지원하도록 codebase 수정) → 15,000 run 을 **3,000 run** 으로 절감. basin간 peak surge 간섭 없음 검증.
 
-- CV architecture 구체 (CNN backbone·U-Net·입력 raster 종류 wind/pressure field·해상도)
-- 15,000 synthetic storm 의 **basin 분포** (서태평양 typhoon 포함 여부 — **한국 적용 직결**)
-- location-invariance 구현 메커니즘 (좌표 인코딩·정규화·도메인 일반화 기법)
-- peak surge 정확도 정량 (RMSE/MAE, 지역별 break-down)
-- 동아시아/한국 검증 결과 유무
-- 공개 dataset·model URL (논문 본문)
+### 4.4 입력 특징 + location-invariance 메커니즘 (PDF §3.1)
 
-→ full PDF (<https://arxiv.org/pdf/2603.25978v1>) read 후 §4 update 권장. 특히 **서태평양 basin 포함 시 한국 적용 1순위 후보** (§6.6).
+- maxele 를 **storm landfall 위치 중심 regular lat-lon grid** 로 보간 → **이것이 location-invariance 핵심**: 절대 지리좌표가 아니라 landfall-상대 윈도를 학습("geographic region 을 model architecture 에 implicit encode", PDF p.5).
+- 윈도 **2.5°×2.5°, 128×128** 해상도. Holland forcing 3시간 간격 −24h~+12h = **13 시각**.
+- **41 입력 채널** = 39 기상(13 pressure + 13 wind-x + 13 wind-y) + 1 bathymetry + 1 land mask. 출력 = 128×128 maxele 장.
+
+### 4.5 아키텍처 — UNet-5 (PDF §3.2)
+
+- **UNet-5** (5단 encoder/decoder), fully-convolutional encoder-decoder + skip connection. f_θ: ℝ^(41×128×128) → ℝ^(128×128) (ζ̂ = maxele).
+- Encoder 5단: 각 (3×3 conv ×2 + ReLU) → 2×2 maxpool, base width C0=64, 단계마다 채널 2배·공간 1/2.
+- Decoder 5단: 2×2 transposed conv 업샘플 + skip concat + (3×3 conv ×2). skip 으로 surge 극대점 국소정보 보존.
+
+### 4.6 정량 결과 (PDF §4, Table 3)
+
+**Holdout RMSE (m)** — global UNet 이 basin-specific local model 을 전 basin 에서 능가 (NA ~10%·NI ~28% 감소):
+
+| basin | local(연안) | local(전점) | **global(연안)** | **global(전점)** |
+|---|--:|--:|--:|--:|
+| NA | 0.73 | 0.38 | 0.66 | 0.34 |
+| EP | 0.26 | 0.19 | 0.23 | 0.18 |
+| NI | 0.99 | 0.48 | 0.71 | 0.40 |
+| SI | 0.74 | 0.49 | 0.64 | 0.48 |
+| **WP** | 0.34 | 0.27 | **0.34** | **0.27** |
+| SP | 0.49 | 0.31 | 0.38 | 0.28 |
+
+→ **WP(한국 basin) global RMSE 연안 0.34m / 전점 0.27m**. 단 WP 는 global ≈ local (전지구 학습이 WP 정확도엔 추가이득 거의 없음 — NA·NI 처럼 자료부족 basin 이 더 큰 이득).
+
+**실 태풍 검증 (PDF §4.2)**: NA 67 hurricane(2003-2023), NOAA 조위 30 storm/188 점. per-point RMSE **ADCIRC 0.22m vs UNet 0.37m**, storm-가중 **ADCIRC 0.48m vs UNet 0.52m** — ML 이 ADCIRC 에 근접하나 미달. Hurricane Hermine(2016) 예시.
+
+### 4.7 한국 적용 함의 (본 위키 분석)
+
+- **WP basin 학습 확정** → §6.6 "한국 zero-shot 1순위" 전제 충족. 공개 code([adcirc-rom](https://github.com/UT-CHG/adcirc-rom)) + DesignSafe model 로 한국 좌표·태풍 landfall inference 즉시 sanity check 가능.
+- 유의: (a) WP holdout RMSE 0.27–0.34m 는 **synthetic 자기검증**치 — 한국 실관측 검증 부재(실 태풍 검증은 NA 만). (b) **peak surge(maxele)만** → 시계열·총수위 침수예측엔 부족(§6.6 b). (c) landfall-중심 윈도라 한국 적용 시 한국 연안 bathymetry + 태풍 track 을 STOFS-2D-Global 메시 해상도로 표현해야 함.
+- 미해결: 한국/동아시아 specific 검증, WP 의 한국 인근 landfall 밀도, datum/MSL 정합.
 
 ## 5. 본 위키 storm-surge 자료와의 관계
 
@@ -372,7 +389,7 @@ abstract 만으로 확인 불가 (정량·구조는 본문 명시 추정):
 | [`04-code-and-tools.md §8`](04-code-and-tools.md#8-검증-metrics) RMSE/skill | RMSE/MAE 사용 = 본 위키 동일 metric 계열 | RMSE 사용 — 본 위키 동일 metric |
 | [`05-examples.md`](05-examples.md) Maemi·Hinnamnor·Bolaven | 한국 적용 시 검증 case (단 US Northeast 학습) | 한국 적용 시 같음 (US Gulf Coast 학습 → 한국 transfer gap 예상) |
 
-→ **Global LI (§4)** 는 PACT 와 같은 direct-emulator 계열(ADCIRC 출력 학습)이나, peak surge 만 산출하고 **전지구 학습**이라는 점에서 위 "transfer gap" 을 설계상 회피 — 본 위키 한국 case([`05-examples.md`](05-examples.md))에 학습 없이 적용 가능성이 가장 높은 후보(서태평양 basin 포함 전제, §4.4).
+→ **Global LI (§4)** 는 PACT 와 같은 direct-emulator 계열(ADCIRC 출력 학습)이나, peak surge 만 산출하고 **전지구 학습**이라는 점에서 위 "transfer gap" 을 설계상 회피 — 본 위키 한국 case([`05-examples.md`](05-examples.md))에 학습 없이 적용 가능성이 가장 높은 후보(서태평양 **WP basin 학습 포함 확정**, §4.3).
 
 ## 6. 한국 적용 검토 (탐색 단계, 미실증)
 
@@ -383,9 +400,9 @@ PACT·StormNet·Global LI 모두 한국 미학습. 한국 적용 시 공통 고�
 3. **태풍 typology 차이** — US Northeast/Gulf Coast 는 hurricane (Atlantic basin), 한국은 typhoon (서태평양 basin, GAHM 권장) — physics regime 차이로 직접 transfer 효과 unknown.
 4. **PACT 의 CMIP6 transfer gap** — climate downscaling 적용 시 reanalysis→CMIP6 degradation. 한국 ensemble 평가에도 동일 issue 예상.
 5. **StormNet 의 bias correction 접근** — 한국 ADCIRC 자체 운영체계 (KMOU 등) 가 있다면 StormNet 류 post-processor 가 **가장 진입장벽 낮은 ML 접근**: full emulator 학습 데이터 불필요, **기존 ADCIRC 출력 + KHOA 관측 만으로 residual 학습 가능**. PACT 류 direct emulator 보다 한국 적용 우선 검토 후보.
-6. **Global LI (§4) 의 zero-shot transfer 가능성** — 전지구 학습 + location-invariance 설계상, 한국 학습셋 **구축 없이** 곧바로 한국 peak surge 추정 시도 가능 (학습 데이터 부재 1번 항목을 우회). 단 두 전제: (a) 15,000 storm 에 **서태평양 typhoon basin 포함** 여부 (§4.4 — 본문 확인 필요), (b) peak surge 만 산출 → 시계열·총수위 침수예측엔 부족. 공개 model 이므로 한국 좌표 inference 만으로 즉시 sanity check 가능 = **실증 진입장벽 최저**.
+6. **Global LI (§4) 의 zero-shot transfer 가능성** — 전지구 학습 + location-invariance 설계상, 한국 학습셋 **구축 없이** 곧바로 한국 peak surge 추정 시도 가능 (학습 데이터 부재 1번 항목을 우회). **서태평양 WP basin 학습 포함 확정**(§4.3, holdout RMSE 연안 0.34m/전점 0.27m) + 공개 code·model(§4.1). 단 한계: (a) WP 정확도는 **synthetic 자기검증**치 — 한국 실관측 검증 부재(실태풍 검증은 NA 만, §4.6), (b) **peak surge(maxele)만** → 시계열·총수위 침수예측엔 부족. 그래도 한국 좌표 inference 만으로 즉시 sanity check 가능 = **실증 진입장벽 최저**.
 
-→ 한국 적용 경로 우선순위 (현실적): **Global LI zero-shot sanity check (즉시, 공개 model inference — basin 포함 전제)** → **StormNet 류 bias correction (단기, ADCIRC 운영체계 위에 얹기)** → PACT 류 direct emulator (장기, 한국 학습 hindcast 셋 구축 후).
+→ 한국 적용 경로 우선순위 (현실적): **Global LI zero-shot sanity check (즉시, 공개 model inference — WP basin 포함 확정)** → **StormNet 류 bias correction (단기, ADCIRC 운영체계 위에 얹기)** → PACT 류 direct emulator (장기, 한국 학습 hindcast 셋 구축 후).
 
 ## 7. 추가 검토 후보 (placeholder — 향후 채워나갈 영역)
 

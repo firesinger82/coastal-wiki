@@ -103,7 +103,7 @@ experience_evidence:
 - 설계모델: [`models/ADCIRC/`](../models/ADCIRC/), [`models/SWAN/source-analysis/swan-adcirc-coupling.md`](../models/SWAN/source-analysis/swan-adcirc-coupling.md)
 - 기후: [[khoa-annual-climate-trend]] (SLR)
 - 외부 출처:
-  - **해양수산부(2022)** — 가상태풍 수치모의 기반 전국 빈도별 폭풍해일고 설계값 (본 노트 **감사 대상 문서**; 정식 보고서명·발행처 문서번호 확인 TODO). 인용 설계값: 광양 249·보령 224·군산 228.4·여수 230.4·목포 141.7 cm 등 ([`extensions/10_design_audit.csv`] 보고서 열).
+  - **해양수산부 「연안(해안)침수예상도」** (본 노트 약칭 '해수부 2022' = 사용 자료 vintage) — 저기압·강풍 이상고조 기반 **가상태풍 시나리오 + ADCIRC 수치모의**로 50~200년(주로 100년) 빈도 폭풍해일고·침수범위 산정, **서·남해안** 대상, 연안포털 <https://coast.mof.go.kr> 게시(연안빅데이터맵 <https://bigdata-coast.kr> KOOS 태풍해일 자료 포함). 본 노트 **감사 대상**. 인용 설계 폭풍해일고: 광양 249·보령 224·군산 228.4·여수 230.4·목포 141.7 cm 등 ([`extensions/10_design_audit.csv`] 보고서 열). (항만별 설계고는 연안포털·빅데이터맵 데이터셋 기준 — 단일 PDF 보고서 문서번호는 미특정; 프로그램 산출 데이터.)
   - 서승원·이화영(2012) 한국해안·해양공학회논문집 24(4) 235-246 (목포 pADCIRC+unSWAN 100년 가상태풍 비대칭 최악트랙)
   - Jin et al.(2024) — 매미강화 시나리오 광양만 5.01m (정식 서지 확인 TODO; 100년 빈도 아님)
   - 해양수산부 보도자료 2025-12-28 (국립해양조사원 관측, 해수면 36년 11.5cm)
