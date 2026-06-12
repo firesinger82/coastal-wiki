@@ -10,7 +10,7 @@
 | `03-analysis-methods.md` | **verified** | tide-surge separation (Pugh §6:1) + interaction 진단 (§7:8) + Mann-Kendall trend (sst/03 canonical) + return period annual maxima (§8:3:2) + joint probability convolution (§8:3:3) |
 | `04-code-and-tools.md` | **verified** | ADCIRC NWS modes·OWI/GRIB·KHOA observation·SWAN coupling·운영 workflow |
 | `05-examples.md` | **source-needed** | Maemi 2003 + Hinnamnor 2022 case cross-ref (본 위키 내부 verified · 외부 실측 surge 수치 KHOA Annual Report fetch 필요) — 2026-05-24 |
-| `06-model-application.md` | (미생성) | ADCIRC primary + Delft3D·SCHISM·SLOSH 비교 — `models/ADCIRC/` 작성 후 verified |
+| `06-model-application.md` | **verified** | 모델 적용 link-hub — ADCIRC(primary, GWCE+surge 구성요소) · Delft3D-FLOW/FM · ROMS(+COAWST) · EFDC. `models/<model>/source-analysis/` verified 링크 중심(중복 금지). SCHISM 미커버 (2026-06-12) |
 | `07-ml-emulators.md` | **verified** | ML/surrogate storm-surge — PACT (Liu et al. 2026, arxiv:2605.09036) entry. abstract 직접 fetch (2026-05-26), full PDF read 후 §2 보강 가능 |
 
 ## 사용된 source_id
