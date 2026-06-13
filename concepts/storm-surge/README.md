@@ -42,3 +42,7 @@
 5. ✅ `05-examples.md` source-needed (2026-05-24) — Maemi 2003 + Hinnamnor 2022 cross-ref. 위키 내부 자료 verified, 외부 실측 KHOA Annual Report·KMA/JMA Best Track fetch 후 verified 승격. Bolaven 2012 등은 별도 sub-노트 후보.
 6. ✅ `_staging adcirc-storm-surge*.md` 7개 → `models/ADCIRC/source-analysis/storm-surge/` promote 완료 (2026-05-23). 추후 `06-model-application.md` 에서 본 노트들 인용
 7. ✅ `07-ml-emulators.md` verified (2026-05-26) — PACT (arxiv:2605.09036) promote from research/inbox/_archive. abstract 직접 fetch + author/date/category 확인. Training data hindcast 모델·구체 RMSE 수치·CMIP6 model 명 등은 full PDF read 후 보강.
+
+## 설계기준 (KDS)
+
+- **KDS 64 10 10 설계조건** §1.2(5) **조석과 이상조위(異常潮位)** + **조위 편차**(=조위 실측−예보, 본 위키 폭풍해일 잔차와 동일 정의) → [`../../standards/kds-64/kds-64-10-10-설계조건.md`](../../standards/kds-64/kds-64-10-10-설계조건.md). 설계조위·기왕고극조위·심해설계파 재현빈도(개정 이력 2019/2020/2021 기후변화 반영).

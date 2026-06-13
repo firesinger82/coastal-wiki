@@ -42,6 +42,7 @@
 - [`concepts/currents/`](../currents/) — nearshore current
 - [`concepts/storm-surge/`](../storm-surge/) — storm 시 littoral drift 폭증
 - [`models/XBeach/`](../../models/XBeach/) — surf zone 단기 모델
+- **설계기준**: [`standards/kds-64/kds-64-50-00-연안보전시설.md`](../../standards/kds-64/kds-64-50-00-연안보전시설.md) (돌제·이안제·표사포착·양빈) + [`kds-64-10-10-설계조건.md`](../../standards/kds-64/kds-64-10-10-설계조건.md) §1.2(8) 표사(부유사·소류사)
 
 ## 작업 계획
 

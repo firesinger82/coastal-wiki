@@ -22,3 +22,8 @@
 - `efdc-sed-trans-2003` — EFDC 표사이동 이론 (PDF, 사용자 핵심)
 - `khoa-portcals-glossary` — 113 표사·퇴적 용어
 - `holthuijsen2007` — radiation stress (`concepts/waves/02-theory.md` §6.6)
+
+## 설계기준 (KDS)
+
+- **KDS 64 10 10 설계조건** §1.2(8) 하구수리 및 **표사** — 부유사(浮遊砂, suspended load)·소류사(掃流砂, bed load) 정의 → [`../../standards/kds-64/kds-64-10-10-설계조건.md`](../../standards/kds-64/kds-64-10-10-설계조건.md)
+- **KDS 64 50 00 연안보전시설** — 표사 포착시설·양빈 등 → [`../../standards/kds-64/kds-64-50-00-연안보전시설.md`](../../standards/kds-64/kds-64-50-00-연안보전시설.md)
