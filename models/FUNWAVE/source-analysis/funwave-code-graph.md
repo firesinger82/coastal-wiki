@@ -57,14 +57,18 @@ main.F [시간루프]
 
 fluxes 23 · wavemaker 17 · fluxes_33v 17 · fluxes_21v 14 · io 13 · samples 11 · mod_meteo 10 · derivatives 10 · sponge 7 · mod_tide 7 · mod_foam_upwinding 7 · misc 7 · bc 6 · mod_tracer 6 · mod_input 6 · mod_foam 6 · tridiagnal 5 · mod_vessel 5 · mod_subgrid 5 · parallel 4 · mod_time_spectra 4 · mod_sediment 4 · init 3 · statistics 2 · nesting 2 · (그 외 main/etauv_solver/dispersion/breaker/sources/masks/mixing/mod_* 등)
 
-## 5. 전수조사 진행 (체크리스트)
+## 5. 전수조사 진행 (체크리스트) — CPU 완료
 
 - [x] 코드 관계성 그래프 (본 노트)
 - [x] 모듈 인벤토리·흐름 ([`funwave-source-map.md`](funwave-source-map.md))
-- [ ] **physics-core 서브루틴별**: fluxes(MUSCL-TVD 23subr)·dispersion·etauv_solver·tridiagnal·breaker·derivatives·sources
-- [ ] wavemaker(17subr) / sponge / bc / masks / init
-- [ ] feature 모듈: sediment·tide·meteo·vessel·tracer·precipitation·subgrid·foam·bathy_correction·time_spectra
-- [ ] 인프라: io·parallel·samples·statistics·nesting·misc
+- [x] **flux·MUSCL-TVD**(fluxes 23subr+derivatives 10) → [`funwave-flux-tvd.md`](funwave-flux-tvd.md)
+- [x] **분산·tridiagonal**(dispersion·etauv_solver·tridiagnal·PHI_COLL) → [`funwave-dispersion-solver.md`](funwave-dispersion-solver.md)
+- [x] **물리 source**(breaker·wavemaker 17subr·sponge·sources·mixing·masks) → [`funwave-physics-sources.md`](funwave-physics-sources.md)
+- [x] **feature 모듈 11종** → [`funwave-feature-modules.md`](funwave-feature-modules.md)
+- [x] **인프라**(bc·init·parallel·io·samples·statistics·nesting·misc·mod_global/param/input) → [`funwave-infrastructure.md`](funwave-infrastructure.md)
+- [x] **FUNWAVE-GPU**(CUDA Fortran *_gpu.F·mod_cuda) → [`funwave-gpu-source.md`](funwave-gpu-source.md) (cusparse·shared·stream·MGPU)
+
+→ **CPU(218 subr 11그룹) + GPU(8 *_gpu.F) 전수조사 완료. 코드 관계성 그래프 확립.**
 
 ## 6. 연결
 
