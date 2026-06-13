@@ -33,8 +33,9 @@ SWAN(위상평균 spectral, [`models/SWAN/`](../SWAN/))과 **다른 class**: FUN
 
 | 경로 | 상태 | 비고 |
 |---|---|---|
-| `source-analysis/` | ✅ 1 (build note) | funwave-build-and-blackwell-port (CPU/GPU 빌드·Blackwell 포팅 검증). physics 분석 후속 |
-| `manual-notes/` | ❌ 미작성 | fengyanshi.github.io 문서 발췌 후보 |
+| `source-analysis/` | ✅ 2 | funwave-source-map(39 .F 모듈맵·지배solver·툴) + funwave-build-and-blackwell-port(빌드·Blackwell cusparse) |
+| `manual-notes/` | ✅ 1 | funwave-tvd-manual (v3.0 abstract·scheme·버전이력, opendataloader-pdf 변환 인용) |
+| `raw/` | source_code(FUNWAVE-TVD/GPU)·manuals(MD) | gitignore 로컬 — 분석 1차자료 |
 | `web-refs/` | ✅ 1 verified | funwave-official-resources (GitHub·docs·논문) |
 
 ## 본 위키에서의 핵심 활용
