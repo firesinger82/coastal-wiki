@@ -36,7 +36,7 @@ SWAN(위상평균 spectral, [`models/SWAN/`](../SWAN/))과 **다른 class**: FUN
 | `source-analysis/` | ✅ 9 (**전수조사**) | code-graph(USE/CALL 관계)·source-map·flux-tvd·dispersion-solver·physics-sources·feature-modules·infrastructure(CPU 218 subr) + **gpu-source**(CUDA 8 *_gpu.F) + build-and-blackwell-port |
 | `manual-notes/` | ✅ 1 | funwave-tvd-manual (v3.0 abstract·scheme·버전이력, opendataloader-pdf 변환 인용) |
 | `raw/` | source_code(FUNWAVE-TVD/GPU)·manuals(MD) | gitignore 로컬 — 분석 1차자료 |
-| `web-refs/` | ✅ 1 verified | funwave-official-resources (GitHub·docs·논문) |
+| `web-refs/` | ✅ 2 verified | [funwave-official-resources](web-refs/funwave-official-resources.md) (GitHub·docs·논문) + [funwave-foundational-papers](web-refs/funwave-foundational-papers.md) (Wei-Kirby1995·Chen2006·Shi2012·Kennedy2000·Yuan2020 GPU·CACR 보고서, verified DOI) |
 
 ## 본 위키에서의 핵심 활용
 

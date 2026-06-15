@@ -20,10 +20,12 @@ note_date: 2026-06-12
 - **Shi, F., Kirby, J.T., Harris, J.C., Geiman, J.D., Grilli, S.T. (2012)** "A high-order adaptive time-stepping TVD solver for Boussinesq modeling of breaking waves and coastal inundation." *Ocean Modelling* **43-44**:36-51. (doi:10.1016/j.ocemod.2011.12.004 — 원문 확인 권장)
   - TVD shock-capturing(쇄파=bore), hybrid finite-volume/finite-difference, 고차 adaptive Runge-Kutta time-stepping, MPI, Cartesian+spherical.
 
-### 2.2 완전비선형 Boussinesq 계보 — ◇ 표준 인용 (DOI 확인 권장)
-- **Wei, G., Kirby, J.T., Grilli, S.T., Subramanya, R. (1995)** "A fully nonlinear Boussinesq model for surface waves. Part 1. Highly nonlinear unsteady waves." *J. Fluid Mech.* **294**:71-92. (FUNWAVE 지배방정식 원형)
-- **Chen, Q. (2006)** "Fully nonlinear Boussinesq-type equations for waves and currents over porous beds." *J. Engineering Mechanics* **132(2)**:220-230. (wave-current, porous bed)
+### 2.2 완전비선형 Boussinesq 계보 — ✅ verified (DOI 확인 2026-06-15)
+- **Wei, G., Kirby, J.T., Grilli, S.T., Subramanya, R. (1995)** "A fully nonlinear Boussinesq model for surface waves. Part 1." *J. Fluid Mech.* **294**:71-92. [doi:10.1017/S0022112095002813](https://doi.org/10.1017/S0022112095002813). (FUNWAVE 지배방정식 원형)
+- **Chen, Q. (2006)** "Fully nonlinear Boussinesq-type equations for waves and currents over porous beds." *J. Engineering Mechanics* **132**(2):220-230. [doi:10.1061/(ASCE)0733-9399(2006)132:2(220)](https://doi.org/10.1061/(ASCE)0733-9399(2006)132:2(220)). (wave-current, porous bed)
 - **Kirby, J.T. et al. (1998)** FUNWAVE 1.0 documentation — Univ. of Delaware Research Report CACR-98-06. (초판)
+
+→ 기초 논문 계보(쇄파 Kennedy 2000·벤치마크 CACR 보고서 포함) 상세: [`funwave-foundational-papers.md`](funwave-foundational-papers.md).
 
 ### 2.3 GPU 가속 — ✅ verified (JAMES, Wiley 확인)
 - **Yuan, Y., Shi, F., Kirby, J.T., Yu, F. (2020)** "FUNWAVE-GPU: Multiple-GPU Acceleration of a Boussinesq-Type Wave Model." *Journal of Advances in Modeling Earth Systems (JAMES)*. **doi:10.1029/2019MS001957**.
@@ -36,7 +38,8 @@ note_date: 2026-06-12
 - 정체·분류: [`../README.md`](../README.md) — 위상해상 Boussinesq(SWAN 위상평균과 대비)
 - 동일 계열: [`../../XBeach/source-analysis/xbeach_nonh.md`](../../XBeach/source-analysis/xbeach_nonh.md) (XBeach-NH Boussinesq-type)
 
-## 4. 미보강 (소스 확보 후)
+## 4. 관련 노트 (보강 완료 2026-06-13~15)
 
-- GitHub clone → `raw/source_code/` + source-analysis (Boussinesq 항·TVD flux·tridiagonal dispersion solver·sponge·wavemaker)
-- 문서 발췌 → manual-notes (입력 input.txt·wavemaker·breaking parameters)
+- ✅ GitHub clone → `raw/source_code/{FUNWAVE-TVD,FUNWAVE-GPU}` + **source-analysis 9 노트**(전수조사 33,760줄/218 subroutine): [`../source-analysis/`](../source-analysis/)
+- ✅ 문서 발췌 → [`../manual-notes/funwave-tvd-manual.md`](../manual-notes/funwave-tvd-manual.md)
+- ✅ 기초 논문 계보(verified DOI): [`funwave-foundational-papers.md`](funwave-foundational-papers.md)
