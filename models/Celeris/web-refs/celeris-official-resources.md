@@ -29,7 +29,8 @@ note_date: 2026-06-12
 - 정체·분류: [`../README.md`](../README.md) — GPU 실시간 위상해상 Boussinesq
 - 동일 class: [`../../FUNWAVE/`](../../FUNWAVE/) (배치 HPC vs 실시간 운용 대비)
 
-## 4. 미보강 (소스 확보 후)
+## 4. 관련 노트 (보강 완료 2026-06-15)
 
-- WebGPU GitHub clone → `raw/source_code/` + source-analysis (확장 Boussinesq flux·moving shoreline·AB3 time-step·WGSL compute shader)
-- celeria.org 문서 → manual-notes (입력·시나리오 설정)
+- ✅ WebGPU clone → `raw/source_code/Celeris-WebGPU/` + **source-analysis 9 노트**(확장 Boussinesq flux·moving shoreline·AB3·PCR·WGSL): [`../source-analysis/`](../source-analysis/)
+- ✅ 상류 `docs/architecture` → **manual-notes**: [`../manual-notes/celeris-architecture-and-config.md`](../manual-notes/celeris-architecture-and-config.md)
+- ✅ COULWAVE 고차 분산 이론 계보: [`celeris-coulwave-theory.md`](celeris-coulwave-theory.md)

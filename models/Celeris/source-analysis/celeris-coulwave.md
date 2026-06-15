@@ -8,7 +8,7 @@ note_date: 2026-06-15
 ---
 
 > 상위: [../README.md](../README.md) · 표준 분산 모드: [celeris-boussinesq-solver.md](celeris-boussinesq-solver.md) · 파이프라인 분기: [celeris-pipeline-graph.md](celeris-pipeline-graph.md)
-> COULWAVE 방정식 차수·유도는 원논문(Lynett & Liu COULWAVE 계열) 참조 → web-refs (미작성 시 추가). 이 노트는 WGSL 코드에서 검증 가능한 사실만 단언한다.
+> COULWAVE 방정식 차수·유도·계보는 [`../web-refs/celeris-coulwave-theory.md`](../web-refs/celeris-coulwave-theory.md) (Nwogu 1993 z_α · Wei-Kirby 1995 단층 kh≲3 · Lynett-Liu 2004 다층 kh≈6). 이 노트는 WGSL 코드에서 검증 가능한 사실만 단언한다.
 
 # COULWAVE 고차 모드 (NLSW_or_Bous == 2)
 
@@ -157,4 +157,4 @@ ARCHITECTURE.md:67은 COULWAVE를 "higher-order mode"로 규정. 정확도↑ �
 
 - 표준 분산 모드 (NLSW_or_Bous==1) 및 PCR 기본: [celeris-boussinesq-solver.md](celeris-boussinesq-solver.md)
 - 타임스텝 패스 그래프·모드 분기: [celeris-pipeline-graph.md](celeris-pipeline-graph.md)
-- COULWAVE 방정식 유도·차수: web-refs/ (Lynett-Liu COULWAVE 원논문 — 미작성 시 추가)
+- COULWAVE 방정식 유도·차수·계보: [`../web-refs/celeris-coulwave-theory.md`](../web-refs/celeris-coulwave-theory.md)
