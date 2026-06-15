@@ -223,6 +223,10 @@ $$T_R[\text{hours}] = 1/P$$
 - **Smith, R.L.** (1984) — POT 분석 (Pugh §8:3:3 reference, line 9670)
 - **Middleton, J.F. & Thompson, K.R.** (1986) — exceedance probability (Pugh §8:3:3, line 9672)
 
+### 9.1 연구 문헌 (research/inbox promote, source-needed)
+
+- **White, B.N., Blanton, B., Luettich, R., Smith, R.L.** (2026) "Fusing Sparse Observations and Dense Simulations for Spatial Extreme Value Analysis: Application to U.S. Coastal Sea Levels" arxiv:[2603.03247](https://arxiv.org/abs/2603.03247) — **GEV(비정상 location) + LMC(linear model of coregionalization) 2-stage frequentist** 로 NOAA 조위 29 + ADCIRC 100 sites 융합, US 연안 해수면 1979-2021 100년 return level. cross-source 상관(공간 interspersed network, co-located 불요)이 정보전달 기제. LOO-CV 에서 gauge-only 대비 RMSE **35% 감소**, block-CV 로 공간외삽서도 이득 지속. R 패키지 `evfuse`. → 본 §3-5 return period 방법론의 **관측-시뮬 융합 확장**. citation_status: source-needed.
+
 ## 10. 연결
 
 - [`01-concept.md`](01-concept.md) — 5 인자 정성

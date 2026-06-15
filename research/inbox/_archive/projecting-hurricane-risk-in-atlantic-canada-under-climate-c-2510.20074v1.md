@@ -10,6 +10,8 @@ link: https://arxiv.org/abs/2510.20074v1
 citation_status: draft-unsourced
 action: archive
 collected: 2026-06-07T00:00:44.638140+00:00
+promoted_to: concepts/storm-surge/06-model-application.md#10.1
+promoted_date: 2026-06-15
 ---
 
 ## Abstract

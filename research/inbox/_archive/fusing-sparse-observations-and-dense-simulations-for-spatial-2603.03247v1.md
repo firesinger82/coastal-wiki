@@ -10,6 +10,8 @@ link: https://arxiv.org/abs/2603.03247v1
 citation_status: draft-unsourced
 action: archive
 collected: 2026-06-06T00:00:46.194278+00:00
+promoted_to: concepts/storm-surge/03-analysis-methods.md#9.1
+promoted_date: 2026-06-15
 ---
 
 ## Abstract

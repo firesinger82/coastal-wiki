@@ -226,6 +226,12 @@ cd /mnt/d/Numerical_models/01_Models/swan/Fin/07_SWAN_LIBRARY
 - 사용자 spectrum_archive 3-layer 비전 별도 노트 (`experience/swan-spectrum-archive-vision.md` 작성 검토)
 - 상용 도구 (MIKE 21 SW) 비교 — 한국 항만 설계에서 사용 빈도
 
+### 8.1 연구 문헌 (research/inbox promote, source-needed)
+
+- **PIML wave runup — XBeach (Saviz Naeini·Snaiki 2024)** — arxiv:[2401.08684](https://arxiv.org/abs/2401.08684). 시간의존 wave runup 을 physics-informed ML 로 예측 — XBeach **Surfbeat(XBSB) 효율 + Nonhydrostatic(XBNH) 정확도** 결합. cGAN 으로 XBSB→XBNH scalogram image-to-image 매핑, 역 wavelet 변환으로 시계열 복원. runup risk 평가. cf. [`05-examples.md`](05-examples.md) · swash-zone runup.
+- **식생 drag 계수 보정 — XBeach NH (Amini·Marsooli·Neshat 2024)** — arxiv:[2401.09687](https://arxiv.org/abs/2401.09687). 식생 wave height 감쇠 예측의 핵심 = drag 계수 추정. 수동보정 vs **메타휴리스틱 최적화**(최초적용) vs Tanino-Nepf(2008) 경험식의 XBeach NH 통합 — 3 방법 비교. nature-based flood mitigation 설계.
+- citation_status: 위 2건 source-needed (abstract 기반)
+
 ## 9. 연결
 
 - `02-theory.md` — action balance, source terms, 분산 관계

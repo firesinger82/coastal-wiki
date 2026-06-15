@@ -176,6 +176,13 @@ print(f"O1: {nearest['o1_진폭']:.2f} cm/s @ {nearest['o1_지각']:.2f}°")
 - TPXO·FES의 조류 데이터 사용법 — pyTMD `currents` mode 인용 보강
 - 라이선스 (UTide MIT 확인, KHOA 자료 사용 정책 확인)
 
+### 6.1 연구 문헌 (research/inbox promote, source-needed)
+
+- **Eddy dipole wave-current (Violante-Carvalho et al. 2025)** — arxiv:[2511.12711](https://arxiv.org/abs/2511.12711). WW3 로 ocean eddy dipole 근방 wave field 에 대한 표층류 영향 평가 — dipole = surface wave **수렴렌즈**(중앙 jet 으로 refraction 채널링), H_s 공간변동. 남서대서양 강 dipole 2개월 hindcast(HYCOM/GlobCurrent/SSalto-Duacs 3 표층류 비교, 위성고도계 H_s 검증). 와류 wave-current 상호작용.
+- **Wave-current 축소모델 — Craik-Leibovich 확장 (Onuki·Fujiwara 2026)** — arxiv:[2606.03231](https://arxiv.org/abs/2606.03231). 약비선형 표면중력파 ↔ 천천히 진화하는 current 양방향 상호작용 reduced asymptotic 모델. Craik-Leibovich wave-averaged momentum 기반이나 Stokes drift 를 외부규정 않고 동반 진폭식으로 결정. **공간 scale separation 미가정** → current-induced advection·refraction·scattering 표현. wave action 보존.
+- **Nearshore 모델 Bayesian 보정 (Balci·Restrepo·Venkataramani 2013)** — arxiv:[1307.0584](https://arxiv.org/abs/1307.0584). **longshore current** nearshore 모델 파라미터(bottom drag·surface forcing)를 field data 로 tuning 하는 Bayesian MLE(다항근사 효율화, covariance 부재 문제 대응). 모델 보정 방법론.
+- citation_status: 위 3건 source-needed (abstract 기반)
+
 ## 7. 연결
 
 - `02-theory.md` — 조류타원 (Lsmaj/Lsmin/θ/g 정의)

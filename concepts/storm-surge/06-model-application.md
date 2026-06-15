@@ -77,6 +77,11 @@ ADCIRC barotropic + 태풍 parametric/재분석 바람 + (선택) SWAN 결합 wa
 - Delft3D/ROMS/EFDC surge **한국 적용 사례** 정량 검증은 미보강(현재 ADCIRC 중심).
 - 각 모델 surge 입력카드(바람·기압 강제력 포맷) 요약은 source-analysis 본문 참조.
 
+### 10.1 연구 문헌 (research/inbox promote, source-needed)
+
+- **Hurricane risk Atlantic Canada (Saviz Naeini·Snaiki·Di Luca 2025)** — arxiv:[2510.20074](https://arxiv.org/abs/2510.20074). physics-informed synthetic hurricane track ensemble 로 wind + coastal-flood hazard 를 historical(1979-2014)→근미래(2024-2059)→원미래(2060-2095) 투영(SLR 포함). wind 을 loss proxy 로 risk 추정 — return-period 풍속 + 침수 depth/extent 증폭. 기후변화 surge/inundation 증폭 정량. citation_status: source-needed.
+- **Meteo-HySEA 메테오쓰나미 (González·Denamiel·Macías 2026)** — arxiv:[2601.03856](https://arxiv.org/abs/2601.03856). GPU 기반 **Meteo-HySEA** vs CPU **AdriSC-ADCIRC** 메테오쓰나미(기상강제 해수면진동) 비교, Adriatic 3 사건(2014/2017/2020, WRF/ERA downscaling + tide-gauge/microbarograph 검증). Meteo-HySEA 가 ADCIRC 보다 큰 진폭·과대 주기(폐쇄만 seiche), GPU order-of-magnitude 가속 → 운영 조기경보 잠재력. **ADCIRC 비교 대상**으로 본 위키 접점. citation_status: source-needed.
+
 ## 11. 연결
 
 - [`01-concept.md`](01-concept.md) · [`02-theory.md`](02-theory.md) · [`03-analysis-methods.md`](03-analysis-methods.md) · [`04-code-and-tools.md`](04-code-and-tools.md) · [`05-examples.md`](05-examples.md) · [`07-ml-emulators.md`](07-ml-emulators.md)

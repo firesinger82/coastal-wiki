@@ -141,6 +141,14 @@ verification_date: 2026-05-21
 - CSTMS Python interface
 - 사용자 축산항 EFDC SED 실제 input·output 사례 → `experience/`
 
+### 10.1 연구 문헌 (research/inbox promote, source-needed)
+
+- **Green-Naghdi DG morphodynamics (Kazhyken·Videman·Dawson 2020)** — arxiv:[2005.00920](https://arxiv.org/abs/2005.00920). Green-Naghdi(분산파 hydrodynamic) + Exner(bed-load morphodynamic) 결합을 discontinuous Galerkin FEM 으로 해석. Strang operator splitting 으로 분산항 분리(surf zone 등 특정영역 무시 가능) + wetting-drying + 쇄파 감지. swash zone 까지 분산효과 해상. coupled/decoupled 두 접근.
+- **Green-Naghdi DG hydro-sediment-morphodynamics (Kazhyken·Videman·Dawson 2020)** — arxiv:[2010.06167](https://arxiv.org/abs/2010.06167). 위 확장 — SHSM(shallow water hydro-sediment-morphodynamic) + Green-Naghdi 분산보정. suspended + bed load 경험식 보정 시 표사·bed morphodynamic 예측. (※ Dawson = ADCIRC 핵심 개발자 — [`models/ADCIRC/`](../../models/ADCIRC/))
+- **Bedform DMD system ID (Mustavee·Singh·Agarwal 2026)** — arxiv:[2603.27604](https://arxiv.org/abs/2603.27604). **하천** bedform 이동 kinematics 로부터 sediment flux 간접추정 — Dynamic Mode Decomposition + Exner 식 결합 → scale-dependent flux surrogate. (하천 대상이나 bedform→flux 추론 기법 연안 전이가치)
+- **Copula 민감도분석 — Delft3D-WAQ (Tene·Stuparu·Kurowicka·El Serafy 2018)** — arxiv:[1804.04541](https://arxiv.org/abs/1804.04541). Morris(1991) 민감도법을 **copula** 로 확장(파라미터 의존성 처리). **Delft3D-WAQ 북해 표사이동 모델**(Deltares)에 적용 — 강한 입력 상관 하 classic Morris 보다 물리 일관성 우수. [`models/Delft3D/`](../../models/Delft3D/) + §3 Delft3D-SED 접점.
+- citation_status: 위 4건 모두 source-needed (abstract 기반 — full PDF read 시 정량·검증 보강)
+
 ## 11. 연결
 
 - `01`-`03` — 도메인 지식

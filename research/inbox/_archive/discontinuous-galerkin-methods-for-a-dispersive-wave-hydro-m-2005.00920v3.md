@@ -10,6 +10,8 @@ link: https://arxiv.org/abs/2005.00920v3
 citation_status: draft-unsourced
 action: archive
 collected: 2026-06-06T00:00:56.177414+00:00
+promoted_to: concepts/sediment-transport/04-code-and-tools.md#10.1
+promoted_date: 2026-06-15
 ---
 
 ## Abstract
