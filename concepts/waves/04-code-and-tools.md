@@ -175,6 +175,14 @@ XBeach 상세: [`models/XBeach/`](../../models/XBeach/) (현재 stub).
 | Boussinesq (Funwave, MIKE Boussinesq) | phase-resolved 비선형 분산 | 항만 공명·조도 |
 | pyHHO·Python 스펙트럼 분석 | post-processing | matplotlib + scipy.signal |
 
+### 5.1 위상평균 vs 위상해상 모델 종합 리뷰 (Ferdaus et al. 2025) (source-needed)
+
+- 출처: arxiv:2511.21856v1 (Ferdaus·Cooper·Schmidt·Pokhrel·Ioup·Abdelguerfi·Simeonov, 2025-11-26), <https://arxiv.org/abs/2511.21856>
+- 요약: 연안공학·해양학 수치 파랑모델을 **위상평균(spectral) vs 위상해상** 축으로 종합 리뷰. 3세대 위상평균 5종 — **SWAN·WAVEWATCH III·MIKE 21 SW·TOMAWAC·WAM** (wave action 보존식) — 의 정식화·지배방정식·기법 평가, 그리고 위상해상 4종 — **FUNWAVE·SWASH·COULWAVE·NHWAVE** (Boussinesq-type + 비정수압) — 비교. 효율·천해 정확도·비선형 wave-wave 상호작용·쇄파·회절·wave-current 상호작용 해상능력을 대비. 운영예보·극한사상·구조물 설계·기후영향 적용과 검증 metric·intercomparison 연구를 정리하고, computational scalability·물리 parameterization·model coupling 한계 + 고해상도/hybrid 신흥 트렌드를 논의.
+- 본 위키 접점: §2(SWAN)·§3(WW3)·§5(MIKE21/TOMAWAC/WAM/Boussinesq) 모델 카탈로그를 횡단하는 1차 리뷰 출처. §6 도구 선택 가이드 및 위상해상 모델 선택근거의 학술적 뒷받침.
+- citation_status: source-needed (abstract 기반 — 본문 모델별 정량 intercomparison 표·검증 metric 수치 미확인)
+- 인용 검증 TODO: full PDF read 시 모델별 정량 비교표·검증 metric·지배방정식 발췌 보강
+
 ## 6. 도구 선택 가이드
 
 | 상황 | 권장 |
