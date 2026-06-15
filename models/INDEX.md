@@ -6,5 +6,9 @@
 | [ADCIRC](ADCIRC/) | TBD | 2D/3D 조석·해일 | unstructured |
 | [XBeach](XBeach/) | TBD | 폭풍 침식·범람 | 직교/곡선 |
 | [Delft3D](Delft3D/) | TBD | 3D 수리·파랑·표사 | 구조 또는 비구조 |
+| [SWAN](SWAN/) | STABLE+ | 천해 풍파 spectral (위상평균) | 구조/곡선/비구조 |
+| [ROMS](ROMS/) | WIP | 3D 해양순환·4D-Var DA | 곡선 직교, terrain-sigma |
+| [FUNWAVE](FUNWAVE/) | WIP | 위상해상 fully-nonlinear Boussinesq nearshore (배치 HPC) | 직교, MPI |
+| [Celeris](Celeris/) | WIP | GPU 실시간 위상해상 확장 Boussinesq (WebGPU 브라우저) | structured, moving shoreline |
 
 새 모델 추가: `_template/` 복사 → `<model-name>/`로 이름 변경.

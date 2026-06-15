@@ -1,3 +1,5 @@
-# models/_template/source-analysis
+# models/Celeris/source-analysis
 
-새 모델 `_template` 복제 시 함께 복제됨. 채우는 방법은 `models/_template/README.md` 참조.
+Celeris-WebGPU 소스(`../raw/source_code/Celeris-WebGPU/`, 35 JS + 42 WGSL) 전수조사 (2026-06-15). 모든 단언 `js/*.js`·`shaders/*.wgsl` `file:line` 인용.
+
+진입점은 [`celeris-source-map.md`](celeris-source-map.md). 노트 목록·읽는 순서는 [`../README.md` §소스 분석 맵](../README.md) 참조.

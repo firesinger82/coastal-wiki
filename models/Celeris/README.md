@@ -2,7 +2,7 @@
 
 > **Canonical source**: 이 디렉토리(`models/Celeris/`)가 Celeris 모델의 구현·메커닉에 대한 진실의 원천. `concepts/waves/06-model-application.md` 등은 여기로의 링크만 가짐.
 >
-> ⚠️ **현재 상태(2026-06-12 신설)**: source-analysis·manual-notes 미작성 — **본 위키에 소스 미확보**. README 정체카드 + web-refs(공식 GitHub·논문)는 verified(공개 출처 인용), 내부 알고리즘 분석은 소스 확보 후.
+> ✅ **현재 상태(2026-06-15 전수조사 완료)**: Celeris-WebGPU 소스(`raw/source_code/Celeris-WebGPU/`, 35 JS + 42 WGSL) clone + **source-analysis 9 노트 + manual-notes 1 노트** 작성(모두 `file:line` 인용 verified). web-refs 1 + 정체카드도 verified.
 
 ## 정체 카드
 
@@ -12,7 +12,7 @@
 - **공식 사이트**: [celeria.org](https://www.celeria.org/about)
 - **GitHub (WebGPU)**: [plynett/plynett.github.io](https://github.com/plynett/plynett.github.io) — 브라우저 WebGPU 구현
 - **원판**: C#/HLSL, **Direct3D** GPU (Windows), 최소 준비로 실행
-- **소스 위치 (본 위키)**: ❌ 미확보 (`raw/source_code/` 없음)
+- **소스 위치 (본 위키)**: ✅ `raw/source_code/Celeris-WebGPU/` (gitignore 로컬, plynett.github.io clone — `js/` 35 + `shaders/` 42 + 상류 `docs/`)
 - **사용 도메인**: 위상해상 **nearshore Boussinesq** — 연안 파랑·runup·항만. ★**실시간 interactive 시뮬레이션 + 시각화**(faster-than-real-time)가 정체성
 - **격자**: structured, **moving shoreline** boundary 지원
 - **수치 기법**: **확장(extended) Boussinesq 방정식**, **hybrid finite-volume / finite-difference**, GPU 병렬(Direct3D → WebGPU). 시간적분 3rd-order Adams-Bashforth(adaptive, Tavakkol-Lynett 2019)
@@ -32,9 +32,25 @@
 
 | 경로 | 상태 | 비고 |
 |---|---|---|
-| `source-analysis/` | ❌ 미작성 | 소스 미확보 — WebGPU GitHub clone 후 작성 |
-| `manual-notes/` | ❌ 미작성 | celeria.org 문서 후보 |
+| `source-analysis/` | ✅ 9 verified | 아래 §소스 분석 맵 |
+| `manual-notes/` | ✅ 1 verified | [celeris-architecture-and-config](manual-notes/celeris-architecture-and-config.md) — 상류 `docs/architecture` + config 레퍼런스 + 원논문 |
 | `web-refs/` | ✅ 1 verified | celeris-official-resources (사이트·GitHub·논문) |
+
+## 소스 분석 맵 (source-analysis/)
+
+> Celeris-WebGPU `raw/source_code/Celeris-WebGPU/` 전수조사 (2026-06-15). 모든 단언 `js/*.js`·`shaders/*.wgsl` `file:line` 인용. FUNWAVE([`../FUNWAVE/source-analysis/`](../FUNWAVE/source-analysis/))의 배치-HPC 대응.
+
+| 노트 | 다루는 것 |
+|---|---|
+| [celeris-source-map](source-analysis/celeris-source-map.md) | 35 JS ↔ 42 WGSL 대응·모듈 표·텍스처 규약 개요 (진입점) |
+| [celeris-pipeline-graph](source-analysis/celeris-pipeline-graph.md) | 타임스텝 패스 순서·모드 분기(NLSW/Bous/COULWAVE·Accuracy_mode)·AB predictor-corrector·핸들러 call graph |
+| [celeris-fv-reconstruction](source-analysis/celeris-fv-reconstruction.md) | Pass0 near-dry · Pass1 MUSCL 재구성 · Pass2 HLL/HLLC/HLLEM Riemann flux |
+| [celeris-boussinesq-solver](source-analysis/celeris-boussinesq-solver.md) | Pass3_Bous 분산항 + Update_TriDiag_coef + **PCR** tridiagonal 음해 (연산 핵심) |
+| [celeris-coulwave](source-analysis/celeris-coulwave.md) | COULWAVE 고차 모드 — Pass3A/3B 보조패스 + COULWAVE PCR |
+| [celeris-breaking-boundary](source-analysis/celeris-breaking-boundary.md) | Pass_Breaking(Kennedy eddy-viscosity) + BoundaryPass(벽·sponge·주기·조파·river·wet/dry) |
+| [celeris-sediment](source-analysis/celeris-sediment.md) | SedTrans Pass1/Pass3 + UpdateBottom (Exner 지형변화, 선택) |
+| [celeris-webgpu-infrastructure](source-analysis/celeris-webgpu-infrastructure.md) | 텍스처 상태 규약·바인드그룹 3-레이어·config 파생상수·진단(means/Hs/timeseries) |
+| [celeris-render](source-analysis/celeris-render.md) | 렌더 파이프라인(비수치) — Copytxf32_txf16 + fragment/vertex3D + skybox |
 
 ## 본 위키에서의 핵심 활용
 
