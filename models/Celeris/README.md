@@ -34,7 +34,7 @@
 |---|---|---|
 | `source-analysis/` | ✅ 9 verified | 아래 §소스 분석 맵 |
 | `manual-notes/` | ✅ 1 verified | [celeris-architecture-and-config](manual-notes/celeris-architecture-and-config.md) — 상류 `docs/architecture` + config 레퍼런스 + 원논문 |
-| `web-refs/` | ✅ 2 verified | [celeris-official-resources](web-refs/celeris-official-resources.md) (사이트·GitHub·Celeris 논문) + [celeris-coulwave-theory](web-refs/celeris-coulwave-theory.md) (COULWAVE 고차 분산 계보 — Nwogu/Wei-Kirby/Lynett-Liu) |
+| `web-refs/` | ✅ 2 verified | [celeris-official-resources](web-refs/celeris-official-resources.md) (사이트·GitHub·Celeris 논문) + [celeris-coulwave-theory](web-refs/celeris-coulwave-theory.md) (분산 모드 위계 — 모드1 Madsen / 모드2 완전비선형 COULWAVE 단일층 + S/T/E 항 매핑, 2층 미구현 정정) |
 
 ## 소스 분석 맵 (source-analysis/)
 

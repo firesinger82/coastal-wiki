@@ -8,7 +8,7 @@ note_date: 2026-06-15
 ---
 
 > 상위: [../README.md](../README.md) · 표준 분산 모드: [celeris-boussinesq-solver.md](celeris-boussinesq-solver.md) · 파이프라인 분기: [celeris-pipeline-graph.md](celeris-pipeline-graph.md)
-> COULWAVE 방정식 차수·유도·계보는 [`../web-refs/celeris-coulwave-theory.md`](../web-refs/celeris-coulwave-theory.md) (Nwogu 1993 z_α · Wei-Kirby 1995 단층 kh≲3 · Lynett-Liu 2004 다층 kh≈6). 이 노트는 WGSL 코드에서 검증 가능한 사실만 단언한다.
+> COULWAVE 방정식 계보·항 매핑은 [`../web-refs/celeris-coulwave-theory.md`](../web-refs/celeris-coulwave-theory.md). **요점**: 모드2 "COULWAVE equations"는 **단일층 완전비선형(fully-nonlinear) 확장 Boussinesq**(Nwogu z_α + Wei-Kirby 1995, `constants_load_calc.js:32` 주석)이며 **2층/다층 아님**(소스에 단일 za). 모드1 "Bous"는 Madsen & Sørensen 약비선형(B=1/15). 이 노트는 WGSL 코드에서 검증 가능한 사실만 단언한다.
 
 # COULWAVE 고차 모드 (NLSW_or_Bous == 2)
 
@@ -22,7 +22,7 @@ note_date: 2026-06-15
 
 타임스텝 내 순서 (ARCHITECTURE.md:50-54): Pass1(flux) → Pass2(explicit) → **(COULWAVE 한정) Pass3A → Pass3B** → Pass3_COULWAVE → Update_TriDiag_coef* → PCRx/PCRy. NLSW는 implicit solve를 직접 텍스처 복사로 대체.
 
-코드상 검증되는 핵심: COULWAVE는 Bous 대비 (a) za(reference velocity 고도)를 셀별로 명시 계산하고, (b) S·T 발산항·그 1·2차 미분·E/F/G 고차 그룹을 **별도 보조패스에서 사전계산해 6-layer 3D 텍스처에 packing**하며, (c) tridiag 계수가 depth-상수형이 아니라 za·eta·z 의존형(넓은 의존)이고, (d) PCR 마지막 패스에서 velocity→flux 환산(× H_loc)을 수행한다. 정확한 분산 차수(예: O(μ⁴) 다층)는 WGSL로 환원 불가 → 원논문.
+코드상 검증되는 핵심: COULWAVE는 Bous 대비 (a) za(reference velocity 고도)를 셀별로 명시 계산하고, (b) S·T 발산항·그 1·2차 미분·E/F/G 고차 그룹을 **별도 보조패스에서 사전계산해 6-layer 3D 텍스처에 packing**하며, (c) tridiag 계수가 depth-상수형이 아니라 za·eta·z 의존형(넓은 의존)이고, (d) PCR 마지막 패스에서 velocity→flux 환산(× H_loc)을 수행한다. 이는 **완전비선형 분산**(η·za·속도구배 곱 유지)이며, Madsen(모드1)의 약비선형(정수심 d 기반)과의 차이가 본질 — 단·다층 구분이 아니다 (§4·web-refs §0).
 
 ---
 
@@ -139,17 +139,19 @@ if (p == Px - 1) {                          // PCRx_COULWAVE:102-108
 
 코드/문서에서 검증되는 계층 (ARCHITECTURE.md:63-67):
 
-| 모드 | NLSW_or_Bous | 분산 | 비용 | implicit solve |
-|---|---|---|---|---|
-| NLSW | 0 | 없음 (천수) | 최저 | bypass (텍스처 복사) |
-| Boussinesq | 1 | 분산 source + tridiag | 중 | PCR |
-| COULWAVE | 2 | 고차 분산 (Pass3A/B 보조 + za·S·T·E·vort) | 최고 | PCR (velocity↔flux 환산 추가) |
+| 모드 | NLSW_or_Bous | 방정식 (`constants_load_calc.js:32`) | 분산 | 비선형 | implicit solve |
+|---|---|---|---|---|---|
+| NLSW | 0 | 비선형 천수 | 없음 | 완전 | bypass (텍스처 복사) |
+| Bous | 1 | **Madsen** Boussinesq (B=1/15) | B-enhanced | **약비선형** | PCR |
+| COULWAVE | 2 | **Fully Non-linear** Boussinesq (COULWAVE eq.) | Nwogu z_α | **완전비선형** | PCR (velocity↔flux 환산 추가) |
 
-ARCHITECTURE.md:67은 COULWAVE를 "higher-order mode"로 규정. 정확도↑ ↔ 비용↑ 트레이드오프: COULWAVE는 매 step 보조패스 2회 + 3D 텍스처 packing + 4차 η차분으로 추가 비용을 진다. **정확한 분산 정확도 차수·적용 수심범위(deep water 한계 등)는 WGSL에서 환원 불가 — 원논문(Lynett-Liu COULWAVE) 참조.** 코드는 어떤 모드가 "언제 더 정확한지" 정량 기준을 담지 않는다(physics는 방정식 유도에 있음).
+**모드 1→2 격상의 본질은 "비선형 차수"(약→완전)이지 "단층→다층"이 아니다** — 둘 다 단일층·O(μ²) 분산. 코드 주석이 모드1을 "Madsen", 모드2를 "Fully Non-linear Boussinesq (COULWAVE equations)"로 명시(`constants_load_calc.js:32`). za(Nwogu reference)는 **모드2만** 사용, 모드1 `Pass3_Bous`는 정수심 d 기반(za 미참조). 항별 식대응·계보는 [`../web-refs/celeris-coulwave-theory.md`](../web-refs/celeris-coulwave-theory.md) §3.
+
+COULWAVE는 매 step 보조패스 2회 + 3D 텍스처 packing + 4차 η차분으로 추가 비용. 정확도↑↔비용↑.
 
 코드-검증 사실 vs 논문 필요 구분:
-- **코드 검증**: 모드 분기 메커니즘, 보조패스 출력 변수, 3D layer 맵, tridiag 계수 형태, PCR velocity↔flux 환산, 현재 2차 차분(4차는 주석 비활성).
-- **논문 필요**: 분산 관계 정확도 차수, multi-layer/higher-order Boussinesq 유도, za=`(1+α)H-d`의 물리적 의미(reference velocity 고도)와 최적 α, deep-water 적용한계.
+- **코드 검증**: 모드 분기 메커니즘, 보조패스 출력 변수(S/T/E/F/G), 3D layer 맵, tridiag 계수 형태, PCR velocity↔flux 환산, 현재 2차 차분(4차는 주석 비활성), za=`−d+(1+α)H` (정수면 za=α·d, α=−0.531=Nwogu 최적).
+- **논문 정독 필요(미수행)**: temp2/temp3 등 분산계수가 Wei-Kirby 1995/Lynett-Wu-Liu 2002의 어느 식번호와 1:1인지. (PDF repo 부재 — web-refs §3.4)
 
 ---
 
