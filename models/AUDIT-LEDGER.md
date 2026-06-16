@@ -34,7 +34,7 @@ purpose: "사용자 지시(2026-06-16) '모든 모델은 모든 문서·코드�
 
 | 모델 | 코어 소스파일 | 코어 검수 | 문서(PDF) | manual-notes | 우선순위 |
 |---|--:|:--:|--:|--:|:--:|
-| **SWASH** | 160 | 🟡 2 노트 | 2 | 0 | **🔴 1 (최악 비율)** |
+| **SWASH** | 160 | ✅ 19 노트 (전수) | 2 | 🟡 1 | 🟢 코드 완료 (swashuse.pdf 잔여) |
 | **Delft3D** | engines_gpl 3,503 | 🟡 21 노트 | 53 | 2 | **🔴 2** |
 | **ROMS** | roms/ROMS ~900 | 🟡 22 노트 | 10 | 3 | **🟠 3** (adjoint suite·utility) |
 | **FUNWAVE** | TVD 38 + GPU 41 | 🟡 9 노트 | 39 | 1 | 🟠 4 (manual·test PDF) |
@@ -44,7 +44,7 @@ purpose: "사용자 지시(2026-06-16) '모든 모델은 모든 문서·코드�
 | **SWAN** | 77 | ✅ 29 노트 | 9 | 29 | 🟢 양호 (audit 노트 존재) |
 | **Celeris** | WebGPU JS+CUDA | ✅ 9 노트 | 3 | 1 | 🟢 양호 |
 
-> **전수 검수 잔여 핵심**: (1) SWASH 158파일, (2) Delft3D waq(527)·dflowfm(1515 대부분)·fbc/rr/rtc, (3) ROMS adjoint/tangent/representer(206)·Utility(196), (4) 전 모델 manual-notes 빈약(PDF 229 대비 65).
+> **전수 검수 잔여 핵심**: ~~(1) SWASH 158파일~~ ✅ **완료(2026-06-16 workflow, 17 신규 노트)**, (2) Delft3D waq(527)·dflowfm(1515 대부분)·fbc/rr/rtc, (3) ROMS adjoint/tangent/representer(206)·Utility(196), (4) 전 모델 manual-notes 빈약(PDF 229 대비 66). **다음 우선순위: Delft3D engines**.
 
 ---
 
@@ -58,16 +58,30 @@ purpose: "사용자 지시(2026-06-16) '모든 모델은 모든 문서·코드�
 | swashtech.pdf | 기술(mimetic 이산화 이론서, 부분완성) | swash-tech-documentation-overview | 🟡 (Ch2/5 deep 잔여, Ch8/9/10/12 원문 미완성) |
 | swashuse.pdf | 사용자 | — | ⬜ |
 
-### 1.2 코드 모듈 (C티어, 파일명 접두 기준)
-| 모듈군 | 대표 파일 | 노트 | 상태 |
-|---|---|---|---|
-| 아키텍처 전반 | (전체) | swash-architecture-source-map | ✅ |
-| 비정수압 압력 solver | SwashPresHead·SwashPresGrad | swash-nonhydrostatic-pressure-solver | ✅ |
-| 운동량/flow (Exp/Imp 1DH·2DH) | SwashExpDep·SwashImpLay·SwashHorzVisc | — | ⬜ |
-| 경계조건·boundwave | SwashBC*·SwashReadBndval | — | ⬜ |
-| 이류/transport·turbulence | SwashUServ·SwashUHorzVisc | — | ⬜ |
-| rigid body·anti-creep·기타 | SwashMotionRigidBod·SwashAntiCreep | — | ⬜ |
-| IO·grid·init | Swan/Swash grid·readers | — | ⬜ |
+### 1.2 코드 모듈 (C티어, 19 source-analysis 노트 — 2026-06-16 workflow 검수 완료)
+> 160파일 → 17 신규 + 2 기존 = **19 노트 전수 커버**. 각 노트 file:line 인용 + 적대 검증 통과(grid-infra 1건 날조인용 수정).
+
+| 모듈 | 노트 | 상태 |
+|---|---|---|
+| 아키텍처 전반 | swash-architecture-source-map | ✅ |
+| 비정수압 압력 projection + 선형 solver | swash-nonhydrostatic-pressure-solver | ✅ |
+| 명시적 수심평균 flow (ExpDep 1DH/2DH/U) | swash-explicit-depthavg-flow | ✅ |
+| 명시적 다층 flow (ExpLay·ExpLayP) | swash-explicit-layered-flow | ✅ |
+| 암시적 수심평균 flow (ImpDep·M) | swash-implicit-depthavg-flow | ✅ |
+| 암시적 다층 flow (ImpLay·M·P) | swash-implicit-layered-flow | ✅ |
+| scalar transport (염분·온도·tracer) | swash-scalar-transport | ✅ |
+| 난류 closure (k-ε·Reynolds·log-law·anti-creep) | swash-turbulence-closure | ✅ |
+| 경계조건·파생성·sponge | swash-boundary-wave-forcing | ✅ |
+| 스펙트럼 경계파일·transfer fnc | swash-boundary-spectral-transfer | ✅ |
+| 바닥마찰·바람응력 | swash-bottom-friction-wind | ✅ |
+| 식생·다공성 구조물 | swash-vegetation-porosity | ✅ |
+| wetting-drying·runup·수심update | swash-wetting-drying-runup | ✅ |
+| 부유체·강체 운동 | swash-floating-rigid-body | ✅ |
+| 초기화·격자·밀도·기하 | swash-initialization-grid | ✅ |
+| time-stepping driver·field update | swash-timestepping-update-driver | ✅ |
+| 입력파싱·prep 검사 | swash-input-parsing-check | ✅ |
+| 출력(quantity·VTK·backup) | swash-output | ✅ |
+| SWAN공유 격자·OceanPack 인프라 (S) | swash-grid-oceanpack-infra | ✅ |
 
 ---
 
