@@ -1,0 +1,199 @@
+---
+title: "모델 전수 검수 원장 (AUDIT LEDGER) — 9개 모델 문서·소스코드 커버리지 추적"
+scope: models
+citation_status: reference
+note_author: "Claude Opus 4.8 (1M context)"
+note_date: 2026-06-16
+purpose: "사용자 지시(2026-06-16) '모든 모델은 모든 문서·코드를 전체 검수' 의 분모를 확정하고 검수 진척을 추적 가능하게 만드는 마스터 ledger. 이게 '전수' 의 정의이자 증명."
+---
+
+# 모델 전수 검수 원장 (AUDIT LEDGER)
+
+> **목적**: 사용자 지시(2026-06-16) — *모든 모델의 모든 문서·소스코드를 전수 검수*. 본 원장은 그 **분모(전체 목록)** 와 **진척(검수 상태)** 을 한 곳에서 추적한다. 인벤토리는 `find` 결정적 수집(2026-06-16). 본 파일은 `reference` 레이어 (검수 상태 추적 도구이지 도메인 단언 아님).
+
+## 검수 티어 (검수 단위 정의)
+
+코드 12,500+ 파일을 의미있는 단위로 만들기 위한 3티어:
+
+| 티어 | 의미 | 검수 의무 |
+|---|---|---|
+| **C (Core)** | 모델 고유 물리·수치 커널 | **필수** — source-analysis 노트 |
+| **S (Support)** | prep·IO·util·parallel·build·coupling glue | 권장 |
+| **T (Third-party/Vendored/Coupled)** | 외부 라이브러리(eigen·boost·petsc·netcdf·gdal·ARPACK/BLAS/LAPACK 등)·결합된 외부모델(WRF) | **면제 (N/A)** — 라이선스/출처만 기록, 코드 검수 제외 |
+
+## 상태 범례
+
+- ✅ **done** — 해당 단위가 ≥1 source-analysis/manual 노트로 실질 커버
+- 🟡 **partial** — 일부 노트 존재하나 큰 미검수 영역 잔존
+- ⬜ **todo** — 노트 없음
+- ⬛ **N/A** — T티어 (검수 면제)
+
+---
+
+## 0. 요약 대시보드 (2026-06-16 기준)
+
+| 모델 | 코어 소스파일 | 코어 검수 | 문서(PDF) | manual-notes | 우선순위 |
+|---|--:|:--:|--:|--:|:--:|
+| **SWASH** | 160 | 🟡 2 노트 | 2 | 0 | **🔴 1 (최악 비율)** |
+| **Delft3D** | engines_gpl 3,503 | 🟡 21 노트 | 53 | 2 | **🔴 2** |
+| **ROMS** | roms/ROMS ~900 | 🟡 22 노트 | 10 | 3 | **🟠 3** (adjoint suite·utility) |
+| **FUNWAVE** | TVD 38 + GPU 41 | 🟡 9 노트 | 39 | 1 | 🟠 4 (manual·test PDF) |
+| **ADCIRC** | adcirc/src 56 (+gahm·asgs) | ✅ 60 노트 | 98 | 21 | 🟢 5 (gahm·asgs 잔여) |
+| **EFDC** | 264 | ✅ 29 노트 | 6 | 5 | 🟢 양호 |
+| **XBeach** | 118 | ✅ 32 노트 | 9 | 3 | 🟢 양호 |
+| **SWAN** | 77 | ✅ 29 노트 | 9 | 29 | 🟢 양호 (audit 노트 존재) |
+| **Celeris** | WebGPU JS+CUDA | ✅ 9 노트 | 3 | 1 | 🟢 양호 |
+
+> **전수 검수 잔여 핵심**: (1) SWASH 158파일, (2) Delft3D waq(527)·dflowfm(1515 대부분)·fbc/rr/rtc, (3) ROMS adjoint/tangent/representer(206)·Utility(196), (4) 전 모델 manual-notes 빈약(PDF 229 대비 65).
+
+---
+
+## 1. SWASH 🔴 (160 코어파일 / SA 2)
+
+**소스**: `raw/source_code/swash/src/*.ftn90` (160). **문서**: swashtech.pdf, swashuse.pdf.
+
+### 1.1 문서
+| PDF | 종류 | 노트 | 상태 |
+|---|---|---|---|
+| swashtech.pdf | 기술(수치·물리) | — | ⬜ |
+| swashuse.pdf | 사용자 | — | ⬜ |
+
+### 1.2 코드 모듈 (C티어, 파일명 접두 기준)
+| 모듈군 | 대표 파일 | 노트 | 상태 |
+|---|---|---|---|
+| 아키텍처 전반 | (전체) | swash-architecture-source-map | ✅ |
+| 비정수압 압력 solver | SwashPresHead·SwashPresGrad | swash-nonhydrostatic-pressure-solver | ✅ |
+| 운동량/flow (Exp/Imp 1DH·2DH) | SwashExpDep·SwashImpLay·SwashHorzVisc | — | ⬜ |
+| 경계조건·boundwave | SwashBC*·SwashReadBndval | — | ⬜ |
+| 이류/transport·turbulence | SwashUServ·SwashUHorzVisc | — | ⬜ |
+| rigid body·anti-creep·기타 | SwashMotionRigidBod·SwashAntiCreep | — | ⬜ |
+| IO·grid·init | Swan/Swash grid·readers | — | ⬜ |
+
+---
+
+## 2. Delft3D 🔴 (engines_gpl 3,503 / SA 21)
+
+**소스**: `src/` 7,240파일 중 **third_party_open 2,633 = ⬛ N/A** (eigen 532·boost 338·petsc 296·proj 292·netcdf 185·expat 169·gdal 153·spherepack 118·metis 115...).
+
+### 2.1 문서 (53 PDF — 핵심 매뉴얼만 추적, 나머지 WAQ 서브·NEFIS·도구류)
+| PDF | 종류 | 노트 | 상태 |
+|---|---|---|---|
+| Delft3D-FLOW_User_Manual | FLOW 사용자 | (web-refs 부분) | 🟡 |
+| Delft3D-WAVE_User_Manual | WAVE 사용자 | — | ⬜ |
+| Delft3D-WAQ_User_Manual (+Tech Ref·Proc Lib) | 수질 | delft3d_delwaq | 🟡 |
+| Delft3D-PART_User_Manual | 입자추적 | delft3d_part | 🟡 |
+| Conceptual/Functional Spec·course PDF | 개념·교육 | — | ⬜ |
+| TIDE/TRIANA/QUICKIN/RGFGRID/GPP/QUICKPLOT 등 도구 | 전·후처리 도구 | — | ⬜ |
+
+### 2.2 코드 모듈 (engines_gpl 중심)
+| 모듈 | 파일 | 티어 | 노트 | 상태 |
+|---|--:|:--:|---|:--:|
+| flow2d3d | 794 | C | dispatcher·adi_solver·drying·heat·turbulence·sigma_z·flow_compute_aux·sediment | ✅ |
+| dflowfm | 1,515 | C | fm_kernel_scheme·fm_mdu_input·fm_overview·fm_compute_aux | 🟡 (대부분 미검수) |
+| waq (수질) | 527 | C | delwaq | 🟡 (코어 process lib 미검수) |
+| fbc | 253 | C | — | ⬜ |
+| part (입자) | 119 | C | part | ✅ |
+| rr (강우유출) | 111 | C | — | ⬜ |
+| wave (SWAN wrapper) | 81 | C | flow_wave_coupling | 🟡 |
+| rtc (실시간제어) | 56 | S | — | ⬜ |
+| dsle/dimr/d_hydro | 47 | S | dimr_coupling·engines_overview | 🟡 |
+| utils_gpl | 766 | S | — | ⬜ |
+| utils_lgpl | 491 | S | — | ⬜ |
+| tools_gpl | 251 | S | dredge_dump·dd | 🟡 |
+| third_party_open | 2,633 | T | — | ⬛ |
+
+---
+
+## 3. ROMS 🟠 (roms/ROMS ~900 / SA 22)
+
+**소스**: WRF(~700, ⬛ 결합 대기모델 N/A)·roms_libs/ARPACK+BLAS+LAPACK(~360, ⬛ N/A) 제외 후 ROMS 코어.
+
+### 3.1 문서 (10 PDF)
+| PDF | 종류 | 노트 | 상태 |
+|---|---|---|---|
+| Exercise_1~9.pdf | 실습 튜토리얼 | — | ⬜ (examples 후보) |
+| tidal_ellipse.pdf | 조석타원 분석 | roms_tidal_forcing(부분) | 🟡 |
+
+### 3.2 코드 모듈 (roms/ROMS)
+| 모듈 | 파일 | 티어 | 노트 | 상태 |
+|---|--:|:--:|---|:--:|
+| Nonlinear | 87 | C | baroclinic_3d·barotropic_2d·advection·horizontal_mixing·vertical_mixing·bottom_boundary_layer·nonlinear_physics_modules | ✅ |
+| Adjoint | 81 | C | adjoint_framework(부분) | 🟡 |
+| Tangent | 70 | C | — | ⬜ |
+| Representer | 55 | C | — | ⬜ |
+| 4D-Var 종합 | (분산) | C | roms_4dvar | 🟡 |
+| Utility | 196 | S | support_modules·grid_metrics·open_boundaries·tidal_forcing·atmospheric_forcing·bulk_flux_coare·nesting·stability_gst | 🟡 (196 중 일부) |
+| Drivers | 44 | S | main_driver_dispatch | 🟡 |
+| Functionals | 43 | S | — | ⬜ |
+| Modules | 38 | C | (분산 참조) | 🟡 |
+| Sediment/biology/ice/wec | — | C | sediment·biology·sea_ice·wec | ✅ |
+| WRF (결합) | ~700 | T | — | ⬛ |
+| ARPACK/BLAS/LAPACK | ~360 | T | — | ⬛ |
+
+---
+
+## 4. FUNWAVE 🟠 (TVD 38 + GPU 41 / SA 9)
+
+### 4.1 문서 (39 PDF — 대부분 validation 출력 caseA/B/C·sph_sol 등 → examples 티어)
+| PDF | 종류 | 노트 | 상태 |
+|---|---|---|---|
+| funwave_tvd_2.1_manual / funwave_tvd_3.0 | 사용자 매뉴얼 | — | ⬜ |
+| Intro-to-FUNWAVE-CHL-TN | 기술노트 | — | ⬜ |
+| funwave_code_analysis | 코드분석 | funwave-code-graph(자체) | 🟡 |
+| caseA/B/C·comp_beach·sph_sol·monai 등 ~33 | 검증 출력 | — | ⬜ (examples) |
+
+### 4.2 코드 모듈
+| 모듈 | 파일 | 티어 | 노트 | 상태 |
+|---|--:|:--:|---|:--:|
+| FUNWAVE-TVD/src | 38 | C | dispersion-solver·flux-tvd·physics-sources·feature-modules·infrastructure·source-map·code-graph | ✅ |
+| FUNWAVE-GPU/src | 41 | C | gpu-source | 🟡 |
+
+---
+
+## 5. ADCIRC 🟢 (adcirc/src 56 +gahm +asgs / SA 60)
+
+### 5.1 문서 (98 PDF)
+| 분류 | 개수 | 노트 | 상태 |
+|---|--:|---|:--:|
+| 매뉴얼류 (DevGuide·theory_2004·ASGSInterfaceGuide·AdcircLite·Paraview) | ~6 | manual-notes 21 | ✅ |
+| 논문 (1991~2008 Luettich·Westerink·Blain·Dietrich 등) | ~30 | foundational 후보 (web-refs 1) | 🟡 (web-refs 격상 여지) |
+| UGM 발표·agenda·abstract | ~20 | — | ⬜ (대부분 N/A) |
+| 기타(ice·jpeg2000·bathy·mesh png변환) | 나머지 | — | ⬜ |
+
+### 5.2 코드 모듈
+| 모듈 | 파일 | 티어 | 노트 | 상태 |
+|---|--:|:--:|---|:--:|
+| adcirc/src | 56 | C | gwce·momentum·timestep·wetdry·boundary·met-forcing·tidal·hotstart·3d-mode·baroclinic·dg-continuity·weir·output | ✅ |
+| adcirc/prep | 18 | S | preprocessing-foundation·parallel | ✅ |
+| adcirc/wind·util | 19 | S | (met-forcing·utilities 부분) | 🟡 |
+| gahm/src (Holland wind) | ~30 | C | (storm-surge nws13 부분) | 🟡 |
+| asgs (자동운영) | ~60 | S | output-writers·local-workflow 다수 | 🟡 |
+
+---
+
+## 6. EFDC 🟢 (264 / SA 29) — 양호
+
+**소스**: EFDC-GVC(301, 구버전)·EFDCPlus_Stable/EFDC(48 코어). 코어+서브시스템(hydro·transport·turbulence·sediment·sedzlj·propwash·waves·ice·toxics·water_quality·mpi·linkages·drifters·vertical·external_mode·hydraulic_structures) 전반 ✅. 문서 6 PDF 중 Theory/Manual/Implementation = manual-notes 5.
+잔여: EFDC-GVC(301 구버전) 별도 검수 여부 판단 필요, GOTM_Turbulence(32, ⬛ 외부 GOTM 결합 T후보).
+
+---
+
+## 7. XBeach 🟢 (118 / SA 32) — 양호
+
+xbeachlibrary(66) 코어 광범위 커버(flow_solver·morphology·nonh·q3d·wave_*·boundary·avalanching·groundwater·vegetation·ship_waves·bed_friction·single_dir·infrastructure·output 등). 문서 9 PDF 중 manual_master/kingsday·usersguide·non-hydrostatic_report·Parallellization_report. 잔여: manual-notes 3 → 매뉴얼 PDF 전수화 여지.
+
+---
+
+## 8. Celeris 🟢 (WebGPU JS+CUDA / SA 9) — 양호
+
+Celeris-WebGPU(JS + .wgsl/.cu compute shader). boussinesq-solver·breaking·fv-reconstruction·render·sediment·webgpu-infra·coulwave·pipeline-graph·source-map 커버. 문서 3 PDF(Tavakkol 2017/2020·Lynett 2026) = web-refs 2. 코어 솔버 ✅.
+
+---
+
+## 9. 검수 진행 규약
+
+1. 한 단위(모듈/문서) 검수 완료 시 → source-analysis(또는 manual-notes) 노트 작성 + **본 원장 상태 갱신** (⬜→🟡/✅).
+2. T티어는 코드 검수 제외, 라이선스·버전·출처만 모델 README 에 기록.
+3. 우선순위는 §0 대시보드 따름: SWASH → Delft3D(waq·dflowfm·fbc/rr/rtc) → ROMS(adjoint suite·Utility) → FUNWAVE → ADCIRC(gahm·asgs) → 매뉴얼 전수화.
+4. 검수 깊이는 산출물 규모에 비례 (santa-method) — 커널 서브루틴은 deep, util/IO 는 요약 가능.
+5. 본 원장은 [INDEX.md](../INDEX.md) 에서 진입.
