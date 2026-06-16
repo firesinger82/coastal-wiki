@@ -55,7 +55,7 @@ purpose: "사용자 지시(2026-06-16) '모든 모델은 모든 문서·코드�
 ### 1.1 문서
 | PDF | 종류 | 노트 | 상태 |
 |---|---|---|---|
-| swashtech.pdf | 기술(수치·물리) | — | ⬜ |
+| swashtech.pdf | 기술(mimetic 이산화 이론서, 부분완성) | swash-tech-documentation-overview | 🟡 (Ch2/5 deep 잔여, Ch8/9/10/12 원문 미완성) |
 | swashuse.pdf | 사용자 | — | ⬜ |
 
 ### 1.2 코드 모듈 (C티어, 파일명 접두 기준)
