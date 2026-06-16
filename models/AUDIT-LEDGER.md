@@ -37,8 +37,8 @@ purpose: "사용자 지시(2026-06-16) '모든 모델은 모든 문서·코드�
 | **SWASH** | 160 | ✅ 19 노트 (전수) | 2 | 🟡 1 | 🟢 코드 완료 (swashuse.pdf 잔여) |
 | **Delft3D** | engines_gpl 3,503 | ✅ 38 노트 (全엔진) | 53 | 2 | 🟢 engines 완료 (utils_gpl/lgpl S·문서 잔여) |
 | **ROMS** | roms/ROMS ~900 | ✅ 33 노트 (4D-Var 포함) | 10 | 3 | 🟢 코드 완료 (Exercise PDF·utils 잔여) |
-| **FUNWAVE** | TVD 38 + GPU 41 | 🟡 9 노트 | 39 | 1 | 🟠 4 (manual·test PDF) |
-| **ADCIRC** | adcirc/src 56 (+gahm·asgs) | ✅ 60 노트 | 98 | 21 | 🟢 5 (gahm·asgs 잔여) |
+| **FUNWAVE** | TVD 38 + GPU 41 | ✅ 10 노트 (코드 완료) | 39 | 1 | 🟢 코드 완료 (manual·test PDF 잔여) |
+| **ADCIRC** | adcirc/src 56 (+gahm·asgs) | ✅ 62 노트 (gahm·asgs 포함) | 98 | 21 | 🟢 코드 완료 |
 | **EFDC** | 264 | ✅ 29 노트 | 6 | 5 | 🟢 양호 |
 | **XBeach** | 118 | ✅ 32 노트 | 9 | 3 | 🟢 양호 |
 | **SWAN** | 77 | ✅ 29 노트 | 9 | 29 | 🟢 양호 (audit 노트 존재) |
@@ -165,7 +165,7 @@ purpose: "사용자 지시(2026-06-16) '모든 모델은 모든 문서·코드�
 | 모듈 | 파일 | 티어 | 노트 | 상태 |
 |---|--:|:--:|---|:--:|
 | FUNWAVE-TVD/src | 38 | C | dispersion-solver·flux-tvd·physics-sources·feature-modules·infrastructure·source-map·code-graph | ✅ |
-| FUNWAVE-GPU/src | 41 | C | gpu-source | 🟡 |
+| FUNWAVE-GPU/src | 41 | C | gpu-source + **gpu-cuda-port(kernel launch·MGPU halo exchange·cuSPARSE v2)** | ✅ |
 
 ---
 
@@ -185,8 +185,8 @@ purpose: "사용자 지시(2026-06-16) '모든 모델은 모든 문서·코드�
 | adcirc/src | 56 | C | gwce·momentum·timestep·wetdry·boundary·met-forcing·tidal·hotstart·3d-mode·baroclinic·dg-continuity·weir·output | ✅ |
 | adcirc/prep | 18 | S | preprocessing-foundation·parallel | ✅ |
 | adcirc/wind·util | 19 | S | (met-forcing·utilities 부분) | 🟡 |
-| gahm/src (Holland wind) | ~30 | C | (storm-surge nws13 부분) | 🟡 |
-| asgs (자동운영) | ~60 | S | output-writers·local-workflow 다수 | 🟡 |
+| gahm/src (GAHM 비대칭 Holland wind) | ~40 | C | **adcirc_gahm_vortex_model**(GahmSolver·radius solver·ATCF isotach·OWI 출력·Vortex 마찰/translation) | ✅ |
+| asgs (자동운영) | ~599 | S | output-writers·local-workflow + **adcirc_asgs_operational_system**(구조·tide_fac·aswip·asgs_main.sh·FigureGen) | ✅ (S요약) |
 
 ---
 
