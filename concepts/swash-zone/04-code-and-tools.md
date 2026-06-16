@@ -32,9 +32,9 @@ related:
 - **Green-Naghdi DG (Kazhyken·Videman·Dawson 2020)** — arxiv:[2005.00920](https://arxiv.org/abs/2005.00920)(morphodynamic) · [2010.06167](https://arxiv.org/abs/2010.06167)(sediment-morpho). Strang splitting 으로 surf zone 등에서 분산항 끄기 → **swash zone 까지 hydrodynamic 해상**. bed morphodynamic 결합. [`sediment-transport/04 §10.1`](../sediment-transport/04-code-and-tools.md) 중복 등재.
 - **Celeris** — [[../../models/Celeris/README]](STUB). WebGPU 실시간 interactive Boussinesq.
 
-## 3. 비정수압 — SWASH (미수록 모델, 후보)
+## 3. 비정수압 — SWASH ✅ ([[../../models/SWASH/README]] 수록)
 
-**SWASH** (Simulating WAves till SHore, Zijlema·Stelling·Smit 2011 *Coastal Engineering* 58:992-1012) — SWAN 과 같은 TU Delft 그룹의 **비정수압 다층** 위상해상 모델. 분산·비선형·쇄파·runup·wave-current. SWAN(위상평균 광역) → SWASH(위상해상 항내·swash) nesting 이 자연스러움. **본 위키 미수록 — `models/SWASH/` 신설 후보** (FUNWAVE/Celeris 와 함께 위상해상 모델군).
+**SWASH** (Simulating WAves till SHore, Zijlema·Stelling·Smit 2011 *Coastal Engineering* 58:992-1012 doi:10.1016/j.coastaleng.2011.05.015) — SWAN 과 같은 TU Delft 그룹의 **비정수압 다층** 위상해상 모델. Boussinesq 고차 분산항 대신 **연직 층분할 + 비정수압 압력**(Poisson)으로 분산 표현(층↑→깊은물 정확). 분산·비선형·쇄파·runup·wave-current. SWAN(위상평균 광역) → SWASH(위상해상 항내·swash) nesting 자연 — SWAN OCP 인프라 공유. ✅ **2026-06-15 신설**: [[../../models/SWASH/README]] (v12.01 GitLab clone) + [`source-analysis`](../../models/SWASH/source-analysis/swash-architecture-source-map.md)(명명규칙 Exp/Imp×Dep/Lay + compute dispatch) + [`web-refs`](../../models/SWASH/web-refs/swash-official-resources.md).
 
 ## 4. XBeach — surfbeat + non-hydrostatic
 
