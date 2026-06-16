@@ -35,7 +35,7 @@ purpose: "사용자 지시(2026-06-16) '모든 모델은 모든 문서·코드�
 | 모델 | 코어 소스파일 | 코어 검수 | 문서(PDF) | manual-notes | 우선순위 |
 |---|--:|:--:|--:|--:|:--:|
 | **SWASH** | 160 | ✅ 19 노트 (전수) | 2 | 🟡 1 | 🟢 코드 완료 (swashuse.pdf 잔여) |
-| **Delft3D** | engines_gpl 3,503 | 🟡 21 노트 | 53 | 2 | **🔴 2** |
+| **Delft3D** | engines_gpl 3,503 | ✅ 38 노트 (全엔진) | 53 | 2 | 🟢 engines 완료 (utils_gpl/lgpl S·문서 잔여) |
 | **ROMS** | roms/ROMS ~900 | 🟡 22 노트 | 10 | 3 | **🟠 3** (adjoint suite·utility) |
 | **FUNWAVE** | TVD 38 + GPU 41 | 🟡 9 노트 | 39 | 1 | 🟠 4 (manual·test PDF) |
 | **ADCIRC** | adcirc/src 56 (+gahm·asgs) | ✅ 60 노트 | 98 | 21 | 🟢 5 (gahm·asgs 잔여) |
@@ -44,7 +44,7 @@ purpose: "사용자 지시(2026-06-16) '모든 모델은 모든 문서·코드�
 | **SWAN** | 77 | ✅ 29 노트 | 9 | 29 | 🟢 양호 (audit 노트 존재) |
 | **Celeris** | WebGPU JS+CUDA | ✅ 9 노트 | 3 | 1 | 🟢 양호 |
 
-> **전수 검수 잔여 핵심**: ~~(1) SWASH 158파일~~ ✅ **완료(2026-06-16 workflow, 17 신규 노트)**, (2) Delft3D waq(527)·dflowfm(1515 대부분)·fbc/rr/rtc, (3) ROMS adjoint/tangent/representer(206)·Utility(196), (4) 전 모델 manual-notes 빈약(PDF 229 대비 66). **다음 우선순위: Delft3D engines**.
+> **전수 검수 잔여 핵심**: ~~(1) SWASH 158파일~~ ✅ · ~~(2) Delft3D engines~~ ✅ **완료(2026-06-16 workflow 2회, 34 신규 노트)**, (3) ROMS adjoint/tangent/representer(206)·Utility(196), (4) 전 모델 manual-notes 빈약(PDF 229 대비 66), (5) Delft3D utils_gpl/lgpl(S). **다음 우선순위: ROMS adjoint suite + Utility**.
 
 ---
 
@@ -99,17 +99,19 @@ purpose: "사용자 지시(2026-06-16) '모든 모델은 모든 문서·코드�
 | Conceptual/Functional Spec·course PDF | 개념·교육 | — | ⬜ |
 | TIDE/TRIANA/QUICKIN/RGFGRID/GPP/QUICKPLOT 등 도구 | 전·후처리 도구 | — | ⬜ |
 
-### 2.2 코드 모듈 (engines_gpl 중심)
+### 2.2 코드 모듈 (engines_gpl 중심) — 2026-06-16 workflow 17 신규 노트 (총 38 SA)
+> engines 전 엔진 검수 완료. 각 노트 file:line 인용 + 적대 검증 통과(special_physics 1건 radstr Sxy cos·sin 누락 적발→수정).
+
 | 모듈 | 파일 | 티어 | 노트 | 상태 |
 |---|--:|:--:|---|:--:|
-| flow2d3d | 794 | C | dispatcher·adi_solver·drying·heat·turbulence·sigma_z·flow_compute_aux·sediment | ✅ |
-| dflowfm | 1,515 | C | fm_kernel_scheme·fm_mdu_input·fm_overview·fm_compute_aux | 🟡 (대부분 미검수) |
-| waq (수질) | 527 | C | delwaq | 🟡 (코어 process lib 미검수) |
-| fbc | 253 | C | — | ⬜ |
+| flow2d3d | 794 | C | dispatcher·adi_solver·drying·heat·turbulence·sigma_z·compute_aux·sediment + **io·inichk_general·special_physics(nearfar/roller/nonhydro)** | ✅ |
+| dflowfm | 1,515 | C | kernel_scheme·mdu·overview·compute_aux + **compute_core·prepost·transport_sediment·waves·data_io·grid_utils** | ✅ (gui 342 S-tier 미검수) |
+| waq (수질) | 527 | C | delwaq + **process_library·algae_models(BLOOM/protist)·kernel_integration·io_preprocess** | ✅ |
+| fbc | 253 | C | **fbc_flow_boundary** (xerces ⬛T 제외) | ✅ |
 | part (입자) | 119 | C | part | ✅ |
-| rr (강우유출) | 111 | C | — | ⬜ |
-| wave (SWAN wrapper) | 81 | C | flow_wave_coupling | 🟡 |
-| rtc (실시간제어) | 56 | S | — | ⬜ |
+| rr (강우유출) | 111 | C | **rr_rainfall_runoff** | ✅ |
+| wave (SWAN wrapper) | 81 | C | flow_wave_coupling + **wave_swan_module** | ✅ |
+| rtc (실시간제어) | 56 | S | **rtc_realtime_control** | ✅ |
 | dsle/dimr/d_hydro | 47 | S | dimr_coupling·engines_overview | 🟡 |
 | utils_gpl | 766 | S | — | ⬜ |
 | utils_lgpl | 491 | S | — | ⬜ |
