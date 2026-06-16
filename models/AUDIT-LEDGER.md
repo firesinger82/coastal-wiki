@@ -36,7 +36,7 @@ purpose: "사용자 지시(2026-06-16) '모든 모델은 모든 문서·코드�
 |---|--:|:--:|--:|--:|:--:|
 | **SWASH** | 160 | ✅ 19 노트 (전수) | 2 | 🟡 1 | 🟢 코드 완료 (swashuse.pdf 잔여) |
 | **Delft3D** | engines_gpl 3,503 | ✅ 38 노트 (全엔진) | 53 | 2 | 🟢 engines 완료 (utils_gpl/lgpl S·문서 잔여) |
-| **ROMS** | roms/ROMS ~900 | 🟡 22 노트 | 10 | 3 | **🟠 3** (adjoint suite·utility) |
+| **ROMS** | roms/ROMS ~900 | ✅ 33 노트 (4D-Var 포함) | 10 | 3 | 🟢 코드 완료 (Exercise PDF·utils 잔여) |
 | **FUNWAVE** | TVD 38 + GPU 41 | 🟡 9 노트 | 39 | 1 | 🟠 4 (manual·test PDF) |
 | **ADCIRC** | adcirc/src 56 (+gahm·asgs) | ✅ 60 노트 | 98 | 21 | 🟢 5 (gahm·asgs 잔여) |
 | **EFDC** | 264 | ✅ 29 노트 | 6 | 5 | 🟢 양호 |
@@ -44,7 +44,7 @@ purpose: "사용자 지시(2026-06-16) '모든 모델은 모든 문서·코드�
 | **SWAN** | 77 | ✅ 29 노트 | 9 | 29 | 🟢 양호 (audit 노트 존재) |
 | **Celeris** | WebGPU JS+CUDA | ✅ 9 노트 | 3 | 1 | 🟢 양호 |
 
-> **전수 검수 잔여 핵심**: ~~(1) SWASH 158파일~~ ✅ · ~~(2) Delft3D engines~~ ✅ **완료(2026-06-16 workflow 2회, 34 신규 노트)**, (3) ROMS adjoint/tangent/representer(206)·Utility(196), (4) 전 모델 manual-notes 빈약(PDF 229 대비 66), (5) Delft3D utils_gpl/lgpl(S). **다음 우선순위: ROMS adjoint suite + Utility**.
+> **전수 검수 잔여 핵심**: ~~(1) SWASH~~ ✅ · ~~(2) Delft3D engines~~ ✅ · ~~(3) ROMS 4D-Var+Utility~~ ✅ **완료(2026-06-16 workflow 3회, 45 신규 노트)**, (4) 전 모델 manual-notes 빈약(PDF 229 대비 66), (5) Delft3D utils_gpl/lgpl(S). **다음 우선순위: FUNWAVE(GPU·매뉴얼) → ADCIRC(gahm·asgs) → manual-notes 전수화**.
 
 ---
 
@@ -130,20 +130,23 @@ purpose: "사용자 지시(2026-06-16) '모든 모델은 모든 문서·코드�
 | Exercise_1~9.pdf | 실습 튜토리얼 | — | ⬜ (examples 후보) |
 | tidal_ellipse.pdf | 조석타원 분석 | roms_tidal_forcing(부분) | 🟡 |
 
-### 3.2 코드 모듈 (roms/ROMS)
+### 3.2 코드 모듈 (roms/ROMS) — 2026-06-16 workflow 11 신규 노트 (총 33 SA)
+> 4D-Var suite(Tangent·Representer·Adjoint) + Drivers·Functionals·Modules·Include·Utility 검수 완료. 적대 검증 통과(global_state g 가드 SOLITON 오기 + utility shapiro ξ/η 방향 뒤바뀜 2건 적발→수정).
+
 | 모듈 | 파일 | 티어 | 노트 | 상태 |
 |---|--:|:--:|---|:--:|
-| Nonlinear | 87 | C | baroclinic_3d·barotropic_2d·advection·horizontal_mixing·vertical_mixing·bottom_boundary_layer·nonlinear_physics_modules | ✅ |
-| Adjoint | 81 | C | adjoint_framework(부분) | 🟡 |
-| Tangent | 70 | C | — | ⬜ |
-| Representer | 55 | C | — | ⬜ |
-| 4D-Var 종합 | (분산) | C | roms_4dvar | 🟡 |
-| Utility | 196 | S | support_modules·grid_metrics·open_boundaries·tidal_forcing·atmospheric_forcing·bulk_flux_coare·nesting·stability_gst | 🟡 (196 중 일부) |
-| Drivers | 44 | S | main_driver_dispatch | 🟡 |
-| Functionals | 43 | S | — | ⬜ |
-| Modules | 38 | C | (분산 참조) | 🟡 |
+| Nonlinear (코어) | 246 | C | baroclinic_3d·barotropic_2d·advection·h/v_mixing·bbl·nonlinear_physics + **core_remaining(prsgrd·rho_eos·omega·diag)** | ✅ |
+| Nonlinear/Vegetation | 10 | C | **nonlinear_vegetation** | ✅ |
+| Adjoint (ADM) | 85 | C | adjoint_framework + **adjoint_model** | ✅ |
+| Tangent (TLM) | 74 | C | **tangent_linear_model** | ✅ |
+| Representer (RPM) | 59 | C | **representer_model** | ✅ |
+| 4D-Var driver | 44 | C | 4dvar + main_driver_dispatch + **4dvar_drivers(i4dvar/rbl4dvar/r4dvar/fsv/adsen...)** | ✅ |
+| Functionals (ana_*) | 43 | C | **analytical_functionals** | ✅ |
+| Modules (mod_*) | 38 | C | support_modules + **global_state_modules** | ✅ |
+| Include (cppdefs) | 40 | S | **include_cppdefs** | ✅ |
+| Utility | 196 | S | grid_metrics·open_boundaries·tidal·atmospheric·bulk_flux·nesting·stability_gst + **io_netcdf(def/wrt/get/nf)·utility_numerics(vorticity/shapiro/scoord...)** | ✅ |
 | Sediment/biology/ice/wec | — | C | sediment·biology·sea_ice·wec | ✅ |
-| WRF (결합) | ~700 | T | — | ⬛ |
+| WRF (결합 대기모델) | ~700 | T | — | ⬛ |
 | ARPACK/BLAS/LAPACK | ~360 | T | — | ⬛ |
 
 ---
