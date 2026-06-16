@@ -32,6 +32,14 @@ related:
 | **Deltares/Delft-FIAT** | [github.com/Deltares/Delft-FIAT](https://github.com/Deltares/Delft-FIAT) | Flood Impact Assessment Tool |
 | **Deltares/hydromt_delft3dfm** | [github.com/Deltares/hydromt_delft3dfm](https://github.com/Deltares/hydromt_delft3dfm) | Python HydroMT D3D-FM 설정 자동화 |
 
+### 2.1 D-HYDRO 생태계 모델 빌더 (source-needed)
+
+D-Flow FM(=Delft3D FM)은 차세대 **D-HYDRO Suite** 의 엔진. 데이터모델→모델 자동생성 도구 계열:
+
+- **D-HyDAMO** — [HKV Confluence DHYD space](https://hkvconfluence.atlassian.net/wiki/spaces/DHYD/overview) (사용자 제공). **HyDAMO**(네덜란드 수계 표준 교환 데이터모델)로부터 **D-HYDRO(D-Flow FM) 1D2D 모델 자동 생성** Python 도구. 문서(HKV 발행, 네덜란드어, ~2026 갱신): Installatie·Genereren van deelmodellen(부분모델 생성)·Meteo-data·Dwarsprofiel(횡단면)·Koppelmethodes(geometrie↔waterlooptak 결합). `hydromt_delft3dfm`(HydroMT 기반)과 동류 — 입력 데이터모델만 다름(HyDAMO vs HydroMT).
+- 적용 맥락: 주로 **내륙 수계(1D 하천망·수로 + 2D 범람)** — 네덜란드 water board 운영. 연안 surge/morphology 보다 riverine/pluvial flood 지향(coastal 직접성 낮음, D-Flow FM 엔진 공유로 본 위키 ecosystem 참조).
+- citation_status: source-needed (Confluence REST API overview 수준 — 스페이스명·페이지·발행주체 verified, 기능 상세는 네덜란드어 문서 deep read TODO).
+
 ## 3. 핵심 논문 — 시초부터 현재까지
 
 ### 3.1 Foundation — FLOW + Morphology
