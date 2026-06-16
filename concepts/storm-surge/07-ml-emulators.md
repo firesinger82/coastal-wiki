@@ -3,7 +3,7 @@ title: "Storm Surge ML Emulators — surrogate models for hydrodynamic storm-sur
 topic: storm-surge
 canonical_source: self
 citation_status: verified
-verification_method: "arxiv:2605.09036 직접 fetch (WebFetch 2026-05-26) — abstract + 메타데이터 (authors, 제출일 2026-05-09, 카테고리 cs.LG) 직접 인용. 본문 §2 의 architecture 디테일·peak-aware loss·결과·한계는 전부 abstract 인용 기반. 정량 RMSE/MAE 수치, training hindcast 모델 (ADCIRC/Delft3D/etc.), CMIP6 5개 model 구체명, US Northeast 정점 좌표/개수 등은 abstract 미명시 — full PDF read 후 보강 가능. §3 추가 (2026-05-26): arxiv:2604.20688v2 (Nader·Giaremis·Dawson·Kaiser·Mohammadiporshokooh·Kaiser 2026, 제출일 2026-04-22 v1 / 2026-04-23 v2, 카테고리 cs.LG/cs.AI, 51p) abstract 직접 fetch — GCN+GAT+LSTM bias-correction architecture · US Gulf Coast 학습 · Hurricane Idalia (2023) test · RMSE 감소율 (48h >70% / 72h >50%) verbatim 인용. §4 cross-ref 표 + §5 한국 적용 검토 (StormNet bias-correction 접근이 한국 우선) 자체 분석 [2026-06-11 재번호 후 현 §5 관계표·§6 한국적용]. **§2.6~2.16 추가 (2026-05-28)**: arxiv:2605.09036v1 **full PDF 41p 직접 fetch** (curl + Read tool) — Table 1 5 CMIP6 모델 (AWI-CM-1-1-MR / CNRM-CM6-1 / EC-Earth3 / MPI-ESM1-2-HR / MRI-ESM2-0) + Table 2 4-station RMSE/MAE (Battery 0.0337/0.0246 / Boston 0.0274/0.0203 / Lewes 0.0276/0.0208 / CBBT 0.0306/0.0235) + Table 3 5% peak (PACT vs ST-GNN ~53% reduction) + Table 4 inference 3.4-3.6s vs ADCIRC 4.5-7h + Table 7/8 cross-dataset (NCEP→GCM 0.14-0.18m vs GCM↔GCM 0.04-0.09m reanalysis-GCM gap) + Appendix A ST-GNN baseline + Appendix C peak-aware ablation. ADCIRC 모델 + TPXO9 + 4 station 좌표 + 학습 config (4×H100 batch 256 lr 0.005 300 epochs Adam wd 10^-5) + GraphSAGE + cross-attention + Transformer + horizon-query + dual-head + L_PeakAware (eq 35) verbatim 인용. Charbonnier slope loss + ρ=0.05 tail fraction 등 hyperparameter 명시. ✅ 기존 §2.6 미보강 6개 항목 모두 해소 (code/data 공개 1건만 ⚠ — corresponding author 요청 필요). **§4 추가 (2026-06-11) → full PDF 격상 (2026-06-12)**: arxiv:2603.25978v1 (Pachev·Arora·Zhao·Valseth, 2026-03-26 [cs.CE]) — 초판 abstract-level 후 **full PDF 직접 read(pdftotext, /tmp/globalLI.txt)** 로 §4.1-4.7 verified 격상. 확정: 6 IBTrACS basin(NA/EP/NI/SI/**WP**/SP — 서태평양 한국 basin 포함) / STORM×IBTrACS→ADCIRC symmetric Holland / NOAA STOFS-2D-Global mesh(12.8M node) / storm packing 15000→3000 / landfall-중심 2.5°×2.5° 128×128 grid(location-invariance 기제) / 41 입력채널(13 pres+13 wind×2+bathy+landmask) / **UNet-5** encoder-decoder C0=64 / Table 3 basin별 RMSE(WP global 연안0.34·전점0.27m) / 실태풍 NA 67 hurricane per-point ADCIRC0.22 vs UNet0.37m / code github UT-CHG/adcirc-rom + DesignSafe 공개. 섹션 재번호 동반: 기존 §4→§5(관계표)·§5→§6(한국적용)·§6→§7(후보)·§7→§8(연결)."
+verification_method: "arxiv:2605.09036 직접 fetch (WebFetch 2026-05-26) — abstract + 메타데이터 (authors, 제출일 2026-05-09, 카테고리 cs.LG) 직접 인용. 본문 §2 의 architecture 디테일·peak-aware loss·결과·한계는 전부 abstract 인용 기반. 정량 RMSE/MAE 수치, training hindcast 모델 (ADCIRC/Delft3D/etc.), CMIP6 5개 model 구체명, US Northeast 정점 좌표/개수 등은 abstract 미명시 — full PDF read 후 보강 가능. §3 추가 (2026-05-26): arxiv:2604.20688v2 (Nader·Giaremis·Dawson·Kaiser·Mohammadiporshokooh·Kaiser 2026, 제출일 2026-04-22 v1 / 2026-04-23 v2, 카테고리 cs.LG/cs.AI, 51p) abstract 직접 fetch — GCN+GAT+LSTM bias-correction architecture · US Gulf Coast 학습 · Hurricane Idalia (2023) test · RMSE 감소율 (48h >70% / 72h >50%) verbatim 인용. §4 cross-ref 표 + §5 한국 적용 검토 (StormNet bias-correction 접근이 한국 우선) 자체 분석 [2026-06-11 재번호 후 현 §5 관계표·§6 한국적용]. **§2.6~2.16 추가 (2026-05-28)**: arxiv:2605.09036v1 **full PDF 41p 직접 fetch** (curl + Read tool) — Table 1 5 CMIP6 모델 (AWI-CM-1-1-MR / CNRM-CM6-1 / EC-Earth3 / MPI-ESM1-2-HR / MRI-ESM2-0) + Table 2 4-station RMSE/MAE (Battery 0.0337/0.0246 / Boston 0.0274/0.0203 / Lewes 0.0276/0.0208 / CBBT 0.0306/0.0235) + Table 3 5% peak (PACT vs ST-GNN ~53% reduction) + Table 4 inference 3.4-3.6s vs ADCIRC 4.5-7h + Table 7/8 cross-dataset (NCEP→GCM 0.14-0.18m vs GCM↔GCM 0.04-0.09m reanalysis-GCM gap) + Appendix A ST-GNN baseline + Appendix C peak-aware ablation. ADCIRC 모델 + TPXO9 + 4 station 좌표 + 학습 config (4×H100 batch 256 lr 0.005 300 epochs Adam wd 10^-5) + GraphSAGE + cross-attention + Transformer + horizon-query + dual-head + L_PeakAware (eq 35) verbatim 인용. Charbonnier slope loss + ρ=0.05 tail fraction 등 hyperparameter 명시. ✅ 기존 §2.6 미보강 6개 항목 모두 해소 (code/data 공개 1건만 ⚠ — corresponding author 요청 필요). **§4 추가 (2026-06-11) → full PDF 격상 (2026-06-12)**: arxiv:2603.25978v1 (Pachev·Arora·Zhao·Valseth, 2026-03-26 [cs.CE]) — 초판 abstract-level 후 **full PDF 직접 read(pdftotext, /tmp/globalLI.txt)** 로 §4.1-4.7 verified 격상. 확정: 6 IBTrACS basin(NA/EP/NI/SI/**WP**/SP — 서태평양 한국 basin 포함) / STORM×IBTrACS→ADCIRC symmetric Holland / NOAA STOFS-2D-Global mesh(12.8M node) / storm packing 15000→3000 / landfall-중심 2.5°×2.5° 128×128 grid(location-invariance 기제) / 41 입력채널(13 pres+13 wind×2+bathy+landmask) / **UNet-5** encoder-decoder C0=64 / Table 3 basin별 RMSE(WP global 연안0.34·전점0.27m) / 실태풍 NA 67 hurricane per-point ADCIRC0.22 vs UNet0.37m / code github UT-CHG/adcirc-rom + DesignSafe 공개. 섹션 재번호 동반: 기존 §4→§5(관계표)·§5→§6(한국적용)·§6→§7(후보)·§7→§8(연결). **§3 full PDF 격상 (2026-06-16)**: arxiv:2604.20688v2 **full PDF 20p 직접 fetch**(curl + pdftotext -layout, /tmp/stormnet.txt) — §3.5 미보강 7항목 전부 해소. Table 1 13 TC(학습 11 / Ian 2022 val / Idalia 2023 test) + Table 3 16 Gulf Coast gauge(NOAA-NOS/TCOON, node 8 Grand Isle LA 최다연결 9) + 그래프 구성(edge iff ρij>0.8 AND dij<500km, Pearson 상관 + haversine, weighted adj=ρij) + offset eq1(modeled−observed, 3σ outlier 제거, MinMax 누설방지 분리) + 아키텍처 MLP→GCN+GAT→2×LSTM(Fig 3) + 학습 config(Adam 200ep lr 3e-5 wd 5e-7 batch 20 past-window 42-48h, single A100) + Idalia 결과(median RMSE 18-72h ~0.08-0.09m 포화, 48h-ahead 미보정 ADCIRC 대비 Cedar Key 60%/Apalachicola 65%/Galveston 73% 감소, peak Cedar Key 35%/29%) + Table 5 ablation(MLP+GAT+GCN+LSTM 0.084 best, GAT+LSTM 0.097>GCN+LSTM 0.131) verbatim. **정직 재구성: 헤드라인 >70%/>50% 는 미보정 ADCIRC 대비, 기존 LSTM baseline[77] 대비로는 36h ~11-12%·>24h window ~10% 만 우위(24h 이하 동등, full timeseries 평균은 LSTM 이 근소 우위) — 주 이점은 짧은 학습시간**. 코드/데이터 공개 repo 명시 없음(데이터 CERA Historical Storm Archive). Gulf Coast 한정(WP 미학습)."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-26
 verification_by: "Claude Opus 4.7 (1M context) — arxiv abs 페이지 직접 fetch + author/date/category/abstract 직접 인용 (PACT + StormNet) + PACT full PDF 41p read (2026-05-28)"
@@ -249,9 +249,9 @@ PDF 명시:
 - 한국 적용 시 KOOS-EJS / WRF-ROMS hindcast 결합 가능성 — §6 한국 적용 검토 참조
 - code/data 공개 미확인 (corresponding author 요청 또는 후속 publication 추적)
 
-## 3. StormNet (Nader, Dawson et al. 2026) — GNN-LSTM bias correction
+## 3. StormNet (Nader, Dawson et al. 2026) — GNN-LSTM bias correction (verified, full PDF read 2026-06-16)
 
-### 3.1 기본 정보 (verified arxiv 2026-05-26 fetch)
+### 3.1 기본 정보
 
 | 항목 | 값 |
 |---|---|
@@ -259,58 +259,77 @@ PDF 명시:
 | 제목 | "StormNet: Improving storm surge predictions with a GNN-based spatio-temporal offset forecasting model" |
 | 저자 | Noujoud Nader, Stefanos Giaremis, **Clint Dawson**, Carola Kaiser, Karame Mohammadiporshokooh, Hartmut Kaiser |
 | arxiv 카테고리 | cs.LG (primary), cs.AI (secondary) |
-| Comments | 51 pages, 9 figures, 5 tables |
+| Keywords | Storm Surge Modeling, Bias Correction, Graph Neural Networks, Graph Convolution Networks |
 | URL | <https://arxiv.org/abs/2604.20688> |
-| 소속 | abstract 페이지 미명시 (**Dawson = UT Austin ADCIRC 핵심 개발자** — 저자 권위) |
+| 소속 | **Dawson = UT Austin ADCIRC 핵심 개발자** — 저자 권위. CERA(Coastal Emergency Risk Assessment) 플랫폼 통합 지향 |
+| 코드/데이터 | 공개 repo 명시 없음. 데이터 = **CERA Historical Storm Archive** (refs [56,61]) |
 
-### 3.2 모델 아키텍처 (abstract 직접)
+### 3.2 모델 아키텍처 (PDF §2.5, Fig 3)
 
-StormNet 은 **station-level bias correction** 을 위한 spatio-temporal GNN. ADCIRC 출력을 fully replace 가 아니라 post-process — physics-based forecast 의 잔차 (offset) 를 학습:
+StormNet 은 **station-level bias correction** 을 위한 spatio-temporal GNN. ADCIRC 출력을 fully replace 가 아니라 post-process — physics-based forecast 의 잔차 (offset) 를 학습. 3 phase pipeline:
 
-- **Graph convolutional (GCN)** — water-level gauge station 사이 spatial dependency 추출
-- **Graph attention (GAT)** — station 간 attention weights 학습 (위치별 영향력 differential)
-- **LSTM** — 시간축 dependency 모델링 (storm 진행 중 시계열 패턴)
-- 최종 출력: ADCIRC forecast 에 더할 offset (= residual correction)
+1. **MLP** (lightweight) — 각 station 의 historical offset 입력 전처리
+2. **GCN** (graph convolution) — 그래프 구조 따라 이웃 station 정보 aggregation, broad spatial correlation
+3. **GAT** (graph attention) — attention 으로 이웃별 중요도 adaptive weighting (storm 중 가장 relevant 한 inter-station 관계 강조)
+4. **2× LSTM** — 시간축 dependency, time-series 예측
+5. 최종 출력: predicted offset $\hat{o}_i(t)$ → ADCIRC forecast 에 더해 보정 (residual correction)
 
-→ PACT (§2) 와 차이: PACT 는 atmospheric forcing → surge 의 **direct emulator**. StormNet 은 ADCIRC 위에 얹는 **post-processor (bias corrector)** — physics layer 보존.
+→ PACT (§2) 와 차이: PACT 는 atmospheric forcing → surge 의 **direct emulator**. StormNet 은 ADCIRC 위에 얹는 **post-processor (bias corrector)** — physics layer 보존. GCN(general spatial) + GAT(adaptive local) 의 **상보 조합**이 핵심 설계.
 
-### 3.3 학습 + 검증 (abstract 직접)
+### 3.3 데이터 + 그래프 구성 (PDF §2.2-2.3)
 
-| 항목 | 값 |
+**Offset 정의 (eq 1)**: $o_i(t) = x_i^{\text{modeled}}(t) - x_i(t)$ — station $i$ 의 ADCIRC 예측치 − 관측치 (hourly). ±3σ 밖 outlier 제거. MinMax scaling 을 train/val/test 별도 적용 (training 속성 기준 → data leakage 방지).
+
+**TC 데이터 (Table 1)**: 13 historical Gulf Coast TC. 학습 11 + **Ian (2022, H5) = validation + Idalia (2023, H4) = test**:
+
+| 학습 TC | Cat | 비고 |
+|---|---|---|
+| Charley(2004)·Dennis(2005)·Eta(2020)·Helene(2024) | H4 | |
+| Wilma(2005)·Michael(2018)·Milton(2024) | H5 | |
+| Hermine(2016)·Debby(2024) | H1 | |
+| Debby(2012)·Fred(2021) | TS | |
+
+**16 gauge stations (Table 3)** — Gulf Coast FL→AL→LA→TX, NOAA-NOS + TCOON 기관. 선정 기준: 모든 storm 에서 obs+modeled 데이터 결측 적은 station (결측 많으면 제외). 예: Cedar Key FL(node 3, landfall 직접 타격 max ~2.5m), Apalachicola FL(node 4, ~1.0m), Grand Isle LA(node 8, **최다연결 9**), Galveston Bay Entrance TX(node 12, landfall 원거리).
+
+**그래프 (undirected, eq)**: node = gauge station, node feature = 관측 수위 시계열 $x_i$. **edge iff $\rho_{ij} > \rho_{\min}$ AND $d_{ij} < d_{\max}$** ($\rho_{\min}=0.8$, $d_{\max}=500$ km). $\rho_{ij}$ = 두 관측 수위 시계열의 Pearson 상관, $d_{ij}$ = haversine 대권거리. weighted adjacency $A_{ij}=\rho_{ij}$. → **물리적 의미**: 강한 수위상관 + 지리근접 station 끼리 연결. 임계값은 disconnected station 안 생기는 최저값.
+
+### 3.4 Idalia (2023) 결과 (PDF §3.1)
+
+- prediction window 6/9/12/15/18/24/36/48/72h 평가. median RMSE 는 18h 까지 증가 후 **18-72h 에서 ~0.08-0.09m 로 포화** (window 늘려도 안 커짐) — 긴 horizon 운영예보(OFS, 통상 ≥3일)에 유망.
+- **48h-ahead, 미보정 ADCIRC 대비 RMSE 감소** (3 대표 정점): Cedar Key 60% / Apalachicola 65% / Galveston Bay Entrance **73%**. **72h-ahead**: 50% / 52% / 59%.
+- **peak surge**: Cedar Key 최대관측수위 지점 forecasting error 를 48h 35% / 72h 29% 감소.
+- TCOON(텍사스) station 이 NOAA-NOS 보다 RMSE 낮음 — Idalia 의 텍사스 영향 미미 (easy case) 때문.
+
+### 3.5 LSTM baseline 비교 + ablation (PDF §3.2, Table 4-5)
+
+**vs 기존 sequential LSTM 방법 [77]** (graph 없이 station 간 상호작용 미모델링):
+
+| window | StormNet vs LSTM |
 |---|---|
-| Training | US Gulf Coast 과거 hurricane 데이터 (구체 hurricane list abstract 미명시) |
-| Test case | **Hurricane Idalia (2023)** |
-| Baseline | Sequential LSTM (graph 없는 sequence-only — StormNet 의 자체 ablation) |
-| Metric | RMSE (root mean square error) |
+| 24h | 거의 동등 |
+| full timeseries (전 station 평균) | LSTM 이 오히려 근소 우위 (각자 8/16 station 우세) |
+| 36h (full) | StormNet 11/16 station 우세, 평균 RMSE **~11% 낮음** |
+| 36h (landfall 전후 2일) | StormNet 13/16 station 우세, **~12% 낮음** |
+| >24h window 종합 | StormNet **~10% 낮은 RMSE** |
 
-### 3.4 결과 (abstract 직접 verbatim)
+**Ablation (Table 5, 24h window, 전 station RMSE m)**:
 
-> "Results demonstrate that StormNet can effectively reduce the root mean square error (RMSE) in water-level predictions by more than 70% for 48-hour forecasts and above 50% for 72-hour forecasts, as well as outperform a sequential LSTM baseline, particularly for longer prediction horizons."
-
-| Forecast horizon | RMSE 감소율 |
+| 구성 | RMSE |
 |---|---|
-| **48-hour** | **>70%** |
-| **72-hour** | **>50%** |
+| GCN+LSTM | 0.131 |
+| GAT+LSTM | 0.097 |
+| GCN+GAT+LSTM | 0.087 |
+| MLP+GAT+LSTM / MLP+GCN+LSTM | 0.088 |
+| **MLP+GAT+GCN+LSTM (full StormNet)** | **0.084** |
 
-→ 긴 시간 horizon 일수록 LSTM baseline 대비 우수 (graph spatial info 효과).
+→ GAT 단독이 GCN 단독보다 우수, GCN+GAT 조합으로 GAT 대비 11% 추가 감소, MLP 추가로 최종 3% 더. full 구성 최적.
 
-추가 abstract 인용:
+### 3.6 정직한 평가 + 한계 (PDF §4)
 
-> "The model also exhibits low training time, enhancing its applicability in real-time operational forecasting systems."
-
-### 3.5 본 위키 미보강 (full PDF read 시 보강 가능)
-
-abstract 만으로는 확인 불가 (51 pages full paper 에 명시 추정):
-
-- training hurricane list (US Gulf Coast 어떤 storms, 몇 개)
-- gauge station 좌표·개수·기간
-- StormNet 의 정확한 graph 구성 (node = station? edge weight = distance? bathymetry? 정점간 hydrodynamic distance?)
-- ADCIRC 의 어떤 version·grid·NWS mode 입력 사용
-- Hurricane Idalia (2023) test 의 정량 station-by-station 결과
-- GAT attention weights 의 해석 (어느 station 이 어디 영향)
-- code/data 공개 여부
-
-→ full paper PDF (<https://arxiv.org/pdf/2604.20688v2>) read 후 본 §3 update 권장.
+- **헤드라인 ">70%/>50%" 는 미보정 ADCIRC 대비** 수치 — 기존 LSTM bias-correction 방법 대비로는 **>24h window 에서 ~10%, 24h 이하 동등** (full timeseries 평균은 LSTM 이 근소 우위). 저자 자체 결론도 "similar accuracy ... for short prediction windows ... but lower RMSE by 10% for windows greater than 24 h". **StormNet 의 실질 차별화 = 짧은 학습시간**(real-time 운영 적합).
+- **구조적 한계** (PDF §4): (a) **obs+modeled 데이터 모두 있는 gauged 좌표에만** 적용 가능 — ungauged 위치 불가, (b) station 별 comparable 학습량 필요, (c) physics 는 그래프 구성에만 들어가고 **학습 과정엔 미반영**, (d) future work = ungauged 위치 bias 추정.
+- Gulf Coast 한정. **WP(서태평양) 미학습** — 한국 직접적용 불가 (intro 가 Western North Pacific TC DB 를 언급하나 본 연구 학습셋은 Gulf Coast).
+- 본 위키 한국 적용: §6.5 — 한국 ADCIRC 운영체계가 있다면 **진입장벽 최저 ML 접근**(full emulator 학습셋 불필요, 기존 ADCIRC 출력 + KHOA 관측만으로 residual 학습). 단 gauged 좌표 제약 = KHOA 정점에 한정.
 
 ## 4. Global Location-Invariant Peak Surge (Pachev, Valseth et al. 2026) — 전지구 UNet emulator
 
