@@ -2,7 +2,7 @@
 
 > **Canonical source**: 이 디렉토리(`models/SWASH/`)가 SWASH 모델의 구현·메커닉에 대한 진실의 원천. `concepts/swash-zone/04-code-and-tools.md`·`concepts/waves/` 등은 여기로의 링크만 가짐.
 >
-> ✅ **현재 상태(2026-06-15 신설)**: SWASH 공식 GitLab(gitlab.tudelft.nl/citg/wavemodels/swash) clone(`raw/source_code/swash/`, v12.01, 152 Fortran) + **source-analysis 1 + web-refs 1**(file:line / DOI 인용 verified). 위상해상 비정수압 모델군(FUNWAVE·Celeris) 합류.
+> ✅ **현재 상태(2026-06-15 신설, 06-16 확장)**: SWASH 공식 GitLab(gitlab.tudelft.nl/citg/wavemodels/swash) clone(`raw/source_code/swash/`, v12.01, 152 Fortran) + **source-analysis 2 + web-refs 1**(file:line / DOI 인용 verified). 위상해상 비정수압 모델군(FUNWAVE·Celeris) 합류.
 
 ## 정체 카드
 
@@ -38,7 +38,7 @@
 
 | 경로 | 상태 | 비고 |
 |---|---|---|
-| `source-analysis/` | ✅ 1 verified | [swash-architecture-source-map](source-analysis/swash-architecture-source-map.md) — 명명규칙·compute dispatch·SWAN 인프라 공유 |
+| `source-analysis/` | ✅ 2 verified | [swash-architecture-source-map](source-analysis/swash-architecture-source-map.md) — 명명규칙·compute dispatch·SWAN 인프라 공유 + [swash-nonhydrostatic-pressure-solver](source-analysis/swash-nonhydrostatic-pressure-solver.md) — θ-scheme·MacCormack·Keller-box·압력 Poisson projection(SIP/BiCGSTAB/tridiag) |
 | `manual-notes/` | (미생성) | swashuse/swashtech/swashimp 매뉴얼 — swash.sourceforge.io online_doc |
 | `web-refs/` | ✅ 1 verified | [swash-official-resources](web-refs/swash-official-resources.md) |
 | `raw/source_code/swash/` | ✅ clone (gitignore) | v12.01, src 152 Fortran |
