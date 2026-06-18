@@ -3,7 +3,7 @@ title: "SST 데이터·도구 정리 — KHOA·OISST·HadISST·COBE-SST2·NIFS"
 topic: sst
 canonical_source: self
 citation_status: verified
-verification_method: "각 데이터셋의 공식 문서 + 실제 다운로드 URL + 본 위키의 fetch 스크립트 (tools/sst-cross-check/) cross-reference. KHOA endpoint 는 활용가이드 HWP (오픈API 활용가이드_조위관측소 실측 수온.hwp) 직접 추출 + 실제 호출로 검증. OISST·HadISST·COBE2 endpoint 는 본 분석에서 실제 다운로드·추출 확인 (experience/khoa-sst-global-crosscheck.md §1)."
+verification_method: "각 데이터셋의 공식 문서 + 공식 다운로드 URL + 본 위키의 fetch 스크립트 (tools/sst-cross-check/) cross-reference. KHOA endpoint 는 활용가이드 HWP (오픈API 활용가이드_조위관측소 실측 수온.hwp) 직접 추출로 검증. OISST·HadISST·COBE2 endpoint 는 각 기관 공식 데이터 배포 페이지 기준."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-23
 verification_by: "Claude Opus 4.7 (1M context) — 실제 다운로드·호출 검증"
@@ -101,7 +101,7 @@ else:
 
 ### 2.5 주요 obsCode (조위관측소, KHOA Annual Report 2025)
 
-13정점 (본 위키 분석 사용):
+한국 연안 주요 조위관측소 예시:
 
 | code | 정점 | 해역 | 좌표 |
 |---|---|---|---|
@@ -167,9 +167,7 @@ ds = xr.open_dataset("sst.mon.mean.nc")
 
 ### 3.3 정점 매칭 (한국 연안 land-pixel fallback)
 
-OISST 0.25° 격자에서 한국 좁은 만·항구 정점은 육지 픽셀로 매핑될 수 있음. `tools/sst-cross-check/fetch_oisst_monthly.py` 의 `find_nearest_ocean()` 함수 — spiral neighborhood 검색으로 최인접 ocean pixel 추출.
-
-본 위키 적용 결과: 13정점 중 4정점 (목포·거제도·포항·울산) LAND→sea fallback 작동.
+OISST 0.25° 격자에서 한국 좁은 만·항구 정점은 육지 픽셀로 매핑될 수 있음. `tools/sst-cross-check/fetch_oisst_monthly.py` 의 `find_nearest_ocean()` 함수 — spiral neighborhood 검색으로 최인접 ocean pixel 추출 (좁은 만·항구 정점에서 LAND→sea fallback 적용).
 
 ### 3.4 직접 다운로드 예제
 
@@ -278,10 +276,10 @@ uv run python tools/sst-cross-check/fetch_cobe2.py
 
 | 스크립트 | 기능 |
 |---|---|
-| `tools/sst-cross-check/fetch_oisst_monthly.py` | OISST v2.1 다운로드 + 13정점 추출 |
-| `tools/sst-cross-check/fetch_hadisst.py` | HadISST 다운로드 + 13정점 |
-| `tools/sst-cross-check/fetch_cobe2.py` | COBE-SST2 다운로드 + 13정점 |
-| `tools/sst-cross-check/analyze_global_trends.py` | 6 window × 3 dataset 선형회귀 |
+| `tools/sst-cross-check/fetch_oisst_monthly.py` | OISST v2.1 다운로드 + 정점 추출 |
+| `tools/sst-cross-check/fetch_hadisst.py` | HadISST 다운로드 + 정점 추출 |
+| `tools/sst-cross-check/fetch_cobe2.py` | COBE-SST2 다운로드 + 정점 추출 |
+| `tools/sst-cross-check/analyze_global_trends.py` | window × dataset 선형회귀 |
 
 재현:
 ```bash

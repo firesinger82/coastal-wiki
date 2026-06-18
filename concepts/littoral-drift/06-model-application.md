@@ -75,7 +75,7 @@ $$
 
 > Canonical: [`efdc_sediment.md`](../../models/EFDC/source-analysis/sediment/efdc_sediment.md).
 
-**단계 4-5**: 두 분기 system ([`sediment-transport/06 §2`](../sediment-transport/06-model-application.md#2-efdc-sed-사용자-주력--2-분기-모델) 와 동일 canonical):
+**단계 4-5**: 두 분기 system ([`sediment-transport/06 §2`](../sediment-transport/06-model-application.md) 와 동일 canonical):
 - **SedTran-Original**: `ISTRAN(6)≥1` cohesive → `CALSED` (Krone-Partheniades), `ISTRAN(7)≥1` noncohesive → `CALSND` (Van Rijn 1984·Engelund-Hansen). 분기 `ssedtox.f90:868-880`.
 - **SEDZLJ**: size-class unified cohesive+noncohesive, multi-bed-layer, **Christoffersen-Jonsson wave-current shear stress**.
 

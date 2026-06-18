@@ -3,7 +3,7 @@ title: "연안표사 (Longshore Sediment Transport) — 정의·driver·empirica
 topic: littoral-drift
 canonical_source: self
 citation_status: verified
-verification_method: "CERC 'Shore Protection Manual' 1984 (외부 표준 reference, 본 위키 내 PDF 미보유 — sources.yml TODO) + Komar & Inman (1970) J. Geophys. Res. 75(30):5914-5927 (Wijetunge ref. 19 직접 인용) + Holthuijsen Ch 11 (textbook/md/Waves-Holthuijsen2007.md) + Soulsby 1997 (concepts/sediment-transport/ 공유) 정형 인용. 한국 longshore drift 사례는 KMOU·해양수산부 보고서 일반 reference (개별 case TODO)."
+verification_method: "CERC 'Shore Protection Manual' 1984 (외부 표준 reference, 본 위키 내 PDF 미보유 — sources.yml TODO) + Komar & Inman (1970) J. Geophys. Res. 75(30):5914-5927 (Wijetunge ref. 19 직접 인용) + Holthuijsen Ch 11 (textbook/md/Waves-Holthuijsen2007.md) + Soulsby 1997 (concepts/sediment-transport/ 공유) 정형 인용."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-23
 verification_by: "Claude Opus 4.7 (1M context) — CERC SPM + Komar-Inman + Wijetunge cross-ref"
@@ -123,21 +123,11 @@ $$\frac{\partial V}{\partial t} = (Q_{l,\text{in}} - Q_{l,\text{out}}) + (Q_{x,\
 - sources = river supply, cliff erosion, beach nourishment
 - sinks = dune deposition, headland trap, harbor capture
 
-한국 적용 예 — 안목항 (강원도):
-- 남쪽에서 북쪽 net longshore drift (남고북저 방향)
-- 항구 방파제 가 longshore drift 차단 → 남쪽 모래 축적, 북쪽 erosion
+일반 메커니즘: 항만 방파제가 net longshore drift 를 차단하면 상류측(updrift) 모래 축적·하류측(downdrift) erosion 이 발생 (CERC SPM 1984 §4; sediment budget control-volume 적용).
 
-## 8. 한국 적용 사례 (citation TODO)
+## 8. 한국 적용 사례
 
-| 위치 | 패턴 | 비고 |
-|---|---|---|
-| **안목항** (강원) | 북향 net drift 차단 → 모래 축적 / 북쪽 erosion | KMOU·해양수산부 연안침식 조사 |
-| **울산항** (남해) | 동향 drift | 항만 확장 시 영향 평가 |
-| **태안** (서해) | NW monsoon storm 시 강한 drift | 만리포·신두리 사구 |
-| **나무드는해변·낙산** (동해) | 강원 동해안 (북→남 net) | 해수욕장 모래 유실 |
-| **부산 해운대** | 양방향 변동 + 인공 beach 보충 | 양빈 (nourishment) 사업 |
-
-상세 case 분석은 [`05-examples.md`](05-examples.md) (예정) 에서.
+> 한국 longshore drift 개별 사례는 객관 데이터(KMOU·해양수산부 연안침식 조사 등 출처 명시 공개 보고서)로 검증 후 `experience/` 에 카테고리화 — 본 canonical 미수록. <!-- citation_status: source-needed -->
 
 ## 9. 측정·관측
 
@@ -176,7 +166,7 @@ $$\frac{\partial V}{\partial t} = (Q_{l,\text{in}} - Q_{l,\text{out}}) + (Q_{x,\
 
 - [`02-theory.md`](02-theory.md) (예정) — radiation stress 유도 + longshore current 식
 - [`04-code-and-tools.md`](04-code-and-tools.md) (예정) — XBeach surf module + GENESIS
-- [`05-examples.md`](05-examples.md) (예정) — 한국 해변 case study
+- [`05-examples.md`](05-examples.md) (예정) — 출처 명시 공개 데이터 기반 case study
 - [`concepts/sediment-transport/01-concept.md`](../sediment-transport/01-concept.md) — bedload·suspended 일반 (인접 토픽)
 - [`concepts/waves/02-theory.md`](../waves/02-theory.md) — wave driver
 - [`concepts/storm-surge/01-concept.md`](../storm-surge/01-concept.md) — storm 시 longshore drift 폭증

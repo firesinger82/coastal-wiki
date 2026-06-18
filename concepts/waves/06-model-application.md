@@ -3,7 +3,7 @@ title: "파랑 — 06 모델 적용 (SWAN · WW3 · XBeach · Delft3D-WAVE)"
 topic: waves
 canonical_source: self
 citation_status: verified
-verification_method: "AI cross-reference. SWAN 부분은 [models/SWAN/manual-notes/swan-action-balance.md] + [source-analysis/wink-pattern.md] verified로 검증. **2026-06-18 갱신**: SWAN(29 SA+29 manual)·XBeach(32 SA)·Delft3D(38 SA)·FUNWAVE·Celeris 전수 검수 완료 — 'stub' stale 참조를 검수 source-analysis cross-link 로 정정(staleness sweep). WW3 만 미수록(models/WW3/ 미생성, research/watchlist 추적). 외부 공식 source 인용분(2026-05-21)은 유지."
+verification_method: "AI cross-reference. SWAN 부분은 [models/SWAN/manual-notes/swan-action-balance.md] verified로 검증. **2026-06-18 갱신**: SWAN(29 SA+29 manual)·XBeach(32 SA)·Delft3D(38 SA)·FUNWAVE·Celeris 전수 검수 완료 — 'stub' stale 참조를 검수 source-analysis cross-link 로 정정(staleness sweep). WW3 만 미수록(models/WW3/ 미생성, research/watchlist 추적). 외부 공식 source 인용분(2026-05-21)은 유지."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-21
 verification_by: "Claude Opus 4.7 (1M context) — cross-ref"
@@ -38,28 +38,28 @@ verification_date: 2026-05-21
 
 → **한국 설계 표준 정량값**(KDS 64 구조물 반사율·정온 기준파고 + 표준 SWAN nesting 워크플로): [`harbor-tranquility-kds64.md`](harbor-tranquility-kds64.md) ★. 실무는 SWAN이 표준(인허가), FUNWAVE/Celeris는 공진·정밀 검증 티어.
 
-## 2. 한국 적용 표준 흐름 — Nested SWAN
+## 2. Nested SWAN 표준 흐름 (downscaling)
 
-(`swan-library-firesinger` WINK 패턴, [`04-code-and-tools.md` §2.4](04-code-and-tools.md))
+대양 hindcast → 연안 spectral 모델로 단계적 격자 세분화(nesting)하는 일반 다운스케일링 워크플로 (SWAN UserManual NESTOUT/NEST):
 
 ```
 Layer 0: WW3 글로벌 hindcast (외해 spectrum)
    ↓ NESTOUT
-Layer 1: SWAN coarse (한국 인근, 0.05° 격자)
+Layer 1: SWAN coarse (광역, ~0.05° 격자)
    ↓ NESTOUT
-Layer 2: SWAN middle (WINK 영역, 0.005° = ~500 m)
+Layer 2: SWAN middle (지역, ~0.005° = ~500 m)
    ↓ NESTOUT
-Layer 3: SWAN detail (사용자 정의, ~50-100 m, 항만·연안)
+Layer 3: SWAN detail (~50-100 m, 항만·연안)
    ↓
-검증: MPT/TW 정점 H_s·T_p·방향 비교
+검증: 관측 정점 H_s·T_p·방향 비교
 ```
 
-각 layer 입력:
-- **수심**: BADA2024/GEBCO (외해) + 대표수심_MSL.parquet (사용자, 정밀 연안)
-- **바람**: JMA-MSM 5 km (`swan-library-firesinger/tools/build_jma_uv_monthly.py`)
-- **경계 spectrum**: 상위 layer NESTOUT 또는 spectrum_archive (`05-examples.md` §6)
+각 layer 입력 (일반):
+- **수심**: GEBCO 등 외해 측심 + 정밀 연안 측심
+- **바람**: 재분석/예보 바람장 (예: JMA-MSM 5 km)
+- **경계 spectrum**: 상위 layer NESTOUT
 - **조류** (선택): EFDC 또는 ADCIRC 출력 (`concepts/currents/06-model-application.md`)
-- **수위** (선택): 약최고고조면 (AHHW) 보정 — `tools/build_ahhw_depths.py`
+- **수위** (선택): 약최고고조면 (AHHW) 보정
 
 ## 3. SWAN — Holthuijsen Ch.9 canonical
 
@@ -80,20 +80,7 @@ Layer 3: SWAN detail (사용자 정의, ~50-100 m, 항만·연안)
 - `BREAKING` — 깊이 유도 쇄파 (Battjes-Janssen 등)
 - `OUTPUT BLOCK/SPECOUT/TABLE` — 출력
 
-### 3.2 사용자 WINK 패턴
-
-13개 한국 연안 middle 도메인 + detail 도메인 (`swan-library-firesinger/metadata/`). 사용자 본인이 운용 중이라 검증된 입력 set.
-
-상세는 [`models/SWAN/source-analysis/wink-pattern.md`](../../models/SWAN/source-analysis/) (작성 예정).
-
-### 3.3 spectrum_archive (재사용)
-
-3-layer 비전:
-1. WINK-compatible baseline
-2. General coastal spectrum archive (임의 detail boundary)
-3. Suitability checker
-
-→ 새 프로젝트마다 외부 SWAN 재실행 불필요 (사용자 비전).
+> 한국 연안 multi-domain nesting 운용 패턴은 바이블 검증(객관 데이터) 후 `experience/` 에 카테고리화 — 본 canonical 미수록. (citation_status: source-needed)
 
 ## 4. WAVEWATCH III (WW3)
 
@@ -117,9 +104,9 @@ Layer 3: SWAN detail (사용자 정의, ~50-100 m, 항만·연안)
 - D3D-4 WAVE = SWAN 통합 (Delft3D-FLOW + WAVE coupling)
 - Delft3D FM (WAVE 부분 D-Waves)
 
-## 7. 검증 (한국 사례)
+## 7. 검증
 
-### 7.1 검증 정점
+### 7.1 검증 정점 (한국 공개 관측망)
 
 - **MPT 74 정점** ([`05-examples.md` §1](05-examples.md)):
   - MOF (해양수산부) 34
@@ -138,11 +125,7 @@ Layer 3: SWAN detail (사용자 정의, ~50-100 m, 항만·연안)
 | Pearson r (T_p) | 상관계수 | > 0.7 |
 | 방향 평균 절대 오차 | mean|Δθ| | < 20° |
 
-### 7.3 사용자 축산항 사례
-
-축산항 SWAN 시뮬 검증:
-- MPT238 영덕(고래불, ~7.5 km), TW_0095 고래불해수욕장(~7.7 km)
-- 자료: `swan-library-firesinger/metadata/validation_stations_chuksan.csv`
+> 특정 항만 SWAN 검증 사례(정량 RMSE·Bias·correlation)는 바이블 검증(객관 데이터) 후 `experience/` 에 카테고리화 — 본 canonical 미수록. (citation_status: source-needed)
 
 ## 8. 다른 토픽과의 교차
 
@@ -154,12 +137,9 @@ Layer 3: SWAN detail (사용자 정의, ~50-100 m, 항만·연안)
 ## 9. 보강 — `verified` 승격 체크리스트
 
 - [ ] `models/SWAN/manual-notes/` — Holthuijsen Ch.9 + SWAN UserManual 입력 카드 상세
-- [ ] `models/SWAN/source-analysis/wink-pattern.md` — 사용자 WINK 13개 도메인 분석
-- [ ] `models/SWAN/source-analysis/jma-msm-wind-workflow.md` — 사용자 바람 파이프라인
 - [ ] `models/SWAN/web-refs/swan-official-resources.md` — 공식 사이트·논문 인용
 - [ ] `models/WW3/` 새 디렉토리 생성 + 정체카드
 - [ ] `models/XBeach/manual-notes/` — XBeach surfbeat·non-hydrostatic 모드
-- [ ] 한국 축산항 SWAN 검증 사례 → `experience/` (RMSE·Bias·correlation 정량)
 
 ## 10. 연결
 
@@ -175,4 +155,3 @@ Layer 3: SWAN detail (사용자 정의, ~50-100 m, 항만·연안)
   - SWAN: [https://swanmodel.sourceforge.io/](https://swanmodel.sourceforge.io/)
   - WW3: [github.com/NOAA-EMC/WW3](https://github.com/NOAA-EMC/WW3)
   - XBeach: [xbeach.readthedocs.io](https://xbeach.readthedocs.io/)
-  - `swan-library-firesinger` (사용자 본인 SWAN 인프라)

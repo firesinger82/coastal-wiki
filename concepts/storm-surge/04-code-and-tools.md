@@ -3,7 +3,7 @@ title: "Storm Surge 도구·데이터 — ADCIRC NWS·OWI·SWAN coupling·KHOA o
 topic: storm-surge
 canonical_source: self
 citation_status: verified
-verification_method: "ADCIRC source-code level NWS 분석 (models/ADCIRC/source-analysis/storm-surge/ 7개 노트, 본 위키 promote 완료) + ADCIRC theory (Luettich & Westerink 2004) + KHOA OpenAPI surveyTideLevel 운영 (본 위키 [`concepts/tides/04-code-and-tools.md`](../tides/04-code-and-tools.md) 인용 + 본 위키 직접 fetch 경험)."
+verification_method: "ADCIRC source-code level NWS 분석 (models/ADCIRC/source-analysis/storm-surge/ 7개 노트) + ADCIRC theory (Luettich & Westerink 2004) + KHOA OpenAPI surveyTideLevel 공식 명세 ([`concepts/tides/04-code-and-tools.md`](../tides/04-code-and-tools.md) 인용)."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-23
 verification_by: "Claude Opus 4.7 (1M context) — ADCIRC source-analysis + KHOA API cross-ref"
@@ -29,16 +29,14 @@ ADCIRC 의 `fort.15` 의 `NWS` 파라미터로 meteorological forcing source 결
 | **0** | no meteo | — | 조석 단독 (storm 없는 baseline) |
 | **6** | 단순 wind/pressure | 일정 grid time series | 학습용 |
 | **12** | OWI ASCII | Oceanweather Inc. 분리 win/pre | 미국·유럽 운영 |
-| **13** | OWI NetCDF | 동일, NetCDF | **한국 JMA-MSM 운영** (사용자 워크플로) |
+| **13** | OWI NetCDF | 동일, NetCDF | JMA-MSM NetCDF 입력 |
 | **14** | GRIB2 | direct | NWP raw 입력 |
 | **19** | AHM (Asymmetric Holland Model) | parametric TC + Best Track | 단일 태풍 학술 분석 |
 | **20** | GAHM (Generalized AHM) | quadrant-dependent | **modern 권장**, ATCF + 4-quadrant |
 | **29** | AHM + OWI | hybrid (vortex + background) | 태풍 + 백그라운드 NWP |
 | **30** | GAHM + OWI | 동일, GAHM | 가장 정밀, 권장 |
 
-### 1.2 한국 운영 워크플로 — NWS=13 (JMA-MSM)
-
-사용자 표준 워크플로 (modeling-wiki → 본 위키 promote 완료):
+### 1.2 NWS=13 (JMA-MSM) 입력 메커닉
 
 - 입력: JMA-MSM (일본기상청 Mesoscale Model) → NetCDF
 - ADCIRC 의 NWS=13 reader (`owiwind_netcdf.F:215, 681, 747`) 가 직접 읽음
@@ -136,21 +134,11 @@ data = r.json()
 # 주의: 일부 record 에 tdlvHgt or bscTdlvHgt 가 None — 안전한 None 체크 필요
 ```
 
-#### **Archive 한계 (verified 측정 2026-05-24)** ⚠️
+#### Archive 한계 — OpenAPI retention
 
-KHOA OpenAPI `surveyTideLevel` 의 retention 은 **약 1년 rolling**:
+KHOA OpenAPI `surveyTideLevel` 의 retention 은 **약 1년 rolling** (1년 이전 `reqDate` 는 `NODATA_ERROR` 반환). 따라서 **과거 storm event (Hinnamnor 2022-09, Maemi 2003-09, Bolaven 2012-08 등) 의 OpenAPI 직접 fetch 불가**. 1년 이전 storm-surge case 분석은 KHOA **Annual Report PDF** 또는 KMA·KIOST 별도 archive 인용 필요.
 
-| 측정 시각 (KST) | reqDate=20241231 | reqDate=20250101 |
-|---|---|---|
-| 2026-05-24 | `NODATA_ERROR` | `NORMAL_SERVICE` |
-
-→ **과거 storm event (Hinnamnor 2022-09, Maemi 2003-09, Bolaven 2012-08 등) 의 OpenAPI 직접 fetch 불가**. 1년 이전 storm-surge case 분석은 KHOA **Annual Report PDF** 또는 KMA·KIOST 별도 archive 인용 필요.
-
-verified procedure (2026-05-24 firesinger@coastal-wiki 측정):
-- 인천 (DT_0001) reqDate=20240810 / 20240101 / 20221231 / 20220906 / 20220101 모두 `NODATA_ERROR`
-- 인천 reqDate=20250101 / 20250901 / 20260101 모두 `NORMAL_SERVICE`
-- 포항 (DT_0091, lat 36.05 lon 129.38) 응답 정상 동작 (어제 fetch verified)
-- 정확한 cut-off boundary: 2024-12-31 (NODATA) / 2025-01-01 (OK) — 측정 시점 기준 1년 retention 일관
+> OpenAPI retention 경계의 실측 검증 절차·정점별 결과는 객관 데이터 정리 후 `experience/` 에 카테고리화 — 본 canonical 미수록.
 
 ### 4.2 한국 정점 surge 분리 (residual)
 
@@ -166,14 +154,14 @@ KHOA OpenAPI 가 둘 다 제공 (`tdlvHgt` 실측, `bscTdlvHgt` 예측). 차이�
 
 | code | 정점 | 해역 | 좌표 (lat, lon) |
 |---|---|---|---|
-| DT_0001 | 인천 | 서해 | 37.452, 126.592 (verified API 응답) |
+| DT_0001 | 인천 | 서해 | 37.452, 126.592 |
 | DT_0005 | 부산 | 남해 | — |
 | DT_0006 | 묵호 | 동해 | — |
 | DT_0007 | 목포 | 서해 | — |
 | DT_0014 | 통영 | 남해 | — |
 | DT_0018 | 군산 | 서해 | — |
 | DT_0020 | 울산 | 남해 동부 | — |
-| DT_0091 | 포항 | 동해 | 36.052, 129.376 (verified API 응답) |
+| DT_0091 | 포항 | 동해 | 36.052, 129.376 |
 | ... 외 다수 ... | | | |
 
 → 정점 코드 전체 표는 [`experience/khoa-multi-station-tide-validation-2026.md`](../../experience/khoa-multi-station-tide-validation-2026.md) §1 참조 (15정점, 본 위키 verified).
@@ -184,7 +172,7 @@ ADCIRC NWS=12/13/14 입력 NWP source:
 
 | Source | 해상도 | 한국 가용성 |
 |---|---|---|
-| **JMA-MSM** | 5 km × 5 km | 한국 ADCIRC 운영 표준 (NWS=13 사용자 워크플로) |
+| **JMA-MSM** | 5 km × 5 km | NWS=13 NetCDF 입력에 사용 |
 | KMA UM | 1.5 km | 국내 운영, NetCDF 변환 필요 |
 | ECMWF IFS | 0.1° / 0.25° | 글로벌, ERA5 reanalysis 한정 사용 |
 | NOAA GFS | 0.25° | 글로벌, 운영 forecast |

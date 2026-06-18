@@ -14,16 +14,16 @@ verification_date: 2026-05-21
 
 ## 1. 모델 비교
 
-| 모델 | 종류 | 라이선스 | 표사 모듈 | 사용자 익숙도 |
+| 모델 | 종류 | 라이선스 | 표사 모듈 | 비고 |
 |---|---|---|---|---|
-| **EFDC SED** | hydrodynamic + sediment (3D) | open source (DSI, USEPA 등) | 자체 모듈 | **사용자 주력** ([축산항] 등) |
+| **EFDC SED** | hydrodynamic + sediment (3D) | open source (DSI, USEPA 등) | 자체 모듈 | USEPA 수질·침퇴적 |
 | **Delft3D-SED** | hydrodynamic + sediment | GPL-3.0 | D3D-4 또는 FM | 표준 (Deltares) |
-| **MIKE 21/3 ST** | 상용 | 상용 (DHI) | ST = Sediment Transport | 한국 항만 설계 |
+| **MIKE 21/3 ST** | 상용 | 상용 (DHI) | ST = Sediment Transport | 항만 설계 |
 | **XBeach sedtrans** | 폭풍 침식 | GPL-3.0 | non-cohesive · 비점착성 | 폭풍 시뮬 |
 | **CSTMS / COAWST** | combined ocean·atm·wave·sed | open source | ROMS + SWAN + CSTMS | 학술 |
 | **TELEMAC-SISYPHE** | unstructured | open source (EDF) | SISYPHE = sediment | 유럽 표준 |
 
-## 2. EFDC SED (사용자 주력)
+## 2. EFDC SED
 
 > **Canonical**: [`models/EFDC/`](../../models/EFDC/) (source-analysis 30 verified: [[../../models/EFDC/source-analysis/sediment/efdc_sediment]]·[[../../models/EFDC/source-analysis/sediment/efdc_sedzlj]]) + `efdc-sed-trans-2003` source (`textbook/md/86899804-EFDC-Theory-Tech-Aspects-of-Sed-Trans-2003-05.md`).
 
@@ -56,13 +56,9 @@ verification_date: 2026-05-21
 - Bed 입자 분포 변화 (multi-layer)
 - 침전·재부유 flux
 
-### 2.4 한국 EFDC 사용자 사례 (`축산항` 등)
+### 2.4 한국 적용 사례
 
-사용자는 `D:\Projects\축산항\` 등에서 EFDC 운용. SED 모듈 적용 사례:
-- 축산항 침퇴적 변화 (15년 누적, 약 -22 cm 침식 또는 +22 cm 퇴적, [memory 1215] 참조)
-- 모델 → idealized 결과 → 보고서
-
-→ 실제 운용 사례는 `experience/` 또는 [`models/EFDC/source-analysis/`](../../models/EFDC/source-analysis/) (작성 검토).
+> 한국 항만 EFDC SED 적용 사례는 바이블 검증(객관 데이터) 후 `experience/` 에 카테고리화 — 본 canonical 미수록. citation_status: source-needed.
 
 ## 3. Delft3D-SED
 
@@ -120,26 +116,24 @@ verification_date: 2026-05-21
 
 | 상황 | 권장 |
 |---|---|
-| 한국 EFDC 시뮬 (사용자 주력) | **EFDC SED** + manual + `efdc-sed-trans-2003` |
+| 침퇴적 + 수질 결합 (3D) | **EFDC SED** + manual + `efdc-sed-trans-2003` |
 | 단순 항만 (단기 설계) | **MIKE 21 ST** 또는 **Delft3D-SED** |
 | 폭풍 침식 시뮬 | **XBeach** sediment + morphology |
 | 학술 ocean-atm-wave-sed coupling | **CSTMS / COAWST** |
 | 평형 단면 검토 (Dean profile) | 수동 (`02-theory.md` §5 식) |
 | 정점별 d_{50} 분석 | scipy, scikit (sieve curve fit) |
 
-## 9. 사용자 SWAN-EFDC coupling
+## 9. SWAN ↔ EFDC coupling (프로그램 간 연관성)
 
-`swan-library-firesinger` ↔ EFDC SED:
 - SWAN 출력 (radiation stress, H_s, T_p) → EFDC SED 입력 (wave forcing)
-- 한국 KHOA 수치조류도 (`tides-khoa-cross-verification.md` §5) → EFDC 외해 흐름 boundary
-- 둘 조합 시 천해 비선형 모드 활성
+- KHOA 수치조류도 (`tides-khoa-cross-verification.md` §5) → EFDC 외해 흐름 boundary 조건
+- wave + current 조합 시 합성 bed shear stress 로 재부유 임계 평가
 
 ## 10. 보강
 
 - EFDC 표사이동 source-code (`models/EFDC/source-analysis/sediment.md`) 발췌
 - Delft3D-SED 입력 카드 정리
 - CSTMS Python interface
-- 사용자 축산항 EFDC SED 실제 input·output 사례 → `experience/`
 
 ### 10.1 연구 문헌 (research/inbox promote, source-needed)
 

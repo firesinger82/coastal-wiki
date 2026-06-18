@@ -134,9 +134,10 @@ def bedload_MPM(theta, theta_cr, d_mm, rho_s=2650, rho=1025, g=9.81):
 | 인천 (서해) | M₂ 40 cm/s | H_s 1.0 m | 0.15 mm | **매우 강함** (강조류+파) |
 | 부산 (남해) | M₂ 3 cm/s | H_s 0.7 m | 0.3 mm | 중간 (파 우세) |
 | 묵호 (동해) | M₂ 0.06 m/s | H_s 1.0 m | 0.5 mm | 파 우세, 너울 침식 |
-| 축산항 (동해) | (조류 약함) | (MPT238) | 0.3-0.5 mm | 너울 침식 |
 
 → 정확한 d_{50}과 활동도는 정점별 저질조사 + 모델링 필요.
+
+→ 한국 특정 항만 적용 사례(개인 모델링 영역)는 바이블 검증(객관 데이터) 후 `experience/` 에 카테고리화 — 본 canonical 미수록. <!-- citation_status: source-needed -->
 
 ## 4. Bed Form 분석 — Soulsby Ch.7
 

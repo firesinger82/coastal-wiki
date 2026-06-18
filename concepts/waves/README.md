@@ -10,8 +10,8 @@
 | `01-concept.md` | **verified** | 정의·풍파vs너울·파라미터·관측·KHOA 용어 |
 | `02-theory.md` | **verified** | linear theory·분산관계·energy·천해변형 (Holthuijsen Ch.5,7) |
 | `03-analysis-methods.md` | **verified** | 스펙트럼·통계·JONSWAP·PM (Holthuijsen Ch.3,4) |
-| `04-code-and-tools.md` | **verified** | SWAN/WW3/XBeach + WINK·spectrum_archive |
-| `05-examples.md` | **verified** | 한국 MPT 74정점 분석 frame + 축산항 사례 |
+| `04-code-and-tools.md` | **verified** | SWAN/WW3/XBeach |
+| `05-examples.md` | **verified** | 한국 MPT 74정점 분석 frame |
 | `06-model-application.md` | **verified** | SWAN canonical (`models/SWAN/` 2 노트 verified) + WW3/XBeach 외부 인용 |
 | `07-wave-transmission.md` | ✅ **verified** (2026-06-18) | 부유체·구조물 파 투과/반사 — inbox promote(1402.1555 실험 + 1403.3766 floating disk array, full-PDF) + SWAN obstacle 투과(Goda/d'Angremond) 대비 |
 | `08-wave-current-interaction.md` | ✅ **verified** (2026-06-18) | 파-흐름 상호작용(Doppler·refraction·blocking) — inbox promote(2511.12711 eddy dipole 풍파 + 2606.03231 reduced wave-current, full-PDF) + SWAN action balance/QC 대비 |
@@ -21,7 +21,6 @@
 - `holthuijsen2007` — [`textbook/notes/waves-holthuijsen-toc.md`](../../textbook/notes/waves-holthuijsen-toc.md) (Ch.1-9 TOC + 핵심 발췌, Ch.9 전체가 SWAN)
 - `khoa-portcals-glossary` — 284 파랑 용어
 - `dashboard-khoa-data` — MPT 74정점 메타데이터 + mof_data
-- `swan-library-firesinger` — 사용자 본인 SWAN library (`D:\Numerical_models\01_Models\swan\Fin\07_SWAN_LIBRARY\`)
 - `hudspeth2005-wave-forces` — 파력 (TBD)
 - `water-wave-mechanics` — 수파역학 (TBD)
 - `khoa-annual-reports` — [`textbook/notes/khoa-annual-reports-overview.md`](../../textbook/notes/khoa-annual-reports-overview.md) (15권 2012-2025, MPT 정점·유의파 통계)

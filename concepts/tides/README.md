@@ -17,8 +17,8 @@
 - `lubbad2009-tides-slides` — [`textbook/notes/tides-lubbad2009-overview.md`](../../textbook/notes/tides-lubbad2009-overview.md)
 - `stewart-physical-ocean` — [`textbook/notes/tides-stewart-ch17.md`](../../textbook/notes/tides-stewart-ch17.md)
 - `tidal-heights-manual` — [`textbook/notes/tides-foreman1977-appendix.md`](../../textbook/notes/tides-foreman1977-appendix.md) (appendix only, 본문 OCR 보강 대기)
-- `khoa-portcals-glossary` — [`/mnt/d/wsl_env/maritime-glossary-mcp/glossary.json`](../../textbook/sources.yml) (직접 lookup)
-- `dashboard-khoa-data` — [`textbook/notes/tides-khoa-nonharmonic-research.md`](../../textbook/notes/tides-khoa-nonharmonic-research.md) (사용자 본인 KHOA 데이터·연구, 부산항 검증)
+- `khoa-portcals-glossary` — [`textbook/sources.yml`](../../textbook/sources.yml) (KHOA PortCALS 용어집)
+- `dashboard-khoa-data` — [`textbook/notes/tides-khoa-nonharmonic-research.md`](../../textbook/notes/tides-khoa-nonharmonic-research.md) (KHOA 공식 비조화상수·관측 데이터)
 - `khoa-tide-model` — [`textbook/notes/tides-khoa-cross-verification.md`](../../textbook/notes/tides-khoa-cross-verification.md) (3개 source 산재값 cross-verification + 변도성 2007 위상 기준 + 수치조류도)
 - `khoa-annual-reports` — [`textbook/notes/khoa-annual-reports-overview.md`](../../textbook/notes/khoa-annual-reports-overview.md) (15권 2012-2025 공식 백서, 조위·파랑·해수유동 통합)
 

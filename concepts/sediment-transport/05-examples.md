@@ -3,7 +3,7 @@ title: "표사이동 — 05 학습 예제 (한국 사례)"
 topic: sediment-transport
 canonical_source: self
 citation_status: source-needed
-verification_method: "AI cross-reference: Soulsby formulae 코드 (verified) + 사용자 축산항 사례 (이전 memory 1215 참조, KHOA 저질조사 자료 보강 대기). 본 페이지의 정량 결과는 자료 확보 후 verified 가능."
+verification_method: "AI cross-reference: Soulsby formulae 코드 (verified). 가정값 기반 교육용 예제 — 정량 결과는 KHOA 저질조사 등 객관 데이터 확보 후 verified 가능."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-21
 verification_by: ""
@@ -12,7 +12,7 @@ verification_date: ""
 
 # 표사이동 — 05 학습 예제
 
-> **상태**: 코드 frame + 정점 골격. 실제 KHOA 저질·EFDC 모델 출력 통합은 보강 대기 (source-needed → verified 승격 시 KHOA 데이터·EFDC output 추가).
+> **상태**: 코드 frame + 정점 골격 (가정값 기반 교육용 예제). 실제 KHOA 저질 데이터 통합은 보강 대기 (source-needed → verified 승격 시 KHOA 데이터 추가).
 
 ## 1. 인천 정점 — bed shear · Shields · bedload
 
@@ -89,29 +89,9 @@ Hs = 1.5; T = 10
 
 → 동해 해변은 거친 모래 + 너울 → bedload + 일부 suspension. 폭풍 시 비선형 sheet flow 발생 가능.
 
-## 3. 축산항 사례 (사용자 모델링 영역)
+## 3. 한국 적용 사례
 
-> 사용자가 [memory ID 1215] 등에서 EFDC SED로 시뮬한 축산항 침퇴적 결과:
-> - 평균 침식·퇴적 ±1.5 cm/yr (idealized 산출)
-> - 15년 누적 약 ±22 cm
->
-> 실제 ddata·모델 input·output → `experience/efdc-chuksan-sediment-validation.md` (작성 검토).
-
-### 3.1 축산항 표사 환경 (추정)
-
-- 위치: 36.510°N, 129.451°E (동해 남부)
-- 외해 파: H_s 평균 1.0-1.5 m, 폭풍 시 4-5 m
-- 조류: 약함 (동해 M₂ ≈ 5-10 cm/s)
-- 모래: 0.3-0.5 mm 추정 (저질조사 필요)
-- **너울 우세** 환경
-
-### 3.2 모델 검증 정점
-
-- MPT238 영덕(고래불): ~7.5 km, MOF 파 buoy
-- TW_0095 고래불해수욕장: ~7.7 km, KHOA 파
-- 자료: `swan-library-firesinger/metadata/validation_stations_chuksan.csv`
-
-축산항 시뮬: SWAN → EFDC + sediment 연쇄.
+> 한국 특정 해역의 EFDC/SWAN 표사 모델링 적용 사례는 바이블 검증(객관 데이터: KHOA 저질조사·OBS·multibeam 등) 후 `experience/` 에 카테고리화 — 본 canonical 미수록. *(source-needed)*
 
 ## 4. 한국 해역별 표사 활동도 (정성 비교, 정량 보강 대기)
 
@@ -122,19 +102,18 @@ Hs = 1.5; T = 10
 | 남해 | 부산 | 0.3 | 0.03 m/s | 0.7 m | bedload + 일부 suspension | 중간 |
 | 남해 | 여수 | 0.2-0.4 | 0.05 m/s | 0.8 m | mixed | 중간 |
 | 동해 | 묵호 | 0.5 | 0.005 m/s | 1.0 m | **bedload 우세** | 너울 의존 |
-| 동해 | 축산 | 0.3-0.5 | (약함) | 1.0 m | bedload + 폭풍 suspension | 너울 의존 |
 | 제주 | 제주 | 0.3 | 0.07 m/s | 0.8 m | bedload + 일부 suspension | 너울 의존 |
 
-→ 정확한 d_{50}은 KHOA 저질조사 필요. 본 표는 일반론 + 사용자 추정.
+→ 정확한 d_{50}은 KHOA 저질조사 필요. 본 표는 일반론 기반 정성 비교 (가정값, source-needed).
 
-## 5. EFDC SED 워크플로 (사용자 표준)
+## 5. EFDC SED 워크플로 (일반 모델 연쇄)
 
 ```
 1. 외해 조류 forcing
    ↓ KHOA 수치조류도 (서해·남해) 또는 NAO.99Jb (동해)
    ↓
 2. 외해 파 forcing
-   ↓ SWAN (사용자 WINK 패턴)
+   ↓ SWAN (nested grid)
    ↓ middle (0.005°) → detail (0.0015°)
    ↓ 파 radiation stress + H_s + T_p output
    ↓
@@ -150,8 +129,7 @@ Hs = 1.5; T = 10
 
 ## 6. 보강·미해결
 
-- 각 정점 d_{50} KHOA 저질조사 자료 입수·통합
-- 인천·축산 EFDC SED 실제 시뮬 결과 → 본 페이지 정량 결과 verified
+- 각 정점 d_{50} KHOA 저질조사 자료 입수·통합 → 본 페이지 정량 결과 verified
 - Soulsby helper 함수 실제 패키지화 → `sediment_helpers.py`
 - 응집침강 (cohesive) 예제 추가
 - Dean equilibrium profile 한국 해변 적용 사례
@@ -164,4 +142,4 @@ Hs = 1.5; T = 10
 - `06-model-application.md` — 모델 적용 통합
 - `concepts/currents/05-examples.md` — 정점별 조류 (입력 데이터)
 - `concepts/waves/05-examples.md` — 정점별 파 (입력 데이터)
-- `experience/` (작성 검토): EFDC 축산항 sediment validation
+- `experience/` — 한국 적용 사례는 객관 데이터 검증 후 별도 레이어로 카테고리화

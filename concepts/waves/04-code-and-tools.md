@@ -3,7 +3,7 @@ title: "파랑 — 04 코드와 도구 (SWAN·WAVEWATCH III·XBeach)"
 topic: waves
 canonical_source: self
 citation_status: verified
-verification_method: "AI cross-reference: textbook/md/Waves-Holthuijsen2007.md Ch.9 (SWAN canonical) + WebSearch acc. 2026-05-21 (WW3 NOAA, XBeach Deltares) + swan-library-firesinger 사용자 자료. §3.4 추가 (2026-05-28): NOAA-EMC/WW3 Issue #1600 (UK Met Office ukmo-rwdavies, OPEN 2026-05-20) GitHub Issues API 직접 fetch — bug body verbatim 인용 (SMC nested grid boundary point mismatch → coastline spurious wave energy), 재현 절차 + 한국 SWAN nested 흐름 영향 자체 분석. Fix PR 제출 예정 (status tracking)."
+verification_method: "AI cross-reference: textbook/md/Waves-Holthuijsen2007.md Ch.9 (SWAN canonical) + WebSearch acc. 2026-05-21 (WW3 NOAA, XBeach Deltares). §3.4 추가 (2026-05-28): NOAA-EMC/WW3 Issue #1600 (UK Met Office ukmo-rwdavies, OPEN 2026-05-20) GitHub Issues API 직접 fetch — bug body verbatim 인용 (SMC nested grid boundary point mismatch → coastline spurious wave energy), 재현 절차. Fix PR 제출 예정 (status tracking)."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-21
 verification_by: "Claude Opus 4.7 (1M context) — cross-ref + WebSearch + WW3 Issue #1600 GitHub API 직접 fetch (2026-05-28)"
@@ -59,23 +59,6 @@ Source terms (Holthuijsen Ch.9 §9.3):
 
 → 정밀 카드 정리: [`models/SWAN/manual-notes/`](../../models/SWAN/manual-notes/) (작성 예정).
 
-### 2.4 사용자 SWAN library (`swan-library-firesinger`)
-
-`D:\Numerical_models\01_Models\swan\Fin\07_SWAN_LIBRARY\`:
-
-| 항목 | 위치 | 역할 |
-|---|---|---|
-| WINK middle 도메인 | `metadata/wink_middle_areas.csv` | 13개 한국 연안 중간 도메인 (1°×0.9°, dx=0.005°) |
-| WINK detail 도메인 | `metadata/wink_detail_areas.csv` | 세밀 도메인 |
-| 검증 정점 | `metadata/validation_stations_chuksan.csv` | 축산항 MPT238·TW_0095 |
-| 수심 생성 | `tools/build_swan_depth_from_parquet.py` | 대표수심_MSL.parquet → SWAN 격자 |
-| AHHW 수심 | `tools/build_ahhw_depths.py` | 약최고고조면 보정 ([`concepts/tides/02-theory.md` §8.2](../tides/02-theory.md)) |
-| Hybrid 수심 | `build_hybrid_middle_depth.py`, `build_smooth_hybrid_middle_depth.py` | BADA2024/GEBCO + parquet 합성 |
-| JMA-MSM 바람 | `tools/build_jma_uv_monthly.py` | 일본기상청 5 km 격자 바람 |
-| Spectrum archive | `spectrum_archive/` | 3-layer 한국 연안 spectrum DB (별도 문서) |
-
-→ WINK 패턴 상세: [`models/SWAN/source-analysis/wink-pattern.md`](../../models/SWAN/source-analysis/wink-pattern.md) (작성 예정).
-
 ## 3. WAVEWATCH III (WW3) — NOAA
 
 ### 3.1 인용
@@ -101,9 +84,8 @@ Source terms (Holthuijsen Ch.9 §9.3):
 | 격자 | 직교/곡선/비구조 | 직교/비구조 (regular mesh 강점) |
 | 천해 비선형 (triad) | LTA built-in | 별도 옵션 |
 | GIS 통합 | 다수 도구 | NetCDF 표준 |
-| 한국 사용 | 사용자 WINK 패턴 | 외해 일반 (NOAA 기반) |
 
-→ 한국 외해 풍파 forcing은 WW3 글로벌 hindcast (예: NOAA/IOWAGA) → SWAN nested run의 표준 흐름.
+→ 외해 풍파 forcing(예: NOAA/IOWAGA WW3 글로벌 hindcast) → SWAN nested run은 일반적 표준 흐름.
 
 ### 3.4 SMC nested grid boundary issue ([Issue #1600](https://github.com/NOAA-EMC/WW3/issues/1600), OPEN 2026-05-20)
 
@@ -188,51 +170,27 @@ XBeach 상세: [`models/XBeach/`](../../models/XBeach/) (source-analysis 32 + ma
 | 상황 | 권장 |
 |---|---|
 | 글로벌 대양 hindcast | **WW3** |
-| 한국 연안 spectral, 외해 forcing 받아 nested | **SWAN** + WINK 패턴 (`swan-library-firesinger`) |
+| 연안 spectral, 외해 forcing 받아 nested | **SWAN** (nested run) |
 | 폭풍 침식·범람 시뮬 | **XBeach** (surfbeat 또는 non-hydrostatic) |
 | 항만 내부 공명·다중 반사 | Boussinesq (Funwave) |
 | 설계파 산출 (재현기간 50/100년) | WW3 글로벌 + POT/Gumbel ([03 §5.3](03-analysis-methods.md)) |
-| 한국 spectrum archive (재사용) | 사용자 `swan-library-firesinger/spectrum_archive/` |
 
-## 7. SWAN library 통합 워크플로 (사용자 예시)
+> 한국 적용 사례는 바이블 검증(객관 데이터) 후 `experience/` 에 카테고리화 — 본 canonical 미수록. (source-needed)
 
-```bash
-cd /mnt/d/Numerical_models/01_Models/swan/Fin/07_SWAN_LIBRARY
-
-# 1) 수심 생성 (대표수심_MSL.parquet → SWAN 격자)
-/mnt/d/Projects/축산항/SWAN/.venv/bin/python3 \
-  tools/build_swan_depth_from_parquet.py \
-  --area CUSTOM_CHUKSAN \
-  --areas-csv metadata/custom_detail_areas.csv \
-  --points-csv metadata/check_points.csv \
-  --out-dir generated
-
-# 2) JMA-MSM 바람 입력
-/mnt/d/Projects/축산항/SWAN/.venv/bin/python3 \
-  tools/build_jma_uv_monthly.py \
-  --year 2025
-
-# 3) SWAN 실행 (외부)
-# 4) NESTOUT → 다음 nesting level
-```
-
-상세는 [`swan-library-firesinger` README](../../textbook/sources.yml) 참조.
-
-## 8. 보강
+## 7. 보강
 
 - **각 모델의 라이선스 확인** (LICENSE 파일 직접 읽기)
 - WW3 한국 적용 사례 (Pacific basin nesting 등) 추가 인용
 - XBeach 천해 검증 한국 사례
-- 사용자 spectrum_archive 3-layer 비전 별도 노트 (`experience/swan-spectrum-archive-vision.md` 작성 검토)
 - 상용 도구 (MIKE 21 SW) 비교 — 한국 항만 설계에서 사용 빈도
 
-### 8.1 연구 문헌 (research/inbox promote, source-needed)
+### 7.1 연구 문헌 (research/inbox promote, source-needed)
 
 - **PIML wave runup — XBeach (Saviz Naeini·Snaiki 2024)** — arxiv:[2401.08684](https://arxiv.org/abs/2401.08684). 시간의존 wave runup 을 physics-informed ML 로 예측 — XBeach **Surfbeat(XBSB) 효율 + Nonhydrostatic(XBNH) 정확도** 결합. cGAN 으로 XBSB→XBNH scalogram image-to-image 매핑, 역 wavelet 변환으로 시계열 복원. runup risk 평가. cf. [`05-examples.md`](05-examples.md) · swash-zone runup.
 - **식생 drag 계수 보정 — XBeach NH (Amini·Marsooli·Neshat 2024)** — arxiv:[2401.09687](https://arxiv.org/abs/2401.09687). 식생 wave height 감쇠 예측의 핵심 = drag 계수 추정. 수동보정 vs **메타휴리스틱 최적화**(최초적용) vs Tanino-Nepf(2008) 경험식의 XBeach NH 통합 — 3 방법 비교. nature-based flood mitigation 설계.
 - citation_status: 위 2건 source-needed (abstract 기반)
 
-## 9. 연결
+## 8. 연결
 
 - `02-theory.md` — action balance, source terms, 분산 관계
 - `03-analysis-methods.md` — 스펙트럼 분석 (post-processing)

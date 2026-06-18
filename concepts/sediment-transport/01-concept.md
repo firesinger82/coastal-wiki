@@ -26,7 +26,7 @@ verification_date: 2026-05-21
 |---|---|---|---|
 | **소류** | bedload | bed 인근 (≤ a few grain diameters) — saltation·rolling·sliding | 흐름 약함 ~ 중간 |
 | **부유** | suspended load | 수괴 내부 (turbulence가 무게 균형) | 흐름 강함 |
-| Wash load | wash load | 매우 미세 (turbulence가 항상 균형) — 한국 적용 한정 | 미사·점토 |
+| Wash load | wash load | 매우 미세 (turbulence가 항상 균형) | 미사·점토 |
 
 → 한국 KHOA: **소류사** (bedload sediment) / **부유사** (suspended sediment) / **연안표사** (littoral drift).
 
@@ -176,14 +176,14 @@ EFDC·Delft3D·XBeach는 hydrodynamic + sediment + morpho 결합 시뮬 지원.
 - Mechanics of Sediment Transport 본문 발췌 (2 MB extracted, 구조 식별 필요)
 - EFDC 표사이동 모듈 (`efdc-sed-trans-2003`) 발췌 → `models/EFDC/source-analysis/sediment.md`
 - 응집침강 (cohesive) 별도 노트
-- 사용자 축산항 표사 사례 (실제 모델링 결과)
+- 한국 적용 사례는 바이블 검증(객관 데이터) 후 experience/ 에 카테고리화 — 본 canonical 미수록 (citation_status: source-needed)
 
 ## 9. 연결
 
 - `02-theory.md` — Shields·Rouse·침강
 - `03-analysis-methods.md` — 입도·관측·formula
 - `04-code-and-tools.md` — EFDC SED 등 모델
-- `05-examples.md` — 축산항·서해 사례
+- `05-examples.md` — 서해 사례 등 (객관 데이터 기반)
 - `06-model-application.md` — 모델 적용 워크플로
 - `concepts/waves/02-theory.md` §6.6 — radiation stress (longshore drift 원인)
 - `concepts/currents/02-theory.md` — 조류 비대칭 (창·낙조류)

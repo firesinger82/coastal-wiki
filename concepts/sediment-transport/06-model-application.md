@@ -19,7 +19,7 @@ verification_date: 2026-05-23
 ### 1.1 입력 (Forcing) — 공통
 
 각 모델은 다음 forcing 필요:
-- **수심**: BADA + parquet (`models/SWAN/source-analysis/wink-pattern.md` §5)
+- **수심**: 측량/해도 기반 격자 수심
 - **흐름**: EFDC/ADCIRC 출력 또는 KHOA 수치조류도
 - **파**: SWAN 출력 (`H_s`, `T_p`, 방향, radiation stress)
 - **풍**: JMA-MSM 또는 KMA
@@ -32,7 +32,7 @@ verification_date: 2026-05-23
 - Bed 입자 분포 변화 (다층)
 - 침전·재부유 flux (kg/m²/s)
 
-## 2. EFDC SED (사용자 주력) — 2 분기 모델
+## 2. EFDC SED — 2 분기 모델
 
 > Canonical: [`models/EFDC/source-analysis/sediment/`](../../models/EFDC/source-analysis/sediment/) — 본 위키 promote 완료 (2026-05-23).
 
@@ -73,10 +73,7 @@ SEDZLJ 활성화 시 추가 arrays (`varalloc.f90:1119-1156`):
 
 ### 2.4 한국 적용 사례
 
-사용자 축산항 (영덕) 시뮬:
-- Idealized 침퇴적 ±1.5 cm/yr 산출
-- 15년 누적 ±22 cm
-- → 별도 `experience/efdc-chuksan-sediment.md` (작성 검토)
+> 한국 적용 사례는 바이블 검증(객관 데이터) 후 `experience/` 에 카테고리화 — 본 canonical 미수록 (citation_status: source-needed).
 
 ### 2.5 관련 source-analysis 노트
 
@@ -138,13 +135,13 @@ ROMS-CSTMS (Community Sediment Transport Modeling System):
 |---|---|---|
 | Bed elevation RMSE | √mean((Δz_model − Δz_obs)²) | < 0.1 m (반년-1년) |
 | Suspended C RMSE | mg/L | < 50 mg/L (점착) |
-| Sandwave migration speed | m/year | 사용자 정점 의존 |
+| Sandwave migration speed | m/year | 대상 정점 의존 |
 | Sediment budget | sum(Δz) over domain | 균형 확인 |
 
 ### 6.2 검증 데이터 source
 
 - **KHOA 저질조사**: d_{50}, multi-layer composition (정점별)
-- **MOF/사용자 OBS**: 부유 농도 시계열
+- **MOF/현장 OBS**: 부유 농도 시계열
 - **Multibeam survey**: bed 표고 변화 (repeat survey, 6개월-1년 단위)
 - **Side-scan sonar**: sandwave migration
 
@@ -191,7 +188,7 @@ models/
 
 - [`01-concept.md`](01-concept.md) ~ [`05-examples.md`](05-examples.md) — 도메인 layer
 - 모델별 canonical ([`models/`](../../models/)):
-  - [`models/EFDC/source-analysis/`](../../models/EFDC/source-analysis/) — 사용자 주력 (18 노트)
+  - [`models/EFDC/source-analysis/`](../../models/EFDC/source-analysis/) (18 노트)
   - [`models/Delft3D/source-analysis/`](../../models/Delft3D/source-analysis/) (10)
   - [`models/XBeach/source-analysis/`](../../models/XBeach/source-analysis/) (16)
   - [`models/ROMS/source-analysis/`](../../models/ROMS/source-analysis/) (11)

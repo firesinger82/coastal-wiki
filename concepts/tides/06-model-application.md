@@ -158,7 +158,7 @@ XBeach는 **단기 폭풍 시뮬레이션** 위주 (수일~수주). 조석 forci
 | 조석 진입 경로 (검수 노트) | 경계 압력셀: PSER 시계열 + MTIDE 조화 합성 | 경계 조화(NBFR `EMO/EFA`) + 전영역 평형 조석 potential(NTIP) | 경계 SSH_TIDES(조위)+UV_TIDES(조류) | 시계열 위주 (미검수) | TIDE 도구 산출 분조 → FLOW `.bca` (FLOW 경계 미검수) |
 | 조류(수평조) 직접 강제 | (경계 유속 합성) | 수위 위주 | **SSH+UV 둘 다** | n/a | 분조 경계 |
 | 외부 DB 파서 내장 | 무 (전처리) | **무** (fort.15 전처리 필수) | 무 (forcing NetCDF 전처리) | n/a | TIDE는 분석/예측 자체 도구 |
-| 한국 서해 적합도 | 양호 (사용자 주력) | 양호 | 양호 | 폭풍 케이스만 | 양호 |
+| 한국 서해 적합도 | 양호 | 양호 | 양호 | 폭풍 케이스만 | 양호 |
 
 > "조석 진입 경로" 행은 각 모델의 **검수완료 source-analysis/manual 노트**로 verified (EFDC `efdc_boundary_conditions.md`+`efdc-implementation-guide.md`, ADCIRC `adcirc-tide-*.md`, ROMS `roms_tidal_forcing.md`, Delft3D `delft3d-tide-user-manual.md`, XBeach `xbeach-master-manual.md` `tideloc`/`zs0file`). Delft3D-FLOW의 모델 내 경계 forcing(`.bnd`/`.bca`) 행만 **미검수(source-needed)**. 분조 수·비선형 천해 분조 등 정량 비교는 각 모델 manual 추가 발췌 후 정밀화. **개인 사용 경험은 `experience/`로** (CONVENTIONS.md §6).
 

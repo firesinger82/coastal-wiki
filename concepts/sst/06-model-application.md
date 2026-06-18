@@ -31,7 +31,7 @@ related:
 | **prognostic 변수** (모델이 계산) | baroclinic ocean (3D) | EFDC, Delft3D-FLOW, ROMS, HYCOM |
 | **forcing 입력** | wave·sediment 모델 (열적 stratification 영향) | SWAN+ADCIRC coupled, Delft3D wave-flow |
 
-본 위키 사용자 주력 모델 (EFDC, Delft3D, ROMS) 은 **prognostic 3D** 그룹 — SST 를 boundary/forcing 입력 + 내부 계산 + 출력 모두.
+EFDC·Delft3D-FLOW·ROMS 는 **prognostic 3D** 그룹 — SST 를 boundary/forcing 입력 + 내부 계산 + 출력 모두 다룬다.
 
 ## 2. Prognostic 3D 모델의 SST 처리
 
@@ -74,10 +74,7 @@ EFDC 의 heat budget 계산:
 - **연직 thermal transport / advection** — 수온은 EFDC 의 일반 tracer 로 연직 upwind advection (`caltran.f90:152-183`) 되며, sigma/Sigma-Zed(SGZ) 연직 격자(`KC`·`IGRIDV`)에 따라 layer thickness `HPK = HP·DZC` 로 분배됨. **verified**: [`models/EFDC/source-analysis/efdc_vertical.md`](../../models/EFDC/source-analysis/efdc_vertical.md) §A·§D (sigma layers·vertical advection). 가파른 지형에서 sigma 좌표 spurious diapycnal mixing 이 인공 성층(SST 연직 구조 왜곡)을 만들 수 있어 `IINTPG=1/2` 권장 (efdc_vertical.md §E·Working Rules).
 - horizontal advection
 
-**한국 적용 권장 값** (citation TODO — `models/EFDC/manual-notes/heat-bulk-flux.md` 작성 시):
-- $C_S, C_L \sim 1.0 \times 10^{-3}$ (중립)
-- albedo $\sim 0.06$ (해수 표면)
-- $\varepsilon \sim 0.97$
+> bulk 계수·albedo·방사율 등 EFDC 표층 heat budget 상수의 객관 인용은 `models/EFDC/manual-notes/heat-bulk-flux.md`(calheat.f90·aser.inp) 작성 시 보강 — 현재 source-needed.
 
 ### 3.3 출력
 
@@ -112,9 +109,7 @@ EFDC 의 SST 출력:
 
 ### 4.3 한국 적용
 
-Delft3D-FLOW 의 한국 연안 적용 예 (citation TODO):
-- 영산강 하구 thermal stratification (Lee et al. 한국해양환경학회)
-- 시화호 thermal model (Choi et al.)
+> 한국 적용 사례는 바이블 검증(객관 데이터·출처 인용 paper) 후 experience/ 에 카테고리화 — 본 canonical 미수록 (source-needed).
 
 ## 5. ROMS 의 SST 처리
 
@@ -143,7 +138,7 @@ bulk_flux 출력 `shflux/srflux` 가 baroclinic 3D mode 의 tracer(T) surface BC
 ### 5.3 한국 적용
 
 - _staging/from-modeling-wiki/knowledge/methods/roms_atmospheric_forcing.md (at commit a9618df^) (modeling-wiki 흡수) — ROMS forcing 일반론
-- ROMS 한국 동해 모델 (NIFS 동해예측시스템 KOOS-EJS 기반) — citation TODO
+- ROMS 한국 동해 적용(예: NIFS 동해예측시스템 KOOS-EJS) — 출처 인용 paper 확보 후 experience/ 카테고리화, 본 canonical 미수록 (source-needed)
 
 ## 6. ADCIRC 의 SST 처리
 
