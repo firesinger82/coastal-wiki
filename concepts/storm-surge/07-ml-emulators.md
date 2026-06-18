@@ -459,33 +459,34 @@ arxiv:2601.02090 (Kristensen·Matuszak·Tedesco·Kullmann·Röhrs). **North/Norw
 - 학습: 43년 **NORA(3km Norwegian Reanalysis) + NORA-Surge hindcast**(DA 미적용). >90 유럽 연안 조위 gauge + NORA-Surge 검증, 수치모델과 comparable 정확도.
 - 저자 솔직 평가: "forecast skill 큰 향상은 아니나, surge 예보를 **수치 → ML 기반으로 전환**하는 발판" = 향후 obs/DA 통합 유연성. StormNet/HURRI-GAN(post-process)과 달리 **GNN 직접 emulator**.
 
-### 7.5 Tampa Bay CNN/RNN 비교 (Farhang Ghahfarokhi et al. 2024) — direct emulator architecture 비교 (source-needed)
+### 7.5 Tampa Bay CNN/RNN 비교 (Farhang Ghahfarokhi et al. 2024) — direct emulator architecture 비교 (verified, full PDF read 2026-06-18)
 
-arxiv:2408.05797v1 (2024-08-11, Farhang Ghahfarokhi·Sonbolestan·Zamanizadeh). **CNN-LSTM / LSTM / 3D-CNN** 세 deep learning architecture 를 Tampa Bay(Florida) surrogate surge 예측에서 비교. NOAA tide station 수위 + reanalysis 기상 학습.
+arxiv:2408.05797v1 (2024-08-11, Farhang Ghahfarokhi·Sonbolestan·Zamanizadeh, 9p). **CNN-LSTM / LSTM / 3D-CNN** 세 deep learning architecture 를 Tampa Bay surrogate surge 예측에서 비교.
 
-- 결과: **CNN-LSTM 최우수** (test loss 0.010, R²=0.84). LSTM 은 train R²=0.88 최고지만 generalization 약함(test R²=0.77), 3D-CNN(test R²=0.82)은 극한조건 불안정.
+- **데이터/정점**: **단일 정점 NOAA 8726520 St. Petersburg, FL**(Tampa Bay), 2011~2023 말 연속 관측. **train 2011-2020 / test 2021~end**(Hurricane Ian 2022 test 기간 포함). 입력 = wind + atmospheric pressure + 이전 sea level.
+- **학습 config**: 3 모델 모두 Adam lr=0.001, **15 epochs**. CNN-LSTM=conv(공간)→flatten→LSTM(시간), 3D-CNN=2×Conv3D(64 filter)+batch norm.
+- **결과 (Table 1)**: **CNN-LSTM 최우수** (test loss 0.010, R²=0.84). LSTM 은 train R²=0.88 최고지만 generalization 약함(test loss 0.014, test R²=0.77), 3D-CNN(test loss 0.011, R²=0.82)은 극한조건 불안정.
 - **Hurricane Ian** case (Tampa Bay 에 −1.5 m **negative surge**) 에서 CNN-LSTM robustness 입증 — 음의 wind setup(역류 수위저하) case 를 명시 다룸.
-- PACT(§2)·DeepSurge(§7.1) 와 관계: 동일 direct-emulator 계열이나 single-bay(Tampa) 한정 + architecture 비교가 초점 — location-invariance(§4)·peak-aware(§2) 같은 일반화 기법 미적용.
-- 출처: <https://arxiv.org/abs/2408.05797> · citation_status: source-needed
-- 인용 검증 TODO: full PDF read 시 train/test split·NOAA station 목록·CNN-LSTM hyperparameter·Hurricane Ian 정량 보강
+- PACT(§2)·DeepSurge(§7.1) 와 관계: 동일 direct-emulator 계열이나 single-station(St. Petersburg) 한정 + architecture 비교가 초점 — location-invariance(§4)·peak-aware(§2) 같은 일반화 기법 미적용.
+- 출처: <https://arxiv.org/abs/2408.05797>
 
-### 7.6 Climate Adaptation-Aware Flood (Hassan·Karapetyan et al. 2025) — 연안 flood SLR·적응 시나리오 CNN (source-needed)
+### 7.6 Climate Adaptation-Aware Flood (Hassan·Karapetyan et al. 2025) — 연안 flood SLR·적응 시나리오 CNN (verified, full PDF read 2026-06-18)
 
-arxiv:2510.26017v1 (2025-10-29). 연안도시 침수를 **SLR projection + shoreline adaptation 시나리오** 조건부로 예측하는 경량 CNN (vision-based low-resource DL framework 기반).
+arxiv:2510.26017v1 (2025-10-29, NYU Abu Dhabi Div. of Engineering, 57p). 연안도시 침수를 **변동 SLR projection + shoreline adaptation 시나리오** 조건부로 예측하는 CNN.
 
-- **Abu Dhabi + San Francisco** 두 지역으로 geographical generalization 입증. flood depth map MAE 를 SOTA 대비 평균 **~20% 감소**.
-- §2-4(surge emulator) 와 차이: surge time-series 가 아니라 **연안 flood depth map** (SLR·적응 시나리오 조건부) 산출 — 도시 planning/적응 의사결정 도구 지향. 한국 연안도시 적응계획(방조제·호안 시나리오)에 개념적 전이가치.
-- 출처: <https://arxiv.org/abs/2510.26017> · Project: <https://caspiannet.github.io/> · citation_status: source-needed
-- 인용 검증 TODO: full PDF — CNN 구조, SLR projection 범위, adaptation 시나리오 정의, 두 지역 데이터 출처/해상도
+- **Abu Dhabi + San Francisco** 두 지역으로 geographical generalization 입증. flood depth map **MAE 를 SOTA 대비 평균 ~20% 감소** (abstract verbatim).
+- **adaptation 분류 체계** (저자): protect(seawall·levee·storm barrier armoring) / accommodate(rising water) / retreat / avoid — 본 모델은 **방어구조물의 최적 공간배치**(어느 shoreline segment 를 fortify 할지) 시나리오를 조건 입력으로 받음 (예: Lower Manhattan 2.5 mile fortification 사례 언급).
+- §2-4(surge emulator) 와 차이: surge time-series 가 아니라 **연안 flood depth map** (SLR·적응 시나리오 조건부) 산출 — 도시 planning/적응 의사결정 도구 지향. 한국 연안도시 적응계획(방조제·호안 segment 배치)에 개념적 전이가치.
+- 출처: <https://arxiv.org/abs/2510.26017> · Project: <https://caspiannet.github.io/>
 
-### 7.7 CLDNet — flood digital-twin SWE surrogate (Si·Chen et al. 2026) ⚠ surge 아님(하천 flood, 기법 전이용) (source-needed)
+### 7.7 CLDNet — flood digital-twin SWE surrogate (Si·Chen et al. 2026) ⚠ surge 아님(하천 flood, 기법 전이용) (verified, full PDF read 2026-06-18)
 
-arxiv:2605.13761v1 (2026-05-13, Si·Qiu·Sallam·Feinstein·He·Yan·Chen). Conditional Latent Dynamics Network — **강우 구동 latent neural ODE** + 지형(고도·경사·Manning roughness) 조건부 **coordinate-based decoder** 로 임의 query 점의 depth·discharge 복원.
+arxiv:2605.13761v1 (2026-05-13, Si·Qiu·Sallam·Feinstein·He·Yan·Chen, 32p). Conditional **L**atent **D**ynamics **Net**work — **강우 구동 저차원 latent neural ODE** + 지형(고도·경사·Manning roughness) 조건부 **coordinate-based decoder** 로 임의 query 점의 depth·discharge 복원.
 
-- Pointwise decoding 으로 memory 가 grid 크기와 decouple → 불규칙 watershed native 처리, gauge 좌표 직접 query(raster snapping 불요). Des Plaines River basin(4.2M active cell, 30m) 96h 예측을 **~29초** (2D SWE solver ~55분 대비 **~115× 가속**), CSI ≈86%@0.5m inundation threshold. regular-grid VAE-ConvLSTM·FNO baseline 능가(둘은 Cartesian grid 전제라 불규칙 watershed 부적용).
+- Pointwise(meshless) decoding 으로 memory 가 grid 크기와 decouple → 불규칙 watershed native 처리, gauge 좌표 직접 query(raster snapping 불요).
+- **검증 2종**: (a) **Texas synthetic 250,000-cell** 벤치마크 — regular-grid **VAE-ConvLSTM·FNO baseline 능가**(둘은 Cartesian grid 전제라 불규칙 watershed 부적용), (b) **Des Plaines River basin**(4,188,840 active cell) **114 real-rainfall Stage IV storm** 케이스 — 96h 전 basin 예측 **~29초**(2D SWE solver ~55분 대비 **~115× 가속**), **CSI ≈86%@0.5m** inundation threshold.
 - ⚠ **연안 surge 아님** — 하천/강우(pluvial-fluvial) flood. 본 §에 수록 이유: latent neural ODE + 좌표 decoder + 불규칙 메시 native 라는 **SWE surrogate 기법**이 연안 inundation(maxele·총수위 침수도) emulation 으로 전이 가능. Global LI(§4)의 격자 maxele 산출 vs CLDNet 의 mesh-free 좌표 query 는 상보적 설계.
-- 출처: <https://arxiv.org/abs/2605.13761> · citation_status: source-needed
-- 인용 검증 TODO: full PDF — neural ODE 구조, decoder 좌표 임베딩, Texas/Des Plaines 정량, 연안 적용 가능성
+- 출처: <https://arxiv.org/abs/2605.13761>
 
 ### 7.8 미트리아지 / placeholder
 
