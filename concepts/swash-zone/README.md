@@ -14,7 +14,7 @@
 |---|---|---|
 | `README.md` | self (governance) | 이 파일 |
 | `01-concept.md` | **source-needed** | swash 정의·process(uprush/backwash·bore collapse·swash-swash interaction·IG)·runup·sediment·전이된 연구 3건 |
-| `04-code-and-tools.md` | **source-needed** | swash 수치모델 점검 — NLSW(analytical)·Boussinesq/Green-Naghdi·SWASH(비정수압)·XBeach(surfbeat/NH)·OpenFOAM VOF·SPH |
+| `04-code-and-tools.md` | ✅ **verified** (2026-06-18) | swash 수치모델 점검 — 모델 swash-handling(SWASH·XBeach·FUNWAVE)을 검수된 source-analysis 로 연결(wetting-drying·breaking·runup·비정수압). NLSW 해·VOF/SPH·한국검증은 source-needed 잔존 |
 | `02-theory.md` | (미생성) | NLSW swash 해(Shen-Meyer 1963·Antuono 2010)·characteristics·Iribarren scaling |
 | `03-analysis-methods.md` | (미생성) | wave/shoreline tracking·scalogram·runup 통계(R2%) |
 | `05-examples.md` | (미생성) | 한국 해빈 swash·runup 관측 사례 |
