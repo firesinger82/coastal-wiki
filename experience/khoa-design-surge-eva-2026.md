@@ -3,7 +3,7 @@ title: "KHOA 장기관측 100년 폭풍해일고 EVA — 해수부(2022) 설계�
 topic: storm-surge
 canonical_source: self
 citation_status: verified
-verification_method: "AI programmatic pipeline: (1) KHOA distribution.do ZIP 과거자료 확장 다운로드 1956-2025 (49정점, 신규 832 연도, fetch_history.py — 무자료=HTTP500+html 즉시마킹, setsid 백그라운드) (2) 정점·연도별 utide(OLS, nodal) 잔차=폭풍해일 → 연최대치·POT 디클러스터 캐시 (3) 극치분석 4법: Gumbel/GEV(L-moment Hosking) 연최대 + POT/GPD(genpareto) + 지역빈도 RFA(지수홍수) + 부트스트랩 CI (4) 해수부 2022 보고서 100년 설계 폭풍해일고 21항만 대조 (5) 정의확인: 서승원·이화영 2012(목포 pADCIRC+unSWAN 100년 가상태풍) + Pugh 교과서(concepts/storm-surge) (6) MSL 추세 vs KHOA 보도자료 2025-12-28 동일기간 1989-2024 (7) datum 동질화 Pettitt 변화점 (8) joint tide-surge probability 총수위 분해 MC. 실행 py=coastal-wiki/.venv(utide 0.3.1·scipy 1.17.1). 도구·산출: /home/firesinger/khoa_tide/utide_validation/{analyze_surge_return_level,analyze_regional_eva,build_eva_cache,analyze_utilization,build_msl_cache,analyze_twl_trend,homogenize_datum,analyze_joint_probability}.py + extensions/6_*~16_*. [2026-06-12 Fable 5 재검토 후 정정: §2 표를 최종 10_design_audit.csv 단일 run 기준으로 재생성(이전 6_surge_return_level.csv 구버전 혼입 제거, 보령 Gumbel>GEV 역전 반영)·§3 CI 분모규칙(22→장항제외 21)·동해항 CI과대 추가·CI기준 vs RFA기준 플래그 분리 명시·해수부2022 서지 보강·reproducible 로컬한정 명시.] [2026-06-12 통영 추가: §7 joint MC 4정점(보령·광양·목포+**통영** 167.4) — 통영 AHHW300/Z100obs347/설계468/+120cm 여유·만조해일억제 σ10.8→9.6. **convolution 정식법 시도(analyze_joint_convolution.py)→과대추정(+53~116cm) 확인, §9에 MC 적정 결론 기록**.] [2026-06-15 §12 추가: SSP 기후증폭(analyze_ssp_amplification.py → extensions/22_ssp_amplification, 입력 13_msl_cache+20_model_hindcast) — 현재 100년 총수위 Gumbel + SLR 2100(SSP1-2.6 +47/SSP5-8.5 +82cm, KHOA·서울대2023) 평행이동 T_future. §9 #2 SSP 항목 해소. ※v3 audit(RFA 남해A/B 분할·POT B=2000)은 산출됐으나 판정 재검 보류로 미편입.]"
+verification_method: "AI programmatic pipeline: (1) KHOA distribution.do ZIP 과거자료 확장 다운로드 1956-2025 (49정점, 신규 832 연도, fetch_history.py — 무자료=HTTP500+html 즉시마킹, setsid 백그라운드) (2) 정점·연도별 utide(OLS, nodal) 잔차=폭풍해일 → 연최대치·POT 디클러스터 캐시 (3) 극치분석 4법: Gumbel/GEV(L-moment Hosking) 연최대 + POT/GPD(genpareto) + 지역빈도 RFA(지수홍수) + 부트스트랩 CI (4) 해수부 2022 보고서 100년 설계 폭풍해일고 21항만 대조 (5) 정의확인: 서승원·이화영 2012(목포 pADCIRC+unSWAN 100년 가상태풍) + Pugh 교과서(concepts/storm-surge) (6) MSL 추세 vs KHOA 보도자료 2025-12-28 동일기간 1989-2024 (7) datum 동질화 Pettitt 변화점 (8) joint tide-surge probability 총수위 분해 MC. 실행 py=coastal-wiki/.venv(utide 0.3.1·scipy 1.17.1). 도구·산출: /home/firesinger/khoa_tide/utide_validation/{analyze_surge_return_level,analyze_regional_eva,build_eva_cache,analyze_utilization,build_msl_cache,analyze_twl_trend,homogenize_datum,analyze_joint_probability}.py + extensions/6_*~16_*. [2026-06-12 Fable 5 재검토 후 정정: §2 표를 최종 10_design_audit.csv 단일 run 기준으로 재생성(이전 6_surge_return_level.csv 구버전 혼입 제거, 보령 Gumbel>GEV 역전 반영)·§3 CI 분모규칙(22→장항제외 21)·동해항 CI과대 추가·CI기준 vs RFA기준 플래그 분리 명시·해수부2022 서지 보강·reproducible 로컬한정 명시.] [2026-06-12 통영 추가: §7 joint MC 4정점(보령·광양·목포+**통영** 167.4) — 통영 AHHW300/Z100obs347/설계468/+120cm 여유·만조해일억제 σ10.8→9.6. **convolution 정식법 시도(analyze_joint_convolution.py)→과대추정(+53~116cm) 확인, §9에 MC 적정 결론 기록**.] [2026-06-15 §12 추가: SSP 기후증폭(analyze_ssp_amplification.py → extensions/22_ssp_amplification, 입력 13_msl_cache+20_model_hindcast) — 현재 100년 총수위 Gumbel + SLR 2100(SSP1-2.6 +47/SSP5-8.5 +82cm, KHOA·서울대2023) 평행이동 T_future. §9 #2 SSP 항목 해소.] [2026-06-18 §13 추가: v3 audit(RFA 남해A/B 분할·서해 영광제외 H₁ 1.94→0.70·POT B=2000·정점별 CRC32 시드) 편입 + 멀티에이전트 검수 정정 — 보령 '잠정 보수'·목포 'CI 상단 구간 정합'·광양 미설명 42~52cm. 논문 draft_kr.md(§1~6) v3 동기화 완료, 검수보고서 paper/AUDIT_2026-06-18.md.]"
 note_author: "Claude Opus 4.8 (1M context) + 사용자 합의"
 note_date: 2026-06-03
 verification_by: "Claude Opus 4.8 (1M context) — 다중 cross-ref (독립 ADCIRC+SWAN 모델값 + KHOA 공식 SLR 발표 + Pugh 교과서 + 자기일관성)"
@@ -26,7 +26,7 @@ experience_evidence:
 
 ## 2. 핵심: 극치분석 방법 선택이 결론을 좌우
 
-폭풍해일 잔차(=관측−utide예측) → 100년 재현값. **방법 의존성이 결정적** (값 = 최종 감사 산출 `extensions/10_design_audit.csv` 단일 기준, n = 정점별 보유연수):
+폭풍해일 잔차(=관측−utide예측) → 100년 재현값. **방법 의존성이 결정적** (아래 표 값은 **v1** `extensions/10_design_audit.csv` 기준, n = 정점별 보유연수; **v3 갱신값은 §13 표 참조** — RFA 권역 분할·POT 자동임계로 보령·여수·군산 RFA가 달라짐):
 
 | 방법 | 여수 | 군산 | 보령 | 특성 |
 |---|--:|--:|--:|---|
@@ -46,9 +46,9 @@ experience_evidence:
 - **과대방향**(보고서 > CI상한): 보령(224 vs CI고 215.5)·**동해항(59 vs 47.9)**
 - **과소방향**(보고서 < CI하한): 목포(142 vs CI저 178.4)·속초(48 vs 50.1)
 
-**설계판정 플래그** (RFA 기준 — CI와 별개 잣대):
-- **과대의심**: 광양(249 vs RFA 140)·보령(224 vs RFA 181)
-- **과소의심**: 목포(142 vs RFA 191·POT 216)·속초(48 vs RFA 67·POT 74)
+**설계판정 플래그** (RFA 기준 — CI와 별개 잣대) [⚠ v1/v2 값; v3 정정은 §13]:
+- **과대의심**: 광양(249 vs RFA 140 → **v3 RFA 166**, 여전히 과대)·보령(224 vs RFA 181 → **v3 RFA 150, '잠정 보수'로 완화** — 점추정 과대이나 setup 정의차 설명 여지)
+- **과소의심**: 속초(48 vs RFA 67·POT 74). ~~목포~~ → **v3에서 제거**: 1957 손상연도 제거 후 POT 153 [118,200]∋141.7 → **하단 경계 지지**(§4·§13).
 - 주의: 광양은 n=16로 CI 광역[111~746]→**CI상 통과**하나 RFA로는 최강 과대의심(§아래); 동해항은 CI상 과대이나 동해·소규모(보고서 59cm)로 설계영향 작음 → 설계플래그엔 미포함.
 - **자료오류**: 장항(연최대 398.8cm 스파이크, 분모 제외)
 
@@ -58,7 +58,7 @@ experience_evidence:
 
 한국 설계기준: **설계조위 = 약최고고조위(천문조+연주조) + 폭풍해일 편차**. 보고서값=편차(총수위 아님) → 우리 잔차와 같은 범주. 단 설계 편차는 **wave setup(+0.2~1m, Pugh)·비대칭 최악경로 가상태풍·노출 설계지점**을 포함, 정온 검조소 잔차는 과소포착.
 
-**목포 3중 일치** (결정적 검증): 독립 설계모델 [서승원·이화영 2012, pADCIRC+unSWAN, 100년 가상태풍 비대칭 최악트랙] **목포 100년 해일고=191cm** = 우리 **RFA 191**(정확일치)·POT 216. 해수부 2022 목포항=141.7(둘다보다 낮음). → 우리 관측법이 공개 설계모델과 cm일치(방법검증), 보고서 목포는 과소.
+**목포 — CI 구간 정합** (⚠ v3 정정, 아래 §13): v1의 "RFA 191 = 독립모델 191 정확일치·보고서 과소" 서사는 **1957 손상연도 가짜극값(220.7cm) 오염 산물**이었다. 손상연도(1957·58·70·79) 제거 후(v3) 목포 **POT 152.7 [117.5, 199.6]·RFA 150.9** 이고, 신뢰구간이 해수부 2022 목포항 **141.7을 포함 → 과소의심이 아니라 '하단 경계 지지'로 재분류**. 독립 설계모델 [서승원·이화영 2012, pADCIRC+unSWAN, 100년 가상태풍 비대칭 최악트랙] **191cm는 동일 CI 상단**에 위치(정확일치가 아닌 구간 정합). 즉 관측·독립모델·설계값이 같은 신뢰구간 안에서 정합하며, QC 소급이 판정을 바꾼 투명성 사례다.
 
 ## 5. 기후: MSL 추세 + 빈도증폭 (KHOA 공식 일치)
 
@@ -86,7 +86,7 @@ experience_evidence:
 ## 8. 종합 결론
 
 1. **모델 vs 관측 = 승패 아닌 상호보완**. 관측(RFA/POT)은 설계값 감사 도구. 보고서 17/21 통과.
-2. **목포가 3중(관측RFA 191 = 독립모델 191 = 검증) 검증** → 우리 파이프라인 신뢰 확립.
+2. **목포 — 손상연도 정정 후 관측(POT 153·RFA 151)·독립모델(191, CI 상단)·설계값(141.7)이 동일 CI [118,200] 구간 안에서 정합** (⚠ v3, §13). v1의 "관측 191 = 모델 191 정확일치" 서사는 1957 가짜극값 오염 산물 — QC 소급이 판정을 바꾼 투명성 사례.
 3. **MSL는 KHOA 공식과 cm 일치** → 빈도증폭·감사 결과에 동일 신뢰 이전.
 4. **설계 보수성은 명명·정량 가능**: wave setup + 비동시조합 + SLR여유고. 보령·광양은 적정 여유 초과분 검토 가치.
 5. **데이터 한계도 분리**: datum오염(목포 구자료)은 보정, 실제신호(목포 침하)는 보존.
@@ -142,3 +142,27 @@ experience_evidence:
 - **시나리오 D(SSP5-8.5+해일강화)**: 20번 SSP585 태풍 해일 후기−전기 평균변화 가산 — `20_model_hindcast` 보유 **7정점만** 산출(태풍해 한정 평균이라 보수적). 본 표 정점 대부분 미산출.
 
 **한계**(스크립트 명시): B·C는 전국 단일 SLR값(해역별 차 무시, 동해 다소 높음), D는 태풍 내습년만 평균(비태풍년·빈도변화 미반영), KHOA 전망 기준선≈현재 근사. 정량 결론보다 **증폭 방향·규모(연례화)의 강건성**에 무게.
+
+## 13. v3 정밀화 + 감사(2026-06-13) 및 검수 정정(2026-06-18)
+
+§2~4·§11(v2)의 **최종 갱신판 = 감사표 v3** (`extensions/10_design_audit_v3.{csv,json,png}`, `25_rfa_diagnostics.*`). v2 대비 변경:
+
+1. **RFA 권역 정밀화(Hosking-Wallis 기반, `analyze_rfa_diagnostics.py`)**: 원 4해역 → **5권역**.
+   - **남해 분할**: 전체 남해 H₁=+2.33(명백 이질) → **남해A 증폭형**(거제도·마산·여수·통영·고흥발포, growth100=3.06) + **남해B 안정형**(부산·거문도·완도·가덕도, 2.23). 전이: 광양·삼천포·여호항 → A.
+   - **서해 영광 제외**: 전체 서해 H₁=**1.94**(이질 가능; 명백 이질 아님), 영광(법성포 깔때기 t₃=0.47; D=1.98<임계 2.491로 통계적 이상정점은 아님)을 **물리적 근거로 사전 제외** → H₁=**0.70**, growth100=2.06. ※ 본문·코드 일부에 떠돌던 "1.97→0.66"은 오기, 정정값은 **1.94→0.70**.
+   - 동해 2.12 / 제주 1.69. 위계: 남해A>남해B>동해>서해>제주.
+   - H₁ 모분포는 GEV 단순화(lmoments3 부재)로 H 과대편향 — GLO 모의 시 권역당 약 1 하락(이질 한 단계 완화), 분할은 보수적.
+2. **POT 부트스트랩 B=2000 + 정점별 CRC32 고정시드**(순서무관 재현성; 전역 RNG는 정점추가 시 타정점 CI가 MC노이즈로 플립 — 군산 경계사례로 발견).
+3. **판정 등급 정비**: CI경계 ±3% '경계' 등급(군산형). 삼천포는 단기록 '저신뢰'.
+
+**v3 최종 판정(21정점, 장항 제외)**: **지지 17·과대 1(광양)·잠정 보수 1(보령)·과소 1(속초)·저신뢰 1(삼천포)**.
+
+| 정점 | POT [CI] | RFA [CI] | 설계 | v3 판정 |
+|---|--|--|--:|--|
+| 광양 | 208 [100,493] | **166 [119,200]** | 249 | **과대**(RFA 상한도 미달; 격차 83 중 setup 제해도 42~52 미설명) |
+| 보령 | 142 [112,185] | **150 [124,168]** | 224 | **잠정 보수**(점추정 74~82 하회=과대신호이나 POT상한+setup상한≈219로 정의차 설명 여지; setup 경험계수 미검증) |
+| 목포 | 153 [118,200] | 151 | 141.7 | **하단 경계 지지**(1957 손상연도 제거; 서승원2012 191=CI 상단) |
+| 속초 | 77 [53,116] | 67 | 48 | **과소**(전 방법 하한>48, Hs≈0 구제불가) |
+| 군산 | 165 [118,233] | 146 | 228.4 | 경계권 지지(상한 ±3%) |
+
+**v1/v2 대비 핵심 정정**(2026-06-18 멀티에이전트 검수): ① 보령 '과대→경계'(v2)는 더 정확히는 **'잠정 보수'**(점추정 과대; setup 상한 동원·경험계수 미검증이라 단정 보류) ② 목포 v1 "RFA 191 정확일치"는 **CI 상단 구간 정합**(손상연도 오염 정정) ③ 서해 H₁ 정정값 **1.94→0.70** ④ 광양 미설명 격차 **42~52cm**. 논문 본문 `paper/draft_kr.md`(§1~§6)는 이 v3 기준으로 동기화 완료. 검수 보고서 = `paper/AUDIT_2026-06-18.md`.
