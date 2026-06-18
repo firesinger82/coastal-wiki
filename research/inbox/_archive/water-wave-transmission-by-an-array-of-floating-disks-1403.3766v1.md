@@ -7,9 +7,11 @@ authors: Luke Bennetts, Timothy Williams
 published: 2014-03-15
 
 link: https://arxiv.org/abs/1403.3766v1
+promoted_to: concepts/waves/07-wave-transmission.md
+promoted_date: 2026-06-18
 citation_status: draft-unsourced
 action: archive
-collected: 2026-06-07T00:00:47.557379+00:00
+collected: 2026-06-16T00:01:46.259054+00:00
 ---
 
 ## Abstract

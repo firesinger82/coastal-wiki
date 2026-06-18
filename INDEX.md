@@ -7,7 +7,7 @@
 | 토픽 | 상태 | 비고 |
 |---|---|---|
 | [tides](concepts/tides/) | **STABLE** (01-06 verified) | 조석 — 6/6 verified. **06 verified 승격(2026-06-18)**: 검수완료 모델 노트 cross-link(ADCIRC tide·ROMS tidal_forcing·EFDC efdc_boundary_conditions+implementation-guide C14 MTIDE·Delft3D-TIDE·XBeach tideloc/zs0file). Delft3D-FLOW .bnd/.bca 만 source-needed 잔존 |
-| [waves](concepts/waves/) | **STABLE** (01-06 verified + 04 §3.4 WW3 SMC boundary issue verified) | 파랑 — 6/6 verified. Holthuijsen 2007 + KHOA 284 용어 + SWAN library + MPT 74정점 + **04 §3.4 WW3 SMC nested grid boundary mismatch spurious energy bug (Issue #1600 OPEN, UK Met Office, 2026-05-28 GitHub API verbatim)** |
+| [waves](concepts/waves/) | **STABLE** (01-07 verified + 04 §3.4 WW3 SMC boundary issue verified) | 파랑 — 6/6 + 07 verified. Holthuijsen 2007 + KHOA 284 용어 + SWAN library + MPT 74정점 + **04 §3.4 WW3 SMC nested grid boundary mismatch spurious energy bug (Issue #1600 OPEN)** + **07 wave transmission 신설(2026-06-18): 부유체·구조물 파 투과/반사(inbox 1402.1555 실험 + 1403.3766 floating disk array full-PDF promote), SWAN obstacle 투과(Goda/d'Angremond)와 대비** |
 | [sediment-transport](concepts/sediment-transport/) | **STABLE** (01-04·06 verified, 05 source-needed) | 표사이동 — 5/6 verified. Soulsby 1997 + KHOA 113 용어 + EFDC SED (Original/SEDZLJ) + Delft3D/XBeach/ROMS source-analysis 통합 |
 | [currents](concepts/currents/) | **STABLE** (01-06 verified) | 조류 — 6/6 verified (UTide 2D + 수치조류도 + KHOA 60+ 용어). **06 verified 승격(2026-06-18)**: ROMS(경압3D·순압2D)·Delft3D(flow2d3d·D-Flow FM)·EFDC(hydro core) 검수 노트 cross-link. 동해 수치조류도 미커버 명시 |
 | [sst](concepts/sst/) | **STABLE** (01-06 verified) | 해수면 수온 — 6/6 verified. 01 정의, 02 heat budget, 03 회귀·MHW, 04 5 데이터셋 운영, 05 MHW 식별 실행 (13정점 ~180 events). **06 verified 승격(2026-06-18)**: ROMS(COARE bulk_flux·대기강제)·Delft3D(heat)·EFDC(연직 수온) 검수 노트 cross-link. experience/ 4건 연결 |
@@ -49,6 +49,8 @@
 | 예제 | 다루는 개념 | 사용 모델 | 상태 |
 |---|---|---|---|
 | [swan-to-swash-nesting](examples/swan-to-swash-nesting/) | waves · swash-zone | SWAN → SWASH | ✅ 절차 템플릿 (2026-06-18, 검수 메커닉 기반: NGRID/NESTOUT→SwashBCspecfile SWAN 분기) |
+| [khoa-surge-eva-pipeline](examples/khoa-surge-eva-pipeline/) | storm-surge · tides | utide → EVA | ✅ 재현 절차 (2026-06-18, KHOA 조위→utide 잔차→Gumbel/GEV/POT/RFA, experience 귀속) |
+| [adcirc-swan-surge-coupling](examples/adcirc-swan-surge-coupling/) | storm-surge · waves · compound-flooding | ADCIRC + SWAN | ✅ 절차 템플릿 (2026-06-18, 비정형 tightly-coupled surge+wave radiation stress, 검수 노트 근거) |
 
 ## experience/ (검증 통과 경험)
 

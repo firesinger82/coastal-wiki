@@ -1,0 +1,48 @@
+! ============================================================================
+! fort.15 — ADCIRC 제어 파일 OUTLINE (ADCIRC+SWAN tightly-coupled surge+wave)
+! ----------------------------------------------------------------------------
+! 본 파일은 결합 핵심 카드만 보이는 절차 템플릿. <...> 자리는 도메인 값으로 대체.
+! 전체 fort.15 라인 순서/포맷은 ADCIRC 메뉴얼 + 다음 검수 노트 참조:
+!   models/ADCIRC/source-analysis/adcirc-fort15-checklist-v1.md
+!   models/ADCIRC/source-analysis/adcirc-parameter-glossary-v1.md
+! 결합 인코딩(NWS=3xx)·time-step 정수비 근거:
+!   models/ADCIRC/source-analysis/adcirc-swan-coupling.md  (§B, §F)
+! ============================================================================
+
+RUNDES                                   ! 1) run description
+RUNID                                     ! 2) run id
+
+! --- 모드/forcing 플래그 (발췌) ---
+0                                         ! NFOVER
+...                                       ! (NABOUT, NSCREEN, IHOT 등 표준 카드)
+
+! --- 결합 핵심: NWS = 3xx ---------------------------------------------------
+! 백의 자리 3 = NRS=3 = "WAVES WILL BE COUPLED TO SWAN" (read_input.F:2255-2261)
+! 나머지 = 베이스 기상 강제:
+!   320 = GAHM vortex + SWAN   (NRS=3, base=20)
+!   312 = OWI WIN/PRE  + SWAN  (NRS=3, base=12)
+!   308 = OWI ASCII    + SWAN  (NRS=3, base=8)
+!   300 = 기상없음     + SWAN  (NRS=3, base=0, 테스트)
+! ⚠ 리터럴 NWS=83/84 는 무효 (wind.F:52-60 allowable 목록에서 제외)
+320                                       ! 8) NWS  ← 결합 트리거
+
+...                                       ! (ICS, IM, NOLIBF, NOLIFA, NOLICA ...)
+
+! --- 시간 스텝 -------------------------------------------------------------
+<DT>                                      ! DTDP : ADCIRC time step (s), 보통 0.5–5
+...                                       ! (STATIM, REFTIM)
+! 결합 주기 정수비: SWAN_DT(=fort.26 COMPUTE DELTC) / DT 가 정수여야 함
+!   예) DT=2.0, SWAN DELTC=300 → 결합 간격 150 스텝 (couple2swan.F:1079-1081)
+<RNDAY>                                   ! RNDAY : 총 모의 일수
+
+! --- nodal attributes / output (표준, 발췌) -------------------------------
+...                                       ! NWP (fort.13 nodal attributes 사용 시)
+...                                       ! NOUTE/TOUTSE/TOUTFE/NSPOOLE (fort.63 수위 출력)
+...                                       ! NOUTV/... (fort.64 유속)
+...                                       ! (maxele 등 max 출력)
+
+! --- (선택) SWAN 시간창 제한 : PR #498 phase-1 -----------------------------
+! 폭풍 landfall 전후로만 SWAN 계산 → wall-clock 절감.
+! 미지정 또는 '-' 포함 시 sentinel "-99999" → 전체 시간 SWAN(기존 동작).
+! fort.26 의 COMPUTE 카드 범위와 짝을 맞춰야 함.
+&SWANTimeControl RunStartDateTime='YYYYMMDD.HHMMSS' /

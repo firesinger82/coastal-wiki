@@ -1,0 +1,45 @@
+$ ===========================================================================
+$ fort.26 — SWAN 명령 파일 OUTLINE (ADCIRC+SWAN tightly-coupled)
+$ ---------------------------------------------------------------------------
+$ 결합 시 SWAN 은 unstructured 모드로 ADCIRC 의 fort.14 를 직접 read 한다.
+$ 메커닉 근거(검수):
+$   models/SWAN/source-analysis/swan-adcirc-coupling-implementation.md (§D, §F)
+$   models/SWAN/source-analysis/swan-unstructured-time-step.md
+$ 명령 포맷 reference:
+$   models/SWAN/source-analysis/swan-command-file-reference.md
+$ <...> 자리는 도메인 값으로 대체. SWAN 주석은 '$'.
+$ ===========================================================================
+
+PROJ 'coupled' '01'
+
+$ --- 모드: 비정상(NONSTAT) + (구면/직교 좌표 ADCIRC 와 일치) ---
+MODE NONSTATIONARY TWODIMENSIONAL
+COORDINATES SPHERICAL          $ ADCIRC ICS 와 좌표계 일치 (또는 CARTESIAN)
+
+$ --- 비정형 격자: ADCIRC fort.14 직접 read --------------------------------
+$ 'READ UNSTRUC ADC' 가 SwanReadADCGrid 로 dispatch → fort.14 의 좌표·수심·
+$ 삼각망·경계 vmark 를 그대로 사용 (swanpre1.ftn:1478-1483).
+CGRID UNSTRUCTURED CIRCLE <MDC> <FLOW> <FHIGH> <MSC>
+READ UNSTRUC ADCIRC            $ 같은 fort.14 (ADCIRC 와 동일 메시·경로 권장)
+
+$ --- 물리 (예시; 도메인에 맞게) ------------------------------------------
+GEN3 WESTHUYSEN                $ 또는 KOMEN / ST6 등 ([[swan-st6-babanin-implementation]])
+BREAKING
+FRICTION MADSEN               $ 또는 JONSWAP / COLLINS
+$ ⚠ SETUP : unstructured 에서 내부 비활성 (swanpre1.ftn:2089-2092).
+$    coupled run 의 wave setup 은 ADCIRC 가 radiation-stress 를 흡수해 생성.
+$ SETUP                       $ ← 켜도 unstructured 에서 무효 (의도적 미사용)
+
+$ --- 강제: 바람/수위/유속은 결합으로 ADCIRC 가 전달 ----------------------
+$ COUPWIND 시 ADCIRC met → SWAN (timestep.F:664-682). 별도 WIND 파일 불요.
+$ ADCIRC → SWAN: 수위 ETA2, 유속 UU2/VV2 매 결합 스텝 갱신 (couple2swan.F:1128-1142).
+
+$ --- 출력 ----------------------------------------------------------------
+BLOCK 'COMPGRID' NOHEAD 'swan_HS.mat' LAY 3 HSIGN TPS DIR
+TABLE 'COMPGRID' HEADER 'swan_out.tab' XP YP HSIGN TPS DIR
+
+$ --- 시간 스텝(결합 주기) -------------------------------------------------
+$ COMPUTE NONSTAT 의 DELTC = SWAN_DT. fort.15 의 ADCIRC DT 로 나눠 정수여야 함
+$ (couple2swan.F:1079-1081). 예) DELTC=300 SEC, ADCIRC DT=2 → 비 150.
+COMPUTE NONSTATIONARY <YYYYMMDD.HHMMSS> <DELTC> SEC <YYYYMMDD.HHMMSS>
+STOP

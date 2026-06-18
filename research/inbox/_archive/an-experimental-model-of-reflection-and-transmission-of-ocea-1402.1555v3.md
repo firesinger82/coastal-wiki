@@ -7,9 +7,11 @@ authors: Alessandro Toffoli, Alberto Alberello, Luke G. Bennetts, Michael H. Mey
 published: 2014-02-07
 
 link: https://arxiv.org/abs/1402.1555v3
+promoted_to: concepts/waves/07-wave-transmission.md
+promoted_date: 2026-06-18
 citation_status: draft-unsourced
 action: archive
-collected: 2026-06-07T00:00:47.557407+00:00
+collected: 2026-06-16T00:01:46.259103+00:00
 ---
 
 ## Abstract

@@ -22,14 +22,14 @@ examples/
 
 ## 예제
 
-| 시나리오 | 다루는 개념 | 사용 모델 | 상태 |
+| 시나리오 | 다루는 개념 | 사용 모델/도구 | 상태 |
 |---|---|---|---|
 | [swan-to-swash-nesting](swan-to-swash-nesting/) | waves · swash-zone | SWAN → SWASH | ✅ 절차 템플릿 (검수 메커닉 기반, 정량 run 미수록) |
+| [khoa-surge-eva-pipeline](khoa-surge-eva-pipeline/) | storm-surge · tides | utide → EVA (experience 연계) | ✅ 재현 절차 (정량은 experience 귀속) |
+| [adcirc-swan-surge-coupling](adcirc-swan-surge-coupling/) | storm-surge · waves · compound-flooding | ADCIRC + SWAN (tightly-coupled, radiation stress) | ✅ 절차 템플릿 (검수 메커닉 기반, 정량 run 미수록) |
 
 ## 후보 (다음)
 
 | 시나리오 | 다루는 개념 | 사용 모델 |
 |---|---|---|
-| adcirc-swan-surge-coupling | storm-surge · waves | ADCIRC + SWAN (radiation stress) |
-| khoa-surge-eva-pipeline | storm-surge · tides | utide → EVA (experience 연계) |
 | delft3d-flow-wave-morphology | sediment-transport · littoral-drift | Delft3D FLOW+WAVE+morphology |
