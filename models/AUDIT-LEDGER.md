@@ -34,17 +34,17 @@ purpose: "사용자 지시(2026-06-16) '모든 모델은 모든 문서·코드�
 
 | 모델 | 코어 소스파일 | 코어 검수 | 문서(PDF) | manual-notes | 우선순위 |
 |---|--:|:--:|--:|--:|:--:|
-| **SWASH** | 160 | ✅ 19 노트 (전수) | 2 | ✅ 2 | 🟢 코드+문서 완료 |
-| **Delft3D** | engines_gpl 3,503 | ✅ 38 노트 (全엔진) | 53 | ✅ 8 (핵심 매뉴얼) | 🟢 engines+핵심매뉴얼 완료 (tools manual·utils S 잔여) |
-| **ROMS** | roms/ROMS ~900 | ✅ 33 노트 (4D-Var 포함) | 10 | 3 | 🟢 코드 완료 (Exercise→examples·utils 잔여) |
-| **FUNWAVE** | TVD 38 + GPU 41 | ✅ 10 노트 (코드 완료) | 39 | 2 | 🟢 코드+매뉴얼 (test plot PDF→examples 잔여) |
-| **ADCIRC** | adcirc/src 56 (+gahm·asgs) | ✅ 62 노트 (gahm·asgs 포함) | 98 | 21 | 🟢 코드 완료 (theory_2004·논문→web-refs 잔여) |
-| **EFDC** | 264 | ✅ 29 노트 | 6 | 6 | 🟢 양호 (Training/Grid 잔여) |
-| **XBeach** | 118 | ✅ 32 노트 | 9 | 4 | 🟢 양호 (kingsday·report 잔여) |
-| **SWAN** | 77 | ✅ 29 노트 | 9 | 29 | 🟢 양호 (audit 노트 존재) |
-| **Celeris** | WebGPU JS+CUDA | ✅ 9 노트 | 3 | 1 | 🟢 양호 (논문→web-refs 잔여) |
+| **SWASH** | 160 | ✅ 19 노트 (전수) | 2 | ✅ 2 | ✅ 완료 |
+| **Delft3D** | engines_gpl 3,503 (+utils) | ✅ 39 노트 (엔진+utils S) | 53 | ✅ 9 (매뉴얼+도구) | ✅ 완료 |
+| **ROMS** | roms/ROMS ~900 | ✅ 33 노트 (4D-Var) | 10 | ✅ 4 (+Exercise 카탈로그) | ✅ 완료 |
+| **FUNWAVE** | TVD 38 + GPU 41 | ✅ 10 노트 | 39 | ✅ 3 (+검증 카탈로그) | ✅ 완료 |
+| **ADCIRC** | adcirc/src 56 (+gahm·asgs) | ✅ 62 노트 | 98 | 21 + web-refs(논문 30) | ✅ 완료 |
+| **EFDC** | 264 (+GVC 301 legacy S) | ✅ 30 노트 (+GVC) | 6 | ✅ 7 (+Training/Grid) | ✅ 완료 |
+| **XBeach** | 118 | ✅ 32 노트 | 9 | 4 | ✅ 완료 (kingsday=master 동계열) |
+| **SWAN** | 77 | ✅ 29 노트 | 9 | 29 | ✅ 완료 |
+| **Celeris** | WebGPU JS+CUDA | ✅ 9 노트 | 3 | 1 + web-refs(Lynett 2026) | ✅ 완료 |
 
-> **전수 검수 잔여 핵심**: ~~(1) SWASH~~ ✅ · ~~(2) Delft3D engines~~ ✅ · ~~(3) ROMS 4D-Var~~ ✅ · ~~(4) 핵심 매뉴얼 10종~~ ✅ **완료(2026-06-16~18 workflow 6회, 58 신규 노트)**. **잔여**: (5) Delft3D utils_gpl/lgpl(S)·tools 매뉴얼, (6) 논문→web-refs(ADCIRC foundational·Celeris Lynett), (7) ROMS Exercise·FUNWAVE test plot→examples, (8) EFDC-GVC 구버전·양호모델 완전성 재확인.
+> **전수 검수 완료 (2026-06-16~18, workflow 7회 · 66 신규 노트)**: ~~SWASH·Delft3D engines·ROMS 4D-Var·핵심 매뉴얼 10종~~ + ~~polish(Delft3D utils·EFDC-GVC·도구/Training 매뉴얼·ADCIRC 30논문·Celeris·ROMS Exercise·FUNWAVE 검증)~~ ✅. 모든 단언 file:line/page 인용 + 적대 검증 통과(9건 실오류 적발→수정). **잔여(선택적)**: Delft3D Library Tables(336p reference 표)·course PDF, EFDC-GVC 심층, 양호모델 추가 심화 — 모두 본체 외 보조.
 
 ---
 
