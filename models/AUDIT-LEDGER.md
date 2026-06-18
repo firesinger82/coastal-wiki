@@ -34,17 +34,17 @@ purpose: "사용자 지시(2026-06-16) '모든 모델은 모든 문서·코드�
 
 | 모델 | 코어 소스파일 | 코어 검수 | 문서(PDF) | manual-notes | 우선순위 |
 |---|--:|:--:|--:|--:|:--:|
-| **SWASH** | 160 | ✅ 19 노트 (전수) | 2 | 🟡 1 | 🟢 코드 완료 (swashuse.pdf 잔여) |
-| **Delft3D** | engines_gpl 3,503 | ✅ 38 노트 (全엔진) | 53 | 2 | 🟢 engines 완료 (utils_gpl/lgpl S·문서 잔여) |
-| **ROMS** | roms/ROMS ~900 | ✅ 33 노트 (4D-Var 포함) | 10 | 3 | 🟢 코드 완료 (Exercise PDF·utils 잔여) |
-| **FUNWAVE** | TVD 38 + GPU 41 | ✅ 10 노트 (코드 완료) | 39 | 1 | 🟢 코드 완료 (manual·test PDF 잔여) |
-| **ADCIRC** | adcirc/src 56 (+gahm·asgs) | ✅ 62 노트 (gahm·asgs 포함) | 98 | 21 | 🟢 코드 완료 |
-| **EFDC** | 264 | ✅ 29 노트 | 6 | 5 | 🟢 양호 |
-| **XBeach** | 118 | ✅ 32 노트 | 9 | 3 | 🟢 양호 |
+| **SWASH** | 160 | ✅ 19 노트 (전수) | 2 | ✅ 2 | 🟢 코드+문서 완료 |
+| **Delft3D** | engines_gpl 3,503 | ✅ 38 노트 (全엔진) | 53 | ✅ 8 (핵심 매뉴얼) | 🟢 engines+핵심매뉴얼 완료 (tools manual·utils S 잔여) |
+| **ROMS** | roms/ROMS ~900 | ✅ 33 노트 (4D-Var 포함) | 10 | 3 | 🟢 코드 완료 (Exercise→examples·utils 잔여) |
+| **FUNWAVE** | TVD 38 + GPU 41 | ✅ 10 노트 (코드 완료) | 39 | 2 | 🟢 코드+매뉴얼 (test plot PDF→examples 잔여) |
+| **ADCIRC** | adcirc/src 56 (+gahm·asgs) | ✅ 62 노트 (gahm·asgs 포함) | 98 | 21 | 🟢 코드 완료 (theory_2004·논문→web-refs 잔여) |
+| **EFDC** | 264 | ✅ 29 노트 | 6 | 6 | 🟢 양호 (Training/Grid 잔여) |
+| **XBeach** | 118 | ✅ 32 노트 | 9 | 4 | 🟢 양호 (kingsday·report 잔여) |
 | **SWAN** | 77 | ✅ 29 노트 | 9 | 29 | 🟢 양호 (audit 노트 존재) |
-| **Celeris** | WebGPU JS+CUDA | ✅ 9 노트 | 3 | 1 | 🟢 양호 |
+| **Celeris** | WebGPU JS+CUDA | ✅ 9 노트 | 3 | 1 | 🟢 양호 (논문→web-refs 잔여) |
 
-> **전수 검수 잔여 핵심**: ~~(1) SWASH~~ ✅ · ~~(2) Delft3D engines~~ ✅ · ~~(3) ROMS 4D-Var+Utility~~ ✅ **완료(2026-06-16 workflow 3회, 45 신규 노트)**, (4) 전 모델 manual-notes 빈약(PDF 229 대비 66), (5) Delft3D utils_gpl/lgpl(S). **다음 우선순위: FUNWAVE(GPU·매뉴얼) → ADCIRC(gahm·asgs) → manual-notes 전수화**.
+> **전수 검수 잔여 핵심**: ~~(1) SWASH~~ ✅ · ~~(2) Delft3D engines~~ ✅ · ~~(3) ROMS 4D-Var~~ ✅ · ~~(4) 핵심 매뉴얼 10종~~ ✅ **완료(2026-06-16~18 workflow 6회, 58 신규 노트)**. **잔여**: (5) Delft3D utils_gpl/lgpl(S)·tools 매뉴얼, (6) 논문→web-refs(ADCIRC foundational·Celeris Lynett), (7) ROMS Exercise·FUNWAVE test plot→examples, (8) EFDC-GVC 구버전·양호모델 완전성 재확인.
 
 ---
 
@@ -89,15 +89,18 @@ purpose: "사용자 지시(2026-06-16) '모든 모델은 모든 문서·코드�
 
 **소스**: `src/` 7,240파일 중 **third_party_open 2,633 = ⬛ N/A** (eigen 532·boost 338·petsc 296·proj 292·netcdf 185·expat 169·gdal 153·spherepack 118·metis 115...).
 
-### 2.1 문서 (53 PDF — 핵심 매뉴얼만 추적, 나머지 WAQ 서브·NEFIS·도구류)
+### 2.1 문서 (53 PDF — 핵심 매뉴얼 ✅, 도구·교육 잔여)
 | PDF | 종류 | 노트 | 상태 |
 |---|---|---|---|
-| Delft3D-FLOW_User_Manual | FLOW 사용자 | (web-refs 부분) | 🟡 |
-| Delft3D-WAVE_User_Manual | WAVE 사용자 | — | ⬜ |
-| Delft3D-WAQ_User_Manual (+Tech Ref·Proc Lib) | 수질 | delft3d_delwaq | 🟡 |
-| Delft3D-PART_User_Manual | 입자추적 | delft3d_part | 🟡 |
-| Conceptual/Functional Spec·course PDF | 개념·교육 | — | ⬜ |
-| TIDE/TRIANA/QUICKIN/RGFGRID/GPP/QUICKPLOT 등 도구 | 전·후처리 도구 | — | ⬜ |
+| Delft3D-FLOW_User_Manual (757p) | FLOW 사용자 | delft3d-flow-user-manual(TOC/MDF) + **delft3d-flow-physics-numerics**(물리·수치 심화) | ✅ |
+| Delft3D-WAVE_User_Manual (208p) | WAVE(SWAN) | **delft3d-wave-user-manual** | ✅ |
+| Delft3D-WAQ_User_Manual (391p) | 수질 사용자 | **delft3d-waq-user-manual** | ✅ |
+| WAQ_Processes_Technical_Reference (611p) | 수질 process 식 | **delft3d-waq-processes-tech-reference** | ✅ |
+| Delft3D-PART_User_Manual (138p) | 입자추적 | **delft3d-part-user-manual** | ✅ |
+| Delft3D-TIDE_User_Manual (103p) | 조석분석 | **delft3d-tide-user-manual** | ✅ |
+| WAQ Library Tables(336p)·Input Desc(105p) | 수질 reference 표 | (tech-ref 노트서 언급) | 🟡 |
+| GPP/QUICKPLOT/RGFGRID/QUICKIN/TRIANA/WES/DIDO/NEFIS | 전·후처리 도구 | delft3d-manuals-overview(인덱스) | 🟡 (S, 도구) |
+| Conceptual/Functional Spec·course PDF·cxx-*·doxygen | 개념·교육·T | — | ⬜/⬛ |
 
 ### 2.2 코드 모듈 (engines_gpl 중심) — 2026-06-16 workflow 17 신규 노트 (총 38 SA)
 > engines 전 엔진 검수 완료. 각 노트 file:line 인용 + 적대 검증 통과(special_physics 1건 radstr Sxy cos·sin 누락 적발→수정).
