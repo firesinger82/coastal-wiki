@@ -43,8 +43,10 @@ purpose: "사용자 지시(2026-06-16) '모든 모델은 모든 문서·코드�
 | **XBeach** | 118 | ✅ 32 노트 | 9 | 4 | ✅ 완료 (kingsday=master 동계열) |
 | **SWAN** | 77 | ✅ 29 노트 | 9 | 29 | ✅ 완료 |
 | **Celeris** | WebGPU JS+CUDA | ✅ 9 노트 | 3 | 1 + web-refs(Lynett 2026) | ✅ 완료 |
+| **SFINCS** 🆕 | src 36 (f90) | 🟡 1 (architecture) | readthedocs | — | WIP (2026-06-18 신설, 모듈 deep 후속) |
+| **LISFLOOD-FP** 🆕 | swe+cuda (C++/CUDA) | 🟡 1 (architecture) | Bristol/SEAMLESS | — | WIP (2026-06-18 신설, 솔버 deep 후속) |
 
-> **전수 검수 완료 (2026-06-16~18, workflow 7회 · 66 신규 노트)**: ~~SWASH·Delft3D engines·ROMS 4D-Var·핵심 매뉴얼 10종~~ + ~~polish(Delft3D utils·EFDC-GVC·도구/Training 매뉴얼·ADCIRC 30논문·Celeris·ROMS Exercise·FUNWAVE 검증)~~ ✅. 모든 단언 file:line/page 인용 + 적대 검증 통과(9건 실오류 적발→수정). **잔여(선택적)**: Delft3D Library Tables(336p reference 표)·course PDF, EFDC-GVC 심층, 양호모델 추가 심화 — 모두 본체 외 보조.
+> **전수 검수 완료 (2026-06-16~18, workflow 7회 · 66 신규 노트)**: ~~SWASH·Delft3D engines·ROMS 4D-Var·핵심 매뉴얼 10종~~ + ~~polish(Delft3D utils·EFDC-GVC·도구/Training 매뉴얼·ADCIRC 30논문·Celeris·ROMS Exercise·FUNWAVE 검증)~~ ✅. 모든 단언 file:line/page 인용 + 적대 검증 통과(9건 실오류 적발→수정). **신규 모델 2(2026-06-18)**: SFINCS(Deltares compound flooding)·LISFLOOD-FP v8.2(Bristol/Sheffield 침수) — README+architecture+web-refs+manifest 생성, **모듈/솔버 deep source-analysis 는 후속 workflow**(SWASH 패턴). **잔여(선택적)**: Delft3D Library Tables·course PDF, EFDC-GVC 심층, 양호모델 추가 심화, 신규2 모델 deep.
 
 ---
 
