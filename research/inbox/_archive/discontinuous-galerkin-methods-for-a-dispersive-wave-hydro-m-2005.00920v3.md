@@ -7,11 +7,11 @@ authors: Kazbek Kazhyken, Juha Videman, Clint Dawson
 published: 2020-05-02
 doi: https://doi.org/10.1016/j.cma.2020.113592
 link: https://arxiv.org/abs/2005.00920v3
-promoted_to: concepts/swash-zone/04-code-and-tools.md
-promoted_date: 2026-06-18
 citation_status: draft-unsourced
 action: archive
-collected: 2026-06-16T00:01:30.144268+00:00
+collected: 2026-06-06T00:00:56.177414+00:00
+promoted_to: concepts/sediment-transport/04-code-and-tools.md#10.1
+promoted_date: 2026-06-15
 ---
 
 ## Abstract
