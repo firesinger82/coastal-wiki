@@ -223,9 +223,7 @@ STOP
 ## 6. 보강
 
 - SWAN Technical Documentation (Booij·Ris·Holthuijsen 1999 + 후속) 발췌
-- SWAN User Manual 입력 카드 전체 정리 → `models/SWAN/manual-notes/swan-input-cards.md`
-- 사용자 WINK 패턴 실제 input file → `source-analysis/wink-pattern.md`
-- 한국 KHOA 적용 사례 (parameter calibration)
+- SWAN User Manual 입력 카드 전체 정리 → `models/SWAN/source-analysis/swan-command-file-reference.md`
 
 ## 7. 연결
 

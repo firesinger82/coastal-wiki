@@ -3,7 +3,7 @@ title: "파랑 — 01 개념"
 topic: waves
 canonical_source: self
 citation_status: verified
-verification_method: "AI cross-reference: textbook/md/Waves-Holthuijsen2007.md (Ch.1-3 TOC + key concepts) + KHOA·PORTCALS glossary (284 wave-related terms) + dashboard-khoa-data MPT station structure."
+verification_method: "AI cross-reference: textbook/md/Waves-Holthuijsen2007.md (Ch.1-3 TOC + key concepts) + KHOA·PORTCALS glossary (284 wave-related terms) + 해양수산부(MOF)/KHOA 공식 관측망 MPT station structure (source-needed)."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-21
 verification_by: "Claude Opus 4.7 (1M context) — cross-ref"
@@ -126,7 +126,7 @@ P(H > h) = exp(-2h²/H_s²)
 - **Imaging radar** (X-band, marine radar)
 - **Altimetry** (laser·acoustic·radar) — H_s 직접 추정
 
-### 7.3 한국 MPT 정점 (DASHBOARD `dashboard-khoa-data` / mof_data 74 정점)
+### 7.3 한국 MPT 정점 (해양수산부 MOF·KHOA 공식 관측망 / mof_data 74 정점, source-needed)
 
 | 기관 | 정점 수 | 비고 |
 |---|---|---|
@@ -184,4 +184,4 @@ P(H > h) = exp(-2h²/H_s²)
 - 소스 노트:
   - [`textbook/notes/waves-holthuijsen-toc.md`](../../textbook/notes/waves-holthuijsen-toc.md) — Holthuijsen 2007 TOC (verified)
   - `khoa-portcals-glossary` — 284 파랑 용어
-  - `dashboard-khoa-data` — MPT 74 정점 메타데이터
+  - 해양수산부(MOF)·KHOA 공식 관측망 — MPT 74 정점 메타데이터 (source-needed)

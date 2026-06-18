@@ -84,5 +84,5 @@ related:
 - [`concepts/storm-surge/03-analysis-methods.md`](../../../concepts/storm-surge/03-analysis-methods.md) — separation·MK trend·return period
 - [`concepts/storm-surge/04-code-and-tools.md`](../../../concepts/storm-surge/04-code-and-tools.md) — NWS modes·KHOA observation·운영 운영
 - [`concepts/tides/06-model-application.md`](../../../concepts/tides/06-model-application.md) — 조석 forcing
-- [`models/ADCIRC/source-analysis/`](../source-analysis/) — 41 source-analysis 노트
-- [`models/ADCIRC/manual-notes/`](../manual-notes/) — 21 verified + 11 local-workflow
+- [`models/ADCIRC/source-analysis/`](../source-analysis/) — 39 source-analysis 노트
+- [`models/ADCIRC/manual-notes/`](../manual-notes/) — 21 verified

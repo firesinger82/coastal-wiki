@@ -23,8 +23,7 @@ import pandas as pd
 import numpy as np
 
 df = pd.read_csv(
-    "/mnt/d/Numerical_models/00_Common/Tide/tide_model/KHOA/"
-    "해양수산부 국립해양조사원_수치조류도 기반 조화상수_20250814.csv",
+    "<KHOA_수치조류도_조화상수.csv>",  # khoa-tide-model source (국립해양조사원 수치조류도 기반 조화상수)
     encoding='cp949'
 )
 df[['lon','lat']] = df['좌표'].str.split(' ', expand=True).astype(float)

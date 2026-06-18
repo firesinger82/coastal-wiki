@@ -3,7 +3,7 @@ title: "조류 — 01 개념"
 topic: currents
 canonical_source: self
 citation_status: verified
-verification_method: "AI cross-reference against /mnt/d/wsl_env/maritime-glossary-mcp/glossary.json (KHOA·PORTCALS) + textbook/md/stewart_textbook.md (§17.4 p.313) + textbook/md/134340780-Tides-and-Currents.md (Lubbad p.50). 15개 KHOA glossary term needle lookup PASS."
+verification_method: "AI cross-reference against khoa-portcals-glossary (KHOA·PORTCALS 용어집) + textbook/md/stewart_textbook.md (§17.4 p.313) + textbook/md/134340780-Tides-and-Currents.md (Lubbad p.50). 15개 KHOA glossary term needle lookup PASS."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-21
 verification_by: "Claude Opus 4.7 (1M context) — cross-ref"

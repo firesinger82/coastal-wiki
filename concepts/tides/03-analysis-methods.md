@@ -158,7 +158,7 @@ Foreman 1977 appendix는 천해 비선형 분조 (M3, M4, MK3, MN4, M6, M8, M10,
 
 ### 4.1 한국 공식 — 국립해양조사원고시 제2021-7호 (검증된 공식 전체)
 
-상세 유도·부산항 검증은 [tides-khoa-nonharmonic-research.md](../../textbook/notes/tides-khoa-nonharmonic-research.md) (`dashboard-khoa-data` source). 결과 공식 요약:
+상세 유도·부산항 검증은 [tides-khoa-nonharmonic-research.md](../../textbook/notes/tides-khoa-nonharmonic-research.md) (`khoa-tide-model` source·국립해양조사원고시 제2021-7호). 결과 공식 요약:
 
 ```
 Z₀         = H_M2 + H_S2 + H_K1 + H_O1     # 4대분조 반조차합

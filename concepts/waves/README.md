@@ -20,7 +20,7 @@
 
 - `holthuijsen2007` — [`textbook/notes/waves-holthuijsen-toc.md`](../../textbook/notes/waves-holthuijsen-toc.md) (Ch.1-9 TOC + 핵심 발췌, Ch.9 전체가 SWAN)
 - `khoa-portcals-glossary` — 284 파랑 용어
-- `dashboard-khoa-data` — MPT 74정점 메타데이터 + mof_data
+- 해양수산부(MOF)·KHOA 공식 관측망 — MPT 74정점 메타데이터 + mof_data (공식 운영자료; 정식 source_id 미등록 → source-needed)
 - `hudspeth2005-wave-forces` — 파력 (TBD)
 - `water-wave-mechanics` — 수파역학 (TBD)
 - `khoa-annual-reports` — [`textbook/notes/khoa-annual-reports-overview.md`](../../textbook/notes/khoa-annual-reports-overview.md) (15권 2012-2025, MPT 정점·유의파 통계)

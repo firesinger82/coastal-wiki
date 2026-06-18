@@ -31,7 +31,6 @@ related:
 | Repo | 역할 |
 |---|---|
 | SourceForge SVN | 공식 — Fortran source |
-| (사용자 SWAN library) | `D:\Numerical_models\01_Models\swan\Fin\07_SWAN_LIBRARY\` — source_id: swan-library-firesinger ([textbook/sources.yml](../../../textbook/sources.yml)) |
 
 ## 3. 핵심 논문 — 시초부터 현재까지
 
@@ -60,11 +59,8 @@ related:
 
 ## 5. 한국 적용
 
-- **사용자 본인 SWAN library** (source_id: swan-library-firesinger):
-  - WINK middle/detail 13 domain pattern
-  - 축산항 validation stations (validation_stations_chuksan.csv)
-  - JMA-MSM wind workflow + GEBCO/BADA2024 bathymetry
-- 본 위키 — [[../source-analysis/wink-pattern]] + [`concepts/waves/06-model-application.md`](../../../concepts/waves/06-model-application.md)
+- 한국 해역 SWAN 적용 사례(WINK 도메인·축산항 검증·JMA-MSM 바람 등)는 외부 개인 환경 자료로 canonical 미수록. 바이블 검증 통과 시 `experience/` 로 카테고리화 (source-needed).
+- 일반 적용 가이드 → [`concepts/waves/06-model-application.md`](../../../concepts/waves/06-model-application.md)
 
 ## 6. 운영 자원
 

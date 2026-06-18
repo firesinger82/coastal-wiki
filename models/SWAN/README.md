@@ -18,28 +18,18 @@
 | 경로 | 내용 |
 |---|---|
 | `manual-notes/` | 공식 메뉴얼 발췌·정리 (TBD) |
-| `source-analysis/` | 소스코드·알고리즘 분석. WINK 패턴 등 사용자 SWAN library 발췌 |
+| `source-analysis/` | 소스코드·알고리즘 분석 (Swan*.ftn90 서브루틴별, 27 노트) |
 | `web-refs/` | swan-official-resources.md (verified 2026-05-24) — sourceforge·공식 매뉴얼·핵심 논문 (Booij-Ris-Holthuijsen 1999·Zijlema 2010·Rogers 2003·Dietrich 2011 SWAN+ADCIRC) |
 
-## 사용자 SWAN library 통합
+## 주요 노트
 
-본 디렉토리는 사용자 본인 자료 (`swan-library-firesinger` source = `D:\Numerical_models\01_Models\swan\Fin\07_SWAN_LIBRARY\`)와 연결:
-
-- `source-analysis/wink-pattern.md` — WINK middle/detail 도메인 패턴 (사용자 정리)
-- `source-analysis/jma-msm-wind-workflow.md` — JMA-MSM 바람 입력 파이프라인
-- `manual-notes/swan-action-balance.md` — Holthuijsen Ch.9 §9.3 action balance equation 발췌
-
-## 작성 우선순위
-
-1. ~~생성~~ (완료, 2026-05-21)
-2. `manual-notes/swan-action-balance.md` — Holthuijsen Ch.9 §9.3 action balance + source terms
-3. `source-analysis/wink-pattern.md` — 사용자 WINK middle/detail
-4. `web-refs/swan-official-resources.md` — 공식 사이트·논문 인용
-5. `source-analysis/swan-input-cards.md` — SWAN INPUT/READINP 카드 정리
+- `manual-notes/swan-action-balance.md` — Holthuijsen Ch.9 §9.3 action balance + source terms
+- `source-analysis/swan-command-file-reference.md` — SWAN INPUT/READINP 카드 정리
+- `source-analysis/swan-source-coverage-audit.md` — 58 source file 인벤토리
+- `web-refs/swan-official-resources.md` — 공식 사이트·논문 인용
 
 ## 연결
 
 - `concepts/waves/06-model-application.md` — 본 디렉토리를 canonical으로 인용
 - `textbook/notes/waves-holthuijsen-toc.md` — Holthuijsen 2007 TOC + Ch.9 SWAN 발췌
-- `swan-library-firesinger` source (`textbook/sources.yml`)
 - 외부: [SWAN sourceforge](https://swanmodel.sourceforge.io/)

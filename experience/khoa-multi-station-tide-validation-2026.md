@@ -184,7 +184,7 @@ DASHBOARD 연구 doc 부산항(H_M2=40 cm 가정, 1.8 cm 차이) 결과와 비�
 
 | 항목 | 본 검증으로 확인됨 |
 |---|---|
-| KHOA `조위관측소_조화상수.csv` 정확성 | ±0.1% 정확 (서귀포 제외) — `dashboard-khoa-data` source 신뢰도 ↑ |
+| KHOA `조위관측소_조화상수.csv` 정확성 | ±0.1% 정확 (서귀포 제외) — `khoa-tide-model` source 신뢰도 ↑ |
 | 인천 M₂ = 284.5 cm | UTide 회복값 284.28 cm — `tides-khoa-cross-verification.md` §3 (DASHBOARD 정확) 재확인 |
 | 한국 4대분조 각속도 9자리 정밀도 | UTide nodal correction 정확히 작동 — `tides-khoa-nonharmonic-research.md` §1 (9자리 권장) 정합 |
 | 위상 변환 g = G + 9·a | UTide G 출력 ↔ KHOA G(`pha_gmt`) 일치 — 변도성 2007 공식 ([02-theory.md §8.3.1](../concepts/tides/02-theory.md)) 정합 |

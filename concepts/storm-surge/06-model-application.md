@@ -39,7 +39,7 @@ ADCIRC barotropic + 태풍 parametric/재분석 바람 + (선택) SWAN 결합 wa
 - **경계·구조물**: [boundary-conditions](../../models/ADCIRC/source-analysis/adcirc-boundary-conditions.md)(radiation/flux/sponge) + [weir-boundary](../../models/ADCIRC/source-analysis/adcirc-weir-boundary.md)(제방·월류).
 - **wave setup(해일 가산)**: [SWAN coupling](../../models/ADCIRC/source-analysis/adcirc-swan-coupling.md) — radiation stress가 surge에 추가. wave 측은 [`../waves/06-model-application.md`](../waves/06-model-application.md).
 - **경압(보통 surge엔 2D barotropic)**: [3D mode](../../models/ADCIRC/source-analysis/adcirc-3d-mode.md) · [baroclinic coupling](../../models/ADCIRC/source-analysis/adcirc-baroclinic-coupling.md).
-- 메시 구축(개인 wide6/wide7 프로젝트)은 canonical 아님 → [`source-analysis/local-workflow/`](../../models/ADCIRC/source-analysis/local-workflow/) (source-needed).
+- 메시 구축(개인 wide6/wide7 프로젝트)은 canonical 아님 → 바이블 검증 통과 시 `experience/` 로 카테고리화 (canonical 미수록, source-needed).
 
 ## 4. Delft3D-FLOW / D-Flow FM
 

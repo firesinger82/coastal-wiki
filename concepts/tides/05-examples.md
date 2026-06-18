@@ -211,7 +211,7 @@ NOAA verified (실측)와의 잔차는 기상·storm surge 등 비-천문조 변
 
 ## 3. 한국 KHOA 정점 — 인천 (DT_0001) 실측 데이터 적용
 
-> **상태**: 인천 4대분조·천해 분조 진폭은 KHOA 공식 조화상수 (`dashboard-khoa-data` source, [tides-khoa-nonharmonic-research.md](../../textbook/notes/tides-khoa-nonharmonic-research.md) §7 인용). UTide·pytides 실제 실행은 KHOA 시계열 다운로드 후 — `experience/`에서 추가 검증 권장.
+> **상태**: 인천 4대분조·천해 분조 진폭은 KHOA 공식 조화상수 (`khoa-tide-model` source, [tides-khoa-nonharmonic-research.md](../../textbook/notes/tides-khoa-nonharmonic-research.md) §7 인용). UTide·pytides 실제 실행은 KHOA 시계열 다운로드 후 — `experience/`에서 추가 검증 권장.
 
 ### 3.1 데이터 출처
 
@@ -220,7 +220,7 @@ NOAA verified (실측)와의 잔차는 기상·storm surge 등 비-천문조 변
   - 조화상수: `/api/oceangrid/tideObsHarmo/search.do`
   - 실측조위: `/api/oceangrid/tideObsReal/search.do`
   - 예측조위: `/api/oceangrid/tideObsPre/search.do`
-- 인천 정점: **DT_0001** (`data/조석/조위관측소_조화상수.csv` `dashboard-khoa-data`)
+- 인천 정점: **DT_0001** (`data/조석/조위관측소_조화상수.csv` `khoa-tide-model`)
 - 주요 정점:
 
 | 영역 | 정점 후보 | 예상 조차 | 우세 분조 |
@@ -234,7 +234,7 @@ NOAA verified (실측)와의 잔차는 기상·storm surge 등 비-천문조 변
 
 ### 3.2 인천 (DT_0001) 조화상수 — 실측
 
-(`dashboard-khoa-data`/`data/조석/조위관측소_조화상수.csv`, [tides-khoa-nonharmonic-research.md](../../textbook/notes/tides-khoa-nonharmonic-research.md) §7)
+(`khoa-tide-model`/`data/조석/조위관측소_조화상수.csv`, [tides-khoa-nonharmonic-research.md](../../textbook/notes/tides-khoa-nonharmonic-research.md) §7)
 
 > **위상 기준 주의** ([02-theory.md §8.3.1](02-theory.md) 변도성 2007):
 > - GMT (G) = 그리니치 자오선 기준

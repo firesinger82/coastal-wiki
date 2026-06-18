@@ -65,7 +65,7 @@ UTide 내부적으로 회전 성분 W⁺ (CCW)·W⁻ (CW) 계산 — `coef["aux"
 
 ## 2. 수치조류도 격자 데이터 (KHOA, `khoa-tide-model`)
 
-> 파일: `D:\Numerical_models\00_Common\Tide\tide_model\KHOA\해양수산부 국립해양조사원_수치조류도 기반 조화상수_20250814.csv`
+> 파일: 국립해양조사원 수치조류도 기반 조화상수 CSV (`khoa-tide-model` source — [textbook/sources.yml](../../textbook/sources.yml))
 >
 > 인코딩: **cp949**
 >
@@ -108,7 +108,7 @@ import numpy as np
 
 # Load (cp949)
 df = pd.read_csv(
-    "/mnt/d/Numerical_models/00_Common/Tide/tide_model/KHOA/해양수산부 국립해양조사원_수치조류도 기반 조화상수_20250814.csv",
+    "<KHOA_수치조류도_조화상수.csv>",  # khoa-tide-model source (국립해양조사원 수치조류도 기반 조화상수)
     encoding='cp949'
 )
 df[['lon','lat']] = df['좌표'].str.split(' ', expand=True).astype(float)

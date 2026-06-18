@@ -3,8 +3,8 @@ title: "adcirc topic map"
 topic: general
 canonical_source: self
 citation_status: verified
-verification_method: "ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-topic-map.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
-note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
+verification_method: "ADCIRC 공식 문서 기반 토픽 조직도. modeling-wiki 마이그레이션(2026-05-23). (2026-06-18 canonical 정화: 삭제된 local-workflow/·forcing-input-foundation 링크 제거.)"
+note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 마이그레이션 2026-05-23 → 2026-06-18 정화"
 note_date: 2026-04~05 (original) / 2026-05-23 (promote)
 verification_by: "사용자 + codex source-code analysis"
 verification_date: 2026-04
@@ -46,10 +46,8 @@ For each topic, the immediate goal is to capture:
 - purpose: stabilize the mesh, bathymetry, boundary, and forcing pipeline before project-specific setup
 - current notes:
   - `adcirc-preprocessing-foundation.md`
-  - `local-workflow/adcirc-mesh-tool-selection.md`
   - `adcirc-bathymetry-input-foundation.md`
-  - `adcirc-forcing-input-foundation.md`
-  - `local-workflow/adcirc-information-gaps.md`
+  - met forcing → `[[adcirc-met-forcing-implementation]]`
 
 ### 3. Storm Surge
 

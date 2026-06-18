@@ -3,16 +3,14 @@ title: "adcirc preprocessing foundation"
 topic: general
 canonical_source: self
 citation_status: verified
-verification_method: "ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-preprocessing-foundation.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
-note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
-note_date: 2026-04~05 (original) / 2026-05-23 (promote)
-verification_by: "사용자 + codex source-code analysis"
-verification_date: 2026-04
+verification_method: "ADCIRC 공식 문서(adcirc.github.io / adcirc.org) 기반 전처리 레이어 정리. file 의미·NWS·전처리 도구 생태계는 공식 docs 근거. (2026-06-18 canonical 정화: 개인 프로젝트 내용 — wide6·JMA-MSM 로컬 분기·E:\\ 경로·local-workflow 링크 — 제거. 개인 ADCIRC 운영 자료는 experience/ 레이어.)"
+note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 마이그레이션 2026-05-23 → 2026-06-18 정화 (Opus 4.8)"
+note_date: 2026-04~05 (original) / 2026-05-23 (promote) / 2026-06-18 (purify)
+verification_by: "공식 ADCIRC 문서 cross-ref"
+verification_date: 2026-06-18
 ---
 
 # ADCIRC Preprocessing Foundation
-
-Date: 2026-04-12
 
 Purpose:
 - define the preprocessing layer that must be stabilized before serious ADCIRC project work
@@ -22,7 +20,7 @@ This note is a foundation note, not a run recipe.
 
 ## Why This Comes First
 
-For local ADCIRC work, the hardest early failure modes usually do not start in `DT` or `TAU0`.
+The hardest early failure modes in ADCIRC work usually do not start in `DT` or `TAU0`.
 They start earlier:
 - the wrong meshing toolchain is chosen
 - bathymetry and coastline data are assembled inconsistently
@@ -55,7 +53,7 @@ Primary outputs:
 - sometimes helper geometry, GIS, or project files outside ADCIRC itself
 
 Primary note:
-- `local-workflow/adcirc-mesh-tool-selection.md`
+- 공식 메시 생성 도구는 아래 "What The Official Tooling Map Implies" 참조 (SMS / OceanMesh2D / SubgridADCIRCUtility).
 
 ### 2. Bathymetry And Topography Assembly
 
@@ -81,11 +79,10 @@ Questions:
 
 Primary outputs:
 - boundary forcing setup in `fort.14`, `fort.15`, `fort.19`, `fort.20`
-- meteorological forcing through `fort.22` or related files
-- for the local storm-surge branch, `JMA-MSM -> OWI NetCDF -> NWS=13`
+- meteorological forcing through `fort.22` or related files (NWS 모드별)
 
 Primary note:
-- `adcirc-forcing-input-foundation.md`
+- met forcing 메커닉 → `[[adcirc-met-forcing-implementation]]`
 
 ## What The Official Tooling Map Implies
 
@@ -98,37 +95,7 @@ The docs do not present one single universal preprocessor. Instead they expose a
 
 This implies that tool choice is itself part of the project design, not a minor implementation detail.
 
-## Current Local Direction
-
-The first local priority should be:
-1. preserve and understand the currently working mesh branch
-2. define the bathymetry assembly path inside that branch
-3. define the forcing ingestion path
-4. only after that, move deeper into project-specific storm-surge setup
-
-Known local facts:
-- for storm-surge work, the dominant forcing path is `JMA-MSM` with `NWS=13`
-- for wide-area mesh work, the current local baseline candidate is `wide6`
-- `wide6` currently points to an `OceanMesh2D` workflow
-
-This changes the mesh question from:
-- "what mesh tool should we pick"
-
-to:
-- "what exactly made `wide6` work, and can any other stack reproduce it"
-
-## What This Note Does Not Decide
-
-This note does not yet decide:
-- whether `SMS` or `OceanMesh2D` should be the long-term default
-- which bathymetry source should be canonical for your project
-- which mesh resolution or tidal constituent set should be used
-- whether subgrid ADCIRC is needed
-
 ## Next Notes To Keep Linked
 
-- `local-workflow/adcirc-mesh-tool-selection.md`
-- `local-workflow/adcirc-mesh-revalidation-principles.md`
 - `adcirc-bathymetry-input-foundation.md`
-- `adcirc-forcing-input-foundation.md`
-- `local-workflow/adcirc-information-gaps.md`
+- met forcing → `[[adcirc-met-forcing-implementation]]`

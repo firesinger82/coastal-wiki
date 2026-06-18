@@ -3,8 +3,8 @@ title: "adcirc bathymetry input foundation"
 topic: general
 canonical_source: self
 citation_status: verified
-verification_method: "ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-bathymetry-input-foundation.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
-note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
+verification_method: "ADCIRC 공식 문서(fort.14/fort.13/fort.141 의미·NWS·전처리 도구) 기반. modeling-wiki 마이그레이션(2026-05-23). (2026-06-18 canonical 정화: 개인 E:\\ 경로·로컬 grid 유틸리티 증거 제거, 공개 도구·소스명만 유지.)"
+note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 마이그레이션 2026-05-23 → 2026-06-18 정화"
 note_date: 2026-04~05 (original) / 2026-05-23 (promote)
 verification_by: "사용자 + codex source-code analysis"
 verification_date: 2026-04
@@ -81,16 +81,7 @@ The official docs indicate:
 - `OceanMesh2D` can interpolate bathymetry and topography and work with DEMs
 - `SubgridADCIRCUtility` exists for high-resolution terrain and landcover representation without requiring extremely fine mesh resolution
 
-Observed local evidence:
-- the bundled `OceanMesh2D` setup in `E:\ADCIRC_essential` explicitly references:
-  - `GSHHS` shoreline
-  - `SRTM15+` bathymetry
-  - optional `GEBCO`
-- `E:\numerical_models\adcirc\tools\utilities\grid` contains bathymetry and grid helper programs such as:
-  - `bath_interp.f`
-  - `interp.f`
-  - `Griddata_v1.32.F90`
-  - `Gridscope_ver1.22.f90`
+Common DEM/shoreline sources used with `OceanMesh2D` include the `GSHHS` shoreline and global bathymetry grids (e.g. `SRTM15+`, optional `GEBCO`). ADCIRC utility programs such as `bath_interp` / `interp` / `Griddata` / `Gridscope` handle interpolation of those sources onto mesh nodes.
 
 So bathymetry work is not just "find a DEM and assign depths."
 It is a pipeline decision:
@@ -128,9 +119,8 @@ Missing or weakly specified areas include:
 - recommended datum harmonization workflow
 - practical QC rules for coastal DEM plus bathymetry merging
 - a canonical "good enough first bathymetry pipeline" for new users
-- which of the local `grid` utilities are still active versus archival
 
-These should be tracked as local knowledge gaps, not filled with guesses.
+These are documentation gaps, not to be filled with guesses.
 
 ## Current Working Rule
 

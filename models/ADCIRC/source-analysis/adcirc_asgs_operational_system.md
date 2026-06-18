@@ -154,7 +154,6 @@ ADCIRC/SWAN 결과(fort.63/64·maxele.63 등)를 시각화·배포 형식으로 
 ## 7. 관련 노트와의 경계
 
 - met forcing(fort.22/NWS, GAHM/vortex) 메커닉 → `[[adcirc-met-forcing-implementation]]` (본 노트는 ASGS 측 `aswip` 호출만).
-- 로컬 fort.22 구조·호환성 → `[[local-workflow/24-local-fort22-structure-compatibility]]`, 로컬 워크플로 → `[[local-workflow/19-local-adcirc-essential-workflow]]`.
 - 출력 파일 writer(fort.63 등) 메커닉 → `[[adcirc-output-writers-implementation]]` (본 노트는 ASGS 후처리 변환 도구 카탈로그만).
 
 ## 8. 한계 (S-tier 명시)

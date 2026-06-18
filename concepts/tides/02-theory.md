@@ -3,7 +3,7 @@ title: "조석 — 02 일반론 (기조력·평형조석·조화상수)"
 topic: tides
 canonical_source: self
 citation_status: verified
-verification_method: "AI programmatic cross-reference against textbook/md/stewart_textbook.md (Stewart §17.4-17.5, pp.314-326) + /mnt/d/wsl_env/maritime-glossary-mcp/glossary.json ([KHOA], [PORTCALS]). 페이지 번호 정정 적용 후 verified."
+verification_method: "AI programmatic cross-reference against textbook/md/stewart_textbook.md (Stewart §17.4-17.5, pp.314-326) + khoa-portcals-glossary ([KHOA], [PORTCALS] 용어집). 페이지 번호 정정 적용 후 verified."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-21
 verification_by: "Claude Opus 4.7 (1M context) — cross-ref"
@@ -448,7 +448,7 @@ MSL은 단기적으로 안정한 비조화상수이지만 **장기 추세**(deca
 
 소스 파일:
 - `textbook/md/stewart_textbook.md` § "Coastal Processes and Tides" (Stewart §17.4-17.5, p.314-326)
-- `/mnt/d/wsl_env/maritime-glossary-mcp/glossary.json` (3055 entries, KHOA + PORTCALS)
+- `khoa-portcals-glossary` source (3055 entries, KHOA + PORTCALS — [textbook/sources.yml](../../textbook/sources.yml))
 
 검증 통과 항목 (페이지별 인덱싱 후 needle lookup, char/word 중복 정규화):
 

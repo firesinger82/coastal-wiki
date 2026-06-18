@@ -1,13 +1,13 @@
 ---
 title: "KHOA 비조화상수 — 한국 공식 정의·공식·부산항 검증"
-source_id: dashboard-khoa-data
-chapter: "docs/research-nonharmonic-tidal-constants.md (사용자 본인 작성 2026-03-24)"
-pages: "전체 (300 lines)"
+source_id: khoa-tide-model
+chapter: "국립해양조사원고시 제2021-7호 (비조화상수·datum 법적 근거) + khoa-tide-model skill.md (4대분조 각속도)"
+pages: "고시 전부개정 2021.3.31"
 page_offset_applied: false
 topic: tides
-canonical_source: self
+canonical_source: khoa-tide-model
 citation_status: verified
-verification_method: "AI cross-reference against /mnt/d/Numerical_models/01_Models/DASHBOARD/docs/research-nonharmonic-tidal-constants.md (사용자 본인 자료). 부산항 KHOA 공식값과 일치 검증 완료된 공식만 인용. 국립해양조사원고시 제2021-7호를 1차 법적 근거로 명시."
+verification_method: "공식 1차근거: 국립해양조사원고시 제2021-7호 (law.go.kr) + khoa-tide-model 통합 조화상수 DB(skill.md 각속도 9자리). 부산항 KHOA 공식값과 일치 검증 완료된 공식만 인용. (이전 dashboard-khoa-data 개인 source_id → khoa-tide-model 공식 재귀속, 2026-06-18 canonical 정화.)"
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-21
 verification_by: "Claude Opus 4.7 (1M context) — cross-ref against user's verified research doc"

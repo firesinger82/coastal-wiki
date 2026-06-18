@@ -1,6 +1,6 @@
 # models/EFDC
 
-> **Canonical source**: 이 디렉토리(`models/EFDC/`)가 EFDC 모델의 구현·메커닉에 대한 진실의 원천. **사용자 주력 모델**.
+> **Canonical source**: 이 디렉토리(`models/EFDC/`)가 EFDC 모델의 구현·메커닉에 대한 진실의 원천.
 
 ## 정체 카드
 
@@ -36,7 +36,7 @@
 - [`concepts/sediment-transport/06-model-application.md`](../../concepts/sediment-transport/06-model-application.md) — EFDC SedTran-Original (ISTRAN=6/7 CALSED/CALSND) vs SEDZLJ unified multi-bed-layer (ssedtox.f90 dispatch)
 - [`concepts/sediment-transport/`](../../concepts/sediment-transport/) — Van Rijn + Soulsby 정형 + EFDC 구현 비교
 - `source-analysis/efdc_sediment.md` — codex source-code 직접 분석 (canonical reference)
-- (예정) [[efdc-chuksan-sediment]] — 사용자 운영 사례 ([[reference-next-session-candidates]] 2c C2, source-needed 강제)
+- (예정) 축산항 등 EFDC 운영 사례 → 바이블 검증 통과 시 `experience/` 로 카테고리화 (canonical 미수록, source-needed)
 
 ## 작성 우선순위 (남은 작업)
 
