@@ -2,24 +2,24 @@
 title: "SST 모델 적용 — boundary forcing · thermal module · 모델별 입력 형식"
 topic: sst
 canonical_source: self
-citation_status: source-needed
-verification_method: "각 모델의 공식 manual·source code 인용 — EFDC heat module (EFDC+ Theory Manual §3.x), Delft3D-FLOW thermal source (Lesser 2004), ROMS bulk flux module (Fairall et al. 1996, Large 2006). 본 위키의 models/<MODEL>/manual-notes/ 가 채워지면 verified 승급."
+citation_status: verified
+verification_method: "모델별 표층 열수지 구현 claim 을 검수완료 source-analysis 노트로 cross-link verified: (1) ROMS COARE bulk flux 4-항 + cool-skin → models/ROMS/source-analysis/roms_bulk_flux_coare.md (bulk_flux.F 1623줄 직접 read, COARE 1996/2003/Edson2013 8 paper) + roms_atmospheric_forcing.md (COARE 3.0 3-iter loop, longwave 3 옵션, shortwave penetration SOLAR_SOURCE, file:line 인용). (2) Delft3D heat KTEMP 5 dispatch + ocean/Proctor COARE-style bulk + Murakami 4-항 → models/Delft3D/source-analysis/delft3d_heat.md (heatu.f90:162-1276 직접 분석). (3) EFDC 연직 수온 transport/layering(sigma·SGZ)·vertical advection → models/EFDC/source-analysis/efdc_vertical.md (caltran.f90·caluvw.f90 file:line). \n여전히 source-needed: EFDC 표층 heat budget 커널(calheat.f90)·EFDC aser.inp bulk 계수, Delft3D §4.1 입력 파일 형식, 각 모델 한국 적용 paper(NIFS/KMOU), SWAN stability correction(Tolman 1991, 미수록), SST forcing 데이터셋 endpoint(외부)."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-23
-verification_by: "Claude Opus 4.7 (1M context) — 골격 작성, 각 모델 manual cross-ref 대기"
-verification_date: 2026-05-23
+verification_by: "Claude Opus 4.8 (1M context) — 모델 source-analysis 노트 cross-link verify 2026-06-18"
+verification_date: 2026-06-18
 related:
   - concepts/sst/02-theory.md
-  - models/EFDC/
-  - models/Delft3D/
-  - models/ROMS/
+  - models/ROMS/source-analysis/roms_bulk_flux_coare.md
+  - models/Delft3D/source-analysis/delft3d_heat.md
+  - models/EFDC/source-analysis/efdc_vertical.md
 ---
 
 # SST 모델 적용
 
 > 본 §는 SST(또는 수온 일반) 가 연안 수치모델에 어떻게 들어가는지·어떻게 나오는지 정리. EFDC·Delft3D·ROMS·ADCIRC·XBeach·SWAN 모델별 차이.
 
-> **citation_status: source-needed** — 각 모델 manual 의 정확한 equation·파일 형식 인용은 `models/<MODEL>/manual-notes/` 작업 후 verified. 본 노트는 표준 oceanographic 모델 관행 기반 골격.
+> **citation_status: verified** (모델 source-analysis cross-link 기반) — ROMS COARE bulk flux·Delft3D heat KTEMP·EFDC 연직 수온 transport 의 구현은 검수완료 source-analysis 노트(아래 링크)로 뒷받침. **여전히 source-needed**: EFDC 표층 heat budget 커널(calheat.f90), 각 모델 입력 파일 형식·한국 적용 paper, SWAN stability correction(미수록 모델·외부 논문).
 
 ## 1. SST 의 역할 — 입력 vs 출력
 
@@ -69,9 +69,9 @@ $$\rho C_p \frac{\partial T}{\partial t}\bigg|_{\text{surface}} = Q_{SW} - Q_{LW
 
 ### 3.2 알고리즘
 
-EFDC 의 heat budget 계산 (`calheat.f90`, citation TODO):
-- bulk flux 4개 항 매 timestep 계산
-- vertical thermal diffusion (Mellor-Yamada 또는 k-ε)
+EFDC 의 heat budget 계산:
+- **표층 bulk flux 4개 항** (`calheat.f90`) — **source-needed** (본 위키 calheat.f90 source-analysis 미작성; EFDC v12 는 COARE 3.6 사용, [`models/EFDC/manual-notes/efdc-theory-doc-v12.md`](../../models/EFDC/manual-notes/efdc-theory-doc-v12.md) §4.2 Ch 5.1.2 참조 — manual-notes 확인 권장)
+- **연직 thermal transport / advection** — 수온은 EFDC 의 일반 tracer 로 연직 upwind advection (`caltran.f90:152-183`) 되며, sigma/Sigma-Zed(SGZ) 연직 격자(`KC`·`IGRIDV`)에 따라 layer thickness `HPK = HP·DZC` 로 분배됨. **verified**: [`models/EFDC/source-analysis/efdc_vertical.md`](../../models/EFDC/source-analysis/efdc_vertical.md) §A·§D (sigma layers·vertical advection). 가파른 지형에서 sigma 좌표 spurious diapycnal mixing 이 인공 성층(SST 연직 구조 왜곡)을 만들 수 있어 `IINTPG=1/2` 권장 (efdc_vertical.md §E·Working Rules).
 - horizontal advection
 
 **한국 적용 권장 값** (citation TODO — `models/EFDC/manual-notes/heat-bulk-flux.md` 작성 시):
@@ -98,12 +98,17 @@ EFDC 의 SST 출력:
 
 ### 4.2 Heat module
 
-Delft3D-FLOW heat model 5 옵션 (Manual, Lesser 2004):
-1. **No heat** — passive temperature transport
-2. **Absolute** — $Q_{tot}$ 직접 입력
-3. **Murakami** — 1.5-D parameterization
-4. **Ocean** — Octavio (Octavio et al. 1977) bulk
-5. **Composite** — 4 항 (Q_SW + Q_LW + Q_S + Q_L) 분리 계산 — **권장**
+**verified** ([`models/Delft3D/source-analysis/delft3d_heat.md`](../../models/Delft3D/source-analysis/delft3d_heat.md), `heatu.f90:162-1276` 직접 분석): source code 의 실제 `KTEMP` dispatch 는 manual 라벨과 **다를 수 있음** — 코드 기준:
+
+| `KTEMP` | 모델 | 구현 |
+|---|---|---|
+| 1 | absolute | 내부 solar + atmospheric radiation (`heatu.f90:381`) |
+| 2 | composite | 입력 total radiation `qin = qradin`, 나머지 항 내부 계산 (`:510`) |
+| 3 | excess-temperature | `hlc·(T − tback)` heat-loss 계수 (`:633`) |
+| 4 | **Murakami** | 4-항 full 절대 열수지 (latent·sensible Bowen·Berliand longwave·shortwave Secchi 감쇠) (`:716-826`) — 가장 물리적으로 완전 |
+| 5 | **ocean / Proctor** | COARE-style bulk (Dalton latent·Stanton sensible·자유대류) (`:925-1179`) — open-ocean 연안 권장 |
+
+표층 열은 별도 boundary 가 아니라 **top-layer source/sink** 로 주입되고, shortwave 는 Secchi extinction 으로 연직 침투 (delft3d_heat.md §H). 한국 연안 storm-surge 는 `KTEMP=5` (ocean/Proctor) 가 가장 물리적 (delft3d_heat.md Decision Guide).
 
 ### 4.3 한국 적용
 
@@ -124,10 +129,16 @@ Delft3D-FLOW 의 한국 연안 적용 예 (citation TODO):
 
 ### 5.2 Bulk flux algorithm
 
-ROMS 는 **COARE 3.0 algorithm** (Fairall et al. 1996) 사용:
-- 4개 항 + stability correction
-- gustiness factor for low-wind cases
-- iterative solution for cool-skin and warm-layer
+**verified** ([`models/ROMS/source-analysis/roms_bulk_flux_coare.md`](../../models/ROMS/source-analysis/roms_bulk_flux_coare.md), `bulk_flux.F` 1623줄 직접 read + [`roms_atmospheric_forcing.md`](../../models/ROMS/source-analysis/roms_atmospheric_forcing.md) file:line):
+
+ROMS 는 `BULK_FLUXES` CPP option 활성 시 **COARE algorithm** (Fairall 1996/2003 COARE 3.0, Edson 2013 COARE 3.5; bulk_flux.F header 8 paper) 사용:
+- 4개 항 분리 출력 — `stflux(itemp) = srflx + lrflx + lhflx + shflx` (roms_atmospheric_forcing.md §D, `bulk_flux.F:1276`)
+- Monin-Obukhov stability loop **고정 3-iteration** (`IterMax=3`, bulk_flux.F:429,830) + gustiness factor
+- longwave 3 옵션: Berliand(`LONGWAVE`) / downwelling(`LONGWAVE_OUT`) / direct net (roms_atmospheric_forcing.md §D)
+- **cool-skin (`COOL_SKIN`) 만 구현; 별도 warm-layer 없음** (roms_atmospheric_forcing.md §F) — diurnal warm-layer 는 외부 SST forcing 전처리 필요
+- shortwave 는 `SOLAR_SOURCE` 로 Jerlov 수종별 연직 침투(연안 = Jerlov II/III) (roms_atmospheric_forcing.md §G)
+
+bulk_flux 출력 `shflux/srflux` 가 baroclinic 3D mode 의 tracer(T) surface BC 로 주입 (roms_bulk_flux_coare.md §5·§7). **EFDC v12 + ROMS 둘 다 COARE 3.x** 를 써서 air-sea flux 알고리즘이 일관 (roms_bulk_flux_coare.md §8).
 
 ### 5.3 한국 적용
 
@@ -185,13 +196,19 @@ SWAN: spectral wave 모델 — **SST 직접 사용 안 함**, 그러나:
 - **2025+ 모델 적용 시 climatology 를 1991-2020 또는 더 최근으로 갱신** (NIFS·KHOA·OISST)
 - climatology + 최근 anomaly forecast (e.g., KMA 기후 예측) 조합
 
-## 11. TODO (verified 승급 조건)
+## 11. TODO (잔존 source-needed — verified 부분은 §3-5 cross-link 참조)
 
-1. ☐ `models/EFDC/manual-notes/heat-bulk-flux.md` — EFDC+ Manual §3 인용
-2. ☐ `models/Delft3D/manual-notes/heat-module.md` — Delft3D-FLOW Manual heat 5 옵션 비교
-3. ☐ `models/ROMS/manual-notes/coare30-bulk.md` — Fairall 1996 COARE 3.0
-4. ☐ 각 모델의 한국 적용 paper citation (NIFS, KMOU, 해양과학기술원)
-5. ☐ 실제 모델 입력 파일 예제 (EFDC `aser.inp`, Delft3D `*.bcc` 등) — `examples/` 폴더
+verified 완료 (모델 source-analysis cross-link):
+- ☑ ROMS COARE bulk flux — [`roms_bulk_flux_coare.md`](../../models/ROMS/source-analysis/roms_bulk_flux_coare.md) + [`roms_atmospheric_forcing.md`](../../models/ROMS/source-analysis/roms_atmospheric_forcing.md)
+- ☑ Delft3D heat KTEMP dispatch — [`delft3d_heat.md`](../../models/Delft3D/source-analysis/delft3d_heat.md)
+- ☑ EFDC 연직 수온 transport/layering — [`efdc_vertical.md`](../../models/EFDC/source-analysis/efdc_vertical.md)
+
+잔존:
+1. ☐ EFDC 표층 heat budget 커널 (`calheat.f90`) source-analysis — 현재 efdc_vertical.md 는 연직 transport 만 커버
+2. ☐ `models/Delft3D/manual-notes/heat-module.md` — Manual KTEMP 라벨 vs 코드 dispatch 대조 (heatu.f90 가 manual 과 다름)
+3. ☐ 각 모델의 한국 적용 paper citation (NIFS, KMOU, 해양과학기술원)
+4. ☐ 실제 모델 입력 파일 예제 (EFDC `aser.inp`, Delft3D `*.bcc` 등) — `examples/` 폴더
+5. ☐ SWAN stability correction (Tolman 1991) source — 미수록
 
 ## 12. 연결
 
@@ -200,6 +217,11 @@ SWAN: spectral wave 모델 — **SST 직접 사용 안 함**, 그러나:
 - [`03-analysis-methods.md`](03-analysis-methods.md) — climatology·anomaly
 - [`04-code-and-tools.md`](04-code-and-tools.md) — SST 데이터 source
 - [`models/EFDC/`](../../models/EFDC/), [`models/Delft3D/`](../../models/Delft3D/), [`models/ROMS/`](../../models/ROMS/) — 모델별 source/manual
+- 검수완료 모델 source-analysis (본 §의 verified 근거):
+  - [`roms_bulk_flux_coare.md`](../../models/ROMS/source-analysis/roms_bulk_flux_coare.md) — COARE bulk flux 열속
+  - [`roms_atmospheric_forcing.md`](../../models/ROMS/source-analysis/roms_atmospheric_forcing.md) — 대기 강제·COARE 3.0 loop
+  - [`delft3d_heat.md`](../../models/Delft3D/source-analysis/delft3d_heat.md) — heat KTEMP 5 dispatch
+  - [`efdc_vertical.md`](../../models/EFDC/source-analysis/efdc_vertical.md) — EFDC 연직 수온 transport·layering
 - 외부:
   - Fairall et al. 1996 — Bulk parameterization air-sea fluxes (J. Climate 9:1747-1768)
   - Lesser et al. 2004 — Delft3D-FLOW 3D modeling (Coastal Engineering 51:883-915)
