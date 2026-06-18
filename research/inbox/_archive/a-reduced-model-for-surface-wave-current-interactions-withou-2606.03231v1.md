@@ -7,11 +7,11 @@ authors: Yohei Onuki, Yasushi Fujiwara
 published: 2026-06-02
 
 link: https://arxiv.org/abs/2606.03231v1
+promoted_to: concepts/waves/08-wave-current-interaction.md
+promoted_date: 2026-06-18
 citation_status: draft-unsourced
 action: archive
-collected: 2026-06-14T00:00:53.135271+00:00
-promoted_to: concepts/currents/04-code-and-tools.md#6.1
-promoted_date: 2026-06-15
+collected: 2026-06-16T00:01:34.039831+00:00
 ---
 
 ## Abstract

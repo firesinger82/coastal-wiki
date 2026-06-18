@@ -14,6 +14,7 @@
 | `05-examples.md` | **verified** | 한국 MPT 74정점 분석 frame + 축산항 사례 |
 | `06-model-application.md` | **verified** | SWAN canonical (`models/SWAN/` 2 노트 verified) + WW3/XBeach 외부 인용 |
 | `07-wave-transmission.md` | ✅ **verified** (2026-06-18) | 부유체·구조물 파 투과/반사 — inbox promote(1402.1555 실험 + 1403.3766 floating disk array, full-PDF) + SWAN obstacle 투과(Goda/d'Angremond) 대비 |
+| `08-wave-current-interaction.md` | ✅ **verified** (2026-06-18) | 파-흐름 상호작용(Doppler·refraction·blocking) — inbox promote(2511.12711 eddy dipole 풍파 + 2606.03231 reduced wave-current, full-PDF) + SWAN action balance/QC 대비 |
 
 ## 사용된 source_id
 

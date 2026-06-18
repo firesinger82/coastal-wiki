@@ -7,11 +7,11 @@ authors: Nelson Violante-Carvalho, Thiago de Paula, Leandro Calado, Felipe Marqu
 published: 2025-11-16
 doi: https://doi.org/10.1016/j.ocemod.2021.101848
 link: https://arxiv.org/abs/2511.12711v1
+promoted_to: concepts/waves/08-wave-current-interaction.md
+promoted_date: 2026-06-18
 citation_status: draft-unsourced
 action: archive
-collected: 2026-06-07T00:00:30.414357+00:00
-promoted_to: concepts/currents/04-code-and-tools.md#6.1
-promoted_date: 2026-06-15
+collected: 2026-06-16T00:01:34.039994+00:00
 ---
 
 ## Abstract

@@ -7,11 +7,11 @@ authors: Sandro Carniel, Aniello Russo, Alvise Benetazzo
 published: 2013-09-29
 
 link: https://arxiv.org/abs/1309.7600v4
+promoted_to: models/ROMS/web-refs/roms-coawst-applications-review.md
+promoted_date: 2026-06-18
 citation_status: draft-unsourced
 action: archive
-collected: 2026-06-13T00:01:43.846508+00:00
-promoted_to: models/ROMS/web-refs/roms-coawst-adriatic-applications.md
-promoted_date: 2026-06-15
+collected: 2026-06-16T00:01:30.144398+00:00
 ---
 
 ## Abstract
