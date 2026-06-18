@@ -17,8 +17,8 @@
 
 - ✅ Zenodo v8.2 아카이브 다운로드·압축해제 (`raw/source_code/LISFLOOD-FP/`, raw gitignored)
 - ✅ **source-analysis 7** (전 솔버군, file:line + 적대 검증): architecture-source-map + **classic-acc-flow**(ACC local-inertia Bates2010·diffusive·Trent) + **channel-sgc**(sub-grid channel·관성식·weir/bridge orifice) + **swe-fv1-dg2**(FV1 Godunov·DG2 multiwavelet·HLL Riemann·SSP-RK2) + **cuda-gpu**(FlowVector·ghostraster) + **io-boundary** + **lisflood2-driver**(sgm_fast 관성파·CFL)
+- ✅ **manual-notes 1** ([user-manual](manual-notes/lisflood-fp-user-manual.md), 적대 검증) — user manual PDF(parfile 키워드·솔버 선택·입출력) + INSTALL.md/README.md(CMake 빌드·netCDF/libnuma). .mass 12열 PDF 자체오기 정정 포함
 - ✅ **web-refs 1** ([official-resources](web-refs/lisflood-fp-official-resources.md))
-- ⬜ manual-notes (Bristol/SEAMLESS-WAVE docs·INSTALL.md — 후속)
 
 ## 소스 구조 (`raw/source_code/LISFLOOD-FP/`)
 

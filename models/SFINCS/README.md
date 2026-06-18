@@ -18,8 +18,8 @@
 
 - ✅ 공식 GitHub clone (`raw/source_code/sfincs/`, depth-1, 182 f90, GPL-3.0)
 - ✅ **source-analysis 8** (전 코어 모듈, file:line + 적대 검증): architecture-source-map + **flow_solver**(reduced SWE momentum/continuity, Bates friction·CFL) + **subgrid_quadtree**(고속화) + **nonhydrostatic_wavemaker** + **boundaries_forcing**(spiderweb 태풍) + **snapwave**(연안 파·IG·Baldock) + **structures_physics** + **io_data**(BMI)
+- ✅ **manual-notes 2** (공식 readthedocs RST + 라이브 URL 병기, 적대 검증): [numerical-implementation](manual-notes/sfincs-numerical-implementation.md)(overview·LIE/SSWE·Bates2010·subgrid 메커닉·stability 키워드·skeleton 정직표기) + [parameters-io-reference](manual-notes/sfincs-parameters-io-reference.md)(sfincs.inp 키워드·입력파일·forcing·구조물·output)
 - ✅ **web-refs 1** ([official-resources](web-refs/sfincs-official-resources.md))
-- ⬜ manual-notes (readthedocs user manual 발췌 — 후속)
 
 ## 소스 구조 (`raw/source_code/sfincs/source/`)
 
