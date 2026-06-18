@@ -2,8 +2,8 @@
 title: "처오름대 (Swash Zone) — 정의·process·runup·sediment + 전이 연구"
 topic: swash-zone
 canonical_source: self
-citation_status: source-needed
-verification_method: "**§4 전이연구 3건 = full PDF 직접 read (2026-06-18, pdftotext) 후 verified** — 1909.11279(Stringari-Power 2019, Univ Newcastle, 7 호주 사빈, highlights/abstract+본문 line 75/177 확인: 40%·landward 10%·IG 50%·extreme 20%/>97%·Iribarren 상관)·2504.18467(Wisconsin-Madison+Delaware, Snell+Ryrie1983 JFM129:193+Antuono2010 JFM658:166, O.H.Hinsdale Directional Wave Basin W1-12 정규/W13-15 불규칙)·2305.03811(Davidson-Brenner-Pujara, Wisconsin-Madison, 입자관성+진입 timing). **실제 읽은 highlights/abstract/명시 실험설정만 인용 — 페이지·식 번호 임의 인용 금지**. §1-3 swash zone 정의·process·파라미터는 publicly-known coastal engineering canonical (Holthuijsen 2007 Ch 11·Masselink-Puleo 2006 review) — 교과서 본문 page 미보유로 **source-needed 유지**(file 전체 citation_status 는 §1-3 미확보 반영해 source-needed)."
+citation_status: partially-verified
+verification_method: "**§4 전이연구 3건 = full PDF 직접 read (2026-06-18, pdftotext) 후 verified** — 1909.11279(Stringari-Power 2019, Univ Newcastle, 7 호주 사빈, highlights/abstract+본문 line 75/177 확인: 40%·landward 10%·IG 50%·extreme 20%/>97%·Iribarren 상관)·2504.18467(Wisconsin-Madison+Delaware, Snell+Ryrie1983 JFM129:193+Antuono2010 JFM658:166, O.H.Hinsdale Directional Wave Basin W1-12 정규/W13-15 불규칙)·2305.03811(Davidson-Brenner-Pujara, Wisconsin-Madison, 입자관성+진입 timing). **실제 읽은 highlights/abstract/명시 실험설정만 인용 — 페이지·식 번호 임의 인용 금지**.\n**§1-3 textbook page 보강 (2026-06-18, grep+Read 로 page 본문 직접 확인 후 인용)**: §1 swash zone=foreshore 정의(alternately wet/dry)·surf/breaker zone 경계 = [coastal-eng-intro-wijetunge] PAGE-12 + [coastal-processes-with-eng-apps] PAGE-7. §2 uprush/backwash·run-up/run-down zone(다음 처오르는 파 만남=swash-swash) = [coastal-structures-design] PAGE-16. §2 sediment uprush/backwash 비대칭(upper foreshore 공극 침투→backwash 운반능↓→퇴적) = [coastal-processes-with-eng-apps] PAGE-18. §2/§3 Ru2% 설계 정의·Rayleigh 분포 = [coastal-structures-design] PAGE-20~21, run-up front velocity 15%/30-40% = PAGE-22. §3 ξ breaker/surf-similarity 명칭·기호 = [coastal-eng-intro-wijetunge] PAGE-27 nomenclature.\n**잔존 source-needed** (보유 page 미수록): IG band 주기 수치, bore collapse 의 NLSW dam-break 형식해, Iribarren $\\xi$ 수식 형태·임계값, IG 변조의 반사성 의존 정량 — Holthuijsen 2007 Ch 11·Masselink-Puleo 2006 review 필요. coastal-processes-with-eng-apps 추출 md 는 PDF p.1-35(Ch 1-3)만 보유 → §5.6 Swash Zone Dynamics(book p.114) 본문 인용 불가."
 note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-15
 related:
@@ -15,30 +15,31 @@ related:
 
 # 처오름대 (Swash Zone)
 
-> ⚠ citation_status: **source-needed**. 정의·process 골격은 publicly-known canonical, 정량·세부는 abstract/추후 교과서 인용 대기.
+> ⚠ citation_status: **partially-verified**. §1 정의·§2 uprush/backwash·runup·§3 Ru2% = 교과서 page 인용 verified. IG band 수치·bore collapse NLSW·Iribarren 수식·IG 변조 정량은 source-needed(Holthuijsen/Masselink 미보유 page).
 
 ## 1. 정의
 
-**Swash zone** = 쇄파된 파(bore)가 해빈 사면을 **밀려 올라갔다(uprush) 중력으로 되돌아 내려오는(backwash)** 운동으로 인해 **주기적으로 물에 잠겼다 노출되는 천이대**. surf zone 의 landward 경계 ~ 최대 runup 한계 사이. shoreline 이 시간에 따라 이동(time-varying wet/dry boundary)하는 영역.
+**Swash zone** = 쇄파된 파(bore)가 해빈 사면을 **밀려 올라갔다(uprush) 중력으로 되돌아 내려오는(backwash)** 운동으로 인해 **주기적으로 물에 잠겼다 노출되는 천이대**. 교과서 용어로는 **전빈(foreshore)** 과 동일 — "해빈 중 파가 오르내릴 때 번갈아 젖었다 마르는(alternately wet or dry as the waves rush up and down) 부분으로, 저조 정선에서 고조 시 wave uprush 한계(= shoreline)까지 뻗는다"([coastal-eng-intro-wijetunge] PAGE-12). 동일한 정의가 Dean & Dalrymple 도 "전빈, 즉 swash zone 은 파가 단면의 가파른 부분을 쓸어올릴 때 번갈아 젖었다 마르는 영역"([coastal-processes-with-eng-apps] PAGE-7). shoreline 이 시간에 따라 이동(time-varying wet/dry boundary)하는 영역.
 
-- 상류 경계: surf zone(쇄파대) — bore 가 swash 로 collapse
+- 상류 경계: surf zone(쇄파대) — bore 가 swash 로 collapse. surf/breaker zone = "shoreline 에서 쇄파 시작 외측 경계까지의 천해 띠"([coastal-eng-intro-wijetunge] PAGE-12)
 - 하류 경계: 최대 처오름선(runup limit) ~ dry beach
-- 시간 규모: incident wave(~수 초~10초) + **infragravity(IG, 수십 초~수 분)** 중첩
+- 시간 규모: incident wave(~수 초~10초) + **infragravity(IG, 수십 초~수 분)** 중첩 (IG band 정량 수치 source-needed)
 
 ## 2. 주요 process
 
 | process | 내용 |
 |---|---|
-| **Uprush / backwash** | bore collapse → 얇은 sheet flow 상류 이동(uprush, 감속) → 중력 backwash(가속). 비대칭 시간구조 |
-| **Bore collapse** | surf zone bore 가 shoreline 에서 무너지며 swash lens 형성 (NLSW dam-break 유사) |
-| **Swash-swash interaction** | 선행 backwash 와 후속 uprush 충돌 / 빠른 bore 가 느린 bore 포획(**bore-bore capture**, §4.1) |
-| **Infragravity 변조** | 반사 IG wave 가 swash 진폭·주기 변조 — 반사성(steep) 해빈서 우세 |
-| **Sediment transport** | uprush(상류 퇴적 경향) vs backwash(하류 침식) 비대칭 → 해빈 경사·berm 형성, swash-zone 표사 |
-| **Runup** | 처오름 수직 한계. 설계·범람(R2% = 2% 초과확률 runup)에 핵심 — [`concepts/waves`](../waves/04-code-and-tools.md) + storm-surge 범람 wave setup |
+| **Uprush / backwash** | bore collapse → 얇은 sheet flow 상류 이동(uprush, 감속) → 중력 backwash(가속). 비대칭 시간구조. 사면 상의 동등 표현: "파가 사면을 올라간 뒤(run up) 다시 흘러내려(rush down) **다음 처오르는 파를 만날 때까지** 내려오는 run-up/run-down zone"([coastal-structures-design] PAGE-16) |
+| **Bore collapse** | surf zone bore 가 shoreline 에서 무너지며 swash lens 형성 (NLSW dam-break 유사) — *NLSW dam-break 형식해는 source-needed* |
+| **Swash-swash interaction** | 선행 backwash 와 후속 uprush 충돌 / 빠른 bore 가 느린 bore 포획(**bore-bore capture**, §4.1). 사면 상 직접 관찰: 흘러내리는 물이 "다음 처오르는 파를 만난다"([coastal-structures-design] PAGE-16) |
+| **Infragravity 변조** | 반사 IG wave 가 swash 진폭·주기 변조 — 반사성(steep) 해빈서 우세 *(정량·반사성 의존 = source-needed)* |
+| **Sediment transport** | uprush(상류 퇴적 경향) vs backwash(하류 침식) 비대칭 → 해빈 경사·berm 형성, swash-zone 표사. 기구: "상부 전빈(upper foreshore)·wave uprush 한계는 공극률이 높아 uprush 물이 모래로 스며들어 사면을 통해 backwash 로 빠져나간다 → backwash 의 부피 손실로 모래를 외해로 운반하는 능력이 떨어져 해빈면(beach face) 퇴적 기구가 된다"([coastal-processes-with-eng-apps] PAGE-18) |
+| **Runup** | 처오름 수직 한계. 설계·범람(Ru2%)에 핵심. **Ru2% = 사면에서 처오르는 파의 2%가 초과하는 처오름 수위**(wave run-up 의 공학 설계 파라미터)([coastal-structures-design] PAGE-20). run-up front velocity 는 max run-up level 의 약 15% 지점에서 시작해 30–40% 지점에서 최대([coastal-structures-design] PAGE-22). [`concepts/waves`](../waves/04-code-and-tools.md) + storm-surge 범람 wave setup |
 
 ## 3. 지배 파라미터
 
-- **Iribarren 수** $\xi = \tan\beta / \sqrt{H/L_0}$ (surf similarity) — swash 체계(반사/소산성)·bore-bore capture 확률 지배(§4.1)
+- **Iribarren 수(surf similarity / breaker parameter $\xi$)** $\xi = \tan\beta / \sqrt{H/L_0}$ — swash 체계(반사/소산성)·bore-bore capture 확률 지배(§4.1). Wijetunge 도 $\xi$ 를 "breaker parameter (surf similarity parameter)"로 명명·기호 사용([coastal-eng-intro-wijetunge] PAGE-27 nomenclature). *수식 형태·임계값 자체는 보유 page 에 미수록 → source-needed*
+- **Ru2%** — 처오름 수위 설계 파라미터(사면서 2% 초과). Rayleigh 분포 가정 시 Ru2% 로 전체 처오름 수위 분포 산출([coastal-structures-design] PAGE-20~21)
 - 해빈 경사 $\tan\beta$, 입사파 $H$·주기, 입자 관성(표사·debris)
 
 ## 4. 전이된 연구 (full PDF 직접 read 2026-06-18, verified)
