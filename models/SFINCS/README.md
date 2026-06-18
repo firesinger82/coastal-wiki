@@ -14,12 +14,12 @@
   - 실행파일: <https://download.deltares.nl/sfincs> · Docker `deltares/sfincs-cpu`
   - Python 빌더: HydroMT-SFINCS (<https://github.com/Deltares/hydromt_sfincs>)
 
-## 현재 상태 (2026-06-18 신규 생성)
+## 현재 상태 (2026-06-18 신규 생성 → 소스 전수 검수)
 
 - ✅ 공식 GitHub clone (`raw/source_code/sfincs/`, depth-1, 182 f90, GPL-3.0)
-- ✅ **source-analysis 1** ([architecture-source-map](source-analysis/sfincs-architecture-source-map.md)) — main→lib 시간루프(momentum/continuity)·코어 36 모듈 맵, file:line
+- ✅ **source-analysis 8** (전 코어 모듈, file:line + 적대 검증): architecture-source-map + **flow_solver**(reduced SWE momentum/continuity, Bates friction·CFL) + **subgrid_quadtree**(고속화) + **nonhydrostatic_wavemaker** + **boundaries_forcing**(spiderweb 태풍) + **snapwave**(연안 파·IG·Baldock) + **structures_physics** + **io_data**(BMI)
 - ✅ **web-refs 1** ([official-resources](web-refs/sfincs-official-resources.md))
-- ⬜ manual-notes (readthedocs user manual 발췌 — 후속), 모듈별 deep source-analysis (subgrid·quadtree·snapwave·momentum 등 — 후속 workflow)
+- ⬜ manual-notes (readthedocs user manual 발췌 — 후속)
 
 ## 소스 구조 (`raw/source_code/sfincs/source/`)
 
