@@ -34,5 +34,5 @@
 ## 본 위키 연계
 
 - 자매 모델: [`SFINCS`](../SFINCS/)(Deltares reduced-complexity compound flooding) — 동류 고속 침수. LISFLOOD-FP 는 솔버 스펙트럼(ACC reduced ~ DG2 full SWE)이 더 넓음.
-- 개념: [`concepts/storm-surge`](../../concepts/storm-surge/)(연안 침수)·향후 compound-flooding/inundation 토픽.
+- 개념(도메인 집): **[`concepts/compound-flooding`](../../concepts/compound-flooding/)** — 침수 모델 스펙트럼 hub([06-model-application](../../concepts/compound-flooding/06-model-application.md))에 LISFLOOD-FP(ACC~DG2) 등재. + [`concepts/storm-surge`](../../concepts/storm-surge/)(연안 침수).
 - full-physics [`ADCIRC`](../ADCIRC/)·[`Delft3D`](../Delft3D/) 대비 raster 기반 고속 범람. ACC(local inertia)=SFINCS reduced SWE 와 유사 계열.

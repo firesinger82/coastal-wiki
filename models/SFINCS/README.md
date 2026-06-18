@@ -33,6 +33,6 @@
 
 ## 본 위키 연계
 
-- 개념: [`concepts/storm-surge`](../../concepts/storm-surge/)(연안 침수·해일)·[`concepts/waves`](../../concepts/waves/)(SnapWave)·향후 compound-flooding 토픽
+- 개념(도메인 집): **[`concepts/compound-flooding`](../../concepts/compound-flooding/)** — SFINCS 가 정의적으로 속하는 복합침수 토픽([06-model-application](../../concepts/compound-flooding/06-model-application.md) 모델 스펙트럼 hub). + [`concepts/storm-surge`](../../concepts/storm-surge/)(해일)·[`concepts/waves`](../../concepts/waves/)(SnapWave)
 - 모델 비교: full-physics [`ADCIRC`](../ADCIRC/)·[`Delft3D`](../Delft3D/) 대비 reduced-complexity 고속 대안. ML emulator([`concepts/storm-surge/07-ml-emulators`](../../concepts/storm-surge/07-ml-emulators.md))와 함께 "고속 침수" 계열.
 - 자매 모델: [`LISFLOOD-FP`](../LISFLOOD-FP/)(Bristol/Sheffield reduced-complexity flood) — 동류 reduced-complexity inundation.
