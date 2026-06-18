@@ -7,9 +7,11 @@ authors: Andrei Dumitriu, Florin Tatui, Florin Miron, Radu Tudor Ionescu, Radu T
 published: 2025-04-03
 doi: https://doi.org/10.1109/CVPRW59228.2023.00133
 link: https://arxiv.org/abs/2504.02558v1
+promoted_to: concepts/rip-currents/01-concept.md
+promoted_date: 2026-06-18
 citation_status: draft-unsourced
 action: archive
-collected: 2026-06-07T00:00:45.695709+00:00
+collected: 2026-06-16T00:01:45.733167+00:00
 ---
 
 ## Abstract

@@ -7,9 +7,11 @@ authors: Andrei Dumitriu, Aakash Ralhan, Florin Miron, Florin Tatui, Radu Tudor 
 published: 2026-04-18
 
 link: https://arxiv.org/abs/2604.17070v2
+promoted_to: concepts/rip-currents/01-concept.md
+promoted_date: 2026-06-18
 citation_status: draft-unsourced
 action: archive
-collected: 2026-06-07T00:00:45.695579+00:00
+collected: 2026-06-16T00:01:45.732337+00:00
 ---
 
 ## Abstract
