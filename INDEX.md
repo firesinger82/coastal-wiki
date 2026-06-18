@@ -45,7 +45,7 @@
 
 | 예제 | 다루는 개념 | 사용 모델 | 상태 |
 |---|---|---|---|
-| (없음) | | | |
+| [swan-to-swash-nesting](examples/swan-to-swash-nesting/) | waves · swash-zone | SWAN → SWASH | ✅ 절차 템플릿 (2026-06-18, 검수 메커닉 기반: NGRID/NESTOUT→SwashBCspecfile SWAN 분기) |
 
 ## experience/ (검증 통과 경험)
 

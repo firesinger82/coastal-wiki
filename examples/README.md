@@ -20,10 +20,16 @@ examples/
 - 사용 모델·개념 명시: 상단에 `concepts/...`, `models/...` 링크.
 - 사용 textbook 자료는 `textbook/notes/...`로 인용.
 
-## 예제 후보
-
-(작업 시작 시 채울 자리)
+## 예제
 
 | 시나리오 | 다루는 개념 | 사용 모델 | 상태 |
 |---|---|---|---|
-| (없음) | | | |
+| [swan-to-swash-nesting](swan-to-swash-nesting/) | waves · swash-zone | SWAN → SWASH | ✅ 절차 템플릿 (검수 메커닉 기반, 정량 run 미수록) |
+
+## 후보 (다음)
+
+| 시나리오 | 다루는 개념 | 사용 모델 |
+|---|---|---|
+| adcirc-swan-surge-coupling | storm-surge · waves | ADCIRC + SWAN (radiation stress) |
+| khoa-surge-eva-pipeline | storm-surge · tides | utide → EVA (experience 연계) |
+| delft3d-flow-wave-morphology | sediment-transport · littoral-drift | Delft3D FLOW+WAVE+morphology |

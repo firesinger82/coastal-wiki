@@ -1,0 +1,45 @@
+!**********************************************************************
+! SWASH 니어쇼어(fine) run — SWAN 스펙트럼 경계 read → 위상해상 처오름
+! 명령 구조 근거: models/SWASH/manual-notes/swash-user-manual.md (§4)
+!                 models/SWASH/source-analysis/swash-boundary-spectral-transfer.md
+!                 models/SWASH/source-analysis/swash-wetting-drying-runup.md
+! <...> = 케이스별 치환 placeholder
+!**********************************************************************
+PROJECT 'nshr' '01'
+
+SET LEVEL=0.0 NAUTICAL
+MODE NONSTATIONARY TWODIMENSIONAL
+COORDINATES SPHERICAL CCM             ! SWAN coarse run과 동일 좌표계
+
+! --- 고해상 니어쇼어 계산격자 (수 m) ---
+CGRID REGULAR <xpc> <ypc> <alpc> <xlenc> <ylenc> <mxc> <myc>
+VERTICAL 3                            ! 다층(K=3) — 비정수압 분산 표현(층↑→깊은물 정확)
+
+! --- 수심 (고해상) ---
+INPGRID BOTTOM REGULAR <xpinp> <ypinp> 0 <mxinp> <myinp> <dxinp> <dyinp>
+READINP BOTTOM 1.0 'bathy_fine.bot' 3 0 FREE
+
+! --- ★ 경계: SWAN coarse 의 nest 스펙트럼 파일 read ---
+! SwashBCspecfile 의 SWAN-포맷 분기(:281-911)가 swan_spec.dat 를 파싱,
+! random-phase Fourier 성분으로 시계열 합성. (lnest = SWAN nesting)
+BOUND SHAPESPEC JONSWAP PEAK DSPR POWER
+BOUNDCOND SIDE N BTYPE WEAKREFL CONSTANT SPECFILE 'swan_spec.dat'
+!  ↑ 외해측(N) 경계에 SWAN 스펙트럼, weakly-reflective
+
+! --- 물리 ---
+BREAKING                              ! bore-front 쇄파 판정 (SwashBreakPoint)
+FRICTION MANNING 0.019
+NONHYDROSTATIC BOX 1.0                ! 비정수압 압력 projection (분산의 정의적 메커닉)
+
+! --- 수치 ---
+DISCRETIZATION UPWIND MOMENTUM
+TIMEINTEGRATION METHOD EXPLICIT 0.5   ! CFL 기반
+
+! --- 출력: 처오름·파고·침수 ---
+QUANTITY RUNUP                        ! SwashRunupHeight
+POINTS 'gauge' FILE 'gauges.loc'
+TABLE 'gauge' HEADER 'runup.tbl' TSEC WATLEV RUNUP
+BLOCK 'COMPGRID' NOHEADER 'hsig.mat' LAY-OUT 3 HSIG SETUP
+
+COMPUTE <tstart> <dt> <tend>
+STOP

@@ -1,0 +1,40 @@
+$**********************************************************************
+$ SWAN 광역(coarse) run — SWASH nesting 경계 스펙트럼 생성
+$ 명령 구조 근거: models/SWAN/manual-notes/swan-command-setup-grid-reference.md
+$                 models/SWAN/source-analysis/swan-nesting-io-implementation.md
+$ <...> = 케이스별 치환 placeholder (수심·바람·도메인)
+$**********************************************************************
+PROJECT 'nest' '01'
+
+SET LEVEL=0.0 NAUTICAL                 $ datum, 방향관례(nautical)
+MODE NONSTATIONARY TWODIMENSIONAL      $ 비정상 2D
+
+COORDINATES SPHERICAL CCM             $ 또는 CARTESIAN (SWASH와 동일해야 함)
+
+$ --- 광역 계산격자 (저해상) ---
+CGRID REGULAR <xpc> <ypc> <alpc> <xlenc> <ylenc> <mxc> <myc> &
+      CIRCLE 36 0.04 1.0 31             $ 36 방향, 0.04~1.0 Hz, 31 freq bin
+
+$ --- 수심 입력 ---
+INPGRID BOTTOM REGULAR <xpinp> <ypinp> 0 <mxinp> <myinp> <dxinp> <dyinp>
+READINP BOTTOM 1.0 'bathy_coarse.bot' 3 0 FREE
+
+$ --- 바람 입력 (예: 균일/격자) ---
+INPGRID WIND ...
+READINP WIND 1.0 'wind.dat' ...
+
+$ --- 외해 경계파 (관측/전구모델/JONSWAP) ---
+BOUNDSPEC SIDE N CONSTANT PAR <hs> <tp> <dir> <dd>
+
+$ --- 물리 (3세대) ---
+GEN3 WESTHUYSEN
+BREAKING
+FRICTION JONSWAP 0.038
+
+$ --- ★ nesting 출력: SWASH 도메인 위치에 nest 격자 + 스펙트럼 writer ---
+NGRID 'nst' <xpn> <ypn> <alpn> <xlenn> <ylenn> <mxn> <myn>   $ swanpre2.ftn:794
+NESTOUT 'nst' 'swan_spec.dat' OUTPUT <tbeg> <delt> <unit>     $ swanpre2.ftn:1984
+$  → swan_spec.dat = SWAN-포맷 2D 스펙트럼 시간열 (SWASH 입력)
+
+COMPUTE NONSTATIONARY <tstart> <dt> <tend>
+STOP
