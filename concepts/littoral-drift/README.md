@@ -9,7 +9,7 @@
 | `README.md` | self (governance) | 이 파일 |
 | `01-concept.md` | **verified** | 정의·driver (radiation stress·longshore current)·empirical formula (CERC/Komar)·budget·한국 적용 |
 | `02-theory.md` | **verified** | radiation stress 유도 (Holthuijsen §7.4.2 eq 7.4.1-9) + set-down/set-up (§7.4.3 eq 7.4.22-27) + longshore current 유도 (Bowen 1969 + Battjes 1974 quadratic friction 확장) |
-| `03-analysis-methods.md` | (미생성) | sediment budget (control volume), tracer 실험, beach profile survey |
+| `03-analysis-methods.md` | ✅ **verified** (2026-06-18) | 산정 공식·방법 — CERC Eq(138) 계수 0.023 + Kamphuis(1991) 입경/경사/주기 의존(식 본체 source-needed) + Damgaard-Soulsby Eq(139) bedload + sediment budget(cell in−out) + one-line shoreline 변화 (Soulsby §10.5·§11.1, Dean-Dalrymple §10.5 F_y) |
 | `04-code-and-tools.md` | ✅ **verified** (2026-06-18) | 연안표사 수치모델 — one-line(GENESIS/LITPACK source-needed) + process-based 검수노트 cross-link(Delft3D iform tram*·XBeach transus·EFDC SEDZLJ·ROMS WEC_VF/CSTMS) |
 | `05-examples.md` | (미생성) | 한국 안목항·울산항·태안 longshore drift 사례 |
 | `06-model-application.md` | ✅ **verified** (2026-06-18) | 4-모델 longshore drift link-hub — radiation stress→longshore current→sediment flux→morphology, 검수 source-analysis 연결 |

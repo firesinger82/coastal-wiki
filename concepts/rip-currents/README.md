@@ -13,7 +13,8 @@
 | 파일 | 상태 | 비고 |
 |---|---|---|
 | `README.md` | self (governance) | 이 파일 |
-| `01-concept.md` | **source-needed** (탐지 §4 full-PDF verified) | 정의·위험·유형·시각signature + ML 탐지 벤치마크(RipVIS·RipSeg·RipDetSeg·YOLOv8). 형성 mechanism taxonomy 는 교과서(MacMahan 2006·Dalrymple 2011) page 미보유 source-needed |
+| `01-concept.md` | **source-needed** (탐지 §4 full-PDF verified) | 정의·위험·유형·시각signature + ML 탐지 벤치마크(RipVIS·RipSeg·RipDetSeg·YOLOv8). |
+| `02-theory.md` | ✅ **verified** (2026-06-18) | 형성 mechanism(쇄파 alongshore 변동→superelevation∝H→보상 seaward flow)·유형·간격·edge wave — textbook 인용(mechanics-of-sediment-transport p.764-766·stewart p.309-310·coastal-eng-guidelines p.91). flash rip·shear instability 정량은 source-needed |
 
 ## 출처 원칙
 
