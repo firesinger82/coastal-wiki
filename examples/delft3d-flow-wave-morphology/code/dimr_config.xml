@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- DIMR 결합 제어 — FLOW(flow2d3d) ↔ WAVE(SWAN) online coupling
+     근거: models/Delft3D/source-analysis/delft3d_dimr_coupling.md
+           wave/delft3d_flow_wave_coupling.md (COM 파일·itcomi 결합주기)
+     ⚠ 대표 구조 템플릿 — 정확 스키마는 Delft3D DIMR 매뉴얼 참조 -->
+<dimrConfig xmlns="http://schemas.deltares.nl/dimr">
+  <control>
+    <!-- FLOW 과 WAVE 를 결합 시간창마다 교대 실행 (parallel/start 블록) -->
+    <parallel>
+      <startGroup>
+        <time>0 <!--start--> 60 <!--coupling interval [s] = itcomi--> 86400 <!--end--></time>
+        <start name="flow"/>
+        <start name="wave"/>
+      </startGroup>
+    </parallel>
+  </control>
+
+  <component name="flow">
+    <library>flow2d3d</library>
+    <workingDir>.</workingDir>
+    <inputFile>flow.mdf</inputFile>
+  </component>
+
+  <component name="wave">
+    <library>wave</library>
+    <workingDir>.</workingDir>
+    <inputFile>wave.mdw</inputFile>
+  </component>
+  <!-- FLOW↔WAVE 는 COM 파일(com-<runid>.dat)로 필드 교환:
+       WAVE→FLOW: Hs/Tp/dir + radiation stress(wsu/wsv/fxw/fyw)
+       FLOW→WAVE: water level + current (online, WaveOL flag) -->
+</dimrConfig>

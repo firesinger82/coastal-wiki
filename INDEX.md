@@ -51,6 +51,7 @@
 | [swan-to-swash-nesting](examples/swan-to-swash-nesting/) | waves · swash-zone | SWAN → SWASH | ✅ 절차 템플릿 (2026-06-18, 검수 메커닉 기반: NGRID/NESTOUT→SwashBCspecfile SWAN 분기) |
 | [khoa-surge-eva-pipeline](examples/khoa-surge-eva-pipeline/) | storm-surge · tides | utide → EVA | ✅ 재현 절차 (2026-06-18, KHOA 조위→utide 잔차→Gumbel/GEV/POT/RFA, experience 귀속) |
 | [adcirc-swan-surge-coupling](examples/adcirc-swan-surge-coupling/) | storm-surge · waves · compound-flooding | ADCIRC + SWAN | ✅ 절차 템플릿 (2026-06-18, 비정형 tightly-coupled surge+wave radiation stress, 검수 노트 근거) |
+| [delft3d-flow-wave-morphology](examples/delft3d-flow-wave-morphology/) | sediment-transport · littoral-drift | Delft3D FLOW+WAVE+MOR | ✅ 절차 템플릿 (2026-06-18, online morphology MORFAC·Exner bott3d·COM 결합 wsu/fxw, 검수 노트 근거) |
 
 ## experience/ (검증 통과 경험)
 
