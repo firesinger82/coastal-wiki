@@ -7,11 +7,11 @@ authors: Julian R. Rice, Karthik Balaguru, Fadia Ticona Rollano, John Wilson, Br
 published: 2025-06-16
 doi: https://doi.org/10.1088/1748-9326/adfd74
 link: https://arxiv.org/abs/2506.13963v1
+promoted_to: concepts/storm-surge/07-ml-emulators.md
+promoted_date: 2026-06-18
 citation_status: draft-unsourced
 action: archive
-collected: 2026-06-14T00:01:10.131929+00:00
-promoted_to: concepts/storm-surge/07-ml-emulators.md#71
-promoted_date: 2026-06-15
+collected: 2026-06-16T00:01:44.600574+00:00
 ---
 
 ## Abstract

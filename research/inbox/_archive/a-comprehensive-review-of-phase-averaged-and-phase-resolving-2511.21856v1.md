@@ -7,11 +7,11 @@ authors: Md Meftahul Ferdaus, Nathan Alton Cooper, Austin B. Schmidt, Pujan Pokh
 published: 2025-11-26
 
 link: https://arxiv.org/abs/2511.21856v1
+promoted_to: models/SWAN/web-refs/swan-ml-surrogate-models.md
+promoted_date: 2026-06-18
 citation_status: draft-unsourced
 action: archive
-collected: 2026-06-07T00:00:30.413735+00:00
-promoted_to: concepts/waves/04-code-and-tools.md#51
-promoted_date: 2026-06-15
+collected: 2026-06-16T00:01:34.039949+00:00
 ---
 
 ## Abstract

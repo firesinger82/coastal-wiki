@@ -7,11 +7,11 @@ authors: Kazbek Kazhyken, Juha Videman, Clint Dawson
 published: 2020-10-11
 doi: https://doi.org/10.1016/j.cma.2021.113684
 link: https://arxiv.org/abs/2010.06167v1
+promoted_to: concepts/littoral-drift/04-code-and-tools.md
+promoted_date: 2026-06-18
 citation_status: draft-unsourced
 action: archive
-collected: 2026-06-07T00:00:34.163587+00:00
-promoted_to: concepts/sediment-transport/04-code-and-tools.md#10.1
-promoted_date: 2026-06-15
+collected: 2026-06-16T00:01:36.801077+00:00
 ---
 
 ## Abstract
