@@ -25,7 +25,7 @@ verification_date: 2026-05-21
 
 ## 2. EFDC SED (사용자 주력)
 
-> **Canonical**: [`models/EFDC/`](../../models/EFDC/) (현재 stub) + `efdc-sed-trans-2003` source (`textbook/md/86899804-EFDC-Theory-Tech-Aspects-of-Sed-Trans-2003-05.md`).
+> **Canonical**: [`models/EFDC/`](../../models/EFDC/) (source-analysis 30 verified: [[../../models/EFDC/source-analysis/sediment/efdc_sediment]]·[[../../models/EFDC/source-analysis/sediment/efdc_sedzlj]]) + `efdc-sed-trans-2003` source (`textbook/md/86899804-EFDC-Theory-Tech-Aspects-of-Sed-Trans-2003-05.md`).
 
 ### 2.1 EFDC 표사이동 이론 — Tech Aspects (2003)
 
@@ -78,7 +78,7 @@ verification_date: 2026-05-21
 - D-Morphology 모듈
 - Sand + mud transport 통합
 
-→ [`models/Delft3D/`](../../models/Delft3D/) (stub).
+→ [`models/Delft3D/`](../../models/Delft3D/) (source-analysis 38 verified: [[../../models/Delft3D/source-analysis/delft3d_sediment_transport_formulae]]·[[../../models/Delft3D/source-analysis/delft3d_sediment_morphology]]).
 
 ## 4. CSTMS / COAWST
 

@@ -12,7 +12,7 @@ verification_date: 2026-05-21
 
 # 파랑 — 04 코드와 도구
 
-본 페이지: 분석·예측·예보 도구. 모델별 입력 카드·메뉴얼은 `models/<model>/`이 canonical (현재 SWAN만 stub 존재).
+본 페이지: 분석·예측·예보 도구. 모델별 입력 카드·메뉴얼은 `models/<model>/`이 canonical (SWAN·XBeach·Delft3D·FUNWAVE·SWASH·Celeris 모두 source-analysis 전수 검수 완료, 2026-06).
 
 ## 1. 도구·모델 비교
 
@@ -162,7 +162,7 @@ WW3 SMC (Spherical Multi-Cell) nested grid 운영 시 boundary point mismatch �
 - Avalanching of dune fronts
 - 비점착성 sediment transport + 지형 변화 (morphological)
 
-XBeach 상세: [`models/XBeach/`](../../models/XBeach/) (현재 stub).
+XBeach 상세: [`models/XBeach/`](../../models/XBeach/) (source-analysis 32 + manual-notes 4 verified).
 
 ## 5. 기타 도구
 

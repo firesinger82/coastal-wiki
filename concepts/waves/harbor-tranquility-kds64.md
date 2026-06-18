@@ -3,7 +3,7 @@ title: "항만 정온도(harbor tranquility) 설계 표준 — KDS 64 + SWAN 실
 topic: waves
 canonical_source: self
 citation_status: verified
-source: "KDS 64 원문 직접 확인 (opendataloader-pdf 변환본 [[standards/kds-64/]], 2026-06-13): 반사율=KDS 64 10 10 참고표 4.3-4(Seelig·Ahrens 1981); 정온 기준파고=KDS 64 40 10 해설표 4.3-1(어선박지 사용가능 최대파고). [2026-06-15 §4.2/4.3 정량값 추가: 하역한계파고 해설표 4.2-4(日本港灣協會 1989, 소형 0.3/중대형 0.5/초대형 0.7~1.5m)·하역vs계류 개념 해설표 4.2-3·선체동요 권고기준 참고표 4.2-1(PIANC 2023, Surge/Sway/Heave/Yaw/Pitch/Roll) — kds-64-40-10-수역시설.md:477-544 직접 추출.] SWAN 정온도 표준 실무=한국 항만설계 관행. ※율포항 항-특정 내용 제거(2026-06-13). ※초판의 '기준파고 미존재' 정정은 오류였음(pdftotext 표 누락) — opendataloader-pdf로 표 확인."
+source: "KDS 64 원문 직접 확인 (opendataloader-pdf 변환본 `standards/kds-64/`, 2026-06-13): 반사율=KDS 64 10 10 참고표 4.3-4(Seelig·Ahrens 1981); 정온 기준파고=KDS 64 40 10 해설표 4.3-1(어선박지 사용가능 최대파고). [2026-06-15 §4.2/4.3 정량값 추가: 하역한계파고 해설표 4.2-4(日本港灣協會 1989, 소형 0.3/중대형 0.5/초대형 0.7~1.5m)·하역vs계류 개념 해설표 4.2-3·선체동요 권고기준 참고표 4.2-1(PIANC 2023, Surge/Sway/Heave/Yaw/Pitch/Roll) — kds-64-40-10-수역시설.md:477-544 직접 추출.] SWAN 정온도 표준 실무=한국 항만설계 관행. ※율포항 항-특정 내용 제거(2026-06-13). ※초판의 '기준파고 미존재' 정정은 오류였음(pdftotext 표 누락) — opendataloader-pdf로 표 확인."
 note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-12
 ---

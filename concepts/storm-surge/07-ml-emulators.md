@@ -494,7 +494,7 @@ arxiv:2605.13761v1 (2026-05-13, Si·Qiu·Sallam·Feinstein·He·Yan·Chen, 32p).
 - LSTM / sequence model station-level surge (StormNet baseline 류, Tiggeloven et al. 미확인)
 - PINN (physics-informed) for SWE / ensemble downscaling(GCM→local) / storm-track conditioned(GAHM→ML)
 
-추적: `research/watchlist/` 에 ML emulator author + arxiv cs.LG ∩ physics.ao-ph 카테고리 등록 후보. 현재 [[../../research/watchlist/repo-myroms-roms]] · [[../../research/watchlist/repo-noaa-emc-ww3]] 등 model repo 위주 — `topic-ml-storm-surge-emulators.md` 신설은 [[reference-next-session-candidates]] 우선순위 3 옵션.
+추적: `research/watchlist/` 에 ML emulator author + arxiv cs.LG ∩ physics.ao-ph 카테고리 등록 후보. 현재 [[../../research/watchlist/repo-myroms-roms]] · [[../../research/watchlist/repo-noaa-emc-ww3]] 등 model repo 위주 — `topic-ml-storm-surge-emulators.md` 신설은 향후 후보.
 
 ## 8. 연결
 

@@ -33,7 +33,7 @@ related:
 
 - **FUNWAVE-TVD** — [[../../models/FUNWAVE/README]]. 완전비선형 Boussinesq, TVD shock-capturing, wetting-drying 로 surf~swash 처오름. ✅ swash-handling 검수: [[../../models/FUNWAVE/source-analysis/funwave-flux-tvd]](TVD flux + **wetting-drying MASK** 처리)·[[../../models/FUNWAVE/source-analysis/funwave-physics-sources]](breaking·bottom friction). GPU(Blackwell, cuSPARSE v2) 빌드 검증됨([[../../models/FUNWAVE/source-analysis/funwave-gpu-cuda-port]]). 위상해상 정온/처오름 정밀 티어.
 - **Green-Naghdi DG (Kazhyken·Videman·Dawson 2020)** — arxiv:[2005.00920](https://arxiv.org/abs/2005.00920)(morphodynamic) · [2010.06167](https://arxiv.org/abs/2010.06167)(sediment-morpho). Strang splitting 으로 surf zone 등에서 분산항 끄기 → **swash zone 까지 hydrodynamic 해상**. bed morphodynamic 결합. [`sediment-transport/04 §10.1`](../sediment-transport/04-code-and-tools.md) 중복 등재.
-- **Celeris** — [[../../models/Celeris/README]](STUB). WebGPU 실시간 interactive Boussinesq.
+- **Celeris** — [[../../models/Celeris/README]] (source-analysis 9 verified: boussinesq-solver·breaking·fv-reconstruction·webgpu-infra). WebGPU 실시간 interactive Boussinesq.
 
 ## 3. 비정수압 — SWASH ✅ ([[../../models/SWASH/README]] 수록)
 

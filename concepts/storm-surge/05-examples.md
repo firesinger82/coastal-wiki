@@ -21,7 +21,7 @@ related:
 
 > 본 §는 한국에 큰 영향을 준 두 태풍 case 의 cross-reference 노트. **실측 surge peak 수치는 KHOA Annual Report 직접 fetch 후 verified 로 승격 가능 — 현재 source-needed**. 도구·workflow·식 계산은 본 위키 내 verified 자료 인용.
 >
-> **본 노트의 정직성 원칙** (M2 rule, [[reference-next-session-candidates]] 의 efdc-chuksan-sediment 패턴):
+> **본 노트의 정직성 원칙** (M2 rule, efdc-chuksan-sediment 패턴):
 > - 본 위키 안에서 verified 인 자료 (Pugh 식, ADCIRC source-analysis, KHOA OpenAPI workflow) 만 직접 인용
 > - 외부 실측 수치 (관측 surge, Best Track 중심기압 절대값, 침수 면적) 는 source 만 명시하고 본 위키 안에서 verified 처리 안 함
 > - 본 위키 02-theory.md 의 표 ([§2.2 한국 적용](02-theory.md#22-한국-적용--태풍-ib-surge)) 의 950/920 mb 도 원본 출처 (KMA·JMA RSMC) fetch 후 별도 검증 필요
@@ -203,7 +203,7 @@ KHOA OpenAPI `surveyTideLevel` 은 archive **~1년 rolling** ([04-code-and-tools
 | [04-code-and-tools.md §1.2](04-code-and-tools.md#12-한국-운영-워크플로--nws13-jma-msm) | NWS=13 JMA-MSM 표준 워크플로 |
 | [04-code-and-tools.md §4.1 KHOA](04-code-and-tools.md#41-실시간-조위-관측) | residual surge 추출 |
 | [`adcirc-jma-msm-nws13-foundation.md`](../../models/ADCIRC/source-analysis/storm-surge/adcirc-jma-msm-nws13-foundation.md) | source-code level NetCDF reader |
-| [[experience-khoa-2024-mhw-extreme]] | 동해 marine heatwave + 태풍 강도화 cascade |
+| [[khoa-2024-mhw-extreme]] | 동해 marine heatwave + 태풍 강도화 cascade |
 
 ---
 
@@ -228,8 +228,8 @@ KHOA OpenAPI `surveyTideLevel` 은 archive **~1년 rolling** ([04-code-and-tools
 
 본 위키 [01-concept.md §3.3 SLR + SST 강화 + storm surge cascade](01-concept.md#33-slr--sst-강화--storm-surge-의-climate-cascade):
 
-- Maemi (2003) 시점의 한국 MSL 대비 Hinnamnor (2022) 는 약 **+7.5 cm** 누적 (3.94 mm/yr × 19년, [[experience-khoa-annual-climate-trend]])
-- 동시 SST 가속 (동해 +0.30°C/decade 등, [[experience-khoa-sst-warming-trend]]) → 태풍 강도화 가능성
+- Maemi (2003) 시점의 한국 MSL 대비 Hinnamnor (2022) 는 약 **+7.5 cm** 누적 (3.94 mm/yr × 19년, [[khoa-annual-climate-trend]])
+- 동시 SST 가속 (동해 +0.30°C/decade 등, [[khoa-sst-warming-trend]]) → 태풍 강도화 가능성
 - → 같은 surge magnitude 라도 **effective inundation level 은 매년 증가** — 100년 누적 시 +40 cm baseline 상승
 
 → 본 위키의 SLR + SST experience 노트는 storm-surge case 분석의 climate boundary condition.
@@ -294,7 +294,7 @@ ADCIRC 가 한국 storm-surge 의 primary unstructured 모델이라면, **EFDC+ 
 
 → **남은 진행 권장**: **3 (Maemi 2003 대체 source)** + **2 (KMA Best Track 직접)** — Hinnamnor §2 는 verified 완료, Maemi §1 만 source-needed 유지.
 
-> **note**: [[experience-khoa-tide-surge-coupling]] ([[reference-next-session-candidates]] C3) 는 **archive 한계로 1년 이내 storm event 만 verified 가능**. Hinnamnor 2022 verification 은 KHOA Annual Report PDF 인용 경로로 변경 필요.
+> **note**: tide-surge coupling 경험노트(`experience/khoa-tide-surge-coupling.md` 미작성)는 **archive 한계로 1년 이내 storm event 만 verified 가능**. Hinnamnor 2022 verification 은 KHOA Annual Report PDF 인용 경로로 변경 필요.
 
 ---
 
@@ -328,9 +328,9 @@ ADCIRC 가 한국 storm-surge 의 primary unstructured 모델이라면, **EFDC+ 
 - [`06-model-application.md`](06-model-application.md) (미생성) — ADCIRC primary, Delft3D-FLOW·SCHISM 비교
 - [`models/ADCIRC/source-analysis/storm-surge/`](../../models/ADCIRC/source-analysis/storm-surge/) — 7개 NWS source-code 분석
 - [[efdc-theory-v12-ch2-hydrodynamics]] §2.4 — wind drag (storm-surge Table 2.2 의 Garratt 1977 referenced)
-- [[experience-khoa-annual-climate-trend]] — SLR baseline
-- [[experience-khoa-sst-warming-trend]] — SST 가속 + 태풍 강도화
-- [[experience-khoa-2024-mhw-extreme]] — 동해 marine heatwave 와 typhoon coupling
+- [[khoa-annual-climate-trend]] — SLR baseline
+- [[khoa-sst-warming-trend]] — SST 가속 + 태풍 강도화
+- [[khoa-2024-mhw-extreme]] — 동해 marine heatwave 와 typhoon coupling
 
 ---
 
@@ -338,4 +338,4 @@ ADCIRC 가 한국 storm-surge 의 primary unstructured 모델이라면, **EFDC+ 
 
 - citation_status **source-needed** — 본 위키 내부 자료 cross-ref 는 verified 이나, 외부 실측 수치 (중심기압 절대값, 관측 surge peak) 는 직접 fetch 미실시. 위 §5 의 보강 우선순위 따라 점진 승격 가능.
 - 작성 의도: storm-surge concept layer 의 **case dimension** 채움. ADCIRC source-analysis 7개 노트 + Pugh equation + KHOA workflow 의 통합 적용 entry point.
-- 산타-method 비례성 ([[feedback-santa-method-proportionality]]) 적용 — 1 노트로 두 case + cross-comparison + 보강 우선순위까지 묶음.
+- 산타-method 비례성 적용 — 1 노트로 두 case + cross-comparison + 보강 우선순위까지 묶음.

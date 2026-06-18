@@ -3,7 +3,7 @@ title: "파랑 — 06 모델 적용 (SWAN · WW3 · XBeach · Delft3D-WAVE)"
 topic: waves
 canonical_source: self
 citation_status: verified
-verification_method: "AI cross-reference. SWAN 부분은 [models/SWAN/manual-notes/swan-action-balance.md] + [source-analysis/wink-pattern.md] verified로 검증. WW3/XBeach/Delft3D는 외부 공식 source (WebSearch 2026-05-21) 인용. 다른 모델 디테일은 해당 models/<model>/ 채워지면 보강."
+verification_method: "AI cross-reference. SWAN 부분은 [models/SWAN/manual-notes/swan-action-balance.md] + [source-analysis/wink-pattern.md] verified로 검증. **2026-06-18 갱신**: SWAN(29 SA+29 manual)·XBeach(32 SA)·Delft3D(38 SA)·FUNWAVE·Celeris 전수 검수 완료 — 'stub' stale 참조를 검수 source-analysis cross-link 로 정정(staleness sweep). WW3 만 미수록(models/WW3/ 미생성, research/watchlist 추적). 외부 공식 source 인용분(2026-05-21)은 유지."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-21
 verification_by: "Claude Opus 4.7 (1M context) — cross-ref"
@@ -19,11 +19,11 @@ verification_date: 2026-05-21
 | 도메인 | 권장 모델 | Canonical |
 |---|---|---|
 | 대양·전 지구 hindcast | **WAVEWATCH III (WW3)** | [`models/`](../../models/) WW3 dir 미생성 (TBD) |
-| 한국 연안 spectral (천해) | **SWAN** | [`models/SWAN/`](../../models/SWAN/) ← STUB |
+| 한국 연안 spectral (천해) | **SWAN** | [`models/SWAN/`](../../models/SWAN/) (STABLE, source-analysis 29 + manual-notes 29) |
 | 천해 + 흐름 결합 (조류 영향) | SWAN with currents | 같음 |
-| 폭풍 침식·범람 | **XBeach** | [`models/XBeach/`](../../models/XBeach/) (stub) |
+| 폭풍 침식·범람 | **XBeach** | [`models/XBeach/`](../../models/XBeach/) (source-analysis 32 verified) |
 | 항만 정온도·공명·다중반사 | 위상해상 Boussinesq (**FUNWAVE**·**Celeris**) / mild-slope (**ARTEMIS**) | [`models/FUNWAVE/`](../../models/FUNWAVE/) · [`models/Celeris/`](../../models/Celeris/) — §1.1 |
-| 통합 풍파·조석·표사 시뮬 | Delft3D-WAVE + FLOW | [`models/Delft3D/`](../../models/Delft3D/) (stub) |
+| 통합 풍파·조석·표사 시뮬 | Delft3D-WAVE + FLOW | [`models/Delft3D/`](../../models/Delft3D/) (source-analysis 38 verified) |
 
 ### 1.1 항만 정온도 (harbor agitation/tranquility) — 모델 선택 trade-off
 
@@ -104,7 +104,7 @@ Layer 3: SWAN detail (사용자 정의, ~50-100 m, 항만·연안)
 
 ## 5. XBeach
 
-> Canonical: [`models/XBeach/`](../../models/XBeach/) (stub)
+> Canonical: [`models/XBeach/`](../../models/XBeach/) (source-analysis 32 + manual-notes 4 verified) — [[../../models/XBeach/source-analysis/xbeach_wave_action_balance]](surfbeat)·[[../../models/XBeach/source-analysis/xbeach_nonh]]·[[../../models/XBeach/source-analysis/xbeach_morphology]]
 
 - 폭풍 침식·범람 사례 (10²-10³ km² 도메인, 시간 1-7 일)
 - 입력: 외부 spectrum (SWAN 출력 또는 직접 measurement)
@@ -112,7 +112,7 @@ Layer 3: SWAN detail (사용자 정의, ~50-100 m, 항만·연안)
 
 ## 6. Delft3D-WAVE (D3D-4 또는 FM)
 
-> Canonical: [`models/Delft3D/`](../../models/Delft3D/) (stub)
+> Canonical: [`models/Delft3D/`](../../models/Delft3D/) (source-analysis 38 + manual-notes 9 verified) — [[../../models/Delft3D/source-analysis/delft3d_wave_swan_module]]·[[../../models/Delft3D/source-analysis/wave/delft3d_flow_wave_coupling]]·[[../../models/Delft3D/manual-notes/delft3d-wave-user-manual]]
 
 - D3D-4 WAVE = SWAN 통합 (Delft3D-FLOW + WAVE coupling)
 - Delft3D FM (WAVE 부분 D-Waves)
@@ -165,10 +165,10 @@ Layer 3: SWAN detail (사용자 정의, ~50-100 m, 항만·연안)
 
 - `01`~`05` — 도메인 지식
 - 모델별 canonical (`models/`):
-  - [`models/SWAN/`](../../models/SWAN/) (stub, 활발히 작성 예정)
-  - `models/WW3/` (미생성)
-  - [`models/XBeach/`](../../models/XBeach/) (stub)
-  - [`models/Delft3D/`](../../models/Delft3D/) (stub)
+  - [`models/SWAN/`](../../models/SWAN/) (STABLE, source-analysis 29 + manual-notes 29)
+  - `models/WW3/` (미생성 — research/watchlist/repo-noaa-emc-ww3 추적)
+  - [`models/XBeach/`](../../models/XBeach/) (source-analysis 32 verified)
+  - [`models/Delft3D/`](../../models/Delft3D/) (source-analysis 38 verified)
 - 소스 노트:
   - [`textbook/notes/waves-holthuijsen-toc.md`](../../textbook/notes/waves-holthuijsen-toc.md) — Holthuijsen Ch.9 SWAN canonical
 - 외부:
