@@ -5,7 +5,7 @@ promoted_date: 2026-05-24
 promote_phase: 2a
 classification: manual-notes-catalog
 source_id: models/XBeach
-notes: "P2 catalog audit 2026-05-24 — xbeach.readthedocs.io 공식 docs URL audit confirmed via WebFetch (examples.html: DELILAH 2D directional spreading + Holland Coast 1976 storm morfac=1 모두 local note 인용과 일치). Mixed local /mnt/e/ + 외부 공식 URL — primary citation = readthedocs"
+notes: "P2 catalog audit 2026-05-24 — xbeach.readthedocs.io 공식 docs URL audit confirmed via WebFetch (examples.html: DELILAH 2D directional spreading + Holland Coast 1976 storm morfac=1 모두 local note 인용과 일치). Mixed local  + 외부 공식 URL — primary citation = readthedocs"
 ---
 # XBeach Local Manual Stack
 
@@ -18,9 +18,9 @@ notes: "P2 catalog audit 2026-05-24 — xbeach.readthedocs.io 공식 docs URL au
 - year: mixed; official docs are active and the local note targets XBeach v1.24 Halloween
 - link: https://xbeach.readthedocs.io/en/latest/
 - local path:
-  - /mnt/e/numerical_models/xbeach/XBEACH_MANUAL.md
-  - /mnt/e/numerical_models/xbeach/src/doc/manual/XBeach_manual_master.pdf
-  - /mnt/e/numerical_models/xbeach/src/doc/manual/XBeach_manual_kingsday.pdf
+  - numerical_models/xbeach/XBEACH_MANUAL.md
+  - numerical_models/xbeach/src/doc/manual/XBeach_manual_master.pdf
+  - numerical_models/xbeach/src/doc/manual/XBeach_manual_kingsday.pdf
 
 ## Why This Matters
 

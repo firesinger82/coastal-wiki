@@ -220,4 +220,4 @@ Code's explicit recommendation: **"We prefer that you use GEN3 BABANIN"** (`swan
 
 ## Provenance
 
-Generated 2026-05-03 from Codex `gpt-5.3-codex` analysis of `/mnt/e/models/swan/source_code/swan/src`. Auto-draft = false; review_required = true.
+Generated 2026-05-03 from Codex `gpt-5.3-codex` analysis of `models/swan/source_code/swan/src`. Auto-draft = false; review_required = true.

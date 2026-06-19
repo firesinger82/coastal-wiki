@@ -20,7 +20,7 @@ This is the level of detail required to debug: "why does my SWAN run blow up at 
 
 ## Source basis
 
-- **Codex deep code analysis** of `/mnt/e/models/swan/source_code/swan/src/{swancom1,swancom5,swanmain}.ftn` — 2026-05-06.
+- **Codex deep code analysis** of `models/swan/source_code/swan/src/{swancom1,swancom5,swanmain}.ftn` — 2026-05-06.
 - **Manual cross-reference** from swantech ch.3 (Numerical approaches), `[file=website:swan:node29]` Numerics.
 
 ## A. Main sweep loop (4-quadrant directional sweeping)
@@ -231,7 +231,6 @@ This is **pointwise** solver convergence, distinct from the global stationary st
 - **Reading `AC1` thinking it's the answer** — it's the previous time step. `AC2` is current.
 - **Running stationary with `MODE NONSTAT` or vice versa** — `SWCOMP` handles both but the time-term contribution from `AC1` is wrong if mode/COMPUTE mismatch.
 - **Implicit sigma path under high refraction** — `SWSIP` can stall. Switch to explicit `SIGEXPL` and accept smaller time step.
-- ▢ **User-experience cases** — placeholder for project-specific incidents.
 
 ## Next expansion
 
@@ -248,7 +247,7 @@ This is **pointwise** solver convergence, distinct from the global stationary st
 - `src/swancom1.ftn` — `SWCOMP`, `SWOMPU`, `ACTION`, `SACCUR`, `SWSTPC`, `PHILIM`, `HJLIM`, `SWSIP`, `SWSOR`.
 - `src/swancom5.ftn` — `STRSXY`, `STRSD`, `STRSSI`, `STRSSB`, `SWFLXD`, `SPROSD`.
 - `src/swanmain.ftn` — outer time-step loop, structured/unstructured dispatch.
-- Inventory of all subroutines: `[file=/mnt/e/models/swan/manuals/refs/subroutines.md]`.
+- Inventory of all subroutines: `[file=models/swan/manuals/refs/subroutines.md]`.
 
 ### Manual cross-reference
 

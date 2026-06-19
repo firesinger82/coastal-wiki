@@ -176,4 +176,4 @@ Applied to every substance weight in every active particle (`rdpart.f90:1820-182
 
 ## Provenance
 
-Generated 2026-05-03 from Codex `gpt-5.3-codex` analysis of `/mnt/e/models/delft3d/source_code/Delft3D/src/engines_gpl/part`. Auto-draft = false; review_required = true.
+Generated 2026-05-03 from Codex `gpt-5.3-codex` analysis of `models/delft3d/source_code/Delft3D/src/engines_gpl/part`. Auto-draft = false; review_required = true.

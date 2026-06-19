@@ -190,4 +190,4 @@ WAVE hotstart uses SWAN hotfiles:
 
 ## Provenance
 
-Generated 2026-05-03 from Codex `gpt-5.3-codex` analysis of `/mnt/e/models/delft3d/source_code/Delft3D/src/engines_gpl`. Auto-draft = false; review_required = true.
+Generated 2026-05-03 from Codex `gpt-5.3-codex` analysis of `models/delft3d/source_code/Delft3D/src/engines_gpl`. Auto-draft = false; review_required = true.

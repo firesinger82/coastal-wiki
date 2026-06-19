@@ -20,7 +20,7 @@ ST6/Babanin is in a separate file (`SdsBabanin.ftn90`) — see `swan-st6-babanin
 
 ## Source basis
 
-Codex deep scan 2026-05-06 of `/mnt/e/models/swan/source_code/swan/src/swancom3.ftn` (wind input family) + `swanpre1.ftn` (parser).
+Codex deep scan 2026-05-06 of `models/swan/source_code/swan/src/swancom3.ftn` (wind input family) + `swanpre1.ftn` (parser).
 
 ## A. `WNDPAR` (GEN1, GEN2)
 
@@ -179,7 +179,6 @@ So **`AGROW` applies broadly to all GEN3 families** (SWIND3/4/5) since it adds t
 - **Comparing Janssen vs Komen at first iteration** — Janssen needs prior-state `USTAR`; iterate to convergence first.
 - **Confusing `PWIND(9)` (Snyder/Komen ρa/ρw) with `PWIND(31)` (AGROW seed)** — both look like "small constants" in tuning files.
 - **Westhuysen with whitecapping other than `IWCAP=7`** — silently uses Yan branch coefficients, not Westhuysen tuning.
-- ▢ User-experience cases — placeholder.
 
 ## References
 

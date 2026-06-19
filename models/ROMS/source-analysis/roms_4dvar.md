@@ -422,6 +422,6 @@ modified +5 -6 ROMS/Utility/read_asspar.F
 
 ## Provenance
 
-Generated 2026-05-03 from Codex `gpt-5.3-codex` analysis of `/mnt/e/models/roms/source_code/roms`. Auto-draft = false; review_required = true.
+Generated 2026-05-03 from Codex `gpt-5.3-codex` analysis of `models/roms/source_code/roms`. Auto-draft = false; review_required = true.
 
 §I Multi-scale B 추가 2026-05-28 by Claude Opus 4.7 (1M context): PR #75 첨부 PDF (15p) 직접 fetch 후 본문 인용. 7개 `multiscale_*` 파일 algorithm 매핑은 PDF + web-refs §8.1 GitHub API fetch 기반.

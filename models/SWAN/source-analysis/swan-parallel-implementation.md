@@ -200,7 +200,6 @@ So SWAN ships with a **built-in merge stage** — unlike ADCIRC which uses fort.
 - **Mismatched `IBLKAD`** between neighbors → halo data corruption silently ruins sweep convergence.
 - **Forgetting `SWBROADC` after master-side read** → other ranks see uninitialized boundary data.
 - **MPI build flags missing** → `!MPI!NCOH` tags become no-ops; runs as serial despite `-np N`.
-- ▢ User-experience cases — placeholder.
 
 ## References
 

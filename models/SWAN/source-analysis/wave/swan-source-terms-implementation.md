@@ -20,7 +20,7 @@ Companion to `swan-propagation-implementation.md` (which covers the propagation 
 
 ## Source basis
 
-- **Codex deep code analysis** of `/mnt/e/models/swan/source_code/swan/src/{swancom1.ftn, swancom2.ftn, swancom3.ftn, swancom4.ftn, SdsBabanin.ftn90}` — 2026-05-06.
+- **Codex deep code analysis** of `models/swan/source_code/swan/src/{swancom1.ftn, swancom2.ftn, swancom3.ftn, swancom4.ftn, SdsBabanin.ftn90}` — 2026-05-06.
 - **Manual cross-reference** from swantech ch.2.3 (Sources and sinks, pages 21–52).
 
 ## Implicit/explicit splitting principle
@@ -202,7 +202,6 @@ at `[file=src/swancom2.ftn line=2188-2190]`.
 - **`FRICTION ... VAR`** without proper `INPGRID FRCOEF` and `READINP FRCOEF` — `FRCOEF(KCGRD(1))` reads zero/garbage.
 - **Quadruplet with `IQUAD=1` on a stiff spectrum** — semi-implicit DIA can oscillate. Switch to Patankar `IQUAD=2`.
 - **Computing wave biphase outside `SINTGRL`** in custom modifications — the biphase pipeline shares state; bypassing it gives wrong triad sign.
-- ▢ **User-experience cases** — placeholder for project-specific incidents.
 
 ## Next expansion
 
@@ -219,7 +218,7 @@ at `[file=src/swancom2.ftn line=2188-2190]`.
 - `src/swancom3.ftn` — wind input family (`WNDPAR`, `SWIND0/3/4/5`).
 - `src/swancom4.ftn` — quadruplet (`SWSNL1/2/3/4`, `FAC4WW`, `FILNL3`) and triad (`SWLTA`).
 - `src/SdsBabanin.ftn90` — ST6/Babanin wind input + whitecapping.
-- Inventory: `[file=/mnt/e/models/swan/manuals/refs/subroutines.md]`.
+- Inventory: `[file=models/swan/manuals/refs/subroutines.md]`.
 
 ### Manual cross-reference
 

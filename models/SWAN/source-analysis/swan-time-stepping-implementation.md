@@ -138,7 +138,6 @@ General error handling: `MSGERR` writes to `PRINTF`; halt when `LEVERR > MAXERR`
 - **`SET TIMINC` confusion**: this command sets the *parsing* time format step, not the compute time step. Compute `DT` comes from `COMPUTE NONSTAT` `DELTC`.
 - **Hot-restart at non-zero `TIMCO`**: `SWREAD(COMPUT)` re-reads `TINIC` from the next `COMPUTE` block. If you intended to continue from hot-start, `TINIC` must match the hot-start time.
 - **`SET TIMEFORMAT` mismatch** between command file and input data files (wind, level, current) → time interpolation reads wrong epoch.
-- ▢ User-experience cases — placeholder.
 
 ## References
 

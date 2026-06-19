@@ -140,7 +140,6 @@ Explicit code-level unsupported features:
 - **Trying to nest from WAM/WW3 onto unstructured fine grid** — hard error at parse.
 - **Inconsistent `fort.14` between ADCIRC and SWAN copies** — mesh diverges silently; results disagree at boundaries.
 - **`GROUP` output on unstructured** — silently disabled.
-- ▢ User-experience cases — placeholder.
 
 ## Next expansion
 

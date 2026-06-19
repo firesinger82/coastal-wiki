@@ -148,7 +148,6 @@ at `[file=src/swancom5.ftn line=5308, 5352-5363, 5408-5418]`.
 - Comparing SORDUP vs BSBT residuals across boundary points — SORDUP degrades to BSBT there, so the comparison is degenerate near boundaries.
 - `FLUXLIM` with PNUMS(6) at default 0 — gives the most diffusive limiter; tune `PNUMS(6)` toward 0.5–1 for sharper transport.
 - Switching `PROPSS` ↔ `PROPSN` mid-run via successive `PROP` commands — only the LAST one applied wins (parser overwrites globals).
-- ▢ User-experience cases — placeholder.
 
 ## References
 

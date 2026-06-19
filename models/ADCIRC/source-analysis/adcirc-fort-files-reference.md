@@ -21,7 +21,7 @@ This note maps every standard `fort.NN` filename in an ADCIRC run to:
 - **manual reference** (ADCIRC Wiki / official PDFs) where the format/parameters are documented,
 - **dependencies** (which other `fort.*` files or fort.15 controls drive it).
 
-Coverage focuses on the main solver path under `/mnt/e/models/adcirc/source_code/adcirc/{src,prep,util,wind}/`. Parallel-only artifacts (per-PE `fort.18`, MPI staging) and clearly deprecated units (e.g., legacy `fort.33` solver log) are noted but not detailed.
+Coverage focuses on the main solver path under `models/adcirc/source_code/adcirc/{src,prep,util,wind}/`. Parallel-only artifacts (per-PE `fort.18`, MPI staging) and clearly deprecated units (e.g., legacy `fort.33` solver log) are noted but not detailed.
 
 ## Source basis
 
@@ -181,7 +181,7 @@ Activated when harmonic-analysis options in fort.15 are set (`NHASE`, `NHASV`, `
 - `prep/prep.F`, `prep/post.F` — `PREP80` writer / `POST*` mergers.
 - `src/logging.F90` — modern logging (replaces fort.33).
 
-Full subroutine inventory: `[file=/mnt/e/models/adcirc/manuals/refs/subroutines.md]`.
+Full subroutine inventory: `[file=models/adcirc/manuals/refs/subroutines.md]`.
 
 ### Manuals (curated, retrieved 2026-05-05 against `manuals` collection, model=adcirc)
 
@@ -201,7 +201,7 @@ Full subroutine inventory: `[file=/mnt/e/models/adcirc/manuals/refs/subroutines.
 |-------|-------|
 | Authored by | Claude Opus 4.7 (this session) |
 | Generated | 2026-05-05 |
-| Source-scan tool | `codex exec --model gpt-5.3-codex` over `/mnt/e/models/adcirc/source_code/adcirc/{src,prep,util,wind}/` |
+| Source-scan tool | `codex exec --model gpt-5.3-codex` over `models/adcirc/source_code/adcirc/{src,prep,util,wind}/` |
 | RAG retrieval | rag_proxy on `manuals` collection, `model=adcirc` filter (15 K chunks) |
 | Review status | `review_required: true` — modeler should validate file:line citations against current ADCIRC trunk version (this scan was r6155-equivalent / v55-line) |
 | Auto re-run | Triggered by quarterly `refresh_models.sh` cron when ADCIRC source updates land |

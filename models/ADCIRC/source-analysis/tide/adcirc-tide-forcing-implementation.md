@@ -150,7 +150,6 @@ Multiplies `TPK` term at `[file=src/timestep.F line=1501-1503, 1536]`. Standard 
 - **Wrong NETA in NBFR block** — number of boundary nodes must match fort.14 open boundary listing.
 - **Missing `ELEVALPHA` line** between constituents — parser desync, all subsequent boundary amplitudes garbage.
 - **NTIP=2 fort.24 with extra constituent** not in `TIPOTAG` — silently dropped, no error.
-- ▢ User-experience cases — placeholder.
 
 ## References
 

@@ -147,7 +147,6 @@ Where ADCIRC reads wind/pressure forcing, how `NWS` selects format, exact reader
 - **NWS=±14 (hybrid)** — only use when you have both background (e.g., GFS) AND mesoscale overlay (e.g., HWRF); otherwise NWS=14 alone.
 - **Wind multiplier scaling** — `NWS13WindMultiplier` for unit conversion. Default 1.0; check if your NetCDF is in m/s or knots.
 - **NOIVB** with hurricane storm-surge — disabling IB underestimates surge by 1-3 cm per mb pressure drop.
-- ▢ User-experience cases — placeholder.
 
 ## References
 

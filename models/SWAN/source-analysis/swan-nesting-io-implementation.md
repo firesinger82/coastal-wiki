@@ -108,7 +108,6 @@ So **time-range exhaustion silently propagates the last spectrum** — the recei
 - **'UF' confusion** — open code 'UF' is internal SWAN, file is ASCII.
 - **NGRID after NESTOUT** in command file — parser fails, but error is unspecific.
 - **Multiple NESTOUT to same file** — appends not overwrites; debugging gets harder.
-- ▢ User-experience cases — placeholder.
 
 ## References
 

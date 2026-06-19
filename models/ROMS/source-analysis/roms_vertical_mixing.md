@@ -145,4 +145,4 @@ PIO path mirrors at `wrt_his.F:4132-4208`. Note: `mod_mixing.F` is the state con
 
 ## Provenance
 
-Generated 2026-05-03 from Codex `gpt-5.3-codex` analysis of `/mnt/e/models/roms/source_code/roms`. Auto-draft = false; review_required = true.
+Generated 2026-05-03 from Codex `gpt-5.3-codex` analysis of `models/roms/source_code/roms`. Auto-draft = false; review_required = true.

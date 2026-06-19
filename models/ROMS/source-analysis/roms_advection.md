@@ -143,4 +143,4 @@ This per-cell sign test is what lets boundary nudging be loose at outflow (let i
 
 ## Provenance
 
-Generated 2026-05-03 from Codex `gpt-5.3-codex` analysis of `/mnt/e/models/roms/source_code/roms`. Auto-draft = false; review_required = true.
+Generated 2026-05-03 from Codex `gpt-5.3-codex` analysis of `models/roms/source_code/roms`. Auto-draft = false; review_required = true.

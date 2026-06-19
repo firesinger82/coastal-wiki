@@ -63,8 +63,8 @@ related:
 
 ## 4. 한국 적용
 
-- 사용자 운영 (축산항·서해 하구·인천만 등) — 본 위키 [[../source-analysis/]] 18 verified 노트
-- (예정) [[../../experience/efdc-chuksan-sediment]] — 사용자 운영 사례 ([[reference-next-session-candidates]] 2c C2)
+- 한국 해역 EFDC 운영 사례(축산항·서해 하구·인천만 등)는 개인 자료로 canonical 미수록 → 바이블 검증 통과 시 `experience/` 로 카테고리화 (source-needed).
+- [[../source-analysis/]] 18 verified 노트는 공식 EFDC source-code 분석 (개인 사례와 무관).
 
 ## 5. 운영 자원
 

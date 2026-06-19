@@ -89,9 +89,9 @@ DSI v12 Ch 6 의 **legacy reference** — Hamrick 시대 (Tetra Tech for US EPA)
 | `EFDC+_Propwash_WhitePaper.pdf` | 항만·하구 선박 통항 영향 분석 (구체 모듈) |
 | `EFDC_Training_Overview.pdf` | 초기 학습·신규 사용자 인계 |
 
-각 별도 노트 작성은 우선순위 낮음 (사용자 운영 빈도 낮은 모듈).
+각 별도 노트 작성은 우선순위 낮음 (운영 빈도 낮은 모듈).
 
-## 5. 사용자 운영 cheat-sheet
+## 5. 운영 작업별 manual 참조
 
 | 작업 | 참조 manual |
 |---|---|

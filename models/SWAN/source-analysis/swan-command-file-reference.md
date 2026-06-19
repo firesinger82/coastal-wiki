@@ -26,7 +26,7 @@ Companion to `swan-foundation.md`. Where the foundation note covers *why*, this 
 
 ## Source basis
 
-- **Codex source scan** of `/mnt/e/models/swan/source_code/swan/src/` (33 commands with file:line citations) — 2026-05-06.
+- **Codex source scan** of `models/swan/source_code/swan/src/` (33 commands with file:line citations) — 2026-05-06.
 - **RAG retrieval** against `manuals` collection filtered to `model=swan` (902 chunks: PDFs `swanuse/swantech/swanimp/swanpgr` + 195 online_doc HTML chapters).
 
 ## Command-file structure (typical order)
@@ -215,7 +215,6 @@ Critical orderings:
 - **`SET LEVEL` left at 0** when modeling a tide-influenced domain — wave-current interaction wrong.
 - **`FRICTION JONSWAP CONSTANT 0.067`** = default; valid for storms but too dissipative for swell — switch to `FRICTION COLL` or measured Madsen for swell-dominated cases.
 - **Output before `COMPUTE`** → the `BLOCK/TABLE/SPECOUT/NESTOUT` records the run state; if placed before `COMPUTE`, you get an empty file. Put output commands BEFORE `COMPUTE` (they're declarative; they fire during/after `COMPUTE`).
-- ▢ **User-experience cases** — placeholder for project-specific incidents (regional Korea coast, JMA wind, ADCIRC-SWAN coupling).
 
 ## Next expansion
 
@@ -230,7 +229,7 @@ Critical orderings:
 
 - `src/swanpre1.ftn` — main `SWREAD` body, parses Group 1–5 commands.
 - `src/swanpre2.ftn` — `SWREOQ` / `SWREPS` for Groups 6–7; `SWBOUN` body for `BOUND` details.
-- Full subroutine inventory: `[file=/mnt/e/models/swan/manuals/refs/subroutines.md]`.
+- Full subroutine inventory: `[file=models/swan/manuals/refs/subroutines.md]`.
 
 ### Manuals (curated, retrieved 2026-05-06 against `manuals` collection, model=swan)
 
@@ -253,7 +252,7 @@ Critical orderings:
 |-------|-------|
 | Authored by | Claude Opus 4.7 (this session) |
 | Generated | 2026-05-06 |
-| Source-scan tool | `codex exec --model gpt-5.3-codex` over `/mnt/e/models/swan/source_code/swan/src/` |
+| Source-scan tool | `codex exec --model gpt-5.3-codex` over `models/swan/source_code/swan/src/` |
 | RAG retrieval | rag_proxy on `manuals` filtered `model=swan` (902 chunks across pdf+website doc_types) |
 | Coverage | 33 top-level commands; sub-keywords at summary level (full BNF deferred to per-command notes) |
 | Review status | `review_required: true` — modeler should validate file:line citations against current SWAN trunk (this scan was post-2024 release-line) |

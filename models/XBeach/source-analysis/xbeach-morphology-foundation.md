@@ -24,7 +24,7 @@ Scope note:
 
 Primary sources used for this draft:
 - `knowledge/methods/xbeach-sources/01-local-manual-stack.md`
-- `/mnt/e/numerical_models/xbeach/XBEACH_MANUAL.md`
+- `numerical_models/xbeach/XBEACH_MANUAL.md`
 - `knowledge/methods/xbeach-parameter-glossary-v1.md`
 - `knowledge/methods/xbeach-boundary-and-wave-setup.md`
 

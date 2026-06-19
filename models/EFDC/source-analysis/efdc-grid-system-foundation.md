@@ -147,7 +147,7 @@ The tool is not the model. Re-grid in the tool, but version-control the resultin
 
 ## Common Pitfalls
 
-The first three pitfalls are extracted from the manuals; the rest are general CFD/coastal-modeling judgments. **The "User-experience cases" subsection is intentionally left for the modeling lead to fill in from project memory.**
+The first three pitfalls are extracted from the manuals; the rest are general CFD/coastal-modeling judgments.
 
 **Manual-derived:**
 1. **Soft-smoothed thalweg.** Sub-grid bathymetry interpolation (inverse-distance-squared) flattens narrow deep channels. Symptom: model under-predicts in-channel current speed even with correct stage [file=EFDC+_Propwash_WhitePaper section=Step 4. Determine Bottom Elevation].
@@ -160,14 +160,9 @@ The first three pitfalls are extracted from the manuals; the rest are general CF
 6. **Wrong assumption that orthogonality is a binary check.** Even a grid that passes the < 3° threshold globally may have one or two cells at 6–8° in a sensitive zone. Inspect orthogonal-deviation maps locally.
 7. **Re-grid without re-doing the BC audit.** Even when (I, J) is preserved, edge cells may have moved subtly enough that an open-boundary segment now intersects a slightly different bathymetry — re-validate stage at the boundary cell after any grid edit.
 
-**User-experience cases (to be filled by the lead modeler):**
-- ▢ Korean estuary case where SIG/SGZ choice mattered concretely (e.g. specific harbor or river-mouth case): which scheme, what triggered the decision, what was the observed difference?
-- ▢ Memorable grid-related mistake from past projects: what went wrong, how it was diagnosed, what lesson was promoted from it?
-- ▢ CVLGrid (or external tool) experience: any version-specific gotchas, file-format conversions that surprised you, orthogonalization passes that helped or hurt.
-
 ## Next Expansion Candidates
 
-- **single-grid vs multi-block topology** — the EFDC manual is largely silent on this. Investigate via the EFDC source tree (`/mnt/e/numerical_models/EFDCPlus_Stable/EFDC/MPI_*` directories suggest some multi-block / domain-decomposition is implemented for MPI). Likely worth a separate `efdc-domain-decomposition-foundation.md` once that is examined.
+- **single-grid vs multi-block topology** — the EFDC manual is largely silent on this. Investigate via the EFDC source tree (`numerical_models/EFDCPlus_Stable/EFDC/MPI_*` directories suggest some multi-block / domain-decomposition is implemented for MPI). Likely worth a separate `efdc-domain-decomposition-foundation.md` once that is examined.
 - **time-varying bathymetry** — referenced in propwash and in some SGZ contexts but never fully specified for general use. Belongs in a `efdc-time-varying-bathymetry.md` once a project case forces the issue.
 - **quantitative layer-count guidelines** — depth-to-vertical-resolution ratios and CFL-vs-layer-thickness tradeoffs are not in the chunks consulted; would need a sensitivity-test study to compile.
 - **Korean estuary case cross-references** — once 2–3 site-specific cases are written, link from this note into the experiment cards.
@@ -184,5 +179,3 @@ The first three pitfalls are extracted from the manuals; the rest are general CF
 - **Date**: 2026-05-02
 - **Authored by**: Claude Opus 4.7 (1M context) — direct authoring (not the auto-draft pipeline that previously failed)
 - **Manual chunks consulted**: 18 (`manuals` collection, multi-query retrieval with bilingual fusion)
-- **Sections needing user input before promotion to wiki**: "Common Pitfalls > User-experience cases"
-- **Once filled, run**: `~/rag/.venv/bin/python ~/rag/scripts/ingest_wiki.py` (after moving file to `/mnt/e/AI_ENV/modeling-wiki/knowledge/methods/`)

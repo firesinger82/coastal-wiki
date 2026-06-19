@@ -124,7 +124,6 @@ Solver routines explicitly zero all six arrays after use at `[file=src/swancom1.
 - **Hot-restart spec mismatch**: if MDC, MSC, or MCGRD differ between runs, `AC2` allocation is a different shape. Hot-start file format embeds these dimensions; mismatch = fatal at read.
 - **Custom `COMPDA` field index** — adding a new field requires updating both the index constant in `swanmain.ftn:1498-1527` and `MCMVAR` in the allocation. Forgetting one corrupts neighboring fields.
 - **OpenMP bug fingerprint**: if you see "matrix corrupted" only with `OMP_NUM_THREADS > 1`, check that any custom code added to the source-term loop didn't use a SHARED variable when it should have been PRIVATE.
-- ▢ User-experience cases — placeholder.
 
 ## References
 

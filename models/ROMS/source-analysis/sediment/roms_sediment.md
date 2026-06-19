@@ -218,4 +218,4 @@ Surface mixed properties recomputed geometrically from all `NST` bed fractions (
 
 ## Provenance
 
-Generated 2026-05-03 from Codex `gpt-5.3-codex` analysis of `/mnt/e/models/roms/source_code/roms`. Auto-draft = false; review_required = true.
+Generated 2026-05-03 from Codex `gpt-5.3-codex` analysis of `models/roms/source_code/roms`. Auto-draft = false; review_required = true.

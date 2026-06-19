@@ -172,4 +172,4 @@ So DD is the mechanism for **joining subdomains where simple MPI partition isn't
 
 ## Provenance
 
-Generated 2026-05-03 from Codex `gpt-5.3-codex` analysis of `/mnt/e/models/delft3d/source_code/Delft3D/src/engines_gpl/flow2d3d`. Auto-draft = false; review_required = true.
+Generated 2026-05-03 from Codex `gpt-5.3-codex` analysis of `models/delft3d/source_code/Delft3D/src/engines_gpl/flow2d3d`. Auto-draft = false; review_required = true.

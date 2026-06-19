@@ -20,7 +20,7 @@ Companion to `swan-command-file-reference.md` (covers output command syntax) and
 
 ## Source basis
 
-Codex deep scan 2026-05-06 of `/mnt/e/models/swan/source_code/swan/src/swanout1.ftn`, `swanout2.ftn`, `swanser.ftn`.
+Codex deep scan 2026-05-06 of `models/swan/source_code/swan/src/swanout1.ftn`, `swanout2.ftn`, `swanser.ftn`.
 
 ## A. SWORDC + SWOUTP dispatcher
 
@@ -192,7 +192,6 @@ MATLAB block output reopens with `STATUS='REPLACE'` at `[file=src/swanout2.ftn l
 - **`TABLE TABD` (no header)** consumed by a script expecting headers — silent column shift.
 - **`SPECOUT SPEC1D` written with `RTYPE='SPRE'`** vs `'SPRC'` (2D) — different column layout.
 - **Multiple time blocks in one file** — append-only, so consumer must split on `'TIME'` markers.
-- ▢ User-experience cases — placeholder.
 
 ## References
 

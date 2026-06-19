@@ -54,5 +54,5 @@ All cloned with `--depth 1` (latest commit only). Total: ~574M.
 
 1. Acquire official PDF manuals (User's Manual v53, Theory) from adcirc.org links
 2. Run same skill on EFDC, XBeach, SWAN, Delft3D, ROMS
-3. Decide what to import from `/mnt/e/numerical_models/adcirc/` (legacy, 91GB)
+3. Decide what to import from `numerical_models/adcirc/` (legacy, 91GB)
 4. Begin RAG ingest of cleaned corpus

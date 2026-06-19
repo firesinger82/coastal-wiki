@@ -96,8 +96,8 @@ So:
 수심 하한(5m clamp)을 제거한 메시:
 - **Set `H0=0.1`** in fort.15
 - Verify `HOFF=0.12` (auto from `1.2*H0`)
-- 100K+ new shallow nodes will participate in wet/dry properly
-- Without this, those nodes get treated as permanently dry → fix #1 effort wasted
+- 다수의 천해 노드가 정상적으로 wet/dry에 참여
+- Without this, those nodes get treated as permanently dry
 
 ## Working Rules
 
@@ -113,7 +113,6 @@ So:
 - **H0=5.0 with naturally-shallow bathymetry** → all shallow nodes always dry; tide can't propagate.
 - **VELMIN=0.5 m/s** (way too high) → re-wetting never triggers; intertidal flats stuck dry.
 - **Hot restart with different H0** → wet/dry state from old H0 frozen; mass artifacts.
-- ▢ User-experience cases — placeholder.
 
 ## References
 

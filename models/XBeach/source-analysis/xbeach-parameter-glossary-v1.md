@@ -25,7 +25,7 @@ Scope note:
 
 Primary confirmed local sources:
 - `knowledge/methods/xbeach-sources/01-local-manual-stack.md`
-- `/mnt/e/numerical_models/xbeach/XBEACH_MANUAL.md`
+- `numerical_models/xbeach/XBEACH_MANUAL.md`
 - official docs root: `https://xbeach.readthedocs.io/en/latest/`
 
 ## Why This Glossary Exists

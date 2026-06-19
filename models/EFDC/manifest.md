@@ -14,7 +14,7 @@ Both `--depth 1`. Total source_code/: 77M.
 
 ## manuals/pdfs/
 
-Imported from `/mnt/e/numerical_models/EFDCPlus_Stable/manual/` (canonical DSI distribution; upstream GitHub repo does NOT include manuals).
+Imported from `numerical_models/EFDCPlus_Stable/manual/` (canonical DSI distribution; upstream GitHub repo does NOT include manuals).
 
 | File | Size | Type |
 |------|------|------|
@@ -52,8 +52,6 @@ Total Confluence size: 2.1G (includes spaces.zip backup).
 - Official site eemodelingsystem.com — HTTP 403 (Cloudflare/anti-bot, would need browser automation)
 - efdcplus.com — HTTP 520 (down)
 
-## Notes for RAG ingest
+## 수집 메모
 
-- All 5 PDFs included per user decision (2026-05-03), including Training_Overview which was previously flagged as case-study contamination
-- Confluence KB included in full per user decision — 1631 pts when previously ingested
-- Same `~/rag/scripts/ingest_kb.py` pipeline (markdown-aware) applies
+- DSI 배포 매뉴얼 5 PDF + Confluence KB 전체 포함. (Training_Overview 는 case-study 성격 포함 — canonical 인용 시 공식 메커닉만 발췌.)

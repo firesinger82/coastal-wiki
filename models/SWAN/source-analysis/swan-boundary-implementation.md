@@ -21,7 +21,7 @@ Companion to `swan-command-file-reference.md` (covers BOUND command syntax) and 
 ## Source basis
 
 - **Codex deep code analysis** 2026-05-06 of:
-  - `/mnt/e/models/swan/source_code/swan/src/swanpre1.ftn` — top-level `SWREAD` dispatch
+  - `models/swan/source_code/swan/src/swanpre1.ftn` — top-level `SWREAD` dispatch
   - `swanpre2.ftn` — `SWBOUN` body (parametric shapes, segments, sides), `BCFILE`/`BCWAMN`/`BCWW3N` (file readers)
   - `swanmain.ftn` — runtime injection (`SNEXTI`, `RBFILE`, `SINTRP`)
   - `swmod2.ftn` — boundary type definitions
@@ -219,7 +219,6 @@ At `[file=src/swanpre2.ftn line=5629]`, `[file=src/swanpre2.ftn line=5717-5720]`
 - **Different freq grid in nested file** — auto-remap covers it but degrades; for tight validation, regenerate coarse run with the fine grid's `SET FREQ`.
 - **No CGRID consistency error** — SWAN won't fail on grid mismatch; you must check the `BSPDIR`/`BSPFRQ` recorded in the boundary file vs your run's `SPCSIG`/`SPCDIR`.
 - **Side `CCW` vs `CLOCKW` confusion** — produces inverted endpoint order; spectra get swapped along the boundary.
-- ▢ **User-experience cases** — placeholder.
 
 ## Next expansion
 

@@ -228,4 +228,4 @@ For Korean coast typhoons (e.g., Hinnamnor 2022, Maemi 2003), NWS=20 GAHM with K
 
 ## Provenance
 
-Generated 2026-05-03 from Codex `gpt-5.3-codex` analysis of `/mnt/e/models/adcirc/source_code/adcirc/src`. Auto-draft = false; review_required = true.
+Generated 2026-05-03 from Codex `gpt-5.3-codex` analysis of `models/adcirc/source_code/adcirc/src`. Auto-draft = false; review_required = true.

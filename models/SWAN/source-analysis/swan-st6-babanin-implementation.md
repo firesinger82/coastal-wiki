@@ -20,7 +20,7 @@ Companion to `swan-source-terms-implementation.md` (which covers other source te
 
 ## Source basis
 
-Codex deep scan 2026-05-06 of `/mnt/e/models/swan/source_code/swan/src/SdsBabanin.ftn90` (~2700 lines, single module).
+Codex deep scan 2026-05-06 of `models/swan/source_code/swan/src/SdsBabanin.ftn90` (~2700 lines, single module).
 
 ## A. Module structure
 
@@ -125,7 +125,6 @@ So negative input (wave decay during opposing wind / falling wind) is opt-in via
 - **Tuning `A1SDS` without measuring** — saturation coefficient is sensitive; published defaults are calibrated for global runs.
 - **`TRUE_U10` vs scaled `UFRIC`** — small differences in wind input through `TEMP2` choice affect long-fetch results.
 - **Neglecting linear `MEMSINA`** — for very low-energy seed states, the linear term matters; `SWIND0_NRL` must be active.
-- ▢ User-experience cases — placeholder.
 
 ## References
 

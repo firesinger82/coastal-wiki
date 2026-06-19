@@ -48,7 +48,7 @@ XBeach is a natural later lane for this wiki because it supports event-scale coa
 ## Confirmed Local Source Availability
 
 Confirmed local source root:
-- `/mnt/e/numerical_models/xbeach`
+- `numerical_models/xbeach`
 
 Confirmed high-value local sources now known:
 - `src/doc/manual/XBeach_manual_master.pdf`

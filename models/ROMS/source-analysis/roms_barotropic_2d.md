@@ -114,4 +114,4 @@ In nesting, the time-averaged `DU_avg1`, `DV_avg1`, `Zt_avg` are exchanged via `
 
 ## Provenance
 
-Generated 2026-05-03 from Codex `gpt-5.3-codex` analysis of `/mnt/e/models/roms/source_code/roms`. Auto-draft = false; review_required = true.
+Generated 2026-05-03 from Codex `gpt-5.3-codex` analysis of `models/roms/source_code/roms`. Auto-draft = false; review_required = true.

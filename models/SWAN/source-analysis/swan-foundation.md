@@ -176,7 +176,6 @@ Output grids can differ from the computational grid `[file=website:swan:node12 s
 - **Stationary on storm event** — looks fine but propagates an "average" wave, missing the surge phase.
 - **Mixing GEN3 with bottom-friction-off** — GEN3 wind input grows with fetch; without dissipation the spectrum runs away.
 - **Output points outside the computational grid** — silently dropped from `TABLE` output. Verify station list against grid bounding box.
-- ▢ **User-experience cases** — placeholder for project-specific incidents (regional Korea coast tuning, JMA wind input nesting, etc.).
 
 ## 10. Next Expansion
 

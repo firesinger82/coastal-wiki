@@ -168,7 +168,6 @@ GWCE iterative residual/dot products globally reduced via `psdot/ps2dots/ps3dots
 - **fort.18 missing for some PE** — usually from interrupted adcprep --prepall; redo from scratch.
 - **HDF5 vs sequential NetCDF** — most ADCIRC builds have sequential. Check `ldd padcirc.exe | grep netcdf`.
 - **adcpost reading wrong fort.80** — when comparing runs, archive fort.80 alongside fort.6X files.
-- ▢ User-experience cases — placeholder.
 
 ## References
 

@@ -149,7 +149,6 @@ Each reads per-PE files and writes full-domain `fort.6X/7X`.
 - **`NFREQ` mismatch between fort.15 NBFR and fort.15 harmonic block** — silent corruption.
 - **Adcprep `--prepall` re-runs every time** — overrides per-PE PE####/fort.6X files. Check before re-running mid-output collection.
 - **NetCDF `_FillValue` for dry nodes** — varies by version; downstream tools must handle.
-- ▢ User-experience cases — placeholder.
 
 ## References
 
