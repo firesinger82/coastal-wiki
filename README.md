@@ -16,7 +16,7 @@
 2. **모든 단언은 출처 명시** (소스코드 라인, 메뉴얼 페이지, 논문 인용, 교과서 챕터).
 3. **AI 요약은 frontmatter `citation_status`로 추적** ([CONVENTIONS.md](CONVENTIONS.md) §2). `verified` 승격 책임자 = 사용자.
 4. **Canonical source 분리**: 모델 메커닉 → `models/`, 도메인 개념 → `concepts/`. 다른 곳은 요약 + 링크만.
-5. **textbook 인용은 `source_id`만**. raw 파일명·Windows 경로 직접 인용 금지 ([textbook/sources.yml](textbook/sources.yml)).
+5. **canonical 은 안정 식별자만**. textbook 인용 = `source_id` ([textbook/sources.yml](textbook/sources.yml)), 소스코드 = repo-상대 `file:line`. 작성자 로컬 절대경로(`D:\`·`E:\`·`/mnt/`·`~/`) 금지 ([CONVENTIONS.md](CONVENTIONS.md) §4). 개인 케이스·run 결과는 위키 밖 — 위키는 케이스 *공급원* ([CLAUDE.md](CLAUDE.md) 절대규칙 8).
 6. **단일 writer**. 이 PC가 작성자, 다른 PC는 read-only.
 7. **수정 이력은 git이 책임진다**. 임의 삭제·재구성 시 reasoning을 커밋 메시지에 기록.
 

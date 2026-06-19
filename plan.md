@@ -123,6 +123,21 @@ frontmatter `citation_status` 필드 도입:
 - 검증 책임자 = **사용자** (firesinger). 다른 AI 모델이 spot-check 가능하지만 최종 `verified` 승격은 사용자 검토 후
 - AI 간 cross-verification (Claude → Codex review)은 보조 도구. 책임은 사용자
 
+### G8. canonical 정화 원칙 (2026-06-18, 대규모 정화 후 코드화 — Codex 적대검증 MODIFY 반영)
+
+위키 = 케이스 *공급원*(reference), 저장소 아님. 개인 케이스는 위키 밖에서 구축. 4 하위 규칙(역할 분담 명확화):
+
+- **G8a 레이어 경계** (CLAUDE.md 절대규칙 8): 개인 run 결과·calibration 수치·작성자/프로젝트 실행에만 의존하는 운영 지침은 canonical 금지. 예외 = 소스코드·식·algorithm 이 main claim 인 failure-patterns/heuristics/playbooks(`models/<model>/source-analysis/` 하위, triage 규칙), wrapper-only `06-model-application.md`. 제거는 `_staging/`·`_archive/` 경유(즉시 삭제 = 별도 게이트, 2a.9/phase 6 동일).
+- **G8b 경로 문법** (CONVENTIONS §4): 작성자 로컬 머신·마운트·홈·드라이브·실행 워크스페이스 *식별* 절대경로(`D:\`·`E:\`·`/mnt/[de]/`·`~/...`·`\\wsl$`)는 canonical 어디에도 금지. 허용 = repo-상대 소스코드 `file:line`, 공식 매뉴얼/vendor 표기 경로의 출처 인용.
+- **G8c 출처 식별 단위** (CONVENTIONS §3): 1 source_id = 1 bibliographic/work + edition. 미러·로컬 사본 = alias. 별개 문서·에디션·repo·논문·데이터셋·릴리스노트 = 별도 source_id (예: `khoa-notice-2021-7` 고시 ≠ `khoa-tide-model` 수치조류도).
+- **G8d 본문 위생** (CONVENTIONS §6): canonical 노트에 개인·프로젝트·실행 사례 기입 유도 placeholder(빈 heading·TODO·체크박스, 예 `▢ User-experience cases`) 금지. 면제 = `source-needed`/일반 미작성 stub, `_template/`.
+
+근거 프레임워크: Diátaxis(reference↔how-to 분리), DRY/SSOT(Hunt-Thomas), Wilson et al. 2017 "Good enough practices in scientific computing"(portable paths), FAIR R1.2(provenance), Matuschak evergreen concept-oriented(= concepts/ 1차축 정합).
+
+**Codex 적대검증 반영(2026-06-18)**: ① 삭제 기본값 → `_staging/`·`_archive/` 수명주기 정합 ② vendor/공식 매뉴얼 경로·repo-상대 file:line 면제 명시 ③ "이질 출처" → work+edition 단위로 정밀화(source_id 과잉분열 방지) ④ source-grounded 플레이북·wrapper-06 면제 명시.
+
+**후속(미결)**: G8b(경로)·G8d(placeholder)는 regex 자동검증 가능 → `tools/validate-canonical-hygiene.sh` 신설 후보. G8c 의미론적 혼용 탐지는 `sources.yml` 스키마(`work_id`/`edition`/`format`) 보강 시 가능.
+
 ## 미결 사항
 
 - textbook 자료 13권 중 어느 것부터 노트화할지 우선순위
