@@ -1,13 +1,13 @@
 ---
 title: "KHOA 비조화상수 — 한국 공식 정의·공식·부산항 검증"
-source_id: khoa-tide-model
-chapter: "국립해양조사원고시 제2021-7호 (비조화상수·datum 법적 근거) + khoa-tide-model skill.md (4대분조 각속도)"
+source_id: khoa-notice-2021-7
+chapter: "국립해양조사원고시 제2021-7호 (비조화상수·datum 1차 출처). 4대분조 각속도 cross-ref: khoa-tide-model skill.md"
 pages: "고시 전부개정 2021.3.31"
 page_offset_applied: false
 topic: tides
-canonical_source: khoa-tide-model
+canonical_source: khoa-notice-2021-7
 citation_status: verified
-verification_method: "공식 1차근거: 국립해양조사원고시 제2021-7호 (law.go.kr) + khoa-tide-model 통합 조화상수 DB(skill.md 각속도 9자리). 부산항 KHOA 공식값과 일치 검증 완료된 공식만 인용. (이전 dashboard-khoa-data 개인 source_id → khoa-tide-model 공식 재귀속, 2026-06-18 canonical 정화.)"
+verification_method: "공식 1차근거: 국립해양조사원고시 제2021-7호 (law.go.kr) — 비조화상수·datum. 4대분조 각속도는 khoa-tide-model skill.md(9자리) cross-ref. 부산항 KHOA 공식값과 일치 검증 완료된 공식만 인용. (이전 dashboard-khoa-data 개인 source_id → 출처별 구별 재귀속: 비조화상수=khoa-notice-2021-7. khoa-tide-model[수치조류도]과 혼용한 것 2026-06-18 정정.)"
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-21
 verification_by: "Claude Opus 4.7 (1M context) — cross-ref against user's verified research doc"

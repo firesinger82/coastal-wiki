@@ -22,7 +22,7 @@ More specifically, start from the `adcirc-testsuite` case referenced by the offi
 
 ## Recorded Local Path
 
-- selected baseline path: `E:\AI_ENV\modeling-wiki\raw\code\adcirc\adcirc-testsuite\adcirc\adcirc_quarterannular-2d-netcdf`
+- selected baseline path: `raw/code/adcirc/adcirc-testsuite/adcirc/adcirc_quarterannular-2d-netcdf`
 - supporting testsuite entry: `test_list.yaml` entry `adcirc_quarterannular-2d-netcdf`
 
 ## Why This Candidate Is First

@@ -38,7 +38,7 @@ purpose: "사용자 지시(2026-06-16) '모든 모델은 모든 문서·코드�
 | **Delft3D** | engines_gpl 3,503 (+utils) | ✅ 39 노트 (엔진+utils S) | 53 | ✅ 9 (매뉴얼+도구) | ✅ 완료 |
 | **ROMS** | roms/ROMS ~900 | ✅ 33 노트 (4D-Var) | 10 | ✅ 4 (+Exercise 카탈로그) | ✅ 완료 |
 | **FUNWAVE** | TVD 38 + GPU 41 | ✅ 10 노트 | 39 | ✅ 3 (+검증 카탈로그) | ✅ 완료 |
-| **ADCIRC** | adcirc/src 56 (+gahm·asgs) | ✅ 39 노트 (정화 2026-06-18) | 98 | 21 + web-refs(논문 30) | ✅ 완료 |
+| **ADCIRC** | adcirc/src 56 (+gahm·asgs) | ✅ 36 노트 (정화 2026-06-18) | 98 | 21 + web-refs(논문 30) | ✅ 완료 |
 | **EFDC** | 264 (+GVC 301 legacy S) | ✅ 30 노트 (+GVC) | 6 | ✅ 7 (+Training/Grid) | ✅ 완료 |
 | **XBeach** | 118 | ✅ 32 노트 | 9 | 4 | ✅ 완료 (kingsday=master 동계열) |
 | **SWAN** | 77 | ✅ 29 노트 | 9 | 29 | ✅ 완료 |

@@ -17,7 +17,8 @@
 ## 사용된 source_id
 
 - `khoa-portcals-glossary` — 60+ 조류 용어 (가장 풍부)
-- `khoa-tide-model` — 수치조류도 광역 조화상수 (813,703 rows, cm/s) + 변도성 2007 위상 기준 + 4대분조 정밀값 (고시 제2021-7호, 조류 분조 분해에도 적용)
+- `khoa-tide-model` — 수치조류도 광역 조화상수 (813,703 rows, cm/s) + 변도성 2007 위상 기준
+- `khoa-notice-2021-7` — 4대분조 각속도 정밀값 (국립해양조사원고시 제2021-7호; 조류 분조 분해에도 적용)
 - `stewart-physical-ocean` — tidal currents 일반 (§17.4 도입부, p.313)
 - `lubbad2009-tides-slides` — tidal currents in inlets/bays (p.50)
 - `khoa-annual-reports` — [`textbook/notes/khoa-annual-reports-overview.md`](../../textbook/notes/khoa-annual-reports-overview.md) (15권 2012-2025, HF-Radar 해수유동 통계)

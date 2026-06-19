@@ -56,7 +56,6 @@ For each topic, the immediate goal is to capture:
 - current notes:
   - `adcirc-storm-surge-foundation.md`
   - `adcirc-storm-surge-nws-families.md`
-  - `adcirc-jma-msm-nws13-foundation.md`
   - `adcirc-storm-surge-requirements-checklist.md`
 
 ### 4. Tides And Boundary Forcing

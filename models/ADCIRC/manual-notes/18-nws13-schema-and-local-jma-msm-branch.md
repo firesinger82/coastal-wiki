@@ -17,7 +17,7 @@ notes: "P2 catalog audit 2026-05-24 — external URL catalog (adcirc.github.io/a
 - authors: ADCIRC development team plus local workflow statement
 - year: active documentation site plus current local practice
 - link: https://adcirc.github.io/adcirc/user_guide/model_configuration/meteorological_forcing/nws13.html ; https://adcirc.github.io/adcirc/technical_reference/input_files/fort22.html
-- local path: E:\AI_ENV\modeling-wiki\raw\code\adcirc\adcirc\docs\user_guide\model_configuration\meteorological_forcing\nws13.rst
+- local path: raw/code/adcirc/adcirc/docs/user_guide/model_configuration/meteorological_forcing/nws13.rst
 
 ## Why This Matters
 

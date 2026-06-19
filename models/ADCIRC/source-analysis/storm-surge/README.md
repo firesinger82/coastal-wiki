@@ -1,6 +1,6 @@
 # models/ADCIRC/source-analysis/storm-surge/
 
-ADCIRC 의 storm-surge 관련 source-code 분석 노트. modeling-wiki (2026-04 작성) 에서 promote.
+ADCIRC 의 storm-surge 관련 source-code 분석 노트 (공식 NWS 외력 패밀리·GAHM/AHM/OWI). modeling-wiki (2026-04 작성) 에서 promote. (2026-06-18 정화: 개인 JMA-MSM/NWS13 운영 플레이북 3노트 제거 — 위키는 공식 출처만, 케이스는 별도.)
 
 ## 파일
 
@@ -8,11 +8,8 @@ ADCIRC 의 storm-surge 관련 source-code 분석 노트. modeling-wiki (2026-04 
 |---|---|
 | `adcirc-storm-surge.md` | NWS=19/20/29/30 GAHM·AHM·OWI hybrid — source-code level (read_input.F, wind.F, vortex.F 인용) |
 | `adcirc-storm-surge-foundation.md` | Foundation — storm-surge 실험 시작 전 이해해야 할 것 |
-| `adcirc-storm-surge-nws-families.md` | NWS family 비교 (NWS=12/13/14/19/20) — 한국 local 워크플로 NWS=13 중심 이유 |
+| `adcirc-storm-surge-nws-families.md` | NWS family 비교 (NWS=12/13/14/19/20) — OWI NetCDF NWS=13 포함 |
 | `adcirc-storm-surge-requirements-checklist.md` | 실험 시작 전 요구사항 체크리스트 |
-| `adcirc-fort15-nws13-operating-rules.md` | `fort.15` 의 NWS=13 운영 룰 — 고정 필드, 매치 필드, 예외 필드 |
-| `adcirc-jma-msm-nws13-foundation.md` | JMA-MSM → NWS=13 한국 local 워크플로 foundation |
-| `adcirc-local-nws13-operating-principles.md` | local NWS=13 운영 원칙 — 표준·허용·예외 분류 |
 
 ## 인용
 

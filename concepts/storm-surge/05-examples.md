@@ -85,14 +85,14 @@ $$\eta_{IB} = -\frac{\Delta P_A}{\rho g} = -\frac{(950 - 1013) \text{ mb}}{1025 
 [04-code-and-tools.md §1.1](04-code-and-tools.md#11-nws-모드-일람) 의 9 NWS 모드 중:
 
 - **NWS=20 (GAHM)** — Best Track + ATCF wind radii 기반 vortex 재구성. 학술 hindcast 표준.
-- **NWS=13 (JMA-MSM NetCDF)** — JMA-MSM 분석장 직접. 사용자 표준 워크플로. 단, Maemi 2003 의 JMA-MSM 보유 여부 별도 확인.
+- **NWS=13 (JMA-MSM NetCDF)** — JMA-MSM 분석장 직접 (OWI NetCDF 변환). 단, Maemi 2003 의 JMA-MSM 보유 여부 별도 확인.
 - **NWS=30 (GAHM + OWI hybrid)** — vortex + 배경 NWP. 가장 정밀.
 
 → Maemi 학술 hindcast 는 보통 **NWS=20 GAHM** + KMA Best Track. 상세는 [`models/ADCIRC/source-analysis/storm-surge/adcirc-storm-surge.md`](../../models/ADCIRC/source-analysis/storm-surge/adcirc-storm-surge.md).
 
 #### Step 3: `fort.15` 운영 셋팅 (verified — ADCIRC source-analysis)
 
-[04-code-and-tools.md §2.1](04-code-and-tools.md#21-fort15-control-file) + [`adcirc-fort15-nws13-operating-rules.md`](../../models/ADCIRC/source-analysis/storm-surge/adcirc-fort15-nws13-operating-rules.md):
+[04-code-and-tools.md §2.1](04-code-and-tools.md#21-fort15-control-file) + [`adcirc-met-forcing-implementation.md §D`](../../models/ADCIRC/source-analysis/adcirc-met-forcing-implementation.md):
 
 ```
 NWS = 20            ! GAHM
@@ -160,14 +160,14 @@ $$\eta_{IB} = -\frac{(920 - 1013)}{1025 \times 0.0981} \approx +0.93 \text{ m}$$
 
 #### Step 2: ADCIRC NWS 모드 선택 (verified)
 
-Hinnamnor 는 **사용자 표준 워크플로 NWS=13 JMA-MSM NetCDF** 사용 가능 (2022 는 JMA-MSM archive 충분). 상세:
+Hinnamnor 는 **NWS=13 JMA-MSM OWI NetCDF** 워크플로 적용 가능 (2022 는 JMA-MSM archive 충분). 상세:
 
-- [04-code-and-tools.md §1.2](04-code-and-tools.md#12-한국-운영-워크플로--nws13-jma-msm) — JMA-MSM 5 km × 5 km 표준
-- [`adcirc-jma-msm-nws13-foundation.md`](../../models/ADCIRC/source-analysis/storm-surge/adcirc-jma-msm-nws13-foundation.md) — `owiwind_netcdf.F:215, 681, 747` reader
+- [04-code-and-tools.md §1.2](04-code-and-tools.md#12-한국-운영-워크플로--nws13-jma-msm) — JMA-MSM 5 km × 5 km
+- [`adcirc-met-forcing-implementation.md §D`](../../models/ADCIRC/source-analysis/adcirc-met-forcing-implementation.md) — NWS=13 OWI NetCDF reader (OWIWIND_NETCDF, wind.F)
 
 #### Step 3: `fort.15` 운영 셋팅 (verified)
 
-NWS=13 표준 셋팅 ([adcirc-fort15-nws13-operating-rules.md](../../models/ADCIRC/source-analysis/storm-surge/adcirc-fort15-nws13-operating-rules.md) §3):
+NWS=13 표준 셋팅 ([adcirc-met-forcing-implementation.md §D](../../models/ADCIRC/source-analysis/adcirc-met-forcing-implementation.md)):
 
 ```
 NWS = 13
@@ -202,7 +202,7 @@ KHOA OpenAPI `surveyTideLevel` 은 archive **~1년 rolling** ([04-code-and-tools
 | [02-theory.md §3 Wind set-up](02-theory.md) | 동해 깊은 수심 → wind set-up 작음 |
 | [04-code-and-tools.md §1.2](04-code-and-tools.md#12-한국-운영-워크플로--nws13-jma-msm) | NWS=13 JMA-MSM 표준 워크플로 |
 | [04-code-and-tools.md §4.1 KHOA](04-code-and-tools.md#41-실시간-조위-관측) | residual surge 추출 |
-| [`adcirc-jma-msm-nws13-foundation.md`](../../models/ADCIRC/source-analysis/storm-surge/adcirc-jma-msm-nws13-foundation.md) | source-code level NetCDF reader |
+| [`adcirc-met-forcing-implementation.md §D`](../../models/ADCIRC/source-analysis/adcirc-met-forcing-implementation.md) | source-code level NWS=13 NetCDF reader |
 | [[khoa-2024-mhw-extreme]] | 동해 marine heatwave + 태풍 강도화 cascade |
 
 ---

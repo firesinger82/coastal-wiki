@@ -246,7 +246,7 @@ C API(`extern "C"`, `gahm_fortran.cpp:71-83`):
 
 Fortran 측(`fortran/gahm.F90`): `gahm_t`(핸들 래퍼)·`date_t` 파생형, `iso_c_binding` interface로 위 C 함수 바인딩(`gahm.F90:21-89`). `gahm_initialize`가 파일·점군으로 인스턴스 생성, `gahm_get`이 (u,v,p) 조회(`gahm.F90:141-165`). 출력 단위: u,v는 m/s(10분 풍), p는 mb(§6.2의 /100).
 
-ADCIRC fort.15 NWS 외력 패밀리에서 GAHM 호출(NWS13 등) 맥락은 [[adcirc-storm-surge-nws-families]] 및 [[adcirc-fort15-nws13-operating-rules]] 참조.
+ADCIRC fort.15 NWS 외력 패밀리에서 GAHM 호출(NWS13 등) 맥락은 [[adcirc-storm-surge-nws-families]] 참조.
 
 ---
 

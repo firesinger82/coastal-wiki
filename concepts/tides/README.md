@@ -18,7 +18,7 @@
 - `stewart-physical-ocean` — [`textbook/notes/tides-stewart-ch17.md`](../../textbook/notes/tides-stewart-ch17.md)
 - `tidal-heights-manual` — [`textbook/notes/tides-foreman1977-appendix.md`](../../textbook/notes/tides-foreman1977-appendix.md) (appendix only, 본문 OCR 보강 대기)
 - `khoa-portcals-glossary` — [`textbook/sources.yml`](../../textbook/sources.yml) (KHOA PortCALS 용어집)
-- `khoa-tide-model` — [`textbook/notes/tides-khoa-nonharmonic-research.md`](../../textbook/notes/tides-khoa-nonharmonic-research.md) (KHOA 공식 비조화상수·국립해양조사원고시 제2021-7호)
+- `khoa-notice-2021-7` — [`textbook/notes/tides-khoa-nonharmonic-research.md`](../../textbook/notes/tides-khoa-nonharmonic-research.md) (KHOA 공식 비조화상수·datum, 국립해양조사원고시 제2021-7호)
 - `khoa-tide-model` — [`textbook/notes/tides-khoa-cross-verification.md`](../../textbook/notes/tides-khoa-cross-verification.md) (3개 source 산재값 cross-verification + 변도성 2007 위상 기준 + 수치조류도)
 - `khoa-annual-reports` — [`textbook/notes/khoa-annual-reports-overview.md`](../../textbook/notes/khoa-annual-reports-overview.md) (15권 2012-2025 공식 백서, 조위·파랑·해수유동 통합)
 

@@ -16,7 +16,7 @@ Date: 2026-04-12
 
 ## Selected Baseline
 
-- local path: `E:\AI_ENV\modeling-wiki\raw\code\adcirc\adcirc-testsuite\adcirc\adcirc_quarterannular-2d-netcdf`
+- local path: `raw/code/adcirc/adcirc-testsuite/adcirc/adcirc_quarterannular-2d-netcdf`
 - testsuite name: `adcirc_quarterannular-2d-netcdf`
 
 ## Why This Anatomy Matters

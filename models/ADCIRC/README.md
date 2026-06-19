@@ -20,7 +20,7 @@
 
 | 경로 | 노트 수 | 상태 | 비고 |
 |---|---:|---|---|
-| `source-analysis/` | 39 (storm-surge/·tide/ subdir 포함) | 활발 | NWS modes·GAHM·mesh tools·source-code 분석. `storm-surge/` subdir + `tide/` subdir. (2026-06-18 정화: 개인 local-workflow/ 23 + forcing-input-foundation 제거) |
+| `source-analysis/` | 36 (storm-surge/·tide/ subdir 포함) | 활발 | NWS modes·GAHM·mesh tools·source-code 분석. `storm-surge/` subdir + `tide/` subdir. (2026-06-18 정화: 개인 local-workflow/ 23 + forcing-input + storm-surge JMA-MSM/NWS13 운영 플레이북 3 제거; E:\ provenance 중립화) |
 | `manual-notes/` | 21 verified | **M-B audit done 2026-05-24** | 21 외부 docs catalog (adcirc.github.io/adcirc.org/github.com URL 검증, WebFetch 03+06 sampling) verified |
 | `web-refs/` | 1 verified | **신설 2026-05-24** | adcirc-official-resources.md — 공식 사이트·GitHub repos (adcirc/adcirc·adcircpy·gahm·asgs·OceanMesh2D)·핵심 논문 (Luettich 1991-92·Westerink 1992·Dietrich 2010-11·Holland 1980) |
 | `raw/` | 1090 .md + 98 pdf + 140 fortran (16.9 GB) | archive | source_code + manuals + website mirror |

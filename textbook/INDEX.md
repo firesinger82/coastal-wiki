@@ -62,7 +62,7 @@
 | [notes/tides-lubbad2009-overview.md](notes/tides-lubbad2009-overview.md) | lubbad2009-tides-slides | tides | verified |
 | [notes/tides-stewart-ch17.md](notes/tides-stewart-ch17.md) | stewart-physical-ocean | tides | verified |
 | [notes/tides-foreman1977-appendix.md](notes/tides-foreman1977-appendix.md) | tidal-heights-manual | tides | verified (appendix only, 본문 p.1-47 OCR 보강 대기) |
-| [notes/tides-khoa-nonharmonic-research.md](notes/tides-khoa-nonharmonic-research.md) | khoa-tide-model | tides | verified (고시 제2021-7호·부산항 검증 완료, 인천 데이터 발췌 포함) |
+| [notes/tides-khoa-nonharmonic-research.md](notes/tides-khoa-nonharmonic-research.md) | khoa-notice-2021-7 | tides | verified (고시 제2021-7호 비조화상수·부산항 검증 완료, 인천 데이터 발췌 포함) |
 | [notes/tides-khoa-cross-verification.md](notes/tides-khoa-cross-verification.md) | khoa-tide-model | tides | verified (3개 source 산재값 cross-verification 보고서) |
 | [notes/waves-holthuijsen-toc.md](notes/waves-holthuijsen-toc.md) | holthuijsen2007 | waves | verified (Ch.1-9 + Appendix TOC, Ch.9 SWAN canonical) |
 | [notes/khoa-annual-reports-overview.md](notes/khoa-annual-reports-overview.md) | khoa-annual-reports | khoa-official | verified (KHOA 국가해양관측망 연간백서 2012-2025, 188K 줄) |

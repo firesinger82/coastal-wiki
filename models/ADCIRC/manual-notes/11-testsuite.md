@@ -17,7 +17,7 @@ notes: "P2 catalog audit 2026-05-24 — external URL catalog (adcirc.github.io/a
 - authors: ADCIRC development group
 - year: active repository
 - link: https://github.com/adcirc/adcirc-testsuite
-- local path: E:\AI_ENV\modeling-wiki\raw\code\adcirc\adcirc-testsuite
+- local path: raw/code/adcirc/adcirc-testsuite
 
 ## Why This Matters
 

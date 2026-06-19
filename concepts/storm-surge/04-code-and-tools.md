@@ -39,9 +39,7 @@ ADCIRC 의 `fort.15` 의 `NWS` 파라미터로 meteorological forcing source 결
 ### 1.2 NWS=13 (JMA-MSM) 입력 메커닉
 
 - 입력: JMA-MSM (일본기상청 Mesoscale Model) → NetCDF
-- ADCIRC 의 NWS=13 reader (`owiwind_netcdf.F:215, 681, 747`) 가 직접 읽음
-- 상세 운영 룰: [`models/ADCIRC/source-analysis/storm-surge/adcirc-jma-msm-nws13-foundation.md`](../../models/ADCIRC/source-analysis/storm-surge/adcirc-jma-msm-nws13-foundation.md)
-- `fort.15` 핵심 필드: [`adcirc-fort15-nws13-operating-rules.md`](../../models/ADCIRC/source-analysis/storm-surge/adcirc-fort15-nws13-operating-rules.md)
+- ADCIRC 의 NWS=13 (OWI NetCDF) reader 가 직접 읽음 — source-level 분석: [`adcirc-met-forcing-implementation.md §D`](../../models/ADCIRC/source-analysis/adcirc-met-forcing-implementation.md) (OWIWIND_NETCDF·NWS13INIT/GET·`&owiWindNetcdf` namelist 4필드)
 
 ### 1.3 NWS=20 GAHM 권장 이유
 

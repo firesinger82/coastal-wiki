@@ -17,7 +17,7 @@ notes: "P2 catalog audit 2026-05-24 — external URL catalog (adcirc.github.io/a
 - authors: ADCIRC development team
 - year: active documentation site
 - link: https://adcirc.github.io/adcirc/technical_reference/input_files/fort14.html ; https://adcirc.github.io/adcirc/technical_reference/input_files/time_varying_bathymetry.html ; https://adcirc.github.io/adcirc/tools/subgrid_adcirc_utility.html ; https://adcirc.github.io/adcirc/tools/oceanmesh2d.html
-- local path: E:\AI_ENV\modeling-wiki\raw\code\adcirc\adcirc\docs\technical_reference\input_files and tools pages
+- local path: raw/code/adcirc/adcirc/docs/technical_reference/input_files and tools pages
 
 ## Why This Matters
 
