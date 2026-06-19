@@ -126,7 +126,7 @@ Multiplies `TPK` term at `[file=src/timestep.F line=1501-1503, 1536]`. Standard 
 - `REFTIM` shifts harmonic time base: `TimeH = IT*DTDP + (STATIM - REFTIM)*86400` at `[file=src/timestep.F line=251-259]`, `[file=src/read_input.F line=2541]`
 - So `(V0+u)` references are relative to the specified harmonic reference epoch
 
-## Decision Guide — wide6 tide forcing
+## Decision Guide — tide forcing 진단
 
 | Issue | Investigation |
 |-------|---------------|

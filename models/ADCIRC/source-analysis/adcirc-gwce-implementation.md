@@ -74,11 +74,11 @@ The Generalized Wave Continuity Equation is ADCIRC's mass-conservation equation 
 - Initial dry-node logic in cold start: `[file=src/cstart.F line=1221-1231, 1258-1268]`
 - No separate dry-node check inside GWCE — purely multiplicative masking via `NODECODE`
 
-## Decision Guide — wide6 relevance
+## Decision Guide — 진단 (트러블슈팅)
 
 | Symptom | Likely cause | Source-level investigation |
 |---------|--------------|----------------------------|
-| Tidal amplitude wrong (남해 +27cm bias) | flux-gradient term + tau0 + bottom-friction interaction | Check `Tau0Var` + `FRIC` flow into `Coef` (`gwce.F:538-592`) |
+| Tidal amplitude wrong (지역 bias) | flux-gradient term + tau0 + bottom-friction interaction | Check `Tau0Var` + `FRIC` flow into `Coef` (`gwce.F:538-592`) |
 | Iteration count high | poor preconditioning or stiff diagonals | `NUMITR` in stdout; tighten `CONVCR` |
 | Boundary spike | tide block format wrong in fort.15 | `NBFR` block mismatch (`gwce.F:1638-1650`) |
 | Mass loss at wet/dry front | `NCELE` masking issue | `gwce.F:477` dry-element zeroing |

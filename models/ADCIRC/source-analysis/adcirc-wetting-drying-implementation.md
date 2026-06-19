@@ -16,7 +16,7 @@ verification_date: 2026-04
 
 Code-level walk-through of the wet/dry algorithm: when nodes flip wet→dry, when dry→wet, what thresholds (`H0`, `HABSMIN`, `HOFF`) control them, and how it interacts with bottom friction and momentum equations.
 
-Especially relevant to wide6 fix #1 work: removing 5m clamp activated 100K+ shallow nodes, so wet/dry behavior matters now.
+수심 하한(clamp)을 제거해 천해 노드가 다수 활성화되는 메시에서는 wet/dry 거동이 특히 중요해진다.
 
 ## A. NOLIFA flag effect
 
@@ -85,15 +85,15 @@ So:
 - But friction effect is switched off on dry nodes via momentum's `NCI=NODECODE` multiplication at `[file=src/momentum.F line=714, 751-753, 783-786]`
 - During wetting checks, `FRIC` is recomputed (Manning→Cd conversion + lower bound) at `[file=src/wetdry.F line=397-408, 543-553, 690-700]`
 
-## Decision Guide — H0 selection (wide6 fix #1 context)
+## Decision Guide — H0 selection (수심 하한별)
 
 | Bathymetry minimum | Recommended H0 | Why |
 |-------------------|----------------|-----|
-| ~5m (forced, OLD wide6) | H0=0.5 → 1.0 (or any) | Wet/dry never fires |
-| ~0.5-1m (natural shallow, NEW wide6) | **H0=0.05 → 0.1** | Standard ADCIRC default; allows correct shallow flow |
-| Goes negative (intertidal, NEW wide6) | H0=0.1, with `NODEDRYMIN`/`NODEWETMIN` tuning | Allows true intertidal dynamics |
+| ~5m (수심 하한 강제 시) | H0=0.5 → 1.0 (or any) | Wet/dry never fires |
+| ~0.5-1m (자연 천해) | **H0=0.05 → 0.1** | Standard ADCIRC default; allows correct shallow flow |
+| 음수 가능 (조간대) | H0=0.1, with `NODEDRYMIN`/`NODEWETMIN` tuning | Allows true intertidal dynamics |
 
-For wide6 after fix #1 (5m clamp removed):
+수심 하한(5m clamp)을 제거한 메시:
 - **Set `H0=0.1`** in fort.15
 - Verify `HOFF=0.12` (auto from `1.2*H0`)
 - 100K+ new shallow nodes will participate in wet/dry properly

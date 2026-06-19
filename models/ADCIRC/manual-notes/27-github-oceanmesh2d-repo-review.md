@@ -32,12 +32,12 @@ This repo matches the architecture already visible in the local `make_mesh_om2d.
 - `meshgen`
 - `msh`
 
-That makes it the strongest conceptual and implementation match to the current `wide6` baseline.
+That makes it a strong conceptual and implementation match for ADCIRC mesh-generation workflows.
 
 ## Practical Assessment
 
 Strengths:
-- direct match to the local working branch
+- direct fit for ADCIRC mesh-generation workflows
 - mature ADCIRC-oriented pre/postprocessing ecosystem
 - built-in concepts for bathymetry, boundaries, and mesh writing
 
@@ -45,7 +45,6 @@ Weaknesses:
 - MATLAB dependency remains
 - some working behavior may depend on OceanMesh2D internals rather than only on the visible script
 
-## Local Relevance
+## Relevance
 
-Current conclusion:
-- this is still the canonical upstream reference for understanding and preserving `wide6`
+- OceanMesh2D는 ADCIRC 메시 생성·전처리의 주요 upstream 참조 (MATLAB end-to-end mesh path).

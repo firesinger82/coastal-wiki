@@ -158,7 +158,6 @@ Activated when harmonic-analysis options in fort.15 are set (`NHASE`, `NHASV`, `
 - **Hot-start ↔ output file mismatch** — restart with different `NOUT*` flag sign (ASCII↔binary) leaves a corrupted partial file. Set `NOUT*` consistently across runs.
 - **fort.13 silent ignore** — if `NWP=0` in fort.15, the file is never read no matter what you put in it. Check `[file=src/nodalattr.F line=1051]` for `NWP` parsing.
 - **NWS=14 vs NWS=13** — both NetCDF; different reader path. `[file=src/owiwind.F line=188]` shows the dispatch.
-- ▢ **User-experience cases** — placeholder for project-specific incidents (wide6 forcing branch, JMA-MSM conversion, etc.). Add as encountered.
 
 ## Next expansion
 

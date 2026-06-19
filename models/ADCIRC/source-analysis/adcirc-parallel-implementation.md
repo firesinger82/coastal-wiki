@@ -144,7 +144,7 @@ GWCE iterative residual/dot products globally reduced via `psdot/ps2dots/ps3dots
 - Opened via `openLogFile(localdir)` in parallel startup at `[file=src/adcirc.F line=221]`
 - Implementation: `open(.../fort.16, STATUS='REPLACE')` at `[file=src/logging.F90 line=332-344]`
 
-## Decision Guide — adcprep workflow (wide6)
+## Decision Guide — adcprep workflow
 
 | Step | Command | Effect |
 |------|---------|--------|

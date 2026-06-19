@@ -125,14 +125,14 @@ Each reads per-PE files and writes full-domain `fort.6X/7X`.
 
 | Use case | NSPOOLE / NSPOOLGE | Output frequency |
 |----------|--------------------|------------------|
-| Tidal validation (wide6) | NSPOOLE = 900 (DT=2s → 30min) | per 30 min — current setting |
+| Tidal validation | NSPOOLE = 900 (DT=2s → 30min) | per 30 min |
 | Storm surge prediction | NSPOOLE = 360 (15 min) | finer for time-critical |
 | Climatology | NSPOOLE = 86400 (1 day) | daily averaging needed externally |
 | Disk-saving runs | NSPOOLE = 1800 (1 hour) | rough validation only |
 
-For wide6 (RNDAY=30, DT=2s, NSPOOLGE=900):
+예시 산정 (RNDAY=30, DT=2s, NSPOOLGE=900, 475K 노드):
 - 30 days × 24 h × 2 (per hour) = ~1440 records on global elevation field
-- Each record = 475K × 8 bytes = 3.8 MB → total 5.5 GB — matches actual fort.63.nc size
+- Each record = 475K × 8 bytes = 3.8 MB → total ~5.5 GB fort.63.nc
 
 ## Working Rules
 
