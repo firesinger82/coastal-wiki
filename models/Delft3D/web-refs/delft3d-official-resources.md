@@ -53,7 +53,7 @@ D-Flow FM(=Delft3D FM)은 차세대 **D-HYDRO Suite** 의 엔진. 데이터모�
 
 ### 3.3 모듈별 — WAVE / WAQ / PART
 
-- **Delft3D-WAVE** = SWAN integration (Booij·Ris·Holthuijsen 1999 인용, [[../../SWAN/web-refs/swan-official-resources.md]])
+- **Delft3D-WAVE** = SWAN integration (Booij·Ris·Holthuijsen 1999 인용, [[../../SWAN/web-refs/swan-official-resources]])
 - **Delft3D-WAQ** — Smits, J.G.C., Van Beek, J.K.L. (2013) "ECO: a generic eutrophication model" 등 다수
 - **Delft3D-PART** — particle tracking module
 

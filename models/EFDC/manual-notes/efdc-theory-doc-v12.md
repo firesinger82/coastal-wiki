@@ -184,7 +184,7 @@ List of Abbreviations                                                       ix
 | Bed Armoring (§6.4.6) | — | active layer + dynamic armoring |
 | 활용 | legacy·교과서 비교 | modern operational |
 
-source-code dispatch — [`models/EFDC/source-analysis/efdc_sediment.md`](../source-analysis/efdc_sediment.md) `ssedtox.f90:868-880`.
+source-code dispatch — [`models/EFDC/source-analysis/efdc_sediment.md`](../source-analysis/sediment/efdc_sediment.md) `ssedtox.f90:868-880`.
 
 ### 4.4 Ch 7 CHEMICAL FATE (p.110+)
 

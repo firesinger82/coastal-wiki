@@ -332,7 +332,7 @@ DG namelist parameter read (`DGFLAG`, `SLOPEFLAG`, `FLUXTYPE`, `RK_ORDER`, `dofh
 - 본 PR 자체: https://github.com/adcirc/adcirc/pull/502
 - Author: `namo626` (GitHub)
 - Related PR (시간 제어): [[adcirc-swan-coupling]] §SWAN Temporal Controls — PR #498 (2026-05-28 verified)
-- Information gaps: [[adcirc-information-gaps]] — DG WIP merge 후 본 노트 갱신
+- DG WIP — checklist/test/publication 미완 (PR #502). merge 후 본 노트 갱신.
 
 ## 12. 후속 추적
 

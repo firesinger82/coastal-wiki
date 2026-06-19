@@ -89,4 +89,4 @@ Beowulf cluster 실 응용 실험:
 
 - [[swan-tech-ch3-discretization]] — §3.2 propagation scheme (halo 1/2/3 점 = BSBT/SORDUP/S&L stencil)
 - [[swan-tech-ch3-solution-iteration-limiter]] — §3.3 four-sweep(병렬화 대상) + §3.4 curvature stopping(Jacobi scalability)
-- [[swan-tech-ch8-unstructured]] — Ch 8 unstructured 병렬(다음)
+- [[swan-tech-ch8-unstructured-grid-scheme]] — Ch 8 unstructured 병렬(다음)

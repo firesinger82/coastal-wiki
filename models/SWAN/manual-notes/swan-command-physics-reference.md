@@ -18,7 +18,7 @@ related:
 
 # SWAN swanuse §4.5.4 Physics commands reference — verified
 
-> swanuse.pdf (User Manual v41.51) §4.5.4 Physics 직접 read. **이론(swantech) ↔ user command(swanuse)** 대응 — 각 물리 command 의 정확 **구문·파라미터·default**. [[swan-documentation-stack]] 가 forward-link 한 command reference (physics 부분). 이론 detail 은 각 [[swan-tech-ch2-*]] 참조.
+> swanuse.pdf (User Manual v41.51) §4.5.4 Physics 직접 read. **이론(swantech) ↔ user command(swanuse)** 대응 — 각 물리 command 의 정확 **구문·파라미터·default**. [[swan-documentation-stack]] 가 forward-link 한 command reference (physics 부분). 이론 detail 은 각 `swan-tech-ch2-*` 참조.
 
 ## 1. GEN3 — wind input + quadruplet + whitecapping 3rd-gen ★
 

@@ -103,9 +103,9 @@ transport formula 3종(`form` 선택, [`xbeach_morphology.md §B`](../../models/
 ROMS 의 longshore current 는 **WEC(Wave Effects on Currents) vortex-force** 형으로 생성([`roms_wec.md`](../../models/ROMS/source-analysis/roms_wec.md)) — radiation stress 형(Mellor) 은 이 tree 에 없음(`WEC_VF`만, `roms_wec.md §A`).
 
 - **WEC_VF**: vortex force 가 quasi-Eulerian 운동량에 `rustr3d/rvstr3d` 로 가산([`roms_wec.md §B`](../../models/ROMS/source-analysis/roms_wec.md)); breaking dissipation(Thornton-Guza·Church-Thornton) 이 surf-zone setup·longshore current driver([`roms_wec.md §F`](../../models/ROMS/source-analysis/roms_wec.md)). Uchiyama et al. 2010 / McWilliams et al. 2004 canonical.
-- **transport(CSTMS)**: bedload = **Meyer-Peter-Müller** / **Soulsby-Damgaard**(combined wave+current) / **van der A et al. 2013**(wave asymmetry crest/trough)([`sediment/roms_sediment.md §C`](../../models/ROMS/source-analysis/roms_sediment.md)). **van Rijn 미구현**(이 tree).
-- suspended 는 **Partheniades 초과전단** `ero = dt·Erate·(1−por)·bed_frac·(τ/τ_ce−1)`([`sediment/roms_sediment.md §G`](../../models/ROMS/source-analysis/roms_sediment.md)); suspended sediment 는 일반 tracer 로 `step3d_t` 이송([`sediment/roms_sediment.md §F`](../../models/ROMS/source-analysis/roms_sediment.md)).
-- **BBL**(SSW/MB/SG) 가 wave-current 결합 bed shear 산출([`sediment/roms_sediment.md §E`](../../models/ROMS/source-analysis/roms_sediment.md)·[`roms_wec.md §E`](../../models/ROMS/source-analysis/roms_wec.md)).
+- **transport(CSTMS)**: bedload = **Meyer-Peter-Müller** / **Soulsby-Damgaard**(combined wave+current) / **van der A et al. 2013**(wave asymmetry crest/trough)([`sediment/roms_sediment.md §C`](../../models/ROMS/source-analysis/sediment/roms_sediment.md)). **van Rijn 미구현**(이 tree).
+- suspended 는 **Partheniades 초과전단** `ero = dt·Erate·(1−por)·bed_frac·(τ/τ_ce−1)`([`sediment/roms_sediment.md §G`](../../models/ROMS/source-analysis/sediment/roms_sediment.md)); suspended sediment 는 일반 tracer 로 `step3d_t` 이송([`sediment/roms_sediment.md §F`](../../models/ROMS/source-analysis/sediment/roms_sediment.md)).
+- **BBL**(SSW/MB/SG) 가 wave-current 결합 bed shear 산출([`sediment/roms_sediment.md §E`](../../models/ROMS/source-analysis/sediment/roms_sediment.md)·[`roms_wec.md §E`](../../models/ROMS/source-analysis/roms_wec.md)).
 
 → littoral drift: 광역 shelf↔surf zone 결합·rip current 까지 보려면 `WEC_VF + ROLLER_RENIERS + BBL_MODEL=SSW + SED_VAN_DER_A`([`roms_wec.md` Decision Guide](../../models/ROMS/source-analysis/roms_wec.md)).
 
@@ -127,7 +127,7 @@ ROMS 의 longshore current 는 **WEC(Wave Effects on Currents) vortex-force** �
 - Delft3D eqtran iform(van Rijn/Bijker/Soulsby) — [`delft3d_sediment_transport_formulae.md §2`](../../models/Delft3D/source-analysis/delft3d_sediment_transport_formulae.md)(`eqtran.f90`) **verified**
 - XBeach transus/sedtransform(Soulsby-vR·vanThiel-vR·vR1993) + skewness `ua` — [`xbeach_morphology.md §B,§E,§G`](../../models/XBeach/source-analysis/xbeach_morphology.md)(`morphevolution.F90`) **verified**
 - EFDC van Rijn/Engelund-Hansen + Christoffersen-Jonsson shear — [`sediment/efdc_sediment.md §D,§F`](../../models/EFDC/source-analysis/sediment/efdc_sediment.md)·[`sediment/efdc_sedzlj.md`](../../models/EFDC/source-analysis/sediment/efdc_sedzlj.md) **verified**
-- ROMS WEC vortex force + MPM/Soulsby-Damgaard/van der A bedload + Partheniades 부유 — [`roms_wec.md`](../../models/ROMS/source-analysis/roms_wec.md)·[`sediment/roms_sediment.md §C,§G`](../../models/ROMS/source-analysis/roms_sediment.md) **verified**
+- ROMS WEC vortex force + MPM/Soulsby-Damgaard/van der A bedload + Partheniades 부유 — [`roms_wec.md`](../../models/ROMS/source-analysis/roms_wec.md)·[`sediment/roms_sediment.md §C,§G`](../../models/ROMS/source-analysis/sediment/roms_sediment.md) **verified**
 - radiation stress→longshore current 인과 chain — [`02-theory.md`](02-theory.md)(Holthuijsen §7.4.2-3) **verified**
 
 ## 9. 연결

@@ -135,7 +135,7 @@ ANA_* 페이지 다수:
 | 4DVar tutorials | [[../source-analysis/roms_4dvar]] + i4dvar.F driver |
 | Nested_Grids | [[../source-analysis/roms_nesting]] |
 | ANA_* analytical | Functionals/ + Include/ |
-| sediment_cppdefs | [[../source-analysis/sediment]] subdir + Nonlinear/Sediment/ |
+| sediment_cppdefs | [[../source-analysis/sediment/roms_sediment]] subdir + Nonlinear/Sediment/ |
 
 ## 6. 관련 자료
 

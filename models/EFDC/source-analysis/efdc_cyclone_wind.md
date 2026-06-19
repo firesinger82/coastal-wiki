@@ -49,11 +49,11 @@ ICYCLONE = 0 none / 1 Holland / 2 Hubbert / 3 McConochie / 4 Willoughby
 ## 4. 위치
 
 - EFDC 가 태풍 해일 모델일 때 외력 공급(관측 best-track → 격자 wind/pressure). 외부 wind 파일(OWI 등) 대안.
-- [[concepts/storm-surge]] 의 ADCIRC GAHM/AHM(parametric TC wind)과 같은 계열 — EFDC 측 구현.
+- [[concepts/storm-surge/01-concept]] 의 ADCIRC GAHM/AHM(parametric TC wind)과 같은 계열 — EFDC 측 구현.
 
 ## 5. 연결
 
 - [[efdc_hydro_core]] — wind stress·기압 forcing → 운동량
 - [[efdc-theory-v12-ch2-hydrodynamics]] — wind drag C_D
-- [[concepts/storm-surge]] — 태풍 해일(ADCIRC parametric wind 대응)
+- [[concepts/storm-surge/01-concept]] — 태풍 해일(ADCIRC parametric wind 대응)
 - Holland 1980 / Willoughby et al. 2006 / Hubbert et al. 1991

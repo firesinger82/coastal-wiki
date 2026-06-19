@@ -84,7 +84,7 @@ Wave 문제 대부분 frequency-direction 동시 분포 필요:
 
 $$E(f) = \int_0^{2\pi} E(f, \theta) d\theta \quad \text{(2.9)}$$
 
-$E(f, \theta)$ = SWAN 의 표준 directional spectrum. **Figure 2.1**: North Sea local breeze + storm 의 1D vs 2D 비교 ([[Holthuijsen 2007]] 재인쇄, Cambridge UP 허가).
+$E(f, \theta)$ = SWAN 의 표준 directional spectrum. **Figure 2.1**: North Sea local breeze + storm 의 1D vs 2D 비교 (Holthuijsen (2007) 재인쇄, Cambridge UP 허가).
 
 ### 1.6 Integral wave parameters (Eq 2.10-2.12)
 

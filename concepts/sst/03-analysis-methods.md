@@ -173,7 +173,7 @@ $$\text{OHC}_0^H = \rho \cdot C_p \cdot \int_0^H T(z) \, dz$$
 - 동해 OHC trend: 0.148 × 10¹⁸ J/year (가장 큰 누적)
 - 남해 0.089, 서해 0.061 × 10¹⁸ J/year
 
-본 위키 NIFS raw 의 다층 trend 분석 → [`experience/nifs-vertical-trends.md`](../../experience/nifs-vertical-trends.md) (예정).
+본 위키 NIFS raw 의 다층 trend 분석 → [`experience/nifs-vertical-sst-trends.md`](../../experience/nifs-vertical-sst-trends.md).
 
 ## 8. 코드 매핑
 

@@ -50,7 +50,7 @@ related:
 | **12** | Fixed layers in Z-model | 388 |
 | App A/B | Files / Special features (B.12 Non-hydrostatic solver, p.621) | 428/505 |
 
-> Ch 11 (sediment) 의 식은 별도 source-analysis 노트 영역 — [[../source-analysis/sediment]] 와 [`concepts/sediment-transport/06-model-application.md`](../../../concepts/sediment-transport/06-model-application.md) 로 위임. 본 노트는 hydrodynamic core 집중.
+> Ch 11 (sediment) 의 식은 별도 source-analysis 노트 영역 — [[../source-analysis/sediment/delft3d_sediment]] 와 [`concepts/sediment-transport/06-model-application.md`](../../../concepts/sediment-transport/06-model-application.md) 로 위임. 본 노트는 hydrodynamic core 집중.
 
 ## 2. 모델 정체·가정 (§9.3.1, p.173)
 
@@ -234,7 +234,7 @@ eddy viscosity 는 항상 직전 ½ time-step 정보 기반. k·ε transport 는
 | §9.8 heat balance 5 모델 (p.229) | [[../source-analysis/delft3d_heat]] |
 | §10.4 ADI 2-stage (p.266) | [[../source-analysis/delft3d_adi_solver]] |
 | §10.8 drying/flooding (p.281-289) | [[../source-analysis/delft3d_drying_flooding]] |
-| Ch 11 sediment·morphology (p.307) | [[../source-analysis/sediment]] |
+| Ch 11 sediment·morphology (p.307) | [[../source-analysis/sediment/delft3d_sediment]] |
 
 ## 13. 관련 자료
 

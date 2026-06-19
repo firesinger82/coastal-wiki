@@ -122,7 +122,7 @@ dd(k1) -= auru ; dd(k2) += auru       ! RHS (유출/유입 부호)
 $$A_n\frac{s_1^{n+1}-s_1^n}{\Delta t} + \sum_{L \in n} \pm q_1(L) = Q_{in}$$
 에서 `q1(L) = au(L)[θ u^{n+1} + (1-θ)u^0]` 를 `u^{n+1}=ru-fu·Δs` 로 치환해, `s1`의 대각·비대각·RHS 항으로 전개한 것이다. 3D는 동일 로직을 layer `Lbot..Ltop`에 대해 누적(`s1ini.f90:346-372`).
 
-비선형이면 `ccrsav = ccr` 저장(`s1ini.f90:374-376`) — outer 반복에서 solve가 `ccr`를 덮어쓰므로 복원용([[step_reduce_hydro]]의 `ccr = ccrsav` `:274`).
+비선형이면 `ccrsav = ccr` 저장(`s1ini.f90:374-376`) — outer 반복에서 solve가 `ccr`를 덮어쓰므로 복원용(`step_reduce_hydro`의 `ccr = ccrsav` `:274`).
 
 ### 3.2 cell 대각·RHS 완성 + 경계 — `s1nod`
 

@@ -216,11 +216,11 @@ User Manual Chapter 1 (p.1) verbatim:
 
 ### 5.2 swantech.pdf 후속 보강 후보 (현재 본 위키 미커버)
 
-- **§2.6 Wave-induced set-up** + Ch 5 2D wave setup implementation (SIP/SOR solver) → 신설 [[swan-2d-setup]]
+- **§2.6 Wave-induced set-up** + Ch 5 2D wave setup implementation (SIP/SOR solver) → 신설 [[swan-tech-ch4-5-bc-2d-setup]]
 - **§2.7 Quasi-coherent modelling** (Wigner distribution + QC approximation, p.58-64) + §3.9 implementation → 신설 [[swan-quasi-coherent]]
 - **§3.8 Refraction approximation** (c_θ limitation, coarse-grid problem) — historical overview, 4가지 sub-section (3.8.1-3.8.5) → [[swan-propagation-implementation]] §확장
 - **§3.6 DIA within four-sweep technique** (Discrete Interaction Approximation Hasselmann 1985) → [[swan-source-terms-implementation]] §S_nl 확장
-- **Ch 6 Iterative solvers (SIP / SOR)** — 본 위키 명시적 미커버 → 신설 [[swan-iterative-solvers]]
+- **Ch 6 Iterative solvers (SIP / SOR)** — 본 위키 명시적 미커버 → 신설 [[swan-tech-ch6-iterative-solvers]]
 - **Ch 8 Unstructured mesh** §8.6 diffusion-like terms + §8.7 conservation of action — 본 위키 부분 커버 (foundation 외)
 - **Ch 1.1 historical background** — SWAN cycle 1/2/3 + 30.62/30.75/40.01/32.10 → [[swan-foundation]] §version history
 
@@ -246,6 +246,6 @@ User Manual Chapter 1 (p.1) verbatim:
 - [[swan-action-balance]] — Tech §2.2.2
 - [[swan-foundation]] — SWAN 모듈 구조 (Impl §3 build + Tech Ch1 historical 통합)
 - [[swan-command-file-reference]] — User §4 commands 매핑
-- 모든 [[swan-*-implementation]] — Tech chapter 매핑 표 (§5.1)
+- 모든 `swan-*-implementation` — Tech chapter 매핑 표 (§5.1)
 - 공식 사이트: http://www.swan.tudelft.nl (Tech §1, User front matter)
 - GitLab 호스팅 (Impl Ch 1): 41.41+ 이후

@@ -121,7 +121,7 @@ List of Figures                                 xvi
 | §4.5.2 Domain (Grid/Bath/Dry/Thin) | `flow2d3d_io` (MDF parser) + `flow2d3d_data` (grid state) |
 | §4.5.6 Boundaries (Flow/Transport BC) | `flow2d3d_kernel` 의 BC routines |
 | §4.5.7.3 Heat flux | [[../source-analysis/delft3d_heat]] |
-| §4.5.7.4-5 Sediment + Morphology | [[../source-analysis/sediment]] subdir |
+| §4.5.7.4-5 Sediment + Morphology | [[../source-analysis/sediment/delft3d_sediment]] subdir |
 | §4.5.7.6 Wind | `flow2d3d_kernel` wind stress |
 | §4.5.9 Operations (Discharge/Dredge-Dump) | [[../source-analysis/delft3d_dredge_dump]] |
 | §4.5.10 Monitoring | `flow2d3d_io` output writers |

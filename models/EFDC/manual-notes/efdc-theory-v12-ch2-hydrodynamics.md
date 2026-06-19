@@ -592,7 +592,7 @@ primary sources of Ch 2 (각 식 옆 인용):
 - `efdc-theory-v12-ch5-temperature.md` — §5.1.2 COARE 3.6 + §5.4 ice + §5.2 light attenuation (Paulson-Simpson 1977 Table 5.1)
 - `efdc-theory-v12-ch6-sediment.md` — §6.3 SedTran + §6.4 SEDZLJ equation level
 - `efdc-mellor-yamada-vs-kantha-comparison.md` — Table 2.1 의 4 옵션 한국 실무 선택 guide
-- `efdc-sgz-application-cases.md` — 한국 항만·하구 SGZ 적용 경험 ([[experience]] 후보)
+- `efdc-sgz-application-cases.md` — 한국 항만·하구 SGZ 적용 경험 (experience/ 후보)
 
 ---
 

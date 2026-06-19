@@ -236,4 +236,4 @@ AIS/user track 의 시간 보간 (prev/next track 위치 사이 선형) → ship
 
 - [[efdc_sedzlj]] — SEDZLJ 침식 머신 (Calc_Prop_Erosion 재사용, TACT/ERATE/SH_SCALE 동일)
 - [[efdc_dispersion]] — EFDC 분산
-- [[sediment-transport]] concepts — 표사이동 (propwash = 인위 재부유)
+- [concepts/sediment-transport](../../../../concepts/sediment-transport/README.md) — 표사이동 (propwash = 인위 재부유)

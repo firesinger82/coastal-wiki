@@ -181,6 +181,6 @@ bed 의 시간 발전:
 - [[efdc-theory-doc-v12]] — DSI 2024 modernized theory
 - [`concepts/sediment-transport/02-theory.md`](../../../concepts/sediment-transport/02-theory.md) — 일반 표사 이론 (cross-reference, 본 doc 식의 도메인 컨텍스트)
 - [`concepts/sediment-transport/06-model-application.md`](../../../concepts/sediment-transport/06-model-application.md) — EFDC SedTran/SEDZLJ dispatch (ssedtox.f90:868-880)
-- [`models/EFDC/source-analysis/efdc_sediment.md`](../source-analysis/efdc_sediment.md) — codex source-code 직접 분석
+- [`models/EFDC/source-analysis/efdc_sediment.md`](../source-analysis/sediment/efdc_sediment.md) — codex source-code 직접 분석
 - `textbook/sources.yml` 의 `efdc-sed-trans-2003` source_id
 - 외부: Krone (1962), Partheniades (1965) — 본 doc §7 의 cohesive sediment legacy paper
