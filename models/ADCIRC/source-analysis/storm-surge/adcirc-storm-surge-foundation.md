@@ -223,10 +223,8 @@ Not decided in this note:
 - what mesh resolution is appropriate
 - whether the workflow should be hindcast, hazard, or forecast style
 
-## Next Foundation Steps For Storm Surge
+## 관련 노트
 
-1. Create a storm-surge source subset under `knowledge/methods/adcirc-sources/`
-2. Make one note for `NWS` families and one note for storm-surge examples
-3. Build a `storm surge requirements checklist` that lists required materials by forcing type
-4. Document the local `JMA-MSM -> NWS=13` path explicitly
-5. Only after that, begin project-specific parameter reasoning
+- NWS 외력 패밀리 비교 → [[adcirc-storm-surge-nws-families]]
+- 요구사항 체크리스트 → [[adcirc-storm-surge-requirements-checklist]]
+- NWS=13 OWI NetCDF reader (source-level) → [[adcirc-met-forcing-implementation]] §D

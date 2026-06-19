@@ -23,10 +23,10 @@ Scope note:
 ## Source Basis
 
 Primary sources used for this draft:
-- `knowledge/methods/xbeach-sources/01-local-manual-stack.md`
+- [[01-local-manual-stack]]
 - `numerical_models/xbeach/XBEACH_MANUAL.md`
-- `knowledge/methods/xbeach-parameter-glossary-v1.md`
-- `knowledge/methods/xbeach-boundary-and-wave-setup.md`
+- [[xbeach-parameter-glossary-v1]]
+- [[xbeach-boundary-and-wave-setup]]
 
 ## First Principle
 
@@ -196,6 +196,6 @@ Two useful reference directions already appear in the local note:
 
 ## Next Expansion Candidates
 
-- `knowledge/methods/xbeach-first-baseline-case-selection.md`
+- [[xbeach-first-baseline-case-selection]]
 - future heuristic on using `morfac = 1` first for storm-event baselines
 - future failure pattern on morphology interpretation drift caused by premature acceleration or unstable boundary setup

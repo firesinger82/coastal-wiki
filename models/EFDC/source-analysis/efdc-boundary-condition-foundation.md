@@ -132,5 +132,5 @@ If stage is acceptable but currents are not, treat boundary-condition interpreta
 ## Next Expansion Candidates
 
 - targeted source-note extraction for exact EFDC+ boundary control names
-- `knowledge/methods/efdc-wetting-drying-foundation.md`
+- [[efdc-wetting-drying-foundation]]
 - future `knowledge/playbooks/efdc-boundary-forcing-checklist.md`

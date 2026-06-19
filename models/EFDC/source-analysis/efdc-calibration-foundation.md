@@ -148,7 +148,7 @@ Each EFDC experiment card should record:
 ## What This Note Should Lead To Next
 
 Natural follow-on notes:
-- `knowledge/methods/efdc-boundary-condition-foundation.md`
+- [[efdc-boundary-condition-foundation]]
 - `knowledge/failure-patterns/efdc-water-level-good-current-bad.md`
 - `knowledge/heuristics/efdc-check-comparison-basis-before-friction-tuning.md`
 - `knowledge/playbooks/efdc-tidal-calibration-order.md`

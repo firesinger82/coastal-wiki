@@ -24,7 +24,7 @@ Scope note:
 ## Source Basis
 
 Primary confirmed local sources:
-- `knowledge/methods/xbeach-sources/01-local-manual-stack.md`
+- [[01-local-manual-stack]]
 - `numerical_models/xbeach/XBEACH_MANUAL.md`
 - official docs root: `https://xbeach.readthedocs.io/en/latest/`
 
@@ -279,7 +279,7 @@ Whenever the first XBeach experiment cards are created, record at minimum:
 
 ## Next Expansion Candidates
 
-- `knowledge/methods/xbeach-boundary-and-wave-setup.md`
-- `knowledge/methods/xbeach-morphology-foundation.md`
+- [[xbeach-boundary-and-wave-setup]]
+- [[xbeach-morphology-foundation]]
 - exact output-variable vocabulary from the official docs and local runs
 - first heuristic on when to prefer `surfbeat` versus `nonh`

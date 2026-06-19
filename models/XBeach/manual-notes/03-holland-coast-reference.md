@@ -91,6 +91,6 @@ Do not use Holland Coast as:
 - related failure patterns:
   - `knowledge/failure-patterns/xbeach-morphology-interpretation-drift.md`
 - related method notes:
-  - `knowledge/methods/xbeach-morphology-foundation.md`
-  - `knowledge/methods/xbeach-first-baseline-case-selection.md`
-  - `knowledge/methods/xbeach-parameter-glossary-v1.md`
+  - [[xbeach-morphology-foundation]]
+  - [[xbeach-first-baseline-case-selection]]
+  - [[xbeach-parameter-glossary-v1]]

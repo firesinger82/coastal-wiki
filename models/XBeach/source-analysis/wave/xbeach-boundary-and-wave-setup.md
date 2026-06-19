@@ -25,7 +25,7 @@ Scope note:
 ## Source Basis
 
 Primary sources used for this draft:
-- `knowledge/methods/xbeach-sources/01-local-manual-stack.md`
+- [[01-local-manual-stack]]
 - `numerical_models/xbeach/XBEACH_MANUAL.md`
 - official docs root: `https://xbeach.readthedocs.io/en/latest/`
 - source file: `numerical_models/xbeach/src/src/xbeachlibrary/boundaryconditions.F90`
@@ -192,6 +192,6 @@ That means every future experiment card should record at minimum:
 
 ## Next Expansion Candidates
 
-- `knowledge/methods/xbeach-morphology-foundation.md`
+- [[xbeach-morphology-foundation]]
 - future heuristic on when to prefer `surfbeat` versus `nonh`
 - future playbook for selecting the first reproducible XBeach storm baseline

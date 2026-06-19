@@ -92,6 +92,6 @@ Do not use DELILAH as:
 - related failure patterns:
   - `knowledge/failure-patterns/xbeach-morphology-interpretation-drift.md`
 - related method notes:
-  - `knowledge/methods/xbeach-boundary-and-wave-setup.md`
-  - `knowledge/methods/xbeach-first-baseline-case-selection.md`
-  - `knowledge/methods/xbeach-morphology-foundation.md`
+  - [[xbeach-boundary-and-wave-setup]]
+  - [[xbeach-first-baseline-case-selection]]
+  - [[xbeach-morphology-foundation]]

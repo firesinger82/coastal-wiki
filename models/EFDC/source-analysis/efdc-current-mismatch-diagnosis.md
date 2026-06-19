@@ -85,8 +85,8 @@ If stage is good but currents are bad, first suspect comparison basis, geometry,
 
 ## Likely Follow-On Notes
 
-- `knowledge/methods/efdc-parameter-glossary-v1.md`
-- `knowledge/methods/efdc-calibration-foundation.md`
-- `knowledge/methods/efdc-boundary-condition-foundation.md`
+- [[efdc-parameter-glossary-v1]]
+- [[efdc-calibration-foundation]]
+- [[efdc-boundary-condition-foundation]]
 - future `knowledge/failure-patterns/efdc-water-level-good-current-bad.md`
 - future `knowledge/playbooks/efdc-tidal-calibration-order.md`
