@@ -24,9 +24,9 @@ verification_date: 2026-05-21
 
 | Label | 경로 | 행 수 | 컬럼 |
 |---|---|---|---|
-| **A** | `D:\Numerical_models\01_Models\DASHBOARD\data\조석\조위관측소_조화상수.csv` | 5232 | obs_code, obs_name, hc_name, amp, pha_gmt, pha_kst |
-| **B** | `D:\Numerical_models\01_Models\DASHBOARD\data\조석\기준검조소_조화 및 비조화 상수.csv` | 603 | obs_code, obs_name, lat, lon, msl, mhws, mhwn, ahhw, mhwi, m2_h/g/k, s2_h/g/k, k1_h/g/k, o1_h/g/k |
-| **C** | `D:\Numerical_models\00_Common\Tide\tide_model\KHOA\khoa_harmonic_db.csv` | 576 | obs_code, obs_name, lon, lat, source, m2_amp, m2_pha_G, m2_pha_g, s2_*, k1_*, o1_* |
+| **A** | `조위관측소_조화상수.csv` | 5232 | obs_code, obs_name, hc_name, amp, pha_gmt, pha_kst |
+| **B** | `기준검조소_조화 및 비조화 상수.csv` | 603 | obs_code, obs_name, lat, lon, msl, mhws, mhwn, ahhw, mhwi, m2_h/g/k, s2_h/g/k, k1_h/g/k, o1_h/g/k |
+| **C** | `khoa_harmonic_db.csv` | 576 | obs_code, obs_name, lon, lat, source, m2_amp, m2_pha_G, m2_pha_g, s2_*, k1_*, o1_* |
 
 ## 2. 분조 각속도 검증
 
@@ -111,7 +111,7 @@ skill.md의 KHOA API 가이드(§ "G 재계산 코드")에서도 `tl_*_k` 값 �
 
 ### 5.1 데이터 구조
 
-- 파일: `D:\Numerical_models\00_Common\Tide\tide_model\KHOA\해양수산부 국립해양조사원_수치조류도 기반 조화상수_20250814.csv` (cp949 인코딩)
+- 파일: `해양수산부 국립해양조사원_수치조류도 기반 조화상수_20250814.csv` (cp949 인코딩)
 - 행: 813,703
 - 컬럼: 14개 분조 × 2 (진폭, 지각) + 좌표 (lon lat)
 - 분조: j1, k1, k2, l2, m1, m2, mu2, n2, nu2, o1, oo1, p1, q1, s2

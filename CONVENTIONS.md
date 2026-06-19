@@ -128,10 +128,11 @@ verification_date: YYYY-MM-DD
 
 ## 9. 위키 무결성 검증 도구
 
-`research/` 격리 enforce 와 본문 무결성 검증은 다음 스크립트로 수행 (정책 출처: [plan.md](plan.md) D3, M10):
+`research/` 격리 enforce 와 canonical 무결성 검증은 다음 스크립트로 수행 (정책 출처: [plan.md](plan.md) D3·M10·G8):
 
 - `tools/validate-research-isolation.sh` — concepts/, models/, experience/ 가 research/ 를 직접 참조하는지 + research/ 내 .md 가 `citation_status: draft-unsourced` 인지 검증. exit 0/1/2/3.
-- `tools/install-hooks.sh` — `.git/hooks/pre-commit` 에 위 스크립트를 등록. 한 번 실행하면 commit마다 자동 검증.
+- `tools/validate-canonical-hygiene.sh` — **G8** 강제: canonical(concepts/·models/·textbook/) 에 작성자 로컬 절대경로(G8b) 또는 개인사례 유도 placeholder(G8d) 가 있는지 검증. vendor 경로·repo-상대 file:line·textbook/md 미러·거버넌스(POLICY/INDEX) 면제. exit 0/1/2/3. 회귀: `tools/test_validate_canonical_hygiene.py` (23 case).
+- `tools/install-hooks.sh` — `.git/hooks/pre-commit` 에 위 두 검증을 등록 (marker v3). 한 번 실행하면 commit마다 자동 검증.
 
 새 PC 에서 clone 후: `bash tools/install-hooks.sh` 한 번 실행.
 

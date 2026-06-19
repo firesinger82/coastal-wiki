@@ -106,7 +106,7 @@ related:
 
 ### 4.1 실행 (Training p82-85)
 
-Citrix 가상 데스크톱(`appserver.ncwater.org`) 로그인 → 데스크톱 아이콘으로 base case 실행 (`D:\Tar_users\dackerman\EFDCBaseCase`).
+Citrix 가상 데스크톱(`appserver.ncwater.org`) 로그인 → 데스크톱 아이콘으로 base case 실행 (교육자료의 `EFDCBaseCase` 작업폴더).
 
 ### 4.2 시나리오 개발 (Training p86-94)
 

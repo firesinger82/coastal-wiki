@@ -7,7 +7,7 @@ page_offset_applied: false
 topic: storm-surge
 canonical_source: self
 citation_status: verified
-verification_method: "E:\\KHOA_연간백서\\markdowns\\Annual_Report(2012.vol.1).md 직접 인용 — line 8155-8521 §7.3 군산 외해역 ADCP, line 8165 (잔차류 강하게), line 8508/8514/8520 (C4 정점 표층·중층·저층 시계열), line 8998 (C6 2nd 저층), line 9208 (정성 결론). 표 7-27 (정점 5개 좌표·기간·간격) + 그림 7-64·7-66·7-81·7-83 (관측·예측·잔차 시계열) 직접 인용."
+verification_method: "Annual_Report(2012.vol.1).md 직접 인용 — line 8155-8521 §7.3 군산 외해역 ADCP, line 8165 (잔차류 강하게), line 8508/8514/8520 (C4 정점 표층·중층·저층 시계열), line 8998 (C6 2nd 저층), line 9208 (정성 결론). 표 7-27 (정점 5개 좌표·기간·간격) + 그림 7-64·7-66·7-81·7-83 (관측·예측·잔차 시계열) 직접 인용."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-24
 verification_by: "Claude Opus 4.7 (1M context) — markdown 직접 인용"
@@ -21,7 +21,7 @@ related:
 
 # KHOA Annual Report 2012 vol.1 §7.3 — 태풍 볼라벤 2012-08-29 군산 외해 ADCP 잔차
 
-> 출처: [`E:\KHOA_연간백서\markdowns\Annual_Report(2012.vol.1).md`](file:///mnt/e/KHOA_연간백서/markdowns/Annual_Report%282012.vol.1%29.md) line 8155-8521, source_id `khoa-annual-reports` (국립해양조사원 국가해양관측망 연간백서 2012-2025).
+> 출처: `Annual_Report(2012.vol.1).md` line 8155-8521, source_id `khoa-annual-reports` (국립해양조사원 국가해양관측망 연간백서 2012-2025).
 
 ## 1. Case 식별
 
@@ -121,4 +121,4 @@ source_id 매니페스트: [`textbook/sources.yml`](../sources.yml) — `khoa-an
 - [`textbook/notes/khoa-annual-reports-overview.md`](khoa-annual-reports-overview.md) §4.5 storm-surge (case 발췌 후보)
 - 외부:
   - KHOA 공식: [http://www.khoa.go.kr/oceangrid/khoa/](http://www.khoa.go.kr/oceangrid/khoa/)
-  - 백서 markdown: `E:\KHOA_연간백서\markdowns\Annual_Report(2012.vol.1).md`
+  - 백서 markdown: `Annual_Report(2012.vol.1).md`

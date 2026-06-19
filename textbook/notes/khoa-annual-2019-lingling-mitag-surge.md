@@ -7,7 +7,7 @@ page_offset_applied: false
 topic: storm-surge
 canonical_source: self
 citation_status: verified
-verification_method: "E:\\KHOA_연간백서\\markdowns\\Annual_Report(2019).md 직접 인용 — line 2892 (서해안 최저기압 -10.7 hPa 누년대비 + 링링·미탁 영향), line 3576 (2019년 한반도 영향 5 태풍 식별), line 4244-4262 (표 3-49 인천 9월 고극조위 957 cm vs 누년 946 cm = +11 cm 편차)."
+verification_method: "Annual_Report(2019).md 직접 인용 — line 2892 (서해안 최저기압 -10.7 hPa 누년대비 + 링링·미탁 영향), line 3576 (2019년 한반도 영향 5 태풍 식별), line 4244-4262 (표 3-49 인천 9월 고극조위 957 cm vs 누년 946 cm = +11 cm 편차)."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-06-01
 verification_by: "Claude Opus 4.7 (1M context) — markdown 직접 인용"
@@ -20,7 +20,7 @@ related:
 
 # KHOA Annual Report 2019 §3 — 태풍 링링 2019 서해안 + 미탁 한반도 상륙 surge
 
-> 출처: `E:\KHOA_연간백서\markdowns\Annual_Report(2019).md`, source_id `khoa-annual-reports`.
+> 출처: `Annual_Report(2019).md`, source_id `khoa-annual-reports`.
 
 ## 1. Case 식별
 

@@ -3,7 +3,7 @@ title: "adcirc bathymetry input foundation"
 topic: general
 canonical_source: self
 citation_status: verified
-verification_method: "ADCIRC 공식 문서(fort.14/fort.13/fort.141 의미·NWS·전처리 도구) 기반. modeling-wiki 마이그레이션(2026-05-23). (2026-06-18 canonical 정화: 개인 E:\\ 경로·로컬 grid 유틸리티 증거 제거, 공개 도구·소스명만 유지.)"
+verification_method: "ADCIRC 공식 문서(fort.14/fort.13/fort.141 의미·NWS·전처리 도구) 기반. modeling-wiki 마이그레이션(2026-05-23). (2026-06-18 canonical 정화: 개인 로컬 경로·grid 유틸리티 증거 제거, 공개 도구·소스명만 유지.)"
 note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 마이그레이션 2026-05-23 → 2026-06-18 정화"
 note_date: 2026-04~05 (original) / 2026-05-23 (promote)
 verification_by: "사용자 + codex source-code analysis"

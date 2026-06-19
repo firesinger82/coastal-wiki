@@ -7,7 +7,7 @@ page_offset_applied: false
 topic: khoa-official
 canonical_source: self
 citation_status: verified
-verification_method: "AI cross-reference against D:\\Numerical_models\\00_Common\\KHOA_WHITE_PAPER\\markdowns\\ 15 .md files (총 188,929 줄). 2025 보고서 구조 + 조석 비조화 공식 정의 confirmed."
+verification_method: "AI cross-reference against  15 .md files (총 188,929 줄). 2025 보고서 구조 + 조석 비조화 공식 정의 confirmed."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-23
 verification_by: "Claude Opus 4.7 (1M context) — cross-ref"
@@ -16,7 +16,7 @@ verification_date: 2026-05-23
 
 # KHOA 국가해양관측망 연간백서 (2012-2025)
 
-> 출처: `khoa-annual-reports` = `D:\Numerical_models\00_Common\KHOA_WHITE_PAPER\markdowns\` (15권, 188,929 줄 markdown)
+> 출처: `khoa-annual-reports` = `` (15권, 188,929 줄 markdown)
 
 ## 1. 백서 list
 

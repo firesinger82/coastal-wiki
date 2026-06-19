@@ -7,7 +7,7 @@ page_offset_applied: false
 topic: storm-surge
 canonical_source: self
 citation_status: verified
-verification_method: "E:\\KHOA_연간백서\\markdowns\\Annual_Report(2022).md 직접 인용 — line 3155-3166 (표 3-5 해역별 월별 고극조위), line 3350 (제11호 힌남노 + 제14호 난마돌 정성), line 4212 (월별 평균풍속 9월 18.6 m/s), line 4486 (생일도 부이 유의파고 5.81 m), line 10546-10597 (포항 표 3-258/259 — 2022 9월 137 cm), line 10413-10464 (울산 표 3-253/254 — 2022 9월 124 cm), line 9626-9677 (마산 표 3-223/224 — 2022 9월 227 cm, 누년대비 -38 cm), line 9358-9409 (통영 표 3-213/214 — 2022 9월 302 cm, 누년대비 -55 cm)."
+verification_method: "Annual_Report(2022).md 직접 인용 — line 3155-3166 (표 3-5 해역별 월별 고극조위), line 3350 (제11호 힌남노 + 제14호 난마돌 정성), line 4212 (월별 평균풍속 9월 18.6 m/s), line 4486 (생일도 부이 유의파고 5.81 m), line 10546-10597 (포항 표 3-258/259 — 2022 9월 137 cm), line 10413-10464 (울산 표 3-253/254 — 2022 9월 124 cm), line 9626-9677 (마산 표 3-223/224 — 2022 9월 227 cm, 누년대비 -38 cm), line 9358-9409 (통영 표 3-213/214 — 2022 9월 302 cm, 누년대비 -55 cm)."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-28
 verification_by: "Claude Opus 4.7 (1M context) — markdown 직접 인용"
@@ -23,7 +23,7 @@ related:
 
 # KHOA Annual Report 2022 §3 — 태풍 힌남노 2022-09-06 동해 동남부 surge
 
-> 출처: [`E:\KHOA_연간백서\markdowns\Annual_Report(2022).md`](file:///mnt/e/KHOA_연간백서/markdowns/Annual_Report%282022%29.md), source_id `khoa-annual-reports` (국립해양조사원 국가해양관측망 연간백서 2012-2025).
+> 출처: `Annual_Report(2022).md`, source_id `khoa-annual-reports` (국립해양조사원 국가해양관측망 연간백서 2012-2025).
 
 ## 1. Case 식별
 
@@ -192,4 +192,4 @@ source_id 매니페스트: [`textbook/sources.yml`](../sources.yml) — `khoa-an
 - [`textbook/notes/khoa-annual-reports-overview.md`](khoa-annual-reports-overview.md) §4.5 storm-surge 발췌 후보
 - 외부:
   - KHOA 공식: [http://www.khoa.go.kr/oceangrid/khoa/](http://www.khoa.go.kr/oceangrid/khoa/)
-  - 백서 markdown: `E:\KHOA_연간백서\markdowns\Annual_Report(2022).md`
+  - 백서 markdown: `Annual_Report(2022).md`

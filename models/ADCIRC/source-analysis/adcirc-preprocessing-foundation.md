@@ -3,7 +3,7 @@ title: "adcirc preprocessing foundation"
 topic: general
 canonical_source: self
 citation_status: verified
-verification_method: "ADCIRC 공식 문서(adcirc.github.io / adcirc.org) 기반 전처리 레이어 정리. file 의미·NWS·전처리 도구 생태계는 공식 docs 근거. (2026-06-18 canonical 정화: 개인 프로젝트 내용 — wide6·JMA-MSM 로컬 분기·E:\\ 경로·local-workflow 링크 — 제거. 개인 ADCIRC 운영 자료는 experience/ 레이어.)"
+verification_method: "ADCIRC 공식 문서(adcirc.github.io / adcirc.org) 기반 전처리 레이어 정리. file 의미·NWS·전처리 도구 생태계는 공식 docs 근거. (2026-06-18 canonical 정화: 개인 프로젝트 내용 — wide6·JMA-MSM 로컬 분기·로컬 경로·local-workflow 링크 — 제거. 개인 ADCIRC 운영 자료는 experience/ 레이어.)"
 note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 마이그레이션 2026-05-23 → 2026-06-18 정화 (Opus 4.8)"
 note_date: 2026-04~05 (original) / 2026-05-23 (promote) / 2026-06-18 (purify)
 verification_by: "공식 ADCIRC 문서 cross-ref"

@@ -15,7 +15,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 WIKI_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 HOOK="$WIKI_ROOT/.git/hooks/pre-commit"
-MARKER="# coastal-wiki:pre-commit:v2"
+MARKER="# coastal-wiki:pre-commit:v3"
 
 if [ ! -d "$WIKI_ROOT/.git" ]; then
     echo "ERROR: $WIKI_ROOT/.git 없음. git repo 루트에서 실행하세요."
@@ -30,11 +30,12 @@ fi
 cat > "$HOOK" <<EOF
 #!/usr/bin/env bash
 $MARKER
-# 정책 출처: plan.md M10, D3 + 2차 review F1·F3 (2026-05-23)
+# 정책 출처: plan.md M10·D3·G8 + 2차 review F1·F3 (2026-05-23) + 정화 G8 (2026-06-18)
 # 검사 순서:
 #   1) staged path guard (F3) — models/*/raw/{source_code,manuals}/ reject
 #   2) 대용량 staged blob 경고 (옵션 임계치 COASTAL_WIKI_MAX_BLOB_MB, 기본 50MB)
 #   3) research isolation 검증 — staged snapshot 기준 (F1)
+#   4) canonical hygiene 검증 (G8b 경로·G8d placeholder) — staged snapshot
 set -euo pipefail
 
 WIKI_ROOT="\$(git rev-parse --show-toplevel)"
@@ -86,6 +87,14 @@ if [ ! -x "\$SCRIPT" ]; then
     exit 1
 fi
 bash "\$SCRIPT" --staged
+
+# ---------- 4) canonical hygiene (G8b 경로 · G8d placeholder, staged snapshot) ----------
+HYGIENE="\$WIKI_ROOT/tools/validate-canonical-hygiene.sh"
+if [ ! -x "\$HYGIENE" ]; then
+    echo "pre-commit: \$HYGIENE 실행 불가. chmod +x 또는 누락 확인."
+    exit 1
+fi
+bash "\$HYGIENE" --staged
 EOF
 
 chmod +x "$HOOK"

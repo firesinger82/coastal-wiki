@@ -172,7 +172,7 @@ OISST 0.25° 격자에서 한국 좁은 만·항구 정점은 육지 픽셀로 �
 ### 3.4 직접 다운로드 예제
 
 ```bash
-cd ~/coastal-wiki/data/sst-global
+cd data/sst-global          # repo-상대 (coastal-wiki clone 기준)
 wget https://downloads.psl.noaa.gov/Datasets/noaa.oisst.v2.highres/sst.mon.mean.nc
 ```
 
@@ -283,7 +283,7 @@ uv run python tools/sst-cross-check/fetch_cobe2.py
 
 재현:
 ```bash
-cd ~/coastal-wiki
+cd <repo-root>                                              # coastal-wiki clone
 uv sync                                                     # 의존성 (한 번)
 uv run python tools/sst-cross-check/fetch_oisst_monthly.py  # ~3분
 uv run python tools/sst-cross-check/fetch_hadisst.py        # ~3분

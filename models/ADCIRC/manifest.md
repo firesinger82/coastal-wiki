@@ -1,7 +1,7 @@
 # ADCIRC Acquisition Manifest
 
 **Acquired**: 2026-05-03
-**Method**: Hermes skill `acquire-model-source` (prototyped here, see ~/.hermes/skills/numerical-modeling/acquire-model-source/SKILL.md)
+**Method**: Hermes skill `acquire-model-source` (numerical-modeling 프로필)
 
 ## source_code/
 
