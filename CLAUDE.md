@@ -14,7 +14,7 @@
 4. **모델 적용 케이스는 객관 가능한 것만**. "내가 해보니" 화법 금지 (`experience/`로 이동).
 5. **단일 writer**. 다른 PC에서는 절대 수정 금지(읽기 전용). 동시 편집 conflict 방지.
 6. **Canonical source 분리** ([CONVENTIONS.md](CONVENTIONS.md) §3): 모델 메커닉 → `models/<model>/`, 도메인 개념 → `concepts/<topic>/`. 다른 곳에는 요약 + 링크만.
-7. **textbook 인용은 `source_id` 기반**. raw 파일명·Windows 경로 직접 사용 금지. 매니페스트는 [textbook/sources.yml](textbook/sources.yml).
+7. **textbook 인용은 `source_id` 기반**. canonical 본문에서 raw 파일명·작성자 로컬 경로 직접 사용 금지 (repo-상대 `file:line`·공식 vendor 경로 인용·`sources.yml` 레지스트리는 예외 — [CONVENTIONS.md](CONVENTIONS.md) §4). 매니페스트는 [textbook/sources.yml](textbook/sources.yml).
 8. **위키는 케이스 *공급원*, 저장소가 아니다**. 개인 run 결과·calibration 수치·작성자/프로젝트 실행에만 의존하는 운영 지침은 canonical(`concepts/`·`models/`·`textbook/`)에 두지 않는다 — 위키를 바탕으로 케이스는 별도에서 구축. 단, 소스코드·식·알고리즘이 *main claim*인 실패패턴·휴리스틱·플레이북은 `models/<model>/source-analysis/{failure-patterns,heuristics,playbooks}/` 허용([plan.md](plan.md) G8/triage), `06-model-application.md`는 요약+source-analysis 링크 wrapper로 유지. 제거할 자산은 마이그레이션 중이면 `_staging/`·`_archive/` 경유(즉시 삭제는 별도 게이트). 근거: reference↔how-to 분리(Diátaxis)·SSOT/DRY. ([CONVENTIONS.md](CONVENTIONS.md) §3·§4·§6, [plan.md](plan.md) G8.)
 
 ## 디렉토리 책임
@@ -25,7 +25,7 @@
 | `models/<model>/source-analysis/` | 모델 소스코드 분석 (서브루틴별·모듈별) | 모델 사용 후기 |
 | `models/<model>/manual-notes/` | 공식 메뉴얼 발췌·정리 (페이지 인용 필수) | 메뉴얼 없는 추정 |
 | `models/<model>/web-refs/` | 공식 위키·논문·블로그 인용 정리 | 비인용 추측 |
-| `textbook/notes/` | 교과서 챕터별 발췌·요약 (출처: `D:\Study\textbook\<file>` + 페이지) | 교과서 본문 그대로 복붙 |
+| `textbook/notes/` | 교과서 챕터별 발췌·요약 (출처: `source_id` + 페이지, [textbook/sources.yml](textbook/sources.yml)) | 교과서 본문 그대로 복붙 |
 | `examples/` | 개념을 가로지르는 실습 (재현 가능 코드/데이터) | 특정 프로젝트 산출물 |
 | `experience/` | 위 3조건 통과한 검증 경험 | 미검증 직관 |
 
@@ -57,7 +57,7 @@
 4. [BOUNDARY.md](BOUNDARY.md) — modeling-wiki와의 경계
 5. [textbook/POLICY.md](textbook/POLICY.md) — textbook 통합 규칙
 6. [textbook/sources.yml](textbook/sources.yml) — source_id 매니페스트
-7. [plan.md](plan.md) — 결정 기록 (Governance Decisions G1-G7 포함)
+7. [plan.md](plan.md) — 결정 기록 (Governance Decisions G1-G8 포함)
 
 ## 검색
 

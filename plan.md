@@ -128,9 +128,9 @@ frontmatter `citation_status` 필드 도입:
 위키 = 케이스 *공급원*(reference), 저장소 아님. 개인 케이스는 위키 밖에서 구축. 4 하위 규칙(역할 분담 명확화):
 
 - **G8a 레이어 경계** (CLAUDE.md 절대규칙 8): 개인 run 결과·calibration 수치·작성자/프로젝트 실행에만 의존하는 운영 지침은 canonical 금지. 예외 = 소스코드·식·algorithm 이 main claim 인 failure-patterns/heuristics/playbooks(`models/<model>/source-analysis/` 하위, triage 규칙), wrapper-only `06-model-application.md`. 제거는 `_staging/`·`_archive/` 경유(즉시 삭제 = 별도 게이트, 2a.9/phase 6 동일).
-- **G8b 경로 문법** (CONVENTIONS §4): 작성자 로컬 머신·마운트·홈·드라이브·실행 워크스페이스 *식별* 절대경로(`D:\`·`E:\`·`/mnt/[de]/`·`~/...`·`\\wsl$`)는 canonical 어디에도 금지. 허용 = repo-상대 소스코드 `file:line`, 공식 매뉴얼/vendor 표기 경로의 출처 인용.
+- **G8b 경로 문법** (CONVENTIONS §4): 작성자 로컬 머신·마운트·홈·드라이브·실행 워크스페이스 *식별* 절대경로(`D:\`·`E:\`·`/mnt/[de]/`·`~/...`·`\\wsl$`)는 canonical 어디에도 금지. 허용 = repo-상대 소스코드 `file:line`, 공식 매뉴얼/vendor 표기 경로의 출처 인용. **적용 범위 = canonical 콘텐츠(`concepts/`·`models/`·`textbook/` 노트)**. 거버넌스/결정기록 문서(본 plan.md 의 마이그레이션 이력 등)·`sources.yml` 레지스트리·`raw/`·`_staging/`·`_archive/` 는 비대상(이력·레지스트리·vendor 미러).
 - **G8c 출처 식별 단위** (CONVENTIONS §3): 1 source_id = 1 bibliographic/work + edition. 미러·로컬 사본 = alias. 별개 문서·에디션·repo·논문·데이터셋·릴리스노트 = 별도 source_id (예: `khoa-notice-2021-7` 고시 ≠ `khoa-tide-model` 수치조류도).
-- **G8d 본문 위생** (CONVENTIONS §6): canonical 노트에 개인·프로젝트·실행 사례 기입 유도 placeholder(빈 heading·TODO·체크박스, 예 `▢ User-experience cases`) 금지. 면제 = `source-needed`/일반 미작성 stub, `_template/`.
+- **G8d 본문 위생** (CONVENTIONS §6): canonical 노트에 개인·프로젝트·실행 사례 기입 유도 placeholder(빈 heading·TODO·체크박스, 예 `▢ User-experience cases`) 금지. 면제 = `source-needed`/객관·공식 내용 대기 stub(개인사례 비요청), `_template/`.
 
 근거 프레임워크: Diátaxis(reference↔how-to 분리), DRY/SSOT(Hunt-Thomas), Wilson et al. 2017 "Good enough practices in scientific computing"(portable paths), FAIR R1.2(provenance), Matuschak evergreen concept-oriented(= concepts/ 1차축 정합).
 
@@ -147,7 +147,8 @@ frontmatter `citation_status` 필드 도입:
 
 ## 검증 이력
 
-- 2026-05-21: 초기 plan → Codex adversarial review → MODIFY 판정 → Governance Decisions 추가 (위 G1-G7)
+- 2026-05-21: 초기 plan → Codex adversarial review → MODIFY 판정 → Governance Decisions G1-G7 추가
+- 2026-06-18: 대규모 canonical 정화 → Codex adversarial review(MODIFY) → 반영 후 Codex 최종 review(MODIFY, 정합성 4건) → 반영 → G8(a-d) 추가
 - 2026-05-23: modeling-wiki 통합 결정 plan 작성 (아래 "통합 결정 (2026-05-23)" 섹션). Codex adversarial review 대기 중.
 
 ---

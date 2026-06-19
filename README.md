@@ -6,7 +6,7 @@
 
 - **1차 축**: `concepts/` — 도메인 개념(조석, 파랑, 표사이동, 흐름 등). 개념 → 일반론 → 분석법 → 코드 → 예제 → 모델적용.
 - **2차 축**: `models/` — 모델별 객관 자료(소스코드 분석, 메뉴얼 발췌, 웹/논문 자료).
-- **횡축**: `textbook/` — `D:\Study\textbook`의 교과서 자료를 참조·인용해 노트화.
+- **횡축**: `textbook/` — 교과서 자료(로컬 원본, [textbook/sources.yml](textbook/sources.yml) 의 `source_id`)를 참조·인용해 노트화.
 - **연결**: `examples/` — 개념을 가로지르는 통합 실습.
 - **유보**: `experience/` — 모델링 경험에서 객관화·논리정밀화 검증을 통과한 정보만. 객관 레이어가 어느 정도 자리잡은 후 추가.
 
@@ -26,7 +26,7 @@
 |---|---|
 | `concepts/<토픽>/` | 도메인 개념 (1차 축). `_template/` 복제해서 새 토픽 생성 |
 | `models/<모델>/` | 모델별 객관 자료 (2차 축). `source-analysis/`, `manual-notes/`, `web-refs/` |
-| `textbook/` | `D:\\Study\\textbook` 통합 노트와 인용. 원본 PDF는 wiki에 복사 안 함 |
+| `textbook/` | 교과서 통합 노트와 인용 (`source_id` 기반, 원본 경로는 [sources.yml](textbook/sources.yml)). 원본 PDF는 wiki에 복사 안 함 |
 | `examples/` | 개념을 가로지르는 실습 |
 | `experience/` | 객관화 통과한 경험 |
 | `research/` | Hermes `coastal-research` 워크벤치. X·arXiv·블로그·툴 후보 수집, digest, watchlist. 본문에서 직접 인용 금지 |
@@ -52,5 +52,5 @@
 - [INDEX.md](INDEX.md) — 전체 맵
 - [CONVENTIONS.md](CONVENTIONS.md) — 작성 규약 (frontmatter, citation_status, canonical source)
 - [BOUNDARY.md](BOUNDARY.md) — modeling-wiki와의 경계 정책
-- [plan.md](plan.md) — 결정 기록 (Governance Decisions G1-G7 포함)
+- [plan.md](plan.md) — 결정 기록 (Governance Decisions G1-G8 포함)
 - [textbook/POLICY.md](textbook/POLICY.md), [textbook/sources.yml](textbook/sources.yml) — textbook 통합 정책 + 매니페스트

@@ -93,7 +93,7 @@ verification_date: YYYY-MM-DD
 
 - 인용은 `textbook/sources.yml`에 등록된 안정적 ID 사용 (예: `holthuijsen2007`)
 - **개인 절대경로 금지** (canonical 어디에도): 작성자의 로컬 머신·마운트·홈·드라이브·실행 워크스페이스를 **식별하는** 경로 — `D:\`·`E:\`·`C:\Users\`·`/mnt/[de]/`·`~/...`·`\\wsl$`. textbook 인용은 source_id로, 코드 예시 경로는 placeholder(`<KHOA_*.csv>`)나 repo-상대로, provenance(소스스캔 위치 등)는 repo-상대·중립 표기
-- **허용 (개인환경 식별 아님)**: ① 소스코드 인용의 repo-상대 `models/<model>/raw/source_code/…/file.f90:LN` 또는 `file:line` 형식, ② 공식 매뉴얼·vendor 가 표기하는 설치·배포 경로(`C:\Program Files\…`, `/opt/…`)를 `manual-notes/`에서 *출처로* 인용
+- **허용 (개인환경 식별 아님)**: ① 소스코드 인용의 repo-상대 `models/<model>/raw/source_code/…/file.f90:LN` 또는 `file:line` 형식, ② 공식 매뉴얼·vendor 가 표기하는 설치·배포 경로(`C:\Program Files\…`, `/opt/…`)를 `manual-notes/`에서 *출처로* 인용, ③ `textbook/sources.yml` 의 `filename:` 필드 — 로컬 원본↔`source_id` 매핑 레지스트리(canonical 본문이 경로 대신 `source_id`를 쓰게 하는 indirection point이므로 경로는 여기 *한 곳*에만)
 - 근거: Wilson et al. 2017 "Good enough practices in scientific computing"(portable paths), FAIR provenance
 
 ## 5. 파일·디렉토리 명명
@@ -112,7 +112,7 @@ verification_date: YYYY-MM-DD
 | `research/` | 후보·digest·watchlist. 검색 샘플과 AI 요약임을 명시. 본문에서 직접 인용 금지 |
 | `drafts/` | 자유 (단 frontmatter `citation_status: draft-unsourced` 명시) |
 
-**개인사례 자리표시자 금지 (G8d)**: canonical(`concepts/`·`models/`) 노트에 개인·프로젝트·실행 사례 기입을 요청하거나 공간을 예약하는 빈 heading·TODO·체크박스·프롬프트(예: `▢ User-experience cases`) **금지** — 개인 사례는 `experience/`. 면제: 공식 인용 대기 `source-needed` placeholder, 일반 미작성 섹션 stub, `_template/` 파일. 근거: canonical/experience 분리 + Diátaxis(reference 에 task 금지).
+**개인사례 자리표시자 금지 (G8d)**: canonical(`concepts/`·`models/`) 노트에 개인·프로젝트·실행 사례 기입을 요청하거나 공간을 예약하는 빈 heading·TODO·체크박스·프롬프트(예: `▢ User-experience cases`) **금지** — 개인 사례는 `experience/`. 면제: 공식 인용 대기 `source-needed` placeholder, **객관·공식 내용을 기다리는** 미작성 섹션 stub(개인·실행 사례를 요청·예약하지 않는 것), `_template/` 파일. 근거: canonical/experience 분리 + Diátaxis(reference 에 task 금지).
 
 ## 7. 변경 이력
 
@@ -137,7 +137,7 @@ verification_date: YYYY-MM-DD
 
 ## 관련 문서
 
-- [plan.md](plan.md) — 결정 기록 (G1-G7, M1-M10, D1-D4)
+- [plan.md](plan.md) — 결정 기록 (G1-G8, M1-M10, D1-D4)
 - [BOUNDARY.md](BOUNDARY.md) — modeling-wiki와의 경계 (통합 이전 정책의 역사적 기록)
 - [textbook/POLICY.md](textbook/POLICY.md) — textbook 통합 정책
 - [textbook/sources.yml](textbook/sources.yml) — source_id 매니페스트
