@@ -993,3 +993,100 @@ P1 의 failure+heuristic+playbook listing = **11** content (4+3+4), 35 catalog (
 
 7차에서 high 사라짐. 8차에서 medium 도 사라지거나 approve 기대.
 
+---
+
+# LLM-Wiki 서빙 레이어 설계 (2026-06-21) — "wiki over RAG" + 멀티머신
+
+작성: Claude Opus 4.8 (1M context) + 사용자 합의
+상태: **설계안 (codex 적대검토 대기)**
+
+## 배경·문제
+
+사용자 지적: "관련정보의 LLM-WIKI로서의 기능이 너무 부족". 진단 = coastal-wiki(700 .md·1740 `[[wikilink]]`·`citation_status`·`sources.yml`)는 **콘텐츠·규약은 갖췄으나 검색·서빙(MCP) 레이어가 비어** LLM이 관련정보를 못 꺼냄. G6(qmd 인덱스)는 설계만 있고 미가동.
+
+## Landscape (motivation, 결정근거 아님 — codex F7 반영)
+
+> ⚠ 이 절은 **방향 동기(motivation)**일 뿐 아키텍처 채택의 출처 근거가 아니다(객관 레이어 출처엄격성과 구분). **실제 결정 근거는 Phase 0/1 로컬 PoC 지표**(검색 precision, verified-filter 성공률, stale-index 감지, MCP latency)로 대체한다.
+
+조사(2026-06-21: GitHub repo search + HN Algolia + X/Grok via Hermes x_search) 시사점 — **"wiki over RAG"가 다수 패턴** (Karpathy "LLM Wiki"):
+- 파일 우선(markdown + git). 순수 벡터 RAG는 개인/팀 규모엔 과잉 — "80~90% 케이스는 wiki layer로 충분" (desktopcommander 2026 roundup, X/Grok 합의).
+- "Obsidian = memory, Claude = reasoning, MCP = bridge" (X 합의).
+- 하이브리드 검색으로 **qmd (Tobi Lütke) 거명** → 사용자 기보유 QMD가 트렌드와 일치.
+- claim+citation = trust graph / 저장보다 pruning → coastal-wiki 정화철학(G8·바이블)과 동일.
+- agent가 wiki를 lint·update하는 루프 (Labhund/llm-wiki Auditor·Adversary).
+- ⚠ SurfSense류 클라우드·벡터 NotebookLM 대안은 minimal-setup·local-first와 어긋나 미채택 (RRF·인용 아이디어만 차용).
+
+## 아키텍처 (레이어)
+
+| 레이어 | 역할 | 구현/레퍼런스 | 현황 |
+|---|---|---|---|
+| L0 콘텐츠 | 바이블 (md+wikilink+citation_status+sources.yml) | coastal-wiki | ✅ |
+| **L1 검색** | 하이브리드(BM25+시맨틱) 인덱스 | **QMD** (mcp__qmd__query), G6 | △ 미가동 |
+| **L3 MCP 브리지** | `wiki_search`/`wiki_read`(viewport)/`wiki_manifest` | Electro-resonance/LLM-WIKI-MCP, obsidian-vault-mcp 패턴 | ❌ |
+| L4 유지보수 루프 | citation_status 자동 adversary·링크감사 | Labhund/llm-wiki 패턴 + 기존 pre-commit validator 확장 | △ |
+| L5 수집 루프 | inbox→구조화(claim-evidence-limitation)→promote | 사용자 논문분석 프롬프트 + loop-library "verification-first" | △ collect.py만 |
+| L2 그래프 | entity·claim·관계 그래프 | Understand-Anything (Egonex-AI, git JSON 증분, article-analyzer) | ❌ |
+| L6 (선택) | 코스탈 전문가 에이전트 양성 | Paideia-Agent (sinmb79) | — |
+| 운영 패브릭 | 루프 실행·재인덱스·멀티머신·추적 | Hermes·cron·Fleet Tailscale·Kanban | ✅ |
+
+**핵심: 비어있는 건 L1 가동 + L3 MCP 브리지뿐이고, 그게 페인의 정확한 원인.** 나머지(L2/L4/L5/L6)는 증분 강화.
+
+## 멀티머신 활용 설계 (다른 컴퓨터에서 사용)
+
+전제: CLAUDE.md §동기화 — writer=이 PC(WSL ext4), reader=다른 PC(git clone+pull, **read-only**). Fleet Tailscale mesh 보유.
+
+세 가지 배치 옵션:
+
+| 옵션 | 방식 | 장점 | 단점 |
+|---|---|---|---|
+| **A. Tailscale 중앙 MCP** (권장) | writer PC(또는 지정 노드)에서 MCP+QMD 1개 가동, Tailscale MagicDNS 호스트명으로 노출. 타 머신 Claude Code/Hermes의 MCP config가 그 호스트 가리킴 | 단일 인덱스(중복 없음)·항상 최신·mesh 그대로 활용·reader는 설정 1줄 | writer 노드 온라인 필요 |
+| B. Git 분산 로컬 | 콘텐츠+그래프(JSON)만 git, 각 reader가 pull 후 자기 QMD 인덱스 로컬 재빌드, MCP 로컬 가동 | 오프라인 가능·서버 의존 없음 | 머신마다 인덱스 재빌드 비용·신선도 pull 시점 |
+| C. 하이브리드 | A를 기본, git clone을 오프라인 fallback | 온라인=최신 중앙, 오프라인=로컬 | 구성 복잡도 ↑ |
+
+**권장 = A(+C fallback):** mesh가 이미 있으므로 중앙 MCP가 가장 경제적. reader는 `~/.claude/mcp.json`(또는 Hermes config)에 Tailscale 호스트:포트만 등록 → read-only 질의. 인덱스는 writer에서 cron 재빌드 1회 → 전 머신 즉시 최신.
+
+**인덱스 산출물 git 정책:** `knowledge-graph.json`(L2, 작고 diff 가능) = **추적**. QMD 벡터 인덱스(크고 머신·임베딩모델 의존) = **gitignore + cron 재빌드**. 콘텐츠가 SSOT, 인덱스는 파생물(재현 가능).
+
+## 구현 시퀀스 (codex 1차 반영 — gate 분리·전제 검증 선행)
+
+각 단계는 **독립 gate**다. 앞 단계 acceptance 미충족 시 다음 진행 금지(catalog stub 금지·minimal-setup 동형).
+
+- **Phase 0 (전제 검증, 비용 최소)** — ❶ **QMD capability matrix**(F2): frontmatter 필터·hybrid(BM25+시맨틱) ranking·index timestamp·corpus allowlist 지원 여부 실측. **하나라도 실패 시 L1 기본값을 SQLite FTS5 + metadata table로 전환**(qmd 고집 금지). ❷ **corpus policy 확정**(F4): 검색대상 allowlist(`concepts/`·`models/`·`textbook/`·`experience/`) / denylist(`research/`·`_staging/`·`_archive/`·`raw/`), 결과에 `citation_status`·path-class 필수 반환, **default = verified+canonical**, research/staging/archive는 명시 옵션 없이는 제외.
+- **Phase 1 (토대, 로컬 read-only PoC만)** — L3 최소셋을 **로컬 stdio MCP**로: `wiki_search`(rg + frontmatter 필터 기반, Phase 0 결과 따라 QMD or FTS5), `wiki_read`(viewport: section/grep/full, **realpath sandbox=repo root**, read-only), `wiki_manifest`(INDEX 계층 + **repo git sha·index sha/timestamp·dirty 여부·indexed file count 반환**, F3). **QMD·Tailscale·cron 제외**. acceptance = 검색 precision·verified-filter·stale 감지 PoC 지표 충족.
+- **Phase 1b (인덱싱 gate)** — Phase 0서 QMD 합격 시 QMD 인덱싱 결선, 불합격 시 FTS5. **SSOT = clean working tree + last committed git sha**(F3) — 서빙은 commit 기준, uncommitted draft 노출 금지. 재인덱스 = 큰 변경 후 수동/post-commit hook(G6 기조).
+- **Phase 1c (멀티머신 gate, 별도 PoC)** — remote MCP transport(stdio→SSE/HTTP adapter) 검증 후에만 옵션 A. **read-only 전용 바이너리/config 분리**(F5: realpath sandbox·denylist·Tailscale tag ACL·bind 제한·request log·optional token). write 도구는 writer PC localhost only.
+- **Phase 2** — L5: 사용자 논문분석 프롬프트를 coastal-promote "구조화 추출(claim-evidence-limitation)" 단계로.
+- **Phase 3** — L4: citation_status 자동 adversary·링크감사 = Hermes cron + Kanban(기존 validator 확장).
+- **Phase 4** — L2: Understand-Anything claim/entity 그래프. **산출물 git 추적 여부는 이 gate에서 결정**(F8: deterministic+compact+provenance-preserving일 때만 추적; source-needed/research claim 혼입 시 별도 오염면이므로 배제).
+- **Phase 5 (선택)** — L6: Paideia로 L0~L3 교재화 전문가 에이전트.
+
+## 위험·우려 (codex 1차 반영)
+
+- **W1 QMD 능력 미검증 의존**(F2 HIGH): L1=QMD를 전제로 두면 verified-filter·source_id provenance가 가정 위. → Phase 0 capability matrix gate, 실패 시 FTS5 fallback 기본값.
+- **W2 SSOT/single-writer**(F3 HIGH): 중앙 MCP가 working tree 직독 시 reader가 미커밋 draft·검증전 변경 노출. cron 인덱스도 commit 기준과 어긋난 stale snapshot. → 서빙 기준 "clean tree + committed sha", manifest에 sha/dirty/timestamp 노출. write는 writer localhost only.
+- **W3 검색 scope = canonical purity**(F4 HIGH): research/staging/archive/source-needed/raw vendor가 같은 검색면에 섞이면 신뢰등급 소실(CONVENTIONS §research 격리·G8). → corpus allowlist/denylist + citation_status 필수 + default verified+canonical.
+- **W4 Phase 범위 과다**(F1 HIGH): 원 Phase 1이 QMD+MCP+Tailscale+cron 동시. G6는 "수동 재빌드·일상은 rg로 충분" 이미 결정. → Phase 0/1/1b/1c gate 분리, Phase 1=로컬 read-only PoC.
+- **W5 Tailscale 보안 과신**(F5 MED): ACL은 네트워크 경계일 뿐 path traversal·과도 read scope·실수 write·타 장비 compromise 미방어. → read-only 분리·sandbox·denylist·tag·bind·log·token을 Phase 1c acceptance에.
+- **W6 remote transport 전제화**(F6 MED): 옵션 A 성립조건(qmd remote transport)이 미검증. → Phase 1c 별도 PoC, Phase 1은 local stdio로 tool contract만 고정.
+- **W7 도구 증식 vs minimal-setup**: L2·L6 의존성↑. Phase 1으로 페인 해소되면 ROI 보고 결정.
+- **W8 단일점**: writer 오프라인 시 reader 질의 불가 → 옵션 C(git clone 오프라인 fallback).
+
+## 미결 사항 (Phase 0 입력)
+
+- QMD frontmatter 필터·hybrid·remote transport 실측 (실패 시 FTS5+sqlite-vec).
+- L3 도구 자체구현 vs 기존(LLM-WIKI-MCP/obsidian-vault-mcp) — Phase 1 PoC서 검색품질·규약정합 비교.
+
+## 검증 이력 — Codex Adversarial Review
+
+**1차 (2026-06-21): 8 findings (high 4 / medium 3 / low 1).** 방향 승인, Phase 1 gate 부족 지적. 전 findings 반영 완료:
+- F1(HIGH 범위과다)→Phase 0/1/1b/1c gate 분리, Phase 1=로컬 read-only PoC.
+- F2(HIGH QMD 미검증)→Phase 0 capability matrix + FTS5 fallback 기본값.
+- F3(HIGH SSOT)→서빙 "clean tree+committed sha", manifest sha/dirty/timestamp.
+- F4(HIGH purity)→corpus allowlist/denylist + citation_status 필수 + default verified+canonical.
+- F5(MED 보안)→read-only 분리·sandbox·denylist·tag·bind·log·token (Phase 1c).
+- F6(MED transport)→Phase 1c 별도 PoC, Phase 1 local stdio only.
+- F7(MED 근거)→Landscape를 motivation으로 격하, 결정근거=PoC 지표.
+- F8(LOW 그래프 추적)→Phase 4 gate로 이연, deterministic+provenance 조건부.
+
+**다음:** Phase 0(QMD 능력실측 + corpus policy) 착수 → 결과 보고 후 Phase 1 PoC. (필요 시 2차 적대검토.)
+
