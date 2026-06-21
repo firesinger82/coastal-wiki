@@ -140,6 +140,21 @@ frontmatter `citation_status` 필드 도입:
 
 **후속(미결)**: G8b(경로)·G8d(placeholder)는 regex 자동검증 가능 → `tools/validate-canonical-hygiene.sh` 신설 후보. G8c 의미론적 혼용 탐지는 `sources.yml` 스키마(`work_id`/`edition`/`format`) 보강 시 가능.
 
+### G9. disclosed-gap 정책 — verified 의 부분 미출처 허용 (2026-06-21, L4 V1 실감사 발견 → 명문화 제안, **Codex 검토 대기**)
+
+**문제:** `wiki_search` 는 파일 단위 `citation_status` 를 반환하는데, currents/02~06 처럼 `verified` 파일이 내부에 미확정 절(예: 한국 조류 typical값·KHOA OpenAPI endpoint·모델 forcing 포맷)을 품는 경우가 실재. 파일 한 줄 "verified" 가 그 절들에 대해 과함. 한편 모든 절 100% sourced 강제 시 위키 거의 전부 탈락(frontier 갭은 정상) — 솔직한 disclosure 는 오히려 좋은 인식론. 코퍼스에 `partial-verified`·`partially-verified` 각 1건(오타 표기 흔들림) 잔존 = 이 긴장을 누군가 이미 손으로 반친 증거.
+
+**결정(A안 — 현행 관행 명문화):** 새 status 신설(C)·검색층 sub-file 파싱(B)·엄격 강등(D) 대신, 이미 실재하는 관행을 규칙으로 승격.
+
+- **G9a verified 정의** (CONVENTIONS §2 보강): `verified` = **모든 사실 단언이 (a)출처 인용 또는 (b)`source-needed` 로 명시적 in-text 표기된 상태. 미출처 AND 미표기 단언 = 0.** 즉 갭이 있어도 *disclosed* 면 verified 유지 가능.
+- **G9b disclosure 마커**: "인식 가능한 표기" 정의 — 절·문장에 `source-needed` 문자열을 포함한 disclaimer 또는 `> [!source-needed]` 콜아웃(lint·audit 가 undisclosed 와 구분 가능하게). 산문 암시만으로는 불충분, 명시 토큰 필요.
+- **G9c L4 mandate 확정**: `coastal-audit`(L4)의 INTEGRITY-VIOLATION = verified 파일의 **미출처 AND 미disclosed** 단언. disclosed 갭은 verified-confirmed(refute). 제안 패치 = 인용 추가 *또는* disclosure 마커 추가. (실증: currents/01 §7 undisclosed→위반·수정 / 02~06 disclosed→통과.)
+- **G9d status 정규화**: A 채택 시 `partial-verified`/`partially-verified` 불필요(disclosed→verified, 미disclosed→source-needed) → 2건 정규화 제거.
+
+**근거:** ① 이미 그렇게 운영 중(compound-flooding/01 "한국 정량=source-needed 명시"가 verified 안에 공존) — 신규 규칙 아닌 *명시* ② L4 가 집행기, G9b 마커가 disclosed/undisclosed 판정을 주관→준결정론화 ③ minimal-setup(검색층 파싱 신설 불요) ④ Diátaxis(reference 가 자기 경계 표기)·FAIR·Matuschak honest uncertainty 정합.
+
+**적용 시 편집 대상**: CONVENTIONS §2(verified 정의+마커), `coastal-audit` SKILL.md(G9c mandate 명문), validate-canonical-hygiene(G9b 마커 기반 undisclosed 탐지 후보), partial-verified 2건 정규화. **santa-method**: 본 기록 → `/codex:adversarial-review` → 반영 → 편집.
+
 ## 미결 사항
 
 - textbook 자료 13권 중 어느 것부터 노트화할지 우선순위
@@ -151,6 +166,7 @@ frontmatter `citation_status` 필드 도입:
 
 - 2026-05-21: 초기 plan → Codex adversarial review → MODIFY 판정 → Governance Decisions G1-G7 추가
 - 2026-06-18: 대규모 canonical 정화 → Codex adversarial review(MODIFY) → 반영 후 Codex 최종 review(MODIFY, 정합성 4건) → 반영 → G8(a-d) 추가
+- 2026-06-21: L4 자가 감사 V1 currents 실감사 → disclosed-gap 긴장 발견 → G9(a-d) disclosed-gap 정책(A안 명문화) 기록. **Codex adversarial review 대기 중.**
 - 2026-05-23: modeling-wiki 통합 결정 plan 작성 (아래 "통합 결정 (2026-05-23)" 섹션). Codex adversarial review 대기 중.
 
 ---
