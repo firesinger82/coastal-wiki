@@ -3,6 +3,7 @@ title: "조류 — 04 코드와 도구"
 topic: currents
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "AI cross-reference: UTide README + _solve.py docstring + KHOA OpenAPI 가이드 (khoa-tide-model skill.md) + 수치조류도 CSV 단위·구조 검증 (tides-khoa-cross-verification §5)."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-21

@@ -3,6 +3,7 @@ title: "조류 — 01 개념"
 topic: currents
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "AI cross-reference against khoa-portcals-glossary (KHOA·PORTCALS 용어집) + textbook/md/stewart_textbook.md (§17.4 p.313) + textbook/md/134340780-Tides-and-Currents.md (Lubbad p.50). 15개 KHOA glossary term needle lookup PASS. §7 천해 비선형 효과 출처 보강(2026-06-21, L4 자가 감사 적발): M4/MS4/M6 overtide 생성 = Pugh sea-level L4461-4471(2차→4th-diurnal, 3차→6th-diurnal), 분조 목록 = tides/03-analysis-methods + tides-foreman1977-appendix note, 서해 우세 = tides-khoa-nonharmonic-research note."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-21

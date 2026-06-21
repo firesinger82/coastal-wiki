@@ -3,6 +3,7 @@ title: "조류 — 06 모델 적용"
 topic: currents
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "조류의 운동량·연속 방정식 흐름 해상(currents solver core) claim 은 검수완료 모델 source-analysis 노트로 verified — ROMS [[roms_baroclinic_3d]]·[[roms_barotropic_2d]] (3D 경압 step3d_uv / 2D 순압 step2d 모드분할, file:line), Delft3D [[delft3d_flow2d3d_dispatcher]] (구조격자 TRISULA ADI kernel) + [[delft3d_dflowfm_compute_core]] (비구조 FM furu/s1ini/u1q1 semi-implicit θ-method), EFDC [[efdc_hydro_core]] (external 2D / internal 3D 모드분할 + PCG 연속식). 여전히 source-needed: §1.1~1.3·§6~8 의 조류 forcing 입력 포맷·글로벌 datum(TPXO/FES/NAO.99Jb/KHOA)·한국 해역 권장·검증 임계치는 모델 manual / 외부 datum 문서 미수록분으로 잔존. ADCIRC·XBeach §3·§5 도 검수 노트 미연결로 잔존."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-21

@@ -3,6 +3,7 @@ title: "복합침수 모델 적용 — 침수 모델 스펙트럼 link-hub (full
 topic: compound-flooding
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: >
   본 노트는 link-hub. 인용한 모든 cross-link 대상 source-analysis 노트의 실재를
   ls 로 직접 확인(2026-06-18), 각 노트의 frontmatter(citation_status: verified)·

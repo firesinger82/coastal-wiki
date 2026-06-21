@@ -11,8 +11,8 @@ CLAUDE.md 절대규칙 #1(canonical 단언 = 출처 인용 필수)의 **자가 �
 
 ## 절대 금지
 
-1. **canonical 파일(`concepts/`·`models/`·`textbook/`·`experience/`) 일절 수정 금지.** 산출물 = 리포트뿐. 출처 보강·citation_status 강등은 *사람*이 리포트를 보고 결정한다(report-only).
-2. **citation_status 자동 변경 금지.** verified→강등, 빈→verified 승격 모두 제안만.
+1. **canonical 파일(`concepts/`·`models/`·`textbook/`·`experience/`) 일절 수정 금지.** 산출물 = 리포트뿐. 출처 보강·citation_status 강등·`has_source_needed` 기입은 *사람*이 리포트를 보고 결정/적용한다(report-only). L4 는 값을 **권고·제안**만.
+2. **citation_status·has_source_needed 자동 변경 금지.** verified→강등, 빈→verified 승격, 플래그 set 모두 제안(report+proposal patch)만, 적용은 사람.
 3. **committed 내용만 감사.** SSOT = HEAD blob(Phase 1 F3). selector 가 `dirty` 표시한 파일은 미커밋분이 아닌 *커밋된 버전*을 본다 — 리포트에 dirty 명시.
 4. **오탐 억제 우선.** "verified가 거짓"은 무거운 지적 — Adversary 단계로 refute 실패한 것만 confirmed.
 
@@ -68,12 +68,15 @@ findings 스키마 (파일당):
 ```json
 { "path": "...", "blob_sha": "<selector 값 그대로>", "citation_status": "verified",
   "dirty": false, "has_real_claims": true, "sourced": 12, "opinion": 1,
+  "has_source_needed": true,
   "unsourced": [ {"line": 42, "text": "원문 문장", "reason": "출처 0",
                   "adversary": "refute 실패 → confirmed"} ],
   "proposals": [ {"old_string": "<committed 파일에서 verbatim>",
                   "new_string": "<출처 보강/상태 정규화한 결과>",
                   "rationale": "무엇을 왜 고치는가"} ] }
 ```
+
+`has_source_needed`(G9e, verified 파일에 한해): **disclosed 갭 보유 = `true` / 완전 sourced = `false`**. recorder 가 ledger·리포트에 기록(권고값). frontmatter 가 이 값과 다르면 **proposals 로 frontmatter 패치 제안**(`old_string`=`citation_status:...` 줄, `new_string`=그 줄 + `has_source_needed: …`) — 적용은 사람(report-only).
 
 recorder 가 verdict 매트릭스를 *결정론적으로* 적용(아래) → `_staging/audit/L4-<date>-<HHMMSS>.md` 리포트 + ledger 갱신. blob_sha 는 selector 가 준 값을 그대로 넣을 것(감사한 정확한 버전 고정).
 
@@ -89,6 +92,8 @@ recorder 가 verdict 매트릭스를 *결정론적으로* 적용(아래) → `_s
 | 빈/source-needed | >0 | needs-work |
 | 표준 외(reference·partial-verified 등) | — | status-nonstandard (정규화) |
 | 실질 단언 없음 | — | scaffolding-exempt |
+
+**여기서 "미출처"(G9c) = 미출처 AND 미disclosed.** disclosed 갭(절·문장이 `source-needed` 토큰/콜아웃으로 명시; G9b)은 미출처에 **세지 않는다** → verified-confirmed 유지하되 그 파일 `has_source_needed: true`. undisclosed 미출처만 INTEGRITY-VIOLATION. (실증: currents/01 §7 undisclosed→위반 / 02~06 disclosed→confirmed+true.) verified-confirmed 파일은 disclosed 갭 유무로 `has_source_needed` 를 true/false 권고; promote-candidate 등 비-verified 는 플래그 비대상.
 
 ### 5. Human gate
 

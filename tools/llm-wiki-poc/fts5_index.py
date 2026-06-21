@@ -55,9 +55,12 @@ def build():
     if DB.exists():
         DB.unlink()
     con = sqlite3.connect(DB)
+    # has_source_needed: G9 disclosed-gap 트라이스테이트 (true/false/'' 부재).
+    # 마지막 컬럼에 추가 → snippet(idx,4)=body·bm25 tier(col5) 인덱스 불변.
     con.execute("""CREATE VIRTUAL TABLE idx USING fts5(
         path UNINDEXED, path_class UNINDEXED, citation_status UNINDEXED,
-        title, body, tier UNINDEXED, tokenize='unicode61')""")
+        title, body, tier UNINDEXED, has_source_needed UNINDEXED,
+        tokenize='unicode61')""")
     t0 = time.time(); n = 0
     for md in WIKI.rglob("*.md"):
         rel = md.relative_to(WIKI)
@@ -71,8 +74,12 @@ def build():
         title = fm.get("title") or md.stem
         cs = fm.get("citation_status", "")
         tier = RAW_DEMOTE if is_raw_dump(rel) else 0.0
-        con.execute("INSERT INTO idx VALUES (?,?,?,?,?,?)",
-                    (str(rel), path_class(rel), cs, title, body, tier))
+        # 부재='' = 미감사(unknown). 'true'/'false' = 감사됨(G9e). 그 외 값은 ''로.
+        hsn = fm.get("has_source_needed", "").strip().lower()
+        if hsn not in ("true", "false"):
+            hsn = ""
+        con.execute("INSERT INTO idx VALUES (?,?,?,?,?,?,?)",
+                    (str(rel), path_class(rel), cs, title, body, tier, hsn))
         n += 1
     con.commit()
     dt = time.time() - t0
@@ -85,14 +92,15 @@ def build():
     print("citation_status histogram:", hist)
 
 def _schema_current():
-    """True iff the existing DB has the current schema (tier column present).
-    Guards against stale pre-tier DBs built before the demotion change —
-    otherwise query()'s `tier` reference raises OperationalError on every search."""
+    """True iff the existing DB has the current schema (newest column present).
+    Guards against stale DBs built before a schema change — otherwise queries
+    referencing the new column raise OperationalError on every search.
+    has_source_needed is the newest column; its presence implies tier too."""
     try:
         con = sqlite3.connect(DB)
         cols = [r[1] for r in con.execute("PRAGMA table_info(idx)").fetchall()]
         con.close()
-        return "tier" in cols
+        return "has_source_needed" in cols
     except sqlite3.Error:
         return False
 
@@ -114,12 +122,18 @@ def query(q, status=None, path_class=None, k=8):
     # tier demotes raw textbook dumps below curated notes (see RAW_DEMOTE);
     # bm25(idx) is negative (lower = better), so adding tier sorts dumps last.
     sql = (f"SELECT path, path_class, citation_status, title, "
-           f"snippet(idx,4,'[',']','…',12), bm25(idx), bm25(idx) + tier AS rank "
+           f"snippet(idx,4,'[',']','…',12), bm25(idx), has_source_needed, "
+           f"bm25(idx) + tier AS rank "
            f"FROM idx WHERE {' AND '.join(where)} ORDER BY rank LIMIT ?")
     rows = con.execute(sql, args + [k]).fetchall()
     con.close()
+    # has_source_needed (G9): 'true'/'false'/None(부재=미감사). 소비자가 verified 의
+    # 완전sourced vs disclosed-갭 vs 미감사를 기계 구별.
+    def _hsn(v):
+        return v if v in ("true", "false") else None
     return [dict(path=r[0], path_class=r[1], citation_status=r[2],
-                 title=r[3], snippet=r[4].strip(), score=round(r[5], 3)) for r in rows]
+                 title=r[3], snippet=r[4].strip(), score=round(r[5], 3),
+                 has_source_needed=_hsn(r[6])) for r in rows]
 
 def manifest_stats():
     """Index-level metadata for wiki_manifest (doc count, status histogram)."""
@@ -129,8 +143,16 @@ def manifest_stats():
         "SELECT citation_status, count(*) FROM idx GROUP BY citation_status").fetchall())
     by_class = dict(con.execute(
         "SELECT path_class, count(*) FROM idx GROUP BY path_class").fetchall())
+    # G9f: verified 의 disclosed-gap 감사 커버리지 (true/false/미감사 3분).
+    vrows = con.execute(
+        "SELECT has_source_needed, count(*) FROM idx WHERE citation_status='verified' "
+        "GROUP BY has_source_needed").fetchall()
+    cov = {"true": 0, "false": 0, "unaudited": 0}
+    for hsn, c in vrows:
+        cov["true" if hsn == "true" else "false" if hsn == "false" else "unaudited"] += c
     con.close()
-    return {"doc_count": n, "citation_status": hist, "path_class": by_class}
+    return {"doc_count": n, "citation_status": hist, "path_class": by_class,
+            "verified_gap_coverage": cov}
 
 def search(q, status=None, allow_only=True, k=8):
     rows = query(q, status=status, k=k)

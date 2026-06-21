@@ -3,6 +3,7 @@ title: "조류 — 03 분석 방법 (UTide 2D·ADCP·KHOA protocol)"
 topic: currents
 canonical_source: self
 citation_status: verified
+has_source_needed: false
 verification_method: "AI cross-reference: KHOA glossary (조류관측·라그랑주식해류측정·오일러식해류측정 등) + UTide _solve.py 2D mode 변수 + Foreman 1977 algorithm 매핑 (조위와 동일)."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-21

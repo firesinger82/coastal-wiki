@@ -62,8 +62,11 @@ def t_search(args):
                     path_class=args.get("path_class"), k=int(args.get("k", 8)))
     lines = [f"{len(rows)} hits for {args['query']!r} "
              f"(status={args.get('status') or 'any'})"]
+    # G9: verified 의 disclosed-gap 상태를 라벨에 노출 (라벨이 증거 과대표현 안 하게).
+    gap = {"true": "⚑disclosed-gap", "false": "✓full-sourced", None: "?unaudited"}
     for r in rows:
-        lines.append(f"[{r['score']}] ({r['citation_status'] or '—'}) {r['path']}\n"
+        tag = f" {gap[r['has_source_needed']]}" if r['citation_status'] == "verified" else ""
+        lines.append(f"[{r['score']}] ({r['citation_status'] or '—'}{tag}) {r['path']}\n"
                      f"    {r['title']}\n    …{r['snippet'][:160]}…")
     return "\n".join(lines)
 

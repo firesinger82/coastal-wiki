@@ -3,6 +3,7 @@ title: "복합침수 (Compound Flooding) — 정의·인자·메커니즘·위�
 topic: compound-flooding
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "정의·5 forcing = SFINCS 공식 docs overview.rst (models/SFINCS/raw/source_code/sfincs/docs/overview.rst) 직접 read, line 35-36·44·127-128 인용 (readthedocs overview.html 동일 본문). 인자 분류·hazard = textbook page 본문 grep+Read 후 인용: [coastal-eng-intro-wijetunge] PAGE-7·22·23·24 (Wijetunge §1·§5 coastal hazards: cyclone surge·tsunami·SLR·erosion), [sea-level] PAGE-24·25·26·198·200·270 (Pugh Ch1/6/7: surge-tide 동시발생 → exceptional high total level, §7:8 tide-surge interaction 본문), [coastal-structures-design] PAGE-16·17·24 (wave run-up·overtopping 설계 프로세스). 복합 메커니즘(surge+tide 비선형 상호작용) = [sea-level] PAGE-270 본문 (TS interaction term·bottom friction) 직접 인용. 모델 cross-link = models/SFINCS/source-analysis/sfincs_boundaries_forcing.md 실재·forcing 커버리지 확인 후 link. 한국 연안도시 정량은 미확보 → source-needed 명시."
 note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-18

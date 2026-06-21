@@ -3,6 +3,7 @@ title: "조류 — 05 학습 예제 (KHOA 수치조류도)"
 topic: currents
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "AI cross-reference: 실제 KHOA 수치조류도 CSV (813,703 rows) 직접 로드·파싱·정점 추출. 결과 데이터는 검증된 source의 직접 출력. 좌표·단위·한계는 [tides-khoa-cross-verification.md §5] 검증."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-21

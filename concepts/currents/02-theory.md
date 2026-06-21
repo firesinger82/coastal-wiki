@@ -3,6 +3,7 @@ title: "조류 — 02 일반론 (분조 분해·조류타원)"
 topic: currents
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "AI cross-reference: KHOA glossary 조류타원 정의 + UTide 2D output (utide/_solve.py 'Lsmaj','Lsmin','theta','g','umean','vmean','uslope','vslope' 변수명 직접 인용) + Stewart §17 tidal currents intro (p.313-314)."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-21

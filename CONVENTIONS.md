@@ -12,6 +12,7 @@ title: "<문서 제목>"
 topic: <concepts/topic/ 경로의 토픽명. 없으면 생략>
 canonical_source: <이 정보의 진짜 위치. 자기 자신이면 self>
 citation_status: draft-unsourced | source-needed | verified
+has_source_needed: true | false   # §2.0 — L4 감사된 verified 만. 부재=미감사. 완전sourced도 false 명시
 note_author: "<Claude Opus 4.7 (1M context) | Codex | 사용자 | ...>"
 note_date: YYYY-MM-DD
 verification_by: "<사용자 또는 verifier 명, verified 단계에서만 필수>"
@@ -27,7 +28,7 @@ verification_date: YYYY-MM-DD
 |---|---|---|
 | `draft-unsourced` | 초안. 출처·검증 미수행 | canonical 위치 그대로. frontmatter `citation_status: draft-unsourced` 명시 필수 |
 | `source-needed` | 골격 OK, 인용 누락. 출처 보강 대기 | 같음 |
-| `verified` | 출처 명시 + 검증 완료 (AI cross-reference 또는 사용자 직접) | canonical 페이지로 정식 승격 |
+| `verified` | **모든 사실 단언이 (a)출처 인용 또는 (b)`source-needed`로 명시적 in-text 표기** (미출처 AND 미표기 = 0). 검증 완료 (AI cross-reference 또는 사용자 직접). disclosed 갭 보유 시 §2.0 `has_source_needed` 필수 | canonical 페이지로 정식 승격 |
 
 **검증 방법 (2종)**:
 
@@ -41,6 +42,28 @@ verification_date: YYYY-MM-DD
 - 미검증 노트도 canonical 위치(`concepts/<topic>/01-concept.md` 등)에 둠. frontmatter 상태가 진실
 - `INDEX.md`는 비-`verified` 항목을 **상태 컬럼**으로 표시
 - `concepts/<topic>/`에서 다른 노트 인용 시 그 노트의 `citation_status`가 `verified`가 아니면 인용하는 쪽도 `source-needed`로 강등
+
+### 2.0 disclosed-gap 정책 — `verified`의 부분 미출처 + 기계가독 플래그 (G9)
+
+`verified` 파일도 일부 절이 미확정일 수 있다 (frontier 갭은 정상). 단 그 갭은 **숨기지 말고 disclosed** 해야 하고, 검색 소비자가 **기계적으로** 알 수 있어야 한다 (라벨이 노출 증거보다 강해지면 trust-boundary 후퇴).
+
+**disclosure 마커 (G9b)**: 미출처 단언이 있는 절·문장은 `source-needed` 문자열을 포함한 disclaimer 또는 `> [!source-needed]` 콜아웃으로 명시한다. **산문 암시만으로는 불충분** — lint·L4 audit가 undisclosed와 구별할 수 있도록 명시 토큰 필수.
+
+**`has_source_needed` 트라이스테이트 (G9e)** — frontmatter 불리언, 생략은 단 하나의 의미:
+
+| 값 | 의미 |
+|---|---|
+| `true` | L4 감사됨 + disclosed 갭 보유 |
+| `false` | L4 감사됨 + 완전 sourced (**완전 sourced여도 명시 필수, 생략 불가**) |
+| **필드 부재** | **미감사(unknown)** — 완전 sourced로 단정 절대 금지 (보수적 해석) |
+
+- `wiki_search`·`wiki_manifest`가 이 값을 그대로 반환 → 소비자가 "완전 sourced냐 / disclosed-갭이냐 / 미감사냐"를 기계 구별.
+- L4(`coastal-audit`) 감사가 모든 감사된 `verified` 파일에 `true`/`false`를 명시 기입한다 (omission→확정).
+- `wiki_manifest`가 verified 중 (true/false/부재) 3분 카운트 = **감사 커버리지** 노출.
+- **INTEGRITY-VIOLATION (G9c)** = `verified` 파일의 **미출처 AND 미disclosed** 단언. disclosed 갭은 위반 아님(단 `has_source_needed: true` 필수).
+- `partial-verified`/`partially-verified` 등 비표준 상태값은 쓰지 않는다 (개별 감사 후 `verified`+플래그 또는 `source-needed`로 정규화).
+
+근거: trust-boundary 보존(라벨 강도 ≤ 노출 증거)·minimal-setup(새 status·검색 sub-file 파싱 없이 frontmatter 1불리언)·Diátaxis·FAIR·Matuschak honest uncertainty. 상세 plan.md G9.
 
 ## 2.1 Governance · Raw 문서의 frontmatter 예외
 

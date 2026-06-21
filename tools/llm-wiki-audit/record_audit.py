@@ -117,6 +117,9 @@ def main():
         ledger[f["path"]] = {
             "blob_sha": f.get("blob_sha"),
             "verdict": v,
+            # G9e 권고값(true=disclosed갭 / false=완전sourced / null=비-verified·미산정).
+            # 적용은 사람(frontmatter 기입). report-only.
+            "has_source_needed": f.get("has_source_needed"),
             "audited_date": today,
             # 라운드로빈 정렬 키 — 날짜만이면 같은 날 반복 시 tie-break 이 path 로
             # 고정돼 동일 N개가 계속 재선정됨(Codex review #1). 마이크로초 타임스탬프로
@@ -141,9 +144,11 @@ def main():
     for r in rows:
         flag = " ⚠" if r["verdict"] == V_VIOLATION else ""
         out.append(f"## {r['verdict']}{flag} — `{r['path']}`")
+        hsn = r.get("has_source_needed")
+        hsn_str = f" · has_source_needed→`{str(hsn).lower()}`(권고)" if hsn is not None else ""
         out.append(f"- citation_status: `{r.get('citation_status','') or '(빈)'}` · "
                    f"sourced {r.get('sourced','?')} · opinion {r.get('opinion','?')} · "
-                   f"미출처 {len(r.get('unsourced', []))}"
+                   f"미출처 {len(r.get('unsourced', []))}{hsn_str}"
                    + ("  · ⚠ dirty(미커밋)" if r.get("dirty") else ""))
         for u in r.get("unsourced", []):
             out.append(f"  - L{u.get('line','?')}: {u.get('text','').strip()}")
