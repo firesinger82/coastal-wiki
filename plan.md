@@ -1051,7 +1051,7 @@ P1 의 failure+heuristic+playbook listing = **11** content (4+3+4), 35 catalog (
 
 각 단계는 **독립 gate**다. 앞 단계 acceptance 미충족 시 다음 진행 금지(catalog stub 금지·minimal-setup 동형).
 
-- **Phase 0 (전제 검증, 비용 최소)** — ❶ **QMD capability matrix**(F2): frontmatter 필터·hybrid(BM25+시맨틱) ranking·index timestamp·corpus allowlist 지원 여부 실측. **하나라도 실패 시 L1 기본값을 SQLite FTS5 + metadata table로 전환**(qmd 고집 금지). ❷ **corpus policy 확정**(F4): 검색대상 allowlist(`concepts/`·`models/`·`textbook/`·`experience/`) / denylist(`research/`·`_staging/`·`_archive/`·`raw/`), 결과에 `citation_status`·path-class 필수 반환, **default = verified+canonical**, research/staging/archive는 명시 옵션 없이는 제외.
+- **Phase 0 (전제 검증, 비용 최소)** — ❶ **L1/L3 후보 3-way 벤치마크**: (a) **QMD** (mcp__qmd__query) (b) **SQLite FTS5+metadata** 자체 (c) **Obsidian MCP** off-the-shelf (cyanheads/obsidian-mcp-server=frontmatter+STDIO/HTTP 595★, jacksteamdev 827★, StevenStavrakis 715★). **결정 기준 4개**: ⓐ **헤드리스 가능**(Obsidian GUI 앱·Local REST API 플러그인 상시구동 불필요 — WSL writer·Hermes cron·Tailscale 서빙이 전부 헤드리스라 GUI 의존은 탈락사유) ⓑ frontmatter/`citation_status` 필터 ⓒ corpus scoping ⓓ remote transport. **헤드리스 Obsidian MCP가 4개 통과 시 채택 → L3 자체구축 불필요**(minimal-setup 이득); GUI 의존이면 탈락하고 QMD or FTS5. ❷ **corpus policy 확정**(F4): 검색대상 allowlist(`concepts/`·`models/`·`textbook/`·`experience/`) / denylist(`research/`·`_staging/`·`_archive/`·`raw/`), 결과에 `citation_status`·path-class 필수 반환, **default = verified+canonical**, research/staging/archive는 명시 옵션 없이는 제외.
 - **Phase 1 (토대, 로컬 read-only PoC만)** — L3 최소셋을 **로컬 stdio MCP**로: `wiki_search`(rg + frontmatter 필터 기반, Phase 0 결과 따라 QMD or FTS5), `wiki_read`(viewport: section/grep/full, **realpath sandbox=repo root**, read-only), `wiki_manifest`(INDEX 계층 + **repo git sha·index sha/timestamp·dirty 여부·indexed file count 반환**, F3). **QMD·Tailscale·cron 제외**. acceptance = 검색 precision·verified-filter·stale 감지 PoC 지표 충족.
 - **Phase 1b (인덱싱 gate)** — Phase 0서 QMD 합격 시 QMD 인덱싱 결선, 불합격 시 FTS5. **SSOT = clean working tree + last committed git sha**(F3) — 서빙은 commit 기준, uncommitted draft 노출 금지. 재인덱스 = 큰 변경 후 수동/post-commit hook(G6 기조).
 - **Phase 1c (멀티머신 gate, 별도 PoC)** — remote MCP transport(stdio→SSE/HTTP adapter) 검증 후에만 옵션 A. **read-only 전용 바이너리/config 분리**(F5: realpath sandbox·denylist·Tailscale tag ACL·bind 제한·request log·optional token). write 도구는 writer PC localhost only.
@@ -1073,8 +1073,8 @@ P1 의 failure+heuristic+playbook listing = **11** content (4+3+4), 35 catalog (
 
 ## 미결 사항 (Phase 0 입력)
 
-- QMD frontmatter 필터·hybrid·remote transport 실측 (실패 시 FTS5+sqlite-vec).
-- L3 도구 자체구현 vs 기존(LLM-WIKI-MCP/obsidian-vault-mcp) — Phase 1 PoC서 검색품질·규약정합 비교.
+- L1/L3 3-way 벤치마크: QMD vs FTS5 자체 vs **Obsidian MCP**(cyanheads 등). 핵심 변별 = **헤드리스 가능 여부**(Obsidian GUI 앱 의존이면 WSL/cron/Tailscale 자동화 부적합) + frontmatter 필터 + corpus scoping + remote transport.
+- 헤드리스 Obsidian MCP가 통과하면 L3 자체구축 생략(off-the-shelf 채택). 참고: 2023Anita/obsidian-llm-knowledge-base (Karpathy LLM KB + Obsidian 워크플로 가이드).
 
 ## 검증 이력 — Codex Adversarial Review
 
@@ -1088,5 +1088,7 @@ P1 의 failure+heuristic+playbook listing = **11** content (4+3+4), 35 catalog (
 - F7(MED 근거)→Landscape를 motivation으로 격하, 결정근거=PoC 지표.
 - F8(LOW 그래프 추적)→Phase 4 gate로 이연, deterministic+provenance 조건부.
 
-**다음:** Phase 0(QMD 능력실측 + corpus policy) 착수 → 결과 보고 후 Phase 1 PoC. (필요 시 2차 적대검토.)
+**1차 후 보강 (2026-06-21, 사용자 지적):** Obsidian-네이티브 서빙 누락 → Phase 0 **L1/L3 3-way 벤치마크에 Obsidian MCP**(cyanheads/obsidian-mcp-server frontmatter+HTTP 595★ 등) 1급 후보로 추가. 결정 변별 = **헤드리스 가능 여부**(GUI 앱 의존이면 WSL/cron/Tailscale 부적합). 통과 시 L3 자체구축 생략.
+
+**다음:** Phase 0(L1/L3 3-way 벤치마크 + corpus policy) 착수 → 결과 보고 후 Phase 1 PoC. (필요 시 2차 적대검토.)
 
