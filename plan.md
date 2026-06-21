@@ -1076,6 +1076,28 @@ P1 의 failure+heuristic+playbook listing = **11** content (4+3+4), 35 catalog (
 - L1/L3 3-way 벤치마크: QMD vs FTS5 자체 vs **Obsidian MCP**(cyanheads 등). 핵심 변별 = **헤드리스 가능 여부**(Obsidian GUI 앱 의존이면 WSL/cron/Tailscale 자동화 부적합) + frontmatter 필터 + corpus scoping + remote transport.
 - 헤드리스 Obsidian MCP가 통과하면 L3 자체구축 생략(off-the-shelf 채택). 참고: 2023Anita/obsidian-llm-knowledge-base (Karpathy LLM KB + Obsidian 워크플로 가이드).
 
+## Phase 0 벤치마크 결과 (2026-06-21 실측)
+
+PoC: `tools/llm-wiki-poc/fts5_index.py` (511 canonical docs 인덱싱 0.47s / 19MB).
+
+**환경 실측:** QMD = **미설치**(바이너리·패키지·MCP설정 전무 — CLAUDE.md G6의 `mcp__qmd__query`는 설계만, 실제 가동된 적 없음). SQLite FTS5 = **즉시 가능**(3.45.1, stdlib, 신규의존 0). Node v22 OK, coastal-wiki는 실제 Obsidian vault(`.obsidian/`).
+
+**3-way 판정 (4 기준):**
+
+| 후보 | ⓐ 헤드리스 | ⓑ frontmatter 필터 | ⓒ corpus scope | ⓓ transport | 판정 |
+|---|---|---|---|---|---|
+| QMD | ? (미설치) | ? | ? | ? | 보류 — 설치+평가 필요, semantic만이 차별점 |
+| **FTS5 자체** | ✅ stdlib | ✅ **실측**(verified 419 필터·BM25 랭킹) | ✅ **실측**(research/_archive/raw=0) | ✅ wrapper(stdio/http) | **PASS (all 4)** |
+| Obsidian MCP | ❌ **GUI앱+REST플러그인 필요**(cyanheads·jacksteamdev·StevenStavrakis·aaronsb 전부) | ✅(REST) | △(설정) | ✅ | 헤드리스 탈락 → 자동화 백본 부적합 |
+
+**결론:**
+- **L1 = FTS5 자체 채택** (헤드리스 백본; 4 기준 실측 통과, 의존성 0). BM25 keyword-only가 한계지만 consensus("개인 KB엔 벡터 과잉, 텍스트검색 80% 충분")와 정합. semantic 필요 시 동일 DB에 sqlite-vec 증분(후속).
+- **Obsidian MCP = 보조(interactive desktop)로만** — 사용자가 Obsidian 앱 켜둔 머신에서의 대화형 편의용. cron/Tailscale 헤드리스 서빙 백본은 아님.
+- **QMD = 미채택** (미설치 + FTS5가 이미 기준 충족; 설치 ROI 낮음). ⚠ CLAUDE.md §검색·G6의 `mcp__qmd__query` 참조는 **stale** → 후속 정정 필요.
+- **부수 발견(데이터 위생):** citation_status 값에 `partial-verified`(1)·`partially-verified`(1) 비표준 혼용 + 빈값 74(주로 README/template). 표준 enum(draft-unsourced/source-needed/verified)과 어긋남 → L4 validator에서 enum 강제 후보.
+
+**다음:** Phase 1 = FTS5를 **로컬 stdio MCP**로 래핑(`wiki_search`/`wiki_read`/`wiki_manifest`, read-only sandbox, manifest에 git sha/dirty/timestamp). corpus policy(Phase 0 ❷)는 PoC에 이미 구현(allowlist/denylist + citation_status 반환).
+
 ## 검증 이력 — Codex Adversarial Review
 
 **1차 (2026-06-21): 8 findings (high 4 / medium 3 / low 1).** 방향 승인, Phase 1 gate 부족 지적. 전 findings 반영 완료:
