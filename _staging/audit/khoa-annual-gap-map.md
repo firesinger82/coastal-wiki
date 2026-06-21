@@ -2,7 +2,8 @@
 
 > 작성 2026-06-21. 14권 전수 survey(5-agent fan-out) 종합. **추출 backlog**(계획 산출물, canonical 아님).
 > 출처 source_id: `khoa-annual-reports`. 경로 `/mnt/e/KHOA_연간백서/markdowns/Annual_Report(YYYY).md`.
-> 원칙(CLAUDE #8): 정의·방법론=concepts/ canonical, 이벤트=textbook/notes 케이스 슬라이스, 연도별 통계 수치 bulk=금지(experience만).
+> 원칙(CLAUDE #8): 정의·방법론=concepts/ canonical, 이벤트=textbook/notes 케이스 슬라이스.
+> **백서 값 인용은 허용·권장**(공식 출처, 규칙 #1 충족 — 대표값·극값 canonical 수록 OK). #8이 막는 건 개인 run/calibration 값. 단 전 정점×전 연도 표 *통째 전사*는 DRY/SSOT상 지양(백서가 SSOT, 전 시계열 분석은 experience/).
 
 ## 기반영(중복 아님 — 추출 완료)
 - Bolaven 2012 군산외해 ADCP 잔차류 (2012 vol.1 §7.3) → `textbook/notes/khoa-annual-2012-bolaven-surge.md`
