@@ -113,11 +113,14 @@ def main():
         else:                   # 내용 불변·이미 감사됨 → 라운드로빈 풀
             item["reason"] = "rotation"
             item["audited_date"] = entry.get("audited_date", "")
+            # 정렬 키 = 마이크로초 타임스탬프(없으면 구 날짜·미상 fallback). 같은 날
+            # 반복 run 에도 방금 감사한 파일이 뒤로 밀려 순환 진행(Codex review #1).
+            item["audited_at"] = entry.get("audited_at") or entry.get("audited_date", "")
             rotation.append(item)
 
-    # 변경분: 무결성 위험 큰 verified 우선. 회전분: 가장 오래 감사 안 된 순(빈 날짜=미상→최우선).
+    # 변경분: 무결성 위험 큰 verified 우선. 회전분: 가장 오래 감사 안 된 순(미상→최우선).
     changed.sort(key=lambda c: (PRIORITY.get(c["citation_status"], 3), c["path"]))
-    rotation.sort(key=lambda c: (c.get("audited_date", ""), c["path"]))
+    rotation.sort(key=lambda c: (c["audited_at"], c["path"]))
 
     pool = changed if changed_only else changed + rotation
     slice_ = pool[:n]

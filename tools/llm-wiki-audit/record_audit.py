@@ -39,24 +39,30 @@ def git_show(path):
 def build_patch(path, proposals):
     """findings 의 proposals(Edit식 old_string/new_string)를 committed 본문 대비
     git-apply 가능한 unified diff 로 렌더. *생성만* 하고 적용하지 않는다(report-only).
-    old_string 이 정확히 1회 매치될 때만 패치화 — 0/다중 매치는 manual 로 표기해
-    깨진 패치를 만들지 않는다. 반환: (patch_text or '', [note...])."""
+
+    같은 파일의 여러 proposal 은 **단일 버퍼에 순차 적용**한 뒤 한 번에 diff 한다
+    (Codex review #2): 각 edit 을 원본에서 독립 diff 하면 인접 hunk context 가
+    선행 edit 으로 바뀐 줄을 포함해 git apply 가 깨질 수 있음. 매 단계 *현재 버퍼*
+    에서 old_string 이 정확히 1회 매치될 때만 적용 — 0/다중 매치는 manual 로 표기.
+    반환: (patch_text or '', [note...])."""
     committed = git_show(path)
-    chunks, notes = [], []
+    buf, notes, applied = committed, [], False
     for pr in proposals:
         old, new = pr.get("old_string", ""), pr.get("new_string", "")
-        cnt = committed.count(old) if old else 0
+        cnt = buf.count(old) if old else 0      # 선행 edit 반영된 현재 버퍼에서 검색
         if cnt != 1:
             notes.append({"status": "MANUAL", "rationale": pr.get("rationale", ""),
-                          "why": f"old_string {cnt}회 매치 — 자동 패치 불가(수동 처리)"})
+                          "why": f"old_string {cnt}회 매치(현재 버퍼) — 자동 패치 불가(수동 처리)"})
             continue
-        new_full = committed.replace(old, new)
-        diff = "".join(difflib.unified_diff(
-            committed.splitlines(keepends=True), new_full.splitlines(keepends=True),
-            fromfile=f"a/{path}", tofile=f"b/{path}"))
-        chunks.append(f"diff --git a/{path} b/{path}\n{diff}")
+        buf = buf.replace(old, new, 1)
+        applied = True
         notes.append({"status": "PATCH", "rationale": pr.get("rationale", "")})
-    return "".join(chunks), notes
+    if not applied:
+        return "", notes
+    diff = "".join(difflib.unified_diff(
+        committed.splitlines(keepends=True), buf.splitlines(keepends=True),
+        fromfile=f"a/{path}", tofile=f"b/{path}"))
+    return f"diff --git a/{path} b/{path}\n{diff}", notes
 
 # verdict 매트릭스 (plan.md "L4 자가 감사 루프 PoC 설계")
 V_VIOLATION = "INTEGRITY-VIOLATION"   # verified 인데 미출처 → 강등 or 출처 보강
@@ -112,6 +118,10 @@ def main():
             "blob_sha": f.get("blob_sha"),
             "verdict": v,
             "audited_date": today,
+            # 라운드로빈 정렬 키 — 날짜만이면 같은 날 반복 시 tie-break 이 path 로
+            # 고정돼 동일 N개가 계속 재선정됨(Codex review #1). 마이크로초 타임스탬프로
+            # 매 run 을 단조 구분 → 방금 감사한 파일은 뒤로 밀려 순환이 진행됨.
+            "audited_at": now.isoformat(),
             "n_unsourced": len(unsourced),
         }
     rows.sort(key=lambda r: (SEVERITY.get(r["verdict"], 9), r["path"]))

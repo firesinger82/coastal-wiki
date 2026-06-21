@@ -1205,8 +1205,9 @@ LLM-Wiki 4계층(L1 검색·L2 graph·L3 MCP·**L4 유지보수 루프**) 중 L4
 - **라운드로빈**(`select_audit.py`): slice 항목에 `reason`(new/changed/rotation) 부여. changed/new 우선(verified 먼저) → 남은 슬롯을 rotation(가장 오래 감사 안 된 순)으로 채움. 정적 verified(대다수)가 1회 감사 후 영영 안 도는 V0 맹점 해소 — 전 canonical 순환 감사. `--changed-only` = V0 동작. 실측: 전 407파일 ledger 충전 시 changed 0·rotation_pool 407·slice=오래된순 5 PASS.
 - **제안 패치**(`record_audit.py`): findings 의 `proposals:[{old_string,new_string,rationale}]`(Edit식, old_string=committed verbatim)을 committed 본문(SSOT, `git show HEAD:`) 대비 git-apply 가능한 unified diff 로 렌더 → `_staging/audit/proposals/L4-<date>-<HHMMSS>.patch` **생성만**(절대 미적용, report-only). old_string 0/다중 매치는 "수동 처리"로 표기(깨진 패치 금지). 실측: 실파일 패치 생성 + `git apply --check` PASS + 워킹트리 무변경 PASS.
 - 적용은 **항상 사람**(`git apply` 검토 후). 자동 적용·pre-commit 통합(V2)은 미포함.
+- **Codex review 2차 반영**: ① 라운드로빈 정체(`audited_date` 날짜 해상도라 같은 날 반복 시 동일 N개 재선정) → ledger 에 마이크로초 `audited_at` 기록·rotation 정렬 키로 사용(같은 날도 전진). ② 동일 파일 다중 proposal 패치 무효(각 edit 을 원본서 독립 diff → 인접 hunk context 겹침) → 단일 버퍼 순차 적용 후 1회 diff. 실측: 같은 날 run2 전진(겹침 0)·인접 2줄 단일 hunk `git apply --check` PASS.
 
-**다음:** V2(post-commit hook 통합) 또는 textbook/experience 대상 확장. (V0·V1 모두 Codex 검토 반영 완료.)
+**다음:** V2(post-commit hook 통합) 또는 textbook/experience 대상 확장. (V0·V1 모두 Codex 2-round 검토 반영 완료.)
 
 ### 외부 프레이밍 정렬 (개념 참고 — 미검증 2차 출처)
 
