@@ -15,7 +15,7 @@ verification_date: 2026-05-21
 
 ## 1. 한국 4정점 — 수치조류도 격자 추출
 
-> 출처: `khoa-tide-model` / `해양수산부 국립해양조사원_수치조류도 기반 조화상수_20250814.csv` (cp949, 813,703 rows). 단위: **cm/s** (조류 속도). 위상 기준은 KHOA 공시 별도 확인 필요 (source-needed — 현재 G/g/κ 명시 없음).
+> 출처: `khoa-tide-model` / `해양수산부 국립해양조사원_수치조류도 기반 조화상수_20250814.csv` (cp949, 813,703 rows). 단위: **cm/s** (조류 속도). 위상 기준: KHOA 공식 표준은 지각 g 를 한국표준시 기준자오선(동경 135°)으로 산출한다 ([03-analysis-methods.md](03-analysis-methods.md) §1.3, `khoa-annual-reports` Annual Report 2025 L2491). CSV 컬럼은 G/g/κ 라벨이 미명시이나 동일 KHOA 기관 표준상 g(135°E)로 해석 (CSV 라벨 자체의 명시만 잔존 source-needed).
 
 ### 1.1 추출 코드
 

@@ -254,6 +254,7 @@ ADCIRC 가 한국 storm-surge 의 primary unstructured 모델이라면, **EFDC+ 
 | **Maemi (매미)** | 2003 | 마산만 직격 | ~2.4 m 마산 (source-needed) | **본 노트 §1** |
 | Sanba (산바) | 2012 | 남해 동부 | ~1.5 m 부산 (source-needed) | Hinnamnor 와 유사 magnitude |
 | **Bolaven (볼라벤)** | **2012-08-29** | 서해 종단 | ~1.2 m 인천 (source-needed) + **군산 외해 ADCP 잔차류 verified** | **§4.1 보강 (verified case)** |
+| **Danas (다나스)** | 2013-10 | **대한해협 북상** | **가덕도 71·부산 53·고흥 56 cm verified ✓** (KHOA 2013 §3, 해일고) | **백서 전용 챕터** ([[khoa-annual-2013-danas-surge]]) |
 | Lingling (링링) | 2019 | 서해 북상 | ~1.0 m 인천 (source-needed) | 서해 storm-surge baseline |
 | **Hinnamnor (힌남노)** | 2022 | **남동해안 직격** | **포항 137 cm verified ✓** (KHOA 2022) | **본 노트 §2** ([[khoa-annual-2022-hinnamnor-surge]]) |
 

@@ -231,6 +231,8 @@ API 키 체계: `khoa.go.kr` (바다누리 전용) vs `data.go.kr` (공공데이
 
 KHOA 각 정점은 **62개 조화상수**를 표준으로 산출 (Annual Report 2025 `<표 3-31>` 등 인용, `khoa-annual-reports`). 주요 4대분조 (M₂·S₂·K₁·O₁) + 다양한 satellite·천해 비선형 분조 포함. Foreman 1977 appendix의 146개 분조 ([tides-foreman1977-appendix.md](../../textbook/notes/tides-foreman1977-appendix.md))의 부분집합.
 
+**KHOA 공식 조석조화분해 SW**: 영국 Proudman 해양연구소(Proudman Oceanographic Laboratory, POL/PSMSL) P.L. Woodworth 등이 개발한 **TASK-2000**(Tidal Analysis Software Kit 2000)을 사용한다 (Annual Report 2025 L2412). 지각 g 는 **한국표준시(KST) 기준자오선 = 동경 135°** 기준으로 산출 (L2420). 동일 TASK-2000 을 조류조화분해에도 사용 → 조위·조류 일관 ([concepts/currents/03 §1.3](../currents/03-analysis-methods.md)). 본 위키 재현 도구(t_tide·UTide, §6)와는 별개의 KHOA 공식 산출 SW.
+
 ## 5. 분석 출력
 
 조화분해 결과 일반 형식:
