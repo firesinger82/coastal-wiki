@@ -61,7 +61,7 @@
 
 ## 검색
 
-- `mcp__qmd__query` — BM25/시맨틱 (수동 인덱스 빌드 필요, [plan.md G6](plan.md))
+- **`coastal-wiki` MCP** (`.mcp.json`) — `wiki_search`(BM25 + `citation_status`/`path_class` 필터, canonical만: concepts/models/textbook/experience, research·_archive·raw 제외) / `wiki_read`(section·grep·full, read-only sandbox) / `wiki_manifest`(git sha·dirty·doc count). 구현 `tools/llm-wiki-poc/`(FTS5, 순수 stdlib), 인덱스는 기동 시 자동 빌드(~0.5s, gitignore). 설계 [plan.md "LLM-Wiki 서빙 레이어"](plan.md), [plan.md G6](plan.md). (~~`mcp__qmd__query`~~ = 미설치 stale, 2026-06-21 FTS5로 대체)
 - 빠른 키워드: `rg "키워드" ~/coastal-wiki -g "*.md" -g "*.yml"` — 전체 트리 스코프 (concepts/models/textbook/examples/experience/governance 문서 포함)
 - 토픽·상태 필터: frontmatter 검색 — `rg "citation_status: verified" -l ~/coastal-wiki`
 - 큰 출력은 `ctx_execute(language: "shell", code: "rg ...")` 경유

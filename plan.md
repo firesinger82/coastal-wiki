@@ -111,11 +111,13 @@ frontmatter `citation_status` 필드 도입:
 - textbook 인용은 fair use 범위 (요약·발췌·교육 목적). 본문 대량 복붙 금지
 - 코드 스니펫: 원본 라이선스 명시, 인용
 
-### G6. 검색 인덱싱
+### G6. 검색 인덱싱 (2026-06-21 갱신 — qmd→FTS5)
 
-- 인덱스 재빌드: **수동**, 큰 변경 후 (`qmd embed` 또는 `mcp__qmd__` 도구). 정기 cron 불필요
-- 일상 검색: `rg`/grep으로 충분
-- frontmatter `topic`, `citation_status`, `model` 필드 기반 필터링 우선
+- **구현 = `coastal-wiki` MCP** (`tools/llm-wiki-poc/`, SQLite FTS5 순수 stdlib). `wiki_search`/`wiki_read`/`wiki_manifest`. 상세: [plan.md "LLM-Wiki 서빙 레이어 설계"](plan.md).
+- 인덱스(`*.db`) = 파생물, **gitignore + 기동 시 자동 재빌드(~0.5s)**. 정기 cron 불필요(단일 writer; 큰 변경 후 재빌드).
+- corpus = canonical allowlist(concepts/models/textbook/experience), research·_staging·_archive·raw 제외. frontmatter `citation_status`·`path_class` 필터.
+- ~~`qmd embed`/`mcp__qmd__`~~ = **미설치 stale**. Phase 0 벤치마크서 QMD 미설치 확인 → FTS5 채택(헤드리스·의존성0·4기준 통과).
+- 일상 키워드 검색은 `rg`/grep 으로도 충분.
 
 ### G7. AI 노트 검증 책임
 
