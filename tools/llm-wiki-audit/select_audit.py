@@ -90,12 +90,18 @@ def main():
         prev = ledger.get(relstr, {}).get("blob_sha")
         if prev == blob:        # 마지막 감사 이후 내용 불변 → skip
             continue
-        cs = citation_status(md.read_text(encoding="utf-8", errors="ignore"))
+        is_dirty = relstr in dirty
+        # SSOT = committed(HEAD blob). dirty 파일은 워킹트리 frontmatter 가
+        # blob_sha 와 어긋날 수 있으므로 citation_status 도 committed 에서 읽어
+        # blob_sha 와 일관 유지(Codex review #2). clean 파일은 워킹트리==HEAD 라
+        # 그대로 read(빠름).
+        content = git("show", f"HEAD:{relstr}") if is_dirty \
+            else md.read_text(encoding="utf-8", errors="ignore")
         candidates.append({
             "path": relstr,
-            "citation_status": cs,
+            "citation_status": citation_status(content),
             "blob_sha": blob,
-            "dirty": relstr in dirty,
+            "dirty": is_dirty,
         })
 
     candidates.sort(key=lambda c: (PRIORITY.get(c["citation_status"], 3), c["path"]))

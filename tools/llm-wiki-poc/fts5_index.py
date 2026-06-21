@@ -84,9 +84,23 @@ def build():
     print(f"indexed {n} docs in {dt:.2f}s  | db {size:.0f} KB")
     print("citation_status histogram:", hist)
 
+def _schema_current():
+    """True iff the existing DB has the current schema (tier column present).
+    Guards against stale pre-tier DBs built before the demotion change —
+    otherwise query()'s `tier` reference raises OperationalError on every search."""
+    try:
+        con = sqlite3.connect(DB)
+        cols = [r[1] for r in con.execute("PRAGMA table_info(idx)").fetchall()]
+        con.close()
+        return "tier" in cols
+    except sqlite3.Error:
+        return False
+
 def ensure_index():
-    """Build the index if missing. Cheap (~0.5s) so callers can rebuild on startup."""
-    if not DB.exists():
+    """Build the index if missing OR schema-stale. Cheap (~0.5s) so callers
+    can rebuild on startup. Rebuild-on-stale-schema lets old DBs self-heal
+    without requiring the post-merge hook (multi-machine 방식1)."""
+    if not DB.exists() or not _schema_current():
         build()
 
 def query(q, status=None, path_class=None, k=8):

@@ -21,7 +21,7 @@ auto-edit 없음: canonical 파일은 손대지 않는다(report-only, 사람이
                         "adversary": "refute 실패 → confirmed"} ] } ] }
 """
 import json, sys
-from datetime import date
+from datetime import datetime
 from pathlib import Path
 
 WIKI = Path(__file__).resolve().parents[2]
@@ -55,7 +55,12 @@ def main():
     if "--in" in sys.argv:
         raw = Path(sys.argv[sys.argv.index("--in") + 1]).read_text()
     data = json.loads(raw)
-    today = data.get("date") or date.today().isoformat()
+    now = datetime.now()
+    today = data.get("date") or now.strftime("%Y-%m-%d")
+    # 슬라이스를 같은 날 반복 감사하므로(설계 의도) 리포트는 시각 suffix 로
+    # 고유화 — 고정 L4-<date>.md 면 이전 슬라이스 findings 가 human gate 전에
+    # 덮여 소실됨(Codex review #1). ledger 는 누적 상태라 고정 파일 유지.
+    stamp = now.strftime("%H%M%S")
     findings = data["findings"]
 
     AUDIT.mkdir(parents=True, exist_ok=True)
@@ -101,7 +106,7 @@ def main():
                 out.append(f"    - adversary: {u['adversary']}")
         out.append("")
 
-    report = AUDIT / f"L4-{today}.md"
+    report = AUDIT / f"L4-{today}-{stamp}.md"
     report.write_text("\n".join(out), encoding="utf-8")
     LEDGER.write_text(json.dumps(ledger, ensure_ascii=False, indent=2), encoding="utf-8")
 
