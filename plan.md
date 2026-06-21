@@ -150,8 +150,12 @@ frontmatter `citation_status` 필드 도입:
 
 - **G9a verified 정의** (CONVENTIONS §2 보강): `verified` = **모든 사실 단언이 (a)출처 인용 또는 (b)`source-needed` 로 명시적 in-text 표기. 미출처 AND 미표기 = 0.** 갭이 있어도 *disclosed* 면 verified 유지 — 단 G9e 플래그 필수.
 - **G9b disclosure 마커**: 절·문장에 `source-needed` 문자열 포함 disclaimer 또는 `> [!source-needed]` 콜아웃(lint·audit 가 undisclosed 와 구분 가능하게). 산문 암시만으로는 불충분, 명시 토큰 필요.
-- **G9e 기계가독 갭 플래그 (Codex 반영 핵심)**: verified 파일이 disclosed 갭을 품으면 frontmatter `has_source_needed: true` 필수(완전 sourced = `false`/생략). **`wiki_search`·`wiki_manifest` 가 이 불리언을 결과에 반환** → 소비자가 "완전 sourced냐 disclosed-갭이냐"를 *기계적으로* 구별(라벨이 증거 과대표현 안 함). status 택소노미 불변·검색층 sub-file 파싱 불요(frontmatter 이미 파싱 중, 1필드 추가).
-- **G9f 호환 규칙**: 기존 `verified` 소비자 대상 — `has_source_needed` **부재 = "갭 미상(아직 L4 미감사)", 완전 sourced로 단정 금지**. 보수적 해석. L4 감사 시 플래그를 set(갭 있음=true / 없음=false)하여 미상→확정. `wiki_manifest` 가 verified 중 플래그 set 비율(감사 커버리지) 노출. currents/02~06 은 이미 L4 감사·disclosed 갭 보유 → `has_source_needed: true` 백필 대상.
+- **G9e 기계가독 갭 플래그 (Codex 반영 핵심) — 명확한 트라이스테이트**: `has_source_needed` 의 직렬화 값은 **정확히 3상태, 생략은 단 하나의 의미**(Codex 2차 반영):
+  - `true` = **L4 감사됨 + disclosed 갭 보유**
+  - `false` = **L4 감사됨 + 완전 sourced** (완전 sourced여도 **`false` 명시 필수 — 생략 불가**)
+  - **필드 부재 = "미감사(unknown)" 단 하나의 의미** — 완전 sourced 로 단정 절대 금지
+  **`wiki_search`·`wiki_manifest` 가 이 값을 그대로 반환**(true/false/부재 구별). 소비자는 부재 시 완전성 주장 불가. status 택소노미 불변·검색층 sub-file 파싱 불요(frontmatter 1필드).
+- **G9f 호환·마이그레이션 규칙**: 기존 `verified` 소비자 — `has_source_needed` 부재 = unknown(미감사), 보수적 해석(완전 sourced 단정 금지). L4 감사가 **모든 감사된 verified 파일에 `true`/`false` 를 명시 기입**(omission→확정). `wiki_manifest` 가 verified 중 (true/false/부재) 3분 카운트 = **감사 커버리지** 노출 → 과도기 가시화. **구현 게이트**: 플래그 파싱·반환 배포 전, 또는 직후 우선과제로 verified 전수 L4 백필(부재 0 목표). currents/02~06 은 이미 감사·disclosed 갭 → `has_source_needed: true` 1차 백필.
 - **G9c L4 mandate 확정**: `coastal-audit`(L4)의 INTEGRITY-VIOLATION = verified 파일의 **미출처 AND 미disclosed** 단언. disclosed 갭은 verified-confirmed(refute) + `has_source_needed: true` 자동 set/검증. 제안 패치 = 인용 추가 *또는* disclosure 마커 추가. (실증: currents/01 §7 undisclosed→위반·수정 / 02~06 disclosed→통과.)
 - **G9d status 정규화**: `partial-verified`/`partially-verified` 2건 → 미상 일괄처리 금지(G9a 위반). **개별 L4 감사 후** disclosed→`verified`+`has_source_needed:true` / undisclosed→`source-needed` 로 정규화.
 
@@ -170,7 +174,7 @@ frontmatter `citation_status` 필드 도입:
 
 - 2026-05-21: 초기 plan → Codex adversarial review → MODIFY 판정 → Governance Decisions G1-G7 추가
 - 2026-06-18: 대규모 canonical 정화 → Codex adversarial review(MODIFY) → 반영 후 Codex 최종 review(MODIFY, 정합성 4건) → 반영 → G8(a-d) 추가
-- 2026-06-21: L4 자가 감사 V1 currents 실감사 → disclosed-gap 긴장 발견 → G9 정책 기록(A안) → Codex 적대검증 **needs-attention(no-ship: trust-boundary 후퇴)** → 하이브리드로 개정(G9e 기계가독 `has_source_needed` 플래그 + G9f 호환규칙 추가). **Codex 재검토 대기 중.**
+- 2026-06-21: L4 자가 감사 V1 currents 실감사 → disclosed-gap 긴장 발견 → G9 정책 기록(A안) → Codex 적대검증 **needs-attention(trust-boundary 후퇴)** → 하이브리드 개정(G9e `has_source_needed` 플래그) → Codex 2차 **needs-attention(생략 의미 모순: G9e "false/생략" vs G9f "생략=미상")** → 트라이스테이트 명확화(true/false/부재 각 1의미, 완전sourced도 false 명시). **Codex 3차 재검토 대기 중.**
 - 2026-05-23: modeling-wiki 통합 결정 plan 작성 (아래 "통합 결정 (2026-05-23)" 섹션). Codex adversarial review 대기 중.
 
 ---
