@@ -83,3 +83,4 @@
   - Windows 측 접근: `\\wsl$\Ubuntu\home\firesinger\coastal-wiki` (Obsidian 등 Windows 앱)
 - reader = 다른 PC (git clone 후 git pull)
 - 작업 후 항상 `git commit && git push`
+- **clone/세팅 시 1회 `bash tools/install-hooks.sh`** — pre-commit(검증) + post-merge·post-checkout(검색 인덱스 자동 재빌드)을 설치. 이후 `git pull`마다 `coastal-wiki` MCP 검색 인덱스가 자동 갱신(방식1 멀티머신). python3 만 있으면 됨.

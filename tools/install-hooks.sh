@@ -108,5 +108,43 @@ EOF
 
 chmod +x "$HOOK"
 echo "OK: pre-commit hook 설치 → $HOOK"
+
+# ---------- post-merge / post-checkout: LLM-Wiki 검색 인덱스 자동 재빌드 ----------
+# (방식1 멀티머신: git pull/clone 후 FTS5 인덱스를 ~0.5s 재빌드 → reader 즉시 최신)
+REINDEX_MARKER="# coastal-wiki:reindex:v1"
+
+install_reindex_hook() {
+    local hook_path="$1" guard="$2"
+    if [ -f "$hook_path" ] && ! grep -q "coastal-wiki:reindex" "$hook_path" 2>/dev/null; then
+        cp "$hook_path" "$hook_path.bak"
+        echo "기존 $(basename "$hook_path") hook 백업: $hook_path.bak"
+    fi
+    cat > "$hook_path" <<EOF
+#!/usr/bin/env bash
+$REINDEX_MARKER
+# git pull/merge/checkout 후 coastal-wiki FTS5 검색 인덱스 자동 재빌드.
+# 실패해도 git 동작을 막지 않음(검색 편의 기능). 인덱스는 gitignore 파생물.
+$guard
+ROOT="\$(git rev-parse --show-toplevel 2>/dev/null)" || exit 0
+SCRIPT="\$ROOT/tools/llm-wiki-poc/fts5_index.py"
+[ -f "\$SCRIPT" ] || exit 0
+command -v python3 >/dev/null 2>&1 || exit 0
+if python3 "\$SCRIPT" build >/dev/null 2>&1; then
+    echo "coastal-wiki: 검색 인덱스 재빌드 완료"
+else
+    echo "coastal-wiki: 검색 인덱스 재빌드 실패(무시) — 수동: python3 tools/llm-wiki-poc/fts5_index.py build"
+fi
+EOF
+    chmod +x "$hook_path"
+    echo "OK: $(basename "$hook_path") hook 설치 → $hook_path"
+}
+
+# post-merge: git pull/merge 후
+install_reindex_hook "$WIKI_ROOT/.git/hooks/post-merge" ""
+# post-checkout: 브랜치 전환($3=1)일 때만 (파일 checkout 은 skip)
+install_reindex_hook "$WIKI_ROOT/.git/hooks/post-checkout" '[ "${3:-0}" = "1" ] || exit 0'
+
+echo
 echo "테스트(working tree): bash tools/validate-research-isolation.sh"
 echo "테스트(staged):       bash tools/validate-research-isolation.sh --staged"
+echo "테스트(인덱스):       python3 tools/llm-wiki-poc/fts5_index.py build"

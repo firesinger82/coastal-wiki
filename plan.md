@@ -1113,7 +1113,7 @@ PoC: `tools/llm-wiki-poc/fts5_index.py` (511 canonical docs 인덱싱 0.47s / 19
 
 **도구 3종:** `wiki_search(query,status?,path_class?,k?)` / `wiki_read(path,mode=section|grep|full,pattern?)` realpath sandbox / `wiki_manifest()`.
 
-**다음:** ① Claude Code 재기동해 MCP 활성화·실사용 검증 ② post-merge git hook으로 인덱스 자동 재빌드(방식1) ③ Phase 1c = HTTP/SSE transport(iOS·중앙, 방식2) ④ stale 정정(CLAUDE.md §검색·G6 `mcp__qmd__query`→FTS5) ⑤ Phase 2(L5 수집루프).
+**다음:** ① Claude Code 재기동해 MCP 활성화·실사용 검증 ✅**② post-merge/post-checkout git hook 자동 재빌드 완료**(install-hooks.sh, 방식1 멀티머신; clone 후 1회 실행→pull마다 0.5s 재인덱스) ✅**④ stale 정정 완료**(CLAUDE.md §검색·G6→FTS5) ③ Phase 1c = HTTP/SSE transport(iOS·중앙, 방식2) ⑤ Phase 2(L5 수집루프).
 
 ## 검증 이력 — Codex Adversarial Review
 
