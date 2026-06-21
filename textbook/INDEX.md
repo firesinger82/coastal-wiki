@@ -65,7 +65,10 @@
 | [notes/tides-khoa-nonharmonic-research.md](notes/tides-khoa-nonharmonic-research.md) | khoa-notice-2021-7 | tides | verified (고시 제2021-7호 비조화상수·부산항 검증 완료, 인천 데이터 발췌 포함) |
 | [notes/tides-khoa-cross-verification.md](notes/tides-khoa-cross-verification.md) | khoa-tide-model | tides | verified (3개 source 산재값 cross-verification 보고서) |
 | [notes/waves-holthuijsen-toc.md](notes/waves-holthuijsen-toc.md) | holthuijsen2007 | waves | verified (Ch.1-9 + Appendix TOC, Ch.9 SWAN canonical) |
-| [notes/khoa-annual-reports-overview.md](notes/khoa-annual-reports-overview.md) | khoa-annual-reports | khoa-official | verified (KHOA 국가해양관측망 연간백서 2012-2025, 188K 줄) |
+| [notes/khoa-annual-reports-overview.md](notes/khoa-annual-reports-overview.md) | khoa-annual-reports | khoa-official | verified (KHOA 국가해양관측망 연간백서 2012-2025, 188K 줄; §2A 관측망·QC 표준 추가) |
+| [notes/khoa-annual-2025-regional-stats.md](notes/khoa-annual-2025-regional-stats.md) | khoa-annual-reports | khoa-official | verified+gap (2025 해역별 조위·파랑·유동·수온/기상 대표값 SSOT) |
+| [notes/khoa-annual-2013-danas-surge.md](notes/khoa-annual-2013-danas-surge.md) | khoa-annual-reports | storm-surge | verified (다나스 2013 대한해협 storm-surge 전용 챕터) |
+| [notes/khoa-annual-typhoon-wave-pressure-extremes.md](notes/khoa-annual-typhoon-wave-pressure-extremes.md) | khoa-annual-reports | waves/storm-surge | verified+gap (2019-2023 태풍 파고·기압·이상조위 극값) |
 
 용어집:
 - [`khoa-portcals-glossary`](sources.yml) — `/mnt/d/wsl_env/maritime-glossary-mcp/glossary.json` (3055 entries, KHOA + PORTCALS). 인용 `([KHOA] 용어)` 또는 `([PORTCALS] 용어)`.
