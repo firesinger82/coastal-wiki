@@ -2,7 +2,8 @@
 title: "처오름대 (Swash Zone) — 정의·process·runup·sediment + 전이 연구"
 topic: swash-zone
 canonical_source: self
-citation_status: partially-verified
+citation_status: verified
+has_source_needed: true
 verification_method: "**§4 전이연구 3건 = full PDF 직접 read (2026-06-18, pdftotext) 후 verified** — 1909.11279(Stringari-Power 2019, Univ Newcastle, 7 호주 사빈, highlights/abstract+본문 line 75/177 확인: 40%·landward 10%·IG 50%·extreme 20%/>97%·Iribarren 상관)·2504.18467(Wisconsin-Madison+Delaware, Snell+Ryrie1983 JFM129:193+Antuono2010 JFM658:166, O.H.Hinsdale Directional Wave Basin W1-12 정규/W13-15 불규칙)·2305.03811(Davidson-Brenner-Pujara, Wisconsin-Madison, 입자관성+진입 timing). **실제 읽은 highlights/abstract/명시 실험설정만 인용 — 페이지·식 번호 임의 인용 금지**.\n**§1-3 textbook page 보강 (2026-06-18, grep+Read 로 page 본문 직접 확인 후 인용)**: §1 swash zone=foreshore 정의(alternately wet/dry)·surf/breaker zone 경계 = [coastal-eng-intro-wijetunge] PAGE-12 + [coastal-processes-with-eng-apps] PAGE-7. §2 uprush/backwash·run-up/run-down zone(다음 처오르는 파 만남=swash-swash) = [coastal-structures-design] PAGE-16. §2 sediment uprush/backwash 비대칭(upper foreshore 공극 침투→backwash 운반능↓→퇴적) = [coastal-processes-with-eng-apps] PAGE-18. §2/§3 Ru2% 설계 정의·Rayleigh 분포 = [coastal-structures-design] PAGE-20~21, run-up front velocity 15%/30-40% = PAGE-22. §3 ξ breaker/surf-similarity 명칭·기호 = [coastal-eng-intro-wijetunge] PAGE-27 nomenclature.\n**잔존 source-needed** (보유 page 미수록): IG band 주기 수치, bore collapse 의 NLSW dam-break 형식해, Iribarren $\\xi$ 수식 형태·임계값, IG 변조의 반사성 의존 정량 — Holthuijsen 2007 Ch 11·Masselink-Puleo 2006 review 필요. coastal-processes-with-eng-apps 추출 md 는 PDF p.1-35(Ch 1-3)만 보유 → §5.6 Swash Zone Dynamics(book p.114) 본문 인용 불가."
 note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-15
