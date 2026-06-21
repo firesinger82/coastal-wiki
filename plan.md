@@ -1139,3 +1139,66 @@ PoC: `tools/llm-wiki-poc/fts5_index.py` (511 canonical docs 인덱싱 0.47s / 19
 
 **다음:** Phase 0(L1/L3 3-way 벤치마크 + corpus policy) 착수 → 결과 보고 후 Phase 1 PoC. (필요 시 2차 적대검토.)
 
+---
+
+# L4 자가 감사 루프 PoC 설계 (2026-06-21) — citation_status adversary
+
+LLM-Wiki 4계층(L1 검색·L2 graph·L3 MCP·**L4 유지보수 루프**) 중 L4의 최소 PoC. 현재 coastal-wiki는 수동 서빙(L1/L3 ✅)까지 완성, **AI 자율 감사 루프는 미착수**. 본 설계 = "밤마다 도는 사서 AI"(V3)의 한 iteration을 손으로 돌려보는 V0.
+
+## 빈틈 특정 (기존 자산 비중복)
+
+결정론적 pre-commit 검증(링크·wikilink resolve·G8b 로컬경로·G8d placeholder·research 참조)이 **못 잡는 단 하나** = CLAUDE.md 절대규칙 #1의 의미 판단: canonical(`concepts/`·`models/`)의 **모든 단언은 출처 인용 필수** — "이 문장이 출처 없는 단언인가/인용된 사실인가/의견인가"는 정규식 불가, LLM 판단 필요. **PoC 범위 = 이 빈틈 하나만**(plan.md L4 "citation_status 자동 adversary").
+
+## 설계 원칙 4
+
+1. **Report-only, auto-edit 금지** — single-writer·무결성 규칙상 에이전트가 canonical 직접 수정 불가. 산출물 = 지적 리포트, 사람이 게이트.
+2. **AI는 판단만, 배관은 결정론적** — 파일선택·집계·상태추적=스크립트. LLM은 "이 단언 출처 있나?"만.
+3. **가장 작은 슬라이스** — 1회 실행 N=5–10파일, ledger로 변경분만 점진 소진(=루프). 전수 1방 금지(W4 회피).
+4. **minimal-setup** — cron/autonomous 아님. `coastal-promote`처럼 수동 트리거 스킬(`coastal-audit`)로 먼저. 자율은 신뢰 축적 후.
+
+## 통합 루프 V0 (단일 감사 + verdict 분기)
+
+타깃 "verified 적대 감사"와 "빈/source-needed 분류"는 별개 파이프라인 아님 — **AI 작업은 동일하게 "각 단언에 출처 있나?" 한 패스**, 차이는 결과를 현재 citation_status와 대조하는 결정론적 verdict뿐.
+
+```
+[Selector] 결정론적: verified ∪ (빈/source-needed) 중 변경된 슬라이스 N파일 (git sha vs ledger)
+   ▼
+[Auditor] AI 1패스: 각 단언 → {sourced / UNSOURCED / opinion}  (현재 status는 미열람 — 편향 방지)
+   ▼
+[Adversary] AI: UNSOURCED 플래그만 refute 시도 → 반박 실패분만 confirmed (precision 우선)
+   ▼
+[Verdict] 결정론적 매트릭스 (아래)
+   ▼
+[Report] _staging/audit/L4-<date>.md (file:line·단언·사유·verdict) + ledger 갱신(파일별 audited_sha)
+   ▼
+[Human gate] 사람이 리포트 보고 출처 보강 / 강등 / 승격 결정
+```
+
+**Verdict 매트릭스** (현재 status × 미출처 단언 수):
+
+| 현재 citation_status | 미출처 | 판정 | 성격 |
+|---|---|---|---|
+| `verified` | >0 | ⚠ **무결성 위반**(verified 거짓) — 강등 or 출처 보강 | 적대 감사 |
+| `verified` | 0 | ✅ verified 재확인 | — |
+| 빈/`source-needed` | 0 | ⬆ verified 승격 후보 | 분류 정리 |
+| 빈/`source-needed` | >0 | ↻ source-needed 유지(작업목록) | 분류 정리 |
+| any | 실질 단언 0 | 🏷 scaffolding(README 등)·면제 표시 | 분류 정리 |
+
+## 상태 = ledger 1파일
+`_staging/audit/ledger.json` = `{ "<path>": {"audited_sha": "...", "verdict": "clean|N findings"} }`. 미변경 파일 skip → 반복 실행이 곧 루프(슬라이스 점진 소진).
+
+## Acceptance (타깃별 분리)
+- **무결성 위반 행**(verified×미출처): **precision ≥ 0.8** 必(오탐=신뢰 타격). Adversary 단계 필수.
+- **분류 행**(빈/source-needed): precision 느슨 OK(제안일 뿐, 사람 승인). recall 우선.
+- 1슬라이스 완주 + ledger 기록 + 사람 1회 검수.
+
+## 성장 경로 V0→V3
+| | 트리거 | 범위 | 산출 |
+|---|---|---|---|
+| **V0**(본 설계) | 수동 스킬 `coastal-audit` | 변경된 N파일(혼합 status) | 리포트만 |
+| V1 | 수동 + 라운드로빈 | 전 canonical 회전 | 리포트 + 제안 diff(미적용) |
+| V2 | post-commit hook | 커밋된 파일만 | 리포트 + pre-commit 경고 통합 |
+| V3 | Hermes cron(야간) | 전수 + 신규 | 자율 감사, 사람은 리포트만(=사서 AI) |
+
+**다음:** `/codex:adversarial-review` 적대 검토 → 반영 → `coastal-audit` 스킬 V0 구현.
+
