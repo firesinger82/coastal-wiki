@@ -20,13 +20,43 @@ auto-edit 없음: canonical 파일은 손대지 않는다(report-only, 사람이
         "unsourced": [ {"line": 42, "text": "...", "reason": "...",
                         "adversary": "refute 실패 → confirmed"} ] } ] }
 """
-import json, sys
+import difflib, json, subprocess, sys
 from datetime import datetime
 from pathlib import Path
 
 WIKI = Path(__file__).resolve().parents[2]
 AUDIT = WIKI / "_staging" / "audit"
 LEDGER = AUDIT / "ledger.json"
+PROPOSALS = AUDIT / "proposals"
+
+
+def git_show(path):
+    """HEAD blob 의 committed 내용 (제안 패치의 base = SSOT, 워킹트리 아님)."""
+    return subprocess.run(["git", "-C", str(WIKI), "show", f"HEAD:{path}"],
+                          capture_output=True, text=True).stdout
+
+
+def build_patch(path, proposals):
+    """findings 의 proposals(Edit식 old_string/new_string)를 committed 본문 대비
+    git-apply 가능한 unified diff 로 렌더. *생성만* 하고 적용하지 않는다(report-only).
+    old_string 이 정확히 1회 매치될 때만 패치화 — 0/다중 매치는 manual 로 표기해
+    깨진 패치를 만들지 않는다. 반환: (patch_text or '', [note...])."""
+    committed = git_show(path)
+    chunks, notes = [], []
+    for pr in proposals:
+        old, new = pr.get("old_string", ""), pr.get("new_string", "")
+        cnt = committed.count(old) if old else 0
+        if cnt != 1:
+            notes.append({"status": "MANUAL", "rationale": pr.get("rationale", ""),
+                          "why": f"old_string {cnt}회 매치 — 자동 패치 불가(수동 처리)"})
+            continue
+        new_full = committed.replace(old, new)
+        diff = "".join(difflib.unified_diff(
+            committed.splitlines(keepends=True), new_full.splitlines(keepends=True),
+            fromfile=f"a/{path}", tofile=f"b/{path}"))
+        chunks.append(f"diff --git a/{path} b/{path}\n{diff}")
+        notes.append({"status": "PATCH", "rationale": pr.get("rationale", "")})
+    return "".join(chunks), notes
 
 # verdict 매트릭스 (plan.md "L4 자가 감사 루프 PoC 설계")
 V_VIOLATION = "INTEGRITY-VIOLATION"   # verified 인데 미출처 → 강등 or 출처 보강
@@ -67,11 +97,17 @@ def main():
     ledger = json.loads(LEDGER.read_text()) if LEDGER.exists() else {}
 
     rows = []
+    all_patch = []          # 누적 패치 텍스트 (한 .patch 파일로)
     for f in findings:
         cs = f.get("citation_status", "")
         unsourced = f.get("unsourced", [])
         v = verdict_for(cs, len(unsourced), f.get("has_real_claims", True))
-        rows.append({**f, "verdict": v})
+        # V1: actionable finding 의 제안 패치 렌더(미적용). proposals 없으면 [].
+        patch_text, notes = build_patch(f["path"], f.get("proposals", [])) \
+            if f.get("proposals") else ("", [])
+        if patch_text:
+            all_patch.append(patch_text)
+        rows.append({**f, "verdict": v, "proposal_notes": notes})
         ledger[f["path"]] = {
             "blob_sha": f.get("blob_sha"),
             "verdict": v,
@@ -104,7 +140,21 @@ def main():
             out.append(f"    - 사유: {u.get('reason','')}")
             if u.get("adversary"):
                 out.append(f"    - adversary: {u['adversary']}")
+        for pn in r.get("proposal_notes", []):
+            tag = "🩹 제안 패치(미적용)" if pn["status"] == "PATCH" else "✍ 수동 처리 필요"
+            out.append(f"  - {tag}: {pn.get('rationale','')}"
+                       + (f" — {pn['why']}" if pn.get("why") else ""))
         out.append("")
+
+    # ── 제안 패치 파일(미적용) ──
+    patch_rel = None
+    if all_patch:
+        PROPOSALS.mkdir(parents=True, exist_ok=True)
+        patch_path = PROPOSALS / f"L4-{today}-{stamp}.patch"
+        patch_path.write_text("".join(all_patch), encoding="utf-8")
+        patch_rel = patch_path.relative_to(WIKI)
+        out.insert(3, f"제안 패치(미적용): `{patch_rel}` — 검토 후 적용은 "
+                      f"`git apply {patch_rel}` (사람 결정). 자동 적용 안 함.\n")
 
     report = AUDIT / f"L4-{today}-{stamp}.md"
     report.write_text("\n".join(out), encoding="utf-8")
@@ -114,6 +164,8 @@ def main():
     print(f"리포트: {report.relative_to(WIKI)}")
     print(f"ledger: {LEDGER.relative_to(WIKI)} ({len(ledger)} 파일 누적)")
     print(f"verdict 집계: {tally}")
+    if patch_rel:
+        print(f"제안 패치(미적용): {patch_rel}  — git apply 는 사람 검토 후.")
     if violations:
         print(f"⚠ 무결성 위반 {violations}건 — 사람 검토 필요(verified 강등 or 출처 보강).")
 

@@ -73,23 +73,27 @@ def main():
     n = 8
     if "--n" in sys.argv:
         n = int(sys.argv[sys.argv.index("--n") + 1])
+    # V1 default = 라운드로빈(변경분 우선 + 정적 파일 오래된순 순환). --changed-only
+    # = V0 동작(변경분만). 정적 verified(대다수)가 1회 감사 후 영영 안 도는 맹점 해소.
+    changed_only = "--changed-only" in sys.argv
 
     ledger = json.loads(LEDGER.read_text()) if LEDGER.exists() else {}
     blobs = head_blobs()
     dirty = dirty_paths()
 
-    candidates = []
+    changed, rotation = [], []
+    total_content = 0
     for md in sorted(WIKI.rglob("*.md")):
         rel = md.relative_to(WIKI)
         if not is_content(rel):
             continue
+        total_content += 1
         relstr = str(rel)
         blob = blobs.get(relstr)
         if blob is None:        # 미커밋 신규 파일 — committed SSOT 없음, skip(경고)
             continue
-        prev = ledger.get(relstr, {}).get("blob_sha")
-        if prev == blob:        # 마지막 감사 이후 내용 불변 → skip
-            continue
+        entry = ledger.get(relstr, {})
+        prev = entry.get("blob_sha")
         is_dirty = relstr in dirty
         # SSOT = committed(HEAD blob). dirty 파일은 워킹트리 frontmatter 가
         # blob_sha 와 어긋날 수 있으므로 citation_status 도 committed 에서 읽어
@@ -97,21 +101,36 @@ def main():
         # 그대로 read(빠름).
         content = git("show", f"HEAD:{relstr}") if is_dirty \
             else md.read_text(encoding="utf-8", errors="ignore")
-        candidates.append({
+        item = {
             "path": relstr,
             "citation_status": citation_status(content),
             "blob_sha": blob,
             "dirty": is_dirty,
-        })
+        }
+        if prev != blob:        # 신규(미감사) 또는 내용 변경 → 최우선
+            item["reason"] = "new" if prev is None else "changed"
+            changed.append(item)
+        else:                   # 내용 불변·이미 감사됨 → 라운드로빈 풀
+            item["reason"] = "rotation"
+            item["audited_date"] = entry.get("audited_date", "")
+            rotation.append(item)
 
-    candidates.sort(key=lambda c: (PRIORITY.get(c["citation_status"], 3), c["path"]))
-    slice_ = candidates[:n]
+    # 변경분: 무결성 위험 큰 verified 우선. 회전분: 가장 오래 감사 안 된 순(빈 날짜=미상→최우선).
+    changed.sort(key=lambda c: (PRIORITY.get(c["citation_status"], 3), c["path"]))
+    rotation.sort(key=lambda c: (c.get("audited_date", ""), c["path"]))
+
+    pool = changed if changed_only else changed + rotation
+    slice_ = pool[:n]
 
     stats = {
-        "total_content": sum(1 for md in WIKI.rglob("*.md")
-                             if is_content(md.relative_to(WIKI))),
-        "pending": len(candidates),
+        "total_content": total_content,
+        "changed": len(changed),
+        "rotation_pool": len(rotation),
+        "never_audited": sum(1 for c in changed if c["reason"] == "new"),
+        "mode": "changed-only" if changed_only else "round-robin",
         "slice": len(slice_),
+        "slice_reasons": {r: sum(1 for c in slice_ if c["reason"] == r)
+                          for r in ("new", "changed", "rotation")},
         "dirty_in_slice": [c["path"] for c in slice_ if c["dirty"]],
     }
     print(json.dumps({"slice": slice_, "stats": stats}, ensure_ascii=False, indent=2))

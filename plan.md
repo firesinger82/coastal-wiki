@@ -1193,14 +1193,20 @@ LLM-Wiki 4계층(L1 검색·L2 graph·L3 MCP·**L4 유지보수 루프**) 중 L4
 - 1슬라이스 완주 + ledger 기록 + 사람 1회 검수.
 
 ## 성장 경로 V0→V3
-| | 트리거 | 범위 | 산출 |
-|---|---|---|---|
-| **V0**(본 설계) | 수동 스킬 `coastal-audit` | 변경된 N파일(혼합 status) | 리포트만 |
-| V1 | 수동 + 라운드로빈 | 전 canonical 회전 | 리포트 + 제안 diff(미적용) |
-| V2 | post-commit hook | 커밋된 파일만 | 리포트 + pre-commit 경고 통합 |
-| V3 | Hermes cron(야간) | 전수 + 신규 | 자율 감사, 사람은 리포트만(=사서 AI) |
+| | 트리거 | 범위 | 산출 | 상태 |
+|---|---|---|---|---|
+| **V0** | 수동 스킬 `coastal-audit` | 변경된 N파일(혼합 status) | 리포트만 | ✅ 구현·dry-run 실증 |
+| **V1** | 수동 + 라운드로빈 | 전 canonical 회전 | 리포트 + 제안 패치(미적용) | ✅ 구현·테스트 |
+| V2 | post-commit hook | 커밋된 파일만 | 리포트 + pre-commit 경고 통합 | 미착수 |
+| V3 | Hermes cron(야간) | 전수 + 신규 | 자율 감사, 사람은 리포트만(=사서 AI) | 미착수 |
 
-**다음:** `/codex:adversarial-review` 적대 검토 → 반영 → `coastal-audit` 스킬 V0 구현.
+### V1 결과 (2026-06-21 — 라운드로빈 + 제안 패치)
+
+- **라운드로빈**(`select_audit.py`): slice 항목에 `reason`(new/changed/rotation) 부여. changed/new 우선(verified 먼저) → 남은 슬롯을 rotation(가장 오래 감사 안 된 순)으로 채움. 정적 verified(대다수)가 1회 감사 후 영영 안 도는 V0 맹점 해소 — 전 canonical 순환 감사. `--changed-only` = V0 동작. 실측: 전 407파일 ledger 충전 시 changed 0·rotation_pool 407·slice=오래된순 5 PASS.
+- **제안 패치**(`record_audit.py`): findings 의 `proposals:[{old_string,new_string,rationale}]`(Edit식, old_string=committed verbatim)을 committed 본문(SSOT, `git show HEAD:`) 대비 git-apply 가능한 unified diff 로 렌더 → `_staging/audit/proposals/L4-<date>-<HHMMSS>.patch` **생성만**(절대 미적용, report-only). old_string 0/다중 매치는 "수동 처리"로 표기(깨진 패치 금지). 실측: 실파일 패치 생성 + `git apply --check` PASS + 워킹트리 무변경 PASS.
+- 적용은 **항상 사람**(`git apply` 검토 후). 자동 적용·pre-commit 통합(V2)은 미포함.
+
+**다음:** V2(post-commit hook 통합) 또는 textbook/experience 대상 확장. (V0·V1 모두 Codex 검토 반영 완료.)
 
 ### 외부 프레이밍 정렬 (개념 참고 — 미검증 2차 출처)
 

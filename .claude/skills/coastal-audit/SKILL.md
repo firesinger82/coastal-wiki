@@ -1,6 +1,6 @@
 ---
 name: coastal-audit
-description: L4 자가 감사 루프 V0 — canonical(concepts/·models/) 단언에 출처가 있는지 AI가 감사. citation_status: verified 인데 미출처 단언이 있으면 "무결성 위반" 적발(CLAUDE.md 절대규칙 #1). report-only — canonical 절대 미수정, 사람이 게이트. 트리거: "audit", "L4 감사", "출처 감사", "citation 감사".
+description: L4 자가 감사 루프 V1 — canonical(concepts/·models/) 단언에 출처가 있는지 AI가 감사. citation_status: verified 인데 미출처 단언이 있으면 "무결성 위반" 적발(CLAUDE.md 절대규칙 #1). 라운드로빈으로 전 canonical 순환 감사, actionable finding 에 제안 패치(.patch, 미적용) 생성. report-only — canonical 절대 미수정, 사람이 게이트. 트리거: "audit", "L4 감사", "출처 감사", "citation 감사".
 ---
 
 # coastal-audit
@@ -18,19 +18,25 @@ CLAUDE.md 절대규칙 #1(canonical 단언 = 출처 인용 필수)의 **자가 �
 
 ## 입력
 
-- 없음(기본): 변경된 슬라이스 N=8 자동 선정
+- 없음(기본): **라운드로빈** 슬라이스 N=8 — 변경분 우선 + 정적 파일 오래된 감사순 순환
 - `--n <N>`: 슬라이스 크기
+- `--changed-only`: V0 동작(변경분만, 순환 없음)
 - 명시 파일 path list: 그 파일만 감사
 
 ## 루프 (5단계)
 
-### 1. Select (결정론적)
+### 1. Select (결정론적 — 라운드로빈)
 
 ```
-python3 tools/llm-wiki-audit/select_audit.py [--n 8]
+python3 tools/llm-wiki-audit/select_audit.py [--n 8] [--changed-only]
 ```
 
-`{slice:[{path,citation_status,blob_sha,dirty}], stats:{total_content,pending,slice,...}}` 반환. ledger(`_staging/audit/ledger.json`)의 blob_sha 와 다른 파일만 후보 — 변경분 점진 소진. verified 우선. `pending`==0 이면 "감사 최신, 새 변경 없음" 보고 후 종료.
+`{slice:[{path,citation_status,blob_sha,dirty,reason}], stats:{...}}` 반환. 각 slice 항목의 `reason`:
+- **new** — ledger 에 없는 미감사 파일
+- **changed** — blob_sha 가 ledger 와 달라짐(내용 변경)
+- **rotation** — 내용 불변·이미 감사됨, 라운드로빈으로 재방문(가장 오래 감사 안 된 순)
+
+선정 = **changed/new 우선(verified 먼저) → 남은 슬롯을 rotation 으로 채움**. 정적 verified(대다수)가 1회 감사 후 영영 안 도는 V0 맹점 해소 — 전 canonical 이 순환 감사됨. `--changed-only` 면 rotation 생략(V0). `stats.changed`==0 이고 rotation 만 남으면 순환 감사 단계.
 
 ### 2. Audit (AI — 핵심 단계)
 
@@ -63,10 +69,15 @@ findings 스키마 (파일당):
 { "path": "...", "blob_sha": "<selector 값 그대로>", "citation_status": "verified",
   "dirty": false, "has_real_claims": true, "sourced": 12, "opinion": 1,
   "unsourced": [ {"line": 42, "text": "원문 문장", "reason": "출처 0",
-                  "adversary": "refute 실패 → confirmed"} ] }
+                  "adversary": "refute 실패 → confirmed"} ],
+  "proposals": [ {"old_string": "<committed 파일에서 verbatim>",
+                  "new_string": "<출처 보강/상태 정규화한 결과>",
+                  "rationale": "무엇을 왜 고치는가"} ] }
 ```
 
-recorder 가 verdict 매트릭스를 *결정론적으로* 적용(아래) → `_staging/audit/L4-<date>.md` 리포트 + ledger 갱신. blob_sha 는 selector 가 준 값을 그대로 넣을 것(감사한 정확한 버전 고정).
+recorder 가 verdict 매트릭스를 *결정론적으로* 적용(아래) → `_staging/audit/L4-<date>-<HHMMSS>.md` 리포트 + ledger 갱신. blob_sha 는 selector 가 준 값을 그대로 넣을 것(감사한 정확한 버전 고정).
+
+**V1 제안 패치(`proposals`, 선택):** actionable finding(INTEGRITY-VIOLATION·needs-work·status-nonstandard·promote-candidate)에 **최소 수정안**을 첨부한다. `old_string` 은 **committed 파일에서 정확히 1회 매치되는 verbatim**(Edit 도구식), `new_string` 은 출처 보강(예: `[[wikilink]]`·각주·`(source_id, p.NN)`)이나 상태 정규화 결과. recorder 가 committed 본문(SSOT) 대비 git-apply 가능한 unified diff 를 `_staging/audit/proposals/L4-<date>-<HHMMSS>.patch` 로 **생성만** 한다 — **절대 적용 안 함**(report-only). old_string 이 0/다중 매치면 patch 화하지 않고 "수동 처리"로 리포트에 표기(깨진 패치 금지). 제안은 보수적으로 — 자신 없으면 patch 없이 finding 만.
 
 **verdict 매트릭스**(현재 citation_status × 미출처 수):
 
@@ -81,7 +92,7 @@ recorder 가 verdict 매트릭스를 *결정론적으로* 적용(아래) → `_s
 
 ### 5. Human gate
 
-리포트 경로 + verdict 집계를 사용자에게 출력. **무결성 위반(INTEGRITY-VIOLATION)이 있으면 그 목록을 우선 제시.** 사용자가 출처 보강/강등/승격을 결정 — skill 은 여기서 멈춘다.
+리포트 경로 + verdict 집계를 사용자에게 출력. **무결성 위반(INTEGRITY-VIOLATION)이 있으면 그 목록을 우선 제시.** 제안 패치가 있으면 **`.patch` 경로와 `git apply <patch>`(검토 후)** 를 안내하되 **자동 적용하지 않는다.** 사용자가 패치 적용/출처 보강/강등/승격을 결정 — skill 은 여기서 멈춘다.
 
 ledger·리포트(`_staging/audit/`)는 검색 인덱스 denylist + tracked. 커밋은 사용자 몫(상태 영속·멀티머신 전파). 커밋 메시지 초안:
 ```
@@ -90,9 +101,10 @@ chore(audit): L4 자가 감사 <date> — N파일, 위반 K건
 Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 ```
 
-## V0 범위 한계 (의도된 축소)
+## 범위 (V1, 의도된 축소)
 
-- 대상 = `concepts/`·`models/` 본문만(rule #1 직격). `textbook/`·`experience/`는 V1+.
+- 대상 = `concepts/`·`models/` 본문만(rule #1 직격). `textbook/`·`experience/`는 후속.
 - 트리거 = 수동. cron/autonomous(V3)는 신뢰 축적 후.
-- 산출 = 리포트만. 제안 diff(V1)·pre-commit 통합(V2) 미포함.
-- 상태값 정규화(partial-verified 등)는 적발만 — 수정은 별도 결정론적 lint 후보.
+- 산출 = 리포트 + 제안 패치(미적용). **pre-commit 통합(V2)·자동 적용은 미포함** — 적용은 항상 사람.
+- 라운드로빈은 단일 슬라이스 단위 수동 반복(자동 전수 순환은 V3 cron).
+- 상태값 정규화(partial-verified 등)는 적발 + 제안 패치 — 적용은 사람.
