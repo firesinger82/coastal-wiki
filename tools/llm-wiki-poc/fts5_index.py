@@ -72,19 +72,44 @@ def build():
     print(f"indexed {n} docs in {dt:.2f}s  | db {size:.0f} KB")
     print("citation_status histogram:", hist)
 
-def search(q, status=None, allow_only=True, k=8):
+def ensure_index():
+    """Build the index if missing. Cheap (~0.5s) so callers can rebuild on startup."""
+    if not DB.exists():
+        build()
+
+def query(q, status=None, path_class=None, k=8):
+    """Return BM25-ranked hits as a list of dicts (data, not print)."""
     con = sqlite3.connect(DB)
     where = ["idx MATCH ?"]; args = [q]
     if status:
         where.append("citation_status = ?"); args.append(status)
-    sql = (f"SELECT path, citation_status, snippet(idx,4,'[',']','…',8), bm25(idx) "
-           f"FROM idx WHERE {' AND '.join(where)} ORDER BY bm25(idx) LIMIT {k}")
-    rows = con.execute(sql, args).fetchall()
+    if path_class:
+        where.append("path_class = ?"); args.append(path_class)
+    sql = (f"SELECT path, path_class, citation_status, title, "
+           f"snippet(idx,4,'[',']','…',12), bm25(idx) "
+           f"FROM idx WHERE {' AND '.join(where)} ORDER BY bm25(idx) LIMIT ?")
+    rows = con.execute(sql, args + [k]).fetchall()
     con.close()
+    return [dict(path=r[0], path_class=r[1], citation_status=r[2],
+                 title=r[3], snippet=r[4].strip(), score=round(r[5], 3)) for r in rows]
+
+def manifest_stats():
+    """Index-level metadata for wiki_manifest (doc count, status histogram)."""
+    con = sqlite3.connect(DB)
+    n = con.execute("SELECT count(*) FROM idx").fetchone()[0]
+    hist = dict(con.execute(
+        "SELECT citation_status, count(*) FROM idx GROUP BY citation_status").fetchall())
+    by_class = dict(con.execute(
+        "SELECT path_class, count(*) FROM idx GROUP BY path_class").fetchall())
+    con.close()
+    return {"doc_count": n, "citation_status": hist, "path_class": by_class}
+
+def search(q, status=None, allow_only=True, k=8):
+    rows = query(q, status=status, k=k)
     print(f"\nQ: {q!r}  status={status or 'any'}  → {len(rows)} hits")
-    for path, cs, snip, score in rows:
-        print(f"  [{score:6.2f}] ({cs or '—':>13}) {path}")
-        print(f"            …{snip.strip()[:90]}…")
+    for r in rows:
+        print(f"  [{r['score']:6.2f}] ({r['citation_status'] or '—':>13}) {r['path']}")
+        print(f"            …{r['snippet'][:90]}…")
 
 if __name__ == "__main__":
     cmd = sys.argv[1] if len(sys.argv) > 1 else "build"

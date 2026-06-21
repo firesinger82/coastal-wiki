@@ -1043,9 +1043,14 @@ P1 의 failure+heuristic+playbook listing = **11** content (4+3+4), 35 catalog (
 | B. Git 분산 로컬 | 콘텐츠+그래프(JSON)만 git, 각 reader가 pull 후 자기 QMD 인덱스 로컬 재빌드, MCP 로컬 가동 | 오프라인 가능·서버 의존 없음 | 머신마다 인덱스 재빌드 비용·신선도 pull 시점 |
 | C. 하이브리드 | A를 기본, git clone을 오프라인 fallback | 온라인=최신 중앙, 오프라인=로컬 | 구성 복잡도 ↑ |
 
-**권장 = A(+C fallback):** mesh가 이미 있으므로 중앙 MCP가 가장 경제적. reader는 `~/.claude/mcp.json`(또는 Hermes config)에 Tailscale 호스트:포트만 등록 → read-only 질의. 인덱스는 writer에서 cron 재빌드 1회 → 전 머신 즉시 최신.
+**실측 mesh (2026-06-21 `tailscale status`):** wsl-rag(100.83.117.111 linux)=**writer/서빙 노드** / desktop-64pt1f7·desktop-rop5h5e(windows 온라인) / desktop-rop5h5e-1(linux offline) / ipad171·iphone171(iOS). repo=GitHub `firesinger82/coastal-wiki`. **인덱스 재빌드 = 0.48s**(어느 머신서든, markdown만 있으면).
 
-**인덱스 산출물 git 정책:** `knowledge-graph.json`(L2, 작고 diff 가능) = **추적**. QMD 벡터 인덱스(크고 머신·임베딩모델 의존) = **gitignore + cron 재빌드**. 콘텐츠가 SSOT, 인덱스는 파생물(재현 가능).
+**권장 = 하이브리드(0.48s 재빌드가 default를 바꿈):**
+- **데스크톱/리눅스 → 방식 1 (Git 분산 + 로컬 재빌드)**: `git pull` → FTS5 인덱스 로컬 재빌드(0.48s, post-merge hook 또는 MCP 기동 시) → **로컬 stdio MCP(read-only)**. 완전 오프라인·서버의존0·원격transport 불필요·**pip 설치 불필요(stdlib only)**. 0.48s라 "중앙 서버 필수"가 아님.
+- **iOS·"항상 최신" → 방식 2 (Tailscale 중앙 HTTP MCP)**: wsl-rag에서 FTS5-MCP를 HTTP/SSE로 100.83.117.111(MagicDNS `wsl-rag`)에 바인드, 타 머신 mcp.json이 가리킴. iOS는 python 불가라 이 방식만 가능. ACL=tailnet 내부 한정.
+- **공통**: reader 전부 **read-only**(search/read만), write는 wsl-rag에서만 → single-writer 보존.
+
+**인덱스 산출물 git 정책:** FTS5 인덱스(`*.db`, 머신·tokenizer 의존, 0.48s 재생성) = **gitignore + 로컬 재빌드**. `knowledge-graph.json`(L2, 작고 diff 가능)은 Phase 4 gate서 결정(F8). 콘텐츠가 SSOT, 인덱스는 파생물.
 
 ## 구현 시퀀스 (codex 1차 반영 — gate 분리·전제 검증 선행)
 
@@ -1097,6 +1102,16 @@ PoC: `tools/llm-wiki-poc/fts5_index.py` (511 canonical docs 인덱싱 0.47s / 19
 - **부수 발견(데이터 위생):** citation_status 값에 `partial-verified`(1)·`partially-verified`(1) 비표준 혼용 + 빈값 74(주로 README/template). 표준 enum(draft-unsourced/source-needed/verified)과 어긋남 → L4 validator에서 enum 강제 후보.
 
 **다음:** Phase 1 = FTS5를 **로컬 stdio MCP**로 래핑(`wiki_search`/`wiki_read`/`wiki_manifest`, read-only sandbox, manifest에 git sha/dirty/timestamp). corpus policy(Phase 0 ❷)는 PoC에 이미 구현(allowlist/denylist + citation_status 반환).
+
+## Phase 1 결과 (2026-06-21 — 로컬 stdio MCP 완성)
+
+`tools/llm-wiki-poc/mcp_server.py` — **순수 stdlib** newline-delimited JSON-RPC 2.0 stdio MCP, read-only. 다른 머신서 pip 설치 불필요(방식 1 정합, system python3 3.12 + FTS5 stdlib 확인). `.mcp.json`에 `coastal-wiki` 등록.
+
+**E2E 실측 통과:** initialize(protocol 2024-11-05) → tools/list(3종) → `wiki_search`('storm surge ADCIRC coupling', status=verified → 3 hits, BM25) → `wiki_manifest`(git_sha + **dirty_working_tree** + doc 511 + verified 419, **F3 충족**) → `wiki_read`(section/grep/full). **보안(F5) 실측:** `../../etc/passwd` 차단·`research/` denylist 차단.
+
+**도구 3종:** `wiki_search(query,status?,path_class?,k?)` / `wiki_read(path,mode=section|grep|full,pattern?)` realpath sandbox / `wiki_manifest()`.
+
+**다음:** ① Claude Code 재기동해 MCP 활성화·실사용 검증 ② post-merge git hook으로 인덱스 자동 재빌드(방식1) ③ Phase 1c = HTTP/SSE transport(iOS·중앙, 방식2) ④ stale 정정(CLAUDE.md §검색·G6 `mcp__qmd__query`→FTS5) ⑤ Phase 2(L5 수집루프).
 
 ## 검증 이력 — Codex Adversarial Review
 
