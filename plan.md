@@ -1202,3 +1202,13 @@ LLM-Wiki 4계층(L1 검색·L2 graph·L3 MCP·**L4 유지보수 루프**) 중 L4
 
 **다음:** `/codex:adversarial-review` 적대 검토 → 반영 → `coastal-audit` 스킬 V0 구현.
 
+### 외부 프레이밍 정렬 (개념 참고 — 미검증 2차 출처)
+
+업계에서 부상한 "loop engineering"(프롬프트가 아니라 *루프*를 설계) 담론이 본 L4 설계와 같은 골격을 가리킨다. 어휘 정렬용으로만 참조하며, **출처는 미검증 2차 가공**(Rahul `@sairahul1` 트위터 스레드 → 일본어 블로그 재정리)이라 위키 canonical 인용 불가 — Boris Cherny/Peter Steinberger 귀속 인용·토큰 수치·arXiv 링크(`2605.01428`, 미래 채번·블로그가 arXiv PDF라는 점에서 의심) 모두 액면 신뢰 금지. Phase 1 F7(Landscape를 motivation으로 격하)과 동일 처리.
+
+- **5단계 루프**(DISCOVER→PLAN→EXECUTE→VERIFY→ITERATE) = 본 V0 매핑: Select→verdict 매트릭스→AI Auditor→AI Adversary(refute)→ledger 점진 소진.
+- **closed vs open loop**: 본 설계는 의도적 **closed**(사람이 path·verdict·종료조건 고정, human gate). open(에이전트 자유 재량)은 토큰 폭발·품질 게이트 부재 위험으로 보류 — minimal-setup·신뢰 축적 원칙과 정합.
+- **maker/checker 분리**(별 에이전트로 검증) = Auditor↔Adversary 분리로 이미 구현. 본 담론이 VERIFY 단계의 핵심으로 지목하는 패턴.
+- **6 빌딩블록** 대비 현황: Skills(`SKILL.md`+`CLAUDE.md`)·Connectors(`coastal-wiki` MCP+git)·Subagents(maker/checker)·Memory(`ledger.json`) = 충족 / Automation(=V3 cron)·Worktrees(read-only 감사라 불필요) = 미적용.
+- 단일 에이전트 루프 ↔ fleet(오케스트레이터+스페셜리스트) 구분은 V0(단일)→ 추후 다축 감사(링크·출처·신선도 병렬) 시 fleet 고려 여지.
+
