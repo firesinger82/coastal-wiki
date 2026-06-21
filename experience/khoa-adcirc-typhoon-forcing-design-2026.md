@@ -40,7 +40,8 @@ KHOA 관측 EVA([[khoa-design-surge-eva-2026]])의 모델 측 대응 — 자체 
 - **GAHM 비대칭 = 34/50/64kt 등풍속의 4사분면(NE/SE/SW/NW) 반경**이 핵심 입력. 반경이 빈약하면 GAHM도 대칭으로 퇴화.
 - **자료원 = JTWC(JMA 아님)**: JTWC가 4사분면 반경을 **2001년부터 직접** 제공(JMA bst는 장축/단축+방향의 타원 2-등풍속이라 변환 필요·열위). ①이 JTWC를 쓴 이유.
 - **2001년 이전 보완(①)**: 사분면 반경=Vmax·Rmax·위도 1차 회귀(① Table 2 계수, 회귀 corr 0.59 > Holland 0.45) / Rmax=Willoughby&Rahn(2004) `46.29·exp(−0.0153·Vmax+0.0166·lat)` / Pc=Knaff&Harper(2010) `Vmax=4.4·(1010−Pc)^0.76`. → 1956~2000도 비대칭 가능.
-  - **✅ Table 2 전사 완료(2026-06-20)**: `khoa_tide/utide_validation/data/gahm_radius_regression.json`(R34/R50/R64 × NE/SE/SW/NW, `R = a_const + a_lat·lat + a_Vmax·Vmax + a_Rmax·Rmax`, 단위 nm/deg/kt) + 헬퍼 `gahm_radius_fill.py`(자기검증: lat30·Vmax80kt·Rmax15nm → R34 NE143/SW112nm, 단조감소·비대칭 정상). 주의: R34의 NE·SE가 a_const만 상이(원논문 그대로) / W&R Rmax 단위(km vs nm) 적용 전 원문 확인 / 회귀는 2001–2021 학습이라 **1990–2000 보완용**(IBTrACS 2001+는 실측 우선).
+  - **✅ Table 2 전사 완료(2026-06-20)**: `khoa_tide/utide_validation/data/gahm_radius_regression.json`(R34/R50/R64 × NE/SE/SW/NW, `R = a_const + a_lat·lat + a_Vmax·Vmax + a_Rmax·Rmax`, 단위 nm/deg/kt) + 헬퍼 `gahm_radius_fill.py`(자기검증: lat30·Vmax80kt·Rmax15nm → R34 NE143/SW112nm, 단조감소·비대칭 정상). 주의: R34의 NE·SE가 a_const만 상이(원논문 그대로) / W&R는 원전대로 Vmax[m/s]→Rmax[km] 후 nm 변환 / 회귀는 2001–2021 학습이라 **1990–2000 보완용**(IBTrACS 2001+는 실측 우선).
+  - **✅ 반경 데이터셋 완성(2026-06-21)**: `build_ibtracs_radii.py` → `extensions/40_ibtracs_korea_radii.{csv,json}`(+`_summary.json`). IBTrACS↔29_ **178/178(이름보유) 매칭**, 16,613 트랙포인트. 반경 **관측 5,742(2001+)·회귀충전 7,678(1990–2000 전량 4,889 포함)·불가 3,193(Vmax결측)**. 충전사슬 Vmax→W&R Rmax→Knaff&Harper Pc→①회귀, **Vmax<등풍속이면 반경=0**(외삽금지). 검증: 볼라벤2012 R34 NE190/SW160nm 비대칭 양호. intl 선행0(`0314`, 45개)은 정식 로더 `gahm_radius_fill.load_korea_radii()`(dtype=str)로 안전 처리(JSON 키도 안전).
 - 입력 생성=ASWIP(ADCIRC 부속). 외곽장·배경장 미반영 한계 → 필요시 ERA5 재격자장과 max-합성 보완(①).
 
 ### 트랙 B — JMA-MSM 직접장 (③)
@@ -57,8 +58,9 @@ KHOA 관측 EVA([[khoa-design-surge-eva-2026]])의 모델 측 대응 — 자체 
 | 검증 타깃·우선순위 | ✅ KHOA `30_`,`32_` (자료오류 4정점 제외, 1차 22태풍, Gate-4 RMSE≤30cm) |
 | ADCIRC + ASWIP 빌드 | ✅ v56.2.1 (ADCIRC 워크스페이스) |
 | ① Table 2 회귀계수 (1990–2000 반경) | ✅ 전사 완료 — `data/gahm_radius_regression.json` + `gahm_radius_fill.py` |
+| **정리된 반경 데이터셋** (178태풍, 관측+충전) | ✅ `extensions/40_ibtracs_korea_radii.{csv,json}` |
 
-**상태**: 강제력 자료·레시피 완비(IBTrACS·JMA-MSM·ERA5 + GAHM 반경회귀). 실제 ADCIRC 구동만 남음(별도 워크스페이스).
+**상태**: 강제력 자료·레시피 완비 + **GAHM 입력 반경 데이터셋 178태풍 생성 완료**(관측 5,742 + 회귀충전 7,678점). 남은 것 = ASWIP로 fort.22(NWS=20) 생성 + 실제 ADCIRC 구동(별도 워크스페이스).
 
 ## 원천 위치
 - 설계 상세: `khoa_tide/utide_validation/ADCIRC_FORCING_DESIGN.md`
