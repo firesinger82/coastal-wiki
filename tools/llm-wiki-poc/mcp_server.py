@@ -11,7 +11,7 @@ Reflects codex 1차: F3 (manifest exposes committed sha + dirty), F4 (corpus
 allowlist + citation_status), F5 (read-only, realpath sandbox, denylist).
 Run:  python3 mcp_server.py        (stdio)
 """
-import json, os, re, subprocess, sys, time
+import contextlib, json, os, re, subprocess, sys, time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -102,7 +102,8 @@ def t_read(args):
 
 
 def t_manifest(_args):
-    fx.ensure_index()
+    with contextlib.redirect_stdout(sys.stderr):   # never leak build() prints to JSON-RPC stdout
+        fx.ensure_index()
     meta = {**git_meta(), **fx.manifest_stats(),
             "corpus_allowlist": sorted(ALLOW),
             "note": "read-only; results carry citation_status; default search returns any status — pass status='verified' to filter"}
@@ -161,7 +162,10 @@ def handle(msg):
 
 
 def main():
-    fx.ensure_index()
+    # CRITICAL: build()/ensure_index() print to stdout; that would corrupt the
+    # JSON-RPC stream. Redirect any startup stdout to stderr.
+    with contextlib.redirect_stdout(sys.stderr):
+        fx.ensure_index()
     log(f"coastal-wiki MCP ready (docs indexed, root={WIKI})")
     for line in sys.stdin:
         line = line.strip()
