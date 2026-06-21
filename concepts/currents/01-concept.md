@@ -3,7 +3,7 @@ title: "조류 — 01 개념"
 topic: currents
 canonical_source: self
 citation_status: verified
-verification_method: "AI cross-reference against khoa-portcals-glossary (KHOA·PORTCALS 용어집) + textbook/md/stewart_textbook.md (§17.4 p.313) + textbook/md/134340780-Tides-and-Currents.md (Lubbad p.50). 15개 KHOA glossary term needle lookup PASS."
+verification_method: "AI cross-reference against khoa-portcals-glossary (KHOA·PORTCALS 용어집) + textbook/md/stewart_textbook.md (§17.4 p.313) + textbook/md/134340780-Tides-and-Currents.md (Lubbad p.50). 15개 KHOA glossary term needle lookup PASS. §7 천해 비선형 효과 출처 보강(2026-06-21, L4 자가 감사 적발): M4/MS4/M6 overtide 생성 = Pugh sea-level L4461-4471(2차→4th-diurnal, 3차→6th-diurnal), 분조 목록 = tides/03-analysis-methods + tides-foreman1977-appendix note, 서해 우세 = tides-khoa-nonharmonic-research note."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-21
 verification_by: "Claude Opus 4.7 (1M context) — cross-ref"
@@ -115,10 +115,11 @@ verification_date: 2026-05-21
 
 ## 7. 천해 비선형 효과
 
-천해에서는 조류도 비선형:
-- 창·낙조류 비대칭 (창조류 더 강하거나 낙조류 더 강함, 지형 의존)
-- **M₄·MS₄·M₆** 등 천해 분조 발생 → 조류도 비대칭화
-- 표사이동 방향 결정의 주요 인자 (← `concepts/sediment-transport/` 작성 시 cross-link)
+천해에서는 조위뿐 아니라 조류도 비선형이며, 그 핵심은 **천해 비선형 분조(overtide)**다. 분조 이론·식·검출은 조석 토픽이 canonical 홈이므로(CONVENTIONS §6) 여기서는 요약·연결만 한다.
+
+- **M₄·MS₄·M₆** 등 천해 분조는 M₂·S₂의 비선형 상호작용으로 생성된다 — 2차(진폭 제곱) 상호작용이 4th-diurnal의 M₄·S₄·MS₄를, 3차 상호작용이 6th-diurnal의 M₆(3×M₂ speed)를 만든다(Pugh, *Sea Level*, 천해조석 비선형 상호작용 절: `textbook/md/sea-level.md` L4461–4471). 분조 목록·분석은 [[../tides/03-analysis-methods]](Foreman 1977 appendix: M3·M4·MS4·M6 등 비선형 분조) 및 [`textbook/notes/tides-foreman1977-appendix.md`](../../textbook/notes/tides-foreman1977-appendix.md) 참조.
+- 이 천해 분조가 조류 곡선을 비대칭화한다 → **창·낙조류 비대칭**(창조류 우세 또는 낙조류 우세, 지형 의존). 한국 서해의 천해 분조 우세(M₄·MS₄ 강함)는 KHOA 조화상수로 관측된다([`textbook/notes/tides-khoa-nonharmonic-research.md`](../../textbook/notes/tides-khoa-nonharmonic-research.md) §천해 분조 비율, [`concepts/tides/04-code-and-tools.md`](../tides/04-code-and-tools.md) L343).
+- 창·낙조류 비대칭은 표사 이동 순(net)방향 결정의 주요 인자다(← `concepts/sediment-transport/` 작성 시 cross-link).
 
 ## 8. 보강·미해결
 
