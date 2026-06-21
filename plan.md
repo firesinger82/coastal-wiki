@@ -140,20 +140,24 @@ frontmatter `citation_status` 필드 도입:
 
 **후속(미결)**: G8b(경로)·G8d(placeholder)는 regex 자동검증 가능 → `tools/validate-canonical-hygiene.sh` 신설 후보. G8c 의미론적 혼용 탐지는 `sources.yml` 스키마(`work_id`/`edition`/`format`) 보강 시 가능.
 
-### G9. disclosed-gap 정책 — verified 의 부분 미출처 허용 (2026-06-21, L4 V1 실감사 발견 → 명문화 제안, **Codex 검토 대기**)
+### G9. disclosed-gap 정책 — verified + 기계가독 갭 플래그 (2026-06-21, L4 V1 실감사 발견 → 하이브리드, **Codex 1차 needs-attention 반영, 재검토 대기**)
 
 **문제:** `wiki_search` 는 파일 단위 `citation_status` 를 반환하는데, currents/02~06 처럼 `verified` 파일이 내부에 미확정 절(예: 한국 조류 typical값·KHOA OpenAPI endpoint·모델 forcing 포맷)을 품는 경우가 실재. 파일 한 줄 "verified" 가 그 절들에 대해 과함. 한편 모든 절 100% sourced 강제 시 위키 거의 전부 탈락(frontier 갭은 정상) — 솔직한 disclosure 는 오히려 좋은 인식론. 코퍼스에 `partial-verified`·`partially-verified` 각 1건(오타 표기 흔들림) 잔존 = 이 긴장을 누군가 이미 손으로 반친 증거.
 
-**결정(A안 — 현행 관행 명문화):** 새 status 신설(C)·검색층 sub-file 파싱(B)·엄격 강등(D) 대신, 이미 실재하는 관행을 규칙으로 승격.
+**Codex 1차 적대검증(needs-attention, no-ship as written):** 순수 명문화(A)는 `verified` 의 의미를 약화시키면서 그 약화를 **소비자(`wiki_search`)가 볼 방법을 안 줌** → trust-boundary 후퇴. 라벨이 노출 증거보다 강해짐(정화철학 G8 모순). 처방 = 별도 status(C) 또는 검색층 갭 메타데이터(B) 중 하나로 **갭을 기계가독화**.
 
-- **G9a verified 정의** (CONVENTIONS §2 보강): `verified` = **모든 사실 단언이 (a)출처 인용 또는 (b)`source-needed` 로 명시적 in-text 표기된 상태. 미출처 AND 미표기 단언 = 0.** 즉 갭이 있어도 *disclosed* 면 verified 유지 가능.
-- **G9b disclosure 마커**: "인식 가능한 표기" 정의 — 절·문장에 `source-needed` 문자열을 포함한 disclaimer 또는 `> [!source-needed]` 콜아웃(lint·audit 가 undisclosed 와 구분 가능하게). 산문 암시만으로는 불충분, 명시 토큰 필요.
-- **G9c L4 mandate 확정**: `coastal-audit`(L4)의 INTEGRITY-VIOLATION = verified 파일의 **미출처 AND 미disclosed** 단언. disclosed 갭은 verified-confirmed(refute). 제안 패치 = 인용 추가 *또는* disclosure 마커 추가. (실증: currents/01 §7 undisclosed→위반·수정 / 02~06 disclosed→통과.)
-- **G9d status 정규화**: A 채택 시 `partial-verified`/`partially-verified` 불필요(disclosed→verified, 미disclosed→source-needed) → 2건 정규화 제거.
+**결정(하이브리드 — A 정신 + 최소 기계가독 신호):** status 택소노미 증가(C)·검색층 sub-file 파싱(B 전체) 둘 다 회피하되, frontmatter 불리언 1필드로 trust-boundary 복원.
 
-**근거:** ① 이미 그렇게 운영 중(compound-flooding/01 "한국 정량=source-needed 명시"가 verified 안에 공존) — 신규 규칙 아닌 *명시* ② L4 가 집행기, G9b 마커가 disclosed/undisclosed 판정을 주관→준결정론화 ③ minimal-setup(검색층 파싱 신설 불요) ④ Diátaxis(reference 가 자기 경계 표기)·FAIR·Matuschak honest uncertainty 정합.
+- **G9a verified 정의** (CONVENTIONS §2 보강): `verified` = **모든 사실 단언이 (a)출처 인용 또는 (b)`source-needed` 로 명시적 in-text 표기. 미출처 AND 미표기 = 0.** 갭이 있어도 *disclosed* 면 verified 유지 — 단 G9e 플래그 필수.
+- **G9b disclosure 마커**: 절·문장에 `source-needed` 문자열 포함 disclaimer 또는 `> [!source-needed]` 콜아웃(lint·audit 가 undisclosed 와 구분 가능하게). 산문 암시만으로는 불충분, 명시 토큰 필요.
+- **G9e 기계가독 갭 플래그 (Codex 반영 핵심)**: verified 파일이 disclosed 갭을 품으면 frontmatter `has_source_needed: true` 필수(완전 sourced = `false`/생략). **`wiki_search`·`wiki_manifest` 가 이 불리언을 결과에 반환** → 소비자가 "완전 sourced냐 disclosed-갭이냐"를 *기계적으로* 구별(라벨이 증거 과대표현 안 함). status 택소노미 불변·검색층 sub-file 파싱 불요(frontmatter 이미 파싱 중, 1필드 추가).
+- **G9f 호환 규칙**: 기존 `verified` 소비자 대상 — `has_source_needed` **부재 = "갭 미상(아직 L4 미감사)", 완전 sourced로 단정 금지**. 보수적 해석. L4 감사 시 플래그를 set(갭 있음=true / 없음=false)하여 미상→확정. `wiki_manifest` 가 verified 중 플래그 set 비율(감사 커버리지) 노출. currents/02~06 은 이미 L4 감사·disclosed 갭 보유 → `has_source_needed: true` 백필 대상.
+- **G9c L4 mandate 확정**: `coastal-audit`(L4)의 INTEGRITY-VIOLATION = verified 파일의 **미출처 AND 미disclosed** 단언. disclosed 갭은 verified-confirmed(refute) + `has_source_needed: true` 자동 set/검증. 제안 패치 = 인용 추가 *또는* disclosure 마커 추가. (실증: currents/01 §7 undisclosed→위반·수정 / 02~06 disclosed→통과.)
+- **G9d status 정규화**: `partial-verified`/`partially-verified` 2건 → 미상 일괄처리 금지(G9a 위반). **개별 L4 감사 후** disclosed→`verified`+`has_source_needed:true` / undisclosed→`source-needed` 로 정규화.
 
-**적용 시 편집 대상**: CONVENTIONS §2(verified 정의+마커), `coastal-audit` SKILL.md(G9c mandate 명문), validate-canonical-hygiene(G9b 마커 기반 undisclosed 탐지 후보), partial-verified 2건 정규화. **santa-method**: 본 기록 → `/codex:adversarial-review` → 반영 → 편집.
+**근거:** ① disclosed 관행은 이미 운영 중(compound-flooding/01) — 명시일 뿐 ② G9e 가 trust-boundary 복원(Codex 해소): 라벨 강도 ≤ 노출 증거 ③ minimal-setup 보존: 새 status·검색 파싱 없이 frontmatter 1불리언 ④ L4 가 플래그 집행기 ⑤ Diátaxis·FAIR·Matuschak honest uncertainty 정합.
+
+**적용 시 편집 대상**: CONVENTIONS §2(verified 정의+마커+`has_source_needed`), `mcp_server.py`/`fts5_index.py`(frontmatter `has_source_needed` 파싱·검색/manifest 반환), `coastal-audit` SKILL.md(G9c·G9e mandate), validate-canonical-hygiene(G9b undisclosed 탐지·G9e 플래그 정합 lint 후보), partial-verified 2건 개별 정규화. **santa-method**: 본 개정 → `/codex:adversarial-review` 재검토 → 반영 → 편집.
 
 ## 미결 사항
 
@@ -166,7 +170,7 @@ frontmatter `citation_status` 필드 도입:
 
 - 2026-05-21: 초기 plan → Codex adversarial review → MODIFY 판정 → Governance Decisions G1-G7 추가
 - 2026-06-18: 대규모 canonical 정화 → Codex adversarial review(MODIFY) → 반영 후 Codex 최종 review(MODIFY, 정합성 4건) → 반영 → G8(a-d) 추가
-- 2026-06-21: L4 자가 감사 V1 currents 실감사 → disclosed-gap 긴장 발견 → G9(a-d) disclosed-gap 정책(A안 명문화) 기록. **Codex adversarial review 대기 중.**
+- 2026-06-21: L4 자가 감사 V1 currents 실감사 → disclosed-gap 긴장 발견 → G9 정책 기록(A안) → Codex 적대검증 **needs-attention(no-ship: trust-boundary 후퇴)** → 하이브리드로 개정(G9e 기계가독 `has_source_needed` 플래그 + G9f 호환규칙 추가). **Codex 재검토 대기 중.**
 - 2026-05-23: modeling-wiki 통합 결정 plan 작성 (아래 "통합 결정 (2026-05-23)" 섹션). Codex adversarial review 대기 중.
 
 ---
