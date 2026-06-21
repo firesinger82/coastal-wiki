@@ -19,6 +19,17 @@ DB = Path(__file__).resolve().parent / "wiki_fts.db"
 ALLOW = {"concepts", "models", "textbook", "experience"}
 DENY_PARTS = {"_archive", "_staging", "raw", "research", ".git", ".obsidian", "node_modules"}
 
+# Raw full-text dumps (textbook/md/<file>.md): indexed for page-lookup / AI
+# cross-reference, but demoted below every curated note so a refined excerpt
+# (textbook/notes, models/*/source-analysis, manual-notes, concepts) always
+# outranks the raw OCR. BM25 in FTS5 is negative (lower = better); adding a
+# large positive constant pushes raw dumps into a strict lower tier while
+# preserving BM25 order within each tier.
+RAW_DEMOTE = 1000.0
+
+def is_raw_dump(rel: Path):
+    return len(rel.parts) >= 2 and rel.parts[0] == "textbook" and rel.parts[1] == "md"
+
 FM = re.compile(r"^---\n(.*?)\n---\n", re.S)
 
 def frontmatter(text):
@@ -46,7 +57,7 @@ def build():
     con = sqlite3.connect(DB)
     con.execute("""CREATE VIRTUAL TABLE idx USING fts5(
         path UNINDEXED, path_class UNINDEXED, citation_status UNINDEXED,
-        title, body, tokenize='unicode61')""")
+        title, body, tier UNINDEXED, tokenize='unicode61')""")
     t0 = time.time(); n = 0
     for md in WIKI.rglob("*.md"):
         rel = md.relative_to(WIKI)
@@ -59,8 +70,9 @@ def build():
         fm, body = frontmatter(text)
         title = fm.get("title") or md.stem
         cs = fm.get("citation_status", "")
-        con.execute("INSERT INTO idx VALUES (?,?,?,?,?)",
-                    (str(rel), path_class(rel), cs, title, body))
+        tier = RAW_DEMOTE if is_raw_dump(rel) else 0.0
+        con.execute("INSERT INTO idx VALUES (?,?,?,?,?,?)",
+                    (str(rel), path_class(rel), cs, title, body, tier))
         n += 1
     con.commit()
     dt = time.time() - t0
@@ -85,9 +97,11 @@ def query(q, status=None, path_class=None, k=8):
         where.append("citation_status = ?"); args.append(status)
     if path_class:
         where.append("path_class = ?"); args.append(path_class)
+    # tier demotes raw textbook dumps below curated notes (see RAW_DEMOTE);
+    # bm25(idx) is negative (lower = better), so adding tier sorts dumps last.
     sql = (f"SELECT path, path_class, citation_status, title, "
-           f"snippet(idx,4,'[',']','…',12), bm25(idx) "
-           f"FROM idx WHERE {' AND '.join(where)} ORDER BY bm25(idx) LIMIT ?")
+           f"snippet(idx,4,'[',']','…',12), bm25(idx), bm25(idx) + tier AS rank "
+           f"FROM idx WHERE {' AND '.join(where)} ORDER BY rank LIMIT ?")
     rows = con.execute(sql, args + [k]).fetchall()
     con.close()
     return [dict(path=r[0], path_class=r[1], citation_status=r[2],
