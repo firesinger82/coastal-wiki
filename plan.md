@@ -1115,6 +1115,14 @@ PoC: `tools/llm-wiki-poc/fts5_index.py` (511 canonical docs 인덱싱 0.47s / 19
 
 **다음:** ① Claude Code 재기동해 MCP 활성화·실사용 검증 ✅**② post-merge/post-checkout git hook 자동 재빌드 완료**(install-hooks.sh, 방식1 멀티머신; clone 후 1회 실행→pull마다 0.5s 재인덱스) ✅**④ stale 정정 완료**(CLAUDE.md §검색·G6→FTS5) ③ Phase 1c = HTTP/SSE transport(iOS·중앙, 방식2) ⑤ Phase 2(L5 수집루프).
 
+## 랭킹 튜닝 — textbook/md 원문 강등 (2026-06-21, commit a80f7de)
+
+**문제:** `textbook/md/<file>.md`(PDF→md 원문 덤프, 19건)는 POLICY.md §"텍스트 추출"상 페이지 lookup·AI cross-ref용으로 **의도적으로 인덱싱**되지만, 순수 BM25에선 원문 전문이 정제 노트보다 상위로 뜨는 경우 발생(예: `Holthuijsen waves shallow water` 쿼리에서 `Waves-Holthuijsen2007.md` bm25 `-8.511`이 `concepts/littoral-drift/01`·`-8.324`보다 위). reference(원문)↔정제(notes·source-analysis·manual-notes·concepts)의 우선순위 역전.
+
+**방식 (deterministic tier 강등):** FTS5 bm25는 음수(낮을수록 우수). raw dump에만 `tier=RAW_DEMOTE(+1000.0)` 컬럼 부여 → `ORDER BY bm25(idx)+tier`. raw dump는 어떤 매치에서도 정제 문서 전체 **아래 티어**로 고정, 같은 티어 내부는 BM25 순서 유지. 노출 `score`는 순수 bm25 그대로(투명성 보존), 강등은 정렬에만 적용. 판별 = `is_raw_dump(rel)`(`textbook/md/` 한정; `raw/`는 이미 denylist 제외라 인덱스 밖).
+
+**효과(실측):** `Holthuijsen` 쿼리에서 `Waves-Holthuijsen2007.md`가 7위→12위(맨 끝)로 강등, bm25가 더 나쁜 정제 문서들이 모두 그 위로. **원문은 여전히 검색·노출됨**(페이지 lookup 유지), 단 동일 매치에선 항상 후순위. `fts5_index.py`: `is_raw_dump`/`RAW_DEMOTE`·fts5 `tier` 컬럼·query 정렬식 3곳 수정. 근거 = Diátaxis reference↔how-to/explanation 분리 원칙의 검색층 반영.
+
 ## 검증 이력 — Codex Adversarial Review
 
 **1차 (2026-06-21): 8 findings (high 4 / medium 3 / low 1).** 방향 승인, Phase 1 gate 부족 지적. 전 findings 반영 완료:
