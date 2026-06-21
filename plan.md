@@ -1222,7 +1222,7 @@ LLM-Wiki 4계층(L1 검색·L2 graph·L3 MCP·**L4 유지보수 루프**) 중 L4
 | **V0** | 수동 스킬 `coastal-audit` | 변경된 N파일(혼합 status) | 리포트만 | ✅ 구현·dry-run 실증 |
 | **V1** | 수동 + 라운드로빈 | 전 canonical 회전 | 리포트 + 제안 패치(미적용) | ✅ 구현·테스트 |
 | V2 | post-commit hook | 커밋된 파일만 | 리포트 + pre-commit 경고 통합 | 미착수 |
-| V3 | Hermes cron(야간) | 전수 + 신규 | 자율 감사, 사람은 리포트만(=사서 AI) | 미착수 |
+| V3 | cron(야간) | 전수 + 신규(라운드로빈) | 자율 감사, 사람은 리포트만(=사서 AI) | ⏳ 러너 구현·DRY 검증, **cron 설치(활성화) 게이트 대기** |
 
 ### V1 결과 (2026-06-21 — 라운드로빈 + 제안 패치)
 
@@ -1232,6 +1232,19 @@ LLM-Wiki 4계층(L1 검색·L2 graph·L3 MCP·**L4 유지보수 루프**) 중 L4
 - **Codex review 2차 반영**: ① 라운드로빈 정체(`audited_date` 날짜 해상도라 같은 날 반복 시 동일 N개 재선정) → ledger 에 마이크로초 `audited_at` 기록·rotation 정렬 키로 사용(같은 날도 전진). ② 동일 파일 다중 proposal 패치 무효(각 edit 을 원본서 독립 diff → 인접 hunk context 겹침) → 단일 버퍼 순차 적용 후 1회 diff. 실측: 같은 날 run2 전진(겹침 0)·인접 2줄 단일 hunk `git apply --check` PASS.
 
 **다음:** V2(post-commit hook 통합) 또는 textbook/experience 대상 확장. (V0·V1 모두 Codex 2-round 검토 반영 완료.)
+
+### V3 구현 (2026-06-21 — 야간 자율 cron 러너)
+
+런타임 결정: coastal-audit 은 **Claude Code 스킬**이라 V3 = `claude -p "/coastal-audit --n N"` **headless** 호출(Hermes `fin -z` 야간 패턴과 동급, 단 Claude Code CLI 사용). Hermes(별 에이전트·별 skills dir)가 아님. cron = 시스템 crontab.
+
+러너 `tools/llm-wiki-audit/run-audit-cron.sh` (report-only 이중 차단):
+1. **사전조건 가드**: `_staging/audit/` 외 미커밋 변경 있으면 `exit 2` (writer 작업 중 충돌·오염 방지). — DRY 실증: 미커밋 시 정확히 abort.
+2. `git pull --ff-only`(divergence 시 경고·현 HEAD 진행) → `claude -p` headless(`--permission-mode acceptEdits`, `--allowedTools Read,Bash,Write,Skill,Glob,Grep`).
+3. **하드 report-only 가드**: 실행 후 canonical(concepts/models/textbook/experience + 거버넌스 .md) 변경은 `git checkout --`로 강제 복원, cron 생성 untracked canonical 은 제거. 스킬이 report-only 지만 자율 런타임이라 런너가 이중 집행 — canonical 은 어떤 경우도 cron 으로 안 바뀜.
+4. `_staging/audit/` 만 커밋(감사 메타=canonical 아님), **push 안 함**(사람 검토). 로그는 `_staging/audit/cron-logs/`(gitignore).
+5. env: `L4_DRY_RUN`(claude stub)·`L4_NO_COMMIT`·`L4_AUDIT_N`·`COASTAL_WIKI_DIR`.
+
+**게이트(미설치)**: crontab 항목은 활성화=자율 실행 개시라 사람 승인 후 설치. 권장 시각=야간(writer 미작업 시간, 사전조건 가드 통과 확률↑). 미해결: ① `claude -p` headless 인증(OAuth 토큰 cron 환경 유효성) 1회 실증 필요 ② 해피패스(clean tree)에서 guard+commit end-to-end 1회 실증(현재 writer 미커밋분 때문에 보류). **Codex 검토 대상.**
 
 ### 외부 프레이밍 정렬 (개념 참고 — 미검증 2차 출처)
 
