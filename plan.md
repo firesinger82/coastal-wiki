@@ -1222,7 +1222,7 @@ LLM-Wiki 4계층(L1 검색·L2 graph·L3 MCP·**L4 유지보수 루프**) 중 L4
 | **V0** | 수동 스킬 `coastal-audit` | 변경된 N파일(혼합 status) | 리포트만 | ✅ 구현·dry-run 실증 |
 | **V1** | 수동 + 라운드로빈 | 전 canonical 회전 | 리포트 + 제안 패치(미적용) | ✅ 구현·테스트 |
 | V2 | post-commit hook | 커밋된 파일만 | 리포트 + pre-commit 경고 통합 | 미착수 |
-| V3 | cron(야간) | 전수 + 신규(라운드로빈) | 자율 감사, 사람은 리포트만(=사서 AI) | ⏳ 러너 구현·DRY 검증, **cron 설치(활성화) 게이트 대기** |
+| V3 | cron(야간 04:00) | 전수 + 신규(라운드로빈) | 자율 감사, 사람은 리포트만(=사서 AI) | ✅ 러너 구현·e2e 검증·**crontab 설치(2026-06-22)** |
 
 ### V1 결과 (2026-06-21 — 라운드로빈 + 제안 패치)
 
@@ -1240,11 +1240,17 @@ LLM-Wiki 4계층(L1 검색·L2 graph·L3 MCP·**L4 유지보수 루프**) 중 L4
 러너 `tools/llm-wiki-audit/run-audit-cron.sh` (report-only 이중 차단):
 1. **사전조건 가드**: `_staging/audit/` 외 미커밋 변경 있으면 `exit 2` (writer 작업 중 충돌·오염 방지). — DRY 실증: 미커밋 시 정확히 abort.
 2. `git pull --ff-only`(divergence 시 경고·현 HEAD 진행) → `claude -p` headless(`--permission-mode acceptEdits`, `--allowedTools Read,Bash,Write,Skill,Glob,Grep`).
-3. **하드 report-only 가드**: 실행 후 canonical(concepts/models/textbook/experience + 거버넌스 .md) 변경은 `git checkout --`로 강제 복원, cron 생성 untracked canonical 은 제거. 스킬이 report-only 지만 자율 런타임이라 런너가 이중 집행 — canonical 은 어떤 경우도 cron 으로 안 바뀜.
-4. `_staging/audit/` 만 커밋(감사 메타=canonical 아님), **push 안 함**(사람 검토). 로그는 `_staging/audit/cron-logs/`(gitignore).
-5. env: `L4_DRY_RUN`(claude stub)·`L4_NO_COMMIT`·`L4_AUDIT_N`·`COASTAL_WIKI_DIR`.
+3. **하드 가드**: 실행 후 `_staging/audit/` 외 모든 tracked 수정은 `git checkout -- . ':(exclude)_staging/audit'`로 복원, *이번 run 이 새로 만든* untracked 만 제거(실행 전 스냅샷 diff). 1차 보장은 커밋 스코프(`git add _staging/audit/` + 스테이징 assert) — 가드가 뚫려도 canonical 은 history 에 안 들어감.
+4. `_staging/audit/` 만 커밋(감사 메타=canonical 아님), **push 안 함**(사람 검토). 로그·lock 은 `_staging/audit/cron-logs/`(gitignore).
+5. flock overlap 차단. env: `L4_DRY_RUN`·`L4_NO_COMMIT`·`L4_AUDIT_N`·`COASTAL_WIKI_DIR`.
 
-**게이트(미설치)**: crontab 항목은 활성화=자율 실행 개시라 사람 승인 후 설치. 권장 시각=야간(writer 미작업 시간, 사전조건 가드 통과 확률↑). 미해결: ① `claude -p` headless 인증(OAuth 토큰 cron 환경 유효성) 1회 실증 필요 ② 해피패스(clean tree)에서 guard+commit end-to-end 1회 실증(현재 writer 미커밋분 때문에 보류). **Codex 검토 대상.**
+**적대검토(2026-06-22, 자체 — Codex 2회 hang 으로 대체):** 발견·반영:
+- ★치명: 초기 하드닝의 blanket `git clean -fd` 가 **Hermes research/inbox·_archive·_staging/from-modeling-wiki·작성중 모델노트 등 정상 untracked 워크벤치를 매일 파괴**(`-fdn` 미리보기로 적발). 동일 원인으로 step0 도 untracked 때문에 매번 abort. → step0=tracked 수정만 검사, step3=스냅샷 diff 로 *새 untracked 만* 제거(기존 보존). DRY+e2e 로 Hermes 3건 보존 실증.
+- F1: 가드를 canonical 한정→`_staging/audit` 외 tracked 전부 복원(`:(exclude)`).
+- F2(잔여): claude ~2분 실행 *중* writer 가 tracked 편집하면 가드가 되돌릴 수 있음 → flock + 야간 시각 + step0 완화, cron 04:00 KST(writer idle).
+- F3: flock. F4: 커밋 스테이징 scope assert + 가드후 tracked leftover assert.
+
+**활성화됨(2026-06-22):** `claude -p` headless 인증 실증(`AUTH_OK_L4V3`) + 해피패스 e2e 2회(canonical 무변경·HEAD 불변·Hermes 보존·report 생성) 후 **crontab 설치 `0 4 * * *`**(매일 04:00 KST). never-audited 399→ 점진 소진 개시. 해제=`crontab -e` 해당 줄 삭제.
 
 ### 외부 프레이밍 정렬 (개념 참고 — 미검증 2차 출처)
 
