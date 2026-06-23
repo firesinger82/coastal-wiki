@@ -2,7 +2,7 @@
 
 > **Canonical source**: 이 디렉토리(`models/CADMAS-SURF/`)가 CADMAS-SURF 계열의 구현·메커닉에 대한 진실의 원천. `concepts/<topic>/06-model-application.md` 등은 여기로의 링크만 가짐.
 >
-> 🆕 **현재 상태(2026-06-23 신설)**: CDIT/PARI 공식 GitHub org [`CADMAS-SURF`](https://github.com/CADMAS-SURF) 의 [`Multiscale-and-Multiphysics-Integrated-Simulator-for-Tsunami`](https://github.com/CADMAS-SURF/Multiscale-and-Multiphysics-Integrated-Simulator-for-Tsunami) repo clone(`raw/source_code/`, git HEAD `da7668f` 2024-08-30, **1263 Fortran 파일** + **영·일 매뉴얼 PDF 19** + 튜토리얼). README 식별카드만 sourced — source-analysis·manual-notes 미착수. VOF 기반 위상해상 RANS 수치파동수조 — SWASH·FUNWAVE(위상해상)보다 한 단계 위인 **자유수면 추적 Navier-Stokes(VOF)** class.
+> 🆕 **현재 상태(2026-06-23 신설+코어검수)**: CDIT/PARI 공식 GitHub org [`CADMAS-SURF`](https://github.com/CADMAS-SURF) 의 [`Multiscale-and-Multiphysics-Integrated-Simulator-for-Tsunami`](https://github.com/CADMAS-SURF/Multiscale-and-Multiphysics-Integrated-Simulator-for-Tsunami) repo clone(`raw/source_code/`, git HEAD `da7668f` 2024-08-30, **1263 Fortran 파일** + **영·일 매뉴얼 PDF 19** + 튜토리얼). **CADMAS-SURF/3D 코어 검수 완료 — source-analysis 5 + manual-notes 1**(전부 file:line/page 인용, 영문 매뉴얼 지배방정식 ↔ 소스 cross-confirm). VOF 기반 위상해상 RANS 수치파동수조 — SWASH·FUNWAVE(위상해상)보다 한 단계 위인 **자유수면 추적 Navier-Stokes(VOF)** class.
 
 ## 정체 카드
 
@@ -37,8 +37,8 @@
 
 | 경로 | 상태 | 비고 |
 |---|---|---|
-| `source-analysis/` | (미생성) | `Simulators/CADMAS-SURF-3D/Source code/` 240 Fortran — `vf_a1main.f` main·`VF_A*.h` 공통블록·VOF 이류·k-ε·포러스·조파 source 우선 |
-| `manual-notes/` | (미생성) | 번들 PDF 19 — CADMAS-SURF3D(영/일)·CADMAS-2F·STR3D·AGENT·STOC-CADMAS(일) |
+| `source-analysis/` | ✅ 5 verified | [architecture-source-map](source-analysis/cadmas-surf3d-architecture-source-map.md)(SMAC+VOF 루프·명명·데이터모델) · [smac-velocity-pressure-solver](source-analysis/cadmas-surf3d-smac-velocity-pressure-solver.md)(예측자·Poisson·MILU-BiCGSTAB) · [vof-free-surface](source-analysis/cadmas-surf3d-vof-free-surface.md)(donor-acceptor·NF 머신) · [turbulence-and-porous-resistance](source-analysis/cadmas-surf3d-turbulence-and-porous-resistance.md)(k-ε·Morison drag·파력) · [wave-generation-and-boundaries](source-analysis/cadmas-surf3d-wave-generation-and-boundaries.md)(조파·Sommerfeld·대수칙) |
+| `manual-notes/` | ✅ 1 verified | [english-manual-governing-equations](manual-notes/cadmas-surf3d-english-manual-governing-equations.md)(Table 0-1-1 + §2 지배방정식, 소스 cross-confirm). 잔여: 일문·CADMAS-2F·STR3D·AGENT 매뉴얼 |
 | `web-refs/` | (미생성) | CDIT/PARI 공식 + 응용논문(tsunami 방파제·월파·detached breakwater) |
 | `raw/source_code/...` | ✅ clone (gitignore) | git HEAD `da7668f` 2024-08-30, 1263 Fortran |
 

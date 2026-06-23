@@ -45,6 +45,7 @@ purpose: "사용자 지시(2026-06-16) '모든 모델은 모든 문서·코드�
 | **Celeris** | WebGPU JS+CUDA | ✅ 9 노트 | 3 | 1 + web-refs(Lynett 2026) | ✅ 완료 |
 | **SFINCS** 🆕 | src 36 (f90) | ✅ 8 노트 (전 코어, 검수) | readthedocs RST | ✅ 2 (numerical·params-io) | ✅ 완료 (코드+문서) |
 | **LISFLOOD-FP** 🆕 | classic+swe+cuda (C++/CUDA) | ✅ 7 노트 (전 솔버, 검수) | user manual PDF | ✅ 1 (user-manual) | ✅ 완료 (코드+문서) |
+| **CADMAS-SURF** 🆕 | SURF-3D 240 (f/f90) | ✅ 5 노트 (SMAC·VOF·k-ε/porous·조파/경계·아키텍처) | 영·일 매뉴얼 19 PDF | ✅ 1 (영문 지배방정식) | ✅ 코어+지배식 (2상/STR3D/AGENT 후속) |
 
 > **전수 검수 완료 (2026-06-16~18, workflow 7회 · 66 신규 노트)**: ~~SWASH·Delft3D engines·ROMS 4D-Var·핵심 매뉴얼 10종~~ + ~~polish(Delft3D utils·EFDC-GVC·도구/Training 매뉴얼·ADCIRC 30논문·Celeris·ROMS Exercise·FUNWAVE 검증)~~ ✅. 모든 단언 file:line/page 인용 + 적대 검증 통과(9건 실오류 적발→수정). **신규 모델 2(2026-06-18)**: SFINCS(Deltares compound flooding)·LISFLOOD-FP v8.2(Bristol/Sheffield 침수) — README+architecture+web-refs+manifest 생성, **모듈/솔버 deep source-analysis 는 후속 workflow**(SWASH 패턴). **잔여(선택적)**: Delft3D Library Tables·course PDF, EFDC-GVC 심층, 양호모델 추가 심화, 신규2 모델 deep.
 
@@ -211,6 +212,34 @@ xbeachlibrary(66) 코어 광범위 커버(flow_solver·morphology·nonh·q3d·wa
 ## 8. Celeris 🟢 (WebGPU JS+CUDA / SA 9) — 양호
 
 Celeris-WebGPU(JS + .wgsl/.cu compute shader). boussinesq-solver·breaking·fv-reconstruction·render·sediment·webgpu-infra·coulwave·pipeline-graph·source-map 커버. 문서 3 PDF(Tavakkol 2017/2020·Lynett 2026) = web-refs 2. 코어 솔버 ✅.
+
+---
+
+## 10. CADMAS-SURF 🆕 (신규 모델 2026-06-23, SURF-3D 240 / SA 5)
+
+**소스**: CDIT/PARI 공식 GitHub org `CADMAS-SURF` 의 `Multiscale-and-Multiphysics-Integrated-Simulator-for-Tsunami` clone (`raw/source_code/`, HEAD `da7668f` 2024-08-30). 멀티스케일·멀티피직스 통합: `STOC-ML/IC`(광역, PARI 별도) → **`CADMAS-SURF/3D`**(단상 VOF NS, 240 Fortran) → `CADMAS-2F`(기액 2상) → `STR3D`(FEM 구조) → `AGENT`(피난). 총 1263 Fortran + 매뉴얼 19 PDF.
+
+### 10.1 문서 (영·일 매뉴얼 19 PDF)
+| PDF | 종류 | 노트 | 상태 |
+|---|---|---|---|
+| CADMAS-SURF3D_Manural_English.pdf (150p) | SURF/3D 영문 매뉴얼 | **cadmas-surf3d-english-manual-governing-equations** (Table 0-1-1 + §2 지배방정식, 소스 cross-confirm) | ✅ |
+| CADMAS-SURF3D_Manual_Japanese.pdf | SURF/3D 일문 | — | ⬜ |
+| STOC-CADMAS_Manual_Japanese.pdf | STOC 결합 일문 | — | ⬜ |
+| CADMAS-2F_Manural_English/Japanese.pdf | 2상 매뉴얼 | — | ⬜ |
+| CADMAS-STR/AGENT_Manual_*.pdf | STR3D·AGENT | — | ⬜ |
+
+### 10.2 코드 — CADMAS-SURF/3D (C티어, 240 Fortran, SA 5 — 2026-06-23 검수)
+> 메인 드라이버 + 핵심 물리 커널 전수. 각 노트 file:line 인용 + 영문 매뉴얼 식 cross-confirm (가상질량 2.5·저항 R·VOF 2.7·Sommerfeld 2.16·k-ε 상수 모두 일치).
+
+| 서브시스템 | 노트 | 상태 |
+|---|---|---|
+| 아키텍처(SMAC+VOF 루프·명명규칙·데이터모델) | cadmas-surf3d-architecture-source-map | ✅ |
+| SMAC 流速-압력(예측자·Poisson·MILU-BiCGSTAB·보정) | cadmas-surf3d-smac-velocity-pressure-solver | ✅ |
+| VOF 자유수면(donor-acceptor·NF 머신·기포/물방울) | cadmas-surf3d-vof-free-surface | ✅ |
+| k-ε 난류·porous Morison drag·파력적분 | cadmas-surf3d-turbulence-and-porous-resistance | ✅ |
+| 조파(소스/파이론)·방사경계·대수칙벽 | cadmas-surf3d-wave-generation-and-boundaries | ✅ |
+
+**잔여(후속)**: SURF/3D 나머지(`vf_cdtcal` CFL·`vf_pmg*` 親子격자 nesting·`vf_stoc_*` STOC 결합·IO/parser S티어) / **CADMAS-2F**(2상 VOF) deep / **STR3D**(FEM) / **AGENT**(피난) / 일문 매뉴얼·2F·STR 매뉴얼. 라이선스 = repo LICENSE 부재(인용의무만, source-needed).
 
 ---
 
