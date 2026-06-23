@@ -2,7 +2,7 @@
 
 > **Canonical source**: 이 디렉토리(`models/CADMAS-SURF/`)가 CADMAS-SURF 계열의 구현·메커닉에 대한 진실의 원천. `concepts/<topic>/06-model-application.md` 등은 여기로의 링크만 가짐.
 >
-> 🆕 **현재 상태(2026-06-23 신설+코어검수)**: CDIT/PARI 공식 GitHub org [`CADMAS-SURF`](https://github.com/CADMAS-SURF) 의 [`Multiscale-and-Multiphysics-Integrated-Simulator-for-Tsunami`](https://github.com/CADMAS-SURF/Multiscale-and-Multiphysics-Integrated-Simulator-for-Tsunami) repo clone(`raw/source_code/`, git HEAD `da7668f` 2024-08-30, **1263 Fortran 파일** + **영·일 매뉴얼 PDF 19** + 튜토리얼). **CADMAS-SURF/3D 코어 검수 완료 — source-analysis 5 + manual-notes 1**(전부 file:line/page 인용, 영문 매뉴얼 지배방정식 ↔ 소스 cross-confirm). VOF 기반 위상해상 RANS 수치파동수조 — SWASH·FUNWAVE(위상해상)보다 한 단계 위인 **자유수면 추적 Navier-Stokes(VOF)** class.
+> 🆕 **현재 상태(2026-06-23 신설+전수검수)**: CDIT/PARI 공식 GitHub org [`CADMAS-SURF`](https://github.com/CADMAS-SURF) 의 [`Multiscale-and-Multiphysics-Integrated-Simulator-for-Tsunami`](https://github.com/CADMAS-SURF/Multiscale-and-Multiphysics-Integrated-Simulator-for-Tsunami) repo clone(`raw/source_code/`, git HEAD `da7668f` 2024-08-30, **~1255 Fortran 파일** + **영·일 매뉴얼 PDF 19** + 튜토리얼). **4개 시뮬레이터 전부 C티어 검수 완료 — source-analysis 12 + manual-notes 1**: SURF/3D(단상, 6노트)·CADMAS-2F(2상+FSI, 2)·STR3D(FEM 구조·지반, 3)·AGENT(피난, 1, 전수). 전부 file:line/page 인용, 영문 매뉴얼 지배방정식 ↔ 소스 cross-confirm. VOF 기반 위상해상 RANS 수치파동수조 — SWASH·FUNWAVE(위상해상)보다 한 단계 위인 **자유수면 추적 Navier-Stokes(VOF)** class. 잔여: S티어(IO/parser/MPI)·매뉴얼 18종·Pre/post 4툴.
 
 ## 정체 카드
 
@@ -26,10 +26,10 @@
 
 | 컴포넌트 | 역할 | 위치 |
 |---|---|---|
-| **CADMAS-SURF/3D** | 3D 비압축 단상 VOF NS | `Simulators/CADMAS-SURF-3D/` (Source code 240 Fortran) |
-| **CADMAS-SURF/3D2F** (CADMAS-2F) | 3D 기액 2상 VOF | `Simulators/CADMAS-SURF-3D2F/` |
-| **STR3D** | FEM 구조·지반 계산 | `Simulators/STR3D/` |
-| **AGENT** | 피난 시뮬레이터 | `Simulators/AGENT/` |
+| **CADMAS-SURF/3D** | 3D 비압축 단상 VOF NS | `Simulators/CADMAS-SURF-3D/` (240 Fortran) — ✅ C티어 검수 (SA 6) |
+| **CADMAS-SURF/3D2F** (CADMAS-2F) | 3D 기액 2상 VOF + FSI | `Simulators/CADMAS-SURF-3D2F/` (388) — ✅ C티어 검수 (SA 2: 압축성 2상·구조결합) |
+| **STR3D** | FEM 구조·지반 계산 | `Simulators/STR3D/` (587) — ✅ C티어 검수 (SA 3: FEM·solver·접촉/결합) |
+| **AGENT** | 피난 시뮬레이터 | `Simulators/AGENT/` (40) — ✅ 전수 검수 (SA 1) |
 | **STOC-ML / STOC-IC** | 정수압/비정수압 광역 tsunami (PARI 별도 배포) | (외부, pari.go.jp) |
 | Pre/Post | CADMAS-MESH(-MULTI)·CADMAS-VR·ViewKai | `Pre and post-processors/` |
 
@@ -37,15 +37,15 @@
 
 | 경로 | 상태 | 비고 |
 |---|---|---|
-| `source-analysis/` | ✅ 6 verified | [architecture-source-map](source-analysis/cadmas-surf3d-architecture-source-map.md)(SMAC+VOF 루프·명명·데이터모델) · [smac-velocity-pressure-solver](source-analysis/cadmas-surf3d-smac-velocity-pressure-solver.md)(예측자·Poisson·MILU-BiCGSTAB) · [vof-free-surface](source-analysis/cadmas-surf3d-vof-free-surface.md)(donor-acceptor·NF 머신) · [turbulence-and-porous-resistance](source-analysis/cadmas-surf3d-turbulence-and-porous-resistance.md)(k-ε·Morison drag·파력) · [wave-generation-and-boundaries](source-analysis/cadmas-surf3d-wave-generation-and-boundaries.md)(조파·Sommerfeld·대수칙) · [timestep-nesting-stoc-coupling](source-analysis/cadmas-surf3d-timestep-nesting-stoc-coupling.md)(CFL Δt·親子 nesting·STOC MPMD 결합) |
+| `source-analysis/` | ✅ 12 verified | **SURF/3D(6)**: [architecture-source-map](source-analysis/cadmas-surf3d-architecture-source-map.md)(SMAC+VOF 루프·명명·데이터모델) · [smac-velocity-pressure-solver](source-analysis/cadmas-surf3d-smac-velocity-pressure-solver.md)(예측자·Poisson·MILU-BiCGSTAB) · [vof-free-surface](source-analysis/cadmas-surf3d-vof-free-surface.md)(donor-acceptor·NF 머신) · [turbulence-and-porous-resistance](source-analysis/cadmas-surf3d-turbulence-and-porous-resistance.md)(k-ε·Morison drag·파력) · [wave-generation-and-boundaries](source-analysis/cadmas-surf3d-wave-generation-and-boundaries.md)(조파·Sommerfeld·대수칙) · [timestep-nesting-stoc-coupling](source-analysis/cadmas-surf3d-timestep-nesting-stoc-coupling.md)(CFL·親子 nesting·STOC). **2F(2)**: [cadmas-2f-twophase-compressible-gas](source-analysis/cadmas-2f-twophase-compressible-gas.md)(압축성 기상 EOS·변밀도·준압축성 Poisson) · [cadmas-2f-structure-coupling-cutcell](source-analysis/cadmas-2f-structure-coupling-cutcell.md)(sf_* FSI cut-cell 공극). **STR3D(3)**: [str3d-fem-core-newmark-elasto-plastic](source-analysis/str3d-fem-core-newmark-elasto-plastic.md)(Newmark-β·요소·탄소성+균열·Biot) · [str3d-linear-solvers](source-analysis/str3d-linear-solvers.md)(ICCG/BiCGStab·PARDISO/MUMPS) · [str3d-contact-and-fluid-coupling](source-analysis/str3d-contact-and-fluid-coupling.md)(MPC 접촉·Coulomb·MPMD 결합). **AGENT(1)**: [cadmas-agent-evacuation-simulator](source-analysis/cadmas-agent-evacuation-simulator.md)(potential-field 피난·Tobler·익사판정) |
 | `manual-notes/` | ✅ 1 verified | [english-manual-governing-equations](manual-notes/cadmas-surf3d-english-manual-governing-equations.md)(Table 0-1-1 + §2 지배방정식, 소스 cross-confirm). 잔여: 일문·CADMAS-2F·STR3D·AGENT 매뉴얼 |
 | `web-refs/` | (미생성) | CDIT/PARI 공식 + 응용논문(tsunami 방파제·월파·detached breakwater) |
 | `raw/source_code/...` | ✅ clone (gitignore) | git HEAD `da7668f` 2024-08-30, 1263 Fortran |
 
-## 다음 후보
+## 다음 후보 (잔여)
 
-- **source-analysis 착수**: `CADMAS-SURF-3D/Source code/vf_a1main.f`(main driver) → VOF 이류(`vf_*` advection)·k-ε·포러스 body·조파 source/무반사 경계 서브루틴별 file:line
-- **manual-notes**: 영문 매뉴얼 `CADMAS-SURF3D_Manural_English.pdf` Ch1 Overview·지배방정식·경계조건 page 인용 발췌
-- **AUDIT-LEDGER 등록**: 신규 모델로 C/S/T 티어 인벤토리 추가
+- **S티어**: SURF/3D IO·parser(`vf_o*`·`vf_i*`)·MPI 래퍼(`vf_zxmp*`) / STR3D 병렬통신(mpi_comm·glb_comm·util) / 2F·STR3D MPI 디테일
+- **manual-notes 18종**: 일문 SURF/3D·STOC-CADMAS·CADMAS-2F·STR3D(CADMAS-STR)·AGENT 매뉴얼 + 영문 튜토리얼
+- **Pre/post 4툴**: CADMAS-MESH(-MULTI)·CADMAS-VR·ViewKai
 - 약어 전개·라이선스 1차 확인(매뉴얼 표지·CDIT Library 서지)
 - `concepts/` cross-link: wave-force·overtopping·breaking·tsunami 토픽에서 위상해상 VOF 옵션으로 링크
