@@ -37,7 +37,7 @@
 
 | 경로 | 상태 | 비고 |
 |---|---|---|
-| `source-analysis/` | ✅ 5 verified | [architecture-source-map](source-analysis/cadmas-surf3d-architecture-source-map.md)(SMAC+VOF 루프·명명·데이터모델) · [smac-velocity-pressure-solver](source-analysis/cadmas-surf3d-smac-velocity-pressure-solver.md)(예측자·Poisson·MILU-BiCGSTAB) · [vof-free-surface](source-analysis/cadmas-surf3d-vof-free-surface.md)(donor-acceptor·NF 머신) · [turbulence-and-porous-resistance](source-analysis/cadmas-surf3d-turbulence-and-porous-resistance.md)(k-ε·Morison drag·파력) · [wave-generation-and-boundaries](source-analysis/cadmas-surf3d-wave-generation-and-boundaries.md)(조파·Sommerfeld·대수칙) |
+| `source-analysis/` | ✅ 6 verified | [architecture-source-map](source-analysis/cadmas-surf3d-architecture-source-map.md)(SMAC+VOF 루프·명명·데이터모델) · [smac-velocity-pressure-solver](source-analysis/cadmas-surf3d-smac-velocity-pressure-solver.md)(예측자·Poisson·MILU-BiCGSTAB) · [vof-free-surface](source-analysis/cadmas-surf3d-vof-free-surface.md)(donor-acceptor·NF 머신) · [turbulence-and-porous-resistance](source-analysis/cadmas-surf3d-turbulence-and-porous-resistance.md)(k-ε·Morison drag·파력) · [wave-generation-and-boundaries](source-analysis/cadmas-surf3d-wave-generation-and-boundaries.md)(조파·Sommerfeld·대수칙) · [timestep-nesting-stoc-coupling](source-analysis/cadmas-surf3d-timestep-nesting-stoc-coupling.md)(CFL Δt·親子 nesting·STOC MPMD 결합) |
 | `manual-notes/` | ✅ 1 verified | [english-manual-governing-equations](manual-notes/cadmas-surf3d-english-manual-governing-equations.md)(Table 0-1-1 + §2 지배방정식, 소스 cross-confirm). 잔여: 일문·CADMAS-2F·STR3D·AGENT 매뉴얼 |
 | `web-refs/` | (미생성) | CDIT/PARI 공식 + 응용논문(tsunami 방파제·월파·detached breakwater) |
 | `raw/source_code/...` | ✅ clone (gitignore) | git HEAD `da7668f` 2024-08-30, 1263 Fortran |

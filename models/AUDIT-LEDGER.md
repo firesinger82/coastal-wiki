@@ -45,7 +45,7 @@ purpose: "사용자 지시(2026-06-16) '모든 모델은 모든 문서·코드�
 | **Celeris** | WebGPU JS+CUDA | ✅ 9 노트 | 3 | 1 + web-refs(Lynett 2026) | ✅ 완료 |
 | **SFINCS** 🆕 | src 36 (f90) | ✅ 8 노트 (전 코어, 검수) | readthedocs RST | ✅ 2 (numerical·params-io) | ✅ 완료 (코드+문서) |
 | **LISFLOOD-FP** 🆕 | classic+swe+cuda (C++/CUDA) | ✅ 7 노트 (전 솔버, 검수) | user manual PDF | ✅ 1 (user-manual) | ✅ 완료 (코드+문서) |
-| **CADMAS-SURF** 🆕 | SURF-3D 240 (f/f90) | ✅ 5 노트 (SMAC·VOF·k-ε/porous·조파/경계·아키텍처) | 영·일 매뉴얼 19 PDF | ✅ 1 (영문 지배방정식) | ✅ 코어+지배식 (2상/STR3D/AGENT 후속) |
+| **CADMAS-SURF** 🆕 | SURF-3D 240 (f/f90) | ✅ 6 노트 (SMAC·VOF·k-ε/porous·조파/경계·**Δt/nesting/STOC**·아키텍처) | 영·일 매뉴얼 19 PDF | ✅ 1 (영문 지배방정식) | ✅ 코어+인프라+지배식 (2상/STR3D/AGENT 후속) |
 
 > **전수 검수 완료 (2026-06-16~18, workflow 7회 · 66 신규 노트)**: ~~SWASH·Delft3D engines·ROMS 4D-Var·핵심 매뉴얼 10종~~ + ~~polish(Delft3D utils·EFDC-GVC·도구/Training 매뉴얼·ADCIRC 30논문·Celeris·ROMS Exercise·FUNWAVE 검증)~~ ✅. 모든 단언 file:line/page 인용 + 적대 검증 통과(9건 실오류 적발→수정). **신규 모델 2(2026-06-18)**: SFINCS(Deltares compound flooding)·LISFLOOD-FP v8.2(Bristol/Sheffield 침수) — README+architecture+web-refs+manifest 생성, **모듈/솔버 deep source-analysis 는 후속 workflow**(SWASH 패턴). **잔여(선택적)**: Delft3D Library Tables·course PDF, EFDC-GVC 심층, 양호모델 추가 심화, 신규2 모델 deep.
 
@@ -238,8 +238,9 @@ Celeris-WebGPU(JS + .wgsl/.cu compute shader). boussinesq-solver·breaking·fv-r
 | VOF 자유수면(donor-acceptor·NF 머신·기포/물방울) | cadmas-surf3d-vof-free-surface | ✅ |
 | k-ε 난류·porous Morison drag·파력적분 | cadmas-surf3d-turbulence-and-porous-resistance | ✅ |
 | 조파(소스/파이론)·방사경계·대수칙벽 | cadmas-surf3d-wave-generation-and-boundaries | ✅ |
+| 시간刻み(CFL)·親子 격자 nesting·STOC 결합(MPMD) | cadmas-surf3d-timestep-nesting-stoc-coupling | ✅ |
 
-**잔여(후속)**: SURF/3D 나머지(`vf_cdtcal` CFL·`vf_pmg*` 親子격자 nesting·`vf_stoc_*` STOC 결합·IO/parser S티어) / **CADMAS-2F**(2상 VOF) deep / **STR3D**(FEM) / **AGENT**(피난) / 일문 매뉴얼·2F·STR 매뉴얼. 라이선스 = repo LICENSE 부재(인용의무만, source-needed).
+**잔여(후속)**: SURF/3D IO/parser S티어(`vf_ii*`·`vf_o*`) / **CADMAS-2F**(2상 VOF) deep / **STR3D**(FEM) / **AGENT**(피난) / 일문 매뉴얼·2F·STR 매뉴얼. 라이선스 = repo LICENSE 부재(인용의무만, source-needed). disclosed gap: CFL=이류+확산만(√gH celerity 항 無), STOC=MPI_COMM_SPLIT MPMD(INTERCOMM 아님).
 
 ---
 
