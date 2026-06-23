@@ -3,6 +3,7 @@ title: "이안류 형성 mechanism·유형 taxonomy — 물리 형성론"
 topic: rip-currents
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "교과서 page 직접 확인 인용: (mechanics-of-sediment-transport, p.764·766 §16.2.5.2-16.2.5.3) 이안류 정의·setup 구배 형성 mechanism·Bowen-Inman·wave refraction별 nearshore circulation 3유형(Fig 16.24)·800m 규모; (stewart-physical-ocean, p.309-310 §17.4·p.325 §17.6) narrow swift seaward rip·수백 m 간격·feeder longshore channel·유속 의존(파고/빈도/onshore wind)·edge wave; (coastal-eng-guidelines, p.91 glossary) radiation stress가 longshore current·rip current 구동 + rip current 정의(surf-zone seaward). 미보유 정량(edge wave 공명파장·shear instability 분산식·flash rip)은 source-needed 명시."
 note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-18

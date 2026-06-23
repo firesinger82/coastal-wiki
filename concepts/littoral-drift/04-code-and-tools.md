@@ -3,6 +3,7 @@ title: "연안표사 수치모델 — one-line/N-line shoreline 모델 + process
 topic: littoral-drift
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "process-based 모델 cross-link 부분(§2-§6)은 본 위키 내 verified 모델 source-analysis 노트가 뒷받침 — Delft3D([`delft3d_sediment_transport_formulae.md`](../../models/Delft3D/source-analysis/delft3d_sediment_transport_formulae.md) eqtran iform 카탈로그·[`sediment/delft3d_sediment.md`](../../models/Delft3D/source-analysis/sediment/delft3d_sediment.md)·[`delft3d_sediment_morphology.md`](../../models/Delft3D/source-analysis/delft3d_sediment_morphology.md))·XBeach([`xbeach_morphology.md`](../../models/XBeach/source-analysis/xbeach_morphology.md) transus/sedtransform file:line·[`xbeach-morphology-foundation.md`](../../models/XBeach/source-analysis/xbeach-morphology-foundation.md))·EFDC([`sediment/efdc_sediment.md`](../../models/EFDC/source-analysis/sediment/efdc_sediment.md)·[`sediment/efdc_sedzlj.md`](../../models/EFDC/source-analysis/sediment/efdc_sedzlj.md))·ROMS([`sediment/roms_sediment.md`](../../models/ROMS/source-analysis/sediment/roms_sediment.md)·[`roms_wec.md`](../../models/ROMS/source-analysis/roms_wec.md)) 노트 직접 read 후 인용. radiation stress→longshore current 인과 chain 은 [`02-theory.md`](02-theory.md)(Holthuijsen §7.4.2-3) 뒷받침. one-line/N-line 모델(§1, GENESIS·LITPACK·UNIBEST)은 본 위키 내 source-analysis 미보유 → bibliographic(source-needed)."
 note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-18

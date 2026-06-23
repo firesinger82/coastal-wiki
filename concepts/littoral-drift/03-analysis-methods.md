@@ -3,6 +3,7 @@ title: "연안표사 분석·산정 방법 — CERC 공식·Kamphuis/Damgaard-So
 topic: littoral-drift
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "Soulsby 'Dynamics of Marine Sands' (marine-sands-manual) §10.5 Longshore transport — CERC 공식 Eq(138) 본문·계수 0.023 (p.198) + 계수 calibration/적용 한계 (p.199) + Damgaard-Soulsby Eq(139a-e) (p.199-200) + Example 10.3 longshore transport 수치 (p.201-203, shingle Q_LS=36,700 m3/yr vs CERC 819,410 m3/yr) + beach planshape(one-line)·coastal profile 모델 분류·sediment budget 셀 (p.207-208) 직접 인용. Dean-Dalrymple 'Water Wave Mechanics' (water-wave-mechanics) §10.5 Example 10.2 longshore wave thrust Eq(10.37) F_y=-dS_xy/dx (p.309) 인용. 모든 page 는 textbook/md ---PAGE-NN--- 구분자로 직접 확인."
 note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-18

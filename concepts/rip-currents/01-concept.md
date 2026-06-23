@@ -3,6 +3,7 @@ title: "이안류 (Rip Currents) — 정의·위험·유형 + CV 자동 탐지 �
 topic: rip-currents
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "신규 토픽 (2026-06-18). §1-3 정의·위험·유형/시각signature **textbook page 직접 read·인용 verified** (2026-06-18 보강): mechanics-of-sediment-transport p.766 §16.2.5.3(정의=concentrated offshore current·800m·fan shape, superelevation 구배 구동, Bowen·Inman, Fig.16.24 파 특성별 rip 패턴 변이) + stewart-physical-ocean p.309(rip=narrow swift seaward flow·수백m 간격·channel·세기 지배요인) + p.310(수영자 위험·해안평행 탈출법·edge wave 주기/파장/감쇠). 해당 page 본문 실제 확인 후 인용. §4 CV 탐지 벤치마크 4편 = arxiv full PDF 직접 read(pdftotext) verified: RipVIS(2504.01128,18p)·YOLOv8 baseline(2504.02558,11p)·RipSeg AIM2025(2508.13401,10p)·RipDetSeg NTIRE2026(2604.17070,12p). **잔존 source-needed**: 정량 유속 임계값(m/s), 정식 유형 taxonomy(MacMahan-Reniers 2006·Dalrymple 2011 Annu.Rev.) page 미보유, edge wave↔rip 간격 정량 연계, 한국 KHOA 운영(§5). radiation stress 형성 정량 유도는 02-theory 위임."
 note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-18

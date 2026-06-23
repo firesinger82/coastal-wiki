@@ -3,6 +3,7 @@ title: "연안표사 — 06 모델 적용 (Delft3D · XBeach · EFDC · ROMS 의
 topic: littoral-drift
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "각 모델 source-analysis 노트 직접 read 후 longshore-drift 적용 정합 확인 + cross-link. Delft3D: delft3d_flow_wave_coupling.md (wave force fxw/fyw·radstr.f90:304·roller massfl.f90:113) + delft3d_sediment_morphology.md (erosed.f90·bott3d.f90 Exner bed update). XBeach: xbeach_morphology.md (transus/bed_update morphevolution.F90, Soulsby-Van Rijn, avalanching). EFDC: efdc_sediment.md (SedTran-Original ISTRAN(6/7) vs SEDZLJ, ssedtox.f90:868-880). ROMS: roms_sediment.md (CSTMS bedload/suspended) + roms_wec.md (vortex-force wec_vf.F·SWAN coupling mct_roms_swan.h). CONVENTIONS.md §3 — 모델 메커닉 디테일은 models/<model>/source-analysis/ 가 진실의 원천, 본 페이지는 요약 + 링크. 인과 chain (radiation stress→longshore current→sediment flux→morphology) 은 01-concept/02-theory (Holthuijsen §7.4.2-3·Bowen 1969·Battjes 1974) 의 검증된 도메인 이론."
 note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-18

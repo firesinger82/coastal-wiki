@@ -3,6 +3,7 @@ title: "연안표사 (Longshore Sediment Transport) — 정의·driver·empirica
 topic: littoral-drift
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "CERC 'Shore Protection Manual' 1984 (외부 표준 reference, 본 위키 내 PDF 미보유 — sources.yml TODO) + Komar & Inman (1970) J. Geophys. Res. 75(30):5914-5927 (Wijetunge ref. 19 직접 인용) + Holthuijsen Ch 11 (textbook/md/Waves-Holthuijsen2007.md) + Soulsby 1997 (concepts/sediment-transport/ 공유) 정형 인용."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-23
