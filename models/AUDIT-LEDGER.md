@@ -45,7 +45,7 @@ purpose: "사용자 지시(2026-06-16) '모든 모델은 모든 문서·코드�
 | **Celeris** | WebGPU JS+CUDA | ✅ 9 노트 | 3 | 1 + web-refs(Lynett 2026) | ✅ 완료 |
 | **SFINCS** 🆕 | src 36 (f90) | ✅ 8 노트 (전 코어, 검수) | readthedocs RST | ✅ 2 (numerical·params-io) | ✅ 완료 (코드+문서) |
 | **LISFLOOD-FP** 🆕 | classic+swe+cuda (C++/CUDA) | ✅ 7 노트 (전 솔버, 검수) | user manual PDF | ✅ 1 (user-manual) | ✅ 완료 (코드+문서) |
-| **CADMAS-SURF** 🆕 | 4 시뮬 ~1255 (f/f90) | ✅ 16 노트 (**코드 100% 포섭**: C티어 12 + S티어/커버리지 4) | 영·일 매뉴얼 19 PDF | ✅ 1 (영문 지배방정식) | ✅ 코드 100% (매뉴얼 18·바이너리3툴 후속) |
+| **CADMAS-SURF** 🆕 | 4 시뮬 ~1255 (f/f90) | ✅ 16 노트 (**코드 100% 포섭**: C티어 12 + S티어/커버리지 4) | **26 PDF 전수** | ✅ 5 (SURF3D·2F·STR·AGENT 영문 cross-confirm + 카탈로그) | ✅ **100% 전수**(코드+매뉴얼; 바이너리3툴 내부·일문상세 source-needed) |
 
 > **전수 검수 완료 (2026-06-16~18, workflow 7회 · 66 신규 노트)**: ~~SWASH·Delft3D engines·ROMS 4D-Var·핵심 매뉴얼 10종~~ + ~~polish(Delft3D utils·EFDC-GVC·도구/Training 매뉴얼·ADCIRC 30논문·Celeris·ROMS Exercise·FUNWAVE 검증)~~ ✅. 모든 단언 file:line/page 인용 + 적대 검증 통과(9건 실오류 적발→수정). **신규 모델 2(2026-06-18)**: SFINCS(Deltares compound flooding)·LISFLOOD-FP v8.2(Bristol/Sheffield 침수) — README+architecture+web-refs+manifest 생성, **모듈/솔버 deep source-analysis 는 후속 workflow**(SWASH 패턴). **잔여(선택적)**: Delft3D Library Tables·course PDF, EFDC-GVC 심층, 양호모델 추가 심화, 신규2 모델 deep.
 
@@ -219,14 +219,14 @@ Celeris-WebGPU(JS + .wgsl/.cu compute shader). boussinesq-solver·breaking·fv-r
 
 **소스**: CDIT/PARI 공식 GitHub org `CADMAS-SURF` 의 `Multiscale-and-Multiphysics-Integrated-Simulator-for-Tsunami` clone (`raw/source_code/`, HEAD `da7668f` 2024-08-30). 멀티스케일·멀티피직스 통합: `STOC-ML/IC`(광역, PARI 별도) → **`CADMAS-SURF/3D`**(단상 VOF NS, 240 Fortran) → `CADMAS-2F`(기액 2상) → `STR3D`(FEM 구조) → `AGENT`(피난). 총 1263 Fortran + 매뉴얼 19 PDF.
 
-### 10.1 문서 (영·일 매뉴얼 19 PDF)
+### 10.1 문서 (26 PDF 전수 — manual-notes 5)
 | PDF | 종류 | 노트 | 상태 |
 |---|---|---|---|
-| CADMAS-SURF3D_Manural_English.pdf (150p) | SURF/3D 영문 매뉴얼 | **cadmas-surf3d-english-manual-governing-equations** (Table 0-1-1 + §2 지배방정식, 소스 cross-confirm) | ✅ |
-| CADMAS-SURF3D_Manual_Japanese.pdf | SURF/3D 일문 | — | ⬜ |
-| STOC-CADMAS_Manual_Japanese.pdf | STOC 결합 일문 | — | ⬜ |
-| CADMAS-2F_Manural_English/Japanese.pdf | 2상 매뉴얼 | — | ⬜ |
-| CADMAS-STR/AGENT_Manual_*.pdf | STR3D·AGENT | — | ⬜ |
+| CADMAS-SURF3D_Manural_English (150p) | SURF/3D 영문 | **cadmas-surf3d-english-manual-governing-equations**(Table 0-1-1+§2 지배식) | ✅ |
+| CADMAS-2F_Manural_English (160p) | 2상 영문 | **cadmas-2f-manual-compressibility**(기상 압축성 EOS/Poisson cross-confirm; /3D 95%중복+부록) | ✅ |
+| CADMAS-STR Manual(18p)+Program Instructions(113p) 영문 | STR3D 영문 | **cadmas-str-manual-fem-theory-input**(Biot·Newmark·von Mises/DP·MPC·NASTRAN; MUMPS 플래그 stale 적발) | ✅ |
+| CADMAS-AGENT_Manual_English (30p) | 피난 영문 | **cadmas-agent-manual**(potential-field·익사판정; Tobler 식 소스전용 적발) | ✅ |
+| 나머지 21 PDF(튜토리얼6·일문중복5·STOC-CADMAS1·STR(CADMAS)2·Pre/post7) | 카탈로그 | **cadmas-manuals-catalogue**(전수 인벤토리) | ✅(🟡 일문상세·바이너리툴 내부 source-needed) |
 
 ### 10.2 코드 — CADMAS-SURF/3D (C티어, 240 Fortran, SA 5 — 2026-06-23 검수)
 > 메인 드라이버 + 핵심 물리 커널 전수. 각 노트 file:line 인용 + 영문 매뉴얼 식 cross-confirm (가상질량 2.5·저항 R·VOF 2.7·Sommerfeld 2.16·k-ε 상수 모두 일치).
