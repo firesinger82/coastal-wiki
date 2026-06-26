@@ -45,7 +45,7 @@ purpose: "사용자 지시(2026-06-16) '모든 모델은 모든 문서·코드�
 | **Celeris** | WebGPU JS+CUDA | ✅ 9 노트 | 3 | 1 + web-refs(Lynett 2026) | ✅ 완료 |
 | **SFINCS** 🆕 | src 36 (f90) | ✅ 8 노트 (전 코어, 검수) | readthedocs RST | ✅ 2 (numerical·params-io) | ✅ 완료 (코드+문서) |
 | **LISFLOOD-FP** 🆕 | classic+swe+cuda (C++/CUDA) | ✅ 7 노트 (전 솔버, 검수) | user manual PDF | ✅ 1 (user-manual) | ✅ 완료 (코드+문서) |
-| **CADMAS-SURF** 🆕 | 4 시뮬 ~1255 (f/f90) | ✅ 12 노트 (4 시뮬 전부 C티어: SURF/3D 6·2F 2·STR3D 3·AGENT 1) | 영·일 매뉴얼 19 PDF | ✅ 1 (영문 지배방정식) | ✅ 全 C티어 (S티어·매뉴얼18·Pre/post 후속) |
+| **CADMAS-SURF** 🆕 | 4 시뮬 ~1255 (f/f90) | ✅ 16 노트 (**코드 100% 포섭**: C티어 12 + S티어/커버리지 4) | 영·일 매뉴얼 19 PDF | ✅ 1 (영문 지배방정식) | ✅ 코드 100% (매뉴얼 18·바이너리3툴 후속) |
 
 > **전수 검수 완료 (2026-06-16~18, workflow 7회 · 66 신규 노트)**: ~~SWASH·Delft3D engines·ROMS 4D-Var·핵심 매뉴얼 10종~~ + ~~polish(Delft3D utils·EFDC-GVC·도구/Training 매뉴얼·ADCIRC 30논문·Celeris·ROMS Exercise·FUNWAVE 검증)~~ ✅. 모든 단언 file:line/page 인용 + 적대 검증 통과(9건 실오류 적발→수정). **신규 모델 2(2026-06-18)**: SFINCS(Deltares compound flooding)·LISFLOOD-FP v8.2(Bristol/Sheffield 침수) — README+architecture+web-refs+manifest 생성, **모듈/솔버 deep source-analysis 는 후속 workflow**(SWASH 패턴). **잔여(선택적)**: Delft3D Library Tables·course PDF, EFDC-GVC 심층, 양호모델 추가 심화, 신규2 모델 deep.
 
@@ -263,7 +263,17 @@ Celeris-WebGPU(JS + .wgsl/.cu compute shader). boussinesq-solver·breaking·fv-r
 |---|---|---|
 | 피난 시뮬(potential-field Dijkstra 항법·Tobler hiking·수심 익사판정·CADMAS 결합·확률) | cadmas-agent-evacuation-simulator | ✅ (40 .f90 전수) |
 
-**잔여(후속)**: **S티어** — SURF/3D IO/parser(`vf_o*`·`vf_i*`)·MPI 래퍼(`vf_zxmp*`) / 2F·STR3D 병렬통신(mpi_comm·glb_comm·util) / **매뉴얼 18종**(일문·2F·STR·AGENT·STOC-CADMAS) / **Pre/post 4툴**(CADMAS-MESH(-MULTI)·VR·ViewKai). 라이선스 = repo LICENSE 부재(인용의무만, source-needed). disclosed gap: SURF/3D CFL=이류+확산만(√gH 無), STOC=MPI_COMM_SPLIT MPMD(INTERCOMM 아님), 2F=표면장력·상변화 無, AGENT underwater_function dead-code.
+### 10.6 S티어 + 커버리지 (코드 100% 포섭, SA 4 — 2026-06-24)
+> C티어 코어 12노트 외 전 파일 카탈로그 + 적발 보조물리.
+
+| 범위 | 노트 | 적발 보조물리 |
+|---|---|---|
+| SURF/3D S티어+보조 | cadmas-surf3d-stier-and-auxiliary-physics | ★Okada 단층 쓰나미소스(mod_fault)·스칼라/온도 수송·공기압·파이론 내부(Stokes5/cnoidal3/stream-func)·진단(vort/div/wlvl) |
+| STR3D S티어+geo | str3d-stier-parallel-mesh-io | geo/(31)=FEM 코어 MPI 병렬쌍둥이·remesh 이동메시·dflt_damp Rayleigh·METIS 분할·FEMAP 출력 |
+| 2F S티어+HiDEM | cadmas-2f-stier-and-hidem-dem-coupling | ★HiDEM(DEM) 결합(vf_jp*/mod_dem)=4번째 파트너·2상물리=EOS집합 전수확인 |
+| Pre/post 4툴 | cadmas-pre-post-processors | ViewKai 소스(GFCONV)·MESH/MESH-MULTI/VR 바이너리(source-needed) |
+
+**최종 잔여(후속)**: **매뉴얼 18종**(일문 SURF/3D·STOC-CADMAS·2F 영/일·STR 영/일·Program Instructions×4·AGENT 영/일·튜토리얼) / **Pre/post 3툴 바이너리 내부**(MESH·MESH-MULTI·VR — 소스부재, 매뉴얼 PDF 출처 필요). 코드(Fortran) = **100% 포섭 완료**. 라이선스 = repo LICENSE 부재(인용의무만, source-needed). disclosed gap: SURF/3D CFL=이류+확산만(√gH 無), STOC=MPI_COMM_SPLIT MPMD, 2F=표면장력·상변화 無, AGENT underwater_function dead-code, HiDEM 본체 repo 부재(인터페이스만).
 
 ---
 
