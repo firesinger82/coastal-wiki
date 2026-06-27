@@ -17,6 +17,7 @@
 
 - readthedocs: <https://sfincs.readthedocs.io/en/latest/> (manual-notes 후속 추출 대상)
 - 소스 내 `docs/` (readthedocs RST 소스) 동봉.
+- **v2.4.0 Galibier 릴리스 검토 (2026-06-27)**: 공식 v2.4.0 "Galibier"(2026.01, 2026-06-15) — **바이너리(exe)+매뉴얼108p+testbed report 360p(Docker CPU/Windows 2판)만, 소스 미동봉**. 소스는 GitHub 태그 `v2.4.0_Galibier_release`(GPL-3.0). 위키 감사 clone(main HEAD 2026-06-18)은 태그 직후 근접하나 정확 일치 미확인 → 엄밀 대조 시 `git clone --branch v2.4.0_Galibier_release`. Docker `deltares/sfincs-cpu:sfincs-v2.4.0-Galibier-Release`. 산출: manual-notes v2.4.0-galibier-validation-testbed(77 케이스)·changelog-known-issues.
 
 ## 라이선스
 

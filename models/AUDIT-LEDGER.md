@@ -43,7 +43,7 @@ purpose: "사용자 지시(2026-06-16) '모든 모델은 모든 문서·코드�
 | **XBeach** | 118 | ✅ 32 노트 | 9 | 4 | ✅ 완료 (kingsday=master 동계열) |
 | **SWAN** | 77 | ✅ 29 노트 | 9 | 29 | ✅ 완료 |
 | **Celeris** | WebGPU JS+CUDA | ✅ 9 노트 | 3 | 1 + web-refs(Lynett 2026) | ✅ 완료 |
-| **SFINCS** 🆕 | src 36 (f90) | ✅ 8 노트 (전 코어, 검수) | readthedocs RST | ✅ 2 (numerical·params-io) | ✅ 완료 (코드+문서) |
+| **SFINCS** 🆕 | src 36 (f90) | ✅ 8 노트 (전 코어, 검수) | readthedocs + **v2.4.0 릴리스** | ✅ 4 (numerical·params-io·**v2.4.0 검증 testbed 77케이스**·**changelog**) | ✅ 완료 (코드+문서+검증) |
 | **LISFLOOD-FP** 🆕 | classic+swe+cuda (C++/CUDA) | ✅ 7 노트 (전 솔버, 검수) | user manual PDF | ✅ 1 (user-manual) | ✅ 완료 (코드+문서) |
 | **CADMAS-SURF** 🆕 | 4 시뮬 ~1255 (f/f90) | ✅ 16 노트 (**코드 100% 포섭**: C티어 12 + S티어/커버리지 4) | **26 PDF 전수** | ✅ 5 (SURF3D·2F·STR·AGENT 영문 cross-confirm + 카탈로그) | ✅ **100% 전수**(코드+매뉴얼; 바이너리3툴 내부·일문상세 source-needed) |
 
