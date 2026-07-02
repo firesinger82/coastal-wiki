@@ -66,6 +66,7 @@
 | [KHOA 49정점 16년 UTide 분석 (2010-2025) — 천해분조·nodal·폭풍해일·SLR·10태풍](experience/khoa-49-station-16yr-utide-2026.md) | 3조건 통과 (49정점 × 평균 14년 ZIP / KHOA 공시 HC + 45정점 nodal 9.7% + MSL 16yr +5.0 mm/yr & KHOA Annual Report 11yr ±0.1-1 mm/yr 정합 + 강화대교 SLR 가속 +7 mm/yr & 장항 감속 −3.7 발견 + 10 태풍 surge + 8 분조 cross-ref / utide_validation/*.py 재현) | **verified** |
 | [KHOA 100년 폭풍해일고 EVA — 해수부2022 설계값 감사·정의·기후증폭 (1956-2025)](experience/khoa-design-surge-eva-2026.md) | 3조건 통과 (1956-2025 확장 49정점 / 극치 4법 POT·GPD·RFA·부트스트랩 → 보고서 17/21 관측지지 + 목포 3중일치 191cm[관측RFA=서승원2012 ADCIRC+SWAN] + MSL 3.25 vs KHOA공식 3.2 mm/yr + 빈도증폭 100년→2100 제주3년 + joint tide-surge 목포 총수위 ±5cm 검증 / utide_validation/*.py 재현) | **verified** |
 | [ADCIRC 태풍 강제력 설계 — GAHM + JMA-MSM 이원 구성](experience/khoa-adcirc-typhoon-forcing-design-2026.md) | 설계(plan) 단계 — 선행연구 3편(① GAHM/해양정보기술 ② 서승원 가상태풍 ③ 황태건 MSM-ADCIRC) + 강제력 자료 완비(IBTrACS WP·JMA-MSM 457일·ERA5 337). A=GAHM(NWS20·JTWC 4사분면반경) 백본·B=MSM 직접장(NWS13) 2006+ 교차검증 | **source-needed** |
+| [확률론적 폭풍해일 설계 국제사례 (미·일·중·네덜란드)](experience/intl-probabilistic-surge-design-2026.md) | deep-research 3회(①미·일 ②중·네덜란드 ③ML surrogate·EVA, 모두 3-0 만장일치) — 4개국 완성: 미국 JPM-OS 정전(NACCS·FEMA, ~159 합성태풍·Holland B·IMEDS) / 일본 결정론 지정태풍(이세만급) / 중국 GB표준 / 네덜란드 Water Act. 한국 JPM 차용 벤치마크 | **source-needed** |
 
 ## research/ (Hermes coastal-research 워크벤치)
 
