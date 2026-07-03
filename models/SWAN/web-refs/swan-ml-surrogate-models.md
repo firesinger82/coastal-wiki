@@ -4,7 +4,7 @@ topic: swan
 canonical_source: external
 external_source: "WebSearch + arxiv/GMD/저널 landing-page fetch (2026-06-02) → 핵심 3편 full-PDF 격상 (2026-07-03). 핵심 직접확인: DELWAVE 1.0 (Mlakar 2024 GMD 17:4705-4725 open-access, PDF 21p full read), DeepONet SWAN surrogate (Cai et al. 2026 arxiv:2604.06433 Dawson 그룹, PDF 46p full read), review (Ferdaus et al. 2025 arxiv:2511.21856, PDF 38p full read)."
 citation_status: verified
-verification_method: "full-PDF 직접 read(2026-07-03, 사용자 지시 'surrogate full-PDF 격상 우선'): ① DELWAVE gmd-17-4705-2024.pdf 전 21p — 아키텍처(Fig 4-7)·입력텐서(Eq 2-10)·ablation(Table 1)·storm precision/recall(Fig 13)·기후신호(§5.3) 본문 확인. ② DeepONet arxiv 2604.06433v1 전 46p — operator 정식화(Eq 2-6)·hyperparam(Table 1 Optuna)·1-D/2-D/DUCK 결과(Table 2-7)·0.04s vs 30s 가속(§5.3)·radiation stress 부록(Eq A.2-A.7) 확인. ③ Ferdaus arxiv 2511.21856v1 전 38p — Table 1-8·모델선택 가이드(§3.8)·critical analysis(DIA/whitecapping/γ)·HPC 벤치(§6)·ML(§3.10·§7.6) 확인, 구버전 노트의 'SWAN=cornerstone' 인용은 phase-averaged 클래스 지칭으로 정정. WebSearch snippet(abstract-level) 잔존: A.3 FNO/GNN/CNN·B forecasting·C hybrid — 정량값 snippet 기반(원문 확인 시 보정)."
+verification_method: "full-PDF 직접 read(2026-07-03, 사용자 지시 'surrogate full-PDF 격상 우선'): ① DELWAVE gmd-17-4705-2024.pdf 전 21p — 아키텍처(Fig 4-7)·입력텐서(Eq 2-10)·ablation(Table 1)·storm precision/recall(Fig 13)·기후신호(§5.3) 본문 확인. ② DeepONet arxiv 2604.06433v1 전 46p — operator 정식화(Eq 2-6)·hyperparam(Table 1 Optuna)·1-D/2-D/DUCK 결과(Table 2-7)·0.04s vs 30s 가속(§5.3)·radiation stress 부록(Eq A.2-A.7) 확인. ③ Ferdaus arxiv 2511.21856v1 전 38p — Table 1-8·모델선택 가이드(§3.8)·critical analysis(DIA/whitecapping/γ)·HPC 벤치(§6)·ML(§3.10·§7.6) 확인, 구버전 노트의 'SWAN=cornerstone' 인용은 phase-averaged 클래스 지칭으로 정정. ④ 추가 arXiv 2편(2026-07-03 2차): FNO CoastalTwin 2110.07100 전 6p(NEMO SSH surrogate 로 분류 정정, 45× 실체 확인)·PINO 2508.03315 전 13p(위상해상 HOSM 재구성으로 분류 정정, physics-in-loss·SSP·실시간 확인) — arXiv 가용분 소진. WebSearch snippet(abstract-level) 잔존: A.3 GNN/CNN·B forecasting·C physics-guided — 전부 paywall, 정량값 snippet 기반(원문 확인 시 보정)."
 note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-02 (초판) / 2026-07-03 (full-PDF 격상)
 verification_by: "Claude Opus 4.8 (1M context) — full-PDF read(DELWAVE 21p/DeepONet 46p/Ferdaus 38p) + WebSearch"
@@ -58,12 +58,12 @@ related:
 - **위키 정합**: 부록 radiation stress 식(Eq A.4-A.6 S_xx/S_yy/S_xy, Hsig=4√∬E A.7)은 swantech Eq 3.59-61·swanuse Appendix A 정의([[../manual-notes/swan-tech-ch3-qc-curvilinear]]·[[../manual-notes/swan-output-variable-definitions]])와 동일.
 - **의의**: **Clint Dawson 그룹(ADCIRC)** — SWAN+ADCIRC coupling([[swan-unstructured-time-step]] Casey Dietrich 41.20)의 **wave 측 surrogate**. Surge 측 PACT([[07-ml-emulators]])와 대칭. Coupled wall-clock 절감 (wave 를 coarse temporal 대신 DeepONet).
 
-### A.3 FNO / GNN / CNN surrogate (abstract-level)
+### A.3 FNO / GNN / CNN surrogate (일부 full-PDF 격상 2026-07-03)
 
-- **FNO (Fourier Neural Operator)**: regional ocean modeling 적용 (*Frontiers Marine Science* 2024, fmars.2024.1383997). Digital Twin Earth-Coasts: FNO coastal flood surrogate **45× 가속** (arxiv:2110.07100, Jiang et al.)
-- **GNN + polynomial ridge regression**: Hs **downscaling**, RMSE **0.3-2 cm**, **80× faster** than numerical (*Ocean Modelling* S1463500323000963)
-- **CNN regional wind-wave surrogate** (*Coastal Eng/Applied Ocean Res* S0141118722002218)
-- **PINO (Physics-Informed Neural Operator)**: nonlinear wavefield reconstruction real-time (arxiv:2508.03315) — physics loss 로 순수 data-driven 한계 극복
+- **FNO CoastalTwin — Jiang et al. 2021** (arxiv:2110.07100, FDL: PNNL·DLR·MIT·IBM·NASA·USGS, 6p 워크숍) ★PDF: ⚠ **분류 정정 — SWAN 아닌 NEMO(순환모델) SSH surrogate**. NW유럽 7 km 520×292, 강제력 MSLP·U10·V10(ERA5 downscaled)+GEBCO(특수 log 스케일링 B′=(ln(B+50)−ln50)/ln100), 2020년 전체 @5 min, 11개월 학습/4월 시험. FNO(linear 20ch + Fourier층 5개(20ch·40 modes)+linear)가 UNet 을 4케이스 전부 압도 — **MSE 0.0011 vs 0.0025, 1-SSIM 0.228 vs 0.418, CORR 0.91 vs 0.75**. **45× = 1개월 에뮬 ~2 min vs NEMO ~1.5 hr(단일 2.6 GHz 코어)** — GPU 병렬화 시 추가 가속 여지 명시. 약점 = **육지 마스크 경계 부근 열화**(佛-西 동측·영국 연안, coastal modeling 공통 이슈로 지목). 플랫폼 CoastalTwin(gitlab, 출판 시 공개).
+- **GNN + polynomial ridge regression**: Hs **downscaling**, RMSE **0.3-2 cm**, **80× faster** than numerical (*Ocean Modelling* S1463500323000963) — abstract-level(paywall).
+- **CNN regional wind-wave surrogate** (*Coastal Eng/Applied Ocean Res* S0141118722002218) — abstract-level(paywall).
+- **PINO — Ehlers·Stender·Hoffmann 2025** (arxiv:2508.03315, TU Hamburg·TU Berlin·Imperial, 13p) ★PDF: ⚠ **분류 정정 — SWAN surrogate 아닌 위상해상(phase-resolved) 파면 재구성 = 데이터 동화 문제**(HOSM/포텐셜류 영역). 희소 계측(부이 5기 case A / X-band 레이더 snapshot+교정부이 1기 case B)에서 η̃·Φ̃ˢ 시공간 전장 복원 — **ground truth 파면 없이 학습**: 자유표면 경계조건(Zakharov form Eq 1-2) 잔차를 loss 에 내장(ℒ_sensor+ℒ_phy,1+ℒ_phy,2+0.25ℒ_reg, HOSM 4차 Taylor 로 Φˢ·W 근사, Fourier 미분+Tukey 창). 아키텍처 = FNO 기반 3층·128 modes·latent 32(부이)/64(레이더), AdamW·RTX3090. HOSM 합성검증(JONSWAP TMA γ=3.3, L_p 100-200 m, ε 0.02-0.13, 1953 m×100 s): **SSP 0.1035(부이)/0.1341(레이더)**, 복원 **0.014 s/샘플 = 실시간**, 지도학습 FNO 대비 **학습데이터 ⅓**. 레이더는 tilt·shadowing 변조 명시 모델링(Eq 8-9), 고 ε 일수록 shadowing 정보손실로 오차↑(물리적 원인, 기법 한계 아님). 한계 = **1D+t 장파봉 한정**(2D+t 후속). DFG rogue-wave 과제, ChatGPT 문법교정 공개.
 
 ### A.4 Wave hydrodynamics surrogate on evolving landscapes ★ (verified, PDF read 2026-06-12)
 
@@ -109,9 +109,10 @@ related:
 | **A surrogate** | DELWAVE 2024 ★PDF | CNN point (3-block, [11,4,90,89] 텐서) | 학습 2.5d, >100 wind/s, Hs MAE 5-10cm, storm P/R 0.97 | climate ensemble, 99%ile ≤5% 과소 |
 | | DeepONet 2026 ★PDF | operator learning (branch×trunk) | **0.04s vs 30s ≈10³×**, Hsig RLE <2%·forces <11% (DUCK) | **ADCIRC 결합** Dawson, 이산화 불변 |
 | | Johnson wave 2026 ★PDF | CNN + surge입력 연쇄 | RMSE 0.05-0.06m, 89% 등가통과 | landscape 진화 (A.4) |
-| | FNO / GNN | neural operator | 45-80× faster, RMSE 0.3-2cm | downscaling (abstract-level) |
+| | FNO CoastalTwin ★PDF | neural operator | 45×(2min vs 1.5hr), MSE 0.0011 | ⚠NEMO SSH(파랑 아님), 육지마스크 열화 |
+| | GNN / CNN | — | 80×, RMSE 0.3-2cm | downscaling (abstract-level, paywall) |
 | **B forecast** | Crossformer/Swin-LSTM | transformer+LSTM | typhoon Hs 3h | SWAN=학습데이터 (abstract-level) |
-| **C hybrid** | PINO / physics-guided | physics loss | extrapolation 개선 | residual correction (abstract-level) |
+| **C hybrid** | PINO ★PDF / physics-guided | physics-in-loss FNO | SSP 0.10-0.13, 0.014s/샘플, GT 불요 | ⚠위상해상 HOSM 재구성(SWAN 아님), 1D+t 한정 |
 | **D review** | Ferdaus 2025 ★PDF | — (38p, 5+5 모델 비교) | SWAN=baseline 1.0, ST6 15-25%↓, DIA/C_ds/γ 비판 | ML=supplement/replace + caveat |
 
 ## F. 핵심 통찰
@@ -123,9 +124,10 @@ related:
 
 ## G. 한계
 
-- **full-PDF verified (2026-07-03)**: A.1 DELWAVE(21p)·A.2 DeepONet(46p)·A.4 Johnson wave(2026-06-12)·D Ferdaus(38p) — 본문 수치·식·표 직접 확인.
-- A.3·B·C 의 정량값은 여전히 **WebSearch snippet abstract-level** (full-text paywall ScienceDirect/MDPI) → primary fetch 시 보정.
-- arxiv 2604.06433(DeepONet)·2511.21856(Ferdaus)·2508.03315(PINO)는 preprint — peer-review 후 metric 변동 가능. Ferdaus 는 생성형 AI 교정 사용 공개(§D provenance).
+- **full-PDF verified (2026-07-03)**: A.1 DELWAVE(21p)·A.2 DeepONet(46p)·A.3 FNO CoastalTwin(6p)·A.3 PINO(13p)·A.4 Johnson wave(2026-06-12)·D Ferdaus(38p) — 본문 수치·식·표 직접 확인. **arXiv 가용분 전부 소진**.
+- ⚠ full read 로 **분류 정정 2건**: FNO CoastalTwin = NEMO SSH surrogate(파랑 아님), PINO = 위상해상 HOSM 파면 재구성(SWAN surrogate 아님) — 본 노트에는 인접영역 참고로 유지하되 SWAN 직접 대체 사례 아님을 명시.
+- 잔여 abstract-level = **전부 paywall**(ScienceDirect/MDPI: GNN downscaling·CNN regional·B forecasting·C physics-guided) → primary 확보 시 보정. 실익 낮음(핵심 SWAN surrogate 계보는 DELWAVE·DeepONet·Johnson 으로 완결).
+- arxiv 2604.06433(DeepONet)·2511.21856(Ferdaus)·2508.03315(PINO)는 preprint — peer-review 후 metric 변동 가능. Ferdaus(Writefull)·PINO(ChatGPT 3.5) 생성형 AI 교정 사용 공개.
 
 ## H. 연결
 
