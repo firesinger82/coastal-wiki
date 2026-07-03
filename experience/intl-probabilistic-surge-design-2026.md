@@ -136,3 +136,33 @@ experience_evidence:
 - copula·공간: **Mazas&Hamm(2017)** Coastal Eng S0378383917300947(chi-plot→EV copula→convolution); **Masina et al.(2015)** S0378383914002270; **Wahl·Mudersbach·Jensen(2012)** NHESS 12:495(Archimedean 다변량 해일); **Sadegh et al.(2017)** WRR 2016WR020242(MvCAT 26copula Bayesian); **Davison·Padoan·Ribatet(2012)** Stat Sci 27:2(공간극치 3분류); R **SpatialExtremes**(Ribatet, rmaxstab/fitmaxstab); Smith(1990)·Reich&Shaby(2012) max-stable
 
 관련: [[khoa-adcirc-typhoon-forcing-design-2026]] [[khoa-design-surge-eva-2026]] · KHOA 프로젝트 메모(위키 외부): `storm-surge-100yr-obs-vs-report` · `three-reference-papers-2026-06`.
+
+## 🌊 추가 취합(2026-07-03): JPM 내 조석-해일 상호작용 + Rmax 표집 + 한국 2023-26
+
+48c(120태풍 surge-only JPM) 서해 경기만 과대 진단과 Rmax 공격면 방어를 위한 표적 조사(웹검색 2에이전트, 원문 5건 확인).
+
+### 조석-해일 상호작용(TSI)의 JPM 내 처리 — 3갈래 관행
+1. **FEMA Region II(NY/NJ)**: 159 JPM-OS 태풍 각각에 **랜덤 조석위상 1개 배정, 완전결합 실행**이 공인 표준(간만차 1.6m인데도 선형중첩 배격 명시). [R2 JPA PDF](https://feedback.region2coastal.com/NationalDisasters/Hurricane%20Sandy/RiskMAP/Public/Public_Documents/Storm_Surge_Reports/R2_Joint_Probablity_Analysis.pdf)
+2. **USACE NACCS/CHS**: 1050폭풍 surge-only + 랜덤조석 재실행 + **"base+96 tides" 선형중첩**(96 랜덤위상, 조석=불확실성 항). 중간조차라 선형중첩 허용 — 대조차 직수입 불가 논거. [TR-15-5](https://apps.dtic.mil/sti/tr/pdf/ADA627157.pdf)
+3. **통계 TSI 보정 convolution — Zhuge et al. 2024 OE 298:117151**: 결합/비결합 모의 차로 TSI 추출→회귀모형→ "surge+랜덤조석+통계TSI" 중첩으로 빈도수위. **재실행 없이 surge-only 결과 보정하는 선례 = 48c에 가장 현실적 경로.** TSI는 대체로 음(-)기여.
+- **영국 SSJPM(skew-surge JPM)**: 여전히 state-of-the-art(EA SC060064/TR2, Ocean Science 2026 재확인). skew surge로 조석종속성 회피 — 관측EVA↔JPM 교차검증 틀로 채택 가능.
+
+### 대조차만 surge-only 과대의 정량 근거(경기만 방어 인용처)
+- **Li et al. 2022 Frontiers**(항저우만, 대조차): TSI가 해일 ±0.5m(해일고의 ~절반) 변조, 최대해일=저조 슬랙. Bhola1970 선형가산 ~1m 과대.
+- **Guo et al. 2025 Frontiers**(샤먼만, 평균조차 4m): 비선형 TSI 첨두 -0.31m(하구 -0.40), 선형중첩 대비 침수면적 **-24%**.
+- → 대조차 천해만 surge-only 과대 0.3~1m급 국제 반복확인 = 인천305·평택331 과대와 정합. 목포 관측(std 저조24.7→고조18.5)과 같은 방향.
+
+### Rmax 표집 — 축소의 위험 정량
+- **FEMA R2 기준 JPM**: ΔP 7 × **Rp|ΔP 조건부 5노드** × Vf·θ·B 각3 = 945조합 → JPM-OS-Q(Toro 2010, Bayesian quadrature ~1/10 축소)로 159개, **반드시 기준세트 대비 1%·0.2% 수위 오차 검증**.
+- **천해일수록 Rmax 민감**(Irish 2008; Gori et al. 2023 JGR-A). Water 2024(MDPI): Rmax 30→15km 보정만으로 최대해일 오차 47.7%→11.8%.
+- → 48c의 Rmax 조건부평균 고정은 얕은 경기만에서 특히 위험 — 표적 ±σ 런으로 유계화 + FEMA식 오차 정량화 필수.
+
+### 한국 2023-26 (경쟁·신규성)
+- **★MOF 2022 설계값 감사 공표논문 부재**(KCI·JKSCOE·JOET·KWRA 확인) — 우리 논문 신규성 유효.
+- 최근접 = 경상국립대(이우동)-KAERI 연작: Jin 2024 KWRA 57-12(가상시나리오 체적지표, "피크 단독 불충분"), **Kim 2025 JOET 39-2(강화 시나리오 남해 내만 5.5~21.8배 증폭 — 검조소EVA 내만 과소평가 반론 근거, §4.2 광양 선제방어 검토)**, Kim 2025 JOET 39-5(TCRM 33앙상블+ADCIRC 한빛원전, 빈도값·MOF비교 없음).
+- Liu & Bensi 2025 arXiv:2511.02058: 미국 JPM을 한국 이식 제안 — "한국 JPM 부재" 문제의식 공유.
+- **KHOA 2024 「연안재해 위험평가 결과보고서」 존재**(MOF 2022 후속 갱신판 성격) — 감사 대상 버전 확인 필요, 원문 확보 권장.
+- 서해 TSI 정량 최신연구도 공백(최신 논거가 Ko et al. 2018, 서해 30년빈도이하 조석기여 90%+).
+
+### 48c 후속 우선순위(이 조사 기준)
+① **Zhuge식 통계 TSI 보정**(재실행 최소: 결합/비결합 쌍 몇 런으로 TSI 회귀 → 48c 보정열) ② Rmax ±σ 표적 민감도 런(경기만+남해 대표점) ③ skew-surge 프레임 교차검증 ④ KHOA 2024 보고서 확보.
