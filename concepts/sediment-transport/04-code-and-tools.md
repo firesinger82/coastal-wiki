@@ -3,6 +3,7 @@ title: "표사이동 — 04 코드와 도구 (EFDC SED · Delft3D-SED · CSTMS �
 topic: sediment-transport
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "AI cross-reference: textbook 자료 + WebSearch 공식 모델 페이지 + Soulsby 1997 implementation guidance."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-21

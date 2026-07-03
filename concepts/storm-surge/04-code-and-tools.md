@@ -3,6 +3,7 @@ title: "Storm Surge 도구·데이터 — ADCIRC NWS·OWI·SWAN coupling·KHOA o
 topic: storm-surge
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "ADCIRC source-code level NWS 분석 (models/ADCIRC/source-analysis/storm-surge/ 7개 노트) + ADCIRC theory (Luettich & Westerink 2004) + KHOA OpenAPI surveyTideLevel 공식 명세 ([`concepts/tides/04-code-and-tools.md`](../tides/04-code-and-tools.md) 인용)."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-23

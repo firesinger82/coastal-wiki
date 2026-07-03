@@ -3,6 +3,7 @@ title: "처오름대 이론 — NLSW swash 해·Iribarren scaling·runup 매개�
 topic: swash-zone
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "**교과서 page 직접 확인 인용분 = verified**: (1) surf similarity(Battjes 1974) ζ=tanβ/√(H0/L0)·Dean number D=Hb/(wT)·Froude F=w/√(gHb) → coastal-processes-with-eng-apps p.26 §3.3.1 Eq(3.1)-(3.3) 본문 read 확인. (2) wave run-up R_u2% 설계파라미터·run-up 속도 Eq(2) u2%=c_u2%√(g(R_u2%−zA))·flow thickness Eq(3)·front velocity Eq(4)·계수 c_h2%=0.20(1:3,1:4)/0.30(1:6)·c_u2%=1.4-1.5·front-velocity 분포(15%/30-40%/75%) → coastal-structures-design p.20-23 §2.3 본문 read 확인. **NLSW swash 해(Shen-Meyer 1963·Antuono 2010 JFM)·Hunt 1959·Stockdon 2006 runup 식·breaker-type ξ 임계값은 본 위키 md 교과서에 본문 부재 → 문헌 cross-ref(01 §4.2·04)로만 표기, 임의 page/식 인용 안 함**. Wijetunge book pp.49-59 run-up 본문은 추출 md 에 미수록(index entry 만 존재) → 인용 안 함."
 note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-18

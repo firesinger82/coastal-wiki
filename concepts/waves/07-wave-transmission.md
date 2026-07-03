@@ -3,6 +3,7 @@ title: 부유체·구조물에 의한 파 투과/반사 (floating breakwater·VL
 topic: waves
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "arxiv full-PDF 직접 read (1402.1555v3, 1403.3766v1) — abstract·방법·결과 본문 인용. SWAN obstacle 식은 기존 manual-note 교차참조."
 note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-18

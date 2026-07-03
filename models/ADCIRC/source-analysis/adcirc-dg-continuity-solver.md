@@ -3,6 +3,7 @@ title: "ADCIRC DG (Discontinuous Galerkin) continuity solver — PR #502 OPEN WI
 topic: adcirc
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "GitHub API repos/adcirc/adcirc/pulls/502 (metadata + 25 files diff list) + repos/adcirc/adcirc/contents/src/dg.F90?ref=refs/pull/502/head (5733 lines module header line 1-120) + contents/src/dg_integration.F90 (1324 lines, header line 1-60) + contents/src/slopelimiter.F90 (206 lines, line 1-50 + SL6 body) 직접 fetch (2026-06-01). PR metadata: author namo626, additions 10358, deletions 67, changedFiles 25, createdAt 2026-04-29, state OPEN, body description: 'Work in progress of adding a discontinuous Galerkin solver to the continuity equation'."
 note_author: "Claude Opus 4.7 (1M context) GitHub API direct fetch"
 note_date: 2026-06-01

@@ -3,6 +3,7 @@ title: "조석 — 05 학습 예제"
 topic: tides
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "AI cross-reference: 코드는 (a) sam-cox/pytides 공식 wiki Example-Pytides-Usage.md, (b) wesleybowman/UTide README.md + utide/_solve.py 공식 docstring에서 직접 인용. URL·코드 fetch via ctx_execute(JS fetch) acc. 2026-05-21. 한국 적용 §3은 코드 틀만, 실제 데이터 검증은 보강 대기 (source-needed)."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-21

@@ -3,6 +3,7 @@ title: "조석 — 01 개념"
 topic: tides
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "AI programmatic cross-reference against converted markdown (textbook/md/134340780-Tides-and-Currents.md). 사용자가 언제든지 override 가능."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-21

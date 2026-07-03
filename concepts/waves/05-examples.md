@@ -3,6 +3,7 @@ title: "파랑 — 05 학습 예제"
 topic: waves
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "코드 패턴은 scipy.signal.welch / numpy 표준. JONSWAP 식은 Holthuijsen §6.3.3. wave climate 정량은 KHOA Annual Report 2025 출처."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-21

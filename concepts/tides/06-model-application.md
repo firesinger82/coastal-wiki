@@ -3,6 +3,7 @@ title: "조석 — 06 모델 적용 (EFDC / ADCIRC / ROMS / XBeach / Delft3D)"
 topic: tides
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "본 문서는 **요약 + 링크 중심** (canonical source 분리 규칙 [CONVENTIONS.md §3]). 각 모델의 조석 구현은 다음 검수완료(verified) 모델 노트로 cross-link·검증됨: ADCIRC tidal forcing(NTIP/fort.15 NBFR/fort.24 SAL — source-code file:line) = `models/ADCIRC/source-analysis/tide/adcirc-tide-forcing-implementation.md` + harmonic prep = `.../adcirc-tide-harmonic-prep.md`; ROMS 경계 조석(SSH_TIDES/UV_TIDES, set_tides.F) = `models/ROMS/source-analysis/roms_tidal_forcing.md`; EFDC 경계 조석(PSER + MTIDE harmonic synthesis, C14-C21 cards) = `models/EFDC/source-analysis/efdc_boundary_conditions.md` §A,§G,§H; Delft3D-TIDE 조화분석/예측(Ch 8 + App A/B) = `models/Delft3D/manual-notes/delft3d-tide-user-manual.md`; XBeach 조석(`tideloc`/`zs0file`) = `models/XBeach/manual-notes/xbeach-master-manual.md` §3.2.3; EFDC 카드(C14 MTIDE/C15) = `models/EFDC/manual-notes/efdc-implementation-guide.md`. **여전히 source-needed**: Delft3D-FLOW의 모델 내 조석 경계 forcing(`.bnd`/`.bca` 정확 사양 — Delft3D-TIDE 노트는 분석/예측 도구이지 FLOW 경계 forcing 매뉴얼이 아님), §6 비교표의 일부 일반론 항목, 글로벌 DB(TPXO/FES/NAO) 자체 사양(외부)."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-21

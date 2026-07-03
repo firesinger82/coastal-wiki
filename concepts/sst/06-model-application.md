@@ -3,6 +3,7 @@ title: "SST 모델 적용 — boundary forcing · thermal module · 모델별 �
 topic: sst
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "모델별 표층 열수지 구현 claim 을 검수완료 source-analysis 노트로 cross-link verified: (1) ROMS COARE bulk flux 4-항 + cool-skin → models/ROMS/source-analysis/roms_bulk_flux_coare.md (bulk_flux.F 1623줄 직접 read, COARE 1996/2003/Edson2013 8 paper) + roms_atmospheric_forcing.md (COARE 3.0 3-iter loop, longwave 3 옵션, shortwave penetration SOLAR_SOURCE, file:line 인용). (2) Delft3D heat KTEMP 5 dispatch + ocean/Proctor COARE-style bulk + Murakami 4-항 → models/Delft3D/source-analysis/delft3d_heat.md (heatu.f90:162-1276 직접 분석). (3) EFDC 연직 수온 transport/layering(sigma·SGZ)·vertical advection → models/EFDC/source-analysis/efdc_vertical.md (caltran.f90·caluvw.f90 file:line). \n여전히 source-needed: EFDC 표층 heat budget 커널(calheat.f90)·EFDC aser.inp bulk 계수, Delft3D §4.1 입력 파일 형식, 각 모델 한국 적용 paper(NIFS/KMOU), SWAN stability correction(Tolman 1991, 미수록), SST forcing 데이터셋 endpoint(외부)."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-23

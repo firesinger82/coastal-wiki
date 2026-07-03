@@ -3,6 +3,7 @@ title: "폭풍해일 — 06 모델 적용 (ADCIRC · Delft3D · ROMS · EFDC)"
 topic: storm-surge
 canonical_source: link-hub
 citation_status: verified
+has_source_needed: true
 note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-12
 ---

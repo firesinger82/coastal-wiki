@@ -3,6 +3,7 @@ title: "표사이동 — 02 일반론 (Shields · Rouse · 침강속도)"
 topic: sediment-transport
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "AI cross-reference: textbook/md/Marine Sands Manual (Soulsby 1997) — bedload/suspended/Shields/Rouse/settling 항목 directly extracted + KHOA 표사 용어."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-21

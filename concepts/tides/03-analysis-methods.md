@@ -3,6 +3,7 @@ title: "조석 — 03 분석 방법 (조화분해·예측)"
 topic: tides
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "AI programmatic cross-reference. Stewart §17.5 (textbook/md/stewart_textbook.md p.321-326) + Foreman 1977 appendix (textbook/md/Manual_for_Tidal_Heights_Analysis_and_Pr.md p.48-66) + KHOA/PORTCALS glossary. Foreman 본문(p.1-47)은 스캔 PDF로 미추출 — 본 문서의 알고리즘 구현 상세는 Stewart 인용으로 한정, 추가 상세는 [tides-foreman1977-appendix.md](../../textbook/notes/tides-foreman1977-appendix.md)의 보강 작업 후 갱신."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-21

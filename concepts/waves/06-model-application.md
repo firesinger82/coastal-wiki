@@ -3,6 +3,7 @@ title: "파랑 — 06 모델 적용 (SWAN · WW3 · XBeach · Delft3D-WAVE)"
 topic: waves
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "AI cross-reference. SWAN 부분은 [models/SWAN/manual-notes/swan-action-balance.md] verified로 검증. **2026-06-18 갱신**: SWAN(29 SA+29 manual)·XBeach(32 SA)·Delft3D(38 SA)·FUNWAVE·Celeris 전수 검수 완료 — 'stub' stale 참조를 검수 source-analysis cross-link 로 정정(staleness sweep). WW3 만 미수록(models/WW3/ 미생성, research/watchlist 추적). 외부 공식 source 인용분(2026-05-21)은 유지."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-21

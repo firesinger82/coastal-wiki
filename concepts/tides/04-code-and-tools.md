@@ -3,6 +3,7 @@ title: "조석 — 04 코드와 도구 + 전 지구 조석 모델"
 topic: tides
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "AI programmatic cross-reference against textbook/md/stewart_textbook.md + textbook/md/Manual_for_Tidal_Heights_Analysis_and_Pr.md, plus WebSearch (2026-05-21) for external repos/papers/tide models — DOI, GitHub URL, official project pages, model documentation. 인용 URL은 acc. 2026-05-21."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-21

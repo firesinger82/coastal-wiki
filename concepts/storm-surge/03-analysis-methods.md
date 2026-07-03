@@ -3,6 +3,7 @@ title: "Storm Surge 분석법 — tide-surge separation + Mann-Kendall trend + r
 topic: storm-surge
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "Pugh 'Tides, Surges and Mean Sea-Level' (textbook/md/sea-level.md, source_id: sea-level) §6:1 non-tidal residual 정의 (line 7026-7030), §7:8 Tide-surge interaction (line 9013-9080), §8:3:2 Annual maxima ranking (line 9328-9510), §8:3:3 Joint tide-surge probability eq (8:5) convolution integral (line 9580-9660). Mann-Kendall trend test 는 [`concepts/sst/03-analysis-methods.md`](../sst/03-analysis-methods.md) §1:2 canonical (Mann 1945, Kendall 1948) 인용 + surge residual 시계열 적용."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-24

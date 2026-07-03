@@ -3,6 +3,7 @@ title: "조석 — 02 일반론 (기조력·평형조석·조화상수)"
 topic: tides
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "AI programmatic cross-reference against textbook/md/stewart_textbook.md (Stewart §17.4-17.5, pp.314-326) + khoa-portcals-glossary ([KHOA], [PORTCALS] 용어집). 페이지 번호 정정 적용 후 verified."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-21

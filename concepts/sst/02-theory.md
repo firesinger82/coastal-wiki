@@ -3,6 +3,7 @@ title: "SST 이론 — 해양 열수지·열팽창·해류 forcing (Stewart §5)
 topic: sst
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "Stewart 'Introduction to Physical Oceanography' Chapter 5 (Oceanic Heat Budget) + Chapter 6 (Temperature, Salinity, Density) 직접 인용. equation 번호·페이지 (eq 5.1-5.6, eq 6.x) Stewart textbook (textbook/md/stewart_textbook.md) 와 1:1 대응."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-23

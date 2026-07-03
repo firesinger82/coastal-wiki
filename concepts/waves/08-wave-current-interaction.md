@@ -4,6 +4,7 @@ topic: waves
 canonical_source: external
 external_source: "arXiv:2511.12711v1 (Violante-Carvalho et al. 2025, Current effects on wind generated waves near an Ocean Eddy Dipole) + arXiv:2606.03231v1 (Onuki & Fujiwara 2026, A reduced model for surface wave–current interactions without spatial scale separation) — 양편 full PDF 직접 read"
 citation_status: verified
+has_source_needed: true
 verification_method: "arXiv 2511.12711·2606.03231 full PDF (curl https://arxiv.org/pdf/...) pdftotext 직접 read. abstract·introduction·방법(§3 WW3 / §2 reduced model)·결과(Hs 상대차·% 증폭·dispersion·conservation) 인용분만 verified. 일부 일반 이론(radiation stress feedback·blocking 정의)은 본 두 논문에 명시 없어 source-needed."
 note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-18

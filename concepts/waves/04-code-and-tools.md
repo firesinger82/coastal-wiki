@@ -3,6 +3,7 @@ title: "파랑 — 04 코드와 도구 (SWAN·WAVEWATCH III·XBeach)"
 topic: waves
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "AI cross-reference: textbook/md/Waves-Holthuijsen2007.md Ch.9 (SWAN canonical) + WebSearch acc. 2026-05-21 (WW3 NOAA, XBeach Deltares). §3.4 추가 (2026-05-28): NOAA-EMC/WW3 Issue #1600 (UK Met Office ukmo-rwdavies, OPEN 2026-05-20) GitHub Issues API 직접 fetch — bug body verbatim 인용 (SMC nested grid boundary point mismatch → coastline spurious wave energy), 재현 절차. Fix PR 제출 예정 (status tracking)."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-21

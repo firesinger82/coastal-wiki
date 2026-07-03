@@ -3,6 +3,7 @@ title: "파랑 — 01 개념"
 topic: waves
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "AI cross-reference: textbook/md/Waves-Holthuijsen2007.md (Ch.1-3 TOC + key concepts) + KHOA·PORTCALS glossary (284 wave-related terms) + 해양수산부(MOF)/KHOA 공식 관측망 MPT station structure (source-needed)."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-21

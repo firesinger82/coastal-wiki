@@ -3,6 +3,7 @@ title: "표사이동 — 01 개념"
 topic: sediment-transport
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "AI cross-reference: textbook/md/590329085-Dynamics-of-Marine-Sands... (Soulsby 1997, 360 KB extracted with bedload/suspended/Shields/Rouse/ripple/dune/settling 항목 다수) + KHOA·PORTCALS glossary 113 표사·퇴적 용어."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-21

@@ -3,6 +3,7 @@ title: "처오름대 수치모델 — NLSW·Boussinesq/Green-Naghdi·SWASH·XBea
 topic: swash-zone
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "swash 수치모델 점검표. **모델 swash-handling(wetting-drying·breaking·runup·비정수압)은 본 위키 검수 완료 source-analysis 노트로 verified** (2026-06-18 승격): SWASH=[[swash-wetting-drying-runup]](SwashDryWet/SwashRunupHeight/SwashBreakPoint bore-front, file:line)·[[swash-nonhydrostatic-pressure-solver]] / XBeach=[[xbeach_nonh]]·[[xbeach_wave_action_balance]](surfbeat)·[[xbeach_flow_solver]] / FUNWAVE=[[funwave-flux-tvd]](TVD wetting-drying MASK)·[[funwave-physics-sources]]. 모델 정체 bibliographic: SWASH=Zijlema·Stelling·Smit 2011 Coastal Eng 58:992-1012 doi:10.1016/j.coastaleng.2011.05.015 / XBeach=Roelvink 2009 Coastal Eng 56:1133-1152 / Green-Naghdi DG=Kazhyken·Videman·Dawson 2020 arxiv:2005.00920·2010.06167 / NLSW swash 해=Shen-Meyer 1963·Antuono 2010 JFM. VOF/SPH(§1 마지막 행)·한국 검증은 미수록=source-needed 잔존."
 note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-15

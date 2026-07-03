@@ -3,6 +3,7 @@ title: "표사이동 — 06 모델 적용 (EFDC SED · Delft3D-SED · XBeach · 
 topic: sediment-transport
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "EFDC+ Stable source-code 직접 분석 (codex 보조, models/EFDC/source-analysis/sediment/ 의 efdc_sediment.md 인용) — SedTran-Original (ISTRAN(6,7) cohesive/noncohesive) vs SEDZLJ unified bed model 구분, Krone-Partheniades, Van Rijn, Christoffersen-Jonsson wave-current shear. Delft3D/XBeach/ROMS source-analysis 도 본 위키 promote 완료 (models/<MODEL>/source-analysis/sediment/). CONVENTIONS.md §3 canonical source 분리 — 본 페이지는 요약 + 링크."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-21 → 2026-05-23 (보강·verified)

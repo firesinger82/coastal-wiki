@@ -3,6 +3,7 @@ title: "표사이동 — 03 분석 방법 (입도·관측·formula)"
 topic: sediment-transport
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "AI cross-reference: Soulsby (1997) Marine Sands + KHOA 표사 용어 + 일반 sediment analysis 표준."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-21
