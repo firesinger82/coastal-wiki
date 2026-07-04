@@ -26,8 +26,8 @@
 
 | 경로 | 노트 수 | 상태 | 비고 |
 |---|---:|---|---|
-| `source-analysis/` | 18 verified | 안정 | SedTran-Original / SEDZLJ 양 분기 + hydro core + boundary + wetdry + MPI 등 |
-| `manual-notes/` | 4 verified | **신설 2026-05-24** | overview (6 manuals 인덱스) + user-manual-r850 (DSI 2021 운영) + theory-doc-v12 (DSI 2024 이론) + sediment-theory-2003 (Tetra Tech legacy) |
+| `source-analysis/` | 19 verified | 안정 | SedTran-Original / SEDZLJ 양 분기 + hydro core + boundary + wetdry + MPI 등 + **조석/바람 강제력 규약 v12.4** ([efdc-tidal-forcing-conventions-v12](source-analysis/efdc-tidal-forcing-conventions-v12.md), 2026-07) |
+| `manual-notes/` | 4 verified | **신설 2026-05-24** | overview (6 manuals 인덱스) + user-manual-r850 (DSI 2021 운영) + theory-doc-v12 (DSI 2024 이론) + sediment-theory-2003 (Tetra Tech legacy). **implementation-guide·user-manual-r850에 v12.4 소스 드리프트 ⚠️ 주석 11항 (2026-07 감사)** |
 | `web-refs/` | 1 verified | **신설 2026-05-24** | efdc-official-resources.md — DSI LLC·eemodelingsystem.com·GitHub dsi-llc/EFDC_Plus·핵심 논문 (Hamrick 1992-96·Park 1995·Ziegler-Lick·James 2010) |
 | `raw/` | 726 .md + 6 pdf + 257 fortran (2.2 GB) | archive | EFDCPlus_Stable + EFDC-GVC 두 분기 |
 

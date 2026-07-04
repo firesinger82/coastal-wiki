@@ -163,6 +163,8 @@ Runtime: `SETOPENBC` computes `cos/sin` from `TIMESEC` and `TCP` (`setopenbc.f90
 
 So total boundary head = PSER series + harmonic synthesis. Either alone or combined.
 
+> 위상 규약 상세 (절대 TIMESEC 합성 η=PFAM·cos(2π(TIMESEC−PFPH)/TCP), PFPH=초 단위 lag, nodal 보정 부재 → 사용자 PFAM=f·H + V0+u folding, G↔UTC / g↔local 페어링 규칙): [[efdc-tidal-forcing-conventions-v12]] — v12.4 검증 2026-07.
+
 ## H. Wet/dry interaction with active BC nodes
 
 Open BCs disable themselves when forced elevation falls below bed + dry threshold:
@@ -193,7 +195,7 @@ Dry-cell transport masks **deliberately keep active boundary-flow cells alive**:
 - `RMULADJ` and `ADDADJ` apply to **all** records; check before scaling.
 - BC ramp `NTSCR*` is in **timesteps**, not seconds — set proportional to spin-up duration.
 - For multi-river runs, group `GRPID` lets you scale a subset uniformly via post-processing — useful for sensitivity tests.
-- Harmonic block (C17) `phase` is in **degrees**; if amplitudes are in cm, ensure `RMULADJ=0.01` to convert to m.
+- Harmonic block (C17) `PFPH` phase is **not degrees** — it is a time lag in the same unit as `TCP` (seconds): `RAD = 2π·PFPH/TCP` (`input.f90:913-915`, v12.4 재확인 2026-07). Degrees must be converted: `PFPH = [TCON·TBEGIN + TCP·(G−(V0+u))/360] mod TCP`. Amplitudes `PFAM` are in m (× G to pressure head at the boundary-card conversion). See [[efdc-tidal-forcing-conventions-v12]].
 - `LOPENBCDRY` events are logged — grep stdout for "OPEN BC DRY" during validation.
 - Subgrid channel needs both donor and receiver cells to be active wet for the channel itself to be active; design `MODCHAN.INP` accordingly.
 
@@ -202,14 +204,14 @@ Dry-cell transport masks **deliberately keep active boundary-flow cells alive**:
 - ▢ Confusing `NPSER` (count of PSER series) with `NPSERS/NPSERW/NPSERE/NPSERN` (per-cell index pointer to which series to use).
 - ▢ Setting `NCSER(6) = 1` for cohesive sediment without also setting `ISTRAN(6) = 1` — concentration series read but never applied.
 - ▢ Forgetting `QFACTOR` (default 1.0) — useful to scale a single source without rewriting `QSER.INP`.
-- ▢ Using harmonic block without rebuilding `TCP` periods after changing `TBEGIN`/`STARTTIME` — astronomical phase reference shifts.
+- ▢ Using harmonic block without rebuilding `PFPH` after changing `TBEGIN` — synthesis uses absolute `TIMESEC = TCON·TBEGIN` (`hdmt.f90:89`; `setopenbc.f90:232`), so the phase lag must be recomputed for the new time origin (`TCP` periods themselves do not change). See [[efdc-tidal-forcing-conventions-v12]].
 - ▢ Volumetric source `QSS` injection at a dry cell — will queue but not enter the system; check `LOPENBCDRY` log.
 - ▢ `ISTYP=1` QSER without proper `WKQ(K)` (must sum to 1) — silent under-injection.
 - ▢ Hot-start with different `NPSER` count than cold run — index pointers misalign.
 
 ## Next expansion
 
-- Tide harmonic preparation workflow (T_TIDE / UTIDE → C17 block conversion).
+- ~~Tide harmonic preparation workflow (T_TIDE / UTIDE → C17 block conversion)~~ → 작성됨: [[efdc-tidal-forcing-conventions-v12]] (2026-07, utide 페어링·nodal fallback 포함).
 - River+ocean coupled BC ramp recipe.
 - Subgrid channel sizing guidelines.
 
