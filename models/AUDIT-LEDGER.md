@@ -101,9 +101,9 @@ purpose: "사용자 지시(2026-06-16) '모든 모델은 모든 문서·코드�
 | WAQ_Processes_Technical_Reference (611p) | 수질 process 식 | **delft3d-waq-processes-tech-reference** | ✅ |
 | Delft3D-PART_User_Manual (138p) | 입자추적 | **delft3d-part-user-manual** | ✅ |
 | Delft3D-TIDE_User_Manual (103p) | 조석분석 | **delft3d-tide-user-manual** | ✅ |
-| WAQ Library Tables(336p)·Input Desc(105p) | 수질 reference 표 | (tech-ref 노트서 언급) | 🟡 |
+| WAQ Library Tables(336p)·Input Desc(105p) | 수질 reference 표 | **delft3d-waq-library-tables-input-funcspec** (index+대표엔트리, 2026-07-04) | ✅ |
 | GPP/QUICKPLOT/RGFGRID/QUICKIN/TRIANA/WES/DIDO/NEFIS | 전·후처리 도구 | delft3d-manuals-overview(인덱스) | 🟡 (S, 도구) |
-| Conceptual/Functional Spec·course PDF·cxx-*·doxygen | 개념·교육·T | — | ⬜/⬛ |
+| Conceptual/Functional Spec·course PDF·cxx-*·doxygen | 개념·교육·T | **delft3d-waq-library-tables-input-funcspec** §3 (Functional Description 6모듈 + course 4종 index, 식無 종결) / cxx-*·doxygen ⬛ 자동생성 | ✅(Func/course)/⬛(doxygen) |
 
 ### 2.2 코드 모듈 (engines_gpl 중심) — 2026-06-16 workflow 17 신규 노트 (총 38 SA)
 > engines 전 엔진 검수 완료. 각 노트 file:line 인용 + 적대 검증 통과(special_physics 1건 radstr Sxy cos·sin 누락 적발→수정).
