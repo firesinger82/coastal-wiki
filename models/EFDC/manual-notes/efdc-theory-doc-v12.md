@@ -196,8 +196,8 @@ Hg·PCB·toxics 의 sorption + degradation. 한국 산업 폐기물 분석에 �
 
 - ✅ [[efdc-theory-v12-ch2-hydrodynamics]] — §2.1-2.7 equation level (gov eq + numerical scheme + SIG/SGZ) — 2026-05-24 작성
 - ✅ [[efdc-theory-v12-ch5-temperature-heat]] — §5.1-5.5 equation level (Full Heat Balance/COARE 3.6/Equilibrium Temp + short wave radiation/light attenuation + bed heat + ice formation/melt + evaporation) + mod_heat.f90 소스 교차검증 — 2026-07-04 작성
-- `efdc-theory-v12-ch6-sediment.md` — §6.3 SedTran + §6.4 SEDZLJ equation level cross-walk
-- `efdc-sedzlj-vs-sedtran-comparison.md` — 두 모듈의 알고리즘 1:1 매핑
+- ✅ [[efdc-theory-v12-ch6-sediment]] — §6.2 부유이동(Eq6.1-6.12) + §6.3 Original SedTran(non-cohesive van Rijn/Shields/bedload 5공식/Rouse 평형농도 Smith-McLean·Garcia-Parker armoring + cohesive floc 4옵션/Krone/Partheniades + 혼합bed 압밀 Eq6.13-6.110) + §6.4 SEDZLJ→[[efdc_sedzlj]] 소스매핑 — 2026-07-04 작성 (Original↔SEDZLJ 대비 부분충족)
+- `efdc-sedzlj-vs-sedtran-comparison.md` — 두 모듈의 알고리즘 1:1 매핑 (ch6 cross-walk §3 에 부분 흡수)
 
 ## 6. 관련 자료
 
