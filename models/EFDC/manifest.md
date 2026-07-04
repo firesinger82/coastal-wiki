@@ -12,6 +12,11 @@
 
 Both `--depth 1`. Total source_code/: 77M.
 
+### ★ 버전 provenance 확정 (2026-07-04)
+
+- **EFDCPlus_Stable = `EFDCPlus_12.4`** (릴리스 헤더 `EFDC/aaefdc.f90:22` "RELEASE: EFDCPlus_12.4", DATE 2025-12-29; 솔루션 파일명 `EFDCPlus_MPI_12.sln` 정합). clone HEAD sha **`3ed76b6eb1263921ba99bf23b66bb85c1a5feac1`** (2026-04-02 "update readme"). 12.4 릴리스 피처(헤더 verbatim): MPI Domain Decomposition · Propeller Wash · 신 WQ kinetics(사용자 정의 algal groups+zooplankton) · 3TL 동적 timestep · GOTM · **SIGMA-Zed(SGZ)**. → **위키 EFDC source-analysis 전체 = EFDC+ 12.4 기준.**
+- **EFDC-GVC** clone HEAD sha **`68dc93fa04c48a785bbe3136e1784ceca2a7a20f`** (2021-11-10) — **repo 동결 4년+**. DSI README 공식: 레거시 테스트용 as-is 무지원, "recommends that users not use the GVC code for on-going models and make the conversion to EFDC+". → GVC 서브루틴 심층 분석 **불요 판정**(계보·구조·GVC↔SGZ 대조는 [source-analysis/efdc_gvc_legacy.md](source-analysis/efdc_gvc_legacy.md) verified 로 충분; SGZ 현행 구현은 mainline 노트 담당).
+
 ## manuals/pdfs/
 
 Imported from `numerical_models/EFDCPlus_Stable/manual/` (canonical DSI distribution; upstream GitHub repo does NOT include manuals).
