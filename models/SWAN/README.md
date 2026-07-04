@@ -17,9 +17,9 @@
 
 | 경로 | 내용 |
 |---|---|
-| `manual-notes/` | 공식 메뉴얼 발췌·정리 (TBD) |
-| `source-analysis/` | 소스코드·알고리즘 분석 (Swan*.ftn90 서브루틴별, 27 노트) |
-| `web-refs/` | swan-official-resources.md (verified 2026-05-24) — sourceforge·공식 매뉴얼·핵심 논문 (Booij-Ris-Holthuijsen 1999·Zijlema 2010·Rogers 2003·Dietrich 2011 SWAN+ADCIRC) |
+| `manual-notes/` | 공식 매뉴얼 4종(swanuse·swantech·swanimp·swanpgr) 발췌·정리 — **29 노트** (swantech Ch2-8 전장 deep + swanuse §4 command 3부작 + v41.51 기준) |
+| `source-analysis/` | 소스코드·알고리즘 분석 (Swan*.ftn90 서브루틴별 + swancom1 cross-walk·setup 솔버, **28 노트**) |
+| `web-refs/` | **4 노트** — official-resources · foundational-papers(8 원논문) · ml-surrogate-models(DELWAVE·DeepONet·Ferdaus 등 full-PDF) · recent-research-2024-2026 |
 
 ## 주요 노트
 

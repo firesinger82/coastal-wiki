@@ -248,7 +248,7 @@ module m_xnldata
 - 본 노트는 source file **header (line 1-60) 만** verified. 각 신규 발견의 sub-routine 별 deep dive 는 별도 (§4.1 신설 후보).
 - mod_xnl4v5.ftn90 의 Van Vledder XNL4 = SWAN 외부 library 형식 — 원논문 (Van Vledder 2006 *Coastal Engineering*) 직접 fetch 후 [[swan-xnl4-exact-quadruplet]] 신설 가치.
 - fftpack51.ftn90 = NCAR vendor library, 본 위키 source-level audit 가치 낮음.
-- swancom1.ftn 12k 라인 — Cycle II legacy 의 정확한 line 매핑 cross-walk 가치 큼 (본 위키 [[swan-schemes-implementation]] 와).
+- ~~swancom1.ftn 12k 라인 — Cycle II legacy 의 정확한 line 매핑 cross-walk 가치 큼 (본 위키 [[swan-schemes-implementation]] 와).~~ → **이행 완료 (2026-07-04)**: [[swan-setup-solver-swancom1-crosswalk]] — 19 서브루틴 전수 cross-walk 표(13 기존커버·4 유틸 판정) + 미커버 물리 실질 **SETUPP/SETUP2D(파랑 setup: radiation stress 적분→1D marching·2D Poisson 9-point SOR)** 심층 신설.
 
 ## 6. 연결
 
