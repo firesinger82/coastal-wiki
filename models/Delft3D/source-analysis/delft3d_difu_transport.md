@@ -59,7 +59,7 @@ d0k = 0.5*qyv*((2*iad1-iad2)*r0(up) + iad2*r0(down))   ! :432-440 → ddkl(RHS)
 
 ## 3. Horizontal diffusion — sigma-plane / anti-creep (:453-523)
 - **sigma-plane** (기본): implicit X `flux = 0.5(difl+difr)/(0.7·gvu)` — **0.7 = Prandtl/Schmidt σ**(:469-475), explicit Y(:496-503).
-- **anti-creep** (`icreep/=0 .and. kmax>1`): `difacr` 로 strictly-horizontal 확산(:508-522) — 급경사 지형 sigma 가짜확산 억제.
+- **anti-creep** (`icreep/=0 .and. kmax>1`): `difacr` 로 strictly-horizontal 확산(:508-522) — 급경사 지형 sigma 가짜확산 억제. **알고리즘 본체(Van Leer 조화평균 제한기)는 [[delft3d_anticreep_difhor]] `difhor.f90`** (difacr 는 dispatcher).
   - 근거 (소스주석 :54-58): **Stelling & van Kester 1994, "On the approximation of horizontal gradients in sigma co-ordinates for bathymetry with steep bottom slopes", Int. J. Num. Methods Fluids 18.**
 
 ## 4. Vertical advection+diffusion + internal-wave (:524-614)
