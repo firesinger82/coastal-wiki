@@ -80,7 +80,7 @@ depth-averaged 2DH implicit solver 의 Method 주석 직접 인용:
 
 ## 6. 미보강 (TODO)
 
-- `bicgstab`/`pcg` 알고리즘 line-by-line(반복·수렴기준) + ILU 전처리 구성.
-- Keller-box 연직 이산화(`tridiag` 적용부) 식 verbatim.
+- ✅ `bicgstab`/`pcg` 알고리즘 line-by-line(반복·수렴기준) + ILU 전처리 구성 → [[swash-linear-solvers]] (2026-07-04 신설, SwashSolvers.ftn90 5705줄 전수: PCG/SIP/BiCGSTAB/tridiag/dac/nested-Newton + ILU RILUD + primary 인용 Eisenstat/Stone/van der Vorst/Bondeli/Brugnano-Casulli).
+- ✅ Keller-box 연직 이산화(`tridiag` 적용부) — [[swash-linear-solvers]] §0·§6 (nconct-23 band 증거 + Thomas double-sweep).
 - θ-scheme `theta`/`theta3` 파라미터 기본값·안정성(`SwashReadInput` 카드).
 - explicit(`SwashExpDep`) vs implicit 선택 기준 + 시간스텝 CFL.
