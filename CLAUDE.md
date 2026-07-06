@@ -79,8 +79,9 @@
 
 ## 동기화
 
-- writer = 이 PC (WSL2 ext4, `~/coastal-wiki`)
+- writer = 이 PC (WSL2 ext4, `~/coastal-wiki`) — **coastal-wiki 유일 writer**. 이 PC가 계산도 겸할 수 있으나 그 결과는 위키가 아닌 `coastal-runs`로(아래).
   - Windows 측 접근: `\\wsl$\Ubuntu\home\firesinger\coastal-wiki` (Obsidian 등 Windows 앱)
-- reader = 다른 PC (git clone 후 git pull)
-- 작업 후 항상 `git commit && git push`
+- reader = 다른 PC (git clone 후 git pull) — 위키에 대해 **pull 전용**. 리더 머신은 `git config pull.ff only` 권장(로컬 커밋 시 조용한 merge 대신 즉시 에러 → divergence 방지).
+- **계산결과 → experience 채널**: 개인 run 결과는 위키에 직접 넣지 않고([RUNS-CHANNEL.md](RUNS-CHANNEL.md)) 별도 `coastal-runs` repo에 축적 → 3조건 게이트 통과분만 이 PC(writer)가 `experience/`로 promote. run 생산자는 여러 머신 가능(머신별 `runs/<host>/` 서브트리, 절대규칙 #8).
+- 작업 후 항상 `git commit && git push` (push 전 `git pull` 로 origin 동기화 — 리더가 올린 변경 합류)
 - **clone/세팅 시 1회 `bash tools/install-hooks.sh`** — pre-commit(검증) + post-merge·post-checkout(검색 인덱스 자동 재빌드)을 설치. 이후 `git pull`마다 `coastal-wiki` MCP 검색 인덱스가 자동 갱신(방식1 멀티머신). python3 만 있으면 됨.
