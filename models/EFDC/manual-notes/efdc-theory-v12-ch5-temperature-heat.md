@@ -61,6 +61,8 @@ $$H_C = c_h\rho_a c_{pa} W_s (T_s-T_a) \quad (5.4)$$
 
 $e_s$ = 수면온도 포화증기압, $e_a$ = 실제증기압 (mb), $P_a$ = 대기압, $c_e,c_h$ = turbulent exchange coeff, $W_s$ = 풍속. **소스 근거**: mod_heat.f90:60-61 주석 "The heat flux terms are derived from a paper by Rosati and Miyakoda (1988) 'A General Circulation Model for Upper Ocean'". full heat balance (non-legacy) 는 ice 모듈과 완전 연동 (p.61).
 
+> ⚠ **disclosed-gap (cloud sign, code≠manual, 2026-07-04)**: 소스 [`mod_heat.f90:648`](../source-analysis/efdc_heat_temperature.md)([[efdc_heat_temperature]] §1.1)는 구름인자를 **`(1-0.8·CLOUDT)`** 로 구현하나, 위 Eq 5.2 인쇄본은 `(1+B_cC)`. 구름↑ → 순 장파 냉각↓ 가 물리적으로 옳으므로 **소스 `(1-0.8C)` 가 표준(Rosati-Miyakoda 1988 원형)**, 매뉴얼 `(1+B_cC)` 는 부호 오식으로 판단(`1-B_cC` 여야 함). 실행값은 소스 기준.
+
 ### 1.2 §5.1.2 COARE 3.6 Bulk Algorithm (p.61) — EFDC+ 12.1부터 신규
 
 Coupled Ocean–Atmosphere Response Experiment v3.6 (Fairall et al. 1996, 2003) — **Monin-Obukhov similarity theory (MOST)** 기반 near-surface flux. bulk 변수로 sensible/latent flux + stress 추정.
