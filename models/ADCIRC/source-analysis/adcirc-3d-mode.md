@@ -56,7 +56,7 @@ Coordinate constants: `A=1`, `B=-1`, `AMB=A-B` (`global_3dvs.F:193`).
 
 ## C. Density / EOS
 
-Salinity/temperature transport when `C3D_BTrans=.TRUE.` (`vsmy.F:1543`):
+Salinity/temperature transport when `C3D_BTrans=.TRUE.` (`vsmy.F:1548-1553` 은 **dispatch만** — 실제 solver 는 `transport.F`/`TRANS_3D`, [[adcirc-transport-solver]] 참조):
 
 | `IDEN` | Transports |
 |---|---|
