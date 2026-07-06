@@ -58,6 +58,8 @@ $$\phi_x = \text{fac1}\,(\rho_i-\rho_{i-1})\,[(z_w-z_r)_i+(z_w-z_r)_{i-1}]$$
 
 ## 2. 상태방정식 rho_eos — Jackett & McDougall (1995)
 
+> **심층·승격**: 전용 노트 [[roms_equation_of_state]] (2026-07-04) — bvf 단열 산출·alpha/beta 조립·linear branch·EFDC EOS cross-model 대조 보강. 아래는 요약.
+
 `rho_eos.F:11-19`: "computes 'in situ' density ... as a function of potential temperature, salinity, and pressure from a polynomial expression (Jackett and McDougall, 1992)". 248 oceanographic 값에 fitting, 지오포텐셜 면을 따라 압력 변화 무시 → 깊이(m, 음수)와 압력(dbar, 음수)을 호환적으로 사용 (`rho_eos.F:16-19`).
 
 체크값 제공 (T=3°C, S=35.5 PSU, Z=-5000 m): `alpha=2.1014611551470e-04`, `beta=7.2575037309946e-04`, `den=1050.36...`, `sound=1548.88...` 등 (`rho_eos.F:21-29`).
