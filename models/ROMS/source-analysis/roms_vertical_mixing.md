@@ -61,6 +61,8 @@ MY2.5 is the legacy closure — keep for backward comparison, but new applicatio
 
 ## D. KPP (LMD/KPP)
 
+> **심층**: 서브루틴·식 level 은 [[roms_kpp_boundary_layer]] (2026-07-04 신설) — interior 3-프로세스·w-scale·bulk-Ri(Vtc)·shape function·nonlocal ghats·Ekman/MO 상한. 아래는 개괄. ⚠ 정정: 마스터 플래그는 `LMD_MIXING`(≠`LMD_KPP`, 존재안함)+`LMD_SKPP`/`LMD_BKPP`; `lmd_wscale.F` 없음(인라인); `RI_HORAVG/VERAVG/SPLINES`=Ri 평활(stability function 무관).
+
 `lmd_vmix.F:33-90` is the top-level driver:
 
 1. Interior mixing (`lmd_vmix_tile`) — shear instability via gradient Richardson `Rig = bvf / (shear² + eps)` (`lmd_vmix.F:181-241, 326-337`); double-diffusion add-ons via `lmd_finish`.
