@@ -1,0 +1,105 @@
+diff --git a/models/ADCIRC/source-analysis/adcirc-3d-mode.md b/models/ADCIRC/source-analysis/adcirc-3d-mode.md
+--- a/models/ADCIRC/source-analysis/adcirc-3d-mode.md
++++ b/models/ADCIRC/source-analysis/adcirc-3d-mode.md
+@@ -3,6 +3,7 @@
+ topic: general
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-3d-mode.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
+ note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
+ note_date: 2026-04~05 (original) / 2026-05-23 (promote)
+@@ -174,8 +175,8 @@
+ 
+ ## Working Rules
+ 
+-- `IM=21` is the most common 3D-baroclinic configuration.
+-- `NFEN=21` (20 sigma layers) is standard for shelf/estuary; up to `NFEN=51` for deep stratification.
++- `IM=21` is the most common 3D-baroclinic configuration. <!-- source-needed: 커뮤니티 관행 단언 — ADCIRC 매뉴얼/문헌/공식 예제 인용 필요 -->
++- `NFEN=21` (20 sigma layers) is standard for shelf/estuary; up to `NFEN=51` for deep stratification. <!-- source-needed: 관행 수치 — 매뉴얼/문헌 인용 필요 -->
+ - For Korean coastal storm surge with thermohaline forcing, use `IM=21` + external HYCOM via `couple2baroclinic3D.F` (`IDEN>=5`).
+ - MY2.5 (`IEVC=50/51`) is recommended over prescribed profiles for stratified runs.
+ - Output `fort.41` (T/S stations) early in run to verify EOS computation.
+@@ -184,10 +185,10 @@
+ ## Common Pitfalls
+ 
+ - ▢ Setting `IM=11` and expecting baroclinic — `IM=11` is barotropic 3D; need `IM=21+` for baroclinic.
+-- ▢ Setting `IDEN=4` without providing both S and T BCs — model crashes.
+-- ▢ Using simple linear EOS (`Eqnstate=1`) for realistic ocean — gives unrealistic pycnocline.
++- ▢ Setting `IDEN=4` without providing both S and T BCs — model crashes. <!-- source-needed: crash 경로 file:line 인용 필요 -->
++- ▢ Using simple linear EOS (`Eqnstate=1`) for realistic ocean — gives unrealistic pycnocline. <!-- source-needed: 물리 결과 단언 — 문헌/교과서 인용 필요 -->
+ - ▢ Confusing `couple2baroclinic3D.F` (external coupling) with true 3D — they look similar but only the latter solves 3D internally.
+-- ▢ `IEVC=50` (MY2.5) cold-started with zero `q²` — singular dissipation; init with positive minimum.
++- ▢ `IEVC=50` (MY2.5) cold-started with zero `q²` — singular dissipation; init with positive minimum. <!-- source-needed: singular 거동 file:line 또는 문헌 인용 필요 -->
+ - ▢ Hot-start with different `IM` — 3D state arrays incompatible.
+ - ▢ Comparing ADCIRC-3D temperature to TEOS-10 reference — slight bias due to legacy EOS; document explicitly.
+ - ▢ Forgetting to set bottom drag for 3D — bottom stress comes from 3D BBL, not 2D Manning.
+diff --git a/models/ADCIRC/source-analysis/adcirc-fort-files-reference.md b/models/ADCIRC/source-analysis/adcirc-fort-files-reference.md
+--- a/models/ADCIRC/source-analysis/adcirc-fort-files-reference.md
++++ b/models/ADCIRC/source-analysis/adcirc-fort-files-reference.md
+@@ -142,7 +142,7 @@
+ 
+ ## Decision Guide
+ 
+-- **Cold-start vs hot-start affects which fort.* files are reopened**: `cstart.F` initializes `fort.61–65`, `fort.71–75`, `fort.81–93` from scratch; `hstart.F` reopens them from the existing files at the hot-start time. Mismatch in `fort.15` `NHSTAR`/`NHSINC` between the two runs causes silent file format drift.
++- **Cold-start vs hot-start affects which fort.* files are reopened**: `cstart.F` initializes `fort.61–65`, `fort.71–75`, `fort.81–93` from scratch; `hstart.F` reopens them from the existing files at the hot-start time. Mismatch in `fort.15` `NHSTAR`/`NHSINC` between the two runs causes silent file format drift. <!-- source-needed: drift 거동의 hstart.F file:line 또는 wiki 페이지 인용 필요 -->
+ - **Output flag sign convention**: `NOUTE`, `NOUTV`, etc. negative values switch ASCII vs binary output. Always cross-check with `[file=wiki:adcirc:Fort.91_file_format]` before consuming.
+ - **NWS bundles fort.22 format**: see `[file=wiki:adcirc:NWS]`. Examples — `NWS=12` OWI legacy, `NWS=13` OWI NetCDF (NetCDF code path different reader). Mixing NWS values between cold and hot start corrupts hot-restart.
+ - **Manning's n via fort.13 requires `NOLIBF=1`**: from `[file=wiki:adcirc:Fort.13_file Nodal Attributes]` — the run terminates if both are not consistent.
+@@ -152,11 +152,11 @@
+ 1. Treat `fort.14` + `fort.15` as the canonical pair — never touch the mesh without keeping the matching `fort.15` (or you get mismatched `NSTAE`/`NSTAV` arrays).
+ 2. Always inspect `fort.80` after a parallel run before opening `fort.61/62/...` — those files are split per PE before merge.
+ 3. When writing scripts that consume ADCIRC output, branch on the file's HEADER (record 1 always carries `RUNDES`, `RUNID`, `AGRID`) — do not infer format from filename alone.
+-4. For harmonic analysis output (`fort.51–53`), the `NFREQ` block in `fort.15` must match the post-processed file or `POST51/52/53` will silently drop frequencies.
++4. For harmonic analysis output (`fort.51–53`), the `NFREQ` block in `fort.15` must match the post-processed file or `POST51/52/53` will silently drop frequencies. <!-- source-needed: drop 거동의 prep/post.F file:line 인용 필요 -->
+ 
+ ## Common Pitfalls
+ 
+-- **Hot-start ↔ output file mismatch** — restart with different `NOUT*` flag sign (ASCII↔binary) leaves a corrupted partial file. Set `NOUT*` consistently across runs.
++- **Hot-start ↔ output file mismatch** — restart with different `NOUT*` flag sign (ASCII↔binary) leaves a corrupted partial file. Set `NOUT*` consistently across runs. <!-- source-needed: corruption 거동 인용 필요 -->
+ - **fort.13 silent ignore** — if `NWP=0` in fort.15, the file is never read no matter what you put in it. Check `[file=src/nodalattr.F line=1051]` for `NWP` parsing.
+ - **NWS=14 vs NWS=13** — both NetCDF; different reader path. `[file=src/owiwind.F line=188]` shows the dispatch.
+ 
+diff --git a/models/ADCIRC/source-analysis/adcirc-parallel-implementation.md b/models/ADCIRC/source-analysis/adcirc-parallel-implementation.md
+--- a/models/ADCIRC/source-analysis/adcirc-parallel-implementation.md
++++ b/models/ADCIRC/source-analysis/adcirc-parallel-implementation.md
+@@ -3,6 +3,7 @@
+ topic: general
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-parallel-implementation.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
+ note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
+ note_date: 2026-04~05 (original) / 2026-05-23 (promote)
+@@ -157,8 +158,8 @@
+ 
+ 1. **`partmesh.txt` is per-node** — METIS output with one PE id per global node.
+ 2. **fort.80 has node/element maps + counts** — but boundary halo metadata is in per-PE fort.18, not fort.80.
+-3. **Halo updates are point-to-point** (IRECV/ISEND), not collective. Number of neighbors per PE is small (typically <= 4).
+-4. **Reductions are infrequent** — only inside JCG iterations for residual checks. Halo exchange dominates communication cost.
++3. **Halo updates are point-to-point** (IRECV/ISEND), not collective. Number of neighbors per PE is small (typically <= 4). <!-- source-needed: neighbor 수 통계 — METIS partition 특성 문헌 또는 실측 인용 필요 -->
++4. **Reductions are infrequent** — only inside JCG iterations for residual checks. Halo exchange dominates communication cost. <!-- source-needed: 성능 단언 — 프로파일/문헌 인용 필요 -->
+ 5. **Re-running adcprep --partmesh** overwrites partmesh.txt; run --prepall after to refresh PE####/. Don't mix old partmesh + new prepall.
+ 
+ ## Common Pitfalls
+@@ -166,7 +167,7 @@
+ - **Adcprep --np mismatch with mpiexec --np** — fatal. PE0017 missing if you run `mpiexec -np 18` after `adcprep --np 17`.
+ - **Stale fort.80** from previous run — POST routines read wrong mapping; merged outputs corrupted.
+ - **fort.18 missing for some PE** — usually from interrupted adcprep --prepall; redo from scratch.
+-- **HDF5 vs sequential NetCDF** — most ADCIRC builds have sequential. Check `ldd padcirc.exe | grep netcdf`.
++- **HDF5 vs sequential NetCDF** — most ADCIRC builds have sequential. Check `ldd padcirc.exe | grep netcdf`. <!-- source-needed: '대부분의 빌드' 일반화 — 공식 빌드 문서 인용 필요 -->
+ - **adcpost reading wrong fort.80** — when comparing runs, archive fort.80 alongside fort.6X files.
+ 
+ ## References
+diff --git a/models/ADCIRC/source-analysis/adcirc-parameter-glossary-v1.md b/models/ADCIRC/source-analysis/adcirc-parameter-glossary-v1.md
+--- a/models/ADCIRC/source-analysis/adcirc-parameter-glossary-v1.md
++++ b/models/ADCIRC/source-analysis/adcirc-parameter-glossary-v1.md
+@@ -2,7 +2,7 @@
+ title: "adcirc parameter glossary v1"
+ topic: general
+ canonical_source: self
+-citation_status: verified
++citation_status: source-needed
+ verification_method: "ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-parameter-glossary-v1.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
+ note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
+ note_date: 2026-04~05 (original) / 2026-05-23 (promote)
