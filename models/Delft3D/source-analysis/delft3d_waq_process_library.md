@@ -189,7 +189,7 @@ $$FNUT = \min\!\Big(\tfrac{(PON/POC)-ALN}{AUN-ALN}, \tfrac{(POP/POC)-ALP}{AUP-AL
 
 - 커널·통합·전치 스킴, 프로세스 등록 메커니즘 → [[delft3d_delwaq]]
 - 동적 식물플랑크톤 종조성 모델(BLOOM): `waq_process/bloom/`, protist: `waq_process/protist/` — ⚠ 본 노트 미분석, source-needed
-- 퇴적물 산소요구·매몰(SOD, sediment flux): `sedox.f90`/`sedsod.f90`/`botmin.f90` 등 — 파일 존재 확인(`waq_process/` ls)하나 본문 식 미인용, source-needed
+- ✅ 퇴적물 산소요구·매몰(SOD, sediment flux): `sedox.f90`(SODCH4 sech 반복해법+메탄)/`botmin.f90`(S1/S2 무기화)/`sedsod.f90` — [[delft3d_waq_sediment_oxygen_demand]] 로 해소(2026-07-07, verified)
 - CO₂/CH₄ 포화: `satco2.f90`/`satch4.f90` — 파일 존재만 확인, source-needed
 
 > 전체 프로세스 파일 184개(`waq_process/` 최상위 ls 기준). 본 노트는 산소·N순환·BOD·1차생산제한·무기화의 **대표 루틴**만 식 단위로 인용했다.
