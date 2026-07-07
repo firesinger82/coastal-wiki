@@ -32,7 +32,7 @@ related:
 | **LISFLOOD-FP** | `DepthThresh` 1e-3 / `MaxHflow` 10 | edge(MaskTest)+DryCheck | **hflow=max(z+h)−max(z)>DepthThresh** | 없음 | [[lisflood-fp-classic-acc-flow]] |
 | **XBeach** | 흐름 eps(값 미커버) / 사면 `hswitch` 0.01·`wetslp` 0.15·`dryslp` 1.0 | cell(wetz) | wetz gating(산정식 미커버) | 사면만(wet/dry 안식각) | [[xbeach_flow_solver]]·[[xbeach_avalanching]] |
 | **FUNWAVE** | `MinDepth` 0.001/0.01 · `MinDepthFrc` 0.01/0.1 | cell(MASK)+9점(MASK9) | `η<−Depth`→dry | 없음 | [[funwave-physics-sources]] |
-| **ROMS** | `Dcrit`(값 미커버) | 셀(rmask_wet)+edge(u/v mask_wet) | 미커버 | 미커버 | ⚠전용노트 부재 |
+| **ROMS** | `Dcrit` 0.10 m | 셀(rmask_wet)+edge(u/v mask_wet, 부호있는 {0,±1,2}) | `ζ+h≤Dcrit`→dry, edge 부호로 방향 | 없음(**one-way flux** 대체) | [[roms_wetting_drying]] |
 
 ## 2. ★핵심 통찰 — "hflow = max(수면) − max(바닥)" 공통 정의
 
@@ -45,7 +45,7 @@ related:
 ## 3. 마스크 위상 3계열
 
 1. **노드 기반(유한요소)**: ADCIRC `NODECODE`(1/0) — 요소 활성은 wet 노드 수(NCTOT)로. 별도 velocity-point 없음.
-2. **셀+face 기반(유한차분/체적)**: Delft3D(KFS/KFU)·SWASH(wets/wetu)·SFINCS(kfuv)·LISFLOOD(MaskTest) — **face(velocity-point)가 1차 판정 주체, cell 은 face 의 OR**. 보수적 wetting(둘러싼 face 전부 dry 여야 cell dry).
+2. **셀+face 기반(유한차분/체적)**: Delft3D(KFS/KFU)·SWASH(wets/wetu)·SFINCS(kfuv)·LISFLOOD(MaskTest)·ROMS(rmask_wet/umask_wet) — **face(velocity-point)가 1차 판정 주체, cell 은 face 의 OR**. 보수적 wetting(둘러싼 face 전부 dry 여야 cell dry). ★ROMS 만 edge mask 가 부호 있는 `{0,±1,2}`로 flux 방향 인코딩(다른 모델 0/1) — [[roms_wetting_drying]] §2.
 3. **셀+분산게이트**: FUNWAVE MASK(wet/dry) + **MASK9**(9점곱) — MASK9 는 셀과 8이웃 모두 wet 일 때만 1 → **완전 습윤 내부에서만 Boussinesq 분산항 활성, 물가는 자동 NSWE 강등**. 위상해상 모델 특유(SWASH breaking 도 유사: breaking 점을 dry 처리해 비정수압 제외).
 
 ## 4. 질량보존·음수수심 방지 대조
@@ -64,10 +64,10 @@ related:
 
 ## 5. ★함정·미커버 (disclosed gaps)
 
-- **hysteresis 있음/없음**: Delft3D·ADCIRC 는 이중임계(젖음>마름)로 채터링 억제 — dry↔wet 반복 진동 방지. SFINCS·LISFLOOD·SWASH·FUNWAVE 는 단일임계(대칭). 채터링은 후자에서 Δt·limiter 로 관리.
+- **hysteresis 있음/없음**: Delft3D·ADCIRC 는 이중임계(젖음>마름)로 채터링 억제 — dry↔wet 반복 진동 방지. SFINCS·LISFLOOD·SWASH·FUNWAVE 는 단일임계(대칭). ROMS 는 이중임계 대신 **one-way flux(유입만 허용)+fast-step 평균 이진화**로 채터링 관리([[roms_wetting_drying]] §3-4). 채터링은 단일임계 모델에서 Δt·limiter 로 관리.
 - **ADCIRC 비율 하드코딩**: HABSMIN=0.8H0·HOFF=1.2H0 고정 — 조정하려면 H0 자체 변경. 수심 5m clamp 제거 메시는 H0=0.1 필수(안 하면 천해 영구 dry).
 - **재습윤 게이트 강도차**: ADCIRC 가 가장 엄격(2 wet 이웃 + HOFF + VELMIN 동시) — 고립 dry 노드 self-activate 불가. SFINCS/LISFLOOD/SWASH 는 임계 회복 즉시 재습윤.
-- **미커버(위키 갭)**: **★ROMS wetting/drying 전용 노트 부재**(Dcrit 기본값·마스크식·재습윤 미분석 — raw `ROMS/Nonlinear/wetdry.F`·매뉴얼 `WET_DRY.md` 존재, 후속 전용노트 대상). XBeach 흐름 solver eps 값·wetz 산정식 수치 미기재(사면 wetslp/dryslp 만 완비). LISFLOOD `tol_h` 노트 미명시(DepthThresh·thin_depth 만).
+- **미커버(위키 갭)**: XBeach 흐름 solver eps 값·wetz 산정식 수치 미기재(사면 wetslp/dryslp 만 완비). LISFLOOD `tol_h` 노트 미명시(DepthThresh·thin_depth 만). (ROMS 는 [[roms_wetting_drying]] 신설로 해소 — 8모델 전원 커버.)
 
 ## 6. 관련
 
