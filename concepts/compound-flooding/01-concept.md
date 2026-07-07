@@ -75,6 +75,7 @@ $$
   - 파 overtopping/setup → [[../waves/01-concept]]
   - 처오름(runup) 범람 → [[../swash-zone/01-concept]]
 - **모델 적용**: full-physics → reduced-complexity(SFINCS·LISFLOOD-FP) → ML emulator 스펙트럼은 [[06-model-application]](작성 예정) 허브 참조. SFINCS forcing 구현은 [[../../models/SFINCS/source-analysis/sfincs_boundaries_forcing]].
+- **침수-노출 전이대 수치처리**: 마름/젖음 전선을 옮기는 임계수심·마스크·질량보존 방식은 침수범위의 1차 결정자 — 8개 천수 모델(Delft3D·ADCIRC·SWASH·SFINCS·LISFLOOD-FP·XBeach·FUNWAVE·ROMS) 대조는 **[[wetting-drying-cross-model]]** 이 canonical. 요지: 2D 범람 모델(SFINCS·LISFLOOD)의 `hflow=max(수면)−max(바닥)` edge 판정 공통 정의, hysteresis 유무(Delft3D·ADCIRC 이중임계 vs 나머지 단일임계), FUNWAVE MASK9 분산항 게이트.
 
 ### 4.1 한국 연안도시 — source-needed
 
