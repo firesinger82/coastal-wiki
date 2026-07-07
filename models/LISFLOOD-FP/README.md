@@ -16,7 +16,7 @@
 ## 현재 상태 (2026-06-18 신규 생성)
 
 - ✅ Zenodo v8.2 아카이브 다운로드·압축해제 (`raw/source_code/LISFLOOD-FP/`, raw gitignored)
-- ✅ **source-analysis 7** (전 솔버군, file:line + 적대 검증): architecture-source-map + **classic-acc-flow**(ACC local-inertia Bates2010·diffusive·Trent) + **channel-sgc**(sub-grid channel·관성식·weir/bridge orifice) + **swe-fv1-dg2**(FV1 Godunov·DG2 multiwavelet·HLL Riemann·SSP-RK2) + **cuda-gpu**(FlowVector·ghostraster) + **io-boundary** + **lisflood2-driver**(sgm_fast 관성파·CFL)
+- ✅ **source-analysis 8** (전 솔버군, file:line + 적대 검증): architecture-source-map + **classic-acc-flow**(ACC local-inertia Bates2010·diffusive·Trent) + **channel-sgc**(sub-grid channel·관성식·weir/bridge orifice) + **swe-fv1-dg2**(FV1 Godunov·DG2·HLL Riemann·SSP-RK2) + **cuda-gpu**(FlowVector·ghostraster) + **io-boundary** + **lisflood2-driver**(sgm_fast 관성파·CFL) + **mwdg2-adaptive-mra**(★멀티웨이블릿 적응격자 `cuda/adaptive/` — HWFV1/MWDG2, maxes.qy 버그 적발)
 - ✅ **manual-notes 1** ([user-manual](manual-notes/lisflood-fp-user-manual.md), 적대 검증) — user manual PDF(parfile 키워드·솔버 선택·입출력) + INSTALL.md/README.md(CMake 빌드·netCDF/libnuma). .mass 12열 PDF 자체오기 정정 포함
 - ✅ **web-refs 1** ([official-resources](web-refs/lisflood-fp-official-resources.md))
 
@@ -25,8 +25,8 @@
 | 경로 | 내용 |
 |---|---|
 | `*.cpp` (root) | **classic FP 솔버**: lisflood.cpp(main)·fp_acc(ACC local-inertia)·fp_flow(diffusive)·fp_trent·sgc(sub-grid channel)·por_flow(porosity)·weir/ch_flow·boundary·input·output |
-| `swe/` | **신규 SWE 솔버**: fv1(FV1 Godunov 1차)·dg2/dg2new(**DG2 multiwavelet** 2차)·hll(HLL Riemann flux)·flux·fields·boundary·input/output |
-| `cuda/` | **GPU(CUDA)** 버전: acc·fv1·dg2·acc_nugrid(동적 해상도) |
+| `swe/` | **신규 SWE 솔버**: fv1(FV1 Godunov 1차)·dg2(DG2 2차)·dg2new(비가동 리팩터)·hll(HLL Riemann flux)·flux·fields·boundary·input/output |
+| `cuda/` | **GPU(CUDA)** 버전: acc·fv1·fv2·dg2·acc_nugrid(Haar 적응 ACC)·**adaptive(★멀티웨이블릿 HWFV1/MWDG2)** |
 | `lisflood2/` | 신규 driver 계층 | 
 | `rain`·`preprocess`·`postprocess` | 강우·전후처리 |
 | `test`·`testing` | 검증 케이스(대용량) |
