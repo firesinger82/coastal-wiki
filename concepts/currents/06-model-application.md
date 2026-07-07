@@ -49,6 +49,10 @@ EFDC도 **external(깊이적분 2D)** 과 **internal(3D shear)** 모드를 분�
 - 시간적분: 3TL(leapfrog+trapezoidal corrector, `IS2TIM=0`) vs 2TL(`IS2TIM>=1`) — §D.
 - 조류 흐름의 개경계 forcing은 `CALPSER`/`SETOPENBC` 가 수위/압력 시계열을 `FP(L)` 에 기입(외부 솔버 전) — §G; §2.1 의 EFDC 조류 forcing 입력이 여기로 들어간다.
 
+### 0.4 저면마찰 — 10모델 cross-model 대조
+
+운동량 방정식의 저면마찰 항(법칙 선택지·조도 knob·implicit 처리·wave-current BBL)은 모델 간 편차가 캘리브레이션에 직결 — **[[bottom-friction-cross-model]]** 이 10모델(EFDC·Delft3D·ROMS·ADCIRC·SWASH·SFINCS·LISFLOOD-FP·FUNWAVE·Celeris·XBeach + SWAN 파랑소산 구분) 대조표의 canonical. 요지: z₀/log-law 3D 해양모델 계보(ZBR/z₀/Zob) vs Manning 계열 천수·범람 계보(`g n²/h^{1/3}`) vs 파랑 소산 별도 축(SWAN `FRICTION` 미지정 시 off 주의).
+
 > 위 §0 의 흐름 해상 claim 은 모두 검수완료 source-analysis 노트로 verified. 아래 §1 이하의 **조류 forcing 입력 포맷·글로벌 datum·한국 해역 권장·검증 임계치**는 모델 manual / 외부 datum 문서(미수록분)로 여전히 source-needed.
 
 ## 1. 모델별 조류 입출력
