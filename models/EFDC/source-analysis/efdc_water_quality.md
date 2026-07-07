@@ -18,7 +18,7 @@ The EFDC+ Eutrophication module: directory structure (`Eutrophication/mod_wq.f90
 
 - `Eutrophication/mod_wq.f90:9-5083` — WATERQUALITY core.
 - `Eutrophication/mod_wq_vars.f90:28-118` — state variable indices.
-- `Eutrophication/mod_diagen.f90:9-1031` — sediment diagenesis.
+- `Eutrophication/mod_diagen.f90` (module :9-1107, flux kernel SEDFLUXNEW/ZBRENT/SOLVSMBE :1121-1393) — sediment diagenesis. 알고리즘: [[efdc_sediment_diagenesis]] (Cerco-Cole/Di Toro 2-layer flux, SOD Brent 폐합).
 - `Eutrophication/mod_biota.f90:57-444` — biota.
 - `Eutrophication/mod_zoopl.f90`, `mod_shellfish.f90`, `mod_rpem.f90` — additional modules.
 - `aaefdc.f90:126, 3086` — `WQ3DINP` init.
