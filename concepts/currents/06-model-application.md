@@ -53,6 +53,10 @@ EFDC도 **external(깊이적분 2D)** 과 **internal(3D shear)** 모드를 분�
 
 운동량 방정식의 저면마찰 항(법칙 선택지·조도 knob·implicit 처리·wave-current BBL)은 모델 간 편차가 캘리브레이션에 직결 — **[[bottom-friction-cross-model]]** 이 10모델(EFDC·Delft3D·ROMS·ADCIRC·SWASH·SFINCS·LISFLOOD-FP·FUNWAVE·Celeris·XBeach + SWAN 파랑소산 구분) 대조표의 canonical. 요지: z₀/log-law 3D 해양모델 계보(ZBR/z₀/Zob) vs Manning 계열 천수·범람 계보(`g n²/h^{1/3}`) vs 파랑 소산 별도 축(SWAN `FRICTION` 미지정 시 off 주의).
 
+### 0.5 연직혼합·난류종결 — 5개 3D 모델 대조
+
+연직 eddy viscosity 공급 메커니즘(MY2.5 계열 vs k-ε/GLS 계열 vs 진단 KPP)·안정함수 세대·배경 하한·파랑 TKE 주입 여부는 **[[vertical-mixing-cross-model]]** 이 canonical (ROMS·Delft3D·EFDC·SWASH·ADCIRC 3D). 요지: 파랑 표면 TKE 주입은 ROMS GLS(Craig-Banner)만 명시적, EFDC 는 저면응력 경유, SWASH breaking 은 수평 점성 경로 — 성층·상층 혼합 캘리브 시 최대 분기점.
+
 > 위 §0 의 흐름 해상 claim 은 모두 검수완료 source-analysis 노트로 verified. 아래 §1 이하의 **조류 forcing 입력 포맷·글로벌 datum·한국 해역 권장·검증 임계치**는 모델 manual / 외부 datum 문서(미수록분)로 여전히 source-needed.
 
 ## 1. 모델별 조류 입출력
