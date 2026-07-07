@@ -128,6 +128,10 @@ Layer 3: SWAN detail (~50-100 m, 항만·연안)
 
 > 특정 항만 SWAN 검증 사례(정량 RMSE·Bias·correlation)는 바이블 검증(객관 데이터) 후 `experience/` 에 카테고리화 — 본 canonical 미수록. (citation_status: source-needed)
 
+## 7.5 쇄파 소산 — 5개 모델 cross-model 대조
+
+깊이유발 쇄파(depth-induced breaking) 처리는 위상평균(SWAN·XBeach 통계적 Qb)과 위상해상(SWASH·FUNWAVE·Celeris 개별 파 onset)이 근본적으로 갈린다 — **[[wave-breaking-cross-model]]** 이 canonical. 요지: SWAN γ=0.73 Battjes-Janssen(기본 ON, Newton-implicit) vs XBeach γ=0.55 Roelvink(explicit+gammax) vs SWASH HFA(α=0.6, 정수압 전환+dry) vs FUNWAVE/Celeris Kennedy eddy viscosity(Cbrk 0.65/0.15). 위상해상 onset(α/Cbrk1≈0.6–0.65)은 전면 급경사로 수렴.
+
 ## 8. 다른 토픽과의 교차
 
 - **tides** (`concepts/tides/`): 약최고고조면 (AHHW) 보정 — SWAN 수심 갱신 시 [`02-theory.md §8.2`](../tides/02-theory.md) DL+Z₀ 적용
