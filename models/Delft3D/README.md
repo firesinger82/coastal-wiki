@@ -28,8 +28,8 @@
 
 | 경로 | 노트 수 | 상태 | 비고 |
 |---|---:|---|---|
-| `source-analysis/` | 14 verified | **M-D 1차+2차 진행** | 기존 10 + M-D 1차 2 (engines_overview·flow2d3d_dispatcher) + M-D 2차 2 (dflowfm_overview·dimr_coupling). Stelling-Duinmeijer 2003 + Kernkamp 2011 + BMI standard 적용. 4795 Fortran 대비 여전히 sparse — kernel scheme deep 후속 |
-| `manual-notes/` | 2 verified | **신설 2026-05-24 (M-C 2차)** | overview (53 PDFs 인덱스) + flow-user-manual (FLOW v4.07.01 TOC + MDF 12 input family). WAVE·WAQ 후속 |
+| `source-analysis/` | 48 verified (top 46 + `sediment/` 1 + `wave/` 1) | **핵심 커널 커버 두터움** | FLOW(adi solver·difu/z_difu transport·difhor anti-creep·forfil·morphology erosed/eqtran 19종) + FM(kernel scheme·compute aux·waves) + WAQ(process library + phcarb·densed·dissi·sulfid·sedox 등) + dredge·dimr·engines. 실측 2026-07-10 (stale 14→48 정정) |
+| `manual-notes/` | 11 verified | **문서잔여 종결 2026-07-04** | overview(53 PDFs 인덱스)·FLOW(user manual·physics-numerics·boundary-forcing)·WAVE·WAQ(user manual·processes tech ref·Library Tables/Input Desc/FuncSpec index)·TIDE·PART·tool manuals. 실측 2026-07-10 (stale 2→11 정정) |
 | `web-refs/` | 1 verified | **신설 2026-05-24** | delft3d-official-resources.md — Deltares OSS·GitHub Deltares/delft3d·Delft-FIAT·hydromt_delft3dfm·핵심 논문 (Lesser 2004·Stelling-Duinmeijer 2003·Kernkamp 2011·van der Wegen 2008) |
 | `raw/` | 56 .md + 53 pdf + 4795 fortran (1.5 GB) | archive | Delft3D + Delft-FIAT + hydromt_delft3dfm |
 
@@ -39,8 +39,8 @@
 - [`concepts/waves/`](../../concepts/waves/) — Delft3D-WAVE (SWAN 통합 + flow-wave 양방향 coupling)
 - [`concepts/littoral-drift/`](../../concepts/littoral-drift/) — surf zone + cross-shore profile
 
-## 작성 우선순위 (남은 작업)
+## 작성 우선순위 (남은 작업, 2026-07-10 갱신)
 
-1. **M-C**: `manual-notes/` FLOW + WAVE + SED + WAQ 4 핵심 모듈 user manual 챕터별 발췌 (4 PDF * 1 노트 each)
-2. **M-D**: `source-analysis/` 보강 — 현재 10 노트가 4795 Fortran 에 sparse. 우선 D3D-4 의 핵심 모듈 (TRISULA hydro, ONLINE_WAVE coupling, SEDTRANS) 추가
+1. ~~M-C: manual-notes FLOW/WAVE/SED/WAQ 발췌~~ — **완료** (11 verified, AUDIT-LEDGER §2.1 문서잔여 종결 2026-07-04)
+2. ~~M-D: source-analysis 보강~~ — **핵심 커널 소진에 근접** (48 verified: ADI·transport·anti-creep·morphology·WAQ processes). 잔여는 WAQ 추가 process·개별 transport 공식(tram*/trab*)·bedcomposition 등 롱테일
 3. **M-E**: `web-refs/` — Deltares OpenEarth 공식 + Lesser et al. 2004 (D3D 통합 논문)
