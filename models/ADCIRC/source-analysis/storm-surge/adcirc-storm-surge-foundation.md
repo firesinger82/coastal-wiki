@@ -2,10 +2,11 @@
 title: "ADCIRC Storm Surge — Foundation note (요구사항 분류)"
 topic: storm-surge
 canonical_source: self
-citation_status: source-needed
-verification_method: "ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/adcirc/src/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-storm-surge-foundation.md (at commit a9618df^) (modeling-wiki 4월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
-note_author: "사용자 + codex source-code 분석 (2026-04 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
-note_date: 2026-04 (original) / 2026-05-23 (promote)
+citation_status: verified
+has_source_needed: true
+verification_method: "2026-07-10 재승격: 공식 docs 직접 대조 — nws_parameters.rst(NWS=3 :248 / =4 :251 / =8 :272-273 / =12 :298 / =13 :308-310 / =14 :311-312 / =19 discouraged :32)·examples/index.rst:26-36(APES/Isabel/Katrina/Global Storm Tide)·ramping_met_forcing_at_hotstart.rst:4·typical_parameter_selections.rst(존재 확인). ★NWS=13 code≠docs divergence 판정: read_input.F:1782(owiWindNetcdf namelist 강제)·:4721('OWI Netcdf (NWS13) format') = 코드 정본 OWI NetCDF, rst :308-310 의 'ramping(WRAMP)' 서술은 stale. 원본은 modeling-wiki 2026-04 작성분 마이그레이션."
+note_author: "사용자 + codex source-code 분석 (2026-04 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23 → Claude Fable 5 docs 재검증·재승격 2026-07-10"
+note_date: 2026-04 (original) / 2026-05-23 (promote) / 2026-07-10 (verified 재승격)
 verification_by: "사용자 + codex source-code analysis"
 verification_date: 2026-04
 related:
@@ -56,10 +57,11 @@ Before real storm-surge setup begins, collect:
 
 ### Official Example Cases
 
-- Hurricane Katrina (`NWS=20`)
-- Global Storm Tide - Hurricane Katrina (`NWS=-14`)
-- Hurricane Isabel Wind Run (`NWS=4`)
-- APES Wind Run (`NWS=3`)
+(`docs/user_guide/examples/index.rst:26-36`)
+- Hurricane Katrina (`NWS=20`) (:33)
+- Global Storm Tide - Hurricane Katrina (`NWS=-14`) (:35)
+- Hurricane Isabel Wind Run (`NWS=4`) (:28)
+- APES Wind Run (`NWS=3`) (:26)
 
 ### Setup Guidance
 
@@ -84,20 +86,21 @@ Why it matters:
 - `NWS` selects the meteorological forcing input type
 - it also changes what the meteorological parameter line in `fort.15` must contain
 
-Relevant official options for surge-related work include:
+Relevant official options for surge-related work include (`docs/user_guide/model_configuration/meteorological_forcing/nws_parameters.rst`):
 - `NWS = 8`
-  - symmetric vortex model
+  - Dynamic Holland vortex model, ATCF Best Track 입력 (rst:272-273)
 - `NWS = 12`
-  - OWI gridded wind and pressure
+  - OWI gridded wind and pressure (rst:298)
 - `NWS = 13`
-  - OWI NetCDF gridded wind/pressure ([[adcirc-fort-files-reference]] fort.22 항목 `[file=src/owiwind.F line=188]`; 원문 "ramped meteorological forcing" 은 오기 — L4 2026-07-10 정정)
+  - OWI NetCDF gridded wind/pressure — **코드 정본**: `read_input.F:1782`(owiWindNetcdf namelist 필수)·`:4721`("OWI Netcdf (NWS13) format wind/pres used"), reader = [[adcirc-met-forcing-implementation]] §D
+  - ★**code≠docs divergence (2026-07-10 판정)**: 원문 "ramped meteorological forcing" 은 오기가 아니라 `nws_parameters.rst:308-310`("Similar to NWS=5... ramping... WRAMP") 의 충실한 전사였음 — 그러나 **그 rst 서술 자체가 코드와 divergent(stale)**. 소스가 물리·기능 정본.
 - `NWS = 14`
-  - GRIB2/NetCDF forcing
+  - GRIB2/NetCDF gridded forcing (rst:311-312)
 - `NWS = 20`
   - Generalized Asymmetric Holland Model
 
 Important official guidance:
-- docs explicitly discourage `NWS=19` in favor of `NWS=20` `[source-needed: 문서 identity — nws_parameters.rst 섹션 인용 필요]`
+- docs explicitly discourage `NWS=19` in favor of `NWS=20` — `nws_parameters.rst:32` verbatim: "Use of the Dynamic Asymmetric Holland Model (NWS=19) is discouraged. The Generalized Asymmetric Holland Model (NWS=20) provides improved functionality." (+:106, :220 "deprecated")
 
 ### 2. Meteorological Timing Family
 
@@ -117,8 +120,8 @@ Examples:
 - meteorological ramp additions such as `DRAMPMete`
 
 Why it matters:
-- official tips note that meteorological forcing should often be ramped in rather than shocked into the system
-- this becomes especially important for hotstart workflows
+- official tips note that meteorological forcing should often be ramped in rather than shocked into the system (`docs/user_guide/tips_and_tricks/ramping_met_forcing_at_hotstart.rst:4` — "it's generally best to ramp in forcing terms to avoid shocking the system")
+- this becomes especially important for hotstart workflows (동 문서 `NRAMP=8` + `DRAMPMete` 절차)
 
 ### 4. Core Numerical Family
 
@@ -135,7 +138,7 @@ Why it matters:
 
 ### 5. Bottom And Surface Drag Family
 
-Examples from official storm-surge parameter selections:
+Examples from official storm-surge parameter selections (`docs/user_guide/model_configuration/typical_configurations/typical_parameter_selections.rst`):
 - wind drag law
 - upper wind drag limit
 - minimum bottom drag coefficient
@@ -209,11 +212,11 @@ Read these before selecting actual storm-surge parameters:
 
 ## What We Know Already
 
-Directly from official sources:
-- `NWS` controls meteorological forcing type and changes the shape of the met-parameter line
-- `NWS=20` is preferred over the deprecated `NWS=19`
-- official examples include Katrina and global storm-tide cases
-- official storm-surge parameter tables show drag, timestep, `h0`, advection, and tidal constituents are all central concerns
+Directly from official sources (인용은 위 각 절):
+- `NWS` controls meteorological forcing type and changes the shape of the met-parameter line (`nws_parameters.rst`)
+- `NWS=20` is preferred over the deprecated `NWS=19` (`nws_parameters.rst:32`)
+- official examples include Katrina and global storm-tide cases (`examples/index.rst:26-36`)
+- official storm-surge parameter tables show drag, timestep, `h0`, advection, and tidal constituents are all central concerns (`typical_parameter_selections.rst`; 세부 수치 항목별 인용은 미수록 — source-needed)
 
 ## What We Are Not Deciding Yet
 

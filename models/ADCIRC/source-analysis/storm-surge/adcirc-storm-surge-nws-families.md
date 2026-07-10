@@ -2,8 +2,9 @@
 title: "ADCIRC Storm Surge — NWS family 비교 (NWS=3/4/13/14/20)"
 topic: storm-surge
 canonical_source: self
-citation_status: source-needed
-verification_method: "ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/adcirc/src/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-storm-surge-nws-families.md (at commit a9618df^) (modeling-wiki 4월 작성) 의 마이그레이션. 2026-07-10 L4 감사 후속: 개인 워크플로 서술은 _staging/from-canonical/adcirc-nws13-jma-msm-local-workflow.md 로 추출(절대규칙 #2·#8), 객관 단언은 [[adcirc-met-forcing-implementation]] (file:line 인용 보유) 로 소급."
+citation_status: verified
+has_source_needed: false
+verification_method: "2026-07-10 재승격: 공식 docs 직접 대조 — nws_parameters.rst(NWS=3 :248 / =4 :251 / =13 :308-310 / =14 :311-312 / =19 discouraged :32 verbatim). NWS=13 실기능은 코드 정본(read_input.F:1782 owiWindNetcdf namelist·:4721 'OWI Netcdf (NWS13) format') — rst :308-310 'ramping' 서술은 stale(code≠docs, [[adcirc-storm-surge-foundation]] 판정 공유). 2026-07-10 L4 감사 후속: 개인 워크플로 서술은 _staging/from-canonical/adcirc-nws13-jma-msm-local-workflow.md 로 추출(절대규칙 #2·#8), 객관 단언은 [[adcirc-met-forcing-implementation]] (file:line 인용 보유) 로 소급."
 note_author: "사용자 + codex source-code 분석 (2026-04 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23 → L4 레이어 정리 2026-07-10"
 note_date: 2026-04 (original) / 2026-05-23 (promote) / 2026-07-10 (layer cleanup)
 verification_by: "사용자 + codex source-code analysis"
@@ -35,34 +36,37 @@ It does not choose final project parameter values.
 
 ## Main Families Relevant To Storm Surge
 
+(포맷 서술 출처: `docs/user_guide/model_configuration/meteorological_forcing/nws_parameters.rst`)
+
 ### `NWS=3`
 
-- type: gridded wind forcing on lon/lat grid
+- type: US Navy Fleet Numeric 포맷 wind file — lon/lat 격자에서 ADCIRC grid 로 공간보간, Garret 식 wind stress (rst:248-249)
 - useful for: simpler wind-run style examples
-- official example link: APES Wind Run
+- official example: APES Wind Run (`examples/index.rst:26`)
 
 ### `NWS=4`
 
-- type: PBL hurricane model input at selected nodes
-- useful for: older storm event examples such as Hurricane Isabel
+- type: PBL/JAG 포맷 wind/pressure at selected ADCIRC grid nodes (rst:251-252)
+- useful for: older storm event examples such as Hurricane Isabel (`examples/index.rst:28`)
 - limitation: legacy/example-oriented
 
 ### `NWS=13`
 
-- type: OWI-style NetCDF gridded wind and pressure
+- type: OWI-style NetCDF gridded wind and pressure — **코드 정본** `read_input.F:1782`(owiWindNetcdf namelist 필수)·`:4721`("OWI Netcdf (NWS13) format wind/pres used")
 - useful for: high-quality gridded forcing with overlays, curvilinear grids, and irregular timesteps
 - reader 경로·namelist 요건: [[adcirc-met-forcing-implementation]] §D (owiwind_netcdf.F file:line 인용)
+- ★code≠docs: `nws_parameters.rst:308-310` 은 NWS=13 을 "NWS=5 유사 + ramping(WRAMP)" 으로 서술 — 코드와 divergent(stale). [[adcirc-storm-surge-foundation]] 판정 참조.
 
 ### `NWS=20`
 
 - type: Generalized Asymmetric Holland Model
-- useful for: parametric tropical cyclone forcing with official preference over deprecated `NWS=19` `[source-needed: 'docs discourage NWS=19' 의 문서 identity — nws_parameters.rst 섹션 인용 필요]`
+- useful for: parametric tropical cyclone forcing — 공식 문서가 NWS=19 를 명시적으로 비권장: `nws_parameters.rst:32` verbatim "Use of the Dynamic Asymmetric Holland Model (NWS=19) is discouraged. The Generalized Asymmetric Holland Model (NWS=20) provides improved functionality."
 - strength: compact forcing representation for hurricane workflows
 - 상세: [[adcirc_gahm_vortex_model]]
 
 ### `NWS=-14` / `NWS=14`
 
-- type: GRIB2 or NetCDF gridded wind and pressure
+- type: GRIB2 or NetCDF gridded wind and pressure — 표준화 기상 포맷 직접 읽기, `NWS=14` cold-start 기준/`-14` hot-start 기준 (rst:311-312)
 - useful for: more generic gridded forcing workflows
 - strength: broad compatibility with gridded products
 - limitation: different configuration path from the OWI-NWS13 convention
@@ -99,5 +103,5 @@ This separation is important because:
 
 ## Next Step
 
-- `[source-needed]` 잔여 인용(NWS=19 deprecation 문서 identity) 보강 후 verified 재승격 검토
+- ~~`[source-needed]` 잔여 인용(NWS=19 deprecation 문서 identity) 보강 후 verified 재승격 검토~~ — **완료(2026-07-10)**: nws_parameters.rst 인용 보강 + verified 재승격
 - 개인 워크플로(JMA-MSM 경로)는 `_staging/from-canonical/adcirc-nws13-jma-msm-local-workflow.md` 에서 experience 게이트 대기
