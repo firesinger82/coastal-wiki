@@ -3,6 +3,7 @@ title: "adcirc parallel implementation"
 topic: general
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-parallel-implementation.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
 note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
 note_date: 2026-04~05 (original) / 2026-05-23 (promote)
@@ -157,8 +158,8 @@ GWCE iterative residual/dot products globally reduced via `psdot/ps2dots/ps3dots
 
 1. **`partmesh.txt` is per-node** — METIS output with one PE id per global node.
 2. **fort.80 has node/element maps + counts** — but boundary halo metadata is in per-PE fort.18, not fort.80.
-3. **Halo updates are point-to-point** (IRECV/ISEND), not collective. Number of neighbors per PE is small (typically <= 4).
-4. **Reductions are infrequent** — only inside JCG iterations for residual checks. Halo exchange dominates communication cost.
+3. **Halo updates are point-to-point** (IRECV/ISEND), not collective. Number of neighbors per PE is small (typically <= 4). <!-- source-needed: neighbor 수 통계 — METIS partition 특성 문헌 또는 실측 인용 필요 -->
+4. **Reductions are infrequent** — only inside JCG iterations for residual checks. Halo exchange dominates communication cost. <!-- source-needed: 성능 단언 — 프로파일/문헌 인용 필요 -->
 5. **Re-running adcprep --partmesh** overwrites partmesh.txt; run --prepall after to refresh PE####/. Don't mix old partmesh + new prepall.
 
 ## Common Pitfalls
@@ -166,7 +167,7 @@ GWCE iterative residual/dot products globally reduced via `psdot/ps2dots/ps3dots
 - **Adcprep --np mismatch with mpiexec --np** — fatal. PE0017 missing if you run `mpiexec -np 18` after `adcprep --np 17`.
 - **Stale fort.80** from previous run — POST routines read wrong mapping; merged outputs corrupted.
 - **fort.18 missing for some PE** — usually from interrupted adcprep --prepall; redo from scratch.
-- **HDF5 vs sequential NetCDF** — most ADCIRC builds have sequential. Check `ldd padcirc.exe | grep netcdf`.
+- **HDF5 vs sequential NetCDF** — most ADCIRC builds have sequential. Check `ldd padcirc.exe | grep netcdf`. <!-- source-needed: '대부분의 빌드' 일반화 — 공식 빌드 문서 인용 필요 -->
 - **adcpost reading wrong fort.80** — when comparing runs, archive fort.80 alongside fort.6X files.
 
 ## References

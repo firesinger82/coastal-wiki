@@ -3,6 +3,7 @@ title: "adcirc tide forcing implementation"
 topic: tides
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-tide-forcing-implementation.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
 note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
 note_date: 2026-04~05 (original) / 2026-05-23 (promote)
@@ -102,7 +103,7 @@ So no hardcoded constituents — user decides which to include.
 
 ### ETRF (Earth tide reduction factor)
 
-Multiplies `TPK` term at `[file=src/timestep.F line=1501-1503, 1536]`. Standard values 0.69 (M2/S2/N2), 0.736 (K1/O1).
+Multiplies `TPK` term at `[file=src/timestep.F line=1501-1503, 1536]`. Standard values 0.69 (M2/S2/N2), 0.736 (K1/O1). ⚠ source-needed(0.69/0.736 표준값의 문헌 출처 미인용).
 
 ### Earth potential vs ocean load (SAL)
 

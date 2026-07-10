@@ -181,7 +181,7 @@ ADCIRC NWS=12/13/14 입력 NWP source:
 
 | 도구 | 용도 |
 |---|---|
-| **ADCIRC** | primary unstructured surge 모델 (한국 KMOU·KIOST·기상청 모두 사용) |
+| **ADCIRC** | primary unstructured surge 모델 (한국 KMOU·KIOST mesh 보유 — §9 학회 발표 기준; 기상청 포함 '모두 사용' 운영 단언은 `[source-needed]`) |
 | Delft3D-FLOW | 3D + sediment 결합 surge (단점: 구조 grid) |
 | SCHISM | unstructured (ADCIRC 대안, growing) |
 | SLOSH | NOAA NHC 단순 운영 (한국 미사용) |
@@ -216,6 +216,8 @@ surge 모델 검증 시 standard metrics:
 | Phase error | timing difference (hours) | ±1-3 h |
 | Skill score (Willmott 1981) | $1 - \sum(O-M)^2 / \sum(|M-\bar{O}| + |O-\bar{O}|)^2$ | > 0.85 (well-tuned) |
 | Maximum envelope RMSE | spatial max surge | 0.2-0.5 m |
+
+> **출처 주의 (source-needed)**: 위 "한국 ADCIRC typical" 수치 범위(RMSE·phase·skill·envelope)는 특정 한국 ADCIRC 검증 연구 인용이 없는 일반 지침값 — 정량 인용 확보 전까지 예시 범위로만 해석(CLAUDE.md 규칙 #1·#8). Skill score 식만 Willmott(1981) 인용.
 
 ## 9. 외부 자료·논문
 

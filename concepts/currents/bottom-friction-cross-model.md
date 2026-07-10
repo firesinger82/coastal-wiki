@@ -3,6 +3,7 @@ title: "저면마찰(bottom friction) cross-model 대조 — 10개 모델 (법�
 topic: currents
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "전 행이 각 모델 verified source-analysis 노트로 소급(각 셀에 노트 링크+file:line). 대표 anchor 직접 재확인(2026-07-07): Delft3D taubot.f90:381-427(Manning/Chezy/W-C/z0)·ROMS set_vbc.F:597-615(LOGDRAG+clamp)·LISFLOOD-FP cuda/adaptive/operators/apply_friction.cuh:41-52(반음해 Jacobian). 미커버 셀은 §5에 disclosed."
 note_author: "Claude Fable 5"
 note_date: 2026-07-07

@@ -2,7 +2,7 @@
 title: "ADCIRC Storm Surge — Foundation note (요구사항 분류)"
 topic: storm-surge
 canonical_source: self
-citation_status: verified
+citation_status: source-needed
 verification_method: "ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/adcirc/src/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-storm-surge-foundation.md (at commit a9618df^) (modeling-wiki 4월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
 note_author: "사용자 + codex source-code 분석 (2026-04 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
 note_date: 2026-04 (original) / 2026-05-23 (promote)
@@ -90,14 +90,14 @@ Relevant official options for surge-related work include:
 - `NWS = 12`
   - OWI gridded wind and pressure
 - `NWS = 13`
-  - ramped meteorological forcing
+  - OWI NetCDF gridded wind/pressure ([[adcirc-fort-files-reference]] fort.22 항목 `[file=src/owiwind.F line=188]`; 원문 "ramped meteorological forcing" 은 오기 — L4 2026-07-10 정정)
 - `NWS = 14`
   - GRIB2/NetCDF forcing
 - `NWS = 20`
   - Generalized Asymmetric Holland Model
 
 Important official guidance:
-- docs explicitly discourage `NWS=19` in favor of `NWS=20`
+- docs explicitly discourage `NWS=19` in favor of `NWS=20` `[source-needed: 문서 identity — nws_parameters.rst 섹션 인용 필요]`
 
 ### 2. Meteorological Timing Family
 

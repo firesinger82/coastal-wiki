@@ -117,6 +117,8 @@ Layer 3: SWAN detail (~50-100 m, 항만·연안)
 
 ### 7.2 검증 메트릭
 
+> ⚠ 아래 '일반 기준' 수치(RMSE·bias·상관계수·방향오차 임계)는 인용 근거 미확보 — 출처(검증 practice 문헌·기관 기준) 확보 전까지 참고값. (source-needed)
+
 | 메트릭 | 정의 | 일반 기준 |
 |---|---|---|
 | RMSE H_s | √mean((Hs_model - Hs_obs)²) | < 0.3 m for typical |

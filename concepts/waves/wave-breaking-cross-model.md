@@ -3,6 +3,7 @@ title: "파랑 쇄파 소산(depth-induced wave breaking) cross-model 대조 —
 topic: waves
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "전 행이 각 모델 verified source-analysis·manual-notes 노트로 소급(셀에 노트 링크+file:line). 대표 anchor 직접 재확인(2026-07-07): SWASH SwashBreakPoint.ftn90:119,123(dsdt>α·√gh→q=0)·FUNWAVE breaker.F:124-142,151(tmp1=Cbrk1·√gh, onset ETAt≥tmp1). 미커버 셀 §5 disclosed."
 note_author: "Claude Fable 5"
 note_date: 2026-07-07

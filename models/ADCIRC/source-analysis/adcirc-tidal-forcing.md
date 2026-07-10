@@ -3,6 +3,7 @@ title: "ADCIRC 조석 forcing & 분석 — tidal potential(TPK/ETRF Love/nodal F
 topic: adcirc
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "models/ADCIRC/raw/source_code/adcirc/src/timestep.F (조석 potential 1509-1556) + internaltide.F90(249) + harm.F(2071) + astronomic.F90/ephemerides.F90/moon.F90 헤더 + 적용부(momentum.F:441 barotropic, gwce.F:1181/2592, CTIP) 직접 read. TIP2 식·ETRF·species L_N·SAL·NTIP=2 path file:line 인용. Luettich-Westerink ADCIRC."
 note_author: "Claude Opus 4.8 (1M context) source-code direct read"
 note_date: 2026-06-03
@@ -41,7 +42,7 @@ TIP2(I) += TPMUL*L_N(NA,I)*COS(ARGT + NA*SLAM(I))          ! tidal potential
 TIP2(I) += SALTMUL * SALTAMP(J,I) * COS(ARGT - SALTPHA(J,I))    ! SALTMUL=RampTip*FFT
 ```
 - `SALTAMP(J,I)`/`SALTPHA(J,I)` = **공간변화 SAL 진폭/위상**(constituent J × node I) — 외부 SAL DB(예: FES, GOT) 에서 fort.13/24 로 입력.
-- `NTIP==2` 또는 `tidePotential` 비활성 시 적용(timestep.F:1527). 대양 규모 조석 정확도(~5-10%)에 중요.
+- `NTIP==2` 또는 `tidePotential` 비활성 시 적용(timestep.F:1527). 대양 규모 조석 정확도(~5-10%)에 중요`[source-needed]`.
 
 ## 3. 직접 luni-solar ephemeris (astronomic/ephemerides/moon.F90)
 
@@ -53,7 +54,7 @@ TIP2(I) += SALTMUL * SALTAMP(J,I) * COS(ARGT - SALTPHA(J,I))    ! SALTMUL=RampTi
 
 성층 대양에서 조류가 거친 해저지형 위로 흐르며 **내부조석(internal tide)으로 에너지 변환** → 순압류에 작용하는 drag:
 - `apply2dinternalwavedrag`(nodalattr.F) 가 실제 적용; internaltide.F90 은 보조(가독성 분리, line 27/58).
-- **시간평균 유속** `UBar = Σ wts·UAV` (~25시간 = 2×M2 주기 window, line 139/188) 로 drag tensor 계산 — 순간 조류가 아닌 조석평균 흐름에 비례하는 wave drag. deep-ocean 조석 소산의 dominant sink(천해 bottom friction 외).
+- **시간평균 유속** `UBar = Σ wts·UAV` (~25시간 = 2×M2 주기 window, line 139/188) 로 drag tensor 계산 — 순간 조류가 아닌 조석평균 흐름에 비례하는 wave drag. deep-ocean 조석 소산의 dominant sink(천해 bottom friction 외)`[source-needed]`.
 
 ## 5. Harmonic analysis (harm.F, 2071)
 

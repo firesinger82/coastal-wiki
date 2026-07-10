@@ -142,7 +142,7 @@ Activated when harmonic-analysis options in fort.15 are set (`NHASE`, `NHASV`, `
 
 ## Decision Guide
 
-- **Cold-start vs hot-start affects which fort.* files are reopened**: `cstart.F` initializes `fort.61–65`, `fort.71–75`, `fort.81–93` from scratch; `hstart.F` reopens them from the existing files at the hot-start time. Mismatch in `fort.15` `NHSTAR`/`NHSINC` between the two runs causes silent file format drift.
+- **Cold-start vs hot-start affects which fort.* files are reopened**: `cstart.F` initializes `fort.61–65`, `fort.71–75`, `fort.81–93` from scratch; `hstart.F` reopens them from the existing files at the hot-start time. Mismatch in `fort.15` `NHSTAR`/`NHSINC` between the two runs causes silent file format drift. <!-- source-needed: drift 거동의 hstart.F file:line 또는 wiki 페이지 인용 필요 -->
 - **Output flag sign convention**: `NOUTE`, `NOUTV`, etc. negative values switch ASCII vs binary output. Always cross-check with `[file=wiki:adcirc:Fort.91_file_format]` before consuming.
 - **NWS bundles fort.22 format**: see `[file=wiki:adcirc:NWS]`. Examples — `NWS=12` OWI legacy, `NWS=13` OWI NetCDF (NetCDF code path different reader). Mixing NWS values between cold and hot start corrupts hot-restart.
 - **Manning's n via fort.13 requires `NOLIBF=1`**: from `[file=wiki:adcirc:Fort.13_file Nodal Attributes]` — the run terminates if both are not consistent.
@@ -152,11 +152,11 @@ Activated when harmonic-analysis options in fort.15 are set (`NHASE`, `NHASV`, `
 1. Treat `fort.14` + `fort.15` as the canonical pair — never touch the mesh without keeping the matching `fort.15` (or you get mismatched `NSTAE`/`NSTAV` arrays).
 2. Always inspect `fort.80` after a parallel run before opening `fort.61/62/...` — those files are split per PE before merge.
 3. When writing scripts that consume ADCIRC output, branch on the file's HEADER (record 1 always carries `RUNDES`, `RUNID`, `AGRID`) — do not infer format from filename alone.
-4. For harmonic analysis output (`fort.51–53`), the `NFREQ` block in `fort.15` must match the post-processed file or `POST51/52/53` will silently drop frequencies.
+4. For harmonic analysis output (`fort.51–53`), the `NFREQ` block in `fort.15` must match the post-processed file or `POST51/52/53` will silently drop frequencies. <!-- source-needed: drop 거동의 prep/post.F file:line 인용 필요 -->
 
 ## Common Pitfalls
 
-- **Hot-start ↔ output file mismatch** — restart with different `NOUT*` flag sign (ASCII↔binary) leaves a corrupted partial file. Set `NOUT*` consistently across runs.
+- **Hot-start ↔ output file mismatch** — restart with different `NOUT*` flag sign (ASCII↔binary) leaves a corrupted partial file. Set `NOUT*` consistently across runs. <!-- source-needed: corruption 거동 인용 필요 -->
 - **fort.13 silent ignore** — if `NWP=0` in fort.15, the file is never read no matter what you put in it. Check `[file=src/nodalattr.F line=1051]` for `NWP` parsing.
 - **NWS=14 vs NWS=13** — both NetCDF; different reader path. `[file=src/owiwind.F line=188]` shows the dispatch.
 

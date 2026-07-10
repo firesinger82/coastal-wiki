@@ -3,6 +3,7 @@ title: "adcirc tide harmonic prep"
 topic: tides
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-tide-harmonic-prep.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
 note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
 note_date: 2026-04~05 (original) / 2026-05-23 (promote)
@@ -178,8 +179,8 @@ For SAL, similar process; write to `fort.24` ASCII or `fort.24.nc` NetCDF.
 - Always write `STATIM`, `REFTIM`, and the FF/FACE epoch in the run README. These three must align.
 - Use 8-character constituent names ("M2      ", "S2      ", etc.) padded; ADCIRC trims, but consistent is safer.
 - Output `fort.51` harmonic analysis at validation stations to compute model-side amplitude/phase, then compare against gauge harmonic constants — this is far more diagnostic than time-series RMSE.
-- For Korean coast, NAO99jb gives good M2/S2/K1/O1 starting point; FES2022b adds N2, K2, P1 if you need finer accuracy.
-- SAL from fort.24 typically reduces M2 amplitude by ~5-10% in shelf seas — if your run shows persistent +10% M2 overprediction, missing SAL is a likely cause.
+- For Korean coast, NAO99jb gives good M2/S2/K1/O1 starting point; FES2022b adds N2, K2, P1 if you need finer accuracy. ⚠ source-needed(지역 정확도 서술 출처 미인용).
+- SAL from fort.24 typically reduces M2 amplitude by ~5-10% in shelf seas — if your run shows persistent +10% M2 overprediction, missing SAL is a likely cause. ⚠ source-needed(~5-10% 정량값 출처 미인용).
 
 ## Common Pitfalls
 

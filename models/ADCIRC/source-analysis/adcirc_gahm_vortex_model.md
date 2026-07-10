@@ -4,6 +4,7 @@ model: ADCIRC
 component: Parametric vortex wind/pressure forcing (GAHM, Generalized Asymmetric Holland Model)
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "소스 직접 read (gahm/src/). gahm/GahmEquations.{h,cpp}·GahmSolver.cpp·GahmRadiusSolver.cpp·GahmRadiusSolverPrivate.cpp / vortex/Vortex.cpp / atcf/AtcfSnap.cpp·AtcfFile.cpp·AtcfIsotach.h·AtcfQuadrant.h·StormTranslation.h / preprocessor/Preprocessor.cpp / physical/Atmospheric.h·Constants.h·Earth.h / fortran/gahm.F90·gahm_fortran.cpp / output/OwiOutput.h"
 note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-16

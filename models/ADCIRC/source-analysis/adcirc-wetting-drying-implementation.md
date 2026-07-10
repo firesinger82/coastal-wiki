@@ -3,6 +3,7 @@ title: "adcirc wetting drying implementation"
 topic: general
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-wetting-drying-implementation.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
 note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
 note_date: 2026-04~05 (original) / 2026-05-23 (promote)
@@ -90,7 +91,7 @@ So:
 | Bathymetry minimum | Recommended H0 | Why |
 |-------------------|----------------|-----|
 | ~5m (수심 하한 강제 시) | H0=0.5 → 1.0 (or any) | Wet/dry never fires |
-| ~0.5-1m (자연 천해) | **H0=0.05 → 0.1** | Standard ADCIRC default; allows correct shallow flow |
+| ~0.5-1m (자연 천해) | **H0=0.05 → 0.1** | Standard ADCIRC default`[source-needed]`; allows correct shallow flow |
 | 음수 가능 (조간대) | H0=0.1, with `NODEDRYMIN`/`NODEWETMIN` tuning | Allows true intertidal dynamics |
 
 수심 하한(5m clamp)을 제거한 메시:
@@ -104,7 +105,7 @@ So:
 1. **`HABSMIN = 0.8*H0`, `HOFF = 1.2*H0`** are hard-coded ratios. To tighten/loosen wet/dry, change `H0` itself.
 2. **`NCELE` masking is multiplicative** — once `NODECODE=0`, that node's contribution to all matrix terms is zero (no special branch).
 3. **Re-wetting needs neighbor support** — isolated dry node with rising water can't self-activate; needs at least 2 wet neighbors at `HOFF`.
-4. **`VELMIN` is the velocity trigger** for re-wetting — defaults to small (~0.001 m/s); too high prevents re-wetting.
+4. **`VELMIN` is the velocity trigger** for re-wetting — defaults to small (~0.001 m/s)`[source-needed]`; too high prevents re-wetting.
 5. **Friction recomputed during wetting checks** — Manning conversion happens twice (assembly + wet check) — slight inefficiency but correct.
 
 ## Common Pitfalls

@@ -3,6 +3,7 @@ title: "ADCIRC NWS=19/20/29/30 — GAHM·AHM·OWI hybrid (source-code analysis)"
 topic: storm-surge
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/adcirc/src/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-storm-surge.md (at commit a9618df^) (modeling-wiki 4월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
 note_author: "사용자 + codex source-code 분석 (2026-04 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
 note_date: 2026-04 (original) / 2026-05-23 (promote)
@@ -159,7 +160,7 @@ Ramp duration/configuration:
 
 Applied at `wind.F:1487, 1517` for NWS=19/20.
 
-For typical Korean / Pacific hurricane hindcasts: `DRAMP=2.0` (days), `DRampMete=1.0` (days for met-only ramp).
+For typical Korean / Pacific hurricane hindcasts: `DRAMP=2.0` (days), `DRampMete=1.0` (days for met-only ramp). ⚠ source-needed(관행 권고값 — 공식 문서·논문 미인용).
 
 ## Validation / typical combinations
 
@@ -176,7 +177,7 @@ For typical Korean / Pacific hurricane hindcasts: `DRAMP=2.0` (days), `DRampMete
 
 GAHM docs (`docs/.../generalized_asymmetric_holland_model.rst:670`): evaluated against Best Track, AHM, SLOSH, H*Wind, OWI hindcast winds.
 
-For Korean coast typhoons (e.g., Hinnamnor 2022, Maemi 2003), NWS=20 GAHM with KMA Best Track is the standard.
+For Korean coast typhoons (e.g., Hinnamnor 2022, Maemi 2003), NWS=20 GAHM with KMA Best Track is the standard. ⚠ source-needed(관행 서술 — 출처 미인용).
 
 ## Decision Guide
 
@@ -193,7 +194,7 @@ For Korean coast typhoons (e.g., Hinnamnor 2022, Maemi 2003), NWS=20 GAHM with K
 
 ## Working Rules
 
-- For NWS=20: `BLAdj=0.9` typical (10-m wind reduction); `GEOFACTOR=1.0` (geostrophic) for Northern Hemisphere strong storms; `0.0` (cyclostrophic) for very strong / small storms.
+- For NWS=20: `BLAdj=0.9` typical (10-m wind reduction); `GEOFACTOR=1.0` (geostrophic) for Northern Hemisphere strong storms; `0.0` (cyclostrophic) for very strong / small storms. ⚠ source-needed(권고값 출처 미인용).
 - ATCF Rmax often needs adjustment via ASWIP — pre-process with ASWIP, don't feed raw ATCF.
 - For NWS=30 hybrid: ensure OWI domain extends well outside vortex radius; otherwise blend produces wind-shadow artifacts.
 - Output `fort.73, fort.74` (global pressure/wind) at validation stations to verify forcing.

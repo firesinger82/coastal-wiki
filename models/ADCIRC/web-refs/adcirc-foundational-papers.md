@@ -4,6 +4,7 @@ model: ADCIRC
 doc: adcirc-foundational-papers
 canonical_source: external
 citation_status: verified
+has_source_needed: true
 verification_method: "models/ADCIRC/raw/manuals/pdfs/ 하위 30개 foundational PDF 각각의 첫 페이지를 직접 추출하여 서지(제목·저자·연도·발행기관/보고서번호) 인용. 텍스트 임베드된 PDF(1998~2008 NRL/ERDC/논문)는 pdftotext -f 1 -l 1, 스캔 이미지 PDF(1991~1996 DRP-92-6 시리즈·2001_Becker)는 pdftoppm -r 200 후 tesseract OCR로 첫 페이지 표제 확인. 각 항목 기여 요약은 추출된 표제/초록 문장 근거."
 note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-18

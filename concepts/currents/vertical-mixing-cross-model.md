@@ -3,6 +3,7 @@ title: "연직혼합·난류종결(vertical mixing / turbulence closure) cross-m
 topic: currents
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "전 행이 각 모델 verified source-analysis 노트로 소급(셀에 노트 링크+file:line). 대표 anchor 직접 재확인(2026-07-07): EFDC calavb.f90:45(SFAV0=0.392010)·SWASH SwashKepsMod1DH.ftn90:84-89(ceps1 1.44/ceps2 1.92/cmu 0.09/sigmak 1.0/sigmae 1.3/sigrho 0.5)·Delft3D turclo.f90:350-359(algebraic fl=exp(-2.3Ri)·fs 감쇠함수). 미커버 셀은 §5 disclosed."
 note_author: "Claude Fable 5"
 note_date: 2026-07-07

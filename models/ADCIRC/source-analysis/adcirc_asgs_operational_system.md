@@ -4,6 +4,7 @@ model: ADCIRC
 component: ASGS (ADCIRC Surge Guidance System) — orchestration + Fortran/Perl 유틸리티
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "소스 직접 read: asgs/DESIGN-DESCRIPTION, asgs/README.md, asgs/asgs_main.sh, asgs/generateDynamicInput.sh, asgs/tides/tide_fac.f, asgs/doc/util/aswip.1.txt, asgs/output/FigureGen/FigureGen.F90, asgs/output/part_track_post.sh, asgs/get_atcf.pl·storm_track_gen.pl·control_file_gen.pl·get_nam.pl. 디렉토리는 ls/find로 카탈로그."
 note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-16

@@ -3,6 +3,7 @@ title: "adcirc 3d mode"
 topic: general
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-3d-mode.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
 note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
 note_date: 2026-04~05 (original) / 2026-05-23 (promote)
@@ -174,8 +175,8 @@ Bottom line: ADCIRC-3D is suitable for **storm surge with stratification effects
 
 ## Working Rules
 
-- `IM=21` is the most common 3D-baroclinic configuration.
-- `NFEN=21` (20 sigma layers) is standard for shelf/estuary; up to `NFEN=51` for deep stratification.
+- `IM=21` is the most common 3D-baroclinic configuration. <!-- source-needed: 커뮤니티 관행 단언 — ADCIRC 매뉴얼/문헌/공식 예제 인용 필요 -->
+- `NFEN=21` (20 sigma layers) is standard for shelf/estuary; up to `NFEN=51` for deep stratification. <!-- source-needed: 관행 수치 — 매뉴얼/문헌 인용 필요 -->
 - For Korean coastal storm surge with thermohaline forcing, use `IM=21` + external HYCOM via `couple2baroclinic3D.F` (`IDEN>=5`).
 - MY2.5 (`IEVC=50/51`) is recommended over prescribed profiles for stratified runs.
 - Output `fort.41` (T/S stations) early in run to verify EOS computation.
@@ -184,10 +185,10 @@ Bottom line: ADCIRC-3D is suitable for **storm surge with stratification effects
 ## Common Pitfalls
 
 - ▢ Setting `IM=11` and expecting baroclinic — `IM=11` is barotropic 3D; need `IM=21+` for baroclinic.
-- ▢ Setting `IDEN=4` without providing both S and T BCs — model crashes.
-- ▢ Using simple linear EOS (`Eqnstate=1`) for realistic ocean — gives unrealistic pycnocline.
+- ▢ Setting `IDEN=4` without providing both S and T BCs — model crashes. <!-- source-needed: crash 경로 file:line 인용 필요 -->
+- ▢ Using simple linear EOS (`Eqnstate=1`) for realistic ocean — gives unrealistic pycnocline. <!-- source-needed: 물리 결과 단언 — 문헌/교과서 인용 필요 -->
 - ▢ Confusing `couple2baroclinic3D.F` (external coupling) with true 3D — they look similar but only the latter solves 3D internally.
-- ▢ `IEVC=50` (MY2.5) cold-started with zero `q²` — singular dissipation; init with positive minimum.
+- ▢ `IEVC=50` (MY2.5) cold-started with zero `q²` — singular dissipation; init with positive minimum. <!-- source-needed: singular 거동 file:line 또는 문헌 인용 필요 -->
 - ▢ Hot-start with different `IM` — 3D state arrays incompatible.
 - ▢ Comparing ADCIRC-3D temperature to TEOS-10 reference — slight bias due to legacy EOS; document explicitly.
 - ▢ Forgetting to set bottom drag for 3D — bottom stress comes from 3D BBL, not 2D Manning.
