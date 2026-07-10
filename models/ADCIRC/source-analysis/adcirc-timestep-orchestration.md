@@ -75,8 +75,12 @@ ramp → friction TK(nodalattr Manning→Cd) → radiation stress(wave) → BPG(
 
 ## 5. 시간 적분 레벨
 
-- **3TL**(IS2TIM=0): leapfrog + trapezoidal corrector, ETA0/1/2 3 레벨, ISTL=2(corrector)/3(full).
-- **2TL**(IS2TIM=1): 2 레벨, dynamic timestep(DTDYN, ISDYNSTP) 옵션.
+> ⚠ **정정(L4 후속 2026-07-10)**: 이 절의 이전 서술("3TL IS2TIM=0 leapfrog+trapezoidal / 2TL IS2TIM=1, ISTL, DTDYN, ISDYNSTP")은 **EFDC 파라미터의 혼용 오기**였음 — `rg IS2TIM|ISTL|DTDYN adcirc/src/` 전역 0건(해당 파라미터는 EFDC `aaefdc.f90:3187-3188` dispatch 의 것). 아래가 ADCIRC 실제 구조.
+
+- **GWCE 3-time-level**: 자유표면 상태 `ETA0/ETA1/ETA2`(n−1, n, n+1) — [[adcirc-gwce-implementation]] §B (`gwce.F:2514-2522`).
+- **시간 가중**: fort.15 입력 `A00,B00,C00`(read_input.F:2996) — RHS 에 `C00`(n−1)·`(A00+B00)`(n) 가중(`gwce.F:1540-1543`, `A00pB00` 조립 `:1444`). 별도 θ 파라미터 없음(§B "No semi-implicit Theta").
+- **predictor-corrector**: `CPRECOR` 플래그(`gwce.F:71,182`) — ζ predictor → U,V → ζ corrector.
+- **mass 옵션**: `ILump=0` consistent(JCG solve) / `1` lumped 대각역산(`gwce.F:418-420, 2001-2017`).
 - DT/DT2/DTO2 = [[adcirc-momentum-implementation]] §2.2 와 동일 시간계수.
 
 ## 6. 연결

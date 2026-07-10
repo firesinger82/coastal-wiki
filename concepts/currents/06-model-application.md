@@ -57,6 +57,10 @@ EFDC도 **external(깊이적분 2D)** 과 **internal(3D shear)** 모드를 분�
 
 연직 eddy viscosity 공급 메커니즘(MY2.5 계열 vs k-ε/GLS 계열 vs 진단 KPP)·안정함수 세대·배경 하한·파랑 TKE 주입 여부는 **[[vertical-mixing-cross-model]]** 이 canonical (ROMS·Delft3D·EFDC·SWASH·ADCIRC 3D). 요지: 파랑 표면 TKE 주입은 ROMS GLS(Craig-Banner)만 명시적, EFDC 는 저면응력 경유, SWASH breaking 은 수평 점성 경로 — 성층·상층 혼합 캘리브 시 최대 분기점.
 
+### 0.6 시간적분 — 12모델 cross-model 대조
+
+시간적분 스킴(LF-AM3·3TL/2TL·GWCE 3레벨·ADI·θ semi-implicit·SSP-RK·AB-AM·SMAC projection)·mode splitting·adaptive dt·implicit 성분은 **[[time-integration-cross-model]]** 이 canonical (ROMS·EFDC·ADCIRC·Delft3D-FLOW·FM·SWASH·FUNWAVE·Celeris·XBeach·SFINCS·LISFLOOD-FP·CADMAS). 요지: split-explicit(ROMS 단독) vs semi-implicit 중력파 격리(해양모델 다수) vs explicit CFL-adaptive(천수) vs 고차 RK/multistep(위상해상) 4계보 — dt 고정/적응 여부와 무조건 안정 성분이 모델 선택·런타임 예측의 1차 분기. 부수 적발: [[adcirc-timestep-orchestration]] §5 의 EFDC 파라미터 혼용 정정(2026-07-10).
+
 > 위 §0 의 흐름 해상 claim 은 모두 검수완료 source-analysis 노트로 verified. 아래 §1 이하의 **조류 forcing 입력 포맷·글로벌 datum·한국 해역 권장·검증 임계치**는 모델 manual / 외부 datum 문서(미수록분)로 여전히 source-needed.
 
 ## 1. 모델별 조류 입출력
