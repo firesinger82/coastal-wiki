@@ -83,6 +83,8 @@ External (depth-integrated): GWCE + 2D momentum (always solved).
 
 Internal (3D shear): `VSSOL()` (`timestep.F:1121`), called only when `C3DVS=.TRUE.`.
 
+VSSOL 내부의 연직 시간적분(2TL θ³-가중 Alp1/Alp2/Alp3·복소 q=u+iv tridiagonal·연직 linear FE·w adjoint 보정)은 → **[[adcirc-3d-vssol-vertical-scheme]]** (2026-07-11 신설, 본 노트의 미커버 갭 해소).
+
 Before VSSOL, barotropic pressure terms loaded into `MOM_LV_X`, aliased as `BTP` (`timestep.F:1125`, `global_3dvs.F:94`).
 
 After internal solve, `Qkp1` vertically integrated for:

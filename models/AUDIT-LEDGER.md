@@ -38,7 +38,7 @@ purpose: "사용자 지시(2026-06-16) '모든 모델은 모든 문서·코드�
 | **Delft3D** | engines_gpl 3,503 (+utils) | ✅ 39 노트 (엔진+utils S) | 53 | ✅ 9 (매뉴얼+도구) | ✅ 완료 |
 | **ROMS** | roms/ROMS ~900 | ✅ 33 노트 (4D-Var) | 10 | ✅ 4 (+Exercise 카탈로그) | ✅ 완료 |
 | **FUNWAVE** | TVD 38 + GPU 41 | ✅ 10 노트 | 39 | ✅ 3 (+검증 카탈로그) | ✅ 완료 |
-| **ADCIRC** | adcirc/src 56 (+gahm·asgs) | ✅ 36 노트 (정화 2026-06-18) | 98 | 21 + web-refs(논문 30) | ✅ 완료 |
+| **ADCIRC** | adcirc/src 56 (+gahm·asgs) | ✅ 37 노트 (정화 2026-06-18 + **VSSOL 연직스킴 2026-07-11 = 마지막 코어 갭 해소**) | 98 | 21 + web-refs(논문 30) | ✅ **종결**(2026-07-11) |
 | **EFDC** | 264 (+GVC 301 legacy S) | ✅ 30 노트 (+GVC) | 6 | ✅ 7 (+Training/Grid) | ✅ 완료 |
 | **XBeach** | 118 | ✅ 32 노트 | 9 | 4 | ✅ 완료 (kingsday=master 동계열) |
 | **SWAN** | 77 | ✅ 29 노트 | 9 | 29 | ✅ 완료 |
@@ -175,7 +175,7 @@ purpose: "사용자 지시(2026-06-16) '모든 모델은 모든 문서·코드�
 
 ---
 
-## 5. ADCIRC 🟢 (adcirc/src 56 +gahm +asgs / SA 60)
+## 5. ADCIRC 🟢 **종결 2026-07-11** (adcirc/src 56 +gahm +asgs / SA 37 verified — 구 "SA 60" 은 2026-06-18 정화 전 stale)
 
 ### 5.1 문서 (98 PDF)
 | 분류 | 개수 | 노트 | 상태 |
@@ -188,9 +188,9 @@ purpose: "사용자 지시(2026-06-16) '모든 모델은 모든 문서·코드�
 ### 5.2 코드 모듈
 | 모듈 | 파일 | 티어 | 노트 | 상태 |
 |---|--:|:--:|---|:--:|
-| adcirc/src | 56 | C | gwce·momentum·timestep·wetdry·boundary·met-forcing·tidal·hotstart·3d-mode·baroclinic·dg-continuity·weir·output | ✅ |
+| adcirc/src | 56 | C | gwce·momentum·timestep·wetdry·boundary·met-forcing·tidal·hotstart·3d-mode·**3d-vssol-vertical-scheme(2026-07-11: θ³ Alp1/2/3·복소 tridiag·w adjoint — 마지막 코어 갭)**·baroclinic·dg-continuity·weir·output | ✅ |
 | adcirc/prep | 18 | S | preprocessing-foundation·parallel | ✅ |
-| adcirc/wind·util | 19 | S | (met-forcing·utilities 부분) | 🟡 |
+| adcirc/wind·util | 19 | S | met-forcing(포맷별 reader dispatch 커버)·utilities — S티어 요약으로 충분 판정(2026-07-11: 잔여는 포맷 변환 유틸, 물리 커널 아님) | ✅ (S요약) |
 | gahm/src (GAHM 비대칭 Holland wind) | ~40 | C | **adcirc_gahm_vortex_model**(GahmSolver·radius solver·ATCF isotach·OWI 출력·Vortex 마찰/translation) | ✅ |
 | asgs (자동운영) | ~599 | S | output-writers + **adcirc_asgs_operational_system**(구조·tide_fac·aswip·asgs_main.sh·FigureGen) | ✅ (S요약) |
 

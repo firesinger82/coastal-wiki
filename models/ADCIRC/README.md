@@ -14,13 +14,13 @@
 - **공식 교과서**: Pugh "Tides, Surges and Mean Sea-Level" (`source_id: sea-level`, [`textbook/md/sea-level.md`](../../textbook/md/sea-level.md)) — storm surge 이론 기반
 - **사용 도메인**: 2D/3D barotropic ocean circulation — 조석·폭풍해일·연안 흐름
 - **격자**: unstructured triangular finite element mesh (`fort.14`)
-- **수치 기법**: Generalized Wave Continuity Equation (GWCE), explicit time stepping, parallel (MPI)
+- **수치 기법**: Generalized Wave Continuity Equation (GWCE) — semi-implicit 3-time-level(A00/B00/C00 가중, consistent JCG / lumped 옵션) + 3D internal mode θ³-가중(Alp1/2/3) 복소 tridiagonal([[adcirc-3d-vssol-vertical-scheme]]), parallel (MPI)
 
 ## 하위 디렉토리 현황
 
 | 경로 | 노트 수 | 상태 | 비고 |
 |---|---:|---|---|
-| `source-analysis/` | 36 (storm-surge/·tide/ subdir 포함) | 활발 | NWS modes·GAHM·mesh tools·source-code 분석. `storm-surge/` subdir + `tide/` subdir. (2026-06-18 정화: 개인 local-workflow/ 23 + forcing-input + storm-surge JMA-MSM/NWS13 운영 플레이북 3 제거; 로컬 provenance 중립화) |
+| `source-analysis/` | 37 verified (storm-surge/·tide/ subdir 포함) | **종결 2026-07-11** (AUDIT-LEDGER §5) | NWS modes·GAHM·mesh tools·source-code 분석. **VSSOL 연직스킴(adcirc-3d-vssol-vertical-scheme, 2026-07-11) 으로 마지막 코어 갭 해소**. (2026-06-18 정화: 개인 local-workflow/ 23 + forcing-input + storm-surge JMA-MSM/NWS13 운영 플레이북 3 제거; 로컬 provenance 중립화) |
 | `manual-notes/` | 21 verified | **M-B audit done 2026-05-24** | 21 외부 docs catalog (adcirc.github.io/adcirc.org/github.com URL 검증, WebFetch 03+06 sampling) verified |
 | `web-refs/` | 1 verified | **신설 2026-05-24** | adcirc-official-resources.md — 공식 사이트·GitHub repos (adcirc/adcirc·adcircpy·gahm·asgs·OceanMesh2D)·핵심 논문 (Luettich 1991-92·Westerink 1992·Dietrich 2010-11·Holland 1980) |
 | `raw/` | 1090 .md + 98 pdf + 140 fortran (16.9 GB) | archive | source_code + manuals + website mirror |
