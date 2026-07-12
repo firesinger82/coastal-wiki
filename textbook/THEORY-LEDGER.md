@@ -19,7 +19,7 @@
 | 05 | RANS·난류 | — | hydraulics-and-hydrology | ⬜ | | | |
 | 06 | 경계층 | — | hydraulics-and-hydrology | ⬜ | | | |
 | 07 | 와도 동역학 | — | hydraulics-and-hydrology | ⬜ | | | |
-| **08** | **선형 파동·분산관계** | theory-ch08-linear-waves | holthuijsen2007·water-wave-mechanics·hudspeth2005·coastal-eng-intro-wijetunge | **T1 파일럿** 🔄 | | | |
+| **08** | **선형 파동·분산관계** | [theory-ch08-linear-waves](notes/theory-ch08-linear-waves.md) | water-wave-mechanics(주)·holthuijsen2007 | ✅ **T1 완료**(2026-07-12) | 26 | 92% (24 부착·2 삭제) | ~0.5h |
 | 09 | 비선형 파동·스펙트럼 | — | holthuijsen2007·hudspeth2005 | ⬜ | | | |
 | 10 | 해안 변형 (shoaling·refraction) | — | coastal-eng-intro-wijetunge·coastal-processes-with-eng-apps | ⬜ | | | |
 | 11 | SWAN 모델 | — | ★claim-level 분해 — 일반 이론만 ①, 모델 구현은 models/SWAN 탐색 링크(복제 금지) | ⬜ | | | |
