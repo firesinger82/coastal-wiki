@@ -45,9 +45,20 @@ host: <계산머신 hostname>
 date: 2026-07-06
 evidence:                             # ★객관 데이터 근거 파일 (repo-상대 경로)
   - runs/<host>/EFDC/<case>/2026-07-06/metrics/peak.csv
-repeat_count: 1                       # ★반복 관찰 횟수 (3조건 게이트가 이 값을 봄)
-reproducible: true                    # ★setup/+sha로 재현 가능?
+repeat_count: 1                       # ★반복 관찰 횟수 — 독립 케이스만 계수(동일 설정 단순 재실행은 1회, 2026-07-12 Codex 반영)
+reproducible: true                    # ★setup/+sha로 재현 가능? 결손 시 false + 사유(허위 재현성 금지)
 status: draft-observation             # 계산머신은 항상 draft. verified 부여 금지(=writer 몫)
+wiki_ref: "coastal-wiki@<sha> models/ADCIRC/source-analysis/adcirc-nffr-periodic-flux-boundary.md §4"  # ★setup 근거로 인용한 위키 노트 — 커밋 sha+경로·절 고정(노트 개정 드리프트 방지, 2026-07-12)
+exec:                                 # ★재현성 증거 (manifest.sha256 은 존재 증명일 뿐 — 재생성 정보, 2026-07-12)
+  cmd: "<실행 명령>"
+  model_sha: "<모델 binary/source sha>"
+  env: "<컴파일러·MPI·OS 요지>"
+  forcing_version: "<forcing/관측자료 버전·접근 식별자>"
+gate:                                 # writer PC 게이트 기록 (계산머신은 비움)
+  reviewer: ""                        # 승격 최종 책임 = 사용자
+  verdict: ""                         # promote | hold | reject
+  date: ""
+  reason: ""
 ---
 
 ## 관찰
@@ -72,12 +83,14 @@ status: draft-observation             # 계산머신은 항상 draft. verified �
 
 wiki writer PC(이 PC)만 수행. `coastal-runs`를 **읽기 전용**으로 pull.
 
-### 3.1 3조건 게이트 (전부 충족 시에만 promote)
+### 3.1 3조건 게이트 (전부 충족 시에만 promote — 2026-07-12 Codex 반영 구체화)
 [CLAUDE.md 절대규칙 #2]:
-1. **반복 관찰** — 같은 현상의 관찰 노트가 `repeat_count` 누적(또는 독립 케이스 복수). 1회성은 대기.
-2. **객관 데이터 근거** — `evidence` 파일의 수치/그림이 실재하고 단언을 뒷받침.
-3. **재현 가능** — `reproducible: true` + setup/ + sha로 제3자 재현 가능.
-- 미충족 = **버리지 않고 runs repo에 대기**(반복 관찰이 쌓일 때까지).
+1. **반복 관찰** — **독립 케이스 최소 2건**(동일 설정 단순 재실행은 1회로 계수). 1회성은 대기.
+2. **객관 데이터 근거** — `evidence` 파일의 수치/그림이 실재하고 단언을 뒷받침 — **사람이 파일 직접 확인**(자기선언 불충분).
+3. **재현 가능** — `reproducible: true` + setup/ + `exec` 필드(명령·model_sha·환경·forcing 버전)로 제3자 재현 가능. 결손분은 복원하지 말고 `false`+사유.
+- 미충족 = **버리지 않고 runs repo에 대기**(반복 관찰이 쌓일 때까지). 판정은 `gate:` 필드에 reviewer·verdict·사유 기록 — **최종 승격 책임 = 사용자**.
+- **phase 기술적 완료 ≠ 승격**: 계산 phase 는 산출물 체크로 완료 가능, experience 승격은 본 게이트 별도(1회 파일럿이 phase 를 막지 않음).
+- **역방향(runs→canonical) 게이트**: run 에서 발견한 버그·미문서 거동은 **소스코드로 독립 확인 성공 시에만** models/ SA 노트 반영(G8). 소스 확인 실패분은 runs/experience 에만.
 
 ### 3.2 promote 작성
 - 통과분만 `experience/<topic>.md` 정식 작성. `citation_status`는 근거 확인 후 부여(자동 `verified` 금지 — [coastal-promote](CONVENTIONS.md) 패턴).

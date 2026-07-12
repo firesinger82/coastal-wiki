@@ -1262,3 +1262,63 @@ LLM-Wiki 4계층(L1 검색·L2 graph·L3 MCP·**L4 유지보수 루프**) 중 L4
 - **6 빌딩블록** 대비 현황: Skills(`SKILL.md`+`CLAUDE.md`)·Connectors(`coastal-wiki` MCP+git)·Subagents(maker/checker)·Memory(`ledger.json`) = 충족 / Automation(=V3 cron)·Worktrees(read-only 감사라 불필요) = 미적용.
 - 단일 에이전트 루프 ↔ fleet(오케스트레이터+스페셜리스트) 구분은 V0(단일)→ 추후 다축 감사(링크·출처·신선도 병렬) 시 fleet 고려 여지.
 
+
+---
+
+# Applied Study 전환 계획 (2026-07-12, v2 — Codex adversarial review 1차 MODIFY 반영)
+
+## 트리거
+
+2026-07-12 **12/12 전 모델 종결**(AUDIT-LEDGER) — 바이블(객관 레이어) 1차 완성. 사용자 지시: "시스템 검토 및 이론적 내용을 어떻게 접목해서 applied study로 갈 것인지 Codex 검토를 통해 계획을 세워보자."
+
+## 1. 시스템 검토 (현황 진단)
+
+| 레이어 | 상태 | 평가 |
+|---|---|---|
+| canonical (concepts 10토픽 + models 12종) | 전 모델 종결·cross-model 7편·L4 자가감사 cron 가동 | **1차 완성** — 유지보수 모드 전환 가능 |
+| examples (4건) | 절차 템플릿 수준 (재현 데이터 없음) | 케이스와 연결 시 실체화 |
+| experience (10건 + heuristics/failure-patterns) | 전부 **데이터 분석 계열**(KHOA 조위·SST·EVA) — **모델 run 계열 0건** | 3조건 게이트는 실증됐으나 run 채널 미사용 |
+| coastal-runs 채널 | 계약·양측 클론 완료, observations 실질 0건 | **가장 큰 갭 — 이론→run 연결 실증 0** |
+| 위키 밖 연구본선 | Rmax ±σ 12런 완주·JPM/EVA §15·TSI 보정 경로·KHOA 2024 대기 | run 산출물 채널 미등록 |
+
+**진단**: 병목은 지식이 아니라 **파이프라인 실사용** — 바이블→케이스 방향의 prospective 완주 사례가 없다.
+
+## 2. 접목 메커니즘 (Codex 반영판)
+
+1. **Setup 근거 인용 체계**: 케이스의 모든 설정 선택에 위키 verified 노트 인용 부착 — 단, **`coastal-wiki@<sha>` + 경로·절을 run 문서 필수 필드로 고정**(노트 개정에 따른 근거 드리프트 방지, Codex #4). 예: 기본 마찰 off 함정 3형제, ADCIRC NFFR 부호(내향 양)·NWS=13 경로, SWASH β sentinel.
+2. **Pre-run 체크리스트 — claim 기준 분할**(D-1 확정, Codex #1): 소스코드·식에서 직접 도출되고 항목별 file:line 근거가 있는 **안정적 함정 원형**만 `models/<model>/source-analysis/playbooks/`(G8 허용). 특정 격자·forcing·보정값·실행순서 의존 체크리스트와 체크 **결과**는 coastal-runs 에 두고 위키 playbook 을 고정 커밋으로 인용.
+3. **run→experience 게이트 구체화**(Codex #5·#6): observations frontmatter 에 기존 3조건 외 **reviewer·판정일·기각/대기 사유** 기록. 반복 관찰 = **독립 케이스**(동일 설정 단순 재실행은 1회로 계수) 최소 2건 + evidence 파일 사람 확인. 최종 승격 책임 = 사용자(G7). **phase 기술적 완료 ≠ experience 승격** — 별도 상태(1회 파일럿은 phase 완료 가능하되 승격은 반복 축적 후).
+4. **역방향 피드백 — source 확인 게이트**(Codex #7): run 발견(버그·미문서 거동) → **소스코드로 독립 확인 성공 시에만** canonical SA 노트 반영(선례: SFINCS Green-Ampt 도 소스 라인 확인 후 기록). 소스 확인 실패분은 coastal-runs observations 또는 게이트 후 experience 에만.
+5. **재현성 증거 강화**(Codex 구조결함 지적): setup/+manifest.sha256 에 더해 **실행 명령·모델 binary/source SHA·환경·forcing/관측자료 버전** 기록 — RUNS-CHANNEL §2.1 스키마 개정 대상.
+
+## 3. Applied study 트랙 (조건부 의존성 그래프 — Codex #8, 구 B→A→C 직렬 폐기)
+
+| 트랙 | 내용 | 진척 | 상태 |
+|---|---|---|---|
+| **A. 폭풍해일 설계 (JPM·EVA)** | 한국 연안 확률론적 설계해일고 — 논문 v0.7 방어 단계·Rmax ±σ 12런 완주 | **최고** | **활성 (즉시)** |
+| **B. 조석 캘리브레이션** | ADCIRC 한국 연안 조석, KHOA 49정점 16yr UTide 검증 기준 | 중 | 활성 (병렬) |
+| **C. Surge surrogate/ML** | run DB → surrogate 훈련 (사용자 핵심 관심사) | 하 | C0(설계)만 조기 착수 |
+| **D. 커플링/복합침수** | ADCIRC+SWAN↔SFINCS | 하 | **backlog** (첫 run→experience 완주 전 보류, Codex #10) |
+
+**의존성 (조건부)**: B 는 A 의 선행조건이 **아님** — A 는 기존 진척으로 즉시 지속. 단 **B 와 A 가 동일 ADCIRC 격자·수심·마찰·경계 체계를 공유함이 입증되면** B 조석 보정 결과가 A2/A3 의 조건부 게이트가 됨(공유 여부 확인이 B1 산출물). C 는 A3 run DB 에 의존하되 **C0(데이터 계약·입출력 변수·DOE 표본설계)는 A3 이전 병렬 착수** — EVA 용 JPM 표본과 ML 훈련 표본은 요구 분포가 다름(parameter-space coverage·극값 밀도), A3 를 이중목적으로 쓰려면 C0 설계가 먼저.
+
+## 4. 로드맵 (phase — 명칭 트랙 접두)
+
+- **P0 (schema spike, 즉시)**: **대표 케이스 1건**(Rmax 12런 중 1)만 coastal-runs 스키마로 등록(구 A0 전량 소급 폐기 — Codex #3 과잉 판정). provenance 결손(당시 환경·해시 미보존)은 복원하지 않고 **결손으로 명시**(`reproducible: false` + 사유). 성공조건: 스키마 필드 전부 채워지고 게이트 심사 1회 모의 통과.
+- **B1 (조석 파일럿)**: ADCIRC 조석 1케이스 — **범위 확정 필수**(Codex #9): 계산기간·검증 정점 subset(49 전체가 아닌 대표 N)·캘리브레이션 변수(마찰·경계 분조)·합격 임계값(RMSE/분조 진폭·위상 오차)을 B1 착수 시 명문화. fort.15 셋업 전체 위키 인용 문서화(§2-1 표준 확립).
+- **A2 (surge hindcast)**: 실태풍(Hinnamnor 등) GAHM vs JMA-MSM(NWS=13) 이원 forcing — B1 과 모델 구성 공유 시 B1 통과를 게이트로.
+- **A3 (JPM run DB 확장)**: EVA 갱신 + (C0 설계 충족 시) surrogate 훈련데이터 겸용 — **EVA 표본과 ML 표본 설계를 분리 정의**.
+- **C1 (surrogate 훈련)**: C0 적합성 검사를 통과한 A3 DB 로.
+- 각 phase 게이트: 기술적 완료(산출물 체크) / experience 승격(3조건+reviewer) **분리 심사**.
+
+## 5. 결정 기록 (Codex 1차 검토 판정 반영)
+
+- **[D-1 확정]** claim 기준 분할 — source-grounded 원형=위키 playbooks, case-specific=coastal-runs (Codex MODIFY→반영).
+- **[D-2 확정]** coastal-runs 단일 SSOT (Codex APPROVE). 논문 원고·배포 코드가 독립 협업/공개 수명주기를 가질 때만 별도 repo, run 데이터는 복제 않고 `coastal-runs@<sha>` 참조.
+- **[D-3 확정]** 대표 케이스 1건 schema spike (Codex APPROVE — 전량 소급은 허위 재현성 위험).
+- **[D-4 폐기→재설계]** B→A→C 직렬 의존 REJECT — §3 조건부 그래프로 교체.
+- **[D-5 반영]** 비례성 역전 교정 — 백필 축소·게이트 기준 구체화(§2-3)·D 트랙 backlog.
+
+## 검증 이력
+
+- 2026-07-12 Codex adversarial review 1차: **MODIFY** — D-1 MODIFY/D-2 APPROVE/D-3 APPROVE(대표만)/D-4 REJECT/D-5 MODIFY + 구조결함 10건(게이트 판정 모호·phase/승격 혼동·역방향 G8 위반 가능·재현성 증거 부족·위키 드리프트·A3 이중목적·A1 범위·소유권·명칭 충돌·범위 팽창) → v2 전면 반영.
