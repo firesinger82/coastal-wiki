@@ -40,7 +40,7 @@ related:
 
 - 조위 시계열을 조화 성분 합으로 전개: $\eta(t) = Z_0 + \sum_i H_i\cos(\omega_i t - g_i)$ — **평형 조석의 조화 전개**가 §4:2 의 출발 (sea-level, p.98; nodal 보정 §4:2:2). 성분 결정은 **최소제곱 fitting** (sea-level, p.112-113).
 - **주요 성분 주기** (stewart-physical-ocean, p.319 표): M₂ 12.4206 h · S₂ 12.0000 h · N₂ 12.6584 h (+K₁·O₁ 일주 성분 동일 표). 정밀 전개는 **Cartwright & Tayler(1971)** 계열 (sea-level, p.113).
-- **Doodson 조화 전개·성분 명명 체계**: 조석 포텐셜을 6개 기본 천문 주파수의 Fourier 급수로 전개, 각 성분에 **Doodson number** $f=n_1f_1+\cdots+n_6f_6$ 부여 — 예: M₂ = 255.555 (stewart-physical-ocean, p.318-319, Eq. 17.17·Table 17.1). ※연도 표기는 출처 간 불일치 — Stewart 는 "Doodson (1922)"(p.319), Pugh 는 서지 목록에서 "Doodson (1921)"(sea-level, p.74; 본문 아닌 참고문헌 나열). ★원문 교재의 "1924" 는 어느 출처로도 미지지 — 오기.
+- **Doodson 조화 전개·Doodson 번호 식별 체계**: 조석 포텐셜을 6개 기본 천문 주파수의 Fourier 급수로 전개(Eq. 17.17, p.318), 각 성분을 **Doodson number** $f=n_1f_1+\cdots+n_6f_6$ 로 식별 — 예: M₂ = 255.555 (stewart-physical-ocean, p.318-319; Table 17.1 은 p.319). ※연도 표기는 출처 간 불일치 — Stewart 는 "Doodson (1922)"(p.318), Pugh 는 서지 목록에서 "Doodson (1921)"(sea-level, p.74; 본문 아닌 참고문헌 나열). ★원문 교재의 "1924" 는 어느 출처로도 미지지 — 오기.
 - **얕은물 비선형 배음**: 천해에서 비선형성이 M₄·S₄ 등 4분일주(fourth-diurnal) 성분을 생성 — nodal 인자는 모성분의 곱을 따름, 예: $f(M_4)=f(M_2)\times f(M_2)$ (sea-level, p.124).
 - 예측: 추출 성분으로 임의 미래 시점 합성 — 기계식 **조석 예측기는 Lord Kelvin & Edward Roberts, 1873** (sea-level, p.155 — ★원문 교재의 "1862" 는 오기, 출처 기준 정정).
 
