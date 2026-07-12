@@ -45,7 +45,7 @@ let source_term = vec4<f32>(
 ```
 4성분 = [질량(dhdt/침투), x운동량, y운동량, scalar transport]. x운동량 항만 보면:
 - `-g·h·detadx` : eta 경사 압력 구동 (`detadx`는 분산 켜질 때 4차 차분, `:241`)
-- `-Hu·friction_` : 바닥 마찰 (`FrictionCalc`, `:67-93`; Manning 옵션 `:82-83`)
+- `-Hu·friction_` : 바닥 마찰 (`FrictionCalc`, `:67-93`) — **식 전개(2026-07-12 보강)**: `isManning==1`이면 `f=g·n²/h^{1/3}`(`:82-83`), 아니면 `f=friction`(무차원 Moody); **f≤0.5 클램프**(`:87` 'non-physical above 0.5'); 마찰항 = `f·√(hu²+hv²)·divide_by_h2`, 여기서 `divide_by_h2=2h²/(h⁴+max(h⁴,1e-6))/base_depth²`(`:74-77`) — ★h⁴ 단정밀도 스케일링 탓에 **수심 <~5% base_depth 에서 마찰 과소**(소스 주석 `:69-73` disclosed). 기본값 `friction=0.000`·`isManning=0`(constants_load_calc.js:42-43) — **기본 마찰 off**.
 - `breaking_x` : 파괴 와점성 유발 운동량 확산 (`:361`, `useBreakingModel`일 때 `txDissipationFlux` 차분)
 - `(Psi1x + Psi2x)` : **Boussinesq 분산 source** (§2)
 - `press_x` : 외부 압력 경사 `-0.5·h·(g/dx)·(P_right-P_left)` (`:314`)

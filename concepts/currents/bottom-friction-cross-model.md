@@ -70,7 +70,7 @@ related:
 - **Delft3D**: cohesive 침식은 total 아닌 **skin friction** 구동([[delft3d_sediment_transport_formulae]]) — 마찰 τ 인용 시 어느 τ 인지 확인.
 - **SWAN**: FRICTION command 미지정 시 저면마찰 **완전 off**(기본 활성 아님) — 천해역 과대 파고의 단골 원인.
 - **XBeach**: `fwcutoff` 기본 1000 m = 사실상 무게이트. 5 m 등으로 낮추면 도메인 대부분 파마찰 비활성(pitfall).
-- **미커버(위키 갭)**: ADCIRC NOLIBF 기본값·HBREAK/FTHETA 수치·3D BBL(vsmy.F) 상세 / FUNWAVE `Cd` 기본 수치 / Celeris FrictionCalc 공식 전개(WGSL :82-83 라인 참조만). 후속 source-analysis 대상. ~~SWASH `irough` 기본값·입력 키워드~~ — **해소(2026-07-12)**: `FRICtion` 카드 키워드 생략 시 **MANNing 기본**(n=0.019); CON 0.002·CHEZ 65·LOG(SMOOTH 기본)·COLE·LIN=11, 카드 생략 시 마찰 off(irough=0, SwashInit.ftn90:313) — SwashReadInput.ftn90:777-806, [[swash-bottom-friction-wind]] 갱신.
+- **미커버(위키 갭)**: ADCIRC NOLIBF 기본값·HBREAK/FTHETA 수치·3D BBL(vsmy.F) 상세. ~~FUNWAVE `Cd` 기본 수치~~ — **해소(2026-07-12)**: ★`Cd_fixed` 기본 **0.0(마찰 완전 off)** — io.F:2777-2783 이 미지정 시 0.0 대입 + 경고 출력('possibly you used FRICTION_MATRIX'), init.F:887 전 격자 배포. SWAN 기본 off 와 같은 함정 계열(§5 첫 항목과 대구). ~~Celeris FrictionCalc 공식 전개~~ — **해소(2026-07-12)**: Pass3_\*.wgsl:67-92 — `isManning==1`이면 `f=g·n²/h^{1/3}`, 아니면 `f=friction`(무차원 Moody), **f 상한 0.5 클램프**('non-physical above 0.5'), 마찰항 `f·√(hu²+hv²)·2h²/(h⁴+max(h⁴,1e-6))/base_depth²` — ★h⁴ 단정밀도 스케일링으로 **수심 <~5% base_depth 에서 마찰 과소**(소스 주석 disclosed). ★기본 friction=**0.000**·isManning=0(constants_load_calc.js:42-43) — Celeris 도 기본 마찰 0. ~~SWASH `irough` 기본값·입력 키워드~~ — **해소(2026-07-12)**: `FRICtion` 카드 키워드 생략 시 **MANNing 기본**(n=0.019); CON 0.002·CHEZ 65·LOG(SMOOTH 기본)·COLE·LIN=11, 카드 생략 시 마찰 off(irough=0, SwashInit.ftn90:313) — SwashReadInput.ftn90:777-806, [[swash-bottom-friction-wind]] 갱신.
 
 ## 6. 관련
 

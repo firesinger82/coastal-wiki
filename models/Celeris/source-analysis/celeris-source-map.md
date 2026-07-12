@@ -53,7 +53,7 @@ Bndry   경계조건 재적용 (2차)                           BoundaryPass.wgs
 |---|---:|---|
 | `main.js` | 4368 | **오케스트레이션**: init, 셰이더 fetch/컴파일, 파이프라인·바인드그룹 생성, `frame()` 루프, UI/이벤트, 패스 dispatch 시퀀스 |
 | `site.js` | 4 | 엔트리 모듈 로더 |
-| `constants_load_calc.js` | 556 | 파이프라인 설정·기본 config·파생 상수 계산 (Courant·dt·Bcoef 등) |
+| `constants_load_calc.js` | 556 | 파이프라인 설정·기본 config·파생 상수 계산 (Courant·dt·Bcoef 등). ★**dt 정적 확정(2026-07-12)**: `dt=Courant_num·min(dx,dy)/√(g·base_depth)`(:404, Courant_num 기본 0.15 :27) — 재계산은 main.js:1614 의 `html_update>0` 블록(UI 변경 시)뿐, frame 루프 per-step CFL 재산정 없음 |
 | `Config_Pipelines.js` | 283 | **파이프라인 팩토리**: `createComputePipeline`/`createRenderPipeline`/skybox/model (l.6,22,111,150) — 셰이더 코드 인자로 받는 범용 함수 |
 | `Create_Textures.js` | 100 | **텍스처 할당** 팩토리: 2D rgba32f / 3D rgba16f / bgra8 / 1D (l.3,16,29,55,69) |
 | `Copy_Data_to_Textures.js` | 527 | CPU→GPU 데이터 전송 (bathy·waves·이미지) |

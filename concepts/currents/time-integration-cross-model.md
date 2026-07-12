@@ -94,7 +94,7 @@ related:
 
 - **★ADCIRC 노트 오염 적발·정정(2026-07-10)**: [[adcirc-timestep-orchestration]] §5 가 EFDC 파라미터(IS2TIM/ISTL/DTDYN/ISDYNSTP)를 ADCIRC 에 혼용 서술했었음 — ADCIRC src 전역 rg 0건으로 확정, A00/B00/C00·CPRECOR·ILump 기반으로 §5 재작성 완료. cross-model 작업이 모델 간 서술 누출을 잡은 사례.
 - **Celeris 시간적분 위치**: AB3/AM4 분기는 shader 측(`Pass3_Bous.wgsl:398-409` 직접 재확인, [[celeris-source-map]] `:400-409` 인용과 일치; Pass3_NLSW·SedTrans_Pass3* 에 동형 반복) — JS 측 `main.js` 는 uniform(`timeScheme`·`pred_or_corrector`) 세팅만. 검색 시 JS 만 뒤지면 못 찾는 함정.
-- **Celeris dt 정적**: 실행 중 dt 재산정 로직이 노트·코드 스코핑에서 확인 안 됨 — `base_depth` 특성수심 기반 초기 추정뿐. 얕은 국소 수심에서 CFL 위반 가능성은 미검증 `[source-needed]`.
+- **Celeris dt 정적 — 확정(2026-07-12, 소스직독)**: `dt = Courant_num·min(dx,dy)/√(g·base_depth)`(constants_load_calc.js:404, Courant_num 기본 **0.15** :27 — 주석 '~0.25 P-C, ~0.05 explicit'). 재계산은 main.js:1614 뿐이며 **`html_update>0` 블록 내부(사용자 UI 파라미터 변경 시)** — 렌더 루프 per-step CFL 재산정 없음. 즉 런 중 dt 정적이 소스로 확정; 얕은 국소 수심 CFL 위반 가능성(base_depth 기준 산정)은 구조적으로 잔존하는 특성.
 - **θ 기본값**: ~~SWASH `theta/theta3`(pnums) 기본값~~ — **해소(2026-07-12)**: `TIMEI METH IMPL THETAC/THETAS`(연속식/수위경사, pnums 1/4)·`VERT THETAU/THETAW`(u·w 연직항, pnums 31/32) 전부 기본 **0.5**(SwashReadInput.ftn90:1866-1867,1900-1901); 비정수압 `NONHYD [theta]`(pnums 5)는 기본 -1 sentinel → CheckPrep 이 **1.0 완전 implicit** 확정(SwashCheckPrep.ftn90:1273-1286, [[swash-nonhydrostatic-pressure-solver]] §6 갱신). **잔존 미커버**: FM θ 수치값·Delft3D ADI advection explicit 성분의 정량 CFL — 해당 노트 disclosed TODO.
 - **ROMS `nfast≠NDTFAST` 함정**: 필터 support 가 NDTFAST 를 초과 — substep 수를 NDTFAST 로 가정한 후처리/디버깅 오류 주의([[roms_barotropic_2d]]).
 - **EFDC NTSTBC 과대 함정**: corrector 주기 >100 시 leapfrog computational mode 성장(checkerboard HP) — [[efdc_hydro_core]] Working Rules.

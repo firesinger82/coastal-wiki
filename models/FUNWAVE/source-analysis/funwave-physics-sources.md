@@ -44,7 +44,7 @@ note_date: 2026-06-13
 
 ## 4. 운동량 소스항 SourceTerms (sources.F:56) — 합산 허브
 운동량식 SourceX/Y에 모든 항 합산:
-`SourceX = g·η/DX·(Depthx(I+1)−Depthx(I))` [수심구배압력] `+ FrcInsX`[마찰 −Cd·U·|V| 또는 Manning −(g·n²/H^(1/3))] `+ Gamma1·MASK9·H·`[Boussinesq 분산] `+ WaveMaker_Mass·U`[조파]. 조건부: FRICTION_SPONGE/BREAKWATER(−CD·U·|V|·Depth), WindForce(+RHO_AW·Cdw·WindU·|Wind|), Smagorinsky(nu_smg 전단발산), VISCOSITY_BREAKING(BreakSourceX HU확산), VESSEL(VesselPressureX), AirPressure(StormPressureX). WaveMaker_Mass: WK_REG `tanh(πt/Tr)D_gen·exp(−β(x−Xc)²)sin(rlamda·y−2πt/T)`, WK_IRR/DATA2D Σ성분.
+`SourceX = g·η/DX·(Depthx(I+1)−Depthx(I))` [수심구배압력] `+ FrcInsX`[마찰 −Cd·U·|V| 또는 Manning −(g·n²/H^(1/3))] `+ Gamma1·MASK9·H·`[Boussinesq 분산] `+ WaveMaker_Mass·U`[조파]. ★**`Cd` 기본값 = 0.0(마찰 완전 off, 2026-07-12 확인)** — `Cd` 카드 미지정 시 io.F:2777-2783 이 `Cd_fixed=0.0` 대입 + 경고 출력("Cd_fixed Default: 0.0, possibly you used FRICTION_MATRIX"), init.F:887 이 전 격자 배포. 마찰이 필요한 런은 `Cd` 또는 `FRICTION_MATRIX` 명시 필수([[bottom-friction-cross-model]] §5 함정 계열). 조건부: FRICTION_SPONGE/BREAKWATER(−CD·U·|V|·Depth), WindForce(+RHO_AW·Cdw·WindU·|Wind|), Smagorinsky(nu_smg 전단발산), VISCOSITY_BREAKING(BreakSourceX HU확산), VESSEL(VesselPressureX), AirPressure(StormPressureX). WaveMaker_Mass: WK_REG `tanh(πt/Tr)D_gen·exp(−β(x−Xc)²)sin(rlamda·y−2πt/T)`, WK_IRR/DATA2D Σ성분.
 
 ## 5. 시간평균·범람 mixing.F·masks.F
 - `MIXING_STUFF`(mixing.F:53)→`CALCULATE_MEAN`(:108): time≥STEADY_TIME 시 Umean·ETAmean·복사응력(Sxx=UUmean−WWmean+0.5g·ETA2mean 경도)·SigWaveHeight `Hsig=4.004√(ETA2mean)`·zero-upcrossing 파고

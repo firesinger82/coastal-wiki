@@ -37,12 +37,12 @@ purpose: "사용자 지시(2026-06-16) '모든 모델은 모든 문서·코드�
 | **SWASH** | 160 | ✅ 21 노트 (전수 + linear/unstructured-solvers 2026-07-04 + **핀포인트 4갭 소스직독 해소 2026-07-12**) | 2 | ✅ 2 | ✅ **종결**(2026-07-12) |
 | **Delft3D** | engines_gpl 3,503 (+utils) | ✅ 39 노트 (엔진+utils S) | 53 | ✅ 9 (매뉴얼+도구) | ✅ 완료 |
 | **ROMS** | roms/ROMS ~900 | ✅ 33 노트 (4D-Var) | 10 | ✅ 4 (+Exercise 카탈로그) | ✅ 완료 |
-| **FUNWAVE** | TVD 38 + GPU 41 | ✅ 10 노트 | 39 | ✅ 3 (+검증 카탈로그) | ✅ 완료 |
+| **FUNWAVE** | TVD 38 + GPU 41 | ✅ 11 노트 (wk-data2d·build-blackwell 포함 실측) | 39 | ✅ 3 (+검증 카탈로그) | ✅ **종결**(2026-07-12; ★Cd 기본 0.0 마찰 off 갭 해소) |
 | **ADCIRC** | adcirc/src 56 (+gahm·asgs) | ✅ 37 노트 (정화 2026-06-18 + **VSSOL 연직스킴 2026-07-11 = 마지막 코어 갭 해소**) | 98 | 21 + web-refs(논문 30) | ✅ **종결**(2026-07-11) |
 | **EFDC** | 264 (+GVC 301 legacy S) | ✅ 38 노트 (+GVC legacy·**CALUVW 전단솔버 2026-07-11 = 마지막 코어 갭**) | 6 | ✅ 9 (+Training/Grid·Ch5/Ch6 cross-walk) | ✅ **종결**(2026-07-11; GVC 불요·GOTM T티어 판정) |
-| **XBeach** | 118 | ✅ 32 노트 | 9 | 4 | ✅ 완료 (kingsday=master 동계열) |
+| **XBeach** | 118 | ✅ 33 노트 (intrawave 2026-07-07 포함 실측) | 9 | ✅ 4 | ✅ **종결**(2026-07-12; eps·wetz 산정식 갭 해소) |
 | **SWAN** | 77 | ✅ 29 노트 (58파일 커버리지 감사 8후보 전원 기작성 + swancom1 crosswalk 2026-07-04) | 9 | 29 | ✅ **종결**(2026-07-12; §11 판정) |
-| **Celeris** | WebGPU JS+CUDA | ✅ 9 노트 | 3 | 1 + web-refs(Lynett 2026) | ✅ 완료 |
+| **Celeris** | WebGPU JS+CUDA | ✅ 9 노트 | 3 | 1 + web-refs(Lynett 2026) | ✅ **종결**(2026-07-12; breaking 계수·FrictionCalc·dt 정적 3갭 해소) |
 | **SFINCS** 🆕 | src 36 (f90) | ✅ 8 노트 (전 코어, 검수) | readthedocs + **v2.4.0 릴리스** | ✅ 4 (numerical·params-io·**v2.4.0 검증 testbed 77케이스**·**changelog**) | ✅ 완료 (코드+문서+검증) |
 | **LISFLOOD-FP** 🆕 | classic+swe+cuda (C++/CUDA) | ✅ 7 노트 (전 솔버, 검수) | user manual PDF | ✅ 1 (user-manual) | ✅ 완료 (코드+문서) |
 | **CADMAS-SURF** 🆕 | 4 시뮬 ~1255 (f/f90) | ✅ 17 노트 (**코드 100% 포섭**: C티어 13(entrapped-air 포함) + S티어/커버리지 4) | **26 PDF 전수** | ✅ 5 (SURF3D·2F·STR·AGENT 영문 cross-confirm + 카탈로그) | ✅ **종결**(2026-07-12; 잔여=일문매뉴얼 중복·바이너리 3툴 내부·LICENSE 부재 — 전부 disclosed 비코어 판정) |
@@ -161,21 +161,23 @@ purpose: "사용자 지시(2026-06-16) '모든 모델은 모든 문서·코드�
 
 ---
 
-## 4. FUNWAVE 🟠 (TVD 38 + GPU 41 / SA 9)
+## 4. FUNWAVE 🟢 **종결 2026-07-12** (TVD 38 + GPU 41 / SA 11 — 구 "SA 9" 헤더 stale)
+
+> **종결 판정(2026-07-12)**: 코드 TVD 38+GPU 41 = C티어 전수(SA 11: TVD 9 + GPU 2). cross-model flag 마지막 갭 해소 — ★**`Cd` 기본값 = 0.0(마찰 완전 off)**, io.F:2777-2783 미지정 시 0.0+경고, init.F:887 배포([[bottom-friction-cross-model]] §5 함정 계열, physics-sources 노트 반영). 문서 잔여는 전부 비코어 — 매뉴얼 2종·검증 케이스는 MN 3(tvd-manual·user-manual-full·validation-cases 카탈로그)이 커버, ~33 PDF 는 validation 출력물(examples 티어), Intro-CHL-TN 은 user-manual 과 중복 개요.
 
 ### 4.1 문서 (39 PDF — 대부분 validation 출력 caseA/B/C·sph_sol 등 → examples 티어)
 | PDF | 종류 | 노트 | 상태 |
 |---|---|---|---|
-| funwave_tvd_2.1_manual / funwave_tvd_3.0 | 사용자 매뉴얼 | — | ⬜ |
-| Intro-to-FUNWAVE-CHL-TN | 기술노트 | — | ⬜ |
+| funwave_tvd_2.1_manual / funwave_tvd_3.0 | 사용자 매뉴얼 | funwave-tvd-manual·funwave-user-manual-full | ✅ |
+| Intro-to-FUNWAVE-CHL-TN | 기술노트 | — (user-manual 중복 개요 — 비코어 판정 2026-07-12) | ⬜ |
 | funwave_code_analysis | 코드분석 | funwave-code-graph(자체) | 🟡 |
-| caseA/B/C·comp_beach·sph_sol·monai 등 ~33 | 검증 출력 | — | ⬜ (examples) |
+| caseA/B/C·comp_beach·sph_sol·monai 등 ~33 | 검증 출력 | funwave-validation-cases(카탈로그) | ✅ (examples 티어) |
 
 ### 4.2 코드 모듈
 | 모듈 | 파일 | 티어 | 노트 | 상태 |
 |---|--:|:--:|---|:--:|
-| FUNWAVE-TVD/src | 38 | C | dispersion-solver·flux-tvd·physics-sources·feature-modules·infrastructure·source-map·code-graph | ✅ |
-| FUNWAVE-GPU/src | 41 | C | gpu-source + **gpu-cuda-port(kernel launch·MGPU halo exchange·cuSPARSE v2)** | ✅ |
+| FUNWAVE-TVD/src | 38 | C | dispersion-solver·flux-tvd·physics-sources·feature-modules·infrastructure·source-map·code-graph·**wk-data2d-spectral-wavemaker(2026-07-07)** | ✅ |
+| FUNWAVE-GPU/src | 41 | C | gpu-source + **gpu-cuda-port(kernel launch·MGPU halo exchange·cuSPARSE v2)** + build-and-blackwell-port | ✅ |
 
 ---
 
@@ -207,15 +209,19 @@ purpose: "사용자 지시(2026-06-16) '모든 모델은 모든 문서·코드�
 
 ---
 
-## 7. XBeach 🟢 (118 / SA 32) — 양호
+## 7. XBeach 🟢 **종결 2026-07-12** (118 / SA 33 — intrawave-sediment 2026-07-07 포함)
 
-xbeachlibrary(66) 코어 광범위 커버(flow_solver·morphology·nonh·q3d·wave_*·boundary·avalanching·groundwater·vegetation·ship_waves·bed_friction·single_dir·infrastructure·output 등). 문서 9 PDF 중 manual_master/kingsday·usersguide·non-hydrostatic_report·Parallellization_report. 잔여: manual-notes 3 → 매뉴얼 PDF 전수화 여지.
+xbeachlibrary(66) 코어 광범위 커버(flow_solver·morphology·nonh·q3d·wave_*·boundary·avalanching·groundwater·vegetation·ship_waves·bed_friction·single_dir·infrastructure·output + intrawave-sediment). 문서 9 PDF 중 manual_master/kingsday·usersguide·non-hydrostatic_report·Parallellization_report — **manual-notes 4**(master-manual·local-stack·DELILAH·Holland ref).
+
+> **종결 판정(2026-07-12)**: cross-model flag 마지막 갭 소스직독 해소 — `eps` 기본 **0.005 m**(params.F90:1398)·wet/dry 마스크 산정식 `compute_wetcells`(wetcells.F90:75-117 — wetz=`hh>eps+numeps`, wetu 는 hu·hum 이중조건, wete 는 파고 δ·H 가산)·형태학 갱신 후 재산정+dry 클램프(morphevolution.F90:3202-3208) — [[xbeach_flow_solver]] §5 반영. 잔여 매뉴얼 PDF 심화는 master-manual 노트(물리 정식화+params reference)가 코어 커버 — 비코어 판정. (kingsday=master 동계열 기판정.)
 
 ---
 
-## 8. Celeris 🟢 (WebGPU JS+CUDA / SA 9) — 양호
+## 8. Celeris 🟢 **종결 2026-07-12** (WebGPU JS+CUDA / SA 9)
 
 Celeris-WebGPU(JS + .wgsl/.cu compute shader). boussinesq-solver·breaking·fv-reconstruction·render·sediment·webgpu-infra·coulwave·pipeline-graph·source-map 커버. 문서 3 PDF(Tavakkol 2017/2020·Lynett 2026) = web-refs 2. 코어 솔버 ✅.
+
+> **종결 판정(2026-07-12)**: cross-model flag 3갭 전부 소스직독 해소 — ①breaking 계수 기본값 dzdt_I 0.50/dzdt_F 0.15/T_star 5.0/δ_b 2.0(constants_load_calc.js:51-54) ②FrictionCalc 식 전개(Pass3_\*.wgsl:67-92 — Manning `g·n²/h^{1/3}` 또는 무차원 f, f≤0.5 클램프, ★h⁴ 단정밀도 스케일링=수심<5% base_depth 마찰 과소 disclosed, ★기본 friction=0.000 off) ③**dt 정적 확정**(constants_load_calc.js:404 `Courant_num 0.15·√(g·base_depth)` 기반 1회 산정, main.js:1614 재계산은 UI 변경 시만 — 기존 `[source-needed]` 미검증 → 소스 확정 전환). 잔여 없음 — CUDA 쌍둥이는 WebGPU 와 동형(coulwave·pipeline-graph 커버).
 
 ---
 

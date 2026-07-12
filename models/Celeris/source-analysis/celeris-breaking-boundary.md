@@ -33,6 +33,8 @@ let dzdt_I = globals.dzdt_I_coef * c_here;                    // 개시(initiati
 let dzdt_F = globals.dzdt_F_coef * c_here;                    // 종료(final) 임계
 ```
 
+**계수 기본값(2026-07-12 확인)**: `dzdt_I_coef=0.50`('start breaking parameter')·`dzdt_F_coef=0.15`('end')·`T_star_coef=5.0`('length of time until breaking becomes fully developed')·`delta_breaking=2.0`('eddy viscosity coefficient') — constants_load_calc.js:51-54.
+
 쇄파 나이에 따라 임계 `dzdt_star`를 시간 보간(`:104-112`):
 
 ```wgsl

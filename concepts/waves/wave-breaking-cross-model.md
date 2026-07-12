@@ -45,7 +45,7 @@ related:
 |---|---|---|---|---|---|
 | **SWASH** | **HFA**(정수압 전환) | `∂ζ/∂t > α·√(gh)`(SwashBreakPoint.ftn90:119) → `q=0`(:123) | **α 0.6 / β 0.3**(hysteresis) | 비정수압 제거→bore 자동소산(운동량 보존), ★brks→wets=0 dry 표시(:238) | [[swash-wetting-drying-runup]] |
 | **FUNWAVE** | **Kennedy 2000 eddy viscosity** | `η_t ≥ Cbrk1·√(gh)`(breaker.F:151, tmp1=Cbrk1·√gh :124-125) | **Cbrk1 0.65 / Cbrk2 0.15** | `ν_br=cap1·Cbrk2√gh·(1+B)`(:142) 운동량 확산항(BreakSourceX), AGE 나이추적 | [[funwave-physics-sources]] |
-| **Celeris** | Kennedy eddy viscosity(WGSL) | `∂η/∂t > dzdt_I_coef·c`(Pass_Breaking.wgsl:100) | dzdt_I/F_coef·T_star(**기본값 미커버**) | `ν_br=min(dxdy/dt, B·δ_b·h·∂η/∂t)`→Pass3 운동량 확산, t_here 상류3셀 advect | [[celeris-breaking-boundary]] |
+| **Celeris** | Kennedy eddy viscosity(WGSL) | `∂η/∂t > dzdt_I_coef·c`(Pass_Breaking.wgsl:100) | **dzdt_I 0.50 / dzdt_F 0.15 / T_star 5.0 / δ_b 2.0**(constants_load_calc.js:51-54, 2026-07-12 확인) | `ν_br=min(dxdy/dt, B·δ_b·h·∂η/∂t)`→Pass3 운동량 확산, t_here 상류3셀 advect | [[celeris-breaking-boundary]] |
 
 **HFA vs eddy viscosity**: SWASH 는 소산항을 명시 주입하지 **않고** 비정수압을 끄면 NLSW bore 가 운동량보존 이산화로 자동 소산 — "무파라미터" 접근(α 만). FUNWAVE·Celeris 는 Kennedy eddy viscosity `ν∝h·∂η/∂t` 를 운동량 확산으로 명시 주입. 셋 다 개별 파봉의 **breaking age**(SWASH iwrk 인접전파 / FUNWAVE AGE / Celeris t_here advect)로 hysteresis 전파.
 
@@ -62,7 +62,7 @@ related:
 - **SWAN 기본 ON**: BREAKING command 없어도 항상 활성(`OFF BREAKING`으로만 해제) — SWAN 저면마찰이 기본 OFF 인 것과 반대([[bottom-friction-cross-model]] §5 대조). γ 0.73 이 swantech Eq 2.68 Battjes-Stive 와 자기정합.
 - **XBeach 기본 정식 ≠ calibration**: 매뉴얼 기본 `break=roelvink2`(H³/h)이나 γ 0.55·n 10 표준값은 **roelvink1 기준 calibration** — roelvink2 사용 시 재보정 필요(문서 자체 경고).
 - **★FUNWAVE 소스 ≠ 매뉴얼 배수**: 소스 onset `ETAt ≥ Cbrk1·√(gh)`(1배, breaker.F:124-151)이나 매뉴얼 §3.4 는 `η_t^(I)=0.65·2√(gh)`(2배) 표기 — **소스 기준 1배**가 실제. 임계값 인용 시 소스 확인.
-- **미커버**: Celeris breaking 계수(dzdt_I/F_coef·T_star_coef·δ_b) 기본값 노트 미기재(config/globals source-needed). SWAN Thornton-Guza·XBeach Janssen-Battjes 는 이론노트에만(command·식 상세 얕음). ~~SWASH psurf 배열 소스 초기값 위치 미커버~~ — **해소(2026-07-12)**: α=0.6·β=**-1 sentinel**·nufac=1.0(SwashInit.ftn90:326-329, BRE 카드 동일 SwashReadInput.ftn90:916-918); ★매뉴얼 "β 기본 0.3" 의 실체는 CheckPrep 자동선택 — BDF 이류 스킴이면 **0.15**, 아니면 0.3(SwashCheckPrep.ftn90:1065-1090, [[swash-wetting-drying-runup]] §2.1 갱신).
+- **미커버**: SWAN Thornton-Guza·XBeach Janssen-Battjes 는 이론노트에만(command·식 상세 얕음). ~~Celeris breaking 계수 기본값~~ — **해소(2026-07-12)**: dzdt_I_coef=**0.50**·dzdt_F_coef=**0.15**·T_star_coef=**5.0**·delta_breaking(δ_b)=**2.0**(constants_load_calc.js:51-54, [[celeris-breaking-boundary]] 갱신). ~~SWASH psurf 배열 소스 초기값 위치 미커버~~ — **해소(2026-07-12)**: α=0.6·β=**-1 sentinel**·nufac=1.0(SwashInit.ftn90:326-329, BRE 카드 동일 SwashReadInput.ftn90:916-918); ★매뉴얼 "β 기본 0.3" 의 실체는 CheckPrep 자동선택 — BDF 이류 스킴이면 **0.15**, 아니면 0.3(SwashCheckPrep.ftn90:1065-1090, [[swash-wetting-drying-runup]] §2.1 갱신).
 
 ## 6. 관련
 
