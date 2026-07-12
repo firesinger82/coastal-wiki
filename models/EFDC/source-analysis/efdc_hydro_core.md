@@ -45,6 +45,8 @@ The PCG operates on **pressure head** `P`, not directly on `HP`. After solve, `H
 
 ## C. Internal (3D) mode coupling (CALUVW)
 
+전단(DU/DV) 연직 **완전 implicit tridiagonal + Sherman-Morrison** solve 자체는 → **[[efdc_internal_shear_caluvw]]** (2026-07-11 신설; 본 절은 그 이후의 정합 복원만).
+
 Three-step consistency restoration:
 
 1. Shear reconstruction from external unit flows (`caluvw.f90:523-532`).
@@ -117,7 +119,7 @@ This is a **quasi-non-hydrostatic** correction (pressure-projection style), not 
 
 ## Next expansion
 
-- CALUVW vertical velocity W detailed note (cross-link to `efdc_vertical.md`).
+- ~~CALUVW vertical velocity W detailed note~~ — [[efdc_vertical]] (W 연속식 :686-872) + [[efdc_internal_shear_caluvw]] (전단 solve) 로 커버 완료 (2026-07-11).
 - PCG preconditioner choice and convergence tuning (separate ops note).
 - Curvilinear metric details (CAC term decomposition).
 

@@ -87,7 +87,7 @@ related:
 | **자유표면/연속** | EFDC(PCG)·ADCIRC(JCG/lumped)·Delft3D(ADI sweep)·FM(Guus+Newton)·SWASH-Imp(θ) |
 | **비정수압/동압 Poisson** | SWASH(SIP/BiCGSTAB, 2차 pressure correction)·XBeach-nonh(5-diag SIP, 스텝당 2회)·CADMAS(7-diag MILU-BiCGSTAB)·SFINCS-nonh(별도 모듈) |
 | **Boussinesq 분산 tridiagonal** | FUNWAVE(매 RK 서브단계, Thomas/cuSPARSE)·Celeris(PCR; Bous 는 계수 재활용, COULWAVE 는 매 스텝) |
-| **연직 확산/이류** | ROMS(Crank-Nicholson 확산 + implicit 연직 advection, **별개 tridiagonal 2회** step3d_t.F:1556-1655,1730-1764)·Delft3D UZD·EFDC(MY2.5 QQ/QQL tridiag)·SWASH(연직 eddy viscosity 포함 무조건 안정)·ADCIRC 3D(θ=Alp3 연직확산+Alp1 Coriolis+Alp2 저면응력 — 복소 tridiag, **연직이류는 explicit**, [[adcirc-3d-vssol-vertical-scheme]]) |
+| **연직 확산/이류** | ROMS(Crank-Nicholson 확산 + implicit 연직 advection, **별개 tridiagonal 2회** step3d_t.F:1556-1655,1730-1764)·Delft3D UZD·EFDC(운동량=**전단 완전 implicit**+Sherman-Morrison [[efdc_internal_shear_caluvw]]·난류 MY2.5 QQ/QQL tridiag)·SWASH(연직 eddy viscosity 포함 무조건 안정)·ADCIRC 3D(θ=Alp3 연직확산+Alp1 Coriolis+Alp2 저면응력 — 복소 tridiag, **연직이류는 explicit**, [[adcirc-3d-vssol-vertical-scheme]]) |
 | **마찰** | SFINCS·LISFLOOD ACC(Bates 분모)·SWASH-Imp(Euler implicit)·ADCIRC(2×2 행렬)·LISFLOOD FV1/DG2(Jacobian) — 상세 [[bottom-friction-cross-model]] §3 |
 
 ## 5. ★함정·미커버 (disclosed gaps)
@@ -100,4 +100,4 @@ related:
 - **EFDC NTSTBC 과대 함정**: corrector 주기 >100 시 leapfrog computational mode 성장(checkerboard HP) — [[efdc_hydro_core]] Working Rules.
 - ~~**ADCIRC 3D 연직 시간적분**: VSSOL 내부의 implicit θ/tridiagonal 여부 미커버~~ — **해소(2026-07-11)**: [[adcirc-3d-vssol-vertical-scheme]] 신설 — 2TL θ³-가중(Alp1 Coriolis·Alp2 저면응력·Alp3 연직확산, fort.15 독립 3-knob)·복소 q=u+iv tridiagonal(node 별 NFEN 계)·연직 linear FE consistent mass·이류는 전부 explicit·w 는 연속식 적분+adjoint 보정(Wf=0 하드코딩).
 - **CADMAS celerity 부재**: VF_CDTCAL 에 √(gH) 항 없음 — 자유수면 안정성은 VOF 이류 CFL 이 사실상 지배. "celerity 안정항" 주장 금지(원노트 명시).
-- **EFDC 내부모드 운동량 연직확산의 시간처리**(implicit θ 형태): 전용 노트 미커버 — [[efdc_hydro_core]] 는 external/내부 결합 구조까지만.
+- ~~**EFDC 내부모드 운동량 연직확산의 시간처리**: 전용 노트 미커버~~ — **해소(2026-07-11)**: [[efdc_internal_shear_caluvw]] 신설 — 미지수가 속도 아닌 **층간 전단 DU/DV**, 연직확산 **완전 implicit**(θ knob 없음, CMU=1+CDZMU·DELTI·HU·AVUI)·Thomas 소거+**Sherman-Morrison rank-one**(저면항력↔깊이적분 결합)·★바람 전단 주입 ISTL==2 게이트(3TL full step 미주입).
