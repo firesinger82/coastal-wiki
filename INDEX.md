@@ -43,7 +43,10 @@
 | 노트 | source_id | 상태 |
 |---|---|---|
 | [theory-ch08-linear-waves.md](textbook/notes/theory-ch08-linear-waves.md) | water-wave-mechanics·holthuijsen2007 | **verified** (T1, 게이트 ⓐ 통과) |
+| [theory-ch09-nonlinear-spectra.md](textbook/notes/theory-ch09-nonlinear-spectra.md) | holthuijsen2007·water-wave-mechanics | **verified** (T3, 게이트 ⓒ 반영 — ★Hasselmann 연도 정정) |
+| [theory-ch10-coastal-transformation.md](textbook/notes/theory-ch10-coastal-transformation.md) | water-wave-mechanics·holthuijsen2007·mechanics-of-sediment-transport | **verified** (T4, 게이트 ⓒ 반영 — ★Sommerfeld 계보 복원·5π/16 source-needed 1건) |
 | [theory-ch12-tides.md](textbook/notes/theory-ch12-tides.md) | sea-level·stewart-physical-ocean | **verified** (T2 — ★원문 연도 오기 2건 정정·첫 ①→① 의존) |
+| [theory-ch13-sediment-transport.md](textbook/notes/theory-ch13-sediment-transport.md) | marine-sands-manual·mechanics-of-sediment-transport·efdc-sed-trans-2003 | **verified** (T5 — ★Krone/Partheniades 연도 미지지 미이식·van-rijn-1993 미러 OCR 실패 판정) |
 | [tides-lubbad2009-overview.md](textbook/notes/tides-lubbad2009-overview.md) | lubbad2009-tides-slides | draft-unsourced |
 
 원본 PDF 매니페스트: [textbook/sources.yml](textbook/sources.yml).
