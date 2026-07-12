@@ -24,10 +24,10 @@
 | 06 | 경계층 | — | hydraulics-and-hydrology | ⬜ | | | |
 | 07 | 와도 동역학 | — | hydraulics-and-hydrology | ⬜ | | | |
 | **08** | **선형 파동·분산관계** | [theory-ch08-linear-waves](notes/theory-ch08-linear-waves.md) | water-wave-mechanics(주)·holthuijsen2007 | ✅ **T1 완료**(2026-07-12, 게이트 ⓐ MODIFY 반영 재검증) | 26 | 92% (24 부착·2 삭제) · 게이트 후 anchor 정밀화 6곳·residue 2건 해소(쓰나미 p.22-23·Phillips p.173/Hasselmann p.163) → residue 0 | ~0.7h |
-| 09 | 비선형 파동·스펙트럼 | [theory-ch09-nonlinear-spectra](notes/theory-ch09-nonlinear-spectra.md) | holthuijsen2007(주)·water-wave-mechanics | ✅ **T3 완료**(2026-07-12) | 30 | 87% (26 부착·4 삭제) · ★연도 오기 1건 정정(Hasselmann 1957→1962 p.203) · Beaufort 표·SMB 시대오류·Jeffreys·Draupner 수치 삭제 · residue 0 | ~0.5h |
-| 10 | 해안 변형 (shoaling·refraction) | [theory-ch10-coastal-transformation](notes/theory-ch10-coastal-transformation.md) | water-wave-mechanics(주)·holthuijsen2007 | ✅ **T4 완료**(2026-07-12) | 26 | 85% (22 부착·4 삭제) · ★계보 대체 1건(회절 'Sommerfeld 1896'→실측 Penney-Price 1952 p.133) · 5π/16 계수·0.15Hb·Fresnel 식·rip 80% 삭제 · residue 0 | ~0.5h |
+| 09 | 비선형 파동·스펙트럼 | [theory-ch09-nonlinear-spectra](notes/theory-ch09-nonlinear-spectra.md) | holthuijsen2007(주)·water-wave-mechanics | 🟡 **T3 완료·ⓒ MODIFY 수정 대기** | 30 | 87% (26 부착·4 삭제) · ★연도 오기 1건 정정(Hasselmann 1957→1962 p.203) · Beaufort 표·SMB 시대오류·Jeffreys·Draupner 수치 삭제 · residue 0 | ~0.5h |
+| 10 | 해안 변형 (shoaling·refraction) | [theory-ch10-coastal-transformation](notes/theory-ch10-coastal-transformation.md) | water-wave-mechanics(주)·holthuijsen2007 | 🟡 **T4 완료·ⓒ MODIFY 수정 대기** | 26 | 85% (22 부착·4 삭제) · ★계보 대체 1건(회절 'Sommerfeld 1896'→실측 Penney-Price 1952 p.133) · 5π/16 계수·0.15Hb·Fresnel 식·rip 80% 삭제 · residue 0 | ~0.5h |
 | 11 | SWAN 모델 | — | ★claim-level 분해 — 일반 이론만 ①, 모델 구현은 models/SWAN 탐색 링크(복제 금지) | ⬜ | | | |
-| **12** | **조석** | [theory-ch12-tides](notes/theory-ch12-tides.md) | sea-level(Pugh, 주)·stewart-physical-ocean | ✅ **T2 완료**(2026-07-12) | 28 | 82% (23 부착·5 삭제) · ★원문 연도 오기 2건 출처 기준 정정(예측기 1862→**1873** p.155·Doodson 1924→**1921** p.74) · ★조석력 1.1e-6 g = 자릿수 의심 오류로 삭제 · residue 0 · **첫 ①→① 의존**(ch08 얕은물 한계) | ~0.6h |
+| **12** | **조석** | [theory-ch12-tides](notes/theory-ch12-tides.md) | sea-level(Pugh, 주)·stewart-physical-ocean | 🟡 **T2 완료·ⓒ MODIFY 수정 대기** | 28 | 82% (23 부착·5 삭제) · ★원문 연도 오기 2건 출처 기준 정정(예측기 1862→**1873** p.155·Doodson 1924→**1921** p.74) · ★조석력 1.1e-6 g = 자릿수 의심 오류로 삭제 · residue 0 · **첫 ①→① 의존**(ch08 얕은물 한계) | ~0.6h |
 | 13 | 퇴적물 이송 (Shields·Rouse) | — | mechanics-of-sediment-transport·marine-sands-manual·van-rijn-1993 | ⬜ | | | |
 | 14 | 해안 형태동역학 (Dean·CERC·Bruun) | — | coastal-processes-with-eng-apps·coastal-eng-guidelines | ⬜ | | | |
 | 15 | EFDC 운용 | — | ★claim-level 분해 — 일반 이론만 ①, 모델 구현은 models/EFDC 탐색 링크(복제 금지) | ⬜ | | | |
@@ -40,4 +40,5 @@
 | 게이트 | 일자 | 판정 | 요지 |
 |---|---|---|---|
 | (설계) Codex 2회차 | 2026-07-12 | MODIFY→반영 | 4-레이어 v2 — plan.md 검증 이력 참조 |
+| **ⓒ T2~T4 배치** (Codex 6회차) | 2026-07-12 | **MODIFY — 수정 후 T5 진행 (⚠미반영 상태로 세션 종료, 다음 세션 최우선)** | 8건: ①T2 Doodson p.74=서지목록일 뿐 — stewart p.318-319 로 분리+연도 1921/1922 불일치 명기 ②T2 조석 장파 판정 sea-level p.156 보강 ③★조석가속도 = 삭제 아닌 **11.2×10⁻⁸ g 정정 복원**(sea-level p.78-79 직접 제시) ④T3 Stokes 2차식 anchor p.302(속도·수송)→**p.319 Eq.11.33** 교체+α 계수 정의 ⑤★★T4 Sommerfeld 1896 해+Fresnel 적분이 **p.134 에 실존** — '미확인' 오판, "Sommerfeld 해 p.134 + Penney-Price 정리 p.133" 복원 ⑥5π/16 = mechanics-of-sediment-transport **p.765 Eq.16.30** OCR 훼손 후보 — 원 PDF 확인 전 삭제 확정 불가 ⑦T4 depends_on ch09 REJECT→탐색 강등 ⑧T4 rip 문장 무인용 — 출처 부착 또는 순수 탐색 전환. 적정 확인: 1873 정정·분조 주기·Hm0·Iribarren·Hasselmann 1962·Sxx·T2/T4→ch08 의존 |
 | **ⓐ T1 파일럿** (Codex 3회차, lint ⓑ 겸) | 2026-07-12 | **MODIFY→필수 6건 반영, T2 진행 가능** | 인용검증: §3 진행파 p.72-77→**p.78 §3.4.4 Eq3.40-42 정정**·선형화 페이지 분리(DFSBC p.73/KFSBC p.74)·바닥 p.63 Eq3.9 / residue 2건(쓰나미 파장·Phillips/Hasselmann) 앵커 확보 / 수식 전사 오류 0(p.78 OCR 소실은 disclosed) / lint: 전용 경로 layer·depends_on **강제**+대상 실존성+`..` 금지+scope guard **HEAD 기준** 전환+escape 감사출력. 후속 개선(비차단): 단언별 audit table·회귀테스트·동일 layer 순환 정책 |
