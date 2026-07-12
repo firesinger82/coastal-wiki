@@ -16,7 +16,7 @@ related:
 
 # ADCIRC 경계조건 — IBTYPE / flux / sponge
 
-> `boundaries.F`(675) + `normal_flow_boundary.F90`(106) + `sponge_layer.F90`(880) 직접 read. ADCIRC fort.14 의 **경계 세그먼트 타입(IBTYPE)** 시스템 + normal flux 적용 + **흡수(sponge) 경계**. open(elevation) 조석 BC 는 [[adcirc-tidal-forcing]] 의 body-force 와 별개의 경계 forcing.
+> `boundaries.F`(675) + `normal_flow_boundary.F90`(106) + `sponge_layer.F90`(880) 직접 read. ADCIRC fort.14 의 **경계 세그먼트 타입(IBTYPE)** 시스템 + normal flux 적용 + **흡수(sponge) 경계**. open(elevation) 조석 BC 는 [[adcirc-tidal-forcing]] 의 body-force 와 별개의 경계 forcing. fort.15 측 NFFR 레코드 구조·QN 합성·gwce.F IBTYPE=32 radiation 이산식·부호 규약(내향 양)은 [[adcirc-nffr-periodic-flux-boundary]] (2026-07-12 신설).
 
 ## 1. 두 경계 부류 (boundaries.F)
 

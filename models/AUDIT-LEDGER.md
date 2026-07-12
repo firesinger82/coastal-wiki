@@ -38,7 +38,7 @@ purpose: "사용자 지시(2026-06-16) '모든 모델은 모든 문서·코드�
 | **Delft3D** | engines_gpl 3,503 (+utils) | ✅ 39 노트 (엔진+utils S) | 53 | ✅ 9 (매뉴얼+도구) | ✅ 완료 |
 | **ROMS** | roms/ROMS ~900 | ✅ 33 노트 (4D-Var) | 10 | ✅ 4 (+Exercise 카탈로그) | ✅ 완료 |
 | **FUNWAVE** | TVD 38 + GPU 41 | ✅ 11 노트 (wk-data2d·build-blackwell 포함 실측) | 39 | ✅ 3 (+검증 카탈로그) | ✅ **종결**(2026-07-12; ★Cd 기본 0.0 마찰 off 갭 해소) |
-| **ADCIRC** | adcirc/src 56 (+gahm·asgs) | ✅ 37 노트 (정화 2026-06-18 + **VSSOL 연직스킴 2026-07-11 = 마지막 코어 갭 해소**) | 98 | 21 + web-refs(논문 30) | ✅ **종결**(2026-07-11) |
+| **ADCIRC** | adcirc/src 56 (+gahm·asgs) | ✅ 38 노트 (정화 2026-06-18 + VSSOL 2026-07-11 + **NFFR flux 경계 2026-07-12 사용자 지목 보강**) | 98 | 21 + web-refs(논문 30) | ✅ **종결**(2026-07-11; 종결 후 보강 허용) |
 | **EFDC** | 264 (+GVC 301 legacy S) | ✅ 38 노트 (+GVC legacy·**CALUVW 전단솔버 2026-07-11 = 마지막 코어 갭**) | 6 | ✅ 9 (+Training/Grid·Ch5/Ch6 cross-walk) | ✅ **종결**(2026-07-11; GVC 불요·GOTM T티어 판정) |
 | **XBeach** | 118 | ✅ 33 노트 (intrawave 2026-07-07 포함 실측) | 9 | ✅ 4 | ✅ **종결**(2026-07-12; eps·wetz 산정식 갭 해소) |
 | **SWAN** | 77 | ✅ 29 노트 (58파일 커버리지 감사 8후보 전원 기작성 + swancom1 crosswalk 2026-07-04) | 9 | 29 | ✅ **종결**(2026-07-12; §11 판정) |
@@ -181,7 +181,7 @@ purpose: "사용자 지시(2026-06-16) '모든 모델은 모든 문서·코드�
 
 ---
 
-## 5. ADCIRC 🟢 **종결 2026-07-11** (adcirc/src 56 +gahm +asgs / SA 37 verified — 구 "SA 60" 은 2026-06-18 정화 전 stale)
+## 5. ADCIRC 🟢 **종결 2026-07-11** (adcirc/src 56 +gahm +asgs / SA 38 verified — 구 "SA 60" 은 2026-06-18 정화 전 stale; 종결 후 보강: NFFR flux 경계 2026-07-12)
 
 ### 5.1 문서 (98 PDF)
 | 분류 | 개수 | 노트 | 상태 |
@@ -194,7 +194,7 @@ purpose: "사용자 지시(2026-06-16) '모든 모델은 모든 문서·코드�
 ### 5.2 코드 모듈
 | 모듈 | 파일 | 티어 | 노트 | 상태 |
 |---|--:|:--:|---|:--:|
-| adcirc/src | 56 | C | gwce·momentum·timestep·wetdry·boundary·met-forcing·tidal·hotstart·3d-mode·**3d-vssol-vertical-scheme(2026-07-11: θ³ Alp1/2/3·복소 tridiag·w adjoint — 마지막 코어 갭)**·baroclinic·dg-continuity·weir·output | ✅ |
+| adcirc/src | 56 | C | gwce·momentum·timestep·wetdry·boundary·met-forcing·tidal·hotstart·3d-mode·**3d-vssol-vertical-scheme(2026-07-11: θ³ Alp1/2/3·복소 tridiag·w adjoint — 마지막 코어 갭)**·baroclinic·dg-continuity·weir·output·**nffr-periodic-flux-boundary(2026-07-12 사용자 지목: fort.15 NFFR 레코드·IBTYPE=32 q=QN−c(η−EN)·QNAM 내향 양 규약·docs ln 앵커 버그 적발)** | ✅ |
 | adcirc/prep | 18 | S | preprocessing-foundation·parallel | ✅ |
 | adcirc/wind·util | 19 | S | met-forcing(포맷별 reader dispatch 커버)·utilities — S티어 요약으로 충분 판정(2026-07-11: 잔여는 포맷 변환 유틸, 물리 커널 아님) | ✅ (S요약) |
 | gahm/src (GAHM 비대칭 Holland wind) | ~40 | C | **adcirc_gahm_vortex_model**(GahmSolver·radius solver·ATCF isotach·OWI 출력·Vortex 마찰/translation) | ✅ |
