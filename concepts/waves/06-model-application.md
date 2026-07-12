@@ -24,7 +24,7 @@ verification_date: 2026-05-21
 | 천해 + 흐름 결합 (조류 영향) | SWAN with currents | 같음 |
 | 폭풍 침식·범람 | **XBeach** | [`models/XBeach/`](../../models/XBeach/) (source-analysis 32 verified) |
 | 항만 정온도·공명·다중반사 | 위상해상 Boussinesq (**FUNWAVE**·**Celeris**) / mild-slope (**ARTEMIS**) | [`models/FUNWAVE/`](../../models/FUNWAVE/) · [`models/Celeris/`](../../models/Celeris/) — §1.1 |
-| 통합 풍파·조석·표사 시뮬 | Delft3D-WAVE + FLOW | [`models/Delft3D/`](../../models/Delft3D/) (source-analysis 38 verified) |
+| 통합 풍파·조석·표사 시뮬 | Delft3D-WAVE + FLOW | [`models/Delft3D/`](../../models/Delft3D/) (source-analysis 48 verified) |
 
 ### 1.1 항만 정온도 (harbor agitation/tranquility) — 모델 선택 trade-off
 
@@ -70,7 +70,7 @@ Layer 3: SWAN detail (~50-100 m, 항만·연안)
 
 ### 3.1 입력 카드 (요약)
 
-상세는 [`models/SWAN/manual-notes/`](../../models/SWAN/manual-notes/) (작성 예정):
+상세는 [`models/SWAN/manual-notes/`](../../models/SWAN/manual-notes/) (29 노트 작성됨):
 
 - `MODE STATIONARY/NONSTATIONARY` — 시간 모드
 - `CGRID REGULAR/CURVILINEAR/UNSTRUCTURED` — 계산 격자
@@ -100,7 +100,7 @@ Layer 3: SWAN detail (~50-100 m, 항만·연안)
 
 ## 6. Delft3D-WAVE (D3D-4 또는 FM)
 
-> Canonical: [`models/Delft3D/`](../../models/Delft3D/) (source-analysis 38 + manual-notes 9 verified) — [[../../models/Delft3D/source-analysis/delft3d_wave_swan_module]]·[[../../models/Delft3D/source-analysis/wave/delft3d_flow_wave_coupling]]·[[../../models/Delft3D/manual-notes/delft3d-wave-user-manual]]
+> Canonical: [`models/Delft3D/`](../../models/Delft3D/) (source-analysis 48 + manual-notes 11 verified) — [[../../models/Delft3D/source-analysis/delft3d_wave_swan_module]]·[[../../models/Delft3D/source-analysis/wave/delft3d_flow_wave_coupling]]·[[../../models/Delft3D/manual-notes/delft3d-wave-user-manual]]
 
 - D3D-4 WAVE = SWAN 통합 (Delft3D-FLOW + WAVE coupling)
 - Delft3D FM (WAVE 부분 D-Waves)
@@ -155,7 +155,7 @@ Layer 3: SWAN detail (~50-100 m, 항만·연안)
   - [`models/SWAN/`](../../models/SWAN/) (STABLE, source-analysis 29 + manual-notes 29)
   - `models/WW3/` (미생성 — research/watchlist/repo-noaa-emc-ww3 추적)
   - [`models/XBeach/`](../../models/XBeach/) (source-analysis 32 verified)
-  - [`models/Delft3D/`](../../models/Delft3D/) (source-analysis 38 verified)
+  - [`models/Delft3D/`](../../models/Delft3D/) (source-analysis 48 verified)
 - 소스 노트:
   - [`textbook/notes/waves-holthuijsen-toc.md`](../../textbook/notes/waves-holthuijsen-toc.md) — Holthuijsen Ch.9 SWAN canonical
 - 외부:

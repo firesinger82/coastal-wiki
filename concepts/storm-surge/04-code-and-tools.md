@@ -62,12 +62,12 @@ ADCIRC 의 모든 parameter. 핵심 storm-surge 관련 필드:
 | 필드 | 의미 |
 |---|---|
 | `NWS` | meteorological forcing source (위 §1.1) |
-| `NOIVB` | inverse-barometer suppression flag |
+| `NOIVB` | inverse-barometer 억제 — ★compile-time flag(`-DNOIVB`)이며 fort.15 필드 아님 ([`adcirc-storm-surge.md`](../../models/ADCIRC/source-analysis/storm-surge/adcirc-storm-surge.md) §G, wind.F:1415,3018) |
 | `RampMete` | vortex spin-up ramp (sec) — typical 1-2 days |
 | `WTIMINC` | met forcing time increment |
 | `BLAdj` | boundary-layer adjustment (NWS=20) |
 | `GEOFACTOR` | geostrophic vs cyclostrophic balance |
-| `IM` | drag coefficient option (Garratt, Powell 등) |
+| `IM` | 모델 정식화 선택 (2DDI/3D; `IM=1/11/21/31`→3D — [`adcirc-3d-mode.md`](../../models/ADCIRC/source-analysis/adcirc-3d-mode.md)). wind drag 는 별개: Garratt 식 + `/metControl/ WindDragLimit` ([`adcirc-met-forcing-implementation.md`](../../models/ADCIRC/source-analysis/adcirc-met-forcing-implementation.md), wind.F:514-539) |
 | `TAU0` | numerical weighting (typical 0.01) |
 
 ### 2.2 `fort.14` (mesh)
@@ -84,8 +84,8 @@ forcing 데이터 — NWS 따라 형식 다름:
 
 | 파일 | 내용 |
 |---|---|
-| `fort.61` | tide-only elevation (stations) |
-| `fort.62` | tide-only velocity (stations) |
+| `fort.61` | station elevation 시계열 (NOUTE — [`adcirc-output-writers-implementation.md`](../../models/ADCIRC/source-analysis/adcirc-output-writers-implementation.md) §A) |
+| `fort.62` | station velocity 시계열 ([`adcirc-output-writers-implementation.md`](../../models/ADCIRC/source-analysis/adcirc-output-writers-implementation.md)) |
 | `fort.63` | full elevation (all nodes) |
 | `fort.64` | full velocity (all nodes) |
 | `maxele.63` | **maximum elevation envelope** (surge map) |
@@ -168,6 +168,8 @@ KHOA OpenAPI 가 둘 다 제공 (`tdlvHgt` 실측, `bscTdlvHgt` 예측). 차이�
 ## 5. NWP (Numerical Weather Prediction) forcing 데이터
 
 ADCIRC NWS=12/13/14 입력 NWP source:
+
+> 아래 해상도·가용성 수치는 외부 기관 명세의 통용값 — 공식 문서 인용 미확보, 참고값으로만 해석 (source-needed).
 
 | Source | 해상도 | 한국 가용성 |
 |---|---|---|

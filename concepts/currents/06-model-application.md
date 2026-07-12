@@ -104,7 +104,7 @@ EFDC도 **external(깊이적분 2D)** 과 **internal(3D shear)** 모드를 분�
 
 ## 3. ADCIRC
 
-> Canonical: [`models/ADCIRC/`](../../models/ADCIRC/) (source-analysis 62, verified)
+> Canonical: [`models/ADCIRC/`](../../models/ADCIRC/) (source-analysis 37, verified)
 
 - `fort.15` 경계 분조 카드 (NBFR + amplitude·equilibrium argument)
 - ADCIRC tidal database가 임의 mesh 경계점에 분조 보간 (조위 + u, v 분조 함께)
