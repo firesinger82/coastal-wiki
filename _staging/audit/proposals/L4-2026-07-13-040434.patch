@@ -1,0 +1,70 @@
+diff --git a/concepts/compound-flooding/wetting-drying-cross-model.md b/concepts/compound-flooding/wetting-drying-cross-model.md
+--- a/concepts/compound-flooding/wetting-drying-cross-model.md
++++ b/concepts/compound-flooding/wetting-drying-cross-model.md
+@@ -3,7 +3,7 @@
+ topic: compound-flooding
+ canonical_source: self
+ citation_status: verified
+-has_source_needed: true
++has_source_needed: false
+ verification_method: "전 행이 각 모델 verified source-analysis 노트로 소급(셀에 노트 링크+file:line). 대표 anchor 직접 재확인(2026-07-07): LISFLOOD-FP fp_acc.cpp:66-68(hflow=max(z+h)−max(z), DepthThresh=1e-3 lisflood.cpp:171). ROMS 는 [[roms_wetting_drying]] 신설(commit 4224c40)로 커버. 미커버 셀 §5 표기."
+ note_author: "Claude Fable 5"
+ note_date: 2026-07-07
+diff --git a/concepts/currents/time-integration-cross-model.md b/concepts/currents/time-integration-cross-model.md
+--- a/concepts/currents/time-integration-cross-model.md
++++ b/concepts/currents/time-integration-cross-model.md
+@@ -3,7 +3,7 @@
+ topic: currents
+ canonical_source: self
+ citation_status: verified
+-has_source_needed: true
++has_source_needed: false
+ verification_method: "전 행이 각 모델 verified source-analysis 노트로 소급(셀에 노트 링크+file:line). 대표 anchor 직접 재확인(2026-07-10): ADCIRC read_input.F:2996(READ A00,B00,C00)·gwce.F:182(CPRECOR)+IS2TIM 전역 rg 0건 / EFDC aaefdc.f90:3187-3188(IS2TIM==0→HDMT, ≥1→HDMT2T) / SWASH SwashComputFlow.ftn90:42-47(Method verbatim 'unconditionally stable…leap-frog') / FUNWAVE mod_global.F:122-123(alpha=(0,3/4,1/3)·beta=(1,1/4,2/3))·main.F:414(ESTIMATE_HUV)·etauv_solver.F:268-270 / SFINCS sfincs_input.f90:70(alfa 기본 0.50) / LISFLOOD SolverParams.h(HWFV1 CFL=0.5·MWDG2 CFL=0.3) / Delft3D adi.f90:282,439(stage1/stage2) / Celeris shaders/Pass3_Bous.wgsl:398-409(Euler/AB3/AM4 분기). 미커버 셀은 §5 disclosed."
+ note_author: "Claude Fable 5"
+ note_date: 2026-07-10
+diff --git a/concepts/storm-surge/04-code-and-tools.md b/concepts/storm-surge/04-code-and-tools.md
+--- a/concepts/storm-surge/04-code-and-tools.md
++++ b/concepts/storm-surge/04-code-and-tools.md
+@@ -63,16 +63,16 @@
+ |---|---|
+ | `NWS` | meteorological forcing source (위 §1.1) |
+ | `NOIVB` | inverse-barometer 억제 — ★compile-time flag(`-DNOIVB`)이며 fort.15 필드 아님 ([`adcirc-storm-surge.md`](../../models/ADCIRC/source-analysis/storm-surge/adcirc-storm-surge.md) §G, wind.F:1415,3018) |
+-| `RampMete` | vortex spin-up ramp (sec) — typical 1-2 days |
++| `RampMete` | vortex spin-up ramp (sec) — typical 1-2 days `[source-needed]` |
+ | `WTIMINC` | met forcing time increment |
+ | `BLAdj` | boundary-layer adjustment (NWS=20) |
+ | `GEOFACTOR` | geostrophic vs cyclostrophic balance |
+ | `IM` | 모델 정식화 선택 (2DDI/3D; `IM=1/11/21/31`→3D — [`adcirc-3d-mode.md`](../../models/ADCIRC/source-analysis/adcirc-3d-mode.md)). wind drag 는 별개: Garratt 식 + `/metControl/ WindDragLimit` ([`adcirc-met-forcing-implementation.md`](../../models/ADCIRC/source-analysis/adcirc-met-forcing-implementation.md), wind.F:514-539) |
+-| `TAU0` | numerical weighting (typical 0.01) |
++| `TAU0` | numerical weighting (typical 0.01 `[source-needed]`) |
+ 
+ ### 2.2 `fort.14` (mesh)
+ 
+-unstructured triangular mesh — 한국 ADCIRC 적용 시 일반적으로 수 십만 ~ 수 백만 nodes. 한국 서해·남해 dense, 외해 coarse.
++unstructured triangular mesh — 한국 ADCIRC 적용 시 일반적으로 수 십만 ~ 수 백만 nodes `[source-needed]`. 한국 서해·남해 dense, 외해 coarse.
+ 
+ ### 2.3 `fort.22` (wind/pressure)
+ 
+@@ -201,8 +201,8 @@
+ 4. **`fort.15`** 편집:
+    - `NWS = 13`
+    - `RampMete = 86400` (1 day spin-up)
+-   - `NOIVB = 0` (IB 포함)
+-5. **ADCIRC 실행** — MPI parallel, 보통 64-256 cores
++   - IB(inverse barometer)는 기본 포함 — `NOIVB` 는 compile-time flag(`-DNOIVB`)로 fort.15 편집 대상 아님 (§2.1, wind.F:1415,3018)
++5. **ADCIRC 실행** — MPI parallel, 보통 64-256 cores `[source-needed]`
+ 6. **검증** — KHOA 정점 surge (관측 vs 모델 hindcast)
+ 7. **maxele.63 → 한국 연안 surge envelope map** (matplotlib + cartopy)
+ 
+diff --git a/concepts/waves/06-model-application.md b/concepts/waves/06-model-application.md
+--- a/concepts/waves/06-model-application.md
++++ b/concepts/waves/06-model-application.md
+@@ -94,7 +94,7 @@
+ 
+ > Canonical: [`models/XBeach/`](../../models/XBeach/) (source-analysis 32 + manual-notes 4 verified) — [[../../models/XBeach/source-analysis/xbeach_wave_action_balance]](surfbeat)·[[../../models/XBeach/source-analysis/xbeach_nonh]]·[[../../models/XBeach/source-analysis/xbeach_morphology]]
+ 
+-- 폭풍 침식·범람 사례 (10²-10³ km² 도메인, 시간 1-7 일)
++- 폭풍 침식·범람 사례 (10²-10³ km² 도메인, 시간 1-7 일) `[source-needed]` <!-- 값 재검토: 10³ km² 는 XBeach 통상 적용 규모 초과 의심 -->
+ - 입력: 외부 spectrum (SWAN 출력 또는 직접 measurement)
+ - 출력: 모래사장 단면 변화, 침수 범위, 인프라 피해 분석
+ 
