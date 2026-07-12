@@ -27,7 +27,7 @@
 | 09 | 비선형 파동·스펙트럼 | — | holthuijsen2007·hudspeth2005 | ⬜ | | | |
 | 10 | 해안 변형 (shoaling·refraction) | — | coastal-eng-intro-wijetunge·coastal-processes-with-eng-apps | ⬜ | | | |
 | 11 | SWAN 모델 | — | ★claim-level 분해 — 일반 이론만 ①, 모델 구현은 models/SWAN 탐색 링크(복제 금지) | ⬜ | | | |
-| **12** | **조석** | — | tidal-heights-manual·sea-level·stewart-physical-ocean | **T2 예정** (③ B1 연계) | | | |
+| **12** | **조석** | [theory-ch12-tides](notes/theory-ch12-tides.md) | sea-level(Pugh, 주)·stewart-physical-ocean | ✅ **T2 완료**(2026-07-12) | 28 | 82% (23 부착·5 삭제) · ★원문 연도 오기 2건 출처 기준 정정(예측기 1862→**1873** p.155·Doodson 1924→**1921** p.74) · ★조석력 1.1e-6 g = 자릿수 의심 오류로 삭제 · residue 0 · **첫 ①→① 의존**(ch08 얕은물 한계) | ~0.6h |
 | 13 | 퇴적물 이송 (Shields·Rouse) | — | mechanics-of-sediment-transport·marine-sands-manual·van-rijn-1993 | ⬜ | | | |
 | 14 | 해안 형태동역학 (Dean·CERC·Bruun) | — | coastal-processes-with-eng-apps·coastal-eng-guidelines | ⬜ | | | |
 | 15 | EFDC 운용 | — | ★claim-level 분해 — 일반 이론만 ①, 모델 구현은 models/EFDC 탐색 링크(복제 금지) | ⬜ | | | |
