@@ -24,7 +24,7 @@
 | 06 | 경계층 | — | hydraulics-and-hydrology | ⬜ | | | |
 | 07 | 와도 동역학 | — | hydraulics-and-hydrology | ⬜ | | | |
 | **08** | **선형 파동·분산관계** | [theory-ch08-linear-waves](notes/theory-ch08-linear-waves.md) | water-wave-mechanics(주)·holthuijsen2007 | ✅ **T1 완료**(2026-07-12, 게이트 ⓐ MODIFY 반영 재검증) | 26 | 92% (24 부착·2 삭제) · 게이트 후 anchor 정밀화 6곳·residue 2건 해소(쓰나미 p.22-23·Phillips p.173/Hasselmann p.163) → residue 0 | ~0.7h |
-| 09 | 비선형 파동·스펙트럼 | — | holthuijsen2007·hudspeth2005 | ⬜ | | | |
+| 09 | 비선형 파동·스펙트럼 | [theory-ch09-nonlinear-spectra](notes/theory-ch09-nonlinear-spectra.md) | holthuijsen2007(주)·water-wave-mechanics | ✅ **T3 완료**(2026-07-12) | 30 | 87% (26 부착·4 삭제) · ★연도 오기 1건 정정(Hasselmann 1957→1962 p.203) · Beaufort 표·SMB 시대오류·Jeffreys·Draupner 수치 삭제 · residue 0 | ~0.5h |
 | 10 | 해안 변형 (shoaling·refraction) | — | coastal-eng-intro-wijetunge·coastal-processes-with-eng-apps | ⬜ | | | |
 | 11 | SWAN 모델 | — | ★claim-level 분해 — 일반 이론만 ①, 모델 구현은 models/SWAN 탐색 링크(복제 금지) | ⬜ | | | |
 | **12** | **조석** | [theory-ch12-tides](notes/theory-ch12-tides.md) | sea-level(Pugh, 주)·stewart-physical-ocean | ✅ **T2 완료**(2026-07-12) | 28 | 82% (23 부착·5 삭제) · ★원문 연도 오기 2건 출처 기준 정정(예측기 1862→**1873** p.155·Doodson 1924→**1921** p.74) · ★조석력 1.1e-6 g = 자릿수 의심 오류로 삭제 · residue 0 · **첫 ①→① 의존**(ch08 얕은물 한계) | ~0.6h |
