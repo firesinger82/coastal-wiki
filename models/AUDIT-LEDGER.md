@@ -1,5 +1,5 @@
 ---
-title: "모델 전수 검수 원장 (AUDIT LEDGER) — 9개 모델 문서·소스코드 커버리지 추적"
+title: "모델 전수 검수 원장 (AUDIT LEDGER) — 12개 모델 문서·소스코드 커버리지 추적 (전 모델 종결 2026-07-12)"
 scope: models
 citation_status: reference
 note_author: "Claude Opus 4.8 (1M context)"
@@ -30,7 +30,9 @@ purpose: "사용자 지시(2026-06-16) '모든 모델은 모든 문서·코드�
 
 ---
 
-## 0. 요약 대시보드 (2026-06-16 기준)
+## 0. 요약 대시보드 (2026-06-16 기준; 카운트 실측 = `bash tools/count-notes.sh --check`)
+
+> **종결 = snapshot 판정 (freshness 규약, 2026-07-12 Codex F-7)**: 각 모델의 "종결"은 검수 당시 소스 snapshot(각 모델 manifest 의 clone sha/버전)에 대한 판정이며 **최신 upstream 에 대한 영구 보증이 아니다**. 실제 프로젝트에서 해당 모델을 사용하기 **직전에** upstream delta(신규 릴리스·검수 sha 와의 차이)를 확인하고, 유의미한 변경이 있으면 해당 모듈만 재검수한다. 상시 upstream 추적은 하지 않음(자동수집 중단 정책과 정합). 기록 위치: 각 모델 섹션에 `audited_ref`(검수 sha/버전)·`latest_release_checked`·`checked_at` 을 사용 시점에 추가.
 
 | 모델 | 코어 소스파일 | 코어 검수 | 문서(PDF) | manual-notes | 우선순위 |
 |---|--:|:--:|--:|--:|:--:|

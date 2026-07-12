@@ -1362,7 +1362,7 @@ LLM-Wiki 4계층(L1 검색·L2 graph·L3 MCP·**L4 유지보수 루프**) 중 L4
 - 파일명: `textbook/notes/theory-ch<NN>-<slug>.md`. frontmatter: `layer: 1`, AI 합성 provenance 명기, `citation_status` 는 인용보강 결과로 판정.
 - 챕터당 절차(인용접지 파이프라인): MDX 이식(인터랙티브 컴포넌트 제거) → **원자 단언 분해** → textbook/md FTS5·페이지 대조 → `(source_id, p.N)` 부착 → **미매칭 단언 = 삭제 또는 source-needed 콜아웃**(부분 부착 ≠ 파일 verified, Codex 지적) → validator.
 - **페이스 = 지표 기반**(Codex #8, "세션당 1-2챕터" 고정 폐기): T1 파일럿(08 선형파동)에서 단언 수·출처 매칭률·소요시간 측정 → `textbook/THEORY-LEDGER.md` 에 기록 → stop/go 게이트 후 장별 scope 재산정.
-- 순서: **T1=08(파일럿) → T2=12 조석(③ B1 조석 캘리브 연계 — Codex #8)** → 09→10→13→14 → 기초 01-07 → **11·15(SWAN·EFDC)는 claim-level 분해** — 일반 이론만 ①에, 모델 구현 서술은 복제하지 않고 기존 models/ 노트 탐색 링크(Codex #4).
+- 순서: **T1=08(파일럿 ✅) → T2=12 조석** → 09→10→13→14 → 기초 00.5~07(8챕터 — F-4 (a) 사용자 확정으로 전부 개별 이식) → **11·15(SWAN·EFDC)는 claim-level 분해** — 일반 이론만 ①에, 모델 구현 서술은 복제하지 않고 기존 models/ 노트 탐색 링크(Codex #4); 일반 이론 잔여가 없으면 노트 신설 없이 "검토 완료" 처리 가능(F-4 검토).
 - 교재 챕터 자체는 sources.yml 에 등록하지 않음(AI 합성본은 출처 아님 — #3). 원 교재 12권이 출처.
 
 ## 4. AP 트랙 — 응용 노트 규약 (레이어 ④)
@@ -1371,12 +1371,15 @@ LLM-Wiki 4계층(L1 검색·L2 graph·L3 MCP·**L4 유지보수 루프**) 중 L4
 - 성격: 연구·융합(JPM/EVA 방법론·surrogate 설계·커플링 연구 종합). citation_status 규율 동일.
 - **문헌 기반 ④ 노트는 experience 승격 선행 불요**(Codex #9) — 개인 결과를 주장하는 ④ 노트만 experience 링크 선행.
 
-## 5. 실행 하네스·순서 (명칭 T*/AP* — 기존 L1 검색/L4 감사와 충돌 회피, Codex #10)
+## 5. 실행 하네스·순서 (명칭 T*/AP* — 기존 L1 검색/L4 감사와 충돌 회피, Codex #10; **시퀀싱 개정 2026-07-12 F-6**)
 
-- **cron/자동 loop 미사용** — 인용 검증은 사람 게이트. 기존 L4 cron 이 신규 노트 자동 감사(lint 기존재). **동시 진행 한도 = 1 트랙**(T/AP/③ 교대, Codex 과부하 지적).
-- 순서: ⑴ 거버넌스 명문화(본 섹션+CONVENTIONS+CLAUDE) → ⑵ 하네스(THEORY-LEDGER·layer lint) → ⑶ **T1**=ch08 파일럿 → Codex 게이트 ⓐ → ⑷ **T2**=ch12 → 배치 진행(~4챕터마다 Codex 게이트 ⓒ) → AP1(첫 응용 노트)·③ P0/B1 교대.
-- Codex 게이트: ⓐ T1 완료(지표+절차) ⓑ lint 설계 ⓒ 배치마다 ⓓ AP 규약 확정. 같은 스레드 `--resume`.
+- **cron/자동 loop 미사용** — 인용 검증은 사람 게이트. 기존 L4 cron 이 신규 노트 자동 감사(lint 기존재). **동시 진행 한도 = 1 트랙**.
+- **확정 시퀀스(사용자 전략 2026-07-12)**: ⑴ 거버넌스+하네스 ✅ → ⑵ T1 파일럿+게이트 ⓐ ✅ → ⑶ **T 트랙 완주** — 분모 = **15챕터 전부**(00.5~15, ch00 Intro 만 제외; **F-4 사용자 확정 = (a) 전부 이식** — 리뷰어 양측(Claude·Codex)의 (b) 도메인 축소 권고 기각, 기록) → ⑷ **실제 프로젝트 착수** — 프로젝트 안에서 ③(run 실행·provenance)·④(연구 종합) 동시 실증. **③ P0/B1 은 위키 로드맵 활성 phase 에서 제외** — 구 "Applied Study 전환 계획 v2" 는 폐기 아닌 **미래 실프로젝트 실행 템플릿**으로 보존(F-6).
+- Codex 게이트: ⓐ 완료(MODIFY→반영) ⓒ 배치(~4챕터)마다 ⓓ AP 규약 확정 시. 같은 스레드 `--resume`.
+- **거버넌스 moratorium(F-5)**: 신규 규칙은 기본 동결 — 기존 규칙(절대규칙·G1-G9·§8.1) 훅 강화로 대응. 기존 규칙으로 표현 불가능 + 반복 사례 확인 시에만 adversarial gate 경유 신설.
 
 ## 검증 이력
 
 - 2026-07-12 Codex adversarial review 2회차(스레드 019f5661): **MODIFY** — E-1 APPROVE(분산 매핑, 단 논리 분류 명시)/E-2 MODIFY(①→② 링크가 단방향 규칙과 자기모순 → 근거/탐색 링크 분리)/E-3 APPROVE(단 07+ 번호 기점유 → NN-applied)/E-4 MODIFY(고정 페이스 폐기→지표 기반, 12장 조기)/E-5 MODIFY(집행 불가능 → 근거 의존성 한정+경량 lint) + 구조결함 10건(v2 단일소속 오류·G8 누출·experience 역할 중첩·규칙 자기모순·레이어 배타성 착각·오염 scope guard·3중 복사본 드리프트·AI 합성본 권위상승·명칭 충돌·writer 과부하) → v2 전면 반영. 사용자 plan-mode 승인(2026-07-12).
+- 2026-07-12 Codex 3회차 = 게이트 ⓐ(T1 파일럿+lint): **MODIFY** → 필수 6건 반영(cac8be1) — T1 인용 정밀화(진행파 p.78 정정·선형화 페이지 분리·residue 2건 해소)·lint 강제/실존성/HEAD scope guard.
+- 2026-07-12 Codex 4회차 = 총평 수정안 F-검토: F-1 MODIFY(count-notes+--check)/F-2 APPROVE(lint 회귀테스트)/**F-3 REJECT**(동일 layer 전면 금지 과함 → ①→① 유도 의존 허용·claim 복제 금지·순환만 금지)/**F-4 (b) 권고 → 사용자 (a) 확정**(16챕터 전부 — 기각 기록)/F-5 MODIFY(moratorium 형)/F-6 APPROVE(로드맵-전략 모순 제거) + 신규 F-7(모델 종결 freshness 수명주기 — snapshot 판정 명시·사용 직전 upstream delta 확인)·F-8(validate-all 단일 진입점, L4 와 구현 분리 유지)·F-9(ledger 이원화 유지·INDEX 얇은 색인). 전 항목 반영 커밋 참조.

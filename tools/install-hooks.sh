@@ -15,7 +15,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 WIKI_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 HOOK="$WIKI_ROOT/.git/hooks/pre-commit"
-MARKER="# coastal-wiki:pre-commit:v5"
+MARKER="# coastal-wiki:pre-commit:v6"
 
 if [ ! -d "$WIKI_ROOT/.git" ]; then
     echo "ERROR: $WIKI_ROOT/.git 없음. git repo 루트에서 실행하세요."
@@ -34,10 +34,8 @@ $MARKER
 # 검사 순서:
 #   1) staged path guard (F3) — models/*/raw/{source_code,manuals}/ reject
 #   2) 대용량 staged blob 경고 (옵션 임계치 COASTAL_WIKI_MAX_BLOB_MB, 기본 50MB)
-#   3) research isolation 검증 — staged snapshot 기준 (F1)
-#   4) canonical hygiene 검증 (G8b 경로·G8d placeholder) — staged snapshot
-#   5) 내부 링크 무결성 (깨진 상대 .md 링크·[[wikilink]]) — staged snapshot
-#   6) 4-레이어 근거 의존성 방향 + scope guard (CONVENTIONS §8.1) — staged snapshot
+#   3) tools/validate-all.sh --staged — 무결성 validator 4종 일괄 (research isolation ·
+#      canonical hygiene · link integrity · layer deps; 목록 SSOT = validate-all.sh, F-8)
 set -euo pipefail
 
 WIKI_ROOT="\$(git rev-parse --show-toplevel)"
@@ -82,37 +80,13 @@ if [ -n "\$big" ]; then
     exit 1
 fi
 
-# ---------- 3) research isolation (staged snapshot) ----------
-SCRIPT="\$WIKI_ROOT/tools/validate-research-isolation.sh"
-if [ ! -x "\$SCRIPT" ]; then
-    echo "pre-commit: \$SCRIPT 실행 불가. chmod +x 또는 누락 확인."
+# ---------- 3~6) 무결성 validator 일괄 (단일 진입점, F-8) ----------
+ALLV="\$WIKI_ROOT/tools/validate-all.sh"
+if [ ! -x "\$ALLV" ]; then
+    echo "pre-commit: \$ALLV 실행 불가. chmod +x 또는 누락 확인."
     exit 1
 fi
-bash "\$SCRIPT" --staged
-
-# ---------- 4) canonical hygiene (G8b 경로 · G8d placeholder, staged snapshot) ----------
-HYGIENE="\$WIKI_ROOT/tools/validate-canonical-hygiene.sh"
-if [ ! -x "\$HYGIENE" ]; then
-    echo "pre-commit: \$HYGIENE 실행 불가. chmod +x 또는 누락 확인."
-    exit 1
-fi
-bash "\$HYGIENE" --staged
-
-# ---------- 5) 내부 링크 무결성 (staged snapshot) ----------
-LINKS="\$WIKI_ROOT/tools/validate-link-integrity.sh"
-if [ ! -x "\$LINKS" ]; then
-    echo "pre-commit: \$LINKS 실행 불가. chmod +x 또는 누락 확인."
-    exit 1
-fi
-bash "\$LINKS" --staged
-
-# ---------- 6) 4-레이어 근거 의존성 (staged snapshot) ----------
-LAYERS="\$WIKI_ROOT/tools/validate-layer-deps.sh"
-if [ ! -x "\$LAYERS" ]; then
-    echo "pre-commit: \$LAYERS 실행 불가. chmod +x 또는 누락 확인."
-    exit 1
-fi
-bash "\$LAYERS" --staged
+bash "\$ALLV" --staged
 EOF
 
 chmod +x "$HOOK"

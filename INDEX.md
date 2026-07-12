@@ -38,8 +38,11 @@
 
 ## textbook/ (교과서 통합)
 
+> 📐 **[textbook/THEORY-LEDGER.md](textbook/THEORY-LEDGER.md)** — 4-레이어 ① 이론 이식(T 트랙) 원장: 15챕터 진척·지표(단언·매칭률·residue)·게이트 기록. 카운트 실측: `bash tools/count-notes.sh` (F-9: 상태는 원장이, 숫자는 도구가).
+
 | 노트 | source_id | 상태 |
 |---|---|---|
+| [theory-ch08-linear-waves.md](textbook/notes/theory-ch08-linear-waves.md) | water-wave-mechanics·holthuijsen2007 | **verified** (T1, 게이트 ⓐ 통과) |
 | [tides-lubbad2009-overview.md](textbook/notes/tides-lubbad2009-overview.md) | lubbad2009-tides-slides | draft-unsourced |
 
 원본 PDF 매니페스트: [textbook/sources.yml](textbook/sources.yml).

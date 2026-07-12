@@ -8,6 +8,8 @@
   - 근거 의존성(`depends_on:`)은 하위 레이어로만: ④(4)→③(3)→②(2)→①(1).
     depends_on 대상의 레이어가 자신보다 크면 위반. 탐색용 본문 링크는 검사하지 않음.
   - depends_on 대상은 repo-상대 경로여야 하고(`..` 금지) **실존**해야 함 (게이트 ⓐ).
+  - **동일 layer 근거 의존은 허용**(①→① 유도 의존 등, Codex F-3) — 단 **순환 금지**:
+    layer 파일 전체의 depends_on 그래프에서 cycle 을 검사.
   - experience/ 를 depends_on 으로 갖는 것은 layer 4 만 허용 (커밋고정 링크 소비).
   - scope guard: layer 커밋에 기존 verified 파일 본문 변경이 섞이면 실패. verified 판정은
     **HEAD 버전 기준**(같은 커밋에서 layer: 를 추가해 우회 불가 — 게이트 ⓐ).
@@ -157,12 +159,13 @@ def main():
         layered.append(path)
         own = fm["layer"]
         for dep in fm["depends_on"]:
-            dep_norm = dep.strip().lstrip("./")
-            if ".." in dep_norm.split("/"):
+            raw = dep.strip()
+            if ".." in raw.split("/"):
                 violations.append(
                     f"{path} → {dep}: depends_on 은 repo-상대 경로만 허용 ('..' 금지)"
                 )
                 continue
+            dep_norm = raw[2:] if raw.startswith("./") else raw
             if not target_exists(dep_norm, staged):
                 violations.append(
                     f"{path} → {dep_norm}: depends_on 대상 파일이 존재하지 않음"
@@ -181,6 +184,46 @@ def main():
                 violations.append(
                     f"{path} (layer {own}) → {dep_norm} (layer {tgt}): 근거 의존이 상위 레이어를 향함 (④→③→②→① 위반)"
                 )
+
+    # 순환 검사 (Codex F-3): layer 파일 전체 그래프에서 cycle 탐지.
+    # staged 후보 + 트리의 layer 파일을 합쳐 그래프 구성 (staged 내용 우선).
+    graph = {}
+    try:
+        tracked = subprocess.check_output(
+            ["git", "grep", "-l", "^layer:", "--", "*.md"], text=True, cwd=ROOT,
+        ).splitlines()
+    except subprocess.CalledProcessError:
+        tracked = []
+    for path in set(tracked) | set(layered):
+        text = read_content(path, staged) or read_content(path, False)
+        if text is None:
+            continue
+        fm = parse_frontmatter(text)
+        if fm["layer"] is None:
+            continue
+        graph[path] = [
+            (d.strip()[2:] if d.strip().startswith("./") else d.strip())
+            for d in fm["depends_on"]
+        ]
+    state = {}  # 0=방문중, 1=완료
+
+    def dfs(node, stack):
+        state[node] = 0
+        for nxt in graph.get(node, []):
+            if nxt not in graph:
+                continue
+            if state.get(nxt) == 0:
+                violations.append(
+                    "순환 근거 의존: " + " → ".join(stack + [node, nxt])
+                )
+                continue
+            if nxt not in state:
+                dfs(nxt, stack + [node])
+        state[node] = 1
+
+    for n in list(graph):
+        if n not in state:
+            dfs(n, [])
 
     # scope guard (staged 모드만): layer 커밋 + 기존 verified 본문 변경 혼합 금지.
     # verified 판정은 HEAD 버전 기준 — 같은 커밋에서 layer: 추가로 우회 불가 (게이트 ⓐ).

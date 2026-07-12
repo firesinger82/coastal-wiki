@@ -156,6 +156,7 @@ verification_date: YYYY-MM-DD
 - **① 이론 노트**: `textbook/notes/theory-ch<NN>-<slug>.md`. frontmatter `layer: 1` + AI 합성 provenance 명기. 인용은 (source_id, page) 전용. **부분 인용 부착 ≠ 파일 verified** — 미매칭 단언은 삭제 또는 source-needed 콜아웃. 상세 이론의 canonical = ① (concepts 01-02·manual-notes 는 요약+링크 소비).
 - **④ 응용 노트**: `concepts/<topic>/NN-applied-<slug>.md` — **NN = 해당 토픽의 다음 빈 번호**(고정 07 아님). 토픽 횡단 연구는 주 연구질문 기준 한 곳만 canonical + INDEX 응용 표 연결. 문헌 기반이면 experience 선행 불요, 개인 결과 주장 시 experience 커밋고정 링크 필수(본문 복제 금지).
 - **근거 의존성의 단방향**: 단언의 검증이 기대는 의존은 ④→③→②→① 방향만. 탐색용 cross-link 는 claim 복제 없는 범위에서 양방향 허용. 신규 파일은 frontmatter `layer:` + `depends_on:`(근거 의존 대상 경로 목록) 기록 — `tools/validate-layer-deps.sh` 가 방향 검사. **기존 verified 파일은 소급 적용·검사 대상에서 제외.**
+- **동일 layer 근거 의존(2026-07-12, Codex F-3)**: **허용** — 특히 ①→① 유도 의존(예: ch09 비선형이 ch08 선형해에 기댐)은 정당. 조건: ⑴ claim 복제 금지(선행 노트의 식·결과를 재서술하지 않고 링크) ⑵ 명시적 `depends_on` 기록 ⑶ **순환 금지**(lint 가 cycle 검사). "단순 관련성"은 탐색 링크로 — 선행 식·정의 없이는 후속 단언이 성립하지 않는 경우만 근거 의존.
 - **③ canonical 허용 기준**: 출처 기반·일반화 가능 절차만 concepts/examples. case-specific 설정·보정값·결과 수치는 G8 대로 coastal-runs → experience 경유.
 
 ## 9. 위키 무결성 검증 도구
@@ -165,7 +166,11 @@ verification_date: YYYY-MM-DD
 - `tools/validate-research-isolation.sh` — concepts/, models/, experience/ 가 research/ 를 직접 참조하는지 + research/ 내 .md 가 `citation_status: draft-unsourced` 인지 검증. exit 0/1/2/3.
 - `tools/validate-canonical-hygiene.sh` — **G8** 강제: canonical(concepts/·models/·textbook/) 에 작성자 로컬 절대경로(G8b) 또는 개인사례 유도 placeholder(G8d) 가 있는지 검증. vendor 경로·repo-상대 file:line·textbook/md 미러·거버넌스(POLICY/INDEX) 면제. exit 0/1/2/3. 회귀: `tools/test_validate_canonical_hygiene.py` (23 case).
 - `tools/validate-link-integrity.sh` — 내부 링크 무결성: 상대 `.md` 링크 + `[[wikilink]]` 타겟이 실존 노트로 resolve 되는지. 코드·glob·textbook/md 미러 스킵, `(예정)`·`미생성` 마커는 forward-ref 로 통과. exit 0/1/2/3. 회귀: `tools/test_validate_link_integrity.py` (16 case).
-- `tools/install-hooks.sh` — `.git/hooks/pre-commit` 에 위 세 검증을 등록 (marker v4). 한 번 실행하면 commit마다 자동 검증.
+- `tools/validate-layer-deps.sh` — **§8.1** 강제: 4-레이어 근거 의존성 방향(④→③→②→①)·동일 layer 순환 금지·레이어 전용 경로(theory-*·NN-applied-*)의 layer/depends_on 필수·대상 실존성·scope guard(HEAD 기준 verified 오염 차단). 회귀: `tools/test_validate_layer_deps.py`.
+- **`tools/validate-all.sh` — 위 4종의 단일 진입점(SSOT, F-8)**. pre-commit 훅은 이것만 호출 — validator 추가·변경 시 이 목록만 갱신.
+- `tools/count-notes.sh` — 노트 개수 실측·원장 대조(F-1): `--check` 는 AUDIT-LEDGER 대시보드의 "✅ N 노트" 를 실측과 대조해 불일치 시 실패. 문서에 개수 하드코딩 시 이 도구로 검증.
+- `tools/install-hooks.sh` — `.git/hooks/pre-commit` 이 `validate-all.sh --staged` 를 호출하도록 등록 (marker v6). 한 번 실행하면 commit마다 자동 검증.
+- ※ L4 자가 감사(coastal-audit, cron)는 **의미 검증** 축 — 위 결정적(구조) 검증과 구현 분리 유지(F-8).
 
 새 PC 에서 clone 후: `bash tools/install-hooks.sh` 한 번 실행.
 
