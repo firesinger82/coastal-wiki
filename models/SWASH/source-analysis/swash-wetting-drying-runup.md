@@ -75,6 +75,7 @@ Method 주석(verbatim): `"Update mask array at those points where the vertical 
 ### 2.1 판정 변수 — 자유표면 수직속도 vs 천수 위상속도
 
 - 임계 파라미터: `alpha = psurf(1)` (breaking onset), `beta = psurf(2)` (post-breaking 재개시) (SwashBreakPoint.ftn90:95-96, 80-81 주석).
+- **기본값(2026-07-12 직독)**: 초기값 α=0.6·β=**-1(sentinel)**·nufac=1.0 (`SwashInit.ftn90:326-329`); `BREaking [alpha] [beta] [nufac]` 카드도 동일 기본 (`SwashReadInput.ftn90:909-918`; `isurf=1` 하드코딩 `:911-912` — isurf=2 분기 `:925-927` 은 dead code). β sentinel 은 `SwashCheckPrep.ftn90:1065-1090` 에서 해석: **BDF 이류 스킴(pnums(6)==3 & pnums(7)==-1)이면 β=0.15, 아니면 β=0.3** — 매뉴얼의 "기본 0.3" 의 실체는 이 자동선택. 역방향 결합도 있음: β=0.3 이고 이류 스킴 미지정이면 central differences 유도(`pnums(6)=3`). `BRE` 지정 시 `horwinc=.true.` + `ihvisc==0→4` 자동 — breaking 소산의 수평점성 경로 활성 (`:920-921`).
 - 천수 위상속도: `rootgh = sqrt( grav * hs(nm) )` ($\sqrt{g\,h_s}$) (:115).
 - 자유표면 수직속도: `dsdt = ( s1(nm) - s0(nm) ) / dt` ($\partial\zeta/\partial t \approx (\zeta^{n+1}-\zeta^n)/\Delta t$) (:117).
 

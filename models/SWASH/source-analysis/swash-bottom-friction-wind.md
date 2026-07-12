@@ -50,6 +50,8 @@ Purpose/Method 헤더 verbatim (`SwashBotFrict.ftn90:39-52`):
 
 선택자는 `irough`. 마찰계수는 `varfr`(공간변동 마찰)이면 `fricf(nm,2)` 배열에서, 아니면 상수 `pbot(1)`(Nikuradse는 `pbot(2)`)에서 읽음 (예: `SwashBotFrict.ftn90:106,128`). 모든 식은 적셔진 셀(`wetu(nm)==1`)에만 적용 (`SwashBotFrict.ftn90:112`).
 
+**입력 카드·기본값(2026-07-12 직독)**: `FRICtion` 카드가 `irough` 를 설정 — 키워드 생략 시 **MANNing 이 기본**(`irough=3`, cf=0.019). `CONstant`→1(cf=0.002), `CHEZy`→2(C=65), `MANNing`→3(n=0.019), `LOGlaw [SMOOTH|ROUGH [h]]`→4(기본 SMOOTH, pbot(2)=0), `COLEbrook [h]`→5, `LINear [k]`→11 (`SwashReadInput.ftn90:777-806`). 카드 자체를 생략하면 바닥마찰 off(`irough` 초기 0 유지).
+
 산출 `cfricu`/`cfricv`는 무차원 마찰계수 $c_f$(헤더 "constant"는 dimensionless라고 명시, `SwashBotFrict.ftn90:47`). 단, 옵션 1·11(linear)은 m/s 차원 (`SwashBotFrict.ftn90:104` 주석 "dimension is m/s").
 
 ### 2.1 옵션별 식 (구조격자, file:line)
@@ -240,5 +242,5 @@ if ( s0(i) < (1.-wcrstp) * smax(i) ) then
 - 4 파일 모두 헤더 Purpose/Method를 verbatim 인용했고, 모든 마찰계수식·drag식·Charnock/Nikuradse 반복식을 file:line으로 직접 인용 — citation_status: verified 정당.
 - 구조격자판과 mesh판의 **반복식·상수가 완전 동일**함을 확인 (Nikuradse `SwashBotFrict.ftn90:298`=`SwashUBotFrict.ftn90:254`; Charnock `SwashWindStress.ftn90:437`=`SwashUWindStress.ftn90:312`). 모순 없음.
 - Manning 식의 $h^{1/3}$ 지수, Colebrook의 `18*log10` 계수와 `cfix=1.0129` 하한, Nikuradse `erough=33`/`esmoot=9`/`ev=11.6` 상수 모두 소스에서 직접 확인.
-- ⚠ 미확인: `pbot`/`pwnd`/`fricf` 배열에 사용자 입력이 매핑되는 read 루틴(예: SwashReadInput 계열)은 본 검수 범위 밖 — §4 매핑은 사용처(file:line) 기반 추정. 입력 키워드명은 source-needed.
+- ~~⚠ 미확인: `pbot`/`pwnd`/`fricf` 배열 매핑 read 루틴 — 입력 키워드명은 source-needed.~~ **부분 해소(2026-07-12)**: `FRICtion` 카드→`irough`+`pbot(1)`/`pbot(2)` 매핑·키워드·기본값을 §2 서두에 직독 반영(`SwashReadInput.ftn90:777-806`). `pwnd`(바람)·`fricf`(공간변동 마찰 read) 매핑은 여전히 미정독.
 - ⚠ 미확인: SwashUBotFrict는 옵션 1/11 분기에서 linear(11)와 constant(1)를 동일 처리(`SwashUBotFrict.ftn90:109-135`); 구조격자판도 동일(`SwashBotFrict.ftn90:102-134`). linear bottom friction의 별도 물리식은 두 파일 모두 cfricu에 그대로 대입할 뿐 별도 분기 없음 — "linear"는 단지 cfricu가 m/s 차원으로 해석됨을 의미(주석 `:104`).

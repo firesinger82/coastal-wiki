@@ -28,7 +28,7 @@ related:
 | **ROMS** | GLS(k-ε/k-ω/k-kl/generic 단일솔버) / MY2.5 / **KPP(진단)** — 컴파일 상호배타(cppdefs.h:233-240) | GLS `tke`+`gls`(ψ), MY `tke`+`q²l` | GLS: Canuto A/B·Kantha-Clayson·Galperin(gls_corstep.F:1084-1126); MY: Galperin/KC(my25_corstep.F:716-730) | KPP interior 내부파 `lmd_iwm=1e-6/√bvf`(운동량, tracer 는 1e-7 — 10× 비대칭) | [[roms_vertical_mixing]]·[[roms_kpp_boundary_layer]] |
 | **Delft3D-FLOW** | `Tkemod`: **algebraic(기본)**/k-l/k-ε/constant(turclo.f90:190-199, dimrd.f90:439-464) | k(`RTUR1`)+ε(`RTUR2`) | algebraic 만 Ri 감쇠 `fl=exp(−2.3Ri)`·`fs=(1+3.33Ri)^{1.5}/(1+10Ri)^{0.5}`(turclo.f90:350-359 직접 확인); k-ε는 `ν=c_μk²/ε` 고정 | `vicoww/dicoww`(1e-6~1e-5 관례) floor 강제(redvic.f90:68-77)·초기 k/ε 1e-7·cap 10 m²/s(turclo.f90:512-517) | [[delft3d_turbulence]] |
 | **EFDC+** | **MY2.5+Galperin(기본)** / `ISTOPT(0)=2` KC1994 / `=3` Kantha2003 / `ISGOTM>0` GOTM(k-ε 등) | `QQ`(q²)+`QQL`(q²l) | `SFAV=0.392010·(1+7.76Ri)/…` Galperin 계열 유리함수(calavb.f90:45,153-156 — SFAV0 직접 확인) | `AVO/ABO`(card C12, ~1e-5 관례) + cap `AVMX`(~0.5) ×HPI(calavb.f90:273-276) | [[efdc_turbulence]] |
-| **SWASH** | 표준 k-ε(`iturb=1`) / +Speziale 비선형(`=3`); `=2` 의미 미확인 | k+ε(`rtur`) | 없음(C_μ=0.09 고정) — 상수 1.44/1.92/0.09/1.0/1.3/0.5(SwashKepsMod1DH.ftn90:84-89 직접 확인) | `bvisc` floor+분자점성 가산+cap 10(SwashVertVisc.ftn90:78-86); ★비선형(iturb=3)은 floor/cap 생략 | [[swash-turbulence-closure]] |
+| **SWASH** | 표준 k-ε(`iturb=1`, `VISC V KEPS`) / full 3D k-ε 선형(`=2`, `VISC FULL KEPS LIN`) / +Speziale 비선형(`=3`, `NONL`) — SwashReadInput.ftn90:1252-1276 | k+ε(`rtur`) | 없음(C_μ=0.09 고정) — 상수 1.44/1.92/0.09/1.0/1.3/0.5(SwashKepsMod1DH.ftn90:84-89 직접 확인) | `bvisc` floor+분자점성 가산+cap 10(SwashVertVisc.ftn90:78-86); ★비선형(iturb=3)은 floor/cap 생략 | [[swash-turbulence-closure]] |
 | **ADCIRC(3D)** | `IEVC` 경험식 5종(상수·ωH²·κu*z 등) / **MY2.5 quasi-eq**(`IEVC=50/51`, vsmy.F:2035,2403) — 2방정식은 MY뿐 | q²+q²l | MY2.5 Sm(수치 미커버) | `EVMin`(수치 미커버) | [[adcirc-3d-mode]] |
 
 ## 2. 계보 — 세 갈래
@@ -56,7 +56,7 @@ related:
 - **ROMS**: closure 3종 컴파일 상호배타 — 플래그 혼용 시 무음 오선택 위험. `tke/gls` prognostic → **restart 파일 필수**(cold-start 특이 소산). ★`LMD_KPP` 플래그는 존재하지 않음(`LMD_MIXING`+`SKPP/BKPP`가 실제). bottom KPP 는 Monin-Obukhov 상한 없음(표면과 비대칭).
 - **Delft3D**: 키워드는 `Tkemod`(★`TKEDIS` 아님 — tkedis 는 내부파 소산 배열). `Algebraic`(기본)은 균일혼합이 아니라 Ri-감쇠 혼합길이(균일은 `Constant`). 스칼라 쪽 내부파 혼합 `difiwe=0.2√bruvai·xlo²` 는 transport 커널 별도 항. Z-model(z_turclo/z_tratur) 상세 미커버.
 - **EFDC**: 이론 Table 2.1 은 4옵션(MY1982 원본 포함)이나 **코드는 3옵션 — MY1982 원 상수 선택 불가**(calavb 분기 2/3만). `AV/AB`는 depth-normalized(물리단위는 ×수심). 파랑 표면 TKE 주입 부재 여부는 미확정(노트에 없음).
-- **SWASH**: `iturb==2` 의미 미확인(source-needed). 비선형 모드는 background floor/cap 을 건너뜀 — 저에너지 영역 ν 소실 가능.
+- **SWASH**: ~~`iturb==2` 의미 미확인(source-needed)~~ — **해소(2026-07-12)**: `=2` = full 3D k-ε 선형(`VISC FULL KEPS LIN`, SwashReadInput.ftn90:1265-1276; print 라벨 '3D viscosity with linear k-eps model' SwashPrintSettings.ftn90:276 — [[swash-turbulence-closure]] 갱신). 비선형 모드는 background floor/cap 을 건너뜀 — 저에너지 영역 ν 소실 가능.
 - **ADCIRC**: 커버 최약 — MY2.5 안정함수 수치·`EVMin` 기본값·표면/저면 q² BC 식·implicit 여부 전부 미커버(vsmy.F 심층 후속 대상, [[adcirc-3d-mode]]).
 
 ## 6. 관련

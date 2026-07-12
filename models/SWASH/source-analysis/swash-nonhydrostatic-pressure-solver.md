@@ -82,5 +82,5 @@ depth-averaged 2DH implicit solver 의 Method 주석 직접 인용:
 
 - ✅ `bicgstab`/`pcg` 알고리즘 line-by-line(반복·수렴기준) + ILU 전처리 구성 → [[swash-linear-solvers]] (2026-07-04 신설, SwashSolvers.ftn90 5705줄 전수: PCG/SIP/BiCGSTAB/tridiag/dac/nested-Newton + ILU RILUD + primary 인용 Eisenstat/Stone/van der Vorst/Bondeli/Brugnano-Casulli).
 - ✅ Keller-box 연직 이산화(`tridiag` 적용부) — [[swash-linear-solvers]] §0·§6 (nconct-23 band 증거 + Thomas double-sweep).
-- θ-scheme `theta`/`theta3` 파라미터 기본값·안정성(`SwashReadInput` 카드).
+- ✅ θ-scheme `theta`/`theta3` 파라미터 기본값 — **해소(2026-07-12, 카드 파서+CheckPrep 직독)**: `theta3 = pnums(5)`(비정수압 압력경사, 각 Imp\*flow 바인딩 예 `SwashImpDepM1DHflow.ftn90:181`) 는 `NONHYD ... [theta]` 카드가 읽고 INREAL 기본 **-1 sentinel** (`SwashReadInput.ftn90:1522`) → `SwashCheckPrep.ftn90:1273-1286` 이 유효범위 0.5≤θ≤1 강제 후 sentinel 을 **1.0(완전 implicit)** 로 확정(구 0.5/0.51/0.6 자동선택 로직은 주석처리 잔존 `:1278-1284`). 나머지 θ: `TIMEI METH IMPL THETAC`→`pnums(1)`(연속식, CheckPrep `:1265-1267` 에러메시지 기준)·`THETAS`→`pnums(4)`(수위경사) 기본 0.5 (`SwashReadInput.ftn90:1866-1867`), `VERT THETAU`→`pnums(31)`·`THETAW`→`pnums(32)`(u·w 연직항) 기본 0.5 (`:1900-1901`; 초기값 동일 `SwashInit.ftn90:405-417`). 안정성 조건 증명 자체는 tech 문서 축(θ≥0.5 강제가 소스 측 구현).
 - explicit(`SwashExpDep`) vs implicit 선택 기준 + 시간스텝 CFL.

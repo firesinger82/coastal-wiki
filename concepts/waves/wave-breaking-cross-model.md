@@ -62,7 +62,7 @@ related:
 - **SWAN 기본 ON**: BREAKING command 없어도 항상 활성(`OFF BREAKING`으로만 해제) — SWAN 저면마찰이 기본 OFF 인 것과 반대([[bottom-friction-cross-model]] §5 대조). γ 0.73 이 swantech Eq 2.68 Battjes-Stive 와 자기정합.
 - **XBeach 기본 정식 ≠ calibration**: 매뉴얼 기본 `break=roelvink2`(H³/h)이나 γ 0.55·n 10 표준값은 **roelvink1 기준 calibration** — roelvink2 사용 시 재보정 필요(문서 자체 경고).
 - **★FUNWAVE 소스 ≠ 매뉴얼 배수**: 소스 onset `ETAt ≥ Cbrk1·√(gh)`(1배, breaker.F:124-151)이나 매뉴얼 §3.4 는 `η_t^(I)=0.65·2√(gh)`(2배) 표기 — **소스 기준 1배**가 실제. 임계값 인용 시 소스 확인.
-- **미커버**: Celeris breaking 계수(dzdt_I/F_coef·T_star_coef·δ_b) 기본값 노트 미기재(config/globals source-needed). SWAN Thornton-Guza·XBeach Janssen-Battjes 는 이론노트에만(command·식 상세 얕음). SWASH psurf 배열 소스 초기값 위치 미커버(매뉴얼 default 0.6/0.3 만).
+- **미커버**: Celeris breaking 계수(dzdt_I/F_coef·T_star_coef·δ_b) 기본값 노트 미기재(config/globals source-needed). SWAN Thornton-Guza·XBeach Janssen-Battjes 는 이론노트에만(command·식 상세 얕음). ~~SWASH psurf 배열 소스 초기값 위치 미커버~~ — **해소(2026-07-12)**: α=0.6·β=**-1 sentinel**·nufac=1.0(SwashInit.ftn90:326-329, BRE 카드 동일 SwashReadInput.ftn90:916-918); ★매뉴얼 "β 기본 0.3" 의 실체는 CheckPrep 자동선택 — BDF 이류 스킴이면 **0.15**, 아니면 0.3(SwashCheckPrep.ftn90:1065-1090, [[swash-wetting-drying-runup]] §2.1 갱신).
 
 ## 6. 관련
 
