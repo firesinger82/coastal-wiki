@@ -6,7 +6,7 @@ depends_on: []
 canonical_source: self
 citation_status: verified
 provenance: "교재 프로젝트 textbook-ai-data-full ch08(AI 합성 MDX, 무인용) 이식분 — 2026-07-12 원자 단언 분해 후 textbook/md 페이지 대조로 (source_id, page) 전수 부착. 미매칭 단언 2건(Lagrange 1788·Cauchy 1815 역사 연표) 삭제. T1 파일럿([THEORY-LEDGER](../THEORY-LEDGER.md))."
-verification_method: "water-wave-mechanics(Dean & Dalrymple) p.13·54-58·63-66·77-80·98·113-114·285·329 + holthuijsen2007 p.63·124·150·§5.5·ch.6 — textbook/md 미러 페이지 직접 대조 (2026-07-12)."
+verification_method: "water-wave-mechanics(Dean & Dalrymple) p.13·54·63(Eq3.9)·64-66·73-74(선형화)·77-80·78(§3.4.4 Eq3.40-42)·98·113-114·285·329 + holthuijsen2007 p.22-23·63·124·136(§5.4.1)·150·163·173-175·203·§5.5 — textbook/md 미러 페이지 직접 대조 (2026-07-12, Codex 게이트 ⓐ MODIFY 반영: 진행파 해 p.78 정정·선형화 페이지 분리·쓰나미/Phillips/Hasselmann 앵커 보강)."
 note_author: "Claude Fable 5 (citation-grounded port)"
 note_date: 2026-07-12
 related:
@@ -27,9 +27,9 @@ related:
 
 | 경계 | 조건 | 출처 |
 |---|---|---|
-| 바닥 $z=-h$ | 관통 불가 $w = \partial\Phi/\partial z = 0$ | (water-wave-mechanics, p.58 경계조건 총괄표) |
-| 자유표면 운동학(KFSBC) | 표면 $F = z-\eta = 0$ 위의 입자는 표면에 머무름 → 선형화 시 $w = \partial\eta/\partial t$ at $z=0$ | (water-wave-mechanics, p.63) |
-| 자유표면 동적(DFSBC) | 표면 압력 균일(대기압) — Bernoulli 식으로 표현, 선형화 시 $\partial\Phi/\partial t + g\eta = 0$ at $z=0$ | (water-wave-mechanics, p.64-66, Eq. 3.13 계열) |
+| 바닥 $z=-h$ | 관통 불가 — 수평 바닥에서 $w = 0$ (경사 바닥은 $w = -u\,dh/dx$) | (water-wave-mechanics, p.63, Eq. 3.9-3.10 — 총괄표는 p.58) |
+| 자유표면 운동학(KFSBC) | 표면 $F = z-\eta = 0$ 위의 입자는 표면에 머무름(정의 p.63) → Taylor 전개·선형화로 $w = \partial\eta/\partial t$ at $z=0$ | (water-wave-mechanics, 정의 p.63·선형화 p.74) |
+| 자유표면 동적(DFSBC) | 표면 압력 균일(대기압) — Bernoulli 식으로 표현(p.64-66, Eq. 3.13 계열), 2차 곱항 무시 선형화로 $\partial\Phi/\partial t + g\eta = 0$ at $z=0$ | (water-wave-mechanics, 표현 p.64-66·선형화 p.73) |
 
 ## 3. 진행파 해와 분산관계
 
@@ -37,7 +37,7 @@ related:
 
 $$ \Phi = \frac{ag}{\omega}\,\frac{\cosh k(z+h)}{\cosh kh}\,\sin(kx-\omega t) $$
 
-(진행파 속도 포텐셜 유도: water-wave-mechanics, ch.3 — 포텐셜 정의 p.54, 해 조립 p.72-77). 두 자유표면 조건을 동시에 만족시키는 조건이 **분산관계**:
+(진행파 속도 포텐셜: water-wave-mechanics, **p.78 §3.4.4 Progressive Waves, Eq. 3.40-3.42** — 포텐셜 정의 p.54; 동형 해 holthuijsen2007, p.136 §5.4.1, Eq. 5.4.1. ⚠ p.78 md 미러는 OCR 로 식 본문 일부 소실 — 계수의 문자 단위 대조는 원 PDF 필요, 식 형태·유도 경로는 양 출처 정합). 두 자유표면 조건을 동시에 만족시키는 조건이 **분산관계**:
 
 $$ \omega^2 = gk\tanh(kh) $$
 
@@ -49,9 +49,9 @@ $\tanh(kh)$ 의 점근으로 (water-wave-mechanics, p.79-80):
 
 - **깊은물** $kh \gg 1$: $\tanh\to 1$, $\omega^2 \approx gk$ → $c = \sqrt{g/k} = \sqrt{gL/2\pi}$ — 파장이 길수록 빠른 **분산성**.
 - **얕은물** $kh \ll 1$: $\tanh\to kh$, $c \approx \sqrt{gh}$ — 파장 무관, 수심만으로 결정되는 **비분산**.
-- 영역 구분: $kh > \pi$ (h/L > 1/2) 깊은물, 그 미만 중간·얕은물 — "shallow water, intermediate depth, deep water regions" (water-wave-mechanics, p.80). 얕은물 근사의 통용 기준 $h/L < 1/20$ (water-wave-mechanics, p.98 — 얕은물 근사 적용 문맥).
+- 영역 구분: $kh > \pi$ (h/L > 1/2) 깊은물 / $kh < \pi/10$ (h/L < 1/20) 얕은물 / 그 사이 중간 — "shallow water, intermediate depth, deep water regions" (water-wave-mechanics, p.80; 얕은물 근사 적용 예 p.98).
 
-산술 예(위 식의 적용, 별도 단언 아님): 수심 4000 m 대양에서 쓰나미(파장 수십~수백 km)는 얕은물 한계 → $c=\sqrt{9.8\times4000}\approx 198$ m/s ≈ 713 km/h.
+산술 예(위 식의 적용, 별도 단언 아님): 쓰나미 — 해저 지진·사면활동 기원의 장파로, 대양에서 진폭이 작아 감지 어렵고 연안 접근 시 크게 증폭 (holthuijsen2007, p.23; 파 스케일 분류 Fig. 1.1, p.22). 대양 수심 4000 m 에서 얕은물 한계 적용 시 $c=\sqrt{9.8\times4000}\approx 198$ m/s ≈ 713 km/h.
 
 ## 5. 입자 궤도
 
@@ -77,7 +77,7 @@ $$ c_g = nC, \qquad n = \frac{1}{2}\left[1 + \frac{2kh}{\sinh 2kh}\right] $$
 
 ## 8. 역사 연표 (코퍼스 실측분)
 
-수파 역학의 실질적 출발은 한 세기 반 전: **Airy 의 선형 파 이론(1845)** → Stokes 고차 이론(1847) → Boussinesq 장파 이론(1872) → Michell(1893)·McCowan(1894) 한계파고 (water-wave-mechanics, p.13 verbatim 연표). 얕은물 약비선형의 Korteweg-DeVries 방정식은 1895 (water-wave-mechanics, p.329). 20세기 풍파 발생·비선형 상호작용은 Phillips·Hasselmann 계보 (holthuijsen2007, ch.6).
+수파 역학의 실질적 출발은 한 세기 반 전: **Airy 의 선형 파 이론(1845)** → Stokes 고차 이론(1847) → Boussinesq 장파 이론(1872) → Michell(1893)·McCowan(1894) 한계파고 (water-wave-mechanics, p.13 verbatim 연표). 얕은물 약비선형의 Korteweg-DeVries 방정식은 1895 (water-wave-mechanics, p.329). 20세기 계보: 스펙트럼 형상의 Phillips(1958) 차원해석 (holthuijsen2007, p.173-175), 비선형 quadruplet 상호작용의 Hasselmann(1962) Boltzmann 적분 (holthuijsen2007, p.163·203).
 
 > 원본 교재 챕터의 "1788 Lagrange·1815 Cauchy" 연표 2건은 코퍼스에서 페이지 확인 불가 → **삭제** (이식 원칙: 미매칭 단언은 잔존 금지).
 

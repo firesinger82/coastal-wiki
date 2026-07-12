@@ -5,6 +5,8 @@
 > **챕터당 절차(인용접지 파이프라인)**: MDX 이식(컴포넌트 제거) → 원자 단언 분해 → `textbook/md/` FTS5·페이지 대조 → `(source_id, p.N)` 부착 → **미매칭 단언 = 삭제 또는 source-needed 콜아웃** → validator(3종+layer lint) → 지표 기록. 부분 부착 ≠ 파일 verified. frontmatter: `layer: 1` + AI 합성 provenance.
 >
 > **stop/go 게이트**: T1 파일럿 지표로 장별 scope·페이스 재산정(고정 "세션당 N챕터" 없음). Codex 게이트 ⓐ(T1 후)·ⓒ(~4챕터 배치마다).
+>
+> **지표 정의(게이트 ⓐ 확장)**: 단언 수 / 매칭률(부착÷전체) / **anchor 정밀도**(표본 재검증에서 직접 지지 판정 비율 — 광범위 인용·적용문맥 인용은 부적정) / **수식 대조**(전사 오류 0 여부; OCR 소실 페이지는 disclosed) / **residue**(무출처 잔존 단언 수 — verified 는 0 필수) / 소요. 단언별 원장(audit table)은 후속 개선 항목.
 
 ## 진척 대시보드
 
@@ -19,7 +21,7 @@
 | 05 | RANS·난류 | — | hydraulics-and-hydrology | ⬜ | | | |
 | 06 | 경계층 | — | hydraulics-and-hydrology | ⬜ | | | |
 | 07 | 와도 동역학 | — | hydraulics-and-hydrology | ⬜ | | | |
-| **08** | **선형 파동·분산관계** | [theory-ch08-linear-waves](notes/theory-ch08-linear-waves.md) | water-wave-mechanics(주)·holthuijsen2007 | ✅ **T1 완료**(2026-07-12) | 26 | 92% (24 부착·2 삭제) | ~0.5h |
+| **08** | **선형 파동·분산관계** | [theory-ch08-linear-waves](notes/theory-ch08-linear-waves.md) | water-wave-mechanics(주)·holthuijsen2007 | ✅ **T1 완료**(2026-07-12, 게이트 ⓐ MODIFY 반영 재검증) | 26 | 92% (24 부착·2 삭제) · 게이트 후 anchor 정밀화 6곳·residue 2건 해소(쓰나미 p.22-23·Phillips p.173/Hasselmann p.163) → residue 0 | ~0.7h |
 | 09 | 비선형 파동·스펙트럼 | — | holthuijsen2007·hudspeth2005 | ⬜ | | | |
 | 10 | 해안 변형 (shoaling·refraction) | — | coastal-eng-intro-wijetunge·coastal-processes-with-eng-apps | ⬜ | | | |
 | 11 | SWAN 모델 | — | ★claim-level 분해 — 일반 이론만 ①, 모델 구현은 models/SWAN 탐색 링크(복제 금지) | ⬜ | | | |
@@ -36,3 +38,4 @@
 | 게이트 | 일자 | 판정 | 요지 |
 |---|---|---|---|
 | (설계) Codex 2회차 | 2026-07-12 | MODIFY→반영 | 4-레이어 v2 — plan.md 검증 이력 참조 |
+| **ⓐ T1 파일럿** (Codex 3회차, lint ⓑ 겸) | 2026-07-12 | **MODIFY→필수 6건 반영, T2 진행 가능** | 인용검증: §3 진행파 p.72-77→**p.78 §3.4.4 Eq3.40-42 정정**·선형화 페이지 분리(DFSBC p.73/KFSBC p.74)·바닥 p.63 Eq3.9 / residue 2건(쓰나미 파장·Phillips/Hasselmann) 앵커 확보 / 수식 전사 오류 0(p.78 OCR 소실은 disclosed) / lint: 전용 경로 layer·depends_on **강제**+대상 실존성+`..` 금지+scope guard **HEAD 기준** 전환+escape 감사출력. 후속 개선(비차단): 단언별 audit table·회귀테스트·동일 layer 순환 정책 |
