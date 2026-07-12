@@ -149,6 +149,15 @@ verification_date: YYYY-MM-DD
 - 나머지 (02~06)는 sourced claim이 생기면 생성
 - `INDEX.md`에 "미생성 섹션" 컬럼으로 진척 추적
 
+## 8.1 4-레이어 아키텍처 규약 (2026-07-12, [plan.md](plan.md) "4-레이어 지식 아키텍처" — Codex 2회차 검토 반영)
+
+**레이어 = 비배타적 논리 역할** (① 이론 ② 모델 ③ 실제 적용 ④ 응용). 디렉토리·파일 번호가 자동 분류 기준이 아니며 claim·문서 역할로 판정.
+
+- **① 이론 노트**: `textbook/notes/theory-ch<NN>-<slug>.md`. frontmatter `layer: 1` + AI 합성 provenance 명기. 인용은 (source_id, page) 전용. **부분 인용 부착 ≠ 파일 verified** — 미매칭 단언은 삭제 또는 source-needed 콜아웃. 상세 이론의 canonical = ① (concepts 01-02·manual-notes 는 요약+링크 소비).
+- **④ 응용 노트**: `concepts/<topic>/NN-applied-<slug>.md` — **NN = 해당 토픽의 다음 빈 번호**(고정 07 아님). 토픽 횡단 연구는 주 연구질문 기준 한 곳만 canonical + INDEX 응용 표 연결. 문헌 기반이면 experience 선행 불요, 개인 결과 주장 시 experience 커밋고정 링크 필수(본문 복제 금지).
+- **근거 의존성의 단방향**: 단언의 검증이 기대는 의존은 ④→③→②→① 방향만. 탐색용 cross-link 는 claim 복제 없는 범위에서 양방향 허용. 신규 파일은 frontmatter `layer:` + `depends_on:`(근거 의존 대상 경로 목록) 기록 — `tools/validate-layer-deps.sh` 가 방향 검사. **기존 verified 파일은 소급 적용·검사 대상에서 제외.**
+- **③ canonical 허용 기준**: 출처 기반·일반화 가능 절차만 concepts/examples. case-specific 설정·보정값·결과 수치는 G8 대로 coastal-runs → experience 경유.
+
 ## 9. 위키 무결성 검증 도구
 
 `research/` 격리 enforce 와 canonical 무결성 검증은 다음 스크립트로 수행 (정책 출처: [plan.md](plan.md) D3·M10·G8):

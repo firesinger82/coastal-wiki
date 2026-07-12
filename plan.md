@@ -1322,3 +1322,61 @@ LLM-Wiki 4계층(L1 검색·L2 graph·L3 MCP·**L4 유지보수 루프**) 중 L4
 ## 검증 이력
 
 - 2026-07-12 Codex adversarial review 1차: **MODIFY** — D-1 MODIFY/D-2 APPROVE/D-3 APPROVE(대표만)/D-4 REJECT/D-5 MODIFY + 구조결함 10건(게이트 판정 모호·phase/승격 혼동·역방향 G8 위반 가능·재현성 증거 부족·위키 드리프트·A3 이중목적·A1 범위·소유권·명칭 충돌·범위 팽창) → v2 전면 반영.
+
+---
+
+# 4-레이어 지식 아키텍처 (2026-07-12, v2 — Codex adversarial review 2회차 MODIFY 전면 반영, 사용자 승인)
+
+## 트리거·정정
+
+사용자 제안: **① 이론 → ② 모델(소스·매뉴얼 = 현 구조) → ③ 모델 및 분석 내용(실제 적용) → ④ 응용(연구·융합)**. 이론 원천 = `E:\numerical_models\textbook-ai-data-full`(교재 16챕터 MDX, 인용 없는 AI 합성본 — 원 코퍼스 12권은 위키 `textbook/md/`·sources.yml 기등록). 직전 "Applied Study 전환 계획 v2" 는 **3분해**(Codex 지적 — 단일 소속 오류): run 실행·provenance=③(P0/B1 로드맵 유지) / 연구 해석·융합 노트=④ / 개인 검증 결과=experience(횡단).
+
+**사용자 확정 전제(2026-07-12)**: (a) 이론 이식 = 챕터별 인용보강(textbook/md 대조 → (source_id, page) 부착), (b) ④ 응용 노트 = concepts/<topic>/ 신규 파일, (c) 기존 verified 노트 오염 금지.
+
+**설계 근거(외부 리서치 2026-07-12)**: Karpathy LLM Wiki 패턴(2026-04 X, raw/wiki/schema + ingest/query/lint) — coastal-wiki 와 동형(raw=textbook/md·wiki=canonical·schema=CONVENTIONS+sources.yml·query=MCP·lint=L4 감사), **결여 연산 = ingest** → 본 계획이 채움. 인용접지 파이프라인 표준(원자 단언 분해→신뢰 KB 검색→검증 스코어링, PaperTrail arXiv:2602.21045 등) = §3 이식 절차의 근거. 하네스 공학(장기 작업 = 단일 드리프트 세션 금지, 스테이지+체크포인트+품질게이트 — philschmid 2026·RepoProver maker/checker).
+
+## 1. 레이어 ↔ 위키 물리 구조 매핑
+
+**레이어는 비배타적 논리 역할이다 — 디렉토리·파일 번호가 자동 분류 기준이 아니며, claim·문서 역할로 판정한다** (Codex #1: concepts/03 에도 분석 이론이, 04 에도 일반 도구 설명이 있을 수 있음).
+
+| 레이어 | 정의 | 주 물리 위치 | 현황 | 갭 |
+|---|---|---|---|---|
+| **① 이론** | 교과서 수준 수식 유도·물리 원리 | `textbook/notes/theory-*` (신설 계열) | md 코퍼스 10권+sources.yml 완비, 체계 이론노트 부재 | 교재 16챕터 이식(T 트랙) |
+| **② 모델** | 소스코드·매뉴얼·공식자료 분석 | `models/<model>/` | **12/12 종결**(2026-07-12) | 유지보수 모드 |
+| **③ 실제 적용** | 출처 기반·**일반화 가능한** 셋업·검증·분석 절차 | concepts 03·04·06 중 해당 claim + `examples/` (canonical) / coastal-runs→experience (개인) | 03·04·06 다수 verified, examples 4건, runs 실사용 0 | P0·B1 로드맵(구 v2 계승) |
+| **④ 응용** | 연구·융합 — 문헌 종합·연구 설계·ML surrogate 등 | `concepts/<topic>/NN-applied-*.md` (다음 빈 번호) | 선례: storm-surge/07-ml-emulators | AP 트랙 신설 |
+| (횡단) 경험 | 3조건 통과 개인 검증 — **별도 provenance 레이어** | `experience/` | 10건 | ④는 experience 를 **커밋고정 링크로만 소비**(본문 복제 금지) |
+
+- **③ canonical 허용 기준**(Codex #3): 출처 기반·일반화 가능 절차만 concepts/examples. case-specific 설정·보정값·결과 수치는 G8 대로 coastal-runs 강제.
+- **① 소유권**(드리프트 방지): 상세 이론의 canonical = ① theory 노트. concepts 01-02·models manual-notes 는 요약+링크로 소비. 신규 ① 노트가 기존 노트와 겹치면 ①이 상세본, 기존 노트는 손대지 않고 이후 자연 갱신 시점에 링크 전환.
+
+## 2. 참조 규율 — "근거 의존성의 단방향" (Codex #5 개칭)
+
+- **근거 의존성**(이 노트의 단언이 저 노트의 검증에 기댐)은 ④→③→②→① 단방향. **탐색용 cross-link 는 claim 복제를 만들지 않는 범위에서 양방향 허용** — ① 이론 노트가 "모델 구현은 [[모델노트]] 참조"라 안내하는 것은 탐색 링크(허용), ① 이 ② 의 소스 분석을 자기 단언의 근거로 쓰는 것은 위반.
+- 인용 단위: ①=(source_id, page) / ②=file:line·페이지 / ③=①② verified 링크+재현 절차 / ④=①②③ 링크+외부 문헌.
+- 개인 run 산출물은 어느 레이어에도 직접 못 들어옴(#8) — coastal-runs 경유 experience 만.
+- **집행**(Codex #6): 신규 파일 전용 frontmatter `layer:`·`depends_on:` + pre-commit lint(`tools/validate-layer-deps.sh`) — 근거 의존 방향만 검사. **기존 verified 파일은 검사·백필 대상 제외.** 이식 커밋이 기존 verified 본문을 변경하지 않았는지 scope guard 동시 검사.
+
+## 3. T 트랙 — 교재 이식 (레이어 ①)
+
+- 파일명: `textbook/notes/theory-ch<NN>-<slug>.md`. frontmatter: `layer: 1`, AI 합성 provenance 명기, `citation_status` 는 인용보강 결과로 판정.
+- 챕터당 절차(인용접지 파이프라인): MDX 이식(인터랙티브 컴포넌트 제거) → **원자 단언 분해** → textbook/md FTS5·페이지 대조 → `(source_id, p.N)` 부착 → **미매칭 단언 = 삭제 또는 source-needed 콜아웃**(부분 부착 ≠ 파일 verified, Codex 지적) → validator.
+- **페이스 = 지표 기반**(Codex #8, "세션당 1-2챕터" 고정 폐기): T1 파일럿(08 선형파동)에서 단언 수·출처 매칭률·소요시간 측정 → `textbook/THEORY-LEDGER.md` 에 기록 → stop/go 게이트 후 장별 scope 재산정.
+- 순서: **T1=08(파일럿) → T2=12 조석(③ B1 조석 캘리브 연계 — Codex #8)** → 09→10→13→14 → 기초 01-07 → **11·15(SWAN·EFDC)는 claim-level 분해** — 일반 이론만 ①에, 모델 구현 서술은 복제하지 않고 기존 models/ 노트 탐색 링크(Codex #4).
+- 교재 챕터 자체는 sources.yml 에 등록하지 않음(AI 합성본은 출처 아님 — #3). 원 교재 12권이 출처.
+
+## 4. AP 트랙 — 응용 노트 규약 (레이어 ④)
+
+- 명명: **다음 빈 번호** `NN-applied-<slug>.md`(고정 07 아님 — waves/07·08 기점유, Codex #7). 토픽 횡단 연구는 주 연구질문 기준 한 곳만 canonical + INDEX 응용 표에서 연결.
+- 성격: 연구·융합(JPM/EVA 방법론·surrogate 설계·커플링 연구 종합). citation_status 규율 동일.
+- **문헌 기반 ④ 노트는 experience 승격 선행 불요**(Codex #9) — 개인 결과를 주장하는 ④ 노트만 experience 링크 선행.
+
+## 5. 실행 하네스·순서 (명칭 T*/AP* — 기존 L1 검색/L4 감사와 충돌 회피, Codex #10)
+
+- **cron/자동 loop 미사용** — 인용 검증은 사람 게이트. 기존 L4 cron 이 신규 노트 자동 감사(lint 기존재). **동시 진행 한도 = 1 트랙**(T/AP/③ 교대, Codex 과부하 지적).
+- 순서: ⑴ 거버넌스 명문화(본 섹션+CONVENTIONS+CLAUDE) → ⑵ 하네스(THEORY-LEDGER·layer lint) → ⑶ **T1**=ch08 파일럿 → Codex 게이트 ⓐ → ⑷ **T2**=ch12 → 배치 진행(~4챕터마다 Codex 게이트 ⓒ) → AP1(첫 응용 노트)·③ P0/B1 교대.
+- Codex 게이트: ⓐ T1 완료(지표+절차) ⓑ lint 설계 ⓒ 배치마다 ⓓ AP 규약 확정. 같은 스레드 `--resume`.
+
+## 검증 이력
+
+- 2026-07-12 Codex adversarial review 2회차(스레드 019f5661): **MODIFY** — E-1 APPROVE(분산 매핑, 단 논리 분류 명시)/E-2 MODIFY(①→② 링크가 단방향 규칙과 자기모순 → 근거/탐색 링크 분리)/E-3 APPROVE(단 07+ 번호 기점유 → NN-applied)/E-4 MODIFY(고정 페이스 폐기→지표 기반, 12장 조기)/E-5 MODIFY(집행 불가능 → 근거 의존성 한정+경량 lint) + 구조결함 10건(v2 단일소속 오류·G8 누출·experience 역할 중첩·규칙 자기모순·레이어 배타성 착각·오염 scope guard·3중 복사본 드리프트·AI 합성본 권위상승·명칭 충돌·writer 과부하) → v2 전면 반영. 사용자 plan-mode 승인(2026-07-12).

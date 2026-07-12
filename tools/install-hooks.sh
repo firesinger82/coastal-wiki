@@ -15,7 +15,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 WIKI_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 HOOK="$WIKI_ROOT/.git/hooks/pre-commit"
-MARKER="# coastal-wiki:pre-commit:v4"
+MARKER="# coastal-wiki:pre-commit:v5"
 
 if [ ! -d "$WIKI_ROOT/.git" ]; then
     echo "ERROR: $WIKI_ROOT/.git 없음. git repo 루트에서 실행하세요."
@@ -37,6 +37,7 @@ $MARKER
 #   3) research isolation 검증 — staged snapshot 기준 (F1)
 #   4) canonical hygiene 검증 (G8b 경로·G8d placeholder) — staged snapshot
 #   5) 내부 링크 무결성 (깨진 상대 .md 링크·[[wikilink]]) — staged snapshot
+#   6) 4-레이어 근거 의존성 방향 + scope guard (CONVENTIONS §8.1) — staged snapshot
 set -euo pipefail
 
 WIKI_ROOT="\$(git rev-parse --show-toplevel)"
@@ -104,6 +105,14 @@ if [ ! -x "\$LINKS" ]; then
     exit 1
 fi
 bash "\$LINKS" --staged
+
+# ---------- 6) 4-레이어 근거 의존성 (staged snapshot) ----------
+LAYERS="\$WIKI_ROOT/tools/validate-layer-deps.sh"
+if [ ! -x "\$LAYERS" ]; then
+    echo "pre-commit: \$LAYERS 실행 불가. chmod +x 또는 누락 확인."
+    exit 1
+fi
+bash "\$LAYERS" --staged
 EOF
 
 chmod +x "$HOOK"

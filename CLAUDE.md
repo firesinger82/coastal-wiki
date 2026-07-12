@@ -21,7 +21,8 @@
 
 | 경로 | 무엇이 들어가는가 | 무엇이 안 들어가는가 |
 |---|---|---|
-| `concepts/<topic>/` | 개념·이론·분석법·코드·예제·모델적용 (도메인 관점) | 특정 사례의 개인 결론 |
+| `concepts/<topic>/` | 개념·이론·분석법·코드·예제·모델적용 + 응용 연구노트(`NN-applied-*`, [CONVENTIONS.md](CONVENTIONS.md) §8.1) | 특정 사례의 개인 결론 |
+| `textbook/notes/theory-*` | 4-레이어 ① 이론 canonical — 교재 인용보강 이식분 (§8.1, [textbook/THEORY-LEDGER.md](textbook/THEORY-LEDGER.md) 추적) | 무인용 AI 합성 잔존 단언 |
 | `models/<model>/source-analysis/` | 모델 소스코드 분석 (서브루틴별·모듈별) | 모델 사용 후기 |
 | `models/<model>/manual-notes/` | 공식 메뉴얼 발췌·정리 (페이지 인용 필수) | 메뉴얼 없는 추정 |
 | `models/<model>/web-refs/` | 공식 위키·논문·블로그 인용 정리 | 비인용 추측 |
