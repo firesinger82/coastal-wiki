@@ -49,6 +49,7 @@ s1=s0,u1=u0 → [Nested Newton loop]: furu(fu/ru) → s1nod(A,d 조립) → solv
 - **`solve_matrix`(m_solve_guus)**: "Guus" solver — minimum-degree reordering + CG/direct 류 SPD 해법(`pack_matrix`+`solve_matrix`). reduce once then conjugate-grad substitute.
 - **Nested Newton**(`firstnniteration`, Casulli-Zanolli): wetting/drying 의 부피-수위 비선형을 Newton 반복으로 — **음수 수심 방지(양정치 보장)**, 무조건 안정. 큰 dt 가능.
 - semi-implicit: 수위·barotropic 운동량 implicit(θ-method), advection explicit(CFL 제한 완화).
+- **θ 수치값(2026-07-12 보강)**: MDU `[numerics] Teta0` — 기본 **0.55** (`m_flowparameters.f90:851 teta0 = 0.55_dp`, 주석 verbatim "uniform teta in horizontal"), 파싱 `unstruc_model.f90:1209`, 유효범위 주석 "Theta of time integration (0.5 < theta < 1)"(`:3185`). 공간상수 θ 는 `flow_geominit.f90:958` 에서 `teta = abs(teta0)` 설정(가변 θ 는 `ivariableteta=2` 시 setdt 재정의, `teta0==1.0` 완전 implicit 특례 `:959`). 연직 transport implicitness 도 동값 계열: `thetavert = tetav`(주석 'Central implicit 0.55d0', `ini_transport.f90:160`).
 
 ## 5. structured(ADI) vs unstructured(FM) 대비
 

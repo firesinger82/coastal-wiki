@@ -35,8 +35,8 @@ purpose: "사용자 지시(2026-06-16) '모든 모델은 모든 문서·코드�
 | 모델 | 코어 소스파일 | 코어 검수 | 문서(PDF) | manual-notes | 우선순위 |
 |---|--:|:--:|--:|--:|:--:|
 | **SWASH** | 160 | ✅ 21 노트 (전수 + linear/unstructured-solvers 2026-07-04 + **핀포인트 4갭 소스직독 해소 2026-07-12**) | 2 | ✅ 2 | ✅ **종결**(2026-07-12) |
-| **Delft3D** | engines_gpl 3,503 (+utils) | ✅ 39 노트 (엔진+utils S) | 53 | ✅ 9 (매뉴얼+도구) | ✅ 완료 |
-| **ROMS** | roms/ROMS ~900 | ✅ 33 노트 (4D-Var) | 10 | ✅ 4 (+Exercise 카탈로그) | ✅ 완료 |
+| **Delft3D** | engines_gpl 3,503 (+utils) | ✅ 48 노트 (엔진 C + utils S, 실측 2026-07-12) | 53 | ✅ 11 (매뉴얼+도구) | ✅ **종결**(2026-07-12; FM θ 0.55·ADI CFL 경고체계·z_turclo 동형 3갭 해소, §2 판정) |
+| **ROMS** | roms/ROMS ~900 | ✅ 37 노트 (4D-Var suite + 2026-07 심화, 실측) | 10 | ✅ 4 (+Exercise 카탈로그) | ✅ **종결**(2026-07-12; flag 0건 판정, §3) |
 | **FUNWAVE** | TVD 38 + GPU 41 | ✅ 11 노트 (wk-data2d·build-blackwell 포함 실측) | 39 | ✅ 3 (+검증 카탈로그) | ✅ **종결**(2026-07-12; ★Cd 기본 0.0 마찰 off 갭 해소) |
 | **ADCIRC** | adcirc/src 56 (+gahm·asgs) | ✅ 38 노트 (정화 2026-06-18 + VSSOL 2026-07-11 + **NFFR flux 경계 2026-07-12 사용자 지목 보강**) | 98 | 21 + web-refs(논문 30) | ✅ **종결**(2026-07-11; 종결 후 보강 허용) |
 | **EFDC** | 264 (+GVC 301 legacy S) | ✅ 38 노트 (+GVC legacy·**CALUVW 전단솔버 2026-07-11 = 마지막 코어 갭**) | 6 | ✅ 9 (+Training/Grid·Ch5/Ch6 cross-walk) | ✅ **종결**(2026-07-11; GVC 불요·GOTM T티어 판정) |
@@ -92,7 +92,9 @@ purpose: "사용자 지시(2026-06-16) '모든 모델은 모든 문서·코드�
 
 ---
 
-## 2. Delft3D 🔴 (engines_gpl 3,503 / SA 21)
+## 2. Delft3D 🟢 **종결 2026-07-12** (engines_gpl 3,503 / SA 48 + MN 11 — 구 "SA 21" 헤더 stale)
+
+> **종결 판정(2026-07-12)**: 전 엔진 C티어 검수(2026-06-16 workflow)+WAQ 4편·morphology·difu 계열 후속 심화 = **SA 48 실측**. cross-model flag 마지막 3건 소스직독 해소 — ①FM `Teta0` 기본 **0.55**(m_flowparameters.f90:851, '0.5<θ<1') ②ADI advection explicit 정량 CFL = `chkadv.f90` 반스텝 Courant 점검(>1 시 G051 경고+권장 dt, 하드스톱 아님 — Stelling 1984 정의) ③Z-model `z_turclo/z_tratur` = σ판과 동일 closure·동일 Ri-감쇠 상수(z_turclo.f90:398-399 = turclo.f90:350-359) 대조 확인, 전용 노트 불요. 잔여 S/⬜ 는 아래 표 판정 — 도구 GUI·utils 는 S요약([delft3d_utils_libraries](Delft3D/source-analysis/delft3d_utils_libraries.md))·비코어, doxygen ⬛.
 
 **소스**: `src/` 7,240파일 중 **third_party_open 2,633 = ⬛ N/A** (eigen 532·boost 338·petsc 296·proj 292·netcdf 185·expat 169·gdal 153·spherepack 118·metis 115...).
 
@@ -122,23 +124,25 @@ purpose: "사용자 지시(2026-06-16) '모든 모델은 모든 문서·코드�
 | rr (강우유출) | 111 | C | **rr_rainfall_runoff** | ✅ |
 | wave (SWAN wrapper) | 81 | C | flow_wave_coupling + **wave_swan_module** | ✅ |
 | rtc (실시간제어) | 56 | S | **rtc_realtime_control** | ✅ |
-| dsle/dimr/d_hydro | 47 | S | dimr_coupling·engines_overview | 🟡 |
-| utils_gpl | 766 | S | — | ⬜ |
-| utils_lgpl | 491 | S | — | ⬜ |
-| tools_gpl | 251 | S | dredge_dump·dd | 🟡 |
+| dsle/dimr/d_hydro | 47 | S | dimr_coupling·engines_overview — S요약 충분 판정(2026-07-12: 결합 오케스트레이션, 물리 커널 아님) | ✅ (S요약) |
+| utils_gpl | 766 | S | **delft3d_utils_libraries**(S-tier 개요) | ✅ (S요약) |
+| utils_lgpl | 491 | S | **delft3d_utils_libraries**(S-tier 개요) | ✅ (S요약) |
+| tools_gpl | 251 | S | dredge_dump·dd — S요약 충분 판정(2026-07-12: 전·후처리 도구) | ✅ (S요약) |
 | third_party_open | 2,633 | T | — | ⬛ |
 
 ---
 
-## 3. ROMS 🟠 (roms/ROMS ~900 / SA 22)
+## 3. ROMS 🟢 **종결 2026-07-12** (roms/ROMS ~900 / SA 37 + MN 4 — 구 "SA 22" 헤더 stale)
 
 **소스**: WRF(~700, ⬛ 결합 대기모델 N/A)·roms_libs/ARPACK+BLAS+LAPACK(~360, ⬛ N/A) 제외 후 ROMS 코어.
+
+> **종결 판정(2026-07-12)**: cross-model 대조노트(시간적분·저면마찰·연직혼합·침수노출) flag **0건** — nonlinear 코어·4D-Var suite(TLM/ADM/RPM)·GST·sea-ice·BBL·biology·KPP·EOS·wetdry·tracer timestep 전부 verified 소급(SFINCS 와 같은 판정-종결형). SA 37 실측(step3d_t·kpp·eos·wetdry 등 2026-07 후속 심화 포함). 문서 잔여는 비코어 — Exercise 는 카탈로그([roms-exercises-catalog](ROMS/manual-notes/roms-exercises-catalog.md)) 기커버(examples 티어), tidal_ellipse.pdf 는 분석 유틸 문서(roms_tidal_forcing 부분 커버로 충분 판정).
 
 ### 3.1 문서 (10 PDF)
 | PDF | 종류 | 노트 | 상태 |
 |---|---|---|---|
-| Exercise_1~9.pdf | 실습 튜토리얼 | — | ⬜ (examples 후보) |
-| tidal_ellipse.pdf | 조석타원 분석 | roms_tidal_forcing(부분) | 🟡 |
+| Exercise_1~9.pdf | 실습 튜토리얼 | **roms-exercises-catalog**(카탈로그) | ✅ (examples 티어) |
+| tidal_ellipse.pdf | 조석타원 분석 | roms_tidal_forcing(부분) — 충분 판정(2026-07-12: 분석 유틸 문서, 코어 아님) | ✅ |
 
 ### 3.2 코드 모듈 (roms/ROMS) — 2026-06-16 workflow 11 신규 노트 (총 33 SA)
 > 4D-Var suite(Tangent·Representer·Adjoint) + Drivers·Functionals·Modules·Include·Utility 검수 완료. 적대 검증 통과(global_state g 가드 SOLITON 오기 + utility shapiro ξ/η 방향 뒤바뀜 2건 적발→수정).

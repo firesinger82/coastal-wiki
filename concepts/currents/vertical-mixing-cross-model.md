@@ -49,15 +49,15 @@ related:
 
 ## 4. 수치 처리 공통점
 
-전 모델이 연직확산·소산을 **implicit(tridiagonal)** 처리(소산 Newton 선형화: Delft3D tratur:904-924·SWASH :503-632·EFDC 대각 :353-355), 생산은 explicit — wet-dry·성층에서의 stiffness 대응이 공통 설계. 예외: ROMS KPP(방정식 자체가 없음), ADCIRC(tridiagonal 여부 위키 미명시).
+전 모델이 연직확산·소산을 **implicit(tridiagonal)** 처리(소산 Newton 선형화: Delft3D tratur:904-924·SWASH :503-632·EFDC 대각 :353-355), 생산은 explicit — wet-dry·성층에서의 stiffness 대응이 공통 설계. 예외: ROMS KPP(방정식 자체가 없음), ADCIRC 는 운동량 연직확산이 **복소 tridiagonal** 로 확인(2026-07-12 갱신, [[adcirc-3d-vssol-vertical-scheme]] — MY2.5 q² 방정식 자체의 처리는 TURB 내부 미커버).
 
 ## 5. ★함정·미커버 (disclosed gaps)
 
 - **ROMS**: closure 3종 컴파일 상호배타 — 플래그 혼용 시 무음 오선택 위험. `tke/gls` prognostic → **restart 파일 필수**(cold-start 특이 소산). ★`LMD_KPP` 플래그는 존재하지 않음(`LMD_MIXING`+`SKPP/BKPP`가 실제). bottom KPP 는 Monin-Obukhov 상한 없음(표면과 비대칭).
-- **Delft3D**: 키워드는 `Tkemod`(★`TKEDIS` 아님 — tkedis 는 내부파 소산 배열). `Algebraic`(기본)은 균일혼합이 아니라 Ri-감쇠 혼합길이(균일은 `Constant`). 스칼라 쪽 내부파 혼합 `difiwe=0.2√bruvai·xlo²` 는 transport 커널 별도 항. Z-model(z_turclo/z_tratur) 상세 미커버.
+- **Delft3D**: 키워드는 `Tkemod`(★`TKEDIS` 아님 — tkedis 는 내부파 소산 배열). `Algebraic`(기본)은 균일혼합이 아니라 Ri-감쇠 혼합길이(균일은 `Constant`). 스칼라 쪽 내부파 혼합 `difiwe=0.2√bruvai·xlo²` 는 transport 커널 별도 항. ~~Z-model(z_turclo/z_tratur) 상세 미커버~~ — **해소(2026-07-12, 소스 대조)**: σ판과 동일 closure(ltur 0/1/2)·동일 Ri-감쇠 상수(`exp(−2.3Ri)`·`1+3.33Ri`, z_turclo.f90:398-399,454,538-539 = turclo.f90:350-359), 차이는 Z-layer 인덱싱뿐([[delft3d_turbulence]] 갱신).
 - **EFDC**: 이론 Table 2.1 은 4옵션(MY1982 원본 포함)이나 **코드는 3옵션 — MY1982 원 상수 선택 불가**(calavb 분기 2/3만). `AV/AB`는 depth-normalized(물리단위는 ×수심). 파랑 표면 TKE 주입 부재 여부는 미확정(노트에 없음).
 - **SWASH**: ~~`iturb==2` 의미 미확인(source-needed)~~ — **해소(2026-07-12)**: `=2` = full 3D k-ε 선형(`VISC FULL KEPS LIN`, SwashReadInput.ftn90:1265-1276; print 라벨 '3D viscosity with linear k-eps model' SwashPrintSettings.ftn90:276 — [[swash-turbulence-closure]] 갱신). 비선형 모드는 background floor/cap 을 건너뜀 — 저에너지 영역 ν 소실 가능.
-- **ADCIRC**: 커버 최약 — MY2.5 안정함수 수치·`EVMin` 기본값·표면/저면 q² BC 식·implicit 여부 전부 미커버(vsmy.F 심층 후속 대상, [[adcirc-3d-mode]]).
+- **ADCIRC**: 커버 최약 — MY2.5 안정함수 수치·표면/저면 q² BC 식은 미커버 잔존(vsmy.F `TURB` 내부, [[adcirc-3d-mode]] §F 카탈로그 수준). **부분 해소(2026-07-12)**: ~~`EVMin` 기본값~~ → 기본값 없음, fort.15 3D 블록 필수 필드(`READ(15,*) IEVC,EVMin,EVCon`, read_input.F:5237)이며 docs 가 "연직 점성 ≥ EVMIN 강제"(floor) 명시(paramdef:1349-1356); ~~운동량 연직확산 implicit 여부~~ → 복소 tridiagonal 확인([[adcirc-3d-vssol-vertical-scheme]], 2026-07-11).
 
 ## 6. 관련
 

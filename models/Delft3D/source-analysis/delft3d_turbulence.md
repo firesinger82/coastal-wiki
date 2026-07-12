@@ -25,7 +25,7 @@ How Delft3D-FLOW selects between constant, algebraic, k-l, and k-ε vertical tur
 - `flow2d3d_data/include/physco.igs:43-47` — `vicoww/dicoww` declarations.
 - `flow2d3d_kernel/src/compute/redvic.f90:68-77`, `reddic.f90:68-77` — background floor enforcement.
 
-Note: this is the sigma-FLOW path. Z-model has parallel `z_turclo.f90` / `z_tratur.f90` with the same closure structure.
+Note: this is the sigma-FLOW path. Z-model has parallel `z_turclo.f90` / `z_tratur.f90` with the same closure structure. **동형 확인(2026-07-12, 소스 대조)**: `z_turclo.f90`(617줄) 헤더가 동일 closure 체계(ltur 0=algebraic/1=k-L/2=k-ε) 명시(:42-49), Ri-감쇠 상수도 σ판과 동일 — `fl = exp(−2.3·min(Ri,30))` (:398,454,538)·`aa = 1+3.33·Ri` (:399,539) = `turclo.f90:350-359` 와 일치. 차이는 Z-layer 인덱싱(kmin·부분셀 마스크)뿐 — 별도 물리 없음, 전용 노트 불요 판정.
 
 ## A. Option dispatch (Tkemod)
 
