@@ -49,6 +49,7 @@ related:
 - **ε=0 ⇒ 균일격자 모드**: regrid 블록은 `epsilon>0 || first_t_step` 에서만 실행(`cuda_adaptive_simulate.cu:479`) — ε=0 이면 첫 스텝 후 finest 균일격자 고정(= 비적응 GPU FV1/DG2).
 - **`grading`(이웃 균형) 은 MWDG2 지형 preflag 에서만**: topo 인코딩 MW 분기에서 significant 셀의 동레벨 이웃 4개 flag(`mra/encode_and_thresh_topo.cu:89-118`) — HWFV1 분기·flow 인코딩에는 부재. 일반적으로 **2:1 balance 는 강제되지 않음**(§2-6).
 - **`tol_q` 데드 파라미터**: 0 하드코딩(`SolverParams.h:16`), parfile·CLI 미노출 → q-임계 절사(`encode_and_thresh_flow.cu:52` 외 다수, `fv1_update.cu:219`)는 전부 무동작.
+- **`tol_h` = 1e-3 하드코딩(2026-07-12 보강)**: adaptive 솔버군의 wet/dry 임계 — `SolverParams.h:15` 기본값이며 `tol_q` 처럼 **parfile 미노출**(생성자 read_keyword 목록 `:33-72` 에 없음). 사용처: DG2 wet 판정(`dg2_update.cu:51-55`, 자기+4이웃 h≥tol_h)·HLL flux·`get_star` wetting-drying·implicit 마찰(`friction_implicit.cu:90`). classic 계열 `DepthThresh`(lisflood.cpp:171, 동값 1e-3) 와 **별개 변수**지만 값 일치. `tol_s`=1e-9(`:17`).
 - **첫 Δt=0.001 s 하드코딩**(`cuda_adaptive_simulate.cu:184`); CFL 값도 솔버별 고정(§1) — parfile `initial_tstep` 은 dry-cell Δt 후보로만 쓰임(§2-8).
 - **별도 미니앱 성격**: `simulation.run(argc, argv)` 가 parfile 을 **자체 키워드로 재파싱**(`max_ref_lvl`·`epsilon`·`hwfv1/mwdg2`·`grading`·`limitslopes`·`tol_Krivo`·`refine_wall`·`ref_thickness`·`startq2d`, `SolverParams.h:33-72`) — 본체 파서(input.cpp)의 State 를 사실상 무시. 합성 테스트 22종 내장(`cuda_adaptive_simulate.cu:59-87`), `monai.dem`·`oregon-seaside-0p02m.dem` 파일명 하드코딩 특례(`SimulationParams.h:58-59`).
 

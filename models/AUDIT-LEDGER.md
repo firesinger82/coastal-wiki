@@ -43,8 +43,8 @@ purpose: "사용자 지시(2026-06-16) '모든 모델은 모든 문서·코드�
 | **XBeach** | 118 | ✅ 33 노트 (intrawave 2026-07-07 포함 실측) | 9 | ✅ 4 | ✅ **종결**(2026-07-12; eps·wetz 산정식 갭 해소) |
 | **SWAN** | 77 | ✅ 29 노트 (58파일 커버리지 감사 8후보 전원 기작성 + swancom1 crosswalk 2026-07-04) | 9 | 29 | ✅ **종결**(2026-07-12; §11 판정) |
 | **Celeris** | WebGPU JS+CUDA | ✅ 9 노트 | 3 | 1 + web-refs(Lynett 2026) | ✅ **종결**(2026-07-12; breaking 계수·FrictionCalc·dt 정적 3갭 해소) |
-| **SFINCS** 🆕 | src 36 (f90) | ✅ 8 노트 (전 코어, 검수) | readthedocs + **v2.4.0 릴리스** | ✅ 4 (numerical·params-io·**v2.4.0 검증 testbed 77케이스**·**changelog**) | ✅ 완료 (코드+문서+검증) |
-| **LISFLOOD-FP** 🆕 | classic+swe+cuda (C++/CUDA) | ✅ 7 노트 (전 솔버, 검수) | user manual PDF | ✅ 1 (user-manual) | ✅ 완료 (코드+문서) |
+| **SFINCS** 🆕 | src 36 (f90) | ✅ 9 노트 (전 코어 + infiltration 2026-07-07) | readthedocs + **v2.4.0 릴리스** | ✅ 5 (numerical·params-io·model-building·testbed 77케이스·changelog) | ✅ **종결**(2026-07-12; flag 0건, §12 판정) |
+| **LISFLOOD-FP** 🆕 | classic+swe+cuda (C++/CUDA) | ✅ 8 노트 (전 솔버 + mwdg2-adaptive 2026-07-07) | user manual PDF | ✅ 1 (user-manual) | ✅ **종결**(2026-07-12; tol_h 1e-3 하드코딩 갭 해소, §13 판정) |
 | **CADMAS-SURF** 🆕 | 4 시뮬 ~1255 (f/f90) | ✅ 17 노트 (**코드 100% 포섭**: C티어 13(entrapped-air 포함) + S티어/커버리지 4) | **26 PDF 전수** | ✅ 5 (SURF3D·2F·STR·AGENT 영문 cross-confirm + 카탈로그) | ✅ **종결**(2026-07-12; 잔여=일문매뉴얼 중복·바이너리 3툴 내부·LICENSE 부재 — 전부 disclosed 비코어 판정) |
 
 > **전수 검수 완료 (2026-06-16~18, workflow 7회 · 66 신규 노트)**: ~~SWASH·Delft3D engines·ROMS 4D-Var·핵심 매뉴얼 10종~~ + ~~polish(Delft3D utils·EFDC-GVC·도구/Training 매뉴얼·ADCIRC 30논문·Celeris·ROMS Exercise·FUNWAVE 검증)~~ ✅. 모든 단언 file:line/page 인용 + 적대 검증 통과(9건 실오류 적발→수정). **신규 모델 2(2026-06-18)**: SFINCS(Deltares compound flooding)·LISFLOOD-FP v8.2(Bristol/Sheffield 침수) — README+architecture+web-refs+manifest 생성, **모듈/솔버 deep source-analysis 는 후속 workflow**(SWASH 패턴). **잔여(선택적)**: Delft3D Library Tables·course PDF, ~~EFDC-GVC 심층~~(**불요 판정 2026-07-04** — DSI 공식 비권장·무지원 + repo 동결 2021-11 sha 68dc93f + mainline 12.4 SGZ 가 후속 통합 구현 + [efdc_gvc_legacy](EFDC/source-analysis/efdc_gvc_legacy.md) verified 로 계보·구조·SGZ 대조 기커버. EFDC+ 버전 provenance 확정: **12.4**, aaefdc.f90:22, sha 3ed76b6 — manifest 참조), ~~신규2 모델 deep~~(SFINCS·LISFLOOD-FP 완료 2026-06 확인), 양호모델 추가 심화.
@@ -304,6 +304,26 @@ Celeris-WebGPU(JS + .wgsl/.cu compute shader). boussinesq-solver·breaking·fv-r
 | mod_xnl4v5.ftn90(9k줄) | Van Vledder 외부 라이브러리 — [swan-xnl4-exact-quadruplet](SWAN/source-analysis/swan-xnl4-exact-quadruplet.md) 기작성, 내부는 **T티어 준용** |
 
 문서 축: 공식 4 docs(swantech·swanuse·swanimp·swanpgr) 全 deep-verify + MN 29 (INDEX 참조).
+
+---
+
+## 12. SFINCS 🟢 **종결 2026-07-12** (src 36 f90 / SA 9 + MN 5)
+
+> 신규 모델(2026-06-18)로 원장 섹션 없이 대시보드 행만 있었음 — 종결 판정과 함께 신설.
+
+**커버리지**: 코어 8노트(main BMI 루프·flow_solver·subgrid/quadtree·nonhydrostatic/wavemaker·boundaries/forcing·SnapWave·structures·IO/BMI) + infiltration(강우손실 6법, 2026-07-07) = **SA 9**. 문서 = readthedocs rst 실질 전부(MN 5: numerical·params-io·model-building·v2.4.0 testbed 77케이스·changelog).
+
+**종결 판정(2026-07-12)**: cross-model 대조노트(시간적분·저면마찰·침수노출) flag **0건** — 전 셀 소급 기완료(alfa 0.50·huthresh 0.05·Bates 분모 등 anchor 직접 재확인 이력). 잔여는 전부 비코어 — singularity.rst(Deltares 사내문서)·numerical_implementation/validation.rst(skeleton, 문서 자체 부재로 disclosed). ★기록 보존 finding: Green-Ampt 인덱싱 버그(sfincs_infiltration.f90:856 np vs nm — 외부 미제출, 위키만 기록 2026-07-07 결정).
+
+---
+
+## 13. LISFLOOD-FP 🟢 **종결 2026-07-12** (classic+swe+cuda C++/CUDA / SA 8 + MN 1)
+
+> 신규 모델(2026-06-18) — §12 와 동일하게 종결 시 섹션 신설.
+
+**커버리지**: 전 솔버 8노트 — lisflood.cpp 다중솔버 dispatch·classic FP(ACC·diffusive·SGC·weir)·swe FV1/DG2(HLL·SSP-RK2)·cuda GPU·acc_nugrid 동적해상도·**mwdg2-adaptive-mra**(멀티웨이블릿 MRA, 2026-07-07)·IO/boundary·sgm_fast. MN 1(user manual).
+
+**종결 판정(2026-07-12)**: 마지막 cross-model flag 해소 — cuda/adaptive `tol_h`=**1e-3 하드코딩**(SolverParams.h:15, parfile 미노출 — tol_q 데드 파라미터와 같은 계열, classic DepthThresh 와 별개 변수·동값). 침수노출 대조노트 미커버 잔여 0. ★기록 보존 finding: maxes.qy copy-paste 버그(get_max_scale_coeffs.cu:23, y-흐름 과소 refine — 외부 미제출, 위키만 기록 2026-07-07 결정). 잔여 매뉴얼 심화=user manual 노트가 코어 커버, 비코어 판정.
 
 ---
 

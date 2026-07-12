@@ -30,7 +30,7 @@ related:
 | **ADCIRC** | `H0`(fort.15) / `HABSMIN`=0.8H0 / `HOFF`=1.2H0 | 노드(NODECODE)+요소(NOFF) | 노드 HTOT≤H0→dry, 요소 NCTOT 판정 | **있음**(HABSMIN<HOFF) | [[adcirc-wetting-drying-implementation]] |
 | **SWASH** | `epshu`(=epsdry, 적응형 ≤1cm) | face(wetu)+cell(wets) | `hu>epshu`→wetu=1, cell=OR(face) | 없음(대칭) | [[swash-wetting-drying-runup]] |
 | **SFINCS** | `huthresh` 0.05(subgrid 시 0 강제) | edge(kfuv)+구조(kcuv) | `max(zs)>max(zb)+huthresh` | 없음 | [[sfincs_flow_solver]] |
-| **LISFLOOD-FP** | `DepthThresh` 1e-3 / `MaxHflow` 10 | edge(MaskTest)+DryCheck | **hflow=max(z+h)−max(z)>DepthThresh** | 없음 | [[lisflood-fp-classic-acc-flow]] |
+| **LISFLOOD-FP** | `DepthThresh` 1e-3 / `MaxHflow` 10 / cuda-adaptive `tol_h` 1e-3 하드코딩(SolverParams.h:15, parfile 미노출) | edge(MaskTest)+DryCheck | **hflow=max(z+h)−max(z)>DepthThresh**; adaptive DG2 는 자기+4이웃 h≥tol_h(dg2_update.cu:51-55) | 없음 | [[lisflood-fp-classic-acc-flow]]·[[lisflood-fp-mwdg2-adaptive-mra]] |
 | **XBeach** | `eps` 0.005 m(params.F90:1398, 0.001-0.1) / 사면 `hswitch` 0.01·`wetslp` 0.15·`dryslp` 1.0 | cell(wetz)+face(wetu/v) | `compute_wetcells`: `hh>eps+numeps`→wetz=1(wetcells.F90:108-111); wetu 는 hu·hum **둘 다** >eps+numeps(:75-77) | 없음(대칭) — 사면만(wet/dry 안식각) | [[xbeach_flow_solver]]·[[xbeach_avalanching]] |
 | **FUNWAVE** | `MinDepth` 0.001/0.01 · `MinDepthFrc` 0.01/0.1 | cell(MASK)+9점(MASK9) | `η<−Depth`→dry | 없음 | [[funwave-physics-sources]] |
 | **ROMS** | `Dcrit` 0.10 m | 셀(rmask_wet)+edge(u/v mask_wet, 부호있는 {0,±1,2}) | `ζ+h≤Dcrit`→dry, edge 부호로 방향 | 없음(**one-way flux** 대체) | [[roms_wetting_drying]] |
@@ -68,7 +68,7 @@ related:
 - **hysteresis 있음/없음**: Delft3D·ADCIRC 는 이중임계(젖음>마름)로 채터링 억제 — dry↔wet 반복 진동 방지. SFINCS·LISFLOOD·SWASH·FUNWAVE 는 단일임계(대칭). ROMS 는 이중임계 대신 **one-way flux(유입만 허용)+fast-step 평균 이진화**로 채터링 관리([[roms_wetting_drying]] §3-4). 채터링은 단일임계 모델에서 Δt·limiter 로 관리.
 - **ADCIRC 비율 하드코딩**: HABSMIN=0.8H0·HOFF=1.2H0 고정 — 조정하려면 H0 자체 변경. 수심 5m clamp 제거 메시는 H0=0.1 필수(안 하면 천해 영구 dry).
 - **재습윤 게이트 강도차**: ADCIRC 가 가장 엄격(2 wet 이웃 + HOFF + VELMIN 동시) — 고립 dry 노드 self-activate 불가. SFINCS/LISFLOOD/SWASH 는 임계 회복 즉시 재습윤.
-- **미커버(위키 갭)**: LISFLOOD `tol_h` 노트 미명시(DepthThresh·thin_depth 만). (ROMS 는 [[roms_wetting_drying]] 신설로 해소 — 8모델 전원 커버.) ~~XBeach eps 값·wetz 산정식~~ — **해소(2026-07-12, 소스직독)**: `eps`=0.005 m 기본(params.F90:1398); 동적 마스크는 `compute_wetcells`(wetcells.F90) — `hh>eps+numeps`→wetz(:108-111), wetu 는 `hu`·`hum` 둘 다 초과 요구(:75-77, 이류항 정합 주석), wete 는 `hh+delta·H>eps .or. wetz==1`(:117); 초기화 `zs>zb+eps`(initialize.F90:1062-1071); ★형태학 갱신 후엔 morphevolution.F90:3202-3208 이 재산정하며 **dry 셀에 `zs=zb+eps`·`hh=eps` 클램프**.
+- ~~LISFLOOD `tol_h` 노트 미명시~~ — **해소(2026-07-12, 소스직독)**: cuda/adaptive 전용 wet/dry 임계 `tol_h`=**1e-3 하드코딩**(SolverParams.h:15, tol_q 처럼 parfile 미노출) — classic `DepthThresh` 와 별개 변수·동값([[lisflood-fp-mwdg2-adaptive-mra]] 갱신). (ROMS 는 [[roms_wetting_drying]] 신설로 해소 — 8모델 전원 커버, **미커버 잔여 0**.) ~~XBeach eps 값·wetz 산정식~~ — **해소(2026-07-12, 소스직독)**: `eps`=0.005 m 기본(params.F90:1398); 동적 마스크는 `compute_wetcells`(wetcells.F90) — `hh>eps+numeps`→wetz(:108-111), wetu 는 `hu`·`hum` 둘 다 초과 요구(:75-77, 이류항 정합 주석), wete 는 `hh+delta·H>eps .or. wetz==1`(:117); 초기화 `zs>zb+eps`(initialize.F90:1062-1071); ★형태학 갱신 후엔 morphevolution.F90:3202-3208 이 재산정하며 **dry 셀에 `zs=zb+eps`·`hh=eps` 클램프**.
 
 ## 6. 관련
 
