@@ -6,8 +6,8 @@ depends_on:
   - textbook/notes/theory-ch08-linear-waves.md
 canonical_source: self
 citation_status: verified
-provenance: "교재 프로젝트 textbook-ai-data-full ch09(AI 합성 MDX, 무인용) 이식분 — 2026-07-12 원자 단언 분해·(source_id, page) 부착. ★원문 연도 오기 1건 정정(Hasselmann 4파 상호작용 1957→1962), 미매칭 삭제 4건(Beaufort별 경사 표·'19세기 Sverdrup-Munk-Bretschneider' 시대 오류·Jeffreys 1932 sheltering·Draupner 수치/freak 임계 2.2Hs). T3([THEORY-LEDGER](../THEORY-LEDGER.md))."
-verification_method: "water-wave-mechanics(D&D) p.13·128-129·186·285·302·319·351 + holthuijsen2007 p.5·42·52·74·79·101·103·163·178·203·207·260 — textbook/md 미러 페이지 직접 대조 (2026-07-12)."
+provenance: "교재 프로젝트 textbook-ai-data-full ch09(AI 합성 MDX, 무인용) 이식분 — 2026-07-12 원자 단언 분해·(source_id, page) 부착. ★원문 연도 오기 1건 정정(Hasselmann 4파 상호작용 1957→1962), 미매칭 삭제 4건(Beaufort별 경사 표·'19세기 Sverdrup-Munk-Bretschneider' 시대 오류·Jeffreys 1932 sheltering·Draupner 수치/freak 임계 2.2Hs). 게이트 ⓒ ④: Stokes 2차 수면형 앵커 p.302(속도·수송 문맥)→p.318-319(Eq. 11.29·11.32·11.33) 정밀화 + α 계수 정의 명시. T3([THEORY-LEDGER](../THEORY-LEDGER.md)), 게이트 ⓒ MODIFY 반영 완료."
+verification_method: "water-wave-mechanics(D&D) p.13·128-129·186·285·318-319·351 + holthuijsen2007 p.5·42·52·74·79·101·103·163·178·203·207·260 — textbook/md 미러 페이지 직접 대조 (2026-07-12, 게이트 ⓒ 재검증 포함)."
 note_author: "Claude Fable 5 (citation-grounded port)"
 note_date: 2026-07-12
 related:
@@ -24,7 +24,7 @@ related:
 ## 1. Stokes 비선형 보정
 
 - 파 경사 $\epsilon = ka$ 를 소매개변수로 한 섭동 전개 — 수렴성은 전개의 성립 조건이며 2차 이론에서 점검 가능 (water-wave-mechanics, p.319).
-- **2차 수면형**: $\eta = a\cos(kx-\sigma t) + a^2k\,\alpha\cos 2(kx-\sigma t)$ 꼴 — 2배 주파수 성분이 더해져 **마루 첨예·골 평탄**의 비대칭 파형 (water-wave-mechanics, p.302, 2차 표면형 전개).
+- **2차 수면형**: $\eta = a\cos(kx-\sigma t) + a^2k\,\alpha\cos 2(kx-\sigma t)$, 계수 $\alpha = \dfrac{\cosh kh\,(2+\cosh 2kh)}{4\sinh^3 kh}$ — 2배 주파수 성분이 더해져 **마루 첨예·골 평탄**의 비대칭 파형 (water-wave-mechanics, p.318, Eq. 11.29 $\eta_2$·Eq. 11.32 합성 $\eta=\epsilon\eta_1+\epsilon^2\eta_2$; 차원형 $H$ 표기는 p.319 상단). **분산관계는 2차에서 불변** $\sigma^2=gk\tanh kh$ — 보정은 3차부터 (p.319, Eq. 11.33).
 - **Stokes drift(질량 수송)**: 선형 궤도는 닫히지만 2차에서 순 평균 이동 발생 — mass transport 로 다룸 (water-wave-mechanics, ch.10 §10.2 Mass Transport, p.285; 실험 맥락 p.186).
 
 ## 2. 쇄파 한계와 쇄파 유형
