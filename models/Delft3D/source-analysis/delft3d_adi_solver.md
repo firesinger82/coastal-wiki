@@ -30,7 +30,7 @@ stage2: (방향 swap, SUD+UZD)                ! 둘째 half-step
 - **stage1**: ξ(u) 방향 운동량+연속 implicit + η(v) 방향 explicit → SUD 가 수위·u 갱신, UZD 가 v 갱신.
 - **stage2**: 방향 교환(η implicit) — 매 step 두 방향을 대칭 처리(2차 정확도, 무조건 안정).
 - `hv`(v-point 수심)는 SUD 에서 wet point(kfv=1) 계산(:285). `dischy`/`solver`/`icreep` 옵션.
-- **advection explicit 성분의 정량 CFL(2026-07-12 보강)**: `chkadv.f90` 이 TRISOL 에서 **반스텝마다 U-점·V-점 각각**(총 4회/step, trisol.f90:2245,2255; Z-모델 z_trisol:3331,3341 z_chkadv) advection Courant 를 점검 — `CFL = hdt·|u0|/gvu`(U, chkadv.f90:157) / `hdt·|v̄|/guu`(V-4점 평균, :162-167), 정의는 헤더 명시 "following definitions G.S. Stelling, 1984"(:35-37). **CFL>1 이면 G051 경고 + 권장 dt = 2·Δx/|u|max 출력(:192-199)이고 하드 스톱은 아님** — ADI 파속(barotropic)은 무조건 안정이나 explicit advection 은 Courant≤1 이 정확도·안정 권고라는 이원 구조가 소스로 확정.
+- **advection explicit 성분의 정량 CFL(2026-07-12 보강; 라인 정정 = Codex 표본 재검증)**: `chkadv.f90` 이 TRISOL 에서 **반스텝마다 U-점·V-점 각각**(σ-모델 총 4회/step — 실호출 trisol.f90:2250,2260,3336,3346; Z-모델은 z_chkadv **2회** z_trisol.f90:1923,2895) advection Courant 를 점검 — `CFL = hdt·|u0|/gvu`(U, chkadv.f90:157) / `hdt·|v̄|/guu`(V-4점 평균, :162-167), 정의는 헤더 명시 "following definitions G.S. Stelling, 1984"(:35-37). **CFL>1 이면 G051 경고 + 권장 dt = 2·Δx/|u|max 출력(:192-199)이고 하드 스톱은 아님** — ADI 파속(barotropic)은 무조건 안정이나 explicit advection 은 Courant≤1 이 정확도·안정 권고라는 이원 구조가 소스로 확정.
 
 ## 2. SUD — implicit 연속+운동량 결합 (sud.f90) ★
 

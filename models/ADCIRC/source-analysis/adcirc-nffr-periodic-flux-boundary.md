@@ -35,7 +35,7 @@ k = 1..NFFR:                      ← 분조별 노드값 블록
 
 - **단위**: QNAM = 단위폭당 유량 진폭 "normal flow/unit width (e.g. m2/s)" (paramdef:834). QNPH·ENPH = 위상(도) — 코드가 라디안 변환(:3576, :3583-3584). ENAM = IBTYPE=32 "outgoing wave" 진폭(수위, m)(paramdef:839-840).
 - **줄 존재 규칙**: `DO J=1,NVEL` 루프 내 `LBCODEI(J)` 조건 READ(:3571-3584) — **flux 경계 노드만 줄이 있고**, land 등 비대상 노드는 줄 자체가 없음. 노드 순서 = fort.14 velocity 경계 나열 순서(NBV).
-- ★**code≠docs 2건**: ① fort15.rst:87 은 2-필드 줄을 "IBTYPE = 2, 12, 22"로만 표기하나 코드는 **52 도 같은 분기**(:3570 `.OR.(LBCODEI(J).EQ.52)`) — NFFR 포함조건 줄(:79)에는 52 명시, 필드 줄에서만 누락. ② parameter_definitions/index.rst 의 QNAM 정의 앵커가 `ln(k,j)` 로 오염(`.. _ln:` + "ln(k,j), QNPH(k,j)") — fort15.rst 의 두 참조도 `:ref:'ln(k,j)'` 로 전파된 **문서 자체 버그**(심볼 QNAM 이 `ln` 으로 치환된 렌더링).
+- ★**code≠docs 1건**: fort15.rst:87 은 2-필드 줄을 "IBTYPE = 2, 12, 22"로만 표기하나 코드는 **52 도 같은 분기**(:3570 `.OR.(LBCODEI(J).EQ.52)`) — NFFR 포함조건 줄(:79)에는 52 명시, 필드 줄에서만 누락. (※초판의 "QNAM 앵커 `ln` 오염" 지적은 **철회** — 2026-07-12 Codex 표본 재검증에서 검증 도구 오류(`rg -r` 치환 플래그 오용)로 판명, 실제 docs 는 `.. _QNAM:` 정상(:830-834).)
 
 ## 2. 런타임 QN·EN 합성 (timestep.F:860-880)
 

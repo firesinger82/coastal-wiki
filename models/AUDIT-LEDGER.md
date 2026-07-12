@@ -36,14 +36,14 @@ purpose: "사용자 지시(2026-06-16) '모든 모델은 모든 문서·코드�
 
 | 모델 | 코어 소스파일 | 코어 검수 | 문서(PDF) | manual-notes | 우선순위 |
 |---|--:|:--:|--:|--:|:--:|
-| **SWASH** | 160 | ✅ 21 노트 (전수 + linear/unstructured-solvers 2026-07-04 + **핀포인트 4갭 소스직독 해소 2026-07-12**) | 2 | ✅ 2 | ✅ **종결**(2026-07-12) |
+| **SWASH** | 160 | ✅ 21 노트 (전수 + linear/unstructured-solvers 2026-07-04 + **핀포인트 4갭 소스직독 해소 2026-07-12**) | 2 | ✅ 2 | ✅ 종결(2026-07-12) **⚠재검토 open**(Codex 재검증: swashtech Ch2/5 = 보존성·mimetic 코어 후보 — §1 참조) |
 | **Delft3D** | engines_gpl 3,503 (+utils) | ✅ 48 노트 (엔진 C + utils S, 실측 2026-07-12) | 53 | ✅ 11 (매뉴얼+도구) | ✅ **종결**(2026-07-12; FM θ 0.55·ADI CFL 경고체계·z_turclo 동형 3갭 해소, §2 판정) |
 | **ROMS** | roms/ROMS ~900 | ✅ 37 노트 (4D-Var suite + 2026-07 심화, 실측) | 10 | ✅ 4 (+Exercise 카탈로그) | ✅ **종결**(2026-07-12; flag 0건 판정, §3) |
 | **FUNWAVE** | TVD 38 + GPU 41 | ✅ 11 노트 (wk-data2d·build-blackwell 포함 실측) | 39 | ✅ 3 (+검증 카탈로그) | ✅ **종결**(2026-07-12; ★Cd 기본 0.0 마찰 off 갭 해소) |
 | **ADCIRC** | adcirc/src 56 (+gahm·asgs) | ✅ 38 노트 (정화 2026-06-18 + VSSOL 2026-07-11 + **NFFR flux 경계 2026-07-12 사용자 지목 보강**) | 98 | 21 + web-refs(논문 30) | ✅ **종결**(2026-07-11; 종결 후 보강 허용) |
 | **EFDC** | 264 (+GVC 301 legacy S) | ✅ 38 노트 (+GVC legacy·**CALUVW 전단솔버 2026-07-11 = 마지막 코어 갭**) | 6 | ✅ 9 (+Training/Grid·Ch5/Ch6 cross-walk) | ✅ **종결**(2026-07-11; GVC 불요·GOTM T티어 판정) |
 | **XBeach** | 118 | ✅ 33 노트 (intrawave 2026-07-07 포함 실측) | 9 | ✅ 4 | ✅ **종결**(2026-07-12; eps·wetz 산정식 갭 해소) |
-| **SWAN** | 77 | ✅ 29 노트 (58파일 커버리지 감사 8후보 전원 기작성 + swancom1 crosswalk 2026-07-04) | 9 | 29 | ✅ **종결**(2026-07-12; §11 판정) |
+| **SWAN** | 77 | ✅ 29 노트 (58파일 커버리지 감사 8후보 전원 기작성 + swancom1 crosswalk 2026-07-04) | 9 | 29 | ✅ 종결(2026-07-12; §11) **⚠재검토 open**(Codex 재검증: swanmain 실질 로직·foundation 근거 부적격·xnl4 경계 — §11 참조) |
 | **Celeris** | WebGPU JS+CUDA | ✅ 9 노트 | 3 | 1 + web-refs(Lynett 2026) | ✅ **종결**(2026-07-12; breaking 계수·FrictionCalc·dt 정적 3갭 해소) |
 | **SFINCS** 🆕 | src 36 (f90) | ✅ 9 노트 (전 코어 + infiltration 2026-07-07) | readthedocs + **v2.4.0 릴리스** | ✅ 5 (numerical·params-io·model-building·testbed 77케이스·changelog) | ✅ **종결**(2026-07-12; flag 0건, §12 판정) |
 | **LISFLOOD-FP** 🆕 | classic+swe+cuda (C++/CUDA) | ✅ 8 노트 (전 솔버 + mwdg2-adaptive 2026-07-07) | user manual PDF | ✅ 1 (user-manual) | ✅ **종결**(2026-07-12; tol_h 1e-3 하드코딩 갭 해소, §13 판정) |
@@ -57,7 +57,9 @@ purpose: "사용자 지시(2026-06-16) '모든 모델은 모든 문서·코드�
 
 **소스**: `raw/source_code/swash/src/*.ftn90` (160). **문서**: swashtech.pdf, swashuse.pdf.
 
-> **종결 판정(2026-07-12)**: 코드 160파일 = 19노트 전수(2026-06-16) + linear-solvers·unstructured-solvers 심화 2편(2026-07-04) = **SA 21**. cross-model 대조가 flag 한 마지막 핀포인트 갭 4건을 소스 직독으로 당일 해소 — ①`iturb==2`=full 3D k-ε 선형(`VISC FULL KEPS LIN`, SwashReadInput.ftn90:1252-1276) ②θ 기본값(THETAC/S/U/W=0.5, NONHYD θ=-1 sentinel→CheckPrep 1.0 완전implicit) ③`FRIC` 카드 기본 MANNing n=0.019·생략 시 off ④breaking β=-1 sentinel→0.3(BDF 시 0.15) 자동선택(SwashCheckPrep.ftn90:1065-1090). 잔여 swashtech Ch2/5 deep 은 **원문 자체가 미완성(under construction) 문서라 비코어 판정** — 코어 이산화는 SA 노트가 소스 레벨로 이미 커버.
+> **종결 판정(2026-07-12)**: 코드 160파일 = 19노트 전수(2026-06-16) + linear-solvers·unstructured-solvers 심화 2편(2026-07-04) = **SA 21**. cross-model 대조가 flag 한 마지막 핀포인트 갭 4건을 소스 직독으로 당일 해소 — ①`iturb==2`=full 3D k-ε 선형(`VISC FULL KEPS LIN`, SwashReadInput.ftn90:1252-1276) ②θ 기본값(THETAC/S/U/W=0.5, NONHYD θ=-1 sentinel→CheckPrep 1.0 완전implicit) ③`FRIC` 카드 기본 MANNing n=0.019·생략 시 off ④breaking β=-1 sentinel→0.3(BDF 시 0.15) 자동선택(SwashCheckPrep.ftn90:1065-1090). ~~잔여 swashtech Ch2/5 deep 은 원문 미완성 문서라 비코어 판정~~
+>
+> **⚠재검토 open(2026-07-12 Codex ② 레이어 표본 재검증, 심각도 높음)**: swashtech Ch2(Hamiltonian·mimetic 이산화·에너지 보존)·Ch5 §5.7(질량·운동량·에너지 보존 증명)은 위키 자체 overview 노트가 "★핵심"으로 평가한 내용 — "비코어" 판정이 자기 자료와 모순. **후속**: 보존성·mimetic 이론 deep note 필요 여부를 명시적 기준으로 재판정(코드 종결은 유효, 문서 축 판정만 open).
 
 ### 1.1 문서
 | PDF | 종류 | 노트 | 상태 |
@@ -200,7 +202,7 @@ purpose: "사용자 지시(2026-06-16) '모든 모델은 모든 문서·코드�
 ### 5.2 코드 모듈
 | 모듈 | 파일 | 티어 | 노트 | 상태 |
 |---|--:|:--:|---|:--:|
-| adcirc/src | 56 | C | gwce·momentum·timestep·wetdry·boundary·met-forcing·tidal·hotstart·3d-mode·**3d-vssol-vertical-scheme(2026-07-11: θ³ Alp1/2/3·복소 tridiag·w adjoint — 마지막 코어 갭)**·baroclinic·dg-continuity·weir·output·**nffr-periodic-flux-boundary(2026-07-12 사용자 지목: fort.15 NFFR 레코드·IBTYPE=32 q=QN−c(η−EN)·QNAM 내향 양 규약·docs ln 앵커 버그 적발)** | ✅ |
+| adcirc/src | 56 | C | gwce·momentum·timestep·wetdry·boundary·met-forcing·tidal·hotstart·3d-mode·**3d-vssol-vertical-scheme(2026-07-11: θ³ Alp1/2/3·복소 tridiag·w adjoint — 마지막 코어 갭)**·baroclinic·dg-continuity·weir·output·**nffr-periodic-flux-boundary(2026-07-12 사용자 지목: fort.15 NFFR 레코드·IBTYPE=32 q=QN−c(η−EN)·QNAM 내향 양 규약 — Codex 표본 재검증 전 항목 일치 확인)** | ✅ |
 | adcirc/prep | 18 | S | preprocessing-foundation·parallel | ✅ |
 | adcirc/wind·util | 19 | S | met-forcing(포맷별 reader dispatch 커버)·utilities — S티어 요약으로 충분 판정(2026-07-11: 잔여는 포맷 변환 유틸, 물리 커널 아님) | ✅ (S요약) |
 | gahm/src (GAHM 비대칭 Holland wind) | ~40 | C | **adcirc_gahm_vortex_model**(GahmSolver·radius solver·ATCF isotach·OWI 출력·Vortex 마찰/translation) | ✅ |
@@ -302,12 +304,12 @@ Celeris-WebGPU(JS + .wgsl/.cu compute shader). boussinesq-solver·breaking·fv-r
 
 **커버리지 근거**: [swan-source-coverage-audit](SWAN/source-analysis/swan-source-coverage-audit.md) 가 src 58 source files 전수 인벤토리 + 기존 노트 매핑을 verified 로 보유. 그 §4.1 이 flag 한 **신설 후보 8건 전원 기작성** — surfbeat-iem·bragg-scattering·gse-correction·quasi-coherent·xnl4-exact-quadruplet·unstructured-time-step·grid-readers·vtk-output. legacy 대형 파일 갭도 해소: swancom1(12k줄) 19 서브루틴 crosswalk + SETUPP/SETUP2D 심층(2026-07-04, [swan-setup-solver-swancom1-crosswalk](SWAN/source-analysis/swan-setup-solver-swancom1-crosswalk.md)).
 
-**종결 판정(2026-07-12)**: 잔여 3건 전부 비코어 —
-| 잔여 | 판정 |
-|---|---|
-| swanmain.ftn(9.3k줄) 정밀 라인매핑 | driver — [swan-foundation](SWAN/source-analysis/swan-foundation.md) 구조 커버로 **S요약 충분** |
-| fftpack51.ftn90(15k줄) | NCAR FFTPACK 5.1 vendor 라이브러리 — **T티어**(출처만, 내부 미분석) |
-| mod_xnl4v5.ftn90(9k줄) | Van Vledder 외부 라이브러리 — [swan-xnl4-exact-quadruplet](SWAN/source-analysis/swan-xnl4-exact-quadruplet.md) 기작성, 내부는 **T티어 준용** |
+**종결 판정(2026-07-12)**: 잔여 3건 비코어 판정 — 단 **당일 Codex ② 레이어 표본 재검증에서 2건 반박, ⚠재검토 open**:
+| 잔여 | 판정 | ⚠재검증(2026-07-12) |
+|---|---|---|
+| swanmain.ftn(9.3k줄) 정밀 라인매핑 | ~~driver — S요약 충분~~ | **반박(높음)**: swanmain:7469-9158 에 RBFILE/RESPEC/FLFILE/SWINCO 등 경계 스펙트럼 읽기·해상도 변환·초기조건 **실질 로직** 존재. 근거로 쓴 [swan-foundation](SWAN/source-analysis/swan-foundation.md) 은 "source code is not directly cited"+`review_required: true` — **source coverage 증거 부적격**. 후속: 해당 서브루틴 C/S 재분류 + 최소 source-map 노트 |
+| fftpack51.ftn90(15k줄) | NCAR FFTPACK 5.1 vendor — **T티어** | 유지 |
+| mod_xnl4v5.ftn90(9k줄) | ~~외부 라이브러리 T티어 준용~~ | **반박(중간)**: 외부 기원은 맞으나 swancom1:1479 `xnl_init`·swancom4:2835,2978 `XNL_MAIN` 직접 호출 — **선택형 core physics**. 후속: 확인 깊이 기준 결정 후 재분류 |
 
 문서 축: 공식 4 docs(swantech·swanuse·swanimp·swanpgr) 全 deep-verify + MN 29 (INDEX 참조).
 

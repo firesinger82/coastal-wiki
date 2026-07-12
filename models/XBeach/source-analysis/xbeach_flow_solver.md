@@ -61,7 +61,7 @@ taubx = cfu*par%rho*ueu*sqrt((1.16*urms)**2 + vmageu**2)    ! Ruessink 2001
 
 연속방정식 `∂zs/∂t = -∇·(h·u)` 로 수위 `zs` 갱신(`dzsdt`, flux divergence). `wetz` mask(wetting-drying), `hu/hv` = u/v-point 수심, `hum/hvm` = 운동량 수심. boundary 에서 `uu` 외삽(:585-589).
 
-**마스크 산정(2026-07-12 보강)**: wet/dry 마스크는 본 파일이 아닌 `wetcells.F90 compute_wetcells` 에서 매 스텝 산정 — `hh>eps+numeps`→`wetz=1`(:108-111), `wetu` 는 `hu`·`hum` **둘 다** `>eps+numeps` 요구(:75-77, "correct advection term" 주석), `wete` 는 `hh+delta·H>eps .or. wetz==1`(:117). 임계 `eps` 기본 **0.005 m**(params.F90:1398, 허용 0.001-0.1). 초기화는 `zs>zb+eps`(initialize.F90:1062-1071), 형태학 갱신 후 재산정은 morphevolution.F90:3202-3208(dry 셀 `zs=zb+eps`·`hh=eps` 클램프).
+**마스크 산정(2026-07-12 보강)**: wet/dry 마스크는 본 파일이 아닌 `wetcells.F90 compute_wetcells` 에서 매 스텝 산정 — `hh>eps+numeps`→`wetz=1`(:108-111), `wetu` 는 `hu`·`hum` **둘 다** `>eps+numeps` 요구(:75-77, "correct advection term" 주석), `wete` 는 `hh+delta·H>eps .or. wetz==1`(:117). 임계 `eps` 기본 **0.005 m**(params.F90:1398, 허용 0.001-0.1). 초기화는 `zs>zb+eps`(initialize.F90:1062-1071). 형태학 갱신 후에는 morphevolution.F90:3202-3208 이 **`wetz` 만** 재판정 + dry 셀 `zs=zb+eps`·`hh=eps` 클램프 — `wetu/wetv/wete` 는 그 자리에서 재산정되지 않고 다음 스텝 `compute_wetcells` 에서 갱신(범위 한정 = 2026-07-12 Codex 재검증).
 
 ## 6. 모드별 차이
 
