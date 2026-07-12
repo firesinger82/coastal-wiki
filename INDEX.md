@@ -43,6 +43,7 @@
 | 노트 | source_id | 상태 |
 |---|---|---|
 | [theory-ch08-linear-waves.md](textbook/notes/theory-ch08-linear-waves.md) | water-wave-mechanics·holthuijsen2007 | **verified** (T1, 게이트 ⓐ 통과) |
+| [theory-ch12-tides.md](textbook/notes/theory-ch12-tides.md) | sea-level·stewart-physical-ocean | **verified** (T2 — ★원문 연도 오기 2건 정정·첫 ①→① 의존) |
 | [tides-lubbad2009-overview.md](textbook/notes/tides-lubbad2009-overview.md) | lubbad2009-tides-slides | draft-unsourced |
 
 원본 PDF 매니페스트: [textbook/sources.yml](textbook/sources.yml).
