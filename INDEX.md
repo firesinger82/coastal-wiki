@@ -47,6 +47,7 @@
 | [theory-ch02-continuity.md](textbook/notes/theory-ch02-continuity.md) | water-wave-mechanics·hudspeth2005-wave-forces | **verified** (T9 — 연속 3형태·incompressible 정량근거·★hydraulics 미러=Surge보고서 판명) |
 | [theory-ch03-euler.md](textbook/notes/theory-ch03-euler.md) | hudspeth2005-wave-forces·water-wave-mechanics | **verified** (T10 — Cauchy 응력텐서 대칭·무점성→Euler·Bernoulli·d'Alembert·①→① 3중 연쇄) |
 | [theory-ch04-navier-stokes.md](textbook/notes/theory-ch04-navier-stokes.md) | hudspeth2005-wave-forces·water-wave-mechanics·mechanics-of-sediment-transport | **verified** (T11 — Newtonian 구성식·Stokes 가정·Reynolds 수·Poiseuille·Phase1 완료) |
+| [theory-ch05-rans.md](textbook/notes/theory-ch05-rans.md) | stewart-physical-ocean·mechanics-of-sediment-transport | **verified** (T12 — Reynolds 분해·응력·닫힘·eddy viscosity·k-ε는 models/ 축) |
 | [theory-ch08-linear-waves.md](textbook/notes/theory-ch08-linear-waves.md) | water-wave-mechanics·holthuijsen2007 | **verified** (T1, 게이트 ⓐ 통과) |
 | [theory-ch09-nonlinear-spectra.md](textbook/notes/theory-ch09-nonlinear-spectra.md) | holthuijsen2007·water-wave-mechanics | **verified** (T3, 게이트 ⓒ 반영 — ★Hasselmann 연도 정정) |
 | [theory-ch10-coastal-transformation.md](textbook/notes/theory-ch10-coastal-transformation.md) | water-wave-mechanics·holthuijsen2007·mechanics-of-sediment-transport | **verified** (T4, 게이트 ⓒ 반영 — ★Sommerfeld 계보 복원·5π/16 source-needed 1건) |
