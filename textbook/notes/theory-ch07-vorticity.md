@@ -9,8 +9,8 @@ depends_on:
 canonical_source: self
 citation_status: verified
 has_source_needed: true
-provenance: "교재 프로젝트 textbook-ai-data-full ch07(AI 합성 MDX, 무인용) 이식분 — 2026-07-14 원자 단언 분해·(source_id, page) 부착. 주 출처 = **water-wave-mechanics(D&D) §2.3(와도·velocity potential·Kelvin) + stewart-physical-ocean(planetary/relative vorticity·2D/3D)**. ★삭제 전 전체 코퍼스 grep(정확 용어+개념 동의어+주 출처 절 통독, 페이지는 ---PAGE-N--- 마커로 확인=T13 행번호 착각 교훈): Lamb-Oseen vortex·solenoidal = 코퍼스 **0건** 삭제. 와도방정식 정식 Dω/Dt=(ω·∇)u+ν∇²ω·늘림항(vortex stretching)·Helmholtz 3정리(D&D 'Helmholtz'=방정식 이름 별개)·circulation Γ=∮u·dl 정식·Kelvin 순환 정리 유도·point vortex = 코퍼스 미확인 → source-needed. 미이식: 워크예제·비행기 후류·vortex atom. ★연안 핵심=planetary vorticity(Coriolis, Rossby)·비회전→velocity potential(ch08 파 이론). depends_on ch03(Euler→Kelvin)·ch04(N-S)·ch00.5(curl·벡터항등식). T14 기초 마지막([THEORY-LEDGER](../THEORY-LEDGER.md))."
-verification_method: "water-wave-mechanics(D&D) p.42-44·60(§2.3 와도 ∇×u=2Ω·velocity potential·Kelvin 1869 와도 보존) + stewart-physical-ocean p.38·212(2D/3D vortex lines·planetary/relative vorticity=Coriolis f) — textbook/md 미러 ---PAGE-N--- 마커 실측 대조 (2026-07-14)."
+provenance: "교재 프로젝트 textbook-ai-data-full ch07(AI 합성 MDX, 무인용) 이식분 — 2026-07-14 원자 단언 분해·(source_id, page) 부착 + 같은 날 Codex 게이트(T14) MODIFY 반영. 주 출처 = **water-wave-mechanics(D&D) §2.3(와도·velocity potential·Kelvin) + stewart-physical-ocean §12(planetary/relative/potential vorticity·2D/3D)**. Codex 게이트 정정: ★velocity potential 부호 오류 u=∇φ→**u=-∇φ**(D&D p.42 Eq.2.70)·★늘림항·potential vorticity 보존 = stewart §12.2 실존('source-needed' 오판 철회) — Π=(ζ+f)/H 궤적 보존(p.215-216 Eq.12.9)·figure skater 늘림(p.216 Fig.12.2). Lamb-Oseen·solenoidal = 코퍼스 0건 삭제. 와도방정식 N-S 회전 정식 유도·Helmholtz 3정리(D&D 'Helmholtz'=방정식 이름 별개)·circulation Γ=∮u·dl 정식·Kelvin 순환 정리 유도·point vortex = 코퍼스 미확인 → source-needed. 미이식: 워크예제·비행기 후류·vortex atom. ★연안 핵심=planetary/potential vorticity(Coriolis·Rossby)·비회전→velocity potential(ch08). depends_on ch03·ch04·ch00.5. T14 기초 마지막([THEORY-LEDGER](../THEORY-LEDGER.md))."
+verification_method: "water-wave-mechanics(D&D) p.42-44·60(§2.3 와도 ∇×u=2Ω·velocity potential u=-∇φ Eq.2.70·Kelvin 1869 와도 보존) + stewart-physical-ocean p.38·212·215-216(2D/3D vortex lines·planetary/relative vorticity=Coriolis f·§12.2 potential vorticity Π=(ζ+f)/H 보존·figure skater) — textbook/md 미러 ---PAGE-N--- 마커 실측 대조 (2026-07-14, Codex 게이트 재검증 포함)."
 note_author: "Claude Fable 5 (citation-grounded port)"
 note_date: 2026-07-14
 related:
@@ -28,7 +28,7 @@ related:
 ## 1. 와도 정의와 velocity potential
 
 - **와도 $\boldsymbol\omega=\nabla\times\mathbf{u}$**: 속도 벡터의 curl(근거 [[theory-ch00_5-math-tools]] §3) — **유체 입자 회전율의 2배** $\nabla\times\mathbf{u}=2\boldsymbol\Omega$ (water-wave-mechanics, p.42-43, §2.3). 큰 흐름 패턴이 아닌 **국소 회전**이 핵심.
-- **비회전(irrotational) → velocity potential**: 와도가 없는 유동은 속도를 스칼라 함수의 기울기로 표현 $\mathbf{u}=\nabla\phi$ — 흐름은 $\phi$ 감소 방향("downhill")으로 (water-wave-mechanics, p.42, §2.3). 이 비회전 조건이 선형파 퍼텐셜 유동의 전제 → [[theory-ch08-linear-waves]]. ※와도장의 $\nabla\cdot\boldsymbol\omega=0$(solenoidal)·와도관 개념은 코퍼스 미확인 — 미이식.
+- **비회전(irrotational) → velocity potential**: 와도가 없는 유동은 속도를 스칼라 함수의 (음의) 기울기로 표현 $\mathbf{u}=-\nabla\phi$ — 흐름은 $\phi$ 감소 방향("downhill")으로 (water-wave-mechanics, p.42, §2.3, Eq. 2.70; $\phi$ 단위 = 길이²/시간). 이 비회전 조건이 선형파 퍼텐셜 유동의 전제 → [[theory-ch08-linear-waves]]. ※와도장의 $\nabla\cdot\boldsymbol\omega=0$(solenoidal)·와도관 개념은 코퍼스 미확인 — 미이식.
 
 ## 2. Kelvin 와도 보존
 
@@ -37,13 +37,15 @@ related:
 
 ## 3. 와도방정식·늘림항 (3D vs 2D)
 
-- **와도방정식**: N-S 의 회전을 취하면 압력항이 소거되고 와도의 물질미분 식 $\dfrac{D\boldsymbol\omega}{Dt}=(\boldsymbol\omega\cdot\nabla)\mathbf{u}+\nu\nabla^2\boldsymbol\omega$ 을 얻음(늘림·기울임항 + 점성 확산) — ※정식 유도·늘림항(vortex stretching)은 코퍼스 직접 미확인 — source-needed. <!-- citation_status: source-needed -->
+- **와도방정식**: N-S 의 회전을 취하면 압력항이 소거되고 와도의 물질미분 식 $\dfrac{D\boldsymbol\omega}{Dt}=(\boldsymbol\omega\cdot\nabla)\mathbf{u}+\nu\nabla^2\boldsymbol\omega$ 을 얻음(늘림·기울임항 + 점성 확산) — ※N-S 회전 정식 유도는 코퍼스 직접 미확인 — source-needed. <!-- citation_status: source-needed -->
+- **늘림항의 물리(figure skater)**: 유체 기둥의 깊이 $H$ 가 변하면 관성모멘트가 바뀌어 회전율(relative vorticity)이 변함 — 피겨스케이터가 팔을 뻗으면 관성모멘트↑·회전↓ 하는 것과 같음 (stewart-physical-ocean, p.216, §12.2, Fig. 12.2). 이것이 늘림항의 각운동량 보존 해석.
 - **3D vs 2D 와도**: 3차원 난류는 2차원과 근본적으로 다름 — **2D 에서는 와도선(vortex lines)이 항상 연직**이라 늘림 효과가 없음 (stewart-physical-ocean, p.38). 얕은(shallow) 대기·해양 유동이 2D 에 가까운 동역학.
 
 ## 4. Planetary vorticity — 연안·해양 응용
 
 - ★**Planetary vorticity $f$**: 지구와 함께 회전하는 모든 것(해양·대기)이 갖는 와도 — **지구 자전율의 2배**, 곧 앞서의 **Coriolis 매개변수** $f=2\Omega\sin\phi$; 극에서 최대, 적도에서 0 (stewart-physical-ocean, p.212). [[theory-ch12-tides]] §2 Coriolis·Kelvin wave 와 연결.
-- **Relative vorticity**: 해양·대기가 지구와 정확히 같은 속도로 돌지 않아 생기는 지구 대비 상대 회전 — 해류의 와도 (stewart-physical-ocean, p.212). 절대와도 = planetary + relative(Rossby 파·potential vorticity 계보). ※potential vorticity 보존 정식은 본 장 미이식(해양동역학 축).
+- **Relative vorticity $\zeta$**: 해양·대기가 지구와 정확히 같은 속도로 돌지 않아 생기는 지구 대비 상대 회전 — 해류의 와도 (stewart-physical-ocean, p.212). 절대와도 = planetary($f$) + relative($\zeta$).
+- **Potential vorticity 보존**: $\Pi=\dfrac{\zeta+f}{H}$ 가 **유체 궤적을 따라 보존**됨 — 깊이 $H$·상대와도 $\zeta$·위도(planetary $f$) 변화가 서로 결합 (stewart-physical-ocean, p.215-216, §12.2, Eq. 12.9; 성층 유체는 Pedlosky 1987 형). Rossby 파·서안 경계류의 기반 — 조석·해류 [[theory-ch12-tides]] 와 연결.
 
 ## 5. Stream function (2D)
 
