@@ -5,7 +5,7 @@ layer: 1
 depends_on: []
 canonical_source: self
 citation_status: verified
-provenance: "교재 프로젝트 textbook-ai-data-full ch14(AI 합성 MDX, 무인용) 이식분 — 2026-07-14 원자 단언 분해·(source_id, page) 부착 + 같은 날 게이트 ⓒ 2차(Codex 8회차) MODIFY 반영. ★원문 오기 1건 정정 복원: Hallermeier closure 2차항 '10.9'→**68.5**(coastal-structures-design p.127 Eq.3 실존 — 초판 '공식 미전사'는 인접 페이지 재검색 누락 오판). 게이트 ⓒ 2차 복원 3건: Hallermeier 식·salient/tombolo 정성 조건(CP p.11·30)·GENESIS/SBEACH 제한적 활용(CSD p.149; '코퍼스 0건' 철회). CERC 상세는 ch13 §8 과의 복제 제거 — depends_on ch13 탐색 강등. 미매칭 삭제/미이식: one-line 확산방정식 유도(Pelnard-Considère)·Dean h=Ax^{2/3} 명시식·A(d) 수치표·CERC K 계수값·Kamphuis 명시식·Dean number 임계표·Bruun 정량식·양빈 손실률 5-10%/년·salient 정량 임계비. 원문 연도 '(Bruun) 1954'·'Dean 1973/1977' 미지지, 'Komar 1998'=서지 실존(CSD p.157)·claim-level 미지지. 워크 계산·한국 사례·수치모델 비교표는 이론 아님 — concepts/models 탐색 위임. T6([THEORY-LEDGER](../THEORY-LEDGER.md))."
+provenance: "교재 프로젝트 textbook-ai-data-full ch14(AI 합성 MDX, 무인용) 이식분 — 2026-07-14 원자 단언 분해·(source_id, page) 부착 + 같은 날 게이트 ⓒ 2차(Codex 8회차) MODIFY 반영. ★원문 오기 1건 정정 복원: Hallermeier closure 2차항 '10.9'→**68.5**(coastal-structures-design p.127 Eq.3 실존 — 초판 '공식 미전사'는 인접 페이지 재검색 누락 오판). 게이트 ⓒ 2차 복원 3건: Hallermeier 식·salient/tombolo 정성 조건(CP p.11·30 — ⓒ 2차 확인 라운드에서 'salient=너무 먼 이안지형' 분기 조건 Fig.3.17(c) 추가)·GENESIS/SBEACH 제한적 활용(CSD p.149; '코퍼스 0건' 철회). CERC 상세는 ch13 §8 과의 복제 제거 — depends_on ch13 탐색 강등. 미매칭 삭제/미이식: one-line 확산방정식 유도(Pelnard-Considère)·Dean h=Ax^{2/3} 명시식·A(d) 수치표·CERC K 계수값·Kamphuis 명시식·Dean number 임계표·Bruun 정량식·양빈 손실률 5-10%/년·salient 정량 임계비. 원문 연도 '(Bruun) 1954'·'Dean 1973/1977' 미지지, 'Komar 1998'=서지 실존(CSD p.157)·claim-level 미지지. 워크 계산·한국 사례·수치모델 비교표는 이론 아님 — concepts/models 탐색 위임. T6([THEORY-LEDGER](../THEORY-LEDGER.md))."
 verification_method: "coastal-processes-with-eng-apps(Dean & Dalrymple) p.11-12·26-27·30(영문 생존 구간; ※미러=35p 부분본 판정) + mechanics-of-sediment-transport p.797-799(§16.5.2-16.5.3) + coastal-structures-design p.124-127·130-133·145·149·157·159 + coastal-eng-guidelines p.27·50-51·93·97-98 + marine-sands-manual p.198-199 — textbook/md 미러 페이지 직접 대조 (2026-07-14, 게이트 ⓒ 2차 재검증 포함)."
 note_author: "Claude Fable 5 (citation-grounded port)"
 note_date: 2026-07-14
@@ -61,8 +61,8 @@ related:
 ## 7. 해안 구조물 영향
 
 - **연안 이송 차단 구조물(groyne·항 입구·도류제)**: **updrift 퇴적 + downdrift 침식** (marine-sands-manual, p.198). 미국 사례에서 groin 은 강한 연안 이송 구역에서 가장 잘 기능 — 두 groin 으로 침식 해안 안정화 사례 (coastal-processes-with-eng-apps, p.12, 영문 예제 본문).
-- **TOMBOLO** = 섬을 본토(또는 다른 섬)에 잇는 bar/spit (coastal-eng-guidelines, p.93 용어집). **형성 기구**: 섬(이안 구조물)의 파 차폐로 파봉이 차폐역 쪽으로 만곡 → 배후에 퇴적체가 성장해 섬-해안을 잇는 지상 연결 형성 — 해안→섬 또는 섬→해안 양방향 성장 가능 (coastal-processes-with-eng-apps, p.30, §Tombolos). 제티 fillet·tombolo 는 이송 방향 지표로도 사용 (coastal-structures-design, p.132).
-- **이안 방파제 응답의 지배 변수**: 구조물과 자연계의 상호작용은 **마루고·연안 방향 길이·이안 거리**에 좌우 (coastal-processes-with-eng-apps, p.11) — ★초판 이식의 "salient 조건 코퍼스 미확인" 은 오판, 정성 조건 복원(게이트 ⓒ 2차). ※정량 임계비(길이/이안거리)는 코퍼스 미확인 — 미이식(설계 상세는 `concepts/waves/06`·KDS 축 탐색).
+- **TOMBOLO** = 섬을 본토(또는 다른 섬)에 잇는 bar/spit (coastal-eng-guidelines, p.93 용어집). **형성 기구**: 섬(이안 구조물)의 파 차폐로 파봉이 차폐역 쪽으로 만곡 → 배후에 퇴적체가 성장해 섬-해안을 잇는 지상 연결 형성 — 해안→섬 또는 섬→해안 양방향 성장 가능; 섬이 이안거리 대비 길고 가늘면 **double tombolo** (coastal-processes-with-eng-apps, p.30, §Tombolos·Fig. 3.17). 제티 fillet·tombolo 는 이송 방향 지표로도 사용 (coastal-structures-design, p.132).
+- **salient vs tombolo 분기**: 이안 지형(섬·구조물)이 해안에서 **너무 멀리 떨어져 있으면 진짜 tombolo 는 형성되지 않고, 해안선이 튀어나온 salient(shoreline protuberance)만** 발생 (coastal-processes-with-eng-apps, p.30, Fig. 3.17(c)). 구조물-자연계 상호작용의 지배 변수는 **마루고·연안 방향 길이·이안 거리** (p.11). ★초판 이식의 "salient 조건 코퍼스 미확인" 은 오판 — 정성 분기 조건 복원(게이트 ⓒ 2차). ※정량 임계비(길이/이안거리)는 코퍼스 미확인 — 미이식(설계 상세는 `concepts/waves/06`·KDS 축 탐색).
 - 침식률이 **~5 m/yr 를 넘으면** 주기적 양빈만으로는 손실을 따라가기 어려움 — 구조물 병행 대안 검토 (coastal-structures-design, p.124).
 
 ## 8. 해빈 양빈 (beach nourishment/replenishment)
