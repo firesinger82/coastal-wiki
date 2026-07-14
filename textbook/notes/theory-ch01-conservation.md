@@ -7,12 +7,13 @@ depends_on:
 canonical_source: self
 citation_status: verified
 has_source_needed: true
-provenance: "교재 프로젝트 textbook-ai-data-full ch01(AI 합성 MDX, 무인용) 이식분 — 2026-07-14 원자 단언 분해·(source_id, page) 부착. 주 출처 = **hudspeth2005-wave-forces §3(Fundamentals of Fluid Mechanics)** — Hudspeth 는 mass·momentum·energy 를 differential element method 로 개별 유도(§3.2·§3.3). ★마스터 보존법칙(일반 강도량 φ 의 ∂φ/∂t+∇·(φu)=S_φ)은 Hudspeth 에 일반형으로 명시 없음 — 연속(φ=ρ)·운동량(φ=ρu) 구체 사례로 부착하고 일반 φ 추상은 교재 교수법 틀로 표시. 미매칭 삭제/미이식: Reynolds 역사노트(1883 파이프 실험·1903 RTT 정식, 코퍼스 0건)·conservative/non-conservative 용어(Hudspeth 미사용, 두 형태 식은 실측)·워크 예제·강 위 배 비유. depends_on ch00.5(RTT·물질미분·발산정리·Taylor 근거 의존, 첫 ①→① 연쇄). T8([THEORY-LEDGER](../THEORY-LEDGER.md))."
-verification_method: "hudspeth2005-wave-forces p.69·75-80·91(§3.1 CV 3종·§3.2 연속·§3.3 운동량·§3.3.1 관성력) — textbook/md 미러 ---PAGE-N--- 마커 실측 대조 (2026-07-14)."
+provenance: "교재 프로젝트 textbook-ai-data-full ch01(AI 합성 MDX, 무인용) 이식분 — 2026-07-14 원자 단언 분해·(source_id, page) 부착 + 같은 날 Codex 게이트(T8) MODIFY 반영. 주 출처 = **hudspeth2005-wave-forces §3(Fundamentals of Fluid Mechanics)** — mass·momentum·energy 를 differential element method 로 개별 유도. Codex 게이트 정정: ★마스터 balance 구조 = **holthuijsen2007 p.360 Eq.E.6**(임의 보존성질 μ 1D 수심적분형)+**Whitham hudspeth p.161 Eq.4.63** 실존 부착('코퍼스 0건' 오판 정정) — 3D 총플럭스형은 여전히 source-needed / 운동량 대입식 = Hudspeth p.90 §3.3.4 Eq.3.36(N-S)·p.91 §3.3.5 Euler 부착 / Reynolds 1883 = stewart p.130 실존(난류전이 실험)이나 RTT 계보와 무관해 범위 제외 / '적분형 불연속·미분형 매끄러운해' 대비 삭제(코퍼스 미확인) / §2 RTT·Gauss 식 재서술을 '질량 검사체적 적용'으로 축소(ch00.5 복제 회피). 미이식: conservative/non-conservative 명명(Hudspeth 미사용)·워크예제·강 위 배 비유. depends_on ch00.5(RTT·물질미분·발산정리·Taylor, 첫 ①→① 연쇄). T8([THEORY-LEDGER](../THEORY-LEDGER.md))."
+verification_method: "hudspeth2005-wave-forces p.69·75-80·90-91·161(§3.1 CV 3종·§3.2 연속·§3.3 운동량·§3.3.1 관성력·§3.3.4-5 N-S/Euler·Whitham 보존원리) + holthuijsen2007 p.360-361(부록 E 일반 balance E.6·질량 E.7-8) + stewart-physical-ocean p.130(Reynolds 1883) — textbook/md 미러 ---PAGE-N--- 마커 실측 대조 (2026-07-14, Codex 게이트 재검증 포함)."
 note_author: "Claude Fable 5 (citation-grounded port)"
 note_date: 2026-07-14
 related:
   - textbook/notes/theory-ch00_5-math-tools.md
+  - textbook/notes/theory-ch09-nonlinear-spectra.md
 ---
 
 # 보존법칙의 뼈대 — 검사체적 · RTT · 마스터 보존형식
@@ -28,10 +29,10 @@ related:
   - **differential control volume** — arbitrary 와 유사하나 특정 좌표계의 미소 유체요소로 제한(13개 분리가능 좌표계 중 택일).
 - 데카르트 미분 검사체적으로 기본법칙을 유도하며, 유체를 **연속체(continuum)=Eulerian field** 로 취급; 압축성 유체의 3개 미지장은 **질량밀도·압력·속도** (hudspeth2005-wave-forces, p.75-76). 유도 도구로 **Taylor 급수 전개**가 핵심 (p.76; 근거 [[theory-ch00_5-math-tools]] §2). ※원문 교재의 검사질량 vs 검사체적 이분법·강 위 배 비유는 Hudspeth 3종 분류로 대체.
 
-## 2. Reynolds 수송정리 (RTT)
+## 2. Reynolds 수송정리 (RTT)의 적용
 
-- 임의 검사체적에 대한 보존의 적분형 — 연속을 예로 $\dfrac{d}{dt}\iiint_{cv(t)}\rho\,dV+\oiint_{cs}\rho\mathbf{q}\cdot\mathbf{n}\,dS=0$ (hudspeth2005-wave-forces, p.78, §3.2, Eq. 3.11). 좌변=검사체적 내 양의 시간변화, 표면적분=경계 통과 알짜 플럭스 — 이 두 항 분해가 RTT 의 본질(근거 [[theory-ch00_5-math-tools]] §7 Leibniz·RTT).
-- 표면적분→체적적분 변환은 **Gauss 발산정리** (hudspeth2005-wave-forces, p.69, Eq. 2.122a; 근거 [[theory-ch00_5-math-tools]] §5) — 적분형↔미분형 보존법칙을 잇는 결정적 단계. ※원문 교재의 Reynolds(1883 파이프 실험·1903 정식) 역사노트는 코퍼스 미확인 — 미이식.
+- RTT·발산정리 자체는 [[theory-ch00_5-math-tools]] §5·§7 canonical(재서술 금지) — 본 장은 이를 **질량 검사체적에 적용**: 임의 검사체적의 연속 적분형이 $\dfrac{d}{dt}\iiint_{cv(t)}\rho\,dV+\oiint_{cs}\rho\mathbf{q}\cdot\mathbf{n}\,dS=0$ 로 구체화됨 (hudspeth2005-wave-forces, p.78, §3.2, Eq. 3.11) — 검사체적 내 질량 변화 = 경계 통과 알짜 질량 플럭스.
+- 표면적분→체적적분 변환(Gauss 발산정리)이 이 적분형을 §3의 미분형으로 잇는 결정적 단계(근거 [[theory-ch00_5-math-tools]] §5). ※원문 교재의 Reynolds 역사노트: 1883 관내 염료 실험은 난류전이(Re≈2000) 연구로 stewart-physical-ocean p.130 에 실존하나 **RTT 계보와 직접 관계가 약해 범위 제외**; RTT 의 1903 정식화 귀속은 코퍼스 미확인 — 미이식.
 
 ## 3. 질량 보존 — 보존형과 비보존형
 
@@ -40,11 +41,12 @@ related:
 
 ## 4. 마스터 보존 구조 — 일반 강도량
 
-- 모든 보존법칙은 **동일 구조 "국소 변화 + 대류 플럭스 발산 = 생성원"** 을 공유: 강도량 $\phi$ 에 대해 $\dfrac{\partial\phi}{\partial t}+\nabla\cdot(\phi\mathbf{u})=S_\phi$ (교재 교수법 틀; Hudspeth 는 이 일반형을 명시하지 않고 아래 구체 사례로 개별 유도). ※일반 강도량 마스터식 자체는 코퍼스 직접 지지 없음 — 구체 사례(질량·운동량)가 근거. <!-- citation_status: source-needed -->
+- 모든 보존법칙은 **동일 balance 구조 "국소 변화율 + 이류(transport) = 생성원"** 을 공유. 임의 보존 성질 $\mu$(밀도)에 대한 (1차원 수심적분) balance 방정식 $\dfrac{\partial(\mu D)}{\partial t}+\dfrac{\partial(u_x\mu D)}{\partial x}=S$ — 좌변=국소 변화율+이류항, 우변=단위면적·단위시간당 생성/소산원 (holthuijsen2007, p.360, Eq. E.6; $D=\eta+d$ 수주 높이). Whitham(1974)의 일반 보존원리 $\partial_t P+\partial_x Q(P)$(RTT 와 유사, 파동밀도 $P$·플럭스밀도 $Q(P)$)도 동형 (hudspeth2005-wave-forces, p.161, Eq. 4.63).
+- **3차원·총플럭스 일반형** $\dfrac{\partial\phi}{\partial t}+\nabla\cdot\mathbf{J}=S_\phi$ — 플럭스 $\mathbf{J}$ 는 대류 $\phi\mathbf{u}$ + 비대류(응력·확산·열전도); 순수 대류 $\mathbf{J}=\phi\mathbf{u}$ 는 질량 사례. Holthuijsen 은 3D balance 를 §5.3.2 에서 다루고 1D(E.6)를 그 유추로 유도. ※3D 총플럭스 마스터식의 완전 전사는 코퍼스 페이지 미확정 — 1D(E.6)·Whitham(4.63)이 지지. <!-- citation_status: source-needed -->
 - 강도량 대입으로 각 법칙이 나옴:
-  - **질량**: $\phi=\rho$, $S=0$ → 연속 방정식 (§3, hudspeth2005-wave-forces p.78). → ch02.
-  - **운동량**($i$성분): $\phi=\rho u_i$, $S=(\nabla\cdot\boldsymbol\sigma)_i+\rho f_i$ → 운동량 방정식 (§5). → ch03·ch04.
-  - 에너지·물질 종은 후속(코퍼스 확보 시).
+  - **질량**: $\mu=\rho$, $S=0$ → 연속 방정식 (holthuijsen2007 p.361, Eq. E.7→E.8; 3D 는 hudspeth2005-wave-forces p.78). → ch02.
+  - **운동량**: 비압축 Newtonian 유체의 **N-S** $\rho\partial_t\mathbf{q}+\rho(\mathbf{q}\cdot\nabla)\mathbf{q}=-\nabla(p+\rho gz)+\mu\nabla^2\mathbf{q}$ (hudspeth2005-wave-forces, p.90, §3.3.4, Eq. 3.36)·무점성이면 **Euler** (p.91, §3.3.5) → ch03·ch04.
+  - **에너지**: Hudspeth §3.4 Mechanical Energy Principle 에 있으나 후속 장으로 범위 이연.
 
 ## 5. 운동량 원리 — 관성력의 국소·대류 분해
 
@@ -54,7 +56,7 @@ related:
 
 ## 6. 적분형 vs 미분형
 
-- 같은 보존법칙을 **적분형**(arbitrary control volume, 전역·불연속 허용)과 **미분형**(differential control volume, 점별·매끄러운 해)으로 표현 — 두 형태는 발산정리로 연결 (hudspeth2005-wave-forces, p.75, §3.1). 본 계열(선형파 이론 전개)은 미분형 중심. ※충격파·불연속(적분형 강점)은 본 장 범위 밖.
+- 같은 보존법칙을 **arbitrary control volume**(적분형, 임의 시스템 적용)과 **differential control volume**(미분형, 특정 좌표계 미소요소)로 표현 — 두 방법은 발산정리로 연결 (hudspeth2005-wave-forces, p.75, §3.1). 본 계열(선형파 이론 전개)은 데카르트 미분 검사체적 중심. ※"적분형은 불연속 허용·미분형은 매끄러운 해" 대비는 코퍼스 직접 확인 안 됨 — 미이식(충격파 등은 본 장 범위 밖).
 
 ## 7. 연결
 
