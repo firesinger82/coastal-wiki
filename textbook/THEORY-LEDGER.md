@@ -15,7 +15,7 @@
 | 챕터 | 주제 | 노트 | 주 출처 후보 | 상태 | 단언 수 | 매칭률 | 소요 |
 |---|---|---|---|:--:|--:|--:|--:|
 | 00 | Intro (학습 안내) | — | — | **이식 제외** (사이트 안내문, 이론 아님) | - | - | - |
-| 00.5 | 수학 도구 (벡터·텐서·RTT) | — | hydraulics-and-hydrology 외 | ⬜ | | | |
+| 00.5 | 수학 도구 (벡터·텐서·RTT) | [theory-ch00_5-math-tools](notes/theory-ch00_5-math-tools.md) | ★**hudspeth2005-wave-forces**(§2·§3, 주출처 정정) | ✅ **T7 완료**(2026-07-14) | 30 | 73% (22 부착·8 삭제/미이식) · ★**주 출처 정정**: hydraulics-and-hydrology=벡터/텐서/RTT/발산정리 전무(스캔 0건)→Hudspeth §2 수학예비+§3 유체기초로 확정 · 핵심 부착: Levi-Civita p.28 Eq2.5·gradient/curl/Laplacian p.30-31·D/Dt=∂t+q·∇ p.32-33·Gauss div p.69 Eq2.122a·Green p.70·RTT p.78 Eq3.11·속도구배 대칭/반대칭 분해 p.83 · 삭제: 순수 수학사(사원수·∂기호·오일러/라그랑주 연도)·pathline/streakline·Stokes 정리·워크예제 · 미표기 residue 0 · ★기초 파일럿(depends_on:[]) | ~1.2h |
 | 01 | 보존법칙 (검사체적·RTT) | — | hydraulics-and-hydrology | ⬜ | | | |
 | 02 | 연속방정식 | — | hydraulics-and-hydrology | ⬜ | | | |
 | 03 | Euler·Bernoulli | — | hydraulics-and-hydrology | ⬜ | | | |

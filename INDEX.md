@@ -42,6 +42,7 @@
 
 | 노트 | source_id | 상태 |
 |---|---|---|
+| [theory-ch00_5-math-tools.md](textbook/notes/theory-ch00_5-math-tools.md) | hudspeth2005-wave-forces | **verified** (T7 기초 파일럿 — ★주 출처 hydraulics→Hudspeth 정정·순수 수학사 삭제) |
 | [theory-ch08-linear-waves.md](textbook/notes/theory-ch08-linear-waves.md) | water-wave-mechanics·holthuijsen2007 | **verified** (T1, 게이트 ⓐ 통과) |
 | [theory-ch09-nonlinear-spectra.md](textbook/notes/theory-ch09-nonlinear-spectra.md) | holthuijsen2007·water-wave-mechanics | **verified** (T3, 게이트 ⓒ 반영 — ★Hasselmann 연도 정정) |
 | [theory-ch10-coastal-transformation.md](textbook/notes/theory-ch10-coastal-transformation.md) | water-wave-mechanics·holthuijsen2007·mechanics-of-sediment-transport | **verified** (T4, 게이트 ⓒ 반영 — ★Sommerfeld 계보 복원·5π/16 source-needed 1건) |
