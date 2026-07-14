@@ -16,7 +16,7 @@
 |---|---|---|---|:--:|--:|--:|--:|
 | 00 | Intro (학습 안내) | — | — | **이식 제외** (사이트 안내문, 이론 아님) | - | - | - |
 | 00.5 | 수학 도구 (벡터·텐서·RTT) | [theory-ch00_5-math-tools](notes/theory-ch00_5-math-tools.md) | ★**hudspeth2005-wave-forces**(§2·§3, 주출처 정정)·stewart-physical-ocean | ✅ **T7 완료**(2026-07-14, Codex 파일럿 게이트 반영) | 31 | 77% (24 부착·7 삭제/미이식) · ★**주 출처 정정**: hydraulics-and-hydrology=벡터/텐서/RTT/발산정리 전무(스캔 0건)→Hudspeth §2 수학예비+§3 유체기초로 확정 · 핵심 부착: Levi-Civita p.29·gradient p.31·Laplacian p.32·D/Dt=∂t+q·∇ p.32-33·Gauss div p.69·Green p.70·RTT p.78·속도구배 분해 p.80-83·Einstein합 p.666 · ★게이트 정정: 마커 실측 정정 9곳·pathline 복원(stewart p.199-201, 삭제 오판)·rank/공변반변 삭제 · 삭제: 순수 수학사·streakline·Stokes 정리·워크예제 · 미표기 residue 0 · ★기초 파일럿(depends_on:[]) | ~1.4h |
-| 01 | 보존법칙 (검사체적·RTT) | — | hydraulics-and-hydrology | ⬜ | | | |
+| 01 | 보존법칙 (검사체적·RTT) | [theory-ch01-conservation](notes/theory-ch01-conservation.md) | ★**hudspeth2005-wave-forces §3**(주출처 정정) | ✅ **T8 완료**(2026-07-14) | 24 | 79% (19 부착·4 삭제·1 source-needed) · ★주 출처 hydraulics→Hudspeth §3(Fundamentals of Fluid Mechanics) · 핵심: CV 3종 p.75(finite/arbitrary/differential)·RTT p.78 Eq3.11·연속 보존형/비보존형 p.78 Eq3.10·운동량 관성력=국소+대류가속 p.79-80 Eq3.14·무점성+비회전→Euler p.91 · ★마스터식 일반 φ = Hudspeth 미명시(구체 사례가 근거)→source-needed 1(has_source_needed) · 삭제: Reynolds 역사·conservative 용어·워크예제 · **첫 ①→① 연쇄(depends_on ch00.5)** | ~0.8h |
 | 02 | 연속방정식 | — | hydraulics-and-hydrology | ⬜ | | | |
 | 03 | Euler·Bernoulli | — | hydraulics-and-hydrology | ⬜ | | | |
 | 04 | Navier-Stokes | — | hydraulics-and-hydrology | ⬜ | | | |
