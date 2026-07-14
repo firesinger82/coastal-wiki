@@ -5,8 +5,8 @@ layer: 1
 depends_on: []
 canonical_source: self
 citation_status: verified
-provenance: "교재 프로젝트 textbook-ai-data-full ch13(AI 합성 MDX, 무인용) 이식분 — 2026-07-13 원자 단언 분해·(source_id, page) 부착. ★원문 연도 미지지 2건 미이식(Krone '1962'·Partheniades '1965' — 코퍼스 실측은 Ariathurai & Krone 1976·Partheniades 무연도 서술), 미매칭 삭제 5건(Rouse 매개변수 모드 구분표 2.5/0.8·기준 높이 a=2d·Van Rijn 1984 bedload 0.053 T^2.1/D*^0.3 명시 계수·boulder/cobble/pebble 상세 경계·fluid mud). 워크 예제·한국 연안 수치(동해안 0.3mm·수만 m³/년)·계절 profile(ch14 주제)·EFDC 모듈 상세는 미이식 — concepts/models 탐색 위임. ※van-rijn-1993 미러 = OCR 실패 껍데기(690p 전부 빈 텍스트) 판정 — 주 출처에서 제외. T5([THEORY-LEDGER](../THEORY-LEDGER.md))."
-verification_method: "marine-sands-manual(Soulsby) p.8·11-12·24·33·48·51·62·74·109-110·114·120·138-141·145-147·162·164-165·168·198-199 + mechanics-of-sediment-transport p.216·229-230·367-368·370·376(서지 p.423)·TOC p.15 + efdc-sed-trans-2003 p.38-42·66 — textbook/md 미러 페이지 직접 대조 (2026-07-13)."
+provenance: "교재 프로젝트 textbook-ai-data-full ch13(AI 합성 MDX, 무인용) 이식분 — 2026-07-13 원자 단언 분해·(source_id, page) 부착, 2026-07-14 게이트 ⓒ 2차(Codex 8회차) MODIFY 반영. ★원문 연도 미지지 2건 미이식(Krone '1962'·Partheniades '1965' — 코퍼스 실측은 Ariathurai & Krone 1976·Partheniades 무연도 서술). 게이트 ⓒ 2차 정정: 기준높이 z_a=2d50 = marine-sands p.149(Zyserman-Fredsøe) 실존 — 삭제 오판 복원 / Van Rijn 0.053·2.1 = efdc-sed-trans p.58 Eq.6.18 판독 — '검증 불가' 과장 정정(완전식은 미전사) / Rouse profile 식 = 미러 문자 소실로 전사 제거(정성+b 정의만). 미매칭 삭제 3건(Rouse 모드 구분표 2.5/0.8·boulder/cobble/pebble 상세 경계·fluid mud[용어는 WWM p.289 실존하나 원 단언 내용 미지지 — 미이식 유지]). 워크 예제·한국 연안 수치·계절 profile(ch14 주제)·EFDC 모듈 상세는 미이식 — concepts/models 탐색 위임. ※van-rijn-1993 미러 = OCR 실패 껍데기(690p 전부 빈 텍스트) 판정 — 주 출처에서 제외. T5([THEORY-LEDGER](../THEORY-LEDGER.md))."
+verification_method: "marine-sands-manual(Soulsby) p.8·11-12·24·33·48·51·62·74·109-110·114·120·138-141·145-149·162·164-165·168·198-199 + mechanics-of-sediment-transport p.216·229-230·367-368·370·376(서지 p.423)·TOC p.15 + efdc-sed-trans-2003 p.38-42·58·66 — textbook/md 미러 페이지 직접 대조 (2026-07-13, 게이트 ⓒ 2차 재검증 2026-07-14)."
 note_author: "Claude Fable 5 (citation-grounded port)"
 note_date: 2026-07-13
 related:
@@ -47,13 +47,15 @@ related:
 ## 4. Bedload 공식 계보
 
 - **Meyer-Peter & Müller(1948)**: $\phi = 8\,(\theta-\theta_{cr})^{3/2}$, $\theta_{cr}=0.047$ — 하천용으로 개발된 고전 (marine-sands-manual, p.164, SC Eq. 117).
-- 동급 계보로 **Bagnold(1963)**·**Yalin(1963)**·**Van Rijn(1984)** 공식이 병렬 정리됨 (marine-sands-manual, p.164-165, SC Eq. 118-120; saltation 모래는 계수 $F_M=9.5$, p.165). ※원문 교재의 Van Rijn(1984) bedload 명시형 "$0.053\sqrt{(s-1)gd^3}\,T^{2.1}/D_*^{0.3}$" 은 미러 OCR 로 계수 문자 검증 불가 — 계보만 이식, 계수 미전사.
+- 동급 계보로 **Bagnold(1963)**·**Yalin(1963)**·**Van Rijn(1984)** 공식이 병렬 정리됨 (marine-sands-manual, p.164-165, SC Eq. 118-120; saltation 모래는 계수 $F_M=9.5$, p.165).
+- **Van Rijn(1984a) bedload 명시형**: 계수 **0.053** 과 지수 **2.1** 은 efdc-sed-trans-2003 p.58, Eq. 6.18 에서 직접 판독 — 단 전체 변수 배열은 해당 미러 OCR 불완전이라 완전식은 미전사 (★초판 이식의 "계수 문자 검증 불가" 판정은 과장 — 게이트 ⓒ 2차로 정정).
 - 동일 조건 예제에서 4공식 비교: $q_b$ 가 $10.9{-}23.9\times10^{-6}\ \mathrm{m^2\,s^{-1}}$ 대역으로 산포 — 반경험식 간 격차의 실감 (marine-sands-manual, p.168).
 
 ## 5. Suspended load — Rouse 분포
 
-- 정상 상태에서 상향 난류 확산과 하향 침강의 평형이 농도 연직 분포를 결정. 와확산계수를 포물형 $K_s=\kappa u_* z(1-z/h)$ 로 두면 **Rouse profile** $\dfrac{c(z)}{c_a}=\left[\dfrac{z_a(h-z)}{z(h-z_a)}\right]^{b}$ 을 얻음 — $c_a$ = 기준 높이 $z_a$ 의 기준 농도, $b$ = Rouse 수 (marine-sands-manual, p.145-146, SC Eq. 105-106).
-- $b$ 작음(세립·강한 흐름) → 전 수심 잘 혼합, $b$ 큼 → 바닥 집중; **Rouse profile 이 가장 널리 쓰임**(특히 하천) — $b=1$ 사례로 지수·멱형 분포와 형상 비교 (marine-sands-manual, p.147, Fig. 28). ※기준 높이 "$a=2d$" 관행 수치는 코퍼스 미확인 — 미이식.
+- 정상 상태에서 상향 난류 확산과 하향 침강의 평형이 농도 연직 분포를 결정. 와확산계수를 포물형 $K_s=\kappa u_* z(1-z/h)$ 로 두면 **Rouse profile** 을 얻음 — 기준 높이 $z_a$ 의 기준 농도 $c_a$ 에 대한 비로 표현되며 지수 = Rouse 수 $b$ (marine-sands-manual, p.145-146; $b$ 정의는 SC Eq. 105 판독, profile 식 자체(Eq. 106-107)는 미러 OCR 문자 소실로 **미전사** — 게이트 ⓒ 2차 판정).
+- $b$ 작음(세립·강한 흐름) → 전 수심 잘 혼합, $b$ 큼 → 바닥 집중; **Rouse profile 이 가장 널리 쓰임**(특히 하천) — $b=1$ 사례로 지수·멱형 분포와 형상 비교 (marine-sands-manual, p.147, Fig. 28).
+- **기준 높이·기준 농도**: 최근 표현으로 좋은 결과를 주는 것이 **Zyserman & Fredsøe(1994)** 기준농도 — 기준 높이 $z_a = 2d_{50}$ 명시 (marine-sands-manual, p.149, SC Eq. 109-111 문맥; ★초판 이식의 "$a=2d$ 미확인" 삭제는 오판 — 게이트 ⓒ 2차로 복원).
 
 ## 6. 바닥 변화 — 퇴적물 연속(Exner)
 

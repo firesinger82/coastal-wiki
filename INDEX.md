@@ -47,7 +47,7 @@
 | [theory-ch10-coastal-transformation.md](textbook/notes/theory-ch10-coastal-transformation.md) | water-wave-mechanics·holthuijsen2007·mechanics-of-sediment-transport | **verified** (T4, 게이트 ⓒ 반영 — ★Sommerfeld 계보 복원·5π/16 source-needed 1건) |
 | [theory-ch12-tides.md](textbook/notes/theory-ch12-tides.md) | sea-level·stewart-physical-ocean | **verified** (T2 — ★원문 연도 오기 2건 정정·첫 ①→① 의존) |
 | [theory-ch13-sediment-transport.md](textbook/notes/theory-ch13-sediment-transport.md) | marine-sands-manual·mechanics-of-sediment-transport·efdc-sed-trans-2003 | **verified** (T5 — ★Krone/Partheniades 연도 미지지 미이식·van-rijn-1993 미러 OCR 실패 판정) |
-| [theory-ch14-coastal-morphodynamics.md](textbook/notes/theory-ch14-coastal-morphodynamics.md) | coastal-processes-with-eng-apps·coastal-structures-design·coastal-eng-guidelines 외 | **verified** (T6 — ★Hallermeier '10.9' 의심 오류 미전사·one-line 절 코퍼스 0건 미이식) |
+| [theory-ch14-coastal-morphodynamics.md](textbook/notes/theory-ch14-coastal-morphodynamics.md) | coastal-processes-with-eng-apps·coastal-structures-design·coastal-eng-guidelines 외 | **verified** (T6, 게이트 ⓒ 2차 반영 — ★Hallermeier '10.9'→68.5 정정 복원·GENESIS/salient 복원) |
 | [tides-lubbad2009-overview.md](textbook/notes/tides-lubbad2009-overview.md) | lubbad2009-tides-slides | draft-unsourced |
 
 원본 PDF 매니페스트: [textbook/sources.yml](textbook/sources.yml).
