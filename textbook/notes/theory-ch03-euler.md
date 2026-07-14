@@ -8,14 +8,16 @@ depends_on:
   - textbook/notes/theory-ch00_5-math-tools.md
 canonical_source: self
 citation_status: verified
-provenance: "교재 프로젝트 textbook-ai-data-full ch03(AI 합성 MDX, 무인용) 이식분 — 2026-07-14 원자 단언 분해·(source_id, page) 부착. 주 출처 = **hudspeth2005-wave-forces §3.3(운동량·응력·대칭성·Euler) + water-wave-mechanics(D&D) §2(Bernoulli·Euler·d'Alembert)**. ★삭제 전 전체 코퍼스 grep(T9 심화 교훈=정확 용어+개념 동의어): Torricelli = 0건 확정 삭제(사이펀 예제 미이식). Cauchy traction 정확식 t_i=σ_ij n_j 는 Hudspeth 명시 미확인 → 응력텐서 정의·대칭성으로 부착, traction 벡터식 개념만. 미이식: 워크예제(호스·사이펀·Torricelli)·Bernoulli 효과 일상예(비행기·스프레이). depends_on ch01(운동량 마스터)·ch02(연속으로 비보존형 약분·비압축)·ch00.5(물질미분·발산·벡터항등식). T10([THEORY-LEDGER](../THEORY-LEDGER.md))."
-verification_method: "hudspeth2005-wave-forces p.78·84-86·90-92·532(§3.3 운동량·§3.3.2 표면응력·대칭성·§3.3.5 Euler·Bernoulli·d'Alembert) + water-wave-mechanics(D&D) p.22·44·50-51·231(Euler 전기·Euler 벡터형·Bernoulli·d'Alembert) — textbook/md 미러 ---PAGE-N--- 마커 실측 대조 (2026-07-14)."
+has_source_needed: true
+provenance: "교재 프로젝트 textbook-ai-data-full ch03(AI 합성 MDX, 무인용) 이식분 — 2026-07-14 원자 단언 분해·(source_id, page) 부착. 주 출처 = **hudspeth2005-wave-forces §3.3(운동량·응력·대칭성·Euler) + water-wave-mechanics(D&D) §2(Bernoulli·Euler·d'Alembert)** — 본 노트가 **Cauchy 응력텐서·Euler·Bernoulli 의 canonical 소유자**(ch01 §4·ch02 의 Euler 언급은 선취 미리보기). ★삭제 전 전체 코퍼스 grep(T9 심화 교훈=정확 용어+개념 동의어): Torricelli = 0건 확정 삭제. Codex 게이트(T10) 정정: d'Alembert 앵커 'Eq.7.27'→'Eq.7.23·7.26 뒤 설명'·무점성 σ=-pI = Hudspeth p.91 Eq.3.38a 부착·4식→'속도(연속)·압력(운동량)' Hudspeth p.74 축소·★Prandtl 1904 경계층 = stewart p.134 실존 부착(연도 미지지 아님)·Cauchy traction 정확식 source-needed 토큰화. 미이식: 워크예제(호스·사이펀·Torricelli)·Bernoulli 효과 일상예. depends_on ch01(운동량 마스터·관성력)·ch02(연속 약분·비압축)·ch00.5(물질미분·발산·벡터항등식). T10([THEORY-LEDGER](../THEORY-LEDGER.md))."
+verification_method: "hudspeth2005-wave-forces p.74·78-80·84-86·90-92·532(§3.3 운동량·§3.3.2 표면응력·대칭성·§3.3.5 Euler·Bernoulli·PST·d'Alembert) + water-wave-mechanics(D&D) p.22·44·50-51·231(Euler 전기·Euler 벡터형·Bernoulli·d'Alembert) + stewart-physical-ocean p.134(Prandtl 1904 경계층) — textbook/md 미러 ---PAGE-N--- 마커 실측 대조 (2026-07-14, Codex 게이트 재검증 포함)."
 note_author: "Claude Fable 5 (citation-grounded port)"
 note_date: 2026-07-14
 related:
   - textbook/notes/theory-ch01-conservation.md
   - textbook/notes/theory-ch02-continuity.md
   - textbook/notes/theory-ch08-linear-waves.md
+  - textbook/notes/theory-ch00_5-math-tools.md
 ---
 
 # Euler 방정식 — 운동량 보존 · Cauchy 응력 · 무점성 · Bernoulli
@@ -31,13 +33,13 @@ related:
 ## 2. Cauchy 응력텐서 — 정의와 대칭성
 
 - 표면응력 성분 $\sigma_{ij}$: **첫 첨자=면의 법선축, 둘째=응력 방향** — 미소 체적 면의 수직·접선 응력을 Taylor 급수로 표현 (hudspeth2005-wave-forces, p.84, §3.3.2, Fig. 3.7; Taylor 근거 [[theory-ch00_5-math-tools]] §2). 3면×3방향 = 9 성분.
-- **대칭성 $\sigma_{ij}=\sigma_{ji}$**: 미분 체적의 **각운동량 balance**(모멘트 합 = 각운동량, $\sum M_A=\rho\Delta V(\Delta R)^2\ddot\theta$)에서, 체적이 0으로 가면 대각 외 응력이 짝지어 상쇄되어야 함 → $\sigma_{zx}=\tau_{xz}$ 등 → **9 성분이 6 독립 성분으로 축약** (hudspeth2005-wave-forces, p.84-86, Eq. 3.26). ※Cauchy traction 벡터식 $t_i=\sigma_{ij}n_j$(임의 면 응력=법선에 텐서 곱)의 정확한 전사는 Hudspeth 명시 미확인 — 응력텐서 정의·대칭성만 이식.
+- **대칭성 $\sigma_{ij}=\sigma_{ji}$**: 미분 체적의 **각운동량 balance**(모멘트 합 = 각운동량, $\sum M_A=\rho\Delta V(\Delta R)^2\ddot\theta$)에서, 체적이 0으로 가면 대각 외 응력이 짝지어 상쇄되어야 함 → $\sigma_{zx}=\tau_{xz}$ 등 → **9 성분이 6 독립 성분으로 축약** (hudspeth2005-wave-forces, p.84-86, Eq. 3.26). ※Cauchy traction 벡터식 $t_i=\sigma_{ij}n_j$(임의 면 응력=법선에 텐서 곱)의 정확한 전사는 Hudspeth 명시 미확인 — 응력텐서 정의·대칭성만 이식. <!-- citation_status: source-needed -->
 
 ## 3. Cauchy 운동량 방정식 → 무점성 Euler
 
-- 종합하면 **비보존형 운동량 방정식** $\rho\dfrac{D\mathbf{u}}{Dt}=\nabla\cdot\boldsymbol\sigma+\rho\mathbf{f}$ — 좌변=단위체적 질량×가속도(물질미분), 우변=표면응력 발산+체적력, 곧 연속체판 $F=ma$ (hudspeth2005-wave-forces, §3.3; [[theory-ch02-continuity]] 연속식으로 $u_i$ 곱 항 약분). 어떤 **구성식(응력↔변형)** 을 넣느냐가 물질을 결정 — 무점성→Euler, Newtonian→N-S(ch04).
-- **무점성(inviscid) 가정**: 전단응력 0, 응력텐서는 등방 압력뿐 $\boldsymbol\sigma=-p\mathbf{I}$ → $\nabla\cdot\boldsymbol\sigma=-\nabla p$ (Kronecker δ 치환, [[theory-ch00_5-math-tools]] §4). 대입 →
-- **Euler 방정식** $\rho\dfrac{D\mathbf{u}}{Dt}=-\nabla p+\rho\mathbf{f}$, 즉 $\dfrac{D\mathbf{q}}{Dt}=-\nabla\!\left(\dfrac{p}{\rho}+gz\right)$ — 자유표면 중력파의 비회전 무점성 유동 근사 (hudspeth2005-wave-forces, p.91, §3.3.5, Eq. 3.41, Lamb 1932; water-wave-mechanics, p.44, Euler 벡터형). **Euler + 연속 = 4식 4미지수**($u,v,w,p$) 닫힌 계.
+- 종합하면 **비보존형 운동량 방정식** $\rho\dfrac{D\mathbf{u}}{Dt}=\nabla\cdot\boldsymbol\sigma+\rho\mathbf{f}$ — 좌변=단위체적 질량×가속도(물질미분, [[theory-ch01-conservation]] §5 관성력 canonical), 우변=표면응력 발산+체적력, 곧 연속체판 $F=ma$ (hudspeth2005-wave-forces, p.78-80, §3.3; [[theory-ch02-continuity]] 연속식으로 $u_i$ 곱 항 약분). 어떤 **구성식(응력↔변형)** 을 넣느냐가 물질을 결정 — 무점성→Euler, Newtonian→N-S(ch04).
+- **무점성(inviscid) 가정**: 전단응력 0, 응력텐서는 등방 압력뿐 $\boldsymbol\sigma=-p\mathbf{I}$ → $\nabla\cdot\boldsymbol\sigma=-\nabla p$ (hudspeth2005-wave-forces, p.91, Eq. 3.38a; Kronecker δ 치환 [[theory-ch00_5-math-tools]] §4). 대입 →
+- **Euler 방정식** $\rho\dfrac{D\mathbf{u}}{Dt}=-\nabla p+\rho\mathbf{f}$, 즉 $\dfrac{D\mathbf{q}}{Dt}=-\nabla\!\left(\dfrac{p}{\rho}+gz\right)$ — 자유표면 중력파의 비회전 무점성 유동 근사 (hudspeth2005-wave-forces, p.91, §3.3.5, Eq. 3.41, Lamb 1932; water-wave-mechanics, p.44, Euler 벡터형). **Euler + 연속 = 닫힌 계** — 비압축 유체는 속도(연속식)·압력(운동량식) 두 미지장으로 환원 (hudspeth2005-wave-forces, p.74).
 
 ## 4. Bernoulli 적분
 
@@ -47,8 +49,8 @@ related:
 
 ## 5. d'Alembert 역설 — 무점성의 한계
 
-- **역설**: 이상(무점성·비회전) 유체에서 매끄러운 물체(원기둥·파일) 주위 흐름은 **압력 대칭 때문에 알짜 항력 = 0** — 실제 유동의 저항과 모순 (water-wave-mechanics, p.231; hudspeth2005-wave-forces, p.532, Eq. 7.27, "d'Alembert's paradox", Milne-Thompson 1968).
-- 이것이 **점성(ch04 N-S)의 필요성**을 보이는 동기 — 아무리 작은 점성도 경계 근처에서 박리·와류를 만들어 항력의 원천이 됨(Prandtl 경계층, ch06). ※Prandtl 1904 경계층 상세·역사 연도는 ch06 로 이연.
+- **역설**: 이상(무점성·비회전) 유체에서 매끄러운 물체(원기둥·파일) 주위 흐름은 **압력 대칭 때문에 알짜 항력 = 0** — 실제 유동의 저항과 모순 (water-wave-mechanics, p.231; hudspeth2005-wave-forces, p.532, Eq. 7.23·7.26 뒤 설명, "d'Alembert's paradox", Milne-Thompson 1968).
+- 이것이 **점성(ch04 N-S)의 필요성**을 보이는 동기 — 아무리 작은 점성도 경계 근처에서 박리·와류를 만들어 항력의 원천이 됨. **Prandtl 이 1904 논문에서 경계층(boundary layer) 개념 도입** (stewart-physical-ocean, p.134, Anderson 2005) — 상세는 ch06 로 이연.
 
 ## 6. 연결
 
