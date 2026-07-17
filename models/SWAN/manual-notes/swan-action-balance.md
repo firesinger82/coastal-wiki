@@ -38,7 +38,7 @@ SWAN의 핵심 방정식:
 
 ### 1.1 왜 N (action) 인가? — Energy E 대신
 
-흐름이 있을 때 (waves on currents) **E는 보존되지 않지만 N은 보존** (Bretherton & Garrett 1968 정리). 즉:
+흐름이 있을 때 (waves on currents) **E는 보존되지 않지만 N은 보존** (Bretherton & Garrett 1969 정리; holthuijsen2007 본문 §7.3.5 및 참고문헌 표기 기준 — 타 문헌에선 1968로도 인용됨). 즉:
 - 정수 + 흐름 없음: ∂E/∂t + ∇·(c_g E) = ΣS_E
 - 흐름 + 비정상: ∂N/∂t + ∇·(c_g N) + ... = ΣS_E / σ
 
@@ -133,7 +133,7 @@ S_brk(σ, θ) = -D_tot / E_tot · E(σ, θ)
 
 - D_tot = 평균 dissipation rate
 - 쇄파 부분 Q_b: H_rms이 H_max로 truncated 가정 (Rayleigh)
-- H_max = γ · h (γ ≈ 0.78, default)
+- H_max = γ · D (D = set-up 포함 총수심; **SWAN 기본 γ = 0.73** — holthuijsen2007 §9.3.4. ※0.78 은 천해 개별파 한계비(H_b/h_b, Weggel 문맥)로 별개 — 혼동 주의)
 
 SWAN 입력: `BREAKING CONSTANT 1.0 0.73` (α=1.0, γ=0.73).
 
