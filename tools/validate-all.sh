@@ -11,6 +11,7 @@ VALIDATORS=(
     validate-canonical-hygiene.sh
     validate-link-integrity.sh
     validate-layer-deps.sh
+    validate-claims.sh
 )
 
 for v in "${VALIDATORS[@]}"; do

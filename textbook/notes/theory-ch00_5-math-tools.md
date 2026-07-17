@@ -5,6 +5,11 @@ layer: 1
 depends_on: []
 canonical_source: self
 citation_status: verified
+claims_total: 31
+claims_attached: 24
+claims_dropped: 7
+claims_source_needed: 0
+claims_basis: legacy-ledger
 provenance: "교재 프로젝트 textbook-ai-data-full ch00.5(AI 합성 MDX, 무인용) 이식분 — 2026-07-14 원자 단언 분해·(source_id, page) 부착 + 같은 날 Codex 게이트(파일럿) MODIFY 반영. ★주 출처 정정: 원장 후보 hydraulics-and-hydrology 에는 벡터·텐서 미적분·물질미분·RTT·발산정리가 전무(스캔 0건) → 실제 주 출처는 **hudspeth2005-wave-forces(Hudspeth, Waves and Wave Forces) §2 수학 도구·§3 유체역학 기초**로 확정. Codex 게이트 정정: 페이지 마커 실측 정정(Levi-Civita p.29·gradient p.31·Laplacian p.32·Leibnitz p.34·Taylor p.36-38·속도구배 p.80-83 §3.3.1·Green 제2 Eq.2.123c·경계 ∂D 통일)·Einstein summation p.666 부착·rank 일반분류/공변반변 삭제(직접 출처 없음)·★pathline 복원(stewart-physical-ocean p.199-201 실존 — 삭제 오판, streakline 만 미이식). 미매칭 삭제/미이식: 순수 수학사(사원수 '벡터 전쟁'·∂ 기호 1786·오일러/라그랑주 연도·야코비 1841)·streakline·Stokes 정리(코퍼스 0건)·워크 예제. 이 노트는 후속 ch01(보존)·ch02(연속)·ch04(N-S) 의 유도 기반(①→① depends_on 대상). T7 기초 파일럿([THEORY-LEDGER](../THEORY-LEDGER.md))."
 verification_method: "hudspeth2005-wave-forces p.27-29·31-34·36-38·69-70·78·80-83·91-92·666(§2.2 표기·연산자·§2.3.3 Taylor·§2.6 적분정리·§3.2-3.3 유체역학 기초·강체 텐서합) + stewart-physical-ocean p.199-201(유선·입자경로·유선함수) — textbook/md 미러 페이지 직접 대조 (2026-07-14, Codex 게이트 재검증 포함)."
 note_author: "Claude Fable 5 (citation-grounded port)"

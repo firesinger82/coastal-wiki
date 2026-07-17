@@ -5,6 +5,11 @@ layer: 1
 depends_on: []
 canonical_source: self
 citation_status: verified
+claims_total: 26
+claims_attached: 24
+claims_dropped: 2
+claims_source_needed: 0
+claims_basis: legacy-ledger
 provenance: "교재 프로젝트 textbook-ai-data-full ch08(AI 합성 MDX, 무인용) 이식분 — 2026-07-12 원자 단언 분해 후 textbook/md 페이지 대조로 (source_id, page) 전수 부착. 미매칭 단언 2건(Lagrange 1788·Cauchy 1815 역사 연표) 삭제. T1 파일럿([THEORY-LEDGER](../THEORY-LEDGER.md))."
 verification_method: "water-wave-mechanics(Dean & Dalrymple) p.13·54·63(Eq3.9)·64-66·73-74(선형화)·77-80·78(§3.4.4 Eq3.40-42)·98·113-114·285·329 + holthuijsen2007 p.22-23·63·124·136(§5.4.1)·150·163·173-175·203·§5.5 — textbook/md 미러 페이지 직접 대조 (2026-07-12, Codex 게이트 ⓐ MODIFY 반영: 진행파 해 p.78 정정·선형화 페이지 분리·쓰나미/Phillips/Hasselmann 앵커 보강)."
 note_author: "Claude Fable 5 (citation-grounded port)"

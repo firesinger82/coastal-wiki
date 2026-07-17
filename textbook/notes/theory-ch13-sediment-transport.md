@@ -5,6 +5,11 @@ layer: 1
 depends_on: []
 canonical_source: self
 citation_status: verified
+claims_total: 35
+claims_attached: 32
+claims_dropped: 3
+claims_source_needed: 0
+claims_basis: legacy-ledger
 provenance: "교재 프로젝트 textbook-ai-data-full ch13(AI 합성 MDX, 무인용) 이식분 — 2026-07-13 원자 단언 분해·(source_id, page) 부착, 2026-07-14 게이트 ⓒ 2차(Codex 8회차) MODIFY 반영. ★원문 연도 미지지 2건 미이식(Krone '1962'·Partheniades '1965' — 코퍼스 실측은 Ariathurai & Krone 1976·Partheniades 무연도 서술). 게이트 ⓒ 2차 정정: 기준높이 z_a=2d50 = marine-sands p.149(Zyserman-Fredsøe) 실존 — 삭제 오판 복원 / Van Rijn 0.053·2.1 = efdc-sed-trans p.58 Eq.6.18 판독 — '검증 불가' 과장 정정(완전식은 미전사) / Rouse profile 식(Eq.106-107)·Rouse 수 정확식(Eq.105 분수 문자) 미러 소실로 전사 제거(정성+변수 나열만; ⓒ 2차 확인 라운드 반영). fluid mud = WWM p.289 용어·이론 실존하나 원 이식 단언(층 형성 조건) claim-level 미지지 — 미이식. 미매칭 삭제 2건(Rouse 모드 구분표 2.5/0.8·boulder/cobble/pebble 상세 경계). 워크 예제·한국 연안 수치·계절 profile(ch14 주제)·EFDC 모듈 상세는 미이식 — concepts/models 탐색 위임. ※van-rijn-1993 미러 = OCR 실패 껍데기(690p 전부 빈 텍스트) 판정 — 주 출처에서 제외. T5([THEORY-LEDGER](../THEORY-LEDGER.md))."
 verification_method: "marine-sands-manual(Soulsby) p.8·11-12·24·33·48·51·62·74·109-110·114·120·138-141·145-149·162·164-165·168·198-199 + mechanics-of-sediment-transport p.216·229-230·367-368·370·376(서지 p.423)·TOC p.15 + efdc-sed-trans-2003 p.38-42·58·66 — textbook/md 미러 페이지 직접 대조 (2026-07-13, 게이트 ⓒ 2차 재검증 2026-07-14)."
 note_author: "Claude Fable 5 (citation-grounded port)"

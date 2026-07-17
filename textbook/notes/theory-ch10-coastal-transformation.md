@@ -6,6 +6,11 @@ depends_on:
   - textbook/notes/theory-ch08-linear-waves.md
 canonical_source: self
 citation_status: verified
+claims_total: 26
+claims_attached: 24
+claims_dropped: 2
+claims_source_needed: 0
+claims_basis: legacy-ledger
 has_source_needed: false
 provenance: "교재 프로젝트 textbook-ai-data-full ch10(AI 합성 MDX, 무인용) 이식분 — 2026-07-12 원자 단언 분해·(source_id, page) 부착. 게이트 ⓒ 정정: ★회절 계보 복원 — 초판의 'Sommerfeld 1896 미확인→Penney-Price 대체' 는 오판, Sommerfeld(1896) 해·Fresnel 적분이 water-wave-mechanics p.134 에 실존(⑤), Penney-Price(1952) 정리는 p.133. 미매칭 삭제 2건(setup ~0.15Hb 크기·rip 익사 80% 통계). ★보류 1건 해소(2026-07-17): 연안류 폐형식 = 원 PDF p.765(인쇄 p.744) 직접 실측 — Eq.16.30 $U_l=(5\\pi/8)(J/c_f)u_m\\sin\\alpha_b$ 부착, 원문 교재 '5π/16' 은 천해 근사 대입 등가형 표기로 판정(미러 OCR 훼손분, 게이트 ⓒ ⑥ 종결). source-needed 0 복귀. rip 정의는 mechanics-of-sediment-transport p.766 부착(⑧). depends_on ch09 는 근거 의존 아님 — 탐색 강등(⑦). rip 상세·해안보호 구조물(§10.6-10.7)은 개념·설계 축 — concepts 탐색 위임. T4([THEORY-LEDGER](../THEORY-LEDGER.md)), 게이트 ⓒ MODIFY 반영 완료."
 verification_method: "water-wave-mechanics(D&D) p.121·124·128-129·132-134·177·303-309·351 + holthuijsen2007 p.207·215·222·260 + mechanics-of-sediment-transport p.765-766 — textbook/md 미러 페이지 직접 대조 (2026-07-12, 게이트 ⓒ 재검증 포함)."

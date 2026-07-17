@@ -5,6 +5,11 @@ layer: 1
 depends_on: []
 canonical_source: self
 citation_status: verified
+claims_total: 41
+claims_attached: 33
+claims_dropped: 8
+claims_source_needed: 0
+claims_basis: legacy-ledger
 provenance: "교재 프로젝트 textbook-ai-data-full ch14(AI 합성 MDX, 무인용) 이식분 — 2026-07-14 원자 단언 분해·(source_id, page) 부착 + 같은 날 게이트 ⓒ 2차(Codex 8회차) MODIFY 반영. ★원문 오기 1건 정정 복원: Hallermeier closure 2차항 '10.9'→**68.5**(coastal-structures-design p.127 Eq.3 실존 — 초판 '공식 미전사'는 인접 페이지 재검색 누락 오판). 게이트 ⓒ 2차 복원 3건: Hallermeier 식·salient/tombolo 정성 조건(CP p.11·30 — ⓒ 2차 확인 라운드에서 'salient=너무 먼 이안지형' 분기 조건 Fig.3.17(c) 추가)·GENESIS/SBEACH 제한적 활용(CSD p.149; '코퍼스 0건' 철회). CERC 상세는 ch13 §8 과의 복제 제거 — depends_on ch13 탐색 강등. 미매칭 삭제/미이식: one-line 확산방정식 유도(Pelnard-Considère)·Dean h=Ax^{2/3} 명시식·A(d) 수치표·CERC K 계수값·Kamphuis 명시식·Dean number 임계표·Bruun 정량식·양빈 손실률 5-10%/년·salient 정량 임계비. 원문 연도 '(Bruun) 1954'·'Dean 1973/1977' 미지지, 'Komar 1998'=서지 실존(CSD p.157)·claim-level 미지지. 워크 계산·한국 사례·수치모델 비교표는 이론 아님 — concepts/models 탐색 위임. T6([THEORY-LEDGER](../THEORY-LEDGER.md))."
 verification_method: "coastal-processes-with-eng-apps(Dean & Dalrymple) p.11-12·26-27·30(영문 생존 구간; ※미러=35p 부분본 판정) + mechanics-of-sediment-transport p.797-799(§16.5.2-16.5.3) + coastal-structures-design p.124-127·130-133·145·149·157·159 + coastal-eng-guidelines p.27·50-51·93·97-98 + marine-sands-manual p.198-199 — textbook/md 미러 페이지 직접 대조 (2026-07-14, 게이트 ⓒ 2차 재검증 포함)."
 note_author: "Claude Fable 5 (citation-grounded port)"

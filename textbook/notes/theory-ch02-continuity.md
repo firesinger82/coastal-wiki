@@ -7,6 +7,11 @@ depends_on:
   - textbook/notes/theory-ch00_5-math-tools.md
 canonical_source: self
 citation_status: verified
+claims_total: 25
+claims_attached: 22
+claims_dropped: 2
+claims_source_needed: 1
+claims_basis: legacy-ledger
 has_source_needed: true
 provenance: "교재 프로젝트 textbook-ai-data-full ch02(AI 합성 MDX, 무인용) 이식분 — 2026-07-14 원자 단언 분해·(source_id, page) 부착 + 같은 날 Codex 게이트(T9) MODIFY 반영. 주 출처 = **water-wave-mechanics(D&D) §2.2 + hudspeth2005-wave-forces §3.2 + stewart-physical-ocean §7**. ★주 출처 정정: 원장 후보 hydraulics-and-hydrology 미러(801443089)는 실제로 **USACE LACPR Hydraulics & Hydrology Appendix**(surge/wave modeling·JPM-OS·levee)라 기초 유체역학 교재 아님. Codex 게이트 정정(★전 코퍼스 grep도 정확 용어만 검색해 개념표현 누락): 저마하 물리근거 = stewart p.125-126 Boussinesq 실존('0건' 오판)·1D 도관 = D&D p.158 Eq.5.34a 속도×단면적 연속조건 실존(복원)·Euler 역사 = D&D p.22 '1761 Principia motus fluidorum'+stewart p.125 압축성 연속식 귀속(원문 '1755' 오기→1761 정정)·약한 비압축 성층 = stewart p.126 Boussinesq 부착·압력 = Hudspeth p.74 범위(속도 질량식·압력 운동량/에너지식)로 축소, Lagrange승수/Poisson 은 ch04 이연(source-needed). 미이식: Mach 수치기준 0.3·venturi·Navier 1822·워크예제. depends_on ch01·ch00.5. T9([THEORY-LEDGER](../THEORY-LEDGER.md))."
 verification_method: "water-wave-mechanics(D&D) p.22·25-26·38-39·44·158(§2.2 연속·압축률·incompressible·§2.3.4 발산·Euler·Euler 전기·step 연속조건) + hudspeth2005-wave-forces p.74·77-78(§3.2 연속 3형태·PST 속도/압력) + stewart-physical-ocean p.125-126(§7 Euler 압축성 연속식·Boussinesq) — textbook/md 미러 ---PAGE-N--- 마커 실측 대조 (2026-07-14, Codex 게이트 재검증 포함)."

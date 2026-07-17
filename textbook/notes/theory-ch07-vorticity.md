@@ -8,6 +8,11 @@ depends_on:
   - textbook/notes/theory-ch00_5-math-tools.md
 canonical_source: self
 citation_status: verified
+claims_total: 18
+claims_attached: 13
+claims_dropped: 2
+claims_source_needed: 3
+claims_basis: legacy-ledger
 has_source_needed: true
 provenance: "교재 프로젝트 textbook-ai-data-full ch07(AI 합성 MDX, 무인용) 이식분 — 2026-07-14 원자 단언 분해·(source_id, page) 부착 + 같은 날 Codex 게이트(T14) MODIFY 반영. 주 출처 = **water-wave-mechanics(D&D) §2.3(와도·velocity potential·Kelvin) + stewart-physical-ocean §12(planetary/relative/potential vorticity·2D/3D)**. Codex 게이트 정정: ★velocity potential 부호 오류 u=∇φ→**u=-∇φ**(D&D p.42 Eq.2.70)·★늘림항·potential vorticity 보존 = stewart §12.2 실존('source-needed' 오판 철회) — Π=(ζ+f)/H 궤적 보존(p.215-216 Eq.12.9)·figure skater 늘림(p.216 Fig.12.2). Lamb-Oseen·solenoidal = 코퍼스 0건 삭제. 와도방정식 N-S 회전 정식 유도·Helmholtz 3정리(D&D 'Helmholtz'=방정식 이름 별개)·circulation Γ=∮u·dl 정식·Kelvin 순환 정리 유도·point vortex = 코퍼스 미확인 → source-needed. 미이식: 워크예제·비행기 후류·vortex atom. ★연안 핵심=planetary/potential vorticity(Coriolis·Rossby)·비회전→velocity potential(ch08). depends_on ch03·ch04·ch00.5. T14 기초 마지막([THEORY-LEDGER](../THEORY-LEDGER.md))."
 verification_method: "water-wave-mechanics(D&D) p.42-44·60(§2.3 와도 ∇×u=2Ω·velocity potential u=-∇φ Eq.2.70·Kelvin 1869 와도 보존) + stewart-physical-ocean p.38·212·215-216(2D/3D vortex lines·planetary/relative vorticity=Coriolis f·§12.2 potential vorticity Π=(ζ+f)/H 보존·figure skater) — textbook/md 미러 ---PAGE-N--- 마커 실측 대조 (2026-07-14, Codex 게이트 재검증 포함)."

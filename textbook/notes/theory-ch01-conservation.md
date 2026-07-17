@@ -6,6 +6,11 @@ depends_on:
   - textbook/notes/theory-ch00_5-math-tools.md
 canonical_source: self
 citation_status: verified
+claims_total: 25
+claims_attached: 21
+claims_dropped: 3
+claims_source_needed: 1
+claims_basis: legacy-ledger
 has_source_needed: true
 provenance: "교재 프로젝트 textbook-ai-data-full ch01(AI 합성 MDX, 무인용) 이식분 — 2026-07-14 원자 단언 분해·(source_id, page) 부착 + 같은 날 Codex 게이트(T8) MODIFY 반영. 주 출처 = **hudspeth2005-wave-forces §3(Fundamentals of Fluid Mechanics)** — mass·momentum·energy 를 differential element method 로 개별 유도. Codex 게이트 정정: ★마스터 balance 구조 = **holthuijsen2007 p.360 Eq.E.6**(임의 보존성질 μ 1D 수심적분형)+**Whitham hudspeth p.161 Eq.4.63** 실존 부착('코퍼스 0건' 오판 정정) — 3D 총플럭스형은 여전히 source-needed / 운동량 대입식 = Hudspeth p.90 §3.3.4 Eq.3.36(N-S)·p.91 §3.3.5 Euler 부착 / Reynolds 1883 = stewart p.130 실존(난류전이 실험)이나 RTT 계보와 무관해 범위 제외 / '적분형 불연속·미분형 매끄러운해' 대비 삭제(코퍼스 미확인) / §2 RTT·Gauss 식 재서술을 '질량 검사체적 적용'으로 축소(ch00.5 복제 회피). 미이식: conservative/non-conservative 명명(Hudspeth 미사용)·워크예제·강 위 배 비유. depends_on ch00.5(RTT·물질미분·발산정리·Taylor, 첫 ①→① 연쇄). T8([THEORY-LEDGER](../THEORY-LEDGER.md))."
 verification_method: "hudspeth2005-wave-forces p.69·75-80·90-91·161(§3.1 CV 3종·§3.2 연속·§3.3 운동량·§3.3.1 관성력·§3.3.4-5 N-S/Euler·Whitham 보존원리) + holthuijsen2007 p.360-361(부록 E 일반 balance E.6·질량 E.7-8) + stewart-physical-ocean p.130(Reynolds 1883) — textbook/md 미러 ---PAGE-N--- 마커 실측 대조 (2026-07-14, Codex 게이트 재검증 포함)."

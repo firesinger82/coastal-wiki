@@ -6,6 +6,11 @@ depends_on:
   - textbook/notes/theory-ch04-navier-stokes.md
 canonical_source: self
 citation_status: verified
+claims_total: 20
+claims_attached: 15
+claims_dropped: 2
+claims_source_needed: 3
+claims_basis: legacy-ledger
 has_source_needed: true
 provenance: "교재 프로젝트 textbook-ai-data-full ch05(AI 합성 MDX, 무인용) 이식분 — 2026-07-14 원자 단언 분해·(source_id, page) 부착 + 같은 날 Codex 게이트(T12) MODIFY 반영. 주 출처 = **stewart-physical-ocean §8(Turbulence) + mechanics-of-sediment-transport(mixing length·Kolmogorov)**. Codex 게이트 정정(★마커·0건 오판): stewart 페이지 정정(난류/Re p.128→p.129·대양 10^11 p.128→p.130·상사 p.130-131·closure p.132+p.135)·mixing length = MST p.154 Prandtl 1925 확립(p.136 개괄 아님, Kármán similarity 별도)·Kolmogorov = MST p.151-152 원 위치(p.883 응용). ★'0건' 철회: TKE·LES/subgrid·k-ε 상수는 일반 교재 미확정이나 모델 매뉴얼·구현 증거 존재(ROMS TKE=½q²·EFDC Smagorinsky·stewart p.272·275 subgrid Mellor-Yamada·SWASH/CADMAS Cμ0.09) → 구현별은 models canonical·일반 이론은 ch05 source-needed. Kolmogorov -5/3 멱법칙·Boussinesq 1877 eddy 정확식·Clay Millennium = 코퍼스 미확인. depends_on ch04(N-S 평균, ch00.5는 특정 정의 미사용이라 의존 제거). T12([THEORY-LEDGER](../THEORY-LEDGER.md))."
 verification_method: "stewart-physical-ocean p.129-133·135-136·272·275(§8 난류·Re·Reynolds 분해 Eq.8.5·Reynolds 응력 Eq.8.13·eddy viscosity·closure·subgrid) + mechanics-of-sediment-transport p.151-152·154(Kolmogorov scale Eq.4.7·Prandtl 1925 mixing length) — textbook/md 미러 ---PAGE-N--- 마커 실측 대조 (2026-07-14, Codex 게이트 재검증 포함)."

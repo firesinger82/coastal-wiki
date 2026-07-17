@@ -7,6 +7,11 @@ depends_on:
   - textbook/notes/theory-ch00_5-math-tools.md
 canonical_source: self
 citation_status: verified
+claims_total: 25
+claims_attached: 22
+claims_dropped: 3
+claims_source_needed: 0
+claims_basis: legacy-ledger
 provenance: "교재 프로젝트 textbook-ai-data-full ch04(AI 합성 MDX, 무인용) 이식분 — 2026-07-14 원자 단언 분해·(source_id, page) 부착 + 같은 날 Codex 게이트(T11) MODIFY 반영. 주 출처 = **hudspeth2005-wave-forces §3.3.3-4·§3.6 + water-wave-mechanics(D&D) + stewart §8.3 + MST**. ★삭제 판정: Millennium/Clay N-S 문제 = stewart 오탐(기상학회 서지·점토광물) 삭제 적정. Codex 게이트 정정(★개념 동의어 grep도 놓침): second viscosity = Hudspeth p.86 실존('Stokes hypothesis 1845'·negative-definite 논쟁, Lamb1932·Schlichting1979 — 'bulk viscosity 0건' 오판)·Poiseuille = MST p.828 Eq.17.4 Q=πR⁴ΔP/(8μL)(포물선 아닌 Hagen-Poiseuille R⁴, 실존근거 놓침)·Re 임계 2300→**2000**(stewart p.130)·상사 3종 p.101→**p.102**·Strouhal b/(UT_s)·Froude Fr²·Re 단독 상사 과장 완화·RANS = stewart §8.3 Reynolds 응력 ρ⟨u'u'⟩ 앵커로 축소('RANS 필수·k-ε' 무앵커 제거)·변형률식 ch00.5 §6 canonical 링크 소비·λ=-2μ/3 등가환산 명시. depends_on ch03·ch00.5. T11([THEORY-LEDGER](../THEORY-LEDGER.md))."
 verification_method: "hudspeth2005-wave-forces p.82-83·86-90·102(§3.3.3 Newtonian·Stokes hypothesis·second viscosity·§3.3.4 N-S Eq.3.36·§3.6 상사·Table 3.2) + water-wave-mechanics(D&D) p.280(no-slip) + mechanics-of-sediment-transport p.828(Hagen-Poiseuille Eq.17.4) + stewart-physical-ocean p.130·132-133·136(Re≈2000·Reynolds 응력·eddy viscosity) — textbook/md 미러 ---PAGE-N--- 마커 실측 대조 (2026-07-14, Codex 게이트 재검증 포함)."
 note_author: "Claude Fable 5 (citation-grounded port)"

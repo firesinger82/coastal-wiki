@@ -8,6 +8,11 @@ depends_on:
   - textbook/notes/theory-ch03-euler.md
 canonical_source: self
 citation_status: verified
+claims_total: 18
+claims_attached: 13
+claims_dropped: 0
+claims_source_needed: 5
+claims_basis: legacy-ledger
 has_source_needed: true
 provenance: "교재 프로젝트 textbook-ai-data-full ch06(AI 합성 MDX, 무인용) 이식분 — 2026-07-14 원자 단언 분해·(source_id, page) 부착 + 같은 날 Codex 게이트(T13) MODIFY 반영. 주 출처 = **stewart-physical-ocean §8(Prandtl 경계층·law of the wall) + marine-sands-manual(bottom BL 로그 profile) + water-wave-mechanics(파 저면 경계층·wake) + hudspeth(박리/wake/vortex shedding)**. ★Codex 게이트 정정(심각): marine-sands 페이지 = grep 행번호를 페이지로 착각한 오류(κ '297'→**p.12**·bottom 로그 '2343'→**p.62**)·stewart Az·Eq.8.20·Charnock p.135→**p.134**·Prandtl p.133-134. ★★박리 '코퍼스 미확인' 오판 철회 — **Hudspeth p.620 §7.9 에 박리점·wake·vortex shedding 정식 실존**(velocity defect→separation points→wake)·D&D p.231 wake→drag·파 저면 경계층 δ≈1mm p.279. MST p.653-654 는 밀도류 계면(벽면 평판 아님)으로 축소. Blasius ODE·δ99·Cf·Falkner-Skan·T-S·천이 Re·역압력구배 정식만 source-needed 유지. ★연안 핵심=law of the wall(bottom BL). depends_on ch04·ch05·ch03(d'Alembert 핵심결과라 근거 승격). T13([THEORY-LEDGER](../THEORY-LEDGER.md))."
 verification_method: "stewart-physical-ocean p.133-134(§8 Prandtl 1904 경계층·flat plate·Kármán Az=κzu*·log profile Eq.8.20·Charnock z0) + marine-sands-manual p.12·62(von Kármán 0.40·bottom 로그 velocity profile SC Eq.22) + water-wave-mechanics p.231·279(wake→drag·파 저면 경계층 δ) + hudspeth2005-wave-forces p.620(§7.9 박리·wake·vortex shedding) — textbook/md 미러 ---PAGE-N--- 마커 실측 대조 (2026-07-14, Codex 게이트 재검증 포함)."

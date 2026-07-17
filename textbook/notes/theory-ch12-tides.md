@@ -6,6 +6,11 @@ depends_on:
   - textbook/notes/theory-ch08-linear-waves.md
 canonical_source: self
 citation_status: verified
+claims_total: 28
+claims_attached: 24
+claims_dropped: 4
+claims_source_needed: 0
+claims_basis: legacy-ledger
 provenance: "교재 프로젝트 textbook-ai-data-full ch12(AI 합성 MDX, 무인용) 이식분 — 2026-07-12 원자 단언 분해 후 textbook/md 대조 (source_id, page) 부착. ★원문 오류 정정 3건: 예측기 1862→1873 · Doodson 1924→1921/1922(출처 간 표기 불일치 명기, stewart p.318-319 본문 vs sea-level p.74 서지) · 조석가속도 1.1e-6 g→11.2×10⁻⁸ g 정정 복원(sea-level p.78-79; 게이트 ⓒ ③으로 초판 '삭제'를 번복). 미매칭 삭제 4건(역기압 1cm/hPa 수치·대조/소조 조차 수치·전지구 조석모델 상품명·해일 사례 목록). 장파 판정은 sea-level p.156 직접 보강(게이트 ⓒ ②). 한국 연안 특성·도구·모델 목록은 이론 아님 — concepts 탐색 위임. T2([THEORY-LEDGER](../THEORY-LEDGER.md)), 게이트 ⓒ MODIFY 반영 완료."
 verification_method: "sea-level(Pugh) p.16-18·69-79·98·109·112-113·124·155-156·166-167·179·197-198 + stewart-physical-ocean p.117·133·318-319·321·324 — textbook/md 미러 페이지 직접 대조 (2026-07-12, 게이트 ⓒ 재검증 포함)."
 note_author: "Claude Fable 5 (citation-grounded port)"

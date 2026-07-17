@@ -6,6 +6,11 @@ depends_on:
   - textbook/notes/theory-ch08-linear-waves.md
 canonical_source: self
 citation_status: verified
+claims_total: 30
+claims_attached: 26
+claims_dropped: 4
+claims_source_needed: 0
+claims_basis: legacy-ledger
 provenance: "교재 프로젝트 textbook-ai-data-full ch09(AI 합성 MDX, 무인용) 이식분 — 2026-07-12 원자 단언 분해·(source_id, page) 부착. ★원문 연도 오기 1건 정정(Hasselmann 4파 상호작용 1957→1962), 미매칭 삭제 4건(Beaufort별 경사 표·'19세기 Sverdrup-Munk-Bretschneider' 시대 오류·Jeffreys 1932 sheltering·Draupner 수치/freak 임계 2.2Hs). 게이트 ⓒ ④: Stokes 2차 수면형 앵커 p.302(속도·수송 문맥)→p.318-319(Eq. 11.29·11.32·11.33) 정밀화 + α 계수 정의 명시. T3([THEORY-LEDGER](../THEORY-LEDGER.md)), 게이트 ⓒ MODIFY 반영 완료."
 verification_method: "water-wave-mechanics(D&D) p.13·128-129·186·285·318-319·351 + holthuijsen2007 p.5·42·52·74·79·101·103·163·178·203·207·260 — textbook/md 미러 페이지 직접 대조 (2026-07-12, 게이트 ⓒ 재검증 포함)."
 note_author: "Claude Fable 5 (citation-grounded port)"

@@ -63,12 +63,21 @@ def check(data):
         if claimed != actual:
             fails.append(f"{m}: 대시보드 {claimed} vs 실측 {actual}")
         print(f"  [{mark}] {m}: 대시보드 {claimed} / 실측 SA {actual}")
+    # theory parity (R1 I-1e, Codex 20회차): THEORY-LEDGER 대시보드의 노트 링크 수 vs 실측
+    tl = open(os.path.join(ROOT, "textbook/THEORY-LEDGER.md"), encoding="utf-8").read()
+    dash = tl.split("## 게이트 기록")[0]
+    ledger_theory = len(set(re.findall(r"\]\((notes/theory-[^)]+\.md)\)", dash)))
+    actual_theory = data["_theory_notes"]
+    mark = "OK" if ledger_theory == actual_theory else "MISMATCH"
+    if ledger_theory != actual_theory:
+        fails.append(f"theory: THEORY-LEDGER 링크 {ledger_theory} vs 실측 {actual_theory}")
+    print(f"  [{mark}] theory: THEORY-LEDGER 대시보드 링크 {ledger_theory} / 실측 {actual_theory}")
     if fails:
         print(f"[count-notes] --check FAIL {len(fails)}건:")
         for f in fails:
             print(f"  ✗ {f}")
         return 1
-    print("[count-notes] --check OK: 대시보드 SA 카운트 전 모델 실측 일치.")
+    print("[count-notes] --check OK: 대시보드 SA + theory 카운트 전부 실측 일치.")
     return 0
 
 
