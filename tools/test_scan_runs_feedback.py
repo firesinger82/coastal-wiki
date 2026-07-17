@@ -108,6 +108,17 @@ def main():
         rc = srf.main(["--runs-root", str(Path(td) / "no-such-dir")])
         check("missing runs-root → exit 2", rc == 2, f"rc={rc}")
 
+        # ⑤ 콜론 뒤 주석 허용 (§2.2 예시 형식 — Phase L L4 정규식 수정 회귀)
+        with tempfile.TemporaryDirectory() as td2:
+            obs2 = Path(td2) / "observations" / "H1"
+            obs2.mkdir(parents=True)
+            (obs2 / "a.md").write_text(
+                "---\nmodel: x\nwiki_feedback:   # 선택 주석\n"
+                "  - id: H1-20260717-t-001\n    type: gap\n---\nbody\n",
+                encoding="utf-8")
+            ids2 = [i for i, _ in srf.observation_ids(Path(td2))]
+            check("trailing comment after key", ids2 == ["H1-20260717-t-001"], f"got {ids2}")
+
     print()
     if failures:
         print(f"FAIL: {len(failures)} case(s): {', '.join(failures)}")
@@ -118,3 +129,4 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+

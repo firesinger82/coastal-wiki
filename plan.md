@@ -1479,5 +1479,6 @@ LLM-Wiki 4계층(L1 검색·L2 graph·L3 MCP·**L4 유지보수 루프**) 중 L4
 
 ## 검증 이력
 
+- 2026-07-17 **Phase L 완료(로컬 writer 세션)**: L1 B1 scope v1.1+핸드오프 gate-failed / L2 템플릿 §2.2 전량 동기 / L3 coastal-runs 소유권 가드(host/admin, 회귀 4/4 PASS)+pull.rebase 교정+이 PC runs-admin / L4 배선(khoa_tide·SURGE .mcp.json+consumer-block v1)→**wiki_search 실호출 성공(첫 히트=당일 부착 Rouse 정확식 — 루프 end-to-end 실증)**·scanner 첫 실증(P0 F1-F3 이관→원장 3건 ack, ★scanner 정규식 버그 수정: 콜론 뒤 주석 §2.2 예시와 불일치 — 회귀 케이스 ⑤ 추가). Ultraplan 경유: 원격 branch 커밋 2건 patch(git am 55441e4·3880edd)로 수용.
 - 2026-07-17 Codex 21회차(B1 사후 게이트): **REJECT** — 상세 위 기록. 반영처 = coastal-runs B1 scope v1.1 + 핸드오프(Phase L L1).
 - 2026-07-17 Codex 22회차(연동 방법론): **MODIFY** — 상세 위 기록. 본 섹션 + RUNS-CHANNEL 개정 + Part 0 이 반영 결과. 원격 세션(branch+PR — 단일 writer 규칙 #5 준수: main 직접 push 금지, writer merge 후 pull) 구현: Part 0·§2.0·§2.2·§2.4·§3.3·scanner·원장 스캐폴드·회귀 2종.

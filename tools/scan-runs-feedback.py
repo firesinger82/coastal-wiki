@@ -22,7 +22,7 @@ LEDGER = WIKI / "_staging" / "runs-feedback" / "ledger.yml"
 
 FM = re.compile(r"^---\n(.*?)\n---\n", re.S)
 # wiki_feedback: 블록(다음 최상위 키 또는 frontmatter 끝까지) 안의 "- id: <값>"
-FEEDBACK_BLOCK = re.compile(r"^wiki_feedback:\n((?:[ \t]+\S.*\n?|[ \t]*\n)*)", re.M)
+FEEDBACK_BLOCK = re.compile(r"^wiki_feedback:[^\n]*\n((?:[ \t]+\S.*\n?|[ \t]*\n)*)", re.M)  # 콜론 뒤 주석 허용(§2.2 예시와 일치 — Phase L L4 버그 수정)
 ITEM_ID = re.compile(r"^[ \t]*-[ \t]+id:[ \t]*(\S+)", re.M)
 LEDGER_ID = re.compile(r"^[ \t]*-[ \t]+feedback_id:[ \t]*(\S+)", re.M)
 
