@@ -4,23 +4,46 @@
 # coastal-wiki 의 git hooks 를 설치. (재실행 안전)
 #
 # 사용:
-#   bash tools/install-hooks.sh
+#   bash tools/install-hooks.sh [--writer|--reader]
+#
+# 역할(R1 I-4, Codex 20회차): --reader 지정 시 이 클론의 커밋을 pre-commit 이 거부
+# (절대규칙 #5 단일 writer 의 '커밋·push 사고 2차 방어' — 미커밋 편집은 못 막음, 한계 명시).
+# 역할 파일 = `git rev-parse --git-path wiki-role` (worktree 호환). 미지정 = legacy
+# (역할 검사 skip, 경고 1줄 — 기존 clone 후방호환).
 #
 # 동작:
 #   - .git/hooks/pre-commit 을 작성/덮어쓰기.
 #   - 기존 pre-commit 중 우리 마커가 없는 것은 .bak 으로 백업.
+#   - post-merge/post-checkout/post-commit 재색인 훅 설치.
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 WIKI_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 HOOK="$WIKI_ROOT/.git/hooks/pre-commit"
-MARKER="# coastal-wiki:pre-commit:v6"
+MARKER="# coastal-wiki:pre-commit:v7"
 
-if [ ! -d "$WIKI_ROOT/.git" ]; then
+if [ ! -d "$WIKI_ROOT/.git" ] && [ ! -f "$WIKI_ROOT/.git" ]; then
     echo "ERROR: $WIKI_ROOT/.git 없음. git repo 루트에서 실행하세요."
     exit 1
 fi
+
+# ---------- 역할 지정 (R1 I-4) ----------
+ROLE_FILE="$(cd "$WIKI_ROOT" && git rev-parse --git-path wiki-role)"
+case "$WIKI_ROOT" in /*) : ;; esac
+case "$ROLE_FILE" in
+    /*) : ;;
+    *) ROLE_FILE="$WIKI_ROOT/$ROLE_FILE" ;;
+esac
+case "${1:-}" in
+    --writer) echo "writer" > "$ROLE_FILE"; echo "역할 기록: writer → $ROLE_FILE" ;;
+    --reader) echo "reader" > "$ROLE_FILE"; echo "역할 기록: reader → $ROLE_FILE (이 클론의 커밋은 pre-commit 이 거부)" ;;
+    "")
+        if [ ! -f "$ROLE_FILE" ]; then
+            echo "⚠ 역할 미지정(legacy 설치) — 커밋 역할 검사 없음. 리더 머신이면 'bash tools/install-hooks.sh --reader' 로 재실행하세요."
+        fi ;;
+    *) echo "ERROR: 알 수 없는 옵션 '$1' (--writer|--reader)"; exit 1 ;;
+esac
 
 if [ -f "$HOOK" ] && ! grep -q "coastal-wiki:pre-commit" "$HOOK" 2>/dev/null; then
     cp "$HOOK" "$HOOK.bak"
@@ -30,16 +53,31 @@ fi
 cat > "$HOOK" <<EOF
 #!/usr/bin/env bash
 $MARKER
-# 정책 출처: plan.md M10·D3·G8 + 2차 review F1·F3 (2026-05-23) + 정화 G8 (2026-06-18)
+# 정책 출처: plan.md M10·D3·G8 + 2차 review F1·F3 (2026-05-23) + 정화 G8 (2026-06-18) + R1 I-4 (2026-07-17)
 # 검사 순서:
+#   0) 역할 가드 (R1 I-4) — wiki-role == reader 면 커밋 거부 (절대규칙 #5 2차 방어)
 #   1) staged path guard (F3) — models/*/raw/{source_code,manuals}/ reject
 #   2) 대용량 staged blob 경고 (옵션 임계치 COASTAL_WIKI_MAX_BLOB_MB, 기본 50MB)
-#   3) tools/validate-all.sh --staged — 무결성 validator 4종 일괄 (research isolation ·
-#      canonical hygiene · link integrity · layer deps; 목록 SSOT = validate-all.sh, F-8)
+#   3) tools/validate-all.sh --staged — 무결성 validator 일괄 (목록 SSOT = validate-all.sh, F-8)
 set -euo pipefail
 
 WIKI_ROOT="\$(git rev-parse --show-toplevel)"
 cd "\$WIKI_ROOT"
+
+# ---------- 0) 역할 가드 (R1 I-4) ----------
+ROLE_FILE="\$(git rev-parse --git-path wiki-role)"
+if [ -f "\$ROLE_FILE" ] && [ "\$(cat "\$ROLE_FILE")" = "reader" ]; then
+    if [ "\${COASTAL_WIKI_ALLOW_READER_COMMIT:-0}" = "1" ]; then
+        echo "⚠⚠ [감사 흔적] reader 클론에서 커밋 강행 (COASTAL_WIKI_ALLOW_READER_COMMIT=1)" >&2
+        echo "⚠⚠ 단일 writer 규칙(절대규칙 #5) 예외 — 사유를 커밋 메시지에 남기세요." >&2
+    else
+        echo "pre-commit: 이 클론은 read-only 리더(wiki-role=reader) — 커밋 거부." >&2
+        echo "  → coastal-wiki 의 유일 writer 머신에서 커밋하거나, 이 변경을 폐기하세요:" >&2
+        echo "     git restore --staged . && git checkout -- ." >&2
+        echo "  → 정말 필요하면 COASTAL_WIKI_ALLOW_READER_COMMIT=1 (감사 흔적 출력됨)." >&2
+        exit 1
+    fi
+fi
 
 # ---------- 1) staged path guard (F3) ----------
 forbidden=\$(git diff --cached -z --name-only --diff-filter=ACMR \\
@@ -126,6 +164,8 @@ EOF
 install_reindex_hook "$WIKI_ROOT/.git/hooks/post-merge" ""
 # post-checkout: 브랜치 전환($3=1)일 때만 (파일 checkout 은 skip)
 install_reindex_hook "$WIKI_ROOT/.git/hooks/post-checkout" '[ "${3:-0}" = "1" ] || exit 0'
+# post-commit: writer 의 일반 커밋 후에도 인덱스 최신 유지 (R1, Codex 20회차 — stale 인덱스 방지)
+install_reindex_hook "$WIKI_ROOT/.git/hooks/post-commit" ""
 
 echo
 echo "테스트(working tree): bash tools/validate-research-isolation.sh"

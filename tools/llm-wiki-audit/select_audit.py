@@ -22,7 +22,7 @@ from pathlib import Path
 
 WIKI = Path(__file__).resolve().parents[2]
 LEDGER = WIKI / "_staging" / "audit" / "ledger.json"
-ROOTS = ("concepts", "models")
+ROOTS = ("concepts", "models", "textbook/notes")  # theory 노트 포함 (R1, Codex 20회차 — 단언 분류 의미검사는 L4 축, F-8 분리)
 DENY = {"raw", "_archive", "_staging", "research", "_template", ".git"}
 SCAFFOLD = re.compile(r"/(README|INDEX|manifest)\.md$")
 FM = re.compile(r"^---\n(.*?)\n---\n", re.S)
