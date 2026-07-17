@@ -9,13 +9,13 @@ depends_on:
 canonical_source: self
 citation_status: verified
 claims_total: 23
-claims_attached: 20
+claims_attached: 21
 claims_dropped: 2
-claims_source_needed: 1
+claims_source_needed: 0
 claims_basis: legacy-ledger
-has_source_needed: true
-provenance: "교재 프로젝트 textbook-ai-data-full ch03(AI 합성 MDX, 무인용) 이식분 — 2026-07-14 원자 단언 분해·(source_id, page) 부착. 주 출처 = **hudspeth2005-wave-forces §3.3(운동량·응력·대칭성·Euler) + water-wave-mechanics(D&D) §2(Bernoulli·Euler·d'Alembert)** — 본 노트가 **Cauchy 응력텐서·Euler·Bernoulli 의 canonical 소유자**(ch01 §4·ch02 의 Euler 언급은 선취 미리보기). ★삭제 전 전체 코퍼스 grep(T9 심화 교훈=정확 용어+개념 동의어): Torricelli = 0건 확정 삭제. Codex 게이트(T10) 정정: d'Alembert 앵커 'Eq.7.27'→'Eq.7.23·7.26 뒤 설명'·무점성 σ=-pI = Hudspeth p.91 Eq.3.38a 부착·4식→'속도(연속)·압력(운동량)' Hudspeth p.74 축소·★Prandtl 1904 경계층 = stewart p.134 실존 부착(연도 미지지 아님)·Cauchy traction 정확식 source-needed 토큰화. 미이식: 워크예제(호스·사이펀·Torricelli)·Bernoulli 효과 일상예. depends_on ch01(운동량 마스터·관성력)·ch02(연속 약분·비압축)·ch00.5(물질미분·발산·벡터항등식). T10([THEORY-LEDGER](../THEORY-LEDGER.md))."
-verification_method: "hudspeth2005-wave-forces p.74·78-80·84-86·90-92·532(§3.3 운동량·§3.3.2 표면응력·대칭성·§3.3.5 Euler·Bernoulli·PST·d'Alembert) + water-wave-mechanics(D&D) p.22·44·50-51·231(Euler 전기·Euler 벡터형·Bernoulli·d'Alembert) + stewart-physical-ocean p.134(Prandtl 1904 경계층) — textbook/md 미러 ---PAGE-N--- 마커 실측 대조 (2026-07-14, Codex 게이트 재검증 포함)."
+has_source_needed: false
+provenance: "교재 프로젝트 textbook-ai-data-full ch03(AI 합성 MDX, 무인용) 이식분 — 2026-07-14 원자 단언 분해·(source_id, page) 부착. 주 출처 = **hudspeth2005-wave-forces §3.3(운동량·응력·대칭성·Euler) + water-wave-mechanics(D&D) §2(Bernoulli·Euler·d'Alembert)** — 본 노트가 **Cauchy 응력텐서·Euler·Bernoulli 의 canonical 소유자**(ch01 §4·ch02 의 Euler 언급은 선취 미리보기). ★삭제 전 전체 코퍼스 grep(T9 심화 교훈=정확 용어+개념 동의어): Torricelli = 0건 확정 삭제. Codex 게이트(T10) 정정: d'Alembert 앵커 'Eq.7.27'→'Eq.7.23·7.26 뒤 설명'·무점성 σ=-pI = Hudspeth p.91 Eq.3.38a 부착·4식→'속도(연속)·압력(운동량)' Hudspeth p.74 축소·★Prandtl 1904 경계층 = stewart p.134 실존 부착(연도 미지지 아님)·Cauchy traction 정확식 source-needed 토큰화. 미이식: 워크예제(호스·사이펀·Torricelli)·Bernoulli 효과 일상예. depends_on ch01(운동량 마스터·관성력)·ch02(연속 약분·비압축)·ch00.5(물질미분·발산·벡터항등식). T10([THEORY-LEDGER](../THEORY-LEDGER.md)). ★R1 I-3 코퍼스 확장(2026-07-17): kundu-cohen-2008(4판, 사용자 제공) 등록으로 source-needed 소진 — 테트라헤드론 traction(p.61)·Cauchy 운동방정식(p.122 Eq.4.15) 부착 — sn 1 해소."
+verification_method: "hudspeth2005-wave-forces p.74·78-80·84-86·90-92·532(§3.3 운동량·§3.3.2 표면응력·대칭성·§3.3.5 Euler·Bernoulli·PST·d'Alembert) + water-wave-mechanics(D&D) p.22·44·50-51·231(Euler 전기·Euler 벡터형·Bernoulli·d'Alembert) + stewart-physical-ocean p.134(Prandtl 1904 경계층) — textbook/md 미러 ---PAGE-N--- 마커 실측 대조 (2026-07-14, Codex 게이트 재검증 포함). + kundu-cohen-2008 실측(2026-07-17): p.61·122 마커 실측."
 note_author: "Claude Fable 5 (citation-grounded port)"
 note_date: 2026-07-14
 related:
@@ -38,7 +38,7 @@ related:
 ## 2. Cauchy 응력텐서 — 정의와 대칭성
 
 - 표면응력 성분 $\sigma_{ij}$: **첫 첨자=면의 법선축, 둘째=응력 방향** — 미소 체적 면의 수직·접선 응력을 Taylor 급수로 표현 (hudspeth2005-wave-forces, p.84, §3.3.2, Fig. 3.7; Taylor 근거 [[theory-ch00_5-math-tools]] §2). 3면×3방향 = 9 성분.
-- **대칭성 $\sigma_{ij}=\sigma_{ji}$**: 미분 체적의 **각운동량 balance**(모멘트 합 = 각운동량, $\sum M_A=\rho\Delta V(\Delta R)^2\ddot\theta$)에서, 체적이 0으로 가면 대각 외 응력이 짝지어 상쇄되어야 함 → $\sigma_{zx}=\tau_{xz}$ 등 → **9 성분이 6 독립 성분으로 축약** (hudspeth2005-wave-forces, p.84-86, Eq. 3.26). ※Cauchy traction 벡터식 $t_i=\sigma_{ij}n_j$(임의 면 응력=법선에 텐서 곱)의 정확한 전사는 Hudspeth 명시 미확인 — 응력텐서 정의·대칭성만 이식. <!-- citation_status: source-needed -->
+- **대칭성 $\sigma_{ij}=\sigma_{ji}$**: 미분 체적의 **각운동량 balance**(모멘트 합 = 각운동량, $\sum M_A=\rho\Delta V(\Delta R)^2\ddot\theta$)에서, 체적이 0으로 가면 대각 외 응력이 짝지어 상쇄되어야 함 → $\sigma_{zx}=\tau_{xz}$ 등 → **9 성분이 6 독립 성분으로 축약** (hudspeth2005-wave-forces, p.84-86, Eq. 3.26). **임의 면의 응력은 응력텐서에서 결정**: 테트라헤드론 요소의 힘 balance 로 임의 방향 면의 응력이 $\tau_{ij}$(좌표 변환 Eq. 2.12)로 정해짐 (kundu-cohen-2008, p.61, §2.7; Sommerfeld 1964 참조 표기) — 이를 미소 요소에 적용한 **Cauchy 운동방정식** $\rho\,Du_i/Dt=\rho g_i+\partial\tau_{ij}/\partial x_j$ (p.122, Eq. 4.15; R1 코퍼스 확장으로 승격).
 
 ## 3. Cauchy 운동량 방정식 → 무점성 Euler
 

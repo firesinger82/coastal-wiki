@@ -8,13 +8,13 @@ depends_on:
 canonical_source: self
 citation_status: verified
 claims_total: 25
-claims_attached: 22
+claims_attached: 23
 claims_dropped: 2
-claims_source_needed: 1
+claims_source_needed: 0
 claims_basis: legacy-ledger
-has_source_needed: true
-provenance: "교재 프로젝트 textbook-ai-data-full ch02(AI 합성 MDX, 무인용) 이식분 — 2026-07-14 원자 단언 분해·(source_id, page) 부착 + 같은 날 Codex 게이트(T9) MODIFY 반영. 주 출처 = **water-wave-mechanics(D&D) §2.2 + hudspeth2005-wave-forces §3.2 + stewart-physical-ocean §7**. ★주 출처 정정: 원장 후보 hydraulics-and-hydrology 미러(801443089)는 실제로 **USACE LACPR Hydraulics & Hydrology Appendix**(surge/wave modeling·JPM-OS·levee)라 기초 유체역학 교재 아님. Codex 게이트 정정(★전 코퍼스 grep도 정확 용어만 검색해 개념표현 누락): 저마하 물리근거 = stewart p.125-126 Boussinesq 실존('0건' 오판)·1D 도관 = D&D p.158 Eq.5.34a 속도×단면적 연속조건 실존(복원)·Euler 역사 = D&D p.22 '1761 Principia motus fluidorum'+stewart p.125 압축성 연속식 귀속(원문 '1755' 오기→1761 정정)·약한 비압축 성층 = stewart p.126 Boussinesq 부착·압력 = Hudspeth p.74 범위(속도 질량식·압력 운동량/에너지식)로 축소, Lagrange승수/Poisson 은 ch04 이연(source-needed). 미이식: Mach 수치기준 0.3·venturi·Navier 1822·워크예제. depends_on ch01·ch00.5. T9([THEORY-LEDGER](../THEORY-LEDGER.md))."
-verification_method: "water-wave-mechanics(D&D) p.22·25-26·38-39·44·158(§2.2 연속·압축률·incompressible·§2.3.4 발산·Euler·Euler 전기·step 연속조건) + hudspeth2005-wave-forces p.74·77-78(§3.2 연속 3형태·PST 속도/압력) + stewart-physical-ocean p.125-126(§7 Euler 압축성 연속식·Boussinesq) — textbook/md 미러 ---PAGE-N--- 마커 실측 대조 (2026-07-14, Codex 게이트 재검증 포함)."
+has_source_needed: false
+provenance: "교재 프로젝트 textbook-ai-data-full ch02(AI 합성 MDX, 무인용) 이식분 — 2026-07-14 원자 단언 분해·(source_id, page) 부착 + 같은 날 Codex 게이트(T9) MODIFY 반영. 주 출처 = **water-wave-mechanics(D&D) §2.2 + hudspeth2005-wave-forces §3.2 + stewart-physical-ocean §7**. ★주 출처 정정: 원장 후보 hydraulics-and-hydrology 미러(801443089)는 실제로 **USACE LACPR Hydraulics & Hydrology Appendix**(surge/wave modeling·JPM-OS·levee)라 기초 유체역학 교재 아님. Codex 게이트 정정(★전 코퍼스 grep도 정확 용어만 검색해 개념표현 누락): 저마하 물리근거 = stewart p.125-126 Boussinesq 실존('0건' 오판)·1D 도관 = D&D p.158 Eq.5.34a 속도×단면적 연속조건 실존(복원)·Euler 역사 = D&D p.22 '1761 Principia motus fluidorum'+stewart p.125 압축성 연속식 귀속(원문 '1755' 오기→1761 정정)·약한 비압축 성층 = stewart p.126 Boussinesq 부착·압력 = Hudspeth p.74 범위(속도 질량식·압력 운동량/에너지식)로 축소, Lagrange승수/Poisson 은 ch04 이연(source-needed). 미이식: Mach 수치기준 0.3·venturi·Navier 1822·워크예제. depends_on ch01·ch00.5. T9([THEORY-LEDGER](../THEORY-LEDGER.md)). ★R1 I-3 코퍼스 확장(2026-07-17): kundu-cohen-2008(4판, 사용자 제공) 등록으로 source-needed 소진 — 압력 Poisson 방정식(p.459) 부착 — sn 1 해소(Lagrange 승수 표현만 미이식 유지)."
+verification_method: "water-wave-mechanics(D&D) p.22·25-26·38-39·44·158(§2.2 연속·압축률·incompressible·§2.3.4 발산·Euler·Euler 전기·step 연속조건) + hudspeth2005-wave-forces p.74·77-78(§3.2 연속 3형태·PST 속도/압력) + stewart-physical-ocean p.125-126(§7 Euler 압축성 연속식·Boussinesq) — textbook/md 미러 ---PAGE-N--- 마커 실측 대조 (2026-07-14, Codex 게이트 재검증 포함). + kundu-cohen-2008 실측(2026-07-17): p.459 마커 실측."
 note_author: "Claude Fable 5 (citation-grounded port)"
 note_date: 2026-07-14
 related:
@@ -52,7 +52,7 @@ related:
 ## 4. 응용 — 비회전·압력의 역할
 
 - **무점성+비압축 → Euler**: inviscid·incompressible 유체는 수직응력(압력)만 작용, 전단응력 0 이라 유체 입자에 회전을 줄 응력이 없음 → 비회전 입자는 비회전 유지(초기 와도는 보존) (water-wave-mechanics, p.44, §2.3 Euler 벡터형). 선형파 이론의 퍼텐셜 유동 전제 → [[theory-ch08-linear-waves]].
-- **압력의 역할**: 비압축 유체의 근본 문제는 **속도(벡터)·압력(스칼라) 두 미지장**을 구하는 것으로 환원 — 표준 풀이는 **속도를 연속(질량)식에서, 압력을 운동량(또는 에너지) 원리에서** 구함 (hudspeth2005-wave-forces, p.74). 비회전 이상유체에서는 단일 속도 퍼텐셜 $\phi$ 로 더 축약 (p.74) → [[theory-ch08-linear-waves]]. ※압력을 $\nabla\cdot\mathbf{u}=0$ 제약의 Lagrange 승수로 보는 해석·Poisson 방정식 $\nabla^2 p=\ldots$ 전개는 코퍼스 직접 지지 없음 — ch04 N-S 로 이연. <!-- citation_status: source-needed -->
+- **압력의 역할**: 비압축 유체의 근본 문제는 **속도(벡터)·압력(스칼라) 두 미지장**을 구하는 것으로 환원 — 표준 풀이는 **속도를 연속(질량)식에서, 압력을 운동량(또는 에너지) 원리에서** 구함 (hudspeth2005-wave-forces, p.74). 비회전 이상유체에서는 단일 속도 퍼텐셜 $\phi$ 로 더 축약 (p.74) → [[theory-ch08-linear-waves]]. 비압축 극한의 압력은 수치해법에서 흔히 **Poisson 방정식으로 풀어 얻음**(연속 제약을 만족시키는 압력 결정 — 다수 기법에서 가장 비싼 단계) (kundu-cohen-2008, p.459, §11 CFD — R1 코퍼스 확장으로 승격). ※'Lagrange 승수' 해석 표현 자체는 여전히 코퍼스 미확인 — 미이식.
 
 ## 5. 연결
 

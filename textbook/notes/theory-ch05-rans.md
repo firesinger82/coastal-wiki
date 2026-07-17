@@ -7,13 +7,13 @@ depends_on:
 canonical_source: self
 citation_status: verified
 claims_total: 20
-claims_attached: 15
+claims_attached: 17
 claims_dropped: 2
-claims_source_needed: 3
+claims_source_needed: 1
 claims_basis: legacy-ledger
 has_source_needed: true
-provenance: "교재 프로젝트 textbook-ai-data-full ch05(AI 합성 MDX, 무인용) 이식분 — 2026-07-14 원자 단언 분해·(source_id, page) 부착 + 같은 날 Codex 게이트(T12) MODIFY 반영. 주 출처 = **stewart-physical-ocean §8(Turbulence) + mechanics-of-sediment-transport(mixing length·Kolmogorov)**. Codex 게이트 정정(★마커·0건 오판): stewart 페이지 정정(난류/Re p.128→p.129·대양 10^11 p.128→p.130·상사 p.130-131·closure p.132+p.135)·mixing length = MST p.154 Prandtl 1925 확립(p.136 개괄 아님, Kármán similarity 별도)·Kolmogorov = MST p.151-152 원 위치(p.883 응용). ★'0건' 철회: TKE·LES/subgrid·k-ε 상수는 일반 교재 미확정이나 모델 매뉴얼·구현 증거 존재(ROMS TKE=½q²·EFDC Smagorinsky·stewart p.272·275 subgrid Mellor-Yamada·SWASH/CADMAS Cμ0.09) → 구현별은 models canonical·일반 이론은 ch05 source-needed. Kolmogorov -5/3 멱법칙·Boussinesq 1877 eddy 정확식·Clay Millennium = 코퍼스 미확인. depends_on ch04(N-S 평균, ch00.5는 특정 정의 미사용이라 의존 제거). T12([THEORY-LEDGER](../THEORY-LEDGER.md))."
-verification_method: "stewart-physical-ocean p.129-133·135-136·272·275(§8 난류·Re·Reynolds 분해 Eq.8.5·Reynolds 응력 Eq.8.13·eddy viscosity·closure·subgrid) + mechanics-of-sediment-transport p.151-152·154(Kolmogorov scale Eq.4.7·Prandtl 1925 mixing length) — textbook/md 미러 ---PAGE-N--- 마커 실측 대조 (2026-07-14, Codex 게이트 재검증 포함)."
+provenance: "교재 프로젝트 textbook-ai-data-full ch05(AI 합성 MDX, 무인용) 이식분 — 2026-07-14 원자 단언 분해·(source_id, page) 부착 + 같은 날 Codex 게이트(T12) MODIFY 반영. 주 출처 = **stewart-physical-ocean §8(Turbulence) + mechanics-of-sediment-transport(mixing length·Kolmogorov)**. Codex 게이트 정정(★마커·0건 오판): stewart 페이지 정정(난류/Re p.128→p.129·대양 10^11 p.128→p.130·상사 p.130-131·closure p.132+p.135)·mixing length = MST p.154 Prandtl 1925 확립(p.136 개괄 아님, Kármán similarity 별도)·Kolmogorov = MST p.151-152 원 위치(p.883 응용). ★'0건' 철회: TKE·LES/subgrid·k-ε 상수는 일반 교재 미확정이나 모델 매뉴얼·구현 증거 존재(ROMS TKE=½q²·EFDC Smagorinsky·stewart p.272·275 subgrid Mellor-Yamada·SWASH/CADMAS Cμ0.09) → 구현별은 models canonical·일반 이론은 ch05 source-needed. Kolmogorov -5/3 멱법칙·Boussinesq 1877 eddy 정확식·Clay Millennium = 코퍼스 미확인. depends_on ch04(N-S 평균, ch00.5는 특정 정의 미사용이라 의존 제거). T12([THEORY-LEDGER](../THEORY-LEDGER.md)). ★R1 I-3 코퍼스 확장(2026-07-17): kundu-cohen-2008(4판, 사용자 제공) 등록으로 source-needed 소진 — Boussinesq eddy viscosity 정식(p.610-611 Eq.13.63)·TKE budget(p.584-588)·Kolmogorov -5/3(p.593) 부착 — sn 3→1(잔여 = k-ε 일반 정식, Kundu 4판에도 부재)."
+verification_method: "stewart-physical-ocean p.129-133·135-136·272·275(§8 난류·Re·Reynolds 분해 Eq.8.5·Reynolds 응력 Eq.8.13·eddy viscosity·closure·subgrid) + mechanics-of-sediment-transport p.151-152·154(Kolmogorov scale Eq.4.7·Prandtl 1925 mixing length) — textbook/md 미러 ---PAGE-N--- 마커 실측 대조 (2026-07-14, Codex 게이트 재검증 포함). + kundu-cohen-2008 실측(2026-07-17): p.584-593·610-611 마커 실측."
 note_author: "Claude Fable 5 (citation-grounded port)"
 note_date: 2026-07-14
 related:
@@ -47,13 +47,13 @@ related:
 ## 4. Eddy viscosity와 mixing length
 
 - **Eddy viscosity 가설**: Reynolds 응력을 평균 속도 구배에 비례로 모델 — $-\rho\langle u'w'\rangle=T_{xz}=\rho A_z\dfrac{\partial U}{\partial z}$, $A_z$ 가 분자 점성 $\nu$ 를 대체하는 **eddy viscosity(eddy diffusivity)** (stewart-physical-ocean, p.133, Eq. 8.13). 분자 점성보다 훨씬 큼.
-- **한계**: $A_z$ 는 **이론으로 얻을 수 없고 데이터로 산정** — 대부분 해양 유동에서 정확히 구하기 어려움 (stewart-physical-ocean, p.136). ※Boussinesq(1877) eddy 가설의 역사 귀속·트레이스 보정 정확식은 코퍼스 미확인 — 미이식(정식은 아래 §5 source-needed). <!-- citation_status: source-needed -->
+- **한계**: $A_z$ 는 **이론으로 얻을 수 없고 데이터로 산정** — 대부분 해양 유동에서 정확히 구하기 어려움 (stewart-physical-ocean, p.136). **Boussinesq 의 eddy viscosity 제안**: 분자 점성 유추로 난류 응력을 $-\overline{u'v'}=\nu_e\,dU/dy$ 로 표현($\nu_e$ = eddy viscosity — 유체 성질이 아닌 유동 성질) (kundu-cohen-2008, p.610-611, Eq. 13.61-13.63 — R1 코퍼스 확장으로 승격; '1877' 연도 귀속·트레이스 보정 정확식은 여전히 미확인 — 미이식).
 - **Mixing length 모델**: **Prandtl 이 1925 에 확립** — 기체 분자운동에 유추해 유체 요소(eddy)의 평균자유행로에 해당하는 **혼합길이(mixing length) $l$** 로 난류 혼합을 기술 (mechanics-of-sediment-transport, p.154; Kármán 은 이후 similarity hypothesis 로 보강). 상세 정식은 표사 이송 [[theory-ch13-sediment-transport]] 문맥 및 `models/` 축.
 
 ## 5. 난류 모델·에너지 캐스케이드
 
-- **난류 모델(k-ε 등)의 구현별 정식·상수는 모델 축, 일반 이론은 보류**: eddy viscosity 를 난류 운동에너지·소산률의 추가 PDE 로 결정하는 k-ε·k-ω·GLS 의 **구현별 정식·상수**(예 $C_\mu=0.09$·Launder-Spalding k-ε)는 `models/`(EFDC·ROMS·SWASH·CADMAS source-analysis)가 canonical — 복제 금지. **일반 이론**(TKE $k=\tfrac12\langle u_i'u_i'\rangle$·Boussinesq eddy 가설·k-ε 두 방정식의 의미)은 textbook 코퍼스 일반 출처 미확정이라 ch05 보류(모델 매뉴얼 증거는 존재: ROMS TKE=$\tfrac12q^2$·EFDC Smagorinsky subgrid closure·stewart p.272·275 subgrid eddy viscosity·Mellor-Yamada). <!-- citation_status: source-needed -->
-- **Kolmogorov 캐스케이드**: 중간 크기 와류가 최대 운동에너지("energy-containing")를 갖고, 작아질수록 점성 소산 증가, **가장 작은 와류 $l_k$**(eddy Reynolds 수 ~1)에서 점성·관성 균형 — Kolmogorov 가 차원해석으로 $l_k$·변동속도를 소산률 $\varepsilon$·동점성 $\nu$ 로 정의 (mechanics-of-sediment-transport, p.151-152, §4, Eq. 4.7; p.883 은 고분자 drag reduction 응용 재인용). ※Kolmogorov -5/3 관성영역 멱법칙 $E(k)=C_K\varepsilon^{2/3}k^{-5/3}$ 는 코퍼스 미확인 — 미이식(스펙트럼 계보는 [[theory-ch09-nonlinear-spectra]] 파랑 축과 별개). <!-- citation_status: source-needed -->
+- **난류 모델(k-ε 등)의 구현별 정식·상수는 모델 축, 일반 이론은 보류**: eddy viscosity 를 난류 운동에너지·소산률의 추가 PDE 로 결정하는 k-ε·k-ω·GLS 의 **구현별 정식·상수**(예 $C_\mu=0.09$·Launder-Spalding k-ε)는 `models/`(EFDC·ROMS·SWASH·CADMAS source-analysis)가 canonical — 복제 금지. **일반 이론 중 TKE·Boussinesq 가설은 R1 코퍼스 확장으로 승격**: 평균류·난류 운동에너지 budget(생산 $-\overline{u_iu_j}\,\partial U_i/\partial x_j$ 이 평균류→난류 에너지 전달) (kundu-cohen-2008, p.584-588, §13.6-7)·eddy viscosity 정식 위 §4. **k-ε 두 방정식 모델의 일반 정식**은 Kundu 4판에도 부재 — 여전히 미확정(모델 매뉴얼 증거: ROMS TKE=$\tfrac12q^2$·EFDC Smagorinsky·stewart p.272·275·Mellor-Yamada). <!-- citation_status: source-needed -->
+- **Kolmogorov 캐스케이드**: 중간 크기 와류가 최대 운동에너지("energy-containing")를 갖고, 작아질수록 점성 소산 증가, **가장 작은 와류 $l_k$**(eddy Reynolds 수 ~1)에서 점성·관성 균형 — Kolmogorov 가 차원해석으로 $l_k$·변동속도를 소산률 $\varepsilon$·동점성 $\nu$ 로 정의 (mechanics-of-sediment-transport, p.151-152, §4, Eq. 4.7; p.883 은 고분자 drag reduction 응용 재인용). **Kolmogorov -5/3 법칙**: 관성아영역(inertial subrange)에서 스펙트럼이 $\nu$ 와 무관 — 차원논증으로 $S=A\varepsilon^{2/3}K^{-5/3}$ ($l^{-1}\ll K\ll\eta^{-1}$) (kundu-cohen-2008, p.593, §13 Kolmogorov 스펙트럼 법칙 — R1 코퍼스 확장으로 승격; 스펙트럼 계보는 [[theory-ch09-nonlinear-spectra]] 파랑 축과 별개).
 
 ## 6. 연결
 
