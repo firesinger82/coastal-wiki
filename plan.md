@@ -1439,4 +1439,5 @@ LLM-Wiki 4계층(L1 검색·L2 graph·L3 MCP·**L4 유지보수 루프**) 중 L4
 
 ## 검증 이력
 
+- 2026-07-17 **R1 구현 완료** — 커밋: d7dec8b(계획 개정+라벨 정직화) · e240b7e(I-1: 집계 5필드 백필 16노트+claim manifest ch11/ch15+validate-claims lint+테스트 8건+count-notes theory parity — ★lint 첫 실행이 자기 파서 결함 즉시 적발·manifest 재산정 ch11 47/37·ch15 45/26) · cd5d8ca(I-4 reader commit guard 실측 PASS+post-commit 재색인+L4 스코프 textbook/notes) · 5a87a29(I-2 페이지 수선 2건+REPAIRS.yml). 잔여: I-3(Kundu PDF 대기)·R1-VR(van-rijn 전권 재추출)·I-6 본체·I-7 본체. ※같은 날 원 PDF 확보(E:\textbook 19권)로 5π/16(caf37a2)·S_bfr(5864735) 선행 해소.
 - 2026-07-17 Codex adversarial review 20회차(resume): **전 항목 MODIFY** — I-1 '산술 lint=근본 해법' 반박(매핑 부재가 원인 → compact claim manifest 추가·frontmatter 우선 규칙 폐기·모집단 정의 고정·validate-all .sh 디스패처 호환·count-notes theory parity·F-5 정직 기술) / I-2 extracts/ 방식 REJECT 급 결함 적발(FTS 중복 색인·G8c 위반) → 제자리 수선+sidecar 로 교체, van-rijn 분리 / I-3 Kundu 1990 서지 정밀화·claim 별 승격 / I-4 '단일 writer 가드' 과대 명칭 격하(미커밋 편집은 못 막음)·fail-open 제거·worktree 호환 / I-5 오진 판정(기구현 확인, 실측 471/122/363) / I-6 라벨 정직화 승격 / 신규 2건 적발: **L4 스코프에 textbook/notes 누락·FTS post-commit 재색인 부재**. 본 개정판이 반영 결과. 구현 커밋은 아래 기록.
