@@ -1433,7 +1433,7 @@ LLM-Wiki 4계층(L1 검색·L2 graph·L3 MCP·**L4 유지보수 루프**) 중 L4
 ## backlog (이번 라운드 비대상)
 
 - **I-5 폐기·재정의**: 'L4 재순환 정책 미정의'는 오진 — select_audit 이 이미 변경분(blob) 우선 + 최고령 회전을 구현(실측 대상 471·ledger 122·changed 363). 필요 시 'N=8/일·최대 재감사 간격 SLO' 재조정 항목으로만 유지.
-- **I-6 본체**: SWAN·SWASH 문서 축 심층 재검토(보존성·mimetic 등) — 별도 콘텐츠 세션.
+- ~~**I-6 본체**~~ **✅완료(2026-07-17)**: 문서축 종결 기준 명문화(AUDIT-LEDGER — (a)포섭/(b)코드 대체 명시/(c)비코어 disclosed + 제약 3) → SWASH swashtech Ch2/5 deep note 신설(Hamiltonian·mimetic·보존 증명 — '비코어' 판정 철회, Codex 지적 수용) + SWAN swanmain 후반 4서브루틴 C 재분류·source-map 신설(함정 9건 적발: 경계 무음 동결·RESPEC IERR 미설정 등)·foundation frontmatter 자기모순 정정 → **양 모델 코드+문서축 종결**.
 - **I-7 본체**: 구세대 노트 페이지 표기 전수 통일 — 비용 과대, `page_offset_applied` 인벤토리 + 발견 시 개별 명기(기준 정의는 I-2 에서 확정).
 - **R1-VR**: van-rijn 전권 재추출 배치(원 PDF 보유 확정) — 품질 시험 후 판정.
 

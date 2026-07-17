@@ -3,7 +3,7 @@ title: "swan foundation"
 topic: general
 canonical_source: self
 citation_status: verified
-verification_method: "SWAN source code 직접 분석 (models/SWAN/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/swan-foundation.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
+verification_method: "★정정(2026-07-17, I-6 재검토 — Codex ② 5회차 지적 반영): 본 노트의 근거는 **매뉴얼·문서 코퍼스**(공식 PDF 4종 swanuse/swantech/swanimp/swanpgr + sourceforge HTML ~902 chunks)이며 **소스코드 직접 인용 아님**(본문 Source basis 자기서술과 일치; 구 frontmatter 의 '소스코드 직접 분석·file:line 명시' 는 오기). 따라서 이 노트는 **source-coverage 증거로 사용 불가** — 서브루틴 커버리지 근거는 개별 source-analysis 노트(file:line 인용 보유)만 유효. 원본 = modeling-wiki 4-5월 작성분 마이그레이션(2026-05-23)."
 note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
 note_date: 2026-04~05 (original) / 2026-05-23 (promote)
 verification_by: "사용자 + codex source-code analysis"
@@ -23,6 +23,8 @@ A foundation reference for SWAN (Simulating WAves Nearshore) covering:
 - key **numerical scheme** choices (BSBT/SORDUP/SecondOrder/Lock-up).
 
 This note treats SWAN's content end-to-end so subsequent notes can dive into specific subsystems (wind input, breaking, nesting, output) without re-establishing context.
+
+> ⚠ **역할 한정(2026-07-17)**: 문서 기반 개관 노트 — 소스코드 커버리지의 근거로 인용하지 말 것(커버리지는 file:line 보유 개별 노트가 유일 근거). swanmain 실질 로직의 source-map 은 [[swan-main-boundary-init-sourcemap]] 참조.
 
 ## Source basis
 
