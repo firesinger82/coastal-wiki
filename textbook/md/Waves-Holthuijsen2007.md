@@ -10625,51 +10625,48 @@ For the WAM Cycle III formulations in SWAN, n = 0 and, for the WAM Cycle IV form
 
 
 ---PAGE-313---
+<!-- page repaired 2026-07-17 from original PDF (see textbook/md/REPAIRS.yml) -->
 
-
+9.3 Action balance 295
 
 cut-off that was used for the spectra (Young and Banner, 1992; Banner and Young,
+1994) and, since this cut-off is different in SWAN from that in WAM (see Section
+9.5.1), differences in the overall wave growth rates between the WAM and SWAN
+models are to be expected.
 
-- 1994) and, since this cut-off is different in SWAN from that in WAM (see Section 9.5.1), differences in the overall wave growth rates between the WAM and SWAN models are to be expected.
+Bottom friction
 
+Bottom friction is the dominant bottom dissipation mechanism for continental shelf
+seas with sandy bottoms and the corresponding source term may generally be
+represented (see Section 8.4.5) as
 
-Bottom friction Bottom friction is the dominant bottom dissipation mechanism for continental shelf seas with sandy bottoms and the corresponding source term may generally be represented (see Section 8.4.5) as
+S_bfr(sigma, theta) = - (C_bfr / g) [ sigma / sinh(kd) ]^2 E(sigma, theta) u_rms,bottom        (9.3.29)
 
-Cbfr g
+in which C_bfr is a bottom-friction coefficient and u_rms,bottom is the root-mean-square
+orbital bottom velocity. Considering the large variations in bottom conditions in
+coastal areas (bottom material, bottom roughness length, ripple height, etc.), there
+is no field data evidence indicating that one should give preference to a particular
+model with which to estimate C_bfr (see Luo and Monbaliu, 1994). Movable-
+bed effects are ignored in SWAN and three bottom-friction models have been
+implemented: the drag-law model of Collins (1972), the eddy-viscosity model of
+Madsen et al. (1988) and the empirical JONSWAP model of Hasselmann et al.
+(1973).
 
-Sbfr(σ,θ) = −
+The JONSWAP model is simply C_bfr = C_JONSWAP = 0.038/u_rms,bottom for swell
+conditions (Hasselmann et al., 1973) and C_bfr = C_JONSWAP = 0.067/u_rms,bottom for
+wind-sea conditions (Bouws and Komen, 1983). The coefficient in the drag model
+of Collins (1972) is C_bfr = C_Collins = 0.015. The model of Madsen et al. (1988)
+gives
 
-σ sinh(kd)
+C_bfr = C_Madsen = f_w / sqrt(2)        (9.3.30)
 
-2
+where f_w is a non-dimensional friction factor estimated with the formulation of
+Jonsson (1966, 1980; cf. Madsen et al., 1988):
 
-###### E(σ,θ)urms,bottom (9.3.29)
+f_w = 0.30        for a_b/k_N < 1.57   (hydraulic rough bottom)        (9.3.31)
 
-in which Cbfr is a bottom-friction coefﬁcient and urms,bottom is the root-mean-square orbital bottom velocity. Considering the large variations in bottom conditions in coastal areas (bottom material, bottom roughness length, ripple height, etc.), there is no ﬁeld data evidence indicating that one should give preference to a particular model with which to estimate Cbfr (see Luo and Monbaliu, 1994). Movablebed effects are ignored in SWAN and three bottom-friction models have been implemented: the drag-law model of Collins (1972), the eddy-viscosity model of Madsen et al. (1988) and the empirical JONSWAP model of Hasselmann et al. (1973).
-
-The JONSWAP model is simply Cbfr = CJONSWAP = 0.038/urms,bottom for swell conditions (Hasselmann et al., 1973) and Cbfr = CJONSWAP = 0.067/urms,bottom for wind-sea conditions (Bouws and Komen, 1983). The coefﬁcient in the drag model of Collins (1972) is Cbfr = CCollins = 0.015. The model of Madsen et al. (1988) gives
-
-fw √2
-
-Cbfr = CMadsen =
-
-(9.3.30)
-
-where fw is a non-dimensional friction factor estimated with the formulation of Jonsson (1966, 1980; cf. Madsen et al., 1988):
-
-###### fw = 0.30 for ab/kN < 1.57
-
-(hydraulic rough bottom) (9.3.31) 1
-
-1 4√ fw = m f + log10
-
-ab kN
-
-4√ fw + log10
-
-for ab/kN ≥ 1.57 (hydraulic smooth bottom) (9.3.32)
-
-
+1/(4 sqrt(f_w)) + log10( 1/(4 sqrt(f_w)) ) = m_f + log10( a_b / k_N )
+        for a_b/k_N >= 1.57   (hydraulic smooth bottom)        (9.3.32)
 
 ---PAGE-314---
 

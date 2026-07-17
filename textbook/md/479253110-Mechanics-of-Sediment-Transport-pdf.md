@@ -36804,51 +36804,43 @@ Fig. 16.22 Definition sketch for a longshore current (after Putnam, J.A.; W.H. M
 
 
 ---PAGE-765---
+<!-- page repaired 2026-07-17 from original PDF (see textbook/md/REPAIRS.yml) -->
 
+in which c_f is the resistance coefficient, l is the distance between the point of
+breaking and the shore and the slope J = h/l, with h being the depth at the breakers
+(Fig. 16.22). Equating the two forces gives
 
-
-in which c1 is the resistance coefficient, I is the distance between the point of breaking and the shore and the slope J = hi/, with h being the depth at the breakers (Fig. 16.22). Equating the two forces gives
-
-- (16.27)
-- (16.28)
-- (16.29)
-
-
-Downloadedfromascelibrary.orgbyNewYorkUniversityon05/25/15.CopyrightASCE.Forpersonaluseonly;allrightsreserved.
+U_l = (m/2) [ sqrt( 1 + 4 C_b sin(alpha_b) / m ) - 1 ]        (16.27)
 
 in which
 
-Ifthe breaking wave is analysed as a solitary wave, then
+m = J A cos(alpha_b) / (c_f h T)        (16.28)
 
-Ch= ~g(h+Hh) h =1.28Hh
+If the breaking wave is analysed as a solitary wave, then
+
+C_b = sqrt( g (h + H_b) )
+h = 1.28 H_b
+A = 4 h^2 sqrt( H_b / (3 h) )
 
 Introducing these quantities into Eq. (16.28), one obtains
 
-From Eqs. (16.27) and (16.28) one finds that the velocity of the longshore current is related to the wave height at the point of breakers, ·the wave period, the angle between the breaking line and shoreline, and the slope and roughness of the bottom. Both field observations and laboratory experiments confirmed the validity of Eq. (16.27).
+m = 2.61 J H_b cos(alpha_b) / (c_f T)        (16.29)
 
-Longuet-Higgins also derived an expression for the velocity of the longshore current using the momentum approach and obtained the expression P3l:
+From Eqs. (16.27) and (16.28) one finds that the velocity of the longshore
+current is related to the wave height at the point of breakers, the wave period, the
+angle between the breaking line and shoreline, and the slope and roughness of the
+bottom. Both field observations and laboratory experiments confirmed the validity of
+Eq. (16.27).
 
-J .
+Longuet-Higgins also derived an expression for the velocity of the longshore
+current using the momentum approach and obtained the expression [33]:
 
-###### U - 57'
+U_l = (5 pi / 8) (J / c_f) u_m sin(alpha_b)        (16.30)
 
-(16.30)
-
-sinah
-
--u
-
-1- 8
-
-111
-
-Cf
-
-in which um is the maximum horizontal velocity due to mass transport in the breaking zone. Ofthe two, Eq. (16.30) is the more widely used.
+in which u_m is the maximum horizontal velocity due to mass transport in the
+breaking zone. Of the two, Eq. (16.30) is the more widely used.
 
 744
-
-
 
 ---PAGE-766---
 
