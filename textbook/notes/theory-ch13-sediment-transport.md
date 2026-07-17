@@ -6,12 +6,12 @@ depends_on: []
 canonical_source: self
 citation_status: verified
 claims_total: 35
-claims_attached: 32
-claims_dropped: 3
+claims_attached: 33
+claims_dropped: 2
 claims_source_needed: 0
 claims_basis: legacy-ledger
-provenance: "교재 프로젝트 textbook-ai-data-full ch13(AI 합성 MDX, 무인용) 이식분 — 2026-07-13 원자 단언 분해·(source_id, page) 부착, 2026-07-14 게이트 ⓒ 2차(Codex 8회차) MODIFY 반영. ★원문 연도 미지지 2건 미이식(Krone '1962'·Partheniades '1965' — 코퍼스 실측은 Ariathurai & Krone 1976·Partheniades 무연도 서술). 게이트 ⓒ 2차 정정: 기준높이 z_a=2d50 = marine-sands p.149(Zyserman-Fredsøe) 실존 — 삭제 오판 복원 / Van Rijn 0.053·2.1 = efdc-sed-trans p.58 Eq.6.18 판독 — '검증 불가' 과장 정정(완전식은 미전사) / Rouse profile 식(Eq.106-107)·Rouse 수 정확식(Eq.105 분수 문자) 미러 소실로 전사 제거(정성+변수 나열만; ⓒ 2차 확인 라운드 반영). fluid mud = WWM p.289 용어·이론 실존하나 원 이식 단언(층 형성 조건) claim-level 미지지 — 미이식. 미매칭 삭제 2건(Rouse 모드 구분표 2.5/0.8·boulder/cobble/pebble 상세 경계). 워크 예제·한국 연안 수치·계절 profile(ch14 주제)·EFDC 모듈 상세는 미이식 — concepts/models 탐색 위임. ※van-rijn-1993 미러 = OCR 실패 껍데기(690p 전부 빈 텍스트) 판정 — 주 출처에서 제외. T5([THEORY-LEDGER](../THEORY-LEDGER.md))."
-verification_method: "marine-sands-manual(Soulsby) p.8·11-12·24·33·48·51·62·74·109-110·114·120·138-141·145-149·162·164-165·168·198-199 + mechanics-of-sediment-transport p.216·229-230·367-368·370·376(서지 p.423)·TOC p.15 + efdc-sed-trans-2003 p.38-42·58·66 — textbook/md 미러 페이지 직접 대조 (2026-07-13, 게이트 ⓒ 2차 재검증 2026-07-14)."
+provenance: "교재 프로젝트 textbook-ai-data-full ch13(AI 합성 MDX, 무인용) 이식분 — 2026-07-13 원자 단언 분해·(source_id, page) 부착, 2026-07-14 게이트 ⓒ 2차(Codex 8회차) MODIFY 반영. ★원문 연도 미지지 2건 미이식(Krone '1962'·Partheniades '1965' — 코퍼스 실측은 Ariathurai & Krone 1976·Partheniades 무연도 서술). 게이트 ⓒ 2차 정정: 기준높이 z_a=2d50 = marine-sands p.149(Zyserman-Fredsøe) 실존 — 삭제 오판 복원 / Van Rijn 0.053·2.1 = efdc-sed-trans p.58 Eq.6.18 판독 — '검증 불가' 과장 정정(완전식은 미전사) / Rouse profile 식(Eq.106-107)·Rouse 수 정확식(Eq.105 분수 문자) 미러 소실로 전사 제거(정성+변수 나열만; ⓒ 2차 확인 라운드 반영). fluid mud = WWM p.289 용어·이론 실존하나 원 이식 단언(층 형성 조건) claim-level 미지지 — 미이식. 미매칭 삭제 2건(Rouse 모드 구분표 2.5/0.8·boulder/cobble/pebble 상세 경계). 워크 예제·한국 연안 수치·계절 profile(ch14 주제)·EFDC 모듈 상세는 미이식 — concepts/models 탐색 위임. ※van-rijn-1993 미러 = OCR 실패 껍데기(690p 전부 빈 텍스트) 판정 — 주 출처에서 제외. T5([THEORY-LEDGER](../THEORY-LEDGER.md)). ★R1-VR 후속(2026-07-17): van-rijn-1993 전권 재추출로 원전 앵커 확보 — Rouse profile 정확식 Eq.7.3.20-21(p.270)·suspension number Z=ws/βκu*·부유 개시 Eq.4.4.5(p.124) 부착, ★fluid mud 층 형성 조건 복원(p.485 §11.8, T5 미이식 철회) → 33 부착(94%)·삭제 2."
+verification_method: "marine-sands-manual(Soulsby) p.8·11-12·24·33·48·51·62·74·109-110·114·120·138-141·145-149·162·164-165·168·198-199 + mechanics-of-sediment-transport p.216·229-230·367-368·370·376(서지 p.423)·TOC p.15 + efdc-sed-trans-2003 p.38-42·58·66 — textbook/md 미러 페이지 직접 대조 (2026-07-13, 게이트 ⓒ 2차 재검증 2026-07-14). + van-rijn-1993 재추출 미러 실측(2026-07-17): p.124·270·485."
 note_author: "Claude Fable 5 (citation-grounded port)"
 note_date: 2026-07-13
 related:
@@ -46,7 +46,7 @@ related:
 
 - **Bedload**: 임계 초과 흐름에서 입자가 바닥을 따라 **구르기·미끄러짐·도약(saltation)** 으로 이동, 무게를 바닥이 간헐 지지 (marine-sands-manual, p.162; 개관 p.24).
 - **Suspended**: 침강속도가 $u_*$ 에 비례하는 상향 난류 성분보다 작으면 부유 지속 — **부유 임계 $u_{*s} = w_s$** (skin-friction 마찰속도 기준) (marine-sands-manual, p.138, SC Eq. 96). 혼합 입도에서는 분급별 적용 — 가는 분급만 부유하고 굵은 분급은 bedload 로 남음 (p.138-139).
-- **Rouse 수(suspension parameter) $b$** 가 부유 농도 분포의 형상을 지배하는 무차원수 — 침강속도를 $\kappa u_*$ 로 무차원화한 값 (marine-sands-manual, p.145, SC Eq. 105; 변수 나열: $\kappa$=von Kármán 상수 **0.40**·$u_*$=total friction velocity — 분수식 문자 자체는 미러 OCR 소실이라 정확식 미전사, 게이트 ⓒ 2차 판정). $\kappa$ 보편값 사용 관행은 p.12·62.
+- **Rouse 수(suspension number) $Z=\dfrac{w_s}{\beta\kappa u_*}$** 가 부유 농도 분포의 형상을 지배하는 무차원수 (van-rijn-1993, p.270 — 원전 실측으로 정확식 확보, R1-VR 재추출 미러; marine-sands-manual p.145 SC Eq.105 는 미러 문자 소실이라 원전으로 대체). $\kappa$=von Kármán 상수 **0.40**·$u_*$=bed-shear velocity·$\beta$=퇴적물/유체 혼합비. $\kappa$ 보편값 사용 관행은 marine-sands p.12·62.
 - 임계 초과가 충분히 크면 **부유 이송이 총 이송의 대부분** (marine-sands-manual, p.138, §8.1). ※원문 교재의 모드 구분표($P>2.5$ bedload only / $0.8{-}2.5$ 혼합 / $<0.8$ suspended)는 코퍼스 미확인 — 미이식(Eq. 96 기준만 이식).
 
 ## 4. Bedload 공식 계보
@@ -58,7 +58,7 @@ related:
 
 ## 5. Suspended load — Rouse 분포
 
-- 정상 상태에서 상향 난류 확산과 하향 침강의 평형이 농도 연직 분포를 결정. 와확산계수를 포물형 $K_s=\kappa u_* z(1-z/h)$ 로 두면 **Rouse profile** 을 얻음 — 기준 높이 $z_a$ 의 기준 농도 $c_a$ 에 대한 비로 표현되며 지수 = Rouse 수 $b$ (marine-sands-manual, p.145-146; $b$ 정의는 SC Eq. 105 판독, profile 식 자체(Eq. 106-107)는 미러 OCR 문자 소실로 **미전사** — 게이트 ⓒ 2차 판정).
+- 정상 상태에서 상향 난류 확산과 하향 침강의 평형이 농도 연직 분포를 결정. 와확산계수를 포물형으로 두면 **Rouse concentration profile**: $\dfrac{c}{c_a}=\left[\dfrac{a}{z}\cdot\dfrac{h-z}{h-a}\right]^{Z}$ — $c_a$ = 기준 높이 $z=a$ 의 기준 농도, 지수 $Z=w_s/(\beta\kappa u_*)$ = suspension number; "Rouse profile 과 parabolic-constant 형(Eq. 7.3.21)이 실측과 최상 일치", 순수 포물형은 수면 농도 0 이라 덜 현실적 (van-rijn-1993, p.270, Eq. 7.3.20-7.3.21 — ★R1-VR 원전 실측으로 T5 '전사 불가' 해소; marine-sands p.145-146 은 동일 내용의 미러 소실분). **부유 개시 판별**: $u_*/w_s=4/D_*$ ($1<D_*\le10$)·$0.4$ ($D_*>10$) (van-rijn-1993, p.124, Eq. 4.4.5; Bagnold 기준은 상한).
 - $b$ 작음(세립·강한 흐름) → 전 수심 잘 혼합, $b$ 큼 → 바닥 집중; **Rouse profile 이 가장 널리 쓰임**(특히 하천) — $b=1$ 사례로 지수·멱형 분포와 형상 비교 (marine-sands-manual, p.147, Fig. 28).
 - **기준 높이·기준 농도**: 최근 표현으로 좋은 결과를 주는 것이 **Zyserman & Fredsøe(1994)** 기준농도 — 기준 높이 $z_a = 2d_{50}$ 명시 (marine-sands-manual, p.149, SC Eq. 109-111 문맥; ★초판 이식의 "$a=2d$ 미확인" 삭제는 오판 — 게이트 ⓒ 2차로 복원).
 
@@ -72,7 +72,7 @@ related:
 - 모래(비점착)는 개별 입자가 흐름에 직접 응답하지만, clay·silt 는 **전기화학적 상호작용**이 지배 (marine-sands-manual, p.24).
 - **점착 진흙 = Bingham 유체 거동**: 임계 마찰속도가 Bingham 항복응력과 결부되며, **소성 상태와 압밀 상태의 임계식이 다름** — 압밀이 임계를 키움 (mechanics-of-sediment-transport, p.367-368, Eq. 8.52-8.53 문맥). 갓 퇴적된 층과 압밀층의 이동 시작 조건 비교는 **Partheniades** 연구로 정리 (p.370).
 - **응집(flocculation)과 침강**: floc 침강속도를 농도 등으로 파라미터화 — 농도 의존 침강식의 고전은 **Ariathurai & Krone(1976)** (efdc-sed-trans-2003, p.66). ※원문 교재의 "Krone 1962·Partheniades 1965" 연도는 코퍼스 미지지 — 미이식.
-- **다층 bed·압밀 추적** 정식화는 모델 구현 축 (efdc-sed-trans-2003, p.38-42, §5 Sediment Bed Mass Conservation, Armoring and Consolidation) — 상세는 `models/EFDC/`(탐색). ※fluid mud 용어·파랑-점성저면 상호작용 이론은 water-wave-mechanics p.289 에 존재하나, 원 교재 이식 단언(fluid mud 층 형성 조건)의 claim-level 근거는 미확인 — 미이식.
+- **다층 bed·압밀 추적** 정식화는 모델 구현 축 (efdc-sed-trans-2003, p.38-42, §5 Sediment Bed Mass Conservation, Armoring and Consolidation) — 상세는 `models/EFDC/`(탐색). **fluid mud 층 형성 조건(복원)**: 고농도(>10 kg/m³) 플록 부유에서 **hindered settling** 로 침강속도가 바닥 근처에서 상대적으로 작아져 근저층에 **fluid mud 층(10~300 kg/m³)** 이 형성 — 층 두께는 **상면 퇴적률 > 하면 압밀률**인 동안 성장(수 m 관측), 사면 중력·수평 농도경사 압력으로 turbidity current 로 수송 가능 (van-rijn-1993, p.485, §11.8 — ★R1-VR 재추출로 T5 미이식 복원; 파랑-점성저면 이론은 water-wave-mechanics p.289).
 
 ## 8. 연안 표사 — CERC 공식
 
