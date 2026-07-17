@@ -5,6 +5,7 @@ component: manual-notes
 canonical_source: self
 verification_method: "CADMAS-AGENT_Manual_English.pdf(30p, 기계번역) pdftotext. 시스템(p.3)·potential 항법 eq7-1(p.26)·shelter potential -1/r eq7-3(p.27)·mob eq7-4(p.27)·signpost(p.28)·랜덤워크 eq7-5(p.28)·익사 deadline(p.7·18 Table6-2)·CADMAS online/offline data.ma(p.3·9-14)·입출력(p.5-12)·확률회피 §7.4-7.5(p.28-29). 소스 cross-confirm: get_direction.f90·recursive_search_shelter.f90·slope_function.f90:23·update_attribute.f90·random_normal.f90. 적발: Tobler 식 소스전용(매뉴얼 미인쇄)·익사=max_depth(peak)·underwater_function dead-code. printed page+file:line."
 citation_status: verified
+has_source_needed: false
 note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-24
 related:

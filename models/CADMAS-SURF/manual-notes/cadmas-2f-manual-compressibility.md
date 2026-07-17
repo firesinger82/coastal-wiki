@@ -5,6 +5,7 @@ component: manual-notes
 canonical_source: self
 verification_method: "CADMAS-2F_Manural_English.pdf(160p, 인쇄 p.463-622) pdftotext 추출. Table 0-1-1(p.467-468)·연속식 eq(2.1) 압축성항(p.471)·EOS eq(2.38)(p.485)·Dρ/Dt eq(2.39)(p.486)·압력선형화 Poisson eq(3.127-3.128)(p.522-523)·입력 OPTION STATE(p.603)/MATE 2열 RHO0(p.585)·참고문헌 CDIT Library(12)(p.621). 소스 cross-confirm: user_eos.f·vf_v1eos.f·vf_vpdrdt.f(EOS·Dρ/Dt·Poisson 계수 정확일치). printed page 직접 인용."
 citation_status: verified
+has_source_needed: false
 note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-24
 related:

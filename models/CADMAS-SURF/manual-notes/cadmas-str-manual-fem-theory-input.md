@@ -5,6 +5,7 @@ component: manual-notes
 canonical_source: self
 verification_method: "CADMAS-STR 영문 2매뉴얼 pdftotext: Manual(18p, 실은 FEMAP 워크플로) + Program Instructions(113p, 실제 이론 §2 p.3-24·Appendix p.100-110). Newmark-β 범위 0.25≤β<0.5(p.5)·Biot u-p eq⑧⑨⑪⑮(p.10-15)·von Mises/Drucker-Prager MATS1 YF(p.35)·MPC 접촉(p.18-24)·Total-Lagrange(Appendix3 p.103-110)·유체압 surface integral(Appendix1 p.100)·NASTRAN bulk card(p.25-51)·KK(21) solver flag(p.52). 소스 cross-confirm: main.f:45(β=1/3)·yfunc.f·Rd_MATS1.f(YF=4→D-P,α=0.07)·m_mumps·pld_cadmas·send_pos. 적발: p.52 flag legend stale(MUMPS=4 누락, PARDISO 주석처리). printed page+file:line."
 citation_status: verified
+has_source_needed: true
 note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-24
 related:

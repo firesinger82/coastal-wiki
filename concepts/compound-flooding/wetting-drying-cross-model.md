@@ -3,7 +3,7 @@ title: "침수-노출(wetting & drying) cross-model 대조 — 8개 천수 모�
 topic: compound-flooding
 canonical_source: self
 citation_status: verified
-has_source_needed: true
+has_source_needed: false
 verification_method: "전 행이 각 모델 verified source-analysis 노트로 소급(셀에 노트 링크+file:line). 대표 anchor 직접 재확인(2026-07-07): LISFLOOD-FP fp_acc.cpp:66-68(hflow=max(z+h)−max(z), DepthThresh=1e-3 lisflood.cpp:171). ROMS 는 [[roms_wetting_drying]] 신설(commit 4224c40)로 커버. 미커버 셀 §5 표기."
 note_author: "Claude Fable 5"
 note_date: 2026-07-07

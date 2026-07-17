@@ -94,7 +94,7 @@ Layer 3: SWAN detail (~50-100 m, 항만·연안)
 
 > Canonical: [`models/XBeach/`](../../models/XBeach/) (source-analysis 32 + manual-notes 4 verified) — [[../../models/XBeach/source-analysis/xbeach_wave_action_balance]](surfbeat)·[[../../models/XBeach/source-analysis/xbeach_nonh]]·[[../../models/XBeach/source-analysis/xbeach_morphology]]
 
-- 폭풍 침식·범람 사례 (10²-10³ km² 도메인, 시간 1-7 일)
+- 폭풍 침식·범람 사례 (10²-10³ km² 도메인, 시간 1-7 일) `[source-needed]` <!-- 값 재검토: 10³ km² 는 XBeach 통상 적용 규모 초과 의심 -->
 - 입력: 외부 spectrum (SWAN 출력 또는 직접 measurement)
 - 출력: 모래사장 단면 변화, 침수 범위, 인프라 피해 분석
 

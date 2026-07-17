@@ -3,7 +3,7 @@ title: "시간적분(time integration) cross-model 대조 — 12개 모델 (스�
 topic: currents
 canonical_source: self
 citation_status: verified
-has_source_needed: true
+has_source_needed: false
 verification_method: "전 행이 각 모델 verified source-analysis 노트로 소급(셀에 노트 링크+file:line). 대표 anchor 직접 재확인(2026-07-10): ADCIRC read_input.F:2996(READ A00,B00,C00)·gwce.F:182(CPRECOR)+IS2TIM 전역 rg 0건 / EFDC aaefdc.f90:3187-3188(IS2TIM==0→HDMT, ≥1→HDMT2T) / SWASH SwashComputFlow.ftn90:42-47(Method verbatim 'unconditionally stable…leap-frog') / FUNWAVE mod_global.F:122-123(alpha=(0,3/4,1/3)·beta=(1,1/4,2/3))·main.F:414(ESTIMATE_HUV)·etauv_solver.F:268-270 / SFINCS sfincs_input.f90:70(alfa 기본 0.50) / LISFLOOD SolverParams.h(HWFV1 CFL=0.5·MWDG2 CFL=0.3) / Delft3D adi.f90:282,439(stage1/stage2) / Celeris shaders/Pass3_Bous.wgsl:398-409(Euler/AB3/AM4 분기). 미커버 셀은 §5 disclosed."
 note_author: "Claude Fable 5"
 note_date: 2026-07-10

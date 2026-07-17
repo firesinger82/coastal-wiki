@@ -191,7 +191,7 @@ Bottom line: ADCIRC-3D is suitable for **storm surge with stratification effects
 - ▢ Using simple linear EOS (`Eqnstate=1`) for realistic ocean — gives unrealistic pycnocline. <!-- source-needed: 물리 결과 단언 — 문헌/교과서 인용 필요 -->
 - ▢ Confusing `couple2baroclinic3D.F` (external coupling) with true 3D — they look similar but only the latter solves 3D internally.
 - ▢ `IEVC=50` (MY2.5) cold-started with zero `q²` — singular dissipation; init with positive minimum. <!-- source-needed: singular 거동 file:line 또는 문헌 인용 필요 -->
-- ▢ Hot-start with different `IM` — 3D state arrays incompatible.
+- ▢ Hot-start with different `IM` — 3D state arrays incompatible. <!-- source-needed: hot-start 3D 상태배열 재로드 경로 hstart.F file:line 인용 필요 -->
 - ▢ Comparing ADCIRC-3D temperature to TEOS-10 reference — slight bias due to legacy EOS; document explicitly.
 - ▢ Forgetting to set bottom drag for 3D — bottom stress comes from 3D BBL, not 2D Manning.
 

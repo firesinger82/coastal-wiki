@@ -63,16 +63,16 @@ ADCIRC 의 모든 parameter. 핵심 storm-surge 관련 필드:
 |---|---|
 | `NWS` | meteorological forcing source (위 §1.1) |
 | `NOIVB` | inverse-barometer 억제 — ★compile-time flag(`-DNOIVB`)이며 fort.15 필드 아님 ([`adcirc-storm-surge.md`](../../models/ADCIRC/source-analysis/storm-surge/adcirc-storm-surge.md) §G, wind.F:1415,3018) |
-| `RampMete` | vortex spin-up ramp (sec) — typical 1-2 days |
+| `RampMete` | vortex spin-up ramp (sec) — typical 1-2 days `[source-needed]` |
 | `WTIMINC` | met forcing time increment |
 | `BLAdj` | boundary-layer adjustment (NWS=20) |
 | `GEOFACTOR` | geostrophic vs cyclostrophic balance |
 | `IM` | 모델 정식화 선택 (2DDI/3D; `IM=1/11/21/31`→3D — [`adcirc-3d-mode.md`](../../models/ADCIRC/source-analysis/adcirc-3d-mode.md)). wind drag 는 별개: Garratt 식 + `/metControl/ WindDragLimit` ([`adcirc-met-forcing-implementation.md`](../../models/ADCIRC/source-analysis/adcirc-met-forcing-implementation.md), wind.F:514-539) |
-| `TAU0` | numerical weighting (typical 0.01) |
+| `TAU0` | numerical weighting (typical 0.01 `[source-needed]`) |
 
 ### 2.2 `fort.14` (mesh)
 
-unstructured triangular mesh — 한국 ADCIRC 적용 시 일반적으로 수 십만 ~ 수 백만 nodes. 한국 서해·남해 dense, 외해 coarse.
+unstructured triangular mesh — 한국 ADCIRC 적용 시 일반적으로 수 십만 ~ 수 백만 nodes `[source-needed]`. 한국 서해·남해 dense, 외해 coarse.
 
 ### 2.3 `fort.22` (wind/pressure)
 
@@ -201,8 +201,8 @@ ADCIRC NWS=12/13/14 입력 NWP source:
 4. **`fort.15`** 편집:
    - `NWS = 13`
    - `RampMete = 86400` (1 day spin-up)
-   - `NOIVB = 0` (IB 포함)
-5. **ADCIRC 실행** — MPI parallel, 보통 64-256 cores
+   - IB(inverse barometer)는 기본 포함 — `NOIVB` 는 compile-time flag(`-DNOIVB`)로 fort.15 편집 대상 아님 (§2.1, wind.F:1415,3018)
+5. **ADCIRC 실행** — MPI parallel, 보통 64-256 cores `[source-needed]`
 6. **검증** — KHOA 정점 surge (관측 vs 모델 hindcast)
 7. **maxele.63 → 한국 연안 surge envelope map** (matplotlib + cartopy)
 

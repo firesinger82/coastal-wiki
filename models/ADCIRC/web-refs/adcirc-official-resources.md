@@ -3,6 +3,7 @@ title: "ADCIRC 공식 자료 — 사이트·GitHub·핵심 논문·커뮤니티 
 topic: adcirc-web-refs
 canonical_source: self
 citation_status: verified
+has_source_needed: false
 verification_method: "공식 도메인 (adcirc.org, adcirc.github.io) WebFetch sampling 2026-05-24 — theory/index.html + parameter_definitions/index.html 본 위키 [[../manual-notes/03-theory-and-formulation]] + [[../manual-notes/06-parameter-definitions]] 작성 시 검증 완료. GitHub URL 은 공개 repo (github.com/adcirc/adcirc, adcirc-testsuite, adcircpy 등). 논문 인용은 publicly-known canonical works."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-24
@@ -10,7 +11,6 @@ verification_by: "Claude Opus 4.7 (1M context) — URL audit + 공인 논문 인
 verification_date: 2026-05-24
 related:
   - models/ADCIRC/README.md
-  - models/ADCIRC/manual-notes/efdc-manuals-overview.md
 ---
 
 # ADCIRC 공식 자료 큐레이션
@@ -84,5 +84,5 @@ related:
 - [`concepts/storm-surge/03-analysis-methods.md`](../../../concepts/storm-surge/03-analysis-methods.md) — separation·MK trend·return period
 - [`concepts/storm-surge/04-code-and-tools.md`](../../../concepts/storm-surge/04-code-and-tools.md) — NWS modes·KHOA observation·운영 운영
 - [`concepts/tides/06-model-application.md`](../../../concepts/tides/06-model-application.md) — 조석 forcing
-- [`models/ADCIRC/source-analysis/`](../source-analysis/) — 36 source-analysis 노트
+- [`models/ADCIRC/source-analysis/`](../source-analysis/) — 38 source-analysis 노트 (README 제외 실측, AUDIT-LEDGER 관례)
 - [`models/ADCIRC/manual-notes/`](../manual-notes/) — 21 verified

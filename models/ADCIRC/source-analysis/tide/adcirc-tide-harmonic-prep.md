@@ -112,7 +112,7 @@ SAL synthesis into `TIP2` (`timestep.F:1547-1548`, `hstart.F:1525-1532`):
 TIP2 += SALTMUL * SALTAMP * cos(ARGT − SALTPHA)
 ```
 
-ADCIRC uses **lag-subtracted** phase (`cos(arg − phase)`). FES2022b convention is the same; NAO99jb and TPXO also use lag convention. **Confirm** before using a database.
+ADCIRC uses **lag-subtracted** phase (`cos(arg − phase)`). FES2022b convention is the same; NAO99jb and TPXO also use lag convention. ⚠ source-needed(외부 DB 위상규약 서술 — FES2022b·NAO99jb·TPXO 공식문서 미인용). **Confirm** before using a database.
 
 ## E. FF and FACE meaning
 

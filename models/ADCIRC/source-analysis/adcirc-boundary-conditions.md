@@ -3,6 +3,7 @@ title: "ADCIRC 경계조건 — IBTYPE 카탈로그(elevation/land no-flow/islan
 topic: adcirc
 canonical_source: self
 citation_status: verified
+has_source_needed: false
 verification_method: "models/ADCIRC/raw/source_code/adcirc/src/boundaries.F (675) + normal_flow_boundary.F90 (106) + sponge_layer.F90 (880) 직접 read — IBTYPE 분류(specifiedFluxBoundaryTypes=(2,12,22,32,52):179, flux 3/13/23·4/24/64·5/25, weir 64), sponge SSIGMA_ETA/MNX/MNY + momentum SPNGCOEF(momentum.F VCOEFXX) file:line 인용. Luettich-Westerink ADCIRC."
 note_author: "Claude Opus 4.8 (1M context) source-code direct read"
 note_date: 2026-06-03

@@ -5,6 +5,7 @@ component: manual-notes
 canonical_source: self
 verification_method: "번들 영문 매뉴얼 CADMAS-SURF3D_Manural_English.pdf 직접 pdftotext 추출(150p). Table 0-1-1 Function list(printed p.318-319) + §2.2 식(2.1)-(2.5) porous Navier-Stokes(p.321-322) + Rx 저항식(p.322) + §VOF 식(2.7) donor-acceptor·NASA-VOF 3D(p.323-325) + Sommerfeld 식(2.16)·energy damping zone 식(2.17-2.19)(p.326-328) + k-ε 상수 Cμ=0.09·σk=1.0·σε=1.3·C1=1.44·C2=1.92·C3=0(p.330). printed page 직접 인용. 소스 source-analysis 와 cross-confirm."
 citation_status: verified
+has_source_needed: false
 note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-23
 related:

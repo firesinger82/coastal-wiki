@@ -46,7 +46,7 @@ related:
 
 입력파일 작성→실행→가시화 절차. canonical 메커닉 아님(절차 how-to). 케이스 구축 시 참조.
 
-## D. 일문 중복 (영문 심층노트의 번역본, 6 PDF)
+## D. 일문 중복 (영문 심층노트의 번역본, 5 PDF)
 
 `CADMAS-SURF3D_Manual_Japanese`(142)·`CADMAS-2F_Manual_Japanese`(147)·`CADMAS-STR_Manual_Japanese`(18)·`CADMAS-STR_Program Instructions_Japanese`(117)·`CADMAS-AGENT_Manual_Japanese`(31). 영문 심층노트와 **동일 내용 일문본** → 별도 추출 불요(영문 노트가 canonical). 영문 미존재 항목 발생 시만 일문 참조.
 
