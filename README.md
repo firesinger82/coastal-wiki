@@ -45,6 +45,8 @@
 
 이 PC = writer, 다른 PC = reader. git push/pull로 sync.
 
+신규 계산머신 1회 세팅: `git clone` 후 [RUNS-CHANNEL.md §2.0](RUNS-CHANNEL.md) 체크리스트를 따른다.
+
 ## 우선 읽을 문서
 
 - [CLAUDE.md](CLAUDE.md) — Claude 진입점

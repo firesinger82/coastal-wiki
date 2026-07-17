@@ -1427,7 +1427,7 @@ LLM-Wiki 4계층(L1 검색·L2 graph·L3 MCP·**L4 유지보수 루프**) 중 L4
 ## 이번 라운드 승격 (Codex 20)
 
 - **I-6a SWAN·SWASH 상태 라벨 정직화**: AUDIT-LEDGER·INDEX 가 '종결'과 '⚠재검토 open' 을 동시 표기 중 → **"코드축 종결 · 문서축 provisional(재검토 open)"** 로 라벨 정정(심층 재검토 자체는 backlog 유지).
-- **FTS freshness**: 훅이 post-merge/post-checkout 만 재색인 — writer 의 일반 commit 후 인덱스 stale. **post-commit 재색인 훅 추가** + 인덱스 manifest 에 `indexed_git_sha` 기록(불일치 시 자동 재빌드는 후속).
+- **FTS freshness**: 훅이 post-merge/post-checkout 만 재색인 — writer 의 일반 commit 후 인덱스 stale. **post-commit 재색인 훅 추가** + 인덱스 manifest 에 `indexed_git_sha` 기록(불일치 시 자동 재빌드는 후속). → **✅완결(2026-07-17 R2 Part 0)**: `indexed_git_sha` 저장 + `ensure_index()` sha 불일치 자동 재빌드 + tools/call 매 호출 검사 + manifest `fresh` 필드.
 - **L4 스코프**: select_audit `ROOTS` 에 `textbook/notes` 추가(theory 노트도 일일 감사 순환 진입).
 
 ## backlog (이번 라운드 비대상)
@@ -1442,3 +1442,42 @@ LLM-Wiki 4계층(L1 검색·L2 graph·L3 MCP·**L4 유지보수 루프**) 중 L4
 - 2026-07-17 **★P0 schema spike 완료** — coastal-runs a33dd03: 대표런 = `~/khoa_tide/tail_autoresearch` v23(폭풍해일 극치 꼬리 CNN emulator 자율연구 24실험, SCORE 28.60→19.25·꼬리 bias −42→−14cm·r_tail 0.40 — karpathy autoresearch 패턴 실구현, 사용자 지정). RUNS-CHANNEL §2.1-2.2 첫 실전: runs/DESKTOP-ROP5H5E/ML-surge-emulator/ + 관찰노트(draft-observation·repeat_count 1·재현성 Δ0.09). **스파이크 발견 3건(스키마 개정 후보)**: F1 model enum 에 ML emulator 부재 / F2 위키 무인용 셋업의 wiki_ref 규정 부재 / F3 autoresearch 루프 내 실험의 repeat_count 지위 명문화 — writer 게이트(사용자 verdict)와 함께 RUNS-CHANNEL 개정 시 처리. ※발견: 이 PC hostname=DESKTOP-ROP5H5E(= writer 겸 계산 host — 계약 허용형).
 - 2026-07-17 **R1 구현 완료** — 커밋: d7dec8b(계획 개정+라벨 정직화) · e240b7e(I-1: 집계 5필드 백필 16노트+claim manifest ch11/ch15+validate-claims lint+테스트 8건+count-notes theory parity — ★lint 첫 실행이 자기 파서 결함 즉시 적발·manifest 재산정 ch11 47/37·ch15 45/26) · cd5d8ca(I-4 reader commit guard 실측 PASS+post-commit 재색인+L4 스코프 textbook/notes) · 5a87a29(I-2 페이지 수선 2건+REPAIRS.yml). 잔여: I-3(Kundu PDF 대기)·R1-VR(van-rijn 전권 재추출)·I-6 본체·I-7 본체. ※같은 날 원 PDF 확보(E:\textbook 19권)로 5π/16(caf37a2)·S_bfr(5864735) 선행 해소.
 - 2026-07-17 Codex adversarial review 20회차(resume): **전 항목 MODIFY** — I-1 '산술 lint=근본 해법' 반박(매핑 부재가 원인 → compact claim manifest 추가·frontmatter 우선 규칙 폐기·모집단 정의 고정·validate-all .sh 디스패처 호환·count-notes theory parity·F-5 정직 기술) / I-2 extracts/ 방식 REJECT 급 결함 적발(FTS 중복 색인·G8c 위반) → 제자리 수선+sidecar 로 교체, van-rijn 분리 / I-3 Kundu 1990 서지 정밀화·claim 별 승격 / I-4 '단일 writer 가드' 과대 명칭 격하(미커밋 편집은 못 막음)·fail-open 제거·worktree 호환 / I-5 오진 판정(기구현 확인, 실측 471/122/363) / I-6 라벨 정직화 승격 / 신규 2건 적발: **L4 스코프에 textbook/notes 누락·FTS post-commit 재색인 부재**. 본 개정판이 반영 결과. 구현 커밋은 아래 기록.
+
+# wiki↔run 연동 방법론 확정 R2 (2026-07-17, Codex 21·22회차 반영)
+
+## 트리거·판정 기록
+
+- **오늘의 두 위반**(위키 세션의 모델 실행 시도·분기점 게이트 생략) 교정 후 시스템 의도 재확인: **위키 = 근거 공급원 / run = `wiki_ref@sha` 인용 실행 / 결과는 게이트 거쳐 역류**. 루프 미배선부 완성이 본 라운드.
+- **Codex 21회차 (B1 사후 게이트)**: **REJECT** — 천문계수 비정상·군산 정점 격자 밖(요소 미포함)·분석 분조 4개 부족(M2-N2 beat 27.55d → 6분조)·16년 상수 직접 비교 부적합·spin-up/hotstart 미진단 등. **실행했으면 무효 런** — 사후 게이트가 무효 런을 사전 차단한 첫 사례. 반영 = Phase L L1(B1 scope v1.1 + 핸드오프 gate-failed).
+- **Codex 22회차 (연동 방법론)**: **MODIFY** — wiki_feedback 최소형 채택·acknowledgment 원장(원 observation 불수정)·scanner 무상태 report-only·managed block SSOT 1곳·M4 가드는 YAGNI 아님(기존 소유권 계약의 집행) + 실결함 적발: **FTS 인덱스가 HEAD 변경 미감지**(sha 최신인데 검색은 구인덱스 가능 — R1 승격 항목의 '후속' 미구현분) → Part 0 선행 구현.
+
+## Part 0 구현 (coastal-wiki — 이 라운드 완결)
+
+- `tools/llm-wiki-poc/fts5_index.py`: `meta` 테이블에 `indexed_git_sha` 저장(build 시 HEAD), `_git_head()`/`_indexed_sha()` 신설, `_schema_current()` 에 meta 존재 요구(구 DB 자가치유 유지), `ensure_index()` 재빌드 조건에 sha 불일치 추가. dirty tree 는 same-HEAD 라 이 축으로 미검출 — 훅·manifest dirty 필드가 담당(한계 명시).
+- `tools/llm-wiki-poc/mcp_server.py`: manifest 에 `indexed_git_sha`+`fresh`(git_sha==indexed_git_sha) 노출, **tools/call 매 호출 `ensure_index()`**(장수 서버가 pull 이후 검색만 stale 로 남는 구멍 — sha 기록만으로는 안 닫힘. fresh 시 ~ms, stale 시 ~0.6s).
+- 회귀 `tools/test_fts_freshness.py`: sha 훼손→재빌드 / 구 스키마→재빌드 / fresh→미재빌드 / manifest 노출.
+
+## 연동 방법론 (SSOT = RUNS-CHANNEL.md — 본 라운드 개정)
+
+- **§2.0 신규 계산머신 부트스트랩**(6단계: 접근·환경 → 위키 리더 + 거부/재색인 실측 → FTS/MCP smoke → coastal-runs + `pull.rebase true` + `--host-id` 훅 → §2.4 배선 → 모델 실행환경 분리). README 는 링크 1줄만.
+- **§2.2 `wiki_feedback` 선택 필드**(gap|suspected-error|promote-candidate · destination · target_ref@sha · evidence · note) + suspected-error 는 G8 독립 소스 확인 후에만 canonical 반영.
+- **§2.4 계산 프로젝트 배선**: 로컬 `.mcp.json` 생성(COASTAL_WIKI_ROOT bash wrapper — 개인 절대경로 커밋 금지) + CLAUDE.md **managed block v1**(원본 §2.4 1곳, 6항목: read-only·ff-only pull·verified 검색·disclosed-gap 정독·fresh+clean sha 만 wiki_ref·모델 실행은 계산 프로젝트에서만).
+- **§3.3 acknowledgment 원장** `_staging/runs-feedback/ledger.yml`(feedback_id·source_ref·verdict·result_ref·date — 원 observation 불수정, 처리 SSOT = 원장 하나) + `tools/scan-runs-feedback.py`(순수 stdlib, 원장 미기재 id 만 출력, report-only) + 회귀 `tools/test_scan_runs_feedback.py`.
+
+## Phase L — 로컬 writer PC 체크리스트 (원격 세션 실행 불가분 — 로컬 세션 작업 지시서)
+
+- **L1. B1 게이트(21회차 REJECT) 문서 반영** [문서만 — v02 실행은 계산 세션 몫]:
+  - `coastal-runs/plans/B1-tide-calib-pilot-scope.md` → v1.1: 분석 분조 4→6(M2 S2 N2 K1 O1 Q1, beat 실측 M2-N2 27.55d)+K2·P1 inference 명시+condition number 보고 / 관측 기준 = 동일 35일 창 UTide 재분석(16년 상수 직접 비교 금지 명문화) / 합격 기준: 정점별 표·최대오차·합격 정점 수 병기, 진폭 상대+절대(cm), 위상 원형차, RMSE 는 datum 정합 후, 조정·검증 정점 분리 / "Cf/hybrid"→균일 quadratic CF 기준선 정정 / equifinality 방지(범위·순서·목적함수 사전 고정) / 착수 전 필수확인 절(21회차 §6): nao_db→fort.15 변환 재현·EFA lag 노드 표본 재계산·실제 UTC epoch·KST-9h·datum·관측 QC·spin-up 진단(day0-10 출력+통과조건)·hotstart(NHSTAR)·smoke run·fort.16 경고 0 / 군산 = 격자 밖 → wet 요소 내 재배치 + 전 정점 inside-element/수심/거리 표 의무·NFOVER fail-closed / 검증 이력에 21회차 REJECT 기록.
+  - `D:\SURGE\B1_tide\v01\README-HANDOFF.md`: 상태 `gate failed — do not run` + 해제조건 6(군산 재배치·tide_fac 재생성·경계 변환/lag 재현·UTC/datum/동일창·spin-up+hotstart·adcprep 재수행) + fort.63/64.nc=전처리 산출물 명기.
+- **L2.** `coastal-runs/observations/_template.md` 전량 동기화 — 개정 §2.2 완전 일치(gate·gate.reason·wiki_ref·exec·custom-ML·wiki_feedback).
+- **L3.** `coastal-runs/tools/install-hooks.sh` 신설 — 위키 install-hooks.sh 패턴 재사용(marker·.bak 백업·`git rev-parse --git-path runs-role`). 역할 `host:<id>`(자기 runs/·observations/ 서브트리만) / `runs-admin`(plans/·template·README·tools — writer PC). pre-commit: 역할 밖 staged 거부(`--diff-filter=ACMRD` + rename 원·신 경로 모두) + 금지 확장자(.nc .nc4 .h5 .hdf5 .grb .grib2 등) 크기 무관 거부 + 대용량 blob 검사. 회귀 4케이스(host/admin/미지정/rename) + "우회 가능한 2차 방어" 한계 주석. 현행 클론 `git config pull.rebase true` 교정 + 이 PC runs-admin 등록.
+- **L4.** `~/khoa_tide/`·`/mnt/d/SURGE/` 에 §2.4 배선(.mcp.json 로컬 생성 + managed block) → khoa_tide 에서 wiki_search 실호출 / coastal-runs 훅 실측(타 host 경로·금지 확장자 거부) / scanner 첫 실증(P0 관찰노트 발견사항 F1-F3 을 wiki_feedback 형식으로 이관 → 첫 스캔 → 원장 첫 기록) / 메모리 갱신. **DESKTOP-64PT1F7 은 §2.0 체크리스트로 사용자가 1회 세팅**(그 머신 세션 몫).
+
+## 비범위 (확정)
+
+- B1 v02 셋업·실행 — 계산 세션 몫(해제조건 6 충족 후) · digest cron 불요 · 원격 MCP/중앙 서비스 불요.
+
+## 검증 이력
+
+- 2026-07-17 Codex 21회차(B1 사후 게이트): **REJECT** — 상세 위 기록. 반영처 = coastal-runs B1 scope v1.1 + 핸드오프(Phase L L1).
+- 2026-07-17 Codex 22회차(연동 방법론): **MODIFY** — 상세 위 기록. 본 섹션 + RUNS-CHANNEL 개정 + Part 0 이 반영 결과. 원격 세션(branch+PR — 단일 writer 규칙 #5 준수: main 직접 push 금지, writer merge 후 pull) 구현: Part 0·§2.0·§2.2·§2.4·§3.3·scanner·원장 스캐폴드·회귀 2종.

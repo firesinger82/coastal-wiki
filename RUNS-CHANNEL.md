@@ -22,6 +22,17 @@
 
 계산 머신(들)이 따르는 부분. writer PC는 이 섹션을 읽기만.
 
+### 2.0 신규 계산머신 부트스트랩 (SSOT — README 는 이 절 링크만)
+
+새 계산 머신 1회 세팅 체크리스트. 순서 고정.
+
+1. **접근·환경 확인**: `ssh -T git@github.com` + 두 repo(coastal-wiki·coastal-runs) fetch/push 권한 · `git config user.name/user.email` · `core.autocrlf`(WSL/Linux `input` 권장) · 시간대/NTP 동기(UTC epoch 재현성) · 디스크 여유.
+2. **위키 리더 세팅**: `git clone` coastal-wiki → `~/coastal-wiki` → `bash tools/install-hooks.sh --reader` + `git config pull.ff only` → **동작 실측 2건**: (a) 임의 커밋 시도가 pre-commit 에서 거부되는지 (b) `git pull` 후 post-merge 재색인 메시지가 나오는지.
+3. **검색 레이어 확인**: `python3 -c "import sqlite3; sqlite3.connect(':memory:').execute(\"CREATE VIRTUAL TABLE t USING fts5(a)\")"` (FTS5 실확인) + MCP smoke — initialize/`wiki_search`/`wiki_manifest` 응답 확인(§2.4 의 `.mcp.json` 경유 또는 stdio 직접).
+4. **coastal-runs 세팅**: `git clone` coastal-runs → **`git config pull.rebase true` 실설정**(§2.3 push 규율의 전제 — 미설정 시 조용한 merge 커밋 드리프트) → `bash tools/install-hooks.sh --host-id <id>` 로 훅 설치(**`--host-id` 명시 지정** — hostname 직접 사용 금지, 역할은 `git rev-parse --git-path runs-role` 파일에 기록, 기존 `runs/<id>/` 충돌 검사) → 자기 `runs/<host_id>/`·`observations/<host_id>/` 생성.
+5. **계산 프로젝트 배선**: 각 계산 프로젝트에 §2.4 적용(로컬 `.mcp.json` 생성 + CLAUDE.md managed block).
+6. **모델 실행환경은 별도**: 모델 실행파일·MPI·컴파일러·DLL 세팅은 이 절의 범위 밖 — "모델별 후속 bootstrap"으로 분리(모델·프로젝트 문서 몫).
+
 ### 2.1 repo 구조
 ```
 coastal-runs/
@@ -59,6 +70,13 @@ gate:                                 # writer PC 게이트 기록 (계산머신
   verdict: ""                         # promote | hold | reject
   date: ""
   reason: ""
+wiki_feedback:                        # 선택 — run→wiki 피드백 채널 (Codex 22회차 최소형). 없으면 필드 생략.
+  - id: <host_id>-<YYYYMMDD>-<slug>-NNN   # 원장 대조 키 — repo 전역 유일
+    type: gap | suspected-error | promote-candidate
+    destination: canonical | experience
+    target_ref: "coastal-wiki@<sha> <경로> §<절>"   # 대상 문서가 아예 없는 gap 은 "unresolved"
+    evidence: [runs/<host>/.../metrics/...]
+    note: "<한 줄>"
 ---
 
 ## 관찰
@@ -71,6 +89,7 @@ gate:                                 # writer PC 게이트 기록 (계산머신
 <setup/ 어느 파일 + 어떤 실행으로 재현되나.>
 ```
 - **`status`는 계산 머신에서 항상 `draft-observation`.** `verified`·`citation_status: verified`는 절대 부여하지 않는다(객관화 판정 = writer PC의 몫).
+- **`wiki_feedback` 규칙**: 계산 머신은 피드백을 *제기*만 한다 — 위키 반영 여부·방식은 writer 게이트(§3.3). 특히 `type: suspected-error` 는 **G8 독립 소스 확인 성공 후에만** 위키 canonical 에 반영(역방향 계약 §3.1 유지 — run 결과 자체는 소스 근거가 아님). id 는 발급 후 불변(원장 대조 키).
 
 ### 2.3 push 규율 (단일 repo + 호스트 네임스페이스인 경우)
 1. `git pull --rebase` (push 직전)
@@ -79,9 +98,40 @@ gate:                                 # writer PC 게이트 기록 (계산머신
 - run 산출물은 비겹침이라 rebase는 항상 clean. 남의 `<host>` 서브트리는 절대 건드리지 않는다.
 - (대안: 머신별 `coastal-runs-<host>` repo면 rebase도 불요.)
 
+### 2.4 계산 프로젝트 배선 — wiki 소비 표준 (managed block 원본 = 이 절 1곳)
+
+계산 프로젝트(예: `~/khoa_tide/`, `/mnt/d/SURGE/`)마다 아래 2개를 배선한다.
+
+**(a) 로컬 `.mcp.json` 생성** — 개인 절대경로는 커밋하지 않는다(프로젝트 repo 가 있으면 `.mcp.json` 을 gitignore 하거나 로컬 전용으로 유지). WSL Claude 런타임 기준:
+
+```json
+{
+  "mcpServers": {
+    "coastal-wiki": {
+      "command": "bash",
+      "args": ["-c", "cd \"${COASTAL_WIKI_ROOT:-$HOME/coastal-wiki}\" && exec python3 tools/llm-wiki-poc/mcp_server.py"]
+    }
+  }
+}
+```
+
+**(b) 계산 프로젝트 CLAUDE.md 에 managed block 부착** — 원본은 아래 블록(버전 마커 포함) 하나뿐이며, 각 프로젝트에는 **그대로 복사**한다(문구 개정은 여기서만 → 마커 버전 올리고 재배포 — 드리프트 방지).
+
+```markdown
+<!-- coastal-wiki:consumer-block:v1 -->
+## coastal-wiki 소비 규칙 (원본: coastal-wiki/RUNS-CHANNEL.md §2.4 — 여기서 직접 수정 금지)
+1. 위키 clone(`~/coastal-wiki`)은 **read-only** — 모델 셋업·본문 편집 금지(위키 편집 = writer PC 위키 세션 몫).
+2. 세션 시작 시 `git -C ~/coastal-wiki pull --ff-only` + working tree clean 확인(리더 머신).
+3. 근거 탐색은 `wiki_search(status="verified")` 부터.
+4. 히트의 disclosed-gap 라벨(⚑/✓/?) 확인 후 `wiki_read` 로 해당 절 정독(스니펫만으로 인용 금지).
+5. `wiki_manifest` 의 **`fresh=true` 이고 `dirty_working_tree=false`** 인 `git_sha` 만 `wiki_ref` 로 인용.
+6. **모델 실행·입력파일 편집은 계산 프로젝트/coastal-runs 에서만** — 위키 세션에서 하지 않는다(세션 역할 경계).
+<!-- /coastal-wiki:consumer-block -->
+```
+
 ## 3. 【라이터 PC 절차】 `coastal-runs` → `experience/` promote 게이트
 
-wiki writer PC(이 PC)만 수행. `coastal-runs`를 **읽기 전용**으로 pull.
+wiki writer PC(이 PC)만 수행. `coastal-runs`를 **읽기 전용**으로 pull. **pull 직후 `python3 tools/scan-runs-feedback.py` 1회**(§3.3 — 미처리 피드백 유무 확인).
 
 ### 3.1 3조건 게이트 (전부 충족 시에만 promote — 2026-07-12 Codex 반영 구체화)
 [CLAUDE.md 절대규칙 #2]:
@@ -96,6 +146,22 @@ wiki writer PC(이 PC)만 수행. `coastal-runs`를 **읽기 전용**으로 pull
 - 통과분만 `experience/<topic>.md` 정식 작성. `citation_status`는 근거 확인 후 부여(자동 `verified` 금지 — [coastal-promote](CONVENTIONS.md) 패턴).
 - **출처 인용 형식**: `coastal-runs@<sha> runs/<host>/<model>/<case>/<date>/` + 구체 근거파일. run 결과의 로컬 절대경로·머신-특정 수치는 canonical(concepts/models/textbook)에 두지 않는다(#8).
 - 위키 무결성: experience 노트도 frontmatter·[[wikilink]]·validator 통과.
+
+### 3.3 run→wiki 피드백 처리 (acknowledgment 원장)
+
+§2.2 `wiki_feedback` 항목의 writer 측 처리 절차.
+
+- **원장** = `coastal-wiki/_staging/runs-feedback/ledger.yml` (위키 repo — writer 만 기록). 항목당:
+  ```yaml
+  - feedback_id: <관찰노트의 wiki_feedback id>
+    source_ref: "coastal-runs@<sha> observations/<host>/<slug>.md"
+    verdict: accepted | deferred | rejected
+    result_ref: "<반영 커밋/문서 경로, deferred/rejected 는 사유 한 줄>"
+    date: YYYY-MM-DD
+  ```
+- **스캐너** `tools/scan-runs-feedback.py --runs-root <coastal-runs 경로>`: coastal-runs 관찰노트의 `wiki_feedback` id 중 **원장에 없는 것만** 출력(무상태 — rg 수동 검색 대체, report-only).
+- **원 observation 은 수정하지 않는다** — writer 는 coastal-runs read-only(§1 소유권). 처리 상태의 SSOT 는 원장 하나.
+- 반영 규칙: `promote-candidate` → §3.1 3조건 게이트 / `suspected-error` → **G8 독립 소스 확인 후에만** canonical 반영 / `gap` → writer 판단으로 canonical 보강 또는 deferred.
 
 ## 4. 재발 방지 (오늘의 divergence 교훈)
 - 각 repo에 writer 하나 → 두 머신이 같은 repo 같은 파일을 push할 일이 없음.
