@@ -1374,7 +1374,7 @@ LLM-Wiki 4계층(L1 검색·L2 graph·L3 MCP·**L4 유지보수 루프**) 중 L4
 ## 5. 실행 하네스·순서 (명칭 T*/AP* — 기존 L1 검색/L4 감사와 충돌 회피, Codex #10; **시퀀싱 개정 2026-07-12 F-6**)
 
 - **cron/자동 loop 미사용** — 인용 검증은 사람 게이트. 기존 L4 cron 이 신규 노트 자동 감사(lint 기존재). **동시 진행 한도 = 1 트랙**.
-- **확정 시퀀스(사용자 전략 2026-07-12)**: ⑴ 거버넌스+하네스 ✅ → ⑵ T1 파일럿+게이트 ⓐ ✅ → ⑶ **T 트랙 완주** — 분모 = **15챕터 전부**(00.5~15, ch00 Intro 만 제외; **F-4 사용자 확정 = (a) 전부 이식** — 리뷰어 양측(Claude·Codex)의 (b) 도메인 축소 권고 기각, 기록) → ⑷ **실제 프로젝트 착수** — 프로젝트 안에서 ③(run 실행·provenance)·④(연구 종합) 동시 실증. **③ P0/B1 은 위키 로드맵 활성 phase 에서 제외** — 구 "Applied Study 전환 계획 v2" 는 폐기 아닌 **미래 실프로젝트 실행 템플릿**으로 보존(F-6).
+- **확정 시퀀스(사용자 전략 2026-07-12)**: ⑴ 거버넌스+하네스 ✅ → ⑵ T1 파일럿+게이트 ⓐ ✅ → ⑶ **T 트랙 완주 ✅(2026-07-17, T16)** — 분모 = **16챕터 전부**(00.5 + 01~15, ch00 Intro 만 제외; 초기 '15챕터' 표기는 산술 오기 — Codex 19회차 게이트 정정. **F-4 사용자 확정 = (a) 전부 이식** — 리뷰어 양측(Claude·Codex)의 (b) 도메인 축소 권고 기각, 기록) → ⑷ **실제 프로젝트 착수** — 프로젝트 안에서 ③(run 실행·provenance)·④(연구 종합) 동시 실증. **③ P0/B1 은 위키 로드맵 활성 phase 에서 제외** — 구 "Applied Study 전환 계획 v2" 는 폐기 아닌 **미래 실프로젝트 실행 템플릿**으로 보존(F-6).
 - Codex 게이트: ⓐ 완료(MODIFY→반영) ⓒ 배치(~4챕터)마다 ⓓ AP 규약 확정 시. 같은 스레드 `--resume`.
 - **거버넌스 moratorium(F-5)**: 신규 규칙은 기본 동결 — 기존 규칙(절대규칙·G1-G9·§8.1) 훅 강화로 대응. 기존 규칙으로 표현 불가능 + 반복 사례 확인 시에만 adversarial gate 경유 신설.
 
@@ -1384,3 +1384,59 @@ LLM-Wiki 4계층(L1 검색·L2 graph·L3 MCP·**L4 유지보수 루프**) 중 L4
 - 2026-07-12 Codex 3회차 = 게이트 ⓐ(T1 파일럿+lint): **MODIFY** → 필수 6건 반영(cac8be1) — T1 인용 정밀화(진행파 p.78 정정·선형화 페이지 분리·residue 2건 해소)·lint 강제/실존성/HEAD scope guard.
 - 2026-07-12 Codex 5회차 = **② 모델분석 레이어 표본 재검증(사용자 지시)**: **MODIFY** — 표본 anchor 대부분 정확(ADCIRC NFFR·EFDC CALUVW·XBeach wet/dry·SWASH solvers 전부 raw 일치). ⚠높음 2건: **SWASH 종결**(swashtech Ch2/5 비코어 판정이 자기 자료와 모순 — 보존성·mimetic 재판정 open)·**SWAN 종결**(swanmain 실질 로직 존재 + swan-foundation 은 source coverage 부적격 — C/S 재분류 open). 중간: xnl4=선택형 core physics 재분류·Delft3D chkadv 인용 라인 정정(주석→실호출 trisol.f90:2250,2260,3336,3346·z_trisol 2회 1923,2895). 낮음: XBeach 형태학 재판정 범위 wetz 한정·★'docs ln 오염' finding 은 **검증 도구 오류(rg -r 치환 플래그)로 판명 — 철회**(적대 검증이 검증자 오류를 적발한 사례). 구조 취약점 6패턴 기록: flag 소진≠coverage·S/T 분류의 파일 역할 편향·자기참조 closure(cross-model↔model note 순환)·anchor 드리프트·overview 의 S-tier 재사용·작성-검증 주체 미분리. 낮음·중간 즉시 반영, 높음 2건 = 레저 ⚠재검토 open.
 - 2026-07-12 Codex 4회차 = 총평 수정안 F-검토: F-1 MODIFY(count-notes+--check)/F-2 APPROVE(lint 회귀테스트)/**F-3 REJECT**(동일 layer 전면 금지 과함 → ①→① 유도 의존 허용·claim 복제 금지·순환만 금지)/**F-4 (b) 권고 → 사용자 (a) 확정**(16챕터 전부 — 기각 기록)/F-5 MODIFY(moratorium 형)/F-6 APPROVE(로드맵-전략 모순 제거) + 신규 F-7(모델 종결 freshness 수명주기 — snapshot 판정 명시·사용 직전 upstream delta 확인)·F-8(validate-all 단일 진입점, L4 와 구현 분리 유지)·F-9(ledger 이원화 유지·INDEX 얇은 색인). 전 항목 반영 커밋 참조.
+
+# 위키 시스템 개선 라운드 R1 (2026-07-17, T트랙 완주 직후 점검)
+
+## 트리거·상태
+
+- **T트랙 16/16 완주**(2026-07-17, T1~T16 + Codex 게이트 19회) — 4-레이어 ① 이론 이식 종결. 시퀀스 ⑶ 완료 → ⑷ 실프로젝트 착수 가능 상태.
+- 완주 직후 시스템 전수 점검(사용자 지시) 결과: validator·원장·L4 cron·훅 전부 정상 / quick-win 소진 완료(L4 패치 4건 게이트·swan-action-balance 정정·pandoe-edge-2004 서지 확정·inbox=이미 클린 확인) / **구조 개선 후보 4건** 잔존 — 본 섹션이 그 계획. F-5 moratorium 준수: 아래는 신규 거버넌스 규칙이 아니라 **기존 규칙(G9·절대규칙 #1·#5)의 도구·훅 강화**이며, 유일한 규약성 변경(I-1 frontmatter 필드)은 본 adversarial gate 경유.
+
+## I-1. 단언 집계 frontmatter + compact claim manifest (지표 오류 재발 방지 — Codex 20 반영판)
+
+- **문제**: 게이트 18·19회차 연속 원장 지표 불일치(T15 41/32/9→43/33/10, T16 34/17/16→36/19/16, 완주 분모 15→16). ★Codex 20 진단: 근본 원인은 산술이 아니라 **매핑 부재**(어떤 단언이 어느 처분인지 재현 불가) — 잘못된 합계도 산술식은 통과할 수 있음. 따라서 집계 lint 는 **Tier-0 방어일 뿐 근본 해법 아님**.
+- **F-5 관계(정직 기술)**: frontmatter 필수 필드 추가는 도구 강화가 아니라 **좁은 범위의 신규 스키마 규칙**임 — 반복 사례(게이트 2회 연속 적발) + 본 adversarial gate 경유로 F-5 예외 조건 충족.
+- **설계**:
+  - (a) **집계 4필드**(Tier-0): `claims_total`·`claims_attached`·`claims_dropped`·`claims_source_needed`. **모집단 정의 고정**: 최종 처분 기준 원자 단언 전체 = 원 MDX 분해 단언 + 게이트 복원·보강 단언 포함(총계는 처분 시점 기준, 삭제/미이식=dropped 로 통합). `claims_source_needed` 는 본문 in-text source-needed 토큰 수와 동일 모집단.
+  - (b) **compact claim manifest**(근본): `textbook/notes/claims/<note>-claims.yml` — 행당 `id·claim(한 줄)·disposition(attached|dropped|source-needed)·anchor(source_id p.N | 사유)`. **T15·T16 + 향후 신규/재검토 노트 필수**, T1~T14 는 `claims_basis: legacy-ledger` 표시(재분해 안 함 — 미검증 집계를 SSOT 로 세탁 금지, 해당 노트를 다시 열 때 매핑 백필).
+  - (c) **lint** `tools/validate-claims.py` + `.sh` wrapper(validate-all 은 `.sh` 배열 디스패처): ①산술 ②`claims_source_needed>0 ↔ has_source_needed` ③layer:1 필드 누락 실패 ④`claims_basis: claim-manifest` 인 노트는 manifest 실존 + 처분별 카운트가 frontmatter 와 일치 ⑤staged 모드 지원 + 회귀테스트(음수·누락·manifest 불일치).
+  - (d) **드리프트 규칙 수정**: '불일치 시 frontmatter 우선' 폐기 — **불일치는 곧 실패**(lint 가 manifest↔frontmatter 상호 대조). 원장 표는 표시용 서사.
+  - (e) **count-notes --check 확장**: theory 실측 수 == THEORY-LEDGER 노트 행 수(16) 검사 + INDEX 잔존 '15챕터' 표기 정정.
+- **L4 관계(F-8 분리 유지)**: 의미 검증(단언 분류의 타당성)은 validate-all 에 넣지 않음 — **L4 감사 스코프에 `textbook/notes` 추가**(select_audit ROOTS 확장)로 대응.
+
+## I-2. OCR 훼손 미러 — 제자리 페이지 수선 + sidecar manifest (Codex 20: extracts/ 방식 폐기)
+
+- **전제 갱신(2026-07-17)**: 사용자 원 PDF 19권 제공(로컬 아카이브) — ②MST p.765(5π/16→**5π/8 실측**, ch10 해소 커밋 caf37a2) ③holthuijsen Eq.9.3.29(**정확식 실측**, ch11 해소 커밋 5864735) 는 노트 측 이미 해소. 남은 것 = **미러 자체의 수선**(후속 검색·재검증 무결성).
+- **방식(Codex 대안 채택)**: ~~extracts/ 보조 발췌~~ **폐기** — FTS 가 `textbook/md/**/*.md` 전체를 색인해 중복 히트 발생 + sources.yml 단일 filename 구조와 충돌(G8c). 대신: 기존 미러의 해당 `---PAGE-N---` 블록만 **제자리 수선**(원 PDF 충실 전사로 교체) + **비색인 sidecar** `textbook/md/REPAIRS.yml` 에 `source_id·pdf_sha256·page·수선 전후 내용 hash·근거(원 PDF 직접 실측)·일자` 기록. 다른 페이지 앵커 불변 — 수선 페이지 인용만 재검증.
+- **페이지 기준 확정(I-7 선행조건 승격)**: canonical 인용의 `p.N` = **미러 `---PAGE-N---` 마커 번호**가 기본 의미(PDF 페이지와 일치). 인쇄 페이지를 쓰는 예외(구세대 노트, `page_offset_applied`·`pages` 필드 보유)는 인벤토리로 관리 — 파일 내 명시가 없으면 마커 기준.
+- **van-rijn(분리)**: 690p 빈 껍데기는 페이지 수선이 아니라 **전권 재추출 + 품질평가**가 필요한 별도 배치 작업(R1-VR) — 원 PDF 보유 확인됨, opendataloader-pdf 시험 추출 → 품질 판정 → 전권 재생성 여부 결정. 이번 라운드 비대상.
+
+## I-3. source-needed 소진 — 코퍼스 확장 (사용자 게이트, Codex 20 정밀화)
+
+- **scope 정정**: 'source-needed 40파일' → 실측 기준 구분: `citation_status: source-needed` 40파일 / `has_source_needed: true`(verified + disclosed 갭) 70여 파일 — 소진 대상 산정은 라운드 착수 시 실측.
+- **서지 주의**: stewart 가 직접 인용하는 판은 **Kundu (1990) Fluid Mechanics** — 이후 판(Kundu & Cohen)을 쓸 경우 정확한 저자·판·연도로 별도 source_id 확정. 한 권으로 일괄 해소 가정 금지 — **TOC/페이지 사전 대조 후 claim 별 승격**.
+- **상태**: blocked-on-user(PDF 제공) — 제공 전까지 disclosed 유지(G9 적합). ※textbook 19권 PDF 는 확보됐으나 Kundu 는 미보유.
+
+## I-4. 리더 머신 commit guard (Codex 20: '단일 writer 가드'가 아닌 '커밋·push 사고의 2차 방어'로 명칭 격하)
+
+- **한계 명시**: ADCIRC 사건의 본체(미커밋 편집·dirty pull)는 pre-commit **이전** 단계라 이 훅으로 못 막음. 이 항목이 막는 것 = 리더에서의 **실수 커밋**(→push→divergence)뿐.
+- **설계(Codex 반영)**: `tools/install-hooks.sh --writer|--reader` — 역할 파일은 `git rev-parse --git-path wiki-role` 로 탐지(worktree 호환). **리더 설치는 역할 미지정 시 실패**(fail-open 방지), 기존 clone 은 명시적 legacy(역할 파일 부재 = 검사 skip, 경고 1줄). pre-commit 최상단: role==reader → 커밋 거부. 우회 env `COASTAL_WIKI_ALLOW_READER_COMMIT=1` 는 유지하되 **stderr 감사 흔적**(굵은 경고 + 사유 입력 권장) 필수.
+- **편집 단계 방어(별도 층)**: 리더 clone 에 read-only 지시 파일(`CLAUDE.md` 는 repo 공유라 이미 writer 규칙 포함 — 리더 로컬 `.claude/CLAUDE.local.md` 권고를 동기화 절에 문서화) + 필요시 읽기전용 마운트는 사용자 운영 선택. "GitHub 서버측 강제 불가" 단정 삭제.
+- **회귀테스트**: writer/reader/미지정/worktree/`--no-verify` 케이스.
+
+## 이번 라운드 승격 (Codex 20)
+
+- **I-6a SWAN·SWASH 상태 라벨 정직화**: AUDIT-LEDGER·INDEX 가 '종결'과 '⚠재검토 open' 을 동시 표기 중 → **"코드축 종결 · 문서축 provisional(재검토 open)"** 로 라벨 정정(심층 재검토 자체는 backlog 유지).
+- **FTS freshness**: 훅이 post-merge/post-checkout 만 재색인 — writer 의 일반 commit 후 인덱스 stale. **post-commit 재색인 훅 추가** + 인덱스 manifest 에 `indexed_git_sha` 기록(불일치 시 자동 재빌드는 후속).
+- **L4 스코프**: select_audit `ROOTS` 에 `textbook/notes` 추가(theory 노트도 일일 감사 순환 진입).
+
+## backlog (이번 라운드 비대상)
+
+- **I-5 폐기·재정의**: 'L4 재순환 정책 미정의'는 오진 — select_audit 이 이미 변경분(blob) 우선 + 최고령 회전을 구현(실측 대상 471·ledger 122·changed 363). 필요 시 'N=8/일·최대 재감사 간격 SLO' 재조정 항목으로만 유지.
+- **I-6 본체**: SWAN·SWASH 문서 축 심층 재검토(보존성·mimetic 등) — 별도 콘텐츠 세션.
+- **I-7 본체**: 구세대 노트 페이지 표기 전수 통일 — 비용 과대, `page_offset_applied` 인벤토리 + 발견 시 개별 명기(기준 정의는 I-2 에서 확정).
+- **R1-VR**: van-rijn 전권 재추출 배치(원 PDF 보유 확정) — 품질 시험 후 판정.
+
+## 검증 이력
+
+- 2026-07-17 Codex adversarial review 20회차(resume): **전 항목 MODIFY** — I-1 '산술 lint=근본 해법' 반박(매핑 부재가 원인 → compact claim manifest 추가·frontmatter 우선 규칙 폐기·모집단 정의 고정·validate-all .sh 디스패처 호환·count-notes theory parity·F-5 정직 기술) / I-2 extracts/ 방식 REJECT 급 결함 적발(FTS 중복 색인·G8c 위반) → 제자리 수선+sidecar 로 교체, van-rijn 분리 / I-3 Kundu 1990 서지 정밀화·claim 별 승격 / I-4 '단일 writer 가드' 과대 명칭 격하(미커밋 편집은 못 막음)·fail-open 제거·worktree 호환 / I-5 오진 판정(기구현 확인, 실측 471/122/363) / I-6 라벨 정직화 승격 / 신규 2건 적발: **L4 스코프에 textbook/notes 누락·FTS post-commit 재색인 부재**. 본 개정판이 반영 결과. 구현 커밋은 아래 기록.

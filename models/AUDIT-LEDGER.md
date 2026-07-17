@@ -36,14 +36,14 @@ purpose: "사용자 지시(2026-06-16) '모든 모델은 모든 문서·코드�
 
 | 모델 | 코어 소스파일 | 코어 검수 | 문서(PDF) | manual-notes | 우선순위 |
 |---|--:|:--:|--:|--:|:--:|
-| **SWASH** | 160 | ✅ 21 노트 (전수 + linear/unstructured-solvers 2026-07-04 + **핀포인트 4갭 소스직독 해소 2026-07-12**) | 2 | ✅ 2 | ✅ 종결(2026-07-12) **⚠재검토 open**(Codex 재검증: swashtech Ch2/5 = 보존성·mimetic 코어 후보 — §1 참조) |
+| **SWASH** | 160 | ✅ 21 노트 (전수 + linear/unstructured-solvers 2026-07-04 + **핀포인트 4갭 소스직독 해소 2026-07-12**) | 2 | ✅ 2 | ✅ **코드축 종결**(2026-07-12) · **문서축 provisional — ⚠재검토 open**(Codex 재검증: swashtech Ch2/5 = 보존성·mimetic 코어 후보 — §1 참조; 라벨 정직화 R1 I-6a 2026-07-17) |
 | **Delft3D** | engines_gpl 3,503 (+utils) | ✅ 48 노트 (엔진 C + utils S, 실측 2026-07-12) | 53 | ✅ 11 (매뉴얼+도구) | ✅ **종결**(2026-07-12; FM θ 0.55·ADI CFL 경고체계·z_turclo 동형 3갭 해소, §2 판정) |
 | **ROMS** | roms/ROMS ~900 | ✅ 37 노트 (4D-Var suite + 2026-07 심화, 실측) | 10 | ✅ 4 (+Exercise 카탈로그) | ✅ **종결**(2026-07-12; flag 0건 판정, §3) |
 | **FUNWAVE** | TVD 38 + GPU 41 | ✅ 11 노트 (wk-data2d·build-blackwell 포함 실측) | 39 | ✅ 3 (+검증 카탈로그) | ✅ **종결**(2026-07-12; ★Cd 기본 0.0 마찰 off 갭 해소) |
 | **ADCIRC** | adcirc/src 56 (+gahm·asgs) | ✅ 38 노트 (정화 2026-06-18 + VSSOL 2026-07-11 + **NFFR flux 경계 2026-07-12 사용자 지목 보강**) | 98 | 21 + web-refs(논문 30) | ✅ **종결**(2026-07-11; 종결 후 보강 허용) |
 | **EFDC** | 264 (+GVC 301 legacy S) | ✅ 38 노트 (+GVC legacy·**CALUVW 전단솔버 2026-07-11 = 마지막 코어 갭**) | 6 | ✅ 9 (+Training/Grid·Ch5/Ch6 cross-walk) | ✅ **종결**(2026-07-11; GVC 불요·GOTM T티어 판정) |
 | **XBeach** | 118 | ✅ 33 노트 (intrawave 2026-07-07 포함 실측) | 9 | ✅ 4 | ✅ **종결**(2026-07-12; eps·wetz 산정식 갭 해소) |
-| **SWAN** | 77 | ✅ 29 노트 (58파일 커버리지 감사 8후보 전원 기작성 + swancom1 crosswalk 2026-07-04) | 9 | 29 | ✅ 종결(2026-07-12; §11) **⚠재검토 open**(Codex 재검증: swanmain 실질 로직·foundation 근거 부적격·xnl4 경계 — §11 참조) |
+| **SWAN** | 77 | ✅ 29 노트 (58파일 커버리지 감사 8후보 전원 기작성 + swancom1 crosswalk 2026-07-04) | 9 | 29 | ✅ **코드축 종결**(2026-07-12; §11) · **문서축 provisional — ⚠재검토 open**(Codex 재검증: swanmain 실질 로직·foundation 근거 부적격·xnl4 경계 — §11 참조; 라벨 정직화 R1 I-6a 2026-07-17) |
 | **Celeris** | WebGPU JS+CUDA | ✅ 9 노트 | 3 | 1 + web-refs(Lynett 2026) | ✅ **종결**(2026-07-12; breaking 계수·FrictionCalc·dt 정적 3갭 해소) |
 | **SFINCS** 🆕 | src 36 (f90) | ✅ 9 노트 (전 코어 + infiltration 2026-07-07) | readthedocs + **v2.4.0 릴리스** | ✅ 5 (numerical·params-io·model-building·testbed 77케이스·changelog) | ✅ **종결**(2026-07-12; flag 0건, §12 판정) |
 | **LISFLOOD-FP** 🆕 | classic+swe+cuda (C++/CUDA) | ✅ 8 노트 (전 솔버 + mwdg2-adaptive 2026-07-07) | user manual PDF | ✅ 1 (user-manual) | ✅ **종결**(2026-07-12; tol_h 1e-3 하드코딩 갭 해소, §13 판정) |
