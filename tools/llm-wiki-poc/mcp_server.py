@@ -105,11 +105,14 @@ def t_read(args):
 
 
 def t_manifest(_args):
-    with contextlib.redirect_stdout(sys.stderr):   # never leak build() prints to JSON-RPC stdout
-        fx.ensure_index()
     meta = {**git_meta(), **fx.manifest_stats(),
             "corpus_allowlist": sorted(ALLOW),
-            "note": "read-only; results carry citation_status; default search returns any status — pass status='verified' to filter"}
+            "note": "read-only; results carry citation_status; default search returns any status — pass status='verified' to filter. wiki_ref may only cite fresh=true AND dirty_working_tree=false shas (RUNS-CHANNEL §2.4)."}
+    # fresh (Codex 22회차): index built at current HEAD. Consumer standard
+    # (RUNS-CHANNEL §2.4 ⑤) requires fresh=true AND dirty_working_tree=false
+    # before citing this sha as wiki_ref.
+    meta["fresh"] = bool(meta.get("git_sha")) and \
+        meta.get("git_sha") == meta.get("indexed_git_sha")
     return json.dumps(meta, ensure_ascii=False, indent=2)
 
 
@@ -155,6 +158,11 @@ def handle(msg):
         if not t:
             return {"isError": True, "content": [{"type": "text", "text": f"unknown tool {name}"}]}
         try:
+            # Freshness on EVERY call (Codex 22회차): a long-lived server would
+            # otherwise serve a stale index after a git pull under it. ~ms when
+            # fresh (rev-parse + one sqlite read), ~0.5s rebuild when stale.
+            with contextlib.redirect_stdout(sys.stderr):
+                fx.ensure_index()
             text = t["fn"](params.get("arguments", {}))
             return {"content": [{"type": "text", "text": text}]}
         except Exception as e:

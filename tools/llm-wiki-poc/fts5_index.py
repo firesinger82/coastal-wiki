@@ -11,7 +11,7 @@ Usage:
   python3 fts5_index.py build               # build index
   python3 fts5_index.py search "<query>" [--all] [--status verified]
 """
-import os, re, sqlite3, sys, time
+import os, re, sqlite3, subprocess, sys, time
 from pathlib import Path
 
 WIKI = Path(__file__).resolve().parents[2]          # repo root
@@ -31,6 +31,27 @@ def is_raw_dump(rel: Path):
     return len(rel.parts) >= 2 and rel.parts[0] == "textbook" and rel.parts[1] == "md"
 
 FM = re.compile(r"^---\n(.*?)\n---\n", re.S)
+
+def _git_head():
+    """HEAD sha of the wiki repo; "" when git/repo is unavailable (freshness
+    check then degrades to schema-only — never blocks search)."""
+    try:
+        r = subprocess.run(["git", "-C", str(WIKI), "rev-parse", "HEAD"],
+                           capture_output=True, text=True, timeout=5)
+        return r.stdout.strip() if r.returncode == 0 else ""
+    except Exception:
+        return ""
+
+def _indexed_sha():
+    """indexed_git_sha recorded at build time; "" on any error (→ rebuild)."""
+    try:
+        con = sqlite3.connect(DB)
+        row = con.execute(
+            "SELECT value FROM meta WHERE key='indexed_git_sha'").fetchone()
+        con.close()
+        return row[0] if row else ""
+    except sqlite3.Error:
+        return ""
 
 def frontmatter(text):
     m = FM.match(text)
@@ -81,6 +102,11 @@ def build():
         con.execute("INSERT INTO idx VALUES (?,?,?,?,?,?,?)",
                     (str(rel), path_class(rel), cs, title, body, tier, hsn))
         n += 1
+    # freshness metadata (Codex 22회차): HEAD sha at build time → ensure_index()
+    # rebuilds when HEAD moves without a reindex hook firing (e.g. hook-less
+    # clone, long-lived MCP server across a git pull). Plain table, not fts5.
+    con.execute("CREATE TABLE meta(key TEXT PRIMARY KEY, value TEXT)")
+    con.execute("INSERT INTO meta VALUES ('indexed_git_sha', ?)", (_git_head(),))
     con.commit()
     dt = time.time() - t0
     size = DB.stat().st_size / 1024
@@ -95,20 +121,32 @@ def _schema_current():
     """True iff the existing DB has the current schema (newest column present).
     Guards against stale DBs built before a schema change — otherwise queries
     referencing the new column raise OperationalError on every search.
-    has_source_needed is the newest column; its presence implies tier too."""
+    has_source_needed is the newest column; meta table is the newest schema
+    element overall (freshness metadata, Codex 22회차)."""
     try:
         con = sqlite3.connect(DB)
         cols = [r[1] for r in con.execute("PRAGMA table_info(idx)").fetchall()]
+        has_meta = con.execute(
+            "SELECT count(*) FROM sqlite_master WHERE type='table' AND name='meta'"
+        ).fetchone()[0] == 1
         con.close()
-        return "has_source_needed" in cols
+        return "has_source_needed" in cols and has_meta
     except sqlite3.Error:
         return False
 
 def ensure_index():
-    """Build the index if missing OR schema-stale. Cheap (~0.5s) so callers
-    can rebuild on startup. Rebuild-on-stale-schema lets old DBs self-heal
-    without requiring the post-merge hook (multi-machine 방식1)."""
+    """Build the index if missing, schema-stale, OR HEAD moved since the last
+    build (indexed_git_sha mismatch — Codex 22회차: sha 최신인데 검색은 구인덱스
+    방지). Cheap (~0.5s rebuild, ~ms when fresh) so callers can run it on
+    startup and per tools/call. Rebuild-on-stale lets old DBs self-heal
+    without requiring the reindex hooks (multi-machine 방식1). Dirty working
+    tree is NOT detectable here (same HEAD) — hooks/manifest dirty flag cover
+    that axis."""
     if not DB.exists() or not _schema_current():
+        build()
+        return
+    head = _git_head()
+    if head and head != _indexed_sha():
         build()
 
 def query(q, status=None, path_class=None, k=8):
@@ -152,7 +190,7 @@ def manifest_stats():
         cov["true" if hsn == "true" else "false" if hsn == "false" else "unaudited"] += c
     con.close()
     return {"doc_count": n, "citation_status": hist, "path_class": by_class,
-            "verified_gap_coverage": cov}
+            "verified_gap_coverage": cov, "indexed_git_sha": _indexed_sha()}
 
 def search(q, status=None, allow_only=True, k=8):
     rows = query(q, status=status, k=k)
