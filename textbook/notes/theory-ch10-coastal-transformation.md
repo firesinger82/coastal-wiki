@@ -6,8 +6,8 @@ depends_on:
   - textbook/notes/theory-ch08-linear-waves.md
 canonical_source: self
 citation_status: verified
-has_source_needed: true
-provenance: "교재 프로젝트 textbook-ai-data-full ch10(AI 합성 MDX, 무인용) 이식분 — 2026-07-12 원자 단언 분해·(source_id, page) 부착. 게이트 ⓒ 정정: ★회절 계보 복원 — 초판의 'Sommerfeld 1896 미확인→Penney-Price 대체' 는 오판, Sommerfeld(1896) 해·Fresnel 적분이 water-wave-mechanics p.134 에 실존(⑤), Penney-Price(1952) 정리는 p.133. 미매칭 삭제 2건(setup ~0.15Hb 크기·rip 익사 80% 통계) + 보류 1건(연안류 5π/16 폐형식 계수 — mechanics-of-sediment-transport p.765 Eq.16.30 OCR 훼손, 원 PDF 확인 대기·삭제 미확정, ⑥). rip 정의는 mechanics-of-sediment-transport p.766 부착(⑧). depends_on ch09 는 근거 의존 아님 — 탐색 강등(⑦). rip 상세·해안보호 구조물(§10.6-10.7)은 개념·설계 축 — concepts 탐색 위임. T4([THEORY-LEDGER](../THEORY-LEDGER.md)), 게이트 ⓒ MODIFY 반영 완료."
+has_source_needed: false
+provenance: "교재 프로젝트 textbook-ai-data-full ch10(AI 합성 MDX, 무인용) 이식분 — 2026-07-12 원자 단언 분해·(source_id, page) 부착. 게이트 ⓒ 정정: ★회절 계보 복원 — 초판의 'Sommerfeld 1896 미확인→Penney-Price 대체' 는 오판, Sommerfeld(1896) 해·Fresnel 적분이 water-wave-mechanics p.134 에 실존(⑤), Penney-Price(1952) 정리는 p.133. 미매칭 삭제 2건(setup ~0.15Hb 크기·rip 익사 80% 통계). ★보류 1건 해소(2026-07-17): 연안류 폐형식 = 원 PDF p.765(인쇄 p.744) 직접 실측 — Eq.16.30 $U_l=(5\\pi/8)(J/c_f)u_m\\sin\\alpha_b$ 부착, 원문 교재 '5π/16' 은 천해 근사 대입 등가형 표기로 판정(미러 OCR 훼손분, 게이트 ⓒ ⑥ 종결). source-needed 0 복귀. rip 정의는 mechanics-of-sediment-transport p.766 부착(⑧). depends_on ch09 는 근거 의존 아님 — 탐색 강등(⑦). rip 상세·해안보호 구조물(§10.6-10.7)은 개념·설계 축 — concepts 탐색 위임. T4([THEORY-LEDGER](../THEORY-LEDGER.md)), 게이트 ⓒ MODIFY 반영 완료."
 verification_method: "water-wave-mechanics(D&D) p.121·124·128-129·132-134·177·303-309·351 + holthuijsen2007 p.207·215·222·260 + mechanics-of-sediment-transport p.765-766 — textbook/md 미러 페이지 직접 대조 (2026-07-12, 게이트 ⓒ 재검증 포함)."
 note_author: "Claude Fable 5 (citation-grounded port)"
 note_date: 2026-07-12
@@ -52,7 +52,7 @@ related:
 
 ## 6. 연안 흐름
 
-- 경사 입사 쇄파의 해안 평행 운동량 전달 → **연안류(longshore current)** — 방향 규칙·발생은 water-wave-mechanics, p.177, 정량 이론 계보는 **Longuet-Higgins(1970)** (p.309, 선형 이론으로 평균류를 계산하는 §10 요약). ※폐형식 계수(원문 교재 "5π/16"): 후보 앵커는 **mechanics-of-sediment-transport p.765, Eq. 16.30**(Longuet-Higgins 운동량 접근 연안류식, "the more widely used") 이나 미러 OCR 훼손으로 계수 문자 판독 불가 — **원 PDF p.765 확인 대기, 삭제 미확정** (게이트 ⓒ ⑥). <!-- citation_status: source-needed -->
+- 경사 입사 쇄파의 해안 평행 운동량 전달 → **연안류(longshore current)** — 방향 규칙·발생은 water-wave-mechanics, p.177, 정량 이론 계보는 **Longuet-Higgins(1970)** (p.309, 선형 이론으로 평균류를 계산하는 §10 요약). **폐형식(운동량 접근)**: $U_l=\dfrac{5\pi}{8}\dfrac{J}{c_f}u_m\sin\alpha_b$ — $u_m$ = 쇄파대 질량수송 최대 수평유속, $J=h/l$ 경사, $c_f$ 저항계수; "of the two, Eq. (16.30) is the more widely used" (mechanics-of-sediment-transport, p.765, Eq. 16.30 — **원 PDF 인쇄 p.744 직접 실측 2026-07-17**, 미러 OCR 훼손분 해소). ※원문 교재의 계수 "5π/16" 은 $u_m$ 에 천해 근사를 대입한 등가형에서 나오는 표기 — MST 원문 계수는 5π/8.
 - **Rip current** = 집중된 외해향 흐름 — 쇄파선 통과 후 부채꼴로 확산·소멸, 800 m 이상 가능. 파고 의존적 setup 의 연안 방향 불균일(고파고 쇄파대→저파고 쇄파대 흐름 수렴)이 외해 방출을 만듦 — 기구 규명은 Bowen & Inman (mechanics-of-sediment-transport, p.766). 상세·한국 연안 사례는 `concepts/rip-currents/` (탐색 위임; 원문 교재의 "익사 80%" 통계는 무출처라 미이식).
 
 ## 7. 연결

@@ -52,7 +52,7 @@
 | [theory-ch07-vorticity.md](textbook/notes/theory-ch07-vorticity.md) | water-wave-mechanics·stewart-physical-ocean | **verified** (T14 — 와도 ω=2Ω·Kelvin 보존·★planetary vorticity(Coriolis)·기초 00.5-07 완결) |
 | [theory-ch08-linear-waves.md](textbook/notes/theory-ch08-linear-waves.md) | water-wave-mechanics·holthuijsen2007 | **verified** (T1, 게이트 ⓐ 통과) |
 | [theory-ch09-nonlinear-spectra.md](textbook/notes/theory-ch09-nonlinear-spectra.md) | holthuijsen2007·water-wave-mechanics | **verified** (T3, 게이트 ⓒ 반영 — ★Hasselmann 연도 정정) |
-| [theory-ch10-coastal-transformation.md](textbook/notes/theory-ch10-coastal-transformation.md) | water-wave-mechanics·holthuijsen2007·mechanics-of-sediment-transport | **verified** (T4, 게이트 ⓒ 반영 — ★Sommerfeld 계보 복원·5π/16 source-needed 1건) |
+| [theory-ch10-coastal-transformation.md](textbook/notes/theory-ch10-coastal-transformation.md) | water-wave-mechanics·holthuijsen2007·mechanics-of-sediment-transport | **verified** (T4, 게이트 ⓒ 반영 — ★Sommerfeld 계보 복원·★5π/16 보류 해소=원 PDF 실측 5π/8 Eq.16.30, source-needed 0) |
 | [theory-ch11-spectral-wave-modeling.md](textbook/notes/theory-ch11-spectral-wave-modeling.md) | holthuijsen2007 | **verified** (T15, 게이트 18회차 반영 — 첫 claim-level 분해: action balance·3세대 소스항만 ①, SWAN 구현은 models/SWAN 링크·★Komen '1세대' 오류 정정·★TG83 p.92-93 복원) |
 | [theory-ch12-tides.md](textbook/notes/theory-ch12-tides.md) | sea-level·stewart-physical-ocean | **verified** (T2 — ★원문 연도 오기 2건 정정·첫 ①→① 의존) |
 | [theory-ch15-coastal-ocean-modeling.md](textbook/notes/theory-ch15-coastal-ocean-modeling.md) | stewart-physical-ocean·sea-level·coastal-structures-design·pando-2004 | **verified**·source-needed 1 (T16, 게이트 19회차 반영 — 정수압·primitive eq·σ-좌표·spin-up·RMSE·잔류류만 ①, EFDC 구현은 models/EFDC 링크. **T트랙 16/16 완주**) |
