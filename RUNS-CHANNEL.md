@@ -38,17 +38,17 @@ coastal-runs/
 ### 2.2 관찰 노트 스키마 (experience 3조건에 1:1 매핑)
 ```yaml
 ---
-model: EFDC | ROMS | Delft3D | SWAN | SWASH | ADCIRC | XBeach | SFINCS | ...
+model: EFDC | ROMS | Delft3D | SWAN | SWASH | ADCIRC | XBeach | SFINCS | custom-ML(<한줄 설명>) | ...  # 물리모델 외 ML emulator·커스텀 코드도 허용 — custom-ML 은 설명 필수 (P0 F1, 2026-07-17)
 version: "12.4 (sha 3ed76b6)"        # 모델 버전 — 재현성
 case: <케이스명>                       # 예: jpm-rmax-sigma
 host: <계산머신 hostname>
 date: 2026-07-06
 evidence:                             # ★객관 데이터 근거 파일 (repo-상대 경로)
   - runs/<host>/EFDC/<case>/2026-07-06/metrics/peak.csv
-repeat_count: 1                       # ★반복 관찰 횟수 — 독립 케이스만 계수(동일 설정 단순 재실행은 1회, 2026-07-12 Codex 반영)
+repeat_count: 1                       # ★반복 관찰 횟수 — 독립 케이스만 계수. 동일 설정 단순 재실행 = 1회(2026-07-12 Codex). ★autoresearch/최적화 루프 내 N회 실험도 동일 데이터셋이면 1 케이스 — 독립 계수는 다른 기간·정점군·도메인일 때만 (P0 F3, 2026-07-17)
 reproducible: true                    # ★setup/+sha로 재현 가능? 결손 시 false + 사유(허위 재현성 금지)
 status: draft-observation             # 계산머신은 항상 draft. verified 부여 금지(=writer 몫)
-wiki_ref: "coastal-wiki@<sha> models/ADCIRC/source-analysis/adcirc-nffr-periodic-flux-boundary.md §4"  # ★setup 근거로 인용한 위키 노트 — 커밋 sha+경로·절 고정(노트 개정 드리프트 방지, 2026-07-12)
+wiki_ref: "coastal-wiki@<sha> models/ADCIRC/source-analysis/adcirc-nffr-periodic-flux-boundary.md §4"  # ★setup 근거로 인용한 위키 노트 — 커밋 sha+경로·절 고정(노트 개정 드리프트 방지, 2026-07-12). ★위키 무인용(탐색적) 셋업은 "none (탐색적 — 근접 canonical: <경로>)" 로 명시 — 공란 금지 (P0 F2, 2026-07-17)
 exec:                                 # ★재현성 증거 (manifest.sha256 은 존재 증명일 뿐 — 재생성 정보, 2026-07-12)
   cmd: "<실행 명령>"
   model_sha: "<모델 binary/source sha>"
