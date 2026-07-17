@@ -48,6 +48,7 @@ purpose: "사용자 지시(2026-06-16) '모든 모델은 모든 문서·코드�
 | **SFINCS** 🆕 | src 36 (f90) | ✅ 9 노트 (전 코어 + infiltration 2026-07-07) | readthedocs + **v2.4.0 릴리스** | ✅ 5 (numerical·params-io·model-building·testbed 77케이스·changelog) | ✅ **종결**(2026-07-12; flag 0건, §12 판정) |
 | **LISFLOOD-FP** 🆕 | classic+swe+cuda (C++/CUDA) | ✅ 8 노트 (전 솔버 + mwdg2-adaptive 2026-07-07) | user manual PDF | ✅ 1 (user-manual) | ✅ **종결**(2026-07-12; tol_h 1e-3 하드코딩 갭 해소, §13 판정) |
 | **CADMAS-SURF** 🆕 | 4 시뮬 ~1255 (f/f90) | ✅ 17 노트 (**코드 100% 포섭**: C티어 13(entrapped-air 포함) + S티어/커버리지 4) | **26 PDF 전수** | ✅ 5 (SURF3D·2F·STR·AGENT 영문 cross-confirm + 카탈로그) | ✅ **종결**(2026-07-12; 잔여=일문매뉴얼 중복·바이너리 3툴 내부·LICENSE 부재 — 전부 disclosed 비코어 판정) |
+| **ShorelineS** 🆕 | functions 136 (.m) | 🟡 1 노트 (architecture-map — 골격·분모 확정, deep SA 후속) | 3 PDF (Frontiers 2020·ICEC2018·FAQ, repo doc/ 동봉) | ⬜ | 🟡 **신설 2026-07-17**(§14 — 사용자 지시 "모델 분석에 ShorelineS 추가") |
 
 > **전수 검수 완료 (2026-06-16~18, workflow 7회 · 66 신규 노트)**: ~~SWASH·Delft3D engines·ROMS 4D-Var·핵심 매뉴얼 10종~~ + ~~polish(Delft3D utils·EFDC-GVC·도구/Training 매뉴얼·ADCIRC 30논문·Celeris·ROMS Exercise·FUNWAVE 검증)~~ ✅. 모든 단언 file:line/page 인용 + 적대 검증 통과(9건 실오류 적발→수정). **신규 모델 2(2026-06-18)**: SFINCS(Deltares compound flooding)·LISFLOOD-FP v8.2(Bristol/Sheffield 침수) — README+architecture+web-refs+manifest 생성, **모듈/솔버 deep source-analysis 는 후속 workflow**(SWASH 패턴). **잔여(선택적)**: Delft3D Library Tables·course PDF, ~~EFDC-GVC 심층~~(**불요 판정 2026-07-04** — DSI 공식 비권장·무지원 + repo 동결 2021-11 sha 68dc93f + mainline 12.4 SGZ 가 후속 통합 구현 + [efdc_gvc_legacy](EFDC/source-analysis/efdc_gvc_legacy.md) verified 로 계보·구조·SGZ 대조 기커버. EFDC+ 버전 provenance 확정: **12.4**, aaefdc.f90:22, sha 3ed76b6 — manifest 참조), ~~신규2 모델 deep~~(SFINCS·LISFLOOD-FP 완료 2026-06 확인), 양호모델 추가 심화.
 
@@ -343,6 +344,13 @@ Celeris-WebGPU(JS + .wgsl/.cu compute shader). boussinesq-solver·breaking·fv-r
 **종결 판정(2026-07-12)**: 마지막 cross-model flag 해소 — cuda/adaptive `tol_h`=**1e-3 하드코딩**(SolverParams.h:15, parfile 미노출 — tol_q 데드 파라미터와 같은 계열, classic DepthThresh 와 별개 변수·동값). 침수노출 대조노트 미커버 잔여 0. ★기록 보존 finding: maxes.qy copy-paste 버그(get_max_scale_coeffs.cu:23, y-흐름 과소 refine — 외부 미제출, 위키만 기록 2026-07-07 결정). 잔여 매뉴얼 심화=user manual 노트가 코어 커버, 비코어 판정.
 
 ---
+
+## 14. ShorelineS 🟡 **신설 2026-07-17** (functions 136 .m / SA 1 architecture-map)
+
+- **정체**: free-form one-line 해안선 진화(Roelvink IHE Delft·Huisman Deltares, MATLAB/Octave, LGPL — LICENSE=v3 전문·소스헤더=2.1+ 병존 disclosed). 위키 유일 해안선 진화 클래스.
+- **스냅샷(audited_ref)**: git `7bf4481ab84c635033ef475fa648a1b09cf9f36b`(2025-10-07), depth-1 clone 2026-07-17. 소스: `models/ShorelineS/raw/source_code/shorelines/`(gitignore) + 외부 드라이브 아카이브 사본(로컬 관리, G8b).
+- **분모**: `functions/` **136 .m**(전수 ls). T티어 vendored = **0**(자체 구현만). C티어 후보 ≈ 40(transport 9·wave 12·coastline change·사구/스핏/양빈/조석/수로 모듈군), 잔여 S티어(prepare/get 유틸·plot·IO). 문서축 = repo `doc/` 3 PDF(기준논문 Roelvink 2020 Frontiers 7:535 — manual-notes 발췌 대상·ICEC2018·FAQ) + `ShorelineS-Publications.txt`(후속 문헌 리스트).
+- **현황**: [architecture-map](ShorelineS/source-analysis/shorelines-architecture-map.md) ✅ verified(5-phase 메인루프·trform 4공식·티어링) / deep SA ⬜ — 우선순위: ①transport.m+공식 계수(theory-ch14 CERC 대조) ②coastline_change.m(one-line 이산화) ③wave_diffraction ④스핏/월류 ⑤적응 timestep. manual-notes ⬜(Frontiers 논문·FAQ 발췌).
 
 ## 9. 검수 진행 규약
 
