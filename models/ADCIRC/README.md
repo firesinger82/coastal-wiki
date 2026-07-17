@@ -11,6 +11,7 @@
 - **GitHub**: [adcirc/adcirc](https://github.com/adcirc/adcirc), [adcirc/adcircpy](https://github.com/adcirc/adcircpy), [adcirc/adcirc-testsuite](https://github.com/adcirc/adcirc-testsuite)
 - **소스 위치 (본 위키)**: `raw/source_code/adcirc/` (Fortran core) + `adcirc-testsuite` + `adcircpy` (Python) + `gahm` (vortex parametrization) + `asgs` (forecast system) + `StormEvents` + `FigureGen`
 - **공식 메뉴얼**: `raw/manuals/pdfs/` 98 PDFs (workshops, papers, theory) + Luettich & Westerink (2004) "Formulation and Numerical Implementation of the 2D/3D ADCIRC" + 공식 wiki mirror
+- **공식 문서사이트 미러**: https://adcirc.github.io/adcirc/ (Sphinx) → md 150편 + SITE-INDEX 색인 (2026-07-14 취득, rst→gfm 무손실 변환; 위키 밖 로컬 아카이브 — [manifest.md](manifest.md) docs-site 절 참조)
 - **공식 교과서**: Pugh "Tides, Surges and Mean Sea-Level" (`source_id: sea-level`, [`textbook/md/sea-level.md`](../../textbook/md/sea-level.md)) — storm surge 이론 기반
 - **사용 도메인**: 2D/3D barotropic ocean circulation — 조석·폭풍해일·연안 흐름
 - **격자**: unstructured triangular finite element mesh (`fort.14`)
