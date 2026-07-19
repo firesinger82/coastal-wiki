@@ -87,9 +87,10 @@ def verdict_for(cs, n_unsourced, has_claims):
 
 
 def main():
-    raw = sys.stdin.read()
     if "--in" in sys.argv:
         raw = Path(sys.argv[sys.argv.index("--in") + 1]).read_text()
+    else:
+        raw = sys.stdin.read()
     data = json.loads(raw)
     now = datetime.now()
     today = data.get("date") or now.strftime("%Y-%m-%d")
@@ -127,6 +128,10 @@ def main():
             "audited_at": now.isoformat(),
             "n_unsourced": len(unsourced),
         }
+        # V1.1 값-검증 필드 (있을 때만 — SKILL.md 값-검증 표본 절)
+        for k in ("value_checks", "value_mismatches", "source_unavailable"):
+            if k in f:
+                ledger[f["path"]][k] = f[k]
     rows.sort(key=lambda r: (SEVERITY.get(r["verdict"], 9), r["path"]))
 
     # ── 리포트 ──
@@ -159,6 +164,14 @@ def main():
             tag = "🩹 제안 패치(미적용)" if pn["status"] == "PATCH" else "✍ 수동 처리 필요"
             out.append(f"  - {tag}: {pn.get('rationale','')}"
                        + (f" — {pn['why']}" if pn.get("why") else ""))
+        # V1.1 값-검증 표본 결과 (있을 때만)
+        if r.get("value_checks"):
+            for vc in r["value_checks"]:
+                mark = "❌ VALUE-MISMATCH" if vc.get("mismatch") else "✓"
+                out.append(f"  - 값검증 {mark} [{vc.get('claim_id','?')}] {vc.get('claim','')} ← {vc.get('source_ref','')}"
+                           + (f" — {vc['note']}" if vc.get("note") else ""))
+        if r.get("source_unavailable"):
+            out.append(f"  - 값검증 접근불가(source_unavailable): {r['source_unavailable']}건")
         out.append("")
 
     # ── 제안 패치 파일(미적용) ──
