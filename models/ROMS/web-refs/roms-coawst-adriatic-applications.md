@@ -103,6 +103,6 @@ COAWST (Coupled Ocean-Atmosphere-Wave-Sediment Transport) 는 ROMS 를 해양 �
 이 논문은 **review/overview** 성격이라 본문에 관측 대비 정량 skill 이 없다. 소재는 아래와 같고, **핵심 1건은 2026-07-19 해소**:
 
 - ✅ **파랑-해류 결합(WCI) 정량 검증 — 해소**: **Benetazzo et al. (2013) Ocean Modelling 70:152-165** 출판본 전문 확보 → [`roms-coawst-wci-benetazzo-2013.md`](roms-coawst-wci-benetazzo-2013.md) 신설. Acqua Alta·위성 대조 Table 1(Hs RMSD 0.20 m·CC 0.90 등) + 2WC/UNC 차 정량(Bora 0.2 m·계절최대 0.6 m·유속 CC 0.70→0.75). ★귀속 정정도 그 노트에서 확정 — **Warner et al. (2010)(COAWST 원전)·CSTMS 명칭 모두 Benetazzo 2013 에 실제 인용**되어 있음(본 리뷰만 미인용이었던 것).
-- ⬜ **video 기반 통합 wave-current-sediment 모델 검증** = **Carniel et al. (2011)** *Oceanological and Hydrobiological Studies* 40(4):11-20 `[source-needed]` — 미확보(§3.5 Bevano 표사 정량).
-- ⬜ **EMMA hypoxia 예보 검증** = **Russo et al. (2009)** *Geofizika* 26(2) `[source-needed]` — 미확보(§3.2 생지화학 skill).
-- ⬜ THREDDS endpoint(`tds.ve.ismar.cnr.it`)·운영 forecast 현행 여부 = 2013 논문 기준, 현재 운영 상태 별도 확인 필요 `[source-needed]`.
+- ✅ **Bevano 표사·형태변화 검증 — 해소**: **Carniel et al. (2011)** *Oceanological and Hydrobiological Studies* 40(4):11-20 전문 확보 → [`roms-bevano-morphodynamics-video-carniel-2011.md`](roms-bevano-morphodynamics-video-carniel-2011.md). 격자 8~55 m·4 입도군·2010-03 Bora(Hs 3.5 m) 사례, ★ARGUS 비디오와 **사주 외해이동 약 40 m 독립 일치**. 단 저자가 검증 강도를 **정성·준정량으로 한정**(통계 skill 미산출).
+- ✅ **EMMA hypoxia 예보 검증 — 해소**: **Russo et al. (2009)** *Geofizika* 26(2):191-213 전문 확보 → [`roms-emma-hypoxia-forecast-russo-2009.md`](roms-emma-hypoxia-forecast-russo-2009.md). E1 부이 2년 대조 — 수온 RMSE 0.90 °C·CC 0.993 / 용존산소 RMSE 1.67 mL/L·CC 0.730, ★오차 대부분이 평균편차(MB)라 bias 보정이 실효.
+- ⬜ THREDDS endpoint(`tds.ve.ismar.cnr.it`)·운영 forecast 현행 여부 = 2013 논문 기준, 현재 운영 상태 별도 확인 필요 `[source-needed]`. (운영 현황이라 위키 canonical 대상 아님 — 케이스 구축 시 확인 항목)
