@@ -109,7 +109,8 @@ verification_date: 2026-05-21
 
 | 도구 | 기능 | 출처 |
 |---|---|---|
-| **pyplosa** | sediment grain size analysis | GitHub (확인) |
+| **pyDGS** | 이미지 기반 입도 분포 추정 (Digital Grain Size) | [github.com/DigitalGrainSize/pyDGS](https://github.com/DigitalGrainSize/pyDGS) |
+| **GrainSizeTools** | 입도 분포 통계·정상상태 입도 해석 | [github.com/marcoalopez/GrainSizeTools](https://github.com/marcoalopez/GrainSizeTools) |
 | Soulsby formulae (NumPy) | `02-theory.md`·`03-analysis-methods.md` 식 직접 구현 | 자체 |
 | scikit-image (수직 단면 분석) | side-scan image 처리 | open |
 

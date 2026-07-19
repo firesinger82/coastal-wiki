@@ -26,7 +26,7 @@ related:
 |---|---|---|---|
 | **NLSW (비선형 천수)** | 해석해 + FV solver | bore collapse·dam-break 유사, 이동 shoreline | 분산 무시 → surf/swash 직접. [`01 §4.2`](01-concept.md) Antuono 2010 해 |
 | **Boussinesq / Green-Naghdi** | **FUNWAVE-TVD** · COULWAVE · Celeris | 약분산 + 비선형, surf~swash. wetting-drying | [[../../models/FUNWAVE/README]] 기수록. Green-Naghdi DG = Kazhyken 2020 |
-| **비정수압 (non-hydrostatic)** | **SWASH** · XBeach-NH | 다층 비정수압, 분산·쇄파·swash | SWASH = SWAN 그룹(Zijlema·Stelling·Smit 2011), 본 위키 미수록 모델 |
+| **비정수압 (non-hydrostatic)** | **SWASH** · XBeach-NH | 다층 비정수압, 분산·쇄파·swash | SWASH = SWAN 그룹(Zijlema·Stelling·Smit 2011). ✅**본 위키 수록·전수검수** — [[../../models/SWASH/README]] (§3) |
 | **Surfbeat (IG-resolving)** | **XBeach surfbeat (XBSB)** | 단파포락+IG 해상(개별 bore 평균), runup | 효율적, storm impact 표준. [`waves/04 §4`](../waves/04-code-and-tools.md) |
 | **VOF / Navier-Stokes** | OpenFOAM(interFoam) · SPH | sheet flow·turbulence·airflow 직접 | 고비용, lab-scale swash 정밀연구 |
 

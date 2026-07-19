@@ -88,7 +88,7 @@ Source terms (Holthuijsen Ch.9 §9.3):
 
 → 외해 풍파 forcing(예: NOAA/IOWAGA WW3 글로벌 hindcast) → SWAN nested run은 일반적 표준 흐름.
 
-### 3.4 SMC nested grid boundary issue ([Issue #1600](https://github.com/NOAA-EMC/WW3/issues/1600), OPEN 2026-05-20)
+### 3.4 SMC nested grid boundary issue ([Issue #1600](https://github.com/NOAA-EMC/WW3/issues/1600), ✅**CLOSED 2026-06-15**)
 
 WW3 SMC (Spherical Multi-Cell) nested grid 운영 시 boundary point mismatch 로 인한 spurious energy bug — UK Met Office 발견 (`ukmo-rwdavies`, 2026-05-20 issue 등록, fix PR 예정). GitHub Issues API 직접 fetch (2026-05-28).
 
@@ -113,14 +113,14 @@ WW3 SMC (Spherical Multi-Cell) nested grid 운영 시 boundary point mismatch �
 
 **한국 적용 영향**:
 
-- 한국은 WW3 글로벌 → SWAN nested 흐름 (§3.3 line 106) — SWAN nested 시 boundary points 모두 sea cell 매치 검증 필요
+- 한국은 WW3 글로벌 → SWAN nested 흐름 (§3.3) — SWAN nested 시 boundary points 모두 sea cell 매치 검증 필요
 - NOAA WW3 글로벌 hindcast → 한국 SMC nested (또는 SWAN nested) 시점에 boundary mismatch 검증 권장
 
-**Status (2026-05-28)**:
+**Status (2026-07-19 갱신 — GitHub Issues API 재조회)**:
 
-- Issue OPEN, mingchen-NOAA collaborator confirmed (2026-05-20)
-- UK Met Office 의 fix PR 제출 예정 ("This issue will be addressed by the UK Met Office and a pull request will follow")
-- Fix merge 후 본 §3.4 본문 갱신 + WW3 release note 추적
+- ✅ **Issue CLOSED — `closed_at` 2026-06-15T17:00:21Z** (등록 2026-05-20, mingchen-NOAA collaborator 확인 후 UK Met Office 대응)
+- ⚠ 종료 사유·merge 된 PR 번호·수정 반영 release 는 **미확인** `[source-needed]` — 실사용 전 해당 커밋과 사용 중 WW3 버전 포함 여부 대조 필요
+- ★신선도 교훈: 2026-05-28 판이 "OPEN·fix PR 예정"으로 5주간 잔존했다. **외부 이슈 트래커 상태는 시점 종속** — 인용 시 조회일자 병기 + 사용 직전 재확인(프로젝트 freshness 규약)
 
 ## 4. XBeach
 

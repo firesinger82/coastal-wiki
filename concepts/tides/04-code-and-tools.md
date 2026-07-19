@@ -268,7 +268,7 @@ pip install utide
 
 ### 6.5 GOT — Goddard Ocean Tide (NASA GSFC)
 
-> Ray, R. D., et al. (2025). **Documentation for Goddard Ocean Tide Solution GOT5: Global Tides from Multi-mission Satellite Altimetry.** NASA Technical Memorandum NASA/TM-20250002085.
+> Ray, R. D. (2025). **Documentation for Goddard Ocean Tide Solution GOT5: Global Tides from Multi-mission Satellite Altimetry.** NASA Technical Memorandum NASA/TM-20250002085.
 >
 > Full PDF: [https://ntrs.nasa.gov/api/citations/20250002085/downloads/GOT5-TechMemo.pdf](https://ntrs.nasa.gov/api/citations/20250002085/downloads/GOT5-TechMemo.pdf)
 > NASA Earth ocean tide models: [https://earth.gsfc.nasa.gov/geo/data/ocean-tide-models](https://earth.gsfc.nasa.gov/geo/data/ocean-tide-models)
@@ -395,4 +395,4 @@ pip install utide
   - **Egbert, Bennett, Foreman (1994)** — TPXO inverse method 원조 (보강 인용)
   - **Lyard et al. (2021)** — FES2014 (preprint, 정식 게재 보강)
   - **Matsumoto, Takanezawa, Ooe (2000)** — *J. Oceanogr.* 56:567-581 — NAO 모델 doi:10.1023/A:1011157212596
-  - **Ray, R. D. et al. (2025)** — GOT5 NASA Technical Memorandum NASA/TM-20250002085
+  - **Ray, R. D. (2025)** — GOT5 NASA Technical Memorandum NASA/TM-20250002085
