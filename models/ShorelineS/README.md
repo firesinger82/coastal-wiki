@@ -2,7 +2,7 @@
 
 > **Canonical source**: 이 디렉토리(`models/ShorelineS/`)가 ShorelineS 모델의 구현·메커닉에 대한 진실의 원천. 다른 곳(concepts 등)은 여기로의 링크만 가짐.
 >
-> 🟢 **현재 상태(2026-07-17 신설 + 코어 1차 검수 동일)**: 소스 clone(sha `7bf4481ab`) + 정체카드 + **source-analysis 4노트**(아키텍처 맵·transport 7공식·coastline_change·파랑/사구/스핏 모듈) + **manual-notes 1**(Roelvink 2020 Frontiers 발췌·코드 대조) + web-refs 1 — 전부 verified. 잔여(disclosed): 회절 기하 본문·transport_mud 본문·위상 처리(merge_coastlines_mc 등) deep — [models/AUDIT-LEDGER.md](../AUDIT-LEDGER.md) §14.
+> ✅ **종결 2026-07-18** (신설 2026-07-17 익일): 소스 clone(sha `7bf4481ab`) + **source-analysis 5** + **manual-notes 2** + web-refs 1 — 전부 verified, 잔여 소진(회절 기하·mud 전문·위상 3파일·C 커버리지 판정·FAQ 발췌). 판정 근거 [models/AUDIT-LEDGER.md](../AUDIT-LEDGER.md) §14 — **13/13 전 모델 종결**.
 
 ## 정체 카드
 
@@ -35,7 +35,7 @@
 
 | 경로 | 상태 | 비고 |
 |---|---|---|
-| `source-analysis/` | ✅ 4 verified | [architecture-map](source-analysis/shorelines-architecture-map.md)(5-phase 루프·분모) · [transport-formulations](source-analysis/shorelines-transport-formulations.md)(★실분기 7종·고각도 Sphimax·적응 dt 확산기준) · [coastline-change](source-analysis/shorelines-coastline-change.md)(staggered FTCS·Bruun SLR·★groyne 자동연장) · [wave-dune-spit-modules](source-analysis/shorelines-wave-dune-spit-modules.md)(회절 Kd 2공식·Larson 사구·overwash 광선법) |
-| `manual-notes/` | ✅ 1 verified | [roelvink2020-frontiers](manual-notes/shorelines-roelvink2020-frontiers.md) — Eq.1/Eq.5·고각도·월류 코드 대조. FAQ PDF 발췌 후속 |
+| `source-analysis/` | ✅ 5 verified | [architecture-map](source-analysis/shorelines-architecture-map.md)(5-phase 루프·분모) · [transport-formulations](source-analysis/shorelines-transport-formulations.md)(★실분기 7종·고각도 Sphimax·적응 dt 확산기준) · [coastline-change](source-analysis/shorelines-coastline-change.md)(staggered FTCS·Bruun SLR·★groyne 자동연장) · [wave-dune-spit-modules](source-analysis/shorelines-wave-dune-spit-modules.md)(회절 Kd 2공식·Larson 사구·overwash 광선법) · [diffraction-mud-topology](source-analysis/shorelines-diffraction-mud-topology.md)(★rotfac 0.8 XBeach 보정·mud 농도수지 전문·위상 3파일·C 커버리지 판정 — 종결 라운드) |
+| `manual-notes/` | ✅ 2 verified | [roelvink2020-frontiers](manual-notes/shorelines-roelvink2020-frontiers.md)(Eq.1/Eq.5·고각도·월류 코드 대조) · [faq-operational](manual-notes/shorelines-faq-operational.md)(ds0 50–100 m·경계 4종·twopoints/maxangle 60°·안정화 노브) |
 | `web-refs/` | ✅ 1 | 공식 repo·사이트·논문 서지 |
-| `raw/source_code/shorelines/` | ✅ clone | sha 7bf4481ab, gitignore 로컬 |
+| `raw/source_code/shorelines/` | ✅ clone | sha 7bf4481ab, gitignore 로컬. ⚠ISO-8859+CRLF — `grep -a` 필요 |

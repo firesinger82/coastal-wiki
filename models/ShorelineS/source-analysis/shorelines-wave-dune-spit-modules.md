@@ -38,4 +38,4 @@ related:
 
 - `transport_mud.m`(200줄): 조석·파랑·바람 **연안 수량수지 기반 농도** → mud 수송·해안선 변화 + 갯벌 Bf/맹그로브 Bm/개척 Bfm 폭 변화율(헤더 :4-8). SWAN 등과 달리 점착성 해안 지형진화를 one-line 레벨에서 내장한 드문 사례.
 - `tide_1d_ana_anycomp.m`(92줄): 임의 분조(진폭 eta·위상 phi·연안파수 k·연안경사 ss)의 **해석적 1D 조류 프로파일**(h[nx,nt]·vt[nx,nt]) — TIDEPROF transport 의 유속원(transport.m:208-212).
-- **미정독 잔여**(disclosed): wave_diffraction.m 본문 기하(회절점 탐색·차폐각 — 928줄 중 헤더·계수부만 정독), transport_mud.m 본문 식, merge_coastlines_mc(690줄 위상 처리)·prepare_grid_groyne(408줄)·make_sgrid_mc(302줄 regrid) — 후속 검수 대상.
+- ~~미정독 잔여~~ → **종결 라운드(2026-07-18)에서 전량 소진**: 회절 기하 파이프라인·mud 전문·위상 처리 3파일·잔여 C티어 12파일 커버리지 판정 = [shorelines-diffraction-mud-topology](shorelines-diffraction-mud-topology.md).

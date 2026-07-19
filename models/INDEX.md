@@ -11,7 +11,7 @@
 | [FUNWAVE](FUNWAVE/) | WIP | 위상해상 fully-nonlinear Boussinesq nearshore (배치 HPC) | 직교, MPI |
 | [Celeris](Celeris/) | WIP | GPU 실시간 위상해상 확장 Boussinesq (WebGPU 브라우저) | structured, moving shoreline |
 | [CADMAS-SURF](CADMAS-SURF/) | WIP | VOF 수치파동수조 — 자유수면 RANS·내파설계 파력·월파 (CDIT/PARI) | 직교 staggered, porous body |
-| [ShorelineS](ShorelineS/) | 신설 2026-07-17 | free-form one-line 해안선 진화 — 연안표사 경사, 월~세기 (IHE Delft/Deltares, MATLAB) | 벡터 해안선(자유 이동점), 다중 섹션·스핏 |
+| [ShorelineS](ShorelineS/) | ✅ 종결 2026-07-18 | free-form one-line 해안선 진화 — 연안표사 경사, 월~세기 (IHE Delft/Deltares, MATLAB) | 벡터 해안선(자유 이동점), 다중 섹션·스핏 |
 
 새 모델 추가: `_template/` 복사 → `<model-name>/`로 이름 변경.
 
