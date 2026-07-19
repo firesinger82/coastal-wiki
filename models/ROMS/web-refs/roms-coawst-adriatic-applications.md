@@ -98,10 +98,11 @@ COAWST (Coupled Ocean-Atmosphere-Wave-Sediment Transport) 는 ROMS 를 해양 �
 
 → 한국 적용 함의: ROMS+SWAN 결합 운영체계의 reference architecture — 반폐쇄해(Adriatic ≈ 일부 한국 연안 만) 다목적 운영 사례로 참조 가능. 단 **한국 직접 적용 사례 아님(미실증)**.
 
-## 6. 미확보 정량치 (disclosed gap)
+## 6. 정량 근거 소재 (gap 해소 현황)
 
-이 논문은 **review/overview** 성격 — 아래는 본 논문 본문에 정량치가 없고 인용 하위 논문에 있음(`[source-needed]` — 하위 논문 미확보):
+이 논문은 **review/overview** 성격이라 본문에 관측 대비 정량 skill 이 없다. 소재는 아래와 같고, **핵심 1건은 2026-07-19 해소**:
 
-- **관측 대비 검증 skill metric** (RMSE·correlation 등) `[source-needed]` — NA-COAWST 파랑-해류 결합 효과 정량 = **Benetazzo et al. (2013) Ocean Modelling 70:152-165** / video 기반 통합모델 검증 = **Carniel et al. (2011)** / EMMA hypoxia 검증 = **Russo et al. (2009)**.
-- COAWST 시스템 정의·MCT 결합 상세의 원전 = **Warner et al. (2010)** (본 논문 미인용, [[roms-official-resources]] §3 교차).
-- THREDDS endpoint(`tds.ve.ismar.cnr.it`)·운영 forecast 현행 여부 = 2013 논문 기준, 현재 운영 상태 별도 확인 필요 `[source-needed]`.
+- ✅ **파랑-해류 결합(WCI) 정량 검증 — 해소**: **Benetazzo et al. (2013) Ocean Modelling 70:152-165** 출판본 전문 확보 → [`roms-coawst-wci-benetazzo-2013.md`](roms-coawst-wci-benetazzo-2013.md) 신설. Acqua Alta·위성 대조 Table 1(Hs RMSD 0.20 m·CC 0.90 등) + 2WC/UNC 차 정량(Bora 0.2 m·계절최대 0.6 m·유속 CC 0.70→0.75). ★귀속 정정도 그 노트에서 확정 — **Warner et al. (2010)(COAWST 원전)·CSTMS 명칭 모두 Benetazzo 2013 에 실제 인용**되어 있음(본 리뷰만 미인용이었던 것).
+- ⬜ **video 기반 통합 wave-current-sediment 모델 검증** = **Carniel et al. (2011)** *Oceanological and Hydrobiological Studies* 40(4):11-20 `[source-needed]` — 미확보(§3.5 Bevano 표사 정량).
+- ⬜ **EMMA hypoxia 예보 검증** = **Russo et al. (2009)** *Geofizika* 26(2) `[source-needed]` — 미확보(§3.2 생지화학 skill).
+- ⬜ THREDDS endpoint(`tds.ve.ismar.cnr.it`)·운영 forecast 현행 여부 = 2013 논문 기준, 현재 운영 상태 별도 확인 필요 `[source-needed]`.
