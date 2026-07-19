@@ -52,6 +52,8 @@ slice 의 각 파일을 읽고(`wiki_read` 또는 Read), **각 단언(assertion)
 - 해당 섹션이나 인접 문장, frontmatter `source_id`, 같은 파일 상단의 포괄 출처로 커버되면 sourced(섹션 단위 인용 허용 — CONVENTIONS §2).
 - 파일에 실질 사실 단언이 없으면(순수 안내·TOC·링크 모음) `has_real_claims=false`.
 
+**값-검증 표본 (V1.1 신설 — "출처가 있는가"에 더해 "인용 값이 원본과 맞는가")**: slice 당 sourced 단언 중 **수치·계수·라인번호가 포함된 것 최대 3건을 무작위 표본**으로 뽑아 원본(소스 file:line 직독·미러 페이지·evidence 파일)과 대조한다. 불일치 = `VALUE-MISMATCH` 플래그(UNSOURCED 와 구분, 동일하게 Adversary 컷 통과 후만 confirmed). 근거: 출처가 붙어 있어도 값 전사 오류가 실재(r_tail 0.287→0.22 혼동·TG83 사건 등 — plan.md "방법론 근거 보강" 하네스 연구 반영 B항). 원본 접근 불가(외부 논문 등)면 표본에서 제외하고 카운트만 기록.
+
 ### 3. Adversary (AI — 오탐 컷)
 
 UNSOURCED 후보마다 **반대 입장에서 refute 시도**: "사실은 이 근처/섹션 헤더/frontmatter/인접 wikilink에 출처가 있지 않은가?" refute 성공하면 그 플래그 폐기. **refute 실패한 것만 confirmed unsourced.** 불확실하면 폐기(precision 우선).
