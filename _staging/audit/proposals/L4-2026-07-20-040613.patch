@@ -1,0 +1,76 @@
+diff --git a/concepts/sediment-transport/04-code-and-tools.md b/concepts/sediment-transport/04-code-and-tools.md
+--- a/concepts/sediment-transport/04-code-and-tools.md
++++ b/concepts/sediment-transport/04-code-and-tools.md
+@@ -102,7 +102,7 @@
+ 
+ - DHI MIKE Powered 의 sediment 모듈
+ - 비점착성 + 점착성 통합
+-- 한국 항만 설계 (성남구·해양수산부) 사용 빈도 높음 — 상용 라이선스
++- 한국 항만 설계 실무 사용 빈도 높음 — 상용 라이선스 `[source-needed]` (기관·사례 원출처 미확인. 구판의 '성남구' 귀속은 항만 관할 주체로 실재 불명이라 제거)
+ - 별도 보강
+ 
+ ## 7. Python 도구
+diff --git a/concepts/storm-surge/02-theory.md b/concepts/storm-surge/02-theory.md
+--- a/concepts/storm-surge/02-theory.md
++++ b/concepts/storm-surge/02-theory.md
+@@ -3,6 +3,7 @@
+ topic: storm-surge
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "Pugh 'Tides, Surges and Mean Sea-Level' Ch 6 (textbook/md/sea-level.md p.184-230) 직접 인용 — §6:1 Weather effects, §6:3 Atmospheric pressure (eq. 6:5), §6:4 Wind stress, §6:5 Numerical modelling, §7:8 Tide-surge interaction. ADCIRC Theory (Luettich & Westerink 2004) GWCE form. textbook/md/sea-level.md line 7370 ('one millibar will produce a decrease in sea-level of one centimetre') + line 7374 (Proudman shelf model amplification) 직접 인용. §3.4 추가 (2026-05-26): arXiv:2605.03933v1 (Sathia & Giometto 2026, 제출일 2026-05-05, 카테고리 physics.flu-dyn) abstract 직접 fetch (WebFetch 2026-05-26) — 새 PBL height scaling 두 식 u_*/β (neutral) + u_*/√(βN) (stable) + 평균 2.5% relative error verbatim 인용. ADCIRC GAHM BL Vmax 환산 cross-ref 와 한국 태풍 적용 검토는 자체 분석. **§3.4.4~3.4.8 추가 (2026-05-28)**: arXiv:2605.03933v1 **full PDF 34p 직접 fetch** (curl + Read tool) — derivation eq 5-32 (Pollard 1973 P73 응용 + slab model + Ri_b closure) + LES setup Appendix A (256×256×512 grid, Bou-Zeid Smagorinsky, CFL=0.075) + Table A1 216 stratified sims + Appendix B 16 neutral/mild (Set A C_R=0.58, avg 6% error / R²=0.99 / RMSE=6.92m) + parity plot stable C_S=1.2 (R²=0.99 / bias=1.04m / RMSE=23.5m) + characteristic heights (v_max 65-85% / inflow peak 6-20% of h) + eq 41-43 R-scaling h~R^((1-n)/2) + eq 44 K_m~R^(-2n) + combined formula B1 p=4 (vs ABL p=2). Wind engineering / coastal resilience 응용 명시. 비교 expressions 구체화 (Meng 1995 / Kepert 2001 / Pollard 1973 / Sous 2013 / Zilitinkevich 2007 외 closure model papers)."
+ note_author: "Claude Opus 4.7 (1M context)"
+ note_date: 2026-05-26
+@@ -74,6 +75,8 @@
+ 
+ 배경기압 1013 mb 기준. ADCIRC 의 `PRBCKGRND = 1013.0 mb` constant (`models/ADCIRC/raw/source_code/adcirc/src/constants.F90:54`).
+ 
++> 표의 중심기압 출처: Maemi 950 hPa(한반도 영향 시, 제주 national record)는 [`05-examples.md` §1.1.1](05-examples.md) 로 verified. Hinnamnor 920 hPa 는 trajectory peak — 한반도 접근 시 약화([[khoa-annual-2022-hinnamnor-surge]] §6), KMA·JMA Best Track 원본 미확보 `[source-needed]`. 'typical 가을 태풍 970-980' 도 `[source-needed]`.
++
+ ### 2.3 동적 응답 — Proudman shelf model amplification
+ 
+ 대기압 변동이 빠르게 움직일 때 (예: 빠른 태풍) 정적 IB 보다 큰 동적 응답 가능 (Pugh §6:3, p.197 인용):
+@@ -402,7 +405,7 @@
+ - IB: $\eta_{IB} = -\Delta P_A / (\rho g)$ — (Pugh eq. 6:5, p.194)
+ - 1 mb = 1 cm: textbook/md/sea-level.md line 7370 직접
+ - Proudman amplification: $A = 1/(1 - C_A^2/gD)$ — Pugh §6:3 p.197
+-- Wind stress: $\tau_w = \rho_a C_D U^2$ — Pugh §6:4 + Garratt 1977
++- Wind stress: $\tau_w = \rho_a C_D U^2$ — Pugh §6:4 eq 6:12; $C_D$ 식은 Smith & Banke 1975 (sea-level.md:7454-7456; Garratt 귀속은 §3.1 2026-07-19 정정으로 철회)
+ - Wind setup: $\Delta\eta \propto U^2 L / H$
+ - Tide-surge interaction 3 sources — Pugh §7:8
+ 
+diff --git a/concepts/storm-surge/05-examples.md b/concepts/storm-surge/05-examples.md
+--- a/concepts/storm-surge/05-examples.md
++++ b/concepts/storm-surge/05-examples.md
+@@ -101,7 +101,7 @@
+ RampMete = 86400    ! 1 day vortex spin-up
+ WTIMINC = 3600      ! 1 h met increment
+ BLAdj = 0.9         ! standard BL adjustment
+-IM = 0              ! Garratt drag (Table 2.2 [[efdc-theory-v12-ch2-hydrodynamics]] §2.4 의 Garratt 1977 과 동일)
++IM = 0              ! 2DDI 정식화 선택자 (★drag 선택자 아님 — adcirc-3d-mode 노트·02-theory §3.1 2026-07 정정. wind drag 는 /metControl/ WindDragLimit 계열)
+ ```
+ 
+ #### Step 4: KHOA 정점 검증 (verified — 04-code-and-tools.md §4)
+diff --git a/concepts/storm-surge/07-ml-emulators.md b/concepts/storm-surge/07-ml-emulators.md
+--- a/concepts/storm-surge/07-ml-emulators.md
++++ b/concepts/storm-surge/07-ml-emulators.md
+@@ -3,6 +3,7 @@
+ topic: storm-surge
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "arxiv:2605.09036 직접 fetch (WebFetch 2026-05-26) — abstract + 메타데이터 (authors, 제출일 2026-05-09, 카테고리 cs.LG) 직접 인용. 본문 §2 의 architecture 디테일·peak-aware loss·결과·한계는 전부 abstract 인용 기반. 정량 RMSE/MAE 수치, training hindcast 모델 (ADCIRC/Delft3D/etc.), CMIP6 5개 model 구체명, US Northeast 정점 좌표/개수 등은 abstract 미명시 — full PDF read 후 보강 가능. §3 추가 (2026-05-26): arxiv:2604.20688v2 (Nader·Giaremis·Dawson·Kaiser·Mohammadiporshokooh·Kaiser 2026, 제출일 2026-04-22 v1 / 2026-04-23 v2, 카테고리 cs.LG/cs.AI, 51p) abstract 직접 fetch — GCN+GAT+LSTM bias-correction architecture · US Gulf Coast 학습 · Hurricane Idalia (2023) test · RMSE 감소율 (48h >70% / 72h >50%) verbatim 인용. §4 cross-ref 표 + §5 한국 적용 검토 (StormNet bias-correction 접근이 한국 우선) 자체 분석 [2026-06-11 재번호 후 현 §5 관계표·§6 한국적용]. **§2.6~2.16 추가 (2026-05-28)**: arxiv:2605.09036v1 **full PDF 41p 직접 fetch** (curl + Read tool) — Table 1 5 CMIP6 모델 (AWI-CM-1-1-MR / CNRM-CM6-1 / EC-Earth3 / MPI-ESM1-2-HR / MRI-ESM2-0) + Table 2 4-station RMSE/MAE (Battery 0.0337/0.0246 / Boston 0.0274/0.0203 / Lewes 0.0276/0.0208 / CBBT 0.0306/0.0235) + Table 3 5% peak (PACT vs ST-GNN ~53% reduction) + Table 4 inference 3.4-3.6s vs ADCIRC 4.5-7h + Table 7/8 cross-dataset (NCEP→GCM 0.14-0.18m vs GCM↔GCM 0.04-0.09m reanalysis-GCM gap) + Appendix A ST-GNN baseline + Appendix C peak-aware ablation. ADCIRC 모델 + TPXO9 + 4 station 좌표 + 학습 config (4×H100 batch 256 lr 0.005 300 epochs Adam wd 10^-5) + GraphSAGE + cross-attention + Transformer + horizon-query + dual-head + L_PeakAware (eq 35) verbatim 인용. Charbonnier slope loss + ρ=0.05 tail fraction 등 hyperparameter 명시. ✅ 기존 §2.6 미보강 6개 항목 모두 해소 (code/data 공개 1건만 ⚠ — corresponding author 요청 필요). **§4 추가 (2026-06-11) → full PDF 격상 (2026-06-12)**: arxiv:2603.25978v1 (Pachev·Arora·Zhao·Valseth, 2026-03-26 [cs.CE]) — 초판 abstract-level 후 **full PDF 직접 read(pdftotext, /tmp/globalLI.txt)** 로 §4.1-4.7 verified 격상. 확정: 6 IBTrACS basin(NA/EP/NI/SI/**WP**/SP — 서태평양 한국 basin 포함) / STORM×IBTrACS→ADCIRC symmetric Holland / NOAA STOFS-2D-Global mesh(12.8M node) / storm packing 15000→3000 / landfall-중심 2.5°×2.5° 128×128 grid(location-invariance 기제) / 41 입력채널(13 pres+13 wind×2+bathy+landmask) / **UNet-5** encoder-decoder C0=64 / Table 3 basin별 RMSE(WP global 연안0.34·전점0.27m) / 실태풍 NA 67 hurricane per-point ADCIRC0.22 vs UNet0.37m / code github UT-CHG/adcirc-rom + DesignSafe 공개. 섹션 재번호 동반: 기존 §4→§5(관계표)·§5→§6(한국적용)·§6→§7(후보)·§7→§8(연결). **§3 full PDF 격상 (2026-06-16)**: arxiv:2604.20688v2 **full PDF 20p 직접 fetch**(curl + pdftotext -layout, /tmp/stormnet.txt) — §3.5 미보강 7항목 전부 해소. Table 1 13 TC(학습 11 / Ian 2022 val / Idalia 2023 test) + Table 3 16 Gulf Coast gauge(NOAA-NOS/TCOON, node 8 Grand Isle LA 최다연결 9) + 그래프 구성(edge iff ρij>0.8 AND dij<500km, Pearson 상관 + haversine, weighted adj=ρij) + offset eq1(modeled−observed, 3σ outlier 제거, MinMax 누설방지 분리) + 아키텍처 MLP→GCN+GAT→2×LSTM(Fig 3) + 학습 config(Adam 200ep lr 3e-5 wd 5e-7 batch 20 past-window 42-48h, single A100) + Idalia 결과(median RMSE 18-72h ~0.08-0.09m 포화, 48h-ahead 미보정 ADCIRC 대비 Cedar Key 60%/Apalachicola 65%/Galveston 73% 감소, peak Cedar Key 35%/29%) + Table 5 ablation(MLP+GAT+GCN+LSTM 0.084 best, GAT+LSTM 0.097>GCN+LSTM 0.131) verbatim. **정직 재구성: 헤드라인 >70%/>50% 는 미보정 ADCIRC 대비, 기존 LSTM baseline[77] 대비로는 36h ~11-12%·>24h window ~10% 만 우위(24h 이하 동등, full timeseries 평균은 LSTM 이 근소 우위) — 주 이점은 짧은 학습시간**. 코드/데이터 공개 repo 명시 없음(데이터 CERA Historical Storm Archive). Gulf Coast 한정(WP 미학습)."
+ note_author: "Claude Opus 4.7 (1M context)"
+ note_date: 2026-05-26
+diff --git a/concepts/swash-zone/01-concept.md b/concepts/swash-zone/01-concept.md
+--- a/concepts/swash-zone/01-concept.md
++++ b/concepts/swash-zone/01-concept.md
+@@ -16,7 +16,7 @@
+ 
+ # 처오름대 (Swash Zone)
+ 
+-> ⚠ citation_status: **partially-verified**. §1 정의·§2 uprush/backwash·runup·§3 Ru2% = 교과서 page 인용 verified. IG band 수치·bore collapse NLSW·Iribarren 수식·IG 변조 정량은 source-needed(Holthuijsen/Masselink 미보유 page).
++> ⚠ citation_status: **verified + `has_source_needed: true`** (disclosed-gap, G9). §1 정의·§2 uprush/backwash·runup·§3 Ru2% = 교과서 page 인용 verified. IG band 수치·bore collapse NLSW·Iribarren 수식·IG 변조 정량은 source-needed(Holthuijsen/Masselink 미보유 page).
+ 
+ ## 1. 정의
+ 
