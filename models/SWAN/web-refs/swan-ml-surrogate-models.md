@@ -76,7 +76,7 @@ related:
 ## B. Forecasting (SWAN/WW3 데이터 → 시계열 DL)
 
 - **Crossformer + SWAN** adaptive decomposition Hs (*Expert Systems with Applications* 2025, S0957417425021426) — [[swan-recent-research-2024-2026]] §2
-- **LSTM > Random Forest** typhoon Hs 3h (Pearl River, 87 typhoon SWAN, *JMSE* 13:1612)
+- **LSTM > Random Forest — 단 3h 한정** (Pearl River, 87 typhoon SWAN, *JMSE* 13(9):1612, doi:10.3390/jmse13091612) — ✅**전문 직독 verified 2026-07-19**: 3h 예보는 LSTM 이 RMSE↓·R²↑(특히 peak 포착), ★**6h 에서는 안정 시나리오 한정 RF 가 근소 우위**·LSTM 은 복잡 발달에 더 반응적. 대표 태풍 10개 독립시험 유보, 인근 3정점 일반화 유지. 상세 [[swan-recent-research-2024-2026]] §2.1
 - **Swin transformer-LSTM** high-res ocean wave (Chinese marginal seas, reanalysis-driven)
 - **Self-Attention ConvLSTM** regional Hs
 - **SWRL Net** (*Weather and Forecasting* 35(6), 2020) — spectral residual DL 로 short-term wave forecast 개선 (numerical 위 residual correction)
@@ -126,7 +126,10 @@ related:
 
 - **full-PDF verified (2026-07-03)**: A.1 DELWAVE(21p)·A.2 DeepONet(46p)·A.3 FNO CoastalTwin(6p)·A.3 PINO(13p)·A.4 Johnson wave(2026-06-12)·D Ferdaus(38p) — 본문 수치·식·표 직접 확인. **arXiv 가용분 전부 소진**.
 - ⚠ full read 로 **분류 정정 2건**: FNO CoastalTwin = NEMO SSH surrogate(파랑 아님), PINO = 위상해상 HOSM 파면 재구성(SWAN surrogate 아님) — 본 노트에는 인접영역 참고로 유지하되 SWAN 직접 대체 사례 아님을 명시.
-- 잔여 abstract-level = **전부 paywall**(ScienceDirect/MDPI: GNN downscaling·CNN regional·B forecasting·C physics-guided) → primary 확보 시 보정. 실익 낮음(핵심 SWAN surrogate 계보는 DELWAVE·DeepONet·Johnson 으로 완결).
+- 잔여 abstract-level 현황 (★2026-07-19 재판정 — 구판 "전부 paywall" 은 **부분 오진**):
+  - **실제 결제벽**(Elsevier): GNN downscaling(*Ocean Modelling*)·CNN regional(*Coastal Eng/Applied Ocean Res*)·Crossformer(*Expert Systems with Applications*)·ANN port(*Ocean Eng*)·WW3+ML(*Coastal Eng*) → 원문 조달 시 보정 `[source-needed]`
+  - ⚠ **오픈액세스인데 paywall 로 분류돼 있던 것**: *JMSE*(MDPI)는 결제벽이 아니라 Cloudflare 봇차단 — reader 프록시로 전문 수신 가능. **JMSE 13:1612 는 2026-07-19 전문 직독 완료**(위 B절 정정 반영). MDPI·Frontiers 계열 잔여 항목은 동일 방법으로 승격 가능.
+  - 핵심 SWAN surrogate 계보(DELWAVE·DeepONet·Johnson)는 full-PDF 로 완결 — 잔여는 주변부.
 - arxiv 2604.06433(DeepONet)·2511.21856(Ferdaus)·2508.03315(PINO)는 preprint — peer-review 후 metric 변동 가능. Ferdaus(Writefull)·PINO(ChatGPT 3.5) 생성형 AI 교정 사용 공개.
 
 ## H. 연결
