@@ -52,7 +52,7 @@ slice 의 각 파일을 읽고(`wiki_read` 또는 Read), **각 단언(assertion)
 - 해당 섹션이나 인접 문장, frontmatter `source_id`, 같은 파일 상단의 포괄 출처로 커버되면 sourced(섹션 단위 인용 허용 — CONVENTIONS §2).
 - 파일에 실질 사실 단언이 없으면(순수 안내·TOC·링크 모음) `has_real_claims=false`.
 
-**값-검증 표본 (V1.1 신설 — "출처가 있는가"에 더해 "인용 값이 원본과 맞는가")**: slice 당 sourced 단언 중 **수치·계수·라인번호가 포함된 것 최대 3건을 무작위 표본**으로 뽑아 원본(소스 file:line 직독·미러 페이지·evidence 파일)과 대조한다. 불일치 = `VALUE-MISMATCH` 플래그(UNSOURCED 와 구분, 동일하게 Adversary 컷 통과 후만 confirmed). 근거: 출처가 붙어 있어도 값 전사 오류가 실재(r_tail 0.287→0.22 혼동·TG83 사건 등 — plan.md "방법론 근거 보강" 하네스 연구 반영 B항). 원본 접근 불가(외부 논문 등)면 표본에서 제외하고 카운트만 기록.
+**값-검증 표본 (V1.1 — 2026-07-19 신설, Codex 적대 패스 대체문안 반영)**: slice 의 sourced 단언 중 수치·계수·라인번호가 있는 **접근 가능한 모집단**에서 매 실행 `min(3, 모집단 수)`건을 검사한다. 접근 불가 단언은 `source_unavailable` 로 별도 기록하며 표본 한도를 소비하지 않고 접근 가능한 단언으로 대체한다. `claim_id=SHA256(path+blob_sha+line+text+source_ref)` 로 식별하고 ledger 에서 미검사 claim 을 우선한다. 초과 후보는 기록된 `audit_run_id` 를 seed 로 결정론적으로 추출하며 seed·모집단 수·선정 claim_id 를 리포트에 남긴다. 불일치 후보는 원본의 단위·정의·버전·문맥을 재확인하는 Adversary 절을 거쳐 `VALUE-MISMATCH` 로 확정한다. findings·ledger·리포트에 `value_checks`, `value_mismatches`, `source_unavailable` 를 기록하며, confirmed mismatch 가 있는 verified 파일은 `INTEGRITY-VIOLATION`, 그 밖은 `needs-work` 로 판정한다. 모든 변경은 제안만 하며 적용은 사람 게이트에 맡긴다. (근거: 출처가 붙어도 값 전사 오류 실재 — r_tail 0.287 혼동·TG83, plan.md 하네스 연구 반영 B항.)
 
 ### 3. Adversary (AI — 오탐 컷)
 
