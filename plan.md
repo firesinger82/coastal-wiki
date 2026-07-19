@@ -1556,10 +1556,39 @@ LLM-Wiki 4계층(L1 검색·L2 graph·L3 MCP·**L4 유지보수 루프**) 중 L4
 
 ★**분모에 포함 여부가 다툼 있는 덩어리**(실측 확인): ROMS 클론 내 **WRF 1,479 파일**(별개 대기모델)·`roms_test` 142 / Delft3D 24,329 중 상당수 third-party·빌드 산출물 추정 → **TR-2 에서 증거 기반 분류 후 사용자 결정**.
 
+## TR-1b. 실측 분모 — 문서축 (2026-07-19)
+
+지시는 "모든 **문서**·코드"였으나 TR-1 초판은 코드만 계상했다(작성자 누락). 문서축 실측:
+
+| 모델 | PDF | HTML/MD | 기타(txt·doc·tex) | manual-notes |
+|---|---:|---:|---:|---:|
+| ADCIRC | 98 | 2,348 | 380 | 21 |
+| ROMS | 10 | 2,383 | 76 | 4 |
+| EFDC | 6 | 726 | 5 | 9 |
+| SWAN | 9 | 407 | 5 | 29 |
+| Delft3D | 53 | 182 | 521 | 11 |
+| Celeris | 3 | 103 | 129 | 1 |
+| FUNWAVE | 39 | 2 | 339 | 3 |
+| XBeach | 9 | 32 | 46 | 4 |
+| CADMAS-SURF | 26 | 9 | 1 | 5 |
+| SFINCS | 1 | 27 | 21 | 5 |
+| LISFLOOD-FP | 1 | 10 | 87 | 1 |
+| ShorelineS | 3 | 2 | 12 | 2 |
+| SWASH | 2 | 1 | 2 | 3 |
+| **합계** | **260** | **6,232** | **1,624** | **98** |
+
+★문서 약 **8,100건**에 manual-notes **98편**. 코드축과 동일한 구조 — 대부분 미판독.
+★HTML/MD 대량분은 공식 사이트·wiki·forum 미러(ADCIRC 2,348·ROMS 2,383·EFDC 726·SWAN 407)로, **미러를 받아만 두고 판독하지 않은 상태**.
+★예외적으로 CADMAS-SURF 는 26 PDF 전수 대조를 주장(5 노트) — Phase 0 에서 진위 확인 대상.
+
+### TR-1c. 외부 문헌축 (web-refs)
+
+2026-07-19 논문 인용 전수감사 결과(canonical 50 노트·인용 142건): **결함 20여 건, 그중 심각 4건** — 검색 스니펫으로 쓴 정량값이 원문과 **정반대**(SWAN ST6), 인용 PII 가 **다른 논문**(Kuehn↔Zhu), 교재에 **없는 식**을 교재 출처로 귀속(Pugh/Garratt), **실재하지 않는 저자**(LISFLOOD 'Sharma'). → 외부 문헌축도 "확보·판독" 이 아니라 "검색 요약" 이었던 구간이 존재. 본 계획의 판독 대상에 **web-refs 가 인용한 원문**을 포함한다(결제벽분은 사용자 도서관 조달).
+
 ## TR-2. Phase 0 — 진짜 분모 확정 (인벤토리) ★첫 사용자 게이트
 
-- 전 파일 1행씩 매니페스트(CSV): `model, path, ext, lines, sha256, class, class_evidence`
-- `class` ∈ {`own-source`, `vendored`, `test`, `build`, `generated`, `data`, `doc`, `duplicate`}
+- **코드·문서 양축 모두** 전 파일 1행씩 매니페스트(CSV): `model, axis(code|doc), path, ext, lines_or_pages, sha256, class, class_evidence`
+- `class` ∈ 코드: {`own-source`,`vendored`,`test`,`build`,`generated`,`data`,`duplicate`} / 문서: {`official-manual`,`theory-doc`,`web-mirror`,`forum`,`release-note`,`duplicate-translation`,`validation-output`}
 - ★`class_evidence` **필수** — 분류 근거를 실제로 본 내용으로 기록(LICENSE 헤더 문구, 상위 repo 출처, 중복 원본 경로, 자동생성 마커 등). **경로·파일명 추측만으로 분류 금지.**
 - 산출: `_staging/total-read/inventory-<date>.csv` + 모델별 분류 요약
 - **사용자 게이트 ①**: 어느 class 를 전수 판독 범위에 넣을지 **사용자가 결정**. AI 는 선택지와 각 선택의 규모(파일·라인·예상 태스크수)만 제시.
