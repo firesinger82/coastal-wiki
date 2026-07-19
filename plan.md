@@ -1482,3 +1482,25 @@ LLM-Wiki 4계층(L1 검색·L2 graph·L3 MCP·**L4 유지보수 루프**) 중 L4
 - 2026-07-17 **Phase L 완료(로컬 writer 세션)**: L1 B1 scope v1.1+핸드오프 gate-failed / L2 템플릿 §2.2 전량 동기 / L3 coastal-runs 소유권 가드(host/admin, 회귀 4/4 PASS)+pull.rebase 교정+이 PC runs-admin / L4 배선(khoa_tide·SURGE .mcp.json+consumer-block v1)→**wiki_search 실호출 성공(첫 히트=당일 부착 Rouse 정확식 — 루프 end-to-end 실증)**·scanner 첫 실증(P0 F1-F3 이관→원장 3건 ack, ★scanner 정규식 버그 수정: 콜론 뒤 주석 §2.2 예시와 불일치 — 회귀 케이스 ⑤ 추가). Ultraplan 경유: 원격 branch 커밋 2건 patch(git am 55441e4·3880edd)로 수용.
 - 2026-07-17 Codex 21회차(B1 사후 게이트): **REJECT** — 상세 위 기록. 반영처 = coastal-runs B1 scope v1.1 + 핸드오프(Phase L L1).
 - 2026-07-17 Codex 22회차(연동 방법론): **MODIFY** — 상세 위 기록. 본 섹션 + RUNS-CHANNEL 개정 + Part 0 이 반영 결과. 원격 세션(branch+PR — 단일 writer 규칙 #5 준수: main 직접 push 금지, writer merge 후 pull) 구현: Part 0·§2.0·§2.2·§2.4·§3.3·scanner·원장 스캐폴드·회귀 2종.
+
+---
+
+## 방법론 근거 보강 — 개선 루프 아키텍처의 외부 언어 (2026-07-19)
+
+**출처**: Carlos E. Perez, *"From Loop Engineering to Graph Engineering?"* (X article 2078418167546691584, 2026-07-18; 선행 *"Loop Engineering"* 2026-06-21, x.com/i/status/2068808668393451770). 도메인 단언 아님 — **거버넌스 설계 근거 문헌**으로만 인용(canonical 밖, 기존 Diátaxis·Karpathy·philschmid 계보와 동렬).
+
+**채택 이유**: 본 위키·runs 채널이 이미 구현한 장치들의 "왜"를 한 프레임으로 기술 — ①단일 루프의 4대 실패(Goodhart="지표 게이밍은 고장이 아니라 루프 정의의 귀결"·상향 맹목·루프 충돌·측정 부패 "no one is watching the watcher") ②해법=위상(카운터 지표 페어링·느린 루프가 빠른 루프의 기준 소유·독립 감사) ③**그래프 자체의 실패 모드 = 순환 상호확인**("everything is consistent and nothing is verified... far more green lights on the way down") ④앵커 3종 = 논쟁 불가 측정·**동결 노드**(최적화가 못 만지는 규칙)·**루트 판단은 기계 밖**(사람) — "the most sophisticated improvement architectures are the ones honest enough to mark where their own authority ends" ⑤지속 축은 loops vs graphs 가 아니라 **ungrounded vs grounded**.
+
+**기존 장치 대응(신규 구현 없음 — 근거 명문화만)**:
+
+| Perez 개념 | 본 시스템 구현 |
+|---|---|
+| 동결 노드/held-out | tail_autoresearch 규칙1(train.py 만 수정 가능)·CV fold 동결·prereg bundle(case2 §5·§10) |
+| 독립 감사 루프 | Codex 적대 게이트(분기점·확인 라운드)·L4 자가감사 cron(report-only+사람 게이트) |
+| 카운터 지표 페어링 | SCORE=0.5·RMSE_all+0.5·RMSE_tail80 + r_tail 보조(성공기준과 분리) |
+| 속도 분리 계층 | 실험 루프(시간) < 세션 게이트(일) < 3조건 승격(시즌) < 사용자 루트 판단 |
+| **순환 방지 앵커** | **G8 역방향 게이트**(run 결과는 소스 근거 아님 — 소스코드 독립 확인만 canonical 반영: wiki→run→wiki 상호확인 차단) + 관측(KHOA·JMA)=현실 접지 |
+| 루트 판단=사람 | 3조건 "evidence 사람 직접 확인"·최종 승격 책임=사용자·L4 report-only |
+| green lights 경계 | case2 §11 프로브 봉인(자기 일관성 아닌 파일시각·해시 접지) |
+
+**후속 조치 없음** — 갭 부재 판정. 인용 각주는 RUNS-CHANNEL §4 에 1줄(아래 커밋).

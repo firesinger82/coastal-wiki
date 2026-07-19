@@ -167,3 +167,4 @@ wiki writer PC(이 PC)만 수행. `coastal-runs`를 **읽기 전용**으로 pull
 - 각 repo에 writer 하나 → 두 머신이 같은 repo 같은 파일을 push할 일이 없음.
 - 리더 머신(위키를 pull만 하는 쪽)은 `git config pull.ff only` — 로컬 커밋이 생기면 pull이 조용한 merge 대신 즉시 에러.
 - 관련: [CLAUDE.md](CLAUDE.md) 동기화 §, [BOUNDARY.md](BOUNDARY.md), 절대규칙 #5(단일 writer)·#8(위키=케이스 공급원).
+- **설계 근거(순환 방지 앵커)**: §3.1 역방향 게이트("run 결과 자체는 소스 근거가 아님")와 "evidence 사람 직접 확인"은 개선 루프 그래프의 순환 상호확인(모든 루프가 서로만 보고 현실을 안 봄) 방지 장치 — [plan.md](plan.md) "방법론 근거 보강 2026-07-19"(Perez 2026 loop→graph→anchor) 참조.
