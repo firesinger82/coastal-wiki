@@ -59,7 +59,7 @@ D-Flow FM(=Delft3D FM)은 차세대 **D-HYDRO Suite** 의 엔진. 데이터모�
 
 ### 3.4 Modern operational
 
-- **van der Wegen, M., Roelvink, J.A. (2008)** "Long-term morphodynamic evolution of a tidal embayment using a two-dimensional, process-based model" *J. Geophys. Res. Earth Surface* 113:F03001 — 장기 morphology
+- **van der Wegen, M., Roelvink, J.A. (2008)** "Long-term morphodynamic evolution of a tidal embayment using a two-dimensional, process-based model" *J. Geophys. Res. Oceans* 113:**C03016** (JGR **Oceans** 113, C3, doi:10.1029/2006JC003983 — ★구판 "Earth Surface F03001"은 섹션·논문번호 모두 오류) — 장기 morphology
 - **Deltares (continual)** — Delft3D FM unstructured mesh modernization
 
 ## 4. 모듈별 활용
@@ -93,7 +93,7 @@ D-Flow FM(=Delft3D FM)은 차세대 **D-HYDRO Suite** 의 엔진. 데이터모�
 - [`concepts/sediment-transport/06-model-application.md`](../../../concepts/sediment-transport/06-model-application.md) — Delft3D-SED Van Rijn + Partheniades-Krone
 - [`concepts/waves/`](../../../concepts/waves/) — Delft3D-WAVE (SWAN 통합)
 - [`concepts/littoral-drift/`](../../../concepts/littoral-drift/) — surf zone + cross-shore profile
-- [`models/Delft3D/source-analysis/`](../source-analysis/) — 10 verified 노트 (sparse, M-D 보강 후보)
+- [`models/Delft3D/source-analysis/`](../source-analysis/) — **48 verified** 노트 (2026-07-19 실측 — 종결, 구판 "10 sparse" stale)
 - [`models/SWAN/`](../../SWAN/) — Delft3D-WAVE 의 backend (관련 모델)
 
 ## 8. Recent releases & updates

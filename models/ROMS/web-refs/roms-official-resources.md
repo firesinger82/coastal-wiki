@@ -100,7 +100,7 @@ related:
 - [`concepts/sediment-transport/06-model-application.md`](../../../concepts/sediment-transport/06-model-application.md) — ROMS-CSTMS sediment
 - [`concepts/currents/`](../../../concepts/currents/) — baroclinic regional current modeling
 - [[../../../experience/nifs-vertical-sst-trends]] — NIFS 다층 수온 + ROMS forcing 정합성
-- [`models/ROMS/source-analysis/`](../source-analysis/) — 11 verified 노트 (sparse, M-D 보강 후보)
+- [`models/ROMS/source-analysis/`](../source-analysis/) — **37 verified** 노트 (2026-07-19 실측 — 종결, 구판 "11 sparse" stale)
 - [`models/ROMS/source-analysis/roms_atmospheric_forcing.md`](../source-analysis/roms_atmospheric_forcing.md) — 대기 forcing 일반론 (a9618df promote)
 
 ## 8. Recent updates

@@ -3,7 +3,7 @@ title: "EFDC 공식 자료 — DSI·GitHub·핵심 논문 (Hamrick 1992-)·커�
 topic: efdc-web-refs
 canonical_source: self
 citation_status: verified
-verification_method: "DSI LLC 공식 도메인 (dsi.llc, eemodelingsystem.com) — EFDC_Theory_Document_Ver_12.pdf 표지 publication 정보 직접 인용 + GitHub 공개 repo (dsi-llc/EFDC_Plus) + Acknowledgement (theory v12 p.i) 의 authorship 정보. 핵심 논문 인용은 publicly-known canonical works (Hamrick 1992 EFDC original)."
+verification_method: "DSI LLC 공식 도메인 (dsi.llc, eemodelingsystem.com) — EFDC_Theory_Document_Ver_12.pdf 표지 publication 정보 직접 인용 + GitHub 공개 repo (dsi-llc/EFDCPlus_Stable) + Acknowledgement (theory v12 p.i) 의 authorship 정보. 핵심 논문 인용은 publicly-known canonical works (Hamrick 1992 EFDC original)."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-24
 verification_by: "Claude Opus 4.7 (1M context) — URL + 공인 논문 인용"
@@ -30,7 +30,7 @@ related:
 
 | Repo | 역할 |
 |---|---|
-| [dsi-llc/EFDC_Plus](https://github.com/dsi-llc/EFDC_Plus) | EFDC+ Stable (DSI 메인) — GPL-3.0 |
+| [dsi-llc/EFDCPlus_Stable](https://github.com/dsi-llc/EFDCPlus_Stable) | EFDC+ Stable (DSI 메인) — GPL-3.0 |
 | (별도 분기) | EFDC-GVC (사용자 보유, 본 위키 `raw/source_code/EFDC-GVC/`) |
 | Legacy (Hamrick) | VIMS EFDC (1992 original, 분기됨) |
 
@@ -64,7 +64,7 @@ related:
 ## 4. 한국 적용
 
 - 한국 해역 EFDC 운영 사례(축산항·서해 하구·인천만 등)는 개인 자료로 canonical 미수록 → 바이블 검증 통과 시 `experience/` 로 카테고리화 (source-needed).
-- [[../source-analysis/]] 18 verified 노트는 공식 EFDC source-code 분석 (개인 사례와 무관).
+- [[../source-analysis/]] **38 verified** 노트 (2026-07-19 실측)는 공식 EFDC source-code 분석 (개인 사례와 무관).
 
 ## 5. 운영 자원
 
@@ -74,11 +74,11 @@ related:
 | Address | 110 W. Dayton Street #202, Edmonds WA 98020 USA |
 | EFDC+ Training | EFDC_Training_Overview.pdf (본 위키 raw/manuals/pdfs/) |
 | Propwash white paper | EFDC+_Propwash_WhitePaper.pdf — DSI 특수 모듈 |
-| GitHub Issues | [github.com/dsi-llc/EFDC_Plus/issues](https://github.com/dsi-llc/EFDC_Plus/issues) |
+| GitHub Issues | [github.com/dsi-llc/EFDCPlus_Stable/issues](https://github.com/dsi-llc/EFDCPlus_Stable/issues) |
 
 ## 6. 본 위키 내 cross-ref
 
 - [`concepts/sediment-transport/06-model-application.md`](../../../concepts/sediment-transport/06-model-application.md) — EFDC SedTran-Original (ISTRAN=6/7) vs SEDZLJ unified
-- [`models/EFDC/manual-notes/`](../manual-notes/) — 4 verified manual-notes (M-C 1차)
-- [`models/EFDC/source-analysis/`](../source-analysis/) — 18 verified 노트 (codex source-code 직접 분석)
+- [`models/EFDC/manual-notes/`](../manual-notes/) — **9 verified** manual-notes (2026-07-19 실측)
+- [`models/EFDC/source-analysis/`](../source-analysis/) — **38 verified** 노트 (2026-07-19 실측) (codex source-code 직접 분석)
 - `textbook/sources.yml` 의 `efdc-general` + `efdc-sed-trans-2003` source_id

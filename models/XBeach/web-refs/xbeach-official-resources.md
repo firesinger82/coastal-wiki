@@ -22,7 +22,7 @@ related:
 |---|---|---|
 | **Deltares XBeach** | [https://oss.deltares.nl/web/xbeach](https://oss.deltares.nl/web/xbeach) | 공식 홈 |
 | **XBeach Manual (online)** | [xbeach.readthedocs.io](https://xbeach.readthedocs.io/) | 운영 매뉴얼 |
-| **OpenEarth XBeach** | [openearth.eu/xbeach](https://openearth.eu/xbeach) | community + tools |
+| **OpenEarth XBeach** | [openearth.eu/xbeach](https://xbeach.readthedocs.io/ ⚠**구 openearth.eu/xbeach 는 도메인 사망(404, 2026-07-19 확인)**) | community + tools |
 
 ## 2. Code repository
 
@@ -35,7 +35,7 @@ related:
 
 ### 3.1 Foundation (2009)
 
-- **Roelvink, D., Reniers, A., van Dongeren, A., van Thiel de Vries, J., McCall, R., Lescinski, J. (2009)** "Modelling storm impacts on beaches, dunes and barrier islands" *Coastal Engineering* 56(11-12):1133-1152 — **XBeach 시초 paper** (Katrina/Sandy 후 dune erosion 대응)
+- **Roelvink, D., Reniers, A., van Dongeren, A., van Thiel de Vries, J., McCall, R., Lescinski, J. (2009)** "Modelling storm impacts on beaches, dunes and barrier islands" *Coastal Engineering* 56(11-12):1133-1152 — **XBeach 시초 paper** (Katrina 후 (★구판 "Katrina/**Sandy**"는 시대착오 — Roelvink et al. 2009 는 2009 게재, Sandy 는 2012-10) dune erosion 대응)
 
 ### 3.2 운영 확장
 
@@ -77,5 +77,5 @@ related:
 - [`concepts/littoral-drift/02-theory.md`](../../../concepts/littoral-drift/02-theory.md) — Holthuijsen §7.4 radiation stress (XBeach surf zone 근간)
 - [`concepts/sediment-transport/06-model-application.md`](../../../concepts/sediment-transport/06-model-application.md) — XBeach Soulsby-van Rijn + avalanching
 - [`concepts/storm-surge/`](../../../concepts/storm-surge/) — storm 시 inundation + dune erosion 결합
-- [`models/XBeach/source-analysis/`](../source-analysis/) — 16 verified 노트
-- [`models/XBeach/manual-notes/`](../manual-notes/) — 3 source-needed (P2 catalog, audit 후속)
+- [`models/XBeach/source-analysis/`](../source-analysis/) — **33 verified**(2026-07-19 실측) 노트
+- [`models/XBeach/manual-notes/`](../manual-notes/) — **4개 전량 verified** (2026-07-19 실측 — 구판 "3 source-needed"는 개수·상태 모두 stale)

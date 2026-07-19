@@ -32,7 +32,7 @@ related:
 |---|---|
 | [adcirc/adcirc](https://github.com/adcirc/adcirc) | Fortran core (메인) |
 | [adcirc/adcirc-testsuite](https://github.com/adcirc/adcirc-testsuite) | 표준 테스트 케이스 (Katrina·Shinnecock 등) |
-| [adcirc/adcircpy](https://github.com/adcirc/adcircpy) (or [oceanmodeling/adcircpy](https://github.com/oceanmodeling/adcircpy)) | Python wrapper |
+| [adcirc/adcircpy](https://github.com/**oceanmodeling**/adcircpy (★구 adcirc/adcircpy 는 404, 2026-07-19 확인)) (or [oceanmodeling/adcircpy](https://github.com/oceanmodeling/adcircpy)) | Python wrapper |
 | [adcirc/gahm](https://github.com/adcirc/gahm) | Generalized Asymmetric Holland Model (vortex) |
 | [StormSurgeLive/asgs](https://github.com/StormSurgeLive/asgs) | ADCIRC Surge Guidance System (운영 forecast) |
 | [CHLNDDEV/OceanMesh2D](https://github.com/CHLNDDEV/OceanMesh2D) | MATLAB mesh generator ([[../manual-notes/27-github-oceanmesh2d-repo-review]]) |

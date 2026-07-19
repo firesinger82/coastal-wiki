@@ -19,7 +19,7 @@ related:
 | 리소스 | 위치 | 비고 |
 |---|---|---|
 | GitHub (공식) | https://github.com/danoroelvink/shorelines | "ShorelineS free-form coastline simulation program". 검수 스냅샷 sha `7bf4481ab84c635033ef475fa648a1b09cf9f36b`(2025-10-07 커밋) |
-| 공식 사이트 | www.shorelines.nl | Roelvink et al. (2020) Data Availability Statement 에 MATLAB 소스 배포처로 명시 |
+| 공식 사이트 | www.shorelines.nl ⚠**2026-07-19 확인: 만료 파킹 도메인(geparkeerd.yourhosting.nl) — 현 배포처 아님. 논문 시점 기록으로만 유효, 소스는 GitHub 참조** | Roelvink et al. (2020) Data Availability Statement 에 MATLAB 소스 배포처로 명시 |
 | 라이선스 | repo `LICENSE` = LGPL v3 전문 / 소스 헤더(`functions/ShorelineS.m:38-42`) = "LGPL v2.1 or later" | 두 표기 병존 — LGPL 계열 확정, 세부 버전 표기 불일치는 disclosed |
 | 배포 형태 | `functions/`(generic 136 .m)·`script/`(케이스별)·`compiled/`·`ShorelineS.ipynb` | repo README.md:4 — functions=케이스 불변, scripts=케이스 정보 분리 원칙 |
 
