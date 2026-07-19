@@ -26,9 +26,9 @@
 
 | 경로 | 노트 수 | 상태 | 비고 |
 |---|---:|---|---|
-| `source-analysis/` | 14 verified | **M-D 1차+2차 진행** | 기존 11 + M-D 1차 2 (main_driver_dispatch·nonlinear_physics_modules) + M-D 2차 1 (bulk_flux_coare 1623 lines Fairall 1996/2003·Edson 2013). 1373 Fortran 대비 여전히 sparse — main3d_loop·KPP walkthrough 후속 |
-| `manual-notes/` | 3 verified | **M-C 2차 진행** | wiki-overview (326 pages 인덱스) + wiki-getting-started (디렉토리 구조) + wiki-cppdefs-options (32 CPP category 운영 결정 매트릭스). vertical-mixing·tidal-forcing 후속 |
-| `web-refs/` | 1 verified | **신설 2026-05-24** | roms-official-resources.md — myroms.org·forum·GitHub myroms/roms·myroms/roms-jedi·핵심 논문 (Shchepetkin-McWilliams 2005·Haidvogel 2008·Warner 2008 CSTMS·Large 1994 KPP) |
+| `source-analysis/` | 37 verified | **종결 2026-07-12** ([AUDIT-LEDGER §3](../AUDIT-LEDGER.md)) | nonlinear 코어·4D-Var suite(TLM/ADM/RPM)·GST·sea-ice·BBL·biology·KPP·EOS·wetdry·tracer timestep 등 전수. cross-model 대조노트 flag 0건 |
+| `manual-notes/` | 4 verified | **M-C 완료** | wiki-overview (326 pages 인덱스) + wiki-getting-started (디렉토리 구조) + wiki-cppdefs-options (32 CPP category 운영 결정 매트릭스) + roms-exercises-catalog |
+| `web-refs/` | 3 verified | **신설 2026-05-24 · COAWST 보강 2026-07-19** | roms-official-resources.md (myroms.org·forum·GitHub·핵심 논문 Shchepetkin-McWilliams 2005·Haidvogel 2008·Warner 2008 CSTMS·Large 1994 KPP) + roms-coawst-applications-review.md + **roms-coawst-adriatic-applications.md** (Carniel et al. 2013 full-PDF — AdriaROMS 2 km·NA-COAWST 0.5 km 운영구성) |
 | `raw/` | 1221 .md + 10 pdf + 1373 fortran (583 MB) | archive | roms 본체 + 6 variants + WRF coupling |
 
 ## 본 위키에서의 핵심 활용
