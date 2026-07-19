@@ -95,7 +95,7 @@ abstract 만으로 불가했던 항목들이 PDF §2-7 + Appendix A-E 직접 인
 
 ### 2.7 Datasets (PDF §2 Table 1) — verified
 
-**Atmospheric forcing**: NCEP/NCAR Reanalysis (Kalnay 1996, 1979-2014) + 5 CMIP6 GCMs (ScenarioMIP SSP5-8.5, historical 1979-2014 + future 2070-2099):
+**Atmospheric forcing**: NCEP/NCAR Reanalysis (Kalnay 1996, 1979-2014) + 5 CMIP6 GCMs (ScenarioMIP SSP5-8.5, historical 1979-2014 + future 2070-2100):
 
 | # | Model | Horizontal resolution | Reference |
 |---|---|---|---|
@@ -447,16 +447,18 @@ arxiv:2603.06649 (2026-02-27). **TimeGAN**(time-series GAN)으로 ADCIRC 의 sys
 
 arxiv:2511.07269. **진화 landscape + climate 시나리오** 하 surge surrogate 학습. 핵심 기여 = **학습 효율화 전략** — 비싼 ADCIRC 시나리오 run 수를 줄이며 surrogate 정확도 유지:
 
-- **clustering(k-medoids) + variance-based adaptive sampling(= active learning)** 으로 storm/시나리오 부분집합 선별(예: 90개 subset) → 수치모의 비용 대폭 절감.
+- ★**헤드라인 결과(2026-07-19 원문 재대조로 보강)**: 3차원 동시 축약 — **격자점 80,000→5,000 · 입력특성 12→10 · storm 90→60** = 원본의 **약 5%** 로 **상관계수 0.94** 달성.
+- 선별 기법은 축별로 다름: **격자점 = k-means**, **storm = k-medoids** + variance-based adaptive sampling(active learning). (구판은 k-medoids 만 기재)
+- ⚠ **"90개 subset"은 이 논문의 산출물이 아님** — CHS-LA 연구(Nadal-Caraballo 2022)의 기존 **CMP2023 subset = 출발 baseline** 이며, 본 논문은 그 90 을 60 으로 더 줄인 것이다(구판 오귀속 정정).
 - hazard curve 정량 = surrogate × JPM integral(Nadal-Caraballo 2022) 또는 surrogate 직접.
-- **§A.4 wave surrogate(2510.12986)와 동일 Purdue Johnson group** — surge surrogate 출력이 wave surrogate 입력으로 연쇄(**surge→wave coupled emulation**). [[../../models/SWAN/web-refs/swan-ml-surrogate-models]] §A.4.
+- **§A.4 wave surrogate(2510.12986)와 동일 Purdue Johnson group** — 다만 ⚠**"surge surrogate 출력 → wave surrogate 입력 연쇄(surge→wave coupled emulation)"는 본 논문에 근거가 없다**(2026-07-19 전문 재대조: 전문에서 "wave"는 선행연구 나열 중 1회뿐, 결합 emulation 논의 전무). 동일 그룹이라는 사실에서 나온 **위키 자체 추론**이므로 원문 인용과 구분 표기 — 검증 전 인용 금지 `[source-needed]`. [[../../models/SWAN/web-refs/swan-ml-surrogate-models]] §A.4.
 
 ### 7.4 FLO — data-driven LAM surge (Norwegian Met Institute 2026) ★ (verified, PDF read 2026-06-12)
 
 arxiv:2601.02090 (Kristensen·Matuszak·Tedesco·Kullmann·Röhrs). **North/Norwegian/Barents Sea** data-driven storm surge model:
 
 - **Anemoi framework**(ECMWF ML weather-forecasting 프레임워크) + **graph neural network(GNN)** 기반 **limited-area model(LAM)**.
-- 학습: 43년 **NORA(3km Norwegian Reanalysis) + NORA-Surge hindcast**(DA 미적용). >90 유럽 연안 조위 gauge + NORA-Surge 검증, 수치모델과 comparable 정확도.
+- 자료·학습: **NORA(3km Norwegian Reanalysis) + NORA-Surge hindcast**(DA 미적용)는 **43년(1979-2022) 커버**이나 ★**학습·검증은 20년(1990-2009)**, **2010-2022 는 평가용 유보**(2026-07-19 원문 재대조 — 구판 "학습 43년"은 커버기간을 학습기간으로 오기). >90 유럽 연안 조위 gauge + NORA-Surge 검증, 수치모델과 comparable 정확도.
 - 저자 솔직 평가: "forecast skill 큰 향상은 아니나, surge 예보를 **수치 → ML 기반으로 전환**하는 발판" = 향후 obs/DA 통합 유연성. StormNet/HURRI-GAN(post-process)과 달리 **GNN 직접 emulator**.
 
 ### 7.5 Tampa Bay CNN/RNN 비교 (Farhang Ghahfarokhi et al. 2024) — direct emulator architecture 비교 (verified, full PDF read 2026-06-18)

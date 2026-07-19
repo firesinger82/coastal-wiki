@@ -35,7 +35,7 @@ related:
 
 - **Bates, Horritt, Fewtrell (2010)** — "A simple inertial formulation of the shallow water equations for efficient two-dimensional flood inundation modelling." *J. Hydrology* 387:33-45. → **ACC(local inertia) 솔버**(`fp_acc.cpp`)의 정식 근거.
 - **Neal, Schumann, Bates (2012)** — sub-grid channel(SGC) 정식화. → `sgc.cpp`.
-- **Shaw, Sharma, Bates (2021)** — "LISFLOOD-FP 8.0: the new model release including FV1/DG2 solvers and GPU." *Geosci. Model Dev.* → swe/ FV1·DG2·GPU 도입.
+- **Shaw, Kesserwani, Neal, Bates, Sharifian (2021)** — "LISFLOOD-FP 8.0: the new model release including FV1/DG2 solvers and GPU." *Geosci. Model Dev.* → swe/ FV1·DG2·GPU 도입.
 - **Kesserwani & Sharifian (2020)** — DG2 + **multiwavelet 적응 격자**(SEAMLESS-WAVE). → 실구현은 `cuda/adaptive/`(hwfv1/mwdg2, [[lisflood-fp-mwdg2-adaptive-mra]]) — ~~`swe/dg2new.cpp`~~ 는 비가동 CPU 리팩터([[lisflood-fp-swe-fv1-dg2]] 정정). 코드 내 인용 `cuda/adaptive/cuda_adaptive_simulate.cu:104`.
 - ⚠ 위 4편 원문 미fetch, 인용 시 DOI/페이지 cross-check.
 

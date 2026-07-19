@@ -49,7 +49,7 @@ related:
 ## 5. Rogers 2012 + Zieger 2015 — ST6 source term package
 
 - **Rogers WE, Babanin AV, Wang DW (2012)**, "Observation-Consistent Input and Whitecapping Dissipation in a Model for Wind-Generated Surface Waves: Description and Simple Calculations", *J. Atmos. Oceanic Technol.* **29**(9), 1329-1346. DOI: 10.1175/JTECH-D-11-00092.1 ◇
-- **Zieger S, Babanin AV, Rogers WE, Young IR (2015)**, "Observation-based source terms in the third-generation wave model WAVEWATCH III: Updates and verification" (ST6), *Ocean Modelling* **96**(1), 2-25. DOI: 10.1016/j.ocemod.2015.07.014 ◇PII
+- **Zieger S, Babanin AV, Rogers WE, Young IR (2015)**, "Observation-based source terms in the third-generation wave model WAVEWATCH III: Updates and verification" (ST6), *Ocean Modelling* **96**, 2-25. DOI: 10.1016/j.ocemod.2015.07.014 ◇PII
 - **내용**: 관측 기반 wind input + whitecapping(local + short-wave modulation) + swell dissipation + wind scaling $S_{ws}u_*$. SWAN ST6 = NRL 2008 도입.
 - **참고**: Babanin AV (2011), *Breaking and Dissipation of Ocean Surface Waves*, Cambridge Univ. Press (단행본, ST6 물리 배경).
 - **본 위키**: [[swan-tech-ch2-dissipation-detailed]] §4 (ST6, SSWELL ZIEGER/ARDHUIN) + [[swan-st6-babanin-implementation]].
@@ -79,7 +79,7 @@ related:
 |---|---|---|
 | DIA quadruplet | Hasselmann S et al. 1985, *JPO* 15, 1378-1391 | [[swan-tech-ch2-nonlinear-detailed]] §A.1 |
 | LTA triad | Eldeberky 1996 PhD (TU Delft) | [[swan-tech-ch2-nonlinear-detailed]] §B.4 |
-| SPB triad | Becq-Girard, Forget, Benoit 1999, *Coastal Eng* 37, 1-24 | §B.3 |
+| SPB triad | Becq-Girard, Forget, Benoit 1999, "Non-linear propagation of unidirectional wave fields over varying topography", *Coastal Eng* **38**(2), **91-113**, doi:10.1016/S0378-3839(99)00043-5 | §B.3 |
 | DCTA triad | Booij, Holthuijsen, Bénit 2009 (ICCE) + Zijlema 2022 | §B.7 |
 | QuadWave | Akrish, Rabaud, ... 2024 (Coastal Eng) | §B.6 |
 | wind C_D | Zijlema, van Vledder, Holthuijsen 2012, *Coastal Eng* 65, 19-26 | [[swan-tech-ch2-sources-sinks]] |

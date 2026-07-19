@@ -104,21 +104,17 @@ $$\tau_w = \rho_a C_D U_{10}^2$$
 - $U_{10}$ = 10 m altitude 풍속 (m/s)
 - $C_D$ = drag coefficient
 
-$C_D$ 의 풍속 의존성 (Pugh §6:4 + Garratt 1977):
+★**2026-07-19 출처 정정**: 구판은 아래 표와 `C_D×10³ = 0.51 + 0.080·U₁₀` 식을 **"Pugh §6:4 + Garratt 1977"** 로 귀속했으나, **교재 원문(sea-level.md) 전문 grep 결과 "Garratt" 0건**이며 표·식 모두 교재에 없다. Pugh 가 제시하는 유일한 drag 식은 아래 Smith & Banke 다.
 
-| $U_{10}$ (m/s) | $C_D \times 10^3$ | 비고 |
-|---:|---:|---|
-| 5 | 0.8-1.0 | light winds |
-| 10 | 1.2-1.4 | typical |
-| 20 | 1.8-2.0 | strong wind |
-| 30 | 2.5-3.0 | hurricane/typhoon |
-| 50 | 3.0-3.5 | extreme (saturate 가능) |
+**Pugh §6:4:2 원문 (sea-level.md:7454-7456) — 실제 교재 식**:
 
-Garratt 1977 fit:
+$$10^3 C_D = 0.63 + 0.066\, W_{10} \qquad (2.5\ \mathrm{m/s} < W_{10} < 21\ \mathrm{m/s})$$
 
-$$C_D \times 10^3 = 0.51 + 0.080 \cdot U_{10}$$ (m/s)
+> "Acceptable values for C_D (**Smith and Banke, 1975**) are given by …" — 교재는 drag 가 풍속 제곱보다 약간 빠르게 증가하며, 이는 파고 증가에 따른 표면조도 증가로 설명된다고 서술. ⚠**적용범위 상한 21 m/s** — 태풍역(30 m/s+) 적용은 외삽임에 유의.
 
-ADCIRC 는 Garratt 또는 Powell 2003 등 옵션 (`fort.15` `IM` parameter).
+구판 표(5→0.8-1.0 … 50→3.0-3.5)는 위 식에서 역산된 값으로 보이나(U=5→0.91, 10→1.31, 30→2.91) **교재 미수록이므로 삭제**. `0.51 + 0.080·U₁₀` 형태는 통상 인용되는 Garratt 형과도 달라 **원전 미확인** `[source-needed]` (Garratt 1977, *Mon. Wea. Rev.* 105:915-929 — DOI 실재 확인, AMS 결제벽으로 본문 미확보).
+
+ADCIRC 의 wind drag 옵션(Garratt 식·Powell 2003 등)은 [`models/ADCIRC/`](../../models/ADCIRC/) canonical 참조 — ★`fort.15` `IM` 은 **drag 선택자가 아니라 모델 정식화(2DDI/3D) 선택자**이며 drag 는 `/metControl/ WindDragLimit` 계열이다(2026-07 정정 반영, [[../../models/ADCIRC/source-analysis/adcirc-3d-mode]]).
 
 ### 3.2 Wind set-up — shallow water
 
@@ -133,11 +129,15 @@ $$\boxed{\Delta \eta_{wind} \approx \frac{\rho_a C_D U^2 \cdot L}{\rho g H}}$$
 - $L$ = wind fetch (km)
 - $H$ = 평균수심
 
-**한국 서해 적용** ($U = 30$ m/s 태풍, $L = 200$ km, $H = 30$ m):
+★**교재 자체의 worked example (Pugh §6:4:2, sea-level.md:7494)** — 아래 "한국 서해 적용"과 **완전히 동일한 조건**(200 km fetch · 수심 30 m, "대략 남부 북해의 규모")을 교재가 이미 풀어 두었다:
 
-$$\Delta\eta_{wind} = \frac{1.2 \times 2.5\times10^{-3} \times 900 \times 200000}{1025 \times 9.81 \times 30} = \frac{540{,}000}{301{,}702} \approx \mathbf{1.79 \text{ m}}$$
+> "For a Strong Gale (Beaufort Force Nine, **22 m/s**) blowing over 200 km of water which has a depth of 30 m … the increase in level would be **0.85 m**. If the wind speed increased to Storm (Beaufort Force Eleven, **30 m/s**) the level of increase would be **1.60 m**."
 
-→ 서해 천해에서 wind set-up 만 +1.8 m 가능. IB +0.6 m + wave setup +1 m + tide spring high → 큰 flood 위험.
+**한국 서해 적용** ($U = 30$ m/s 태풍, $L = 200$ km, $H = 30$ m) — 교재값 **1.60 m** 를 기준으로 삼는다.
+
+구판은 같은 조건에 $C_D = 2.5\times10^{-3}$ 를 넣어 **1.79 m** 를 제시했으나, 그 $C_D$ 는 위에서 삭제된 미출처 표에서 온 값이고 **교재 자신의 답(1.60 m)이 존재한다는 사실도 누락**돼 있었다(2026-07-19 정정). 교재 식(Smith & Banke)으로 30 m/s 를 대입하면 $C_D \approx 2.6\times10^{-3}$ 이나 이는 식의 적용범위(21 m/s) 밖 외삽이며, 교재가 어느 $C_D$ 로 1.60 m 를 얻었는지는 본문에 명시되지 않았다 `[source-needed]`.
+
+→ 서해 천해에서 wind set-up 만 **+1.6 m 규모** 가능. IB + wave setup + 대조 만조가 겹치면 큰 범람 위험 (각 성분 정량은 해당 절 참조).
 
 **동해 적용** ($U = 30$ m/s, $L = 200$ km, $H = 1000$ m):
 

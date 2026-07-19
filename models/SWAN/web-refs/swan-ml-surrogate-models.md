@@ -60,9 +60,12 @@ related:
 
 ### A.3 FNO / GNN / CNN surrogate (일부 full-PDF 격상 2026-07-03)
 
-- **FNO CoastalTwin — Jiang et al. 2021** (arxiv:2110.07100, FDL: PNNL·DLR·MIT·IBM·NASA·USGS, 6p 워크숍) ★PDF: ⚠ **분류 정정 — SWAN 아닌 NEMO(순환모델) SSH surrogate**. NW유럽 7 km 520×292, 강제력 MSLP·U10·V10(ERA5 downscaled)+GEBCO(특수 log 스케일링 B′=(ln(B+50)−ln50)/ln100), 2020년 전체 @5 min, 11개월 학습/4월 시험. FNO(linear 20ch + Fourier층 5개(20ch·40 modes)+linear)가 UNet 을 4케이스 전부 압도 — **MSE 0.0011 vs 0.0025, 1-SSIM 0.228 vs 0.418, CORR 0.91 vs 0.75**. **45× = 1개월 에뮬 ~2 min vs NEMO ~1.5 hr(단일 2.6 GHz 코어)** — GPU 병렬화 시 추가 가속 여지 명시. 약점 = **육지 마스크 경계 부근 열화**(佛-西 동측·영국 연안, coastal modeling 공통 이슈로 지목). 플랫폼 CoastalTwin(gitlab, 출판 시 공개).
-- **GNN + polynomial ridge regression**: Hs **downscaling**, RMSE **0.3-2 cm**, **80× faster** than numerical (*Ocean Modelling* S1463500323000963) — abstract-level(paywall).
-- **CNN regional wind-wave surrogate** (*Coastal Eng/Applied Ocean Res* S0141118722002218) — abstract-level(paywall).
+- **FNO CoastalTwin — Jiang et al. 2021** (arxiv:2110.07100, FDL: PNNL·DLR·MIT·IBM·NASA·USGS, 6p 워크숍) ★PDF: ⚠ **분류 정정 — SWAN 아닌 NEMO(순환모델) SSH surrogate**. NW유럽 7 km 520×292, 강제력 MSLP·U10·V10(ERA5 downscaled)+GEBCO(특수 log 스케일링 B′=(ln(B+50)−ln50)/ln100), 2020년 전체 @5 min, 11개월 학습/4월 시험. FNO(linear 20ch + Fourier층 5개(20ch·40 modes)+linear)가 UNet 을 4케이스 전부 압도 — **MSE 0.0011 vs 0.0025, 1-SSIM 0.2283 vs 0.4178**(Table 1, Case 1) — ★구판의 "CORR 0.91 vs 0.75"는 **원문 부재 수치라 삭제**(2026-07-19 전문 재대조: CORR 은 §2.3 에 지표로 정의되고 Fig 3 공간상관 *지도*로만 제시, 수치 표 없음). **45× = 1개월 에뮬 ~2 min vs NEMO ~1.5 hr(단일 2.6 GHz 코어)** — GPU 병렬화 시 추가 가속 여지 명시. 약점 = **육지 마스크 경계 부근 열화**(佛-西 동측·영국 연안, coastal modeling 공통 이슈로 지목). 플랫폼 CoastalTwin(gitlab, 출판 시 공개).
+- **GNN + polynomial regression 초해상** — ★**2026-07-19 서지 오귀속 정정 + 전문 확보 verified**: **Kuehn J, Abadie S, Delpey M, Roeber V (2024)**, "Super-resolution on unstructured coastal wave computations with graph neural networks and polynomial regressions", *Coastal Engineering* **194**, 104619, doi:10.1016/j.coastaleng.2024.104619. **OA 전문**(HAL hal-04704696). 
+  - ⚠ 구판이 붙인 PII `S1463500323000963` 은 **전혀 다른 논문** — Zhu X, Wu K, Huang W (2023), "Deep learning approach for downscaling of significant wave height data from wave models", *Ocean Modelling* **185**, 102257 (**CNN 초해상**이며 GNN·ridge regression 미등장). 즉 *수치는 맞고 서지가 틀린* 형태(swan-recent-research 건과 정반대 방향의 같은 계열 실패).
+  - 정량(원문 대조): RMSE **0.3~2 cm** — 단 이는 **polynomial regression(PR)** 값. 가속은 **30~80배**(Table 6: PR 81/62/30, GN 70/55/28) — "80×"는 Region 1·PR 단일 최량치.
+  - ★원문 highlight: "**Polynomial regressions outperform graph neural networks in most cases**" — 우열 방향이 구판에 누락돼 있었음.
+- **CNN regional wind-wave surrogate** — 서지 확정(2026-07-19 Crossref): **Huang et al. (2022)**, *Applied Ocean Research* **126**, 103287, doi:10.1016/j.apor.2022.103287 — 본문 abstract-level(Elsevier 결제벽) `[source-needed]`.
 - **PINO — Ehlers·Stender·Hoffmann 2025** (arxiv:2508.03315, TU Hamburg·TU Berlin·Imperial, 13p) ★PDF: ⚠ **분류 정정 — SWAN surrogate 아닌 위상해상(phase-resolved) 파면 재구성 = 데이터 동화 문제**(HOSM/포텐셜류 영역). 희소 계측(부이 5기 case A / X-band 레이더 snapshot+교정부이 1기 case B)에서 η̃·Φ̃ˢ 시공간 전장 복원 — **ground truth 파면 없이 학습**: 자유표면 경계조건(Zakharov form Eq 1-2) 잔차를 loss 에 내장(ℒ_sensor+ℒ_phy,1+ℒ_phy,2+0.25ℒ_reg, HOSM 4차 Taylor 로 Φˢ·W 근사, Fourier 미분+Tukey 창). 아키텍처 = FNO 기반 3층·128 modes·latent 32(부이)/64(레이더), AdamW·RTX3090. HOSM 합성검증(JONSWAP TMA γ=3.3, L_p 100-200 m, ε 0.02-0.13, 1953 m×100 s): **SSP 0.1035(부이)/0.1341(레이더)**, 복원 **0.014 s/샘플 = 실시간**, 지도학습 FNO 대비 **학습데이터 ⅓**. 레이더는 tilt·shadowing 변조 명시 모델링(Eq 8-9), 고 ε 일수록 shadowing 정보손실로 오차↑(물리적 원인, 기법 한계 아님). 한계 = **1D+t 장파봉 한정**(2D+t 후속). DFG rogue-wave 과제, ChatGPT 문법교정 공개.
 
 ### A.4 Wave hydrodynamics surrogate on evolving landscapes ★ (verified, PDF read 2026-06-12)
@@ -77,8 +80,7 @@ related:
 
 - **Crossformer + SWAN** adaptive decomposition Hs (*Expert Systems with Applications* 2025, S0957417425021426) — [[swan-recent-research-2024-2026]] §2
 - **LSTM > Random Forest — 단 3h 한정** (Pearl River, 87 typhoon SWAN, *JMSE* 13(9):1612, doi:10.3390/jmse13091612) — ✅**전문 직독 verified 2026-07-19**: 3h 예보는 LSTM 이 RMSE↓·R²↑(특히 peak 포착), ★**6h 에서는 안정 시나리오 한정 RF 가 근소 우위**·LSTM 은 복잡 발달에 더 반응적. 대표 태풍 10개 독립시험 유보, 인근 3정점 일반화 유지. 상세 [[swan-recent-research-2024-2026]] §2.1
-- **Swin transformer-LSTM** high-res ocean wave (Chinese marginal seas, reanalysis-driven)
-- **Self-Attention ConvLSTM** regional Hs
+- ⚠ **Swin transformer-LSTM**(중국 연변해, 재분석 구동)·**Self-Attention ConvLSTM** regional Hs — ★**저자·연도·저널·DOI 전무 = 식별 불가 항목**(2026-07-19 감사 적발). 절대규칙 #1(무출처 단언 금지) 저촉이므로 **서지 확정 전까지 인용 금지** `[source-needed]`.
 - **SWRL Net** (*Weather and Forecasting* 35(6), 2020) — spectral residual DL 로 short-term wave forecast 개선 (numerical 위 residual correction)
 - **ANN port wave forecast** (WW3 기반, *Ocean Eng* S0029801822008496)
 

@@ -4,7 +4,7 @@ topic: storm-surge
 canonical_source: self
 citation_status: verified
 has_source_needed: true
-verification_method: "본 위키 내 cross-reference 만 verified — 02-theory.md (Pugh §6:3 IB 식, Maemi 950 mb / Hinnamnor 920 mb 중심기압 인용) + 04-code-and-tools.md (NWS 모드·KHOA OpenAPI + archive 한계 verified) + models/ADCIRC/source-analysis/storm-surge/ 7개 노트 (NWS=13 JMA-MSM + GAHM Best Track + fort.15 운영 규칙). **§2 Hinnamnor 2022 는 KHOA Annual Report 2022 §3 직접 인용으로 verified** (별도 노트 [[khoa-annual-2022-hinnamnor-surge]] 분리, 2026-05-28). **§1 Maemi 2003 §1.1.1 disclosed-gap (2026-06-01) — 핵심 수치는 Wikipedia + Park et al. JCR SI65 doi:10.2112/SI65-067.1 + eSurge + WebSearch 직접 인용으로 verified: peak 910 hPa (JMA) / 885 hPa (JTWC) / Jeju national record 950 hPa / 마산 1.40 m 1403 mm / 사망 120명 / ₩5.52 trillion 손실 확보**. 잔존 source-needed = KHOA 관측 surge peak (Annual Report 2003 부재 — 백서 변환 2012 시작, 본질적 출처 공백). **§4.1 Bolaven 2012 는 KHOA Annual Report 2012 vol.1 §7.3 직접 인용으로 verified** (별도 노트 [[khoa-annual-2012-bolaven-surge]] 분리)."
+verification_method: "본 위키 내 cross-reference 만 verified — 02-theory.md (Pugh §6:3 IB 식, Maemi 950 mb / Hinnamnor 920 mb 중심기압 인용) + 04-code-and-tools.md (NWS 모드·KHOA OpenAPI + archive 한계 verified) + models/ADCIRC/source-analysis/storm-surge/ 7개 노트 (NWS=13 JMA-MSM + GAHM Best Track + fort.15 운영 규칙). **§2 Hinnamnor 2022 는 KHOA Annual Report 2022 §3 직접 인용으로 verified** (별도 노트 [[khoa-annual-2022-hinnamnor-surge]] 분리, 2026-05-28). **§1 Maemi 2003 §1.1.1 disclosed-gap (2026-06-01) — 핵심 수치는 Wikipedia + Shim et al. JCR SI65 doi:10.2112/SI65-067.1 + eSurge + WebSearch 직접 인용으로 verified: peak 910 hPa (JMA) / 885 hPa (JTWC) / Jeju national record 950 hPa / 마산 1.40 m 1403 mm / 사망 120명 / ₩5.52 trillion 손실 확보**. 잔존 source-needed = KHOA 관측 surge peak (Annual Report 2003 부재 — 백서 변환 2012 시작, 본질적 출처 공백). **§4.1 Bolaven 2012 는 KHOA Annual Report 2012 vol.1 §7.3 직접 인용으로 verified** (별도 노트 [[khoa-annual-2012-bolaven-surge]] 분리)."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-24
 verification_by: "Claude Opus 4.7 (1M context) — 위키 내부 cross-ref만 verified, 외부 실측 수치는 source-needed 분리"
@@ -42,7 +42,7 @@ related:
 
 #### 1.1.1 추가 verified 항목 (2026-06-01 partial-verified)
 
-WebSearch + Wikipedia + Park et al. JCR 직접 fetch:
+WebSearch + Wikipedia + Shim et al. JCR 직접 fetch:
 
 | 항목 | 값 | 출처 |
 |---|---|---|
@@ -54,13 +54,13 @@ WebSearch + Wikipedia + Park et al. JCR 직접 fetch:
 | 최대 풍속 peak (10-min, JMA) | 195 km/h (120 mph) | Wikipedia ✓ |
 | 최대 풍속 peak (1-min, JTWC) | 280 km/h (175 mph), Cat 5 | Wikipedia ✓ |
 | 풍속 한반도 상륙 시 | 140 km/h (JMA) / 165 km/h (JTWC) | Wikipedia ✓ |
-| **마산만 surge** | **1.40 m (1403 mm) on 2003-09-12, recurrence ~98 yr** | eSurge / Park et al. JCR SI 65, 2013 doi:10.2112/SI65-067.1 ✓ |
+| **마산만 surge** | **1.40 m (1403 mm) on 2003-09-12, recurrence ~98 yr** | eSurge / Shim et al. JCR SI 65, 2013 doi:10.2112/SI65-067.1 ✓ |
 | 사망자 | 117 (한국) + 3 (일본) = **120** | Wikipedia ✓ |
 | 한국 경제 손실 | **₩5.52 trillion** (~US$4.8B 2003) | Wikipedia ✓ |
 | Homeless / 가옥 파괴 | 25,000 / ~5,000 | Wikipedia ✓ |
 
 **Note: 본 위키 외부 실측 surge 와 추정 차이**:
-- WebSearch/eSurge/Park et al.: **마산 1.40 m (residual or selected datum)**
+- WebSearch/eSurge/Shim et al.: **마산 1.40 m (residual or selected datum)**
 - 본 위키 [01-concept.md §3.2](01-concept.md#32-한국-주요-태풍-storm-surge-case-khoa-annual-report-인용) 기존 표기: **~2.4 m**
 - 차이 가능성: (a) 1.40 m = 잔차 (residual) vs 2.4 m = 절대 해수면 above MSL (천문조 + surge 합산), (b) 측정 정점 차이 (마산 조위관측소 vs 마산만 head), (c) 자료원 차이 (KHOA 직접 측정 vs 사후 hindcast 표시). KHOA Annual Report 2003 부재로 직접 비교 불가 — **§5 보강 우선순위 2 유지**.
 
@@ -338,6 +338,6 @@ ADCIRC 가 한국 storm-surge 의 primary unstructured 모델이라면, **EFDC+ 
 
 ## 8. 작성 메타
 
-- citation_status **verified + `has_source_needed: true`** (disclosed-gap, G9) — §2 Hinnamnor·§4.1 Bolaven 은 KHOA 연간백서 직접 인용, §1 Maemi 핵심 수치는 Park et al. (JCR SI65) 등 직접 인용으로 verified. **잔존 미출처는 절 단위 `source-needed` 토큰으로 disclosed** (KHOA 관측 surge peak — Annual Report 2003 부재로 본질적 공백, 그 외 실측치는 §5 우선순위 따라 점진 승격). 비표준 `partial-verified` → G9 disclosed-gap 정규화 (2026-06-21).
+- citation_status **verified + `has_source_needed: true`** (disclosed-gap, G9) — §2 Hinnamnor·§4.1 Bolaven 은 KHOA 연간백서 직접 인용, §1 Maemi 핵심 수치는 Shim et al. (JCR SI65) 등 직접 인용으로 verified. **잔존 미출처는 절 단위 `source-needed` 토큰으로 disclosed** (KHOA 관측 surge peak — Annual Report 2003 부재로 본질적 공백, 그 외 실측치는 §5 우선순위 따라 점진 승격). 비표준 `partial-verified` → G9 disclosed-gap 정규화 (2026-06-21).
 - 작성 의도: storm-surge concept layer 의 **case dimension** 채움. ADCIRC source-analysis 7개 노트 + Pugh equation + KHOA workflow 의 통합 적용 entry point.
 - 산타-method 비례성 적용 — 1 노트로 두 case + cross-comparison + 보강 우선순위까지 묶음.

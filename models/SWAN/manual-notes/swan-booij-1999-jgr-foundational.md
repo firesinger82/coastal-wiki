@@ -87,7 +87,7 @@ related:
 
 - **Action balance equation (1) 의 정확한 LaTeX form** (현재 [[swan-action-balance]] 의 식 출처는 SWAN 매뉴얼 verbatim) — Part 1 §2 직접 인용 시 LaTeX 일치 검증
 - **Eq 번호 cross-walk** Part 1 §2-3 (propagation + source term) ↔ SWAN 매뉴얼 ↔ 본 위키 노트
-- **검증 case (Part 2)**: NMI (Norderney·Friesian Sea), Lake George Wave Tank, Haringvliet — 본 위키 [[swan-foundation]] 의 검증 case 표 보강 가능
+- **검증 case (Part 2)**: ★2026-07-19 원문(Ris et al. 1999 Part 2) 직접 대조 — 초록 "verified in stationary mode with measurements in **five real field cases**", §3 = **Haringvliet 1 + Norderneyer Seegat 2(저조·고조) + Friesche Zeegat 2**. 구판의 "NMI"·"Lake George Wave Tank"는 **원문에 문자열 자체가 부재**(Lake George 는 Part 2 가 아니며 수조가 아니라 천해 호수 현장) — 삭제
 - DOI를 통한 Springer/AGU institutional access 시 full PDF read 가능 (사용자 환경)
 
 ## 6. 연결

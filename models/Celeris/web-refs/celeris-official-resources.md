@@ -22,7 +22,7 @@ note_date: 2026-06-12
   - **확장 Boussinesq 방정식**, hybrid finite-volume / finite-difference, **moving shoreline**, GPU(Direct3D) **faster-than-real-time**, photorealistic + colormapped 동시 시각화. coastal wave 용 최초의 interactive 모델링 플랫폼.
 
 ### 2.2 시간적분 — ✅ verified (arxiv)
-- **Tavakkol, S., Lynett, P. (2019)** "Adaptive Third Order Adams-Bashforth Time Stepping for Extended Boussinesq Equations." arxiv: [1909.04153](https://arxiv.org/abs/1909.04153).
+- **Tavakkol, S., **Son, S.**, Lynett, P. (2019)** "Adaptive Third Order Adams-Bashforth Time Stepping for Extended Boussinesq Equations." arxiv: [1909.04153](https://arxiv.org/abs/1909.04153).
 
 ### 2.3 Celeris Base (Unity3D/VR 판) — ✅ verified (Comput. Phys. Commun.)
 - **Tavakkol, S., Lynett, P. (2020)** "Celeris Base: An interactive and immersive Boussinesq-type nearshore wave simulation software." *Computer Physics Communications* **248**:106966. ADS: 2020CoPhC.24806966T. — Unity3D + C#/HLSL compute shader, **VR 헤드셋·360° 비디오·지도 오버레이·실시간 게이지**. 확장 Boussinesq를 hybrid FV-FD로 GPU 풀이. WebGPU판의 직전 세대.
