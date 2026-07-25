@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://coastal-wiki/resume-gate/submission.schema.json",
+  "title": "resume-gate worker submission",
+  "description": "The only worker-writable record. It carries observations and evidence, never completion authority. Evidence inherits candidate.source_id so a candidate/evidence source mismatch cannot be represented.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "contract_version", "manifest", "run_id", "candidate", "evidence", "attempt_reason"],
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+    "contract_version": { "type": "string", "const": "resume-gate/1" },
+    "manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["manifest_id", "sha256"],
+      "properties": {
+        "manifest_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{7,63}$" },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9_-]{7,63}$",
+      "description": "Must equal the launcher-injected run_id; stage-3 rejects mismatches."
+    },
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_id", "claim", "claim_type"],
+      "properties": {
+        "source_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{0,63}$" },
+        "claim": { "type": "string", "pattern": "\\S", "maxLength": 4000 },
+        "claim_type": { "type": "string", "enum": ["explicit", "inference"] }
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "description": "All entries are anchored to candidate.source_id by construction; no separately writable evidence source_id exists.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["locator", "quote"],
+        "properties": {
+          "locator": { "$ref": "#/$defs/locator" },
+          "quote": { "type": "string", "pattern": "\\S", "maxLength": 4000 }
+        }
+      }
+    },
+    "attempt_reason": {
+      "type": "string",
+      "pattern": "\\S",
+      "maxLength": 500,
+      "description": "Audit metadata only. The judge adapter must not include this field in judge input."
+    }
+  },
+  "$defs": {
+    "locator": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "start", "end"],
+          "properties": {
+            "type": { "const": "line_range" },
+            "start": { "type": "integer", "minimum": 1 },
+            "end": { "type": "integer", "minimum": 1 }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "start", "end"],
+          "properties": {
+            "type": { "const": "page_range" },
+            "start": { "type": "integer", "minimum": 1 },
+            "end": { "type": "integer", "minimum": 1 }
+          }
+        }
+      ]
+    }
+  }
+}

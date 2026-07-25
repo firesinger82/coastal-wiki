@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://coastal-wiki/resume-gate/judge.schema.json",
+  "title": "resume-gate external judge verdict",
+  "description": "Independent Codex/Grok verdict bound to the exact contract, manifest, submission, and judge engine version.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "contract_version",
+    "manifest",
+    "submission_sha256",
+    "judge",
+    "engine_version",
+    "verdict",
+    "claim_supported_by_evidence",
+    "reasoning",
+    "issues"
+  ],
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+    "contract_version": { "type": "string", "const": "resume-gate/1" },
+    "manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["manifest_id", "sha256"],
+      "properties": {
+        "manifest_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{7,63}$" },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+    "submission_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "judge": { "type": "string", "enum": ["codex", "grok"] },
+    "engine_version": { "type": "string", "pattern": "\\S", "maxLength": 200 },
+    "verdict": { "type": "string", "enum": ["PASS", "FAIL", "INCONCLUSIVE"] },
+    "claim_supported_by_evidence": { "type": "boolean" },
+    "reasoning": { "type": "string", "pattern": "\\S", "maxLength": 8000 },
+    "issues": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "\\S", "maxLength": 2000 }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "verdict": { "const": "PASS" } }, "required": ["verdict"] },
+      "then": {
+        "properties": {
+          "claim_supported_by_evidence": { "const": true },
+          "issues": { "maxItems": 0 }
+        }
+      }
+    }
+  ]
+}

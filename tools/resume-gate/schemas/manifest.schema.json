@@ -1,0 +1,226 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://coastal-wiki/resume-gate/manifest.schema.json",
+  "title": "resume-gate source manifest",
+  "description": "Human-approved and frozen work denominator, source registry, and negative controls. work_items is the sole denominator; no independently editable count exists.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "contract_version",
+    "manifest_id",
+    "run_scope",
+    "work_items",
+    "sources",
+    "controls"
+  ],
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+    "contract_version": { "type": "string", "const": "resume-gate/1" },
+    "manifest_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9_-]{7,63}$",
+      "description": "Human-assigned immutable manifest identity. The canonical JSON hash is bound in submissions and decisions."
+    },
+    "run_scope": { "type": "string", "pattern": "\\S", "maxLength": 2000 },
+    "work_items": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "Sole denominator SSOT. Its length is the required work-item count; duplicate source IDs are schema-invalid.",
+      "items": { "$ref": "#/$defs/source_id" }
+    },
+    "sources": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": { "pattern": "^[a-z0-9][a-z0-9_-]{0,63}$" },
+      "additionalProperties": { "$ref": "#/$defs/source" },
+      "description": "ID-keyed source registry. work_items values must resolve to keys here; stage-3 checks that cross-field membership."
+    },
+    "controls": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["canary", "parser_negative"],
+      "properties": {
+        "canary": { "$ref": "#/$defs/canary_control" },
+        "parser_negative": { "$ref": "#/$defs/parser_negative_control" }
+      }
+    }
+  },
+  "$defs": {
+    "source_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9_-]{0,63}$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "nonblank": {
+      "type": "string",
+      "pattern": "\\S"
+    },
+    "safe_relative_path": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000,
+      "pattern": "^(?=.*\\S)(?!/)(?![A-Za-z]:[\\\\/])(?!.*(?:^|[\\\\/])\\.\\.(?:[\\\\/]|$))(?!.*[\\\\])[^\\u0000]+$",
+      "description": "Lexically repo-relative POSIX path: rejects absolute paths, Windows separators/drives, NUL, and '..' segments. Realpath containment is a stage-3 check."
+    },
+    "locator": {
+      "oneOf": [
+        { "$ref": "#/$defs/line_locator" },
+        { "$ref": "#/$defs/page_locator" }
+      ]
+    },
+    "line_locator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "start", "end"],
+      "properties": {
+        "type": { "const": "line_range" },
+        "start": { "type": "integer", "minimum": 1 },
+        "end": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "page_locator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "start", "end"],
+      "properties": {
+        "type": { "const": "page_range" },
+        "start": { "type": "integer", "minimum": 1 },
+        "end": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "artifact_type", "locators"],
+      "properties": {
+        "path": { "$ref": "#/$defs/safe_relative_path" },
+        "sha256": { "$ref": "#/$defs/sha256" },
+        "artifact_type": { "type": "string", "enum": ["code", "pdf"] },
+        "locators": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/locator" }
+        },
+        "expected_claim_kind": { "type": "string", "pattern": "\\S", "maxLength": 1000 }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "artifact_type": { "const": "code" } }, "required": ["artifact_type"] },
+          "then": { "properties": { "locators": { "items": { "$ref": "#/$defs/line_locator" } } } }
+        },
+        {
+          "if": { "properties": { "artifact_type": { "const": "pdf" } }, "required": ["artifact_type"] },
+          "then": { "properties": { "locators": { "items": { "$ref": "#/$defs/page_locator" } } } }
+        }
+      ]
+    },
+    "control_common": {
+      "type": "object",
+      "required": [
+        "control_id",
+        "kind",
+        "expected_status",
+        "allowed_failure_codes",
+        "input_artifact_sha256",
+        "execution_artifact_sha256"
+      ],
+      "properties": {
+        "control_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{7,63}$" },
+        "kind": { "type": "string" },
+        "expected_status": { "type": "string" },
+        "allowed_failure_codes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]{2,63}$" }
+        },
+        "input_artifact_sha256": { "$ref": "#/$defs/sha256" },
+        "execution_artifact_sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "canary_control": {
+      "allOf": [
+        { "$ref": "#/$defs/control_common" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "control_id",
+            "kind",
+            "source_id",
+            "locator",
+            "expected_status",
+            "allowed_failure_codes",
+            "input_artifact_sha256",
+            "execution_artifact_sha256"
+          ],
+          "properties": {
+            "control_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{7,63}$" },
+            "kind": { "const": "canary" },
+            "source_id": { "$ref": "#/$defs/source_id" },
+            "locator": { "$ref": "#/$defs/locator" },
+            "expected_status": { "const": "CAUGHT" },
+            "allowed_failure_codes": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]{2,63}$" }
+            },
+            "input_artifact_sha256": { "$ref": "#/$defs/sha256" },
+            "execution_artifact_sha256": { "$ref": "#/$defs/sha256" }
+          }
+        }
+      ]
+    },
+    "parser_negative_control": {
+      "allOf": [
+        { "$ref": "#/$defs/control_common" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "control_id",
+            "kind",
+            "mutation",
+            "expected_status",
+            "allowed_failure_codes",
+            "input_artifact_sha256",
+            "execution_artifact_sha256"
+          ],
+          "properties": {
+            "control_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{7,63}$" },
+            "kind": { "const": "parser_negative" },
+            "mutation": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["mutation_id", "operation", "target"],
+              "properties": {
+                "mutation_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{7,63}$" },
+                "operation": {
+                  "type": "string",
+                  "enum": ["duplicate_key", "path_traversal", "locator_type_swap", "range_reverse", "hash_tamper", "evidence_source_swap"]
+                },
+                "target": { "type": "string", "pattern": "\\S", "maxLength": 500 }
+              }
+            },
+            "expected_status": { "const": "REJECTED" },
+            "allowed_failure_codes": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]{2,63}$" }
+            },
+            "input_artifact_sha256": { "$ref": "#/$defs/sha256" },
+            "execution_artifact_sha256": { "$ref": "#/$defs/sha256" }
+          }
+        }
+      ]
+    }
+  }
+}

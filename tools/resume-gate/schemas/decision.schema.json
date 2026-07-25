@@ -1,0 +1,196 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://coastal-wiki/resume-gate/decision.schema.json",
+  "title": "resume-gate final decision",
+  "description": "Decision-engine-only completion record. PASS is schema-valid if and only if all six truth-table inputs have their required passing values.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "contract_version", "run_id", "attempt_id", "provenance", "inputs", "status", "chain_root"],
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+    "contract_version": { "type": "string", "const": "resume-gate/1" },
+    "run_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{7,63}$" },
+    "attempt_id": { "type": "integer", "minimum": 1 },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["manifest", "submission", "judges", "decision_engine_version"],
+      "properties": {
+        "manifest": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["schema_version", "manifest_id", "sha256"],
+          "properties": {
+            "schema_version": { "type": "integer", "const": 1 },
+            "manifest_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{7,63}$" },
+            "sha256": { "$ref": "#/$defs/sha256" }
+          }
+        },
+        "submission": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["schema_version", "sha256"],
+          "properties": {
+            "schema_version": { "type": "integer", "const": 1 },
+            "sha256": { "$ref": "#/$defs/sha256" }
+          }
+        },
+        "judges": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["codex", "grok"],
+          "properties": {
+            "codex": { "$ref": "#/$defs/judge_provenance" },
+            "grok": { "$ref": "#/$defs/judge_provenance" }
+          }
+        },
+        "decision_engine_version": { "type": "string", "pattern": "\\S", "maxLength": 200 }
+      }
+    },
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["deterministic", "codex", "grok", "canary", "parser_negative", "evidence_chain"],
+      "properties": {
+        "deterministic": { "$ref": "#/$defs/deterministic" },
+        "codex": { "$ref": "#/$defs/judge_input" },
+        "grok": { "$ref": "#/$defs/judge_input" },
+        "canary": { "$ref": "#/$defs/canary_result" },
+        "parser_negative": { "$ref": "#/$defs/parser_negative_result" },
+        "evidence_chain": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "provenance_sha256"],
+          "properties": {
+            "status": { "type": "string", "enum": ["VALID", "INVALID"] },
+            "provenance_sha256": {
+              "$ref": "#/$defs/sha256",
+              "description": "Hash of canonical decision provenance; stage-3 recomputes it and includes it under chain_root."
+            }
+          }
+        }
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": ["PASS", "FAIL", "HARD_FAIL", "FAILED_STOPPED", "NOT_COMPLETE", "CANARY_CAUGHT"]
+    },
+    "chain_root": { "$ref": "#/$defs/sha256" }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "judge_provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "engine_version", "result_sha256"],
+      "properties": {
+        "schema_version": { "type": "integer", "const": 1 },
+        "engine_version": { "type": "string", "pattern": "\\S", "maxLength": 200 },
+        "result_sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "judge_input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["verdict"],
+      "properties": {
+        "verdict": { "type": "string", "enum": ["PASS", "FAIL", "INCONCLUSIVE"] }
+      }
+    },
+    "deterministic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "failure_codes"],
+      "properties": {
+        "status": { "type": "string", "enum": ["PASS", "FAIL"] },
+        "failure_codes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]{2,63}$" }
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "status": { "const": "PASS" } }, "required": ["status"] },
+          "then": { "properties": { "failure_codes": { "maxItems": 0 } } }
+        },
+        {
+          "if": { "properties": { "status": { "const": "FAIL" } }, "required": ["status"] },
+          "then": { "properties": { "failure_codes": { "minItems": 1 } } }
+        }
+      ]
+    },
+    "canary_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["control_id", "status", "failure_codes", "input_artifact_sha256", "execution_artifact_sha256"],
+      "properties": {
+        "control_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{7,63}$" },
+        "status": { "type": "string", "enum": ["CAUGHT", "MISSED", "NA"] },
+        "failure_codes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]{2,63}$" }
+        },
+        "input_artifact_sha256": { "$ref": "#/$defs/sha256" },
+        "execution_artifact_sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "parser_negative_result": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["control_id", "status", "failure_codes", "input_artifact_sha256", "execution_artifact_sha256"],
+      "properties": {
+        "control_id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{7,63}$" },
+        "status": { "type": "string", "enum": ["REJECTED", "ACCEPTED", "NA"] },
+        "failure_codes": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]{2,63}$" }
+        },
+        "input_artifact_sha256": { "$ref": "#/$defs/sha256" },
+        "execution_artifact_sha256": { "$ref": "#/$defs/sha256" }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "status": { "const": "PASS" } }, "required": ["status"] },
+      "then": {
+        "properties": {
+          "inputs": {
+            "properties": {
+              "deterministic": { "properties": { "status": { "const": "PASS" } } },
+              "codex": { "properties": { "verdict": { "const": "PASS" } } },
+              "grok": { "properties": { "verdict": { "const": "PASS" } } },
+              "canary": { "properties": { "status": { "const": "CAUGHT" } } },
+              "parser_negative": { "properties": { "status": { "const": "REJECTED" } } },
+              "evidence_chain": { "properties": { "status": { "const": "VALID" } } }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "inputs": {
+            "properties": {
+              "deterministic": { "properties": { "status": { "const": "PASS" } }, "required": ["status"] },
+              "codex": { "properties": { "verdict": { "const": "PASS" } }, "required": ["verdict"] },
+              "grok": { "properties": { "verdict": { "const": "PASS" } }, "required": ["verdict"] },
+              "canary": { "properties": { "status": { "const": "CAUGHT" } }, "required": ["status"] },
+              "parser_negative": { "properties": { "status": { "const": "REJECTED" } }, "required": ["status"] },
+              "evidence_chain": { "properties": { "status": { "const": "VALID" } }, "required": ["status"] }
+            },
+            "required": ["deterministic", "codex", "grok", "canary", "parser_negative", "evidence_chain"]
+          }
+        },
+        "required": ["inputs"]
+      },
+      "then": { "properties": { "status": { "const": "PASS" } } }
+    }
+  ]
+}
