@@ -6,6 +6,8 @@
 
 `decision.json(status=PASS)`만 판독 완료를 뜻한다. worker 자연어, 자기평가, confidence, TODO, `attempt_reason`, subagent 요약은 완료 권한이 없다. 결정 파일은 worker submit 경로가 아니라 결정 엔진만 생성한다.
 
+**이 게이트는 모델의 자기검증을 대체·보완하는 장치가 아니다.** 모델이 스스로 검증을 얼마나 잘하게 되든, 자기신고에 완료 권한이 없다는 사실은 변하지 않는다. 모델 세대 교체(자기검증 능력 향상, "재검토 지시는 불필요"류 마이그레이션 권고)를 이유로 이 계약을 제거·완화하지 않는다. (CLAUDE.md 작업 규범 #4)
+
 방어 대상은 관리형 Claude Code 세션과 그 세션의 tool·subagent·MCP다. 악성 사람/root 또는 같은 UID의 별도 악성 프로세스에 대한 비부인성은 범위 밖이다. 보호된 source tree와 설치될 실행기는 root-owned read-only라는 전제를 둔다.
 
 ## 1단계 계약

@@ -13,7 +13,7 @@ topic: <concepts/topic/ 경로의 토픽명. 없으면 생략>
 canonical_source: <이 정보의 진짜 위치. 자기 자신이면 self>
 citation_status: draft-unsourced | source-needed | verified
 has_source_needed: true | false   # §2.0 — L4 감사된 verified 만. 부재=미감사. 완전sourced도 false 명시
-note_author: "<Claude Opus 4.7 (1M context) | Codex | 사용자 | ...>"
+note_author: "<Claude <세션 모델> (1M context) | Codex | 사용자 | ...>"   # 모델명은 작성 세션의 실제 모델
 note_date: YYYY-MM-DD
 verification_by: "<사용자 또는 verifier 명, verified 단계에서만 필수>"
 verification_date: YYYY-MM-DD

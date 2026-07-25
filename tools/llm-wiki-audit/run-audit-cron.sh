@@ -93,9 +93,12 @@ elif [ -n "$(git status --porcelain _staging/audit/)" ]; then
     git diff --cached --name-only | grep -v '^_staging/audit/' | head
     git reset -q; exit 4
   fi
+  # 무인 실행이라 세션 모델명을 알 수 없다 → 현재 운영 모델을 기본값으로, env 로 덮어씀.
+  # 모델 승급 시 이 기본값 갱신(또는 COASTAL_MODEL_SIG 설정). CONVENTIONS §1 note_author 와 같은 규칙.
+  MODEL_SIG="${COASTAL_MODEL_SIG:-Claude Opus 5 (1M context)}"
   git commit -q -m "chore(audit): L4 V3 자율 감사 $TS — N=$N (report-only, cron)
 
-Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>" \
+Co-Authored-By: $MODEL_SIG <noreply@anthropic.com>" \
     && echo "audit 산출물 커밋 완료" || echo "커밋 실패"
 else
   echo "audit 산출물 변경 없음"

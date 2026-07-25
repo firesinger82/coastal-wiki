@@ -119,8 +119,9 @@ promoted_date: YYYY-MM-DD
   - <archive 파일> → <destination> (citation_status: source-needed)
   - ...
 
-  Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
+  Co-Authored-By: Claude <세션 모델> (1M context) <noreply@anthropic.com>
   ```
+  (모델명은 실행 세션의 실제 모델 — 하드코딩 금지. CONVENTIONS §1 `note_author` 와 같은 규칙.)
 - pre-commit hook (`tools/validate-research-isolation.sh`) 위반 여부 사전 점검: archive 파일은 inbox 트리 안에 있어 frontmatter `citation_status` 가 변하지 않아야 함 — 새 필드 `promoted_to` 만 추가하므로 통과해야 정상.
 
 ## Skill 호출 예시

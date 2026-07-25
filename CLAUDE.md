@@ -17,6 +17,17 @@
 7. **textbook 인용은 `source_id` 기반**. canonical 본문에서 raw 파일명·작성자 로컬 경로 직접 사용 금지 (repo-상대 `file:line`·공식 vendor 경로 인용·`sources.yml` 레지스트리는 예외 — [CONVENTIONS.md](CONVENTIONS.md) §4). 매니페스트는 [textbook/sources.yml](textbook/sources.yml).
 8. **위키는 케이스 *공급원*, 저장소가 아니다**. 개인 run 결과·calibration 수치·작성자/프로젝트 실행에만 의존하는 운영 지침은 canonical(`concepts/`·`models/`·`textbook/`)에 두지 않는다 — 위키를 바탕으로 케이스는 별도에서 구축. 단, 소스코드·식·알고리즘이 *main claim*인 실패패턴·휴리스틱·플레이북은 `models/<model>/source-analysis/{failure-patterns,heuristics,playbooks}/` 허용([plan.md](plan.md) G8/triage), `06-model-application.md`는 요약+source-analysis 링크 wrapper로 유지. 제거할 자산은 마이그레이션 중이면 `_staging/`·`_archive/` 경유(즉시 삭제는 별도 게이트). 근거: reference↔how-to 분리(Diátaxis)·SSOT/DRY. ([CONVENTIONS.md](CONVENTIONS.md) §3·§4·§6, [plan.md](plan.md) G8.)
 
+## 작업 규범 (Opus 5 대응)
+
+모델 세대별 행동 특성에 대한 하네스 보정. 위 절대 규칙과 충돌하면 절대 규칙이 우선한다.
+
+1. **명시 지시 없이는 수정하지 않는다.** 읽기·조사·보고가 기본값. 요청 범위를 임의로 넓히거나 좁히지 않는다. 인접한 개선점이 보이면 실행 대신 보고한다. 애매하면 신중한 동료처럼 판단하되, 해석에 따라 결과물이 달라지는 지점에서만 묻는다. (근거: 2026-07-24 total-read 사고)
+2. **응답과 산출물 길이는 과제에 비례.** 노트·리포트에 요약 반복·보일러플레이트 절을 덧붙이지 않는다. 실질이 끝나면 멈춘다. 짧게 쓰려고 문장을 파편·화살표·약어로 압축하지 말고, 넣을 내용을 고르는 쪽으로 줄인다.
+3. **subagent·workflow는 요청 시에만.** 직접 몇 번의 tool call로 끝나는 일을 위임하지 않는다. 검증 목적 위임은 금지 — 검증은 4항 소관.
+4. **완료 판정은 자기신고가 아니다.** [`coastal-audit`](.claude/skills/coastal-audit/SKILL.md)의 Adversary·human gate와 [`tools/resume-gate/`](tools/resume-gate/README.md)의 `decision.json`은 모델 자기검증을 대체하는 장치가 아니라, 자기신고에 완료 권한을 주지 않기 위한 **외부 게이트**다. 모델의 자기검증 능력 향상을 이유로 제거·완화하지 않는다.
+5. **자기수정은 짧게.** 사용자의 판단·코드·결론을 바꾸는 오류만 정정하고 계속 진행한다. 경위 서술·자책·오류 집계는 하지 않는다. 후속 질문이 곧 지적은 아니다 — 물은 것에 답한다.
+6. **장기 작업은 첫 턴에 전체 사양을.** 자율·다단계 작업(전수 감사, 마이그레이션, 파일럿)은 목표·제약·완료조건을 처음에 모두 주는 편이 여러 턴에 걸쳐 점증적으로 지시하는 것보다 결과가 낫다. 사용자·AI 양쪽에 해당.
+
 ## 디렉토리 책임
 
 | 경로 | 무엇이 들어가는가 | 무엇이 안 들어가는가 |

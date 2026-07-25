@@ -58,6 +58,8 @@ slice 의 각 파일을 읽고(`wiki_read` 또는 Read), **각 단언(assertion)
 
 UNSOURCED 후보마다 **반대 입장에서 refute 시도**: "사실은 이 근처/섹션 헤더/frontmatter/인접 wikilink에 출처가 있지 않은가?" refute 성공하면 그 플래그 폐기. **refute 실패한 것만 confirmed unsourced.** 불확실하면 폐기(precision 우선).
 
+> **이 단계는 "네 답을 다시 검토하라"류 자기검증 지시가 아니다.** 오탐(verified 거짓 지적)을 잘라내는 게이트이며, 5단계 human gate와 함께 이 skill 의 판정 신뢰성을 지탱한다. 모델 세대 교체(자기검증 능력 향상)를 이유로 제거·축약하지 않는다. (CLAUDE.md 작업 규범 #4)
+
 ### 4. Record (결정론적)
 
 각 파일의 findings 를 JSON 으로 조립해 recorder 에 전달:
@@ -105,8 +107,9 @@ ledger·리포트(`_staging/audit/`)는 검색 인덱스 denylist + tracked. 커
 ```
 chore(audit): L4 자가 감사 <date> — N파일, 위반 K건
 
-Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+Co-Authored-By: Claude <세션 모델> (1M context) <noreply@anthropic.com>
 ```
+(모델명은 이 skill 을 실행한 세션의 실제 모델을 기입 — 하드코딩 금지. 노트 감사 추적용, CONVENTIONS §1 `note_author` 와 같은 규칙.)
 
 ## 범위 (V1, 의도된 축소)
 
