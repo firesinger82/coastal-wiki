@@ -54,6 +54,17 @@ DATA_BEGIN = "<<<RESUME_GATE_DATA_BEGIN>>>"
 DATA_END = "<<<RESUME_GATE_DATA_END>>>"
 _RESERVED_DATA_MARKERS = ("<<<RESUME_GATE_DATA_", "<<<SLICE_")
 CLI_ERROR_MESSAGE_LIMIT = 500
+_GROK_COMPAT_CELLS = {
+    "cursor": frozenset({"skills", "rules", "agents", "mcps", "hooks", "sessions"}),
+    "claude": frozenset({"skills", "rules", "agents", "mcps", "hooks", "sessions"}),
+    "codex": frozenset({"skills", "rules", "agents", "mcps", "hooks", "sessions"}),
+}
+_GROK_MARKETPLACE_BOOKKEEPING_KEYS = frozenset(
+    {
+        "default_skills_installs_purged",
+        "official_marketplace_auto_installed",
+    }
+)
 
 
 def _load_validator() -> Any:
@@ -172,14 +183,33 @@ def _json_compact(value: Any) -> str:
     return json.dumps(value, ensure_ascii=False, separators=(",", ":"))
 
 
-def derive_cli_schema(schema: dict[str, Any]) -> dict[str, Any]:
+def _remove_patterns(value: Any) -> None:
+    if isinstance(value, dict):
+        value.pop("pattern", None)
+        for nested in value.values():
+            _remove_patterns(nested)
+    elif isinstance(value, list):
+        for nested in value:
+            _remove_patterns(nested)
+
+
+def derive_cli_schema(
+    schema: dict[str, Any],
+    *,
+    judge_name: str,
+) -> dict[str, Any]:
     """Derive the generation-only schema without weakening the contract schema."""
 
-    return {
+    derived = {
         key: copy.deepcopy(value)
         for key, value in schema.items()
         if key != "allOf"
     }
+    if judge_name == "grok":
+        _remove_patterns(derived)
+    elif judge_name != "codex":
+        raise ValueError(f"unsupported judge for CLI schema: {judge_name!r}")
+    return derived
 
 
 def _contains_reserved_marker(value: str) -> bool:
@@ -393,6 +423,24 @@ def _has_nested_credential_config(value: Any) -> bool:
     return False
 
 
+def _verify_grok_compat_disabled(value: Any) -> None:
+    if not isinstance(value, dict) or set(value) - set(_GROK_COMPAT_CELLS):
+        raise RunnerError("Grok config contains unapproved compatibility structure")
+    for vendor, cells in value.items():
+        allowed_cells = _GROK_COMPAT_CELLS[vendor]
+        if not isinstance(cells, dict) or set(cells) - allowed_cells:
+            raise RunnerError("Grok config contains unapproved compatibility structure")
+        if any(enabled is not False for enabled in cells.values()):
+            raise RunnerError("Grok config enables compatibility customization")
+
+
+def _verify_grok_marketplace_bookkeeping(value: Any) -> None:
+    if not isinstance(value, dict) or set(value) - _GROK_MARKETPLACE_BOOKKEEPING_KEYS:
+        raise RunnerError("Grok config contains unapproved marketplace structure")
+    if any(not isinstance(bookkeeping, bool) for bookkeeping in value.values()):
+        raise RunnerError("Grok marketplace bookkeeping is not boolean")
+
+
 def _verify_grok_auth(environment: Mapping[str, str]) -> None:
     grok_home = _auth_home(environment, "GROK_HOME", ".grok")
     auth = _read_private_json(grok_home / "auth.json", "Grok auth")
@@ -411,12 +459,16 @@ def _verify_grok_auth(environment: Mapping[str, str]) -> None:
         config = tomllib.loads(config_path.read_text(encoding="utf-8")) if config_path.is_file() else {}
     except (OSError, UnicodeDecodeError, tomllib.TOMLDecodeError) as error:
         raise RunnerError(f"Grok config cannot be verified: {error}") from error
-    unapproved_sections = set(config) - {"cli", "ui"}
+    unapproved_sections = set(config) - {"cli", "ui", "compat", "marketplace"}
     if unapproved_sections:
         raise RunnerError(
             "Grok config contains unapproved sections: "
             + ", ".join(sorted(unapproved_sections))
         )
+    if "compat" in config:
+        _verify_grok_compat_disabled(config["compat"])
+    if "marketplace" in config:
+        _verify_grok_marketplace_bookkeeping(config["marketplace"])
     if _has_nested_credential_config(config):
         raise RunnerError("Grok config contains credential-bearing fields")
 
@@ -852,7 +904,7 @@ def run_adapter(
             schema = _load_judge_schema(schema_path)
         except RuntimeError as error:
             return AdapterOutcome.failed("JUDGE_SCHEMA_UNAVAILABLE", str(error))
-        cli_schema = derive_cli_schema(schema)
+        cli_schema = derive_cli_schema(schema, judge_name=config.name)
         try:
             if not empty_cwd.is_dir() or any(empty_cwd.iterdir()):
                 return AdapterOutcome.failed(

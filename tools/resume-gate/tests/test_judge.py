@@ -201,6 +201,32 @@ class CodexPreflightMockRunner(adapter.SubprocessJudgeRunner):
         return self.login_result
 
 
+class GrokPreflightMockRunner(adapter.SubprocessJudgeRunner):
+    def __init__(self, inspect_value: dict[str, Any]) -> None:
+        self.inspect_value = inspect_value
+        self.calls: list[tuple[str, ...]] = []
+
+    def _run_preflight(
+        self,
+        argv: tuple[str, ...],
+        environment: dict[str, str],
+    ) -> adapter.ProcessResult:
+        del environment
+        self.calls.append(argv)
+        if argv[-1] == "--version":
+            return adapter.ProcessResult(
+                0,
+                (adapter.GROK_ENGINE_VERSION + "\n").encode("utf-8"),
+                b"",
+            )
+        assert argv[-2:] == ("inspect", "--json")
+        return adapter.ProcessResult(
+            0,
+            json.dumps(self.inspect_value).encode("utf-8"),
+            b"",
+        )
+
+
 def run_with_mock(
     judge_name: str,
     result_factory: Callable[[dict[str, Any], dict[str, Any]], dict[str, Any]],
@@ -268,16 +294,51 @@ def test_valid_codex_fail_is_returned_and_prompt_is_exact() -> None:
     assert b"attempt_reason" not in runner.prompt
 
 
-def test_cli_schema_removes_only_top_level_allof_for_both_judges() -> None:
+def test_cli_schemas_are_judge_specific_without_weakening_contract_schema() -> None:
     contract_schema = load_json(GATE_ROOT / "schemas" / "judge.schema.json")
-    cli_schema = adapter.derive_cli_schema(contract_schema)
+    codex_schema = adapter.derive_cli_schema(contract_schema, judge_name="codex")
+    grok_schema = adapter.derive_cli_schema(contract_schema, judge_name="grok")
     assert "allOf" in contract_schema
-    assert "allOf" not in cli_schema
-    assert set(cli_schema) == set(contract_schema) - {"allOf"}
-    for key, value in cli_schema.items():
+    assert "allOf" not in codex_schema
+    assert "allOf" not in grok_schema
+    assert set(codex_schema) == set(contract_schema) - {"allOf"}
+    for key, value in codex_schema.items():
         assert value == contract_schema[key]
 
-    observed_schemas = []
+    def collect_patterns(value: Any) -> list[Any]:
+        patterns: list[Any] = []
+        if isinstance(value, dict):
+            if "pattern" in value:
+                patterns.append(value["pattern"])
+            for nested in value.values():
+                patterns.extend(collect_patterns(nested))
+        elif isinstance(value, list):
+            for nested in value:
+                patterns.extend(collect_patterns(nested))
+        return patterns
+
+    assert collect_patterns(contract_schema)
+    assert collect_patterns(codex_schema) == collect_patterns(contract_schema)
+    assert not collect_patterns(grok_schema)
+
+    expected_grok_schema = copy.deepcopy(codex_schema)
+
+    def delete_patterns(value: Any) -> None:
+        if isinstance(value, dict):
+            value.pop("pattern", None)
+            for nested in value.values():
+                delete_patterns(nested)
+        elif isinstance(value, list):
+            for nested in value:
+                delete_patterns(nested)
+
+    delete_patterns(expected_grok_schema)
+    assert grok_schema == expected_grok_schema
+    assert (
+        grok_schema["properties"]["reasoning"]["maxLength"]
+        == contract_schema["properties"]["reasoning"]["maxLength"]
+    )
+
     for judge_name in ("codex", "grok"):
         outcome, runner = run_with_mock(
             judge_name,
@@ -288,9 +349,8 @@ def test_cli_schema_removes_only_top_level_allof_for_both_judges() -> None:
             ),
         )
         assert outcome.status == "VALIDATED", outcome.as_dict()
-        assert runner.schema == cli_schema
-        observed_schemas.append(runner.schema)
-    assert observed_schemas[0] == observed_schemas[1]
+        expected_schema = codex_schema if judge_name == "codex" else grok_schema
+        assert runner.schema == expected_schema
 
 
 def test_echo_fields_and_engine_version_mutations_are_rejected() -> None:
@@ -555,7 +615,8 @@ def test_pinned_cli_command_lines_block_mutation_surfaces() -> None:
     assert "--ignore-rules" in codex
 
     schema_value = adapter.derive_cli_schema(
-        load_json(GATE_ROOT / "schemas" / "judge.schema.json")
+        load_json(GATE_ROOT / "schemas" / "judge.schema.json"),
+        judge_name="grok",
     )
     grok = adapter.build_grok_argv(
         prompt="mock prompt",
@@ -608,10 +669,210 @@ def test_grok_inspect_rejects_external_customization() -> None:
         raise AssertionError("Grok inspect accepted enabled external compatibility")
 
 
+def test_grok_preflight_accepts_only_disabled_known_compat_config() -> None:
+    clean_inspect = {
+        "projectInstructions": [],
+        "hooks": [],
+        "plugins": [],
+        "mcpServers": [],
+        "skills": [],
+        "agents": [{"source": {"type": "builtin"}}],
+        "externalCompat": {"cells": [{"enabled": False}]},
+    }
+    disabled_compat = """
+[compat.cursor]
+skills = false
+rules = false
+agents = false
+mcps = false
+hooks = false
+sessions = false
+
+[compat.claude]
+skills = false
+rules = false
+agents = false
+mcps = false
+hooks = false
+sessions = false
+
+[compat.codex]
+skills = false
+rules = false
+agents = false
+mcps = false
+hooks = false
+sessions = false
+"""
+    with tempfile.TemporaryDirectory(prefix="resume-gate-grok-auth-test-") as temp:
+        grok_home = pathlib.Path(temp) / ".grok"
+        grok_home.mkdir()
+        auth_path = grok_home / "auth.json"
+        write_json(
+            auth_path,
+            {
+                "https://auth.x.ai::mock-client": {
+                    "auth_mode": "oidc",
+                    "refresh_token": "mock-refresh-token",
+                }
+            },
+        )
+        auth_path.chmod(0o600)
+        (grok_home / "config.toml").write_text(disabled_compat, encoding="utf-8")
+        empty_cwd = pathlib.Path(temp) / "empty"
+        empty_cwd.mkdir()
+        runner = GrokPreflightMockRunner(clean_inspect)
+        runner.preflight(
+            adapter.JUDGES["grok"],
+            {"GROK_HOME": str(grok_home)},
+            empty_cwd,
+        )
+        assert len(runner.calls) == 2
+
+
+def test_grok_config_rejects_enabled_malformed_or_unknown_compat() -> None:
+    rejected_configs = (
+        "[compat.claude]\nskills = true\n",
+        '[compat.claude]\nskills = "false"\n',
+        "[compat.claude]\nunknown = false\n",
+        "[compat.unknown]\nskills = false\n",
+    )
+    with tempfile.TemporaryDirectory(prefix="resume-gate-grok-config-test-") as temp:
+        grok_home = pathlib.Path(temp)
+        auth_path = grok_home / "auth.json"
+        write_json(
+            auth_path,
+            {
+                "https://auth.x.ai::mock-client": {
+                    "auth_mode": "oidc",
+                    "refresh_token": "mock-refresh-token",
+                }
+            },
+        )
+        auth_path.chmod(0o600)
+        config_path = grok_home / "config.toml"
+        for config_text in rejected_configs:
+            config_path.write_text(config_text, encoding="utf-8")
+            try:
+                adapter._verify_grok_auth({"GROK_HOME": str(grok_home)})
+            except adapter.RunnerError:
+                pass
+            else:
+                raise AssertionError(f"Grok config accepted: {config_text!r}")
+
+
+def test_grok_config_still_rejects_other_top_level_sections() -> None:
+    with tempfile.TemporaryDirectory(prefix="resume-gate-grok-config-test-") as temp:
+        grok_home = pathlib.Path(temp)
+        auth_path = grok_home / "auth.json"
+        write_json(
+            auth_path,
+            {
+                "https://auth.x.ai::mock-client": {
+                    "auth_mode": "oidc",
+                    "refresh_token": "mock-refresh-token",
+                }
+            },
+        )
+        auth_path.chmod(0o600)
+        (grok_home / "config.toml").write_text(
+            "[mcp.mock]\ncommand = \"mock\"\n",
+            encoding="utf-8",
+        )
+        try:
+            adapter._verify_grok_auth({"GROK_HOME": str(grok_home)})
+        except adapter.RunnerError:
+            pass
+        else:
+            raise AssertionError("Grok config accepted an unapproved mcp section")
+
+
+def test_grok_preflight_accepts_known_boolean_marketplace_bookkeeping() -> None:
+    clean_inspect = {
+        "projectInstructions": [],
+        "hooks": [],
+        "plugins": [],
+        "mcpServers": [],
+        "skills": [],
+        "agents": [{"source": {"type": "builtin"}}],
+        "externalCompat": {"cells": [{"enabled": False}]},
+    }
+    with tempfile.TemporaryDirectory(prefix="resume-gate-grok-marketplace-test-") as temp:
+        grok_home = pathlib.Path(temp) / ".grok"
+        grok_home.mkdir()
+        auth_path = grok_home / "auth.json"
+        write_json(
+            auth_path,
+            {
+                "https://auth.x.ai::mock-client": {
+                    "auth_mode": "oidc",
+                    "refresh_token": "mock-refresh-token",
+                }
+            },
+        )
+        auth_path.chmod(0o600)
+        (grok_home / "config.toml").write_text(
+            """
+[marketplace]
+default_skills_installs_purged = true
+official_marketplace_auto_installed = false
+""",
+            encoding="utf-8",
+        )
+        empty_cwd = pathlib.Path(temp) / "empty"
+        empty_cwd.mkdir()
+        runner = GrokPreflightMockRunner(clean_inspect)
+        runner.preflight(
+            adapter.JUDGES["grok"],
+            {"GROK_HOME": str(grok_home)},
+            empty_cwd,
+        )
+        assert len(runner.calls) == 2
+
+
+def test_grok_config_rejects_marketplace_sources_unknown_or_nonboolean_values() -> None:
+    rejected_configs = (
+        """
+[[marketplace.sources]]
+name = "unapproved"
+""",
+        """
+[marketplace]
+unknown = true
+""",
+        """
+[marketplace]
+default_skills_installs_purged = "true"
+""",
+    )
+    with tempfile.TemporaryDirectory(prefix="resume-gate-grok-marketplace-test-") as temp:
+        grok_home = pathlib.Path(temp)
+        auth_path = grok_home / "auth.json"
+        write_json(
+            auth_path,
+            {
+                "https://auth.x.ai::mock-client": {
+                    "auth_mode": "oidc",
+                    "refresh_token": "mock-refresh-token",
+                }
+            },
+        )
+        auth_path.chmod(0o600)
+        config_path = grok_home / "config.toml"
+        for config_text in rejected_configs:
+            config_path.write_text(config_text, encoding="utf-8")
+            try:
+                adapter._verify_grok_auth({"GROK_HOME": str(grok_home)})
+            except adapter.RunnerError:
+                pass
+            else:
+                raise AssertionError(f"Grok config accepted: {config_text!r}")
+
+
 TESTS = [
     test_canary_data_golden_and_attempt_reason_omitted,
     test_valid_codex_fail_is_returned_and_prompt_is_exact,
-    test_cli_schema_removes_only_top_level_allof_for_both_judges,
+    test_cli_schemas_are_judge_specific_without_weakening_contract_schema,
     test_echo_fields_and_engine_version_mutations_are_rejected,
     test_schema_invalid_output_is_rejected,
     test_generation_schema_accepts_but_contract_rejects_pass_with_issues,
@@ -625,6 +886,11 @@ TESTS = [
     test_codex_preflight_rejects_partial_or_split_login_confirmation,
     test_pinned_cli_command_lines_block_mutation_surfaces,
     test_grok_inspect_rejects_external_customization,
+    test_grok_preflight_accepts_only_disabled_known_compat_config,
+    test_grok_config_rejects_enabled_malformed_or_unknown_compat,
+    test_grok_config_still_rejects_other_top_level_sections,
+    test_grok_preflight_accepts_known_boolean_marketplace_bookkeeping,
+    test_grok_config_rejects_marketplace_sources_unknown_or_nonboolean_values,
 ]
 
 

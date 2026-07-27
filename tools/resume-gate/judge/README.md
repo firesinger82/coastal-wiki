@@ -13,9 +13,10 @@
   `7a71c502a919bfb3ca70e18f1aca7dbb392dd5e7808f4962e7237ef9f75fe8b0`이며
   `adapter.py`의 `PROMPT_SHA256`에 고정했다.
 - judge 계약 schema는 `../schemas/judge.schema.json`, deterministic 결박과 source
-  snapshot은 기존 `../validator/validate.py`를 직접 로드해 재사용한다. CLI 생성
-  보조에는 이 객체에서 최상위 `allOf`만 제거한 런타임 파생본을 두 judge에 동일하게
-  사용하며, 계약 검증은 계속 원본 전체 schema로 수행한다.
+  snapshot은 기존 `../validator/validate.py`를 직접 로드해 재사용한다. Codex CLI
+  생성 보조에는 이 객체에서 최상위 `allOf`만 제거한 런타임 파생본을 사용하고,
+  Grok 파생본은 여기에 더해 중첩된 모든 `pattern`을 제거한다. 계약 검증은 계속
+  원본 전체 schema로 수행한다.
 
 adapter는 시작할 때 prompt 해시와 API-key 환경을 먼저 검사한 후 다음 순서로
 진행한다.
@@ -27,8 +28,9 @@ adapter는 시작할 때 prompt 해시와 API-key 환경을 먼저 검사한 후
 3. slice에는 NFKC를 적용하되 line/page 구조와 whitespace는 보존한다.
 4. strict-decoded allowlist로 DATA를 조립한다. `schema_version`은 submission의
    strict-decoded 정수 값을 사용하고, `attempt_reason`은 읽어 전달하지 않는다.
-5. 원본 schema에서 최상위 `allOf`만 메모리에서 제거해 생성 보조 schema를 만든 뒤,
-   runner preflight 후 한 번만 외부 CLI를 호출한다.
+5. 원본 schema에서 최상위 `allOf`를 메모리에서 제거하고, Grok에만 모든 중첩
+   `pattern`도 제거해 생성 보조 schema를 만든 뒤 runner preflight 후 한 번만 외부
+   CLI를 호출한다.
 6. Codex JSONL 또는 Grok JSON wrapper를 strict decode하고, 그 안의 judge JSON도
    duplicate-key를 거부하는 strict decode를 한다.
 7. 원본 `judge.schema.json` 전체로 검증한 뒤 `contract_version`, `manifest_id`,
@@ -85,8 +87,10 @@ API-key 인증은 다음처럼 거부한다.
   override는 거부한다.
 - Grok은 exact empty cwd에서 `grok inspect --json`을 실행해 project instruction,
   hook, plugin, MCP server, non-bundled skill, non-builtin agent와 enabled external
-  compatibility가 하나라도 있으면 호출 전에 거부한다. `config.toml`도 `cli`·`ui`
-  이외 section을 허용하지 않는다.
+  compatibility가 하나라도 있으면 호출 전에 거부한다. `config.toml`은 `cli`·`ui`,
+  알려진 모든 leaf가 정확히 `false`인 `compat`, 그리고 알려진 불리언 북키핑 키
+  `default_skills_installs_purged`·`official_marketplace_auto_installed`만 있는
+  `marketplace`만 허용한다.
 - 실제 child 환경에서도 API-key 변수를 제거하고 `/usr/bin/env -u`를 호출
   command에 명시한다.
 - Grok `0.2.112`의 local headless 문서가 정의한
@@ -139,7 +143,7 @@ Grok 고정 argv:
   --no-plan --no-subagents --no-memory --disable-web-search \
   --max-turns 1 \
   --output-format json \
-  --json-schema '<최상위 allOf만 제거한 런타임 파생 schema의 compact JSON>' \
+  --json-schema '<최상위 allOf와 모든 pattern을 제거한 Grok 파생 schema의 compact JSON>' \
   --verbatim \
   -p '<prompt.fixed.txt + blank LF + generated DATA>'
 ```
@@ -156,7 +160,7 @@ subagent surface를 이중 차단한다. cwd는 존재하는 빈 디렉토리여
 ```
 
 mock suite는 canary DATA golden bytes, `attempt_reason` 제외, echo/engine 변조,
-생성 보조 schema의 단일-key 파생·두 judge 동일성, 원본 schema 집행 유지
+judge별 생성 보조 schema 파생(Codex는 `pattern` 유지, Grok은 재귀 제거), 원본 schema 집행 유지
 (`PASS`+non-empty issues 거부), CLI error event 진단 전파, `INCONCLUSIVE`,
 timeout, nonzero exit, API-key env, prompt hash mismatch, CLI argv와 Grok
 customization preflight를 검사한다.
@@ -167,8 +171,10 @@ customization preflight를 검사한다.
   subscription 뒤의 model revision을 바꾸는 것은 이 값만으로 탐지할 수 없다.
 - read-only sandbox는 repository write를 막지만 CLI 자체의 subscription token
   refresh·session runtime state 기록까지 금지하지는 않는다.
-- 현재 사용자 Grok profile처럼 marketplace/plugin/hook/MCP가 로드되는 profile은
-  preflight에서 거부된다. live 검증자는 cached OAuth auth는 유지하되 customization이
-  없는 격리된 `GROK_HOME`을 준비해야 한다.
+- Grok `0.2.112`가 종료 시 기록하는 알려진 `marketplace` 불리언 북키핑은 허용하지만,
+  `[[marketplace.sources]]`나 미지 키·비불리언 값은 계속 preflight에서 거부한다.
+- Grok 제약 샘플러의 `pattern` fullmatch가 `\S` 텍스트를 한 글자로 붕괴시키지 않도록
+  생성 파생본에서만 `pattern`을 제거하며, 원본 schema 검증과 `engine_version` 등 echo
+  결박 대조는 그대로 집행한다.
 - 이 단계는 decision engine, 두 judge 만장일치, control 결과, evidence chain 또는
   root 설치를 구현하지 않는다.
