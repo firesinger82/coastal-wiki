@@ -1,0 +1,69 @@
+{
+  "_draft_note": "DRAFT — 동결 아님. controls 의 4개 sha256 필드는 TBD(3단계 validator·control 아티팩트 실물 필요, 진행방식(b)). TBD 문자열은 의도적으로 schema-invalid — 실수로 동결본 행세를 못 하게 함. source 값(path·sha256·locator)은 2026-07-25~27 실측. 동결 = 사용자가 값 승인 후 _draft_note 제거·TBD 치환·커밋.",
+  "schema_version": 1,
+  "contract_version": "resume-gate/1",
+  "manifest_id": "rg-pilot-swan-efdc-001",
+  "run_scope": "resume-gate 파일럿 1차: 코드 2건(SWAN BQF write/read 불일치, EFDC svdcmp 도달불가 비수렴 분기) + PDF 1건(SWAN swantech action density 정의). 판독 claim 을 source anchor 에 결박하는 최소 회로 검증용. canonical 무변경, models/ 는 read-only 전제.",
+  "work_items": [
+    "swan_xnl4v5_bqf",
+    "efdc_svdcmp_its",
+    "swan_swantech_action_density"
+  ],
+  "sources": {
+    "swan_xnl4v5_bqf": {
+      "path": "models/SWAN/raw/source_code/swan/src/mod_xnl4v5.ftn90",
+      "sha256": "e86dde7fe90c7d7c950b61363895e8e167aeee8087e83b1a924cd64aa1a6617a",
+      "artifact_type": "code",
+      "locators": [
+        { "type": "line_range", "start": 4570, "end": 4570 },
+        { "type": "line_range", "start": 2508, "end": 2508 },
+        { "type": "line_range", "start": 76, "end": 76 }
+      ],
+      "expected_claim_kind": "BQF 기록/판독 레코드 불일치 — L4570 write(luq_bqf) iq_geom,iq_disp,iq_geom 이 세 번째 슬롯에 iq_geom 을 중복 기록, L2508 read 는 세 번째를 iz_cple(결합계수, L76 선언)로 해석 → BQF 재사용 시 iz_cple 가 iq_geom 값을 받음"
+    },
+    "efdc_svdcmp_its": {
+      "path": "models/EFDC/raw/source_code/EFDC-GVC/svdcmp.for",
+      "sha256": "44efab3ce19fb84f68f81f01159842d0e3c781f2151160723ee2672694d904a3",
+      "artifact_type": "code",
+      "locators": [
+        { "type": "line_range", "start": 163, "end": 163 },
+        { "type": "line_range", "start": 198, "end": 203 }
+      ],
+      "expected_claim_kind": "도달 불가 비수렴 분기 — L163 DO 48 ITS=1,30 상한 30 인데 L199 IF(ITS.EQ.60) 은 항상 거짓, 원본 경고 L198 IF(ITS.EQ.30) PAUSE 는 주석 처리 → 비수렴 경고 완전 소실"
+    },
+    "swan_swantech_action_density": {
+      "path": "models/SWAN/raw/manuals/pdfs/swantech.pdf",
+      "sha256": "6b56cfa29aebb27b4f64c879b86ab2570d5ee6f14e80f3ae63e79ad485ebbada",
+      "artifact_type": "pdf",
+      "locators": [
+        { "type": "page_range", "start": 19, "end": 19 }
+      ],
+      "expected_claim_kind": "action density 정의 — 'The action density is defined as N = E/σ' (물리 p.19 = 인쇄 p.11, Ch.2 Governing equations; 물리 페이지는 opendataloader-pdf --pages 단일추출 교차검증, 전체분할은 off-by-one 이 있어 불채용)"
+    }
+  },
+  "controls": {
+    "canary": {
+      "control_id": "rg-pilot-canary-001",
+      "kind": "canary",
+      "source_id": "efdc_svdcmp_its",
+      "locator": { "type": "line_range", "start": 163, "end": 163 },
+      "expected_status": "CAUGHT",
+      "allowed_failure_codes": ["CANARY_FABRICATED_CLAIM"],
+      "input_artifact_sha256": "TBD_canary_input_after_stage3",
+      "execution_artifact_sha256": "TBD_stage3_validator_binary"
+    },
+    "parser_negative": {
+      "control_id": "rg-pilot-parseneg-001",
+      "kind": "parser_negative",
+      "mutation": {
+        "mutation_id": "rg-pilot-mut-dupkey-001",
+        "operation": "duplicate_key",
+        "target": "sources.swan_xnl4v5_bqf"
+      },
+      "expected_status": "REJECTED",
+      "allowed_failure_codes": ["JSON_DUPLICATE_KEY"],
+      "input_artifact_sha256": "TBD_mutated_input_after_stage3",
+      "execution_artifact_sha256": "TBD_stage3_validator_binary"
+    }
+  }
+}
