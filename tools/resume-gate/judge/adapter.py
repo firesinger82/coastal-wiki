@@ -20,6 +20,7 @@ import pathlib
 import subprocess
 import sys
 import tempfile
+import time
 import tomllib
 import unicodedata
 from collections.abc import Mapping, Sequence
@@ -150,14 +151,44 @@ class AdapterOutcome:
     status: str
     judge_result: dict[str, Any] | None = None
     failure: AdapterFailure | None = None
+    raw_stdout: bytes = b""
+    raw_stderr: bytes = b""
+    audit_meta: dict[str, Any] | None = None
 
     @classmethod
-    def validated(cls, result: dict[str, Any]) -> "AdapterOutcome":
-        return cls(status="VALIDATED", judge_result=result)
+    def validated(
+        cls,
+        result: dict[str, Any],
+        *,
+        raw_stdout: bytes = b"",
+        raw_stderr: bytes = b"",
+        audit_meta: dict[str, Any] | None = None,
+    ) -> "AdapterOutcome":
+        return cls(
+            status="VALIDATED",
+            judge_result=result,
+            raw_stdout=raw_stdout,
+            raw_stderr=raw_stderr,
+            audit_meta=audit_meta,
+        )
 
     @classmethod
-    def failed(cls, code: str, detail: str) -> "AdapterOutcome":
-        return cls(status="FAIL", failure=AdapterFailure(code, detail))
+    def failed(
+        cls,
+        code: str,
+        detail: str,
+        *,
+        raw_stdout: bytes = b"",
+        raw_stderr: bytes = b"",
+        audit_meta: dict[str, Any] | None = None,
+    ) -> "AdapterOutcome":
+        return cls(
+            status="FAIL",
+            failure=AdapterFailure(code, detail),
+            raw_stdout=raw_stdout,
+            raw_stderr=raw_stderr,
+            audit_meta=audit_meta,
+        )
 
     def as_dict(self) -> dict[str, Any]:
         value: dict[str, Any] = {"status": self.status}
@@ -166,6 +197,68 @@ class AdapterOutcome:
         if self.failure is not None:
             value["failure"] = self.failure.as_dict()
         return value
+
+
+def _redacted_argv(config: JudgeConfig) -> list[str]:
+    """Return the fixed invocation shape without prompt, schema, or local paths."""
+
+    if config.name == "codex":
+        return [
+            "env",
+            "-u",
+            "OPENAI_API_KEY",
+            "-u",
+            "XAI_API_KEY",
+            "codex",
+            "exec",
+            "--ephemeral",
+            "--sandbox",
+            "read-only",
+            "--cd",
+            "<redacted-path>",
+            "--skip-git-repo-check",
+            "--ignore-user-config",
+            "--ignore-rules",
+            "--json",
+            "--output-schema",
+            "<redacted-schema-path>",
+            "-",
+        ]
+    return [
+        "env",
+        "-u",
+        "OPENAI_API_KEY",
+        "-u",
+        "XAI_API_KEY",
+        "GROK_DISABLE_AUTOUPDATER=1",
+        "grok",
+        "--cwd",
+        "<redacted-path>",
+        "--sandbox",
+        "read-only",
+        "--tools",
+        "",
+        "--disallowed-tools",
+        "Agent",
+        "--deny",
+        "MCPTool",
+        "--permission-mode",
+        "dontAsk",
+        "--no-plan",
+        "--no-subagents",
+        "--no-memory",
+        "--disable-web-search",
+        "--max-turns",
+        "1",
+        "--output-format",
+        "json",
+        "--json-schema",
+        "<redacted-schema>",
+        "--verbatim",
+        "-p",
+        "<redacted-prompt>",
+        "<redacted-prompt>",
+    ]
 
 
 def _strict_json_bytes(raw: bytes, label: str) -> Any:
@@ -920,6 +1013,7 @@ def run_adapter(
                 f"{type(error).__name__}: {error}",
             )
 
+        invocation_started_ns = time.monotonic_ns()
         try:
             completed = runner.invoke(
                 config,
@@ -938,6 +1032,17 @@ def run_adapter(
                 "CLI_INVOCATION_FAILED",
                 f"{type(error).__name__}: {error}",
             )
+        duration_ms = max(0, (time.monotonic_ns() - invocation_started_ns) // 1_000_000)
+        audit_meta = {
+            "schema_version": 1,
+            "judge": judge_name,
+            "argv": _redacted_argv(config),
+            "argv_redacted": True,
+            "exit_code": completed.returncode,
+            "duration_ms": duration_ms,
+            "stdout_bytes": len(completed.stdout),
+            "stderr_bytes": len(completed.stderr),
+        }
         if completed.returncode != 0:
             detail = f"{judge_name} judge exited {completed.returncode}"
             error_message = _last_cli_error_event_message(completed.stdout)
@@ -946,6 +1051,9 @@ def run_adapter(
             return AdapterOutcome.failed(
                 "CLI_EXIT_NONZERO",
                 detail,
+                raw_stdout=completed.stdout,
+                raw_stderr=completed.stderr,
+                audit_meta=audit_meta,
             )
 
         try:
@@ -955,7 +1063,13 @@ def run_adapter(
                 else _parse_grok_output(completed.stdout)
             )
         except (ValueError, UnicodeError) as error:
-            return AdapterOutcome.failed("CLI_OUTPUT_INVALID", str(error))
+            return AdapterOutcome.failed(
+                "CLI_OUTPUT_INVALID",
+                str(error),
+                raw_stdout=completed.stdout,
+                raw_stderr=completed.stderr,
+                audit_meta=audit_meta,
+            )
 
         expected = {
             "contract_version": manifest["contract_version"],
@@ -972,8 +1086,19 @@ def run_adapter(
                 expected=expected,
             )
         except (KeyError, TypeError, ValueError, UnicodeError) as error:
-            return AdapterOutcome.failed("JUDGE_RESULT_REJECTED", str(error))
-        return AdapterOutcome.validated(judge_result)
+            return AdapterOutcome.failed(
+                "JUDGE_RESULT_REJECTED",
+                str(error),
+                raw_stdout=completed.stdout,
+                raw_stderr=completed.stderr,
+                audit_meta=audit_meta,
+            )
+        return AdapterOutcome.validated(
+            judge_result,
+            raw_stdout=completed.stdout,
+            raw_stderr=completed.stderr,
+            audit_meta=audit_meta,
+        )
     except BaseException as error:
         return AdapterOutcome.failed(
             "ADAPTER_INTERNAL_ERROR",

@@ -292,6 +292,14 @@ def test_valid_codex_fail_is_returned_and_prompt_is_exact() -> None:
     fixed = (GATE_ROOT / "judge" / "prompt.fixed.txt").read_bytes()
     assert runner.prompt.startswith(fixed + b"\n" + adapter.DATA_BEGIN.encode("ascii"))
     assert b"attempt_reason" not in runner.prompt
+    assert outcome.raw_stdout
+    assert outcome.raw_stderr == b""
+    assert outcome.audit_meta is not None
+    assert outcome.audit_meta["argv_redacted"] is True
+    assert outcome.audit_meta["exit_code"] == 0
+    assert outcome.audit_meta["duration_ms"] >= 0
+    assert all("/" not in argument for argument in outcome.audit_meta["argv"])
+    assert all("mock prompt" not in argument for argument in outcome.audit_meta["argv"])
 
 
 def test_cli_schemas_are_judge_specific_without_weakening_contract_schema() -> None:

@@ -17,6 +17,7 @@ import pathlib
 import re
 import sys
 import tempfile
+import unicodedata
 from collections.abc import Callable, Mapping
 from typing import Any, Protocol
 
@@ -91,6 +92,13 @@ class EngineConfig:
     state_root: pathlib.Path = DEFAULT_STATE_ROOT
     schema_dir: pathlib.Path = DEFAULT_SCHEMA_DIR
     auto_start_controls: bool = True
+
+
+@dataclasses.dataclass(frozen=True)
+class JudgeCapture:
+    stdout: bytes
+    stderr: bytes
+    meta: dict[str, Any]
 
 
 def _sha256_bytes(raw: bytes) -> str:
@@ -286,6 +294,38 @@ def compute_decision_status(inputs: Mapping[str, Any]) -> str:
     return "PASS" if _passing_inputs(inputs) else "FAIL"
 
 
+def _hard_fail_reason_codes(inputs: Mapping[str, Any]) -> list[str]:
+    """Map engine-observable §4.3 control breaches onto a terminal axis."""
+
+    reasons: list[str] = []
+    try:
+        if inputs["canary"]["status"] == "MISSED":
+            reasons.extend(
+                inputs["canary"].get("failure_codes") or ["CANARY_CONTROL_FAILED"]
+            )
+        if inputs["parser_negative"]["status"] == "ACCEPTED":
+            reasons.extend(
+                inputs["parser_negative"].get("failure_codes")
+                or ["PARSER_NEGATIVE_ACCEPTED"]
+            )
+    except (KeyError, TypeError):
+        return sorted(set(reasons))
+    return sorted(set(reasons))
+
+
+def _redacted_argv_is_safe(argv: Any) -> bool:
+    if not isinstance(argv, list) or not all(isinstance(item, str) for item in argv):
+        return False
+    secret_markers = ("token=", "bearer ", "sk-", "xai-", "eyj")
+    return not any(
+        "/" in item
+        or "\\" in item
+        or re.match(r"^[A-Za-z]:", item) is not None
+        or any(marker in item.lower() for marker in secret_markers)
+        for item in argv
+    )
+
+
 class ResumeGateEngine:
     """One run of the phase-5 decision engine."""
 
@@ -319,7 +359,7 @@ class ResumeGateEngine:
         self.current_decision_path = self.run_dir / "decision.json"
         self.status_path = self.run_dir / "status.json"
 
-        manifest_result, manifest, _ = deterministic.validate_manifest(
+        manifest_result, manifest, source_snapshots = deterministic.validate_manifest(
             self.manifest_path,
             self.repo_root,
             schema_dir=self.schema_dir,
@@ -328,7 +368,9 @@ class ResumeGateEngine:
             raise ValueError(f"frozen manifest failed stage-3: {manifest_result}")
         self.manifest = manifest
         self.manifest_sha256 = manifest_result["manifest_sha256"]
+        self.source_snapshots = source_snapshots
         self.decision_schema = self._load_decision_schema()
+        self.judge_schema = self._load_judge_schema()
 
         self.ledger_hash, _, self.entries = verify_ledger(
             self.ledger_path, self.head_path, config.run_id
@@ -349,6 +391,15 @@ class ResumeGateEngine:
         )
         if issues or not isinstance(value, dict):
             raise RuntimeError("decision schema is unavailable")
+        Draft202012Validator.check_schema(value)
+        return value
+
+    def _load_judge_schema(self) -> dict[str, Any]:
+        value, issues = deterministic.strict_json_load_path(
+            self.schema_dir / "judge.schema.json", "judge schema"
+        )
+        if issues or not isinstance(value, dict):
+            raise RuntimeError("judge schema is unavailable")
         Draft202012Validator.check_schema(value)
         return value
 
@@ -410,6 +461,206 @@ class ResumeGateEngine:
             raise LedgerError(f"{label} strict decode failed: {','.join(codes)}")
         return raw, value
 
+    @staticmethod
+    def _read_raw_artifact(path: pathlib.Path, label: str) -> bytes:
+        if path.is_symlink() or not path.is_file():
+            raise LedgerError(f"{label} must be a regular file")
+        try:
+            return path.read_bytes()
+        except OSError as error:
+            raise LedgerError(f"{label} read failed: {error}") from error
+
+    @staticmethod
+    def _artifact_ref(relative_path: str, raw: bytes) -> dict[str, str]:
+        return {"path": relative_path, "sha256": _sha256_bytes(raw)}
+
+    def _verify_artifact_ref(
+        self,
+        attempt_dir: pathlib.Path,
+        reference: Any,
+        expected_relative_path: str,
+        label: str,
+    ) -> bytes:
+        if (
+            not isinstance(reference, dict)
+            or set(reference) != {"path", "sha256"}
+            or reference.get("path") != expected_relative_path
+        ):
+            raise LedgerError(f"{label} has an invalid artifact reference")
+        raw = self._read_raw_artifact(attempt_dir / expected_relative_path, label)
+        if reference.get("sha256") != _sha256_bytes(raw):
+            raise LedgerError(f"{label} hash mismatch")
+        return raw
+
+    @staticmethod
+    def _normalized_snapshot_slice(
+        snapshot: Any,
+        locator: Mapping[str, Any],
+    ) -> str:
+        if snapshot.artifact_type == "code":
+            if snapshot.lines is None or locator.get("type") != "line_range":
+                raise ValueError("code snapshot/locator mismatch")
+            raw = "\n".join(
+                snapshot.lines[locator["start"] - 1 : locator["end"]]
+            )
+        else:
+            if snapshot.pages is None or locator.get("type") != "page_range":
+                raise ValueError("PDF snapshot/locator mismatch")
+            raw = "\n".join(
+                snapshot.pages[page]
+                for page in range(locator["start"], locator["end"] + 1)
+            )
+        return unicodedata.normalize("NFKC", raw)
+
+    def _persist_source_artifacts(
+        self,
+        attempt_dir: pathlib.Path,
+        submission: dict[str, Any] | None,
+        submission_sha256: str,
+        deterministic_result: Mapping[str, Any],
+    ) -> dict[str, Any]:
+        """Persist the manifest subset and exact NFKC slices supplied to judges."""
+
+        source_entries: list[dict[str, Any]] = []
+        slice_refs: list[dict[str, Any]] = []
+        if (
+            deterministic_result.get("status") == "PASS"
+            and isinstance(submission, dict)
+        ):
+            source_id = submission["candidate"]["source_id"]
+            source = self.manifest["sources"][source_id]
+            snapshot = self.source_snapshots[source_id]
+            locator_entries: list[dict[str, Any]] = []
+            for index, evidence in enumerate(submission["evidence"]):
+                locator = evidence["locator"]
+                slice_text = self._normalized_snapshot_slice(snapshot, locator)
+                relative_path = f"source-slices/{source_id}/{index}.txt"
+                slice_raw = slice_text.encode("utf-8", errors="strict")
+                _write_new(attempt_dir / relative_path, slice_raw)
+                reference = {
+                    "source_id": source_id,
+                    "index": index,
+                    "locator": locator,
+                    **self._artifact_ref(relative_path, slice_raw),
+                }
+                slice_refs.append(reference)
+                locator_entries.append(
+                    {
+                        "index": index,
+                        "locator": locator,
+                        "slice_path": relative_path,
+                        "slice_sha256": reference["sha256"],
+                    }
+                )
+            source_entries.append(
+                {
+                    "source_id": source_id,
+                    "path": source["path"],
+                    "sha256": source["sha256"],
+                    "artifact_type": source["artifact_type"],
+                    "locators": locator_entries,
+                }
+            )
+
+        source_manifest = {
+            "schema_version": 1,
+            "contract_version": CONTRACT_VERSION,
+            "manifest": {
+                "manifest_id": self.manifest["manifest_id"],
+                "sha256": self.manifest_sha256,
+            },
+            "submission_sha256": submission_sha256,
+            "sources": source_entries,
+        }
+        source_manifest_raw = _json_bytes(source_manifest)
+        source_manifest_path = attempt_dir / "source-manifest.json"
+        _write_new(source_manifest_path, source_manifest_raw)
+        return {
+            "source_manifest": self._artifact_ref(
+                "source-manifest.json", source_manifest_raw
+            ),
+            "source_slices": slice_refs,
+        }
+
+    @staticmethod
+    def _safe_capture_meta(
+        judge_name: str,
+        mapped: Mapping[str, Any],
+        capture: JudgeCapture,
+    ) -> dict[str, Any]:
+        meta = dict(capture.meta)
+        argv = meta.get("argv")
+        argv_is_safe = (
+            meta.get("argv_redacted") is True
+            and _redacted_argv_is_safe(argv)
+        )
+        if not argv_is_safe:
+            argv = ["<injected-judge-invoker>"]
+        exit_code = meta.get("exit_code")
+        if not isinstance(exit_code, int) or isinstance(exit_code, bool):
+            exit_code = 0 if mapped.get("status") == "VALIDATED" else 1
+        duration_ms = meta.get("duration_ms")
+        if not isinstance(duration_ms, int) or isinstance(duration_ms, bool):
+            duration_ms = 0
+        return {
+            "schema_version": 1,
+            "judge": judge_name,
+            "argv": argv,
+            "argv_redacted": True,
+            "exit_code": exit_code,
+            "duration_ms": max(0, duration_ms),
+            "stdout_bytes": len(capture.stdout),
+            "stderr_bytes": len(capture.stderr),
+            "capture": (
+                "adapter-process"
+                if capture.meta
+                else "injected-outcome"
+            ),
+        }
+
+    def _persist_judge_artifacts(
+        self,
+        attempt_dir: pathlib.Path,
+        judge_name: str,
+        mapped: dict[str, Any],
+        capture: JudgeCapture,
+        source_artifacts: Mapping[str, Any],
+    ) -> dict[str, Any]:
+        judge_relative_dir = f"judges/{judge_name}"
+        stdout_path = f"{judge_relative_dir}/stdout.raw"
+        stderr_path = f"{judge_relative_dir}/stderr.raw"
+        meta_path = f"{judge_relative_dir}/meta.json"
+        verdict_path = f"{judge_relative_dir}/verdict.json"
+
+        meta = self._safe_capture_meta(judge_name, mapped, capture)
+        verdict = mapped.get("judge_result")
+        if not isinstance(verdict, dict):
+            verdict = {
+                "schema_version": 1,
+                "judge": judge_name,
+                "status": "UNAVAILABLE",
+                "failure": mapped.get(
+                    "failure",
+                    {"code": "VERDICT_UNAVAILABLE", "detail": "judge was not called"},
+                ),
+            }
+        meta_raw = _json_bytes(meta)
+        verdict_raw = _json_bytes(verdict)
+        _write_new(attempt_dir / stdout_path, capture.stdout)
+        _write_new(attempt_dir / stderr_path, capture.stderr)
+        _write_new(attempt_dir / meta_path, meta_raw)
+        _write_new(attempt_dir / verdict_path, verdict_raw)
+
+        artifacts = {
+            "source_manifest": source_artifacts["source_manifest"],
+            "source_slices": source_artifacts["source_slices"],
+            "stdout": self._artifact_ref(stdout_path, capture.stdout),
+            "stderr": self._artifact_ref(stderr_path, capture.stderr),
+            "meta": self._artifact_ref(meta_path, meta_raw),
+            "verdict": self._artifact_ref(verdict_path, verdict_raw),
+        }
+        return {**mapped, "artifacts": artifacts}
+
     def _verify_attempt_artifacts(self) -> None:
         """Recompute every persisted attempt's evidence chain from disk."""
 
@@ -446,6 +697,100 @@ class ResumeGateEngine:
                 attempt_dir / "deterministic.json",
                 f"attempt {attempt} deterministic result",
             )
+            source_manifest_raw, source_manifest = self._read_artifact(
+                attempt_dir / "source-manifest.json",
+                f"attempt {attempt} source manifest",
+            )
+            if (
+                source_manifest.get("schema_version") != 1
+                or source_manifest.get("contract_version") != CONTRACT_VERSION
+                or source_manifest.get("manifest")
+                != {
+                    "manifest_id": self.manifest["manifest_id"],
+                    "sha256": self.manifest_sha256,
+                }
+                or source_manifest.get("submission_sha256") != request_hash
+                or not isinstance(source_manifest.get("sources"), list)
+            ):
+                raise LedgerError(f"attempt {attempt} source manifest binding mismatch")
+
+            source_slice_refs: list[dict[str, Any]] = []
+            expected_sources = 1 if deterministic_result.get("status") == "PASS" else 0
+            if len(source_manifest["sources"]) != expected_sources:
+                raise LedgerError(f"attempt {attempt} source manifest coverage mismatch")
+            for source_entry in source_manifest["sources"]:
+                source_id = source_entry.get("source_id")
+                registered = self.manifest["sources"].get(source_id)
+                if (
+                    not isinstance(registered, dict)
+                    or source_entry.get("path") != registered.get("path")
+                    or source_entry.get("sha256") != registered.get("sha256")
+                    or source_entry.get("artifact_type") != registered.get("artifact_type")
+                    or not isinstance(source_entry.get("locators"), list)
+                    or not isinstance(request_value, dict)
+                    or request_value.get("candidate", {}).get("source_id") != source_id
+                ):
+                    raise LedgerError(f"attempt {attempt} source entry mismatch")
+                snapshot = self.source_snapshots.get(source_id)
+                if snapshot is None:
+                    raise LedgerError(f"attempt {attempt} source snapshot is unavailable")
+                evidence_items = request_value.get("evidence")
+                if (
+                    not isinstance(evidence_items, list)
+                    or len(source_entry["locators"]) != len(evidence_items)
+                ):
+                    raise LedgerError(f"attempt {attempt} source locator coverage mismatch")
+                for locator_entry, evidence_item in zip(
+                    source_entry["locators"], evidence_items, strict=True
+                ):
+                    index = locator_entry.get("index")
+                    locator = locator_entry.get("locator")
+                    if (
+                        not isinstance(index, int)
+                        or index < 0
+                        or index >= len(evidence_items)
+                        or evidence_items[index].get("locator") != locator
+                    ):
+                        raise LedgerError(f"attempt {attempt} source locator mismatch")
+                    relative_path = f"source-slices/{source_id}/{index}.txt"
+                    reference = {
+                        "path": locator_entry.get("slice_path"),
+                        "sha256": locator_entry.get("slice_sha256"),
+                    }
+                    slice_raw = self._verify_artifact_ref(
+                        attempt_dir,
+                        reference,
+                        relative_path,
+                        f"attempt {attempt} source slice {source_id}/{index}",
+                    )
+                    try:
+                        expected_slice = self._normalized_snapshot_slice(
+                            snapshot, locator
+                        ).encode("utf-8", errors="strict")
+                    except (KeyError, TypeError, ValueError) as error:
+                        raise LedgerError(
+                            f"attempt {attempt} source slice cannot be reconstructed"
+                        ) from error
+                    if slice_raw != expected_slice:
+                        raise LedgerError(
+                            f"attempt {attempt} source slice content mismatch"
+                        )
+                    source_slice_refs.append(
+                        {
+                            "source_id": source_id,
+                            "index": index,
+                            "locator": locator,
+                            "path": relative_path,
+                            "sha256": _sha256_bytes(slice_raw),
+                        }
+                    )
+            source_artifacts = {
+                "source_manifest": self._artifact_ref(
+                    "source-manifest.json", source_manifest_raw
+                ),
+                "source_slices": source_slice_refs,
+            }
+
             judge_records: dict[str, dict[str, Any]] = {}
             for judge_name in ("codex", "grok"):
                 _, judge_records[judge_name] = self._read_artifact(
@@ -474,6 +819,92 @@ class ResumeGateEngine:
 
             judge_hashes: dict[str, str] = {}
             for judge_name, record in judge_records.items():
+                artifacts = record.get("artifacts")
+                if (
+                    not isinstance(artifacts, dict)
+                    or set(artifacts)
+                    != {
+                        "source_manifest",
+                        "source_slices",
+                        "stdout",
+                        "stderr",
+                        "meta",
+                        "verdict",
+                    }
+                    or artifacts["source_manifest"] != source_artifacts["source_manifest"]
+                    or artifacts["source_slices"] != source_artifacts["source_slices"]
+                ):
+                    raise LedgerError(
+                        f"attempt {attempt} {judge_name} artifact binding mismatch"
+                    )
+                judge_relative_dir = f"judges/{judge_name}"
+                stdout_raw = self._verify_artifact_ref(
+                    attempt_dir,
+                    artifacts["stdout"],
+                    f"{judge_relative_dir}/stdout.raw",
+                    f"attempt {attempt} {judge_name} raw stdout",
+                )
+                stderr_raw = self._verify_artifact_ref(
+                    attempt_dir,
+                    artifacts["stderr"],
+                    f"{judge_relative_dir}/stderr.raw",
+                    f"attempt {attempt} {judge_name} raw stderr",
+                )
+                meta_raw = self._verify_artifact_ref(
+                    attempt_dir,
+                    artifacts["meta"],
+                    f"{judge_relative_dir}/meta.json",
+                    f"attempt {attempt} {judge_name} metadata",
+                )
+                meta, meta_codes = _strict_object(
+                    meta_raw, f"attempt {attempt} {judge_name} metadata"
+                )
+                if (
+                    meta is None
+                    or meta_codes
+                    or meta.get("judge") != judge_name
+                    or meta.get("argv_redacted") is not True
+                    or not _redacted_argv_is_safe(meta.get("argv"))
+                    or not isinstance(meta.get("exit_code"), int)
+                    or isinstance(meta.get("exit_code"), bool)
+                    or not isinstance(meta.get("duration_ms"), int)
+                    or isinstance(meta.get("duration_ms"), bool)
+                    or meta.get("stdout_bytes") != len(stdout_raw)
+                    or meta.get("stderr_bytes") != len(stderr_raw)
+                ):
+                    raise LedgerError(
+                        f"attempt {attempt} {judge_name} metadata is unsafe"
+                    )
+                verdict_raw = self._verify_artifact_ref(
+                    attempt_dir,
+                    artifacts["verdict"],
+                    f"{judge_relative_dir}/verdict.json",
+                    f"attempt {attempt} {judge_name} normalized verdict",
+                )
+                verdict, verdict_codes = _strict_object(
+                    verdict_raw, f"attempt {attempt} {judge_name} normalized verdict"
+                )
+                if verdict is None or verdict_codes:
+                    raise LedgerError(
+                        f"attempt {attempt} {judge_name} verdict decode mismatch"
+                    )
+                if isinstance(record.get("judge_result"), dict):
+                    if verdict != record["judge_result"]:
+                        raise LedgerError(
+                            f"attempt {attempt} {judge_name} verdict binding mismatch"
+                        )
+                    verdict_errors = list(
+                        Draft202012Validator(self.judge_schema).iter_errors(verdict)
+                    )
+                    if verdict_errors:
+                        raise LedgerError(
+                            f"attempt {attempt} {judge_name} verdict schema mismatch: "
+                            f"{verdict_errors[0].message}"
+                        )
+                elif verdict.get("status") != "UNAVAILABLE":
+                    raise LedgerError(
+                        f"attempt {attempt} {judge_name} unavailable verdict mismatch"
+                    )
                 record_hash = _canonical_hash(record)
                 judge_hashes[judge_name] = record_hash
                 if (
@@ -583,9 +1014,10 @@ class ResumeGateEngine:
         submission_path: pathlib.Path,
         launcher_run_id: str,
         submission_sha256: str,
-    ) -> tuple[dict[str, Any], str, str]:
+    ) -> tuple[dict[str, Any], str, str, JudgeCapture]:
+        outcome: Any = None
         try:
-            raw = self.judge_invoker(
+            outcome = self.judge_invoker(
                 judge_name=judge_name,
                 repo_root=self.repo_root,
                 manifest_path=self.manifest_path,
@@ -601,7 +1033,20 @@ class ResumeGateEngine:
                 },
             }
         else:
-            mapped = self._outcome_mapping(raw)
+            mapped = self._outcome_mapping(outcome)
+        if outcome is not None:
+            raw_stdout = getattr(outcome, "raw_stdout", None)
+            raw_stderr = getattr(outcome, "raw_stderr", None)
+            audit_meta = getattr(outcome, "audit_meta", None)
+        else:
+            raw_stdout = raw_stderr = audit_meta = None
+        if not isinstance(raw_stdout, bytes):
+            raw_stdout = _json_bytes(mapped)
+        if not isinstance(raw_stderr, bytes):
+            raw_stderr = b""
+        if not isinstance(audit_meta, Mapping):
+            audit_meta = {}
+        capture = JudgeCapture(raw_stdout, raw_stderr, dict(audit_meta))
         result = mapped.get("judge_result")
         valid = (
             mapped.get("status") == "VALIDATED"
@@ -618,8 +1063,18 @@ class ResumeGateEngine:
             and bool(result["engine_version"].strip())
         )
         if valid:
-            return mapped, result["verdict"], result["engine_version"]
-        return mapped, "INCONCLUSIVE", f"{judge_name}-adapter-failure"
+            return (
+                mapped,
+                result["verdict"],
+                result["engine_version"],
+                capture,
+            )
+        return (
+            mapped,
+            "INCONCLUSIVE",
+            f"{judge_name}-adapter-failure",
+            capture,
+        )
 
     def _control_result(
         self,
@@ -702,7 +1157,7 @@ class ResumeGateEngine:
                 submission_hash = stage3["submission_sha256"]
                 verdicts: dict[str, str] = {}
                 for judge_name in ("codex", "grok"):
-                    mapped, verdict, _ = self._invoke_judge(
+                    mapped, verdict, _, _ = self._invoke_judge(
                         judge_name,
                         request_path,
                         canary_value["run_id"],
@@ -715,11 +1170,18 @@ class ResumeGateEngine:
                 canary_judges["deterministic"] = stage3
         else:
             canary_judges["input"] = {"failure_codes": canary_decode_codes}
-        canary_codes = (
-            list(canary["allowed_failure_codes"])
-            if canary_caught
-            else ["CANARY_CONTROL_FAILED"]
-        )
+        canary_codes = list(canary["allowed_failure_codes"])
+        if not canary_caught:
+            canary_codes = (
+                ["CANARY_JUDGE_PASS"]
+                if any(
+                    isinstance(record.get("judge_result"), dict)
+                    and record["judge_result"].get("verdict") == "PASS"
+                    for record in canary_judges.values()
+                    if isinstance(record, dict)
+                )
+                else ["CANARY_CONTROL_FAILED"]
+            )
         canary_control_result = self._control_result(
             canary,
             status="CAUGHT" if canary_caught else "MISSED",
@@ -734,6 +1196,12 @@ class ResumeGateEngine:
         }
         payload = {
             "results": results,
+            "hard_fail_reasons": _hard_fail_reason_codes(
+                {
+                    "canary": canary_control_result,
+                    "parser_negative": parser_control_result,
+                }
+            ),
             "artifacts_sha256": {
                 "canary_judges": _canonical_hash(canary_judges),
                 "parser_result": _canonical_hash(parser_result),
@@ -858,7 +1326,7 @@ class ResumeGateEngine:
 
         self._verify_control_artifact_continuity()
         self._verify_attempt_artifacts()
-        if self.current_status in {"PASS", "FAILED_STOPPED"}:
+        if self.current_status in {"PASS", "HARD_FAIL", "FAILED_STOPPED"}:
             return self._receipt(len(self.attempt_history))
         attempt = len(self.attempt_history) + 1
         if attempt > MAX_SUBMITS:
@@ -908,25 +1376,32 @@ class ResumeGateEngine:
             schema_dir=self.schema_dir,
         )
         _write_new(attempt_dir / "deterministic.json", _json_bytes(deterministic_result))
+        source_artifacts = self._persist_source_artifacts(
+            attempt_dir,
+            decoded,
+            submission_hash,
+            deterministic_result,
+        )
 
         judge_records: dict[str, dict[str, Any]] = {}
+        judge_captures: dict[str, JudgeCapture] = {}
         judge_inputs: dict[str, dict[str, str]] = {}
         judge_provenance: dict[str, dict[str, Any]] = {}
         if deterministic_result.get("status") == "PASS":
             validated_submission_hash = deterministic_result["submission_sha256"]
             for judge_name in ("codex", "grok"):
-                mapped, verdict, engine_version = self._invoke_judge(
+                mapped, verdict, engine_version, capture = self._invoke_judge(
                     judge_name,
                     request_path,
                     self.config.run_id,
                     validated_submission_hash,
                 )
                 judge_records[judge_name] = mapped
+                judge_captures[judge_name] = capture
                 judge_inputs[judge_name] = {"verdict": verdict}
                 judge_provenance[judge_name] = {
                     "schema_version": 1,
                     "engine_version": engine_version,
-                    "result_sha256": _canonical_hash(mapped),
                 }
         else:
             for judge_name in ("codex", "grok"):
@@ -935,15 +1410,33 @@ class ResumeGateEngine:
                     "failure": {"code": "DETERMINISTIC_REJECT", "detail": judge_name},
                 }
                 judge_records[judge_name] = mapped
+                judge_captures[judge_name] = JudgeCapture(
+                    stdout=_json_bytes(mapped),
+                    stderr=b"",
+                    meta={},
+                )
                 judge_inputs[judge_name] = {"verdict": "INCONCLUSIVE"}
                 judge_provenance[judge_name] = {
                     "schema_version": 1,
                     "engine_version": f"{judge_name}-not-called",
-                    "result_sha256": _canonical_hash(mapped),
                 }
         judges_dir = attempt_dir / "judges"
-        for judge_name, record in judge_records.items():
-            _write_new(judges_dir / f"{judge_name}.json", _json_bytes(record))
+        for judge_name, record in tuple(judge_records.items()):
+            bound_record = self._persist_judge_artifacts(
+                attempt_dir,
+                judge_name,
+                record,
+                judge_captures[judge_name],
+                source_artifacts,
+            )
+            judge_records[judge_name] = bound_record
+            judge_provenance[judge_name]["result_sha256"] = _canonical_hash(
+                bound_record
+            )
+            _write_new(
+                judges_dir / f"{judge_name}.json",
+                _json_bytes(bound_record),
+            )
 
         existing_head, _, _ = verify_ledger(
             self.ledger_path, self.head_path, self.config.run_id
@@ -977,14 +1470,19 @@ class ResumeGateEngine:
             },
         }
         decision_status = compute_decision_status(inputs)
-        stop_reason = self._no_progress_reason(
-            candidate_evidence_hash=candidate_evidence_hash,
-            evidence_hash=evidence_hash,
-            deterministic_result=deterministic_result,
-            decision_status=decision_status,
-        )
-        if stop_reason is not None:
-            decision_status = "FAILED_STOPPED"
+        hard_fail_reasons = _hard_fail_reason_codes(inputs)
+        stop_reason: str | None = None
+        if hard_fail_reasons:
+            decision_status = "HARD_FAIL"
+        else:
+            stop_reason = self._no_progress_reason(
+                candidate_evidence_hash=candidate_evidence_hash,
+                evidence_hash=evidence_hash,
+                deterministic_result=deterministic_result,
+                decision_status=decision_status,
+            )
+            if stop_reason is not None:
+                decision_status = "FAILED_STOPPED"
 
         decision = {
             "schema_version": 1,
@@ -1027,6 +1525,7 @@ class ResumeGateEngine:
             ),
             "decision_status": decision_status,
             "decision_sha256": _canonical_hash(decision),
+            "hard_fail_reasons": hard_fail_reasons,
             "hard_stop_reason": stop_reason,
             "current_status": decision_status,
         }

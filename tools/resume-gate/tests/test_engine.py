@@ -289,6 +289,18 @@ def test_decision_table_all_single_losses_are_double_rejected() -> None:
         assert core.compute_decision_status(inputs) == "FAIL", field
         assert not list(validator.iter_errors(decision_record(inputs, "FAIL"))), field
         assert list(validator.iter_errors(decision_record(inputs, "PASS"))), field
+    canary_missed = copy.deepcopy(passing)
+    canary_missed["canary"].update(
+        status="MISSED", failure_codes=["CANARY_JUDGE_PASS"]
+    )
+    assert core._hard_fail_reason_codes(canary_missed) == ["CANARY_JUDGE_PASS"]
+    parser_accepted = copy.deepcopy(passing)
+    parser_accepted["parser_negative"].update(
+        status="ACCEPTED", failure_codes=["PARSER_NEGATIVE_ACCEPTED"]
+    )
+    assert core._hard_fail_reason_codes(parser_accepted) == [
+        "PARSER_NEGATIVE_ACCEPTED"
+    ]
 
 
 def test_controls_run_before_positive_and_full_pass_decision() -> None:
@@ -325,7 +337,12 @@ def test_controls_unexecuted_or_missed_prevent_pass() -> None:
         assert engine.controls is not None
         assert engine.controls["canary"]["status"] == "MISSED"
         receipt = engine.submit(submission(manifest))
-        assert receipt["status"] == "FAIL"
+        assert receipt["status"] == "HARD_FAIL"
+        attempts_before = sorted((engine.run_dir / "attempts").iterdir())
+        ledger_before = engine.ledger_path.read_bytes()
+        assert engine.submit(submission(manifest, claim="changed claim")) == receipt
+        assert sorted((engine.run_dir / "attempts").iterdir()) == attempts_before
+        assert engine.ledger_path.read_bytes() == ledger_before
 
 
 def test_control_artifact_hash_mismatch_is_recorded_and_blocks_pass() -> None:
@@ -358,7 +375,7 @@ def test_control_artifact_hash_mismatch_is_recorded_and_blocks_pass() -> None:
         receipt = engine.submit(
             submission(manifest, run_id="engine-run-hash-001")
         )
-        assert receipt["status"] == "FAIL"
+        assert receipt["status"] == "HARD_FAIL"
         assert invoker.calls == [
             ("engine-run-hash-001", "codex"),
             ("engine-run-hash-001", "grok"),
@@ -540,6 +557,30 @@ def test_evidence_chain_rejects_attempt_artifact_tamper_on_restart() -> None:
             raise AssertionError("tampered attempt artifact retained a VALID chain")
 
 
+def test_evidence_chain_rejects_each_new_raw_evidence_artifact_tamper() -> None:
+    relative_targets = (
+        "source-manifest.json",
+        "source-slices/engine_source/0.txt",
+        "judges/codex/stdout.raw",
+        "judges/codex/stderr.raw",
+        "judges/codex/meta.json",
+        "judges/codex/verdict.json",
+    )
+    for relative_target in relative_targets:
+        with engine_context() as (engine, manifest, _invoker, _temp):
+            assert engine.submit(submission(manifest))["status"] == "PASS"
+            target = engine.run_dir / "attempts" / "000001" / relative_target
+            target.write_bytes(target.read_bytes() + b"\ntampered")
+            try:
+                core.ResumeGateEngine(engine.config, MockJudgeInvoker())
+            except core.LedgerError:
+                pass
+            else:
+                raise AssertionError(
+                    f"tampered {relative_target} retained a VALID chain"
+                )
+
+
 def test_mcp_surface_exactly_submit_and_bad_input_fails_closed() -> None:
     with engine_context() as (engine, manifest, _invoker, _temp):
         server = mcp.ResumeGateMCP(engine)
@@ -680,6 +721,7 @@ TESTS = [
     test_restart_restores_controls_attempts_and_status_without_rerun,
     test_ledger_detects_tamper_tail_deletion_and_reordering,
     test_evidence_chain_rejects_attempt_artifact_tamper_on_restart,
+    test_evidence_chain_rejects_each_new_raw_evidence_artifact_tamper,
     test_mcp_surface_exactly_submit_and_bad_input_fails_closed,
     test_mcp_strict_outer_decode_rejects_duplicate_key,
     test_path_injection_and_overwrite_targets_are_rejected,
