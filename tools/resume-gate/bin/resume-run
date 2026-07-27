@@ -1,0 +1,198 @@
+#!/usr/bin/env python3
+"""Issue one run ID and launch a managed resume-coordinator session."""
+from __future__ import annotations
+
+import argparse
+import datetime as dt
+import hashlib
+import json
+import os
+import pathlib
+import re
+import secrets
+import stat
+import sys
+import tomllib
+
+
+REPO_ROOT = pathlib.Path("/home/firesinger/coastal-wiki")
+STATE_ROOT = pathlib.Path("/home/firesinger/.local/state/resume-gate")
+DEFAULT_CLAUDE = pathlib.Path("/home/firesinger/.local/bin/claude")
+DEFAULT_CLAUDE_CONFIG = pathlib.Path("/home/firesinger/.claude")
+DEFAULT_CODEX_HOME = pathlib.Path("/home/firesinger/.codex")
+HASH_RE = re.compile(r"^[0-9a-f]{64}$")
+COMPAT_VENDORS = ("cursor", "claude", "codex")
+COMPAT_CELLS = ("skills", "rules", "agents", "mcps", "hooks", "sessions")
+MARKETPLACE_KEYS = {
+    "default_skills_installs_purged",
+    "official_marketplace_auto_installed",
+}
+REMOVED_ENV = {
+    "OPENAI_API_KEY",
+    "XAI_API_KEY",
+    "GROK_CODE_XAI_API_KEY",
+    "GROK_AUTH_PROVIDER_COMMAND",
+    "GROK_CLI_CHAT_PROXY_BASE_URL",
+    "GROK_OIDC_ISSUER",
+    "GROK_OIDC_CLIENT_ID",
+}
+
+
+class LaunchError(ValueError):
+    pass
+
+
+def _absolute_real_dir(path: pathlib.Path, label: str) -> pathlib.Path:
+    if not path.is_absolute() or path.is_symlink() or not path.is_dir():
+        raise LaunchError(f"{label} must be an existing absolute non-symlink directory")
+    return path.resolve(strict=True)
+
+
+def _regular_file(path: pathlib.Path, label: str) -> pathlib.Path:
+    if path.is_symlink() or not path.is_file():
+        raise LaunchError(f"{label} must be a regular non-symlink file")
+    return path.resolve(strict=True)
+
+
+def _verify_isolated_grok_home(home: pathlib.Path, expected_hash: str) -> pathlib.Path:
+    home = _absolute_real_dir(home, "Grok isolated HOME")
+    if {entry.name for entry in home.iterdir()} != {".grok"}:
+        raise LaunchError("Grok isolated HOME must contain only .grok")
+    grok_home = _absolute_real_dir(home / ".grok", "Grok config directory")
+    if {entry.name for entry in grok_home.iterdir()} != {"auth.json", "config.toml"}:
+        raise LaunchError("Grok .grok must contain exactly auth.json and config.toml")
+
+    auth_path = _regular_file(grok_home / "auth.json", "Grok auth")
+    if stat.S_IMODE(auth_path.stat().st_mode) & 0o077:
+        raise LaunchError("Grok auth must be owner-only")
+    try:
+        auth = json.loads(auth_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as error:
+        raise LaunchError(f"Grok auth is unreadable: {error}") from error
+    if not isinstance(auth, dict) or not auth:
+        raise LaunchError("Grok auth must be a non-empty JSON object")
+
+    config_path = _regular_file(grok_home / "config.toml", "Grok config")
+    actual_hash = hashlib.sha256(config_path.read_bytes()).hexdigest()
+    if actual_hash != expected_hash:
+        raise LaunchError("Grok config.toml does not match the configured frozen hash")
+    try:
+        config = tomllib.loads(config_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, tomllib.TOMLDecodeError) as error:
+        raise LaunchError(f"Grok config is invalid TOML: {error}") from error
+    if set(config) != {"compat", "marketplace"}:
+        raise LaunchError("Grok config must contain only compat and marketplace")
+    compat = config["compat"]
+    if not isinstance(compat, dict) or set(compat) != set(COMPAT_VENDORS):
+        raise LaunchError("Grok config must declare all compat vendors")
+    for vendor in COMPAT_VENDORS:
+        cells = compat[vendor]
+        if not isinstance(cells, dict) or set(cells) != set(COMPAT_CELLS):
+            raise LaunchError(f"Grok compat.{vendor} must declare every compatibility cell")
+        if any(value is not False for value in cells.values()):
+            raise LaunchError(f"Grok compat.{vendor} must be entirely false")
+    marketplace = config["marketplace"]
+    if not isinstance(marketplace, dict) or set(marketplace) != MARKETPLACE_KEYS:
+        raise LaunchError("Grok marketplace must declare both bookkeeping keys")
+    if any(not isinstance(value, bool) for value in marketplace.values()):
+        raise LaunchError("Grok marketplace bookkeeping values must be boolean")
+    return grok_home
+
+
+def _new_run_id() -> str:
+    timestamp = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ").lower()
+    return f"resume-{timestamp}-{secrets.token_hex(12)}"
+
+
+def _parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--grok-isolated-home",
+        type=pathlib.Path,
+        default=os.environ.get("COASTAL_RESUME_GROK_ISOLATED_HOME"),
+        required="COASTAL_RESUME_GROK_ISOLATED_HOME" not in os.environ,
+    )
+    parser.add_argument(
+        "--grok-config-sha256",
+        default=os.environ.get("COASTAL_RESUME_GROK_CONFIG_SHA256"),
+        required="COASTAL_RESUME_GROK_CONFIG_SHA256" not in os.environ,
+    )
+    parser.add_argument(
+        "--claude-config-dir",
+        type=pathlib.Path,
+        default=DEFAULT_CLAUDE_CONFIG,
+    )
+    parser.add_argument("--codex-home", type=pathlib.Path, default=DEFAULT_CODEX_HOME)
+    parser.add_argument("--claude-bin", type=pathlib.Path, default=DEFAULT_CLAUDE)
+    parser.add_argument("--resume", dest="session_id")
+    parser.add_argument("prompt", nargs="?")
+    return parser
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = _parser().parse_args(argv)
+    if not isinstance(args.grok_config_sha256, str) or not HASH_RE.fullmatch(
+        args.grok_config_sha256
+    ):
+        raise LaunchError("Grok config hash must be lowercase SHA-256")
+
+    repo_root = _absolute_real_dir(REPO_ROOT, "repository root")
+    isolated_home = _absolute_real_dir(args.grok_isolated_home, "Grok isolated HOME")
+    grok_home = _verify_isolated_grok_home(
+        isolated_home, args.grok_config_sha256
+    )
+    claude_config = _absolute_real_dir(args.claude_config_dir, "Claude config directory")
+    codex_home = _absolute_real_dir(args.codex_home, "Codex home")
+    claude_bin = _regular_file(args.claude_bin, "Claude executable")
+
+    run_id = _new_run_id()
+    environment = dict(os.environ)
+    for name in REMOVED_ENV:
+        environment.pop(name, None)
+    environment.update(
+        {
+            "HOME": str(isolated_home),
+            "GROK_HOME": str(grok_home),
+            "CODEX_HOME": str(codex_home),
+            "CLAUDE_CONFIG_DIR": str(claude_config),
+            "COASTAL_RESUME_REPO_ROOT": str(repo_root),
+            "COASTAL_RESUME_STATE_ROOT": str(STATE_ROOT),
+            "COASTAL_RESUME_RUN_ID": run_id,
+            "COASTAL_RESUME_GROK_ISOLATED_HOME": str(isolated_home),
+            "COASTAL_RESUME_GROK_CONFIG_SHA256": args.grok_config_sha256,
+            "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1",
+            "CLAUDE_CODE_DISABLE_BACKGROUND_TASKS": "1",
+            "CLAUDE_CODE_DISABLE_CRON": "1",
+        }
+    )
+
+    command = [
+        str(claude_bin),
+        "--agent",
+        "resume-coordinator",
+        "--permission-mode",
+        "dontAsk",
+        "--tools",
+        "Read,Grep,Glob,Agent",
+        "--disable-slash-commands",
+        "--no-chrome",
+    ]
+    if args.session_id is not None:
+        if not args.session_id or args.session_id.startswith("-"):
+            raise LaunchError("resume session ID is invalid")
+        command.extend(("--resume", args.session_id))
+    if args.prompt is not None:
+        command.append(args.prompt)
+
+    print(f"resume-gate run_id={run_id}", file=sys.stderr, flush=True)
+    os.chdir(repo_root)
+    os.execve(str(claude_bin), command, environment)
+    return 127
+
+
+if __name__ == "__main__":
+    try:
+        sys.exit(main())
+    except (LaunchError, OSError) as error:
+        print(f"resume-run: {error}", file=sys.stderr)
+        sys.exit(2)

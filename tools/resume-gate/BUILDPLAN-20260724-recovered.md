@@ -31,11 +31,11 @@ Claude Code의 Linux managed settings 경로, managed-only 정책, managed MCP�
 | 제출 스키마 | `tools/resume-gate/schemas/submission.schema.json` | `resume-submit` validator | MCP tool input schema |
 | 외부 판정 스키마 | `tools/resume-gate/schemas/judge.schema.json` | Codex/Grok adapter와 validator | MCP 서버가 외부 판정 결과를 구조화 |
 | 최종 결정 스키마 | `tools/resume-gate/schemas/decision.schema.json` | 결정 엔진만 생성 | MCP 응답과 `Stop` hook이 참조하는 외부 완료 상태 |
-| 파일럿 고정 manifest | `tools/resume-gate/fixtures/pilot/manifest.json` | 사람 승인 후 고정, validator가 읽음 | `Read`로 확보된 후보 근거를 MCP가 고정 분모와 대조 |
+| 파일럿 고정 manifest | `tools/resume-gate/fixtures/pilot/manifest.frozen.json` | 사람 승인 후 고정, validator가 읽음 | `Read`로 확보된 후보 근거를 MCP가 고정 분모와 대조 |
 | 단일 MCP 실행기 | `tools/resume-gate/bin/resume-submit-mcp` | Claude Code가 stdio MCP로 기동하되 판정·쓰기 권한은 서버 코드가 소유 | managed MCP, 정확히 하나의 도구 `mcp__resume-submit__submit` |
 | 결정론 validator/parser | 위 단일 MCP 실행기에 포함 | `resume-submit` 프로세스 | MCP 호출 이후 schema·hash·line/page·quote 검증 |
-| Codex 판정 prompt | `tools/resume-gate/prompts/codex-judge.md` | root 고정본을 Codex CLI가 소비 | MCP 서버가 외부 구독 CLI를 호출 |
-| Grok 판정 prompt | `tools/resume-gate/prompts/grok-judge.md` | root 고정본을 Grok CLI가 소비 | MCP 서버가 외부 구독 CLI를 호출 |
+| Codex 판정 prompt | `tools/resume-gate/judge/prompt.fixed.txt` | root 고정본을 Codex CLI가 소비 | MCP 서버가 외부 구독 CLI를 호출 |
+| Grok 판정 prompt | `tools/resume-gate/judge/prompt.fixed.txt` | 같은 root 고정본을 Grok CLI가 소비 | MCP 서버가 외부 구독 CLI를 호출 |
 | managed permissions/hooks 정책 | `tools/resume-gate/policy/50-coastal-resume.json` | 설치 후 root, Claude Code permission engine | `permissions`, `dontAsk`, `allowManagedPermissionRulesOnly`, `allowManagedHooksOnly`, `disableBypassPermissionsMode`, `disableAutoMode`, `disableSideloadFlags`, `strictPluginOnlyCustomization` |
 | 배타적 MCP 설정 | `tools/resume-gate/policy/managed-mcp.json` | 설치 후 root | `/etc/claude-code/managed-mcp.json`의 exclusive managed MCP |
 | coordinator agent | `tools/resume-gate/policy/agents/resume-coordinator.md` | 설치 후 managed agent | `--agent resume-coordinator`, `Read/Grep/Glob`, 지정 subagent와 단일 submit만 사용 |
@@ -127,7 +127,7 @@ env -u OPENAI_API_KEY -u XAI_API_KEY \
   --sandbox read-only \
   --cd /opt/coastal-resume/empty \
   --json \
-  --output-schema /opt/coastal-resume/share/schemas/judge.schema.json \
+  --output-schema /opt/coastal-resume/lib/schemas/judge.schema.json \
   -
 ```
 
@@ -312,111 +312,29 @@ manifest에 있는 SWAN 파일을 사용하되 존재하지 않는 `line=999999`
 
 ---
 
-## 5. 1회성 sudo 설치 커맨드 목록
+## 5. 파일럿 한시 sudo 설치·제거
 
-현재 라운드에서는 실행하지 않는다. 다음 명령은 **1–7단계 산출물이 만들어지고 G1 승인을 받은 뒤** 사용자가 직접 실행할 정확한 설치안이다.
+현재 산출물 작성 라운드에서는 실행하지 않는다. 파일럿은 머신 전역 managed
+settings의 영향 때문에 **설치 → 파일럿 → 제거**를 한 묶음으로 운용하며,
+상시 설치는 권장하지 않는다.
 
-기존 managed 파일을 조용히 덮어쓰지 않도록 `test ! -e`에서 멈춘다. 기존 파일이 있다면 별도 사람 검토로 병합안을 만든 뒤 다시 승인해야 한다.
+설치·제거 커맨드 전문과 원상 확인 절차는
+[`INSTALL.md`](INSTALL.md)를 단일 기준으로 삼는다. 판정 코드와 고정 입력은
+별칭 없이 다음 실제 이름과 원 구조로 `/opt/coastal-resume/lib/`에 설치한다.
 
-```bash
-set -euo pipefail
+- `engine/__init__.py`, `engine/core.py`, `engine/mcp_server.py`
+- `validator/validate.py`
+- `judge/adapter.py`, `judge/prompt.fixed.txt`
+- `schemas/manifest.schema.json`, `schemas/submission.schema.json`,
+  `schemas/judge.schema.json`, `schemas/decision.schema.json`
+- `fixtures/pilot/manifest.frozen.json`
+- `fixtures/pilot/canary-fabricated-claim.submission.json`
+- `fixtures/pilot/parser-negative-duplicate-source.manifest.json`
 
-cd /home/firesinger/coastal-wiki
-
-sudo test ! -e /etc/claude-code/managed-settings.d/50-coastal-resume.json
-sudo test ! -e /etc/claude-code/managed-mcp.json
-
-sudo install -d -o root -g root -m 0755 \
-  /etc/claude-code/managed-settings.d \
-  /etc/claude-code/.claude/agents \
-  /opt/coastal-resume/bin \
-  /opt/coastal-resume/share/schemas \
-  /opt/coastal-resume/share/prompts \
-  /opt/coastal-resume/share/fixtures/pilot
-
-sudo install -d -o root -g root -m 0555 \
-  /opt/coastal-resume/empty
-
-sudo install -o root -g root -m 0644 \
-  tools/resume-gate/policy/50-coastal-resume.json \
-  /etc/claude-code/managed-settings.d/50-coastal-resume.json
-
-sudo install -o root -g root -m 0644 \
-  tools/resume-gate/policy/managed-mcp.json \
-  /etc/claude-code/managed-mcp.json
-
-sudo install -o root -g root -m 0644 \
-  tools/resume-gate/policy/agents/resume-coordinator.md \
-  /etc/claude-code/.claude/agents/resume-coordinator.md
-
-sudo install -o root -g root -m 0644 \
-  tools/resume-gate/policy/agents/resume-code-reader.md \
-  /etc/claude-code/.claude/agents/resume-code-reader.md
-
-sudo install -o root -g root -m 0644 \
-  tools/resume-gate/policy/agents/resume-pdf-reader.md \
-  /etc/claude-code/.claude/agents/resume-pdf-reader.md
-
-sudo install -o root -g root -m 0555 \
-  tools/resume-gate/bin/resume-submit-mcp \
-  /opt/coastal-resume/bin/resume-submit-mcp
-
-sudo install -o root -g root -m 0555 \
-  tools/resume-gate/bin/resume-pretool-guard \
-  /opt/coastal-resume/bin/resume-pretool-guard
-
-sudo install -o root -g root -m 0555 \
-  tools/resume-gate/bin/resume-stop-gate \
-  /opt/coastal-resume/bin/resume-stop-gate
-
-sudo install -o root -g root -m 0555 \
-  tools/resume-gate/bin/resume-run \
-  /opt/coastal-resume/bin/resume-run
-
-sudo install -o root -g root -m 0444 \
-  tools/resume-gate/schemas/submission.schema.json \
-  /opt/coastal-resume/share/schemas/submission.schema.json
-
-sudo install -o root -g root -m 0444 \
-  tools/resume-gate/schemas/judge.schema.json \
-  /opt/coastal-resume/share/schemas/judge.schema.json
-
-sudo install -o root -g root -m 0444 \
-  tools/resume-gate/schemas/decision.schema.json \
-  /opt/coastal-resume/share/schemas/decision.schema.json
-
-sudo install -o root -g root -m 0444 \
-  tools/resume-gate/prompts/codex-judge.md \
-  /opt/coastal-resume/share/prompts/codex-judge.md
-
-sudo install -o root -g root -m 0444 \
-  tools/resume-gate/prompts/grok-judge.md \
-  /opt/coastal-resume/share/prompts/grok-judge.md
-
-sudo install -o root -g root -m 0444 \
-  tools/resume-gate/fixtures/pilot/manifest.json \
-  /opt/coastal-resume/share/fixtures/pilot/manifest.json
-
-sudo install -o root -g root -m 0444 \
-  tools/resume-gate/INSTALL-MANIFEST.sha256 \
-  /opt/coastal-resume/share/INSTALL-MANIFEST.sha256
-
-cd /
-sudo sha256sum -c /opt/coastal-resume/share/INSTALL-MANIFEST.sha256
-```
-
-설치 뒤 비-sudo 검증 명령:
-
-```bash
-claude --version
-claude /doctor
-claude mcp list
-claude mcp add --transport http should-fail https://example.invalid/mcp
-codex login status
-grok inspect --json
-```
-
-`models/` 또는 `corpus/`에 대해 실행할 sudo·`chmod`·`chown` 명령은 **없음**이다. 기존 잠금은 그대로 유지한다.
+따라서 과거 계획의 `prompts/codex-judge.md`, `prompts/grok-judge.md`,
+`fixtures/pilot/manifest.json` 설치 별칭은 사용하지 않는다.
+`models/`·`corpus/`의 소유권, 모드, 내용과 기존 잠금은 설치·제거 어느
+쪽에서도 건드리지 않는다.
 
 ---
 

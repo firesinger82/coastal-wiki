@@ -604,7 +604,7 @@ def test_codex_preflight_rejects_partial_or_split_login_confirmation() -> None:
 
 
 def test_pinned_cli_command_lines_block_mutation_surfaces() -> None:
-    schema = pathlib.Path("/opt/coastal-resume/share/schemas/judge.schema.json")
+    schema = pathlib.Path("/opt/coastal-resume/lib/schemas/judge.schema.json")
     empty = pathlib.Path("/opt/coastal-resume/empty")
     codex = adapter.build_codex_argv(schema_path=schema, empty_cwd=empty)
     assert codex[-1] == "-"

@@ -1,0 +1,355 @@
+#!/usr/bin/env python3
+"""Block Stop unless the current launcher run has a fully bound PASS decision."""
+from __future__ import annotations
+
+import hashlib
+import json
+import os
+import pathlib
+import re
+import sys
+from collections.abc import Iterable, Mapping
+from typing import Any
+
+
+RUN_ENV = "COASTAL_RESUME_RUN_ID"
+STATE_ENV = "COASTAL_RESUME_STATE_ROOT"
+CONTRACT_VERSION = "resume-gate/1"
+ZERO_HASH = "0" * 64
+RUN_RE = re.compile(r"^[a-z0-9][a-z0-9_-]{7,63}$")
+HASH_RE = re.compile(r"^[0-9a-f]{64}$")
+
+
+class GateError(ValueError):
+    pass
+
+
+def _reject_duplicate_keys(pairs: Iterable[tuple[str, Any]]) -> dict[str, Any]:
+    result: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in result:
+            raise GateError(f"duplicate JSON key: {key}")
+        result[key] = value
+    return result
+
+
+def _strict_json(raw: bytes, label: str) -> dict[str, Any]:
+    try:
+        value = json.loads(
+            raw.decode("utf-8", errors="strict"),
+            object_pairs_hook=_reject_duplicate_keys,
+            parse_constant=lambda value: (_ for _ in ()).throw(
+                GateError(f"non-finite JSON number: {value}")
+            ),
+        )
+    except (UnicodeDecodeError, json.JSONDecodeError, GateError) as error:
+        raise GateError(f"{label} is invalid JSON: {error}") from error
+    if not isinstance(value, dict):
+        raise GateError(f"{label} is not an object")
+    return value
+
+
+def _read_regular(path: pathlib.Path, label: str) -> tuple[bytes, dict[str, Any]]:
+    if path.is_symlink() or not path.is_file():
+        raise GateError(f"{label} is not a regular file")
+    try:
+        raw = path.read_bytes()
+    except OSError as error:
+        raise GateError(f"{label} cannot be read: {error}") from error
+    return raw, _strict_json(raw, label)
+
+
+def _check_jcs(value: Any) -> None:
+    if value is None or isinstance(value, (bool, str)):
+        return
+    if isinstance(value, int) and not isinstance(value, bool):
+        if not -(2**53 - 1) <= value <= 2**53 - 1:
+            raise GateError("integer is outside the RFC 8785 interoperable range")
+        return
+    if isinstance(value, list):
+        for item in value:
+            _check_jcs(item)
+        return
+    if isinstance(value, dict):
+        for key, item in value.items():
+            if not isinstance(key, str):
+                raise GateError("object key is not a string")
+            _check_jcs(item)
+        return
+    raise GateError("unsupported JCS value")
+
+
+def _jcs_text(value: Any) -> str:
+    if value is None:
+        return "null"
+    if value is True:
+        return "true"
+    if value is False:
+        return "false"
+    if isinstance(value, int):
+        return str(value)
+    if isinstance(value, str):
+        return json.dumps(value, ensure_ascii=False, separators=(",", ":"))
+    if isinstance(value, list):
+        return "[" + ",".join(_jcs_text(item) for item in value) + "]"
+    if isinstance(value, dict):
+        keys = sorted(value, key=lambda key: key.encode("utf-16-be", errors="strict"))
+        return "{" + ",".join(
+            f"{_jcs_text(key)}:{_jcs_text(value[key])}" for key in keys
+        ) + "}"
+    raise GateError("unsupported JCS value")
+
+
+def _canonical_hash(value: Any) -> str:
+    _check_jcs(value)
+    return hashlib.sha256(_jcs_text(value).encode("utf-8", errors="strict")).hexdigest()
+
+
+def _verify_ledger(
+    run_dir: pathlib.Path,
+    run_id: str,
+) -> tuple[str, list[dict[str, Any]]]:
+    ledger_path = run_dir / "attempt-ledger.jsonl"
+    head_path = run_dir / "attempt-ledger.head.json"
+    if ledger_path.is_symlink() or head_path.is_symlink():
+        raise GateError("ledger path is a symlink")
+    if not ledger_path.is_file() or not head_path.is_file():
+        raise GateError("ledger or head checkpoint is missing")
+
+    previous = ZERO_HASH
+    entries: list[dict[str, Any]] = []
+    for index, raw in enumerate(ledger_path.read_bytes().splitlines(), start=1):
+        entry = _strict_json(raw, f"ledger line {index}")
+        if set(entry) != {
+            "schema_version",
+            "contract_version",
+            "run_id",
+            "event_index",
+            "event_type",
+            "prev_hash",
+            "payload",
+            "entry_hash",
+        }:
+            raise GateError("ledger entry has an invalid field set")
+        if (
+            entry["schema_version"] != 1
+            or entry["contract_version"] != CONTRACT_VERSION
+            or entry["run_id"] != run_id
+            or entry["event_index"] != index
+            or entry["prev_hash"] != previous
+            or not isinstance(entry["payload"], dict)
+        ):
+            raise GateError("ledger binding or order is invalid")
+        claimed = entry["entry_hash"]
+        material = {key: value for key, value in entry.items() if key != "entry_hash"}
+        if not isinstance(claimed, str) or claimed != _canonical_hash(material):
+            raise GateError("ledger entry hash mismatch")
+        previous = claimed
+        entries.append(entry)
+
+    _, head = _read_regular(head_path, "ledger head")
+    if head != {
+        "schema_version": 1,
+        "run_id": run_id,
+        "entry_count": len(entries),
+        "head_hash": previous,
+    }:
+        raise GateError("ledger head checkpoint mismatch")
+    return previous, entries
+
+
+def _passing_inputs(inputs: Any) -> bool:
+    try:
+        return (
+            inputs["deterministic"]["status"] == "PASS"
+            and inputs["deterministic"]["failure_codes"] == []
+            and inputs["codex"]["verdict"] == "PASS"
+            and inputs["grok"]["verdict"] == "PASS"
+            and inputs["canary"]["status"] == "CAUGHT"
+            and inputs["parser_negative"]["status"] == "REJECTED"
+            and inputs["evidence_chain"]["status"] == "VALID"
+        )
+    except (KeyError, TypeError):
+        return False
+
+
+def _verify_attempt(
+    run_dir: pathlib.Path,
+    entry: Mapping[str, Any],
+    *,
+    run_id: str,
+    manifest_sha256: str,
+) -> tuple[bytes, dict[str, Any]]:
+    payload = entry["payload"]
+    attempt = payload.get("attempt")
+    if not isinstance(attempt, int) or attempt < 1:
+        raise GateError("attempt number is invalid")
+    attempt_dir = run_dir / "attempts" / f"{attempt:06d}"
+    if attempt_dir.is_symlink() or not attempt_dir.is_dir():
+        raise GateError("attempt directory is unsafe")
+
+    request_raw, request = _read_regular(attempt_dir / "request.json", "request")
+    request_hash = _canonical_hash(request)
+    if request_hash != payload.get("submission_sha256"):
+        raise GateError("submission hash mismatch")
+
+    _, deterministic = _read_regular(
+        attempt_dir / "deterministic.json", "deterministic result"
+    )
+    judge_records: dict[str, dict[str, Any]] = {}
+    for judge_name in ("codex", "grok"):
+        _, judge_records[judge_name] = _read_regular(
+            attempt_dir / "judges" / f"{judge_name}.json",
+            f"{judge_name} result",
+        )
+    decision_raw, decision = _read_regular(
+        attempt_dir / "decision.json", "attempt decision"
+    )
+
+    if (
+        decision.get("schema_version") != 1
+        or decision.get("contract_version") != CONTRACT_VERSION
+        or decision.get("run_id") != run_id
+        or decision.get("attempt_id") != attempt
+        or decision.get("status") != payload.get("decision_status")
+        or decision.get("provenance", {}).get("manifest", {}).get("sha256")
+        != manifest_sha256
+        or decision.get("provenance", {}).get("submission", {}).get("sha256")
+        != request_hash
+        or _canonical_hash(decision) != payload.get("decision_sha256")
+    ):
+        raise GateError("decision binding mismatch")
+
+    judge_hashes: dict[str, str] = {}
+    for judge_name, record in judge_records.items():
+        judge_hash = _canonical_hash(record)
+        judge_hashes[judge_name] = judge_hash
+        if (
+            decision.get("provenance", {})
+            .get("judges", {})
+            .get(judge_name, {})
+            .get("result_sha256")
+            != judge_hash
+        ):
+            raise GateError(f"{judge_name} result hash mismatch")
+
+    chain_material = {
+        "manifest_sha256": manifest_sha256,
+        "submission_sha256": request_hash,
+        "deterministic_sha256": _canonical_hash(deterministic),
+        "judge_sha256": judge_hashes,
+        "previous_ledger_hash": entry["prev_hash"],
+    }
+    provenance_hash = _canonical_hash(chain_material)
+    inputs = decision.get("inputs")
+    if (
+        not isinstance(inputs, dict)
+        or inputs.get("evidence_chain", {}).get("provenance_sha256")
+        != provenance_hash
+        or decision.get("chain_root")
+        != _canonical_hash({"provenance_sha256": provenance_hash, "inputs": inputs})
+    ):
+        raise GateError("decision evidence chain mismatch")
+    return decision_raw, decision
+
+
+def _verify_current_pass(run_id: str, state_root: pathlib.Path) -> None:
+    if not state_root.is_absolute() or state_root.is_symlink():
+        raise GateError("state root is not a fixed real directory")
+    state_root = state_root.resolve(strict=True)
+    run_dir = state_root / run_id
+    if run_dir.is_symlink() or not run_dir.is_dir():
+        raise GateError("current run directory is unavailable")
+    if run_dir.parent != state_root:
+        raise GateError("current run directory escaped state root")
+
+    ledger_hash, entries = _verify_ledger(run_dir, run_id)
+    attempt_entries = [entry for entry in entries if entry["event_type"] == "ATTEMPT"]
+    if not attempt_entries:
+        raise GateError("current run has no decision attempt")
+    if entries[-1] is not attempt_entries[-1]:
+        raise GateError("current run ended in a non-attempt state")
+
+    controls = [entry for entry in entries if entry["event_type"] == "CONTROLS"]
+    if len(controls) != 1 or entries[0] is not controls[0]:
+        raise GateError("negative controls are missing or out of order")
+
+    manifest_sha256: str | None = None
+    latest_raw: bytes | None = None
+    latest_decision: dict[str, Any] | None = None
+    for entry in attempt_entries:
+        attempt_path = (
+            run_dir / "attempts" / f"{entry['payload'].get('attempt', 0):06d}" / "decision.json"
+        )
+        _, candidate = _read_regular(attempt_path, "attempt decision")
+        candidate_manifest = (
+            candidate.get("provenance", {}).get("manifest", {}).get("sha256")
+        )
+        if not isinstance(candidate_manifest, str) or not HASH_RE.fullmatch(
+            candidate_manifest
+        ):
+            raise GateError("manifest hash is malformed")
+        if manifest_sha256 is None:
+            manifest_sha256 = candidate_manifest
+        elif candidate_manifest != manifest_sha256:
+            raise GateError("manifest changed within the run")
+        latest_raw, latest_decision = _verify_attempt(
+            run_dir,
+            entry,
+            run_id=run_id,
+            manifest_sha256=manifest_sha256,
+        )
+
+    assert latest_raw is not None and latest_decision is not None
+    current_raw, current_decision = _read_regular(run_dir / "decision.json", "current decision")
+    if current_raw != latest_raw or current_decision != latest_decision:
+        raise GateError("current decision is not the latest ledger decision")
+    latest_payload = attempt_entries[-1]["payload"]
+    if (
+        latest_payload.get("decision_status") != "PASS"
+        or latest_payload.get("current_status") != "PASS"
+        or current_decision.get("status") != "PASS"
+        or not _passing_inputs(current_decision.get("inputs"))
+    ):
+        raise GateError("current decision is not PASS")
+
+    _, status = _read_regular(run_dir / "status.json", "status checkpoint")
+    if status != {
+        "schema_version": 1,
+        "contract_version": CONTRACT_VERSION,
+        "run_id": run_id,
+        "accepted_attempts": len(attempt_entries),
+        "ledger_hash": ledger_hash,
+        "status": "PASS",
+    }:
+        raise GateError("status checkpoint is not bound to current PASS")
+
+
+def _block(reason: str) -> int:
+    output = {
+        "decision": "block",
+        "reason": f"resume-gate: current run has no valid PASS decision ({reason})",
+    }
+    print(json.dumps(output, ensure_ascii=False, separators=(",", ":")))
+    return 0
+
+
+def main() -> int:
+    try:
+        event = _strict_json(sys.stdin.buffer.read(), "Stop hook input")
+        if event.get("hook_event_name") != "Stop":
+            raise GateError("unexpected hook event")
+        run_id = os.environ.get(RUN_ENV, "")
+        if not RUN_RE.fullmatch(run_id):
+            raise GateError("launcher run ID is absent or invalid")
+        state_text = os.environ.get(STATE_ENV, "")
+        if not state_text:
+            raise GateError("launcher state root is absent")
+        _verify_current_pass(run_id, pathlib.Path(state_text))
+    except BaseException as error:
+        return _block(f"{type(error).__name__}: {error}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -68,12 +68,8 @@ _GROK_MARKETPLACE_BOOKKEEPING_KEYS = frozenset(
 
 
 def _load_validator() -> Any:
-    candidates = (
-        GATE_ROOT / "validator" / "validate.py",
-        GATE_ROOT / "share" / "validator" / "validate.py",
-    )
-    path = next((candidate for candidate in candidates if candidate.is_file()), None)
-    if path is None:
+    path = GATE_ROOT / "validator" / "validate.py"
+    if not path.is_file():
         raise RuntimeError("deterministic validator module is unavailable")
     module_name = "resume_gate_stage3_validator_for_judge"
     spec = importlib.util.spec_from_file_location(module_name, path)

@@ -1,0 +1,277 @@
+#!/usr/bin/env python3
+"""Fail-closed PreToolUse whitelist for the managed resume-gate session."""
+from __future__ import annotations
+
+import json
+import os
+import pathlib
+import re
+import sys
+import unicodedata
+from collections.abc import Mapping
+from typing import Any
+
+
+REPO_ENV = "COASTAL_RESUME_REPO_ROOT"
+RUN_ENV = "COASTAL_RESUME_RUN_ID"
+ALLOWED_AGENTS = frozenset({"resume-code-reader", "resume-pdf-reader"})
+ALLOWED_PLAIN_TOOLS = frozenset({"Read", "Grep", "Glob"})
+SUBMIT_TOOL = "mcp__resume-submit__submit"
+PERCENT_ESCAPE_RE = re.compile(r"%[0-9A-Fa-f]{2}")
+
+
+class GuardError(ValueError):
+    pass
+
+
+def _reject_duplicate_keys(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    result: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in result:
+            raise GuardError(f"duplicate JSON key: {key}")
+        result[key] = value
+    return result
+
+
+def _load_event() -> dict[str, Any]:
+    try:
+        value = json.loads(
+            sys.stdin.buffer.read().decode("utf-8", errors="strict"),
+            object_pairs_hook=_reject_duplicate_keys,
+            parse_constant=lambda value: (_ for _ in ()).throw(
+                GuardError(f"non-finite JSON number: {value}")
+            ),
+        )
+    except (UnicodeDecodeError, json.JSONDecodeError, GuardError) as error:
+        raise GuardError(f"invalid hook input: {error}") from error
+    if not isinstance(value, dict):
+        raise GuardError("hook input is not an object")
+    if value.get("hook_event_name") != "PreToolUse":
+        raise GuardError("unexpected hook event")
+    return value
+
+
+def _safe_text(value: Any, label: str, *, allow_empty: bool = False) -> str:
+    if not isinstance(value, str):
+        raise GuardError(f"{label} is not a string")
+    if not allow_empty and not value:
+        raise GuardError(f"{label} is empty")
+    if "\x00" in value or any(ord(character) < 0x20 for character in value):
+        raise GuardError(f"{label} contains a control character")
+    if unicodedata.normalize("NFKC", value) != value:
+        raise GuardError(f"{label} is not Unicode-normalized")
+    if "\\" in value:
+        raise GuardError(f"{label} contains a backslash")
+    if PERCENT_ESCAPE_RE.search(value):
+        raise GuardError(f"{label} contains percent encoding")
+    return value
+
+
+def _contains_parent_segment(value: str) -> bool:
+    return any(segment == ".." for segment in pathlib.PurePosixPath(value).parts)
+
+
+def _within(path: pathlib.Path, roots: tuple[pathlib.Path, ...]) -> bool:
+    return any(path == root or root in path.parents for root in roots)
+
+
+def _allowed_roots(repo_root: pathlib.Path) -> tuple[pathlib.Path, ...]:
+    roots: list[pathlib.Path] = []
+    for name in ("models", "corpus"):
+        candidate = repo_root / name
+        if candidate.exists():
+            if candidate.is_symlink() or not candidate.is_dir():
+                raise GuardError(f"protected root is unsafe: {name}")
+            roots.append(candidate.resolve(strict=True))
+    if not roots:
+        raise GuardError("no protected read root is available")
+    return tuple(roots)
+
+
+def _resolve_existing_path(
+    raw: Any,
+    *,
+    cwd: pathlib.Path,
+    roots: tuple[pathlib.Path, ...],
+    label: str,
+) -> pathlib.Path:
+    text = _safe_text(raw, label)
+    if _contains_parent_segment(text):
+        raise GuardError(f"{label} contains parent traversal")
+    candidate = pathlib.Path(text)
+    if not candidate.is_absolute():
+        candidate = cwd / candidate
+    try:
+        resolved = candidate.resolve(strict=True)
+    except OSError as error:
+        raise GuardError(f"{label} cannot be resolved: {error}") from error
+    if not _within(resolved, roots):
+        raise GuardError(f"{label} resolves outside protected roots")
+    return resolved
+
+
+def _check_glob_pattern(
+    raw: Any,
+    *,
+    base: pathlib.Path,
+    roots: tuple[pathlib.Path, ...],
+) -> None:
+    pattern = _safe_text(raw, "Glob pattern")
+    pure = pathlib.PurePosixPath(pattern)
+    if pure.is_absolute() or _contains_parent_segment(pattern):
+        raise GuardError("Glob pattern escapes its base")
+
+    literal_parts: list[str] = []
+    for part in pure.parts:
+        if any(marker in part for marker in ("*", "?", "[")):
+            break
+        literal_parts.append(part)
+    prefix = base.joinpath(*literal_parts)
+    cursor = prefix
+    while not cursor.exists() and cursor != base:
+        cursor = cursor.parent
+    resolved = cursor.resolve(strict=True)
+    if not _within(resolved, roots):
+        raise GuardError("Glob literal prefix resolves outside protected roots")
+    try:
+        for match in base.glob(pattern):
+            if not _within(match.resolve(strict=True), roots):
+                raise GuardError("Glob match resolves outside protected roots")
+    except (OSError, RuntimeError, ValueError) as error:
+        raise GuardError(f"Glob matches cannot be resolved safely: {error}") from error
+
+
+def _check_read(
+    tool_input: Mapping[str, Any],
+    *,
+    cwd: pathlib.Path,
+    roots: tuple[pathlib.Path, ...],
+) -> None:
+    allowed = {"file_path", "offset", "limit", "pages"}
+    if set(tool_input) - allowed or "file_path" not in tool_input:
+        raise GuardError("Read input has an unapproved field set")
+    _resolve_existing_path(
+        tool_input["file_path"],
+        cwd=cwd,
+        roots=roots,
+        label="Read file_path",
+    )
+
+
+def _check_grep(
+    tool_input: Mapping[str, Any],
+    *,
+    cwd: pathlib.Path,
+    roots: tuple[pathlib.Path, ...],
+) -> None:
+    allowed = {
+        "pattern",
+        "path",
+        "glob",
+        "output_mode",
+        "-i",
+        "multiline",
+        "head_limit",
+        "offset",
+        "type",
+        "-n",
+        "-A",
+        "-B",
+        "-C",
+    }
+    if set(tool_input) - allowed or "pattern" not in tool_input:
+        raise GuardError("Grep input has an unapproved field set")
+    _safe_text(tool_input["pattern"], "Grep pattern", allow_empty=True)
+    base = _resolve_existing_path(
+        tool_input.get("path", str(cwd)),
+        cwd=cwd,
+        roots=roots,
+        label="Grep path",
+    )
+    if "glob" in tool_input:
+        _check_glob_pattern(tool_input["glob"], base=base, roots=roots)
+
+
+def _check_glob(
+    tool_input: Mapping[str, Any],
+    *,
+    cwd: pathlib.Path,
+    roots: tuple[pathlib.Path, ...],
+) -> None:
+    if set(tool_input) - {"pattern", "path"} or "pattern" not in tool_input:
+        raise GuardError("Glob input has an unapproved field set")
+    base = _resolve_existing_path(
+        tool_input.get("path", str(cwd)),
+        cwd=cwd,
+        roots=roots,
+        label="Glob path",
+    )
+    if not base.is_dir():
+        raise GuardError("Glob path is not a directory")
+    _check_glob_pattern(tool_input["pattern"], base=base, roots=roots)
+
+
+def _check_agent(tool_input: Mapping[str, Any]) -> None:
+    allowed = {"prompt", "description", "subagent_type", "model"}
+    if set(tool_input) - allowed:
+        raise GuardError("Agent input has an unapproved field set")
+    if tool_input.get("subagent_type") not in ALLOWED_AGENTS:
+        raise GuardError("Agent type is not an approved resume reader")
+    _safe_text(tool_input.get("prompt"), "Agent prompt")
+    if "description" in tool_input:
+        _safe_text(tool_input["description"], "Agent description")
+    if "model" in tool_input:
+        _safe_text(tool_input["model"], "Agent model")
+
+
+def check_event(event: Mapping[str, Any]) -> None:
+    run_id = _safe_text(os.environ.get(RUN_ENV), RUN_ENV)
+    if not re.fullmatch(r"[a-z0-9][a-z0-9_-]{7,63}", run_id):
+        raise GuardError("launcher run ID is invalid")
+
+    repo_text = _safe_text(os.environ.get(REPO_ENV), REPO_ENV)
+    repo_root = pathlib.Path(repo_text)
+    if not repo_root.is_absolute() or repo_root.is_symlink():
+        raise GuardError("repository root is not a fixed real directory")
+    repo_root = repo_root.resolve(strict=True)
+
+    cwd = _resolve_existing_path(
+        event.get("cwd"),
+        cwd=repo_root,
+        roots=(repo_root,),
+        label="hook cwd",
+    )
+    tool_name = _safe_text(event.get("tool_name"), "tool_name")
+    tool_input = event.get("tool_input")
+    if not isinstance(tool_input, Mapping):
+        raise GuardError("tool_input is not an object")
+
+    if tool_name == SUBMIT_TOOL:
+        return
+    if tool_name == "Agent":
+        _check_agent(tool_input)
+        return
+    if tool_name not in ALLOWED_PLAIN_TOOLS:
+        raise GuardError(f"tool is not whitelisted: {tool_name}")
+
+    roots = _allowed_roots(repo_root)
+    if tool_name == "Read":
+        _check_read(tool_input, cwd=cwd, roots=roots)
+    elif tool_name == "Grep":
+        _check_grep(tool_input, cwd=cwd, roots=roots)
+    else:
+        _check_glob(tool_input, cwd=cwd, roots=roots)
+
+
+def main() -> int:
+    try:
+        event = _load_event()
+        check_event(event)
+    except BaseException as error:
+        print(f"resume-gate PreToolUse denied: {type(error).__name__}: {error}", file=sys.stderr)
+        return 2
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

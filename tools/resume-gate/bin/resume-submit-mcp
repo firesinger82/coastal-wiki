@@ -1,0 +1,31 @@
+#!/bin/sh
+set -eu
+
+repo_root=/home/firesinger/coastal-wiki
+lib_root=/opt/coastal-resume/lib
+python_bin=/home/firesinger/coastal-wiki/.venv/bin/python
+
+: "${COASTAL_RESUME_RUN_ID:?launcher did not supply COASTAL_RESUME_RUN_ID}"
+: "${COASTAL_RESUME_STATE_ROOT:?launcher did not supply COASTAL_RESUME_STATE_ROOT}"
+
+case "$COASTAL_RESUME_RUN_ID" in
+  *[!a-z0-9_-]* | ??????? | ?????? | ????? | ???? | ??? | ?? | ? | "")
+    echo "invalid launcher run ID" >&2
+    exit 2
+    ;;
+esac
+
+unset OPENAI_API_KEY XAI_API_KEY GROK_CODE_XAI_API_KEY
+unset GROK_AUTH_PROVIDER_COMMAND GROK_CLI_CHAT_PROXY_BASE_URL
+unset GROK_OIDC_ISSUER GROK_OIDC_CLIENT_ID
+
+exec "$python_bin" "$lib_root/engine/mcp_server.py" \
+  --repo-root "$repo_root" \
+  --manifest "$lib_root/fixtures/pilot/manifest.frozen.json" \
+  --run-id "$COASTAL_RESUME_RUN_ID" \
+  --state-root "$COASTAL_RESUME_STATE_ROOT" \
+  --canary-submission "$lib_root/fixtures/pilot/canary-fabricated-claim.submission.json" \
+  --parser-negative "$lib_root/fixtures/pilot/parser-negative-duplicate-source.manifest.json" \
+  --execution-artifact "$lib_root/validator/validate.py" \
+  --empty-cwd /opt/coastal-resume/empty \
+  --timeout-seconds 180
