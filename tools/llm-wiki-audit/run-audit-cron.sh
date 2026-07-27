@@ -55,14 +55,19 @@ echo "HEAD=$(git rev-parse --short HEAD)"
 SNAP_UNTRACKED="$(git status --porcelain --untracked-files=all | grep '^??' | cut -c4- | sort || true)"
 
 # 3. coastal-audit headless 실행 (report-only 스킬; canonical write 는 step4 가드가 복원)
+# 실행 모델과 커밋 서명은 한 쌍 — 반드시 함께 변경 (Codex 검토 2026-07-27: 자동 추종 + 정적
+# 서명은 양립 불가 → 모델을 명시 고정). env 로 쌍째 덮어쓸 수 있다.
+L4_MODEL="${COASTAL_MODEL:-claude-fable-5}"
+MODEL_SIG="${COASTAL_MODEL_SIG:-Claude Fable 5 (1M context)}"
 if [ "${L4_DRY_RUN:-0}" = "1" ]; then
   echo "[DRY_RUN] claude 호출 생략"
 else
   claude -p "/coastal-audit --n $N" \
+    --model "$L4_MODEL" \
     --permission-mode acceptEdits \
     --allowedTools "Read,Bash,Write,Skill,Glob,Grep" \
     --add-dir "$REPO" 2>&1 | tail -50
-  echo "claude rc=${PIPESTATUS[0]}"
+  echo "claude rc=${PIPESTATUS[0]} model=$L4_MODEL"
 fi
 
 # 4. 하드 가드 — _staging/audit/ 외 변경 제거
@@ -93,9 +98,8 @@ elif [ -n "$(git status --porcelain _staging/audit/)" ]; then
     git diff --cached --name-only | grep -v '^_staging/audit/' | head
     git reset -q; exit 4
   fi
-  # 무인 실행이라 세션 모델명을 알 수 없다 → 현재 운영 모델을 기본값으로, env 로 덮어씀.
-  # 모델 승급 시 이 기본값 갱신(또는 COASTAL_MODEL_SIG 설정). CONVENTIONS §1 note_author 와 같은 규칙.
-  MODEL_SIG="${COASTAL_MODEL_SIG:-Claude Opus 5 (1M context)}"
+  # MODEL_SIG 는 step3 에서 실행 모델(L4_MODEL)과 한 쌍으로 정의됨. 현재 러너는 실행
+  # 결과에서 모델명을 수집하지 않으므로, 쌍 정의가 서명 정확성의 근거다.
   git commit -q -m "chore(audit): L4 V3 자율 감사 $TS — N=$N (report-only, cron)
 
 Co-Authored-By: $MODEL_SIG <noreply@anthropic.com>" \
