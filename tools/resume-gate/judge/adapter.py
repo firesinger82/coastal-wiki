@@ -9,6 +9,7 @@ through an injectable runner, and validates every returned binding.
 from __future__ import annotations
 
 import argparse
+import copy
 import dataclasses
 import hashlib
 import hmac
@@ -18,6 +19,7 @@ import os
 import pathlib
 import subprocess
 import sys
+import tempfile
 import tomllib
 import unicodedata
 from collections.abc import Mapping, Sequence
@@ -51,6 +53,7 @@ UNKNOWN_GROK_AUTH_ENV_NAMES = (
 DATA_BEGIN = "<<<RESUME_GATE_DATA_BEGIN>>>"
 DATA_END = "<<<RESUME_GATE_DATA_END>>>"
 _RESERVED_DATA_MARKERS = ("<<<RESUME_GATE_DATA_", "<<<SLICE_")
+CLI_ERROR_MESSAGE_LIMIT = 500
 
 
 def _load_validator() -> Any:
@@ -118,7 +121,7 @@ class JudgeRunner(Protocol):
         config: JudgeConfig,
         *,
         prompt: bytes,
-        schema_path: pathlib.Path,
+        schema: dict[str, Any],
         empty_cwd: pathlib.Path,
         environment: Mapping[str, str],
         timeout_seconds: int,
@@ -167,6 +170,16 @@ def _strict_json_bytes(raw: bytes, label: str) -> Any:
 
 def _json_compact(value: Any) -> str:
     return json.dumps(value, ensure_ascii=False, separators=(",", ":"))
+
+
+def derive_cli_schema(schema: dict[str, Any]) -> dict[str, Any]:
+    """Derive the generation-only schema without weakening the contract schema."""
+
+    return {
+        key: copy.deepcopy(value)
+        for key, value in schema.items()
+        if key != "allOf"
+    }
 
 
 def _contains_reserved_marker(value: str) -> bool:
@@ -488,7 +501,11 @@ class SubprocessJudgeRunner:
                 (str(config.binary), "login", "status"),
                 environment,
             )
-            if login.returncode != 0 or login.stdout.strip() != b"Logged in using ChatGPT":
+            login_confirmation = b"Logged in using ChatGPT"
+            if login.returncode != 0 or not (
+                login.stdout.strip() == login_confirmation
+                or login.stderr.strip() == login_confirmation
+            ):
                 raise RunnerError("Codex CLI did not confirm ChatGPT subscription login")
         else:
             _verify_grok_auth(environment)
@@ -518,36 +535,59 @@ class SubprocessJudgeRunner:
         config: JudgeConfig,
         *,
         prompt: bytes,
-        schema_path: pathlib.Path,
+        schema: dict[str, Any],
         empty_cwd: pathlib.Path,
         environment: Mapping[str, str],
         timeout_seconds: int,
     ) -> ProcessResult:
         try:
             if config.name == "codex":
-                argv = build_codex_argv(schema_path=schema_path, empty_cwd=empty_cwd)
                 input_bytes: bytes | None = prompt
+                schema_bytes = (
+                    _json_compact(schema) + "\n"
+                ).encode("utf-8", errors="strict")
+                with tempfile.NamedTemporaryFile(
+                    mode="w+b",
+                    prefix="resume-gate-codex-schema-",
+                    suffix=".json",
+                ) as schema_file:
+                    schema_file.write(schema_bytes)
+                    schema_file.flush()
+                    argv = build_codex_argv(
+                        schema_path=pathlib.Path(schema_file.name),
+                        empty_cwd=empty_cwd,
+                    )
+                    completed = subprocess.run(
+                        list(argv),
+                        input=input_bytes,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE,
+                        cwd=empty_cwd,
+                        env=dict(environment),
+                        shell=False,
+                        check=False,
+                        timeout=timeout_seconds,
+                    )
             else:
                 prompt_text = prompt.decode("utf-8", errors="strict")
-                schema = _load_judge_schema(schema_path)
                 argv = build_grok_argv(
                     prompt=prompt_text,
                     schema=schema,
                     empty_cwd=empty_cwd,
                 )
                 input_bytes = None
-            completed = subprocess.run(
-                list(argv),
-                input=input_bytes,
-                stdin=subprocess.DEVNULL if input_bytes is None else None,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                cwd=empty_cwd,
-                env=dict(environment),
-                shell=False,
-                check=False,
-                timeout=timeout_seconds,
-            )
+                completed = subprocess.run(
+                    list(argv),
+                    input=input_bytes,
+                    stdin=subprocess.DEVNULL,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    cwd=empty_cwd,
+                    env=dict(environment),
+                    shell=False,
+                    check=False,
+                    timeout=timeout_seconds,
+                )
         except subprocess.TimeoutExpired as error:
             raise RunnerTimeout(f"{config.name} judge timed out") from error
         except (OSError, UnicodeError) as error:
@@ -555,9 +595,39 @@ class SubprocessJudgeRunner:
         return ProcessResult(completed.returncode, completed.stdout, completed.stderr)
 
 
+def _error_event_message(event: dict[str, Any]) -> str | None:
+    message = event.get("message")
+    if isinstance(message, str):
+        return message[:CLI_ERROR_MESSAGE_LIMIT]
+    error = event.get("error")
+    if isinstance(error, str):
+        return error[:CLI_ERROR_MESSAGE_LIMIT]
+    if isinstance(error, dict) and isinstance(error.get("message"), str):
+        return error["message"][:CLI_ERROR_MESSAGE_LIMIT]
+    return None
+
+
+def _last_cli_error_event_message(stdout: bytes) -> str | None:
+    last_message: str | None = None
+    for line_number, raw_line in enumerate(stdout.splitlines(), start=1):
+        if not raw_line.strip():
+            continue
+        try:
+            event = _strict_json_bytes(raw_line, f"CLI JSONL line {line_number}")
+        except ValueError:
+            continue
+        if (
+            isinstance(event, dict)
+            and event.get("type") in {"turn.failed", "error"}
+        ):
+            last_message = _error_event_message(event)
+    return last_message
+
+
 def _parse_codex_output(stdout: bytes) -> bytes:
     messages: list[str] = []
     turn_completed = False
+    last_terminal_event: tuple[str, str | None] | None = None
     for line_number, raw_line in enumerate(stdout.splitlines(), start=1):
         if not raw_line.strip():
             continue
@@ -566,7 +636,7 @@ def _parse_codex_output(stdout: bytes) -> bytes:
             raise ValueError(f"Codex JSONL line {line_number} is not a typed event")
         event_type = event["type"]
         if event_type in {"turn.failed", "error"}:
-            raise ValueError(f"Codex emitted terminal event {event_type}")
+            last_terminal_event = (event_type, _error_event_message(event))
         if event_type == "turn.completed":
             turn_completed = True
         if event_type == "item.completed":
@@ -576,6 +646,12 @@ def _parse_codex_output(stdout: bytes) -> bytes:
                 if not isinstance(text, str):
                     raise ValueError("Codex agent_message text is absent")
                 messages.append(text)
+    if last_terminal_event is not None:
+        event_type, message = last_terminal_event
+        detail = f"Codex emitted terminal event {event_type}"
+        if message is not None:
+            detail += f": {message}"
+        raise ValueError(detail)
     if not turn_completed:
         raise ValueError("Codex JSONL has no turn.completed event")
     if len(messages) != 1:
@@ -776,6 +852,7 @@ def run_adapter(
             schema = _load_judge_schema(schema_path)
         except RuntimeError as error:
             return AdapterOutcome.failed("JUDGE_SCHEMA_UNAVAILABLE", str(error))
+        cli_schema = derive_cli_schema(schema)
         try:
             if not empty_cwd.is_dir() or any(empty_cwd.iterdir()):
                 return AdapterOutcome.failed(
@@ -799,7 +876,7 @@ def run_adapter(
             completed = runner.invoke(
                 config,
                 prompt=full_prompt,
-                schema_path=schema_path,
+                schema=cli_schema,
                 empty_cwd=empty_cwd,
                 environment=clean_environment,
                 timeout_seconds=timeout_seconds,
@@ -814,9 +891,13 @@ def run_adapter(
                 f"{type(error).__name__}: {error}",
             )
         if completed.returncode != 0:
+            detail = f"{judge_name} judge exited {completed.returncode}"
+            error_message = _last_cli_error_event_message(completed.stdout)
+            if error_message is not None:
+                detail += f": {error_message}"
             return AdapterOutcome.failed(
                 "CLI_EXIT_NONZERO",
-                f"{judge_name} judge exited {completed.returncode}",
+                detail,
             )
 
         try:

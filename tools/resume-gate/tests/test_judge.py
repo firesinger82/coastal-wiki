@@ -148,6 +148,7 @@ class MockRunner:
         self.invoke_calls = 0
         self.prompt: bytes | None = None
         self.environment: dict[str, str] | None = None
+        self.schema: dict[str, Any] | None = None
 
     def preflight(
         self,
@@ -169,12 +170,35 @@ class MockRunner:
     def invoke(self, config: adapter.JudgeConfig, **kwargs: Any) -> adapter.ProcessResult:
         self.invoke_calls += 1
         self.prompt = kwargs["prompt"]
+        self.schema = copy.deepcopy(kwargs["schema"])
         assert kwargs["empty_cwd"].is_dir()
         assert not any(kwargs["empty_cwd"].iterdir())
         if self.invoke_error is not None:
             raise self.invoke_error
         assert self.process_result is not None
         return self.process_result
+
+
+class CodexPreflightMockRunner(adapter.SubprocessJudgeRunner):
+    def __init__(self, login_result: adapter.ProcessResult) -> None:
+        self.login_result = login_result
+        self.calls: list[tuple[str, ...]] = []
+
+    def _run_preflight(
+        self,
+        argv: tuple[str, ...],
+        environment: dict[str, str],
+    ) -> adapter.ProcessResult:
+        del environment
+        self.calls.append(argv)
+        if argv[-1] == "--version":
+            return adapter.ProcessResult(
+                0,
+                (adapter.CODEX_ENGINE_VERSION + "\n").encode("utf-8"),
+                b"",
+            )
+        assert argv[-2:] == ("login", "status")
+        return self.login_result
 
 
 def run_with_mock(
@@ -244,6 +268,31 @@ def test_valid_codex_fail_is_returned_and_prompt_is_exact() -> None:
     assert b"attempt_reason" not in runner.prompt
 
 
+def test_cli_schema_removes_only_top_level_allof_for_both_judges() -> None:
+    contract_schema = load_json(GATE_ROOT / "schemas" / "judge.schema.json")
+    cli_schema = adapter.derive_cli_schema(contract_schema)
+    assert "allOf" in contract_schema
+    assert "allOf" not in cli_schema
+    assert set(cli_schema) == set(contract_schema) - {"allOf"}
+    for key, value in cli_schema.items():
+        assert value == contract_schema[key]
+
+    observed_schemas = []
+    for judge_name in ("codex", "grok"):
+        outcome, runner = run_with_mock(
+            judge_name,
+            lambda manifest, submission, name=judge_name: judge_result(
+                name,
+                manifest,
+                submission,
+            ),
+        )
+        assert outcome.status == "VALIDATED", outcome.as_dict()
+        assert runner.schema == cli_schema
+        observed_schemas.append(runner.schema)
+    assert observed_schemas[0] == observed_schemas[1]
+
+
 def test_echo_fields_and_engine_version_mutations_are_rejected() -> None:
     mutations = (
         ("contract_version", lambda result: result.update(contract_version="resume-gate/2")),
@@ -281,14 +330,25 @@ def test_schema_invalid_output_is_rejected() -> None:
     assert_failed(outcome, "JUDGE_RESULT_REJECTED")
 
 
-def test_pass_with_nonempty_issues_is_schema_rejected() -> None:
+def test_generation_schema_accepts_but_contract_rejects_pass_with_issues() -> None:
+    generated_result: dict[str, Any] | None = None
+
     def factory(manifest: dict[str, Any], submission: dict[str, Any]) -> dict[str, Any]:
+        nonlocal generated_result
         result = judge_result("codex", manifest, submission, verdict="PASS")
         result["issues"] = ["PASS must not carry an issue."]
+        generated_result = result
         return result
 
-    outcome, _runner = run_with_mock("codex", factory)
+    outcome, runner = run_with_mock("codex", factory)
+    assert generated_result is not None
+    assert runner.schema is not None
+    assert not list(
+        adapter.Draft202012Validator(runner.schema).iter_errors(generated_result)
+    )
     assert_failed(outcome, "JUDGE_RESULT_REJECTED")
+    assert outcome.failure is not None
+    assert "$.issues" in outcome.failure.detail
 
 
 def test_inconclusive_is_a_validated_nonpass_verdict() -> None:
@@ -341,6 +401,52 @@ def test_nonzero_exit_is_rejected() -> None:
         assert_failed(outcome, "CLI_EXIT_NONZERO")
 
 
+def test_last_cli_error_event_message_is_propagated_and_truncated() -> None:
+    long_message = "invalid_json_schema: " + ("x" * 600)
+    stdout = (
+        "\n".join(
+            json.dumps(event, separators=(",", ":"))
+            for event in (
+                {"type": "error", "message": "older error"},
+                {"type": "turn.failed", "error": {"message": long_message}},
+            )
+        )
+        + "\n"
+    ).encode("utf-8")
+    cases = (
+        (1, "CLI_EXIT_NONZERO"),
+        (0, "CLI_OUTPUT_INVALID"),
+    )
+    for returncode, expected_code in cases:
+        with input_files() as (
+            manifest_path,
+            submission_path,
+            empty_cwd,
+            _manifest,
+            submission,
+        ):
+            runner = MockRunner(adapter.ProcessResult(returncode, stdout, b""))
+            outcome = adapter.run_adapter(
+                judge_name="codex",
+                repo_root=REPO_ROOT,
+                manifest_path=manifest_path,
+                submission_path=submission_path,
+                launcher_run_id=submission["run_id"],
+                runner=runner,
+                empty_cwd=empty_cwd,
+                environment={"HOME": "/mock/home"},
+            )
+            assert_failed(outcome, expected_code)
+            assert outcome.failure is not None
+            detail_prefix = (
+                "codex judge exited 1: "
+                if returncode
+                else "Codex emitted terminal event turn.failed: "
+            )
+            assert outcome.failure.detail == detail_prefix + long_message[:500]
+            assert "older error" not in outcome.failure.detail
+
+
 def test_api_key_environment_is_rejected_before_runner() -> None:
     for variable, value in (("OPENAI_API_KEY", "must-not-be-used"), ("XAI_API_KEY", "")):
         with input_files() as (
@@ -387,6 +493,56 @@ def test_prompt_hash_mismatch_is_rejected_before_runner() -> None:
         assert runner.invoke_calls == 0
 
 
+def test_codex_preflight_accepts_exact_login_on_either_stream() -> None:
+    confirmation = b"Logged in using ChatGPT\n"
+    stream_results = (
+        adapter.ProcessResult(0, b"", confirmation),
+        adapter.ProcessResult(0, confirmation, b""),
+    )
+    with tempfile.TemporaryDirectory(prefix="resume-gate-codex-auth-test-") as temp:
+        codex_home = pathlib.Path(temp)
+        auth_path = codex_home / "auth.json"
+        write_json(auth_path, {"auth_mode": "chatgpt", "tokens": {}})
+        auth_path.chmod(0o600)
+        environment = {"CODEX_HOME": str(codex_home)}
+        for login_result in stream_results:
+            runner = CodexPreflightMockRunner(login_result)
+            runner.preflight(
+                adapter.JUDGES["codex"],
+                environment,
+                pathlib.Path(temp),
+            )
+            assert [call[-2:] for call in runner.calls] == [
+                (str(adapter.CODEX_BINARY), "--version"),
+                ("login", "status"),
+            ]
+
+
+def test_codex_preflight_rejects_partial_or_split_login_confirmation() -> None:
+    invalid_results = (
+        adapter.ProcessResult(0, b"prefix Logged in using ChatGPT", b""),
+        adapter.ProcessResult(0, b"Logged in using ", b"ChatGPT"),
+    )
+    with tempfile.TemporaryDirectory(prefix="resume-gate-codex-auth-test-") as temp:
+        codex_home = pathlib.Path(temp)
+        auth_path = codex_home / "auth.json"
+        write_json(auth_path, {"auth_mode": "chatgpt", "tokens": {}})
+        auth_path.chmod(0o600)
+        environment = {"CODEX_HOME": str(codex_home)}
+        for login_result in invalid_results:
+            runner = CodexPreflightMockRunner(login_result)
+            try:
+                runner.preflight(
+                    adapter.JUDGES["codex"],
+                    environment,
+                    pathlib.Path(temp),
+                )
+            except adapter.RunnerError:
+                pass
+            else:
+                raise AssertionError("Codex preflight accepted an inexact login confirmation")
+
+
 def test_pinned_cli_command_lines_block_mutation_surfaces() -> None:
     schema = pathlib.Path("/opt/coastal-resume/share/schemas/judge.schema.json")
     empty = pathlib.Path("/opt/coastal-resume/empty")
@@ -398,7 +554,9 @@ def test_pinned_cli_command_lines_block_mutation_surfaces() -> None:
     assert "--ignore-user-config" in codex
     assert "--ignore-rules" in codex
 
-    schema_value = load_json(GATE_ROOT / "schemas" / "judge.schema.json")
+    schema_value = adapter.derive_cli_schema(
+        load_json(GATE_ROOT / "schemas" / "judge.schema.json")
+    )
     grok = adapter.build_grok_argv(
         prompt="mock prompt",
         schema=schema_value,
@@ -453,14 +611,18 @@ def test_grok_inspect_rejects_external_customization() -> None:
 TESTS = [
     test_canary_data_golden_and_attempt_reason_omitted,
     test_valid_codex_fail_is_returned_and_prompt_is_exact,
+    test_cli_schema_removes_only_top_level_allof_for_both_judges,
     test_echo_fields_and_engine_version_mutations_are_rejected,
     test_schema_invalid_output_is_rejected,
-    test_pass_with_nonempty_issues_is_schema_rejected,
+    test_generation_schema_accepts_but_contract_rejects_pass_with_issues,
     test_inconclusive_is_a_validated_nonpass_verdict,
     test_timeout_is_rejected,
     test_nonzero_exit_is_rejected,
+    test_last_cli_error_event_message_is_propagated_and_truncated,
     test_api_key_environment_is_rejected_before_runner,
     test_prompt_hash_mismatch_is_rejected_before_runner,
+    test_codex_preflight_accepts_exact_login_on_either_stream,
+    test_codex_preflight_rejects_partial_or_split_login_confirmation,
     test_pinned_cli_command_lines_block_mutation_surfaces,
     test_grok_inspect_rejects_external_customization,
 ]

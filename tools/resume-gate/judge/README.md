@@ -12,8 +12,10 @@
 - `prompt.fixed.txt`: 사용자 승인 고정 지시부. LF, 마지막 newline 포함 SHA-256은
   `7a71c502a919bfb3ca70e18f1aca7dbb392dd5e7808f4962e7237ef9f75fe8b0`이며
   `adapter.py`의 `PROMPT_SHA256`에 고정했다.
-- judge schema는 `../schemas/judge.schema.json`, deterministic 결박과 source
-  snapshot은 기존 `../validator/validate.py`를 직접 로드해 재사용한다.
+- judge 계약 schema는 `../schemas/judge.schema.json`, deterministic 결박과 source
+  snapshot은 기존 `../validator/validate.py`를 직접 로드해 재사용한다. CLI 생성
+  보조에는 이 객체에서 최상위 `allOf`만 제거한 런타임 파생본을 두 judge에 동일하게
+  사용하며, 계약 검증은 계속 원본 전체 schema로 수행한다.
 
 adapter는 시작할 때 prompt 해시와 API-key 환경을 먼저 검사한 후 다음 순서로
 진행한다.
@@ -25,12 +27,19 @@ adapter는 시작할 때 prompt 해시와 API-key 환경을 먼저 검사한 후
 3. slice에는 NFKC를 적용하되 line/page 구조와 whitespace는 보존한다.
 4. strict-decoded allowlist로 DATA를 조립한다. `schema_version`은 submission의
    strict-decoded 정수 값을 사용하고, `attempt_reason`은 읽어 전달하지 않는다.
-5. runner preflight 뒤 한 번만 외부 CLI를 호출한다.
+5. 원본 schema에서 최상위 `allOf`만 메모리에서 제거해 생성 보조 schema를 만든 뒤,
+   runner preflight 후 한 번만 외부 CLI를 호출한다.
 6. Codex JSONL 또는 Grok JSON wrapper를 strict decode하고, 그 안의 judge JSON도
    duplicate-key를 거부하는 strict decode를 한다.
-7. `judge.schema.json`으로 검증한 뒤 `contract_version`, `manifest_id`,
+7. 원본 `judge.schema.json` 전체로 검증한 뒤 `contract_version`, `manifest_id`,
    `manifest_sha256`, `submission_sha256`, `judge`를 UTF-8 bytes로 비교하고,
    `engine_version`도 고정 기대값과 비교한다.
+
+Codex 생성 보조 schema는 owner-only secure temporary file로 기록해
+`--output-schema`에 넘기고 프로세스 종료 즉시 삭제한다. Grok은 같은 파생 객체를
+compact JSON argv로 넘긴다. CLI가 nonzero exit하거나 Codex가 `error` 또는
+`turn.failed`를 내면 마지막 error event message를 최대 500자로 잘라
+`failure.detail`에 포함한다.
 
 DATA 문법은 다음 순서로 고정한다. JSON scalar/object는 UTF-8, compact JSON이며
 object 내부 key 순서도 adapter 코드에 고정되어 있다.
@@ -68,7 +77,8 @@ API-key 인증은 다음처럼 거부한다.
 - 호출 환경에 `OPENAI_API_KEY`, `XAI_API_KEY`, 또는 legacy
   `GROK_CODE_XAI_API_KEY` 이름이 존재하면 빈 값이어도 runner 전에 거부.
 - Codex는 owner-only `auth.json`의 `auth_mode=chatgpt`, API key 부재, cached token
-  존재와 `codex login status`의 정확한 `Logged in using ChatGPT` 출력을 요구.
+  존재와 `codex login status`의 stdout 또는 stderr 한 스트림에서 정확한
+  `Logged in using ChatGPT` 출력을 요구.
 - Grok은 owner-only `auth.json`의 모든 entry가 `https://auth.x.ai::` issuer,
   `auth_mode=oidc`, refresh token 존재 조건을 만족해야 한다. custom
   model/auth section과 credential-bearing config, external auth/OIDC/proxy 환경
@@ -110,7 +120,7 @@ Codex 고정 argv:
   --cd /opt/coastal-resume/empty \
   --skip-git-repo-check --ignore-user-config --ignore-rules \
   --json \
-  --output-schema /opt/coastal-resume/share/schemas/judge.schema.json \
+  --output-schema /tmp/resume-gate-codex-schema-<random>.json \
   -
 ```
 
@@ -129,7 +139,7 @@ Grok 고정 argv:
   --no-plan --no-subagents --no-memory --disable-web-search \
   --max-turns 1 \
   --output-format json \
-  --json-schema '<judge.schema.json의 exact compact JSON>' \
+  --json-schema '<최상위 allOf만 제거한 런타임 파생 schema의 compact JSON>' \
   --verbatim \
   -p '<prompt.fixed.txt + blank LF + generated DATA>'
 ```
@@ -146,9 +156,10 @@ subagent surface를 이중 차단한다. cwd는 존재하는 빈 디렉토리여
 ```
 
 mock suite는 canary DATA golden bytes, `attempt_reason` 제외, echo/engine 변조,
-schema-invalid 출력, `PASS`+non-empty issues, `INCONCLUSIVE`, timeout, nonzero
-exit, API-key env, prompt hash mismatch, CLI argv와 Grok customization preflight를
-검사한다.
+생성 보조 schema의 단일-key 파생·두 judge 동일성, 원본 schema 집행 유지
+(`PASS`+non-empty issues 거부), CLI error event 진단 전파, `INCONCLUSIVE`,
+timeout, nonzero exit, API-key env, prompt hash mismatch, CLI argv와 Grok
+customization preflight를 검사한다.
 
 ## 알려진 경계
 
