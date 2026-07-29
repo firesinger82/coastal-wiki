@@ -1,0 +1,101 @@
+diff --git a/models/Delft3D/manual-notes/delft3d-flow-boundary-forcing.md b/models/Delft3D/manual-notes/delft3d-flow-boundary-forcing.md
+--- a/models/Delft3D/manual-notes/delft3d-flow-boundary-forcing.md
++++ b/models/Delft3D/manual-notes/delft3d-flow-boundary-forcing.md
+@@ -3,7 +3,7 @@
+ model: Delft3D
+ canonical_source: self
+ citation_status: verified
+-verification_method: "models/Delft3D/raw/manuals/pdfs/Delft3D-FLOW_User_Manual.pdf (Deltares, v4.07.01, Rev 80907, 3 May 2026) 직접 pdftotext -layout 추출. §4.5.6 Boundaries (인쇄 p.43-60, PDF p.65-86), Appendix A.2.10 Open boundaries(.bnd, 인쇄 p.453-454)·A.2.11 Astronomic(.bca, p.455-456)·A.2.12 Corrections(.cor, p.457)·A.2.13 Harmonic(.bch, p.459)·A.2.14 QH(.bcq, p.460)·A.2.15 Time-series(.bct, p.461) (PDF p.476-483), §9.4.1.2 Open boundary conditions (인쇄 p.192-194, PDF p.214-216) 직접 인용. 인쇄 페이지 = PDF 물리 페이지 − 22 (예: PDF 65 = 인쇄 43, PDF 476 = 인쇄 454)."
++verification_method: "models/Delft3D/raw/manuals/pdfs/Delft3D-FLOW_User_Manual.pdf (Deltares, v4.07.01, Rev 80907, 3 May 2026) 직접 pdftotext -layout 추출. §4.5.6 Boundaries (인쇄 p.43-60, PDF p.65-86), Appendix A.2.10 Open boundaries(.bnd, 인쇄 p.454-455)·A.2.11 Astronomic(.bca, p.455-456)·A.2.12 Corrections(.cor, p.457)·A.2.13 Harmonic(.bch, p.459)·A.2.14 QH(.bcq, p.460)·A.2.15 Time-series(.bct, p.461) (PDF p.476-483), §9.4.1.2 Open boundary conditions (인쇄 p.192-194, PDF p.214-216) 직접 인용. 인쇄 페이지 = PDF 물리 페이지 − 22 (예: PDF 65 = 인쇄 43, PDF 476 = 인쇄 454)."
+ note_author: "Claude Opus 4.8 (1M context)"
+ note_date: 2026-06-18
+ verification_by: "Claude Opus 4.8 (1M context) — PDF 직접 추출 확인"
+@@ -37,13 +37,13 @@
+ 
+ 원칙 (p.44-45): 모든 경계에 같은 type 적용 회피(직선수로 양단 velocity → 연속성 문제로 dry up/overflow). 한쪽 법선유속 + 반대쪽 수위가 안정. 대형 조석 basin 은 수위경계만으로 forcing 이 건전. 수위는 globally varying 량이라 작은 오차가 넓은 영역 유속에 큰 응답을 유발 → 경계를 관심영역에서 **가능한 멀리** 배치.
+ 
+-## 2. 경계 section 정의 + .bnd 파일 (§4.5.6 p.46-49 + App A.2.10 p.453-454)
++## 2. 경계 section 정의 + .bnd 파일 (§4.5.6 p.46-49 + App A.2.10 p.454-455)
+ 
+ 경계는 begin(A)/end(B) 두 **support point** 로 정의되고, 중간점은 양단 forcing 의 **선형보간**으로 산출 (p.45). 진폭·위상으로 표현된 경계는 보간이 (계산된 시간의존 경계값이 아니라) 진폭·위상 자체에 적용됨 (p.45 Remark).
+ 
+ GUI Data Group Boundaries 에서 정의(name, begin/end grid index (M1,N1)-(M2,N2), type, 반사계수 Alfa, forcing type, 연직 profile)하고 확장자 `bnd` 파일로 저장 (p.46 Open/Save).
+ 
+-**.bnd 레코드 포맷** (App A.2.10, p.453-454) — ASCII, 텍스트는 fix-format / 수치는 free-format. 1 레코드 = 1 경계 section:
++**.bnd 레코드 포맷** (App A.2.10, p.454-455) — ASCII, 텍스트는 fix-format / 수치는 free-format. 1 레코드 = 1 경계 section:
+ 
+ | 필드 | 내용 |
+ |---|---|
+@@ -55,9 +55,9 @@
+ | Vertical profile (3 strings) | 3D + velocity type(C,Q,T,R)만: Uniform / Logarithmic / 3D profile |
+ | 두 label (각 12 char) | data type=A 일 때만, `.bca` 진폭·위상 블록 참조 (두 번째 label 은 첫 label 시작 +13 이상 위치) |
+ 
+-제약 (p.454): max 레코드 길이 132; section 명은 position 1; astronomic·harmonic 경계는 QH 보다 먼저, QH 는 time-series 보다 먼저; astronomic·harmonic **혼용 불가**. section 수 ≤ 300 (p.48). Alfa 범위 0~10,000 default 0 (p.48). 반사계수는 Neumann·Riemann 에 적용 안 됨 (p.49).
++제약 (p.455): max 레코드 길이 132; section 명은 position 1; astronomic·harmonic 경계는 QH 보다 먼저, QH 는 time-series 보다 먼저; astronomic·harmonic **혼용 불가**. section 수 ≤ 300 (p.48). Alfa 범위 0~10,000 default 0 (p.48). 반사계수는 Neumann·Riemann 에 적용 안 됨 (p.49).
+ 
+-**.bnd 예시** (p.454, 원문 그대로):
++**.bnd 예시** (p.455, 원문 그대로):
+ ```
+ Paradise Bay 1   Q A   1   1    1   5 0.0 Uniform      Paradise_1A   Paradisee_lB
+ Paradise Bay 2   C A  16   3   16   6 0.0 Logarithmic  Paradise_2A   Paradisee_2B
+diff --git a/models/Delft3D/manual-notes/delft3d-manuals-overview.md b/models/Delft3D/manual-notes/delft3d-manuals-overview.md
+--- a/models/Delft3D/manual-notes/delft3d-manuals-overview.md
++++ b/models/Delft3D/manual-notes/delft3d-manuals-overview.md
+@@ -44,7 +44,7 @@
+ | Delft3D-WAQ_Input_File_Description.pdf | 입력 파일 명세 |
+ | Delft3D-WAQ_Tools.pdf | WAQ 부속 도구 |
+ 
+-→ **WAQ 가 가장 풍부한 sub-manual 라인업** (12 PDFs).
++→ **WAQ 가 가장 풍부한 sub-manual 라인업** (11 PDFs).
+ 
+ ### 1.3 PART (Particle Tracking)
+ 
+diff --git a/models/Delft3D/manual-notes/delft3d-part-user-manual.md b/models/Delft3D/manual-notes/delft3d-part-user-manual.md
+--- a/models/Delft3D/manual-notes/delft3d-part-user-manual.md
++++ b/models/Delft3D/manual-notes/delft3d-part-user-manual.md
+@@ -99,7 +99,7 @@
+ ### 3.5 3D flow field — 2DH 보정 프로파일 (§6.4, p.95-96)
+ 2DH FLOW에 연직 프로파일 중첩("2.5 DH" 모드):
+ - 저면 전단 **로그 프로파일**: $v_z = C\ln\!\big(\tfrac{H-Z}{Z_0}+1\big)\times v$ (eq.6.14), 정규화 $C$ (eq.6.15). 조도길이 $Z_0\sim$ 2 cm (p.95).
+-- 바람 **포물선 프로파일**: $v_z = \alpha\big[3(1-\tfrac{Z}{H})-2(1-\tfrac{Z}{H})\big]W$ (eq.6.16), wind drag $\alpha\sim0.03$; 연직적분 0(평균 바람효과는 2DH 장에 이미 포함되어야 함) (p.96).
++- 바람 **포물선 프로파일**: $v_z = \alpha\big(3(1-\tfrac{Z}{H})-2\big)\big(1-\tfrac{Z}{H}\big)W$ (eq.6.16), wind drag $\alpha\sim0.03$; 연직적분 0(평균 바람효과는 2DH 장에 이미 포함되어야 함) (p.96).
+ 
+ ## 4. Oil spill module (§6.5, p.96-102)
+ 
+diff --git a/models/Delft3D/manual-notes/delft3d-tide-user-manual.md b/models/Delft3D/manual-notes/delft3d-tide-user-manual.md
+--- a/models/Delft3D/manual-notes/delft3d-tide-user-manual.md
++++ b/models/Delft3D/manual-notes/delft3d-tide-user-manual.md
+@@ -4,6 +4,7 @@
+ doc: Delft3D-TIDE_User_Manual.pdf
+ canonical_source: manual
+ citation_status: verified
++has_source_needed: true
+ verification_method: "Delft3D-TIDE_User_Manual.pdf pdftotext -layout 직접 추출 후 TOC + 핵심 장 페이지 인용. 표지(p.iii 직전, 버전 5.00)·Ch 2 sub-system(p.4)·Ch 8 Conceptual description 지배식/Nyquist/Rayleigh/astronomical coupling/least squares/median error/prediction/tide table(p.45-51)·App A ANALYSIS·PREDICT input format(p.53-62)·App B tidal component base(p.73-75) 인용. 페이지는 매뉴얼 footer 'NN of 95' 기준."
+ note_author: "Claude Opus 4.8 (1M context)"
+ note_date: 2026-06-18
+@@ -184,7 +185,7 @@
+ 
+ ---
+ 
+-## Appendix B — 내부 component base (p.73–75)
++## Appendix B — 내부 component base (p.73–76)
+ 
+ - 총 **234개** 내부 성분: primary(평형조에 등장, 육지無 단일 심해) + compound(primary의 선형결합) (p.73). 각 성분 angular frequency(degr/hour) 제공, primary는 equilibrium tide 상대크기, 결합 후보는 main 대비 equilibrium 진폭관계(위상관계=0) 제공 (p.73).
+ - **북해**: §A.3 직전 예제의 60-constituent 세트가 좋은 선택 (p.73).
+@@ -207,11 +208,11 @@
+ | N2 | 28.4397295 | 0.17398 | **0.191 × M2** (p.75) |
+ | NU2 | 28.5125831 | 0.03304 | **0.194 × N2** (p.75) |
+ | **M2** | 28.9841042 | 0.90872 | (최대 성분) (p.75) |
+-| L2 | 29.5284789 | 0.02663 | 0.029 × M2 (p.75) |
+-| T2 | 29.9589333 | 0.02476 | 0.059 × S2 (p.75) |
+-| **S2** | 30.0000000 | 0.42248 | (p.75) |
+-| R2 | 30.0410667 | 0.00366 | 0.009 × S2 (p.75) |
+-| **K2** | 30.0821373 | 0.12004 | **0.284 × S2** (p.75) |
++| L2 | 29.5284789 | 0.02663 | 0.029 × M2 (p.76) |
++| T2 | 29.9589333 | 0.02476 | 0.059 × S2 (p.76) |
++| **S2** | 30.0000000 | 0.42248 | (p.76) |
++| R2 | 30.0410667 | 0.00366 | 0.009 × S2 (p.76) |
++| **K2** | 30.0821373 | 0.12004 | **0.284 × S2** (p.76) |
+ 
+ → §8.3.4의 잘 알려진 결합 (K1,P1)·(N2,NU2)·(S2,K2)가 App B의 coupling relation으로 정량화됨 (p.74–75).
+ 
