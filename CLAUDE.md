@@ -41,25 +41,10 @@
 | `examples/` | 개념을 가로지르는 실습 (재현 가능 코드/데이터) | 특정 프로젝트 산출물 |
 | `experience/` | 위 3조건 통과한 검증 경험 | 미검증 직관 |
 
-## 새 토픽 생성 워크플로 (최소 시작)
+## 새 토픽·새 모델 생성 워크플로
 
-[CONVENTIONS.md](CONVENTIONS.md) §8 — 6파일 전체 생성 강제하지 않음.
-
-1. `concepts/<topic>/` 디렉토리 생성
-2. **최소 필수 2 파일**: `README.md` + `01-concept.md` (frontmatter `citation_status` 명시)
-3. 나머지 (02~06)는 sourced claim이 생기면 그때 생성
-4. 관련 textbook 챕터는 `textbook/notes/<topic>-<source_id>-chN.md`로 발췌 (인용은 [textbook/sources.yml](textbook/sources.yml)의 `source_id` 사용)
-5. `INDEX.md`에 토픽 등록 (미생성 섹션 컬럼으로 진척 추적)
-
-전체 6파일 템플릿이 필요하면 `concepts/_template/`에서 골라 복사.
-
-## 새 모델 추가 워크플로
-
-1. `models/_template/` 복사해 `models/<model>/`로
-2. `README.md`에 모델 정체성·라이선스·공식 사이트
-3. `source-analysis/` — 주요 서브루틴별 노트
-4. `manual-notes/` — 메뉴얼 챕터별 노트
-5. `web-refs/` — 공식 wiki·논문·기술 블로그 인용
+- 새 토픽: [CONVENTIONS.md](CONVENTIONS.md) §8 (최소 시작 2파일 — 6파일 강제 없음, 템플릿은 `concepts/_template/`에서 작업내용에 맞게 복사)
+- 새 모델: `models/_template/` 복사 → `models/<model>/` (구조·필수 항목은 템플릿 자체 참조)
 
 ## 작업 진입 시 우선 읽을 것
 
