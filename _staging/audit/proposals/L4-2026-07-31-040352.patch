@@ -1,0 +1,55 @@
+diff --git a/models/Delft3D/source-analysis/delft3d_dd.md b/models/Delft3D/source-analysis/delft3d_dd.md
+--- a/models/Delft3D/source-analysis/delft3d_dd.md
++++ b/models/Delft3D/source-analysis/delft3d_dd.md
+@@ -147,10 +147,10 @@
+ 
+ ## Working Rules
+ 
+-- For Korean Han River estuary nested in Yellow Sea: shelf grid 500-1000 m, estuary 50-100 m → DD with 5:1 or 9:1 ratio.
++- For Korean Han River estuary nested in Yellow Sea: shelf grid 500-1000 m, estuary 50-100 m → DD with 5:1 or 9:1 ratio. ⚠ source-needed — 해상도·비율 근거 미제시(CLAUDE.md #8: experience/ 또는 케이스 레포 이관 후보).
+ - Verify `.ddb` boundary index ranges match grid extents.
+-- Block Jacobi 5 iterations OK for typical 1:1 to 1:5 refinement; large refinement (1:9+) may need more iterations (recompile with higher `MaxIters`).
+-- DD overhead: ~10-20% per subdomain for mapper communication.
++- Block Jacobi 기본 5 iterations (`mapper_config.cpp:210-212`). ⚠ source-needed — '1:1~1:5 에 충분 / 1:9+ 는 추가 필요'는 근거 미제시.
++- DD overhead: ~10-20% per subdomain for mapper communication. ⚠ source-needed — 소스·매뉴얼 근거 없음(프로파일링 미제시).
+ - DD + MPI not supported simultaneously; pick one.
+ - DIMR `.ddb` shadowing bug: prefer d-hydro path or single MDF for now.
+ - Check log for "Block Jacobi did not converge" — increase iterations or tighten interface.
+@@ -163,7 +163,7 @@
+ - ▢ Expecting MPI speedup with DD — DD is for refinement coupling, not parallelization.
+ - ▢ DIMR `.ddb` initialization — possible bug at `flow2d3d.cpp:218-234`.
+ - ▢ Confusing DD ghost cells with MPI ghost cells — DD has `ddbound` padding; MPI has `iblkad` halos.
+-- ▢ Hot-start with different DD topology — coupling fails; restart cleanly.
++- ▢ Hot-start with different DD topology — coupling fails; restart cleanly. ⚠ source-needed
+ 
+ ## References
+ 
+diff --git a/models/Delft3D/source-analysis/delft3d_delwaq.md b/models/Delft3D/source-analysis/delft3d_delwaq.md
+--- a/models/Delft3D/source-analysis/delft3d_delwaq.md
++++ b/models/Delft3D/source-analysis/delft3d_delwaq.md
+@@ -154,13 +154,13 @@
+ 
+ ## Working Rules
+ 
+-- FLOW `Flwq` interval typically 1 hour for coastal; 15 min for fast estuary.
+-- DELWAQ `idt` must divide hyd interval; common ratio 1:1 to 1:6.
++- FLOW `Flwq` interval typically 1 hour for coastal; 15 min for fast estuary. ⚠ source-needed — 권장값 근거 미제시(CLAUDE.md #8: 운영 권고는 케이스 레포 후보).
++- DELWAQ `idt` must divide hyd interval (`inputs_block_3.f90:686-697`); common ratio 1:1 to 1:6 ⚠ source-needed.
+ - Process library `proc_def.dat` from Deltares — don't modify; extend via `.sub` files.
+ - Verify FLOW volume closure (`wrwaqbal` output) before running DELWAQ — bad closure → wrong WQ.
+ - For DD-FLOW + DELWAQ: `ddcouple` after FLOW completes; merged hyd then DELWAQ.
+ - `.his` for time series; `.map` for spatial; both binary — use ODS reader or `maptonetcdf`.
+-- Substance ordering in `.sub` matters — must match expected by process library.
++- Substance ordering in `.sub` matters — must match expected by process library. ⚠ source-needed — 파서 순서 의존성 인용 없음.
+ 
+ ## Common Pitfalls
+ 
+@@ -170,7 +170,7 @@
+ - ▢ Multi-domain DELWAQ without `ddcouple` — separate per-subdomain runs unsupported.
+ - ▢ `.sub` file referencing process not in library — preprocessor errors.
+ - ▢ Comparing DELWAQ time vs FLOW — may diverge after first conversion; use hyd time.
+-- ▢ Hot-start DELWAQ across hyd file change — segment indices may shift.
++- ▢ Hot-start DELWAQ across hyd file change — segment indices may shift. ⚠ source-needed
+ 
+ ## References
+ 
