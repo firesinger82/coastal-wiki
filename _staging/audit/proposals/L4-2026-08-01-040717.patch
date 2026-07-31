@@ -1,0 +1,89 @@
+diff --git a/models/Delft3D/source-analysis/delft3d_dflowfm_overview.md b/models/Delft3D/source-analysis/delft3d_dflowfm_overview.md
+--- a/models/Delft3D/source-analysis/delft3d_dflowfm_overview.md
++++ b/models/Delft3D/source-analysis/delft3d_dflowfm_overview.md
+@@ -48,7 +48,7 @@
+ | 격자 | structured curvilinear | **unstructured** (triangle/quad mixed) |
+ | 수치 scheme | TRISULA ADI (Stelling-Leendertse) | **Stelling-Kernkamp staggered** (Stelling-Duinmeijer 2003, Kernkamp 2011) |
+ | Time-stepping | implicit ADI | semi-implicit |
+-| Vertical | sigma (또는 z) | sigma + z + sigma-z (hybrid) |
++| Vertical | sigma (또는 z) | sigma + z + sigma-z (hybrid) — `m_flow.f90:70-73` LAYTP_SIGMA/Z("Fixed z- or z-sigma-layers")/POLYGON_MIXED/DENS_SIGMA ([[delft3d_dflowfm_data_io]] §1.1) |
+ | Packages | 8 (flow2d3d + 7 sub) | **3** (cli·kernel·lib) — 단순화 |
+ | Coupling | dimr 외 한정 | **dimr native** |
+ | Bench example | 호수·하구·연안 (curvilinear) | 비정형 영역 (강 분류·complex 해안선·범람) |
+diff --git a/models/Delft3D/source-analysis/delft3d_dflowfm_compute_core.md b/models/Delft3D/source-analysis/delft3d_dflowfm_compute_core.md
+--- a/models/Delft3D/source-analysis/delft3d_dflowfm_compute_core.md
++++ b/models/Delft3D/source-analysis/delft3d_dflowfm_compute_core.md
+@@ -4,6 +4,7 @@
+ component: dflowfm/dflowfm_kernel-compute
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "Delft3D 소스 직접 read (src/engines_gpl/dflowfm/packages/dflowfm_kernel/src). furu.f90(운동량 fu/ru 계산)·s1ini.f90(연속식 행렬 조립)·s1nod.f90(대각/RHS 및 경계)·u1q1.f90(속도/플럭스 update)·step_reduce_hydro.f90(암시 시간적분 outer loop)·setau.f90(습윤 단면적)·iterfurufm.f90(구조물 운동량) 의 알고리즘을 file:line 인용. solver 호출/Gauss+CG 구조는 dflowfm_utils/solve_guus.F90 인용."
+ note_author: "Claude Opus 4.8 (1M context)"
+ note_date: 2026-06-16
+diff --git a/models/Delft3D/source-analysis/delft3d_dflowfm_data_io.md b/models/Delft3D/source-analysis/delft3d_dflowfm_data_io.md
+--- a/models/Delft3D/source-analysis/delft3d_dflowfm_data_io.md
++++ b/models/Delft3D/source-analysis/delft3d_dflowfm_data_io.md
+@@ -4,6 +4,7 @@
+ component: dflowfm/data-io-manager
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "Delft3D 소스 직접 read (src/engines_gpl/dflowfm/packages/dflowfm_kernel/src/). dflowfm_data(m_flow·m_flowgeom·m_flowtimes·m_flowparameters·m_transport·unstruc_model), dflowfm_io(unstruc_netcdf·unc_write_his·wrimap·caching·read_restart_from_map·unstruc_netcdf_incremental), dflowfm_manager(flow_externaloutput·inctime_user·flow_usertimestep) 의 module 헤더·변수 선언 주석·subroutine 본체를 file:line 인용"
+ note_author: "Claude Opus 4.8 (1M context)"
+ note_date: 2026-06-16
+diff --git a/models/Delft3D/source-analysis/delft3d_dflowfm_grid_utils.md b/models/Delft3D/source-analysis/delft3d_dflowfm_grid_utils.md
+--- a/models/Delft3D/source-analysis/delft3d_dflowfm_grid_utils.md
++++ b/models/Delft3D/source-analysis/delft3d_dflowfm_grid_utils.md
+@@ -4,6 +4,7 @@
+ component: dflowfm/grid-generation(RGF)+utils
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "Delft3D 소스 직접 read (src/engines_gpl/dflowfm/packages/dflowfm_kernel/src/). dflowfm_rgf의 tranfn2.f90(transfinite interpolation 본체), orthogrid.f90/ortsor.f90/sor.f90/atppar.f90(orthogonalization 외/중/내 iteration + 계수행렬), splrgfr.f90/makespl.f90/makes.f90(spline→곡선격자), bndsmt.f90(경계 스무딩), attractrepulse.f90, mappro.f90/mapprojections.f90(좌표투영), refine.f90; dflowfm_data의 m_orthosettings.f90/m_gridsettings.f90(파라미터 정의); dflowfm_utils의 tridag.f90, rest_f90/dlinedis2.f90/ludcmp.f90/pol2curvi.f90/m_snappol.f90 file:line 인용"
+ note_author: "Claude Opus 4.8 (1M context)"
+ note_date: 2026-06-16
+diff --git a/models/Delft3D/source-analysis/delft3d_dflowfm_kernel_scheme.md b/models/Delft3D/source-analysis/delft3d_dflowfm_kernel_scheme.md
+--- a/models/Delft3D/source-analysis/delft3d_dflowfm_kernel_scheme.md
++++ b/models/Delft3D/source-analysis/delft3d_dflowfm_kernel_scheme.md
+@@ -3,6 +3,7 @@
+ topic: delft3d
+ canonical_source: self
+ citation_status: verified
++has_source_needed: false
+ verification_method: "models/Delft3D/raw/source_code/Delft3D/src/engines_gpl/dflowfm/packages/dflowfm_kernel/src/dflowfm_kernel/compute/ 직접 read — furu.f90(fu/ru/kfs 44, 2D kmx==0 + 3D) + s1nod.f90(continuity 행렬 bb/dd/a1 45, nonlin) + step_reduce_hydro.f90(s1nod+furu+solve_matrix Guus + firstnniteration Nested Newton 44) file:line 인용. Stelling-Duinmeijer 2003 + Kernkamp 2011."
+ note_author: "Claude Opus 4.8 (1M context) source-code direct read"
+ note_date: 2026-06-04
+diff --git a/models/Delft3D/source-analysis/delft3d_dflowfm_mdu_input.md b/models/Delft3D/source-analysis/delft3d_dflowfm_mdu_input.md
+--- a/models/Delft3D/source-analysis/delft3d_dflowfm_mdu_input.md
++++ b/models/Delft3D/source-analysis/delft3d_dflowfm_mdu_input.md
+@@ -6,6 +6,7 @@
+ note_author: "Claude Opus 4.7 (1M context)"
+ note_date: 2026-05-28
+ citation_status: verified
++has_source_needed: false
+ verification_by: "Claude Opus 4.7 (1M context) — PR #900 diff + body GitHub API 직접 fetch + Fortran source verbatim"
+ verification_date: 2026-05-28
+ related:
+diff --git a/models/Delft3D/source-analysis/delft3d_dflowfm_prepost.md b/models/Delft3D/source-analysis/delft3d_dflowfm_prepost.md
+--- a/models/Delft3D/source-analysis/delft3d_dflowfm_prepost.md
++++ b/models/Delft3D/source-analysis/delft3d_dflowfm_prepost.md
+@@ -4,6 +4,7 @@
+ component: dflowfm/prepost (network·geometry·flowgeom admin)
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "Delft3D 소스 직접 read (src/engines_gpl/dflowfm/.../dflowfm_kernel/prepost/). flow_geominit.f90 의 두 phase 구조·findcells/find1dcells 호출·flow link admin(ln/kcu/ln2lne·lncn)·node link admin(nd%ln) / makenetnodescoding.f90 의 NB 코딩 / partition_from_commandline.f90·partition_write_domains.f90 의 METIS·idomain·도메인 파일 기록 / makecell.f90·find1dcells.f90·setbobs.f90·update_geom.f90 를 file:line 인용"
+ note_author: "Claude Opus 4.8 (1M context)"
+ note_date: 2026-06-16
+diff --git a/models/Delft3D/source-analysis/delft3d_dflowfm_transport_sediment.md b/models/Delft3D/source-analysis/delft3d_dflowfm_transport_sediment.md
+--- a/models/Delft3D/source-analysis/delft3d_dflowfm_transport_sediment.md
++++ b/models/Delft3D/source-analysis/delft3d_dflowfm_transport_sediment.md
+@@ -4,6 +4,7 @@
+ component: dflowfm/compute_transport+compute_sediment
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "Delft3D 소스 직접 read (src/engines_gpl/dflowfm/packages/dflowfm_kernel/src/dflowfm_kernel/). compute_transport: update_constituents.f90(드라이버·서브스텝), comp_fluxhor3d.f90(수평 advection+diffusion FV flux·MUSCL stencil), comp_fluxver.f90(수직 explicit flux), dlimiter.f90(MC limiter), solve_vertical.f90(tridag implicit), solve_2d.f90, make_rhs.f90, get_dtmax.f90(transport CFL), ini_transport.f90(constituent admin·thetavert). compute_sediment: m_fm_bott3d.f90(bed update divergence), fm_upwbed.f90(bedload→link upwind), fm_red_soursin.f90(soursin reduction), fm_erosed.f90(Partheniades-Krone source/sink header), fill_constituents.f90(soursin→const_sour/sink 결선), netnode_based/getequilibriumtransportrates.f90·ucrouse.f90(legacy netnode 평형수송) file:line 인용"
+ note_author: "Claude Opus 4.8 (1M context)"
+ note_date: 2026-06-16
