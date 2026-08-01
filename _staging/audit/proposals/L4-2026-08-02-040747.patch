@@ -1,0 +1,138 @@
+diff --git a/models/Delft3D/source-analysis/delft3d_dflowfm_waves.md b/models/Delft3D/source-analysis/delft3d_dflowfm_waves.md
+--- a/models/Delft3D/source-analysis/delft3d_dflowfm_waves.md
++++ b/models/Delft3D/source-analysis/delft3d_dflowfm_waves.md
+@@ -4,6 +4,7 @@
+ component: dflowfm/compute_waves
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "Delft3D 소스 직접 read (src/engines_gpl/dflowfm/packages/dflowfm_kernel/src/dflowfm_kernel/compute_waves/). 파 결합 dispatcher(compute_wave_forcing_rhs.f90), 파라미터 계산(compute_wave_parameters.f90), wave force(setwavfu.f90), Stokes 속도(wave_comp_stokes_velocities.f90·wave_uorbrlabda.f90), 파 mass flux 경계(setwavmubnd.f90), 파-흐름 bottom stress(tauwave.f90·setmodind.f90), surfbeat(surfbeat/xbeachwaves.f90: radiation stress·wave action balance·roller·breaker dissipation) 의 식·자료구조·분기를 file:line 인용. 모드 상수는 dflowfm_data/m_waveconst.f90 인용"
+ note_author: "Claude Opus 4.8 (1M context)"
+ note_date: 2026-06-16
+diff --git a/models/Delft3D/source-analysis/delft3d_dimr_coupling.md b/models/Delft3D/source-analysis/delft3d_dimr_coupling.md
+--- a/models/Delft3D/source-analysis/delft3d_dimr_coupling.md
++++ b/models/Delft3D/source-analysis/delft3d_dimr_coupling.md
+@@ -40,6 +40,8 @@
+ 
+ ## 3. DIMR 의 역할 — Why multi-engine coupling
+ 
++> ⚠ source-needed — 본 절의 결합 이력(comm file 한정)·'임의 N 엔진' 능력 단언은 ls 검증 범위 밖. Deltares DIMR 문서 절/코드 인용 필요.
++
+ D3D-4 시절: flow2d3d ↔ wave (SWAN) coupling 만 가능 (comm file 통신).
+ DIMR 도입 후: **임의 N 엔진** 결합 가능 — 예시:
+ 
+@@ -54,6 +56,8 @@
+ | 전 결합 (operational) | dflowfm + wave + waq + rr + rtc + part 모두 |
+ 
+ ## 4. BMI (Basic Model Interface) 표준
++
++> ⚠ source-needed — 'BMI 준수·각 엔진 메소드 구현·DIMR orchestration' 단언은 dimr_lib 코드 인용 필요 (FBC 한정으로는 [[delft3d_fbc_flow_boundary]] §8 bmi.h:41-74 이 입증).
+ 
+ DIMR 의 핵심 설계: **BMI (CSDMS Basic Model Interface)** 준수.
+ 
+@@ -74,6 +78,8 @@
+ - ★ **모델별 DA 비교**: ROMS=native exact-adjoint 변분 / **Delft3D·XBeach=OpenDA(BMI black-box)** / ADCIRC=외부 ensemble / SWAN·EFDC=없음. 상세 [[roms_adjoint_framework]] §4.
+ 
+ ## 5. dimr_config.xml — 운영 설정
++
++> ⚠ source-needed — 아래 XML 예시는 schemas/ XSD 와 element-level 대조 미실시(예시 스케치).
+ 
+ DIMR 의 runtime 설정 파일 (`schemas/` 의 XSD 정의):
+ 
+@@ -130,6 +136,8 @@
+ 
+ ## 7. flow2d3d 와의 비교
+ 
++> ⚠ source-needed — 동기화 빈도(분 단위 vs time-step)·통신 비용(디스크 vs 메모리) 정량 비교는 인용 미확보.
++
+ | 항목 | flow2d3d (legacy comm file) | dimr (BMI) |
+ |---|---|---|
+ | Coupling 메커니즘 | 파일 IO (comm.dat) | BMI in-memory |
+diff --git a/models/Delft3D/source-analysis/delft3d_dredge_dump.md b/models/Delft3D/source-analysis/delft3d_dredge_dump.md
+--- a/models/Delft3D/source-analysis/delft3d_dredge_dump.md
++++ b/models/Delft3D/source-analysis/delft3d_dredge_dump.md
+@@ -192,7 +192,7 @@
+ - Per-area `active` table is in **hydrodynamic time** unless `TS_MorTimeScale=true` — make sure the units match.
+ - Dredge mass is removed bed-side; if you need water-column suspended sediment from dredge plume, use a separate source term — DAD does not generate it.
+ - Multi-fraction nourishment percentages **must sum to 100%** per area; reader checks and stops if not.
+-- For navigation depth maintenance, `triggerlevel` ≈ `DredgeDepth + 0.5 m` is a good buffer to avoid constant dredging at threshold.
++- For navigation depth maintenance, `triggerlevel` ≈ `DredgeDepth + 0.5 m` is a good buffer to avoid constant dredging at threshold. *(⚠ source-needed — 운영 휴리스틱, 매뉴얼·문헌 근거 미확보)*
+ 
+ ## Common Pitfalls
+ 
+@@ -203,7 +203,7 @@
+ - ▢ Confusing `active` table with `triggerlevel` — both gate dredging; `active=0` overrides depth trigger.
+ - ▢ Looking for water-column sink from dredge plume — not implemented; DAD is bed-only.
+ - ▢ Comparing `LINK_SUM` across `morfac` settings expecting same value — `morfac=10` gives 10× volumes for same `dt`.
+-- ▢ Restart with DAD: bed administration recovers but `LINK_SUM` resets to zero each run unless `cumLink_continue` is set (check version-specific support).
++- ▢ Restart with DAD: bed administration recovers but `LINK_SUM` resets to zero each run — *(⚠ source-needed — `cumLink_continue` 는 utils_gpl/morphology 소스 grep 0건, 실재 미확인 파라미터명. restart 동작 전반 인용 필요)*
+ 
+ ## Next expansion
+ 
+diff --git a/models/Delft3D/source-analysis/delft3d_drying_flooding.md b/models/Delft3D/source-analysis/delft3d_drying_flooding.md
+--- a/models/Delft3D/source-analysis/delft3d_drying_flooding.md
++++ b/models/Delft3D/source-analysis/delft3d_drying_flooding.md
+@@ -137,6 +137,8 @@
+ 
+ ## Decision Guide
+ 
++> ⚠ source-needed — 아래 표의 파라미터 권고 수치(Dryflc·Dco 범위 등)는 매뉴얼 페이지·문헌 인용 미확보(운영 휴리스틱).
++
+ | Domain feature | Setting |
+ |---|---|
+ | Tidal flats with regular wet/dry | `Dpsopt=MEAN`, `Dryflc=0.05–0.1 m`, `Dco=0.1–0.5 m` |
+@@ -149,6 +151,8 @@
+ | Validate mass closure | Output `KFS, qxk, qyk`; verify `dh/dt` matches flux divergence |
+ 
+ ## Working Rules
++
++> ⚠ source-needed — 본 절·Common Pitfalls 의 정량 임계(Dco ~0.01/~1 m 거동, sud 반복 >5·>10 진단)는 인용 미확보.
+ 
+ - **Avoid `Dryflp` keyword** — use `Dpsopt` directly. Legacy `Dryflp=NO` is no longer accepted.
+ - `Drycrt` is auto half of `Dryflc` — explicitly set if you want different hysteresis.
+diff --git a/models/Delft3D/source-analysis/delft3d_engines_overview.md b/models/Delft3D/source-analysis/delft3d_engines_overview.md
+--- a/models/Delft3D/source-analysis/delft3d_engines_overview.md
++++ b/models/Delft3D/source-analysis/delft3d_engines_overview.md
+@@ -33,8 +33,8 @@
+ | **part** | Particle tracking (Delft3D-PART) — oil·dispersant·sediment particles | [[delft3d_part]] |
+ | **rtc** | Real-Time Control — 운영 시 hydraulic structure 제어 | 미분석 |
+ | **rr** | Rainfall-Runoff — 강수-유출 모델 | 미분석 |
+-| **fbc** | Flow Boundary Condition utility | 미분석 |
+-| **dsle** | Delft Sea-Level Equation — geoid·SLR | 미분석 |
++| **fbc** | D-Feedback Control (구 RTC-Tools) — 실시간 피드백 제어 | [[delft3d_fbc_flow_boundary]] |
++| **dsle** | 갑문 염수침입 대책(sea lock salt intrusion, lock exchange) 모듈 — `dsle/packages/src/{sealock.c,dsle.c}` (dsle.c 주석 "Salt intrusion counter-measures", dsle.h:153) | 미분석 |
+ | **d_hydro** | Hydro launcher (orchestrator entry point) | 미분석 |
+ | **docs** | 문서 (소스 트리 내) | nav only |
+ 
+diff --git a/models/Delft3D/source-analysis/delft3d_fbc_flow_boundary.md b/models/Delft3D/source-analysis/delft3d_fbc_flow_boundary.md
+--- a/models/Delft3D/source-analysis/delft3d_fbc_flow_boundary.md
++++ b/models/Delft3D/source-analysis/delft3d_fbc_flow_boundary.md
+@@ -4,6 +4,7 @@
+ component: fbc/FBCTools
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "Delft3D 소스 직접 read (src/engines_gpl/fbc/packages/FBCTools/src/...). element/rule/trigger 기반 클래스(schematization/element.h, rules/rule.h, triggers/trigger.h), 시뮬레이터 실행순서(rtcToolsSimulator.cpp), PID positional 알고리즘(rules/pidControllerPositional.cpp), 조건 평가(triggers/condition.cpp + utilities/utils.h relationalOperator), lookup table 보간(utilities/lookupTableConverter.cpp), timeseries 자료구조(timeseries/timeSeriesBasics.h), BMI 인터페이스(bmi.h), dataBinding XSD 출처(dataBinding/rtcToolsConfig.hxx) 를 file:line 인용. xerces는 외부 라이브러리로 존재만 확인(timeseries/piTimeSeriesSAX2Handler.h)."
+ note_author: "Claude Opus 4.8 (1M context)"
+ note_date: 2026-06-16
+diff --git a/models/Delft3D/source-analysis/delft3d_flow2d3d_dispatcher.md b/models/Delft3D/source-analysis/delft3d_flow2d3d_dispatcher.md
+--- a/models/Delft3D/source-analysis/delft3d_flow2d3d_dispatcher.md
++++ b/models/Delft3D/source-analysis/delft3d_flow2d3d_dispatcher.md
+@@ -70,6 +70,8 @@
+ 
+ ## 5. I/O package — Input/Output dispatcher
+ 
++> ⚠ source-needed — MDF·trim·trih·comm 역할 기술은 매뉴얼 페이지 인용 필요([[../manual-notes/delft3d-flow-user-manual]] 연결 후보).
++
+ `flow2d3d_io/` 의 핵심 파일:
+ - **MDF file (Master Definition File)** — 모든 운영 설정 (격자·시간·BC·forcings·sediment·heat·turbulence)
+ - **trim file** — 시간 series 출력 (every time step 또는 sampling)
+@@ -79,6 +81,8 @@
+ 운영 시 사용자가 MDF 작성 → flow2d3d_io parse → flow2d3d_data 채움 → flow2d3d_kernel 실행 → trim/trih/comm 출력.
+ 
+ ## 6. Manager package — Time-step orchestration
++
++> ⚠ source-needed — 아래 역할(특히 'CFL 기반 자동 조정 옵션')은 코드 인용 0. flow2d3d 는 고정 Δt 가 통례라 자동조정 단언은 검증 전 삭제 후보.
+ 
+ `flow2d3d_manager/`:
+ - Time-step 제어 (CFL 기반 자동 조정 옵션)
