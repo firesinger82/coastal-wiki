@@ -1,0 +1,207 @@
+{
+ "date": "2026-08-03",
+ "findings": [
+  {
+   "path": "models/Delft3D/source-analysis/delft3d_flow2d3d_inichk_general.md",
+   "blob_sha": "d50844754cc9bb1f183a40748bcec3e15756823f",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 52,
+   "opinion": 3,
+   "has_source_needed": true,
+   "unsourced": [
+    {
+     "line": 17,
+     "text": "두 드라이버 `inchki`(553L)·`inchkr`(1315L)가 순서대로 호출한다",
+     "reason": "VALUE-MISMATCH(수치 전사) — inchki.f90 실제 555행(wc -l). 같은 문서 §1 표는 '라인수 555' 로 정확, L17 만 553 오기(문서 내부 모순). inchkr 1315 는 정확.",
+     "adversary": "refute 실패 → confirmed. (a) 버전 상이 가능성: raw 트리 내 inchki.f90 유일본·읽기전용 잠금, 같은 노트 §1 표(동일 작성일)가 555 — 동일 트리 기준 (b) 코드라인만·주석 제외 등 어떤 계수 정의로도 553(−2) 도출 불가 (c) 인접 수치 inchkr 1315 정확 → 국소 전사오류"
+    }
+   ],
+   "value_checks": [
+    {
+     "claim_id": "dedcb2ccafa8",
+     "claim": "DRYFLC 하한: dryflc<=0→V074→dryflc=0.02 (:124-127)·주석 'inconsistency for drying and flooding versus calibration of 1/H**2 in CUCNP' (:120-123)·dryflc>1.0→V073 (:128-130)",
+     "source_ref": "flow2d3d_kernel/src/inichk/chknum.f90:120-131",
+     "mismatch": false,
+     "note": "원본 직접 read — 값·메시지코드·주석 verbatim 전부 정확(0.02=:128, V074=:127, V073=:131, 주석=:122-124). 인용범위가 실제 대비 1-2행 이른 shift 이나 앵커 블록과 중첩·값 정확 — 실질 유효 판정. [값검증 표본 V1.1: run 2026-08-03, 접근가능 모집단(수치·계수·라인번호 보유 sourced 단언) 약 70건 전원 ledger 미검사 → 미검사 우선 규칙으로 슬라이스 선두 3파일에서 각 파일 요약부가 대표 게이트로 지목한 단언 1건씩 결정론 선정(초과 후보 seed 추첨 불요) — VC1=inichk chknum dryflc·VC2=io rstfil precision·VC3=special_physics rollu. source_unavailable 0건. 표본 외 ad-hoc 검증: f1 라인수 모순·f4/f5 라인수 전수·tur2d 귀속]"
+    },
+    {
+     "claim_id": "ad19a4b05f54",
+     "claim": "두 드라이버 inchki(553L)·inchkr(1315L)",
+     "source_ref": "flow2d3d_kernel/src/inichk/inchki.f90·inchkr.f90 (wc -l)",
+     "mismatch": true,
+     "note": "실제 inchki.f90=555행(inchkr 1315 정확). 같은 문서 §1 표는 555 로 정확 — L17 전사 오류. [표본 외 ad-hoc: 문서 내부 모순 발견에 따른 추가 검증]"
+    }
+   ],
+   "value_mismatches": 1,
+   "source_unavailable": 0,
+   "proposals": [
+    {
+     "old_string": "`inchki`(553L)",
+     "new_string": "`inchki`(555L)",
+     "rationale": "VALUE-MISMATCH 정정 — inchki.f90 실제 555행(wc -l), 같은 문서 §1 표(555)와 정합"
+    },
+    {
+     "old_string": "citation_status: verified\n",
+     "new_string": "citation_status: verified\nhas_source_needed: true\n",
+     "rationale": "G9e — §6 'read*/string 파싱·NEFIS 헬퍼군 실행부 미인용 — source-needed' disclosed 갭 보유 → has_source_needed: true 프론트매터 명시 권고"
+    }
+   ]
+  },
+  {
+   "path": "models/Delft3D/source-analysis/delft3d_flow2d3d_io.md",
+   "blob_sha": "f5eae68a260c5159c3a7499ea9035a992843a77b",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 46,
+   "opinion": 3,
+   "has_source_needed": true,
+   "unsourced": [],
+   "value_checks": [
+    {
+     "claim_id": "0c7419e0d4c4",
+     "claim": "restart precision 자동감지: direct access recl=4·read rec=1·iprec=l/nmaxgl/mmaxgl·4→FTYPE_UNFORM32/8→FTYPE_UNFORM64 (:210-221)·dfbroadc_gdp (:228)·precision 로그 (:230-232)",
+     "source_ref": "flow2d3d_io/src/input/rstfil.f90:205-232",
+     "mismatch": false,
+     "note": "원본 직접 read — open direct recl=4(:210-211)·read rec=1(:212)·iprec=l/nmaxgl/mmaxgl(:215)·4/8 분기(:216-219)·dfbroadc_gdp(:228)·single/double 로그(:229-232) 라인·값 전부 일치"
+    }
+   ],
+   "value_mismatches": 0,
+   "source_unavailable": 0,
+   "proposals": [
+    {
+     "old_string": "citation_status: verified\n",
+     "new_string": "citation_status: verified\nhas_source_needed: true\n",
+     "rationale": "G9e — §1.2 search/readnc 위치 미확인(⚠)·§3.4 헤더 미인용 writer·말미 '⚠ 미확인/source-needed' disclosed 갭 보유 → has_source_needed: true 명시 권고"
+    }
+   ]
+  },
+  {
+   "path": "models/Delft3D/source-analysis/delft3d_flow2d3d_special_physics.md",
+   "blob_sha": "17fe26e8dd0990e1edbeb2b816a35af380347b60",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 55,
+   "opinion": 2,
+   "has_source_needed": true,
+   "unsourced": [],
+   "value_checks": [
+    {
+     "claim_id": "b86918508abb",
+     "claim": "sinkr=2g·βroll/c (:97)·βtr=0.025(1/kh)((h−Hrms)/Hrms)², k=2π/(cTp), Hrms=√(8Ew/ρg) (:89-93)·dis(nm,2)=sinkr·eroll0 (:99)·sourr=max(0,sinkw·Ew−df) (:104)·dis(nm,1)=dis2+dis3+dis4 (:115)",
+     "source_ref": "flow2d3d_kernel/src/compute_roller/rollu.f90:85-116",
+     "mismatch": false,
+     "note": "원본 직접 read — sinkr(nm)=2.0_fp*ag*btr/c(nm) :97, btr=0.025(1/(kwav·hdis))((hdis−hrms)/hrms)² :93·kwav=2π/(c·tp) :91·hrms=(8·ewave0/(rhow·ag))^0.5 :92, dis(nm,2)=sinkr·eroll0 :99, src=max(0,sinkw·ewave0−df) :104, dis(nm,1)=dis(nm,2)+dis(nm,3)+dis(nm,4) :115 — 식·계수·라인 완전 일치"
+    }
+   ],
+   "value_mismatches": 0,
+   "source_unavailable": 0,
+   "proposals": [
+    {
+     "old_string": "citation_status: verified\n",
+     "new_string": "citation_status: verified\nhas_source_needed: true\n",
+     "rationale": "G9e — DESA 이론 원문(Choi & Lee)·roller 이론 원문(H. Petit)·nhfull/horadv 변형 세부 등 본문 명시 source-needed disclosed 갭 보유 → has_source_needed: true 명시 권고"
+    }
+   ]
+  },
+  {
+   "path": "models/Delft3D/source-analysis/delft3d_flow_compute_aux.md",
+   "blob_sha": "0978e01736e827169c1e681faef6710aed1e5d6c",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 16,
+   "opinion": 3,
+   "has_source_needed": false,
+   "unsourced": [],
+   "value_checks": [
+    {
+     "claim_id": "7fce41dd3dd3",
+     "claim": "11개 compute 파일 라인수(adv2d 558·sourmu 491·calbf 441·calksc 430·trtrou 974·tur2d 823·z_uzd 1481·z_vermom_finvol 523·z_difuflux 488·culver 604·f0isf1 507) + tur2d HLES Uittenbogaard 귀속",
+     "source_ref": "flow2d3d_kernel/src/compute/*.f90 (wc -l)·tur2d.f90:64",
+     "mismatch": false,
+     "note": "[표본 외 ad-hoc] 11/11 라인수 전수 일치·HLES Uittenbogaard 귀속 tur2d.f90:64 'diffusivity (R.E. Uittenbogaard)' 확인"
+    }
+   ],
+   "value_mismatches": 0,
+   "source_unavailable": 0
+  },
+  {
+   "path": "models/Delft3D/source-analysis/delft3d_fm_compute_aux.md",
+   "blob_sha": "eab32dfbb137706533f7ef73764c481f0c256039",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 14,
+   "opinion": 3,
+   "has_source_needed": false,
+   "unsourced": [],
+   "value_checks": [
+    {
+     "claim_id": "9b91c9602431",
+     "claim": "12개 FM compute 파일 라인수(advec 1277·sethu 791·setucxucyucxuucyunew 1163·setucxcuy_leastsquare 761·volume_table 967·set_kbot_ktop 721·structure_parameters 1052·m_longculverts 1654·m_dambreak_breach_submodule 1304·update_verticalprofiles 963·setship 932·oned_functions 1247)",
+     "source_ref": "dflowfm_kernel/src/dflowfm_kernel/compute 트리 (wc -l)",
+     "mismatch": false,
+     "note": "[표본 외 ad-hoc] 12/12 라인수 전수 일치"
+    }
+   ],
+   "value_mismatches": 0,
+   "source_unavailable": 0
+  },
+  {
+   "path": "models/Delft3D/source-analysis/delft3d_forfil_forester_filter.md",
+   "blob_sha": "262f62db4800b1247f754a1a9042666eb6c3e421",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 26,
+   "opinion": 2,
+   "has_source_needed": false,
+   "unsourced": []
+  },
+  {
+   "path": "models/Delft3D/source-analysis/delft3d_heat.md",
+   "blob_sha": "725f42c92b8ffc3b50ccb192cf7c4d705c292a06",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 42,
+   "opinion": 14,
+   "has_source_needed": false,
+   "unsourced": []
+  },
+  {
+   "path": "models/Delft3D/source-analysis/delft3d_part.md",
+   "blob_sha": "c3b424b2855874463210b8a0721f5ea96b5fa591",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 36,
+   "opinion": 16,
+   "has_source_needed": false,
+   "unsourced": [
+    {
+     "line": 152,
+     "text": "Volume + flow records in `.hyd` must be monotonic; PART interpolates linearly.",
+     "reason": "코드 동작 단언, 인용 0. 역증거: Source basis 포괄범위 내 rdhydr.f90:238 주석 'flows must be block since no space is reserved for flow-interpolation' — flow 는 블록(무보간) 명시, '선형보간' 단언과 충돌.",
+     "adversary": "refute 시도: Source basis rdhydr.f90:145-239 포괄인용이 커버하는가 → 해당 범위 주석이 오히려 반대 진술(flow 무보간). volume 만 선형보간일 가능성은 남으나 단언은 volume+flow 일괄이라 커버 불성립 — refute 실패 → confirmed"
+    },
+    {
+     "line": 154,
+     "text": "Particle count: 10K-100K typical; cost scales linearly.",
+     "reason": "운영 권고 수치 — Source basis 9항목·본문 file:line 어디에도 근거 없음(2026-08-02 run dredge_dump L195 '0.5 m buffer' 선례 동형).",
+     "adversary": "refute 시도: 코드에서 도출 가능한가 → typical 파티클 수는 소스·주석에 부재, 경험 지식성 수치 — refute 실패 → confirmed"
+    },
+    {
+     "line": 163,
+     "text": "FLOW `.hyd` time period shorter than PART simulation — PART extrapolates last record.",
+     "reason": "코드 동작 단언, 인용 0. part_io·part_kernel 전체 grep 'extrapolat' 0건(.hyd 경로와 무관한 meteo1.f90 만 해당).",
+     "adversary": "refute 시도: rdhydr 포괄인용(145-239)·§C 서술 어디에도 만료 후 마지막 레코드 유지/외삽 동작 없음, 코드 텍스트 검색도 무근거 — refute 실패 → confirmed"
+    }
+   ]
+  }
+ ]
+}

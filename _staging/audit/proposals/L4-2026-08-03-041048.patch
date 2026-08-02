@@ -1,0 +1,42 @@
+diff --git a/models/Delft3D/source-analysis/delft3d_flow2d3d_inichk_general.md b/models/Delft3D/source-analysis/delft3d_flow2d3d_inichk_general.md
+--- a/models/Delft3D/source-analysis/delft3d_flow2d3d_inichk_general.md
++++ b/models/Delft3D/source-analysis/delft3d_flow2d3d_inichk_general.md
+@@ -4,6 +4,7 @@
+ component: flow2d3d/flow2d3d_kernel(inichk·general)
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "Delft3D 소스 직접 read (src/engines_gpl/flow2d3d/packages/flow2d3d_kernel/src/inichk·general). inchki/inchkr 의 call 시퀀스(grep -n call), chkgeo/chknum 실행부, nm_to_n_and_m/n_and_m_to_nm 변환식, 각 chk*/ini* subroutine 헤더 Function 주석을 file:line 인용"
+ note_author: "Claude Opus 4.8 (1M context)"
+ note_date: 2026-06-16
+@@ -14,7 +15,7 @@
+ 
+ # Delft3D flow2d3d 초기화·검사·general 유틸
+ 
+-> flow2d3d 구조격자 커널의 시뮬레이션 시작 단계 — 격자/입력 정합성 검사(`chk*`)와 초기조건 채우기(`ini*`)를 두 드라이버 `inchki`(553L)·`inchkr`(1315L)가 순서대로 호출한다. `general/`은 인덱스 변환·에러출력·시간·기하 공용 함수. (경로: src/engines_gpl/flow2d3d/packages/flow2d3d_kernel/src/{inichk,general}/)
++> flow2d3d 구조격자 커널의 시뮬레이션 시작 단계 — 격자/입력 정합성 검사(`chk*`)와 초기조건 채우기(`ini*`)를 두 드라이버 `inchki`(555L)·`inchkr`(1315L)가 순서대로 호출한다. `general/`은 인덱스 변환·에러출력·시간·기하 공용 함수. (경로: src/engines_gpl/flow2d3d/packages/flow2d3d_kernel/src/{inichk,general}/)
+ 
+ 상위 디스패처/시간루프 흐름은 [[delft3d_flow2d3d_dispatcher]] 참조. 건습(drying/flooding) 알고리즘 본체는 [[delft3d_drying_flooding]], σ/z 수직격자는 [[delft3d_sigma_z]], 난류 초기화 본체는 [[delft3d_turbulence]] 참조 — 본 노트는 **초기화 오케스트레이션과 검사 항목** 자체에 집중한다.
+ 
+diff --git a/models/Delft3D/source-analysis/delft3d_flow2d3d_io.md b/models/Delft3D/source-analysis/delft3d_flow2d3d_io.md
+--- a/models/Delft3D/source-analysis/delft3d_flow2d3d_io.md
++++ b/models/Delft3D/source-analysis/delft3d_flow2d3d_io.md
+@@ -4,6 +4,7 @@
+ component: flow2d3d/flow2d3d_io
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "Delft3D 소스 직접 read (src/engines_gpl/flow2d3d/packages/flow2d3d_io/src/). input/readmd.f90 마스터 디스패처 call 시퀀스(573-909), input/rdrund.f90 legacy search/readnc 키워드 메커니즘(98-131), input/rdmeteo.f90 modern prop_get(199-485), output/postpr.f90 his/map/rst 트리거 로직(930-1206), output/wrh_main.f90 NEFIS/NetCDF 이중 백엔드 + REQUESTTYPE_DEFINE/WRITE 2-pass(329-534), output/wrtarray.f90 typed-rank putelt/nf90_put_var dispatch(101-296), input/rstfil.f90 restart precision 자동감지(166-232), preprocessor/tdatom.f90 시변 데이터 중간파일 생성(598-718) file:line 인용"
+ note_author: "Claude Opus 4.8 (1M context)"
+ note_date: 2026-06-16
+diff --git a/models/Delft3D/source-analysis/delft3d_flow2d3d_special_physics.md b/models/Delft3D/source-analysis/delft3d_flow2d3d_special_physics.md
+--- a/models/Delft3D/source-analysis/delft3d_flow2d3d_special_physics.md
++++ b/models/Delft3D/source-analysis/delft3d_flow2d3d_special_physics.md
+@@ -4,6 +4,7 @@
+ component: flow2d3d/kernel(compute_nearfar·compute_roller·non_hydro)
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "Delft3D 소스 직접 read (src/engines_gpl/flow2d3d/packages/flow2d3d_kernel/src/). near_field.f90 dispatch(L392-655)·desa.f90 entrainment/sink/source(L361-654)·radstr.f90 radiation stress tensor(L212-373)·rollu.f90 roller energy(L85-116)·massfl.f90 mass flux(L96-117)·z_hydpres.f90 Poisson 행렬(L208-291,L474-485)·z_momcor.f90 velocity correction(L179-321) file:line 인용. 일부 솔버 내부(BiCGSTAB/ILU 세부)는 description 헤더만 인용."
+ note_author: "Claude Opus 4.8 (1M context)"
+ note_date: 2026-06-16
