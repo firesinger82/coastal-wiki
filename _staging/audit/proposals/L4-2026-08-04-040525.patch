@@ -1,0 +1,42 @@
+diff --git a/models/Delft3D/source-analysis/delft3d_turbulence.md b/models/Delft3D/source-analysis/delft3d_turbulence.md
+--- a/models/Delft3D/source-analysis/delft3d_turbulence.md
++++ b/models/Delft3D/source-analysis/delft3d_turbulence.md
+@@ -160,6 +160,8 @@
+ 
+ ## Working Rules
+ 
++> ⚠ **source-needed** — 이 절의 정량 수치(`algebraic` 가 `k-ε` 대비 30% 저렴, `vicoww` 권장범위 1e-6~1e-5 m²/s)는 §Source basis 의 소스코드 read 로 유도되지 않고 §References 문헌에 페이지 단위로 귀속되지도 않았다. 벤치마크 출처 보강 또는 정량 표현 삭제 필요.
++
+ - For `k-ε` runs, output `RTUR1` (k) and `RTUR2` (ε) to TRIM-MAP for diagnostics. Surface k spike at strong winds is normal.
+ - `vicoww` (background) typical 1e-6 to 1e-5 m²/s; never zero.
+ - Internal-wave dissipation `tkedis` is small in coastal seas; significant in deep stratified fjords.
+@@ -170,6 +172,8 @@
+ 
+ ## Common Pitfalls
+ 
++> ⚠ **source-needed** — 아래 항목 중 정량 비교치(k-ε 가 algebraic 의 10× 크기)는 소스코드 인용으로 뒷받침되지 않는다(실행 결과 비교). 출처 보강 또는 정성 표현으로 완화 필요.
++
+ - ▢ Looking for `TKEDIS` keyword — it's `Tkemod`. `tkedis` is the internal-wave source array, not the option.
+ - ▢ Setting `Tkemod=algebraic` thinking it's uniform mixing — it's Richardson-damped mixing-length. Use `constant` for uniform.
+ - ▢ K-ε with cold-start `k=ε=0` — singular dissipation; always init to `1e-7` minimum.
+diff --git a/models/Delft3D/source-analysis/delft3d_sigma_z.md b/models/Delft3D/source-analysis/delft3d_sigma_z.md
+--- a/models/Delft3D/source-analysis/delft3d_sigma_z.md
++++ b/models/Delft3D/source-analysis/delft3d_sigma_z.md
+@@ -148,6 +148,8 @@
+ 
+ ## Decision Guide
+ 
++> ⚠ **source-needed** — 아래 표의 수치 임계값(depth ratio < 5)은 소스코드·§References 어디에도 귀속되지 않은 실무 판정선이다. 출처 보강 또는 정성 표현(완만한 수심 변화)으로 완화 필요.
++
+ | Domain feature | Coordinate |
+ |---|---|
+ | Mild bathymetry, depth ratio < 5 | Sigma |
+@@ -162,6 +164,8 @@
+ 
+ ## Working Rules
+ 
++> ⚠ **source-needed** — 이 절의 수치 권장값(`kmax` 20–50·비용 선형 스케일링)과 기능 한계 단언(sigma→Z restart 미지원)은 §Source basis 의 file:line 인용으로 뒷받침되지 않는다. 코드·매뉴얼 근거 보강 필요.
++
+ - For sigma, `THICK` should be denser near surface and bottom (geometric or stretched) — uniform `thick=0.1` (10 layers) gives poor surface/bottom resolution.
+ - Z-model: `Ztop` should be ≥ max expected `s1` (e.g., MSL + storm surge + tide); `Zbot` ≤ min bathymetry.
+ - Z-model layer count: `kmax = 20–50` typical for coastal applications; more layers cost ~linearly.

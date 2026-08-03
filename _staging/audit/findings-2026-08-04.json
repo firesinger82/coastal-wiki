@@ -1,0 +1,190 @@
+{
+  "date": "2026-08-04",
+  "findings": [
+    {
+      "path": "models/Delft3D/source-analysis/delft3d_turbulence.md",
+      "blob_sha": "56b96a115f794ba9e2f12a5c12f19faaa4878492",
+      "citation_status": "verified",
+      "dirty": false,
+      "has_real_claims": true,
+      "sourced": 41,
+      "opinion": 6,
+      "has_source_needed": true,
+      "unsourced": [
+        {
+          "line": 166,
+          "text": "For shallow tidal flats, `algebraic` is sufficient and 30% cheaper than `k-ε`.",
+          "reason": "정량 성능 주장(30% 저렴). §Source basis 의 소스코드 read 로 유도 불가(런타임 벤치마크), §References(Rodi 1980·Burchard & Petersen 1999·Theory Manual) 중 어느 것에도 귀속 표기 없음. disclosed 갭 아님.",
+          "adversary": "refute 시도 — (a) 인접 문장·절 헤더에 출처? 없음. (b) frontmatter verification_method 는 '본문 내 file:line 명시'만 보증 → 벤치마크 수치 미포함. (c) References 포괄 커버? Delft3D 특정 closure 의 런타임 비율은 열거된 3문헌의 주제 범위 밖. refute 실패 → confirmed"
+        },
+        {
+          "line": 178,
+          "text": "▢ Comparing `vicww` output across closures expecting same magnitude — k-ε can produce 10× algebraic in active mixing regions.",
+          "reason": "정량 크기비교(10×). 소스코드 read 로 유도 불가(실행 결과 비교), 출처 인용 없음. disclosed 갭 아님.",
+          "adversary": "refute 시도 — 같은 절 다른 항목에도 출처 없음, 파일 상단 포괄 출처는 file:line 기반 코드 인용만 보증. 시뮬레이션 결과 비교치를 커버하는 인용 부재. refute 실패 → confirmed"
+        }
+      ],
+      "proposals": [
+        {
+          "old_string": "## Working Rules\n\n- For `k-ε` runs, output `RTUR1` (k) and `RTUR2` (ε) to TRIM-MAP for diagnostics. Surface k spike at strong winds is normal.",
+          "new_string": "## Working Rules\n\n> ⚠ **source-needed** — 이 절의 정량 수치(`algebraic` 가 `k-ε` 대비 30% 저렴, `vicoww` 권장범위 1e-6~1e-5 m²/s)는 §Source basis 의 소스코드 read 로 유도되지 않고 §References 문헌에 페이지 단위로 귀속되지도 않았다. 벤치마크 출처 보강 또는 정량 표현 삭제 필요.\n\n- For `k-ε` runs, output `RTUR1` (k) and `RTUR2` (ε) to TRIM-MAP for diagnostics. Surface k spike at strong winds is normal.",
+          "rationale": "verified 파일의 undisclosed 정량 단언을 disclosed 갭으로 전환(G9b) — 출처를 날조하지 않고 갭을 명시하는 최소 수정. 적용 시 L166 은 미출처 집계에서 빠지고 파일은 verified-confirmed + has_source_needed:true 가 된다."
+        },
+        {
+          "old_string": "## Common Pitfalls\n\n- ▢ Looking for `TKEDIS` keyword — it's `Tkemod`. `tkedis` is the internal-wave source array, not the option.",
+          "new_string": "## Common Pitfalls\n\n> ⚠ **source-needed** — 아래 항목 중 정량 비교치(k-ε 가 algebraic 의 10× 크기)는 소스코드 인용으로 뒷받침되지 않는다(실행 결과 비교). 출처 보강 또는 정성 표현으로 완화 필요.\n\n- ▢ Looking for `TKEDIS` keyword — it's `Tkemod`. `tkedis` is the internal-wave source array, not the option.",
+          "rationale": "L178 의 10× 주장을 disclosed 갭으로 전환. 본문 주장 자체는 손대지 않고 갭만 공시."
+        }
+      ],
+      "value_mismatches": 0,
+      "source_unavailable": 0
+    },
+    {
+      "path": "models/Delft3D/source-analysis/delft3d_sigma_z.md",
+      "blob_sha": "c56466c5360f98fb5280214e294faee0309acf3e",
+      "citation_status": "verified",
+      "dirty": false,
+      "has_real_claims": true,
+      "sourced": 38,
+      "opinion": 5,
+      "has_source_needed": true,
+      "unsourced": [
+        {
+          "line": 153,
+          "text": "| Mild bathymetry, depth ratio < 5 | Sigma |",
+          "reason": "수치 임계값(depth ratio < 5)으로 좌표계를 가르는 판정 기준. 소스코드에 존재하지 않는 실무 임계값이며 §References(Phillips 1957·Stelling & Van Kester 1994·Bijvelds 2001·Theory Manual) 중 귀속 표기 없음.",
+          "adversary": "refute 시도 — (a) 같은 표·인접 절 출처? 없음(Decision Guide 전체 무인용). (b) sigma slope error 문헌의 표준 지표는 rx0/Haney 수 계열이며 'depth ratio 5' 는 열거 문헌에서 확인되지 않음. (c) 코드 유도 가능? Zmodel 은 이진 플래그일 뿐 임계값 없음. refute 실패 → confirmed"
+        },
+        {
+          "line": 167,
+          "text": "- Z-model layer count: `kmax = 20–50` typical for coastal applications; more layers cost ~linearly.",
+          "reason": "수치 권장범위 + 비용 스케일링 주장. 소스코드 read 로 유도 불가, 출처 없음.",
+          "adversary": "refute 시도 — §H 는 kmax 의 파싱·배열 할당만 file:line 으로 커버(dimrd.f90:328-345), '연안 적용 통상 20~50' 은 그 범위 밖. 인접 문장·frontmatter 어디에도 근거 없음. refute 실패 → confirmed"
+        },
+        {
+          "line": 170,
+          "text": "- Cold-start with sigma → restart as Z-model: not supported. Pick early.",
+          "reason": "모델 기능 한계에 대한 사실 단언인데 file:line·매뉴얼 페이지 인용 없음. 같은 파일의 §A~§H 는 모든 동종 단언에 file:line 을 붙이고 있어 이 절만 예외.",
+          "adversary": "refute 시도 — restart 경로(restart/trirst) 인용이 §Source basis 에 없음. §E 의 'Zmodel 은 이진' 인용(procs.igs:51·tricom_step.F90:870,889)은 좌표 전환 불가를 뜻하지 restart 호환성을 뜻하지 않음(별개 단언). refute 실패 → confirmed"
+        }
+      ],
+      "proposals": [
+        {
+          "old_string": "## Decision Guide\n\n| Domain feature | Coordinate |",
+          "new_string": "## Decision Guide\n\n> ⚠ **source-needed** — 아래 표의 수치 임계값(depth ratio < 5)은 소스코드·§References 어디에도 귀속되지 않은 실무 판정선이다. 출처 보강 또는 정성 표현(완만한 수심 변화)으로 완화 필요.\n\n| Domain feature | Coordinate |",
+          "rationale": "verified 파일의 undisclosed 수치 임계값을 disclosed 갭으로 전환(G9b). 표 내용은 미변경."
+        },
+        {
+          "old_string": "## Working Rules\n\n- For sigma, `THICK` should be denser near surface and bottom (geometric or stretched) — uniform `thick=0.1` (10 layers) gives poor surface/bottom resolution.",
+          "new_string": "## Working Rules\n\n> ⚠ **source-needed** — 이 절의 수치 권장값(`kmax` 20–50·비용 선형 스케일링)과 기능 한계 단언(sigma→Z restart 미지원)은 §Source basis 의 file:line 인용으로 뒷받침되지 않는다. 코드·매뉴얼 근거 보강 필요.\n\n- For sigma, `THICK` should be denser near surface and bottom (geometric or stretched) — uniform `thick=0.1` (10 layers) gives poor surface/bottom resolution.",
+          "rationale": "L167·L170 을 disclosed 갭으로 전환. 본문 주장 자체는 손대지 않고 갭만 공시."
+        }
+      ],
+      "value_mismatches": 0,
+      "source_unavailable": 0
+    },
+    {
+      "path": "models/Delft3D/source-analysis/delft3d_sediment_transport_formulae.md",
+      "blob_sha": "e4009aae9b33cee17d324f9a24f5c680d4b970f3",
+      "citation_status": "verified",
+      "dirty": false,
+      "has_real_claims": true,
+      "sourced": 52,
+      "opinion": 3,
+      "has_source_needed": true,
+      "unsourced": [],
+      "value_checks": [
+        {
+          "claim_id": "1afc52b2f7a3",
+          "claim": "sour = eropar · taum**powern (침식 entrainment flux)",
+          "source_ref": "morphology_kernel/src/erosilt.f90:184",
+          "mismatch": false,
+          "note": "원본 L183 `taum = max(0.0_fp, taub/tcrero - 1.0_fp)` · L184 `sour = eropar * taum**powern` — 식·라인 정확 일치"
+        },
+        {
+          "claim_id": "a7a8e78a0b12",
+          "claim": "taucrmin = 0.1 ; betaslope = 2.0 (bed-slope 효과)",
+          "source_ref": "morphology_kernel/src/erosilt.f90:177-178",
+          "mismatch": false,
+          "note": "원본 L177 `taucrmin  = 0.1_fp` · L178 `betaslope = 2.0_fp` — 값·라인 정확 일치. 인접 인용 :179-180(경사 보간 후 max) 도 일치"
+        }
+      ],
+      "value_mismatches": 0,
+      "source_unavailable": 0
+    },
+    {
+      "path": "models/Delft3D/source-analysis/delft3d_sediment_morphology.md",
+      "blob_sha": "a60cbc2da34514c070d000f686f6bb26d452b126",
+      "citation_status": "verified",
+      "dirty": false,
+      "has_real_claims": true,
+      "sourced": 44,
+      "opinion": 4,
+      "has_source_needed": true,
+      "unsourced": [],
+      "value_checks": [
+        {
+          "claim_id": "80bfcaff5c35",
+          "claim": "erosed.f90 = 1513줄 (패키지 파일 라인수 표)",
+          "source_ref": "flow2d3d_kernel/src/compute_sediment/erosed.f90 (wc -l)",
+          "mismatch": false,
+          "note": "wc -l = 1513 정확 일치. 동일 표의 bott3d.f90 1311 도 일치(부수 확인)"
+        }
+      ],
+      "value_mismatches": 0,
+      "source_unavailable": 0
+    },
+    {
+      "path": "models/Delft3D/source-analysis/delft3d_rr_rainfall_runoff.md",
+      "blob_sha": "38e46f53072de99e610e41f1356cac0a66531464",
+      "citation_status": "verified",
+      "dirty": false,
+      "has_real_claims": true,
+      "sourced": 63,
+      "opinion": 4,
+      "has_source_needed": true,
+      "unsourced": [],
+      "value_mismatches": 0,
+      "source_unavailable": 0
+    },
+    {
+      "path": "models/Delft3D/source-analysis/delft3d_rtc_realtime_control.md",
+      "blob_sha": "7e178c4ceedc30c0dd9cb0545703cf13748cca46",
+      "citation_status": "verified",
+      "dirty": false,
+      "has_real_claims": true,
+      "sourced": 58,
+      "opinion": 3,
+      "has_source_needed": true,
+      "unsourced": [],
+      "value_mismatches": 0,
+      "source_unavailable": 0
+    },
+    {
+      "path": "models/Delft3D/source-analysis/delft3d_utils_libraries.md",
+      "blob_sha": "85c93019d4836f0376e66d36719976367db8b6d0",
+      "citation_status": "verified",
+      "dirty": false,
+      "has_real_claims": true,
+      "sourced": 71,
+      "opinion": 5,
+      "has_source_needed": true,
+      "unsourced": [],
+      "value_mismatches": 0,
+      "source_unavailable": 0
+    },
+    {
+      "path": "models/Delft3D/source-analysis/delft3d_waq_algae_models.md",
+      "blob_sha": "a2c999076039dae96546c3a7528a649fb79488a5",
+      "citation_status": "verified",
+      "dirty": false,
+      "has_real_claims": true,
+      "sourced": 57,
+      "opinion": 4,
+      "has_source_needed": true,
+      "unsourced": [],
+      "value_mismatches": 0,
+      "source_unavailable": 0
+    }
+  ]
+}
