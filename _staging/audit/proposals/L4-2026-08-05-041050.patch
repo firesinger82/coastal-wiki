@@ -1,0 +1,71 @@
+diff --git a/models/Delft3D/source-analysis/delft3d_waq_kernel_integration.md b/models/Delft3D/source-analysis/delft3d_waq_kernel_integration.md
+--- a/models/Delft3D/source-analysis/delft3d_waq_kernel_integration.md
++++ b/models/Delft3D/source-analysis/delft3d_waq_kernel_integration.md
+@@ -123,7 +123,7 @@
+ 
+ ### 3.2 boundary: Thatcher-Harleman
+ 
+-`scheme_1` 은 신규 경계농도 산정 시 OpenDA 버퍼 우선 적용 후 `thatcher_harleman_bc(a(ibset),a(ibsav),...)` 호출 (`integration_scheme_1.f90:222-231`). T-H 는 유입/유출 전환 시 경계농도의 시간이력 완화(return time)를 적용하는 표준 estuarine BC.
++`scheme_1` 은 신규 경계농도 산정 시 OpenDA 버퍼 우선 적용 후 `thatcher_harleman_bc(a(ibset),a(ibsav),...)` 호출 (`integration_scheme_1.f90:222-231`). T-H 는 유출 시 유출농도를 `bsave` 에 저장·적용하고, 유입 시 time-lag 보다 유입시간이 짧으면 저장값에서 규정값으로 코사인 완화하는 estuarine BC (`thatcher_harleman_bc.f90:35-41` 헤더 주석).
+ 
+ ### 3.3 explicit Euler 적분 (`update_concentration.f90`)
+ 
+diff --git a/models/Delft3D/source-analysis/delft3d_waq_sediment_denitrification.md b/models/Delft3D/source-analysis/delft3d_waq_sediment_denitrification.md
+--- a/models/Delft3D/source-analysis/delft3d_waq_sediment_denitrification.md
++++ b/models/Delft3D/source-analysis/delft3d_waq_sediment_denitrification.md
+@@ -16,7 +16,7 @@
+ # Delft3D WAQ 저니 탈질 — `densed.f90` (SUBROUTINE DENSED)
+ 
+ > 소스: `.../src/engines_gpl/waq/waq_process/densed.f90` (158줄, `module m_densed`).
+-> **정체**: 저니(sediment)에서의 **탈질(denitrification) — NO3⁻ → N2 제거 flux**. 하구·연안 부영양화 완화의 최대 질소 sink. 위키가 커버한 **수주 탈질 `denwat`([[delft3d_waq_process_library]])의 저니 대응짝** → 질소순환 sink 완결. SOD 노트(탄소·산소 diagenesis)와 인접하되 N 화학은 미겹침(상보).
++> **정체**: 저니(sediment)에서의 **탈질(denitrification) — NO3⁻ → N2 제거 flux**. 하구·연안 질소 제거의 주요 sink(정량 기여도·순위는 코드 read 로 유도 불가 — ⚠ 문헌 인용 source-needed). 위키가 커버한 **수주 탈질 `denwat`([[delft3d_waq_process_library]])의 저니 대응짝** → 질소순환 sink 완결. SOD 노트(탄소·산소 diagenesis)와 인접하되 N 화학은 미겹침(상보).
+ 
+ ## 0. flux process — 상태변수 구동
+ `phcarb`(진단, flux 0)과 달리 **flux를 실제 갱신**: `FL(1+IFLUX)`에 탈질률 기입(:138) → NO3 상태변수를 감소시킴. active + **bottom 층만** 처리.
+diff --git a/models/Delft3D/source-analysis/delft3d_waq_sediment_oxygen_demand.md b/models/Delft3D/source-analysis/delft3d_waq_sediment_oxygen_demand.md
+--- a/models/Delft3D/source-analysis/delft3d_waq_sediment_oxygen_demand.md
++++ b/models/Delft3D/source-analysis/delft3d_waq_sediment_oxygen_demand.md
+@@ -67,9 +67,9 @@
+ ## 4. 주요 findings (code≠manual, 개발자 주석)
+ - **★메탄 double-count guard**: 수렴 시 `DOXSOD` 를 CH4-보정값으로 덮되 `DMINER` 를 빼냄 — 주석 "anders dubbeltelling met BotMin!!!!"(:313-317). sedox↔botmin 결합 제약(단일 process 매뉴얼로는 안 보임).
+ - **★개발자 미결(Dutch "Te doen")**: 가스버블 블록에 "mag ik dsod gebruiken voor diagen?"·"temperatuurcorrectie niet dubbelop???"·"groot risico dubbeltellingen"(:265-281) — 온도보정·DetC 수요 이중적용 가능성을 코드가 자인. 매뉴얼 부재.
+-- **수치 guard(식에 없음)**: DOXSOD floor 1e-15(:252)·dowc floor 1e-3(:454)·**half-step damping(:481, 수렴증명·반복상한 없음, 매뉴얼의 direct solve 암시와 다름)**.
++- **수치 guard(식에 없음)**: DOXSOD floor 1e-15(:252)·dowc floor 1e-3(:454)·**half-step damping(:481, 수렴증명·반복상한 없음; 매뉴얼의 direct solve 암시와 다름 — ⚠ 매뉴얼 페이지 미인용, source-needed)**.
+ - **온도 base 2종 공존**: sedox/botmin `theta^(T-20)`(증가) vs SODCH4 메탄포화 `0.9759^(T-20)`(감소) — 한 process 내 반대 온도민감도.
+-- **swoxy 런타임 층 라우팅**: flux 가 도달하는 저니층(S1/S2)이 수관 산소의 계산된 함수(정적 config 아님) — 매뉴얼은 고정층으로 제시.
++- **swoxy 런타임 층 라우팅**: flux 가 도달하는 저니층(S1/S2)이 수관 산소의 계산된 함수(정적 config 아님) — 매뉴얼은 고정층으로 제시(⚠ 매뉴얼 페이지 미인용, source-needed).
+ 
+ ## 5. Primary sources
+ - **Deltares D-Water Quality Technical Reference(Processes Library Description)** — SOD·SwitchOxyDem·S1/S2 무기화(process명 SEDOX·BMS1/2·SEDOD·SWOXY).
+diff --git a/models/Delft3D/source-analysis/delft3d_waq_sulphide_speciation.md b/models/Delft3D/source-analysis/delft3d_waq_sulphide_speciation.md
+--- a/models/Delft3D/source-analysis/delft3d_waq_sulphide_speciation.md
++++ b/models/Delft3D/source-analysis/delft3d_waq_sulphide_speciation.md
+@@ -19,7 +19,7 @@
+ > **정체**: 공극수(pore water) **총 용존 황화물(SUD) → H2S / HS⁻ / S²⁻ 3 화학종 분배**. 무산소(anoxic) 저니·저층수의 황산염 환원 산물 — H2S 는 독성·악취·금속(FeS) 결합의 주역. [[delft3d_waq_ph_carbonate]]의 탄산계와 동형 수학(diprotic Bjerrum)이나 물질(황) 신설. 진단(diagnostic) process.
+ 
+ ## 0. 진단 process — 화학종 분율만
+-flux 미갱신, 출력 6(농도 3 + 분율 3)만 기입(:131-136). 총 SUD 는 별도 process(황산염 환원·산화)가 구동, 본 루틴은 순간 pH·T 평형 분배.
++flux 미갱신, 출력 6(농도 3 + 분율 3)만 기입(:136-141; 내부 계산 대입은 :113-118). 총 SUD 는 별도 process(황산염 환원·산화)가 구동, 본 루틴은 순간 pH·T 평형 분배.
+ 
+ ## 1. 2단 산해리 speciation (diprotic)
+ ```fortran
+@@ -33,7 +33,7 @@
+ ```
+ - 해리상수 `ks = 10^(log K)·TC^(T−20)` — log 형 입력 + Arrhenius형 온도보정.
+ - **Bjerrum 분배**: 공통분모 `1 + ks1/H + ks1ks2/H²` 로 H2S 분율 → HS⁻·S²⁻ 순차.
+-- 분율 출력 `frh2sdis=csd1/csdt` 등(:114-116).
++- 분율 출력 `frh2sdis=csd1/csdt` 등(:116-118).
+ 
+ ## 2. ★간극수 농도 보정 `sud/(32000·poros)`
+ `csdt = SUD/(32000·POROS)`(:108) — 32000 = 황 원자량 32 g/mol × 1000(m³→l), `/POROS` 로 벌크 gS/m³ 를 **공극수 mol/l** 로 환산. [[delft3d_waq_opal_silica_dissolution]] `CSID/POROS` 와 동일 철학 — 저니 반응 매질은 물 부피뿐. 저니(POROS<1) 적용 전제.
+@@ -41,8 +41,8 @@
+ ## 3. ★주요 findings
+ - **★active-cell 게이트 부재**: 다른 WAQ process(phcarb·densed·dissi 모두 `IF(BTEST(IKNMRK,0))`)와 달리 **IKNMRK 검사 없이 전 셀 루프**(:90) — inactive 셀도 speciation 계산(무해하나 불필요 연산). 진단이라 flux 오염은 없음.
+ - **★코드 주석 오류(탄산 복붙)**: 지역변수 선언 주석이 `ks1 ! acidity ... for H2CO3`·`ks2 ! ... for CO2`(:79-80) — 실제는 황화물 해리(lksth2s/lksths 로 계산, :106-107). [[delft3d_waq_ph_carbonate]]에서 복사된 주석 잔재. 심볼명 ks1/ks2 도 탄산 관례 — **인용 시 주석 무시, 코드 로직 기준**.
+-- **★frsdis 음수 가드**: `frsdis = 1 − fr1 − fr2` 가 부동소수 오차로 <0 이면 `csd3/csdt` 재계산(:117-119) — S²⁻ 분율이 극미(고pH 아니면 ~0)라 언더플로 대비.
+-- **SUD≤1e-20 → 전 출력 0**(:101, else :122-128): 무황화물 셀 단락.
++- **★frsdis 음수 가드**: `frsdis = 1 − fr1 − fr2` 가 부동소수 오차로 <0 이면 `csd3/csdt` 재계산(:118-120) — S²⁻ 분율이 극미(고pH 아니면 ~0)라 언더플로 대비.
++- **SUD≤1e-20 → 전 출력 0**(:101, else 영점화 :125-130): 무황화물 셀 단락.
+ - **pH·온도 외부 의존**: pH 는 [[delft3d_waq_ph_carbonate]] 등이 공급 — S²⁻ 는 고pH에서만 유의, 하구 pH 7–8 대에선 H2S+HS⁻ 지배.
+ 
+ ## 4. Primary sources

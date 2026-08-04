@@ -1,0 +1,266 @@
+{
+  "date": "2026-08-05",
+  "findings": [
+    {
+      "path": "models/Delft3D/source-analysis/delft3d_waq_io_preprocess.md",
+      "blob_sha": "937510c4d5f3822d385c1e5b40f41652c9e09950",
+      "citation_status": "verified",
+      "dirty": false,
+      "has_real_claims": true,
+      "sourced": 62,
+      "opinion": 4,
+      "has_source_needed": true,
+      "unsourced": [],
+      "value_checks": [
+        {
+          "claim_id": "703878350ea2",
+          "claim": "versip = 5.07 · nbprm = 1750(최대 프로세스) · novarm = 15000(최대 변수)",
+          "source_ref": "waq_preprocessor/dlwqp1.f90:105-108",
+          "mismatch": false,
+          "note": "[표본 선정, seed=2026-08-05-L4] 원본 L105 versip=5.07 · L107 novarm=15000 · L108 nbprm=1750 — 3값 전부 정확, 인용 범위 :105-108 안에 모두 포함"
+        }
+      ]
+    },
+    {
+      "path": "models/Delft3D/source-analysis/delft3d_waq_kernel_integration.md",
+      "blob_sha": "fd4119d6533445b2c912b7a338750656408dab15",
+      "citation_status": "verified",
+      "dirty": false,
+      "has_real_claims": true,
+      "sourced": 71,
+      "opinion": 5,
+      "unsourced": [
+        {
+          "line": 126,
+          "text": "T-H 는 유입/유출 전환 시 경계농도의 시간이력 완화(return time)를 적용하는 표준 estuarine BC.",
+          "reason": "Thatcher-Harleman BC 의 *동작 정의*를 서술하는 도메인 단언인데 출처 0. §3.2 가 인용한 것은 호출 지점(integration_scheme_1.f90:222-231)뿐이며 T-H 루틴 자체·원논문(Thatcher & Harleman 1972) 인용 없음.",
+          "adversary": "refute 시도 — (a) 인접 문장·절 헤더 출처? 호출지점 file:line 뿐, T-H 내부 동작 근거 아님. (b) frontmatter verification_method 커버? 열거된 read 대상(integration_schemes·integration_scheme_1·calculate_transport_with_explicit_derivatives·update_concentration·calculate_processes·prodr2·theta_calculation·flux_corrected_transport·gmres_solver·scale_derivatives)에 thatcher_harleman_bc.f90 없음. (c) §8 disclosed 갭? §8 는 procal·스킴16-18/23/24/26·double_sweep·vertical_forester·initialize_pointer_matrices 만 열거 — T-H 미포함, 즉 undisclosed. refute 실패 → confirmed. (검증: 실제 thatcher_harleman_bc.f90:35-41 헤더 주석에 outflow 저장/inflow time-lag 동작이 서술돼 있어 서술 내용 자체는 옳음 — 결함은 인용 부재)"
+        }
+      ],
+      "proposals": [
+        {
+          "old_string": "T-H 는 유입/유출 전환 시 경계농도의 시간이력 완화(return time)를 적용하는 표준 estuarine BC.",
+          "new_string": "T-H 는 유출 시 유출농도를 `bsave` 에 저장·적용하고, 유입 시 time-lag 보다 유입시간이 짧으면 저장값에서 규정값으로 코사인 완화하는 estuarine BC (`thatcher_harleman_bc.f90:35-41` 헤더 주석).",
+          "rationale": "무인용 도메인 단언 → 실재하는 헤더 주석 file:line 인용으로 대체(내용도 코드 주석 표현에 맞춤)"
+        }
+      ],
+      "value_checks": [
+        {
+          "claim_id": "bf5e04cf122b",
+          "claim": "amass = amass + idt*deriv ; deriv = 0.0 (Euler 적분)",
+          "source_ref": "calculation/update_concentration.f90:72-73",
+          "mismatch": false,
+          "note": "[표본 외 ad-hoc] 원본 L72 `amass = amass + idt * deriv` · L73 `deriv = 0.0` — 식·라인 정확 일치"
+        }
+      ]
+    },
+    {
+      "path": "models/Delft3D/source-analysis/delft3d_waq_opal_silica_dissolution.md",
+      "blob_sha": "7d9f3c1678ba38c06dd4d0c49f291359bf2be1c5",
+      "citation_status": "verified",
+      "dirty": false,
+      "has_real_claims": true,
+      "sourced": 19,
+      "opinion": 3,
+      "has_source_needed": false,
+      "unsourced": [],
+      "value_checks": [
+        {
+          "claim_id": "851f744ebda2",
+          "claim": "SWDISSI=0 → FSOL = KSOL*TEMPC*OPAL*(CSIDE − CSID/POROS) / SWDISSI=1 → FSOL = KSOL*TEMPC*OPAL",
+          "source_ref": "waq_process/dissi.f90:109-112",
+          "mismatch": false,
+          "note": "[표본 외 ad-hoc] 원본 L109 IF(NINT(SWDISSi)==0) · L110 2차식 · L112 1차식 — 식·분기·라인 정확 일치. 파일 길이 153줄도 일치"
+        }
+      ]
+    },
+    {
+      "path": "models/Delft3D/source-analysis/delft3d_waq_ph_carbonate.md",
+      "blob_sha": "cb0aa008626818159eef627f3d5ca33062c02c1b",
+      "citation_status": "verified",
+      "dirty": false,
+      "has_real_claims": true,
+      "sourced": 33,
+      "opinion": 3,
+      "has_source_needed": true,
+      "unsourced": [],
+      "value_checks": [
+        {
+          "claim_id": "8d937fb0f49c",
+          "claim": "총붕소 BT=0.000416·S/35 (Millero, :349) · 칼슘 Ca=0.01028·S/35 (:352)",
+          "source_ref": "waq_process/phcarb.f90:349,352",
+          "mismatch": false,
+          "note": "[표본 외 ad-hoc] 계수 0.000416·0.01028 및 S/35 스케일링 정확 일치, 인용 라인 :349/:352 는 Millero 귀속 주석행(대입행은 :350/:353)이라 귀속 인용으로 타당. 단 원본은 `BT = MTOMM*0.000416*(SAL/35.0)` 로 MTOMM(=1.0E+3, mol→mmol, :117)을 곱함 — 노트 표기는 mol/kg 문헌형이라 mmol/kg 문맥과 단위 1000배 어긋남. adversary: 계수 자체는 정확·문헌형이 표준이라 mismatch 아님으로 판정, 다만 단위인자 명시 권고"
+        }
+      ]
+    },
+    {
+      "path": "models/Delft3D/source-analysis/delft3d_waq_process_library.md",
+      "blob_sha": "f0135c7c52b5f1e1a410ccc5dedf5fa8a9ccd075",
+      "citation_status": "verified",
+      "dirty": false,
+      "has_real_claims": true,
+      "sourced": 58,
+      "opinion": 3,
+      "has_source_needed": true,
+      "unsourced": [],
+      "value_checks": [
+        {
+          "claim_id": "bd073bf8b1b2",
+          "claim": "Weiss(Monteiro/cisr) 산소포화 계수 a1=-173.4292 a2=249.6339 a3=143.3483 a4=-21.8492 b1=-0.033096 b2=0.014259 b3=-0.0017",
+          "source_ref": "waq_process/satoxy.f90:78-84",
+          "mismatch": false,
+          "note": "[표본 선정, seed=2026-08-05-L4] 원본 L78-84 parameter 문 7계수 전부 자릿수까지 정확 일치, 라인 범위도 정확"
+        }
+      ]
+    },
+    {
+      "path": "models/Delft3D/source-analysis/delft3d_waq_sediment_denitrification.md",
+      "blob_sha": "395ae74e5aa8713a068c37979dcd440a9d119925",
+      "citation_status": "verified",
+      "dirty": false,
+      "has_real_claims": true,
+      "sourced": 20,
+      "opinion": 2,
+      "unsourced": [
+        {
+          "line": 19,
+          "text": "하구·연안 부영양화 완화의 최대 질소 sink.",
+          "reason": "저니 탈질이 하구·연안 질소 sink 중 *최대*라는 정량 순위 단언. densed.f90 코드 read 로 유도 불가하며 문헌 인용(Seitzinger 계열 등) 없음.",
+          "adversary": "refute 시도 — (a) 인접 문장·절 출처? '정체' 블록 전체 무인용. (b) §6 Primary sources 포괄 커버? 열거는 'Delft3D-WAQ Processes Library(process 정의)'와 [[delft3d_waq_process_library]] 뿐 — process 정의 문서는 하구 N 수지 순위를 다루지 않음. (c) frontmatter verification_method 커버? densed.f90:158줄 전수 read 만 보증. (d) 도입부 framing 으로 opinion 처리 가능? 최상급 정량 비교라 사실 단언. refute 실패 → confirmed"
+        }
+      ],
+      "proposals": [
+        {
+          "old_string": "하구·연안 부영양화 완화의 최대 질소 sink.",
+          "new_string": "하구·연안 질소 제거의 주요 sink(정량 기여도·순위는 코드 read 로 유도 불가 — ⚠ 문헌 인용 source-needed).",
+          "rationale": "무인용 최상급 단언을 완화 + disclosed 갭(source-needed 토큰)으로 전환. 문헌 확보 시 인용 교체"
+        }
+      ],
+      "value_checks": [
+        {
+          "claim_id": "46cb583648f3",
+          "claim": "FL(1+IFLUX) = (DENR + TEMFAK*NO3)/DEPTH",
+          "source_ref": "waq_process/densed.f90:138",
+          "mismatch": false,
+          "note": "[표본 외 ad-hoc] 원본 L138 완전 동일. 파일 길이 158줄도 일치"
+        }
+      ]
+    },
+    {
+      "path": "models/Delft3D/source-analysis/delft3d_waq_sediment_oxygen_demand.md",
+      "blob_sha": "ea8bee51765d67f1aad930abf5d80fa2f38627f3",
+      "citation_status": "verified",
+      "dirty": false,
+      "has_real_claims": true,
+      "sourced": 31,
+      "opinion": 3,
+      "unsourced": [
+        {
+          "line": 72,
+          "text": "swoxy 런타임 층 라우팅 … 매뉴얼은 고정층으로 제시.",
+          "reason": "매뉴얼이 무엇을 제시하는지에 대한 *내용 단언*인데 페이지 인용 없음. CLAUDE.md 절대규칙 #1 은 메뉴얼 단언에 페이지 인용을 요구.",
+          "adversary": "refute 시도 — (a) §5 Primary sources 의 'Deltares D-Water Quality Technical Reference' 문서 수준 열거로 커버되나? 코드와 매뉴얼을 *대조*하는 주장이라 어느 절·페이지가 고정층을 제시하는지 특정 없이는 검증 불가. (b) §4 헤더 '(code≠manual, 개발자 주석)' 가 disclosed 갭인가? 대조를 예고할 뿐 페이지 부재를 명시하지 않음 — undisclosed. (c) 코드만으로 유도 가능? 매뉴얼 내용은 코드에서 유도 불가. refute 실패 → confirmed"
+        },
+        {
+          "line": 70,
+          "text": "half-step damping(:481, 수렴증명·반복상한 없음, 매뉴얼의 direct solve 암시와 다름)",
+          "reason": "코드 측(:481)은 인용되나 '매뉴얼의 direct solve 암시' 부분은 매뉴얼 페이지 인용 없는 매뉴얼 내용 단언.",
+          "adversary": "refute 시도 — (a) 같은 항목의 :481 인용이 커버? 커버 대상은 코드 damping 사실뿐, 매뉴얼 서술은 별개 주장. (b) §5 문서 수준 열거로 충분? L72 와 동일 사유로 불충분(대조 주장). refute 실패 → confirmed"
+        }
+      ],
+      "proposals": [
+        {
+          "old_string": "- **swoxy 런타임 층 라우팅**: flux 가 도달하는 저니층(S1/S2)이 수관 산소의 계산된 함수(정적 config 아님) — 매뉴얼은 고정층으로 제시.",
+          "new_string": "- **swoxy 런타임 층 라우팅**: flux 가 도달하는 저니층(S1/S2)이 수관 산소의 계산된 함수(정적 config 아님) — 매뉴얼은 고정층으로 제시(⚠ 매뉴얼 페이지 미인용, source-needed).",
+          "rationale": "매뉴얼 내용 단언을 disclosed 갭으로 전환. 페이지 확인 시 (source_id, p.NN) 로 교체"
+        },
+        {
+          "old_string": "**half-step damping(:481, 수렴증명·반복상한 없음, 매뉴얼의 direct solve 암시와 다름)**",
+          "new_string": "**half-step damping(:481, 수렴증명·반복상한 없음; 매뉴얼의 direct solve 암시와 다름 — ⚠ 매뉴얼 페이지 미인용, source-needed)**",
+          "rationale": "동일 — 매뉴얼 대조 주장의 페이지 부재를 명시"
+        }
+      ],
+      "value_checks": [
+        {
+          "claim_id": "ee9acebd7315",
+          "claim": "ch4ssd = 99.*(1.+(dep+hsed/2.)/10.)*0.9759**(temp-20) (메탄 포화농도)",
+          "source_ref": "waq_process/sedox.f90:451",
+          "mismatch": false,
+          "note": "[표본 외 ad-hoc] 원본 L451 `ch4ssd = 99.*(1.+(dep+hsed/2.)/10.)*0.9759**stp20` — 계수 99·10·0.9759 및 라인 정확 일치(stp20=temp-20 로 전개한 표기 차이만). :449 kappac 도 일치. 파일 길이 533줄 일치"
+        }
+      ]
+    },
+    {
+      "path": "models/Delft3D/source-analysis/delft3d_waq_sulphide_speciation.md",
+      "blob_sha": "53a322a98c863a438bc4448c7a83ffbea7565b99",
+      "citation_status": "verified",
+      "dirty": false,
+      "has_real_claims": true,
+      "sourced": 23,
+      "opinion": 3,
+      "has_source_needed": false,
+      "unsourced": [],
+      "value_mismatches": 4,
+      "value_checks": [
+        {
+          "claim_id": "3741e07705c7",
+          "claim": "csdt = sud/(32000.*poros) — 벌크 gS/m3 → 공극수 mol/l",
+          "source_ref": "waq_process/sulfid.f90:108",
+          "mismatch": false,
+          "note": "[표본 선정, seed=2026-08-05-L4] 원본 L108 완전 동일. 인접 :105 h_ion·:106 ks1·:107 ks2·:109 csd1 도 라인 정확 일치"
+        },
+        {
+          "claim_id": "sulfid-lineref-01",
+          "claim": "출력 6(농도 3 + 분율 3)만 기입(:131-136)",
+          "source_ref": "waq_process/sulfid.f90:136-141",
+          "mismatch": true,
+          "note": "❌ 실제 출력 대입은 L136-141(process_space_real(ipnt(9..14))). 인용 :131-136 은 endif/공백/주석 구간. adversary: (a) 다른 출력 블록 존재? 없음. (b) 내부 계산 대입(:113-118) 지칭? 그 범위와도 불일치. refute 실패 → VALUE-MISMATCH 확정(라인 인용 드리프트, 값·로직은 정확)"
+        },
+        {
+          "claim_id": "sulfid-lineref-02",
+          "claim": "분율 출력 frh2sdis=csd1/csdt 등(:114-116)",
+          "source_ref": "waq_process/sulfid.f90:116-118",
+          "mismatch": true,
+          "note": "❌ 실제 frh2sdis L116·frhsdis L117·frsdis L118. 인용 :114-116 은 dishswk/disswk(농도 출력)를 포함하고 분율 2건을 놓침 — 2행 드리프트"
+        },
+        {
+          "claim_id": "sulfid-lineref-03",
+          "claim": "frsdis<0 이면 csd3/csdt 재계산(:117-119)",
+          "source_ref": "waq_process/sulfid.f90:118-120",
+          "mismatch": true,
+          "note": "❌ 실제 L118 frsdis 계산·L119 if(frsdis<0)·L120 재계산. 1-2행 드리프트"
+        },
+        {
+          "claim_id": "sulfid-lineref-04",
+          "claim": "SUD<=1e-20 → 전 출력 0 (:101, else :122-128)",
+          "source_ref": "waq_process/sulfid.f90:123-130",
+          "mismatch": true,
+          "note": "❌ :101 조건행은 정확하나 else 영점화 블록은 L125-130(else 문 L123). 인용 :122-128 은 앞 2행 어긋나고 뒤 2행 누락"
+        }
+      ],
+      "proposals": [
+        {
+          "old_string": "만 기입(:131-136).",
+          "new_string": "만 기입(:136-141; 내부 계산 대입은 :113-118).",
+          "rationale": "라인 인용 드리프트 정정 — 출력 대입 실제 위치 L136-141"
+        },
+        {
+          "old_string": "등(:114-116).",
+          "new_string": "등(:116-118).",
+          "rationale": "분율 출력 3건의 실제 라인으로 정정"
+        },
+        {
+          "old_string": "재계산(:117-119)",
+          "new_string": "재계산(:118-120)",
+          "rationale": "frsdis 음수 가드 블록 실제 라인으로 정정"
+        },
+        {
+          "old_string": "**SUD≤1e-20 → 전 출력 0**(:101, else :122-128)",
+          "new_string": "**SUD≤1e-20 → 전 출력 0**(:101, else 영점화 :125-130)",
+          "rationale": "else 영점화 블록 실제 라인으로 정정"
+        }
+      ]
+    }
+  ]
+}
