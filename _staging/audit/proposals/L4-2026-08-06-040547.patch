@@ -1,0 +1,80 @@
+diff --git a/models/Delft3D/source-analysis/delft3d_wave_swan_module.md b/models/Delft3D/source-analysis/delft3d_wave_swan_module.md
+--- a/models/Delft3D/source-analysis/delft3d_wave_swan_module.md
++++ b/models/Delft3D/source-analysis/delft3d_wave_swan_module.md
+@@ -4,6 +4,7 @@
+ component: wave/swan-wrapper
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "Delft3D 소스 직접 read (src/engines_gpl/wave/). swan_tot.f90 의 시간/격자 루프와 run_swan.f90 의 SWAN 호출, swan_input.f90:write_swan_inp 의 SWAN command-file(PROJECT/CGRID/INPGRID/READINP/BOUN NEST/POINTS NGRID/COMPUTE/HOTSTART/STOP) 생성, swan_flow_grid_maps.f90:make_grid_map(mkmap·ESMF) 와 grmap.f90 의 가중평균 보간, get_flow_fields.f90/map_swan_output.f90/wave2com.f90 의 데이터 교환을 file:line 인용"
+ note_author: "Claude Opus 4.8 (1M context)"
+ note_date: 2026-06-16
+diff --git a/models/Delft3D/source-analysis/sediment/delft3d_sediment.md b/models/Delft3D/source-analysis/sediment/delft3d_sediment.md
+--- a/models/Delft3D/source-analysis/sediment/delft3d_sediment.md
++++ b/models/Delft3D/source-analysis/sediment/delft3d_sediment.md
+@@ -3,6 +3,7 @@
+ topic: sediment-transport
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "Delft3D source code 직접 분석 (models/Delft3D/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/delft3d_sediment.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
+ note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
+ note_date: 2026-04~05 (original) / 2026-05-23 (promote)
+@@ -162,6 +163,8 @@
+ 
+ ## Working Rules
+ 
++> ⚠️ source-needed — 본 절의 수치 범위(`tcrero`·`eropar`·`D50`·`factcr`)는 출처 미인용 운영 heuristic. 근거 인용 보강 또는 `experience/` 이관 검토(절대규칙 #8).
++
+ - For Korean coastal mud (Yeongsan, Han mouth): mud `iform=-3`, `tcrero=0.1-0.3 Pa`, `eropar=1e-5 to 5e-4 kg/m²/s`.
+ - Sand `D50` 0.1-0.5 mm typical; `factcr=1.5-2.0` for hiding effect in mixtures.
+ - Output `dps, sbuu, sbvv, sourse, sinkse` for diagnostics.
+@@ -173,7 +176,7 @@
+ 
+ - ▢ Wrong sign on `dps` — positive downward; `dps -= depchg` for accretion is correct.
+ - ▢ Confusing `iform=-2` with `-4` — both via `tram2` but different physics.
+-- ▢ Setting `tcrdep > tcrero` — model halts; deposition must be at lower stress than erosion.
++- ▢ Setting `tcrdep > tcrero` — model halts; deposition must be at lower stress than erosion. (source-needed — 정지 거동 소스 라인 미인용)
+ - ▢ Multi-fraction without `D50` per fraction — defaults applied silently.
+ - ▢ Forgetting `red_soursin` doesn't limit mud — large mud source/sink can propagate; verify dt.
+ - ▢ Suspended sand without 3D — only `soursin_2d` available; less accurate.
+diff --git a/models/Delft3D/source-analysis/wave/delft3d_flow_wave_coupling.md b/models/Delft3D/source-analysis/wave/delft3d_flow_wave_coupling.md
+--- a/models/Delft3D/source-analysis/wave/delft3d_flow_wave_coupling.md
++++ b/models/Delft3D/source-analysis/wave/delft3d_flow_wave_coupling.md
+@@ -3,6 +3,7 @@
+ topic: general
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "Delft3D source code 직접 분석 (models/Delft3D/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/delft3d_flow_wave_coupling.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
+ note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
+ note_date: 2026-04~05 (original) / 2026-05-23 (promote)
+@@ -155,6 +156,8 @@
+ 
+ ## Working Rules
+ 
++> ⚠️ source-needed — 본 절의 heuristic 수치(`Flpp` 산정식·roller CPU ~30%)는 출처 미인용. 근거 인용 보강 또는 `experience/` 이관 검토(절대규칙 #8).
++
+ - `Flpp` should be ~ wave field response time (≈ tide period / 4 for tides; ≈ wind change time scale for surge). Too short = expensive; too long = lagged feedback.
+ - Always check FLOW and WAVE grid alignment before running coupled — use Delft3D-MOR or Delft3D-Quickplot to verify overlap.
+ - For storm hindcast: use `WaveOL=true`, `Flpp ~ 60 min`. Acceptable for semi-stationary winds.
+@@ -168,7 +171,7 @@
+ - ▢ Setting `WaveOL=true` but not running Delft3D-WAVE simultaneously — FLOW waits forever at `itwav`.
+ - ▢ Setting `Flpp` to mismatch WAVE expected interval — first time mismatch crashes WAVE.
+ - ▢ Using offline COM (`WaveOL=0`) but writing COM with online setup — fields stale immediately.
+-- ▢ Hot-start without `WriteHotFile` enabled in prior run — SWAN cold-starts; surface gravity waves take 30+ min spin-up.
++- ▢ Hot-start without `WriteHotFile` enabled in prior run — SWAN cold-starts; surface gravity waves take 30+ min spin-up. (source-needed — spin-up 수치 출처 미인용)
+ - ▢ Restart without prior `map-rol-series` file — roller restarts cold; surf-zone solution discontinuous.
+ - ▢ Looking for `TWAVE` keyword — doesn't exist; use `Flpp`/`itcomi`.
+ - ▢ Looking for `TAUWX` — actual code uses `wsu/wsv` and `fxw/fyw`.
+diff --git a/models/Delft3D/web-refs/delft3d-official-resources.md b/models/Delft3D/web-refs/delft3d-official-resources.md
+--- a/models/Delft3D/web-refs/delft3d-official-resources.md
++++ b/models/Delft3D/web-refs/delft3d-official-resources.md
+@@ -3,6 +3,7 @@
+ topic: delft3d-web-refs
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "Deltares 공식 도메인 (oss.deltares.nl) + GitHub 공개 repo (Deltares/delft3d). 핵심 논문 인용은 publicly-known canonical works (Lesser et al. 2004, Stelling & Duinmeijer 2003). §8 추가 (2026-05-26): GitHub API `gh release view DIMRset_2026.02 -R Deltares/Delft3D` + `gh api repos/Deltares/Delft3D/compare/DIMRset_2026.01...DIMRset_2026.02` (1067 commits / 300 files / 6개월) + `gh pr view 900 -R Deltares/Delft3D` 직접 fetch (2026-05-26). PR body verbatim + 변경 파일 4개 직접 확인 + release commit log 주요 UNST-\*/DELWAQ-\* 카테고리 추출. release notes body 자체는 비어있어 GitHub commit log 가 first-party authoritative source."
+ note_author: "Claude Opus 4.7 (1M context)"
+ note_date: 2026-05-26
