@@ -1,0 +1,62 @@
+diff --git a/models/EFDC/source-analysis/efdc_boundary_conditions.md b/models/EFDC/source-analysis/efdc_boundary_conditions.md
+--- a/models/EFDC/source-analysis/efdc_boundary_conditions.md
++++ b/models/EFDC/source-analysis/efdc_boundary_conditions.md
+@@ -191,7 +191,7 @@
+ 
+ ## Working Rules
+ 
+-- Always set `INTPSER=1` (Catmull-Rom) for tidal-data PSER — linear interp introduces sub-tidal noise.
++- Always set `INTPSER=1` (Catmull-Rom) for tidal-data PSER — linear interp introduces sub-tidal noise. <!-- source-needed: 보간 방식별 노이즈 특성 근거(문헌 또는 수치실험) 미인용 -->
+ - `RMULADJ` and `ADDADJ` apply to **all** records; check before scaling.
+ - BC ramp `NTSCR*` is in **timesteps**, not seconds — set proportional to spin-up duration.
+ - For multi-river runs, group `GRPID` lets you scale a subset uniformly via post-processing — useful for sensitivity tests.
+@@ -207,7 +207,7 @@
+ - ▢ Using harmonic block without rebuilding `PFPH` after changing `TBEGIN` — synthesis uses absolute `TIMESEC = TCON·TBEGIN` (`hdmt.f90:89`; `setopenbc.f90:232`), so the phase lag must be recomputed for the new time origin (`TCP` periods themselves do not change). See [[efdc-tidal-forcing-conventions-v12]].
+ - ▢ Volumetric source `QSS` injection at a dry cell — will queue but not enter the system; check `LOPENBCDRY` log.
+ - ▢ `ISTYP=1` QSER without proper `WKQ(K)` (must sum to 1) — silent under-injection.
+-- ▢ Hot-start with different `NPSER` count than cold run — index pointers misalign.
++- ▢ Hot-start with different `NPSER` count than cold run — index pointers misalign. <!-- source-needed: restart 루틴 file:line 미확인 -->
+ 
+ ## Next expansion
+ 
+diff --git a/models/EFDC/source-analysis/efdc_caldisp_postprocess.md b/models/EFDC/source-analysis/efdc_caldisp_postprocess.md
+--- a/models/EFDC/source-analysis/efdc_caldisp_postprocess.md
++++ b/models/EFDC/source-analysis/efdc_caldisp_postprocess.md
+@@ -3,6 +3,7 @@
+ topic: efdc
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "models/EFDC/raw/source_code/EFDC-GVC/caldisp2.for (336 lines) + caldisp3.for (557 lines) 직접 read. 호출부 hdmt*.for (ISDISP=2/3 dispatch, N>=NDISP & NCTBC==1) + aaefdc.for (NDISP=NTS-NTSPTC+2, TPN=NTSPTC) 직접 확인. 알고리즘·출력파일·변수 file:line 인용. John Hamrick 2001-11-01 EFDC-FULL 1.0a."
+ note_author: "Claude Opus 4.8 (1M context) source-code direct read"
+ note_date: 2026-06-03
+diff --git a/models/EFDC/source-analysis/efdc_drifters.md b/models/EFDC/source-analysis/efdc_drifters.md
+--- a/models/EFDC/source-analysis/efdc_drifters.md
++++ b/models/EFDC/source-analysis/efdc_drifters.md
+@@ -214,12 +214,12 @@
+ 
+ ## Working Rules
+ 
+-- Particle count: 1000-10000 typical; cost scales linearly.
++- Particle count: 1000-10000 typical; cost scales linearly. <!-- source-needed: 관행 수치·스케일링 근거 미인용 -->
+ - For oil spills, separate groups for surface oil, dispersed droplets, evaporated.
+-- `LA_HORDIF, LA_VERDIF`: typical 0.1-1 m²/s (constant); or use model `AH/AV`.
++- `LA_HORDIF, LA_VERDIF`: typical 0.1-1 m²/s (constant); or use model `AH/AV`. <!-- source-needed: typical 범위 근거 미인용 -->
+ - Random-seed reproducibility: not built in; for reproducibility, use `LA_DIFOP=1` (constant) and seed RNG externally.
+ - Output frequency: balance trajectory smoothness vs file size.
+-- For Korean tidal oil spill: particles often re-enter via rebound at coast — verify `BEDGEMOVE` events.
++- For Korean tidal oil spill: particles often re-enter via rebound at coast — verify `BEDGEMOVE` events. <!-- source-needed: 반복 관찰 근거 미인용 — 3조건 통과 시 experience/ 이관 후보 -->
+ - NetCDF output preferred over binary for analysis.
+ 
+ ## Common Pitfalls
+diff --git a/models/EFDC/source-analysis/efdc_gvc_legacy.md b/models/EFDC/source-analysis/efdc_gvc_legacy.md
+--- a/models/EFDC/source-analysis/efdc_gvc_legacy.md
++++ b/models/EFDC/source-analysis/efdc_gvc_legacy.md
+@@ -4,6 +4,7 @@
+ component: source-analysis/legacy-branch
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "EFDC-GVC/ 트리 전체 ls/find/grep (342 file, 293 .for) + README.md·EFDC.CMN·EFDC.PAR·EFDC_GVC_2010.vfproj 직접 read. 핵심 파일 setgvc.for·caltrani.for·costranw.for·calwqcgvc.for·budget5.for·calexpgvc.for 헤더·본문 file:line 인용. aaefdc.for 디스패치(IGRIDV 분기) grep+read. EFDCPlus_Stable/ 와 확장자·CMake·SGZ 대조."
+ note_author: "Claude Opus 4.8 (1M context)"
+ note_date: 2026-06-18
