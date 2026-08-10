@@ -1,0 +1,72 @@
+diff --git a/models/EFDC/source-analysis/efdc_turbulence.md b/models/EFDC/source-analysis/efdc_turbulence.md
+--- a/models/EFDC/source-analysis/efdc_turbulence.md
++++ b/models/EFDC/source-analysis/efdc_turbulence.md
+@@ -3,6 +3,7 @@
+ topic: general
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "EFDC source code 직접 분석 (models/EFDC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/efdc_turbulence.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
+ note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
+ note_date: 2026-04~05 (original) / 2026-05-23 (promote)
+@@ -157,9 +158,9 @@
+ 
+ ## Working Rules
+ 
+-- Background mixing `AVO/ABO` (~1e-5 m²/s typical) prevents zero-`AV` regions; never set to zero.
+-- `AVMX` cap (~0.5 m²/s default) protects against runaway in shallow tidal regions.
+-- For GOTM coupling, ensure `gotm_input.nml` is consistent with EFDC vertical resolution; mismatched layer counts crash silently.
++- Background mixing `AVO/ABO` (~1e-5 m²/s typical) prevents zero-`AV` regions; never set to zero. <!-- source-needed: typical 값 ~1e-5 근거 미인용 -->
++- `AVMX` cap (~0.5 m²/s default) protects against runaway in shallow tidal regions. <!-- source-needed: default 0.5 근거(입력 카드 기본값 문서 또는 코드 초기값) 미인용 -->
++- For GOTM coupling, ensure `gotm_input.nml` is consistent with EFDC vertical resolution; mismatched layer counts crash silently. <!-- source-needed: crash 거동 근거 미인용 -->
+ - `ISTOPT(0)` change between Galperin/Kantha mid-run is non-trivial — close the run, restart cleanly.
+ - MY2.5 dissipation is implicit-in-diagonal; explicit dissipation forms in older theory papers don't apply to this code.
+ 
+diff --git a/models/EFDC/source-analysis/efdc_vertical.md b/models/EFDC/source-analysis/efdc_vertical.md
+--- a/models/EFDC/source-analysis/efdc_vertical.md
++++ b/models/EFDC/source-analysis/efdc_vertical.md
+@@ -3,6 +3,7 @@
+ topic: general
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "EFDC source code 직접 분석 (models/EFDC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/efdc_vertical.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
+ note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
+ note_date: 2026-04~05 (original) / 2026-05-23 (promote)
+@@ -112,12 +113,12 @@
+ 
+ ## Working Rules
+ 
+-- For SGZ runs, ensure `KSZ` neighbors differ by no more than 1 — large jumps cause numerical noise at face transitions.
+-- `KMINV` (minimum active layer) prevents single-layer cells; default 1, raise to 2 for stability in very shallow cells.
+-- `SGZHPDELTA` controls the SGZ blending; typical values 0.1–0.3 of `HDRY`.
++- For SGZ runs, ensure `KSZ` neighbors differ by no more than 1 — large jumps cause numerical noise at face transitions. <!-- source-needed: 이웃차 ≤1 규칙·noise 거동 근거 미인용 -->
++- `KMINV` (minimum active layer) prevents single-layer cells; default 1, raise to 2 for stability in very shallow cells. <!-- source-needed: default 1·권장 2 근거 미인용 -->
++- `SGZHPDELTA` controls the SGZ blending; typical values 0.1–0.3 of `HDRY`. <!-- source-needed: typical 0.1-0.3 근거 미인용 -->
+ - If `KC >= 8` and bathymetry is steep, plot a vertical section of T/S — sigma-coordinate spurious diapycnal mixing shows as artificial stratification near slopes; cure with `IINTPG=2`.
+ - `HPK` should always be >= `DZC * HDRY` for active layers; if not, drying logic missed it.
+-- Vertical velocity W is diagnostic; large W spikes (>0.1 m/s in coastal) almost always mean horizontal flux imbalance, not a real physical signal.
++- Vertical velocity W is diagnostic; large W spikes (>0.1 m/s in coastal) almost always mean horizontal flux imbalance, not a real physical signal. <!-- source-needed: 임계 >0.1 m/s 근거 미인용 -->
+ 
+ ## Common Pitfalls
+ 
+diff --git a/models/EFDC/source-analysis/efdc_water_quality.md b/models/EFDC/source-analysis/efdc_water_quality.md
+--- a/models/EFDC/source-analysis/efdc_water_quality.md
++++ b/models/EFDC/source-analysis/efdc_water_quality.md
+@@ -3,6 +3,7 @@
+ topic: general
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "EFDC source code 직접 분석 (models/EFDC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/efdc_water_quality.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
+ note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
+ note_date: 2026-04~05 (original) / 2026-05-23 (promote)
+@@ -198,7 +199,7 @@
+ - WQ timestep can be different from hydro timestep; set in `wq_3dwc.jnp`.
+ - Sediment diagenesis (`IWQBEN=1`) is essential for SOD-driven anoxia; without it, DO budget incomplete.
+ - `PARADJ=0.43` is the standard PAR fraction; rarely changed.
+-- `WQKESS` (light extinction) typically 0.5-2.0 m⁻¹; calibrate from Secchi depth observations.
++- `WQKESS` (light extinction) typically 0.5-2.0 m⁻¹; calibrate from Secchi depth observations. <!-- source-needed: typical 범위 0.5-2.0 근거 미인용 -->
+ - Algae growth limitation: typically nutrient + light + temperature multiplicative.
+ - For Korean coastal cases, multiple algae groups (diatoms, dinoflagellates, cyanobacteria) recommended.
+ 
