@@ -1,0 +1,253 @@
+{
+ "date": "2026-08-12",
+ "findings": [
+  {
+   "path": "models/EFDC/source-analysis/efdc_wetdry.md",
+   "blob_sha": "7d31ccf78796153143614241a14eb7a00d7edde7",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 55,
+   "opinion": 10,
+   "unsourced": [
+    {
+     "line": 136,
+     "text": "Tidal flats with regular wet/dry | ISDRY=99, HDRY=0.05–0.1 m, NDRYSTP=10–50",
+     "reason": "Decision Guide 권장 수치범위(HDRY 0.05–0.1 m, NDRYSTP 10–50) 단언 — §A/B/E 인용은 read 위치·메커닉만 커버, 권장값 출처 0. L149 Working Rule 의 NDRYSTP 10–50 과 동일 수치 중복(플래그는 본 행 1건으로 집계).",
+     "adversary": "refute 시도: raw input.f90:357-380 (NDRYSTP read + '*** IF > 0, EFDC+ WILL WASTE ISOLATED CELL WATER AFTER NDRYSTP STEPS' 주석)·mod_var_global.f90:851/1048 직접 grep — 메커닉 주석만, 권장 범위 값은 코드·인용 어디에도 없음. refute 실패 → confirmed"
+    },
+    {
+     "line": 146,
+     "text": "HDRY should be larger than your typical free-surface noise (~3-5x). Too small → constant flicker; too large → too aggressive drying.",
+     "reason": "3-5x 배수 수치 + flicker 거동 단언 — §B 는 HDRY 의미(mod_var_global.f90:1048)만 인용, 배수·거동 출처 0. References 의 Hamrick 1992 는 페이지 없는 generic.",
+     "adversary": "refute 시도: mod_var_global.f90:1048 doc 주석·calpuv9c.f90 인용 범위 확인 — free-surface noise 대비 배수 권고는 어디에도 없음. refute 실패 → confirmed"
+    },
+    {
+     "line": 156,
+     "text": "Setting HDRY < HWET violates the model's assumption (HWET should always be >= HDRY).",
+     "reason": "HWET≥HDRY 제약 단언 — §B 인용(mod_var_global.f90:1053)은 HWET 를 'Minimum water depth to allow for QSER withdrawals' 로만 정의, 제약·assumption 근거 인용 0.",
+     "adversary": "refute 시도: mod_var_global.f90:1053 직접 grep — withdrawal 최소수심 정의뿐, HDRY 와의 대소 제약 문구 없음. input.f90 C11 read 부도 검증 로직 미인용. refute 실패 → confirmed"
+    },
+    {
+     "line": 161,
+     "text": "MPI runs: LMASKDRY needs ghost-cell sync; if turbulence/sediment output looks wrong at subdomain boundaries, verify the wet/dry exchange step.",
+     "reason": "MPI ghost-cell 동기화 필요 + 경계 오출력 거동 단언 — Source basis 에 MPI/communication 파일 인용 0.",
+     "adversary": "refute 시도: 파일 내 인용 8개 소스 모두 비-MPI 경로. raw 트리에서 LMASKDRY 사용 파일 열거 — 통신 계층 인용이 노트에 전무. refute 실패 → confirmed"
+    }
+   ],
+   "value_checks": [],
+   "value_mismatches": 0,
+   "source_unavailable": 0,
+   "has_source_needed": true,
+   "proposals": [
+    {
+     "old_string": "| Tidal flats with regular wet/dry | `ISDRY=99`, `HDRY=0.05–0.1 m`, `NDRYSTP=10–50` |",
+     "new_string": "| Tidal flats with regular wet/dry | `ISDRY=99`, `HDRY=0.05–0.1 m`, `NDRYSTP=10–50` <!-- source-needed: 권장 수치범위 출처 미인용 --> |",
+     "rationale": "disclosed 갭 전환: Decision Guide 권장 수치범위에 source-needed 콜아웃 부착 (G9b)."
+    },
+    {
+     "old_string": "- `HDRY` should be larger than your typical free-surface noise (~3-5x). Too small → constant flicker; too large → too aggressive drying.",
+     "new_string": "- `HDRY` should be larger than your typical free-surface noise (~3-5x). Too small → constant flicker; too large → too aggressive drying. <!-- source-needed: 3-5x 배수·거동 근거 미인용 -->",
+     "rationale": "disclosed 갭 전환: 3-5x 배수 단언에 source-needed 콜아웃 부착 (G9b)."
+    },
+    {
+     "old_string": "- ▢ Setting `HDRY < HWET` violates the model's assumption (`HWET` should always be >= `HDRY`).",
+     "new_string": "- ▢ Setting `HDRY < HWET` violates the model's assumption (`HWET` should always be >= `HDRY`). <!-- source-needed: HWET≥HDRY 제약의 소스·매뉴얼 근거 미인용 -->",
+     "rationale": "disclosed 갭 전환: HWET≥HDRY 제약 단언에 source-needed 콜아웃 부착 (G9b)."
+    },
+    {
+     "old_string": "- ▢ MPI runs: `LMASKDRY` needs ghost-cell sync; if turbulence/sediment output looks wrong at subdomain boundaries, verify the wet/dry exchange step.",
+     "new_string": "- ▢ MPI runs: `LMASKDRY` needs ghost-cell sync; if turbulence/sediment output looks wrong at subdomain boundaries, verify the wet/dry exchange step. <!-- source-needed: MPI 교환 경로 인용 미보강 -->",
+     "rationale": "disclosed 갭 전환: MPI 동기화 거동 단언에 source-needed 콜아웃 부착 (G9b)."
+    },
+    {
+     "old_string": "citation_status: verified",
+     "new_string": "citation_status: verified\nhas_source_needed: true",
+     "rationale": "G9e: 콜아웃 부착 시 disclosed 갭 보유 — frontmatter 플래그 부재 정규화."
+    }
+   ]
+  },
+  {
+   "path": "models/EFDC/source-analysis/sediment/efdc_propwash.md",
+   "blob_sha": "7539d0858a3258fca7e161134ce226086c69ecfe",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 60,
+   "opinion": 8,
+   "unsourced": [],
+   "value_checks": [
+    {
+     "claim_id": "d6d735dd022b",
+     "claim": "efflux_vel = 1.59*rps*prop_diam*sqrt(thrust_coeff) — Jiang et al. 2019 채택 (Hamill 1987 1.33 + Hamill-Kee 2016 주석처리) (L146)",
+     "source_ref": "Propwash/Mod_Active_Ship.f90:835-837",
+     "mismatch": false,
+     "note": ":836 efflux_vel = 1.59 * self.rps * ship.prop_diam * sqrt(ship.thrust_coeff) '*** Jiang, etal 2019' 활성 / :835 Hamill&Kee 2016 (1.22·rps^1.01·D^0.84·Ct^0.62) 주석 / :837 Hamill 1987 (1.33) 주석 — 계수·채택관계·주석처리 진술 정확 일치. (V1.1 표본: seed=L4-2026-08-12-n8-manual, 접근 가능 모집단 30(수치·계수·라인번호 sourced 단언 열거, 전원 ledger 미검사), 선정 3 — 5741fbcfffdb·d6d735dd022b·4da22eaa4dee, source_unavailable 0)"
+    }
+   ],
+   "value_mismatches": 0,
+   "source_unavailable": 0,
+   "has_source_needed": false,
+   "proposals": []
+  },
+  {
+   "path": "models/EFDC/source-analysis/sediment/efdc_sediment.md",
+   "blob_sha": "92abd184d9926ae8e952a7fc22987f12035e6d34",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 45,
+   "opinion": 10,
+   "unsourced": [
+    {
+     "line": 227,
+     "text": "Original cohesive has a fixed bed model (KB=1 is common); SEDZLJ supports many bed layers (typical 5–10).",
+     "reason": "'KB=1 is common'·'typical 5–10' 관행·수치범위 단언 — 인용된 소스 라인은 배열 할당·dispatch 메커닉만, 층수 관행값 출처 0.",
+     "adversary": "refute 시도: varalloc.f90·s_sedic.f90 인용 범위 및 Card C36 KB 정의 확인 — KB 는 입력값일 뿐 typical 5–10 근거 없음. James et al. 2010 은 페이지 없는 generic. refute 실패 → confirmed"
+    },
+    {
+     "line": 237,
+     "text": "Original module + waves without caltbxy wave-BBL — bottom shear underestimated by 30-50%.",
+     "reason": "30-50% 과소추정 정량 단언 — §F 인용(hdmt2t.f90:409-438·caltbxy.f90:276-321)은 메커닉만 커버, 정량치 출처 0.",
+     "adversary": "refute 시도: raw SedTran-Original/·caltbxy.f90 에서 '30-50' grep — 부재. Christoffersen & Jonsson 1985 는 페이지 없는 generic 나열로 이 정량치 미커버. refute 실패 → confirmed"
+    }
+   ],
+   "value_checks": [],
+   "value_mismatches": 0,
+   "source_unavailable": 0,
+   "has_source_needed": true,
+   "proposals": [
+    {
+     "old_string": "- Original cohesive has a fixed bed model (`KB=1` is common); SEDZLJ supports many bed layers (typical 5–10).",
+     "new_string": "- Original cohesive has a fixed bed model (`KB=1` is common); SEDZLJ supports many bed layers (typical 5–10). <!-- source-needed: KB 관행값·층수 범위 근거 미인용 -->",
+     "rationale": "disclosed 갭 전환: 층수 관행값 단언에 source-needed 콜아웃 부착 (G9b)."
+    },
+    {
+     "old_string": "- ▢ Original module + waves without `caltbxy` wave-BBL — bottom shear underestimated by 30-50%.",
+     "new_string": "- ▢ Original module + waves without `caltbxy` wave-BBL — bottom shear underestimated by 30-50%. <!-- source-needed: 30-50% 정량치 근거 미인용 -->",
+     "rationale": "disclosed 갭 전환: 30-50% 정량 단언에 source-needed 콜아웃 부착 (G9b)."
+    },
+    {
+     "old_string": "citation_status: verified",
+     "new_string": "citation_status: verified\nhas_source_needed: true",
+     "rationale": "G9e: 콜아웃 부착 시 disclosed 갭 보유 — frontmatter 플래그 부재 정규화."
+    }
+   ]
+  },
+  {
+   "path": "models/EFDC/source-analysis/sediment/efdc_sedzlj.md",
+   "blob_sha": "0514b66ad1bf6dd6a841f274d3f6c1d558d22198",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 70,
+   "opinion": 6,
+   "unsourced": [
+    {
+     "line": 133,
+     "text": "TACTM = active-layer thickness multiplier (보통 2~10), ...",
+     "reason": "'보통 2~10' typical 범위 수치 단언 — TACT 식(s_sedzlj.f90:273-277)·TACTM read(s_sedic.f90:112-113)는 인용됐으나 범위 값 출처 0.",
+     "adversary": "refute 시도: mod_var_global.f90:2244 ('Non-dimensional active layer thickness multiplier')·s_sedic.f90:113 ('read in active layer multiplier') 직접 grep — 범위 주석 없음. refute 실패 → confirmed. (참고: 동일 §2.1 'BEDLOAD_CUTOFF ≈200μm' 후보는 인용범위 내 s_sedzlj.f90:134 주석 'Gessler if D50 > 200um or Krone if < 200 um' 으로 refute 성공 → 폐기)"
+    }
+   ],
+   "value_checks": [
+    {
+     "claim_id": "5741fbcfffdb",
+     "claim": "Van Rijn 1981 bedload: TRANS=max((TAU-TCRE)/TCRE,0) (Eq21) / DZBL=D50/10000*0.3*DISTAR^0.7*sqrt(TRANS) (Eq20b) / BLVEL=1.5*TRANS^0.6*sqrt((SEDDENS/WATERDENS-1)*980*D50/10000) (Eq20a) (L342-345)",
+     "source_ref": "SedTran-SEDZLJ/s_bedload.f90:147-150",
+     "mismatch": false,
+     "note": ":147 TRANS eqn.21 / :148 DZBL eqn.20b (계수 0.3·지수 0.7) / :150 BLVEL eqn.20a (계수 1.5·지수 0.6·980·/10000) 정확 일치. 노트 미인용인 :149 min(DZBL,HPCM) clamp 는 누락이지 오기 아님."
+    }
+   ],
+   "value_mismatches": 0,
+   "source_unavailable": 0,
+   "has_source_needed": true,
+   "proposals": [
+    {
+     "old_string": "`TACTM` = active-layer thickness multiplier (보통 2~10), `D50AVG` = bed-surface 평균 입경 (μm), `BULKDENS` = 건조밀도 (g/cm³).",
+     "new_string": "`TACTM` = active-layer thickness multiplier (보통 2~10 <!-- source-needed: 범위 근거 미인용 -->), `D50AVG` = bed-surface 평균 입경 (μm), `BULKDENS` = 건조밀도 (g/cm³).",
+     "rationale": "disclosed 갭 전환: TACTM typical 범위에 source-needed 콜아웃 부착 (G9b)."
+    },
+    {
+     "old_string": "citation_status: verified",
+     "new_string": "citation_status: verified\nhas_source_needed: true",
+     "rationale": "G9e: 콜아웃 부착 시 disclosed 갭 보유 — frontmatter 플래그 부재 정규화."
+    }
+   ]
+  },
+  {
+   "path": "models/EFDC/web-refs/efdc-official-resources.md",
+   "blob_sha": "d082cfbe90cf1db637c239c870a873559d89e22f",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 25,
+   "opinion": 6,
+   "unsourced": [],
+   "value_checks": [],
+   "value_mismatches": 0,
+   "source_unavailable": 0,
+   "has_source_needed": false,
+   "proposals": []
+  },
+  {
+   "path": "models/FUNWAVE/manual-notes/funwave-tvd-manual.md",
+   "blob_sha": "749e3a7dd8ffc90c2224e0ab796ebd7a43749a6b",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 12,
+   "opinion": 4,
+   "unsourced": [],
+   "value_checks": [],
+   "value_mismatches": 0,
+   "source_unavailable": 0,
+   "has_source_needed": false,
+   "proposals": []
+  },
+  {
+   "path": "models/FUNWAVE/manual-notes/funwave-user-manual-full.md",
+   "blob_sha": "2afe7830677a976b97460a4308104bec675b1568",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 80,
+   "opinion": 5,
+   "unsourced": [],
+   "value_checks": [
+    {
+     "claim_id": "4da22eaa4dee",
+     "claim": "기준면 zα = -h + βH: ζ=-0.53, β=0.47; Nwogu(1993) α=-0.39 (zα=-0.53h)가 0≤kh≤π 위상속도 최대오차 최소화 (L64-65)",
+     "source_ref": "funwave_tvd_3.0.pdf p.16 (raw/manuals/funwave_tvd_3.0.md:323-327)",
+     "mismatch": false,
+     "note": "변환본 :327 'ζ = −0.53 as in Nwogu (1993) and β = 1 + ζ = 0.47' + :323 'α = −0.39, corresponding to zα = −0.53h, minimizes the maximum error in wave phase speed 0 ≤ kh ≤ π' — 계수·근거 정확 일치. 입력 Beta ref=-0.531(:1602)과의 구분도 노트가 올바르게 재현."
+    }
+   ],
+   "value_mismatches": 0,
+   "source_unavailable": 0,
+   "has_source_needed": false,
+   "proposals": []
+  },
+  {
+   "path": "models/FUNWAVE/manual-notes/funwave-validation-cases.md",
+   "blob_sha": "d15e5bc79059240bc951ffa7e8f19be706c8740c",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 30,
+   "opinion": 8,
+   "unsourced": [],
+   "value_checks": [],
+   "value_mismatches": 0,
+   "source_unavailable": 0,
+   "has_source_needed": true,
+   "proposals": [
+    {
+     "old_string": "citation_status: verified",
+     "new_string": "citation_status: verified\nhas_source_needed: true",
+     "rationale": "G9e: §4 메모의 disclosed 갭(⚠ 미확인 plot 라벨·BM 번호 체계 source-needed) 보유 — frontmatter 플래그 부재 정규화."
+    }
+   ]
+  }
+ ]
+}

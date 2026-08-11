@@ -1,0 +1,104 @@
+diff --git a/models/EFDC/source-analysis/efdc_wetdry.md b/models/EFDC/source-analysis/efdc_wetdry.md
+--- a/models/EFDC/source-analysis/efdc_wetdry.md
++++ b/models/EFDC/source-analysis/efdc_wetdry.md
+@@ -3,6 +3,7 @@
+ topic: general
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "EFDC source code 직접 분석 (models/EFDC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/efdc_wetdry.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
+ note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
+ note_date: 2026-04~05 (original) / 2026-05-23 (promote)
+@@ -133,7 +134,7 @@
+ 
+ | Domain feature | Setting |
+ |---|---|
+-| Tidal flats with regular wet/dry | `ISDRY=99`, `HDRY=0.05–0.1 m`, `NDRYSTP=10–50` |
++| Tidal flats with regular wet/dry | `ISDRY=99`, `HDRY=0.05–0.1 m`, `NDRYSTP=10–50` <!-- source-needed: 권장 수치범위 출처 미인용 --> |
+ | Stable shoreline, no real drying | `ISDRY=1` (basic), default `NDRYSTP=50` |
+ | Rigid-lid (atmospheric pressure forcing only) | `ISDRY=-1` |
+ | Many isolated puddles producing `VDWASTE` warnings | Increase `NDRYSTP`, raise `HDRY`, or check bathymetry for unrealistic dimples |
+@@ -143,7 +144,7 @@
+ 
+ ## Working Rules
+ 
+-- `HDRY` should be larger than your typical free-surface noise (~3-5x). Too small → constant flicker; too large → too aggressive drying.
++- `HDRY` should be larger than your typical free-surface noise (~3-5x). Too small → constant flicker; too large → too aggressive drying. <!-- source-needed: 3-5x 배수·거동 근거 미인용 -->
+ - The 500-iteration cap on wet/dry pressure solve is essentially conservation insurance; if you see warnings, the cell is in a numerically pathological state — usually fix bathymetry, not the cap.
+ - `ISDRY=99` is the production choice for tidal flats. Other modes are mostly legacy.
+ - `NDRYSTP` should be 10–50 timesteps; too small → spurious drainage of marginal cells; too large → permanent puddles.
+@@ -153,12 +154,12 @@
+ ## Common Pitfalls
+ 
+ - ▢ Setting `HWET` thinking it's the rewetting threshold — it controls **withdrawals/structures only**.
+-- ▢ Setting `HDRY < HWET` violates the model's assumption (`HWET` should always be >= `HDRY`).
++- ▢ Setting `HDRY < HWET` violates the model's assumption (`HWET` should always be >= `HDRY`). <!-- source-needed: HWET≥HDRY 제약의 소스·매뉴얼 근거 미인용 -->
+ - ▢ Forgetting `NDRYSTP` — default applied; isolated cells drain silently to `0.9*HDRY` and water is removed (visible only as `VDWASTE`).
+ - ▢ Using `ISDRY=1` (basic) for tidal flats — you'll see hysteresis as cells dry but won't rewet on the flood. Use `ISDRY=99`.
+ - ▢ Rigid lid (`ISDRY=-1`) with hot-start that had wetting/drying active — face mask states diverge.
+ - ▢ Subgrid channels with bathymetry where neither side stays wet at low tide — channel flips off silently; expected channel flow not produced.
+-- ▢ MPI runs: `LMASKDRY` needs ghost-cell sync; if turbulence/sediment output looks wrong at subdomain boundaries, verify the wet/dry exchange step.
++- ▢ MPI runs: `LMASKDRY` needs ghost-cell sync; if turbulence/sediment output looks wrong at subdomain boundaries, verify the wet/dry exchange step. <!-- source-needed: MPI 교환 경로 인용 미보강 -->
+ 
+ ## Next expansion
+ 
+diff --git a/models/EFDC/source-analysis/sediment/efdc_sediment.md b/models/EFDC/source-analysis/sediment/efdc_sediment.md
+--- a/models/EFDC/source-analysis/sediment/efdc_sediment.md
++++ b/models/EFDC/source-analysis/sediment/efdc_sediment.md
+@@ -3,6 +3,7 @@
+ topic: sediment-transport
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "EFDC source code 직접 분석 (models/EFDC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/efdc_sediment.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
+ note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
+ note_date: 2026-04~05 (original) / 2026-05-23 (promote)
+@@ -224,7 +225,7 @@
+ 
+ - SEDZLJ requires `LSEDZLJ=.TRUE.` in input AND `ISTRAN(6)>=1`. Setting only one is silent failure.
+ - `D50` per size class drives both critical shear and settling — populate carefully.
+-- Original cohesive has a fixed bed model (`KB=1` is common); SEDZLJ supports many bed layers (typical 5–10).
++- Original cohesive has a fixed bed model (`KB=1` is common); SEDZLJ supports many bed layers (typical 5–10). <!-- source-needed: KB 관행값·층수 범위 근거 미인용 -->
+ - Wave-current shear: SEDZLJ's Christoffersen-Jonsson is the only realistic option for wave-action coastlines. Original `QQ/CTURB2` works for purely current-driven cases.
+ - Watch `TAU(L)` time series at validation stations — this is the bottom shear actually driving sediment (for SEDZLJ).
+ - Hard-bottom cells (no erodible material) need `IBEDH(L,K)=1` flagged; without that, both modules will erode through "rock."
+@@ -234,7 +235,7 @@
+ 
+ - ▢ Setting `LSEDZLJ=.TRUE.` and also expecting Original cohesive parameters (TAURS etc.) to apply — they don't; SEDZLJ has its own input cards.
+ - ▢ Reading `ISTRAN(7)` setting in output for SEDZLJ — it gets disabled; check `LSEDZLJ` instead.
+-- ▢ Original module + waves without `caltbxy` wave-BBL — bottom shear underestimated by 30-50%.
++- ▢ Original module + waves without `caltbxy` wave-BBL — bottom shear underestimated by 30-50%. <!-- source-needed: 30-50% 정량치 근거 미인용 -->
+ - ▢ SEDZLJ run with `TAUCOR` (cohesive critical shear) too high for fine sand fractions — non-erosion (no transport at typical events).
+ - ▢ Forgetting `SED` constituent ramp `NTSCR6` — sediment concentrations spike at startup.
+ - ▢ Bed thickness `HBED` going negative — check `LAYERACTIVE` consistency; may need full restart.
+diff --git a/models/EFDC/source-analysis/sediment/efdc_sedzlj.md b/models/EFDC/source-analysis/sediment/efdc_sedzlj.md
+--- a/models/EFDC/source-analysis/sediment/efdc_sedzlj.md
++++ b/models/EFDC/source-analysis/sediment/efdc_sedzlj.md
+@@ -3,6 +3,7 @@
+ topic: sediment-transport
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "EFDC+ Stable raw source 직접 read (models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/SedTran-SEDZLJ/), Card C36 매뉴얼 페이지 (models/EFDC/raw/manuals/confluence/spaces/ECIG/.../Card_Image_36.md) 직접 인용. Theory v12 §6.4 SEDZLJ cross-ref (manual-notes/efdc-theory-doc-v12.md:136), legacy 비교는 efdc-sediment-theory-2003.md."
+ note_author: "Claude Opus 4.7 (1M context) source-code 직접 read"
+ note_date: 2026-05-28
+@@ -130,7 +131,7 @@
+ endif
+ ```
+ 
+-`TACTM` = active-layer thickness multiplier (보통 2~10), `D50AVG` = bed-surface 평균 입경 (μm), `BULKDENS` = 건조밀도 (g/cm³).
++`TACTM` = active-layer thickness multiplier (보통 2~10 <!-- source-needed: 범위 근거 미인용 -->), `D50AVG` = bed-surface 평균 입경 (μm), `BULKDENS` = 건조밀도 (g/cm³).
+ 
+ ### 2.5 TAUCRIT (critical shear) 보간
+ 
+diff --git a/models/FUNWAVE/manual-notes/funwave-validation-cases.md b/models/FUNWAVE/manual-notes/funwave-validation-cases.md
+--- a/models/FUNWAVE/manual-notes/funwave-validation-cases.md
++++ b/models/FUNWAVE/manual-notes/funwave-validation-cases.md
+@@ -4,6 +4,7 @@
+ doc: "FUNWAVE-TVD 소스트리 benchmarks/·simple_cases/ 1페이지 검증 plot PDF (raw/source_code/FUNWAVE-TVD/), funwave_tvd_2.1_manual.pdf §5"
+ canonical_source: manual
+ citation_status: verified
++has_source_needed: true
+ verification_method: "raw/source_code/FUNWAVE-TVD 트리 35개 PDF를 find/ls 로 전수 열거 후, 대표 검증 plot 17개를 pdftotext 로 직접 추출해 plot 제목·축 라벨·범례(FUNWAVE/ANALYTICAL/EXPERIMENT/Measured data, NRMSD 값) 인용. 케이스 식별은 (a) plotter .m 파일명(BM5_A_Plotter.m, BM7_loader.m)과 (b) funwave_tvd_2.1_manual.pdf line-grep(§5.1~5.6 목차·본문 line 2813/3918/4083 등 Briggs·Synolakis·Berkhoff·Mase&Kirby 출처)로 교차확인. simple_cases morpho/rip 디렉토리는 ls 로 vessel*/ 입력 존재 확인."
+ note_author: "Claude Opus 4.8 (1M context)"
+ note_date: 2026-06-18
