@@ -1,0 +1,20 @@
+diff --git a/models/FUNWAVE/source-analysis/funwave-build-and-blackwell-port.md b/models/FUNWAVE/source-analysis/funwave-build-and-blackwell-port.md
+--- a/models/FUNWAVE/source-analysis/funwave-build-and-blackwell-port.md
++++ b/models/FUNWAVE/source-analysis/funwave-build-and-blackwell-port.md
+@@ -3,6 +3,7 @@
+ model: FUNWAVE
+ citation_status: verified
+ verification_method: "본 위키 WSL2(Ubuntu 24.04)에서 직접 clone·빌드·실행 (2026-06-12). 소스 = models/FUNWAVE/raw/source_code/{FUNWAVE-TVD, FUNWAVE-GPU}/ (gitignore, 로컬). 컴파일러·실행 로그 직접 확인."
++has_source_needed: true
+ note_author: "Claude Opus 4.8 (1M context)"
+ note_date: 2026-06-12
+ ---
+@@ -35,7 +36,7 @@
+ 
+ ### 3.1 ★ 핵심 수정 — cuSPARSE 옛 API 제거 대응 (CUDA 12+/Blackwell)
+ 
+-논문의 **batched tridiagonal solver**가 `cusparseSgtsvStridedBatch` 호출 → **CUDA 12.0에서 제거**됨(Blackwell은 CUDA 12.8+ 필수 → 옛 API로 회귀 불가). **v2 API로 이식**:
++논문의 **batched tridiagonal solver**가 `cusparseSgtsvStridedBatch` 호출 → **CUDA 12.0에서 제거**됨(Blackwell은 CUDA 12.8+ 필수 → 옛 API로 회귀 불가). <!-- source-needed: gtsv v1 제거 버전·Blackwell CUDA 최소버전은 NVIDIA cuSPARSE 릴리스노트/CUDA 문서 인용 필요 (직접 관찰은 'CUDA 13.1에 심볼 부재'까지만) --> **v2 API로 이식**:
+ 
+ - `cusparseSgtsvStridedBatch(h,m,dl,d,du,x,bc,bs)` → **`cusparseSgtsv2StridedBatch(h,m,dl,d,du,x,bc,bs, pBuffer)`** + 사전 `cusparseSgtsv2StridedBatch_bufferSizeExt(...,bufsize)` 로 work buffer 크기 조회.
+ - NVHPC `cusparse` 모듈 인터페이스(`compilers/src/cusparse.f90:7380,7328`): `pBuffer = character*1, device :: pBuffer(*)` (`!dir$ ignore_tkr`) → **device 배열 직접 전달**(c_loc 불필요), `pBufferSizeInBytes = integer(8)`.
