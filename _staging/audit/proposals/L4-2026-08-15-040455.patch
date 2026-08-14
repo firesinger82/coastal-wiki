@@ -1,0 +1,21 @@
+diff --git a/models/LISFLOOD-FP/source-analysis/lisflood-fp-architecture-source-map.md b/models/LISFLOOD-FP/source-analysis/lisflood-fp-architecture-source-map.md
+--- a/models/LISFLOOD-FP/source-analysis/lisflood-fp-architecture-source-map.md
++++ b/models/LISFLOOD-FP/source-analysis/lisflood-fp-architecture-source-map.md
+@@ -57,7 +57,7 @@
+ | 파일 | 솔버 |
+ |---|---|
+ | `swe/fv1.cpp` | **FV1** — 1차 Godunov 유한체적 (full 2D SWE, shock-capturing) |
+-| `swe/dg2.cpp`·`dg2new.cpp` | **DG2** — 2차 Discontinuous Galerkin. **dg2new = multiwavelet 적응**(v8.2 headline: dynamic resolution adaptivity) |
++| `swe/dg2.cpp`·`dg2new.cpp` | **DG2** — 2차 Discontinuous Galerkin. ~~dg2new = multiwavelet~~ → **비가동 균일격자 CPU 리팩터**(dispatch 주석 lisflood.cpp:784, BC 미완 dg2new.cpp:300·350; multiwavelet 적응 실구현은 `cuda/adaptive/` — [[lisflood-fp-swe-fv1-dg2]] §7 정정) |
+ | `swe/hll.cpp` | **HLL** Riemann flux (FV1/DG2 공용 numerical flux) |
+ | `swe/flux.cpp`·`fields.cpp` | flux·필드 자료구조 |
+ | `swe/boundary/input/output/stats` | swe 전용 경계·IO·통계 |
+@@ -79,7 +79,7 @@
+ ## 4. 후속 deep-dive 후보
+ 
+ - `fp_acc.cpp` — ACC local-inertia 이산화(Bates 2010 식) line-by-line
+-- `swe/dg2new.cpp` — DG2 multiwavelet 적응 격자(v8.2 핵심, Kesserwani)
++- `cuda/adaptive/` — multiwavelet 적응격자 HWFV1/MWDG2(v8.2 핵심, Kesserwani) — [[lisflood-fp-mwdg2-adaptive-mra]] 로 완료(~~dg2new~~ 는 비가동 리팩터, [[lisflood-fp-swe-fv1-dg2]] §7)
+ - `swe/hll.cpp` — HLL Riemann flux
+ - `sgc.cpp` — sub-grid channel(SGC) 처리
+ - `cuda/acc_nugrid` — GPU 비균일격자 동적 해상도
