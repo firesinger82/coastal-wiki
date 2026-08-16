@@ -1,0 +1,106 @@
+diff --git a/models/ROMS/source-analysis/roms_4dvar.md b/models/ROMS/source-analysis/roms_4dvar.md
+--- a/models/ROMS/source-analysis/roms_4dvar.md
++++ b/models/ROMS/source-analysis/roms_4dvar.md
+@@ -3,6 +3,7 @@
+ topic: general
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "ROMS source code 직접 분석 (models/ROMS/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/roms_4dvar.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시. §I 추가 (2026-05-28): PR #75 첨부 `multi_scale_B_v1.pdf` (15p) 직접 fetch + 본문 인용 — Matérn correlation eq (1) / weighted sum eq (2) / implicit diffusion eq (3)(4) / Daley length scale 관계 / `s4dvar.in` 7개 신규 parameter (Nscale·Mlap·Bwgt·HdecayMX/MY/IX/IY/FX/FY·HdecayB·NiterCG·NiterCI) / CG+CI 솔버 워크플로 / WC13 results (Fig 1-11). 7개 multiscale_* 파일 algorithm 매핑은 PDF + web-refs §8.1 GitHub API 직접 fetch 기반."
+ note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23 + §I 작성 2026-05-28"
+ note_date: 2026-04~05 (original) / 2026-05-23 (promote) / 2026-05-28 (§I 추가)
+@@ -379,10 +380,10 @@
+ ## Working Rules
+ 
+ - Run a strong-constraint I4DVAR first, even if your target is weak-constraint — it builds the basic-state trajectory and shakes out observation file mistakes cheaply.
+-- Outer loops typically 1–3; inner loops 10–50 (CG iterations). Cost grows linearly with outer × inner.
+-- Always check the cost-function reduction across outer loops. `J_final / J_initial < 0.5` is normal; > 0.95 means the system is not converging (bad B, bad obs, or trivial increment).
+-- Run the TLM-AD pair with the inner-product test at least once after any source change. Asymmetry > 1e-10 in double precision is a bug.
+-- Background covariance correlation lengths: scale-of-eddies in horizontal (10–50 km coastal, 100–300 km open ocean), 50–200 m vertical. Too short ⇒ noisy increments; too long ⇒ smeared.
++- Outer loops typically 1–3; inner loops 10–50 (CG iterations). Cost grows linearly with outer × inner. *(source-needed: 경험적 권장 수치 — 출처 미확보, L4 2026-08-17)*
++- Always check the cost-function reduction across outer loops. `J_final / J_initial < 0.5` is normal; > 0.95 means the system is not converging (bad B, bad obs, or trivial increment). *(source-needed: 경험적 권장 수치 — 출처 미확보, L4 2026-08-17)*
++- Run the TLM-AD pair with the inner-product test at least once after any source change. Asymmetry > 1e-10 in double precision is a bug. *(source-needed: 경험적 권장 수치 — 출처 미확보, L4 2026-08-17)*
++- Background covariance correlation lengths: scale-of-eddies in horizontal (10–50 km coastal, 100–300 km open ocean), 50–200 m vertical. Too short ⇒ noisy increments; too long ⇒ smeared. *(source-needed: 경험적 권장 수치 — 출처 미확보, L4 2026-08-17)*
+ - For weak-constraint, check that model-error covariance `Q` is non-trivial. Default `Q=B` reduces to strong-constraint in disguise.
+ 
+ ## Common Pitfalls
+diff --git a/models/ROMS/source-analysis/roms_4dvar_drivers.md b/models/ROMS/source-analysis/roms_4dvar_drivers.md
+--- a/models/ROMS/source-analysis/roms_4dvar_drivers.md
++++ b/models/ROMS/source-analysis/roms_4dvar_drivers.md
+@@ -4,6 +4,7 @@
+ component: ROMS/Drivers
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "ROMS 소스 직접 read (roms/ROMS/Drivers/). nl/ad/tl/rp_roms.h 헤더, i4dvar.F·rbl4dvar.F·r4dvar.F 모듈 phase 주석+PUBLIC 목록, i4dvar/rbl4dvar/r4dvar_roms.h 헤더, fsv/afte/fte/op/hessian_op/hessian_so/so/so_semi_roms.h + 대응 propagator_*.h 헤더, adsen/optobs/correlation/array_modes/pert/picard/symmetry/tlcheck/jedi_roms.h, split_*_roms.h, obs_sen_*_analysis/forecast.h 를 file:line 인용."
+ note_author: "Claude Opus 4.8 (1M context)"
+ note_date: 2026-06-16
+diff --git a/models/ROMS/source-analysis/roms_adjoint_framework.md b/models/ROMS/source-analysis/roms_adjoint_framework.md
+--- a/models/ROMS/source-analysis/roms_adjoint_framework.md
++++ b/models/ROMS/source-analysis/roms_adjoint_framework.md
+@@ -3,7 +3,8 @@
+ topic: roms
+ canonical_source: self
+ citation_status: verified
+-verification_method: "models/ROMS/raw/source_code/roms/ROMS/ Adjoint/(65 ad_*.F)·Tangent/(54 tl_*.F)·Representer/(39 rp_*.F) + Drivers/(i4dvar_roms.h/r4dvar/rbl4dvar/obs_sen_*/array_modes/picard.h) 직접 ls + ad_step3d_t.F(adjoint tracer transpose 헤더) file:line 인용."
++has_source_needed: true
++verification_method: "models/ROMS/raw/source_code/roms/ROMS/ Adjoint/(65 .F = ad_* 63 + adsen_* 2)·Tangent/(54 tl_*.F)·Representer/(39 rp_*.F) + Drivers/(i4dvar_roms.h/r4dvar/rbl4dvar/obs_sen_*/array_modes/picard.h) 직접 ls + ad_step3d_t.F(adjoint tracer transpose 헤더) file:line 인용."
+ note_author: "Claude Opus 4.8 (1M context) source-code direct read"
+ note_date: 2026-06-04
+ verification_by: "Claude Opus 4.8 (1M context) — NLM/TLM/ADM/RPM + 4dvar driver 구조"
+@@ -30,7 +31,7 @@
+ 
+ - **각 물리 커널마다** 대응: `ad_step2d`/`ad_step3d_t`/`ad_step3d_uv`/`ad_prsgrd`/`ad_rho_eos`/`ad_uv3dmix`… (NL의 prsgrd·rho_eos·advection 모두 손으로 adjoint coding). ad_main2d/3d = adjoint 시간역행 driver.
+ - **exact adjoint**: TLM 의 정확한 수치 transpose(자동미분 아닌 hand-coded) → gradient 가 cost function 과 정확히 일치(검증된 J↔∇J). ROMS DA 정확도의 핵심.
+-- **전소스 커버 방식**: `Adjoint/`(81)·`Tangent/`(70)·`Representer/`(55)의 개별 `ad_*`/`tl_*`/`rp_*` 파일은 **각 NL 커널의 1:1 transpose** 라 위 패턴으로 **class 특성화**(개별 file 노트는 반복적이라 미작성; NL 물리 자체는 [[roms_baroclinic_3d]]·[[roms_advection]] 등 covered). 단 `Drivers/`의 **GST(stability)·observation sensitivity** 는 별개 기능 → [[roms_stability_gst]].
++- **전소스 커버 방식**: `Adjoint/`(81)·`Tangent/`(70)·`Representer/`(55; `.F`+`.h` 합산)의 개별 `ad_*`/`tl_*`/`rp_*` 파일은 **각 NL 커널의 1:1 transpose** 라 위 패턴으로 **class 특성화**(개별 file 노트는 반복적이라 미작성; NL 물리 자체는 [[roms_baroclinic_3d]]·[[roms_advection]] 등 covered). 단 `Drivers/`의 **GST(stability)·observation sensitivity** 는 별개 기능 → [[roms_stability_gst]].
+ 
+ ## 2. 변분 driver (Drivers/) — 3 방법
+ 
+@@ -56,8 +57,8 @@
+ | **Delft3D** | **OpenDA**(외부, black-box) — EnKF/DUD ensemble·calibration | `third_party_open/openda` ([[delft3d_dflowfm_kernel_scheme]] BMI) |
+ | **XBeach** | **OpenDA**(BMI interface, [[xbeach_infrastructure]] §7) + Beach Wizard(관측 동화 bathymetry [[xbeach_beachwizard]]) | black-box ensemble |
+ | **ADCIRC** | **외부 ensemble**(ASGS, **built-in DA/adjoint 전무**) — Kalman/ensemble surge 는 외부 wrapper | src/ 55 .F 중 adjoint/variational/ensemble 0개(2026-06-10 전수 확인). `thirdparty/wgrib2/Ensemble.c`는 GRIB2 유틸(무관) |
+-| **SWAN** | 외부(없음, native DA 부재) | — |
+-| **EFDC** | 외부(없음) | — |
++| **SWAN** | 외부(없음, native DA 부재) | source-needed (전수감사 결과 인용 필요) |
++| **EFDC** | 외부(없음) | source-needed (전수감사 결과 인용 필요) |
+ 
+ → **ROMS 만 native exact-adjoint 변분 DA**(가장 강력·검증). 나머지는 OpenDA black-box ensemble(adjoint 불필요, 모델 수정 없이 결합) 또는 외부. coastal surge(ADCIRC)·wave(SWAN)는 주로 ensemble/통계.
+ 
+diff --git a/models/ROMS/source-analysis/roms_adjoint_model.md b/models/ROMS/source-analysis/roms_adjoint_model.md
+--- a/models/ROMS/source-analysis/roms_adjoint_model.md
++++ b/models/ROMS/source-analysis/roms_adjoint_model.md
+@@ -4,6 +4,7 @@
+ component: ROMS/Adjoint
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "ROMS 소스 직접 read (roms/ROMS/Adjoint/). ad_main3d.F 역방향 driver 루프, ad_rhs3d.F 의 adjoint RHS 연산 구조(Coriolis 블록 verbatim), ad_step3d_t.F corrector/spline adjoint, ad_pre_step3d.F·ad_prsgrd.F·ad_omega.F·ad_t3dmix.F·ad_uv3dmix.F dispatch 를 file:line 인용"
+ note_author: "Claude Opus 4.8 (1M context)"
+ note_date: 2026-06-16
+diff --git a/models/ROMS/source-analysis/roms_advection.md b/models/ROMS/source-analysis/roms_advection.md
+--- a/models/ROMS/source-analysis/roms_advection.md
++++ b/models/ROMS/source-analysis/roms_advection.md
+@@ -3,6 +3,7 @@
+ topic: general
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "ROMS source code 직접 분석 (models/ROMS/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/roms_advection.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
+ note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
+ note_date: 2026-04~05 (original) / 2026-05-23 (promote)
+@@ -114,10 +115,10 @@
+ ## Working Rules
+ 
+ - Always set `Hadvection` and `Vadvection` per tracer in input — defaults can vary by code version.
+-- HSIMT cost: ~25% over UPSTREAM3 in typical configs. Worth it for any positive-definite tracer.
++- HSIMT cost: ~25% over UPSTREAM3 in typical configs. Worth it for any positive-definite tracer. *(source-needed: 경험적 권장 수치 — 출처 미확보, L4 2026-08-17)*
+ - MPDATA without `TS_MPDATA_LIMIT` can produce ringing in fronts; turn the limiter on for production runs.
+-- For sigma-coordinate steep-bathy domains, `PJ_GRADPQ4` reduces velocity bias near sharp slopes substantially — pair with smoothed bathymetry (`r_max ≤ 0.2`) for best results.
+-- `obc_in / obc_out` ratio of 100–1000 is normal for nesting boundaries.
++- For sigma-coordinate steep-bathy domains, `PJ_GRADPQ4` reduces velocity bias near sharp slopes substantially — pair with smoothed bathymetry (`r_max ≤ 0.2`) for best results. *(source-needed: 경험적 권장 수치 — 출처 미확보, L4 2026-08-17)*
++- `obc_in / obc_out` ratio of 100–1000 is normal for nesting boundaries. *(source-needed: 경험적 권장 수치 — 출처 미확보, L4 2026-08-17)*
+ - If you see tracer mass drift, check the `Huon/Hvom` correction in `step3d_uv.F:1507-1526` — advection scheme is rarely the cause; barotropic-baroclinic coupling is.
+ 
+ ## Common Pitfalls
