@@ -1,0 +1,177 @@
+diff --git a/models/ROMS/source-analysis/roms_analytical_functionals.md b/models/ROMS/source-analysis/roms_analytical_functionals.md
+--- a/models/ROMS/source-analysis/roms_analytical_functionals.md
++++ b/models/ROMS/source-analysis/roms_analytical_functionals.md
+@@ -42,20 +42,21 @@
+ 
+ | idx | 함수 | idx | 함수 | idx | 함수 |
+ |---|---|---|---|---|---|
+-| 1 | biology | 13 | humid | 27 | tclima |
+-| 2 | initial | 14 | m2clima | 28 | passive |
+-| 3 | btflux | 15 | m2obc | 29 | rain |
+-| 4 | cloud | 16 | m3clima | 30 | drag/respiration |
+-| 5 | dqdsst | 17 | m3obc | 31 | stflux |
+-| 6 | fsobc | 18 | mask | 32 | respiration |
+-| 7 | grid | 19 | psource | 33 | tair |
+-| 8 | hmixcoef/nudgcoef | 20 | sediment | 34 | tobc |
+-| 9 | — | 21 | pair | 35 | vmix |
+-| 10 | — | 22 | spinning | 36 | winds |
+-| 11 | sponge/ssh | 23 | scope | 37 | wwave |
+-| 12 | — | 24 | smflux | 38 | wtype |
++| 1 | biology | 14 | m3obc | 27 | srflux |
++| 2 | drag | 15 | mask | 28 | ssh |
++| 3 | btflux | 16 | nudgcoef | 29 | sss |
++| 4 | cloud | 17 | pair | 30 | respiration/sst |
++| 5 | diag | 18 | passive | 31 | stflux |
++| 6 | fsobc | 19 | perturb | 32 | tair |
++| 7 | grid | 20 | psource | 33 | tclima |
++| 8 | hmixcoef/sponge | 21 | rain | 34 | tobc |
++| 9 | humid | 22 | scope | 35 | vmix |
++| 10 | initial | 23 | sediment | 36 | winds |
++| 11 | m2clima | 24 | smflux | 37 | wwave |
++| 12 | m2obc | 25 | specir | 38 | dqdsst |
++| 13 | m3clima | 26 | spinning | 39 | wtype |
+ 
+-(예: `ana_initial.h:66` `ANANAME(2)`, `ana_grid.h:94`/`:95` `ANANAME(7),(10)`, `ana_smflux.h` `ANANAME(24)`, `ana_tobc.h:48` `ANANAME(34)`, `ana_perturb.h:56` `ANANAME(48)=__FILE__`.) 등록 코드는 `#ifdef DISTRIBUTE` 하 master tile 만 기록 (`ana_btflux.h:39-43`).
++(예: `ana_initial.h:95` `ANANAME(10)`, `ana_grid.h:94` `ANANAME(7)`, `ana_smflux.h:57` `ANANAME(24)`, `ana_tobc.h:48` `ANANAME(34)`, `ana_vegetation.h:56` `ANANAME(48)=__FILE__`.) 등록 코드는 `#ifdef DISTRIBUTE` 하 master tile 만 기록 (`ana_btflux.h:39-43`).
+ 
+ ## 2. 기능별 카탈로그 (무엇을 해석적으로 지정하는가)
+ 
+diff --git a/models/ROMS/source-analysis/roms_atmospheric_forcing.md b/models/ROMS/source-analysis/roms_atmospheric_forcing.md
+--- a/models/ROMS/source-analysis/roms_atmospheric_forcing.md
++++ b/models/ROMS/source-analysis/roms_atmospheric_forcing.md
+@@ -3,6 +3,7 @@
+ topic: general
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "ROMS source code 직접 분석 (models/ROMS/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/roms_atmospheric_forcing.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
+ note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
+ note_date: 2026-04~05 (original) / 2026-05-23 (promote)
+@@ -164,13 +165,13 @@
+ 
+ ## Working Rules
+ 
+-- Bulk inputs typically from atmospheric model (e.g., ERA5, GFS) at 1-3 hour intervals.
++- Bulk inputs typically from atmospheric model (e.g., ERA5, GFS) at 1-3 hour intervals. *(source-needed: 간격 관행 출처 미확인)*
+ - `LONGWAVE_OUT` is more accurate than `LONGWAVE` (Berliand) — use when downwelling longwave available.
+ - COARE iteration count fixed at 3; in tropical/equatorial regions, may want to extend (modify `IterMax`).
+ - For Korean coastal (Yellow Sea, East Sea): Jerlov II or III; output `srflx` to verify magnitude.
+ - Output `lhflx, shflx, lrflx, srflx` separately for energy budget audits.
+-- Cool-skin diurnal cycle visible in `delTc` output; ~0.1-0.3 K typical.
+-- Wind stress typically ~10⁻³ τ for U10=10 m/s; verify magnitudes.
++- Cool-skin diurnal cycle visible in `delTc` output; ~0.1-0.3 K typical. *(source-needed: 수치범위 출처 미확인)*
++- Wind stress typically ~10⁻³ τ for U10=10 m/s; verify magnitudes. *(source-needed: 수치·표기 불명(τ≈10⁻¹ N/m² vs C_d≈10⁻³ 혼동 의심) — 출처 확인 필요)*
+ 
+ ## Common Pitfalls
+ 
+diff --git a/models/ROMS/source-analysis/roms_baroclinic_3d.md b/models/ROMS/source-analysis/roms_baroclinic_3d.md
+--- a/models/ROMS/source-analysis/roms_baroclinic_3d.md
++++ b/models/ROMS/source-analysis/roms_baroclinic_3d.md
+@@ -3,6 +3,7 @@
+ topic: general
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "ROMS source code 직접 분석 (models/ROMS/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/roms_baroclinic_3d.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
+ note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
+ note_date: 2026-04~05 (original) / 2026-05-23 (promote)
+@@ -90,7 +91,7 @@
+ 
+ | Goal | Setting |
+ |---|---|
+-| Resolve thermocline depth | `Vstretching=4`, `theta_s ≈ 7`, `theta_b ≈ 0.4`, `Tcline ≈ depth_of_thermocline` |
++| Resolve thermocline depth | `Vstretching=4`, `theta_s ≈ 7`, `theta_b ≈ 0.4`, `Tcline ≈ depth_of_thermocline` *(source-needed: 권장수치 출처 미확인)* |
+ | Resolve bottom boundary layer | `Vstretching=4` with `theta_b > 1` |
+ | Coastal shallow shelf | `Vtransform=2`, `theta_s=5`, `theta_b=0.4`, `hc=10–50 m` |
+ | Linear stratification test | `NONLIN_EOS` off; set `R0/T0/S0/Tcoef/Scoef` |
+@@ -105,14 +106,14 @@
+ - For shelf/coastal applications, `Vtransform=2` is preferred; the unbounded `hc=Tcline` keeps the surface-following property intact in deep+shallow combined domains.
+ - When using `BULK_FLUXES`, `srflx` is still required separately (penetrating shortwave) — do not assume `bulk_flux` handles solar.
+ - Per-tracer advection choice lets you keep T/S smooth (`UPSTREAM3`) but enforce monotonicity on positive-definite tracers (`HSIMT`) — exploit this.
+-- `OMEGA_IMPLICIT` adds robustness in tidal regimes with thin layers; expect ~10% cost increase but fewer CFL blowups.
++- `OMEGA_IMPLICIT` adds robustness in tidal regimes with thin layers; expect ~10% cost increase but fewer CFL blowups. *(source-needed: ~10% 수치 출처 미확인)*
+ 
+ ## Common Pitfalls
+ 
+ - ▢ Mixing `Vtransform=1` initial conditions with `Vtransform=2` runtime — `Hz` mismatches silently corrupt T/S.
+ - ▢ Setting `theta_s` very high (>10) without proportional vertical resolution — produces unrealistically thin surface layers and timestep restrictions.
+ - ▢ Forgetting to set `srflx` when `BULK_FLUXES` is on — surface heat budget loses penetrating solar.
+-- ▢ Choosing `MPDATA` for T/S in long runs without rotation invariance check — known to introduce small spurious cross-frontal mixing.
++- ▢ Choosing `MPDATA` for T/S in long runs without rotation invariance check — known to introduce small spurious cross-frontal mixing. *(source-needed: 'known to' 문헌 미인용)*
+ - ▢ Linear EOS with realistic forcing — gives unrealistic abyssal stratification; only valid for idealized tests.
+ 
+ ## Next expansion
+diff --git a/models/ROMS/source-analysis/roms_barotropic_2d.md b/models/ROMS/source-analysis/roms_barotropic_2d.md
+--- a/models/ROMS/source-analysis/roms_barotropic_2d.md
++++ b/models/ROMS/source-analysis/roms_barotropic_2d.md
+@@ -3,6 +3,7 @@
+ topic: general
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "ROMS source code 직접 분석 (models/ROMS/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/roms_barotropic_2d.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
+ note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
+ note_date: 2026-04~05 (original) / 2026-05-23 (promote)
+@@ -81,7 +82,7 @@
+ | Question | Answer |
+ |---|---|
+ | 2D-only run? | `NDTFAST=1` (forced) |
+-| 3D coastal, dt~600s | `NDTFAST=20–60`; aim for ~`dt/NDTFAST ≤ 0.5*Δx/√(g·Hmax)` then halve |
++| 3D coastal, dt~600s | `NDTFAST=20–60`; aim for ~`dt/NDTFAST ≤ 0.5*Δx/√(g·Hmax)` then halve *(source-needed: 계수·범위 출처 미확인)* |
+ | Seeing barotropic noise / ringing? | Increase `NDTFAST` first; only switch scheme if noise persists with `NDTFAST=60+` |
+ | Tracer conservation drift? | Verify `Huon/Hvom` correction is happening (debug `step3d_uv.F:1507-1526`); not an `NDTFAST` issue |
+ | Nesting transport mismatch? | Confirm `DU_avg1/DV_avg1/Zt_avg` are exchanged at `n2dfx` step |
+@@ -89,7 +90,7 @@
+ 
+ ## Working Rules
+ 
+-- Set `NDTFAST` so `dtfast` resolves the fastest gravity wave by 4–8 substeps, then add margin: `NDTFAST = ceil(dt * sqrt(g*Hmax) / (0.4 * dx_min))`.
++- Set `NDTFAST` so `dtfast` resolves the fastest gravity wave by 4–8 substeps, then add margin: `NDTFAST = ceil(dt * sqrt(g*Hmax) / (0.4 * dx_min))`. *(source-needed: 계수 0.4 휴리스틱 출처 미확인)*
+ - Do **not** assume `nfast == NDTFAST`. Trust the filter; the actual averaging window from `set_weights.F` may be 1.5–2× `NDTFAST`.
+ - Watch `Zt_avg1` and `DU_avg1` diagnostics in tile output: if they drift relative to `zeta`/`ubar` snapshots, the 2D filter is under-resolved.
+ - For nesting, parent and child must use compatible `NDTFAST` so exchanged averages line up in time. Telescoping nests need `RefineSteps` to align with `nfast`.
+@@ -98,7 +99,7 @@
+ 
+ - ▢ Setting `NDTFAST=1` "to speed things up" — corrupts the filter; kills mass conservation.
+ - ▢ Choosing `Flather` on a closed coast — radiation-condition assumes an open boundary; results in artificial drainage.
+-- ▢ Long runs with steady winds and low `NDTFAST` show slow barotropic drift; symptom is `zeta` mean creeping. Cure is filter, not boundary.
++- ▢ Long runs with steady winds and low `NDTFAST` show slow barotropic drift; symptom is `zeta` mean creeping. Cure is filter, not boundary. *(source-needed: 거동 관찰 출처 미확인 — experience/ 이동 후보)*
+ - ▢ Tracer mass loss after restart suggests the mass-flux correction is being short-circuited (e.g., turning off `MASKING` or modifying `Huon` outside `step3d_uv.F`).
+ 
+ ## Next expansion
+diff --git a/models/ROMS/source-analysis/roms_bulk_flux_coare.md b/models/ROMS/source-analysis/roms_bulk_flux_coare.md
+--- a/models/ROMS/source-analysis/roms_bulk_flux_coare.md
++++ b/models/ROMS/source-analysis/roms_bulk_flux_coare.md
+@@ -3,6 +3,7 @@
+ topic: roms-bulk-flux-coare
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/bulk_flux.F 직접 read (head 50 lines, 1623 total lines, MODULE bulk_flux_mod under BULK_FLUXES CPP option, Copyright Hernan Arango 2002-2026). 인용 paper 8 개 (Fairall 1996·2003 COARE, Liu-Katsaros-Businger 1979, Taylor-Yelland 2001, Oost 2002, Drennan 2003, Edson 2013) Fortran header 주석에서 직접 추출."
+ note_author: "Claude Opus 4.7 (1M context)"
+ note_date: 2026-05-24
+@@ -110,16 +111,17 @@
+ | `SPECIFIC_HUMIDITY` | Qair = specific humidity (vs relative humidity) |
+ | Wave-roughness sub-options | Taylor-Yelland·Oost·Drennan 활성 (cppdefs §8) |
+ 
+-→ 운영 결정 — KOOS-EJS 류는 보통 `BULK_FLUXES + LONGWAVE_OUT + EMINUSP + COOL_SKIN` 활성.
++→ 운영 결정 — KOOS-EJS 류는 보통 `BULK_FLUXES + LONGWAVE_OUT + EMINUSP + COOL_SKIN` 활성. *(source-needed: 운영 관행 근거 미인용 — experience/ 이동 검토)*
+ 
+ ## 7. 사용 흐름 (main3d 호출 순서)
+ 
+-`main3d.F` baroclinic loop 매 step:
+-1. **NetCDF 외부 forcing read** (Tair·Pair·Qair·wind 등)
+-2. **bulk_flux.F 호출** → sustr/svstr/shflux/ssflux 계산
+-3. **운동량 surface BC 적용** (Nonlinear/u3dbc, v3dbc 등)
+-4. **Tracer surface BC 적용** (Nonlinear/t3dbc)
+-5. 다음 step
++`main3d.F` baroclinic loop 매 step (`main3d.F:446-454` 실측):
++1. **외부 forcing read·보간** (`get_data`/`set_data` — Tair·Pair·Qair·wind 등)
++2. **bulk_flux 호출** (`main3d.F:446-448`) → 표면 응력·열플럭스 계산
++3. **`set_vbc` 호출** (`main3d.F:454`) — 계산된 플럭스를 연직 경계조건(surface/bottom BC)으로 적용
++4. 다음 step
++
++(주: `u3dbc`/`v3dbc`/`t3dbc` 는 측면 개경계(OBC) 루틴 — 표면 BC 적용 경로 아님.)
+ 
+ ## 8. 본 위키 cross-ref
+ 

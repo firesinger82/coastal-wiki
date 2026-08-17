@@ -1,0 +1,310 @@
+{
+ "date": "2026-08-18",
+ "findings": [
+  {
+   "path": "models/ROMS/source-analysis/roms_analytical_functionals.md",
+   "blob_sha": "1db2d8547a36475a84281f57ac3b2508e69db98f",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 55,
+   "opinion": 3,
+   "has_source_needed": false,
+   "unsourced": [
+    {
+     "line": 43,
+     "text": "ANANAME 인덱스 고정 매핑 표 (idx 1-38) 및 L58 예시 인용 3건 — sourced 형식이나 값 오전사 (VALUE-MISMATCH 집계 1건)",
+     "reason": "VALUE-MISMATCH: 실측 매핑과 대량 불일치 — 표 idx 2=initial(실제 drag), 5=dqdsst(실제 diag), 9/10/12='—'(실제 humid/initial/m2obc), 13-23 전부 offset, 19=psource(실제 perturb, psource=20), 38=wtype(실제 dqdsst, wtype=39). 예시 인용도 오귀속: ana_initial.h:66 ANANAME(2)→실제 :95 ANANAME(10) / ana_grid.h:95 ANANAME(10)→ana_grid 는 :94 ANANAME(7) 단독 / ana_perturb.h:56 ANANAME(48)→실제 :125 ANANAME(19), ANANAME(48)=__FILE__ 은 ana_vegetation.h:56 소재(동일 라인번호·타 파일 오귀속). 일치분: 1 biology·3 btflux·4 cloud·6 fsobc·7 grid·24 smflux·34 tobc·35 vmix·36 winds·37 wwave.",
+     "adversary": "재확인: 버전 드리프트 가설 검토 — 동일 노트의 ana_tobc.h:48(34)·ana_smflux(24)·ana_grid.h:94(7)는 현 트리와 일치 → 같은 트리 대상 작성, 전사 오류로 판정. 전 ana_*.h grep 전수 재실행으로 확정. refute 실패 → VALUE-MISMATCH confirmed"
+    }
+   ],
+   "value_checks": [
+    {
+     "claim_id": "e3a5ff493818",
+     "claim": "L43-58: ANANAME 인덱스 표(idx 1-38) + 예시 인용(ana_initial.h:66 ANANAME(2)·ana_grid.h:95 ANANAME(10)·ana_perturb.h:56 ANANAME(48))",
+     "source_ref": "raw/source_code/roms/ROMS/Functionals/*.h grep ANANAME 전수",
+     "mismatch": true,
+     "note": "❌ 상세는 unsourced 집계 참조. 부수검증: '42개 .h'(L17)=실측 42 ✓. 표본선정: 접근가능 수치·라인번호 sourced 단언 모집단≈41(전건 ledger 미검사→미검사 우선), min(3,·)=3건, run seed=L4-2026-08-18-manual"
+    }
+   ],
+   "value_mismatches": 1,
+   "proposals": [
+    {
+     "old_string": "| idx | 함수 | idx | 함수 | idx | 함수 |\n|---|---|---|---|---|---|\n| 1 | biology | 13 | humid | 27 | tclima |\n| 2 | initial | 14 | m2clima | 28 | passive |\n| 3 | btflux | 15 | m2obc | 29 | rain |\n| 4 | cloud | 16 | m3clima | 30 | drag/respiration |\n| 5 | dqdsst | 17 | m3obc | 31 | stflux |\n| 6 | fsobc | 18 | mask | 32 | respiration |\n| 7 | grid | 19 | psource | 33 | tair |\n| 8 | hmixcoef/nudgcoef | 20 | sediment | 34 | tobc |\n| 9 | — | 21 | pair | 35 | vmix |\n| 10 | — | 22 | spinning | 36 | winds |\n| 11 | sponge/ssh | 23 | scope | 37 | wwave |\n| 12 | — | 24 | smflux | 38 | wtype |",
+     "new_string": "| idx | 함수 | idx | 함수 | idx | 함수 |\n|---|---|---|---|---|---|\n| 1 | biology | 14 | m3obc | 27 | srflux |\n| 2 | drag | 15 | mask | 28 | ssh |\n| 3 | btflux | 16 | nudgcoef | 29 | sss |\n| 4 | cloud | 17 | pair | 30 | respiration/sst |\n| 5 | diag | 18 | passive | 31 | stflux |\n| 6 | fsobc | 19 | perturb | 32 | tair |\n| 7 | grid | 20 | psource | 33 | tclima |\n| 8 | hmixcoef/sponge | 21 | rain | 34 | tobc |\n| 9 | humid | 22 | scope | 35 | vmix |\n| 10 | initial | 23 | sediment | 36 | winds |\n| 11 | m2clima | 24 | smflux | 37 | wwave |\n| 12 | m2obc | 25 | specir | 38 | dqdsst |\n| 13 | m3clima | 26 | spinning | 39 | wtype |",
+     "rationale": "ANANAME 표 오전사 정정 — 2026-08-18 전 ana_*.h grep 실측 매핑으로 교체 (idx 8=hmixcoef·sponge 중복, 30=respiration·sst 중복, 48=vegetation 은 예시문 반영)"
+    },
+    {
+     "old_string": "(예: `ana_initial.h:66` `ANANAME(2)`, `ana_grid.h:94`/`:95` `ANANAME(7),(10)`, `ana_smflux.h` `ANANAME(24)`, `ana_tobc.h:48` `ANANAME(34)`, `ana_perturb.h:56` `ANANAME(48)=__FILE__`.)",
+     "new_string": "(예: `ana_initial.h:95` `ANANAME(10)`, `ana_grid.h:94` `ANANAME(7)`, `ana_smflux.h:57` `ANANAME(24)`, `ana_tobc.h:48` `ANANAME(34)`, `ana_vegetation.h:56` `ANANAME(48)=__FILE__`.)",
+     "rationale": "예시 인용 오귀속 정정 — ana_initial 등록은 :95 (10), ana_grid 는 :94 (7) 단독, ANANAME(48)은 ana_perturb 아닌 ana_vegetation.h:56"
+    }
+   ]
+  },
+  {
+   "path": "models/ROMS/source-analysis/roms_atmospheric_forcing.md",
+   "blob_sha": "33877576db1073ddfa654534ad6a4794fa7e78fc",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 48,
+   "opinion": 14,
+   "has_source_needed": true,
+   "unsourced": [
+    {
+     "line": 167,
+     "text": "Bulk inputs typically from atmospheric model (e.g., ERA5, GFS) at 1-3 hour intervals.",
+     "reason": "1-3시간 간격 typical 관행 수치 단언 — Source basis(코드 file:line)·References(페이지 없는 generic) 어디에도 없음. Working Rules 절 무인용.",
+     "adversary": "refute 시도: bulk_flux.F·get_data.F 주석에서 'hour|interval' grep — 부재. refute 실패 → confirmed"
+    },
+    {
+     "line": 172,
+     "text": "Cool-skin diurnal cycle visible in delTc output; ~0.1-0.3 K typical.",
+     "reason": "~0.1-0.3 K 수치범위 단언 — 출처 0. References 의 Fairall 1996 은 페이지 없는 generic (08-17 선례: generic ref 는 수치범위 미커버).",
+     "adversary": "refute 시도: bulk_flux.F 에서 '0.1|0.3 K' grep — 부재. refute 실패 → confirmed"
+    },
+    {
+     "line": 173,
+     "text": "Wind stress typically ~10⁻³ τ for U10=10 m/s; verify magnitudes.",
+     "reason": "수치 단언인데 표기 자체가 불명(τ~10⁻¹ N/m² 와 C_d~10⁻³ 혼동 의심) + 출처 0.",
+     "adversary": "refute 시도: bulk_flux.F 에서 '1.0E-3|Cd' 주석 확인 — 해당 typical 값 서술 부재. refute 실패 → confirmed"
+    }
+   ],
+   "source_unavailable": 1,
+   "value_checks": [],
+   "proposals": [
+    {
+     "old_string": "- Bulk inputs typically from atmospheric model (e.g., ERA5, GFS) at 1-3 hour intervals.",
+     "new_string": "- Bulk inputs typically from atmospheric model (e.g., ERA5, GFS) at 1-3 hour intervals. *(source-needed: 간격 관행 출처 미확인)*",
+     "rationale": "disclosed 갭 전환: 1-3시간 간격 단언에 source-needed 콜아웃 부착 (G9b)"
+    },
+    {
+     "old_string": "- Cool-skin diurnal cycle visible in `delTc` output; ~0.1-0.3 K typical.",
+     "new_string": "- Cool-skin diurnal cycle visible in `delTc` output; ~0.1-0.3 K typical. *(source-needed: 수치범위 출처 미확인)*",
+     "rationale": "disclosed 갭 전환: ~0.1-0.3 K 범위에 source-needed 콜아웃 부착 (G9b)"
+    },
+    {
+     "old_string": "- Wind stress typically ~10⁻³ τ for U10=10 m/s; verify magnitudes.",
+     "new_string": "- Wind stress typically ~10⁻³ τ for U10=10 m/s; verify magnitudes. *(source-needed: 수치·표기 불명(τ≈10⁻¹ N/m² vs C_d≈10⁻³ 혼동 의심) — 출처 확인 필요)*",
+     "rationale": "disclosed 갭 전환 + 표기 오류 의심 명시 (G9b)"
+    },
+    {
+     "old_string": "citation_status: verified",
+     "new_string": "citation_status: verified\nhas_source_needed: true",
+     "rationale": "G9e: 콜아웃 부착 시 disclosed 갭 보유 — frontmatter 플래그 기입"
+    }
+   ]
+  },
+  {
+   "path": "models/ROMS/source-analysis/roms_baroclinic_3d.md",
+   "blob_sha": "bc4ea484321b37532cf961f0e60b27ef5d92eea8",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 40,
+   "opinion": 10,
+   "has_source_needed": true,
+   "unsourced": [
+    {
+     "line": 93,
+     "text": "Resolve thermocline depth → Vstretching=4, theta_s ≈ 7, theta_b ≈ 0.4 / Coastal shallow shelf → theta_s=5, theta_b=0.4, hc=10–50 m (Decision Guide 수치권장 2행, 1건 집계)",
+     "reason": "stretching 파라미터 권장 수치 단언 — set_scoord.F 인용은 옵션 정의만 커버, 권장값 출처 0. References(S&M 2003/2005)는 페이지 없는 generic.",
+     "adversary": "refute 시도: set_scoord.F 주석에서 'theta_s|recommend|typical' grep — 부재. refute 실패 → confirmed"
+    },
+    {
+     "line": 108,
+     "text": "OMEGA_IMPLICIT ... expect ~10% cost increase but fewer CFL blowups.",
+     "reason": "~10% 비용 정량 단언 — 출처 0 (08-17 roms_advection ~25% 선례와 동일 계열).",
+     "adversary": "refute 시도: step3d_uv.F 에서 '10 %|percent|cost' grep — 부재. refute 실패 → confirmed"
+    },
+    {
+     "line": 115,
+     "text": "Choosing MPDATA for T/S in long runs without rotation invariance check — known to introduce small spurious cross-frontal mixing.",
+     "reason": "'known to' 거동 단언 — References 에 MPDATA 문헌(Smolarkiewicz 등) 자체가 없고 코드 인용도 분기 위치만 커버.",
+     "adversary": "refute 시도: mpdata_adiff.F 주석에서 'spurious|cross-front' grep — 부재. refute 실패 → confirmed"
+    }
+   ],
+   "value_checks": [],
+   "proposals": [
+    {
+     "old_string": "| Resolve thermocline depth | `Vstretching=4`, `theta_s ≈ 7`, `theta_b ≈ 0.4`, `Tcline ≈ depth_of_thermocline` |",
+     "new_string": "| Resolve thermocline depth | `Vstretching=4`, `theta_s ≈ 7`, `theta_b ≈ 0.4`, `Tcline ≈ depth_of_thermocline` *(source-needed: 권장수치 출처 미확인)* |",
+     "rationale": "disclosed 갭 전환: stretching 권장수치에 source-needed 콜아웃 부착 (G9b)"
+    },
+    {
+     "old_string": "- `OMEGA_IMPLICIT` adds robustness in tidal regimes with thin layers; expect ~10% cost increase but fewer CFL blowups.",
+     "new_string": "- `OMEGA_IMPLICIT` adds robustness in tidal regimes with thin layers; expect ~10% cost increase but fewer CFL blowups. *(source-needed: ~10% 수치 출처 미확인)*",
+     "rationale": "disclosed 갭 전환: ~10% 정량 단언에 source-needed 콜아웃 부착 (G9b)"
+    },
+    {
+     "old_string": "- ▢ Choosing `MPDATA` for T/S in long runs without rotation invariance check — known to introduce small spurious cross-frontal mixing.",
+     "new_string": "- ▢ Choosing `MPDATA` for T/S in long runs without rotation invariance check — known to introduce small spurious cross-frontal mixing. *(source-needed: 'known to' 문헌 미인용)*",
+     "rationale": "disclosed 갭 전환: MPDATA 거동 단언에 source-needed 콜아웃 부착 (G9b)"
+    },
+    {
+     "old_string": "citation_status: verified",
+     "new_string": "citation_status: verified\nhas_source_needed: true",
+     "rationale": "G9e: 콜아웃 부착 시 disclosed 갭 보유 — frontmatter 플래그 기입"
+    }
+   ]
+  },
+  {
+   "path": "models/ROMS/source-analysis/roms_barotropic_2d.md",
+   "blob_sha": "f105cafc64a110a7980bf038cbd1a20aa9aeae80",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 35,
+   "opinion": 8,
+   "has_source_needed": true,
+   "unsourced": [
+    {
+     "line": 84,
+     "text": "3D coastal, dt~600s → NDTFAST=20–60; aim for ~dt/NDTFAST ≤ 0.5*Δx/√(g·Hmax) then halve",
+     "reason": "NDTFAST 권장범위·안전계수 0.5 휴리스틱 단언 — 출처 0. checkdefs.F 인용은 2D-only 강제만 커버.",
+     "adversary": "refute 시도: read_phypar.F·checkdefs.F 주석 재확인 — NDTFAST 정의·2D-only 체크뿐 권장식 부재. refute 실패 → confirmed"
+    },
+    {
+     "line": 92,
+     "text": "NDTFAST = ceil(dt * sqrt(g*Hmax) / (0.4 * dx_min))",
+     "reason": "계수 0.4 포함 산정식 단언 — Source basis·References 어디에도 없음 (L84 와 동일 계열, 별도 절 별도 집계).",
+     "adversary": "refute 시도: set_weights.F·checkdefs.F 에서 '0.4' 관련 grep — 부재. refute 실패 → confirmed"
+    },
+    {
+     "line": 101,
+     "text": "Long runs with steady winds and low NDTFAST show slow barotropic drift; symptom is zeta mean creeping. Cure is filter, not boundary.",
+     "reason": "모델 거동 관찰 단언(경험담 화법) — 출처 0. 절대규칙 #4 경계(경험이면 experience/ 소관).",
+     "adversary": "refute 시도: step2d_LF_AM3.h·set_weights.F 주석에서 drift 서술 grep — 부재. refute 실패 → confirmed"
+    }
+   ],
+   "value_checks": [],
+   "proposals": [
+    {
+     "old_string": "| 3D coastal, dt~600s | `NDTFAST=20–60`; aim for ~`dt/NDTFAST ≤ 0.5*Δx/√(g·Hmax)` then halve |",
+     "new_string": "| 3D coastal, dt~600s | `NDTFAST=20–60`; aim for ~`dt/NDTFAST ≤ 0.5*Δx/√(g·Hmax)` then halve *(source-needed: 계수·범위 출처 미확인)* |",
+     "rationale": "disclosed 갭 전환: NDTFAST 권장 휴리스틱에 source-needed 콜아웃 부착 (G9b)"
+    },
+    {
+     "old_string": "- Set `NDTFAST` so `dtfast` resolves the fastest gravity wave by 4–8 substeps, then add margin: `NDTFAST = ceil(dt * sqrt(g*Hmax) / (0.4 * dx_min))`.",
+     "new_string": "- Set `NDTFAST` so `dtfast` resolves the fastest gravity wave by 4–8 substeps, then add margin: `NDTFAST = ceil(dt * sqrt(g*Hmax) / (0.4 * dx_min))`. *(source-needed: 계수 0.4 휴리스틱 출처 미확인)*",
+     "rationale": "disclosed 갭 전환: 산정식에 source-needed 콜아웃 부착 (G9b)"
+    },
+    {
+     "old_string": "- ▢ Long runs with steady winds and low `NDTFAST` show slow barotropic drift; symptom is `zeta` mean creeping. Cure is filter, not boundary.",
+     "new_string": "- ▢ Long runs with steady winds and low `NDTFAST` show slow barotropic drift; symptom is `zeta` mean creeping. Cure is filter, not boundary. *(source-needed: 거동 관찰 출처 미확인 — experience/ 이동 후보)*",
+     "rationale": "disclosed 갭 전환 + 레이어 경계 검토 표기 (G9b)"
+    },
+    {
+     "old_string": "citation_status: verified",
+     "new_string": "citation_status: verified\nhas_source_needed: true",
+     "rationale": "G9e: 콜아웃 부착 시 disclosed 갭 보유 — frontmatter 플래그 기입"
+    }
+   ]
+  },
+  {
+   "path": "models/ROMS/source-analysis/roms_biology.md",
+   "blob_sha": "6373fb000df45464ab772c670a95a4c8b5e0ed5f",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 28,
+   "opinion": 4,
+   "has_source_needed": false,
+   "unsourced": [],
+   "value_checks": [
+    {
+     "claim_id": "471f099028b7",
+     "claim": "L41-49: 파일 라인수: fennel.h 2375 · npzd_Franks.h 589 · npzd_Powell.h 663",
+     "source_ref": "raw/source_code/roms/ROMS/Nonlinear/Biology/ wc -l",
+     "mismatch": false,
+     "note": "표본 외 부수검증 — wc -l 실측 2375/589/663 전부 일치"
+    }
+   ],
+   "proposals": []
+  },
+  {
+   "path": "models/ROMS/source-analysis/roms_bottom_boundary_layer.md",
+   "blob_sha": "441a05fa1cb992d0ab8fdcd48c8ecbce8556e25b",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 26,
+   "opinion": 3,
+   "has_source_needed": false,
+   "unsourced": [],
+   "value_checks": [
+    {
+     "claim_id": "4300e207c833",
+     "claim": "L39: zoBF=ar·rheight²/rlength (ssw_bbl.h:510), ar=27.7/30(Grant-Madsen 1982) 또는 0.267(Nielsen 1992)",
+     "source_ref": "raw/source_code/roms/ROMS/Nonlinear/BBL/ssw_bbl.h:305,307,510",
+     "mismatch": false,
+     "note": "ssw_bbl.h:305 ar=27.7/30(Grant-Madsen), :307 ar=0.267(Nielsen), :510 zoBF=ar*rheight**2/(rlength+eps) 전부 일치. 부수: 라인수 1849/730/1149 ✓, z0N~D50/12 는 :494 2.5·d50/30 과 등가 ✓. 표본선정: 접근가능 수치·라인번호 sourced 단언 모집단≈41(전건 ledger 미검사→미검사 우선), min(3,·)=3건, run seed=L4-2026-08-18-manual"
+    }
+   ],
+   "proposals": []
+  },
+  {
+   "path": "models/ROMS/source-analysis/roms_bulk_flux_coare.md",
+   "blob_sha": "3c9aa3d4503f31f0c287ec7d715ea45a88f167e5",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 30,
+   "opinion": 6,
+   "has_source_needed": true,
+   "unsourced": [
+    {
+     "line": 113,
+     "text": "→ 운영 결정 — KOOS-EJS 류는 보통 BULK_FLUXES + LONGWAVE_OUT + EMINUSP + COOL_SKIN 활성.",
+     "reason": "KOOS-EJS 운영 관행 단언 — 출처 0 (문서·설정파일 인용 없음). 운영 관행이면 절대규칙 #8/#2 상 canonical 부적합 소지도 있음(사람 판단).",
+     "adversary": "refute 시도: 파일 내 인접 인용·wikilink·frontmatter 검토 — KOOS-EJS 근거 연결 없음. refute 실패 → confirmed"
+    },
+    {
+     "line": 117,
+     "text": "§7 main3d 호출 순서 5단계 — 3. 운동량 surface BC 적용 (Nonlinear/u3dbc, v3dbc 등) / 4. Tracer surface BC 적용 (Nonlinear/t3dbc)",
+     "reason": "호출 순서 단언인데 §7 전체 file:line 0 (verification_method 는 head 50 lines 만 커버). 실측(main3d.F:446-454)은 bulk_flux→set_vbc 가 표면 BC 적용 경로 — u3dbc/v3dbc/t3dbc 는 측면 개경계(OBC) 루틴으로 서술 자체도 소스와 불일치.",
+     "adversary": "refute 시도: related [[roms_atmospheric_forcing]] §A(main3d.F:441-448 인용)가 커버하는지 검토 — bulk_flux 위치만 커버, u3dbc=표면BC 서술은 미커버·모순. refute 실패 → confirmed"
+    }
+   ],
+   "value_checks": [],
+   "proposals": [
+    {
+     "old_string": "→ 운영 결정 — KOOS-EJS 류는 보통 `BULK_FLUXES + LONGWAVE_OUT + EMINUSP + COOL_SKIN` 활성.",
+     "new_string": "→ 운영 결정 — KOOS-EJS 류는 보통 `BULK_FLUXES + LONGWAVE_OUT + EMINUSP + COOL_SKIN` 활성. *(source-needed: 운영 관행 근거 미인용 — experience/ 이동 검토)*",
+     "rationale": "disclosed 갭 전환 + 레이어 경계 검토 표기 (G9b) — 또는 근거 문서 인용/삭제는 사람 결정"
+    },
+    {
+     "old_string": "`main3d.F` baroclinic loop 매 step:\n1. **NetCDF 외부 forcing read** (Tair·Pair·Qair·wind 등)\n2. **bulk_flux.F 호출** → sustr/svstr/shflux/ssflux 계산\n3. **운동량 surface BC 적용** (Nonlinear/u3dbc, v3dbc 등)\n4. **Tracer surface BC 적용** (Nonlinear/t3dbc)\n5. 다음 step",
+     "new_string": "`main3d.F` baroclinic loop 매 step (`main3d.F:446-454` 실측):\n1. **외부 forcing read·보간** (`get_data`/`set_data` — Tair·Pair·Qair·wind 등)\n2. **bulk_flux 호출** (`main3d.F:446-448`) → 표면 응력·열플럭스 계산\n3. **`set_vbc` 호출** (`main3d.F:454`) — 계산된 플럭스를 연직 경계조건(surface/bottom BC)으로 적용\n4. 다음 step\n\n(주: `u3dbc`/`v3dbc`/`t3dbc` 는 측면 개경계(OBC) 루틴 — 표면 BC 적용 경로 아님.)",
+     "rationale": "§7 무인용 + 오서술 정정 — main3d.F:446-454 실측 순서(bulk_flux→set_vbc)로 교체, u3dbc 계열의 표면 BC 오귀속 제거"
+    },
+    {
+     "old_string": "citation_status: verified",
+     "new_string": "citation_status: verified\nhas_source_needed: true",
+     "rationale": "G9e: 콜아웃 부착 시 disclosed 갭 보유 — frontmatter 플래그 기입"
+    }
+   ]
+  },
+  {
+   "path": "models/ROMS/source-analysis/roms_equation_of_state.md",
+   "blob_sha": "9b196d454e60bbc08f004e3b2e5ccde2699ad4eb",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 45,
+   "opinion": 4,
+   "has_source_needed": false,
+   "unsourced": [],
+   "value_checks": [
+    {
+     "claim_id": "b1b59e9b07a9",
+     "claim": "L34-47: Q00=999.842594 (mod_eoscoef.F:50) + den1 Horner 다항식 (rho_eos.F:274-285)",
+     "source_ref": "raw/source_code/roms/ROMS/Modules/mod_eoscoef.F:50, Nonlinear/rho_eos.F:274-285",
+     "mismatch": false,
+     "note": "mod_eoscoef.F:50 Q00=+9.99842594e+02 일치, rho_eos.F:274 C(0) Horner·:285 den1=C(0)+Ts*(C(1)+sqrtTs*C(2)+Ts*W00) 일치. 파일 889줄 ✓. 표본선정: 접근가능 수치·라인번호 sourced 단언 모집단≈41(전건 ledger 미검사→미검사 우선), min(3,·)=3건, run seed=L4-2026-08-18-manual"
+    }
+   ],
+   "proposals": []
+  }
+ ]
+}
