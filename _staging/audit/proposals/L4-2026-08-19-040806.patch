@@ -1,0 +1,44 @@
+diff --git a/models/ROMS/source-analysis/roms_grid_metrics.md b/models/ROMS/source-analysis/roms_grid_metrics.md
+--- a/models/ROMS/source-analysis/roms_grid_metrics.md
++++ b/models/ROMS/source-analysis/roms_grid_metrics.md
+@@ -166,7 +166,7 @@
+ - `NtileI*NtileJ` must equal MPI rank count exactly — runtime check.
+ - For wide-shallow domains (e.g., shelf), use `NtileI > NtileJ` (more tiles in long direction).
+ - For tall domains (e.g., zonal coastline), `NtileJ > NtileI`.
+-- Ghost cell width: typically 2 (controlled by `Hadvection` order); higher for biharmonic mixing.
++- Ghost cell width: typically 2; 3 when `Hadvection` is MPDATA/HSIMT or with `UV_VIS4` biharmonic viscosity, forced >=3 under nesting (`inp_par.F:208-227`).
+ - Output `pm, pn, dmde, dndx, pmask` to history once for verification.
+ 
+ ## Common Pitfalls
+diff --git a/models/ROMS/source-analysis/roms_horizontal_mixing.md b/models/ROMS/source-analysis/roms_horizontal_mixing.md
+--- a/models/ROMS/source-analysis/roms_horizontal_mixing.md
++++ b/models/ROMS/source-analysis/roms_horizontal_mixing.md
+@@ -33,7 +33,7 @@
+ ## 3. 옵션·적용
+ 
+ - **harmonic vs biharmonic**: `UV_VIS2/TS_DIF2`(harmonic 2차) vs `UV_VIS4/TS_DIF4`(biharmonic 4차). 상수 또는 grid/deformation-dependent(Smagorinsky `VISC_GRID`).
+-- **rotated mixing**: isopycnal/geopotential 회전(가짜 대각혼합 억제). 
++- **rotated mixing**: isopycnal/geopotential 회전(가짜 대각혼합 억제) — `MIX_GEO_UV`/`MIX_GEO_TS`/`MIX_ISO_TS` 옵션(cppdefs.h:220-227). 
+ - **vegetation**(:82): 식생이 수평 viscosity 증가(canopy drag 난류).
+ - 산출 `Hviscosity`(:117) → [[roms_baroclinic_3d]] step3d_uv 운동량 + tracer 수평 확산.
+ 
+diff --git a/models/ROMS/source-analysis/roms_io_netcdf.md b/models/ROMS/source-analysis/roms_io_netcdf.md
+--- a/models/ROMS/source-analysis/roms_io_netcdf.md
++++ b/models/ROMS/source-analysis/roms_io_netcdf.md
+@@ -4,6 +4,7 @@
+ component: ROMS/Utility
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "ROMS 소스 직접 read (roms/ROMS/Utility, roms/ROMS/Modules). mod_netcdf.F (INTERFACE 오버로딩·netcdf_create cmode), def_dim.F·def_var.F (nf90/PIO 듀얼 인터페이스·nf90_def_var·deflate), def_his.F (파일 생성·차원·변수 정의), wrt_his.F (Rindex 시간레코드 write·nf_fwrite), nf_fwrite2d.F·nf_fread2d.F (gather/scatter·water-point packing), get_2dfld.F·get_grid.F·get_state.F·read_phypar.F 헤더·핵심 로직 file:line 인용"
+ note_author: "Claude Opus 4.8 (1M context)"
+ note_date: 2026-06-16
+@@ -69,7 +70,7 @@
+ 
+ ### 2.3 파일 생성 모드 (CMODE)
+ `mod_netcdf.F:209-216` — 기본 생성 모드 플래그. `HDF5 || PARALLEL_IO || OUT_NETCDF4` 시 `CMODE = nf90_netcdf4` (NetCDF-4/HDF5), 아니면 classic. `netcdf_create` 에서 `IOR` 로 추가 플래그 합성:
+-- 병렬 경로 (`netcdf_create.F:9137-9140` 부근): `my_cmode=IOR(CMODE, nf90_mpiio)` → `IOR(my_cmode, nf90_clobber)` → `nf90_create(path=..., cmode=my_cmode, ...)`
++- 병렬 경로 (`mod_netcdf.F:9137-9140`): `my_cmode=IOR(CMODE, nf90_mpiio)` → `IOR(my_cmode, nf90_clobber)` → `nf90_create(path=..., cmode=my_cmode, ...)`
+ - 직렬 경로 (`:9163-9169`): `my_cmode=IOR(nf90_clobber, CMODE)`, `IOR(my_cmode, nf90_share)`, `nf90_create(TRIM(ncname), my_cmode, ncid)`
+ 
+ (`netcdf_create` SUBROUTINE 본체: `mod_netcdf.F:9083-9216`)
