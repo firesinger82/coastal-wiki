@@ -1,0 +1,61 @@
+diff --git a/models/ROMS/source-analysis/roms_nonlinear_physics_modules.md b/models/ROMS/source-analysis/roms_nonlinear_physics_modules.md
+--- a/models/ROMS/source-analysis/roms_nonlinear_physics_modules.md
++++ b/models/ROMS/source-analysis/roms_nonlinear_physics_modules.md
+@@ -42,19 +42,19 @@
+ ### 2.1 BBL — Bottom Boundary Layer
+ 
+ `Nonlinear/BBL/` — wave + current boundary layer scheme. 종류:
+-- Madsen 1994 (`mb_bbl.F`)
+-- Soulsby-Wright (`sw_bbl.F`)
+-- Sediment-mediated (Sherwood et al. 2018) — CSTMS 와 결합
++- Soulsby 1997 파라메트릭 근사 (`mb_bbl.h:11`, 저자 Meinte Blaas)
++- Styles & Glenn 2000 2-layer eddy viscosity (`sg_bbl.h:17-19`)
++- Sherwood·Signell·Warner (`ssw_bbl.h:10-12`) — CSTMS 와 결합
+ 
+ bottom friction → bed shear → resuspension 의 시작점. CSTMS sediment 와 강한 결합.
+ 
+ ### 2.2 Biology — Biogeochemistry
+ 
+ 여러 옵션:
+-- **NPZD** (Nitrogen-Phytoplankton-Zooplankton-Detritus) — 단순 4-box
+-- **BEC** (Biogeochemical Elemental Cycling) — 복잡, NCAR
+-- **Fennel** et al. — N-cycle 중심
+-- **Estuarine** — 강 하구 specific
++- **NPZD** (Nitrogen-Phytoplankton-Zooplankton-Detritus) — 단순 4-box (`npzd_Franks.h`·`npzd_iron.h`·`npzd_Powell.h`)
++- **Fennel** et al. — N-cycle 중심 (`fennel.h`)
++- **ECB** (Estuarine Carbon Biogeochemistry, Feng et al. 2015) — 강 하구 specific (`ecb_mod.h:10`)
++- 그 외 인벤토리: EcoSim·Nemuro·Hypoxia SRM·oyster·red_tide (`Biology/` ls)
+ 
+ `#define BIO_FENNEL` 등 CPP 옵션으로 활성.
+ 
+@@ -109,7 +109,7 @@
+ 
+ | 파일 | 역할 |
+ |---|---|
+-| `conv_2d.F` + `conv_3d.F` + `conv_bry*.F` | state ↔ NetCDF output 변환 |
++| `conv_2d.F` + `conv_3d.F` + `conv_bry*.F` | 4D-Var 배경오차공분산 적용 — 확산방정식 space convolution 필터 (`conv_2d.F:14-17`) |
+ | `diag.F` | 운영 diagnostics (CFL, energy, KE 등) |
+ 
+ ## 4. Main loop 호출 순서 (개관)
+diff --git a/models/ROMS/source-analysis/roms_nonlinear_vegetation.md b/models/ROMS/source-analysis/roms_nonlinear_vegetation.md
+--- a/models/ROMS/source-analysis/roms_nonlinear_vegetation.md
++++ b/models/ROMS/source-analysis/roms_nonlinear_vegetation.md
+@@ -4,6 +4,7 @@
+ component: ROMS/Nonlinear/Vegetation
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "ROMS 소스 직접 read (roms/ROMS/Nonlinear/Vegetation/). vegetation_drag.F(항력·Luhar-Nepf flex reconfiguration), vegetation_stream.F(파 streaming), vegetation_turb.F(Uittenbogaard 식생 난류), vegetation_mod.h/var.h(자료구조·plant 4속성), vegetation_inp.h(CD_VEG 읽기), marsh_wave_thrust.F(Tonelli thrust) file:line 인용. rhs3d.F·step2d_LF_AM3.h 결합점 확인"
+ note_author: "Claude Opus 4.8 (1M context)"
+ note_date: 2026-06-16
+diff --git a/models/ROMS/source-analysis/roms_representer_model.md b/models/ROMS/source-analysis/roms_representer_model.md
+--- a/models/ROMS/source-analysis/roms_representer_model.md
++++ b/models/ROMS/source-analysis/roms_representer_model.md
+@@ -4,6 +4,7 @@
+ component: ROMS/Representer
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "ROMS 소스 직접 read (roms/ROMS/Representer/, roms/ROMS/Drivers/, roms/ROMS/Modules/). rp_main3d.F·rp_initial.F·rp_post_initial.F·rp_diag.F·rp_rhs3d.F·rp_pre_step3d.F·rp_prsgrd.F·rp_t3drelax.F·rp_uv3drelax.F·rp_def_ini.F 헤더·본문, Drivers/picard_roms.h·rp_roms.h, Modules/mod_param.F(iRPM) file:line 인용"
+ note_author: "Claude Opus 4.8 (1M context)"
+ note_date: 2026-06-16
