@@ -1,0 +1,148 @@
+diff --git a/models/ROMS/source-analysis/roms_tangent_linear_model.md b/models/ROMS/source-analysis/roms_tangent_linear_model.md
+--- a/models/ROMS/source-analysis/roms_tangent_linear_model.md
++++ b/models/ROMS/source-analysis/roms_tangent_linear_model.md
+@@ -4,6 +4,7 @@
+ component: ROMS/Tangent
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "ROMS 소스 직접 read (roms/ROMS/Tangent/). tl_main3d.F·tl_main2d.F·tl_step3d_t.F·tl_pre_step3d.F·tl_step2d.F·tl_omega.F·tl_rho_eos.F·tl_initial.F·tl_get_data.F·tl_prsgrd.F 의 헤더 주석·CALL 시퀀스·선형화 라인을 file:line 인용"
+ note_author: "Claude Opus 4.8 (1M context)"
+ note_date: 2026-06-16
+@@ -25,7 +26,7 @@
+ 
+ $$\delta\mathbf{x}_{n+1} = \mathbf{M}\,\delta\mathbf{x}_n, \qquad \mathbf{M} = \frac{\partial\mathcal{M}}{\partial\mathbf{x}}\Big|_{\text{BASIC STATE}}$$
+ 
+-`Tangent/` 의 `tl_*` 루틴은 NLM 코드([[roms_baroclinic_3d]]의 `main3d.F` 등)의 **줄단위 선형화 버전**으로, 동일한 CALL 시퀀스를 유지하되 각 비선형 연산을 그 directional derivative 로 치환한다. `Tangent/` 디렉토리는 54개 `.F`/`.h` 파일로, NLM 의 거의 모든 커널에 1:1 대응한다.
++`Tangent/` 의 `tl_*` 루틴은 NLM 코드([[roms_baroclinic_3d]]의 `main3d.F` 등)의 **줄단위 선형화 버전**으로, 동일한 CALL 시퀀스를 유지하되 각 비선형 연산을 그 directional derivative 로 치환한다. `Tangent/` 디렉토리는 54개 `.F` 파일(+16개 `.h` include)로, NLM 의 거의 모든 커널에 1:1 대응한다.
+ 
+ ROMS 모델 ID `iTLM` 으로 식별된다 (`tl_main3d.F` 전반에서 `iTLM` 인자 사용, 예 `tl_main3d.F:179` `CALL ntimesteps (iTLM, ...)`).
+ 
+diff --git a/models/ROMS/source-analysis/roms_tidal_forcing.md b/models/ROMS/source-analysis/roms_tidal_forcing.md
+--- a/models/ROMS/source-analysis/roms_tidal_forcing.md
++++ b/models/ROMS/source-analysis/roms_tidal_forcing.md
+@@ -3,6 +3,7 @@
+ topic: roms
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/set_tides.F (645) 직접 read — SSH_TIDES/UV_TIDES CPP(3), tidal elevation+current 추가(12), set_tides_tile + mod_tides, AVERAGES_DETIDE(32-48) file:line 인용."
+ note_author: "Claude Opus 4.8 (1M context) source-code direct read"
+ note_date: 2026-06-04
+@@ -26,8 +27,8 @@
+ 
+ ## 2. Nodal correction + equilibrium
+ 
+-- 조석 forcing 파일(tide forcing NetCDF)의 진폭/위상은 기준시각 기준 → **nodal correction**(18.6년 교점 보정)·equilibrium argument 로 현재 시각 보정(`tide_start`).
+-- ramp(점진 도입)로 초기 충격 완화.
++- 조석 forcing 파일(tide forcing NetCDF)의 진폭/위상은 기준시각 기준 → 코드는 위상을 `cff=2π·(time−tide_start·day2sec)`(set_tides.F:261, :280, :437)로 환산. **nodal correction**(18.6년)·equilibrium argument 는 `set_tides.F`·`mod_tides.F`에 없음 — 전처리(forcing 파일 생성) 단계 소관 <!-- source-needed: 전처리 도구(OTPS/Foreman) 출처 -->.
++- ramp(점진 도입)로 초기 충격 완화 — `RAMP_TIDES` 시 `ramp=TANH((tdays−dstart)/1.0)`, 아니면 1 (set_tides.F:249-252); `ramp*SSH_Tamp`(:287).
+ 
+ ## 3. AVERAGES_DETIDE — de-tiding (set_tides.F:32-48)
+ 
+diff --git a/models/ROMS/source-analysis/roms_utility_numerics.md b/models/ROMS/source-analysis/roms_utility_numerics.md
+--- a/models/ROMS/source-analysis/roms_utility_numerics.md
++++ b/models/ROMS/source-analysis/roms_utility_numerics.md
+@@ -4,6 +4,7 @@
+ component: ROMS/Utility
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "ROMS 소스 직접 read (roms/ROMS/Utility/). vorticity.F·uv_rotate.F·uv_var_change.F·set_scoord.F·set_weights.F·interpolate.F·shapiro.F·stiffness.F·round.F·white_noise.F·tadv.F·tile_indices.F·timers.F·zeta_balance.F·time_corr.F·sum_imp.F·set_masks.F·inp_par.F·inp_decode.F·yaml_parser.F·grid_coords.F 의 헤더 주석·핵심 알고리즘을 file:line 인용"
+ note_author: "Claude Opus 4.8 (1M context)"
+ note_date: 2026-06-16
+diff --git a/models/ROMS/source-analysis/roms_vertical_mixing.md b/models/ROMS/source-analysis/roms_vertical_mixing.md
+--- a/models/ROMS/source-analysis/roms_vertical_mixing.md
++++ b/models/ROMS/source-analysis/roms_vertical_mixing.md
+@@ -3,6 +3,7 @@
+ topic: general
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "ROMS source code 직접 분석 (models/ROMS/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/roms_vertical_mixing.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
+ note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
+ note_date: 2026-04~05 (original) / 2026-05-23 (promote)
+@@ -109,7 +110,7 @@
+ 
+ | Application | Closure |
+ |---|---|
+-| Open-ocean mixed-layer dynamics, transient events | GLS k-ε (`Vstretching=4`, `theta_s≥6`) |
++| Open-ocean mixed-layer dynamics, transient events | GLS k-ε (`Vstretching=4`, `theta_s≥6` <!-- source-needed: stretching 권장값 출처 -->) |
+ | Shallow shelf with strong tides | GLS k-ω or MY2.5 |
+ | Quick configuration, no TKE budget needed | KPP |
+ | Sediment / wave-current BBL | `BBL_MODEL = SSW` (Sherwood-Signell-Warner) |
+@@ -118,10 +119,10 @@
+ 
+ ## Working Rules
+ 
+-- For GLS, set `gls_cmu0=0.5544`, `gls_p`, `gls_m`, `gls_n` according to chosen subform (k-ε: `p=3, m=1.5, n=-1`; k-ω: `p=-1, m=0.5, n=-1`). Don't mix-and-match without checking.
++- For GLS, set `gls_cmu0`, `gls_p`, `gls_m`, `gls_n` together per subform — roms.in 권장표(`User/External/roms.in:2024-2032`): k-ε `p=3, m=1.5, n=-1, cmu0=0.5477`; k-ω `p=-1, m=0.5, n=-1, cmu0=0.5477`; k-kl/gen `cmu0=0.5544`. Don't mix-and-match without checking.
+ - Always output `Akv` and `Akt(itemp)` to history when calibrating — looking at `T/S` profiles alone hides whether mixing is doing the right thing.
+-- `Charnok` boundary at the surface is required when forcing with strong winds; otherwise GLS underpredicts surface TKE production by 30–50%.
+-- KPP `Ric` defaults to 0.45–0.50 (deep ML) or 0.30 (shallow ML); test sensitivity if MLD is your target metric.
++- `Charnok` boundary at the surface is required when forcing with strong winds; otherwise GLS underpredicts surface TKE production by 30–50% <!-- source-needed: 정량치 출처 -->.
++- KPP `Ric` code default is `lmd_Ric = 0.3` (`mod_scalars.F:1721`; 0.25/0.5/0.75 alternatives commented out) — values of 0.45–0.50 for deep ML are a literature choice, not a ROMS default <!-- source-needed: 0.45–0.50 권장 출처 -->; test sensitivity if MLD is your target metric.
+ - Bottom drag: log-law gives a physical `Cd`, but `z0` choice dominates. Use sediment-derived `z0` for shelves; constant `Cd` (quadratic) is acceptable for idealized runs.
+ 
+ ## Common Pitfalls
+diff --git a/models/ROMS/source-analysis/roms_wec.md b/models/ROMS/source-analysis/roms_wec.md
+--- a/models/ROMS/source-analysis/roms_wec.md
++++ b/models/ROMS/source-analysis/roms_wec.md
+@@ -3,6 +3,7 @@
+ topic: general
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "ROMS source code 직접 분석 (models/ROMS/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/roms_wec.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
+ note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
+ note_date: 2026-04~05 (original) / 2026-05-23 (promote)
+@@ -178,7 +179,7 @@
+ - WEC_VF is the modern recommendation; older "radiation stress" form (Mellor) not in this tree.
+ - For surf zone, all four (`WEC_VF + roller + streaming + breaking dissipation`) typically active.
+ - SWAN coupling gives spectral Stokes drift (better near coastlines); bulk Stokes for offline forcing.
+-- `WEC_VF` adds significant compute cost (~30%); skip for non-coastal regional runs.
++- `WEC_VF` adds significant compute cost (~30% <!-- source-needed: 정량치 출처 -->); skip for non-coastal regional runs.
+ - Output `Hwave, Dwave, Lwave` to confirm SWAN coupling delivering correct fields.
+ - For Korean coast: SWAN-ROMS coupling for surge+waves; ROMS WEC_VF if surf-zone resolution.
+ 
+@@ -186,7 +187,7 @@
+ 
+ - ▢ Looking for `WEC_MELLOR` — not in this tree; use `WEC_VF`.
+ - ▢ Activating `WEC_VF` without wave forcing (no SWAN, no bulk) — empty arrays.
+-- ▢ Bulk Stokes with very narrow-band spectrum (e.g., swell) — bulk formula underestimates surface Stokes.
++- ▢ Bulk Stokes with very narrow-band spectrum (e.g., swell) — bulk formula underestimates surface Stokes <!-- source-needed: bulk vs spectrum 비교 근거 -->.
+ - ▢ Forgetting `BBL_MODEL` with `WEC_VF` — bottom-stream component missing.
+ - ▢ Using `ROLLER_SVENDSEN` for non-breaking conditions — produces no roller energy; harmless but wasteful.
+ - ▢ Expecting WW3 — only WAM/SWAN coupling in ESMF/MCT framework.
+diff --git a/models/ROMS/source-analysis/sediment/roms_sediment.md b/models/ROMS/source-analysis/sediment/roms_sediment.md
+--- a/models/ROMS/source-analysis/sediment/roms_sediment.md
++++ b/models/ROMS/source-analysis/sediment/roms_sediment.md
+@@ -3,6 +3,7 @@
+ topic: sediment-transport
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "ROMS source code 직접 분석 (models/ROMS/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/roms_sediment.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
+ note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
+ note_date: 2026-04~05 (original) / 2026-05-23 (promote)
+@@ -184,9 +185,9 @@
+ 
+ - Active layer index 1 is the only erodible layer; deeper layers pull up only when active layer thinned.
+ - Cohesive `ibtcr` profile evolves with deposition/erosion — captures consolidation.
+-- For Korean tidal flats: `COHESIVE_BED + SED_FLOCS` essential; mud dominates.
++- For Korean tidal flats: `COHESIVE_BED + SED_FLOCS` essential; mud dominates <!-- source-needed: 한국 조간대 퇴적상 문헌 · 레이어 경계(절대규칙 #8) 검토 -->.
+ - BBL choice: `SSW` is the modern default; `MB/SG` for legacy comparison.
+-- `tau_ce` per class typically 0.05-0.2 Pa for sand; for cohesive, `ibtcr` evolves dynamically.
++- `tau_ce` per class typically 0.05-0.2 Pa for sand <!-- source-needed: 범위 출처 -->; for cohesive, `ibtcr` evolves dynamically.
+ - Output `bed_thick`, `bed_frac`, `mud_*`, `sand_*` for diagnostics.
+ - Multi-fraction conservation requires matched `NCS, NNS` between cold and hot start.
+ 
+@@ -198,7 +199,7 @@
+ - ▢ Comparing `bed_mass` across runs with different `Hz` — needs accounting for column volume.
+ - ▢ Hot-start with different `NCS+NNS` — mismatched tracer indices.
+ - ▢ Expecting Van Rijn in these files — not implemented; use MPM, Soulsby, or Van der A.
+-- ▢ Bedload at outflow boundary — explicitly zeroed; net export looks zero but suspended is OK.
++- ▢ Bedload at boundary — `sed_bedload.F:662, 1127` apply *gradient* boundary conditions (no explicit zeroing found in that block) <!-- source-needed: 'zeroed' 주장의 코드 위치 -->; check net export against suspended load separately.
+ 
+ ## Next expansion
+ 
