@@ -1,0 +1,12 @@
+diff --git a/models/SFINCS/source-analysis/sfincs-architecture-source-map.md b/models/SFINCS/source-analysis/sfincs-architecture-source-map.md
+--- a/models/SFINCS/source-analysis/sfincs-architecture-source-map.md
++++ b/models/SFINCS/source-analysis/sfincs-architecture-source-map.md
+@@ -47,7 +47,7 @@
+ - `timestep_analysis` 옵션 시 적응 dt 진단(`sfincs_timestep_analysis.f90`, :588).
+ - 프로파일링: momentum(`tloopflux`)·continuity(`tloopcont`) 시간 비중 로그(:743,:756).
+ 
+-→ **reduced-complexity 핵심**: full SWE 의 advection 을 단순화(국소관성 LIE 류)한 momentum + continuity 의 explicit staggered 적분 → full-physics 대비 고속. (advection 항은 `sfincs_advection_diffusion.f90` 에서 옵션 처리.)
++→ **reduced-complexity 핵심**: full SWE 의 advection 을 단순화(국소관성 LIE 류)한 momentum + continuity 의 explicit staggered 적분 → full-physics 대비 고속. (momentum 의 advection 항은 `sfincs_momentum.f90:413-498` 에서 옵션 처리(`advection` 플래그, `advection_scheme` 0/1); `sfincs_advection_diffusion.f90` 은 tracer 이류·확산 `compute_tracer_fluxes`(`:5`) 전용 — 상세 [[sfincs_flow_solver]] §2.2·§4.)
+ 
+ ## 3. 코어 36 모듈 (`source/src/*.f90`) 분류
+ 

@@ -4290,5 +4290,171 @@
         "note": "일치"
       }
     ]
+  },
+  "models/SFINCS/manual-notes/sfincs-parameters-io-reference.md": {
+    "blob_sha": "a38d8d0fe79aa61417e17f946820d5c8acf879f5",
+    "verdict": "verified-confirmed",
+    "has_source_needed": false,
+    "audited_date": "2026-08-24",
+    "audited_at": "2026-08-24T04:02:22.684842",
+    "n_unsourced": 0,
+    "value_checks": [
+      {
+        "claim": "rhoa default 1.25 kg/m3 (L93)",
+        "source_ref": "docs/parameters.rst:190-193",
+        "result": "match"
+      },
+      {
+        "claim": "cdval default '0.001 0.0025 0.0015' (L115)",
+        "source_ref": "docs/parameters.rst:296-299",
+        "result": "match"
+      },
+      {
+        "claim": "unstable stop message 'Maximum depth of 100.0 m reached!!! Simulation stopped.' (L299)",
+        "source_ref": "docs/output.rst:124",
+        "result": "match"
+      }
+    ],
+    "value_mismatches": [],
+    "source_unavailable": []
+  },
+  "models/SFINCS/manual-notes/sfincs-v2.4.0-galibier-changelog-known-issues.md": {
+    "blob_sha": "694edfd3008aa2b9e435008824ec217d457461d0",
+    "verdict": "verified-confirmed",
+    "has_source_needed": false,
+    "audited_date": "2026-08-24",
+    "audited_at": "2026-08-24T04:02:22.684842",
+    "n_unsourced": 0,
+    "value_checks": [],
+    "value_mismatches": [],
+    "source_unavailable": [
+      {
+        "claim": "§1.2.2/§1.2.3 changelog·known issues 항목 전반",
+        "reason": "Galibier manual PDF 가 repo 밖(/mnt/e) — 이 세션에서 원본 미접근. 'stopdepth→uvmax v2.1.1 Dollerup' 계보 부분만 docs/parameters.rst:202,221 로 간접 일치 확인"
+      }
+    ]
+  },
+  "models/SFINCS/manual-notes/sfincs-v2.4.0-galibier-validation-testbed.md": {
+    "blob_sha": "9c46a2be832dd013133ebbc4600d98fba28b7803",
+    "verdict": "verified-confirmed",
+    "has_source_needed": false,
+    "audited_date": "2026-08-24",
+    "audited_at": "2026-08-24T04:02:22.684842",
+    "n_unsourced": 0,
+    "value_checks": [],
+    "value_mismatches": [],
+    "source_unavailable": [
+      {
+        "claim": "77/77 PASS·34 WARNING, 케이스별 p.N, Asheville 1475s 등 수치",
+        "reason": "testbed report PDF 가 repo 밖 — 원본 미접근. 티어3 표 일부 케이스 p='—' 는 절 헤더 p.108-179 범위 인용으로 섹션단위 커버"
+      }
+    ]
+  },
+  "models/SFINCS/source-analysis/sfincs-architecture-source-map.md": {
+    "blob_sha": "6146dccb7e701c9a22276e11ee68a2bb3fa069fb",
+    "verdict": "INTEGRITY-VIOLATION",
+    "has_source_needed": false,
+    "audited_date": "2026-08-24",
+    "audited_at": "2026-08-24T04:02:22.684842",
+    "n_unsourced": 1,
+    "value_checks": [
+      {
+        "claim": "compute_fluxes :584 / compute_water_levels :618 / dt=alfa*min_dt :391 (L40,L43,L46)",
+        "source_ref": "sfincs_lib.f90:391,584,618",
+        "result": "match"
+      },
+      {
+        "claim": "momentum advection 담당 모듈 (L50)",
+        "source_ref": "sfincs_momentum.f90:413-498 vs sfincs_advection_diffusion.f90:5",
+        "result": "MISMATCH"
+      }
+    ],
+    "value_mismatches": [
+      {
+        "line": 50,
+        "claimed": "advection 항 = sfincs_advection_diffusion.f90",
+        "actual": "momentum advection = sfincs_momentum.f90:413-498; sfincs_advection_diffusion.f90 = tracer fluxes (compute_tracer_fluxes :5)",
+        "adversary": "단위·버전·문맥 재확인: 동일 raw clone(main HEAD 2026-06-18), 용어 'advection 항'은 L50 문맥상 SWE momentum 항. VALUE-MISMATCH 확정."
+      }
+    ],
+    "source_unavailable": []
+  },
+  "models/SFINCS/source-analysis/sfincs_boundaries_forcing.md": {
+    "blob_sha": "4e34b6bc14406ad3b8a728e9f0c3347bba24d22f",
+    "verdict": "verified-confirmed",
+    "has_source_needed": false,
+    "audited_date": "2026-08-24",
+    "audited_at": "2026-08-24T04:02:22.684842",
+    "n_unsourced": 0,
+    "value_checks": [
+      {
+        "claim": "Green-Ampt 식 verbatim 'qinfmap(nm) = (ksfield(nm) * (1.0 + (GA_head(np) * GA_sigma(np)) / GA_F(nm)))' (L244)",
+        "source_ref": "sfincs_infiltration.f90:856",
+        "result": "match"
+      }
+    ],
+    "value_mismatches": [],
+    "source_unavailable": []
+  },
+  "models/SFINCS/source-analysis/sfincs_flow_solver.md": {
+    "blob_sha": "9c2e9ea689b8c2107f92226aad5ae9ae9fffbdae",
+    "verdict": "verified-confirmed",
+    "has_source_needed": false,
+    "audited_date": "2026-08-24",
+    "audited_at": "2026-08-24T04:02:22.684842",
+    "n_unsourced": 0,
+    "value_checks": [
+      {
+        "claim": "Bates 갱신식 q=(qsm+frc*dt)/(1+gn2*dt*|qfr|/hu^(7/3)) (L91-93)",
+        "source_ref": "sfincs_momentum.f90:677",
+        "result": "match"
+      },
+      {
+        "claim": "alfa 0.50 / dtmax 60 / huthresh 0.05 / advlim 1.0 기본값",
+        "source_ref": "sfincs_input.f90:70,79,80,98",
+        "result": "match"
+      },
+      {
+        "claim": "dt = alfa*min_dt (L155-159)",
+        "source_ref": "sfincs_lib.f90:391",
+        "result": "match"
+      }
+    ],
+    "value_mismatches": [],
+    "source_unavailable": []
+  },
+  "models/SFINCS/source-analysis/sfincs_infiltration.md": {
+    "blob_sha": "f9916c44cdd44ccb9c58bb3b01b624f32020362a",
+    "verdict": "verified-confirmed",
+    "has_source_needed": false,
+    "audited_date": "2026-08-24",
+    "audited_at": "2026-08-24T04:02:22.684842",
+    "n_unsourced": 0,
+    "value_checks": [
+      {
+        "claim": "★GA 인덱싱 버그: 루프 do nm=1,np (:838) vs GA_head(np)/GA_sigma(np) (:856)",
+        "source_ref": "sfincs_infiltration.f90:838,856",
+        "result": "match — 버그 실재 확인"
+      }
+    ],
+    "value_mismatches": [],
+    "source_unavailable": []
+  },
+  "models/SFINCS/source-analysis/sfincs_io_data.md": {
+    "blob_sha": "95fe465a14c13d6a386e5715b869fe2239f4025d",
+    "verdict": "verified-confirmed",
+    "has_source_needed": false,
+    "audited_date": "2026-08-24",
+    "audited_at": "2026-08-24T04:02:22.684842",
+    "n_unsourced": 0,
+    "value_checks": [
+      {
+        "claim": "alpha/dtmax/huthresh 기본값 표 (L96,L98,L100)",
+        "source_ref": "sfincs_input.f90:70,79,80",
+        "result": "match"
+      }
+    ],
+    "value_mismatches": [],
+    "source_unavailable": []
   }
 }
