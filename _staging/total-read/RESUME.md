@@ -36,7 +36,7 @@ def norm(p):
 | 2 | **ROMS** | 2,457/11,661 | 9,204 | `txt_all_ROMS_*` (263샤드). WRF 4,744 포함 |
 | 3 | **Delft3D** | 1,154/31,187 | 30,033 | `txt_all_Delft3D_*` (859샤드). 최대 난관 |
 
-| 0 | ★**code·note·doc-002 재판독 — 226/310** (2026-08-13 중단) | 226/310 | 84 | 08-11 미처분 건 종결. §5.2 무관용 → 310건 격리 완료(`pending-superseded/20260813-namerule/`). 원인은 프롬프트 v3 29↔31행 자기모순(창작 라벨 0건). **게이트 v5**·**프롬프트 code-v4**(`13b91717…`). 수납 226건 validator v5·게이트 재적용·표본 실측·접근감사 전건 통과. **완주 shard 5개**(note-000 20/20 · code-003 48/48 · code-002 49/49 · code-001 49/49 · doc-002 41/41). 잔여 84파일 ≈ 57,600행 ≈ **11.7M 토큰**(204토큰/행 실측). 재개는 아래 "재판독 재개표". 규격 [WO-20260728-amendment-03.md](workorders/WO-20260728-amendment-03.md), 경위 [SESSION-LOG.md](SESSION-LOG.md) 2026-08-13 |
+| 0 | ✅ **code·note·doc-002 재판독 — 310/310 완결** (2026-08-25) | 310/310 | 0 | 08-11 미처분 건 종결. §5.2 무관용 → 310건 격리 완료(`pending-superseded/20260813-namerule/`). 원인은 프롬프트 v3 29↔31행 자기모순(창작 라벨 0건). **게이트 v5**·**프롬프트 code-v4**(`13b91717…`). **8 shard 전량 완결**(note-000·code-001/002/003/004·doc-002·FUNWAVE-000·EFDC-000). pending 690건 validator v5 결함 0, 각 shard 5종 검증 전건 통과. EFDC `mod_var_global.f90`(07 기각 원인) 재판독 완료로 '완결 10모델' 철회 원인 해소. 후속: 맹검 224표본·완결 게이트 7항(WO §5-§6 외부 게이트). 규격 [WO-20260728-amendment-03.md](workorders/WO-20260728-amendment-03.md), 경위 [SESSION-LOG.md](SESSION-LOG.md) 2026-08-13 |
 | 0 | ✅ **doc/FUNWAVE 421 완주** (2026-08-11) | 421/421 | 0 | shard 11개, validator 전수 결함 0, 큐 대조 누락·중복 0. 전량 pending(맹검 미실시). 게이트 **v4**·프롬프트 **doc-v2**(`6cf7a860…`) 체제. 폐기 282건은 `pending-superseded/20260811-{modelid,anchorrule}/` 에 매니페스트와 함께 보존 |
 | 4 | **재판독 큐 semantic** (code 679·doc 991·web 145·note 68) | 132/1,883 | 1,751 | §5.1 통과: EFDC-000(6)·FUNWAVE-000(49)·FUNWAVE-001(49) pending / 진행: FUNWAVE-002 17/49·003 11/48·004 미개시 (★07-29 월한도 중단, 사용자 지시: FUNWAVE 까지만 하고 중단). WO+부속서01 체제, ★구조 인덱스 **미열람** 판독. 재개: state/reread-20260728/ 의 002·003 run 이어받기 |
 
@@ -57,20 +57,20 @@ def norm(p):
 | **Grok** — | **웹축 전용** | `bash _staging/total-read/run_wave.sh web <모델> <샤드번호...>` |
 | ~~Antigravity~~ ❌ | **제외** | sha256 날조 2회 |
 
-## 재판독 재개표 (2026-08-13 중단 시점 — run_id 그대로 이어받을 것)
+## 재판독 완결표 (2026-08-25 — 8 shard 310/310 전량 완결)
 
-★**판독자는 한 번에 1명만 투입한다** (2026-08-13 사용자 지시). 08-13 에 7 스트림 병렬로 돌려
-Claude 세션 한도를 태웠다. 완주 속도보다 한도 보존이 우선이다.
+★**판독자는 한 번에 1명만 투입한다** (2026-08-13 사용자 지시). 8 shard 전량 순차 완주 완료.
+아래 표는 완결 기록. 후속 total-read 대형 3모델(ADCIRC·ROMS·Delft3D)은 상단 "잔여" 표 참조.
 
 | shard | run_id | 수납 | 재개 파일 |
 |---|---|---:|---|
 | note-FUNWAVE-000 | `…-fable5-20260813T005226Z-b33d4276` | **20/20 완료·검증필** | — |
-| code-EFDC-000 | `…-fable5-20260813T012841Z-5799640f` | 1/6 | `EFDC/…/EFDC/input.f90` (acked 39/39, eof) |
-| code-FUNWAVE-000 | `…-fable5-20260813T012841Z-2131dcc5` | 8/49 | `FUNWAVE-GPU/src/exchange_gpu0819.F` (acked 11/11, eof) |
+| code-EFDC-000 | `…-fable5-20260813T012841Z-5799640f` | **6/6 완료·검증필** | — (mod_var_global 07기각 원인 해소) |
+| code-FUNWAVE-000 | `…-fable5-20260813T012841Z-2131dcc5` | **49/49 완료·검증필** | — |
 | code-FUNWAVE-001 | `…-fable5-20260813T012841Z-2ec7b3b5` | **49/49 완료·검증필** | — |
 | code-FUNWAVE-002 | `…-fable5-20260813T012841Z-ff3d40e9` | **49/49 완료·검증필** | — |
 | code-FUNWAVE-003 | `…-fable5-20260813T012841Z-7a6fa701` | **48/48 완료·검증필** | — |
-| code-FUNWAVE-004 | `…-fable5-20260813T012841Z-cf6786b6` | 10/48 | `FUNWAVE-TVD/src/fluxes_33v.F` (acked 4/9, **부분 ack**) |
+| code-FUNWAVE-004 | `…-fable5-20260813T012841Z-cf6786b6` | **48/48 완료·검증필** | — (4배치 이어받기) |
 | doc-FUNWAVE-002 | `…-codex-20260813T012841Z-68f0ed11` | **41/41 완료·검증필** | — (input.txt SLP@L31·PLOT_INTV@L48 교정 확인) |
 
 재개 순서 권장: FUNWAVE-000(41파일 11,621행) → EFDC-000(5파일 17,556행, 파일당 3,500행) →
