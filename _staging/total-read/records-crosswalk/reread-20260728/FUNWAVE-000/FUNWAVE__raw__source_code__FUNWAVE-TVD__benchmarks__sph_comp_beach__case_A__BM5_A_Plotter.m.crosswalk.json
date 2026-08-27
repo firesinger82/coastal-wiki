@@ -1,0 +1,150 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-000",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/benchmarks/sph_comp_beach/case_A/BM5_A_Plotter.m",
+ "source_sha256": "fe0e9eeb19741a192fb8a193065d5a6ca60c074e0ca6dbe8512b0ecd12158e02",
+ "base_run_id": "reread20260728-code-FUNWAVE-000-fable5-20260813T012841Z-2131dcc5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-000-codexaudit-20260826T022956Z-b1ecf500",
+ "base_record_file": "301cd54986cc0e168d0d40036d1899f2e0f723cf8387660465a8b12bef5b525b.json",
+ "audit_record_file": "301cd54986cc0e168d0d40036d1899f2e0f723cf8387660465a8b12bef5b525b.json",
+ "base_record_sha256_bytes": "0a7b5476b1dc0bc030afd20fcbb790fb6852774999acb942dfb81c718d3aa47e",
+ "audit_record_sha256_bytes": "7ddf033bbe7fdab07b3fafe4820ec152e1767384552bab917dcbe621aa8f0623",
+ "base_finding_count": 4,
+ "audit_finding_count": 6,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B1",
+    "B4"
+   ],
+   "base_member_text": [
+    "Title says 'Case B (H/d=0.0.0378)' (L102) though the directory is case_A, and the H/d value contains a doubled decimal ('0.0.0378'); model station elevations are plotted in their native units against cm-converted reference data with no *100 conversion (L25-33 is a no-op loop) -- unit consistency cannot be confirmed here."
+   ],
+   "audit_member_text": [
+    "Every assignment in the second loop L26-L32 assigns each element to itself, so this loop has no effect.",
+    "The file resides under case_A and is named BM5_A_Plotter, but the active title at L102 says Case B; its H/d text also contains the anomalous literal 0.0.0378."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Model time is divided by 10 before shifting (L15-21) -- implies the station files' time column is in 0.1-s units for this case; not documented in the file."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "g-series are rescaled only over their first 600 samples (L35) while plotted in full against t from A.mat; if the series are longer than 600 the tail remains in meters."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Gauge numbering n4..n10 vs station files sta_0001..sta_0007 mapping and the physical gauges 4-10 layout come from the benchmark definition, external to this file."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Both loops at L14-L33 use length(n4) while indexing n5 through n10; shorter arrays fail and longer arrays retain unshifted or untouched tail rows."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The conversion loop at L35-L43 unconditionally accesses elements 1..600 of all g4..g10 arrays imported at L2; no length check prevents out-of-range access."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Each plot pairs imported time t with a g series at L69,L74,L79,L84,L89,L94,L99 without checking equal lengths; station and reference inputs likewise receive no column-count checks before two-column indexing."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Offsets are actively applied to n4/g4 through n9/g9 at L47-L63, while the analogous n10/g10 offsets are commented at L65-L66; whether the seventh trace is intentionally unshifted is not stated."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

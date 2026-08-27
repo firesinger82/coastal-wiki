@@ -1,0 +1,216 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-000",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-GPU/src/exchange_gpu.F",
+ "source_sha256": "40a4a399a93bd445ade7b3661d054e95cbbd9e227e83e42fb07a1eaff7c7a0c2",
+ "base_run_id": "reread20260728-code-FUNWAVE-000-fable5-20260813T012841Z-2131dcc5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-000-codexaudit-20260826T022956Z-b1ecf500",
+ "base_record_file": "7c4a25da62c3f41737cc1d20c29ad58832aa5de4b025c53403fef72382017221.json",
+ "audit_record_file": "7c4a25da62c3f41737cc1d20c29ad58832aa5de4b025c53403fef72382017221.json",
+ "base_record_sha256_bytes": "65c31abbb6e8c304dcd9ca83eb4b0ea5cde4568cc9c4c0dd0982283bc26b702d",
+ "audit_record_sha256_bytes": "46291b32819354eb80755cca26d0767faa64a0bad2e18b32699eee835f357d4a",
+ "base_finding_count": 7,
+ "audit_finding_count": 8,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "교차라인 결함 후보: COUPLING 동측 2번째 구간의 Fx_d(Iend1,J) 식이 Gamma3_d 를 참조(L213) — 같은 블록 1번째 구간(L206)과 다른 모든 벽 플럭스는 Gamma3 사용, Gamma3_d 는 use 목록(L8-34)에 없어 COUPLING 빌드 시 미정의 심볼로 보임(원문 그대로 기록)"
+   ],
+   "audit_member_text": [
+    "COUPLING east-boundary copy/paste/name defect: the first excluded east segment uses imported Gamma3, but the second segment uses `Gamma3_d` at L213. `Gamma3_d` is absent from the restricted GLOBAL and mod_cuda import lists at L7-L35 and is not locally declared under IMPLICIT NONE, so a COUPLING build reaches an undefined identifier; the otherwise identical formulas use Gamma3."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "boundary_condition_Y_kernel 의 n_suth,n_nrth 선언(L113)은 비MGPU 판 인자 목록(L109)에 없는데 무조건 선언됨 — 비MGPU 빌드에서 미사용 로컬로 남음"
+   ],
+   "audit_member_text": [
+    "Non-MGPU interface mismatch: `boundary_condition_Y_kernel` conditionally omits n_suth/n_nrth from its non-MGPU argument list, but `integer,value :: n_suth,n_nrth` remains unconditional at L116. VALUE applies to dummy arguments, so those names are declared with VALUE while not being dummies in that configuration. The host non-MGPU launch likewise omits them, confirming the signature/declaration mismatch."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "CPU EXCHANGE 의 FILTERING(SHAPIRO_3) 블록이 GPU 판에 미이식 — 'TO DO by YUAN' (L864-865)"
+   ],
+   "audit_member_text": [
+    "The GPU exchange explicitly states that the CPU EXCHANGE preprocessing FILTERING block is absent at L859-L860. Whether GPU and CPU runs are expected to be numerically equivalent when that switch is enabled cannot be resolved from this file."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "EXCHANGE_GPU 가 실수형 PHI_COLL_GPU 에 MASK_d 를 직접 전달(L832) — 주석화된 PHI_COLL_INT_GPU 호출(L831)과 rMASK 우회(L828-830)를 대체한 형태로, MASK_d 의 타입(INTEGER 면 generic interface 로 INT 판에 결합, REAL 이면 REAL 판)이 mod_cuda 정의에 달려 있어 이 파일만으로 미확정"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "PHI_COLL_INT_GPU 는 VTYPE==1 만 구현 — VTYPE 2..6 은 존재하지 않음(마스크 전용)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "periodic_NSexchange_gpu 는 EXCHANGE_DISPERSION_GPU 의 주기 y 교환만 담당하며 DISP_TIME_LEFT 시 ETATx_d/ETATy_d 는 주기 교환 목록에 없음(L358) — CPU 판 EXCHANGE_DISPERSION 은 ETAT/ETATx/ETATy 모두 PHI_COLL — 의도 여부 미확정"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "phi_exch_cuda 는 이 파일에 정의 없음(mgpu_utilities 소재 추정)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Real and integer MGPU periodic paths repeatedly call `cudaMemcpy2D` with pitches and widths expressed as Mloc or Mloc-2*Nghost (for example L1001-L1011 and the analogous integer block). The file does not state whether the CUDA Fortran overload interprets these quantities as elements or bytes; if it follows the byte-count API, REAL(SP)/INTEGER rows are under-copied by their element size. The interface definition is outside this file and must be checked."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The real PY==1 periodic copies omit an explicit cudaMemcpy kind while the analogous integer copies include cudaMemcpyDeviceToDevice. Whether overload inference makes the two paths equivalent is not documented here."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Boundary kernels iterate through expanded Ibeg-1:Iend+1/Jbeg-1:Jend+1 ranges and write neighboring indices such as I+1 or J+1. Safety assumes at least the corresponding ghost width and consistent Iend/Jend placement; the kernels receive no Mloc/Nloc and perform no outer allocation-bound check."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "VTYPE 4 y-boundary handling is explicitly described as not an exact solution and simply zeros cross-derivative ghosts (around L1320-L1417); the approximation's effect and intended conditions are not specified."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The generic interface declares module procedures with the same generic/specific spelling `PHI_COLL_GPU` plus `PHI_COLL_INT_GPU` at L38-L41. Compiler acceptance of a generic sharing the real specific's name is compiler-language-version dependent and is not established here."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

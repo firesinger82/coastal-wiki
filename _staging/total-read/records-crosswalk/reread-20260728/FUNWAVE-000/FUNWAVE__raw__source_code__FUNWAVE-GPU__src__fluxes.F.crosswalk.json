@@ -1,0 +1,235 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-000",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-GPU/src/fluxes.F",
+ "source_sha256": "74c3e74e875cfe62c3631af3a30141c8e9dd66c3b17659d598f7b209ceedcb19",
+ "base_run_id": "reread20260728-code-FUNWAVE-000-fable5-20260813T012841Z-2131dcc5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-000-codexaudit-20260826T022956Z-b1ecf500",
+ "base_record_file": "cc4344949aa0cd95b5c1b53c8752c42b5ede0262d1a6d2342bba53cb67949f68.json",
+ "audit_record_file": "cc4344949aa0cd95b5c1b53c8752c42b5ede0262d1a6d2342bba53cb67949f68.json",
+ "base_record_sha256_bytes": "c5811fa77fb4d241a2e449b07302cef9584c4a849e53493b9f4bbf2f562724b5",
+ "audit_record_sha256_bytes": "864c26265a331d17a6de17bce47f34b1dc6c26e89f99f116a1c91b4664d77b47",
+ "base_finding_count": 9,
+ "audit_finding_count": 8,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "TMP1/TMP2 (DelyFun L222-234, DelxFun L276-287, CONSTRUCT_HO_X L1548-1576, CONSTRUCT_HO_Y L1663-1691) and loop indices I,J (e.g. HLL L150-151, DelyFun L219-220) are not declared locally despite IMPLICIT NONE -- they must be module variables from USE PARAM; not resolvable from this file."
+   ],
+   "audit_member_text": [
+    "CONSTRUCT_HO_X and CONSTRUCT_HO_Y use TMP1/TMP2 under IMPLICIT NONE around L1519-L1550 and L1662-L1690, but their local declarations list only TXP/TYP, DVP, VAN1/VAN2, and RAT. Whether PARAM accidentally supplies shared TMP scratch is external; if it does not, compilation fails, and if it does the routines are unexpectedly non-reentrant."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [
+    "File header comment L3 says 'FILE main.F' although this file is fluxes.F."
+   ],
+   "audit_member_text": [
+    "The opening file banner names main.F although this source is fluxes.F, indicating copied provenance metadata rather than the implemented unit."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "L607-608 (CONSTRUCTION, non-CARTESIAN branch): FyL=Gamma3*HyL*UyL*VyL*Gamma3 and FyR likewise multiply Gamma3 twice, unlike GxL=HxL*UxL*VxL*Gamma3 (L538) and CONSTRUCTION_HO's FyL=Gamma3*HyL*UyL*VyL (L1459) -- apparent Gamma3^2 bug; relation L538 vs L607 vs L1459."
+   ],
+   "audit_member_text": [
+    "The non-Cartesian basic CONSTRUCTION y transverse flux multiplies Gamma3 twice at L605-L606, whereas its x transverse flux and the corresponding high-order/non-Cartesian y fluxes contain one Gamma3. This isolated extra metric factor is a copy/paste and dimensional-consistency defect."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "HLL fallback (L158-159): when |SR-SL|<SMALL the numerator is divided by SMALL instead of the actual denominator, scaling the flux arbitrarily rather than limiting it; relation L157-L161."
+   ],
+   "audit_member_text": [
+    "The HLL near-coincident-speed branch divides numerator by SMALL rather than retaining the sign of SR-SL. The discontinuous replacement and its conservation effect when SR-SL is small and negative require numerical-policy confirmation."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "CONSTRUCTION_HO_minmod (L774), CONSTRUCT_HO_X_minmod (L995) and CONSTRUCT_HO_Y_minmod (L1113) are never called in this file (FLUXES L67 calls CONSTRUCTION_HO; CONSTRUCTION_HO_minmod itself calls CONSTRUCT_HO_X/Y without the DX/DY dummies the _minmod variants require); kept per comments L61-65 and L990-992."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "VANLEER_LIMITER (L1230) and MINMOD_LIMITER (L1246) are defined but every use is commented out (L216, L233, L270, L286); VANLEER_LIMITER one-arg branch (A+ABS(A))/(1.0+A) (L1240) has no guard against A=-1."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "CONSTRUCTION ZALPHA branch (L473-479, L502-512, L575-581, L625-635) uses U4xL/V4yL and MASK9u/v, but the DelxFun/CONSTRUCT_X construction of U4/V4 (L446-457, L553-563) is compiled only under CARTESIAN -- in a non-CARTESIAN+ZALPHA build these arrays are used without being built in this subroutine (CONSTRUCTION_HO/minmod by contrast have ZALPHA construct calls L831-837, L1322-1328)."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Kappa dummy of CONSTRUCT_X/CONSTRUCT_Y (L660, L717) is declared (L670, L727) but unused after Choi's 2016 rewrite (comments L674-677, L730-733); callers still pass Kappa (L439-443, L545-549)."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A8"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "WAVE_SPEED x-interface ghost fill loops L346-367 and y-interface L382-403 are labeled 'does not really matter' (L346); comment block L309-315 records the Dmitry M1/N1 dimension bug history."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Use-before-assignment across conditionals occurs in every Cartesian/ZALPHA reconstruction family. U4xL/U4xR and V4xL/V4xR are produced only inside IF(DISPERSION) near L428-L433, L803-L808, and L1305-L1310, but PL/PR/Fx/Gx consume them unconditionally immediately afterward. The same pattern affects U4y/V4y and QL/QR/Gy/Fy. With DISPERSION false, stale or undefined reconstructed arrays enter fluxes rather than the nondispersive formulas used by the nested non-ZALPHA branch."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The high-order reconstruction loops access Vin/MASK at Ibeg-2 and Iend+3 or Jbeg-2 and Jend+3 while dummies are declared only as M-by-N arrays. Safety relies on an unstated caller halo-width/interior-index contract."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "VANLEER_LIMITER's two-argument form divides by ABS(A)+ABS(B) without a zero-denominator guard, and its one-argument form divides by 1+A without guarding A=-1. Current slope callers appear to gate the two-argument case by a positive product, but the function interface itself does not enforce those preconditions."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Several routines use I, J and TMP scratch without local declarations despite IMPLICIT NONE; their availability through PARAM/GLOBAL makes loop state and reentrancy dependent on module-level declarations rather than explicit routine contracts."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

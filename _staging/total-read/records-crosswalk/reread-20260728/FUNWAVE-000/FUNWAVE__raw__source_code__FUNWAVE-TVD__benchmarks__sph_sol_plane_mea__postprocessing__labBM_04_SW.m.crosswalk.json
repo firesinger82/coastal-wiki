@@ -1,0 +1,171 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-000",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/benchmarks/sph_sol_plane_mea/postprocessing/labBM_04_SW.m",
+ "source_sha256": "01b335d64a15dfd678de8bd297d4bb54d873ba9d9dc9de3f6fb9d0862d569669",
+ "base_run_id": "reread20260728-code-FUNWAVE-000-fable5-20260813T012841Z-2131dcc5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-000-codexaudit-20260826T022956Z-b1ecf500",
+ "base_record_file": "bb1c5c82a7048b2fb129ddd385d0cdb96d3369f7e50376e8ce80874354ee535d.json",
+ "audit_record_file": "bb1c5c82a7048b2fb129ddd385d0cdb96d3369f7e50376e8ce80874354ee535d.json",
+ "base_record_sha256_bytes": "7a0d00cd902649c821d0de3c89938cbdf3193e9b2e4d1dd8fe26e834d35e6984",
+ "audit_record_sha256_bytes": "ef1832c81c4a88a3814cda510ab19236e0c4381349d352b67cb5fb637328c1db",
+ "base_finding_count": 5,
+ "audit_finding_count": 7,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "load()+eval by filename stem (L179, L191) has the same fragility as the analytical script (variable name must match file stem)."
+   ],
+   "audit_member_text": [
+    "Filename/interface mismatch across L176-L194: load is followed by dot/underscore parsing and eval of the stripped filename as a variable, so paths with directories, multiple dots, or invalid identifier basenames can fail or bind the wrong loaded variable; no loaded-variable validation is done."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "NRMSD denominator N=length(ina)+length(ina1) counts beach-filled NaN points as data (L244-245), unlike analyBM_01_SW.m which uses N=length(xn) -- small definitional difference between the two official scripts."
+   ],
+   "audit_member_text": [
+    "Metric-domain inconsistency repeated from L232-L247 onward: interpolation NaNs are replaced by beach elevations and included in NRMSD, while maximum-amplitude error uses only the pre-fill finite set ina, so the two scores cover different model-support domains."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "The t=60 echo row is labeled [30 ...] instead of [60 ...] (first line of the t=60 echo block, chunk boundary L401) -- copy-paste slip in the reported time index."
+   ],
+   "audit_member_text": [
+    "Copy/paste output defect at L401: the t=60 H=0.0185 diagnostic prints leading label 30, unlike the calculation and plot that identify t=60 (L381-L415)."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "The final 'return' (L692) is redundant at function end; commented '%SELFE' alternatives (L662, L664) show model-specific tweaks left in the official script."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Panel axis windows [-2 20] for H=0.0185 vs the clip window [-10,20] used in the error computation (x_30n L232) -- errors include points outside the displayed axis."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Use-before-supplied interface defect across L166 and L184: a one-argument call enters the else branch and evaluates isempty(filename2) even though filename2 was not supplied."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Wrong-interface guard across L517-L527: the H=0.30 t=15 model curve is conditioned on filename2, but its legend is conditioned on filename1. With only filename2 supplied the model curve lacks its label; with only filename1 supplied a nonexistent second-case model is labeled."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Every NRMSD divides by N and analytical range Norm, and every maximum error divides by the analytical maximum, without guards for empty overlap, zero range, or zero maximum (first occurrence L244-L247)."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The model arrays are indexed through column 6 for a1 and column 5 for a2 without runtime shape checks; interpolation also assumes monotone, compatible coordinate columns."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

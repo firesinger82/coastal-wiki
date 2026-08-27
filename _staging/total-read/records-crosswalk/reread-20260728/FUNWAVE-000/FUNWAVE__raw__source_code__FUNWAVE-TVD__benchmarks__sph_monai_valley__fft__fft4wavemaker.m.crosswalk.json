@@ -1,0 +1,159 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-000",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/benchmarks/sph_monai_valley/fft/fft4wavemaker.m",
+ "source_sha256": "2286f040918e5813e5eaf3f81e4b5d09956cae4d94feab9c10691cc9b7de263a",
+ "base_run_id": "reread20260728-code-FUNWAVE-000-fable5-20260813T012841Z-2131dcc5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-000-codexaudit-20260826T022956Z-b1ecf500",
+ "base_record_file": "a439fd296d448e5f75d0e45be774f99ca66bc6692459c22d575e78588fc404fb.json",
+ "audit_record_file": "a439fd296d448e5f75d0e45be774f99ca66bc6692459c22d575e78588fc404fb.json",
+ "base_record_sha256_bytes": "9d360d8f74083c4b2fdfed094e07af3a8d58d7907321154b38aca91b6d3cc240",
+ "audit_record_sha256_bytes": "4d674d6582a9ba894b9ecd30c073968061827e7db322b8881ca91ad12958a27f",
+ "base_finding_count": 3,
+ "audit_finding_count": 6,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "sample_frequency=0.5 (L7) is again the sampling interval, not a frequency (rate 2 Hz); variable name contradicts usage."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "scale_fac=100.0 (L10) multiplies both plots and output amplitudes -- m-to-cm conversion consistent with the spherical runs' cm convention, but the input file's units are not stated."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "L6 truncates to 1024 samples and linear-indexes data1, which would interleave a two-column input despite the L5 comment allowing (t,ele); L13 comment retains the non-ASCII encoding artifact; commented cutoff_number fprintf (L81) references an undefined variable."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Two-column interface failure: line 5 advertises either one- or two-column input, but line 6 uses linear indexing data1(1:1024), which for a two-column matrix selects the first 1024 column-major elements rather than the elevation column; lines 14-15 then select data(:,nc), so the documented (t,ele) layout is not actually decoded and can reduce wave to the wrong data or a scalar depending on array shape."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The identifier sample_frequency is dimensionally inconsistent with its uses: lines 16 and 20 multiply sample indices/count by it to obtain time, and line 45 derives frequency as j/time. Those formulas require a sample interval, not a sampling frequency; if 0.5 is truly a frequency, the time and all output periods/frequency filtering are inverted."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Empty-selection use-before-assign: per, cnn, and enn are created only inside the cutoff branch on lines 46-50. If no FFT component falls strictly between the bounds, icount remains zero, yet line 79 evaluates cnn=cnn*scale_fac while cnn is undefined, causing failure instead of producing an empty output."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The input must contain at least 1024 linear elements for line 6; no length validation exists before indexing."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Legend-to-series mismatch: plot order is y (full DFT reconstruction) on line 69, wave (input data) on line 71, and z on line 73, but line 74 labels them 'Data', 'DFT Interpolant', and 'approximated' respectively, swapping the first two meanings."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Output fopen on line 77 is unchecked; a failed open yields an invalid fid subsequently passed to fprintf and fclose on lines 82 and 84."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

@@ -5,12 +5,16 @@
 > 출력 `records-crosswalk/reread-20260728/*.crosswalk.json`(6파일·130 dispositions·PASS). DETTMP=confirmed_delta 검증.
 > **다음 = 운영 shard 확대(blinded 단일 subagent).** 설계는 [MERGE-PLAN-20260827.md](MERGE-PLAN-20260827.md).
 
-## 다음 작업 = shard 확대 (blinded)
-- 파일럿은 UNBLINDED 자율판독(mechanics 검증용). 운영은 §2 준수: **단일 subagent·벤더라벨 제거·A/B 무작위**.
-- 후보쌍만 투입(라인앵커·텍스트 유사도) — 전량 아님(§2 비용절감).
-- confirmed_delta 는 subagent 제안 → **원문 span 대조로만 확정**(read-only `models/` 인용).
-- shard 별로 `build_crosswalk.py` 패턴 재사용 → `verify_crosswalk.py` 게이트 → 누적.
-- confirmed_delta 누적분 → supplement 승격(§3) → WO amendment → canonical 선택.
+## ✅ 첫 blinded shard = FUNWAVE-000 (code) 완료 (2026-08-27)
+- 파이프라인: `blind_shard.py`(라벨제거·seeded A/B무작위·후보쌍) → blinded subagent → `finalize_shard.py`(un-blind 병합) → `verify_crosswalk.py`.
+- 49파일·438 dispositions·PASS. distinct_unconfirmed 206·base_only 153·equivalent 78·**confirmed_delta 1**(convert.f B3 OOB, span확정). delta 후보 23(HIGH) 중 1 confirmed·1 refuted(sediment.F B3, span-gate 기각 실증)·21 pending.
+- 산출: `records-crosswalk/reread-20260728/FUNWAVE-000/`(+`_provenance/` 에 blinded_input·keymap·verdicts·delta_candidates 동결, `DELTA-REVIEW.md`). 파일럿은 `.../EFDC-000/` 로 네임스페이스 이동.
+
+## 다음 작업 = 나머지 shard 확대 (같은 blinded 파이프라인)
+- 남은 쌍(code): **FUNWAVE-001·002·003**(각 ~49파일)·**FUNWAVE-004**(audit 16 — 004a/b/c 분할분과 합산 필요)·**note FUNWAVE-000**(20파일).
+- shard 마다: `blind_shard.py <base> <audit> <TAG> <out>` → **fresh general-purpose subagent 1명**(fork 금지·병렬 금지) → `finalize_shard.py` → in-scope Fortran HIGH 후보만 span-확정 → `verify_crosswalk.py` → 커밋.
+- confirmed_delta·pending-HIGH 누적 → supplement 게이트(§3, 누적 shard 대상) → WO amendment → canonical 선택.
+- 대형 3모델(ADCIRC/ROMS/Delft3D)은 별건(감사 미실시 — 먼저 감사 run 필요).
 
 ---
 ## (완료) 파일럿 = EFDC-000 crosswalk

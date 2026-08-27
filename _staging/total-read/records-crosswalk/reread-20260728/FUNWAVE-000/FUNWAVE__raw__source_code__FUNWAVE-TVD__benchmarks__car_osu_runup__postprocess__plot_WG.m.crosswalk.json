@@ -1,0 +1,145 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-000",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/benchmarks/car_osu_runup/postprocess/plot_WG.m",
+ "source_sha256": "05244334a3e36a2a65d282d431084d8db4630b44ed42daf1028d8e0c8be9244b",
+ "base_run_id": "reread20260728-code-FUNWAVE-000-fable5-20260813T012841Z-2131dcc5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-000-codexaudit-20260826T022956Z-b1ecf500",
+ "base_record_file": "a995b3f0fe58c2a4aa2ea6be1d08f59f1219079d386bc88d51540c42d02e2633.json",
+ "audit_record_file": "a995b3f0fe58c2a4aa2ea6be1d08f59f1219079d386bc88d51540c42d02e2633.json",
+ "base_record_sha256_bytes": "c58b6bf8412b83dcb8d94d935a6cad4358eeebec061ebeacffb2b6237a404f4d",
+ "audit_record_sha256_bytes": "d145c6c37e76fba8ba7668b0d32831d4830efaf7bad12ba60ae3528280f33fdd",
+ "base_finding_count": 5,
+ "audit_finding_count": 6,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "Script-level break at L97 outside any loop is an error in modern MATLAB (legacy versions treated it as no-op); everything after it is blank/comment anyway."
+   ],
+   "audit_member_text": [
+    "The standalone break at L97 occurs after the plotting for-loop has ended at L93, so it is outside a loop and causes MATLAB execution to error before normal script completion."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "All measured gauges are plotted against the time column of WGdata, which after L37-52 holds WG9.txt (L70) -- gauges 1-8 use gauge 9's clock and its record length; assumes identical time bases across WG*.txt, not verifiable here."
+   ],
+   "audit_member_text": [
+    "After WG1 supplies the peak-alignment time at L16-L34, WGdata is overwritten through WG9 at L38-L52; the observation plot at L70 consequently uses WG9 column 1 as the time coordinate for every WG column, with no check that all gauge files share time samples or row counts."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "WG(:,i) columns are filled assuming every WG*.txt has the same number of rows (L37-53); measured values divided by 100 (cm to m, L70) whereas the ADV scripts multiply model by 100 -- unit conventions differ per file type."
+   ],
+   "audit_member_text": [
+    "WG columns are assigned from nine separate files at L37-L53 with no row-count compatibility checks; MATLAB array growth or dimension mismatch can leave a matrix whose rows do not correspond to the WG9-based index used at L70."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "fact (L4) and BO_line_width (L63) are defined but unused (the LineWidth set call is commented at L76); MarkerSize is set with obs_line_width (L72) though the line has no markers."
+   ],
+   "audit_member_text": [
+    "fact defined at L4 and BO_line_width defined at L63 are never used by active code; the only line-width use is commented out at L76."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Unlike the ADV scripts there is no -0.25 s correction (L34); model eta columns 2..10 are paired with gauges 1..9 implicitly."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The model plot eta(:,i) at L74 assumes the FSE input has at least nine elevation columns (n>=10 at L12-L14), but no bound check precedes the i=1:9 loop."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Exact maximum tests followed by break (L19-L22,L27-L30) choose the first tied maximum without an explicit tie policy."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

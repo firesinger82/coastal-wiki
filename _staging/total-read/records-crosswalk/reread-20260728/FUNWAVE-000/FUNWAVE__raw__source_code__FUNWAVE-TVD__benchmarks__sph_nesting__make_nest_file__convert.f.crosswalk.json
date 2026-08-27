@@ -1,0 +1,187 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-000",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/benchmarks/sph_nesting/make_nest_file/convert.f",
+ "source_sha256": "bb88ea1a4ab19d63b6527115dfbc0fe22dd9a503aae6cf8a7d4a9903f61ec075",
+ "base_run_id": "reread20260728-code-FUNWAVE-000-fable5-20260813T012841Z-2131dcc5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-000-codexaudit-20260826T022956Z-b1ecf500",
+ "base_record_file": "400204c1a405285dd31c4460ce20293e4959357d9f4e74c3e97b889730708160.json",
+ "audit_record_file": "400204c1a405285dd31c4460ce20293e4959357d9f4e74c3e97b889730708160.json",
+ "base_record_sha256_bytes": "e718d13cb0847eebe8316071b1052c6658061829f471da94923d829992598ce0",
+ "audit_record_sha256_bytes": "9d5e19b2934d2addc94c5982153ae9019a7ea7eab766c38a7c6f71454b66ce94",
+ "base_finding_count": 5,
+ "audit_finding_count": 7,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "For sides with n=0 (south/east/north here) Nsm_side=(0-1)*iscale+1=-1 (L57-60), so the header writes -1-0-1+1=-1 points for those sides (L261-267); whether FUNWAVE's COUPLING reader tolerates negative counts is external to this file."
+   ],
+   "audit_member_text": [
+    "Inactive-side header defect: nsouth, neast, and nnorth are zero on lines 36-38, but the formulas on lines 58-60 yield Nsm=-1. Lines 261, 265, and 267 still write boundary counts derived from those values, producing -1 points for inactive east/south/north sides instead of a nonnegative zero count."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "tmp=(III-II)/iscale (L189, repeated L204, L219, L234) is integer/integer division assigned to a real: tmp is 0 for all III<II+iscale and 1 only at III=II+iscale, so the intended linear interpolation degenerates to piecewise-constant (nearest-coarse-point) refinement -- likely bug."
+   ],
+   "audit_member_text": [
+    "Definite interpolation defect: I, II, III, and iscale are implicitly INTEGER, so tmp=(III-II)/iscale on the west/east/south/north interpolation paths (west block around line 189 and lines 204, 219, 234) performs integer division before assignment to real tmp. With iscale=2, the interior weight is 0 instead of 0.5, collapsing intended linear interpolation to repeated endpoints."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Ndata is overwritten by each side's read loop (L90, L118, L147, L174) -- the last active side's record count wins; sides with different lengths would silently truncate/extend."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "The refinement loop covers III=II..II+iscale inclusive (L188), writing the shared endpoint twice for consecutive I; icount-based sta_NNNN numbering assumes the station file order east->west->south->north matches how mk_station.m generated them ('order should be east, west, south, north' L68 vs the grid_A script's west+south legs)."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "nsta (L34) is unused; implicit typing throughout (no IMPLICIT NONE); FORMAT 100 (L319) unused."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Cross-file length/time mismatch: every station read overwrites the shared time vector and scalar Ndata (for example east lines 84-90 and west lines 112-118). The later global loop DO K=1,Ndata at line 183 therefore uses only the last-read station's length and time base for every side and station; if files differ, earlier shorter arrays are read uninitialized or earlier longer samples are silently truncated, and differing timestamps are never compared."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "confirmed_delta",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Out-of-bounds search: lines 251-254 increment Kstart while TIME(Kstart)<time_cut without checking Kstart<=Ndata (or Ntotal). If time_cut exceeds the final available timestamp, TIME is indexed beyond valid data and potentially beyond its allocation before the loop can terminate."
+   ],
+   "representative": "audit",
+   "rationale": "span-verified 2026-08-27: unbounded DO WHILE search over TIME() with no Kstart<=Ndata/Ntotal bound; time_cut past last timestamp reads uninitialized elements and past Ntotal=10000 exceeds allocation (OOB). base missed.",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "evidence_span": {
+    "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/benchmarks/sph_nesting/make_nest_file/convert.f",
+    "lines": "251-254",
+    "quote": "Kstart=1\n        DO WHILE (TIME(Kstart)<time_cut)\n          Kstart=Kstart+1\n        ENDDO"
+   }
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "No configuration checks enforce 0<=nside<=nsta_tot, iscale>0, Nsm_side<=Nb, or valid start/trim bounds before interpolation and implied-DO output indexing; changed inputs can divide by zero or exceed coupling-array bounds."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Station OPEN/READ operations have no IOSTAT/ERR handling other than END= labels. Missing files or malformed records are unchecked fatal errors, and a file containing exactly Ntotal records leaves no capacity to detect additional data."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The configured nsta value on line 34 is not used to validate that nwest+nsouth+neast+nnorth equals the intended number of sequential sta_NNNN files, so filename-to-side mapping can silently drift when side counts are edited."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

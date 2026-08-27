@@ -1,0 +1,148 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-000",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/benchmarks/sph_sol_plane_ana/ETA_Liner.m",
+ "source_sha256": "33d7417e5f25486f946defcc42a723d8f483bc17ac28a75df90da5008bc65128",
+ "base_run_id": "reread20260728-code-FUNWAVE-000-fable5-20260813T012841Z-2131dcc5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-000-codexaudit-20260826T022956Z-b1ecf500",
+ "base_record_file": "e34188b6526d9693b2c06e80fcd04aeeef89881e88f23f76bc5c54411c96bd78.json",
+ "audit_record_file": "e34188b6526d9693b2c06e80fcd04aeeef89881e88f23f76bc5c54411c96bd78.json",
+ "base_record_sha256_bytes": "bb8c7e9acfd56566a1dd54b7d414e889e23c859a49108ecf1049708316ea95e4",
+ "audit_record_sha256_bytes": "ce7b5f4f8250faccfe64c20b1c33139795f77ed23d9894d657e3574addfcbef2",
+ "base_finding_count": 4,
+ "audit_finding_count": 5,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "n=length(d) (L7) is the number of columns of the 2D snapshot only if the snapshot has more columns than rows (length returns the larger dimension)."
+   ],
+   "audit_member_text": [
+    "Shape/interface defect: every load is assumed to return a matrix with at least two rows (lines 8, 10, 12, 14, 16, 18, 20), while n=length(d) on line 7 returns the largest matrix dimension rather than the second-row width. If a snapshot has more rows than columns, the loop bound can exceed d1's length."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Row 2 of each snapshot is used as the profile (L8 etc.) -- presumably the second j-row of a nearly-1D domain; why row 2 rather than row 1 is not stated."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "The x re-indexing loop (L46-50) uses x(i+kk-1) with kk being the smallest kept i from the first loop (last assignment during the n:-1:1 sweep); correctness relies on the kept window being contiguous -- true only if x is monotonic, which it is (linear in i)."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Snapshot indices 0112..0207 correspond to specific non-dimensional times of the benchmark; mapping is external; the eta values are divided by dep=100 m though the spherical runs elsewhere store cm -- units of these snapshot files are not verifiable here."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Cross-file range coupling: n is computed only from eta_0112 on line 7 and then used to index d1 through d7 together on lines 31-42. Later snapshots are never checked for equal second-row lengths, so any shorter row causes out-of-range access and any longer row is silently truncated."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Empty-selection use-before-assign: data and kk are created only when a coordinate passes both tests on lines 32-35. If no sample lies in [-2,20], the coordinate loop is empty but line 52 still writes undefined data."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The coordinate reconstruction on line 49 depends on accepted indices forming one contiguous run and on kk retaining the smallest accepted index from the reverse scan. That holds only because the hard-coded dx is positive and the current x formula is monotone; this invariant is not checked if parameters change."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "All seven loads and the output write are unchecked, and fdir defaults to the process working directory, so missing/malformed snapshots or an unwritable output path fail without a controlled diagnostic."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

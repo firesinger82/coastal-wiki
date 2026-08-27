@@ -1,0 +1,209 @@
+[
+ {
+  "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/benchmarks/sph_nesting/postprocessing/plot_ab.m",
+  "record_file": "23b2b09d117ed6c737d5b45ef07762c6f5ab4cd6fceb18f1e70b196125db7f15.json",
+  "audit_id": "B0",
+  "text": "Cross-snapshot range defect: x1 and x2 are computed once from the lengths of snapshot 0100 on lines 14-15, but z1 and z2 are replaced by snapshots 0200/0300/0400 on lines 45-46, 56-57, and 66-67 without recomputing coordinates. Any later snapshot length change causes plot dimension errors or assigns coordinates from the wrong grid extent.",
+  "review_status": "pending",
+  "review_note": "",
+  "canonical_scope": "out-of-scope (benchmark/postprocessing script, 절대규칙 #8)"
+ },
+ {
+  "source_path": "FUNWAVE/raw/source_code/FUNWAVE-GPU/src/sediment.F",
+  "record_file": "24e038034427784e268e7f437d9e8590aa8d4d5916da0fb1a738265451ad4298.json",
+  "audit_id": "B1",
+  "text": "The positive-V F4 diffusion branch uses H(I,J+1)+H(I,J) while its concentration difference and face velocity are on the south face J-1; the negative branch uses H(I,J-1)+H(I,J). This sign-dependent geometry mismatch changes diffusion solely with flow direction.",
+  "review_status": "pending",
+  "review_note": "",
+  "canonical_scope": "in-scope (model source)"
+ },
+ {
+  "source_path": "FUNWAVE/raw/source_code/FUNWAVE-GPU/src/sediment.F",
+  "record_file": "24e038034427784e268e7f437d9e8590aa8d4d5916da0fb1a738265451ad4298.json",
+  "audit_id": "B2",
+  "text": "For px==1, the x wall block's IF(npx==0) ... ELSEIF(npx==px-1) executes only the west condition and skips the east condition. The y block has an explicit py==1 case setting both sides, confirming the x single-partition omission.",
+  "review_status": "pending",
+  "review_note": "",
+  "canonical_scope": "in-scope (model source)"
+ },
+ {
+  "source_path": "FUNWAVE/raw/source_code/FUNWAVE-GPU/src/sediment.F",
+  "record_file": "24e038034427784e268e7f437d9e8590aa8d4d5916da0fb1a738265451ad4298.json",
+  "audit_id": "B3",
+  "text": "Both deposition implementations evaluate (1-n_porosity)/CH before multiplication by CH, with no CH>0 guard. Active wet cells can have CH=0 initially or after MAX clamping in sediment_solver, so division by zero precedes any algebraic cancellation.",
+  "review_status": "refuted",
+  "review_note": "MIN cap absorbs Inf before *CH; IEEE-benign",
+  "canonical_scope": "in-scope (model source)"
+ },
+ {
+  "source_path": "FUNWAVE/raw/source_code/FUNWAVE-GPU/src/sediment.F",
+  "record_file": "24e038034427784e268e7f437d9e8590aa8d4d5916da0fb1a738265451ad4298.json",
+  "audit_id": "B6",
+  "text": "sediment_flux forms HxL/HxR (Mloc1 by Nloc) and HyL/HyR (Mloc by Nloc1) by adding whole Zb, whose cell-centered shape is Mloc by Nloc. No face reconstruction or slice is applied to Zb, producing shape/interface inconsistency or wrong bed placement at faces.",
+  "review_status": "pending",
+  "review_note": "",
+  "canonical_scope": "in-scope (model source)"
+ },
+ {
+  "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/benchmarks/sph_comp_beach/case_A/BM5_A_Plotter.m",
+  "record_file": "301cd54986cc0e168d0d40036d1899f2e0f723cf8387660465a8b12bef5b525b.json",
+  "audit_id": "B0",
+  "text": "Both loops at L14-L33 use length(n4) while indexing n5 through n10; shorter arrays fail and longer arrays retain unshifted or untouched tail rows.",
+  "review_status": "pending",
+  "review_note": "",
+  "canonical_scope": "out-of-scope (benchmark/postprocessing script, 절대규칙 #8)"
+ },
+ {
+  "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/benchmarks/car_osu_runup/postprocess/plot_ADV_AB.m",
+  "record_file": "344639ef1475ae0544deb12704123c90fd14973c59ea12fc99176c46f8bc23a9.json",
+  "audit_id": "B0",
+  "text": "If eta(:,1) or WGdata(:,2) contains NaN, max at lines 17 or 25 can be NaN and equality is false for every iteration; empty inputs also skip the loops. num_t_shift and/or exp_t_shift are then used before assignment at line 32.",
+  "review_status": "pending",
+  "review_note": "",
+  "canonical_scope": "out-of-scope (benchmark/postprocessing script, 절대규칙 #8)"
+ },
+ {
+  "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/benchmarks/car_osu_runup/postprocess/plot_ADV_AB.m",
+  "record_file": "344639ef1475ae0544deb12704123c90fd14973c59ea12fc99176c46f8bc23a9.json",
+  "audit_id": "B2",
+  "text": "Measured plotting at lines 43 and 62 uses length(veldata) as a row bound. Because MATLAB length returns the largest dimension, a file with fewer rows than columns indexes beyond its row range; size(veldata,1) is the required interface dimension.",
+  "review_status": "pending",
+  "review_note": "",
+  "canonical_scope": "out-of-scope (benchmark/postprocessing script, 절대규칙 #8)"
+ },
+ {
+  "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/benchmarks/car_mase_kirby/postprocessing/error_series.m",
+  "record_file": "3639a53021f76071c612a0ca9f7fb358714fe8fcf932d1d8669769b12e76005c.json",
+  "audit_id": "B0",
+  "text": "relative_error is assigned without a k subscript at line 46 inside the 11-iteration loop on lines 41-47, so every iteration overwrites the preceding result and only the k=11 value survives; this is inconsistent with the indexed std_data and std_model outputs on lines 44-45.",
+  "review_status": "pending",
+  "review_note": "",
+  "canonical_scope": "out-of-scope (benchmark/postprocessing script, 절대규칙 #8)"
+ },
+ {
+  "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/benchmarks/sph_nesting/make_nest_file/convert.f",
+  "record_file": "400204c1a405285dd31c4460ce20293e4959357d9f4e74c3e97b889730708160.json",
+  "audit_id": "B1",
+  "text": "Cross-file length/time mismatch: every station read overwrites the shared time vector and scalar Ndata (for example east lines 84-90 and west lines 112-118). The later global loop DO K=1,Ndata at line 183 therefore uses only the last-read station's length and time base for every side and station; if files differ, earlier shorter arrays are read uninitialized or earlier longer samples are silently truncated, and differing timestamps are never compared.",
+  "review_status": "pending",
+  "review_note": "",
+  "canonical_scope": "in-scope (model source)"
+ },
+ {
+  "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/benchmarks/sph_nesting/make_nest_file/convert.f",
+  "record_file": "400204c1a405285dd31c4460ce20293e4959357d9f4e74c3e97b889730708160.json",
+  "audit_id": "B3",
+  "text": "Out-of-bounds search: lines 251-254 increment Kstart while TIME(Kstart)<time_cut without checking Kstart<=Ndata (or Ntotal). If time_cut exceeds the final available timestamp, TIME is indexed beyond valid data and potentially beyond its allocation before the loop can terminate.",
+  "review_status": "confirmed",
+  "review_note": "OOB unbounded TIME() search, L251-254",
+  "canonical_scope": "in-scope (model source)"
+ },
+ {
+  "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/benchmarks/sph_comp_beach/case_B/BM2_B_Plotter.m",
+  "record_file": "531a618b170aa1fb9c7a6975bde69ea93cd2f011c978928f5fdd7dc1ac0ca90f.json",
+  "audit_id": "B0",
+  "text": "Both L14-L33 loops use length(n4) while indexing n5..n10; unequal station lengths cause out-of-range access for shorter files or leave longer tails unprocessed.",
+  "review_status": "pending",
+  "review_note": "",
+  "canonical_scope": "out-of-scope (benchmark/postprocessing script, 절대규칙 #8)"
+ },
+ {
+  "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/benchmarks/sph_sol_plane_ana/analyBM_01_SW.m",
+  "record_file": "5d25512b3a36c8168ad5a050c67182acea6dd05e31d1ee0d20d736c5babdf35d.json",
+  "audit_id": "B0",
+  "text": "Use-before-supplied interface defect across L161 and L179: the no-argument branch is guarded by nargin<1, so a legal one-argument call enters the else branch and references missing filename2 at L179.",
+  "review_status": "pending",
+  "review_note": "",
+  "canonical_scope": "out-of-scope (benchmark/postprocessing script, 절대규칙 #8)"
+ },
+ {
+  "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/benchmarks/sph_sol_plane_ana/Time_Liner.m",
+  "record_file": "60932e5dee84ac0bbcd5d31c54d41a79cb11f75a111c2cab5aa20c66e4b57960.json",
+  "audit_id": "B0",
+  "text": "Definite zero-index failure in both peak searches: kk and kk2 start at 0 on lines 16 and 28, while loops begin at element 2 and update only for a strictly larger later value. If the first element is maximal (or either series has length 1), kk/kk2 remains 0 and lines 25/37 perform illegal MATLAB index-0 access. They must begin at 1 for the initialization from element 1 to be coherent.",
+  "review_status": "pending",
+  "review_note": "",
+  "canonical_scope": "out-of-scope (benchmark/postprocessing script, 절대규칙 #8)"
+ },
+ {
+  "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/benchmarks/sph_comp_beach/case_C/BM5_C_Plotter.m",
+  "record_file": "685233d5f983d541d421ed3bcac07f59ceb4620cfe27ccaf6056ad6d49021579.json",
+  "audit_id": "B1",
+  "text": "Range coupling: both loops use length(n4) as the bound (lines 14 and 25) while indexing n5 through n10 on lines 16-21 and 27-32; any shorter station array causes out-of-range indexing, and extra rows in longer arrays are left untransformed.",
+  "review_status": "pending",
+  "review_note": "",
+  "canonical_scope": "out-of-scope (benchmark/postprocessing script, 절대규칙 #8)"
+ },
+ {
+  "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/bc.f90",
+  "record_file": "7a6526cb6568811b6adb8f66be14714bcce0caf3fb1f65ee63314aa3d7be566d.json",
+  "audit_id": "B0",
+  "text": "Halo-exchange interface gap across L324-L325,L365-L414,L781: EXCHANGE sends staggered P/Q through PHI_COLL_VARIABLE_LENGTH, but that routine only reflects physical-edge ghosts and returns without any MPI/phi_exch call; ordinary PHI_COLL always finishes with phi_exch. Unless another caller-owned exchange exists, P/Q internal-processor halos remain stale when these fields are enabled.",
+  "review_status": "pending",
+  "review_note": "",
+  "canonical_scope": "in-scope (model source)"
+ },
+ {
+  "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/bc.f90",
+  "record_file": "7a6526cb6568811b6adb8f66be14714bcce0caf3fb1f65ee63314aa3d7be566d.json",
+  "audit_id": "B1",
+  "text": "Periodic overwrite defect across L445-L504 and L664-L779: PHI_COLL fills periodic y ghosts first, and VTYPE 1/2/3 protect later y boundary logic with .NOT.PERIODIC (e.g. L643), but VTYPE 4/5/6 south/north blocks have no such guard. On periodic end ranks they can overwrite periodic data with zero, symmetric, or antisymmetric physical-boundary values before phi_exch.",
+  "review_status": "pending",
+  "review_note": "",
+  "canonical_scope": "in-scope (model source)"
+ },
+ {
+  "source_path": "FUNWAVE/raw/source_code/FUNWAVE-GPU/src/breaker.F",
+  "record_file": "8296b045d9b04ac5b0b95c9cae4aac8f3732a92099947be16c6f17b31f4dce23.json",
+  "audit_id": "B0",
+  "text": "AGE is declared INTENT(OUT) at L110, but its incoming values are read in the initiation/aging test at L141-L146 and as neighbor history at L175-L214, before every element is necessarily defined by this invocation. The algorithm requires persistent prior age, so the declared interface conflicts with its use and should be assessed as INOUT.",
+  "review_status": "pending",
+  "review_note": "",
+  "canonical_scope": "in-scope (model source)"
+ },
+ {
+  "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/benchmarks/sph_comp_beach/case_A/BM5_tmp_Plotter.m",
+  "record_file": "89cd73a7782a9722d732fc73a3db6ed88b11719a091c8486477aaaf019c15118.json",
+  "audit_id": "B0",
+  "text": "Both length-based loops at L39-L57 use length(n4) while indexing n5 through n10; unequal station lengths can either index past shorter inputs or leave tails of longer inputs untransformed.",
+  "review_status": "pending",
+  "review_note": "",
+  "canonical_scope": "out-of-scope (benchmark/postprocessing script, 절대규칙 #8)"
+ },
+ {
+  "source_path": "FUNWAVE/raw/source_code/FUNWAVE-GPU/src/exchange_gpu0819.F",
+  "record_file": "99c935deeac265d93d745d66039e84adbd19d0461ac5da5593029a3e48181b8b.json",
+  "audit_id": "B6",
+  "text": "PHI_COLL_OUTER_GPU duplicates hundreds of lines of PHI_COLL_GPU reflection logic but omits its final communication call. The duplication makes later parity/boundary fixes prone to diverge and is the direct source of the internal-halo inconsistency above.",
+  "review_status": "pending",
+  "review_note": "",
+  "canonical_scope": "in-scope (model source)"
+ },
+ {
+  "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/benchmarks/sph_sol_plane_mea/postprocessing/labBM_04_SW.m",
+  "record_file": "bb1c5c82a7048b2fb129ddd385d0cdb96d3369f7e50376e8ce80874354ee535d.json",
+  "audit_id": "B0",
+  "text": "Use-before-supplied interface defect across L166 and L184: a one-argument call enters the else branch and evaluates isempty(filename2) even though filename2 was not supplied.",
+  "review_status": "pending",
+  "review_note": "",
+  "canonical_scope": "out-of-scope (benchmark/postprocessing script, 절대규칙 #8)"
+ },
+ {
+  "source_path": "FUNWAVE/raw/source_code/FUNWAVE-GPU/src/fluxes.F",
+  "record_file": "cc4344949aa0cd95b5c1b53c8752c42b5ede0262d1a6d2342bba53cb67949f68.json",
+  "audit_id": "B0",
+  "text": "Use-before-assignment across conditionals occurs in every Cartesian/ZALPHA reconstruction family. U4xL/U4xR and V4xL/V4xR are produced only inside IF(DISPERSION) near L428-L433, L803-L808, and L1305-L1310, but PL/PR/Fx/Gx consume them unconditionally immediately afterward. The same pattern affects U4y/V4y and QL/QR/Gy/Fy. With DISPERSION false, stale or undefined reconstructed arrays enter fluxes rather than the nondispersive formulas used by the nested non-ZALPHA branch.",
+  "review_status": "pending",
+  "review_note": "",
+  "canonical_scope": "in-scope (model source)"
+ },
+ {
+  "source_path": "FUNWAVE/raw/source_code/FUNWAVE-GPU/src/breaker_gpu.F",
+  "record_file": "cc467e0c883c7e82fef064e96f38afc1bd436b074ae37fec3e56905adba48467.json",
+  "audit_id": "B0",
+  "text": "Use-before-assignment across branches: breaking_kernel assigns DXg and DYg only inside the Age_sh<=ZERO, non-immediate-trigger branch at L168-L184, but all paths then use them to compute xmk/ymk at L234-L238. If the immediate trigger branch L162-L164 or positive-age branch L166-L167 is taken, wavemaker footprint selection consumes undefined DXg/DYg.",
+  "review_status": "pending",
+  "review_note": "",
+  "canonical_scope": "in-scope (model source)"
+ }
+]

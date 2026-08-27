@@ -1,0 +1,193 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-000",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/benchmarks/car_mase_kirby/postprocessing/error_series.m",
+ "source_sha256": "e982e6ea17231fcbf6fde5d9932ce89d556018d10d77ebaa460f69e6d00042b7",
+ "base_run_id": "reread20260728-code-FUNWAVE-000-fable5-20260813T012841Z-2131dcc5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-000-codexaudit-20260826T022956Z-b1ecf500",
+ "base_record_file": "3639a53021f76071c612a0ca9f7fb358714fe8fcf932d1d8669769b12e76005c.json",
+ "audit_record_file": "3639a53021f76071c612a0ca9f7fb358714fe8fcf932d1d8669769b12e76005c.json",
+ "base_record_sha256_bytes": "432dfae36ec8be9dd50d04057983a733791fdfcacc2e651c24bc2f59f1711481",
+ "audit_record_sha256_bytes": "a18fae361db26e30ff2f89d43cef7d688122718a9ecdb503c59e47f730a8e0c3",
+ "base_finding_count": 5,
+ "audit_finding_count": 7,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "rmse() (L49) is not defined here; requires external function."
+   ],
+   "audit_member_text": [
+    "The rmse call at line 49 relies on a function not defined in this file; compatibility depends on an external MATLAB/toolbox or path-provided implementation."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Measured records are raw gauge units while the model is converted to cm (L9); the comparison at L44-46 assumes r2d*.dat are already in cm -- units not verifiable from this file (the companion fft script applies scale_fac=0.01 to the same r2d470.dat)."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "z (L8), model_time (L12), num inside the second loop (L31), and data_time (L36) are computed but never used; the variable name error shadows MATLAB's built-in error function (L49)."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "No time-window alignment or truncation is applied before std comparison (unlike comp_mkskew.m's 400-sample cut) -- model and data records of different lengths/durations are compared whole; whether that is intended cannot be resolved here."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "The fnam column order (L17-28) maps measured files by depth to gauge index; the deepest gauge column 1 (r2d470) is loaded but excluded by the shift at L37-39."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "relative_error is assigned without a k subscript at line 46 inside the 11-iteration loop on lines 41-47, so every iteration overwrites the preceding result and only the k=11 value survives; this is inconsistent with the indexed std_data and std_model outputs on lines 44-45."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Lines 7-12 overwrite gage for each numerical station and take time/model_time only from the final station. Those coordinates are never used when standard deviations are compared at lines 41-49, and the separately synthesized data_time at line 36 is also unused, so no sampling interval, duration, or time alignment check connects the two data sources."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Lines 44-46 divide by std_data(k) with no zero/non-finite guard, and line 49 divides by max(std_data) with no zero/non-finite guard; constant, empty, or invalid input can yield NaN or Inf and defeat the error metric."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "num is recomputed at line 31 but is not used by the experimental-file load at line 32, which instead indexes fnam; this is a copy/paste residue and can falsely suggest that the numeric suffix controls the file mapping."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The filename table is written by column at lines 17-28 and each column is passed directly to load at line 32. The file does not establish whether the target MATLAB/Octave load interface accepts a column character vector; environments requiring a row character vector will reject fnam(:,k)."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Lines 7-9 require every numerical file to have a second column and equal row count, while lines 32-33 require each experimental load to be a single compatible-length vector. None of these file-shape interfaces is checked."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

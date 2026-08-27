@@ -1,0 +1,186 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-000",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-GPU/src/etauv_solver.F",
+ "source_sha256": "05f5380ea682ecb10c1a0903e5ae2107789744f411e3113685ba787fe87713d6",
+ "base_run_id": "reread20260728-code-FUNWAVE-000-fable5-20260813T012841Z-2131dcc5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-000-codexaudit-20260826T022956Z-b1ecf500",
+ "base_record_file": "526bf753bb80885e1819fc1fc0a9b3115d78df10104a9e1b1ffbe4151b520a62.json",
+ "audit_record_file": "526bf753bb80885e1819fc1fc0a9b3115d78df10104a9e1b1ffbe4151b520a62.json",
+ "base_record_sha256_bytes": "c80eeecd5b2e8b686f35919d636e6127bd3c40d06c7bfbff466c98b40790336c",
+ "audit_record_sha256_bytes": "2e8fa1d83bbf34511a7dac39aebc76835d977b0850037432a535c37f722182ac",
+ "base_finding_count": 6,
+ "audit_finding_count": 7,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [
+    "선언만 되고 이 파일에서 미사용: WK_Source(L62, 사용부 전체 주석화), kf,kd(L69), IM(L323), PARALLEL 의 AperG..VG(L311-313), 비병렬의 Axx..V1D,Aper..Vper(L315-320), myF 는 TRID* 출력으로만 사용"
+   ],
+   "audit_member_text": [
+    "Declared ESTIMATE_HUV names WK_Source, kf and kd at L62/L69 are used only in commented-out wavemaker code at L105-L112, so their retained interface intent is unclear."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "교차라인 의미 결함 후보: y 방향 COUPLING 분기(L457-465)가 IF(IN_DOMAIN_SOUTH)...ELSEIF(IN_DOMAIN_SOUTH) — 두 번째 조건도 IN_DOMAIN_SOUTH 라서 도달 불가(x 방향 대응부 L364-368 은 WEST/EAST 쌍) — IN_DOMAIN_NORTH 오기로 보임(원문 그대로 기록)"
+   ],
+   "audit_member_text": [
+    "The y-direction coupling boundary dispatch repeats the same predicate: `IF(IN_DOMAIN_SOUTH)` at L455 followed by `ELSEIF(IN_DOMAIN_SOUTH)` at L459. The second branch, which applies the Jend/V(I,J+1) correction at L460-L461, is unreachable and appears to be a copy/paste error where a north-domain predicate was intended."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "L391·L468 의 IF(tmp2.NE.0.0_SP.OR.MASK(I,J).GT.0) 는 .OR. — tmp2=0 이라도 MASK>0 이면 tmp1/tmp2 나눗셈 수행(0 나눗셈 가능): .AND. 의도였는지 미확정"
+   ],
+   "audit_member_text": [
+    "The nominal zero-pivot guards are ineffective for active cells. Both x and y systems test `tmp2.NE.0.0_SP.OR.MASK(I,J).GT.0` at L391 and L468, then divide by tmp2 at L392-L394 and L469-L471. When MASK>0 and tmp2==0, the OR condition is true and all three divisions are singular; the zero-coefficient ELSE branch is reached only when tmp2==0 and MASK<=0."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "b1·b2·Gamma1·Gamma2·ALPHA·BETA·Eta0·Ubar0·Vbar0·EtaOld·UbarOld·VbarOld·TroughLimit·CrestLimit·FroudeCap 는 USE GLOBAL 소재 — 이 파일에 정의 없음"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "GET_Eta_U_V_HU_HV 의 x 방향 계수에는 y 방향과 달리 Gamma2(DISP_TIME_LEFT) 비선형항이 없음(L346-350 vs L428-439) — 비대칭 의도 여부 이 파일만으로 미확정"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "TRIDx/TRIDx_ser/TRIDy/TRIDy_ser/TRIDy_periodic 정의는 외부 파일 소재"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "For non-CARTESIAN builds, wavemaker coordinate spacing is fixed from DX(1,1),DY(1,1) at L75-L78 and wavemaker continuity branches use those scalars throughout L89-L190, whereas the no-wavemaker branch uses DX(I,J),DY(I,J) at L203-L205. The accuracy/units assumption for a spatially varying grid inside a wavemaker is not documented."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "GET_Eta_U_V_HU_HV has IMPLICIT NONE at L307 but uses I, J and tmp1/tmp2/tmp3/tmp4 throughout L340-L474 without local declarations. They must be supplied by `USE GLOBAL` or compilation fails; if supplied, loop and scratch state is module-associated rather than local, with reentrancy/thread-safety consequences not explained here."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "ISTEP directly indexes ALPHA and BETA in all stage updates at L223-L282, but this file does not constrain ISTEP to the allocated coefficient range."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The Froude test divides Utotal by Fr at L522. Fr is based on `sqrt(GRAV*Max(H,MinDepthFrc))` at L521; positivity of imported GRAV and MinDepthFrc is assumed but not checked here."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

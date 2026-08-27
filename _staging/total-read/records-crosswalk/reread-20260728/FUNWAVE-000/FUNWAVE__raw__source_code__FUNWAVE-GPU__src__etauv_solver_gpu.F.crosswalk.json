@@ -1,0 +1,250 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-000",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-GPU/src/etauv_solver_gpu.F",
+ "source_sha256": "267cbd3229e078253ef95a3bbd99dde3e366fd1aae0ffda90c84380fa563df8d",
+ "base_run_id": "reread20260728-code-FUNWAVE-000-fable5-20260813T012841Z-2131dcc5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-000-codexaudit-20260826T022956Z-b1ecf500",
+ "base_record_file": "b5fe763a946ceed20b08df2943467171d3ddd5db8824e50b89013002d5a0ace5.json",
+ "audit_record_file": "b5fe763a946ceed20b08df2943467171d3ddd5db8824e50b89013002d5a0ace5.json",
+ "base_record_sha256_bytes": "895faf7776301c28ff02581a00be69752fb4c7778f2c471c5d43e6ad06c596d3",
+ "audit_record_sha256_bytes": "ac0f0f372cdf32274de95da8bcaf18b08f23512ede2323d6842d084a9c6d3e89",
+ "base_finding_count": 8,
+ "audit_finding_count": 10,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "triDxDy_mgpu_cuda_v1 back substitution 남측 송신(L307)이 myFx_T/myFy_d 가 아닌 Y1_d(1,Jbeg) 를 송신 — v1(비주기 이중 아님)에서 Y1_d 사용은 v2 와의 혼선으로 보이나 의도 미확정"
+   ],
+   "audit_member_text": [
+    "In multi-GPU native solver v1, the y backward substitution produces `myFy_d` (kernel call around L289-L291), but the south-boundary send copies from `Y1_d(1,Jbeg)` at L307. Y1_d belongs to the periodic two-solve path and is not assigned by triDxDy_mgpu_cuda_v1, so nonperiodic MGPU y back-substitution can transmit stale/uninitialized data instead of the solved myFy_d boundary."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "교차라인 결함 후보: periodic_triDy_cusparse 의 L1056-1057 'Arow(1+(i-NGhost-1)*...)=0.0_SP' 가 do 루프 밖에서 루프변수 i 를 사용 — 직전 루프(L1046-1052) 종료 후 i 값에 의존하는 단일 원소 대입으로, 전체 행 경계 0 설정 의도(비교: triDy_cusparse_init_kernel L1777-1778 은 j==Jbeg/Jend 조건으로 처리)와 불일치로 보임"
+   ],
+   "audit_member_text": [
+    "`periodic_triDy_cusparse` copies Drow to D1row and then executes two boundary coefficient assignments using scalar `i` outside any DO at L1055-L1057. The preceding DO leaves i at its terminal value; with conventional Iend=Mloc-NGhost this row-index expression advances one batch beyond the allocated `(Mloc-2*NGhost)*(Nloc-2*NGhost)` vectors, so the writes can be out of range and do not clear every batch boundary."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "교차라인: triDy_init_kernel·triDy_cusparse_init_kernel 의 COUPLING 분기 IF(IN_DOMAIN_SOUTH)...ELSEIF(IN_DOMAIN_SOUTH) (L1660-1668, L1755-1763) — CPU etauv_solver.F 과 동일한 도달불가 ELSEIF(IN_DOMAIN_NORTH 오기로 보임) 재현"
+   ],
+   "audit_member_text": [
+    "Every coefficient initializer repeats the CPU guard defect: `tmp2.NE.0.0_SP.OR.MASK_d(I,J).GT.0` precedes division by tmp2 in native x, cuSPARSE x, native y (L1669-L1672), and cuSPARSE y kernels. An active cell with tmp2==0 takes the division path. The y initializers also repeat `IF(IN_DOMAIN_SOUTH)` followed by `ELSEIF(IN_DOMAIN_SOUTH)` (native at L1658-L1664 and again in the cuSPARSE-y block), making the Jend/north coupling correction unreachable."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "ESTIMATE_HUV_GPU 의 인자 ISTEP 는 'integer :: ISTEP' (L89) — intent 미지정; TriSolver==1 첫 할당 경로는 Allocated_1 을 .True. 로 만들지 않아(L112-120, 플래그 설정은 TriSolver==0 쪽 L106 만) 매 호출 재할당 시도 가능"
+   ],
+   "audit_member_text": [
+    "TriSolver allocation state is inconsistent. Under `.NOT.Allocated_1`, the TriSolver==0 branch sets `Allocated_1=.True.` before allocating matrices, while the TriSolver==1 branch allocates Arow/Brow/Crow/D1row/Drow but never sets the flag (L118-L137). A later ESTIMATE_HUV_GPU call with TriSolver==1 re-enters allocation on already allocated arrays. The nearby comment says not to try solver 1 (L170-L173), but the runtime branch remains callable."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "HUV_BAR_KERNEL 의 WaveMakerCode 정수(4,5,6,7,8,9,10,12)와 CPU 판 문자열(WK_REG/WK_IRR/JON_2D/JON_1D/TMA_1D/WK_TIME/WK_DATA2D/LEFT_BC_IRR)의 대응표는 이 파일에 없음 — mod_cuda 나 초기화 코드 소재로 추정"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "IF(tmp2.NE.0.0_SP.OR.MASK_d.GT.0) (L1490,1566,1671,1765)의 .OR. 조건은 CPU 판과 동일 — tmp2=0·MASK>0 시 0 나눗셈 가능"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "COUPLING 분기의 IN_DOMAIN_WEST/EAST/SOUTH (L1465-1473 등)는 use 목록에 없음 — COUPLING 정의 시 컴파일 의존 미확정"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "streamID·cusparseh·gtsv_buf·TriSolver·BlockDim* 등은 mod_cuda 소재 — 이 파일에 정의 없음"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The TriSolver==1 dispatch calls `triDy_cusparse` regardless of PERIODIC in the ESTIMATE_HUV_GPU branch around L169-L177. A distinct `periodic_triDy_cusparse` implementation exists at L982-L1195 but has no call in this file; therefore PERIODIC is passed into coefficient initialization yet the periodic solver is bypassed for solver 1."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Native Thomas forward sweeps test only `A != ZERO` and then divide by `1/A-C_previous` (x at L1804-L1806, the combined x solver later in the same block, and analogous y kernels). They do not test the actual pivot denominator, so a nonzero A does not prevent a singular or near-singular elimination step."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Periodic Sherman-Morrison scale factors divide by `1-(C_end*Y2_begin-A_beg*Y2_end)` in native paths around L772-L802 and cuSPARSE paths around L1137-L1188 without a zero/conditioning check."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The module uses `USE GLOBAL, ONLY:` at L18-L24 but COUPLING kernels reference IN_DOMAIN_WEST/EAST/SOUTH and spherical code references R_earth later. Those names are not visible in the explicit GLOBAL list; whether PARAM or another conditional module supplies them must be checked in the build configurations."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B8"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Several MPI backward messages send `2*Mloc` or `2*Nloc` elements after copying only the first buffer column (for example L307-L311 and corresponding v2/triDy routines). Receivers use only the first column for the backward value. The extra stale payload is ignored locally but the oversized protocol is undocumented and increases coupling fragility."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B9"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The post kernel evaluates Utotal/Fr at L2001. Fr is derived from imported GRAV and MinDepthFrc immediately before this chunk; positivity is assumed, so a zero lower depth bound would leave a division-by-zero path."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

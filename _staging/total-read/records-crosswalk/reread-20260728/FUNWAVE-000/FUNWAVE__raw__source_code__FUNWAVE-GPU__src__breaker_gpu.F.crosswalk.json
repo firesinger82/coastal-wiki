@@ -1,0 +1,193 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-000",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-GPU/src/breaker_gpu.F",
+ "source_sha256": "c69b53ee9f2eee590a6f5bc031cf2959d17da34decd3d758b0a5856309119c1f",
+ "base_run_id": "reread20260728-code-FUNWAVE-000-fable5-20260813T012841Z-2131dcc5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-000-codexaudit-20260826T022956Z-b1ecf500",
+ "base_record_file": "cc467e0c883c7e82fef064e96f38afc1bd436b074ae37fec3e56905adba48467.json",
+ "audit_record_file": "cc467e0c883c7e82fef064e96f38afc1bd436b074ae37fec3e56905adba48467.json",
+ "base_record_sha256_bytes": "aa6146aae60ad2b994e529cec7d5ea1e50d1b2d92d59643d2ef4b145ce6bde3c",
+ "audit_record_sha256_bytes": "91e5fece5db141670fcabaf4d55dde9045b28527fe39cfc3570097323eb9736e",
+ "base_finding_count": 6,
+ "audit_finding_count": 6,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "breaking_kernel 의 cap2,AGE1,AGE2,AGE3,xmk 관련: cap2·AGE1·AGE2·AGE3(L135,139) 선언만 되고 미사용(사분면 검사가 Age_sh 직접 참조로 대체됨)"
+   ],
+   "audit_member_text": [
+    "Local cap2 (L135), AGE1/AGE2/AGE3 (L139), and imported MGlob/NGlob and several selected GLOBAL symbols (L19-L22) are not used in this module; no intent is documented here."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "breaking_kernel 은 halo 스레드(tx=1 또는 blockDim 경계)를 계산에서 제외(L156-157)하는데, 블록 간 겹침(overlap) 기동 격자가 이를 보상하는지는 grid 계산(L35-36, Inner 치수 사용)과 mod_cuda 의 BlockDim 정의에 달려 있음 — 이 파일만으로 미확정"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "viscosity_wmaker_kernel 은 임계와 계수에 WAVEMAKER_visbrk 를 쓰고(L107,109) CPU 판 breaker.F 대응부는 WAVEMAKER_Cbrk 를 씀 — 의도적 차이인지 이 파일만으로 미확정; WAVEMAKER_Cbrk 인자는 이 커널에서 미사용"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "viscosity_wmaker_kernel 의 인덱스 가드 L80 은 소문자 Nghost 로 참조(인자 선언은 NGhost L67) — Fortran 대소문자 무구분으로 동작하나 표기 불일치"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "wavemaker 영역 밖 셀의 nu_break_d 를 viscosity_wmaker_kernel 은 갱신하지 않음(L104-114 — ELSE 없음): CPU 판과 달리 외부 셀 배경점성 설정이 없는지는 호출 맥락 의존"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "L38 AGE_BREAKING0_d=AGE_BREAKING_d 는 SHOW_BREAKING 분기에서만 수행 — WAVEMAKER_VIS 경로에서 Age 배열 미사용이므로 정합"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Use-before-assignment across branches: breaking_kernel assigns DXg and DYg only inside the Age_sh<=ZERO, non-immediate-trigger branch at L168-L184, but all paths then use them to compute xmk/ymk at L234-L238. If the immediate trigger branch L162-L164 or positive-age branch L166-L167 is taken, wavemaker footprint selection consumes undefined DXg/DYg."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Shared-memory boundary initialization gap: Age_sh is initialized only for global indices inside Ibeg-1:Iend+1 and Jbeg-1:Jend+1 at L151-L153, while the subsequent computation also admits central cells on those same inclusive edges at L156-L157 and reads tx±1/ty±1 neighbors at L196-L222. For an admitted central cell on an expanded-domain edge, the corresponding outward neighbor slot was not initialized by L151-L153; thread-index interior checks prevent shared-array index overflow but do not ensure that neighbor slot received a value."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Current-age/viscosity lag requires caller-level confirmation: the kernel writes newly started or propagated ages to AGE_BREAKING_d at L162-L225, but exterior viscosity tests the prior snapshot Age_sh at L257 rather than the new AGE_BREAKING_d value. A cell whose prior age is zero can be marked with AGE_BREAKING_d=DT yet receive zero exterior viscosity at L300-L301 until a later invocation."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Angular partition does not include an exact +180 degree result: ATAN2 is converted to degrees at L190, quadrant 2 is [90,180) at L203, and quadrant 3 begins at -180 at L211. Whether ATAN2 can yield +180 for signed-zero inputs, leaving propagation unhandled, is not resolved in this file."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "viscosity_wmaker_kernel receives and declares WAVEMAKER_Cbrk at L45-L48 and L62-L69 but never references it in its body; Iend and Jend are likewise passed but its bounds use Mloc/Nloc at L80. Whether these are stale interface arguments or intentionally retained ABI symmetry is not stated."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

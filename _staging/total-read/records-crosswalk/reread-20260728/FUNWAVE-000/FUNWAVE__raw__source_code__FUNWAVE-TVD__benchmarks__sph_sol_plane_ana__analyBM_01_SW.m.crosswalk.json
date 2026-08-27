@@ -1,0 +1,184 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-000",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/benchmarks/sph_sol_plane_ana/analyBM_01_SW.m",
+ "source_sha256": "40547a2dafa3c69e2edc55b3067c1a13b491db3e0ec64023fae17b2c4a4d96a5",
+ "base_run_id": "reread20260728-code-FUNWAVE-000-fable5-20260813T012841Z-2131dcc5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-000-codexaudit-20260826T022956Z-b1ecf500",
+ "base_record_file": "5d25512b3a36c8168ad5a050c67182acea6dd05e31d1ee0d20d736c5babdf35d.json",
+ "audit_record_file": "5d25512b3a36c8168ad5a050c67182acea6dd05e31d1ee0d20d736c5babdf35d.json",
+ "base_record_sha256_bytes": "d75791ae49095f10ebb57b9627805ccd1f269d857c2aa7face5ef373c67017d4",
+ "audit_record_sha256_bytes": "abeff34eb04b564b8414519fc44c5bccabe0cc0f355c87570cb0102570cd6899",
+ "base_finding_count": 5,
+ "audit_finding_count": 8,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B4",
+    "B6"
+   ],
+   "base_member_text": [
+    "J index vectors (L234 and analogues) are computed but never used; the t=50 echo uses max(a_50) over the full range instead of max(a_50(I)) (L413) unlike the other panels."
+   ],
+   "audit_member_text": [
+    "Repeated snapshot blocks compute J as the finite/in-range model-row set (first at L234) but never use it; interpolation uses the full model columns, and out-of-domain NaNs are replaced by the beach line (first at L240), so missing model coverage is scored as bathymetry rather than rejected.",
+    "Copy inconsistency at L413: the t=50 diagnostic prints max(a_50) over the entire analytical array, whereas adjacent t=35,40,45,55,60,65 diagnostics print max(a_XX(I)) over the filtered comparison range."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "Model files are loaded with load() then materialized via eval of the filename stem (L174, L186) -- requires the ASCII file to load as a variable named after the file; fails for names starting with digits or containing dots beyond the extension."
+   ],
+   "audit_member_text": [
+    "Filename/interface mismatch across L171-L188: load is followed by strfind-based extension stripping and eval of the stripped filename as a MATLAB variable. Paths containing multiple dots, directories, or basenames that are not valid identifiers can fail or select the wrong variable; no loaded-variable validation exists."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "The seven snapshot blocks are copy-paste variants differing only in column index and axis limits; per-panel ax1 ymax values (0.04001/0.06001/0.08001/0.1001) encode expected wave growth -- not parameterized."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "err/err1 annotations in each panel show the errors of the preceding computation block; for the analytical-only invocation they stay NaN and are suppressed (if ~isnan guards)."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "The header calls the case both H=0.019 (L33) and H=0.0185 (L67, L204) -- benchmark nominal vs actual amplitude; which applies to analytical_SW.mat is not resolvable here."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Use-before-supplied interface defect across L161 and L179: the no-argument branch is guarded by nargin<1, so a legal one-argument call enters the else branch and references missing filename2 at L179."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Stale-state defect across L569,L601,L652-L654,L702-L704: the runup section resets err but not err1. If filename1 supplied a last snapshot error and filename2 is empty, that stale err1 is rendered as an ERR Max Runup Amp value in both runup panels."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Inconsistent comparison domain at L666-L683: x/h=0.25 NRMSD filters interpolated model values with ina, but maximum-runup error compares max(y2(ina1)) with max(y2n) over broader arrays; out-of-range NaNs or analytical points outside the model time domain can therefore invalidate or distort the metric."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "All NRMSD blocks divide by N and Norm without checking N>0 or nonzero analytical range (first at L248-L249; runup at L626-L627), leaving empty-overlap and constant-reference singularities unguarded."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "No pre-index shape checks enforce the documented >=8 columns for a1 or >=3 columns for a2 before accesses spanning L233-L581 and L616-L693."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

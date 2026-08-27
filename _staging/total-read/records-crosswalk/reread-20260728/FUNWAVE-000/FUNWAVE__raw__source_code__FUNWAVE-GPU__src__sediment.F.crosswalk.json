@@ -1,0 +1,317 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-000",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-GPU/src/sediment.F",
+ "source_sha256": "068bc0193ae194236cb74e9e9286772b3a4d8c00e5adcd22b55838cce92f7061",
+ "base_run_id": "reread20260728-code-FUNWAVE-000-fable5-20260813T012841Z-2131dcc5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-000-codexaudit-20260826T022956Z-b1ecf500",
+ "base_record_file": "24e038034427784e268e7f437d9e8590aa8d4d5916da0fb1a738265451ad4298.json",
+ "audit_record_file": "24e038034427784e268e7f437d9e8590aa8d4d5916da0fb1a738265451ad4298.json",
+ "base_record_sha256_bytes": "197d757bc2fb6e65470a3dead43e4e1774db3a38fa13f128c93e3b098dd5f87b",
+ "audit_record_sha256_bytes": "79cfa870aced431fd40bdce3fcb0487de44d95d1463046ffdc22022fa19f6c1f",
+ "base_finding_count": 10,
+ "audit_finding_count": 11,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "eval_sed_load L38-42: ustar_c through ustar_c4 all divide by log(30*MAX(H(I+1,J),MinDepth)/k_s) although they correspond to velocities at (I,J),(I+1,J),(I-1,J),(I,J+1),(I,J-1) -- apparent copy-paste of H(I+1,J); likewise tau_xy L128 and c_a L133 use H(I+1,J) instead of H(I,J)."
+   ],
+   "audit_member_text": [
+    "Neighbor shear velocities ustar_c1 through ustar_c4 all use MAX(H(I+1,J),MinDepth) around L38-L42, even for center, west, north and south velocities. The surrounding k1-k4 formulas use direction-matched depths, exposing this as a copy/paste location defect that feeds all diffusion coefficients."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "sediment_flux calls CONSTRUCT_HO_X with 12 arguments including DX (L314-318) and CONSTRUCT_HO_Y with DY (L335-339), but CONSTRUCT_HO_X/Y defined in fluxes.F of this same source tree take 11 arguments without DX/DY (the DX-bearing variants there are CONSTRUCT_HO_X_minmod/CONSTRUCT_HO_Y_minmod); which routine actually binds cannot be resolved from this file."
+   ],
+   "audit_member_text": [
+    "sediment_flux calls CONSTRUCT_HO_X/Y with an extra DX/DY actual argument around L300-L309. The independently read fluxes.F definitions of CONSTRUCT_HO_X/Y omit spacing arguments, while only the `_minmod` variants accept them. Without an alternate explicit interface at link time, these calls shift every subsequent argument and violate the procedure ABI."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "F4 upwind branch inconsistency: IF branch L72-73 uses -k4*(H(I,J+1)+H(I,J)) for the bottom (J-1) face while the ELSE branch L75-76 uses -k4*(H(I,J-1)+H(I,J)); relation L73 vs L76."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Pickup laws differ between branches: Upw branch c_b exponent 1.50 and Dstar**(-0.3) (L131) vs RK-branch sediment_source 2.40 and Dstar**(-0.6) (L270); Upw branch lacks the CH>=.50/13 and H<=1.2*MinDepth pickup caps present at L280-283."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "L316/L337 pass CH (not CHH) into outputs named CHHxL/CHHyL; CHH=CH*H computed at L307 is never used afterwards -- the flux formulas L322/L343 multiply CHHxL by HxL, so CHHxL actually holds reconstructed CH."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "eval_sed_load declares ISTEP (L12) but never uses it (ISTAGE is the loop variable L162); Delta_c divides by H(I,J) with the MAX(H,MinDepth) guard commented out (L114)."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Many work variables (u_c,u_c1-4,ustar_c*,k1-4,F1-4,tau_xy,c_b,reduction,c_a,Delta_c,CH0,htt,counter_ava,c_dum,tan_phi,ava,Zs,P_ave,D_ave,Counter_s,Morph_step,DT1,CHX,CHY,CHH,CHHxL...,FsL/R,GsL/R,Fs,Gs) are not declared in this file -- all assumed from USE GLOBAL; not resolvable here."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "update_bed avalanche relaxation (L710-884) restarts the full-grid scan from label 96 after every single cell adjustment (GO TO 96) with only c_dum>1000 escape (L716) -- O(1000) full-grid rescans possible per morphology step; the odd/even counter_ava sweeps alternate J-first (L522-523, L718-719) vs I-first (L614-615, from L799) loop order."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A8"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "sediment_solver caps CH at .750_SP/13.0_SP (L214-217) with the compensating Zb feedback commented out (L215); cap constant differs from the .50_SP/13.0_SP pickup cutoff (L280) -- rationale not stated in file."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A9"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "sediment_flux wall BCs zero only the normal fluxes at domain edges (L368-460); unlike eval_sed_load's Upw branch there is no py==1 special case for the y-direction."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The positive-V F4 diffusion branch uses H(I,J+1)+H(I,J) while its concentration difference and face velocity are on the south face J-1; the negative branch uses H(I,J-1)+H(I,J). This sign-dependent geometry mismatch changes diffusion solely with flow direction."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "For px==1, the x wall block's IF(npx==0) ... ELSEIF(npx==px-1) executes only the west condition and skips the east condition. The y block has an explicit py==1 case setting both sides, confirming the x single-partition omission."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Both deposition implementations evaluate (1-n_porosity)/CH before multiplication by CH, with no CH>0 guard. Active wet cells can have CH=0 initially or after MAX clamping in sediment_solver, so division by zero precedes any algebraic cancellation."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH) | span-reviewed 2026-08-27 REFUTED as material delta: MIN(2.0,(1-n)/CH) caps Inf before *CH (L152/L249), benign result under IEEE; risk only under -ffpe-trap build. not promoted.",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The direct upwind path updates CH without nonnegative or upper-concentration clipping, while sediment_solver clamps both bounds. Selecting Sed_Scheme therefore changes not only discretization but admissible concentration handling."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "sediment_flux forms HxL/HxR (Mloc1 by Nloc) and HyL/HyR (Mloc by Nloc1) by adding whole Zb, whose cell-centered shape is Mloc by Nloc. No face reconstruction or slice is applied to Zb, producing shape/interface inconsistency or wrong bed placement at faces."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Pickup formulas divide by Tau_cr and c_b and logarithmic shear denominators without guarding zero or singular values. D50, Shields_cr, Sdensity and water depth input domains are not validated here."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B8"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The avalanche pass updates I-1/J-1 neighbors in-place and jumps back to label 96 after each correction, restarting the entire scan until a hard 1000-restart cap. Results depend on alternating traversal order and may exit with slopes still above tan_phi without reporting nonconvergence."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B9"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Avalanche reads and writes ghost-adjacent I-1/J-1 cells but update_bed performs no halo exchange inside or after the iterative relaxation. Cross-partition bed slopes can therefore use stale halos and diverge between decompositions."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B10"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Morph_step is used as both equality trigger and divisor without a positivity check. If it is zero, averaging divides by zero; if Counter_s is not initialized/reset consistently, the NE test can miss the sole equality trigger."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

@@ -1,0 +1,137 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-000",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-GPU/src/derivatives.F",
+ "source_sha256": "d53019e11741de38138f16de47704786d9b116f2c9a90bd5c72c6101b0c4b53e",
+ "base_run_id": "reread20260728-code-FUNWAVE-000-fable5-20260813T012841Z-2131dcc5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-000-codexaudit-20260826T022956Z-b1ecf500",
+ "base_record_file": "f3afa94b232809e7ff8c685f6d3c49665b576a17a3339114bbca3f056e778467.json",
+ "audit_record_file": "f3afa94b232809e7ff8c685f6d3c49665b576a17a3339114bbca3f056e778467.json",
+ "base_record_sha256_bytes": "ed67b8358531c8eed37dc4d1294333f3205cdafd007202ffe98b8643c28a6181",
+ "audit_record_sha256_bytes": "71564f1726ad630b0fef3c814fd08c7f1979c3558a0b38afb6c3fe99ea83f151",
+ "base_finding_count": 4,
+ "audit_finding_count": 5,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "교차라인 의미 결함 후보: DERIVATIVE_YY_HIGH 비CARTESIAN 판의 마지막 스텐실 항이 -Uin(I+2,J+2) (L407) — CARTESIAN 판 L404 및 y 방향 대칭 스텐실 상 -Uin(I,J+2) 이어야 할 자리로, I+2 는 오타로 보이는 불일치(원문 그대로 기록)"
+   ],
+   "audit_member_text": [
+    "Non-CARTESIAN DERIVATIVE_YY_HIGH has a cross-axis stencil mismatch: its first four terms at L406-L407 keep x index I and vary J, but the final positive-side term is Uin(I+2,J+2) at L407. The CARTESIAN branch uses Uin(I,J+2) at L403-L404. This changes the nominal yy stencil by adding an x offset only in the non-CARTESIAN branch and is consistent with a copy/paste defect."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "tmp1..tmp4 (DERIVATIVE_XY L242-248, DERIVATIVE_XY_HIGH L315-334)는 이 파일에 선언 없음 — USE PARAM 모듈 소재 전역 임시변수로 추정되나 이 파일만으로 미확정"
+   ],
+   "audit_member_text": [
+    "Every subroutine enables IMPLICIT NONE (L53, L89, L124, L159, L193, L228, L265, L301, L353, L389) but none locally declares loop indices I and J used from L64 onward. DERIVATIVE_XY additionally uses tmp1/tmp2 at L242-L248 without local declarations, and DERIVATIVE_XY_HIGH uses tmp1/tmp2/tmp3/tmp4 at L315-L335 without local declarations. The file's USE PARAM statements may supply these names; if they do not, compilation fails, while if they do, the loop/scratch state is use-associated rather than local and reentrancy/thread-safety depends on PARAM. That dependency cannot be resolved from this file."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "DERIVATIVE_XX(L276)·DERIVATIVE_XX_HIGH(L364)의 주석 'I assume no 2nd derivative' 의 의미(격자 곡률 무시 가정으로 추정)는 이 파일만으로 미확정"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "루프 변수 I,J 도 이 파일 내 선언 없음(IMPLICIT NONE 하에서) — USE PARAM 제공으로 추정"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The higher-order routines access Uin at offsets up to plus/minus two (L67-L71, L103-L107, L315-L335, L368-L372, L403-L407), but their loops accept arbitrary Ibeg:Iend and Jbeg:Jend without checking a two-cell halo. The required caller-side bounds contract is not declared here."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Comments label DERIVATIVE_XY_HIGH, DERIVATIVE_XX_HIGH, and DERIVATIVE_YY_HIGH as fourth derivatives at L293, L345, and L381, while the implemented denominators and five-point coefficients at L315-L335, L368-L372, and L403-L407 form wider approximations of mixed/second derivatives. Whether '4th-derivative' was intended to mean fourth-order accuracy is not stated."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "For non-CARTESIAN spacing, all stencils divide a uniform-grid difference formula by only the center-cell DX(I,J) and/or DY(I,J) (for example L70-L71, L211-L212, L246-L248, L327-L336); only DERIVATIVE_XY_HIGH explicitly documents a locally constant-spacing assumption at L326. Applicability on materially varying grids is not specified."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

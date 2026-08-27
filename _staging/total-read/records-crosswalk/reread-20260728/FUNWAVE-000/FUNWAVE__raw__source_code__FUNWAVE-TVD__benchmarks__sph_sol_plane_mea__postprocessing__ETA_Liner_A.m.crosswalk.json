@@ -1,0 +1,118 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-000",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/benchmarks/sph_sol_plane_mea/postprocessing/ETA_Liner_A.m",
+ "source_sha256": "e9a0cf38c186bb3d984fb0cb5f6b872da2a89338165c5eeb27f85902718ec367",
+ "base_run_id": "reread20260728-code-FUNWAVE-000-fable5-20260813T012841Z-2131dcc5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-000-codexaudit-20260826T022956Z-b1ecf500",
+ "base_record_file": "ed83fc6267bead9e506e5e837ec30d6b0093f8e57282bddf339859aa9a2438f3.json",
+ "audit_record_file": "ed83fc6267bead9e506e5e837ec30d6b0093f8e57282bddf339859aa9a2438f3.json",
+ "base_record_sha256_bytes": "caf956cc5f39f74f42dd544c47353ea3d27594fa28065cf06e81c5a558cc0974",
+ "audit_record_sha256_bytes": "16995720f912a4a5760c86ccf946e6e74f07d11976a490c3a1eb341661b6aca9",
+ "base_finding_count": 3,
+ "audit_finding_count": 4,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "n=length(d) is the larger snapshot dimension; assumes columns exceed rows."
+   ],
+   "audit_member_text": [
+    "length(d) at L7 selects the largest matrix dimension rather than explicitly the second-row width; an input with more rows than columns makes d1(i) exceed its column count."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Five snapshots produce 6 data columns, but the output keeps the BP1_SHAPE filename used by the 7-snapshot analytical variant -- downstream consumers expecting 8 columns would mismatch; snapshot indices 0095..0219 map to benchmark times externally."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Row 2 of each 2D snapshot used as profile; x re-indexing via kk relies on the kept window being contiguous (monotonic x) -- same caveats as the _ana variant."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Cross-file range defect across L7-L16 and L32-L36: n is taken only from eta_0095, but the same index i is applied to d1-d5 without checking that every loaded matrix has at least two rows and n columns; any shorter or differently shaped file causes out-of-range indexing."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Empty-selection defect across L26-L46: if no generated x lies in [-2,20], kk and data are never assigned, yet the later coordinate loop/output still uses data, causing an undefined-variable failure rather than an empty result."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The script overwrites d for each load and never checks that all five snapshots share the same spatial grid, so equal lengths with different grids silently produce misregistered columns."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

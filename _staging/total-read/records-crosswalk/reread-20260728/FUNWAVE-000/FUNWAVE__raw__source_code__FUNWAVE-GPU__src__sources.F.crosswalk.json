@@ -1,0 +1,257 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-000",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-GPU/src/sources.F",
+ "source_sha256": "89669bd72ad76c209b11235dc67b02ce9d3a77c5f174b9424704009c145fe1ec",
+ "base_run_id": "reread20260728-code-FUNWAVE-000-fable5-20260813T012841Z-2131dcc5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-000-codexaudit-20260826T022956Z-b1ecf500",
+ "base_record_file": "8d8fec7438e40770eca5eecc0b00c0389781095f6d040056e24c2238781e000e.json",
+ "audit_record_file": "8d8fec7438e40770eca5eecc0b00c0389781095f6d040056e24c2238781e000e.json",
+ "base_record_sha256_bytes": "5765444e2464efa4349591bf2fe06e349a4149ec5932e4b141f2f75b3121a32a",
+ "audit_record_sha256_bytes": "5d633fbb080be572fa8325beb022a64ad80d35aa4cfde3c0b879d2ff5854e178",
+ "base_finding_count": 9,
+ "audit_finding_count": 8,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "nu_vis is declared default-precision REAL (L66) while the arrays combined into it (nu_break, nu_sponge) and all other reals are REAL(SP) -- precision mixing if SP is double."
+   ],
+   "audit_member_text": [
+    "nu_vis is declared default REAL while its sources and all arithmetic use SP. If SP differs from default real, breaking/sponge viscosity is narrowed before entering momentum sources."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "WaveMaker_Mass is assigned only inside the wavemaker box (L98-145) and never zeroed outside it in this routine; cells leaving the box retain stale values unless initialized elsewhere (GLOBAL)."
+   ],
+   "audit_member_text": [
+    "WaveMaker_Mass is assigned only inside the spatial maker window and only when one recognized WAVEMAKER prefix matches. The array is not cleared at routine entry, so cells outside the window and cells after a mode change can retain a previous time step's mass forcing; SourceX/SourceY consume it unconditionally in the Cartesian loop."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "PQ_scheme is hardcoded .FALSE. (L67); the P/Q-based viscous branch (L342-364) is dead code, kept with the explanation (L339-340) that P,Q are not exchanged at processor interfaces -- whether this remains true of the current EXCHANGE routines cannot be determined from this file."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Statement label 107 format(500f12.6) (L184) has no corresponding WRITE; INTEGER kd (L69) is declared but never used."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Coriolis terms exist only in the non-CARTESIAN branches (L415, L432, L448, L465); the CARTESIAN branch (L190-395) has no Coriolis -- asymmetry not explained in file."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Non-CARTESIAN dispersion factor differs by preprocessor flag: ZALPHA multiplies div(P,Q) by (U4-U1p)/(V4-V1p) (L413, L430) while the default multiplies by (-U1p)/(-V1p) (L446, L463); CARTESIAN uses (U4-U1p) (L212) -- relation of the three variants not stated."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "The wavemaker loop covers all cells 1..Nloc/1..Mloc including ghost cells (L84-85) while source assembly runs Jbeg..Jend/Ibeg..Iend (L187-188)."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "MANNING friction interprets Cd(I,J) as Manning n (GRAV*Cd**2/H**(1/3), L196-198) whereas the default branch interprets Cd as a drag coefficient (L200) -- same array, two meanings depending on compile flag."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A8"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Loop indices I,J and TIME, plus all forcing arrays (U1p,U1pp,U2,U3,V1p,V1pp,V2,V3,U4,V4,Cm,Sm,OMGN_IR,OMGN2D,D_gen,D_genS,Beta_gen,Beta_genS,rlamda,WAVE_COMP,CD_4_SPONGE,CD_breakwater,WaveMakerCd,nu_smg,Coriolis,SlopeX,SlopeY,VesselPressureX/Y,StormPressureX/Y,MASK_WIND,WindU2D/V2D,RHO_AW,Cdw) are module variables not declared here -- semantics depend on GLOBAL/VESSEL_MODULE/METEO_MODULE."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "All non-Cartesian wavemaker coordinates use fixed DX(1,1)/DY(1,1), even though later source derivatives use DX(I,J)/DY(I,J). A spatially varying curvilinear grid therefore receives a maker window and phase based on the first cell rather than physical coordinates."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The large CARTESIAN branch applies WaveMaker_Mass, friction sponge, current-balance drag, breakwater drag, METEO wind, MIXING and breaking/sponge viscosity. The non-Cartesian branch begins at L400 and reaches the loop end without corresponding terms. Feature flags can therefore silently lose their configured forcing outside Cartesian builds."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Regular and spectral ramp factors divide by Time_ramp and period/frequency quantities without zero-domain checks. The time-component mode additionally divides by each WAVE_COMP(kf,1). Invalid input causes singular forcing before any guard."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "PQ_scheme is initialized false and never changed, making the P/Q viscosity branch unreachable. The comment attributes this to missing processor exchange, so this is a hard-coded distributed-memory workaround rather than a selectable scheme."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Local integer kd is declared but never used. Its presence alongside kf suggests removed directional/component logic and should be reconciled with the active wave loops."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "CARTESIAN centered dispersive derivatives read I±1/J±1 and the disabled PQ path reads I+2/J+2 while the computation loop is Ibeg:Iend/Jbeg:Jend. Safety depends on ghost widths and exchanged P/Q/U4/V4 contracts not enforced in this routine."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

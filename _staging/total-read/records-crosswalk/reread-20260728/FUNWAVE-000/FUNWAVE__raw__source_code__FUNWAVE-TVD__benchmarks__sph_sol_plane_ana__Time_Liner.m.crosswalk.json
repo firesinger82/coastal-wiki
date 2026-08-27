@@ -1,0 +1,174 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-000",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/benchmarks/sph_sol_plane_ana/Time_Liner.m",
+ "source_sha256": "bf86a6b2067725261c6b25684893bac87f487e291c6689de82c551369d6079d7",
+ "base_run_id": "reread20260728-code-FUNWAVE-000-fable5-20260813T012841Z-2131dcc5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-000-codexaudit-20260826T022956Z-b1ecf500",
+ "base_record_file": "60932e5dee84ac0bbcd5d31c54d41a79cb11f75a111c2cab5aa20c66e4b57960.json",
+ "audit_record_file": "60932e5dee84ac0bbcd5d31c54d41a79cb11f75a111c2cab5aa20c66e4b57960.json",
+ "base_record_sha256_bytes": "346acf1b41dc6c02961aee03b17edeb5acd3922b7bee0dec658bd98cc109f033",
+ "audit_record_sha256_bytes": "789bd73588689809bc973041c1c65dc49f324f4d866d02dc385e35676b006b8f",
+ "base_finding_count": 3,
+ "audit_finding_count": 7,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "d2's time column is never rescaled or used (only d1's, L12-14); d2(:,2) is sampled at the same row index i (L46), assuming both stations share identical sampling."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "The -0.0145 NaN floor (L48) presumably masks the dry-gauge minimum at station 2; the constant's origin is not stated; a=1.9 (L9) is unused."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "The i-filter d1(i,1)>d1(i-1,1) (L43) drops rows where time did not increase -- suggests the station file may contain repeated time stamps (restart overlap); cause external to this file; station-to-gauge mapping (sta_0002 = runup/shoreline gauge) is implicit."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Definite zero-index failure in both peak searches: kk and kk2 start at 0 on lines 16 and 28, while loops begin at element 2 and update only for a strictly larger later value. If the first element is maximal (or either series has length 1), kk/kk2 remains 0 and lines 25/37 perform illegal MATLAB index-0 access. They must begin at 1 for the initialization from element 1 to be coherent."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Use-before-local-assignment / implicit interface: y2 and t2 are only expected to be injected by load('analytical_RU.mat') on line 3, then used on lines 27, 29-37 without field, length, or shape checks; t2 is also assumed index-compatible with y2."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Cross-file pairing defect: n comes only from d1 on line 10, and the output loop indexes d2(i,2) using d1's bound and d1's monotonic-time test on lines 42-47. d2 length and timestamps are never checked, so a shorter d2 fails and unequal time grids are paired merely by row number."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Shape defect: length(d1) returns the largest dimension, but subsequent code requires at least two columns and n rows. Unusual matrix orientation or fewer than two columns breaks indexing."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Empty-output use-before-assign: data is only created inside the strictly-increasing-time branch on lines 43-50. If d1 contains no increase after row 1, line 54 writes undefined data."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The parameter a=1.9 on line 9 is never read after assignment, indicating stale/copied configuration with no effect."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "d1 time is multiplied by sqrt(9.81/dep) on line 13 while analytical t2 is not transformed; the file does not state that t2 is already in the same nondimensional time basis, so the computed gap cannot be independently validated."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

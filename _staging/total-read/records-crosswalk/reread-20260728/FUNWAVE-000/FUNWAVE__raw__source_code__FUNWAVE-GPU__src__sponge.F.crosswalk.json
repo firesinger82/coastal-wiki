@@ -1,0 +1,298 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-000",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-GPU/src/sponge.F",
+ "source_sha256": "b507c58d155b7a1c5757e13ca8857f227c98efc7861e231323acdb909a56cc32",
+ "base_run_id": "reread20260728-code-FUNWAVE-000-fable5-20260813T012841Z-2131dcc5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-000-codexaudit-20260826T022956Z-b1ecf500",
+ "base_record_file": "1bf218c456358be046203d53b894c53896d6d53d6860be9476bcc4647ac1f475.json",
+ "audit_record_file": "1bf218c456358be046203d53b894c53896d6d53d6860be9476bcc4647ac1f475.json",
+ "base_record_sha256_bytes": "d5f3e635fead7a3a1133a4206608332fc93385f068bbf4b0f08475f58ebed291",
+ "audit_record_sha256_bytes": "25e7365b80b952ae23b7a0f4e5121a44e98cb7d381671626b6cf619373a73f2a",
+ "base_finding_count": 10,
+ "audit_finding_count": 9,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "50*(I-1)/(Iwidth-1) (L178, L621-624, L688-691, L717-720) is integer division, so the Larsen-Dancy exponent ri changes in integer steps; Iwidth=1 would divide by zero (no guard)."
+   ],
+   "audit_member_text": [
+    "All Larsen-Dancy exponent expressions use integer operands in `50*(index)/(Iwidth-1)`. Fortran integer division quantizes the exponent to steps instead of a continuous ramp, and Iwidth==1 divides by zero. The width-to-Iwidth conversion has no lower-bound validation."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "SPONGE_DAMPING guards only ETA with MASK>ZERO (L58-60) while U,V are damped even at masked cells (L61-62); MASK (integer) is compared against real ZERO."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "ABSORBING_GENERATING_BC: Din2D (L85) and K (L84) declared but unused; Grav and Stokes_Drift_Ser imported (L79-81) but unused; the /SPONGE**4 attenuation of targets (L112-114) has no in-file justification; loop indices i,j are module variables imported from GLOBAL (L78)."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "CALCULATE_SPONGE_MAKER handles only a west-side sponge (signature carries only Sponge_west_width, L136-138) unlike the four-sided CALCULATE_SPONGE; its serial/parallel ri difference is only the iista offset (L175 vs L178)."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "CALCULATE_FRICTION_SPONGE west/east passes reset lim=0.0_SP unconditionally (L249, L274), discarding any pre-existing SPONGE, while south/north use lim=SPONGE(I,J) if positive (L308-312, L337-341); also SPONGE is INTENT(OUT) and zeroed (L217, L235) whereas CALCULATE_DIFFUSION_SPONGE takes INTENT(INOUT) (L399) and never zeroes -- asymmetries not explained."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "R_sponge and A_sponge dummies are unused in CALCULATE_FRICTION_SPONGE and CALCULATE_DIFFUSION_SPONGE (amplitudes come from GLOBAL CDsponge L199 / Csp L381); depth and MinDepthFrc are imported in all three calculators (L199, L381, L568) but never used; DXg,DYg,xx (L220, L402, L589) assigned/declared but unused."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "CALCULATE_CD_BREAKWATER: tmp_glob spans Mglob+2*Nghost x Nglob+2*Nghost (L778, L797-798) but the spreading loops clamp Ib,Jb to Min(Mglob,...)/Min(Nglob,...) and MAX(1,...) (L802-803), so upper ghost rows/cols beyond Mglob/Nglob never receive absorber values while lower ghost cells (1..Nghost) can; relation L797-798 vs L802-803."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "CALCULATE_CD_BREAKWATER master slice CD_breakwater=tmp_glob(1:Mloc,1:Nloc) (L865) assumes rank 0's subdomain starts at global index 1; correctness depends on iista/jjsta convention defined elsewhere."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A8"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "The distribution loop (L868-895) serializes one mpi_isend+mpi_wait per rank from master; ireq/istatus reused; ri,lim (L773) and Iwidth partially unused in the breakwater routine (Iwidth,Jwidth used only as disk radii L800-801)."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A9"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "MPI symbols (mpi_status_size L768, MPI_INTEGER L855, mpi_sp L881, MPI_COMM_WORLD) are not use-associated in this file; presumably via PARAM or an MPI module elsewhere."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "SPONGE_DAMPING and ABSORBING_GENERATING_BC divide by SPONGE or SpongeMaker without checking positivity/nonzero values. CALCULATE_SPONGE intends coefficients at least one, but the arrays are externally supplied and the other coefficient builders can start at zero, so the consuming contract is not enforced."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "CALCULATE_SPONGE_MAKER loops I=1:Iwidth without clipping Iwidth to M. A requested west width larger than the local/global domain writes beyond SPONGE; parallel ranks away from the west also execute that local range rather than limiting it to owned cells."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Friction and diffusion sponge routines accept R_sponge and A_sponge but never use them; their profiles depend only on global CDsponge/Csp and a fixed tanh length 10. The shared interface therefore exposes inert user controls."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "All non-Cartesian width conversions and breakwater distance calculations use DX(1,1)/DY(1,1). Spatially varying cell dimensions make requested physical widths and radial distances position dependent, but the code treats them as uniform."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Parallel east/north distance offsets multiply each rank's own `(iiend-iista+1)` or `(jjend-jjsta+1)` by the number of remaining partitions. With uneven domain decomposition this does not equal the number of cells to the global edge, shifting sponge profiles by rank."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "ABSORBING_GENERATING_BC imports Din2D and K/Stokes_Drift_Ser but never uses them. The absent drift correction may be deliberate, but the interface/import residue makes mass-current compensation unclear."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "CALCULATE_CD_BREAKWATER allocates the full global tmp_glob on every rank although only rank zero initializes it. This is an avoidable per-rank global-memory scaling cost; allocation failure is not checked."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B8"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The breakwater MPI distribution assumes rank numbering `1:px*py-1` matches gathered decomposition order and sends every block with tag 1. That mapping is external to this routine and should be checked against the communicator/cartesian topology."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

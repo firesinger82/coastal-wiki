@@ -1,0 +1,171 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-000",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-GPU/src/dispersion.F",
+ "source_sha256": "5a5028cd619cc3d289a0bc20e0a7532adf1375ce31a6c8454458c728a5050d8b",
+ "base_run_id": "reread20260728-code-FUNWAVE-000-fable5-20260813T012841Z-2131dcc5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-000-codexaudit-20260826T022956Z-b1ecf500",
+ "base_record_file": "dc22e322299801fff35bbd39dab5eb8d2feda89f31f5d1aff923e03717487af7.json",
+ "audit_record_file": "dc22e322299801fff35bbd39dab5eb8d2feda89f31f5d1aff923e03717487af7.json",
+ "base_record_sha256_bytes": "62c0ab1086dc3e8602ff16eb972101bc0542f785a814f97c78fa9a1db954fc66",
+ "audit_record_sha256_bytes": "edcd8c4e0a5cdaf4b1e13bacedaa6c623286524838b923e7218a5277f35f51a3",
+ "base_finding_count": 6,
+ "audit_finding_count": 6,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "omega_1 (L459-460)의 계수 b2 는 이 파일에 선언 없음(USE GLOBAL 소재로 추정) — Beta_2 와 별개 심볼인지 이 파일만으로 미확정"
+   ],
+   "audit_member_text": [
+    "The vorticity correction uses imported identifier b2 at L460-L461 while neighboring dispersion coefficients use Beta_1 and Beta_2 throughout L292-L454. The definition and units of b2 are outside this file, so the apparent name change cannot be adjudicated from this source alone."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "U4/V4 가 CARTESIAN 블록(L292-316)과 ZALPHA 블록(L318-325)에서 이중 정의될 수 있음(두 매크로 동시 정의 시 ZALPHA 가 덮어씀) — 배타성 보장은 빌드 시스템 소관으로 미확정"
+   ],
+   "audit_member_text": [
+    "CARTESIAN U4/V4 are assigned and may receive Gamma2 corrections at L291-L316; the separate ZALPHA block then assigns U4/V4 again at L318-L325. If CARTESIAN and ZALPHA can both be defined, the second block silently discards the Gamma2 additions. Mutual exclusivity of these preprocessor symbols is not enforced or documented here."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "교차라인: DU/DV·ETAT 루프는 J=1,Nloc-1·I=1,Mloc-1 (L103-104)인데 바로 위 주석 L111 은 'ykchoi pointed a bug: J=1,Nloc, I=1,Mloc' — 버그 지적이 코드에 반영되지 않은 상태(마지막 행·열 미계산)인지 이 파일만으로 미확정"
+   ],
+   "audit_member_text": [
+    "Range/assignment inconsistency: local DU and DV and GLOBAL ETAT are assigned only in loops J=1:Nloc-1 and I=1:Mloc-1 at L102-L118. The source comment at L110 explicitly says the corrected bounds are J=1,Nloc and I=1,Mloc, but the code still uses the shortened ranges. DU/DV are immediately passed to derivative routines over Ibeg:Iend,Jbeg:Jend at L149-L156 and their derivative results are consumed over the full 1:Mloc,1:Nloc loop at L289-L380; ETAT is later consumed at L415-L418. Unless caller/global initialization supplies the omitted last row and column and all stencil halos, these paths read stale or undefined values."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "교차라인: CARTESIAN 분기의 ELSEIF(SHOW_BREAKING .OR. WAVEMAKER_VIS)THEN (L144)/비CARTESIAN IF(L146)의 몸체가 비어 있음(L148-149) — ETAT 는 이미 L114-116 에서 무조건 계산되므로 분기 자체가 잔재로 보이나 의도는 미확정"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "U1pp/V1pp 첫 항 '-reta*Beta_2*ETAx(I,J)*Beta_2*(...)' (L406,409)는 Beta_2 가 두 번 곱해지는 형태 — 원문 그대로 기록, 의도(제곱) 여부 미확정"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "SPH_EXTRA_DISP 블록의 VxL,VxR,HVxL,HVxR,UxL,UxR,VyL,VyR,HUxL,HUxR,HVyL,HVyR,Lat_theta,R_earth (L357-374)는 이 파일에 선언 없음 — GLOBAL 소재 추정"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The file documents that Ut and Vt should be evaluated outside the Runge-Kutta loop and that the current placement may affect hot starts at L124-L126, yet computes them locally from U-U0 over DT at L131-L140. The call site's RK and restart ordering is not present, so the magnitude and phase error cannot be resolved here."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Physical-edge blocks zero Uxy/DUxy/Vxy/DVxy and also Utxy/DUtxy/Vtxy/DVtxy at L193-L284, whereas the time-derivative arrays are computed only for CARTESIAN Gamma2>ZERO at L158-L179. Whether all those GLOBAL arrays are always allocated and initialized in other build modes is not established in this file."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "All derivative calls rely on stencil accesses beyond Ibeg:Iend/Jbeg:Jend, but this routine's local DU/DV/DUt/DVt arrays have no explicit initialization outside their assignment loops and no halo exchange before the calls at L149-L178. The required halo ownership and ordering contract must be checked in callers and exchange routines."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

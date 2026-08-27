@@ -1,0 +1,219 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-000",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/benchmarks/car_osu_runup/postprocess/plot_ADV_AB.m",
+ "source_sha256": "43c41a429e0cf649f3932a2b80d9184d2cbd10660a1f7a1bf5885cd6df9293e3",
+ "base_run_id": "reread20260728-code-FUNWAVE-000-fable5-20260813T012841Z-2131dcc5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-000-codexaudit-20260826T022956Z-b1ecf500",
+ "base_record_file": "344639ef1475ae0544deb12704123c90fd14973c59ea12fc99176c46f8bc23a9.json",
+ "audit_record_file": "344639ef1475ae0544deb12704123c90fd14973c59ea12fc99176c46f8bc23a9.json",
+ "base_record_sha256_bytes": "bd184d112b84890136f980ca037ee03844ac06fe92516268fa1fd2fc5004c2c5",
+ "audit_record_sha256_bytes": "62374bfe29f6cb44b58e362829a98616cec7cdd009c389af643618eb16b74974",
+ "base_finding_count": 5,
+ "audit_finding_count": 8,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "The ADV B model curve gets an additional -0.25 s shift (L65) on top of the global -0.25 s in L32, while ADV A uses the global shift only (L46) -- total shifts differ between panels without in-file justification."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "text('ADV A') and legend are issued at L57-58 after the B-station data have replaced data/vel/veldata (L51-56) but before subplot(212); they still target the first axes only because subplot(212) is created at L60 -- fragile ordering."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "n is set to 6 at L37/L53 overwriting the column count from size (L10), and vel is padded to 6 columns though only column 1 is plotted; m from L36/L52 overwrites the FSE record length; num_shift_ind/exp_shift_ind (L18, L26) unused."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Peak alignment uses eta column 1 of the model FSE file vs column 2 of WG1.txt (L17 vs L25); which gauge model column 1 corresponds to is not stated in this file."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Demeaning by mean(veldata(1:25,2)) (L43, L62) assumes the first 25 samples are still water; sampling rates of the measured files are not stated."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "If eta(:,1) or WGdata(:,2) contains NaN, max at lines 17 or 25 can be NaN and equality is false for every iteration; empty inputs also skip the loops. num_t_shift and/or exp_t_shift are then used before assignment at line 32."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Line 32 already subtracts 0.25 from the shared model time, line 46 plots ADV A against that shifted t, and line 65 subtracts another 0.25 only for ADV B. No comment or separate B alignment calculation explains the cumulative 0.50-second B shift, making this a likely copied double shift/interface mismatch."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Measured plotting at lines 43 and 62 uses length(veldata) as a row bound. Because MATLAB length returns the largest dimension, a file with fewer rows than columns indexes beyond its row range; size(veldata,1) is the required interface dimension."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Measured mean removal at lines 43 and 62 unconditionally indexes rows 1:25 and column 2, while model extraction at lines 39 and 55 requires at least two input columns. Short or narrow files fail with no validation."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The time vector t comes from datae rows at line 11, whereas vel rows come from independently loaded A/B files at lines 35 and 51. Plots at lines 46 and 65 require equal vector lengths, but neither A nor B row count is checked against length(t)."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "vel is preallocated with six columns at lines 38 and 54, but the copy ranges at lines 39 and 55 are driven by nn from each input file. nn-1 greater than six silently expands the buffer, while nn-1 below six leaves zero-filled unused columns; n=6 at lines 37 and 53 is never used to enforce the apparent six-column contract."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "num_shift_ind and exp_shift_ind are assigned at lines 18 and 26 but never read, and n is overwritten at lines 37 and 53 without being consumed; these are dead copy/paste remnants rather than active controls."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Division by fact occurs at lines 46 and 65 without a nonzero check; the current default at line 4 is safe, but the exposed parameter becomes singular if changed to zero."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

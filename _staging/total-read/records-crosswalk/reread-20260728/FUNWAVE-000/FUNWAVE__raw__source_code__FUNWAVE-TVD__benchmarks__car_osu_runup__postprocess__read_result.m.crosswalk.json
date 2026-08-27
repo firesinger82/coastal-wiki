@@ -1,0 +1,164 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-000",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/benchmarks/car_osu_runup/postprocess/read_result.m",
+ "source_sha256": "df2aacd741def438ccfc573ba79e8d7bf06647d48848302393e6bca0d24703f8",
+ "base_run_id": "reread20260728-code-FUNWAVE-000-fable5-20260813T012841Z-2131dcc5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-000-codexaudit-20260826T022956Z-b1ecf500",
+ "base_record_file": "7f8e4f55d820daafa733a0aa0f19dce30329d485ca9f3a216349ce1684dc2568.json",
+ "audit_record_file": "7f8e4f55d820daafa733a0aa0f19dce30329d485ca9f3a216349ce1684dc2568.json",
+ "base_record_sha256_bytes": "a2559859eab2c0c6bf2bedaad6d24df8eaf56dbe91943abf4b7349157bebdd9b",
+ "audit_record_sha256_bytes": "e98787eecf5c5b7bd65f87a0bd68c3798f3769538914e498bd2777f0faeb970f",
+ "base_finding_count": 7,
+ "audit_finding_count": 7,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B3",
+    "B6"
+   ],
+   "base_member_text": [
+    "sk (L18), v (L16), X,Y (L14) and windowsize (L84, reassigned every iteration) are unused in the live part; fdir is a hard-coded personal path (L3)."
+   ],
+   "audit_member_text": [
+    "The absolute snapshot directory at L3 makes all L78-L80 loads depend on one user's filesystem and no existence or shape check precedes arithmetic with dep.",
+    "windowsize at L84, v at L16, and sk at L18 are unused by active extraction logic."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "break at L139 makes L141-188 (model_bench2.mat save and quick-look figures) dead code in modern MATLAB script context break is also illegal outside a loop."
+   ],
+   "audit_member_text": [
+    "The standalone break at L139 is outside every loop (the kt loop closes at L106), which causes MATLAB to error; model assembly, model_bench2.mat output, and all diagnostics at L141-L195 cannot execute normally."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B1",
+    "B2"
+   ],
+   "base_member_text": [
+    "w computation (L88-93): both divx and divy come from diff() with no dimension argument, differencing along the first (row/y) dimension for both terms -- so w=-diff_y(h*u)/dx-diff_y(h*v)/dy rather than a proper 2D divergence; also diff shortens the first dimension by 1 while sampling still uses full-grid indices jg (L100-102), a 1-row misalignment."
+   ],
+   "audit_member_text": [
+    "Both divx and divy use diff with no dimension argument at L88-L91, so MATLAB differences both fluxes along the first nonsingleton dimension; the x-flux is not differenced along the second grid dimension even though L92-L93 divide it by dx.",
+    "jg can be assigned iy+1=ny at L53, but w1 and w2 have one fewer row because diff defaults to the first dimension at L88-L91; sampling w1/w2 at L100 or L102 can therefore exceed their row range for a gauge mapped to row ny."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "nearest-index search (L47-69) leaves ig/jg undefined for gauges outside the axis ranges; no guard; igjg.mat cache can silently go stale when the grid changes (only the interactive flag L45 controls refresh)."
+   ],
+   "audit_member_text": [
+    "ig and jg are only assigned when each gauge falls into one of the half-open cell intervals scanned at L48-L67; if a coordinate lies outside or exactly at an uncovered boundary, the later samples at L96-L102 use an unassigned element."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "The kg==18 special case uses the deeper level w1 (hh1=0.03+dep) while all others use w2 (hh2=0.01+dep) (L99-103) -- ADV elevation rationale not in the file."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "hh1/hh2 add constants to the full depth array; interpretation (sensor heights above bed 3 cm/1 cm?) is not stated."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "FSE output selects gauges 1,3,6,7,9,12,13,15,17 (L109-117) to form 9 columns matching the WG1-9 comparison in plot_WG.m; mapping justified only implicitly."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The same unqualified diff operations yield arrays reduced only in rows, so divx and divy happen to have matching shapes but do not represent orthogonal derivatives; this masks the axis mismatch rather than producing a dimension error."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

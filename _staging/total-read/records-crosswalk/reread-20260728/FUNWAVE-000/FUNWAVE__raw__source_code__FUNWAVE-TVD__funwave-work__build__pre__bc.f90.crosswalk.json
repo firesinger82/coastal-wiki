@@ -1,0 +1,174 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-000",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/bc.f90",
+ "source_sha256": "11210cd0dd4873781a152ff92cec91510af348611c79a642643e368c75f113e1",
+ "base_run_id": "reread20260728-code-FUNWAVE-000-fable5-20260813T012841Z-2131dcc5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-000-codexaudit-20260826T022956Z-b1ecf500",
+ "base_record_file": "7a6526cb6568811b6adb8f66be14714bcce0caf3fb1f65ee63314aa3d7be566d.json",
+ "audit_record_file": "7a6526cb6568811b6adb8f66be14714bcce0caf3fb1f65ee63314aa3d7be566d.json",
+ "base_record_sha256_bytes": "3897f8c88f1b4fd96bd3f8c4093c8593d5efb0d7dd5a1839105a04a00dd5f438",
+ "audit_record_sha256_bytes": "df49ff545ec53182f79a1953d1efd7ea683f8cc50c05d86f6e36fa18164bb9d2",
+ "base_finding_count": 6,
+ "audit_finding_count": 4,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "This is generated cpp output (build/pre/) of bc.F with PARALLEL active and CARTESIAN apparently off (PERIODIC handled at runtime, no DX scalar branches remain) -- flag set of the originating build is not recorded in the file (stray comments '! end cartesian' L512, '! end parallel' L508 are residue of stripped preprocessor blocks)."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "MASK (integer array in GLOBAL) is ghost-exchanged through a REAL copy rMASK (L324-326) because PHI_COLL only accepts REAL(SP) -- implicit real-to-int truncation on assignment back; relation L298 vs L324-326."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "PHI_COLL declares nreq,ll,l,JJ,myvar,mybeta (L439, L442) that are never used; the periodic exchange serializes MPI_SEND before posting the matching MPI_IRECV on the peer (L453-494) -- correct only while messages fit MPI's eager buffering."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "PHI_COLL's PY=1 in-place periodic wrap copies over I=Ibeg..Iend only (L499-504) while the PY>1 path exchanges full Mloc rows including x-ghosts (L454, L468) -- corner ghost handling differs between the two paths."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Compared with the GPU port (FUNWAVE-GPU/src/exchange_gpu0819.F): here EXCHANGE_DISPERSION exchanges ETATx/ETATy (L229-231) which the GPU version comments out; EXCHANGE additionally exchanges radiation-stress fields Wsurf/P_center/Q_center/U_davg/V_davg (L304-308) absent there; loop indices I,J,K are GLOBAL module variables (no local declarations despite IMPLICIT NONE in each routine)."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "phi_exch (L781) is defined elsewhere (MPI halo exchange); VTYPE=4 y-direction zeroing carries the comment 'this one is not an exact solution' (chunk3, before the VTYPE=4 south block)."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Halo-exchange interface gap across L324-L325,L365-L414,L781: EXCHANGE sends staggered P/Q through PHI_COLL_VARIABLE_LENGTH, but that routine only reflects physical-edge ghosts and returns without any MPI/phi_exch call; ordinary PHI_COLL always finishes with phi_exch. Unless another caller-owned exchange exists, P/Q internal-processor halos remain stale when these fields are enabled."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Periodic overwrite defect across L445-L504 and L664-L779: PHI_COLL fills periodic y ghosts first, and VTYPE 1/2/3 protect later y boundary logic with .NOT.PERIODIC (e.g. L643), but VTYPE 4/5/6 south/north blocks have no such guard. On periodic end ranks they can overwrite periodic data with zero, symmetric, or antisymmetric physical-boundary values before phi_exch."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Boundary-condition halo-range dependency in L120-L194: loops already span Ibeg-1:Iend+1 and Jbeg-1:Jend+1, then access MASK(I-1,J), MASK(I+1,J), MASK(I,J-1), MASK(I,J+1) and P/F/G at I+1 or J+1. Correctness requires at least two addressable halo layers at extremes; this file neither asserts Nghost>=2 nor bounds-checks those accesses."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "PHI_COLL accepts any integer VTYPE (L434) but has no else/error branch outside 1..6; an invalid code silently skips physical-boundary semantics and still calls phi_exch at L781."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

@@ -1,0 +1,231 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-000",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-GPU/src/samples.F",
+ "source_sha256": "d199df6611f42201611e81b243492ba5e5c55fd9ee206f8eec1ed992aa02284f",
+ "base_run_id": "reread20260728-code-FUNWAVE-000-fable5-20260813T012841Z-2131dcc5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-000-codexaudit-20260826T022956Z-b1ecf500",
+ "base_record_file": "2ca047f37355ec5fd4fd5535acd5712519101beb5cf0410511bbc54eef78c880.json",
+ "audit_record_file": "2ca047f37355ec5fd4fd5535acd5712519101beb5cf0410511bbc54eef78c880.json",
+ "base_record_sha256_bytes": "ab2c336d3fc9f4e9fd3fa77bb3b88d3442d920307ea18a65827f92943d1ef89a",
+ "audit_record_sha256_bytes": "0afa9516e096a8574fc06f27135a6eb1a4a722d33aa5c921f52d3b06fcf1cb85",
+ "base_finding_count": 8,
+ "audit_finding_count": 8,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "Serial CARTESIAN INITIAL_RECTANGULAR (L231-234) lacks the out-of-window clipping applied in the parallel branch (L220-227); Il<1 or Ir>M would produce an invalid array section."
+   ],
+   "audit_member_text": [
+    "The parallel INITIAL_RECTANGULAR branch clips Il/Ir/Jl/Jr to array limits and handles no-overlap, while the serial branch writes Eta(Il:Ir,Jl:Jr) without any clipping. Rectangles partly or wholly outside the serial grid can create invalid sections or runtime bounds errors."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "INITIAL_N_WAVE: dummy gamma_s (L439, L447) is never used; x2 appears only in the commented general n-wave formula (L490); local tlag (L71 in SOLITARY_WAVE_LEFT_BOUNDARY) likewise assigned but unused."
+   ],
+   "audit_member_text": [
+    "INITIAL_N_WAVE accepts gamma_s and x2 but never uses either in active code; the x2-dependent general N-wave expression is commented and gamma is recomputed locally. The public interface therefore advertises controls that do not affect output."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "INITIAL_WAVE (L95-160) is effectively dead code: goto 200 (L123), goto 100 (L135) and goto 213 (L150) skip the box (L124-131), dam-break (L136-141) and alongshore-crest (L151-157) blocks, and the gaussian is commented (L144-145), so Eta is never modified; sigma/x_c/y_c/a (L116-119) and XX/YY (L104-114) are computed but unused."
+   ],
+   "audit_member_text": [
+    "INITIAL_WAVE is effectively a no-op for Eta: unconditional `goto 200` skips the box assignment, unconditional `goto 100` skips the dam-break assignment, the Gaussian assignment is commented, and `goto 213` skips the alongshore crest. XX/YY and scalar parameters are computed but no active initial field is written."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "tmp1/tmp2 used in INITIAL_WAVE (L125-127) and tmp1 in INITIAL_N_WAVE (L473-486) are not locally declared despite IMPLICIT NONE -- must be module variables from USE GLOBAL/PARAM; same for loop indices I,J in the INTENT-based subroutines (e.g. L283-284, L466-467)."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "alpha=-0.39 hardcoded (L534) replaces the commented formula alpha=0.5_SP*Beta*Beta+Beta (L531); comments L532-533 record that the resulting wave shape does not match the equation ('alpha = -0.10 seems OK'); the Beta dummy (L525) is consequently unused."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "SUB_SLTRY: zr (L632) is computed but is neither an OUT argument nor used; r1 (L617) and C_ph (L618) receive the identical value rx*cph; local cph shadows the caller's Cph actual argument bound to r1."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "INITIAL_GAUSIAN header comment (L251) says input keyword 'INI_REC' although the routine is the gaussian hump (dipole header L340 correctly says 'INI_DIP')."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Newton loop failure paths only stop without message: explanatory write commented at L611 (SUB_SLTRY) and L456 (INITIAL_N_WAVE depth guard)."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "INITIAL_SOLITARY_WAVE accepts Beta and even shows the intended alpha formula in a comment, but unconditionally assigns alpha=-0.39 before calling SUB_SLTRY. Thus Beta does not affect the generated solution and all caller-selected beta values collapse to one profile."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Gaussian and dipole formulas divide by WID and WID**2 without a positive-width check. SOLITARY_WAVE_LEFT_BOUNDARY and SUB_SLTRY similarly divide by h00/h1 and amplitude ratios without validating their domains."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "SUB_SLTRY performs x=x-fx/fpx before checking iteration count and never guards fpx=0. Subsequent SQRT expressions require x and (alp2-alp*x) domains that are also unchecked, so the advertised STOP path does not protect singular Newton steps or invalid roots."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "For non-Cartesian variable spacing, INITIAL_WAVE, INITIAL_N_WAVE and INITIAL_SOLITARY_WAVE estimate position by multiplying a local DX(I,J) by an index rather than accumulating cell widths. Correctness therefore depends on DX being uniform despite its array-valued interface."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The file banner says sample.F while the actual path is samples.F; this is a provenance-name mismatch."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}
