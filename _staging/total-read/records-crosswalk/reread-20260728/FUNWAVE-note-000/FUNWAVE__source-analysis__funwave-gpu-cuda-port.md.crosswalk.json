@@ -1,0 +1,219 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-note-000",
+ "source_path": "FUNWAVE/source-analysis/funwave-gpu-cuda-port.md",
+ "source_sha256": "2aed5e5d65443545d0ca250388d41d42c4441af40a1f92f3b25c4fb8f0ef6a6f",
+ "base_run_id": "reread20260728-note-FUNWAVE-000-fable5-20260813T005226Z-b33d4276",
+ "audit_run_id": "reread20260728-note-FUNWAVE-000-codexaudit-20260826T020658Z-97dd3be1",
+ "base_record_file": "eb38b4ee4692999720d8fed81f14dfdd834e87dac3ebb0017584e5b4814b3b7d.json",
+ "audit_record_file": "eb38b4ee4692999720d8fed81f14dfdd834e87dac3ebb0017584e5b4814b3b7d.json",
+ "base_record_sha256_bytes": "d7065d8cf41d29354534b0d4f349fca7086fec98c90a4b99ad4188de43091fce",
+ "audit_record_sha256_bytes": "b46e23d9bceab265b132badd5ccddee666b7d0a9471cf6c3c8f87ce54fb293c4",
+ "base_finding_count": 4,
+ "audit_finding_count": 9,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "§7.2 방향 이름 가드 표기 'n_west/east/suth/nrth'(L193) — 'suth/nrth' 철자가 소스 변수명 그대로인지 노트 오타인지 이 파일만으로 판정 불가"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "L185 주석 '! D2H pack'은 스테이징 방향 서술(L170 device→host)과 맞지만 cudaMemcpy2D 호출 자체에는 방향 인자가 없어(host/device 판단은 인터페이스) 실제 전송 방향은 소스 대조 필요"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "transpose_kernel이 'naive 전치(coalesced write/strided read)'(L108)라는 성능 특성 서술은 코드 구조에서의 추론으로, 프로파일 근거는 이 노트에 없음"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "§3.2 tBlock=dim3(32,1,1) 앵커(:191,332,578)와 §3.4·§7.4 등 여러 발췌가 '~'(:86~, :183~, :321~, :597~) 형식의 개시 라인만 제공 — 발췌 종료 라인은 원문 대조 필요"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Blackwell port updates only Makefile_cuda to nvfortran/cc120 (lines 31, 37), while Makefile_mgpu remains FC=mpif90 with -Mcuda=cuda10.1 (line 33). Therefore the described MGPU path is not shown as compatible with the CUDA12+/Blackwell requirement that motivated the port."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "CUDA runtime cudaMemcpy2D pitch and width arguments are described and passed as Mloc/Nghost element counts (lines 188-193). The API normally specifies pitches and width in bytes; no multiplication by real/integer element size or Fortran overload semantics is shown, creating a byte-vs-element unit mismatch risk for all staged halo copies."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "device selection uses dev=newRank without querying device count or taking a modulo (lines 159-162). More MPI ranks than GPUs on a node can pass an out-of-range device id before the later memory guard."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "cudaMemcpy2dAsync is claimed to overlap X/Y exchanges (lines 201-210), but rmsgx/smsgx host buffers are not identified as pinned/page-locked. Without pinned host memory the copy may serialize or fail to provide the claimed overlap."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "the MGPU tridiagonal snippet receives and sends 2*Nloc MPI_SP elements but the visible cudaMemcpy2D copies only Nloc by one row for myDx_T (lines 201-206). The omitted ellipsis may contain the second coefficient copy; the displayed interface does not account for all transferred elements."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "edge ranks change sweep start to Ibeg+1/Jbeg+1 when MPI_PROC_NULL (line 212). No boundary equation is given to show why skipping the first interior index is correct rather than an off-by-one loss."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "inner-tile output covers 14 cells per block, but this section does not show breaking_kernel's launch grid denominator (lines 122-136). If the grid were sized with 16 rather than Inner=14, the domain tail would be uncovered."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "CudaMemUse checks >80% only after cudaMemGetInfo and is described as warning+STOP (lines 167-168); return status, totalMem=0, and allocation-failure handling are not given."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B8"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "the note describes a source read and mechanisms but no multi-GPU execution result, halo numerical comparison, or stream-race test. MGPU correctness remains unvalidated within this file (lines 154-213)."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}
