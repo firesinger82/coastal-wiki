@@ -1,0 +1,377 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "EFDC",
+ "shard": "EFDC-000",
+ "source_path": "EFDC/raw/source_code/EFDCPlus_Stable/EFDC/mod_netcdf.f90",
+ "source_sha256": "dbf9473abaa44745b6a1bd1b4892ee025d0a813f8cbc8d19176343c9f6ea16bf",
+ "base_run_id": "reread20260728-code-EFDC-000-fable5-20260813T012841Z-5799640f",
+ "audit_run_id": "reread20260728-code-EFDC-000-codexaudit-20260826T022956Z-6d4b819d",
+ "base_record_file": "7d0c698c648e94b495a64d9a81a716ca58741b7ab6d4cb1b0a42a931cfb70687.json",
+ "audit_record_file": "7d0c698c648e94b495a64d9a81a716ca58741b7ab6d4cb1b0a42a931cfb70687.json",
+ "base_record_sha256_bytes": "188ff7a3250ec6e251e082cab273ae44dc3a50bbdc8342abc69473b3466f1720",
+ "audit_record_sha256_bytes": "deb0d8d588a5cc86c82eed2170ee8bb3975850581d30007c7faec39a18613e6e",
+ "base_finding_count": 9,
+ "audit_finding_count": 16,
+ "provenance": {
+  "pilot": true,
+  "blinded": false,
+  "note": "Pilot mechanics validation. Production shards use blinded A/B-randomized agent (MERGE-PLAN §2). confirmed_delta span verified against read-only source.",
+  "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B11"
+   ],
+   "base_member_text": [
+    "L1566-L1570: in the ISWAVE == 4 branch, var 18 ('Diss', catalog wave_dissipation @L116) is filled from WV_Global(L).FREQ (L1568) - the same source used for 'Tp' (L1563-L1565); the relation between dissipation output and FREQ is not stated in this file."
+   ],
+   "audit_member_text": [
+    "Wave dissipation is a copy/paste value error: array1d is filled from WV_Global(L).FREQ at L1567-L1569 immediately before writing variable 18 `Diss` at L1570. The same FREQ source was already used for peak period at L1563-L1565, so the dissipation variable receives frequency data with incompatible meaning/units."
+   ],
+   "representative": "audit",
+   "rationale": "wave var 18 'Diss' filled from WV_Global.FREQ — same source as Tp",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [
+    "nc_write_bed_2d declares str2d(2) but cnt2d(3) (L1321) and passes a 2-element start with 3-element count to nf90_put_var @L1349; whether this start/count rank mismatch is intended is not resolvable from this file."
+   ],
+   "audit_member_text": [
+    "nc_write_bed_2d writes rank-3 variables using str2d declared with length 2 at L1321 and set to `(1,time_idx)` at L1323, while cnt2d has three entries and includes KB at L1325/L1338. The layer start index is omitted, so HBED/BDENBED/PORBED writes at L1592-L1594 have a start/count interface mismatch."
+   ],
+   "representative": "audit",
+   "rationale": "nc_write_bed_2d: 2-element start with 3-element count (KB layer) — start/count rank mismatch",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "L1909-L1975: the msg argument is 'WQAQ' for all twelve shellfish 2D writes (vars 143-154) although the source members differ (WQAQ/WQEA/FR/BMG/B_RESPI/B_GRAZI/B_DEATH/B_FECAL/B_URINE/B_RPOC/B_LPOC/B_DOC); msg only feeds the check_err label 'put_'//msg @L1265."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "msg 'WQAQ' for all 12 shellfish 2D writes (vars 143-154)",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "def_time_vars defines vars 11-12 whenever IS_NC_OUT(2) > 0 (L861-L862) with no ISWAVE guard, but nc_write writes idx 11-12 only inside if( ISWAVE >= 1 ) (L1538-L1552); when ISWAVE == 0 with IS_NC_OUT(2) on, the defined variables are never written."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "def_time_vars defines 11-12 with no ISWAVE guard; nc_write writes only ISWAVE>=1",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "timesec is used in nc_output (L2076, L2087) and nc_output_hf (L2116) without a local declaration; it must come from a use-associated module (GLOBAL @L14); its relation to timeday/timehour (L2068-L2069) is not established in this file."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "timesec used without local declaration (use-associated)",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "catalog vars 10 (noncohesive_shear @L108), 45 (bed_erosion_rate @L143), 46 (bed_deposition_rate @L144) have no corresponding write in nc_write; TODO comments 'ADD IN DEP_SED_FLX_GLOBAL AND ERO_SED_FLX_GLOBAL HERE' at L1674-L1675."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "catalog vars 10/45/46 have no write; TODO stubs",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "set_nc_flags (L263-L301) is never invoked in this file: both call sites are commented out (L599, L773); where IS_NC_OUT is otherwise initialized is outside this file."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "set_nc_flags never invoked (both call sites commented)",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "def_var 9 comment says 'Stress from non-cohesive components' (L858 context @L857-L859) yet nc_write labels both idx 9 (L1535) and idx 12 (L1543) with the same msg 'SHEAR2'."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "def_var 9 'non-cohesive' but idx 9 and idx 12 share msg 'SHEAR2'",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A8"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "L413-L419: the guard if( r > 0 ) around lonc/latc accumulation is commented out, so nv(c,k) == 0 would index lon(0)/lat(0); no zero-check remains other than m > 0 (L421)."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "commented if(r>0) guard leaves nv(c,k)==0 indexing lon(0)/lat(0)",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "UGRID face-connectivity role is internally inconsistent: Mesh2D advertises `face_node_connectivity: Mesh2D_face_nodes` at L471, but Mesh2D_face_nodes itself uses misspelled `face_node_connnectivity` at L482, so consumers may not recognize its cf_role."
+   ],
+   "representative": "audit",
+   "rationale": "UGRID face_node_connectivity vs misspelled 'connnectivity' cf_role",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Sigma-Z metadata names a nonexistent/inconsistent depth coordinate: the IGRIDV branch writes `depth: Bottom` at L562, while the same file defines bottom elevation as BELV and the standard-sigma branch uses `depth: BELV` at L577."
+   ],
+   "representative": "audit",
+   "rationale": "Sigma-Z depth attr 'Bottom' vs 'BELV' across branches",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The generic def_var routine always attaches coordinates `Mesh2D_face_y Mesh2D_face_x`, mesh `Mesh2D`, and grid_mapping `crs` at L1035-L1057. nc_create_hf_file defines only cell/col/row/lon/lat/name at L739-L770 and no Mesh2D or crs variables, then invokes def_time_vars at L774; high-frequency files therefore contain dangling coordinate, mesh, and grid-mapping references."
+   ],
+   "representative": "audit",
+   "rationale": "hf file lacks Mesh2D/crs vars but def_var attaches those coords — dangling refs",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Inactive component counts are passed directly as fixed dimension lengths (NDYE, NTOX, NSED, NSND, NSEDS2, NALGAE, NZOOPL, NSF, NQCTL, NQWR) at L726-L736 and similarly in the full-grid creator at L443-L453. Since the NetCDF unlimited length is zero, any inactive count of zero can create unintended unlimited dimensions rather than an absent/zero-length class dimension; compatibility and downstream shapes are unresolved."
+   ],
+   "representative": "audit",
+   "rationale": "inactive component counts as fixed dim lengths; zero -> unintended unlimited dim",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The RSSBC array is dimensioned for LCM_Global and filled through LCM_Global at L665-L679, then written with count LCM_Global-1 at L680, whereas CUV and the face mesh use nc.cellcnt/LA_Global-1 at L636-L672. If LCM_Global exceeds LA_Global, this write exceeds the defined face dimension or associates ghost cells with active faces."
+   ],
+   "representative": "audit",
+   "rationale": "RSSBC written count LCM_Global-1 vs face dim LA_Global-1",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "For high-frequency output with IJHFRE(IS) other than zero, lon and lat remain MISSING_VALUE because coordinate assignment is wholly inside IJHFRE(IS)==0 at L790-L806, even though cell indices are populated unconditionally at L808-L814. The intended coordinate source for that mode is not present here."
+   ],
+   "representative": "audit",
+   "rationale": "hf lon/lat stay MISSING when IJHFRE(IS)!=0",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "nc_write_wc_2d initializes `values` only in the full-grid branch at L1247-L1254. In the high-frequency branch L1234-L1245, Sigma-Z layers below KSZ_Global are never assigned, so uninitialized memory is written for those layers."
+   ],
+   "representative": "audit",
+   "rationale": "nc_write_wc_2d hf branch leaves Sigma-Z layers below KSZ unassigned",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B8"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "LAYERACTIVE is stored as int2d(cell,KB) at L1626-L1635, but nf90_put_var is given count `(KB,nc.cellcnt,1)` at L1636. The first two dimensions are reversed relative to both the allocation and other cell-layer writers, causing a shape/count mismatch unless the two lengths happen to match."
+   ],
+   "representative": "audit",
+   "rationale": "LAYERACTIVE put_var count (KB,cellcnt,1) reverses first two dims",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B9"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "In the non-LSEDZLJ exposed-bed branch, TOXB is defined through ncvar(30) with the bed-layer/component layout in def_time_vars at L932-L940, but only a cell-by-NTOX surface array is passed to nc_write_wc_2d at L1733-L1741. That helper loops its second index from KSZ_Global through KC at L1241-L1244, not 1 through NTOX, so it can index beyond array2d/values and cannot satisfy the bed variable rank."
+   ],
+   "representative": "audit",
+   "rationale": "TOXB bed-layer var fed a cell-by-NTOX surface via vertical-layer helper",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B10"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "All cell-by-shellfish-class variables 143-154 are passed to nc_write_wc_2d at L1901-L1975. That water-column helper allocates second extent NSF but loops k=KSZ_Global(L)..KC at L1241-L1244. When KC and NSF differ this reads/writes outside the class array or leaves class slots unset; these calls should use a class-oriented cell writer rather than a vertical-layer writer."
+   ],
+   "representative": "audit",
+   "rationale": "shellfish class vars use water-column helper (loops KSZ..KC not 1..NSF)",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B12"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The wave radiation-stress descriptors Sxx/Sxy/Syy are labelled W/m2 in the nc_var table at L117-L119, while the variables are populated directly from WVHUU_Global/WVHUV_Global/WVHVV_Global at L1571-L1573 without any documented conversion. Whether those source arrays actually have energy-flux units rather than radiation-stress units is unresolved and should be reconciled with their producers."
+   ],
+   "representative": "audit",
+   "rationale": "Sxx/Sxy/Syy labelled W/m2 but from WVHUU/WVHUV/WVHVV without conversion",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B13"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "File-open state is not synchronized with actual close behavior. nc_close_file closes only when ncdfout>1 at L1080-L1088 but never clears isopen; nc_output and nc_output_hf always call it at L2088/L2117 and on the next call reopen whenever isopen==1 at L2060-L2062/L2108-L2109. For ncdfout<=1 this reopens an already-open file; for ncdfout>1 isopen continues to describe a closed handle."
+   ],
+   "representative": "audit",
+   "rationale": "nc_close_file never clears isopen — reopen/close state desync",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B14"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "At a date rollover in split-file mode, the `isopen==1` branch calls nc_write on nc(0) at L2075-L2077 before creating the new file. Under the ncdfout>1 path the preceding invocation closed that handle at L2088, so the rollover write targets a closed NetCDF id and can stop in a checked writer; under a persistent-open path it duplicates the transition timestep into the prior file before also writing it to the new file at L2087."
+   ],
+   "representative": "audit",
+   "rationale": "date rollover writes nc(0) to a closed handle before creating new file",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B15"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Most direct NetCDF operations in def_var and nc_write assign status without check_err (for example L1026-L1064, L1467-L1469, L1980-L2031), while helper-based writes stop on error. This inconsistent error contract can let failed definitions, attributes, time writes, or structure outputs proceed with invalid ids and surface only in later operations."
+   ],
+   "representative": "audit",
+   "rationale": "most direct NetCDF ops omit check_err — inconsistent error contract",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

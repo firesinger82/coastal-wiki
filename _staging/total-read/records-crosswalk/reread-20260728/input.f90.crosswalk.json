@@ -1,0 +1,476 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "EFDC",
+ "shard": "EFDC-000",
+ "source_path": "EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90",
+ "source_sha256": "314ff53457954b8541e6c4b398fd995aab56bbed216bd9aee8e102badec0434d",
+ "base_run_id": "reread20260728-code-EFDC-000-fable5-20260813T012841Z-5799640f",
+ "audit_run_id": "reread20260728-code-EFDC-000-codexaudit-20260826T022956Z-6d4b819d",
+ "base_record_file": "83cfe59f04eabf4457b7e0cc3434bffc9d66323afe7c69e4a1f89584832d644a.json",
+ "audit_record_file": "83cfe59f04eabf4457b7e0cc3434bffc9d66323afe7c69e4a1f89584832d644a.json",
+ "base_record_sha256_bytes": "a8e6068f16b43b371ca8ef68efc06c39f342b87d5b4add32dd63335fe4ad09c9",
+ "audit_record_sha256_bytes": "ebf0f70bd13fe3253cec482801383b79b14cf4a2754a3041fed2174d1ff85fe2",
+ "base_finding_count": 16,
+ "audit_finding_count": 21,
+ "provenance": {
+  "pilot": true,
+  "blinded": false,
+  "note": "Pilot mechanics validation. Production shards use blinded A/B-randomized agent (MERGE-PLAN §2). confirmed_delta span verified against read-only source.",
+  "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "L911/L927 and L1258/L1279: in the C17 and C21 blocks 'elseif( NPFORT >= 1 )' precedes 'elseif( NPFORT == 2 )', making the ==2 branch unreachable; C18/C19/C20 use '== 1' (L989, L1079, L1168) so their ==2 branches are reachable - asymmetric treatment of NPFORT=2."
+   ],
+   "audit_member_text": [
+    "C17 mode selection is internally shadowed: `elseif (NPFORT >= 1)` at L911 consumes NPFORT=2, so the five-field PFX2 read at L927-L936 is unreachable; the same ordering at L947 and L956 makes the mode-2 PFX2 broadcast unreachable. North boundary repeats the shadow at L1258 versus L1279. Consequently mode-2 interpolation later reads PFX2 at L1018/L1109/L1198/L1288 without this file's intended population path."
+   ],
+   "representative": "audit",
+   "rationale": "NPFORT>=1 ordered before ==2 makes mode-2 PFX2 read/broadcast unreachable (C17/C21)",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B10"
+   ],
+   "base_member_text": [
+    "L4106/L4147-L4153: the spatially-constant else branch of the TOXPARB (bed partition) block assigns TOXPARW, not TOXPARB (L4151), duplicating the water-column branch @L4093-L4099; TOXPARB never receives the constant fill."
+   ],
+   "audit_member_text": [
+    "PARTITIONB's spatially constant else branch L4147-L4153 writes `TOXPARW` instead of `TOXPARB`, leaving the bed array unexpanded while overwriting the water-column array."
+   ],
+   "representative": "audit",
+   "rationale": "PARTITIONB constant else branch writes TOXPARW, leaving bed TOXPARB unfilled",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B12"
+   ],
+   "base_member_text": [
+    "L4847-L4853: DYE.INP ISALTYP==0 branch loops 'do L = LG,LA_Global' (L4850) using stale LG as lower bound and reads into fixed DYE_Global(LG,K,MD) while loop variable L is unused - inconsistent with SALT (L4758) and TEMP (L4807) analogues which loop 'do LG = 2,LA_Global'."
+   ],
+   "audit_member_text": [
+    "DYE sequential format loops `do L=LG,LA_Global` at L4850 but stores every record into `DYE_Global(LG,...)` at L4851; LG is not assigned in that branch and the loop variable L is unused."
+   ],
+   "representative": "audit",
+   "rationale": "DYE.INP loop do L=LG,LA_Global stores DYE_Global(LG,...) with stale LG, L unused",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B13"
+   ],
+   "base_member_text": [
+    "L5153-L5156: TOXB.INP 'fill any missing layers' loop runs after the per-cell read loop but indexes TOXB_Global(LG,...) with the last value of LG only, so only one cell is filled; contrast per-cell fill in DOCB (L4329-4331)."
+   ],
+   "audit_member_text": [
+    "TOXB missing-layer fill L5153-L5156 is outside the global-cell loop, so it fills only the final LG's layers KBINPUT+1:KB rather than every cell."
+   ],
+   "representative": "audit",
+   "rationale": "TOXB missing-layer fill outside cell loop — fills only final LG",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A9"
+   ],
+   "audit_ids": [
+    "B18"
+   ],
+   "base_member_text": [
+    "L7001-L7066: for ISICE==1 the ISER.INP series are read on master (L7004-7035) but the Broadcast block (L7057-7065) sits inside the 'elseif( ISICE == 2 )' branch, so ISER data appear not to be broadcast to other ranks in this file."
+   ],
+   "audit_member_text": [
+    "ISICE=1 series are read only on master L7001-L7035, while MITLAST/TSICE broadcasts L7057-L7065 are inside the `elseif(ISICE==2)` branch; no ISICE=1 broadcast is visible."
+   ],
+   "representative": "audit",
+   "rationale": "ISICE==1 series read on master but Broadcast sits in elseif(ISICE==2) branch",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A10"
+   ],
+   "audit_ids": [
+    "B19"
+   ],
+   "base_member_text": [
+    "L7262/L7286/L7310/L7313: in the MHK block, 'endif' at L7286 closes 'if( NFLAGPWR == 1 )' so 'elseif( NFLAGPWR == 2 )' (L7310) and 'elseif( NFLAGPWR == 3 )' (L7313) chain to 'if( process_id == master_id )' (L7262); consequently the NFLAGPWR==1 broadcasts (L7288-L7308) execute only on the master rank and the ==2/==3 branches execute only on non-master ranks."
+   ],
+   "audit_member_text": [
+    "MHK nesting pairs `elseif(NFLAGPWR==2/3)` L7310/L7313 with `if(process_id==master_id)` L7262, not with the already-ended inner flag-1 test L7264-L7286. Flag-1 collective broadcasts L7288-L7308 therefore execute only on master; flag-3 is entered only by non-master ranks and its nested master read L7314 cannot execute. Flag-3 also reads one stale-M element at L7315 without a class loop. The final cell check L7364-L7370 uses scalar DIAMMHK last computed only in master paths."
+   ],
+   "representative": "audit",
+   "rationale": "MHK NFLAGPWR nesting pairs elseif 2/3 with master test; flag-1 broadcasts master-only",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4",
+    "A8",
+    "A15"
+   ],
+   "audit_ids": [
+    "B11"
+   ],
+   "base_member_text": [
+    "L4576: FPOCB.INP IREAD==2/ISALTYP/=0 branch uses implied-DO stride NS: (STFPOCB(L,K,NS),K = 1,KBINPUT,NS) - stride is the sediment-class index, inconsistent with stride-1 at L4568.",
+    "L4414: 'STPOCB(L,K) = 0.0' executes outside any L/K loop (right after broadcasts @L4409-4411), zeroing a single element addressed by stale loop indices; probably intended STPOCB = 0.0 (whole array).",
+    "L4460: inside the POCB.INP IREAD==1/else branch, STDOCB(:,:) = 0.0 is zeroed (not STPOCB) before reading STPOCB values - likely copy-paste from the DOCB block @L4315."
+   ],
+   "audit_member_text": [
+    "POCB executes `STPOCB(L,K)=0.0` at L4414 before this block establishes L/K loops, and several IREAD formats L4416-L4456/L4484-L4507 read unit 1 on every rank although only master opened it L4402-L4406. L4460 clears `STDOCB` in the POCB branch. FPOCB IREAD=2 alternative format uses NS as implied-do stride at L4576. FOCB closes unit 1 on master at L4653 and closes it again on all ranks at L4670."
+   ],
+   "representative": "audit",
+   "rationale": "COMPOSITE many-to-one: B11 bundles STPOCB(L,K)=0.0 outside loop (A8), STDOCB cleared in POCB branch (A15), FPOCB NS implied-do stride (A4)",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "L1943 vs L1954/L1974: card C37 reads SEDVRDT, but the no-sediment else branch assigns SEDVDRT = 0.0 (L1954) while L1974 assigns SEDVRDT = 0.0 - two distinct identifiers (letter transposition); whether SEDVDRT is a separate global or a defect cannot be resolved from this file (SEDVDRT is also locally declared @L87)."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "C37 SEDVRDT vs SEDVDRT letter transposition",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "L1696-L1699: Broadcast_Array(HS_COEFF, master_id) is called four times consecutively (once per coefficient column?) - Broadcast_Array broadcasts the whole array each time, so three calls are redundant."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "Broadcast_Array(HS_COEFF) called 4x — 3 redundant",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "L832-L841: card C14D block is headed by comment '!C14C' (L832) and its read (L837) has no 'if( ISO > 0 ) GOTO 100' error guard, unlike other cards; same for C14C read @L808-816."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "C14D block headed '!C14C', read lacks ISO>0 error guard",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A11"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "L2034: tau_crit_coh.inp is read with hard-coded loop bounds 'do L = 2, 4393' and 10 columns into TAUCRCOH(L,K) - grid-size assumption not derived from any input dimension."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "tau_crit_coh.inp hard-coded loop bound do L=2,4393",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A12"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "L2596/L2622-L2624: WINDFA/WINDFB/WINDFC are multiplied by 4.42674E-10 unconditionally after the C46C read; comment L2619-2621 explains the units conversion, but re-running INPUT would re-scale."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "WINDFA/B/C *4.42674E-10 unconditional — re-run re-scales",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A13"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "L6869: TEMB(1) = ABS(TEMBO) uses TEMBO read at L2631 (card C46D, NASER>0 only); if NASER==0 TEMBO is used uninitialized here."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "TEMB(1)=ABS(TEMBO) with TEMBO uninitialized when NASER==0",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A14"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "L3066-L3073 and L3088-L3098, L3166-L3197: cards C66A/C66B, C68, C69, C70, C73-C83 only set NCARD without any read - dead card slots retained for numbering."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "dead card slots C66A/B,C68-C83 set NCARD only",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "South NPFORT=1 amplitude calculation uses `PCBS(L,M)` in the cosine term at L1000 while the block writes and otherwise reads `PCBS_GL`/`PSBS_GL` at L998-L1005; `PCBS` is not populated in that global-boundary block."
+   ],
+   "representative": "audit",
+   "rationale": "south NPFORT=1 cosine uses PCBS(L,M) while block populates PCBS_GL",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Diagnostic output L507-L508 labels both global widths as x-direction although L508 writes `global_max_width_y`."
+   ],
+   "representative": "audit",
+   "rationale": "L508 diagnostic labels global_max_width_y as x-direction",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Jet/WQ input raises MMAX by NWQV at L1529-L1531, fills CQCJP/CWRCJP through MMAX at L1541-L1545, then reuses the completed DO variable MS and increments it for active kinetics at L1548-L1553. The final index can exceed the just-read MMAX range; array bounds and downstream compact-layout intent are defined outside this file."
+   ],
+   "representative": "audit",
+   "rationale": "Jet/WQ MMAX+NWQV then reuses completed DO var MS — index can exceed MMAX",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Cohesive card C39 reads `ISEDSCOR(NS)` at L2000, but cohesive broadcasts L2010-L2018 omit it. C40 reads `SEDS(NS).WCLIMIT` at L2025, also omitted there. Both are broadcast only inside the later NSND>0 block (L2089-L2092), so cohesive-only MPI runs have unsynchronized non-master values. The master-only TAUCRCOH file read L2031-L2037 likewise has no broadcast visible here."
+   ],
+   "representative": "audit",
+   "rationale": "C39 ISEDSCOR/C40 WCLIMIT/TAUCRCOH broadcasts omitted in cohesive path",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "`DYESTEPW` is read on master at L2710 but no broadcast follows before the dye-options block ends at L2716."
+   ],
+   "representative": "audit",
+   "rationale": "DYESTEPW read on master with no following broadcast",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "`CLTMSR_GL` is read with C87 station metadata L3258-L3263, but its only broadcast is commented out at L3278."
+   ],
+   "representative": "audit",
+   "rationale": "CLTMSR_GL broadcast commented out",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "MODDXDY derives local I/J from global ITMP/JTMP at L3634-L3635 and validates local bounds, but then calls `LIJ(ITMP,JTMP)` at L3639 rather than `LIJ(I,J)`; FBODY demonstrates the consistent local-index form at L3903-L3910."
+   ],
+   "representative": "audit",
+   "rationale": "MODDXDY calls LIJ(ITMP,JTMP) not LIJ(I,J)",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B8"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "MODCHAN initializes MDCHH=0 on every rank L3657, master reads MDCHH/QCHERR/channel and LMD/QCHAN data L3659-L3706, but broadcasts only selected raw arrays L3710-L3718. MDCHH, QCHERR, LMDCH*, and QCHAN* are not synchronized in this file."
+   ],
+   "representative": "audit",
+   "rationale": "MODCHAN syncs selected raw arrays; MDCHH/QCHERR/LMDCH*/QCHAN* unsynced",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B9"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "`AVO=ABS(AVO)` at L3799 precedes `if(AVO<0.)` at L3805, making AVMAP mode unreachable. Within that branch L3837-L3840 assigns AHMAX/AHMIN/ADMAX/ADMIN from fixed AVMAX/AVMIN/ABMAX/ABMIN rather than updating the AV/AB extrema and prints inside the LG loop L3843."
+   ],
+   "representative": "audit",
+   "rationale": "AVO=ABS(AVO) precedes if(AVO<0) — AVMAP mode unreachable",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B14"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "PSERAVG normalization L5695-L5696 divides by TIM(NREC)-TIM(1) without checking NREC>=2 or nonzero endpoint separation."
+   ],
+   "representative": "audit",
+   "rationale": "PSERAVG divides by TIM(NREC)-TIM(1) with no NREC>=2 / nonzero check",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B15"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "SSER reads record count into `MCSER(NS,1)` at L5869 but loops on `TSSAL(NS).NREC` at L5874/L5883; no assignment connects those fields in this file. ASER repeats this at L6757 versus L6766/L6774, WSER at L6903 versus L6907/L6909, and ISER/ISTAT at L7012/L7046 versus L7015/L7049."
+   ],
+   "representative": "audit",
+   "rationale": "SSER reads MCSER(NS,1) but loops TSSAL(NS).NREC (ASER/WSER/ISER repeat)",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B16"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "TXDRY converts class 1 from per-day to per-second at L6299 but omits `/86400` for classes 2..NTOX at L6301-L6305. TXDRY/TXWET are also opened and read by all ranks without master/broadcast wrapping at L6282-L6341, unlike adjacent series."
+   ],
+   "representative": "audit",
+   "rationale": "TXDRY /86400 applied to class 1 only, omitted for 2..NTOX",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B17"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "QCTRULES sorts IDX by descending RULES level at L6556-L6565 but ON and OFF trigger construction uses RULES(M,...) directly at L6570-L6607, never RULES(IDX(M),...), so the sort does not affect stored trigger order."
+   ],
+   "representative": "audit",
+   "rationale": "QCTRULES sorts IDX but triggers use RULES(M) not RULES(IDX(M))",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B20"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "PARSE_LOGICAL can return an unassigned logical when a colon is followed only by blanks (L7564-L7568). PARSESTRING has no fallback when neither blank nor tab exists before masked MINVAL/slicing L7590-L7594. READ_SUBSET does not broadcast HFREGRP names assigned L7655-L7657; HFREDAYEN/HFREDAY are allocated L7619-L7620 but never assigned/broadcast; its ISO check L7654 is stale with respect to internal substring reads L7644-L7652."
+   ],
+   "representative": "audit",
+   "rationale": "PARSE_LOGICAL/PARSESTRING/READ_SUBSET unassigned-return & missing broadcast paths",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

@@ -1,0 +1,321 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "EFDC",
+ "shard": "EFDC-000",
+ "source_path": "EFDC/raw/source_code/EFDCPlus_Stable/EFDC/mod_scaninp.f90",
+ "source_sha256": "eb51263228605a3d1ca50fe9e77e817da515b17f08616285739215f7f6c79876",
+ "base_run_id": "reread20260728-code-EFDC-000-fable5-20260813T012841Z-5799640f",
+ "audit_run_id": "reread20260728-code-EFDC-000-codexaudit-20260826T022956Z-6d4b819d",
+ "base_record_file": "5d5841f6191b214880eb061c88a8e31f83574f8ae762e4eb9343331eab057cd8.json",
+ "audit_record_file": "5d5841f6191b214880eb061c88a8e31f83574f8ae762e4eb9343331eab057cd8.json",
+ "base_record_sha256_bytes": "85a6ac029ff43381c382ff1543a8fb9fe99f32c5292784be951e26f76237e224",
+ "audit_record_sha256_bytes": "87d078addb496a56511f42da88445d85db6681738573eba02e65b39e12327fb0",
+ "base_finding_count": 8,
+ "audit_finding_count": 14,
+ "provenance": {
+  "pilot": true,
+  "blinded": false,
+  "note": "Pilot mechanics validation. Production shards use blinded A/B-randomized agent (MERGE-PLAN §2). confirmed_delta span verified against read-only source.",
+  "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "L948, L997: SCANASER's loop variable is NA but its label-20 error message prints NS, which is never assigned in this subroutine - the series number in the error text is undefined."
+   ],
+   "audit_member_text": [
+    "use-before-assign/copy-paste: SCANASER의 오류 진단은 실제 series loop 변수 NA가 아니라 선언 후 대입되지 않은 NS를 출력한다(L927,L997-L998). 또한 SUNDAY.INP에서 master만 NDASER를 늘리지만(L982-L991) 그 뒤 NDASER 방송 없이 반환한다."
+   ],
+   "representative": "audit",
+   "rationale": "SCANASER prints unassigned NS not loop var NA; B adds NDASER post-read broadcast gap",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [
+    "B9"
+   ],
+   "base_member_text": [
+    "L2062-L2085 (SCANSEDZLJ): read errors are detected only by 'ERROR == 1'; other nonzero IOSTAT values (including negative end-of-file codes) bypass the handlers."
+   ],
+   "audit_member_text": [
+    "특이 I/O 검사 무력화: SCANSEDZLJ의 네 read는 IOSTAT를 받은 뒤 ERROR==1만 오류로 취급한다(L2059-L2080). Fortran의 다른 양수 오류 코드 및 음수 EOF는 이 검사에 걸리지 않아 후속 값이 미정일 수 있다."
+   ],
+   "representative": "audit",
+   "rationale": "SCANSEDZLJ read errors gated on ERROR==1; other IOSTAT/EOF bypass handlers",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [
+    "B8"
+   ],
+   "base_member_text": [
+    "L1590, L1935-L1948: FNWQSR is dimensioned 40 and filled to index 19+NALGAE+NZOOPL with no bound check; behavior when NALGAE+NZOOPL > 21 is not resolvable in-file."
+   ],
+   "audit_member_text": [
+    "범위 초과 가능성: FNWQSR과 FNWQSRALGAE는 40개로 고정 선언되어 있지만(L1588-L1589), NWQV=19+NALGAE+NZOOPL을 상한 검사 없이 사용하고 FNWQSR(1:NWQV)을 순회한다(L1627 부근,L1954,L1981). NALGAE+NZOOPL>21이면 배열 범위를 넘는다."
+   ],
+   "representative": "audit",
+   "rationale": "FNWQSR fixed dim 40 filled to 19+NALGAE+NZOOPL with no bound check",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "L25-L26: module-level 'character(*) :: STR*200' and 'CFILE*15' declare assumed-length characters with length specs but no parameter attribute - nonstandard Fortran; how the target compilers treat this is not resolvable in-file."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "assumed-length char with length spec, no parameter attr — nonstandard",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "L904: SCANGWSR sizes each groundwater series record as 3+NDYE+NSED+NSND+NTOX values with in-line comment 'DELME - WQ' - WQ constituents are not part of the scan count; whether GWSER.INP may carry WQ columns is not resolvable here."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "SCANGWSR groundwater record count 'DELME - WQ'",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "L1410-L1415 (SCANWRSER): error label 20 prints the read-error message but has no STOPP and falls through into label 40's 'UNEXPECTED END' message before stopping - the reported reason at label 20 is misleading."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "SCANWRSER label-20 error falls through to label-40 message before STOPP",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "L1902 vs L1904: file opened is 'WQPSL.INP' but ERRSTR reads 'READING WPQSL.INP' (transposed) - error text does not match the file name."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "WQPSL.INP opened but ERRSTR reads 'WPQSL.INP' (transposed)",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "L811: inside the NWSER > 1 block, Broadcast_Scalar(NWSER, ...) re-broadcasts a value already broadcast at L226; whether this is defensive or vestigial is not stated."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "NWSER re-broadcast — defensive vs vestigial unresolved",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "MPI 전파 누락 가능성: C45E에서 master가 TOXDEP(NT).TXDRY와 TXWET까지 읽지만(L482 부근), 뒤에서는 ITXDRY와 ITXWET 플래그만 방송한다(L485-L486). 비-master가 실제 건·습식 침적값을 사용하는 경로가 있다면 rank 간 값이 달라진다."
+   ],
+   "representative": "audit",
+   "rationale": "C45E TOXDEP TXDRY/TXWET read but only ITXDRY/ITXWET flags broadcast (MPI)",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "MPI 전파 누락 가능성: C46에서 VOL_VEL_MAX와 VOL_DEP_MIN을 master가 읽지만(L493 부근), 이어지는 방송 목록(L496-L503)에 두 값이 없다."
+   ],
+   "representative": "audit",
+   "rationale": "C46 VOL_VEL_MAX/VOL_DEP_MIN read, absent from broadcast list (MPI)",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "MPI 인터페이스 불일치: MODCHAN.INP에서 master가 MDCHH,MDCHHD,MDCHHD2를 함께 읽은 뒤(L791 부근) MDCHH만 방송한다(L794 부근). 뒤의 두 전역값은 비-master에서 동기화되지 않는다."
+   ],
+   "representative": "audit",
+   "rationale": "MODCHAN MDCHH/MDCHHD/MDCHHD2 read, only MDCHH broadcast (MPI)",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "MPI unit 수명 불일치: SCANDSER는 DSER.INP를 master에서만 연다(L1192 부근)지만 close(1)은 master 조건 밖에서 모든 rank가 실행한다(L1227). 비-master가 열지 않은 unit 1을 닫을 수 있다."
+   ],
+   "representative": "audit",
+   "rationale": "SCANDSER opens DSER.INP master-only but close(1) on all ranks",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "MPI 전파 누락 가능성: SCANWQ의 JSON point-source loop는 master에서만 NCSERM을 ITMP로 늘린다(L1768-L1778 부근). 이후 공통 경로의 NCSERM=max(NCSERM,NWQCSRM)(L1842)은 그 master-only 증가분을 비-master에 전달하지 않는다."
+   ],
+   "representative": "audit",
+   "rationale": "SCANWQ master-only NCSERM increment not propagated (MPI)",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "MPI 상태 불일치: wq_biota.jnp의 use_hydro_feedback 경로는 master에서 MACDRAG=1 및 ISVEG=2로 바꾸지만(L1859-L1860), 뒤에서는 ISMOB와 IVARSETL만 방송한다(L1870-L1871). allocation flag로 쓰인다는 주석과 달리 rank별 ISVEG/MACDRAG가 달라질 수 있다."
+   ],
+   "representative": "audit",
+   "rationale": "wq_biota master sets MACDRAG/ISVEG but broadcasts only ISMOB/IVARSETL",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "use-before-assign: FNWQSR(40)은 ISWQLVL==1 분기에서만 채워지고(L1933-L1948), ISWQLVL==0용 초기화 코드는 주석 처리돼 있다(L1924-L1930). 그럼에도 모든 옵션에서 FNWQSR(NW)를 INQUIRE/OPEN에 사용한다(L1955-L1985). kinetic option 0에서 미초기화 문자열을 파일명으로 사용한다."
+   ],
+   "representative": "audit",
+   "rationale": "FNWQSR uninitialized in ISWQLVL==0 path yet used as filename",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B10"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "MPI 전파 누락: SCANSEDZLJ는 master가 KB,ICALC_BL뿐 아니라 SEDSTEP,SEDSTART,IHTSTRT,IMORPH,ISWNWAVE,MAXDEPLIMIT,HPMIN도 읽지만(L2065), 방송은 KB,ICALC_BL,ITBM,NSICM 네 값뿐이다(L2085-L2088). 나머지 설정이 비-master에서 사용되는지 확인이 필요하다."
+   ],
+   "representative": "audit",
+   "rationale": "SCANSEDZLJ reads SEDSTEP/.../HPMIN but broadcasts only 4 values (MPI)",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B11"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "조건부 미대입 방송: SCNTXSED는 각 NN에서 NCSERNC=0으로 초기화하지만 NLOOP는 해당 독성/퇴적물/모래 조건이 참일 때만 대입한다(L2104-L2125). 조건이 거짓이어도 NLOOP를 즉시 방송한다(L2128), 따라서 미정값을 MPI 호출 인자로 전달한다."
+   ],
+   "representative": "audit",
+   "rationale": "SCNTXSED broadcasts NLOOP even when left unassigned",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B12"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "SCANEFDC의 C67은 ISPD만 읽은 뒤 NPDM=max(1,NPD)를 계산한다(L535-L541 부근). 이 루틴 안에서 NPD 대입이 보이지 않으므로 GLOBAL의 선행 초기화에 의존하는지 확인이 필요하다."
+   ],
+   "representative": "audit",
+   "rationale": "SCANEFDC C67 NPDM=max(1,NPD) with NPD not assigned in routine",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B13"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "복붙/중복 후보: C22 뒤 Broadcast_Scalar(NDYE,master_id)가 같은 블록에서 두 번 호출된다(L299와 L303 부근). 기능상 무해할 수 있으나 인접 방송 목록의 누락을 가리는 복사 흔적이다."
+   ],
+   "representative": "audit",
+   "rationale": "C22 Broadcast_Scalar(NDYE) called twice — copy trace",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

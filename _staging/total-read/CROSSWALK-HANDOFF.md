@@ -1,7 +1,19 @@
-# 재개 핸드오프 — crosswalk 파일럿부터 (다음 세션 진입점)
+# 재개 핸드오프 — crosswalk (다음 세션 진입점)
 
 > 상태: 맹검 감사 269/269 완료·커밋(813b896). 병합 설계 확정·커밋(bb9737e).
-> **다음 = crosswalk 실행 미착수.** 설계는 [MERGE-PLAN-20260827.md](MERGE-PLAN-20260827.md).
+> **✅ 파일럿 EFDC-000 완료(2026-08-27)** — 스키마 [CROSSWALK-SCHEMA.md](CROSSWALK-SCHEMA.md)·검증기 `verify_crosswalk.py`·빌더 `build_crosswalk.py` 신설,
+> 출력 `records-crosswalk/reread-20260728/*.crosswalk.json`(6파일·130 dispositions·PASS). DETTMP=confirmed_delta 검증.
+> **다음 = 운영 shard 확대(blinded 단일 subagent).** 설계는 [MERGE-PLAN-20260827.md](MERGE-PLAN-20260827.md).
+
+## 다음 작업 = shard 확대 (blinded)
+- 파일럿은 UNBLINDED 자율판독(mechanics 검증용). 운영은 §2 준수: **단일 subagent·벤더라벨 제거·A/B 무작위**.
+- 후보쌍만 투입(라인앵커·텍스트 유사도) — 전량 아님(§2 비용절감).
+- confirmed_delta 는 subagent 제안 → **원문 span 대조로만 확정**(read-only `models/` 인용).
+- shard 별로 `build_crosswalk.py` 패턴 재사용 → `verify_crosswalk.py` 게이트 → 누적.
+- confirmed_delta 누적분 → supplement 승격(§3) → WO amendment → canonical 선택.
+
+---
+## (완료) 파일럿 = EFDC-000 crosswalk
 
 ## 재개 절차
 1. 트리 잠금 해제: `sudo chown -R firesinger:firesinger _staging/total-read && sudo chmod -R u+w _staging/total-read`

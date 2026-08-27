@@ -1,0 +1,326 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "EFDC",
+ "shard": "EFDC-000",
+ "source_path": "EFDC/raw/source_code/EFDCPlus_Stable/EFDC/aaefdc.f90",
+ "source_sha256": "41b93cabcabf96788006d9c197e945d8d4b314cb4be1edafb66c37f7caebe61a",
+ "base_run_id": "reread20260728-code-EFDC-000-fable5-20260813T012841Z-5799640f",
+ "audit_run_id": "reread20260728-code-EFDC-000-codexaudit-20260826T022956Z-6d4b819d",
+ "base_record_file": "6de5c1b50366260e1d20e4ab66a609693ac841ea015aba7ac7d1fc6fce195441.json",
+ "audit_record_file": "6de5c1b50366260e1d20e4ab66a609693ac841ea015aba7ac7d1fc6fce195441.json",
+ "base_record_sha256_bytes": "e649b43363daf61b26b2c139f095e20a4984688b97858e6abdaca6b75d9b01fb",
+ "audit_record_sha256_bytes": "9e41b65ebecddfd7ea49fb8a0d945cbeace50edfac1f486dede053e23d26573c",
+ "base_finding_count": 11,
+ "audit_finding_count": 11,
+ "provenance": {
+  "pilot": true,
+  "blinded": false,
+  "note": "Pilot mechanics validation. Production shards use blinded A/B-randomized agent (MERGE-PLAN §2). confirmed_delta span verified against read-only source.",
+  "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "confirmed_delta",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "L924-L929: DETTMP is first assigned the reciprocal determinant and then compared with 0.0. A singular denominator raises division-by-zero/Inf rather than making its reciprocal exactly zero, so the STOPP singular-transform guard is ineffective."
+   ],
+   "representative": "audit",
+   "rationale": "DETTMP=1/det then compared ==0.0: reciprocal of singular det is Inf not 0, so STOPP guard is dead code",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27",
+   "evidence_span": {
+    "path": "EFDC/raw/source_code/EFDCPlus_Stable/EFDC/aaefdc.f90",
+    "lines": "924-928",
+    "quote": "DETTMP = 1./( CUE(L)*CVN(L) - CUN(L)*CVE(L) )\n      if( DETTMP == 0.0 )then\n        write(6,6262)\n        write(6,6263) IL(L), JL(L)\n        call STOPP('.', 1)"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "L1327 'DZC_Global(LG,:) = DZCK(K)' — IGRIDV==0 분기의 LG 루프(L1325-L1328) 안에서 K 가 루프 변수가 아님. 직전 K 루프는 L1299-L1301 (do K = 1,KC) 이므로 루프 종료 후 K=KC+1 잔존값으로 DZCK(KC+1) 를 참조하는 것으로 읽힘 — 의도는 DZCK(K) 벡터 복사 또는 K 루프 내부였을 것. 교차라인: L1299↔L1327."
+   ],
+   "audit_member_text": [
+    "L1322-L1326: immediately before the IGRIDV==0 block, DO K=1,KC has completed. The block assigns DZC_Global(LG,:)=DZCK(K) instead of a vector/subscripted K loop, so K is the post-loop value (normally KC+1) and can be out of bounds while broadcasting one scalar across all layers."
+   ],
+   "representative": "audit",
+   "rationale": "DZC_Global(LG,:)=DZCK(K) after DO K loop closed — K is post-loop KC+1, scalar broadcast/OOB",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "TOX 수층 초기화의 경계 시계열 존재 검사 인덱스 불일치 — 남측만 NCSERS(LL,4) @1948, 서/동/북측은 NCSERW/NCSERE/NCSERN(LL,5) @1959/@1970/@1981. DYE 는 4면 모두 (LL,3) @1834/@1845/@1856/@1867, SED 는 모두 (LL,6), SND 는 모두 (LL,7) 로 일관 — TOX 만 4↔5 혼재. 교차라인: L1948↔L1959."
+   ],
+   "audit_member_text": [
+    "L1968-L1991: the south toxic boundary initialization tests NCSERS(LL,4), whereas west/east/north tests use toxic constituent index 5. This direction-only 4-versus-5 discrepancy is a likely copied suspended-load condition and can change whether south TOX values are imposed."
+   ],
+   "representative": "audit",
+   "rationale": "south toxic boundary tests NCSERS(LL,4) while W/E/N use index 5",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A10"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "L1031 read(1,66,...)C,(IFDCH(I,J),...) 에서 C 는 real 선언(@174)인데 FORMAT 66 'I3,2X,113I1' 의 첫 필드 I3 로 읽음 — 정수 편집서술자로 real 을 읽는 형태. 또 L1033 WRITE(7,166) 은 unit 7 을 명시적 open 없이 사용."
+   ],
+   "audit_member_text": [
+    "L1031-L1033: foodchain matrix input reads the leading formatted integer into real C, but the diagnostic WRITE emits JDUMY, which is declared but is not assigned in this branch; the echoed row label is undefined/stale."
+   ],
+   "representative": "audit",
+   "rationale": "foodchain read pulls leading integer into real C; B adds diagnostic WRITE of unassigned JDUMY",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "DYE 콜드스타트 판정 L1818 은 'ISRESTI == 1' 을 쓰는데 SAL L1656 · TEM L1720 · TOX L1931 등은 'ISRESTI >= 1' — ISRESTI>1(예: 10, L1650 주석의 구형 재시작) 일 때 DYE 만 분기가 달라짐. 교차라인: L1656↔L1818."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "DYE cold-start uses ISRESTI==1 while SAL/TEM/TOX use >=1",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "L324 'if( VERSION <= 43 .and. VERSION >= 41 .and. NTHREADS > 2 ) NTHREADS = 2' — VERSION 은 L259 에서 3 으로 설정된 integer(1) 이므로 이 조건은 도달 불가로 읽힘(41-43 이 되는 경로가 이 파일에 없음). 교차라인: L259↔L324."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "VERSION 41-43 && NTHREADS>2 branch unreachable (VERSION set to 3)",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "STOPP 의 GNU 분기(#ifdef GNU, L3560-L3567)에는 ilen 선언이 없는데 L3586 'ilen = LEN_TRIM(MSG)' 는 양쪽 분기 공용 — GNU 빌드에서는 implicit 타입(이 서브루틴에 implicit none 없음)에 의존. 또 ilen 은 대입 후 사용처 없음. 교차라인: L3574↔L3586."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "STOPP GNU branch ilen undeclared / assigned-but-unused",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "FRACK 은 L2626 에서 계산되지만 이 파일 안에서 이후 사용처가 없음(대입만 존재)."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "FRACK computed but unused in this file",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "L1584 에서 unit 5000+process_id 로 열고 L1591 에서는 close(5000) — process_id/=0 인 프로세스는 연 unit 과 닫는 unit 이 불일치. 교차라인: L1584↔L1591."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "open unit 5000+process_id but close(5000) — mismatch on non-root ranks",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "선언만 되고 이 파일 내 사용을 확인하지 못한 지역변수: THICK @155, TSHIFT @158, DET @159, TA1/TA2 @161, DEPTHMIN @165, ACS2/AS2/AC2 @182, TNT @183, LPBTMP @213, LBELMIN @214, IISTMP 외 IRET @231, DAY @245, MPI_LIST @242(소문자 mpi_list 로는 사용 @1570 — 대소문자 무구분이므로 동일 변수), starting_time/ending_time @251, KU/KD @225/@226, IYEAR @224."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "declared-but-unused local list",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A8"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "서측(W) 면의 주석처리 대체블록(L2679-L2692)은 endif 뒤에 위치하고, 동/남/북측은 같은 내용이 '!elseif' 형태로 if 블록 내부(L2711-L2723 등)에 위치 — E/S/N 은 활성 elseif 가 없어져 endif 만 남은 구조(L2724, L2756, L2788). 편집 이력상 비대칭."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "W-face commented block asymmetry vs E/S/N",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A9"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "L749 'if( ISPPH == 100 ) ISPPH = 1' 이후 ISPPH==100 정보는 소실 — 고빈도 스냅샷 여부는 NSHOTS 로만 잔존."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "ISPPH==100->1 loses high-freq snapshot marker",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "L853-L865: LXLY record is copied from R2D_Global(1,:) into R2D_Global(LG,:) before the ISWGS84 branch converts only row 1. Consequently Center_X/Center_Y use converted UTM values while later DLON/DLAT mapping from row LG uses the pre-conversion coordinates; verify whether the copy was intended after conversion."
+   ],
+   "representative": "audit",
+   "rationale": "LXLY ISWGS84 conversion applied to row 1 only; DLON/DLAT from row LG pre-conversion",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "L1341-L1358: IGRIDV==1 reads only IIN,JIN,K, leaving R1D_Global at its zero initialization; the code still normalizes and stores an all-zero DZC_Global row. Local DZC is later rebuilt from DZCK for IGRIDV==1, but SGZLAYER.OUT/global reporting can retain the zero row; intended reporting semantics are unclear."
+   ],
+   "representative": "audit",
+   "rationale": "IGRIDV==1 leaves R1D_Global zero, stores all-zero DZC_Global row",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "L2446-L2453: the SGZV normalization failure branch labels BAD SGZV and tests SUM(SGZV), but its per-layer diagnostic prints SGZU rather than SGZV, obscuring the failing field."
+   ],
+   "representative": "audit",
+   "rationale": "SGZV normalization-failure branch prints SGZU per-layer diagnostic",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "L1567-L1595: the single-domain comparison branch reads domain_list_*.txt without OUTDIR, whereas the multi-domain producer branch writes OUTDIR//mpi_list. Unless the working directory is OUTDIR, the files produced by one branch are not found by the other."
+   ],
+   "representative": "audit",
+   "rationale": "single-domain reads domain_list_*.txt without OUTDIR vs multi-domain OUTDIR//mpi_list",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B8"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "L2967-L2978: MAPHMD.INP supplies L,I,J but the code uses L directly as a local array index without LIJ(I,J) or Map2Local conversion. In decomposed MPI domains a global L may select the wrong local cell or exceed the local allocation."
+   ],
+   "representative": "audit",
+   "rationale": "MAPHMD.INP uses global L directly as local index without LIJ/Map2Local",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B9"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "L927/L1366/L1371 versus L3559-L3572: multiple calls pass STOPP('.',1), while the GNU preprocessor branch defines only STOPP(MSG). With no explicit interface this may rely on ABI tolerance for an extra actual argument; it is an interface mismatch even though the non-GNU IOPEN argument is optional."
+   ],
+   "representative": "audit",
+   "rationale": "STOPP('.',1) calls vs GNU STOPP(MSG) — argument-count interface mismatch",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B10"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "L3322-L3399 versus L3404-L3424: text timing reports include TPROPW and display DSITIMING slices of 13 or 16 entries, but TIME.CSV omits TPROPW and maps only selected DSITIME entries; consumers cannot assume identical timing columns across outputs."
+   ],
+   "representative": "audit",
+   "rationale": "timing report columns (TPROPW/DSITIMING) differ between text report and TIME.CSV",
+   "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}
