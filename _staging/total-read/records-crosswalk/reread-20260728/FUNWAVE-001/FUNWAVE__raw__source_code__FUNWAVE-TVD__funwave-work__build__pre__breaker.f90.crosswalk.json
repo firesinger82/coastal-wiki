@@ -114,12 +114,12 @@
     "DXg and DYg are local variables declared at line 112 and assigned only inside the AGE<=ZERO propagation branch at lines 151-152, yet are used unconditionally later to form xmk/ymk at lines 220-221. If AGE(I,J)>ZERO at lines 146-147, those locals reach lines 220-221 undefined."
    ],
    "representative": "audit",
-   "rationale": "span-verified 2026-08-27: DXg/DYg (decl L112) assigned only in innermost new-breaking ELSE (L152-153); breaking-branch and AGE>ZERO aging-branch leave them unset, yet xmk/ymk consume them unconditionally after all ENDIFs at L221-222. use-before-assign (undefined on first use). base missed.",
+   "rationale": "span-verified 2026-08-27: DXg/DYg (decl L112) assigned only in innermost new-breaking ELSE (L151-152); breaking-branch and AGE>ZERO aging-branch leave them unset, yet xmk/ymk consume them unconditionally after all ENDIFs at L221-222. use-before-assign (undefined on first use). base missed.",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
    "decided_at": "2026-08-27",
    "evidence_span": {
     "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/breaker.f90",
-    "lines": "112,152-153,221-222",
+    "lines": "112,151-152,221-222",
     "quote": "REAL(SP) :: xmk,ymk,DXg,DYg   ! L112 decl\n... (assigned only in AGE<=ZERO branch) DXg=DX ; DYg=DY   ! L152-153\n... (after ENDIFs, unconditional) xmk=(I-Ibeg)*DXg + (iista-1)*DXg ; ymk=(J-Jbeg)*DYg + (jjsta-1)*DYg   ! L221-222"
    }
   },
