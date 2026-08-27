@@ -187,7 +187,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B0"
@@ -197,9 +197,14 @@
     "L744-790: U_FILE 누락 시 NO_UV_FILE=.TRUE.로 만들지만 V_FILE이 존재하면 후속 ELSE가 이를 .FALSE.로 덮어쓴 뒤 곧바로 IF(NO_UV_FILE)로 복구를 시도하므로, U만 누락된 경우를 보존하지 못하는 교차라인 상태 결함이다."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
+   "rationale": "U_FILE 누락 시 NO_UV_FILE=.TRUE.(L754) 후 V_FILE 블록이 독립적으로 .FALSE.(L765/782) 덮어씀; L783 복구 IF(NO_UV_FILE) 는 이미 FALSE 라 미작동 → U-only 누락 상태 소실, 미정의 U 사용. base 미검출.",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "evidence_span": {
+    "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/io.F",
+    "lines": "754,765,771,782-783",
+    "quote": "          NO_UV_FILE = .TRUE.\n…\n          NO_UV_FILE = .FALSE.\n…\n          NO_UV_FILE = .TRUE.\n…\n          NO_UV_FILE = .FALSE.\n          IF(NO_UV_FILE) NO_UV_FILE = .TRUE.    ! in case you dont have u file"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",

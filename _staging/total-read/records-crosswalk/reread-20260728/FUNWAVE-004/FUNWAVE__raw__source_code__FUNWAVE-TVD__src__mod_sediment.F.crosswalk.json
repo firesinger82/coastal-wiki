@@ -254,7 +254,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B2"
@@ -264,12 +264,17 @@
     "Cohesive deposition probability is not bounded below: Pd becomes negative when Tau_xy exceeds Tau_crd_coh (L1363), and D is then assigned WS*CH*Pd without MAX(0,...) (L1364). Because the transport source is Pickup-D (L1208), negative deposition acts as an additional positive concentration source."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
+   "rationale": "Cohesive Pd=1-Tau_xy/MAX(SMALL,Tau_crd_coh)(L1363), Tau_xy>Tau_crd_coh 시 Pd<0, D=WS*CH*Pd 무클램프(L1364) → 음의 침적(허위 침식원). base 미검출.",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "evidence_span": {
+    "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/mod_sediment.F",
+    "lines": "1363-1364",
+    "quote": "           Pd = 1.0_SP - Tau_xy(I,J)/MAX(SMALL,Tau_crd_coh)\n           D(I,J) = WS*CH(I,J)*Pd"
+   }
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B3"
@@ -279,9 +284,14 @@
     "Avalanche transfers are stored with scalar assignment rather than accumulation: each steep cell writes both its own and one neighbor's Zb_avalanching entry (L1585-L1627). Later loop iterations can overwrite earlier incoming/outgoing transfers to the same cell before the one-shot bed update at L1633-L1634, making the result loop-order dependent and losing superposed transfers."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
+   "rationale": "Avalanche Zb_avalanching(I,J)=dh·이웃=-dh 스칼라 대입(L1593-1594, 유사 L1604/1615/1626), 누적(+=) 아님 → 다중이웃 아발란치가 서로 덮어씀, 질량 비보존. base 미검출.",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "evidence_span": {
+    "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/mod_sediment.F",
+    "lines": "1593-1594",
+    "quote": "              Zb_avalanching(I,J)=dh\n              Zb_avalanching(I-1,J)=-dh"
+   }
   }
  ]
 }

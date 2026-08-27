@@ -183,7 +183,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B0"
@@ -193,9 +193,14 @@
     "Use-before-assign on missing NumVessel: READ_INTEGER at L149 has no ierr/default branch, but NumVessel is immediately used as every allocation extent at L263-L285 and as the loop bound at L312. A missing or invalid key leaves the module integer without a defined value before allocation."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
+   "rationale": "NumVessel READ 후 ierr/default 분기 없음(L149), 직후 ALLOCATE extent 로 직접 사용(L263). 'NumVessel' 키 누락 시 INTENT(OUT) 미정의 크기 할당. base 미검출.",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "evidence_span": {
+    "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/mod_vessel.F",
+    "lines": "149,263",
+    "quote": "      CALL READ_INTEGER(NumVessel,FILE_NAME,'NumVessel',ierr)\n…\n      ALLOCATE (Xvessel1(NumVessel),Yvessel1(NumVessel),  &"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",

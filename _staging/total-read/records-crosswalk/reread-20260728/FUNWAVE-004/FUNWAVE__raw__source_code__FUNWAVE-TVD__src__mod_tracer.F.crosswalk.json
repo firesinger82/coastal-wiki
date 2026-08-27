@@ -183,7 +183,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B1"
@@ -193,9 +193,14 @@
     "MPI use-before-assignment defect: X_TRACK_ALL, Y_TRACK_ALL, and IN_CELL_ALL are populated only inside myid==0 blocks at L442-L466, but the selection loop at L470-L477 is outside any root guard and reads these automatic local arrays on every rank. Non-root ranks therefore branch on and copy uninitialized gathered arrays before the later scatter overwrites coordinates."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
+   "rationale": "X_TRACK_ALL/IN_CELL_ALL 는 myid==0 블록서만 채움(L444,464), 선택루프(L470-473)는 root 밖에서 IN_CELL_ALL/X_TRACK_ALL 읽음 → 비root 미정의 read. MPI UBA. base 미검출.",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "evidence_span": {
+    "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/mod_tracer.F",
+    "lines": "444,464,470-473",
+    "quote": "               X_TRACK_ALL(I,l)= xx(l)\n…\n               IN_CELL_ALL(I,l)= yy(l)\n…\n       DO I=1,NumTracker\n         DO l=1,px*py\n          IF(IN_CELL_ALL(I,l))THEN\n             X_TRACK(I)=X_TRACK_ALL(I,l)"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",

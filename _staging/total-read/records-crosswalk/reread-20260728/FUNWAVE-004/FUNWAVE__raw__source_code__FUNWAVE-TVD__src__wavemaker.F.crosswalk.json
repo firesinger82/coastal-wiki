@@ -236,7 +236,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B1"
@@ -246,9 +246,14 @@
     "WK_DATA2D compresses retained directions and WAVE_COMP into DireTmp/WaveCompTmp (L238-L275) but never applies the same index map to Phase2D read at L213-L215. When phases are present, L295-L301 converts the first NumDir original phase columns, which need not correspond to the retained directions after rejected columns; amplitude and phase can therefore be paired from different directions."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
+   "rationale": "WK_DATA2D: Dire/WAVE_COMP 는 DireCount 로 압축(L241)하나 Phase2D 는 원본 index I 유지(read L214, use L299). 방향 기각 시 위상-진폭 인덱스 불일치. base 미검출.",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "evidence_span": {
+    "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/wavemaker.F",
+    "lines": "214,241,299",
+    "quote": "         READ(1,*,END=110)(Phase2D(J,I),J=1,NumFreq)\n…\n         DireTmp(DireCount)=Dire(I)\n…\n          Phase2D(J,I)=Phase2D(J,I)*0.005555555555556*pi"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",
@@ -266,7 +271,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B4"
@@ -276,9 +281,14 @@
     "WK_WAVEMAKER_2D_SPECTRAL_DATA returns Beta_gen(NumFreq,NumDir) (L638), and initialization passes Beta_gen2D to CALCULATE_Cm_Sm (L328-L332), but CALCULATE_Cm_Sm declares beta_gen(mfreq) (L842) and indexes only beta_gen(kf) in the direction loop (L858-L880). This is a rank/interface mismatch and discards direction-dependent beta values."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
+   "rationale": "Beta_gen 생산자 DIMENSION(NumFreq,NumDir),INTENT(OUT)(L638) vs 소비자 CALCULATE_Cm_Sm beta_gen(mfreq),INTENT(IN)(L842). 2D→1D rank 불일치(호출 L328), NumDir>1 서 열 오독. base 미검출.",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "evidence_span": {
+    "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/wavemaker.F",
+    "lines": "328,638,842",
+    "quote": "      CALL CALCULATE_Cm_Sm(Mloc,Nloc,DX,DY,Xc_WK,Ibeg,Jbeg,NumFreq,NumDir,&\n…\n     REAL(SP),DIMENSION(NumFreq,NumDir), INTENT(OUT) :: D_gen,Beta_gen,rlamda\n…\n     REAL(SP),DIMENSION(mfreq),INTENT(IN) :: beta_gen"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",
@@ -296,7 +306,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B8"
@@ -306,9 +316,14 @@
     "WK_NEW_EQUAL_DFREQ_IRREGULAR_WAVE initializes only theta(1) and AG(1) when mtheta==1 (L2860-L2862), although both arrays have length mfreq (L2832-L2834). It later evaluates dot_product over all AG entries (L2914), reads AG(kf) for every component (L2917-L2919), and reads theta(kf) in the component loop (L2940, L3015-L3019), so entries 2:mfreq are used before assignment."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
+   "rationale": "WK_NEW_EQUAL_DFREQ_IRREGULAR_WAVE mtheta==1 분기가 theta(1)/AG(1)만 초기화(L2861-2862), DO kf=1,mfreq(L2896) 가 AG(kf) 소비. mfreq>1 서 UBA. base 미검출.",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "evidence_span": {
+    "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/wavemaker.F",
+    "lines": "2860-2862,2896",
+    "quote": "    IF(mtheta==1) THEN ! 1D case\n        theta(1) = theta_input*pi/180.0_SP\n        AG(1) = 1.0_SP\n…\n    DO kf=1,mfreq"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",
@@ -326,7 +341,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B10"
@@ -336,9 +351,14 @@
     "phi1 in WK_NEW_EQUAL_DFREQ_IRREGULAR_WAVE is INTENT(OUT) (L2836) but random phases are assigned only inside IF(PERIODIC) at L2941-L3014. The nonperiodic return leaves phi1 undefined, yet WAVEMAKER_INITIALIZATION immediately passes it to CALCULATE_NEW_Cm_Sm (L590-L599), whose trigonometric fields read phi1 at L3105-L3117 and L3128-L3162."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
+   "rationale": "phi1 DIMENSION(mfreq,1),INTENT(OUT)(L2836) 이나 IF(PERIODIC) 내부서만 대입(L2992). 비주기 경로 phi1 미정의 소비. UBA. base 미검출.",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "evidence_span": {
+    "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/wavemaker.F",
+    "lines": "2836,2992",
+    "quote": "    REAL(SP),DIMENSION(mfreq,1),INTENT(OUT) :: D_gen,phi1,rlamda\n…\n            phi1(kf,1)=rand()*2.0_SP*pi"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",

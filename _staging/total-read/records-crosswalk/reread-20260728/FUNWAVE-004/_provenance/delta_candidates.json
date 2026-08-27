@@ -5,7 +5,8 @@
   "audit_id": "B1",
   "text": "Range defect: no check enforces SubMainGridRatio>0 before NumPixel is formed at L104, dimensions are allocated at L106-L109, and division by REAL(NumPixel) occurs at L171-L172 and L213-L214. Zero or negative input can therefore create invalid/zero extents and division by zero.",
   "canonical_scope": "in-scope (model source)",
-  "review_status": "pending"
+  "review_status": "reviewed-med",
+  "review_note": "SubMainGridRatio>0 미검사·NumPixel 나눗셈: ratio=0 도달성 불명(통상 >=1). config-validation."
  },
  {
   "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/nesting.F",
@@ -13,7 +14,8 @@
   "audit_id": "B1",
   "text": "Both the initial equal-time state and EOF collapse interpolation weights to zero: TIME_COUPLING_2 is initialized equal to TIME_COUPLING_1 (L93-L95), while equal slots set tmp1=tmp2=ZERO (L488-L497). At EOF, TIME_COUPLING_1 is first advanced to TIME_COUPLING_2, the failed read jumps to L483 (L367-L372), and the same equal-slot branch zeros every coupled ETA/U/V ghost value at L509-L588 instead of retaining the last boundary record.",
   "canonical_scope": "in-scope (model source)",
-  "review_status": "pending"
+  "review_status": "reviewed-med",
+  "review_note": "보간 weight 초기 동시각/EOF 0 붕괴: 초기/말미 edge. weight-0."
  },
  {
   "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/tools/filter/matlab/mk_conv_grid.m",
@@ -29,7 +31,8 @@
   "audit_id": "B0",
   "text": "The periodic WK_REG initialization computes 2*pi/Tperiod before testing Tperiod==ZERO (L83-L91). The same ineffective ordering recurs in WK_WAVEMAKER_2D_SPECTRAL_DATA (Tperiod=1/Freq at L783, test at L788), WK_WAVEMAKER_REGULAR_WAVE (division L2381, test L2385), WK_WAVEMAKER_TIME_SERIES (division L2435, test L2441), and WK_NEW_WAVEMAKER_2D_SPECTRAL_DATA (division L2760, test L2766); zero frequency/period can fault before the intended guard.",
   "canonical_scope": "in-scope (model source)",
-  "review_status": "pending"
+  "review_status": "refuted",
+  "review_note": "2*pi/Tperiod 를 Tperiod==0 테스트 전 계산하나, 테스트가 Tperiod 자체를 검사(DETTMP 와 달리 유효 가드). Inf 는 STOP 전 일시값."
  },
  {
   "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/wavemaker.F",
@@ -37,7 +40,7 @@
   "audit_id": "B1",
   "text": "WK_DATA2D compresses retained directions and WAVE_COMP into DireTmp/WaveCompTmp (L238-L275) but never applies the same index map to Phase2D read at L213-L215. When phases are present, L295-L301 converts the first NumDir original phase columns, which need not correspond to the retained directions after rejected columns; amplitude and phase can therefore be paired from different directions.",
   "canonical_scope": "in-scope (model source)",
-  "review_status": "pending"
+  "review_status": "confirmed"
  },
  {
   "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/wavemaker.F",
@@ -45,7 +48,7 @@
   "audit_id": "B4",
   "text": "WK_WAVEMAKER_2D_SPECTRAL_DATA returns Beta_gen(NumFreq,NumDir) (L638), and initialization passes Beta_gen2D to CALCULATE_Cm_Sm (L328-L332), but CALCULATE_Cm_Sm declares beta_gen(mfreq) (L842) and indexes only beta_gen(kf) in the direction loop (L858-L880). This is a rank/interface mismatch and discards direction-dependent beta values.",
   "canonical_scope": "in-scope (model source)",
-  "review_status": "pending"
+  "review_status": "confirmed"
  },
  {
   "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/wavemaker.F",
@@ -53,7 +56,8 @@
   "audit_id": "B6",
   "text": "All equal-frequency variants divide by mfreq-1 without an mfreq>1 guard (L1584, L2160, L2849). A one-component configuration therefore produces a singular df before later loops.",
   "canonical_scope": "in-scope (model source)",
-  "review_status": "pending"
+  "review_status": "reviewed-med",
+  "review_note": "mfreq-1 분모 무가드: mfreq=1 도달성 불명(spectrum 통상 >1)."
  },
  {
   "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/wavemaker.F",
@@ -61,7 +65,7 @@
   "audit_id": "B8",
   "text": "WK_NEW_EQUAL_DFREQ_IRREGULAR_WAVE initializes only theta(1) and AG(1) when mtheta==1 (L2860-L2862), although both arrays have length mfreq (L2832-L2834). It later evaluates dot_product over all AG entries (L2914), reads AG(kf) for every component (L2917-L2919), and reads theta(kf) in the component loop (L2940, L3015-L3019), so entries 2:mfreq are used before assignment.",
   "canonical_scope": "in-scope (model source)",
-  "review_status": "pending"
+  "review_status": "confirmed"
  },
  {
   "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/wavemaker.F",
@@ -69,7 +73,7 @@
   "audit_id": "B10",
   "text": "phi1 in WK_NEW_EQUAL_DFREQ_IRREGULAR_WAVE is INTENT(OUT) (L2836) but random phases are assigned only inside IF(PERIODIC) at L2941-L3014. The nonperiodic return leaves phi1 undefined, yet WAVEMAKER_INITIALIZATION immediately passes it to CALCULATE_NEW_Cm_Sm (L590-L599), whose trigonometric fields read phi1 at L3105-L3117 and L3128-L3162.",
   "canonical_scope": "in-scope (model source)",
-  "review_status": "pending"
+  "review_status": "confirmed"
  },
  {
   "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/tools/input_generation/PreProcessing_FUNWAVE.m",
@@ -93,7 +97,7 @@
   "audit_id": "B2",
   "text": "Cohesive deposition probability is not bounded below: Pd becomes negative when Tau_xy exceeds Tau_crd_coh (L1363), and D is then assigned WS*CH*Pd without MAX(0,...) (L1364). Because the transport source is Pickup-D (L1208), negative deposition acts as an additional positive concentration source.",
   "canonical_scope": "in-scope (model source)",
-  "review_status": "pending"
+  "review_status": "confirmed"
  },
  {
   "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/mod_sediment.F",
@@ -101,7 +105,7 @@
   "audit_id": "B3",
   "text": "Avalanche transfers are stored with scalar assignment rather than accumulation: each steep cell writes both its own and one neighbor's Zb_avalanching entry (L1585-L1627). Later loop iterations can overwrite earlier incoming/outgoing transfers to the same cell before the one-shot bed update at L1633-L1634, making the result loop-order dependent and losing superposed transfers.",
   "canonical_scope": "in-scope (model source)",
-  "review_status": "pending"
+  "review_status": "confirmed"
  },
  {
   "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/breaker.F",
@@ -133,7 +137,8 @@
   "audit_id": "B1",
   "text": "초기화 누락/조건 불일치: ALLOCATE_VARIABLES는 CARTESIAN/ZALPHA에서 U4xL/U4xR, V4yL/V4yR뿐 아니라 V4xL/V4xR와 U4yL/U4yR도 할당하지만(L143-L161), INITIALIZATION의 영 초기화는 CARTESIAN U4xL/U4xR와 V4yL/V4yR 네 배열만 다룬다(L473-L478). V4xL/V4xR·U4yL/U4yR은 이 파일에서 초기화되지 않으며 ZALPHA 빌드에서는 앞의 네 배열도 영 초기화되지 않는다.",
   "canonical_scope": "in-scope (model source)",
-  "review_status": "pending"
+  "review_status": "refuted",
+  "review_note": "INITIALIZATION 영초기화가 4/8 배열만 다루나, 미영초기화 배열도 Gamma1*..(non-DISPERSION시 Gamma1=0) 로만 소비 → 소거."
  },
  {
   "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/init.F",
@@ -141,7 +146,8 @@
   "audit_id": "B2",
   "text": "도달불가 설정: non-CARTESIAN 분기에서 SLOPE_CTR를 L1172에서 항상 .FALSE.로 덮은 직후 L1174와 L1183-L1186에서 IF(SLOPE_CTR) 보호 코드를 둔다. 이 루틴 실행에서는 경고와 slope cap이 모두 도달 불가이며 외부 입력으로 활성화할 경로가 보이지 않는다.",
   "canonical_scope": "in-scope (model source)",
-  "review_status": "pending"
+  "review_status": "reviewed-med",
+  "review_note": "non-CARTESIAN 서 SLOPE_CTR 항상 .FALSE. 후 IF(SLOPE_CTR) 보호코드 → 도달불가 dead code, 결함 아님."
  },
  {
   "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/fluxes_33v.F",
@@ -149,7 +155,8 @@
   "audit_id": "B0",
   "text": "use-before-assign 가능성: CONSTRUCTION에서 U4xL/U4xR은 DISPERSION일 때만 L459-L465에서 구성되지만 CARTESIAN PL/PR와 FxL/FxR은 L474-L509에서 이를 무조건 참조한다. 같은 패턴으로 V4yL/V4yR은 L569-L575 조건부 정의 뒤 L581-L636에서 참조된다. DISPERSION=false에서 전역 배열의 별도 초기화가 없다면 미정의 값을 읽는다.",
   "canonical_scope": "in-scope (model source)",
-  "review_status": "pending"
+  "review_status": "refuted",
+  "review_note": "U4xL DISPERSION-only 정의 후 무조건 참조이나 Gamma1*U4xL, Gamma1=ZERO(non-DISPERSION) → 소거."
  },
  {
   "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/sponge.F",
@@ -157,7 +164,8 @@
   "audit_id": "B0",
   "text": "CALCULATE_SPONGE_MAKER는 Iwidth를 INT(width/DX)+Nghost로 정한 뒤(L190-L192) Iwidth-1로 나눈다(L204/L207). CALCULATE_SPONGE도 각 양의 경계 폭에서 같은 분모를 사용한다(L636-L653, L664-L681, L703-L720, L732-L749). 이 파일에는 Iwidth>1 검사가 없어 Nghost와 폭/간격 조합이 Iwidth<=1이면 0 나눗셈 또는 비정상 지수가 발생한다.",
   "canonical_scope": "in-scope (model source)",
-  "review_status": "pending"
+  "review_status": "reviewed-med",
+  "review_note": "Iwidth-1 분모, Iwidth>1 미검사: Iwidth=INT(width/DX)+Nghost 통상 >>1. edge."
  },
  {
   "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/fluxes.F",
@@ -165,7 +173,8 @@
   "audit_id": "B0",
   "text": "비분산 실행에서 고차 보정 배열의 정의-사용 순서가 닫히지 않는다. 예를 들어 CONSTRUCTION_HO_minmod는 U4xL/V4xL을 DISPERSION일 때만 L850-L855에서 정의하지만 L860-L924에서 조건 없이 읽고, y 배열도 L948-L953에서만 정의한 뒤 L955-L1020에서 읽는다. 같은 구조가 CONSTRUCTION(L590-L604 대 L609-L664), CONSTRUCTION_HO(L1352-L1357 대 L1359-L1420; L1444-L1449 대 L1451-L1513), MLP(L1785-L1790 대 L1792-L1853; L1873-L1878 대 L1880-L1942), WENO(L2145-L2148 대 L2150-L2207; L2220-L2223 대 L2225-L2283)에 반복된다. Gamma1이 0이어도 미정의/NaN 배열과의 곱은 안전하지 않으므로 외부 초기화 보장이 없다면 use-before-assign이다.",
   "canonical_scope": "in-scope (model source)",
-  "review_status": "pending"
+  "review_status": "refuted",
+  "review_note": "CONSTRUCTION_HO U4xL/V4xL DISPERSION-only 이나 Gamma1=0 로 소거."
  },
  {
   "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/io.F",
@@ -173,7 +182,7 @@
   "audit_id": "B0",
   "text": "L744-790: U_FILE 누락 시 NO_UV_FILE=.TRUE.로 만들지만 V_FILE이 존재하면 후속 ELSE가 이를 .FALSE.로 덮어쓴 뒤 곧바로 IF(NO_UV_FILE)로 복구를 시도하므로, U만 누락된 경우를 보존하지 못하는 교차라인 상태 결함이다.",
   "canonical_scope": "in-scope (model source)",
-  "review_status": "pending"
+  "review_status": "confirmed"
  },
  {
   "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/io.F",
@@ -181,7 +190,8 @@
   "audit_id": "B2",
   "text": "L2707 대 L3028-3031: ROLLER가 READ_INPUT 후반에서 읽히기 약 320행 전에 IF(ROLLER)로 VISCOSITY_BREAKING을 강제한다. 이 파일 안에서는 선행 대입이 없어 use-before-assign이며, 입력 ROLLER_EFFECT는 이 선행 결정에 반영될 수 없다.",
   "canonical_scope": "in-scope (model source)",
-  "review_status": "pending"
+  "review_status": "pending",
+  "review_note": "ROLLER→VISCOSITY_BREAKING 강제(L2707)가 ROLLER read(L3028) 선행: IF(ROLLER) 강제 지점 다중구역 추적 필요."
  },
  {
   "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/mod_vessel.F",
@@ -189,7 +199,7 @@
   "audit_id": "B0",
   "text": "Use-before-assign on missing NumVessel: READ_INTEGER at L149 has no ierr/default branch, but NumVessel is immediately used as every allocation extent at L263-L285 and as the loop bound at L312. A missing or invalid key leaves the module integer without a defined value before allocation.",
   "canonical_scope": "in-scope (model source)",
-  "review_status": "pending"
+  "review_status": "confirmed"
  },
  {
   "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/mod_vessel.F",
@@ -197,7 +207,8 @@
   "audit_id": "B1",
   "text": "Source/propeller interface mismatch: propeller inputs are read only inside the PR source branch at L352-L360, but E0, Veff, Cf, and IZEF are computed unconditionally for every vessel under PROPELLER at L445-L450. SL or PA vessels therefore use unassigned N_revolution, D_prop, C_thrust, D_hub, BAR, H_prop, and C_duct.",
   "canonical_scope": "in-scope (model source)",
-  "review_status": "pending"
+  "review_status": "pending",
+  "review_note": "propeller 입력 PR 분기만 read vs E0/Veff 전vessel 계산: vessel 모듈 인터페이스 심층 필요."
  },
  {
   "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/mod_vessel.F",
@@ -205,7 +216,8 @@
   "audit_id": "B2",
   "text": "PA initialization mismatch: geometry/source parameters are read for PR at L352-L381 and SL at L383-L388, with no PA branch before the path read at L389-L390; VESSEL_FORCING nevertheless dispatches PA to GREEN_FUNCTION_SOURCE at L552-L555, which uses LengthVessel, WidthVessel, Pvessel and related state at L827-L875. Those values are unassigned for PA as parsed here.",
   "canonical_scope": "in-scope (model source)",
-  "review_status": "pending"
+  "review_status": "pending",
+  "review_note": "PA 분기 부재 vs VESSEL_FORCING PA dispatch: vessel 인터페이스 심층 필요."
  },
  {
   "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/mod_meteo.F",
@@ -213,7 +225,8 @@
   "audit_id": "B0",
   "text": "L541-L600: Holland_Model_Forcing가 새 레코드를 읽기 전에 TimeStorm1/Xstorm1/Ystorm1만 이전 2값으로 이동시키고 Pn_storm1/Pc_storm1/A_storm1/B_storm1은 갱신하지 않는다. L596-L601 보간은 두 번째 구간부터 새 endpoint와 최초 레코드의 압력·형상 계수를 섞어 잘못된 storm 강도를 만든다.",
   "canonical_scope": "in-scope (model source)",
-  "review_status": "pending"
+  "review_status": "pending",
+  "review_note": "Holland rollover: 완전 shift(L471-477, 7필드)와 부분 shift(L551-, Time/X/Y만) 공존 — 활성 경로 판별 모호."
  },
  {
   "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/mod_meteo.F",
@@ -221,7 +234,8 @@
   "audit_id": "B1",
   "text": "L1076-L1120: MeteoGausian_Forcing도 rollover 때 Time/X/Y만 갱신하고 DP_storm1/SigmaX1/SigmaY1/Theta1을 이전 2값으로 옮기지 않는다. 두 번째 구간부터 Gaussian 크기·폭·방향 보간의 왼쪽 endpoint가 낡는다.",
   "canonical_scope": "in-scope (model source)",
-  "review_status": "pending"
+  "review_status": "pending",
+  "review_note": "MeteoGausian rollover 부분 shift 주장 — [20] 미해소로 함께 보류."
  },
  {
   "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/mod_precipitation.F",
@@ -229,7 +243,8 @@
   "audit_id": "B0",
   "text": "L165-L188,L247-L297: 초기화는 첫 raster를 PrecRateData2에만 읽고 PrecRateData1을 초기화하지 않는다. 다음 timestamp를 넘기기 전에는 tmp1/tmp2가 둘 다 ZERO이므로 L294에서 첫 rainfall field가 0으로 사라지며, 첫 갱신 전 입력 강수가 적용되지 않는다.",
   "canonical_scope": "in-scope (model source)",
-  "review_status": "pending"
+  "review_status": "reviewed-med",
+  "review_note": "tmp 는 IF(TIME>TimePrec1) 내부서만 설정; 첫 데이터 이전/EOF 만 0(방어가능). weight-0."
  },
  {
   "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/mod_tracer.F",
@@ -237,7 +252,7 @@
   "audit_id": "B1",
   "text": "MPI use-before-assignment defect: X_TRACK_ALL, Y_TRACK_ALL, and IN_CELL_ALL are populated only inside myid==0 blocks at L442-L466, but the selection loop at L470-L477 is outside any root guard and reads these automatic local arrays on every rank. Non-root ranks therefore branch on and copy uninitialized gathered arrays before the later scatter overwrites coordinates.",
   "canonical_scope": "in-scope (model source)",
-  "review_status": "pending"
+  "review_status": "confirmed"
  },
  {
   "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/mod_tide.F",
@@ -245,6 +260,7 @@
   "audit_id": "B3",
   "text": "Range/singularity exposure: Iwidth comes from unvalidated WaveMakerPointNum (L117-L120), appears in denominators Iwidth-1 at L261-L300, and controls array loop bounds at L325-L360. Iwidth=1 makes the exponent division singular; Iwidth greater than Mloc or Nloc produces out-of-range or non-domain boundary indices.",
   "canonical_scope": "in-scope (model source)",
-  "review_status": "pending"
+  "review_status": "reviewed-med",
+  "review_note": "Iwidth-1 분모, WaveMakerPointNum 미검증: Iwidth=1 edge."
  }
 ]
