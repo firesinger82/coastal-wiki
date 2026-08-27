@@ -1,0 +1,152 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-004",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/fluxes_21v.F",
+ "source_sha256": "3af62b15bbaafde1983374096d354225c1f70f93fa0cf16f5978aa8d1b92e19b",
+ "base_run_id": "reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6",
+ "audit_run_id": "reread20260728-code-FUNWAVE-004-codexaudit-20260826T022957Z-8833a3a8",
+ "base_record_file": "30e11b3b79ebe8cbc27609157a8a485ddfd39d5bd9c7188d8bd60416429c95c2.json",
+ "audit_record_file": "30e11b3b79ebe8cbc27609157a8a485ddfd39d5bd9c7188d8bd60416429c95c2.json",
+ "base_record_sha256_bytes": "6b3b2ba18439a3588db80109afbadf55d3a878d8f26d11f97b3f815ed42fca30",
+ "audit_record_sha256_bytes": "6294272826fb340304ecc54a443a1bf07e2d36441237024ae52a7a3f2e81a6a0",
+ "base_finding_count": 6,
+ "audit_finding_count": 4,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "In CONSTRUCT_X/CONSTRUCT_Y the kappa-scheme expressions apply (1-kappa) and (1+kappa) weights to the same Din value (L661-669, L719-727), so they algebraically reduce to the 2nd-order 0.5*D*Din form and the Kappa argument has no effect — precursor of the later ykchoi observation ('kappa is meaningless') coded explicitly in fluxes.F"
+   ],
+   "audit_member_text": [
+    "교차라인 복붙 정합성: CONSTRUCT_Y의 내부·경계 좌/우 재구성식에서 두 가중항이 모두 같은 Din(I,J-1), Din(I,J), Din(I,N) 등을 참조해 (1-Kappa)+(1+Kappa)=2가 되므로 입력 Kappa가 완전히 소거된다(L661-L684). CONSTRUCT_X에도 동일한 패턴이 반복된다(L719-L742). 이웃한 두 기울기를 섞으려던 식인지 확인 필요하다."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "Same Gamma3-squared anomaly as fluxes.F: non-CARTESIAN FyL/FyR=Gamma3*Hy*Uy*Vy*Gamma3 (L593-594) vs GxL=HxL*UxL*VxL*Gamma3 (L525-526)"
+   ],
+   "audit_member_text": [
+    "x/y 인터페이스 대칭 불일치: CONSTRUCTION의 비-CARTESIAN 분기에서 GxL/GxR은 Gamma3가 한 번인데(L535-L536), FyL/FyR은 Gamma3가 앞과 뒤에 중복되어 제곱된다(L590-L591). 같은 파일의 고차 비-CARTESIAN FyL/FyR은 Gamma3 한 번만 사용한다(L960-L961). 저차 y-flux의 복붙 오류 가능성을 확인해야 한다."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "This file duplicates most of fluxes.F at an earlier revision (v2.1 per filename): no MLP/WENO/CONSTRUCTION_HO_minmod schemes, no UseEtaScreen branches, FLUXES has only FOU/default paths (L57-68); which file is compiled is decided by the build system, not visible here"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Header block mislabeled 'FILE main.F' (L4) and first line records an in-progress modification note (L1)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "FLUX_AT_INTERFACE_HLL locals SR,SL,FL,FR,UL,UR (L113) unused; DelxU4/DelxV4/DelyV4/DelyU4 declared in CONSTRUCTION (L410-411) are used only inside the DISPERSION branch, and CONSTRUCTION_HO declares DelxU4/DelyV4 (L765-766) never used"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "HLL degenerate case divides by SMALL rather than limiting (L146-147), as in fluxes.F"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "특이점 검사 무력화: VANLEER_LIMITER의 B-present 경로는 A=B=0이면 분모 ABS(A)+ABS(B)가 0이고(L1218-L1219), B-absent 경로는 A=-1이면 분모 1+A가 0이다(L1220-L1221). 앞선 DelxFun/DelyFun의 직접식에는 SMALL 검사가 있지만 이 함수 자체에는 없으므로 독립 호출 시 0/0이 가능하다."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "범위 전제: CONSTRUCT_HO_X는 I=Ibeg-1..Iend+2에서 Vin(I-2)와 Vin(I+1)을 읽고(L997-L1001), CONSTRUCT_HO_Y는 J=Jbeg-1..Jend+2에서 Vin(J-2)와 Vin(J+1)을 읽는다(L1099-L1103). 호출부가 Ibeg/Jbeg 및 배열 ghost 폭을 항상 최소 3으로 보장하는지는 이 파일만으로 확인되지 않는다."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

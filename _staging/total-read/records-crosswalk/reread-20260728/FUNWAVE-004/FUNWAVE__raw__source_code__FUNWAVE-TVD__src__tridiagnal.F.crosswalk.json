@@ -1,0 +1,208 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-004",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/tridiagnal.F",
+ "source_sha256": "ad0033966a16baba726a99b456184d7b493f5e5b663e9cc1e3cd58b0bd4e4402",
+ "base_run_id": "reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6",
+ "audit_run_id": "reread20260728-code-FUNWAVE-004c-codexaudit-20260826T235048Z-1a481a82",
+ "base_record_file": "66515443c94ca79521e601e7e0453e77498addfc37c4d9498b72754c7232acb2.json",
+ "audit_record_file": "66515443c94ca79521e601e7e0453e77498addfc37c4d9498b72754c7232acb2.json",
+ "base_record_sha256_bytes": "74dd0012eee8d9a456b1eb221d0b3fc9dfc1008a851273865716f075c56fccfc",
+ "audit_record_sha256_bytes": "2a113311439f5643d868313ec027046d30600793dfc69a0246a9d9dcf36cc4e3",
+ "base_finding_count": 8,
+ "audit_finding_count": 5,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "header comment of TRIDy @L496 says 'TRIDx is parallel version' while the routine solves the y direction (@L497, SUBROUTINE TRIDy @L502) — copy-paste artifact"
+   ],
+   "audit_member_text": [
+    "Copy-text mismatch: the comment immediately above SUBROUTINE TRIDy calls it TRIDx at L494 even though it implements the y-direction solver at L503."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "TRIDy_periodic locals Axx,Cxx,Dxx,U1D declared @L82 and rmsg,smsg @L83 are never used in its body (L88-324); PARALLEL locals nreq,ll,myvar,mybeta @L72,@L76 also unused"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "loop index variables i,j in TRIDy_periodic/TRIDx/TRIDy are not declared locally (only II,JJ @L72; commented 'integer i, j' @L511) — presumably USE GLOBAL I,J via USE PARAM/GLOBAL; cannot be confirmed from this file"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "case-insensitive reuse: A_beg/C_end written @L146-147 are the same variables as a_beg/c_end declared @L81 (Fortran case-insensitivity)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "in the corner-collection loops the inner index is lowercase i (do i = 1,Mloc @L103) but the renormalization loops use c_end(I)/a_beg(I) with the loop variable spelled i (do i= Ibeg, Iend @L154, c_end(I) @L155) — same identifier; anchors verified per line"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "serial second-RHS loop @L215-221 zeroes only interior j=Jbeg+1..Jend-1 @L217-219 while the PARALLEL branch zeroes all interior cells first @L195-199 then sets ends @L201-213; equivalence depends on d having no stale values outside Jbeg..Jend rows — relation across L195-221"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "TRIDy_periodic under PARALLEL requires PY processor rows with ProcessorID mapping; the beta broadcast loops @L285-297 execute MPI_SEND/IRECV pairs inside DO II=1,PX with all ranks iterating — correctness relies on matched send/recv ordering across ranks, not verifiable from this file alone"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "TRIDx/TRIDy forward sweeps are guarded by a(i,j).ne.ZERO (@L440,@L530) but boundary renormalization divides by a(Ibeg,j)/a(i,Jbeg) only inside the same guard (@L430,@L520); rows with a=0 skip renormalization entirely — semantic assumption that a=0 marks masked rows, defined elsewhere"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Copy/payload mismatch in TRIDx back substitution: only smsg(j,1) is assigned at L481, but MPI_ISEND transmits 2*Nloc elements at L483-L484. Column 2 therefore contains stale/uninitialized values; the matching receive requests 2*Nloc at L461-L462 although only rmsg(j,1) is consumed at L465."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The same back-substitution payload mismatch is copied into TRIDy: only smsg(i,1) is assigned at L571, but 2*Mloc elements are sent at L573-L574; the receiver requests 2*Mloc at L551-L552 and consumes only column 1 at L555."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "All Thomas/Sherman-Morrison divisions check only a/A against ZERO (for example L431 and L441), but do not test the effective pivot denominators 1/a-rmsg(:,2), 1/a-c(previous), the cyclic endpoint factors 1+c_end and 1+a_beg (L204/L210), or the Sherman-Morrison beta denominator (L278-L279). A zero effective pivot remains unchecked."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Ordering risk in periodic endpoint exchange: blocking MPI_SEND is issued at L108 before the peer posts MPI_IRECV at L113, and the same send-before-receive pattern recurs for c_end and the y1/y2 endpoint transfers. Completion therefore depends on MPI buffering/eager behavior for message length Mloc rather than a nonblocking send or paired Sendrecv."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

@@ -1,0 +1,287 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-004",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/mod_sediment.F",
+ "source_sha256": "109c4951dcd5fcba376d7dacc61b4abc2d22793b7f034b26d643fb6de19275a4",
+ "base_run_id": "reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6",
+ "audit_run_id": "reread20260728-code-FUNWAVE-004c-codexaudit-20260826T235048Z-1a481a82",
+ "base_record_file": "3917e06f212c0735803e45aa45f4483948adc56a9d2994e3778f2d867bfc5a7e.json",
+ "audit_record_file": "3917e06f212c0735803e45aa45f4483948adc56a9d2994e3778f2d867bfc5a7e.json",
+ "base_record_sha256_bytes": "b659cc909de484bdbcdc123665b655317fc749e5e44a5be502d8ba1959d8c00f",
+ "audit_record_sha256_bytes": "7d114cb097ce4c723978acee6941d669c2dbb25fc10cd18194b919c35e78ff6c",
+ "base_finding_count": 15,
+ "audit_finding_count": 4,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "Cross-line: k4 @L1177 uses ustar_c which is only computed inside the preceding x-direction diffusion loop (L1127-1132); in the y-direction loop (L1163-1192) ustar_c is never recomputed for the current (I,J), so k4 combines ustar_c4 for (I,J-1) with a stale ustar_c from the last x-loop iteration"
+   ],
+   "audit_member_text": [
+    "Use of a stale or undefined shear velocity in y diffusion: ustar_c is assigned only inside the preceding x-face loop and only when MASK(I,J)>0 (L1123-L1158), but the separate y-face loop never recomputes it and combines that residual scalar with cell-specific ustar_c4 in k4 (L1163-L1177). Thus every y-face can use the last qualifying x-loop cell's value, or an undefined value if no qualifying x cell ran."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "Deposition loop bounds Jbeg,Jend+1 / Ibeg,Iend+1 (L1356-1357) exceed the source-loop bounds Jbeg,Jend / Ibeg,Iend (L1244-1245)"
+   ],
+   "audit_member_text": [
+    "Tau_xy has no initialization after allocation (L867-L925) and is assigned only where MASK>0 and H>MinDepthPickup (L1244-L1256). The later deposition loop spans Ibeg:Iend+1 and Jbeg:Jend+1 and, for every MASK>0 cohesive cell, reads Tau_xy in Pd (L1355-L1364). Shallow wet cells and wet halo cells can therefore read Tau_xy before assignment; no Tau_xy halo exchange appears between these regions."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Cross-line: cohesive deposition overwrites module-scope WS @L1362 each point using the flocs formula, destroying any user-input WS value read @L548 for subsequent use"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Kappa1 (L737) and Kappa2 (L752) are read and logged but never used in any computation in this file"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "FILE_EXIST used @L959-960 without local declaration in SEDIMENT_INITIAL (L145-147) - must come from a USE'd module; likewise loop indices I,J in SEDIMENT_INITIAL (L977) and MORPHOLOGICAL_CHANGE (L1530) are not locally declared"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "CHXxR/CHXxL are zeroed twice (L882-883 and L886-887); arrays CHX,CHY,CHXxL,CHXxR,CHYyL,CHYyR,CHHxR,CHHxL,CHHyR,CHHyL,FsL,FsR,GsL,GsR,Fs,Gs,CH0,ZbOld,dZb,Delta_c,ava allocated and zeroed (L845-916) but not used in any computation in this file - the scheme uses local Scalx/Scaly instead"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Declared but unused scalars in this file: A_sed,D_sed,htt,ec_max,ec_max_w,ec_max_c,beta_d,u_c1,u_c3,ustar_c1,ustar_c3,k1,k3,F1,F2,F3,F4,Satuation (L117-122), DT1,Counter (L93), c_dum (L88), Counter_s,Counter_ava (L87), fr,Pd? (Pd used L1363; fr unused L1002), R2,R3 (L1000), TMP_NAME (L146), PrecName-equivalent none; Mask_s allocated (L852) and zeroed (L917) but hard-bottom logic uses Zs not Mask_s"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "tan_phi declared lowercase @L121 and read as Tan_phi @L669 (case-insensitive same variable)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A8"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "IVAR argument of FLUX_SCALAR_BC (L1455) and local K (L1458) are unused inside the subroutine"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A9"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Morph_interval and Aval_interval default to SMALL (L613, L628), meaning the averaging reset (L1386) and avalanching (L1556) trigger every step unless specified"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A10"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Hard-bottom Zs is read only over interior points in serial branch (L977-979) while Zs was initialized to LARGE (L878) - ghost values stay LARGE"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A11"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "PLOT_INTV_SEDIMENT/PLOT_COUNT_SEDIMENT are read/initialized here (L767-776) but no output writing occurs in this file"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A12"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Aval_accum accumulates avalanching (L1634) but is never output or used elsewhere in this file"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A13"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "gamma_cao capped at 2.0 (L1368) permits deposition enhancement factor >1 only up to (1-n_porosity)/CH; commented-out alternative D(I,J)=ZERO @L1370"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A14"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Weight0=0.9/Weight1=0.1 branch is labeled 'TVD, minmod' in comment @L1066 but implements a fixed-weight biased average, not a minmod limiter"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Cohesive deposition probability is not bounded below: Pd becomes negative when Tau_xy exceeds Tau_crd_coh (L1363), and D is then assigned WS*CH*Pd without MAX(0,...) (L1364). Because the transport source is Pickup-D (L1208), negative deposition acts as an additional positive concentration source."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Avalanche transfers are stored with scalar assignment rather than accumulation: each steep cell writes both its own and one neighbor's Zb_avalanching entry (L1585-L1627). Later loop iterations can overwrite earlier incoming/outgoing transfers to the same cell before the one-shot bed update at L1633-L1634, making the result loop-order dependent and losing superposed transfers."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

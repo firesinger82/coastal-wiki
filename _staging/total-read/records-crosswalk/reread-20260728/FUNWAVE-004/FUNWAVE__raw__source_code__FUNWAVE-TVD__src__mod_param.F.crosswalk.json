@@ -1,0 +1,103 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-004",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/mod_param.F",
+ "source_sha256": "bded43978218a19bce766578bdf4cdbc329055dcc7b7b921989dc9094fa0f17f",
+ "base_run_id": "reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6",
+ "audit_run_id": "reread20260728-code-FUNWAVE-004a-codexaudit-20260826T235047Z-4f05567c",
+ "base_record_file": "327f8b392564c5f0977eddc46c7a0168c973e666fdd4a9356cbc4f1e7664aae4.json",
+ "audit_record_file": "327f8b392564c5f0977eddc46c7a0168c973e666fdd4a9356cbc4f1e7664aae4.json",
+ "base_record_sha256_bytes": "b3f6f25224565dc15d3b5b88e2e2c59dae9060015b41ec2597458d87843ab557",
+ "audit_record_sha256_bytes": "1d81ef78d77ca434a824fa3db76832061bdab884b296500944a40885430a1a62",
+ "base_finding_count": 4,
+ "audit_finding_count": 2,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "pi=3.141592653 (L71) has no _SP kind suffix, so under DOUBLE_PRECISION it is a single-precision literal widened to REAL(8); DEG2RAD=0.0175 (L80) is a truncated pi/180=0.01745329 - both lower-accuracy than the other constants."
+   ],
+   "audit_member_text": [
+    "Cross-line consistency defect: DEG2RAD is 0.0175_SP at L80, whereas the same module's pi=3.141592653 at L71 implies pi/180 approximately 0.0174532925; the literal conversion factor is therefore inconsistent with the local pi definition (about 0.27% high). The source does not state whether this coarse approximation is intentional."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Cross-line/cross-file: I, J, K (L83) and tmp1-tmp5/itmp1-itmp5 (L84-85) are module-global work variables shared by every routine that USEs PARAM - this is where loop indices and temporaries (e.g. tmp3 used in mod_meteo.F) resolve; sharing loop indices across routines forbids OpenMP-style reentrancy."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "RES (L83) is declared but its role is not defined in this file."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "DOUBLE_PRECISION branch sets SP=8 directly (L59) assuming kind 8 exists rather than using SELECTED_REAL_KIND - compiler-dependent assumption."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Cross-line consistency defect: RHO_AW is documented as relative to water and set to 0.0012041_SP at L77, but the absolute values RHO_AIR=1.15_SP and RHO_WATER=1000.0_SP at L78-L79 imply RHO_AIR/RHO_WATER=0.00115. The module contains two inconsistent air/water density ratios without explaining which consumers should use."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

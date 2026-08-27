@@ -1,0 +1,193 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-004",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/bc.F",
+ "source_sha256": "e8639ff41047888ae04988bb743bd5d2b1629ff374014643a017bceda0b203d8",
+ "base_run_id": "reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6",
+ "audit_run_id": "reread20260728-code-FUNWAVE-004-codexaudit-20260826T022957Z-8833a3a8",
+ "base_record_file": "69c75f4b8bb91d239ded4d9f3775da3e5aae4fea657cedc07d86c69a69b40877.json",
+ "audit_record_file": "69c75f4b8bb91d239ded4d9f3775da3e5aae4fea657cedc07d86c69a69b40877.json",
+ "base_record_sha256_bytes": "3261e6eb27e2d2e0222ed3b973c6425a2b189bc206dabf0b02f4a79cd33f63f4",
+ "audit_record_sha256_bytes": "a9361427ed2559c221d3db4e5720cbded27d85edf84811c4e887784a1a929a51",
+ "base_finding_count": 7,
+ "audit_finding_count": 5,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "Locals nreq,ll,l,JJ,myvar,mybeta declared @L661,L664 are never used in PHI_COLL"
+   ],
+   "audit_member_text": [
+    "Parallel locals nreq, ll, l, myvar, and mybeta are declared at L661-L664 but not assigned or referenced through L1272."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Comment block L215-219 states the masked-cell loop was extended to Jbeg-1..Jend+1 per Jeff but that the routine still does not check whether a point adjacent to an inter-processor boundary (in ghost cells owned by another processor) is land — the code at L221-293 relies on exchanged MASK ghosts (EXCHANGE L459-461) and the flag guards L226-230 etc.; whether this fully resolves the described flux-modification problem is not decidable from this file"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "VTYPE=4 ghost treatment zeroes cross-derivative ghosts on y-sides with the in-code admission 'this one is not an exact solution' (L1070); no caller in this file uses VTYPE=4,5,6 — callers of PHI_COLL here use only VTYPE 1,2,3 (L312-511), so the users of types 4-6 are elsewhere"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "In BOUNDARY_CONDITION the serial (non-COUPLING) west branch skips the wall for WaveMaker ABS/LEFT_BC_IRR (L83-93) but the COUPLING west branch (L66-81) applies the wall unconditionally — cross-branch asymmetry between L66-81 and L83-93"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "PHI_COLL periodic MPI exchange (L676-721) uses blocking MPI_SEND before the matching MPI_IRECV is guaranteed posted (tag 0, MPI_COMM_WORLD); correctness relies on MPI buffering/ordering across the DO II=1,PX loop"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "EXCHANGE converts integer MASK through REAL array rMASK for the periodic PHI_COLL call (L459-461); rounding behavior of the real-to-integer copy-back at L461 for exchanged ghost values is implicit"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Fixed arrays EtaRxR/EtaRxL/EtaRyR/EtaRyL, Depthx/Depthy, Gamma3, Gamma2, MinDepthFrc, filter_interval, DISP_TIME_LEFT, IN_DOMAIN_*, Kstart_*/Kend_* come from GLOBAL/PARAM modules defined elsewhere"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "PHI_COLL first installs periodic y ghost cells when PERIODIC is true at L669-L759, but only the VTYPE 1-3 y-boundary blocks are guarded by .NOT.PERIODIC (L801-L1027); the VTYPE 4-6 y blocks at L1032-L1266 subsequently zero, mirror, or negate those periodic ghosts, so PERIODIC is ineffective for those selector values."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "BOUNDARY_CONDITION loops over Ibeg-1:Iend+1 and Jbeg-1:Jend+1 at L221-L293, then accesses MASK(I-1,J) at L235, P(I+1,J) at L241, MASK(I+1,J) at L252, Q(I,J+1) at L275, and MASK(I,J+1) at L287; this requires at least two valid ghost layers but the subroutine contains no Nghost/range check."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The CARTESIAN branch of EXCHANGE_DISPERSION conditionally exchanges time-dispersion fields ETAT/ETATx/ETATy or Ut/Vt and their derivatives inside Gamma2>ZERO (L328-L376), while the non-CARTESIAN branch L380-L411 has no corresponding time-field exchanges, leaving compile-time branches with different halo-update interfaces."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "PHI_COLL accepts arbitrary VTYPE at L653 but has only independent IF blocks for values 1 through 6 (L763-L1266) and no rejection/default path; an out-of-range selector silently skips local physical-boundary fills before the parallel phi_exch call at L1269."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

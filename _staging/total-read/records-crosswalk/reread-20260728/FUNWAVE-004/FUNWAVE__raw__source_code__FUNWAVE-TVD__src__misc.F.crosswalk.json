@@ -1,0 +1,227 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-004",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/misc.F",
+ "source_sha256": "fe4f1c12481908e7f1c397384360d35bcb4ebd17e4e41a388bf7af4148052a78",
+ "base_run_id": "reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6",
+ "audit_run_id": "reread20260728-code-FUNWAVE-004-codexaudit-20260826T022957Z-8833a3a8",
+ "base_record_file": "3224ddf101ebbe3495178ad0df8bb7783e714ee04d0f8fd4d8f91fe20d6ca5f6.json",
+ "audit_record_file": "3224ddf101ebbe3495178ad0df8bb7783e714ee04d0f8fd4d8f91fe20d6ca5f6.json",
+ "base_record_sha256_bytes": "cd2dd05c24dade41b764159752e9bbf701701deacfedd0578cf985ebe8c304ed",
+ "audit_record_sha256_bytes": "8af7b6a58144ec36efdbf8255535a21966da0cf6c5988806bb56c978b647e3e6",
+ "base_finding_count": 6,
+ "audit_finding_count": 9,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [
+    "SHAPIRO_3 cross-line issue: the x pass assigns VAR only for I in 1+Nghost..M-Nghost and MASK==1 (L495-506), but the y pass reads VAR(I,J) and VAR(I,J+-k) for all I=1,M and MASK(I,J)==1 (L515-524) - VAR at ghost columns I<=Nghost or I>M-Nghost, and at cells whose neighbors were masked in x, is read uninitialized."
+   ],
+   "audit_member_text": [
+    "SHAPIRO_3 use-before-assign: VAR is declared without initialization at L488 and the x pass assigns it only for wet cells and I=1+Nghost..M-Nghost at L495-L510. The y pass spans every I=1..M and reads VAR at L518-L524 whenever the current MASK is wet, including x-boundary cells never written and neighbor cells skipped as dry; multiplying an undefined neighbor by a zero mask does not make the undefined read valid."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [
+    "wall_time_secs approximates elapsed seconds by months*mscale where mscale is the length of a single month chosen by the current month (L459-470, formula L472-473), and the leap test is only years divisible by 4 (L466) - approximate by construction."
+   ],
+   "audit_member_text": [
+    "Calendar conversion is non-monotonic and omits the year: wall_time_secs reads years at L457 only to choose February length at L466, then computes tcurrent from month*current_month_length plus day/time at L472-L473. It neither accumulates preceding months with their actual lengths nor includes years, causing discontinuities and collisions across month/year boundaries; the leap-year test also ignores century rules."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "CHECK_BLOWUP header comment says threshold was changed to 100*max_depth (L391) but the code compares against EtaBlowVal from GLOBAL (L409); where EtaBlowVal is set to 100*max depth is not in this file."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "ESTIMATE_DT uses TMP1/TMP2/TMP3, LARGE, SMALL, GRAV, MPI_SP without local declaration (L239-281) - they come from USE PARAM/GLOBAL (L217-220), definitions external to this file."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "INDEX under PARALLEL uses iista/iiend/jjsta/jjend (L132-136) which are not declared locally - assumed from GLOBAL; myidi/myidj are set only inside the myid==icp match (L108-110) before use at L132-133."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "MAX_MIN_PROPERTY declares MaxAbsEta (L313) but never uses it in this subroutine (L307-383)."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Invalid post-finalize control flow: when nprocs /= px*py, INDEX calls MPI_FINALIZE at L89 but neither stops nor returns; execution then reaches MPI_CART_CREATE and MPI_CART_COORDS at L93-L95 on a finalized MPI runtime."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "MPI communicator/rank interface mismatch: MPI_CART_CREATE permits rank reordering through global reorder at L93-L94, but L95 passes world-rank myid directly to MPI_CART_COORDS for comm2d. If reorder is true, coordinates and all downstream myidi/myidj and neighbor assignments can be associated with the wrong rank."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Range/initialization coupling in ESTIMATE_DT: the CFL scan covers all M,N cells including ghost cells at L240-L275 rather than Ibeg:Iend/Jbeg:Jend. Any uninitialized or stale halo H/U/V can spuriously reduce TMP3 and DT; no interface precondition states that all ghost cells are valid before this call."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Nonpositive-step failure: FIXED_DT is copied at L285 and only halved while greater than DT_tmp at L286-L288; a zero or negative DT_fixed passes unchanged, and TIME=TIME+DT at L294 can stall or reverse the outer time loop. No positivity check is present."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Arrival-time sentinel collision: L350 uses ARRTIME==0 as 'not recorded' and L351 stores TIME. A genuine first arrival at TIME=0 stores the sentinel value again, so later calls can overwrite the true arrival time."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "NaN can defeat the blow-up test: CHECK_BLOWUP reduces MAXVAL(abs(Eta)) at L403-L406 and only tests MaxAbsEta > EtaBlowVal at L409. A NaN elevation need not satisfy that ordered comparison, so the numerical-failure check has no explicit finite/NaN guard before normal execution continues."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B8"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "SHAPIRO_3 requires at least three halo cells because L499-L504 and L519-L524 access offsets through +/-3, but the loops are bounded merely by Nghost at L495-L496 and L515-L516 and never enforce Nghost>=3. Smaller Nghost values produce out-of-range accesses."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

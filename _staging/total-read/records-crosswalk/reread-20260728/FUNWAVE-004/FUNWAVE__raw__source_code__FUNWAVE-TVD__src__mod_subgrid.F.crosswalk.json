@@ -1,0 +1,212 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-004",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/mod_subgrid.F",
+ "source_sha256": "9ceff19fe08673c88b6ad975eba41f8cbe99297d60ed64153b154260bb851456",
+ "base_run_id": "reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6",
+ "audit_run_id": "reread20260728-code-FUNWAVE-004a-codexaudit-20260826T235047Z-4f05567c",
+ "base_record_file": "0b6b1a827cf238dfce536b0dccf1d04ff0081c73369bb98e0f32828298669039.json",
+ "audit_record_file": "0b6b1a827cf238dfce536b0dccf1d04ff0081c73369bb98e0f32828298669039.json",
+ "base_record_sha256_bytes": "ca4f6705551d45c5e1134d38b35626df4be4450c3c775f1ff5799918189c979f",
+ "audit_record_sha256_bytes": "5b3a1eaa8b06425c9bd80ab3c1d5f1b863a166c54c5d8343d5a75f562d93e964",
+ "base_finding_count": 9,
+ "audit_finding_count": 5,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "Header comment @L46 describes 'TIDE_MODULE ... tide/surge boundary conditions' - copied from the tide module, does not describe this SUBGRID module"
+   ],
+   "audit_member_text": [
+    "Copy/paste defect: the file header says 'TIDE_MODULE ... add tide/surge boundary conditions' at L46, while the implemented entity is SUBGRID_MODULE at L52 and all procedures implement subgrid bathymetry/porosity."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "SubMainGridRatio @L89-100: when absent from input.txt the log claims 'use 1 for default' (L93) but no assignment SubMainGridRatio=1 exists, leaving it undefined before NumPixel= @L104 and ALLOCATE @L109"
+   ],
+   "audit_member_text": [
+    "Use-before-assignment/default-path defect: SubMainGridRatio is declared without initialization at L62, READ_INTEGER is called at L89, and ierr==1 only emits 'use 1 for default' at L90-L100; no SubMainGridRatio=1 assignment occurs before NumPixel and allocation extents use it at L104-L109. Correctness depends on undocumented mutation by READ_INTEGER even on failure."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Cross-line index inconsistency between GetFile_SubGrid branches: serial stores at ghost-offset (Ix+Nghost,Iy+Nghost) @L330,L333 while parallel stores at (Ix,Iy) into global arrays @L257,L260 that are later mapped through GLOB_to_LOC which applies the Nghost shift @L368 - net alignment differs if Ix,Iy are 1-based interior indices"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "UPDATE_SUBGRID updates DepAvgSubgrid/Porosity but never DepMaxSubgrid; initial pass uses still-water DepSubGrid>0 (L160) while update uses Eta+DepSubGrid>0 (L203-204)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "GLOB_to_LOC rank 0 self-block PHI=PHIGLOB(1:Mloc,1:Nloc) @L408 assumes rank 0 subdomain starts at global origin (Nistas(1)=1)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "rMASKS allocated @L106-108 but never used; unused declarations: AvgEta,TmpEta,tmpv3,tmpv4 @L60, Ktmp,tmpk1,tmpk2,pcount1,pcount2 @L61, LINE @L69, l @L235/L308, Ifile @L83, TMP_NAME only used for porosity.ini @L186"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "OUT_POROSITY is read with input keyword 'Porosity' @L102 (name differs from variable), and READ_STRING for DEPTH_FILE @L113 duplicates the read done in init.F (comment @L140 acknowledges repetition)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Dry-point convention: Porosity set to 1.0 where <SMALL (L180, L223), so fully-dry cells carry porosity 1 downstream by design for etauv_solver"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A8"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Commented debug block @L291-297 (tmp0.txt); PHIGLOB in GLOB_to_LOC @L351 is a fixed-size automatic array defined on all ranks but only filled on myid 0 @L365-388"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Range defect: no check enforces SubMainGridRatio>0 before NumPixel is formed at L104, dimensions are allocated at L106-L109, and division by REAL(NumPixel) occurs at L171-L172 and L213-L214. Zero or negative input can therefore create invalid/zero extents and division by zero."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Range defect: sparse-file Ix/Iy are used directly as PHIGLOB(Ix,Iy,...) at L257-L261 in the parallel path and as Ix+Nghost/Iy+Nghost at L330-L334 in the serial path, with no bounds validation against global or local array extents."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "MPI cross-line size/rank assumption: gather destination arrays are allocated with nprocs entries at L396, but the send loop is bounded by px*py at L411 and indexes the gathered arrays with irank+1 at L413-L416. No local check establishes px*py==nprocs; a mismatch can overrun bounds or address nonexistent ranks."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

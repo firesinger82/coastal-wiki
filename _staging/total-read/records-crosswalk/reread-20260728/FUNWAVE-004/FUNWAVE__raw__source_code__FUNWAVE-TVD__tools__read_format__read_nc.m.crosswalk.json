@@ -1,0 +1,145 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-004",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/tools/read_format/read_nc.m",
+ "source_sha256": "b480fc076d4c515e1467cb7e8b1ef12218ec8075939ede5589fe47f1320beaf4",
+ "base_run_id": "reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6",
+ "audit_run_id": "reread20260728-code-FUNWAVE-004b-codexaudit-20260826T235047Z-9ba829b8",
+ "base_record_file": "f6ee9fc9e33b7333f9d381d4bfa719807cbd071b9ca9b0bc8ed64cfa7fa1b100.json",
+ "audit_record_file": "f6ee9fc9e33b7333f9d381d4bfa719807cbd071b9ca9b0bc8ed64cfa7fa1b100.json",
+ "base_record_sha256_bytes": "a305a116933d8410201bf6a588945f5769f4c39baf169f3eed64c46e5032fbbc",
+ "audit_record_sha256_bytes": "8fed5c767455b0cb2f78c036304a951c5238572b804c6197be755dc63d116a16",
+ "base_finding_count": 5,
+ "audit_finding_count": 6,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "the netCDF file is never closed (no netcdf.close after L25)"
+   ],
+   "audit_member_text": [
+    "netcdf.open creates ncid at L25, but no netcdf.close or cleanup appears through EOF L94, so the file handle remains open after the script finishes or errors."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "strmatch @L44,@L47 matches attribute-name prefixes and is deprecated; attributes like 'scale_factor_x' would false-positive — file-dependent"
+   ],
+   "audit_member_text": [
+    "strmatch at L44 and L47 performs prefix-style matching rather than an explicit exact attribute-name comparison, so similarly prefixed attributes can be mistaken for add_offset or scale_factor."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "dep=Band1' @L64 assumes the file exposes variable 'Band1' (GDAL netCDF convention) plus lat/lon vectors — true for this NOAA DEM but not general; crop indices 2000:8000 / 1:6500 are case-specific with no provenance comment; script name says 'median' outputs (dep_median.txt) without explanation"
+   ],
+   "audit_member_text": [
+    "Post-processing assumes dynamically created variables named exactly Band1, lat, and lon at L64, L66, L78, and L79, but the enumeration loop accepts arbitrary netCDF schemas and never verifies that these three variables exist or have dimensions consistent with the transpose at L64."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "offset/scale persist across variables in the loop: flag resets @L39 each variable but offset does not — a variable with scale_factor and no add_offset would reuse a previous variable's offset in the eval @L55; latent cross-line defect L39-55, whether it occurs depends on the file's attributes"
+   ],
+   "audit_member_text": [
+    "Only flag is reset per variable at L39. offset is assigned only when add_offset is encountered at L44-L46, while flag is enabled solely by scale_factor at L47-L50; the scaled expression at L55 can therefore use an unassigned offset for the first scale-only variable or a stale offset from an earlier variable, and an add_offset-only variable takes the unscaled branch at L57 and ignores its offset."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "duplicate 'clear all' @L1 and @L21 — remnant of concatenating the Stranne reader with the FUNWAVE-specific tail"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The fixed crop dep(2000:8000,1:6500) at L72-L77 and matching lat/lon slices at L78-L79 have no bounds checks against the dimensions loaded at L29/L37; smaller or differently ordered datasets produce out-of-range failures or wrong spatial subsets."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Variable data are assigned with eval from raw netCDF varname at L55/L57; names that are not valid MATLAB identifiers, collide with script state such as i/scale/offset, or contain executable syntax can fail or overwrite control variables before later iterations."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

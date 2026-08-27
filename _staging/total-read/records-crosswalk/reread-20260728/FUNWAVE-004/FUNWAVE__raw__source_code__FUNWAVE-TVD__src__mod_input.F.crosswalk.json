@@ -1,0 +1,193 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-004",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/mod_input.F",
+ "source_sha256": "96e2ba8dadaae65fce38e3c80614cebcc60963d6d6b5729a492562760851f7a6",
+ "base_run_id": "reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6",
+ "audit_run_id": "reread20260728-code-FUNWAVE-004a-codexaudit-20260826T235047Z-4f05567c",
+ "base_record_file": "f2f64acc0d34d63cd36cceb85f9d10b8ae4d5d36b295eb17d9638a76576a94ae.json",
+ "audit_record_file": "f2f64acc0d34d63cd36cceb85f9d10b8ae4d5d36b295eb17d9638a76576a94ae.json",
+ "base_record_sha256_bytes": "83b1e161052be2563bcf7a2616ced9eae87e05dd19ac6a7fd90bbebb6c96e2d5",
+ "audit_record_sha256_bytes": "1affb638f95fe93276adef3cb2a57db63e22911ef9c67407b5cfff1cb59117a7",
+ "base_finding_count": 7,
+ "audit_finding_count": 5,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "Cross-line: READ_VALUE opens unit 10 (L283) but the success path RETURNs at L299 without CLOSE - only the EOF/failure path closes (L306). Each successful keyword lookup leaves unit 10 open; repeated OPEN on the same unit relies on Fortran reopen semantics."
+   ],
+   "audit_member_text": [
+    "READ_VALUE returns on a successful match at line 299 without closing unit 10; CLOSE(10) exists only on the EOF path at line 306. Repeated reads therefore reopen an already-connected hard-coded unit (lines 282-306)."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Cross-line: on keyword-not-found (ERR_IF_ONE==1) the readers RETURN with the INTENT(OUT) argument never assigned (L102, L153, L202, L247); callers rely on assigning defaults after the call, but with INTENT(OUT) the variable is formally undefined during the call."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "CHECK_CONSISTENCY_TYPE classification edge cases: an all-digit string value (e.g. a numeric filename) classifies as INTEGER so READ_STRING STOPs (L252-261); exponent form without a dot (1E5) classifies as INTEGER so READ_FLOAT STOPs (L157-166); a single 'T'/'F' intended as a string classifies as logical. Whether input.txt conventions avoid these is external."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "ERR_IF_ONE lacks an INTENT declaration in READ_INTEGER/READ_FLOAT/READ_LOGICAL (L81, L132, L181) but is INTENT(OUT) in READ_STRING (L225) - inconsistent interface across the generic set."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "READ_VALUE lines whose '=' is absent give FRONT=0 and TMPV_NEXT=TEXT(1:-1) empty (L295-296); an empty MatchCharacter would match such lines - callers never pass empty keys, but the guard is absent."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Under PARALLEL, only rank 0 prints diagnostics but ALL ranks call MPI_FINALIZE and STOP on missing file (L86-88); non-collective STOP after MPI_FINALIZE ordering is implementation-dependent."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "The license banner says 'FILE main.F' (L3) although this file is mod_input.F."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The type checker recognizes a float only if a dot exists at lines 340-345. Valid exponent notation without a dot, such as 1E-3, passes the numeric alphabet test at lines 319,332-337 but is classified INTEGER, conflicting with READ_FLOAT (lines 155-165)."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The first ! is stripped without quote handling and the first = is always the separator at lines 290-298, so string values containing those characters cannot round-trip."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "READ_LOGICAL warns for values other than single-letter T/F at lines 204-211 but then accepts every value beginning with uppercase T at lines 213-214; lowercase true becomes false while unrelated T-prefixed text becomes true."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "VAL_READ and VAL_TYPE are shared module variables at lines 61-62, making the public readers non-reentrant under concurrent calls."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

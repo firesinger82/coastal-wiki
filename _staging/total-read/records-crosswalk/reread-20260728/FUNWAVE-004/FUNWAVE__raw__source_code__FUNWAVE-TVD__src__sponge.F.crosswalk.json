@@ -1,0 +1,193 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-004",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/sponge.F",
+ "source_sha256": "65e3f76b2c0a1c2b82524bd67ed19fd863715f98d236d63a4a55d89a1e05a99b",
+ "base_run_id": "reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6",
+ "audit_run_id": "reread20260728-code-FUNWAVE-004a-codexaudit-20260826T235047Z-4f05567c",
+ "base_record_file": "76ee6216977890313a0635b06517d8ff8876055c9573f170e2ddc6bbe4630f20.json",
+ "audit_record_file": "76ee6216977890313a0635b06517d8ff8876055c9573f170e2ddc6bbe4630f20.json",
+ "base_record_sha256_bytes": "2134702b0df9617e1f0e54b950638db1c788776dcaf30473ad474c3fc215072e",
+ "audit_record_sha256_bytes": "033c85c0c8bc6ac8cd2641fa5ae93df730f65491b1565e0dd8076993d4ac6cc7",
+ "base_finding_count": 9,
+ "audit_finding_count": 3,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "dummy args R_sponge,A_sponge are declared but unused in CALCULATE_FRICTION_SPONGE (L245 vs body using CDsponge) and CALCULATE_DIFFUSION_SPONGE (L427 vs body using Csp); likewise depth,MinDepthFrc imported @L228,@L410,@L597 but unused in those bodies"
+   ],
+   "audit_member_text": [
+    "CALCULATE_FRICTION_SPONGE 인터페이스는 R_sponge와 A_sponge를 입력으로 선언하지만(L242-L245) 실제 L251-L395 계산은 GLOBAL의 CDsponge만 사용한다(L228/L287 등). CALCULATE_DIFFUSION_SPONGE도 같은 두 인자를 선언하지만(L424-L427) 실제 L433-L580 계산은 GLOBAL의 Csp만 사용한다(L410/L469 등). 복사된 인터페이스와 구현이 불일치하며 호출자가 넘긴 두 값은 효과가 없다. 두 루틴이 함께 가져오는 depth와 MinDepthFrc(L228/L410)도 본문에서 사용되지 않는다."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Din2D declared @L88 but never assigned or used anywhere in ABSORBING_GENERATING_BC (L77-156)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "SPONGE_TIDE_WEST (L140), TIDAL_BC_GEN_ABS (L132), TideWEST_ETA/TideWEST_U/TideWEST_V (L133-135) are not in the USE GLOBAL ONLY lists L78-83 — presumably provided by USE TIDE_MODULE (L84); cannot be confirmed from this file"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "U/V relaxation commented out @L142-143: only Eta is relaxed toward the target (L140) while HU,HV are recomputed @L145-146 from un-relaxed U,V"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "commented BB/CC forms @L113-114 include Phase_Ser; active forms @L115-116 omit it — phase presumably carried in Cm/Sm coefficients, not verifiable here"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "exponent 50*(I-1)/(Iwidth-1) (L207,L653,L681,L720,L749) is integer arithmetic (I,Iwidth INTEGER @L186 etc.) — truncating division feeds REAL ri; relation across declaration and use lines"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "CALCULATE_SPONGE_MAKER handles only the west strip (Sponge_west_width, L165-213); no east/south/north branches unlike the other CALCULATE_* routines"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "scalar xx declared @L249,@L431,@L618 is unused in those three subroutines; a different allocatable xx(:,:) @L798 is used in CALCULATE_CD_BREAKWATER"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A8"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "SPONGEMAKER imported @L78 is referenced only in the commented line @L138 (SpongeMaker); active code uses SPONGE_TIDE_WEST instead"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "CALCULATE_SPONGE_MAKER는 Iwidth를 INT(width/DX)+Nghost로 정한 뒤(L190-L192) Iwidth-1로 나눈다(L204/L207). CALCULATE_SPONGE도 각 양의 경계 폭에서 같은 분모를 사용한다(L636-L653, L664-L681, L703-L720, L732-L749). 이 파일에는 Iwidth>1 검사가 없어 Nghost와 폭/간격 조합이 Iwidth<=1이면 0 나눗셈 또는 비정상 지수가 발생한다."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "세 개의 4방향 계수 루틴은 병렬 east/north 위치를 (남은 rank 수)*(현재 rank의 로컬 폭)으로 보정한다: friction L307/L374, diffusion L493/L560, 지수 sponge L678/L746. iiend-iista+1 및 jjend-jjsta+1은 현재 rank의 폭이므로, 전역 크기가 프로세스 수로 균등 분할되지 않아 rank별 폭이 다르면 다른 rank들의 실제 누적 폭과 달라져 경계 계수 범위가 이동할 수 있다."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

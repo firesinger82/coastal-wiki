@@ -1,0 +1,171 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-004",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/etauv_solver.F",
+ "source_sha256": "2701f3b31405ba66650d907268afb70a4103c574f5174a5d18a446cd794fc3b0",
+ "base_run_id": "reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6",
+ "audit_run_id": "reread20260728-code-FUNWAVE-004-codexaudit-20260826T022957Z-8833a3a8",
+ "base_record_file": "01855c8f6d7deaec9b716275caece275038814933b48202f9583806a6bea5608.json",
+ "audit_record_file": "01855c8f6d7deaec9b716275caece275038814933b48202f9583806a6bea5608.json",
+ "base_record_sha256_bytes": "357bf69b854718b2b944688b4cb3db8fe6b7b0f7ff267225301780fbe1171c90",
+ "audit_record_sha256_bytes": "4af404d3d25c4b5fe098863207fdb2a82b8753756d5c9222dbc04a5d3de7a069",
+ "base_finding_count": 7,
+ "audit_finding_count": 5,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "COUPLING y-direction boundary block tests IN_DOMAIN_SOUTH twice (IF @L518 and ELSEIF @L522) — the second should presumably be IN_DOMAIN_NORTH to mirror the x-direction WEST/EAST pair (L425-429); as written the Jend/north RHS move (L523-525) is unreachable"
+   ],
+   "audit_member_text": [
+    "y방향 COUPLING 경계 분기의 첫 조건과 ELSEIF가 모두 IN_DOMAIN_SOUTH이다(L516-L526). 첫 IF가 거짓일 때 동일 조건인 ELSEIF(L521)는 참일 수 없으므로 J=Jend에서 V(I,J+1)를 빼는 두 번째 보정(L522-L524)은 도달 불가다. x방향의 WEST/ELSEIF EAST 대칭(L424-L433)에 비춰 두 번째 y 조건은 IN_DOMAIN_NORTH 복붙 누락으로 보인다."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "Wsurf is assigned R1 before the SUBGRID porosity division and SEDIMENT/PRECIPITATION additions (L247 vs L249-265), so Wsurf excludes those mass sources"
+   ],
+   "audit_member_text": [
+    "ESTIMATE_HUV는 Wsurf를 기본 flux divergence R1 직후 저장한다(L246-L247). 그 뒤 SUBGRID porosity 나눗셈, sediment mass, precipitation을 R1에 추가하고(L249-L265) 이 수정된 R1으로 Eta를 갱신한다(L267-L278). Wsurf가 최종 연속방정식 RHS를 뜻한다면 소스·다공성 보정과 불일치하고, 표면 수직속도에서 이 항들을 의도적으로 제외하는 인터페이스 계약은 이 파일에 없다."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "Guard condition IF(tmp2.NE.0.0_SP.OR.MASK(I,J).GT.0) (L452,L529) uses .OR., so a masked cell with tmp2/=0 still forms coefficients and a zero tmp2 with MASK>0 still divides by tmp2 — whether .AND. was intended is not decidable here"
+   ],
+   "audit_member_text": [
+    "특이점 검사가 OR로 무력화된다. x계수 블록은 IF(tmp2.NE.0.0_SP.OR.MASK(I,J).GT.0)(L452) 안에서 tmp1/tmp2, tmp3/tmp2, tmp4/tmp2를 계산하고(L453-L455), y계수 블록도 같은 조건(L529)과 나눗셈(L530-L532)을 복제한다. 따라서 MASK>0인 정상 젖은 셀에서는 tmp2=0이어도 분기가 참이 되어 0 나눗셈을 수행한다. 반대로 MASK<=0이고 tmp2만 비영이어도 해 계수를 만든다."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "The non-wavemaker CARTESIAN R1 branch uses scalar DXg,DYg (L219-220) while the comment L216-217 says version 1.1 had a bug where Dxg,Dyg should be DX() and DY() — the non-CARTESIAN fix is at L227-228, but all wavemaker R1 branches (L138-145 etc.) still use scalar DXg,DYg regardless of CARTESIAN"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "WK_Source and kf,kd (declared L71,L78) are only used in commented-out code (L131-136); IM (L370) is declared but never used"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "ALPHA(ISTEP),BETA(ISTEP) RK coefficients, b1,b2,Gamma1,Gamma2,Gamma3,FroudeCap,TroughLimit,CrestLimit,WaveMaker_Mass,SourceX,SourceY and the TRID* solvers are defined in other files"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "In ESTIMATE_HUV the eta equation adds WaveMaker_Mass only inside the box test repeated per wavemaker type with identical R1 expressions (L126-214) — WK_DATA2D branch box test at L205-206 has a trailing '!' after THEN"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "x방향 분산 삼대각 계수에는 y방향의 DISP_TIME_LEFT/Gamma2 보정 분기(L484-L505)에 대응하는 조건부 보정이 없고 Gamma1 항만 있다(L406-L419). 방향별 수식 비대칭이 의도된 분할인지 누락인지 이 파일만으로 확인되지 않는다."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "wavemaker R1과 삼대각 계수는 DXg/DYg 또는 DX/DY 및 R_earth를 반복해 분모로 사용하며(L138-L214,L218-L242,L289-L329,L406-L513), 비영 검사는 없다. 또한 Froude cap은 Fr로 나눈다(L581-L589); MinDepthFrc와 GRAV가 양수라는 GLOBAL 초기화 전제에 의존한다."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

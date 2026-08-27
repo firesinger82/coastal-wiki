@@ -1,0 +1,223 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-004",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/init.F",
+ "source_sha256": "e70758ebe753622c73eca2d61f4254db85b04a14547cfadc6c3d01b06ac587c4",
+ "base_run_id": "reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6",
+ "audit_run_id": "reread20260728-code-FUNWAVE-004-codexaudit-20260826T022957Z-8833a3a8",
+ "base_record_file": "5ea916fb66dfbd0635b28293f1ee1e2bdeb78452d0af3302ac137405454932ab.json",
+ "audit_record_file": "5ea916fb66dfbd0635b28293f1ee1e2bdeb78452d0af3302ac137405454932ab.json",
+ "base_record_sha256_bytes": "9120ba9405ebf18b2b13a6549d90ed803fcacc4af0aee8827b196a8f99b1e6e9",
+ "audit_record_sha256_bytes": "71e91a8e9a260d06c940f3794e417d78501427e5e3569866b3074f991984eabe",
+ "base_finding_count": 9,
+ "audit_finding_count": 5,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "nu_break is ALLOCATEd unconditionally (L213, guard commented out L211/L216 per fyshi 01/15/2024) and ALLOCATEd again inside IF(WAVEMAKER_VIS) (L223) — if WAVEMAKER_VIS is true this is a second ALLOCATE of an already-allocated array; relation L213 vs L223."
+   ],
+   "audit_member_text": [
+    "중복 할당 결함: nu_break는 쇄파 옵션과 무관하게 L213에서 이미 ALLOCATE되는데 WAVEMAKER_VIS가 참이면 L223에서 ALLOCATED 검사나 DEALLOCATE 없이 다시 ALLOCATE한다. 표준 Fortran에서는 이미 할당된 allocatable 재할당 오류가 발생한다."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Comment 'ELSE ! for stretch grid' (L361) labels the branch that runs when StretchGrid is FALSE (computed uniform spherical grid); the file-reading branch L308-359 is the actual stretch-grid path — inverted comment."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "VarGlob is allocated (Mglob,Nglob) for DEPTH_TYPE=='SLO' (L726) but (Mloc,Nloc) 'use local here' for the obstacle GetFile (L1045); GetFile semantics for local- vs global-sized target not visible in this file."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "PARALLEL breakwater path: only myid 0 reads and ghost-fills BreakWaterWidth (L1081-1104) with the array allocated at global size on all ranks (L1077); no broadcast appears before CALCULATE_CD_BREAKWATER (L1136) — distribution presumably inside that subroutine, external to this file."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Beta_2=(1.0_SP/5.0_SP)**2/1.0_SP (L664): trailing /1.0_SP is a no-op; also Beta_2 defined only in CARTESIAN branch while ZALPHA branch defines Beta_1 only (L678)."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Local variable WHAT (L292) is declared but never used in INITIALIZATION."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "INITIAL_UVZ declares its own FILE_EXIST (L1287) while INITIALIZATION relies on a FILE_EXIST not declared in this file (L688, presumably from GLOBAL) — same name, different scopes."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "AGE_BREAKING zeroed only IF(SHOW_BREAKING) (L623-625) though allocated unconditionally (L212)."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A8"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "HeightMax comment says used 'not only in output but also meteo module' (L191); meteo linkage external to this file."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "초기화 누락/조건 불일치: ALLOCATE_VARIABLES는 CARTESIAN/ZALPHA에서 U4xL/U4xR, V4yL/V4yR뿐 아니라 V4xL/V4xR와 U4yL/U4yR도 할당하지만(L143-L161), INITIALIZATION의 영 초기화는 CARTESIAN U4xL/U4xR와 V4yL/V4yR 네 배열만 다룬다(L473-L478). V4xL/V4xR·U4yL/U4yR은 이 파일에서 초기화되지 않으며 ZALPHA 빌드에서는 앞의 네 배열도 영 초기화되지 않는다."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "도달불가 설정: non-CARTESIAN 분기에서 SLOPE_CTR를 L1172에서 항상 .FALSE.로 덮은 직후 L1174와 L1183-L1186에서 IF(SLOPE_CTR) 보호 코드를 둔다. 이 루틴 실행에서는 경고와 slope cap이 모두 도달 불가이며 외부 입력으로 활성화할 경로가 보이지 않는다."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "인터페이스 확인 필요: INITIAL_SOLITARY_WAVE와 INITIAL_N_WAVE 호출은 CARTESIAN 전처리 보호 없이 DX를 전달한다(L894-L905). 이 파일 안에서 non-CARTESIAN DX는 rank-2로 사용된다(L310, L358-L383). 두 외부 루틴의 DX dummy가 scalar라면 implicit interface 때문에 비직교 빌드에서 rank 불일치가 검출되지 않고 첫 원소 주소만 전달될 수 있다."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "영 분모/퇴화 입력 검사 없음: EtaBlowVal은 L844에서 100*MAXVAL(abs(Depth))로 설정된다. 전 영역 초기 수심이 0인 건조/퇴화 입력이면 임계값도 0이 되며 이후 blow-up 판정의 의도와 달라질 수 있지만 이 파일에는 양의 하한 검사가 없다."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

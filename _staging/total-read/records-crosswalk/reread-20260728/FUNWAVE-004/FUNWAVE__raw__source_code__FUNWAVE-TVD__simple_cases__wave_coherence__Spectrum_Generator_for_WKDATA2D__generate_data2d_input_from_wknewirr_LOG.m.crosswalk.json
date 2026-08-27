@@ -1,0 +1,143 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-004",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/wave_coherence/Spectrum_Generator_for_WKDATA2D/generate_data2d_input_from_wknewirr_LOG.m",
+ "source_sha256": "2be37033851f10f97fb9b8fe8a5498c86c90b52516a014cbe4865933fe95b29c",
+ "base_run_id": "reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6",
+ "audit_run_id": "reread20260728-code-FUNWAVE-004-codexaudit-20260826T022957Z-8833a3a8",
+ "base_record_file": "8b0781b08b934ac26ca66a74946ec4777c403786ab244e331b6a148d8c9408c3.json",
+ "audit_record_file": "8b0781b08b934ac26ca66a74946ec4777c403786ab244e331b6a148d8c9408c3.json",
+ "base_record_sha256_bytes": "2dee96f4658e0850b85834d9596775ea62806a5a7b8d4bbcdb8197004cc0ee7d",
+ "audit_record_sha256_bytes": "d212be11cedbaa47b0ef3383a2c45d3580fb0307535d155c84d5350f7b1087f7",
+ "base_finding_count": 6,
+ "audit_finding_count": 5,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "The first fid (LOG.txt, L7) is never closed; fid is reused for the output file at L43 and only that one is closed (L50)"
+   ],
+   "audit_member_text": [
+    "The input handle opened at L7 is never closed before fid is overwritten by the output handle at L43; L50 closes only the output handle."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "theta_pbc (L35, PBC-adjusted direction) is parsed but not written to wave2d.txt — the output uses theta_in (L47)"
+   ],
+   "audit_member_text": [
+    "theta_pbc is parsed from the LOG at L17 and assigned at L35, but the output direction written at L47 is theta_in; the parsed PBC direction is otherwise unused."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B0",
+    "B1"
+   ],
+   "base_member_text": [
+    "EOF check ~ischar(tline) at L28 runs after tline may have been sliced at L15-20; if the file ends between the marker and the two data lines, str2double would receive invalid input before the break"
+   ],
+   "audit_member_text": [
+    "EOF is tested only at L28, after tline is passed to strfind at L23; when L12 returns the non-character EOF sentinel, L23 can receive an invalid type before the guard executes.",
+    "When a marker sets i=1 at L23-L25 but no complete following data pair exists, L18 can return EOF and L19-L20 index fixed character ranges before any EOF or length check."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Parsing relies on fixed character columns of LOG.txt (tline(6:12), (16:24), (28:36) at L15-20); the actual log format is defined elsewhere (FUNWAVE wavemaker logging code), so correctness of the slicing cannot be verified from this file"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "The marker check at L23 sets i=1 for every matching header line, so the parser expects exactly one data-line pair per marker occurrence; behavior if the log has a different layout is undefined"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "fp=0.10 (L5) is hardcoded and must be manually matched to the case's actual peak frequency (comment on L5)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "If no complete record is parsed in L11-L31, output is never assigned before it is indexed at L33-L37."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

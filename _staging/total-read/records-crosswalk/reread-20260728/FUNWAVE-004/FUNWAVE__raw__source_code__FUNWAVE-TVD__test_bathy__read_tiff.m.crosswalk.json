@@ -1,0 +1,144 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-004",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/test_bathy/read_tiff.m",
+ "source_sha256": "a48ed68ccd32b456258efb55cd7a1c9a63683584f949da145997c28437adaeb3",
+ "base_run_id": "reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6",
+ "audit_run_id": "reread20260728-code-FUNWAVE-004b-codexaudit-20260826T235047Z-9ba829b8",
+ "base_record_file": "535b1bb80e7150ae04754a0011f918acaa5117b5383f636966448a7115f0e79b.json",
+ "audit_record_file": "535b1bb80e7150ae04754a0011f918acaa5117b5383f636966448a7115f0e79b.json",
+ "base_record_sha256_bytes": "2bff77d786eedfc65362663e611df67284370016244eefa700127660d1820761",
+ "audit_record_sha256_bytes": "0d272cc62c66b15b2328a786317a300ebc4fc081312932252d178c605b8e0a5b",
+ "base_finding_count": 4,
+ "audit_finding_count": 4,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "K=0.11111*ones(3) sums to 0.99999, not exactly 1 (1/9=0.1111...) — slight energy loss per filter pass; whether intentional shorthand unresolved"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "crop dep1=dep(1:100,1:72) @L13 (100 rows x 72 cols) vs output filename 'dep_72x100.txt' @L14 — name orders 72x100; FUNWAVE reads row-per-line, so rows=100 lines of 72 values; naming convention (Mglob x Nglob) implied but not stated in file"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "filtered output 'filtered.txt' is written from dep1 after in-place interior replacement @L28 but the unfiltered 'dep_72x100.txt' was already written @L14-19 — which file downstream cases use is not determinable here"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "name='myfile' placeholder @L5 requires manual edit; commented NCEI ninth-arcsecond DEM reference @L2-3 indicates original data source"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "L13 indexes dep(1:100,1:72) without checking the dimensions of data returned at L8; a TIFF with fewer than 100 rows or 72 columns causes an out-of-range indexing failure."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The TIFF sample type returned by read(t) at L8 is not normalized before unary negation at L10 and conv2 at L26; conversion to double occurs only at L30, so unsigned or otherwise unsupported TIFF sample classes can saturate, reject negation, or be incompatible with the convolution before the conversion."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The Tiff handle t opened at L7 is read at L8 but never closed through EOF L33, while only the unrelated text fid is closed at L19."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "K at L25 uses nine coefficients of 0.11111, whose sum is 0.99999 rather than exactly 1; the interior replacement at L28 therefore slightly attenuates a constant field on every application instead of preserving it exactly."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

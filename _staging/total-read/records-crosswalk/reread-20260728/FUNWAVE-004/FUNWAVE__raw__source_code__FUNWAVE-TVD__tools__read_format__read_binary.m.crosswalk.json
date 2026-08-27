@@ -1,0 +1,99 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-004",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/tools/read_format/read_binary.m",
+ "source_sha256": "601f9ef0fb0ec9cbc35d02399f454a8484a010c1a4d0bb8b2d6ffc17872e5cfe",
+ "base_run_id": "reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6",
+ "audit_run_id": "reread20260728-code-FUNWAVE-004a-codexaudit-20260826T235047Z-4f05567c",
+ "base_record_file": "ccda399f1a0d0f48aa03e6d05c04a249054a17d9e6be7eef6cc5f638959557da.json",
+ "audit_record_file": "ccda399f1a0d0f48aa03e6d05c04a249054a17d9e6be7eef6cc5f638959557da.json",
+ "base_record_sha256_bytes": "252f06db7c5040d02f26e34f8dcff3eff9c3d39ba85f68378dc97e9804e5e1e6",
+ "audit_record_sha256_bytes": "b2c7972b973e0146244a1df902727da51847c3a3afccf70abc64ef396b611b39",
+ "base_finding_count": 1,
+ "audit_finding_count": 4,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "m=3190, n=10100 are case-specific dimensions (Mglob x Nglob of some run) with no comment identifying the case; file 'eta_00006' implies FUNWAVE binary output naming but the producing case is not stated"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The file name and matrix shape are hard-coded independently at L2-L5, and fread's returned element count is not captured or compared with m*n. A short, long, differently shaped, or differently ordered file can therefore yield padded/partial data or leave trailing bytes unnoticed while still proceeding to transpose and plot."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "fopen failure is not checked at L4 before fileID is passed to fread at L5 and fclose at L6, so a missing/unreadable eta_00006 produces downstream handle errors rather than a source-specific diagnostic."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The input declares only '*single' at L5 and relies on fopen's native machine format at L4. A FUNWAVE binary produced with different endianness cannot be identified or byte-swapped by this script."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The apostrophe at L7 is conjugate transpose. Current eta is real single data, so it equals a plain transpose, but the code implicitly couples visualization orientation to fread's column-major interpretation and gives no coordinate/dimension check confirming that the resulting n-by-m orientation matches the producer's layout."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

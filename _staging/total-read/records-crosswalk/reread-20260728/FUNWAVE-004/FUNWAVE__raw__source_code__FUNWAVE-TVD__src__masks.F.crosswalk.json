@@ -1,0 +1,145 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-004",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/masks.F",
+ "source_sha256": "b6e8c16ef8c826edbc2cf683893bd439b4aa69169b28556f7cdf5c83d9a29412",
+ "base_run_id": "reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6",
+ "audit_run_id": "reread20260728-code-FUNWAVE-004-codexaudit-20260826T022957Z-8833a3a8",
+ "base_record_file": "44c5cf28aa282477704de1dbcd937b509365a98187957f24e88dc4e21e306830.json",
+ "audit_record_file": "44c5cf28aa282477704de1dbcd937b509365a98187957f24e88dc4e21e306830.json",
+ "base_record_sha256_bytes": "fa2db52f3d7b3f16aee76ca2f89fe078246d848afac64a5ccf809d94981b77fa",
+ "audit_record_sha256_bytes": "f1fc527666fd81e1a738ae4c2f0abf13bf732fc5ebfb49fafd1e3f47cf593c95",
+ "base_finding_count": 6,
+ "audit_finding_count": 5,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "L79 'EtaScreen=ETA(I,J)' uses scalar indices I,J outside any loop (whole-array intent implied by ETAtmp=EtaScreen at L80) — under UseEtaScreen this assigns only one element whose I,J values are leftovers from the caller; likely intended EtaScreen=ETA."
+   ],
+   "audit_member_text": [
+    "Use-before-assign/range defect in the UseEtaScreen build: L79 evaluates ETA(I,J) before this subroutine's I and J loops assign them at L83-L84. Because EtaScreen is assigned from that single indexed scalar before ETAtmp=EtaScreen at L80, stale imported loop indices can also cause an out-of-range read or fill the screen from the wrong cell; the commented L75 suggests the intended source was the full ETA array."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "Flood sweep reads MASK(I-1..I+1,J-1..J+1) at I=Ibeg-2..Iend+2 (L83-84), touching indices down to Ibeg-3 only via DepthX(I+1,J) at L157 style writes — boundary index extent relies on ghost width Nghost>=3."
+   ],
+   "audit_member_text": [
+    "Range contract is unchecked: the update loops reach Ibeg-2..Iend+2 and Jbeg-2..Jend+2 at L83-L84 while neighbor expressions read I-1/I+1 and J-1/J+1 (L90-L124 and L156-L159), requiring at least three valid halo cells; no local bound or Nghost check enforces that precondition."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "MASK9tmp is assigned only over Jbeg-1..Jend+1 x Ibeg-1..Iend+1 (L175-176) but MASK9=MASK9tmp copies the whole allocated array (L193), leaving outer ghost rows of MASK9 from uninitialized MASK9tmp memory until PHI_INT_EXCH (L201, PARALLEL only)."
+   ],
+   "audit_member_text": [
+    "Partial-initialization defect: MASK9tmp is allocated over all Mloc,Nloc at L63 but assigned only for I=Ibeg-1..Iend+1 and J=Jbeg-1..Jend+1 at L175-L191. L193 copies the entire temporary array into MASK9, so any allocated ghost extent outside those ranges receives uninitialized values before exchanges at L200-L201."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "Dmass accumulation (L136/L138) uses (ETAtmp-ETA) but the version-3.4 line that made ETAtmp differ from ETA (L132 'ETAtmp(I,J)=MinDepth-Depth(I,J)') is commented out; in the non-UseEtaScreen build ETAtmp is never assigned before use, so the summand is undefined-minus-ETA; in the UseEtaScreen build ETAtmp=EtaScreen (L80)."
+   ],
+   "audit_member_text": [
+    "Use-before-assign in the ordinary build: ETAtmp is allocated at L64, its full initialization ETAtmp=ETA is commented out at L75, and its only live assignment is inside UseEtaScreen at L80, yet both drying-mass branches read ETAtmp(I,J) unconditionally at L136/L138. Without UseEtaScreen, Dmass is computed from uninitialized allocation contents."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "MASK9tmp is INTEGER (L57) but assigned ZERO (L185), a REAL(SP) named constant from PARAM — implicit conversion."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "CHECK_MASS_CONSERVATION correction subtracts DwetEta from all wet cells every call (L240-244) — global mass redistribution; comment L208 says it is 'a general setting after tests' though it remains behind an ifdef."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Ineffective singularity guard: L235 divides by Max(DX*DY,WetArea), and L237 divides by Max(DX(1,1)*DY(1,1),WetArea). Max chooses a denominator but does not impose a positive floor, so zero area and zero spacing still yield division by zero."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

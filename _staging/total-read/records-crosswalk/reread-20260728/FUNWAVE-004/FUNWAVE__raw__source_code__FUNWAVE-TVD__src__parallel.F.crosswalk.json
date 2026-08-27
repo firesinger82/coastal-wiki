@@ -1,0 +1,118 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-004",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/parallel.F",
+ "source_sha256": "3daf27c40e4689bb3848fd06f90e4e5b086b6c5dba016541d38beeed02da043b",
+ "base_run_id": "reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6",
+ "audit_run_id": "reread20260728-code-FUNWAVE-004a-codexaudit-20260826T235047Z-4f05567c",
+ "base_record_file": "b2444ea3dbe1f2a36dc72ed92aaddd450e117ab7ac767e20fbac7f9fc7749aab.json",
+ "audit_record_file": "b2444ea3dbe1f2a36dc72ed92aaddd450e117ab7ac767e20fbac7f9fc7749aab.json",
+ "base_record_sha256_bytes": "b0b6844be1089103784adfc0fd9bf906056ff644db7b9d1e8c0383705fe16859",
+ "audit_record_sha256_bytes": "9b9123f56138d022672a626af1ee8e4c58398295d20647e2cbbc95623a51d7d2",
+ "base_finding_count": 6,
+ "audit_finding_count": 1,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "phi_exch uses blanket USE GLOBAL (L57) for Mloc/Nloc/loop indices i,j while phi_exch_variable_length shadows the global dims with dummies (L189) but still gets i,j from GLOBAL via USE list omission - loop indices i,j,irank etc. are not declared locally in any of the four subroutines"
+   ],
+   "audit_member_text": [
+    "phi_exch_variable_length는 IMPLICIT NONE을 사용한다(L187). 그러나 제한적 USE GLOBAL,ONLY 목록에는 i와 j가 없고(L186), 로컬 선언 L188-L195에도 i,j가 없는데 L206-L207을 시작으로 두 변수를 DO 인덱스로 반복 사용한다. 이 범위 안에서는 i,j가 선언되기 전에 사용되는 것이 아니라 아예 선언되지 않아 컴파일 인터페이스가 성립하지 않는 교차라인 결함이다."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Send/receive buffers for east-west are declared (Nloc,Nghost) but packed with index order (j,i) where j runs over Nloc (L78 etc.) - consistent within this file but transposed relative to the (Mloc,Nghost) north-south convention (i,j)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "phi_int_exch header comment @L307 still says 'phi_exch' (copied); DISTRIBUTE_VarGlob has its descriptive comment block duplicated verbatim (L432-438 and L439-445)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "DISTRIBUTE_VarGlob rank-0 self block PHI=PHIGLOB(1:Mloc,1:Nloc) @L509 assumes rank 0's window starts at global origin (Nistas(1)-Nghost=1); same construct as GLOB_to_LOC in mod_subgrid.F"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Message tags pair west recv 0/east send 0 and west send 1/east recv 1 (L74-97) so simultaneous bidirectional exchanges do not collide; corners are handled implicitly because east-west exchanges full Nloc columns including ghost rows filled by the subsequent north-south phase only after this phase - ghost corners receive values from the second phase using already-exchanged columns"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "DISTRIBUTE_VarGlob sends each slab with mpi_isend immediately followed by mpi_wait (L525-526) making the transfers effectively blocking and serialized over ranks"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

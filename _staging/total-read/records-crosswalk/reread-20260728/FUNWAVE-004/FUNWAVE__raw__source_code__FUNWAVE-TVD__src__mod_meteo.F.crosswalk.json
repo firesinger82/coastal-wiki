@@ -1,0 +1,268 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-004",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/mod_meteo.F",
+ "source_sha256": "46876f51ca4bb90a152091081c8491e37f588746cd2675192a01d3eeb86db727",
+ "base_run_id": "reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6",
+ "audit_run_id": "reread20260728-code-FUNWAVE-004b-codexaudit-20260826T235047Z-9ba829b8",
+ "base_record_file": "a95fe13602567139176550f517f787889029d5ca76edbf8ce378131b1dfd965a.json",
+ "audit_record_file": "a95fe13602567139176550f517f787889029d5ca76edbf8ce378131b1dfd965a.json",
+ "base_record_sha256_bytes": "0279f902377f3cbfe6d7d9ff38617594065a2d990e8dfe5631df22555fbc7da8",
+ "audit_record_sha256_bytes": "29a6111239c8df5caf9ef4b1532127f705fd6471fafb3569582593ff1bbd7d99",
+ "base_finding_count": 11,
+ "audit_finding_count": 6,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "Xco/Yco are allocated in each Setup routine (L407, L759, L973); if two mechanisms were enabled simultaneously the second ALLOCATE of an already-allocated array would fail - mutual exclusion is not enforced in code."
+   ],
+   "audit_member_text": [
+    "L329-L344 대 L407,L751,L949: Holland, SlideModel, MeteoGausian 플래그는 상호배타 검사가 없는데 각 setup이 동일 allocatable Xco/Yco를 무조건 ALLOCATE한다. 둘 이상 true면 두 번째 setup에서 already-allocated 오류가 발생하고, 세 모델 모두 unit 300도 재사용해 열린 시계열 인터페이스가 충돌한다."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Unit comments are internally inconsistent: Pw is in mb (comment L611) but the AirPressure conversion comment says 'convert from cm to meter' with /100 (L615); the Gaussian branch divides by 100 (L1171) and the LINEAR_JUMP branch multiplies by 0.01 (L1134) with the same 'cm to meter' comment. Whether dP inputs are cm of water or mb is not determinable from this file."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "tmp3 is assigned in Holland_Model_Forcing (L625) and Constant_Wind_Forcing (L705) but is not in either subroutine's USE GLOBAL,ONLY list (L539, L673) nor the module-level list (L58-59); its resolution (likely USE PARAM at L57) is external. In both places tmp3 is computed but never used afterwards."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Comment '120 CONTINUE ! no more data for vessel Kves' (L603, L901, L1122) is a copy-paste from a vessel module; there is no Kves here."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Cross-line: AngleLocal=ATAN2((Xco-Xstorm),(Yco-Ystorm)) (L621) has the x-difference as the first (y) argument - the wind direction convention (angle measured from north) and the -COS/+SIN composition (L630-634) yield a cyclonic rotation whose hemisphere/sign convention is not documented in this file."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "AlphaSlide and BetaSlide are read (L818-819) but never used in Slide_Model_Forcing (L847-946); slide speed/acceleration comes solely from the track file positions."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Slide_Model_Forcing initializes Eta and Eta0 to -StormPressureTotal on first call (L924-925) - a static-response initial condition; Eta/Eta0 are module-imported globals (L59) written from inside METEO."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Holland setup validates nothing about record monotonicity in time; ThetaStorm (L574, L877) is computed but never used in this file."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A8"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "WHAT is read from the constant wind file header (L526) and discarded; StationName/StormName strings are used only for logging."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A9"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "MASK_WIND is computed (L644-654, L716-725) but not used within this module - its consumer is external."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A10"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "In non-PARALLEL Gaussian zero-sigma failure, STOP occurs (L1155) but the setup-time check is absent - a zero sigma in the first record fails only at first forcing call."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "L541-L600: Holland_Model_Forcing가 새 레코드를 읽기 전에 TimeStorm1/Xstorm1/Ystorm1만 이전 2값으로 이동시키고 Pn_storm1/Pc_storm1/A_storm1/B_storm1은 갱신하지 않는다. L596-L601 보간은 두 번째 구간부터 새 endpoint와 최초 레코드의 압력·형상 계수를 섞어 잘못된 storm 강도를 만든다."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "L1076-L1120: MeteoGausian_Forcing도 rollover 때 Time/X/Y만 갱신하고 DP_storm1/SigmaX1/SigmaY1/Theta1을 이전 2값으로 옮기지 않는다. 두 번째 구간부터 Gaussian 크기·폭·방향 보간의 왼쪽 endpoint가 낡는다."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "L541-L594, L853-L891, L1076-L1113: 각 track forcing은 TIME이 여러 레코드 시간을 건너뛰어도 IF에서 레코드를 한 건만 읽고 반복해서 따라잡지 않는다. 그 결과 tmp2가 0..1 밖으로 나가 위치와 강도를 외삽할 수 있다."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "L681-L695: Constant_Wind_Forcing도 icount_winddata를 호출당 한 번만 증가시킨다. 큰 DT/재시작으로 여러 timestamp를 넘으면 뒤처진 레코드를 사용하고 TIME>현재 레코드일 때 tmp2=0으로 낡은 WU/WV를 고정한다. 또한 중복 TimeWind 값이면 L689-L690 분모가 0이다."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "L208-L209: MeteoGausian=true이면 AirPressure를 강제로 true로 만들지만, 뒤의 wind/pressure 블록이 Holland 또는 constant wind일 때만 실행되며 그 안의 READ_LOGICAL(AirPressure) 기본 실패 경로가 다시 false로 덮을 수 있다. Gaussian과 wind 모델을 함께 켠 구성은 Gaussian 압력 강제의 결과가 입력 키 존재 여부에 따라 뒤집힌다."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

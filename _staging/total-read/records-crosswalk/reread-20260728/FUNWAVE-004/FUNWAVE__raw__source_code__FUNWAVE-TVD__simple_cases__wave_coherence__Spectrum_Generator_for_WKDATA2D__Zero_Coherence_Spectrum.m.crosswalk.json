@@ -1,0 +1,145 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-004",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/wave_coherence/Spectrum_Generator_for_WKDATA2D/Zero_Coherence_Spectrum.m",
+ "source_sha256": "dfd24477c6405e86bd7fdd54e45028ace783679688def64565d894b4ce29997e",
+ "base_run_id": "reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6",
+ "audit_run_id": "reread20260728-code-FUNWAVE-004-codexaudit-20260826T022957Z-8833a3a8",
+ "base_record_file": "eebf150c9d96d8c2ebd7d8b7c968a9e95990c15e56072be40d755245e68d14b1.json",
+ "audit_record_file": "eebf150c9d96d8c2ebd7d8b7c968a9e95990c15e56072be40d755245e68d14b1.json",
+ "base_record_sha256_bytes": "3db516dfd62ca35b67a8122e2f981a574d17dcdb846697294d7511cd1233c44c",
+ "audit_record_sha256_bytes": "ade1f4118fae9b503aa790777e3d7ed8b81bb32e12660aac6dcbf2b5edce99bb",
+ "base_finding_count": 6,
+ "audit_finding_count": 5,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "L32 assigns scalar offset to variable named diff (shadows MATLAB builtin diff); L33 freq=freq+diff shifts the whole grid by the fp mismatch, so the actual grid no longer starts exactly at fmin (relation L7/L10 vs L32-33)"
+   ],
+   "audit_member_text": [
+    "L32 computes only the nonnegative magnitude of the nearest-grid difference, then L33 always adds it to every frequency; when the nearest frequency lies above fp, this shifts it farther above fp instead of locking fp to a component."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "Hs_output (L73) is computed but is not among the function outputs (L1-2) and is not otherwise used"
+   ],
+   "audit_member_text": [
+    "Hs_output is assigned at L73 but is neither returned in L1-L2 nor subsequently used."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "host_freqs_idx first-element check compares against 0 (L57) although idx_theta:mtheta:mfreq starting value 0 can only occur when idx_theta==0 (L36,L56)"
+   ],
+   "audit_member_text": [
+    "idx_theta can be zero or exceed mfreq at L36; L56 can then produce [0] or an empty vector, L58 may delete its only element, and L57/L60 index the first/end element without an emptiness check."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "All physical inputs (fmax,fmin,mfreq,mtheta,depth,g,fp,gamma_spec,sigma_theta,theta_mean,Hmo) come from inputs.mat (L4) whose contents are not visible in this file"
+   ],
+   "audit_member_text": [
+    "The function has no input arguments (L1-L2) and obtains fmax, fmin, mfreq, depth, g, fp, gamma_spec, sigma_theta, mtheta, theta_mean, and Hmo only through the dynamic load at L4, leaving its executable interface dependent on inputs.mat contents."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "theta_mean is added in degrees at L45 but multiplied by pi/180 at L51 inside the AG series while theta(kf) at that point is already in radians (L46) — mixed unit handling across L45/L46/L51"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "N_spec=20/sigma_theta (L30) may be non-integer yet is used as for-loop upper bound at L49"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "No guards precede divisors mfreq-1 (L7), sigma_theta (L30), real(mtheta)-1.0 (L44), Energy_total (L64), sum(AG.*EnergyBin) (L65), or freq_resolution (L69), so boundary/degenerate inputs can make the later normalization singular."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

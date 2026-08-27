@@ -1,0 +1,186 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-004",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/fluxes_33v.F",
+ "source_sha256": "28bd475a041b1612f064e9272c54ccb347f03c3e7c4ad7de6fdc0cdd15721a77",
+ "base_run_id": "reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6",
+ "audit_run_id": "reread20260728-code-FUNWAVE-004-codexaudit-20260826T022957Z-8833a3a8",
+ "base_record_file": "6390e1cbff69bc4a2e3ed4bd5df41b12861ddffbe7dacaefb14b8b8a5903dadc.json",
+ "audit_record_file": "6390e1cbff69bc4a2e3ed4bd5df41b12861ddffbe7dacaefb14b8b8a5903dadc.json",
+ "base_record_sha256_bytes": "a7c849955f2703b2d4a8274ce79b349e97f7b6e6b3b977e8f708ecc1683b2581",
+ "audit_record_sha256_bytes": "aff93d9183353697c9dca23fd08baf1a752bfb269d21346c0ba16c8d18d3fb23",
+ "base_finding_count": 8,
+ "audit_finding_count": 5,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "CONSTRUCTION_HO_minmod (L788), CONSTRUCT_HO_X_minmod (L1017) and CONSTRUCT_HO_Y_minmod (L1135) are not called by any active code in this file; the only invocation is commented out (L62-65) with history note that 4th-order+minmod is unstable (L783-785, L1012-1014) — dead code kept for tests."
+   ],
+   "audit_member_text": [
+    "인터페이스/호출 불일치: CONSTRUCTION_HO_minmod(L788)는 L808-L950에서 접미사 없는 CONSTRUCT_HO_X/Y를 호출한다. 이 파일에 별도로 정의된 _minmod 커널은 CONSTRUCT_HO_X_minmod(L1017)와 CONSTRUCT_HO_Y_minmod(L1131)이며 추가 DX/DY 인자도 요구한다. 또한 최상위의 minmod 호출은 L61-L64에서 주석 처리되어 있어 _minmod 커널은 이 파일 내부 호출 그래프에서 도달하지 않는다."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "VANLEER_LIMITER one-argument form (A+ABS(A))/(1.0+A) (L1262) divides by (1.0+A) without the SMALL guard used at the in-line applications (L1580-1584); function itself is only referenced in commented-out lines (L239, L292, L222, L276)."
+   ],
+   "audit_member_text": [
+    "특이점 검사 불일치: VANLEER_LIMITER의 2인자 식 L1260은 A=B=0에서 분모가 0이고 1인자 식 L1262는 A=-1에서 분모가 0인데 보호 조건이 없다. 반면 실제 고차 인라인 구현은 작은 TMP를 치환한 뒤 abs(1+RAT)>SMALL을 검사한다(L1579-L1588, L1694-L1703). 외부 호출자가 함수형 구현을 쓰면 NaN/0 나눗셈 가능성이 남는다."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "Cross-line inconsistency: non-CARTESIAN FyL/FyR in CONSTRUCTION multiply Gamma3 twice (FyL=Gamma3*HyL*UyL*VyL*Gamma3, L621-622) while the same branch in CONSTRUCTION_HO uses a single Gamma3 (FyL=Gamma3*HyL*UyL*VyL, L1489-1490) and GxL (L548) also uses it once — likely leftover error in the L621-622 pair."
+   ],
+   "audit_member_text": [
+    "복붙/계수 불일치: 저차 CONSTRUCTION의 non-CARTESIAN FyL/FyR은 L621-L622에서 Gamma3를 두 번 곱하지만, 같은 블록의 CARTESIAN 식은 L610-L618에서 한 번, 고차 CONSTRUCTION_HO의 대응 non-CARTESIAN 식은 L1489-L1492에서 한 번만 곱한다. y 횡방향 flux가 Gamma3^2로 스케일되는 유일한 분기다."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Header block says 'FILE main.F' (L3) but this file defines the FLUXES family; header appears copied from main.F — file-identity vs header mismatch."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Kappa dummy argument of CONSTRUCT_X (L731) and CONSTRUCT_Y (L674) is declared (L741, L684) but never used in the simplified bodies (comments L744-746, L688-690)."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "FLUX_AT_INTERFACE_HLL declares locals SR,SL,FL,FR,UL,UR (L124) that are never referenced in its body (L126-131)."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "CONSTRUCT_HO_X_minmod takes DX (L1022/L1024) and CONSTRUCT_HO_Y_minmod takes DY (L1140/L1142) but neither uses them in reconstruction formulas (L1115-1116, L1234-1235); active CONSTRUCT_HO_X/Y omit the grid-size argument entirely (L1503, L1618)."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "In WAVE_SPEED the y-direction star velocity reuses variable U_S computed from V components (L381) — name inherited from x-branch; no separate V_S."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "use-before-assign 가능성: CONSTRUCTION에서 U4xL/U4xR은 DISPERSION일 때만 L459-L465에서 구성되지만 CARTESIAN PL/PR와 FxL/FxR은 L474-L509에서 이를 무조건 참조한다. 같은 패턴으로 V4yL/V4yR은 L569-L575 조건부 정의 뒤 L581-L636에서 참조된다. DISPERSION=false에서 전역 배열의 별도 초기화가 없다면 미정의 값을 읽는다."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "범위 전제 미검증: CONSTRUCT_HO_X와 _minmod 변형은 I=Ibeg-1..Iend+2에서 Vin(I-2)와 Vin(I+1)을 읽고(L1036-L1039, L1524-L1527), y 변형은 J=Jbeg-1..Jend+2에서 J-2/J+1을 읽는다(L1150-L1153, L1639-L1642). dummy 배열 경계는 1..M,1..N뿐이며 Ibeg/Jbeg 및 ghost 폭의 최소 3칸 전제를 이 루틴에서 검사하지 않는다."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

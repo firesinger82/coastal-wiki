@@ -1,0 +1,152 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-004",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/mixing_salatin.F",
+ "source_sha256": "caf8c07ab26be8b5d3d3e9298a4c348dbfe93174cdb3ae68b10c5503cb03737b",
+ "base_run_id": "reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6",
+ "audit_run_id": "reread20260728-code-FUNWAVE-004b-codexaudit-20260826T235047Z-9ba829b8",
+ "base_record_file": "19f6f6d286f17436325cb3cb1e4250d4a688dd24f9de6b10e4e5681f5a3ed23a.json",
+ "audit_record_file": "19f6f6d286f17436325cb3cb1e4250d4a688dd24f9de6b10e4e5681f5a3ed23a.json",
+ "base_record_sha256_bytes": "b5a8d3403216739714382a77cdf427123f6434389fff76d9e4a408c95bc08425",
+ "audit_record_sha256_bytes": "9a0d969d20371ef236c11328139a955668219fa39e6bb30627ab5b6ad64cdb2a",
+ "base_finding_count": 7,
+ "audit_finding_count": 3,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "Cross-line: T_sum and T_sumUVmean are declared INTENT(OUT) (L103) but are read before being written (L116-117, L119, L200) - with INTENT(OUT) their values on entry are formally undefined in Fortran; the code relies on them behaving as INOUT."
+   ],
+   "audit_member_text": [
+    "Use-before-definition: T_sum and T_sumUVmean are declared INTENT(OUT) at L103, but their incoming values are read on the right-hand sides of T_sum=T_sum+DT and T_sumUVmean=T_sumUVmean+DT at L116-L117. Fortran makes an INTENT(OUT) dummy undefined on entry, so both accumulation clocks start from undefined values unless the interface intent is corrected."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "Division by real(NumDT1-1) (L127) and real(NumDT2-1) (L212) is unguarded; on the first finalize with NumDT1<=1 or NumDT2<=1 this divides by zero or is negative-weighted."
+   ],
+   "audit_member_text": [
+    "The sample-variance formulas divide by NumDT1-1 at L127-L128 and NumDT2-1 at L212-L213, but their interval branches at L119 and L200 have no guard requiring either counter to exceed 1; the only explicit count resets are to zero at L134 and L223, so short/zero intervals can reach a zero or negative denominator."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "File header comment still says 'FILE mixing.F' (L3) although this is mixing_salatin.F; relation to the plain mixing.F build variant (which file is compiled) is decided outside this file."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Cross-line mixed weighting: ETA2sum accumulates unweighted ETA^2 samples (L158-161) and is divided by count NumDT1 (L127-128), while ETAsum is DT-weighted and divided by time T_sum (L123-124); the variance formula therefore mixes a count-normalized second moment with a time-normalized mean, exact only for uniform DT. Same mixture in the vorticity branch: Vorsum is DT-weighted / T_sumUVmean (L207-209) but Vor2sum is count-based / NumDT2 (L212-213, L234-237); commented-out count-based Vorsum lines (L206, L208) show the alternative."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "NumDT1=ZERO and NumDT2=ZERO assign the (presumably real) PARAM constant ZERO to INTEGER counters (L134, L223); ZERO is defined in USE PARAM outside this file."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Per-interval resets of Num_Zero_Up/HavgSum/HrmsSum are commented out (L144-146), so WaveHeightAve/RMS are cumulative since STEADY_TIME."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Vor_Instant is INTENT(INOUT) (L109) but only read here (L207, L231, L234); where it is computed is external to this file."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "SQRT is applied directly to cancellation-prone expanded variances at L131 and L214 without clamping or checking for a small negative roundoff result, which can produce invalid values even when the intended variance is nonnegative."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

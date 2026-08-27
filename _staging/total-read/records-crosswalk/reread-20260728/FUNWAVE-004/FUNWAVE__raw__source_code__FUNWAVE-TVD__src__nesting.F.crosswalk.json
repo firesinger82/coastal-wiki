@@ -1,0 +1,133 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-004",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/nesting.F",
+ "source_sha256": "9c4379071b360d1d6057a5b45b0fd7cd554789364cf12dad910bc4d7965ba5e2",
+ "base_run_id": "reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6",
+ "audit_run_id": "reread20260728-code-FUNWAVE-004c-codexaudit-20260826T235048Z-1a481a82",
+ "base_record_file": "10a5e9bb4bc6e55c03e553505ecdd4f54e1d9e455fb4d714059b6da51538fb00.json",
+ "audit_record_file": "10a5e9bb4bc6e55c03e553505ecdd4f54e1d9e455fb4d714059b6da51538fb00.json",
+ "base_record_sha256_bytes": "fa20896e8f01b9318fd20d4fae2f62ffba456de3e760feb102d29f6d30d364ad",
+ "audit_record_sha256_bytes": "7743ae135c7fb25a17a929121e914f61b98b68499f85e57fd172b6851dc8868d",
+ "base_finding_count": 6,
+ "audit_finding_count": 2,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "Cross-line: in OneWayCoupling every boundary separator line ('! east' etc.) is list-directed READ into TIME_COUPLING_2 (L376, L395, L401, L422, L428, L449, L455, L476) - the commented-out originals (L375 etc.) read the line without a variable; if the separator line is non-numeric text the read yields IOstatus>0 (error, not EOF) which is not trapped by 'IF (IOstatus < 0)', leaving TIME_COUPLING_2 undefined by that statement; the real next time was already read at L371, so these reads at best re-consume separator lines and at worst overwrite the time level"
+   ],
+   "audit_member_text": [
+    "The initial reader consumes each side label/separator with a list-directed READ having no item (east L102; analogous west/south/north L121, L138, L155). The update routine's replacements instead read every separator into TIME_COUPLING_2 (east L376, west L401, south L428, north L455, plus absent-side branches L395, L422, L449, L476). This overwrites the actual time read at L371 with non-time side records or advances the numeric time incorrectly, a repeated copy/port mismatch that corrupts schedule parsing."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "EOF handling: GOTO 120 from any partial read (L372-477) jumps past all remaining boundary reads to L483, so a truncated last record leaves slot-2 arrays partially updated while TIME_COUPLING_1 was already advanced (L368)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "PARALLEL overlap test @L182-183 (and east/south/north analogues) combines '>Nghost .AND. <Nloc-Nghost+1' terms with .OR. in a way that treats one-endpoint-inside as partial overlap; the full-span case is handled separately @L195-199 - boundary-case correctness at exact subdomain edges depends on these inequalities being exclusive"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Ghost-cell fill loops use fixed local ghost ranges I=1..Nghost (west L508) and I=Iend+1..Iend+Nghost (east L532) etc., while coupling array index J-Nghost+Kshift_* must stay within 1..N_COUPLING_*; no explicit bounds check on the index expression"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Format 119 (5E16.6) requires the nesting file rows to wrap every 5 values; declared twice (L114, L363) with the same label in different scopes"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "OneWayCoupling interpolates and overwrites ETA/U/V/HU/HV only in ghost cells - interior is untouched (one-way nesting); no ETA0/masking interaction in this file"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Both the initial equal-time state and EOF collapse interpolation weights to zero: TIME_COUPLING_2 is initialized equal to TIME_COUPLING_1 (L93-L95), while equal slots set tmp1=tmp2=ZERO (L488-L497). At EOF, TIME_COUPLING_1 is first advanced to TIME_COUPLING_2, the failed read jumps to L483 (L367-L372), and the same equal-slot branch zeros every coupled ETA/U/V ghost value at L509-L588 instead of retaining the last boundary record."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

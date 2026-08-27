@@ -1,0 +1,233 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-004",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/mod_tide.F",
+ "source_sha256": "0d5194cef6eaa2b3ad6f2b5ef812e86dba5111ac84273f846e85728dbbda41da",
+ "base_run_id": "reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6",
+ "audit_run_id": "reread20260728-code-FUNWAVE-004b-codexaudit-20260826T235047Z-9ba829b8",
+ "base_record_file": "f597d299847a6c076ee5ee05c3fb629709c6d15ca6f577257ab6443daa627833.json",
+ "audit_record_file": "f597d299847a6c076ee5ee05c3fb629709c6d15ca6f577257ab6443daa627833.json",
+ "base_record_sha256_bytes": "d41ecf72aa424e2fcc36de9be4e9ef9354b2aaf94cc85ff30f05b532d2b21537",
+ "audit_record_sha256_bytes": "b977dee368b9f792f59aa6652adcbd32cd0c5c1cc9917ac9f1c0ddb4277043df",
+ "base_finding_count": 10,
+ "audit_finding_count": 7,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "Shared EOF label: END=120 in all four DO WHILE readers (L868,L922,L975,L1028) jumps to 120 CONTINUE @L1070 at the very end of TIDE_DATA, so EOF on the west file skips the east/south/north updates for that step (their interpolation continues next call with stale brackets)"
+   ],
+   "audit_member_text": [
+    "Shared EOF control-flow defect: each directional advancing READ uses END=120 (west L868, east L922, south L975, north L1028), and label 120 is after all four direction blocks at L1070. EOF on an earlier active side skips that side's interpolation and every later side's read/interpolation for the current call."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "Cross-line bug: serial north sponge uses ri=R_sp**(50*(Nloc-i)/(Iwidth-1)) @L300 with loop index i, while the PARALLEL branch @L298 and the south/west analogues use the j distance - serial north sponge varies along x instead of y"
+   ],
+   "audit_member_text": [
+    "Cross-line copy/paste defect: the serial north sponge loop iterates J and I at L295-L300 but its exponent uses Nloc-i at L300, whereas the parallel north form uses Nloc-j at L298 and the south serial form uses j at L288. The serial north sponge therefore varies with the horizontal I index instead of distance from the north boundary."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B1",
+    "B6"
+   ],
+   "base_member_text": [
+    "Cross-line copy-paste bug: all-boundaries-off test @L647-648 checks (.NOT.TideWest).AND.(.NOT.TideEast).AND.(.NOT.TideEast).AND.(.NOT.TideEast) - TideSouth and TideNorth are never tested; additionally the parallel log message @L654 wrongly prints 'You dont specify TideNorth_V, use default: 0' where the serial branch prints 'You specify Tide but no BCs, set tide as false' @L657-658"
+   ],
+   "audit_member_text": [
+    "Cross-line direction omission: the all-sides-disabled predicate at L647-L648 tests TideWest once and TideEast three times, omitting TideSouth and TideNorth. Consequently a configuration with only south and/or north active can execute TIDAL_BC_ABS=.FALSE. at L649 even though a tidal boundary remains enabled.",
+    "In the parallel branch of REMOVE_SPONGE, the file-unit diagnostic for the all-false condition at L654 says TideNorth_V is unspecified, unlike the actual condition message at L653 and serial unit-3 message at L658; this is a copied diagnostic mismatch."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "REMOVE_SPONGE (zeroing Sponge_*_width) is called only under TIDAL_BC_ABS @L222-237, not for TIDAL_BC_GEN_ABS"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Sponge exponent 50*(i-1)/(Iwidth-1) is integer arithmetic (i, Iwidth INTEGER) - exponent truncates to integer steps; sponge shape is stepwise"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Comment @L965 'Ifile = 203  ! east' mislabels the south unit; module-scope Ifile @L84 is shadowed by locals @L108/L384/L676/L853"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "TideDataFileName @L69 declared but never used; Lstart,Lend @L249 unused; Iwidth is set from Iwidth_tide only in TIDE_SPONGE @L251 but TIDE_BC uses Iwidth (L325 etc) - if TIDE_SPONGE were skipped Iwidth would be undefined"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Tide files are opened on units 201-204 in Tide_READ_DATA_INIT and stay open for sequential reading in TIDE_DATA across calls; header line consumed once @L700 etc"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A8"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Case variants TideWEST_U (L904) and TideWest_U (L79) are the same case-insensitive variable"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A9"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "TIDE_BC boundary strips use local indices I=1..Iwidth etc on every rank; on interior ranks the sponge value is lim=1 (inverted to 1) making the relaxation a no-op by construction of the global-offset exponents"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Range/singularity exposure: Iwidth comes from unvalidated WaveMakerPointNum (L117-L120), appears in denominators Iwidth-1 at L261-L300, and controls array loop bounds at L325-L360. Iwidth=1 makes the exponent division singular; Iwidth greater than Mloc or Nloc produces out-of-range or non-domain boundary indices."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Time-series ordering is not validated: DO WHILE advances while Time_*_2 < TIME+DT at L867-L869, L921-L923, L974-L976, and L1027-L1029, while interpolation divides by MAX(SMALL,ABS(Time_*_2-Time_*_1)) at L897-L899 and analogues. Duplicate or decreasing timestamps are masked rather than rejected and can consume records until the shared EOF jump."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The data-file OPEN and initial READ operations at L699-L701, L741-L743, L782-L784, and L823-L825 have no IOSTAT/ERR/END handling; missing, empty, or malformed files terminate through runtime I/O behavior rather than disabling the affected boundary."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

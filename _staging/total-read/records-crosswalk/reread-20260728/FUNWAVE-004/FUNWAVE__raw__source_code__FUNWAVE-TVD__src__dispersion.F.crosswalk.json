@@ -1,0 +1,182 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-004",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/dispersion.F",
+ "source_sha256": "fbd39b2ae8c34b6708815aea9627406acd0824aecceed6df35d094ed77940d45",
+ "base_run_id": "reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6",
+ "audit_run_id": "reread20260728-code-FUNWAVE-004-codexaudit-20260826T022957Z-8833a3a8",
+ "base_record_file": "b1124416cc2df0aea1844b47e9c50b1b9e25d2fcc342e6e2622575c9928123e5.json",
+ "audit_record_file": "b1124416cc2df0aea1844b47e9c50b1b9e25d2fcc342e6e2622575c9928123e5.json",
+ "base_record_sha256_bytes": "e2ed9d92856714b3c5a57004a703226ee28edd511ed7470c303bd4de3e3e92a3",
+ "audit_record_sha256_bytes": "35dfc6008e862ce007d6335890c2c023aac2dcd7614c021b8a35d70221b76b8e",
+ "base_finding_count": 7,
+ "audit_finding_count": 5,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "b2 (lowercase, L475-476) vs Beta_2 both appear in omega_1; the definition and value of b2 and Beta_1/Beta_2 are in GLOBAL/PARAM elsewhere; whether b2==Beta_2 is not decidable here"
+   ],
+   "audit_member_text": [
+    "omega_1 식은 주변 비선형 계수에서 쓰는 Beta_1과 별개 철자인 b2를 사용한다(L475-L476). Fortran 대소문자 차이는 없지만 b2와 beta_2는 서로 다른 이름이므로, GLOBAL에서 b2가 의도한 계수로 정의되는지 원문만으로 확인되지 않는다."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "ETAT loop runs J=1,Nloc-1 and I=1,Mloc-1 (L103-104) leaving ETAT undefined at I=Mloc and J=Nloc rows, and the in-code comment L111 says ykchoi flagged this (should be J=1,Nloc, I=1,Mloc) — the loop bounds were not changed in this source"
+   ],
+   "audit_member_text": [
+    "경계 초기화 범위 불일치 가능성: 주석은 ETAT 계산의 수정 범위를 J=1,Nloc 및 I=1,Mloc라고 명시하지만(L108-L111), 실제 DU/DV/ETAT 대입 루프는 1..Nloc-1, 1..Mloc-1에 머문다(L103-L119). 이후 DU/DV 전체에 미분을 요청하고(L152-L159) ETAT를 Ibeg:Iend,Jbeg:Jend 비선형 식에서 참조한다(L398-L438). GLOBAL의 Ibeg/Iend/Jbeg/Jend 및 halo 계약이 마지막 행·열을 배제하지 않으면 미대입 값 사용이다."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "The IF(SHOW_BREAKING .OR. WAVEMAKER_VIS) branch at L144-149 (and its non-CARTESIAN twin L146) has an empty body before ENDIF — the intended ETAT-related computation for that case is absent or handled elsewhere"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Ut,Vt evaluated inside the RK loop against Steve Brandt's advice (L126-128), kept 'temporarily' pending tests per the comment — behavioral impact and hot-start implication undetermined from this file"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "U1pp/V1pp appear only in the CARTESIAN gamma2>0 second loop (L422-436) while U4/V4/U1p/V1p are set in the first loop; how these terms combine into momentum equations happens in other files"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "VorticityMax update (L482) stores signed omega when abs(omega) exceeds VorticityMax — a negative omega with large magnitude overwrites the stored max, making 'VorticityMax' signed rather than a magnitude maximum"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "The first dispersion loop runs to Mloc,Nloc (L293-294) reading Uxx etc. computed only on Ibeg..Iend interior plus ghost fills from EXCHANGE_DISPERSION (L289); validity at outermost ghost cells relies on the PHI_COLL fills in bc.F"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "CARTESIAN의 U4/V4 대입 및 gamma2 보정 뒤에 별도의 ZALPHA U4/V4 대입 블록이 이어진다(L294-L329). 두 매크로가 동시에 정의될 수 있다면 후자가 앞 계산과 gamma2 보정을 덮어쓰며, 둘 다 정의되지 않으면 U4/V4가 이 서브루틴에서 대입되지 않는다. 빌드 시스템의 상호배타성 계약은 이 파일에 없다."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "CARTESIAN 비선형 루프는 Ibeg:Iend,Jbeg:Jend에서 I+1/I-1/J+1/J-1 중앙차분을 수행한다(L398-L420). 로컬 배열의 저장 경계 또는 교환된 halo가 이 범위를 한 칸 감싼다는 계약이 GLOBAL에 있어야 하며, 이 파일만으로 범위 안전성을 확인할 수 없다."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Ut와 Vt는 DT로 나눈다(L137-L138), 중앙차분과 구면항은 DX, DY, R_earth 및 COS(Lat_theta)를 분모로 사용한다(L405-L419,L361-L379). 이 파일에는 DT/DX/DY/R_earth의 비영 여부나 극점 cos=0 회피 검사가 없어서 호출 전 전제에 의존한다."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

@@ -1,0 +1,193 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-004",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/mod_time_spectra.F",
+ "source_sha256": "f7e5068997dc0bdb90ac31aa34bd83bec981972a12759e1feceaf00dc8c6575b",
+ "base_run_id": "reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6",
+ "audit_run_id": "reread20260728-code-FUNWAVE-004c-codexaudit-20260826T235048Z-1a481a82",
+ "base_record_file": "f3bfc5257fca181abde5772351b9924eda3e2cebf48bb3700ea350f8b99dc3d2.json",
+ "audit_record_file": "f3bfc5257fca181abde5772351b9924eda3e2cebf48bb3700ea350f8b99dc3d2.json",
+ "base_record_sha256_bytes": "9c7ba400435ec041c82cd82fff32ddfcde116baa0e6dea4c97bcc6e7279496d2",
+ "audit_record_sha256_bytes": "5a81a9f22711fba3e430e62c7d89c7fbcbe24adffb917efea5e5bd6295ea4aab",
+ "base_finding_count": 9,
+ "audit_finding_count": 3,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "Cross-line index bug: in the Not_done_periodic block the loop runs DO KK=1,NumFreq (L444) but assigns Theta_2D(I,KKK) (L448 and L450) using I - I is a module/global integer left at NumFreq+1 by the earlier DO I=1,NumFreq loop (L422), so only one row of Theta_2D is written while the Cm/Sm superposition reads Theta_2D(KK,KKK) (L497-526)"
+   ],
+   "audit_member_text": [
+    "The direction initialization loops over frequency index KK and direction index KKK (L444-L453) but writes Theta_2D(I,KKK), not Theta_2D(KK,KKK), in both branches (L448, L450). I is a host-associated/global loop variable rather than the active frequency index, so one row may be repeatedly overwritten or the write may be out of bounds, while reconstruction later reads Theta_2D(KK,KKK) for every KK (L497-L526)."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Comment @L121 'read precipitation from input.txt' and label comment @L379 'no more data for vessel Kves' are copied from mod_precipitation.F/vessel context, not this module"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Dep_Ser @L381 uses Depth(1,1) - a per-rank local corner value (ghost cell) that differs across MPI ranks, combined with only TideWest_ETA even though four tide boundaries exist in TIDE_MODULE"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Hardcoded literal 3.1415926 used for phase conversions (L218, L226-230) while PI is available from GLOBAL (used @L203, L423)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "One-time initialization relies on implicit SAVE of initialized locals Not_done_wavenumber/Not_done_periodic (L416) - wavenumbers and periodic angles are never recomputed even though Dep_Ser changes with tide level each call (dispersion solved once with the initial Dep_Ser)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Random phases (Phase_Data /= 1) are generated per rank with rand() without explicit seeding - PARALLEL ranks may generate different phase sets; no MPI broadcast in this file"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Unused declarations: SpectraName @L118, rII,rJJ @L321, ierr @L320 (INTERPOLATION), tmp_eta,tmp_u,tmp_v @L414, K @L410, PHASE_DATA case variant of Phase_Data (same variable), commented Ein2D/Din2D/Uin2D/Vin2D @L412-413; Stokes_Drift_Ser zeroed @L456 but never computed; Fact set @L457 but never used; Celerity/Wave_Length only used for the initial guess (L424-426, final recompute @L437 unused afterwards)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "TIME_SPECTRA_PROTECTION message inconsistency: parallel log says 'TideBcType = DATA' @L303 while stdout/serial say only 'TideBcType' @L304/L308-309"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A8"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Unit 400 remains open across the run for sequential spectra-schedule reads (L331-337) - same unit number convention as mod_precipitation.F rainfall schedule; both modules would collide if enabled together"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Initialization allocates AmpData1 but reads only AmpData2 and copies the time/name, not the amplitude matrix (L176-L181, L243-L264). In interpolation tmp1 and tmp2 start at zero and remain zero when TIME is equal to or earlier than the first timestamp (L362-L375); L377 then multiplies the uninitialized AmpData1 by zero and also zeroes AmpData2, yielding zero or undefined Amp_Ser at that boundary."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "At schedule EOF the routine first advances TimeSpectra1 and AmpData1 to the last loaded record (L325-L329), then an EOF on the next time read jumps directly to label 120 (L333-L335, L379), bypassing L361-L377. Amp_Ser therefore remains the previous pre-EOF interpolation rather than being explicitly set to the final AmpData1, and subsequent calls repeat the same EOF jump."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

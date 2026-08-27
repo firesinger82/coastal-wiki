@@ -1,0 +1,152 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-004",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/mixing.F",
+ "source_sha256": "6ade4eb4c9d0887c3732bdb10e6c935f907adc15cab78dfd364ef338676c1d46",
+ "base_run_id": "reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6",
+ "audit_run_id": "reread20260728-code-FUNWAVE-004a-codexaudit-20260826T235047Z-4f05567c",
+ "base_record_file": "c1dde34920c5c927c0c0348f6ee252836801d4808d27eb27a9a57ffe7e99a38b.json",
+ "audit_record_file": "c1dde34920c5c927c0c0348f6ee252836801d4808d27eb27a9a57ffe7e99a38b.json",
+ "base_record_sha256_bytes": "9edb00c4edd3f1e52214506757d2dbe576cb9b138460339eeb5cca3960ff87d6",
+ "audit_record_sha256_bytes": "597a537599f82552b3a268e3c72e63c766bd6618744a89ea1e673f525eb57d18",
+ "base_finding_count": 6,
+ "audit_finding_count": 4,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "Per-interval resets of Num_Zero_Up/HavgSum/HrmsSum are commented out (L253-255), so WaveHeightAve/WaveHeightRMS (L250-251) are cumulative over the whole run since STEADY_TIME, not per averaging window."
+   ],
+   "audit_member_text": [
+    "Num_Zero_Up, HavgSum, and HrmsSum reset statements are commented out at lines 253-255, while other interval accumulators are reset at lines 225-242. Consequently the wave-height statistics published at lines 250-251 are cumulative across preview intervals rather than scoped to T_INTV_mean; the intended scope is unresolved."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "Cross-line: T_sum is decremented by T_INTV_mean (L224) instead of reset to ZERO while all sums are zeroed (L225-242); the residual T_sum carries into the next interval so subsequent means (sums/T_sum, L147-180) are normalized by a slightly larger denominator; the in-code comment L224 questions this."
+   ],
+   "audit_member_text": [
+    "Cross-line averaging-window mismatch: T_sum retains a DT overshoot by subtracting only T_INTV_mean at line 224, but all associated sums are reset to ZERO at lines 225-242. Unless every threshold hit is exact, the next denominator includes residual time for which no numerator contribution remains (lines 144-145,224-242)."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Cross-line: in the finalize branch the means Umean/ETAmean etc. are computed (L152-154) only when T_sum crosses T_INTV_mean; UUsum increments (L160-162, L274-276) use U_davg_mean/ETAmean from the previous interval, which is intentional per comments L218-220 but means the first interval uses uninitialized/zero means."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Gravity is hardcoded as 9.80 in radiation-stress and pressure-gradient terms (L187, L191, L193, L195) instead of the GRAV parameter used elsewhere in the code base."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "MIXING_STUFF header says it computes Smagorinsky-mixing-related means (L47, L57) but comment L58-59 (ykchoi) notes Umean/Vmean may not be used by other routines; actual consumers are outside this file."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Variables T_sum, T_INTV_mean, ETA2sum, U_davg, P_center, BreakSourceX/Y, ZERO, Emax/Emin, Num_Zero_Up, HavgSum/HrmsSum etc. all come from USE GLOBAL (L109); their declarations/initial values are external to this file."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "UUsum/UVsum/VVsum use U_davg_mean and V_davg_mean at lines 161-163 and 274-276 before the new completed-window means are assigned at lines 170-171; the ELSE path never updates those means. Thus fluctuations are referenced to a previously stored mean (and possibly uninitialized state for the first window), not the current running-window mean (lines 157-176,270-276)."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The radiation-stress and depth-integrated-flux stencils iterate I=Ibeg..Iend and J=Jbeg..Jend at lines 184-185 while accessing I-1/I+1 and J-1/J+1 through lines 186-212. This is in bounds only if the GLOBAL ranges exclude physical array edges or provide ghost cells; neither invariant is established in this file."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

@@ -1,0 +1,141 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-004",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/derivatives.F",
+ "source_sha256": "d53019e11741de38138f16de47704786d9b116f2c9a90bd5c72c6101b0c4b53e",
+ "base_run_id": "reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6",
+ "audit_run_id": "reread20260728-code-FUNWAVE-004-codexaudit-20260826T022957Z-8833a3a8",
+ "base_record_file": "321c2b67b15496a2e43274dc73689cd5024d5b54cb2f4244ba1f39d1659a2b00.json",
+ "audit_record_file": "321c2b67b15496a2e43274dc73689cd5024d5b54cb2f4244ba1f39d1659a2b00.json",
+ "base_record_sha256_bytes": "a8013824ac7c813f4789744a9f586440bd47db898b469b8494e87815679df663",
+ "audit_record_sha256_bytes": "c79bd46f3f65288fbdc9c7c1f537b793c9dfa2aac98c79dca484aea45c7a4a89",
+ "base_finding_count": 4,
+ "audit_finding_count": 6,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "DERIVATIVE_XY_HIGH header comment says '4th-derivative xy' (L293) and DERIVATIVE_XX_HIGH/YY_HIGH say '4th-derivative xx/yy' (L345,L381) while the implementations are 4th-order-accurate first/second/cross derivatives — comment wording vs implemented operator"
+   ],
+   "audit_member_text": [
+    "Comments call DERIVATIVE_XY_HIGH, DERIVATIVE_XX_HIGH, and DERIVATIVE_YY_HIGH fourth derivatives at L293,L345,L381, but their formulas compute mixed or pure second derivatives with wider accuracy stencils."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "MASK multiplies the result after division (e.g. L69), zeroing derivatives at masked cells but still reading Uin at neighbors up to +/-2 cells; ghost-cell validity at Ibeg-2/Jend+2 is assumed from callers"
+   ],
+   "audit_member_text": [
+    "Wide routines read I or J offsets of plus/minus two at L68-L72, L104-L108, L315-L335, L368-L372, and L403-L407 without checking that the supplied Ibeg/Iend/Jbeg/Jend leave two valid halo cells."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "Cross-branch inconsistency in DERIVATIVE_YY_HIGH: the non-CARTESIAN branch's last stencil term is Uin(I+2,J+2) (L407) whereas the CARTESIAN branch uses Uin(I,J+2) (L404); the y-direction 5-point stencil should not shift in I, so L407 appears to be a typo/bug affecting non-CARTESIAN (spherical/curvilinear) builds"
+   ],
+   "audit_member_text": [
+    "In non-CARTESIAN DERIVATIVE_YY_HIGH, the last positive-y stencil sample at L407 is Uin(I+2,J+2), while the Cartesian counterpart at L404 and every other yy term keep I fixed; this diagonal I+2 copy/paste term changes the operator and can also exceed the x stencil range unexpectedly."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Loop indices I,J and temporaries tmp1..tmp4 are not declared in any subroutine here — they come from USE PARAM module scope (L53 etc.), so these routines are not thread-safe with respect to module-level tmp variables"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "DERIVATIVE_Y_High coefficients at L68-L72 are [1,2,0,-2,-1]/(8 DY), and DERIVATIVE_X_High uses the same pattern at L104-L108. Their cubic moment is nonzero, so these named higher-order first derivatives retain O(h^2) truncation error rather than the fourth-order centered coefficients used elsewhere in this file."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "All ten Uout dummy arrays are INTENT(OUT) but only Ibeg:Iend by Jbeg:Jend is assigned inside each routine; Fortran makes the entire incoming actual argument undefined on entry, so output cells outside that loop range remain undefined despite retaining full M-by-N shape."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Every formula divides by DX, DY, DX(I,J), or DY(I,J), including squared products in second derivatives, without a nonzero spacing check."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

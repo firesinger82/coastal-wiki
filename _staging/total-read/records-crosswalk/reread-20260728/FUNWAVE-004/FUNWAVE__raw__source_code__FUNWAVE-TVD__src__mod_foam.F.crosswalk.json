@@ -1,0 +1,186 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-004",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/mod_foam.F",
+ "source_sha256": "b5ce1352996a0535bcafef8ea697eab941c7a654ba5a95e32cf55cc07aa38a4d",
+ "base_run_id": "reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6",
+ "audit_run_id": "reread20260728-code-FUNWAVE-004a-codexaudit-20260826T235047Z-4f05567c",
+ "base_record_file": "cb28eb215c7c0ce7a9ae79de90721d617944fc0e7cafaefd328d2b3aa5645701.json",
+ "audit_record_file": "cb28eb215c7c0ce7a9ae79de90721d617944fc0e7cafaefd328d2b3aa5645701.json",
+ "base_record_sha256_bytes": "6eadfc63418b36de38931a2f08df0a7c4a2511866d01cc7891eb14fdeca4bcad",
+ "audit_record_sha256_bytes": "ea40a19a9f59967ea7b2ed0bffad08038866e90d39d6c36573430e4e0ff376c0",
+ "base_finding_count": 8,
+ "audit_finding_count": 5,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "FxFoam/FyFoam/GxFoam/GyFoam are allocated and zeroed (L45-47, L256-259) but never used elsewhere in this file; Usurf1/2, Vsurf1/2, VFsurf1/2, DepthFoam likewise only initialized (L262-267, L50-53). EtaFoamMax is tracked (L302, L308) but never output or read here."
+   ],
+   "audit_member_text": [
+    "EtaFoamMax is reset and updated at lines 302 and 308 but never read elsewhere in this module after initialization, leaving its intended coupling/output unresolved."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "myid is referenced in PARALLEL branches of INITIALIZATION_FOAM (L80, L87, L102, ...) but no USE GLOBAL list in this module imports myid (module-level L3-8 or subroutine-level L59-61); how it resolves under PARALLEL compilation is external to this file."
+   ],
+   "audit_member_text": [
+    "Under PARALLEL, INITIALIZATION_FOAM repeatedly references myid in its diagnostics, but neither the module-level GLOBAL ONLY list at lines 3-8 nor the subroutine GLOBAL ONLY lists at lines 59-62 import myid. Compilation therefore relies on an undocumented transitive/public association through INPUT_READ at line 64."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "Overshoot limiter sets Uadd=Usurf(I,J) (not Usurf-UFoam) when the drag increment exceeds the velocity difference (L354-355); whether the intended limit is the difference is not determinable from this file."
+   ],
+   "audit_member_text": [
+    "Velocity-increment limiter is algebraically inconsistent with its subsequent additive update: when Uadd exceeds the remaining difference, line 354 assigns Uadd=Usurf rather than Usurf-UFoam, and line 357 then adds that full surface velocity to the existing foam velocity. The same defect occurs for V at lines 355 and 358, so the purported cap can overshoot instead of landing on the target (lines 350-358)."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Cross-line: the module-level SMALL PARAMETER (L36) is shadowed in INITIALIZATION_FOAM by USE GLOBAL,ONLY : ... SMALL (L59); neither is actually used in that subroutine."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Cross-line: the x-direction upwind test uses >ZERO in the thickness pass (L447) but >0 in the velocity pass (L458); the y-direction uses >ZERO in both (L471, L482). Comment L445 also records a previous loop-range inconsistency between x and y directions."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "UPDATE_FOAM_MASK is annotated 'useless so far' (L494) and its locals left/right/top/bottom (L496) are unused; whether it is called from elsewhere is outside this file."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "OUT_FOAM (L33) and PLOT_INTV_FOAM/PLOT_COUNT_FOAM (L11, L76-91) are set up but no output subroutine exists in this module; the writer of foam fields is external."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "iista/jjsta imported under PARALLEL (L61) and itmp1-itmp5 (L59) are unused in this file."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Host/use association collision: MOD_FOAM defines its own parameter SMALL at line 36, but contained INITIALIZATION_FOAM explicitly USE-associates GLOBAL::SMALL with the same local name at line 59. Whether this compiles depends on nonstandard conflict handling; standard-conforming builds may reject the duplicate association (lines 36,57-64)."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "FOAM_UPDATE uses face fluxes MxFoam/MyFoam at lines 325-333 before this routine itself constructs them; FOAM_FLUX is a separate routine at lines 435-492 and is not called here. Correctness depends on an external call order FOAM_FLUX -> FOAM_UPDATE that this module does not enforce."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

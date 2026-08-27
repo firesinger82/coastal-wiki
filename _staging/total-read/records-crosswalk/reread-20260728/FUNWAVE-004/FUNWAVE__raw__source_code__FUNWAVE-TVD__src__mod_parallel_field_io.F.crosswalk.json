@@ -1,0 +1,159 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-004",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/mod_parallel_field_io.F",
+ "source_sha256": "7c0d29fcb02947a183bd49ec0aac403f12e0912eadfebcd868f9a424be571b5d",
+ "base_run_id": "reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6",
+ "audit_run_id": "reread20260728-code-FUNWAVE-004c-codexaudit-20260826T235048Z-1a481a82",
+ "base_record_file": "a6ce671ad27379ddbe26d3cbbfd1b7d76bedb62c6d0c031d86d93fef92628846.json",
+ "audit_record_file": "a6ce671ad27379ddbe26d3cbbfd1b7d76bedb62c6d0c031d86d93fef92628846.json",
+ "base_record_sha256_bytes": "41c8c5dbb7f5b64acd785de110820cf2c4a7435bd6cb68fab805ca36ca10ec92",
+ "audit_record_sha256_bytes": "82372a1910244a48235817df4593f4c9577d629d019b17e03a174ad6faed57c4",
+ "base_finding_count": 7,
+ "audit_finding_count": 2,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Cross-line: FORMAT_LEN is built once under the SAVEd FirstCallPutFile flag (L85-92) but FORMAT_LEN itself is the CHARACTER(LEN=16) from MODULE GLOBAL (USE GLOBAL L56); the format count field uses Mglob but the write loop strides by OUTPUT_RES (L146), so for OUTPUT_RES>1 the format repeat count exceeds the items written - harmless in Fortran but the format does not reflect the decimated width."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "PHIGLOB(MGlob,NGlob) is an automatic (stack) array on every rank (L79), not just rank 0 - large-grid stack usage on all ranks; the commented alternative with ghost dimensions is at L78."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "PutFileASCII derived-type/inner loop assumes iista:iiend gathered ranges tile MGlob x NGlob exactly (L114, L128); no overlap/coverage check is performed."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "PutFileBinary declares PHITEST (L166) and istatus (L168) but never uses them; ierr from MPI calls is never checked in either subroutine."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "PutFileBinary writes raw 'native' mpi_sp records with no header; the byte layout/global-size metadata must be known by the post-processor - external convention."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "The nonblocking mpi_irecv/mpi_isend pairs are each immediately mpi_wait'ed (L125-126, L134-135), making them effectively blocking; ireq is reused across iterations."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "END SUBROUTINE names use different capitalization (PutfileASCII L157, PutfileBinary L221) than the declarations (L60, L161) - legal in Fortran, purely cosmetic."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "PutFileBinary opens with MPI_MODE_WRONLY + MPI_MODE_CREATE (L208-L210) and writes the current global view (L213-L218) but never calls MPI_FILE_SET_SIZE or otherwise truncates an already-existing file; if a later output is smaller, stale trailing bytes can remain."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "PutFileASCII uses OUTPUT_RES as both outer and implied-DO stride (L144-L145) without any local positivity/range check; OUTPUT_RES=0 is an invalid DO step and a negative value suppresses the expected traversal."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

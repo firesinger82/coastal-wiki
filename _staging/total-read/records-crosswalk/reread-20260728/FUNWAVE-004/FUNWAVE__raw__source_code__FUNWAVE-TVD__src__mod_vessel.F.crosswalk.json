@@ -1,0 +1,261 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-004",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/mod_vessel.F",
+ "source_sha256": "d06116f0d86c08ad7ba699e966dbe9d6127ad3a5e668432ad369d8c3a08763fc",
+ "base_run_id": "reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6",
+ "audit_run_id": "reread20260728-code-FUNWAVE-004b-codexaudit-20260826T235047Z-9ba829b8",
+ "base_record_file": "a5d41826b6d02a5bfafc3698572763ae72a74a2b94e8625768515177fafcb539.json",
+ "audit_record_file": "a5d41826b6d02a5bfafc3698572763ae72a74a2b94e8625768515177fafcb539.json",
+ "base_record_sha256_bytes": "b27352900c68b81445d485357851c16dc1a923f52fb5641d6ab61ceff90411e4",
+ "audit_record_sha256_bytes": "685cd72b36b7f879681b1747ed08cd9b7a5939e8ca45caead43b8a8a4a09ed12",
+ "base_finding_count": 11,
+ "audit_finding_count": 8,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "Shared label 120 @L560 is inside the Kves loop (per-vessel EOF skips only that vessel's source accumulation for the step) - unlike mod_tide.F where one EOF skips all remaining boundaries"
+   ],
+   "audit_member_text": [
+    "EOF behavior: the path READ at L485 jumps to label 120 at L560, after all source dispatches. Once a vessel path reaches EOF, that vessel contributes no pressure/flux for that call and subsequent calls that again enter the read condition, rather than holding its last position; the intended post-track lifetime is not stated in this file."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0",
+    "A1"
+   ],
+   "audit_ids": [
+    "B3",
+    "B7"
+   ],
+   "base_member_text": [
+    "REALISTIC_VESSEL_BODY branch of GREEN_FUNCTION_SOURCE cannot compile as written: declarations @L809-812 appear after the executable statement @L806; @L835 has unbalanced parentheses '+ V(I,J+1)-V(I,J-1))/DY*0.5_SP)'; @L837/L842/L844 index 1D arrays Xco/Yco as Xco(I,J)/Yco(I,J); @L851-852 lacks an operator between '(Uvel(Kves)-U(I,J))/DX' and the next term - dead code unless the macro is never enabled",
+    "Cross-line: W_farfield @L831-835 is assigned as a whole-array expression using scalar-indexed right-hand side inside the (I,J) loop, and Z_prime(I,J)=Pvessel(Kves) @L830 treats the draft as depth of the source point; far-field condition @L827-828 uses .AND. so points beside the hull (only one coordinate outside) are neither near- nor far-field"
+   ],
+   "audit_member_text": [
+    "REALISTIC_VESSEL_BODY compile-path defects: executable assignment L806 precedes conditional declarations L809-L812; L835 has unmatched parentheses; Xco and Yco are indexed as rank-2 at L837 although all other uses are Xco(I),Yco(J); Z_prime is used as a whole array in scalar r3/r3_2m/r3_4m expressions at L837 and L843-L845; W_farfield is assigned as a whole array at L831-L835 and then used in scalar assignment L851-L852; L851-L852 also lacks an arithmetic operator between the two parenthesized velocity terms. This conditional branch is not a type/rank/syntax-consistent Fortran implementation.",
+    "The realistic far-field selection requires both ABS(Lves)>=Length and ABS(Wves)>=Width at L827-L828. Points outside only one side of the rectangle are excluded although comments L823-L825 describe the far field as outside the rectangle; whether AND should be OR is unresolved from this file."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "VESSEL_FORCING pressure-gradient loop @L576-586 divides by scalar DX/DY only - no non-CARTESIAN (spherical) variant, unlike other modules with DX(I,J) branches"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Type-1 taper condition @L685-686 'Lves>0.5*L*Alpha1' vs midship @L695-696 'Lves<=0.5*L*Alpha1' overlap consistently, but if AlphaVessel1=1 (clamped max) the taper zone is empty and P_x=1 across the half-length; commented-out Type-2 parameter protection @L366-372 acknowledged as removed"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "MakeVesselDraft initial draft @L613-623 sets Eta=-VesselPressureTotal only where |P|>SMALL on the first VESSEL_FORCING call for all source types even though only 'PR' fills VesselPressureTotal"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "OUT_VESSEL and PLOT_INTV_VESSEL/PLOT_COUNT_VESSEL are read/initialized here but no vessel output writing exists in this file; ResistanceX/Y computed and reduced but not output here"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "DEEP_DRAFT_VESSEL neighborhood loops @L592-593 run II=I-Nghost..I+Nghost without bounds clamping - at interior edges II/JJ index ghost cells legally, but MaskVessel edits are not ghost-exchanged in this file"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A8"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Vessel file name supports up to 5 digits (L315-324) but writes leading zeros digit-by-digit; FILE_VESSEL remains 5 chars of a longer 80-char blank string"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A9"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "GREEN_FUNCTION_SOURCE non-realistic branch is identical in shape to SLENDER_BODY_SOURCE Type-1 (compare L873-875 and L911-913); Gz allocated @L275-276 and zeroed @L288 but only used in the broken REALISTIC_VESSEL_BODY branch"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A10"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "ierr declared in PRESSURE_SOURCE/GREEN_FUNCTION_SOURCE/SLENDER_BODY_SOURCE (L640,L802,L892) but unused; dummy names Xves,Yves shadow module variables @L86"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Use-before-assign on missing NumVessel: READ_INTEGER at L149 has no ierr/default branch, but NumVessel is immediately used as every allocation extent at L263-L285 and as the loop bound at L312. A missing or invalid key leaves the module integer without a defined value before allocation."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Source/propeller interface mismatch: propeller inputs are read only inside the PR source branch at L352-L360, but E0, Veff, Cf, and IZEF are computed unconditionally for every vessel under PROPELLER at L445-L450. SL or PA vessels therefore use unassigned N_revolution, D_prop, C_thrust, D_hub, BAR, H_prop, and C_duct."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "PA initialization mismatch: geometry/source parameters are read for PR at L352-L381 and SL at L383-L388, with no PA branch before the path read at L389-L390; VESSEL_FORCING nevertheless dispatches PA to GREEN_FUNCTION_SOURCE at L552-L555, which uses LengthVessel, WidthVessel, Pvessel and related state at L827-L875. Those values are unassigned for PA as parsed here."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Propeller and shape singularities are not range-checked: L446-L450 divide by D_hub, H_prop and C_duct, raise C_thrust to a negative power and take SQRT(C_thrust); L726-L729 divide by D_prop, C_thrust and ABS(Lrear); pressure/slender formulas divide by LengthVessel and WidthVessel at L713-L716 and L873-L875/L911-L934. Zero or nonpositive vessel-file values can produce division by zero or invalid real powers."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Unknown SourceType is not rejected after L349. It bypasses all geometry reads at L352-L388 and all forcing dispatches at L531-L557, while diagnostics at L403-L419 still read and print uninitialized geometry arrays."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

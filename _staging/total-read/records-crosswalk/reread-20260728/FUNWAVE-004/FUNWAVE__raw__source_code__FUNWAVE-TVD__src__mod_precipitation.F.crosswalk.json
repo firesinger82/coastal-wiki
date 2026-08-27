@@ -1,0 +1,208 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-004",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/mod_precipitation.F",
+ "source_sha256": "b5e574ecffc721183d9a691bb07c6cbcf2b9fd5fb86acd014c01565f88618f5b",
+ "base_run_id": "reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6",
+ "audit_run_id": "reread20260728-code-FUNWAVE-004b-codexaudit-20260826T235047Z-9ba829b8",
+ "base_record_file": "b31271233325ce15b6fc49c2ac114b691b0a53f47698e09133a9ff28ba8bf054.json",
+ "audit_record_file": "b31271233325ce15b6fc49c2ac114b691b0a53f47698e09133a9ff28ba8bf054.json",
+ "base_record_sha256_bytes": "b786eec8431d053dbe432bd22a4b0133bec2630c05b7d970884711b1baba7cd1",
+ "audit_record_sha256_bytes": "9333fdda3b429ebe763f5866fd03571320be341a83f753a31c08ead19e358175",
+ "base_finding_count": 8,
+ "audit_finding_count": 5,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "L300 label-120 comment says 'no more data for vessel Kves' though this is the precipitation module - text apparently carried over from the vessel module; the GOTO 120 at L257 (EOF on unit 400) is the actual jump source, so after rain schedule EOF the time-blend block L280-298 is skipped and the last PrecRateData is reused without further conversion"
+   ],
+   "audit_member_text": [
+    "L249-L256,L299: EOF를 만나기 전에 TimePrec1/NamePrec1/PrecRateData1을 현재 2값으로 이동한 뒤 GOTO 120으로 시간보간·단위변환을 건너뛴다. 이전 호출의 이미 변환된 PrecRateData를 그대로 재사용해 마지막 원자료를 확정하지 못하고 상태 단위도 갱신 경로와 분리된다."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "PLOT_INTV_PREC and PLOT_COUNT_PREC declared @L74 but never assigned or referenced in this file - the precipitation output interval logic must live elsewhere"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "RainWaveInteraction read @L114 but not used anywhere else in this file; its physical effect is implemented outside this module"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "PrecName @L96 and myvar @L82 declared but unused in this file"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Interpolation loops run only Ibeg..Iend-1, Jbeg..Jend-1 (L304-305) with edge copy L316-322; ghost regions of PrecRateModel outside Ibeg..Iend/Jbeg..Jend are never filled"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Unit number collision risk: unit 400 stays open across calls while unit 401 is opened/closed per field (L254 vs L269); WRITE(3,...) assumes log unit 3 opened elsewhere"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "L291 'tmp1=1.0_SP - tmp2;' has a trailing semicolon (non-standard Fortran carryover)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "OUT_Precipitation (decl @L73) and OUT_PRECIPITATION (@L130,L132) are the same case-insensitive variable; declaration default and read-fallback both .TRUE."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "L165-L188,L247-L297: 초기화는 첫 raster를 PrecRateData2에만 읽고 PrecRateData1을 초기화하지 않는다. 다음 timestamp를 넘기기 전에는 tmp1/tmp2가 둘 다 ZERO이므로 L294에서 첫 rainfall field가 0으로 사라지며, 첫 갱신 전 입력 강수가 적용되지 않는다."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "L247-L276: TIME이 여러 TimePrec 레코드를 건너뛰어도 IF가 다음 레코드를 한 건만 읽는다. 뒤처진 구간으로 L288-L294를 외삽할 수 있으므로 WHILE형 catch-up이 필요하다."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "L305-L311: Mglob 또는 Nglob이 1이면 좌표 사상 분모가 0이고, M_PrecDim 또는 N_PrecDim이 1이면 II+1/JJ+1이 범위를 넘는다. 입력 차원 최소 2 검사가 없다."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "L305-L311: 계산된 rII/rJJ를 [1,M_PrecDim]/[1,N_PrecDim]로 clamp하지 않아 전역 인덱스·파일 차원 불일치나 ghost/index 구성 오류가 곧바로 PrecRateData 범위초과로 이어진다."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

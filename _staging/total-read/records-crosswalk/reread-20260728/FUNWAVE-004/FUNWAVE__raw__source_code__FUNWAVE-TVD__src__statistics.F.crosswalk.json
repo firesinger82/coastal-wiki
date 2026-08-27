@@ -1,0 +1,141 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-004",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/statistics.F",
+ "source_sha256": "4c710663a17c77f9603a15fdfba8a79ae9785898745090a566fe4124c15b6d26",
+ "base_run_id": "reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6",
+ "audit_run_id": "reread20260728-code-FUNWAVE-004b-codexaudit-20260826T235047Z-9ba829b8",
+ "base_record_file": "d606a86cde53da04ced55a12f063cb511702b690aff92fc932d37cdeeaf34be5.json",
+ "audit_record_file": "d606a86cde53da04ced55a12f063cb511702b690aff92fc932d37cdeeaf34be5.json",
+ "base_record_sha256_bytes": "c22c2e44ed6745ddfef8ddf370127bd34a772c387d37e9e86485f1caba13403c",
+ "audit_record_sha256_bytes": "342735e97e29873485a5a067c90e59ab4490af55df018b29fb11678b64512a8a",
+ "base_finding_count": 6,
+ "audit_finding_count": 4,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "Fr reduced with MPI_MAX @L132 independently of UTotalMax @L130 — after reduction Fr may come from a different cell than the global-max UTotal cell; printed Froude=UTotalMax/Fr @L148 mixes the two"
+   ],
+   "audit_member_text": [
+    "L107-L110 bind Fr to the cell that produces the local UTotalMax, but PARALLEL reductions independently take MAX of UTotalMax at L130 and Fr at L132 before UTotalMax/Fr is reported and checked at L148, L160, and L183; different ranks can supply the two maxima, so the quotient can lose the intended speed/depth pairing."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "MassVolume0 declared @L60, FirstCallStatistics declared/SAVEd @L61-62, and MaxM initialized @L59 are never used in the executable body (L69-190) — apparently vestigial"
+   ],
+   "audit_member_text": [
+    "MassVolume0 at L60 and saved FirstCallStatistics at L61-L62 have no subsequent read or assignment through EOF L215, consistent with incomplete or copied-out first-call baseline logic."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "Energy accumulation @L84-86 is not masked by MASK unlike MassVolume (L80-82) — dry cells still contribute; whether intentional cannot be resolved from this file"
+   ],
+   "audit_member_text": [
+    "MassVolume is gated by MASK>0 at L80-L82 and L88-L90, while Energy is accumulated outside those IF blocks at L84-L86 and L91-L93; inactive or dry cells can therefore contribute to Energy unless their H/U/V values are guaranteed neutral elsewhere."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Dmass printed @L148,L160 and checked @L184 is not computed here — comes from USE GLOBAL (L53), labeled 'WetDryMass' in the header text @L147,L159"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "declaration initializers =ZERO @L57-59 imply implicit SAVE semantics in Fortran; only MassVolume/Energy/UTotalMax are re-zeroed each call @L69-71 — MaxEta/MinEta/MaxU/MaxV are overwritten @L98-101 so unaffected, but UTotal/Fr retain prior-call values until reassigned (Fr fallback @L115 then masks it)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "log unit 3 written @L154-164,L201 without OPEN in this file — unit opened elsewhere (LOG_FILE presumably), not verifiable here"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "MaxEta, MinEta, MaxU, and MaxV use unmasked rectangular MAXVAL/MINVAL ranges at L98-L101, whereas the maximum-speed/Froude scan explicitly requires MASK>ZERO at L106; extrema may therefore come from cells excluded from the latter statistic."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

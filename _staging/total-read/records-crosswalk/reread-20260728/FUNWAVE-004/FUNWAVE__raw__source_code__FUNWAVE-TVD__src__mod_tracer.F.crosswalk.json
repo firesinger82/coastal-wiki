@@ -1,0 +1,231 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-004",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/mod_tracer.F",
+ "source_sha256": "4fadd96e57ef55ff1b7e6fb7e91d9e1968d6904f0288dfc64c58f0950acce547",
+ "base_run_id": "reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6",
+ "audit_run_id": "reread20260728-code-FUNWAVE-004a-codexaudit-20260826T235047Z-4f05567c",
+ "base_record_file": "df16584eb5e403a224eed8b118af87bb03021d14ec087b3f905eca86e72893b5.json",
+ "audit_record_file": "df16584eb5e403a224eed8b118af87bb03021d14ec087b3f905eca86e72893b5.json",
+ "base_record_sha256_bytes": "aed3d19941e0dd9240c5283e8984d87a62c400ab36ab72478fd90c733f65fb0d",
+ "audit_record_sha256_bytes": "11a7b5912105dd576090aedad8546710a871cee539de5885ec80983394ae1d20",
+ "base_finding_count": 10,
+ "audit_finding_count": 6,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "Header comment @L46 'VESSEL is a module to model ship-wakes' is copied from mod_vessel.F and does not describe this tracer module"
+   ],
+   "audit_member_text": [
+    "Copy/paste metadata defect: L46 describes VESSEL and ship wakes, but the implemented module is TRACER at L54 and contains only particle tracking procedures."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "Cross-line: dry-cell revert test @L397 sums MASK(nx2(I),ny2(I)) twice and never checks MASK(nx3(I),ny3(I)) - the third triangle vertex mask is ignored"
+   ],
+   "audit_member_text": [
+    "Copy/paste logic defect: the rollback dryness test at L397 sums MASK at vertex 1 and vertex 2 twice, omitting the separately stored vertex 3 (nx3,ny3 restored at L402-L403 and used by interpolation at L515/L519 and subsequent layer branches). A dry/wet state unique to vertex 3 cannot affect rollback."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "Exact float comparison Sc(I)==0.0 @L509 guards the division; degenerate cells only produce a stdout warning and freeze the tracker velocity update"
+   ],
+   "audit_member_text": [
+    "Ineffective singularity guard: MOVE_TRACER rejects only exact Sc(I)==0.0 at L509, then divides weighted velocities by Sc(I) at L516, L520, L525, L529, L534, and L538. Near-degenerate triangles with very small nonzero area pass the check and can create unbounded tracer velocities; no SMALL/tolerance test is used."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Loop index I used in DO I=1,NumTracker (L193, L395, L434, L470, L482, L507, L569) is not declared in this module (only II,JJ @L69) - it must be host-associated from USE PARAM/GLOBAL; the module-level I is shared state across these subroutines"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Usurf,Vsurf,Ubott,Vbott allocated @L128 and read in MOVE_TRACER (L513-529) but never assigned in this file - surface/bottom velocity fields must be filled elsewhere or remain undefined for LAYER_012=1,2 trackers"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "BROADCAST_XY: when IN_CELL is true on multiple ranks the highest rank index l wins (L470-477); npxs/npys gathered @L428-431 but never used; IDsend @L424 unused; commented MPI_Barrier @L440"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "TRACK_TIME_COUNT @L70 and FirstCallTrack @L78 declared/initialized but never used in this file; PLOT_INTV_TRACKING is read @L123 but the output cadence logic using it is not in this file (PLOT_COUNT_TRACKING only zeroed @L174)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Tracker file is re-read allocation (L125-127) occurs before the IF(.NOT.ALLOCATED(Sc)) guard (L136) - calling TRACER_INITIAL twice would re-ALLOCATE X_TRACK etc. without deallocation"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A8"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Search area convention: areas computed with vertex order such that clockwise order gives negative area (comment L183-184); containment requires area1,area2,area3>=0 (L259, L301)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A9"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "OUTPUT_TRACKING keeps units 8/9 open for the whole run; under PARALLEL only rank 0 writes but all ranks hold identical positions after BROADCAST_XY"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "MPI use-before-assignment defect: X_TRACK_ALL, Y_TRACK_ALL, and IN_CELL_ALL are populated only inside myid==0 blocks at L442-L466, but the selection loop at L470-L477 is outside any root guard and reads these automatic local arrays on every rank. Non-root ranks therefore branch on and copy uninitialized gathered arrays before the later scatter overwrites coordinates."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "MPI range/interface assumption: gather buffers are dimensioned NumberProcessor at L421-L426, while copy/fill/selection loops use px*py at L443, L453, L463, L471, L485, and L493. No local invariant establishes px*py==NumberProcessor; mismatch permits buffer overrun or leaves gathered ranks unexamined."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Input range gap: NumTracker is read without validation at L122 and immediately controls allocations at L125-L164 and loop bounds; malformed, zero, or negative counts and short per-tracker input are not checked locally."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

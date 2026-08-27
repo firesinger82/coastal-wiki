@@ -1,0 +1,212 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-004",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/fluxes.F",
+ "source_sha256": "349f400afcc35d62b681002fcb2417014c019793c713800710c70d522a6050c1",
+ "base_run_id": "reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6",
+ "audit_run_id": "reread20260728-code-FUNWAVE-004-codexaudit-20260826T022957Z-8833a3a8",
+ "base_record_file": "87252ada30770063aa59bf90c0ac7ec61770a0d7bc3782171fc6a6ab69d1e81a.json",
+ "audit_record_file": "87252ada30770063aa59bf90c0ac7ec61770a0d7bc3782171fc6a6ab69d1e81a.json",
+ "base_record_sha256_bytes": "12208297a3c7a7c0108d03ced7dab49565c78a0d56e9067b7751c93265c0569b",
+ "audit_record_sha256_bytes": "db0f04aa3a1bbdbea31ade382992ced257801345f4b0293a2f3c7cc5369e507c",
+ "base_finding_count": 10,
+ "audit_finding_count": 4,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "In CONSTRUCTION's non-CARTESIAN branch FyL=Gamma3*HyL*UyL*VyL*Gamma3 and FyR likewise (L649-650) multiply Gamma3 twice, inconsistent with GxL=HxL*UxL*VxL*Gamma3 (L576-577) and with the single-Gamma3 forms in CONSTRUCTION_HO_minmod (L1024-1025), CONSTRUCTION_HO (L1517-1518) and CONSTRUCTION_HO_MLP (L1946-1947) — apparent Gamma3^2 bug for spherical builds"
+   ],
+   "audit_member_text": [
+    "CONSTRUCTION의 non-CARTESIAN·non-ZALPHA y 횡운동량 flux만 L649-L650에서 Gamma3를 두 번 곱한다(FyL/FyR=Gamma3*Hy*Uy*Vy*Gamma3). 같은 파일의 대응 x flux L568-L569 및 다른 세 재구성의 spherical y flux L1024-L1025, L1517-L1518, L1946-L1947은 Gamma3가 한 번이어서 복붙 계수 중복으로 보인다."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "In CONSTRUCT_HO_X_MLP/Y_MLP, gamRtanth2=tanth2/gamR is evaluated before the abs(gamR)<smallv guard (L2000-2001, L2075-2076) and gamLtanth1=tanth1/gamL likewise (L2012-2013, L2087-2088): the division by a near-zero gam occurs before the reset, risking overflow/FPE; similarly gamL/gamR themselves divide before their guards (L1984-1989)"
+   ],
+   "audit_member_text": [
+    "MLP x 재구성은 TXP1/TXP3/delsol/gamR/gamL로 먼저 나눈 뒤에야 L1985, L1989, L1994, L1998, L2001, L2013에서 작은 분모를 검사한다(L1984-L2013). y 복제도 L2059-L2088에서 같은 순서다. trap-enabled 부동소수점에서는 후행 대입이 예외를 되돌릴 수 없고, 비트랩에서도 이미 Inf/NaN을 만든 뒤 덮는 구조여서 특이점 검사가 무력화된다."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Header block names the file 'FILE main.F' (L3) although this is fluxes.F — copy/paste artifact"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "CONSTRUCT_HO_X_minmod/Y_minmod take DX/DY arguments (L1045,L1163) that are never used in the reconstruction; CONSTRUCT_X/Y keep an unused Kappa argument (comments L717-719,L772-775); DelxU4/DelxV4/DelyV4/DelyU4 locals in CONSTRUCTION_HO_minmod (L820-821) are declared but unused there"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "CONSTRUCTION_HO_MLP (L1779,L1867) and CONSTRUCTION_WENO (L2139,L2214) construct Eta directly with no UseEtaScreen preprocessor variant, unlike CONSTRUCTION (L477-481) and CONSTRUCTION_HO_minmod/HO (L840-844,L1342-1346) — EtaScreen option silently unavailable for MLP/WENO paths"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "WENO_CONSTRUCT_X/Y take no MASK argument and apply no dry-cell fallback (L2301,L2392), unlike the minmod/MLP reconstructors; CONSTRUCTION_WENO exists only under CARTESIAN (L2118-2289) and the WENO scheme assumes constant dx (comments L2294-2295)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "MLP reconstructors read transverse neighbors Vin(I-1,J+1),Vin(I-1,J-1) etc. (L1993,L1997,L2068,L2072) without MASK checks although MASK is an argument (L1958,L2032) — MASK is unused in both MLP construct routines"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "FLUX_AT_INTERFACE_HLL declares locals SR,SL,FL,FR,UL,UR (L152) that are never used (the HLL work happens in subroutine HLL)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A8"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "HLL near-degenerate case divides by SMALL instead of (SR-SL) (L185-186), changing magnitude rather than limiting the flux — approximation behavior when SR is approximately SL"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A9"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Wave-speed ghost-strip copies (L381-401,L417-437) use nearest interior values with the in-code remark 'this does not really matter' (L380); correctness depends on downstream use of ghost interface speeds"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "비분산 실행에서 고차 보정 배열의 정의-사용 순서가 닫히지 않는다. 예를 들어 CONSTRUCTION_HO_minmod는 U4xL/V4xL을 DISPERSION일 때만 L850-L855에서 정의하지만 L860-L924에서 조건 없이 읽고, y 배열도 L948-L953에서만 정의한 뒤 L955-L1020에서 읽는다. 같은 구조가 CONSTRUCTION(L590-L604 대 L609-L664), CONSTRUCTION_HO(L1352-L1357 대 L1359-L1420; L1444-L1449 대 L1451-L1513), MLP(L1785-L1790 대 L1792-L1853; L1873-L1878 대 L1880-L1942), WENO(L2145-L2148 대 L2150-L2207; L2220-L2223 대 L2225-L2283)에 반복된다. Gamma1이 0이어도 미정의/NaN 배열과의 곱은 안전하지 않으므로 외부 초기화 보장이 없다면 use-before-assign이다."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "VANLEER_LIMITER는 B가 있을 때 L1288의 분모 ABS(A)+ABS(B)가 A=B=0이면 0이고, B가 없을 때 L1290의 분모 1+A가 A=-1이면 0인데 어느 경로에도 특이점 검사가 없다. 반면 실제 고차 재구성 본문 L1608-L1616/L1624-L1632는 SMALL 검사를 따로 하므로 독립 함수 인터페이스는 동일 입력에 안전하지 않다."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

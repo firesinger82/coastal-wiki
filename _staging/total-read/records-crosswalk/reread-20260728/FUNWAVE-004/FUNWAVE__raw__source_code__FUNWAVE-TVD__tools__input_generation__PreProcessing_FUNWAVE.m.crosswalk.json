@@ -1,0 +1,186 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-004",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/tools/input_generation/PreProcessing_FUNWAVE.m",
+ "source_sha256": "1aaca293f1bbb985c80655e2186d0647459bc92fb0ca50b640900b6c41306358",
+ "base_run_id": "reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6",
+ "audit_run_id": "reread20260728-code-FUNWAVE-004a-codexaudit-20260826T235047Z-4f05567c",
+ "base_record_file": "254f1a28fd882ce1c6d0cc97c0df277b668029126a6ca98ca19041b3b0b5a3a7.json",
+ "audit_record_file": "254f1a28fd882ce1c6d0cc97c0df277b668029126a6ca98ca19041b3b0b5a3a7.json",
+ "base_record_sha256_bytes": "8d594643e4102c6479392396e68df171e0b05ef65537574ba211017e337a608e",
+ "audit_record_sha256_bytes": "7c07322a0bd9facd19964b6cf597b786dcd189790762ebaa520a7edd44bdaf8a",
+ "base_finding_count": 6,
+ "audit_finding_count": 7,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "griddata leaves NaN outside the convex hull of input points; zb_domain init is NaN @L265 and no NaN check before writing DEP.txt @L391-405 — FUNWAVE behavior on NaN depths not addressed in this file"
+   ],
+   "audit_member_text": [
+    "griddata may return NaN where the target grid lies outside the input convex hull (L182, L460, L577). The DEM NaNs are copied into the full domain and output (L269-L278, L401); friction NaNs overwrite the initialized outside value in the real-domain block (L477-L480); obstacle NaNs survive round and are inserted at L583 and L608. No isfinite/fill check exists before plots or text output."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "DEP.txt/MANN.txt written with fprintf '%d ' (@L401,@L516) on floating-point values — MATLAB then prints full precision scientific notation for non-integers; whether intended over %f is unresolved (OBS.txt uses '%i ' @L642 on genuine integers)"
+   ],
+   "audit_member_text": [
+    "DEM and friction are interpolated continuous-valued fields (L182, L460), but their text writers use integer conversion '%d' at L401 and L516. This is inconsistent with depths such as 30.85 (L58) and friction 0.02 (L90) and can quantize or otherwise integer-format values instead of preserving the required real precision; the obstacle writer's '%i' at L642 is consistent only because that layer is rounded at L583."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "X_local = linspace(0, dx_cells*nx_extent_local, nx_extent_local) @L175 yields spacing dx*nx/(nx-1), slightly larger than dx_cells; same for y @L176 and domain vectors @L258-259 — off-by-one vs stated cell length, intent unresolved"
+   ],
+   "audit_member_text": [
+    "The script defines nx_extent_local=ceil(x_extent_local/dx_cells) and ny_extent_local analogously (L171-L172), but then creates exactly that many linspace samples from 0 through dx_cells*count (L175-L176). The actual adjacent spacing is dx_cells*count/(count-1), not dx_cells. The full-domain vectors repeat the same count/endpoint mismatch at L258-L259 while Mglob/Nglob are reported as nx_total/ny_total at L352-L355, so geometric coordinates, stated cell size, and array counts are not mutually consistent."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "cyclic-BC fill @L325-331: south rows use interpolatedVectors(:, i+ny_sponge_north-1) and north rows interpolatedVectors(:,i) — mapping direction (which end equals which edge) follows from interp1([0 1],[north south]) @L321 but the index arithmetic for equality of outermost rows is not obviously symmetric; verified only that both draw from the same vector family, cross-line L314-331"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "friction interpolation reuses X_local/Y_local from the DEM section (@L460) assuming friction UTM grid covers the same local domain; no coverage check"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "hard-coded site values (origin 282450/4575600, rotation 105.5, depth 30.85, Tp 14.2) are a specific case study left as defaults — which site is not stated in the file"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Each transition row uses linspace(depth_wavemaker,depths_edge_offshore(i),nx_interpolation) at L236-L238, including both endpoint values in nx_interpolation samples. The immediately adjacent measured-domain first column is depths_edge_offshore (L228, L269-L270), so the edge value is duplicated across the final transition sample and first measured sample while nx_interpolation was computed as a cell count at L224; this is another location/extent off-by-one."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "interpolatedVectors is allocated with shape [nx_total,n_vectors_cyclic] at L317 and each column is one x-profile (L320-L322), but L326 and L330 assign an nx_total-by-1 column directly into a 1-by-nx_total row slice of zb_domain. MATLAB does not make these orientations conformable for matrix subscript assignment; the cyclic path needs an explicit transpose or a row-oriented temporary."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The finite-depth wavelength loop at L208-L212 has neither an iteration cap nor validation of Tp_wavemaker/depth_wavemaker. Nonconvergent finite inputs can loop indefinitely; NaN inputs make the comparison false and silently propagate NaN into later ceil-based extents."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The cyclic construction assumes ny_sponge_south+ny_sponge_north-1 is positive (L314) and then indexes interpolatedVectors using both sponge counts (L325-L330). Zero or very small configured sponge thicknesses can produce zero/negative allocation extents or invalid indices, despite the console instruction that cyclic FUNWAVE sponge thicknesses should be set to zero referring only to the later model input (L373-L377), not guarding preprocessing settings."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}
