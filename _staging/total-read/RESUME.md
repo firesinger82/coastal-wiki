@@ -1,5 +1,10 @@
 # 세션 재개 지침 (다음 세션에서 이것부터 읽을 것)
 
+> ★2026-08-27 최신: **code·note 재판독 310/310 완결** + **맹검 감사 269/269 전수 완료**(Codex).
+> 병합 설계 확정(오버레이+delta 승격). **다음 = crosswalk 파일럿(EFDC-000)** — 진입점은
+> [CROSSWALK-HANDOFF.md](CROSSWALK-HANDOFF.md). 감사·설계 경위 [SESSION-LOG.md](SESSION-LOG.md) 2026-08-26~27,
+> [MERGE-PLAN-20260827.md](MERGE-PLAN-20260827.md), [workorders/WO-20260728-amendment-04.md](workorders/WO-20260728-amendment-04.md).
+
 > 상태 스냅샷: **2026-07-28** / semantic 후보 canonical key **22,269 / 71,143 (31.3%)** (중복 640행 미해소 — canonical 선택은 감사 6단계에서)
 >
 > ⚠️ **처분 실행(2026-07-28, 사용자 승인)**: [METHOD-AUDIT-20260724.md](METHOD-AUDIT-20260724.md) §2 처분안 실행 완료 —

@@ -1,5 +1,24 @@
 # 전수 판독 세션 로그 — 2026-07-19 ~ 07-28
 
+## 2026-08-26~27 세션 — 맹검 감사 269/269 전수 완료 + 병합 설계 확정
+
+- **A. 맹검 감사(WO §6)**: Codex `gpt-5.6-sol` 가 1차(Claude) 레코드 미열람 맹검으로 code+note
+  269파일 전량 독립 재판독. 표본(10%) 대신 사용자 결정으로 **전수**. 게이트 재사용, 감사 run
+  (`*-codexaudit-*`)은 1차와 물리 분리. 30분 크론 + `audit_maintain.sh` 스트림 유지(3~5 병렬),
+  FW004 롱테일은 004a/b/c 3분할 병렬로 가속. 커밋 813b896.
+  - 판정 기준(보정, 사용자 승인): material 정합성 결함만 불합격 사유. 확정 clean miss **1건**
+    — EFDC aaefdc.f90 DETTMP 특이점검사 무력화(역수 후 ==0, Claude 누락, 소스검증).
+    나머지 Codex 후보는 대부분 Claude 1차와 겹침 → **Claude 판독 강함 검증**. note/doc 통과.
+  - 운영 실측: Codex 컨텍스트 작아 1~2파일/invocation → 많은 이어받기. 세션 크론이 야간 13h
+    조용히 정지(머신·세션 정상인데 in-memory 스케줄러 멈춤) — 장기 무인은 클라우드 스케줄 권장.
+- **B. 병합 설계**: 전량 union→canonical 초안 → Codex 적대검증(HIGH 1·MED 3, 'precision 저하:
+  확정 delta 1건 대비 미판정 2,600건 유입, 소비자 2벤더검증 오해') → 사용자 결정으로
+  **오버레이+delta 승격** 채택. canonical=Claude 유지, 감사층 병존, 원문확인 delta만 supplement,
+  전량 union은 검색 오버레이, 구조필드 병합 안 함. 커밋 bb9737e.
+- **다음**: crosswalk 실행 미착수. 진입점 CROSSWALK-HANDOFF.md(파일럿 EFDC-000).
+  이후 대형 3모델(ADCIRC/ROMS/Delft3D) 별건.
+
+
 ## 2026-08-24~25 세션 — code·note·doc-002 재판독 **310/310 완결**
 
 - 08-13 에 착수한 결함 처분 재판독을 순차 판독(사용자 지시: 병렬 금지)으로 완주.
