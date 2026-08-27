@@ -1,0 +1,3200 @@
+{
+ "shard": "FUNWAVE-002",
+ "instructions_ref": "see subagent prompt",
+ "files": [
+  {
+   "file_token": "F00",
+   "lang": ".py",
+   "listX": [
+    {
+     "id": "F00-X0",
+     "text": "`dep` is loaded only once at L23 and mutated under each frame mask at L58. Dry cells from any earlier frame remain NaN in later frames even if later masks mark them wet, so depth masking accumulates across the frame loop."
+    },
+    {
+     "id": "F00-X1",
+     "text": "There is no figure clear/close or axes reset in the loop L44-L93. Repeated subplot calls reuse axes while each iteration adds pcolor/contour/quiver artists and new colorbar axes, so multi-frame runs accumulate graphics state and colorbars and can distort later saved images and memory use."
+    },
+    {
+     "id": "F00-X2",
+     "text": "Both panels restrict x to `m*dx/2` at L67 and L90 although arrays span x=0 through approximately m*dx at L31; the reason for discarding the second half of the domain is unstated."
+    },
+    {
+     "id": "F00-X3",
+     "text": "HOME is indexed directly at L13 (KeyError if absent), input conversion has no validation, and array shapes are not checked before common masking/plotting."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F00-Y0",
+     "text": "filename says eta_vor but no vorticity is computed or plotted (no curl equivalent in this port); only eta and depth+quiver panels exist"
+    },
+    {
+     "id": "F00-Y1",
+     "text": "dep is NaN-masked in-place per snapshot (L58) and never reloaded, accumulating holes across frames like the MATLAB siblings"
+    },
+    {
+     "id": "F00-Y2",
+     "text": "plt.show() inside the loop (L93) blocks until each figure window is closed in interactive backends; frames also stack because no clf is called after subplotting"
+    },
+    {
+     "id": "F00-Y3",
+     "text": "from matplotlib.cm import jet (L10) fails on matplotlib >= 3.9 where cm.jet was removed from that namespace; version requirement unstated"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F00-X0",
+     "F00-Y1"
+    ],
+    [
+     "F00-X1",
+     "F00-Y2"
+    ],
+    [
+     "F00-X2",
+     "F00-Y2"
+    ],
+    [
+     "F00-X3",
+     "F00-Y3"
+    ]
+   ]
+  },
+  {
+   "file_token": "F01",
+   "lang": ".F",
+   "listX": [
+    {
+     "id": "F01-X0",
+     "text": "the linear side slope makes depth decrease away from the channel and can go negative (dry land) for large abs(Y); no clipping is applied (L31-L32)"
+    },
+    {
+     "id": "F01-X1",
+     "text": "X and Y arrays are computed but only Y is used for the depth formula and neither is written out"
+    },
+    {
+     "id": "F01-X2",
+     "text": "the expected contents/order of bathy_param.txt are defined only implicitly by the READ order (L9-L15); no comments document units"
+    }
+   ],
+   "listY": [
+    {
+     "id": "F01-Y0",
+     "text": "Input-to-allocation preconditions are unchecked: Mglob and Nglob read at L9-L10 are used as allocation extents at L18 and loop bounds at L20-L29 without positivity or allocation-status checks; malformed or nonpositive values fail or produce empty output."
+    },
+    {
+     "id": "F01-Y1",
+     "text": "The fixed format at L41 contains 9000 f12.6 descriptors while L39 may supply Mglob values. For Mglob above 9000, format reversion can split one intended grid row across output records, breaking the depth.txt row interface."
+    },
+    {
+     "id": "F01-Y2",
+     "text": "Depth is reduced linearly outside the channel at L30-L32 with no lower bound. Large |Y|, slope, or small dep_channel can make DEPTH negative, but the file neither rejects nor documents that regime."
+    },
+    {
+     "id": "F01-Y3",
+     "text": "X is allocated and filled at L18 and L23 but never consumed or written; DX read at L11 therefore has no effect on depth.txt."
+    },
+    {
+     "id": "F01-Y4",
+     "text": "All reads and opens at L7-L16 and L37 omit IOSTAT/ERR handling, so missing, short, or nonnumeric parameter input is not distinguished before dependent calculations."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F01-X0",
+     "F01-Y0"
+    ],
+    [
+     "F01-X0",
+     "F01-Y2"
+    ],
+    [
+     "F01-X0",
+     "F01-Y4"
+    ],
+    [
+     "F01-X2",
+     "F01-Y0"
+    ],
+    [
+     "F01-X2",
+     "F01-Y3"
+    ],
+    [
+     "F01-X2",
+     "F01-Y4"
+    ]
+   ]
+  },
+  {
+   "file_token": "F02",
+   "lang": ".F",
+   "listX": [
+    {
+     "id": "F02-X0",
+     "text": "Even Nglob produces an off-center Y range at L24; the absolute-value bank rule then gives unequal side extents/depths."
+    },
+    {
+     "id": "F02-X1",
+     "text": "Mglob values beyond the 9000 descriptors at L41 can cause format reversion and split a J row across records."
+    },
+    {
+     "id": "F02-X2",
+     "text": "Dimensions, spacings, width, slope, and resulting depth are unvalidated; I/O/allocation statuses are unchecked."
+    },
+    {
+     "id": "F02-X3",
+     "text": "Three case-local byte-identical copies require synchronized fixes."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F02-Y0",
+     "text": "bathy_param.txt column meanings are fixed only by read order (L9-15); no comment in this file documents units of DX/DY/slope"
+    },
+    {
+     "id": "F02-Y1",
+     "text": "FORMAT 9000f12.6 (L41) caps one output record at 9000 values while the WRITE implied loop runs I=1,Mglob (L39); behavior for Mglob>9000 (record wrapping) is not addressed in this file"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F02-X1",
+     "F02-Y1"
+    ]
+   ]
+  },
+  {
+   "file_token": "F03",
+   "lang": ".py",
+   "listX": [
+    {
+     "id": "F03-X0",
+     "text": "ax created at L34 is never used; all plotting goes through plt state calls"
+    },
+    {
+     "id": "F03-X1",
+     "text": "plt.hold(True) (L41) was removed in matplotlib 3.0, so the script targets an older matplotlib; version requirement is not stated"
+    },
+    {
+     "id": "F03-X2",
+     "text": "the load path directory is spelled 'Intel_Shoal' (L10) versus the case name inlet_shoal; output filename has a double underscore 'inlet__shoal_bathy.png' (L54)"
+    }
+   ],
+   "listY": [
+    {
+     "id": "F03-Y0",
+     "text": "Execution-stopping API mismatch: L41 calls plt.hold(True), but the script imports pyplot directly at L5 and defines no hold shim. This legacy call is absent in modern Matplotlib, so execution can raise AttributeError before overlays, colorbar, and save at L44-L54; plotting already holds by default and the call is unnecessary."
+    },
+    {
+     "id": "F03-Y1",
+     "text": "Likely copy/paste path defect: every title/comment/output describes inlet_shoal (L1 and L54), while the hard-coded input directory at L10 is named Intel_Shoal. If the directory follows the case name, the only input fails before plotting."
+    },
+    {
+     "id": "F03-Y2",
+     "text": "Producer/consumer orientation mismatch with mkxyz_shoal_inlet_Uchannel.f: this script maps loaded rows to y and columns to x at L13-L18, but that generator writes dep_shoal_inlet.txt with outer i rows and inner j columns. The plot at L37 therefore swaps the generated physical axes and also discards its centered/shifted coordinates."
+    },
+    {
+     "id": "F03-Y3",
+     "text": "Range assumptions are unchecked: overlays require x through 260 at L21-L25 and labels use y=1000 and 1200 at L45/L47, but no comparison with x/y bounds occurs before plotting."
+    },
+    {
+     "id": "F03-Y4",
+     "text": "The hard-coded user-specific absolute path at L10 has no argument, configuration, or existence check; the double underscore in the output name at L54 is not explained by the file."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F03-X0",
+     "F03-Y2"
+    ],
+    [
+     "F03-X1",
+     "F03-Y0"
+    ],
+    [
+     "F03-X1",
+     "F03-Y2"
+    ],
+    [
+     "F03-X1",
+     "F03-Y3"
+    ],
+    [
+     "F03-X2",
+     "F03-Y0"
+    ],
+    [
+     "F03-X2",
+     "F03-Y1"
+    ],
+    [
+     "F03-X2",
+     "F03-Y2"
+    ],
+    [
+     "F03-X2",
+     "F03-Y4"
+    ]
+   ]
+  },
+  {
+   "file_token": "F04",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F04-X0",
+     "text": "Producer/consumer orientation mismatch with the preceding bathymetry generator: this file assumes matrix rows are y and columns are x at L3-L7. mkxyz_shoal_inlet_Uchannel.f writes dep_shoal_inlet.txt with outer i records and inner j values (its L145-L149), so loading yields rows=i and columns=j. Consequently this script maps the generator's x index onto y and its y index onto x at L6-L7/L19, transposing the physical axes without transposing dep."
+    },
+    {
+     "id": "F04-X1",
+     "text": "Coordinate-origin mismatch: L6-L7 discard the generator's centered, y-shifted physical coordinates and replace them by zero-origin index coordinates. The overlays and annotations at L9-L12 and L25-L28 therefore cannot be tied to the x/y files produced alongside dep from this file alone."
+    },
+    {
+     "id": "F04-X2",
+     "text": "No dimension or file-shape check precedes y(end) at L10/L12 or pcolor at L19; an empty or differently oriented depth file changes overlay geometry silently or errors downstream."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F04-Y0",
+     "text": "y_sponge and y_wavemaker (L10, L12) use y(end) so both rectangles span the full y extent; the sponge x-range 0-180 and wavemaker x-range 240-260 are hard-coded and their consistency with the case input.txt is not verifiable from this file"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F04-X0",
+     "F04-Y0"
+    ],
+    [
+     "F04-X1",
+     "F04-Y0"
+    ],
+    [
+     "F04-X2",
+     "F04-Y0"
+    ]
+   ]
+  },
+  {
+   "file_token": "F05",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F05-X0",
+     "text": "this commented variant loads dep.out (L16) while the sibling plot_bathy.m loads dep_shoal_inlet.txt; which filename actually exists under ../bathy/ is not determinable from this file"
+    },
+    {
+     "id": "F05-X1",
+     "text": "fdir assignment at L9 lacks a trailing semicolon so it echoes to the console; whether intentional (tutorial display) is not stated"
+    }
+   ],
+   "listY": [
+    {
+     "id": "F05-Y0",
+     "text": "Geometry-range assumption: fixed sponge/wavemaker x coordinates through 260 at L26/L30 and text positions y=1000/1200 at L49/L51 are not checked against x(end) and y(end) derived from the loaded matrix at L22-L23. Small or differently spaced domains silently place overlays or labels outside the plot."
+    },
+    {
+     "id": "F05-Y1",
+     "text": "The script assumes dep.out rows map to y and columns map to x at L17-L23 and that both spacings are exactly 2 m at L20-L21; neither orientation nor spacing is read from the data or validated."
+    },
+    {
+     "id": "F05-Y2",
+     "text": "Only dep.out is loaded at L16 even though the neighboring bathymetry workflow emits separately shifted x/y coordinate files; this script has no path for preserving non-zero origins or nonuniform coordinates."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F05-X0",
+     "F05-Y0"
+    ],
+    [
+     "F05-X0",
+     "F05-Y1"
+    ],
+    [
+     "F05-X0",
+     "F05-Y2"
+    ]
+   ]
+  },
+  {
+   "file_token": "F06",
+   "lang": ".py",
+   "listX": [
+    {
+     "id": "F06-X0",
+     "text": "dep is allocated as a full m x m array (L19) though only column 0 is read/written (L23, L25, L46) — mirrors the MATLAB zeros(m) square-matrix quirk of plot_solitary.m at the cost of an unnecessary 1024x1024 array"
+    },
+    {
+     "id": "F06-X1",
+     "text": "the slope condition compares the integer index i to the position Xslp in meters (if i < Xslp, L22) — equivalent to comparing x[i] only because dx=1.0 (L12); would misplace the toe for other dx"
+    },
+    {
+     "id": "F06-X2",
+     "text": "the plotted eta is eta[0,:] (first row, L46), implying the loaded eta_ files are 2-D with the 1-D profile in row 0; file layout is not documented here"
+    },
+    {
+     "id": "F06-X3",
+     "text": "wid (L31) and length (L32) are assigned but never used — figure size is hardcoded as figsize=(7,8) (L36); comment '# Locate Wavemaker and sponge' (L29) has no associated code"
+    },
+    {
+     "id": "F06-X4",
+     "text": "time in the title is files[num]*10 (L52), asserting a 10 s output interval not read from any input"
+    }
+   ],
+   "listY": [
+    {
+     "id": "F06-Y0",
+     "text": "The slope condition compares array index `i` to physical coordinate Xslp at L22, while the actual coordinate is x[i]=i*dx at L18. It only locates the toe correctly because dx currently equals 1; changing dx moves the physical toe to Xslp*dx rather than Xslp."
+    },
+    {
+     "id": "F06-Y1",
+     "text": "A 1-D bathymetry is stored as an m-by-m matrix at L19 even though only column 0 is written/read (L23-L27,L46), consuming quadratic memory and leaving 1023 unused constant-depth columns. The MATLAB version's analogous square allocation caused multi-series plotting; this port avoids that only by explicitly selecting DEP[:,0]."
+    },
+    {
+     "id": "F06-Y2",
+     "text": "np.loadtxt returns a 1-D array for a single-row eta file, but L46 unconditionally indexes eta[0,:], which fails for that common shape; there is no shape normalization/check."
+    },
+    {
+     "id": "F06-Y3",
+     "text": "The absolute path contains both `surface_wave_1d` and `surface_wave_1D` with conflicting case, which is fragile on case-sensitive filesystems. `wid` and `length` are unused, and displayed time remains a hard-coded file-index*10 mapping."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F06-X0",
+     "F06-Y0"
+    ],
+    [
+     "F06-X0",
+     "F06-Y1"
+    ],
+    [
+     "F06-X0",
+     "F06-Y2"
+    ],
+    [
+     "F06-X1",
+     "F06-Y0"
+    ],
+    [
+     "F06-X1",
+     "F06-Y1"
+    ],
+    [
+     "F06-X2",
+     "F06-Y1"
+    ],
+    [
+     "F06-X2",
+     "F06-Y2"
+    ],
+    [
+     "F06-X3",
+     "F06-Y1"
+    ],
+    [
+     "F06-X4",
+     "F06-Y1"
+    ],
+    [
+     "F06-X4",
+     "F06-Y2"
+    ]
+   ]
+  },
+  {
+   "file_token": "F07",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F07-X0",
+     "text": "Masking is applied to eta, baseline dep, u, and v at L57-L60, but not to concentration `ch` or depth change `depp`, which was computed before masking at L52-L54. Thus the second and third panels can display dry-cell/sentinel values while the first panel and arrows hide them—an inconsistent mask interface."
+    },
+    {
+     "id": "F07-X1",
+     "text": "`log10(ch)` at L82 has no positive-value check; zero concentration yields -Inf and negative/sentinel values yield complex results, yet the finite caxis [-1,1] at L83 assumes valid logarithms."
+    },
+    {
+     "id": "F07-X2",
+     "text": "Baseline `dep` is destructively masked inside the loop at L58; the current single-frame range hides accumulation, but any multi-frame range would retain earlier dry-mask NaNs and also compute later depp at L54 against an already-corrupted baseline."
+    },
+    {
+     "id": "F07-X3",
+     "text": "Fixed ax=[0,249,0,199] is not derived from n,m,dx,dy, and no cross-array shape check precedes arithmetic/masking."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F07-Y0",
+     "text": "depp is computed at L54 before dep is NaN-masked at L58, so panel 3 shows bed change everywhere including masked dry cells; the ordering differs from the eta masking and may be intentional or an oversight"
+    },
+    {
+     "id": "F07-Y1",
+     "text": "concentration ch is plotted unmasked (no ch(mask<1)=NaN line, unlike the vessel scripts which mask ch); log10(ch) yields -Inf for zero concentration"
+    },
+    {
+     "id": "F07-Y2",
+     "text": "concentration unit label g/l (L85) with caxis [-1 1] implies 0.1-10 g/l displayed; conversion assumptions are not stated in the file"
+    },
+    {
+     "id": "F07-Y3",
+     "text": "dep masked in-place (L58) accumulates across frames when a multi-frame range is used"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F07-X0",
+     "F07-Y0"
+    ],
+    [
+     "F07-X0",
+     "F07-Y3"
+    ],
+    [
+     "F07-X1",
+     "F07-Y2"
+    ],
+    [
+     "F07-X2",
+     "F07-Y0"
+    ],
+    [
+     "F07-X2",
+     "F07-Y3"
+    ]
+   ]
+  },
+  {
+   "file_token": "F08",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F08-X0",
+     "text": "Parallel-list interface is unchecked: nfile drives the loop at L18/L27 while labels are indexed from the independently defined min cell array at L19/L40. Any length or ordering change to one list yields an indexing failure or silently wrong time label; no time is derived from the output itself."
+    },
+    {
+     "id": "F08-X1",
+     "text": "The variable name min at L19 shadows MATLAB's built-in min for the remainder of the workspace, creating a latent call-interface failure if this script is extended or run interactively without clearing again."
+    },
+    {
+     "id": "F08-X2",
+     "text": "Dimension/orientation assumption: x/y lengths come from dep_shoal_inlet.txt at L4-L10, but the plotted eta and mask are loaded from another directory at L30-L31. There is no check that eta, mask, and dep share shape or orientation before mask indexing at L33 and pcolor at L37. The preceding generator writes the bathymetry with outer i rows and inner j columns, making the x/y interpretation especially suspect."
+    },
+    {
+     "id": "F08-X3",
+     "text": "The only image output is commented at L61, so the figure configured and rendered at L21-L60 is not persisted despite the apparent postprocessing workflow."
+    },
+    {
+     "id": "F08-X4",
+     "text": "Hard-coded user directory at L2 and overlay/label positions through x=300 and y=1200 at L12-L15/L44-L48 are not validated against the loaded domain."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F08-Y0",
+     "text": "variable name min (L19) shadows the MATLAB builtin min within this script"
+    },
+    {
+     "id": "F08-Y1",
+     "text": "time labels '200' and '300' sec are asserted for snapshots 5 and 7 (L18-L19, L40) but the output interval that would justify them is not in this file"
+    },
+    {
+     "id": "F08-Y2",
+     "text": "the print command (L61) and colorbar (L56-L57) are commented out, so the script displays but saves nothing"
+    },
+    {
+     "id": "F08-Y3",
+     "text": "commented print filename suffix _irr (L61) suggests an irregular-wave run; not confirmable from this file"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F08-X0",
+     "F08-Y0"
+    ],
+    [
+     "F08-X0",
+     "F08-Y1"
+    ],
+    [
+     "F08-X1",
+     "F08-Y0"
+    ],
+    [
+     "F08-X1",
+     "F08-Y1"
+    ],
+    [
+     "F08-X2",
+     "F08-Y1"
+    ],
+    [
+     "F08-X3",
+     "F08-Y0"
+    ],
+    [
+     "F08-X3",
+     "F08-Y1"
+    ],
+    [
+     "F08-X3",
+     "F08-Y2"
+    ],
+    [
+     "F08-X3",
+     "F08-Y3"
+    ],
+    [
+     "F08-X4",
+     "F08-Y0"
+    ],
+    [
+     "F08-X4",
+     "F08-Y1"
+    ]
+   ]
+  },
+  {
+   "file_token": "F09",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F09-X0",
+     "text": "time labels '200'/'400'/'600' sec for snapshots 40/80/120 imply a 5 s output interval, unlike the multi_vessel plot_wave.m which labels the same snapshot numbers as 80/160/240 sec; neither interval is verifiable from these scripts alone"
+    },
+    {
+     "id": "F09-X1",
+     "text": "concentration plotted linearly as C (g/L) caxis [0 1.2] (L64-L65, L69) whereas the multi_vessel script converts with 2680*1000 to mg/L and takes log10; unit convention difference unexplained"
+    },
+    {
+     "id": "F09-X2",
+     "text": "variable min shadows the builtin; tight_subplot is an external dependency"
+    }
+   ],
+   "listY": [
+    {
+     "id": "F09-Y0",
+     "text": "Displayed times are a separate hand-maintained string array `min` (L20,L54) rather than derived from nfile (L18). The current pairs imply 5 seconds per output index, but no cadence parameter or length-equality check ties the two arrays together; edits can silently mislabel frames or index beyond the labels."
+    },
+    {
+     "id": "F09-Y1",
+     "text": "The variable name `min` at L20 shadows MATLAB's built-in `min` for the remainder of the workspace/script, which can break later added minimum calculations."
+    },
+    {
+     "id": "F09-Y2",
+     "text": "No shape checks ensure dep, eta, mask, and ch conform before mask indexing and mirrored assignments. Fixed axes are not derived from M,N,dx,dy."
+    }
+   ],
+   "candidate_pairs": []
+  },
+  {
+   "file_token": "F10",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F10-X0",
+     "text": "Wet cells with CH=0 pass the mask at L41 but become -Inf in `log10(CH*2680*1000.0)` at L69; negative/sentinel concentrations produce non-real/NaN values. No positivity floor or invalid-value mask supports the finite [0,2.999] color range."
+    },
+    {
+     "id": "F10-X1",
+     "text": "Displayed times are stored separately in `min` (L20,L58) instead of derived from nfile (L18); no cadence parameter or array-length check prevents silent mislabeling. The name `min` also shadows MATLAB's built-in minimum function."
+    },
+    {
+     "id": "F10-X2",
+     "text": "The only print statement is commented at L89, so despite the file's batch-like construction it produces no image file unless run interactively and manually saved."
+    },
+    {
+     "id": "F10-X3",
+     "text": "The absolute external-drive path is unchecked; field shapes and fixed plot axes are not validated against the loaded grid."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F10-Y0",
+     "text": "byte-identical duplicate of multi_vessel_morphology/plot_wave.m; in this directory the fdir target matches the case name, suggesting this is the original and the multi_vessel copy is the stale one — not decidable from file contents alone"
+    },
+    {
+     "id": "F10-Y1",
+     "text": "tight_subplot is required but, unlike the cohesive case directory, no copy is co-located here as far as this file shows; 2680*1000 mg/L conversion provenance unstated; variable min shadows the builtin"
+    }
+   ],
+   "candidate_pairs": []
+  },
+  {
+   "file_token": "F11",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F11-X0",
+     "text": "Generation coordinates start at x=-11,y=1 (L23-L24), but diagnostic coordinates restart at x=0,y=0 (L56-L57), shifting the displayed feature coordinates by +11 m and -1 m."
+    },
+    {
+     "id": "F11-X1",
+     "text": "The disabled symmetry edit at L35 selects yc index ncell/2=1 for ncell=2, which is the y=0 edge center rather than the central y=100 entry at MATLAB index 2; if central symmetry breaking is intended, this is off by one."
+    },
+    {
+     "id": "F11-X2",
+     "text": "The saved matrix contains no coordinate metadata, so the intended origin convention cannot be resolved locally."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F11-Y0",
+     "text": "byte-identical duplicate of rip_tracking/bathy/makebath.m; which case the parameters (ncell=2, xcell=60, 8 m cap) were originally tuned for cannot be determined from the file"
+    },
+    {
+     "id": "F11-Y1",
+     "text": "the commented symmetry-breaking line yc(ncell/2) (L35) would address yc(1) for ncell=2; xcell=60 places the domain end at x=300 while the Gaussian channel sits at xc=100 with sigma^2=2500 — see rip_tracking record for the same observations"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F11-X1",
+     "F11-Y1"
+    ]
+   ]
+  },
+  {
+   "file_token": "F12",
+   "lang": ".py",
+   "listX": [
+    {
+     "id": "F12-X0",
+     "text": "depp computed before dep is NaN-masked (L54 vs L58) — same ordering as the MATLAB sibling; dep masked in-place accumulates across frames without reload"
+    },
+    {
+     "id": "F12-X1",
+     "text": "ch is plotted unmasked and np.log10(ch) (L86) produces -inf/warnings for zero concentration"
+    },
+    {
+     "id": "F12-X2",
+     "text": "the axis window fraction 7*m*dx/9 (L69, L103, L114) crops the right 2/9 of the domain; rationale not stated"
+    },
+    {
+     "id": "F12-X3",
+     "text": "plt.show() in the loop (L126) blocks per frame; figures are not cleared between snapshots"
+    },
+    {
+     "id": "F12-X4",
+     "text": "from matplotlib.cm import jet (L10) incompatible with matplotlib >= 3.9"
+    }
+   ],
+   "listY": [
+    {
+     "id": "F12-Y0",
+     "text": "`depp` is calculated at L54 before current masking, while only eta, baseline dep, u, and v are masked at L57-L60; concentration and evolving depth/depth change remain unmasked, so dry/sentinel values appear in panels 2 and 3 while panel 1 and arrows hide them."
+    },
+    {
+     "id": "F12-Y1",
+     "text": "Baseline `dep` is mutated to NaN at L58 and never restored. On the next frame, depp=dep1-dep at L54 already inherits all historical dry NaNs, and further masking accumulates, making multi-frame depth changes history-dependent."
+    },
+    {
+     "id": "F12-Y2",
+     "text": "`np.log10(ch)` at L86 lacks a positivity/missing-value guard; zeros become -Inf and negatives become NaN, inconsistent with the finite [-1,1] display range."
+    },
+    {
+     "id": "F12-Y3",
+     "text": "There is no figure/axes clear or close inside L41-L126, so artists and newly created colorbar axes accumulate across frames."
+    },
+    {
+     "id": "F12-Y4",
+     "text": "All panels crop x to 7/9 of the loaded domain at L69,L103,L114 without explanation; HOME, inputs, file existence, and cross-array shapes are unvalidated."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F12-X0",
+     "F12-Y0"
+    ],
+    [
+     "F12-X0",
+     "F12-Y1"
+    ],
+    [
+     "F12-X1",
+     "F12-Y2"
+    ],
+    [
+     "F12-X2",
+     "F12-Y4"
+    ],
+    [
+     "F12-X3",
+     "F12-Y3"
+    ]
+   ]
+  },
+  {
+   "file_token": "F13",
+   "lang": ".f",
+   "listX": [
+    {
+     "id": "F13-X0",
+     "text": "Range defect across L21, L76-L87, and L97: for 0<y<100 the slope branch at L77 produces negative dep. Outside abs(x)<=150 the channel branch at L80-L83 does not replace it, and the basin branch begins only at y>=100 at L85. The later min(dep,h) at L97 preserves the negative value. depmin=0.002 at L7 is never applied, so a substantial grid region is emitted with negative depth."
+    },
+    {
+     "id": "F13-X1",
+     "text": "Dead configuration/interface mismatch: slope, breakwater_length, y_break, x_break, width_inlet, and depmin are assigned at L7-L8, L13-L15, and L26 but never used. Breakwater placement instead uses literal index ranges 412:612 and 300:301 at L111-L112. With the coordinate transform at L20-L21 those rows lie near y=-163 to -161 rather than the configured y_break=-150."
+    },
+    {
+     "id": "F13-X2",
+     "text": "Dimension parameter hazard: m and n are presented as parameters at L1, but obstacle loops unconditionally access i=412:612 and j=300:301 at L111-L125. Reducing either parameter below those maxima causes out-of-bounds access; no range check connects the interface values to the hard-coded indices."
+    },
+    {
+     "id": "F13-X3",
+     "text": "Declared arrays cori and dep_swan at L2 are never assigned or written, and breakwater_length/width_inlet/slope controls are similarly inactive, leaving their intended outputs or geometry effects unresolved from this file."
+    },
+    {
+     "id": "F13-X4",
+     "text": "The output loops use i as the record index and j as the inner list at L134-L167, so each file is m rows by n columns despite arrays being declared (m,n); the consuming orientation is not declared in this file."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F13-Y0",
+     "text": "declared arrays cori and dep_swan (L2) are never assigned or written"
+    },
+    {
+     "id": "F13-Y1",
+     "text": "constants depmin (L7), slope (L8), breakwater_length (L13), y_break (L14), x_break (L15), width_inlet (L26) are defined but never used; the breakwater extent is instead hard-coded as index ranges i=412,612 and j=300,301 (L111-L112, L120-L121)"
+    },
+    {
+     "id": "F13-Y2",
+     "text": "hard-coded breakwater index span i=412..612 covers 200 cells = 400 m at dx=2, numerically matching the unused breakwater_length=400.0 (L13), but the file does not state this relation"
+    },
+    {
+     "id": "F13-Y3",
+     "text": "format 3000f12.3 (L171) allows up to 3000 values per record while only n=512 (rows write j=1,n) are written; commented-out tmp.txt block at L65-L69 wrote h with i=1,m=1024 per record"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F13-X0",
+     "F13-Y0"
+    ],
+    [
+     "F13-X0",
+     "F13-Y1"
+    ],
+    [
+     "F13-X0",
+     "F13-Y2"
+    ],
+    [
+     "F13-X1",
+     "F13-Y0"
+    ],
+    [
+     "F13-X1",
+     "F13-Y1"
+    ],
+    [
+     "F13-X1",
+     "F13-Y2"
+    ],
+    [
+     "F13-X2",
+     "F13-Y0"
+    ],
+    [
+     "F13-X2",
+     "F13-Y1"
+    ],
+    [
+     "F13-X3",
+     "F13-Y0"
+    ],
+    [
+     "F13-X3",
+     "F13-Y1"
+    ],
+    [
+     "F13-X4",
+     "F13-Y3"
+    ]
+   ]
+  },
+  {
+   "file_token": "F14",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F14-X0",
+     "text": "`dep` is loaded once before the frame loop at L5, then destructively set to NaN under each frame's mask at L33. A cell dry in any early frame remains NaN in all later frames even if it becomes wet, so the depth panel accumulates the union of historical dry masks rather than showing the current mask."
+    },
+    {
+     "id": "F14-X1",
+     "text": "The two caxis calls for the depth subplot conflict: L75 sets [-12,0], then L80 overwrites it with [-12,2.5] on the same axes without intervening axes selection."
+    },
+    {
+     "id": "F14-X2",
+     "text": "The file does not validate that u, v, eta, mask, and dep dimensions agree before shared masking/curl operations (L27-L57)."
+    },
+    {
+     "id": "F14-X3",
+     "text": "`w_ang` and `icount` are calculated but never used (L21-L24,L57). Interactive nstart/nend are unvalidated, so reversed or nonexistent output ranges yield no plots or load failures."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F14-Y0",
+     "text": "dep is masked in-place with the first snapshot's mask (L33) and never reloaded, so later snapshots inherit accumulated NaN holes from all previous masks"
+    },
+    {
+     "id": "F14-Y1",
+     "text": "caxis for panel 3 is set to [-12 0] (L75) then overridden to [-12 2.5] (L80); the intended range is ambiguous"
+    },
+    {
+     "id": "F14-Y2",
+     "text": "the vorticity panel uses time-averaged umean/vmean (L27-L28) while panel 1 shows instantaneous eta; the mixing of averaged and instantaneous fields is by design of the output but not commented"
+    },
+    {
+     "id": "F14-Y3",
+     "text": "the dashed line at x=140 (L67) presumably marks the bar/rip-channel location; derivation not in this file"
+    },
+    {
+     "id": "F14-Y4",
+     "text": "icount (L21, L24) is incremented but unused"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F14-X0",
+     "F14-Y0"
+    ],
+    [
+     "F14-X0",
+     "F14-Y2"
+    ],
+    [
+     "F14-X1",
+     "F14-Y1"
+    ],
+    [
+     "F14-X2",
+     "F14-Y0"
+    ],
+    [
+     "F14-X2",
+     "F14-Y2"
+    ],
+    [
+     "F14-X2",
+     "F14-Y4"
+    ],
+    [
+     "F14-X3",
+     "F14-Y2"
+    ],
+    [
+     "F14-X3",
+     "F14-Y4"
+    ]
+   ]
+  },
+  {
+   "file_token": "F15",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F15-X0",
+     "text": "ha is grown dynamically (preallocation commented out at L48); callers in this directory pass gap=[.05 0.5] (large column gap) which with Nw=1 has no effect since gap(2) is only used when Nw>1 (L44, L59)"
+    },
+    {
+     "id": "F15-X1",
+     "text": "axes are created with blanked XTickLabel/YTickLabel (L57-L58); callers must restore labels if needed — the doc example (L21-L23) shows this"
+    }
+   ],
+   "listY": [
+    {
+     "id": "F15-Y0",
+     "text": "Explicitly empty `gap` is not treated like an omitted argument: L29 only tests `nargin<3`, L33 skips expansion because numel([])=0, and L43-L44 then index gap(1:2), causing an indexing failure. `marg_h` has an explicit empty check at L30, showing the interface handling is inconsistent."
+    },
+    {
+     "id": "F15-Y1",
+     "text": "Explicitly empty `marg_w` likewise bypasses the L31 default and L36 expansion, then L44/L51 index an empty array; the fifth-argument interface therefore fails for `[]` although the fourth argument accepts it."
+    },
+    {
+     "id": "F15-Y2",
+     "text": "No validation constrains Nh/Nw to positive integers or two-element vector arguments to exactly two entries (L33-L44); zero dimensions can divide by zero and longer vectors affect sum(marg_*) while only the first two elements are used for placement."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F15-X0",
+     "F15-Y0"
+    ],
+    [
+     "F15-X0",
+     "F15-Y1"
+    ],
+    [
+     "F15-X0",
+     "F15-Y2"
+    ],
+    [
+     "F15-X1",
+     "F15-Y0"
+    ],
+    [
+     "F15-X1",
+     "F15-Y1"
+    ]
+   ]
+  },
+  {
+   "file_token": "F16",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F16-X0",
+     "text": "printside (L228-L231) is an external function not defined in this file; the exact per-side record format of the coupling file depends on it"
+    },
+    {
+     "id": "F16-X1",
+     "text": "fcur (L7) and steps (L122) are assigned but never used"
+    },
+    {
+     "id": "F16-X2",
+     "text": "the interpolated fine grid has (msize-1)*iscale+1 points only when 1:1/iscale:msize lands exactly on msize; the script prints a '?=' check (L143) but does not abort on mismatch"
+    },
+    {
+     "id": "F16-X3",
+     "text": "boundary sides with zero stations would leave st_side_block undefined (first_read never cleared, L35-L72) and crash at L76; no guard exists"
+    },
+    {
+     "id": "F16-X4",
+     "text": "start/stop selection uses strict inequalities (L119-L120), so a sample exactly at starttime or stoptime is excluded"
+    },
+    {
+     "id": "F16-X5",
+     "text": "eta/u/v arrays are cleared per side (L172) but eta_fine cell arrays persist until after the block write (L243); side data structure comment at L177 says (space,var,time), var order u,v,eta (L181-L183)"
+    }
+   ],
+   "listY": [
+    {
+     "id": "F16-Y0",
+     "text": "`st_side_block` is assigned only when a matching side code is encountered (L43-L68), but every side/block element is unconditionally read to form `en_side_block` at L76 and to bound the station loop at L127. A missing side therefore produces use-before-assign (or an invalid stale matrix element) instead of an empty boundary."
+    },
+    {
+     "id": "F16-Y1",
+     "text": "`num_blocks` assumes the final row's third column is the maximum side code and exactly divisible by four (L10); the later length checks L24-L28 do not validate either assumption or the station-map ordering."
+    },
+    {
+     "id": "F16-Y2",
+     "text": "The time-window searches can return empty `start` or `stop` (L119-L120), after which L121 and L130-L132 index with empty bounds; even a one-sample result later makes `time(2)-time(1)` at L241 out of range."
+    },
+    {
+     "id": "F16-Y3",
+     "text": "`iscale` and `itscale` are checked only for vector length (L24-L28), not positive integer values. They are used as reciprocal spatial colon steps (L140,L152-L154) and temporal colon steps (L121,L130-L132), so zero, negative, or fractional values can create empty/misaligned sampling and output dimensions."
+    },
+    {
+     "id": "F16-Y4",
+     "text": "Neither `fopen` result is checked before writes (L80-L82 and L209-L224), so inaccessible log/output paths propagate invalid file identifiers into fprintf rather than a controlled failure."
+    },
+    {
+     "id": "F16-Y5",
+     "text": "`fcur` is defined at L7 but never used; the script reads and writes relative to `fgrid`/`foutput`, making the declared coupling-tools directory ineffective."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F16-X0",
+     "F16-Y4"
+    ],
+    [
+     "F16-X1",
+     "F16-Y0"
+    ],
+    [
+     "F16-X1",
+     "F16-Y1"
+    ],
+    [
+     "F16-X1",
+     "F16-Y2"
+    ],
+    [
+     "F16-X1",
+     "F16-Y3"
+    ],
+    [
+     "F16-X1",
+     "F16-Y5"
+    ],
+    [
+     "F16-X2",
+     "F16-Y3"
+    ],
+    [
+     "F16-X3",
+     "F16-Y0"
+    ],
+    [
+     "F16-X3",
+     "F16-Y4"
+    ],
+    [
+     "F16-X4",
+     "F16-Y2"
+    ],
+    [
+     "F16-X4",
+     "F16-Y3"
+    ],
+    [
+     "F16-X5",
+     "F16-Y2"
+    ]
+   ]
+  },
+  {
+   "file_token": "F17",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F17-X0",
+     "text": "The curl at L45 is a spatial derivative of velocity and therefore has inverse-time units, but the third-panel colorbar labels vorticity as `1/s^2` at L98; this is a dimensional-label defect (it should be inverse seconds for u,v in m/s and x,y in m)."
+    },
+    {
+     "id": "F17-X1",
+     "text": "Displayed time is hard-coded as `files(num)*20` at L47 rather than read from output metadata or tied to FrameRate/output cadence; changing the file-index stride does not validate the assumed 20 s model-output interval."
+    },
+    {
+     "id": "F17-X2",
+     "text": "No dimension consistency check relates dep, mask, u, v, and eta before common logical indexing and mesh operations (L33-L45); any differently shaped field fails or silently misrepresents coordinates."
+    },
+    {
+     "id": "F17-X3",
+     "text": "Dry cells are set to NaN before `curl` (L38-L45), so MATLAB's finite differences can propagate NaNs into wet cells adjacent to the mask boundary; the source applies no one-sided boundary treatment."
+    },
+    {
+     "id": "F17-X4",
+     "text": "`vort1` from L45 is never used, and the current `files=[10:10]` at L27 produces a one-frame movie despite the general loop/movie structure."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F17-Y0",
+     "text": "files=[10:10] (L27) renders a single frame, so the resulting 'movie' has one frame; presumably a leftover from debugging a longer range"
+    },
+    {
+     "id": "F17-Y1",
+     "text": "the time label multiplier 20 s (L47) is the assumed output interval; not verifiable from this file"
+    },
+    {
+     "id": "F17-Y2",
+     "text": "vorticity colorbar is labeled '(1/s^2)' (L98) though vorticity has units 1/s"
+    },
+    {
+     "id": "F17-Y3",
+     "text": "subplot comments at L54, L71, L88 all say 'plot total depth' though panels 2 and 3 show speed and vorticity"
+    },
+    {
+     "id": "F17-Y4",
+     "text": "frame capture at -r300 on an 8x12 inch figure yields very large frames; commented imresize to 1024x576 (L15-L16, L110) was abandoned"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F17-X0",
+     "F17-Y1"
+    ],
+    [
+     "F17-X0",
+     "F17-Y2"
+    ],
+    [
+     "F17-X1",
+     "F17-Y1"
+    ],
+    [
+     "F17-X2",
+     "F17-Y0"
+    ],
+    [
+     "F17-X2",
+     "F17-Y1"
+    ],
+    [
+     "F17-X3",
+     "F17-Y1"
+    ],
+    [
+     "F17-X4",
+     "F17-Y0"
+    ],
+    [
+     "F17-X4",
+     "F17-Y1"
+    ]
+   ]
+  },
+  {
+   "file_token": "F18",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F18-X0",
+     "text": "the factor 2680*1000.0 (L87) converts volumetric concentration to mg/L assuming sediment density 2680 kg/m^3; this provenance is not stated in the file"
+    },
+    {
+     "id": "F18-X1",
+     "text": "tight_subplot (L38) is a third-party helper that must exist on the MATLAB path; not shipped in this directory as far as this file shows"
+    },
+    {
+     "id": "F18-X2",
+     "text": "mirroring uses dep(n-1:-1:1,:) (L36) so row n is the symmetry axis and appears once; consistency with the model's half-domain symmetry boundary cannot be verified here"
+    },
+    {
+     "id": "F18-X3",
+     "text": "the still-water-line x-extent [15.7 102.32] (L159) is hard-coded; its derivation from the channel geometry is not in the file"
+    },
+    {
+     "id": "F18-X4",
+     "text": "mint labels (L21) correspond to the commented 3-snapshot set (L19); with nfile=[120] the title lines using mint are also commented (L75, L90)"
+    },
+    {
+     "id": "F18-X5",
+     "text": "DEP mirrored array is used only for the profile plot -DEP(:,1) (L157); mask uses threshold mask<1 (L51-L52) rather than mask==0 as in sibling scripts"
+    }
+   ],
+   "listY": [
+    {
+     "id": "F18-Y0",
+     "text": "Cross-iteration overwrite: the loop at L41 can contain multiple nfile entries, but ETA, CH, BEDS, BEDB, and BB are overwritten at L55-L66. The summary after the loop at L141-L165 therefore represents only the last frame, while earlier frames leave no separate summary."
+    },
+    {
+     "id": "F18-Y1",
+     "text": "The same four axes ha(1:4) are reused on every iteration at L84-L121 without an explicit clear or replacement policy; with multiple nfile values, successive graphics may replace or layer inconsistently rather than produce one frame-specific figure."
+    },
+    {
+     "id": "F18-Y2",
+     "text": "Shape assumptions are unchecked: every loaded field at L44-L48 is assigned into n-by-m slices at L55-L64 using dimensions obtained only from dep at L8. Any discrepant shape fails at assignment, and mask is applied to eta/ch at L51-L52 without first checking matching dimensions."
+    },
+    {
+     "id": "F18-Y3",
+     "text": "Mask propagation is inconsistent: eta and ch are set to NaN where mask<1 at L51-L52, but beds and bedb are not masked before BEDS/BEDB/BB are formed at L60-L66, so dry/invalid cells can contribute to the mean B at L144."
+    },
+    {
+     "id": "F18-Y4",
+     "text": "The logarithm at L87 has no positivity guard. Unmasked zero CH produces -Inf and negative CH produces non-real values before pcolor/caxis; mask<1 at L52 does not guarantee CH>0."
+    },
+    {
+     "id": "F18-Y5",
+     "text": "ETA contains NaNs introduced at L51 and mirrored at L55-L56, but extrema at L147-L148 do not request omission of NaNs; affected rows can yield missing envelope values depending on MATLAB version/defaults."
+    },
+    {
+     "id": "F18-Y6",
+     "text": "tight_subplot at L38 is a non-core external function with no availability check or local fallback; the plotting path stops before axes creation when it is absent."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F18-X0",
+     "F18-Y1"
+    ],
+    [
+     "F18-X0",
+     "F18-Y4"
+    ],
+    [
+     "F18-X1",
+     "F18-Y0"
+    ],
+    [
+     "F18-X1",
+     "F18-Y2"
+    ],
+    [
+     "F18-X1",
+     "F18-Y6"
+    ],
+    [
+     "F18-X2",
+     "F18-Y0"
+    ],
+    [
+     "F18-X2",
+     "F18-Y6"
+    ],
+    [
+     "F18-X3",
+     "F18-Y0"
+    ],
+    [
+     "F18-X4",
+     "F18-Y1"
+    ],
+    [
+     "F18-X4",
+     "F18-Y4"
+    ],
+    [
+     "F18-X5",
+     "F18-Y0"
+    ],
+    [
+     "F18-X5",
+     "F18-Y2"
+    ],
+    [
+     "F18-X5",
+     "F18-Y3"
+    ],
+    [
+     "F18-X5",
+     "F18-Y4"
+    ],
+    [
+     "F18-X5",
+     "F18-Y5"
+    ]
+   ]
+  },
+  {
+   "file_token": "F19",
+   "lang": ".py",
+   "listX": [
+    {
+     "id": "F19-X0",
+     "text": "bottom-fill condition where=depth[1,:]>(depth[1,:]-.05) (L60) is always true, so the where clause is a no-op"
+    },
+    {
+     "id": "F19-X1",
+     "text": "time annotation is placed at xy=(Lt*.85,3) (L66) while the y-axis is clipped at 1 by plt.axis (L47), so the text anchor lies outside the visible axes"
+    },
+    {
+     "id": "F19-X2",
+     "text": "readETAData takes a postprocessDir argument (L25) but uses the global outputDir (L33); the passed argument is ignored"
+    },
+    {
+     "id": "F19-X3",
+     "text": "plt.savefig keyword ext=\"png\" (L71) is not a standard matplotlib argument"
+    },
+    {
+     "id": "F19-X4",
+     "text": "row index 1 (surf[1,:], depth[1,:]) selects the second row consistent with the MATLAB sibling's dep(2,:) artificial-row stripping, per comment L17"
+    }
+   ],
+   "listY": [
+    {
+     "id": "F19-Y0",
+     "text": "Interface mismatch: readETAData declares postprocessDir at L25 and callers pass outputDir at L41, but the function ignores that parameter and instead closes over global outputDir at L33; callers cannot redirect reads through the advertised argument."
+    },
+    {
+     "id": "F19-Y1",
+     "text": "Range/visibility defect: the plot y-axis is capped at 1 at L47, but the time annotation is placed at y=3 in data coordinates at L66, so it lies outside the visible axes."
+    },
+    {
+     "id": "F19-Y2",
+     "text": "The save call at L71 passes ext=\"png\" to pyplot.savefig even though the filename already supplies .png; this keyword is not part of the pyplot savefig API and can be forwarded as an unsupported backend keyword, preventing frame output."
+    },
+    {
+     "id": "F19-Y3",
+     "text": "depth.shape at L17 assumes a 2-D input and plotting indexes depth[1,:] at L47 and L54-L60; surf[1,:] is likewise used at L46 and L54-L55. No check ensures either array has two rows or that their column counts match Mglob."
+    },
+    {
+     "id": "F19-Y4",
+     "text": "The file-index guard at L29 is an assert, so Python optimization can remove it; file selection at L33 then proceeds without the stated range check."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F19-X0",
+     "F19-Y1"
+    ],
+    [
+     "F19-X0",
+     "F19-Y3"
+    ],
+    [
+     "F19-X1",
+     "F19-Y0"
+    ],
+    [
+     "F19-X1",
+     "F19-Y1"
+    ],
+    [
+     "F19-X1",
+     "F19-Y2"
+    ],
+    [
+     "F19-X1",
+     "F19-Y3"
+    ],
+    [
+     "F19-X2",
+     "F19-Y0"
+    ],
+    [
+     "F19-X2",
+     "F19-Y4"
+    ],
+    [
+     "F19-X3",
+     "F19-Y1"
+    ],
+    [
+     "F19-X3",
+     "F19-Y2"
+    ],
+    [
+     "F19-X4",
+     "F19-Y3"
+    ]
+   ]
+  },
+  {
+   "file_token": "F20",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F20-X0",
+     "text": "Range precondition is unchecked: L21 indexes every loaded matrix from row shift(num)=1000 and column 2 (L7) without verifying at least 1000 rows and two columns, so a shorter or one-column station file fails before spectral estimation."
+    },
+    {
+     "id": "F20-X1",
+     "text": "The loop size comes from nfile at L17 while shift is populated independently only for indices 1:3 at L7 and line styles exist only as p1-p3 at L9-L11; changing nfile without updating both structures causes out-of-range shift access or an undefined variable through eval at L32."
+    },
+    {
+     "id": "F20-X2",
+     "text": "nps is assigned at L25 but never used; pwelch instead receives nfft at L30, so any intended segment-length control through nps is ineffective."
+    },
+    {
+     "id": "F20-X3",
+     "text": "The value passed as pwelch's sampling-frequency argument at L30 is stored in a variable named dt and computed as 1/0.5 at L22. Numerically this is 2, consistent with a 0.5 s interval, but the file does not state the input sampling interval or validate it against the station data."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F20-Y0",
+     "text": "the variable named dt=1.0/0.5=2.0 (L22) is passed in pwelch's sampling-frequency argument position (L30); if the gauge output interval is actually 0.5 s the sampling frequency 2.0 Hz is correct but the name dt is misleading, and with the plotted band 0-0.3 Hz (L37) this cannot be resolved from the file alone"
+    },
+    {
+     "id": "F20-Y1",
+     "text": "nps=512 (L25) is never used"
+    },
+    {
+     "id": "F20-Y2",
+     "text": "noverlap=512 equals the window length bartlett(nfft/2)=bartlett(524) only approximately (524 vs 512); pwelch semantics with noverlap smaller than window length are valid but the mismatch of nfft/2=524 vs noverlap=512 is unexplained"
+    },
+    {
+     "id": "F20-Y3",
+     "text": "eval-based style selection (L32) instead of indexing a cell array"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F20-X0",
+     "F20-Y0"
+    ],
+    [
+     "F20-X0",
+     "F20-Y1"
+    ],
+    [
+     "F20-X1",
+     "F20-Y0"
+    ],
+    [
+     "F20-X1",
+     "F20-Y3"
+    ],
+    [
+     "F20-X2",
+     "F20-Y0"
+    ],
+    [
+     "F20-X2",
+     "F20-Y1"
+    ],
+    [
+     "F20-X2",
+     "F20-Y3"
+    ],
+    [
+     "F20-X3",
+     "F20-Y0"
+    ],
+    [
+     "F20-X3",
+     "F20-Y1"
+    ],
+    [
+     "F20-X3",
+     "F20-Y3"
+    ]
+   ]
+  },
+  {
+   "file_token": "F21",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F21-X0",
+     "text": "Eta is masked to NaN before mirroring (L49,L53-L54), then rowwise `max`/`min` are called without `omitnan` at L97-L98. Any dry/masked cell in a row can make that row's extrema NaN rather than the wet-cell envelope, so the final red curves may disappear across rows containing shoreline masks."
+    },
+    {
+     "id": "F21-X1",
+     "text": "The script is structured for multiple `nfile` values (L41-L89), but ETA/BEDS/BB are overwritten on every iteration and the section statistics L92-L111 use only the final frame. `mint` has three entries at L21 while active nfile has one and is never used, indicating an incompletely reduced multi-frame version."
+    },
+    {
+     "id": "F21-X2",
+     "text": "Masking is applied to eta and concentration only (L49-L50), not `beds`; whether dry-cell DchgS values are valid is unstated. No shape checks precede mirroring assignments."
+    },
+    {
+     "id": "F21-X3",
+     "text": "`BEDB` is allocated at L30 but never used; fixed axes are not derived from M,N,dx,dy."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F21-Y0",
+     "text": "concentration is plotted in linear g/L with caxis [0 1.2] (L65-L66, L69) without the 2680*1000 conversion used in the multi_vessel sibling; whether the model's C output unit differs between cases or the label is inconsistent cannot be determined here"
+    },
+    {
+     "id": "F21-Y1",
+     "text": "BEDB is allocated (L31) but never loaded or used; BB=BEDS only (L61) consistent with cohesive (suspended-only) transport"
+    },
+    {
+     "id": "F21-Y2",
+     "text": "mint labels (L21) are never used since nfile has one entry; the still-water extent [15.7 102.32] (L109) is hard-coded as in the multi_vessel script"
+    },
+    {
+     "id": "F21-Y3",
+     "text": "tight_subplot is an external dependency; second-figure axis limits [0 120 ...] (L105, L115) bound y although N=2n-1 rows imply y up to N-1 which may exceed 120"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F21-X1",
+     "F21-Y2"
+    ],
+    [
+     "F21-X1",
+     "F21-Y3"
+    ],
+    [
+     "F21-X3",
+     "F21-Y1"
+    ]
+   ]
+  },
+  {
+   "file_token": "F22",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F22-X0",
+     "text": "start/stop/time are computed at L115-L117 before the block loop using kk, whose value is whatever the last logging loop left (kk=num_blocks); correct only because num_blocks=1 in this configuration"
+    },
+    {
+     "id": "F22-X1",
+     "text": "printside (L224-L227) is an external function not defined in this file"
+    },
+    {
+     "id": "F22-X2",
+     "text": "header point counts use size(eta_fine{...},2) (L216-L219) while the multi-block variant uses size(eastfine,1); both equal the fine point count, but this variant omits the duplicate header block written to the log"
+    },
+    {
+     "id": "F22-X3",
+     "text": "fcur (L7) and steps (L118) are unused; same zero-station-side crash risk at L78 as the multi-block script; same strict-inequality window selection (L115-L116)"
+    }
+   ],
+   "listY": [
+    {
+     "id": "F22-Y0",
+     "text": "The time window is computed at L116-L119 before the block loop starts at L122, using `kk` left over from the preceding completed loops (therefore the final block index). If metadata yields more than one block, all blocks reuse the final block's start/stop/time while data slicing inside the loop uses each block's `itscale(kk)` at L132-L134, creating mismatched time labels and sample counts."
+    },
+    {
+     "id": "F22-Y1",
+     "text": "`st_side_block` is conditionally assigned only when a side is encountered (L45-L70), but is unconditionally read at L78 and L129. Any absent side is a use-before-assign failure."
+    },
+    {
+     "id": "F22-Y2",
+     "text": "The final-row `/4` inference at L11 assumes ordered, complete side codes; no divisibility or maximum/order check precedes the block/parameter loops."
+    },
+    {
+     "id": "F22-Y3",
+     "text": "Empty time-search results from L116-L117 break subsequent slicing; a one-sample time vector also makes the interval expression `time(2)-time(1)` at L237 out of range."
+    },
+    {
+     "id": "F22-Y4",
+     "text": "Only parameter-vector lengths are checked (L26-L30). Nonpositive or fractional `iscale`/`itscale` values flow into colon steps and reciprocal interpolation grids at L118,L132-L134,L143,L154-L156 without validation."
+    },
+    {
+     "id": "F22-Y5",
+     "text": "`fcur` is assigned at L7 but never used, and neither fopen return at L82/L213 is checked before writes."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F22-X0",
+     "F22-Y0"
+    ],
+    [
+     "F22-X0",
+     "F22-Y3"
+    ],
+    [
+     "F22-X0",
+     "F22-Y4"
+    ],
+    [
+     "F22-X2",
+     "F22-Y5"
+    ],
+    [
+     "F22-X3",
+     "F22-Y0"
+    ],
+    [
+     "F22-X3",
+     "F22-Y1"
+    ],
+    [
+     "F22-X3",
+     "F22-Y2"
+    ],
+    [
+     "F22-X3",
+     "F22-Y3"
+    ],
+    [
+     "F22-X3",
+     "F22-Y4"
+    ],
+    [
+     "F22-X3",
+     "F22-Y5"
+    ]
+   ]
+  },
+  {
+   "file_token": "F23",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F23-X0",
+     "text": "The colon grids do not guarantee inclusion of the requested upper bound when `(x2-x1)/dx` or `(y2-y1)/dx` is nonintegral. The RI definition itself notes y2=42.246666... but y(end)=42.233333 at L71; the NC latitude span L10-L14 is also not an integer number of `dx` steps, so the generated north side is below the declared y2."
+    },
+    {
+     "id": "F23-X1",
+     "text": "Each side loop includes both corners (L19-L51 and repeated blocks), intentionally matching the displayed total formula 2*length(x)+2*length(y) at L53 but duplicating each physical corner under two side ids; the file contains no explicit statement whether downstream coupling expects duplicated corners."
+    },
+    {
+     "id": "F23-X2",
+     "text": "The three plot writes assume a pre-existing `plots` directory (L61,L121,L180), and the final fopen result is not checked before fprintf (L183-L185)."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F23-Y0",
+     "text": "sta columns are (lat, lon, side_id) — column 1 is latitude, column 2 longitude (L21-L22); consumers must know this order, and the coupling scripts read only column 3"
+    },
+    {
+     "id": "F23-Y1",
+     "text": "corner points are duplicated between adjacent sides (east/west loops span all y including y(1) and y(end) which also appear in south/north loops); whether the FUNWAVE STATIONS output expects deduplicated corners is not determinable here"
+    },
+    {
+     "id": "F23-Y2",
+     "text": "the comment '% 60 times' (L3) does not explain that dx=1/60 degree = 1 arcminute; RI y2 comment (L71) admits the range end is not hit exactly"
+    },
+    {
+     "id": "F23-Y3",
+     "text": "the NC block plot (L57) plots all rows accumulated so far, correct only because NC is first; RI/FL plots slice by icount_last"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F23-X0",
+     "F23-Y2"
+    ],
+    [
+     "F23-X1",
+     "F23-Y0"
+    ],
+    [
+     "F23-X1",
+     "F23-Y3"
+    ],
+    [
+     "F23-X2",
+     "F23-Y3"
+    ]
+   ]
+  },
+  {
+   "file_token": "F24",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F24-X0",
+     "text": "CH is masked for dry cells but not constrained positive (L51,L57,L79); wet zeros become -Inf under log10 and negative/sentinel values become non-real/NaN, with no floor supporting caxis [0,0.5]."
+    },
+    {
+     "id": "F24-X1",
+     "text": "Neither suspended nor bedload change is masked (L46-L47,L59-L65), so BB and its mean may include dry/sentinel cells while eta/concentration panels hide them."
+    },
+    {
+     "id": "F24-X2",
+     "text": "The time label array `min={'40'}` is unused because its only title is commented at L82; it also shadows MATLAB's min built-in. The single frame overwrites loop arrays, so a future multi-frame list would leave section plots based only on the final frame."
+    },
+    {
+     "id": "F24-X3",
+     "text": "No print/save call exists, so the script produces only interactive figures. Field shapes and fixed axes are unvalidated."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F24-Y0",
+     "text": "min={'40'} (L20) is only consumed by the commented-out title (L82) and shadows the MATLAB built-in min; with nfile=[20] (L19) the '40' label would not match the snapshot index anyway (commented L18 suggests an earlier nfile=[40 80 120] configuration)"
+    },
+    {
+     "id": "F24-Y1",
+     "text": "tight_subplot (L37) is an external helper not defined in this file; the call also lacks a trailing semicolon so ha/pos echo to console"
+    },
+    {
+     "id": "F24-Y2",
+     "text": "units of loaded fields (eta in m, C in g/L per colorbar labels L73/L84) are asserted only by plot labels, not documented in this file"
+    },
+    {
+     "id": "F24-Y3",
+     "text": "B (L111) is indexed without preallocation inside the loop; final figure uses BB from the last nfile iteration only"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F24-X0",
+     "F24-Y0"
+    ],
+    [
+     "F24-X0",
+     "F24-Y2"
+    ],
+    [
+     "F24-X2",
+     "F24-Y0"
+    ],
+    [
+     "F24-X2",
+     "F24-Y2"
+    ]
+   ]
+  },
+  {
+   "file_token": "F25",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F25-X0",
+     "text": "Mask loading and all mask applications are commented out at L34,L36-L37,L44-L46. Eta, FoamEta, mean velocity, curl, and quiver therefore include any dry-cell/sentinel values even though copied masking code is present but ineffective."
+    },
+    {
+     "id": "F25-X1",
+     "text": "`log(FoamEta)` at L85 has no positivity guard: zero foam thickness maps to -Inf and negative values produce complex results, while caxis is finite [-10,10] at L90. The file does not state a floor or missing-value convention."
+    },
+    {
+     "id": "F25-X2",
+     "text": "Instantaneous files use num=k-1 at L29 while averaged velocity uses floor(time/50) at L30 with time=(k-1)*30 at L28. These two cadence assumptions are hard-coded and no timestamps are compared, so the overlaid quivers can be temporally mispaired if either output cadence differs."
+    },
+    {
+     "id": "F25-X3",
+     "text": "No shape checks relate dep, eta, FoamEta, u, and v. `w_ang` is unused, and the absolute user-specific fdir at L3 is unchecked."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F25-Y0",
+     "text": "the pairing of instantaneous eta/FoamEta at 30 s intervals (dt=30, L26-L29) with averaged umean/vmean at 50 s intervals (L30) means the vorticity/quiver panels lag or lead the eta panel by up to 20 s per frame; intended alignment is not documented"
+    },
+    {
+     "id": "F25-Y1",
+     "text": "log(FoamEta) (L85) yields -Inf where foam thickness is zero; no floor is applied and mask filtering is commented out (L34-L37)"
+    },
+    {
+     "id": "F25-Y2",
+     "text": "dep is loaded (L5) but only used for grid sizing; the caxis [-10 10] on a log-meter scale (L90) implies foam from e-10 to e10 m which cannot be physical at the top end — display range only"
+    },
+    {
+     "id": "F25-Y3",
+     "text": "mov is indexed from k=3 (L27, L107) leaving mov(1:2) empty; loop start at 3 rather than 1 is unexplained"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F25-X0",
+     "F25-Y0"
+    ],
+    [
+     "F25-X0",
+     "F25-Y1"
+    ],
+    [
+     "F25-X1",
+     "F25-Y1"
+    ],
+    [
+     "F25-X1",
+     "F25-Y2"
+    ],
+    [
+     "F25-X2",
+     "F25-Y0"
+    ],
+    [
+     "F25-X2",
+     "F25-Y1"
+    ],
+    [
+     "F25-X2",
+     "F25-Y3"
+    ],
+    [
+     "F25-X3",
+     "F25-Y2"
+    ]
+   ]
+  },
+  {
+   "file_token": "F26",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F26-X0",
+     "text": "Immediate overwrite/cross-platform defect: the advertised user directory at L9 is unconditionally replaced on L10 by one developer-specific Windows path. The relative setting can never take effect without editing code, and the script is nonportable as shipped."
+    },
+    {
+     "id": "F26-X1",
+     "text": "Directory-role mismatch: the active fdir names simple_cases_input at L10, yet the same directory must contain dep.out at L26 and time-varying eta_/mask_ outputs at L59-L60. Input and output artifacts are conflated; if outputs reside in an output directory, the loop fails after depth loading."
+    },
+    {
+     "id": "F26-X2",
+     "text": "Unchecked parallel lists: nfile at L13 controls the loop while times at L16 is independently indexed at L73. Length/order divergence causes failure or false time labels, and the displayed time is not derived from file metadata."
+    },
+    {
+     "id": "F26-X3",
+     "text": "Shape/orientation mismatch is unchecked: dep defines x/y at L26-L33, while eta and mask are separate loads at L59-L60. No equality check precedes mask indexing L64 or pcolor L70; the preceding bathymetry generator writes outer-i rows, which also conflicts with this script's rows-as-y interpretation."
+    },
+    {
+     "id": "F26-X4",
+     "text": "The only print call is commented at L103, so no image is saved. Fixed overlays/labels through x=300 and y=1200 at L36-L41/L78-L83 are also not range-checked."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F26-Y0",
+     "text": "the L9 fdir='../bathy/' is dead code overridden at L10 by a personal Windows path; the intended shipped default is ambiguous"
+    },
+    {
+     "id": "F26-Y1",
+     "text": "snapshot/time pairing differs from sibling plot_wave.m (nfile=[5 7], '200'/'300' there vs [5 20], '150'/'600' here); which pairing matches the case output interval is not determinable from this file"
+    },
+    {
+     "id": "F26-Y2",
+     "text": "L10 path says simple_cases_input yet eta_/mask_ are model output files; directory naming inconsistency"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F26-X0",
+     "F26-Y0"
+    ],
+    [
+     "F26-X0",
+     "F26-Y2"
+    ],
+    [
+     "F26-X1",
+     "F26-Y0"
+    ],
+    [
+     "F26-X1",
+     "F26-Y2"
+    ],
+    [
+     "F26-X2",
+     "F26-Y0"
+    ],
+    [
+     "F26-X2",
+     "F26-Y2"
+    ]
+   ]
+  },
+  {
+   "file_token": "F27",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F27-X0",
+     "text": "L55 indexes nfile(num) where num=nfile(i) (L52); since nfile=1:301 this equals nfile(i) here, but for any non-contiguous nfile this double-indexing would be a bug"
+    },
+    {
+     "id": "F27-X1",
+     "text": "plot_color_bars (L18) is declared in the user input section but never used in this script"
+    },
+    {
+     "id": "F27-X2",
+     "text": "the loop bound is hard-coded 1:301 (L50) instead of 1:length(nfile), duplicating L15"
+    },
+    {
+     "id": "F27-X3",
+     "text": "m from size (L27) is unused after the row-2 slice"
+    }
+   ],
+   "listY": [
+    {
+     "id": "F27-Y0",
+     "text": "Use-before-range-validation across configuration lines: the loop is hard-coded as i=1:301 at L50 rather than length(nfile), then L52 indexes nfile(i). Any shorter user-selected nfile vector from L15 fails before loading."
+    },
+    {
+     "id": "F27-Y1",
+     "text": "Double indexing/interface mismatch: num is already nfile(i) at L52, but L55 computes nfile(num). This happens to reproduce 1:301 for the default identity vector, while a non-identity subset can select the wrong frame or exceed nfile's range."
+    },
+    {
+     "id": "F27-Y2",
+     "text": "The documented user switch plot_color_bars is assigned at L18 but never read, and no colorbar call exists; changing it cannot affect output."
+    },
+    {
+     "id": "F27-Y3",
+     "text": "Both dep and eta are forced to row 2 at L29 and L62 without checking row count; x is sized from dep's pre-slice column count at L27-L33, and no check ensures each eta row has the same length before fill at L71."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F27-X0",
+     "F27-Y0"
+    ],
+    [
+     "F27-X0",
+     "F27-Y1"
+    ],
+    [
+     "F27-X1",
+     "F27-Y0"
+    ],
+    [
+     "F27-X1",
+     "F27-Y2"
+    ],
+    [
+     "F27-X2",
+     "F27-Y0"
+    ],
+    [
+     "F27-X2",
+     "F27-Y1"
+    ],
+    [
+     "F27-X2",
+     "F27-Y2"
+    ],
+    [
+     "F27-X3",
+     "F27-Y3"
+    ]
+   ]
+  },
+  {
+   "file_token": "F28",
+   "lang": ".F",
+   "listX": [
+    {
+     "id": "F28-X0",
+     "text": "The y-coordinate formula L24 is not cell-centered symmetrically for even Nglob: it yields indices from `(1-Nglob/2)*DY` through `(Nglob/2)*DY` (for Nglob=100, -49*DY through +50*DY). Because bank depth uses abs(Y) at L30-L32, the two sides contain unequal coordinate extents and can receive asymmetric depth values despite symmetric input parameters."
+    },
+    {
+     "id": "F28-X1",
+     "text": "The output format has exactly 9000 F descriptors at L41 while the implied-DO writes Mglob values at L39. If Mglob exceeds 9000, Fortran format reversion can continue the same J values on another record, breaking the intended one-grid-row-per-record layout."
+    },
+    {
+     "id": "F28-X2",
+     "text": "No bounds/physical validation prevents nonpositive Mglob/Nglob/DX/DY, negative width, or slopes large enough to make DEPTH negative outside the channel (L9-L35)."
+    },
+    {
+     "id": "F28-X3",
+     "text": "OPEN/READ/ALLOCATE/WRITE have no IOSTAT or size checks, so missing/malformed input and allocation/output failures are uncontrolled."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F28-Y0",
+     "text": "byte-identical duplicate of multi_vessel_morphology/mk_depth.F; same observations apply: depth can go negative for large abs(Y) without clipping, X/Y arrays are never written, bathy_param.txt content order only implicit in READ sequence (L9-L15)"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F28-X2",
+     "F28-Y0"
+    ]
+   ]
+  },
+  {
+   "file_token": "F29",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F29-X0",
+     "text": "`dep` is created once before the loop at L13 and then destructively masked at L42. The active one-frame range hides the effect, but any restored multi-frame range would retain NaNs from every earlier mask and prevent re-wetted cells from returning in the depth panel."
+    },
+    {
+     "id": "F29-X1",
+     "text": "Depth is cropped with fixed n=100,m=312 at L8-L13 without checking dep1 size; frame fields are likewise not checked against this fixed mesh before logical masking and curl."
+    },
+    {
+     "id": "F29-X2",
+     "text": "The depth subplot's caxis [-12,0] at L88 is overwritten by [-12,2.5] at L93. `w_ang` and `icount` are unused after assignment."
+    },
+    {
+     "id": "F29-X3",
+     "text": "tk_x.txt and tk_y.txt are reloaded inside every frame at L37-L38 and only column 2 is plotted at L57,L80,L101, independent of `num`; the file does not document whether column 2 is an entire trajectory or a fixed particle selection."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F29-Y0",
+     "text": "only column 2 of tk_x/tk_y is plotted (L57, L80, L101); the number of tracked particles (columns) and the meaning of column 1 (time or particle 1) are not determinable from this file"
+    },
+    {
+     "id": "F29-Y1",
+     "text": "the crop to m=312, n=100 (L8-L9, L13) presumes depth_a15.txt is at least that large; the rip_tracking makebath.m produces n=100 rows (ncell=2, ycell=100, dy=2) and m=312 columns (x=-11..300, dx=1), so the 'crop' actually spans the whole array — hard-coding appears to be a workaround for the commented size() line (L7)"
+    },
+    {
+     "id": "F29-Y2",
+     "text": "tk_x.txt/tk_y.txt are loaded inside the snapshot loop (L37-L38) though they do not depend on num"
+    },
+    {
+     "id": "F29-Y3",
+     "text": "dep masked in-place accumulates NaN across frames (single-frame here since nstart=nend=10); duplicate caxis for panel 3 (L88, L93)"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F29-X0",
+     "F29-Y1"
+    ],
+    [
+     "F29-X0",
+     "F29-Y2"
+    ],
+    [
+     "F29-X1",
+     "F29-Y1"
+    ],
+    [
+     "F29-X2",
+     "F29-Y3"
+    ],
+    [
+     "F29-X3",
+     "F29-Y0"
+    ],
+    [
+     "F29-X3",
+     "F29-Y2"
+    ]
+   ]
+  },
+  {
+   "file_token": "F30",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F30-X0",
+     "text": "transect row index 50 (L28) is hard-coded; its physical y location (50*dy=25 km if 1-based offset ignored) relative to the meteo forcing track is not determinable from this file"
+    },
+    {
+     "id": "F30-X1",
+     "text": "hour labels imply snapshot spacing of 5 files = 0.5 hr, i.e. 360 s output interval, but the case input.txt is needed to confirm"
+    },
+    {
+     "id": "F30-X2",
+     "text": "variable min (L14) shadows the MATLAB builtin"
+    },
+    {
+     "id": "F30-X3",
+     "text": "y (L10) is computed but unused; no print/save so figures are display-only"
+    }
+   ],
+   "listY": [
+    {
+     "id": "F30-Y0",
+     "text": "Range and shape assumptions cross the initial and loop loads: x is sized from eta_00001 at L4-L9, while each later eta is loaded at L25 and row 50 is indexed at L28 without checking at least 50 rows or the same column count as the initial file."
+    },
+    {
+     "id": "F30-Y1",
+     "text": "The loop count follows length(nfile) at L22, but subplot rows are fixed at 6 at L27 and title labels are independently indexed from min at L32; changing nfile alone can exceed the subplot grid or min's range."
+    },
+    {
+     "id": "F30-Y2",
+     "text": "Interface compatibility: the explicitly requested zbuffer renderer at L42 is unavailable in newer MATLAB releases, so renderer selection can fail even after plotting."
+    },
+    {
+     "id": "F30-Y3",
+     "text": "dy and y are computed at L8-L10 but never used; the displayed product is only a fixed row transect, despite constructing a two-dimensional coordinate grid."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F30-X0",
+     "F30-Y0"
+    ],
+    [
+     "F30-X0",
+     "F30-Y1"
+    ],
+    [
+     "F30-X2",
+     "F30-Y0"
+    ],
+    [
+     "F30-X2",
+     "F30-Y3"
+    ],
+    [
+     "F30-X3",
+     "F30-Y0"
+    ],
+    [
+     "F30-X3",
+     "F30-Y3"
+    ]
+   ]
+  },
+  {
+   "file_token": "F31",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F31-X0",
+     "text": "The subplot interface is coupled to the default vector length in three independent places: tight_subplot creates exactly 6 axes at L30, the loop follows length(nfile) at L33, and each iteration indexes two axes at L53 and L67. More than three nfile entries exceeds ha; fewer leave unused axes. The title also indexes the independent min cell array at L58."
+    },
+    {
+     "id": "F31-X1",
+     "text": "All loop-loaded arrays at L36-L38 are assumed to have the n-by-m shape learned only from dep at L7. mask is immediately used to index eta and ch at L40-L41, and both are assigned into fixed ETA/CH slices at L44-L47 without shape checks."
+    },
+    {
+     "id": "F31-X2",
+     "text": "The logarithm at L69 is evaluated without requiring CH>0. mask<1 handling at L41 only converts masked cells to NaN; unmasked zero values become -Inf and negative values become non-real before pcolor."
+    },
+    {
+     "id": "F31-X3",
+     "text": "tight_subplot at L30 is an external helper with no availability check or fallback, so the complete plotting path depends on an undeclared interface."
+    },
+    {
+     "id": "F31-X4",
+     "text": "The free-surface axes enable hold at L56 but never issue hold off. Each iteration uses a distinct default axis for the present three frames, but reuse or rerun in an existing figure can retain graphics unexpectedly."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F31-Y0",
+     "text": "file resides in multi_vessel_morphology but fdir targets single_vessel_fr_13 results (L2); which run it was last used for is ambiguous"
+    },
+    {
+     "id": "F31-Y1",
+     "text": "time labels '80','160','240' sec for snapshots 40,80,120 imply a 2 s output interval; not verifiable from this file"
+    },
+    {
+     "id": "F31-Y2",
+     "text": "2680*1000.0 mg/L conversion factor provenance (sediment density) not stated"
+    },
+    {
+     "id": "F31-Y3",
+     "text": "dep loaded at L5 is only used for grid sizing; tight_subplot is an external dependency; variable min shadows the builtin"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F31-X1",
+     "F31-Y0"
+    ],
+    [
+     "F31-X1",
+     "F31-Y3"
+    ]
+   ]
+  },
+  {
+   "file_token": "F32",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F32-X0",
+     "text": "the residuals Rx/Ry (L201-L202) sum all budget terms with plus signs; whether sign conventions of the model outputs make these true residuals (should be ~0) or net forcing cannot be verified without the model source"
+    },
+    {
+     "id": "F32-X1",
+     "text": "vbh=[0.0:1.0:3:0] (L278) is malformed (colon expression 3:0 is empty) but vbh is never used"
+    },
+    {
+     "id": "F32-X2",
+     "text": "yy2 (middle row nn1) is computed (L218) but all its plot lines are commented out; icount (L27) unused"
+    },
+    {
+     "id": "F32-X3",
+     "text": "binary reads assume FUNWAVE binary output format (m n) single precision with no header; byte order/format not verifiable from this file"
+    },
+    {
+     "id": "F32-X4",
+     "text": "figure 1 caption labels X1/X2 for rows and Y1-Y4 for columns while variables are named nn (rows) and mm (columns); fig numbering order in file is 1,3,2"
+    },
+    {
+     "id": "F32-X5",
+     "text": "eval-based cd (L50, L205) changes the working directory mid-script; plots/ paths at L344/L407/L473 are relative to fdir_curr"
+    }
+   ],
+   "listY": [
+    {
+     "id": "F32-Y0",
+     "text": "The statement `vbh=[0.0:1.0:3:0]` at L278 has four colon operands and is not a valid MATLAB colon expression; it executes even though `vbh` is unused, so it can stop the script before the remaining figures. The following contour uses a separate valid `[0:0.1:3]` at L279, consistent with a copied `3.0` typo."
+    },
+    {
+     "id": "F32-Y1",
+     "text": "Only Hsig/etamean/velocity/budget fields are accumulated and averaged over numb=2:3 (L59-L195). `eta` is overwritten on each iteration at L53-L57 and the map at L239 therefore shows only the last snapshot (numb=3) beside panels labeled from two-snapshot averages, an inconsistent temporal aggregation."
+    },
+    {
+     "id": "F32-Y2",
+     "text": "Every momentum-profile panel places its letter above the corresponding y-axis maximum: figure 3 uses 0.0014 vs ax1 max 0.0012 (L351,L374), 0.014 vs 0.012 (L352,L383), and 0.09 vs 0.075 for ax3/ax4 (L353-L354,L393,L403); figure 2 similarly uses 0.086>0.075, 0.15>0.135, 0.028>0.025, and 0.1>0.09 (L416-L419,L436,L445,L459,L469). With clipping, the subplot labels can be invisible."
+    },
+    {
+     "id": "F32-Y3",
+     "text": "All binary opens/reads assume success and exactly 960*480 singles (L54-L175); fileID and element counts are unchecked, and `cd` is changed via eval, so an early error can leave the caller in the results directory."
+    },
+    {
+     "id": "F32-Y4",
+     "text": "`tmp`, `icount`, `vbh`, and several txt_x/txt_y assignments are unused; plot output also assumes a pre-existing `plots` directory."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F32-X0",
+     "F32-Y1"
+    ],
+    [
+     "F32-X1",
+     "F32-Y0"
+    ],
+    [
+     "F32-X5",
+     "F32-Y1"
+    ],
+    [
+     "F32-X5",
+     "F32-Y2"
+    ],
+    [
+     "F32-X5",
+     "F32-Y3"
+    ]
+   ]
+  },
+  {
+   "file_token": "F33",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F33-X0",
+     "text": "`zeros(m)` at L11 creates a 1024-by-1024 matrix, not a 1-by-1024 bathymetry vector. The logical assignment at L12 updates only selected linear entries among the first 1024 elements, and plot(x,-dep,...) at L29 treats the matrix as many series instead of one profile. This is a deterministic dimensional bug; initialization should specify a vector shape."
+    },
+    {
+     "id": "F33-X1",
+     "text": "Displayed time is files(num)*10 at L35 with no output-cadence metadata. The axis extends to x=1024 at L31 while the generated vector ends at 1023, a minor fixed-range mismatch."
+    },
+    {
+     "id": "F33-X2",
+     "text": "The absolute input path is unchecked, eta shape is not validated against x, and the script has no file-output call."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F33-Y0",
+     "text": "dep=zeros(m)+10.0 (L11) creates an m x m square matrix in MATLAB (zeros with scalar argument), not a length-m vector; L12 then modifies it by logical indexing against the length-m vector x, and plot(x,-dep,...) (L29) receives a matrix — the intended 1-D profile plot depends on this implicit behavior, not clarified in the file"
+    },
+    {
+     "id": "F33-Y1",
+     "text": "title computes time as files(num)*10 (L35), implying a 10 s output interval for indices [1 6 11 17] (L16); the interval is asserted only here, not read from any input"
+    },
+    {
+     "id": "F33-Y2",
+     "text": "fdir is a hardcoded developer macOS path (L2) — script is not portable as committed; comment '% wavemaker and sponge' (L14) has no associated code"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F33-X0",
+     "F33-Y0"
+    ],
+    [
+     "F33-X0",
+     "F33-Y1"
+    ],
+    [
+     "F33-X0",
+     "F33-Y2"
+    ],
+    [
+     "F33-X1",
+     "F33-Y0"
+    ],
+    [
+     "F33-X1",
+     "F33-Y1"
+    ]
+   ]
+  },
+  {
+   "file_token": "F34",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F34-X0",
+     "text": "contour level vector [-12:0 0.1:0.1:8] (L47) concatenates integer levels -12..0 with the single value 0.1 (the expression 0.1:0.1:8 starts at 0.1 with step 0.1 but is written after a space inside brackets so it parses as [-12:0, 0.1:0.1:8], i.e. -12..0 then 0.1..8 by 0.1); whether the author intended asymmetric spacing above 0 is unstated"
+    },
+    {
+     "id": "F34-X1",
+     "text": "u and v are not masked (L34-L35 commented) unlike the movie sibling, so quiver draws vectors in dry cells"
+    },
+    {
+     "id": "F34-X2",
+     "text": "eta, vort, and the time label are computed but unused in the plots (L28, L38, L40, title commented L73)"
+    },
+    {
+     "id": "F34-X3",
+     "text": "file index 90 with 20 s interval implies t=1800 s; the interval is not verifiable from this file"
+    }
+   ],
+   "listY": [
+    {
+     "id": "F34-Y0",
+     "text": "The only active mask applications target `eta` and `dep1` at L31-L32, but neither variable is plotted afterward. Masking of u/v is commented out at L34-L35, so `uu` at L37 and the speed/quiver plot at L59-L65 include dry-cell velocity values; the apparent wet/dry safeguard is ineffective."
+    },
+    {
+     "id": "F34-Y1",
+     "text": "`vort`, `vort1`, and `time` are computed at L38-L40 but never used; the corresponding title is commented at L73, indicating copied movie logic that does not affect this snapshot."
+    },
+    {
+     "id": "F34-Y2",
+     "text": "No size check ensures dep, eta, mask, u, and v share dimensions before logical indexing and plotting (L26-L38)."
+    },
+    {
+     "id": "F34-Y3",
+     "text": "The output-index-to-time factor 20 at L40 is hard-coded and unverified, while `files=[90:90]` at L20 fixes the loop to a single snapshot."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F34-X1",
+     "F34-Y0"
+    ],
+    [
+     "F34-X1",
+     "F34-Y1"
+    ],
+    [
+     "F34-X1",
+     "F34-Y2"
+    ],
+    [
+     "F34-X1",
+     "F34-Y3"
+    ],
+    [
+     "F34-X2",
+     "F34-Y0"
+    ],
+    [
+     "F34-X2",
+     "F34-Y1"
+    ],
+    [
+     "F34-X2",
+     "F34-Y2"
+    ],
+    [
+     "F34-X2",
+     "F34-Y3"
+    ]
+   ]
+  },
+  {
+   "file_token": "F35",
+   "lang": ".py",
+   "listX": [
+    {
+     "id": "F35-X0",
+     "text": "variable min (L32) shadows the Python builtin min"
+    },
+    {
+     "id": "F35-X1",
+     "text": "snapshot/time pairing [5,11] with ['150','900'] differs from the MATLAB siblings ([5 7]/'200','300' and [5 20]/'150','600'); for nfile difference 5 vs 11 the label jump 150 to 900 sec is not proportional and the pairing cannot be validated from this file"
+    },
+    {
+     "id": "F35-X2",
+     "text": "plt.hold(True) (L55) requires matplotlib < 3.0; version requirement is not stated"
+    },
+    {
+     "id": "F35-X3",
+     "text": "ax (L49) is assigned but unused; fig.subplots_adjust called inside the loop each iteration (L50)"
+    }
+   ],
+   "listY": [
+    {
+     "id": "F35-Y0",
+     "text": "Interface mismatch: the call plt.hold(True) at L55 targets the removed pyplot hold API in modern Matplotlib, so execution fails there on such versions after the plotting work at L40-L54."
+    },
+    {
+     "id": "F35-Y1",
+     "text": "Cross-list range coupling: the loop bound is len(nfile) at L42 but title indexing uses min[num] at L53; the current literals at L31-L32 both have length two, but editing only nfile can make the title access exceed min's range."
+    },
+    {
+     "id": "F35-Y2",
+     "text": "The eta and mask arrays loaded independently at L44-L45 are combined at L47 and plotted against x/y derived from dep at L16-L21 without any shape compatibility check; mismatched case outputs fail or mask/plot the wrong geometry."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F35-X0",
+     "F35-Y1"
+    ],
+    [
+     "F35-X2",
+     "F35-Y0"
+    ],
+    [
+     "F35-X2",
+     "F35-Y1"
+    ],
+    [
+     "F35-X3",
+     "F35-Y0"
+    ],
+    [
+     "F35-X3",
+     "F35-Y1"
+    ],
+    [
+     "F35-X3",
+     "F35-Y2"
+    ]
+   ]
+  },
+  {
+   "file_token": "F36",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F36-X0",
+     "text": "byte-identical duplicate of the multi_vessel_morphology copy; same notes apply (dynamic growth of ha with preallocation commented at L48, blanked tick labels L57-L58 that callers must restore)"
+    }
+   ],
+   "listY": [
+    {
+     "id": "F36-Y0",
+     "text": "Explicitly empty gap bypasses the default at L29 and scalar expansion at L33, then gap(1:2) is indexed at L43-L44; this deterministic empty-argument failure contrasts with marg_h, whose L30 guard handles empty."
+    },
+    {
+     "id": "F36-Y1",
+     "text": "Explicitly empty marg_w similarly bypasses L31/L36 and is indexed at L44/L51, so the fifth argument rejects `[]` while the fourth accepts it."
+    },
+    {
+     "id": "F36-Y2",
+     "text": "Nh/Nw positivity/integrality and vector argument lengths are not validated. Zero dimensions divide by zero, and extra margin elements affect sum at L43-L44 while only the first two elements drive placement."
+    },
+    {
+     "id": "F36-Y3",
+     "text": "This file is an exact duplicate of another case-local tight_subplot, so fixes must be synchronized across copies."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F36-X0",
+     "F36-Y0"
+    ],
+    [
+     "F36-X0",
+     "F36-Y1"
+    ],
+    [
+     "F36-X0",
+     "F36-Y2"
+    ]
+   ]
+  },
+  {
+   "file_token": "F37",
+   "lang": ".F",
+   "listX": [
+    {
+     "id": "F37-X0",
+     "text": "For even Nglob, L24 produces asymmetric coordinates `(1-Nglob/2)..Nglob/2`; using abs(Y) in L30-L32 therefore yields unequal side extents/depths instead of a cell-centered symmetric channel."
+    },
+    {
+     "id": "F37-X1",
+     "text": "The 9000-value format at L41 can revert to an additional record when Mglob>9000 at L39, splitting a logical grid row."
+    },
+    {
+     "id": "F37-X2",
+     "text": "Input geometry is unvalidated, so bad dimensions/spacings or a steep slope can create allocation failures or negative depths. I/O and allocation status are unchecked."
+    },
+    {
+     "id": "F37-X3",
+     "text": "This is an exact case-local duplicate of the cohesive generator, so defects/fixes can diverge between copies."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F37-Y0",
+     "text": "byte-identical duplicate of multi_vessel_morphology/mk_depth.F and single_vessel_cohesive/mk_depth.F; same observations: no depth clipping so land can go negative, X/Y computed but not written, bathy_param.txt format implicit in READ order"
+    }
+   ],
+   "candidate_pairs": []
+  },
+  {
+   "file_token": "F38",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F38-X0",
+     "text": "Two flattening/averaging formulas incorrectly assume square subcells. L72 advances each jj row by `cell_n` but indexes ii across `cell_m`; the row stride must be cell_m. L89 divides the cell sum by cell_m twice instead of cell_m*cell_n. Active cell_m=cell_n=4 masks both defects, but rectangular configurations corrupt metadata columns and coarse averages."
+    },
+    {
+     "id": "F38-X1",
+     "text": "Block bounds are not validated against the coarse/fine grids or obs_m/obs_n against cell_m/cell_n. Parameter edits can drive j_coarse/i_coarse or n1:n2/m1:m2 out of range."
+    },
+    {
+     "id": "F38-X2",
+     "text": "dep_bottom=9999 is defined at L26 but never used. dep_top is added as an offset to local coarse depth at L64 rather than assigned as an absolute top elevation/depth; the intended meaning is unstated."
+    },
+    {
+     "id": "F38-X3",
+     "text": "dep_level clips negative depths to zero only for dep_sub averaging (L79-L89), while dep_full and dep_sub_info retain negatives. Thus coarse and fine outputs are not direct conservative representations of one another around exposed blocks."
+    },
+    {
+     "id": "F38-X4",
+     "text": "Hard-coded dimension-bearing filenames become stale if grid parameters change; plot directory and fopen success are unchecked."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F38-Y0",
+     "text": "dep_bottom=9999.0 (L26) is defined but never referenced anywhere in the file"
+    },
+    {
+     "id": "F38-Y1",
+     "text": "patch average at L89 divides by cell_m twice (/cell_m/cell_m) rather than cell_m*cell_n; numerically identical only because cell_m==cell_n==4 (L22-23)"
+    },
+    {
+     "id": "F38-Y2",
+     "text": "column index 2+(jj-1)*cell_n+ii (L72) uses cell_n as the stride over ii which ranges 1..cell_m (L68-69); correct flattening only while cell_m==cell_n"
+    },
+    {
+     "id": "F38-Y3",
+     "text": "obstacle sub-window formulas (L37-40) place the 3x3 window at rows/cols 1:3 of the 4x4 cell, i.e. offset toward the low-index corner, not symmetric — whether intended is not stated"
+    },
+    {
+     "id": "F38-Y4",
+     "text": "block region starts at coarse column m_start=400 with nx_blocks=100 (L32, L34) reaching column 499, one short of nx_total=500 (L3); coverage intent not documented in this file"
+    },
+    {
+     "id": "F38-Y5",
+     "text": "dep_cell_add and dep_sub_writeout are indexed without preallocation (L64, L70-72); dep_cell_add(:,:) on the left side requires the variable to already exist on first iteration in some MATLAB versions — no initialization appears in this file"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F38-X0",
+     "F38-Y1"
+    ],
+    [
+     "F38-X0",
+     "F38-Y2"
+    ],
+    [
+     "F38-X0",
+     "F38-Y5"
+    ],
+    [
+     "F38-X2",
+     "F38-Y0"
+    ],
+    [
+     "F38-X2",
+     "F38-Y1"
+    ],
+    [
+     "F38-X2",
+     "F38-Y2"
+    ],
+    [
+     "F38-X2",
+     "F38-Y4"
+    ],
+    [
+     "F38-X2",
+     "F38-Y5"
+    ],
+    [
+     "F38-X3",
+     "F38-Y1"
+    ]
+   ]
+  },
+  {
+   "file_token": "F39",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F39-X0",
+     "text": "Explicit empty gap and marg_w bypass defaults/scalar expansion and are later indexed, while explicit empty marg_h is handled; the input interface is inconsistent."
+    },
+    {
+     "id": "F39-X1",
+     "text": "Nh/Nw and vector lengths are unvalidated, permitting divide-by-zero and mixed use of all margin elements in sum versus only the first two in placement."
+    },
+    {
+     "id": "F39-X2",
+     "text": "This byte-identical duplicate requires any fix to be synchronized with the other case-local copies."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F39-Y0",
+     "text": "ha grows without preallocation (assignment at L55; the preallocation ha = zeros(Nh*Nw,1) at L48 is commented out) — handle-class compatibility of numeric preallocation may be why"
+    },
+    {
+     "id": "F39-Y1",
+     "text": "nargin<4 uses || isempty(marg_h) (L30) but nargin<3 and nargin<5 (L29, L31) do not have the isempty guard — passing [] for gap or marg_w is not defaulted, asymmetry unexplained in this file"
+    }
+   ],
+   "candidate_pairs": []
+  },
+  {
+   "file_token": "F40",
+   "lang": ".py",
+   "listX": [
+    {
+     "id": "F40-X0",
+     "text": "this rip_tracking copy is byte-identical to the rip_2d version: fdir (L14) and output names (L92) still reference rip_2D, so it was copied without adaptation to the rip_tracking case"
+    },
+    {
+     "id": "F40-X1",
+     "text": "filename says eta_vor but no vorticity is computed or plotted"
+    },
+    {
+     "id": "F40-X2",
+     "text": "dep is NaN-masked in-place per snapshot without reload (L58), accumulating holes across frames"
+    },
+    {
+     "id": "F40-X3",
+     "text": "plt.show() inside the loop (L93) blocks per frame; no figure clearing between frames"
+    },
+    {
+     "id": "F40-X4",
+     "text": "from matplotlib.cm import jet (L10) is incompatible with matplotlib >= 3.9; version requirement unstated"
+    }
+   ],
+   "listY": [
+    {
+     "id": "F40-Y0",
+     "text": "This file is under the `rip_tracking` case but hard-codes `simple_cases/rip_2D/work/output` at L14 and names outputs `rip_2d_...` at L92. It is byte-identical to the rip_2d postprocessor and therefore appears to be an unadapted copy that reads and labels the wrong case rather than rip_tracking results."
+    },
+    {
+     "id": "F40-Y1",
+     "text": "`dep` is loaded once at L23 and destructively masked each frame at L58, so dry cells accumulate across frames and cannot reappear when later masks become wet."
+    },
+    {
+     "id": "F40-Y2",
+     "text": "No clear/close/reset occurs inside L44-L93; plot artists and colorbar axes accumulate across frames, affecting later images and memory."
+    },
+    {
+     "id": "F40-Y3",
+     "text": "Both panels crop x to half the loaded domain at L67,L90 without explanation. HOME/input/file existence and cross-array shapes are unvalidated."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F40-X0",
+     "F40-Y0"
+    ],
+    [
+     "F40-X0",
+     "F40-Y2"
+    ],
+    [
+     "F40-X0",
+     "F40-Y3"
+    ],
+    [
+     "F40-X2",
+     "F40-Y1"
+    ],
+    [
+     "F40-X3",
+     "F40-Y0"
+    ],
+    [
+     "F40-X3",
+     "F40-Y2"
+    ],
+    [
+     "F40-X3",
+     "F40-Y3"
+    ],
+    [
+     "F40-X4",
+     "F40-Y0"
+    ]
+   ]
+  },
+  {
+   "file_token": "F41",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F41-X0",
+     "text": "Random origins are not bounded by feature size and MATLAB's 1-based matrix indices. With ystart=0 and widthy=150 (L14-L16,L25), `yy1` can be zero, while the insertion at L46 uses it directly as an index. Also y0 can approach 149 and sizes reach 80, exceeding n=200; x0 can approach 599 and size 80 exceeds m=656. The seeded draws may or may not hit each invalid case, but the declared sampling range permits deterministic out-of-bounds failures."
+    },
+    {
+     "id": "F41-X1",
+     "text": "Min-max normalization at L53-L55 has no guard for `mm==mn`; empty/zero feature settings or an all-clipped relief would divide by zero and contaminate `dep` at L57."
+    },
+    {
+     "id": "F41-X2",
+     "text": "The second pcolor panel calls ylabel twice at L76-L77, with the latter text `points in x`; this is a copy/paste error that overwrites the y label instead of setting xlabel."
+    },
+    {
+     "id": "F41-X3",
+     "text": "`k=30` at L4 is never read. Plot writes assume the `plots` directory already exists."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F41-Y0",
+     "text": "with dep_flat=2 and rat=1.005 the deepest hill crest reaches dep=2-2/1.005=0.00995 before the slope is added, keeping cells barely wet; after adding slope values 10.0 down to 10.0-0.03*655=-9.65 (L85) the right part of the domain becomes negative depth (dry hills), consistent with the rain_on_hills case name, but intended still-water datum is not documented"
+    },
+    {
+     "id": "F41-Y1",
+     "text": "patch placement can exceed array bounds only if xstart+widthx+max(sizes) > m; here 250+350+80=680 > m=656, so an out-of-bounds write at L46 is possible for unlucky rand draws; with rng(2) the actual draws evidently fit, but the script is not generally safe"
+    },
+    {
+     "id": "F41-Y2",
+     "text": "k=30 (L4) is never used; second ylabel at L77 overwrites the first and labels the y-axis 'points in x' on a y axis; figure 1 (patch rectangles) is never printed (L59 commented)"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F41-X0",
+     "F41-Y1"
+    ],
+    [
+     "F41-X1",
+     "F41-Y2"
+    ],
+    [
+     "F41-X2",
+     "F41-Y2"
+    ],
+    [
+     "F41-X3",
+     "F41-Y2"
+    ]
+   ]
+  },
+  {
+   "file_token": "F42",
+   "lang": ".py",
+   "listX": [
+    {
+     "id": "F42-X0",
+     "text": "N = 2*n+1 (L21) with mirror fill targets ETA[n:-1,:] (L61 etc.) leaves the last row (index N-1) permanently zero and duplicates the loaded row n-1 at row n; the companion MATLAB script's mirroring convention (2*n-1) is not reproduced here — which convention matches the solver output layout is not determinable from this file"
+    },
+    {
+     "id": "F42-X1",
+     "text": "first profile subplot plots plt.plot(x,B) (L121) but labels the abscissa 'y (m)' (L123) and limits it to [0,120] (L125); B is filled only for j in range(nn) rows (L116-117) while its allocation np.shape(BB[0,:]) is column-length mm (L114) — x vs y axis identity of this plot is internally inconsistent"
+    },
+    {
+     "id": "F42-X2",
+     "text": "fdir = os.path.join(pwd,FOLDER,'output') (L12) joins pwd with FOLDER that is already absolute (built from HOME, L10-11), so pwd is discarded by os.path.join semantics; intended directory resolution unclear"
+    },
+    {
+     "id": "F42-X3",
+     "text": "both savefig names use time[num] (L105, L135) but L135 executes outside the for loop, relying on the leaked loop variable num"
+    },
+    {
+     "id": "F42-X4",
+     "text": "from IPython.display import display (L4) is never used"
+    },
+    {
+     "id": "F42-X5",
+     "text": "depth source is 'dep.out' (L16) while the MATLAB counterpart reads 'dep_00001'; concentration colorbar unit here is mg/L (L90) — units are asserted only by plot labels"
+    }
+   ],
+   "listY": [
+    {
+     "id": "F42-Y0",
+     "text": "The mirror allocation/slices are inconsistent: N=2*n+1 at L21, while each target slice `0:n` and `n:-1` has n rows (L60-L68), filling only 2n rows and leaving final row index 2n as initialized zero in ETA/CH/BEDS/BEDB/DEP. The reverse slice also duplicates eta/dep's last row. This creates a spurious zero boundary row and a different topology from the MATLAB version's 2n-1 mirror."
+    },
+    {
+     "id": "F42-Y1",
+     "text": "The row-mean buffer B is allocated with shape BB[0,:], i.e. length M (L114), but the loop writes nn=N row means (L116-L117) and the plot pairs B with x (length M) at L121 while labeling the axis y. If N>M it indexes B out of range; if N<M, only the first N entries are means and the remaining plotted values stay zero. It should be dimensioned/paird with y, not x."
+    },
+    {
+     "id": "F42-Y2",
+     "text": "Concentration is logged without a positive-value guard at L88. In addition, the colorbar says mg/L but the code applies no unit conversion to CH, unlike the related MATLAB plot that explicitly multiplies concentration before labeling."
+    },
+    {
+     "id": "F42-Y3",
+     "text": "beds/bedb are unmasked before BB and row means (L53-L70,L117). `time[num]` is used after the loop at L135, so an empty files list leaves num undefined; multiple files leave section output based only on the final frame."
+    },
+    {
+     "id": "F42-Y4",
+     "text": "FOLDER is already absolute because it begins with HOME at L11, so joining it with pwd at L12 silently discards pwd; the comment/path construction imply a relative-project intent but actual behavior is HOME-rooted."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F42-X0",
+     "F42-Y0"
+    ],
+    [
+     "F42-X1",
+     "F42-Y1"
+    ],
+    [
+     "F42-X1",
+     "F42-Y3"
+    ],
+    [
+     "F42-X2",
+     "F42-Y4"
+    ],
+    [
+     "F42-X3",
+     "F42-Y3"
+    ],
+    [
+     "F42-X5",
+     "F42-Y0"
+    ],
+    [
+     "F42-X5",
+     "F42-Y2"
+    ],
+    [
+     "F42-X5",
+     "F42-Y4"
+    ]
+   ]
+  },
+  {
+   "file_token": "F43",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F43-X0",
+     "text": "mask is loaded at L17 but never used in the profile computation (L30-L39)"
+    },
+    {
+     "id": "F43-X1",
+     "text": "n and m from size(dep) at L7 are never used"
+    },
+    {
+     "id": "F43-X2",
+     "text": "the coefficients -0.5528 and 0.4472 in za (L34) are hard-coded; their provenance (z_alpha = -0.5528 h + 0.4472 eta corresponds to z_alpha ~ -0.53 h in Boussinesq models) is not stated in the file"
+    },
+    {
+     "id": "F43-X3",
+     "text": "despite the filename plot_vertical_profile.m no plotting or saving occurs; U and V are computed and discarded at loop end (L12-L43)"
+    }
+   ],
+   "listY": [
+    {
+     "id": "F43-Y0",
+     "text": "Cross-iteration overwrite: files is explicitly a vector and drives the loop at L4 and L12, but z, U, and V are indexed only by vertical level at L31 and L37-L38, with no k/output dimension or per-file save. If files contains more than one index, every iteration overwrites the preceding reconstruction and only the last remains."
+    },
+    {
+     "id": "F43-Y1",
+     "text": "Mask interface is ineffective: mask is loaded at L17 but never referenced after assignment, so dry/invalid cells are not masked before za, U, and V are computed at L34 and L37-L38."
+    },
+    {
+     "id": "F43-Y2",
+     "text": "All loaded grids at L6 and L16-L23 are assumed dimensionally compatible; n and m measured at L7 are never used for checks, so incompatible inputs fail later by MATLAB array operations rather than an explicit interface check."
+    },
+    {
+     "id": "F43-Y3",
+     "text": "The z-level formula at L31 divides by z_num-1, while z_num is user-editable at L9 and has no guard against 1."
+    },
+    {
+     "id": "F43-Y4",
+     "text": "The hard-coded absolute fdir at L2 has no override or existence check."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F43-X0",
+     "F43-Y0"
+    ],
+    [
+     "F43-X0",
+     "F43-Y1"
+    ],
+    [
+     "F43-X0",
+     "F43-Y2"
+    ],
+    [
+     "F43-X0",
+     "F43-Y3"
+    ],
+    [
+     "F43-X1",
+     "F43-Y0"
+    ],
+    [
+     "F43-X1",
+     "F43-Y2"
+    ],
+    [
+     "F43-X1",
+     "F43-Y3"
+    ],
+    [
+     "F43-X1",
+     "F43-Y4"
+    ],
+    [
+     "F43-X2",
+     "F43-Y0"
+    ],
+    [
+     "F43-X2",
+     "F43-Y1"
+    ],
+    [
+     "F43-X2",
+     "F43-Y3"
+    ],
+    [
+     "F43-X3",
+     "F43-Y0"
+    ],
+    [
+     "F43-X3",
+     "F43-Y1"
+    ],
+    [
+     "F43-X3",
+     "F43-Y2"
+    ],
+    [
+     "F43-X3",
+     "F43-Y3"
+    ]
+   ]
+  },
+  {
+   "file_token": "F44",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F44-X0",
+     "text": "The inline comment says `60 times` at L3, but the expression is 6/3600 degree (six arcseconds), a tenfold copy/comment mismatch that can mislead grid-spacing edits."
+    },
+    {
+     "id": "F44-X1",
+     "text": "Location labels conflict across the file: L7 says Wilmington NC, while the diagnostic filename is `NestRI_NA.jpg` at L61 and the station output is `station_NA.txt` at L66. The source does not resolve which case identity is intended."
+    },
+    {
+     "id": "F44-X2",
+     "text": "All four side loops include both endpoints (L19-L51), so corners are duplicated under adjacent side identifiers while the count formula at L53 explicitly includes those duplicates; downstream corner convention is not stated here."
+    },
+    {
+     "id": "F44-X3",
+     "text": "`icount_last` is assigned at L63 but never read. The plot path assumes a `plots` directory, and fopen is unchecked before fprintf at L66-L68."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F44-Y0",
+     "text": "comment says 'Wilmington NC' (L7) but the coordinates lon -72..-70.85, lat 41.1..41.9 (L8-L11) are in the Rhode Island/Massachusetts area, matching the output names NestRI_NA.jpg (L61) and station_NA.txt (L66); the comment appears stale"
+    },
+    {
+     "id": "F44-Y1",
+     "text": "the coupling_file_single_block.m consumer loads station_WI.txt, not station_NA.txt written here (L66); the file pair correspondence is inconsistent within this directory"
+    },
+    {
+     "id": "F44-Y2",
+     "text": "comment '% 60 times' (L3) is copied from the multi-block script though dx here is 6/3600 (0.1 arcminute); icount_last (L63) is assigned but never used"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F44-X0",
+     "F44-Y0"
+    ],
+    [
+     "F44-X0",
+     "F44-Y2"
+    ],
+    [
+     "F44-X1",
+     "F44-Y0"
+    ],
+    [
+     "F44-X1",
+     "F44-Y1"
+    ],
+    [
+     "F44-X1",
+     "F44-Y2"
+    ],
+    [
+     "F44-X3",
+     "F44-Y0"
+    ],
+    [
+     "F44-X3",
+     "F44-Y1"
+    ],
+    [
+     "F44-X3",
+     "F44-Y2"
+    ]
+   ]
+  },
+  {
+   "file_token": "F45",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F45-X0",
+     "text": "Generation uses x starting at -11 and y starting at 1 (L23-L24), but the diagnostic reconstructs x and y from zero at L56-L57, shifting the displayed coordinates by +11 m and -1 m relative to the Gaussian calculation."
+    },
+    {
+     "id": "F45-X1",
+     "text": "The commented symmetry edit at L35 uses `yc(ncell/2)`. For ncell=2, yc has entries for centers 0,100,200 and MATLAB index ncell/2=1 selects the edge center at 0 rather than the middle center at index 2; if the intended target is the central cell, this is an off-by-one index."
+    },
+    {
+     "id": "F45-X2",
+     "text": "The saved depth matrix at L49 contains no coordinates, leaving the intended relationship between generation offsets and model-grid origin unstated."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F45-Y0",
+     "text": "with xcell=60 the domain x extends only to 300 while the Gaussian center is at xc=100 with sigma^2=2500 (L22-L23), so the channel structure occupies proportionally more of the shorter cross-shore domain than in rip_2d; intended relation between xcell and xc is not documented"
+    },
+    {
+     "id": "F45-Y1",
+     "text": "the commented symmetry-breaking line yc(ncell/2) (L35) would index yc(1) for ncell=2, i.e. the first center, not a middle one"
+    },
+    {
+     "id": "F45-Y2",
+     "text": "same output filename depth_a15.txt as the rip_2d version (L49) though grid sizes differ; xx,yy change meaning mid-script (L24 vs L56-L57)"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F45-X0",
+     "F45-Y0"
+    ],
+    [
+     "F45-X0",
+     "F45-Y2"
+    ],
+    [
+     "F45-X1",
+     "F45-Y1"
+    ],
+    [
+     "F45-X2",
+     "F45-Y2"
+    ]
+   ]
+  },
+  {
+   "file_token": "F46",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F46-X0",
+     "text": "Cross-line data-index inconsistency: eta is loaded only while num=21/fnum=00021 at L12-L15; the averaged block changes num to 4 and fnum to 00004 at L53-L54 but reloads only FRCX and BrkDX at L57-L58, then reuses the stale index-21 eta at L67 in the figure labeled as averaged at L52 and written at L94. Thus figure 2 combines fields from different output indices."
+    },
+    {
+     "id": "F46-X1",
+     "text": "Interface assumption without validation: x and y have lengths m=250 and n=50 from L3-L9, but none of the five load sites at L15-L17 and L57-L58 checks that the loaded matrices are 50-by-250 before pcolor calls at L24, L33, L42, L67, L76, and L85."
+    },
+    {
+     "id": "F46-X2",
+     "text": "The hard-coded absolute fdir at L1 makes every load at L15-L17 and L57-L58 depend on one user-local directory; the file contains no override or existence check."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F46-Y0",
+     "text": "figure(2) subplot(131) at L66-L73 replots the instantaneous eta loaded at L15 (title 'inst \\eta' L73) alongside averaged fields, so figure 2 mixes snapshot 21 eta with averaged output number 4; whether that is intended is not stated in the file"
+    },
+    {
+     "id": "F46-Y1",
+     "text": "the averaged block reuses num=4 for both FRCX_ and BrkDissX_ but no averaged eta file is loaded (L53-L58)"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F46-X0",
+     "F46-Y0"
+    ],
+    [
+     "F46-X0",
+     "F46-Y1"
+    ],
+    [
+     "F46-X1",
+     "F46-Y0"
+    ],
+    [
+     "F46-X1",
+     "F46-Y1"
+    ],
+    [
+     "F46-X2",
+     "F46-Y0"
+    ],
+    [
+     "F46-X2",
+     "F46-Y1"
+    ]
+   ]
+  },
+  {
+   "file_token": "F47",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F47-X0",
+     "text": "x starts at -11 (L23) giving 11 m of dry land (h<0) behind the shoreline; the choice of -11 rather than a round number is unexplained"
+    },
+    {
+     "id": "F47-X1",
+     "text": "the symmetry-breaking line (L35) is commented out, so this saved depth_a15.txt is the symmetric configuration; filename suffix a15 matches a=1.5 (L22)"
+    },
+    {
+     "id": "F47-X2",
+     "text": "the Gaussians at yc=0 and yc=ncell*ycell=500 are truncated at the domain edges (y spans dy/2..499); periodic wrap consistency is left to the model's periodic boundary condition and is not enforced here"
+    },
+    {
+     "id": "F47-X3",
+     "text": "xx,yy change meaning mid-script from meshgrid arrays (L24) to 1D plot vectors (L56-L57)"
+    }
+   ],
+   "listY": [
+    {
+     "id": "F47-Y0",
+     "text": "The active generation mesh begins at x=-11 and y=dy/2=1 (L23-L24), but the diagnostic reconstructs coordinates from zero at L56-L57. Thus the plotted bathymetry is shifted +11 m in x and -1 m in y relative to the coordinates used to generate the Gaussian channels."
+    },
+    {
+     "id": "F47-Y1",
+     "text": "The documented symmetry-breaking edit at L35 indexes `yc(ncell/2)`. With the active odd ncell=5 (L10), ncell/2 is 2.5 and is not a valid MATLAB index, so uncommenting the advertised option fails before changing symmetry."
+    },
+    {
+     "id": "F47-Y2",
+     "text": "The saved matrix carries no coordinate metadata (L49); whether the generation offsets in L23 are meant as physical domain coordinates or only formula coordinates cannot be resolved from this file."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F47-X0",
+     "F47-Y0"
+    ],
+    [
+     "F47-X0",
+     "F47-Y2"
+    ],
+    [
+     "F47-X1",
+     "F47-Y0"
+    ],
+    [
+     "F47-X1",
+     "F47-Y1"
+    ],
+    [
+     "F47-X1",
+     "F47-Y2"
+    ],
+    [
+     "F47-X3",
+     "F47-Y0"
+    ],
+    [
+     "F47-X3",
+     "F47-Y2"
+    ]
+   ]
+  },
+  {
+   "file_token": "F48",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F48-X0",
+     "text": "fdir mixes Windows backslashes with a trailing forward slash (L8) and lacks a semicolon so it echoes; directory named simple_cases_input though umean_/eta_ are output files"
+    },
+    {
+     "id": "F48-X1",
+     "text": "same in-place dep masking accumulation issue as the sibling (L54): masks from all previous snapshots persist"
+    },
+    {
+     "id": "F48-X2",
+     "text": "ax spans y 0-2000 (L58) though the rip_2d bathymetry from makebath.m has y up to ~500; whether a larger domain input.txt exists is not determinable here"
+    },
+    {
+     "id": "F48-X3",
+     "text": "duplicate caxis for panel 3 ([-12 0] L96 overridden by [-12 2.5] L101); icount unused"
+    }
+   ],
+   "listY": [
+    {
+     "id": "F48-Y0",
+     "text": "`dep` is loaded once at L17 but destructively masked inside the multi-frame loop at L54. Cells masked in an earlier frame remain NaN on later frames even if later masks mark them wet, so the bathymetry panel accumulates historical dry regions."
+    },
+    {
+     "id": "F48-Y1",
+     "text": "The depth subplot's caxis is set to [-12,0] at L96 and then overwritten by [-12,2.5] at L101 on the same axes."
+    },
+    {
+     "id": "F48-Y2",
+     "text": "The absolute Windows fdir at L8 mixes backslashes with a trailing slash and ties the script to one workstation; there is no existence check before loads."
+    },
+    {
+     "id": "F48-Y3",
+     "text": "No shared-shape check precedes masking and curl of dep/u/v/eta/mask. `w_ang` and `icount` are unused after assignment, and nstart/nend are unvalidated."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F48-X0",
+     "F48-Y2"
+    ],
+    [
+     "F48-X1",
+     "F48-Y0"
+    ],
+    [
+     "F48-X2",
+     "F48-Y0"
+    ],
+    [
+     "F48-X3",
+     "F48-Y1"
+    ]
+   ]
+  }
+ ]
+}

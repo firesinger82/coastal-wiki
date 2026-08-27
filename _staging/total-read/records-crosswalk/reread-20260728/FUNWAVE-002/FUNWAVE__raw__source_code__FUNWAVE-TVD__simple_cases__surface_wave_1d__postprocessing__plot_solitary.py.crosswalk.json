@@ -1,0 +1,126 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-002",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/surface_wave_1d/postprocessing/plot_solitary.py",
+ "source_sha256": "cc83a8ab9e7c9c7c46c1f246bda9ffd6a34b977e076bcb446e1ee85a62718bf1",
+ "base_run_id": "reread20260728-code-FUNWAVE-002-fable5-20260813T012841Z-ff3d40e9",
+ "audit_run_id": "reread20260728-code-FUNWAVE-002-codexaudit-20260826T022957Z-7b64342a",
+ "base_record_file": "41ee0641d7e27d8f9718e31aed7f99c596c5ce5caae155935668b061db4ee1fc.json",
+ "audit_record_file": "41ee0641d7e27d8f9718e31aed7f99c596c5ce5caae155935668b061db4ee1fc.json",
+ "base_record_sha256_bytes": "bb7de22fa6206f7370dc832ee7d36c14b9888a38fe862e42a44acd548aa25720",
+ "audit_record_sha256_bytes": "4f9c9b6e040f4fd2dc2da903b3e1e1b4b606b3da03237d041f741a4e26098996",
+ "base_finding_count": 5,
+ "audit_finding_count": 4,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "the plotted eta is eta[0,:] (first row, L46), implying the loaded eta_ files are 2-D with the 1-D profile in row 0; file layout is not documented here"
+   ],
+   "audit_member_text": [
+    "np.loadtxt returns a 1-D array for a single-row eta file, but L46 unconditionally indexes eta[0,:], which fails for that common shape; there is no shape normalization/check."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "the slope condition compares the integer index i to the position Xslp in meters (if i < Xslp, L22) — equivalent to comparing x[i] only because dx=1.0 (L12); would misplace the toe for other dx"
+   ],
+   "audit_member_text": [
+    "The slope condition compares array index `i` to physical coordinate Xslp at L22, while the actual coordinate is x[i]=i*dx at L18. It only locates the toe correctly because dx currently equals 1; changing dx moves the physical toe to Xslp*dx rather than Xslp."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "dep is allocated as a full m x m array (L19) though only column 0 is read/written (L23, L25, L46) — mirrors the MATLAB zeros(m) square-matrix quirk of plot_solitary.m at the cost of an unnecessary 1024x1024 array"
+   ],
+   "audit_member_text": [
+    "A 1-D bathymetry is stored as an m-by-m matrix at L19 even though only column 0 is written/read (L23-L27,L46), consuming quadratic memory and leaving 1023 unused constant-depth columns. The MATLAB version's analogous square allocation caused multi-series plotting; this port avoids that only by explicitly selecting DEP[:,0]."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "wid (L31) and length (L32) are assigned but never used — figure size is hardcoded as figsize=(7,8) (L36); comment '# Locate Wavemaker and sponge' (L29) has no associated code"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "time in the title is files[num]*10 (L52), asserting a 10 s output interval not read from any input"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The absolute path contains both `surface_wave_1d` and `surface_wave_1D` with conflicting case, which is fragile on case-sensitive filesystems. `wid` and `length` are unused, and displayed time remains a hard-coded file-index*10 mapping."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

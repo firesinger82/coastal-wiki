@@ -1,0 +1,109 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-002",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/inlet_shoal/postprocessing/plot_bathy_inlet.py",
+ "source_sha256": "51c4e013956c565597d02989c717ed5deeccd9fc1df1ec2168e94334acb38ce4",
+ "base_run_id": "reread20260728-code-FUNWAVE-002-fable5-20260813T012841Z-ff3d40e9",
+ "audit_run_id": "reread20260728-code-FUNWAVE-002-codexaudit-20260826T022957Z-7b64342a",
+ "base_record_file": "1c2af57d6541f2b034dbe303665e7685f8d0ba149219a1e67f0dfcb5a7f6fd39.json",
+ "audit_record_file": "1c2af57d6541f2b034dbe303665e7685f8d0ba149219a1e67f0dfcb5a7f6fd39.json",
+ "base_record_sha256_bytes": "88e0dbc1d7462ac481074f87120e584027eb04d606d24203acbd024d4990f3f3",
+ "audit_record_sha256_bytes": "63332179a4a2927c18f2174022dfe20ef7dfa4793ffe29564565e78cdc6b1a31",
+ "base_finding_count": 3,
+ "audit_finding_count": 5,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B1",
+    "B4"
+   ],
+   "base_member_text": [
+    "the load path directory is spelled 'Intel_Shoal' (L10) versus the case name inlet_shoal; output filename has a double underscore 'inlet__shoal_bathy.png' (L54)"
+   ],
+   "audit_member_text": [
+    "Likely copy/paste path defect: every title/comment/output describes inlet_shoal (L1 and L54), while the hard-coded input directory at L10 is named Intel_Shoal. If the directory follows the case name, the only input fails before plotting.",
+    "The hard-coded user-specific absolute path at L10 has no argument, configuration, or existence check; the double underscore in the output name at L54 is not explained by the file."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "plt.hold(True) (L41) was removed in matplotlib 3.0, so the script targets an older matplotlib; version requirement is not stated"
+   ],
+   "audit_member_text": [
+    "Execution-stopping API mismatch: L41 calls plt.hold(True), but the script imports pyplot directly at L5 and defines no hold shim. This legacy call is absent in modern Matplotlib, so execution can raise AttributeError before overlays, colorbar, and save at L44-L54; plotting already holds by default and the call is unnecessary."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "ax created at L34 is never used; all plotting goes through plt state calls"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Producer/consumer orientation mismatch with mkxyz_shoal_inlet_Uchannel.f: this script maps loaded rows to y and columns to x at L13-L18, but that generator writes dep_shoal_inlet.txt with outer i rows and inner j columns. The plot at L37 therefore swaps the generated physical axes and also discards its centered/shifted coordinates."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Range assumptions are unchecked: overlays require x through 260 at L21-L25 and labels use y=1000 and 1200 at L45/L47, but no comparison with x/y bounds occurs before plotting."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

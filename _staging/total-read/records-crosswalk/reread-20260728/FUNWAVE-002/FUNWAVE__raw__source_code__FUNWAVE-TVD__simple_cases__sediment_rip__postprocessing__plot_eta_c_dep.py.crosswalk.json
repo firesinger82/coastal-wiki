@@ -1,0 +1,117 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-002",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/sediment_rip/postprocessing/plot_eta_c_dep.py",
+ "source_sha256": "088b7738a8d498b2071bc222064ea555b89c73074c27ce42138d26085fa500fa",
+ "base_run_id": "reread20260728-code-FUNWAVE-002-fable5-20260813T012841Z-ff3d40e9",
+ "audit_run_id": "reread20260728-code-FUNWAVE-002-codexaudit-20260826T022957Z-7b64342a",
+ "base_record_file": "6b5f2eee25568f93af88d7950180a7bb144b5c9f0c6a4c7342ff5b2929518272.json",
+ "audit_record_file": "6b5f2eee25568f93af88d7950180a7bb144b5c9f0c6a4c7342ff5b2929518272.json",
+ "base_record_sha256_bytes": "876debb650d3487233b6dbbe6eefc40952dc057f6e2629b61fa08fab47612830",
+ "audit_record_sha256_bytes": "7715a98cb5d8d332dcccc8a5f461c7cf5e6498dcceff24ceb717d108e9bffa02",
+ "base_finding_count": 5,
+ "audit_finding_count": 5,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0",
+    "B1"
+   ],
+   "base_member_text": [
+    "depp computed before dep is NaN-masked (L54 vs L58) — same ordering as the MATLAB sibling; dep masked in-place accumulates across frames without reload"
+   ],
+   "audit_member_text": [
+    "`depp` is calculated at L54 before current masking, while only eta, baseline dep, u, and v are masked at L57-L60; concentration and evolving depth/depth change remain unmasked, so dry/sentinel values appear in panels 2 and 3 while panel 1 and arrows hide them.",
+    "Baseline `dep` is mutated to NaN at L58 and never restored. On the next frame, depp=dep1-dep at L54 already inherits all historical dry NaNs, and further masking accumulates, making multi-frame depth changes history-dependent."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "plt.show() in the loop (L126) blocks per frame; figures are not cleared between snapshots"
+   ],
+   "audit_member_text": [
+    "There is no figure/axes clear or close inside L41-L126, so artists and newly created colorbar axes accumulate across frames."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "ch is plotted unmasked and np.log10(ch) (L86) produces -inf/warnings for zero concentration"
+   ],
+   "audit_member_text": [
+    "`np.log10(ch)` at L86 lacks a positivity/missing-value guard; zeros become -Inf and negatives become NaN, inconsistent with the finite [-1,1] display range."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "the axis window fraction 7*m*dx/9 (L69, L103, L114) crops the right 2/9 of the domain; rationale not stated"
+   ],
+   "audit_member_text": [
+    "All panels crop x to 7/9 of the loaded domain at L69,L103,L114 without explanation; HOME, inputs, file existence, and cross-array shapes are unvalidated."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "from matplotlib.cm import jet (L10) incompatible with matplotlib >= 3.9"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

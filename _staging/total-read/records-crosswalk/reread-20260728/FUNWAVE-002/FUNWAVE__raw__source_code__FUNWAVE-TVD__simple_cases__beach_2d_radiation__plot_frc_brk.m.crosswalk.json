@@ -1,0 +1,75 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-002",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/beach_2d_radiation/plot_frc_brk.m",
+ "source_sha256": "07cc3d9a9a9c4f41db734c31f4d8a3f90dfab4e304c8c7fad80e3ce4bbeefe36",
+ "base_run_id": "reread20260728-code-FUNWAVE-002-fable5-20260813T012841Z-ff3d40e9",
+ "audit_run_id": "reread20260728-code-FUNWAVE-002-codexaudit-20260826T022957Z-7b64342a",
+ "base_record_file": "eaa5a2243cc2cea31a6dfdb1ce8acec6a113e26dbe4122a5dc21ef8af8df6b02.json",
+ "audit_record_file": "eaa5a2243cc2cea31a6dfdb1ce8acec6a113e26dbe4122a5dc21ef8af8df6b02.json",
+ "base_record_sha256_bytes": "003a7496d9466fc7bb12e3e1021dc47a5a44e925ea81525ea62b8d5dbbd4e592",
+ "audit_record_sha256_bytes": "b011918d2650ceaecbeaacbd9b4947dd10bbe1fe96c77468f4cb9ea644355cb5",
+ "base_finding_count": 2,
+ "audit_finding_count": 3,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0",
+    "A1"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "figure(2) subplot(131) at L66-L73 replots the instantaneous eta loaded at L15 (title 'inst \\eta' L73) alongside averaged fields, so figure 2 mixes snapshot 21 eta with averaged output number 4; whether that is intended is not stated in the file",
+    "the averaged block reuses num=4 for both FRCX_ and BrkDissX_ but no averaged eta file is loaded (L53-L58)"
+   ],
+   "audit_member_text": [
+    "Cross-line data-index inconsistency: eta is loaded only while num=21/fnum=00021 at L12-L15; the averaged block changes num to 4 and fnum to 00004 at L53-L54 but reloads only FRCX and BrkDX at L57-L58, then reuses the stale index-21 eta at L67 in the figure labeled as averaged at L52 and written at L94. Thus figure 2 combines fields from different output indices."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Interface assumption without validation: x and y have lengths m=250 and n=50 from L3-L9, but none of the five load sites at L15-L17 and L57-L58 checks that the loaded matrices are 50-by-250 before pcolor calls at L24, L33, L42, L67, L76, and L85."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The hard-coded absolute fdir at L1 makes every load at L15-L17 and L57-L58 depend on one user-local directory; the file contains no override or existence check."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

@@ -1,0 +1,88 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-002",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/single_vessel_cohesive/mk_depth.F",
+ "source_sha256": "8c7547c03ba58a60b5bc78ad80709de016e0226ea77200fbe598bd9e0df09d12",
+ "base_run_id": "reread20260728-code-FUNWAVE-002-fable5-20260813T012841Z-ff3d40e9",
+ "audit_run_id": "reread20260728-code-FUNWAVE-002-codexaudit-20260826T022957Z-7b64342a",
+ "base_record_file": "a02cf452f4c1b5457386eef4cf779e2242006e883083bb536d838bac593020a3.json",
+ "audit_record_file": "a02cf452f4c1b5457386eef4cf779e2242006e883083bb536d838bac593020a3.json",
+ "base_record_sha256_bytes": "2059bc4d9b30ae0d3bb93e26b63a3e36ec2e03f79e148c675c0a29d15ede33ca",
+ "audit_record_sha256_bytes": "12b86b34f52f16f7d22a52c1c8085d87441a03d0f65885f94e1f4065f305e23f",
+ "base_finding_count": 1,
+ "audit_finding_count": 4,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "byte-identical duplicate of multi_vessel_morphology/mk_depth.F; same observations apply: depth can go negative for large abs(Y) without clipping, X/Y arrays are never written, bathy_param.txt content order only implicit in READ sequence (L9-L15)"
+   ],
+   "audit_member_text": [
+    "No bounds/physical validation prevents nonpositive Mglob/Nglob/DX/DY, negative width, or slopes large enough to make DEPTH negative outside the channel (L9-L35)."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The y-coordinate formula L24 is not cell-centered symmetrically for even Nglob: it yields indices from `(1-Nglob/2)*DY` through `(Nglob/2)*DY` (for Nglob=100, -49*DY through +50*DY). Because bank depth uses abs(Y) at L30-L32, the two sides contain unequal coordinate extents and can receive asymmetric depth values despite symmetric input parameters."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The output format has exactly 9000 F descriptors at L41 while the implied-DO writes Mglob values at L39. If Mglob exceeds 9000, Fortran format reversion can continue the same J values on another record, breaking the intended one-grid-row-per-record layout."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "OPEN/READ/ALLOCATE/WRITE have no IOSTAT or size checks, so missing/malformed input and allocation/output failures are uncontrolled."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

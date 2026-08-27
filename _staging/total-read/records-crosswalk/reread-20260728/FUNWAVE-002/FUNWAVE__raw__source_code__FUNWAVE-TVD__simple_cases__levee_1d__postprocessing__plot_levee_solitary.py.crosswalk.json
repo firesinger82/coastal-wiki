@@ -1,0 +1,141 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-002",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/levee_1d/postprocessing/plot_levee_solitary.py",
+ "source_sha256": "2d2bfb82d91fbce60246e4529bfd6bcd1f795d0cf84a6fd1add29f0a18ba4440",
+ "base_run_id": "reread20260728-code-FUNWAVE-002-fable5-20260813T012841Z-ff3d40e9",
+ "audit_run_id": "reread20260728-code-FUNWAVE-002-codexaudit-20260826T022957Z-7b64342a",
+ "base_record_file": "7f2d1cce8ff9e5ef2d5e296bf6068ae92c854ca9b592120098e2915a0bd95e94.json",
+ "audit_record_file": "7f2d1cce8ff9e5ef2d5e296bf6068ae92c854ca9b592120098e2915a0bd95e94.json",
+ "base_record_sha256_bytes": "80ab2b090bfdea6d68e4be92d005373b3c902a11af63036956b7e1ac4c94e970",
+ "audit_record_sha256_bytes": "ebef11ef0be45b59c4dc72c0ca9d2a62674442b5ecad4ca23c252feadf06237f",
+ "base_finding_count": 5,
+ "audit_finding_count": 5,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "readETAData takes a postprocessDir argument (L25) but uses the global outputDir (L33); the passed argument is ignored"
+   ],
+   "audit_member_text": [
+    "Interface mismatch: readETAData declares postprocessDir at L25 and callers pass outputDir at L41, but the function ignores that parameter and instead closes over global outputDir at L33; callers cannot redirect reads through the advertised argument."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "plt.savefig keyword ext=\"png\" (L71) is not a standard matplotlib argument"
+   ],
+   "audit_member_text": [
+    "The save call at L71 passes ext=\"png\" to pyplot.savefig even though the filename already supplies .png; this keyword is not part of the pyplot savefig API and can be forwarded as an unsupported backend keyword, preventing frame output."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "time annotation is placed at xy=(Lt*.85,3) (L66) while the y-axis is clipped at 1 by plt.axis (L47), so the text anchor lies outside the visible axes"
+   ],
+   "audit_member_text": [
+    "Range/visibility defect: the plot y-axis is capped at 1 at L47, but the time annotation is placed at y=3 in data coordinates at L66, so it lies outside the visible axes."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "bottom-fill condition where=depth[1,:]>(depth[1,:]-.05) (L60) is always true, so the where clause is a no-op"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "row index 1 (surf[1,:], depth[1,:]) selects the second row consistent with the MATLAB sibling's dep(2,:) artificial-row stripping, per comment L17"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "depth.shape at L17 assumes a 2-D input and plotting indexes depth[1,:] at L47 and L54-L60; surf[1,:] is likewise used at L46 and L54-L55. No check ensures either array has two rows or that their column counts match Mglob."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The file-index guard at L29 is an assert, so Python optimization can remove it; file selection at L33 then proceeds without the stated range check."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

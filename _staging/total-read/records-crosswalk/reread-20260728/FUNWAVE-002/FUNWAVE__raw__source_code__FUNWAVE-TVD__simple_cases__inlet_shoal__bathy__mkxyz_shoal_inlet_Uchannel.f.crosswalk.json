@@ -1,0 +1,122 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-002",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/inlet_shoal/bathy/mkxyz_shoal_inlet_Uchannel.f",
+ "source_sha256": "6baefa00385f3cef83e35bea04f1d4542dc491b7d836532a38a892cb7a629624",
+ "base_run_id": "reread20260728-code-FUNWAVE-002-fable5-20260813T012841Z-ff3d40e9",
+ "audit_run_id": "reread20260728-code-FUNWAVE-002-codexaudit-20260826T022957Z-7b64342a",
+ "base_record_file": "6face14c3e1efb5d5b38ca9607e8c59b9688e7a19e7fb0078963e1828ece9e2d.json",
+ "audit_record_file": "6face14c3e1efb5d5b38ca9607e8c59b9688e7a19e7fb0078963e1828ece9e2d.json",
+ "base_record_sha256_bytes": "ab22bd36f09a2ed7d8f66c1ba8b680d8a302751097c391cdf7a20bcda03f29ca",
+ "audit_record_sha256_bytes": "e0809d8e2459fd75becdd43a4993ed4cd576f308baabe62ed92d47436e1e6fdf",
+ "base_finding_count": 4,
+ "audit_finding_count": 5,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0",
+    "A1"
+   ],
+   "audit_ids": [
+    "B1",
+    "B3"
+   ],
+   "base_member_text": [
+    "declared arrays cori and dep_swan (L2) are never assigned or written",
+    "constants depmin (L7), slope (L8), breakwater_length (L13), y_break (L14), x_break (L15), width_inlet (L26) are defined but never used; the breakwater extent is instead hard-coded as index ranges i=412,612 and j=300,301 (L111-L112, L120-L121)"
+   ],
+   "audit_member_text": [
+    "Dead configuration/interface mismatch: slope, breakwater_length, y_break, x_break, width_inlet, and depmin are assigned at L7-L8, L13-L15, and L26 but never used. Breakwater placement instead uses literal index ranges 412:612 and 300:301 at L111-L112. With the coordinate transform at L20-L21 those rows lie near y=-163 to -161 rather than the configured y_break=-150.",
+    "Declared arrays cori and dep_swan at L2 are never assigned or written, and breakwater_length/width_inlet/slope controls are similarly inactive, leaving their intended outputs or geometry effects unresolved from this file."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "hard-coded breakwater index span i=412..612 covers 200 cells = 400 m at dx=2, numerically matching the unused breakwater_length=400.0 (L13), but the file does not state this relation"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "format 3000f12.3 (L171) allows up to 3000 values per record while only n=512 (rows write j=1,n) are written; commented-out tmp.txt block at L65-L69 wrote h with i=1,m=1024 per record"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Range defect across L21, L76-L87, and L97: for 0<y<100 the slope branch at L77 produces negative dep. Outside abs(x)<=150 the channel branch at L80-L83 does not replace it, and the basin branch begins only at y>=100 at L85. The later min(dep,h) at L97 preserves the negative value. depmin=0.002 at L7 is never applied, so a substantial grid region is emitted with negative depth."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH) | span-reviewed 2026-08-27 REFUTED: slope dep=flat*(-y/width_surf) negative for y>0 is intended emergent-beach slope (L76-78), handled by min(dep,h) L92-94 + wet/dry mask. not material.",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Dimension parameter hazard: m and n are presented as parameters at L1, but obstacle loops unconditionally access i=412:612 and j=300:301 at L111-L125. Reducing either parameter below those maxima causes out-of-bounds access; no range check connects the interface values to the hard-coded indices."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The output loops use i as the record index and j as the inner list at L134-L167, so each file is m rows by n columns despite arrays being declared (m,n); the consuming orientation is not declared in this file."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

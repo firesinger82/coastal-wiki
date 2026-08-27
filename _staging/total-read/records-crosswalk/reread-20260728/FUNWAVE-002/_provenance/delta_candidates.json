@@ -1,0 +1,50 @@
+[
+ {
+  "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/inlet_shoal/postprocessing/plot_bathy_inlet.py",
+  "record_file": "1c2af57d6541f2b034dbe303665e7685f8d0ba149219a1e67f0dfcb5a7f6fd39.json",
+  "audit_id": "B2",
+  "text": "Producer/consumer orientation mismatch with mkxyz_shoal_inlet_Uchannel.f: this script maps loaded rows to y and columns to x at L13-L18, but that generator writes dep_shoal_inlet.txt with outer i rows and inner j columns. The plot at L37 therefore swaps the generated physical axes and also discards its centered/shifted coordinates.",
+  "canonical_scope": "out-of-scope (postprocessing script .py, 절대규칙 #8)",
+  "review_status": "pending"
+ },
+ {
+  "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/inlet_shoal/postprocessing/plot_bathy.m",
+  "record_file": "1f7b00555e38634ea663bf1af32820e71a624e69115275768d871b0feef61165.json",
+  "audit_id": "B0",
+  "text": "Producer/consumer orientation mismatch with the preceding bathymetry generator: this file assumes matrix rows are y and columns are x at L3-L7. mkxyz_shoal_inlet_Uchannel.f writes dep_shoal_inlet.txt with outer i records and inner j values (its L145-L149), so loading yields rows=i and columns=j. Consequently this script maps the generator's x index onto y and its y index onto x at L6-L7/L19, transposing the physical axes without transposing dep.",
+  "canonical_scope": "out-of-scope (postprocessing script .m, 절대규칙 #8)",
+  "review_status": "pending"
+ },
+ {
+  "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/inlet_shoal/bathy/mkxyz_shoal_inlet_Uchannel.f",
+  "record_file": "6face14c3e1efb5d5b38ca9607e8c59b9688e7a19e7fb0078963e1828ece9e2d.json",
+  "audit_id": "B0",
+  "text": "Range defect across L21, L76-L87, and L97: for 0<y<100 the slope branch at L77 produces negative dep. Outside abs(x)<=150 the channel branch at L80-L83 does not replace it, and the basin branch begins only at y>=100 at L85. The later min(dep,h) at L97 preserves the negative value. depmin=0.002 at L7 is never applied, so a substantial grid region is emitted with negative depth.",
+  "canonical_scope": "in-scope (model source)",
+  "review_status": "refuted"
+ },
+ {
+  "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/rain_on_hills/postprocessing/movie_uvz.m",
+  "record_file": "77263262d598b251fb772b468162b4c614b90a696a6435f292f3ca913ff9f512.json",
+  "audit_id": "B3",
+  "text": "Dry cells are set to NaN before `curl` (L38-L45), so MATLAB's finite differences can propagate NaNs into wet cells adjacent to the mask boundary; the source applies no one-sided boundary treatment.",
+  "canonical_scope": "out-of-scope (postprocessing script .m, 절대규칙 #8)",
+  "review_status": "pending"
+ },
+ {
+  "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/single_vessel_cohesive/plot_morpho_avg_setup.m",
+  "record_file": "7fb26cab3885fe79a175c513ef2395daa466290f51bfde978357934718079eda.json",
+  "audit_id": "B0",
+  "text": "Eta is masked to NaN before mirroring (L49,L53-L54), then rowwise `max`/`min` are called without `omitnan` at L97-L98. Any dry/masked cell in a row can make that row's extrema NaN rather than the wet-cell envelope, so the final red curves may disappear across rows containing shoreline masks.",
+  "canonical_scope": "out-of-scope (postprocessing script .m, 절대규칙 #8)",
+  "review_status": "pending"
+ },
+ {
+  "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/rip_tracking/postprocessing/plot_eta_vor_track.m",
+  "record_file": "a3c13d4886160d37b026f329df7e9e68ee5bd84e628924d68a859b97bbcd949b.json",
+  "audit_id": "B0",
+  "text": "`dep` is created once before the loop at L13 and then destructively masked at L42. The active one-frame range hides the effect, but any restored multi-frame range would retain NaNs from every earlier mask and prevent re-wetted cells from returning in the depth panel.",
+  "canonical_scope": "out-of-scope (postprocessing script .m, 절대규칙 #8)",
+  "review_status": "pending"
+ }
+]

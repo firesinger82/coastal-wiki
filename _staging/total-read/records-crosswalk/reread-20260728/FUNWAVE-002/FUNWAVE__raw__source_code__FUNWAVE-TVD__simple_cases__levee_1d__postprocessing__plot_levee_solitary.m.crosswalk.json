@@ -1,0 +1,111 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-002",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/levee_1d/postprocessing/plot_levee_solitary.m",
+ "source_sha256": "f4fc81c22275f68f4a2c2841dcf0d293f6c2d0b16248a795330393e99e663895",
+ "base_run_id": "reread20260728-code-FUNWAVE-002-fable5-20260813T012841Z-ff3d40e9",
+ "audit_run_id": "reread20260728-code-FUNWAVE-002-codexaudit-20260826T022957Z-7b64342a",
+ "base_record_file": "9f8705b9b63aff9e8788257b2f1da13863e76de49fee16207252ae45a57155e8.json",
+ "audit_record_file": "9f8705b9b63aff9e8788257b2f1da13863e76de49fee16207252ae45a57155e8.json",
+ "base_record_sha256_bytes": "5498e7dae5fca6a06a552c126b8eae536308ef40ff6b29f4d3bccfae86b29308",
+ "audit_record_sha256_bytes": "7e63497e0fad2e31b47ead25d2728934862c20a6a88de1f74f47757519e8beb3",
+ "base_finding_count": 4,
+ "audit_finding_count": 4,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "plot_color_bars (L18) is declared in the user input section but never used in this script"
+   ],
+   "audit_member_text": [
+    "The documented user switch plot_color_bars is assigned at L18 but never read, and no colorbar call exists; changing it cannot affect output."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "L55 indexes nfile(num) where num=nfile(i) (L52); since nfile=1:301 this equals nfile(i) here, but for any non-contiguous nfile this double-indexing would be a bug"
+   ],
+   "audit_member_text": [
+    "Double indexing/interface mismatch: num is already nfile(i) at L52, but L55 computes nfile(num). This happens to reproduce 1:301 for the default identity vector, while a non-identity subset can select the wrong frame or exceed nfile's range."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "the loop bound is hard-coded 1:301 (L50) instead of 1:length(nfile), duplicating L15"
+   ],
+   "audit_member_text": [
+    "Use-before-range-validation across configuration lines: the loop is hard-coded as i=1:301 at L50 rather than length(nfile), then L52 indexes nfile(i). Any shorter user-selected nfile vector from L15 fails before loading."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "m from size (L27) is unused after the row-2 slice"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Both dep and eta are forced to row 2 at L29 and L62 without checking row count; x is sized from dep's pre-slice column count at L27-L33, and no check ensures each eta row has the same length before fill at L71."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

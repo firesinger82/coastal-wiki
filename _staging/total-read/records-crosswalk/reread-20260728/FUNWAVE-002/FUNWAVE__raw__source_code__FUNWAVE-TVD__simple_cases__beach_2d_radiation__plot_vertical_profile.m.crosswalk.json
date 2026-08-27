@@ -1,0 +1,137 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-002",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/beach_2d_radiation/plot_vertical_profile.m",
+ "source_sha256": "0b39085703842d67e5eb4cdf24dd87e432e6f36141bff59f7f5c5bf4790299ae",
+ "base_run_id": "reread20260728-code-FUNWAVE-002-fable5-20260813T012841Z-ff3d40e9",
+ "audit_run_id": "reread20260728-code-FUNWAVE-002-codexaudit-20260826T022957Z-7b64342a",
+ "base_record_file": "e1ccdda6083e4403e89f01b02b625bed02aa2b4f0fd43cb277c97dfbaf859401.json",
+ "audit_record_file": "e1ccdda6083e4403e89f01b02b625bed02aa2b4f0fd43cb277c97dfbaf859401.json",
+ "base_record_sha256_bytes": "aced65af04847aa0b962c2ef9d115855bba31fa4657cfdc13b6ec0ec77a4ce97",
+ "audit_record_sha256_bytes": "d396b1af268aeb04ac6a442e28e2fe72839ca03e97593507dd5bde2482c2dd17",
+ "base_finding_count": 4,
+ "audit_finding_count": 5,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "mask is loaded at L17 but never used in the profile computation (L30-L39)"
+   ],
+   "audit_member_text": [
+    "Mask interface is ineffective: mask is loaded at L17 but never referenced after assignment, so dry/invalid cells are not masked before za, U, and V are computed at L34 and L37-L38."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "n and m from size(dep) at L7 are never used"
+   ],
+   "audit_member_text": [
+    "All loaded grids at L6 and L16-L23 are assumed dimensionally compatible; n and m measured at L7 are never used for checks, so incompatible inputs fail later by MATLAB array operations rather than an explicit interface check."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "the coefficients -0.5528 and 0.4472 in za (L34) are hard-coded; their provenance (z_alpha = -0.5528 h + 0.4472 eta corresponds to z_alpha ~ -0.53 h in Boussinesq models) is not stated in the file"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "despite the filename plot_vertical_profile.m no plotting or saving occurs; U and V are computed and discarded at loop end (L12-L43)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Cross-iteration overwrite: files is explicitly a vector and drives the loop at L4 and L12, but z, U, and V are indexed only by vertical level at L31 and L37-L38, with no k/output dimension or per-file save. If files contains more than one index, every iteration overwrites the preceding reconstruction and only the last remains."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The z-level formula at L31 divides by z_num-1, while z_num is user-editable at L9 and has no guard against 1."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The hard-coded absolute fdir at L2 has no override or existence check."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

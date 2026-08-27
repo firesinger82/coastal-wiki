@@ -1,0 +1,126 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-002",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/rip_2d/postprocessing/plot_eta_vor.m",
+ "source_sha256": "5c54a4f7286c6791c4699fec7b7d9aae56bb6f3037685512b40aa239830888f4",
+ "base_run_id": "reread20260728-code-FUNWAVE-002-fable5-20260813T012841Z-ff3d40e9",
+ "audit_run_id": "reread20260728-code-FUNWAVE-002-codexaudit-20260826T022957Z-7b64342a",
+ "base_record_file": "74ca5e7e9c6d1d4c7a1bb5a6d6444659f7d79558408f08d8df1d65eada0889d4.json",
+ "audit_record_file": "74ca5e7e9c6d1d4c7a1bb5a6d6444659f7d79558408f08d8df1d65eada0889d4.json",
+ "base_record_sha256_bytes": "bb180d2aecb3f808f496c5e48e8c8acbdf198da04cd9dd68c847c1e901558924",
+ "audit_record_sha256_bytes": "b45e525a824751563adfc4f21fd086b0005c62f749e765c9bfe1610854abbe5d",
+ "base_finding_count": 5,
+ "audit_finding_count": 4,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "icount (L21, L24) is incremented but unused"
+   ],
+   "audit_member_text": [
+    "`w_ang` and `icount` are calculated but never used (L21-L24,L57). Interactive nstart/nend are unvalidated, so reversed or nonexistent output ranges yield no plots or load failures."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "caxis for panel 3 is set to [-12 0] (L75) then overridden to [-12 2.5] (L80); the intended range is ambiguous"
+   ],
+   "audit_member_text": [
+    "The two caxis calls for the depth subplot conflict: L75 sets [-12,0], then L80 overwrites it with [-12,2.5] on the same axes without intervening axes selection."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "dep is masked in-place with the first snapshot's mask (L33) and never reloaded, so later snapshots inherit accumulated NaN holes from all previous masks"
+   ],
+   "audit_member_text": [
+    "`dep` is loaded once before the frame loop at L5, then destructively set to NaN under each frame's mask at L33. A cell dry in any early frame remains NaN in all later frames even if it becomes wet, so the depth panel accumulates the union of historical dry masks rather than showing the current mask."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "the vorticity panel uses time-averaged umean/vmean (L27-L28) while panel 1 shows instantaneous eta; the mixing of averaged and instantaneous fields is by design of the output but not commented"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "the dashed line at x=140 (L67) presumably marks the bar/rip-channel location; derivation not in this file"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The file does not validate that u, v, eta, mask, and dep dimensions agree before shared masking/curl operations (L27-L57)."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

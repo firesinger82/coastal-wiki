@@ -1,0 +1,98 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-002",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/rip_tracking/postprocessing/plot_eta_vor_track.m",
+ "source_sha256": "01f909a5ee82a7769d5d7c6591dc2d53e99e4ed1a4efeaaf7c2662e18b41c6e5",
+ "base_run_id": "reread20260728-code-FUNWAVE-002-fable5-20260813T012841Z-ff3d40e9",
+ "audit_run_id": "reread20260728-code-FUNWAVE-002-codexaudit-20260826T022957Z-7b64342a",
+ "base_record_file": "a3c13d4886160d37b026f329df7e9e68ee5bd84e628924d68a859b97bbcd949b.json",
+ "audit_record_file": "a3c13d4886160d37b026f329df7e9e68ee5bd84e628924d68a859b97bbcd949b.json",
+ "base_record_sha256_bytes": "0473696183c17794300546c6220540f7bf0a44281b71593be1eb4f5c18a30d00",
+ "audit_record_sha256_bytes": "904f5eaec71b9671c3931240f9b731a5110c339a93dd4517cae71daad001b27f",
+ "base_finding_count": 4,
+ "audit_finding_count": 4,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "the crop to m=312, n=100 (L8-L9, L13) presumes depth_a15.txt is at least that large; the rip_tracking makebath.m produces n=100 rows (ncell=2, ycell=100, dy=2) and m=312 columns (x=-11..300, dx=1), so the 'crop' actually spans the whole array — hard-coding appears to be a workaround for the commented size() line (L7)"
+   ],
+   "audit_member_text": [
+    "Depth is cropped with fixed n=100,m=312 at L8-L13 without checking dep1 size; frame fields are likewise not checked against this fixed mesh before logical masking and curl."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0",
+    "A2"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "only column 2 of tk_x/tk_y is plotted (L57, L80, L101); the number of tracked particles (columns) and the meaning of column 1 (time or particle 1) are not determinable from this file",
+    "tk_x.txt/tk_y.txt are loaded inside the snapshot loop (L37-L38) though they do not depend on num"
+   ],
+   "audit_member_text": [
+    "tk_x.txt and tk_y.txt are reloaded inside every frame at L37-L38 and only column 2 is plotted at L57,L80,L101, independent of `num`; the file does not document whether column 2 is an entire trajectory or a fixed particle selection."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "dep masked in-place accumulates NaN across frames (single-frame here since nstart=nend=10); duplicate caxis for panel 3 (L88, L93)"
+   ],
+   "audit_member_text": [
+    "The depth subplot's caxis [-12,0] at L88 is overwritten by [-12,2.5] at L93. `w_ang` and `icount` are unused after assignment."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "`dep` is created once before the loop at L13 and then destructively masked at L42. The active one-frame range hides the effect, but any restored multi-frame range would retain NaNs from every earlier mask and prevent re-wetted cells from returning in the depth panel."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

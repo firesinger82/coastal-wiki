@@ -1,0 +1,154 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-002",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/subgrid_blocks_beach/mk_depth.m",
+ "source_sha256": "f0dafffe80180293508a335112fe797fa6eea9ecba1f7b2ef869f78dcba63782",
+ "base_run_id": "reread20260728-code-FUNWAVE-002-fable5-20260813T012841Z-ff3d40e9",
+ "audit_run_id": "reread20260728-code-FUNWAVE-002-codexaudit-20260826T022957Z-7b64342a",
+ "base_record_file": "cc135af0371fc9f108a60de0ee3482d1c1afa0fbc3ea45d822bdf4a285d32f25.json",
+ "audit_record_file": "cc135af0371fc9f108a60de0ee3482d1c1afa0fbc3ea45d822bdf4a285d32f25.json",
+ "base_record_sha256_bytes": "588c31730eea75e0fcc88bbbccdfa65ca71b9156905ddbe7ebbc5620c54668cc",
+ "audit_record_sha256_bytes": "91a0c83708f6ddd2a678286132a16b9482942d28a3e1694d4e736c871dfcc5e5",
+ "base_finding_count": 6,
+ "audit_finding_count": 5,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1",
+    "A2"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "patch average at L89 divides by cell_m twice (/cell_m/cell_m) rather than cell_m*cell_n; numerically identical only because cell_m==cell_n==4 (L22-23)",
+    "column index 2+(jj-1)*cell_n+ii (L72) uses cell_n as the stride over ii which ranges 1..cell_m (L68-69); correct flattening only while cell_m==cell_n"
+   ],
+   "audit_member_text": [
+    "Two flattening/averaging formulas incorrectly assume square subcells. L72 advances each jj row by `cell_n` but indexes ii across `cell_m`; the row stride must be cell_m. L89 divides the cell sum by cell_m twice instead of cell_m*cell_n. Active cell_m=cell_n=4 masks both defects, but rectangular configurations corrupt metadata columns and coarse averages."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "dep_bottom=9999.0 (L26) is defined but never referenced anywhere in the file"
+   ],
+   "audit_member_text": [
+    "dep_bottom=9999 is defined at L26 but never used. dep_top is added as an offset to local coarse depth at L64 rather than assigned as an absolute top elevation/depth; the intended meaning is unstated."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "obstacle sub-window formulas (L37-40) place the 3x3 window at rows/cols 1:3 of the 4x4 cell, i.e. offset toward the low-index corner, not symmetric — whether intended is not stated"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "block region starts at coarse column m_start=400 with nx_blocks=100 (L32, L34) reaching column 499, one short of nx_total=500 (L3); coverage intent not documented in this file"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "dep_cell_add and dep_sub_writeout are indexed without preallocation (L64, L70-72); dep_cell_add(:,:) on the left side requires the variable to already exist on first iteration in some MATLAB versions — no initialization appears in this file"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Block bounds are not validated against the coarse/fine grids or obs_m/obs_n against cell_m/cell_n. Parameter edits can drive j_coarse/i_coarse or n1:n2/m1:m2 out of range."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "dep_level clips negative depths to zero only for dep_sub averaging (L79-L89), while dep_full and dep_sub_info retain negatives. Thus coarse and fine outputs are not direct conservative representations of one another around exposed blocks."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Hard-coded dimension-bearing filenames become stale if grid parameters change; plot directory and fopen success are unchecked."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

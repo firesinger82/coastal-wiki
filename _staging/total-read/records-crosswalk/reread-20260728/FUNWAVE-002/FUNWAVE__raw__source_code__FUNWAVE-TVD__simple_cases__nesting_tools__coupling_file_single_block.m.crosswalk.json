@@ -1,0 +1,139 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-002",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/nesting_tools/coupling_file_single_block.m",
+ "source_sha256": "d898e683771ab6c0315c94efa485253459c74b5b1c14d2ff42ad40c0be6356bb",
+ "base_run_id": "reread20260728-code-FUNWAVE-002-fable5-20260813T012841Z-ff3d40e9",
+ "audit_run_id": "reread20260728-code-FUNWAVE-002-codexaudit-20260826T022957Z-7b64342a",
+ "base_record_file": "8c33e53f94cd8f551d40443c5ad4f7374380ef7f09c6bdea3d0d320619708fe8.json",
+ "audit_record_file": "8c33e53f94cd8f551d40443c5ad4f7374380ef7f09c6bdea3d0d320619708fe8.json",
+ "base_record_sha256_bytes": "3feeb9931b79d38ed8ee5221f43a10667750b965fe2369ece0573f4e7c8eb5a6",
+ "audit_record_sha256_bytes": "84abc67ee1be7589a5ff7621ea6ffea0cfcaac5c4620a850313525d7d74a9845",
+ "base_finding_count": 4,
+ "audit_finding_count": 6,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "start/stop/time are computed at L115-L117 before the block loop using kk, whose value is whatever the last logging loop left (kk=num_blocks); correct only because num_blocks=1 in this configuration"
+   ],
+   "audit_member_text": [
+    "The time window is computed at L116-L119 before the block loop starts at L122, using `kk` left over from the preceding completed loops (therefore the final block index). If metadata yields more than one block, all blocks reuse the final block's start/stop/time while data slicing inside the loop uses each block's `itscale(kk)` at L132-L134, creating mismatched time labels and sample counts."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B1",
+    "B5"
+   ],
+   "base_member_text": [
+    "fcur (L7) and steps (L118) are unused; same zero-station-side crash risk at L78 as the multi-block script; same strict-inequality window selection (L115-L116)"
+   ],
+   "audit_member_text": [
+    "`st_side_block` is conditionally assigned only when a side is encountered (L45-L70), but is unconditionally read at L78 and L129. Any absent side is a use-before-assign failure.",
+    "`fcur` is assigned at L7 but never used, and neither fopen return at L82/L213 is checked before writes."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "printside (L224-L227) is an external function not defined in this file"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "header point counts use size(eta_fine{...},2) (L216-L219) while the multi-block variant uses size(eastfine,1); both equal the fine point count, but this variant omits the duplicate header block written to the log"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The final-row `/4` inference at L11 assumes ordered, complete side codes; no divisibility or maximum/order check precedes the block/parameter loops."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Empty time-search results from L116-L117 break subsequent slicing; a one-sample time vector also makes the interval expression `time(2)-time(1)` at L237 out of range."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Only parameter-vector lengths are checked (L26-L30). Nonpositive or fractional `iscale`/`itscale` values flow into colon steps and reciprocal interpolation grids at L118,L132-L134,L143,L154-L156 without validation."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

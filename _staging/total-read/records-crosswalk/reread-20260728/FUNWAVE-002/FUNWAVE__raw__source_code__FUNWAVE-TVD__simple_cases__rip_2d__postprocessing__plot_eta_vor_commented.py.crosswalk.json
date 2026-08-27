@@ -1,0 +1,122 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-002",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/rip_2d/postprocessing/plot_eta_vor_commented.py",
+ "source_sha256": "b59add9d08dcb6d9c2a8cdd694e0ea15b4bc5febf9c52561cd8ecea4b993f476",
+ "base_run_id": "reread20260728-code-FUNWAVE-002-fable5-20260813T012841Z-ff3d40e9",
+ "audit_run_id": "reread20260728-code-FUNWAVE-002-codexaudit-20260826T022957Z-7b64342a",
+ "base_record_file": "0a44e53ed2f94f330fb61fba40ee462946d44121aa27cca8754d5302ba353a6c.json",
+ "audit_record_file": "0a44e53ed2f94f330fb61fba40ee462946d44121aa27cca8754d5302ba353a6c.json",
+ "base_record_sha256_bytes": "e328065bc5cbd3f0b7625831ae87dd1b7996f638e73c998da530bea234717cac",
+ "audit_record_sha256_bytes": "7f42f58ecb07d6d0c38466ae701b1fa0bbaba17ffe55d855a0955bdf8457c188",
+ "base_finding_count": 4,
+ "audit_finding_count": 4,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "dep is NaN-masked in-place per snapshot (L58) and never reloaded, accumulating holes across frames like the MATLAB siblings"
+   ],
+   "audit_member_text": [
+    "`dep` is loaded only once at L23 and mutated under each frame mask at L58. Dry cells from any earlier frame remain NaN in later frames even if later masks mark them wet, so depth masking accumulates across the frame loop."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "plt.show() inside the loop (L93) blocks until each figure window is closed in interactive backends; frames also stack because no clf is called after subplotting"
+   ],
+   "audit_member_text": [
+    "There is no figure clear/close or axes reset in the loop L44-L93. Repeated subplot calls reuse axes while each iteration adds pcolor/contour/quiver artists and new colorbar axes, so multi-frame runs accumulate graphics state and colorbars and can distort later saved images and memory use."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "filename says eta_vor but no vorticity is computed or plotted (no curl equivalent in this port); only eta and depth+quiver panels exist"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "from matplotlib.cm import jet (L10) fails on matplotlib >= 3.9 where cm.jet was removed from that namespace; version requirement unstated"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Both panels restrict x to `m*dx/2` at L67 and L90 although arrays span x=0 through approximately m*dx at L31; the reason for discarding the second half of the domain is unstated."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "HOME is indexed directly at L13 (KeyError if absent), input conversion has no validation, and array shapes are not checked before common masking/plotting."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

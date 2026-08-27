@@ -1,0 +1,94 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-002",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/rain_on_hills/work/mk_1_random_bathy.m",
+ "source_sha256": "87663ff22bce5ad6702cf61f14d54e9eabf8129ca3e29bd3f41b9f5d258728e1",
+ "base_run_id": "reread20260728-code-FUNWAVE-002-fable5-20260813T012841Z-ff3d40e9",
+ "audit_run_id": "reread20260728-code-FUNWAVE-002-codexaudit-20260826T022957Z-7b64342a",
+ "base_record_file": "cf2aabfe0012b27a2daaf4b78c162e3b189e375196a6f78ffec5f0fa1b603f50.json",
+ "audit_record_file": "cf2aabfe0012b27a2daaf4b78c162e3b189e375196a6f78ffec5f0fa1b603f50.json",
+ "base_record_sha256_bytes": "fc2b1d4c0da73cf857cc66bbaeec33285ac53e23c3b07497b47f2b3f3379ee07",
+ "audit_record_sha256_bytes": "fabdd867220b39aa5bb97a20d200dedfb99ba799c9bb0b0cd26e241f05861b69",
+ "base_finding_count": 3,
+ "audit_finding_count": 4,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "patch placement can exceed array bounds only if xstart+widthx+max(sizes) > m; here 250+350+80=680 > m=656, so an out-of-bounds write at L46 is possible for unlucky rand draws; with rng(2) the actual draws evidently fit, but the script is not generally safe"
+   ],
+   "audit_member_text": [
+    "Random origins are not bounded by feature size and MATLAB's 1-based matrix indices. With ystart=0 and widthy=150 (L14-L16,L25), `yy1` can be zero, while the insertion at L46 uses it directly as an index. Also y0 can approach 149 and sizes reach 80, exceeding n=200; x0 can approach 599 and size 80 exceeds m=656. The seeded draws may or may not hit each invalid case, but the declared sampling range permits deterministic out-of-bounds failures."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B2",
+    "B3"
+   ],
+   "base_member_text": [
+    "k=30 (L4) is never used; second ylabel at L77 overwrites the first and labels the y-axis 'points in x' on a y axis; figure 1 (patch rectangles) is never printed (L59 commented)"
+   ],
+   "audit_member_text": [
+    "The second pcolor panel calls ylabel twice at L76-L77, with the latter text `points in x`; this is a copy/paste error that overwrites the y label instead of setting xlabel.",
+    "`k=30` at L4 is never read. Plot writes assume the `plots` directory already exists."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "with dep_flat=2 and rat=1.005 the deepest hill crest reaches dep=2-2/1.005=0.00995 before the slope is added, keeping cells barely wet; after adding slope values 10.0 down to 10.0-0.03*655=-9.65 (L85) the right part of the domain becomes negative depth (dry hills), consistent with the rain_on_hills case name, but intended still-water datum is not documented"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Min-max normalization at L53-L55 has no guard for `mm==mn`; empty/zero feature settings or an all-clipped relief would divide by zero and contaminate `dep` at L57."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

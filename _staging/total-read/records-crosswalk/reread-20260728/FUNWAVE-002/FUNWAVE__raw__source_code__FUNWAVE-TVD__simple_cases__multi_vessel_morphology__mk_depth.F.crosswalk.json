@@ -1,0 +1,133 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-002",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/multi_vessel_morphology/mk_depth.F",
+ "source_sha256": "8c7547c03ba58a60b5bc78ad80709de016e0226ea77200fbe598bd9e0df09d12",
+ "base_run_id": "reread20260728-code-FUNWAVE-002-fable5-20260813T012841Z-ff3d40e9",
+ "audit_run_id": "reread20260728-code-FUNWAVE-002-codexaudit-20260826T022957Z-7b64342a",
+ "base_record_file": "0eeb215ced80686ff450c8b02429d112144ecadb6feda461279a886e248e6f33.json",
+ "audit_record_file": "0eeb215ced80686ff450c8b02429d112144ecadb6feda461279a886e248e6f33.json",
+ "base_record_sha256_bytes": "de150a9e0142d206b89ddfd30dc549be33706a235cfae76a90f5004a88bf1d34",
+ "audit_record_sha256_bytes": "14d02a3b0368e45056a4b7703283eb66c5845cf0508295cefb323ee365f00d36",
+ "base_finding_count": 3,
+ "audit_finding_count": 5,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "the linear side slope makes depth decrease away from the channel and can go negative (dry land) for large abs(Y); no clipping is applied (L31-L32)"
+   ],
+   "audit_member_text": [
+    "Depth is reduced linearly outside the channel at L30-L32 with no lower bound. Large |Y|, slope, or small dep_channel can make DEPTH negative, but the file neither rejects nor documents that regime."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "X and Y arrays are computed but only Y is used for the depth formula and neither is written out"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "the expected contents/order of bathy_param.txt are defined only implicitly by the READ order (L9-L15); no comments document units"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Input-to-allocation preconditions are unchecked: Mglob and Nglob read at L9-L10 are used as allocation extents at L18 and loop bounds at L20-L29 without positivity or allocation-status checks; malformed or nonpositive values fail or produce empty output."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The fixed format at L41 contains 9000 f12.6 descriptors while L39 may supply Mglob values. For Mglob above 9000, format reversion can split one intended grid row across output records, breaking the depth.txt row interface."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "X is allocated and filled at L18 and L23 but never consumed or written; DX read at L11 therefore has no effect on depth.txt."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "All reads and opens at L7-L16 and L37 omit IOSTAT/ERR handling, so missing, short, or nonnumeric parameter input is not distinguished before dependent calculations."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

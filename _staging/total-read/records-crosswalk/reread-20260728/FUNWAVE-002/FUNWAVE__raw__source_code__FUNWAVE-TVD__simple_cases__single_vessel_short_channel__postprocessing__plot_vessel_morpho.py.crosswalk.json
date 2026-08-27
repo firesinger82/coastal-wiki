@@ -1,0 +1,134 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-002",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/single_vessel_short_channel/postprocessing/plot_vessel_morpho.py",
+ "source_sha256": "456e07552bf75e45c0f374df4ed987c1fbeb8357061ce654200da08fd73d0b7b",
+ "base_run_id": "reread20260728-code-FUNWAVE-002-fable5-20260813T012841Z-ff3d40e9",
+ "audit_run_id": "reread20260728-code-FUNWAVE-002-codexaudit-20260826T022957Z-7b64342a",
+ "base_record_file": "d54e46bb52b2331767d9d9ac3bfc33d8b9b1b284216ac7d4b3f21fe4dfeb624c.json",
+ "audit_record_file": "d54e46bb52b2331767d9d9ac3bfc33d8b9b1b284216ac7d4b3f21fe4dfeb624c.json",
+ "base_record_sha256_bytes": "460f6db7db56dcb79f91027fbe785248403808ab09233eac07e9e0a35e477934",
+ "audit_record_sha256_bytes": "b967ca5943f30ef561776f7a235ef2f12271f90ae5cbe7610743db2a373bf646",
+ "base_finding_count": 6,
+ "audit_finding_count": 5,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "fdir = os.path.join(pwd,FOLDER,'output') (L12) joins pwd with FOLDER that is already absolute (built from HOME, L10-11), so pwd is discarded by os.path.join semantics; intended directory resolution unclear"
+   ],
+   "audit_member_text": [
+    "FOLDER is already absolute because it begins with HOME at L11, so joining it with pwd at L12 silently discards pwd; the comment/path construction imply a relative-project intent but actual behavior is HOME-rooted."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "both savefig names use time[num] (L105, L135) but L135 executes outside the for loop, relying on the leaked loop variable num"
+   ],
+   "audit_member_text": [
+    "beds/bedb are unmasked before BB and row means (L53-L70,L117). `time[num]` is used after the loop at L135, so an empty files list leaves num undefined; multiple files leave section output based only on the final frame."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "N = 2*n+1 (L21) with mirror fill targets ETA[n:-1,:] (L61 etc.) leaves the last row (index N-1) permanently zero and duplicates the loaded row n-1 at row n; the companion MATLAB script's mirroring convention (2*n-1) is not reproduced here — which convention matches the solver output layout is not determinable from this file"
+   ],
+   "audit_member_text": [
+    "The mirror allocation/slices are inconsistent: N=2*n+1 at L21, while each target slice `0:n` and `n:-1` has n rows (L60-L68), filling only 2n rows and leaving final row index 2n as initialized zero in ETA/CH/BEDS/BEDB/DEP. The reverse slice also duplicates eta/dep's last row. This creates a spurious zero boundary row and a different topology from the MATLAB version's 2n-1 mirror."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "depth source is 'dep.out' (L16) while the MATLAB counterpart reads 'dep_00001'; concentration colorbar unit here is mg/L (L90) — units are asserted only by plot labels"
+   ],
+   "audit_member_text": [
+    "Concentration is logged without a positive-value guard at L88. In addition, the colorbar says mg/L but the code applies no unit conversion to CH, unlike the related MATLAB plot that explicitly multiplies concentration before labeling."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "first profile subplot plots plt.plot(x,B) (L121) but labels the abscissa 'y (m)' (L123) and limits it to [0,120] (L125); B is filled only for j in range(nn) rows (L116-117) while its allocation np.shape(BB[0,:]) is column-length mm (L114) — x vs y axis identity of this plot is internally inconsistent"
+   ],
+   "audit_member_text": [
+    "The row-mean buffer B is allocated with shape BB[0,:], i.e. length M (L114), but the loop writes nn=N row means (L116-L117) and the plot pairs B with x (length M) at L121 while labeling the axis y. If N>M it indexes B out of range; if N<M, only the first N entries are means and the remaining plotted values stay zero. It should be dimensioned/paird with y, not x."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "from IPython.display import display (L4) is never used"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

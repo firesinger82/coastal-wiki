@@ -1,0 +1,109 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-002",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/rip_2d_foam/plot_eta_vor_foam.m",
+ "source_sha256": "d8651bbb87223df11110fde2e21326a3b03a9e13a072eeb7f691873512863462",
+ "base_run_id": "reread20260728-code-FUNWAVE-002-fable5-20260813T012841Z-ff3d40e9",
+ "audit_run_id": "reread20260728-code-FUNWAVE-002-codexaudit-20260826T022957Z-7b64342a",
+ "base_record_file": "9b2e623a1940012cfb2e994cd2b6c6ec77756a120cf430224a5a53c15c9da70c.json",
+ "audit_record_file": "9b2e623a1940012cfb2e994cd2b6c6ec77756a120cf430224a5a53c15c9da70c.json",
+ "base_record_sha256_bytes": "ce01863690394b973a519651c1dbf22477c6cea33605e3dc2a7e158ddfbcfec1",
+ "audit_record_sha256_bytes": "ae6ae8567fe93621871543691d6e9e4a9b36359595f56d0ed8de41fc48d720ec",
+ "base_finding_count": 4,
+ "audit_finding_count": 4,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B0",
+    "B1"
+   ],
+   "base_member_text": [
+    "log(FoamEta) (L85) yields -Inf where foam thickness is zero; no floor is applied and mask filtering is commented out (L34-L37)"
+   ],
+   "audit_member_text": [
+    "Mask loading and all mask applications are commented out at L34,L36-L37,L44-L46. Eta, FoamEta, mean velocity, curl, and quiver therefore include any dry-cell/sentinel values even though copied masking code is present but ineffective.",
+    "`log(FoamEta)` at L85 has no positivity guard: zero foam thickness maps to -Inf and negative values produce complex results, while caxis is finite [-10,10] at L90. The file does not state a floor or missing-value convention."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "the pairing of instantaneous eta/FoamEta at 30 s intervals (dt=30, L26-L29) with averaged umean/vmean at 50 s intervals (L30) means the vorticity/quiver panels lag or lead the eta panel by up to 20 s per frame; intended alignment is not documented"
+   ],
+   "audit_member_text": [
+    "Instantaneous files use num=k-1 at L29 while averaged velocity uses floor(time/50) at L30 with time=(k-1)*30 at L28. These two cadence assumptions are hard-coded and no timestamps are compared, so the overlaid quivers can be temporally mispaired if either output cadence differs."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "dep is loaded (L5) but only used for grid sizing; the caxis [-10 10] on a log-meter scale (L90) implies foam from e-10 to e10 m which cannot be physical at the top end — display range only"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "mov is indexed from k=3 (L27, L107) leaving mov(1:2) empty; loop start at 3 rather than 1 is unexplained"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "No shape checks relate dep, eta, FoamEta, u, and v. `w_ang` is unused, and the absolute user-specific fdir at L3 is unchecked."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

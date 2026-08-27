@@ -1,0 +1,122 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-002",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/sediment_rip/postprocessing/plot_eta_c_dep.m",
+ "source_sha256": "13a26d15a1ae1f928cc45847a360fbe87d53b590ff948b2546dd4bf7fbedf516",
+ "base_run_id": "reread20260728-code-FUNWAVE-002-fable5-20260813T012841Z-ff3d40e9",
+ "audit_run_id": "reread20260728-code-FUNWAVE-002-codexaudit-20260826T022957Z-7b64342a",
+ "base_record_file": "454c1b240924add8de508b1c4dd368c3c04cde14ec11953fcab644f5f6c38f1a.json",
+ "audit_record_file": "454c1b240924add8de508b1c4dd368c3c04cde14ec11953fcab644f5f6c38f1a.json",
+ "base_record_sha256_bytes": "a1b8a9d0768a46ed25855933af0db82b5d1ba46c0b82099b370d655afc6eafa5",
+ "audit_record_sha256_bytes": "19d4a2426d5a3e96ddd87054bceccf41ce0de516c3be36afd68d5dd0565df8e0",
+ "base_finding_count": 4,
+ "audit_finding_count": 4,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "depp is computed at L54 before dep is NaN-masked at L58, so panel 3 shows bed change everywhere including masked dry cells; the ordering differs from the eta masking and may be intentional or an oversight"
+   ],
+   "audit_member_text": [
+    "Masking is applied to eta, baseline dep, u, and v at L57-L60, but not to concentration `ch` or depth change `depp`, which was computed before masking at L52-L54. Thus the second and third panels can display dry-cell/sentinel values while the first panel and arrows hide them—an inconsistent mask interface."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "dep masked in-place (L58) accumulates across frames when a multi-frame range is used"
+   ],
+   "audit_member_text": [
+    "Baseline `dep` is destructively masked inside the loop at L58; the current single-frame range hides accumulation, but any multi-frame range would retain earlier dry-mask NaNs and also compute later depp at L54 against an already-corrupted baseline."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "concentration ch is plotted unmasked (no ch(mask<1)=NaN line, unlike the vessel scripts which mask ch); log10(ch) yields -Inf for zero concentration"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "concentration unit label g/l (L85) with caxis [-1 1] implies 0.1-10 g/l displayed; conversion assumptions are not stated in the file"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "`log10(ch)` at L82 has no positive-value check; zero concentration yields -Inf and negative/sentinel values yield complex results, yet the finite caxis [-1,1] at L83 assumes valid logarithms."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Fixed ax=[0,249,0,199] is not derived from n,m,dx,dy, and no cross-array shape check precedes arithmetic/masking."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

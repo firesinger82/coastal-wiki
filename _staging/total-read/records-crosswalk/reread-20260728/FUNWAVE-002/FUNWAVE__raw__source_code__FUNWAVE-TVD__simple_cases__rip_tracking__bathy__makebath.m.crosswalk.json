@@ -1,0 +1,92 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-002",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/rip_tracking/bathy/makebath.m",
+ "source_sha256": "5ea0e6d39cc24859946688a967955429b5672d85a3a554c1869aefb86ea6e6b9",
+ "base_run_id": "reread20260728-code-FUNWAVE-002-fable5-20260813T012841Z-ff3d40e9",
+ "audit_run_id": "reread20260728-code-FUNWAVE-002-codexaudit-20260826T022957Z-7b64342a",
+ "base_record_file": "e594ec4f8420be0228ddd26b3a3fa64c95eaf22fdae52340c0c77d2cb8bf3308.json",
+ "audit_record_file": "e594ec4f8420be0228ddd26b3a3fa64c95eaf22fdae52340c0c77d2cb8bf3308.json",
+ "base_record_sha256_bytes": "12c6a051ca7e3ff043b44737c9b640f6d7095e640984a853081fbe93fb3f2853",
+ "audit_record_sha256_bytes": "8db8209065020c6521391bc7cab35fbde9254454b7f5d6fe708e7b325d9a4c5e",
+ "base_finding_count": 3,
+ "audit_finding_count": 3,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "same output filename depth_a15.txt as the rip_2d version (L49) though grid sizes differ; xx,yy change meaning mid-script (L24 vs L56-L57)"
+   ],
+   "audit_member_text": [
+    "Generation uses x starting at -11 and y starting at 1 (L23-L24), but the diagnostic reconstructs x and y from zero at L56-L57, shifting the displayed coordinates by +11 m and -1 m relative to the Gaussian calculation."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "the commented symmetry-breaking line yc(ncell/2) (L35) would index yc(1) for ncell=2, i.e. the first center, not a middle one"
+   ],
+   "audit_member_text": [
+    "The commented symmetry edit at L35 uses `yc(ncell/2)`. For ncell=2, yc has entries for centers 0,100,200 and MATLAB index ncell/2=1 selects the edge center at 0 rather than the middle center at index 2; if the intended target is the central cell, this is an off-by-one index."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "with xcell=60 the domain x extends only to 300 while the Gaussian center is at xc=100 with sigma^2=2500 (L22-L23), so the channel structure occupies proportionally more of the shorter cross-shore domain than in rip_2d; intended relation between xcell and xc is not documented"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The saved depth matrix at L49 contains no coordinates, leaving the intended relationship between generation offsets and model-grid origin unstated."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

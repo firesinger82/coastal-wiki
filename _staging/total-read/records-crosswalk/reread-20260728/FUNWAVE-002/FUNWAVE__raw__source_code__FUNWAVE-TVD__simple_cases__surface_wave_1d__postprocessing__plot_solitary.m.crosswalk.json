@@ -1,0 +1,92 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-002",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/surface_wave_1d/postprocessing/plot_solitary.m",
+ "source_sha256": "205327f89aac39f532c5abbd91c5a1a67321061eb5013052392d65fcd91552ba",
+ "base_run_id": "reread20260728-code-FUNWAVE-002-fable5-20260813T012841Z-ff3d40e9",
+ "audit_run_id": "reread20260728-code-FUNWAVE-002-codexaudit-20260826T022957Z-7b64342a",
+ "base_record_file": "b39c05fa90a0e82c4bc862ef25b35e38c3bb88635e5828b115580b0d9e36baaf.json",
+ "audit_record_file": "b39c05fa90a0e82c4bc862ef25b35e38c3bb88635e5828b115580b0d9e36baaf.json",
+ "base_record_sha256_bytes": "bad0879d2ed41a1ac52206f47f2dcf7ed035c925fc80791c36891bd9a901d400",
+ "audit_record_sha256_bytes": "8e006079e2b69c8d315119d2d398de3ffa259bdddc616b130a226ba990556a27",
+ "base_finding_count": 3,
+ "audit_finding_count": 3,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "dep=zeros(m)+10.0 (L11) creates an m x m square matrix in MATLAB (zeros with scalar argument), not a length-m vector; L12 then modifies it by logical indexing against the length-m vector x, and plot(x,-dep,...) (L29) receives a matrix — the intended 1-D profile plot depends on this implicit behavior, not clarified in the file"
+   ],
+   "audit_member_text": [
+    "`zeros(m)` at L11 creates a 1024-by-1024 matrix, not a 1-by-1024 bathymetry vector. The logical assignment at L12 updates only selected linear entries among the first 1024 elements, and plot(x,-dep,...) at L29 treats the matrix as many series instead of one profile. This is a deterministic dimensional bug; initialization should specify a vector shape."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "title computes time as files(num)*10 (L35), implying a 10 s output interval for indices [1 6 11 17] (L16); the interval is asserted only here, not read from any input"
+   ],
+   "audit_member_text": [
+    "Displayed time is files(num)*10 at L35 with no output-cadence metadata. The axis extends to x=1024 at L31 while the generated vector ends at 1023, a minor fixed-range mismatch."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "fdir is a hardcoded developer macOS path (L2) — script is not portable as committed; comment '% wavemaker and sponge' (L14) has no associated code"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The absolute input path is unchecked, eta shape is not validated against x, and the script has no file-output call."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

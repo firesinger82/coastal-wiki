@@ -1,0 +1,84 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-002",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/inlet_shoal/postprocessing/plot_bathy.m",
+ "source_sha256": "2021e03190e432797bd01fc66fb91340fbc39bc5dbb6eda26bf2371d1c6bd77a",
+ "base_run_id": "reread20260728-code-FUNWAVE-002-fable5-20260813T012841Z-ff3d40e9",
+ "audit_run_id": "reread20260728-code-FUNWAVE-002-codexaudit-20260826T022957Z-7b64342a",
+ "base_record_file": "1f7b00555e38634ea663bf1af32820e71a624e69115275768d871b0feef61165.json",
+ "audit_record_file": "1f7b00555e38634ea663bf1af32820e71a624e69115275768d871b0feef61165.json",
+ "base_record_sha256_bytes": "2448f88634973ee19f5f7c0cddd90fbeabb2adbe0852eede636a8512688c6049",
+ "audit_record_sha256_bytes": "7fabe5d836247399aa02caec0a2fbaf6067325f64babc931d340c180636d28a6",
+ "base_finding_count": 1,
+ "audit_finding_count": 3,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "y_sponge and y_wavemaker (L10, L12) use y(end) so both rectangles span the full y extent; the sponge x-range 0-180 and wavemaker x-range 240-260 are hard-coded and their consistency with the case input.txt is not verifiable from this file"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Producer/consumer orientation mismatch with the preceding bathymetry generator: this file assumes matrix rows are y and columns are x at L3-L7. mkxyz_shoal_inlet_Uchannel.f writes dep_shoal_inlet.txt with outer i records and inner j values (its L145-L149), so loading yields rows=i and columns=j. Consequently this script maps the generator's x index onto y and its y index onto x at L6-L7/L19, transposing the physical axes without transposing dep."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Coordinate-origin mismatch: L6-L7 discard the generator's centered, y-shifted physical coordinates and replace them by zero-origin index coordinates. The overlays and annotations at L9-L12 and L25-L28 therefore cannot be tied to the x/y files produced alongside dep from this file alone."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "No dimension or file-shape check precedes y(end) at L10/L12 or pcolor at L19; an empty or differently oriented depth file changes overlay geometry silently or errors downstream."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}
