@@ -1,0 +1,154 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-003",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/vessel_propeller_effect/movie_wave_morph.m",
+ "source_sha256": "7dd5eceb050ac0624da4d4c0d72d70e71cd2c207643402eff997c0c6c73664e5",
+ "base_run_id": "reread20260728-code-FUNWAVE-003-fable5-20260813T012841Z-7a6fa701",
+ "audit_run_id": "reread20260728-code-FUNWAVE-003-codexaudit-20260826T022957Z-453e6221",
+ "base_record_file": "bf3a7d9f27d8b47f037f9e7f207955b5b0a2e3d65bda3bbd6a3f57e2b07dd03c.json",
+ "audit_record_file": "bf3a7d9f27d8b47f037f9e7f207955b5b0a2e3d65bda3bbd6a3f57e2b07dd03c.json",
+ "base_record_sha256_bytes": "8d31f89c39ad29706a779a80ce61d11f2b8af7eb3d6a9aa94f3d9eae6c87d476",
+ "audit_record_sha256_bytes": "4a6448a0179028ede947a3a5ed970df58d1c89dea11f60e1577f4f88adbf2d1d",
+ "base_finding_count": 6,
+ "audit_finding_count": 5,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "The concentration fields are multiplied by 100 but displayed against caxis [0.0 0.01] (L60, L62, L72, L74) with a colorbar labeled plain ' c ' — the effective displayed range is raw C in [0, 1e-4]; the units and the reason for the x100 scaling are not stated."
+   ],
+   "audit_member_text": [
+    "Potential concentration-scale mismatch at L60/L72 and L62/L74: concentration is multiplied by 100 but both color axes remain [0,0.01], which corresponds to an unscaled range [0,0.0001]. The colorbar is still labeled only 'c', so intended fraction-versus-percent units are unresolved."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1",
+    "A2"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "ds/db and ds1/db1 (DchgS/DchgB depth-change fields, L38-L39, L43-L44) are loaded every frame but never plotted.",
+    "eta1 (no-propeller eta, L41) is loaded but never plotted."
+   ],
+   "audit_member_text": [
+    "Loaded-data/output mismatch at L36-L44 versus L46-L77: eta1, ds, db, ds1, and db1 are never consumed; despite the file's morph name, sediment-change fields do not affect any panel, and only propeller eta plus the two concentration arrays are displayed."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "The 1 s output interval implied by the title (L50) must match the case input; unverifiable here."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "dep is loaded from dep_00000 (L5) — a time-stamped depth output name implying morphology updates — but depth evolution is not shown."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "mov(num).cdata stores unresized 300-dpi frames for all 75 frames (L82-L85), unlike siblings that resize to 576x1024; memory-heavy and the commented vidHeight/vidWidth (L23-L24) confirm resizing was dropped."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Graphics-state accumulation defect across L30 and L47-L77: clf runs only once before the frame loop, while every subplot executes hold on and never clears or releases it. Each iteration therefore layers another pcolor and creates additional colorbars on persistent axes, causing growing memory/object counts and stale stacked graphics across the 75-frame video."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "All propeller/no-propeller arrays are plotted on coordinates sized from output/dep_00000 at L5-L13 without shape checks; a mismatched comparison run fails or misaligns."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "MATLAB pcolor at L47, L60, and L72 ordinarily omits the final matrix row and column as colored faces."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

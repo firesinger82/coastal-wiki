@@ -1,0 +1,139 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-003",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/vessel_island_beach/postprocessing/plot_wave_vessel_island.m",
+ "source_sha256": "43a141a2aac6654aecfc3dbd486867baefcdca2ca237a533fd82d0637cc7eb4c",
+ "base_run_id": "reread20260728-code-FUNWAVE-003-fable5-20260813T012841Z-7a6fa701",
+ "audit_run_id": "reread20260728-code-FUNWAVE-003-codexaudit-20260826T022957Z-453e6221",
+ "base_record_file": "82a0d39b8068b2b50900f0eb8a428d2fba88b3303ec93cca28aa8c53ac427914.json",
+ "audit_record_file": "82a0d39b8068b2b50900f0eb8a428d2fba88b3303ec93cca28aa8c53ac427914.json",
+ "base_record_sha256_bytes": "601430382358079f46c45ceceaa3489517a6ea2fd086060e648a46a2023cc726",
+ "audit_record_sha256_bytes": "1ff21cf4954d2d6c01fac457ea68a694764aaa708f9bc0748a0ceea54689eb12",
+ "base_finding_count": 5,
+ "audit_finding_count": 5,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0",
+    "A2"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "The variable mask is loaded from eta_00001 (L6) but never used; the name suggests a leftover from a mask-based version.",
+    "The eta>10.0 NaN filter (L50) implies dry cells carry large sentinel values in this output; the exact sentinel convention is not documented here."
+   ],
+   "audit_member_text": [
+    "The variable mask loaded from eta_00001 at L6 is never used and is not a mask; dry/invalid regions are instead inferred solely by eta>10 at L50, which can also discard legitimate values above that threshold."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "No dy is defined; y uses dx (L21), correct only because the case grid is square (dx=dy=2.0 per mk_depth.m) — a latent bug if the case changes."
+   ],
+   "audit_member_text": [
+    "Likely copy/paste spacing defect across L17-L21: no dy parameter is defined and y uses dx. This silently forces square cells even if the intended y spacing differs."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "The commented title (L62-L63) suggests a 2.5 s output interval; unverifiable from this file."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "depth.txt is read from the script's working directory (fdep='', L4, L11) while eta comes from output/ — the run layout must place depth.txt beside the script."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Cross-file shape assumption across L11-L21 and L47-L56: plotting coordinates are sized from depth.txt, while each eta file is not checked for matching dimensions."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Interactive ns/ne at L8-L9 are not validated as ordered nonnegative integers. ns>ne yields no frames, while invalid numbers generate missing/ill-formed filenames; no diagnostic occurs before opening the writer at L31-L33."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "MATLAB pcolor at L56 ordinarily omits the final matrix row and column as colored faces; no compensation is present."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

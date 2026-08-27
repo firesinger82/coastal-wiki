@@ -1,0 +1,190 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-003",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/wave_coherence/PostProcessing/LOG_READ.m",
+ "source_sha256": "c8c33e56225798be31da12fbe8d22c13b0ba0709c14aeec161ecf0ccb1ffbb41",
+ "base_run_id": "reread20260728-code-FUNWAVE-003-fable5-20260813T012841Z-7a6fa701",
+ "audit_run_id": "reread20260728-code-FUNWAVE-003-codexaudit-20260826T022957Z-453e6221",
+ "base_record_file": "f6b00136e6caed7bd3d717e3d2fd87e84e18cb3da346e686bcb03df2a3c8c672.json",
+ "audit_record_file": "f6b00136e6caed7bd3d717e3d2fd87e84e18cb3da346e686bcb03df2a3c8c672.json",
+ "base_record_sha256_bytes": "0014a02d3f210532afc3af871e0f2c38e4ad797d7047f4791d4555bd73770175",
+ "audit_record_sha256_bytes": "eec8a38c3a9d25134ebddab6f32965e8f576908a4b2f8b9acdc731923a1a4a97",
+ "base_finding_count": 7,
+ "audit_finding_count": 7,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "H, theta_pbc are computed/extracted (L35, L37) but never used in the plot."
+   ],
+   "audit_member_text": [
+    "theta_pbc at L35 and aggregate H at L37 are computed but never used; the figure compares no PBC-direction series despite parsing it."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "xlim mixes radians and degrees: [-pi/2+theta_mean*pi/180-0.2 ...] is scaled by 180/pi (L47), while the xlabel says theta (rad) and xticks are set at degree values -90:22.5:90 (L58, L62) — units on the axis are inconsistent unless theta_in is in degrees."
+   ],
+   "audit_member_text": [
+    "Angle-unit mismatch across L46-L62: theta_in is plotted against degree tick values -90..90 and x limits explicitly convert radians to degrees at L47, but the x-axis label at L58 says radians."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "freq_resolution uses length(f_i) instead of length(f_i)-1 (L42), a fencepost approximation."
+   ],
+   "audit_member_text": [
+    "Likely bin-width off-by-one at L42: for N samples spanning f_i(1) through f_i(end) with both endpoints included, uniform spacing is span/(N-1), but the code divides by N, inflating E_i at L43 by N/(N-1). Irregular or singleton f_i is also unhandled."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "The fixed character slices (6:12, 16:24, 28:36; L13-L17) depend on the exact LOG.txt formatting of the FUNWAVE-TVD directional wavemaker output block; any format change breaks the parser silently (str2double returns NaN)."
+   ],
+   "audit_member_text": [
+    "Fixed-column parsing at L13-L17 assumes minimum line lengths of 36 and 12 characters and silently converts malformed fields to NaN; there is no length or finite-value validation before downstream arithmetic."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "The header match makes i=1 for every occurrence (L20-L23), so the parser reads only the first data line after each header occurrence and the following line as amplitude — it assumes exactly one component per header repetition; the actual LOG structure is not visible here."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "E_i normalization by pi (L43) implies a directional bin of pi radians spread; the derivation of this constant is not stated."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "fp=0.1 and theta_mean=0 (L38-L39) are hardcoded assumptions about the case's peak frequency and mean direction."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "EOF/order defect across L10-L25: tline is sliced at L13-L17 or passed to strfind at L20 before the non-character EOF test at L25. A header without both following fixed-width data lines can therefore index the numeric EOF sentinel or a short line before EOF is recognized."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Use-before-assignment path across L7-L28 and L30: if no matching header/data block is parsed, output is never created but output(:,4) is immediately read. fopen failure at L5 is also unchecked, and fid is never closed."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The figures directory used at L64 and L70 is not created or checked before saveas."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

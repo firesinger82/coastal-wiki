@@ -1,0 +1,118 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-003",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/surface_wave_1d/postprocessing/plot_wave.m",
+ "source_sha256": "8e54e9e07f2c47eaf310c634e1a8a7367b45b660db888e42a641f1b69c08f7bc",
+ "base_run_id": "reread20260728-code-FUNWAVE-003-fable5-20260813T012841Z-7a6fa701",
+ "audit_run_id": "reread20260728-code-FUNWAVE-003-codexaudit-20260826T022957Z-453e6221",
+ "base_record_file": "eb8a3bfcb688b9bb0074fb136adf31130dcea0a15fecb995f7dc2aaea56f77a7.json",
+ "audit_record_file": "eb8a3bfcb688b9bb0074fb136adf31130dcea0a15fecb995f7dc2aaea56f77a7.json",
+ "base_record_sha256_bytes": "57d2788d6545b522a7cb8e9f62955a02450604fa05e62796935d8ebad6d4e674",
+ "audit_record_sha256_bytes": "a201503cd9ef681c3325a6755973f048f7dd339a247a56fe0fd39d9e117cbb49",
+ "base_finding_count": 4,
+ "audit_finding_count": 3,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "dep=zeros(m)+10.0 (L11) creates an m-by-m matrix (zeros with a single scalar argument), not a length-m vector; plot(x,-dep,...) (L26) then plots x against matrix columns — works but relies on MATLAB implicit expansion of the masked assignment at L12; whether this was intended over zeros(1,m) is not stated in the file."
+   ],
+   "audit_member_text": [
+    "Concrete dimension defect across L10-L12 and L26: zeros(m) at L11 creates an m-by-m matrix, while x is a 1-by-m vector. The logical slope update therefore does not define a one-dimensional depth vector, and plot(x,-dep,...) receives a 1024-by-1024 depth matrix rather than the intended 1024 samples."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "fdir is a hardcoded developer-specific absolute path (L2)."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Snapshot eta_00014 is hardcoded (L25); the correspondence to a physical time depends on the model output interval, which is not in this file."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Wavemaker center 250 and sponge extent 180 (L16-L17) are asserted graphically; agreement with the case input.txt values is not verifiable from this script."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Cross-line range inconsistency: x spans 0..1023 for m=1024 and dx=1 (L4-L10), but the fixed x-axis extends through 1024 (L32)."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "eta is loaded from an external file at L25 and plotted against x at L26 without a length or shape check."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

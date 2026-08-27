@@ -1,0 +1,137 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-003",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/vessel_island_beach/postprocessing/mk_depth.m",
+ "source_sha256": "25224cf7470806674e0cae6575cc4e1f0e715adc0c3ba601c85709c172acc769",
+ "base_run_id": "reread20260728-code-FUNWAVE-003-fable5-20260813T012841Z-7a6fa701",
+ "audit_run_id": "reread20260728-code-FUNWAVE-003-codexaudit-20260826T022957Z-453e6221",
+ "base_record_file": "1ac51103b152c420ebc8cf8c4768d559c8b6eb92aaa71f61e5a2ecaedc4c54e5.json",
+ "audit_record_file": "1ac51103b152c420ebc8cf8c4768d559c8b6eb92aaa71f61e5a2ecaedc4c54e5.json",
+ "base_record_sha256_bytes": "637424dbf5d69557638f8b1b916cba2f1e49a5a5267800cb7f608737224ce3e0",
+ "audit_record_sha256_bytes": "cdfd9fa7d784e51c9622183a7b9b5d77ee93d4bae2f13de5c01840ab639e78c8",
+ "base_finding_count": 5,
+ "audit_finding_count": 4,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "During spin-up the angle uses omega=speed0/Rship while the radius is still rship<Rship (L50-L56), so the actual speed actsp is below speed0 until t0; actsp is computed (L59) but its output column is commented out (L68), leaving the discrepancy unrecorded in vessel_0001."
+   ],
+   "audit_member_text": [
+    "Nominal/actual speed mismatch across L40, L51, L55, and L59: speed0 sets only angular rate using the final Rship, while the radius changes during t<t0, so total vessel speed includes radial motion and tangential speed rship*speed0/Rship. actsp measures that differing speed but is omitted from output at L68."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "xship/yship use the domain-centered coordinates and are shifted by +m/2*dx, +n/2*dy on output (L66-L67), implicitly assuming the model origin is the lower-left corner; not verifiable here."
+   ],
+   "audit_member_text": [
+    "Grid centering at L8-L9 subtracts m/2*dx and n/2*dy from indices 0..m-1 and 0..n-1, giving even-sized ranges -500..498 rather than symmetric endpoint coordinates; the saved ship shift at L66-L67 follows the same origin convention, but the intended cell-center/edge convention is undocumented."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "The vessel file format (header-less 3-column t,x,y named vessel_0001) must match what the FUNWAVE-TVD vessel module expects; the reader-side contract is not in this file."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Despite living in postprocessing/, this is an input-preparation script (writes depth.txt and vessel_0001)."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Double semicolons at L66-L67 are typos without functional effect."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Potential orientation/interface defect at L42-L44 and L65-L67: t, xship, and yship are created as row vectors and assigned directly to vessel(:,k) column slices without transposition; compatibility depends on MATLAB indexed-assignment shape handling and is not guarded."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "MATLAB pcolor at L35 ordinarily omits the final matrix row and column as colored faces; this affects only the preview, not the saved depth array."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

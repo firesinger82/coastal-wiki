@@ -1,0 +1,103 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-003",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/tide_frf_abc_data/postprocessing/plot_time_series.m",
+ "source_sha256": "609b72534110371bdb844e1c5d8ba611eb7e577dad6c01cbb8456c4b531aa0d0",
+ "base_run_id": "reread20260728-code-FUNWAVE-003-fable5-20260813T012841Z-7a6fa701",
+ "audit_run_id": "reread20260728-code-FUNWAVE-003-codexaudit-20260826T022957Z-453e6221",
+ "base_record_file": "7d85af91f05bdab1f6ba9b8a288d93f6389f65973bbce578b96a10893b7c6cd9.json",
+ "audit_record_file": "7d85af91f05bdab1f6ba9b8a288d93f6389f65973bbce578b96a10893b7c6cd9.json",
+ "base_record_sha256_bytes": "40fa78ff0c73e42e5c7e83355745dbaab76ccf57c48d79d3ca0a3fb9e4a1faaa",
+ "audit_record_sha256_bytes": "8bf5b7894f347f38cf31239eaeda4e14de63995e1bab64e469f39adeb2e89424",
+ "base_finding_count": 4,
+ "audit_finding_count": 2,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "sta(sta(:,2)==0)=NaN (L28) uses the column-2 zero mask as linear indices into the whole matrix, so it NaNs entries in column 1 (time) at the corresponding linear positions rather than the intended eta values in column 2 — a latent indexing bug unless the file is single-column-of-interest."
+   ],
+   "audit_member_text": [
+    "Line 28 forms an N-by-1 logical mask from sta(:,2) but applies it as a one-subscript linear index to the whole sta matrix; for a multi-column matrix this targets the first N linear elements rather than explicitly sta(mask,2), so the plotted column-2 zeros remain unchanged while corresponding column-1 entries can become NaN (lines 28, 31)."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "The variable sta is overwritten from the data matrix to the label string inside the loop (L26 vs L32); harmless only because the data is reloaded each iteration."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Station files use 4-digit padding sta_0001 (L21) unlike the 5-digit field snapshots elsewhere; the FUNWAVE-TVD station output naming convention is assumed, not shown here."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Whether the G <k> label numbering matches the physical FRF gauge numbers or the reversed numbering used in plot_bathy_stations.m is not determinable from this file."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The script writes into plots_movies at lines 46-47 without creating or checking that directory, so output depends on prior filesystem state."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

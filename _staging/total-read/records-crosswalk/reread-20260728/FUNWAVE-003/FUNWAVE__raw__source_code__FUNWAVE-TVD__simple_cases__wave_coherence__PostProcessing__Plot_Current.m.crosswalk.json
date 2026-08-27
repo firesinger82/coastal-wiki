@@ -1,0 +1,167 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-003",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/wave_coherence/PostProcessing/Plot_Current.m",
+ "source_sha256": "9c794341df0937c807e23acfc6fbaac11304d9fc4f8376479ece1f0109b0b22a",
+ "base_run_id": "reread20260728-code-FUNWAVE-003-fable5-20260813T012841Z-7a6fa701",
+ "audit_run_id": "reread20260728-code-FUNWAVE-003-codexaudit-20260826T022957Z-453e6221",
+ "base_record_file": "21767300c62305bce7dc85fc0eccf903e4eecc6cdbd0d26b88c2e1a818c6760f.json",
+ "audit_record_file": "21767300c62305bce7dc85fc0eccf903e4eecc6cdbd0d26b88c2e1a818c6760f.json",
+ "base_record_sha256_bytes": "d05ee8b0b30da4d6719e333f8943c215ea09c8054d3d3f9ea0c73fe2d261b9b3",
+ "audit_record_sha256_bytes": "bbb01f4c4177a6f70be73b0becc62baf12c271eb8049cd5880431257fa85ea3b",
+ "base_finding_count": 5,
+ "audit_finding_count": 6,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "colors(190,:) (L44) assumes the copper colormap has at least 190 rows (default 256); fails under smaller colormap settings."
+   ],
+   "audit_member_text": [
+    "Range/version risk at L43-L44: copper is called without an explicit row count and row 190 is then indexed. Environments returning the legacy 64-row default colormap raise an out-of-range error; the intended 190th color should request a sufficiently large table explicitly."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "The quiver at L30-L32 indexes the vectors x,y with 2D subscripts and mixes strides (x uses skx twice, u/v use (1:sky:end,1:skx:end)); it works only because skx==sky==5 — changing one stride breaks the coordinate/data alignment."
+   ],
+   "audit_member_text": [
+    "Potential quiver interface mismatch across L5-L6 and L30-L32: x and y are row vectors (subsampled to lengths 50 and 100), while u/v slices are 100x50 matrices. Unlike the already available xx/yy grids from L9, these coordinate arguments are not shaped to match U/V; correctness depends on whether the MATLAB version expands vector coordinates for quiver."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Coordinates x=2:2:500, y=2:2:1000 (L5-L6) start at 2 rather than 0; whether this matches the model's cell-center convention for the 250x500 grid is not verifiable from this file."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "The mask is taken from time 00000 while the mean fields are output 00001 (L11-L13); a moving shoreline between the two would misclassify cells."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "file_no is overwritten from number to string (L7, L10), a minor type reuse."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "All u/v/mask/depth arrays are assumed to match the hard-coded 500x250 coordinate grid at L5-L16, with no dimension check before masking or plotting."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Dry points at L41-L45 are defined by every NaN in u after L15, so pre-existing numerical NaNs are indistinguishable from mask-derived dry cells and are plotted as sand."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "MATLAB pcolor at L18 ordinarily omits the final depth row and column as colored faces."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The figures directory used at L48 is not created or checked before saveas."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

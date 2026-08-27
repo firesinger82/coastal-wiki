@@ -1,0 +1,137 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-003",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/tide_frf_abc_data/postprocessing/plot_bathy_stations.m",
+ "source_sha256": "f1608c122d154c5a412f719fe7ac9311d52c0e471d240d172dde433c449a0527",
+ "base_run_id": "reread20260728-code-FUNWAVE-003-fable5-20260813T012841Z-7a6fa701",
+ "audit_run_id": "reread20260728-code-FUNWAVE-003-codexaudit-20260826T022957Z-453e6221",
+ "base_record_file": "dfcfd5f45619c9ca0b9af238666c7152003089b71dffd8c55fa1c4a08ac62668.json",
+ "audit_record_file": "dfcfd5f45619c9ca0b9af238666c7152003089b71dffd8c55fa1c4a08ac62668.json",
+ "base_record_sha256_bytes": "f89ebbe65a23ffc715f3bca690547e15484c80d62a82062f7e9c97892f19711c",
+ "audit_record_sha256_bytes": "3f2ce056c2699180d7c81f7d6458da5118016a0cbf50a9fec2d6c3d91dac9918",
+ "base_finding_count": 5,
+ "audit_finding_count": 4,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "for k=1:length(station) (L52) uses length() of a matrix, which is max(rows,cols); correct only while the station count exceeds 2 columns."
+   ],
+   "audit_member_text": [
+    "Station-loop range defect: length(station) at L52 uses the largest matrix dimension, not the number of station rows. A one-row, two-column station file therefore iterates twice and indexes past sta_i/sta_j at L53-L55."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "Label y-position uses Y(sta_j(k)-15,sta_i(k)) (L55) — an index offset of 15 rows — which errors if sta_j(k)<=15; also mixing an index offset (rows) with the -20 coordinate offset in x is inconsistent."
+   ],
+   "audit_member_text": [
+    "Unchecked label offset: station markers use row sta_j(k), but label y coordinates use sta_j(k)-15 at L55. Any station with sta_j<=15 produces a zero/negative MATLAB index; no bounds check exists."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Station labels are generated as G<14-k> (L54), i.e. G13, G12, ... for k=1,2,...; this presumes exactly 13 stations ordered opposite to the FRF gauge numbering — the actual number of rows in station.txt is not visible here, and if it is not 13 labels go wrong (G0, negative)."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Stale comments 'make up breaker and foam for visualization' and 'eta without breaker' (L42, L45) are leftovers from the sibling movie script and do not describe this code."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "The +220 y-registration matches movie_eta_foam.m but differs from movie_mean_values.m (+180); which is correct for frf_03.jpg is not determinable here."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Station indices are used directly against 800-by-660 X/Y without integer/range validation (L11-L13, L53-L55)."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The dep binary read assumes exactly m*n singles and does not check fopen/fread success (L16-L19)."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

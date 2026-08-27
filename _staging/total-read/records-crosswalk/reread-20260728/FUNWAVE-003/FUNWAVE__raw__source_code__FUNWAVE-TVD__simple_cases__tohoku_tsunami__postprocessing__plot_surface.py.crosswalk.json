@@ -1,0 +1,122 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-003",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/tohoku_tsunami/postprocessing/plot_surface.py",
+ "source_sha256": "acb228a60461b7f9a13e6143ce601796e90d1e903845c0c7164f69db1dea038d",
+ "base_run_id": "reread20260728-code-FUNWAVE-003-fable5-20260813T012841Z-7a6fa701",
+ "audit_run_id": "reread20260728-code-FUNWAVE-003-codexaudit-20260826T022957Z-453e6221",
+ "base_record_file": "8fda2b8840d7afbf90dea5e654f70cd9b902b42c92a1c092eee989c927663e71.json",
+ "audit_record_file": "8fda2b8840d7afbf90dea5e654f70cd9b902b42c92a1c092eee989c927663e71.json",
+ "base_record_sha256_bytes": "0f855a37507bd0cef2592a96ab8feb67bf2e627ada08f4598cbea186a5b2d953",
+ "audit_record_sha256_bytes": "61cea58ac905157ab6211846fe2b2e198b9b6523d2eb2d7e9168c2597f2ccd1e",
+ "base_finding_count": 3,
+ "audit_finding_count": 5,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "dep and eta must come from the same run/grid for the mask (L36) to align; both are hardcoded workshop paths (L11, L13)."
+   ],
+   "audit_member_text": [
+    "Portability defect at L9-L13: both dep and eta locations are developer-specific absolute paths despite the instruction to supply one's own path; running elsewhere requires source edits."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "mat.rcParams.update (L56) is called inside the loop after most text is drawn; rcParams affect subsequently created elements, so first-panel fonts may differ."
+   ],
+   "audit_member_text": [
+    "Ordering defect at L33-L56: the global font-size update occurs after each panel's title/labels/colorbar are created. On a fresh process the first panel uses the prior default while later panels can use size 10, yielding inconsistent typography."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Snapshot-to-hour mapping [2,9] -> ['1','8'] implies a 3600 s output interval, consistent with the MATLAB sibling but not verifiable from this file."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Cross-array shape assumption at L11-L21 and L35-L40: eta is masked with dep and plotted on dep-derived coordinates without checking matching dimensions."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The independent nfile and hr lists at L23-L24 are indexed by the same num at L34 and L42 but equal lengths are not enforced; changing only nfile can cause an out-of-range hr access."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Matplotlib pcolor at L40 does not specify shading while x/y lengths match eta dimensions; behavior can vary by Matplotlib version between boundary truncation and acceptance with automatic shading."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

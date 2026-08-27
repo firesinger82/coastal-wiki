@@ -1,0 +1,122 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-003",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/vertical_velocity_structure/wvnum_omvec.m",
+ "source_sha256": "74ab8fb7fbb92f8cc0545eb2b711dee39f510ea9da43f56a9ab0516d7a8e8d79",
+ "base_run_id": "reread20260728-code-FUNWAVE-003-fable5-20260813T012841Z-7a6fa701",
+ "audit_run_id": "reread20260728-code-FUNWAVE-003-codexaudit-20260826T022957Z-453e6221",
+ "base_record_file": "68d28939d2a9d4d066ff7627feddc84b782c257e3d9be5e8b5336f1da6f865a4.json",
+ "audit_record_file": "68d28939d2a9d4d066ff7627feddc84b782c257e3d9be5e8b5336f1da6f865a4.json",
+ "base_record_sha256_bytes": "8348db19c28f0d1c60dca49afa5c3ba4522e83150ba3a75aa1d9d2bfcf912f3a",
+ "audit_record_sha256_bytes": "649e670f237002abee0d48ff9c9494c8ef964951e7a1603cca9d275a0089b992",
+ "base_finding_count": 3,
+ "audit_finding_count": 5,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "No iteration cap exists; non-convergence would loop forever (L8-L15)."
+   ],
+   "audit_member_text": [
+    "There is no maximum iteration count at L8-L15, so a finite but nonconvergent/oscillatory input can loop indefinitely."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "The elementwise operators (.* ./) suggest vector omega/h support ('omvec'), but k*h uses the plain * operator (L9-L10), which is only elementwise for scalar h or scalar k; for vector h and vector k of the same orientation it still works elementwise only when one is scalar — a latent shape restriction not documented."
+   ],
+   "audit_member_text": [
+    "Vector interface mismatch across L3 and L9-L10: some omega operations are elementwise, but multiplication by h uses matrix '*' and error is initially sized from length(h) at L7. The routine works for the scalar h used by its neighboring caller, but general h/omega vectors can have incompatible dimensions or unintended matrix products."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "constants and params_defined are empty because the only numeric literal is the convergence tolerance .000001 embedded in the while condition (L8), which has no name in the file; per A-2 it is preserved in the verbatim span of L8."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Singularity/termination defect for omega=0 across L3 and L8-L13: the initial expression is 0/sqrt(tanh(0)) and yields NaN; after one Newton pass the NaN relative error makes the comparison error>1e-6 false, so the loop exits and returns NaN rather than detecting the singular input or converging to k=0."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The Newton step divides by fp at L11 and the convergence metric divides by k at L12 without zero/finite checks. NaN comparisons can terminate the loop as if converged, while Inf/finite failures are not reported."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The local variable error at L7 and L12 shadows MATLAB's built-in error function, preventing diagnostic use of error by name within this scope."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

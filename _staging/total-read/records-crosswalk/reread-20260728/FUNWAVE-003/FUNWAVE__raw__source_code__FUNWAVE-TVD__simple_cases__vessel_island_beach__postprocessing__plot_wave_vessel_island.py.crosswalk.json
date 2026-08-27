@@ -1,0 +1,179 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-003",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/vessel_island_beach/postprocessing/plot_wave_vessel_island.py",
+ "source_sha256": "27cbd7a5cb3d293e3e1fa7d2dfdd1f04727559beae0b976afa062f2f96272897",
+ "base_run_id": "reread20260728-code-FUNWAVE-003-fable5-20260813T012841Z-7a6fa701",
+ "audit_run_id": "reread20260728-code-FUNWAVE-003-codexaudit-20260826T022957Z-453e6221",
+ "base_record_file": "826403e9e5281a0ebefd786c618e8cc754140b721b84a491a4b55e305b750c49.json",
+ "audit_record_file": "826403e9e5281a0ebefd786c618e8cc754140b721b84a491a4b55e305b750c49.json",
+ "base_record_sha256_bytes": "861ac8511efccf924c6ae51e23f1087b570e5176e719cd05b754c95a7d034e88",
+ "audit_record_sha256_bytes": "b1bf3d4d351dceb27f7316bf5f282ca7dd7e077ce16af58cc0141b4d9f3ff3bf",
+ "base_finding_count": 7,
+ "audit_finding_count": 7,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "range(ns,ne) (L35) excludes ne, unlike the MATLAB ns:ne inclusive loop."
+   ],
+   "audit_member_text": [
+    "End-bound off-by-one at L17-L18 and L35: an input described as the plot end number is excluded by range(ns,ne), so frame ne is never rendered; ns==ne renders nothing."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "mask (L14) is loaded but never used."
+   ],
+   "audit_member_text": [
+    "mask loaded from eta_00001 at L13-L14 is never used; eta masking instead relies only on eta>10 at L42."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "The os.path.join('Users','Gaby',...) paths (L10-L11) are relative (no leading separator), so they resolve under the current working directory rather than the absolute /Users/Gaby intended by the comment at L8."
+   ],
+   "audit_member_text": [
+    "The path components at L10-L11 start with 'Users' rather than '/Users' (or a drive/root), so despite appearing workstation-specific they are relative to the current directory; the user-path instruction does not match the constructed paths."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "fdep+'depth.txt' (L20) concatenates without a path separator, producing '.../vessel_island_beachdepth.txt' — a path bug; os.path.join is used everywhere else."
+   ],
+   "audit_member_text": [
+    "Definite path-concatenation defect at L11 and L20: fdep has no trailing separator, so fdep+'depth.txt' produces a path ending in 'vessel_island_beachdepth.txt' rather than a depth.txt child and normally fails before plotting."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "conflict",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "'%.4d' applied to NUM*2.5 (L54) formats a float with an integer conversion; in Python 3 this raises no error only for whole floats via %d truncation semantics ('%.4d' % 2.5 actually raises TypeError in Python 3 for floats — script likely written for Python 2)."
+   ],
+   "audit_member_text": [
+    "Numerical formatting defect at L53-L55: (num-1)*2.5 can be half-integral, but %.4d truncates it to an integer (for example 2.5 becomes 0002), producing incorrect displayed seconds."
+   ],
+   "representative": "audit",
+   "rationale": "blinded CONFLICT: %.4d on 2.5: X3 says truncates, Y3 says TypeError",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "dx=1.0 here (L26) versus dx=2.0 in the MATLAB sibling and mk_depth (dx=2.0); y0=2.0 (L25) also differs from the MATLAB y0=0.0 — coordinate axes will disagree with the depth grid actually generated by mk_depth."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "The 2.5 s output interval implied by the title (L54) is unverifiable from this file."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "No dy exists and y at L29 reuses dx, forcing square spacing; eta dimensions are also not checked against dep-derived x/y before L44."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Matplotlib pcolor at L44 does not specify shading while coordinate lengths match eta dimensions, making edge coverage version-dependent."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

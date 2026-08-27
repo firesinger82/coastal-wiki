@@ -1,0 +1,133 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-003",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/tide_abs_2bc_data/plot_wave.m",
+ "source_sha256": "f911ef837eb5a0094079f7a66a2cfbc99e607286ef35d24a730b8d4733d7e413",
+ "base_run_id": "reread20260728-code-FUNWAVE-003-fable5-20260813T012841Z-7a6fa701",
+ "audit_run_id": "reread20260728-code-FUNWAVE-003-codexaudit-20260826T022957Z-453e6221",
+ "base_record_file": "54232edd492dd173323021dfdaeda20714eaaffb3b73236cd9f6f9dc1b636002.json",
+ "audit_record_file": "54232edd492dd173323021dfdaeda20714eaaffb3b73236cd9f6f9dc1b636002.json",
+ "base_record_sha256_bytes": "9c8f6633e5af3647045670c4cef7f0a898cb07b7b7afd1b2271c8116d85f9a79",
+ "audit_record_sha256_bytes": "fcd3861c92b8da7d67c124aa5999a8d6000fed055858420c585e3b3e342c2b6d",
+ "base_finding_count": 5,
+ "audit_finding_count": 3,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "The ylabel ' y (m) ' is set only when num==1 (L49-L51) but clf (L37) wipes it on every subsequent frame, so frames 2..99 have no ylabel; also it is applied to the transect subplot (1,2,2), the active axes at that point, though 'y (m)' semantically fits the mesh panel."
+   ],
+   "audit_member_text": [
+    "Cross-line labeling defect: clf at L37 clears the figure every iteration, but ylabel is recreated only when num==1 at L49-L51, so frames 2..99 have no y label. The call also occurs after subplot(1,2,2) at L44 and labels the eta profile axis as physical 'y (m)' rather than labeling the first mesh subplot."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "mov(num).cdata accumulates all 99 resized frames in memory (L63) although each frame is written immediately (L65); the array is never used afterwards."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Frame list starts at 1 (L12) while the sizing load uses eta_00001 (L4) — eta_00000 is skipped; whether that is intentional is not stated."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "The commented export name eta_inlet_shoal_irr.jpg (L72) refers to an inlet_shoal case, suggesting this script was copied from another case's postprocessing."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "dx=dy=2.0 (L7-L8) are asserted; agreement with the case grid spacing in input.txt is not verifiable from this script."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "All frame dimensions are fixed from eta_00001 at L4-L10, while every later eta/mask pair is loaded at L31-L32 and used at L34-L45 without checks. A changed eta shape breaks mesh/profile coordinates, and a mask shape mismatch breaks logical assignment."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The center-row expression floor(n/2) at L45 is invalid when n=1 because MATLAB indices start at 1; the file imposes no lower bound on n after size() at L6."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

@@ -1,0 +1,139 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-003",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/wave_coherence/Spectrum_Generator_for_WKDATA2D/Plot_1Dth.m",
+ "source_sha256": "121e7a9178c9d4169e7aa61cad940a3c24095f479aa1177a5c1b3c63e64c7096",
+ "base_run_id": "reread20260728-code-FUNWAVE-003-fable5-20260813T012841Z-7a6fa701",
+ "audit_run_id": "reread20260728-code-FUNWAVE-003-codexaudit-20260826T022957Z-453e6221",
+ "base_record_file": "295ac3d46b112744f3f92f7b52949046ca42c41db9780ce72a142dde05eb6aa0.json",
+ "audit_record_file": "295ac3d46b112744f3f92f7b52949046ca42c41db9780ce72a142dde05eb6aa0.json",
+ "base_record_sha256_bytes": "f26ec3d5c9ff9208a49dba9525d5738cfefbb2609e9194ac50509818df711b0e",
+ "audit_record_sha256_bytes": "faa598828d7556c0aa3ac8dc94f71f8cbf6c1c9f6589135727b507c353daa028",
+ "base_finding_count": 4,
+ "audit_finding_count": 6,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0",
+    "B5"
+   ],
+   "base_member_text": [
+    "cross-line defect candidate: Hmo_Syy1d_th (L28) sums Syy1d_th, which is initialized to zeros(1,mtheta) at L6 and never written afterwards — the computed Hmo is always 0; the integrated spectrum actually lives in Syy1d_th_unique (L19-27), and the only use of Hmo_Syy1d_th is the commented-out title (L43)"
+   ],
+   "audit_member_text": [
+    "Definite variable-selection defect across L6, L19-L28: directional energy is accumulated into Syy1d_th_unique, but Hmo_Syy1d_th is calculated from the separate Syy1d_th array that remains all zeros. The diagnostic is therefore always zero regardless of input energy.",
+    "The zero Hmo diagnostic is not exposed because the title at L43 is commented, so the variable mismatch is silently hidden from output."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "reps computed in L9-16 is never used elsewhere in this file"
+   ],
+   "audit_member_text": [
+    "The O(mfreq^2) reps calculation at L9-L16 uses exact float equality and its result is never consumed; repetitions do not affect the directional integration or plot."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "unit mix across arguments: theta/theta_unique are plotted in radians (L33, L40) while theta_mean is converted by *pi/180 (L33, L35, L36), implying degrees — conventions are defined by the caller, not this file"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "directional integration (L23-24) multiplies by scalar freq_resolution, assuming uniform frequency spacing; validity depends on the generator that built freq"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Direction grouping at L22 uses exact equality, so nearly identical theta values remain separate even if they represent the same direction numerically."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "mfreq is trusted at L9/L11/L21 rather than checked against freq, theta, and Spectrum_Energy lengths; inconsistent inputs cause out-of-range access, and freq_resolution shape is not validated for the multiplication continued at L23-L24."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Graphics-state accumulation at L31-L50: figure(12) is opened with hold on and is never cleared or closed, so repeated calls can overlay old spectra and boundary lines into subsequent saved files."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

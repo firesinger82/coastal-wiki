@@ -1,0 +1,124 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-003",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/vessel_island_beach/postprocessing/mk_depth_commented.m",
+ "source_sha256": "7bec7eb3a3bba1125d79af49b4cce680af25f3fea69e66c2d1effb3cd631ce92",
+ "base_run_id": "reread20260728-code-FUNWAVE-003-fable5-20260813T012841Z-7a6fa701",
+ "audit_run_id": "reread20260728-code-FUNWAVE-003-codexaudit-20260826T022957Z-453e6221",
+ "base_record_file": "4c5900a8c5976d0bca5dff9c167ccbb5aa004180e5c0e215577e6ce9930df586.json",
+ "audit_record_file": "4c5900a8c5976d0bca5dff9c167ccbb5aa004180e5c0e215577e6ce9930df586.json",
+ "base_record_sha256_bytes": "7e4aa4cc99609a05d69f40c9ce4865f6c69b9cb86e80d74f14539d3d986439ca",
+ "audit_record_sha256_bytes": "906e939b5f515ee83b4ae65cf671e1bc25444d0f9ddd89ace0dfbe2d823b9a3c",
+ "base_finding_count": 4,
+ "audit_finding_count": 5,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "The comment 'Shifting positions by half a grid space' (L105) is wrong: +m/2*dx shifts by half the domain width (500 m), not half a grid cell."
+   ],
+   "audit_member_text": [
+    "Comment/code scale mismatch at L105-L107: the stated shift is half a grid space, but the code adds half the full grid extent (m/2*dx and n/2*dy). The arithmetic matches conversion from centered coordinates to an origin at a grid corner, not the comment."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1",
+    "A2"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "Same spin-up inconsistency as the siblings: omega uses Rship while rship<Rship for t<t0 (L75-L87), so actual speed (actsp, L94) is below speed0 during spin-up; actsp output stays commented out (L108).",
+    "The 'corrected speed' comment at L93 labels actsp, but the value is never used downstream."
+   ],
+   "audit_member_text": [
+    "Comment/code mismatch and speed defect across L83-L94: the comment says angular speed is based on current radius, but omega divides by fixed Rship rather than rship. During the radial ramp, speed0 is therefore neither the tangential speed nor the total actual speed; actsp computes the discrepancy but is omitted from output at L108."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Comment 'Fixing land height to be 2m max' (L45) and the moat/island geometry values are asserted; agreement with the case input.txt is not verifiable from this file."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Potential orientation/interface defect at L58-L63 and L103-L107: row vectors t/xship/yship are assigned directly to vessel(:,k) column slices without transposition; no shape normalization is present."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Grid centering at L9-L10 yields even-sized ranges -500..498 rather than symmetric endpoints, so the chosen cell-center/edge convention remains ambiguous."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "MATLAB pcolor at L98 ordinarily omits the final matrix row and column as colored faces; this affects the preview only."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

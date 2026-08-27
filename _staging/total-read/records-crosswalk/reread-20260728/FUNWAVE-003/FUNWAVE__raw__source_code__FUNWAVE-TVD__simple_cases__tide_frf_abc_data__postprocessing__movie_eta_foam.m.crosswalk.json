@@ -1,0 +1,148 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-003",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/tide_frf_abc_data/postprocessing/movie_eta_foam.m",
+ "source_sha256": "3945b48632a93cb3a2ffebb8097412ca63eeffd7e586d576f24cb90d183f14d0",
+ "base_run_id": "reread20260728-code-FUNWAVE-003-fable5-20260813T012841Z-7a6fa701",
+ "audit_run_id": "reread20260728-code-FUNWAVE-003-codexaudit-20260826T022957Z-453e6221",
+ "base_record_file": "da58f3f4d8ff714e01a051fb684193bc0f281abd93ad424fa513e29e5b5bc203.json",
+ "audit_record_file": "da58f3f4d8ff714e01a051fb684193bc0f281abd93ad424fa513e29e5b5bc203.json",
+ "base_record_sha256_bytes": "fbca1d55e2131ef46b3ed534c3c0dc1eb0729e4327d947c3bf731f775dad5843",
+ "audit_record_sha256_bytes": "58ef761efc71463e58438b3b5b6dd91333f89b8d9a6555f40806b30564591260",
+ "base_finding_count": 6,
+ "audit_finding_count": 3,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "The 600.0 s per output frame assumed in the time label (L116) is not derivable from this file; it must match PLOT_INTV in the case input, which is not readable here."
+   ],
+   "audit_member_text": [
+    "Displayed time hard-codes 600 seconds per file number at L116; no file metadata or parameter in this script establishes that output cadence."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "bubble and foam are explicitly 'made up' for visualization (comment L81): thresholds 10 s, 600 s, decay scales 10 and 50, amplitudes 1.5 and 1.0, floor 0.1, and sentinel 9000.0 (L84-L97) have no stated physical basis in the file."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Registration offsets +105 and +220 and image rotation imrotate(RGB,1) (L25-L26, L106) are 'approximately' matched per comment L24; the geo-accuracy is unquantified."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "The 'age' output field is read as wave/breaker age in seconds (L73, L85, L93); its exact model definition is not in this file."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "mov(k).cdata accumulates all 158 frames in memory though each is written immediately (L136-L138); the array is never reused."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "foam has no NaN floor analogous to bubble(bubble<0.1)=NaN, so the foam pcolor layer covers the whole wet domain with near-zero values over the background image (L95-L97, L124)."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Mask-application inconsistency: mask is read at L63-L69 and applied to age/foam and eta at L94 and L100, but bubble is derived from the unmasked breaker/age field at L84-L90 and plotted at L110. Positive age values in inactive cells can therefore render bubbles over masked land/dry cells."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Every binary fopen/fread sequence (L12-L15, L54-L57, L63-L66, L71-L74) assumes exactly m*n single-precision values and never checks fileID or the count returned by fread. A missing or short file propagates into transpose/flip and then conflicts with the fixed 800-by-660 X/Y grids at L109-L124."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

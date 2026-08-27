@@ -1,0 +1,129 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-003",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/tide_frf_abc_data/postprocessing/plot_time_series_less.m",
+ "source_sha256": "ca2cd60c463426bdb979ba7bf83affb45e30c524c7cea54991bdb4de8878bc06",
+ "base_run_id": "reread20260728-code-FUNWAVE-003-fable5-20260813T012841Z-7a6fa701",
+ "audit_run_id": "reread20260728-code-FUNWAVE-003-codexaudit-20260826T022957Z-453e6221",
+ "base_record_file": "49ab6b67dc5ba25c5cd1faef0dff03286b477c9240af1e348dc8a0d13ad6e2a1.json",
+ "audit_record_file": "49ab6b67dc5ba25c5cd1faef0dff03286b477c9240af1e348dc8a0d13ad6e2a1.json",
+ "base_record_sha256_bytes": "00d60d6e917fadfd67bf6aad68b2fd8762e1322c23c4d6daa49b9ea2f6b9849f",
+ "audit_record_sha256_bytes": "56cfc5555fb2fd8579cc1aeb3d7e677a68aec15a39446e34ca616526d5d903e5",
+ "base_finding_count": 4,
+ "audit_finding_count": 3,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Same linear-indexing issue as the sibling script: sta(sta(:,2)==0)=NaN (L28) NaNs positions in column 1 (time) addressed by the column-2 mask, not the eta values themselves."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "ylabel condition k==4 (L37) puts the eta label on the first plot of the second row while k==1 covers the first row; label placement for k=4 overlaps the xlabel condition (L40) — appears intended for a 2x3 grid but slightly inconsistent (row 2 starts at k=4)."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Selection [1 4 7 10 12 13] with labels G1..G6 (L7, L32) matches the file_sta selection in plot_bathy_stations_less.m; the mapping to physical FRF gauges is not documented here."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Axis time limit 26.6 hr (L35) implies roughly 95,760 s of simulation; the actual run length is not verifiable from this file."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Line 28 derives an N-by-1 mask from sta(:,2) but applies it with one-subscript linear indexing; for a multi-column matrix it modifies first-column elements rather than sta(mask,2), while line 31 still plots unchanged column 2."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The selected station number is numb=files(k) at line 19, but the displayed label uses k at line 32; gauges 4, 7, 10, 12, and 13 are therefore labeled G 2 through G 6 instead of their selected station numbers (lines 7, 19, 32)."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Lines 46-47 assume plots_movies already exists; no directory creation or check occurs."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

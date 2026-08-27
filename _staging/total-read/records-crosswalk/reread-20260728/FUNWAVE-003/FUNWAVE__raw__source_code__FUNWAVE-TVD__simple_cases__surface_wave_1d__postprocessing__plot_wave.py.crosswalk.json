@@ -1,0 +1,130 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-003",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/surface_wave_1d/postprocessing/plot_wave.py",
+ "source_sha256": "fc6d9a96a7be449dfe91c388dfe4800e10924a3d58f008ca72caec0f445b3d37",
+ "base_run_id": "reread20260728-code-FUNWAVE-003-fable5-20260813T012841Z-7a6fa701",
+ "audit_run_id": "reread20260728-code-FUNWAVE-003-codexaudit-20260826T022957Z-453e6221",
+ "base_record_file": "0120e2e29318fda3be2dd6f74dc07ef325496b15c1aab221c3505de3a3a63978.json",
+ "audit_record_file": "0120e2e29318fda3be2dd6f74dc07ef325496b15c1aab221c3505de3a3a63978.json",
+ "base_record_sha256_bytes": "e3954dad4843414ef2208cb0d456bf80946351d99f2e450926fafbb330243817",
+ "audit_record_sha256_bytes": "c9351ef2496452708fe886df81a1b82ad15f7bec2953d9ac005bef6e212463af",
+ "base_finding_count": 5,
+ "audit_finding_count": 5,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "eta is indexed as eta[0,:] (L47), i.e. the first row of a 2D array, while the MATLAB counterpart plots the whole vector; consistency with the eta_00014 file layout is not verifiable from this script."
+   ],
+   "audit_member_text": [
+    "Likely runtime shape defect at L43-L47: numpy.loadtxt returns a one-dimensional array for a file containing a single row or a single column, but L47 unconditionally indexes eta[0,:] as two-dimensional. A normal 1-D eta file therefore raises an indexing error instead of plotting."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "dep is allocated as a full (m,m) matrix (L18) but only column 0 is ever computed and plotted (L20-L24, L47) — a length-m vector would suffice; whether this mirrors the MATLAB zeros(m) quirk deliberately is not stated."
+   ],
+   "audit_member_text": [
+    "The m-by-m dep allocation at L18 is inconsistent with the one-dimensional model and only column zero is populated/read (L22-L26, L47), wasting O(m^2) storage."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "Loop condition 'if i < Xslp' (L21) compares the integer index i to the coordinate Xslp=800.0; this coincides with x[i] < Xslp only because dx=1.0, so the script silently breaks for other dx."
+   ],
+   "audit_member_text": [
+    "Coordinate/index inconsistency: the slope branch compares integer index i with physical-coordinate Xslp at L21 while computes depth from x[i] at L24. It only places the breakpoint correctly because dx is currently 1.0; changing dx breaks the intended Xslp location."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "plt.hold(True) (L51) was removed from matplotlib (deprecated 2.0, removed 3.0), so the script fails on modern matplotlib; also it is called after the plot calls it would affect."
+   ],
+   "audit_member_text": [
+    "API incompatibility: plt.hold(True) at L51 uses the removed pyplot hold API, so contemporary Matplotlib raises AttributeError before the figure is saved at L65."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "fdir is a hardcoded user-specific path (L9); snapshot eta_00014 (L43) is hardcoded and its physical time depends on the model output interval not present here."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "x covers 0..1023 (L11-L17), while the fixed axis extends to 1024 at L58."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

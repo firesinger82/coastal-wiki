@@ -1,0 +1,158 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-003",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/wave_coherence/Spectrum_Generator_for_WKDATA2D/Plot_1Df.m",
+ "source_sha256": "22437d5b3e6a46796865077cd52ae8dd3c3acbd7ac55da7d968e9cbb41c48204",
+ "base_run_id": "reread20260728-code-FUNWAVE-003-fable5-20260813T012841Z-7a6fa701",
+ "audit_run_id": "reread20260728-code-FUNWAVE-003-codexaudit-20260826T022957Z-453e6221",
+ "base_record_file": "0d7084f79cffaa96284148ec48663630c8af975142506cb3e8c17037a508d31b.json",
+ "audit_record_file": "0d7084f79cffaa96284148ec48663630c8af975142506cb3e8c17037a508d31b.json",
+ "base_record_sha256_bytes": "981d0d881def16507539781d5867171d366e5624cbddc854c151f69b66e3cc04",
+ "audit_record_sha256_bytes": "ff6ba717d78474d42335a82ab1b477e600c3c85ce410f809dd9649f10a712721",
+ "base_finding_count": 5,
+ "audit_finding_count": 7,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "Hmo_Syy1d_f (L26-27) is only referenced in commented-out title lines (L42, L67), so the computed value is unused in active code"
+   ],
+   "audit_member_text": [
+    "Hmo_Syy1d_f is computed and rounded at L26-L27 but never checked or displayed because its title lines are commented."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0",
+    "A1"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "reps_condensed is built in the first loop (L5-12) but never used elsewhere in this file — its purpose relative to the second loop (L15-24), which recomputes the same duplicate-detection, is unstated",
+    "freq_condensed (L21) is assigned but never used later in this file"
+   ],
+   "audit_member_text": [
+    "reps_condensed at L4-L12 and freq_condensed at L21 are computed but never used in plotting or output; the displayed placement relies only on representative original indices."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "the relation between the condensed freq grid and the full freq_no_coh axis (why direct indexing Syy1d_f_whole(freq_index) at L30 is valid) depends on how the caller constructs freq and freq_no_coh"
+   ],
+   "audit_member_text": [
+    "mfreq is trusted as the loop bound at L5/L15 rather than derived/checked against freq and Spectrum_Energy. freq_index is then used against a vector sized from freq_no_coh at L29-L30, so inconsistent lengths cause out-of-range access."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "the factor pi applied to Spectrum_Energy (L17, L20) implies a directional/angular integration convention defined by the calling spectrum generator, not stated in this file"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Condensation algorithm defect across L5-L24: duplicates are merged only when equal frequencies are adjacent. The gate-read Coherence_Spectrum replaces guest values in place without sorting, so equal host frequencies can be separated; those nonadjacent coherent components remain separate and their energies are not combined."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Exact floating-point equality at L6/L16 is the only grouping criterion, with no tolerance; numerically equivalent frequencies produced through different arithmetic can fail to condense."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The 31-point moving average at L57 is applied after zeros are inserted at all non-representative positions at L29-L30. This spreads energy across zero gaps and changes amplitudes based on sparse index layout rather than smoothing the condensed frequency/value pairs."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The first figure is closed at L54, but the second figure opened at L56 is left open after the final save at L77."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

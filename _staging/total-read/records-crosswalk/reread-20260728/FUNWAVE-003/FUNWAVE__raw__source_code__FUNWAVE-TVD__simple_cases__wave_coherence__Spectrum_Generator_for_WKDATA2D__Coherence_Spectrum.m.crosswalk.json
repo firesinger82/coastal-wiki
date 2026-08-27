@@ -1,0 +1,170 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-003",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/wave_coherence/Spectrum_Generator_for_WKDATA2D/Coherence_Spectrum.m",
+ "source_sha256": "9dc84b339198760677417dfb4cc5bf61cf478b76a478e2bd7f8ea88432f95d6f",
+ "base_run_id": "reread20260728-code-FUNWAVE-003-fable5-20260813T012841Z-7a6fa701",
+ "audit_run_id": "reread20260728-code-FUNWAVE-003-codexaudit-20260826T022957Z-453e6221",
+ "base_record_file": "fe47e0edfddff33562dac0fb44d4c1a38c2d9872252712ea6561c0066749ff2e.json",
+ "audit_record_file": "fe47e0edfddff33562dac0fb44d4c1a38c2d9872252712ea6561c0066749ff2e.json",
+ "base_record_sha256_bytes": "516970afe5835c02a2f1b39f3021aead7a3c1210bdbcb83b8fd6a5ecbe7ff899",
+ "audit_record_sha256_bytes": "e0dbc2a6667b4109d24760af8430fdd8327ef491122045c6f00b3d52cadfeff3",
+ "base_finding_count": 8,
+ "audit_finding_count": 7,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "reps bookkeeping (L42-L43) assigns the host's count to every component sharing that frequency; whether Num_Coherent counts components or frequencies is ambiguous (coherent_idx counts entries with reps>1, L44-L45), so the loop may overshoot the requested percentage."
+   ],
+   "audit_member_text": [
+    "Counting can overshoot or misrepresent the target across L42-L45: reps is propagated to every frequency equal to a host, and coherent_idx counts both hosts and all guests with reps>1. The while condition only requires the count to reach/exceed Num_Coherent, not equal it."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [
+    "Hmo_output (L87) is computed as a check but never compared or returned."
+   ],
+   "audit_member_text": [
+    "The claimed output-height check at L86-L87 only computes Hmo_output and never compares it with Hmo or raises a diagnostic, so failed energy calibration is not detected."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "Host selection maps each guest to the nearest host frequency ABOVE it (negative differences set to inf, L35-L37); if a guest exceeds all hosts, min of all-inf gives index 1 — behavior in that edge case is questionable and unguarded."
+   ],
+   "audit_member_text": [
+    "Invalid-host fallback at L35-L39: when a guest frequency exceeds every host, all freq_diff entries become Inf, yet min selects the first host and the guest is moved to a lower frequency despite the preceding exclusion rule. An empty host_freqs vector is likewise unhandled."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0",
+    "A1"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "All spectral parameters come from load inputs.mat (L5) — Coherent_Percentage, mcomponent, mfreq, depth, g, fp, gamma_spec, sigma_theta, theta_mean, Hmo are never defined in this file, so the function's behavior is opaque without that mat-file (produced by a sibling script not in this file).",
+    "The input arguments idx_theta and freq_in vs the loaded mfreq/mcomponent overlap in role; idx_theta is never used in the function body."
+   ],
+   "audit_member_text": [
+    "Function-interface violation at L1-L5: load inputs.mat injects hidden dependencies (including Coherent_Percentage, mcomponent, mfreq, depth, g, fp, gamma_spec, sigma_theta, theta_mean, and Hmo) directly into the local workspace and can overwrite same-named explicit inputs. The declared idx_theta input is never used anywhere."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "The wrapped-normal series truncation N_spec=20/sigma_theta (L72) is not an integer in general; MATLAB's colon operator truncates implicitly."
+   ],
+   "audit_member_text": [
+    "Singularity checks are absent across L53-L85: nonpositive frequency/fp, nonpositive depth/g, zero sigma_theta, zero Energy_total, zero sum(AG.*EnergyBin), or zero freq_resolution can create Inf/NaN or division by zero. N_spec at L72 is also not forced to an integer before use as a loop bound."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "The while loop can exhaust freqs_pool before reaching Num_Coherent if the count logic stalls; no guard exists (L27-L46)."
+   ],
+   "audit_member_text": [
+    "Pool-exhaustion/range defect across L17 and L27-L33: Num_Coherent is not bounded by the achievable pool/count. If the target cannot be reached, mfreq_temp becomes zero and guest_idx becomes zero, making freqs_pool(0) invalid; ceil(rand*mfreq_temp) can also produce zero if rand returns exactly zero."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "The comment '% 79.6287' (L70) is an unexplained magic number left in the code."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Shape/interface assumptions: reps is sized from loaded mfreq at L21 while indexing uses freq_in/host indices; theta(kf), EnergyBin, and AG assume all loaded/input lengths and orientations agree, without validation."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}
