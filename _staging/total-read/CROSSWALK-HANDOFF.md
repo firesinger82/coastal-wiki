@@ -10,10 +10,25 @@
 - 49파일·438 dispositions·PASS. distinct_unconfirmed 206·base_only 153·equivalent 78·**confirmed_delta 1**(convert.f B3 OOB, span확정). delta 후보 23(HIGH) 중 1 confirmed·1 refuted(sediment.F B3, span-gate 기각 실증)·21 pending.
 - 산출: `records-crosswalk/reread-20260728/FUNWAVE-000/`(+`_provenance/` 에 blinded_input·keymap·verdicts·delta_candidates 동결, `DELTA-REVIEW.md`). 파일럿은 `.../EFDC-000/` 로 네임스페이스 이동.
 
-## 다음 작업 = 나머지 shard 확대 (같은 blinded 파이프라인)
-- 남은 쌍(code): **FUNWAVE-001·002·003**(각 ~49파일)·**FUNWAVE-004**(audit 16 — 004a/b/c 분할분과 합산 필요)·**note FUNWAVE-000**(20파일).
-- shard 마다: `blind_shard.py <base> <audit> <TAG> <out>` → **fresh general-purpose subagent 1명**(fork 금지·병렬 금지) → `finalize_shard.py` → in-scope Fortran HIGH 후보만 span-확정 → `verify_crosswalk.py` → 커밋.
-- confirmed_delta·pending-HIGH 누적 → supplement 게이트(§3, 누적 shard 대상) → WO amendment → canonical 선택.
+## ✅ 감사쌍 보유 shard 전량 완료 (2026-08-27) — crosswalk 생성 단계 종료
+7 shard 전부 blinded 파이프라인 완주·커밋·verify PASS:
+| shard | 축 | 파일 | dispositions | confirmed_delta |
+|---|---|---|---|---|
+| EFDC-000(파일럿) | code | 6 | 130 | 1 (DETTMP) |
+| FUNWAVE-000 | code | 49 | 438 | 1 (convert.f B3) |
+| FUNWAVE-001 | code | 49 | 337 | 1 (breaker.f90 B1) |
+| FUNWAVE-002 | code | 49 | 289 | 0 |
+| FUNWAVE-003 | code | 48 | 319 | 0 |
+| FUNWAVE-004 | code | 48 | 478 | 1 (breaker.F B1) |
+| FUNWAVE-note-000 | note | 20 | 151 | 1 (manual STATIONS_FILE) |
+
+- 누적: dispositions 2,142 · **confirmed_delta 5**(전량 원문/코드 span 확정, base 미검출) · span-gate 기각 2(sediment.F B3·mkxyz B0).
+- 산출: `records-crosswalk/reread-20260728/<SHARD>/`(+`_provenance/`·`DELTA-REVIEW.md`). 스크립트: `blind_shard.py`·`finalize_shard.py`·`verify_crosswalk.py`(레코드파일명 키).
+
+## 다음 작업 = supplement 게이트(§3) — pending HIGH 승격
+- 각 shard `_provenance/delta_candidates.json` 의 **in-scope pending HIGH** 를 원문 span 재확인 → confirmed_delta 승격(특히 FUNWAVE-004 25건·001 16건: fluxes/init U4xL·wavemaker Beta_gen/phi1·mod_vessel NumVessel·mod_meteo/precipitation rollover 등).
+- 승격분 → canonical supplement(hash 고정·원본 미변경, §3) → WO amendment(§5.3 완결게이트 좁게 개정) → §7 canonical 선택 → `/codex:review`.
+- .m/.py 후처리 스크립트 HIGH 는 범위밖(#8) — supplement 목적지 없음.
 - 대형 3모델(ADCIRC/ROMS/Delft3D)은 별건(감사 미실시 — 먼저 감사 run 필요).
 
 ---
