@@ -115,7 +115,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B0"
@@ -125,9 +125,14 @@
     "Use-before-assignment across branches: breaking_kernel assigns DXg and DYg only inside the Age_sh<=ZERO, non-immediate-trigger branch at L168-L184, but all paths then use them to compute xmk/ymk at L234-L238. If the immediate trigger branch L162-L164 or positive-age branch L166-L167 is taken, wavemaker footprint selection consumes undefined DXg/DYg."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
+   "rationale": "span-verified 2026-08-27: breaking_kernel DXg/DYg(decl L137) assigned only in innermost Age_sh<=ZERO branch (L173-174/179-180); breaking(AGE=DT) and aging(Age_sh>ZERO) branches leave unset, yet xmk/ymk use them after all ENDIFs at L234-237. Directly (no Gamma multiplier) → real UBA. GPU variant of breaker.f90/breaker.F confirmed delta. base missed.",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "evidence_span": {
+    "path": "FUNWAVE/raw/source_code/FUNWAVE-GPU/src/breaker_gpu.F",
+    "lines": "137,173-174,234-237",
+    "quote": "    REAL(SP) :: xmk,ymk,DXg,DYg\n…\n                DXg=DX_d\n                DYg=DY_d\n…\n        xmk=(I-Ibeg)*DXg + (iista-1)*DXg\n        ymk=(J-Jbeg)*DYg + (jjsta-1)*DYg\n# else\n        xmk=(I-Ibeg)*DXg"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",

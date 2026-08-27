@@ -5,8 +5,8 @@
  "generated_by": "llm:claude-opus-4-8 (supplement gate Phase A)",
  "generated_at": "2026-08-27",
  "note": "canonical selected_record = base(Claude 1차, unchanged). supplements = span-reconfirmed audit confirmed_delta. Does NOT add canonical keys (completion gate item 2 preserved).",
- "entry_count": 5,
- "supplement_count": 5,
+ "entry_count": 7,
+ "supplement_count": 7,
  "entries": [
   {
    "canonical_key": {
@@ -43,6 +43,86 @@
      "decided_by": "llm:claude-opus-4-8 (pilot; self-adjudicated, UNBLINDED — mechanics validation only)",
      "decided_at": "2026-08-27",
      "rationale": "DETTMP=1/det then compared ==0.0: reciprocal of singular det is Inf not 0, so STOPP guard is dead code",
+     "reconfirmed_at": "2026-08-27",
+     "reconfirm_method": "span re-extracted from live source at cited lines; source_file_sha256 vs record source_sha256 checked by verifier"
+    }
+   ]
+  },
+  {
+   "canonical_key": {
+    "model": "FUNWAVE",
+    "normalized_path": "FUNWAVE/raw/source_code/FUNWAVE-GPU/src/breaker.F",
+    "source_sha256": "c591db049ac4e7dc9125bc2bc8004fc599486f73f1216fe7d5a6786d35df5001"
+   },
+   "shard": "FUNWAVE-000",
+   "selected_record": {
+    "layer": "base_1차",
+    "reader": "anthropic/claude-fable-5",
+    "run_id": "reread20260728-code-FUNWAVE-000-fable5-20260813T012841Z-2131dcc5",
+    "record_file": "8296b045d9b04ac5b0b95c9cae4aac8f3732a92099947be16c6f17b31f4dce23.json",
+    "record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-000-fable5-20260813T012841Z-2131dcc5/8296b045d9b04ac5b0b95c9cae4aac8f3732a92099947be16c6f17b31f4dce23.json",
+    "record_sha256_bytes": "6366a9a993c3976418ce3106999de3cc28b9baa28c5fee206d3f0ebdb2665e54"
+   },
+   "supplements": [
+    {
+     "member_input_ids": [
+      "B0"
+     ],
+     "finding_text": "AGE is declared INTENT(OUT) at L110, but its incoming values are read in the initiation/aging test at L141-L146 and as neighbor history at L175-L214, before every element is necessarily defined by this invocation. The algorithm requires persistent prior age, so the declared interface conflicts with its use and should be assessed as INOUT.",
+     "src_run_id": "reread20260728-code-FUNWAVE-000-codexaudit-20260826T022956Z-b1ecf500",
+     "src_record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-000-codexaudit-20260826T022956Z-b1ecf500/8296b045d9b04ac5b0b95c9cae4aac8f3732a92099947be16c6f17b31f4dce23.json",
+     "src_record_sha256_bytes": "5eb0897ffb20a9eb3b56df3fde3cf5185efee9168f9f0af2037e2a7d0300d321",
+     "source_span": {
+      "path": "FUNWAVE/raw/source_code/FUNWAVE-GPU/src/breaker.F",
+      "lines": "112,152-155,183"
+     },
+     "source_file_sha256": "c591db049ac4e7dc9125bc2bc8004fc599486f73f1216fe7d5a6786d35df5001",
+     "authoritative_quote": "\n…\n        DXg=DX\n        DYg=DY\n        propxy=SQRT(DX*DX+DY*DY)/MAX(C,SMALL)\n        propx=SQRT(DX*DX)/MAX(C,SMALL)\n…\n         ENDIF",
+     "source_span_hash": "11bac31c47bbe2b706c65b1d75c17039accc7f23dd3a34fc0ffac57382db69fc",
+     "decision": "confirmed_delta",
+     "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+     "decided_at": "2026-08-27",
+     "rationale": "span-verified 2026-08-27: AGE declared DIMENSION(M,N),INTENT(OUT) (L112) but read as prior/persistent history at L152,L155 and neighbor L183=AGE1=AGE(I-1,J) before any write in this invocation. INTENT(OUT) makes actual arg undefined on entry; breaker age-tracking requires persistence → should be INOUT. base missed. (manifestation compiler-dependent: many compilers leave INTENT(OUT) arrays intact, but it is UB.)",
+     "reconfirmed_at": "2026-08-27",
+     "reconfirm_method": "span re-extracted from live source at cited lines; source_file_sha256 vs record source_sha256 checked by verifier"
+    }
+   ]
+  },
+  {
+   "canonical_key": {
+    "model": "FUNWAVE",
+    "normalized_path": "FUNWAVE/raw/source_code/FUNWAVE-GPU/src/breaker_gpu.F",
+    "source_sha256": "c69b53ee9f2eee590a6f5bc031cf2959d17da34decd3d758b0a5856309119c1f"
+   },
+   "shard": "FUNWAVE-000",
+   "selected_record": {
+    "layer": "base_1차",
+    "reader": "anthropic/claude-fable-5",
+    "run_id": "reread20260728-code-FUNWAVE-000-fable5-20260813T012841Z-2131dcc5",
+    "record_file": "cc467e0c883c7e82fef064e96f38afc1bd436b074ae37fec3e56905adba48467.json",
+    "record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-000-fable5-20260813T012841Z-2131dcc5/cc467e0c883c7e82fef064e96f38afc1bd436b074ae37fec3e56905adba48467.json",
+    "record_sha256_bytes": "aa6146aae60ad2b994e529cec7d5ea1e50d1b2d92d59643d2ef4b145ce6bde3c"
+   },
+   "supplements": [
+    {
+     "member_input_ids": [
+      "B0"
+     ],
+     "finding_text": "Use-before-assignment across branches: breaking_kernel assigns DXg and DYg only inside the Age_sh<=ZERO, non-immediate-trigger branch at L168-L184, but all paths then use them to compute xmk/ymk at L234-L238. If the immediate trigger branch L162-L164 or positive-age branch L166-L167 is taken, wavemaker footprint selection consumes undefined DXg/DYg.",
+     "src_run_id": "reread20260728-code-FUNWAVE-000-codexaudit-20260826T022956Z-b1ecf500",
+     "src_record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-000-codexaudit-20260826T022956Z-b1ecf500/cc467e0c883c7e82fef064e96f38afc1bd436b074ae37fec3e56905adba48467.json",
+     "src_record_sha256_bytes": "91e5fece5db141670fcabaf4d55dde9045b28527fe39cfc3570097323eb9736e",
+     "source_span": {
+      "path": "FUNWAVE/raw/source_code/FUNWAVE-GPU/src/breaker_gpu.F",
+      "lines": "137,173-174,234-237"
+     },
+     "source_file_sha256": "c69b53ee9f2eee590a6f5bc031cf2959d17da34decd3d758b0a5856309119c1f",
+     "authoritative_quote": "    REAL(SP) :: xmk,ymk,DXg,DYg\n…\n                DXg=DX_d\n                DYg=DY_d\n…\n        xmk=(I-Ibeg)*DXg + (iista-1)*DXg\n        ymk=(J-Jbeg)*DYg + (jjsta-1)*DYg\n# else\n        xmk=(I-Ibeg)*DXg",
+     "source_span_hash": "5093918451a7f6811e25058aec0740d56459bc345c4ad2e7b71f9b1f579bfae5",
+     "decision": "confirmed_delta",
+     "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+     "decided_at": "2026-08-27",
+     "rationale": "span-verified 2026-08-27: breaking_kernel DXg/DYg(decl L137) assigned only in innermost Age_sh<=ZERO branch (L173-174/179-180); breaking(AGE=DT) and aging(Age_sh>ZERO) branches leave unset, yet xmk/ymk use them after all ENDIFs at L234-237. Directly (no Gamma multiplier) → real UBA. GPU variant of breaker.f90/breaker.F confirmed delta. base missed.",
      "reconfirmed_at": "2026-08-27",
      "reconfirm_method": "span re-extracted from live source at cited lines; source_file_sha256 vs record source_sha256 checked by verifier"
     }

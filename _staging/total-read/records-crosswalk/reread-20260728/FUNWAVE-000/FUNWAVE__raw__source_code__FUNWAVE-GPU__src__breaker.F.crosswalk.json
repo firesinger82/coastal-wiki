@@ -127,7 +127,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B0"
@@ -137,9 +137,14 @@
     "AGE is declared INTENT(OUT) at L110, but its incoming values are read in the initiation/aging test at L141-L146 and as neighbor history at L175-L214, before every element is necessarily defined by this invocation. The algorithm requires persistent prior age, so the declared interface conflicts with its use and should be assessed as INOUT."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
+   "rationale": "span-verified 2026-08-27: AGE declared DIMENSION(M,N),INTENT(OUT) (L112) but read as prior/persistent history at L152,L155 and neighbor L183=AGE1=AGE(I-1,J) before any write in this invocation. INTENT(OUT) makes actual arg undefined on entry; breaker age-tracking requires persistence → should be INOUT. base missed. (manifestation compiler-dependent: many compilers leave INTENT(OUT) arrays intact, but it is UB.)",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "evidence_span": {
+    "path": "FUNWAVE/raw/source_code/FUNWAVE-GPU/src/breaker.F",
+    "lines": "112,152-155,183",
+    "quote": "\n…\n        DXg=DX\n        DYg=DY\n        propxy=SQRT(DX*DX+DY*DY)/MAX(C,SMALL)\n        propx=SQRT(DX*DX)/MAX(C,SMALL)\n…\n         ENDIF"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",

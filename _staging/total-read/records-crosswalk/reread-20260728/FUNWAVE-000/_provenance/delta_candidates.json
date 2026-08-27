@@ -14,7 +14,7 @@
   "audit_id": "B1",
   "text": "The positive-V F4 diffusion branch uses H(I,J+1)+H(I,J) while its concentration difference and face velocity are on the south face J-1; the negative branch uses H(I,J-1)+H(I,J). This sign-dependent geometry mismatch changes diffusion solely with flow direction.",
   "review_status": "pending",
-  "review_note": "",
+  "review_note": "deep cross-routine (MPI/geometry) analysis required — not resolved 2026-08-27 batch",
   "canonical_scope": "in-scope (model source)"
  },
  {
@@ -23,7 +23,7 @@
   "audit_id": "B2",
   "text": "For px==1, the x wall block's IF(npx==0) ... ELSEIF(npx==px-1) executes only the west condition and skips the east condition. The y block has an explicit py==1 case setting both sides, confirming the x single-partition omission.",
   "review_status": "pending",
-  "review_note": "",
+  "review_note": "deep cross-routine (MPI/geometry) analysis required — not resolved 2026-08-27 batch",
   "canonical_scope": "in-scope (model source)"
  },
  {
@@ -41,7 +41,7 @@
   "audit_id": "B6",
   "text": "sediment_flux forms HxL/HxR (Mloc1 by Nloc) and HyL/HyR (Mloc by Nloc1) by adding whole Zb, whose cell-centered shape is Mloc by Nloc. No face reconstruction or slice is applied to Zb, producing shape/interface inconsistency or wrong bed placement at faces.",
   "review_status": "pending",
-  "review_note": "",
+  "review_note": "deep cross-routine (MPI/geometry) analysis required — not resolved 2026-08-27 batch",
   "canonical_scope": "in-scope (model source)"
  },
  {
@@ -85,7 +85,7 @@
   "record_file": "400204c1a405285dd31c4460ce20293e4959357d9f4e74c3e97b889730708160.json",
   "audit_id": "B1",
   "text": "Cross-file length/time mismatch: every station read overwrites the shared time vector and scalar Ndata (for example east lines 84-90 and west lines 112-118). The later global loop DO K=1,Ndata at line 183 therefore uses only the last-read station's length and time base for every side and station; if files differ, earlier shorter arrays are read uninitialized or earlier longer samples are silently truncated, and differing timestamps are never compared.",
-  "review_status": "pending",
+  "review_status": "reviewed-med",
   "review_note": "",
   "canonical_scope": "in-scope (model source)"
  },
@@ -140,7 +140,7 @@
   "audit_id": "B0",
   "text": "Halo-exchange interface gap across L324-L325,L365-L414,L781: EXCHANGE sends staggered P/Q through PHI_COLL_VARIABLE_LENGTH, but that routine only reflects physical-edge ghosts and returns without any MPI/phi_exch call; ordinary PHI_COLL always finishes with phi_exch. Unless another caller-owned exchange exists, P/Q internal-processor halos remain stale when these fields are enabled.",
   "review_status": "pending",
-  "review_note": "",
+  "review_note": "deep cross-routine (MPI/geometry) analysis required — not resolved 2026-08-27 batch",
   "canonical_scope": "in-scope (model source)"
  },
  {
@@ -149,7 +149,7 @@
   "audit_id": "B1",
   "text": "Periodic overwrite defect across L445-L504 and L664-L779: PHI_COLL fills periodic y ghosts first, and VTYPE 1/2/3 protect later y boundary logic with .NOT.PERIODIC (e.g. L643), but VTYPE 4/5/6 south/north blocks have no such guard. On periodic end ranks they can overwrite periodic data with zero, symmetric, or antisymmetric physical-boundary values before phi_exch.",
   "review_status": "pending",
-  "review_note": "",
+  "review_note": "deep cross-routine (MPI/geometry) analysis required — not resolved 2026-08-27 batch",
   "canonical_scope": "in-scope (model source)"
  },
  {
@@ -157,7 +157,7 @@
   "record_file": "8296b045d9b04ac5b0b95c9cae4aac8f3732a92099947be16c6f17b31f4dce23.json",
   "audit_id": "B0",
   "text": "AGE is declared INTENT(OUT) at L110, but its incoming values are read in the initiation/aging test at L141-L146 and as neighbor history at L175-L214, before every element is necessarily defined by this invocation. The algorithm requires persistent prior age, so the declared interface conflicts with its use and should be assessed as INOUT.",
-  "review_status": "pending",
+  "review_status": "confirmed",
   "review_note": "",
   "canonical_scope": "in-scope (model source)"
  },
@@ -176,7 +176,7 @@
   "audit_id": "B6",
   "text": "PHI_COLL_OUTER_GPU duplicates hundreds of lines of PHI_COLL_GPU reflection logic but omits its final communication call. The duplication makes later parity/boundary fixes prone to diverge and is the direct source of the internal-halo inconsistency above.",
   "review_status": "pending",
-  "review_note": "",
+  "review_note": "deep cross-routine (MPI/geometry) analysis required — not resolved 2026-08-27 batch",
   "canonical_scope": "in-scope (model source)"
  },
  {
@@ -193,7 +193,7 @@
   "record_file": "cc4344949aa0cd95b5c1b53c8752c42b5ede0262d1a6d2342bba53cb67949f68.json",
   "audit_id": "B0",
   "text": "Use-before-assignment across conditionals occurs in every Cartesian/ZALPHA reconstruction family. U4xL/U4xR and V4xL/V4xR are produced only inside IF(DISPERSION) near L428-L433, L803-L808, and L1305-L1310, but PL/PR/Fx/Gx consume them unconditionally immediately afterward. The same pattern affects U4y/V4y and QL/QR/Gy/Fy. With DISPERSION false, stale or undefined reconstructed arrays enter fluxes rather than the nondispersive formulas used by the nested non-ZALPHA branch.",
-  "review_status": "pending",
+  "review_status": "refuted",
   "review_note": "",
   "canonical_scope": "in-scope (model source)"
  },
@@ -202,7 +202,7 @@
   "record_file": "cc467e0c883c7e82fef064e96f38afc1bd436b074ae37fec3e56905adba48467.json",
   "audit_id": "B0",
   "text": "Use-before-assignment across branches: breaking_kernel assigns DXg and DYg only inside the Age_sh<=ZERO, non-immediate-trigger branch at L168-L184, but all paths then use them to compute xmk/ymk at L234-L238. If the immediate trigger branch L162-L164 or positive-age branch L166-L167 is taken, wavemaker footprint selection consumes undefined DXg/DYg.",
-  "review_status": "pending",
+  "review_status": "confirmed",
   "review_note": "",
   "canonical_scope": "in-scope (model source)"
  }
