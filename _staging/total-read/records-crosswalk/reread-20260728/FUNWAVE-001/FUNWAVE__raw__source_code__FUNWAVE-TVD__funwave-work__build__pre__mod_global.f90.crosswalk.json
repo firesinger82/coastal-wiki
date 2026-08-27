@@ -115,7 +115,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B1"
@@ -125,9 +125,14 @@
     "EtaBlowVal is declared without initialization at L384. In io.f90 its READ_FLOAT is commented and an unrelated stale ierr condition controls a 10.0 assignment; CHECK_BLOWUP later always compares against EtaBlowVal. Unless another initialization routine always assigns it, the stability check can use undefined data."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
+   "rationale": "EtaBlowVal 무초기화 선언(mod_global L384). io.f90 L2104 READ_FLOAT 주석처리, L2105 IF(ierr==1) 의 ierr 는 직전 OUT_Radiation read(L2101) 것 → 해당 키 존재 시 EtaBlowVal 영구 미대입, CHECK_BLOWUP 가 미정의 임계값 사용. base 미검출.",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "evidence_span": {
+    "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/io.f90",
+    "lines": "2101-2106",
+    "quote": "      CALL READ_LOGICAL(OUT_Radiation,FILE_NAME,'Radiation',ierr) \n\n!ykchoi\n!\tCALL READ_FLOAT(EtaBlowVal,FILE_NAME,'EtaBlowVal',ierr)\n      IF(ierr==1)THEN\n        EtaBlowVal = 10.0_SP"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",

@@ -190,7 +190,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B0"
@@ -200,12 +200,17 @@
     "Several error paths say STOP or diagnose invalid input but call MPI_FINALIZE without STOP, RETURN, or control transfer: zero depth/period at lines 102-105 and infeasible periodic-angle searches at lines 117-128 and 137-147 continue into later wavemaker logic after MPI has been finalized; CalcPeriodicTheta likewise finalizes at line 912 and continues at line 915. The initial period guard is additionally too late because 2*pi/Tperiod is already evaluated at line 98."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
+   "rationale": "에러경로가 MPI_FINALIZE 호출 후 STOP/RETURN 없이 낙하(L102-104 zero depth/period; 유사 L122-129 periodic-angle). MPI 종료 후 실행 지속=UB. base 미검출.",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "evidence_span": {
+    "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/wavemaker.f90",
+    "lines": "102-104",
+    "quote": "      IF(DEP_WK==ZERO.OR.Tperiod==ZERO)THEN\n         if(myid.eq.0) write(*,*) 're-set depth, Tperiod for wavemaker, STOP!'\n         call MPI_FINALIZE ( ier )"
+   }
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B1"
@@ -215,9 +220,14 @@
     "WK_DATA2D filters directions and compacts Dire and WAVE_COMP at lines 203-242, but never compacts Phase2D before using Phase2D(J,I) at lines 255-282. When rejected directions are interspersed, input phases remain indexed by original direction while amplitudes and directions use compacted indices."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
+   "rationale": "Dire/WAVE_COMP 는 DireCount 로 압축(L206,208)하나 Phase2D 는 원본 index I 유지(L259). 방향 기각 시 진폭·방향은 압축인덱스, 위상은 원본인덱스 → 불일치. base 미검출.",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "evidence_span": {
+    "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/wavemaker.f90",
+    "lines": "206,208,259",
+    "quote": "         DireTmp(DireCount)=Dire(I)\n…\n           WaveCompTmp(J,DireCount) = WAVE_COMP(J,I)   \n…\n          Phase2D(J,I)=Phase2D(J,I)*0.005555555555556*pi"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",
@@ -250,7 +260,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B4"
@@ -260,9 +270,14 @@
     "The WK_NEW_IRR one-direction branch initializes only theta(1) and AG(1) at lines 2522-2524, although both arrays have mfreq elements and later every AG(kf) and theta(kf) is consumed at lines 2558-2581 and 2602-2670. For mfreq greater than one this is direct use-before-assignment."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
+   "rationale": "WK_NEW_IRR mtheta==1 분기가 theta(1)/AG(1)만 초기화(L2523-2524), 이후 DO kf=1,mfreq 가 AG(kf)/theta(kf) 소비. AG 는 DIMENSION(mfreq) → mfreq>1 서 use-before-assign. base 미검출.",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "evidence_span": {
+    "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/wavemaker.f90",
+    "lines": "2522-2524",
+    "quote": "    IF(mtheta==1) THEN ! 1D case\n        theta(1) = theta_input*pi/180.0_SP\n        AG(1) = 1.0_SP"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",
@@ -280,7 +295,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B6"
@@ -290,9 +305,14 @@
     "phi1 is INTENT(OUT) at line 2498 but assigned at line 2653 only inside IF(PERIODIC), lines 2603-2663. The nonperiodic WK_NEW_IRR path returns phase_ir undefined and CALCULATE_NEW_Cm_Sm immediately consumes it through the calls at lines 504-510 and the expressions at lines 2742-2773."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
+   "rationale": "phi1 DIMENSION(mfreq,1),INTENT(OUT)(L2498) 이나 IF(PERIODIC) 내부서만 대입(L2653). 비주기 경로는 phi1 미정의로 CALCULATE_NEW_Cm_Sm 소비. UBA. base 미검출.",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "evidence_span": {
+    "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/wavemaker.f90",
+    "lines": "2498,2653",
+    "quote": "    REAL(SP),DIMENSION(mfreq,1),INTENT(OUT) :: D_gen,phi1,rlamda\n…\n            phi1(kf,1)=rand(0)*2.0_SP*pi"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",

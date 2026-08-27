@@ -111,7 +111,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B0"
@@ -121,9 +121,14 @@
     "Lines 379-380 compare abs(omega) against VorticityMax but then store signed omega rather than abs(omega). A new negative extremum can make VorticityMax negative, after which later positive magnitudes trivially exceed it; the stored field therefore does not consistently represent a maximum magnitude."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
+   "rationale": "VorticityMax: abs(omega) 비교 후 signed omega(I,J) 저장(L379-380) → 음의 극값이 VorticityMax 를 음수화, 최대 크기장 부정확. 진단출력 결함. base 미검출.",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "evidence_span": {
+    "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/dispersion.f90",
+    "lines": "379-380",
+    "quote": "        IF(abs(omega(I,J)).GT.VorticityMax(I,J)) THEN\n        VorticityMax(I,J)=omega(I,J)"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",

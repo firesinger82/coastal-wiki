@@ -251,7 +251,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B8"
@@ -261,9 +261,14 @@
     "Station buffering loses and/or fabricates samples: once the condition at L2428 is false, the current sample is never inserted before L2435-L2438 flush and reset, so each overflow-triggering sample is dropped. At TIME>=TOTAL_TIME the same ELSE writes exactly StationOutputBuffer rows even when BufferCount is smaller; ZUV_Buffer was allocated at L2374-L2375 but not initialized, so unwritten tail rows can be uninitialized on the first partial flush or stale after later flushes before files close at L2451-L2457."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
+   "rationale": "station 버퍼: BufferCount==StationOutputBuffer(full) 시 ELSE(L2434) 가 flush+reset(L2438)만 하고 현 샘플 미삽입 → overflow 유발 샘플 드롭. TIME>=TOTAL_TIME 시 BufferCount 미만이어도 StationOutputBuffer 행 전체 기록=낡은행 조작. base 미검출.",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "evidence_span": {
+    "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/io.f90",
+    "lines": "2428-2438",
+    "quote": "            IF(BufferCount(i)<StationOutputBuffer.AND.TIME<TOTAL_TIME)THEN\n              BufferCount(i) = BufferCount(i) +1\n              ZUV_BUFFER(BufferCount(i),i,1)=time\n              ZUV_BUFFER(BufferCount(i),i,2)=eta_sta\n              ZUV_BUFFER(BufferCount(i),i,3)=u_sta\n              ZUV_BUFFER(BufferCount(i),i,4)=v_sta\n            ELSE\n              DO j=1,StationOutputBuffer\n                write (iunit,'(E21.10E4, 3E16.5E4)') (ZUV_BUFFER(j,i,k),k=1,4)\n              ENDDO              \n              BufferCount(i) = 0"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",

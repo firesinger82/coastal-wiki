@@ -13,7 +13,7 @@
   "audit_id": "B0",
   "text": "Lines 379-380 compare abs(omega) against VorticityMax but then store signed omega rather than abs(omega). A new negative extremum can make VorticityMax negative, after which later positive magnitudes trivially exceed it; the stored field therefore does not consistently represent a maximum magnitude.",
   "canonical_scope": "in-scope (model source)",
-  "review_status": "pending"
+  "review_status": "confirmed"
  },
  {
   "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/wavemaker.f90",
@@ -21,7 +21,7 @@
   "audit_id": "B0",
   "text": "Several error paths say STOP or diagnose invalid input but call MPI_FINALIZE without STOP, RETURN, or control transfer: zero depth/period at lines 102-105 and infeasible periodic-angle searches at lines 117-128 and 137-147 continue into later wavemaker logic after MPI has been finalized; CalcPeriodicTheta likewise finalizes at line 912 and continues at line 915. The initial period guard is additionally too late because 2*pi/Tperiod is already evaluated at line 98.",
   "canonical_scope": "in-scope (model source)",
-  "review_status": "pending"
+  "review_status": "confirmed"
  },
  {
   "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/wavemaker.f90",
@@ -29,7 +29,7 @@
   "audit_id": "B1",
   "text": "WK_DATA2D filters directions and compacts Dire and WAVE_COMP at lines 203-242, but never compacts Phase2D before using Phase2D(J,I) at lines 255-282. When rejected directions are interspersed, input phases remain indexed by original direction while amplitudes and directions use compacted indices.",
   "canonical_scope": "in-scope (model source)",
-  "review_status": "pending"
+  "review_status": "confirmed"
  },
  {
   "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/wavemaker.f90",
@@ -37,7 +37,7 @@
   "audit_id": "B4",
   "text": "The WK_NEW_IRR one-direction branch initializes only theta(1) and AG(1) at lines 2522-2524, although both arrays have mfreq elements and later every AG(kf) and theta(kf) is consumed at lines 2558-2581 and 2602-2670. For mfreq greater than one this is direct use-before-assignment.",
   "canonical_scope": "in-scope (model source)",
-  "review_status": "pending"
+  "review_status": "confirmed"
  },
  {
   "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/wavemaker.f90",
@@ -45,7 +45,7 @@
   "audit_id": "B6",
   "text": "phi1 is INTENT(OUT) at line 2498 but assigned at line 2653 only inside IF(PERIODIC), lines 2603-2663. The nonperiodic WK_NEW_IRR path returns phase_ir undefined and CALCULATE_NEW_Cm_Sm immediately consumes it through the calls at lines 504-510 and the expressions at lines 2742-2773.",
   "canonical_scope": "in-scope (model source)",
-  "review_status": "pending"
+  "review_status": "confirmed"
  },
  {
   "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/wavemaker.f90",
@@ -53,7 +53,8 @@
   "audit_id": "B9",
   "text": "The equal-energy frequency repair reads Freq(kff-1) when kff can be 1 at lines 1101-1104 and 1662-1665, and compares Freq(mfreq-1) without requiring mfreq>1 at lines 1112-1113 and 1669-1671. The equal-dfrequency routines separately divide by mfreq-1, so no branch safely supports mfreq=1 despite explicit mtheta==1 handling elsewhere.",
   "canonical_scope": "in-scope (model source)",
-  "review_status": "pending"
+  "review_status": "reviewed-med",
+  "review_note": "Freq(kff-1)/mfreq-1: kff=1·mfreq=1 도달성 불명(spectrum 통상 mfreq>1), defensive 맥락. 잠재 edge."
  },
  {
   "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/mod_global.f90",
@@ -61,7 +62,8 @@
   "audit_id": "B0",
   "text": "The module sets MPI Cartesian reorder=.true. at L78, while misc.f90 passes the MPI_COMM_WORLD rank myid to MPI_CART_COORDS and builds ProcessorID/world-rank mappings without obtaining the reordered comm2d rank. This confirms a cross-file communicator/rank-interface mismatch: any actual reorder can assign wrong coordinates, tile ranges, neighbors and point-to-point destinations.",
   "canonical_scope": "in-scope (model source)",
-  "review_status": "pending"
+  "review_status": "pending",
+  "review_note": "MPI Cartesian reorder=.true. vs misc.f90 world-rank CART_COORDS: 통신자/rank 인터페이스 다중파일 심층분석 필요."
  },
  {
   "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/mod_global.f90",
@@ -69,7 +71,7 @@
   "audit_id": "B1",
   "text": "EtaBlowVal is declared without initialization at L384. In io.f90 its READ_FLOAT is commented and an unrelated stale ierr condition controls a 10.0 assignment; CHECK_BLOWUP later always compares against EtaBlowVal. Unless another initialization routine always assigns it, the stability check can use undefined data.",
   "canonical_scope": "in-scope (model source)",
-  "review_status": "pending"
+  "review_status": "confirmed"
  },
  {
   "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/IG_waves/spectral_data/Step_2_IG_wave.m",
@@ -85,7 +87,8 @@
   "audit_id": "B0",
   "text": "Use-before-assign 가능성: AmpData1은 L157-L161에서 할당되지만 초기 스펙트럼 읽기는 AmpData2만 채운다(L218-L221). AmpData1의 첫 대입은 TIME이 두 시각보다 큰 분기 내부 L272뿐인데, L300-L315는 그 분기 밖에서 AmpData1을 항상 식의 피연산자로 참조한다. TIME<=TimeSpectra1이면 가중치가 0이어도 미정의 배열 원소 평가가 발생할 수 있다.",
   "canonical_scope": "in-scope (model source)",
-  "review_status": "pending"
+  "review_status": "refuted",
+  "review_note": "Amp_Ser=AmpData2*tmp1+AmpData1*tmp2; TIME<=TimeSpectra1 이면 tmp2=0 → AmpData1 미정의여도 소거. NaN-poison MED."
  },
  {
   "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/IG_waves/spectral_data/Step_1_read_write_spec.m",
@@ -117,7 +120,8 @@
   "audit_id": "B1",
   "text": "Gradx and Grady are allocated at L126-L129 without initialization and assigned only where MASK0==1 at L178-L180. Masked cells retain undefined values, yet the entire arrays are exchanged at L219-L220 and written at L247-L249.",
   "canonical_scope": "in-scope (model source)",
-  "review_status": "pending"
+  "review_status": "reviewed-med",
+  "review_note": "Gradx masked(=비물리 dry) 셀 미정의가 진단 gradx.txt 에 유입. 물리 보정은 MASK0==1 만 사용. 진단출력 한정."
  },
  {
   "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/mod_input.f90",
@@ -125,7 +129,8 @@
   "audit_id": "B0",
   "text": "All four destination arguments are INTENT(OUT) (INTEGER_VAL L87, FLOAT_VAL L123, LOGICAL_VAL L158, STRING_VAL L190), but a missing key returns without assigning them at L100-L103, L137-L140, L172-L175 and L204-L207. Fortran makes an INTENT(OUT) actual argument undefined on entry, so callers cannot safely retain module initializers. This turns unchecked missing keys in io.f90—including WAVE_DATA_TYPE, ETA_LIMITER, NumberStations and the block of output flags—into undefined values rather than defaults.",
   "canonical_scope": "in-scope (model source)",
-  "review_status": "pending"
+  "review_status": "reviewed-med",
+  "review_note": "INTENT(OUT) missing-key 미대입은 ierr-check default 표준패턴(예 io.F Gamma1)의 정상 사용. 호출부 ierr 미확인 입증 필요."
  },
  {
   "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/io.f90",
@@ -133,7 +138,7 @@
   "audit_id": "B8",
   "text": "Station buffering loses and/or fabricates samples: once the condition at L2428 is false, the current sample is never inserted before L2435-L2438 flush and reset, so each overflow-triggering sample is dropped. At TIME>=TOTAL_TIME the same ELSE writes exactly StationOutputBuffer rows even when BufferCount is smaller; ZUV_Buffer was allocated at L2374-L2375 but not initialized, so unwritten tail rows can be uninitialized on the first partial flush or stale after later flushes before files close at L2451-L2457.",
   "canonical_scope": "in-scope (model source)",
-  "review_status": "pending"
+  "review_status": "confirmed"
  },
  {
   "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/fluxes.f90",
@@ -141,7 +146,8 @@
   "audit_id": "B0",
   "text": "In CONSTRUCT_HO_X_MLP, every protective small-denominator test is executed after the corresponding division: gamL is divided at line 1546 before TXP1 is tested at line 1547; gamR at 1550 before TXP3 at 1551; tanth1/tanth2 at 1555/1559 before delsol tests at 1556/1560; and gamRtanth2/gamLtanth1 at 1562/1574 before gamma tests at 1563/1575. Zero or tiny denominators can therefore raise floating-point exceptions or create Inf/NaN before the fallback assignment, making the checks ineffective.",
   "canonical_scope": "in-scope (model source)",
-  "review_status": "pending"
+  "review_status": "refuted",
+  "review_note": "gamL=TXP2/TXP1 직후 if(abs(TXP1)<smallv)gamL=0 사용 전 교정(L1546-1548). IEEE 무해, -ffpe-trap 만 위험."
  },
  {
   "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/fluxes.f90",
@@ -149,7 +155,8 @@
   "audit_id": "B1",
   "text": "CONSTRUCT_HO_Y_MLP duplicates the same divide-before-check sequence: gamL/gamR at lines 1621/1625 precede denominator tests at 1622/1626; tanth1/tanth2 at 1630/1634 precede delsol tests at 1631/1635; and transverse gamma divisions at 1637/1649 precede gamma tests at 1638/1650.",
   "canonical_scope": "in-scope (model source)",
-  "review_status": "pending"
+  "review_status": "refuted",
+  "review_note": "Y_MLP 동일 divide-before-check 교정 패턴."
  },
  {
   "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/fluxes.f90",
@@ -157,6 +164,7 @@
   "audit_id": "B2",
   "text": "The dispersive face arrays U4xL/U4xR/V4xL/V4xR and U4yL/U4yR/V4yL/V4yR are assigned only inside IF(DISPERSION) blocks (for example lines 452-460 and 511-519), but they are read unconditionally immediately afterward in PL/PR, QL/QR, and momentum-flux expressions (lines 466-555). The same copied pattern occurs in HO-minmod (lines 686-774), HO, MLP (lines 1431-1510), and WENO construction. When DISPERSION is false, this file supplies no initialization before those reads; correctness depends on external initialization and on multiplication by Gamma1 not exposing undefined values.",
   "canonical_scope": "in-scope (model source)",
-  "review_status": "pending"
+  "review_status": "refuted",
+  "review_note": "U4xL 는 Gamma1*..*U4xL 로만 사용; init.f90 L491/498 Gamma1=ZERO(non-DISPERSION) → 소거."
  }
 ]
