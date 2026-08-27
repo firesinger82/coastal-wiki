@@ -1,0 +1,178 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-001",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/mod_parallel_field_io.f90",
+ "source_sha256": "b20a9caabd8bfc26453dfe73a8c2da08ad5ec6eca1670ef3c9b2a71c1910c9d1",
+ "base_run_id": "reread20260728-code-FUNWAVE-001-fable5-20260813T012841Z-2ec7b3b5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
+ "base_record_file": "ba6e4e98fb53bad3fb06c0c43e638868c5c06bf83d0982c0d53d7e1ca419f934.json",
+ "audit_record_file": "ba6e4e98fb53bad3fb06c0c43e638868c5c06bf83d0982c0d53d7e1ca419f934.json",
+ "base_record_sha256_bytes": "66664c98d546fd03b199231d0d6f07448d76bf7b92f537ad6b2df3b93f3045c2",
+ "audit_record_sha256_bytes": "48127e26ef6f14dcc6afd54f5f1c370c2cb7a28c7498c4fd8262586004c30089",
+ "base_finding_count": 7,
+ "audit_finding_count": 4,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "PutFileBinary writes PHI with mem_type_loc which skips ghost cells; strides OUTPUT_RES are not applied in the binary path (contrast ASCII loop L155-L156)"
+   ],
+   "audit_member_text": [
+    "ASCII output applies OUTPUT_RES in both J and I loops at L155-L156, but PutFileBinary defines/writes the full interior subarrays at L191-L226 and never references OUTPUT_RES. Selecting FIELD_IO_TYPE therefore changes not only encoding but also spatial resolution and array dimensions, an interface mismatch for the same PutFile caller."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Loop indices J @L155 and I @L156 are not declared anywhere in PutFileASCII despite IMPLICIT NONE @L72 — they must be host-associated through USE GLOBAL @L66; whether GLOBAL provides I,J cannot be confirmed from this file"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "PHITEST @L176 and istatus @L178 (scalar INTEGER) are declared in PutFileBinary but never used (the write uses MPI_STATUS_IGNORE @L226); istatus in PutFileASCII @L83 is by contrast an array of size mpi_status_size"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "FORMAT_LEN (from GLOBAL) is built only once under FirstCallPutFile (L95-L102); the Mglob value is frozen into the format at first call — cross-line relation L91/L96/L98-L101 with the WRITE @L156"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "PHIGLOB is a full Mglob x Nglob automatic array allocated on every rank @L89 even though only rank 0 uses it (L123-L125, L153-L164)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "mpi_sp datatype and mpi_status_size come from USE GLOBAL/MPI; their definitions are outside this file"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "END SUBROUTINE names PutfileASCII @L167 / PutfileBinary @L231 differ in letter case from declarations PutFileASCII @L70 / PutFileBinary @L171 (legal in Fortran, case-insensitive)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "PutFileBinary creates and commits mem_type_loc and file_type_glob on every call at L209-L216 but never calls MPI_TYPE_FREE before returning at L231. Repeated preview output leaks two MPI datatype handles per field and can exhaust MPI resources in long runs."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "MPI_FILE_OPEN uses WRONLY+CREATE at L219-L221 without an exclusive/create-new or truncation step. Reusing an existing filename whose expected payload is shorter can leave trailing bytes from the previous file, because the routine writes the current view and closes without setting file size."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "PutFileASCII steps DO loops by OUTPUT_RES at L155-L156 with no local range validation. READ_INPUT accepts any integer and provides no positivity check, so OUTPUT_RES=0 is an invalid zero DO increment and negative values produce empty/invalid traversal rather than a controlled error."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

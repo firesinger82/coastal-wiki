@@ -1,0 +1,204 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-001",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/tridiagnal.f90",
+ "source_sha256": "8a4de9610da708c702a40e74c568bf1e0fae99a45288a2be2211212ff17a82a2",
+ "base_run_id": "reread20260728-code-FUNWAVE-001-fable5-20260813T012841Z-2ec7b3b5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
+ "base_record_file": "ea10cbea9e874b278714170d8f557efe94b1d8b3a9da1d760fffd8abed89f75d.json",
+ "audit_record_file": "ea10cbea9e874b278714170d8f557efe94b1d8b3a9da1d760fffd8abed89f75d.json",
+ "base_record_sha256_bytes": "024835879e33511d7f0103999aeb5297d04fd53d55ea30e40fdafca9530e0085",
+ "audit_record_sha256_bytes": "2031a44028fdab27041c992c8ebf23b988b1b5b9f80178744b2a4bf45ad39d9e",
+ "base_finding_count": 7,
+ "audit_finding_count": 5,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "TRIDy_periodic loops L154-L156 and L160-L162 use lowercase loop variable i but index c_end(I)/a_beg(I) with uppercase I — the same identifier in Fortran, so consistent, but beta loops L251/L277 likewise mix beta(i) with c_end(I); the equations rely on i==I identity"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "TRIDx/TRIDy modify dummy arguments a,c,d in place without INTENT declarations (L312, L399); TRIDy_periodic's comment @L168 documents that c,d are 'trashed' — callers must pass copies (c1=c @L171 protects only the first pass)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "TRIDx forward-sweep guard 'if (a(i,j).ne.ZERO)' (L323, L333, L411, L421) leaves c,d unmodified where a==ZERO — the meaning of a zero sub-diagonal row (boundary rows?) is established by the callers, not this file"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "TRIDy_periodic: the two-rank exchanges (L104-L141, L214-L246) use blocking MPI_SEND before the matching IRECV is guaranteed posted on the peer — correctness relies on eager delivery for Mloc-sized messages when ProcessorID(II,1)==ProcessorID(II,PY) ranks differ; when PY==1 both branches are skipped and a_beg/c_end are copied locally (L144-L147) only over Ibeg:Iend while the parallel path copies 1:Mloc"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Sequential dependency: TRIDx/TRIDy pipeline ranks — each rank waits for its west/south neighbor's seed before sweeping (L318-L328, L406-L417), serializing across the processor row/column"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Unused declarations: nreq,ll,JJ @L80, myvar,mybeta @L84, Axx,Cxx,Dxx,U1D @L89, rmsg,smsg @L90 (in TRIDy_periodic), commented '! integer i, j' @L402; loop indices i,j,I,J are PARAM module variables (no local declarations despite IMPLICIT NONE)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Header of TRIDy (L385) says 'TRIDx is parallel version...' — copy-paste; file name 'tridiagnal' is itself a misspelling of tridiagonal"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "TRIDy_periodic divides by 1+c_end and 1+a_beg at lines 154-161 and 190-196, and by the Sherman-Morrison correction denominator at lines 251-252 and 277-278, without testing those denominators for zero or near-zero; singular periodic systems can therefore produce division by zero despite the algorithm comments at lines 57-62."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "TRIDx and TRIDy test only a(...).ne.ZERO at lines 323 and 333 or 411 and 421, but then divide by the distinct eliminated pivot 1/a-rmsg(:,2) or 1/a-c(previous) at lines 324-326, 334-336, 412-414, and 422-424; the zero test does not protect against a zero eliminated pivot."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The backward phase fills only smsg(:,1) at lines 373-375 and 460-463 but MPI_ISEND transmits 2*Nloc or 2*Mloc values at lines 376-377 and 464-465. Thus smsg(:,2) is stale or uninitialized while receivers request the same two-column count at lines 354-355 and 442-443; current receivers use only column 1, but the communicated interface and initialized payload do not match."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "All three routines use loop indices i and j under IMPLICIT NONE (lines 77, 310, 397), while no active local declarations for i or j appear (the only visible candidate is commented out at line 402). Successful compilation therefore depends on USE PARAM or another use-associated module exporting mutable i/j names, an implicit cross-module coupling not established in this file."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "TRIDy_periodic sends all Mloc beta entries at line 259 after assigning only Ibeg:Iend at lines 250-254, and receivers copy all 1:Mloc entries at lines 266-268; halo entries outside the interior range can carry uninitialized data even though subsequent solution loops currently consume only Ibeg:Iend at lines 283-287."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

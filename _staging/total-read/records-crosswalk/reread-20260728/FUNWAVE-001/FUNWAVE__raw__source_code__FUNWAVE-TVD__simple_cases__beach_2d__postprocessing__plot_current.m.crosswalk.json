@@ -1,0 +1,129 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-001",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/beach_2d/postprocessing/plot_current.m",
+ "source_sha256": "f8873aa5dc754205934753f09ebae65303c2c914ee15389b034533e526636b2e",
+ "base_run_id": "reread20260728-code-FUNWAVE-001-fable5-20260813T012841Z-2ec7b3b5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
+ "base_record_file": "9ae9950389e1485f2734869f22a3c37f51da0a15994f97eed7a8af594c709459.json",
+ "audit_record_file": "9ae9950389e1485f2734869f22a3c37f51da0a15994f97eed7a8af594c709459.json",
+ "base_record_sha256_bytes": "509e9183c3e027614a28e782b6413fa3e6207bbf722fe2d109a6ac2563aa1d2e",
+ "audit_record_sha256_bytes": "f2df99edac9ad11fa6f1a94e0952ab3341f48e05791c026bfc6303ce20900169",
+ "base_finding_count": 3,
+ "audit_finding_count": 4,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "quiver @L47 indexes the 1-D vectors x,y with 2-D subscripts (1:sk:end,1:sk:end) — for row/column vectors the second subscript degenerates, so the x/y arguments become subsampled vectors while u,v are subsampled 2-D arrays; relies on quiver's vector-input broadcasting"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "pcolor(x,y,ht) @L41 plots Hsig but the commented ylabel text @L63-L64 says '\\eta (m)' and the commented print name @L68 references the inlet_shoal case — copied from another script; cell variable 'min' @L19 shadows the MATLAB builtin and its '200' label is unused (title commented @L45)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "caxis([-0. 1]) @L43 uses negative zero as lower bound; dx/dy hardcoded 2.0 must match the case's input.txt"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Grid dimensions are taken only from eta_00001 at lines 4-10, but u, v, ht, and mask for each fnum are loaded at lines 30-33 and indexed together at lines 35-47 without shape checks. Any output whose dimensions differ from eta_00001 or from its peer fields causes logical-index or plotting dimension failures."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The only image-export command is commented out at line 68, so despite configuring paper size at line 23 the script produces no persistent output file."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Sponge/wavemaker polygons and labels are hard-coded in physical coordinates at lines 12-15 and 50-55; their positions are not derived from input metadata and can lie outside or mislabel grids whose extent differs from this case."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The variable min is defined at line 19 but its sole title use is commented at line 45; nfile can be lengthened independently of min without any active time annotation or validation."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

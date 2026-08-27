@@ -1,0 +1,156 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-001",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/beach_2d/postprocessing/plot_current.py",
+ "source_sha256": "31acb17b0524ed28d8f2c84ed2d04fdeb490c57bd9ab3dcd7d171add799cc2e2",
+ "base_run_id": "reread20260728-code-FUNWAVE-001-fable5-20260813T012841Z-2ec7b3b5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
+ "base_record_file": "a1c7d8ad3d2cf280d6f5526e491982cc15213d8bc84e8371f7d40a1822f24fe9.json",
+ "audit_record_file": "a1c7d8ad3d2cf280d6f5526e491982cc15213d8bc84e8371f7d40a1822f24fe9.json",
+ "base_record_sha256_bytes": "98482b9df1adf505f1cfaf48df829c79188655fbc55fb883e16ce89bc7a7c136",
+ "audit_record_sha256_bytes": "ce68485cd55611b517a2892679f88b04dd0a8fad836358222df278bfe95663b5",
+ "base_finding_count": 5,
+ "audit_finding_count": 6,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "With nfile=[1], the else branch (L79-L82) never runs, so no colorbar is drawn in the default configuration; 'min' and 'length' shadow Python builtins"
+   ],
+   "audit_member_text": [
+    "The colorbar is created only in the else branch at lines 79-82. With the default one-element nfile at line 29, num is always zero and the saved plot has no Hsig colorbar; with multiple files, only non-first subplots receive one."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "plt.hold(True) @L58 was removed from matplotlib (deprecated 2.0, removed 3.0) — script requires an old matplotlib"
+   ],
+   "audit_member_text": [
+    "plt.hold(True) at line 58 assumes a pyplot hold API and can raise AttributeError in Matplotlib versions where hold was removed; no compatibility branch is present."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "Quiver slicing @L63 uses len(u) (row count) for both dimensions (0:len(u)-1:sk twice) — for non-square grids the column slice bound is wrong (m != n); the masked arrays u_masked/v_masked are computed (L48-L49) but the unmasked u,v are what quiver plots"
+   ],
+   "audit_member_text": [
+    "The quiver call at line 63 uses len(u) for both row and column slice limits. For the rectangular n-by-m beach grid established at line 15, the column extent should follow m/shape[1]; the copied row bound produces a U/V shape that does not match the x coordinate vector when n differs from m."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "os is used (L12, L42-L45) but never imported — the script raises NameError as shipped; import os is missing"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "fdir @L9 is a workshop-specific absolute path; must be edited per user (comments L7-L8)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The script uses os.path.join beginning at line 12 but imports only numpy and matplotlib at lines 4-5. os is undefined, so execution fails on the first data load before any plotting."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Masking creates u_masked and v_masked at lines 48-49, but the quiver call at line 63 uses raw u and v. Dry-cell vectors therefore remain visible even though the comment at line 47 says values where mask=0 should not be plotted."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Shapes of eta, mask, u, v, and ht are not checked before masked_where and plotting at lines 48-63, min[num] at line 56 assumes min and nfile have equal lengths, and the fixed absolute fdir at line 9 is machine-specific."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

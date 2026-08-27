@@ -1,0 +1,257 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-001",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/fluxes.f90",
+ "source_sha256": "895f332462c3014037bb3cbfc22cb978725a7d15afe4290179963a730a195eda",
+ "base_run_id": "reread20260728-code-FUNWAVE-001-fable5-20260813T012841Z-2ec7b3b5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
+ "base_record_file": "fe1f725cadc0a1b644a81cb24b26e353e1d7013c561030314bb62286f1ad8ecc.json",
+ "audit_record_file": "fe1f725cadc0a1b644a81cb24b26e353e1d7013c561030314bb62286f1ad8ecc.json",
+ "base_record_sha256_bytes": "05707e99bf69a570ebdd0b598f9fc2af974d38af99752a5c9609ddbd4940f7c0",
+ "audit_record_sha256_bytes": "d5560eae149c547782f09d8a7d28fb6a77826558b98dff343ac28419e5232be8",
+ "base_finding_count": 9,
+ "audit_finding_count": 8,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [
+    "CONSTRUCT_X/CONSTRUCT_Y keep the Kappa dummy argument though ykchoi comments (L584-586, L627-628) state kappa is meaningless after the 08/31/2016 simplification"
+   ],
+   "audit_member_text": [
+    "CONSTRUCT_X and CONSTRUCT_Y accept Kappa at lines 579 and 622, but Kappa is not used in either body; comments at lines 584-586 and 625-628 say it is meaningless. The retained interface argument can diverge from callers' expectation that Kappa selects reconstruction order."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "CONSTRUCT_HO_X_MLP/Y_MLP ignore their MASK argument — no dry-cell fallback unlike the minmod/HO variants (declared @L1526/L1600 but never referenced in the body)"
+   ],
+   "audit_member_text": [
+    "CONSTRUCT_HO_X_MLP and CONSTRUCT_HO_Y_MLP declare and receive MASK at lines 1526 and 1600, but their active bodies never reference MASK. Unlike the minmod/HO kernels, the MLP kernels therefore do not lower order or zero gradients at dry-neighbor stencils; the dummy-argument interface suggests wet/dry handling that is not implemented in these routines."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Header comment L14 says 'FILE main.F' while every subroutine here is the fluxes/reconstruction module — header/content mismatch (preprocessor concatenation artifact or copy-paste)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Loop indices I,J and temporaries TMP1,TMP2 (used at L1253,L1269 in CONSTRUCT_HO_X and L1368,L1384 in CONSTRUCT_HO_Y and in Del*Fun @L252-253,L292-293) are not declared locally — they come from PARAM/GLOBAL modules (cross-file); the same-named local TXP1/TYP1 sets shadow nothing but the mixed use of module-level TMP* inside these kernels means the routines are not thread-safe as written"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "VANLEER_LIMITER (L1020) and MINMOD_LIMITER (L1036) are defined but never called in this file; DelxFun/DelyFun/CONSTRUCT_HO_* inline the same expressions instead (commented-out calls @L259,L298)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "WENO_CONSTRUCT_X/Y have no MASK argument at all — CONSTRUCTION_WENO passes none (L1696-1700), so WENO reconstruction has no wetting-drying protection in this file"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "MLP x-variant reads Vin(I-1,J+1),Vin(I-1,J-1),Vin(I,J+1),Vin(I,J-1) (L1555-1560) — transverse stencil access with no J-bound guard at J=Jbeg-?; loop runs J=Jbeg,Jend (L1538) so J-1/J+1 stay within ghost region only if Nghost>=1 (cross-file assumption)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "the six-argument declaration REAL(SP)::SR,SL,FL,FR,UL,UR in FLUX_AT_INTERFACE_HLL (L161) is unused — the actual SL/SR etc. are the GLOBAL arrays passed to HLL"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A8"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "BOUNDARY_CONDITION (L124), EXCHANGE-side arrays (PL,PR,QL,QR,FxL..GyR,UxL..V4yR,Depthx,Depthy,Kappa,HIGH_ORDER,CONSTR,Gamma1,Gamma3,MASK9) are defined in GLOBAL/other files (cross-file)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "In CONSTRUCT_HO_X_MLP, every protective small-denominator test is executed after the corresponding division: gamL is divided at line 1546 before TXP1 is tested at line 1547; gamR at 1550 before TXP3 at 1551; tanth1/tanth2 at 1555/1559 before delsol tests at 1556/1560; and gamRtanth2/gamLtanth1 at 1562/1574 before gamma tests at 1563/1575. Zero or tiny denominators can therefore raise floating-point exceptions or create Inf/NaN before the fallback assignment, making the checks ineffective."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "CONSTRUCT_HO_Y_MLP duplicates the same divide-before-check sequence: gamL/gamR at lines 1621/1625 precede denominator tests at 1622/1626; tanth1/tanth2 at 1630/1634 precede delsol tests at 1631/1635; and transverse gamma divisions at 1637/1649 precede gamma tests at 1638/1650."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The dispersive face arrays U4xL/U4xR/V4xL/V4xR and U4yL/U4yR/V4yL/V4yR are assigned only inside IF(DISPERSION) blocks (for example lines 452-460 and 511-519), but they are read unconditionally immediately afterward in PL/PR, QL/QR, and momentum-flux expressions (lines 466-555). The same copied pattern occurs in HO-minmod (lines 686-774), HO, MLP (lines 1431-1510), and WENO construction. When DISPERSION is false, this file supplies no initialization before those reads; correctness depends on external initialization and on multiplication by Gamma1 not exposing undefined values."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "VANLEER_LIMITER divides by ABS(A)+ABS(B) when optional B is present and by 1.0+A otherwise (lines 1027-1030), with no local zero-denominator guard. A=B=0 and A=-1 respectively produce 0/0 if this public function is called, although active reconstruction code in this file uses inline guarded formulas instead."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The HLL transonic branch tests ABS(SR-SL)<SMALL but then divides the numerator by positive SMALL rather than by the signed speed difference (lines 193-198). This regularization changes denominator sign for a small negative SR-SL and does not establish the limiting flux; its intended behavior is unresolved."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "MLP and WENO stencils access up to I-3/I+2 and J-3/J+2 while their loops are driven directly by Ibeg/Iend/Jbeg/Jend (lines 1541-1559 and 1813-1853, with y analogues). No local bounds/ghost-width assertion is present, so array safety depends on external bounds guaranteeing at least three valid ghost indices."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

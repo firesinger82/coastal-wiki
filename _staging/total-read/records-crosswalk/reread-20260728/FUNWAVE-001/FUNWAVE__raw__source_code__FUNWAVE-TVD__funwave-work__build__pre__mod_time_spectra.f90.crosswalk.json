@@ -1,0 +1,163 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-001",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/mod_time_spectra.f90",
+ "source_sha256": "f17edf88c618b1439056454d0870658c8a62ee23180f93d97b256204be756091",
+ "base_run_id": "reread20260728-code-FUNWAVE-001-fable5-20260813T012841Z-2ec7b3b5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
+ "base_record_file": "5e90087429a57acf015c5f519eb0b5e6f3de97f81b52cd9043229faf125c683d.json",
+ "audit_record_file": "5e90087429a57acf015c5f519eb0b5e6f3de97f81b52cd9043229faf125c683d.json",
+ "base_record_sha256_bytes": "1f98fe73930aa4405f1cbf4f6fa537eadb00c1a78b8650837d4b60127c7908b4",
+ "audit_record_sha256_bytes": "fb5b7cada6734a75d5f6450ff1c5faaaed396151873bc7e2c890ca2b3e80569c",
+ "base_finding_count": 8,
+ "audit_finding_count": 2,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "CALCULATE_DATA2D_Cm_Sm_TIME periodic block (L380-L392) loops DO KK=1,NumFreq @L382 / DO KKK=1,NumDir @L383 but assigns Theta_2D(I,KKK) @L386/@L388 using I (module-level loop variable from GLOBAL) instead of KK — only row I of Theta_2D is written while the accumulation loops read Theta_2D(KK,KKK) @L419 etc.; cross-line defect L382-L391 vs L418-L447"
+   ],
+   "audit_member_text": [
+    "범위초과/복붙 첨자 결함: L360-L377의 DO I=1,NumFreq 종료 후 I는 통상 NumFreq+1이고, 이어지는 DO KK=1,NumFreq 내부 L386과 L388이 Theta_2D(KK,KKK)가 아니라 Theta_2D(I,KKK)에 기록한다. Theta_2D는 L157-L161에서 (NumFreq,NumDir)로 할당되므로 bounds checking 시 범위초과이며, 검사 없이도 모든 KK 방향값을 올바른 주파수 행에 채우지 못한다."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Label 120 @L317 (EOF target from @L278) is placed before the Dep_Ser update @L319 and the CALL @L321, so after spectra data runs out the code still recomputes Dep_Ser and Cm/Sm each step while Amp_Ser update @L315 is skipped; comment @L317 mentions 'vessel Kves' — copied from a vessel module"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "tmp1/tmp2 both remain ZERO when TIME <= TimeSpectra1 (L300-L313), making Amp_Ser=0 @L315 before the first spectra time instead of holding AmpData1"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Dep_Ser @L319 uses Depth(1,1) — the local (per-processor, ghost-corner) depth cell, so Dep_Ser differs across MPI ranks and from the physical wavemaker location; also Newton wavenumbers (L358-L378) are computed once (SAVEd flag) with the then-current Dep_Ser and never updated though Dep_Ser changes each call"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Phase conversions use literal 3.1415926 (L188, L195) while pi/PI from PARAM is used elsewhere (L177, L361); rand(0) @L195 is a compiler extension and per-rank reproducibility/synchronization of random phases across MPI ranks is not established in this file"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Per_Ser is loaded with frequency then inverted @L171 — after L171 Per_Ser holds periods; Amp_Ser is indexed (KK=freq, KKK=dir) while the input matrices are read as (row=direction, implied-do over frequency) @L184/L219/L292 — consistent internally but transposed relative to file layout"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Unit 400 (spectra index file) is opened @L150 and never closed in this file; unit 401 is reopened/closed per amplitude file; locals SpectraName @L122, WHAT after reads, rII,rJJ @L264, K @L348, tmp_eta,tmp_u,tmp_v @L352, myvar @L109, Fact @L395, NameSpectra1/TimeSpectra1 usage after L270 shift are declared/assigned but partly unused"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "TIME_SPECTRA_PROTECTION mismatched message pair @L250-L251 (log says 'TideBcType = DATA', stdout omits '= DATA'); comment @L125 'read precipitation from input.txt' is a copy-paste from the precipitation module"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Use-before-assign 가능성: AmpData1은 L157-L161에서 할당되지만 초기 스펙트럼 읽기는 AmpData2만 채운다(L218-L221). AmpData1의 첫 대입은 TIME이 두 시각보다 큰 분기 내부 L272뿐인데, L300-L315는 그 분기 밖에서 AmpData1을 항상 식의 피연산자로 참조한다. TIME<=TimeSpectra1이면 가중치가 0이어도 미정의 배열 원소 평가가 발생할 수 있다."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

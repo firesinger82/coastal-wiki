@@ -1,0 +1,156 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-001",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/sources.f90",
+ "source_sha256": "c24a50558410ee80bd852a179d820ff3b7b0437b94402f2065041126a4456cfc",
+ "base_run_id": "reread20260728-code-FUNWAVE-001-fable5-20260813T012841Z-2ec7b3b5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
+ "base_record_file": "2b7fdbbf4c30ddbb464abb476e57a58a8cba4a8e647ba00bb247202d0a81d0b7.json",
+ "audit_record_file": "2b7fdbbf4c30ddbb464abb476e57a58a8cba4a8e647ba00bb247202d0a81d0b7.json",
+ "base_record_sha256_bytes": "87829e41aa4b184a90a3e266bba70f91090f5a8c04d1371410e2193b6e63f0d8",
+ "audit_record_sha256_bytes": "30b00563ee1c56c52cfc3ddfb4897a5b41b8f28525a57a1929fa1f91aff4bd2e",
+ "base_finding_count": 8,
+ "audit_finding_count": 3,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "WaveMakerCurrentBalance window uses DXg/DYg (L263-L264, L306-L307) which for the Cartesian build are copies of DX/DY set elsewhere; jlo/jhi/ilo/ihi (wavemaker index window, from GLOBAL Salatin block) are assumed set before SourceTerms is called — not verified in this file"
+   ],
+   "audit_member_text": [
+    "L263-L264 및 L306-L307은 xmk/ymk 계산에 DXg/DYg를 사용하지만 이 파일 안의 대입은 L84-L90에서 전부 주석 처리되어 있어, GLOBAL 쪽 초기화가 없다면 미정의 값을 사용할 수 있다."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "label 107 FORMAT @L225 is never referenced by any WRITE in this file; kd @L74 declared unused; commented DXg/DYg preprocessor block @L84-L91 shows the spherical-grid variant was removed at preprocessing"
+   ],
+   "audit_member_text": [
+    "L74의 kd는 선언 뒤 이 서브루틴에서 사용되지 않는다."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "PQ_scheme branch (L337-L359) is unreachable with the compiled-in default .FALSE. @L72 (an initialized local, implying SAVE, never reassigned in this file); loop indices I,J,KF are PARAM/GLOBAL module variables (KF vs kf same identifier case-insensitively, both used L154/L161 vs L123)"
+   ],
+   "audit_member_text": [
+    "PQ_scheme는 L72에서 .FALSE.로 초기화된 뒤 이 서브루틴 안에서 재대입되지 않지만 L332에서 분기 조건으로 사용된다. 따라서 L332-L359의 P/Q 점성 source 경로는 이 파일의 실행 흐름에서는 도달 불가능하며, 주석 L334-L335도 false 강제를 명시한다."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "nu_vis @L71 is declared REAL (default kind), not REAL(SP) — kind mismatch with the REAL(SP) arrays it combines (nu_break @L200, nu_sponge @L215); whether default REAL == SP depends on compiler flags"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "BB/CC are dimensioned with Nfreq @L78 while BB2/CC2 use NumFreq @L80 and BB1 uses NumWaveComp @L79 — three different size variables from GLOBAL; automatic arrays are created from whichever is currently set, and for wavemaker types that leave the others 0/undefined the unused arrays have undefined size at entry (all five are allocated on every call regardless of branch)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "WK_REG branch tests WAVEMAKER(1:6) @L111 while the second branch tests WaveMaker(1:6)/(1:10) @L119-L121 — WK_NEW_IRR also matches 'WK_IRR'? No: WK_NEW_IRR(1:6)='WK_NEW' does not equal 'WK_IRR', but 'WK_IRR...' variants with longer names (e.g. WK_IRR vs WK_IRREGULAR) and the ordering of (1:10)=='WK_NEW_IRR' after the (1:6) tests are load-bearing; also 'WK_DATA2D'(1:9) @L152 vs 'WK_NEW_DATA2D'(1:13) @L168 ordering matters since (1:9) of WK_NEW_DATA2D is 'WK_NEW_DA' (no clash) — string-prefix dispatch is fragile but internally consistent here"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "The wavemaker mass source is added as WaveMaker_Mass*U / WaveMaker_Mass*V (L252, L296) inside SourceX/SourceY; the mass-source itself presumably also enters the continuity equation elsewhere (not in this file)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Depth-gradient term uses (Eta)/DX*(Depthx(I+1,J)-Depthx(I,J)) @L238 — Depthx/Depthy are face values from GLOBAL; MinDepthFrc floor appears only in the dispersion factor Max(H,MinDepthFrc) @L243/@L287"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

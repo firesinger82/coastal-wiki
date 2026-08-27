@@ -16,7 +16,7 @@ def load_records(dirp):
     for f in os.listdir(dirp):
         if f.endswith(".json"):
             r=json.load(open(os.path.join(dirp,f)))
-            out[r["source_sha256"]]={"rec":r,"path":os.path.join(dirp,f),"file":f}
+            out[f]={"rec":r,"path":os.path.join(dirp,f),"file":f}  # key by record filename (source_sha256 can collide across duplicate-content paths)
     return out
 
 def main():
@@ -28,9 +28,10 @@ def main():
         nfiles+=1
         cw=json.load(open(os.path.join(cwdir,f)))
         sha=cw["source_sha256"]; tag=f
-        if sha not in base: fails.append(f"{tag}: no base record for source sha"); continue
-        if sha not in aud:  fails.append(f"{tag}: no audit record for source sha"); continue
-        b=base[sha]; a=aud[sha]
+        bf=cw.get("base_record_file"); af=cw.get("audit_record_file")
+        if bf not in base: fails.append(f"{tag}: base record file '{bf}' not found"); continue
+        if af not in aud:  fails.append(f"{tag}: audit record file '{af}' not found"); continue
+        b=base[bf]; a=aud[af]
         # (4) integrity: recompute parent record hashes, do NOT trust stored field
         if sha_bytes(b["path"])!=cw["base_record_sha256_bytes"]:
             fails.append(f"{tag}: base record bytes hash mismatch (record changed since crosswalk)")

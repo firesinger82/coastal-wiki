@@ -1,0 +1,88 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-001",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/mod_param.f90",
+ "source_sha256": "dd7962d762f5e85b4521016b17025aa72ca89a920a246abc56f62b07e7b6229f",
+ "base_run_id": "reread20260728-code-FUNWAVE-001-fable5-20260813T012841Z-2ec7b3b5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
+ "base_record_file": "7510cdcc4a3f2bc338e971ef629fefd39539ffd1d93d079f3f022fd8c92a509a.json",
+ "audit_record_file": "7510cdcc4a3f2bc338e971ef629fefd39539ffd1d93d079f3f022fd8c92a509a.json",
+ "base_record_sha256_bytes": "7fd9022ae0d84c5664731ff3ea5d6c09bd3c81048d805a24cbe1a308c1fbd612",
+ "audit_record_sha256_bytes": "0b6574d1f518ba5a6f4b74075077e371d76968da0d323e3ff7b95ee5a65f0764",
+ "base_finding_count": 3,
+ "audit_finding_count": 2,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "pi @L71 is the only PARAMETER literal without an _SP kind suffix (default real, then converted); DEG2RAD @L80 = 0.0175 is a truncated pi/180 (0.017453...) — precision relation with pi @L71 is implicit, not stated in the file"
+   ],
+   "audit_member_text": [
+    "DEG2RAD=0.0175 at L80 is inconsistent with the module's own pi at L71: pi/180 is approximately 0.0174532925, so every direction conversion using DEG2RAD has about 0.267% scale error."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Module-level mutable scratch variables I,J,K,RES @L83 and itmp/tmp sets @L84-L85 are shared across every routine that USEs PARAM (no SAVE statement, no protection) — which routines rely on them is not determinable from this file"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "SP=SELECTED_REAL_KIND(6,30) @L67 fixes single precision and MPI_SP=MPI_REAL @L68 must stay consistent with it; any double-precision build would need both changed together (cross-line relation L67-L68)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "RHO_AW is documented as air density relative to water and set to 0.0012041 at L77, while the adjacent absolute values RHO_AIR/RHO_WATER at L78-L79 imply 0.00115. The two density representations differ by about 4.7%, so routines choosing one or the other do not share the same air-water ratio."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

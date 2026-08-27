@@ -1,0 +1,208 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-001",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/init.f90",
+ "source_sha256": "8f7bb2a5b557da2e07e8e071eb0ae3474ab57cb28a702e6cd3484bc1d957c5c7",
+ "base_run_id": "reread20260728-code-FUNWAVE-001-fable5-20260813T012841Z-2ec7b3b5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
+ "base_record_file": "8219aa16f5104a530cca212a2e59c692edbd4c397c8d712448d04ce3f475e7a2.json",
+ "audit_record_file": "8219aa16f5104a530cca212a2e59c692edbd4c397c8d712448d04ce3f475e7a2.json",
+ "base_record_sha256_bytes": "613f8c8290d4e9f4c9e2eff6c7900b63e9573d557a3e406f32cd44ef667d0195",
+ "audit_record_sha256_bytes": "3e09494d14e2e5b4c2a6fba734a5290a8474508f4597250fda4bd107e3515672",
+ "base_finding_count": 8,
+ "audit_finding_count": 5,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "U4xL/U4xR/V4yL/V4yR are zeroed (L361-364) but V4xL/V4xR/U4yL/U4yR allocated at L150-151 are not zero-initialized in INITIALIZATION — asymmetry with no in-file rationale"
+   ],
+   "audit_member_text": [
+    "ALLOCATE_VARIABLES allocates V4xL/V4xR and U4yL/U4yR with the other dispersive face arrays at lines 154-155, but INITIALIZATION zeros only U4xL/U4xR and V4yL/V4yR at lines 361-364. No assignment to V4xL/V4xR or U4yL/U4yR appears elsewhere in this file before initialization returns. Flux construction reads all four directional pairs, including in non-dispersive paths, so these omitted initializations are a copy-pattern asymmetry and can expose undefined allocated values before a reconstruction writes them."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "CHARACTER WHAT (L264) and INT2FLO/tmp4preview allocations (L157-158) are declared/allocated but not used in this file"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "nu_break is allocated twice when WAVEMAKER_VIS is true: unconditionally at L191 (=nu_bkg L192) and again inside IF(WAVEMAKER_VIS) at L201 (=ZERO L202) — a second ALLOCATE of an already-allocated array is a runtime error unless the compiler tolerates it; relation not resolvable in-file"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "INITIALIZATION zeroes PLOT_COUNT=0 at L436 then overwrites PLOT_COUNT=PLOT_INTV at L481 (same for PLOT_COUNT_STATION L437/L482, SCREEN_COUNT L441/L484) — the first assignments are dead"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "the empty IF branches IF(Gamma3>ZERO)THEN/ELSE (L488-493) and IF(DISPERSION)/ELSE (L495-500) rely on comments only; Beta_ref, Gamma1-3, MinDepth, MinDepthFrc, LARGE, nu_bkg values come from GLOBAL/input (cross-file)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "GetFile, DISTRIBUTE_VarGlob, PHI_COLL, PHI_INT_EXCH, CORRECTION, WAVEMAKER_INITIALIZATION, CALCULATE_* , INITIAL_* , CAL_DISPERSION, CALCULATE_CD_BREAKWATER are defined in other files (cross-file)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "BREAKWATER read is rank-0 only (L784-807) and BreakWaterWidth is deallocated at L811 right after CALCULATE_CD_BREAKWATER — how non-zero ranks receive the width data must happen inside CALCULATE_CD_BREAKWATER (cross-file)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "ilo/ihi/jlo/jhi are computed (L878-895) for the Salatin wavemaker speedup but consumed in source.F per comment L875 (cross-file)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The blow-up threshold is set to 100 times the maximum absolute interior Depth at line 617 and globally maximized at lines 618-619. A zero-depth domain therefore produces EtaBlowVal=0 with no positive floor in this file, leaving any downstream absolute-threshold test dependent on external handling."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "INITIALIZATION declares WHAT at line 264 but never references it in active code; the declaration appears stale."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The breakwater reader opens fixed unit 1 and performs nested formatted READ statements at lines 783-787 without IOSTAT or ERR handling. The preceding existence check detects only a missing file, so malformed or short rows terminate through runtime I/O behavior rather than the file's explicit MPI shutdown path."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The MLP/WENO reconstruction kernels require up to three ghost indices; this initializer builds MASK9 only over Ibeg:Iend,Jbeg:Jend at lines 826-831 and relies on PHI_INT_EXCH at lines 834-835 for ghosts. The required relationship between Nghost and those later stencil widths is not asserted here."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

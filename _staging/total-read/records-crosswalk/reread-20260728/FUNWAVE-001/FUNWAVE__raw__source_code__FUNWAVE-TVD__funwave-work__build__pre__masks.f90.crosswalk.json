@@ -1,0 +1,122 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-001",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/masks.f90",
+ "source_sha256": "0c6b507c7148a988dc7864983a632859ecb71e6bc62f05261f66253af5a621eb",
+ "base_run_id": "reread20260728-code-FUNWAVE-001-fable5-20260813T012841Z-2ec7b3b5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
+ "base_record_file": "272e8020efbbc5c9d2b77ebcf0e5fa1be8d0b46fbc2a6fa02c0757d5d1c41ba6.json",
+ "audit_record_file": "272e8020efbbc5c9d2b77ebcf0e5fa1be8d0b46fbc2a6fa02c0757d5d1c41ba6.json",
+ "base_record_sha256_bytes": "19c9cf7a01902d14af0a3471a2a5328027dc357af686d986ff52a51139d9a03e",
+ "audit_record_sha256_bytes": "c274cc3998285f902ab1a5227691ac0bd4ceeb124ccec0181047d89d4ae7d9d1",
+ "base_finding_count": 5,
+ "audit_finding_count": 3,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "the depth-flattening block (L130-135) uses the OLD MASK (not MASKtmp), so cells drying in this very call keep unflattened DepthX/DepthY until the next call — ordering relation between L111-112 and L130-135"
+   ],
+   "audit_member_text": [
+    "Wet/dry decisions are written to MASKtmp at L91-L112 but the interface-depth correction at L130 tests the old MASK, because MASK is not replaced by MASKtmp until L141. Newly flooded cells still satisfy old MASK<1 and are treated as dry for DepthX/DepthY, while newly dried cells still have old MASK==1 and skip the correction."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "Dmass accumulation (L117) reads ETAtmp which is never assigned in this version — both assignments (ETAtmp=ETA @L79, ETAtmp(I,J)=MinDepth-Depth(I,J) @L114) are commented out as 'version 3.4', so Dmass sums an uninitialized array; whether Dmass is consumed anywhere is cross-file"
+   ],
+   "audit_member_text": [
+    "ETAtmp is allocated at L70 but its only visible initialization, ETAtmp=ETA, is commented at L79; the drying branch nevertheless reads ETAtmp(I,J) in the Dmass equation at L117. Dmass therefore incorporates undefined allocation contents whenever a wet cell dries."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "local myvar (L67) is declared but unused"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "the flood test IF(Eta(I,J)>-Depth(I,J)) at L90 wets a cell regardless of neighbors (marked 'rainfall case $$$' @L89), overlapping the neighbor-based tests that follow"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "MASK9 zeroing by the SWE_ETA_DEP criterion couples to fluxes.F where MASK9 multiplies the dispersion terms (cross-file); Dmass, MASK_STRUC, SWE_ETA_DEP, VISCOSITY_BREAKING, phi_int_exch are defined cross-file"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "MASK9tmp is allocated over all Mloc,Nloc at L69 but assigned only on Ibeg-1:Iend+1 and Jbeg-1:Jend+1 at L146-L162 before the whole array is copied at L164. If the allocated halo extends beyond that range, untouched elements are undefined until or unless PHI_INT_EXCH at L168 fills every such position."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

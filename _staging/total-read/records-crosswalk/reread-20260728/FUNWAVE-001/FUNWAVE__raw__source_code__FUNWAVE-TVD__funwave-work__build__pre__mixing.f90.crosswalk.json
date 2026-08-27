@@ -1,0 +1,141 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-001",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/mixing.f90",
+ "source_sha256": "4967185861cf5082df880379e470d1ee284c75d982ee63de112e5b874fd1cde9",
+ "base_run_id": "reread20260728-code-FUNWAVE-001-fable5-20260813T012841Z-2ec7b3b5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
+ "base_record_file": "9c720a37532b13ea32c79ccb035f42ae484e425fd1c42079157dbb6483d10f81.json",
+ "audit_record_file": "9c720a37532b13ea32c79ccb035f42ae484e425fd1c42079157dbb6483d10f81.json",
+ "base_record_sha256_bytes": "6f8c194a1ecf28e88ec7e249e54ea1c559ed6a74247895dc49dc61a9dda70088",
+ "audit_record_sha256_bytes": "f713d2371fea4ecaa0148556f7e44fe4f821bf1c7e0114f6eca0c8ff6e41c100",
+ "base_finding_count": 6,
+ "audit_finding_count": 4,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "UUsum etc. subtract U_davg_mean computed from the PREVIOUS window inside both branches (L171-173, L285-287) — first-window accumulations subtract the initial zero mean; cross-line dependency"
+   ],
+   "audit_member_text": [
+    "ETA2sum at L157/L278 measures deviations from ETAmean, but ETAmean is updated only at interval completion L165 and then held through the next interval. UUsum/UVsum/VVsum at L171-L173 and L285-L287 similarly use prior-window U_davg_mean/V_davg_mean and ETAmean. The reported ETA2mean and radiation moments are therefore centered on the previous interval's means, not the same samples' means; no correction term is applied when the mean changes."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "window-closing branch adds the final step to the sums and immediately computes means before resetting, but the reset keeps T_sum remainder (T_sum=T_sum-T_INTV_mean @L235, ykchoi's own comment questions whether it should be ZERO) — the first window after reset divides fresh sums by a T_sum that starts at the remainder, biasing the next means; unresolved intent"
+   ],
+   "audit_member_text": [
+    "When a step crosses T_INTV_mean, the full current DT is added to all sums at L154-L178 and used in the completed mean, but L235 retains T_sum-T_INTV_mean while L236-L253 reset every sum to zero. The retained fractional time has no corresponding retained integral, so the next interval's denominator includes unrepresented time and biases all means low after non-exact interval crossings."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "Num_Zero_Up/HavgSum/HrmsSum are never reset (reset lines commented out @L264-266), so WaveHeightAve/RMS are running statistics over the entire post-STEADY_TIME run, not per averaging window"
+   ],
+   "audit_member_text": [
+    "Num_Zero_Up, HavgSum and HrmsSum resets are commented out at L264-L266 while interval sums reset at L235-L253. Consequently WaveHeightAve/RMS at L261-L262 are cumulative across all prior waves, whereas SigWaveHeight and the mean/radiation fields are interval products; whether that mixed temporal basis is intended is not established in the routine."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "MIXING_STUFF gate uses 'time' (lowercase) >= STEADY_TIME @L71 while the header comment says mean eta is also calculated — STEADY_TIME/T_INTV_mean default to LARGE in io.f90 so averaging is off unless configured (cross-file)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "hard-coded 9.80 (L198,L204,L206) and 4.004 (L255) rather than GRAV — inconsistency with GRAV used elsewhere"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Tmpe/Tmp_0 comparison uses Zero (capitalized) @L301 from PARAM (cross-file); DXg/DYg, Wsurf, BreakSourceX/Y, Cd, U_davg etc. all cross-file"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Wave extrema/upcrossing detection exists only in the T_sum<T_INTV_mean ELSE branch L294-L312. The sample that reaches/crosses the interval threshold follows the IF branch and contributes to time sums L157-L178 but is skipped by Emax/Emin and zero-upcrossing logic, dropping one wave-detection sample at every mean-output boundary."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

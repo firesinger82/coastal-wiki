@@ -1,0 +1,73 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-001",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/beach_2d/postprocessing/plot_wave_2d.py",
+ "source_sha256": "918e7b5b56505734bd33693d84babd2ddf67e83897bbf9cce382c514e88ec53b",
+ "base_run_id": "reread20260728-code-FUNWAVE-001-fable5-20260813T012841Z-2ec7b3b5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
+ "base_record_file": "9e87533d434f59054dfcfa789b070aa02971ca5e5541ee52fc3b642a77da7592.json",
+ "audit_record_file": "9e87533d434f59054dfcfa789b070aa02971ca5e5541ee52fc3b642a77da7592.json",
+ "base_record_sha256_bytes": "dec8e0f0616c47bb98a47b74c4711ed45e7e9e5e1f361edac701802d86ee6306",
+ "audit_record_sha256_bytes": "45b414937fbe6ab532c2a060acbc03405fb1e63fe174a3c1551a1059715268a6",
+ "base_finding_count": 2,
+ "audit_finding_count": 2,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "plt.hold(True) @L54 requires matplotlib < 3.0 (removed API); unlike plot_current.py this script does import os @L6"
+   ],
+   "audit_member_text": [
+    "Interface compatibility is unspecified: L54 calls plt.hold(True), but the script declares no Matplotlib version or compatibility guard, so environments where pyplot lacks hold will fail before annotations and save (L54-L73)."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "'min' @L31 and 'length' @L35 shadow Python builtins; fdir is a user-specific Windows path that must be edited; label times 20/100 s vs file numbers 10/50 assume 2 s output interval (unchecked)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "x and y are sized only from eta_00001 at L12 and L15-L20, then reused for every subsequently loaded eta/mask pair at L43-L50 without any shape check; differing snapshot dimensions would break masked_where or pcolor alignment (L12, L15-L20, L43-L50)."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

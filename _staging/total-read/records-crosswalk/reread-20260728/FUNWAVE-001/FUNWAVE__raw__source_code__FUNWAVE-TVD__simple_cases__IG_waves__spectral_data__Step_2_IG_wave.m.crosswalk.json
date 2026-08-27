@@ -1,0 +1,178 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-001",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/IG_waves/spectral_data/Step_2_IG_wave.m",
+ "source_sha256": "63ac0b4511d0c1f10595c88aedf68659b0535a8de1d3fad55e5c3fef8e172895",
+ "base_run_id": "reread20260728-code-FUNWAVE-001-fable5-20260813T012841Z-2ec7b3b5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
+ "base_record_file": "41b5c64d4586846cb48e6046f9d0e6df583136e076590eaa35701c4020ea16e5.json",
+ "audit_record_file": "41b5c64d4586846cb48e6046f9d0e6df583136e076590eaa35701c4020ea16e5.json",
+ "base_record_sha256_bytes": "2946459f32758c2b523504362e06a3e3df96acb70148ebcf98370ca55bcf6204",
+ "audit_record_sha256_bytes": "7089b9a9bc2107d86204f166b1710681979784c0a6932656ac0677b9b8331c41",
+ "base_finding_count": 5,
+ "audit_finding_count": 6,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "If no pair satisfies the window, anm/Fnm/PHI_nm are never created and L95-L98 would error — no guard"
+   ],
+   "audit_member_text": [
+    "Fnm, anm, and PHI_nm are created only inside the pair filter at lines 65-87, but are unconditionally read at lines 95-97. If the selected band has fewer than two components or no pair satisfies f(1)>f1 and f(2)<f2, those arrays are undefined and the script fails before output."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Pair-selection window @L65 requires f(1)>f1 AND f(2)<f2 with f1/f2 = peakf +/- 0.03 Hz — both members of the pair must lie inside the +/-LowFreqRange band around the peak; the comment @L62 says 'sort out using low frequency range' but the test constrains the parent short-wave frequencies, not the difference frequency fnm"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "IGW_each @L130 repeats the dimensional oddity of adding freq_low inside the cosine argument (diagnostic plots only); element-wise vector-times-row-time products (L128, L130, L133) rely on implicit expansion as in the 2_wave_components script"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Header comment block (L1-L13) is identical to IG_wave_generation.m including 'output file: spectrum_random_phase.txt' — here the name matches the actual output, confirming the 2_wave_components copy diverged"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "lambda @L70, Knm @L82, omega_nm @L72, Eng1 @L109, E @L140, angle @L35 are computed/loaded but unused in the written output; variable 'angle' shadows the MATLAB builtin"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "SPC_angle.txt is loaded at line 35 but angle is never used; the output direction is hard-coded to zero at line 107, so Step_1's angle channel is discarded."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The plotted IG series adds freq_low as an extra phase at line 130, while the exported Phase1 at lines 110 and 118 contains only phase_low and the combined reconstruction at line 133 likewise omits freq_low. The IG diagnostic trace is therefore inconsistent with the written spectrum."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The Dnm calculation divides by omega(1)*omega(2) and the difference-wave dispersion residual at lines 75-77 without checking zero/duplicate frequencies or resonance, so Inf/NaN can reach anm at line 79 and the output at line 117."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The comment at line 93 promises arranging difference frequencies by resolution, but lines 95-98 only alias the unsorted pair-order arrays. Repeated difference frequencies are neither sorted nor combined, despite later plots labelling an integrated series at lines 159 and 166."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Nearest-cutoff indices n1 and n2 are used directly in fre1(n1:n2) and spc1(n1:n2) at lines 33 and 37 without checking ordering, equal lengths of the SPC inputs, or at least two retained points; malformed or descending frequency inputs can produce empty or mismatched arrays."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

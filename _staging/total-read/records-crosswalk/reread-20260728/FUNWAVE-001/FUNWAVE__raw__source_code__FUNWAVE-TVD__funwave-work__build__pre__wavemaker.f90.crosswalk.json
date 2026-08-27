@@ -1,0 +1,373 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-001",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/wavemaker.f90",
+ "source_sha256": "4b31adee872fada150f2a738af6055ae61b344cc119be4e7cf0f130f82197577",
+ "base_run_id": "reread20260728-code-FUNWAVE-001-fable5-20260813T012841Z-2ec7b3b5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
+ "base_record_file": "2f3875d1bb187e9042aad0fe9979e83522b6311fa80ef006e4e65aecedc7eef4.json",
+ "audit_record_file": "2f3875d1bb187e9042aad0fe9979e83522b6311fa80ef006e4e65aecedc7eef4.json",
+ "base_record_sha256_bytes": "e06f0b219d090f41c33f013ae76e99468fec5c79206004a4ca876e03dcd97fbf",
+ "audit_record_sha256_bytes": "e9b2043f99deaca4c66b38658f9be8e3244b437e7838acd0212d56b9be278b50",
+ "base_finding_count": 11,
+ "audit_finding_count": 13,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A10"
+   ],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [
+    "width outputs are computed from the last wave_length value of the preceding loop in WK_NEW_EQUAL_DFREQ_IRREGULAR_WAVE (L2675-L2679: wkn recomputed but wave_length not recomputed before width=delta*wave_length/2) — width uses stale wave_length from the final kf iteration, unlike WK_WAVEMAKER_2D_SPECTRAL_DATA which recomputes wave_length @L698 before width @L699"
+   ],
+   "audit_member_text": [
+    "Three irregular generators recompute peak-frequency omgn, tb, tc, and wkn at lines 1833-1836, 2059-2062, and 2675-2678, but then compute width from wave_length left over from the last component loop at lines 1837, 2063, and 2679. The recomputed peak wavenumber is unused, so width depends on the last component rather than the declared peak frequency."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "WAVEMAKER_INITIALIZATION label anomaly: '109    INPUT_WAVE_PHASE = .TRUE.' @L194 sits between the Phase2D READ (END=110 @L184) and '110 CONTINUE' @L195 — when the phase read hits EOF, control jumps to 110 but INPUT_WAVE_PHASE has already been executed on the fall-through path @L194 (label 109 is never referenced), so 'You input phase info' @L190-191 prints before the read outcome is known; contrast the WK_NEW_DATA2D variant which sets the flag after CLOSE @L411 yet also prints unconditionally @L408"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "CALCULATE_TMA_Cm_Sm allocates Amp_Ser/.../Phase_Ser (L1039-L1041) and Cm_eta... (L1042-L1044) without checking prior allocation — repeated wavemaker initialization would double-ALLOCATE; same in CALCULATE_DATA2D_Cm_Sm (L790-L792, comment @L789)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Random phases use rand(0) (GNU extension) at 8 sites with no seeding control in this file — reproducibility and cross-rank consistency of Cm/Sm patterns depend on identical rand sequences on every MPI rank"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Wei-Kirby coefficients are duplicated in 7 near-identical blocks with hardcoded alpha=-0.39 and mixed pi literals (3.14159 @L683/L2114/L2170/L2446 vs named pi elsewhere); deg->rad uses 0.005555555555556*pi @L259 in one place and pi/180 elsewhere"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "WK_NEW_EQUAL_DFREQ_IRREGULAR_WAVE: alpha_c is INTENT(INOUT) and clamped (L2551-L2552) but passed INTENT(IN) to WAVE_COHERENCE @L2803; Etma is an array (mfreq) here @L2494 vs scalar in older routines; the JON phi override is commented out (L2563-L2565) so WK_NEW_IRR always applies the TMA depth factor"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "WAVE_COHERENCE: allocatable-on-assignment arrays host_freqs_idx/host_freqs/temp_idx/freq_diff rely on F2003 auto-allocation; the DO WHILE loop (L2859-L2894) can exhaust candidate_freq_pool if Num_Coherent is large relative to pool size (no empty-pool guard after removals); final deallocation commented out (L2896-L2897); moved components inherit the host frequency but keep their own direction/phase — the 'repetitions' bookkeeping (L2887-L2892) counts coherent members for the whole set"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "CALCULATE_NEW_Cm_Sm accumulates duplicate-frequency components into the first slot of each equal-frequency run via kf_temp=kf-kkk (L2750-L2762) — correctness requires equal frequencies to be contiguous in Freq, which WAVE_COHERENCE's in-place substitution (L2880-L2884) does not obviously guarantee; loop_index is ALLOCATEd @L2720 each call without prior-deallocation check"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Periodic-angle quantization appears in five separately-maintained copies (WK_REG L109-L159, WK_WAVEMAKER_2D_SPECTRAL_DATA L561-L654, CalcPeriodicTheta L898-L985, WK_(EQUAL_DFREQ_)IRREGULAR_WAVE L1776-L1814/L2003-L2041, WK_NEW_* retry variants L2363-L2408/L2601-L2663) with differing failure behavior (MPI_FINALIZE, clamp to pi/2-SMALL, or 0.001-rad decrement retry)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A8"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "WK_WAVEMAKER_IRREGULAR_WAVE writes its periodic-adjusted angle back into the loop variable Theta @L1812/@L2039 inside the ktheta loop — subsequent ktheta iterations reuse the overwritten value only via recomputation @L1738; loop nesting is do kf { do ktheta } but end comments @L1828-1829/@L2055-2056 label them reversed ('end kf' on inner, 'end ktheta' on outer)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A9"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "WK_TIME path (L300-L314) reads WAVE_COMP without allocating it in this file (allocation presumably in init/io based on NumWaveComp read elsewhere); T_brk=WAVE_COMP(NumWaveComp,1) @L285/@L311 takes the last component's period, and in WK_NEW_DATA2D T_brk=Freq(FreqCount) @L478 stores a frequency (not a period) — dimensional inconsistency between paths"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Several error paths say STOP or diagnose invalid input but call MPI_FINALIZE without STOP, RETURN, or control transfer: zero depth/period at lines 102-105 and infeasible periodic-angle searches at lines 117-128 and 137-147 continue into later wavemaker logic after MPI has been finalized; CalcPeriodicTheta likewise finalizes at line 912 and continues at line 915. The initial period guard is additionally too late because 2*pi/Tperiod is already evaluated at line 98."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "WK_DATA2D filters directions and compacts Dire and WAVE_COMP at lines 203-242, but never compacts Phase2D before using Phase2D(J,I) at lines 255-282. When rejected directions are interspersed, input phases remain indexed by original direction while amplitudes and directions use compacted indices."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "In WK_NEW_DATA2D, an END condition on phase input at line 403 jumps directly to label 1100 at line 413, bypassing CLOSE(1) at line 405; the optional-phase-absent path leaks the open unit. The older WK_TIME path opens unit 1 at line 301 and has no corresponding close before its branch ends at line 314."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Initialization sets NumDir=2 at line 388 but allocates and passes measured-spectrum arrays with second extent 1 at lines 390-392 and 430-475; the called new generator explicitly declares those arrays (NumFreq,1) at lines 2340-2346 and CALCULATE_NEW_Cm_Sm ignores mtheta while declaring fixed second extent 1 at lines 2705-2709. The count interface and actual array shape therefore disagree and rely on the current implementations never indexing direction 2."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The WK_NEW_IRR one-direction branch initializes only theta(1) and AG(1) at lines 2522-2524, although both arrays have mfreq elements and later every AG(kf) and theta(kf) is consumed at lines 2558-2581 and 2602-2670. For mfreq greater than one this is direct use-before-assignment."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "WK_NEW_EQUAL_DFREQ_IRREGULAR_WAVE declares displace_theta with extent mfreq at line 2505 but assigns the one-element result of MINLOC to the whole array at line 2526. Except when mfreq=1, the intrinsic assignment is shape-nonconforming even though only displace_theta(1) is subsequently used at line 2527."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "phi1 is INTENT(OUT) at line 2498 but assigned at line 2653 only inside IF(PERIODIC), lines 2603-2663. The nonperiodic WK_NEW_IRR path returns phase_ir undefined and CALCULATE_NEW_Cm_Sm immediately consumes it through the calls at lines 504-510 and the expressions at lines 2742-2773."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B8"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Zero-period checks in WK_WAVEMAKER_REGULAR_WAVE and WK_WAVEMAKER_TIME_SERIES are ineffective because division by Tperiod occurs first at lines 2096 and 2150, before checks at lines 2100 and 2156. Other unguarded singular operations include 1/PeakPeriod at lines 278 and 472, df=(fmax-fmin)/(mfreq-1) at lines 1358, 1886, and 2511, 20/sigma_theta at lines 1118, 1390, 1676, 1914, and 2520, and Newton division by Fkdif at line 807."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B9"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The equal-energy frequency repair reads Freq(kff-1) when kff can be 1 at lines 1101-1104 and 1662-1665, and compares Freq(mfreq-1) without requiring mfreq>1 at lines 1112-1113 and 1669-1671. The equal-dfrequency routines separately divide by mfreq-1, so no branch safely supports mfreq=1 despite explicit mtheta==1 handling elsewhere."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B10"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "SHOW_BREAKING in the WK_DATA2D branch indexes WAVE_COMP(NumWaveComp,1) at lines 284-286 although that array is allocated with first extent NumFreq at lines 169-171; no relation between NumWaveComp and NumFreq is established in this branch. The new-data branch assigns T_brk=Freq(FreqCount) at lines 477-479, a frequency, while other branches assign periods such as 1/FreqMax at lines 349-350 and 514-515, indicating a unit/interface inconsistency."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B11"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "WAVE_COHERENCE can build an empty host list when idx_theta=0 and mtheta>mfreq, then indexes host_freqs_idx(0) at line 2829. It can also build an empty candidate pool, notably mtheta=1 where every frequency is a host, yet a positive coherence request enters lines 2859-2863; mfreq_temp is then zero and CEILING(rand(0)*mfreq_temp) produces index 0. Even with a nonempty pool, a random value exactly zero makes candidate_freq_idx zero at line 2861."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B12"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The dispersion/Newton and source-strength formulas repeatedly divide by depth, frequency, delta, wave length, rI, sinh(kh), energy integrals, and directional sums without coherent range validation (for example lines 674-687, 803-811, 855-878, 1150-1160, 1264-1287, 1422-1427, 2046-2053, 2442-2450, and 2575-2576). Exact wkn==0 repairs at lines 1206, 1477, 1763, 1990, and 2593 occur only after the square-root/division expression and do not catch NaN or near-zero denominators."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

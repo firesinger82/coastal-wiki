@@ -1,0 +1,141 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-001",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/derivatives.f90",
+ "source_sha256": "ee0da921be64abc356f259a65ba0b83ad6f06895ffb4590894ddd57f01443e73",
+ "base_run_id": "reread20260728-code-FUNWAVE-001-fable5-20260813T012841Z-2ec7b3b5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
+ "base_record_file": "4e17d43b6d6f43873e1623e2f7972ece2a866d41e07d2dc0316eecad7780d206.json",
+ "audit_record_file": "4e17d43b6d6f43873e1623e2f7972ece2a866d41e07d2dc0316eecad7780d206.json",
+ "base_record_sha256_bytes": "bf1b15933b300d4baaa09a6243f2326242cf1dfe41a6a90fd2e43ee846c4ea02",
+ "audit_record_sha256_bytes": "07c8805cb76407019d44937945403f28df56316a2b2d201c3d90fb1bdc983fff",
+ "base_finding_count": 4,
+ "audit_finding_count": 6,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "Loop indices I,J and temporaries tmp1,tmp2 (L203-204) and tmp1..tmp4 (L257-264) are not declared in any subroutine here; they must come from the PARAM module (cross-file)"
+   ],
+   "audit_member_text": [
+    "DERIVATIVE_XY and DERIVATIVE_XY_HIGH assign tmp1 through tmp4 at lines 203-204 and 257-263 without local declarations under IMPLICIT NONE, so they must be module entities imported wholesale from PARAM. If PARAM storage is shared, concurrent calls are not reentrant/thread-safe; PARAM declarations are outside this file."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "Header comments call DERIVATIVE_XY_HIGH/XX_HIGH/YY_HIGH '4th-derivative' (L240,L274,L301) but the code computes 4th-order-accurate first cross- and second derivatives — comment/code mismatch"
+   ],
+   "audit_member_text": [
+    "The HIGH routine comments call DERIVATIVE_XY_HIGH, DERIVATIVE_XX_HIGH, and DERIVATIVE_YY_HIGH '4th-derivative' operators at lines 240, 274, and 301, but their formulas at lines 257-266, 292-293, and 318-319 compute a mixed second derivative or pure second derivatives using fourth-order-accurate stencils; derivative order and accuracy order are conflated."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "DERIVATIVE_Y_High/X_High are titled 'first-derivative with higher-order' (L57,L83) but their stencil (u(+2)+2u(+1)-2u(-1)-u(-2))/(8h) differs from the standard 4th-order formula (-u(+2)+8u(+1)-8u(-1)+u(-2))/(12h) used inside DERIVATIVE_XY_HIGH (L257-264); the actual order/derivation is not stated in the file"
+   ],
+   "audit_member_text": [
+    "DERIVATIVE_Y_High and DERIVATIVE_X_High are described as higher-order at lines 57 and 83, but coefficients [1,2,-2,-1]/(8h) in lines 74-75 and 101-102 have a nonzero cubic Taylor moment and therefore remain second-order accurate; the intended provenance of this nonstandard wide stencil is not stated."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "DERIVATIVE_XX and DERIVATIVE_XX_HIGH both carry the comment 'I assume no 2nd derivative' (L228,L289) whose meaning in context is not explained"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Comments 'I assume no 2nd derivative' at lines 228 and 289 directly precede active xx second-derivative calculations at lines 231-232 and 292-293, so the comments contradict executable code."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "All HIGH kernels access I or J offsets of plus/minus two at lines 74-75, 101-102, 257-266, 292-293, and 318-319, but their loops use the caller bounds without boundary checks; whether every caller supplies a two-cell halo is unresolved in this file."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "MASK is INTEGER at each declaration but is used as a multiplicative scale rather than a logical branch throughout; admissible values are not constrained here, so values other than 0 or 1 would rescale derivatives."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

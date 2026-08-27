@@ -1,0 +1,156 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-001",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/beach_2d/spectral_data/MATLAB/mk_2d_1d_spec_frf.m",
+ "source_sha256": "870716085cda12b89c1c89873f8acf1d2cdac9ec301b29bd407d6ba5c70ab6ee",
+ "base_run_id": "reread20260728-code-FUNWAVE-001-fable5-20260813T012841Z-2ec7b3b5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
+ "base_record_file": "61f2c6619506c90041edf0d8949104fa8d401e4b9e2fb8dc1454d09d1de5591d.json",
+ "audit_record_file": "61f2c6619506c90041edf0d8949104fa8d401e4b9e2fb8dc1454d09d1de5591d.json",
+ "base_record_sha256_bytes": "8e67c28da14bb443a3bc8388a139032c7d92a535cd39ad6c0d55ad0fbb1aadde",
+ "audit_record_sha256_bytes": "bd3a7f9184818bcf36c8f46b268a39a55e0b50a079a9244174928b52be5bb16b",
+ "base_finding_count": 4,
+ "audit_finding_count": 7,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[peakf,peakd]=find(Amp==v1) @L68 can return multiple cells for ties (subsequent scalar use assumes one); v1 from max(max(Amp)) @L67 while ind1 is unused"
+   ],
+   "audit_member_text": [
+    "Peak ties are not reduced to one location: find at L68 can return vector peakf/peakd, while colon ranges at L73-L74 require scalar endpoints; tied global maxima can therefore make truncation fail or become ambiguous (L67-L74)."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "Axis limits (0-8 S(f) @L39, 0-0.008 S(theta) @L47) and contour levels @L50 are dataset-specific; -71.8 deg rotation constant @L16 is FRF-array-specific and undocumented beyond the 'rotate 0 deg' comment; angle_end @L12, ind1, Hrms/Hrms_model computed but unused in output"
+   ],
+   "audit_member_text": [
+    "angle_end is assigned at L12 but never referenced through EOF L170; thmax instead derives solely from NumDir at L17, so changing angle_end has no effect on the direction grid (L12, L17-L19)."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "Phase @L86 uses size(Amp_model) as [ndd nff] naming directions-first but Amp_model is (freq,dir) — the plotted phase field's orientation vs pcolor(Dire_model,Freq_model,Phase) @L119 relies on rand's shape matching by accident; the written Phase_input @L137 is regenerated separately with a different shape ([nd nf]=size(Amp_input') effectively), so plot and file phases differ"
+   ],
+   "audit_member_text": [
+    "The displayed phase is generated as Phase at L86 and plotted at L119, but the phase written to wave2d_frf.txt is independently regenerated as Phase_input at L137 and appended at L151; the phase panel therefore does not depict the output realization (L86, L119, L137, L151)."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "1D amplitude conversion @L159 omits the ddire factor (uses Amp_Frq_model*dfreq*8 where Amp_Frq_model already integrated over direction @L83 with *ddire) — consistent by construction, but the asymmetry with @L133 is implicit; the 1D file has no phase block"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The centered truncation formulas are inclusive at both ends: with an interior peak and even NFreq=50 or NDir=30 (L69-L72), L73-L74 select 51 or 31 indices respectively, exceeding the variables named as maxima by one."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The truncated frequency subplot plots x=Amp_Frq_model and y=Freq_model at L93, but L94-L95 label the y-axis as spectral density and x-axis as frequency, the reverse of both the plotted arguments and the corresponding raw subplot labels at L35-L37."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The 2-D amplitude is explicitly transposed to direction-by-frequency layout at L133-L136 before writing at L150, whereas the 1-D amplitude derived as a frequency-column vector at L159 is not transposed before L166 even though L162 declares NumDir=1; whether the consumer reads a flat stream or requires the same NumDir-by-NumFreq row layout is unresolved (L133-L136, L150, L159, L162, L166)."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Each output remains open through fid after fprintf (L145-L149 and L161-L165) while dlmwrite separately appends to the same pathname before fclose (L150-L153 and L166-L168); ordering and buffering behavior for the two simultaneous file access paths is not established in this file."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

@@ -1,0 +1,103 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-001",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/IG_waves/spectral_data/wvnum_omvec.m",
+ "source_sha256": "74ab8fb7fbb92f8cc0545eb2b711dee39f510ea9da43f56a9ab0516d7a8e8d79",
+ "base_run_id": "reread20260728-code-FUNWAVE-001-fable5-20260813T012841Z-2ec7b3b5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
+ "base_record_file": "6e9a06c2796430c6b14d0f36ed02b4133bf2d8b47ea13261af666c8ab19bc152.json",
+ "audit_record_file": "6e9a06c2796430c6b14d0f36ed02b4133bf2d8b47ea13261af666c8ab19bc152.json",
+ "base_record_sha256_bytes": "9318f22f1f4a9dea0fa8520bacf791156b52e4718be5b3c0cdff7da70da17206",
+ "audit_record_sha256_bytes": "1416c55fb3f37f7da6fe562e41daf7a439e49d6bd2d7257c1e806a73fe96a6c5",
+ "base_finding_count": 3,
+ "audit_finding_count": 3,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "error is initialized with ones(length(h),1)' @L7 — sized by scalar h (length 1), not by the omega vector; the while condition still works because error is re-assigned @L12 to omega's shape after the first iteration, but the first-pass condition tests a single 1"
+   ],
+   "audit_member_text": [
+    "The initial error vector uses length(h) at line 7 rather than the shape or length of omega/k; scalar h with vector omega starts with a scalar convergence mask and relies on the first iteration to change shape."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "The local variable name 'error' shadows MATLAB's built-in error function inside this scope"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "No iteration cap: the while loop @L8-L15 runs until convergence with tolerance .000001 on relative change — divergence (e.g. omega=0) would loop forever; f/fp sign convention: kn=k-f./fp @L11 with fp defined as the negative derivative of f w.r.t. k means the update is k+f/|fp'| — consistent as written since fp = -d(residual)/dk"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "For omega=0 or h=0, the initial estimate at line 3 evaluates 0/sqrt(tanh(0)), and the relative error at line 12 also divides by k. No zero-frequency or zero-depth branch prevents NaN propagation."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The Newton update divides by fp at line 11 without a zero/near-zero derivative check, and the while loop at line 8 has no iteration limit or non-finite test; nonconvergent states can loop indefinitely, while NaN can terminate the comparison with an invalid result."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

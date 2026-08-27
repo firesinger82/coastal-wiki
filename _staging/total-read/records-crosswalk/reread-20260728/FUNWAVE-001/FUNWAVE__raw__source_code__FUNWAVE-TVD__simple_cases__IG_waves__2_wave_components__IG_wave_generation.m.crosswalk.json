@@ -1,0 +1,167 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-001",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/IG_waves/2_wave_components/IG_wave_generation.m",
+ "source_sha256": "63c36b5fa6b9918219cec8a49bd1068c0f889dde6fda5c6f70c62f764562e5ac",
+ "base_run_id": "reread20260728-code-FUNWAVE-001-fable5-20260813T012841Z-2ec7b3b5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
+ "base_record_file": "114401d957c38c11f0b9049e75fb56f3eaa25641e5fcd0d2127f6adc8459aec3.json",
+ "audit_record_file": "114401d957c38c11f0b9049e75fb56f3eaa25641e5fcd0d2127f6adc8459aec3.json",
+ "base_record_sha256_bytes": "83806fa7a19c3d8d4be036b89aeca70a0aa9f2d8065034bdd3ba365b3690f930",
+ "audit_record_sha256_bytes": "b2e6c15055c95827a9557b70df0d186cc335ff495f25d78aaee3c2238dcc54f2",
+ "base_finding_count": 6,
+ "audit_finding_count": 5,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "Header @L12 declares output 'spectrum_random_phase.txt' but the script writes 'spectrum_two_components.txt' @L88 — name mismatch between documentation and code"
+   ],
+   "audit_member_text": [
+    "The header documents spectrum_random_phase.txt at line 12, while the actual output is spectrum_two_components.txt at line 88; downstream instructions using the documented name will not find the produced file."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "angle (SPC_angle.txt @L29) and Eng1 @L95, lambda @L59, Knm @L71, omega_nm @L61, fre_used/spc_used @L74-L75, Hrms/Hsig/E (L123-L126) are computed but never used in the written output; MATLAB built-in name 'angle' is shadowed"
+   ],
+   "audit_member_text": [
+    "Eng1, lambda, Knm, OMEGA_nm, fre_used, and spc_used are computed at lines 59, 71-75, and 95 but never consumed; in particular Eng1 is not the quantity written, so the output contains amplitudes despite a separately constructed energy representation."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "IGW_each @L116 adds freq_low (a frequency) directly inside the cosine phase argument (OMEGA_nm_low.*time+freq_low+phase_low) — dimensionally inconsistent with the wave synthesis at L114/L119 which use phase only; likely affects only the diagnostic plot, not the written output"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Element-wise products like Amp_each.*cos(Omega_each.*time+Phi_each) @L114 multiply column vectors by the row vector time — relies on MATLAB implicit expansion (R2016b+); Wave_total=sum(Wave_each) @L115 then sums over components only if the orientation matches; IGW_total=IGW_each @L117 is not summed at all (single pair case)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "The written file mixes fprintf-formatted header/Freq/Dire lines with dlmwrite '-append' data (L98-L104) while fid is still open — fclose happens after dlmwrite @L106; ordering correctness relies on OS-level append semantics"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "wvnum_omvec is required but absent from this file; the direction file value is not written (Dire hardcoded 0.0 @L93)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The script explicitly loads SPC_angle.txt at line 29 but never uses angle; it hard-codes Dire=0.0 at line 93. Thus the advertised single input angle at line 9 is silently discarded from the generated FUNWAVE spectrum."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The plotted IG reconstruction adds freq_low directly as a phase term at line 116, whereas the generated-file reconstruction at line 119 uses only Phase1 and the exported IG phases at lines 96 and 104 contain phase_low without freq_low. The diagnostic blue IG trace therefore does not represent the spectral file that the script writes."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The Dnm expression divides by omega(1)*omega(2) and by g*knm*tanh(knm*h)-(omega(1)-omega(2))^2 at lines 64-66 without checking zero-frequency inputs, duplicate frequencies (knm=fnm=0), or a difference-frequency free-wave resonance. A zero or near-zero denominator propagates Inf/NaN into anm at line 68 and the output at line 103."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

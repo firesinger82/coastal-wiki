@@ -1,0 +1,2821 @@
+{
+ "shard": "FUNWAVE-001",
+ "instructions_ref": "see subagent prompt",
+ "files": [
+  {
+   "file_token": "F00",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F00-X0",
+     "text": "Header @L12 declares output 'spectrum_random_phase.txt' but the script writes 'spectrum_two_components.txt' @L88 — name mismatch between documentation and code"
+    },
+    {
+     "id": "F00-X1",
+     "text": "IGW_each @L116 adds freq_low (a frequency) directly inside the cosine phase argument (OMEGA_nm_low.*time+freq_low+phase_low) — dimensionally inconsistent with the wave synthesis at L114/L119 which use phase only; likely affects only the diagnostic plot, not the written output"
+    },
+    {
+     "id": "F00-X2",
+     "text": "Element-wise products like Amp_each.*cos(Omega_each.*time+Phi_each) @L114 multiply column vectors by the row vector time — relies on MATLAB implicit expansion (R2016b+); Wave_total=sum(Wave_each) @L115 then sums over components only if the orientation matches; IGW_total=IGW_each @L117 is not summed at all (single pair case)"
+    },
+    {
+     "id": "F00-X3",
+     "text": "The written file mixes fprintf-formatted header/Freq/Dire lines with dlmwrite '-append' data (L98-L104) while fid is still open — fclose happens after dlmwrite @L106; ordering correctness relies on OS-level append semantics"
+    },
+    {
+     "id": "F00-X4",
+     "text": "angle (SPC_angle.txt @L29) and Eng1 @L95, lambda @L59, Knm @L71, omega_nm @L61, fre_used/spc_used @L74-L75, Hrms/Hsig/E (L123-L126) are computed but never used in the written output; MATLAB built-in name 'angle' is shadowed"
+    },
+    {
+     "id": "F00-X5",
+     "text": "wvnum_omvec is required but absent from this file; the direction file value is not written (Dire hardcoded 0.0 @L93)"
+    }
+   ],
+   "listY": [
+    {
+     "id": "F00-Y0",
+     "text": "The script explicitly loads SPC_angle.txt at line 29 but never uses angle; it hard-codes Dire=0.0 at line 93. Thus the advertised single input angle at line 9 is silently discarded from the generated FUNWAVE spectrum."
+    },
+    {
+     "id": "F00-Y1",
+     "text": "The header documents spectrum_random_phase.txt at line 12, while the actual output is spectrum_two_components.txt at line 88; downstream instructions using the documented name will not find the produced file."
+    },
+    {
+     "id": "F00-Y2",
+     "text": "The plotted IG reconstruction adds freq_low directly as a phase term at line 116, whereas the generated-file reconstruction at line 119 uses only Phase1 and the exported IG phases at lines 96 and 104 contain phase_low without freq_low. The diagnostic blue IG trace therefore does not represent the spectral file that the script writes."
+    },
+    {
+     "id": "F00-Y3",
+     "text": "The Dnm expression divides by omega(1)*omega(2) and by g*knm*tanh(knm*h)-(omega(1)-omega(2))^2 at lines 64-66 without checking zero-frequency inputs, duplicate frequencies (knm=fnm=0), or a difference-frequency free-wave resonance. A zero or near-zero denominator propagates Inf/NaN into anm at line 68 and the output at line 103."
+    },
+    {
+     "id": "F00-Y4",
+     "text": "Eng1, lambda, Knm, OMEGA_nm, fre_used, and spc_used are computed at lines 59, 71-75, and 95 but never consumed; in particular Eng1 is not the quantity written, so the output contains amplitudes despite a separately constructed energy representation."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F00-X0",
+     "F00-Y1"
+    ],
+    [
+     "F00-X4",
+     "F00-Y4"
+    ]
+   ]
+  },
+  {
+   "file_token": "F01",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F01-X0",
+     "text": "Lines 379-380 compare abs(omega) against VorticityMax but then store signed omega rather than abs(omega). A new negative extremum can make VorticityMax negative, after which later positive magnitudes trivially exceed it; the stored field therefore does not consistently represent a maximum magnitude."
+    },
+    {
+     "id": "F01-X1",
+     "text": "ETAT is assigned only for I=1..Mloc-1 and J=1..Nloc-1 at lines 108-118, while it is consumed over Ibeg..Iend and Jbeg..Jend at lines 298-328. Whether every consumed element is assigned in this call depends on the GLOBAL bounds; no local range assertion establishes that Iend<=Mloc-1 and Jend<=Nloc-1."
+    },
+    {
+     "id": "F01-X2",
+     "text": "Ut and Vt divide by DT at lines 136-137 without a local nonzero/positive-DT guard; safety depends on an external timestep invariant."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F01-Y0",
+     "text": "Comment L116 records a known bug (loop bounds should be J=1,Nloc, I=1,Mloc) but the code at L108-109 still loops J=1,Nloc-1, I=1,Mloc-1 — i.e. ETAT and DU/DV are not computed on the last row/column in this version"
+    },
+    {
+     "id": "F01-Y1",
+     "text": "ELSEIF(SHOW_BREAKING .OR. WAVEMAKER_VIS) branch at L144-146 is empty — ETAT needed for breaking is computed unconditionally at L118, so the branch body may have been moved out; intent not stated"
+    },
+    {
+     "id": "F01-Y2",
+     "text": "b2 used in omega_1 (L373-374) is not declared locally and its relation to Beta_1/Beta_2 comes from GLOBAL (cross-file)"
+    },
+    {
+     "id": "F01-Y3",
+     "text": "Loop indices I,J and neighbor-rank variables n_west,n_east,n_suth,n_nrth, MPI_PROC_NULL come from USE GLOBAL (cross-file)"
+    },
+    {
+     "id": "F01-Y4",
+     "text": "U1p/V1p (L281-290) use Uxx,Vxy,DUxx,DVxy computed only by second-order DERIVATIVE_XX/XY (L86-92) — header comment L66-67 says derivative_xx_high was changed to second order per Harris suggestion; the _HIGH variants defined in derivatives.f90 are not called here"
+    },
+    {
+     "id": "F01-Y5",
+     "text": "EXCHANGE_DISPERSION (L244) and DERIVATIVE_* are defined in other files (cross-file)"
+    }
+   ],
+   "candidate_pairs": []
+  },
+  {
+   "file_token": "F02",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F02-X0",
+     "text": "ETAtmp is allocated at L70 but its only visible initialization, ETAtmp=ETA, is commented at L79; the drying branch nevertheless reads ETAtmp(I,J) in the Dmass equation at L117. Dmass therefore incorporates undefined allocation contents whenever a wet cell dries."
+    },
+    {
+     "id": "F02-X1",
+     "text": "Wet/dry decisions are written to MASKtmp at L91-L112 but the interface-depth correction at L130 tests the old MASK, because MASK is not replaced by MASKtmp until L141. Newly flooded cells still satisfy old MASK<1 and are treated as dry for DepthX/DepthY, while newly dried cells still have old MASK==1 and skip the correction."
+    },
+    {
+     "id": "F02-X2",
+     "text": "MASK9tmp is allocated over all Mloc,Nloc at L69 but assigned only on Ibeg-1:Iend+1 and Jbeg-1:Jend+1 at L146-L162 before the whole array is copied at L164. If the allocated halo extends beyond that range, untouched elements are undefined until or unless PHI_INT_EXCH at L168 fills every such position."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F02-Y0",
+     "text": "Dmass accumulation (L117) reads ETAtmp which is never assigned in this version — both assignments (ETAtmp=ETA @L79, ETAtmp(I,J)=MinDepth-Depth(I,J) @L114) are commented out as 'version 3.4', so Dmass sums an uninitialized array; whether Dmass is consumed anywhere is cross-file"
+    },
+    {
+     "id": "F02-Y1",
+     "text": "local myvar (L67) is declared but unused"
+    },
+    {
+     "id": "F02-Y2",
+     "text": "the flood test IF(Eta(I,J)>-Depth(I,J)) at L90 wets a cell regardless of neighbors (marked 'rainfall case $$$' @L89), overlapping the neighbor-based tests that follow"
+    },
+    {
+     "id": "F02-Y3",
+     "text": "the depth-flattening block (L130-135) uses the OLD MASK (not MASKtmp), so cells drying in this very call keep unflattened DepthX/DepthY until the next call — ordering relation between L111-112 and L130-135"
+    },
+    {
+     "id": "F02-Y4",
+     "text": "MASK9 zeroing by the SWE_ETA_DEP criterion couples to fluxes.F where MASK9 multiplies the dispersion terms (cross-file); Dmass, MASK_STRUC, SWE_ETA_DEP, VISCOSITY_BREAKING, phi_int_exch are defined cross-file"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F02-X0",
+     "F02-Y0"
+    ],
+    [
+     "F02-X0",
+     "F02-Y1"
+    ],
+    [
+     "F02-X0",
+     "F02-Y3"
+    ],
+    [
+     "F02-X1",
+     "F02-Y0"
+    ],
+    [
+     "F02-X1",
+     "F02-Y2"
+    ],
+    [
+     "F02-X1",
+     "F02-Y3"
+    ],
+    [
+     "F02-X2",
+     "F02-Y1"
+    ]
+   ]
+  },
+  {
+   "file_token": "F03",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F03-X0",
+     "text": "Energy normalizations differ: Etotal @L9 divides the squared-Hmo sum by 8 while the componentwise E @L12 also uses /8 — for Hmo per component the usual energy is Hmo^2/16; the script's Hrms values (L10, L83) depend on this convention which is not documented in-file"
+    },
+    {
+     "id": "F03-X1",
+     "text": "Dens is indexed (kf,ktheta) @L22 but Em is (ktheta,kf) @L20 — transposed storage; contourf(A,F,Dens,...) @L73 then pairs A (angle centers) with rows kf — consistent only because Dens rows are kf; the pcolor @L7 pairs fre as x with angle as y against spc whose orientation is (n=angles, m=freqs) per L16-L18 loops"
+    },
+    {
+     "id": "F03-X2",
+     "text": "E_a/E_f are initialized from dangle/dfre*0.0 (L28-L29) making them one shorter than the axes; D_f/D_a grow implicitly; 'angle' shadows the MATLAB builtin; contour-level vector v @L71 and the commented totalE @L82 are unused"
+    }
+   ],
+   "listY": [
+    {
+     "id": "F03-Y0",
+     "text": "The raw pcolor drawn at L7 is later erased when figure(1) is selected and clf is called at L53-L54; no pause or save occurs between them, so the initial visualization has no lasting output (L7, L53-L54)."
+    },
+    {
+     "id": "F03-Y1",
+     "text": "No nonzero or monotonic-spacing check precedes divisions by dangle and dfre at L22, L35, and L42; duplicate coordinate entries produce division by zero, and descending entries produce signed negative densities (L14-L15, L22, L35, L42)."
+    },
+    {
+     "id": "F03-Y2",
+     "text": "If either loaded coordinate has fewer than two entries, the loops at L18-L26 and/or L31-L43 do not define Em, Dens, F, A, D_f, or D_a before those names are used at L46 and L56-L73; the file has no size guard (L16-L46, L56-L73)."
+    },
+    {
+     "id": "F03-Y3",
+     "text": "The initial Etotal/Hrms path at L9-L10 is never consumed before Hrms is overwritten from Etotal_1 at L83 and only then displayed at L86; the first Hrms calculation is dead relative to observable output (L9-L10, L83, L86)."
+    },
+    {
+     "id": "F03-Y4",
+     "text": "v is defined at L71, but both consumers that use v are commented out at L72 and L74 while contourf at L73 uses the literal level count 40, leaving v disconnected from the active contour path (L71-L74)."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F03-X0",
+     "F03-Y0"
+    ],
+    [
+     "F03-X0",
+     "F03-Y1"
+    ],
+    [
+     "F03-X0",
+     "F03-Y2"
+    ],
+    [
+     "F03-X0",
+     "F03-Y3"
+    ],
+    [
+     "F03-X1",
+     "F03-Y0"
+    ],
+    [
+     "F03-X1",
+     "F03-Y1"
+    ],
+    [
+     "F03-X1",
+     "F03-Y2"
+    ],
+    [
+     "F03-X1",
+     "F03-Y3"
+    ],
+    [
+     "F03-X1",
+     "F03-Y4"
+    ],
+    [
+     "F03-X2",
+     "F03-Y1"
+    ],
+    [
+     "F03-X2",
+     "F03-Y2"
+    ],
+    [
+     "F03-X2",
+     "F03-Y3"
+    ],
+    [
+     "F03-X2",
+     "F03-Y4"
+    ]
+   ]
+  },
+  {
+   "file_token": "F04",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F04-X0",
+     "text": "The portable relative fdir at line 8 is unconditionally overwritten at line 9 by a machine-specific Windows path, so the script cannot use the documented local input directory without editing source."
+    },
+    {
+     "id": "F04-X1",
+     "text": "The plotted scalar is Hsig loaded at line 62 and passed to pcolor at line 70, but the colorbar label is eta (m) at line 96. This copy/paste label assigns the wrong physical quantity to the visualization."
+    },
+    {
+     "id": "F04-X2",
+     "text": "times is validated against nfile at lines 24-26 but never used in the active plot; no title is created, so the validation cannot make the intended time annotation appear."
+    },
+    {
+     "id": "F04-X3",
+     "text": "Field dimensions are inferred from eta_00001 at lines 29-36, then u, v, ht, and mask are indexed together at lines 60-76 with no shape checks; inconsistent output shapes cause masking or quiver/pcolor dimension errors."
+    },
+    {
+     "id": "F04-X4",
+     "text": "The only image output command is commented at line 100, so the configured paper geometry and completed figure are not saved."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F04-Y0",
+     "text": "fdir is assigned twice (L8, L9): the shipped state points at a contributor's Windows Desktop path (Michael Lam) and the line lacks a semicolon; users must delete/edit L9 to run"
+    },
+    {
+     "id": "F04-Y1",
+     "text": "times labels (L15) are validated (L24-L26) but never used in the plot (no title in this variant); colorbar label '\\eta (m)' @L96 mislabels the plotted quantity (Hsig, loaded @L62); commented print name @L100 references the inlet_shoal case"
+    },
+    {
+     "id": "F04-Y2",
+     "text": "Same quiver 2-D-subscripting of 1-D x/y as plot_current.m @L76; the Windows path @L9 points at simple_cases_input while data files are model output"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F04-X1",
+     "F04-Y1"
+    ],
+    [
+     "F04-X2",
+     "F04-Y1"
+    ]
+   ]
+  },
+  {
+   "file_token": "F05",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F05-X0",
+     "text": "PQ_scheme는 L72에서 .FALSE.로 초기화된 뒤 이 서브루틴 안에서 재대입되지 않지만 L332에서 분기 조건으로 사용된다. 따라서 L332-L359의 P/Q 점성 source 경로는 이 파일의 실행 흐름에서는 도달 불가능하며, 주석 L334-L335도 false 강제를 명시한다."
+    },
+    {
+     "id": "F05-X1",
+     "text": "L74의 kd는 선언 뒤 이 서브루틴에서 사용되지 않는다."
+    },
+    {
+     "id": "F05-X2",
+     "text": "L263-L264 및 L306-L307은 xmk/ymk 계산에 DXg/DYg를 사용하지만 이 파일 안의 대입은 L84-L90에서 전부 주석 처리되어 있어, GLOBAL 쪽 초기화가 없다면 미정의 값을 사용할 수 있다."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F05-Y0",
+     "text": "nu_vis @L71 is declared REAL (default kind), not REAL(SP) — kind mismatch with the REAL(SP) arrays it combines (nu_break @L200, nu_sponge @L215); whether default REAL == SP depends on compiler flags"
+    },
+    {
+     "id": "F05-Y1",
+     "text": "BB/CC are dimensioned with Nfreq @L78 while BB2/CC2 use NumFreq @L80 and BB1 uses NumWaveComp @L79 — three different size variables from GLOBAL; automatic arrays are created from whichever is currently set, and for wavemaker types that leave the others 0/undefined the unused arrays have undefined size at entry (all five are allocated on every call regardless of branch)"
+    },
+    {
+     "id": "F05-Y2",
+     "text": "WK_REG branch tests WAVEMAKER(1:6) @L111 while the second branch tests WaveMaker(1:6)/(1:10) @L119-L121 — WK_NEW_IRR also matches 'WK_IRR'? No: WK_NEW_IRR(1:6)='WK_NEW' does not equal 'WK_IRR', but 'WK_IRR...' variants with longer names (e.g. WK_IRR vs WK_IRREGULAR) and the ordering of (1:10)=='WK_NEW_IRR' after the (1:6) tests are load-bearing; also 'WK_DATA2D'(1:9) @L152 vs 'WK_NEW_DATA2D'(1:13) @L168 ordering matters since (1:9) of WK_NEW_DATA2D is 'WK_NEW_DA' (no clash) — string-prefix dispatch is fragile but internally consistent here"
+    },
+    {
+     "id": "F05-Y3",
+     "text": "The wavemaker mass source is added as WaveMaker_Mass*U / WaveMaker_Mass*V (L252, L296) inside SourceX/SourceY; the mass-source itself presumably also enters the continuity equation elsewhere (not in this file)"
+    },
+    {
+     "id": "F05-Y4",
+     "text": "Depth-gradient term uses (Eta)/DX*(Depthx(I+1,J)-Depthx(I,J)) @L238 — Depthx/Depthy are face values from GLOBAL; MinDepthFrc floor appears only in the dispersion factor Max(H,MinDepthFrc) @L243/@L287"
+    },
+    {
+     "id": "F05-Y5",
+     "text": "label 107 FORMAT @L225 is never referenced by any WRITE in this file; kd @L74 declared unused; commented DXg/DYg preprocessor block @L84-L91 shows the spherical-grid variant was removed at preprocessing"
+    },
+    {
+     "id": "F05-Y6",
+     "text": "PQ_scheme branch (L337-L359) is unreachable with the compiled-in default .FALSE. @L72 (an initialized local, implying SAVE, never reassigned in this file); loop indices I,J,KF are PARAM/GLOBAL module variables (KF vs kf same identifier case-insensitively, both used L154/L161 vs L123)"
+    },
+    {
+     "id": "F05-Y7",
+     "text": "WaveMakerCurrentBalance window uses DXg/DYg (L263-L264, L306-L307) which for the Cartesian build are copies of DX/DY set elsewhere; jlo/jhi/ilo/ihi (wavemaker index window, from GLOBAL Salatin block) are assumed set before SourceTerms is called — not verified in this file"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F05-X0",
+     "F05-Y0"
+    ],
+    [
+     "F05-X0",
+     "F05-Y1"
+    ],
+    [
+     "F05-X0",
+     "F05-Y5"
+    ],
+    [
+     "F05-X0",
+     "F05-Y6"
+    ],
+    [
+     "F05-X1",
+     "F05-Y0"
+    ],
+    [
+     "F05-X1",
+     "F05-Y1"
+    ],
+    [
+     "F05-X1",
+     "F05-Y5"
+    ],
+    [
+     "F05-X1",
+     "F05-Y6"
+    ],
+    [
+     "F05-X2",
+     "F05-Y1"
+    ],
+    [
+     "F05-X2",
+     "F05-Y5"
+    ],
+    [
+     "F05-X2",
+     "F05-Y7"
+    ]
+   ]
+  },
+  {
+   "file_token": "F06",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F06-X0",
+     "text": "WAVEMAKER_INITIALIZATION label anomaly: '109    INPUT_WAVE_PHASE = .TRUE.' @L194 sits between the Phase2D READ (END=110 @L184) and '110 CONTINUE' @L195 — when the phase read hits EOF, control jumps to 110 but INPUT_WAVE_PHASE has already been executed on the fall-through path @L194 (label 109 is never referenced), so 'You input phase info' @L190-191 prints before the read outcome is known; contrast the WK_NEW_DATA2D variant which sets the flag after CLOSE @L411 yet also prints unconditionally @L408"
+    },
+    {
+     "id": "F06-X1",
+     "text": "CALCULATE_TMA_Cm_Sm allocates Amp_Ser/.../Phase_Ser (L1039-L1041) and Cm_eta... (L1042-L1044) without checking prior allocation — repeated wavemaker initialization would double-ALLOCATE; same in CALCULATE_DATA2D_Cm_Sm (L790-L792, comment @L789)"
+    },
+    {
+     "id": "F06-X2",
+     "text": "Random phases use rand(0) (GNU extension) at 8 sites with no seeding control in this file — reproducibility and cross-rank consistency of Cm/Sm patterns depend on identical rand sequences on every MPI rank"
+    },
+    {
+     "id": "F06-X3",
+     "text": "Wei-Kirby coefficients are duplicated in 7 near-identical blocks with hardcoded alpha=-0.39 and mixed pi literals (3.14159 @L683/L2114/L2170/L2446 vs named pi elsewhere); deg->rad uses 0.005555555555556*pi @L259 in one place and pi/180 elsewhere"
+    },
+    {
+     "id": "F06-X4",
+     "text": "WK_NEW_EQUAL_DFREQ_IRREGULAR_WAVE: alpha_c is INTENT(INOUT) and clamped (L2551-L2552) but passed INTENT(IN) to WAVE_COHERENCE @L2803; Etma is an array (mfreq) here @L2494 vs scalar in older routines; the JON phi override is commented out (L2563-L2565) so WK_NEW_IRR always applies the TMA depth factor"
+    },
+    {
+     "id": "F06-X5",
+     "text": "WAVE_COHERENCE: allocatable-on-assignment arrays host_freqs_idx/host_freqs/temp_idx/freq_diff rely on F2003 auto-allocation; the DO WHILE loop (L2859-L2894) can exhaust candidate_freq_pool if Num_Coherent is large relative to pool size (no empty-pool guard after removals); final deallocation commented out (L2896-L2897); moved components inherit the host frequency but keep their own direction/phase — the 'repetitions' bookkeeping (L2887-L2892) counts coherent members for the whole set"
+    },
+    {
+     "id": "F06-X6",
+     "text": "CALCULATE_NEW_Cm_Sm accumulates duplicate-frequency components into the first slot of each equal-frequency run via kf_temp=kf-kkk (L2750-L2762) — correctness requires equal frequencies to be contiguous in Freq, which WAVE_COHERENCE's in-place substitution (L2880-L2884) does not obviously guarantee; loop_index is ALLOCATEd @L2720 each call without prior-deallocation check"
+    },
+    {
+     "id": "F06-X7",
+     "text": "Periodic-angle quantization appears in five separately-maintained copies (WK_REG L109-L159, WK_WAVEMAKER_2D_SPECTRAL_DATA L561-L654, CalcPeriodicTheta L898-L985, WK_(EQUAL_DFREQ_)IRREGULAR_WAVE L1776-L1814/L2003-L2041, WK_NEW_* retry variants L2363-L2408/L2601-L2663) with differing failure behavior (MPI_FINALIZE, clamp to pi/2-SMALL, or 0.001-rad decrement retry)"
+    },
+    {
+     "id": "F06-X8",
+     "text": "WK_WAVEMAKER_IRREGULAR_WAVE writes its periodic-adjusted angle back into the loop variable Theta @L1812/@L2039 inside the ktheta loop — subsequent ktheta iterations reuse the overwritten value only via recomputation @L1738; loop nesting is do kf { do ktheta } but end comments @L1828-1829/@L2055-2056 label them reversed ('end kf' on inner, 'end ktheta' on outer)"
+    },
+    {
+     "id": "F06-X9",
+     "text": "WK_TIME path (L300-L314) reads WAVE_COMP without allocating it in this file (allocation presumably in init/io based on NumWaveComp read elsewhere); T_brk=WAVE_COMP(NumWaveComp,1) @L285/@L311 takes the last component's period, and in WK_NEW_DATA2D T_brk=Freq(FreqCount) @L478 stores a frequency (not a period) — dimensional inconsistency between paths"
+    },
+    {
+     "id": "F06-X10",
+     "text": "width outputs are computed from the last wave_length value of the preceding loop in WK_NEW_EQUAL_DFREQ_IRREGULAR_WAVE (L2675-L2679: wkn recomputed but wave_length not recomputed before width=delta*wave_length/2) — width uses stale wave_length from the final kf iteration, unlike WK_WAVEMAKER_2D_SPECTRAL_DATA which recomputes wave_length @L698 before width @L699"
+    }
+   ],
+   "listY": [
+    {
+     "id": "F06-Y0",
+     "text": "Several error paths say STOP or diagnose invalid input but call MPI_FINALIZE without STOP, RETURN, or control transfer: zero depth/period at lines 102-105 and infeasible periodic-angle searches at lines 117-128 and 137-147 continue into later wavemaker logic after MPI has been finalized; CalcPeriodicTheta likewise finalizes at line 912 and continues at line 915. The initial period guard is additionally too late because 2*pi/Tperiod is already evaluated at line 98."
+    },
+    {
+     "id": "F06-Y1",
+     "text": "WK_DATA2D filters directions and compacts Dire and WAVE_COMP at lines 203-242, but never compacts Phase2D before using Phase2D(J,I) at lines 255-282. When rejected directions are interspersed, input phases remain indexed by original direction while amplitudes and directions use compacted indices."
+    },
+    {
+     "id": "F06-Y2",
+     "text": "In WK_NEW_DATA2D, an END condition on phase input at line 403 jumps directly to label 1100 at line 413, bypassing CLOSE(1) at line 405; the optional-phase-absent path leaks the open unit. The older WK_TIME path opens unit 1 at line 301 and has no corresponding close before its branch ends at line 314."
+    },
+    {
+     "id": "F06-Y3",
+     "text": "Initialization sets NumDir=2 at line 388 but allocates and passes measured-spectrum arrays with second extent 1 at lines 390-392 and 430-475; the called new generator explicitly declares those arrays (NumFreq,1) at lines 2340-2346 and CALCULATE_NEW_Cm_Sm ignores mtheta while declaring fixed second extent 1 at lines 2705-2709. The count interface and actual array shape therefore disagree and rely on the current implementations never indexing direction 2."
+    },
+    {
+     "id": "F06-Y4",
+     "text": "The WK_NEW_IRR one-direction branch initializes only theta(1) and AG(1) at lines 2522-2524, although both arrays have mfreq elements and later every AG(kf) and theta(kf) is consumed at lines 2558-2581 and 2602-2670. For mfreq greater than one this is direct use-before-assignment."
+    },
+    {
+     "id": "F06-Y5",
+     "text": "WK_NEW_EQUAL_DFREQ_IRREGULAR_WAVE declares displace_theta with extent mfreq at line 2505 but assigns the one-element result of MINLOC to the whole array at line 2526. Except when mfreq=1, the intrinsic assignment is shape-nonconforming even though only displace_theta(1) is subsequently used at line 2527."
+    },
+    {
+     "id": "F06-Y6",
+     "text": "phi1 is INTENT(OUT) at line 2498 but assigned at line 2653 only inside IF(PERIODIC), lines 2603-2663. The nonperiodic WK_NEW_IRR path returns phase_ir undefined and CALCULATE_NEW_Cm_Sm immediately consumes it through the calls at lines 504-510 and the expressions at lines 2742-2773."
+    },
+    {
+     "id": "F06-Y7",
+     "text": "Three irregular generators recompute peak-frequency omgn, tb, tc, and wkn at lines 1833-1836, 2059-2062, and 2675-2678, but then compute width from wave_length left over from the last component loop at lines 1837, 2063, and 2679. The recomputed peak wavenumber is unused, so width depends on the last component rather than the declared peak frequency."
+    },
+    {
+     "id": "F06-Y8",
+     "text": "Zero-period checks in WK_WAVEMAKER_REGULAR_WAVE and WK_WAVEMAKER_TIME_SERIES are ineffective because division by Tperiod occurs first at lines 2096 and 2150, before checks at lines 2100 and 2156. Other unguarded singular operations include 1/PeakPeriod at lines 278 and 472, df=(fmax-fmin)/(mfreq-1) at lines 1358, 1886, and 2511, 20/sigma_theta at lines 1118, 1390, 1676, 1914, and 2520, and Newton division by Fkdif at line 807."
+    },
+    {
+     "id": "F06-Y9",
+     "text": "The equal-energy frequency repair reads Freq(kff-1) when kff can be 1 at lines 1101-1104 and 1662-1665, and compares Freq(mfreq-1) without requiring mfreq>1 at lines 1112-1113 and 1669-1671. The equal-dfrequency routines separately divide by mfreq-1, so no branch safely supports mfreq=1 despite explicit mtheta==1 handling elsewhere."
+    },
+    {
+     "id": "F06-Y10",
+     "text": "SHOW_BREAKING in the WK_DATA2D branch indexes WAVE_COMP(NumWaveComp,1) at lines 284-286 although that array is allocated with first extent NumFreq at lines 169-171; no relation between NumWaveComp and NumFreq is established in this branch. The new-data branch assigns T_brk=Freq(FreqCount) at lines 477-479, a frequency, while other branches assign periods such as 1/FreqMax at lines 349-350 and 514-515, indicating a unit/interface inconsistency."
+    },
+    {
+     "id": "F06-Y11",
+     "text": "WAVE_COHERENCE can build an empty host list when idx_theta=0 and mtheta>mfreq, then indexes host_freqs_idx(0) at line 2829. It can also build an empty candidate pool, notably mtheta=1 where every frequency is a host, yet a positive coherence request enters lines 2859-2863; mfreq_temp is then zero and CEILING(rand(0)*mfreq_temp) produces index 0. Even with a nonempty pool, a random value exactly zero makes candidate_freq_idx zero at line 2861."
+    },
+    {
+     "id": "F06-Y12",
+     "text": "The dispersion/Newton and source-strength formulas repeatedly divide by depth, frequency, delta, wave length, rI, sinh(kh), energy integrals, and directional sums without coherent range validation (for example lines 674-687, 803-811, 855-878, 1150-1160, 1264-1287, 1422-1427, 2046-2053, 2442-2450, and 2575-2576). Exact wkn==0 repairs at lines 1206, 1477, 1763, 1990, and 2593 occur only after the square-root/division expression and do not catch NaN or near-zero denominators."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F06-X10",
+     "F06-Y7"
+    ]
+   ]
+  },
+  {
+   "file_token": "F07",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F07-X0",
+     "text": "All twelve arrays are indexed at hard-coded row ny=25 and overlaid by direction without any row-count or column-length compatibility check; any field with fewer than 25 rows causes range failure, and differing column counts misalign the plotted balance terms (L6-L18, L21, L25-L31, L38-L44)."
+    },
+    {
+     "id": "F07-X1",
+     "text": "Inputs are resolved beneath fdir='output/' at L1 and L6-L18, but the JPEG at L50 is written to the process working directory rather than fdir; the intended output location is not stated (L1, L6-L18, L50)."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F07-Y0",
+     "text": "No clear all at top — relies on a clean workspace; the twelve mean/radiation fields (OUT_Radiation etc.) must have been enabled in the FUNWAVE input for these files to exist; x-axis is grid index (no dx scaling) and ny=25 is case-specific"
+    }
+   ],
+   "candidate_pairs": []
+  },
+  {
+   "file_token": "F08",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F08-X0",
+     "text": "L331/L334 '!# if defined (1)' / '!# endif' — preprocessor directives left as comments in this build/pre preprocessed file; PERIODIC @L333 is unconditionally declared here, but the original conditional block boundary relation (L331-L334) is only visible via these comment markers"
+    },
+    {
+     "id": "F08-X1",
+     "text": "L358 commented-out declaration 'LOGICAL :: WAVE_DATA = .FALSE.' and L389 commented-out 'REAL(SP) :: PLOT_SMALLINTV' — disabled in this version; whether other code still references them is not determinable from this file"
+    },
+    {
+     "id": "F08-X2",
+     "text": "Kappa @L130, gamma1 @L168, gamma2 @L169, gamma3 @L171, Beta_1,Beta_2 @L174, a1,a2,b1,b2 @L176 are declared without initializers; the comment formulas @L133 and @L175 state relations whose actual assignments are not in this file"
+    },
+    {
+     "id": "F08-X3",
+     "text": "OUT_Time @L316 is the only OUT_* logical declared without a default initializer"
+    },
+    {
+     "id": "F08-X4",
+     "text": "alpha @L128 (RK coefficient array) vs alpha_c @L405 (coherence percentage) and beta @L129 vs Beta_ref @L172/Beta_1,Beta_2 @L174 are distinct same-stem identifiers declared far apart"
+    }
+   ],
+   "listY": [
+    {
+     "id": "F08-Y0",
+     "text": "The module sets MPI Cartesian reorder=.true. at L78, while misc.f90 passes the MPI_COMM_WORLD rank myid to MPI_CART_COORDS and builds ProcessorID/world-rank mappings without obtaining the reordered comm2d rank. This confirms a cross-file communicator/rank-interface mismatch: any actual reorder can assign wrong coordinates, tile ranges, neighbors and point-to-point destinations."
+    },
+    {
+     "id": "F08-Y1",
+     "text": "EtaBlowVal is declared without initialization at L384. In io.f90 its READ_FLOAT is commented and an unrelated stale ierr condition controls a 10.0 assignment; CHECK_BLOWUP later always compares against EtaBlowVal. Unless another initialization routine always assigns it, the stability check can use undefined data."
+    },
+    {
+     "id": "F08-Y2",
+     "text": "OUT_Time is the only flag in its declaration group without a module initializer at L315-L318. READ_INPUT normally supplies .FALSE. on a missing key, but any use before or on a failed/partial READ_INPUT path differs from every adjacent output flag and can observe an undefined logical."
+    },
+    {
+     "id": "F08-Y3",
+     "text": "Several module initializers conflict with READ_INPUT's absent-key defaults: MinDepth 0.001/MinDepthFrc 0.5/CFL 0.15/FroudeCap 10/SWE_ETA_DEP 0.7 at L149-L154 versus io.f90 assignments 0.1/0.1/0.5/3.0/0.8; DISPERSION .FALSE. at L177 versus .TRUE.; Csp 0.15 and CDsponge 0.0 at L378-L379 versus 0.1 and 5.0. The routine-level values overwrite them only after their reads, making pre-read consumers and alternate initialization paths configuration-dependent."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F08-X1",
+     "F08-Y1"
+    ],
+    [
+     "F08-X2",
+     "F08-Y3"
+    ],
+    [
+     "F08-X3",
+     "F08-Y2"
+    ],
+    [
+     "F08-X4",
+     "F08-Y3"
+    ]
+   ]
+  },
+  {
+   "file_token": "F09",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F09-X0",
+     "text": "The initial error vector uses length(h) at line 7 rather than the shape or length of omega/k; scalar h with vector omega starts with a scalar convergence mask and relies on the first Newton iteration to change its shape."
+    },
+    {
+     "id": "F09-X1",
+     "text": "For omega=0 or h=0, the initial estimate at line 3 evaluates 0/sqrt(tanh(0)), producing 0/0, and the relative error at line 12 also divides by k. No zero-frequency or zero-depth branch prevents NaN propagation."
+    },
+    {
+     "id": "F09-X2",
+     "text": "The Newton update divides by fp at line 11 without checking a zero or near-zero derivative, and the while loop at line 8 has no iteration limit or non-finite test; nonconvergent or NaN states can therefore run indefinitely or terminate with NaN because comparisons with NaN are false."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F09-Y0",
+     "text": "error is initialized with ones(length(h),1)' @L7 — sized by scalar h (length 1), not by the omega vector; the while condition still works because error is re-assigned @L12 to omega's shape after the first iteration, but the first-pass condition tests a single 1"
+    },
+    {
+     "id": "F09-Y1",
+     "text": "The local variable name 'error' shadows MATLAB's built-in error function inside this scope"
+    },
+    {
+     "id": "F09-Y2",
+     "text": "No iteration cap: the while loop @L8-L15 runs until convergence with tolerance .000001 on relative change — divergence (e.g. omega=0) would loop forever; f/fp sign convention: kn=k-f./fp @L11 with fp defined as the negative derivative of f w.r.t. k means the update is k+f/|fp'| — consistent as written since fp = -d(residual)/dk"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F09-X0",
+     "F09-Y0"
+    ]
+   ]
+  },
+  {
+   "file_token": "F10",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F10-X0",
+     "text": "The filename/header interface is inconsistent: the physical path is mod_meteo.f90, the embedded FILE label says mod_storm.F at L14, and the prose promises a METEO module at L57, but no MODULE declaration exists. Any build or caller expecting METEO from this unit would receive no symbol; the intended implementation location is not stated."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F10-Y0",
+     "text": "The entire METEO module body (declarations, subroutines) is absent from this preprocessed file — only comments survive between the header (L12-L63) and '! end meteo' @L65, indicating the meteo compile-time option was off when build/pre was generated; the actual module content cannot be determined from this file"
+    },
+    {
+     "id": "F10-Y1",
+     "text": "Header FILE line @L14 says 'mod_storm.F' while the file is named mod_meteo.f90 — source-file naming mismatch"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F10-X0",
+     "F10-Y0"
+    ],
+    [
+     "F10-X0",
+     "F10-Y1"
+    ]
+   ]
+  },
+  {
+   "file_token": "F11",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F11-X0",
+     "text": "SPC_angle.txt is loaded at line 35 but angle is never used; the output direction is hard-coded to zero at line 107, so Step_1's angle channel is discarded."
+    },
+    {
+     "id": "F11-X1",
+     "text": "Fnm, anm, and PHI_nm are created only inside the pair filter at lines 65-87, but are unconditionally read at lines 95-97. If the selected band has fewer than two components or no pair satisfies f(1)>f1 and f(2)<f2, those arrays are undefined and the script fails before output."
+    },
+    {
+     "id": "F11-X2",
+     "text": "The plotted IG series adds freq_low as an extra phase at line 130, while the exported Phase1 at lines 110 and 118 contains only phase_low and the combined reconstruction at line 133 likewise omits freq_low. The IG diagnostic trace is therefore inconsistent with the written spectrum."
+    },
+    {
+     "id": "F11-X3",
+     "text": "The Dnm calculation divides by omega(1)*omega(2) and the difference-wave dispersion residual at lines 75-77 without checking zero/duplicate frequencies or resonance, so Inf/NaN can reach anm at line 79 and the output at line 117."
+    },
+    {
+     "id": "F11-X4",
+     "text": "The comment at line 93 promises arranging difference frequencies by resolution, but lines 95-98 only alias the unsorted pair-order arrays. Repeated difference frequencies are neither sorted nor combined, despite later plots labelling an integrated series at lines 159 and 166."
+    },
+    {
+     "id": "F11-X5",
+     "text": "Nearest-cutoff indices n1 and n2 are used directly in fre1(n1:n2) and spc1(n1:n2) at lines 33 and 37 without checking ordering, equal lengths of the SPC inputs, or at least two retained points; malformed or descending frequency inputs can produce empty or mismatched arrays."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F11-Y0",
+     "text": "Pair-selection window @L65 requires f(1)>f1 AND f(2)<f2 with f1/f2 = peakf +/- 0.03 Hz — both members of the pair must lie inside the +/-LowFreqRange band around the peak; the comment @L62 says 'sort out using low frequency range' but the test constrains the parent short-wave frequencies, not the difference frequency fnm"
+    },
+    {
+     "id": "F11-Y1",
+     "text": "If no pair satisfies the window, anm/Fnm/PHI_nm are never created and L95-L98 would error — no guard"
+    },
+    {
+     "id": "F11-Y2",
+     "text": "IGW_each @L130 repeats the dimensional oddity of adding freq_low inside the cosine argument (diagnostic plots only); element-wise vector-times-row-time products (L128, L130, L133) rely on implicit expansion as in the 2_wave_components script"
+    },
+    {
+     "id": "F11-Y3",
+     "text": "Header comment block (L1-L13) is identical to IG_wave_generation.m including 'output file: spectrum_random_phase.txt' — here the name matches the actual output, confirming the 2_wave_components copy diverged"
+    },
+    {
+     "id": "F11-Y4",
+     "text": "lambda @L70, Knm @L82, omega_nm @L72, Eng1 @L109, E @L140, angle @L35 are computed/loaded but unused in the written output; variable 'angle' shadows the MATLAB builtin"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F11-X1",
+     "F11-Y1"
+    ]
+   ]
+  },
+  {
+   "file_token": "F12",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F12-X0",
+     "text": "Fr after MPI_ALLREDUCE(MPI_MAX) @L131-L132 is the maximum phase speed across ranks, not the phase speed at the location of the global UTotalMax — the printed Froude number UTotalMax/Fr (L144, L156) mixes extrema from different ranks (cross-line L108-L110 vs L129-L132)"
+    },
+    {
+     "id": "F12-X1",
+     "text": "Energy accumulation (L92-L94) is not MASK-guarded, unlike MassVolume (L88-L90) — dry cells contribute 0.5*g*H^2 terms"
+    },
+    {
+     "id": "F12-X2",
+     "text": "NaN check runs only on rank 0 (guard @L165) on the already-reduced values, and MPI_ABORT @L193 is called from rank 0 only — hang risk if other ranks are inside a collective is not addressed in this file; ISNAN is a compiler extension"
+    },
+    {
+     "id": "F12-X3",
+     "text": "MassVolume0 @L71, MaxM @L70, FirstCallStatistics @L72-L73 declared/initialized but never used afterwards in this file; locals initialized in declarations (L68-L70) acquire implicit SAVE, though L78-L80 re-zeroes the accumulators each call (MaxEta/MinEta/MaxU/MaxV/Fr are fully overwritten @L98-L115)"
+    },
+    {
+     "id": "F12-X4",
+     "text": "Dmass (wet-dry mass, printed @L144/L156 and NaN-checked @L176) is computed elsewhere — not updated in this file"
+    }
+   ],
+   "listY": [
+    {
+     "id": "F12-Y0",
+     "text": "L108-L111은 각 rank의 로컬 최대 UTotal 위치에서 Fr을 짝지어 계산하지만, L129와 L131은 UTotalMax와 Fr을 별도의 MPI_MAX로 축약한다. 두 최대값이 서로 다른 rank에서 올 수 있어 L144/L156/L175의 UTotalMax/Fr가 전역 최대속도 위치의 Froude 수라는 짝 관계를 보존하지 않는다."
+    },
+    {
+     "id": "F12-Y1",
+     "text": "Fr는 L69의 선언 초기화 때문에 저장 수명을 가지지만, 호출 시작 시 L78-L80은 MassVolume/Energy/UTotalMax만 재설정하고 Fr은 재설정하지 않는다. wet cell이 없거나 모든 wet-cell 속도가 0이면 L108-L111 대입이 실행되지 않고 L115의 ZERO 검사도 이전 호출의 비영값 때문에 무력화되어 오래된 Fr이 출력될 수 있다."
+    },
+    {
+     "id": "F12-Y2",
+     "text": "MassVolume0(L71), FirstCallStatistics(L72-L73), MaxM(L70)은 이후 참조되지 않아, 이름상 의도된 최초 질량 기준/호출 상태/최대 질량 계산이 구현 흐름에 연결되지 않는다."
+    },
+    {
+     "id": "F12-Y3",
+     "text": "CHECK_STATISTICS는 L189에서 ISNAN만 검사하므로 overflow로 생성된 무한대 값은 L193의 MPI_ABORT 경로를 통과하지 않는다."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F12-X0",
+     "F12-Y0"
+    ],
+    [
+     "F12-X0",
+     "F12-Y1"
+    ],
+    [
+     "F12-X2",
+     "F12-Y3"
+    ],
+    [
+     "F12-X3",
+     "F12-Y0"
+    ],
+    [
+     "F12-X3",
+     "F12-Y1"
+    ],
+    [
+     "F12-X3",
+     "F12-Y2"
+    ],
+    [
+     "F12-X4",
+     "F12-Y0"
+    ]
+   ]
+  },
+  {
+   "file_token": "F13",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F13-X0",
+     "text": "the original mod_foam.F content (the foam model compiled under its preprocessor flag) is not recoverable from this preprocessed file; PREVIEW in io.f90 retains a '! foam / ! end foam' placeholder consistent with the feature being compiled out (cross-file)"
+    }
+   ],
+   "listY": [],
+   "candidate_pairs": []
+  },
+  {
+   "file_token": "F14",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F14-X0",
+     "text": "Loop indices I,J and temporaries tmp1,tmp2 (L203-204) and tmp1..tmp4 (L257-264) are not declared in any subroutine here; they must come from the PARAM module (cross-file)"
+    },
+    {
+     "id": "F14-X1",
+     "text": "Header comments call DERIVATIVE_XY_HIGH/XX_HIGH/YY_HIGH '4th-derivative' (L240,L274,L301) but the code computes 4th-order-accurate first cross- and second derivatives — comment/code mismatch"
+    },
+    {
+     "id": "F14-X2",
+     "text": "DERIVATIVE_Y_High/X_High are titled 'first-derivative with higher-order' (L57,L83) but their stencil (u(+2)+2u(+1)-2u(-1)-u(-2))/(8h) differs from the standard 4th-order formula (-u(+2)+8u(+1)-8u(-1)+u(-2))/(12h) used inside DERIVATIVE_XY_HIGH (L257-264); the actual order/derivation is not stated in the file"
+    },
+    {
+     "id": "F14-X3",
+     "text": "DERIVATIVE_XX and DERIVATIVE_XX_HIGH both carry the comment 'I assume no 2nd derivative' (L228,L289) whose meaning in context is not explained"
+    }
+   ],
+   "listY": [
+    {
+     "id": "F14-Y0",
+     "text": "The HIGH routine comments call DERIVATIVE_XY_HIGH, DERIVATIVE_XX_HIGH, and DERIVATIVE_YY_HIGH '4th-derivative' operators at lines 240, 274, and 301, but their formulas at lines 257-266, 292-293, and 318-319 compute a mixed second derivative or pure second derivatives using fourth-order-accurate stencils; derivative order and accuracy order are conflated."
+    },
+    {
+     "id": "F14-Y1",
+     "text": "DERIVATIVE_Y_High and DERIVATIVE_X_High are described as higher-order at lines 57 and 83, but coefficients [1,2,-2,-1]/(8h) in lines 74-75 and 101-102 have a nonzero cubic Taylor moment and therefore remain second-order accurate; the intended provenance of this nonstandard wide stencil is not stated."
+    },
+    {
+     "id": "F14-Y2",
+     "text": "Comments 'I assume no 2nd derivative' at lines 228 and 289 directly precede active xx second-derivative calculations at lines 231-232 and 292-293, so the comments contradict executable code."
+    },
+    {
+     "id": "F14-Y3",
+     "text": "All HIGH kernels access I or J offsets of plus/minus two at lines 74-75, 101-102, 257-266, 292-293, and 318-319, but their loops use the caller bounds without boundary checks; whether every caller supplies a two-cell halo is unresolved in this file."
+    },
+    {
+     "id": "F14-Y4",
+     "text": "DERIVATIVE_XY and DERIVATIVE_XY_HIGH assign tmp1 through tmp4 at lines 203-204 and 257-263 without local declarations under IMPLICIT NONE, so they must be module entities imported wholesale from PARAM. If PARAM storage is shared, concurrent calls are not reentrant/thread-safe; PARAM declarations are outside this file."
+    },
+    {
+     "id": "F14-Y5",
+     "text": "MASK is INTEGER at each declaration but is used as a multiplicative scale rather than a logical branch throughout; admissible values are not constrained here, so values other than 0 or 1 would rescale derivatives."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F14-X0",
+     "F14-Y4"
+    ],
+    [
+     "F14-X1",
+     "F14-Y0"
+    ],
+    [
+     "F14-X1",
+     "F14-Y2"
+    ],
+    [
+     "F14-X2",
+     "F14-Y1"
+    ]
+   ]
+  },
+  {
+   "file_token": "F15",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F15-X0",
+     "text": "Use-before-assign 가능성: AmpData1은 L157-L161에서 할당되지만 초기 스펙트럼 읽기는 AmpData2만 채운다(L218-L221). AmpData1의 첫 대입은 TIME이 두 시각보다 큰 분기 내부 L272뿐인데, L300-L315는 그 분기 밖에서 AmpData1을 항상 식의 피연산자로 참조한다. TIME<=TimeSpectra1이면 가중치가 0이어도 미정의 배열 원소 평가가 발생할 수 있다."
+    },
+    {
+     "id": "F15-X1",
+     "text": "범위초과/복붙 첨자 결함: L360-L377의 DO I=1,NumFreq 종료 후 I는 통상 NumFreq+1이고, 이어지는 DO KK=1,NumFreq 내부 L386과 L388이 Theta_2D(KK,KKK)가 아니라 Theta_2D(I,KKK)에 기록한다. Theta_2D는 L157-L161에서 (NumFreq,NumDir)로 할당되므로 bounds checking 시 범위초과이며, 검사 없이도 모든 KK 방향값을 올바른 주파수 행에 채우지 못한다."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F15-Y0",
+     "text": "CALCULATE_DATA2D_Cm_Sm_TIME periodic block (L380-L392) loops DO KK=1,NumFreq @L382 / DO KKK=1,NumDir @L383 but assigns Theta_2D(I,KKK) @L386/@L388 using I (module-level loop variable from GLOBAL) instead of KK — only row I of Theta_2D is written while the accumulation loops read Theta_2D(KK,KKK) @L419 etc.; cross-line defect L382-L391 vs L418-L447"
+    },
+    {
+     "id": "F15-Y1",
+     "text": "Label 120 @L317 (EOF target from @L278) is placed before the Dep_Ser update @L319 and the CALL @L321, so after spectra data runs out the code still recomputes Dep_Ser and Cm/Sm each step while Amp_Ser update @L315 is skipped; comment @L317 mentions 'vessel Kves' — copied from a vessel module"
+    },
+    {
+     "id": "F15-Y2",
+     "text": "tmp1/tmp2 both remain ZERO when TIME <= TimeSpectra1 (L300-L313), making Amp_Ser=0 @L315 before the first spectra time instead of holding AmpData1"
+    },
+    {
+     "id": "F15-Y3",
+     "text": "Dep_Ser @L319 uses Depth(1,1) — the local (per-processor, ghost-corner) depth cell, so Dep_Ser differs across MPI ranks and from the physical wavemaker location; also Newton wavenumbers (L358-L378) are computed once (SAVEd flag) with the then-current Dep_Ser and never updated though Dep_Ser changes each call"
+    },
+    {
+     "id": "F15-Y4",
+     "text": "Phase conversions use literal 3.1415926 (L188, L195) while pi/PI from PARAM is used elsewhere (L177, L361); rand(0) @L195 is a compiler extension and per-rank reproducibility/synchronization of random phases across MPI ranks is not established in this file"
+    },
+    {
+     "id": "F15-Y5",
+     "text": "Per_Ser is loaded with frequency then inverted @L171 — after L171 Per_Ser holds periods; Amp_Ser is indexed (KK=freq, KKK=dir) while the input matrices are read as (row=direction, implied-do over frequency) @L184/L219/L292 — consistent internally but transposed relative to file layout"
+    },
+    {
+     "id": "F15-Y6",
+     "text": "Unit 400 (spectra index file) is opened @L150 and never closed in this file; unit 401 is reopened/closed per amplitude file; locals SpectraName @L122, WHAT after reads, rII,rJJ @L264, K @L348, tmp_eta,tmp_u,tmp_v @L352, myvar @L109, Fact @L395, NameSpectra1/TimeSpectra1 usage after L270 shift are declared/assigned but partly unused"
+    },
+    {
+     "id": "F15-Y7",
+     "text": "TIME_SPECTRA_PROTECTION mismatched message pair @L250-L251 (log says 'TideBcType = DATA', stdout omits '= DATA'); comment @L125 'read precipitation from input.txt' is a copy-paste from the precipitation module"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F15-X0",
+     "F15-Y1"
+    ],
+    [
+     "F15-X0",
+     "F15-Y2"
+    ],
+    [
+     "F15-X0",
+     "F15-Y3"
+    ],
+    [
+     "F15-X0",
+     "F15-Y5"
+    ],
+    [
+     "F15-X0",
+     "F15-Y6"
+    ],
+    [
+     "F15-X1",
+     "F15-Y0"
+    ],
+    [
+     "F15-X1",
+     "F15-Y3"
+    ],
+    [
+     "F15-X1",
+     "F15-Y4"
+    ]
+   ]
+  },
+  {
+   "file_token": "F16",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F16-X0",
+     "text": "The final regular aggregation block begins at ii=1591 and consumes E(1591:1620) under lines 40-44, but the residual block starts at trun+sk=1631 at line 46. E(1621:1630) is omitted from both EE blocks, so E_t at line 50 is not energy-conservative relative to E_total at line 31."
+    },
+    {
+     "id": "F16-X1",
+     "text": "Hard-coded slices require at least 100 rows and three columns at lines 24-25, at least 1620 integrated bins for the loop at lines 40-44, f(1646) at line 45, and E(1631:end) at line 46. No size check precedes these accesses, so shorter input_data_case1.txt files fail out of range."
+    },
+    {
+     "id": "F16-X2",
+     "text": "depth and peak_freq are hard-coded at lines 18-19 rather than derived from input_data_case1.txt, and the output angle is likewise hard-coded to zero at lines 83 and 101; the generated SPC/FUNWAVE files cannot preserve differing case metadata present outside this script."
+    },
+    {
+     "id": "F16-X3",
+     "text": "df and dff use only the first spacing at lines 35 and 47, while E itself uses every local spacing at line 28. The plotted densities at lines 63 and 66 therefore assume equal spacing without checking it, even though the energy integration supports nonuniform f."
+    },
+    {
+     "id": "F16-X4",
+     "text": "The third plotted series E_IG_data is added at line 67, but the legend at line 72 supplies only two labels, leaving the displayed series-to-label mapping incomplete."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F16-Y0",
+     "text": "depth=13.0 @L18 and peak_freq=0.158 @L19 are hardcoded for case1 rather than derived from the loaded data — must be edited per case"
+    },
+    {
+     "id": "F16-Y1",
+     "text": "The loop bound trun=1601 @L38 and tail index f(trun+floor(sk+sk/2)) @L45 assume input_data_case1.txt has enough rows (>1646); the last band-average window E(ii:ii+sk-1) @L42 with ii up to 1591 also requires length(E)>=1620 — no bounds checking"
+    },
+    {
+     "id": "F16-Y2",
+     "text": "Amp uses EE(2:end-1) @L56 — the first and last (tail) bins are dropped from the written components (Hsig_resolved @L54 measures exactly what is kept); the energy in bin 1 and the tail bin is silently discarded from the FUNWAVE input"
+    },
+    {
+     "id": "F16-Y3",
+     "text": "spectrum_windwave_only.txt is written without a phase block (only amplitudes @L110), unlike the two-component file written by IG_wave_generation.m — the downstream reader must supply random phases"
+    },
+    {
+     "id": "F16-Y4",
+     "text": "The written frequency resolution is nonuniform at the tail (dff computed @L47 from the first two centers only); df @L35 'for equal increment' is used only for plotting normalization @L63"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F16-X2",
+     "F16-Y0"
+    ]
+   ]
+  },
+  {
+   "file_token": "F17",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F17-X0",
+     "text": "[peakf,peakd]=find(Amp==v1) @L68 can return multiple cells for ties (subsequent scalar use assumes one); v1 from max(max(Amp)) @L67 while ind1 is unused"
+    },
+    {
+     "id": "F17-X1",
+     "text": "Phase @L86 uses size(Amp_model) as [ndd nff] naming directions-first but Amp_model is (freq,dir) — the plotted phase field's orientation vs pcolor(Dire_model,Freq_model,Phase) @L119 relies on rand's shape matching by accident; the written Phase_input @L137 is regenerated separately with a different shape ([nd nf]=size(Amp_input') effectively), so plot and file phases differ"
+    },
+    {
+     "id": "F17-X2",
+     "text": "1D amplitude conversion @L159 omits the ddire factor (uses Amp_Frq_model*dfreq*8 where Amp_Frq_model already integrated over direction @L83 with *ddire) — consistent by construction, but the asymmetry with @L133 is implicit; the 1D file has no phase block"
+    },
+    {
+     "id": "F17-X3",
+     "text": "Axis limits (0-8 S(f) @L39, 0-0.008 S(theta) @L47) and contour levels @L50 are dataset-specific; -71.8 deg rotation constant @L16 is FRF-array-specific and undocumented beyond the 'rotate 0 deg' comment; angle_end @L12, ind1, Hrms/Hrms_model computed but unused in output"
+    }
+   ],
+   "listY": [
+    {
+     "id": "F17-Y0",
+     "text": "The centered truncation formulas are inclusive at both ends: with an interior peak and even NFreq=50 or NDir=30 (L69-L72), L73-L74 select 51 or 31 indices respectively, exceeding the variables named as maxima by one."
+    },
+    {
+     "id": "F17-Y1",
+     "text": "Peak ties are not reduced to one location: find at L68 can return vector peakf/peakd, while colon ranges at L73-L74 require scalar endpoints; tied global maxima can therefore make truncation fail or become ambiguous (L67-L74)."
+    },
+    {
+     "id": "F17-Y2",
+     "text": "The truncated frequency subplot plots x=Amp_Frq_model and y=Freq_model at L93, but L94-L95 label the y-axis as spectral density and x-axis as frequency, the reverse of both the plotted arguments and the corresponding raw subplot labels at L35-L37."
+    },
+    {
+     "id": "F17-Y3",
+     "text": "The displayed phase is generated as Phase at L86 and plotted at L119, but the phase written to wave2d_frf.txt is independently regenerated as Phase_input at L137 and appended at L151; the phase panel therefore does not depict the output realization (L86, L119, L137, L151)."
+    },
+    {
+     "id": "F17-Y4",
+     "text": "The 2-D amplitude is explicitly transposed to direction-by-frequency layout at L133-L136 before writing at L150, whereas the 1-D amplitude derived as a frequency-column vector at L159 is not transposed before L166 even though L162 declares NumDir=1; whether the consumer reads a flat stream or requires the same NumDir-by-NumFreq row layout is unresolved (L133-L136, L150, L159, L162, L166)."
+    },
+    {
+     "id": "F17-Y5",
+     "text": "angle_end is assigned at L12 but never referenced through EOF L170; thmax instead derives solely from NumDir at L17, so changing angle_end has no effect on the direction grid (L12, L17-L19)."
+    },
+    {
+     "id": "F17-Y6",
+     "text": "Each output remains open through fid after fprintf (L145-L149 and L161-L165) while dlmwrite separately appends to the same pathname before fclose (L150-L153 and L166-L168); ordering and buffering behavior for the two simultaneous file access paths is not established in this file."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F17-X0",
+     "F17-Y0"
+    ],
+    [
+     "F17-X0",
+     "F17-Y1"
+    ],
+    [
+     "F17-X1",
+     "F17-Y3"
+    ],
+    [
+     "F17-X1",
+     "F17-Y4"
+    ],
+    [
+     "F17-X2",
+     "F17-Y3"
+    ],
+    [
+     "F17-X2",
+     "F17-Y4"
+    ],
+    [
+     "F17-X2",
+     "F17-Y6"
+    ],
+    [
+     "F17-X3",
+     "F17-Y2"
+    ],
+    [
+     "F17-X3",
+     "F17-Y5"
+    ]
+   ]
+  },
+  {
+   "file_token": "F18",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F18-X0",
+     "text": "The history says 'put in the sediment module' at L62, yet this file contains no MODULE declaration or implementation. The expected sediment/morphodynamic interface and implementation location are absent from this unit."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F18-Y0",
+     "text": "The entire SEDIMENT module body is absent from this preprocessed file — only the comment header (L12-L63) and '! end sediment' @L65 remain; the sediment transport/morphology implementation cannot be determined from this file (compile-time sediment option was off when build/pre was generated)"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F18-X0",
+     "F18-Y0"
+    ]
+   ]
+  },
+  {
+   "file_token": "F19",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F19-X0",
+     "text": "The entire VESSEL module body is absent (preprocessor-excluded); only the comment header and '! end vessel' @L64 remain, so the ship-wake implementation cannot be determined from this file"
+    },
+    {
+     "id": "F19-X1",
+     "text": "FILE line @L14 spells the source name 'vessle.F' (typo) versus the file name mod_vessel.f90"
+    }
+   ],
+   "listY": [
+    {
+     "id": "F19-Y0",
+     "text": "구현/복붙 정합성 결함: VESSEL ship-wake module이라고 선언하지만(L57) 실제 모듈이나 프로시저가 없고, L14 표제의 vessle.F는 경로 mod_vessel.f90와도 철자가 불일치한다. 의도된 구현이 별도 전처리 단계에서 주입되는지 또는 이 빌드 사본에서 누락됐는지는 원문만으로 결정할 수 없다."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F19-X1",
+     "F19-Y0"
+    ]
+   ]
+  },
+  {
+   "file_token": "F20",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F20-X0",
+     "text": "The initial error vector uses length(h) at line 7 rather than the shape or length of omega/k; scalar h with vector omega starts with a scalar convergence mask and relies on the first iteration to change shape."
+    },
+    {
+     "id": "F20-X1",
+     "text": "For omega=0 or h=0, the initial estimate at line 3 evaluates 0/sqrt(tanh(0)), and the relative error at line 12 also divides by k. No zero-frequency or zero-depth branch prevents NaN propagation."
+    },
+    {
+     "id": "F20-X2",
+     "text": "The Newton update divides by fp at line 11 without a zero/near-zero derivative check, and the while loop at line 8 has no iteration limit or non-finite test; nonconvergent states can loop indefinitely, while NaN can terminate the comparison with an invalid result."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F20-Y0",
+     "text": "error is initialized with ones(length(h),1)' @L7 — sized by scalar h (length 1), not by the omega vector; the while condition still works because error is re-assigned @L12 to omega's shape after the first iteration, but the first-pass condition tests a single 1"
+    },
+    {
+     "id": "F20-Y1",
+     "text": "The local variable name 'error' shadows MATLAB's built-in error function inside this scope"
+    },
+    {
+     "id": "F20-Y2",
+     "text": "No iteration cap: the while loop @L8-L15 runs until convergence with tolerance .000001 on relative change — divergence (e.g. omega=0) would loop forever; f/fp sign convention: kn=k-f./fp @L11 with fp defined as the negative derivative of f w.r.t. k means the update is k+f/|fp'| — consistent as written since fp = -d(residual)/dk"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F20-X0",
+     "F20-Y0"
+    ]
+   ]
+  },
+  {
+   "file_token": "F21",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F21-X0",
+     "text": "DEG2RAD=0.0175 at L80 is inconsistent with the module's own pi at L71: pi/180 is approximately 0.0174532925, so every direction conversion using DEG2RAD has about 0.267% scale error."
+    },
+    {
+     "id": "F21-X1",
+     "text": "RHO_AW is documented as air density relative to water and set to 0.0012041 at L77, while the adjacent absolute values RHO_AIR/RHO_WATER at L78-L79 imply 0.00115. The two density representations differ by about 4.7%, so routines choosing one or the other do not share the same air-water ratio."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F21-Y0",
+     "text": "pi @L71 is the only PARAMETER literal without an _SP kind suffix (default real, then converted); DEG2RAD @L80 = 0.0175 is a truncated pi/180 (0.017453...) — precision relation with pi @L71 is implicit, not stated in the file"
+    },
+    {
+     "id": "F21-Y1",
+     "text": "Module-level mutable scratch variables I,J,K,RES @L83 and itmp/tmp sets @L84-L85 are shared across every routine that USEs PARAM (no SAVE statement, no protection) — which routines rely on them is not determinable from this file"
+    },
+    {
+     "id": "F21-Y2",
+     "text": "SP=SELECTED_REAL_KIND(6,30) @L67 fixes single precision and MPI_SP=MPI_REAL @L68 must stay consistent with it; any double-precision build would need both changed together (cross-line relation L67-L68)"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F21-X0",
+     "F21-Y0"
+    ],
+    [
+     "F21-X0",
+     "F21-Y1"
+    ],
+    [
+     "F21-X0",
+     "F21-Y2"
+    ],
+    [
+     "F21-X1",
+     "F21-Y0"
+    ],
+    [
+     "F21-X1",
+     "F21-Y1"
+    ]
+   ]
+  },
+  {
+   "file_token": "F22",
+   "lang": ".m",
+   "listX": [],
+   "listY": [
+    {
+     "id": "F22-Y0",
+     "text": "Time labels '20'/'100' sec @L19 vs file numbers 10/50 @L18 imply a 2 s output interval — consistency with the case's input.txt PLOT_INTV is assumed, not checked; 'min' shadows the builtin and the label says sec while the commented variant calls it minutes"
+    },
+    {
+     "id": "F22-Y1",
+     "text": "Commented print name @L62 references the inlet_shoal case (copied template); the zbuffer renderer @L59 is removed in newer MATLAB versions"
+    }
+   ],
+   "candidate_pairs": []
+  },
+  {
+   "file_token": "F23",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F23-X0",
+     "text": "ALLOCATE_VARIABLES allocates V4xL/V4xR and U4yL/U4yR with the other dispersive face arrays at lines 154-155, but INITIALIZATION zeros only U4xL/U4xR and V4yL/V4yR at lines 361-364. No assignment to V4xL/V4xR or U4yL/U4yR appears elsewhere in this file before initialization returns. Flux construction reads all four directional pairs, including in non-dispersive paths, so these omitted initializations are a copy-pattern asymmetry and can expose undefined allocated values before a reconstruction writes them."
+    },
+    {
+     "id": "F23-X1",
+     "text": "The blow-up threshold is set to 100 times the maximum absolute interior Depth at line 617 and globally maximized at lines 618-619. A zero-depth domain therefore produces EtaBlowVal=0 with no positive floor in this file, leaving any downstream absolute-threshold test dependent on external handling."
+    },
+    {
+     "id": "F23-X2",
+     "text": "INITIALIZATION declares WHAT at line 264 but never references it in active code; the declaration appears stale."
+    },
+    {
+     "id": "F23-X3",
+     "text": "The breakwater reader opens fixed unit 1 and performs nested formatted READ statements at lines 783-787 without IOSTAT or ERR handling. The preceding existence check detects only a missing file, so malformed or short rows terminate through runtime I/O behavior rather than the file's explicit MPI shutdown path."
+    },
+    {
+     "id": "F23-X4",
+     "text": "The MLP/WENO reconstruction kernels require up to three ghost indices; this initializer builds MASK9 only over Ibeg:Iend,Jbeg:Jend at lines 826-831 and relies on PHI_INT_EXCH at lines 834-835 for ghosts. The required relationship between Nghost and those later stencil widths is not asserted here."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F23-Y0",
+     "text": "CHARACTER WHAT (L264) and INT2FLO/tmp4preview allocations (L157-158) are declared/allocated but not used in this file"
+    },
+    {
+     "id": "F23-Y1",
+     "text": "nu_break is allocated twice when WAVEMAKER_VIS is true: unconditionally at L191 (=nu_bkg L192) and again inside IF(WAVEMAKER_VIS) at L201 (=ZERO L202) — a second ALLOCATE of an already-allocated array is a runtime error unless the compiler tolerates it; relation not resolvable in-file"
+    },
+    {
+     "id": "F23-Y2",
+     "text": "U4xL/U4xR/V4yL/V4yR are zeroed (L361-364) but V4xL/V4xR/U4yL/U4yR allocated at L150-151 are not zero-initialized in INITIALIZATION — asymmetry with no in-file rationale"
+    },
+    {
+     "id": "F23-Y3",
+     "text": "INITIALIZATION zeroes PLOT_COUNT=0 at L436 then overwrites PLOT_COUNT=PLOT_INTV at L481 (same for PLOT_COUNT_STATION L437/L482, SCREEN_COUNT L441/L484) — the first assignments are dead"
+    },
+    {
+     "id": "F23-Y4",
+     "text": "the empty IF branches IF(Gamma3>ZERO)THEN/ELSE (L488-493) and IF(DISPERSION)/ELSE (L495-500) rely on comments only; Beta_ref, Gamma1-3, MinDepth, MinDepthFrc, LARGE, nu_bkg values come from GLOBAL/input (cross-file)"
+    },
+    {
+     "id": "F23-Y5",
+     "text": "GetFile, DISTRIBUTE_VarGlob, PHI_COLL, PHI_INT_EXCH, CORRECTION, WAVEMAKER_INITIALIZATION, CALCULATE_* , INITIAL_* , CAL_DISPERSION, CALCULATE_CD_BREAKWATER are defined in other files (cross-file)"
+    },
+    {
+     "id": "F23-Y6",
+     "text": "BREAKWATER read is rank-0 only (L784-807) and BreakWaterWidth is deallocated at L811 right after CALCULATE_CD_BREAKWATER — how non-zero ranks receive the width data must happen inside CALCULATE_CD_BREAKWATER (cross-file)"
+    },
+    {
+     "id": "F23-Y7",
+     "text": "ilo/ihi/jlo/jhi are computed (L878-895) for the Salatin wavemaker speedup but consumed in source.F per comment L875 (cross-file)"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F23-X0",
+     "F23-Y2"
+    ]
+   ]
+  },
+  {
+   "file_token": "F24",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F24-X0",
+     "text": "WK_Source computation is fully commented out (L125-130,L136) — wavemaker mass source now comes from WaveMaker_Mass computed in sources.F per comment L123"
+    },
+    {
+     "id": "F24-X1",
+     "text": "locals kf,kd (L77) and IM (L273) are declared but unused in this file (kf appears only in the commented-out WK_Source block L126-130)"
+    },
+    {
+     "id": "F24-X2",
+     "text": "tmp1..tmp4, I, J, and all state arrays (P,Q,Fx,Fy,Gx,Gy,SourceX,SourceY,Eta,Eta0,Ubar,Vbar,ALPHA,BETA,DXg,DYg,b1,b2,Gamma1,Gamma2,Gamma3,MASK,MASK9,Wsurf,WaveMaker_Mass,CrestLimit,TroughLimit,FroudeCap,iista,jjsta,n_west,MPI_PROC_NULL etc.) come from USE GLOBAL — cross-file definitions"
+    },
+    {
+     "id": "F24-X3",
+     "text": "ALPHA(ISTEP)/BETA(ISTEP) RK stage coefficients (L210,L232,L247) are defined elsewhere; the '3rd-order LK scheme' of header L58 vs 'MUSCL-Hancock, Zhou et al., p. 7' of L79 refer to external references not resolvable in-file"
+    },
+    {
+     "id": "F24-X4",
+     "text": "condition IF(tmp2.NE.0.0_SP.OR.MASK(I,J).GT.0) (L318,L368) mixes an OR where an AND might be expected (a dry cell with tmp2/=0 still divides by tmp2); intent not stated in file"
+    },
+    {
+     "id": "F24-X5",
+     "text": "TRIDx/TRIDy/TRIDy_periodic (L330,L384,L387) are defined in another file"
+    },
+    {
+     "id": "F24-X6",
+     "text": "the four wavemaker branches WK_IRR-group/WK_REG/WK_TIME/WK_DATA2D (L110-193) compute identical R1 expressions differing only by which wavemaker string matches; LEFT_BC_IRR affects only the tridiagonal RHS (L309-314), not R1"
+    }
+   ],
+   "listY": [
+    {
+     "id": "F24-Y0",
+     "text": "The x-system guard at line 318 uses tmp2.NE.0.0_SP OR MASK(I,J).GT.0, followed by divisions by tmp2 at lines 319-321. For any wet cell with MASK>0, tmp2==0 still enters the division branch, so the singularity check is ineffective."
+    },
+    {
+     "id": "F24-Y1",
+     "text": "The same OR-condition/division pattern is duplicated for the y system at lines 368-371, independently allowing division by zero in a wet cell."
+    },
+    {
+     "id": "F24-Y2",
+     "text": "ISTEP is accepted without a local range check at line 68 and indexes ALPHA and BETA at lines 210, 232, and 247; array safety depends on the caller enforcing the stage range."
+    },
+    {
+     "id": "F24-Y3",
+     "text": "The continuity residual divides by global DXg and DYg at lines 132-198, and momentum residuals divide by DX and DY at lines 228-245, without local nonzero-spacing checks; safety depends on initialization invariants outside this file."
+    },
+    {
+     "id": "F24-Y4",
+     "text": "WK_Source, kf, kd, and IM are declared at lines 70, 77, and 273 but have no active-code use in this file; their apparent uses are commented out or absent."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F24-X1",
+     "F24-Y4"
+    ]
+   ]
+  },
+  {
+   "file_token": "F25",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F25-X0",
+     "text": "Grid dimensions are taken only from eta_00001 at lines 4-10, but u, v, ht, and mask for each fnum are loaded at lines 30-33 and indexed together at lines 35-47 without shape checks. Any output whose dimensions differ from eta_00001 or from its peer fields causes logical-index or plotting dimension failures."
+    },
+    {
+     "id": "F25-X1",
+     "text": "The only image-export command is commented out at line 68, so despite configuring paper size at line 23 the script produces no persistent output file."
+    },
+    {
+     "id": "F25-X2",
+     "text": "Sponge/wavemaker polygons and labels are hard-coded in physical coordinates at lines 12-15 and 50-55; their positions are not derived from input metadata and can lie outside or mislabel grids whose extent differs from this case."
+    },
+    {
+     "id": "F25-X3",
+     "text": "The variable min is defined at line 19 but its sole title use is commented at line 45; nfile can be lengthened independently of min without any active time annotation or validation."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F25-Y0",
+     "text": "quiver @L47 indexes the 1-D vectors x,y with 2-D subscripts (1:sk:end,1:sk:end) — for row/column vectors the second subscript degenerates, so the x/y arguments become subsampled vectors while u,v are subsampled 2-D arrays; relies on quiver's vector-input broadcasting"
+    },
+    {
+     "id": "F25-Y1",
+     "text": "pcolor(x,y,ht) @L41 plots Hsig but the commented ylabel text @L63-L64 says '\\eta (m)' and the commented print name @L68 references the inlet_shoal case — copied from another script; cell variable 'min' @L19 shadows the MATLAB builtin and its '200' label is unused (title commented @L45)"
+    },
+    {
+     "id": "F25-Y2",
+     "text": "caxis([-0. 1]) @L43 uses negative zero as lower bound; dx/dy hardcoded 2.0 must match the case's input.txt"
+    }
+   ],
+   "candidate_pairs": []
+  },
+  {
+   "file_token": "F26",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F26-X0",
+     "text": "window-closing branch adds the final step to the sums and immediately computes means before resetting, but the reset keeps T_sum remainder (T_sum=T_sum-T_INTV_mean @L235, ykchoi's own comment questions whether it should be ZERO) — the first window after reset divides fresh sums by a T_sum that starts at the remainder, biasing the next means; unresolved intent"
+    },
+    {
+     "id": "F26-X1",
+     "text": "Num_Zero_Up/HavgSum/HrmsSum are never reset (reset lines commented out @L264-266), so WaveHeightAve/RMS are running statistics over the entire post-STEADY_TIME run, not per averaging window"
+    },
+    {
+     "id": "F26-X2",
+     "text": "UUsum etc. subtract U_davg_mean computed from the PREVIOUS window inside both branches (L171-173, L285-287) — first-window accumulations subtract the initial zero mean; cross-line dependency"
+    },
+    {
+     "id": "F26-X3",
+     "text": "MIXING_STUFF gate uses 'time' (lowercase) >= STEADY_TIME @L71 while the header comment says mean eta is also calculated — STEADY_TIME/T_INTV_mean default to LARGE in io.f90 so averaging is off unless configured (cross-file)"
+    },
+    {
+     "id": "F26-X4",
+     "text": "hard-coded 9.80 (L198,L204,L206) and 4.004 (L255) rather than GRAV — inconsistency with GRAV used elsewhere"
+    },
+    {
+     "id": "F26-X5",
+     "text": "Tmpe/Tmp_0 comparison uses Zero (capitalized) @L301 from PARAM (cross-file); DXg/DYg, Wsurf, BreakSourceX/Y, Cd, U_davg etc. all cross-file"
+    }
+   ],
+   "listY": [
+    {
+     "id": "F26-Y0",
+     "text": "When a step crosses T_INTV_mean, the full current DT is added to all sums at L154-L178 and used in the completed mean, but L235 retains T_sum-T_INTV_mean while L236-L253 reset every sum to zero. The retained fractional time has no corresponding retained integral, so the next interval's denominator includes unrepresented time and biases all means low after non-exact interval crossings."
+    },
+    {
+     "id": "F26-Y1",
+     "text": "ETA2sum at L157/L278 measures deviations from ETAmean, but ETAmean is updated only at interval completion L165 and then held through the next interval. UUsum/UVsum/VVsum at L171-L173 and L285-L287 similarly use prior-window U_davg_mean/V_davg_mean and ETAmean. The reported ETA2mean and radiation moments are therefore centered on the previous interval's means, not the same samples' means; no correction term is applied when the mean changes."
+    },
+    {
+     "id": "F26-Y2",
+     "text": "Wave extrema/upcrossing detection exists only in the T_sum<T_INTV_mean ELSE branch L294-L312. The sample that reaches/crosses the interval threshold follows the IF branch and contributes to time sums L157-L178 but is skipped by Emax/Emin and zero-upcrossing logic, dropping one wave-detection sample at every mean-output boundary."
+    },
+    {
+     "id": "F26-Y3",
+     "text": "Num_Zero_Up, HavgSum and HrmsSum resets are commented out at L264-L266 while interval sums reset at L235-L253. Consequently WaveHeightAve/RMS at L261-L262 are cumulative across all prior waves, whereas SigWaveHeight and the mean/radiation fields are interval products; whether that mixed temporal basis is intended is not established in the routine."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F26-X0",
+     "F26-Y0"
+    ],
+    [
+     "F26-X0",
+     "F26-Y3"
+    ],
+    [
+     "F26-X1",
+     "F26-Y3"
+    ],
+    [
+     "F26-X2",
+     "F26-Y1"
+    ],
+    [
+     "F26-X4",
+     "F26-Y0"
+    ],
+    [
+     "F26-X4",
+     "F26-Y3"
+    ]
+   ]
+  },
+  {
+   "file_token": "F27",
+   "lang": ".py",
+   "listX": [
+    {
+     "id": "F27-X0",
+     "text": "Interface compatibility is unspecified: L54 calls plt.hold(True), but the script declares no Matplotlib version or compatibility guard, so environments where pyplot lacks hold will fail before annotations and save (L54-L73)."
+    },
+    {
+     "id": "F27-X1",
+     "text": "x and y are sized only from eta_00001 at L12 and L15-L20, then reused for every subsequently loaded eta/mask pair at L43-L50 without any shape check; differing snapshot dimensions would break masked_where or pcolor alignment (L12, L15-L20, L43-L50)."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F27-Y0",
+     "text": "plt.hold(True) @L54 requires matplotlib < 3.0 (removed API); unlike plot_current.py this script does import os @L6"
+    },
+    {
+     "id": "F27-Y1",
+     "text": "'min' @L31 and 'length' @L35 shadow Python builtins; fdir is a user-specific Windows path that must be edited; label times 20/100 s vs file numbers 10/50 assume 2 s output interval (unchecked)"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F27-X0",
+     "F27-Y0"
+    ],
+    [
+     "F27-X1",
+     "F27-Y0"
+    ]
+   ]
+  },
+  {
+   "file_token": "F28",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F28-X0",
+     "text": "ABSORBING_GENERATING_BC relaxes only Eta @L151 — the U/V relaxation lines are commented out (L153-L154) while HU/HV are rebuilt from the un-relaxed U,V @L156-L157; also the relaxation runs over the entire local grid (L132-L133) using SPONGE_TIDE_WEST from TIDE_MODULE (west array only, no east/south/north counterpart here)"
+    },
+    {
+     "id": "F28-X1",
+     "text": "BB/CC drop Phase_Ser (commented @L124-L125 vs active @L126-L127) — random/imported phases are not applied in this optimized path; whether Phase_LEFT/Phase_Ser entered Cm/Sm upstream is outside this file"
+    },
+    {
+     "id": "F28-X2",
+     "text": "SPONGE_DAMPING divides U,V by SPONGE even where MASK==0 (only ETA is mask-guarded, L69-L73)"
+    },
+    {
+     "id": "F28-X3",
+     "text": "Larsen-Dancy exponents use integer arithmetic 50*(...)/(Iwidth-1) (L204, L545, L565, L596, L617) — quantized steps and no Iwidth=1 guard; friction/diffusion ramps divide ri by 10.0 cells regardless of sponge width (L265 etc.)"
+    },
+    {
+     "id": "F28-X4",
+     "text": "CALCULATE_FRICTION_SPONGE declares SPONGE INTENT(OUT) @L237 and zeroes it @L250, but CALCULATE_DIFFUSION_SPONGE/CALCULATE_SPONGE use INTENT(INOUT) (L376, L520) preserving prior content via lim — the three routines write the same-named argument with different accumulation conventions (note @L244-L245)"
+    },
+    {
+     "id": "F28-X5",
+     "text": "CALCULATE_SPONGE reset floor A_Sponge**(R_Sponge**50) (L579, L631): R_Sponge**50 is a REAL exponentiation here while the ramp exponents are integer-quantized — the cutoff value's consistency with the ramp is implicit"
+    },
+    {
+     "id": "F28-X6",
+     "text": "CALCULATE_CD_BREAKWATER: east/north ramp offsets use (px-npx-1)*(iiend-iista+1) (L280/L331/L423/L474/L565/L617) which assumes equal block widths across ranks; Din2D @L99, xx @L240/@L379/@L523, DXg/DYg locals (L247-248 etc.), Stokes_Drift_Ser/Grav imports, R_sponge/A_sponge dummies in friction/diffusion versions are declared/imported but unused in their routines"
+    },
+    {
+     "id": "F28-X7",
+     "text": "tmp_glob is allocated on all ranks @L671 (only rank 0 fills it) and deallocated @L785; receiving ranks' CD_breakwater is filled by mpi_irecv @L775 relying on Mloc==Niend-Nista+1+2*Nghost shape match — unchecked in this file"
+    }
+   ],
+   "listY": [
+    {
+     "id": "F28-Y0",
+     "text": "ABSORBING_GENERATING_BC는 Uin2D/Vin2D를 L107-L108에서 0으로 초기화하고 L137-L140에서 계산하지만, 이를 U/V에 적용하는 유일한 문장은 L153-L154에서 주석 처리되어 있다. 이어 L156-L157은 기존 U/V로 HU/HV를 재계산하므로 계산된 속도 경계 성분이 폐기된다."
+    },
+    {
+     "id": "F28-Y1",
+     "text": "CALCULATE_SPONGE_MAKER와 CALCULATE_SPONGE의 지수식은 L194/L535 등에서 Iwidth=INT(width/spacing)+Nghost를 만든 뒤 L204, L545, L565, L596, L617에서 Iwidth-1로 나눈다. 양의 폭이어도 INT(width/spacing)=0이고 Nghost=1이면 Iwidth=1이 가능하며 0 나눗셈 검사가 없다."
+    },
+    {
+     "id": "F28-Y2",
+     "text": "CALCULATE_FRICTION_SPONGE의 인터페이스는 R_sponge/A_sponge를 L235-L236에서 받고 CALCULATE_DIFFUSION_SPONGE도 L374-L375에서 받지만 두 서브루틴 본문은 이 인수를 한 번도 사용하지 않고 각각 GLOBAL의 CDsponge/Csp만 사용한다(L265-L333, L404-L476). 호출자가 R/A로 형태를 제어한다고 기대하면 인터페이스와 구현이 불일치한다."
+    },
+    {
+     "id": "F28-Y3",
+     "text": "ABSORBING_GENERATING_BC의 Din2D는 L99에서 선언되지만 대입·참조가 없고, CALCULATE_FRICTION_SPONGE·CALCULATE_DIFFUSION_SPONGE·CALCULATE_SPONGE의 DXg/DYg/xx 중 DXg/DYg는 대입 뒤 미사용이며 xx는 미대입·미사용이다(L240,L247-L248; L379,L386-L387; L523,L529-L530)."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F28-X0",
+     "F28-Y0"
+    ],
+    [
+     "F28-X3",
+     "F28-Y1"
+    ],
+    [
+     "F28-X3",
+     "F28-Y2"
+    ],
+    [
+     "F28-X4",
+     "F28-Y2"
+    ],
+    [
+     "F28-X4",
+     "F28-Y3"
+    ],
+    [
+     "F28-X6",
+     "F28-Y1"
+    ],
+    [
+     "F28-X6",
+     "F28-Y2"
+    ],
+    [
+     "F28-X6",
+     "F28-Y3"
+    ]
+   ]
+  },
+  {
+   "file_token": "F29",
+   "lang": ".py",
+   "listX": [
+    {
+     "id": "F29-X0",
+     "text": "The script uses os.path.join beginning at line 12 but imports only numpy and matplotlib at lines 4-5. os is undefined, so execution fails on the first data load before any plotting."
+    },
+    {
+     "id": "F29-X1",
+     "text": "The quiver call at line 63 uses len(u) for both row and column slice limits. For the rectangular n-by-m beach grid established at line 15, the column extent should follow m/shape[1]; the copied row bound produces a U/V shape that does not match the x coordinate vector when n differs from m."
+    },
+    {
+     "id": "F29-X2",
+     "text": "Masking creates u_masked and v_masked at lines 48-49, but the quiver call at line 63 uses raw u and v. Dry-cell vectors therefore remain visible even though the comment at line 47 says values where mask=0 should not be plotted."
+    },
+    {
+     "id": "F29-X3",
+     "text": "The colorbar is created only in the else branch at lines 79-82. With the default one-element nfile at line 29, num is always zero and the saved plot has no Hsig colorbar; with multiple files, only non-first subplots receive one."
+    },
+    {
+     "id": "F29-X4",
+     "text": "plt.hold(True) at line 58 assumes a pyplot hold API and can raise AttributeError in Matplotlib versions where hold was removed; no compatibility branch is present."
+    },
+    {
+     "id": "F29-X5",
+     "text": "Shapes of eta, mask, u, v, and ht are not checked before masked_where and plotting at lines 48-63, min[num] at line 56 assumes min and nfile have equal lengths, and the fixed absolute fdir at line 9 is machine-specific."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F29-Y0",
+     "text": "os is used (L12, L42-L45) but never imported — the script raises NameError as shipped; import os is missing"
+    },
+    {
+     "id": "F29-Y1",
+     "text": "plt.hold(True) @L58 was removed from matplotlib (deprecated 2.0, removed 3.0) — script requires an old matplotlib"
+    },
+    {
+     "id": "F29-Y2",
+     "text": "Quiver slicing @L63 uses len(u) (row count) for both dimensions (0:len(u)-1:sk twice) — for non-square grids the column slice bound is wrong (m != n); the masked arrays u_masked/v_masked are computed (L48-L49) but the unmasked u,v are what quiver plots"
+    },
+    {
+     "id": "F29-Y3",
+     "text": "With nfile=[1], the else branch (L79-L82) never runs, so no colorbar is drawn in the default configuration; 'min' and 'length' shadow Python builtins"
+    },
+    {
+     "id": "F29-Y4",
+     "text": "fdir @L9 is a workshop-specific absolute path; must be edited per user (comments L7-L8)"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F29-X1",
+     "F29-Y2"
+    ],
+    [
+     "F29-X3",
+     "F29-Y3"
+    ],
+    [
+     "F29-X4",
+     "F29-Y1"
+    ]
+   ]
+  },
+  {
+   "file_token": "F30",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F30-X0",
+     "text": "The source advertises a PRECIPITATION module at L57 but defines no Fortran symbol. The separate wetting comment in masks.f90 refers to a rainfall case, yet this unit supplies no rainfall source/interface; the intended implementation and call path are absent."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F30-Y0",
+     "text": "The entire PRECIPITATION module body is absent from this preprocessed file — only the comment header (L12-L62) and '! end prec' @L64 remain, so the actual rainfall-effect implementation cannot be determined from this file (compile-time option was off when build/pre was generated)"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F30-X0",
+     "F30-Y0"
+    ]
+   ]
+  },
+  {
+   "file_token": "F31",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F31-X0",
+     "text": "The path/header identity and description are a copy/paste mismatch: mod_subgrid.f90 ends as subgrid at L62 but claims to be TIDE_MODULE at L57, and no module is defined. A build or reader cannot determine whether this unit is an unimplemented subgrid component or a duplicate tide placeholder."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F31-Y0",
+     "text": "Description @L57 names 'TIDE_MODULE ... tide/surge boundary conditions' while the file name (and FILE line @L14, end marker @L62) say subgrid — the header comment appears copied from a tide module; which module body this file originally held cannot be determined from this file"
+    },
+    {
+     "id": "F31-Y1",
+     "text": "The entire module body is absent (preprocessor-excluded); only comments remain between L12 and L62"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F31-X0",
+     "F31-Y0"
+    ],
+    [
+     "F31-X0",
+     "F31-Y1"
+    ]
+   ]
+  },
+  {
+   "file_token": "F32",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F32-X0",
+     "text": "phi_int_exch's header comment @L313 still describes 'phi_exch' (copy-paste); DISTRIBUTE_VarGlob's header block is duplicated twice (L436-L442 and L443-L449, second adds 05/08/2017 Young-Kwang Choi)"
+    },
+    {
+     "id": "F32-X1",
+     "text": "E-W buffers are dimensioned (Nloc,Nghost) but indexed (j,i) with j over grid rows (L74-L75 vs L86-L88): correctness of MPI matching relies on both sides using identical linearized order — internally consistent here but the (j,i) convention is opposite to the N-S buffers' (i,j)"
+    },
+    {
+     "id": "F32-X2",
+     "text": "DISTRIBUTE_VarGlob consistency: receiver's lenxy (L535-L537, from its own Nista/Niend) must equal sender's lenx*leny (L523-L525, from gathered indices) and PHI(Mloc,Nloc) shape — requires Mloc==iiend-iista+1+2*Nghost globally; no check in this file"
+    },
+    {
+     "id": "F32-X3",
+     "text": "Loop indices i,j (lower case, L86-L177 etc.) and I,J (L471-L492) are not declared in any of the four subroutines despite IMPLICIT NONE — they are the shared module scratch variables from PARAM (via USE PARAM/USE GLOBAL)"
+    },
+    {
+     "id": "F32-X4",
+     "text": "PHIGLOB @L456 is a full padded global automatic array created on every rank although only rank 0 uses it (L470-L493, L512-L528)"
+    },
+    {
+     "id": "F32-X5",
+     "text": "No periodic-wrap logic appears in the exchanges: periodicity is delegated to the Cartesian communicator's neighbor values (n_west etc. from GLOBAL); 'periods' is imported @L194 but unused in this file"
+    },
+    {
+     "id": "F32-X6",
+     "text": "Statement-terminating semicolons @L496-L499; req/status arrays are sized 4 while each phase posts at most 4 requests — nreq reset @L81/L132 etc. keeps within bounds"
+    }
+   ],
+   "listY": [],
+   "candidate_pairs": []
+  },
+  {
+   "file_token": "F33",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F33-X0",
+     "text": "AGE is declared INTENT(OUT) at line 117 but is read before any guaranteed definition in the onset test at lines 142-143, the positive-age branch at line 146, and neighbor propagation at lines 165-205. Under Fortran INTENT(OUT) semantics its incoming value is undefined; the algorithm appears to require INTENT(INOUT) or explicit initialization."
+    },
+    {
+     "id": "F33-X1",
+     "text": "DXg and DYg are local variables declared at line 112 and assigned only inside the AGE<=ZERO propagation branch at lines 151-152, yet are used unconditionally later to form xmk/ymk at lines 220-221. If AGE(I,J)>ZERO at lines 146-147, those locals reach lines 220-221 undefined."
+    },
+    {
+     "id": "F33-X2",
+     "text": "Xc_WK and Yc_WK occur twice in the same GLOBAL ONLY import sequence at lines 101-103, consistent with a duplicated continuation-list fragment; compiler acceptance and intended import list are unresolved."
+    },
+    {
+     "id": "F33-X3",
+     "text": "npx, npy and Nghost are imported at lines 101 and 106 but occur only in commented-out coordinate formulas at lines 218-219; tmp4preview is imported at line 105 but unused. Local cap2, etat_star, B and T_star declared at lines 111-113 are also unused, indicating dead remnants."
+    },
+    {
+     "id": "F33-X4",
+     "text": "The depth-dependent T_brk expression is commented out at line 127, so the active routine always uses the caller-provided T_brk from line 110 despite the preceding 'make T_brk as function of depth' comment at line 126."
+    },
+    {
+     "id": "F33-X5",
+     "text": "Propagation time uses the MIN of |ETAt|/|grad eta| and sqrt(g|H|) at line 149, while roller flux uses the MAX of the same two speed estimates at line 266; the physical reason for opposite limiters is not stated in this file."
+    },
+    {
+     "id": "F33-X6",
+     "text": "ANGLE can equal positive 180 degrees from ATAN2 at line 134, but quadrant 2 accepts ANGLE<180 at line 176 while quadrant 3 begins at -180 at line 187; the exact +180 case therefore matches no propagation quadrant."
+    },
+    {
+     "id": "F33-X7",
+     "text": "The loops extend through Ibeg-1:Iend+1 and Jbeg-1:Jend+1 at lines 123-124 and then read one additional neighbor in the propagation branches at lines 165-205. Whether passed arrays (1:M,1:N) always contain the resulting two-cell halo cannot be established from this file."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F33-Y0",
+     "text": "VISCOSITY_WMAKER called at L82 is not defined in this file; its definition is in another source file"
+    },
+    {
+     "id": "F33-Y1",
+     "text": "Loop indices I,J and temporaries tmp1,tmp2,tmp3,tmp4 are used (L123-140) but not declared locally; they must come from USE GLOBAL/PARAM modules (cross-file)"
+    },
+    {
+     "id": "F33-Y2",
+     "text": "Declared but unused in this file: cap2 (L111), etat_star,B,T_star (L113), tmp4preview (L105); npx,npy imported at L106 are only referenced in commented-out lines L218-219 superseded by iista/jjsta form at L220-221"
+    },
+    {
+     "id": "F33-Y3",
+     "text": "AGE is declared INTENT(OUT) at L117 but is read before any assignment (AGE(I,J).EQ.ZERO at L143, AGE(I,J).GT.ZERO at L146), i.e. the scheme relies on the actual argument (AGE_BREAKING, L77) retaining its previous-step values across calls despite the OUT intent"
+    },
+    {
+     "id": "F33-Y4",
+     "text": "SHOW_BREAKING, WAVEMAKER_VIS, Mloc, Nloc, visbrk, Cbrk1, Cbrk2, T_brk, AGE_BREAKING used in WAVE_BREAKING (L75-82) come from USE GLOBAL without ONLY list; their definitions are cross-file"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F33-X0",
+     "F33-Y3"
+    ],
+    [
+     "F33-X3",
+     "F33-Y2"
+    ]
+   ]
+  },
+  {
+   "file_token": "F34",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F34-X0",
+     "text": "Gradx0/Gradx use a centered difference over 2*DX but divide only by DX (L158,L179) — the 'slope' compared against SlopeCap is twice the actual centered-difference slope, or a one-sided-scaled definition; not clarified in file"
+    },
+    {
+     "id": "F34-X1",
+     "text": "the smoothing stencil coefficients 0.4+4*0.15=1.0 conserve the sum only on uniform fields; Depth1 at masked/boundary-adjacent cells uses Depth0 neighbors that may be outside the corrected set"
+    },
+    {
+     "id": "F34-X2",
+     "text": "change_percentage is written into tmp1, a GLOBAL temporary (L185) — thread-unsafe reuse; locals Ifile,K,K5,K10,K15,nreq,len,req,status,myint,TMP_NAME(in CORRECTION) are declared but unused (the MPI_WAITALL usage is commented out @L206)"
+    },
+    {
+     "id": "F34-X3",
+     "text": "SmoothBelowDepth semantics: MASK0=0 (excluded from correction) where Depth0<SmoothBelowDepth — with the -LARGE default nothing is excluded; the name suggests smoothing BELOW a depth but the code excludes below it; intent ambiguity noted"
+    },
+    {
+     "id": "F34-X4",
+     "text": "iteration cap 1000 and threshold 0.05 are hard-coded; convergence is on max relative change, reduced across ranks each iteration; phi_exch/phi_int_exch/PutFile are cross-file"
+    }
+   ],
+   "listY": [
+    {
+     "id": "F34-Y0",
+     "text": "Both the initial and iterative central differences use points I-1 and I+1 (or J-1/J+1) but divide by DX/DY at L158-L159 and L179-L180 rather than the two-cell distance 2*DX/2*DY. If SlopeCap is a physical |dh/dx| threshold as the module comments state, slopes are doubled and smoothing is triggered too aggressively."
+    },
+    {
+     "id": "F34-Y1",
+     "text": "Gradx and Grady are allocated at L126-L129 without initialization and assigned only where MASK0==1 at L178-L180. Masked cells retain undefined values, yet the entire arrays are exchanged at L219-L220 and written at L247-L249."
+    },
+    {
+     "id": "F34-Y2",
+     "text": "Within the last iteration Gradx/Grady are computed from the pre-update Depth0 at L179-L180, then Depth1 is smoothed and copied to Depth0 at L183-L196. On convergence exit the output gradients therefore describe the preceding bathymetry, not the final Depth assigned at L216; they are never recomputed after the loop."
+    },
+    {
+     "id": "F34-Y3",
+     "text": "The loop starts pointcount at 0 (L99), tests pointcount<=1000 at L166, and increments after every update at L198, permitting 1001 smoothing iterations although the apparent cap is 1000."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F34-X0",
+     "F34-Y0"
+    ],
+    [
+     "F34-X0",
+     "F34-Y1"
+    ],
+    [
+     "F34-X0",
+     "F34-Y2"
+    ],
+    [
+     "F34-X2",
+     "F34-Y0"
+    ],
+    [
+     "F34-X2",
+     "F34-Y1"
+    ],
+    [
+     "F34-X2",
+     "F34-Y2"
+    ]
+   ]
+  },
+  {
+   "file_token": "F35",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F35-X0",
+     "text": "Loop indices J @L155 and I @L156 are not declared anywhere in PutFileASCII despite IMPLICIT NONE @L72 — they must be host-associated through USE GLOBAL @L66; whether GLOBAL provides I,J cannot be confirmed from this file"
+    },
+    {
+     "id": "F35-X1",
+     "text": "PHITEST @L176 and istatus @L178 (scalar INTEGER) are declared in PutFileBinary but never used (the write uses MPI_STATUS_IGNORE @L226); istatus in PutFileASCII @L83 is by contrast an array of size mpi_status_size"
+    },
+    {
+     "id": "F35-X2",
+     "text": "FORMAT_LEN (from GLOBAL) is built only once under FirstCallPutFile (L95-L102); the Mglob value is frozen into the format at first call — cross-line relation L91/L96/L98-L101 with the WRITE @L156"
+    },
+    {
+     "id": "F35-X3",
+     "text": "PHIGLOB is a full Mglob x Nglob automatic array allocated on every rank @L89 even though only rank 0 uses it (L123-L125, L153-L164)"
+    },
+    {
+     "id": "F35-X4",
+     "text": "mpi_sp datatype and mpi_status_size come from USE GLOBAL/MPI; their definitions are outside this file"
+    },
+    {
+     "id": "F35-X5",
+     "text": "PutFileBinary writes PHI with mem_type_loc which skips ghost cells; strides OUTPUT_RES are not applied in the binary path (contrast ASCII loop L155-L156)"
+    },
+    {
+     "id": "F35-X6",
+     "text": "END SUBROUTINE names PutfileASCII @L167 / PutfileBinary @L231 differ in letter case from declarations PutFileASCII @L70 / PutFileBinary @L171 (legal in Fortran, case-insensitive)"
+    }
+   ],
+   "listY": [
+    {
+     "id": "F35-Y0",
+     "text": "ASCII output applies OUTPUT_RES in both J and I loops at L155-L156, but PutFileBinary defines/writes the full interior subarrays at L191-L226 and never references OUTPUT_RES. Selecting FIELD_IO_TYPE therefore changes not only encoding but also spatial resolution and array dimensions, an interface mismatch for the same PutFile caller."
+    },
+    {
+     "id": "F35-Y1",
+     "text": "PutFileBinary creates and commits mem_type_loc and file_type_glob on every call at L209-L216 but never calls MPI_TYPE_FREE before returning at L231. Repeated preview output leaks two MPI datatype handles per field and can exhaust MPI resources in long runs."
+    },
+    {
+     "id": "F35-Y2",
+     "text": "MPI_FILE_OPEN uses WRONLY+CREATE at L219-L221 without an exclusive/create-new or truncation step. Reusing an existing filename whose expected payload is shorter can leave trailing bytes from the previous file, because the routine writes the current view and closes without setting file size."
+    },
+    {
+     "id": "F35-Y3",
+     "text": "PutFileASCII steps DO loops by OUTPUT_RES at L155-L156 with no local range validation. READ_INPUT accepts any integer and provides no positivity check, so OUTPUT_RES=0 is an invalid zero DO increment and negative values produce empty/invalid traversal rather than a controlled error."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F35-X0",
+     "F35-Y0"
+    ],
+    [
+     "F35-X0",
+     "F35-Y3"
+    ],
+    [
+     "F35-X1",
+     "F35-Y0"
+    ],
+    [
+     "F35-X1",
+     "F35-Y1"
+    ],
+    [
+     "F35-X1",
+     "F35-Y2"
+    ],
+    [
+     "F35-X2",
+     "F35-Y0"
+    ],
+    [
+     "F35-X2",
+     "F35-Y3"
+    ],
+    [
+     "F35-X3",
+     "F35-Y0"
+    ],
+    [
+     "F35-X3",
+     "F35-Y3"
+    ],
+    [
+     "F35-X5",
+     "F35-Y0"
+    ],
+    [
+     "F35-X5",
+     "F35-Y3"
+    ],
+    [
+     "F35-X6",
+     "F35-Y0"
+    ],
+    [
+     "F35-X6",
+     "F35-Y1"
+    ]
+   ]
+  },
+  {
+   "file_token": "F36",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F36-X0",
+     "text": "복붙/인터페이스 정합성 결함: 파일명과 L14 표제는 mod_tracer.F인데 L57의 유일한 기능 설명은 VESSEL ship-wake module이며, 실제 tracer 또는 vessel 구현 선언이 한 줄도 없다. 이 파일이 의도된 tracer 모듈인지 잘못 복사된 빈 vessel 골격인지 원문만으로 결정할 수 없다."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F36-Y0",
+     "text": "Description @L57 says 'VESSEL ... ship-wakes' while the file name (FILE line @L14) is mod_tracer and the end marker @L63 says 'end tracking' — header comment appears copied from the vessel module; which module body this file originally held cannot be determined from this file"
+    },
+    {
+     "id": "F36-Y1",
+     "text": "The entire module body is absent (preprocessor-excluded); only comments remain"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F36-X0",
+     "F36-Y0"
+    ]
+   ]
+  },
+  {
+   "file_token": "F37",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F37-X0",
+     "text": "REMOVE_SPONGE all-sides-inactive guard (L515-L516) tests (.NOT.TideWest).AND.(.NOT.TideEast).AND.(.NOT.TideEast).AND.(.NOT.TideEast) — TideEast is tested three times and TideSouth/TideNorth never, so TIDAL_BC_ABS=.FALSE. @L517 can trigger or fail incorrectly when only south/north differ (cross-line L515-L517)"
+    },
+    {
+     "id": "F37-X1",
+     "text": "Log message @L521 in REMOVE_SPONGE reads 'You dont specify TideNorth_V, use default: 0' while the paired stdout message @L520 says 'You specify Tide but no BCs, set tide as false' — copy-paste from Tide_READ_CONSTANT"
+    },
+    {
+     "id": "F37-X2",
+     "text": "TIDE_DATA: tmp1/tmp2 are both ZERO whenever TIME <= Time_tide_*_1 (init L698-L699/L745-L746/L791-L792/L837-L838 with guard L701/L748/L794/L840), so Tide*_U/V/ETA @L714-L716 etc. evaluate to zero before the first data time instead of holding the first record — cross-line relation between the zero-init and the interpolation lines"
+    },
+    {
+     "id": "F37-X3",
+     "text": "Sponge exponents (L230/L238/L247/L255) use integer arithmetic 50*(...)/(Iwidth-1): the exponent is integer-quantized, and Iwidth=1 would divide by zero — no guard in the file"
+    },
+    {
+     "id": "F37-X4",
+     "text": "Shared label 120 @L859 is the END= target of all four sides' READs (L685/L732/L778/L824): EOF on an earlier side jumps past the remaining sides' update for that call"
+    },
+    {
+     "id": "F37-X5",
+     "text": "Units 201-204 opened in Tide_READ_DATA_INIT are never CLOSEd in this file; TIDE_DATA re-derives Ifile from a local variable @L670 that shadows the module Ifile @L93; comment @L768 mislabels south unit 203 as '! east'"
+    },
+    {
+     "id": "F37-X6",
+     "text": "TIDE_BC strips are indexed on the local domain (I=1,Iwidth @L277; I=Mloc-Iwidth+1 @L289; J=1,Iwidth @L300; J=Nloc-Iwidth+1 @L312) with no npx/npy boundary-ownership test, while SPONGE_TIDE_* values encode global position (L230-L256) — interior processors rely on the sponge arrays evaluating to the pass-through value"
+    },
+    {
+     "id": "F37-X7",
+     "text": "Tide width parameter is read from input key 'WaveMakerPointNum' @L123 (wavemaker-named key controls tide sponge width); local Lstart,Lend @L219 declared but never used; TideDataFileName @L78 and WaveMaker import @L107 unused in this file; unit 3 (log file) is written throughout but opened elsewhere"
+    },
+    {
+     "id": "F37-X8",
+     "text": "Tide_READ_DATA_INIT: when a side's file name key is missing, the warning prints TRIM(TMP_NAME) (L548/L579/L609/L639) which at that point still holds the previous side's file name (or blanks) rather than the missing key name"
+    }
+   ],
+   "listY": [
+    {
+     "id": "F37-Y0",
+     "text": "REMOVE_SPONGE's all-sides-disabled condition tests TideWest once and TideEast three times at L515-L516, omitting TideSouth and TideNorth. If west/east are absent but south or north is valid, it wrongly sets TIDAL_BC_ABS=.FALSE. at L517; this is a direct copy/paste defect."
+    },
+    {
+     "id": "F37-Y1",
+     "text": "Iwidth_tide is accepted without range checks, copied to Iwidth at L221, and used as the divisor Iwidth-1 at L230/L238/L247/L255. A value of 1 causes division by zero; values <=0 or larger than Mloc/Nloc also make the TIDE_BC strip loops L277-L313 invalid or out of bounds."
+    },
+    {
+     "id": "F37-Y2",
+     "text": "TIDE_SPONGE globalizes local positions with npx*Mglob/px and npy*Nglob/py at L230-L255, assuming equal block sizes. INDEX instead supports uneven remainder partitions through grid_range_per_procs. When Mglob or Nglob is not divisible by PX/PY, sponge positions are shifted at rank boundaries; iista/jjsta are imported but unused."
+    },
+    {
+     "id": "F37-Y3",
+     "text": "All four time-series READ statements branch to the single label 120 at L859 on EOF (west L685, east L732, south L778, north L824). EOF on an earlier side skips that side's interpolation and every later side for the whole call; repeated calls encounter the same EOF again, so west exhaustion can permanently suppress east/south/north updates. The intended 'no more data' equality logic is bypassed by the jump."
+    },
+    {
+     "id": "F37-Y4",
+     "text": "The time-series files opened on units 201-204 at L556/L587/L617/L647 are never closed. More importantly, after EOF the code neither freezes the last value nor disables the side; control jumps out before interpolation, leaving boundary values at their prior call and preventing subsequent-side processing."
+    },
+    {
+     "id": "F37-Y5",
+     "text": "Both TIDAL_BC_ABS and TIDAL_BC_GEN_ABS may be true; initialization allocates one shared set of sponges, but main calls TIDE_BC only under TIDAL_BC_ABS while generating/absorbing behavior is handled elsewhere. This module contains no mutual-exclusion or precedence rule, so simultaneous flags can apply overlapping boundary mechanisms."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F37-X0",
+     "F37-Y0"
+    ],
+    [
+     "F37-X1",
+     "F37-Y0"
+    ],
+    [
+     "F37-X3",
+     "F37-Y1"
+    ],
+    [
+     "F37-X3",
+     "F37-Y2"
+    ],
+    [
+     "F37-X4",
+     "F37-Y3"
+    ],
+    [
+     "F37-X6",
+     "F37-Y1"
+    ],
+    [
+     "F37-X6",
+     "F37-Y2"
+    ],
+    [
+     "F37-X7",
+     "F37-Y1"
+    ]
+   ]
+  },
+  {
+   "file_token": "F38",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F38-X0",
+     "text": "INITIAL_WAVE is entirely dead code as compiled: goto 200 @L125 jumps past the box block (L127-L133), goto 100 @L137 past the dam-break block (L139-L143), goto 213 @L152 past the alongshore-crest block (L153-L159), and the Gaussian is commented (L146-L147) — the subroutine leaves Eta untouched though input key 'INI' selects it (cross-line L125/L137/L152)"
+    },
+    {
+     "id": "F38-X1",
+     "text": "INITIAL_SOLITARY_WAVE hardcodes alpha=-0.39 @L364; comments L361-L363 record that the formula 0.5*Beta*Beta+Beta with beta=-0.531 'should be' -0.39 but 'the solitary wave shape does not match the equation. but alpha = -0.10 seems OK' — the discrepancy is documented, not resolved; dummy argument Beta @L355 is consequently unused"
+    },
+    {
+     "id": "F38-X2",
+     "text": "Both STOP paths are silent (L309 with message commented @L308; L427 with message commented @L426) — failure cause is not reported at runtime"
+    },
+    {
+     "id": "F38-X3",
+     "text": "SUB_SLTRY: zr @L447 is computed but never used; r1 and C_ph are duplicates (L432-L433); au @L442 contains eps in both numerator and denominator (cancels); header @L391 cites 'Nogu equations' (spelling; likely Nwogu)"
+    },
+    {
+     "id": "F38-X4",
+     "text": "INITIAL_GAUSIAN's header @L212 says key 'INI_REC' (copy-paste from INITIAL_RECTANGULAR); actual key for Gaussian is not stated in this file"
+    },
+    {
+     "id": "F38-X5",
+     "text": "SOLITARY_WAVE_LEFT_BOUNDARY: tex/tlag are recomputed inside the J loop though loop-invariant (L79-L80) and tlag is never used; boundary applies Eta/H only at the single column Ibeg on west-edge ranks"
+    },
+    {
+     "id": "F38-X6",
+     "text": "Loop indices i,j,I,J and scratch tmp1,tmp2 are the PARAM module shared variables (no local declarations despite IMPLICIT NONE); XX,YY @L105 are computed (L111-L116) but used only by the commented Gaussian lines (L146-L147); locals sigma,x_c,y_c,a @L118-L121 and ii1,ii2 @L153-L154 belong to dead code; Il,Jl,Ir,Jr declared unused in INITIAL_GAUSIAN @L226 and INITIAL_DIPOLE @L265; gamma_s dummy @L303 unused"
+    },
+    {
+     "id": "F38-X7",
+     "text": "INITIAL_DIPOLE literal 1.414_SP (approx sqrt(2)) @L279 and the +0.5_SP exponent offset @L280 are not explained in the file"
+    }
+   ],
+   "listY": [
+    {
+     "id": "F38-Y0",
+     "text": "도달불가/무대입 결함: INITIAL_WAVE의 격자 루프에서 L125 GOTO 200이 box 대입 L127-L133을, L137 GOTO 100이 dam-break 대입 L139-L143을 각각 항상 건너뛴다. 루프 뒤 L152 GOTO 213도 alongshore 대입 L153-L159를 항상 건너뛰므로 이 서브루틴은 INTENT가 명시되지 않은 GLOBAL Eta를 전혀 초기화하지 않는다."
+    },
+    {
+     "id": "F38-Y1",
+     "text": "인터페이스 불일치: INITIAL_N_WAVE는 x2와 gamma_s를 입력으로 선언하지만(L303) 활성 계산 L314-L330에서 둘 다 사용하지 않는다. x2는 주석 처리된 general N-wave 식 L326에만 남고 gamma는 L315에서 재계산되어 호출자가 준 gamma_s가 무시된다."
+    },
+    {
+     "id": "F38-Y2",
+     "text": "입력 무력화/하드코딩 결함: INITIAL_SOLITARY_WAVE는 Beta를 입력으로 받지만(L355) Beta 기반 alpha 식은 L361에서 주석 처리되고 L364가 alpha=-0.39로 고정한다. 따라서 서로 다른 Beta 호출이 SUB_SLTRY에 동일한 alp를 전달한다(L366)."
+    },
+    {
+     "id": "F38-Y3",
+     "text": "특이점 검사 결여: SUB_SLTRY는 alp와 h1을 분모에 사용하고(L410,L413-L415,L443-L446), Newton 갱신은 fpx로 나누지만(L422), alp=0, h1=0, fpx=0 또는 alp2-alp*x<=0 검사가 없다. 공개 서브루틴 입력 범위가 선언되지 않아 0/음수/NaN 경로가 원문상 차단되지 않는다."
+    },
+    {
+     "id": "F38-Y4",
+     "text": "복붙 설명 불일치: INITIAL_GAUSIAN의 주석은 input.txt 선택값을 INI_REC이라고 적어(L211-L213) 바로 앞 INITIAL_RECTANGULAR의 INI_REC 설명(L167-L169)과 중복되며 Gaussian 전용 선택자와 구분되지 않는다."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F38-X0",
+     "F38-Y0"
+    ],
+    [
+     "F38-X1",
+     "F38-Y2"
+    ],
+    [
+     "F38-X2",
+     "F38-Y1"
+    ],
+    [
+     "F38-X2",
+     "F38-Y3"
+    ],
+    [
+     "F38-X3",
+     "F38-Y3"
+    ],
+    [
+     "F38-X4",
+     "F38-Y4"
+    ],
+    [
+     "F38-X6",
+     "F38-Y0"
+    ],
+    [
+     "F38-X6",
+     "F38-Y1"
+    ]
+   ]
+  },
+  {
+   "file_token": "F39",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F39-X0",
+     "text": "구현 정합성 결함: nesting.f90라는 code 축 파일이지만 L1-L58에 라이선스 외 구현이나 인터페이스가 전혀 없어, nesting 기능이 의도적으로 비활성인 빈 translation unit인지 빌드 사본에서 구현이 누락된 것인지 원문만으로 결정할 수 없다."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F39-Y0",
+     "text": "The entire nesting implementation is absent (preprocessor-excluded); only the license header L12-L55 remains, with no description/HISTORY block — the nesting functionality cannot be determined from this file"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F39-X0",
+     "F39-Y0"
+    ]
+   ]
+  },
+  {
+   "file_token": "F40",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F40-X0",
+     "text": "The left subplot's plotting line is commented out @L16 (etasrn-eta difference view), so subplot(121) renders empty axes with fixed caxis/axis — leftover from debugging the etasrn ('screen' eta) field; dep is loaded @L5 but never used"
+    }
+   ],
+   "listY": [
+    {
+     "id": "F40-Y0",
+     "text": "The first subplot is selected at L14, but its only data-rendering statement is commented out at L15; L16-L17 therefore configure limits on an otherwise empty axes while the second subplot is populated at L19-L23."
+    },
+    {
+     "id": "F40-Y1",
+     "text": "dep is read from disk at L5 but is never referenced afterward through EOF L26, making this input load semantically disconnected from the plotting path."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F40-X0",
+     "F40-Y0"
+    ],
+    [
+     "F40-X0",
+     "F40-Y1"
+    ]
+   ]
+  },
+  {
+   "file_token": "F41",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F41-X0",
+     "text": "License header FILE line @L14 says 'main.F' but this file is the INPUT_READ module (mod_input) — header/file-name mismatch"
+    },
+    {
+     "id": "F41-X1",
+     "text": "READ_VALUE: successful match RETURNs @L253 without CLOSE(10); CLOSE @L260 is reached only via the EOF path (label 100 @L258) — unit 10 apparently left open on every successful key lookup (relation L237/L253/L260); also each READ_* call re-OPENs unit 10 per key"
+    },
+    {
+     "id": "F41-X2",
+     "text": "ERR_IF_ONE has INTENT(OUT) in READ_STRING @L193 and READ_VALUE @L230 but no INTENT attribute in READ_INTEGER @L90, READ_FLOAT @L127, READ_LOGICAL @L162"
+    },
+    {
+     "id": "F41-X3",
+     "text": "READ_LOGICAL: type mismatch only warns (L178-L180, no STOP) unlike INTEGER/FLOAT/STRING which MPI_FINALIZE+STOP; value is then set from first character only (L182-L183), so CHECK_CONSISTENCY_TYPE's 'logical' result is not actually required"
+    },
+    {
+     "id": "F41-X4",
+     "text": "CHECK_CONSISTENCY_TYPE returns VTYPE 'INTEGER' in uppercase @L298 while other types are lowercase ('float' @L296, 'logical' @L280, 'string' @L288); the comparisons @L107 ('INTEGER'), @L143 ('float'), @L178 ('logical'), @L211 ('string') match these exact cases — case consistency is load-bearing across subroutines"
+    },
+    {
+     "id": "F41-X5",
+     "text": "ERR_IF_ONE is initialized to 0 @L236 only inside READ_VALUE; typed readers test ERR_IF_ONE == 1 (L100, L137, L172, L204) relying on READ_VALUE having set it"
+    }
+   ],
+   "listY": [
+    {
+     "id": "F41-Y0",
+     "text": "All four destination arguments are INTENT(OUT) (INTEGER_VAL L87, FLOAT_VAL L123, LOGICAL_VAL L158, STRING_VAL L190), but a missing key returns without assigning them at L100-L103, L137-L140, L172-L175 and L204-L207. Fortran makes an INTENT(OUT) actual argument undefined on entry, so callers cannot safely retain module initializers. This turns unchecked missing keys in io.f90—including WAVE_DATA_TYPE, ETA_LIMITER, NumberStations and the block of output flags—into undefined values rather than defaults."
+    },
+    {
+     "id": "F41-Y1",
+     "text": "READ_VALUE returns immediately on a match at L251-L253 without CLOSE(10); CLOSE occurs only on EOF at L258-L260. Successful reads leave unit 10 connected. Reopening/rewinding the same unit repeatedly may work for the same file, but switching InputFileName while connected is nonportable and the successful path never releases the unit."
+    },
+    {
+     "id": "F41-Y2",
+     "text": "CHECK_CONSISTENCY_TYPE calls a numeric string 'float' only if it contains a dot (L293-L299). Valid real inputs such as 1 or 1E-3 are classified INTEGER and rejected by READ_FLOAT at L142-L146, despite list-directed READ at L149 being able to convert them. Conversely malformed dot-containing numeric strings reach an unchecked internal READ failure."
+    },
+    {
+     "id": "F41-Y3",
+     "text": "Logical recognition accepts only a one-character uppercase T or F at L278-L282, and READ_LOGICAL sets true only when the first character is uppercase T at L182-L183. Lowercase t/f and standard .TRUE./.FALSE. forms are diagnosed as non-logical and then silently mapped false rather than rejected or parsed."
+    },
+    {
+     "id": "F41-Y4",
+     "text": "READ_VALUE computes FRONT=index(TEXT,'=') at L249 and immediately forms TEXT(1:FRONT-1) at L250 without a FRONT==0 branch. Blank/comment-only or arbitrary non-assignment lines therefore rely on compiler handling of a substring ending at -1 and can raise a bounds error under checking builds."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F41-X1",
+     "F41-Y1"
+    ],
+    [
+     "F41-X1",
+     "F41-Y4"
+    ],
+    [
+     "F41-X2",
+     "F41-Y0"
+    ],
+    [
+     "F41-X3",
+     "F41-Y0"
+    ],
+    [
+     "F41-X3",
+     "F41-Y3"
+    ],
+    [
+     "F41-X4",
+     "F41-Y0"
+    ],
+    [
+     "F41-X4",
+     "F41-Y2"
+    ],
+    [
+     "F41-X4",
+     "F41-Y3"
+    ],
+    [
+     "F41-X5",
+     "F41-Y0"
+    ],
+    [
+     "F41-X5",
+     "F41-Y2"
+    ]
+   ]
+  },
+  {
+   "file_token": "F42",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F42-X0",
+     "text": "Comment @L14 calls the times values 'minutes' while the title @L73 prints 'sec' — with a 2 s output interval the values 20/100 are seconds; commented print name @L105 is the inlet_shoal template leftover; zbuffer renderer @L102 removed in newer MATLAB"
+    }
+   ],
+   "listY": [
+    {
+     "id": "F42-Y0",
+     "text": "Time units are internally inconsistent: the user-input comment defines times as minutes at L14, while the plotted title appends 'sec' to the same times{num} values at L73; the intended unit cannot be determined within this file (L14-L15, L73)."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F42-X0",
+     "F42-Y0"
+    ]
+   ]
+  },
+  {
+   "file_token": "F43",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F43-X0",
+     "text": "U/V hot-start presence is not combined correctly: U_FILE absence sets NO_UV_FILE=.TRUE. at L428, but a present V_FILE overwrites it to .FALSE. at L446; the supposed preservation test at L447 tests that newly false value, so the comment 'in case you dont have u file' is ineffective."
+    },
+    {
+     "id": "F43-X1",
+     "text": "ETA_LIMITER is read at L1124 and immediately tested at L1125 without any ierr branch/default; if READ_LOGICAL does not assign on a missing key and the GLOBAL value is not initialized elsewhere, the branch uses an undefined or stale value."
+    },
+    {
+     "id": "F43-X2",
+     "text": "The absorbing DATA phase read jumps from L1275 to label 991 at L1279 on EOF, bypassing CLOSE(1) at L1277; the no-phase fallback therefore leaves unit 1 open while successful phase input sets INPUT_PHASE at L1278."
+    },
+    {
+     "id": "F43-X3",
+     "text": "WAVE_DATA_TYPE is read at L1228 without checking ierr, then sliced at L1255; likewise WidthWaveMaker and R/A sponge-wavemaker reads at L1249-L1252 have no absence handling. Missing keys can therefore propagate undefined/stale configuration into branch selection and sponge calculations unless GLOBAL or INPUT_READ supplies undocumented initialization."
+    },
+    {
+     "id": "F43-X4",
+     "text": "ROLLER is consulted at L1677 to force VISCOSITY_BREAKING before ROLLER_EFFECT is read and defaulted at L1868-L1871. Thus the forcing decision uses the pre-input value and is not revisited after the actual ROLLER input is known."
+    },
+    {
+     "id": "F43-X5",
+     "text": "The absent-CONSTRUCTION diagnostic says 'USE HLL' at L1752, but the actual default assigned at L1753 is HLLC, so the log and active numerical flux disagree."
+    },
+    {
+     "id": "F43-X6",
+     "text": "The mutually enabled VISCOSITY_BREAKING/WAVEMAKER_VIS path prints STOP and calls MPI_FINALIZE at L1950-L1956 but has no STOP/RETURN after finalization (L1957 continues), allowing execution to proceed after MPI has been finalized."
+    },
+    {
+     "id": "F43-X7",
+     "text": "EtaBlowVal input is commented out at L2104, yet L2105 tests ierr left by the preceding OUT_Radiation read at L2101. Its conditional assignment is therefore controlled by an unrelated key; L2106 assigns 10.0_SP while L2108-L2109 claim '100xmax_depth' and L2113 says init.F sets that value, leaving this block internally inconsistent."
+    },
+    {
+     "id": "F43-X8",
+     "text": "Station buffering loses and/or fabricates samples: once the condition at L2428 is false, the current sample is never inserted before L2435-L2438 flush and reset, so each overflow-triggering sample is dropped. At TIME>=TOTAL_TIME the same ELSE writes exactly StationOutputBuffer rows even when BufferCount is smaller; ZUV_Buffer was allocated at L2374-L2375 but not initialized, so unwritten tail rows can be uninitialized on the first partial flush or stale after later flushes before files close at L2451-L2457."
+    },
+    {
+     "id": "F43-X9",
+     "text": "NumberStations is read at L2048 and used at L2049 without an ierr default; absence handling depends on undocumented prior initialization. The many output logical reads L2065-L2101 likewise overwrite the same ierr and provide no per-flag default in this routine."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F43-Y0",
+     "text": "EtaBlowVal block L2103-2111: the READ_FLOAT is commented out (@L2104) but the IF(ierr==1) default EtaBlowVal=10.0_SP remains, keyed to the stale ierr of the preceding OUT_Radiation read (@L2101); init.f90 later overwrites EtaBlowVal=100*max depth — cross-line/cross-file dead-code interaction"
+    },
+    {
+     "id": "F43-Y1",
+     "text": "VISCOSITY_BREAKING=T + WAVEMAKER_VIS=T conflict block (L1950-1957) calls MPI_FINALIZE but has no STOP statement, unlike every other fatal branch — execution continues after finalize"
+    },
+    {
+     "id": "F43-Y2",
+     "text": "IF(ROLLER) VISCOSITY_BREAKING=.TRUE. at L1677 executes before ROLLER is read at L1868 — the override uses ROLLER's pre-read (module default) value, so ROLLER_EFFECT set in input cannot force VISCOSITY_BREAKING here"
+    },
+    {
+     "id": "F43-Y3",
+     "text": "V_FILE ELSE branch (L1445-1448... i.e. L444-448 of chunk: NO_UV_FILE=.FALSE. @L446 then IF(NO_UV_FILE) NO_UV_FILE=.TRUE. @L447) — the guard is a no-op after the preceding assignment, and a present V_FILE resets NO_UV_FILE=.FALSE. even if U_FILE was absent"
+    },
+    {
+     "id": "F43-Y4",
+     "text": "CONSTR default is the string 'HLLC' (@L1753) while its log message says 'USE HLL' (@L1752); consumers test only CONSTR(1:3)=='HLL' so both behave as HLL"
+    },
+    {
+     "id": "F43-Y5",
+     "text": "unit 10000 'time_dt.out' is opened (@L138) before RESULT_FOLDER is read (@L2021), so it lands in the CWD, and FDIR=TRIM(RESULT_FOLDER) at L137 uses RESULT_FOLDER before it is read — premature/dead assignment in READ_INPUT"
+    },
+    {
+     "id": "F43-Y6",
+     "text": "STATIONS station-file suffix is written with write(file_name(1:4),'(I4.4)') i (@L2402) into FILE_NAME whose remainder stays blank — 4-digit station names vs 5-digit field-file names in PREVIEW"
+    },
+    {
+     "id": "F43-Y7",
+     "text": "labels 881/991 (L1278-1279): 881 INPUT_PHASE=.TRUE. is reachable only by fallthrough after the Phase_LEFT read loop completes; no GOTO 881 exists in the file — whether INPUT_PHASE correctly reflects a phase-less file relies on READ END=991 skipping 881, an easily-broken control-flow idiom"
+    },
+    {
+     "id": "F43-Y8",
+     "text": "rand(0) (@L1287) is a compiler-specific extension; DEG2RAD, LARGE, ZERO, SP and all GLOBAL variables are defined cross-file"
+    },
+    {
+     "id": "F43-Y9",
+     "text": "locals LINE, I_comp, MKFOLDER(after L2042), FILE_NAME_MEAN (@L2480), TMP_NAME in PutFile (@L2900) are declared but unused or write-only"
+    },
+    {
+     "id": "F43-Y10",
+     "text": "STATISTICS and PutFileASCII/PutFileBinary and READ_* parsers are defined in other files (cross-file)"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F43-X0",
+     "F43-Y3"
+    ],
+    [
+     "F43-X2",
+     "F43-Y7"
+    ],
+    [
+     "F43-X4",
+     "F43-Y2"
+    ],
+    [
+     "F43-X5",
+     "F43-Y4"
+    ],
+    [
+     "F43-X6",
+     "F43-Y1"
+    ],
+    [
+     "F43-X7",
+     "F43-Y0"
+    ],
+    [
+     "F43-X9",
+     "F43-Y0"
+    ],
+    [
+     "F43-X9",
+     "F43-Y9"
+    ]
+   ]
+  },
+  {
+   "file_token": "F44",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F44-X0",
+     "text": "When nprocs differs from PX*PY, INDEX prints a STOP diagnostic and calls MPI_FINALIZE at L93-L100 but has no STOP/RETURN; it continues into MPI_CART_CREATE at L103 after MPI finalization."
+    },
+    {
+     "id": "F44-X1",
+     "text": "MPI_CART_COORDS is passed the MPI_COMM_WORLD rank myid at L105 rather than first obtaining the rank in comm2d. This is valid only if the GLOBAL reorder argument used at L104 is false and all world ranks belong to the Cartesian communicator; neither condition is established locally, and the mismatch path already continues after finalize."
+    },
+    {
+     "id": "F44-X2",
+     "text": "ESTIMATE_DT advances TIME by DT at L268 without capping DT against TOTAL_TIME (which is not an argument). Combined with the main loop's TIME<TOTAL_TIME condition, the last step can overshoot the requested end time; forcing, arrival times, and final-output scheduling then use the overshot clock."
+    },
+    {
+     "id": "F44-X3",
+     "text": "wall_time_secs selects only the current month's length at L399-L409 and computes months*mscale at L412 rather than accumulating preceding months; it also reads years at L397 but never includes it. The scalar is discontinuous/wrong across month or year boundaries, and its divisible-by-4 leap rule at L406 omits Gregorian century rules."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F44-Y0",
+     "text": "INDEX processor-count guard (L93-101) calls MPI_FINALIZE without STOP — ranks continue into MPI_CART_CREATE after finalize"
+    },
+    {
+     "id": "F44-Y1",
+     "text": "ESTIMATE_DT uses TMP1,TMP2,TMP3 and loop indices I,J that are not declared locally despite IMPLICIT NONE (L220) — they come from USE PARAM/GLOBAL (cross-file), so the CFL scan is not thread-safe"
+    },
+    {
+     "id": "F44-Y2",
+     "text": "MAX_MIN_PROPERTY declares MaxAbsEta and omega_0 (L284) but never uses them; OUT_VORmax exchange (L330-332) exchanges VorticityMax which is filled in dispersion.F (cross-file)"
+    },
+    {
+     "id": "F44-Y3",
+     "text": "wall_time_secs treats months cumulatively as months*mscale (all elapsed months given the CURRENT month's length) — approximation inherent to the formula L412-413; the subroutine is not called anywhere in this file"
+    },
+    {
+     "id": "F44-Y4",
+     "text": "leap-year test years.eq.4*int(years/4) (L406) ignores century rules"
+    },
+    {
+     "id": "F44-Y5",
+     "text": "ndims, reorder, comm2d, dims, periods, coords, EtaBlowVal, ICOUNT, ARRTIME, ArrTimeMin etc. are defined in GLOBAL (cross-file)"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F44-X0",
+     "F44-Y0"
+    ],
+    [
+     "F44-X3",
+     "F44-Y3"
+    ],
+    [
+     "F44-X3",
+     "F44-Y4"
+    ]
+   ]
+  },
+  {
+   "file_token": "F45",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F45-X0",
+     "text": "Mask condition @L19 is inverted relative to the other beach_2d scripts (which NaN mask==0): here wet cells are NaNed so the red circles @L20 mark dry cells — intent (testing wet/dry front on screen) is implied by the file name but not documented"
+    },
+    {
+     "id": "F45-X1",
+     "text": "etasrn_ output field ('screen' eta?) is loaded @L12 — its producer/meaning is outside this file; x-axis is column index (no dx scaling), window 200-250 columns"
+    }
+   ],
+   "listY": [
+    {
+     "id": "F45-Y0",
+     "text": "The file does not define mask value semantics: L15 plots all eta, then L19 removes mask>0 cells and L20 plots only the remainder as red markers, so whether that overlay is intended to identify dry/nonpositive-mask cells cannot be resolved from this file alone (L15, L19-L20)."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F45-X0",
+     "F45-Y0"
+    ],
+    [
+     "F45-X1",
+     "F45-Y0"
+    ]
+   ]
+  },
+  {
+   "file_token": "F46",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F46-X0",
+     "text": "TRIDy_periodic loops L154-L156 and L160-L162 use lowercase loop variable i but index c_end(I)/a_beg(I) with uppercase I — the same identifier in Fortran, so consistent, but beta loops L251/L277 likewise mix beta(i) with c_end(I); the equations rely on i==I identity"
+    },
+    {
+     "id": "F46-X1",
+     "text": "TRIDx/TRIDy modify dummy arguments a,c,d in place without INTENT declarations (L312, L399); TRIDy_periodic's comment @L168 documents that c,d are 'trashed' — callers must pass copies (c1=c @L171 protects only the first pass)"
+    },
+    {
+     "id": "F46-X2",
+     "text": "TRIDx forward-sweep guard 'if (a(i,j).ne.ZERO)' (L323, L333, L411, L421) leaves c,d unmodified where a==ZERO — the meaning of a zero sub-diagonal row (boundary rows?) is established by the callers, not this file"
+    },
+    {
+     "id": "F46-X3",
+     "text": "TRIDy_periodic: the two-rank exchanges (L104-L141, L214-L246) use blocking MPI_SEND before the matching IRECV is guaranteed posted on the peer — correctness relies on eager delivery for Mloc-sized messages when ProcessorID(II,1)==ProcessorID(II,PY) ranks differ; when PY==1 both branches are skipped and a_beg/c_end are copied locally (L144-L147) only over Ibeg:Iend while the parallel path copies 1:Mloc"
+    },
+    {
+     "id": "F46-X4",
+     "text": "Sequential dependency: TRIDx/TRIDy pipeline ranks — each rank waits for its west/south neighbor's seed before sweeping (L318-L328, L406-L417), serializing across the processor row/column"
+    },
+    {
+     "id": "F46-X5",
+     "text": "Unused declarations: nreq,ll,JJ @L80, myvar,mybeta @L84, Axx,Cxx,Dxx,U1D @L89, rmsg,smsg @L90 (in TRIDy_periodic), commented '! integer i, j' @L402; loop indices i,j,I,J are PARAM module variables (no local declarations despite IMPLICIT NONE)"
+    },
+    {
+     "id": "F46-X6",
+     "text": "Header of TRIDy (L385) says 'TRIDx is parallel version...' — copy-paste; file name 'tridiagnal' is itself a misspelling of tridiagonal"
+    }
+   ],
+   "listY": [
+    {
+     "id": "F46-Y0",
+     "text": "TRIDy_periodic divides by 1+c_end and 1+a_beg at lines 154-161 and 190-196, and by the Sherman-Morrison correction denominator at lines 251-252 and 277-278, without testing those denominators for zero or near-zero; singular periodic systems can therefore produce division by zero despite the algorithm comments at lines 57-62."
+    },
+    {
+     "id": "F46-Y1",
+     "text": "TRIDx and TRIDy test only a(...).ne.ZERO at lines 323 and 333 or 411 and 421, but then divide by the distinct eliminated pivot 1/a-rmsg(:,2) or 1/a-c(previous) at lines 324-326, 334-336, 412-414, and 422-424; the zero test does not protect against a zero eliminated pivot."
+    },
+    {
+     "id": "F46-Y2",
+     "text": "The backward phase fills only smsg(:,1) at lines 373-375 and 460-463 but MPI_ISEND transmits 2*Nloc or 2*Mloc values at lines 376-377 and 464-465. Thus smsg(:,2) is stale or uninitialized while receivers request the same two-column count at lines 354-355 and 442-443; current receivers use only column 1, but the communicated interface and initialized payload do not match."
+    },
+    {
+     "id": "F46-Y3",
+     "text": "All three routines use loop indices i and j under IMPLICIT NONE (lines 77, 310, 397), while no active local declarations for i or j appear (the only visible candidate is commented out at line 402). Successful compilation therefore depends on USE PARAM or another use-associated module exporting mutable i/j names, an implicit cross-module coupling not established in this file."
+    },
+    {
+     "id": "F46-Y4",
+     "text": "TRIDy_periodic sends all Mloc beta entries at line 259 after assigning only Ibeg:Iend at lines 250-254, and receivers copy all 1:Mloc entries at lines 266-268; halo entries outside the interior range can carry uninitialized data even though subsequent solution loops currently consume only Ibeg:Iend at lines 283-287."
+    }
+   ],
+   "candidate_pairs": []
+  },
+  {
+   "file_token": "F47",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F47-X0",
+     "text": "All working variables (TIME, TOTAL_TIME, Eta, Ubar, U0, ISTAGE, tbegin/tend, TIDAL_BC_ABS, TideBcType etc.) come from GLOBAL/TIDE_MODULE/TIME_SPECTRA_MODULE — cross-file; ISTAGE and tbegin/tend were moved to mod_global per comments L157-158"
+    },
+    {
+     "id": "F47-X1",
+     "text": "the hot-start data layout documented at L84-145 (units, fields, 'need to confirm if the saved data is consistent with input.txt' L91) describes functionality whose read/write code is not in this file"
+    },
+    {
+     "id": "F47-X2",
+     "text": "the header call plan (L60-79) lists 'FLUXES / SourceTerms again' after EXCHANGE but the actual stage loop calls each once per stage — the comment reflects an older structure"
+    },
+    {
+     "id": "F47-X3",
+     "text": "every subroutine called (INDEX, EXCHANGE, ESTIMATE_DT, SourceTerms, UPDATE_MASK, MIXING_STUFF, MAX_MIN_PROPERTY, CHECK_BLOWUP, ABSORBING_GENERATING_BC, IRREGULAR_LEFT_BC, SPONGE_DAMPING, SOLITARY_WAVE_LEFT_BOUNDARY, TIDE_*, TIME_SPECTRA_*) is defined in other files (cross-file)"
+    }
+   ],
+   "listY": [
+    {
+     "id": "F47-Y0",
+     "text": "READ_INPUT exposes configurable Time_Scheme (io.f90 L1739-L1746), but this driver unconditionally labels and executes a three-stage loop at L254-L255. Whether ESTIMATE_HUV alone makes non-Runge_Kutta selections coherent is not visible here; fluxes, sources, breaking, exchanges, and boundary calls still execute three times regardless."
+    },
+    {
+     "id": "F47-Y1",
+     "text": "OUTPUT is called only at the beginning of each TIME<TOTAL_TIME iteration (L209-L213). After the final step exits the loop, only STATIONS receives an explicit final call (L320-L324); no final PREVIEW/OUTPUT call is visible, so a requested field snapshot exactly at TOTAL_TIME depends on ESTIMATE_DT/output-counter behavior outside this file and can be omitted if the last state first reaches TOTAL_TIME inside the step."
+    }
+   ],
+   "candidate_pairs": []
+  },
+  {
+   "file_token": "F48",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F48-X0",
+     "text": "In CONSTRUCT_HO_X_MLP, every protective small-denominator test is executed after the corresponding division: gamL is divided at line 1546 before TXP1 is tested at line 1547; gamR at 1550 before TXP3 at 1551; tanth1/tanth2 at 1555/1559 before delsol tests at 1556/1560; and gamRtanth2/gamLtanth1 at 1562/1574 before gamma tests at 1563/1575. Zero or tiny denominators can therefore raise floating-point exceptions or create Inf/NaN before the fallback assignment, making the checks ineffective."
+    },
+    {
+     "id": "F48-X1",
+     "text": "CONSTRUCT_HO_Y_MLP duplicates the same divide-before-check sequence: gamL/gamR at lines 1621/1625 precede denominator tests at 1622/1626; tanth1/tanth2 at 1630/1634 precede delsol tests at 1631/1635; and transverse gamma divisions at 1637/1649 precede gamma tests at 1638/1650."
+    },
+    {
+     "id": "F48-X2",
+     "text": "The dispersive face arrays U4xL/U4xR/V4xL/V4xR and U4yL/U4yR/V4yL/V4yR are assigned only inside IF(DISPERSION) blocks (for example lines 452-460 and 511-519), but they are read unconditionally immediately afterward in PL/PR, QL/QR, and momentum-flux expressions (lines 466-555). The same copied pattern occurs in HO-minmod (lines 686-774), HO, MLP (lines 1431-1510), and WENO construction. When DISPERSION is false, this file supplies no initialization before those reads; correctness depends on external initialization and on multiplication by Gamma1 not exposing undefined values."
+    },
+    {
+     "id": "F48-X3",
+     "text": "CONSTRUCT_HO_X_MLP and CONSTRUCT_HO_Y_MLP declare and receive MASK at lines 1526 and 1600, but their active bodies never reference MASK. Unlike the minmod/HO kernels, the MLP kernels therefore do not lower order or zero gradients at dry-neighbor stencils; the dummy-argument interface suggests wet/dry handling that is not implemented in these routines."
+    },
+    {
+     "id": "F48-X4",
+     "text": "VANLEER_LIMITER divides by ABS(A)+ABS(B) when optional B is present and by 1.0+A otherwise (lines 1027-1030), with no local zero-denominator guard. A=B=0 and A=-1 respectively produce 0/0 if this public function is called, although active reconstruction code in this file uses inline guarded formulas instead."
+    },
+    {
+     "id": "F48-X5",
+     "text": "The HLL transonic branch tests ABS(SR-SL)<SMALL but then divides the numerator by positive SMALL rather than by the signed speed difference (lines 193-198). This regularization changes denominator sign for a small negative SR-SL and does not establish the limiting flux; its intended behavior is unresolved."
+    },
+    {
+     "id": "F48-X6",
+     "text": "MLP and WENO stencils access up to I-3/I+2 and J-3/J+2 while their loops are driven directly by Ibeg/Iend/Jbeg/Jend (lines 1541-1559 and 1813-1853, with y analogues). No local bounds/ghost-width assertion is present, so array safety depends on external bounds guaranteeing at least three valid ghost indices."
+    },
+    {
+     "id": "F48-X7",
+     "text": "CONSTRUCT_X and CONSTRUCT_Y accept Kappa at lines 579 and 622, but Kappa is not used in either body; comments at lines 584-586 and 625-628 say it is meaningless. The retained interface argument can diverge from callers' expectation that Kappa selects reconstruction order."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F48-Y0",
+     "text": "Header comment L14 says 'FILE main.F' while every subroutine here is the fluxes/reconstruction module — header/content mismatch (preprocessor concatenation artifact or copy-paste)"
+    },
+    {
+     "id": "F48-Y1",
+     "text": "Loop indices I,J and temporaries TMP1,TMP2 (used at L1253,L1269 in CONSTRUCT_HO_X and L1368,L1384 in CONSTRUCT_HO_Y and in Del*Fun @L252-253,L292-293) are not declared locally — they come from PARAM/GLOBAL modules (cross-file); the same-named local TXP1/TYP1 sets shadow nothing but the mixed use of module-level TMP* inside these kernels means the routines are not thread-safe as written"
+    },
+    {
+     "id": "F48-Y2",
+     "text": "VANLEER_LIMITER (L1020) and MINMOD_LIMITER (L1036) are defined but never called in this file; DelxFun/DelyFun/CONSTRUCT_HO_* inline the same expressions instead (commented-out calls @L259,L298)"
+    },
+    {
+     "id": "F48-Y3",
+     "text": "CONSTRUCT_HO_X_MLP/Y_MLP ignore their MASK argument — no dry-cell fallback unlike the minmod/HO variants (declared @L1526/L1600 but never referenced in the body)"
+    },
+    {
+     "id": "F48-Y4",
+     "text": "WENO_CONSTRUCT_X/Y have no MASK argument at all — CONSTRUCTION_WENO passes none (L1696-1700), so WENO reconstruction has no wetting-drying protection in this file"
+    },
+    {
+     "id": "F48-Y5",
+     "text": "CONSTRUCT_X/CONSTRUCT_Y keep the Kappa dummy argument though ykchoi comments (L584-586, L627-628) state kappa is meaningless after the 08/31/2016 simplification"
+    },
+    {
+     "id": "F48-Y6",
+     "text": "MLP x-variant reads Vin(I-1,J+1),Vin(I-1,J-1),Vin(I,J+1),Vin(I,J-1) (L1555-1560) — transverse stencil access with no J-bound guard at J=Jbeg-?; loop runs J=Jbeg,Jend (L1538) so J-1/J+1 stay within ghost region only if Nghost>=1 (cross-file assumption)"
+    },
+    {
+     "id": "F48-Y7",
+     "text": "the six-argument declaration REAL(SP)::SR,SL,FL,FR,UL,UR in FLUX_AT_INTERFACE_HLL (L161) is unused — the actual SL/SR etc. are the GLOBAL arrays passed to HLL"
+    },
+    {
+     "id": "F48-Y8",
+     "text": "BOUNDARY_CONDITION (L124), EXCHANGE-side arrays (PL,PR,QL,QR,FxL..GyR,UxL..V4yR,Depthx,Depthy,Kappa,HIGH_ORDER,CONSTR,Gamma1,Gamma3,MASK9) are defined in GLOBAL/other files (cross-file)"
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F48-X3",
+     "F48-Y3"
+    ],
+    [
+     "F48-X7",
+     "F48-Y5"
+    ]
+   ]
+  }
+ ]
+}

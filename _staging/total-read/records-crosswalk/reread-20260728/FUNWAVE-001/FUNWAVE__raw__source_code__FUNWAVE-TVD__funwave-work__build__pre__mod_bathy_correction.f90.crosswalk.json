@@ -1,0 +1,148 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-001",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/mod_bathy_correction.f90",
+ "source_sha256": "28c71d27c9e74983540a5ccf85080dfe884253cb6e3f69adbd61da3709b89ee7",
+ "base_run_id": "reread20260728-code-FUNWAVE-001-fable5-20260813T012841Z-2ec7b3b5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
+ "base_record_file": "b99b616e2005ad0242d4a8016b29257065d91009b2667c7a44a12dab50a3377f.json",
+ "audit_record_file": "b99b616e2005ad0242d4a8016b29257065d91009b2667c7a44a12dab50a3377f.json",
+ "base_record_sha256_bytes": "aa6c8aa63e59df852747a840a35e7c7a0a3dae519225945c6c24102f4ad69c91",
+ "audit_record_sha256_bytes": "7be58dee56722478db118ee6b6655c9e43fcc73efee5a9d6a3662e7bb48483d7",
+ "base_finding_count": 5,
+ "audit_finding_count": 4,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "Gradx0/Gradx use a centered difference over 2*DX but divide only by DX (L158,L179) — the 'slope' compared against SlopeCap is twice the actual centered-difference slope, or a one-sided-scaled definition; not clarified in file"
+   ],
+   "audit_member_text": [
+    "Both the initial and iterative central differences use points I-1 and I+1 (or J-1/J+1) but divide by DX/DY at L158-L159 and L179-L180 rather than the two-cell distance 2*DX/2*DY. If SlopeCap is a physical |dh/dx| threshold as the module comments state, slopes are doubled and smoothing is triggered too aggressively."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "the smoothing stencil coefficients 0.4+4*0.15=1.0 conserve the sum only on uniform fields; Depth1 at masked/boundary-adjacent cells uses Depth0 neighbors that may be outside the corrected set"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "change_percentage is written into tmp1, a GLOBAL temporary (L185) — thread-unsafe reuse; locals Ifile,K,K5,K10,K15,nreq,len,req,status,myint,TMP_NAME(in CORRECTION) are declared but unused (the MPI_WAITALL usage is commented out @L206)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "SmoothBelowDepth semantics: MASK0=0 (excluded from correction) where Depth0<SmoothBelowDepth — with the -LARGE default nothing is excluded; the name suggests smoothing BELOW a depth but the code excludes below it; intent ambiguity noted"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "iteration cap 1000 and threshold 0.05 are hard-coded; convergence is on max relative change, reduced across ranks each iteration; phi_exch/phi_int_exch/PutFile are cross-file"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Gradx and Grady are allocated at L126-L129 without initialization and assigned only where MASK0==1 at L178-L180. Masked cells retain undefined values, yet the entire arrays are exchanged at L219-L220 and written at L247-L249."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Within the last iteration Gradx/Grady are computed from the pre-update Depth0 at L179-L180, then Depth1 is smoothed and copied to Depth0 at L183-L196. On convergence exit the output gradients therefore describe the preceding bathymetry, not the final Depth assigned at L216; they are never recomputed after the loop."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The loop starts pointcount at 0 (L99), tests pointcount<=1000 at L166, and increments after every update at L198, permitting 1001 smoothing iterations although the apparent cap is 1000."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

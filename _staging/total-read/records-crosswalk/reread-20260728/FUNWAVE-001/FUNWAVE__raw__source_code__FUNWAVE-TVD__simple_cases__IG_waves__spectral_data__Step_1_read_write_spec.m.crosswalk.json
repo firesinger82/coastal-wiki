@@ -1,0 +1,163 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-001",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/IG_waves/spectral_data/Step_1_read_write_spec.m",
+ "source_sha256": "70463fbdde80c8ba747ce4d985406bc4529ab9e153c5dd46aacefb309248c55b",
+ "base_run_id": "reread20260728-code-FUNWAVE-001-fable5-20260813T012841Z-2ec7b3b5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
+ "base_record_file": "618ca3de0826f89536ac7b72baa6472dc65aa41bc286844f5ae3cb985479ac27.json",
+ "audit_record_file": "618ca3de0826f89536ac7b72baa6472dc65aa41bc286844f5ae3cb985479ac27.json",
+ "base_record_sha256_bytes": "cf22a54fef1a4983a93efc72af5d5264862036a36ff14b85b1ab69a859fe551d",
+ "audit_record_sha256_bytes": "fecdeb3f80e369129137aa825f94e3c66ececaa1046d637ae250be590b4259f7",
+ "base_finding_count": 5,
+ "audit_finding_count": 5,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "depth=13.0 @L18 and peak_freq=0.158 @L19 are hardcoded for case1 rather than derived from the loaded data — must be edited per case"
+   ],
+   "audit_member_text": [
+    "depth and peak_freq are hard-coded at lines 18-19 rather than derived from input_data_case1.txt, and the output angle is likewise hard-coded to zero at lines 83 and 101; the generated SPC/FUNWAVE files cannot preserve differing case metadata present outside this script."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "The loop bound trun=1601 @L38 and tail index f(trun+floor(sk+sk/2)) @L45 assume input_data_case1.txt has enough rows (>1646); the last band-average window E(ii:ii+sk-1) @L42 with ii up to 1591 also requires length(E)>=1620 — no bounds checking"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Amp uses EE(2:end-1) @L56 — the first and last (tail) bins are dropped from the written components (Hsig_resolved @L54 measures exactly what is kept); the energy in bin 1 and the tail bin is silently discarded from the FUNWAVE input"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "spectrum_windwave_only.txt is written without a phase block (only amplitudes @L110), unlike the two-component file written by IG_wave_generation.m — the downstream reader must supply random phases"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "The written frequency resolution is nonuniform at the tail (dff computed @L47 from the first two centers only); df @L35 'for equal increment' is used only for plotting normalization @L63"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The final regular aggregation block begins at ii=1591 and consumes E(1591:1620) under lines 40-44, but the residual block starts at trun+sk=1631 at line 46. E(1621:1630) is omitted from both EE blocks, so E_t at line 50 is not energy-conservative relative to E_total at line 31."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Hard-coded slices require at least 100 rows and three columns at lines 24-25, at least 1620 integrated bins for the loop at lines 40-44, f(1646) at line 45, and E(1631:end) at line 46. No size check precedes these accesses, so shorter input_data_case1.txt files fail out of range."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "df and dff use only the first spacing at lines 35 and 47, while E itself uses every local spacing at line 28. The plotted densities at lines 63 and 66 therefore assume equal spacing without checking it, even though the energy integration supports nonuniform f."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The third plotted series E_IG_data is added at line 67, but the legend at line 72 supplies only two labels, leaving the displayed series-to-label mapping incomplete."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

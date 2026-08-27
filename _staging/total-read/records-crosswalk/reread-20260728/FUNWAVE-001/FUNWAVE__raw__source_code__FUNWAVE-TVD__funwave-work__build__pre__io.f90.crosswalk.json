@@ -1,0 +1,284 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-001",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/io.f90",
+ "source_sha256": "3ebb39f25c399c02b20a6ff4113c548d2c83e22b50cdbc45c3bc4324f8aceff1",
+ "base_run_id": "reread20260728-code-FUNWAVE-001-fable5-20260813T012841Z-2ec7b3b5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
+ "base_record_file": "e0c1246b3720207c6ded67b7cdf30640e30782d91c864d516dbc6622c84fa6f9.json",
+ "audit_record_file": "e0c1246b3720207c6ded67b7cdf30640e30782d91c864d516dbc6622c84fa6f9.json",
+ "base_record_sha256_bytes": "b20da41e225e2f4c3497abf0d7f1c62210ada5cfb5664eb92858de18df3e5635",
+ "audit_record_sha256_bytes": "2a6608b3508e842bd5cfd1287be838c419a5de91df2db51d0ec915d037321cd0",
+ "base_finding_count": 11,
+ "audit_finding_count": 10,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [
+    "EtaBlowVal block L2103-2111: the READ_FLOAT is commented out (@L2104) but the IF(ierr==1) default EtaBlowVal=10.0_SP remains, keyed to the stale ierr of the preceding OUT_Radiation read (@L2101); init.f90 later overwrites EtaBlowVal=100*max depth — cross-line/cross-file dead-code interaction"
+   ],
+   "audit_member_text": [
+    "EtaBlowVal input is commented out at L2104, yet L2105 tests ierr left by the preceding OUT_Radiation read at L2101. Its conditional assignment is therefore controlled by an unrelated key; L2106 assigns 10.0_SP while L2108-L2109 claim '100xmax_depth' and L2113 says init.F sets that value, leaving this block internally inconsistent."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "IF(ROLLER) VISCOSITY_BREAKING=.TRUE. at L1677 executes before ROLLER is read at L1868 — the override uses ROLLER's pre-read (module default) value, so ROLLER_EFFECT set in input cannot force VISCOSITY_BREAKING here"
+   ],
+   "audit_member_text": [
+    "ROLLER is consulted at L1677 to force VISCOSITY_BREAKING before ROLLER_EFFECT is read and defaulted at L1868-L1871. Thus the forcing decision uses the pre-input value and is not revisited after the actual ROLLER input is known."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [
+    "VISCOSITY_BREAKING=T + WAVEMAKER_VIS=T conflict block (L1950-1957) calls MPI_FINALIZE but has no STOP statement, unlike every other fatal branch — execution continues after finalize"
+   ],
+   "audit_member_text": [
+    "The mutually enabled VISCOSITY_BREAKING/WAVEMAKER_VIS path prints STOP and calls MPI_FINALIZE at L1950-L1956 but has no STOP/RETURN after finalization (L1957 continues), allowing execution to proceed after MPI has been finalized."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "V_FILE ELSE branch (L1445-1448... i.e. L444-448 of chunk: NO_UV_FILE=.FALSE. @L446 then IF(NO_UV_FILE) NO_UV_FILE=.TRUE. @L447) — the guard is a no-op after the preceding assignment, and a present V_FILE resets NO_UV_FILE=.FALSE. even if U_FILE was absent"
+   ],
+   "audit_member_text": [
+    "U/V hot-start presence is not combined correctly: U_FILE absence sets NO_UV_FILE=.TRUE. at L428, but a present V_FILE overwrites it to .FALSE. at L446; the supposed preservation test at L447 tests that newly false value, so the comment 'in case you dont have u file' is ineffective."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "CONSTR default is the string 'HLLC' (@L1753) while its log message says 'USE HLL' (@L1752); consumers test only CONSTR(1:3)=='HLL' so both behave as HLL"
+   ],
+   "audit_member_text": [
+    "The absent-CONSTRUCTION diagnostic says 'USE HLL' at L1752, but the actual default assigned at L1753 is HLLC, so the log and active numerical flux disagree."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "unit 10000 'time_dt.out' is opened (@L138) before RESULT_FOLDER is read (@L2021), so it lands in the CWD, and FDIR=TRIM(RESULT_FOLDER) at L137 uses RESULT_FOLDER before it is read — premature/dead assignment in READ_INPUT"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "STATIONS station-file suffix is written with write(file_name(1:4),'(I4.4)') i (@L2402) into FILE_NAME whose remainder stays blank — 4-digit station names vs 5-digit field-file names in PREVIEW"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "labels 881/991 (L1278-1279): 881 INPUT_PHASE=.TRUE. is reachable only by fallthrough after the Phase_LEFT read loop completes; no GOTO 881 exists in the file — whether INPUT_PHASE correctly reflects a phase-less file relies on READ END=991 skipping 881, an easily-broken control-flow idiom"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A8"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "rand(0) (@L1287) is a compiler-specific extension; DEG2RAD, LARGE, ZERO, SP and all GLOBAL variables are defined cross-file"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A9"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "locals LINE, I_comp, MKFOLDER(after L2042), FILE_NAME_MEAN (@L2480), TMP_NAME in PutFile (@L2900) are declared but unused or write-only"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A10"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "STATISTICS and PutFileASCII/PutFileBinary and READ_* parsers are defined in other files (cross-file)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "ETA_LIMITER is read at L1124 and immediately tested at L1125 without any ierr branch/default; if READ_LOGICAL does not assign on a missing key and the GLOBAL value is not initialized elsewhere, the branch uses an undefined or stale value."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The absorbing DATA phase read jumps from L1275 to label 991 at L1279 on EOF, bypassing CLOSE(1) at L1277; the no-phase fallback therefore leaves unit 1 open while successful phase input sets INPUT_PHASE at L1278."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "WAVE_DATA_TYPE is read at L1228 without checking ierr, then sliced at L1255; likewise WidthWaveMaker and R/A sponge-wavemaker reads at L1249-L1252 have no absence handling. Missing keys can therefore propagate undefined/stale configuration into branch selection and sponge calculations unless GLOBAL or INPUT_READ supplies undocumented initialization."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B8"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Station buffering loses and/or fabricates samples: once the condition at L2428 is false, the current sample is never inserted before L2435-L2438 flush and reset, so each overflow-triggering sample is dropped. At TIME>=TOTAL_TIME the same ELSE writes exactly StationOutputBuffer rows even when BufferCount is smaller; ZUV_Buffer was allocated at L2374-L2375 but not initialized, so unwritten tail rows can be uninitialized on the first partial flush or stale after later flushes before files close at L2451-L2457."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B9"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "NumberStations is read at L2048 and used at L2049 without an ierr default; absence handling depends on undocumented prior initialization. The many output logical reads L2065-L2101 likewise overwrite the same ierr and provide no per-flag default in this routine."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

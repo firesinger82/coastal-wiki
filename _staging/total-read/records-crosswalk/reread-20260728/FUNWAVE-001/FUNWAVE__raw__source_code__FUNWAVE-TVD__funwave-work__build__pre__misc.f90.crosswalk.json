@@ -1,0 +1,139 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-001",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/misc.f90",
+ "source_sha256": "276c11fe037412d7456fcc97cb846db0996fa13e96a1f1b4d7d3c8cfb640d1a0",
+ "base_run_id": "reread20260728-code-FUNWAVE-001-fable5-20260813T012841Z-2ec7b3b5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
+ "base_record_file": "e244c6be6ac2cb8b0b41409ffb51d4e5ea9235ed052f3b318537776e0319321f.json",
+ "audit_record_file": "e244c6be6ac2cb8b0b41409ffb51d4e5ea9235ed052f3b318537776e0319321f.json",
+ "base_record_sha256_bytes": "e026218a4d6abd10ffdb48b673907f655b9a813b81b66baaa89ba36373973ef1",
+ "audit_record_sha256_bytes": "c320f8e607d0718a384afe748edc7fa43da9dea942f8ee6a2c43a20c5b21bbd5",
+ "base_finding_count": 6,
+ "audit_finding_count": 4,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3",
+    "A4"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "wall_time_secs treats months cumulatively as months*mscale (all elapsed months given the CURRENT month's length) — approximation inherent to the formula L412-413; the subroutine is not called anywhere in this file",
+    "leap-year test years.eq.4*int(years/4) (L406) ignores century rules"
+   ],
+   "audit_member_text": [
+    "wall_time_secs selects only the current month's length at L399-L409 and computes months*mscale at L412 rather than accumulating preceding months; it also reads years at L397 but never includes it. The scalar is discontinuous/wrong across month or year boundaries, and its divisible-by-4 leap rule at L406 omits Gregorian century rules."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "INDEX processor-count guard (L93-101) calls MPI_FINALIZE without STOP — ranks continue into MPI_CART_CREATE after finalize"
+   ],
+   "audit_member_text": [
+    "When nprocs differs from PX*PY, INDEX prints a STOP diagnostic and calls MPI_FINALIZE at L93-L100 but has no STOP/RETURN; it continues into MPI_CART_CREATE at L103 after MPI finalization."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "ESTIMATE_DT uses TMP1,TMP2,TMP3 and loop indices I,J that are not declared locally despite IMPLICIT NONE (L220) — they come from USE PARAM/GLOBAL (cross-file), so the CFL scan is not thread-safe"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "MAX_MIN_PROPERTY declares MaxAbsEta and omega_0 (L284) but never uses them; OUT_VORmax exchange (L330-332) exchanges VorticityMax which is filled in dispersion.F (cross-file)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "ndims, reorder, comm2d, dims, periods, coords, EtaBlowVal, ICOUNT, ARRTIME, ArrTimeMin etc. are defined in GLOBAL (cross-file)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "MPI_CART_COORDS is passed the MPI_COMM_WORLD rank myid at L105 rather than first obtaining the rank in comm2d. This is valid only if the GLOBAL reorder argument used at L104 is false and all world ranks belong to the Cartesian communicator; neither condition is established locally, and the mismatch path already continues after finalize."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "ESTIMATE_DT advances TIME by DT at L268 without capping DT against TOTAL_TIME (which is not an argument). Combined with the main loop's TIME<TOTAL_TIME condition, the last step can overshoot the requested end time; forcing, arrival times, and final-output scheduling then use the overshot clock."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

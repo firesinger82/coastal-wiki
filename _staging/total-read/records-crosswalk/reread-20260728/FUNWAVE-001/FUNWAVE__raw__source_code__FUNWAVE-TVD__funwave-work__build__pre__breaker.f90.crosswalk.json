@@ -1,0 +1,202 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-001",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/breaker.f90",
+ "source_sha256": "aee5250685d61a9ae77b775ced2ae280c8d1eba493ce5273bf8aead52f5057fb",
+ "base_run_id": "reread20260728-code-FUNWAVE-001-fable5-20260813T012841Z-2ec7b3b5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
+ "base_record_file": "b29288eb569e210c51bf6b855b60148b7a1aad0c059b27c875415b962b45c446.json",
+ "audit_record_file": "b29288eb569e210c51bf6b855b60148b7a1aad0c059b27c875415b962b45c446.json",
+ "base_record_sha256_bytes": "905b7af9b1af282ba8166aa0b8eb01d4506b9d140883de7a65491640a15782f5",
+ "audit_record_sha256_bytes": "d394e3daf4b5ba6e4a20826a1f54a6436d45809500ce453d461a0b0d351b2493",
+ "base_finding_count": 5,
+ "audit_finding_count": 8,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "AGE is declared INTENT(OUT) at L117 but is read before any assignment (AGE(I,J).EQ.ZERO at L143, AGE(I,J).GT.ZERO at L146), i.e. the scheme relies on the actual argument (AGE_BREAKING, L77) retaining its previous-step values across calls despite the OUT intent"
+   ],
+   "audit_member_text": [
+    "AGE is declared INTENT(OUT) at line 117 but is read before any guaranteed definition in the onset test at lines 142-143, the positive-age branch at line 146, and neighbor propagation at lines 165-205. Under Fortran INTENT(OUT) semantics its incoming value is undefined; the algorithm appears to require INTENT(INOUT) or explicit initialization."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "Declared but unused in this file: cap2 (L111), etat_star,B,T_star (L113), tmp4preview (L105); npx,npy imported at L106 are only referenced in commented-out lines L218-219 superseded by iista/jjsta form at L220-221"
+   ],
+   "audit_member_text": [
+    "npx, npy and Nghost are imported at lines 101 and 106 but occur only in commented-out coordinate formulas at lines 218-219; tmp4preview is imported at line 105 but unused. Local cap2, etat_star, B and T_star declared at lines 111-113 are also unused, indicating dead remnants."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "VISCOSITY_WMAKER called at L82 is not defined in this file; its definition is in another source file"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Loop indices I,J and temporaries tmp1,tmp2,tmp3,tmp4 are used (L123-140) but not declared locally; they must come from USE GLOBAL/PARAM modules (cross-file)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "SHOW_BREAKING, WAVEMAKER_VIS, Mloc, Nloc, visbrk, Cbrk1, Cbrk2, T_brk, AGE_BREAKING used in WAVE_BREAKING (L75-82) come from USE GLOBAL without ONLY list; their definitions are cross-file"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "confirmed_delta",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "DXg and DYg are local variables declared at line 112 and assigned only inside the AGE<=ZERO propagation branch at lines 151-152, yet are used unconditionally later to form xmk/ymk at lines 220-221. If AGE(I,J)>ZERO at lines 146-147, those locals reach lines 220-221 undefined."
+   ],
+   "representative": "audit",
+   "rationale": "span-verified 2026-08-27: DXg/DYg (decl L112) assigned only in innermost new-breaking ELSE (L152-153); breaking-branch and AGE>ZERO aging-branch leave them unset, yet xmk/ymk consume them unconditionally after all ENDIFs at L221-222. use-before-assign (undefined on first use). base missed.",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "evidence_span": {
+    "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/breaker.f90",
+    "lines": "112,152-153,221-222",
+    "quote": "REAL(SP) :: xmk,ymk,DXg,DYg   ! L112 decl\n... (assigned only in AGE<=ZERO branch) DXg=DX ; DYg=DY   ! L152-153\n... (after ENDIFs, unconditional) xmk=(I-Ibeg)*DXg + (iista-1)*DXg ; ymk=(J-Jbeg)*DYg + (jjsta-1)*DYg   ! L221-222"
+   }
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Xc_WK and Yc_WK occur twice in the same GLOBAL ONLY import sequence at lines 101-103, consistent with a duplicated continuation-list fragment; compiler acceptance and intended import list are unresolved."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The depth-dependent T_brk expression is commented out at line 127, so the active routine always uses the caller-provided T_brk from line 110 despite the preceding 'make T_brk as function of depth' comment at line 126."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Propagation time uses the MIN of |ETAt|/|grad eta| and sqrt(g|H|) at line 149, while roller flux uses the MAX of the same two speed estimates at line 266; the physical reason for opposite limiters is not stated in this file."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "ANGLE can equal positive 180 degrees from ATAN2 at line 134, but quadrant 2 accepts ANGLE<180 at line 176 while quadrant 3 begins at -180 at line 187; the exact +180 case therefore matches no propagation quadrant."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The loops extend through Ibeg-1:Iend+1 and Jbeg-1:Jend+1 at lines 123-124 and then read one additional neighbor in the propagation branches at lines 165-205. Whether passed arrays (1:M,1:N) always contain the resulting two-cell halo cannot be established from this file."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

@@ -1,0 +1,114 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-001",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/main.f90",
+ "source_sha256": "357af6128a321d07e0c0e5d073ab9e8be59009643703bc378df72204730d363c",
+ "base_run_id": "reread20260728-code-FUNWAVE-001-fable5-20260813T012841Z-2ec7b3b5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
+ "base_record_file": "f932efc043c0f7fef2bca3a44400fdb726a8200d9db4384e67e50cfa57cc3d97.json",
+ "audit_record_file": "f932efc043c0f7fef2bca3a44400fdb726a8200d9db4384e67e50cfa57cc3d97.json",
+ "base_record_sha256_bytes": "2f6d8dc08fcbe31df0145780ec93c8199318774a208552cba58ff658db1d9588",
+ "audit_record_sha256_bytes": "bd0010f80cab72ffa108e79db7ca83ad6a0cbcb5007f71e1de671724998d215c",
+ "base_finding_count": 4,
+ "audit_finding_count": 2,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "All working variables (TIME, TOTAL_TIME, Eta, Ubar, U0, ISTAGE, tbegin/tend, TIDAL_BC_ABS, TideBcType etc.) come from GLOBAL/TIDE_MODULE/TIME_SPECTRA_MODULE — cross-file; ISTAGE and tbegin/tend were moved to mod_global per comments L157-158"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "the hot-start data layout documented at L84-145 (units, fields, 'need to confirm if the saved data is consistent with input.txt' L91) describes functionality whose read/write code is not in this file"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "the header call plan (L60-79) lists 'FLUXES / SourceTerms again' after EXCHANGE but the actual stage loop calls each once per stage — the comment reflects an older structure"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "every subroutine called (INDEX, EXCHANGE, ESTIMATE_DT, SourceTerms, UPDATE_MASK, MIXING_STUFF, MAX_MIN_PROPERTY, CHECK_BLOWUP, ABSORBING_GENERATING_BC, IRREGULAR_LEFT_BC, SPONGE_DAMPING, SOLITARY_WAVE_LEFT_BOUNDARY, TIDE_*, TIME_SPECTRA_*) is defined in other files (cross-file)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "READ_INPUT exposes configurable Time_Scheme (io.f90 L1739-L1746), but this driver unconditionally labels and executes a three-stage loop at L254-L255. Whether ESTIMATE_HUV alone makes non-Runge_Kutta selections coherent is not visible here; fluxes, sources, breaking, exchanges, and boundary calls still execute three times regardless."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "OUTPUT is called only at the beginning of each TIME<TOTAL_TIME iteration (L209-L213). After the final step exits the loop, only STATIONS receives an explicit final call (L320-L324); no final PREVIEW/OUTPUT call is visible, so a requested field snapshot exactly at TOTAL_TIME depends on ESTIMATE_DT/output-counter behavior outside this file and can be omitted if the last state first reaches TOTAL_TIME inside the step."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

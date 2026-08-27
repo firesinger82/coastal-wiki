@@ -1,0 +1,159 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-001",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/dispersion.f90",
+ "source_sha256": "1e429115d882c27c149129c0c75f932290c6cb89c70b60e4a7d0f5af7335c11a",
+ "base_run_id": "reread20260728-code-FUNWAVE-001-fable5-20260813T012841Z-2ec7b3b5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
+ "base_record_file": "1275220ff45975aecd439c99c493bb04a57d67075cdc28423695ac3a8bd3a45d.json",
+ "audit_record_file": "1275220ff45975aecd439c99c493bb04a57d67075cdc28423695ac3a8bd3a45d.json",
+ "base_record_sha256_bytes": "3906c4b83b43779851c5307794282b4f6495b2a8d626b6838302efaf2af05d3c",
+ "audit_record_sha256_bytes": "0ddfe614c7591536c4e1733f54a7ce2e67d222c07f677cd570c39af9f0a4e149",
+ "base_finding_count": 6,
+ "audit_finding_count": 3,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Comment L116 records a known bug (loop bounds should be J=1,Nloc, I=1,Mloc) but the code at L108-109 still loops J=1,Nloc-1, I=1,Mloc-1 — i.e. ETAT and DU/DV are not computed on the last row/column in this version"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "ELSEIF(SHOW_BREAKING .OR. WAVEMAKER_VIS) branch at L144-146 is empty — ETAT needed for breaking is computed unconditionally at L118, so the branch body may have been moved out; intent not stated"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "b2 used in omega_1 (L373-374) is not declared locally and its relation to Beta_1/Beta_2 comes from GLOBAL (cross-file)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Loop indices I,J and neighbor-rank variables n_west,n_east,n_suth,n_nrth, MPI_PROC_NULL come from USE GLOBAL (cross-file)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "U1p/V1p (L281-290) use Uxx,Vxy,DUxx,DVxy computed only by second-order DERIVATIVE_XX/XY (L86-92) — header comment L66-67 says derivative_xx_high was changed to second order per Harris suggestion; the _HIGH variants defined in derivatives.f90 are not called here"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "EXCHANGE_DISPERSION (L244) and DERIVATIVE_* are defined in other files (cross-file)"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Lines 379-380 compare abs(omega) against VorticityMax but then store signed omega rather than abs(omega). A new negative extremum can make VorticityMax negative, after which later positive magnitudes trivially exceed it; the stored field therefore does not consistently represent a maximum magnitude."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "ETAT is assigned only for I=1..Mloc-1 and J=1..Nloc-1 at lines 108-118, while it is consumed over Ibeg..Iend and Jbeg..Jend at lines 298-328. Whether every consumed element is assigned in this call depends on the GLOBAL bounds; no local range assertion establishes that Iend<=Mloc-1 and Jend<=Nloc-1."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Ut and Vt divide by DT at lines 136-137 without a local nonzero/positive-DT guard; safety depends on an external timestep invariant."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

@@ -1,0 +1,167 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-001",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/mod_input.f90",
+ "source_sha256": "840613b8f78689e400121fa4c642fcf4853020a1123ce5741782463e67870dca",
+ "base_run_id": "reread20260728-code-FUNWAVE-001-fable5-20260813T012841Z-2ec7b3b5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
+ "base_record_file": "d7b1363ac4a788292d87bd894cc083c9477065de1cbffeeafa1150776654c239.json",
+ "audit_record_file": "d7b1363ac4a788292d87bd894cc083c9477065de1cbffeeafa1150776654c239.json",
+ "base_record_sha256_bytes": "b0b4024c81ef07ac7e4ebcea768e38520bdf21eef2e3aaf8b9c3bc0c9e676245",
+ "audit_record_sha256_bytes": "399153105e172fe168134d8391dfa5b60d255d71d593ad2092f8ad9f6bb367ae",
+ "base_finding_count": 6,
+ "audit_finding_count": 5,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "READ_LOGICAL: type mismatch only warns (L178-L180, no STOP) unlike INTEGER/FLOAT/STRING which MPI_FINALIZE+STOP; value is then set from first character only (L182-L183), so CHECK_CONSISTENCY_TYPE's 'logical' result is not actually required"
+   ],
+   "audit_member_text": [
+    "Logical recognition accepts only a one-character uppercase T or F at L278-L282, and READ_LOGICAL sets true only when the first character is uppercase T at L182-L183. Lowercase t/f and standard .TRUE./.FALSE. forms are diagnosed as non-logical and then silently mapped false rather than rejected or parsed."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "READ_VALUE: successful match RETURNs @L253 without CLOSE(10); CLOSE @L260 is reached only via the EOF path (label 100 @L258) — unit 10 apparently left open on every successful key lookup (relation L237/L253/L260); also each READ_* call re-OPENs unit 10 per key"
+   ],
+   "audit_member_text": [
+    "READ_VALUE returns immediately on a match at L251-L253 without CLOSE(10); CLOSE occurs only on EOF at L258-L260. Successful reads leave unit 10 connected. Reopening/rewinding the same unit repeatedly may work for the same file, but switching InputFileName while connected is nonportable and the successful path never releases the unit."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "License header FILE line @L14 says 'main.F' but this file is the INPUT_READ module (mod_input) — header/file-name mismatch"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "ERR_IF_ONE has INTENT(OUT) in READ_STRING @L193 and READ_VALUE @L230 but no INTENT attribute in READ_INTEGER @L90, READ_FLOAT @L127, READ_LOGICAL @L162"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "CHECK_CONSISTENCY_TYPE returns VTYPE 'INTEGER' in uppercase @L298 while other types are lowercase ('float' @L296, 'logical' @L280, 'string' @L288); the comparisons @L107 ('INTEGER'), @L143 ('float'), @L178 ('logical'), @L211 ('string') match these exact cases — case consistency is load-bearing across subroutines"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "ERR_IF_ONE is initialized to 0 @L236 only inside READ_VALUE; typed readers test ERR_IF_ONE == 1 (L100, L137, L172, L204) relying on READ_VALUE having set it"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "All four destination arguments are INTENT(OUT) (INTEGER_VAL L87, FLOAT_VAL L123, LOGICAL_VAL L158, STRING_VAL L190), but a missing key returns without assigning them at L100-L103, L137-L140, L172-L175 and L204-L207. Fortran makes an INTENT(OUT) actual argument undefined on entry, so callers cannot safely retain module initializers. This turns unchecked missing keys in io.f90—including WAVE_DATA_TYPE, ETA_LIMITER, NumberStations and the block of output flags—into undefined values rather than defaults."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "CHECK_CONSISTENCY_TYPE calls a numeric string 'float' only if it contains a dot (L293-L299). Valid real inputs such as 1 or 1E-3 are classified INTEGER and rejected by READ_FLOAT at L142-L146, despite list-directed READ at L149 being able to convert them. Conversely malformed dot-containing numeric strings reach an unchecked internal READ failure."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "READ_VALUE computes FRONT=index(TEXT,'=') at L249 and immediately forms TEXT(1:FRONT-1) at L250 without a FRONT==0 branch. Blank/comment-only or arbitrary non-assignment lines therefore rely on compiler handling of a substring ending at -1 and can raise a bounds error under checking builds."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

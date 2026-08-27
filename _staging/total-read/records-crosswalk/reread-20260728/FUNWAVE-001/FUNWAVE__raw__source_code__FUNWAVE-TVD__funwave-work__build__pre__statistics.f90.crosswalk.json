@@ -1,0 +1,137 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-001",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/statistics.f90",
+ "source_sha256": "6fde35e6dd33a18bb0075bb402973ae5b2e263d94668484604ef593df74a8897",
+ "base_run_id": "reread20260728-code-FUNWAVE-001-fable5-20260813T012841Z-2ec7b3b5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
+ "base_record_file": "430fe527bff0faf728f10847da1dc83ca68fe7ffcc00429597f40f2843c92044.json",
+ "audit_record_file": "430fe527bff0faf728f10847da1dc83ca68fe7ffcc00429597f40f2843c92044.json",
+ "base_record_sha256_bytes": "4663405de786b9e1561aa89d87e63380c09a44fc8a0fe124c3067c1807a65888",
+ "audit_record_sha256_bytes": "51232f35b62fd570dbf5499a515f7166bfe3b2a84186576e4c982290bee20ba3",
+ "base_finding_count": 5,
+ "audit_finding_count": 4,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "Fr after MPI_ALLREDUCE(MPI_MAX) @L131-L132 is the maximum phase speed across ranks, not the phase speed at the location of the global UTotalMax — the printed Froude number UTotalMax/Fr (L144, L156) mixes extrema from different ranks (cross-line L108-L110 vs L129-L132)"
+   ],
+   "audit_member_text": [
+    "L108-L111은 각 rank의 로컬 최대 UTotal 위치에서 Fr을 짝지어 계산하지만, L129와 L131은 UTotalMax와 Fr을 별도의 MPI_MAX로 축약한다. 두 최대값이 서로 다른 rank에서 올 수 있어 L144/L156/L175의 UTotalMax/Fr가 전역 최대속도 위치의 Froude 수라는 짝 관계를 보존하지 않는다."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "MassVolume0 @L71, MaxM @L70, FirstCallStatistics @L72-L73 declared/initialized but never used afterwards in this file; locals initialized in declarations (L68-L70) acquire implicit SAVE, though L78-L80 re-zeroes the accumulators each call (MaxEta/MinEta/MaxU/MaxV/Fr are fully overwritten @L98-L115)"
+   ],
+   "audit_member_text": [
+    "MassVolume0(L71), FirstCallStatistics(L72-L73), MaxM(L70)은 이후 참조되지 않아, 이름상 의도된 최초 질량 기준/호출 상태/최대 질량 계산이 구현 흐름에 연결되지 않는다."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Energy accumulation (L92-L94) is not MASK-guarded, unlike MassVolume (L88-L90) — dry cells contribute 0.5*g*H^2 terms"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "NaN check runs only on rank 0 (guard @L165) on the already-reduced values, and MPI_ABORT @L193 is called from rank 0 only — hang risk if other ranks are inside a collective is not addressed in this file; ISNAN is a compiler extension"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Dmass (wet-dry mass, printed @L144/L156 and NaN-checked @L176) is computed elsewhere — not updated in this file"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "Fr는 L69의 선언 초기화 때문에 저장 수명을 가지지만, 호출 시작 시 L78-L80은 MassVolume/Energy/UTotalMax만 재설정하고 Fr은 재설정하지 않는다. wet cell이 없거나 모든 wet-cell 속도가 0이면 L108-L111 대입이 실행되지 않고 L115의 ZERO 검사도 이전 호출의 비영값 때문에 무력화되어 오래된 Fr이 출력될 수 있다."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED) | CONFLICT vs a matched finding: X3: Fr fully overwritten each call; Y1: Fr can stay stale",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "CHECK_STATISTICS는 L189에서 ISNAN만 검사하므로 overflow로 생성된 무한대 값은 L193의 MPI_ABORT 경로를 통과하지 않는다."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

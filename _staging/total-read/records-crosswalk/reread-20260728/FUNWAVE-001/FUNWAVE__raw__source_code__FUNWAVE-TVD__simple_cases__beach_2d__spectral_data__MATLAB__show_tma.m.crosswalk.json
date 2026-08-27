@@ -1,0 +1,133 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "FUNWAVE",
+ "shard": "FUNWAVE-001",
+ "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/simple_cases/beach_2d/spectral_data/MATLAB/show_tma.m",
+ "source_sha256": "d8984b6cfacc653f2941c057d6bba7f8da275a48b9755eb21b02f89f822afcca",
+ "base_run_id": "reread20260728-code-FUNWAVE-001-fable5-20260813T012841Z-2ec7b3b5",
+ "audit_run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
+ "base_record_file": "286995dc27d82252499b3bfc01019e1b4fe68fb91ee7558e7a2feeccedaceb9d.json",
+ "audit_record_file": "286995dc27d82252499b3bfc01019e1b4fe68fb91ee7558e7a2feeccedaceb9d.json",
+ "base_record_sha256_bytes": "22624ffef6a00e62a67ba150077cfb65d4db9001b11a2a61fe73be6f421ad5a7",
+ "audit_record_sha256_bytes": "5cf191695d1cb748fd7076ba5a76e1be947750d6c82b20b647e8c7a175c38b83",
+ "base_finding_count": 3,
+ "audit_finding_count": 5,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "E_a/E_f are initialized from dangle/dfre*0.0 (L28-L29) making them one shorter than the axes; D_f/D_a grow implicitly; 'angle' shadows the MATLAB builtin; contour-level vector v @L71 and the commented totalE @L82 are unused"
+   ],
+   "audit_member_text": [
+    "v is defined at L71, but both consumers that use v are commented out at L72 and L74 while contourf at L73 uses the literal level count 40, leaving v disconnected from the active contour path (L71-L74)."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Energy normalizations differ: Etotal @L9 divides the squared-Hmo sum by 8 while the componentwise E @L12 also uses /8 — for Hmo per component the usual energy is Hmo^2/16; the script's Hrms values (L10, L83) depend on this convention which is not documented in-file"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "Dens is indexed (kf,ktheta) @L22 but Em is (ktheta,kf) @L20 — transposed storage; contourf(A,F,Dens,...) @L73 then pairs A (angle centers) with rows kf — consistent only because Dens rows are kf; the pcolor @L7 pairs fre as x with angle as y against spc whose orientation is (n=angles, m=freqs) per L16-L18 loops"
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The raw pcolor drawn at L7 is later erased when figure(1) is selected and clf is called at L53-L54; no pause or save occurs between them, so the initial visualization has no lasting output (L7, L53-L54)."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "No nonzero or monotonic-spacing check precedes divisions by dangle and dfre at L22, L35, and L42; duplicate coordinate entries produce division by zero, and descending entries produce signed negative densities (L14-L15, L22, L35, L42)."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "If either loaded coordinate has fewer than two entries, the loops at L18-L26 and/or L31-L43 do not define Em, Dens, F, A, D_f, or D_a before those names are used at L46 and L56-L73; the file has no size guard (L16-L46, L56-L73)."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "The initial Etotal/Hrms path at L9-L10 is never consumed before Hrms is overwritten from Etotal_1 at L83 and only then displayed at L86; the first Hrms calculation is dead relative to observable output (L9-L10, L83, L86)."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}
