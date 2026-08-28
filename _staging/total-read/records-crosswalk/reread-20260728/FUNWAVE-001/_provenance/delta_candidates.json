@@ -53,8 +53,8 @@
   "audit_id": "B9",
   "text": "The equal-energy frequency repair reads Freq(kff-1) when kff can be 1 at lines 1101-1104 and 1662-1665, and compares Freq(mfreq-1) without requiring mfreq>1 at lines 1112-1113 and 1669-1671. The equal-dfrequency routines separately divide by mfreq-1, so no branch safely supports mfreq=1 despite explicit mtheta==1 handling elsewhere.",
   "canonical_scope": "in-scope (model source)",
-  "review_status": "reviewed-med",
-  "review_note": "Freq(kff-1)/mfreq-1: kff=1·mfreq=1 도달성 불명(spectrum 통상 mfreq>1), defensive 맥락. 잠재 edge."
+  "review_status": "confirmed",
+  "review_note": "Codex deep re-audit 2026-08-28: For explicit Nfreq=1, the final comparison unconditionally indexes Freq(0), and the equal-dfrequency variants also divide by mfreq-1. The input path validates only a missing key, not Nfreq>1, so no neutralizer excludes the case."
  },
  {
   "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/mod_global.f90",
@@ -62,8 +62,8 @@
   "audit_id": "B0",
   "text": "The module sets MPI Cartesian reorder=.true. at L78, while misc.f90 passes the MPI_COMM_WORLD rank myid to MPI_CART_COORDS and builds ProcessorID/world-rank mappings without obtaining the reordered comm2d rank. This confirms a cross-file communicator/rank-interface mismatch: any actual reorder can assign wrong coordinates, tile ranges, neighbors and point-to-point destinations.",
   "canonical_scope": "in-scope (model source)",
-  "review_status": "pending",
-  "review_note": "MPI Cartesian reorder=.true. vs misc.f90 world-rank CART_COORDS: 통신자/rank 인터페이스 다중파일 심층분석 필요."
+  "review_status": "uncertain",
+  "review_note": "Codex deep re-audit 2026-08-28: The code incorrectly treats the MPI_COMM_WORLD rank as the comm2d rank and separately builds world-rank mappings. Material failure depends on whether the deployed MPI implementation actually reorders ranks, which is runtime behavior not fixed by the tree."
  },
  {
   "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/mod_global.f90",
@@ -120,8 +120,8 @@
   "audit_id": "B1",
   "text": "Gradx and Grady are allocated at L126-L129 without initialization and assigned only where MASK0==1 at L178-L180. Masked cells retain undefined values, yet the entire arrays are exchanged at L219-L220 and written at L247-L249.",
   "canonical_scope": "in-scope (model source)",
-  "review_status": "reviewed-med",
-  "review_note": "Gradx masked(=비물리 dry) 셀 미정의가 진단 gradx.txt 에 유입. 물리 보정은 MASK0==1 만 사용. 진단출력 한정."
+  "review_status": "refuted",
+  "review_note": "Codex deep re-audit 2026-08-28: Undefined entries are confined to MASK0=0 cells and Gradx/Grady are not consumed by the correction calculation after being formed. Their only ultimate use is diagnostic file output, so masked non-physical values do not change the computed bathymetry."
  },
  {
   "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/mod_input.f90",
@@ -129,8 +129,8 @@
   "audit_id": "B0",
   "text": "All four destination arguments are INTENT(OUT) (INTEGER_VAL L87, FLOAT_VAL L123, LOGICAL_VAL L158, STRING_VAL L190), but a missing key returns without assigning them at L100-L103, L137-L140, L172-L175 and L204-L207. Fortran makes an INTENT(OUT) actual argument undefined on entry, so callers cannot safely retain module initializers. This turns unchecked missing keys in io.f90—including WAVE_DATA_TYPE, ETA_LIMITER, NumberStations and the block of output flags—into undefined values rather than defaults.",
   "canonical_scope": "in-scope (model source)",
-  "review_status": "reviewed-med",
-  "review_note": "INTENT(OUT) missing-key 미대입은 ierr-check default 표준패턴(예 io.F Gamma1)의 정상 사용. 호출부 ierr 미확인 입증 필요."
+  "review_status": "confirmed",
+  "review_note": "Codex deep re-audit 2026-08-28: A missing key returns with an INTENT(OUT) destination undefined, and unchecked callers immediately branch on that value; the same pattern exists for logical, real, and string readers. These callers do not restore a default from ierr, so module initializers are not a valid neutralizer under Fortran semantics."
  },
  {
   "source_path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/io.f90",

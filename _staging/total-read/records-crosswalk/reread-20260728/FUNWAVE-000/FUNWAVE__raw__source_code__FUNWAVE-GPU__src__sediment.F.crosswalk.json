@@ -179,7 +179,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B1"
@@ -189,12 +189,17 @@
     "The positive-V F4 diffusion branch uses H(I,J+1)+H(I,J) while its concentration difference and face velocity are on the south face J-1; the negative branch uses H(I,J-1)+H(I,J). This sign-dependent geometry mismatch changes diffusion solely with flow direction."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-verified 2026-08-28 by Codex deep re-audit: The positive-flow south-face diffusion uses the north-cell depth pair, while the negative branch uses the south-face pair. F4 feeds the concentration update and no guard or zero factor removes this sign-dependent geometry error.",
+   "decided_by": "llm:openai/codex (deep re-audit 2026-08-28) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "evidence_span": {
+    "path": "FUNWAVE/raw/source_code/FUNWAVE-GPU/src/sediment.F",
+    "lines": "71-76",
+    "quote": "\t\t\t\t\tIF (V(I,J).GE.0.0) THEN\n\t\t\t\t\t\tF4=CH(I,J-1)*V(I,J)*(H(I,J)+H(I,J-1))/2.0 &\n\t\t\t\t\t\t\t-k4*(H(I,J+1)+H(I,J))*(CH(I,J)-CH(I,J-1))/2.0/DY\n\t\t\t\t\tELSE\n\t\t\t\t\t\tF4=CH(I,J)*V(I,J)*(H(I,J)+H(I,J-1))/2.0 &\n\t\t\t\t\t\t\t-k4*(H(I,J-1)+H(I,J))*(CH(I,J)-CH(I,J-1))/2.0/DY"
+   }
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B2"
@@ -204,9 +209,14 @@
     "For px==1, the x wall block's IF(npx==0) ... ELSEIF(npx==px-1) executes only the west condition and skips the east condition. The y block has an explicit py==1 case setting both sides, confirming the x single-partition omission."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-verified 2026-08-28 by Codex deep re-audit: With px=1, npx is both 0 and px-1, so ELSEIF makes the east-wall F1 assignment unreachable. The analogous py=1 branch explicitly handles both ends, and no later x-boundary assignment neutralizes the omission.",
+   "decided_by": "llm:openai/codex (deep re-audit 2026-08-28) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "evidence_span": {
+    "path": "FUNWAVE/raw/source_code/FUNWAVE-GPU/src/sediment.F",
+    "lines": "93-102",
+    "quote": "\t\t\t\t\tIF (npx.EQ.0) THEN\n\t\t\t\t\t\tIF (I.EQ.Ibeg) F2=0.0\n\t\t\t\t\tELSEIF (npx.EQ.px-1) THEN\n\t\t\t\t\t\tIF (I.EQ.Iend+1) F1=0.0\n\t\t\t\t\tENDIF\n\t\t\t\t\n! BC (Wall Condition) y-direction\n\t\t\t\t\tIF (py.EQ.1) THEN\n\t\t\t\t\t\tIF (J.EQ.Jbeg) F4=0.0\n\t\t\t\t\t\tIF (J.EQ.Jend) F3=0.0"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",
@@ -239,7 +249,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B6"
@@ -249,9 +259,14 @@
     "sediment_flux forms HxL/HxR (Mloc1 by Nloc) and HyL/HyR (Mloc by Nloc1) by adding whole Zb, whose cell-centered shape is Mloc by Nloc. No face reconstruction or slice is applied to Zb, producing shape/interface inconsistency or wrong bed placement at faces."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-verified 2026-08-28 by Codex deep re-audit: Cell-centered Zb(Mloc,Nloc) is added as a whole array to x- and y-face arrays whose respective extents are Mloc1 and Nloc1. The intrinsic assignments require conforming shapes; there is no reconstruction, slice, or guard to make them conform.",
+   "decided_by": "llm:openai/codex (deep re-audit 2026-08-28) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "evidence_span": {
+    "path": "FUNWAVE/raw/source_code/FUNWAVE-GPU/src/sediment.F",
+    "lines": "319,340",
+    "quote": "     HxL=EtaRxL+Depthx+Zb\n…\n    HyL=EtaRyL+Depthy+Zb"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",

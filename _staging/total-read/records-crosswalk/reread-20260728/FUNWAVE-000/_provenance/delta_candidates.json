@@ -13,8 +13,8 @@
   "record_file": "24e038034427784e268e7f437d9e8590aa8d4d5916da0fb1a738265451ad4298.json",
   "audit_id": "B1",
   "text": "The positive-V F4 diffusion branch uses H(I,J+1)+H(I,J) while its concentration difference and face velocity are on the south face J-1; the negative branch uses H(I,J-1)+H(I,J). This sign-dependent geometry mismatch changes diffusion solely with flow direction.",
-  "review_status": "pending",
-  "review_note": "deep cross-routine (MPI/geometry) analysis required — not resolved 2026-08-27 batch",
+  "review_status": "confirmed",
+  "review_note": "Codex deep re-audit 2026-08-28: The positive-flow south-face diffusion uses the north-cell depth pair, while the negative branch uses the south-face pair. F4 feeds the concentration update and no guard or zero factor removes this sign-dependent geometry error.",
   "canonical_scope": "in-scope (model source)"
  },
  {
@@ -22,8 +22,8 @@
   "record_file": "24e038034427784e268e7f437d9e8590aa8d4d5916da0fb1a738265451ad4298.json",
   "audit_id": "B2",
   "text": "For px==1, the x wall block's IF(npx==0) ... ELSEIF(npx==px-1) executes only the west condition and skips the east condition. The y block has an explicit py==1 case setting both sides, confirming the x single-partition omission.",
-  "review_status": "pending",
-  "review_note": "deep cross-routine (MPI/geometry) analysis required — not resolved 2026-08-27 batch",
+  "review_status": "confirmed",
+  "review_note": "Codex deep re-audit 2026-08-28: With px=1, npx is both 0 and px-1, so ELSEIF makes the east-wall F1 assignment unreachable. The analogous py=1 branch explicitly handles both ends, and no later x-boundary assignment neutralizes the omission.",
   "canonical_scope": "in-scope (model source)"
  },
  {
@@ -40,8 +40,8 @@
   "record_file": "24e038034427784e268e7f437d9e8590aa8d4d5916da0fb1a738265451ad4298.json",
   "audit_id": "B6",
   "text": "sediment_flux forms HxL/HxR (Mloc1 by Nloc) and HyL/HyR (Mloc by Nloc1) by adding whole Zb, whose cell-centered shape is Mloc by Nloc. No face reconstruction or slice is applied to Zb, producing shape/interface inconsistency or wrong bed placement at faces.",
-  "review_status": "pending",
-  "review_note": "deep cross-routine (MPI/geometry) analysis required — not resolved 2026-08-27 batch",
+  "review_status": "confirmed",
+  "review_note": "Codex deep re-audit 2026-08-28: Cell-centered Zb(Mloc,Nloc) is added as a whole array to x- and y-face arrays whose respective extents are Mloc1 and Nloc1. The intrinsic assignments require conforming shapes; there is no reconstruction, slice, or guard to make them conform.",
   "canonical_scope": "in-scope (model source)"
  },
  {
@@ -85,8 +85,8 @@
   "record_file": "400204c1a405285dd31c4460ce20293e4959357d9f4e74c3e97b889730708160.json",
   "audit_id": "B1",
   "text": "Cross-file length/time mismatch: every station read overwrites the shared time vector and scalar Ndata (for example east lines 84-90 and west lines 112-118). The later global loop DO K=1,Ndata at line 183 therefore uses only the last-read station's length and time base for every side and station; if files differ, earlier shorter arrays are read uninitialized or earlier longer samples are silently truncated, and differing timestamps are never compared.",
-  "review_status": "reviewed-med",
-  "review_note": "",
+  "review_status": "refuted",
+  "review_note": "Codex deep re-audit 2026-08-28: convert.f assumes a common record count and clock, but the native producer advances every active station buffer in the same station-output call and stores the same global TIME. Differing native station lengths/timestamps require truncated or externally altered files, not a reachable normal producer path.",
   "canonical_scope": "in-scope (model source)"
  },
  {
@@ -139,8 +139,8 @@
   "record_file": "7a6526cb6568811b6adb8f66be14714bcce0caf3fb1f65ee63314aa3d7be566d.json",
   "audit_id": "B0",
   "text": "Halo-exchange interface gap across L324-L325,L365-L414,L781: EXCHANGE sends staggered P/Q through PHI_COLL_VARIABLE_LENGTH, but that routine only reflects physical-edge ghosts and returns without any MPI/phi_exch call; ordinary PHI_COLL always finishes with phi_exch. Unless another caller-owned exchange exists, P/Q internal-processor halos remain stale when these fields are enabled.",
-  "review_status": "pending",
-  "review_note": "deep cross-routine (MPI/geometry) analysis required — not resolved 2026-08-27 batch",
+  "review_status": "refuted",
+  "review_note": "Codex deep re-audit 2026-08-28: The only scheme that consumes P/Q as exchanged cell-interface state is hard-disabled by PQ_scheme=.FALSE.; the active scheme uses locally formed HU/HV fluxes. Thus the absent P/Q MPI exchange does not affect computed output in the in-tree configuration.",
   "canonical_scope": "in-scope (model source)"
  },
  {
@@ -148,8 +148,8 @@
   "record_file": "7a6526cb6568811b6adb8f66be14714bcce0caf3fb1f65ee63314aa3d7be566d.json",
   "audit_id": "B1",
   "text": "Periodic overwrite defect across L445-L504 and L664-L779: PHI_COLL fills periodic y ghosts first, and VTYPE 1/2/3 protect later y boundary logic with .NOT.PERIODIC (e.g. L643), but VTYPE 4/5/6 south/north blocks have no such guard. On periodic end ranks they can overwrite periodic data with zero, symmetric, or antisymmetric physical-boundary values before phi_exch.",
-  "review_status": "pending",
-  "review_note": "deep cross-routine (MPI/geometry) analysis required — not resolved 2026-08-27 batch",
+  "review_status": "refuted",
+  "review_note": "Codex deep re-audit 2026-08-28: All in-tree PHI_COLL callers select VTYPE 1, 2, or 3, whose y-boundary blocks have the periodic guard. No caller selects the unguarded VTYPE 4-6 branches, so the proposed overwrite is unreachable.",
   "canonical_scope": "in-scope (model source)"
  },
  {
@@ -175,8 +175,8 @@
   "record_file": "99c935deeac265d93d745d66039e84adbd19d0461ac5da5593029a3e48181b8b.json",
   "audit_id": "B6",
   "text": "PHI_COLL_OUTER_GPU duplicates hundreds of lines of PHI_COLL_GPU reflection logic but omits its final communication call. The duplication makes later parity/boundary fixes prone to diverge and is the direct source of the internal-halo inconsistency above.",
-  "review_status": "pending",
-  "review_note": "deep cross-routine (MPI/geometry) analysis required — not resolved 2026-08-27 batch",
+  "review_status": "refuted",
+  "review_note": "Codex deep re-audit 2026-08-28: PHI_COLL_OUTER_GPU is used for physical-edge reflection only; moment_gpu explicitly recomputes the derivative halo through two ghost layers from already available base-field halos. Non-root/internal ranks therefore do not consume an unsynchronized derivative halo from this routine.",
   "canonical_scope": "in-scope (model source)"
  },
  {

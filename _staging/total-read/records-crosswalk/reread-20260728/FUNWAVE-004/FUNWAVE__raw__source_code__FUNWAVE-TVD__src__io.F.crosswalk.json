@@ -207,7 +207,7 @@
    }
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B2"
@@ -217,9 +217,14 @@
     "L2707 대 L3028-3031: ROLLER가 READ_INPUT 후반에서 읽히기 약 320행 전에 IF(ROLLER)로 VISCOSITY_BREAKING을 강제한다. 이 파일 안에서는 선행 대입이 없어 use-before-assign이며, 입력 ROLLER_EFFECT는 이 선행 결정에 반영될 수 없다."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-verified 2026-08-28 by Codex deep re-audit: ROLLER is initialized, so this is not an undefined read, but the force-to-true test runs before ROLLER_EFFECT is parsed. An explicit ROLLER_EFFECT=true with VISCOSITY_BREAKING=false therefore bypasses the intended coupling, and no later test repairs it.",
+   "decided_by": "llm:openai/codex (deep re-audit 2026-08-28) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "evidence_span": {
+    "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/io.F",
+    "lines": "2689,2703,3030-3032",
+    "quote": "      CALL READ_LOGICAL(VISCOSITY_BREAKING,FILE_NAME,'VISCOSITY_BREAKING',ierr)\n…\n      IF(ROLLER) VISCOSITY_BREAKING = .TRUE.\n…\n      CALL READ_LOGICAL(ROLLER,FILE_NAME,'ROLLER_EFFECT',ierr)\n      IF(ierr==1)THEN\n        ROLLER = .FALSE."
+   }
   },
   {
    "disposition": "distinct_unconfirmed",

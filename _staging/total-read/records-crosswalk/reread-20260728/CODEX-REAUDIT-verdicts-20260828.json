@@ -1,0 +1,209 @@
+[
+  {
+    "shard": "000",
+    "file": "sediment.F",
+    "audit_id": "B1",
+    "verdict": "CONFIRM",
+    "evidence_lines": "sediment.F:71-76",
+    "quote": "IF (V(I,J).GE.0.0) THEN\nF4=CH(I,J-1)*V(I,J)*(H(I,J)+H(I,J-1))/2.0 &\n-k4*(H(I,J+1)+H(I,J))*(CH(I,J)-CH(I,J-1))/2.0/DY\nELSE\nF4=CH(I,J)*V(I,J)*(H(I,J)+H(I,J-1))/2.0 &\n-k4*(H(I,J-1)+H(I,J))*(CH(I,J)-CH(I,J-1))/2.0/DY",
+    "reason": "The positive-flow south-face diffusion uses the north-cell depth pair, while the negative branch uses the south-face pair. F4 feeds the concentration update and no guard or zero factor removes this sign-dependent geometry error."
+  },
+  {
+    "shard": "000",
+    "file": "sediment.F",
+    "audit_id": "B2",
+    "verdict": "CONFIRM",
+    "evidence_lines": "sediment.F:93-102",
+    "quote": "IF (npx.EQ.0) THEN\nIF (I.EQ.Ibeg) F2=0.0\nELSEIF (npx.EQ.px-1) THEN\nIF (I.EQ.Iend+1) F1=0.0\nIF (py.EQ.1) THEN\nIF (J.EQ.Jbeg) F4=0.0",
+    "reason": "With px=1, npx is both 0 and px-1, so ELSEIF makes the east-wall F1 assignment unreachable. The analogous py=1 branch explicitly handles both ends, and no later x-boundary assignment neutralizes the omission."
+  },
+  {
+    "shard": "000",
+    "file": "sediment.F",
+    "audit_id": "B6",
+    "verdict": "CONFIRM",
+    "evidence_lines": "sediment.F:319,340;mod_global.F:123;mod_sediment.F:396;init.F:66,70",
+    "quote": "HxL=EtaRxL+Depthx+Zb\nHyL=EtaRyL+Depthy+Zb\n! Mloc1=Mloc+1, Nloc1=Nloc+1\nALLOCATE(Zb(Mloc,Nloc))\nHxL(Mloc1,Nloc),HxR(Mloc1,Nloc), &\nHyL(Mloc,Nloc1),HyR(Mloc,Nloc1), &",
+    "reason": "Cell-centered Zb(Mloc,Nloc) is added as a whole array to x- and y-face arrays whose respective extents are Mloc1 and Nloc1. The intrinsic assignments require conforming shapes; there is no reconstruction, slice, or guard to make them conform."
+  },
+  {
+    "shard": "000",
+    "file": "convert.f",
+    "audit_id": "B1",
+    "verdict": "REFUTE",
+    "evidence_lines": "convert.f:84-90;io.F:3882-3883,3905-3907",
+    "quote": "do ktime=1,ntotal\nread(1,*,end=301)time(ktime),east_z(k,ktime),east_u(k,ktime),\nNdata=ktime-1\ndo i=1,NumberStations\nIF(BufferCount(i)<StationOutputBuffer.AND.TIME<TOTAL_TIME)THEN\nZUV_BUFFER(BufferCount(i),i,1)=time",
+    "reason": "convert.f assumes a common record count and clock, but the native producer advances every active station buffer in the same station-output call and stores the same global TIME. Differing native station lengths/timestamps require truncated or externally altered files, not a reachable normal producer path."
+  },
+  {
+    "shard": "000",
+    "file": "bc.f90",
+    "audit_id": "B0",
+    "verdict": "REFUTE",
+    "evidence_lines": "bc.f90:319-321;sources.f90:72,332,334-335",
+    "quote": "IF(VISCOSITY_BREAKING .OR. DIFFUSION_SPONGE .OR. WAVEMAKER_VIS)THEN\nCALL PHI_COLL_VARIABLE_LENGTH(Mloc1,Nloc,Ibeg,Iend1,Jbeg,Jend,Nghost,P,VTYPE)\nCALL PHI_COLL_VARIABLE_LENGTH(Mloc,Nloc1,Ibeg,Iend,Jbeg,Jend1,Nghost,Q,VTYPE)\nLOGICAL :: PQ_scheme = .FALSE.\nIF(PQ_scheme)THEN\n!      it affects edges, make PQ_scheme=false",
+    "reason": "The only scheme that consumes P/Q as exchanged cell-interface state is hard-disabled by PQ_scheme=.FALSE.; the active scheme uses locally formed HU/HV fluxes. Thus the absent P/Q MPI exchange does not affect computed output in the in-tree configuration."
+  },
+  {
+    "shard": "000",
+    "file": "bc.f90",
+    "audit_id": "B1",
+    "verdict": "REFUTE",
+    "evidence_lines": "bc.f90:210-220,665-779",
+    "quote": "VTYPE=2\nCALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Uxx,VTYPE,PERIODIC)\nVTYPE=3\nCALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Vyy,VTYPE,PERIODIC)\nVTYPE=1\nCALL PHI_COLL(Mloc,Nloc,Ibeg,Iend,Jbeg,Jend,Nghost,Uxy,VTYPE,PERIODIC)",
+    "reason": "All in-tree PHI_COLL callers select VTYPE 1, 2, or 3, whose y-boundary blocks have the periodic guard. No caller selects the unguarded VTYPE 4-6 branches, so the proposed overwrite is unreachable."
+  },
+  {
+    "shard": "000",
+    "file": "exchange_gpu0819.F",
+    "audit_id": "B6",
+    "verdict": "REFUTE",
+    "evidence_lines": "exchange_gpu0819.F:1247-1251,1876;moment_gpu.F:222,229-230,240",
+    "quote": "call phi_exch_cuda (PHI)\nEND SUBROUTINE PHI_COLL_GPU\nEND SUBROUTINE PHI_COLL_OUTER_GPU\nif (i>=Ibeg-3 .AND. i<=Iend+3 .AND. j>=Jbeg-3 .AND. j<=Jend+3) then\nif (i>=Ibeg-2 .AND. i<=Iend+2 .AND. j>=Jbeg-2 .AND. j<=Jend+2 .and. &\ncall derivative_xx_kernel(tMASK,DXg,U_sh(tx-1,ty),U_sh(tx+1,ty),U_sh(tx,ty),Uxx_d(i,j))",
+    "reason": "PHI_COLL_OUTER_GPU is used for physical-edge reflection only; moment_gpu explicitly recomputes the derivative halo through two ghost layers from already available base-field halos. Non-root/internal ranks therefore do not consume an unsynchronized derivative halo from this routine."
+  },
+  {
+    "shard": "001",
+    "file": "wavemaker.f90",
+    "audit_id": "B9",
+    "verdict": "CONFIRM",
+    "evidence_lines": "wavemaker.f90:1102-1104,1112-1113;io.f90:1054-1056",
+    "quote": "IF(Freq(kff).eq.0.0)THEN\nFreq(kff)=Freq(kff-1)\nENDIF\nIF ( Freq(mfreq) < Freq(mfreq-1) ) THEN\nCALL READ_INTEGER(Nfreq,FILE_NAME,'Nfreq',ierr)\nNfreq = 45",
+    "reason": "For explicit Nfreq=1, the final comparison unconditionally indexes Freq(0), and the equal-dfrequency variants also divide by mfreq-1. The input path validates only a missing key, not Nfreq>1, so no neutralizer excludes the case."
+  },
+  {
+    "shard": "001",
+    "file": "mod_global.f90",
+    "audit_id": "B0",
+    "verdict": "UNCERTAIN",
+    "evidence_lines": "mod_global.f90:78;misc.f90:103-105,113-116",
+    "quote": "LOGICAL :: reorder = .true.\ncall MPI_CART_CREATE( MPI_COMM_WORLD, ndims, dims, &\nperiods, reorder, comm2d, ier )\ncall MPI_CART_COORDS( comm2d, myid, 2, coords, ier)\nicp=0\nProcessorID(I,J) = icp",
+    "reason": "The code incorrectly treats the MPI_COMM_WORLD rank as the comm2d rank and separately builds world-rank mappings. Material failure depends on whether the deployed MPI implementation actually reorders ranks, which is runtime behavior not fixed by the tree."
+  },
+  {
+    "shard": "001",
+    "file": "mod_bathy_correction.f90",
+    "audit_id": "B1",
+    "verdict": "REFUTE",
+    "evidence_lines": "mod_bathy_correction.f90:178-180,246-249",
+    "quote": "IF(MASK0(I,J)==1)THEN\nGradx(I,J)=ABS(Depth0(I+1,J)-Depth0(I-1,J))/DX\nGrady(I,J)=ABS(Depth0(I,J+1)-Depth0(I,J-1))/DY\nTMP_NAME = TRIM(FDIR)//'gradx.txt'\ncall PutFile(TMP_NAME,Gradx)\ncall PutFile(TMP_NAME,Grady)",
+    "reason": "Undefined entries are confined to MASK0=0 cells and Gradx/Grady are not consumed by the correction calculation after being formed. Their only ultimate use is diagnostic file output, so masked non-physical values do not change the computed bathymetry."
+  },
+  {
+    "shard": "001",
+    "file": "mod_input.f90",
+    "audit_id": "B0",
+    "verdict": "CONFIRM",
+    "evidence_lines": "mod_input.f90:87,99-102;io.f90:2048-2049",
+    "quote": "INTEGER,          INTENT(OUT) :: INTEGER_VAL\nCALL READ_VALUE(InputFileName,MatchCharacter,VAL_READ,ERR_IF_ONE)\nIF(ERR_IF_ONE == 1)THEN\nRETURN\nCALL READ_INTEGER(NumberStations,FILE_NAME,'NumberStations',ierr)\nIF(NumberStations>0)THEN",
+    "reason": "A missing key returns with an INTENT(OUT) destination undefined, and unchecked callers immediately branch on that value; the same pattern exists for logical, real, and string readers. These callers do not restore a default from ierr, so module initializers are not a valid neutralizer under Fortran semantics."
+  },
+  {
+    "shard": "004",
+    "file": "mod_subgrid.F",
+    "audit_id": "B1",
+    "verdict": "REFUTE",
+    "evidence_lines": "mod_subgrid.F:157-172",
+    "quote": "DO JJ=1,SubMainGridRatio\nDO II=1,SubMainGridRatio\npcount=pcount+1\nIF(pcount==0)THEN\nDepAvgSubgrid(I,J)=-LARGE\nELSE",
+    "reason": "For zero or negative ratios, the Fortran allocations have zero extents and the 1:ratio loops execute zero times, leaving pcount=0. The pcount guard bypasses both NumPixel divisions, so the claimed divide-by-zero path is neutralized."
+  },
+  {
+    "shard": "004",
+    "file": "nesting.F",
+    "audit_id": "B1",
+    "verdict": "CONFIRM",
+    "evidence_lines": "nesting.F:93-95,488-492,509-510",
+    "quote": "READ(11,*) TIME_COUPLING_1\nTIME_COUPLING_2 = TIME_COUPLING_1\nIF(TIME_COUPLING_1.EQ.TIME_COUPLING_2)THEN\ntmp2=ZERO\ntmp1=ZERO\nETA(I,J)=Z_COUPLING_WEST(J-Nghost+Kshift_WEST,2)*tmp1&",
+    "reason": "Both initialization and EOF leave equal time slots, and the equal-slot branch sets both weights to zero rather than retaining either record. Those weights directly zero coupled ETA/U/V ghosts, with no later boundary restoration before they are used."
+  },
+  {
+    "shard": "004",
+    "file": "wavemaker.F",
+    "audit_id": "B6",
+    "verdict": "CONFIRM",
+    "evidence_lines": "wavemaker.F:1580-1584;io.F:1726-1728",
+    "quote": "ALLOCATE(Cm_eta(Mloc,Nloc,Numfreq),Sm_eta(Mloc,Nloc,Numfreq), &\ndf = (fmax-fmin)/(mfreq-1.0_SP)\nCALL READ_INTEGER(Nfreq,FILE_NAME,'Nfreq',ierr)\nIF(ierr==1)THEN\nNfreq = 45",
+    "reason": "All equal-frequency implementations divide by mfreq-1 before their component loops. The reader supplies 45 only when the key is absent and never rejects explicit Nfreq=1, so the singular denominator is reachable."
+  },
+  {
+    "shard": "004",
+    "file": "init.F",
+    "audit_id": "B2",
+    "verdict": "CONFIRM",
+    "evidence_lines": "init.F:1179-1191",
+    "quote": "SLOPE_CTR = .FALSE.\nIF(SLOPE_CTR)THEN\nWRITE(*,*)'SLOPE CONTROL IS ON'\nENDIF\nIF(SLOPE_CTR)THEN\nIF(ABS(SlopeX(I,J))>MAX_SLOPE)SlopeX(I,J)=SIGN(MAX_SLOPE,SlopeX(I,J))",
+    "reason": "The routine unconditionally clears SLOPE_CTR immediately before both guarded blocks, and there is no intervening assignment or input path. The warning and slope caps are therefore provably dead in every execution of this branch."
+  },
+  {
+    "shard": "004",
+    "file": "sponge.F",
+    "audit_id": "B0",
+    "verdict": "REFUTE",
+    "evidence_lines": "mod_global.F:127-129;sponge.F:190-192,204",
+    "quote": "! Mloc1=Mloc+1, Nloc1=Nloc+1\nINTEGER, PARAMETER :: Nghost = 3\nIwidth=INT(Sponge_west_width/DX)+Nghost\nIwidth=INT(Sponge_west_width/DX(1,1))+Nghost\nri = R_Sponge**(50*(i + (iista - 1) -1)/(Iwidth-1))",
+    "reason": "Nghost is a compile-time 3, and the caller only enters maker/boundary sponge construction for nonnegative widths and positive grid spacing. Consequently Iwidth is at least 3 in a normal run, making Iwidth-1 nonzero."
+  },
+  {
+    "shard": "004",
+    "file": "io.F",
+    "audit_id": "B2",
+    "verdict": "CONFIRM",
+    "evidence_lines": "mod_global.F:281;io.F:2689,2703,3030-3032",
+    "quote": "LOGICAL :: ROLLER=.FALSE.\nCALL READ_LOGICAL(VISCOSITY_BREAKING,FILE_NAME,'VISCOSITY_BREAKING',ierr)\nIF(ROLLER) VISCOSITY_BREAKING = .TRUE.\nCALL READ_LOGICAL(ROLLER,FILE_NAME,'ROLLER_EFFECT',ierr)\nIF(ierr==1)THEN\nROLLER = .FALSE.",
+    "reason": "ROLLER is initialized, so this is not an undefined read, but the force-to-true test runs before ROLLER_EFFECT is parsed. An explicit ROLLER_EFFECT=true with VISCOSITY_BREAKING=false therefore bypasses the intended coupling, and no later test repairs it."
+  },
+  {
+    "shard": "004",
+    "file": "mod_vessel.F",
+    "audit_id": "B1",
+    "verdict": "CONFIRM",
+    "evidence_lines": "mod_vessel.F:352,358-359,446-450",
+    "quote": "IF(SourceType(Kves)(1:2)=='PR')THEN\nREAD(Ifile,*) N_revolution(Kves),D_prop(Kves), C_thrust(Kves), &\nD_hub(Kves), BAR(Kves), H_prop(Kves), C_duct(Kves)\nE0 = (D_prop(Kves)/D_hub(Kves))**(-0.403_SP)*C_thrust(Kves)**(-1.79_SP) &\nVeff(Kves) = E0*N_revolution(Kves)*D_prop(Kves)*SQRT(C_thrust(Kves))\nCf(Kves) = 0.01_SP*(D_prop(Kves)/H_prop(Kves))",
+    "reason": "Propeller parameters are assigned only for PR, but the PROPELLER post-read calculations run for every vessel. SL and PA entries therefore read uninitialized values and may divide by uninitialized denominators; no SourceType guard neutralizes those calculations."
+  },
+  {
+    "shard": "004",
+    "file": "mod_vessel.F",
+    "audit_id": "B2",
+    "verdict": "CONFIRM",
+    "evidence_lines": "mod_vessel.F:383-390,552-554,827-830",
+    "quote": "IF(SourceType(Kves)(1:2)=='SL')THEN\nREAD(Ifile,*)  LengthVessel(Kves), WidthVessel(Kves), &\nENDIF\nIF(SourceType(Kves)(1:2)=='PA') THEN\nCALL GREEN_FUNCTION_SOURCE (Xves,Yves)\nIF(ABS(Lves)>=LengthVessel(Kves).AND. &",
+    "reason": "The parser has geometry branches for PR and SL only, then proceeds to the path record; PA is nevertheless a supported dispatch. GREEN_FUNCTION_SOURCE immediately consumes PA's unassigned vessel geometry and pressure state, with no default or guard."
+  },
+  {
+    "shard": "004",
+    "file": "mod_meteo.F",
+    "audit_id": "B0",
+    "verdict": "CONFIRM",
+    "evidence_lines": "mod_meteo.F:549-558,598-601",
+    "quote": "IF(TIME>TimeStorm1.AND.TIME>TimeStorm2) THEN\nTimeStorm1=TimeStorm2\nXstorm1 = Xstorm2\nYstorm1 = Ystorm2\nREAD(Ifile,*,END=120)  TimeStorm2,Xstorm2,Ystorm2,  &\nPn_storm = Pn_storm2*tmp1 + Pn_storm1*tmp2",
+    "reason": "Rollover advances only time and position, leaving Pn/Pc/A/B endpoint 1 at the initial record before reading the next endpoint. Subsequent interpolation mixes that stale storm intensity/shape with the new record, and no later synchronization updates it."
+  },
+  {
+    "shard": "004",
+    "file": "mod_meteo.F",
+    "audit_id": "B1",
+    "verdict": "CONFIRM",
+    "evidence_lines": "mod_meteo.F:1072-1081,1117-1120",
+    "quote": "IF(TIME>TimeStorm1.AND.TIME>TimeStorm2) THEN\nTimeStorm1=TimeStorm2\nXstorm1 = Xstorm2\nYstorm1 = Ystorm2\nREAD(Ifile,*,END=120)  TimeStorm2,Xstorm2,Ystorm2,  &\ndP_storm = Dp_storm2*tmp1 + dP_storm1*tmp2",
+    "reason": "Gaussian rollover likewise omits DP/SigmaX/SigmaY/Theta from endpoint 1 while advancing time and position. From the second interval onward, the interpolation uses stale magnitude, widths, and direction with no compensating assignment."
+  },
+  {
+    "shard": "004",
+    "file": "mod_precipitation.F",
+    "audit_id": "B0",
+    "verdict": "REFUTE",
+    "evidence_lines": "main.F:320,375-376;misc.F:294;mod_precipitation.F:248,250-252",
+    "quote": "CALL ESTIMATE_DT(Mloc,Nloc,DX,DY,U,V,H,MinDepthFrc,DT,CFL,TIME)\nCALL PRECIPITATION_DISTRIBUTION\nTIME=TIME+DT\nIF(TIME>TimePrec1.AND.TIME>TimePrec2) THEN\nTimePrec1=TimePrec2\nPrecRateData1=PrecRateData2",
+    "reason": "Before the first record time, both zero weights intentionally suppress precipitation; ESTIMATE_DT advances TIME before distribution is called. Once TIME passes the equal initial slots, the rollover copies initialized Data2 into Data1 before any nonzero interpolation weight can consume Data1."
+  },
+  {
+    "shard": "004",
+    "file": "mod_tide.F",
+    "audit_id": "B3",
+    "verdict": "CONFIRM",
+    "evidence_lines": "mod_tide.F:116-119,251,261,325,337",
+    "quote": "CALL READ_INTEGER(Iwidth_tide,FILE_NAME,'WaveMakerPointNum',ierr)\nIF(ierr==1)THEN\nIwidth_tide = 30\nIwidth = Iwidth_tide\nri = R_sp**(50*(i+npx*Mglob/px-1)/(Iwidth-1))\nDO I=1,Iwidth",
+    "reason": "Only a missing key gets the default; explicit values are not range-checked. Iwidth=1 reaches the singular denominator, while widths beyond a local dimension drive the boundary loops outside the allocated grid, with no cap or guard."
+  }
+]

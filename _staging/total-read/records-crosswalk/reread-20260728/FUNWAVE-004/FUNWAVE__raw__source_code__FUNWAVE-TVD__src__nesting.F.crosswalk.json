@@ -115,7 +115,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B1"
@@ -125,9 +125,14 @@
     "Both the initial equal-time state and EOF collapse interpolation weights to zero: TIME_COUPLING_2 is initialized equal to TIME_COUPLING_1 (L93-L95), while equal slots set tmp1=tmp2=ZERO (L488-L497). At EOF, TIME_COUPLING_1 is first advanced to TIME_COUPLING_2, the failed read jumps to L483 (L367-L372), and the same equal-slot branch zeros every coupled ETA/U/V ghost value at L509-L588 instead of retaining the last boundary record."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-verified 2026-08-28 by Codex deep re-audit: Both initialization and EOF leave equal time slots, and the equal-slot branch sets both weights to zero rather than retaining either record. Those weights directly zero coupled ETA/U/V ghosts, with no later boundary restoration before they are used.",
+   "decided_by": "llm:openai/codex (deep re-audit 2026-08-28) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "evidence_span": {
+    "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/nesting.F",
+    "lines": "93-95,488-492,509-510",
+    "quote": "         READ(11,*) TIME_COUPLING_1 \n! initialize time_2\n         TIME_COUPLING_2 = TIME_COUPLING_1\n…\n    IF(TIME>TIME_COUPLING_1)THEN\n      IF(TIME_COUPLING_1.EQ.TIME_COUPLING_2)THEN\n        ! no more data\n        tmp2=ZERO\n        tmp1=ZERO\n…\n        ETA(I,J)=Z_COUPLING_WEST(J-Nghost+Kshift_WEST,2)*tmp1&\n                +Z_COUPLING_WEST(J-Nghost+Kshift_WEST,1)*tmp2"
+   }
   }
  ]
 }

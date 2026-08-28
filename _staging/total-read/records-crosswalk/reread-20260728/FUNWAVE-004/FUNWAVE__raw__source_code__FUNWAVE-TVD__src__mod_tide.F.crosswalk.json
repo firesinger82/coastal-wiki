@@ -185,7 +185,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B3"
@@ -195,9 +195,14 @@
     "Range/singularity exposure: Iwidth comes from unvalidated WaveMakerPointNum (L117-L120), appears in denominators Iwidth-1 at L261-L300, and controls array loop bounds at L325-L360. Iwidth=1 makes the exponent division singular; Iwidth greater than Mloc or Nloc produces out-of-range or non-domain boundary indices."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-verified 2026-08-28 by Codex deep re-audit: Only a missing key gets the default; explicit values are not range-checked. Iwidth=1 reaches the singular denominator, while widths beyond a local dimension drive the boundary loops outside the allocated grid, with no cap or guard.",
+   "decided_by": "llm:openai/codex (deep re-audit 2026-08-28) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "evidence_span": {
+    "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/mod_tide.F",
+    "lines": "116-119,251,261,325,337",
+    "quote": "      CALL READ_INTEGER(Iwidth_tide,FILE_NAME,'WaveMakerPointNum',ierr)\n\n      IF(ierr==1)THEN\n        Iwidth_tide = 30\n…\n  Iwidth = Iwidth_tide ! specified in read or default = 30\n…\n         ri = R_sp**(50*(i+npx*Mglob/px-1)/(Iwidth-1))\n…\n     DO I=1,Iwidth\n…\n     DO I=Mloc-Iwidth+1,Mloc"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",

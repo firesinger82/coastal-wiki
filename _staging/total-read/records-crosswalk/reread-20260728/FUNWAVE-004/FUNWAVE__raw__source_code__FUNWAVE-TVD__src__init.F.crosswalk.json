@@ -175,7 +175,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B2"
@@ -185,9 +185,14 @@
     "도달불가 설정: non-CARTESIAN 분기에서 SLOPE_CTR를 L1172에서 항상 .FALSE.로 덮은 직후 L1174와 L1183-L1186에서 IF(SLOPE_CTR) 보호 코드를 둔다. 이 루틴 실행에서는 경고와 slope cap이 모두 도달 불가이며 외부 입력으로 활성화할 경로가 보이지 않는다."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-verified 2026-08-28 by Codex deep re-audit: The routine unconditionally clears SLOPE_CTR immediately before both guarded blocks, and there is no intervening assignment or input path. The warning and slope caps are therefore provably dead in every execution of this branch.",
+   "decided_by": "llm:openai/codex (deep re-audit 2026-08-28) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "evidence_span": {
+    "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/init.F",
+    "lines": "1179-1191",
+    "quote": "    SLOPE_CTR = .FALSE.\n    MAX_SLOPE = 0.1\n    IF(SLOPE_CTR)THEN\n      WRITE(*,*)'SLOPE CONTROL IS ON'\n    ENDIF\n\n    DO J=Jbeg,Jend\n    DO I=Ibeg,Iend\n      SlopeX(I,J) = (Depthx(I+1,J)-Depthx(I,J))/DX(I,J)\n      SlopeY(I,J) = (Depthy(I,J+1)-Depthy(I,J))/DY(I,J)\n      IF(SLOPE_CTR)THEN\n        IF(ABS(SlopeX(I,J))>MAX_SLOPE)SlopeX(I,J)=SIGN(MAX_SLOPE,SlopeX(I,J))\n        IF(ABS(SlopeY(I,J))>MAX_SLOPE)SlopeY(I,J)=SIGN(MAX_SLOPE,SlopeY(I,J))"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",

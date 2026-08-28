@@ -190,7 +190,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B0"
@@ -200,12 +200,17 @@
     "L541-L600: Holland_Model_Forcing가 새 레코드를 읽기 전에 TimeStorm1/Xstorm1/Ystorm1만 이전 2값으로 이동시키고 Pn_storm1/Pc_storm1/A_storm1/B_storm1은 갱신하지 않는다. L596-L601 보간은 두 번째 구간부터 새 endpoint와 최초 레코드의 압력·형상 계수를 섞어 잘못된 storm 강도를 만든다."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-verified 2026-08-28 by Codex deep re-audit: Rollover advances only time and position, leaving Pn/Pc/A/B endpoint 1 at the initial record before reading the next endpoint. Subsequent interpolation mixes that stale storm intensity/shape with the new record, and no later synchronization updates it.",
+   "decided_by": "llm:openai/codex (deep re-audit 2026-08-28) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "evidence_span": {
+    "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/mod_meteo.F",
+    "lines": "549-558,598-601",
+    "quote": "    IF(TIME>TimeStorm1.AND.TIME>TimeStorm2) THEN\n\n         TimeStorm1=TimeStorm2\n         Xstorm1 = Xstorm2\n         Ystorm1 = Ystorm2\n\n    Ifile = 300\n\n    READ(Ifile,*,END=120)  TimeStorm2,Xstorm2,Ystorm2,  &\n                        Pn_storm2,Pc_storm2, A_storm2, B_storm2\n…\n    Pn_storm = Pn_storm2*tmp1 + Pn_storm1*tmp2\n    Pc_storm = Pc_storm2*tmp1 + Pc_storm1*tmp2\n    A_storm = A_storm2*tmp1 + A_storm1*tmp2\n    B_storm = B_storm2*tmp1 + B_storm1*tmp2"
+   }
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B1"
@@ -215,9 +220,14 @@
     "L1076-L1120: MeteoGausian_Forcing도 rollover 때 Time/X/Y만 갱신하고 DP_storm1/SigmaX1/SigmaY1/Theta1을 이전 2값으로 옮기지 않는다. 두 번째 구간부터 Gaussian 크기·폭·방향 보간의 왼쪽 endpoint가 낡는다."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-verified 2026-08-28 by Codex deep re-audit: Gaussian rollover likewise omits DP/SigmaX/SigmaY/Theta from endpoint 1 while advancing time and position. From the second interval onward, the interpolation uses stale magnitude, widths, and direction with no compensating assignment.",
+   "decided_by": "llm:openai/codex (deep re-audit 2026-08-28) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "evidence_span": {
+    "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/mod_meteo.F",
+    "lines": "1072-1081,1117-1120",
+    "quote": "    IF(TIME>TimeStorm1.AND.TIME>TimeStorm2) THEN\n\n         TimeStorm1=TimeStorm2\n         Xstorm1 = Xstorm2\n         Ystorm1 = Ystorm2\n\n    Ifile = 300\n\n    READ(Ifile,*,END=120)  TimeStorm2,Xstorm2,Ystorm2,  &\n                        DP_storm2,SigmaX2, SigmaY2, Theta2\n…\n    dP_storm = Dp_storm2*tmp1 + dP_storm1*tmp2\n    SigmaX = SigmaX2*tmp1 + SigmaX1*tmp2 \n    SigmaY= SigmaY2*tmp1 + SigmaY1*tmp2\n    Theta = (Theta2*tmp1 + Theta1*tmp2)*PI/180.0_SP"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",

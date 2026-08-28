@@ -291,7 +291,7 @@
    }
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B6"
@@ -301,9 +301,14 @@
     "All equal-frequency variants divide by mfreq-1 without an mfreq>1 guard (L1584, L2160, L2849). A one-component configuration therefore produces a singular df before later loops."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-verified 2026-08-28 by Codex deep re-audit: All equal-frequency implementations divide by mfreq-1 before their component loops. The reader supplies 45 only when the key is absent and never rejects explicit Nfreq=1, so the singular denominator is reachable.",
+   "decided_by": "llm:openai/codex (deep re-audit 2026-08-28) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "evidence_span": {
+    "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/wavemaker.F",
+    "lines": "1580-1584",
+    "quote": "       ALLOCATE(Cm_eta(Mloc,Nloc,Numfreq),Sm_eta(Mloc,Nloc,Numfreq), &\n                Cm_u(Mloc,Nloc,Numfreq),Sm_u(Mloc,Nloc,Numfreq),&\n                Cm_v(Mloc,Nloc,Numfreq),Sm_v(Mloc,Nloc,Numfreq) )\n\n       df = (fmax-fmin)/(mfreq-1.0_SP)"
+   }
   },
   {
    "disposition": "confirmed_delta",

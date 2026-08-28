@@ -330,7 +330,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B9"
@@ -340,9 +340,14 @@
     "The equal-energy frequency repair reads Freq(kff-1) when kff can be 1 at lines 1101-1104 and 1662-1665, and compares Freq(mfreq-1) without requiring mfreq>1 at lines 1112-1113 and 1669-1671. The equal-dfrequency routines separately divide by mfreq-1, so no branch safely supports mfreq=1 despite explicit mtheta==1 handling elsewhere."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-verified 2026-08-28 by Codex deep re-audit: For explicit Nfreq=1, the final comparison unconditionally indexes Freq(0), and the equal-dfrequency variants also divide by mfreq-1. The input path validates only a missing key, not Nfreq>1, so no neutralizer excludes the case.",
+   "decided_by": "llm:openai/codex (deep re-audit 2026-08-28) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "evidence_span": {
+    "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/wavemaker.f90",
+    "lines": "1102-1104,1112-1113",
+    "quote": "        IF(Freq(kff).eq.0.0)THEN\n           Freq(kff)=Freq(kff-1)\n        ENDIF\n…\n\t  IF ( Freq(mfreq) < Freq(mfreq-1) ) THEN\n\t      Freq(mfreq) = Freq(mfreq-1)"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",

@@ -119,7 +119,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B0"
@@ -129,9 +129,14 @@
     "All four destination arguments are INTENT(OUT) (INTEGER_VAL L87, FLOAT_VAL L123, LOGICAL_VAL L158, STRING_VAL L190), but a missing key returns without assigning them at L100-L103, L137-L140, L172-L175 and L204-L207. Fortran makes an INTENT(OUT) actual argument undefined on entry, so callers cannot safely retain module initializers. This turns unchecked missing keys in io.f90—including WAVE_DATA_TYPE, ETA_LIMITER, NumberStations and the block of output flags—into undefined values rather than defaults."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-verified 2026-08-28 by Codex deep re-audit: A missing key returns with an INTENT(OUT) destination undefined, and unchecked callers immediately branch on that value; the same pattern exists for logical, real, and string readers. These callers do not restore a default from ierr, so module initializers are not a valid neutralizer under Fortran semantics.",
+   "decided_by": "llm:openai/codex (deep re-audit 2026-08-28) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "evidence_span": {
+    "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/mod_input.f90",
+    "lines": "87,99-102",
+    "quote": "  INTEGER,          INTENT(OUT) :: INTEGER_VAL \n…\n  CALL READ_VALUE(InputFileName,MatchCharacter,VAL_READ,ERR_IF_ONE)\n  IF(ERR_IF_ONE == 1)THEN\n   IF(MYID==0) WRITE(*,*) TRIM(MatchCharacter), ' DOES NOT EXIST. USE DEFAULT VALUE'\n     RETURN"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",

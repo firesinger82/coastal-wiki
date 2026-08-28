@@ -203,7 +203,7 @@
    }
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B1"
@@ -213,12 +213,17 @@
     "Source/propeller interface mismatch: propeller inputs are read only inside the PR source branch at L352-L360, but E0, Veff, Cf, and IZEF are computed unconditionally for every vessel under PROPELLER at L445-L450. SL or PA vessels therefore use unassigned N_revolution, D_prop, C_thrust, D_hub, BAR, H_prop, and C_duct."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-verified 2026-08-28 by Codex deep re-audit: Propeller parameters are assigned only for PR, but the PROPELLER post-read calculations run for every vessel. SL and PA entries therefore read uninitialized values and may divide by uninitialized denominators; no SourceType guard neutralizes those calculations.",
+   "decided_by": "llm:openai/codex (deep re-audit 2026-08-28) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "evidence_span": {
+    "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/mod_vessel.F",
+    "lines": "352,358-359,446-450",
+    "quote": "        IF(SourceType(Kves)(1:2)=='PR')THEN\n…\n         READ(Ifile,*) N_revolution(Kves),D_prop(Kves), C_thrust(Kves), &\n                       D_hub(Kves), BAR(Kves), H_prop(Kves), C_duct(Kves)\n…\n     E0 = (D_prop(Kves)/D_hub(Kves))**(-0.403_SP)*C_thrust(Kves)**(-1.79_SP) &\n                 *BAR(Kves)**(0.744_SP)\n     Veff(Kves) = E0*N_revolution(Kves)*D_prop(Kves)*SQRT(C_thrust(Kves))\n     Cf(Kves) = 0.01_SP*(D_prop(Kves)/H_prop(Kves))\n     IZEF(Kves) = D_prop(Kves)/2.0_SP/C_duct(Kves)"
+   }
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B2"
@@ -228,9 +233,14 @@
     "PA initialization mismatch: geometry/source parameters are read for PR at L352-L381 and SL at L383-L388, with no PA branch before the path read at L389-L390; VESSEL_FORCING nevertheless dispatches PA to GREEN_FUNCTION_SOURCE at L552-L555, which uses LengthVessel, WidthVessel, Pvessel and related state at L827-L875. Those values are unassigned for PA as parsed here."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-verified 2026-08-28 by Codex deep re-audit: The parser has geometry branches for PR and SL only, then proceeds to the path record; PA is nevertheless a supported dispatch. GREEN_FUNCTION_SOURCE immediately consumes PA's unassigned vessel geometry and pressure state, with no default or guard.",
+   "decided_by": "llm:openai/codex (deep re-audit 2026-08-28) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "evidence_span": {
+    "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/mod_vessel.F",
+    "lines": "383-390,552-554,827-830",
+    "quote": "        IF(SourceType(Kves)(1:2)=='SL')THEN\n         READ(Ifile,*)  LengthVessel(Kves), WidthVessel(Kves), &\n                      AlphaVessel1(Kves),AlphaVessel2(Kves), &\n                      BetaVessel(Kves),Pvessel(Kves)\n\n        ENDIF\n         READ(Ifile,*)  ! t, x, y\n         READ(Ifile,*)  TimeVessel2(Kves),Xvessel2(Kves),Yvessel2(Kves)\n…\n   IF(SourceType(Kves)(1:2)=='PA') THEN\n   \n     CALL GREEN_FUNCTION_SOURCE (Xves,Yves)\n…\n      IF(ABS(Lves)>=LengthVessel(Kves).AND. &\n         ABS(Wves)>=WidthVessel(Kves)) THEN\n\n        Z_prime(I,J) = Pvessel(Kves)"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",
