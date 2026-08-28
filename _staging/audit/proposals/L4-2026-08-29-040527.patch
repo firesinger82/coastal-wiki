@@ -1,0 +1,58 @@
+diff --git a/models/SWAN/source-analysis/swan-adcirc-coupling.md b/models/SWAN/source-analysis/swan-adcirc-coupling.md
+--- a/models/SWAN/source-analysis/swan-adcirc-coupling.md
++++ b/models/SWAN/source-analysis/swan-adcirc-coupling.md
+@@ -133,7 +133,7 @@
+ | Nesting child of coupled parent | `BOUND NEST 'parent.spec'` (coarser SWAN parent) |
+ | Disable SWAN-side MPI init in coupled | Use `-adcirc` switch in `switch.pl` |
+ | Disable wind-input from ADCIRC met | Set SWAN's own `INPGRID WIND` instead of `COUPWIND` in ADCIRC |
+-| Output radiation stresses for diagnostic | Use `BLOCK ... 'fname' ...FX FY...` (or compute from `HSIGN`, `DIR`) |
++| Output wave-induced force for diagnostic | Use `BLOCK ... 'fname' ... FORCE ...` — `FORCE` = wave-induced force vector per unit surface area, N/m² (swanuse §4 output quantities, online_doc node35); `FX`/`FY` is not a SWAN output keyword |
+ 
+ ## Working Rules
+ 
+diff --git a/models/SWAN/source-analysis/swan-boundary-implementation.md b/models/SWAN/source-analysis/swan-boundary-implementation.md
+--- a/models/SWAN/source-analysis/swan-boundary-implementation.md
++++ b/models/SWAN/source-analysis/swan-boundary-implementation.md
+@@ -66,7 +66,7 @@
+ - `DSPR DEGR` → `DSHAPE = 1` (degrees)
+ - `DSPR POW` → `DSHAPE = 2` (power)
+ 
+-This is why a wrong `MEAN` vs `PEAK` setting produces wave energy at half/twice the intended frequency — the negative sign on `FSHAPE` is the encoding.
++This is why a wrong `MEAN` vs `PEAK` setting shifts the imposed spectrum in frequency (the given period is interpreted as mean instead of peak period, or vice versa) — the negative sign on `FSHAPE` is the encoding.
+ 
+ ### SEGMENT path
+ 
+diff --git a/models/SWAN/source-analysis/swan-bragg-scattering.md b/models/SWAN/source-analysis/swan-bragg-scattering.md
+--- a/models/SWAN/source-analysis/swan-bragg-scattering.md
++++ b/models/SWAN/source-analysis/swan-bragg-scattering.md
+@@ -3,6 +3,7 @@
+ topic: swan
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "raw source `models/SWAN/raw/source_code/swan/src/SwanBraggScat.ftn90` 직접 read (1491 lines, line 1-150 module header + line 524-1382 subroutine 위치). [[swan-documentation-stack]] §2.3.7 Bragg scattering (Tech p.48) + User Manual cmd `BRAGG` (p.71) 매핑."
+ note_author: "Claude Opus 4.7 (1M context) raw source direct read"
+ note_date: 2026-06-01
+diff --git a/models/SWAN/source-analysis/swan-command-file-reference.md b/models/SWAN/source-analysis/swan-command-file-reference.md
+--- a/models/SWAN/source-analysis/swan-command-file-reference.md
++++ b/models/SWAN/source-analysis/swan-command-file-reference.md
+@@ -202,8 +202,8 @@
+ 1. **`SET PWTAIL` matters for stationary convergence** — too steep tail underestimates whitecapping, may prevent convergence.
+ 2. **`NUMERICAL STOPC ...` is the convergence gate for stationary** — default tolerances are loose; tighten for high-quality validation.
+ 3. **`COMPGRID` is a built-in name** for the computational grid — you don't need to define it via `FRAME`/`POINTS`.
+-4. **`NESTOUT` writes 2D spectra** — the receiving fine-grid `BOUND NEST` reads them, both grids must share `SET FREQ` and `SET DIR` parameters.
+-5. **`COMPUTE NONSTAT` time format**: `YYYYMMDD.HHMMSS` (default), or with `SET TIMEFORMAT` set differently — be explicit when sharing scripts.
++4. **`NESTOUT` writes 2D spectra** — the receiving fine-grid `BOUND NEST` reads them; a differing spectral grid (`CGRID` `[flow] [fhigh] [msc] [mdc]`) is remapped by `CHGBAS` with no hard check ([[swan-boundary-implementation]] §B), so share the `CGRID` spectral settings when exact consistency matters. (`SET FREQ`/`SET DIR` are not SWAN commands.)
++5. **`COMPUTE NONSTAT` time format**: ISO `YYYYMMDD.HHMMSS` recommended (swanuse §2.8 Time and date notation, [[swan-usage-general]] §5); `SET TIMEFORMAT` is not a SWAN command — be explicit when sharing scripts.
+ 6. **Multiple `INPGRID WIND` blocks override each other** — keep one canonical wind input per run.
+ 
+ ## Common Pitfalls
+@@ -213,7 +213,7 @@
+ - **Mixing structured and unstructured** in the same `INPGRID/READINP` block → fails. Each input field must match the type declared in its `INPGRID`.
+ - **Forgetting `MODE STAT` ↔ `COMPUTE STAT`** mismatch → SWAN ignores the inconsistency and assumes nonstationary; debug from the log header.
+ - **`SET LEVEL` left at 0** when modeling a tide-influenced domain — wave-current interaction wrong.
+-- **`FRICTION JONSWAP CONSTANT 0.067`** = default; valid for storms but too dissipative for swell — switch to `FRICTION COLL` or measured Madsen for swell-dominated cases.
++- **`FRICTION JONSWAP CONSTANT [cfjon]`** — current default `[cfjon] = 0.038` (swanuse v41.51 §4.5.4 FRICTION, online_doc node28 "Default: [cfjon] = 0.038"); `0.067` is **not** the current default. Wind-sea vs swell suitability of the two values: see the same manual section before switching to `COLLINS`/`MADSEN`.
+ - **Output before `COMPUTE`** → the `BLOCK/TABLE/SPECOUT/NESTOUT` records the run state; if placed before `COMPUTE`, you get an empty file. Put output commands BEFORE `COMPUTE` (they're declarative; they fire during/after `COMPUTE`).
+ 
+ ## Next expansion

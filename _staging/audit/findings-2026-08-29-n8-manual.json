@@ -1,0 +1,265 @@
+{
+ "date": "2026-08-29",
+ "audit_run_id": "L4-2026-08-29-n8-swan-source-analysis",
+ "value_sampling_note": "모집단 = 8파일 sourced 수치·라인 단언 중 로컬 raw 로 접근 가능한 것(models/SWAN/raw/source_code/swan/src 41.51 + raw/manuals/website/online_doc swanuse·swantech HTML). 표본 3건(data-structures COMPDA 인덱스 / boundary FSHAPE·GAMMA / usage-general depmin·froudmax) + 부수 확인 6파일 + 불일치 1건(command-file-reference cfjon). seed=audit_run_id, 전 파일 신규(ledger 미검사). PDF 는 미사용(HTML online_doc 로 대체, Ch8 은 website=PDF offset 0).",
+ "findings": [
+  {
+   "path": "models/SWAN/manual-notes/swan-tech-ch8-unstructured-ops.md",
+   "blob_sha": "f5c831f43058fe4b59adae24fe49fdc48f7171b4",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 38,
+   "opinion": 4,
+   "has_source_needed": false,
+   "unsourced": [],
+   "value_checks": [
+    {
+     "claim_id": "e36922307fa0",
+     "claim": "L25-93: §8.4=Eq 8.17-8.29 / §8.5=8.30-8.38 / §8.6=8.39 / §8.7=8.40-8.45 (website=PDF offset 0)",
+     "source_ref": "swantech online_doc node93-96.html (local raw/manuals/website)",
+     "mismatch": false,
+     "note": "✓ 부수 확인(표본 한도 외) — 4개 node 의 식 번호 집합이 노트 절 배분과 정확히 일치; node95 의 '2.181'·'3.13' 교차참조도 일치."
+    }
+   ],
+   "value_mismatches": 0,
+   "source_unavailable": 0,
+   "proposals": []
+  },
+  {
+   "path": "models/SWAN/manual-notes/swan-usage-general.md",
+   "blob_sha": "2c4156ab4820f06b6ffe4f6ab08a46910399478e",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 41,
+   "opinion": 3,
+   "has_source_needed": false,
+   "unsourced": [],
+   "value_checks": [
+    {
+     "claim_id": "d3debd9d657a",
+     "claim": "L37-38: froudmax=0.8 (super-critical→sub-critical), depmin default 0.05 m",
+     "source_ref": "swanuse online_doc node23.html SET (\"Default: [depmin] = 0.05\", \"Default: [froudmax] = 0.8\") + node5.html (\"locally reduced to sub-critical flow\")",
+     "mismatch": false,
+     "note": "✓ 두 default 일치. 부수 확인: L56 Phillips 0.0081 (node13 ✓), L71-72 연도 0-9999 / 1931-2030 (node14 ✓), L54 Bragg since 41.41 (node13 ✓)."
+    }
+   ],
+   "value_mismatches": 0,
+   "source_unavailable": 0,
+   "proposals": []
+  },
+  {
+   "path": "models/SWAN/source-analysis/swan-adcirc-coupling-implementation.md",
+   "blob_sha": "7e204dad5240065ed8a76ffbc5862d0b74f3ad8b",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 44,
+   "opinion": 9,
+   "has_source_needed": false,
+   "unsourced": [],
+   "value_checks": [
+    {
+     "claim_id": "ce337f4f9478",
+     "claim": "L28-32: OPTG=5 at swanpre1.ftn:1643-1649; SWCOMP/SwanCompUnstruc dispatch swanmain.ftn:618-627",
+     "source_ref": "models/SWAN/raw/source_code/swan/src/swanpre1.ftn:1643-1649, swanmain.ftn:618-628",
+     "mismatch": false,
+     "note": "✓ 부수 확인 — `ELSEIF (KEYWIS('UNSTRUC'))`/`OPTG = 5` 1643-1644, `IF (OPTG.NE.5)` 618 → SwanCompUnstruc 624-627 일치. Working Rules 5·Pitfalls 는 인용절에서 파생된 휴리스틱으로 opinion 처리."
+    }
+   ],
+   "value_mismatches": 0,
+   "source_unavailable": 0,
+   "proposals": []
+  },
+  {
+   "path": "models/SWAN/source-analysis/swan-adcirc-coupling.md",
+   "blob_sha": "fdeeb77b3a9f6c6ba18889bdd1fcba36cdfb0485",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 40,
+   "opinion": 10,
+   "has_source_needed": false,
+   "unsourced": [
+    {
+     "line": 136,
+     "text": "Output radiation stresses for diagnostic | Use `BLOCK ... 'fname' ...FX FY...` (or compute from `HSIGN`, `DIR`)",
+     "reason": "출처 0 + 사실 불일치: SWAN BLOCK/TABLE 출력량에 `FX`/`FY` 키워드 없음 — wave-induced force 는 vector 출력량 `FORCE` (swanuse online_doc node32/node35 \"FORCE wave-induced force per unit surface area (vector; N/m²)\"). `HSIGN`,`DIR` 로 radiation stress 계산 가능하다는 부분도 무출처.",
+     "adversary": "refute 시도: (a) FX/FY 가 netCDF 변수명인가? — BLOCK 명령 인자 문맥이며 swanuse 출력량 목록에 부재. (b) 사용자 정의 QUANTITY 인가? — QUANTITY 는 기존 출력량 속성 변경만. (c) ADCIRC 측 노트가 커버? — [[adcirc-swan-coupling]]·[[adcirc-hotstart]] 는 SwanHotStartUnit/COUPWIND (L132·L135) 를 커버하므로 그 두 행은 refute 성공·폐기; FX FY 는 SWAN 명령 사양이라 ADCIRC 노트가 근거 못 됨. refute 실패 → confirmed."
+    }
+   ],
+   "value_checks": [
+    {
+     "claim_id": "7272c185bd9e",
+     "claim": "L107-110: fx = -ρ g (∂Sxx/∂x + ∂Sxy/∂y), fy = -ρ g (∂Sxy/∂x + ∂Syy/∂y) at SwanComputeForce.ftn90:304-307",
+     "source_ref": "models/SWAN/raw/source_code/swan/src/SwanComputeForce.ftn90:304-307 (`fx(ivert) = -RHO * GRAV * ( dsxxdx + dsxydy )`, `fy(ivert) = -RHO * GRAV * ( dsxydx + dsyydy )`)",
+     "mismatch": false,
+     "note": "✓ 부수 확인 — 식·라인 일치. switch.pl:31,93-96 `-adcirc`/`!ADC`/`!COH` 도 일치(파일 위치는 src/ 가 아닌 swan/ 루트)."
+    }
+   ],
+   "value_mismatches": 0,
+   "source_unavailable": 0,
+   "proposals": [
+    {
+     "old_string": "| Output radiation stresses for diagnostic | Use `BLOCK ... 'fname' ...FX FY...` (or compute from `HSIGN`, `DIR`) |",
+     "new_string": "| Output wave-induced force for diagnostic | Use `BLOCK ... 'fname' ... FORCE ...` — `FORCE` = wave-induced force vector per unit surface area, N/m² (swanuse §4 output quantities, online_doc node35); `FX`/`FY` is not a SWAN output keyword |",
+     "rationale": "무출처·오기 키워드(FX FY) → 실제 출력량 FORCE 로 정정 + swanuse 출처 부착. 'HSIGN, DIR 로 계산' 무출처 구절 제거."
+    }
+   ]
+  },
+  {
+   "path": "models/SWAN/source-analysis/swan-boundary-implementation.md",
+   "blob_sha": "50af8d3dc15b154aab0a62dfba5643105e04531f",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 52,
+   "opinion": 8,
+   "has_source_needed": false,
+   "unsourced": [
+    {
+     "line": 69,
+     "text": "This is why a wrong `MEAN` vs `PEAK` setting produces wave energy at half/twice the intended frequency — the negative sign on `FSHAPE` is the encoding.",
+     "reason": "'half/twice'(계수 2) 는 무출처 정량 단언. 인용된 swanpre2.ftn:2821-2825 는 FSHAPE 부호 반전만 보여줌; 평균주기↔첨두주기 차는 스펙트럼 형상에 따라 수십 % 수준이지 2배가 아님(어느 출처도 붙지 않음).",
+     "adversary": "refute 시도: (a) 인접 §E SHAPESPEC defaults 에 근거? — 부호 encoding 만 재서술. (b) swanuse BOUND SHAPE 절이 커버? — 노트에 인용 없음. (c) 과장 수사(opinion)? — '계수 2' 의 사실 형식이라 단언으로 분류. refute 실패 → confirmed. 부수: L122·L212·L219 의 `SET FREQ`/`SET DIR` 는 SWAN SET 키워드가 아님(스펙트럼 격자는 CGRID 인자, swanuse node23) — 실질 주장(CHGBAS 재매핑·hard check 없음)은 인용됨이라 미출처로 세지 않고 용어 오류로만 기록(자매 노트 4건 동일 패턴 — 별도 처리 권고)."
+    }
+   ],
+   "value_checks": [
+    {
+     "claim_id": "13a7e4a69722",
+     "claim": "L56-60,194: JON→FSHAPE=2, PM→1, GAUS→4 (SIGFR→PSHAPE(2) rad/s), BIN→3, TMA→5; GAMMA default 3.3; MEAN → FSHAPE=-FSHAPE; DSPR DEGR→DSHAPE=1 / POW→2",
+     "source_ref": "models/SWAN/raw/source_code/swan/src/swanpre2.ftn:2802-2835",
+     "mismatch": false,
+     "note": "✓ 전부 일치 (FSHAPE 값·3.3 default 2805/2817·PI2*SIGMAG 변환·부호 반전 2823·DSHAPE 2831-2834)."
+    }
+   ],
+   "value_mismatches": 0,
+   "source_unavailable": 0,
+   "proposals": [
+    {
+     "old_string": "This is why a wrong `MEAN` vs `PEAK` setting produces wave energy at half/twice the intended frequency — the negative sign on `FSHAPE` is the encoding.",
+     "new_string": "This is why a wrong `MEAN` vs `PEAK` setting shifts the imposed spectrum in frequency (the given period is interpreted as mean instead of peak period, or vice versa) — the negative sign on `FSHAPE` is the encoding.",
+     "rationale": "무출처 계수('half/twice') 제거, 인용된 부호 encoding 사실만 남김."
+    }
+   ]
+  },
+  {
+   "path": "models/SWAN/source-analysis/swan-bragg-scattering.md",
+   "blob_sha": "530db4e3e04b4b7a1710b91bea5aa929f09b50d4",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 22,
+   "opinion": 6,
+   "has_source_needed": true,
+   "unsourced": [],
+   "value_checks": [
+    {
+     "claim_id": "e9bda63bed80",
+     "claim": "L52-63: 1491 lines; SWBRBOT 69 / fit2 524 / SWFBXY 561 / SWFB 771 / SWBRAGG1 942 / SWBRAGG2 1094 / SWBRAGG3 1247 / FILBRG 1382; header 41.80 Sept 2021 Rijnsdorp+Reniers",
+     "source_ref": "models/SWAN/raw/source_code/swan/src/SwanBraggScat.ftn90 (wc -l; grep subroutine; L30-45)",
+     "mismatch": false,
+     "note": "✓ 8개 라인·행수·헤더 전부 일치. §4 알고리즘(추정)·§5 variant 분리(추정)·§7 이론식은 §9 한계에 명시 disclosed 갭 → has_source_needed=true 권고(미출처로 세지 않음). §5 인자 목록 중 SWBRAGG1 에는 `fbd` 인자 없음(942 signature) — 노트는 '각 SWBRAGG*' 로 묶어 서술, 경미."
+    }
+   ],
+   "value_mismatches": 0,
+   "source_unavailable": 0,
+   "proposals": [
+    {
+     "old_string": "citation_status: verified\n",
+     "new_string": "citation_status: verified\nhas_source_needed: true\n",
+     "rationale": "G9e: §4·§5·§7 의 추정/미인용 식은 §9 한계에 disclosed → 플래그 true 권고."
+    }
+   ]
+  },
+  {
+   "path": "models/SWAN/source-analysis/swan-command-file-reference.md",
+   "blob_sha": "0762fd76554e591dae2cff816cbbe5eb7c2063e9",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 60,
+   "opinion": 12,
+   "has_source_needed": false,
+   "unsourced": [
+    {
+     "line": 216,
+     "text": "**`FRICTION JONSWAP CONSTANT 0.067`** = default; valid for storms but too dissipative for swell — switch to `FRICTION COLL` or measured Madsen for swell-dominated cases.",
+     "reason": "VALUE-MISMATCH: swanuse v41.51 FRICTION 절(online_doc node28) \"Default: [cfjon] = 0.038\". 0.067 은 현행 default 아님. storm/swell 적합성 문장도 무출처.",
+     "adversary": "refute 시도: (a) 구버전 SWAN 기준? — 노트 Provenance 가 'post-2024 release-line' 스캔이라 명시, 위키 raw 매뉴얼도 41.51. (b) 인용 `[file=pdf:swan:swantech]` ch.2.3.3 가 0.067 을 기술? — 그 값은 Hasselmann 1973 JONSWAP 계수로 이론 문맥이지 SWAN default 아님; 노트는 'default' 라 단정. refute 실패 → confirmed VALUE-MISMATCH."
+    },
+    {
+     "line": 205,
+     "text": "**`NESTOUT` writes 2D spectra** — the receiving fine-grid `BOUND NEST` reads them, both grids must share `SET FREQ` and `SET DIR` parameters.",
+     "reason": "출처 0 + 두 가지 불일치: `SET FREQ`/`SET DIR` 는 SWAN 명령이 아님(SET 키워드 목록은 이 노트 L78 자체·swanuse node23; 스펙트럼 격자는 CGRID 인자). 'must share' 는 자매 노트 [[swan-boundary-implementation]] §B 의 인용된 사실(CHGBAS 재매핑, hard check 없음)과 모순.",
+     "adversary": "refute 시도: (a) SET FREQ 가 CGRID 스펙트럼 인자의 약칭? — 노트는 CGRID 인자를 L86 에 별도 정확히 기재하고 있어 약칭으로 볼 수 없음. (b) 'must' 가 권고 의미? — 'must share ... parameters' 사실 형식. refute 실패 → confirmed."
+    },
+    {
+     "line": 206,
+     "text": "**`COMPUTE NONSTAT` time format**: `YYYYMMDD.HHMMSS` (default), or with `SET TIMEFORMAT` set differently — be explicit when sharing scripts.",
+     "reason": "출처 0; `SET TIMEFORMAT` 은 SWAN SET 키워드가 아님(swanuse node23). 시간표기는 swanuse §2.8 (ISO 권장, [[swan-usage-general]] §5) 로 커버 가능하나 노트에 인용 없음.",
+     "adversary": "refute 시도: (a) L78 SET 키 목록에 TIMEFORMAT 있나? — 없음. (b) swanuse 어딘가에 존재? — node23 SET 절 grep 0건. refute 실패 → confirmed. (L203 PWTAIL·L208 INPGRID override·L215 MODE/COMPUTE mismatch 도 무출처 후보였으나 반증 근거를 확보 못 해 precision 우선 폐기.)"
+    }
+   ],
+   "value_checks": [
+    {
+     "claim_id": "9e9c7d5fcf60",
+     "claim": "L78-150: PROJECT 523 / MODE 738 / COMPUTE 875 / BREAKING 2376 / GEN3 2904 / QUADRUPL 3286 / TRIAD 3337 / STOP 497 (swanpre1); FRAME 323 / GROUP 372 / POINTS 536 / BLOCK 1171 / TABLE 1577 / SPECOUT 1873 / NESTOUT 1984 / SWBOUN 2695 (swanpre2)",
+     "source_ref": "models/SWAN/raw/source_code/swan/src/swanpre1.ftn, swanpre2.ftn (sed -n)",
+     "mismatch": false,
+     "note": "✓ 16개 파서 라인 전부 KEYWIS 분기와 일치."
+    },
+    {
+     "claim_id": "6010936a0ede",
+     "claim": "L216: FRICTION JONSWAP CONSTANT 0.067 = default",
+     "source_ref": "swanuse v41.51 online_doc node28.html FRICTION (\"Default: [cfjon] = 0.038\")",
+     "mismatch": true,
+     "note": "❌ VALUE-MISMATCH — 현행 default 0.038. Adversary 통과, confirmed."
+    }
+   ],
+   "value_mismatches": 1,
+   "source_unavailable": 0,
+   "proposals": [
+    {
+     "old_string": "- **`FRICTION JONSWAP CONSTANT 0.067`** = default; valid for storms but too dissipative for swell — switch to `FRICTION COLL` or measured Madsen for swell-dominated cases.",
+     "new_string": "- **`FRICTION JONSWAP CONSTANT [cfjon]`** — current default `[cfjon] = 0.038` (swanuse v41.51 §4.5.4 FRICTION, online_doc node28 \"Default: [cfjon] = 0.038\"); `0.067` is **not** the current default. Wind-sea vs swell suitability of the two values: see the same manual section before switching to `COLLINS`/`MADSEN`.",
+     "rationale": "값검증 불일치(0.067→0.038) 정정 + 출처 부착; 무출처 storm/swell 단정은 매뉴얼 참조로 대체."
+    },
+    {
+     "old_string": "4. **`NESTOUT` writes 2D spectra** — the receiving fine-grid `BOUND NEST` reads them, both grids must share `SET FREQ` and `SET DIR` parameters.",
+     "new_string": "4. **`NESTOUT` writes 2D spectra** — the receiving fine-grid `BOUND NEST` reads them; a differing spectral grid (`CGRID` `[flow] [fhigh] [msc] [mdc]`) is remapped by `CHGBAS` with no hard check ([[swan-boundary-implementation]] §B), so share the `CGRID` spectral settings when exact consistency matters. (`SET FREQ`/`SET DIR` are not SWAN commands.)",
+     "rationale": "존재하지 않는 명령 제거, 'must' 를 자매 노트의 인용된 사실(재매핑)로 교체."
+    },
+    {
+     "old_string": "5. **`COMPUTE NONSTAT` time format**: `YYYYMMDD.HHMMSS` (default), or with `SET TIMEFORMAT` set differently — be explicit when sharing scripts.",
+     "new_string": "5. **`COMPUTE NONSTAT` time format**: ISO `YYYYMMDD.HHMMSS` recommended (swanuse §2.8 Time and date notation, [[swan-usage-general]] §5); `SET TIMEFORMAT` is not a SWAN command — be explicit when sharing scripts.",
+     "rationale": "존재하지 않는 명령 제거 + swanuse §2.8 출처 연결."
+    }
+   ]
+  },
+  {
+   "path": "models/SWAN/source-analysis/swan-data-structures-implementation.md",
+   "blob_sha": "3c79985ae81b93b0acc774ef20e5339860758041",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 58,
+   "opinion": 7,
+   "has_source_needed": false,
+   "unsourced": [],
+   "value_checks": [
+    {
+     "claim_id": "9ca6d08a4b8f",
+     "claim": "L73-78: JDP2=8 (1505), JVX2=11 (1508), JVY2=12 (1509), JWX2=16 (1513), JWY2=17 (1514), JFRC2 at 1529; index block 1498-1527",
+     "source_ref": "models/SWAN/raw/source_code/swan/src/swanmain.ftn:1498-1530",
+     "mismatch": false,
+     "note": "✓ 6개 값·라인 전부 일치 (MCMVAR=29 at 1527). 부수 확인: AC2 ALLOCATE swanpre1.ftn:4980 / `AC2 = 0.` 4989 ✓, BSPECS 433 / BGRIDP(6*NBGRPT) 435 ✓. L82 WIND10 파생·Pitfalls hot-start 는 인용 없는 파생 서술이나 반증 불가 → opinion 처리."
+    }
+   ],
+   "value_mismatches": 0,
+   "source_unavailable": 0,
+   "proposals": []
+  }
+ ]
+}
