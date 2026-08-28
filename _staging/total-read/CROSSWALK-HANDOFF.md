@@ -25,11 +25,21 @@
 - 누적: dispositions 2,142 · **confirmed_delta 5**(전량 원문/코드 span 확정, base 미검출) · span-gate 기각 2(sediment.F B3·mkxyz B0).
 - 산출: `records-crosswalk/reread-20260728/<SHARD>/`(+`_provenance/`·`DELTA-REVIEW.md`). 스크립트: `blind_shard.py`·`finalize_shard.py`·`verify_crosswalk.py`(레코드파일명 키).
 
-## 다음 작업 = supplement 게이트(§3) — pending HIGH 승격
-- 각 shard `_provenance/delta_candidates.json` 의 **in-scope pending HIGH** 를 원문 span 재확인 → confirmed_delta 승격(특히 FUNWAVE-004 25건·001 16건: fluxes/init U4xL·wavemaker Beta_gen/phi1·mod_vessel NumVessel·mod_meteo/precipitation rollover 등).
-- 승격분 → canonical supplement(hash 고정·원본 미변경, §3) → WO amendment(§5.3 완결게이트 좁게 개정) → §7 canonical 선택 → `/codex:review`.
-- .m/.py 후처리 스크립트 HIGH 는 범위밖(#8) — supplement 목적지 없음.
-- 대형 3모델(ADCIRC/ROMS/Delft3D)은 별건(감사 미실시 — 먼저 감사 run 필요).
+## ✅ supplement 게이트(§3) 완료 (2026-08-28) — Phase A/B/C
+- **Phase A/B**: pending in-scope HIGH 50 재확인 → **confirmed_delta 23**(EFDC 1·FUNWAVE code 21·note 1),
+  기각 12·MED 11·심층보류 6(io.F B2·vessel B1/B2·meteo B0/B1·mod_global B0 MPI). span-gate 기각으로 precision 보호.
+- **Phase C**: SPEC.md §80 amendment 적용("item 2 보강 + canonical supplement") + `verify_supplement.py` v4
+  이중 게이트(기계+사람). santa-method Codex 적대검증 4라운드([SUPPLEMENT-CODEX-REVIEW.md](SUPPLEMENT-CODEX-REVIEW.md)).
+- 산출: `supplement-manifest.json`(23, authority 와 exact)·`supplement-decisions.json`(23 pending)·
+  `SUPPLEMENT-SCHEMA.md`·`build_supplement_manifest.py`. mechanical PASS, **사람 승인 0/23**.
+
+## 다음 작업 = ★사용자 decisions 승인 (사람 게이트)
+- `supplement-decisions.json` 23건 각 status=approved·approver=<사람>·approved_at 기입 → `verify_supplement.py` PASS 시 canonical 유효.
+  검토 다이제스트: scratchpad `DELTA-APPROVAL-DIGEST.md`(세션 종료 시 소실 — 각 근거는 crosswalk confirmed_delta evidence_span).
+  producer(Claude) 자기승인 불가. 부분 승인 가능.
+- 이후(선택): 정식 canonical manifest 도입 시 verify_supplement 에 모집단 조인 추가(F1 공시한계 해소).
+- 남은 in-scope pending(심층보류 6·MED 11)은 필요 시 추가 재확인 → 승격.
+- .m/.py 후처리 스크립트 HIGH 는 범위밖(#8). 대형 3모델(ADCIRC/ROMS/Delft3D)은 감사 미실시 별건.
 
 ---
 ## (완료) 파일럿 = EFDC-000 crosswalk
