@@ -84,6 +84,32 @@ preflight(sha256+chunk manifest) → LLM 이 전 chunk 순차 완독(chunk별 �
 6. 맹검 층화표본 통과 + 의미 canary(교차라인 결함) 검출 확인
 7. RESUME·SESSION-LOG·status·manifest 4곳 동수일 때만 표기 갱신
 
+### item 2 보강 + canonical supplement (2026-08-28 사용자 승인 — MERGE-PLAN §3-4, Codex 4-round 하드닝)
+
+**item 2 명확화**: 고유 canonical key 는 canonical manifest 에 정확히 1회 — 각 key 는 **selected_record
+정확히 1개**(1차 base). key 는 선택적으로 hash-고정 `supplements[]`(감사 confirmed_delta)를 참조할 수
+있으나 **별도 canonical key·별도 selected_record 를 만들지 않는다**. supplement 는 완결/100% 판정의
+필요조건도 충분조건도 아니며 **게이트 1-7(item 6 맹검 감사 포함)은 그대로 필수**다.
+
+**canonical supplement**: crosswalk 에서 confirmed_delta 로 판정되고 원문 span 재확인 + 사람 승인을 통과한
+감사(2차) finding 만 canonical 을 보강한다. selected_record 는 불변. 상세·필드는
+[SUPPLEMENT-SCHEMA.md](SUPPLEMENT-SCHEMA.md), 근거 병합설계는 [MERGE-PLAN-20260827.md](MERGE-PLAN-20260827.md) §3-4,
+적대검증 경위는 [SUPPLEMENT-CODEX-REVIEW.md](SUPPLEMENT-CODEX-REVIEW.md).
+
+이중 게이트 (`verify_supplement.py`, 저장필드 신뢰 금지 — 전부 소스 재도출):
+- **기계**: selected/audit 레코드·crosswalk·evidence bytes 해시 재계산; 각 레코드 source_sha256==key;
+  canonical model/path·selected_record·audit_record 를 crosswalk 에 핀 고정; crosswalk 를 delta authority 로
+  전량 열거해 manifest 가 confirmed_delta 집합과 **정확·완전** 일치(누락·초과 0); audit_id 문법·모순 disposition
+  거부; span bounds+quote 재추출; evidence realpath containment(abs·`..` 이탈 거부).
+- **사람**(작업규범 #4, 자기신고 완결권한 금지): `supplement-decisions.json` 승인 receipt — crosswalk/span/
+  audit-record/evidence 해시 4종 바인딩·status=approved·approver 는 사람(모델 identity 거부·producer 분리)·
+  approved_at 필수. **우회 플래그 없음.** producer(Claude)는 approved receipt 를 작성하지 않는다.
+  인용이 finding 을 실제 뒷받침하는지(의미 함의)는 **승인자(사람)의 판정** 소관.
+
+무효화: 바인딩된 어느 해시라도 바뀌면 supplement 무효 → 재판정+재승인.
+공시한계: reread 코퍼스에 단일 canonical manifest 파일이 없어 crosswalk 를 authority 로 바인딩(정식 manifest
+도입 시 모집단 조인 추가); 사람성은 사용자가 decisions 파일을 직접 작성함으로써 보장(서명 PKI 범위밖).
+
 ### 게이트 3항 예외 확장 — 수치격자 (2026-07-28 사용자 승인)
 
 mechanical 예외에 **수치격자(numeric_grid)** 를 추가한다: `bytes >= 100,000` AND 선두

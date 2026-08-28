@@ -1,47 +1,55 @@
-# supplement-manifest/v1 — canonical 보강 (confirmed_delta 승격)
+# supplement-manifest/v2 — canonical 보강 (confirmed_delta 승격, Codex-hardened)
 
-> MERGE-PLAN §3-4 구현. supplement 게이트 Phase A. 빌더 `build_supplement_manifest.py`, 검증기 `verify_supplement.py`.
-> canonical = base(Claude 1차) 불변 유지. supplement = span-재확인된 audit confirmed_delta. **새 canonical key 생성 안 함**(완결게이트 §80-2 "정확히 1회" 보존).
+> MERGE-PLAN §3-4 구현. 빌더 `build_supplement_manifest.py`, 검증기 `verify_supplement.py`(v4, 4-round 하드닝).
+> 적대검증 경위 [SUPPLEMENT-CODEX-REVIEW.md](SUPPLEMENT-CODEX-REVIEW.md). SPEC 반영 §80 "item 2 보강 + canonical supplement".
+> canonical = base(Claude 1차) 불변. supplement = span-재확인 + 사람 승인된 audit confirmed_delta. **새 canonical key/ selected_record 생성 안 함**.
 
-## 구조
-`supplement-manifest.json` — canonical key 당 1 entry:
+## 파일
+- `supplement-manifest.json` (supplement-manifest/v2) — canonical key 당 1 entry.
+- `supplement-decisions.json` (supplement-decisions/v2) — 사람 승인 receipt (미승인은 status=pending).
+
+## manifest 구조
 ```
-canonical_key: {model, normalized_path, source_sha256}
-selected_record: base(Claude fable-5) — run_id·record_file·record_path·record_sha256_bytes(재계산)
-supplements[]: 확정 delta
-  member_input_ids          # 원본 audit finding id (crosswalk 추적)
-  finding_text              # audit 원문
-  src_run_id·src_record_path·src_record_sha256_bytes(재계산)
-  source_span {path, lines} # 증거 위치 (doc-vs-code delta 는 canonical 과 다른 파일 가능)
-  source_file_sha256        # 증거 소스파일 실측 sha
-  authoritative_quote       # 인용 라인 실소스 재추출 (crosswalk 재구성본 아님)
-  source_span_hash          # sha256(quote)
-  decision: confirmed_delta·decided_by·decided_at·rationale
-  reconfirmed_at·reconfirm_method  # §6.4 span 재확인
+schema, corpus, generated_by(producer), entry_count, supplement_count
+entries[]:
+  canonical_key {model, normalized_path, source_sha256}
+  crosswalk {path, sha256_bytes}                 # 이 key 를 판정한 crosswalk (해시 핀)
+  selected_record {reader, run_id, record_file, record_path, record_sha256_bytes, record_source_sha256}
+                                                 # crosswalk base 와 정확히 일치(검증기 강제) — 제2 selector 아님
+  supplements[]:
+    member_input_ids [audit_id...]               # 비어있지 않음, 문법 ^B(0|[1-9]\d*)$
+    finding_texts {audit_id: text}               # 각 == 감사레코드 unresolved[idx]
+    audit_record {run_id, record_path, record_sha256_bytes, record_source_sha256}  # crosswalk audit 에 핀
+    evidence_sources [{path, sha256}]            # 인용 소스 (doc-vs-code 는 canonical 과 다른 파일 가능)
+    source_span {path, lines} · authoritative_quote · source_span_hash
+    decision: confirmed_delta · decided_by · decided_at · rationale · reconfirmed_at
 ```
 
-## verify_supplement.py 게이트 (모든 증거 소스 재도출 — §4 "필드 신뢰 금지")
-1. canonical key 유일 (supplement 는 key 추가 안 함).
-2. selected_record bytes 해시 재계산 == 저장값.
-3. supplement src(audit) record bytes 해시 재계산 == 저장값.
-4. **live 소스 sha256 == record source_sha256 == supplement.source_file_sha256** (판독 후 소스 불변).
-5. authoritative_quote 를 live 소스 인용라인에서 재추출 == 저장값; source_span_hash == sha256(quote). (§6.4 span 재확인 기계화)
-6. 전 supplement decision == confirmed_delta.
-7. 각 supplement 가 crosswalk 의 confirmed_delta 처분으로 역추적됨.
+## decisions receipt (사람 게이트)
+```
+{canonical_source_sha256, canonical_path, audit_id,
+ crosswalk_sha256_bytes, source_span_hash, audit_record_sha256_bytes, evidence_sha256[],  # 4-해시 바인딩
+ status: pending|approved|rejected, approver(사람), approved_at, note}
+```
 
-## Phase A 결과 (5 supplements)
-| shard | canonical | supplement | 결함 |
-|---|---|---|---|
-| EFDC-000 | aaefdc.f90 | B1 L924-928 | DETTMP 특이행렬 역수 후 ==0 비교, STOPP 가드 사장 |
-| FUNWAVE-000 | convert.f | B3 L251-254 | 무경계 DO WHILE TIME() 탐색 OOB |
-| FUNWAVE-001 | breaker.f90 | B1 L112,151-152,221-222 | DXg/DYg use-before-assign |
-| FUNWAVE-004 | breaker.F | B1 L103,161-168,238-239 | DXg/DYg use-before-assign |
-| FUNWAVE-note-000 | funwave-user-manual-full.md | B5 io.F L3361 | 본문 'STATION FILE' vs 파서 키 STATIONS_FILE |
+## verify_supplement.py 이중 게이트 (저장필드 신뢰 금지 — 전부 소스 재도출)
+**기계 (M)**: 레코드/crosswalk/evidence bytes 해시 재계산; 각 레코드 source_sha256==key; canonical model/path·
+selected_record·audit_record 를 crosswalk 에 핀; **crosswalk 전량 열거해 manifest 가 confirmed_delta 집합과
+exact+complete**(누락·초과 0); 전 crosswalk audit_id 문법·모순 disposition 거부; span bounds+quote 재추출+
+source_span_hash; evidence realpath containment(abs·`..` 거부); schema/corpus/decision_count/dedup.
+**사람 (H)**: 승인 receipt 4-해시 바인딩 일치·status=approved·approver 사람(모델 identity·producer 거부)·
+approved_at 필수. **우회 플래그 없음.**
 
-verify PASS. 전 supplement live 소스 재추출·해시 재도출·crosswalk 추적.
+canonical 유효 = M PASS AND H approved. pending·미승인은 항상 FAIL.
 
-## Phase B (예정) — pending in-scope HIGH 50건 span 재확인 → 확정분 편입
-FUNWAVE-000 10·001 15·004 25. 직접 수행(검증 위임 금지). 확정분 crosswalk confirmed_delta 승격 후 manifest 재빌드.
+## Phase A/B 결과 (23 supplements, pending)
+| shard | confirmed_delta |
+|---|---|
+| EFDC-000 | 1 (DETTMP) |
+| FUNWAVE-000 | 3 (convert.f OOB·breaker.F/breaker_gpu.F UBA) |
+| FUNWAVE-001 | 8 (breaker.f90·dispersion·wavemaker×4·mod_global·io) |
+| FUNWAVE-004 | 10 (breaker.F·wavemaker×4·sediment×2·io·vessel·tracer) |
+| FUNWAVE-note-000 | 1 (manual STATIONS_FILE) |
 
-## Phase C (예정·게이트) — WO(SPEC.md §80-2) amendment
-완결게이트 "고유 canonical key 정확히 1회"에 optional `supplements[]` 수용 명문화. **santa-method Codex 적대검증 경유**(완결게이트 개정은 자기신고 불가, CLAUDE.md 작업규범 #4).
+전 supplement mechanical PASS, 사람 승인 0/23(전부 pending). 사용자가 `supplement-decisions.json` 승인 시 canonical 유효.
+Phase B 기각 12·MED 11·심층보류 6 은 각 shard `_provenance/delta_candidates.json`.

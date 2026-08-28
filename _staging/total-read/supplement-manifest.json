@@ -1,10 +1,10 @@
 {
- "schema": "supplement-manifest/v1",
+ "schema": "supplement-manifest/v2",
  "corpus": "reread-20260728",
- "design_ref": "MERGE-PLAN-20260827.md §3-4",
- "generated_by": "llm:claude-opus-4-8 (supplement gate Phase A)",
+ "design_ref": "MERGE-PLAN-20260827.md §3-4; hardened per Codex adversarial review 2026-08-27",
+ "generated_by": "llm:claude-opus-4-8 (supplement gate; span-reconfirm only — NOT completion authority)",
  "generated_at": "2026-08-27",
- "note": "canonical selected_record = base(Claude 1차, unchanged). supplements = span-reconfirmed audit confirmed_delta. Does NOT add canonical keys (completion gate item 2 preserved).",
+ "note": "selected_record=base(Claude 1차, unchanged). supplements=span-reconfirmed audit confirmed_delta, bound to crosswalk+audit-record+evidence-source hashes. Canonical validity requires verify_supplement.py PASS AND an approved human decision receipt (supplement-decisions.json). Supplements are neither necessary nor sufficient for the completion gate.",
  "entry_count": 16,
  "supplement_count": 23,
  "entries": [
@@ -21,22 +21,37 @@
     "run_id": "reread20260728-code-EFDC-000-fable5-20260813T012841Z-5799640f",
     "record_file": "6de5c1b50366260e1d20e4ab66a609693ac841ea015aba7ac7d1fc6fce195441.json",
     "record_path": "total-read/pending/reread-20260728/reread20260728-code-EFDC-000-fable5-20260813T012841Z-5799640f/6de5c1b50366260e1d20e4ab66a609693ac841ea015aba7ac7d1fc6fce195441.json",
-    "record_sha256_bytes": "e649b43363daf61b26b2c139f095e20a4984688b97858e6abdaca6b75d9b01fb"
+    "record_sha256_bytes": "e649b43363daf61b26b2c139f095e20a4984688b97858e6abdaca6b75d9b01fb",
+    "record_source_sha256": "41b93cabcabf96788006d9c197e945d8d4b314cb4be1edafb66c37f7caebe61a"
+   },
+   "crosswalk": {
+    "path": "total-read/records-crosswalk/reread-20260728/EFDC-000/aaefdc.f90.crosswalk.json",
+    "sha256_bytes": "612966129f51b7d6f8b5955551bff460acf46bc00ddd2c9e63378b88b3c84a62"
    },
    "supplements": [
     {
      "member_input_ids": [
       "B1"
      ],
-     "finding_text": "L924-L929: DETTMP is first assigned the reciprocal determinant and then compared with 0.0. A singular denominator raises division-by-zero/Inf rather than making its reciprocal exactly zero, so the STOPP singular-transform guard is ineffective.",
-     "src_run_id": "reread20260728-code-EFDC-000-codexaudit-20260826T022956Z-6d4b819d",
-     "src_record_path": "total-read/pending/reread-20260728/reread20260728-code-EFDC-000-codexaudit-20260826T022956Z-6d4b819d/6de5c1b50366260e1d20e4ab66a609693ac841ea015aba7ac7d1fc6fce195441.json",
-     "src_record_sha256_bytes": "9e41b65ebecddfd7ea49fb8a0d945cbeace50edfac1f486dede053e23d26573c",
+     "finding_texts": {
+      "B1": "L924-L929: DETTMP is first assigned the reciprocal determinant and then compared with 0.0. A singular denominator raises division-by-zero/Inf rather than making its reciprocal exactly zero, so the STOPP singular-transform guard is ineffective."
+     },
+     "audit_record": {
+      "run_id": "reread20260728-code-EFDC-000-codexaudit-20260826T022956Z-6d4b819d",
+      "record_path": "total-read/pending/reread-20260728/reread20260728-code-EFDC-000-codexaudit-20260826T022956Z-6d4b819d/6de5c1b50366260e1d20e4ab66a609693ac841ea015aba7ac7d1fc6fce195441.json",
+      "record_sha256_bytes": "9e41b65ebecddfd7ea49fb8a0d945cbeace50edfac1f486dede053e23d26573c",
+      "record_source_sha256": "41b93cabcabf96788006d9c197e945d8d4b314cb4be1edafb66c37f7caebe61a"
+     },
+     "evidence_sources": [
+      {
+       "path": "EFDC/raw/source_code/EFDCPlus_Stable/EFDC/aaefdc.f90",
+       "sha256": "41b93cabcabf96788006d9c197e945d8d4b314cb4be1edafb66c37f7caebe61a"
+      }
+     ],
      "source_span": {
       "path": "EFDC/raw/source_code/EFDCPlus_Stable/EFDC/aaefdc.f90",
       "lines": "924-928"
      },
-     "source_file_sha256": "41b93cabcabf96788006d9c197e945d8d4b314cb4be1edafb66c37f7caebe61a",
      "authoritative_quote": "      DETTMP = 1./( CUE(L)*CVN(L) - CUN(L)*CVE(L) )\n      if( DETTMP == 0.0 )then\n        write(6,6262)\n        write(6,6263) IL(L), JL(L)\n        call STOPP('.', 1)",
      "source_span_hash": "c7e38de62113a5e577b4fc2f580dc402ce07ba2299f57fbfbbc0afd6a46d548c",
      "decision": "confirmed_delta",
@@ -44,7 +59,7 @@
      "decided_at": "2026-08-27",
      "rationale": "DETTMP=1/det then compared ==0.0: reciprocal of singular det is Inf not 0, so STOPP guard is dead code",
      "reconfirmed_at": "2026-08-27",
-     "reconfirm_method": "span re-extracted from live source at cited lines; source_file_sha256 vs record source_sha256 checked by verifier"
+     "reconfirm_method": "span re-extracted (bounds-checked) from exact live source; audit_id/finding_text membership + crosswalk + record hashes verified by verify_supplement.py"
     }
    ]
   },
@@ -61,22 +76,37 @@
     "run_id": "reread20260728-code-FUNWAVE-000-fable5-20260813T012841Z-2131dcc5",
     "record_file": "8296b045d9b04ac5b0b95c9cae4aac8f3732a92099947be16c6f17b31f4dce23.json",
     "record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-000-fable5-20260813T012841Z-2131dcc5/8296b045d9b04ac5b0b95c9cae4aac8f3732a92099947be16c6f17b31f4dce23.json",
-    "record_sha256_bytes": "6366a9a993c3976418ce3106999de3cc28b9baa28c5fee206d3f0ebdb2665e54"
+    "record_sha256_bytes": "6366a9a993c3976418ce3106999de3cc28b9baa28c5fee206d3f0ebdb2665e54",
+    "record_source_sha256": "c591db049ac4e7dc9125bc2bc8004fc599486f73f1216fe7d5a6786d35df5001"
+   },
+   "crosswalk": {
+    "path": "total-read/records-crosswalk/reread-20260728/FUNWAVE-000/FUNWAVE__raw__source_code__FUNWAVE-GPU__src__breaker.F.crosswalk.json",
+    "sha256_bytes": "2becd1316a5b5e10fed05a6b14317f86baea429780248fea1b4f10707be940c2"
    },
    "supplements": [
     {
      "member_input_ids": [
       "B0"
      ],
-     "finding_text": "AGE is declared INTENT(OUT) at L110, but its incoming values are read in the initiation/aging test at L141-L146 and as neighbor history at L175-L214, before every element is necessarily defined by this invocation. The algorithm requires persistent prior age, so the declared interface conflicts with its use and should be assessed as INOUT.",
-     "src_run_id": "reread20260728-code-FUNWAVE-000-codexaudit-20260826T022956Z-b1ecf500",
-     "src_record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-000-codexaudit-20260826T022956Z-b1ecf500/8296b045d9b04ac5b0b95c9cae4aac8f3732a92099947be16c6f17b31f4dce23.json",
-     "src_record_sha256_bytes": "5eb0897ffb20a9eb3b56df3fde3cf5185efee9168f9f0af2037e2a7d0300d321",
+     "finding_texts": {
+      "B0": "AGE is declared INTENT(OUT) at L110, but its incoming values are read in the initiation/aging test at L141-L146 and as neighbor history at L175-L214, before every element is necessarily defined by this invocation. The algorithm requires persistent prior age, so the declared interface conflicts with its use and should be assessed as INOUT."
+     },
+     "audit_record": {
+      "run_id": "reread20260728-code-FUNWAVE-000-codexaudit-20260826T022956Z-b1ecf500",
+      "record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-000-codexaudit-20260826T022956Z-b1ecf500/8296b045d9b04ac5b0b95c9cae4aac8f3732a92099947be16c6f17b31f4dce23.json",
+      "record_sha256_bytes": "5eb0897ffb20a9eb3b56df3fde3cf5185efee9168f9f0af2037e2a7d0300d321",
+      "record_source_sha256": "c591db049ac4e7dc9125bc2bc8004fc599486f73f1216fe7d5a6786d35df5001"
+     },
+     "evidence_sources": [
+      {
+       "path": "FUNWAVE/raw/source_code/FUNWAVE-GPU/src/breaker.F",
+       "sha256": "c591db049ac4e7dc9125bc2bc8004fc599486f73f1216fe7d5a6786d35df5001"
+      }
+     ],
      "source_span": {
       "path": "FUNWAVE/raw/source_code/FUNWAVE-GPU/src/breaker.F",
       "lines": "112,152-155,183"
      },
-     "source_file_sha256": "c591db049ac4e7dc9125bc2bc8004fc599486f73f1216fe7d5a6786d35df5001",
      "authoritative_quote": "\n…\n        DXg=DX\n        DYg=DY\n        propxy=SQRT(DX*DX+DY*DY)/MAX(C,SMALL)\n        propx=SQRT(DX*DX)/MAX(C,SMALL)\n…\n         ENDIF",
      "source_span_hash": "11bac31c47bbe2b706c65b1d75c17039accc7f23dd3a34fc0ffac57382db69fc",
      "decision": "confirmed_delta",
@@ -84,7 +114,7 @@
      "decided_at": "2026-08-27",
      "rationale": "span-verified 2026-08-27: AGE declared DIMENSION(M,N),INTENT(OUT) (L112) but read as prior/persistent history at L152,L155 and neighbor L183=AGE1=AGE(I-1,J) before any write in this invocation. INTENT(OUT) makes actual arg undefined on entry; breaker age-tracking requires persistence → should be INOUT. base missed. (manifestation compiler-dependent: many compilers leave INTENT(OUT) arrays intact, but it is UB.)",
      "reconfirmed_at": "2026-08-27",
-     "reconfirm_method": "span re-extracted from live source at cited lines; source_file_sha256 vs record source_sha256 checked by verifier"
+     "reconfirm_method": "span re-extracted (bounds-checked) from exact live source; audit_id/finding_text membership + crosswalk + record hashes verified by verify_supplement.py"
     }
    ]
   },
@@ -101,22 +131,37 @@
     "run_id": "reread20260728-code-FUNWAVE-000-fable5-20260813T012841Z-2131dcc5",
     "record_file": "cc467e0c883c7e82fef064e96f38afc1bd436b074ae37fec3e56905adba48467.json",
     "record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-000-fable5-20260813T012841Z-2131dcc5/cc467e0c883c7e82fef064e96f38afc1bd436b074ae37fec3e56905adba48467.json",
-    "record_sha256_bytes": "aa6146aae60ad2b994e529cec7d5ea1e50d1b2d92d59643d2ef4b145ce6bde3c"
+    "record_sha256_bytes": "aa6146aae60ad2b994e529cec7d5ea1e50d1b2d92d59643d2ef4b145ce6bde3c",
+    "record_source_sha256": "c69b53ee9f2eee590a6f5bc031cf2959d17da34decd3d758b0a5856309119c1f"
+   },
+   "crosswalk": {
+    "path": "total-read/records-crosswalk/reread-20260728/FUNWAVE-000/FUNWAVE__raw__source_code__FUNWAVE-GPU__src__breaker_gpu.F.crosswalk.json",
+    "sha256_bytes": "8a0087d364033c91935bc37f91aa1146509d2de169784ddf5931c567a52f2992"
    },
    "supplements": [
     {
      "member_input_ids": [
       "B0"
      ],
-     "finding_text": "Use-before-assignment across branches: breaking_kernel assigns DXg and DYg only inside the Age_sh<=ZERO, non-immediate-trigger branch at L168-L184, but all paths then use them to compute xmk/ymk at L234-L238. If the immediate trigger branch L162-L164 or positive-age branch L166-L167 is taken, wavemaker footprint selection consumes undefined DXg/DYg.",
-     "src_run_id": "reread20260728-code-FUNWAVE-000-codexaudit-20260826T022956Z-b1ecf500",
-     "src_record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-000-codexaudit-20260826T022956Z-b1ecf500/cc467e0c883c7e82fef064e96f38afc1bd436b074ae37fec3e56905adba48467.json",
-     "src_record_sha256_bytes": "91e5fece5db141670fcabaf4d55dde9045b28527fe39cfc3570097323eb9736e",
+     "finding_texts": {
+      "B0": "Use-before-assignment across branches: breaking_kernel assigns DXg and DYg only inside the Age_sh<=ZERO, non-immediate-trigger branch at L168-L184, but all paths then use them to compute xmk/ymk at L234-L238. If the immediate trigger branch L162-L164 or positive-age branch L166-L167 is taken, wavemaker footprint selection consumes undefined DXg/DYg."
+     },
+     "audit_record": {
+      "run_id": "reread20260728-code-FUNWAVE-000-codexaudit-20260826T022956Z-b1ecf500",
+      "record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-000-codexaudit-20260826T022956Z-b1ecf500/cc467e0c883c7e82fef064e96f38afc1bd436b074ae37fec3e56905adba48467.json",
+      "record_sha256_bytes": "91e5fece5db141670fcabaf4d55dde9045b28527fe39cfc3570097323eb9736e",
+      "record_source_sha256": "c69b53ee9f2eee590a6f5bc031cf2959d17da34decd3d758b0a5856309119c1f"
+     },
+     "evidence_sources": [
+      {
+       "path": "FUNWAVE/raw/source_code/FUNWAVE-GPU/src/breaker_gpu.F",
+       "sha256": "c69b53ee9f2eee590a6f5bc031cf2959d17da34decd3d758b0a5856309119c1f"
+      }
+     ],
      "source_span": {
       "path": "FUNWAVE/raw/source_code/FUNWAVE-GPU/src/breaker_gpu.F",
       "lines": "137,173-174,234-237"
      },
-     "source_file_sha256": "c69b53ee9f2eee590a6f5bc031cf2959d17da34decd3d758b0a5856309119c1f",
      "authoritative_quote": "    REAL(SP) :: xmk,ymk,DXg,DYg\n…\n                DXg=DX_d\n                DYg=DY_d\n…\n        xmk=(I-Ibeg)*DXg + (iista-1)*DXg\n        ymk=(J-Jbeg)*DYg + (jjsta-1)*DYg\n# else\n        xmk=(I-Ibeg)*DXg",
      "source_span_hash": "5093918451a7f6811e25058aec0740d56459bc345c4ad2e7b71f9b1f579bfae5",
      "decision": "confirmed_delta",
@@ -124,7 +169,7 @@
      "decided_at": "2026-08-27",
      "rationale": "span-verified 2026-08-27: breaking_kernel DXg/DYg(decl L137) assigned only in innermost Age_sh<=ZERO branch (L173-174/179-180); breaking(AGE=DT) and aging(Age_sh>ZERO) branches leave unset, yet xmk/ymk use them after all ENDIFs at L234-237. Directly (no Gamma multiplier) → real UBA. GPU variant of breaker.f90/breaker.F confirmed delta. base missed.",
      "reconfirmed_at": "2026-08-27",
-     "reconfirm_method": "span re-extracted from live source at cited lines; source_file_sha256 vs record source_sha256 checked by verifier"
+     "reconfirm_method": "span re-extracted (bounds-checked) from exact live source; audit_id/finding_text membership + crosswalk + record hashes verified by verify_supplement.py"
     }
    ]
   },
@@ -141,22 +186,37 @@
     "run_id": "reread20260728-code-FUNWAVE-000-fable5-20260813T012841Z-2131dcc5",
     "record_file": "400204c1a405285dd31c4460ce20293e4959357d9f4e74c3e97b889730708160.json",
     "record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-000-fable5-20260813T012841Z-2131dcc5/400204c1a405285dd31c4460ce20293e4959357d9f4e74c3e97b889730708160.json",
-    "record_sha256_bytes": "e718d13cb0847eebe8316071b1052c6658061829f471da94923d829992598ce0"
+    "record_sha256_bytes": "e718d13cb0847eebe8316071b1052c6658061829f471da94923d829992598ce0",
+    "record_source_sha256": "bb88ea1a4ab19d63b6527115dfbc0fe22dd9a503aae6cf8a7d4a9903f61ec075"
+   },
+   "crosswalk": {
+    "path": "total-read/records-crosswalk/reread-20260728/FUNWAVE-000/FUNWAVE__raw__source_code__FUNWAVE-TVD__benchmarks__sph_nesting__make_nest_file__convert.f.crosswalk.json",
+    "sha256_bytes": "580e67ed5289e646e014557ef3649e9523ad94623565ae3069a7c35fbf695885"
    },
    "supplements": [
     {
      "member_input_ids": [
       "B3"
      ],
-     "finding_text": "Out-of-bounds search: lines 251-254 increment Kstart while TIME(Kstart)<time_cut without checking Kstart<=Ndata (or Ntotal). If time_cut exceeds the final available timestamp, TIME is indexed beyond valid data and potentially beyond its allocation before the loop can terminate.",
-     "src_run_id": "reread20260728-code-FUNWAVE-000-codexaudit-20260826T022956Z-b1ecf500",
-     "src_record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-000-codexaudit-20260826T022956Z-b1ecf500/400204c1a405285dd31c4460ce20293e4959357d9f4e74c3e97b889730708160.json",
-     "src_record_sha256_bytes": "9d5e19b2934d2addc94c5982153ae9019a7ea7eab766c38a7c6f71454b66ce94",
+     "finding_texts": {
+      "B3": "Out-of-bounds search: lines 251-254 increment Kstart while TIME(Kstart)<time_cut without checking Kstart<=Ndata (or Ntotal). If time_cut exceeds the final available timestamp, TIME is indexed beyond valid data and potentially beyond its allocation before the loop can terminate."
+     },
+     "audit_record": {
+      "run_id": "reread20260728-code-FUNWAVE-000-codexaudit-20260826T022956Z-b1ecf500",
+      "record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-000-codexaudit-20260826T022956Z-b1ecf500/400204c1a405285dd31c4460ce20293e4959357d9f4e74c3e97b889730708160.json",
+      "record_sha256_bytes": "9d5e19b2934d2addc94c5982153ae9019a7ea7eab766c38a7c6f71454b66ce94",
+      "record_source_sha256": "bb88ea1a4ab19d63b6527115dfbc0fe22dd9a503aae6cf8a7d4a9903f61ec075"
+     },
+     "evidence_sources": [
+      {
+       "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/benchmarks/sph_nesting/make_nest_file/convert.f",
+       "sha256": "bb88ea1a4ab19d63b6527115dfbc0fe22dd9a503aae6cf8a7d4a9903f61ec075"
+      }
+     ],
      "source_span": {
       "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/benchmarks/sph_nesting/make_nest_file/convert.f",
       "lines": "251-254"
      },
-     "source_file_sha256": "bb88ea1a4ab19d63b6527115dfbc0fe22dd9a503aae6cf8a7d4a9903f61ec075",
      "authoritative_quote": "        Kstart=1\n        DO WHILE (TIME(Kstart)<time_cut)\n          Kstart=Kstart+1\n        ENDDO",
      "source_span_hash": "a5b73fcf7e4c05ea0e52ad04ef026dafca8975c0484df5dcb59a409162dac65e",
      "decision": "confirmed_delta",
@@ -164,7 +224,7 @@
      "decided_at": "2026-08-27",
      "rationale": "span-verified 2026-08-27: unbounded DO WHILE search over TIME() with no Kstart<=Ndata/Ntotal bound; time_cut past last timestamp reads uninitialized elements and past Ntotal=10000 exceeds allocation (OOB). base missed.",
      "reconfirmed_at": "2026-08-27",
-     "reconfirm_method": "span re-extracted from live source at cited lines; source_file_sha256 vs record source_sha256 checked by verifier"
+     "reconfirm_method": "span re-extracted (bounds-checked) from exact live source; audit_id/finding_text membership + crosswalk + record hashes verified by verify_supplement.py"
     }
    ]
   },
@@ -181,22 +241,37 @@
     "run_id": "reread20260728-code-FUNWAVE-001-fable5-20260813T012841Z-2ec7b3b5",
     "record_file": "b29288eb569e210c51bf6b855b60148b7a1aad0c059b27c875415b962b45c446.json",
     "record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-001-fable5-20260813T012841Z-2ec7b3b5/b29288eb569e210c51bf6b855b60148b7a1aad0c059b27c875415b962b45c446.json",
-    "record_sha256_bytes": "905b7af9b1af282ba8166aa0b8eb01d4506b9d140883de7a65491640a15782f5"
+    "record_sha256_bytes": "905b7af9b1af282ba8166aa0b8eb01d4506b9d140883de7a65491640a15782f5",
+    "record_source_sha256": "aee5250685d61a9ae77b775ced2ae280c8d1eba493ce5273bf8aead52f5057fb"
+   },
+   "crosswalk": {
+    "path": "total-read/records-crosswalk/reread-20260728/FUNWAVE-001/FUNWAVE__raw__source_code__FUNWAVE-TVD__funwave-work__build__pre__breaker.f90.crosswalk.json",
+    "sha256_bytes": "16386a62831e9403a35a35eb781a708ad0f961b0c549e5a924abdc8ffda60ed7"
    },
    "supplements": [
     {
      "member_input_ids": [
       "B1"
      ],
-     "finding_text": "DXg and DYg are local variables declared at line 112 and assigned only inside the AGE<=ZERO propagation branch at lines 151-152, yet are used unconditionally later to form xmk/ymk at lines 220-221. If AGE(I,J)>ZERO at lines 146-147, those locals reach lines 220-221 undefined.",
-     "src_run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
-     "src_record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e/b29288eb569e210c51bf6b855b60148b7a1aad0c059b27c875415b962b45c446.json",
-     "src_record_sha256_bytes": "d394e3daf4b5ba6e4a20826a1f54a6436d45809500ce453d461a0b0d351b2493",
+     "finding_texts": {
+      "B1": "DXg and DYg are local variables declared at line 112 and assigned only inside the AGE<=ZERO propagation branch at lines 151-152, yet are used unconditionally later to form xmk/ymk at lines 220-221. If AGE(I,J)>ZERO at lines 146-147, those locals reach lines 220-221 undefined."
+     },
+     "audit_record": {
+      "run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
+      "record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e/b29288eb569e210c51bf6b855b60148b7a1aad0c059b27c875415b962b45c446.json",
+      "record_sha256_bytes": "d394e3daf4b5ba6e4a20826a1f54a6436d45809500ce453d461a0b0d351b2493",
+      "record_source_sha256": "aee5250685d61a9ae77b775ced2ae280c8d1eba493ce5273bf8aead52f5057fb"
+     },
+     "evidence_sources": [
+      {
+       "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/breaker.f90",
+       "sha256": "aee5250685d61a9ae77b775ced2ae280c8d1eba493ce5273bf8aead52f5057fb"
+      }
+     ],
      "source_span": {
       "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/breaker.f90",
       "lines": "112,151-152,221-222"
      },
-     "source_file_sha256": "aee5250685d61a9ae77b775ced2ae280c8d1eba493ce5273bf8aead52f5057fb",
      "authoritative_quote": "     REAL(SP) :: xmk,ymk,DXg,DYg\n…\n        DXg=DX\n        DYg=DY\n…\n            ymk=(J-Jbeg)*DYg + (jjsta-1)*DYg\n!---ykchoi Jan/23/2018]",
      "source_span_hash": "eeffc87392cb0ff4fa345bf33bffb36f1d8ea28c437c25dc36bbb37ac22d3c76",
      "decision": "confirmed_delta",
@@ -204,7 +279,7 @@
      "decided_at": "2026-08-27",
      "rationale": "span-verified 2026-08-27: DXg/DYg (decl L112) assigned only in innermost new-breaking ELSE (L151-152); breaking-branch and AGE>ZERO aging-branch leave them unset, yet xmk/ymk consume them unconditionally after all ENDIFs at L221-222. use-before-assign (undefined on first use). base missed.",
      "reconfirmed_at": "2026-08-27",
-     "reconfirm_method": "span re-extracted from live source at cited lines; source_file_sha256 vs record source_sha256 checked by verifier"
+     "reconfirm_method": "span re-extracted (bounds-checked) from exact live source; audit_id/finding_text membership + crosswalk + record hashes verified by verify_supplement.py"
     }
    ]
   },
@@ -221,22 +296,37 @@
     "run_id": "reread20260728-code-FUNWAVE-001-fable5-20260813T012841Z-2ec7b3b5",
     "record_file": "1275220ff45975aecd439c99c493bb04a57d67075cdc28423695ac3a8bd3a45d.json",
     "record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-001-fable5-20260813T012841Z-2ec7b3b5/1275220ff45975aecd439c99c493bb04a57d67075cdc28423695ac3a8bd3a45d.json",
-    "record_sha256_bytes": "3906c4b83b43779851c5307794282b4f6495b2a8d626b6838302efaf2af05d3c"
+    "record_sha256_bytes": "3906c4b83b43779851c5307794282b4f6495b2a8d626b6838302efaf2af05d3c",
+    "record_source_sha256": "1e429115d882c27c149129c0c75f932290c6cb89c70b60e4a7d0f5af7335c11a"
+   },
+   "crosswalk": {
+    "path": "total-read/records-crosswalk/reread-20260728/FUNWAVE-001/FUNWAVE__raw__source_code__FUNWAVE-TVD__funwave-work__build__pre__dispersion.f90.crosswalk.json",
+    "sha256_bytes": "c8fdf6d9955e571204350f40f20428d7635af3e2aba7f0dd4db32be2c503f45e"
    },
    "supplements": [
     {
      "member_input_ids": [
       "B0"
      ],
-     "finding_text": "Lines 379-380 compare abs(omega) against VorticityMax but then store signed omega rather than abs(omega). A new negative extremum can make VorticityMax negative, after which later positive magnitudes trivially exceed it; the stored field therefore does not consistently represent a maximum magnitude.",
-     "src_run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
-     "src_record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e/1275220ff45975aecd439c99c493bb04a57d67075cdc28423695ac3a8bd3a45d.json",
-     "src_record_sha256_bytes": "0ddfe614c7591536c4e1733f54a7ce2e67d222c07f677cd570c39af9f0a4e149",
+     "finding_texts": {
+      "B0": "Lines 379-380 compare abs(omega) against VorticityMax but then store signed omega rather than abs(omega). A new negative extremum can make VorticityMax negative, after which later positive magnitudes trivially exceed it; the stored field therefore does not consistently represent a maximum magnitude."
+     },
+     "audit_record": {
+      "run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
+      "record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e/1275220ff45975aecd439c99c493bb04a57d67075cdc28423695ac3a8bd3a45d.json",
+      "record_sha256_bytes": "0ddfe614c7591536c4e1733f54a7ce2e67d222c07f677cd570c39af9f0a4e149",
+      "record_source_sha256": "1e429115d882c27c149129c0c75f932290c6cb89c70b60e4a7d0f5af7335c11a"
+     },
+     "evidence_sources": [
+      {
+       "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/dispersion.f90",
+       "sha256": "1e429115d882c27c149129c0c75f932290c6cb89c70b60e4a7d0f5af7335c11a"
+      }
+     ],
      "source_span": {
       "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/dispersion.f90",
       "lines": "379-380"
      },
-     "source_file_sha256": "1e429115d882c27c149129c0c75f932290c6cb89c70b60e4a7d0f5af7335c11a",
      "authoritative_quote": "        IF(abs(omega(I,J)).GT.VorticityMax(I,J)) THEN\n        VorticityMax(I,J)=omega(I,J)",
      "source_span_hash": "5a1224562d8c2448f6507b032b9511a214edeee6b18a666fc66e72b080dc5bb8",
      "decision": "confirmed_delta",
@@ -244,7 +334,7 @@
      "decided_at": "2026-08-27",
      "rationale": "VorticityMax: abs(omega) 비교 후 signed omega(I,J) 저장(L379-380) → 음의 극값이 VorticityMax 를 음수화, 최대 크기장 부정확. 진단출력 결함. base 미검출.",
      "reconfirmed_at": "2026-08-27",
-     "reconfirm_method": "span re-extracted from live source at cited lines; source_file_sha256 vs record source_sha256 checked by verifier"
+     "reconfirm_method": "span re-extracted (bounds-checked) from exact live source; audit_id/finding_text membership + crosswalk + record hashes verified by verify_supplement.py"
     }
    ]
   },
@@ -261,22 +351,37 @@
     "run_id": "reread20260728-code-FUNWAVE-001-fable5-20260813T012841Z-2ec7b3b5",
     "record_file": "e0c1246b3720207c6ded67b7cdf30640e30782d91c864d516dbc6622c84fa6f9.json",
     "record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-001-fable5-20260813T012841Z-2ec7b3b5/e0c1246b3720207c6ded67b7cdf30640e30782d91c864d516dbc6622c84fa6f9.json",
-    "record_sha256_bytes": "b20da41e225e2f4c3497abf0d7f1c62210ada5cfb5664eb92858de18df3e5635"
+    "record_sha256_bytes": "b20da41e225e2f4c3497abf0d7f1c62210ada5cfb5664eb92858de18df3e5635",
+    "record_source_sha256": "3ebb39f25c399c02b20a6ff4113c548d2c83e22b50cdbc45c3bc4324f8aceff1"
+   },
+   "crosswalk": {
+    "path": "total-read/records-crosswalk/reread-20260728/FUNWAVE-001/FUNWAVE__raw__source_code__FUNWAVE-TVD__funwave-work__build__pre__io.f90.crosswalk.json",
+    "sha256_bytes": "c246c38bd5d763412d1cd91b45e69b2e96c07db12bd75f635a27cb9ea066f91b"
    },
    "supplements": [
     {
      "member_input_ids": [
       "B8"
      ],
-     "finding_text": "Station buffering loses and/or fabricates samples: once the condition at L2428 is false, the current sample is never inserted before L2435-L2438 flush and reset, so each overflow-triggering sample is dropped. At TIME>=TOTAL_TIME the same ELSE writes exactly StationOutputBuffer rows even when BufferCount is smaller; ZUV_Buffer was allocated at L2374-L2375 but not initialized, so unwritten tail rows can be uninitialized on the first partial flush or stale after later flushes before files close at L2451-L2457.",
-     "src_run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
-     "src_record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e/e0c1246b3720207c6ded67b7cdf30640e30782d91c864d516dbc6622c84fa6f9.json",
-     "src_record_sha256_bytes": "2a6608b3508e842bd5cfd1287be838c419a5de91df2db51d0ec915d037321cd0",
+     "finding_texts": {
+      "B8": "Station buffering loses and/or fabricates samples: once the condition at L2428 is false, the current sample is never inserted before L2435-L2438 flush and reset, so each overflow-triggering sample is dropped. At TIME>=TOTAL_TIME the same ELSE writes exactly StationOutputBuffer rows even when BufferCount is smaller; ZUV_Buffer was allocated at L2374-L2375 but not initialized, so unwritten tail rows can be uninitialized on the first partial flush or stale after later flushes before files close at L2451-L2457."
+     },
+     "audit_record": {
+      "run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
+      "record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e/e0c1246b3720207c6ded67b7cdf30640e30782d91c864d516dbc6622c84fa6f9.json",
+      "record_sha256_bytes": "2a6608b3508e842bd5cfd1287be838c419a5de91df2db51d0ec915d037321cd0",
+      "record_source_sha256": "3ebb39f25c399c02b20a6ff4113c548d2c83e22b50cdbc45c3bc4324f8aceff1"
+     },
+     "evidence_sources": [
+      {
+       "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/io.f90",
+       "sha256": "3ebb39f25c399c02b20a6ff4113c548d2c83e22b50cdbc45c3bc4324f8aceff1"
+      }
+     ],
      "source_span": {
       "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/io.f90",
       "lines": "2428-2438"
      },
-     "source_file_sha256": "3ebb39f25c399c02b20a6ff4113c548d2c83e22b50cdbc45c3bc4324f8aceff1",
      "authoritative_quote": "            IF(BufferCount(i)<StationOutputBuffer.AND.TIME<TOTAL_TIME)THEN\n              BufferCount(i) = BufferCount(i) +1\n              ZUV_BUFFER(BufferCount(i),i,1)=time\n              ZUV_BUFFER(BufferCount(i),i,2)=eta_sta\n              ZUV_BUFFER(BufferCount(i),i,3)=u_sta\n              ZUV_BUFFER(BufferCount(i),i,4)=v_sta\n            ELSE\n              DO j=1,StationOutputBuffer\n                write (iunit,'(E21.10E4, 3E16.5E4)') (ZUV_BUFFER(j,i,k),k=1,4)\n              ENDDO              \n              BufferCount(i) = 0",
      "source_span_hash": "a5eeba766696f4d116b4eb54c724a1140211b668a44d9f09af4ea05d01292026",
      "decision": "confirmed_delta",
@@ -284,7 +389,7 @@
      "decided_at": "2026-08-27",
      "rationale": "station 버퍼: BufferCount==StationOutputBuffer(full) 시 ELSE(L2434) 가 flush+reset(L2438)만 하고 현 샘플 미삽입 → overflow 유발 샘플 드롭. TIME>=TOTAL_TIME 시 BufferCount 미만이어도 StationOutputBuffer 행 전체 기록=낡은행 조작. base 미검출.",
      "reconfirmed_at": "2026-08-27",
-     "reconfirm_method": "span re-extracted from live source at cited lines; source_file_sha256 vs record source_sha256 checked by verifier"
+     "reconfirm_method": "span re-extracted (bounds-checked) from exact live source; audit_id/finding_text membership + crosswalk + record hashes verified by verify_supplement.py"
     }
    ]
   },
@@ -301,22 +406,37 @@
     "run_id": "reread20260728-code-FUNWAVE-001-fable5-20260813T012841Z-2ec7b3b5",
     "record_file": "344313459101463a708ad08e91b4fcb4e2dce71df50f1cc3d3ba3318ab4bdf8f.json",
     "record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-001-fable5-20260813T012841Z-2ec7b3b5/344313459101463a708ad08e91b4fcb4e2dce71df50f1cc3d3ba3318ab4bdf8f.json",
-    "record_sha256_bytes": "763fd411f78aab073dddbb85fac3091b2afed0161cca82ece9343e76bea26533"
+    "record_sha256_bytes": "763fd411f78aab073dddbb85fac3091b2afed0161cca82ece9343e76bea26533",
+    "record_source_sha256": "0a908b3886026e7e379aebe7880df391a6bf0a0585f2bb54f054d21fe429504a"
+   },
+   "crosswalk": {
+    "path": "total-read/records-crosswalk/reread-20260728/FUNWAVE-001/FUNWAVE__raw__source_code__FUNWAVE-TVD__funwave-work__build__pre__mod_global.f90.crosswalk.json",
+    "sha256_bytes": "d08982557772be5bd51118f000283933fe3d7775122741cb5bf00c3a1c247d95"
    },
    "supplements": [
     {
      "member_input_ids": [
       "B1"
      ],
-     "finding_text": "EtaBlowVal is declared without initialization at L384. In io.f90 its READ_FLOAT is commented and an unrelated stale ierr condition controls a 10.0 assignment; CHECK_BLOWUP later always compares against EtaBlowVal. Unless another initialization routine always assigns it, the stability check can use undefined data.",
-     "src_run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
-     "src_record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e/344313459101463a708ad08e91b4fcb4e2dce71df50f1cc3d3ba3318ab4bdf8f.json",
-     "src_record_sha256_bytes": "9f33f4afbf49c7a5d809cf13c24a4e375c4aaea1b02560f6162f0e1d8642b33c",
+     "finding_texts": {
+      "B1": "EtaBlowVal is declared without initialization at L384. In io.f90 its READ_FLOAT is commented and an unrelated stale ierr condition controls a 10.0 assignment; CHECK_BLOWUP later always compares against EtaBlowVal. Unless another initialization routine always assigns it, the stability check can use undefined data."
+     },
+     "audit_record": {
+      "run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
+      "record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e/344313459101463a708ad08e91b4fcb4e2dce71df50f1cc3d3ba3318ab4bdf8f.json",
+      "record_sha256_bytes": "9f33f4afbf49c7a5d809cf13c24a4e375c4aaea1b02560f6162f0e1d8642b33c",
+      "record_source_sha256": "0a908b3886026e7e379aebe7880df391a6bf0a0585f2bb54f054d21fe429504a"
+     },
+     "evidence_sources": [
+      {
+       "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/io.f90",
+       "sha256": "3ebb39f25c399c02b20a6ff4113c548d2c83e22b50cdbc45c3bc4324f8aceff1"
+      }
+     ],
      "source_span": {
       "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/io.f90",
       "lines": "2101-2106"
      },
-     "source_file_sha256": "3ebb39f25c399c02b20a6ff4113c548d2c83e22b50cdbc45c3bc4324f8aceff1",
      "authoritative_quote": "      CALL READ_LOGICAL(OUT_Radiation,FILE_NAME,'Radiation',ierr) \n\n!ykchoi\n!\tCALL READ_FLOAT(EtaBlowVal,FILE_NAME,'EtaBlowVal',ierr)\n      IF(ierr==1)THEN\n        EtaBlowVal = 10.0_SP",
      "source_span_hash": "cc9b41314c22e8190a229c9d7d5a6d26a5780efa2a866efb4629f7f82e344e3b",
      "decision": "confirmed_delta",
@@ -324,7 +444,7 @@
      "decided_at": "2026-08-27",
      "rationale": "EtaBlowVal 무초기화 선언(mod_global L384). io.f90 L2104 READ_FLOAT 주석처리, L2105 IF(ierr==1) 의 ierr 는 직전 OUT_Radiation read(L2101) 것 → 해당 키 존재 시 EtaBlowVal 영구 미대입, CHECK_BLOWUP 가 미정의 임계값 사용. base 미검출.",
      "reconfirmed_at": "2026-08-27",
-     "reconfirm_method": "span re-extracted from live source at cited lines; source_file_sha256 vs record source_sha256 checked by verifier"
+     "reconfirm_method": "span re-extracted (bounds-checked) from exact live source; audit_id/finding_text membership + crosswalk + record hashes verified by verify_supplement.py"
     }
    ]
   },
@@ -341,22 +461,37 @@
     "run_id": "reread20260728-code-FUNWAVE-001-fable5-20260813T012841Z-2ec7b3b5",
     "record_file": "2f3875d1bb187e9042aad0fe9979e83522b6311fa80ef006e4e65aecedc7eef4.json",
     "record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-001-fable5-20260813T012841Z-2ec7b3b5/2f3875d1bb187e9042aad0fe9979e83522b6311fa80ef006e4e65aecedc7eef4.json",
-    "record_sha256_bytes": "e06f0b219d090f41c33f013ae76e99468fec5c79206004a4ca876e03dcd97fbf"
+    "record_sha256_bytes": "e06f0b219d090f41c33f013ae76e99468fec5c79206004a4ca876e03dcd97fbf",
+    "record_source_sha256": "4b31adee872fada150f2a738af6055ae61b344cc119be4e7cf0f130f82197577"
+   },
+   "crosswalk": {
+    "path": "total-read/records-crosswalk/reread-20260728/FUNWAVE-001/FUNWAVE__raw__source_code__FUNWAVE-TVD__funwave-work__build__pre__wavemaker.f90.crosswalk.json",
+    "sha256_bytes": "dffb2c2304ad75fd6f575570e84d1962d11307573f327c4063cb4bdc6bc805e5"
    },
    "supplements": [
     {
      "member_input_ids": [
       "B0"
      ],
-     "finding_text": "Several error paths say STOP or diagnose invalid input but call MPI_FINALIZE without STOP, RETURN, or control transfer: zero depth/period at lines 102-105 and infeasible periodic-angle searches at lines 117-128 and 137-147 continue into later wavemaker logic after MPI has been finalized; CalcPeriodicTheta likewise finalizes at line 912 and continues at line 915. The initial period guard is additionally too late because 2*pi/Tperiod is already evaluated at line 98.",
-     "src_run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
-     "src_record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e/2f3875d1bb187e9042aad0fe9979e83522b6311fa80ef006e4e65aecedc7eef4.json",
-     "src_record_sha256_bytes": "e9b2043f99deaca4c66b38658f9be8e3244b437e7838acd0212d56b9be278b50",
+     "finding_texts": {
+      "B0": "Several error paths say STOP or diagnose invalid input but call MPI_FINALIZE without STOP, RETURN, or control transfer: zero depth/period at lines 102-105 and infeasible periodic-angle searches at lines 117-128 and 137-147 continue into later wavemaker logic after MPI has been finalized; CalcPeriodicTheta likewise finalizes at line 912 and continues at line 915. The initial period guard is additionally too late because 2*pi/Tperiod is already evaluated at line 98."
+     },
+     "audit_record": {
+      "run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
+      "record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e/2f3875d1bb187e9042aad0fe9979e83522b6311fa80ef006e4e65aecedc7eef4.json",
+      "record_sha256_bytes": "e9b2043f99deaca4c66b38658f9be8e3244b437e7838acd0212d56b9be278b50",
+      "record_source_sha256": "4b31adee872fada150f2a738af6055ae61b344cc119be4e7cf0f130f82197577"
+     },
+     "evidence_sources": [
+      {
+       "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/wavemaker.f90",
+       "sha256": "4b31adee872fada150f2a738af6055ae61b344cc119be4e7cf0f130f82197577"
+      }
+     ],
      "source_span": {
       "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/wavemaker.f90",
       "lines": "102-104"
      },
-     "source_file_sha256": "4b31adee872fada150f2a738af6055ae61b344cc119be4e7cf0f130f82197577",
      "authoritative_quote": "      IF(DEP_WK==ZERO.OR.Tperiod==ZERO)THEN\n         if(myid.eq.0) write(*,*) 're-set depth, Tperiod for wavemaker, STOP!'\n         call MPI_FINALIZE ( ier )",
      "source_span_hash": "459cc25522f0a87e003b4fd13d64f46ca1b544380e2a6871821a9a361580b733",
      "decision": "confirmed_delta",
@@ -364,21 +499,31 @@
      "decided_at": "2026-08-27",
      "rationale": "에러경로가 MPI_FINALIZE 호출 후 STOP/RETURN 없이 낙하(L102-104 zero depth/period; 유사 L122-129 periodic-angle). MPI 종료 후 실행 지속=UB. base 미검출.",
      "reconfirmed_at": "2026-08-27",
-     "reconfirm_method": "span re-extracted from live source at cited lines; source_file_sha256 vs record source_sha256 checked by verifier"
+     "reconfirm_method": "span re-extracted (bounds-checked) from exact live source; audit_id/finding_text membership + crosswalk + record hashes verified by verify_supplement.py"
     },
     {
      "member_input_ids": [
       "B1"
      ],
-     "finding_text": "WK_DATA2D filters directions and compacts Dire and WAVE_COMP at lines 203-242, but never compacts Phase2D before using Phase2D(J,I) at lines 255-282. When rejected directions are interspersed, input phases remain indexed by original direction while amplitudes and directions use compacted indices.",
-     "src_run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
-     "src_record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e/2f3875d1bb187e9042aad0fe9979e83522b6311fa80ef006e4e65aecedc7eef4.json",
-     "src_record_sha256_bytes": "e9b2043f99deaca4c66b38658f9be8e3244b437e7838acd0212d56b9be278b50",
+     "finding_texts": {
+      "B1": "WK_DATA2D filters directions and compacts Dire and WAVE_COMP at lines 203-242, but never compacts Phase2D before using Phase2D(J,I) at lines 255-282. When rejected directions are interspersed, input phases remain indexed by original direction while amplitudes and directions use compacted indices."
+     },
+     "audit_record": {
+      "run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
+      "record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e/2f3875d1bb187e9042aad0fe9979e83522b6311fa80ef006e4e65aecedc7eef4.json",
+      "record_sha256_bytes": "e9b2043f99deaca4c66b38658f9be8e3244b437e7838acd0212d56b9be278b50",
+      "record_source_sha256": "4b31adee872fada150f2a738af6055ae61b344cc119be4e7cf0f130f82197577"
+     },
+     "evidence_sources": [
+      {
+       "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/wavemaker.f90",
+       "sha256": "4b31adee872fada150f2a738af6055ae61b344cc119be4e7cf0f130f82197577"
+      }
+     ],
      "source_span": {
       "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/wavemaker.f90",
       "lines": "206,208,259"
      },
-     "source_file_sha256": "4b31adee872fada150f2a738af6055ae61b344cc119be4e7cf0f130f82197577",
      "authoritative_quote": "         DireTmp(DireCount)=Dire(I)\n…\n           WaveCompTmp(J,DireCount) = WAVE_COMP(J,I)   \n…\n          Phase2D(J,I)=Phase2D(J,I)*0.005555555555556*pi",
      "source_span_hash": "51ae38d485b044831b44956ba66efe4f835c0e4e232e68a71069a18f3d79c20a",
      "decision": "confirmed_delta",
@@ -386,21 +531,31 @@
      "decided_at": "2026-08-27",
      "rationale": "Dire/WAVE_COMP 는 DireCount 로 압축(L206,208)하나 Phase2D 는 원본 index I 유지(L259). 방향 기각 시 진폭·방향은 압축인덱스, 위상은 원본인덱스 → 불일치. base 미검출.",
      "reconfirmed_at": "2026-08-27",
-     "reconfirm_method": "span re-extracted from live source at cited lines; source_file_sha256 vs record source_sha256 checked by verifier"
+     "reconfirm_method": "span re-extracted (bounds-checked) from exact live source; audit_id/finding_text membership + crosswalk + record hashes verified by verify_supplement.py"
     },
     {
      "member_input_ids": [
       "B4"
      ],
-     "finding_text": "The WK_NEW_IRR one-direction branch initializes only theta(1) and AG(1) at lines 2522-2524, although both arrays have mfreq elements and later every AG(kf) and theta(kf) is consumed at lines 2558-2581 and 2602-2670. For mfreq greater than one this is direct use-before-assignment.",
-     "src_run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
-     "src_record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e/2f3875d1bb187e9042aad0fe9979e83522b6311fa80ef006e4e65aecedc7eef4.json",
-     "src_record_sha256_bytes": "e9b2043f99deaca4c66b38658f9be8e3244b437e7838acd0212d56b9be278b50",
+     "finding_texts": {
+      "B4": "The WK_NEW_IRR one-direction branch initializes only theta(1) and AG(1) at lines 2522-2524, although both arrays have mfreq elements and later every AG(kf) and theta(kf) is consumed at lines 2558-2581 and 2602-2670. For mfreq greater than one this is direct use-before-assignment."
+     },
+     "audit_record": {
+      "run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
+      "record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e/2f3875d1bb187e9042aad0fe9979e83522b6311fa80ef006e4e65aecedc7eef4.json",
+      "record_sha256_bytes": "e9b2043f99deaca4c66b38658f9be8e3244b437e7838acd0212d56b9be278b50",
+      "record_source_sha256": "4b31adee872fada150f2a738af6055ae61b344cc119be4e7cf0f130f82197577"
+     },
+     "evidence_sources": [
+      {
+       "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/wavemaker.f90",
+       "sha256": "4b31adee872fada150f2a738af6055ae61b344cc119be4e7cf0f130f82197577"
+      }
+     ],
      "source_span": {
       "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/wavemaker.f90",
       "lines": "2522-2524"
      },
-     "source_file_sha256": "4b31adee872fada150f2a738af6055ae61b344cc119be4e7cf0f130f82197577",
      "authoritative_quote": "    IF(mtheta==1) THEN ! 1D case\n        theta(1) = theta_input*pi/180.0_SP\n        AG(1) = 1.0_SP",
      "source_span_hash": "7bdabb8e02b0413ac0953aca058f25bf22947d1cb7606bf71943b8b911788c93",
      "decision": "confirmed_delta",
@@ -408,21 +563,31 @@
      "decided_at": "2026-08-27",
      "rationale": "WK_NEW_IRR mtheta==1 분기가 theta(1)/AG(1)만 초기화(L2523-2524), 이후 DO kf=1,mfreq 가 AG(kf)/theta(kf) 소비. AG 는 DIMENSION(mfreq) → mfreq>1 서 use-before-assign. base 미검출.",
      "reconfirmed_at": "2026-08-27",
-     "reconfirm_method": "span re-extracted from live source at cited lines; source_file_sha256 vs record source_sha256 checked by verifier"
+     "reconfirm_method": "span re-extracted (bounds-checked) from exact live source; audit_id/finding_text membership + crosswalk + record hashes verified by verify_supplement.py"
     },
     {
      "member_input_ids": [
       "B6"
      ],
-     "finding_text": "phi1 is INTENT(OUT) at line 2498 but assigned at line 2653 only inside IF(PERIODIC), lines 2603-2663. The nonperiodic WK_NEW_IRR path returns phase_ir undefined and CALCULATE_NEW_Cm_Sm immediately consumes it through the calls at lines 504-510 and the expressions at lines 2742-2773.",
-     "src_run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
-     "src_record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e/2f3875d1bb187e9042aad0fe9979e83522b6311fa80ef006e4e65aecedc7eef4.json",
-     "src_record_sha256_bytes": "e9b2043f99deaca4c66b38658f9be8e3244b437e7838acd0212d56b9be278b50",
+     "finding_texts": {
+      "B6": "phi1 is INTENT(OUT) at line 2498 but assigned at line 2653 only inside IF(PERIODIC), lines 2603-2663. The nonperiodic WK_NEW_IRR path returns phase_ir undefined and CALCULATE_NEW_Cm_Sm immediately consumes it through the calls at lines 504-510 and the expressions at lines 2742-2773."
+     },
+     "audit_record": {
+      "run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
+      "record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e/2f3875d1bb187e9042aad0fe9979e83522b6311fa80ef006e4e65aecedc7eef4.json",
+      "record_sha256_bytes": "e9b2043f99deaca4c66b38658f9be8e3244b437e7838acd0212d56b9be278b50",
+      "record_source_sha256": "4b31adee872fada150f2a738af6055ae61b344cc119be4e7cf0f130f82197577"
+     },
+     "evidence_sources": [
+      {
+       "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/wavemaker.f90",
+       "sha256": "4b31adee872fada150f2a738af6055ae61b344cc119be4e7cf0f130f82197577"
+      }
+     ],
      "source_span": {
       "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/wavemaker.f90",
       "lines": "2498,2653"
      },
-     "source_file_sha256": "4b31adee872fada150f2a738af6055ae61b344cc119be4e7cf0f130f82197577",
      "authoritative_quote": "    REAL(SP),DIMENSION(mfreq,1),INTENT(OUT) :: D_gen,phi1,rlamda\n…\n            phi1(kf,1)=rand(0)*2.0_SP*pi",
      "source_span_hash": "5e0fb84f05a27e4f116cb8986c31989800324c941fe70149a07681534de11e6a",
      "decision": "confirmed_delta",
@@ -430,7 +595,7 @@
      "decided_at": "2026-08-27",
      "rationale": "phi1 DIMENSION(mfreq,1),INTENT(OUT)(L2498) 이나 IF(PERIODIC) 내부서만 대입(L2653). 비주기 경로는 phi1 미정의로 CALCULATE_NEW_Cm_Sm 소비. UBA. base 미검출.",
      "reconfirmed_at": "2026-08-27",
-     "reconfirm_method": "span re-extracted from live source at cited lines; source_file_sha256 vs record source_sha256 checked by verifier"
+     "reconfirm_method": "span re-extracted (bounds-checked) from exact live source; audit_id/finding_text membership + crosswalk + record hashes verified by verify_supplement.py"
     }
    ]
   },
@@ -447,22 +612,37 @@
     "run_id": "reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6",
     "record_file": "42f7dc76abdfdd390b820ec7824e050a714b46694b9f2e7e0e040f2270179e95.json",
     "record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6/42f7dc76abdfdd390b820ec7824e050a714b46694b9f2e7e0e040f2270179e95.json",
-    "record_sha256_bytes": "ea18ac050a8edf4c04c37a469e4c45c4314f1e4a5d35121761ec58a228061ef4"
+    "record_sha256_bytes": "ea18ac050a8edf4c04c37a469e4c45c4314f1e4a5d35121761ec58a228061ef4",
+    "record_source_sha256": "b1c2ee621eb61091288b3d3f139493607a49d377fbd73ba5be4303c5cce3bb10"
+   },
+   "crosswalk": {
+    "path": "total-read/records-crosswalk/reread-20260728/FUNWAVE-004/FUNWAVE__raw__source_code__FUNWAVE-TVD__src__breaker.F.crosswalk.json",
+    "sha256_bytes": "95458b273b8ef46710b4b55601e055f387fe7827201124c548a2b6f4313d3853"
    },
    "supplements": [
     {
      "member_input_ids": [
       "B1"
      ],
-     "finding_text": "DXg and DYg are assigned only in the nested non-VIS_DEPTH_RATIO path at L160-L167 when the L151 onset condition is false and the L154 age condition reaches its ELSE, but they are used unconditionally for xmk/ymk at L238-L243; onset cells and already-aging cells therefore use unassigned coordinate spacings.",
-     "src_run_id": "reread20260728-code-FUNWAVE-004-codexaudit-20260826T022957Z-8833a3a8",
-     "src_record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-004-codexaudit-20260826T022957Z-8833a3a8/42f7dc76abdfdd390b820ec7824e050a714b46694b9f2e7e0e040f2270179e95.json",
-     "src_record_sha256_bytes": "fae47fa4d2775230e096332ce6ee9564380b0b542512ed6906c18497ddb5013c",
+     "finding_texts": {
+      "B1": "DXg and DYg are assigned only in the nested non-VIS_DEPTH_RATIO path at L160-L167 when the L151 onset condition is false and the L154 age condition reaches its ELSE, but they are used unconditionally for xmk/ymk at L238-L243; onset cells and already-aging cells therefore use unassigned coordinate spacings."
+     },
+     "audit_record": {
+      "run_id": "reread20260728-code-FUNWAVE-004-codexaudit-20260826T022957Z-8833a3a8",
+      "record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-004-codexaudit-20260826T022957Z-8833a3a8/42f7dc76abdfdd390b820ec7824e050a714b46694b9f2e7e0e040f2270179e95.json",
+      "record_sha256_bytes": "fae47fa4d2775230e096332ce6ee9564380b0b542512ed6906c18497ddb5013c",
+      "record_source_sha256": "b1c2ee621eb61091288b3d3f139493607a49d377fbd73ba5be4303c5cce3bb10"
+     },
+     "evidence_sources": [
+      {
+       "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/breaker.F",
+       "sha256": "b1c2ee621eb61091288b3d3f139493607a49d377fbd73ba5be4303c5cce3bb10"
+      }
+     ],
      "source_span": {
       "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/breaker.F",
       "lines": "103,161-168,238-239"
      },
-     "source_file_sha256": "b1c2ee621eb61091288b3d3f139493607a49d377fbd73ba5be4303c5cce3bb10",
      "authoritative_quote": "     REAL(SP) :: xmk,ymk,DXg,DYg\n…\n        DXg=DX\n        DYg=DY\n        propxy=SQRT(DX*DX+DY*DY)/MAX(C,SMALL)\n        propx=SQRT(DX*DX)/MAX(C,SMALL)\n        propy=SQRT(DY*DY)/MAX(C,SMALL)\n# else\n        DXg=DX(I,J)\n        DYg=DY(I,J)\n…\n            xmk=(I-Ibeg)*DXg + (iista-1)*DXg\n            ymk=(J-Jbeg)*DYg + (jjsta-1)*DYg",
      "source_span_hash": "2d05357fea781cbbffb3a6d0ca2b1bdf47df834ee9aeb36a987538b7ceb5d34e",
      "decision": "confirmed_delta",
@@ -470,7 +650,7 @@
      "decided_at": "2026-08-27",
      "rationale": "span-verified 2026-08-27: DXg/DYg(decl L103) assigned only in innermost AGE<=ZERO branch (L161/167); breaking-branch(L153) and aging-branch(L156-157) leave unset, yet xmk/ymk use them after all ENDIFs at L238-239/242-243. use-before-assign. mirrors FUNWAVE-001 breaker.f90 B1. base missed.",
      "reconfirmed_at": "2026-08-27",
-     "reconfirm_method": "span re-extracted from live source at cited lines; source_file_sha256 vs record source_sha256 checked by verifier"
+     "reconfirm_method": "span re-extracted (bounds-checked) from exact live source; audit_id/finding_text membership + crosswalk + record hashes verified by verify_supplement.py"
     }
    ]
   },
@@ -487,22 +667,37 @@
     "run_id": "reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6",
     "record_file": "8e5a290831c949f28c4c0f9f6d7aa3e7b9ce7173fc10aea125f9e0a4073109e8.json",
     "record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6/8e5a290831c949f28c4c0f9f6d7aa3e7b9ce7173fc10aea125f9e0a4073109e8.json",
-    "record_sha256_bytes": "ea64c1bea46ea6e9b13ecc69682ed154c743e1afce5bbdb0bcdc7cc19f081c57"
+    "record_sha256_bytes": "ea64c1bea46ea6e9b13ecc69682ed154c743e1afce5bbdb0bcdc7cc19f081c57",
+    "record_source_sha256": "bc14cdfea0718b890ac41b4c5b3440311da15e460526f46b10d69f12deb43730"
+   },
+   "crosswalk": {
+    "path": "total-read/records-crosswalk/reread-20260728/FUNWAVE-004/FUNWAVE__raw__source_code__FUNWAVE-TVD__src__io.F.crosswalk.json",
+    "sha256_bytes": "90ffc89f4efb31deab1e92ad2bda8cb1ebf867fc2fa085b56e39a43fd7a64622"
    },
    "supplements": [
     {
      "member_input_ids": [
       "B0"
      ],
-     "finding_text": "L744-790: U_FILE 누락 시 NO_UV_FILE=.TRUE.로 만들지만 V_FILE이 존재하면 후속 ELSE가 이를 .FALSE.로 덮어쓴 뒤 곧바로 IF(NO_UV_FILE)로 복구를 시도하므로, U만 누락된 경우를 보존하지 못하는 교차라인 상태 결함이다.",
-     "src_run_id": "reread20260728-code-FUNWAVE-004-codexaudit-20260826T022957Z-8833a3a8",
-     "src_record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-004-codexaudit-20260826T022957Z-8833a3a8/8e5a290831c949f28c4c0f9f6d7aa3e7b9ce7173fc10aea125f9e0a4073109e8.json",
-     "src_record_sha256_bytes": "d1415369ab641cabfc796975ebae32f874c09fb62db08b70a64cb6728a2b1fe3",
+     "finding_texts": {
+      "B0": "L744-790: U_FILE 누락 시 NO_UV_FILE=.TRUE.로 만들지만 V_FILE이 존재하면 후속 ELSE가 이를 .FALSE.로 덮어쓴 뒤 곧바로 IF(NO_UV_FILE)로 복구를 시도하므로, U만 누락된 경우를 보존하지 못하는 교차라인 상태 결함이다."
+     },
+     "audit_record": {
+      "run_id": "reread20260728-code-FUNWAVE-004-codexaudit-20260826T022957Z-8833a3a8",
+      "record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-004-codexaudit-20260826T022957Z-8833a3a8/8e5a290831c949f28c4c0f9f6d7aa3e7b9ce7173fc10aea125f9e0a4073109e8.json",
+      "record_sha256_bytes": "d1415369ab641cabfc796975ebae32f874c09fb62db08b70a64cb6728a2b1fe3",
+      "record_source_sha256": "bc14cdfea0718b890ac41b4c5b3440311da15e460526f46b10d69f12deb43730"
+     },
+     "evidence_sources": [
+      {
+       "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/io.F",
+       "sha256": "bc14cdfea0718b890ac41b4c5b3440311da15e460526f46b10d69f12deb43730"
+      }
+     ],
      "source_span": {
       "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/io.F",
       "lines": "754,765,771,782-783"
      },
-     "source_file_sha256": "bc14cdfea0718b890ac41b4c5b3440311da15e460526f46b10d69f12deb43730",
      "authoritative_quote": "          NO_UV_FILE = .TRUE.\n…\n          NO_UV_FILE = .FALSE.\n…\n          NO_UV_FILE = .TRUE.\n…\n          NO_UV_FILE = .FALSE.\n          IF(NO_UV_FILE) NO_UV_FILE = .TRUE.    ! in case you dont have u file",
      "source_span_hash": "1ba33f11243e65293f25885d6f90fbb2d534707b11ce66eb047e1461299580ec",
      "decision": "confirmed_delta",
@@ -510,7 +705,7 @@
      "decided_at": "2026-08-27",
      "rationale": "U_FILE 누락 시 NO_UV_FILE=.TRUE.(L754) 후 V_FILE 블록이 독립적으로 .FALSE.(L765/782) 덮어씀; L783 복구 IF(NO_UV_FILE) 는 이미 FALSE 라 미작동 → U-only 누락 상태 소실, 미정의 U 사용. base 미검출.",
      "reconfirmed_at": "2026-08-27",
-     "reconfirm_method": "span re-extracted from live source at cited lines; source_file_sha256 vs record source_sha256 checked by verifier"
+     "reconfirm_method": "span re-extracted (bounds-checked) from exact live source; audit_id/finding_text membership + crosswalk + record hashes verified by verify_supplement.py"
     }
    ]
   },
@@ -527,22 +722,37 @@
     "run_id": "reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6",
     "record_file": "3917e06f212c0735803e45aa45f4483948adc56a9d2994e3778f2d867bfc5a7e.json",
     "record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6/3917e06f212c0735803e45aa45f4483948adc56a9d2994e3778f2d867bfc5a7e.json",
-    "record_sha256_bytes": "b659cc909de484bdbcdc123665b655317fc749e5e44a5be502d8ba1959d8c00f"
+    "record_sha256_bytes": "b659cc909de484bdbcdc123665b655317fc749e5e44a5be502d8ba1959d8c00f",
+    "record_source_sha256": "109c4951dcd5fcba376d7dacc61b4abc2d22793b7f034b26d643fb6de19275a4"
+   },
+   "crosswalk": {
+    "path": "total-read/records-crosswalk/reread-20260728/FUNWAVE-004/FUNWAVE__raw__source_code__FUNWAVE-TVD__src__mod_sediment.F.crosswalk.json",
+    "sha256_bytes": "141a4f9f7c68dc6539a692c53deeab7a042e0692ed3e222de2ab2107d89729a1"
    },
    "supplements": [
     {
      "member_input_ids": [
       "B2"
      ],
-     "finding_text": "Cohesive deposition probability is not bounded below: Pd becomes negative when Tau_xy exceeds Tau_crd_coh (L1363), and D is then assigned WS*CH*Pd without MAX(0,...) (L1364). Because the transport source is Pickup-D (L1208), negative deposition acts as an additional positive concentration source.",
-     "src_run_id": "reread20260728-code-FUNWAVE-004c-codexaudit-20260826T235048Z-1a481a82",
-     "src_record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-004c-codexaudit-20260826T235048Z-1a481a82/3917e06f212c0735803e45aa45f4483948adc56a9d2994e3778f2d867bfc5a7e.json",
-     "src_record_sha256_bytes": "7d114cb097ce4c723978acee6941d669c2dbb25fc10cd18194b919c35e78ff6c",
+     "finding_texts": {
+      "B2": "Cohesive deposition probability is not bounded below: Pd becomes negative when Tau_xy exceeds Tau_crd_coh (L1363), and D is then assigned WS*CH*Pd without MAX(0,...) (L1364). Because the transport source is Pickup-D (L1208), negative deposition acts as an additional positive concentration source."
+     },
+     "audit_record": {
+      "run_id": "reread20260728-code-FUNWAVE-004c-codexaudit-20260826T235048Z-1a481a82",
+      "record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-004c-codexaudit-20260826T235048Z-1a481a82/3917e06f212c0735803e45aa45f4483948adc56a9d2994e3778f2d867bfc5a7e.json",
+      "record_sha256_bytes": "7d114cb097ce4c723978acee6941d669c2dbb25fc10cd18194b919c35e78ff6c",
+      "record_source_sha256": "109c4951dcd5fcba376d7dacc61b4abc2d22793b7f034b26d643fb6de19275a4"
+     },
+     "evidence_sources": [
+      {
+       "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/mod_sediment.F",
+       "sha256": "109c4951dcd5fcba376d7dacc61b4abc2d22793b7f034b26d643fb6de19275a4"
+      }
+     ],
      "source_span": {
       "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/mod_sediment.F",
       "lines": "1363-1364"
      },
-     "source_file_sha256": "109c4951dcd5fcba376d7dacc61b4abc2d22793b7f034b26d643fb6de19275a4",
      "authoritative_quote": "           Pd = 1.0_SP - Tau_xy(I,J)/MAX(SMALL,Tau_crd_coh)\n           D(I,J) = WS*CH(I,J)*Pd",
      "source_span_hash": "e4bfb097d1f08ae65730bf9b1bd5f729391d5cd5e0626a4f04515902071976b2",
      "decision": "confirmed_delta",
@@ -550,21 +760,31 @@
      "decided_at": "2026-08-27",
      "rationale": "Cohesive Pd=1-Tau_xy/MAX(SMALL,Tau_crd_coh)(L1363), Tau_xy>Tau_crd_coh 시 Pd<0, D=WS*CH*Pd 무클램프(L1364) → 음의 침적(허위 침식원). base 미검출.",
      "reconfirmed_at": "2026-08-27",
-     "reconfirm_method": "span re-extracted from live source at cited lines; source_file_sha256 vs record source_sha256 checked by verifier"
+     "reconfirm_method": "span re-extracted (bounds-checked) from exact live source; audit_id/finding_text membership + crosswalk + record hashes verified by verify_supplement.py"
     },
     {
      "member_input_ids": [
       "B3"
      ],
-     "finding_text": "Avalanche transfers are stored with scalar assignment rather than accumulation: each steep cell writes both its own and one neighbor's Zb_avalanching entry (L1585-L1627). Later loop iterations can overwrite earlier incoming/outgoing transfers to the same cell before the one-shot bed update at L1633-L1634, making the result loop-order dependent and losing superposed transfers.",
-     "src_run_id": "reread20260728-code-FUNWAVE-004c-codexaudit-20260826T235048Z-1a481a82",
-     "src_record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-004c-codexaudit-20260826T235048Z-1a481a82/3917e06f212c0735803e45aa45f4483948adc56a9d2994e3778f2d867bfc5a7e.json",
-     "src_record_sha256_bytes": "7d114cb097ce4c723978acee6941d669c2dbb25fc10cd18194b919c35e78ff6c",
+     "finding_texts": {
+      "B3": "Avalanche transfers are stored with scalar assignment rather than accumulation: each steep cell writes both its own and one neighbor's Zb_avalanching entry (L1585-L1627). Later loop iterations can overwrite earlier incoming/outgoing transfers to the same cell before the one-shot bed update at L1633-L1634, making the result loop-order dependent and losing superposed transfers."
+     },
+     "audit_record": {
+      "run_id": "reread20260728-code-FUNWAVE-004c-codexaudit-20260826T235048Z-1a481a82",
+      "record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-004c-codexaudit-20260826T235048Z-1a481a82/3917e06f212c0735803e45aa45f4483948adc56a9d2994e3778f2d867bfc5a7e.json",
+      "record_sha256_bytes": "7d114cb097ce4c723978acee6941d669c2dbb25fc10cd18194b919c35e78ff6c",
+      "record_source_sha256": "109c4951dcd5fcba376d7dacc61b4abc2d22793b7f034b26d643fb6de19275a4"
+     },
+     "evidence_sources": [
+      {
+       "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/mod_sediment.F",
+       "sha256": "109c4951dcd5fcba376d7dacc61b4abc2d22793b7f034b26d643fb6de19275a4"
+      }
+     ],
      "source_span": {
       "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/mod_sediment.F",
       "lines": "1593-1594"
      },
-     "source_file_sha256": "109c4951dcd5fcba376d7dacc61b4abc2d22793b7f034b26d643fb6de19275a4",
      "authoritative_quote": "              Zb_avalanching(I,J)=dh\n              Zb_avalanching(I-1,J)=-dh",
      "source_span_hash": "a436dc9d978a772831d84909f200398a17750a091a7f6bf5fae4d7f4991cac84",
      "decision": "confirmed_delta",
@@ -572,7 +792,7 @@
      "decided_at": "2026-08-27",
      "rationale": "Avalanche Zb_avalanching(I,J)=dh·이웃=-dh 스칼라 대입(L1593-1594, 유사 L1604/1615/1626), 누적(+=) 아님 → 다중이웃 아발란치가 서로 덮어씀, 질량 비보존. base 미검출.",
      "reconfirmed_at": "2026-08-27",
-     "reconfirm_method": "span re-extracted from live source at cited lines; source_file_sha256 vs record source_sha256 checked by verifier"
+     "reconfirm_method": "span re-extracted (bounds-checked) from exact live source; audit_id/finding_text membership + crosswalk + record hashes verified by verify_supplement.py"
     }
    ]
   },
@@ -589,22 +809,37 @@
     "run_id": "reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6",
     "record_file": "df16584eb5e403a224eed8b118af87bb03021d14ec087b3f905eca86e72893b5.json",
     "record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6/df16584eb5e403a224eed8b118af87bb03021d14ec087b3f905eca86e72893b5.json",
-    "record_sha256_bytes": "aed3d19941e0dd9240c5283e8984d87a62c400ab36ab72478fd90c733f65fb0d"
+    "record_sha256_bytes": "aed3d19941e0dd9240c5283e8984d87a62c400ab36ab72478fd90c733f65fb0d",
+    "record_source_sha256": "4fadd96e57ef55ff1b7e6fb7e91d9e1968d6904f0288dfc64c58f0950acce547"
+   },
+   "crosswalk": {
+    "path": "total-read/records-crosswalk/reread-20260728/FUNWAVE-004/FUNWAVE__raw__source_code__FUNWAVE-TVD__src__mod_tracer.F.crosswalk.json",
+    "sha256_bytes": "3ff6930ea4fcccb695fe10b242f4322972855e42f305c93105427a5c43d33f8e"
    },
    "supplements": [
     {
      "member_input_ids": [
       "B1"
      ],
-     "finding_text": "MPI use-before-assignment defect: X_TRACK_ALL, Y_TRACK_ALL, and IN_CELL_ALL are populated only inside myid==0 blocks at L442-L466, but the selection loop at L470-L477 is outside any root guard and reads these automatic local arrays on every rank. Non-root ranks therefore branch on and copy uninitialized gathered arrays before the later scatter overwrites coordinates.",
-     "src_run_id": "reread20260728-code-FUNWAVE-004a-codexaudit-20260826T235047Z-4f05567c",
-     "src_record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-004a-codexaudit-20260826T235047Z-4f05567c/df16584eb5e403a224eed8b118af87bb03021d14ec087b3f905eca86e72893b5.json",
-     "src_record_sha256_bytes": "11a7b5912105dd576090aedad8546710a871cee539de5885ec80983394ae1d20",
+     "finding_texts": {
+      "B1": "MPI use-before-assignment defect: X_TRACK_ALL, Y_TRACK_ALL, and IN_CELL_ALL are populated only inside myid==0 blocks at L442-L466, but the selection loop at L470-L477 is outside any root guard and reads these automatic local arrays on every rank. Non-root ranks therefore branch on and copy uninitialized gathered arrays before the later scatter overwrites coordinates."
+     },
+     "audit_record": {
+      "run_id": "reread20260728-code-FUNWAVE-004a-codexaudit-20260826T235047Z-4f05567c",
+      "record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-004a-codexaudit-20260826T235047Z-4f05567c/df16584eb5e403a224eed8b118af87bb03021d14ec087b3f905eca86e72893b5.json",
+      "record_sha256_bytes": "11a7b5912105dd576090aedad8546710a871cee539de5885ec80983394ae1d20",
+      "record_source_sha256": "4fadd96e57ef55ff1b7e6fb7e91d9e1968d6904f0288dfc64c58f0950acce547"
+     },
+     "evidence_sources": [
+      {
+       "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/mod_tracer.F",
+       "sha256": "4fadd96e57ef55ff1b7e6fb7e91d9e1968d6904f0288dfc64c58f0950acce547"
+      }
+     ],
      "source_span": {
       "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/mod_tracer.F",
       "lines": "444,464,470-473"
      },
-     "source_file_sha256": "4fadd96e57ef55ff1b7e6fb7e91d9e1968d6904f0288dfc64c58f0950acce547",
      "authoritative_quote": "               X_TRACK_ALL(I,l)= xx(l)\n…\n               IN_CELL_ALL(I,l)= yy(l)\n…\n       DO I=1,NumTracker\n         DO l=1,px*py\n          IF(IN_CELL_ALL(I,l))THEN\n             X_TRACK(I)=X_TRACK_ALL(I,l)",
      "source_span_hash": "415d35fbac7957816b27042a1756c3689f22ef2d8c1399223d851c2ff28a44e7",
      "decision": "confirmed_delta",
@@ -612,7 +847,7 @@
      "decided_at": "2026-08-27",
      "rationale": "X_TRACK_ALL/IN_CELL_ALL 는 myid==0 블록서만 채움(L444,464), 선택루프(L470-473)는 root 밖에서 IN_CELL_ALL/X_TRACK_ALL 읽음 → 비root 미정의 read. MPI UBA. base 미검출.",
      "reconfirmed_at": "2026-08-27",
-     "reconfirm_method": "span re-extracted from live source at cited lines; source_file_sha256 vs record source_sha256 checked by verifier"
+     "reconfirm_method": "span re-extracted (bounds-checked) from exact live source; audit_id/finding_text membership + crosswalk + record hashes verified by verify_supplement.py"
     }
    ]
   },
@@ -629,22 +864,37 @@
     "run_id": "reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6",
     "record_file": "a5d41826b6d02a5bfafc3698572763ae72a74a2b94e8625768515177fafcb539.json",
     "record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6/a5d41826b6d02a5bfafc3698572763ae72a74a2b94e8625768515177fafcb539.json",
-    "record_sha256_bytes": "b27352900c68b81445d485357851c16dc1a923f52fb5641d6ab61ceff90411e4"
+    "record_sha256_bytes": "b27352900c68b81445d485357851c16dc1a923f52fb5641d6ab61ceff90411e4",
+    "record_source_sha256": "d06116f0d86c08ad7ba699e966dbe9d6127ad3a5e668432ad369d8c3a08763fc"
+   },
+   "crosswalk": {
+    "path": "total-read/records-crosswalk/reread-20260728/FUNWAVE-004/FUNWAVE__raw__source_code__FUNWAVE-TVD__src__mod_vessel.F.crosswalk.json",
+    "sha256_bytes": "4d32fb8b13ec7a9081045a5807a081511faf85d75e22f2772d00ef1b91e5237a"
    },
    "supplements": [
     {
      "member_input_ids": [
       "B0"
      ],
-     "finding_text": "Use-before-assign on missing NumVessel: READ_INTEGER at L149 has no ierr/default branch, but NumVessel is immediately used as every allocation extent at L263-L285 and as the loop bound at L312. A missing or invalid key leaves the module integer without a defined value before allocation.",
-     "src_run_id": "reread20260728-code-FUNWAVE-004b-codexaudit-20260826T235047Z-9ba829b8",
-     "src_record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-004b-codexaudit-20260826T235047Z-9ba829b8/a5d41826b6d02a5bfafc3698572763ae72a74a2b94e8625768515177fafcb539.json",
-     "src_record_sha256_bytes": "685cd72b36b7f879681b1747ed08cd9b7a5939e8ca45caead43b8a8a4a09ed12",
+     "finding_texts": {
+      "B0": "Use-before-assign on missing NumVessel: READ_INTEGER at L149 has no ierr/default branch, but NumVessel is immediately used as every allocation extent at L263-L285 and as the loop bound at L312. A missing or invalid key leaves the module integer without a defined value before allocation."
+     },
+     "audit_record": {
+      "run_id": "reread20260728-code-FUNWAVE-004b-codexaudit-20260826T235047Z-9ba829b8",
+      "record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-004b-codexaudit-20260826T235047Z-9ba829b8/a5d41826b6d02a5bfafc3698572763ae72a74a2b94e8625768515177fafcb539.json",
+      "record_sha256_bytes": "685cd72b36b7f879681b1747ed08cd9b7a5939e8ca45caead43b8a8a4a09ed12",
+      "record_source_sha256": "d06116f0d86c08ad7ba699e966dbe9d6127ad3a5e668432ad369d8c3a08763fc"
+     },
+     "evidence_sources": [
+      {
+       "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/mod_vessel.F",
+       "sha256": "d06116f0d86c08ad7ba699e966dbe9d6127ad3a5e668432ad369d8c3a08763fc"
+      }
+     ],
      "source_span": {
       "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/mod_vessel.F",
       "lines": "149,263"
      },
-     "source_file_sha256": "d06116f0d86c08ad7ba699e966dbe9d6127ad3a5e668432ad369d8c3a08763fc",
      "authoritative_quote": "      CALL READ_INTEGER(NumVessel,FILE_NAME,'NumVessel',ierr)\n…\n      ALLOCATE (Xvessel1(NumVessel),Yvessel1(NumVessel),  &",
      "source_span_hash": "0e71c250e0c01ad40181698faea15ddca17ecee2b06fefe1017fffed702fc100",
      "decision": "confirmed_delta",
@@ -652,7 +902,7 @@
      "decided_at": "2026-08-27",
      "rationale": "NumVessel READ 후 ierr/default 분기 없음(L149), 직후 ALLOCATE extent 로 직접 사용(L263). 'NumVessel' 키 누락 시 INTENT(OUT) 미정의 크기 할당. base 미검출.",
      "reconfirmed_at": "2026-08-27",
-     "reconfirm_method": "span re-extracted from live source at cited lines; source_file_sha256 vs record source_sha256 checked by verifier"
+     "reconfirm_method": "span re-extracted (bounds-checked) from exact live source; audit_id/finding_text membership + crosswalk + record hashes verified by verify_supplement.py"
     }
    ]
   },
@@ -669,22 +919,37 @@
     "run_id": "reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6",
     "record_file": "1b6095f36bdcbd8d1527161eaa7e4d11c1e593b787d87dec07e5713aca106d9c.json",
     "record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-004-fable5-20260813T012841Z-cf6786b6/1b6095f36bdcbd8d1527161eaa7e4d11c1e593b787d87dec07e5713aca106d9c.json",
-    "record_sha256_bytes": "483c6e6b2e0e0f646777cd473253fa326400ede68582ac772a13260e88e19912"
+    "record_sha256_bytes": "483c6e6b2e0e0f646777cd473253fa326400ede68582ac772a13260e88e19912",
+    "record_source_sha256": "d8bd500cf549729dc61aeb503070a6af05fa21ca8c5198fbec82374385468459"
+   },
+   "crosswalk": {
+    "path": "total-read/records-crosswalk/reread-20260728/FUNWAVE-004/FUNWAVE__raw__source_code__FUNWAVE-TVD__src__wavemaker.F.crosswalk.json",
+    "sha256_bytes": "6d24bf032e5c4c65f5868cd79dc2503b4624917730ce6e3f45656dabb1bea743"
    },
    "supplements": [
     {
      "member_input_ids": [
       "B1"
      ],
-     "finding_text": "WK_DATA2D compresses retained directions and WAVE_COMP into DireTmp/WaveCompTmp (L238-L275) but never applies the same index map to Phase2D read at L213-L215. When phases are present, L295-L301 converts the first NumDir original phase columns, which need not correspond to the retained directions after rejected columns; amplitude and phase can therefore be paired from different directions.",
-     "src_run_id": "reread20260728-code-FUNWAVE-004a-codexaudit-20260826T235047Z-4f05567c",
-     "src_record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-004a-codexaudit-20260826T235047Z-4f05567c/1b6095f36bdcbd8d1527161eaa7e4d11c1e593b787d87dec07e5713aca106d9c.json",
-     "src_record_sha256_bytes": "64678b12ec2f1f3b5de51439a1497c5f1e7a5d4c988ea820b5d4502d7b6891fd",
+     "finding_texts": {
+      "B1": "WK_DATA2D compresses retained directions and WAVE_COMP into DireTmp/WaveCompTmp (L238-L275) but never applies the same index map to Phase2D read at L213-L215. When phases are present, L295-L301 converts the first NumDir original phase columns, which need not correspond to the retained directions after rejected columns; amplitude and phase can therefore be paired from different directions."
+     },
+     "audit_record": {
+      "run_id": "reread20260728-code-FUNWAVE-004a-codexaudit-20260826T235047Z-4f05567c",
+      "record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-004a-codexaudit-20260826T235047Z-4f05567c/1b6095f36bdcbd8d1527161eaa7e4d11c1e593b787d87dec07e5713aca106d9c.json",
+      "record_sha256_bytes": "64678b12ec2f1f3b5de51439a1497c5f1e7a5d4c988ea820b5d4502d7b6891fd",
+      "record_source_sha256": "d8bd500cf549729dc61aeb503070a6af05fa21ca8c5198fbec82374385468459"
+     },
+     "evidence_sources": [
+      {
+       "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/wavemaker.F",
+       "sha256": "d8bd500cf549729dc61aeb503070a6af05fa21ca8c5198fbec82374385468459"
+      }
+     ],
      "source_span": {
       "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/wavemaker.F",
       "lines": "214,241,299"
      },
-     "source_file_sha256": "d8bd500cf549729dc61aeb503070a6af05fa21ca8c5198fbec82374385468459",
      "authoritative_quote": "         READ(1,*,END=110)(Phase2D(J,I),J=1,NumFreq)\n…\n         DireTmp(DireCount)=Dire(I)\n…\n          Phase2D(J,I)=Phase2D(J,I)*0.005555555555556*pi",
      "source_span_hash": "773c4d8e88421e5af8b276b48304f83473ca624f66d22aed91dea40017eaec1c",
      "decision": "confirmed_delta",
@@ -692,21 +957,31 @@
      "decided_at": "2026-08-27",
      "rationale": "WK_DATA2D: Dire/WAVE_COMP 는 DireCount 로 압축(L241)하나 Phase2D 는 원본 index I 유지(read L214, use L299). 방향 기각 시 위상-진폭 인덱스 불일치. base 미검출.",
      "reconfirmed_at": "2026-08-27",
-     "reconfirm_method": "span re-extracted from live source at cited lines; source_file_sha256 vs record source_sha256 checked by verifier"
+     "reconfirm_method": "span re-extracted (bounds-checked) from exact live source; audit_id/finding_text membership + crosswalk + record hashes verified by verify_supplement.py"
     },
     {
      "member_input_ids": [
       "B4"
      ],
-     "finding_text": "WK_WAVEMAKER_2D_SPECTRAL_DATA returns Beta_gen(NumFreq,NumDir) (L638), and initialization passes Beta_gen2D to CALCULATE_Cm_Sm (L328-L332), but CALCULATE_Cm_Sm declares beta_gen(mfreq) (L842) and indexes only beta_gen(kf) in the direction loop (L858-L880). This is a rank/interface mismatch and discards direction-dependent beta values.",
-     "src_run_id": "reread20260728-code-FUNWAVE-004a-codexaudit-20260826T235047Z-4f05567c",
-     "src_record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-004a-codexaudit-20260826T235047Z-4f05567c/1b6095f36bdcbd8d1527161eaa7e4d11c1e593b787d87dec07e5713aca106d9c.json",
-     "src_record_sha256_bytes": "64678b12ec2f1f3b5de51439a1497c5f1e7a5d4c988ea820b5d4502d7b6891fd",
+     "finding_texts": {
+      "B4": "WK_WAVEMAKER_2D_SPECTRAL_DATA returns Beta_gen(NumFreq,NumDir) (L638), and initialization passes Beta_gen2D to CALCULATE_Cm_Sm (L328-L332), but CALCULATE_Cm_Sm declares beta_gen(mfreq) (L842) and indexes only beta_gen(kf) in the direction loop (L858-L880). This is a rank/interface mismatch and discards direction-dependent beta values."
+     },
+     "audit_record": {
+      "run_id": "reread20260728-code-FUNWAVE-004a-codexaudit-20260826T235047Z-4f05567c",
+      "record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-004a-codexaudit-20260826T235047Z-4f05567c/1b6095f36bdcbd8d1527161eaa7e4d11c1e593b787d87dec07e5713aca106d9c.json",
+      "record_sha256_bytes": "64678b12ec2f1f3b5de51439a1497c5f1e7a5d4c988ea820b5d4502d7b6891fd",
+      "record_source_sha256": "d8bd500cf549729dc61aeb503070a6af05fa21ca8c5198fbec82374385468459"
+     },
+     "evidence_sources": [
+      {
+       "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/wavemaker.F",
+       "sha256": "d8bd500cf549729dc61aeb503070a6af05fa21ca8c5198fbec82374385468459"
+      }
+     ],
      "source_span": {
       "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/wavemaker.F",
       "lines": "328,638,842"
      },
-     "source_file_sha256": "d8bd500cf549729dc61aeb503070a6af05fa21ca8c5198fbec82374385468459",
      "authoritative_quote": "      CALL CALCULATE_Cm_Sm(Mloc,Nloc,DX,DY,Xc_WK,Ibeg,Jbeg,NumFreq,NumDir,&\n…\n     REAL(SP),DIMENSION(NumFreq,NumDir), INTENT(OUT) :: D_gen,Beta_gen,rlamda\n…\n     REAL(SP),DIMENSION(mfreq),INTENT(IN) :: beta_gen",
      "source_span_hash": "81327cbcc76339f7740633dbca3357c1077a2b611cfe53e7fb873b99bd46e856",
      "decision": "confirmed_delta",
@@ -714,21 +989,31 @@
      "decided_at": "2026-08-27",
      "rationale": "Beta_gen 생산자 DIMENSION(NumFreq,NumDir),INTENT(OUT)(L638) vs 소비자 CALCULATE_Cm_Sm beta_gen(mfreq),INTENT(IN)(L842). 2D→1D rank 불일치(호출 L328), NumDir>1 서 열 오독. base 미검출.",
      "reconfirmed_at": "2026-08-27",
-     "reconfirm_method": "span re-extracted from live source at cited lines; source_file_sha256 vs record source_sha256 checked by verifier"
+     "reconfirm_method": "span re-extracted (bounds-checked) from exact live source; audit_id/finding_text membership + crosswalk + record hashes verified by verify_supplement.py"
     },
     {
      "member_input_ids": [
       "B8"
      ],
-     "finding_text": "WK_NEW_EQUAL_DFREQ_IRREGULAR_WAVE initializes only theta(1) and AG(1) when mtheta==1 (L2860-L2862), although both arrays have length mfreq (L2832-L2834). It later evaluates dot_product over all AG entries (L2914), reads AG(kf) for every component (L2917-L2919), and reads theta(kf) in the component loop (L2940, L3015-L3019), so entries 2:mfreq are used before assignment.",
-     "src_run_id": "reread20260728-code-FUNWAVE-004a-codexaudit-20260826T235047Z-4f05567c",
-     "src_record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-004a-codexaudit-20260826T235047Z-4f05567c/1b6095f36bdcbd8d1527161eaa7e4d11c1e593b787d87dec07e5713aca106d9c.json",
-     "src_record_sha256_bytes": "64678b12ec2f1f3b5de51439a1497c5f1e7a5d4c988ea820b5d4502d7b6891fd",
+     "finding_texts": {
+      "B8": "WK_NEW_EQUAL_DFREQ_IRREGULAR_WAVE initializes only theta(1) and AG(1) when mtheta==1 (L2860-L2862), although both arrays have length mfreq (L2832-L2834). It later evaluates dot_product over all AG entries (L2914), reads AG(kf) for every component (L2917-L2919), and reads theta(kf) in the component loop (L2940, L3015-L3019), so entries 2:mfreq are used before assignment."
+     },
+     "audit_record": {
+      "run_id": "reread20260728-code-FUNWAVE-004a-codexaudit-20260826T235047Z-4f05567c",
+      "record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-004a-codexaudit-20260826T235047Z-4f05567c/1b6095f36bdcbd8d1527161eaa7e4d11c1e593b787d87dec07e5713aca106d9c.json",
+      "record_sha256_bytes": "64678b12ec2f1f3b5de51439a1497c5f1e7a5d4c988ea820b5d4502d7b6891fd",
+      "record_source_sha256": "d8bd500cf549729dc61aeb503070a6af05fa21ca8c5198fbec82374385468459"
+     },
+     "evidence_sources": [
+      {
+       "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/wavemaker.F",
+       "sha256": "d8bd500cf549729dc61aeb503070a6af05fa21ca8c5198fbec82374385468459"
+      }
+     ],
      "source_span": {
       "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/wavemaker.F",
       "lines": "2860-2862,2896"
      },
-     "source_file_sha256": "d8bd500cf549729dc61aeb503070a6af05fa21ca8c5198fbec82374385468459",
      "authoritative_quote": "    IF(mtheta==1) THEN ! 1D case\n        theta(1) = theta_input*pi/180.0_SP\n        AG(1) = 1.0_SP\n…\n    DO kf=1,mfreq",
      "source_span_hash": "647471a8f1539c81a708fd5d4a4d9eb9c189e5aae1cc4d48151c23790081e0ac",
      "decision": "confirmed_delta",
@@ -736,21 +1021,31 @@
      "decided_at": "2026-08-27",
      "rationale": "WK_NEW_EQUAL_DFREQ_IRREGULAR_WAVE mtheta==1 분기가 theta(1)/AG(1)만 초기화(L2861-2862), DO kf=1,mfreq(L2896) 가 AG(kf) 소비. mfreq>1 서 UBA. base 미검출.",
      "reconfirmed_at": "2026-08-27",
-     "reconfirm_method": "span re-extracted from live source at cited lines; source_file_sha256 vs record source_sha256 checked by verifier"
+     "reconfirm_method": "span re-extracted (bounds-checked) from exact live source; audit_id/finding_text membership + crosswalk + record hashes verified by verify_supplement.py"
     },
     {
      "member_input_ids": [
       "B10"
      ],
-     "finding_text": "phi1 in WK_NEW_EQUAL_DFREQ_IRREGULAR_WAVE is INTENT(OUT) (L2836) but random phases are assigned only inside IF(PERIODIC) at L2941-L3014. The nonperiodic return leaves phi1 undefined, yet WAVEMAKER_INITIALIZATION immediately passes it to CALCULATE_NEW_Cm_Sm (L590-L599), whose trigonometric fields read phi1 at L3105-L3117 and L3128-L3162.",
-     "src_run_id": "reread20260728-code-FUNWAVE-004a-codexaudit-20260826T235047Z-4f05567c",
-     "src_record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-004a-codexaudit-20260826T235047Z-4f05567c/1b6095f36bdcbd8d1527161eaa7e4d11c1e593b787d87dec07e5713aca106d9c.json",
-     "src_record_sha256_bytes": "64678b12ec2f1f3b5de51439a1497c5f1e7a5d4c988ea820b5d4502d7b6891fd",
+     "finding_texts": {
+      "B10": "phi1 in WK_NEW_EQUAL_DFREQ_IRREGULAR_WAVE is INTENT(OUT) (L2836) but random phases are assigned only inside IF(PERIODIC) at L2941-L3014. The nonperiodic return leaves phi1 undefined, yet WAVEMAKER_INITIALIZATION immediately passes it to CALCULATE_NEW_Cm_Sm (L590-L599), whose trigonometric fields read phi1 at L3105-L3117 and L3128-L3162."
+     },
+     "audit_record": {
+      "run_id": "reread20260728-code-FUNWAVE-004a-codexaudit-20260826T235047Z-4f05567c",
+      "record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-004a-codexaudit-20260826T235047Z-4f05567c/1b6095f36bdcbd8d1527161eaa7e4d11c1e593b787d87dec07e5713aca106d9c.json",
+      "record_sha256_bytes": "64678b12ec2f1f3b5de51439a1497c5f1e7a5d4c988ea820b5d4502d7b6891fd",
+      "record_source_sha256": "d8bd500cf549729dc61aeb503070a6af05fa21ca8c5198fbec82374385468459"
+     },
+     "evidence_sources": [
+      {
+       "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/wavemaker.F",
+       "sha256": "d8bd500cf549729dc61aeb503070a6af05fa21ca8c5198fbec82374385468459"
+      }
+     ],
      "source_span": {
       "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/wavemaker.F",
       "lines": "2836,2992"
      },
-     "source_file_sha256": "d8bd500cf549729dc61aeb503070a6af05fa21ca8c5198fbec82374385468459",
      "authoritative_quote": "    REAL(SP),DIMENSION(mfreq,1),INTENT(OUT) :: D_gen,phi1,rlamda\n…\n            phi1(kf,1)=rand()*2.0_SP*pi",
      "source_span_hash": "b9400d0c325a4a99e3fe9f50df1dac4cae499273b742ff9a7236ac5681058e52",
      "decision": "confirmed_delta",
@@ -758,7 +1053,7 @@
      "decided_at": "2026-08-27",
      "rationale": "phi1 DIMENSION(mfreq,1),INTENT(OUT)(L2836) 이나 IF(PERIODIC) 내부서만 대입(L2992). 비주기 경로 phi1 미정의 소비. UBA. base 미검출.",
      "reconfirmed_at": "2026-08-27",
-     "reconfirm_method": "span re-extracted from live source at cited lines; source_file_sha256 vs record source_sha256 checked by verifier"
+     "reconfirm_method": "span re-extracted (bounds-checked) from exact live source; audit_id/finding_text membership + crosswalk + record hashes verified by verify_supplement.py"
     }
    ]
   },
@@ -775,22 +1070,37 @@
     "run_id": "reread20260728-note-FUNWAVE-000-fable5-20260813T005226Z-b33d4276",
     "record_file": "f919bfc7339adc691269ac42953b45433042e4c085826496ec7ac93f8b43882b.json",
     "record_path": "total-read/pending/reread-20260728/reread20260728-note-FUNWAVE-000-fable5-20260813T005226Z-b33d4276/f919bfc7339adc691269ac42953b45433042e4c085826496ec7ac93f8b43882b.json",
-    "record_sha256_bytes": "14c0fdbf0f23c756040c35f294861118b9a2efffb40cf58ac6c03bee410b3973"
+    "record_sha256_bytes": "14c0fdbf0f23c756040c35f294861118b9a2efffb40cf58ac6c03bee410b3973",
+    "record_source_sha256": "0822880acf6e4934b5760bf76259a224e00e46f557a6fca2c23351cdad8433d0"
+   },
+   "crosswalk": {
+    "path": "total-read/records-crosswalk/reread-20260728/FUNWAVE-note-000/FUNWAVE__manual-notes__funwave-user-manual-full.md.crosswalk.json",
+    "sha256_bytes": "52938046249aa78f09f1734916a047a1c1ba45d9c19f9e8208cce7d74c0840a7"
    },
    "supplements": [
     {
      "member_input_ids": [
       "B5"
      ],
-     "finding_text": "station output 설명은 `STATION FILE` 단수 이름을 사용한다 (line 223). 예제는 `STATIONS FILE = gauge.txt` 복수 이름을 쓴다 (line 250). 실제 파서 키가 어느 쪽인지 인터페이스가 불일치한다.",
-     "src_run_id": "reread20260728-note-FUNWAVE-000-codexaudit-20260826T020658Z-97dd3be1",
-     "src_record_path": "total-read/pending/reread-20260728/reread20260728-note-FUNWAVE-000-codexaudit-20260826T020658Z-97dd3be1/f919bfc7339adc691269ac42953b45433042e4c085826496ec7ac93f8b43882b.json",
-     "src_record_sha256_bytes": "598b766cdc1ce255ddfbcf26f74cb23eb247ecea056b3a184b93e19cb7a77598",
+     "finding_texts": {
+      "B5": "station output 설명은 `STATION FILE` 단수 이름을 사용한다 (line 223). 예제는 `STATIONS FILE = gauge.txt` 복수 이름을 쓴다 (line 250). 실제 파서 키가 어느 쪽인지 인터페이스가 불일치한다."
+     },
+     "audit_record": {
+      "run_id": "reread20260728-note-FUNWAVE-000-codexaudit-20260826T020658Z-97dd3be1",
+      "record_path": "total-read/pending/reread-20260728/reread20260728-note-FUNWAVE-000-codexaudit-20260826T020658Z-97dd3be1/f919bfc7339adc691269ac42953b45433042e4c085826496ec7ac93f8b43882b.json",
+      "record_sha256_bytes": "598b766cdc1ce255ddfbcf26f74cb23eb247ecea056b3a184b93e19cb7a77598",
+      "record_source_sha256": "0822880acf6e4934b5760bf76259a224e00e46f557a6fca2c23351cdad8433d0"
+     },
+     "evidence_sources": [
+      {
+       "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/io.F",
+       "sha256": "bc14cdfea0718b890ac41b4c5b3440311da15e460526f46b10d69f12deb43730"
+      }
+     ],
      "source_span": {
       "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/src/io.F",
       "lines": "3361"
      },
-     "source_file_sha256": "bc14cdfea0718b890ac41b4c5b3440311da15e460526f46b10d69f12deb43730",
      "authoritative_quote": "      CALL READ_STRING(STATIONS_FILE,FILE_NAME,'STATIONS_FILE',ierr)",
      "source_span_hash": "6b376adf2d5aafed87f58d9366e1a28b8e2452bad121ff5727c5063f40171629",
      "decision": "confirmed_delta",
@@ -798,7 +1108,7 @@
      "decided_at": "2026-08-27",
      "rationale": "span-verified 2026-08-27 against parser: io.F:3361 READ_STRING(...,'STATIONS_FILE',...) — real key is plural STATIONS_FILE. manual prose L223 singular 'STATION FILE' is wrong (example L250 plural is correct). doc-vs-code delta, base missed.",
      "reconfirmed_at": "2026-08-27",
-     "reconfirm_method": "span re-extracted from live source at cited lines; source_file_sha256 vs record source_sha256 checked by verifier"
+     "reconfirm_method": "span re-extracted (bounds-checked) from exact live source; audit_id/finding_text membership + crosswalk + record hashes verified by verify_supplement.py"
     }
    ]
   }
