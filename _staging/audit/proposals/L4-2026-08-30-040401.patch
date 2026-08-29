@@ -1,0 +1,88 @@
+diff --git a/models/SWAN/source-analysis/swan-diffraction-obstacles.md b/models/SWAN/source-analysis/swan-diffraction-obstacles.md
+--- a/models/SWAN/source-analysis/swan-diffraction-obstacles.md
++++ b/models/SWAN/source-analysis/swan-diffraction-obstacles.md
+@@ -58,7 +58,7 @@
+ 
+ Smoothing avoids crossing land/obstacles by checking `CROSS` and depth before applying neighbor contributions (`:5710-5717`).
+ 
+-Typical settings: `SMPAR=0.2, SMNUM=5` for harbor cases; defaults `0,0` effectively disable smoothing.
++Manual guidance: `SMPAR=0.2` recommended, with `SMNUM ≈ ⌊4ε_x²/(3Δx²)⌋` chosen from filter width ε_x and grid size (swanuse DIFFRAC, online_doc node28); defaults `0,0` effectively disable smoothing.
+ 
+ ## C. OBSTACLE: TRANS vs REFL
+ 
+@@ -153,7 +153,7 @@
+ - Obstacle polylines: 2 points (line segment) is the simplest; many points trace curved structures.
+ - Avoid structures that exactly diagonal-cross grid cells — structured SWAN can only cross orthogonal links.
+ - For unstructured grids near coasts with structures, ensure mesh resolution ≥ structure scale × 4.
+-- `RDIFF POWN=2` to `8` typical for natural shorelines (sand: 4; rocky: 8); `RSPEC` for engineered concrete.
++- `RDIFF [pown]` for diffuse reflection off natural shorelines, `RSPEC` for engineered structures (source-needed: material-specific `POWN` values not established in manual or source).
+ - Output `BLOCK ... DIFPARAM` to verify diffraction is active and not pathological.
+ 
+ ## Common Pitfalls
+diff --git a/models/SWAN/source-analysis/swan-foundation.md b/models/SWAN/source-analysis/swan-foundation.md
+--- a/models/SWAN/source-analysis/swan-foundation.md
++++ b/models/SWAN/source-analysis/swan-foundation.md
+@@ -62,7 +62,7 @@
+ - Quadrant 3: cx < 0 and cy < 0
+ - Quadrant 4: cx > 0 and cy < 0
+ 
+-For each sweep, propagation is implicit upwind. Default scheme is **BSBT** (Backward Space, Backward Time) — first-order upwind, robust, dissipative. Alternative schemes:
++For each sweep, propagation is implicit upwind. Default scheme is **SORDUP** for stationary and **S&L** (Stelling–Leendertse) for nonstationary runs (swanuse `PROP`, online_doc node29); **BSBT** (Backward Space, Backward Time) — first-order upwind, robust, dissipative — is selectable via `PROP BSBT`. Alternative schemes:
+ - `SORDUP` — second-order upwind for stationary
+ - `SecondOrder` — for nonstationary higher accuracy
+ - See `[file=pdf:swan:swantech section="Chapter 3.2.2 Note on the choice of scheme" page=83]`
+@@ -169,7 +169,7 @@
+ 1. **Define the spectral grid before everything.** Frequency range (typically 0.04–1.0 Hz) and direction sectors (24 or 36 sectors) drive every later cost. Doubling sectors doubles run time.
+ 2. **Boundary condition is the dominant uncertainty.** A stationary run with parametric JONSWAP and wrong `Hs/Tp` produces precisely-wrong wave heights inland. Validate boundary against buoy or coarse-grid spectrum first.
+ 3. **Triads are off by default.** In surf-zone shoaling work, you must explicitly turn `TRIad` on or you'll under-predict secondary peaks.
+-4. **For nesting, NEVER mix domains with different spectral grids.** SWAN requires the same `SET FREQ`/`SET DIR` between coarse and fine.
++4. **For nesting, prefer identical spectral grids (`CGRID` frequency/direction arguments) in coarse and fine.** SWAN does not require it — boundary spectra are remapped by `CHGBAS` without a hard check (see [[swan-nesting-io-implementation]] §E) — but remapping loses accuracy.
+ 5. **Stationary-mode iteration limit (`SET MAXIT`) matters for convergence on stiff source terms.** Increase if Hs residuals don't drop.
+ 
+ ## 9. Common Pitfalls
+diff --git a/models/SWAN/source-analysis/swan-grid-readers.md b/models/SWAN/source-analysis/swan-grid-readers.md
+--- a/models/SWAN/source-analysis/swan-grid-readers.md
++++ b/models/SWAN/source-analysis/swan-grid-readers.md
+@@ -3,6 +3,7 @@
+ topic: swan
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "raw `models/SWAN/raw/source_code/swan/src/SwanRead{ADCGrid,EasymeshGrid,TriangleGrid,Grid}.ftn90` 직접 read (header line 1-65 + Purpose). 모두 40.80 (2007-07/12) Zijlema 신설. Tech §8.2 Notes on grid generation + User cmd READGRID UNSTRUCTURED (swanuse.pdf p.34) 매핑."
+ note_author: "Claude Opus 4.7 (1M context) raw source direct read"
+ note_date: 2026-06-01
+diff --git a/models/SWAN/source-analysis/swan-gse-correction.md b/models/SWAN/source-analysis/swan-gse-correction.md
+--- a/models/SWAN/source-analysis/swan-gse-correction.md
++++ b/models/SWAN/source-analysis/swan-gse-correction.md
+@@ -3,6 +3,7 @@
+ topic: swan
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "raw `models/SWAN/raw/source_code/swan/src/SwanGSECorr.ftn90` 직접 read (280 lines, line 1-100 subroutine header + argument 변수 정의). Tech §3.8 refraction approximation + §8.6 diffusion-like terms (p.146) + Booij-Holthuijsen 1987 GSE 이론."
+ note_author: "Claude Opus 4.7 (1M context) raw source direct read"
+ note_date: 2026-06-01
+diff --git a/models/SWAN/source-analysis/swan-output-formats.md b/models/SWAN/source-analysis/swan-output-formats.md
+--- a/models/SWAN/source-analysis/swan-output-formats.md
++++ b/models/SWAN/source-analysis/swan-output-formats.md
+@@ -190,7 +190,7 @@
+ - For nesting: parent and child must use **compatible** frequencies and directions (typically same, or child wider range).
+ - Output frequency: BLOCK every 1 hour, TABLE every 15-30 min, SPEC at peak storm time only (very large files).
+ - NetCDF output requires SWAN built with `-DNETCDF` flag — verify with linker output.
+-- For parallel SWAN: `-NNN` files need post-processing to merge — use SWAN's `SWAN-merge` tool or manual concatenation.
++- For parallel SWAN: `-NNN` output files need post-processing to merge (manual concatenation). SWAN ships `hcat` (`src/hcat/swanhcat.ftn:4`) for hotfiles only, not for BLOCK/TABLE output.
+ - `BLKV` (VTK) useful for ParaView visualization.
+ 
+ ## Common Pitfalls
+diff --git a/models/SWAN/source-analysis/swan-output-writers-implementation.md b/models/SWAN/source-analysis/swan-output-writers-implementation.md
+--- a/models/SWAN/source-analysis/swan-output-writers-implementation.md
++++ b/models/SWAN/source-analysis/swan-output-writers-implementation.md
+@@ -190,7 +190,7 @@
+ 
+ - Forgetting to apply `FACTOR` when reading SWAN output — values look 1000× off.
+ - **`TABLE TABD` (no header)** consumed by a script expecting headers — silent column shift.
+-- **`SPECOUT SPEC1D` written with `RTYPE='SPRE'`** vs `'SPRC'` (2D) — different column layout.
++- **`SPECOUT SPEC1D` written with `RTYPE='SPE1'`** (`swanpre2.ftn:1886`) vs `'SPRC'` (2D) — different column layout.
+ - **Multiple time blocks in one file** — append-only, so consumer must split on `'TIME'` markers.
+ 
+ ## References
