@@ -1,0 +1,76 @@
+[
+  {
+    "meta": "core-file-map",
+    "files_audited": [
+      "models/ADCIRC/raw/source_code/adcirc/src/driver.F",
+      "models/ADCIRC/raw/source_code/adcirc/src/adcirc.F",
+      "models/ADCIRC/raw/source_code/adcirc/src/timestep.F",
+      "models/ADCIRC/raw/source_code/adcirc/src/gwce.F",
+      "models/ADCIRC/raw/source_code/adcirc/src/itpackv.F",
+      "models/ADCIRC/raw/source_code/adcirc/src/momentum.F",
+      "models/ADCIRC/raw/source_code/adcirc/src/wetdry.F",
+      "models/ADCIRC/raw/source_code/adcirc/src/boundaries.F",
+      "models/ADCIRC/raw/source_code/adcirc/src/normal_flow_boundary.F90",
+      "models/ADCIRC/raw/source_code/adcirc/src/weir_boundary.F90",
+      "models/ADCIRC/raw/source_code/adcirc/src/messenger.F90",
+      "models/ADCIRC/raw/source_code/adcirc/src/mesh.F"
+    ],
+    "files_skipped_reason": "Skipped tests, third-party libraries, pre/post utilities, output-only code, and initialization paths not needed to validate core-solver candidates."
+  },
+  {
+    "file": "models/ADCIRC/raw/source_code/adcirc/src/itpackv.F",
+    "lines": "470,551-568,581",
+    "quote": "       if (q1 .OR.  ((in .gt.5) .AND. \n     1        (mod(in,5).ne. 0))) then\n\n#ifdef CMPI\n        call ps2dots(n,d,dtwd,del3nrms)\n        delnnm = del3nrms(1)",
+    "severity": "HIGH",
+    "class": "UBA",
+    "reason": "q1 is a saved local with no assignment before this first test, and later JCG solves can also inherit its prior solve's value. The branches perform MPI all-reductions with different counts and supply different solution norms to convergence, while pstop_nrms assigns q1 only after the test."
+  },
+  {
+    "file": "models/ADCIRC/raw/source_code/adcirc/src/momentum.F",
+    "lines": "864-901,1844-1846,2587-2589",
+    "quote": "            NEle=NeiTabEle(NBDI,NNeigh(NBDI)-1)\n            NCEle=NCI*NodeCode(NM2)*NodeCode(NM3)*NOFF(NELE)\n            IF (NEle.NE.0.AND.NCEle.NE.0) THEN",
+    "severity": "HIGH",
+    "class": "OOB",
+    "reason": "For a type-41 boundary node, the wrap triangle is outside the domain and its NeiTabEle entry is zero, while NOFF is allocated with lower bound 1; line 900 therefore reads NOFF(0). The NEle guard occurs only after the dereference, and the same ordering is repeated in all three momentum formulations."
+  },
+  {
+    "file": "models/ADCIRC/raw/source_code/adcirc/src/normal_flow_boundary.F90",
+    "lines": "78-86,98-99",
+    "quote": "         TAUX_R = -1.0d0*NY_R\n         TAUY_R = NX_R\n\n         ! Solve for QX1_R and QY1_R\n         QY_R = Q/(((-1.0d0*TAUY_R)/TAUX_R)*NX_R + NY_R)\n         QX_R = -TAUY_R*QY_R/TAUX_R",
+    "severity": "HIGH",
+    "class": "sign/geometry",
+    "reason": "NY_R is the boundary segment's delta-x divided by length, so an ordinary vertical segment makes NY_R and TAUX_R exactly zero and both component formulas divide by zero. The components are immediately combined into QROT without a guard or cap, so even zero prescribed flow can inject NaN."
+  },
+  {
+    "file": "models/ADCIRC/raw/source_code/adcirc/src/weir_boundary.F90",
+    "lines": "2477,2507-2517,2546-2579",
+    "quote": "      if (abs(RBARWL1 - RBARWL2) < BARMIN) then\n         !...............WATER LEVEL EQUAL ON BOTH SIDES OF PIPE -> CASE 2\n         FLUX = 0.d0\n         return\n      end if\n      if ((RBARWL1 > RBARWL2) .and. (RBARWL1 > BARMIN)) then",
+    "severity": "HIGH",
+    "class": "UBA",
+    "reason": "FLUX is INTENT(OUT), but no branch assigns it when the head difference is at least BARMIN while the higher head is at most BARMIN, for example 0.02 and -0.02 m with BARMIN=0.04 m. The caller's prior zero is invalidated on entry and the undefined result is added directly to QN2."
+  },
+  {
+    "file": "models/ADCIRC/raw/source_code/adcirc/src/gwce.F",
+    "lines": "1325-1334",
+    "quote": "         if (CAliDisp) then\n            Ma2    = G*DPavg/Cs2\n            Cfac   = (1.0D0 - 0.25D0*Ma2 - Ad*DPavg**Bd)**2D0\n            Ma2    = G*DPavg/Cs2\n            CfacS0 = (1.0D0 - 0.25D0*Ma2 - Ad*DPavgS0**Bd)**2D0\n         endif",
+    "severity": "MED",
+    "class": "logic",
+    "reason": "The previous-time coefficient CfacS0 recomputes Ma2 from current DPavg instead of DPavgS0, mixing time levels inside one dispersion factor. CfacS0 is then used directly in the previous-time gravity contribution, with no overwrite or limiter that removes the mismatch."
+  },
+  {
+    "file": "models/ADCIRC/raw/source_code/adcirc/src/wetdry.F",
+    "lines": "172,841-845",
+    "quote": "C tcm v50.66.01 -- This is an additional test for wetting only when time varying \nC                  bathymetry is used and is only performed during the period of \nC                  bathymetry evolution.\nC\n         IF ((NDDT.NE.0).AND.(IT.LE.BTIME_END+1) ) THEN",
+    "severity": "MED",
+    "class": "logic",
+    "reason": "IT is a timestep number, whereas BTIME_END is the bathymetry-change end time in seconds, so the extra wetting pass runs for the wrong physical interval whenever DT is not one second. No physical-time value is passed into this routine or substituted before the comparison."
+  },
+  {
+    "file": "models/ADCIRC/raw/source_code/adcirc/src/wetdry.F",
+    "lines": "867-869,921-926;932-934,986-991;997-999,1051-1056",
+    "quote": "!Casey 220207 from Rosemary : In ALL wetting criteria\n                              IF((CBAROCLINIC).and.(IDEN.EQ.4))THEN\n                                 DO k = 1,NFEN\n                                    SAL(NM3,k) =0.5D0*(SAL(NM1,k)+SAL(NM2,k))\n                                    TEMP(NM3,k)=0.5D0*(TEMP(NM1,k)+TEMP(NM2,k))\n                                 ENDDO",
+    "severity": "MED",
+    "class": "logic",
+    "reason": "In the shown enclosing branch NM1 is the newly wetted node, but salinity and temperature are written to NM3; the next two branches similarly wet NM2/NM3 while writing NM1/NM2. The newly active node therefore retains stale tracer state and an already-wet neighbor is overwritten, with no later tracer initialization in this wetting pass."
+  }
+]
