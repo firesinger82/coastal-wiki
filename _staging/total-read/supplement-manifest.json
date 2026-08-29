@@ -6,7 +6,7 @@
  "generated_at": "2026-08-27",
  "note": "selected_record=base(Claude 1차, unchanged). supplements=span-reconfirmed audit confirmed_delta, bound to crosswalk+audit-record+evidence-source hashes. Canonical validity requires verify_supplement.py PASS AND an approved human decision receipt (supplement-decisions.json). Supplements are neither necessary nor sufficient for the completion gate.",
  "entry_count": 22,
- "supplement_count": 37,
+ "supplement_count": 38,
  "entries": [
   {
    "canonical_key": {
@@ -530,9 +530,41 @@
    },
    "crosswalk": {
     "path": "total-read/records-crosswalk/reread-20260728/FUNWAVE-001/FUNWAVE__raw__source_code__FUNWAVE-TVD__funwave-work__build__pre__mod_global.f90.crosswalk.json",
-    "sha256_bytes": "d08982557772be5bd51118f000283933fe3d7775122741cb5bf00c3a1c247d95"
+    "sha256_bytes": "68171171483f1de6ab255fea1b96bee3a1326c96b55efe91149106f287b45ab9"
    },
    "supplements": [
+    {
+     "member_input_ids": [
+      "B0"
+     ],
+     "finding_texts": {
+      "B0": "The module sets MPI Cartesian reorder=.true. at L78, while misc.f90 passes the MPI_COMM_WORLD rank myid to MPI_CART_COORDS and builds ProcessorID/world-rank mappings without obtaining the reordered comm2d rank. This confirms a cross-file communicator/rank-interface mismatch: any actual reorder can assign wrong coordinates, tile ranges, neighbors and point-to-point destinations."
+     },
+     "audit_record": {
+      "run_id": "reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e",
+      "record_path": "total-read/pending/reread-20260728/reread20260728-code-FUNWAVE-001-codexaudit-20260826T022957Z-e3a3d09e/344313459101463a708ad08e91b4fcb4e2dce71df50f1cc3d3ba3318ab4bdf8f.json",
+      "record_sha256_bytes": "9f33f4afbf49c7a5d809cf13c24a4e375c4aaea1b02560f6162f0e1d8642b33c",
+      "record_source_sha256": "0a908b3886026e7e379aebe7880df391a6bf0a0585f2bb54f054d21fe429504a"
+     },
+     "evidence_sources": [
+      {
+       "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/misc.f90",
+       "sha256": "276c11fe037412d7456fcc97cb846db0996fa13e96a1f1b4d7d3c8cfb640d1a0"
+      }
+     ],
+     "source_span": {
+      "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/misc.f90",
+      "lines": "103-111,116"
+     },
+     "authoritative_quote": "    call MPI_CART_CREATE( MPI_COMM_WORLD, ndims, dims, &\n         periods, reorder, comm2d, ier )\n    call MPI_CART_COORDS( comm2d, myid, 2, coords, ier)\n\n    npx = coords(1)\n    npy = coords(2)\n\n    call MPI_Cart_shift( comm2d, 0, 1, n_west, n_east, ier )\n    call MPI_Cart_shift( comm2d, 1, 1, n_suth, n_nrth, ier )\n…\n      ProcessorID(I,J) = icp",
+     "source_span_hash": "9b5a50a389db46fb070f9d9cbafd331adb3fa9470f280b4710f9cb83eb6a6d64",
+     "decision": "confirmed_delta",
+     "decided_by": "llm:openai/codex (deep-dive 2026-08-28) + caller span-confirm",
+     "decided_at": "2026-08-27",
+     "rationale": "span-verified 2026-08-28 by Codex deep-dive: reorder=.true.(mod_global.f90 L78) 이나 myid 는 world rank 유지(comm2d rank refresh 없음); MPI_CART_COORDS(comm2d,myid)+ProcessorID 는 world-rank 배정, halo 이웃은 MPI_Cart_shift(comm2d) comm2d 토폴로지 → reorder 발생 시 subdomain·halo 매핑 어긋나 분해 손상. latent 이식성 결함(MPICH/OpenMPI 통상 reorder 안함으로 '동작').",
+     "reconfirmed_at": "2026-08-27",
+     "reconfirm_method": "span re-extracted (bounds-checked) from exact live source; audit_id/finding_text membership + crosswalk + record hashes verified by verify_supplement.py"
+    },
     {
      "member_input_ids": [
       "B1"

@@ -33,3 +33,10 @@
 
 ### UNCERTAIN 1
 - 001·mod_global.f90·B0 — The code incorrectly treats the MPI_COMM_WORLD rank as the comm2d rank and separately builds world-rank mappings. Material failure depends on whether the deployed MPI implementatio (MPI 구현 의존 — 별도 판단)
+
+## 후속 심층조사 (2026-08-28) — UNCERTAIN 1건 결판
+- **001·mod_global.f90·B0 → CONFIRM** (task bhfez2w8k): reorder=.true.(mod_global.f90 L78) 이나 myid 는
+  world rank 유지(comm2d rank refresh 부재, 전 build/pre 확인). misc.f90 L105 MPI_CART_COORDS(comm2d,myid)+
+  ProcessorID(L116) 는 world-rank 배정, halo 이웃(MPI_Cart_shift comm2d, L110-111)은 comm2d 토폴로지 →
+  reorder 발생 시 subdomain·halo 매핑 어긋나 도메인 분해 손상. latent 이식성 결함(evidence misc.f90 L103-116).
+- 재감사 총계: CONFIRM 15 · REFUTE 8 (23 잔여후보 전건 결판, UNCERTAIN 0).

@@ -100,7 +100,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B0"
@@ -110,9 +110,14 @@
     "The module sets MPI Cartesian reorder=.true. at L78, while misc.f90 passes the MPI_COMM_WORLD rank myid to MPI_CART_COORDS and builds ProcessorID/world-rank mappings without obtaining the reordered comm2d rank. This confirms a cross-file communicator/rank-interface mismatch: any actual reorder can assign wrong coordinates, tile ranges, neighbors and point-to-point destinations."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-verified 2026-08-28 by Codex deep-dive: reorder=.true.(mod_global.f90 L78) 이나 myid 는 world rank 유지(comm2d rank refresh 없음); MPI_CART_COORDS(comm2d,myid)+ProcessorID 는 world-rank 배정, halo 이웃은 MPI_Cart_shift(comm2d) comm2d 토폴로지 → reorder 발생 시 subdomain·halo 매핑 어긋나 분해 손상. latent 이식성 결함(MPICH/OpenMPI 통상 reorder 안함으로 '동작').",
+   "decided_by": "llm:openai/codex (deep-dive 2026-08-28) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "evidence_span": {
+    "path": "FUNWAVE/raw/source_code/FUNWAVE-TVD/funwave-work/build/pre/misc.f90",
+    "lines": "103-111,116",
+    "quote": "    call MPI_CART_CREATE( MPI_COMM_WORLD, ndims, dims, &\n         periods, reorder, comm2d, ier )\n    call MPI_CART_COORDS( comm2d, myid, 2, coords, ier)\n\n    npx = coords(1)\n    npy = coords(2)\n\n    call MPI_Cart_shift( comm2d, 0, 1, n_west, n_east, ier )\n    call MPI_Cart_shift( comm2d, 1, 1, n_suth, n_nrth, ier )\n…\n      ProcessorID(I,J) = icp"
+   }
   },
   {
    "disposition": "confirmed_delta",
