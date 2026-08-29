@@ -1,0 +1,34 @@
+[
+  {
+    "id": "H0",
+    "file": "models/ADCIRC/raw/source_code/adcirc/src/itpackv.F",
+    "verdict": "CONFIRM",
+    "decisive_lines": "itpackv.F:357-368,470,525,551-581,857; messenger.F90:1159-1182,1204-1226",
+    "quote": "       if (q1 .OR.  ((in .gt.5) .AND. \n     1        (mod(in,5).ne. 0))) then\n\n#ifdef CMPI\n        call ps2dots(n,d,dtwd,del3nrms)",
+    "reason": "I found no dummy, DATA, or source initializer: the bare SAVE covers local q1, and JCG sets in=0 before its first itjcg call, where line 551 reads q1 before pstop_nrms assigns it. The branch selects ps2dots versus ps3dots, whose MPI_ALLREDUCE counts are 2 and 3, and also substitutes unorm=1 on the former path, so the indeterminate or prior-solve value has a real effect."
+  },
+  {
+    "id": "H1",
+    "file": "models/ADCIRC/raw/source_code/adcirc/src/momentum.F",
+    "verdict": "CONFIRM",
+    "decisive_lines": "momentum.F:864-901; global.F:409,879; mesh.F:2537-2540,3060-3065,3112-3118,3248-3285",
+    "quote": "            NM3=NM2          !wrap back to beginning to get final contribution\n            NM2=NNFirst\n            NEle=NeiTabEle(NBDI,NNeigh(NBDI)-1)\n            NCEle=NCI*NodeCode(NM2)*NodeCode(NM3)*NOFF(NELE)\n            IF (NEle.NE.0.AND.NCEle.NE.0) THEN",
+    "reason": "I traced type 41 into ME2GW and NEIGHB's construction: boundary elements are compacted into the leading slots, leaving the wrap slot NNeigh-1 zero, while NOFF is allocated as NOFF(MNE) with lower bound 1. Line 900 therefore evaluates NOFF(0) in a separate assignment before the NEle/=0 guard at line 901 can act."
+  },
+  {
+    "id": "H2",
+    "file": "models/ADCIRC/raw/source_code/adcirc/src/normal_flow_boundary.F90",
+    "verdict": "CONFIRM",
+    "decisive_lines": "normal_flow_boundary.F90:75-102; mesh.F:2423-2433; read_input.F:1095-1125; timestep.F:861-897",
+    "quote": "         TAUX_R = -1.0d0*NY_R\n         TAUY_R = NX_R\n\n         ! Solve for QX1_R and QY1_R\n         QY_R = Q/(((-1.0d0*TAUY_R)/TAUX_R)*NX_R + NY_R)\n         QX_R = -TAUY_R*QY_R/TAUX_R",
+    "reason": "I traced NY_R to SIII_OLD=(XGK_OLD-XGJ_OLD)/XL_OLD at mesh.F:2433; a constant-x boundary chord makes TAUX_R exactly zero, with no epsilon guard or alternate branch before both divisions. Negative rotated-coordinate ICS inputs are normalized to accepted case 20:24, and specified-flow call sites invoke the function, so an axis-aligned mesh segment reaches the singular formula."
+  },
+  {
+    "id": "H3",
+    "file": "models/ADCIRC/raw/source_code/adcirc/src/weir_boundary.F90",
+    "verdict": "CONFIRM",
+    "decisive_lines": "weir_boundary.F90:51,2477,2504-2517,2546-2579; timestep.F:1051-1057",
+    "quote": "         end if\n         return\n      end if\n\n   end subroutine COMPUTE_CROSS_BARRIER_PIPE_FLUX",
+    "reason": "I checked every branch and the caller: there is no top or trailing default assignment, and caller-side PIPE_FLUX=0 becomes undefined on entry to an INTENT(OUT) dummy. Since RBARWL=ETA2-PIPEHT, values such as 0.03 and -0.02 bypass the both-below, near-equal, and higher-above-BARMIN tests and reach line 2579 without defining FLUX."
+  }
+]

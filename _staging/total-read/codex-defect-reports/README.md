@@ -21,3 +21,11 @@ ADCIRC(base/감사 없음, ~305k줄) 코어 12파일 first-pass. `B-adcirc-delta
   - MED wetdry.F L867-1056 — 신규 wet 노드(NM1)에 salinity/temp 를 NM3 에 기록(노드 오지정)
 - ★base/감사 없어 supplement 게이트 진입 불가. 정식화하려면 별도 감사 채널 필요.
 - ROMS(2.8M)·Delft3D(1.6M)·ADCIRC 잔여는 후속(메가프로젝트).
+
+## B 적대검증 (2026-08-29, task-mtedvg99)
+ADCIRC HIGH 4건을 독립 skeptic 이 REFUTE 시도 → **전건 CONFIRM**(교차파일 추적, `B-adcirc-verify.json`):
+- H0 itpackv.F: bare SAVE q1, DATA/init 없음, in=0 후 첫 itjcg 가 pstop_nrms 대입 전 q1 read(L551) — messenger MP 카운트 상이 확인.
+- H1 momentum.F: type-41 wrap slot(NNeigh-1)=0, NOFF(MNE) 하한 1 → NOFF(0) OOB(L900, mesh/global 추적).
+- H2 normal_flow_boundary.F90: NY_R←SIII_OLD=(XGK-XGJ)/XL(mesh L2433), 상수-x chord 시 TAUX_R=0, epsilon 가드 없음.
+- H3 weir_boundary.F90: 전 분기+호출부 무-default, PIPE_FLUX INTENT(OUT) 진입 시 미정의, RBARWL=ETA2-PIPEHT 특정값 전분기 우회.
+→ ADCIRC HIGH 4 = supplement 수준(원문 span + 적대검증) 신뢰도. 단 base/감사 부재로 게이트엔 미진입(별도 채널 필요).
