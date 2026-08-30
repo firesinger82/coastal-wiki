@@ -1,0 +1,356 @@
+{
+ "date": "2026-08-31",
+ "audit_run_id": "L4-2026-08-31-n8-swan-source-analysis-2",
+ "value_sampling_note": "모집단 = 8파일의 sourced 수치·계수·라인 단언 중 로컬 raw(models/SWAN/raw/source_code/swan/src, 41.51, 전 파일 mtime 2026-05-03 불변)로 접근 가능한 것 전부 — source_unavailable 0. 전 파일 ledger 미검사(new)라 미검사-우선 규칙으로 대표 수치 3건 표본: #1 crosswalk PNUMS(23-25) / #2 propagation PHILIM 0.0081 공식 / #3 st6 BNT=(0.035)² — 3/3 일치. 부수 확인(한도 외): schemes PROPSS/PROPSN·DIFFRACTION, stationary MXITST/MXITNS·SORDUP fatal, QCM 12 서브루틴 라인 전건, coverage 라인수 4건, propagation 솔버 dispatch — 일치. 별도로 Audit/Adversary 단계에서 mismatch 4건 확정: coverage '58 files'(실측 76), crosswalk §2 표 Purpose 요지 3행(ACTION/SOLMAT/SOLMT1). seed=audit_run_id(결정론 추출 불요 — 모집단 전원 미검사).",
+ "findings": [
+  {
+   "path": "models/SWAN/source-analysis/swan-parallel-implementation.md",
+   "blob_sha": "563b89b8cb0fe119fb4fef451ffe6e53a8a912a6",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 46,
+   "opinion": 12,
+   "has_source_needed": false,
+   "unsourced": [
+    {
+     "line": 176,
+     "text": "So SWAN ships with a **built-in merge stage** — unlike ADCIRC which uses fort.80 + adcprep+adcpost, SWAN handles per-PE → global file consolidation internally.",
+     "reason": "크로스모델 사실 단언(ADCIRC fort.80·adcprep·adcpost)에 출처 0 — SWAN 측 절반만 §G 인용 커버",
+     "adversary": "refute 시도: (a) §G 인용이 커버? — swanparll 라인은 SWAN 측만. (b) 위키에 [[adcirc-parallel-implementation]] 존재하나 본문 미링크 — 파일 내 인용 부재. refute 실패 → confirmed"
+    },
+    {
+     "line": 187,
+     "text": "| Coupled with ADCIRC | controlled by ADCIRC's MPI | SWAN inherits MPI comm |",
+     "reason": "ADCIRC 결합 시 MPI comm 상속 메커니즘 단언 무인용",
+     "adversary": "refute 시도: Decision Guide 인접 행은 사용 레시피(opinion)이나 본 행은 메커니즘 단언. 자매 노트 swan-adcirc-coupling-implementation 존재하나 미링크. refute 실패 → confirmed"
+    }
+   ],
+   "value_checks": [],
+   "value_mismatches": 0,
+   "source_unavailable": 0,
+   "proposals": [
+    {
+     "old_string": "So SWAN ships with a **built-in merge stage** — unlike ADCIRC which uses fort.80 + adcprep+adcpost, SWAN handles per-PE → global file consolidation internally.",
+     "new_string": "So SWAN ships with a **built-in merge stage** — unlike ADCIRC which uses fort.80 + adcprep+adcpost ([[adcirc-parallel-implementation]]), SWAN handles per-PE → global file consolidation internally.",
+     "rationale": "ADCIRC 측 단언을 기존 verified ADCIRC 노트 wikilink 로 소싱 (canonical 근거 연결)"
+    }
+   ]
+  },
+  {
+   "path": "models/SWAN/source-analysis/swan-propagation-implementation.md",
+   "blob_sha": "7423adbac6c371b69e87e59780d0900cec5b8969",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 55,
+   "opinion": 14,
+   "has_source_needed": false,
+   "unsourced": [
+    {
+     "line": 200,
+     "text": "`PNUMS(4)` is set by `NUMERICAL ACCUR` command (default 99% — i.e., 99% of wet points must have converged).",
+     "reason": "기본값 단언 무인용 + 코드와 불일치: swanmain.ftn:1227 `PNUMS(4) = 99.50` (99% 아님)",
+     "adversary": "refute 시도: (a) 인접 :2352-2355 인용? — 정지 조건만, 기본값 아님. (b) refs 의 node29 포괄 인용? — 섹션 인용 아닌 파일말미 목록이고 값도 실제 99.50 과 다름. refute 실패 → confirmed (사실상 오전사이기도)"
+    }
+   ],
+   "value_checks": [
+    {
+     "claim_id": "4b9025f6163a",
+     "claim": "L140-142: PHILIM 클램프 공식 DAC2MX=ABS((PNUMS(20)*0.0081)/(2·σ·k³·cg)) @ swancom1:7978-7979",
+     "source_ref": "raw swancom1.ftn:7977-7979",
+     "mismatch": false,
+     "note": "✓ 표본 #2 — 식·계수 0.0081·라인 모두 일치 (연속행 분할까지 동일)"
+    },
+    {
+     "claim_id": "589e6998984e",
+     "claim": "L89-91: 솔버 dispatch 표 SWSIP :3693-3700 / SOLMT1 :3709-3716 / SOLMAT :3722-3731",
+     "source_ref": "raw swancom1.ftn:3690-3732",
+     "mismatch": false,
+     "note": "✓ 부수 확인(한도 외) — 세 호출 위치·no-current→SOLMAT(Thomas) 일치. 표의 조건 문구(SOLMAT 'explicit sigma')는 코드 주석('No current. Only implicit scheme in directional space')보다 느슨하나 오류 아님"
+    }
+   ],
+   "value_mismatches": 0,
+   "source_unavailable": 0,
+   "proposals": [
+    {
+     "old_string": "`PNUMS(4)` is set by `NUMERICAL ACCUR` command (default 99% — i.e., 99% of wet points must have converged).",
+     "new_string": "`PNUMS(4)` is set by `NUMERICAL ACCUR` command (default `PNUMS(4) = 99.50` at `[file=src/swanmain.ftn line=1227]` — i.e., 99.5% of wet points must have converged).",
+     "rationale": "무인용 기본값을 코드 실측치로 정정(99%→99.50)하고 file:line 소싱"
+    }
+   ]
+  },
+  {
+   "path": "models/SWAN/source-analysis/swan-quasi-coherent.md",
+   "blob_sha": "07e28ed1fde2001d0428edbf5aa16b586e4e2cb9",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 34,
+   "opinion": 5,
+   "has_source_needed": true,
+   "unsourced": [],
+   "value_checks": [
+    {
+     "claim_id": "b35bf2947899",
+     "claim": "§3 표: 12 서브루틴 선언 라인 (83/697/943/1165/1417/1656/2050/2367/2698/3106/3187/3342) + 3464 lines",
+     "source_ref": "raw SwanQCM.ftn90 grep subroutine + wc -l",
+     "mismatch": false,
+     "note": "✓ 표본 #3 대체 후보였으나 한도 외 부수 확인 — 12/12 라인·총 라인수 전건 일치"
+    }
+   ],
+   "value_mismatches": 0,
+   "source_unavailable": 0,
+   "proposals": [
+    {
+     "old_string": "citation_status: verified",
+     "new_string": "citation_status: verified\nhas_source_needed: true",
+     "rationale": "G9e: §7-8 의 원논문 '추정'(Smit·Janssen 2013)·'DOI 검증 필요' disclosed 갭 보유 → has_source_needed: true 권고"
+    }
+   ]
+  },
+  {
+   "path": "models/SWAN/source-analysis/swan-schemes-implementation.md",
+   "blob_sha": "f914f7fe7447b78c31b5751f5ddfbf0a6430844e",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 40,
+   "opinion": 13,
+   "has_source_needed": false,
+   "unsourced": [
+    {
+     "line": 143,
+     "text": "5. **Hard error path**: if `NSTATC=1` and `PROPSC=2`, you get BSBT at run time (silently degraded), not the SORDUP you asked for.",
+     "reason": "무인용 + 자기 §B(:2420-2422 hard error)·§C(:6564-6568 disallowed)와 모순. 코드 실측: MSGERR(3,...) = fatal, 자동 강등 아님",
+     "adversary": "refute 시도: (a) §A 의 PROPSL 국소 강등(:3099-3233)이 근거? — 그건 경계/dry 스텐실 강등이지 NSTATC 모드 불일치가 아님. (b) MSGERR level 3 이 경고일 가능성? — swancom5:2421 'SORDUP scheme is for stationary mode only' + swanmain:6565 동일 level 3(fatal). refute 실패 → confirmed"
+    }
+   ],
+   "value_checks": [
+    {
+     "claim_id": "540e11cff0bf",
+     "claim": "L27-32: 기본값 PROPSS=2·PROPSN=3·PROPSC=1·PROPSL=1 @ swanmain:1179-1183 / DIFFRACTION→BSBT @ :4094-4095",
+     "source_ref": "raw swanmain.ftn:1179-1183, 4094-4095",
+     "mismatch": false,
+     "note": "✓ 부수 확인(한도 외) — 값·라인 전부 일치"
+    }
+   ],
+   "value_mismatches": 0,
+   "source_unavailable": 0,
+   "proposals": [
+    {
+     "old_string": "5. **Hard error path**: if `NSTATC=1` and `PROPSC=2`, you get BSBT at run time (silently degraded), not the SORDUP you asked for.",
+     "new_string": "5. **Hard error path**: if `NSTATC=1` and `PROPSC=2`, SWAN aborts with a fatal `MSGERR(3, 'SORDUP scheme only in stationary run')` at `[file=src/swanmain.ftn line=6564-6566]` (guard also at `[file=src/swancom5.ftn line=2420-2422]`) — no silent degradation to BSBT.",
+     "rationale": "무인용 '자동 강등' 단언이 자체 §B·§C 인용 및 코드 실측(fatal error)과 모순 → 코드 근거로 정정"
+    }
+   ]
+  },
+  {
+   "path": "models/SWAN/source-analysis/swan-setup-solver-swancom1-crosswalk.md",
+   "blob_sha": "a7eed953242ec3c96ba396c4d49d0533ce85b77f",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 58,
+   "opinion": 4,
+   "has_source_needed": false,
+   "unsourced": [],
+   "value_checks": [
+    {
+     "claim_id": "ee132760c48a",
+     "claim": "§4.3: REPS=PNUMS(23)=1e-6 / IAMOUT=PNUMS(24)=0 / MAXIT=PNUMS(25)=1000 @ swanmain:1269-1271",
+     "source_ref": "raw swanmain.ftn:1269-1271",
+     "mismatch": false,
+     "note": "✓ 표본 #1 — 세 값·라인 모두 일치"
+    },
+    {
+     "claim_id": "b7aebdc7d513",
+     "claim": "§2 표 #6: ACTION :5117 역할='spectral 방향/주파수 bin 범위 결정' (Purpose 헤더 요지 주장)",
+     "source_ref": "raw swancom1.ftn:5210-5213 Purpose",
+     "mismatch": true,
+     "note": "✗ VALUE-MISMATCH — 실제 Purpose: 'to determine the transport, refraction and the source terms of the action balance equation'. Adversary(원문 재확인): bin 범위(idcmin/idcmax) 결정은 ACTION 의 부수 동작일 수 있으나 표가 명시한 근거 단위는 Purpose 헤더 → 불일치 확정"
+    },
+    {
+     "claim_id": "9888443789ca",
+     "claim": "§2 표 #9: SOLMAT :6256 역할='행렬 조립'",
+     "source_ref": "raw swancom1.ftn:6310-6316 Purpose",
+     "mismatch": true,
+     "note": "✗ VALUE-MISMATCH — 실제 Purpose: 'SUBROUTINE to solve the linear system ... by means of the Thomas sweep algorithm'. 조립(ACTION)이 아니라 해법. 자매 노트 [[swan-propagation-implementation]] 표('Thomas tri-diagonal 솔버')와도 모순"
+    },
+    {
+     "claim_id": "96c8d2111247",
+     "claim": "§2 표 #10: SOLMT1 :6499 역할='행렬 조립 변형'",
+     "source_ref": "raw swancom1.ftn:6553-6560 Purpose",
+     "mismatch": true,
+     "note": "✗ VALUE-MISMATCH — 실제 Purpose: 'solve the linear system ... Ambient currents are involved and the propagation term in frequency space is discretized explicitly'. 해법 서브루틴"
+    }
+   ],
+   "value_mismatches": 3,
+   "source_unavailable": 0,
+   "proposals": [
+    {
+     "old_string": "| 6 | `ACTION` | :5117 | spectral 방향/주파수 bin 범위 결정 | [[swan-propagation-implementation]] |",
+     "new_string": "| 6 | `ACTION` | :5117 | action balance 의 transport·refraction·source term 결정 (Purpose `:5212-5213`) | [[swan-propagation-implementation]] |",
+     "rationale": "Purpose 헤더 요지 오전사 정정 (실헤더 :5212-5213)"
+    },
+    {
+     "old_string": "| 9 | `SOLMAT` | :6256 | 행렬 조립 | [[swan-schemes-implementation]] |",
+     "new_string": "| 9 | `SOLMAT` | :6256 | 선형계 해법 — Thomas sweep, no-current (Purpose `:6312-6316`) | [[swan-schemes-implementation]] |",
+     "rationale": "'행렬 조립'은 ACTION 소관 — SOLMAT Purpose 는 'solve the linear system'"
+    },
+    {
+     "old_string": "| 10 | `SOLMT1` | :6499 | 행렬 조립 변형 | [[swan-schemes-implementation]] |",
+     "new_string": "| 10 | `SOLMT1` | :6499 | 선형계 해법 — ambient current + σ-공간 explicit (Purpose `:6555-6560`) | [[swan-schemes-implementation]] |",
+     "rationale": "동일 — SOLMT1 Purpose 는 current 포함 선형계 해법"
+    }
+   ]
+  },
+  {
+   "path": "models/SWAN/source-analysis/swan-source-coverage-audit.md",
+   "blob_sha": "a5c6b38ea620fc07ee60cb4e842dd5c69c21e836",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 42,
+   "opinion": 10,
+   "has_source_needed": false,
+   "unsourced": [],
+   "value_checks": [
+    {
+     "claim_id": "8d869c46fbfe",
+     "claim": "제목·L23·L28·L73: 'src 에 58 source files' (+§1.1 '47 ftn90'·§1.2 '11 ftn')",
+     "source_ref": "raw ls models/SWAN/raw/source_code/swan/src (mtime 전부 2026-05-03 = 노트 작성 전 그대로)",
+     "mismatch": true,
+     "note": "✗ VALUE-MISMATCH — 실측: .ftn90 58 + .ftn 18 = **76 source files** (+cmake 2·CMakeLists·hcat = 80 entries). '58' 은 ftn90 만의 수. Adversary(정의 재확인): 'source files=ftn90 만' 해석은 노트 스스로 §1.2 legacy ftn 11개를 58 안에 포함해 셈하므로 성립 안 함. §1.1 '47'(실제 목록 50)·§1.2 '11'(목록 12) 도 자체 목록과 불일치. refute 실패 → confirmed"
+    },
+    {
+     "claim_id": "bb1f9a4dae1d",
+     "claim": "L52·L63-64·L73: swancom1 12,121 / swanmain 9,338 / fftpack51 15,110 / mod_xnl4v5 8,989 / SwanQCM 3,464 lines",
+     "source_ref": "raw wc -l",
+     "mismatch": false,
+     "note": "✓ 부수 확인(한도 외) — 확인한 라인수 전건 일치 (swancom1·swanmain·SdsBabanin 2,708≈'~2700'·SwanQCM)"
+    }
+   ],
+   "value_mismatches": 1,
+   "source_unavailable": 0,
+   "proposals": [
+    {
+     "old_string": "58 source files in models/SWAN/raw/source_code/swan/src/",
+     "new_string": "76 source files (58 .ftn90 + 18 .ftn) in models/SWAN/raw/source_code/swan/src/",
+     "rationale": "실측 정정 — 58 은 .ftn90 만의 수"
+    },
+    {
+     "old_string": "총: **58 source files**. Largest: `fftpack51.ftn90` (15k) > `swancom1.ftn` (12k) > `mod_xnl4v5.ftn90` (9k) > `swanmain.ftn` (9k).",
+     "new_string": "총: **76 source files (58 .ftn90 + 18 .ftn)**. Largest: `fftpack51.ftn90` (15k) > `swancom1.ftn` (12k) > `mod_xnl4v5.ftn90` (9k) > `swanmain.ftn` (9k).",
+     "rationale": "동일 정정 (총계)"
+    },
+    {
+     "old_string": "### 1.1 신규 ftn90 modular files (47 files — Cycle III 41.x 시기)",
+     "new_string": "### 1.1 신규 ftn90 modular files (58 files — Cycle III 41.x 시기; §1.3 의 서비스 ftn90 포함)",
+     "rationale": "ftn90 실측 58 (§1.1 목록 50 + §1.3 서비스 8)"
+    },
+    {
+     "old_string": "### 1.2 Legacy ftn files (11 files — Cycle II 이전 + service routines)",
+     "new_string": "### 1.2 Legacy ftn files (18 files — Cycle II 이전 + service routines; 표 12 + §1.3 의 ocp*·swmod*·SwanSpectPart 6)",
+     "rationale": "ftn 실측 18"
+    }
+   ]
+  },
+  {
+   "path": "models/SWAN/source-analysis/swan-st6-babanin-implementation.md",
+   "blob_sha": "bfc531e3a283fba8178693b916551aff59dba333",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 38,
+   "opinion": 9,
+   "has_source_needed": false,
+   "unsourced": [
+    {
+     "line": 117,
+     "text": "1. **ST6 is opt-in** — `GEN3 ST6` activates `IWIND=8`; pair with `WCAP ST6` to set `IWCAP=8`. Mixing ST6 wind with non-ST6 whitecapping defeats the calibration.",
+     "reason": "명령 체계 단언 무인용 + 코드와 불일치: `WCAP ST6` 키워드는 파서에 없음 — `GEN3 ... ST6` 가 LWINDM=8(→IWIND=8)+IWCAP=8 을 한 명령으로 설정 (swanpre1.ftn:2983-2991); WCAP 블록(:2459ff)의 옵션은 KOM/JANSSEN/AB 등",
+     "adversary": "refute 시도: (a) 구버전 SWAN 에 WCAP ST6 존재? — 스캔 대상(2024 release-line)=위키 raw 41.51, grep 'ST6' 전 파일에서 GEN3 블록에만 존재. (b) §F 인용(swancom1:7428-7534)이 커버? — 소비 측이지 명령 파서 아님. refute 실패 → confirmed"
+    },
+    {
+     "line": 124,
+     "text": "- **`GEN3 ST6` without `WCAP ST6`** — wind input + non-ST6 dissipation = imbalanced, runaway energy or spurious decay.",
+     "reason": "동일 — 존재하지 않는 `WCAP ST6` 명령 전제의 pitfall",
+     "adversary": "L117 과 동일 근거로 refute 실패 → confirmed"
+    }
+   ],
+   "value_checks": [
+    {
+     "claim_id": "724191b310f4",
+     "claim": "L60: 경험 포화계수 BNT=(0.035)² @ SdsBabanin.ftn90:168",
+     "source_ref": "raw SdsBabanin.ftn90:168 `BNT=(0.035**2)  ! Bnt value given by Babanin et al (2007)`",
+     "mismatch": false,
+     "note": "✓ 표본 #3 — 값·라인 일치"
+    }
+   ],
+   "value_mismatches": 0,
+   "source_unavailable": 0,
+   "proposals": [
+    {
+     "old_string": "1. **ST6 is opt-in** — `GEN3 ST6` activates `IWIND=8`; pair with `WCAP ST6` to set `IWCAP=8`. Mixing ST6 wind with non-ST6 whitecapping defeats the calibration.",
+     "new_string": "1. **ST6 is opt-in** — `GEN3 ST6` sets both the wind side (`LWINDM=8` → `IWIND=8` when wind is present) and the whitecapping side (`IWCAP=8`) in one command at `[file=src/swanpre1.ftn line=2983-2991]`; there is no separate `WCAP ST6` keyword (`WCAP` options are KOMEN/JANSSEN/LHIG/BJ/KBJ/AB — `[file=src/swanpre1.ftn line=2459]`). Mixing ST6 wind with non-ST6 whitecapping defeats the calibration.",
+     "rationale": "존재하지 않는 `WCAP ST6` 명령 단언을 파서 실측으로 정정 + 소싱"
+    },
+    {
+     "old_string": "- **`GEN3 ST6` without `WCAP ST6`** — wind input + non-ST6 dissipation = imbalanced, runaway energy or spurious decay.",
+     "new_string": "- **Overriding ST6 dissipation after `GEN3 ST6`** (a later `WCAP ...` command resets `IWCAP` away from 8 — `[file=src/swanpre1.ftn line=2459]`) — wind input + non-ST6 dissipation = imbalanced, runaway energy or spurious decay.",
+     "rationale": "동일 정정 — pitfall 의 실제 발생 경로(후행 WCAP 재설정)로 교체"
+    }
+   ]
+  },
+  {
+   "path": "models/SWAN/source-analysis/swan-stationary-vs-nonstationary.md",
+   "blob_sha": "55bf6edc1e93f8f853c6f5bd90e9d9936cea5c56",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 52,
+   "opinion": 16,
+   "has_source_needed": false,
+   "unsourced": [
+    {
+     "line": 189,
+     "text": "- BSBT is the default and works for nearly all cases. SORDUP and S&L for academic comparison only.",
+     "reason": "무인용 + 코드·자매노트와 모순: 기본값은 SORDUP(정상, PROPSS=2)·S&L(비정상, PROPSN=3) — swanmain.ftn:1179-1180; BSBT 는 `PROP BSBT` opt-in",
+     "adversary": "refute 시도: (a) PROPSL=1 초기값(swanmain:1182)이 'BSBT default' 근거? — PROPSL 은 PROPSC 로 덮이는 국소 플래그(swancom1:3052), 사용자 기본 스킴 아님. (b) 자기 §E 인용(swmod1:2869-2874)? — 코드표만, 기본값 아님. [[swan-schemes-implementation]] §A·Decision Guide 와도 정면 모순. refute 실패 → confirmed"
+    },
+    {
+     "line": 181,
+     "text": "| ADCIRC coupled (NWS=320) | `MODE NONSTAT`, `DELTC` matches `Flpp` from ADCIRC |",
+     "reason": "크로스모델 수치 단언(NWS=320) 무인용 — 위키 ADCIRC 노트에도 320 미확인(grep: 본 파일 자신만)",
+     "adversary": "refute 시도: (a) [[adcirc-swan-coupling]] 노트가 커버? — NWS 300 계열 언급뿐, 320·Flpp 매칭 미확인 + 본문 미링크. (b) 사용 레시피(opinion)? — 행 내 NWS=320 은 검증가능 사실 단언. refute 실패 → confirmed"
+    }
+   ],
+   "value_checks": [
+    {
+     "claim_id": "19e1ee3c72f3",
+     "claim": "L50: 기본값 MXITST=50·MXITNS=1·ITERMX=MXITST @ swanmain:1092-1095",
+     "source_ref": "raw swanmain.ftn:1092-1095",
+     "mismatch": false,
+     "note": "✓ 부수 확인(한도 외) — 값·라인 일치"
+    },
+    {
+     "claim_id": "ec8d521006c2",
+     "claim": "L119: SORDUP stationary-only 경고/에러 @ swancom5:2304-2422",
+     "source_ref": "raw swancom5.ftn:2420-2422 MSGERR(3,...)",
+     "mismatch": false,
+     "note": "✓ 부수 확인 — fatal MSGERR 존재 일치"
+    }
+   ],
+   "value_mismatches": 0,
+   "source_unavailable": 0,
+   "proposals": [
+    {
+     "old_string": "- BSBT is the default and works for nearly all cases. SORDUP and S&L for academic comparison only.",
+     "new_string": "- Scheme defaults are **SORDUP (stationary, `PROPSS=2`) and S&L (nonstationary, `PROPSN=3`)** (`swanmain.ftn:1179-1180`); `PROP BSBT` is the opt-in first-order fallback — unconditionally stable but more dissipative.",
+     "rationale": "무인용 'BSBT is the default' 가 코드 기본값·[[swan-schemes-implementation]] 과 모순 → 실측 정정 + 소싱"
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,133 @@
+diff --git a/models/SWAN/source-analysis/swan-parallel-implementation.md b/models/SWAN/source-analysis/swan-parallel-implementation.md
+--- a/models/SWAN/source-analysis/swan-parallel-implementation.md
++++ b/models/SWAN/source-analysis/swan-parallel-implementation.md
+@@ -173,7 +173,7 @@
+ 
+ After merge: per-process intermediate files closed/deleted at `[file=src/swanparll.ftn line=4259-4262]`.
+ 
+-So SWAN ships with a **built-in merge stage** — unlike ADCIRC which uses fort.80 + adcprep+adcpost, SWAN handles per-PE → global file consolidation internally.
++So SWAN ships with a **built-in merge stage** — unlike ADCIRC which uses fort.80 + adcprep+adcpost ([[adcirc-parallel-implementation]]), SWAN handles per-PE → global file consolidation internally.
+ 
+ ## Decision Guide
+ 
+diff --git a/models/SWAN/source-analysis/swan-propagation-implementation.md b/models/SWAN/source-analysis/swan-propagation-implementation.md
+--- a/models/SWAN/source-analysis/swan-propagation-implementation.md
++++ b/models/SWAN/source-analysis/swan-propagation-implementation.md
+@@ -197,7 +197,7 @@
+ ```
+ at `[file=src/swancom1.ftn line=2352-2355]`. Hard cap is `ITERMX` via the outer `DO 450 ITER = 1, ITERMX` `[file=src/swancom1.ftn line=1487]`.
+ 
+-`PNUMS(4)` is set by `NUMERICAL ACCUR` command (default 99% — i.e., 99% of wet points must have converged).
++`PNUMS(4)` is set by `NUMERICAL ACCUR` command (default `PNUMS(4) = 99.50` at `[file=src/swanmain.ftn line=1227]` — i.e., 99.5% of wet points must have converged).
+ 
+ ### Linear-solver convergence (separate)
+ 
+diff --git a/models/SWAN/source-analysis/swan-quasi-coherent.md b/models/SWAN/source-analysis/swan-quasi-coherent.md
+--- a/models/SWAN/source-analysis/swan-quasi-coherent.md
++++ b/models/SWAN/source-analysis/swan-quasi-coherent.md
+@@ -3,6 +3,7 @@
+ topic: swan
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "raw `models/SWAN/raw/source_code/swan/src/SwanQCM.ftn90` 직접 read (3464 lines, line 1-80 module header + grep subroutine 12개 위치). Tech §2.7 (Wigner distribution evolution + QC approximation, p.58-64) + §3.9 implementation (p.102) + User cmd SCAT (p.81)."
+ note_author: "Claude Opus 4.7 (1M context) raw source direct read"
+ note_date: 2026-06-01
+diff --git a/models/SWAN/source-analysis/swan-schemes-implementation.md b/models/SWAN/source-analysis/swan-schemes-implementation.md
+--- a/models/SWAN/source-analysis/swan-schemes-implementation.md
++++ b/models/SWAN/source-analysis/swan-schemes-implementation.md
+@@ -140,7 +140,7 @@
+ 2. **GSE only with SANDL** — don't bother enabling `PROP GSE` if you're in stationary mode.
+ 3. **`FLUXLIM` is θ-only** — it doesn't affect XY propagation.
+ 4. **DIFFRACTION forces BSBT** — silently. If accuracy matters and you need higher-order, drop diffraction.
+-5. **Hard error path**: if `NSTATC=1` and `PROPSC=2`, you get BSBT at run time (silently degraded), not the SORDUP you asked for.
++5. **Hard error path**: if `NSTATC=1` and `PROPSC=2`, SWAN aborts with a fatal `MSGERR(3, 'SORDUP scheme only in stationary run')` at `[file=src/swanmain.ftn line=6564-6566]` (guard also at `[file=src/swancom5.ftn line=2420-2422]`) — no silent degradation to BSBT.
+ 
+ ## Common Pitfalls
+ 
+diff --git a/models/SWAN/source-analysis/swan-setup-solver-swancom1-crosswalk.md b/models/SWAN/source-analysis/swan-setup-solver-swancom1-crosswalk.md
+--- a/models/SWAN/source-analysis/swan-setup-solver-swancom1-crosswalk.md
++++ b/models/SWAN/source-analysis/swan-setup-solver-swancom1-crosswalk.md
+@@ -42,11 +42,11 @@
+ | 3 | `SWPRSET` | :3842 | "Print all the settings used in SWAN run" — 설정 출력 | (유틸 — 본 표로 종결) |
+ | 4 | `SACCUR` | :4436 | 수렴판정: "check the accuracy of the final computation... terminate" | [[swan-propagation-implementation]] (curvature stopping) |
+ | 5 | `INSAC` | :4906 | 수렴판정 legacy 변형 — Purpose 헤더가 SACCUR 와 거의 동일("...quit") | (SACCUR 계열 legacy — 본 표로 종결) |
+-| 6 | `ACTION` | :5117 | spectral 방향/주파수 bin 범위 결정 | [[swan-propagation-implementation]] |
++| 6 | `ACTION` | :5117 | action balance 의 transport·refraction·source term 결정 (Purpose `:5212-5213`) | [[swan-propagation-implementation]] |
+ | 7 | `SINTGRL` | :5517 | "compute several integrals used in SWAN and some general parameters" (Hs 등 적분량) | (유틸 — 수렴판정·출력 공급) |
+ | 8 | `SOLPRE` | :6032 | 솔버 전처리 | [[swan-schemes-implementation]] |
+-| 9 | `SOLMAT` | :6256 | 행렬 조립 | [[swan-schemes-implementation]] |
+-| 10 | `SOLMT1` | :6499 | 행렬 조립 변형 | [[swan-schemes-implementation]] |
++| 9 | `SOLMAT` | :6256 | 선형계 해법 — Thomas sweep, no-current (Purpose `:6312-6316`) | [[swan-schemes-implementation]] |
++| 10 | `SOLMT1` | :6499 | 선형계 해법 — ambient current + σ-공간 explicit (Purpose `:6555-6560`) | [[swan-schemes-implementation]] |
+ | 11 | `PHILIM` | :7857 | action limiter (Hersbach-Janssen) | [[swan-propagation-implementation]] (Eq 3.27) |
+ | 12 | `HJLIM` | :8004 | limiter 변형 | 동 |
+ | 13 | `RESCALE` | :8146 | 음에너지 제거 rescale | [[swan-schemes-implementation]] (Tolman 1991) |
+diff --git a/models/SWAN/source-analysis/swan-source-coverage-audit.md b/models/SWAN/source-analysis/swan-source-coverage-audit.md
+--- a/models/SWAN/source-analysis/swan-source-coverage-audit.md
++++ b/models/SWAN/source-analysis/swan-source-coverage-audit.md
+@@ -25,10 +25,10 @@
+ ## 1. 58 source file inventory (raw ls 직접)
+ 
+ ```
+-58 source files in models/SWAN/raw/source_code/swan/src/
+-```
+-
+-### 1.1 신규 ftn90 modular files (47 files — Cycle III 41.x 시기)
++76 source files (58 .ftn90 + 18 .ftn) in models/SWAN/raw/source_code/swan/src/
++```
++
++### 1.1 신규 ftn90 modular files (58 files — Cycle III 41.x 시기; §1.3 의 서비스 ftn90 포함)
+ 
+ `Swan*.ftn90` (modern Fortran 90 module format):
+ - **Grid topology**: SwanCheckGrid / SwanCreateEdges / SwanFindPoint / SwanGridCell / SwanGridFace / SwanGridTopology / SwanGridVert / SwanGriddata / SwanGridobjects / SwanInitCompGrid / SwanPointinMesh / SwanPrintGridInfo / SwanVertlist
+@@ -44,7 +44,7 @@
+ - **Parallel**: SwanParallel
+ - **Physics modules**: **SwanBraggScat** / **SwanGSECorr** / **SwanIEM** / **SwanQCM** / SdsBabanin
+ 
+-### 1.2 Legacy ftn files (11 files — Cycle II 이전 + service routines)
++### 1.2 Legacy ftn files (18 files — Cycle II 이전 + service routines; 표 12 + §1.3 의 ocp*·swmod*·SwanSpectPart 6)
+ 
+ | 파일 | 라인 | 역할 |
+ |---|---|---|
+@@ -70,7 +70,7 @@
+ | swmod1.ftn / swmod2.ftn | — | Data modules |
+ | srclist.cmake / srclistnc.cmake | — | CMake source lists |
+ 
+-총: **58 source files**. Largest: `fftpack51.ftn90` (15k) > `swancom1.ftn` (12k) > `mod_xnl4v5.ftn90` (9k) > `swanmain.ftn` (9k).
++총: **76 source files (58 .ftn90 + 18 .ftn)**. Largest: `fftpack51.ftn90` (15k) > `swancom1.ftn` (12k) > `mod_xnl4v5.ftn90` (9k) > `swanmain.ftn` (9k).
+ 
+ ## 2. 기존 20 source-analysis 노트 매핑
+ 
+diff --git a/models/SWAN/source-analysis/swan-st6-babanin-implementation.md b/models/SWAN/source-analysis/swan-st6-babanin-implementation.md
+--- a/models/SWAN/source-analysis/swan-st6-babanin-implementation.md
++++ b/models/SWAN/source-analysis/swan-st6-babanin-implementation.md
+@@ -114,14 +114,14 @@
+ 
+ ## Working Rules
+ 
+-1. **ST6 is opt-in** — `GEN3 ST6` activates `IWIND=8`; pair with `WCAP ST6` to set `IWCAP=8`. Mixing ST6 wind with non-ST6 whitecapping defeats the calibration.
++1. **ST6 is opt-in** — `GEN3 ST6` sets both the wind side (`LWINDM=8` → `IWIND=8` when wind is present) and the whitecapping side (`IWCAP=8`) in one command at `[file=src/swanpre1.ftn line=2983-2991]`; there is no separate `WCAP ST6` keyword (`WCAP` options are KOMEN/JANSSEN/LHIG/BJ/KBJ/AB — `[file=src/swanpre1.ftn line=2459]`). Mixing ST6 wind with non-ST6 whitecapping defeats the calibration.
+ 2. **`MEMSINA`/`MEMSINB` are zero-sized** when `IWIND ≠ 8` — don't try to read them in custom code without checking.
+ 3. **`A1SDS`, `A2SDS`, `P1SDS`, `P2SDS`, `UPWARDS`** are the saturation tunables in `WCAP ST6`. They live in `SWCOMM3` and are settable via the command file.
+ 4. **`ZIEGER` activates negative wind input** — required for swell decay under opposing wind. Off by default in many configurations.
+ 
+ ## Common Pitfalls
+ 
+-- **`GEN3 ST6` without `WCAP ST6`** — wind input + non-ST6 dissipation = imbalanced, runaway energy or spurious decay.
++- **Overriding ST6 dissipation after `GEN3 ST6`** (a later `WCAP ...` command resets `IWCAP` away from 8 — `[file=src/swanpre1.ftn line=2459]`) — wind input + non-ST6 dissipation = imbalanced, runaway energy or spurious decay.
+ - **Tuning `A1SDS` without measuring** — saturation coefficient is sensitive; published defaults are calibrated for global runs.
+ - **`TRUE_U10` vs scaled `UFRIC`** — small differences in wind input through `TEMP2` choice affect long-fetch results.
+ - **Neglecting linear `MEMSINA`** — for very low-energy seed states, the linear term matters; `SWIND0_NRL` must be active.
+diff --git a/models/SWAN/source-analysis/swan-stationary-vs-nonstationary.md b/models/SWAN/source-analysis/swan-stationary-vs-nonstationary.md
+--- a/models/SWAN/source-analysis/swan-stationary-vs-nonstationary.md
++++ b/models/SWAN/source-analysis/swan-stationary-vs-nonstationary.md
+@@ -186,7 +186,7 @@
+ 
+ - Stationary `MXITST=50` is generous; reduce to 30 for speed if convergence robust.
+ - For non-stationary, `MXITNS=1` is the production default; only raise for special cases.
+-- BSBT is the default and works for nearly all cases. SORDUP and S&L for academic comparison only.
++- Scheme defaults are **SORDUP (stationary, `PROPSS=2`) and S&L (nonstationary, `PROPSN=3`)** (`swanmain.ftn:1179-1180`); `PROP BSBT` is the opt-in first-order fallback — unconditionally stable but more dissipative.
+ - Convergence criterion: `STOPC` more rigorous than `ACCUR`; recommend `STOPC` for production.
+ - For unstructured grids, sweep ordering matters — first sweep along dominant wave direction speeds convergence.
+ - Output `BLOCK 'sname' ITERMAX HSIGN ...` to monitor iteration count and Hs convergence per stationary call.
