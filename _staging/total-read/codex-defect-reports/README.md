@@ -54,3 +54,12 @@ owiwind_netcdf NaN-skip 미정의 read·nws08 Holland/CLE15 위경도 스왑·su
 ## ADCIRC 누적 (게이트 밖, 적대검증 완료)
 1차 7(HIGH 4 검증·MED 3) + tier-2 12(HIGH 8 검증·MED 4) = **19 결함(HIGH 12 전건 적대검증 CONFIRM·MED 7)**.
 30파일 감사(전체 837 중). ROMS/Delft3D 미착수.
+
+## C — ROMS 코어 1차 결함감사 (무감사 2.8M줄, 2026-08-30, task-mtfcgj94) — 16~20파일
+★로그 검증: 실제 sed/nl/rg 로 step3d_uv/step3d_t/step2d/prsgrd/omega/mp_exchange 등 판독 확인, 중립화로
+halo-init·HSIMT 의심 등 기각. **4건(HIGH 2·MED 2)** 생존:
+- HIGH step3d_uv.F L235-1736 — Huon/Hvom INTENT(OUT) 이나 첫 대입이 set_massflux 산출 incoming 값을 읽음(INOUT 이어야). UBA.
+- HIGH main3d.F L681-683 — STEP2D_FB_AB3_AM4 서 knew 가 4까지 순환하나 zeta/ubar/vbar 는 3 시간슬롯만 할당(mod_ocean L407) → OOB. checkdefs 통과.
+- MED step3d_t.F L1080-1088 — 수직 Courant=1 서 KaZ=0, 무조건 1/KaZ → Inf/NaN(HSIMT 수평경로엔 가드 있음).
+- MED wvelocity.F L222-227 — N=1 서 level 2 참조(수직 extent N 초과). read_phypar 는 N<0 만 거부.
+- HIGH 2 적대검증 예정. ROMS 나머지·Delft3D 후속.

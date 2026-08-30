@@ -1,0 +1,60 @@
+[
+  {
+    "meta": "roms-core-map",
+    "files_audited": [
+      "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/main3d.F",
+      "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/step2d.F",
+      "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/step2d_LF_AM3.h",
+      "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/pre_step3d.F",
+      "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/rhs3d.F",
+      "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/step3d_uv.F",
+      "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/step3d_t.F",
+      "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/prsgrd.F",
+      "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/prsgrd31.h",
+      "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/omega.F",
+      "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/wvelocity.F",
+      "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/set_depth.F",
+      "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/set_massflux.F",
+      "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/ini_fields.F",
+      "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/gls_prestep.F",
+      "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/gls_corstep.F",
+      "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/bc_2d.F",
+      "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/bc_3d.F",
+      "models/ROMS/raw/source_code/roms/ROMS/Utility/mp_exchange.F",
+      "models/ROMS/raw/source_code/roms/ROMS/Modules/mod_ocean.F"
+    ],
+    "note": "First-pass, depth-focused audit of the nonlinear split-explicit solve path: main3d orchestration, LF-AM3 step2d kernel, default prsgrd31 pressure gradient, GLS closure, nonlinear MPI exchange routines, and physical boundary conditions. Conditional alternative pressure-gradient, turbulence, and 2D kernels were not exhaustively audited; four findings below survived caller, initialization, halo, configuration, and time-level neutralizer checks."
+  },
+  {
+    "file": "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/step3d_uv.F",
+    "lines": [235, 238, 1511, 1736],
+    "quote": "      real(r8), intent(out) :: Huon(LBi:,LBj:,:)\n      real(r8), intent(out) :: Hvom(LBi:,LBj:,:)\n            Huon(i,j,k)=0.5_r8*(Huon(i,j,k)+u(i,j,k,nnew)*DC(i,k))\n              Hvom(i,j,k)=0.5_r8*(Hvom(i,j,k)+v(i,j,k,nnew)*DC(i,k))",
+    "severity": "HIGH",
+    "class": "use-before-assignment / INTENT(OUT) undefined",
+    "reason": "Fortran makes each actual argument undefined on entry through INTENT(OUT), yet the first assignments read the incoming Huon/Hvom values produced earlier by set_massflux. No earlier assignment in step3d_uv_tile restores those values, and the explicit-shape declarations repeat the same INTENT(OUT) contract."
+  },
+  {
+    "file": "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/main3d.F",
+    "lines": [681, 683],
+    "quote": "                  kstp(ng)=knew(ng)\n                  knew(ng)=kstp(ng)+1\n                  IF (knew(ng).gt.4) knew(ng)=1",
+    "severity": "HIGH",
+    "class": "time-level out-of-bounds",
+    "reason": "With the recognized STEP2D_FB_AB3_AM4 option, knew cycles through 4 and step2d indexes zeta/ubar/vbar(:,:,knew), but mod_ocean.F:407-413 allocates all three fields with only three time slots. checkdefs.F accepts and reports this option, and there is no allocation or runtime guard that supplies a fourth slot."
+  },
+  {
+    "file": "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/step3d_t.F",
+    "lines": [1080, 1088],
+    "quote": "                cff=pm(i,j)*pn(i,j)*dt(ng)\n                KaZ(k)=1.0_r8-ABS(cff*W(i,j,k)/                         &\n     &                            (z_r(i,j,k+1)-z_r(i,j,k)))\n                oKaZ(k)=1.0_r8/KaZ(k)",
+    "severity": "MED",
+    "class": "divide-by-zero",
+    "reason": "At a local vertical Courant magnitude of exactly one, KaZ is zero and the unconditional reciprocal produces Inf/NaN before the limiter uses it. No CFL guard enforces strict inequality, while the sibling horizontal HSIMT path explicitly neutralizes KaX<=eps1 before taking its reciprocal."
+  },
+  {
+    "file": "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/wvelocity.F",
+    "lines": [222, 227],
+    "quote": "          slope=(z_r(i,j,1)-z_w(i,j,0))/                                &\n     &          (z_r(i,j,2)-z_r(i,j,1))            ! extrapolation slope\n          wvel(i,j,0)=cff1*(vert(i,j,1)-                                &\n     &                      slope*(vert(i,j,2)-                         &\n     &                             vert(i,j,1)))+                       &\n     &                cff2*vert(i,j,1)-                                 &",
+    "severity": "MED",
+    "class": "out-of-bounds / missing dimension guard",
+    "reason": "The unconditional cubic endpoint reconstruction reads vertical level 2 when N=1, outside arrays whose vertical extent is N. read_phypar.F rejects only N<0 (despite saying N must be greater than zero), and no later minimum-N guard neutralizes this accepted configuration."
+  }
+]
