@@ -63,3 +63,7 @@ halo-init·HSIMT 의심 등 기각. **4건(HIGH 2·MED 2)** 생존:
 - MED step3d_t.F L1080-1088 — 수직 Courant=1 서 KaZ=0, 무조건 1/KaZ → Inf/NaN(HSIMT 수평경로엔 가드 있음).
 - MED wvelocity.F L222-227 — N=1 서 level 2 참조(수직 extent N 초과). read_phypar 는 N<0 만 거부.
 - HIGH 2 적대검증 예정. ROMS 나머지·Delft3D 후속.
+
+## C ROMS 적대검증 (2026-08-30) — HIGH 2/2 CONFIRM
+독립 skeptic REFUTE 시도(ROMS 3-time-level·tile 관례 주의) → 전건 CONFIRM(`C-roms-verify.json`):
+step3d_uv Huon/Hvom intent(out) read-before-write·main3d knew=4 vs 3슬롯 OOB.

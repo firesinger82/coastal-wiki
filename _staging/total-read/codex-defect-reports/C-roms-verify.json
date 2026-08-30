@@ -1,0 +1,18 @@
+[
+  {
+    "id": "H0",
+    "file": "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/step3d_uv.F",
+    "verdict": "CONFIRM",
+    "decisive_lines": "Nonlinear/main3d.F:357,999; Nonlinear/set_massflux.F:143-155; Nonlinear/step3d_uv.F:124-125,237-238,1511,1736",
+    "quote": "      real(r8), intent(out) :: Huon(LBi:,LBj:,:)\n      real(r8), intent(out) :: Hvom(LBi:,LBj:,:)\n            Huon(i,j,k)=0.5_r8*(Hz(i,j,k)+Hz(i-1,j,k))*u(i,j,k,nrhs)*   &\n            Hvom(i,j,k)=0.5_r8*(Hz(i,j,k)+Hz(i,j-1,k))*v(i,j,k,nrhs)*   &\n            Huon(i,j,k)=0.5_r8*(Huon(i,j,k)+u(i,j,k,nnew)*DC(i,k))\n              Hvom(i,j,k)=0.5_r8*(Hvom(i,j,k)+v(i,j,k,nnew)*DC(i,k))",
+    "reason": "set_massflux defines the shared GRID arrays before step3d_uv, whose tile dummy arguments are nevertheless INTENT(OUT), making the associated actual arrays undefined on entry. No earlier Huon/Hvom definition occurs in step3d_uv_tile; their first writes read those undefined incoming values on the right-hand side."
+  },
+  {
+    "id": "H1",
+    "file": "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/main3d.F",
+    "verdict": "CONFIRM",
+    "decisive_lines": "Nonlinear/main3d.F:665,681-687; Modules/mod_ocean.F:407-413; Nonlinear/step2d_LF_AM3.h:1029,2577,2606",
+    "quote": "                  kstp(ng)=knew(ng)\n                  knew(ng)=kstp(ng)+1\n                  IF (knew(ng).gt.4) knew(ng)=1\n      allocate ( OCEAN(ng) % ubar(LBi:UBi,LBj:UBj,3) )\n      allocate ( OCEAN(ng) % zeta(LBi:UBi,LBj:UBj,3) )\n          zeta(i,j,knew)=zeta_new(i,j)",
+    "reason": "When STEP2D_FB_AB3_AM4 is enabled, main3d advances knew through 4 and calls step2d, which writes zeta(:,:,knew) (and ubar/vbar) although mod_ocean allocates those third dimensions with extent 3. There is no conditional fourth allocation or guard, so the option-enabled path performs a real fourth-index access."
+  }
+]
