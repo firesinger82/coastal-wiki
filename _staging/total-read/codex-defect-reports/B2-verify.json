@@ -1,0 +1,66 @@
+[
+  {
+    "file": "models/ADCIRC/raw/source_code/adcirc/src/read_input.F",
+    "lines": "5141-5172;5178-5182;5213-5221",
+    "verdict": "CONFIRM",
+    "decisive_lines": "read_input.F:5155-5172,5178-5182,5213-5221; global_3dvs.F:419-445,570-579",
+    "quote": "      MNFEN = NFEN\n\nC...  ALLOCATE GENERAL 3D ARRAYS\n\n      CALL ALLOC_3DVS()",
+    "reason": "I searched for an NFEN lower-bound guard or reallocation, but the only check is NFEN.LT.0 and ALLOC_3DVS sizes Sigma at the original value. Thus NFEN=0 reaches Sigma(1), while generated grids can change NFEN=1 to 2 only after the NFEN-sized allocation."
+  },
+  {
+    "file": "models/ADCIRC/raw/source_code/adcirc/src/transport.F",
+    "lines": "1443-1475",
+    "verdict": "CONFIRM",
+    "decisive_lines": "read_input.F:5155-5172; global_3dvs.F:372,400; transport.F:251-273,1343,1443-1475",
+    "quote": "      If ( LAbov == NFEN ) Then\n         k4 = NFEN\n         k3 = NFEN - 1\n         k2 = NFEN - 2\n         k1 = NFEN - 3\n      Else If ( LBelo == 1 ) Then",
+    "reason": "I looked for NFEN>=4 validation and a small-grid fallback, but input accepts NFEN=2/3 and cubic interpolation is the default at live TRANS_3D call sites. The endpoint branches therefore form indices -1/0 or 4 and immediately index Sigma and inarray_vertical."
+  },
+  {
+    "file": "models/ADCIRC/raw/source_code/adcirc/src/ephemerides.F90",
+    "lines": "109-126;164-170;173-216",
+    "verdict": "CONFIRM",
+    "decisive_lines": "ephemerides.F90:114-126,164-170,215-218; tidalpotential.F90:387-403,407-425",
+    "quote": "      if (seconds_between < self%tbeg(2) .or. seconds_between > self%tend(2)) then\n         ierr = 2\n         return\n      end if",
+    "reason": "I checked both callee and caller error handling: the failed first recache returns before allocating self%times, yet rank search follows unconditionally. The caller's check_tip_err only logs and also continues to consume MoonSunCoor, so no bailout neutralizes the path."
+  },
+  {
+    "file": "models/ADCIRC/raw/source_code/adcirc/src/wind.F",
+    "lines": "860-879;957-991;2088-2108;2223-2291",
+    "verdict": "CONFIRM",
+    "decisive_lines": "wind.F:860-879,957-991,2087-2108,2223-2291; timestep.F:651-652,1130-1134; read_input.F:1853-1860",
+    "quote": "      integer, intent(in) :: nws\n      real(8), intent(out) :: wsx2(:)\n      real(8), intent(out) :: wsy2(:)\n      real(8), intent(out) :: pr2(:)\n      real(8), intent(out) :: wvnxout(:)\n      real(8), intent(out) :: wvnyout(:)",
+    "reason": "I checked for routine-entry defaults and caller overwrite/ignore behavior; NWS=3 is accepted, assigns winds but not PR2 in either live or hot-start branches, and the timestep later adds PR2 to 3D pressure forcing. Caller-side background assignment cannot preserve an actual argument across an INTENT(OUT) call, while hot-start wind outputs are likewise left undefined on several branches."
+  },
+  {
+    "file": "models/ADCIRC/raw/source_code/adcirc/src/owiwind.F",
+    "lines": "270-310;338-358",
+    "verdict": "CONFIRM",
+    "decisive_lines": "owiwind.F:269-310,338-364; wind.F:1998-2030,2937-2982",
+    "quote": "           if (.not.uvpHasBeenSet) then\n              if (abs(NWS).ne.14) then ! WJP: Don't overwrite if NWS = 14\n                 WVNX(I)=0.d0\n                 WVNY(I)=0.d0\n                 PRN(I)=PRdeflt*100.d0/RHOWATG\n              endif",
+    "reason": "I traced NWS=-14 setup and timing, but NWS12GET is truly INTENT(OUT) and deliberately skips assignments at nodes without OWI data. The prior NWS14 field is therefore not a valid preserved base field, and HasData changes the interpolation ratio without redefining those actual-array elements."
+  },
+  {
+    "file": "models/ADCIRC/raw/source_code/adcirc/src/owiwind_netcdf.F",
+    "lines": "687-737;815-865",
+    "verdict": "CONFIRM",
+    "decisive_lines": "owiwind_netcdf.F:483-505,687-737,815-865",
+    "quote": "\t      ! Adjust U/V Based on scalar wind magnitude\n              IF ((UU(iV) .eq. 0.) .and.\n     &            (VV(iV) .eq. 0.)) then\n                sWdir = 0.\n              ELSE\n                sWdir = ATAN2(UU(iV),VV(iV))",
+    "reason": "I checked both output initialization and local initialization: outputs get background defaults, but UU, VV, Wind, and PP do not. A NaN corner skips their assignments, after which they are read and copied over the initialized outputs at lines 854-865."
+  },
+  {
+    "file": "models/ADCIRC/raw/source_code/adcirc/src/nws08.F90",
+    "lines": "606;1201;1582-1596",
+    "verdict": "CONFIRM",
+    "decisive_lines": "nws08.F90:586-606,1181-1201,1582-1596; wind.F:589-600",
+    "quote": "   subroutine update_storm_eye_position(lat, lon, EyeLon, EyeLat, FoundEye)\n      implicit none\n      real(8), parameter :: eps = epsilon(1.d0)\n      real(8), intent(in) :: lat, lon\n      real(8), intent(inout), dimension(3) :: EyeLon, EyeLat\n      logical, intent(inout) :: FoundEye",
+    "reason": "I matched dummy names and actual positions at both calls: Holland swaps the coordinate values, while CLE15 swaps the output arrays, and both store latitude in EyeLon and longitude in EyeLat. Calm branches assign correctly, but active-storm values reach PowellWindDrag without correction."
+  },
+  {
+    "file": "models/ADCIRC/raw/source_code/adcirc/src/subdomain.F",
+    "lines": "398-451;513-551",
+    "verdict": "CONFIRM",
+    "decisive_lines": "subdomain.F:398-451,513-551; hstart.F:719-731,849-854; adcirc.F:331-353,475-476",
+    "quote": "         ! Read the first set of boundary conditions:\n         read (1019,*) n\n         do i=1,ncbn\n             read (1019,*) n,ecbn2(i),ucbn2(i)\n             read (1019,*) vcbn2(i),wdcbn2(i)\n             wdcbn1(i)=wdcbn2(i) !ensure that the wet nodes begin wet",
+    "reason": "I searched for a seek by TimeLoc, ITHS, or the record timestep n, but openFort019H always reads the first record and never uses TimeLoc. Timestepping resumes at ITHS+1 and readFort019 uses that global phase against beginning-of-file fields, so a normal full fort.019 is time-mixed."
+  }
+]

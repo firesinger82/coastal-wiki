@@ -45,3 +45,12 @@ ADCIRC HIGH 4건을 독립 skeptic 이 REFUTE 시도 → **전건 CONFIRM**(교�
 - **HIGH·time-mixing** subdomain.F L398-451;513-551 — The hot-start opener never references TimeLoc after accepting it; it zeros the old field and reads the first fort.019 record instead of seeking the ho
 - **MED·logic** harm.F L401-479 — Under NFOVER=1, all four invalid harmonic-output selectors are announced as reset to zero, but none is actually assigned. No later normalization occur
 - **MED·sign/geometry** rs2.F L619-628;663-672 — A repeated or collinear STWAVE triangle has totalarea=0; for a collinear target the inclusion test accepts 0<=0 and immediately divides by zero to for
+
+## B tier-2 적대검증 (2026-08-30, task a223508844) — HIGH 8/8 CONFIRM
+독립 skeptic REFUTE 시도 → 전건 CONFIRM(`B2-verify.json`): read_input NFEN OOB·transport NFEN OOB·
+ephemerides IERR=2 후 미정의 참조·wind NWS=3 PR2 미대입·owiwind no-data INTENT(OUT) 미정의·
+owiwind_netcdf NaN-skip 미정의 read·nws08 Holland/CLE15 위경도 스왑·subdomain hotstart time-mixing.
+
+## ADCIRC 누적 (게이트 밖, 적대검증 완료)
+1차 7(HIGH 4 검증·MED 3) + tier-2 12(HIGH 8 검증·MED 4) = **19 결함(HIGH 12 전건 적대검증 CONFIRM·MED 7)**.
+30파일 감사(전체 837 중). ROMS/Delft3D 미착수.
