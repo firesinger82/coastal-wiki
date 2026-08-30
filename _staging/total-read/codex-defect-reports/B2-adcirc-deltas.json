@@ -1,0 +1,122 @@
+[
+  {
+    "meta": "tier2-file-map",
+    "files_audited": [
+      "models/ADCIRC/raw/source_code/adcirc/src/transport.F",
+      "models/ADCIRC/raw/source_code/adcirc/src/couple2baroclinic3D.F",
+      "models/ADCIRC/raw/source_code/adcirc/src/global_3dvs.F",
+      "models/ADCIRC/raw/source_code/adcirc/src/internaltide.F90",
+      "models/ADCIRC/raw/source_code/adcirc/src/tidalpotential.F90",
+      "models/ADCIRC/raw/source_code/adcirc/src/ephemerides.F90",
+      "models/ADCIRC/raw/source_code/adcirc/src/wind.F",
+      "models/ADCIRC/raw/source_code/adcirc/src/owiwind.F",
+      "models/ADCIRC/raw/source_code/adcirc/src/owiwind_netcdf.F",
+      "models/ADCIRC/raw/source_code/adcirc/src/nws08.F90",
+      "models/ADCIRC/raw/source_code/adcirc/src/couple2swan.F",
+      "models/ADCIRC/raw/source_code/adcirc/src/rs2.F",
+      "models/ADCIRC/raw/source_code/adcirc/src/harm.F",
+      "models/ADCIRC/raw/source_code/adcirc/src/hstart.F",
+      "models/ADCIRC/raw/source_code/adcirc/src/read_input.F",
+      "models/ADCIRC/raw/source_code/adcirc/src/subdomain.F",
+      "models/ADCIRC/raw/source_code/adcirc/src/sponge_layer.F90",
+      "models/ADCIRC/raw/source_code/adcirc/src/vsmy.F"
+    ],
+    "note": "Audited 18 next-tier solve, forcing, coupling, hot-start, and analysis files; findings below are only candidates that survived caller and neutralizer tracing. The 12 first-pass files named by the requester were excluded."
+  },
+  {
+    "file": "models/ADCIRC/raw/source_code/adcirc/src/read_input.F",
+    "lines": "5141-5172;5178-5182;5213-5221",
+    "quote": "      IF(NFEN.LT.0) THEN\n      MNFEN = NFEN\n      CALL ALLOC_3DVS()\n      IF(IGC.NE.0) THEN\n         CALL FEGRIDS(IGC,HH1)",
+    "severity": "HIGH",
+    "class": "OOB",
+    "reason": "NFEN=0 passes, and NFEN=1 is also permitted even though generated grids raise it to 2 only after NFEN-sized arrays have been allocated; IGC=0 writes Sigma(1) immediately and generated grids write Sigma(2) past the allocation. No later validation or reallocation neutralizes the bad size."
+  },
+  {
+    "file": "models/ADCIRC/raw/source_code/adcirc/src/transport.F",
+    "lines": "1443-1475",
+    "quote": "      If ( LAbov == NFEN ) Then\n         k4 = NFEN\n         k3 = NFEN - 1\n         k2 = NFEN - 2\n         k1 = NFEN - 3\n      Else If ( LBelo == 1 ) Then",
+    "severity": "HIGH",
+    "class": "OOB",
+    "reason": "With the default cubic scheme and accepted NFEN=2 or 3, the top branch sets k1 to -1 or 0, while the bottom branch sets k4=4, before indexing Sigma and inarray_vertical. There is no NFEN>=4 guard or fallback to linear interpolation."
+  },
+  {
+    "file": "models/ADCIRC/raw/source_code/adcirc/src/ephemerides.F90",
+    "lines": "109-126;164-170;173-216",
+    "quote": "      else\n         ierr = self%recache_data(seconds_between, UniformRankSearch)\n      end if\n      if (.not. UniformRankSearch) then\n         J = GET_RANK_BINARY_SEARCH(seconds_between, self%times, self%len_times);",
+    "severity": "HIGH",
+    "class": "OOB",
+    "reason": "For a first external-table request outside file coverage, recache_data returns IERR=2 before allocating self%times, but this routine continues into rank search and later touches undefined MoonSunCoor. No early return or termination neutralizes the error before the caller computes tidal potential."
+  },
+  {
+    "file": "models/ADCIRC/raw/source_code/adcirc/src/wind.F",
+    "lines": "860-879;957-991;2088-2108;2223-2291",
+    "quote": "      real(8), intent(out) :: pr2(:)\n            WSX2(I) = RampMete*airwaterdensityrat*WDragCo*WindX*WindMag\n            WSY2(I) = RampMete*airwaterdensityrat*WDragCo*WindY*WindMag\n            WVNXOUT(I)=RampMete*WindX\n            WVNYOUT(I)=RampMete*WindY",
+    "severity": "HIGH",
+    "class": "UBA",
+    "reason": "The NWS=3 branches assign wind stress and wind output but never PR2; the hot-start branch also leaves the wind-output dummies unset. Because these are INTENT(OUT), caller-side background initialization is invalidated on entry and is not a neutralizer."
+  },
+  {
+    "file": "models/ADCIRC/raw/source_code/adcirc/src/owiwind.F",
+    "lines": "270-310;338-358",
+    "quote": "        REAL(8),intent(out)   :: WVNX(:),WVNY(:),PRN(:)\n           if (.not.uvpHasBeenSet) then\n              if (abs(NWS).ne.14) then ! WJP: Don't overwrite if NWS = 14\n                 WVNX(I)=0.d0\n                 WVNY(I)=0.d0\n                 PRN(I)=PRdeflt*100.d0/RHOWATG",
+    "severity": "HIGH",
+    "class": "UBA",
+    "reason": "NWS=-14 calls this routine to overlay OWI values only where data exist, but INTENT(OUT) makes all three actual arrays undefined before the no-data branches deliberately skip assignment. HasData selects later interpolation timing but never restores the undefined base-field entries."
+  },
+  {
+    "file": "models/ADCIRC/raw/source_code/adcirc/src/owiwind_netcdf.F",
+    "lines": "687-737;815-865",
+    "quote": "              ENDIF\n\t      ! Adjust U/V Based on scalar wind magnitude\n              IF ((UU(iV) .eq. 0.) .and.\n              PRN2(IV) = PP(IV)\n              WVNX2(IV) = UU(IV)\n              WVNY2(IV) = VV(IV)",
+    "severity": "HIGH",
+    "class": "UBA",
+    "reason": "When a wind or pressure corner is converted from _FillValue to NaN, the self-equality guard skips assignment of UU/VV/Wind or PP, yet these uninitialized locals are still read and copied to outputs. The deliberate NaN conversion has no else, initialization, or next-node cycle neutralizer."
+  },
+  {
+    "file": "models/ADCIRC/raw/source_code/adcirc/src/nws08.F90",
+    "lines": "606;1201;1582-1596",
+    "quote": "      call update_storm_eye_position(lon, lat, EyeLon, EyeLat, FoundEye)\n      call update_storm_eye_position(lat, lon, EyeLat, EyeLon, FoundEye)\n   subroutine update_storm_eye_position(lat, lon, EyeLon, EyeLat, FoundEye)",
+    "severity": "HIGH",
+    "class": "sign/geometry",
+    "reason": "The Holland and CLE15 active-storm calls pass different swapped argument orders, but both cause the helper to store latitude in EyeLon and longitude in EyeLat. The calm branches are correct, and no later correction occurs before sector-based wind drag consumes the coordinates."
+  },
+  {
+    "file": "models/ADCIRC/raw/source_code/adcirc/src/nws08.F90",
+    "lines": "650-670",
+    "quote": "         alpha = (RMW/RAD(I))**B\n         V_r(I) = sqrt(alpha*exp(1.d0 - alpha)*spd*(spd + non_cyclostrophic_part) &",
+    "severity": "MED",
+    "class": "sign/geometry",
+    "reason": "At a mesh node exactly at the storm eye, sphericalDistance returns zero, so alpha divides by zero and the velocity radical evaluates an infinity-times-zero product that yields NaN. There is no radius epsilon or eye-node special case before the forcing is returned."
+  },
+  {
+    "file": "models/ADCIRC/raw/source_code/adcirc/src/nws08.F90",
+    "lines": "1494-1511",
+    "quote": "      r = dble([(I, I=0, int(r0), 1000)])\n      res = (2d0*(r/rm)**2/(2d0 - CkCd_this + CkCd_this*(r/rm)**2))**(1d0/(2d0 - CkCd_this))* &\n            (rm*Vm + 0.5d0*f*rm**2d0)\n      res = (res - 0.5d0*f*r**2d0)/r\n      res(1) = 0d0",
+    "severity": "MED",
+    "class": "dead-guard",
+    "reason": "The vector expression divides its first element by r(1)=0 and only overwrites res(1) afterward. That post-assignment cannot neutralize an IEEE divide trap or invalid intermediate, and there is no prior mask."
+  },
+  {
+    "file": "models/ADCIRC/raw/source_code/adcirc/src/subdomain.F",
+    "lines": "398-451;513-551",
+    "quote": "      SUBROUTINE openFort019H(TimeLoc)\n         REAL(8), intent(in) :: TimeLoc\n             ecbn1(i)=0.0\n             ucbn1(i)=0.0\n             vcbn1(i)=0.0\n         read (1019,*) n",
+    "severity": "HIGH",
+    "class": "time-mixing",
+    "reason": "The hot-start opener never references TimeLoc after accepting it; it zeros the old field and reads the first fort.019 record instead of seeking the hot-start epoch. readFort019 then interpolates those beginning-of-file fields using the global hot-start timestep phase, with no skip or timestamp neutralizer."
+  },
+  {
+    "file": "models/ADCIRC/raw/source_code/adcirc/src/harm.F",
+    "lines": "401-479",
+    "quote": "      IF((NHASE.LT.0).OR.(NHASE.GT.5)) THEN\n         IF (NFOVER.EQ.1) THEN\n            CALL allMessage(WARNING,\"Input value of NHASE is not valid.\")\n            CALL allMessage(WARNING,\"NHASE will be set to zero.\")\n         ELSE",
+    "severity": "MED",
+    "class": "logic",
+    "reason": "Under NFOVER=1, all four invalid harmonic-output selectors are announced as reset to zero, but none is actually assigned. No later normalization occurs, so the invalid values remain active in harmonic/output selection logic."
+  },
+  {
+    "file": "models/ADCIRC/raw/source_code/adcirc/src/rs2.F",
+    "lines": "619-628;663-672",
+    "quote": "            totalarea = abs((x2*y3-x3*y2)-(x1*y3-x3*y1)+(x1*y2-x2*y1))\n            if((subarea1+subarea2+subarea3).le.\n     &           (totalarea*1.00001d0)) then\n              rscnf(1,n,s)=subarea1/totalarea",
+    "severity": "MED",
+    "class": "sign/geometry",
+    "reason": "A repeated or collinear STWAVE triangle has totalarea=0; for a collinear target the inclusion test accepts 0<=0 and immediately divides by zero to form radiation-stress weights. No area epsilon or degenerate-cell rejection neutralizes either triangle path."
+  }
+]

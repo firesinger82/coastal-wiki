@@ -29,3 +29,19 @@ ADCIRC HIGH 4건을 독립 skeptic 이 REFUTE 시도 → **전건 CONFIRM**(교�
 - H2 normal_flow_boundary.F90: NY_R←SIII_OLD=(XGK-XGJ)/XL(mesh L2433), 상수-x chord 시 TAUX_R=0, epsilon 가드 없음.
 - H3 weir_boundary.F90: 전 분기+호출부 무-default, PIPE_FLUX INTENT(OUT) 진입 시 미정의, RBARWL=ETA2-PIPEHT 특정값 전분기 우회.
 → ADCIRC HIGH 4 = supplement 수준(원문 span + 적대검증) 신뢰도. 단 base/감사 부재로 게이트엔 미진입(별도 채널 필요).
+
+## B tier-2 (ADCIRC 코어 확대, 2026-08-30, task-mtef53zl) — 18파일
+결과: HIGH 8 · MED 4. ★단일 pass·미검증(HIGH 는 적대검증 예정).
+
+- **HIGH·OOB** read_input.F L5141-5172;5178-5182;5213-5221 — NFEN=0 passes, and NFEN=1 is also permitted even though generated grids raise it to 2 only after NFEN-sized arrays have been allocated; IGC=0 writes S
+- **HIGH·OOB** transport.F L1443-1475 — With the default cubic scheme and accepted NFEN=2 or 3, the top branch sets k1 to -1 or 0, while the bottom branch sets k4=4, before indexing Sigma an
+- **HIGH·OOB** ephemerides.F90 L109-126;164-170;173-216 — For a first external-table request outside file coverage, recache_data returns IERR=2 before allocating self%times, but this routine continues into ra
+- **HIGH·UBA** wind.F L860-879;957-991;2088-2108;2223-2291 — The NWS=3 branches assign wind stress and wind output but never PR2; the hot-start branch also leaves the wind-output dummies unset. Because these are
+- **HIGH·UBA** owiwind.F L270-310;338-358 — NWS=-14 calls this routine to overlay OWI values only where data exist, but INTENT(OUT) makes all three actual arrays undefined before the no-data bra
+- **HIGH·UBA** owiwind_netcdf.F L687-737;815-865 — When a wind or pressure corner is converted from _FillValue to NaN, the self-equality guard skips assignment of UU/VV/Wind or PP, yet these uninitiali
+- **HIGH·sign/geometry** nws08.F90 L606;1201;1582-1596 — The Holland and CLE15 active-storm calls pass different swapped argument orders, but both cause the helper to store latitude in EyeLon and longitude i
+- **MED·sign/geometry** nws08.F90 L650-670 — At a mesh node exactly at the storm eye, sphericalDistance returns zero, so alpha divides by zero and the velocity radical evaluates an infinity-times
+- **MED·dead-guard** nws08.F90 L1494-1511 — The vector expression divides its first element by r(1)=0 and only overwrites res(1) afterward. That post-assignment cannot neutralize an IEEE divide 
+- **HIGH·time-mixing** subdomain.F L398-451;513-551 — The hot-start opener never references TimeLoc after accepting it; it zeros the old field and reads the first fort.019 record instead of seeking the ho
+- **MED·logic** harm.F L401-479 — Under NFOVER=1, all four invalid harmonic-output selectors are announced as reset to zero, but none is actually assigned. No later normalization occur
+- **MED·sign/geometry** rs2.F L619-628;663-672 — A repeated or collinear STWAVE triangle has totalarea=0; for a collinear target the inclusion test accepts 0<=0 and immediately divides by zero to for
