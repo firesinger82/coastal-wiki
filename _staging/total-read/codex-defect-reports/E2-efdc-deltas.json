@@ -1,0 +1,134 @@
+[
+ {
+  "meta": {
+   "audit": "EFDC+ second-tier solve-path defect audit",
+   "date": "2026-08-31",
+   "mode": "read-only",
+   "source_root": "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC",
+   "files_audited_count": 18,
+   "defects_found": 11,
+   "severity_counts": {
+    "high": 2,
+    "medium": 9,
+    "low": 0
+   },
+   "scope_notes": "Excluded all prior-pass files specified by the requester. Findings were retained only after tracing surrounding wet/dry masks, depth floors, layer bounds, and sibling branches.",
+   "output_status": "Requested scratchpad directory exists but is not writable; JSON returned inline.",
+   "refuted_candidates": [
+    "HP/HU/HV divisions protected by wet-cell lists, LOPENBCDRY, HDRY/HWET floors, or SUB/SVB masks were not reported.",
+    "Wave hyperbolic-function divisions are protected by HP > HDRYWAV, positive wave thresholds, minimum wave number, or explicit SINH floors.",
+    "L-index neighbor accesses in cellmap remain within the allocated sentinel/ghost-cell layout.",
+    "hdmt.f90:464 is a dead guard because M2 is capped to NREC at lines 459-461; it was not treated as a defect.",
+    "The apparently uninitialized low-wave dissipation in wavesxy.f90 is overwritten before hydrodynamic use."
+   ]
+  },
+  "files_audited": [
+   "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/hdmt.f90",
+   "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/hdmt2t.f90",
+   "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calstepd.f90",
+   "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/caltbxy.f90",
+   "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calbuoy.f90",
+   "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calebi.f90",
+   "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/caltsxy.f90",
+   "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calqq1.f90",
+   "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calqq2t.f90",
+   "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/setbcs.f90",
+   "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/setopenbc.f90",
+   "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/cellmap.f90",
+   "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/cellmask.f90",
+   "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/negdep.f90",
+   "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/subchan.f90",
+   "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Waves/wavebl.f90",
+   "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Waves/wavesxy.f90",
+   "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/MPI_Mapping/Map_Discharge_BCs.f90"
+  ]
+ },
+ {
+  "file": "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/hdmt.f90",
+  "lines": "360-369, 1239-1254",
+  "quote": "VTMP = 0.5*STCUV(L)*(V(LN,KSZV(LNC(L)))     + V(L,KSZV(L)))\nVTMP = 0.5*STCUV(L)*( V(LN ,KSZV(LN) ) + V(L,KSZV(L)) )",
+  "severity": "medium",
+  "class": "stale-neighbor-index",
+  "reason": "Neither loop assigns LN for the current L. LN retains an earlier loop's final north-neighbor index; the OpenMP private list at line 1239 also omits it. Consequently, almost every wave-enabled cell can use another cell's V velocity when calculating current-wave angle and bottom turbulent intensity. LNC(L), LA bounds, and LWVMASK do not repair the mismatched first index."
+ },
+ {
+  "file": "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/hdmt.f90",
+  "lines": "483-499",
+  "quote": "PRISEMAX = 0.0\ndo LL = 1,NQSIJ\n  NS = BCPS(LL).NQSERQ\n  if( NS < 1 ) CYCLE\n  L = BCPS(LL).L\n  DTHMIN = max(DEPTHMIN(LL),0.5*HDRY)\n\n  PRISE = PEAKFLOW(NS)/DTHMIN/DXYP(L)\n  if( PRISE > PRISEMAX )then\n    LVARY  = L\n    LLVARY = LL\n    PRISEMAX = PRISE\n  endif\nenddo\n\nTDIFF = VARYTHRESH / PRISEMAX",
+  "severity": "medium",
+  "class": "divide-by-zero",
+  "reason": "PEAKFLOW starts at zero and only accepts larger positive values. An all-zero, all-negative, or absent applicable inflow window leaves PRISEMAX equal to zero, so dynamic-DT control divides by zero. The DTHMIN floor protects the other divisor only; no guard requires PRISEMAX to be positive."
+ },
+ {
+  "file": "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/hdmt2t.f90",
+  "lines": "411-427",
+  "quote": "do L = 2,LA\n  TVAR3S(L) = TSY(LNC(L))\n  TVAR3W(L) = TSX(LEC(L))\n  TVAR3E(L) = TBX(LEC(L)   )\n  TVAR3N(L) = TBY(LNC(L))\nenddo\n\ndo L = 2,LA\n  TAUBC2 = (RSSBCE(L)*TVAR3E(L)+RSSBCW(L)*TBX(L))**2 + (RSSBCN(L)*TVAR3N(L)+RSSBCS(L)*TBY(L))**2\n  TAUBC = 0.5*SQRT(TAUBC2)\n  CTAUC(L) = TAUBC\n  UTMP = 0.5*STCUV(L)*(U(LEC(L),KSZU(LEC(L))) + U(L,KSZU(L)))+1.E-12\n  VTMP = 0.5*STCUV(L)*(V(LN ,KSZV(LN )) + V(L,KSZV(L)))",
+  "severity": "medium",
+  "class": "stale-neighbor-index",
+  "reason": "LN is not assigned in either loop and retains the final value from the earlier neighbor-initialization loop. This corrupts startup current-wave angle and bottom turbulence. The operational counterpart at lines 953-964 correctly uses LNC(L), confirming that the initialization expression is inconsistent."
+ },
+ {
+  "file": "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calstepd.f90",
+  "lines": "79-105",
+  "quote": "do K = 1,KC\n  do L = 2,LA\n    QSUBOUT(L,K) = 0.0\n    QSUBINN(L,K) = 0.0\n  enddo\nenddo\n\ndo K = 1,KC\n  do NMD = 1,MDCHH\n    if( LKSZ(L,K) ) CYCLE\n    LMDCHHT = LMDCHH(NMD)\n    LMDCHUT = LMDCHU(NMD)\n    LMDCHVT = LMDCHV(NMD)",
+  "severity": "medium",
+  "class": "stale-loop-index",
+  "reason": "The channel loop tests LKSZ(L,K) before assigning any channel cell to L. L is the terminated loop variable from the preceding LA loop, so layer inclusion is determined by an unrelated padding or stale cell rather than the host/guest channel cells. This can omit or include channel source terms incorrectly in dynamic-timestep limits; LA/KC bounds do not make the stale index semantically valid."
+ },
+ {
+  "file": "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/caltbxy.f90",
+  "lines": "697-723",
+  "quote": "if( HEIGHT_MAC(L,NAL) < FHLAYC )then\n  ! *** GRADUALLY DECREASE MACROPHYTE EFFECTS  (PMC)\n  HVGTC = HEIGHT_MAC(L,1)-HP(L)*Z(L,K-1)\n  HVGTC = max(HVGTC,0.)\nendif",
+  "severity": "medium",
+  "class": "wrong-species-index",
+  "reason": "The condition and every neighboring west/south calculation use macrophyte class NAL, but the current-cell height calculation hard-codes class 1. For NAL greater than one, vegetation drag is calculated using another class's height. HPK, layer bounds, and the nonnegative clamp do not correct the class mismatch."
+ },
+ {
+  "file": "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calebi.f90",
+  "lines": "437-445",
+  "quote": "do K = KTBV(LP),KBBV(LP),-1\n  BEC   = BEC  + DZCB(K,ND)\n  DZCBK = SGZV(L,K)*BK(K,ND)\n  BI1C  = BI1C + DZCBK\n  BI2C  = BI2C + DZCBK + ZZN(K,LS)*DZCB(K,ND)\nenddo\nBI1N(L) = BI1C\nBI2N(L) = BI2C\nBEN(L)  = BEC",
+  "severity": "high",
+  "class": "wrong-destination-index",
+  "reason": "This block explicitly computes the north-face integral of LS using B(LS,K) and ZZN(K,LS), but stores the result in BI1N/BI2N/BEN at L. The analogous blocked U-face path stores the east integral at LW, and the pressure-gradient solver consumes BI1N(LS). The assignment therefore overwrites the wrong cell and leaves the required blocked-face integral stale, directly corrupting SGZ baroclinic forcing."
+ },
+ {
+  "file": "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/caltsxy.f90",
+  "lines": "840-857",
+  "quote": "if( WINDSYX(L) < -99.0 )then\n  WINDXX = WINDSXX(L)*WNDVELE(L)+WINDSXY(L)*WNDVELN(L)\n  WNDFAC = ABS(WINDSTKA(L))\n  WINDXX = WNDFAC*WNDVELE(L)\n  U10 = ABS(WINDXX)\n  TSX(L) = 1.2E-6*(0.8 + 0.065*U10)*U10*WINDXX\n  TSY(L) = 0.\nendif",
+  "severity": "medium",
+  "class": "overwritten-coordinate-projection",
+  "reason": "The x-channel branch computes the grid-aligned wind projection and immediately overwrites it with the sheltered east component, discarding the north component and grid rotation. The adjacent y-channel branch correctly scales its projected WINDYY value, confirming the x assignment should scale WINDXX."
+ },
+ {
+  "file": "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/setopenbc.f90",
+  "lines": "152-163",
+  "quote": "do IBC = 1,NBCSOP\n  OBCRESIDUALQ1(IBC) = OBCRESIDUALQ(IBC)*SUMDAY\nenddo\n\n! *** Remove one increment\nif( SUMDAY >= TIDALP )then\n  do IBC = 1,NBCSOP\n    if( LOPENBCDRY(L) ) CYCLE\n    VOLSUM  = OBCRESIDUALQ1(IBC)\n    OBCRESIDUALQ1(IBC) = (VOLSUM - RINC*OBCRESIDUALQ(IBC))\n  enddo",
+  "severity": "medium",
+  "class": "stale-boundary-index",
+  "reason": "The removal loop never assigns L from LOBCS(IBC), although the later normalization loop does so at line 209. One stale boundary cell's dry flag therefore controls removal for every open boundary, causing wet and dry residual-flow histories to be updated incorrectly. LOPENBCDRY is a valid guard, but it guards the wrong boundary."
+ },
+ {
+  "file": "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/setopenbc.f90",
+  "lines": "580-596",
+  "quote": "CST = 0.5*DELTD2*G   *HRVO(L)*RCY(L)*HVT(L)\nTMP = DELTD2*SQRT(G*HVT(L))*DYIV(L)\nCC(L) = CST*(1.+TMP)/TMP\nCS(L) = -CST\nFP(L) = CST*( 2.*FP(L) + SQRT(G*HVT(L))*FVHDXE(L)*DXIV(L)/HVT(L))/TMP\nFP(L) = FP(L) + CNT*PSERAVG(NPSERN(LL),1)/TMP",
+  "severity": "high",
+  "class": "wrong-direction-coefficient",
+  "reason": "The north radiation branch consistently derives and uses CST, but the tidal-offset restoration unexpectedly uses CNT, the south-boundary coefficient. CNT may be stale from a different cell or uninitialized when no preceding south branch assigned it, corrupting or poisoning the north boundary forcing. The HVT divisor is wet-boundary guarded and is not the defect."
+ },
+ {
+  "file": "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/subchan.f90",
+  "lines": "69-103",
+  "quote": "SRFHOST = H1P(LHOST)+BELV(LHOST)\nSRFCHAN = H1P(LCHNV)+BELV(LCHNV)\n...\nif( HP(LHOST) <= 0.0 .or. HP(LCHNU) <= 0.0 )then\n  if( IACTIVE(NMD) == 1 )then\n    IACTIVE(NMD) = 0\n  endif\nendif",
+  "severity": "medium",
+  "class": "wrong-channel-endpoint",
+  "reason": "The type-2 y-channel branch uses LCHNV for its surface, width, length, and flow calculations but tests LCHNU for dryness. LCHNU is the x-channel guest and may be unrelated or a sentinel for a type-2 channel. This can disable a valid y-channel or leave a dry y-channel active; the HP check itself is valid but applied to the wrong endpoint."
+ },
+ {
+  "file": "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Waves/wavesxy.f90",
+  "lines": "507-540",
+  "quote": "WV_Global(LG).HEIGHT = 0.\nWV_Global(LG).HEIGHT = 0.5*WV_Global(LG).HEIGHT\nWV_Global(2:LA_Global).HEIGHT = WV_Global(2:LA_Global).HEISIG",
+  "severity": "medium",
+  "class": "dead-option-logic",
+  "reason": "The vegetation branch attempts to zero wave height in vegetated cells and halve it beside vegetation, but the unconditional whole-domain assignment at line 540 replaces every adjusted HEIGHT with HEISIG. Consequently, the documented vegetation wave attenuation has no effect before wave forcing enters hydrodynamics."
+ }
+]

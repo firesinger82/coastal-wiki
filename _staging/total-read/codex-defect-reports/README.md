@@ -121,3 +121,10 @@ drychk.f90 qxk/qyk · bccorr.f90 qxk · secrhs.f90 sour/sink · secbou.f90 r1 (�
 - MED lmd_vmix.F L225-336 — shear 재구성 부정확(부분 중립화).
 - MED conv_3d.F L327-404 — GEOPOTENTIAL_HCONV xi-flux 가 Kh(i-1,j) 를 자기자신에 더해 Kh(i,j) 무영향(face 스텐실).
 - HIGH 2 적대검증 예정.
+
+## E EFDC tier-2 (2026-08-31, task-mtgtxw31) — 18파일
+★로그 real-read. **11건(HIGH 2·MED 9)** — index/방향 버그 다수:
+- HIGH calebi.f90 L437-445 — 북면 LS 적분(B(LS,K)·ZZN(K,LS))을 잘못된 목적지 index L 의 BI1N/BI2N/BEN 에 저장.
+- HIGH setopenbc.f90 L580-596 — 북 radiation 분기가 CST 유도·사용하나 tidal-offset 복원엔 남쪽계수 CNT 사용.
+- MED: hdmt LN 미대입 stale(+OMP private 누락)·PEAKFLOW 0-나눗셈·hdmt2t LN·calstepd L stale·caltbxy NAL vs class1 하드코딩·caltsxy 풍향투영 덮어씀·setopenbc stale boundary·subchan LCHNV 계산/LCHNU 검사·wavesxy veg 무조건대입.
+- HIGH 2 적대검증 예정.
