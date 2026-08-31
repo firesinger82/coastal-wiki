@@ -107,3 +107,8 @@ drychk.f90 qxk/qyk · bccorr.f90 qxk · secrhs.f90 sour/sink · secbou.f90 r1 (�
 - HIGH calpuv2c.f90 L659-664 — 2TL MPI 경로도 subgrid channel 시 압력/자유표면 solve 없이 downstream flux·depth 소비.
 - MED calexp2t L1128-1132(SGZ 를 미대입 L 로 인덱스)·L1201-1205(Y-source 가 X성분을 Y face 에 주입)·caltran_ad L161-166(FWUU/FWVV 하면 zero)·calavb L356-360(bottom AQ 차원 불일치)·caluvw L1139-1143(SUB vs SVB mask).
 - HIGH 2 적대검증 예정. (calpuv 는 DETTMP 파일 계열 — EFDC-000 감사쌍 있으나 calpuv 자체는 미판독.)
+
+## E EFDC 적대검증 (2026-08-31) — H0 REFUTE · H1 CONFIRM
+- **calpuv2c.f90 H1 → CONFIRM**: cold-start MPI 가 restart-only 가드 우회, rank0 positive MDCHH 가 전 압력solver skip, 미해결 P 가 face-discharge/channel-flow 서 소비→HP 갱신. 실 질량비보존.
+- **calpuv9c.f90 H0 → REFUTE**: rank0 는 solver skip 하나 worker rank(MDCHH=0)는 Congrad_MPI 진입, rank0 가 MPI barrier 서 block — 조용한 비보존이 아닌 다른 거동. 특정 주장 미성립(→ 잠재 MPI 데드락 별건).
+→ EFDC 확정 HIGH 1(calpuv2c)·MED 5, 기각 HIGH 1. span-gate 가 false positive 1건 적발.
