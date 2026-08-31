@@ -92,3 +92,6 @@ drychk.f90 qxk/qyk · bccorr.f90 qxk · secrhs.f90 sour/sink · secbou.f90 r1 (�
 | **계** | **~68** | **29** | **18 전건 검증** | **11** |
 반복 최다 클래스: INTENT(OUT) sparse-assignment UBA(ADCIRC wind/owiwind·ROMS Huon/Hvom·Delft3D 4건).
 전부 base/감사 없어 supplement 게이트 밖 — 정식화엔 별도 감사채널 필요. 각 모델 잔여 대부분 미감사.
+
+## A MED 3 상세 (2026-08-31, 상세화+중립화 검사) — 전건 CONFIRM(MED)
+→ 3건 모두 default 설정선 중립화되나 지원되는 비default 경로에선 실결함(MED). FUNWAVE 3차 독립판독 신규 HIGH 0 재확인.
