@@ -1,0 +1,71 @@
+diff --git a/models/SWAN/source-analysis/swan-surfbeat-iem.md b/models/SWAN/source-analysis/swan-surfbeat-iem.md
+--- a/models/SWAN/source-analysis/swan-surfbeat-iem.md
++++ b/models/SWAN/source-analysis/swan-surfbeat-iem.md
+@@ -97,7 +97,7 @@
+ 
+ ## 4. Surfbeat physics 배경
+ 
+-**Infragravity wave (IG)** = 0.01 ~ 0.05 Hz (20~100 s 주기) 의 sub-harmonic ocean wave. 주된 형성 mechanism:
++**Infragravity wave (IG)** = 0.01 ~ 0.05 Hz (20~100 s 주기) 의 sub-harmonic ocean wave *(source-needed: IG 대역·형성 mechanism·응용 등 §4 배경 전반 — 표준 리뷰 논문 인용 필요)*. 주된 형성 mechanism:
+ 
+ 1. **Bound IG** (Longuet-Higgins·Stewart 1962): short-wave group 의 radiation stress 변동 → group-bound long wave
+ 2. **Free IG** at shore: bound IG 가 surf zone 에서 단파 breaking 후 free 로 release → coastal IG sea level oscillation
+diff --git a/models/SWAN/source-analysis/swan-vtk-output.md b/models/SWAN/source-analysis/swan-vtk-output.md
+--- a/models/SWAN/source-analysis/swan-vtk-output.md
++++ b/models/SWAN/source-analysis/swan-vtk-output.md
+@@ -3,6 +3,7 @@
+ topic: swan
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "raw `models/SWAN/raw/source_code/swan/src/SwanVTKPDataSets.ftn90` (308) + `SwanVTKWriteData.ftn90` (207) + `SwanVTKWriteHeader.ftn90` (292) 직접 read — 모두 41.95 (2022-07 Zijlema) 신설."
+ note_author: "Claude Opus 4.7 (1M context) raw source direct read"
+ note_date: 2026-06-01
+diff --git a/models/SWAN/source-analysis/swan-whitecapping.md b/models/SWAN/source-analysis/swan-whitecapping.md
+--- a/models/SWAN/source-analysis/swan-whitecapping.md
++++ b/models/SWAN/source-analysis/swan-whitecapping.md
+@@ -200,7 +200,7 @@
+ - ▢ Confusing `CDS2` (whitecapping) with `CDSV` (swell, Babanin physics).
+ - ▢ Adjusting `A1SDS/A2SDS` in `GEN3 WESTH` run — those are ST6 parameters, ignored.
+ - ▢ Expecting whitecapping with `GEN1/GEN2` — disabled.
+-- ▢ Cold-start `GEN3 ST6` with very short spin-up — Babanin cumulative term needs ~1 day to spin up.
++- ▢ Cold-start `GEN3 ST6` with very short spin-up — Babanin cumulative term needs ~1 day to spin up. *(source-needed: "~1 day" 수치 출처 부재 — 문헌 근거 제시 또는 experience/ 이동 대상)*
+ - ▢ Not pairing `GEN3 ST6` with `BABANIN` or `WAVE_BREAKING` — incomplete physics.
+ 
+ ## Next expansion
+diff --git a/models/SWAN/source-analysis/swan-xnl4-exact-quadruplet.md b/models/SWAN/source-analysis/swan-xnl4-exact-quadruplet.md
+--- a/models/SWAN/source-analysis/swan-xnl4-exact-quadruplet.md
++++ b/models/SWAN/source-analysis/swan-xnl4-exact-quadruplet.md
+@@ -84,7 +84,7 @@
+ | `iq_integ` | 0-3 integration output 옵션 |
+ | `iq_interp` | 1 bi-linear / 2 nearest bins |
+ 
+-→ **매우 많은 옵션** — DIA 단순 4-leg 식 대비 정확하지만 **계산 비용 큼 (50-100배)**.
++→ **매우 많은 옵션** — DIA 단순 4-leg 식 대비 정확하지만 **계산 비용 큼 (DIA 대비 10³~10⁴배, swantech §2.3.4)**.
+ 
+ ## 3. Top-level subroutines (28개 중 핵심)
+ 
+@@ -121,9 +121,9 @@
+ 
+ ### 4.3 DIA (Hasselmann 1985) vs XNL4
+ 
+-**DIA** (Tech §3.6): resonance locus 의 **단일 representative quadruplet** (λ 비율 0.25 / -0.25 etc) → 단순 4-leg 곱셈식. **빠름** (SWAN 표준) 하지만 정확도 ~30-50% 오차.
++**DIA** (Tech §3.6): resonance locus 의 **단일 representative quadruplet** (λ 비율 0.25 / -0.25 etc) → 단순 4-leg 곱셈식. **빠름** (SWAN 표준) 하지만 근사가 거침 (swantech §2.3.4: "relatively crude in the approximation of the Boltzmann integral"; 정량 오차 수치는 source-needed).
+ 
+-**XNL4**: 전체 locus 적분 (Simpson/Gauss-Legendre). **정확** (오차 1-5%) 하지만 50-100배 느림.
++**XNL4**: 전체 locus 적분 (Simpson/Gauss-Legendre). **정확** 하지만 DIA 대비 10³~10⁴배 느림 (swantech §2.3.4: "these exact interaction calculations are extremely expensive, typically requiring 10³ to 10⁴ times more computational effort than the DIA").
+ 
+ User cmd `QUADRUPL` (p.64) 의 옵션 선택. 학술 연구 / 검증용 XNL4, 운영 hindcast DIA.
+ 
+diff --git a/models/SWAN/source-analysis/wave/swan-source-terms-implementation.md b/models/SWAN/source-analysis/wave/swan-source-terms-implementation.md
+--- a/models/SWAN/source-analysis/wave/swan-source-terms-implementation.md
++++ b/models/SWAN/source-analysis/wave/swan-source-terms-implementation.md
+@@ -191,7 +191,7 @@
+ 
+ ## Working Rules
+ 
+-1. The source-term order in `SWCOMP` is fixed: `SBOT → SSURF → SWIND0 → WNDPAR → SWCAP → quadruplets → triads`. Adding a custom term means inserting in this order.
++1. The source-term order in `SWCOMP` is fixed: `SBOT → SSURF → SWIND0 → WNDPAR → SWCAP → triads → quadruplets` — triads first per code comment "compute nonlinear interactions, starting with triads" (`[file=src/swancom1.ftn line=7543-7556]`; quadruplets at `[file=src/swancom1.ftn line=7609-7692]`). Adding a custom term means inserting in this order.
+ 2. The matrix split (implicit vs explicit) is a **stability vs accuracy** trade-off. Implicit on diagonal is rock-solid. Explicit on RHS allows positive feedback (wind input) but requires either limiter or implicit dissipation to balance.
+ 3. Memo tables (`MEMSINB`, `MEMNL4`) are computed once per iteration and replayed per sweep — debugging output should snapshot these between iteration boundaries, not per sweep.
+ 4. `IMATDA` should remain positive (stable). If it goes negative, look for: a missing implicit dissipation term, or a Patankar-rule violation in custom code.
