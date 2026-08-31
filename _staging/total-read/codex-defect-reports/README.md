@@ -112,3 +112,12 @@ drychk.f90 qxk/qyk · bccorr.f90 qxk · secrhs.f90 sour/sink · secbou.f90 r1 (�
 - **calpuv2c.f90 H1 → CONFIRM**: cold-start MPI 가 restart-only 가드 우회, rank0 positive MDCHH 가 전 압력solver skip, 미해결 P 가 face-discharge/channel-flow 서 소비→HP 갱신. 실 질량비보존.
 - **calpuv9c.f90 H0 → REFUTE**: rank0 는 solver skip 하나 worker rank(MDCHH=0)는 Congrad_MPI 진입, rank0 가 MPI barrier 서 block — 조용한 비보존이 아닌 다른 거동. 특정 주장 미성립(→ 잠재 MPI 데드락 별건).
 → EFDC 확정 HIGH 1(calpuv2c)·MED 5, 기각 HIGH 1. span-gate 가 false positive 1건 적발.
+
+## C ROMS tier-2 (2026-08-31, task-mtgtxawc) — 18파일
+★로그 real-read: t3dmix/my25/bvf_mix/lmd_vmix/lmd_bkpp/conv_3d/wetdry 등 실제 판독(step3d_t 인라인 tracer-adv 확인). **5건(HIGH 2·MED 3)**:
+- HIGH lmd_bkpp.F L252-530 — Ustar 는 중첩 sqrt 라 음수 불가 → 안정성 가드 항상 참(dead guard).
+- HIGH wetdry.F L300-315 — 양 분기가 umask_full=1 동일 대입, vmask_full 도 동일 → 복붙 mask 가드 무력.
+- MED my25_corstep.F L786-791 — 동쪽 halo 를 Iend+1 대신 Iend-1 로 copy(타 방향은 정상).
+- MED lmd_vmix.F L225-336 — shear 재구성 부정확(부분 중립화).
+- MED conv_3d.F L327-404 — GEOPOTENTIAL_HCONV xi-flux 가 Kh(i-1,j) 를 자기자신에 더해 Kh(i,j) 무영향(face 스텐실).
+- HIGH 2 적대검증 예정.

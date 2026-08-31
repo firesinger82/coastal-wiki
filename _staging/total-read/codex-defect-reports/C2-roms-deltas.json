@@ -1,0 +1,96 @@
+[
+ {
+  "meta": {
+   "run": "C2-roms-deltas",
+   "audit_type": "second-tier ROMS NEUTRALIZER defect audit",
+   "audit_date": "2026-08-31",
+   "repo_root": "/home/firesinger/coastal-wiki",
+   "source_root": "models/ROMS/raw/source_code/roms/ROMS",
+   "files_audited_count": 18,
+   "finding_count": 5,
+   "scope_note": "Audited selected next-tier nonlinear solve-path files actually present in the repository. All first-pass files named by the request were excluded. CPP-gated paths were assessed only for correctness when their option is active."
+  },
+  "files_audited": [
+   "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/t3dmix.F",
+   "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/t3dmix2_geo.h",
+   "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/t3dmix2_iso.h",
+   "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/t3dmix2_s.h",
+   "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/t3dmix4_geo.h",
+   "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/t3dmix4_iso.h",
+   "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/t3dmix4_s.h",
+   "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/my25_corstep.F",
+   "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/my25_prestep.F",
+   "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/lmd_vmix.F",
+   "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/lmd_skpp.F",
+   "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/lmd_bkpp.F",
+   "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/bvf_mix.F",
+   "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/set_avg.F",
+   "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/set_zeta.F",
+   "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/rho_eos.F",
+   "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/wetdry.F",
+   "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/conv_3d.F"
+  ]
+ },
+ {
+  "file": "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/my25_corstep.F",
+  "lines": [
+   786,
+   791
+  ],
+  "quote": "        IF (DOMAIN(ng)%Eastern_Edge(tile)) THEN\n          DO j=Jstr,Jend\n            DO itrc=1,NAT\n              Akt(Iend-1,j,k,itrc)=Akt(Iend,j,k,itrc)\n            END DO\n            Akv(Iend-1,j,k)=Akv(Iend,j,k)",
+  "severity": "MED",
+  "class": "wrong halo target / interior overwrite",
+  "reason": "The eastern boundary copy targets Iend-1 instead of the eastern halo Iend+1. The western, northern, and southern blocks all copy into their one-point halos; this file's eastern corner formulas and lmd_vmix's equivalent block also use Iend+1. Consequently the intended east halo remains stale while the valid Iend-1 interior column is silently replaced by Iend values for every vertical mixing coefficient."
+ },
+ {
+  "file": "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/lmd_vmix.F",
+  "lines": [
+   225,
+   226,
+   334,
+   336
+  ],
+  "quote": "            shear2=dU(i,k)*dU(i,k)+dV(i,k)*dV(i,k)\n            Rig(i,j,k)=bvf(i,j,k)/(shear2+eps)\n            shear2=bvf(i,j,k)/(Rig(i,j,k)+eps)\n            cff=shear2*shear2/(shear2*shear2+16.0E-10_r8)\n            nu_sx=cff*nu_sx",
+  "severity": "MED",
+  "class": "neutralized shear-mixing input",
+  "reason": "LMD_RIMIX computes the real squared shear before reducing it to Rig, then later tries to reconstruct shear as bvf/(Rig+eps). At exactly neutral stratification, bvf and Rig are both zero for any finite velocity shear, so the reconstructed shear and cff are forced to zero. This removes the entire shear-instability contribution from Akv and Akt precisely where finite shear should give its maximum Richardson-number response. Both RI_SPLINES and direct-gradient branches form Rig with the same ratio, so the neutralization is not branch-specific."
+ },
+ {
+  "file": "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/lmd_bkpp.F",
+  "lines": [
+   252,
+   255,
+   522,
+   530
+  ],
+  "quote": "          Ustar(i,j)=SQRT(SQRT((0.5_r8*(bustr(i,j)+bustr(i+1,j)))**2+   &\n     &                         (0.5_r8*(bvstr(i,j)+bvstr(i,j+1)))**2))\n!  Under neutral and stable conditions, the depth of the bottom\n          IF (Ustar(i,j).ge.0.0_r8) THEN\n            hekman=lmd_cekman*Ustar(i,j)/MAX(ABS(f(i,j)),eps)-h(i,j)\n            hbbl(i,j)= MIN(hekman,hbbl(i,j))",
+  "severity": "HIGH",
+  "class": "always-true stability guard",
+  "reason": "Ustar is constructed by nested square roots and therefore cannot be negative, making the guard always true even though the adjacent comment restricts this cap to neutral and stable conditions. The surface KPP counterpart explicitly requires both Ustar>0 and Bfsfc>0. Here an unstable bottom buoyancy flux is still Ekman-capped; with zero stress hekman equals -h (the bottom), collapsing hbbl so the later bottom-boundary-layer mixing loop has no thickness and neutralizing buoyancy-driven bottom mixing."
+ },
+ {
+  "file": "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/wetdry.F",
+  "lines": [
+   300,
+   305,
+   310,
+   315
+  ],
+  "quote": "            IF ((rmask_wet(i-1,j).eq.0.0_r8).or.                        &\n     &          (rmask_wet(i  ,j).eq.0.0_r8)) THEN\n              umask_full(i,j)=1.0_r8\n            ELSE\n              umask_full(i,j)=1.0_r8\n            END IF",
+  "severity": "HIGH",
+  "class": "dead mask guard / neutralized nesting mask",
+  "reason": "Both branches assign umask_full=1, and the immediately following vmask_full guard has the same identical assignments. This discards the wet/dry and static velocity masks established by wetdry_ini_tile on every dynamic update. The full masks are not diagnostic-only: nesting.F multiplies U- and V-contact interpolation weights by umask_full and vmask_full. Forcing them to one therefore bypasses dry/land donor exclusion in nested velocity coupling; no later dynamic assignment restores the masks before they are consumed."
+ },
+ {
+  "file": "models/ROMS/raw/source_code/roms/ROMS/Nonlinear/conv_3d.F",
+  "lines": [
+   327,
+   341,
+   404
+  ],
+  "quote": "                cff=0.25_r8*(Kh(i-1,j)+Kh(i-1,j))*on_u(i,j)\n                cff=0.25_r8*(Kh(i,j-1)+Kh(i,j))*om_v(i,j)\n              FX(i,j)=pmon_u(i,j)*0.5_r8*(Kh(i-1,j)+Kh(i,j))*           &",
+  "severity": "MED",
+  "class": "neutralized coefficient input / wrong face stencil",
+  "reason": "In the GEOPOTENTIAL_HCONV xi-flux, the face coefficient adds Kh(i-1,j) to itself, so Kh(i,j) has no influence on FX. The eta flux immediately below averages its two adjacent cells, and the S-coordinate xi implementation also averages Kh(i-1,j) with Kh(i,j), refuting an intentional one-sided convention. Spatial variation from the right-hand diffusivity cell is therefore silently removed from this physical convolution flux."
+ }
+]
