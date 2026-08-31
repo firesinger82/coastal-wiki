@@ -147,3 +147,16 @@ drychk.f90 qxk/qyk · bccorr.f90 qxk · secrhs.f90 sour/sink · secbou.f90 r1 (�
 - HIGH taubot.f90 L480-488 — tpu 지역스칼라(L198) 첫 참조(L487)가 첫 대입보다 앞 → UBA.
 - MED cucbp(sqrt-before-guard divisor 불일치)·z_turclo(one-layer vicuv/dicuv drop·kmax>1 one-wet-layer skip)·incbc(discharge abscissae div)·windtostress(gdheat 덮어씀).
 - HIGH 5 적대검증 예정.
+
+## D Delft3D tier-2 적대검증 (2026-08-31) — HIGH 5/5 CONFIRM
+cucdp bb INTENT(OUT)·difuflux kfs/kfv·z_difuflux kkmin UBA·z_difuflux nmu/num 이웃·taubot tpu UBA — 전건 CONFIRM.
+
+## ★★ 대형·EFDC 4모델 코어 감사 총계 (tier-1+tier-2, 게이트 밖, HIGH 전건 적대검증)
+| 모델 | 감사파일 | 확정 HIGH | MED | 기각 HIGH |
+|---|---|---|---|---|
+| ADCIRC | ~48 | 12 | 7 | — |
+| ROMS | ~38 | 3 | 5 | 1 (lmd_bkpp) |
+| Delft3D | ~34 | 9 | 7 | — |
+| EFDC | ~37 | 3 | 14 | 1 (calpuv9c) |
+| **계** | **~157** | **27** | **33** | **2** |
+전 확정 HIGH(27)는 원문 span + 독립 skeptic 적대검증 통과. 반복 최다 = **INTENT(OUT) sparse-assignment / 지역변수 UBA**(4모델 전부 독립 발생: ADCIRC wind/owiwind·ROMS Huon/Hvom·Delft3D cucdp/drychk/secrhs·EFDC calpuv 계열). 방향/인덱스 오류도 다수(EFDC calebi·setopenbc, Delft3D z_difuflux nmu/num, ROMS conv_3d). 각 모델 잔여 대부분·ROMS 2.8M/Delft3D 1.6M 대부분 미감사.
