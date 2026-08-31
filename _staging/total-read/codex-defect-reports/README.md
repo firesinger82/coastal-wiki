@@ -100,3 +100,10 @@ drychk.f90 qxk/qyk · bccorr.f90 qxk · secrhs.f90 sour/sink · secbou.f90 r1 (�
 - **etauv_solver.F** L425-431 — west test owns the whole outer branch, east is an ELSEIF; if both x-coupling flags true on one domain, I=Iend stays in the west arm, fails its I=Ibeg  [중립화: gated by COUPLING compile + DISPERSION runtime, but both-sides-active case not n]
 - **mod_time_spectra.F** L325-333,365-373 — single IF advances the spectrum pair by only one record even if TIME crossed several record times → interpolation weights extrapolate until later step [중립화: small timesteps / EOF-hold avoid it but neither is an enforced bracket guard; no]
 - **mod_sediment.F** L1385-1400 — SEDIMENT_ADVECTION_DIFFUSION runs once per each of 3 RK stages but adds full physical DT to the averaging clock and sums each call → non-default Morph [중립화: default Morph_interval=SMALL resets every stage (neutralized); explicitly-config]
+
+## E — EFDC+ 코어 1차 결함감사 (cal* 솔버, 2026-08-31, task-mtgpwmvp) — 19파일
+★로그 검증: calexp2t/congrad 등 실제 판독. (기읽은 6 EFDC-000 IO/setup 파일 제외.) **7건(HIGH 2·MED 5)**:
+- HIGH calpuv9c.f90 L693-698 — MPI+MDCHH>=1(subgrid channel) 분기서 MPI/channel 압력solver 모두 미호출 후 P를 해결된 듯 exchange·사용. 질량 비보존.
+- HIGH calpuv2c.f90 L659-664 — 2TL MPI 경로도 subgrid channel 시 압력/자유표면 solve 없이 downstream flux·depth 소비.
+- MED calexp2t L1128-1132(SGZ 를 미대입 L 로 인덱스)·L1201-1205(Y-source 가 X성분을 Y face 에 주입)·caltran_ad L161-166(FWUU/FWVV 하면 zero)·calavb L356-360(bottom AQ 차원 불일치)·caluvw L1139-1143(SUB vs SVB mask).
+- HIGH 2 적대검증 예정. (calpuv 는 DETTMP 파일 계열 — EFDC-000 감사쌍 있으나 calpuv 자체는 미판독.)

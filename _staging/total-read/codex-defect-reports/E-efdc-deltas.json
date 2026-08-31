@@ -1,0 +1,83 @@
+[
+ {
+  "meta": "efdc-core-map",
+  "files_audited": [
+   "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calpuv9c.f90",
+   "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calpuv2c.f90",
+   "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/congrad.f90",
+   "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/congradc.f90",
+   "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/MPI_Domain_Decomp/Congrad_MPI.f90",
+   "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp.f90",
+   "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp2t.f90",
+   "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calhdmf.f90",
+   "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calhdmf3.f90",
+   "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/caluvw.f90",
+   "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calavb.f90",
+   "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Transport/calconc.f90",
+   "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Transport/caltran.f90",
+   "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Transport/caltran_ad.f90",
+   "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Transport/caldiff.f90",
+   "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Transport/calfqc.f90",
+   "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Transport/calqvs.f90",
+   "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/MPI_Communication/mod_Communicate_Ghost_Routines.f90",
+   "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/MPI_Communication/Communicate_Groups.f90"
+  ],
+  "note": "First-pass depth audit of the external pressure/continuity solve, 2TL/3TL explicit and diffusive momentum, velocity/vertical-viscosity updates, constituent transport/source assembly, and their MPI halo paths. The six previously audited files and the requested physics/output/test exclusions were not selected."
+ },
+ {
+  "file": "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calpuv9c.f90",
+  "lines": "693-698",
+  "quote": "  ! *********************************************************************************************\n  ! *** CALL THE PRECONDITIONED CONJUGATE GRADIENT SOLVER\n  if( num_processors > 1 )then\n    if( MDCHH == 0 ) CALL Congrad_MPI    ! *** MSCHH> = 1 not parallelized yet @todo\n    TTDS = DSTIME(0)        ! delme - 2TL does not have this communicaiton...\n    call MPI_barrier(DSIcomm, ierr)",
+  "severity": "HIGH",
+  "class": "mass/volume non-conservation",
+  "reason": "With MPI and MDCHH>=1, this branch calls neither the MPI pressure solver nor the channel-aware serial solver, then exchanges and uses P as though the continuity system had been solved. The only CONGRADC call is in the serial branch, and no configuration guard neutralizes this path."
+ },
+ {
+  "file": "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calpuv2c.f90",
+  "lines": "659-664",
+  "quote": "  if( num_processors > 1 )then\n    if( MDCHH == 0 ) Call Congrad_MPI   ! *** MSCHH> = 1 not parallelized yet @todo\n  else\n    if( MDCHH == 0 ) CALL CONGRAD\n    if( MDCHH >= 1 ) CALL CONGRADC\n  endif",
+  "severity": "HIGH",
+  "class": "mass/volume non-conservation",
+  "reason": "The 2TL MPI path likewise performs no pressure/free-surface solve when subgrid channels exist, after which downstream flux and depth updates consume the unsolved P. No MPI channel solver or rejection guard is present on this path."
+ },
+ {
+  "file": "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp2t.f90",
+  "lines": "1128-1132",
+  "quote": "        if( MDCHTYP(NMD) == 1 )then  \n          if( QCHANU(NMD) > 0.0 )then  \n            do K = 1,KC  \n              QMCSINKX(LCHNU,K) = QMCSINKX(LCHNU,K)-0.5*DZC(L,K)*QCHANU(NMD)*(U(LCHNU,K)+U(LCHNU+1,K))  \n              QMCSINKY(LCHNU,K) = QMCSINKY(LCHNU,K)-0.5*DZC(L,K)*QCHANU(NMD)*(V(LCHNU,K)+V(LNC(LCHNU),K))",
+  "severity": "MED",
+  "class": "OOB or wrong subscript",
+  "reason": "The channel loop indexes cell-dependent SGZ thickness with L, which is not assigned in this SINGLE block, instead of a channel/host cell such as LCHNU. Thus a stale or undefined unrelated cell controls every layer's channel momentum weight, with no later remapping or guard."
+ },
+ {
+  "file": "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp2t.f90",
+  "lines": "1201-1205",
+  "quote": "          if( QMCSOURY(L,K) /= 0.0 )then  \n            TMPVAL = SVB(L)+SVB(LN)  \n            TMPVAL = max(TMPVAL,1.0)  \n            FY(L,K)  = FY(L,K)  - SVB3D(L ,K)*QMCSOURX(L,K)/TMPVAL  \n            FY(LN,K) = FY(LN,K) - SVB3D(LN,K)*QMCSOURX(L,K)/TMPVAL",
+  "severity": "MED",
+  "class": "sign/geometry inconsistency",
+  "reason": "The Y-source branch tests QMCSOURY but applies the X component to both FY faces, so the computed Y channel momentum is discarded and X momentum is injected into Y. The SVB masks only scale that wrong component; they do not neutralize it."
+ },
+ {
+  "file": "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Transport/caltran_ad.f90",
+  "lines": "161-166",
+  "quote": "          FUHUD(L     , K,IW) = 0.0  \n          FUHUD(LEC(L), K,IW) = 0.0  \n          FVHUD(L     , K,IW) = 0.0  \n          FVHUD(LNC(L), K,IW) = 0.0  \n          FWUU(L,K  ,IW)  = 0.0  \n          FWVV(L,K-1,IT)  = 0.0",
+  "severity": "MED",
+  "class": "OOB or wrong subscript",
+  "reason": "Before positive/negative vertical flux splitting, both adjacent raw antidiffusive faces reside in FWUU, but the lower source-cell face is zeroed in FWVV instead. For an interior source layer FWVV is subsequently regenerated from the still-nonzero FWUU, so the intended source-cell limiter has no neutralizer on that face."
+ },
+ {
+  "file": "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calavb.f90",
+  "lines": "356-360",
+  "quote": "        do LP = LF,LL  \n          L = LWET(LP)  \n          AQ(L,KSZ(L)) = 0.314*DML(L,KSZ(L))**QQSQR(L,KSZ(L)) + AVOXYHPI(L)\n          AQ(L,KC)     = 0.314*DML(L,KC    )* QQSQR(L,KC    ) + AVOXYHPI(L)\n        enddo",
+  "severity": "MED",
+  "class": "sign/geometry inconsistency",
+  "reason": "The bottom AQ expression exponentiates mixing length by sqrt(TKE), while the adjacent interior and top formulas multiply those quantities; this is dimensionally inconsistent and can inflate bottom diffusivity by orders of magnitude. In a multi-active-layer cell the top assignment does not overwrite the bottom value."
+ },
+ {
+  "file": "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/caluvw.f90",
+  "lines": "1139-1143",
+  "quote": "              if( ABS(UHDYE(L)) > ABS(VHDXE(L)) )then\n                SINH4(L) = 0.25*SINHH/WV(L).FREQ*WV(L).K * SUB(L)*(HP(LWC(L))-HP(L))*DXIU(L)\n              else\n                SINH4(L) = 0.25*SINHH/WV(L).FREQ*WV(L).K * SUB(L)*(HP(LSC(L))-HP(L))*DYIV(L)\n              endif",
+  "severity": "MED",
+  "class": "sign/geometry inconsistency",
+  "reason": "The south-neighbor depth gradient in the Y-dominant branch is masked by the U-face mask SUB rather than the Y-face mask SVB. At asymmetric walls this admits or suppresses vertical Stokes drift against the actual face geometry, and STOKESW is later added to W2 without an SVB correction."
+ }
+]
