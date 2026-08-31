@@ -95,3 +95,8 @@ drychk.f90 qxk/qyk · bccorr.f90 qxk · secrhs.f90 sour/sink · secbou.f90 r1 (�
 
 ## A MED 3 상세 (2026-08-31, 상세화+중립화 검사) — 전건 CONFIRM(MED)
 → 3건 모두 default 설정선 중립화되나 지원되는 비default 경로에선 실결함(MED). FUNWAVE 3차 독립판독 신규 HIGH 0 재확인.
+
+(A MED 3 상세 항목):
+- **etauv_solver.F** L425-431 — west test owns the whole outer branch, east is an ELSEIF; if both x-coupling flags true on one domain, I=Iend stays in the west arm, fails its I=Ibeg  [중립화: gated by COUPLING compile + DISPERSION runtime, but both-sides-active case not n]
+- **mod_time_spectra.F** L325-333,365-373 — single IF advances the spectrum pair by only one record even if TIME crossed several record times → interpolation weights extrapolate until later step [중립화: small timesteps / EOF-hold avoid it but neither is an enforced bracket guard; no]
+- **mod_sediment.F** L1385-1400 — SEDIMENT_ADVECTION_DIFFUSION runs once per each of 3 RK stages but adds full physical DT to the averaging clock and sums each call → non-default Morph [중립화: default Morph_interval=SMALL resets every stage (neutralized); explicitly-config]
