@@ -78,3 +78,17 @@ step3d_uv Huon/Hvom intent(out) read-before-write·main3d knew=4 vs 3슬롯 OOB.
 - MED tratur.f90 — V-wall 난류가 속도엔 GVV, 길이척도엔 GUU 사용(불일치).
 - MED tritra.f90 — SNELLI 가 longshore flux 0 으로 풀고 질량/morphology flux 는 원 discharge 로 재구성.
 - HIGH 4 적대검증 예정.
+
+## D Delft3D 적대검증 (2026-08-31) — HIGH 4/4 CONFIRM
+독립 skeptic 이 실제 INTENT 키워드 확정 → 전건 INTENT(OUT), CONFIRM:
+drychk.f90 qxk/qyk · bccorr.f90 qxk · secrhs.f90 sour/sink · secbou.f90 r1 (모두 sparse-assign UBA).
+
+## ★대형 3모델 코어 감사 누적 (게이트 밖, 로그 real-read 검증, HIGH 전건 적대검증 CONFIRM)
+| 모델 | 감사파일 | 결함 | HIGH(검증) | MED |
+|---|---|---|---|---|
+| ADCIRC | 30/837 | 19 | 12 ✅ | 7 |
+| ROMS | ~20/3870 | 4 | 2 ✅ | 2 |
+| Delft3D | ~18/7256 | 6 | 4 ✅ | 2 |
+| **계** | **~68** | **29** | **18 전건 검증** | **11** |
+반복 최다 클래스: INTENT(OUT) sparse-assignment UBA(ADCIRC wind/owiwind·ROMS Huon/Hvom·Delft3D 4건).
+전부 base/감사 없어 supplement 게이트 밖 — 정식화엔 별도 감사채널 필요. 각 모델 잔여 대부분 미감사.

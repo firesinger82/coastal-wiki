@@ -1,0 +1,34 @@
+[
+  {
+    "file": "drychk.f90",
+    "intent_found": "qxk: intent(out); qyk: intent(out)",
+    "verdict": "CONFIRM",
+    "decisive_lines": "packages/flow2d3d_kernel/src/compute/drychk.f90:77-78,111-136,175-180; packages/flow2d3d_kernel/src/compute/adi.f90:395-409; packages/flow2d3d_kernel/src/main/trisol.f90:1999-2026; packages/flow2d3d_kernel/src/compute/difu.f90:194-195,366-443",
+    "quote": "real(fp), dimension(gdp%d%nmlb:gdp%d%nmub, kmax), intent(out) :: qxk ... qyk; qxk(nm, k) = 0.0_fp; call dfexchg ( qxk, 1, kmax, dfloat, nm_pos, gdp ); qxu = qxk(nm, k)/6.0_fp",
+    "reason": "The plain explicit-shape qxk/qyk dummies are genuinely INTENT(OUT), but only four faces around cells that newly dry are zeroed; when nfltyp==0 no flux element is assigned at all. Prior SUD population cannot survive INTENT(OUT), and drychk itself exchanges both arrays before returning; the caller then reaches TRITRA/DIFU without a full overwrite, where DIFU reads qxk/qyk across every nm and k. Thus none of the intent, full-body population, pre-initialization, post-overwrite, or subset-only-use counter-hypotheses refutes the defect."
+  },
+  {
+    "file": "bccorr.f90",
+    "intent_found": "qxk: intent(out) (subroutine name is bccor)",
+    "verdict": "CONFIRM",
+    "decisive_lines": "packages/flow2d3d_kernel/src/compute/bccorr.f90:1,80,106-145; packages/flow2d3d_kernel/src/compute/adi.f90:346-369,505-527; packages/flow2d3d_kernel/src/compute/sud.f90:216,389-395",
+    "quote": "subroutine bccor(...); ... intent(out) :: qxk; qxk(nmf,k) = circ2d(1,ic) * thick(k); ... intent(in) :: qyk; d0k(nm, k) = ... - qyk(nm, k) + qyk(nm - icy, k)",
+    "reason": "The file defines BCCOR (not BCCORR), and its flux dummy is plain INTENT(OUT); it writes only qualifying discharge-boundary endpoints. At both ADI call sites that actual array is immediately passed as SUD's explicit-direction qyk, which is INTENT(IN) and read for every active continuity cell before the implicit-direction flux is rebuilt. Earlier flux population is therefore erased semantically and there is no intervening full reset, so the sbkol-enabled path is a real undefined-value use."
+  },
+  {
+    "file": "secrhs.f90",
+    "intent_found": "sour: intent(out); sink: intent(out)",
+    "verdict": "CONFIRM",
+    "decisive_lines": "packages/flow2d3d_kernel/src/compute/secrhs.f90:98-99,142,158-202; packages/flow2d3d_kernel/src/main/trisol.f90:1403-1416,1853-1884,1996-2026; packages/flow2d3d_kernel/src/compute/sousin.f90:109-116; packages/flow2d3d_kernel/src/compute/difu.f90:695-729",
+    "quote": "intent(out) :: sink; intent(out) :: sour; k = 1; sour(nm, k, lsecfl) = ...; sink(nm, k, lsecfl) = ...; do l = 1, lstsci ... sink(nm,k,l) ... sour(nm,k,l)",
+    "reason": "SOUSIN does fully zero and initialize all source/sink entries earlier in the half step, but SECRHS's subsequent plain INTENT(OUT) association undefines that entire storage. SECRHS restores only active (nm,1,lsecfl) entries; DISCHA and other following routines only add or alter selected constituents/locations rather than fully resetting the arrays. DIFU then loops over all constituents, layers, and active cells and reads both arrays, so the pre-initialization counter-hypothesis does not save this path."
+  },
+  {
+    "file": "secbou.f90",
+    "intent_found": "r1: intent(out)",
+    "verdict": "CONFIRM",
+    "decisive_lines": "packages/flow2d3d_kernel/src/compute/secbou.f90:82,116-157; packages/flow2d3d_kernel/src/compute/difu.f90:702-720,743-760; packages/flow2d3d_kernel/src/compute/difuvl.f90:730-781; packages/flow2d3d_kernel/src/compute/f0isf1.f90:392-403",
+    "quote": "intent(out) :: r1; k = 1; r1(nmf, k, lsecfl) = equili; ... r1(nmlu, k, lsecfl) = equili; call dfexchg ( r1(:,:,l), 1, kmax, dfloat, nm_pos, gdp )",
+    "reason": "R1 is genuinely plain whole-field INTENT(OUT), not INOUT, while SECBOU restores only k=1 secondary-flow values at the two row endpoints. On the lsec==2 path, DIFU/DIFUVL has already populated active interior r1 values immediately before SECBOU; after the call it exchanges the now-undefined full secondary-flow slice and cycles without rebuilding it. The broader r1 array is later consumed/copied (for example F0ISF1 copies every constituent/cell/layer), so neither prior population nor later overwrite refutes the defect."
+  }
+]
