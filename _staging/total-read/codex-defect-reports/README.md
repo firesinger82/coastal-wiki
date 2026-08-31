@@ -128,3 +128,7 @@ drychk.f90 qxk/qyk · bccorr.f90 qxk · secrhs.f90 sour/sink · secbou.f90 r1 (�
 - HIGH setopenbc.f90 L580-596 — 북 radiation 분기가 CST 유도·사용하나 tidal-offset 복원엔 남쪽계수 CNT 사용.
 - MED: hdmt LN 미대입 stale(+OMP private 누락)·PEAKFLOW 0-나눗셈·hdmt2t LN·calstepd L stale·caltbxy NAL vs class1 하드코딩·caltsxy 풍향투영 덮어씀·setopenbc stale boundary·subchan LCHNV 계산/LCHNU 검사·wavesxy veg 무조건대입.
 - HIGH 2 적대검증 예정.
+
+## E EFDC tier-2 적대검증 (2026-08-31) — HIGH 2/2 CONFIRM
+- calebi.f90 H0 CONFIRM: V블록이 "NORTH FACE INTEGRAL OF LS"(B(LS,K)·ZZN(K,LS))를 LS 아닌 L 의 BI1N/BI2N/BEN 에 저장. consumer calpuv2c.f90 L521-522 는 BI*N(LS) 소비 → 목적지 index 오류 확정.
+- setopenbc.f90 H1 CONFIRM: 남/서/동 branch 는 각자 계수(CNT/CET/CWT)로 offset 복원하나, 북 branch 는 전부 CST 쓰다 L596서만 미할당 CNT 사용(그 CNT L609 할당은 excess-flow용, tidal 아님).
