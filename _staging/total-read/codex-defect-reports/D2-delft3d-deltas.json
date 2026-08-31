@@ -1,0 +1,116 @@
+[
+ {
+  "meta": {
+   "files_audited": [
+    "packages/flow2d3d_kernel/src/compute/cucbp.f90",
+    "packages/flow2d3d_kernel/src/compute/cucdp.f90",
+    "packages/flow2d3d_kernel/src/compute/mom_cw.f90",
+    "packages/flow2d3d_kernel/src/compute/mom_cyclic.f90",
+    "packages/flow2d3d_kernel/src/compute/mom_fls.f90",
+    "packages/flow2d3d_kernel/src/compute/mom_waqua.f90",
+    "packages/flow2d3d_kernel/src/compute/difuflux.f90",
+    "packages/flow2d3d_kernel/src/compute/difacr.f90",
+    "packages/flow2d3d_kernel/src/compute/difhor.f90",
+    "packages/flow2d3d_kernel/src/compute/z_difuflux.f90",
+    "packages/flow2d3d_kernel/src/compute/z_vihrov.f90",
+    "packages/flow2d3d_kernel/src/compute/z_turclo.f90",
+    "packages/flow2d3d_kernel/src/compute/upwhu.f90",
+    "packages/flow2d3d_kernel/src/compute/z_updtvol.f90",
+    "packages/flow2d3d_kernel/src/compute/hydkad.f90",
+    "packages/flow2d3d_kernel/src/timedep/incbc.f90",
+    "packages/flow2d3d_kernel/src/timedep/windtostress.f90",
+    "packages/flow2d3d_kernel/src/compute/taubot.f90"
+   ],
+   "categories_covered": [
+    "horizontal advection/momentum schemes",
+    "transport flux limiting and horizontal diffusion",
+    "z-layer vertical/horizontal eddy viscosity and turbulence closure",
+    "continuity, water-level, volume, and hydrodynamic activity masks",
+    "open-boundary application and QH interpolation",
+    "bottom-friction coupling",
+    "wind-stress forcing coupling"
+   ],
+   "notes": "Selection rationale: cucbp/cucdp cover boundary coefficient changes; mom_cw/mom_cyclic/mom_fls/mom_waqua cover the four non-UZD momentum variants; difuflux/difacr/difhor/z_difuflux cover limiter and diffusion paths; z_vihrov/z_turclo cover z-layer mixing; upwhu/z_updtvol/hydkad cover water-level, volume, and activity updates; incbc covers non-bccorr boundary application; windtostress covers atmospheric forcing; taubot covers bottom friction. Supporting callers and input readers were inspected only to validate data flow. No standalone dryflp.f90, dryflc.f90, hydbc.f90, z_hydbc.f90, calcuv.f90, kepsilon.f90, or ktur.f90 exists in this tree; dryflp/dryflc are configuration values in the already-excluded drying path. Pressure-gradient insertion resides in the excluded uzd/cucnp path, so no separate eligible pressure routine was found. Previously audited files and their defects were not re-audited or re-reported. Actual INTENT declarations were checked for every argument involved in a stale/undefined-data candidate. Candidate depth and geometry divisions were rejected when protected by kfu/kfv/kcs/kfs masks, dryflc/drytrsh floors, MAX guards, or validated wind-stress breakpoints."
+  }
+ },
+ {
+  "file": "packages/flow2d3d_kernel/src/compute/cucdp.f90",
+  "lines": "68",
+  "quote": "    real(fp), dimension(gdp%d%nmlb:gdp%d%nmub), intent(out) :: bb",
+  "severity": "high",
+  "class": "incorrect INTENT causes undefined coefficients",
+  "reason": "bb is explicitly INTENT(OUT), so the whole actual array becomes undefined on entry. Lines 98-117 define only the two endpoints of discharge boundaries of types 5/7. The supporting caller check in sud.f90:908-919 shows bb(nm) is subsequently read for every active kfu cell, leaving interior and other-boundary coefficients undefined rather than preserved. No mask or initialization in cucdp defines the remaining elements."
+ },
+ {
+  "file": "packages/flow2d3d_kernel/src/compute/cucbp.f90",
+  "lines": "349-350",
+  "quote": "             alfas   = sqrt(ag/(dep + sepu))\n             if (dep<0) then",
+  "severity": "medium",
+  "class": "late and mismatched validity guard",
+  "reason": "The square root is evaluated before the only guard. Its divisor is total depth dep+sepu, but the later test checks dep alone. Thus dep<0 can raise an invalid floating-point operation before the fallback, while dep>=0 with sepu<=-dep bypasses the guard entirely. This branch has no preceding dry-cell skip, epsilon floor, or MAX depth clamp. The symmetric end-of-row branch repeats the ordering at lines 557-564."
+ },
+ {
+  "file": "packages/flow2d3d_kernel/src/compute/difuflux.f90",
+  "lines": "262",
+  "quote": "          if (kfs(nm)==1 .and. kcs(nm)>0) then ",
+  "severity": "high",
+  "class": "wrong face-activity mask",
+  "reason": "The Y-face loop is guarded by cell wetness kfs rather than face activity kfv. iad1=kfv at line 278 masks only advection; the diffusive flux at lines 293-300 is still added whenever hmin>dryflc, without a kfv test. That depth guard proves the cells are wet but does not prove the intervening V face is open, so constituents can diffuse through a closed face. The X-direction counterpart correctly uses kfu at line 169."
+ },
+ {
+  "file": "packages/flow2d3d_kernel/src/compute/z_difuflux.f90",
+  "lines": "338-355",
+  "quote": "          if (kfu(nm) /= 0 .and. kcs(nm)*kcs(nmu) /= 0) then\n             kmin   = max(kfumin(nm), 1)\n             kkmin  = min(kfsmx0(nm), kfsmax(nm))\n             kkminu = min(kfsmx0(nmu), kfsmax(nmu))\n             do k = kmin, min(kkmin, kkminu)\n                do l = 1, lstsci\n                   if (qxk(nm,k) > 0.0_fp) then\n                      fluxu(nm,k,l) = fluxu(nm,k,l) + qxk(nm, k) * r1(nm , k, l)\n                   elseif (qxk(nm,k) < 0.0_fp) then\n                      fluxu(nm,k,l) = fluxu(nm,k,l) + qxk(nm, k) * r1(nmu, k, l)\n                   endif\n                enddo\n             enddo\n          endif\n          !\n          ! Adjacent cell water fall correction (explicit)\n          !\n          if (kfumx0(nm) > min(kkmin,kkminu)) then",
+  "severity": "high",
+  "class": "uninitialized loop bounds",
+  "reason": "kkmin and kkminu are local integers declared without initialization at line 118. They are assigned only inside the kfu/kcs guard, but the water-fall test reads both after that guard unconditionally. On an inactive or closed X face they are undefined on the first such iteration or stale from the previous nm thereafter, potentially producing invalid loop and array bounds. No earlier initialization exists in the iupw branch. The Y block repeats the defect for kkmin/kkminv at lines 377-395."
+ },
+ {
+  "file": "packages/flow2d3d_kernel/src/compute/z_difuflux.f90",
+  "lines": "364-368",
+  "quote": "                elseif (qxk(nm, k) < 0.0_fp) then\n                   do l = 1, lstsci\n                      flux = qxk(nm, k) * r0(num, k, l)\n                      if (kcs(nm) == 1) then\n                         fluxu(nm, kkmin, l) = fluxu(nm, kkmin, l) + flux",
+  "severity": "high",
+  "class": "wrong upstream-neighbor index",
+  "reason": "For X transport the adjacent cell is nmu=nm+icx, while num=nm+icy is the transverse Y neighbor. The normal negative-X-flow path correctly reads r1(nmu,...) at line 347, but this water-fall correction reads r0(num,...). The kcs(nm) guard controls only destination activity and cannot correct the wrong source index, so negative X flux imports concentration from the Y neighbor."
+ },
+ {
+  "file": "packages/flow2d3d_kernel/src/compute/z_turclo.f90",
+  "lines": "211-217",
+  "quote": "    if (kmax==1) then\n       do nm = 1, nmmax\n          vicuv(nm, 1) = vicuv(nm, kbg)\n          dicuv(nm, 1) = dicuv(nm, kbg)\n       enddo\n       goto 2000\n    endif",
+  "severity": "medium",
+  "class": "single-layer turbulence term omission",
+  "reason": "The one-layer z-model exit copies only background coefficients and drops vicuv/dicuv at khtur. The normal z-layer formula at lines 608-611 adds both kbg and khtur, and detvic populates khtur; there is no guard proving khtur is zero. Thus HLES or wave-induced horizontal mixing is silently omitted for kmax=1."
+ },
+ {
+  "file": "packages/flow2d3d_kernel/src/compute/z_turclo.f90",
+  "lines": "604-615",
+  "quote": "    do nm = 1, nmmax\n       if (kfsmax(nm)>kfsmin(nm)) then\n         do k = kfsmin(nm), kfsmax(nm)\n            if (kfs(nm)==1) then\n               vicuv(nm, k) = 0.5 * (vicww(nm, k) + vicww(nm, k-1)) &\n                            & + vicuv(nm, kbg) + vicuv(nm, khtur)\n               dicuv(nm, k) = 0.5 * (dicww(nm, k) + dicww(nm, k-1)) &\n                            & + dicuv(nm, kbg) + dicuv(nm, khtur)\n            endif\n         enddo\n       endif\n    enddo",
+  "severity": "medium",
+  "class": "one-wet-layer coefficient not refreshed",
+  "reason": "For kmax>1, a currently wet column with exactly one wet layer has kfsmax==kfsmin and is skipped even when kfs(nm)==1. Lines 221-228 initialize vicww/dicww but not physical vicuv/dicuv slots. The actual dummy declarations at lines 126-127 contain no INTENT keyword and are not INTENT(OUT); skipped slots therefore retain caller storage from a prior wet-layer layout instead of being recomputed from vertical, background, and HLES terms. No dry mask neutralizes this because the omitted case is explicitly a wet cell."
+ },
+ {
+  "file": "packages/flow2d3d_kernel/src/timedep/incbc.f90",
+  "lines": "635-647",
+  "quote": "    do ito = ntof + 1, ntof + ntoq\n       if (     (itbct(5, ito)<0)               &\n         & .or. (qtfrct(ito)<hydrbc(1, ito, 1)) &\n         & .or. (qtfrct(ito)>hydrbc(3, ito, 1))  ) then\n          call updbcq(lunbcq    ,lundia    ,itbct     ,ito       ,nto       , &\n                    & kcd       ,hydrbc    ,qtfrct(ito)          ,gdp       )\n       endif\n       !\n       ! Change QTFRCT(ITO) from discharge into waterlevel using table\n       !\n       qtfrct(ito) = hydrbc(2, ito, 1) + (hydrbc(4, ito, 1) - hydrbc(2, ito, 1))&\n                   & *((qtfrct(ito) - hydrbc(1, ito, 1))                        &\n                   & /(hydrbc(3, ito, 1) - hydrbc(1, ito, 1)))",
+  "severity": "medium",
+  "class": "unchecked interpolation denominator",
+  "reason": "The only guard reloads a range; it never checks equality of the two discharge abscissae before dividing. Supporting inspection of updbcq.f90 and inibcq.f90 found no monotonicity or duplicate-Q validation. With adjacent equal Q values, a qtfrct equal to that Q is inside the selected range, bypasses the reload, and divides by zero. This is not a shallow-water depth divisor, and no epsilon or equality guard exists on this path."
+ },
+ {
+  "file": "packages/flow2d3d_kernel/src/timedep/windtostress.f90",
+  "lines": "139-147",
+  "quote": "             windcd(n,m) = max(cdwl, cd)\n             !\n             windsu(n,m) = windcd(n,m) * wsp2 * cos(wangle) * rhoa\n             windsv(n,m) = windcd(n,m) * wsp2 * sin(wangle) * rhoa\n             w10mag(n,m) = wsp\n             if((sdlake == 1) .and. (wslake == 1)) then\n                gdp%gdheat%stanton = windcd(n,m) * gdp%gdheat%mulsta\n                gdp%gdheat%dalton  = windcd(n,m) * gdp%gdheat%muldal\n             endif",
+  "severity": "medium",
+  "class": "spatial coefficient collapsed to last cell",
+  "reason": "windcd is spatial and varies with local wind speed, but scalar gdheat components stanton and dalton are overwritten in every active-cell iteration. heatu.f90:1093-1111 later applies those scalars at every nm, so all cells use the coefficient from the last active loop cell and results depend on traversal or domain decomposition. The gd_heat declarations were checked: these are scalar module components with no INTENT, and there is no per-cell storage or reduction guard."
+ },
+ {
+  "file": "packages/flow2d3d_kernel/src/compute/taubot.f90",
+  "lines": "480-488",
+  "quote": "       if (v2dwbl .and. kmax>1 .and. .not.zmodel) then\n          !\n          ! Determine representative 2Dh velocity based on velocities in first layer above wave boundary layer \n          ! kmaxx is the first layer with its centre above the wave boundary layer\n          ! Use deltau from previous time step !\n          ! Only implemented for sigma layers\n          !\n          if (tpu>1.0) then",
+  "severity": "high",
+  "class": "use before assignment",
+  "reason": "tpu is a local scalar declared at line 198. Its first executable reference is this test at line 487, while its first assignment occurs only at line 570 after kmaxxx and the velocities have already been selected. With v2dwbl enabled, the first cell reads an undefined value and later cells test the previous cell's wave period, making the representative layer and bottom stress order-dependent. The option condition does not initialize tpu, and no earlier assignment exists."
+ }
+]

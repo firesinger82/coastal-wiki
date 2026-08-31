@@ -132,3 +132,18 @@ drychk.f90 qxk/qyk · bccorr.f90 qxk · secrhs.f90 sour/sink · secbou.f90 r1 (�
 ## E EFDC tier-2 적대검증 (2026-08-31) — HIGH 2/2 CONFIRM
 - calebi.f90 H0 CONFIRM: V블록이 "NORTH FACE INTEGRAL OF LS"(B(LS,K)·ZZN(K,LS))를 LS 아닌 L 의 BI1N/BI2N/BEN 에 저장. consumer calpuv2c.f90 L521-522 는 BI*N(LS) 소비 → 목적지 index 오류 확정.
 - setopenbc.f90 H1 CONFIRM: 남/서/동 branch 는 각자 계수(CNT/CET/CWT)로 offset 복원하나, 북 branch 는 전부 CST 쓰다 L596서만 미할당 CNT 사용(그 CNT L609 할당은 excess-flow용, tidal 아님).
+
+## C ROMS tier-2 적대검증 (2026-08-31) — wetdry CONFIRM · lmd_bkpp REFUTE
+- wetdry.F CONFIRM: umask_full/vmask_full 양 분기 동일 대입 → dry-cell 테스트 무력, mask 전역 1. consumer nesting.F L1559 가 umask_full 로 donor 보간가중 선택 → nested 보간서 wet/dry 무력화.
+- lmd_bkpp.F REFUTE: Ustar 항상 ≥0 로 IF 항상 참이나 항상 Ekman limiter 실행(필요 계산 누락 아님) → HIGH dead-guard 기준 미충족(무해 중복).
+→ ROMS tier-2 확정 HIGH 1·MED 3·기각 1.
+
+## D Delft3D tier-2 (2026-08-31, task-mtgtxncm) — cucdp/cucbp/difuflux/z_difuflux/z_turclo/incbc/windtostress/taubot
+**10건(HIGH 5·MED 5)**:
+- HIGH cucdp.f90 L68 — bb INTENT(OUT) 전체 무효, 두 endpoint 만 정의(sparse INTENT(OUT) 반복클래스).
+- HIGH difuflux.f90 L262 — Y-face loop 을 face활성 kfv 아닌 cell wetness kfs 로 가드, iad1=kfv 는 advection 만 mask, diffusion 미가드.
+- HIGH z_difuflux.f90 L338-355 — kkmin/kkminu 무초기화(L118), kfu/kcs 가드 내부서만 대입 → UBA.
+- HIGH z_difuflux.f90 L364-368 — X transport 이 nmu=nm+icx 대신 num=nm+icy(transverse Y 이웃) 사용.
+- HIGH taubot.f90 L480-488 — tpu 지역스칼라(L198) 첫 참조(L487)가 첫 대입보다 앞 → UBA.
+- MED cucbp(sqrt-before-guard divisor 불일치)·z_turclo(one-layer vicuv/dicuv drop·kmax>1 one-wet-layer skip)·incbc(discharge abscissae div)·windtostress(gdheat 덮어씀).
+- HIGH 5 적대검증 예정.
