@@ -67,3 +67,14 @@ halo-init·HSIMT 의심 등 기각. **4건(HIGH 2·MED 2)** 생존:
 ## C ROMS 적대검증 (2026-08-30) — HIGH 2/2 CONFIRM
 독립 skeptic REFUTE 시도(ROMS 3-time-level·tile 관례 주의) → 전건 CONFIRM(`C-roms-verify.json`):
 step3d_uv Huon/Hvom intent(out) read-before-write·main3d knew=4 vs 3슬롯 OOB.
+
+## D — Delft3D 코어 1차 결함감사 (무감사 1.6M줄, 2026-08-30, task-mtfv18ed) — FLOW ADI
+★로그 검증: engines_gpl/flow2d3d 엔진 소스 실제 판독. Codex sandbox read-only 로 JSON 미기록 → 로그 복구.
+**6건(HIGH 4·MED 2)** (★HIGH 4 는 전부 sparse INTENT(OUT) UBA 계열 — 라인은 적대검증서 확정):
+- HIGH drychk.f90 — sparse INTENT(OUT) 가 전체 qxk/qyk flux 배열 무효화.
+- HIGH bccorr.f90 — sparse INTENT(OUT) 가 SUD 전 비경계 flux 무효화.
+- HIGH secrhs.f90 — 다구성 sour/sink 전체 무효화, secondary-flow 항목만 복원.
+- HIGH secbou.f90 — 전체 r1 농도배열 무효화, 경계 끝점만 복원.
+- MED tratur.f90 — V-wall 난류가 속도엔 GVV, 길이척도엔 GUU 사용(불일치).
+- MED tritra.f90 — SNELLI 가 longshore flux 0 으로 풀고 질량/morphology flux 는 원 discharge 로 재구성.
+- HIGH 4 적대검증 예정.
