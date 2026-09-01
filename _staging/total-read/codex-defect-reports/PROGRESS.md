@@ -12,7 +12,7 @@
 | Delft3D | 24,748 | ⬜ | 🟡(코어34) | ⬜ | ⬜ | ⬜ | ✅(HIGH9) | ⬜ | ~0.1% | 🟡(코어 부분·third-party 미분리) |
 | CADMAS-SURF | 1,310 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 0% | ⬜ |
 | SFINCS | 241 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 0% | ⬜ |
-| XBeach | 102(승인) | ✅ | ⏸R1-000(6/19) | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 0% | ⬜ |
+| XBeach | 102(승인) | ✅ | ✅(102/102·6shard·H260/M306/L130) | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | R1 100% | 🟡(R1 완료·R2 대기) |
 | SWAN | 82 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 0% | ⬜ |
 | SWASH | 162 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 0% | ⬜ |
 | LISFLOOD-FP | 868 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 0% | ⬜ (C/CUDA) |
@@ -24,4 +24,4 @@
 현재 **어떤 모델도 완료 아님**. FUNWAVE 가 코드축 실질완료(3독립판독·신규HIGH0)로 가장 근접.
 
 ## 다음 착수
-공정표 1진: **XBeach P0 승인 완료**(분모 102파일). **R1-000 파일럿 투입**(2026-08-31). ⏸**일시중단: Codex "model at capacity" 2연속 실패** — R1-000 부분 6/19 보존(XBeach-R1-000.partial.jsonl). 용량 회복 후 재개(나머지 13파일부터).
+공정표 1진: **XBeach R1 완료(2026-09-01)** — 6 shard(000~005) Codex 순차 판독 102/102 파일·71,568줄, real-read 검증(롤아웃 nl/sed 범위 = wc -l 전량) 전 shard PASS. 산출 `model-audit/XBeach/XBeach-R1.jsonl`(shard별 `XBeach-00N.jsonl` + Codex 로그). R1 unresolved 는 1차 리더 미필터(HIGH 260/MED 306/LOW 130) — R2 blind·CW·V 에서 걸러진다. 특기: wave_boundary_update.f90·wave_boundary_main.f90(분리형 wave-boundary 대체 모듈)에 compile-time 결함 다수 → 실제 빌드 포함 여부를 R2/CW 에서 확인 필요. **다음 = XBeach R2(독립 blind, R1 미열람·다른 seed)**.
