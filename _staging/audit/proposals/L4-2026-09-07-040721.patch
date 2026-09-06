@@ -1,0 +1,53 @@
+diff --git a/models/XBeach/source-analysis/wave/xbeach_wave_boundary.md b/models/XBeach/source-analysis/wave/xbeach_wave_boundary.md
+--- a/models/XBeach/source-analysis/wave/xbeach_wave_boundary.md
++++ b/models/XBeach/source-analysis/wave/xbeach_wave_boundary.md
+@@ -32,11 +32,11 @@
+ ## A. `wbctype` dispatch
+ 
+ Constants in `paramsconst.F90:133`:
+-- `parametric, swan, vardens, off, jons_table, reuse, ts_1, ts_2, ts_nonh` → `WBCTYPE_*`.
++- `params, parametric, swan, vardens, off, jons_table, reuse, ts_1, ts_2, ts_nonh` → `WBCTYPE_*` (`params`=`WBCTYPE_PARAMS`=0 은 `parametric`=1 과 별개 상수, `paramsconst.F90:133-142`).
+ - **No `WBCTYPE_JONS`** — old `instat=jons` translates to `WBCTYPE_PARAMETRIC` (`params.F90:2644`).
+ 
+ Accepted in `params.txt`:
+-- `parametric, swan, vardens, off, jonstable, reuse, ts_1, ts_2, ts_nonh` (`params.F90:321`).
++- `params, parametric, swan, vardens, off, jonstable, reuse, ts_1, ts_2, ts_nonh` (`params.F90:323-332`).
+ - Old `instat` names also accepted: `jons, swan, vardens, off, jons_table, ...` (`:2561`).
+ 
+ Files involved:
+diff --git a/models/XBeach/source-analysis/xbeach-parameter-glossary-v1.md b/models/XBeach/source-analysis/xbeach-parameter-glossary-v1.md
+--- a/models/XBeach/source-analysis/xbeach-parameter-glossary-v1.md
++++ b/models/XBeach/source-analysis/xbeach-parameter-glossary-v1.md
+@@ -3,6 +3,7 @@
+ topic: general
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "XBeach source code 직접 분석 (models/XBeach/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/xbeach-parameter-glossary-v1.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
+ note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
+ note_date: 2026-04~05 (original) / 2026-05-23 (promote)
+@@ -76,10 +77,10 @@
+ - more appropriate for steep settings, structures, gravel beaches, or individual-wave behavior
+ - not the first default unless the case really needs it
+ 
+-### `nhq3d`
++### `nonhq3d`
+ 
+ Locally documented as:
+-- `nhq3d = 1` for a two-layer reduced non-hydrostatic formulation
++- `nonhq3d = 1` for a two-layer reduced non-hydrostatic formulation (`params.F90:897`, `params.def:295` — `nhq3d` 표기는 소스에 없음)
+ 
+ Why it matters:
+ - belongs to the non-hydrostatic family of choices
+diff --git a/models/XBeach/source-analysis/xbeach_avalanching.md b/models/XBeach/source-analysis/xbeach_avalanching.md
+--- a/models/XBeach/source-analysis/xbeach_avalanching.md
++++ b/models/XBeach/source-analysis/xbeach_avalanching.md
+@@ -129,7 +129,7 @@
+ ## Working Rules
+ 
+ - `wetslp=0.15` (≈ 8.5°) is the underwater repose for sand. `dryslp=1.0` (45°) is dry repose.
+-- `hswitch` defines the dry/wet threshold; default ~0.01 m means anything above MSL+1cm is "dry."
++- `hswitch` defines the dry/wet threshold; code default is 0.0 m (`params.F90:1203`; 2015 manual lists 0.1 m). Wet criterion is `max(hav) > hswitch+eps`, so with defaults the wet/dry switch sits ~eps above MSL — not 1 cm.
+ - Avalanching is event-based — for storm peak, expect many `n_aval` events; calm period, few or none.
+ - Mass conservation: single-fraction `dAfac` is exact; multi-fraction `update_fractions` may have small residual; for budget studies, monitor `dz_avg` vs `flux_in - flux_out`.
+ - `morfac` scaling on avalanching is intentional: with accelerated morphology, the bed needs more relaxation passes per step. Early termination at `n_aval=0` keeps cost bounded.
