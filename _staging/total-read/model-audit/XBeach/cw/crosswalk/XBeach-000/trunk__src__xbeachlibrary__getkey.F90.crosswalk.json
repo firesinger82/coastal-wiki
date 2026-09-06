@@ -41,7 +41,17 @@
    "representative": "audit",
    "rationale": "blinded SAME (many-to-one)",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "These are tagged alternatives, not a collection of pointers whose association status must all be valid: successful getkey sets value%type and the corresponding scalar pointer (getkey.F90:L87-L100). The general consumer branches on that tag, and typed getters consume their matching scalar immediately, so unused components remaining undefined does not establish this defect.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/ncoutput.F90:L356-L363",
+     "quote": "         rc = getkey(par, keys(i), val)\n         if (val%type == 'i') then\n            NF90(nf90_put_att(ncid, parvarid, keys(i), val%i0 ))\n         elseif (val%type == 'c') then\n            NF90(nf90_put_att(ncid, parvarid, keys(i), val%c0 ))\n         elseif (val%type == 'r') then\n            NF90(nf90_put_att(ncid, parvarid, keys(i), val%r0 ))\n         end if"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -60,7 +70,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "getkey explicitly uses one saved target per scalar type and returns pointers to it; the comment acknowledges the aliasing but does not prevent it. Immediate-copy consumers avoid the problem, yet retaining two successful same-type descriptors through the public getkey API reproduces it.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "base_only",

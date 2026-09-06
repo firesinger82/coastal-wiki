@@ -37,7 +37,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "The subcommunicator distribution path supplies xmpi_master, fixed to zero at xmpi.F90:250, so it cannot enter the root-error branch. The optional toall path instead supplies xmpi_imaster on xmpi_ocomm, which is MPI_COMM_WORLD (xmpi.F90:229,270); although that nonzero root conflicts with this routine, aborting WORLD there does not terminate ranks outside the supplied communicator. The direct varoutput.F90:206 call also supplies the zero compute master.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/templates/space_distribute.mako:L4-L12",
+     "quote": "    src    = xmpi_master\n    comm   = xmpi_comm\n    iamsrc = xmaster\n    if(present(toall)) then\n      if(toall) then\n        src    = xmpi_imaster\n        comm   = xmpi_ocomm\n        iamsrc = xomaster\n      endif"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -56,7 +66,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "The missing local IERROR tests do not establish the claimed silent cascade: xmpi.F90:210-245 installs comm_errhandler on MPI_COMM_WORLD before splitting the compute communicator, and no returning error-handler configuration was found. That handler reports the error and calls halt_program, which reaches xmpi_abort and STOP (xmpi.F90:314-320,1680-1704); datatype operations likewise have fatal default handling rather than a configured return-and-continue path.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xmpi.F90:L1721-L1726",
+     "quote": "   call MPI_Comm_get_name(comm,o,r,ier)\n   call MPI_Comm_rank(MPI_COMM_WORLD,ra,ier)\n   write(0,*) 'MPI process #',ra,'in ',o(1:r),' generated an error:',error_code\n   call MPI_Error_string(error_code,e,r,ier)\n   write(0,*) e(1:r)\n   call halt_program"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",

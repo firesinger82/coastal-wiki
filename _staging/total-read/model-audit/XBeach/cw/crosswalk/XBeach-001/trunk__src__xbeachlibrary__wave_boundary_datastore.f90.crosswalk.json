@@ -58,6 +58,16 @@
     "quote": "      real*8,dimension(:),allocatable  :: xb,yb,theta     ! Note, can these be changed to pointers?\n      integer                          :: randomseed\n      integer                          :: nspr",
     "verified_at_lines": "L24-L26",
     "source_sha256": "189a137244043330e3b3a33bd8ea3d0b8d015e5c0e863c7f93492fafab5c77a2"
+   },
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "randomseed is indeed a scalar without ALLOCATABLE or POINTER, making the consumer's ALLOCATED/DEALLOCATE expressions invalid. These prototype modules are absent from both checked project source lists and the active call graph, so this is a latent integration defect, not a failure of the shipped executable.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am:L4-L60",
+     "quote": "libxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\\n\tconstants.F90 \\\n\ttypesandkinds.F90 \\\n\tiso_c_utils.f90 \\\n\tlogging.F90 \\\n\tparamsconst.F90 \\\n\tfilefunctions.F90 \\\n\treadkey.F90 \\\n\tmnemonic.F90 \\\n\tinterp.F90 \\\n\tmath_tools.F90 \\\n\tparams.F90 \\\n\tgetkey.F90 \\\n\tspaceparamsdef.F90 \\\n\tspaceparams.F90 \\\n\tcompute_tide_zs0.F90 \\\n\twetcells.F90 \\\n\tvegetation.F90 \\\n\twave_functions.F90 \\\n\twaveparams.F90 \\\n\twaveparamsnew.F90 \\\n\troelvink.F90 \\\n\twave_stationary_directions.F90 \\\n\twave_instationary.F90 \\\n\twave_timestep.F90 \\\n\tsolver.F90 \\\n\tflow_secondorder.F90 \\\n\tnonh.F90 \\\n\tboundaryconditions.F90 \\\n\tmorphevolution.F90 \\\n\tgroundwater.F90 \\\n\trainfall.F90 \\\n\tdrifters.F90 \\\n\treadtide.F90 \\\n\treadwind.F90 \\\n\tinitialize.F90 \\\n\ttimestep.F90 \\\n\tbedroughness.F90 \\\n\tvsm_u_XB.f90 \\\n\tflow_timestep.F90 \\\n\tpostprocess.F90 \\\n\tvarianceupdate.F90 \\\n\tvaroutput.F90 \\\n\tncoutput.F90 \\\n\toutput.F90 \\\n\tship.F90 \\\n\tmnemoniciso.F90 \\\n\tloopcounters.F90 \\\n\tlibxbeach.F90 \\\n\tdebugging.F90 \\\n\tintrospection.F90 \\\n\txbeach_bmi.f90"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   }
  ]

@@ -37,7 +37,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED_UNVERIFIED",
+    "rationale": "Overlapping ranks use the same global drifter indices and distributed grid metrics, and flow synchronizes both velocity components before drifter is called. The predictor and second-order branches repeat those exchanges, and the final nonhydrostatic correction exchanges them internally (nonh.F90:2238-2239), so overlapping updates are identical and independent minima cannot splice differing positions on this path.",
+    "neutralizer": {
+     "where": "trunk/src/xbeachlibrary/flow_timestep.F90:L630-L650",
+     "quote": "#ifdef USEMPI\n      call xmpi_shift_ee(s%uu)\n      call xmpi_shift_ee(s%vv)\n#endif\n\n      if (par%wavemodel==WAVEMODEL_NONH) then\n         !Do explicit predictor step with pressure\n         call nonh_cor(s,par,0,uu_old,vv_old)\n\n#ifdef USEMPI\n         call xmpi_shift_ee(s%uu)\n         call xmpi_shift_ee(s%vv)\n#endif\n      end if\n\n      if (par%secorder==1) then\n         !Call second order correction to the advection\n         call flow_secondorder_advUV(s,par,uu_old,vv_old)\n#ifdef USEMPI\n         call xmpi_shift_ee(s%uu)\n         call xmpi_shift_ee(s%vv)"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",

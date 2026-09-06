@@ -39,7 +39,14 @@
    "representative": "audit",
    "rationale": "blinded SAME (many-to-one)",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "This is a reuse or externally changed-configuration defect, rather than a failure during an ordinary fixed-configuration run. The standard parameter setup fixes the modes before the first call, but a second lifecycle with changed dimensions or later enabling a mode can bypass the required saved allocations.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -58,7 +65,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "The claim confuses MPI array-layout names with physical boundary names. The parameter declarations explicitly define left at ny+1 and right at zero, exactly matching the calls in flow_timestep.",
+    "neutralizer": {
+     "where": "trunk/src/xbeachlibrary/params.def:L141-L143",
+     "quote": "      integer                           :: left                     = -123                 !  [name] Switch for lateral boundary at ny+1\n      character(slen)                   :: left_str                 =  ''                  !\n      integer                           :: right                    = -123                 !  [name] Switch for lateral boundary at 0"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -77,7 +94,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The viscosity stencil combines three U wet flags with a V wet flag at the fourth location. Wetcells derives those flags independently from different face depths, so neither their declarations nor the stencil context makes them interchangeable.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -98,7 +122,17 @@
    "representative": "audit",
    "rationale": "blinded SAME (many-to-one)",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The saved interpolants are initially zeroed, so the issue is stale or incorrect boundary/halo values rather than wholly uninitialized storage on the first call. Several later assignments still leave edges unchanged before whole-array magnitudes are formed, and no intervening interpolation exchange fills them.",
+    "neutralizer": {
+     "where": "trunk/src/xbeachlibrary/flow_timestep.F90:L74-L122",
+     "quote": "      if (.not. allocated(vsu) ) then\n         allocate (   vsu(s%nx+1,s%ny+1))\n         allocate (   usu(s%nx+1,s%ny+1))\n         allocate (   vsv(s%nx+1,s%ny+1))\n         allocate (   usv(s%nx+1,s%ny+1))\n         allocate (   veu(s%nx+1,s%ny+1))\n         allocate (   uev(s%nx+1,s%ny+1))\n         allocate (  dudx(s%nx+1,s%ny+1))\n         allocate (  dvdy(s%nx+1,s%ny+1))\n         allocate (    us(s%nx+1,s%ny+1))\n         allocate (    vs(s%nx+1,s%ny+1))\n         allocate (sinthm(s%nx+1,s%ny+1))\n         allocate (costhm(s%nx+1,s%ny+1))\n         !\n         if (par%secorder == 1  .or. par%wavemodel==WAVEMODEL_NONH) then\n            allocate(vv_old(s%nx+1,s%ny+1)); vv_old = s%vv\n            allocate(uu_old(s%nx+1,s%ny+1)); uu_old = s%uu\n            allocate(zs_old(s%nx+1,s%ny+1)); zs_old = s%zs\n         endif\n\n         s%vu      =0.d0\n         vsu     =0.d0\n         usu     =0.d0\n         vsv     =0.d0\n         usv     =0.d0\n         s%uv      =0.d0\n         veu     =0.d0\n         uev     =0.d0\n         s%ueu     =0.d0\n         s%vev     =0.d0\n         dudx    =0.d0\n         s%ududx   =0.d0\n         dvdy    =0.d0\n         s%vdvdy   =0.d0\n         s%udvdx   =0.d0\n         s%vdudy   =0.d0\n         s%viscu   =0.d0\n         s%viscv   =0.d0\n         us      =0.d0\n         vs      =0.d0\n         s%u       =0.d0\n         s%v       =0.d0\n         s%ue      =0.d0\n         s%ve      =0.d0\n         fc      =2.d0*par%wearth*sin(par%lat)\n\n         call bedroughness_init(s,par) ! note, this is not yet designed for initialisation\n         ! on sglobal, so don't call from initialize.F90\n      endif"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -117,7 +151,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The residual V acceleration requires viscosity to have been enabled previously and then disabled through configuration reuse or an external parameter change. The normal fixed-parameter run does not make that transition, but the off branch really clears only nuh and viscu while the V update can still consume viscv.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -136,7 +177,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The VSM caller checks wetz and nz but does not require positive cfu before sqrt(g/cfu) or ensure the resulting ks is nonzero. Coefficient inputs can supply zero, and positive depth does not prevent either the caller division or the later roughness singularities.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "base_only",

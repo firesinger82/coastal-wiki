@@ -1,0 +1,884 @@
+{
+  "shard": "XBeach-001",
+  "verdicts": [
+    {
+      "vid": "trunk__src__xbeachlibrary__boundaryconditions.F90#0",
+      "verdict": "REFUTED",
+      "rationale": "The normal input path strictly restricts order to [1,2], so the empty order=3 branch is unreachable with an accepted configuration.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.F90:L555-L555",
+        "quote": "      par%order       = readkey_dbl ('params.txt','order',    2.d0,           1.d0,    2.d0    ,strict=.true.)"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__boundaryconditions.F90#1",
+      "verdict": "STANDS",
+      "rationale": "TS_NONH is a live wave_bc branch; unlike the spectral branch at 763-769, its 880-884 broadcasts omit isSet_V. The flag is a local variable and only the master calls velocity_Boundary, so non-master use at 903 has no defining assignment."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__boundaryconditions.F90#2",
+      "verdict": "STANDS",
+      "rationale": "For new-old>1 the serial branch assigns both endpoints from gq2, despite reading gq1 at 612. Neither the subsequent interpolation at 659-660 nor the final velocity conversion restores the earlier discharge."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__boundaryconditions.F90#4",
+      "verdict": "STANDS",
+      "rationale": "Reinitialization deallocates the data arrays but never clears the saved iZ/iU/iV/etc. indices. A forced or changed-file initialization can therefore allocate/read a field using a previous header's index."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__boundaryconditions.F90#5",
+      "verdict": "STANDS",
+      "rationale": "The ordinary interpolation paths define all flags, but the EOF paths bypass them and define only isSet_Q. INTENT(OUT) invalidates prior flag values; wave_bc immediately consumes the other flags."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__boundaryconditions.F90#6",
+      "verdict": "REFUTED",
+      "rationale": "User-supplied zero taper is replaced with 1e-6 during parameter postprocessing. The later zero assignment in boundaryconditions is restricted to stationary JONS_TABLE, whose boundary application has its own positive-taper branch.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.F90:L1625-L1625",
+        "quote": "      par%taper    = max(par%taper,1.d-6)"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__boundaryconditions.F90#7",
+      "verdict": "STANDS",
+      "rationale": "Each minimum update takes the newly updated maximum and the current spatial minimum, discarding previous temporal minima. Initialization and later window resets do not repair the accumulation within a window."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__boundaryconditions.F90#8",
+      "verdict": "STANDS",
+      "rationale": "The hybrid branch allows constant zs and zs0 over a window, and its minimum/maximum denominator is then zero. The outer hybrid-mode guard and min(huge(...),...) do not impose any positive surface range."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__boundaryconditions.F90#9",
+      "verdict": "STANDS",
+      "rationale": "The reader returns raw Q through ug and identifies it using isSet_Q. Only the #else serial path converts those quantities by depth; space_distribute merely transfers them in the MPI path."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__boundaryconditions.F90#10",
+      "verdict": "NARROWED",
+      "rationale": "A late first call can leave fc undefined, but ordinary hotstart does not establish that scenario: timestep initialization resets t to zero. The remaining risk is an externally advanced first call using a lateral condition that actually consumes fc.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/timestep.F90:L144-L144",
+        "quote": "      par%t = 0.0d0"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__boundaryconditions.F90#11",
+      "verdict": "STANDS",
+      "rationale": "The per-rank vertical-discharge loop uses globally supplied pdisch and clamps each point into local bounds. Unlike discharge_boundary_h it has no indomain/ownership test before adding mass."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__boundaryconditions.F90#12",
+      "verdict": "NARROWED",
+      "rationale": "Duplicate first timestamps give a definite zero denominator in the initialization interpolation. The one-record explanation is inaccurate: EOF is detected by the subsequent read, whose INTENT(INOUT) time retains its previous value, rather than reliably executing the cited t1=t0 branch; later duplicate records can also be skipped by the catch-up loop.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/boundaryconditions.F90:L2151-L2168",
+        "quote": "               do while (.not. (t>=t0 .and. t<t1))\n                  t0 = t1\n                  if (iU >0) u0 = u1\n                  if (iV >0) v0 = v1\n                  if (iZ >0) z0 = z1\n                  if (iW >0) w0 = w1\n                  if (idu >0) du0 = du1\n                  if (idv >0) dv0 = dv1\n                  call velocity_Boundary_read(t1,tmp,Unit_U,lVaru,lIsEof,nvar)\n                  t1 = t1+bcstarttime\n                  if (iU >0) u1 = tmp(:,iU-1)\n                  if (iV >0) v1 = tmp(:,iV-1)\n                  if (iZ >0) z1 = tmp(:,iZ-1)\n                  if (iW >0) w1 = tmp(:,iW-1)\n                  if (idu >0) du1 = tmp(:,idu-1)\n                  if (idv >0) dv1 = tmp(:,idv-1)\n                  if (lIsEof) exit !Exit on end of file condition\n               end do"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__boundaryconditions.F90#13",
+      "verdict": "STANDS",
+      "rationale": "The scalar/vector dispatch has an empty ELSE and lVarU is saved. IOSTAT checks validate the read operation, not the mode string, so an unknown string keeps the prior interpretation."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__boundaryconditions.F90#15",
+      "verdict": "STANDS",
+      "rationale": "Successful reads of nt are followed directly by allocations and sum(dataE)/nt. The IOSTAT checks do not reject a syntactically valid zero count."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__boundaryconditions.F90#16",
+      "verdict": "NARROWED",
+      "rationale": "The unprotected mean boundary depth ht=zs0-zb remains a real dry-boundary hazard in the Surfbeat branches. The nonhydrostatic s%hh divisions are partly protected by the model's positive-depth invariant, and a finite positive-depth linear dispersion solution does not have an exact cg^2=g*h resonance.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/flow_timestep.F90:L940-L940",
+        "quote": "      s%hh  = max(s%zs-s%zb,par%eps)    ! water depth"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__boundaryconditions.F90#17",
+      "verdict": "STANDS",
+      "rationale": "The reuse/list reader accepts a syntactically valid zero or negative dtbcfile without a positivity check, and later record calculations divide by that value. The ordinary generator's positive step does not protect externally supplied reuse files, which are a supported boundary source."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__boundaryconditions.F90#19",
+      "verdict": "STANDS",
+      "rationale": "The missing-Z fallback copies absolute zs(2,:) into zi; the FRONT_NONH application adds zs0 to zi without subtracting it first. Tapering does not restore a relative elevation datum."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__boundaryconditions.F90#21",
+      "verdict": "NARROWED",
+      "rationale": "cats and Trep have positive recommended bounds, but these readkey calls are not strict and table-supplied Trep is not checked. The failure is restricted to zero/invalid user or external forcing parameters, rather than the default hybrid configuration."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__boundaryconditions.F90#22",
+      "verdict": "STANDS",
+      "rationale": "The global reductions address ownership but not empty global selections: ranges_init sets jmin_vv=2 and jmax_vv=ny-1, so an allowed ny=2 grid has no terms in dnvsum. The unguarded vdnvsum/dnvsum therefore remains 0/0 even with nonzero cell metrics."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__boundaryconditions.F90#25",
+      "verdict": "STANDS",
+      "rationale": "The back-corner assignments explicitly select front-row dzs0dn, dnv and zb. Later lateral updates run only over the interior zs i bounds and do not generally overwrite these corners."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__boundaryconditions.F90#28",
+      "verdict": "STANDS",
+      "rationale": "indomain tests only endpoint inclusion before every local momentum update. Clamping endpoints afterward cannot recover a crossing subdomain for which indomain is false."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__compute_tide_zs0.F90#0",
+      "verdict": "NARROWED",
+      "rationale": "The defect applies to instant/hybrid tides with cross-shore decomposition: fill_tide_grid uses local end rows and local bed maxima as if they were global. Initialization uses the full master grid, and alongshore decomposition into complete cross-shore strips is explicitly supported.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/compute_tide_zs0.F90:L569-L571",
+        "quote": "   subroutine fill_tide_grid(s)\n      ! This subroutine fills the zs0 field. Used by tide=instant and hybrid, and by tide=velocity at initialization\n      ! subroutine is not yet fully MPI-compliant for tide=instant/hybrid (only works if mpi-domains are cross-shore strips)"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__compute_tide_zs0.F90#1",
+      "verdict": "NARROWED",
+      "rationale": "Invalid zero-spacing grids can fail these denominators, but an endpoint bed maximum alone need not corrupt the result because the interpolation arm can be bypassed. Case 4 can still evaluate 0/0 at a coincident maximum/first endpoint; the broad claim should distinguish that reachable boundary case from unused infinite ddist values.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/compute_tide_zs0.F90:L517-L526",
+        "quote": "               ddist = 1.d0/(disttide2-distmaxzbg)\n               do i = imin,imax\n                  if (s%sdist(i,jmin)<=distmaxzbg) then\n                     s%zs0(i,jmin) = tide1\n                     s%dzs0dn(i,jmin) = tidegradient1*s%wetz(i,jmin)\n                  else\n                     fac = (s%sdist(i,jmin)-distmaxzbg)*ddist\n                     s%zs0(i,jmin) = (1.d0-fac)*tide1+fac*tide2\n                     s%dzs0dn(i,jmin) = ((1.d0-fac)*tidegradient1+fac*tidegradient2)*s%wetz(i,jmin)\n                  endif"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__compute_tide_zs0.F90#2",
+      "verdict": "STANDS",
+      "rationale": "In the case-4 ELSE, tide2 is selected while tidegradient1 is used, unlike the tide2/gradient2 pairing in case 1. The wet mask only removes dry-cell gradients and does not repair unequal wet-side gradients."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__readtide.F90#0",
+      "verdict": "STANDS",
+      "rationale": "An empty nonzero-tideloc file sets tidelen=0 and the final duration test indexes element zero. The tideloc=0 shortcut does not apply when a tide file is requested."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__readwind.F90#0",
+      "verdict": "STANDS",
+      "rationale": "A nonblank empty wind file sets windlen=0 and the duration check indexes windinpt(0). The stationary-wind initialization is in the separate blank-filename branch."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_boundary_datastore.f90#1",
+      "verdict": "NARROWED",
+      "rationale": "randomseed is indeed a scalar without ALLOCATABLE or POINTER, making the consumer's ALLOCATED/DEALLOCATE expressions invalid. These prototype modules are absent from both checked project source lists and the active call graph, so this is a latent integration defect, not a failure of the shipped executable.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am:L4-L60",
+        "quote": "libxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\\n\tconstants.F90 \\\n\ttypesandkinds.F90 \\\n\tiso_c_utils.f90 \\\n\tlogging.F90 \\\n\tparamsconst.F90 \\\n\tfilefunctions.F90 \\\n\treadkey.F90 \\\n\tmnemonic.F90 \\\n\tinterp.F90 \\\n\tmath_tools.F90 \\\n\tparams.F90 \\\n\tgetkey.F90 \\\n\tspaceparamsdef.F90 \\\n\tspaceparams.F90 \\\n\tcompute_tide_zs0.F90 \\\n\twetcells.F90 \\\n\tvegetation.F90 \\\n\twave_functions.F90 \\\n\twaveparams.F90 \\\n\twaveparamsnew.F90 \\\n\troelvink.F90 \\\n\twave_stationary_directions.F90 \\\n\twave_instationary.F90 \\\n\twave_timestep.F90 \\\n\tsolver.F90 \\\n\tflow_secondorder.F90 \\\n\tnonh.F90 \\\n\tboundaryconditions.F90 \\\n\tmorphevolution.F90 \\\n\tgroundwater.F90 \\\n\trainfall.F90 \\\n\tdrifters.F90 \\\n\treadtide.F90 \\\n\treadwind.F90 \\\n\tinitialize.F90 \\\n\ttimestep.F90 \\\n\tbedroughness.F90 \\\n\tvsm_u_XB.f90 \\\n\tflow_timestep.F90 \\\n\tpostprocess.F90 \\\n\tvarianceupdate.F90 \\\n\tvaroutput.F90 \\\n\tncoutput.F90 \\\n\toutput.F90 \\\n\tship.F90 \\\n\tmnemoniciso.F90 \\\n\tloopcounters.F90 \\\n\tlibxbeach.F90 \\\n\tdebugging.F90 \\\n\tintrospection.F90 \\\n\txbeach_bmi.f90"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_boundary_main.f90#1",
+      "verdict": "NARROWED",
+      "rationale": "There is only one recomputation per call and no loop or reassignment that advances across all missed intervals. These prototype modules are absent from both checked project source lists and the active call graph, so this is a latent integration defect, not a failure of the shipped executable.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am:L4-L60",
+        "quote": "libxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\\n\tconstants.F90 \\\n\ttypesandkinds.F90 \\\n\tiso_c_utils.f90 \\\n\tlogging.F90 \\\n\tparamsconst.F90 \\\n\tfilefunctions.F90 \\\n\treadkey.F90 \\\n\tmnemonic.F90 \\\n\tinterp.F90 \\\n\tmath_tools.F90 \\\n\tparams.F90 \\\n\tgetkey.F90 \\\n\tspaceparamsdef.F90 \\\n\tspaceparams.F90 \\\n\tcompute_tide_zs0.F90 \\\n\twetcells.F90 \\\n\tvegetation.F90 \\\n\twave_functions.F90 \\\n\twaveparams.F90 \\\n\twaveparamsnew.F90 \\\n\troelvink.F90 \\\n\twave_stationary_directions.F90 \\\n\twave_instationary.F90 \\\n\twave_timestep.F90 \\\n\tsolver.F90 \\\n\tflow_secondorder.F90 \\\n\tnonh.F90 \\\n\tboundaryconditions.F90 \\\n\tmorphevolution.F90 \\\n\tgroundwater.F90 \\\n\trainfall.F90 \\\n\tdrifters.F90 \\\n\treadtide.F90 \\\n\treadwind.F90 \\\n\tinitialize.F90 \\\n\ttimestep.F90 \\\n\tbedroughness.F90 \\\n\tvsm_u_XB.f90 \\\n\tflow_timestep.F90 \\\n\tpostprocess.F90 \\\n\tvarianceupdate.F90 \\\n\tvaroutput.F90 \\\n\tncoutput.F90 \\\n\toutput.F90 \\\n\tship.F90 \\\n\tmnemoniciso.F90 \\\n\tloopcounters.F90 \\\n\tlibxbeach.F90 \\\n\tdebugging.F90 \\\n\tintrospection.F90 \\\n\txbeach_bmi.f90"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_boundary_main.f90#2",
+      "verdict": "NARROWED",
+      "rationale": "The unconditional OPEN has no non-BUILDXBEACH fid assignment, and the LOCLIST loop tests an uninitialized local err. These prototype modules are absent from both checked project source lists and the active call graph, so this is a latent integration defect, not a failure of the shipped executable.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am:L4-L60",
+        "quote": "libxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\\n\tconstants.F90 \\\n\ttypesandkinds.F90 \\\n\tiso_c_utils.f90 \\\n\tlogging.F90 \\\n\tparamsconst.F90 \\\n\tfilefunctions.F90 \\\n\treadkey.F90 \\\n\tmnemonic.F90 \\\n\tinterp.F90 \\\n\tmath_tools.F90 \\\n\tparams.F90 \\\n\tgetkey.F90 \\\n\tspaceparamsdef.F90 \\\n\tspaceparams.F90 \\\n\tcompute_tide_zs0.F90 \\\n\twetcells.F90 \\\n\tvegetation.F90 \\\n\twave_functions.F90 \\\n\twaveparams.F90 \\\n\twaveparamsnew.F90 \\\n\troelvink.F90 \\\n\twave_stationary_directions.F90 \\\n\twave_instationary.F90 \\\n\twave_timestep.F90 \\\n\tsolver.F90 \\\n\tflow_secondorder.F90 \\\n\tnonh.F90 \\\n\tboundaryconditions.F90 \\\n\tmorphevolution.F90 \\\n\tgroundwater.F90 \\\n\trainfall.F90 \\\n\tdrifters.F90 \\\n\treadtide.F90 \\\n\treadwind.F90 \\\n\tinitialize.F90 \\\n\ttimestep.F90 \\\n\tbedroughness.F90 \\\n\tvsm_u_XB.f90 \\\n\tflow_timestep.F90 \\\n\tpostprocess.F90 \\\n\tvarianceupdate.F90 \\\n\tvaroutput.F90 \\\n\tncoutput.F90 \\\n\toutput.F90 \\\n\tship.F90 \\\n\tmnemoniciso.F90 \\\n\tloopcounters.F90 \\\n\tlibxbeach.F90 \\\n\tdebugging.F90 \\\n\tintrospection.F90 \\\n\txbeach_bmi.f90"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_boundary_main.f90#3",
+      "verdict": "NARROWED",
+      "rationale": "The single-spectrum arm never assigns the administration component subsequently used as the generator's count. These prototype modules are absent from both checked project source lists and the active call graph, so this is a latent integration defect, not a failure of the shipped executable.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am:L4-L60",
+        "quote": "libxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\\n\tconstants.F90 \\\n\ttypesandkinds.F90 \\\n\tiso_c_utils.f90 \\\n\tlogging.F90 \\\n\tparamsconst.F90 \\\n\tfilefunctions.F90 \\\n\treadkey.F90 \\\n\tmnemonic.F90 \\\n\tinterp.F90 \\\n\tmath_tools.F90 \\\n\tparams.F90 \\\n\tgetkey.F90 \\\n\tspaceparamsdef.F90 \\\n\tspaceparams.F90 \\\n\tcompute_tide_zs0.F90 \\\n\twetcells.F90 \\\n\tvegetation.F90 \\\n\twave_functions.F90 \\\n\twaveparams.F90 \\\n\twaveparamsnew.F90 \\\n\troelvink.F90 \\\n\twave_stationary_directions.F90 \\\n\twave_instationary.F90 \\\n\twave_timestep.F90 \\\n\tsolver.F90 \\\n\tflow_secondorder.F90 \\\n\tnonh.F90 \\\n\tboundaryconditions.F90 \\\n\tmorphevolution.F90 \\\n\tgroundwater.F90 \\\n\trainfall.F90 \\\n\tdrifters.F90 \\\n\treadtide.F90 \\\n\treadwind.F90 \\\n\tinitialize.F90 \\\n\ttimestep.F90 \\\n\tbedroughness.F90 \\\n\tvsm_u_XB.f90 \\\n\tflow_timestep.F90 \\\n\tpostprocess.F90 \\\n\tvarianceupdate.F90 \\\n\tvaroutput.F90 \\\n\tncoutput.F90 \\\n\toutput.F90 \\\n\tship.F90 \\\n\tmnemoniciso.F90 \\\n\tloopcounters.F90 \\\n\tlibxbeach.F90 \\\n\tdebugging.F90 \\\n\tintrospection.F90 \\\n\txbeach_bmi.f90"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_boundary_main.f90#4",
+      "verdict": "NARROWED",
+      "rationale": "INTENT(OUT) undefines the incoming flag, and the ordinary no-recomputation return path has no assignment to it. These prototype modules are absent from both checked project source lists and the active call graph, so this is a latent integration defect, not a failure of the shipped executable.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am:L4-L60",
+        "quote": "libxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\\n\tconstants.F90 \\\n\ttypesandkinds.F90 \\\n\tiso_c_utils.f90 \\\n\tlogging.F90 \\\n\tparamsconst.F90 \\\n\tfilefunctions.F90 \\\n\treadkey.F90 \\\n\tmnemonic.F90 \\\n\tinterp.F90 \\\n\tmath_tools.F90 \\\n\tparams.F90 \\\n\tgetkey.F90 \\\n\tspaceparamsdef.F90 \\\n\tspaceparams.F90 \\\n\tcompute_tide_zs0.F90 \\\n\twetcells.F90 \\\n\tvegetation.F90 \\\n\twave_functions.F90 \\\n\twaveparams.F90 \\\n\twaveparamsnew.F90 \\\n\troelvink.F90 \\\n\twave_stationary_directions.F90 \\\n\twave_instationary.F90 \\\n\twave_timestep.F90 \\\n\tsolver.F90 \\\n\tflow_secondorder.F90 \\\n\tnonh.F90 \\\n\tboundaryconditions.F90 \\\n\tmorphevolution.F90 \\\n\tgroundwater.F90 \\\n\trainfall.F90 \\\n\tdrifters.F90 \\\n\treadtide.F90 \\\n\treadwind.F90 \\\n\tinitialize.F90 \\\n\ttimestep.F90 \\\n\tbedroughness.F90 \\\n\tvsm_u_XB.f90 \\\n\tflow_timestep.F90 \\\n\tpostprocess.F90 \\\n\tvarianceupdate.F90 \\\n\tvaroutput.F90 \\\n\tncoutput.F90 \\\n\toutput.F90 \\\n\tship.F90 \\\n\tmnemoniciso.F90 \\\n\tloopcounters.F90 \\\n\tlibxbeach.F90 \\\n\tdebugging.F90 \\\n\tintrospection.F90 \\\n\txbeach_bmi.f90"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_boundary_main.f90#5",
+      "verdict": "REFUTED",
+      "rationale": "The first taper does not consume the allocated array before initialization: bccount starts at zero and generate_ebcf sets the current column before evaluating the taper. The separate whole-column overwrite defect does not establish undefined first-taper input.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_boundary_update.f90:L2249-L2252",
+        "quote": "            if (bccount==0) then\n               lastwaveelevation(:,itheta) = zeta(iy,ind_end_taper,itheta)\n            endif\n            zeta(iy,:,itheta)=zeta(iy,:,itheta)*wp%taperw+(1-wp%taperw)*lastwaveelevation(iy,itheta)"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_boundary_main.f90#6",
+      "verdict": "NARROWED",
+      "rationale": "No local or module declaration supplies nspr under IMPLICIT NONE, so the optional-dummy interface cannot compile as written. These prototype modules are absent from both checked project source lists and the active call graph, so this is a latent integration defect, not a failure of the shipped executable.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am:L4-L60",
+        "quote": "libxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\\n\tconstants.F90 \\\n\ttypesandkinds.F90 \\\n\tiso_c_utils.f90 \\\n\tlogging.F90 \\\n\tparamsconst.F90 \\\n\tfilefunctions.F90 \\\n\treadkey.F90 \\\n\tmnemonic.F90 \\\n\tinterp.F90 \\\n\tmath_tools.F90 \\\n\tparams.F90 \\\n\tgetkey.F90 \\\n\tspaceparamsdef.F90 \\\n\tspaceparams.F90 \\\n\tcompute_tide_zs0.F90 \\\n\twetcells.F90 \\\n\tvegetation.F90 \\\n\twave_functions.F90 \\\n\twaveparams.F90 \\\n\twaveparamsnew.F90 \\\n\troelvink.F90 \\\n\twave_stationary_directions.F90 \\\n\twave_instationary.F90 \\\n\twave_timestep.F90 \\\n\tsolver.F90 \\\n\tflow_secondorder.F90 \\\n\tnonh.F90 \\\n\tboundaryconditions.F90 \\\n\tmorphevolution.F90 \\\n\tgroundwater.F90 \\\n\trainfall.F90 \\\n\tdrifters.F90 \\\n\treadtide.F90 \\\n\treadwind.F90 \\\n\tinitialize.F90 \\\n\ttimestep.F90 \\\n\tbedroughness.F90 \\\n\tvsm_u_XB.f90 \\\n\tflow_timestep.F90 \\\n\tpostprocess.F90 \\\n\tvarianceupdate.F90 \\\n\tvaroutput.F90 \\\n\tncoutput.F90 \\\n\toutput.F90 \\\n\tship.F90 \\\n\tmnemoniciso.F90 \\\n\tloopcounters.F90 \\\n\tlibxbeach.F90 \\\n\tdebugging.F90 \\\n\tintrospection.F90 \\\n\txbeach_bmi.f90"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_boundary_main.f90#10",
+      "verdict": "NARROWED",
+      "rationale": "Generation uses point,time,direction ordering while the consumer fixes the time subscript using itheta and passes the remaining direction slice as a time series. These prototype modules are absent from both checked project source lists and the active call graph, so this is a latent integration defect, not a failure of the shipped executable.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am:L4-L60",
+        "quote": "libxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\\n\tconstants.F90 \\\n\ttypesandkinds.F90 \\\n\tiso_c_utils.f90 \\\n\tlogging.F90 \\\n\tparamsconst.F90 \\\n\tfilefunctions.F90 \\\n\treadkey.F90 \\\n\tmnemonic.F90 \\\n\tinterp.F90 \\\n\tmath_tools.F90 \\\n\tparams.F90 \\\n\tgetkey.F90 \\\n\tspaceparamsdef.F90 \\\n\tspaceparams.F90 \\\n\tcompute_tide_zs0.F90 \\\n\twetcells.F90 \\\n\tvegetation.F90 \\\n\twave_functions.F90 \\\n\twaveparams.F90 \\\n\twaveparamsnew.F90 \\\n\troelvink.F90 \\\n\twave_stationary_directions.F90 \\\n\twave_instationary.F90 \\\n\twave_timestep.F90 \\\n\tsolver.F90 \\\n\tflow_secondorder.F90 \\\n\tnonh.F90 \\\n\tboundaryconditions.F90 \\\n\tmorphevolution.F90 \\\n\tgroundwater.F90 \\\n\trainfall.F90 \\\n\tdrifters.F90 \\\n\treadtide.F90 \\\n\treadwind.F90 \\\n\tinitialize.F90 \\\n\ttimestep.F90 \\\n\tbedroughness.F90 \\\n\tvsm_u_XB.f90 \\\n\tflow_timestep.F90 \\\n\tpostprocess.F90 \\\n\tvarianceupdate.F90 \\\n\tvaroutput.F90 \\\n\tncoutput.F90 \\\n\toutput.F90 \\\n\tship.F90 \\\n\tmnemoniciso.F90 \\\n\tloopcounters.F90 \\\n\tlibxbeach.F90 \\\n\tdebugging.F90 \\\n\tintrospection.F90 \\\n\txbeach_bmi.f90"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_boundary_main.f90#11",
+      "verdict": "NARROWED",
+      "rationale": "The nonhydrostatic generation branch does not allocate the hydrostatic arrays, whereas the BUILDXBEACH interpolation block still references them. These prototype modules are absent from both checked project source lists and the active call graph, so this is a latent integration defect, not a failure of the shipped executable.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am:L4-L60",
+        "quote": "libxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\\n\tconstants.F90 \\\n\ttypesandkinds.F90 \\\n\tiso_c_utils.f90 \\\n\tlogging.F90 \\\n\tparamsconst.F90 \\\n\tfilefunctions.F90 \\\n\treadkey.F90 \\\n\tmnemonic.F90 \\\n\tinterp.F90 \\\n\tmath_tools.F90 \\\n\tparams.F90 \\\n\tgetkey.F90 \\\n\tspaceparamsdef.F90 \\\n\tspaceparams.F90 \\\n\tcompute_tide_zs0.F90 \\\n\twetcells.F90 \\\n\tvegetation.F90 \\\n\twave_functions.F90 \\\n\twaveparams.F90 \\\n\twaveparamsnew.F90 \\\n\troelvink.F90 \\\n\twave_stationary_directions.F90 \\\n\twave_instationary.F90 \\\n\twave_timestep.F90 \\\n\tsolver.F90 \\\n\tflow_secondorder.F90 \\\n\tnonh.F90 \\\n\tboundaryconditions.F90 \\\n\tmorphevolution.F90 \\\n\tgroundwater.F90 \\\n\trainfall.F90 \\\n\tdrifters.F90 \\\n\treadtide.F90 \\\n\treadwind.F90 \\\n\tinitialize.F90 \\\n\ttimestep.F90 \\\n\tbedroughness.F90 \\\n\tvsm_u_XB.f90 \\\n\tflow_timestep.F90 \\\n\tpostprocess.F90 \\\n\tvarianceupdate.F90 \\\n\tvaroutput.F90 \\\n\tncoutput.F90 \\\n\toutput.F90 \\\n\tship.F90 \\\n\tmnemoniciso.F90 \\\n\tloopcounters.F90 \\\n\tlibxbeach.F90 \\\n\tdebugging.F90 \\\n\tintrospection.F90 \\\n\txbeach_bmi.f90"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_boundary_update.f90#1",
+      "verdict": "NARROWED",
+      "rationale": "The time coordinates differ by dtbc, and Kmin can change the internal sample count independently of the output count; neither the allocator nor the direct assignment reconciles them. These prototype modules are absent from both checked project source lists and the active call graph, so this is a latent integration defect, not a failure of the shipped executable.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am:L4-L60",
+        "quote": "libxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\\n\tconstants.F90 \\\n\ttypesandkinds.F90 \\\n\tiso_c_utils.f90 \\\n\tlogging.F90 \\\n\tparamsconst.F90 \\\n\tfilefunctions.F90 \\\n\treadkey.F90 \\\n\tmnemonic.F90 \\\n\tinterp.F90 \\\n\tmath_tools.F90 \\\n\tparams.F90 \\\n\tgetkey.F90 \\\n\tspaceparamsdef.F90 \\\n\tspaceparams.F90 \\\n\tcompute_tide_zs0.F90 \\\n\twetcells.F90 \\\n\tvegetation.F90 \\\n\twave_functions.F90 \\\n\twaveparams.F90 \\\n\twaveparamsnew.F90 \\\n\troelvink.F90 \\\n\twave_stationary_directions.F90 \\\n\twave_instationary.F90 \\\n\twave_timestep.F90 \\\n\tsolver.F90 \\\n\tflow_secondorder.F90 \\\n\tnonh.F90 \\\n\tboundaryconditions.F90 \\\n\tmorphevolution.F90 \\\n\tgroundwater.F90 \\\n\trainfall.F90 \\\n\tdrifters.F90 \\\n\treadtide.F90 \\\n\treadwind.F90 \\\n\tinitialize.F90 \\\n\ttimestep.F90 \\\n\tbedroughness.F90 \\\n\tvsm_u_XB.f90 \\\n\tflow_timestep.F90 \\\n\tpostprocess.F90 \\\n\tvarianceupdate.F90 \\\n\tvaroutput.F90 \\\n\tncoutput.F90 \\\n\toutput.F90 \\\n\tship.F90 \\\n\tmnemoniciso.F90 \\\n\tloopcounters.F90 \\\n\tlibxbeach.F90 \\\n\tdebugging.F90 \\\n\tintrospection.F90 \\\n\txbeach_bmi.f90"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_boundary_update.f90#2",
+      "verdict": "NARROWED",
+      "rationale": "Both readers access the second input angle before validating the count, so a one-angle input remains an out-of-bounds case. These prototype modules are absent from both checked project source lists and the active call graph, so this is a latent integration defect, not a failure of the shipped executable.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am:L4-L60",
+        "quote": "libxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\\n\tconstants.F90 \\\n\ttypesandkinds.F90 \\\n\tiso_c_utils.f90 \\\n\tlogging.F90 \\\n\tparamsconst.F90 \\\n\tfilefunctions.F90 \\\n\treadkey.F90 \\\n\tmnemonic.F90 \\\n\tinterp.F90 \\\n\tmath_tools.F90 \\\n\tparams.F90 \\\n\tgetkey.F90 \\\n\tspaceparamsdef.F90 \\\n\tspaceparams.F90 \\\n\tcompute_tide_zs0.F90 \\\n\twetcells.F90 \\\n\tvegetation.F90 \\\n\twave_functions.F90 \\\n\twaveparams.F90 \\\n\twaveparamsnew.F90 \\\n\troelvink.F90 \\\n\twave_stationary_directions.F90 \\\n\twave_instationary.F90 \\\n\twave_timestep.F90 \\\n\tsolver.F90 \\\n\tflow_secondorder.F90 \\\n\tnonh.F90 \\\n\tboundaryconditions.F90 \\\n\tmorphevolution.F90 \\\n\tgroundwater.F90 \\\n\trainfall.F90 \\\n\tdrifters.F90 \\\n\treadtide.F90 \\\n\treadwind.F90 \\\n\tinitialize.F90 \\\n\ttimestep.F90 \\\n\tbedroughness.F90 \\\n\tvsm_u_XB.f90 \\\n\tflow_timestep.F90 \\\n\tpostprocess.F90 \\\n\tvarianceupdate.F90 \\\n\tvaroutput.F90 \\\n\tncoutput.F90 \\\n\toutput.F90 \\\n\tship.F90 \\\n\tmnemoniciso.F90 \\\n\tloopcounters.F90 \\\n\tlibxbeach.F90 \\\n\tdebugging.F90 \\\n\tintrospection.F90 \\\n\txbeach_bmi.f90"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_boundary_update.f90#3",
+      "verdict": "NARROWED",
+      "rationale": "The input frequency axis is neither reordered nor converted from relative frequency; descending input violates the later endpoint and interpolation assumptions, while relative-to-absolute conversion matters when current is nonzero. These prototype modules are absent from both checked project source lists and the active call graph, so this is a latent integration defect, not a failure of the shipped executable.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am:L4-L60",
+        "quote": "libxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\\n\tconstants.F90 \\\n\ttypesandkinds.F90 \\\n\tiso_c_utils.f90 \\\n\tlogging.F90 \\\n\tparamsconst.F90 \\\n\tfilefunctions.F90 \\\n\treadkey.F90 \\\n\tmnemonic.F90 \\\n\tinterp.F90 \\\n\tmath_tools.F90 \\\n\tparams.F90 \\\n\tgetkey.F90 \\\n\tspaceparamsdef.F90 \\\n\tspaceparams.F90 \\\n\tcompute_tide_zs0.F90 \\\n\twetcells.F90 \\\n\tvegetation.F90 \\\n\twave_functions.F90 \\\n\twaveparams.F90 \\\n\twaveparamsnew.F90 \\\n\troelvink.F90 \\\n\twave_stationary_directions.F90 \\\n\twave_instationary.F90 \\\n\twave_timestep.F90 \\\n\tsolver.F90 \\\n\tflow_secondorder.F90 \\\n\tnonh.F90 \\\n\tboundaryconditions.F90 \\\n\tmorphevolution.F90 \\\n\tgroundwater.F90 \\\n\trainfall.F90 \\\n\tdrifters.F90 \\\n\treadtide.F90 \\\n\treadwind.F90 \\\n\tinitialize.F90 \\\n\ttimestep.F90 \\\n\tbedroughness.F90 \\\n\tvsm_u_XB.f90 \\\n\tflow_timestep.F90 \\\n\tpostprocess.F90 \\\n\tvarianceupdate.F90 \\\n\tvaroutput.F90 \\\n\tncoutput.F90 \\\n\toutput.F90 \\\n\tship.F90 \\\n\tmnemoniciso.F90 \\\n\tloopcounters.F90 \\\n\tlibxbeach.F90 \\\n\tdebugging.F90 \\\n\tintrospection.F90 \\\n\txbeach_bmi.f90"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_boundary_update.f90#4",
+      "verdict": "NARROWED",
+      "rationale": "The output allocation block has an undeclared tslenbc and repeats qxbct instead of allocating qybct; no earlier hydrostatic allocation repairs that block. These prototype modules are absent from both checked project source lists and the active call graph, so this is a latent integration defect, not a failure of the shipped executable.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am:L4-L60",
+        "quote": "libxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\\n\tconstants.F90 \\\n\ttypesandkinds.F90 \\\n\tiso_c_utils.f90 \\\n\tlogging.F90 \\\n\tparamsconst.F90 \\\n\tfilefunctions.F90 \\\n\treadkey.F90 \\\n\tmnemonic.F90 \\\n\tinterp.F90 \\\n\tmath_tools.F90 \\\n\tparams.F90 \\\n\tgetkey.F90 \\\n\tspaceparamsdef.F90 \\\n\tspaceparams.F90 \\\n\tcompute_tide_zs0.F90 \\\n\twetcells.F90 \\\n\tvegetation.F90 \\\n\twave_functions.F90 \\\n\twaveparams.F90 \\\n\twaveparamsnew.F90 \\\n\troelvink.F90 \\\n\twave_stationary_directions.F90 \\\n\twave_instationary.F90 \\\n\twave_timestep.F90 \\\n\tsolver.F90 \\\n\tflow_secondorder.F90 \\\n\tnonh.F90 \\\n\tboundaryconditions.F90 \\\n\tmorphevolution.F90 \\\n\tgroundwater.F90 \\\n\trainfall.F90 \\\n\tdrifters.F90 \\\n\treadtide.F90 \\\n\treadwind.F90 \\\n\tinitialize.F90 \\\n\ttimestep.F90 \\\n\tbedroughness.F90 \\\n\tvsm_u_XB.f90 \\\n\tflow_timestep.F90 \\\n\tpostprocess.F90 \\\n\tvarianceupdate.F90 \\\n\tvaroutput.F90 \\\n\tncoutput.F90 \\\n\toutput.F90 \\\n\tship.F90 \\\n\tmnemoniciso.F90 \\\n\tloopcounters.F90 \\\n\tlibxbeach.F90 \\\n\tdebugging.F90 \\\n\tintrospection.F90 \\\n\txbeach_bmi.f90"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_boundary_update.f90#5",
+      "verdict": "NARROWED",
+      "rationale": "A location with no energy in the selected component band produces hm0post=0 and reaches the unconditional variance rescaling. These prototype modules are absent from both checked project source lists and the active call graph, so this is a latent integration defect, not a failure of the shipped executable.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am:L4-L60",
+        "quote": "libxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\\n\tconstants.F90 \\\n\ttypesandkinds.F90 \\\n\tiso_c_utils.f90 \\\n\tlogging.F90 \\\n\tparamsconst.F90 \\\n\tfilefunctions.F90 \\\n\treadkey.F90 \\\n\tmnemonic.F90 \\\n\tinterp.F90 \\\n\tmath_tools.F90 \\\n\tparams.F90 \\\n\tgetkey.F90 \\\n\tspaceparamsdef.F90 \\\n\tspaceparams.F90 \\\n\tcompute_tide_zs0.F90 \\\n\twetcells.F90 \\\n\tvegetation.F90 \\\n\twave_functions.F90 \\\n\twaveparams.F90 \\\n\twaveparamsnew.F90 \\\n\troelvink.F90 \\\n\twave_stationary_directions.F90 \\\n\twave_instationary.F90 \\\n\twave_timestep.F90 \\\n\tsolver.F90 \\\n\tflow_secondorder.F90 \\\n\tnonh.F90 \\\n\tboundaryconditions.F90 \\\n\tmorphevolution.F90 \\\n\tgroundwater.F90 \\\n\trainfall.F90 \\\n\tdrifters.F90 \\\n\treadtide.F90 \\\n\treadwind.F90 \\\n\tinitialize.F90 \\\n\ttimestep.F90 \\\n\tbedroughness.F90 \\\n\tvsm_u_XB.f90 \\\n\tflow_timestep.F90 \\\n\tpostprocess.F90 \\\n\tvarianceupdate.F90 \\\n\tvaroutput.F90 \\\n\tncoutput.F90 \\\n\toutput.F90 \\\n\tship.F90 \\\n\tmnemoniciso.F90 \\\n\tloopcounters.F90 \\\n\tlibxbeach.F90 \\\n\tdebugging.F90 \\\n\tintrospection.F90 \\\n\txbeach_bmi.f90"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_boundary_update.f90#6",
+      "verdict": "NARROWED",
+      "rationale": "The expression computes angular-frequency squared divided by 2*pi; no later square root repairs the cutoff used to select frequencies. These prototype modules are absent from both checked project source lists and the active call graph, so this is a latent integration defect, not a failure of the shipped executable.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am:L4-L60",
+        "quote": "libxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\\n\tconstants.F90 \\\n\ttypesandkinds.F90 \\\n\tiso_c_utils.f90 \\\n\tlogging.F90 \\\n\tparamsconst.F90 \\\n\tfilefunctions.F90 \\\n\treadkey.F90 \\\n\tmnemonic.F90 \\\n\tinterp.F90 \\\n\tmath_tools.F90 \\\n\tparams.F90 \\\n\tgetkey.F90 \\\n\tspaceparamsdef.F90 \\\n\tspaceparams.F90 \\\n\tcompute_tide_zs0.F90 \\\n\twetcells.F90 \\\n\tvegetation.F90 \\\n\twave_functions.F90 \\\n\twaveparams.F90 \\\n\twaveparamsnew.F90 \\\n\troelvink.F90 \\\n\twave_stationary_directions.F90 \\\n\twave_instationary.F90 \\\n\twave_timestep.F90 \\\n\tsolver.F90 \\\n\tflow_secondorder.F90 \\\n\tnonh.F90 \\\n\tboundaryconditions.F90 \\\n\tmorphevolution.F90 \\\n\tgroundwater.F90 \\\n\trainfall.F90 \\\n\tdrifters.F90 \\\n\treadtide.F90 \\\n\treadwind.F90 \\\n\tinitialize.F90 \\\n\ttimestep.F90 \\\n\tbedroughness.F90 \\\n\tvsm_u_XB.f90 \\\n\tflow_timestep.F90 \\\n\tpostprocess.F90 \\\n\tvarianceupdate.F90 \\\n\tvaroutput.F90 \\\n\tncoutput.F90 \\\n\toutput.F90 \\\n\tship.F90 \\\n\tmnemoniciso.F90 \\\n\tloopcounters.F90 \\\n\tlibxbeach.F90 \\\n\tdebugging.F90 \\\n\tintrospection.F90 \\\n\txbeach_bmi.f90"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_boundary_update.f90#7",
+      "verdict": "NARROWED",
+      "rationale": "repeatwbc can return wp%rtbc without constructing wp, and incrementing the local bccount never updates the saved administration object. These prototype modules are absent from both checked project source lists and the active call graph, so this is a latent integration defect, not a failure of the shipped executable.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am:L4-L60",
+        "quote": "libxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\\n\tconstants.F90 \\\n\ttypesandkinds.F90 \\\n\tiso_c_utils.f90 \\\n\tlogging.F90 \\\n\tparamsconst.F90 \\\n\tfilefunctions.F90 \\\n\treadkey.F90 \\\n\tmnemonic.F90 \\\n\tinterp.F90 \\\n\tmath_tools.F90 \\\n\tparams.F90 \\\n\tgetkey.F90 \\\n\tspaceparamsdef.F90 \\\n\tspaceparams.F90 \\\n\tcompute_tide_zs0.F90 \\\n\twetcells.F90 \\\n\tvegetation.F90 \\\n\twave_functions.F90 \\\n\twaveparams.F90 \\\n\twaveparamsnew.F90 \\\n\troelvink.F90 \\\n\twave_stationary_directions.F90 \\\n\twave_instationary.F90 \\\n\twave_timestep.F90 \\\n\tsolver.F90 \\\n\tflow_secondorder.F90 \\\n\tnonh.F90 \\\n\tboundaryconditions.F90 \\\n\tmorphevolution.F90 \\\n\tgroundwater.F90 \\\n\trainfall.F90 \\\n\tdrifters.F90 \\\n\treadtide.F90 \\\n\treadwind.F90 \\\n\tinitialize.F90 \\\n\ttimestep.F90 \\\n\tbedroughness.F90 \\\n\tvsm_u_XB.f90 \\\n\tflow_timestep.F90 \\\n\tpostprocess.F90 \\\n\tvarianceupdate.F90 \\\n\tvaroutput.F90 \\\n\tncoutput.F90 \\\n\toutput.F90 \\\n\tship.F90 \\\n\tmnemoniciso.F90 \\\n\tloopcounters.F90 \\\n\tlibxbeach.F90 \\\n\tdebugging.F90 \\\n\tintrospection.F90 \\\n\txbeach_bmi.f90"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_boundary_update.f90#8",
+      "verdict": "NARROWED",
+      "rationale": "The loop assigns the entire finite tbc slice on every iteration, so all its entries finish with the last scalar time. These prototype modules are absent from both checked project source lists and the active call graph, so this is a latent integration defect, not a failure of the shipped executable.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am:L4-L60",
+        "quote": "libxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\\n\tconstants.F90 \\\n\ttypesandkinds.F90 \\\n\tiso_c_utils.f90 \\\n\tlogging.F90 \\\n\tparamsconst.F90 \\\n\tfilefunctions.F90 \\\n\treadkey.F90 \\\n\tmnemonic.F90 \\\n\tinterp.F90 \\\n\tmath_tools.F90 \\\n\tparams.F90 \\\n\tgetkey.F90 \\\n\tspaceparamsdef.F90 \\\n\tspaceparams.F90 \\\n\tcompute_tide_zs0.F90 \\\n\twetcells.F90 \\\n\tvegetation.F90 \\\n\twave_functions.F90 \\\n\twaveparams.F90 \\\n\twaveparamsnew.F90 \\\n\troelvink.F90 \\\n\twave_stationary_directions.F90 \\\n\twave_instationary.F90 \\\n\twave_timestep.F90 \\\n\tsolver.F90 \\\n\tflow_secondorder.F90 \\\n\tnonh.F90 \\\n\tboundaryconditions.F90 \\\n\tmorphevolution.F90 \\\n\tgroundwater.F90 \\\n\trainfall.F90 \\\n\tdrifters.F90 \\\n\treadtide.F90 \\\n\treadwind.F90 \\\n\tinitialize.F90 \\\n\ttimestep.F90 \\\n\tbedroughness.F90 \\\n\tvsm_u_XB.f90 \\\n\tflow_timestep.F90 \\\n\tpostprocess.F90 \\\n\tvarianceupdate.F90 \\\n\tvaroutput.F90 \\\n\tncoutput.F90 \\\n\toutput.F90 \\\n\tship.F90 \\\n\tmnemoniciso.F90 \\\n\tloopcounters.F90 \\\n\tlibxbeach.F90 \\\n\tdebugging.F90 \\\n\tintrospection.F90 \\\n\txbeach_bmi.f90"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_boundary_update.f90#9",
+      "verdict": "NARROWED",
+      "rationale": "The initial CDF value was missed: the final value is 1+(p_first-p_last)/2, so a deficit requires p_last>p_first and disappears for equal endpoints. Unequal endpoints remain possible here, but LINEAR_INTERP clamps out-of-range draws rather than reading beyond an array; this prototype is also excluded from the build.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_boundary_update.f90:L1592-L1594",
+        "quote": "      cdflocal(1) = pdflocal(1)\n      do ii=2,naint\n         cdflocal(ii) = cdflocal(ii-1) + (pdflocal(ii)+pdflocal(ii-1))/2"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_boundary_update.f90#10",
+      "verdict": "NARROWED",
+      "rationale": "distx and disty are rank-one arrays, not implicit per-point scalars, so their multiplication with the rank-two interaction slices is nonconformable. These prototype modules are absent from both checked project source lists and the active call graph, so this is a latent integration defect, not a failure of the shipped executable.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am:L4-L60",
+        "quote": "libxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\\n\tconstants.F90 \\\n\ttypesandkinds.F90 \\\n\tiso_c_utils.f90 \\\n\tlogging.F90 \\\n\tparamsconst.F90 \\\n\tfilefunctions.F90 \\\n\treadkey.F90 \\\n\tmnemonic.F90 \\\n\tinterp.F90 \\\n\tmath_tools.F90 \\\n\tparams.F90 \\\n\tgetkey.F90 \\\n\tspaceparamsdef.F90 \\\n\tspaceparams.F90 \\\n\tcompute_tide_zs0.F90 \\\n\twetcells.F90 \\\n\tvegetation.F90 \\\n\twave_functions.F90 \\\n\twaveparams.F90 \\\n\twaveparamsnew.F90 \\\n\troelvink.F90 \\\n\twave_stationary_directions.F90 \\\n\twave_instationary.F90 \\\n\twave_timestep.F90 \\\n\tsolver.F90 \\\n\tflow_secondorder.F90 \\\n\tnonh.F90 \\\n\tboundaryconditions.F90 \\\n\tmorphevolution.F90 \\\n\tgroundwater.F90 \\\n\trainfall.F90 \\\n\tdrifters.F90 \\\n\treadtide.F90 \\\n\treadwind.F90 \\\n\tinitialize.F90 \\\n\ttimestep.F90 \\\n\tbedroughness.F90 \\\n\tvsm_u_XB.f90 \\\n\tflow_timestep.F90 \\\n\tpostprocess.F90 \\\n\tvarianceupdate.F90 \\\n\tvaroutput.F90 \\\n\tncoutput.F90 \\\n\toutput.F90 \\\n\tship.F90 \\\n\tmnemoniciso.F90 \\\n\tloopcounters.F90 \\\n\tlibxbeach.F90 \\\n\tdebugging.F90 \\\n\tintrospection.F90 \\\n\txbeach_bmi.f90"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_boundary_update.f90#11",
+      "verdict": "NARROWED",
+      "rationale": "Zero spectral normalization denominators and the unbounded overlap loop remain exposed; the convergence ratio is undefined when its old scale is zero. These prototype modules are absent from both checked project source lists and the active call graph, so this is a latent integration defect, not a failure of the shipped executable.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am:L4-L60",
+        "quote": "libxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\\n\tconstants.F90 \\\n\ttypesandkinds.F90 \\\n\tiso_c_utils.f90 \\\n\tlogging.F90 \\\n\tparamsconst.F90 \\\n\tfilefunctions.F90 \\\n\treadkey.F90 \\\n\tmnemonic.F90 \\\n\tinterp.F90 \\\n\tmath_tools.F90 \\\n\tparams.F90 \\\n\tgetkey.F90 \\\n\tspaceparamsdef.F90 \\\n\tspaceparams.F90 \\\n\tcompute_tide_zs0.F90 \\\n\twetcells.F90 \\\n\tvegetation.F90 \\\n\twave_functions.F90 \\\n\twaveparams.F90 \\\n\twaveparamsnew.F90 \\\n\troelvink.F90 \\\n\twave_stationary_directions.F90 \\\n\twave_instationary.F90 \\\n\twave_timestep.F90 \\\n\tsolver.F90 \\\n\tflow_secondorder.F90 \\\n\tnonh.F90 \\\n\tboundaryconditions.F90 \\\n\tmorphevolution.F90 \\\n\tgroundwater.F90 \\\n\trainfall.F90 \\\n\tdrifters.F90 \\\n\treadtide.F90 \\\n\treadwind.F90 \\\n\tinitialize.F90 \\\n\ttimestep.F90 \\\n\tbedroughness.F90 \\\n\tvsm_u_XB.f90 \\\n\tflow_timestep.F90 \\\n\tpostprocess.F90 \\\n\tvarianceupdate.F90 \\\n\tvaroutput.F90 \\\n\tncoutput.F90 \\\n\toutput.F90 \\\n\tship.F90 \\\n\tmnemoniciso.F90 \\\n\tloopcounters.F90 \\\n\tlibxbeach.F90 \\\n\tdebugging.F90 \\\n\tintrospection.F90 \\\n\txbeach_bmi.f90"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_boundary_update.f90#12",
+      "verdict": "NARROWED",
+      "rationale": "A zero denominator requires zero/invalid endpoint spectral variance, not ordinary interpolation between finite positive spectra: summation commutes with the linear interpolation, making sfimp and sfnow equal apart from rounding. These prototype modules are absent from both checked project source lists and the active call graph, so this is a latent integration defect, not a failure of the shipped executable.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am:L4-L60",
+        "quote": "libxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\\n\tconstants.F90 \\\n\ttypesandkinds.F90 \\\n\tiso_c_utils.f90 \\\n\tlogging.F90 \\\n\tparamsconst.F90 \\\n\tfilefunctions.F90 \\\n\treadkey.F90 \\\n\tmnemonic.F90 \\\n\tinterp.F90 \\\n\tmath_tools.F90 \\\n\tparams.F90 \\\n\tgetkey.F90 \\\n\tspaceparamsdef.F90 \\\n\tspaceparams.F90 \\\n\tcompute_tide_zs0.F90 \\\n\twetcells.F90 \\\n\tvegetation.F90 \\\n\twave_functions.F90 \\\n\twaveparams.F90 \\\n\twaveparamsnew.F90 \\\n\troelvink.F90 \\\n\twave_stationary_directions.F90 \\\n\twave_instationary.F90 \\\n\twave_timestep.F90 \\\n\tsolver.F90 \\\n\tflow_secondorder.F90 \\\n\tnonh.F90 \\\n\tboundaryconditions.F90 \\\n\tmorphevolution.F90 \\\n\tgroundwater.F90 \\\n\trainfall.F90 \\\n\tdrifters.F90 \\\n\treadtide.F90 \\\n\treadwind.F90 \\\n\tinitialize.F90 \\\n\ttimestep.F90 \\\n\tbedroughness.F90 \\\n\tvsm_u_XB.f90 \\\n\tflow_timestep.F90 \\\n\tpostprocess.F90 \\\n\tvarianceupdate.F90 \\\n\tvaroutput.F90 \\\n\tncoutput.F90 \\\n\toutput.F90 \\\n\tship.F90 \\\n\tmnemoniciso.F90 \\\n\tloopcounters.F90 \\\n\tlibxbeach.F90 \\\n\tdebugging.F90 \\\n\tintrospection.F90 \\\n\txbeach_bmi.f90"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_boundary_update.f90#13",
+      "verdict": "NARROWED",
+      "rationale": "The explicit module interface has one dummy argument but the call supplies two; there is no generic overload to absorb the extra argument. These prototype modules are absent from both checked project source lists and the active call graph, so this is a latent integration defect, not a failure of the shipped executable.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am:L4-L60",
+        "quote": "libxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\\n\tconstants.F90 \\\n\ttypesandkinds.F90 \\\n\tiso_c_utils.f90 \\\n\tlogging.F90 \\\n\tparamsconst.F90 \\\n\tfilefunctions.F90 \\\n\treadkey.F90 \\\n\tmnemonic.F90 \\\n\tinterp.F90 \\\n\tmath_tools.F90 \\\n\tparams.F90 \\\n\tgetkey.F90 \\\n\tspaceparamsdef.F90 \\\n\tspaceparams.F90 \\\n\tcompute_tide_zs0.F90 \\\n\twetcells.F90 \\\n\tvegetation.F90 \\\n\twave_functions.F90 \\\n\twaveparams.F90 \\\n\twaveparamsnew.F90 \\\n\troelvink.F90 \\\n\twave_stationary_directions.F90 \\\n\twave_instationary.F90 \\\n\twave_timestep.F90 \\\n\tsolver.F90 \\\n\tflow_secondorder.F90 \\\n\tnonh.F90 \\\n\tboundaryconditions.F90 \\\n\tmorphevolution.F90 \\\n\tgroundwater.F90 \\\n\trainfall.F90 \\\n\tdrifters.F90 \\\n\treadtide.F90 \\\n\treadwind.F90 \\\n\tinitialize.F90 \\\n\ttimestep.F90 \\\n\tbedroughness.F90 \\\n\tvsm_u_XB.f90 \\\n\tflow_timestep.F90 \\\n\tpostprocess.F90 \\\n\tvarianceupdate.F90 \\\n\tvaroutput.F90 \\\n\tncoutput.F90 \\\n\toutput.F90 \\\n\tship.F90 \\\n\tmnemoniciso.F90 \\\n\tloopcounters.F90 \\\n\tlibxbeach.F90 \\\n\tdebugging.F90 \\\n\tintrospection.F90 \\\n\txbeach_bmi.f90"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_boundary_update.f90#14",
+      "verdict": "NARROWED",
+      "rationale": "The flux sample time is one step ahead of the advertised output time, and direct whole-array assignment has no guarantee that internal and output time counts match. These prototype modules are absent from both checked project source lists and the active call graph, so this is a latent integration defect, not a failure of the shipped executable.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am:L4-L60",
+        "quote": "libxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\\n\tconstants.F90 \\\n\ttypesandkinds.F90 \\\n\tiso_c_utils.f90 \\\n\tlogging.F90 \\\n\tparamsconst.F90 \\\n\tfilefunctions.F90 \\\n\treadkey.F90 \\\n\tmnemonic.F90 \\\n\tinterp.F90 \\\n\tmath_tools.F90 \\\n\tparams.F90 \\\n\tgetkey.F90 \\\n\tspaceparamsdef.F90 \\\n\tspaceparams.F90 \\\n\tcompute_tide_zs0.F90 \\\n\twetcells.F90 \\\n\tvegetation.F90 \\\n\twave_functions.F90 \\\n\twaveparams.F90 \\\n\twaveparamsnew.F90 \\\n\troelvink.F90 \\\n\twave_stationary_directions.F90 \\\n\twave_instationary.F90 \\\n\twave_timestep.F90 \\\n\tsolver.F90 \\\n\tflow_secondorder.F90 \\\n\tnonh.F90 \\\n\tboundaryconditions.F90 \\\n\tmorphevolution.F90 \\\n\tgroundwater.F90 \\\n\trainfall.F90 \\\n\tdrifters.F90 \\\n\treadtide.F90 \\\n\treadwind.F90 \\\n\tinitialize.F90 \\\n\ttimestep.F90 \\\n\tbedroughness.F90 \\\n\tvsm_u_XB.f90 \\\n\tflow_timestep.F90 \\\n\tpostprocess.F90 \\\n\tvarianceupdate.F90 \\\n\tvaroutput.F90 \\\n\tncoutput.F90 \\\n\toutput.F90 \\\n\tship.F90 \\\n\tmnemoniciso.F90 \\\n\tloopcounters.F90 \\\n\tlibxbeach.F90 \\\n\tdebugging.F90 \\\n\tintrospection.F90 \\\n\txbeach_bmi.f90"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_boundary_update.f90#16",
+      "verdict": "NARROWED",
+      "rationale": "The local direction-grid variables lack defining assignments, WDindex lacks allocation, the bin test uses i instead of itheta, and par_px has no declaration. These prototype modules are absent from both checked project source lists and the active call graph, so this is a latent integration defect, not a failure of the shipped executable.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am:L4-L60",
+        "quote": "libxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\\n\tconstants.F90 \\\n\ttypesandkinds.F90 \\\n\tiso_c_utils.f90 \\\n\tlogging.F90 \\\n\tparamsconst.F90 \\\n\tfilefunctions.F90 \\\n\treadkey.F90 \\\n\tmnemonic.F90 \\\n\tinterp.F90 \\\n\tmath_tools.F90 \\\n\tparams.F90 \\\n\tgetkey.F90 \\\n\tspaceparamsdef.F90 \\\n\tspaceparams.F90 \\\n\tcompute_tide_zs0.F90 \\\n\twetcells.F90 \\\n\tvegetation.F90 \\\n\twave_functions.F90 \\\n\twaveparams.F90 \\\n\twaveparamsnew.F90 \\\n\troelvink.F90 \\\n\twave_stationary_directions.F90 \\\n\twave_instationary.F90 \\\n\twave_timestep.F90 \\\n\tsolver.F90 \\\n\tflow_secondorder.F90 \\\n\tnonh.F90 \\\n\tboundaryconditions.F90 \\\n\tmorphevolution.F90 \\\n\tgroundwater.F90 \\\n\trainfall.F90 \\\n\tdrifters.F90 \\\n\treadtide.F90 \\\n\treadwind.F90 \\\n\tinitialize.F90 \\\n\ttimestep.F90 \\\n\tbedroughness.F90 \\\n\tvsm_u_XB.f90 \\\n\tflow_timestep.F90 \\\n\tpostprocess.F90 \\\n\tvarianceupdate.F90 \\\n\tvaroutput.F90 \\\n\tncoutput.F90 \\\n\toutput.F90 \\\n\tship.F90 \\\n\tmnemoniciso.F90 \\\n\tloopcounters.F90 \\\n\tlibxbeach.F90 \\\n\tdebugging.F90 \\\n\tintrospection.F90 \\\n\txbeach_bmi.f90"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_boundary_update.f90#17",
+      "verdict": "NARROWED",
+      "rationale": "The misspelled duration variable and unmatched ENDIF are genuine syntax/declaration failures in this source. These prototype modules are absent from both checked project source lists and the active call graph, so this is a latent integration defect, not a failure of the shipped executable.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am:L4-L60",
+        "quote": "libxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\\n\tconstants.F90 \\\n\ttypesandkinds.F90 \\\n\tiso_c_utils.f90 \\\n\tlogging.F90 \\\n\tparamsconst.F90 \\\n\tfilefunctions.F90 \\\n\treadkey.F90 \\\n\tmnemonic.F90 \\\n\tinterp.F90 \\\n\tmath_tools.F90 \\\n\tparams.F90 \\\n\tgetkey.F90 \\\n\tspaceparamsdef.F90 \\\n\tspaceparams.F90 \\\n\tcompute_tide_zs0.F90 \\\n\twetcells.F90 \\\n\tvegetation.F90 \\\n\twave_functions.F90 \\\n\twaveparams.F90 \\\n\twaveparamsnew.F90 \\\n\troelvink.F90 \\\n\twave_stationary_directions.F90 \\\n\twave_instationary.F90 \\\n\twave_timestep.F90 \\\n\tsolver.F90 \\\n\tflow_secondorder.F90 \\\n\tnonh.F90 \\\n\tboundaryconditions.F90 \\\n\tmorphevolution.F90 \\\n\tgroundwater.F90 \\\n\trainfall.F90 \\\n\tdrifters.F90 \\\n\treadtide.F90 \\\n\treadwind.F90 \\\n\tinitialize.F90 \\\n\ttimestep.F90 \\\n\tbedroughness.F90 \\\n\tvsm_u_XB.f90 \\\n\tflow_timestep.F90 \\\n\tpostprocess.F90 \\\n\tvarianceupdate.F90 \\\n\tvaroutput.F90 \\\n\tncoutput.F90 \\\n\toutput.F90 \\\n\tship.F90 \\\n\tmnemoniciso.F90 \\\n\tloopcounters.F90 \\\n\tlibxbeach.F90 \\\n\tdebugging.F90 \\\n\tintrospection.F90 \\\n\txbeach_bmi.f90"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_boundary_update.f90#18",
+      "verdict": "NARROWED",
+      "rationale": "The recovery loop runs over output frequencies while specin retains the input frequency extent; no index mapping makes specin%S(i,:) safe or physically corresponding. These prototype modules are absent from both checked project source lists and the active call graph, so this is a latent integration defect, not a failure of the shipped executable.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am:L4-L60",
+        "quote": "libxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\\n\tconstants.F90 \\\n\ttypesandkinds.F90 \\\n\tiso_c_utils.f90 \\\n\tlogging.F90 \\\n\tparamsconst.F90 \\\n\tfilefunctions.F90 \\\n\treadkey.F90 \\\n\tmnemonic.F90 \\\n\tinterp.F90 \\\n\tmath_tools.F90 \\\n\tparams.F90 \\\n\tgetkey.F90 \\\n\tspaceparamsdef.F90 \\\n\tspaceparams.F90 \\\n\tcompute_tide_zs0.F90 \\\n\twetcells.F90 \\\n\tvegetation.F90 \\\n\twave_functions.F90 \\\n\twaveparams.F90 \\\n\twaveparamsnew.F90 \\\n\troelvink.F90 \\\n\twave_stationary_directions.F90 \\\n\twave_instationary.F90 \\\n\twave_timestep.F90 \\\n\tsolver.F90 \\\n\tflow_secondorder.F90 \\\n\tnonh.F90 \\\n\tboundaryconditions.F90 \\\n\tmorphevolution.F90 \\\n\tgroundwater.F90 \\\n\trainfall.F90 \\\n\tdrifters.F90 \\\n\treadtide.F90 \\\n\treadwind.F90 \\\n\tinitialize.F90 \\\n\ttimestep.F90 \\\n\tbedroughness.F90 \\\n\tvsm_u_XB.f90 \\\n\tflow_timestep.F90 \\\n\tpostprocess.F90 \\\n\tvarianceupdate.F90 \\\n\tvaroutput.F90 \\\n\tncoutput.F90 \\\n\toutput.F90 \\\n\tship.F90 \\\n\tmnemoniciso.F90 \\\n\tloopcounters.F90 \\\n\tlibxbeach.F90 \\\n\tdebugging.F90 \\\n\tintrospection.F90 \\\n\txbeach_bmi.f90"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_boundary_update.f90#19",
+      "verdict": "NARROWED",
+      "rationale": "The scalar assignment really overwrites other points' saved elevations, although bccount=0 initializes each current point immediately before its first taper, limiting the continuity error to subsequent state use. These prototype modules are absent from both checked project source lists and the active call graph, so this is a latent integration defect, not a failure of the shipped executable.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_boundary_update.f90:L2249-L2256",
+        "quote": "            if (bccount==0) then\n               lastwaveelevation(:,itheta) = zeta(iy,ind_end_taper,itheta)\n            endif\n            zeta(iy,:,itheta)=zeta(iy,:,itheta)*wp%taperw+(1-wp%taperw)*lastwaveelevation(iy,itheta)\n            ! note that taperw is only zero at the start, not the end of the time series, so we\n            ! can safely copy zeta at the point in time where t=rtbc to lastwaveelevation for use\n            ! in the generation of the next time series\n            lastwaveelevation(:,itheta) = zeta(iy,ind_end_taper,itheta)"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_boundary_update.f90#32",
+      "verdict": "NARROWED",
+      "rationale": "Without BUILDXBEACH neither interpolation block supplies its output, and subsequent normalization/direction use is unconditional. These prototype modules are absent from both checked project source lists and the active call graph, so this is a latent integration defect, not a failure of the shipped executable.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am:L4-L60",
+        "quote": "libxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\\n\tconstants.F90 \\\n\ttypesandkinds.F90 \\\n\tiso_c_utils.f90 \\\n\tlogging.F90 \\\n\tparamsconst.F90 \\\n\tfilefunctions.F90 \\\n\treadkey.F90 \\\n\tmnemonic.F90 \\\n\tinterp.F90 \\\n\tmath_tools.F90 \\\n\tparams.F90 \\\n\tgetkey.F90 \\\n\tspaceparamsdef.F90 \\\n\tspaceparams.F90 \\\n\tcompute_tide_zs0.F90 \\\n\twetcells.F90 \\\n\tvegetation.F90 \\\n\twave_functions.F90 \\\n\twaveparams.F90 \\\n\twaveparamsnew.F90 \\\n\troelvink.F90 \\\n\twave_stationary_directions.F90 \\\n\twave_instationary.F90 \\\n\twave_timestep.F90 \\\n\tsolver.F90 \\\n\tflow_secondorder.F90 \\\n\tnonh.F90 \\\n\tboundaryconditions.F90 \\\n\tmorphevolution.F90 \\\n\tgroundwater.F90 \\\n\trainfall.F90 \\\n\tdrifters.F90 \\\n\treadtide.F90 \\\n\treadwind.F90 \\\n\tinitialize.F90 \\\n\ttimestep.F90 \\\n\tbedroughness.F90 \\\n\tvsm_u_XB.f90 \\\n\tflow_timestep.F90 \\\n\tpostprocess.F90 \\\n\tvarianceupdate.F90 \\\n\tvaroutput.F90 \\\n\tncoutput.F90 \\\n\toutput.F90 \\\n\tship.F90 \\\n\tmnemoniciso.F90 \\\n\tloopcounters.F90 \\\n\tlibxbeach.F90 \\\n\tdebugging.F90 \\\n\tintrospection.F90 \\\n\txbeach_bmi.f90"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_boundary_update.f90#33",
+      "verdict": "NARROWED",
+      "rationale": "No local declaration, argument, or module variable supplies the referenced s object in the enabled logging branch. These prototype modules are absent from both checked project source lists and the active call graph, so this is a latent integration defect, not a failure of the shipped executable.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am:L4-L60",
+        "quote": "libxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\\n\tconstants.F90 \\\n\ttypesandkinds.F90 \\\n\tiso_c_utils.f90 \\\n\tlogging.F90 \\\n\tparamsconst.F90 \\\n\tfilefunctions.F90 \\\n\treadkey.F90 \\\n\tmnemonic.F90 \\\n\tinterp.F90 \\\n\tmath_tools.F90 \\\n\tparams.F90 \\\n\tgetkey.F90 \\\n\tspaceparamsdef.F90 \\\n\tspaceparams.F90 \\\n\tcompute_tide_zs0.F90 \\\n\twetcells.F90 \\\n\tvegetation.F90 \\\n\twave_functions.F90 \\\n\twaveparams.F90 \\\n\twaveparamsnew.F90 \\\n\troelvink.F90 \\\n\twave_stationary_directions.F90 \\\n\twave_instationary.F90 \\\n\twave_timestep.F90 \\\n\tsolver.F90 \\\n\tflow_secondorder.F90 \\\n\tnonh.F90 \\\n\tboundaryconditions.F90 \\\n\tmorphevolution.F90 \\\n\tgroundwater.F90 \\\n\trainfall.F90 \\\n\tdrifters.F90 \\\n\treadtide.F90 \\\n\treadwind.F90 \\\n\tinitialize.F90 \\\n\ttimestep.F90 \\\n\tbedroughness.F90 \\\n\tvsm_u_XB.f90 \\\n\tflow_timestep.F90 \\\n\tpostprocess.F90 \\\n\tvarianceupdate.F90 \\\n\tvaroutput.F90 \\\n\tncoutput.F90 \\\n\toutput.F90 \\\n\tship.F90 \\\n\tmnemoniciso.F90 \\\n\tloopcounters.F90 \\\n\tlibxbeach.F90 \\\n\tdebugging.F90 \\\n\tintrospection.F90 \\\n\txbeach_bmi.f90"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_boundary_update.f90#34",
+      "verdict": "NARROWED",
+      "rationale": "generate_qbcf has no s object in scope, so s%ny is invalid in that allocation. These prototype modules are absent from both checked project source lists and the active call graph, so this is a latent integration defect, not a failure of the shipped executable.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am:L4-L60",
+        "quote": "libxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\\n\tconstants.F90 \\\n\ttypesandkinds.F90 \\\n\tiso_c_utils.f90 \\\n\tlogging.F90 \\\n\tparamsconst.F90 \\\n\tfilefunctions.F90 \\\n\treadkey.F90 \\\n\tmnemonic.F90 \\\n\tinterp.F90 \\\n\tmath_tools.F90 \\\n\tparams.F90 \\\n\tgetkey.F90 \\\n\tspaceparamsdef.F90 \\\n\tspaceparams.F90 \\\n\tcompute_tide_zs0.F90 \\\n\twetcells.F90 \\\n\tvegetation.F90 \\\n\twave_functions.F90 \\\n\twaveparams.F90 \\\n\twaveparamsnew.F90 \\\n\troelvink.F90 \\\n\twave_stationary_directions.F90 \\\n\twave_instationary.F90 \\\n\twave_timestep.F90 \\\n\tsolver.F90 \\\n\tflow_secondorder.F90 \\\n\tnonh.F90 \\\n\tboundaryconditions.F90 \\\n\tmorphevolution.F90 \\\n\tgroundwater.F90 \\\n\trainfall.F90 \\\n\tdrifters.F90 \\\n\treadtide.F90 \\\n\treadwind.F90 \\\n\tinitialize.F90 \\\n\ttimestep.F90 \\\n\tbedroughness.F90 \\\n\tvsm_u_XB.f90 \\\n\tflow_timestep.F90 \\\n\tpostprocess.F90 \\\n\tvarianceupdate.F90 \\\n\tvaroutput.F90 \\\n\tncoutput.F90 \\\n\toutput.F90 \\\n\tship.F90 \\\n\tmnemoniciso.F90 \\\n\tloopcounters.F90 \\\n\tlibxbeach.F90 \\\n\tdebugging.F90 \\\n\tintrospection.F90 \\\n\txbeach_bmi.f90"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_directions.F90#0",
+      "verdict": "REFUTED",
+      "rationale": "There is no active caller of this superseded solver; moreover, its assumed zero intrinsic frequency is neutralized in the shared dispersion producer by a 0.010 floor before action conversion. The non-WCI producer uses 2*pi/Trep.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_functions.F90:L1080-L1085",
+        "quote": "         s%sigm = sqrt( par%g*km*tanh(arg)*fac)\n         s%sigm = max(s%sigm,0.010d0)\n         !  update intrinsic frequency\n         do itheta=1,s%ntheta\n            s%sigt(:,:,itheta) = s%sigm\n         enddo"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_directions.F90#1",
+      "verdict": "NARROWED",
+      "rationale": "Dveg is indeed absent from this older routine, but it has no active caller and is excluded from the library source list. The selected replacement wave_stationary_directions includes Dveg at 444, so this is a latent inconsistency in superseded code.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_stationary_directions.F90:L438-L448",
+        "quote": "            do itheta=1,ntheta_local\n               where(s%wete(i,:)==1)\n                  ! just dissipation due to breaking, used for roller energy balance (in callTypeStationary only)\n                  dder(i,:,itheta)=ee_local(i,:,itheta)*s%D(i,:)/max(s%E(i,:),0.00001d0)\n                  ! Then all short wave energy dissipation, including bed friction and vegetation, used to reduce wave height\n                  ! Robert: note Dveg needs update for callTypeDirections, because based on only instantaneous H\n                  dd(i,:,itheta)=dder(i,:,itheta) + ee_local(i,:,itheta)*(s%Df(i,:)+s%Dveg(i,:))/max(s%E(i,:),0.00001d0)\n               elsewhere\n                  dder(i,:,itheta)=0.d0\n                  dd(i,:,itheta)=0.d0\n               endwhere"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_directions.F90#2",
+      "verdict": "NARROWED",
+      "rationale": "The arithmetic mean really fails when energy straddles the ends of a stored full-circle sector, such as -pi to pi. This older solver is excluded and uncalled; the current dispatcher selects wave_stationary_directions.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_timestep.F90:L89-L91",
+        "quote": "            if ((abs(mod(par%t,par%wavint))<0.001d0*par%dt) .or. s%newstatbc==1 .or. par%t==par%dt) then\n               call wave_dispersion(s,par,1)  ! use s%hhws water depth (and velocity)\n               call wave_stationary_directions(s,par,1)"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_directions.F90#6",
+      "verdict": "NARROWED",
+      "rationale": "The full-row mask genuinely has a different extent when j bounds omit columns, including ordinary non-MPI interior bounds. This is confined to the uncalled older solver; the active replacement slices the mask consistently.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_stationary_directions.F90:L620-L624",
+        "quote": "            select case (par%truncationType)\n             case (TRUNCATIONTYPE_ABSOLUTE)\n               Herr=maxval(abs(Hprev(jmin_ee:jmax_ee)-s%H(i,jmin_ee:jmax_ee)),mask=s%wete(i,jmin_ee:jmax_ee)==1)\n             case (TRUNCATIONTYPE_RELATIVE)\n               Herr=maxval(abs(Hprev(jmin_ee:jmax_ee)-s%H(i,jmin_ee:jmax_ee))/s%H(i,jmin_ee:jmax_ee),mask=s%wete(i,jmin_ee:jmax_ee)==1)"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_functions.F90#0",
+      "verdict": "STANDS",
+      "rationale": "ntheta=2 is allowed by grid construction and the second-order scheme is not downgraded for two angular bins. The first boundary flux accesses bin 3 for negative ctheta, while the last boundary flux can access bin 0 for positive ctheta; the wet-cell guard does not prevent these cases."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_functions.F90#1",
+      "verdict": "NARROWED",
+      "rationale": "The single_dir wavint case is normally protected by wave-event scheduling and compute_dt's clipping to the next event. The remaining extrapolating filter weights require dt>cats*Trep in the other averaging path, or a caller bypassing normal timestep scheduling; positive depth alone does not protect the velocity filter.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/timestep.F90:L652-L657",
+        "quote": "         if (tpar%tnext > par%t) then\n            ! sometime dt too small and then integer overflow. Catch with check beforehand\n            if ((tpar%tnext-par%t)/par%dt<dble(0.9*huge(0))) then\n               n = ceiling((tpar%tnext-par%t)/par%dt)\n               par%dt = (tpar%tnext-par%t)/n\n            endif"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_functions.F90#2",
+      "verdict": "STANDS",
+      "rationale": "iter starts at zero and increments only while iter<150, so exhaustion ends at 150 and the iter<=itermax test always succeeds. No caller can receive the advertised negative result from finite nonconvergent iteration."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_functions.F90#3",
+      "verdict": "REFUTED",
+      "rationale": "All repository callers pass the constants 0, 1 or 2, matching the three implemented branches; the optional default is also 0. No supported call supplies the alleged unsupported switch.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_timestep.F90:L98-L102",
+        "quote": "            if (par%wci==1) then\n               call wave_dispersion(s,par,2) ! use s%hhwcins water depth (and velocity)\n            else\n               call wave_dispersion(s,par,0) ! use s%hhw water depth\n            endif"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_functions.F90#4",
+      "verdict": "STANDS",
+      "rationale": "The shared wave_dispersion expressions have only upper min clamps and hhlocal is not capped at hwcimax. Positive depth greater than that configurable threshold therefore makes the current multiplier negative; the later intrinsic-frequency floor does not repair wm or cgxm/cgym."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_functions.F90#5",
+      "verdict": "REFUTED",
+      "rationale": "The alleged zero denominators are neutralized upstream for valid model state: hh is floored at eps, hstokes is hh plus a nonnegative correction (or max(hh,hmin)), and c comes from positive intrinsic frequency/k or a 0.01 fallback. The wet mask also excludes dry velocity states.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_timestep.F90:L64-L72",
+        "quote": "      if (par%oldhmin==1) then\n         s%hstokes = max(s%hh,par%hmin)\n      else\n         gamma = s%H/s%hh\n         where (gamma>1.d0)\n            s%hstokes = par%deltahmin*(gamma-1.d0)*s%H+s%hh\n         elsewhere\n            s%hstokes = s%hh\n         endwhere"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_functions.F90#6",
+      "verdict": "NARROWED",
+      "rationale": "Saved work storage really persists across calls and can be wrong after changing grid size or enabling WCI mid-lifetime. Normal stepping retains one grid and fixed switches, and direction-velocity storage already allocates max(ntheta,ntheta_s), so ordinary single_dir alternation is not a counterexample.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_functions.F90:L1123-L1137",
+        "quote": "      if(.not. allocated(cgx)) then\n         if (par%single_dir==1) then\n            nthetamax = max(s%ntheta,s%ntheta_s)\n         else\n            nthetamax = s%ntheta\n         endif\n         allocate(cgx(s%nx+1,s%ny+1,nthetamax))\n         allocate(cgy(s%nx+1,s%ny+1,nthetamax))\n         allocate(cx(s%nx+1,s%ny+1,nthetamax))\n         allocate(cy(s%nx+1,s%ny+1,nthetamax))\n         allocate(ctheta(s%nx+1,s%ny+1,nthetamax))\n         if (par%wci==1) then\n            allocate(uwci(s%nx+1,s%ny+1))\n            allocate(vwci(s%nx+1,s%ny+1))\n         endif"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_functions.F90#7",
+      "verdict": "REFUTED",
+      "rationale": "Fy is initialized globally, physical front/back rows are explicitly set, and the remaining final lateral row is a dummy for the v-momentum indexing rather than an uninitialized force used by the solver. The claim mistakes commented boundary copies for missing required initialization.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/initialize.F90:L550-L551",
+        "quote": "      s%Fx        = 0.d0\n      s%Fy        = 0.d0"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_instationary.F90#0",
+      "verdict": "REFUTED",
+      "rationale": "wave always calls wave_dispersion before wave_instationary, and WCI sigm is floored at 0.010 then copied into every sigt slice. Without WCI sigt is initialized from a positive representative period.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_functions.F90:L1080-L1085",
+        "quote": "         s%sigm = sqrt( par%g*km*tanh(arg)*fac)\n         s%sigm = max(s%sigm,0.010d0)\n         !  update intrinsic frequency\n         do itheta=1,s%ntheta\n            s%sigt(:,:,itheta) = s%sigm\n         enddo"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_instationary.F90#2",
+      "verdict": "STANDS",
+      "rationale": "wcrestpos has nx+1 elements, so the two sentinels make nx+3; linear_interp's explicit n-sized dummy honors the passed nx+1. The omitted terminal points are therefore genuinely inaccessible to interpolation."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_instationary.F90#3",
+      "verdict": "NARROWED",
+      "rationale": "The wet-cell and roller guards exclude the dry zero velocities. A zero directional speed remains possible with WCI when the current cancels the positive intrinsic phase-velocity vector; without WCI its magnitude is the positive c.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_functions.F90:L1178-L1187",
+        "quote": "                  if (par%wci==1) then\n                     cgx(i,j,itheta)= s%cg(i,j)*cs+uwci(i,j)\n                     cgy(i,j,itheta)= s%cg(i,j)*sn+vwci(i,j)\n                     cx(i,j,itheta) =  s%c(i,j)*cs+uwci(i,j)\n                     cy(i,j,itheta) =  s%c(i,j)*sn+vwci(i,j)\n                  else\n                     cgx(i,j,itheta)= s%cg(i,j)*cs\n                     cgy(i,j,itheta)= s%cg(i,j)*sn\n                     cx(i,j,itheta) =  s%c(i,j)*cs\n                     cy(i,j,itheta) =  s%c(i,j)*sn"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_instationary.F90#4",
+      "verdict": "STANDS",
+      "rationale": "Within the activated roller limit, rr is rescaled as energy while R is clipped against a depth-times-gamma length. R is not recomputed before compute_stokes_drift consumes it, so the dimensional mismatch affects the resulting roller drift."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_instationary.F90#5",
+      "verdict": "STANDS",
+      "rationale": "The configured angular sector can cover -pi to pi, and Fortran MOD in initialization preserves negative angles. Equal energy near those two stored endpoints is consequently averaged toward zero; neither the energy denominator nor the ordinary multidirectional branch performs a circular mean."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_stationary.F90#0",
+      "verdict": "NARROWED",
+      "rationale": "The old solver uses an arithmetic angular mean and can fail for a wrapped stored direction array. It is excluded and uncalled in the present library, whose dispatcher selects wave_stationary_directions instead.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_timestep.F90:L75-L81",
+        "quote": "      select case (par%wavemodel)\n       case(WAVEMODEL_STATIONARY)\n         ! call update_means_wave_flow not required: stationary always uses instantaneous water depth s%hhw\n         if ((abs(mod(par%t,par%wavint))<0.001d0*par%dt) .or. s%newstatbc==1) then\n            call wave_dispersion(s,par,0)  ! use instantaneous water depth (and velocity)\n            call wave_stationary_directions(s,par,0)\n            s%newstatbc   = 0"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_stationary.F90#1",
+      "verdict": "REFUTED",
+      "rationale": "The model's dispersion producer floors intrinsic frequency and fills sigt before the active solvers; the old solver is additionally absent from the build/call graph. Lack of a repeated local floor does not establish a zero-frequency defect.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_functions.F90:L1080-L1085",
+        "quote": "         s%sigm = sqrt( par%g*km*tanh(arg)*fac)\n         s%sigm = max(s%sigm,0.010d0)\n         !  update intrinsic frequency\n         do itheta=1,s%ntheta\n            s%sigt(:,:,itheta) = s%sigm\n         enddo"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_stationary.F90#2",
+      "verdict": "REFUTED",
+      "rationale": "s%hh is already floored at par%eps by initialization and each flow/morphology update, so a dry cell does not supply zero depth here. The cited old solver is also not selected by the active dispatcher.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/flow_timestep.F90:L940-L940",
+        "quote": "      s%hh  = max(s%zs-s%zb,par%eps)    ! water depth"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_stationary.F90#4",
+      "verdict": "NARROWED",
+      "rationale": "Only a wet WCI cell whose current cancels intrinsic phase velocity can make this denominator zero; dry cells and non-WCI positive phase speed do not. In addition this older stationary routine is excluded and uncalled.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_timestep.F90:L75-L81",
+        "quote": "      select case (par%wavemodel)\n       case(WAVEMODEL_STATIONARY)\n         ! call update_means_wave_flow not required: stationary always uses instantaneous water depth s%hhw\n         if ((abs(mod(par%t,par%wavint))<0.001d0*par%dt) .or. s%newstatbc==1) then\n            call wave_dispersion(s,par,0)  ! use instantaneous water depth (and velocity)\n            call wave_stationary_directions(s,par,0)\n            s%newstatbc   = 0"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_stationary.F90#5",
+      "verdict": "NARROWED",
+      "rationale": "The missing absolute value is real in the old routine, but the selected replacement uses maxval(abs(cgx)). Even in the old routine the y and theta timestep minima may cap dtw, so an excessively large final timestep additionally requires those constraints to be weak.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_stationary_directions.F90:L257-L265",
+        "quote": "         select case (callType)\n          case(callTypeStationary)\n            dtw=        .5d0*minval(s%dsu(i-1:i+1,jmin_ee:jmax_ee))/max(1.0d-6,maxval(abs(s%cgx(i-1:i+1,jmin_ee:jmax_ee,:))))\n            dtw=min(dtw,.5d0*minval(s%dnv(i,jmin_ee:jmax_ee))      /max(1.0d-6,maxval(abs(s%cgy(i,jmin_ee:jmax_ee,:)      ))))\n            dtw=min(dtw,.5d0*dtheta_local                          /max(1.0d-6,maxval(abs(s%ctheta(i,jmin_ee:jmax_ee,:)   ))))\n          case(callTypeDirections)\n            dtw=        .5d0*minval(s%dsu(i-1:i+1,jmin_ee:jmax_ee))/max(1.0d-6,maxval(abs(s%cgx_s(i-1:i+1,jmin_ee:jmax_ee,:))))\n            dtw=min(dtw,.5d0*minval(s%dnv(i,jmin_ee:jmax_ee))      /max(1.0d-6,maxval(abs(s%cgy_s(i,jmin_ee:jmax_ee,:)      ))))\n            dtw=min(dtw,.5d0*dtheta_local                          /max(1.0d-6,maxval(abs(s%ctheta_s(i,jmin_ee:jmax_ee,:)   ))))"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_stationary.F90#6",
+      "verdict": "REFUTED",
+      "rationale": "Fy has a global zero initialization before wave propagation; absent extrapolation does not imply undefined boundary storage. This older routine is also not called by the current wave dispatcher.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/initialize.F90:L550-L551",
+        "quote": "      s%Fx        = 0.d0\n      s%Fy        = 0.d0"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_stationary_directions.F90#0",
+      "verdict": "STANDS",
+      "rationale": "Both theta and theta_s can represent a full-circle sector with energy concentrated at its two ends. Their arithmetic weighted means then point toward the middle of the sector, and the nonzero-energy guard does not correct this angular discontinuity."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_stationary_directions.F90#1",
+      "verdict": "NARROWED",
+      "rationale": "The relative-height metric really divides by zero for a wet zero-energy cell. The ignored EE wetmask alone is not a demonstrated error: dry ee_local is cleared before eeprev is saved and again after updates, so those dry-cell differences are normally zero.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_stationary_directions.F90:L192-L200",
+        "quote": "      do itheta=1,ntheta_local\n         where(s%wete==0)\n            ee_local(:,:,itheta) = 0.d0\n         endwhere\n      enddo\n      where(s%wete==0)\n         s%E=0.d0\n         s%H=0.d0\n      endwhere"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_stationary_directions.F90#2",
+      "verdict": "REFUTED",
+      "rationale": "The upstream wave_dispersion call floors sigm to 0.010 for WCI and otherwise sets it to 2*pi/Trep. Nothing in this solver's action round trip reassigns it to zero.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_functions.F90:L1080-L1085",
+        "quote": "         s%sigm = sqrt( par%g*km*tanh(arg)*fac)\n         s%sigm = max(s%sigm,0.010d0)\n         !  update intrinsic frequency\n         do itheta=1,s%ntheta\n            s%sigt(:,:,itheta) = s%sigm\n         enddo"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_stationary_directions.F90#3",
+      "verdict": "NARROWED",
+      "rationale": "A changed-grid or changed-callType reentry can leave saved auxiliary arrays incompatible, but normal stepping never alternates these callTypes: stationary uses 0 and single_dir Surfbeat uses 1 for a fixed model configuration. Invalid callType has no repository caller.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_timestep.F90:L75-L91",
+        "quote": "      select case (par%wavemodel)\n       case(WAVEMODEL_STATIONARY)\n         ! call update_means_wave_flow not required: stationary always uses instantaneous water depth s%hhw\n         if ((abs(mod(par%t,par%wavint))<0.001d0*par%dt) .or. s%newstatbc==1) then\n            call wave_dispersion(s,par,0)  ! use instantaneous water depth (and velocity)\n            call wave_stationary_directions(s,par,0)\n            s%newstatbc   = 0\n         endif\n       case(WAVEMODEL_SURFBEAT)\n         if (par%single_dir==1) then\n            ! always need to update depths for wave directions model, as well as in case of wci (dealt with in subroutine)\n            call update_means_wave_flow(s,par)\n            !\n            ! if necessary, update wave directions\n            if ((abs(mod(par%t,par%wavint))<0.001d0*par%dt) .or. s%newstatbc==1 .or. par%t==par%dt) then\n               call wave_dispersion(s,par,1)  ! use s%hhws water depth (and velocity)\n               call wave_stationary_directions(s,par,1)"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_stationary_directions.F90#4",
+      "verdict": "STANDS",
+      "rationale": "RH is explicitly sqrt(R/rhog8), and the scaled rr energy is followed by R=RH*gammafac_i. No final summation repairs R before compute_stokes_drift, so the active limiter stores a length in an energy field."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_stationary_directions.F90#5",
+      "verdict": "NARROWED",
+      "rationale": "The wet-cell guard eliminates the dry zero-speed path, and non-WCI phase speed is positive. The remaining zero denominator requires roller=1 and WCI current cancellation of the intrinsic propagation vector.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_functions.F90:L1178-L1187",
+        "quote": "                  if (par%wci==1) then\n                     cgx(i,j,itheta)= s%cg(i,j)*cs+uwci(i,j)\n                     cgy(i,j,itheta)= s%cg(i,j)*sn+vwci(i,j)\n                     cx(i,j,itheta) =  s%c(i,j)*cs+uwci(i,j)\n                     cy(i,j,itheta) =  s%c(i,j)*sn+vwci(i,j)\n                  else\n                     cgx(i,j,itheta)= s%cg(i,j)*cs\n                     cgy(i,j,itheta)= s%cg(i,j)*sn\n                     cx(i,j,itheta) =  s%c(i,j)*cs\n                     cy(i,j,itheta) =  s%c(i,j)*sn"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__wave_timestep.F90#0",
+      "verdict": "REFUTED",
+      "rationale": "The raw hh field is itself floored to eps in initialization, flow_timestep and morphevolution; it is not a zero dry-cell depth on the normal call path. The extra hhw clamp is not the only depth protection.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/morphevolution.F90:L3200-L3200",
+        "quote": "      s%hh=max(s%zs-s%zb,par%eps)"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__waveparams.F90#0",
+      "verdict": "NARROWED",
+      "rationale": "Nbin is not initialized, the interval test excludes the upper edge, and one-sided wrapping can leave directions outside the opposite edge before maxval/indexing. However, makebcf has no repository caller: the live boundary path invokes spectral_wave_bc from waveparamsnew, so this is latent legacy-code behavior.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/boundaryconditions.F90:L239-L247",
+        "quote": "         elseif ((par%wbctype==WBCTYPE_PARAMETRIC .or. par%wbctype==WBCTYPE_JONS_TABLE) .and. &\n         (par%wavemodel/=WAVEMODEL_STATIONARY .and. xmaster)) then\n            call spectral_wave_bc(sg,par,curline)\n            ! 5) SWAN\n         elseif (par%wbctype==WBCTYPE_SWAN.and.xmaster) then\n            call spectral_wave_bc(sg,par,curline)\n            ! 6) vardens\n         elseif (par%wbctype==WBCTYPE_VARDENS.and.xmaster) then\n            call spectral_wave_bc(sg,par,curline)"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__waveparams.F90#1",
+      "verdict": "NARROWED",
+      "rationale": "Clamping negative qx before ATAN loses the quadrant, and qy additionally uses the already overwritten qx in the next rotation expression. However, makebcf has no repository caller: the live boundary path invokes spectral_wave_bc from waveparamsnew, so this is latent legacy-code behavior.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/boundaryconditions.F90:L239-L247",
+        "quote": "         elseif ((par%wbctype==WBCTYPE_PARAMETRIC .or. par%wbctype==WBCTYPE_JONS_TABLE) .and. &\n         (par%wavemodel/=WAVEMODEL_STATIONARY .and. xmaster)) then\n            call spectral_wave_bc(sg,par,curline)\n            ! 5) SWAN\n         elseif (par%wbctype==WBCTYPE_SWAN.and.xmaster) then\n            call spectral_wave_bc(sg,par,curline)\n            ! 6) vardens\n         elseif (par%wbctype==WBCTYPE_VARDENS.and.xmaster) then\n            call spectral_wave_bc(sg,par,curline)"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__waveparams.F90#2",
+      "verdict": "NARROWED",
+      "rationale": "A zero-height spectrum is accepted and reaches zero spectral moments/normalization denominators; the local S0 floor does not make those moments positive. However, makebcf has no repository caller: the live boundary path invokes spectral_wave_bc from waveparamsnew, so this is latent legacy-code behavior.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/boundaryconditions.F90:L239-L247",
+        "quote": "         elseif ((par%wbctype==WBCTYPE_PARAMETRIC .or. par%wbctype==WBCTYPE_JONS_TABLE) .and. &\n         (par%wavemodel/=WAVEMODEL_STATIONARY .and. xmaster)) then\n            call spectral_wave_bc(sg,par,curline)\n            ! 5) SWAN\n         elseif (par%wbctype==WBCTYPE_SWAN.and.xmaster) then\n            call spectral_wave_bc(sg,par,curline)\n            ! 6) vardens\n         elseif (par%wbctype==WBCTYPE_VARDENS.and.xmaster) then\n            call spectral_wave_bc(sg,par,curline)"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__waveparams.F90#3",
+      "verdict": "REFUTED",
+      "rationale": "No repository caller invokes the legacy makebcf or its private readers, so non-master ranks do not execute the alleged input path. The active spectral generator is instead invoked explicitly under xmaster and its results are distributed by boundaryconditions.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/boundaryconditions.F90:L239-L247",
+        "quote": "         elseif ((par%wbctype==WBCTYPE_PARAMETRIC .or. par%wbctype==WBCTYPE_JONS_TABLE) .and. &\n         (par%wavemodel/=WAVEMODEL_STATIONARY .and. xmaster)) then\n            call spectral_wave_bc(sg,par,curline)\n            ! 5) SWAN\n         elseif (par%wbctype==WBCTYPE_SWAN.and.xmaster) then\n            call spectral_wave_bc(sg,par,curline)\n            ! 6) vardens\n         elseif (par%wbctype==WBCTYPE_VARDENS.and.xmaster) then\n            call spectral_wave_bc(sg,par,curline)"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__waveparams.F90#4",
+      "verdict": "REFUTED",
+      "rationale": "Both arrays have the same time extent and these two quantities are used only through stdzeta/stdeta. Replacing both N denominators by N-1 cancels exactly in that ratio, so the parentheses do not cause a statistical weighting defect.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/waveparams.F90:L1453-L1457",
+        "quote": "               stdzeta = sqrt(sum(zeta(index2,:,ii)**2)/(size(zeta(index2,:,ii)-1)))\n               stdeta = sqrt(sum(eta(index2,:)**2)/(size(eta(index2,:)-1)))\n               !\n               ! Calculate amplitude of directional wave envelope\n               Ampzeta(index2,:,ii)= Amp(index2,:)*stdzeta/stdeta"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__waveparams.F90#6",
+      "verdict": "REFUTED",
+      "rationale": "An unhandled Fortran end-of-file condition on these READ statements terminates execution; it does not silently continue the loop or repeatedly read past EOF. A missing tailored diagnostic is a different issue from the claimed hang.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/waveparams.F90:L465-L472",
+        "quote": "         do while (switch==0)\n            read(44,'(a)')rtext\n            if (rtext == 'RFREQ ') then\n               switch = 1\n            elseif (rtext == 'AFREQ ') then\n               switch = 2\n            end if\n         end do"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__waveparams.F90#7",
+      "verdict": "NARROWED",
+      "rationale": "The difference-wave vector can have negative KKx, and ATAN(KKy/KKx) discards that quadrant with no later directional correction. However, makebcf has no repository caller: the live boundary path invokes spectral_wave_bc from waveparamsnew, so this is latent legacy-code behavior.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/boundaryconditions.F90:L239-L247",
+        "quote": "         elseif ((par%wbctype==WBCTYPE_PARAMETRIC .or. par%wbctype==WBCTYPE_JONS_TABLE) .and. &\n         (par%wavemodel/=WAVEMODEL_STATIONARY .and. xmaster)) then\n            call spectral_wave_bc(sg,par,curline)\n            ! 5) SWAN\n         elseif (par%wbctype==WBCTYPE_SWAN.and.xmaster) then\n            call spectral_wave_bc(sg,par,curline)\n            ! 6) vardens\n         elseif (par%wbctype==WBCTYPE_VARDENS.and.xmaster) then\n            call spectral_wave_bc(sg,par,curline)"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__waveparams.F90#8",
+      "verdict": "NARROWED",
+      "rationale": "Neither reader rejects ndir=1 before accessing theta(2); the directional orientation adjustment occurs after that access. However, makebcf has no repository caller: the live boundary path invokes spectral_wave_bc from waveparamsnew, so this is latent legacy-code behavior.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/boundaryconditions.F90:L239-L247",
+        "quote": "         elseif ((par%wbctype==WBCTYPE_PARAMETRIC .or. par%wbctype==WBCTYPE_JONS_TABLE) .and. &\n         (par%wavemodel/=WAVEMODEL_STATIONARY .and. xmaster)) then\n            call spectral_wave_bc(sg,par,curline)\n            ! 5) SWAN\n         elseif (par%wbctype==WBCTYPE_SWAN.and.xmaster) then\n            call spectral_wave_bc(sg,par,curline)\n            ! 6) vardens\n         elseif (par%wbctype==WBCTYPE_VARDENS.and.xmaster) then\n            call spectral_wave_bc(sg,par,curline)"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__waveparams.F90#9",
+      "verdict": "NARROWED",
+      "rationale": "ny=1 takes the ny>0 branch but makes its 2:ny averaging slices empty, and no denominator floor repairs the resulting quotient. However, makebcf has no repository caller: the live boundary path invokes spectral_wave_bc from waveparamsnew, so this is latent legacy-code behavior.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/boundaryconditions.F90:L239-L247",
+        "quote": "         elseif ((par%wbctype==WBCTYPE_PARAMETRIC .or. par%wbctype==WBCTYPE_JONS_TABLE) .and. &\n         (par%wavemodel/=WAVEMODEL_STATIONARY .and. xmaster)) then\n            call spectral_wave_bc(sg,par,curline)\n            ! 5) SWAN\n         elseif (par%wbctype==WBCTYPE_SWAN.and.xmaster) then\n            call spectral_wave_bc(sg,par,curline)\n            ! 6) vardens\n         elseif (par%wbctype==WBCTYPE_VARDENS.and.xmaster) then\n            call spectral_wave_bc(sg,par,curline)"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__waveparams.F90#10",
+      "verdict": "NARROWED",
+      "rationale": "Descending frequency input is not sorted, and RFREQ is treated as AFREQ even when a nonzero ambient current would distinguish them; zero-current ordered input is not affected. However, makebcf has no repository caller: the live boundary path invokes spectral_wave_bc from waveparamsnew, so this is latent legacy-code behavior.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/boundaryconditions.F90:L239-L247",
+        "quote": "         elseif ((par%wbctype==WBCTYPE_PARAMETRIC .or. par%wbctype==WBCTYPE_JONS_TABLE) .and. &\n         (par%wavemodel/=WAVEMODEL_STATIONARY .and. xmaster)) then\n            call spectral_wave_bc(sg,par,curline)\n            ! 5) SWAN\n         elseif (par%wbctype==WBCTYPE_SWAN.and.xmaster) then\n            call spectral_wave_bc(sg,par,curline)\n            ! 6) vardens\n         elseif (par%wbctype==WBCTYPE_VARDENS.and.xmaster) then\n            call spectral_wave_bc(sg,par,curline)"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__waveparams.F90#11",
+      "verdict": "NARROWED",
+      "rationale": "The range-to-K calculation has no minimum of two, so a degenerate retained frequency range reaches divisions by K-1 and zero df. However, makebcf has no repository caller: the live boundary path invokes spectral_wave_bc from waveparamsnew, so this is latent legacy-code behavior.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/boundaryconditions.F90:L239-L247",
+        "quote": "         elseif ((par%wbctype==WBCTYPE_PARAMETRIC .or. par%wbctype==WBCTYPE_JONS_TABLE) .and. &\n         (par%wavemodel/=WAVEMODEL_STATIONARY .and. xmaster)) then\n            call spectral_wave_bc(sg,par,curline)\n            ! 5) SWAN\n         elseif (par%wbctype==WBCTYPE_SWAN.and.xmaster) then\n            call spectral_wave_bc(sg,par,curline)\n            ! 6) vardens\n         elseif (par%wbctype==WBCTYPE_VARDENS.and.xmaster) then\n            call spectral_wave_bc(sg,par,curline)"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__waveparams.F90#24",
+      "verdict": "NARROWED",
+      "rationale": "The intermediate Ampzeta values are order-dependent, but WBCTYPE_PARAMS/JONS_TABLE output bypasses them and uses the final total Amp with rD. Other output modes retain the defect in legacy makebcf, which has no repository caller.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/waveparams.F90:L1499-L1509",
+        "quote": "      if (par%wbctype==WBCTYPE_PARAMS .or. par%wbctype==WBCTYPE_JONS_TABLE) then\n         call writelog('ls','','Apply symmetric energy distribution w.r.t mean wave direction')\n         do ii=1,Ns\n            do index2=1,wp%Npy\n               E_tdir(index2,:,ii)=0.0d0\n               E_tdir(index2,:,ii)=0.5d0*(par%rho)*(par%g)*Amp(index2,:)**2*rD(ii)\n            enddo\n         enddo\n      else\n         E_tdir=0.0d0\n         E_tdir=0.5d0*(par%rho)*(par%g)*Ampzeta**2"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__waveparamsnew.F90#0",
+      "verdict": "NARROWED",
+      "rationale": "The interpolated writer really supplies three values per point to a four-field record contract, leaving the fourth field unspecified. The present Surfbeat consumer uses only q columns 1 and 2, so a HIGH hydrodynamic consequence from the omitted elevation is not demonstrated; the file-format defect remains.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/boundaryconditions.F90:L659-L664",
+        "quote": "               q = (dtbcfile-(tnew-par%t))/dtbcfile*q2 + &          !Jaap\n               (tnew-par%t)/dtbcfile*q1\n               ! be aware: ui and vi are defined w.r.t. the grid, not w.r.t. the coordinate system!\n               s%ui(1,:) = (q(:,1)*dcos(s%alfau(1,:)) + q(:,2)*dsin(s%alfau(1,:)))/ht(1,:)*min(par%t/par%taper,1.0d0)\n               s%vi(1,:) = (-q(:,1)*dsin(s%alfau(1,:)) + q(:,2)*dcos(s%alfau(1,:)))/ht(1,:)*min(par%t/par%taper,1.0d0)\n               if (xmpi_istop) s%ee(1,:,:)=s%ee(1,:,:)*min(par%t/par%taper,1.0d0)"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__waveparamsnew.F90#1",
+      "verdict": "STANDS",
+      "rationale": "The first-order generator establishes layer thicknesses h0+z and -z, but the second-order accumulation divides by z and h0+z instead. With nhlay in (0,1), z is negative, so the lower-layer correction even acquires the wrong sign; no subsequent velocity update reverses this."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__waveparamsnew.F90#2",
+      "verdict": "NARROWED",
+      "rationale": "PRindex is a POINTER, so allocating it while associated is legal and does not itself cause the claimed already-allocated runtime failure. Each iteration loses the previous target, leaving a memory leak for ny>0; final cleanup can free only the last target.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/waveparamsnew.F90:L57-L60",
+        "quote": "      integer, dimension(:),pointer          :: Findex     ! Index of wave train component locations on frequency/Fourier axis\n      integer, dimension(:),pointer          :: WDindex    ! Index of wave train component locations on wave directional bin axis\n      integer, dimension(:),pointer          :: PRindex    ! Index of wave train components to be phase-resolved (rather than\n      ! using energy balance)"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__waveparamsnew.F90#3",
+      "verdict": "STANDS",
+      "rationale": "The zero-height input is explicitly accepted and creates a zero spectrum; interpolation, representative-period calculation and directional normalization do not reject or special-case it. SWAN's ZERO-record rejection does not cover the permitted zero-height parametric input."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__waveparamsnew.F90#4",
+      "verdict": "STANDS",
+      "rationale": "k3 is initialized to zero and rows above K+1 populate only columns greater than one. Their k3(m,1) therefore remains zero during the cutoff test, and no later pass applies the missing cutoff to populated columns."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__waveparamsnew.F90#5",
+      "verdict": "STANDS",
+      "rationale": "In the enabled 3D second-order branch, KKx/KKy are wavenumber components rather than dimensionless depth products. The other layer terms use those components multiplied by depths, and no caller nondimensionalizes them to justify the isolated sinh(KKx)/sinh(KKy) subtraction."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__waveparamsnew.F90#6",
+      "verdict": "STANDS",
+      "rationale": "Neither the SWAN reader nor its caller sorts the frequency axis or rejects descending frequencies. The angular cyclic interpolation repairs only the angle axis; the later first/last-frequency bounds and signed frequency increments still mishandle a descending input."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__waveparamsnew.F90#7",
+      "verdict": "NARROWED",
+      "rationale": "For valid positive endpoint spectra, linear interpolation commutes with summation, so sfimp equals sfnow and the denominator cannot vanish. The unguarded expression is only hazardous with zero/invalid endpoint variance or degenerate spatial coordinates, states normally already broken by earlier spectral normalization; interpolation itself does not create the zero.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/waveparamsnew.F90:L2050-L2068",
+        "quote": "            positions(1) = s%ndist(1,n_index_loc(interpindex(1)))\n            positions(2) = s%ndist(1,n_index_loc(interpindex(2)))\n            here = s%ndist(1,i)\n            do ii=1,wp%K\n               sf(1) = wp%vargen(interpindex(1))%Sf(ii)\n               sf(2) = wp%vargen(interpindex(2))%Sf(ii)\n               call LINEAR_INTERP(positions,sf,2,here,wp%Sfinterp(i,ii),dummy)\n               sf(1) = wp%vargenq(interpindex(1))%Sf(ii)\n               sf(2) = wp%vargenq(interpindex(2))%Sf(ii)\n               call LINEAR_INTERP(positions,sf,2,here,wp%Sfinterpq(i,ii),dummy)\n            enddo\n            ! Ensure that the total amount of variance has not been reduced/increased\n            ! during interpolation for short wave energy only. This is not done for\n            ! Sf for bound long wave generation\n            sfnow = sum(wp%Sfinterp(i,:))  ! integration over fixed bin df size unnecessary\n            sf(1) = sum(wp%vargen(interpindex(1))%Sf)\n            sf(2) = sum(wp%vargen(interpindex(2))%Sf)\n            call LINEAR_INTERP(positions,sf,2,here,sfimp,dummy)\n            wp%Sfinterp(i,:)=wp%Sfinterp(i,:)*sfimp/sfnow"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__waveparamsnew.F90#8",
+      "verdict": "STANDS",
+      "rationale": "Both readers use angular entries 1 and 2 before any minimum-count validation, and interp_in_cyclic_function likewise requires x(2). The cyclic padding therefore does not neutralize a one-direction input."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__waveparamsnew.F90#9",
+      "verdict": "NARROWED",
+      "rationale": "The spectrum arrays are POINTER components, so a second ALLOCATE is legal and does not cause the claimed already-associated allocation failure. Repeated reads instead abandon previous pointer targets, producing a memory leak during multi-interval catch-up.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/waveparamsnew.F90:L13-L17",
+        "quote": "   type spectrum                                         ! These are related to input spectra\n      real*8,dimension(:,:),pointer          :: S        ! 2D variance density spectrum\n      real*8,dimension(:),pointer            :: f,ang    ! 1D frequency and direction vectors for S\n      real*8,dimension(:),pointer            :: Sf       ! S integrated over all directions\n      real*8,dimension(:),pointer            :: Sd       ! S integrated over all frequencies"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__waveparamsnew.F90#11",
+      "verdict": "STANDS",
+      "rationale": "Component indices are constructed consecutively with Findex(ii)=Findex(1)+ii-1, but the phase expression adds ii without subtracting one. The final component reads outside the generated-component span even when still within the larger Fourier allocation; no later phase adjustment restores the intended bins."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__waveparamsnew.F90#12",
+      "verdict": "NARROWED",
+      "rationale": "The initial CDF value was missed: CDF(last)=1+(p_first-p_last)/2, so a deficit requires unequal endpoints with p_last>p_first, not merely trapezoidal accumulation after sum normalization. Cyclic interpolation normally supplies equal endpoints; inconsistent endpoint data or numerical endpoint discrepancies can retain the narrower sampling defect, and LINEAR_INTERP clamps excess draws.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/waveparamsnew.F90:L1640-L1647",
+        "quote": "         ! Boundary condition, which may be nonzero:\n         cdflocal(1) = pdflocal(1)\n         do ii=2,naint\n            cdflocal(ii) = cdflocal(ii-1) + (pdflocal(ii)+pdflocal(ii-1))/2\n            ! Note: this only works if the directional\n            ! bins are constant in size. Assumed multiplication\n            ! by one.\n         enddo"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__waveparamsnew.F90#13",
+      "verdict": "STANDS",
+      "rationale": "g*k*tanh(k*h) has units of angular frequency squared, so dividing it directly by 2*pi does not produce frequency. This value directly limits the generated frequency range and is never square-rooted later."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__waveparamsnew.F90#14",
+      "verdict": "STANDS",
+      "rationale": "The 3D superharmonic branch calculates and transforms both qy layer fields, but its accumulation updates only uits and duits. The output writer subsequently emits vits/dvits without any corresponding transverse superharmonic addition."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__waveparamsnew.F90#15",
+      "verdict": "STANDS",
+      "rationale": "The shared selected component band can miss all energy at one spectrum location even when another location keeps the combined spectrum nonzero. The per-location interpolator then returns zero for every component, and the unconditional hm0/hm0post rescaling has no fallback or guard."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__waveparamsnew.F90#16",
+      "verdict": "STANDS",
+      "rationale": "The parameter reader permits nhlay=0 while leaving nonhq3d=1, and the nonhydrostatic highcomp/order path still calls generate_secondorder. Its allocations then select four-field storage, but the later nonhq3d-only branch references unallocated layer arrays and fields 5-6."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__waveparamsnew.F90#17",
+      "verdict": "STANDS",
+      "rationale": "The t>tstop-dt return follows the bccount increment but precedes the only curline assignment. Boundary regeneration has no matching guard that prevents a call in that final-step interval, so INTENT(OUT) leaves the caller's sequence selector undefined on that path."
+    }
+  ]
+}

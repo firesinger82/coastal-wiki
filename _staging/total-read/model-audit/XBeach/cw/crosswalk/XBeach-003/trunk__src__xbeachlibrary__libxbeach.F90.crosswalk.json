@@ -58,7 +58,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "Ordinary timesteps set error to 0 or 1, so this is not a general post-step failure. However, MPI decomposition warnings 5/6 survive init (xmpi.F90:404-406; logging.F90:274-279), and a direct outputext call before the first executestep can encounter them and leave its result undefined.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/timestep.F90:L456-L458",
+     "quote": "      if (present(ierr)) then\n         ierr = 0\n      endif"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -77,7 +87,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "timestep can set ierr=1 on its defuse path (timestep.F90:727-760), after which executestep skips physics but still increments n and assigns result 0. outputext subsequently consults the shared error flag, but direct executestep clients receive the wrong success status and completed-step count.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "base_only",
@@ -143,6 +160,13 @@
     "quote": "#ifdef USEMPI\r\n      if (execute_counter .eq. 1) then\r\n         ! exclude first pass from time measurement\r\n         call xmpi_barrier\r\n         t01 = MPI_Wtime()\r\n      endif\r\n",
     "verified_at_lines": "L269-L274",
     "source_sha256": "1656cceb95c9d87a51b70225a725fc6e544ed56b424c97a9e2806c86f15b6696"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "execute_counter starts at zero in loopcounters.F90:6, so t01 is assigned only on the second executestep entry. final unconditionally passes t01 in MPI builds, and writelog_finalize checks only argument presence, not initialization; zero- or one-step library runs remain exposed.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {

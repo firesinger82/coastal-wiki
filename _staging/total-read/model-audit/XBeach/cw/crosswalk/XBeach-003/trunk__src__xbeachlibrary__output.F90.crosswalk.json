@@ -37,7 +37,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The division requires a later log_progress call with timings enabled and at least five seconds since the prior report; a zero-duration run that never steps does not execute it. A library client can set tstop=0 through introspection.F90:261-262, and the input reader's positive recommended bound is non-strict, so the gated division is still possible.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/output.F90:L326-L336",
+     "quote": "      else\n         if (par%timings .ne. 0) then\n            ndt=ndt+1\n            sumdt=sumdt+par%dt\n            call date_and_time(VALUES=datetime)\n            ! Current time in seconds\n            tnow=day*24.d0*3600.d0+datetime(5)*3600.d0+60.d0*datetime(6)+1.d0*datetime(7)+0.001d0*datetime(8)\n            ! Is it time to update the log again?\n            if (tnow>=tprev+5.d0) then\n               ! Percentage complete\n               percnow = 100.d0*par%t/par%tstop"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",

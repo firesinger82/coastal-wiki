@@ -37,7 +37,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The routine derives icycle directly from the first spacing and caller-supplied period, then uses it as the increment/decrement in wrapping loops. The active waveparamsnew.F90:L1326-L1328 caller supplies a positive period but does not establish a positive compatible first input-angle spacing, and there is no fallback for nonpositive icycle.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -58,7 +65,17 @@
    "representative": "audit",
    "rationale": "blinded SAME (many-to-one)",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The public mapping helpers are unsafe with fabricated or corrupted references, but the repository's ship path obtains iref from MKMAP, which emits either all-zero references or four in-range cell corners. Thus retain LOW missing defensive validation for direct API misuse, not a demonstrated out-of-bounds mapping in the normal ship path.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/interp.F90:L457-L464",
+     "quote": "                     covered(i2) = 1\n                     call bilin5(xp, yp, x2(i2), y2(i2), hbuff, ier)\n                     w(:, i2) = real(hbuff(:),4)\n                     !\n                     iref(1, i2) = i1 + (j1 - 1)*m1\n                     iref(2, i2) = i1 + 1 + (j1 - 1)*m1\n                     iref(3, i2) = i1 + 1 + j1*m1\n                     iref(4, i2) = i1 + j1*m1"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -77,7 +94,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The real*4 conversion can affect near-edge tests through loss of precision in relative geometry, but the alleged dependence on the absolute coordinate scale is overstated. xq-xp and yq-yp are evaluated in double precision before conversion, removing the large common origin; the remaining issue is sensitivity to local offsets and near-cancelling edge tests.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/interp.F90:L997-L1000",
+     "quote": "      do i = 1, n\n         x(i) = real( xq(i)-xp , 4)\n         y(i) = real( yq(i)-yp , 4)\n      enddo"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -96,7 +123,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "Uncovered entries of covered are indeed left untouched, but the only repository caller never reads that array after passing it to MKMAP (ship.F90:L323-L328). iref and w are explicitly zeroed and control the actual mapping, so retain a LOW public output-contract defect rather than HIGH simulation corruption.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/interp.F90:L331-L332",
+     "quote": "      iref=0\n      w=0.d0"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -121,7 +158,14 @@
    "representative": "audit",
    "rationale": "blinded SAME (many-to-one)",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "IPON containment does not establish BILIN5's nonsingularity/convexity conditions; degenerate or concave cells can pass containment yet take an early error exit. Both callers then copy the undefined INTENT(OUT) weights and mark coverage successful, with no IER check or replacement weights.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -140,7 +184,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The integration is wrong for both stated short-interval cases, but the excess is not uniformly one full cell: with unit spacing and y=1, limits 0.2..0.8 return 2.6 instead of 0.6, while 0.2..1.8 return 2.6 instead of 1.6. No internal caller of this public trapezoidal routine was found, so retain a MED standalone integration defect with corrected magnitude.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -159,7 +210,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "Equidistance is an explicit precondition, so failure on an arbitrary nonuniform grid is not independently a bug in the stated algorithm. The residual LOW robustness issue is undefined behavior for invalid lengths, zero spacing, or reversed overlapping limits supplied directly to this otherwise unused public helper.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/interp.F90:L1374-L1377",
+     "quote": "   subroutine trapezoidal(x,y,n,x1_in,x2_in,integ)\n      ! Compute integral over function y(x) from x1 to x2\n      ! x is equidistant\n      !(c)2014 Dano Roelvink"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -178,7 +239,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The n>icycle+1 branch has no executable initialization or error action, and xc(1) and yc are subsequently read. Neither the active spectral caller nor the trapezoidal_cyclic wrapper rejects a source angle array whose length exceeds the cycle inferred from its first spacing.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -197,7 +265,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Index wrapping does not repair facright: for a unit-spaced grid starting at 0.5, query 1.0 gets zero fractional weight instead of 0.5. Negative non-grid queries likewise use a negative MOD remainder, and the caller's positive cycle does not constrain all source origins or stationary target angles.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -216,7 +291,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The INTENT(OUT) declaration makes every untouched covered entry undefined even if the caller had initialized it. No repository call to make_map was found, so this remains a MED latent public output-contract defect rather than demonstrated HIGH runtime corruption.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -237,7 +319,14 @@
    "representative": "audit",
    "rationale": "blinded SAME (many-to-one)",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "Zero n2 is not handled and can already fail inside SORT/INDEXX before HUNT, so the helper is unsafe for an empty target set. The ship caller uses the product of its grid extents for n2 and no ordinary empty-target invocation was found; retain LOW empty-input robustness rather than a demonstrated simulation failure.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -277,7 +366,14 @@
    "representative": "audit",
    "rationale": "blinded SAME (many-to-one)",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "For a positive previous reference, unbounded coordinate displacements can produce out-of-grid new references and zero metrics remain unchecked. No call to mkmap_step exists elsewhere in the repository, so retain MED latent helper bounds failure rather than HIGH impact on the active mapper.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -296,7 +392,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The active set_stationary_spectrum caller passes s%ntheta_s directly, and grid_bathy imposes no ntarget>=2 condition. A narrow valid angular range can produce one target bin, making xtarg(2) out of bounds even without supplying a zero spacing.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "base_only",

@@ -37,7 +37,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The helper does leave ordinary-point result entries undefined, but a repository-wide caller search finds no use of this function. Active output computes runup independently inside ncoutput, so downgrade this to a latent helper defect rather than HIGH corruption of ordinary point output.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/ncoutput.F90:L927-L937",
+     "quote": "            do ii = par%npoints+1, par%npoints+par%nrugauge\n               iru         = ii-par%npoints   !  iru will run from 1 to par%nrugauge\n               tempvectorr = huge(0.d0)\n               ! for netcdf output:\n               do ird=1,par%nrugdepth\n#ifdef USEMPI\n                  call space_global_to_local(sl,1,rugrowindex(iru),rugx,rugy)\n#else\n                  rugx = 1\n                  rugy = rugrowindex(iru)\n#endif"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -56,7 +66,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The rotate=0 transport cases compute scratch arrays but never assign x, and the only default assignment belongs to a different SELECT CASE branch. rotate=0 is explicitly accepted by params.F90:1301, and ordinary global/point/mean output calls this routine without filling x afterward.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -75,7 +92,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "alfazr3 is dimensioned from alfaz itself, so the whole-plane assignment at lines 343-345 is conforming even when t%r3 differs; that claimed immediate shape requirement is a misreading. Registered rank-3 fields all use nx+1,ny+1 horizontally, and active rotated global output collects alfaz before the call (ncoutput.F90:837-839); the unrotated/default copy does not combine the mismatched fields.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/postprocess.F90:L300-L300",
+     "quote": "      real*8, dimension(size(s%alfaz,1), size(s%alfaz,2), size(t%r3,3)) :: alfazr3,Susg,Svsg,Subg,Svbg"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -94,7 +121,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "Five full-sized temporaries impose genuine memory/work overhead, although only four are zeroed and alfazr3 is filled from alfaz. The Intel project configurations explicitly use /heap-arrays, so the specific stack-exhaustion claim is limited to other storage/compiler configurations; retain LOW memory-scaling overhead.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xbeachlibrary.vfproj:L8-L8",
+     "quote": "\t\t\t\t<Tool Name=\"VFFortranCompilerTool\" AdditionalOptions=\"/heap-arrays\" SuppressStartupBanner=\"true\" DebugInformationFormat=\"debugEnabled\" Optimization=\"optimizeDisabled\" Preprocess=\"preprocessYes\" AdditionalIncludeDirectories=\"includes\\version\\;includes\\genfiles\\\" Diagnostics=\"diagnosticsShowAll\" WarnInterfaces=\"true\" ModulePath=\"bin\\static\\win32\\$(ConfigurationName)\\\" ObjectFile=\"bin\\static\\win32\\$(ConfigurationName)\\\" PdbFile=\"bin\\static\\win32\\$(ConfigurationName)\\vc100.pdb\" Traceback=\"true\" BoundsCheck=\"true\" RuntimeLibrary=\"rtMultiThreadedDebug\" Interfaces=\"true\"/>"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -115,7 +152,17 @@
    "representative": "audit",
    "rationale": "blinded SAME (many-to-one)",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The primary claim's malformed-optional-argument paths are real in the helpers, but located output calls supply both positive local indices or omit both, so HIGH runtime impact is not demonstrated. Also, contrary to other_wording, rank-2 bounds are initialized before the row test; only ranks 3/4 have the nonpositive-row uninitialized-bounds case.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/postprocess.F90:L177-L184",
+     "quote": "      is  = 1\n      ie  = size(x,1)\n      js  = 1\n      je  = size(x,2)\n      isx = is\n      iex = ie\n      jsx = js\n      jex = je"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "base_only",
@@ -196,6 +243,16 @@
     "quote": "      ! This is not correct....\r\n      where (par%pointtypes == 1)\r\n         runup = max(maxval(minloc(s%wetz(:,:)))-1,1)\r\n      end where\r\n",
     "verified_at_lines": "L505-L508",
     "source_sha256": "3b984856cc8b1f281b6ccee6006fe600a880df9a5470bb04c254f9cab2cdf4c5"
+   },
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The unused helper does broadcast a single incorrect global-minimum-derived index to all gauge slots. Active runup output instead iterates each gauge's rugrowindex and searches that line for the depth crossing, so retain only a latent helper logic defect with reduced severity.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/ncoutput.F90:L955-L963",
+     "quote": "                     if (rugrowindex(iru)>0) then  ! master domain always contains this runup gauge\n                        ! local index of minimum location where hh<rugdepth\n                        do j=xmin+1,xmax\n                           if ((sl%hh(j,  rugy)<=par%rugdepth(ird)) .and. &\n                           &   (sl%hh(j-1,rugy)> par%rugdepth(ird)) ) then\n                              idumhl=j-1\n                              exit\n                           endif\n                        enddo"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   }
  ]

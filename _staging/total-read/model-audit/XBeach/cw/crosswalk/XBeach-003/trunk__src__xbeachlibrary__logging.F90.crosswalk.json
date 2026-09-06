@@ -37,7 +37,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "All located callers pass the constants dper=5 and dt=2, which neutralize the claimed dper=0 model path. The unchecked SYSTEM_CLOCK count_rate remains a narrower failure on systems where the clock is unavailable and returns zero; nonpositive dt itself is not used as a divisor.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_stationary_directions.F90:L247-L254",
+     "quote": "      call progress_indicator(.true.,0.d0,5.d0,2.d0)\n      imax=s%nx\n      itermax = 0\n      !\n      !\n      ! Start of loop of the grid\n      do i=2,imax\n         call progress_indicator(.false.,dble(i)/imax*100,5.d0,2.d0)"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -56,7 +66,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "libxbeach.F90 initializes n=0 and permits final without any executestep calls, passing that zero directly to writelog_finalize. The xmaster gate does not establish n>0, so both divisions remain reachable in a legitimate initialize/finalize lifecycle.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -94,7 +111,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "Without IOSTAT or ERR, a Fortran OPEN failure triggers runtime error termination; it does not silently evade all detection. The remaining issue is the library's failure to translate that fatal I/O error into its own error result or coordinated handling, rather than a HIGH silent-open-failure defect.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/logging.F90:L84-L93",
+     "quote": "         logfileid       = generate_logfileid()\n         if (xmaster)    open(logfileid,     file='XBlog.txt',       status='replace')\n\n         errorfileid     = generate_logfileid()\n         if (xmaster)    open(errorfileid,   file='XBerror.txt',     status='replace')\n\n         warningfileid   = generate_logfileid()\n         if (xmaster)    open(warningfileid, file='XBwarning.txt',   status='replace')\n\n         if (logfileid < 0 .or. errorfileid < 0 .or. warningfileid < 0) error = 1"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "base_only",

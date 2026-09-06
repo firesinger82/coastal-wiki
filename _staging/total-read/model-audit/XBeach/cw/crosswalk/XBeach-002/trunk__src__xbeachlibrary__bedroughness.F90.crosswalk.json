@@ -39,7 +39,14 @@
    "representative": "audit",
    "rationale": "blinded SAME (many-to-one)",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Comparing bedroughness_init with bedroughness_update confirms that the latter omits mincf and gives the grain-size U branch a different upper bound. The final maximum of 1 does not restore mincf or make the directional bounds equivalent.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -58,7 +65,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The dynamic-roughness branches divide by dstem or droot, including the non-eroded branch when droot is zero. params.F90 accepts zero for both length scales, and neither the vegetation mask nor initialization supplies a positive substitute.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -77,7 +91,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The coefficient-file read and the update formulas provide no nonzero/logarithm-domain validation for Chezy or White-Colebrook inputs. Scalar readkey bounds are warnings unless strict is requested, and a clamp after the division or logarithm cannot prevent its invalid evaluation.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "base_only",
@@ -173,6 +194,13 @@
     "quote": "         Ubed = abs(s%vmageu)\r\n         Ventilation  = -infilb/max(Ubed,1.d-6)\r\n         Ventilation  = max(min(Ventilation,epsVentilation),-epsVentilation)\r\n         blphi = 0.9d0/2/s%cfu*Ventilation\r\n         ! need to account for devision by zero\r\n         where(infilb>=0.d0)\r\n",
     "verified_at_lines": "L360-L365",
     "source_sha256": "508ccef2919d203a716f831f4ffd80a57068562eab747a00a94da802a840dfef"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The ventilation formula divides by cfu before its blphi regularization, and subsequently also evaluates 1/cfu. Wetu tests depth rather than friction, while zero friction can enter through the coefficient input, so the wet mask does not neutralize the singularity.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {
@@ -194,6 +222,13 @@
     "quote": "         where(infilb>=0.d0)\r\n            blphi = min(blphi,-1d-4)\r\n            facbl = blphi/(exp(blphi)-1.d0)\r\n            facbl = min(facbl,maxEnhancement1)\r\n",
     "verified_at_lines": "L365-L368",
     "source_sha256": "508ccef2919d203a716f831f4ffd80a57068562eab747a00a94da802a840dfef"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "For zero infiltration, the nonnegative branch replaces zero blphi by -1e-4, giving a factor greater than one rather than its exact limit of one. With nonzero flow and ordinary cfu below one, the subsequent cap and multiplication retain the small spurious shear increment.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {
@@ -245,6 +280,13 @@
     "quote": "      where(s%wetu==1 .and. kbl>0.d0)\r\n         ! New way:\r\n         s%taubx_add = s%taubx_add + s%cfu*par%rho*par%gamma_turb*kbl*sign(1.d0,s%ue)\r\n",
     "verified_at_lines": "L701-L703",
     "source_sha256": "508ccef2919d203a716f831f4ffd80a57068562eab747a00a94da802a840dfef"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The turbulence contribution uses SIGN with the velocity and therefore chooses a positive sign at exactly zero velocity. With positive boundary-layer turbulent energy the added stress survives even though the velocity-dependent baseline stress vanishes; no zero-velocity guard precedes its use.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {

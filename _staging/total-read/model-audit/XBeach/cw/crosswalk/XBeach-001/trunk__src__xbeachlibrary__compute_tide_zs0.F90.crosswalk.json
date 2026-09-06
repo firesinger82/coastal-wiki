@@ -37,7 +37,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The defect applies to instant/hybrid tides with cross-shore decomposition: fill_tide_grid uses local end rows and local bed maxima as if they were global. Initialization uses the full master grid, and alongshore decomposition into complete cross-shore strips is explicitly supported.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/compute_tide_zs0.F90:L569-L571",
+     "quote": "   subroutine fill_tide_grid(s)\n      ! This subroutine fills the zs0 field. Used by tide=instant and hybrid, and by tide=velocity at initialization\n      ! subroutine is not yet fully MPI-compliant for tide=instant/hybrid (only works if mpi-domains are cross-shore strips)"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -58,7 +68,17 @@
    "representative": "audit",
    "rationale": "blinded SAME (many-to-one)",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "Invalid zero-spacing grids can fail these denominators, but an endpoint bed maximum alone need not corrupt the result because the interpolation arm can be bypassed. Case 4 can still evaluate 0/0 at a coincident maximum/first endpoint; the broad claim should distinguish that reachable boundary case from unused infinite ddist values.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/compute_tide_zs0.F90:L517-L526",
+     "quote": "               ddist = 1.d0/(disttide2-distmaxzbg)\n               do i = imin,imax\n                  if (s%sdist(i,jmin)<=distmaxzbg) then\n                     s%zs0(i,jmin) = tide1\n                     s%dzs0dn(i,jmin) = tidegradient1*s%wetz(i,jmin)\n                  else\n                     fac = (s%sdist(i,jmin)-distmaxzbg)*ddist\n                     s%zs0(i,jmin) = (1.d0-fac)*tide1+fac*tide2\n                     s%dzs0dn(i,jmin) = ((1.d0-fac)*tidegradient1+fac*tidegradient2)*s%wetz(i,jmin)\n                  endif"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -77,7 +97,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "In the case-4 ELSE, tide2 is selected while tidegradient1 is used, unlike the tide2/gradient2 pairing in case 1. The wet mask only removes dry-cell gradients and does not repair unequal wet-side gradients.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "base_only",

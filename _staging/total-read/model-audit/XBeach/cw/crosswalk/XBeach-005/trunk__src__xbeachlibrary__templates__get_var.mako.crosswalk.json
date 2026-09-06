@@ -37,7 +37,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "This is reachable after normal serial initialization: initialize.F90:501-511 allocates cgx_s, cgy_s, ctheta_s and ee_s with zero extents when single_dir is not one, and variables.def:75-78 exposes them to the generator. The ASSOCIATED check in templates/indextos.mako:32-36 only sets a temporary descriptor and does not stop get_var, whose lower-bound element reference remains unconditional; no subsequent initialization gives these pointer targets nonzero size.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -56,7 +63,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "Unknown names really leave x unchanged: mnemonic.F90:43-48 logs a warning and returns -1, followed by the unassigned return in get_var.mako:27-28. However, the claimed recognized-name/case mismatch is not present in a consistent build, because chartoindex.mako:9-14 and get_var.mako:31-37 enumerate the same variables list supplied by scripts/generate.py:149-166,239-251; retain the defect only for unknown-name failure, with a log diagnostic rather than completely silent failure.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/templates/chartoindex.mako:L9-L14",
+     "quote": "        select case(line)\n%for i, var in enumerate(variables):\n          case(mnem_${var['name'].ljust(maxnamelen)})\n             chartoindex = ${i+1}\n%endfor\n        end select"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "base_only",

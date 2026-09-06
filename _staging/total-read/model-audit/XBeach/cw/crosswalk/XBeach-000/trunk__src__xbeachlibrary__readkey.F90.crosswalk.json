@@ -56,7 +56,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "An unpaired optional name does cause an absent-value reference, but every located setallowednames call supplies complete positional name/value pairs as the documented setup pattern requires. Retain LOW defensive API-contract checking for malformed keyword calls, not HIGH failure from model input.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/readkey.F90:L739-L744",
+     "quote": "   !  integer NAME1, NAME2, NAME3\n   !  call setallowednames('name1',NAME1,'name2',NAME2,'name3',NAME3)\n   !   this defines the allowed names ('name1', 'name2', 'name3') and\n   !   the to-be associated integer values (NAME1, NAME2, NAME3)\n   !  call setoldname('0','1')\n   !   this defines alternate allowed names for 'name1' and 'name2'"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -75,7 +85,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "Independent setup calls can construct nov>nv, but the located params registrations keep legacy-name counts within canonical counts. Retain MED latent API misuse: allowed(j) is outside its dummy extent when j>nv, although the actual backing allowednames array still has 20 entries, so this is not automatically a heap-buffer overrun.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/readkey.F90:L43-L47",
+     "quote": "   integer, parameter, private                   :: maxnames = 20\n   character(slen), dimension(maxnames), private :: allowednames\n   character(slen), dimension(maxnames), private :: oldnames\n   character(slen), private                      :: varname\n   integer,         dimension(maxnames), private :: intvalues"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -94,7 +114,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The complete cache loader counts all lines, then increments ikey for every line with '=' without limiting it to 1024. Neither strippedline nor caller validation filters excess records, so 1025 such lines can overrun both fixed arrays before normal parameter validation.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -113,7 +140,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "With USEMPI and bcast=.false., non-master results are indeed undefined, but this option is used for master-only file-reading paths rather than as a promise to compute a value on every rank. Retain LOW latent API misuse; for example vegetation's nonbroadcast reads are inside its xmaster block, and the default readers broadcast.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vegetation.F90:L105-L109",
+     "quote": "         if (xmaster) then\n            allocate(veg(par%nveg))\n            fid=create_new_fid()\n            call check_file_exist(par%veggiefile)\n            open(fid,file=par%veggiefile)"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -132,7 +169,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "A keyword call that skips an earlier optional scalar triggers the stated absent-argument access. All actual read_v scalar calls in ship.F90:L181-L200 pass a contiguous positional prefix, so retain LOW public API robustness rather than HIGH failure in the current file readers.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/ship.F90:L181-L186",
+     "quote": "                     call read_v(fid,sh(i)%track_t(it),sh(i)%track_x(it),sh(i)%track_y(it))\n                  enddo\n               else\n                  do it=1,sh(i)%track_nt\n                     ! also read in track_dir, in nautical deg\n                     call read_v(fid,sh(i)%track_t(it),sh(i)%track_x(it),sh(i)%track_y(it),sh(i)%track_dir(it))"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -151,7 +198,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The numeric value buffer is parsed with F10.0 and no second parse verifies the full text. A value such as 1.234567890123 is limited to its first ten characters, and strict range handling occurs only after that truncation.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -172,7 +226,14 @@
    "representative": "audit",
    "rationale": "blinded SAME (many-to-one)",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The double and integer vector readers only halt for negative conversion status, and malformed numeric tokens normally produce positive status. No earlier token validation or initialization defines the unread tail before the range checks and return.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "base_only",
@@ -208,6 +269,13 @@
     "quote": "               value_vec(1:vlength)=defval\r\n               do i=1,vlength\r\n                  if (.not. lsilent) call writelog('l','(a,a,f0.4,a)',(printkey),' = ', &\r\n                  value_vec(i),' (no record found, default value used)')\r\n               enddo",
     "verified_at_lines": "L447-L451",
     "source_sha256": "1a95b6c3f57b3144ac3b6d251d22b74e3183eb276ed7b8b75144d8d8aaa39031"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The helpers section the result using unchecked vlength and define only that prefix. The strict ngd bound protects grain-size calls, but nrugdepth is non-strict at params.F90:L1260-L1261 and can exceed its fixed result capacity; later tail initialization does not undo an earlier overflow.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {
@@ -229,6 +297,13 @@
     "quote": "      ! If the file name of the input file changes, the file should be reread\r\n      if (fname/=fnameold) then\r\n         ! Make sure this reset only recurs when the input file name changes\r\n         fnameold=fname\r\n         nkeys=0",
     "verified_at_lines": "L603-L607",
     "source_sha256": "1a95b6c3f57b3144ac3b6d251d22b74e3183eb276ed7b8b75144d8d8aaa39031"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "fnameold is the sole cache invalidation key and there is no public reset or same-name refresh path. Switching filenames can incidentally refresh it, but consecutive reads of a modified same-name file necessarily retain the old values and readindex state as claimed.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {
@@ -265,6 +340,16 @@
     "quote": "      if (xmaster) then\r\n         do i=1,numallowednames\r\n            if (d .eq. allowednames(i)) then\r\n               parm = intvalues(i)\r\n               if (present(parm_str)) then\r\n                  parm_str = d",
     "verified_at_lines": "L786-L791",
     "source_sha256": "1a95b6c3f57b3144ac3b6d251d22b74e3183eb276ed7b8b75144d8d8aaa39031"
+   },
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "parm_str is undefined immediately on a non-master return from parmapply, but all_input later broadcasts the entire parameter structure before the normal initialization consumers use these strings (params.F90:L1976-L1978). Retain LOW standalone API return-contract failure rather than HIGH persistent MPI parameter corruption.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.F90:L2012-L2018",
+     "quote": "      call xmpi_bcast(par%swave,toall)\n      parlen = int(sizeof(par))\n\n      if (toall) then\n         call MPI_Bcast(par,parlen,MPI_BYTE,xmpi_imaster,xmpi_ocomm,ierror)\n      else\n         call MPI_Bcast(par,parlen,MPI_BYTE,xmpi_master,xmpi_comm,ierror)"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {
@@ -301,6 +386,13 @@
     "quote": "      do itab=1,slen\r\n         if (ichar(line(itab:itab))<32 .or. ichar(line(itab:itab))>126) then  ! this is anything not in standard\r\n            ! alphanumeric\r\n            strippedline(itab:itab) = ' '\r\n         else\r\n            strippedline(itab:itab) = line(itab:itab)",
     "verified_at_lines": "L1141-L1146",
     "source_sha256": "1a95b6c3f57b3144ac3b6d251d22b74e3183eb276ed7b8b75144d8d8aaa39031"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "strippedline blanks every byte outside 32..126 before the cache stores any value, and readkey_name subsequently returns that modified string. No encoding-aware path preserves non-ASCII filename bytes, so this affects actual file-valued parameters.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   }
  ]

@@ -37,7 +37,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "strlen initializes its result to zero and changes it only on encountering C_NULL_CHAR. Neither char_array_to_string nor the C-facing query wrappers distinguish a full unterminated buffer from a valid empty string, so the malformed-input ambiguity is real.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -56,7 +63,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The second conversion incorrectly reads char_array1, but equality is not universal: string2 has the length derived from char_array2, so a shorter second argument can truncate the copied first string and produce a nonzero comparison. Retain the wrong-argument defect without the assertion that every comparison reports equality.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/iso_c_utils.f90:L27-L31",
+     "quote": "      character(len=strlen(char_array1)) :: string1\n      character(len=strlen(char_array2)) :: string2\n\n      string1 = trim(char_array_to_string(char_array1))\n      string2 = trim(char_array_to_string(char_array1))"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -75,7 +92,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The result has MAXSTRINGLEN=1024 elements, while the copy bound is unrestricted len_trim(string) and the terminator is placed at len_trim(string)+1. A 1024-character nonblank value already overruns at the terminator; slen is also 1024, so the surrounding string declarations do not guarantee a spare terminator slot.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "base_only",
@@ -111,6 +135,13 @@
     "quote": "      string1 = trim(char_array_to_string(char_array1))\r\n      string2 = trim(char_array_to_string(char_array1))\r\n      strcmp = 0\r\n      if (llt(string1,string2)) strcmp = -1\r\n      if (lgt(string1,string2)) strcmp = 1\r\n",
     "verified_at_lines": "L30-L34",
     "source_sha256": "b63c219fb525ae5463f47044c1b5f8cc05b134cbfee88ae221357952902a424b"
+   },
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "Ignoring the independent wrong-source bug, trimming and Fortran blank-padding comparisons do collapse meaningful trailing spaces relative to C strcmp. The repository contains no calls to this utility, so this is a latent compatibility defect rather than a demonstrated model or BMI execution failure.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {

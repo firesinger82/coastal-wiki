@@ -37,7 +37,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "ratio_s is already (rhos-rho)/rho, but the dstar expression subtracts another one from that submerged-density ratio. The comparison formulation uses the submerged contrast directly, and no intervening assignment changes ratio_s to the total density ratio.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -56,7 +63,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The cited saved allocations survive the model instance and are guarded by allocation status rather than grid, grain or layer shape. Neither the sediment initialization nor the library finalization resizes or clears all of those work arrays for another lifecycle.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -75,7 +89,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "fe is only allocated in the streaming-enabled branch but is assigned a scalar zero outside that allocation condition. Scalar assignment cannot infer the shape of an unallocated rank-two allocatable, and streaming can be disabled in the parameter configuration.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -94,7 +115,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "Ordinary dry cells have hh floored to eps, so dryness alone does not establish a zero-depth denominator. The k singularity remains: wave-current interaction assigns the magnitude of the resultant wavevector without a positive floor (wave_functions.F90:1072-1088), and the subsequent Ursell clamp occurs after division.",
+    "neutralizer": {
+     "where": "trunk/src/xbeachlibrary/initialize.F90:L1012-L1012",
+     "quote": "      s%hh=max(s%zs-s%zb,par%eps)"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -113,7 +144,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "With the usual nonnegative asymmetry calibration and positive threshold, vmg and ua prevent the asserted independent zero denominator. The division can fail or reverse sign when a supplied negative asymmetry calibration makes ua cancel or exceed vmg in magnitude; facSk/facAs bounds in params.F90:961-965 are non-strict warnings, and the ue threshold does not test used.",
+    "neutralizer": {
+     "where": "trunk/src/xbeachlibrary/morphevolution.F90:L3035-L3039",
+     "quote": "      Bm = m1 + (m2-m1)/(1+exp((m3-log10(Urs))/m4));\n      B1 = (-90.d0+90.d0*tanh(m5/Urs**m6))*par%px/180.d0\n      s%Sk = Bm*cos(B1)                                            !Skewness (eq 8)\n      s%As = Bm*sin(B1)                                            !Asymmetry(eq 9)\n      s%ua = par%sws*(par%facSk*s%Sk-par%facAs*s%As)*s%urms"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -132,7 +173,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "edg2 is already calibrated before deposition multiplies by sedcal again, so non-unit sedcal breaks the paired transfer even when enough layers are present. The erosion layer search also has no nd ceiling; its structure-depth restriction is not a bound on the cumulative available sediment layers.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -151,7 +199,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The two branches really mix a flux with a depth increment, but the direct zs and gwlevel updates use depth consistently. Since bed evolution runs after flow and the next groundwater step recomputes infil, the proven defect is the post-bed-update exchange field rather than a demonstrated HIGH surface-water mass-balance error.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -170,7 +225,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "Spatially heterogeneous nd is not produced by the model: initialization sets every cell to par%nd and layer merging does not change that count. A bounds defect nevertheless survives at the permitted nd_var=nd endpoint, since update_fractions accesses nd_var+1 (including Ap and A at line 1275), while params.F90:1434 allows nd_var through nd.",
+    "neutralizer": {
+     "where": "trunk/src/xbeachlibrary/initialize.F90:L1420-L1423",
+     "quote": "      ! bottom of sediment model\n      s%z0bed = s%zb - sum(s%dzbed,DIM=3)\n\n      s%nd = par%nd"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -189,7 +254,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The Van Rijn profile construction uses neighboring vertical levels even when kmax is one. params.F90:1146-1147 explicitly permits kmax=1 and copies it into nz; the nz>1 guard in flow protects the separate VSM routine, not this Van Rijn branch.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -208,7 +280,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The initial velocity angle does include a negative-U quadrant correction, so the claim overstates that part. The adjusted psi_x still uses an uncorrected ratio atan and has an unguarded zero denominator, allowing an incorrect quadrant for the final transport.",
+    "neutralizer": {
+     "where": "trunk/src/xbeachlibrary/morphevolution.F90:L439-L448",
+     "quote": "                     if (s%urepb(i,j) < 0.d0) then\n                        delta_x = datan(s%vrepb(i,j)/s%urepb(i,j))+par%px ! Angle between fluid velocity vector and the s%x-axis\n                     else\n                        delta_x = datan(s%vrepb(i,j)/s%urepb(i,j))        ! Angle between fluid velocity vector and the s%x-axis\n                     endif\n                     delta = (par%rhos-par%rho)/par%rho\n                     shields = sqrt(s%taubx(i,j)**2 + s%tauby(i,j)**2)/(delta*par%rho*par%g*s%D50(jg))\n                     ! shields = (urepb(i,j)**2.d0+vrepb(i,j)**2.d0)*s%cf(i,j)/(par%g*D50(jg)*delta)\n                     ftheta = 1.d0/(9.d0*(s%D50(jg)/s%hh(i,j))**0.3d0*sqrt(shields)) ! Talmon\n                     psi_x = datan(  (dsin(delta_x)-ftheta*s%dzbdy(i,j))  /  (dcos(delta_x)-ftheta*s%dzbdx(i,j))  )"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -227,7 +309,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The denominator is the upwind face depth hu, which flow clamps to zero rather than eps. A positive cell-centered hh or a later transport wet mask therefore does not prevent H/hu from being evaluated at a dry face.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -246,7 +335,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "With the variable layer and the following layer both zero, both limits on dzbt return zero and dzb_loc cannot decrease. The merge/split comparisons do not repair that zero/zero layer pair, and there is no iteration or progress guard.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -265,7 +361,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "disturb is assigned only in the positive-betad branch; the alternative assignment is commented out. Zero betad is an allowed setting, and the subsequent use has no initialization in either this procedure or its caller.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -284,7 +387,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The hh floor removes the ordinary dry-depth part, but uu can be exactly zero when ceqbg divides by hh*uu before the shear mask. The stale bed-disabled output additionally requires prior nonzero ceqbg or a mode transition, because sediment initialization starts that field at zero.",
+    "neutralizer": {
+     "where": "trunk/src/xbeachlibrary/flow_timestep.F90:L940-L940",
+     "quote": "      s%hh  = max(s%zs-s%zb,par%eps)    ! water depth"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -303,7 +416,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The maintained hh floor prevents an ordinary zero-depth division, but does not establish hh>za. A shallow cell can have hh equal to or below the uncapped reference elevation, leaving the hh-za singularity or invalid integration interval intact.",
+    "neutralizer": {
+     "where": "trunk/src/xbeachlibrary/flow_timestep.F90:L940-L940",
+     "quote": "      s%hh  = max(s%zs-s%zb,par%eps)    ! water depth"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -322,7 +445,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The cited assignment has ny+1 columns on the left and ny columns on the right. Neither the boundary condition nor the nz branch changes those declared extents, so the arrays are nonconformable when this path executes.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -341,7 +471,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "In the multi-layer interpolation path the last U sediment face is not assigned before full-field magnitudes are formed; analogous cross-face values are only copied at selected physical edges. Searching the caller and following assignments found no fill or exchange that supplies all omitted values.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -360,7 +497,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "hh is the maintained numerical water depth, not the raw possibly zero zs-zb difference. Initialization and each flow update floor it to positive eps before turbulence is called, so ordinary dry cells cannot produce the claimed zero-depth division.",
+    "neutralizer": {
+     "where": "trunk/src/xbeachlibrary/flow_timestep.F90:L940-L940",
+     "quote": "      s%hh  = max(s%zs-s%zb,par%eps)    ! water depth"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -379,7 +526,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The negative Y-slope branch tests dzbdx<0 although the positive branch and the correction formula use dzbdy. A wet V face with negative dzbdy and nonnegative dzbdx therefore misses the correction; the grid and wet masks do not require the slope signs to match.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -398,7 +552,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Fortran gives AND higher precedence than OR, so the non-berm mask applies only to the Svb alternative. A cell with nontrivial Sub enters the correction even when bermslopeindexbed is true; the adjacent suspended-load condition explicitly groups both transport alternatives before its mask.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -417,7 +578,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The runup index is initialized to nx+1 and subsequently supplied by the bounded structure search, and hh has the model depth floor; these do not establish the claimed ordinary index/dry-depth failure. Tbore can still be zero through the accepted Tbfac=0 setting, so the surviving numerical defect is the bore-period division.",
+    "neutralizer": {
+     "where": "trunk/src/xbeachlibrary/initialize.F90:L1447-L1460",
+     "quote": "      s%Tbore      = 0.d0\n      s%ua         = 0.d0\n      s%dzav       = 0.d0\n      s%Sk         = 0.d0\n      s%As         = 0.d0\n      s%kturb      = 0.d0\n      s%rolthick   = 0.d0\n      s%Sutot      = 0.d0\n      s%Svtot      = 0.d0\n      s%cctot      = 0.d0\n      s%runup      = 0.d0\n      s%Hrunup     = 0.d0\n      s%xHrunup    = 0.d0\n      s%istruct    = s%nx+1"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -436,7 +607,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The reconstruction divides by face depth and face velocity, either of which can be zero. Limiting qsed or multiplying transport by a dry mask first merely makes the numerator zero as well and does not define the resulting 0/0.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -455,7 +633,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "After normal completion of the smoothing loop, i is nx+1, so the subsequent top-boundary copy reads the opposite terminal row. Neither transport routine resets i or uses an explicit first-interior-row source before that copy.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -474,7 +659,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "An assignment to the complete array occurs inside the local cell loop, overwriting results from previous cells with the current cell expression. There is no later spatial reconstruction that restores the discarded variation.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "conflict",
@@ -784,6 +976,13 @@
     "quote": "                  pbbedv(i,j)=0.5d0*(s%pbbed(i,j,1,jg)+s%pbbed(i,j+1,1,jg))\r\n               end if\r\n            end do\r\n         end do\r\n         !\r\n         Svb = pbbedv*Svb\r\n",
     "verified_at_lines": "L485-L490",
     "source_sha256": "765f474008f7cb843353dc0790cc3f3ebdc00631353da7592e2bb0508e968391"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "pbbedu and pbbedv are scratch arrays whose terminal faces are not filled before full-array multiplication into Sub/Svb. Neither initial sediment fractions nor zero boundary transport initializes those scratch elements, and zero times undefined data is not a valid neutralizer.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {
@@ -835,6 +1034,16 @@
     "quote": "         Ucrb(:,:) = Ucr(:,:)*sqrt(srfTotal) ! Lodewijk\r\n         if (par%bdslpeffini == BDSLPEFFINI_TOTAL) then\r\n            Ucrs = Ucrb\r\n         else\r\n            Ucrs = Ucr*(1.d0+sqrt(srfRhee)) ! Lodewijk, no effect on suspended load by bed slope\r\n         endif\r\n",
     "verified_at_lines": "L1594-L1599",
     "source_sha256": "765f474008f7cb843353dc0790cc3f3ebdc00631353da7592e2bb0508e968391"
+   },
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The unequal factors matter only for nonzero dilatancy correction outside BDSLPEFFINI_TOTAL. TOTAL explicitly copies Ucrb into Ucrs, while zero srfRhee makes both dilatancy factors unity; the other branch retains the different nonlinear correction.",
+    "neutralizer": {
+     "where": "trunk/src/xbeachlibrary/morphevolution.F90:L1593-L1599",
+     "quote": "         ! Calculate the new critical velocity based on the modification factors on the Shields parameter, bed slope only on bed load\n         Ucrb(:,:) = Ucr(:,:)*sqrt(srfTotal) ! Lodewijk\n         if (par%bdslpeffini == BDSLPEFFINI_TOTAL) then\n            Ucrs = Ucrb\n         else\n            Ucrs = Ucr*(1.d0+sqrt(srfRhee)) ! Lodewijk, no effect on suspended load by bed slope\n         endif"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {

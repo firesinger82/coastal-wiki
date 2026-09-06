@@ -37,7 +37,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "nsetbathy's recommended minimum in params.F90:L1447 is not strict, and no schedule ordering check precedes LINEAR_INTERP. That routine returns yy=0 for n<=0 (interp.F90:L121-L126), while otherwise assuming ascending abscissae, so both stated failure modes survive the caller check.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -58,7 +65,14 @@
    "representative": "audit",
    "rationale": "blinded SAME (many-to-one)",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Neither tide_init nor loading bedfriccoef assigns s%cf after its explicit zeroing; the actual friction calculation occurs later in the flow machinery. With hotstartflow=1 and wet cells, the WHERE expressions divide by this zero field, and the fixed-point loop has neither an iteration limit nor explicit nonfinite handling.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -77,7 +91,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The multi-grain files are read directly into pbbed and only their sum is checked; a composition such as (-0.2,1.2) is already unit-sum and is left untouched. No per-component clamp precedes the weighted grain diameters at initialize.F90:L1390-L1395.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -96,7 +117,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "idrift and jdrift are double-precision grid-space coordinates, so these assignments do not truncate to integer indices. drifters.F90:L35-L48 converts them later and checks all four indices before array access; the alleged unbounded integer-index initialization misreads the declaration.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/variables.def:L245-L246",
+     "quote": "   double precision,              target :: idrift(:)        !< [-] Drifter x-coordinate in grid space {\"shape\": [\"par%ndrifter\"], \"standard_name\": \"\", \"broadcast\": \"b\"}\n   double precision,              target :: jdrift(:)        !< [-] Drifter y-coordinate in grid space {\"shape\": [\"par%ndrifter\"], \"standard_name\": \"\", \"broadcast\": \"b\"}"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -134,7 +165,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "All three low-level readers discard OPEN/READ statuses after the preliminary list-directed length check. The fixed E15.8/I4 formats impose a different field contract, so text that passes the preliminary numeric check can still fail or be misparsed during the unchecked restart read.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -153,7 +191,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "Bathymetry scaling by posdwn squared in magnitude remains possible for positive values >=0.1 other than 1, including out-of-range magnitudes accepted with a warning, but not for every non-unit input. all_input first converts every value below 0.1, including zero and negative fractions, to -1; the residual issue is acceptance/scaling of noncanonical positive sign values.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.F90:L1536-L1538",
+     "quote": "      if (par%posdwn<0.1d0) then\n         par%posdwn=-1.d0  ! Backward compatibility, now posdwn = 0 also works in input (i.e. posdwn = false)\n      endif"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -191,7 +239,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "The normal caller has already scanned the same Delft3D grid header in all_input before grid_bathy runs. That earlier scan checks IOSTAT on every comment-line read and halts on EOF, so an unchanged comment-only file cannot reach this second unchecked loop.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.F90:L205-L213",
+     "quote": "            do while (comment .eqv. .true.)\n               read(31,'(a)',iostat=ier)line\n               if (ier .ne. 0) then\n                  call report_file_read_error(par%xyfile)\n               endif\n               if (line(1:1)/='*') then\n                  comment=.false.\n               endif\n            enddo"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -248,7 +306,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The single_dir and swave branches avoid some individual divisions but each enabled angular-grid path still has an unchecked user-controlled spacing. params.F90:L263-L265 supplies only advisory bounds, and no later minimum count is imposed before allocation or the ntheta average.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -267,7 +332,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "grid_bathy really evaluates and, under MPI, sends undefined zb on the stated paths, but the normal lifecycle subsequently loads zb/zb0 and sed_init recomputes slopes before time integration (libxbeach.F90:L163-L179). Retain MED undefined early reads rather than infer persistent HIGH bathymetry corruption from these temporary values.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/initialize.F90:L1464-L1471",
+     "quote": "      ! Initialize dzbdx, dzbdy\n      do j=1,s%ny+1\n         do i=1,s%nx\n            s%dzbdx(i,j)=(s%zb(i+1,j)-s%zb(i,j))/s%dsu(i,j)\n         enddo\n      enddo\n      ! dummy, needed to keep compiler happy\n      s%dzbdx(s%nx+1,:)=s%dzbdx(s%nx,:)"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -286,7 +361,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "zs0fac has no active tide-computation consumer in this source tree. tide_init and tide_boundary_timestep use fill_tide_grid, whose completely submerged branch directly interpolates offshore and bay levels into zs0, so zero legacy weights do not suppress tides.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/compute_tide_zs0.F90:L615-L620",
+     "quote": "         elseif (tide1>maxzbg .and. tide2>maxzbg) then\n            ddist = 1.d0/(s%sdist(s%nx+1,j)-s%sdist(1,j))\n            do i = 3,s%nx-1\n               fac = (s%sdist(i,j)-s%sdist(1,j))*ddist\n               s%zs0(i,j) = (1.d0-fac)*tide1+fac*tide2\n            enddo"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -305,7 +390,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "With ny=0 and endpoints nearest different cross-shore cells, the v-line branch stores n1=0 exactly as claimed; params imposes no 1D line-discharge restriction. The downstream domain test is not a reliable neutralizer because boundaryconditions.F90:L1645-L1646 can extend the lower alongshore range to zero.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "base_only",
@@ -416,6 +508,13 @@
     "quote": "         ! Initialize dzbdx, dzbdy\r\n         do j=1,s%ny+1\r\n            do i=1,s%nx\r\n               s%dzbdx(i,j)=(s%zb(i+1,j)-s%zb(i,j))/s%dsu(i,j)\r\n            enddo\r\n         enddo",
     "verified_at_lines": "L395-L400",
     "source_sha256": "9803067bd2fa4962d9e2247f6e8b5f87e18a9860802595424183994a715523cd"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The XBeach nx minimum in params.F90:L150 is advisory, Delft3D dimensions bypass it, and gridprops forms distances without rejecting coincident coordinates. Neither the later repeated slope initialization nor the ny>0 guards protect the cross-shore boundary copies and divisions from invalid nx or zero dsu.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {
@@ -437,6 +536,13 @@
     "quote": "      do itheta=1,s%ntheta\r\n         s%sigt(:,:,itheta) = 2*par%px/par%Trep\r\n      end do\r\n      s%sigm = sum(s%sigt,3)/s%ntheta\r\n      call dispersion(par,s,s%hh)",
     "verified_at_lines": "L619-L623",
     "source_sha256": "9803067bd2fa4962d9e2247f6e8b5f87e18a9860802595424183994a715523cd"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "WBCTYPE_PARAMS and the TS_1/TS_2 paths can retain a zero Trep accepted by non-strict reads at params.F90:L422-L432. They are outside the Trep=10 override in wave_init, so the intrinsic-frequency division is reached without a positive-period check.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {
@@ -458,6 +564,13 @@
     "quote": "      s%uu=0.d0\r\n      s%u=0.d0\r\n      s%vv=0.d0\r\n      s%v=0.d0\r\n      s%vu=0.d0\r\n      s%uv=0.d0",
     "verified_at_lines": "L1042-L1047",
     "source_sha256": "9803067bd2fa4962d9e2247f6e8b5f87e18a9860802595424183994a715523cd"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "hotstart_init_1 loads uu/vv before flow_init, whose later assignments overwrite both regardless of hotstart. hotstart_init_2 reloads other restart fields but never uu/vv, so no subsequent loader restores the discarded velocities.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {

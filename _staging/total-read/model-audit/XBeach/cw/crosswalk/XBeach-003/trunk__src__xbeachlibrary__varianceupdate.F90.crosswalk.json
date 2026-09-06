@@ -37,7 +37,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "makecrossvector assumes rank-2 fields and a matching section extent without validating them, but a repository-wide search finds no caller. The issue is therefore a latent public-helper contract defect under an invalid direct call, not a demonstrated failure of current cross-section output.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -56,7 +63,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The sine/cosine arrays and initialization flag are saved locals of makeaverage, initialized only once and inaccessible to clearaverage. output.F90:167-168 calls clearaverage after every averaging output, but it resets only meansparslocal, leaving the circular sums from earlier windows intact.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -75,7 +89,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "The current generated state registry contains no rank-3 or rank-4 integer variables; variables.def's integer arrays have rank 1 or 2, and indextos derives type/rank directly from those declarations. Thus a user cannot make the alleged integer rank-3/4 selection through readmeans in this source tree, despite the unused generic initialization branches.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/templates/indextos.mako:L30-L38",
+     "quote": "%for i, var in enumerate(variables):\n case(  ${i+1})\n   if (associated(s%${var[\"name\"]})) then\n      t%${typecodes[var[\"type\"]]}${rank(var)}  => s%${var[\"name\"]}\n   else\n      t%${typecodes[var[\"type\"]]}${rank(var)}  => NULL()\n   endif\n   t%rank =  ${rank(var)}\n   t%type = '${typecodes[var[\"type\"]]}'"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -94,7 +118,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The wrong real-component dimension lookup is reachable for current integer rank-2 variables such as wetz, which readmeans accepts by name. The generator associates i2 only, and serial builds reuse the same integer metadata rather than manufacturing a real view, so neither serial operation nor prior global initialization repairs the local branch.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -132,7 +163,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "pbbed is an existing allocated rank-4 real field, and means_init permits it without a later rank restriction. indextos associates its r4 component only, while makeaverage reads r3 for three sizes before rotation or accumulation; no initializer gives r3 a corresponding rank-4 view.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "base_only",
@@ -243,6 +281,13 @@
     "quote": "               tvar2d_sin = tvar2d_sin + mult*sin(tvar2d)\r\n               tvar2d_cos = tvar2d_cos + mult*cos(tvar2d)\r\n               where (abs(tvar2d_sin)<numeps .and. abs(tvar2d_cos)<numeps)\r\n                  tvar2d_cos = numeps*sign(tvar2d_cos,1.d0)\r\n               endwhere\r\n               meansparslocal(i)%mean2d = atan2(tvar2d_sin,tvar2d_cos)\r\n",
     "verified_at_lines": "L346-L351",
     "source_sha256": "04276e4292cef22fca94de2f725ee5ebe9abec9e88effb55b670296c9f0a5789"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "SIGN takes its magnitude from the first argument, so the expression is epsilon*abs(cos_sum), not a signed epsilon floor. Exact zero remains zero and small values shrink further; the output-time gate removes the usual t=0 call but neither forbids repeated zero-dt API output nor establishes nonzero circular sums.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   }
  ]

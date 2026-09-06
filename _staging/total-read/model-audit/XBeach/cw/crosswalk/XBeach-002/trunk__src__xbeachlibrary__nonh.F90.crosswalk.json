@@ -37,7 +37,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The MPI physical-left branch copies a row instead of the left column, duplicating the top-boundary operation. The subsequent halo exchange has no neighbor at that physical boundary and therefore cannot supply the omitted column.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -56,7 +63,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The public nonhydrostatic initializer unconditionally allocates persistent module arrays. No matching deallocation or allocation-state guard is supplied by the library lifecycle, so repeating initialization in the same process can allocate already allocated objects.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -75,7 +89,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The initializer floors depth with eps, so a normal dry cell is not a zero-depth counterexample. Non-strict Topt validation still permits invalid frequency input, and the dispersion iteration has no iteration/stagnation limit; the surviving issue is robustness outside the ordinary finite positive input regime.",
+    "neutralizer": {
+     "where": "trunk/src/xbeachlibrary/nonh.F90:L3311-L3319",
+     "quote": "            sigma = 2.0_rkind*par%px/par%Topt\n            if (par%dispc <= 0.0_rKind) then\n               !Calculate the optimum value of the dispersion coeficiant.\n               do j=1,s%ny+1\n                  do i=1,s%nx+1\n                     d = max(s%zs0(i,j)-s%zb(i,j),par%eps)\n                     k = disper(sigma,d,par%g,2.0_rKind*par%px,0.0001_rKind)\n                     if (d>0.0_rKind) then\n                        wcoef(i,j) = 1.0_rKind / (  4.0_rKind*par%g / (d*sigma**2) - 4.0_rKind / ((k*d)**2)  )"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -94,7 +118,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "nhlay=1 is explicitly accepted by params.F90:900 and becomes wcoef in the reduced two-layer model. Expressions dividing by 1-wcoef are still evaluated for active wet nonhydrostatic cells, so wetting/breaking guards do not exclude the degenerate layer split.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -115,7 +146,17 @@
    "representative": "audit",
    "rationale": "blinded SAME (many-to-one)",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The wrong cfu selection remains a V-friction defect where U and V roughness differ. The alleged wrong wcoef averaging direction is neutralized in this two-layer path because wcoef is spatially constant at nhlay.",
+    "neutralizer": {
+     "where": "trunk/src/xbeachlibrary/nonh.F90:L3307-L3309",
+     "quote": "      if (allocated(wcoef)) then\n         if ( par%nonhq3d == 1 ) then\n            wcoef = par%nhlay"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -134,7 +175,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The cited two-layer branch assigns the bed derivative from dzs_e rather than the bed derivative just calculated. Both adjacent faces can remain wet while breaking suppresses nonhZ, so the masks do not make that branch unreachable or equate surface and bed slopes.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -153,7 +201,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The two-dimensional counterpart likewise copies a surface-derivative temporary into the bed derivative. The breaking mask can disable the cell correction without drying both adjacent faces, and no later assignment repairs the derivative before coefficient assembly.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -172,7 +227,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "This pressure assembly is the reduced two-layer path, where wcoef is assigned the scalar nhlay throughout the grid. The supposedly wrong neighboring index therefore retrieves the same coefficient; spatially optimized wcoef belongs to the other model branch.",
+    "neutralizer": {
+     "where": "trunk/src/xbeachlibrary/nonh.F90:L3307-L3309",
+     "quote": "      if (allocated(wcoef)) then\n         if ( par%nonhq3d == 1 ) then\n            wcoef = par%nhlay"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -191,7 +256,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The wcoef-difference term is zero in the two-layer model and cannot cause the claimed directional discrepancy. The free-surface difference still has the opposite ordering in dV versus dU for a non-flat surface, so that part of the correction remains inconsistent.",
+    "neutralizer": {
+     "where": "trunk/src/xbeachlibrary/nonh.F90:L3307-L3309",
+     "quote": "      if (allocated(wcoef)) then\n         if ( par%nonhq3d == 1 ) then\n            wcoef = par%nhlay"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -210,7 +285,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "dzs_n is assigned dzb_s rather than dzs_s, so the north surface contribution follows the bed gradient. Neither the wet-face mask nor the surrounding coefficient assembly requires the free surface and bed to have the same slope.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "base_only",
@@ -336,6 +418,13 @@
     "quote": "               dwdx1 = .5d0*(s%nuh(i-1,j  )+s%nuh(i,j  ))*s%hu(i-1,j  )*(Wm_old(i  ,j  )-Wm_old(i-1,j  ))*ddxu(i-1)\r\n               dwdx2 = .5d0*(s%nuh(i+1,j  )+s%nuh(i,j  ))*s%hu(i  ,j  )*(Wm_old(i+1,j  )-Wm_old(i  ,j  ))*ddxu(i)\r\n               dwdy1 = s%nuh(i  ,j-1)*s%hu(i  ,j-1)*(Wm_old(i  ,j  )-Wm_old(i  ,j-1))*ddyv(j-1)\r\n               dwdy2 = s%nuh(i  ,j  )*s%hu(i  ,j  )*(Wm_old(i  ,j+1)-Wm_old(i  ,j  ))*ddyv(j)\r\n               Wm(i,j) = Wm(i,j)   + (1.0_rKind/s%hh(i,j))*par%dt*(dwdx2-dwdx1)*ddxz(i)*real(s%wetu(i,j)*s%wetu(i-1,j),rKind) &\r\n               + (1.0_rKind/s%hh(i,j))*par%dt*(dwdy2-dwdy1)*ddyz(j)*real(s%wetv(i,j)*s%wetv(i,j-1),rKind)\r\n",
     "verified_at_lines": "L1172-L1177",
     "source_sha256": "18f471b386e5905a78c98c24fc2f6252ae4fc66c9e2010665e5f35a59d324583"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The V viscosity contribution uses hu at the cited locations even though the corresponding directional depth is hv. The wetv mask establishes wetness, not equality of those independently calculated upwind depths, and viscosity can be nonzero on that path.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {

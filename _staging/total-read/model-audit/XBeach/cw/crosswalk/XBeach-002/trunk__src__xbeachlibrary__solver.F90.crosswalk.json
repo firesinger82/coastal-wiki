@@ -37,7 +37,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The unchecked denominators are real, but failure requires a singular/poorly scaled factorization or loss of the usual favorable matrix structure. The nonhydrostatic slope terms do not provide a universal pivot bound, while small added only to p3 leaves 1+p1 and 1+p2 entirely unprotected; this is a numerical robustness defect rather than evidence that ordinary SIP solves fail.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -56,7 +63,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The zero initialization does prevent itmin from ever recording a positive minimum. However, searches find no reporting or external use of this private counter, so the demonstrated impact is unused internal bookkeeping rather than an incorrect reported diagnostic.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -75,7 +89,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "For a zero RHS the relative threshold is zero, and an exactly solved zero residual fails the strict less-than comparison. There is no absolute tolerance or zero-RHS early return before the iteration loop, so even this converged case can exhaust the configured iterations.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -94,7 +115,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "params.F90:882-889 restricts the solver to sip or tridiag through the validated option reader. Invalid option strings halt before solver_solvemat is called, so the missing fallback branch is not reachable from supported configuration input.",
+    "neutralizer": {
+     "where": "trunk/src/xbeachlibrary/readkey.F90:L301-L312",
+     "quote": "            if (passed) then\n               call writelog('l','(a24,a,a)',printkey,' = ',trim(value_str))\n            else\n               call writelog('sle','(a24,a,a,a)','Invalid option for ',trim(printkey),' : ',trim(value))\n               call writelog('sle','(a24,a,a)','Valid options for ',trim(printkey),' are:')\n               do i=1,nv\n                  call writelog('sle','(a24)',trim(allowed(i)))\n               enddo\n               do j=1,nov\n                  call writelog('sle','(a24)',trim(old(j)))\n               enddo\n               call halt_program"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -113,7 +144,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "solver_free deallocates residual and work without clearing initialized, while solver_solvemat relies on that flag to initialize them. Although the internal driver does not call solver_free, the public free-then-solve sequence described by the claim really bypasses allocation.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -132,7 +170,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The saved dimensions and solver settings can become incompatible only on reuse with changed grid/configuration or an external parameter change. They remain consistent throughout an ordinary fixed-configuration run, but neither solver_solvemat nor solver_free implements the required reinitialization for that later lifecycle.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -151,7 +196,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The normal nonhydrostatic caller omits fixshallow, so zero or near-zero elimination pivots remain unchecked for degenerate or poorly conditioned matrices; the wet-cell identity rows do not constrain all active slope-dependent rows. Groundwater callers explicitly enabling fixshallow do have a tiny-pivot replacement, so this is not a universal failure of every Thomas call.",
+    "neutralizer": {
+     "where": "trunk/src/xbeachlibrary/solver.F90:L279-L298",
+     "quote": "      if (present(fixshallow)) then\n         lfixshallow = fixshallow\n      else\n         lfixshallow = .false.\n      endif\n\n      fac    = amat(1,1,jindex)\n      if (abs(fac)<tiny(0.d0) .and. lfixshallow) then\n         fac = sign(tiny(0.d0),fac)\n      endif\n      x(1,jindex) = rhs(1,jindex)/fac\n\n      !forward elimination\n      do i=2,nx+1\n         cmat(i)  = amat(3,i-1,jindex)/fac\n         fac      = amat(1,i,jindex)-amat(2,i,jindex)*cmat(i)\n         if (abs(fac)<tiny(0.d0) .and. lfixshallow) then\n            fac = sign(tiny(0.d0),fac)\n         endif\n         x(i,jindex) = (rhs(i,jindex)-amat(2,i,jindex)*x(i-1,jindex))/fac"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "base_only",

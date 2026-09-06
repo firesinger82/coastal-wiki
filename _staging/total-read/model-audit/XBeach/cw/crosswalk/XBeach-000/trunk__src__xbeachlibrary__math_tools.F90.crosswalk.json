@@ -37,7 +37,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The flip=1 implementation really indexes columns with the row extent, but every located model call uses flip=2; waveparams.F90 even changes its flag from 1 to 2 before calling. Retain MED latent public flip=1 corruption; for M1<M2 the untouched columns are zero-initialized, not undefined.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/waveparams.F90:L673-L677",
+     "quote": "      ! If angles were decreasing, flip S_array as also dir is flipped\n      if (flipped == 1) then\n         flipped=2\n         call flipa(wp%S_array,nfreq,ndir,flipped)\n      end if"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -56,7 +66,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The npass<=1 return precedes every allocation/deallocation that defines stat, and fftn immediately tests stat after the call. A singleton transformed dimension is a legitimate shape and no wrapper rejects it, so the undefined-status path is not confined to invalid input.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -75,7 +92,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "The routine constructs an analytic signal from real data in-place, which explains why its input/output buffer is complex. The actual envelope callers explicitly replace the buffer with real water-level series immediately before the call, so no imaginary input information is lost in the intended operation.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/waveparamsnew.F90:L2436-L2443",
+     "quote": "         do iy=1,s%ny+1\n            ! Integrate instantaneous water level excitation of wave components over directions\n            eta(iy,:) = sum(zeta(iy,:,:),2)\n            tempcmplx=eta(iy,:)\n            !\n            ! Hilbert transformation to determine envelope of all total\n            ! non-directional wave components\n            call hilbert(tempcmplx,size(tempcmplx))"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -94,7 +121,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The documented dim contract is a subset of available dimensions with size no greater than the rank, and stat reports temporary-allocation errors rather than argument validation. Invalid, duplicate, or oversized selectors therefore amount to LOW unchecked contract misuse, with no such model call found; the truncation is not evidence of a valid-input FFT defect.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/math_tools.F90:L72-L82",
+     "quote": "   !   dim      One dimensional integer array, containing the dimensions to be\n   !            transformed. Default is (/1,...,N/) with N being the rank of\n   !            array, i.e. complete transform. dim can restrict transformation\n   !            to a subset of available dimensions. Its size must not exceed the\n   !            rank of array or the size of shape respectivly.\n   !\n   !   inv      If .true., inverse transformation will be performed. Default is\n   !            .false., i.e. forward transformation.\n   !\n   !   stat     If present, a system dependent nonzero status value will be\n   !            returned in stat, if allocation of temporary storage failed."
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -113,7 +150,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "An empty dim subset executes no fftradix call and leaves a present INTENT(OUT) stat undefined. PRODUCT of that empty subset is one, so the identity transform itself is harmless, but it does not define the returned status.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -132,7 +176,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "m<=0 is unguarded and would fail before meaningful Hilbert processing, but all located model calls pass the size of a generated signal buffer. Retain LOW robustness for empty/invalid input rather than MED corruption of a valid positive-length signal.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -151,7 +202,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The zero-seed repair happens after IABS and MOD, so it cannot make negation of the most-negative default integer representable. The public routine has no exclusion for that input; later generator arithmetic may produce a positive value, but the overflowing IABS operation remains.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -170,7 +228,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "Arbitrary shape/data disagreement violates the explicit caller contract, and fft wrappers supply SHAPE(array). The remaining MED issue is unchecked default-integer PRODUCT overflow for genuinely very large valid arrays, plus unsupported empty extents; a general assumed-size traversal bug cannot be inferred merely from fabricated shape values.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/math_tools.F90:L49-L53",
+     "quote": "   !   shape    With subroutine fftn, the shape of the array to be transformed\n   !            has to be passed separately, since fftradix - the internal trans-\n   !            formation routine - will treat array always as one dimensional.\n   !            The product of elements in shape must be the number of\n   !            elements in array."
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "base_only",

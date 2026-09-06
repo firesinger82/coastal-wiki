@@ -37,7 +37,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The exported function checks only array%rank < dim, and indextos validates the variable index, not DIM. Thus a valid rank-2 variable such as zb with dim=0 reaches SIZE with invalid DIM; the Python wrapper's +1 conversion does not protect direct C callers.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -56,7 +63,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The parameter-name getter really indexes keys(index) unchecked, but the array-name getter delegates to indextos, which validates 1..numvars and halts before selecting storage. Retain the bounds finding only for getparametername_c.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/spaceparams.F90:L54-L57",
+     "quote": "      if (index .lt. 1 .or. index .gt. numvars) then\n         call writelog('els','(a,i3,a)','invalid index ',index,' in indextos. Program will stop')\n         call halt_program\n      endif"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -75,7 +92,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "After setting getarraydimsize_c=-1, every successful rank/type branch only assigns dimsize and falls through to the function end. The Fortran wrapper propagates this status, although the Python wrapper ignores it; no callee assignment changes the function result.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -94,7 +118,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "Unknown parameters do return success without checking index=-1, but the returned type code is deterministically blank rather than undefined. getkey_indextype initializes both outputs before searching, so retain only the misleading success-status defect.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/getkey.F90:L42-L43",
+     "quote": "      index = -1\n      type = ''"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -113,7 +147,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The scratch lifetime hazard affects direct native clients that retain a pointer across the next successful call to the same getter, separately for each rank and numeric type. The shipped Python wrapper copies non-scalar results into an ndarray before returning, so its previously returned arrays are not invalidated.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/pybeach/xbeach/libxbeach.py:L231-L236",
+     "quote": "        if rank == 0:\n            # Just return the number\n            result = arrayp.contents.value\n        else:\n            result = array(arrayp)\n        return result"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -132,7 +176,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "Rank-specific getters/setters do select rN/iN after checking only the mnemonic, and the generated indextos code associates only the selected component. Exclude generic getarray from this specific claim: its arrayf2c callee in mnemoniciso.F90:32-45 returns an unrelated local scratch pointer rather than dereferencing a mismatched selected component.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -151,7 +202,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "Null or undersized buffers are unsafe for direct C setter calls with a valid mnemonic, but this is an invalid-caller-input robustness issue rather than a demonstrated failure with conforming buffers. Retain a lower-severity native API validation gap: pointer conversion and model-derived shapes cannot establish the incoming allocation's extent.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -170,7 +228,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "r0 and i0 are unsaved procedure-local TARGET scalars whose addresses escape at introspection.F90:550 and 785. The SAVE statement at module scope saves module variables, not these procedure locals, and the array metadata pointers do not extend the copied scalars' lifetimes.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "base_only",
@@ -221,6 +286,13 @@
     "quote": "   integer(c_int) function getparametertype_c(name, typecode, length) bind(C,name=\"getparametertype\")\r\n      use getkey_module, only: getkey_indextype\r\n      character(kind=c_char,len=1),intent(in) :: name(length)\r\n      character(kind=c_char, len=1), intent(out) :: typecode\r\n      integer(c_int) :: length\r\n      character(len=length) :: key\r\n",
     "verified_at_lines": "L137-L142",
     "source_sha256": "870a8c3214b3642de9315de935dd5cd3c06ba38e694e7080410ffe572fb8e08e"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The length-sized name dummies are passed to a helper that scans MAXSTRINGLEN elements for NUL and does not use the supplied length. Existing Python buffers usually contain an extra physical terminator, but a direct C caller supplying exactly length bytes without NUL can be read beyond its allocation; the Fortran wrappers also contain length-sized conversion buffers.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {
@@ -242,6 +314,13 @@
     "quote": "      getdoubleparameter_c = -1\r\n      myname = char_array_to_string(name)\r\n      getdoubleparameter_c =  getkey(par, myname, myparam)\r\n      if (getdoubleparameter_c .eq. -1) return\r\n      value = myparam%r0\r\n      getdoubleparameter_c = 0\r\n",
     "verified_at_lines": "L218-L223",
     "source_sha256": "870a8c3214b3642de9315de935dd5cd3c06ba38e694e7080410ffe572fb8e08e"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "getkey.F90:90-100 associates only c0, i0, or r0 according to the parameter type and returns success for any recognized name. The numeric getters check only that success status, so requesting an integer parameter with the double getter, or vice versa, dereferences a component that getkey did not associate.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {

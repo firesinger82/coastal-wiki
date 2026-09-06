@@ -37,7 +37,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The point extraction section allocates pointoutputs, whereas r3/r4 are either never allocated on the writer or are deallocated before output; any global-output scratch is also deallocated at ncoutput.F90:1270,1288. The ordinary-point guard only limits the failure to npoints>0 and does not supply either temporary.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -58,7 +65,17 @@
    "representative": "audit",
    "rationale": "blinded SAME (many-to-one)",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "Unknown names are rejected by readOutputStrings and indextos itself range-checks before accessing the generated table. The current variables.def supplies only integer and real state entries, so neither an unchecked mnemonic access nor the claimed unsupported-type attribute path is reachable with this registry.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/spaceparams.F90:L54-L57",
+     "quote": "      if (index .lt. 1 .or. index .gt. numvars) then\n         call writelog('els','(a,i3,a)','invalid index ',index,' in indextos. Program will stop')\n         call halt_program\n      endif"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -77,7 +94,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The three writers genuinely discard OPEN's IOSTAT and proceed, so failed opens can lead to erroneous implicit-unit output or fatal writes. Omission of STATUS='REPLACE' alone does not establish stale trailing records here: these are sequential formatted writes followed by CLOSE, unlike the direct-access global files.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -134,7 +158,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "There are no rank-4 integer state variables, and the only rank-1 integer is pntdisch (variables.def:243), whose par%ndischarge dimension is rejected by NetCDF dimensionid before definition. Retain the missing rank-1 write for Fortran global output of allocated pntdisch, not the claimed already-defined NetCDF rank-1/rank-4 records.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/ncoutput.F90:L1689-L1692",
+     "quote": "       case default\n         call writelog('els','','Unknown dimension expression:'  // expression)\n         stop 1\n      end select"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -153,7 +187,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "readOutputStrings validates names only and permits integer spatial variables such as wetz; the allocation check in output.F90 covers globals, not point types. pointsvarids is allocated without initialization, and the integer/default point branch reaches attribute calls without defining that entry.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -174,7 +215,14 @@
    "representative": "audit",
    "rationale": "blinded SAME (many-to-one)",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The trailing dimensions are explicitly retained in NetCDF definitions, but the writes pass a single scalar at their first indices with no enclosing loop over those dimensions. A rank-3 field with multiple wave directions or sediment classes therefore leaves the remaining components unwritten; warning messages do not reject that selection.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -193,7 +241,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The serial branch uses size(t%r3,3) for a rank-4 selection, while templates/indextos.mako associates only the component corresponding to the selected rank. pbbed is a real allocated rank-4 field (variables.def:204; initialize.F90:1286), so this is not an unreachable type/rank combination.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -278,6 +333,13 @@
     "quote": "      if (dooutput_drifter) then\r\n         itd = itd+1\r\n#ifdef USENETCDF\r\n         if (donetcdf) then\r\n            ! output time:\r\n            NF90(nf90_put_var(ncid, drifterstimevarid, CONVREAL(par%t), start=(/itd/)))\r\n",
     "verified_at_lines": "L1554-L1559",
     "source_sha256": "04a33fdba34ee869590e0a7bb898d5edc8c7fd1b6ca9dc9634c727e74afaaa7b"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Only fortoutput_init assigns the saved counters, and output.F90:61-65 selects ncoutput_init alone for NetCDF output. timestep_init initializes distinct tpar counters rather than these module variables; global/point indexing uses tpar, but itd remains the uninitialized drifter index identified by the claim.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {
@@ -329,6 +391,13 @@
     "quote": "               ! Make sure the variable has x and y as the first 2 dimensions\r\n               if ((dimensionid(t%dimensions(1)) .ne. xdimid) .or. (dimensionid(t%dimensions(2)) .ne. ydimid)) then\r\n                  call writelog('lse','', 'Tried to store variable ' // trim(mnem) // ', but it is not a function of x,y')\r\n               endif\r\n               select case(t%rank)\r\n                case(2)\r\n",
     "verified_at_lines": "L491-L496",
     "source_sha256": "04a33fdba34ee869590e0a7bb898d5edc8c7fd1b6ca9dc9634c727e74afaaa7b"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "A supported non-spatial rank-2 variable such as tideinpz has known dimension IDs but fails the x/y test only by logging; name parsing imposes no spatial-shape contract. It is still defined as point-by-time and later sampled with grid indices, so dimensionid's rejection of unknown expressions does not neutralize known non-spatial shapes.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {
@@ -380,6 +449,16 @@
     "quote": "         ! Store the time (in morphological time)\r\n#ifdef USENETCDF\r\n         if(donetcdf) then\r\n            NF90(nf90_put_var(ncid, globaltimevarid, CONVREAL(par%t*max(par%morfac,1.d0)), (/tpar%itg/)))\r\n         endif\r\n",
     "verified_at_lines": "L1136-L1140",
     "source_sha256": "04a33fdba34ee869590e0a7bb898d5edc8c7fd1b6ca9dc9634c727e74afaaa7b"
+   },
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The inconsistency occurs when morfacopt=0 and morfac>1; with morfacopt=1 the multiplication is intended, and max(morfac,1) makes factors at or below one harmless. params.F90:1187-1188 permits the problematic combination and does not reset morfac merely because morfacopt is zero.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/ncoutput.F90:L1137-L1140",
+     "quote": "#ifdef USENETCDF\n         if(donetcdf) then\n            NF90(nf90_put_var(ncid, globaltimevarid, CONVREAL(par%t*max(par%morfac,1.d0)), (/tpar%itg/)))\n         endif"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {
@@ -416,6 +495,13 @@
     "quote": "               elseif (par%meanvars(i)=='thetamean') then       ! thetamean\r\n                  write(indextomeanunit(i),rec=itm) &\r\n                  &  CONVREAL( &\r\n                  &            mod(2.d0*par%px + atan2(nint(meansparsglobal(i)%mean2d)/1d7, &\r\n                  &            mod(meansparsglobal(i)%mean2d,1.d0)*1d1), 2.d0*par%px) / par%px * 180 &\r\n                  &  )\r\n",
     "verified_at_lines": "L1500-L1505",
     "source_sha256": "04a33fdba34ee869590e0a7bb898d5edc8c7fd1b6ca9dc9634c727e74afaaa7b"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "makeaverage stores atan2(tvar2d_sin,tvar2d_cos) directly, and the packed assignment immediately below it is commented out (varianceupdate.F90:351-354). Neither means_collect nor the serial pointer assignment repacks the value, so both legacy decoding expressions consume the wrong representation.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {
@@ -437,6 +523,16 @@
     "quote": "         par%tintm = tpar%tpm(min(itm+2,stpm))-tpar%tpm(itm+1)  ! Next averaging period (min to stop array out of bounds)\r\n         par%tintm = max(par%tintm,tiny(0.d0))                  ! to prevent par%tintm=0 after last output\r\n      endif  ! dooutput_mean .and. dofortran_compat\r\n",
     "verified_at_lines": "L1546-L1548",
     "source_sha256": "04a33fdba34ee869590e0a7bb898d5edc8c7fd1b6ca9dc9634c727e74afaaa7b"
+   },
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The missing NetCDF interval update affects nonuniform supplied averaging schedules, for which mult continues to use a stale par%tintm. Automatically generated tpm values are uniformly spaced by par%tintm, so ordinary fixed-interval schedules do not need this update; no active update exists in outputtimes_update.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/timestep.F90:L282-L285",
+     "quote": "               allocate(tpar%tpm(ii))\n               do i=1,ii\n                  tpar%tpm(i)=par%tstart+par%tintm*real(i-1)\n               enddo"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {
@@ -458,6 +554,13 @@
     "quote": "      if (dooutput_drifter) then\r\n         itd = itd+1\r\n#ifdef USENETCDF\r\n         if (donetcdf) then\r\n            ! output time:\r\n            NF90(nf90_put_var(ncid, drifterstimevarid, CONVREAL(par%t), start=(/itd/)))\r\n",
     "verified_at_lines": "L1554-L1559",
     "source_sha256": "04a33fdba34ee869590e0a7bb898d5edc8c7fd1b6ca9dc9634c727e74afaaa7b"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Drifter initialization divides release/end times by the morphological factor when morfacopt=1 (initialize.F90:1670-1673), confirming that par%t is then internal hydrodynamic time. Writing it raw for drifters while other axes multiply by the factor creates the claimed inconsistency when the factor exceeds one.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {
@@ -494,6 +597,13 @@
     "quote": "             case (2)\r\n               reclenm = wordsize*size(t%r2)\r\n             case (3)\r\n               reclenm = wordsize*size(t%r3)\r\n             case (4)\r\n               reclenm = wordsize*size(t%r4)\r\n",
     "verified_at_lines": "L1815-L1820",
     "source_sha256": "04a33fdba34ee869590e0a7bb898d5edc8c7fd1b6ca9dc9634c727e74afaaa7b"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Integer rank-2 mean variables such as wetz are accepted by readmeans and means_init, but fortoutput_init always uses t%r2 for their record length. The generated metadata associates i2 only, and neither makeaveragenames nor wordsize supplies a conversion; the earlier integer initialization bug is an additional fault, not a reliable guard.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {
@@ -515,6 +625,13 @@
     "quote": "      if ( .not. lopen ) then\r\n         filename = trim(mnemonics(outnumbers(index)))//'.dat'\r\n         open(unit, file=filename,form='unformatted',&\r\n         &    access='direct',recl=reclen)\r\n      endif\r\n      inquire(unit=unit,nextrec=jtg)\r\n",
     "verified_at_lines": "L1852-L1857",
     "source_sha256": "04a33fdba34ee869590e0a7bb898d5edc8c7fd1b6ca9dc9634c727e74afaaa7b"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "checkfile opens direct-access global output with default STATUS='UNKNOWN' and does not truncate it elsewhere. Overwriting fewer records leaves older higher-numbered records physically present, even though dims.dat may tell careful consumers how many new records to read.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   }
  ]

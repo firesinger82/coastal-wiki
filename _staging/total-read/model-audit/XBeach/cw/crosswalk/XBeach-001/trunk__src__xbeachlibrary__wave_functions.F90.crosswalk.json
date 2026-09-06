@@ -37,7 +37,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "ntheta=2 is allowed by grid construction and the second-order scheme is not downgraded for two angular bins. The first boundary flux accesses bin 3 for negative ctheta, while the last boundary flux can access bin 0 for positive ctheta; the wet-cell guard does not prevent these cases.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -56,7 +63,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The single_dir wavint case is normally protected by wave-event scheduling and compute_dt's clipping to the next event. The remaining extrapolating filter weights require dt>cats*Trep in the other averaging path, or a caller bypassing normal timestep scheduling; positive depth alone does not protect the velocity filter.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/timestep.F90:L652-L657",
+     "quote": "         if (tpar%tnext > par%t) then\n            ! sometime dt too small and then integer overflow. Catch with check beforehand\n            if ((tpar%tnext-par%t)/par%dt<dble(0.9*huge(0))) then\n               n = ceiling((tpar%tnext-par%t)/par%dt)\n               par%dt = (tpar%tnext-par%t)/n\n            endif"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -75,7 +92,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "iter starts at zero and increments only while iter<150, so exhaustion ends at 150 and the iter<=itermax test always succeeds. No caller can receive the advertised negative result from finite nonconvergent iteration.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -94,7 +118,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "All repository callers pass the constants 0, 1 or 2, matching the three implemented branches; the optional default is also 0. No supported call supplies the alleged unsupported switch.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_timestep.F90:L98-L102",
+     "quote": "            if (par%wci==1) then\n               call wave_dispersion(s,par,2) ! use s%hhwcins water depth (and velocity)\n            else\n               call wave_dispersion(s,par,0) ! use s%hhw water depth\n            endif"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -113,7 +147,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The shared wave_dispersion expressions have only upper min clamps and hhlocal is not capped at hwcimax. Positive depth greater than that configurable threshold therefore makes the current multiplier negative; the later intrinsic-frequency floor does not repair wm or cgxm/cgym.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -132,7 +173,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "The alleged zero denominators are neutralized upstream for valid model state: hh is floored at eps, hstokes is hh plus a nonnegative correction (or max(hh,hmin)), and c comes from positive intrinsic frequency/k or a 0.01 fallback. The wet mask also excludes dry velocity states.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_timestep.F90:L64-L72",
+     "quote": "      if (par%oldhmin==1) then\n         s%hstokes = max(s%hh,par%hmin)\n      else\n         gamma = s%H/s%hh\n         where (gamma>1.d0)\n            s%hstokes = par%deltahmin*(gamma-1.d0)*s%H+s%hh\n         elsewhere\n            s%hstokes = s%hh\n         endwhere"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -151,7 +202,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "Saved work storage really persists across calls and can be wrong after changing grid size or enabling WCI mid-lifetime. Normal stepping retains one grid and fixed switches, and direction-velocity storage already allocates max(ntheta,ntheta_s), so ordinary single_dir alternation is not a counterexample.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_functions.F90:L1123-L1137",
+     "quote": "      if(.not. allocated(cgx)) then\n         if (par%single_dir==1) then\n            nthetamax = max(s%ntheta,s%ntheta_s)\n         else\n            nthetamax = s%ntheta\n         endif\n         allocate(cgx(s%nx+1,s%ny+1,nthetamax))\n         allocate(cgy(s%nx+1,s%ny+1,nthetamax))\n         allocate(cx(s%nx+1,s%ny+1,nthetamax))\n         allocate(cy(s%nx+1,s%ny+1,nthetamax))\n         allocate(ctheta(s%nx+1,s%ny+1,nthetamax))\n         if (par%wci==1) then\n            allocate(uwci(s%nx+1,s%ny+1))\n            allocate(vwci(s%nx+1,s%ny+1))\n         endif"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -170,7 +231,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "Fy is initialized globally, physical front/back rows are explicitly set, and the remaining final lateral row is a dummy for the v-momentum indexing rather than an uninitialized force used by the solver. The claim mistakes commented boundary copies for missing required initialization.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/initialize.F90:L550-L551",
+     "quote": "      s%Fx        = 0.d0\n      s%Fy        = 0.d0"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "base_only",

@@ -37,7 +37,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "The normal input path strictly restricts order to [1,2], so the empty order=3 branch is unreachable with an accepted configuration.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.F90:L555-L555",
+     "quote": "      par%order       = readkey_dbl ('params.txt','order',    2.d0,           1.d0,    2.d0    ,strict=.true.)"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -56,7 +66,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "TS_NONH is a live wave_bc branch; unlike the spectral branch at 763-769, its 880-884 broadcasts omit isSet_V. The flag is a local variable and only the master calls velocity_Boundary, so non-master use at 903 has no defining assignment.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -75,7 +92,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "For new-old>1 the serial branch assigns both endpoints from gq2, despite reading gq1 at 612. Neither the subsequent interpolation at 659-660 nor the final velocity conversion restores the earlier discharge.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -113,7 +137,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Reinitialization deallocates the data arrays but never clears the saved iZ/iU/iV/etc. indices. A forced or changed-file initialization can therefore allocate/read a field using a previous header's index.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -132,7 +163,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The ordinary interpolation paths define all flags, but the EOF paths bypass them and define only isSet_Q. INTENT(OUT) invalidates prior flag values; wave_bc immediately consumes the other flags.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -151,7 +189,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "User-supplied zero taper is replaced with 1e-6 during parameter postprocessing. The later zero assignment in boundaryconditions is restricted to stationary JONS_TABLE, whose boundary application has its own positive-taper branch.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.F90:L1625-L1625",
+     "quote": "      par%taper    = max(par%taper,1.d-6)"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -170,7 +218,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Each minimum update takes the newly updated maximum and the current spatial minimum, discarding previous temporal minima. Initialization and later window resets do not repair the accumulation within a window.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -189,7 +244,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The hybrid branch allows constant zs and zs0 over a window, and its minimum/maximum denominator is then zero. The outer hybrid-mode guard and min(huge(...),...) do not impose any positive surface range.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -208,7 +270,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The reader returns raw Q through ug and identifies it using isSet_Q. Only the #else serial path converts those quantities by depth; space_distribute merely transfers them in the MPI path.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -227,7 +296,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "A late first call can leave fc undefined, but ordinary hotstart does not establish that scenario: timestep initialization resets t to zero. The remaining risk is an externally advanced first call using a lateral condition that actually consumes fc.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/timestep.F90:L144-L144",
+     "quote": "      par%t = 0.0d0"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -246,7 +325,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The per-rank vertical-discharge loop uses globally supplied pdisch and clamps each point into local bounds. Unlike discharge_boundary_h it has no indomain/ownership test before adding mass.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -265,7 +351,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "Duplicate first timestamps give a definite zero denominator in the initialization interpolation. The one-record explanation is inaccurate: EOF is detected by the subsequent read, whose INTENT(INOUT) time retains its previous value, rather than reliably executing the cited t1=t0 branch; later duplicate records can also be skipped by the catch-up loop.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/boundaryconditions.F90:L2151-L2168",
+     "quote": "               do while (.not. (t>=t0 .and. t<t1))\n                  t0 = t1\n                  if (iU >0) u0 = u1\n                  if (iV >0) v0 = v1\n                  if (iZ >0) z0 = z1\n                  if (iW >0) w0 = w1\n                  if (idu >0) du0 = du1\n                  if (idv >0) dv0 = dv1\n                  call velocity_Boundary_read(t1,tmp,Unit_U,lVaru,lIsEof,nvar)\n                  t1 = t1+bcstarttime\n                  if (iU >0) u1 = tmp(:,iU-1)\n                  if (iV >0) v1 = tmp(:,iV-1)\n                  if (iZ >0) z1 = tmp(:,iZ-1)\n                  if (iW >0) w1 = tmp(:,iW-1)\n                  if (idu >0) du1 = tmp(:,idu-1)\n                  if (idv >0) dv1 = tmp(:,idv-1)\n                  if (lIsEof) exit !Exit on end of file condition\n               end do"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -284,7 +380,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The scalar/vector dispatch has an empty ELSE and lVarU is saved. IOSTAT checks validate the read operation, not the mode string, so an unknown string keeps the prior interpretation.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",
@@ -320,6 +423,13 @@
     "quote": "            Emean=sum(dataE)/nt",
     "verified_at_lines": "L164-L164",
     "source_sha256": "0cbaa20cd8dd147005ec6b01d13ec05ac46bb98d181e0a7fec1025cd9fe30b71"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Successful reads of nt are followed directly by allocations and sum(dataE)/nt. The IOSTAT checks do not reject a syntactically valid zero count.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {
@@ -341,6 +451,16 @@
     "quote": "               s%bi(1) = -(2*s%cg(1,j)/s%c(1,j)-0.5d0)*(em-ei)/(s%cg(1,j)**2-par%g*s%hh(1,j))/par%rho\n               ht=s%zs0(1:2,:)-s%zb(1:2,:)\n               s%ui(1,j) = s%cg(1,j)*s%bi(1)/ht(1,j)*cos(s%theta0-s%alfaz(1,j))",
     "verified_at_lines": "L451-L453",
     "source_sha256": "0cbaa20cd8dd147005ec6b01d13ec05ac46bb98d181e0a7fec1025cd9fe30b71"
+   },
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The unprotected mean boundary depth ht=zs0-zb remains a real dry-boundary hazard in the Surfbeat branches. The nonhydrostatic s%hh divisions are partly protected by the model's positive-depth invariant, and a finite positive-depth linear dispersion solution does not have an exact cg^2=g*h resonance.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/flow_timestep.F90:L940-L940",
+     "quote": "      s%hh  = max(s%zs-s%zb,par%eps)    ! water depth"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {
@@ -362,6 +482,13 @@
     "quote": "                  old=floor((par%t/dtbcfile)+1)\n                  recpos=1\n               end if\n               new=floor((par%t/dtbcfile)+1)",
     "verified_at_lines": "L594-L597",
     "source_sha256": "0cbaa20cd8dd147005ec6b01d13ec05ac46bb98d181e0a7fec1025cd9fe30b71"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The reuse/list reader accepts a syntactically valid zero or negative dtbcfile without a positivity check, and later record calculations divide by that value. The ordinary generator's positive step does not protect externally supplied reuse files, which are a supported boundary source.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {
@@ -398,6 +525,13 @@
     "quote": "                  s%uu(1,jmin_zs:jmax_zs) = s%ui(1,jmin_zs:jmax_zs)\n                  s%vv(1,jmin_zs:jmax_zs) = s%vi(1,jmin_zs:jmax_zs)\n                  s%zs(1,jmin_zs:jmax_zs) = s%zi(1,jmin_zs:jmax_zs)+s%zs0(1,jmin_zs:jmax_zs)\n                  s%ws(1,jmin_zs:jmax_zs) = s%wi(1,jmin_zs:jmax_zs)",
     "verified_at_lines": "L1310-L1313",
     "source_sha256": "0cbaa20cd8dd147005ec6b01d13ec05ac46bb98d181e0a7fec1025cd9fe30b71"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The missing-Z fallback copies absolute zs(2,:) into zi; the FRONT_NONH application adds zs0 to zi without subtracting it first. Tapering does not restore a relative elevation datum.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {
@@ -434,6 +568,13 @@
     "quote": "               factime = 1.d0/par%cats/par%Trep*par%dt\n            elseif (par%tidetype==TIDETYPE_HYBRID) then\n               factime = hybf1*1.d0/par%cats/par%Trep*par%dt\n            else\n               ! do we need this?\n               factime = 0.1d0/par%cats/par%Trep*par%dt",
     "verified_at_lines": "L1141-L1146",
     "source_sha256": "0cbaa20cd8dd147005ec6b01d13ec05ac46bb98d181e0a7fec1025cd9fe30b71"
+   },
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "cats and Trep have positive recommended bounds, but these readkey calls are not strict and table-supplied Trep is not checked. The failure is restricted to zero/invalid user or external forcing parameters, rather than the default hybrid configuration.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {
@@ -455,6 +596,13 @@
     "quote": "         s%umean(1,:)=factime*udnusum/dnusum+(1.0d0-factime)*s%umean(1,:)\n         s%vmean(1,:)=factime*vdnvsum/dnvsum+(1.0d0-factime)*s%vmean(1,:)",
     "verified_at_lines": "L1177-L1178",
     "source_sha256": "0cbaa20cd8dd147005ec6b01d13ec05ac46bb98d181e0a7fec1025cd9fe30b71"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The global reductions address ownership but not empty global selections: ranges_init sets jmin_vv=2 and jmax_vv=ny-1, so an allowed ny=2 grid has no terms in dnvsum. The unguarded vdnvsum/dnvsum therefore remains 0/0 even with nonzero cell metrics.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {
@@ -506,6 +654,13 @@
     "quote": "               s%zs(s%nx+1,1)=max(s%zs(s%nx+1,2) - s%dzs0dn(1,1)*s%dnv(1,1),s%zb(1,1))\n            endif\n            if (xmpi_isright) then\n               s%uu(s%nx+1,s%ny+1)=s%uu(s%nx+1,s%ny)\n               s%vv(s%nx+1,s%ny+1)=s%vv(s%nx+1,s%ny)\n               s%zs(s%nx+1,s%ny+1)=max(s%zs(s%nx+1,s%ny) + s%dzs0dn(1,s%ny+1)*s%dnv(1,s%ny),s%zb(1,s%ny+1))",
     "verified_at_lines": "L1462-L1467",
     "source_sha256": "0cbaa20cd8dd147005ec6b01d13ec05ac46bb98d181e0a7fec1025cd9fe30b71"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The back-corner assignments explicitly select front-row dzs0dn, dnv and zb. Later lateral updates run only over the interior zs i bounds and do not generally overwrite these corners.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {
@@ -557,6 +712,13 @@
     "quote": "            indomain =  (   m1l >= iminl .and. m1l <= imaxl .and.         &\n            n1l >=jminl .and. n1l <= jmaxl       ) .or.  &\n            (   m2l >=iminl .and. m2l <= imaxl .and.         &\n            n2l >=jminl  .and. n2l <= jmaxl       )",
     "verified_at_lines": "L1670-L1673",
     "source_sha256": "0cbaa20cd8dd147005ec6b01d13ec05ac46bb98d181e0a7fec1025cd9fe30b71"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "indomain tests only endpoint inclusion before every local momentum update. Clamping endpoints afterward cannot recover a crossing subdomain for which indomain is false.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {

@@ -1,0 +1,548 @@
+[
+ {
+  "vid": "trunk__src__xbeach__xbeach.F90#0",
+  "source_path": "trunk/src/xbeach/xbeach.F90",
+  "kind": "equivalent_high",
+  "claim": "[L14-L32] (HIGH/ignored lifecycle errors) Every return code after readinput is overwritten without inspection, so initialization, parameter lookup, step, output, or finalization failures cannot stop or alter the driver.",
+  "other_wording": "[L19-L28] (HIGH/unchecked status / lifecycle) All return codes from initialization, parameter lookup, time stepping, and output are overwritten without validation, so failed initialization can leave t or tstop undefined and failed steps can still loop or emit output."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__filefunctions.F90#0",
+  "source_path": "trunk/src/xbeachlibrary/filefunctions.F90",
+  "kind": "equivalent_high",
+  "claim": "[L49-L65] (MED/MPI result inconsistency) check_file_exist performs the inquiry only on xmaster without broadcasting error, so a present exist output is always reported true on non-master ranks regardless of the file's existence.",
+  "other_wording": "[L49-L65] (MED/mpi-consistency) File existence is checked only on xmaster and the error flag is never broadcast, so non-master callers requesting the optional exist result always report true even when the master found the file missing."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__filefunctions.F90#2",
+  "source_path": "trunk/src/xbeachlibrary/filefunctions.F90",
+  "kind": "equivalent_high",
+  "claim": "[L70-L149] (MED/unchecked I/O and allocation) The three check_file_length variants do not validate extents or capture allocation/open errors, so bad dimensions or an inaccessible file can trigger a raw runtime failure before their intended read-error reporting.",
+  "other_wording": "[L81-L93,L109-L121,L136-L148] (MED/input-error-handling) The check_file_length overloads open files without OPEN IOSTAT handling, so permission/open failures are reported only indirectly through a subsequent read."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__filefunctions.F90#3",
+  "source_path": "trunk/src/xbeachlibrary/filefunctions.F90",
+  "kind": "equivalent_high",
+  "claim": "[L315-L321] (LOW/unchecked I/O classification) get_file_length does not capture OPEN errors and treats every nonzero READ iostat as ordinary end-of-file, so malformed numeric input is silently reported as a shorter file.",
+  "other_wording": "[L295-L325] (MED/misnamed-contract) get_file_length stops counting at the first nonnumeric/failed list-directed record and counts numeric records rather than physical lines, making the generic name misleading and malformed later records indistinguishable from end-of-file."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__filefunctions.F90#10",
+  "source_path": "trunk/src/xbeachlibrary/filefunctions.F90",
+  "kind": "confirmed_delta",
+  "claim": "[L197-L224] (MED/empty-list validation gap) A LOCLIST file containing only its header produces nlocs=0 and skips all boundary-duration validation, allowing a positive-duration simulation to pass this check without any boundary file.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__getkey.F90#0",
+  "source_path": "trunk/src/xbeachlibrary/getkey.F90",
+  "kind": "equivalent_high",
+  "claim": "[L21-L28] (LOW/undefined pointer state) parameter pointer components have no default NULL() association, leaving unused components undefined or stale across descriptor reuse.",
+  "other_wording": "[L13-L29,L88-L100] (MED/pointer-state) parameter pointer components have no default NULL initialization, and getkey associates only the pointer matching the current type, leaving the other pointer components with undefined or stale association state."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__getkey.F90#1",
+  "source_path": "trunk/src/xbeachlibrary/getkey.F90",
+  "kind": "equivalent_high",
+  "claim": "[L76-L100] (MED/shared-result aliasing) Every getkey result of a given type points to one module-saved scratch scalar, so a later call silently changes the value observed through all earlier descriptors and the routine is not reentrant or thread-safe.",
+  "other_wording": "[L76-L100] (MED/aliasing-contract) All returned scalar pointers alias one of three shared SAVE temporaries, so a later getkey call of the same type silently changes the value observed through every earlier result and makes the API non-reentrant."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__initialize.F90#0",
+  "source_path": "trunk/src/xbeachlibrary/initialize.F90",
+  "kind": "equivalent_high",
+  "claim": "[L424-L458] (MED/unchecked bathymetry schedule) setbathy_init accepts nonpositive or unsorted nsetbathy/time values without validation, allowing an empty schedule to silently initialize every bathymetry value to zero or a nonmonotonic schedule to violate linear_interp's ordering contract.",
+  "other_wording": "[L438-L456] (MED/interpolation-contract) Prescribed-bathymetry timestamps are not checked for ordering or coverage of time zero, and the interpolation status returned in dummy is ignored when constructing the initial bed."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__initialize.F90#1",
+  "source_path": "trunk/src/xbeachlibrary/initialize.F90",
+  "kind": "equivalent_high",
+  "claim": "[L930,L1076-L1156] (HIGH/divide by zero / nontermination) The hotstartflow fixed-point solver divides by s%cf immediately after flow_init explicitly sets s%cf to zero, and its convergence loop has no iteration cap or nonfinite-value exit.",
+  "other_wording": "[L1076-L1156] (HIGH/division-by-zero) The hotstartflow iteration divides by s%cf even though flow_init explicitly set s%cf to zero and has not computed a friction coefficient before entering this block."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__initialize.F90#2",
+  "source_path": "trunk/src/xbeachlibrary/initialize.F90",
+  "kind": "equivalent_high",
+  "claim": "[L1362-L1377] (MED/invalid fraction acceptance) Multi-grain initialization normalizes any positive-sum fractions without rejecting individual negative fractions, so physically invalid negative bed composition can survive normalization.",
+  "other_wording": "[L1367-L1377] (MED/input-validation) Sediment-fraction normalization handles a near-zero total but never rejects negative individual fractions, so a positive total containing negatives is normalized into still-negative bed fractions."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__initialize.F90#3",
+  "source_path": "trunk/src/xbeachlibrary/initialize.F90",
+  "kind": "equivalent_high",
+  "claim": "[L1658-L1667] (MED/drifter index bounds) Drifter positions are converted to integer indices by implicit truncation after metric division and are never clamped to the grid, so offsets outside the nearest cell or zero metrics can yield invalid indices.",
+  "other_wording": "[L1658-L1666] (MED/bounds) Drifter indices are formed by adding unconstrained fractional offsets to the nearest grid index and converting to integer without clamping, so out-of-domain drifter coordinates can produce indices outside the arrays."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__initialize.F90#5",
+  "source_path": "trunk/src/xbeachlibrary/initialize.F90",
+  "kind": "equivalent_high",
+  "claim": "[L1791-L1801,L1815-L1825,L1839-L1851] (HIGH/ignored hotstart I/O errors) All low-level hotstart readers capture open and per-row read iostat values but never test them, so fixed-format mismatches or I/O failures can silently leave restart arrays partially undefined despite the earlier list-directed length check.",
+  "other_wording": "[L1795-L1801,L1819-L1825,L1843-L1851] (HIGH/input-error-handling) All low-level hotstart readers capture OPEN/READ IOSTAT but never inspect it, allowing format or I/O failures to leave restart fields partially undefined after existence/length checks pass."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__initialize.F90#6",
+  "source_path": "trunk/src/xbeachlibrary/initialize.F90",
+  "kind": "equivalent_high",
+  "claim": "[L38-L55,L242] (MED/parameter transformation ambiguity) posdwn is transformed to posdwn*abs(posdwn), so any value other than exactly -1, 0, or 1 unexpectedly rescales bathymetry rather than merely enforcing a sign convention.",
+  "other_wording": "[L48-L55] (MED/parameter-transform) posdwn is transformed as posdwn*abs(posdwn), so permitted fractional inputs change magnitude (for example 0.5 becomes 0.25) rather than merely being normalized or sign-adjusted."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__initialize.F90#8",
+  "source_path": "trunk/src/xbeachlibrary/initialize.F90",
+  "kind": "equivalent_high",
+  "claim": "[L169-L180] (HIGH/EOF nontermination) The Delft3D comment-skip loop tests line(1:1) without first handling a nonzero read iostat, so EOF after comment lines can leave the previous '*' line in place and loop indefinitely.",
+  "other_wording": "[L175-L180] (MED/input-error-handling) The Delft3D comment-skip loop does not inspect READ IOSTAT before testing line(1:1), so EOF or a read failure before a non-comment line has no controlled exit."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__initialize.F90#11",
+  "source_path": "trunk/src/xbeachlibrary/initialize.F90",
+  "kind": "equivalent_high",
+  "claim": "[L315-L347,L619-L623] (HIGH/angular-grid zero division) dtheta and dtheta_s are used as divisors without validation and rounded counts can become zero, after which allocations and sigm=sum(...)/ntheta operate on an invalid or empty angular grid.",
+  "other_wording": "[L315-L347,L619-L623] (HIGH/zero-dimension) Directional bin counts are computed with NINT and are not constrained to at least one; equal/narrow angle bounds can yield ntheta or ntheta_s zero, followed by zero-sized wave arrays and division by s%ntheta."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__initialize.F90#12",
+  "source_path": "trunk/src/xbeachlibrary/initialize.F90",
+  "kind": "equivalent_high",
+  "claim": "[L104-L133,L203-L214,L226-L253,L393-L412] (HIGH/uninitialized bathymetry use) For setbathy==1 the initial depth read is skipped, and for XBeach-format hotstart==1 it is also skipped, yet zb is sent, negated, boundary-copied, copied to zb0, and used for slopes before the later bathymetry/hotstart loaders define it.",
+  "other_wording": "[L109-L133,L203-L212,L240-L253,L395-L410] (MED/hotstart-initialization) When hotstart is enabled the bathymetry reads are skipped, but grid_bathy still negates, boundary-copies, snapshots, and differentiates the allocated zb array before hotstart_init_1 later supplies its values."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__initialize.F90#13",
+  "source_path": "trunk/src/xbeachlibrary/initialize.F90",
+  "kind": "equivalent_high",
+  "claim": "[L1211-L1224] (HIGH/missing tide initialization) For a completely wet domain under instant tide, the intended interpolation branch contains only comments and leaves both zs0fac weights zero everywhere, suppressing offshore and bay tide contributions.",
+  "other_wording": "[L1211-L1215] (HIGH/disabled-logic) For a completely wet domain under instantaneous tide, the only code intended to populate zs0fac is commented out, leaving both tide weights at the earlier all-zero initialization."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__initialize.F90#14",
+  "source_path": "trunk/src/xbeachlibrary/initialize.F90",
+  "kind": "equivalent_high",
+  "claim": "[L1580-L1594] (MED/one-dimensional index defect) For a line discharge classified in the v direction on a ny=0 grid, n1 is clamped down to zero and stored as a grid index.",
+  "other_wording": "[L1580-L1594] (MED/bounds) For a v-oriented discharge in a ny==0 model, the n1 clamp first raises the index to 1 and then lowers it to s%ny==0, storing a zero grid index in pdisch."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__initialize.F90#21",
+  "source_path": "trunk/src/xbeachlibrary/initialize.F90",
+  "kind": "confirmed_delta",
+  "claim": "[L242-L249,L395-L410,L1464-L1482] (MED/unchecked grid extent and metric) Boundary copies assume nx>=1 and slope calculations divide by dsu/dnv without checking positive nonzero grid metrics.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__initialize.F90#22",
+  "source_path": "trunk/src/xbeachlibrary/initialize.F90",
+  "kind": "confirmed_delta",
+  "claim": "[L619-L623] (MED/period division) Wave intrinsic frequency is computed as 2*pi/Trep without a local positive-period guard for boundary types that do not force Trep to 10.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__initialize.F90#23",
+  "source_path": "trunk/src/xbeachlibrary/initialize.F90",
+  "kind": "confirmed_delta",
+  "claim": "[L1011-L1012,L1037-L1056] (HIGH/hotstart state destruction) Although hotstart zs, uu, and vv are deliberately preserved during allocation and initial zeroing, flow_init later unconditionally resets uu and vv and all derived flow quantities to zero, discarding the loaded hotstart velocities.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__interp.F90#0",
+  "source_path": "trunk/src/xbeachlibrary/interp.F90",
+  "kind": "equivalent_high",
+  "claim": "[L1487-L1525] (HIGH/nontermination / invalid extent) A zero, negative, or incompatible dx/xcycle can make icycle nonpositive, leading to invalid allocations and wrapping loops that cannot progress because they add or subtract icycle.",
+  "other_wording": "[L1487-L1516] (HIGH/invalid-cycle) interp_in_cyclic_function assumes n>=2 and a positive nonzero dx/xcycle; zero or negative icycle leads invalid allocation/indexing and can make the wrap loops nonterminating."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__interp.F90#1",
+  "source_path": "trunk/src/xbeachlibrary/interp.F90",
+  "kind": "equivalent_high",
+  "claim": "[L879-L898,L939-L945] (MED/insufficient index validation) grmap and grmap2 validate references only as positive (and grmap only gates on the first reference), so references greater than n1 directly index f1 and zero or negative later grmap references are silently redirected to f1(1).",
+  "other_wording": "[L879-L898] (HIGH/bounds) grmap validates only the first reference as positive; subsequent references are not bounded above by n1, and nonpositive references are coerced to f1(1) rather than rejected."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__interp.F90#2",
+  "source_path": "trunk/src/xbeachlibrary/interp.F90",
+  "kind": "equivalent_high",
+  "claim": "[L995-L1030] (MED/precision-dependent geometry) ipon reduces translated double-precision polygon coordinates to real kind 4 before edge and crossing tests, making containment results lose precision and depend on absolute coordinate scale.",
+  "other_wording": "[L989-L1013] (MED/precision-loss) ipon converts coordinate offsets from real*8 to real*4 before edge/intersection tests, making polygon classification sensitive to large-coordinate cancellation and small cells."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__interp.F90#3",
+  "source_path": "trunk/src/xbeachlibrary/interp.F90",
+  "kind": "equivalent_high",
+  "claim": "[L266-L280,L325-L332,L440-L483] (HIGH/undefined output state) mkmap never initializes covered, so any target not processed as lying in a source cell retains undefined or caller-supplied status despite the documented default of zero.",
+  "other_wording": "[L263-L274,L316-L332,L440-L481] (HIGH/uninitialized-output) mkmap documents covered=0 as the default but never initializes covered, so targets not found inside any source cell retain undefined status."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__interp.F90#4",
+  "source_path": "trunk/src/xbeachlibrary/interp.F90",
+  "kind": "equivalent_high",
+  "claim": "[L443-L480,L458-L459,L711-L749,L726-L727,L1291-L1344] (HIGH/ignored error / undefined weights) Both mapping routines ignore bilin5's ier and copy hbuff even though bilin5 exits on several error paths without defining its INTENT(OUT) weight array, while also marking the target covered.",
+  "other_wording": "[L458-L464] (HIGH/ignored-error) mkmap ignores bilin5's error flag and stores hbuff and reference indices even when the bilinear solver exits without defining its output weights."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__interp.F90#5",
+  "source_path": "trunk/src/xbeachlibrary/interp.F90",
+  "kind": "equivalent_high",
+  "claim": "[L1379-L1409] (HIGH/integration defect) trapezoidal double-counts a full grid-cell contribution when both limits lie in the same cell or adjacent cells because Imid is formed even when there is no middle interval.",
+  "other_wording": "[L1385-L1410] (HIGH/same-cell-integration) trapezoidal double-counts when both integration limits fall in the same source interval: it adds a first partial trapezoid plus a middle full-cell contribution instead of integrating only x1 to x2."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__interp.F90#6",
+  "source_path": "trunk/src/xbeachlibrary/interp.F90",
+  "kind": "equivalent_high",
+  "claim": "[L1379-L1397] (MED/unchecked grid contract) trapezoidal assumes n>=2, nonzero ascending spacing, ordered limits, and equidistance but validates none of these before division and index calculation.",
+  "other_wording": "[L1379-L1393] (MED/input-domain) trapezoidal has no n>=2, ascending/equidistant, nonzero-dx, or x1<=x2 validation before endpoint access, division, and index construction."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__interp.F90#7",
+  "source_path": "trunk/src/xbeachlibrary/interp.F90",
+  "kind": "equivalent_high",
+  "claim": "[L1487-L1516] (HIGH/unhandled invalid branch) interp_in_cyclic_function's n>icycle+1 branch contains only a comment and leaves xc and yc uninitialized before they are used.",
+  "other_wording": "[L1491-L1493,L1516-L1545] (HIGH/unhandled-error) When n>icycle+1 the routine labels the case nonsense but performs no error return and proceeds with uninitialized xc/yc arrays."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__interp.F90#8",
+  "source_path": "trunk/src/xbeachlibrary/interp.F90",
+  "kind": "equivalent_high",
+  "claim": "[L1518-L1545] (MED/cyclic interpolation defect) The interpolation fraction uses mod(xp,dx)/dx without subtracting the grid origin and uses sign-preserving mod for negative coordinates, so shifted grids or negative query coordinates can receive incorrect or extrapolative weights even though indices are cyclically wrapped.",
+  "other_wording": "[L1518-L1545] (HIGH/cyclic-phase) The interpolation fraction uses mod(xp,dx)/dx instead of the offset from xc(1), and MOD can be negative, producing wrong or extrapolative weights for shifted grids and negative target coordinates."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__interp.F90#9",
+  "source_path": "trunk/src/xbeachlibrary/interp.F90",
+  "kind": "equivalent_high",
+  "claim": "[L525-L535,L593-L600,L708-L751] (HIGH/undefined output state) make_map declares covered INTENT(OUT) but never initializes entries for targets not found in any source cell, leaving those output elements undefined.",
+  "other_wording": "[L524-L535,L593-L600,L708-L750] (HIGH/uninitialized-output) make_map declares covered INTENT(OUT) but never initializes it globally, assigning it only for targets that pass a cell polygon test."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__interp.F90#10",
+  "source_path": "trunk/src/xbeachlibrary/interp.F90",
+  "kind": "equivalent_high",
+  "claim": "[L263-L280,L318-L337,L383-L405] (MED/zero-size bounds) mkmap accepts n2 without validation but initializes search positions to one and calls hunt on zero-length arrays when n2 is zero, where hunt reads xx(n) and xx(1).",
+  "other_wording": "[L336-L400,L574-L605,L651-L700,L1051-L1077,L1120-L1191] (HIGH/zero-size) The mapping/sort path has no n2>0 guard; with zero targets it still calls hunt/indexx, whose implementations access xx(n), xx(1), or indx(0)."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__interp.F90#12",
+  "source_path": "trunk/src/xbeachlibrary/interp.F90",
+  "kind": "equivalent_high",
+  "claim": "[L812-L833] (HIGH/unchecked division and reference bounds) mkmap_step divides by dsu and dnv without zero checks and applies unrestricted floor offsets without ensuring the updated i1,j1 still identify a valid cell, so it can emit invalid flattened references.",
+  "other_wording": "[L812-L833] (HIGH/bounds) mkmap_step updates source-cell indices using unconstrained FLOOR offsets and builds four linear indices without clamping i1/j1 to 1:m1-1 and 1:n1-1."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__interp.F90#13",
+  "source_path": "trunk/src/xbeachlibrary/interp.F90",
+  "kind": "equivalent_high",
+  "claim": "[L1457-L1470] (MED/target-size contract) interp_using_trapez_rule unconditionally reads xtarg(2) and divides by the inferred spacing, so ntarg<2 or equal first targets cause bounds or divide-by-zero failures.",
+  "other_wording": "[L1457-L1470] (HIGH/bounds) interp_using_trapez_rule unconditionally accesses xtarg(2) and divides by its spacing, with no ntarg>=2 or nonzero-spacing guard."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__math_tools.F90#0",
+  "source_path": "trunk/src/xbeachlibrary/math_tools.F90",
+  "kind": "equivalent_high",
+  "claim": "[L1117-L1121] (HIGH/array-bounds / dimension defect) flipa's flip==1 branch loops to M1 while indexing the second dimension temp3a(:,ii) and M1+1-ii, so a nonsquare M1-by-M2 array can be indexed out of bounds or only partly assigned and the branch does not actually reverse the first dimension.",
+  "other_wording": "[L1099-L1128] (HIGH/bounds-and-axis) flipa's flip==1 branch loops to M1 while indexing the second dimension and assigns whole columns, causing out-of-bounds access when M1>M2 and duplicating column-flip behavior instead of flipping rows."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__math_tools.F90#1",
+  "source_path": "trunk/src/xbeachlibrary/math_tools.F90",
+  "kind": "equivalent_high",
+  "claim": "[L337-L341,L348-L353,L372] (HIGH/undefined output status) fftradix returns for npass <= 1 without defining its INTENT(OUT) optional stat, after which fftn reads that undefined value when stat is present.",
+  "other_wording": "[L337-L342,L348-L372] (HIGH/uninitialized-status) fftradix returns immediately for npass<=1 without defining optional INTENT(OUT) stat, after which fftn tests that undefined status value."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__math_tools.F90#2",
+  "source_path": "trunk/src/xbeachlibrary/math_tools.F90",
+  "kind": "equivalent_high",
+  "claim": "[L983,L999] (LOW/unclear data contract) hilbert declares xi complex but deliberately initializes the transform from only real(xi), silently discarding any input imaginary component without documenting that xi must represent real data.",
+  "other_wording": "[L983,L999] (MED/data-loss) hilbert accepts a complex input array but explicitly copies only real(xi) into the transform buffer, silently discarding any imaginary component."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__math_tools.F90#3",
+  "source_path": "trunk/src/xbeachlibrary/math_tools.F90",
+  "kind": "equivalent_high",
+  "claim": "[L323-L332,L337-L339] (MED/unchecked dimension contract) fftn neither rejects nor reports zero, duplicate, or out-of-range dim entries (and silently truncates an oversized dim array), allowing invalid shape indexing, repeated transforms, or a zero-length normalization product.",
+  "other_wording": "[L323-L339] (HIGH/dimension-validation) fftn truncates an overlong dim list but never validates each dimension index or rejects duplicates, so zero/out-of-range entries index shape illegally and repeated entries are transformed/scaled multiple times."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__math_tools.F90#4",
+  "source_path": "trunk/src/xbeachlibrary/math_tools.F90",
+  "kind": "equivalent_high",
+  "claim": "[L323-L345] (MED/undefined output status) When a present dim array has size zero, fftn performs no fftradix call and returns without ever defining its INTENT(OUT) stat argument.",
+  "other_wording": "[L323-L343] (MED/empty-transform-status) When a present dim array has zero length, fftn performs no fftradix call and never defines the caller's optional INTENT(OUT) stat."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__math_tools.F90#5",
+  "source_path": "trunk/src/xbeachlibrary/math_tools.F90",
+  "kind": "equivalent_high",
+  "claim": "[L976-L1018] (MED/input-domain contract) hilbert accepts m without validation, and m <= 0 reaches log(real(m)) and subsequent invalid exponent/allocation/index calculations.",
+  "other_wording": "[L976-L999] (HIGH/zero-size) hilbert evaluates log(real(m)) and derives an FFT allocation size without checking m>0, so a zero-length input enters log(0) and invalid integer/exponent calculations."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__math_tools.F90#6",
+  "source_path": "trunk/src/xbeachlibrary/math_tools.F90",
+  "kind": "equivalent_high",
+  "claim": "[L1288-L1293] (LOW/integer edge case) random applies iabs to an unrestricted default integer seed, for which the most-negative representable integer is not representable after negation and can yield overflow or a nonpositive seed.",
+  "other_wording": "[L1288-L1293] (MED/integer-overflow) random seeds with iabs(j) without handling the most-negative integer, whose absolute value is not representable and can leave an invalid negative seed."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__math_tools.F90#7",
+  "source_path": "trunk/src/xbeachlibrary/math_tools.F90",
+  "kind": "equivalent_high",
+  "claim": "[L331-L338] (MED/integer overflow / bounds contract) The products of caller-provided shape values are computed in default integer without validation, so nonpositive or overflowing extents can produce invalid scaling and assumed-size array traversal.",
+  "other_wording": "[L331-L339] (HIGH/shape-validation) fftn does not require positive shape entries or guard PRODUCT overflow before using the product for scaling, loop bounds, and transform strides."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__mnemonic.F90#0",
+  "source_path": "trunk/src/xbeachlibrary/mnemonic.F90",
+  "kind": "equivalent_high",
+  "claim": "[L21-L31] (LOW/undefined pointer state) arraytype's mutually exclusive pointer components have no default NULL() initialization, so newly declared descriptors contain undefined association status for every component not explicitly set by generated mapping code.",
+  "other_wording": "[L10-L33] (MED/pointer-state) Every rank/type pointer in arraytype lacks default NULL initialization, so consumers cannot safely query association state on a newly created descriptor before the construction code explicitly initializes all unused alternatives."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__mnemoniciso.F90#0",
+  "source_path": "trunk/src/xbeachlibrary/mnemoniciso.F90",
+  "kind": "equivalent_high",
+  "claim": "[L16] (HIGH/invalid declaration) dimensions is given both a DIMENSION(maxrank) attribute and an entity array specification (20), a duplicate shape declaration that standard-conforming Fortran rejects.",
+  "other_wording": "[L16] (HIGH/declaration) The dimensions component specifies array shape twice (DIMENSION(maxrank) and an entity array spec of (20)), which is a conflicting Fortran declaration and is likely rejected by a conforming compiler."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__mnemoniciso.F90#1",
+  "source_path": "trunk/src/xbeachlibrary/mnemoniciso.F90",
+  "kind": "equivalent_high",
+  "claim": "[L32-L45] (HIGH/dangling foreign pointer) arrayf2c always returns c_loc(a) for a local three-element temporary rather than the requested farray storage, and that pointer becomes invalid when the function returns.",
+  "other_wording": "[L32-L45] (HIGH/dangling-pointer) arrayf2c returns a C pointer to the local target array a, whose lifetime ends when the function returns, and the pointer does not reference any data from farray."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__mnemoniciso.F90#2",
+  "source_path": "trunk/src/xbeachlibrary/mnemoniciso.F90",
+  "kind": "equivalent_high",
+  "claim": "[L50-L60] (HIGH/logic defect) stringlength never exits on a null character and then unconditionally overwrites every detected position with size(char_array), so it always returns the full array size.",
+  "other_wording": "[L50-L60] (HIGH/logic) stringlength records null-character positions without exiting and then unconditionally assigns size(char_array), so it always returns the full buffer size regardless of termination."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__params.F90#2",
+  "source_path": "trunk/src/xbeachlibrary/params.F90",
+  "kind": "equivalent_high",
+  "claim": "[L1709-L1714] (LOW/boundary-condition threshold) The tide auto-epsi branch tests epsi<-1 even though the configured default is exactly -1, so the documented automatic path is not entered at the default sentinel.",
+  "other_wording": "[L1710-L1714] (LOW/boundary-condition) The tide/epsi post-check tests epsi < -1 even though the configured default is exactly -1, so the documented automatic-computation notice is skipped for the default sentinel."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__params.F90#4",
+  "source_path": "trunk/src/xbeachlibrary/params.F90",
+  "kind": "equivalent_high",
+  "claim": "[L2454-L2464] (HIGH/unchecked EOF) readPointPosition searches indefinitely with external READ statements that have no iostat, so a missing or differently cased count keyword terminates on raw end-of-file instead of reporting a controlled input error.",
+  "other_wording": "[L2457-L2464] (MED/input-error-handling) readPointPosition searches indefinitely for the section keyword using reads without IOSTAT, so a missing/malformed section reaches EOF without a controlled read error or termination path."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__params.F90#10",
+  "source_path": "trunk/src/xbeachlibrary/params.F90",
+  "kind": "confirmed_delta",
+  "claim": "[L145-L167,L301-L315] (HIGH/parameter-order defect) The XBeach grid branch decides whether a depth file is required from par%hotstart before the hotstart parameter is read from params.txt, so a requested hotstart can follow stale/default state and unnecessarily require or load depfile.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__params.F90#11",
+  "source_path": "trunk/src/xbeachlibrary/params.F90",
+  "kind": "confirmed_delta",
+  "claim": "[L170-L175,L247-L266,L283-L296,L419-L434] (HIGH/advisory-only critical bounds) Critical positive quantities including dx, dy, dtheta, dtheta_s, tstop, gravity, and wave periods are read without strict=.true., so zero or negative out-of-range values only warn and can later drive divisions, invalid extents, or nonterminating angle normalization.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__params.F90#12",
+  "source_path": "trunk/src/xbeachlibrary/params.F90",
+  "kind": "confirmed_delta",
+  "claim": "[L193-L237] (MED/unchecked external grid dimensions) Delft3D mmax and nmax are converted directly to nx=mmax-1 and ny=nmax-1 without validating minimum or maximum grid sizes before downstream allocation and boundary indexing.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__params.F90#16",
+  "source_path": "trunk/src/xbeachlibrary/params.F90",
+  "kind": "confirmed_delta",
+  "claim": "[L1227-L1248] (HIGH/zero output interval accepted) tint, tintg, tintp, tintm, and tinth use strict lower bounds of zero, allowing zero intervals that timestep_init later uses as divisors when generating schedules.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__params.F90#17",
+  "source_path": "trunk/src/xbeachlibrary/params.F90",
+  "kind": "confirmed_delta",
+  "claim": "[L1536-L1538] (LOW/nonlinear option coercion) Every posdwn value below 0.1, including allowed small positive values, is coerced to -1 while other positive magnitudes remain unnormalized, making this nominal sign option behave discontinuously.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__readkey.F90#1",
+  "source_path": "trunk/src/xbeachlibrary/readkey.F90",
+  "kind": "equivalent_high",
+  "claim": "[L806-L913] (HIGH/optional-argument misuse) setallowednames tests only each optional name aN before dereferencing the independently optional value vN, so legal calls that omit a paired value reference an absent optional argument.",
+  "other_wording": "[L819-L912] (MED/optional-argument-contract) setallowednames tests only presence of each name and then dereferences its paired optional integer without verifying that the integer is present, making malformed public calls undefined."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__readkey.F90#2",
+  "source_path": "trunk/src/xbeachlibrary/readkey.F90",
+  "kind": "equivalent_high",
+  "claim": "[L238-L300] (HIGH/alias-table bounds) readkey_str maps old option j to allowed(j) without requiring nov<=nv, while the independent allowed/old-name setup APIs permit more old names than allowed names.",
+  "other_wording": "[L238-L300] (MED/index-contract) Legacy-name translation indexes allowed(j) for every old name without enforcing nov<=nv, so a caller that registers more legacy aliases than canonical names reads beyond the allowed array."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__readkey.F90#3",
+  "source_path": "trunk/src/xbeachlibrary/readkey.F90",
+  "kind": "equivalent_high",
+  "claim": "[L585-L643] (HIGH/fixed-cache overflow) readkey stores every line containing '=' into fixed 1024-element keyword/value arrays without checking ikey before incrementing, so a larger parameter file writes out of bounds.",
+  "other_wording": "[L597-L641] (HIGH/bounds) readkey caches key/value pairs in fixed 1024-element arrays but increments ikey for every line containing '=' without a capacity check, allowing a sufficiently large parameter file to index past both arrays."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__readkey.F90#4",
+  "source_path": "trunk/src/xbeachlibrary/readkey.F90",
+  "kind": "equivalent_high",
+  "claim": "[L106-L149,L194-L235,L274-L322,L358-L380,L420-L462,L501-L543] (MED/undefined MPI result) When bcast is false, all scalar and vector readers assign results only on xmaster, so non-master callers receive undefined function results despite the routines remaining publicly callable on all ranks.",
+  "other_wording": "[L57-L149,L152-L235,L238-L322,L326-L381,L384-L462,L465-L543] (MED/mpi-contract) The scalar and vector readers assign results only on xmaster and leave non-master results undefined when bcast is false, but the public interfaces do not constrain bcast=false calls to master-only execution."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__readkey.F90#5",
+  "source_path": "trunk/src/xbeachlibrary/readkey.F90",
+  "kind": "equivalent_high",
+  "claim": "[L1021-L1105] (HIGH/optional-argument misuse) read_v_9 assumes optional outputs are present contiguously; presence of a higher-numbered argument causes all lower arguments to be read and broadcast even if some were omitted via keywords.",
+  "other_wording": "[L1032-L1105] (MED/optional-argument-contract) read_v_9 assumes optional outputs form a contiguous prefix (for example, presence of a8 implies a1 through a7) and dereferences/broadcasts earlier optional arguments without PRESENT checks."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__readkey.F90#6",
+  "source_path": "trunk/src/xbeachlibrary/readkey.F90",
+  "kind": "equivalent_high",
+  "claim": "[L109-L114] (MED/numeric parsing truncation) readkey_dbl parses through fixed F10.0 format, so only a ten-character field is consumed and longer valid floating-point values can be truncated or rejected.",
+  "other_wording": "[L106-L114] (HIGH/numeric-parsing) readkey_dbl parses every value with fixed-width F10.0, so numeric text longer than ten columns can be truncated or rejected even though the backing value buffer is much longer."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__readkey.F90#7",
+  "source_path": "trunk/src/xbeachlibrary/readkey.F90",
+  "kind": "equivalent_high",
+  "claim": "[L423-L440,L504-L521] (HIGH/ignored conversion error) Both vector readers handle only negative internal-read iostat, so a positive iostat from an invalid token is ignored and partially undefined elements are subsequently range-checked, logged, and returned.",
+  "other_wording": "[L420-L440] (HIGH/input-error-handling) readkey_dblvec handles only negative IOSTAT after list-directed conversion; a positive IOSTAT from an invalid token is ignored and partially undefined vector elements are subsequently range-checked and returned."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__readkey.F90#9",
+  "source_path": "trunk/src/xbeachlibrary/readkey.F90",
+  "kind": "confirmed_delta",
+  "claim": "[L384-L463,L465-L544] (HIGH/vector bounds and undefined tail) The vector readers never require 0<=vlength<=tlength, directly section value_vec(1:vlength), and leave result elements vlength+1:tlength undefined.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__readkey.F90#10",
+  "source_path": "trunk/src/xbeachlibrary/readkey.F90",
+  "kind": "confirmed_delta",
+  "claim": "[L603-L643] (MED/stale file cache) The parameter cache is invalidated only when the filename string changes, so rereading a modified file under the same name returns stale values and stale used-key tracking.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__readkey.F90#12",
+  "source_path": "trunk/src/xbeachlibrary/readkey.F90",
+  "kind": "confirmed_delta",
+  "claim": "[L762-L804] (HIGH/undefined optional MPI output) parmapply assigns optional parm_str only on xmaster and never broadcasts it, so a present parm_str is undefined on non-master ranks even when parameter broadcasting is enabled.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__readkey.F90#14",
+  "source_path": "trunk/src/xbeachlibrary/readkey.F90",
+  "kind": "confirmed_delta",
+  "claim": "[L1136-L1148] (LOW/input corruption) strippedline replaces every byte outside printable 7-bit ASCII with a blank, silently corrupting valid non-ASCII parameter values and filenames.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__spaceparams.F90#0",
+  "source_path": "trunk/src/xbeachlibrary/spaceparams.F90",
+  "kind": "equivalent_high",
+  "claim": "[L1114-L1129,L1135] (HIGH/false collection state) For real rank-1 arrays and unsupported real ranks/types, space_collect_index performs no collection yet still marks sg%collected(index) true, suppressing future attempts.",
+  "other_wording": "[L1114-L1135] (HIGH/false-success) Real variables of unhandled rank (notably rank 1) and unknown real cases fall through without collection but are still marked sg%collected(index)=.true., suppressing future attempts."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__spaceparams.F90#1",
+  "source_path": "trunk/src/xbeachlibrary/spaceparams.F90",
+  "kind": "equivalent_high",
+  "claim": "[L65-L101,L104-L122] (LOW/inconsistent index validation) index_allocate and index_allocated do not validate index as indextos does, and an invalid index can silently no-op or be reported allocated because the default result is true.",
+  "other_wording": "[L82-L101,L104-L121] (MED/index-validation) index_allocate and index_allocated do not validate index or reject an unknown choice, unlike indextos, so invalid requests can silently no-op or report a scalar-like allocated result."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__spaceparams.F90#2",
+  "source_path": "trunk/src/xbeachlibrary/spaceparams.F90",
+  "kind": "equivalent_high",
+  "claim": "[L306-L365] (LOW/asymmetric API contract) space_distribute_vector treats every xy value other than lowercase 'x' as a y distribution, while space_distribute_block_vector accepts only lowercase 'y' and aborts for all other values.",
+  "other_wording": "[L329-L336] (MED/selector-contract) space_distribute_vector treats every selector other than lowercase 'x' as 'y', allowing typos or unsupported selectors to choose the wrong decomposition silently."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__spaceparams.F90#3",
+  "source_path": "trunk/src/xbeachlibrary/spaceparams.F90",
+  "kind": "equivalent_high",
+  "claim": "[L1065-L1087,L1135] (MED/unchecked collection index) space_collect_index uses index directly in sg%collected before indextos can validate it, and space_collect_mnem passes through chartoindex results without checking for an unknown mnemonic.",
+  "other_wording": "[L1083-L1101,L1147-L1156] (HIGH/bounds) space_collect_mnem passes chartoindex's -1 failure result to space_collect_index, which indexes sg%collected(index) before the later indextos range check can reject it."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__spaceparams.F90#5",
+  "source_path": "trunk/src/xbeachlibrary/spaceparams.F90",
+  "kind": "equivalent_high",
+  "claim": "[L1335-L1398] (HIGH/degenerate-cell division) gridprops inverts computed cell areas, and in 1D products of metrics, without rejecting zero-area or repeated-coordinate cells, producing infinite geometric factors.",
+  "other_wording": "[L1335-L1399] (MED/division-by-zero) Grid-cell inverse areas are formed by unconditional division by computed polygon areas (or metric products) with no local degeneracy/zero-area guard."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__spaceparams.F90#11",
+  "source_path": "trunk/src/xbeachlibrary/spaceparams.F90",
+  "kind": "confirmed_delta",
+  "claim": "[L1175-L1253,L1402-L1419] (MED/minimum-grid bounds) gridprops assumes nx>=1 throughout and requires nx>=2 to define alfaz from an interior point; with nx=1 its two boundary-copy assignments merely circulate an uninitialized orientation.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__spaceparamsdef.F90#0",
+  "source_path": "trunk/src/xbeachlibrary/spaceparamsdef.F90",
+  "kind": "equivalent_high",
+  "claim": "[L57-L60] (MED/uninitialized global ranges) All exported computational range bounds lack initial values, so any use before ranges_init receives undefined indices.",
+  "other_wording": "[L57-L60] (MED/global-state-initialization) The public module-wide stencil-bound integers have no initialization, so any caller that observes them before the separate setup routine assigns every bound receives undefined state."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__timestep.F90#0",
+  "source_path": "trunk/src/xbeachlibrary/timestep.F90",
+  "kind": "equivalent_high",
+  "claim": "[L162-L168,L200-L205,L238-L243,L276-L285,L319-L328] (MED/unchecked interval arithmetic) Generated schedules divide by wavint/tintg/tintp/tintm/tinth and allocate from the result without local checks for zero, negative, or otherwise invalid intervals and time ranges.",
+  "other_wording": "[L201-L205,L239-L243,L277-L285,L320-L328] (HIGH/division-by-zero) Fixed schedule construction divides by tintg, tintp, tintm, or tinth even though the parameter reader allows each interval to be zero."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__timestep.F90#1",
+  "source_path": "trunk/src/xbeachlibrary/timestep.F90",
+  "kind": "equivalent_high",
+  "claim": "[L566-L574] (HIGH/dimensional timestep defect) In the 1D viscosity criterion mdx is a squared spacing but positive par%dy is assigned to mdy without squaring, unlike the 2D branch, producing a dimensionally inconsistent and incorrect stability limit.",
+  "other_wording": "[L566-L574] (HIGH/dimensional-consistency) In the 1D viscosity criterion mdx is a squared spacing, but when par%dy>0 mdy is assigned the unsquared spacing before mdx*mdy/(mdx+mdy), unlike the squared-spacing formulation used in 2D."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__timestep.F90#2",
+  "source_path": "trunk/src/xbeachlibrary/timestep.F90",
+  "kind": "equivalent_high",
+  "claim": "[L437,L661-L668,L706-L710] (MED/implicit initialization contract) timestep's saved dtref has no explicit initial value and compute_dt initializes it only when it happens to equal zero or enters a t<=0 branch, making calls that begin at positive time depend on undefined saved state.",
+  "other_wording": "[L706,L710,L661-L668] (HIGH/uninitialized-state) The SAVE variable dtref in timestep has no initialization before its first call to compute_dt, whose only initialization path requires dtref to compare equal to exactly zero."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__timestep.F90#3",
+  "source_path": "trunk/src/xbeachlibrary/timestep.F90",
+  "kind": "equivalent_high",
+  "claim": "[L363-L406] (MED/unsorted schedule inconsistency) Current-output tests follow each array's counter order while next-time selection takes a masked minval over the full array, so unsorted file schedules can be stepped to without being emitted and counters can become permanently misaligned.",
+  "other_wording": "[L184-L199,L222-L237,L260-L275,L303-L318,L363-L404] (MED/schedule-ordering) Schedule files are neither sorted nor checked for monotonicity, while current-event detection advances in file order but tnext uses MINVAL over all future values, so an unsorted file can schedule a time that the index-based detector will not emit."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__timestep.F90#5",
+  "source_path": "trunk/src/xbeachlibrary/timestep.F90",
+  "kind": "equivalent_high",
+  "claim": "[L143-L158] (HIGH/uninitialized lifecycle state) timestep_init initializes the other counters and output flags but omits tpar%ith and tpar%outputh, which are subsequently read and incremented by outputtimes_update.",
+  "other_wording": "[L103-L116,L146-L157] (HIGH/uninitialized-state) timestep_init initializes four counters and four specific output flags but omits ith and outputh, which are later used to index tph and determine output."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__timestep.F90#11",
+  "source_path": "trunk/src/xbeachlibrary/timestep.F90",
+  "kind": "confirmed_delta",
+  "claim": "[L363-L406] (HIGH/duplicate schedule deadlock) For duplicate scheduled times, each output counter advances only once while tnext excludes all times equal to the current time, leaving the counter pinned on the duplicate and preventing that output category from matching later times.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__timestep.F90#15",
+  "source_path": "trunk/src/xbeachlibrary/timestep.F90",
+  "kind": "confirmed_delta",
+  "claim": "[L595-L629] (MED/unchecked permeability division) Groundwater stability calculations divide directly by par%kx and par%ky without local positivity checks when their respective branches are enabled.",
+  "other_wording": null
+ }
+]

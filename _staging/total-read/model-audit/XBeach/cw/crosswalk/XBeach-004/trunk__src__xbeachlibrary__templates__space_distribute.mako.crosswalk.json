@@ -37,7 +37,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The latent USEMPI/toall=.true. path is broken, but xmpi_imaster is computational-master outer rank 1 (xmpi.F90:28,270), not xomaster/output rank 0; iamsrc and src therefore disagree. All repository distribution callers omit toall, and if that option is used the helpers explicitly abort on root!=0 before their collective, so an existing-run collective hang is not established.",
+    "neutralizer": {
+     "where": "trunk/src/xbeachlibrary/templates/genmpi_distr.mako:L6-L9",
+     "quote": "if (root /= 0) then\n  print *,'Error in matrix_distr_real8: root must be 0, but is:',root\n  call MPI_Abort(MPI_COMM_WORLD,1,ier)\nendif"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "base_only",

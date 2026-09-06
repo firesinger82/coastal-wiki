@@ -1,0 +1,534 @@
+[
+ {
+  "vid": "trunk__src__pybeach__xbeach__libxbeach.py#0",
+  "source_path": "trunk/src/pybeach/xbeach/libxbeach.py",
+  "kind": "equivalent_high",
+  "claim": "[L98-L119,L131-L144,L206-L227,L254-L264] (HIGH/python3/ffi-contract) ctypes c_char.value is bytes on Python 3, but all type-code branches compare it with text strings, causing valid native type codes to fall through as unsupported.",
+  "other_wording": "[L21-L23,L93-L119,L127-L144,L166-L184,L192-L227,L243-L276] (HIGH/Python 3 incompatibility) ctypes c_char results are bytes and create_string_buffer requires bytes under Python 3, but the wrapper consistently compares type codes with str literals and assumes string inputs, making core parameter and array dispatch fail."
+ },
+ {
+  "vid": "trunk__src__pybeach__xbeach__libxbeach.py#1",
+  "source_path": "trunk/src/pybeach/xbeach/libxbeach.py",
+  "kind": "equivalent_high",
+  "claim": "[L26-L38,L278-L285] (MED/portability/resource-lifecycle) The explicit unload path assumes a Unix-style libdl and repeatedly calls dlclose based on an external lsof/grep probe, which is not a reliable or portable library-lifetime contract (notably on Windows and systems without lsof).",
+  "other_wording": "[L26-L47,L278-L285] (MED/unsafe unload loop) Finalization repeatedly calls dlclose on one saved handle until a shell-based lsof probe says the path is absent, which can reuse an already-closed handle or unload a library still shared by another wrapper instance."
+ },
+ {
+  "vid": "trunk__src__pybeach__xbeach__libxbeach.py#3",
+  "source_path": "trunk/src/pybeach/xbeach/libxbeach.py",
+  "kind": "equivalent_high",
+  "claim": "[L256-L263] (HIGH/type-mismatch) For a rank-zero integer array, set_array selects c_double instead of c_int, passing scalar storage with the wrong native representation to set0dintarray.",
+  "other_wording": "[L261-L276] (HIGH/wrong scalar type) The integer scalar setter uses c_double rather than c_int and passes that address to set0dintarray, causing the Fortran side to reinterpret floating-point bytes as an integer."
+ },
+ {
+  "vid": "trunk__src__pybeach__xbeach__libxbeach.py#6",
+  "source_path": "trunk/src/pybeach/xbeach/libxbeach.py",
+  "kind": "equivalent_high",
+  "claim": "[L98-L105] (HIGH/ffi/memory-safety) Character parameter retrieval allocates only one c_char and passes it as the native output buffer even though valuelength is returned after the call, so a multi-character native result can overwrite the Python-owned object.",
+  "other_wording": "[L98-L102] (HIGH/output buffer overflow) Character-parameter retrieval allocates only one c_char even though the Fortran entry point writes a full fixed-length character array into that address."
+ },
+ {
+  "vid": "trunk__src__pybeach__xbeach__libxbeach.py#15",
+  "source_path": "trunk/src/pybeach/xbeach/libxbeach.py",
+  "kind": "confirmed_delta",
+  "claim": "[L251-L253] (LOW/validation) Shape compatibility is enforced only with assert, so optimized Python execution removes this guard before native memory is passed.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__pybeach__xbeach__libxbeach.py#16",
+  "source_path": "trunk/src/pybeach/xbeach/libxbeach.py",
+  "kind": "confirmed_delta",
+  "claim": "[L258-L264] (MED/input-validation) set_array has no unsupported-type else branch, so an unexpected native type code reaches function-name construction with dtype and typename uninitialized.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__general_mpi_new.F90#0",
+  "source_path": "trunk/src/xbeachlibrary/general_mpi_new.F90",
+  "kind": "equivalent_high",
+  "claim": "[L110-L134,L180-L231,L278-L323,L380-L463,L525-L606,L659-L725,L769-L837,L900-L1019,L1092-L1223,L1303-L1417,L1455-L1570,L1729-L1753] (MED/mpi/error-handling) MPI status codes are consistently captured but not checked, so communication failures can leave partially populated arrays or enter later waits with invalid requests.",
+  "other_wording": "[L110-L134,L180-L231,L278-L323,L380-L463,L525-L606,L659-L725,L769-L837,L900-L1019,L1092-L1223,L1303-L1417,L1455-L1570,L1730-L1753] (LOW/unchecked MPI status) MPI return codes are stored throughout the module but never tested, so communication failures are not distinguished from valid results."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__general_mpi_new.F90#2",
+  "source_path": "trunk/src/xbeachlibrary/general_mpi_new.F90",
+  "kind": "equivalent_high",
+  "claim": "[L389-L454,L534-L596] (HIGH/mpi/liveness) Both column-send root loops terminate only after incrementing sends, so a valid zero-total workload makes the unbounded loop advance j forever.",
+  "other_wording": "[L421-L454,L563-L596] (MED/nontermination edge case) If sum(ln(1:procs)) is zero on the root, the unconditional loop has no send event that can reach its exit test and runs forever; no positive-dimension precondition is enforced."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__introspection.F90#0",
+  "source_path": "trunk/src/xbeachlibrary/introspection.F90",
+  "kind": "equivalent_high",
+  "claim": "[L454-L483] (HIGH/dimension-validation) Dimension-size lookup rejects only dim values greater than rank; zero or negative dimensions pass through and can reach SIZE with an invalid DIM argument, while rank-1 lookup ignores dim entirely.",
+  "other_wording": "[L468-L482] (MED/dimension validation) getarraydimsize_c checks only rank < dim, so dim values of zero or less can reach the SIZE intrinsic with an invalid dimension argument."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__introspection.F90#1",
+  "source_path": "trunk/src/xbeachlibrary/introspection.F90",
+  "kind": "equivalent_high",
+  "claim": "[L164-L180,L359-L376] (HIGH/bounds) Parameter and array name lookup index allocatable key/state tables directly without checking the caller-supplied index range.",
+  "other_wording": "[L173-L180,L369-L376] (HIGH/unchecked index) The parameter-name and array-name entry points index keys or call indextos without validating the caller-supplied index, so an out-of-range C/API index can cause an out-of-bounds access."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__introspection.F90#2",
+  "source_path": "trunk/src/xbeachlibrary/introspection.F90",
+  "kind": "equivalent_high",
+  "claim": "[L454-L484] (HIGH/status-contract) getarraydimsize_c initializes its status to -1 and never sets it to zero after successfully computing dimsize, so every call reports failure.",
+  "other_wording": "[L454-L484] (MED/incorrect status contract) getarraydimsize_c initializes its function result to -1 and never changes it to success after computing dimsize, so every successful dimension query is reported as a failure."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__introspection.F90#3",
+  "source_path": "trunk/src/xbeachlibrary/introspection.F90",
+  "kind": "equivalent_high",
+  "claim": "[L124-L149] (HIGH/error-propagation) getparametertype_c always returns success zero and does not validate the index returned by getkey_indextype, so an unknown parameter can return an undefined type code as a successful query.",
+  "other_wording": "[L145-L149] (MED/false success status) getparametertype_c unconditionally returns success and does not propagate whether getkey_indextype found the requested parameter."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__introspection.F90#4",
+  "source_path": "trunk/src/xbeachlibrary/introspection.F90",
+  "kind": "equivalent_high",
+  "claim": "[L574-L743,L807-L881] (MED/pointer-lifetime) Array C getters return pointers into one saved scratch allocation per rank and deallocate that allocation on the next same-rank getter call, but this short lifetime is not exposed in the API.",
+  "other_wording": "[L587-L600,L635-L647,L682-L694,L730-L742,L820-L832,L868-L879] (MED/returned pointer lifetime) Each nonscalar C getter returns a pointer into a saved scratch allocation that is deallocated by the next call of the same rank/type, silently invalidating previously returned data and making the API non-reentrant."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__introspection.F90#5",
+  "source_path": "trunk/src/xbeachlibrary/introspection.F90",
+  "kind": "equivalent_high",
+  "claim": "[L486-L507,L510-L1260] (MED/rank-type-validation) Generic and rank-specific array entry points validate only the mnemonic, not that the selected array's type and rank match the routine, before dereferencing a specific pointer component.",
+  "other_wording": "[L520-L524,L565-L569,L613-L617,L660-L664,L708-L712,L756-L760,L799-L803,L847-L851,L894-L898,L941-L945,L988-L992,L1035-L1039,L1082-L1086,L1130-L1134,L1178-L1182,L1226-L1230] (MED/type/rank validation) Typed getters and setters validate only that a name exists, not that its registered type and rank match the selected entry point, so a wrong API choice can dereference an unassociated arraytype component."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__introspection.F90#6",
+  "source_path": "trunk/src/xbeachlibrary/introspection.F90",
+  "kind": "equivalent_high",
+  "claim": "[L902-L1023,L1043-L1260] (HIGH/ffi/pointer-validation) All C array setters convert and dereference the incoming c_ptr without checking c_associated or receiving a buffer length, so null or undersized caller buffers cannot be rejected.",
+  "other_wording": "[L949-L975,L996-L1022,L1090-L1116,L1138-L1164,L1186-L1212,L1234-L1260] (LOW/buffer-size contract) C array setters infer the model target shape but accept no source-buffer length, leaving no way to reject a caller buffer that is too short before copying that many elements."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__introspection.F90#7",
+  "source_path": "trunk/src/xbeachlibrary/introspection.F90",
+  "kind": "equivalent_high",
+  "claim": "[L529-L552,L764-L787] (HIGH/dangling-pointer) Scalar C getters return c_loc of an unsaved local target, so the pointer becomes undefined as soon as the function returns.",
+  "other_wording": "[L529-L552,L764-L787] (HIGH/dangling C pointer) The scalar C getters return c_loc of an automatic local target (r0 or i0), whose lifetime ends when the function returns, leaving the caller with an invalid pointer."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__introspection.F90#10",
+  "source_path": "trunk/src/xbeachlibrary/introspection.F90",
+  "kind": "confirmed_delta",
+  "claim": "[L137-L149,L203-L223,L245-L269,L290-L311,L316-L336,L392-L406,L422-L436,L454-L505,L529-L1260] (HIGH/ffi/string-bounds) C entry points pass variable-length name arrays to char_array_to_string, whose dummy contract reads up to 1024 elements, so length-sized buffers without an in-range NUL can be read beyond their declared extent.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__introspection.F90#11",
+  "source_path": "trunk/src/xbeachlibrary/introspection.F90",
+  "kind": "confirmed_delta",
+  "claim": "[L203-L224,L290-L312] (HIGH/type-confusion) Numeric parameter getters do not verify myparam's type before reading r0 or i0, so calling a getter with a valid name of the wrong type accesses the wrong parameter component.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__iso_c_utils.f90#0",
+  "source_path": "trunk/src/xbeachlibrary/iso_c_utils.f90",
+  "kind": "equivalent_high",
+  "claim": "[L11-L21] (MED/string-validation) strlen returns zero both for an empty string and for a full 1024-byte array with no NUL terminator, so unterminated input is silently misinterpreted as empty.",
+  "other_wording": "[L14-L21] (MED/unterminated string handling) strlen returns zero rather than MAXSTRINGLEN when no NUL byte is present, causing a full nonterminated buffer to be misreported as empty."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__iso_c_utils.f90#1",
+  "source_path": "trunk/src/xbeachlibrary/iso_c_utils.f90",
+  "kind": "equivalent_high",
+  "claim": "[L27-L34] (HIGH/wrong-argument) strcmp constructs both string1 and string2 from char_array1, causing every comparison to report equality.",
+  "other_wording": "[L30-L34] (HIGH/comparison logic) strcmp converts char_array1 into both string1 and string2, so it never compares the second input and always returns equality."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__iso_c_utils.f90#2",
+  "source_path": "trunk/src/xbeachlibrary/iso_c_utils.f90",
+  "kind": "equivalent_high",
+  "claim": "[L60-L68] (HIGH/bounds) string_to_char_array does not cap len_trim to MAXSTRINGLEN-1, so strings of length 1024 or more write beyond the result when data and the terminator are stored.",
+  "other_wording": "[L60-L68] (HIGH/buffer overflow) string_to_char_array does not reject or truncate input strings of length 1024 or greater, and writes the terminator at len_trim(string)+1 beyond its fixed 1024-element result."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__iso_c_utils.f90#4",
+  "source_path": "trunk/src/xbeachlibrary/iso_c_utils.f90",
+  "kind": "confirmed_delta",
+  "claim": "[L30-L34] (LOW/semantic-contract) strcmp trims both converted strings and uses Fortran lexical comparison, which does not preserve ordinary C strcmp behavior for spaces preceding the NUL.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__libxbeach.F90#1",
+  "source_path": "trunk/src/xbeachlibrary/libxbeach.F90",
+  "kind": "equivalent_high",
+  "claim": "[L228-L237] (HIGH/uninitialized-result) outputext assigns its function result only when module error is exactly 0 or 1, leaving the C-visible return value undefined for any other error code.",
+  "other_wording": "[L228-L239] (MED/undefined/stale status) outputext tests the library module's stale error variable rather than receiving a status from output, and leaves its function result undefined for error values other than 0 or 1."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__libxbeach.F90#2",
+  "source_path": "trunk/src/xbeachlibrary/libxbeach.F90",
+  "kind": "equivalent_high",
+  "claim": "[L278-L316] (HIGH/error-propagation) executestep sets error through timestep and skips physics on failure, but then unconditionally increments the completed-step count and returns success zero.",
+  "other_wording": "[L278-L316] (HIGH/error propagation) executestep suppresses a nonzero timestep error by skipping physics but then unconditionally increments the step count and returns success."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__libxbeach.F90#6",
+  "source_path": "trunk/src/xbeachlibrary/libxbeach.F90",
+  "kind": "confirmed_delta",
+  "claim": "[L269-L274,L330-L336] (MED/uninitialized-timing) MPI finalization passes saved t01 to timing output even though t01 is assigned only when execute_counter equals 1, so short or failed runs can finalize with an undefined loop-start timestamp.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__logging.F90#0",
+  "source_path": "trunk/src/xbeachlibrary/logging.F90",
+  "kind": "equivalent_high",
+  "claim": "[L151-L181] (MED/arithmetic-input-contract) progress_indicator does not require positive dper, dt, or count_rate; in particular dper=0 reaches mod(curper,dper) and divides by zero.",
+  "other_wording": "[L166-L180] (MED/division by zero) progress_indicator permits dper equal to zero and then can evaluate mod(curper,dper), which is undefined for a zero divisor."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__logging.F90#1",
+  "source_path": "trunk/src/xbeachlibrary/logging.F90",
+  "kind": "equivalent_high",
+  "claim": "[L304-L313] (MED/arithmetic) Final timing divides by timestep count n without guarding n=0, affecting both average timestep and performance calculations.",
+  "other_wording": "[L302-L313] (MED/division by zero) writelog_finalize divides by the timestep count n without guarding the valid lifecycle case in which finalization occurs before any execute step."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__logging.F90#3",
+  "source_path": "trunk/src/xbeachlibrary/logging.F90",
+  "kind": "equivalent_high",
+  "claim": "[L84-L93] (HIGH/io-error-handling) Log-file OPEN statements have no iostat checks, while the reported error is based only on whether a positive unit number was found, so actual open failures are not detected.",
+  "other_wording": "[L84-L93] (MED/file-open error handling) The OPEN statements have no IOSTAT handling and the subsequent error test checks only whether a unit number was available, not whether any log file was successfully opened."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__ncoutput.F90#0",
+  "source_path": "trunk/src/xbeachlibrary/ncoutput.F90",
+  "kind": "equivalent_high",
+  "claim": "[L1357-L1377] (HIGH/unallocated-access) Fortran-compatible rank-3 and rank-4 point output reads local temporaries r3 and r4 on the I/O path even though extracted values were stored in pointoutputs and those temporaries have already been deallocated or were never allocated there.",
+  "other_wording": "[L1357-L1377] (HIGH/unallocated array access) The Fortran-compatible rank-3 and rank-4 point paths read local allocatables r3 and r4 after the sampling phase instead of pointoutputs, but those temporaries are not allocated there."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__ncoutput.F90#1",
+  "source_path": "trunk/src/xbeachlibrary/ncoutput.F90",
+  "kind": "equivalent_high",
+  "claim": "[L374-L425] (MED/input-validation) Global variable setup passes unchecked mnemonic indices to indextos, and an unsupported type leaves its ID at -1 but still proceeds to attach attributes to that invalid ID.",
+  "other_wording": "[L375-L380,L481-L485,L1025-L1029,L1143-L1147,L1319-L1323,L1780-L1784,L1811-L1812] (MED/unchecked mnemonic lookup) Multiple output paths pass chartoindex results directly to indextos or mnemonic indexing without checking for -1, so an invalid configured variable can become an out-of-bounds access rather than a controlled configuration error."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__ncoutput.F90#2",
+  "source_path": "trunk/src/xbeachlibrary/ncoutput.F90",
+  "kind": "equivalent_high",
+  "claim": "[L2124-L2131,L2144-L2151,L2164-L2173] (MED/io-error-handling) All hotstart writers capture OPEN iostat but never check it and then perform unguarded writes and close operations; they also omit replacement semantics for existing files.",
+  "other_wording": "[L2127-L2131,L2147-L2151,L2167-L2173] (MED/ignored I/O error) Hotstart writers capture OPEN failures in ierr but never test it and proceed to write and close the unit as if the file were valid."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__ncoutput.F90#5",
+  "source_path": "trunk/src/xbeachlibrary/ncoutput.F90",
+  "kind": "equivalent_high",
+  "claim": "[L1149-L1198] (HIGH/missing-rank-support) Integer global variables are defined for ranks 0 through 4 during initialization, but writing omits ranks 1 and 4 and only prints a message, leaving their records unwritten.",
+  "other_wording": "[L1150-L1198] (MED/rank support inconsistency) Integer global variables are declared for ranks 0 through 4 during initialization, but the writer handles only ranks 0, 2, and 3, silently leaving rank-1 or rank-4 variables unwritten."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__ncoutput.F90#6",
+  "source_path": "trunk/src/xbeachlibrary/ncoutput.F90",
+  "kind": "equivalent_high",
+  "claim": "[L486-L527] (HIGH/unsupported-type) Point initialization creates IDs only for real variables, but the default branch merely prints for other types and then unconditionally uses the uninitialized pointsvarids entry for attributes.",
+  "other_wording": "[L481-L527] (MED/uninitialized NetCDF variable id) pointsvarids is not initialized, and an unsupported point-variable type merely prints a message before attributes are written through the unassigned ID."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__ncoutput.F90#7",
+  "source_path": "trunk/src/xbeachlibrary/ncoutput.F90",
+  "kind": "equivalent_high",
+  "claim": "[L1350-L1371] (HIGH/partial-write) NetCDF point output for rank-3 and rank-4 variables writes only element (1,1,1) or (1,1,1,1) while the variables were defined with full trailing dimensions, leaving all other components unwritten.",
+  "other_wording": "[L1350-L1371] (HIGH/truncated scientific output) Rank-3 and rank-4 NetCDF point output passes only the single first scalar of each sampled array, so all other vertical/class dimensions remain unwritten despite being declared in the variable."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__ncoutput.F90#8",
+  "source_path": "trunk/src/xbeachlibrary/ncoutput.F90",
+  "kind": "equivalent_high",
+  "claim": "[L1088-L1102] (HIGH/wrong-rank-component) The non-MPI rank-4 point path allocates its third dimension from t%r3 instead of t%r4, potentially dereferencing an unassociated pointer and producing the wrong shape.",
+  "other_wording": "[L1099-L1102] (HIGH/wrong array component) The non-MPI rank-4 point path sizes its third dimension from t%r3 instead of t%r4, which can dereference an unassociated rank-3 component and allocates the wrong shape."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__ncoutput.F90#13",
+  "source_path": "trunk/src/xbeachlibrary/ncoutput.F90",
+  "kind": "confirmed_delta",
+  "claim": "[L127-L130,L169-L247,L1134-L1136,L1300-L1302,L1554-L1559] (HIGH/uninitialized-state) The NetCDF-only initializer never initializes saved output counters, while ncoutput increments them and uses itd directly as the drifter record index; those counters are initialized only by fortoutput_init.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__ncoutput.F90#16",
+  "source_path": "trunk/src/xbeachlibrary/ncoutput.F90",
+  "kind": "confirmed_delta",
+  "claim": "[L491-L516] (MED/validation-without-stop) A point variable whose first two dimensions are not x and y only produces a log message and is still defined and later sampled as a spatial field.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__ncoutput.F90#19",
+  "source_path": "trunk/src/xbeachlibrary/ncoutput.F90",
+  "kind": "confirmed_delta",
+  "claim": "[L1139,L1305,L1415] (HIGH/time-scaling) Global, point, and mean NetCDF times are always multiplied by morfac, whereas the rest of the module and BMI time API apply that scaling only when morfacopt equals 1.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__ncoutput.F90#21",
+  "source_path": "trunk/src/xbeachlibrary/ncoutput.F90",
+  "kind": "confirmed_delta",
+  "claim": "[L1432-L1438,L1500-L1505] (HIGH/scientific-output) thetamean output applies a legacy packed-value decoding expression even though the active averaging code stores a direct atan2 angle, corrupting both NetCDF and Fortran angular means.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__ncoutput.F90#22",
+  "source_path": "trunk/src/xbeachlibrary/ncoutput.F90",
+  "kind": "confirmed_delta",
+  "claim": "[L1546-L1548] (MED/format-dependent-state) The next averaging interval is updated only inside the Fortran-compatible output branch, so NetCDF-only runs retain the configured nominal interval even when the final or scheduled interval differs.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__ncoutput.F90#23",
+  "source_path": "trunk/src/xbeachlibrary/ncoutput.F90",
+  "kind": "confirmed_delta",
+  "claim": "[L1554-L1595] (MED/time-coordinate-consistency) Drifter NetCDF time is written as raw par%t while global, point, and mean time coordinates in the same file use morphological scaling, producing inconsistent time axes when scaling is active.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__ncoutput.F90#25",
+  "source_path": "trunk/src/xbeachlibrary/ncoutput.F90",
+  "kind": "confirmed_delta",
+  "claim": "[L1811-L1825] (HIGH/wrong-type-component) Fortran mean-file record lengths are always derived from real pointer components even though the averaging initializer permits integer mean variables.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__ncoutput.F90#26",
+  "source_path": "trunk/src/xbeachlibrary/ncoutput.F90",
+  "kind": "confirmed_delta",
+  "claim": "[L1843-L1857] (MED/stale-output) Lazily opened global Fortran files omit status='replace', so an existing longer file from a prior run can retain stale trailing records.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__output.F90#0",
+  "source_path": "trunk/src/xbeachlibrary/output.F90",
+  "kind": "equivalent_high",
+  "claim": "[L336-L345] (MED/arithmetic) Progress and completion-time calculations divide by par%tstop without guarding a zero stop time.",
+  "other_wording": "[L336-L345] (MED/division by zero) Progress reporting divides by par%tstop in several expressions without guarding a zero stop time."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__postprocess.F90#0",
+  "source_path": "trunk/src/xbeachlibrary/postprocess.F90",
+  "kind": "equivalent_high",
+  "claim": "[L498-L509] (HIGH/uninitialized-result) runup assigns result elements only where pointtypes equals 1, so all ordinary point elements are returned uninitialized.",
+  "other_wording": "[L498-L509] (MED/incomplete function) runup is explicitly marked incorrect and assigns results only where pointtypes equals 1, leaving all other elements of its returned array undefined."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__postprocess.F90#1",
+  "source_path": "trunk/src/xbeachlibrary/postprocess.F90",
+  "kind": "equivalent_high",
+  "claim": "[L269-L278] (HIGH/missing-assignment) When rotation is disabled, the Sutot and Svtot cases compute a temporary transport field but never assign it to x, leaving the intent(out) result undefined.",
+  "other_wording": "[L268-L278] (HIGH/unassigned output) With rotation disabled, the Sutot and Svtot branches compute interpolated transport scratch arrays but never copy them into x, leaving the requested output undefined."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__postprocess.F90#2",
+  "source_path": "trunk/src/xbeachlibrary/postprocess.F90",
+  "kind": "equivalent_high",
+  "claim": "[L300-L345] (MED/shape-error-handling) gridrotate_r3 merely logs mismatched leading dimensions between alfaz and t%r3 and then continues into conforming-array assignments and indexed expressions that require those dimensions to match.",
+  "other_wording": "[L337-L345] (MED/non-enforced shape assertion) gridrotate_r3 only logs mismatched horizontal shapes and then proceeds with whole-array assignments that require those shapes to conform."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__postprocess.F90#3",
+  "source_path": "trunk/src/xbeachlibrary/postprocess.F90",
+  "kind": "equivalent_high",
+  "claim": "[L300-L333] (LOW/resource-use) gridrotate_r3 creates and zeroes five full rank-3 automatic arrays for every call regardless of the selected variable, risking substantial stack use.",
+  "other_wording": "[L300,L329-L345] (MED/memory scaling) Every rank-3 rotation creates five full-grid automatic 3-D scratch arrays even when the selected variable needs none or only a subset, creating a substantial stack/memory exhaustion risk for large scientific grids."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__postprocess.F90#4",
+  "source_path": "trunk/src/xbeachlibrary/postprocess.F90",
+  "kind": "equivalent_high",
+  "claim": "[L186-L196,L283-L327,L409-L442] (HIGH/optional-argument-contract) The rank-2, rank-3, and rank-4 rotation routines dereference optional col whenever positive row is present without checking col is present; rank 3 and 4 also leave all section indices uninitialized when row is present but nonpositive.",
+  "other_wording": "[L186-L197,L307-L327,L420-L440] (HIGH/uninitialized bounds) All rank-2/3/4 gridrotate routines leave their section bounds uninitialized when row is present but nonpositive, despite the comments making only positive row values special."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__postprocess.F90#9",
+  "source_path": "trunk/src/xbeachlibrary/postprocess.F90",
+  "kind": "confirmed_delta",
+  "claim": "[L505-L508] (HIGH/scientific-logic) The source itself marks runup incorrect, and its implementation assigns every gauge the same scalar derived from the first global minimum location of wetz rather than determining runup along each gauge line.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__varianceupdate.F90#0",
+  "source_path": "trunk/src/xbeachlibrary/varianceupdate.F90",
+  "kind": "equivalent_high",
+  "claim": "[L499-L523] (MED/bounds-rank-contract) makecrossvector indexes every requested variable through r2/i2 at mg and assigns it into a caller section without validating variable rank, mg bounds, or destination extent.",
+  "other_wording": "[L504-L523] (LOW/bounds contract) makecrossvector uses caller-supplied mg directly as a row or column index without validating it against the selected array."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__varianceupdate.F90#1",
+  "source_path": "trunk/src/xbeachlibrary/varianceupdate.F90",
+  "kind": "equivalent_high",
+  "claim": "[L337-L351,L441-L477] (HIGH/state-reset) The saved circular accumulators tvar2d_sin and tvar2d_cos are never reset by clearaverage, so later averaging periods include all prior periods even though the published mean arrays are cleared.",
+  "other_wording": "[L337-L351,L441-L477] (HIGH/state not reset) The saved sine and cosine accumulators used for thetamean are never cleared by clearaverage, so each nominal averaging period includes all prior periods."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__varianceupdate.F90#2",
+  "source_path": "trunk/src/xbeachlibrary/varianceupdate.F90",
+  "kind": "equivalent_high",
+  "claim": "[L389-L412] (HIGH/type-contract) Rank-3 averaging always sizes temporaries from t%r3 and calls the real grid-rotation path even though means_init explicitly permits rank-3 integer variables, making integer selections dereference the wrong component.",
+  "other_wording": "[L389-L412,L423-L424] (HIGH/unsupported integer mean) Although initialization accepts integer rank-3 and rank-4 mean variables, makeaverage unconditionally uses real components and real rotation paths for those ranks."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__varianceupdate.F90#3",
+  "source_path": "trunk/src/xbeachlibrary/varianceupdate.F90",
+  "kind": "equivalent_high",
+  "claim": "[L199-L201,L222-L225,L247-L251] (HIGH/wrong-component) All local integer-array initialization branches obtain dimensions from the real pointer components r2/r3/r4 instead of i2/i3/i4, which may be unassociated and is not the selected variable storage.",
+  "other_wording": "[L196-L201,L218-L225,L242-L251] (HIGH/wrong array component) Local mean initialization sizes integer rank-2/3/4 variables through the real pointer components r2/r3/r4 instead of i2/i3/i4, which can dereference unassociated pointers."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__varianceupdate.F90#5",
+  "source_path": "trunk/src/xbeachlibrary/varianceupdate.F90",
+  "kind": "equivalent_high",
+  "claim": "[L413-L435] (HIGH/wrong-rank-component) Rank-4 temporary dimensions 1 through 3 are taken from t%r3 rather than t%r4, so a normal rank-4 variable can dereference an unassociated rank-3 pointer or allocate the wrong shape.",
+  "other_wording": "[L413-L415] (HIGH/wrong array component) Rank-4 averaging sizes its first three dimensions from t%r3 rather than t%r4, so a normal rank-4 variable can fail before accumulation begins."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__varianceupdate.F90#12",
+  "source_path": "trunk/src/xbeachlibrary/varianceupdate.F90",
+  "kind": "confirmed_delta",
+  "claim": "[L337-L351] (MED/numerical-guard) The near-zero circular-mean guard computes numeps*sign(tvar2d_cos,1.d0), which remains zero when cosine is zero and is far below numeps otherwise, so it does not reliably prevent the invalid atan2(0,0) case.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__xbeach_bmi.f90#0",
+  "source_path": "trunk/src/xbeachlibrary/xbeach_bmi.f90",
+  "kind": "equivalent_high",
+  "claim": "[L43-L56] (HIGH/api-contract) initialize converts the caller-supplied configuration path into configfile but never uses it, so the BMI configuration argument has no effect on model initialization.",
+  "other_wording": "[L43-L56] (HIGH/ignored configuration) BMI initialize converts the supplied configuration-file path but never uses it, so initialization silently reads the library's default input rather than the requested file."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__xbeach_bmi.f90#1",
+  "source_path": "trunk/src/xbeachlibrary/xbeach_bmi.f90",
+  "kind": "equivalent_high",
+  "claim": "[L141-L154] (MED/ffi/pointer-contract) set_current_time converts and dereferences an arbitrary incoming c_ptr without checking c_associated, so a null pointer from the C caller is invalid.",
+  "other_wording": "[L146-L153] (MED/null pointer handling) set_current_time converts and dereferences the incoming C pointer without checking for C_NULL_PTR."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__xbeach_bmi.f90#2",
+  "source_path": "trunk/src/xbeachlibrary/xbeach_bmi.f90",
+  "kind": "equivalent_high",
+  "claim": "[L88-L114] (MED/uninitialized-output) get_var_type returns without setting c_type_name when chartoindex fails and also converts an uninitialized type_name for an unexpected type code.",
+  "other_wording": "[L99-L114,L132-L135] (MED/undefined query output) Unknown variable names cause get_var_type and get_var_rank to return without initializing their output arguments or providing an error status."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__xbeach_bmi.f90#4",
+  "source_path": "trunk/src/xbeachlibrary/xbeach_bmi.f90",
+  "kind": "equivalent_high",
+  "claim": "[L61-L77] (HIGH/error-propagation) update overwrites the executestep return code with outputext's return code unconditionally, masking a failed timestep whenever outputext returns success.",
+  "other_wording": "[L67-L77] (HIGH/lost error status) update overwrites the executestep return code with outputext's return code, allowing a failed model step to be reported as successful."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__xmpi.F90#1",
+  "source_path": "trunk/src/xbeachlibrary/xmpi.F90",
+  "kind": "equivalent_high",
+  "claim": "[L257-L260,L314-L320,L1696-L1701,L1711-L1727] (HIGH/mpi/error-path) The I/O rank deliberately has xmpi_comm set to MPI_COMM_NULL, yet normal halt and communicator error handling call xmpi_abort on xmpi_comm, so an error on that rank can attempt MPI_Abort with an invalid communicator instead of terminating the full job.",
+  "other_wording": "[L314-L320,L1696-L1701,L1711-L1727] (HIGH/incorrect abort communicator) Normal error handling aborts xmpi_comm, which excludes the output rank and is MPI_COMM_NULL on that rank, so output-rank failures can recurse or hang and compute-rank failures can strand the output process."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__xmpi.F90#2",
+  "source_path": "trunk/src/xbeachlibrary/xmpi.F90",
+  "kind": "equivalent_high",
+  "claim": "[L1619-L1670] (MED/mpi/input-contract) xmpi_getrow does not validate prow, n, size(a,2), or size(b), so inconsistent metadata can produce invalid ranks, nonconforming assignment, buffer mismatch, or an unmatched blocking receive.",
+  "other_wording": "[L1619-L1671] (MED/unchecked row contract) xmpi_getrow does not validate n, prow, or b's extent before assigning a full row and communicating n elements."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__xmpi.F90#3",
+  "source_path": "trunk/src/xbeachlibrary/xmpi.F90",
+  "kind": "equivalent_high",
+  "claim": "[L690-L773] (MED/buffer-size-contract) All sendrecv overloads reuse size(sendbuf) as the receive count without checking recvbuf size, permitting receive truncation or overwrite for mismatched arguments.",
+  "other_wording": "[L690-L771] (MED/message-size contract) All xmpi_sendrecv wrappers use the sender's size as the receive count without verifying that recvbuf has the same number of elements."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__xmpi.F90#4",
+  "source_path": "trunk/src/xbeachlibrary/xmpi.F90",
+  "kind": "equivalent_high",
+  "claim": "[L371-L372] (HIGH/arithmetic) The XPREF condition can evaluate m/nmin when integer division n/xmpi_size produced zero, because Fortran does not require short-circuit evaluation of .and., yielding a division by zero.",
+  "other_wording": "[L371-L376] (HIGH/division by zero) The XPREF processor-grid branch can set nmin to zero and evaluate m/nmin; Fortran does not guarantee short-circuit evaluation of the preceding nmin>4 condition."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__xmpi.F90#5",
+  "source_path": "trunk/src/xbeachlibrary/xmpi.F90",
+  "kind": "equivalent_high",
+  "claim": "[L1568-L1585] (MED/mpi/liveness) xmpi_send_sleep ignores all MPI errors and polls forever until flag becomes true, so a failed Irecv or MPI_Test has no exit path.",
+  "other_wording": "[L210-L249,L311,L494-L639,L701-L857,L1387-L1583,L1613,L1660-L1670] (LOW/unchecked MPI status) Most MPI return codes are assigned but not inspected locally, reducing diagnostic context even where a communicator error handler may run."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__xmpi.F90#6",
+  "source_path": "trunk/src/xbeachlibrary/xmpi.F90",
+  "kind": "equivalent_high",
+  "claim": "[L648-L687] (MED/bounds-contract) Character broadcast does not verify that non-source character variables can hold the source's trimmed length before assigning x(i:i).",
+  "other_wording": "[L648-L683] (MED/string buffer bounds) Character broadcast sends the source's trimmed length but never checks the receiving character capacity before assigning x(i:i), so differing declared lengths can write past the receiver."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__xmpi.F90#8",
+  "source_path": "trunk/src/xbeachlibrary/xmpi.F90",
+  "kind": "equivalent_high",
+  "claim": "[L1730-L1755] (HIGH/preprocessor/error-path) The GNU-version test checks __GNUC_MINOR__ >= 8 even for major versions above 4, so many modern GNU compilers retain the fallback backtrace routine that intentionally dereferences a null pointer on every normal halt.",
+  "other_wording": "[L1730-L1755] (MED/diagnostic crash) On compiler configurations that leave MBACKTRACE defined, the error reporter deliberately dereferences a null pointer to force a segmentation fault before orderly MPI termination."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__xmpi.F90#9",
+  "source_path": "trunk/src/xbeachlibrary/xmpi.F90",
+  "kind": "equivalent_high",
+  "claim": "[L1374-L1560] (MED/mpi/message-contract) The paired send helpers derive counts independently from each rank's local array and do not validate from/to ranks, so shape disagreement or invalid endpoints can cause truncation or indefinite blocking.",
+  "other_wording": "[L1374-L1560] (MED/message-size contract) The paired xmpi_send wrappers derive counts independently from the sender and receiver actual arrays and exchange no shape metadata, so mismatched caller shapes yield truncation or partial data."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__xmpi.F90#12",
+  "source_path": "trunk/src/xbeachlibrary/xmpi.F90",
+  "kind": "confirmed_delta",
+  "claim": "[L338-L387] (LOW/integer-range) Processor-grid scoring uses default-integer products and a fixed 1000000000 sentinel, allowing large domain dimensions to overflow or leave a valid factorization unselected.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__xmpi.F90#13",
+  "source_path": "trunk/src/xbeachlibrary/xmpi.F90",
+  "kind": "confirmed_delta",
+  "claim": "[L359-L365] (MED/input-validation) Manual decomposition checks only the product, so two negative manual dimensions can pass and later become invalid divisors and neighbor geometry.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__xmpinew.F90#0",
+  "source_path": "trunk/src/xbeachlibrary/xmpinew.F90",
+  "kind": "equivalent_high",
+  "claim": "[L413-L496] (MED/buffer-size-contract) Every sendrecv overload derives both the send and receive MPI counts solely from size(sendbuf) and never checks recvbuf size, so a mismatched caller can overrun or incompletely fill the receive object.",
+  "other_wording": "[L413-L494] (MED/message-size contract) Sendrecv wrappers use size(sendbuf) for both send and receive counts without validating recvbuf's extent."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__xmpinew.F90#1",
+  "source_path": "trunk/src/xbeachlibrary/xmpinew.F90",
+  "kind": "equivalent_high",
+  "claim": "[L387-L407] (MED/bounds-contract) Character broadcast sends the root's trimmed length but never verifies that receiving character variables are at least that long before assigning x(i:i), so differing declared lengths can write out of bounds.",
+  "other_wording": "[L374-L406] (MED/string buffer bounds) Character broadcast does not check that each receiver's character variable is at least as long as the source string before assigning x(i:i)."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__xmpinew.F90#2",
+  "source_path": "trunk/src/xbeachlibrary/xmpinew.F90",
+  "kind": "equivalent_high",
+  "claim": "[L737-L856] (MED/bounds-contract) The ranged shift routines accept arbitrary i1/i2 and derive sections using a fixed four-cell overlap without validating ordering or array extents; the rank-3 version is additionally marked in-source as not correct.",
+  "other_wording": "[L245-L280,L737-L855] (MED/domain-size precondition) Processor-grid construction has no minimum local-domain check even though halo shifts subsequently index fixed positions up to four cells from each boundary."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__xmpinew.F90#3",
+  "source_path": "trunk/src/xbeachlibrary/xmpinew.F90",
+  "kind": "equivalent_high",
+  "claim": "[L954-L1005] (MED/mpi/input-contract) xmpi_getrow does not validate prow, n, size(a,2), or size(b), so invalid metadata can yield an invalid source rank, shape-nonconforming assignment, buffer mismatch, or a blocking receive that never matches.",
+  "other_wording": "[L954-L1005] (MED/unchecked row contract) xmpi_getrow uses n and prow directly without checking the source row length, destination extent, or processor-row range."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__xmpinew.F90#4",
+  "source_path": "trunk/src/xbeachlibrary/xmpinew.F90",
+  "kind": "equivalent_high",
+  "claim": "[L151-L177,L185,L297-L371,L424-L570,L948,L995-L1005] (MED/mpi/error-handling) MPI return codes are repeatedly written to local variables and never checked, so failed collectives or point-to-point operations can silently leave state invalid or ranks divergent.",
+  "other_wording": "[L151-L177,L297-L570,L948,L995-L1005] (LOW/unchecked MPI status) MPI return codes are stored throughout but never inspected and no communicator error handler is installed in this implementation."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__xmpinew.F90#9",
+  "source_path": "trunk/src/xbeachlibrary/xmpinew.F90",
+  "kind": "confirmed_delta",
+  "claim": "[L201-L220] (LOW/integer-range) Automatic processor-grid selection computes border lengths in default integers and uses a hard-coded 1000000000 sentinel, so sufficiently large grid dimensions can overflow or fail to select a factorization.",
+  "other_wording": null
+ }
+]

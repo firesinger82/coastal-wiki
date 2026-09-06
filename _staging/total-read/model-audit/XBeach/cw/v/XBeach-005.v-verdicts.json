@@ -1,0 +1,84 @@
+{
+  "shard": "XBeach-005",
+  "verdicts": [
+    {
+      "vid": "trunk__src__xbeachlibrary__templates__RF.mako#0",
+      "verdict": "NARROWED",
+      "rationale": "The LOW portability concern is limited to compilers or strict language modes that reject the REAL*8 extension; this declaration specifies eight-byte storage on the supported GNU/Intel implementations, rather than leaving the element kind at default real. The independently real precision issue in other_wording is the unkinded constructor literals, which round at default-real precision before widening when default real is narrower than eight bytes; scripts/generate.py:239-251 preserves those literals and morphevolution.F90:3055-3169 uses the table without restoring that precision. No MED numerical impact or varying eight-byte element precision across the supplied builds is demonstrated."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__templates__RFveg.mako#0",
+      "verdict": "NARROWED",
+      "rationale": "The LOW portability concern is limited to compilers or strict language modes that reject the REAL*8 extension; this declaration specifies eight-byte storage on the supported GNU/Intel implementations, rather than leaving the element kind at default real. The independently real precision issue in other_wording is the unkinded constructor literals, which round at default-real precision before widening when default real is narrower than eight bytes; scripts/generate.py:239-251 preserves those literals and vegetation.F90:568-684 uses the table without restoring that precision. No MED numerical impact or varying eight-byte element precision across the supplied builds is demonstrated."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__templates__genmpi_coll.mako#0",
+      "verdict": "REFUTED",
+      "rationale": "The missing local IERROR tests do not establish the claimed silent cascade: xmpi.F90:210-245 installs comm_errhandler on MPI_COMM_WORLD before splitting the compute communicator, and no returning error-handler configuration was found. That handler reports the error and calls halt_program, which reaches xmpi_abort and STOP (xmpi.F90:314-320,1680-1704); datatype operations likewise have fatal default handling rather than a configured return-and-continue path.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xmpi.F90:L1721-L1726",
+        "quote": "   call MPI_Comm_get_name(comm,o,r,ier)\n   call MPI_Comm_rank(MPI_COMM_WORLD,ra,ier)\n   write(0,*) 'MPI process #',ra,'in ',o(1:r),' generated an error:',error_code\n   call MPI_Error_string(error_code,e,r,ier)\n   write(0,*) e(1:r)\n   call halt_program"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__templates__genmpi_coll.mako#2",
+      "verdict": "REFUTED",
+      "rationale": "Every in-tree matrix_coll caller in spaceparams.F90:833-1046 supplies xmpi_omaster and xmpi_ocomm; xmpi.F90:229-236 initializes these to MPI_COMM_WORLD and zero, with no later reassignment found. Thus the root-error branch is unreachable through these callers, and their communicator has no outside ranks for the claimed overbroad abort to affect.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xmpi.F90:L229-L236",
+        "quote": "      xmpi_ocomm = MPI_COMM_WORLD\n      call MPI_Comm_rank(xmpi_ocomm,xmpi_orank,ierr)\n      call MPI_Comm_size(xmpi_ocomm,xmpi_osize,ierr)\n      if (xmpi_osize < 2) then\n         print *,'Number of MPI processes must be 2 or greater, but is:',xmpi_osize\n         call halt_program(.false.)\n      endif\n      xmpi_omaster = 0"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__templates__genmpi_distr.mako#0",
+      "verdict": "REFUTED",
+      "rationale": "The subcommunicator distribution path supplies xmpi_master, fixed to zero at xmpi.F90:250, so it cannot enter the root-error branch. The optional toall path instead supplies xmpi_imaster on xmpi_ocomm, which is MPI_COMM_WORLD (xmpi.F90:229,270); although that nonzero root conflicts with this routine, aborting WORLD there does not terminate ranks outside the supplied communicator. The direct varoutput.F90:206 call also supplies the zero compute master.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/templates/space_distribute.mako:L4-L12",
+        "quote": "    src    = xmpi_master\n    comm   = xmpi_comm\n    iamsrc = xmaster\n    if(present(toall)) then\n      if(toall) then\n        src    = xmpi_imaster\n        comm   = xmpi_ocomm\n        iamsrc = xomaster\n      endif"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__templates__genmpi_distr.mako#1",
+      "verdict": "REFUTED",
+      "rationale": "The missing local IERROR tests do not establish the claimed silent cascade: xmpi.F90:210-245 installs comm_errhandler on MPI_COMM_WORLD before splitting the compute communicator, and no returning error-handler configuration was found. That handler reports the error and calls halt_program, which reaches xmpi_abort and STOP (xmpi.F90:314-320,1680-1704); datatype operations likewise have fatal default handling rather than a configured return-and-continue path.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xmpi.F90:L1721-L1726",
+        "quote": "   call MPI_Comm_get_name(comm,o,r,ier)\n   call MPI_Comm_rank(MPI_COMM_WORLD,ra,ier)\n   write(0,*) 'MPI process #',ra,'in ',o(1:r),' generated an error:',error_code\n   call MPI_Error_string(error_code,e,r,ier)\n   write(0,*) e(1:r)\n   call halt_program"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__templates__get_var.mako#0",
+      "verdict": "STANDS",
+      "rationale": "This is reachable after normal serial initialization: initialize.F90:501-511 allocates cgx_s, cgy_s, ctheta_s and ee_s with zero extents when single_dir is not one, and variables.def:75-78 exposes them to the generator. The ASSOCIATED check in templates/indextos.mako:32-36 only sets a temporary descriptor and does not stop get_var, whose lower-bound element reference remains unconditional; no subsequent initialization gives these pointer targets nonzero size."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__templates__get_var.mako#1",
+      "verdict": "NARROWED",
+      "rationale": "Unknown names really leave x unchanged: mnemonic.F90:43-48 logs a warning and returns -1, followed by the unassigned return in get_var.mako:27-28. However, the claimed recognized-name/case mismatch is not present in a consistent build, because chartoindex.mako:9-14 and get_var.mako:31-37 enumerate the same variables list supplied by scripts/generate.py:149-166,239-251; retain the defect only for unknown-name failure, with a log diagnostic rather than completely silent failure.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/templates/chartoindex.mako:L9-L14",
+        "quote": "        select case(line)\n%for i, var in enumerate(variables):\n          case(mnem_${var['name'].ljust(maxnamelen)})\n             chartoindex = ${i+1}\n%endfor\n        end select"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__templates__get_var_shape.mako#0",
+      "verdict": "REFUTED",
+      "rationale": "The enclosing module explicitly defines MAXDIMS as the compile-time constant six, so the six-element assignment conforms in every supplied build. Changing that source constant without updating its implementation is a hypothetical future edit, not a current shape defect or runtime-selectable dimension contract.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xbeach_bmi.f90:L27-L28",
+        "quote": "   ! This is assumed.....\n   integer(c_int), parameter :: MAXDIMS = 6"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__templates__set_var.mako#1",
+      "verdict": "STANDS",
+      "rationale": "For a recognized scalar name such as nx, the generated C binding reaches c_f_pointer and then reads the resulting disassociated pointer when xptr is null. Neither chartoindex nor indextos checks xptr, and xbeach_bmi.f90:140 includes the binding directly without a validating wrapper; the unknown-name return does not protect a valid-name null input."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__templates__writelog.mako#0",
+      "verdict": "STANDS",
+      "rationale": "typesandkinds.F90:4 fixes slen at 1024, while the logger accepts assumed-length strings and formats and performs the internal write before the xmaster/destination checks in logging.F90:332-370. A concrete caller is readkey_name in readkey.F90:329-383, which logs a user-derived value of up to slen characters using a24 plus additional text at line 372, exceeding display capacity for long values. Trimming and the later callback conversion do not bound that internal record, and neither internal-write branch handles I/O failure."
+    }
+  ]
+}

@@ -37,7 +37,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The normal first update, including a hotstart, follows t=0 initialization and timestep advancement, so it ordinarily broadcasts the flag through t<=dt. The undefined worker state requires delayed first rainfall activation, externally changed time, or exceptional first-step clipping/rounding that breaks that comparison; a restart alone does not establish it.",
+    "neutralizer": {
+     "where": "trunk/src/xbeachlibrary/timestep.F90:L143-L146",
+     "quote": "      ! initialize the time to 0\n      par%t = 0.0d0\n\n      tpar%tnext = 0.0d0"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",

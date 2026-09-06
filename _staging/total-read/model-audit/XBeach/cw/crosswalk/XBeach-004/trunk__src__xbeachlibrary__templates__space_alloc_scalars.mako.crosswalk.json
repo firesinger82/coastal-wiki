@@ -37,7 +37,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "Scalar components are initialized null POINTERs, so repeated ALLOCATE changes their association and can leak the old target; it does not itself incur the already-allocated runtime error assumed by this claim. The current initialization calls allocate distinct global/local objects (libxbeach.F90:107,193-207 and spaceparams.F90:397), and the standalone demo allocates once; an ordinary resource-exhaustion failure without STAT is separate from the asserted repeated-allocation failure.",
+    "neutralizer": {
+     "where": "trunk/src/xbeachlibrary/templates/spacedecl.mako:L15-L17",
+     "quote": "%for variable in variables:\n    ${variable['fortrantype']}, ${dimstr(variable)} pointer :: ${variable['name']} => NULL()\n%endfor"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",

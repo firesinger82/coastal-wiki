@@ -37,7 +37,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED_UNVERIFIED",
+    "rationale": "The lifecycle calls ranges_init after decomposition and before nonhydrostatic setup, means/output initialization, and all computation steps. ranges_init assigns every declared bound on all relevant branches, and no earlier active stencil use was found; merely being public and undefined before required setup is not a demonstrated defect.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/libxbeach.F90:L207-L218",
+     "quote": "      call space_distribute_space (sglobal,s,par)\n#endif\n\n      call ranges_init(s)\n\n      ! nonh_init does not always need to be called\n      if (par%wavemodel==WAVEMODEL_NONH) call nonh_init(s,par)\n\n      ! initialize output\n      call means_init             (sglobal,s,par     )\n\n      call output_init            (sglobal,s,par,tpar)"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "base_only",

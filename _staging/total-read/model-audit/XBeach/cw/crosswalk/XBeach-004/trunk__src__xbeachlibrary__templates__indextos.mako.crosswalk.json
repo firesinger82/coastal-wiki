@@ -56,7 +56,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The char/character mismatch and direct KeyError on additional mapped types are real latent extension problems, but all 327 current variables are double or int. mnemonic.F90:10-33 also provides only real/integer pointer members, so a type merely accepted by generate.py is not already supported by the introspection contract; this requires a coordinated type-system extension, not just correction of one dictionary key.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "base_only",
@@ -92,6 +99,13 @@
     "quote": "   t%name = '${var[\"name\"]}'\n   t%btype = '${var[\"broadcast\"]}'\n   t%units= '${var[\"unit\"]}'\n   t%standardname= '${var.get(\"standard_name\", \"\")}'\n   t%description= '${var[\"description\"]}'",
     "verified_at_lines": "L39-L43",
     "source_sha256": "cd839a46134c87e02a9c7a841bd8704ab62b3223b87f043ccecec7a7a87f4d6f"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The actual variable regex preserves an apostrophe in a description such as water's depth, and indextos.mako:43 then inserts it inside a single-quoted Fortran literal without doubling it. No parser sanitization or Mako lookup filter escapes Fortran literals; existing descriptions contain no apostrophes, but a legitimate new description directly triggers malformed output.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   }
  ]

@@ -37,7 +37,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The optional exist result is wrong on a non-master only when execution returns, notably with forceclose=.false.; default missing-file handling halts on the master. No repository caller requests exist, so this is a LOW latent API-result defect rather than an observed MPI simulation inconsistency.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/filefunctions.F90:L49-L58",
+     "quote": "      error = 0\n      if (xmaster) call check_file_exist_generic(filename,error)\n\n      if (error==1 .and. endsim) then\n         if (xmaster) then\n            call writelog('sle','','File ''',trim(filename),''' not found. Terminating simulation')\n         endif\n         call halt_program\n      endif\n"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -75,7 +85,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The full three readers allocate and OPEN before their checked READ, without STAT or IOSTAT on those earlier operations. Callers often check existence first, but that neither guarantees readability nor prevents allocation failure; invalid dimensions are not uniformly rejected upstream.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -94,7 +111,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Existence is checked, but OPEN failures remain unchecked and any nonzero numeric READ status terminates counting. params.F90:L596-L599 and L1309-L1310 use this count for discharge/drifter records, so a malformed first numeric field can silently shorten or empty the inferred input.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "base_only",
@@ -205,6 +229,16 @@
     "quote": "         if (trim(testc)=='LOCLIST') then\r\n            nlocs = nlines-1\r\n            allocate(bcfiles(nlocs))\r\n            do ifid = 1,nlocs",
     "verified_at_lines": "L197-L200",
     "source_sha256": "d5e4c239d7ecec15ef329769fb187aecaf61bf701d6955850a11dcae52e1fe00"
+   },
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The helper does accept header-only LOCLIST, but spectral_wave_init subsequently requires nspectrumloc>=1 and reads that many location records, halting on the missing first record (initialize.F90:L678-L704). This is a LOW early-validation gap, not evidence that the spectral simulation can run without a boundary file.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/initialize.F90:L694-L703",
+     "quote": "         do i=1,par%nspectrumloc\n            ! read x,y and file name per location\n            read(fid,*,IOSTAT=err)xspec(i),yspec(i),bcfiles(i)%fname\n            bcfiles(i)%listline = 0\n            if (err /= 0) then\n               ! something has gone wrong during the read of this file\n               call writelog('ewls','a,i0,a,a)','error reading line ',i+1,' of file ',par%bcfile)\n               call writelog('ewls','','check file for format errors and ensure the number of  ',&\n               'lines is equal to nspectrumloc')\n               call halt_program"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {

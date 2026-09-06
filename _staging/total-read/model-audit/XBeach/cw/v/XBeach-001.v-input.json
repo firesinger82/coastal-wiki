@@ -1,0 +1,807 @@
+[
+ {
+  "vid": "trunk__src__xbeachlibrary__boundaryconditions.F90#0",
+  "source_path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+  "kind": "equivalent_high",
+  "claim": "[L697-L701] (HIGH/incomplete branch) The `par%order==3` branch contains only commented-out assignments, leaving `s%zi` and `s%ui` at prior or undefined values while execution continues as if a third-order boundary had been generated.",
+  "other_wording": "[L678-L701] (MED/unimplemented option) The par%order==3 nonhydrostatic monochromatic branch contains only commented assignments, leaving s%zi and s%ui stale while accepting the option."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__boundaryconditions.F90#1",
+  "source_path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+  "kind": "equivalent_high",
+  "claim": "[L868-L913] (HIGH/MPI state propagation) The TS_NONH MPI path broadcasts several `isSet_*` flags but omits `isSet_V`, after which every rank branches on that uninitialized local flag.",
+  "other_wording": "[L880-L884, L903-L907] (HIGH/MPI uninitialized state) The TS_NONH MPI path does not broadcast isSet_V, yet every rank tests it to set s%vi and s%isSet_Vbc, so non-master ranks use an undefined logical."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__boundaryconditions.F90#2",
+  "source_path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+  "kind": "equivalent_high",
+  "claim": "[L627-L631] (HIGH/serial/MPI divergence) In the non-MPI multi-record-jump branch, both `q1` and `q2` are assigned from `gq2`, whereas the MPI branch distributes `gq1` into `q1`, eliminating the intended discharge interpolation only in serial runs.",
+  "other_wording": "[L629-L630] (HIGH/incorrect state assignment) In the non-MPI multi-record-jump path, both q1 and q2 are assigned from gq2, so the earlier discharge record gq1 read at lines 612-615 is discarded and temporal interpolation uses the later record at both endpoints."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__boundaryconditions.F90#4",
+  "source_path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+  "kind": "equivalent_high",
+  "claim": "[L1860-L1868,L1915-L2012] (HIGH/stale parser state) Saved header indices are not reset when a new boundary file is initialized, so variables omitted by the new file can retain column indices from the previous file.",
+  "other_wording": "[L1860-L1868, L1915-L2012] (HIGH/stale parser state) Saved header indices iZ/iU/iV/idU/idV/iQ/iW/iT are not reset when a new boundary file is initialized, so variables absent from the new header can retain indices from the previous file."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__boundaryconditions.F90#5",
+  "source_path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+  "kind": "equivalent_high",
+  "claim": "[L2171-L2183,L2240-L2253] (HIGH/output initialization) Both end-of-file return paths assign only `isSet_Q`; the other `intent(out)` presence flags are left undefined even though callers immediately use them to accept or replace returned fields.",
+  "other_wording": "[L2171-L2183, L2240-L2253] (HIGH/undefined output flags) When EOF is reached during or before a regular call, values and isSet_Q are assigned but isSet_U/isSet_V/isSet_Z/isSet_W/isSet_dU/isSet_dV are not, despite all being intent(out) and subsequently consumed by callers."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__boundaryconditions.F90#6",
+  "source_path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+  "kind": "equivalent_high",
+  "claim": "[L426-L473,L657-L664,L863-L866] (HIGH/numerical robustness) Several Surfbeat and nonhydrostatic boundary branches evaluate `par%t/par%taper` without the zero-taper guard used by the stationary branch, so an allowed zero taper can inject NaNs.",
+  "other_wording": "[L409-L416, L426-L434, L448-L472, L657-L664, L863-L866] (MED/unguarded division) Several Surfbeat and nonhydrostatic taper expressions divide by par%taper without the positive-taper guard used by the stationary branch, so an allowed zero taper would produce invalid boundary values."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__boundaryconditions.F90#7",
+  "source_path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+  "kind": "equivalent_high",
+  "claim": "[L1022-L1038] (HIGH/accumulator defect) All four hybrid minimum updates call `min` with the corresponding maximum accumulator instead of the previous minimum, so historical minima are lost whenever later samples rise.",
+  "other_wording": "[L1022-L1025, L1035-L1038] (HIGH/incorrect extrema update) All four hybrid-tide minimum updates call min with the corresponding maximum accumulator instead of the minimum accumulator, corrupting the observed ranges used to compute the hybrid coefficients."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__boundaryconditions.F90#8",
+  "source_path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+  "kind": "equivalent_high",
+  "claim": "[L1047-L1071] (HIGH/numerical robustness) Hybrid relative error divides by the maximum observed surface range without a positive floor, producing a zero denominator for constant-level windows.",
+  "other_wording": "[L1049, L1063] (MED/unguarded division) Hybrid relative error divides by the maximum observed range without a positive floor, so constant water-level windows can yield division by zero."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__boundaryconditions.F90#9",
+  "source_path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+  "kind": "equivalent_high",
+  "claim": "[L873-L899] (HIGH/serial/MPI divergence) When a TS_NONH file supplies discharge `Q`, conversion of `uig` and `duig` from discharge to velocity is compiled only in the non-MPI branch, so MPI runs distribute discharge values into velocity fields.",
+  "other_wording": "[L886-L899] (HIGH/MPI/serial inconsistency) TS_NONH discharge-to-velocity conversion guarded by isSet_Q exists only in the non-MPI preprocessor branch, so MPI runs distribute raw discharges as boundary velocities and also never broadcast isSet_Q."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__boundaryconditions.F90#10",
+  "source_path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+  "kind": "equivalent_high",
+  "claim": "[L1511-L1515] (LOW/initialization) Saved Coriolis parameter `fc` is initialized only when `par%t<=par%dt`, so a first call after that interval, such as a hot-start entry, uses an undefined value.",
+  "other_wording": "[L1511-L1515, L1551, L1581] (MED/conditional initialization) Saved Coriolis coefficient fc is initialized only when par%t<=par%dt, so a first invocation after a hot start or externally managed time can use an undefined value."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__boundaryconditions.F90#11",
+  "source_path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+  "kind": "equivalent_high",
+  "claim": "[L1777-L1798] (HIGH/MPI source duplication) Vertical point discharge clamps the global point into every rank's local index range without an ownership test, causing every MPI rank to apply the source at some local cell.",
+  "other_wording": "[L1785-L1798] (HIGH/MPI domain ownership) Vertical point discharges are clamped into each local subdomain and applied with no ownership test, causing every MPI rank to inject every point source at a local edge cell."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__boundaryconditions.F90#12",
+  "source_path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+  "kind": "equivalent_high",
+  "claim": "[L2067-L2127,L2185-L2228] (HIGH/time interpolation) A one-record file sets `t1=t0` and duplicate timestamps are otherwise permitted, yet all initialized variables are interpolated by dividing by `t1-t0`.",
+  "other_wording": "[L2067-L2087] (HIGH/division by zero) For a boundary file with only one time level, EOF handling sets t1 equal to t0 and then immediately performs interpolation divided by t1-t0."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__boundaryconditions.F90#13",
+  "source_path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+  "kind": "equivalent_high",
+  "claim": "[L1961-L1973] (MED/input validation) An unrecognized scalar/vector mode is silently accepted and leaves saved `lVaru` at its previous-file value.",
+  "other_wording": "[L1961-L1973] (MED/invalid-input handling) An unrecognized scalar/vector mode is silently accepted and leaves saved lVarU at its prior value, so malformed or changed files can be parsed using stale layout state."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__boundaryconditions.F90#15",
+  "source_path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+  "kind": "confirmed_delta",
+  "claim": "[L139-L164,L176-L203] (MED/input validation) The TS readers accept `nt` without requiring it to be positive and then allocate from it and divide `sum(dataE)` by `nt`.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__boundaryconditions.F90#16",
+  "source_path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+  "kind": "confirmed_delta",
+  "claim": "[L434-L453,L470-L472,L684-L696] (HIGH/numerical robustness) Bound-wave and nonhydrostatic formulas divide by boundary depth, `sinh(kh)`, `tanh(kh)`, and the resonant term `cg**2-g*h` without dry-point or small-denominator protection.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__boundaryconditions.F90#17",
+  "source_path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+  "kind": "confirmed_delta",
+  "claim": "[L490-L500,L594-L660] (MED/time interpolation) The spectral-record calculation divides by `dtbcfile` and derives direct-access record numbers from it without validating that this file-supplied interval is positive.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__boundaryconditions.F90#19",
+  "source_path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+  "kind": "confirmed_delta",
+  "claim": "[L778-L780,L830-L832,L864,L1310-L1313] (HIGH/reference-level consistency) If a nonhydrostatic boundary file omits `Z`, `s%zi` is set to the absolute neighboring surface `s%zs(2,:)`, but the applied boundary later adds `s%zs0` to `s%zi`, apparently adding the mean level twice.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__boundaryconditions.F90#21",
+  "source_path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+  "kind": "confirmed_delta",
+  "claim": "[L998-L999,L1029-L1042,L1141-L1146,L1363-L1365] (MED/parameter validation) Hybrid averaging and relaxation divide by combinations of `cats`, `Trep`, and `hybtavg` without enforcing positive values.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__boundaryconditions.F90#22",
+  "source_path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+  "kind": "confirmed_delta",
+  "claim": "[L1177-L1178,L1386-L1387] (MED/numerical robustness) Boundary mean velocities divide by globally accumulated metric lengths without checking for an empty or zero-width boundary selection.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__boundaryconditions.F90#25",
+  "source_path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+  "kind": "confirmed_delta",
+  "claim": "[L1458-L1468] (HIGH/copy/paste indexing) Back-boundary corner water levels use `dzs0dn(1,...)` and `zb(1,...)` instead of the `nx+1` back-boundary row, applying front-boundary geometry at both back corners.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__boundaryconditions.F90#28",
+  "source_path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+  "kind": "confirmed_delta",
+  "claim": "[L1659-L1678] (HIGH/MPI domain intersection) A horizontal discharge segment is considered local only when at least one endpoint lies in the rank's box, so a segment that crosses a subdomain while both endpoints lie outside that subdomain is omitted there.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__compute_tide_zs0.F90#0",
+  "source_path": "trunk/src/xbeachlibrary/compute_tide_zs0.F90",
+  "kind": "equivalent_high",
+  "claim": "[L569-L572,L584-L634] (MED/MPI correctness) The source explicitly states that `fill_tide_grid` is not fully MPI-compliant for distributed grids, while this routine supplies interior tide levels and gradients for instant and hybrid tide modes.",
+  "other_wording": "[L569-L645] (HIGH/MPI correctness limitation) fill_tide_grid updates each local interior from its local cross-shore maximum and local boundary endpoints with no MPI reduction or global-coordinate reconstruction, and the source itself states this only works for cross-shore-strip decompositions."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__compute_tide_zs0.F90#1",
+  "source_path": "trunk/src/xbeachlibrary/compute_tide_zs0.F90",
+  "kind": "equivalent_high",
+  "claim": "[L251-L254,L379-L401,L489-L545,L616-L634] (HIGH/numerical robustness) Multiple tide gradients and spatial interpolants divide by grid spacing or endpoint-distance differences without guarding coincident points or zero spacing, allowing infinities or NaNs on degenerate grids or boundary placements.",
+  "other_wording": "[L249-L257, L379-L401] (MED/unguarded geometric division) Tidal gradients divide by boundary distance differences (or s%dnz for 1-D) without validating nonzero spacing, so a degenerate or repeated boundary coordinate produces invalid gradients."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__compute_tide_zs0.F90#2",
+  "source_path": "trunk/src/xbeachlibrary/compute_tide_zs0.F90",
+  "kind": "equivalent_high",
+  "claim": "[L534-L552] (MED/gradient consistency) In case 4, points beyond `distmaxzbl` receive the tide-2 water level but `tidegradient1`, making the reported gradient inconsistent with the selected side's forcing.",
+  "other_wording": "[L543-L553] (HIGH/incorrect gradient selection) In case 4 on a lateral boundary, points beyond the separating maximum receive tide2 but are assigned tidegradient1 rather than tidegradient2."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__readtide.F90#0",
+  "source_path": "trunk/src/xbeachlibrary/readtide.F90",
+  "kind": "equivalent_high",
+  "claim": "[L64-L85] (HIGH/empty-input bounds) An empty tide file yields tidelen=0 and the duration check indexes tideinpt(0).",
+  "other_wording": "[L64-L71, L85] (HIGH/empty-input handling) An empty or unreadable tide file yields s%tidelen=0 and is then indexed as s%tideinpt(0) in the duration check."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__readwind.F90#0",
+  "source_path": "trunk/src/xbeachlibrary/readwind.F90",
+  "kind": "equivalent_high",
+  "claim": "[L80-L104] (HIGH/empty-input bounds) An empty wind file produces windlen=0 and then indexes windinpt(0) in the duration check.",
+  "other_wording": "[L80-L87, L104] (HIGH/empty-input handling) An empty or unreadable non-stationary wind file yields s%windlen=0 and is then indexed as s%windinpt(0) in the duration check."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_boundary_datastore.f90#1",
+  "source_path": "trunk/src/xbeachlibrary/wave_boundary_datastore.f90",
+  "kind": "confirmed_delta",
+  "claim": "[L24-L26] (HIGH/cross-module type contract) randomseed is declared as a non-allocatable scalar, conflicting with wave_boundary_main's ALLOCATED and DEALLOCATE operations on that component.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_boundary_main.f90#1",
+  "source_path": "trunk/src/xbeachlibrary/wave_boundary_main.f90",
+  "kind": "equivalent_high",
+  "claim": "[L238-L254] (MED/time catch-up) A single IF generates at most one series when t has advanced past multiple durations, so startComputeNewSeries can remain behind the requested time.",
+  "other_wording": "[L239-L250] (MED/time-jump handling) A time jump spanning multiple series durations generates only one new series rather than advancing until startComputeNewSeries exceeds t, leaving administration and interpolation potentially behind the requested time."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_boundary_main.f90#2",
+  "source_path": "trunk/src/xbeachlibrary/wave_boundary_main.f90",
+  "kind": "equivalent_high",
+  "claim": "[L290-L325] (HIGH/uninitialized I/O state) fid is assigned only under BUILDXBEACH although OPEN is unconditional, and err is tested in the LOCLIST counting loop before it is initialized.",
+  "other_wording": "[L313-L319] (HIGH/conditional initialization) fid is assigned only inside BUILDXBEACH but the OPEN and subsequent I/O are outside that guard, so the non-XBeach build uses an undefined unit number."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_boundary_main.f90#3",
+  "source_path": "trunk/src/xbeachlibrary/wave_boundary_main.f90",
+  "kind": "equivalent_high",
+  "claim": "[L365-L374] (HIGH/administration state) The single-spectrum branch sets only local nspectra=1 and never stores waveSpectrumAdministration%nspectra, leaving the generator's spectrum count stale or undefined.",
+  "other_wording": "[L365-L374] (HIGH/uninitialized administration field) The single-spectrum branch sets local nspectra=1 but never assigns waveSpectrumAdministration%nspectra, leaving the stored count undefined."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_boundary_main.f90#4",
+  "source_path": "trunk/src/xbeachlibrary/wave_boundary_main.f90",
+  "kind": "equivalent_high",
+  "claim": "[L238-L254] (HIGH/output contract) isRecomputed is INTENT(OUT) but is assigned only when recomputation occurs, leaving it undefined on ordinary interpolation calls.",
+  "other_wording": "[L238-L254] (HIGH/undefined output) isRecomputed is intent(out) but is assigned only when a new series is generated, so calls before the next generation deadline return it undefined."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_boundary_main.f90#5",
+  "source_path": "trunk/src/xbeachlibrary/wave_boundary_main.f90",
+  "kind": "equivalent_high",
+  "claim": "[L308-L311] (HIGH/uninitialized state) lastwaveelevation is allocated but never initialized despite the stated zero-initialization intent, so the first taper can consume undefined values.",
+  "other_wording": "[L308-L312] (MED/uninitialized continuation state) lastwaveelevation is allocated under a comment saying it is initialized to zero, but no value is assigned before later reuse as spectral continuation state."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_boundary_main.f90#6",
+  "source_path": "trunk/src/xbeachlibrary/wave_boundary_main.f90",
+  "kind": "equivalent_high",
+  "claim": "[L52-L60,L141-L145,L171-L175] (HIGH/build failure) nspr is present in the procedure signature and used with PRESENT but has no declaration under implicit none.",
+  "other_wording": "[L52-L60, L142-L175] (HIGH/compile-time declaration defect) Dummy argument nspr is used with present(nspr) but is never declared, which is invalid under implicit none."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_boundary_main.f90#10",
+  "source_path": "trunk/src/xbeachlibrary/wave_boundary_main.f90",
+  "kind": "confirmed_delta",
+  "claim": "[L256-L270] (HIGH/array indexing) Energy interpolation slices eebct(i,itheta,:) even though generation stores it as (point,time,direction); this supplies a direction-length vector while passing the time-axis length.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_boundary_main.f90#11",
+  "source_path": "trunk/src/xbeachlibrary/wave_boundary_main.f90",
+  "kind": "confirmed_delta",
+  "claim": "[L142-L190,L256-L270] (HIGH/mode contract) The nonhydrostatic option still unconditionally interpolates hydrostatic eebct, qxbct, and qybct arrays that its generation path does not allocate.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_boundary_update.f90#1",
+  "source_path": "trunk/src/xbeachlibrary/wave_boundary_update.f90",
+  "kind": "equivalent_high",
+  "claim": "[L2346-L2359] (HIGH/time-series indexing/shape) Interpolated samples use (it-1)*dtbc while storage time uses (it-2)*dtbc, and the no-interpolation whole-array assignment assumes tslen equals tslenbc although Kmin can make those extents differ.",
+  "other_wording": "[L2346-L2358] (HIGH/off-by-one/shape mismatch) The resampling branch queries (it-1)*dtbc for an output slot corresponding to (it-2)*dtbc, while the no-resampling branch assigns a tslen array into a tslenbc slice without ensuring equal extents."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_boundary_update.f90#2",
+  "source_path": "trunk/src/xbeachlibrary/wave_boundary_update.f90",
+  "kind": "equivalent_high",
+  "claim": "[L897-L962,L1124-L1172] (MED/bounds/input validation) SWAN and variance-density inputs index angle entries 1 and 2 without enforcing nang>=2.",
+  "other_wording": "[L861-L925, L1064-L1078, L1111-L1172, L1224-L1238] (MED/spectral-axis validation) Readers index the second direction element and pass frequency/direction axes onward without enforcing at least two bins and strict monotonic order, despite later integration and interpolation depending on those properties."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_boundary_update.f90#3",
+  "source_path": "trunk/src/xbeachlibrary/wave_boundary_update.f90",
+  "kind": "equivalent_high",
+  "claim": "[L862-L881,L1293-L1309] (HIGH/spectrum-axis handling) The SWAN reader notes non-monotonic frequencies but performs only no-op conversion before integration and 2-D interpolation assume ordered absolute frequencies.",
+  "other_wording": "[L854-L881] (HIGH/unimplemented frequency conversion) SWAN relative-frequency input (RFREQ) is detected but the documented conversion to absolute frequency is a no-op marked STILL TO BE DONE."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_boundary_update.f90#4",
+  "source_path": "trunk/src/xbeachlibrary/wave_boundary_update.f90",
+  "kind": "equivalent_high",
+  "claim": "[L2693-L2698] (HIGH/allocation/build failure) Hydrostatic output uses undeclared tslenbc, allocates qxbct twice, and never allocates qybct before writing it.",
+  "other_wording": "[L2460-L2729] (HIGH/compile-time unresolved symbols) generate_qbcf uses undeclared s, tslenbc, and non-BUILDXBEACH interpolation symbols, preventing a valid build as written."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_boundary_update.f90#5",
+  "source_path": "trunk/src/xbeachlibrary/wave_boundary_update.f90",
+  "kind": "equivalent_high",
+  "claim": "[L1843-L1846] (HIGH/numerical robustness) Variance is rescaled by (hm0/hm0post)^2 without guarding hm0post=0.",
+  "other_wording": "[L1843-L1846] (HIGH/division by zero) Wave-train variance rescaling divides by hm0post without guarding a zero interpolated spectrum."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_boundary_update.f90#6",
+  "source_path": "trunk/src/xbeachlibrary/wave_boundary_update.f90",
+  "kind": "equivalent_high",
+  "claim": "[L1515-L1520] (HIGH/scientific formula) The nonhydrostatic cutoff frequency omits the square root from the dispersion relation, yielding dimensionally incorrect filtering.",
+  "other_wording": "[L1515-L1520] (HIGH/incorrect dispersion formula) The nonhydrostatic frequency cutoff uses g*k*tanh(kh)/(2π) instead of sqrt(g*k*tanh(kh))/(2π), giving dimensionally and numerically incorrect cutoff frequencies."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_boundary_update.f90#7",
+  "source_path": "trunk/src/xbeachlibrary/wave_boundary_update.f90",
+  "kind": "equivalent_high",
+  "claim": "[L100-L108,L234-L238] (HIGH/repeat-state contract) The repeatwbc path skips initialization of local wp but returns wp%rtbc, and bccount is incremented only in a local copy rather than written back to waveSpectrumAdministration.",
+  "other_wording": "[L100-L108, L234-L235] (HIGH/undefined repeat duration) The repeatwbc branch never initializes local wp, yet the routine obtains the returned duration from wp%rtbc after that branch."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_boundary_update.f90#8",
+  "source_path": "trunk/src/xbeachlibrary/wave_boundary_update.f90",
+  "kind": "equivalent_high",
+  "claim": "[L2338-L2341] (HIGH/time-axis corruption) Each loop iteration assigns one scalar time to the entire internal tbc slice, leaving all finite time entries equal to the final loop value.",
+  "other_wording": "[L2339-L2341] (HIGH/time-axis construction) Each loop iteration assigns one scalar time to the entire interior tbc slice, leaving all finite time entries equal to the last loop value."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_boundary_update.f90#9",
+  "source_path": "trunk/src/xbeachlibrary/wave_boundary_update.f90",
+  "kind": "equivalent_high",
+  "claim": "[L1587-L1606] (MED/sampling/CDF) Simple-sum PDF normalization followed by trapezoidal CDF accumulation leaves the final CDF below one, so some random draws fall outside the interpolation range.",
+  "other_wording": "[L1587-L1619] (MED/CDF normalization) The directional PDF is normalized by its discrete sum but its trapezoidal CDF is not renormalized to end at one, so upper-tail random draws lie outside the constructed CDF range."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_boundary_update.f90#10",
+  "source_path": "trunk/src/xbeachlibrary/wave_boundary_update.f90",
+  "kind": "equivalent_high",
+  "claim": "[L2638-L2664] (HIGH/array conformance) The per-point phase shift multiplies K-by-K matrices by whole npb-length distx/disty vectors instead of distx(j)/disty(j), producing nonconformable array expressions.",
+  "other_wording": "[L2661-L2669] (HIGH/array-shape defect) Boundary unrolling multiplies K-shaped matrices by whole npb-length distx and disty arrays rather than distx(j) and disty(j), producing nonconformable shapes or unintended element mapping."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_boundary_update.f90#11",
+  "source_path": "trunk/src/xbeachlibrary/wave_boundary_update.f90",
+  "kind": "equivalent_high",
+  "claim": "[L394,L528,L666-L671,L687-L688,L1459,L1476,L1662-L1672] (HIGH/numerical robustness) Zero-energy spectra and removed partitions reach unguarded divisions; in particular a zero scalefac1 can turn the overlap convergence metric into NaN and prevent its unbounded loop from terminating.",
+  "other_wording": "[L624-L671] (HIGH/invalid convergence arithmetic) The partition iteration explicitly permits scalefac1 to become zero and then divides by scalefac1 in its convergence metric, producing infinities or NaNs."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_boundary_update.f90#12",
+  "source_path": "trunk/src/xbeachlibrary/wave_boundary_update.f90",
+  "kind": "equivalent_high",
+  "claim": "[L1948-L1952] (MED/numerical robustness) Spatial spectrum interpolation rescales by sfimp/sfnow without guarding sfnow=0.",
+  "other_wording": "[L1932-L1952] (MED/unguarded spatial interpolation) Spatial spectrum interpolation neither rejects coincident spectrum positions nor guards sfnow=0 before rescaling by sfimp/sfnow."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_boundary_update.f90#13",
+  "source_path": "trunk/src/xbeachlibrary/wave_boundary_update.f90",
+  "kind": "equivalent_high",
+  "claim": "[L197,L2376] (HIGH/build failure) generate_swts is called with two arguments even though its explicit module procedure accepts only wp.",
+  "other_wording": "[L197-L198, L2376-L2385] (HIGH/procedure interface mismatch) generate_swts is called with two arguments (wp,s) but is defined with only wp."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_boundary_update.f90#14",
+  "source_path": "trunk/src/xbeachlibrary/wave_boundary_update.f90",
+  "kind": "equivalent_high",
+  "claim": "[L2698-L2712] (HIGH/time-series indexing/shape) Flux interpolation repeats the one-step time offset, while direct assignments require q's tslen to conform to tslenbc.",
+  "other_wording": "[L2698-L2712] (HIGH/off-by-one/shape mismatch) Long-wave resampling repeats the one-step time offset and unchecked tslen-to-tslenbc shape assignment used by the energy path."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_boundary_update.f90#16",
+  "source_path": "trunk/src/xbeachlibrary/wave_boundary_update.f90",
+  "kind": "equivalent_high",
+  "claim": "[L2035-L2085] (HIGH/uninitialized state/build failure) Direction distribution allocates with uninitialized lntheta, uses uninitialized ldtheta, never allocates WDindex, indexes binedges with wave index i instead of itheta, and references undefined par_px.",
+  "other_wording": "[L2035-L2137] (HIGH/compile-time/uninitialized directional grid) lntheta and ldtheta are never assigned before allocation and looping, wp%WDindex is used without allocation, and par_px is undeclared."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_boundary_update.f90#17",
+  "source_path": "trunk/src/xbeachlibrary/wave_boundary_update.f90",
+  "kind": "equivalent_high",
+  "claim": "[L73-L80,L234-L242] (HIGH/build failure) generate_wave_boundary_surfbeat assigns misspelled undeclared durantionlength and contains an unmatched endif, so the module cannot compile under implicit none.",
+  "other_wording": "[L73-L242] (HIGH/compile-time structural defects) The main generator references undeclared par, s, and bcfiles, assigns misspelled undeclared durantionlength, and contains an unmatched endif at line 240, so this routine cannot compile under implicit none."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_boundary_update.f90#18",
+  "source_path": "trunk/src/xbeachlibrary/wave_boundary_update.f90",
+  "kind": "equivalent_high",
+  "claim": "[L1324-L1340] (HIGH/indexing) When restoring a nonzero Sf into an empty interpolated bin, output-grid index i is used to index specin%S, which can exceed specin%nf and does not identify the corresponding input frequency.",
+  "other_wording": "[L1334-L1339] (HIGH/out-of-bounds indexing) The zero-directional-interpolation fallback indexes specin%S with the standard-grid index i, which can run to 801 even when the input spectrum has fewer frequency rows."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_boundary_update.f90#19",
+  "source_path": "trunk/src/xbeachlibrary/wave_boundary_update.f90",
+  "kind": "equivalent_high",
+  "claim": "[L2243-L2256] (HIGH/state corruption) Inside the iy loop, scalar zeta(iy,...) values are assigned to the entire lastwaveelevation(:,itheta) column, so every boundary point is repeatedly overwritten with one point's elevation.",
+  "other_wording": "[L2249-L2256] (HIGH/cross-point state overwrite) Inside the iy loop, a scalar elevation for point iy is assigned to the entire lastwaveelevation(:,itheta) vector, so each boundary point overwrites continuation state for all points."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_boundary_update.f90#32",
+  "source_path": "trunk/src/xbeachlibrary/wave_boundary_update.f90",
+  "kind": "confirmed_delta",
+  "claim": "[L1578-L1619] (HIGH/conditional implementation) Without BUILDXBEACH the interpolation blocks are empty, leaving pdflocal and thetagen undefined while the routine continues to normalize and use them.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_boundary_update.f90#33",
+  "source_path": "trunk/src/xbeachlibrary/wave_boundary_update.f90",
+  "kind": "confirmed_delta",
+  "claim": "[L2167-L2189,L2301-L2304] (HIGH/build failure) BUILDXBEACH logging references s%ntheta and s%ny in generate_ebcf although no s object is in scope.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_boundary_update.f90#34",
+  "source_path": "trunk/src/xbeachlibrary/wave_boundary_update.f90",
+  "kind": "confirmed_delta",
+  "claim": "[L2500-L2516] (HIGH/build failure) generate_qbcf allocates q using s%ny even though no s object is declared or passed.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_directions.F90#0",
+  "source_path": "trunk/src/xbeachlibrary/wave_directions.F90",
+  "kind": "equivalent_high",
+  "claim": "[L195-L202,L227-L234] (MED/numerical robustness) Wave-action conversion divides by sigm without a positive-frequency guard.",
+  "other_wording": "[L195-L201] (HIGH/unguarded action conversion) Wet-cell wave energy is divided by s%sigm without enforcing a positive intrinsic frequency."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_directions.F90#1",
+  "source_path": "trunk/src/xbeachlibrary/wave_directions.F90",
+  "kind": "equivalent_high",
+  "claim": "[L286-L294] (MED/physics consistency) Directional dissipation omits Dveg despite other wave solvers including vegetation dissipation, an inconsistency explicitly noted in the source.",
+  "other_wording": "[L286-L293] (MED/missing physical source term) Directional dissipation distributes only breaking and bed-friction losses even though the source comment explicitly identifies missing vegetation dissipation Dveg."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_directions.F90#2",
+  "source_path": "trunk/src/xbeachlibrary/wave_directions.F90",
+  "kind": "equivalent_high",
+  "claim": "[L150-L152,L259-L263,L339-L349] (HIGH/circular statistics) Mean wave directions use arithmetic angle averages and are incorrect for spectra crossing the angular wrap.",
+  "other_wording": "[L150-L152, L259-L263, L339-L345] (HIGH/circular-angle averaging) Mean wave direction is computed as an arithmetic energy-weighted angle, which gives incorrect results for energy distributed across the 0/2π wrap."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_directions.F90#6",
+  "source_path": "trunk/src/xbeachlibrary/wave_directions.F90",
+  "kind": "confirmed_delta",
+  "claim": "[L353-L360] (HIGH/MPI shape conformance) The convergence maxval applies a full-row wete mask to a jmin_ee:jmax_ee slice, which is nonconformable whenever those MPI bounds exclude halo columns.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_functions.F90#0",
+  "source_path": "trunk/src/xbeachlibrary/wave_functions.F90",
+  "kind": "equivalent_high",
+  "claim": "[L283-L348] (HIGH/small-dimension bounds) Second-order theta advection is enabled for any ntheta>1, but ntheta=2 makes the boundary stencil reference ee(:,:,3) outside the two-bin array.",
+  "other_wording": "[L283-L348] (HIGH/small-direction-grid bounds) Second-order directional advection is enabled for any ntheta>1 but indexes itheta+2 at the lower boundary, which is out of bounds when ntheta=2."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_functions.F90#1",
+  "source_path": "trunk/src/xbeachlibrary/wave_functions.F90",
+  "kind": "equivalent_high",
+  "claim": "[L24-L47] (MED/time filtering) The temporal smoothing factor is not clamped to [0,1], so sufficiently large dt relative to wavint or cats*Trep gives a negative weight to the previous state.",
+  "other_wording": "[L24-L48] (MED/unbounded smoothing weight) The wave-flow smoothing factors are not capped at one, so large hydrodynamic timesteps can make the old-state coefficient negative."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_functions.F90#2",
+  "source_path": "trunk/src/xbeachlibrary/wave_functions.F90",
+  "kind": "equivalent_high",
+  "claim": "[L823-L835] (HIGH/convergence reporting) iteratedispersion can never return its documented negative nonconvergence signal because the loop cannot leave with iter>itermax while the test accepts every iter<=itermax, including exhaustion at 150.",
+  "other_wording": "[L823-L835] (HIGH/ineffective convergence failure detection) The dispersion loop can only exit with iter<=itermax, so the post-loop test always reports success even when the iteration reaches its limit without satisfying the error tolerance."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_functions.F90#3",
+  "source_path": "trunk/src/xbeachlibrary/wave_functions.F90",
+  "kind": "equivalent_high",
+  "claim": "[L979-L1003] (MED/dispatch validation) An unsupported useAverageDepthSwitch leaves hhlocal and potentially velocities at stale values and continues the dispersion calculation.",
+  "other_wording": "[L979-L1003] (MED/invalid option handling) An unsupported useAverageDepthSwitch value is silently accepted and leaves hhlocal and possibly velocity work arrays holding stale values."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_functions.F90#4",
+  "source_path": "trunk/src/xbeachlibrary/wave_functions.F90",
+  "kind": "equivalent_high",
+  "claim": "[L1026-L1033,L1047-L1048] (HIGH/WCI taper) The current-interaction taper can become negative when depth exceeds hwcimax because it lacks a zero lower clamp, reversing the current contribution to intrinsic frequency and group velocity.",
+  "other_wording": "[L1026-L1033, L1047-L1048] (HIGH/current-weight sign reversal) The WCI depth weight uses 1-h/hwcimax without a nonnegative clamp, so depths above hwcimax reverse rather than suppress the current contribution."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_functions.F90#5",
+  "source_path": "trunk/src/xbeachlibrary/wave_functions.F90",
+  "kind": "equivalent_high",
+  "claim": "[L1321-L1329] (HIGH/numerical robustness) Stokes and roller fluxes divide wet-cell energy by c and hstokes without lower bounds, so zero phase speed or zero hstokes yields invalid fluxes.",
+  "other_wording": "[L1321-L1329] (MED/unguarded physical division) Wet-cell Stokes and roller drift divide by phase speed and hstokes without enforcing positive denominators."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_functions.F90#6",
+  "source_path": "trunk/src/xbeachlibrary/wave_functions.F90",
+  "kind": "equivalent_high",
+  "claim": "[L721-L724,L936-L974,L1116-L1138,L1315-L1319] (LOW/persistent allocation) Multiple saved/pointer work arrays are allocated once without later shape or option checks, creating undocumented fixed-grid and fixed-WCI configuration lifetime requirements.",
+  "other_wording": "[L856-L859, L947-L974, L1123-L1138, L1317-L1319] (MED/saved-shape/configuration state) Multiple saved work arrays are allocated only on first use, so changed grid dimensions or enabling WCI after an earlier non-WCI call can leave wrong shapes or unallocated WCI arrays."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_functions.F90#7",
+  "source_path": "trunk/src/xbeachlibrary/wave_functions.F90",
+  "kind": "equivalent_high",
+  "claim": "[L1250-L1302] (MED/boundary initialization) Fy remains unset on several boundaries, as the code comments acknowledge, with lateral copies commented out and only selected MPI-edge rows assigned.",
+  "other_wording": "[L1250-L1302] (HIGH/MPI boundary incompleteness) Radiation-stress force stencils leave several subdomain-edge Fx/Fy values unset and perform no neighbor communication, a gap explicitly identified by the inline comments."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_instationary.F90#0",
+  "source_path": "trunk/src/xbeachlibrary/wave_instationary.F90",
+  "kind": "equivalent_high",
+  "claim": "[L189-L195,L212-L220] (MED/numerical robustness) Wave action conversion divides wet-cell energy by sigt with no positive-frequency guard.",
+  "other_wording": "[L189-L195] (HIGH/unguarded action conversion) Wave energy is divided by per-direction intrinsic frequency s%sigt with no positive-frequency guard."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_instationary.F90#2",
+  "source_path": "trunk/src/xbeachlibrary/wave_instationary.F90",
+  "kind": "equivalent_high",
+  "claim": "[L379-L388,L402-L412] (HIGH/interpolation contract) Wave-crest boundary interpolation constructs nx+3 point coordinate/value arrays but passes nx+1 as their length, truncating the final interior point and upper sentinel and changing the intended interpolation domain.",
+  "other_wording": "[L378-L388, L402-L412] (HIGH/interpolation extent mismatch) Wave-crest boundary interpolation constructs nx+3 coordinate and value entries by adding two infinite endpoints but passes nx+1 as the interpolation length, silently excluding part of the constructed support."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_instationary.F90#3",
+  "source_path": "trunk/src/xbeachlibrary/wave_instationary.F90",
+  "kind": "equivalent_high",
+  "claim": "[L322-L337] (HIGH/numerical robustness) Roller dissipation divides by sqrt(cx^2+cy^2) without guarding zero propagation speed.",
+  "other_wording": "[L325-L330] (HIGH/division by zero) Roller dissipation divides by the magnitude of directional phase velocity without guarding a zero-speed wet cell."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_instationary.F90#4",
+  "source_path": "trunk/src/xbeachlibrary/wave_instationary.F90",
+  "kind": "equivalent_high",
+  "claim": "[L437-L457] (HIGH/dimensional/state consistency) After roller directional energies are rescaled, s%R is limited directly against gammax*hhw, mixing energy and height units, and is not recomputed from the scaled rr field.",
+  "other_wording": "[L437-L454] (HIGH/dimensionally incorrect roller cap) After scaling directional roller energy using equivalent height RH, total roller energy s%R is capped directly against gammax*hhw (an energy-versus-length comparison) instead of being recomputed from the scaled rr or converted height."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_instationary.F90#5",
+  "source_path": "trunk/src/xbeachlibrary/wave_instationary.F90",
+  "kind": "equivalent_high",
+  "claim": "[L144-L165,L460-L466] (HIGH/circular statistics) For multi-directional waves the mean angle is an arithmetic weighted average, producing incorrect directions across the angular wrap.",
+  "other_wording": "[L140-L145, L460-L465] (HIGH/circular-angle averaging) Multi-direction mean wave angles are computed by arithmetic averaging rather than circular vector averaging, failing for spectra spanning the 0/2π boundary."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_stationary.F90#0",
+  "source_path": "trunk/src/xbeachlibrary/wave_stationary.F90",
+  "kind": "equivalent_high",
+  "claim": "[L120-L126,L209-L211,L324-L329] (HIGH/circular statistics) Mean wave directions are arithmetic angle averages and therefore fail for energy distributed across the angular wrap.",
+  "other_wording": "[L120-L125, L209-L211, L324-L329] (HIGH/wave-direction calculation) Arithmetic angle averaging mishandles wraparound spectra, while the Snell branch passes an unclamped ratio to asin and can leave its real domain."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_stationary.F90#1",
+  "source_path": "trunk/src/xbeachlibrary/wave_stationary.F90",
+  "kind": "equivalent_high",
+  "claim": "[L161-L165,L192-L195] (MED/numerical robustness) Wave-action conversion divides by sigt without guarding zero intrinsic frequency.",
+  "other_wording": "[L161-L165] (HIGH/unguarded action conversion) The full row slab is divided by s%sigt without a wet mask or positive-frequency floor."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_stationary.F90#2",
+  "source_path": "trunk/src/xbeachlibrary/wave_stationary.F90",
+  "kind": "equivalent_high",
+  "claim": "[L203-L207] (MED/dry-cell robustness) The depth-limited breaking rescale divides by gammax*s%hh without a wet mask or positive-depth guard.",
+  "other_wording": "[L199-L207] (HIGH/dry-cell division) The breaker-height correction evaluates H/(gammax*hh) over all cells without excluding zero-depth dry cells, allowing 0/0 and NaN energy."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_stationary.F90#4",
+  "source_path": "trunk/src/xbeachlibrary/wave_stationary.F90",
+  "kind": "equivalent_high",
+  "claim": "[L279-L288] (HIGH/numerical robustness) Roller source and dissipation updates divide twice by sqrt(cx^2+cy^2) without guarding zero propagation speed.",
+  "other_wording": "[L279-L288] (HIGH/division by zero) Both the roller update and reported roller dissipation divide by directional phase-speed magnitude without a positive floor."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_stationary.F90#5",
+  "source_path": "trunk/src/xbeachlibrary/wave_stationary.F90",
+  "kind": "equivalent_high",
+  "claim": "[L143-L147] (HIGH/stability timestep) The x-advection timestep denominator uses maxval(cgx) rather than maxval(abs(cgx)), so an all-negative x velocity field selects the 1e-10 floor and an excessively large timestep.",
+  "other_wording": "[L145-L147] (HIGH/CFL calculation) The cross-shore CFL denominator uses maxval(cgx) rather than maxval(abs(cgx)), so a field of large negative propagation velocities yields an excessively large timestep."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_stationary.F90#6",
+  "source_path": "trunk/src/xbeachlibrary/wave_stationary.F90",
+  "kind": "equivalent_high",
+  "claim": "[L393-L426] (MED/boundary initialization) Fy is assigned only on interior i rows and j=1:ny, while its offshore/onshore and final lateral boundary rows are explicitly left unset by commented-out boundary copies.",
+  "other_wording": "[L393-L426] (MED/stale force boundaries) Several Fy boundary entries are deliberately not assigned, so the saved model state can retain values from an earlier stationary solve rather than a defined boundary condition."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_stationary_directions.F90#0",
+  "source_path": "trunk/src/xbeachlibrary/wave_stationary_directions.F90",
+  "kind": "equivalent_high",
+  "claim": "[L203-L219,L397-L410,L557-L570] (HIGH/circular statistics) Mean wave direction is calculated as an arithmetic weighted mean of angles, which gives a direction near zero for energy straddling the -pi/+pi wrap instead of the correct circular mean.",
+  "other_wording": "[L202-L220, L397-L410, L557-L570] (HIGH/wave-direction calculation) Both modes use arithmetic mean angles that fail across 0/2π, and stationary Snell refraction passes an unclamped value to asin."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_stationary_directions.F90#1",
+  "source_path": "trunk/src/xbeachlibrary/wave_stationary_directions.F90",
+  "kind": "equivalent_high",
+  "claim": "[L620-L643] (HIGH/convergence metric) Relative height convergence divides by s%H with no zero guard, while the EE branches populate wetmask but never apply it and therefore do not implement their apparent wet-cell-only contract.",
+  "other_wording": "[L620-L643] (HIGH/convergence metric defects) Relative H error divides by zero wave height, while the EE metrics build a wetmask but never apply it, allowing dry or halo cells to control convergence."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_stationary_directions.F90#2",
+  "source_path": "trunk/src/xbeachlibrary/wave_stationary_directions.F90",
+  "kind": "equivalent_high",
+  "claim": "[L294-L300,L357-L363] (MED/numerical robustness) Wave action conversion divides wet-cell energy by sigm without any positive-frequency guard.",
+  "other_wording": "[L294-L300] (HIGH/unguarded action conversion) Wet-cell energy is divided by s%sigm without checking for a positive intrinsic frequency."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_stationary_directions.F90#3",
+  "source_path": "trunk/src/xbeachlibrary/wave_stationary_directions.F90",
+  "kind": "equivalent_high",
+  "claim": "[L70-L114] (MED/persistent allocation/dispatch) callType has no default validation and saved work arrays are sized only on the first call, so a later call with a different grid or ntheta_local reuses incompatible shapes.",
+  "other_wording": "[L70-L122] (HIGH/call-mode-dependent saved shape) Common saved arrays are dimensioned using the first callType's direction count and never resized, although the routine is designed to be called in both stationary and directions modes with potentially different ntheta values."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_stationary_directions.F90#4",
+  "source_path": "trunk/src/xbeachlibrary/wave_stationary_directions.F90",
+  "kind": "equivalent_high",
+  "claim": "[L601-L610] (HIGH/dimensional/state consistency) After scaling directional roller energy by gammafac squared, s%R is assigned RH*gammafac, a wave-height quantity, instead of a consistently scaled roller energy.",
+  "other_wording": "[L599-L610] (HIGH/dimensionally incorrect roller state) After scaling rr by a height-based gamma factor, s%R is assigned RH*gammafac, a length, rather than the corresponding roller energy or the sum of scaled rr."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_stationary_directions.F90#5",
+  "source_path": "trunk/src/xbeachlibrary/wave_stationary_directions.F90",
+  "kind": "equivalent_high",
+  "claim": "[L509-L514] (HIGH/numerical robustness) Roller dissipation divides by sqrt(cx^2+cy^2) without guarding zero propagation speed.",
+  "other_wording": "[L509-L514] (HIGH/division by zero) Roller dissipation divides by directional phase-speed magnitude without a positive floor."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__wave_timestep.F90#0",
+  "source_path": "trunk/src/xbeachlibrary/wave_timestep.F90",
+  "kind": "equivalent_high",
+  "claim": "[L56-L72] (MED/numerical robustness) Although hhw is protected against dry or negative depth, gamma is computed with the unclamped s%hh, so zero-depth cells can produce infinities or NaNs in hstokes.",
+  "other_wording": "[L64-L73] (HIGH/dry-cell division) The new hstokes path computes H/hh across the full grid without a positive depth floor, so dry zero-depth cells can produce invalid gamma and zero hstokes."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__waveparams.F90#0",
+  "source_path": "trunk/src/xbeachlibrary/waveparams.F90",
+  "kind": "equivalent_high",
+  "claim": "[L1280-L1314] (HIGH/uninitialized indexing) Nbin is never initialized and directions equal to the upper bin edge or still outside the opposite edge after wrapping receive no assignment before maxval and array indexing use.",
+  "other_wording": "[L1280-L1337] (HIGH/uninitialized directional-bin indices) Nbin is never initialized, and a direction shifted once by 2π can still fall outside a computational sector narrower than 2π, leaving its bin entry undefined before maxval and nspr handling."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__waveparams.F90#1",
+  "source_path": "trunk/src/xbeachlibrary/waveparams.F90",
+  "kind": "equivalent_high",
+  "claim": "[L1789-L1794] (HIGH/vector rotation) Curvilinear flux rotation derives direction with atan(qy/max(qx,eps)), which clamps negative qx and cannot preserve the correct quadrant.",
+  "other_wording": "[L1789-L1794] (HIGH/curvilinear rotation quadrant loss) Flux rotation derives its angle from atan(qy/max(qx,eps)), which replaces every negative qx with a positive epsilon and therefore gives incorrect quadrants and components."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__waveparams.F90#2",
+  "source_path": "trunk/src/xbeachlibrary/waveparams.F90",
+  "kind": "equivalent_high",
+  "claim": "[L260,L311,L1016-L1017,L1057-L1059,L1194-L1205,L1922-L1932] (HIGH/numerical robustness) Zero wave height is accepted but multiple subsequent spectral normalizations and representative-period calculations divide by zero.",
+  "other_wording": "[L1194-L1210] (HIGH/zero-energy rescaling) Hm0 correction divides by hm0now and directional-width construction divides by S0 without a zero-energy contract; the small S0 floor does not protect hm0now."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__waveparams.F90#3",
+  "source_path": "trunk/src/xbeachlibrary/waveparams.F90",
+  "kind": "equivalent_high",
+  "claim": "[L69-L89,L107-L118,L478-L489,L502-L533,L613-L666,L801-L850] (HIGH/MPI state distribution) Master-only input populates testc, dimensions, switches, factors, and spectrum arrays while all corresponding broadcasts are commented out, leaving non-master ranks to branch on uninitialized values, allocate with undefined extents, and compute from undefined data.",
+  "other_wording": "[L69-L86] (HIGH/non-master undefined state) testc is read only by the master but is tested on every rank to set saved reuse, with the corresponding broadcasts explicitly commented out."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__waveparams.F90#4",
+  "source_path": "trunk/src/xbeachlibrary/waveparams.F90",
+  "kind": "equivalent_high",
+  "claim": "[L1453-L1454] (LOW/statistics) The standard-deviation denominators use size(array-1), which equals N rather than the apparently intended N-1.",
+  "other_wording": "[L1453-L1454] (LOW/standard-deviation denominator) The expressions size(array-1) return the full sample count rather than size(array)-1 as the surrounding standard-deviation comments imply."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__waveparams.F90#6",
+  "source_path": "trunk/src/xbeachlibrary/waveparams.F90",
+  "kind": "equivalent_high",
+  "claim": "[L465-L472,L627-L650] (MED/input error handling) The SWAN keyword-search loops have no I/O status checks, so malformed or truncated files can loop indefinitely or repeatedly read past EOF.",
+  "other_wording": "[L465-L472, L627-L649] (HIGH/unbounded malformed-input loop) SWAN keyword searches perform reads without IOSTAT or EOF handling and can loop indefinitely on a truncated or malformed file."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__waveparams.F90#7",
+  "source_path": "trunk/src/xbeachlibrary/waveparams.F90",
+  "kind": "equivalent_high",
+  "claim": "[L1703-L1709] (HIGH/direction calculation) Bound-wave direction uses atan(KKy/KKx) rather than atan2, losing the quadrant whenever KKx is negative.",
+  "other_wording": "[L1703-L1709] (HIGH/direction quadrant loss) Difference-wave direction uses atan(KKy/KKx) with a signed epsilon instead of atan2, losing the correct quadrant whenever KKx is negative."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__waveparams.F90#8",
+  "source_path": "trunk/src/xbeachlibrary/waveparams.F90",
+  "kind": "equivalent_high",
+  "claim": "[L517-L593,L817-L835] (MED/bounds/input validation) Both SWAN and variance-density readers dereference theta(2) without validating ndir>=2.",
+  "other_wording": "[L474-L593, L723-L749, L805-L881] (MED/spectral-axis validation) SWAN and VarDens inputs are used without requiring at least two directions or strictly increasing frequency and direction axes, despite direct second-element indexing, quadrature, and interpolation."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__waveparams.F90#9",
+  "source_path": "trunk/src/xbeachlibrary/waveparams.F90",
+  "kind": "equivalent_high",
+  "claim": "[L157-L162] (HIGH/bounds/numerical robustness) The ny>0 branch uses slices 2:ny, so ny=1 produces empty sums and division by zero instead of using the single offshore point.",
+  "other_wording": "[L157-L162] (MED/empty weighted average) For a minimal 2-D grid with ny=1, the offshore-depth average uses empty slices and divides by a zero sum."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__waveparams.F90#10",
+  "source_path": "trunk/src/xbeachlibrary/waveparams.F90",
+  "kind": "equivalent_high",
+  "claim": "[L463-L498,L733-L765] (HIGH/spectrum-axis handling) The SWAN frequency-conversion branch is a no-op and never repairs descending or relative-frequency input before moment integration and frequency-range calculations assume an increasing absolute axis.",
+  "other_wording": "[L463-L498] (HIGH/unimplemented frequency conversion) SWAN RFREQ input is recognized but its conversion to absolute frequency is a no-op."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__waveparams.F90#11",
+  "source_path": "trunk/src/xbeachlibrary/waveparams.F90",
+  "kind": "equivalent_high",
+  "claim": "[L1016-L1036] (HIGH/degenerate spectrum) If the selected frequency range has one bin, M or wp%K can be one and the code divides by M, wp%K-1, and the resulting zero df.",
+  "other_wording": "[L981-L1036, L1872-L1905] (HIGH/empty/degenerate spectral range) An empty threshold range makes M zero and a single-bin range makes K=1 and df=0, causing divisions by M, K-1, and df."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__waveparams.F90#24",
+  "source_path": "trunk/src/xbeachlibrary/waveparams.F90",
+  "kind": "confirmed_delta",
+  "claim": "[L1367-L1457] (HIGH/order-dependent physics) The total envelope and directional weights are computed inside the directional-bin loop before later bins' zeta values exist, so Ampzeta for early bins depends on processing order and omits later directional components.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__waveparamsnew.F90#0",
+  "source_path": "trunk/src/xbeachlibrary/waveparamsnew.F90",
+  "kind": "equivalent_high",
+  "claim": "[L2990-L3008] (HIGH/boundary-file schema) When time-step interpolation is active, qinterp has only three fields and the writer omits the fourth elevation field even though the direct-access record length and non-interpolated path use four fields.",
+  "other_wording": "[L2982-L3009] (HIGH/direct-access record shape) When dtchanged is true qinterp has only three fields although the file record length and reader contract are four fields, unlike the non-interpolated write of q(:,:,:)."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__waveparamsnew.F90#1",
+  "source_path": "trunk/src/xbeachlibrary/waveparamsnew.F90",
+  "kind": "equivalent_high",
+  "claim": "[L3524-L3529] (HIGH/layer averaging) The 3D second-order update divides the first-layer flux by z (negative) and the second by h0+z, inconsistent with the layer thicknesses and with the earlier short-wave implementation that uses h0+z for layer 1 and -z for layer 2.",
+  "other_wording": "[L3524-L3528] (HIGH/incorrect layer flux conversion) Second-order layer flux is converted using q1/z and q2/(h0+z), even though z is negative and the lower and upper layer thicknesses are h0+z and -z respectively."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__waveparamsnew.F90#2",
+  "source_path": "trunk/src/xbeachlibrary/waveparamsnew.F90",
+  "kind": "equivalent_high",
+  "claim": "[L2006-L2098] (HIGH/allocation/runtime) wp%PRindex is allocated inside the offshore-point loop, so the second iteration attempts to allocate an already-associated pointer.",
+  "other_wording": "[L2006-L2098] (HIGH/repeated pointer allocation) wp%PRindex is allocated inside the offshore-point loop, so the second point attempts to allocate an already-associated pointer."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__waveparamsnew.F90#3",
+  "source_path": "trunk/src/xbeachlibrary/waveparamsnew.F90",
+  "kind": "equivalent_high",
+  "claim": "[L489,L641,L1495,L1512,L1637] (HIGH/numerical robustness) Hm0=0 is explicitly accepted, but the resulting zero spectrum reaches unguarded normalizations and weighted means whose denominators are zero.",
+  "other_wording": "[L627-L641] (MED/singular shallow-depth formula) The TMA correction divides by tanh(k*h0) and normalizes by sqrt(sum(y)) without guarding zero boundary depth or a collapsed spectrum."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__waveparamsnew.F90#4",
+  "source_path": "trunk/src/xbeachlibrary/waveparamsnew.F90",
+  "kind": "equivalent_high",
+  "claim": "[L3341-L3342] (MED/filtering/indexing) The high-wavenumber cutoff tests only k3(m,1), but rows m>K+1 populate columns ii>1 while column 1 remains zero, so those higher rows evade the cutoff.",
+  "other_wording": "[L3271-L3342] (HIGH/wrong cutoff index) The superharmonic cutoff tests k3(m,1), but for m>K+1 valid entries start above column 1 and k3(m,1) remains its initialized zero, disabling the intended cutoff."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__waveparamsnew.F90#5",
+  "source_path": "trunk/src/xbeachlibrary/waveparamsnew.F90",
+  "kind": "equivalent_high",
+  "claim": "[L3411-L3417] (HIGH/scientific formula) The upper-layer qx2/qy2 ratios subtract sinh(KKx) or sinh(KKy) with no depth factor, unlike the surrounding dimensionless sinh(k*depth) terms, producing dimensionally inconsistent layer partitioning.",
+  "other_wording": "[L3413, L3417] (HIGH/dimensionally inconsistent layer formula) The upper-layer ratios subtract sinh(KKx) or sinh(KKy) rather than an interface-depth product, leaving a dimensioned wavenumber as a hyperbolic-function argument and omitting z."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__waveparamsnew.F90#6",
+  "source_path": "trunk/src/xbeachlibrary/waveparamsnew.F90",
+  "kind": "equivalent_high",
+  "claim": "[L965-L998,L1038-L1046,L1311-L1335] (HIGH/spectrum-axis handling) The SWAN reader acknowledges that frequencies are often non-monotone but performs only no-op assignments, after which interpolation and integration assume ordered endpoints and can reject or negatively integrate a descending frequency axis.",
+  "other_wording": "[L978-L990, L1175-L1203, L1327-L1336, L1353-L1356] (HIGH/axis/interpolation mismatch) The readers do not sort or reject nonmonotone axes—even noting that SWAN frequencies are often nonmonotone—while endpoint range tests and linear_interp calls assume an ordered frequency axis."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__waveparamsnew.F90#7",
+  "source_path": "trunk/src/xbeachlibrary/waveparamsnew.F90",
+  "kind": "equivalent_high",
+  "claim": "[L2064-L2068] (MED/numerical robustness) Spatial spectrum interpolation rescales by sfimp/sfnow without guarding sfnow=0.",
+  "other_wording": "[L2061-L2068] (HIGH/zero interpolation divisor) Spatial spectral interpolation rescales by sfimp/sfnow without guarding sfnow=0."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__waveparamsnew.F90#8",
+  "source_path": "trunk/src/xbeachlibrary/waveparamsnew.F90",
+  "kind": "equivalent_high",
+  "claim": "[L1015-L1046,L1189-L1203,L1132-L1143,L1239-L1250] (MED/bounds/input validation) Both spectrum readers index angular entries 1 and 2 without enforcing nang>=2, so a one-direction input can read out of bounds.",
+  "other_wording": "[L980-L990, L1015-L1046, L1175-L1203, L1241-L1249] (HIGH/unchecked array extent) File-provided frequency and direction counts are not validated, while later code unconditionally accesses angle element 2 and adjacent-angle differences."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__waveparamsnew.F90#9",
+  "source_path": "trunk/src/xbeachlibrary/waveparamsnew.F90",
+  "kind": "equivalent_high",
+  "claim": "[L172-L180,L593-L607,L1092,L1180-L1206] (HIGH/allocation/runtime) The external-time catch-up loop can call read_spectrum_input repeatedly on the same specin element, but each reader unconditionally allocates already-associated pointer components, causing an allocation failure when more than one spectrum interval is skipped.",
+  "other_wording": "[L172-L181, L593-L607, L691, L984, L1019, L1092, L1180, L1193, L1206] (HIGH/reallocation of associated pointers) The catch-up loop can call a spectrum reader repeatedly on the same spectrum object, but the readers allocate its pointer components again without first deallocating or nullifying them."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__waveparamsnew.F90#11",
+  "source_path": "trunk/src/xbeachlibrary/waveparamsnew.F90",
+  "kind": "equivalent_high",
+  "claim": "[L3348-L3350] (HIGH/indexing/phase) Second-order component phases use Findex(1)+ii rather than Findex(1)+ii-1 (or Findex(ii)), shifting every primary component by one frequency bin and reading beyond the generated-component span for ii=K.",
+  "other_wording": "[L3348-L3350] (HIGH/off-by-one Fourier index) Superharmonic phases access Findex(1)+ii and +jj instead of the component indices Findex(ii) and Findex(jj), shifting every lookup and reaching beyond the last generated component."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__waveparamsnew.F90#12",
+  "source_path": "trunk/src/xbeachlibrary/waveparamsnew.F90",
+  "kind": "equivalent_high",
+  "claim": "[L1637-L1657] (MED/sampling/CDF) The PDF is normalized by its simple sum but its CDF is then formed with trapezoidal half-endpoint weights, leaving the last CDF value below one and sending some uniform random draws outside the CDF interpolation range.",
+  "other_wording": "[L1637-L1657] (HIGH/CDF construction) The trapezoidal cumulative directional distribution is not normalized after integration, so its final value is generally below one although draws span the full [0,1) interval."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__waveparamsnew.F90#13",
+  "source_path": "trunk/src/xbeachlibrary/waveparamsnew.F90",
+  "kind": "equivalent_high",
+  "claim": "[L1567-L1572] (HIGH/scientific formula) The nonhydrostatic cutoff frequency is computed as g*k*tanh(kh)/(2*pi), omitting the square root required by the dispersion relation and yielding dimensionally incorrect frequency filtering.",
+  "other_wording": "[L1569-L1572] (HIGH/dispersion formula) The nonhydrostatic frequency cutoff assigns g*k*tanh(kh)/(2*pi) without the square root required to convert dispersion-relation omega-squared to frequency."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__waveparamsnew.F90#14",
+  "source_path": "trunk/src/xbeachlibrary/waveparamsnew.F90",
+  "kind": "equivalent_high",
+  "claim": "[L3436-L3441,L3524-L3530] (MED/missing state update) Second-order 3D generation computes qy1 and qy2 fields but the accumulation branch updates only uits and duits, leaving vits and dvits without the corresponding transverse second-order contribution.",
+  "other_wording": "[L3436-L3441, L3524-L3530] (HIGH/discarded transverse velocity) The second-order routine computes qy1 and qy2 time series but never adds them to vits or dvits when assembling the nonhydrostatic boundary signal."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__waveparamsnew.F90#15",
+  "source_path": "trunk/src/xbeachlibrary/waveparamsnew.F90",
+  "kind": "equivalent_high",
+  "claim": "[L1939-L1959] (HIGH/numerical robustness) Wave-train variance rescales by (hm0/hm0post)^2 without guarding hm0post=0, which occurs when the selected component frequency range contains no energy for a location.",
+  "other_wording": "[L1956-L1959] (HIGH/zero normalization divisor) Per-location variance is rescaled by (hm0/hm0post)^2 without checking hm0post, which can be zero for a location with no selected-frequency energy."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__waveparamsnew.F90#16",
+  "source_path": "trunk/src/xbeachlibrary/waveparamsnew.F90",
+  "kind": "equivalent_high",
+  "claim": "[L3226-L3242,L3407-L3418,L3434-L3441] (HIGH/branch-condition/runtime) Allocation of six-field 3D arrays requires nonhq3d==1 and nhlay>0, but later use tests only nonhq3d==1, so nonhq3d==1 with nhlay<=0 accesses unallocated qx/qy arrays and fields 5-6 of four-field arrays.",
+  "other_wording": "[L3226-L3242, L3406-L3418, L3434-L3447] (HIGH/allocation/branch mismatch) Six-field storage and qx/qy layer arrays are allocated only when nonhq3d=1 and nhlay>0, but later branches test only nonhq3d=1 and can access those arrays when they were never allocated."
+ },
+ {
+  "vid": "trunk__src__xbeachlibrary__waveparamsnew.F90#17",
+  "source_path": "trunk/src/xbeachlibrary/waveparamsnew.F90",
+  "kind": "equivalent_high",
+  "claim": "[L125-L131,L331-L332] (MED/state/output contract) The routine increments bccount before the final-timestep early return, and that return leaves the INTENT(OUT) curline unassigned while also consuming a boundary-condition sequence number.",
+  "other_wording": "[L125-L130] (HIGH/output/state contract) The last-step early return occurs after incrementing bccount and before assigning the INTENT(OUT) curline, so the caller receives an undefined line while the global sequence advances."
+ }
+]

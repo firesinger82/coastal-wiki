@@ -75,7 +75,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "Only the automatic-computation notice is skipped at epsi=-1. The actual boundary update tests epsi<0 and computes factime for that sentinel, so this is a LOW logging-threshold issue, not loss of automatic tide relaxation.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/boundaryconditions.F90:L1137-L1146",
+     "quote": "      ! jaap: compute epsi based on offshore boundary conditions if epsi = -1\n      if (par%epsi<0.d0) then\n         if (par%swave==1) then\n            if(par%tidetype==TIDETYPE_VELOCITY) then\n               factime = 1.d0/par%cats/par%Trep*par%dt\n            elseif (par%tidetype==TIDETYPE_HYBRID) then\n               factime = hybf1*1.d0/par%cats/par%Trep*par%dt\n            else\n               ! do we need this?\n               factime = 0.1d0/par%cats/par%Trep*par%dt"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -113,7 +123,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "A wholly absent count keyword defaults to zero and does not call this reader, but a differently cased positive count is accepted by readkey and then missed by this case-sensitive scan. Retain MED mixed-case/section parsing failure and unchecked EOF, rather than the broader HIGH missing-keyword scenario.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.F90:L2239-L2242",
+     "quote": "         par%pointvars=''\n         if (par%npoints>0) then\n            call readPointPosition(par,'point',xpointsw,ypointsw)\n            ! Is the keyword npointvar specified?"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "base_only",
@@ -209,6 +229,13 @@
     "quote": "         if (par%setbathy .ne. 1 .and. par%hotstart .ne. 1) then\r\n            par%depfile = readkey_name('params.txt','depfile',required=.true.)\r\n            call check_file_exist(par%depfile)\r\n            call check_file_length(par%depfile,par%nx+1,par%ny+1)",
     "verified_at_lines": "L160-L163",
     "source_sha256": "73648b5733a8f90a8f18cda32743bdc2ef42f649e39c521e28e06584ee63c359"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Generated parameter declarations initialize hotstart to -123 (params.def:L92), not to the user's requested value. all_input tests it for depfile at L160 and reads hotstart only at L312, with no earlier hotstart assignment or caller pre-read; a normal fresh hotstart request therefore unnecessarily requires depfile.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {
@@ -230,6 +257,16 @@
     "quote": "            par%dtheta_s   = readkey_dbl ('params.txt','dtheta_s',    10.d0,      0.1d0,   20.d0,required=.true.)\r\n         else\r\n            par%dtheta   = readkey_dbl ('params.txt','dtheta',    10.d0,      0.1d0,   180.d0,required=.true.)\r\n         endif",
     "verified_at_lines": "L263-L266",
     "source_sha256": "73648b5733a8f90a8f18cda32743bdc2ef42f649e39c521e28e06584ee63c359"
+   },
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The advisory bounds really permit zero/negative gravity, periods and active grid spacings to reach unsafe arithmetic, but some negative dx/dy values intentionally request metric fallback on variable grids. The claimed nonterminating angular normalization is not established by these parameters: its increment is the fixed positive px constant; retain the concrete HIGH division/invalid-grid failures.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.def:L502-L502",
+     "quote": "      double precision                  :: px                       = 4.d0*atan(1.d0)      !  [-] Pi"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {
@@ -251,6 +288,13 @@
     "quote": "#ifdef USEMPI\r\n         call xmpi_bcast(mmax,toall)\r\n         call xmpi_bcast(nmax,toall)\r\n#endif\r\n         par%nx = mmax-1\r\n         par%ny = nmax-1",
     "verified_at_lines": "L232-L237",
     "source_sha256": "73648b5733a8f90a8f18cda32743bdc2ef42f649e39c521e28e06584ee63c359"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The external header parser checks READ success and a Cartesian marker, not dimension bounds. mmax/nmax feed nx/ny directly, then grid_bathy/gridprops allocate and index boundaries without a subsequent minimum-size gate.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {
@@ -317,6 +361,13 @@
     "quote": "      par%tstart  = readkey_dbl ('params.txt','tstart',   0.d0,      0.d0,par%tstop,strict=.true.)\r\n      par%tint    = readkey_dbl ('params.txt','tint',     900.d0,     .0d0, par%tstop-par%tstart,strict=.true.)  ! Robert\r\n      par%tsglobal = readkey_name('params.txt','tsglobal')\r\n      if (par%tsglobal==' ') then\r\n         par%tintg   = readkey_dbl ('params.txt','tintg', par%tint,     0.d0, par%tstop-par%tstart,strict=.true.)  ! Robert",
     "verified_at_lines": "L1227-L1231",
     "source_sha256": "73648b5733a8f90a8f18cda32743bdc2ef42f649e39c521e28e06584ee63c359"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Strict range checks use value<minimum, so zero is accepted for each listed interval. The output-category and schedule-file gates avoid unused divisors, but selecting any corresponding generated schedule with interval zero reaches the division in timestep_init; morphological rescaling preserves zero.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {
@@ -338,6 +389,13 @@
     "quote": "      if (par%posdwn<0.1d0) then\r\n         par%posdwn=-1.d0  ! Backward compatibility, now posdwn = 0 also works in input (i.e. posdwn = false)\r\n      endif",
     "verified_at_lines": "L1536-L1538",
     "source_sha256": "73648b5733a8f90a8f18cda32743bdc2ef42f649e39c521e28e06584ee63c359"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The parser accepts fractional posdwn values and the later <0.1 conversion changes their sign semantics discontinuously. No discrete-sign validation or normalization of the remaining positive values follows, and grid_bathy then multiplies depth by the resulting magnitude squared.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {

@@ -1,0 +1,523 @@
+{
+  "shard": "XBeach-000",
+  "verdicts": [
+    {
+      "vid": "trunk__src__xbeach__xbeach.F90#0",
+      "verdict": "REFUTED",
+      "rationale": "The ignored rc assignments exist, but the claimed inability of failures to stop the driver is false: init/final return zero on normal completion, and timestep failures are carried in libxbeach_module%error to outputext, which calls output_error and halts (libxbeach.F90:L228-L237). The fixed t/tstop lookups are valid generated parameters; no recoverable lifecycle failure bypassing this path was found.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/output.F90:L209-L212",
+        "quote": "      !call output(s, sglobal, par, tpar, update=.false.)\n      call writelog('lse','','An extra output timestep is created to inquire the last timestep')\n      call writelog('lse','','    before an error occured')\n      call halt_program"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__filefunctions.F90#0",
+      "verdict": "NARROWED",
+      "rationale": "The optional exist result is wrong on a non-master only when execution returns, notably with forceclose=.false.; default missing-file handling halts on the master. No repository caller requests exist, so this is a LOW latent API-result defect rather than an observed MPI simulation inconsistency.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/filefunctions.F90:L49-L58",
+        "quote": "      error = 0\n      if (xmaster) call check_file_exist_generic(filename,error)\n\n      if (error==1 .and. endsim) then\n         if (xmaster) then\n            call writelog('sle','','File ''',trim(filename),''' not found. Terminating simulation')\n         endif\n         call halt_program\n      endif\n"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__filefunctions.F90#2",
+      "verdict": "STANDS",
+      "rationale": "The full three readers allocate and OPEN before their checked READ, without STAT or IOSTAT on those earlier operations. Callers often check existence first, but that neither guarantees readability nor prevents allocation failure; invalid dimensions are not uniformly rejected upstream."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__filefunctions.F90#3",
+      "verdict": "STANDS",
+      "rationale": "Existence is checked, but OPEN failures remain unchecked and any nonzero numeric READ status terminates counting. params.F90:L596-L599 and L1309-L1310 use this count for discharge/drifter records, so a malformed first numeric field can silently shorten or empty the inferred input."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__filefunctions.F90#10",
+      "verdict": "NARROWED",
+      "rationale": "The helper does accept header-only LOCLIST, but spectral_wave_init subsequently requires nspectrumloc>=1 and reads that many location records, halting on the missing first record (initialize.F90:L678-L704). This is a LOW early-validation gap, not evidence that the spectral simulation can run without a boundary file.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/initialize.F90:L694-L703",
+        "quote": "         do i=1,par%nspectrumloc\n            ! read x,y and file name per location\n            read(fid,*,IOSTAT=err)xspec(i),yspec(i),bcfiles(i)%fname\n            bcfiles(i)%listline = 0\n            if (err /= 0) then\n               ! something has gone wrong during the read of this file\n               call writelog('ewls','a,i0,a,a)','error reading line ',i+1,' of file ',par%bcfile)\n               call writelog('ewls','','check file for format errors and ensure the number of  ',&\n               'lines is equal to nspectrumloc')\n               call halt_program"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__getkey.F90#0",
+      "verdict": "REFUTED",
+      "rationale": "These are tagged alternatives, not a collection of pointers whose association status must all be valid: successful getkey sets value%type and the corresponding scalar pointer (getkey.F90:L87-L100). The general consumer branches on that tag, and typed getters consume their matching scalar immediately, so unused components remaining undefined does not establish this defect.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/ncoutput.F90:L356-L363",
+        "quote": "         rc = getkey(par, keys(i), val)\n         if (val%type == 'i') then\n            NF90(nf90_put_att(ncid, parvarid, keys(i), val%i0 ))\n         elseif (val%type == 'c') then\n            NF90(nf90_put_att(ncid, parvarid, keys(i), val%c0 ))\n         elseif (val%type == 'r') then\n            NF90(nf90_put_att(ncid, parvarid, keys(i), val%r0 ))\n         end if"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__getkey.F90#1",
+      "verdict": "STANDS",
+      "rationale": "getkey explicitly uses one saved target per scalar type and returns pointers to it; the comment acknowledges the aliasing but does not prevent it. Immediate-copy consumers avoid the problem, yet retaining two successful same-type descriptors through the public getkey API reproduces it."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__initialize.F90#0",
+      "verdict": "STANDS",
+      "rationale": "nsetbathy's recommended minimum in params.F90:L1447 is not strict, and no schedule ordering check precedes LINEAR_INTERP. That routine returns yy=0 for n<=0 (interp.F90:L121-L126), while otherwise assuming ascending abscissae, so both stated failure modes survive the caller check."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__initialize.F90#1",
+      "verdict": "STANDS",
+      "rationale": "Neither tide_init nor loading bedfriccoef assigns s%cf after its explicit zeroing; the actual friction calculation occurs later in the flow machinery. With hotstartflow=1 and wet cells, the WHERE expressions divide by this zero field, and the fixed-point loop has neither an iteration limit nor explicit nonfinite handling."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__initialize.F90#2",
+      "verdict": "STANDS",
+      "rationale": "The multi-grain files are read directly into pbbed and only their sum is checked; a composition such as (-0.2,1.2) is already unit-sum and is left untouched. No per-component clamp precedes the weighted grain diameters at initialize.F90:L1390-L1395."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__initialize.F90#3",
+      "verdict": "REFUTED",
+      "rationale": "idrift and jdrift are double-precision grid-space coordinates, so these assignments do not truncate to integer indices. drifters.F90:L35-L48 converts them later and checks all four indices before array access; the alleged unbounded integer-index initialization misreads the declaration.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/variables.def:L245-L246",
+        "quote": "   double precision,              target :: idrift(:)        !< [-] Drifter x-coordinate in grid space {\"shape\": [\"par%ndrifter\"], \"standard_name\": \"\", \"broadcast\": \"b\"}\n   double precision,              target :: jdrift(:)        !< [-] Drifter y-coordinate in grid space {\"shape\": [\"par%ndrifter\"], \"standard_name\": \"\", \"broadcast\": \"b\"}"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__initialize.F90#5",
+      "verdict": "STANDS",
+      "rationale": "All three low-level readers discard OPEN/READ statuses after the preliminary list-directed length check. The fixed E15.8/I4 formats impose a different field contract, so text that passes the preliminary numeric check can still fail or be misparsed during the unchecked restart read."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__initialize.F90#6",
+      "verdict": "NARROWED",
+      "rationale": "Bathymetry scaling by posdwn squared in magnitude remains possible for positive values >=0.1 other than 1, including out-of-range magnitudes accepted with a warning, but not for every non-unit input. all_input first converts every value below 0.1, including zero and negative fractions, to -1; the residual issue is acceptance/scaling of noncanonical positive sign values.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.F90:L1536-L1538",
+        "quote": "      if (par%posdwn<0.1d0) then\n         par%posdwn=-1.d0  ! Backward compatibility, now posdwn = 0 also works in input (i.e. posdwn = false)\n      endif"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__initialize.F90#8",
+      "verdict": "REFUTED",
+      "rationale": "The normal caller has already scanned the same Delft3D grid header in all_input before grid_bathy runs. That earlier scan checks IOSTAT on every comment-line read and halts on EOF, so an unchanged comment-only file cannot reach this second unchecked loop.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.F90:L205-L213",
+        "quote": "            do while (comment .eqv. .true.)\n               read(31,'(a)',iostat=ier)line\n               if (ier .ne. 0) then\n                  call report_file_read_error(par%xyfile)\n               endif\n               if (line(1:1)/='*') then\n                  comment=.false.\n               endif\n            enddo"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__initialize.F90#11",
+      "verdict": "STANDS",
+      "rationale": "The single_dir and swave branches avoid some individual divisions but each enabled angular-grid path still has an unchecked user-controlled spacing. params.F90:L263-L265 supplies only advisory bounds, and no later minimum count is imposed before allocation or the ntheta average."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__initialize.F90#12",
+      "verdict": "NARROWED",
+      "rationale": "grid_bathy really evaluates and, under MPI, sends undefined zb on the stated paths, but the normal lifecycle subsequently loads zb/zb0 and sed_init recomputes slopes before time integration (libxbeach.F90:L163-L179). Retain MED undefined early reads rather than infer persistent HIGH bathymetry corruption from these temporary values.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/initialize.F90:L1464-L1471",
+        "quote": "      ! Initialize dzbdx, dzbdy\n      do j=1,s%ny+1\n         do i=1,s%nx\n            s%dzbdx(i,j)=(s%zb(i+1,j)-s%zb(i,j))/s%dsu(i,j)\n         enddo\n      enddo\n      ! dummy, needed to keep compiler happy\n      s%dzbdx(s%nx+1,:)=s%dzbdx(s%nx,:)"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__initialize.F90#13",
+      "verdict": "REFUTED",
+      "rationale": "zs0fac has no active tide-computation consumer in this source tree. tide_init and tide_boundary_timestep use fill_tide_grid, whose completely submerged branch directly interpolates offshore and bay levels into zs0, so zero legacy weights do not suppress tides.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/compute_tide_zs0.F90:L615-L620",
+        "quote": "         elseif (tide1>maxzbg .and. tide2>maxzbg) then\n            ddist = 1.d0/(s%sdist(s%nx+1,j)-s%sdist(1,j))\n            do i = 3,s%nx-1\n               fac = (s%sdist(i,j)-s%sdist(1,j))*ddist\n               s%zs0(i,j) = (1.d0-fac)*tide1+fac*tide2\n            enddo"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__initialize.F90#14",
+      "verdict": "STANDS",
+      "rationale": "With ny=0 and endpoints nearest different cross-shore cells, the v-line branch stores n1=0 exactly as claimed; params imposes no 1D line-discharge restriction. The downstream domain test is not a reliable neutralizer because boundaryconditions.F90:L1645-L1646 can extend the lower alongshore range to zero."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__initialize.F90#21",
+      "verdict": "STANDS",
+      "rationale": "The XBeach nx minimum in params.F90:L150 is advisory, Delft3D dimensions bypass it, and gridprops forms distances without rejecting coincident coordinates. Neither the later repeated slope initialization nor the ny>0 guards protect the cross-shore boundary copies and divisions from invalid nx or zero dsu."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__initialize.F90#22",
+      "verdict": "STANDS",
+      "rationale": "WBCTYPE_PARAMS and the TS_1/TS_2 paths can retain a zero Trep accepted by non-strict reads at params.F90:L422-L432. They are outside the Trep=10 override in wave_init, so the intrinsic-frequency division is reached without a positive-period check."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__initialize.F90#23",
+      "verdict": "STANDS",
+      "rationale": "hotstart_init_1 loads uu/vv before flow_init, whose later assignments overwrite both regardless of hotstart. hotstart_init_2 reloads other restart fields but never uu/vv, so no subsequent loader restores the discarded velocities."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__interp.F90#0",
+      "verdict": "STANDS",
+      "rationale": "The routine derives icycle directly from the first spacing and caller-supplied period, then uses it as the increment/decrement in wrapping loops. The active waveparamsnew.F90:L1326-L1328 caller supplies a positive period but does not establish a positive compatible first input-angle spacing, and there is no fallback for nonpositive icycle."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__interp.F90#1",
+      "verdict": "NARROWED",
+      "rationale": "The public mapping helpers are unsafe with fabricated or corrupted references, but the repository's ship path obtains iref from MKMAP, which emits either all-zero references or four in-range cell corners. Thus retain LOW missing defensive validation for direct API misuse, not a demonstrated out-of-bounds mapping in the normal ship path.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/interp.F90:L457-L464",
+        "quote": "                     covered(i2) = 1\n                     call bilin5(xp, yp, x2(i2), y2(i2), hbuff, ier)\n                     w(:, i2) = real(hbuff(:),4)\n                     !\n                     iref(1, i2) = i1 + (j1 - 1)*m1\n                     iref(2, i2) = i1 + 1 + (j1 - 1)*m1\n                     iref(3, i2) = i1 + 1 + j1*m1\n                     iref(4, i2) = i1 + j1*m1"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__interp.F90#2",
+      "verdict": "NARROWED",
+      "rationale": "The real*4 conversion can affect near-edge tests through loss of precision in relative geometry, but the alleged dependence on the absolute coordinate scale is overstated. xq-xp and yq-yp are evaluated in double precision before conversion, removing the large common origin; the remaining issue is sensitivity to local offsets and near-cancelling edge tests.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/interp.F90:L997-L1000",
+        "quote": "      do i = 1, n\n         x(i) = real( xq(i)-xp , 4)\n         y(i) = real( yq(i)-yp , 4)\n      enddo"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__interp.F90#3",
+      "verdict": "NARROWED",
+      "rationale": "Uncovered entries of covered are indeed left untouched, but the only repository caller never reads that array after passing it to MKMAP (ship.F90:L323-L328). iref and w are explicitly zeroed and control the actual mapping, so retain a LOW public output-contract defect rather than HIGH simulation corruption.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/interp.F90:L331-L332",
+        "quote": "      iref=0\n      w=0.d0"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__interp.F90#4",
+      "verdict": "STANDS",
+      "rationale": "IPON containment does not establish BILIN5's nonsingularity/convexity conditions; degenerate or concave cells can pass containment yet take an early error exit. Both callers then copy the undefined INTENT(OUT) weights and mark coverage successful, with no IER check or replacement weights."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__interp.F90#5",
+      "verdict": "NARROWED",
+      "rationale": "The integration is wrong for both stated short-interval cases, but the excess is not uniformly one full cell: with unit spacing and y=1, limits 0.2..0.8 return 2.6 instead of 0.6, while 0.2..1.8 return 2.6 instead of 1.6. No internal caller of this public trapezoidal routine was found, so retain a MED standalone integration defect with corrected magnitude."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__interp.F90#6",
+      "verdict": "NARROWED",
+      "rationale": "Equidistance is an explicit precondition, so failure on an arbitrary nonuniform grid is not independently a bug in the stated algorithm. The residual LOW robustness issue is undefined behavior for invalid lengths, zero spacing, or reversed overlapping limits supplied directly to this otherwise unused public helper.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/interp.F90:L1374-L1377",
+        "quote": "   subroutine trapezoidal(x,y,n,x1_in,x2_in,integ)\n      ! Compute integral over function y(x) from x1 to x2\n      ! x is equidistant\n      !(c)2014 Dano Roelvink"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__interp.F90#7",
+      "verdict": "STANDS",
+      "rationale": "The n>icycle+1 branch has no executable initialization or error action, and xc(1) and yc are subsequently read. Neither the active spectral caller nor the trapezoidal_cyclic wrapper rejects a source angle array whose length exceeds the cycle inferred from its first spacing."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__interp.F90#8",
+      "verdict": "STANDS",
+      "rationale": "Index wrapping does not repair facright: for a unit-spaced grid starting at 0.5, query 1.0 gets zero fractional weight instead of 0.5. Negative non-grid queries likewise use a negative MOD remainder, and the caller's positive cycle does not constrain all source origins or stationary target angles."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__interp.F90#9",
+      "verdict": "NARROWED",
+      "rationale": "The INTENT(OUT) declaration makes every untouched covered entry undefined even if the caller had initialized it. No repository call to make_map was found, so this remains a MED latent public output-contract defect rather than demonstrated HIGH runtime corruption."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__interp.F90#10",
+      "verdict": "NARROWED",
+      "rationale": "Zero n2 is not handled and can already fail inside SORT/INDEXX before HUNT, so the helper is unsafe for an empty target set. The ship caller uses the product of its grid extents for n2 and no ordinary empty-target invocation was found; retain LOW empty-input robustness rather than a demonstrated simulation failure."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__interp.F90#12",
+      "verdict": "NARROWED",
+      "rationale": "For a positive previous reference, unbounded coordinate displacements can produce out-of-grid new references and zero metrics remain unchecked. No call to mkmap_step exists elsewhere in the repository, so retain MED latent helper bounds failure rather than HIGH impact on the active mapper."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__interp.F90#13",
+      "verdict": "STANDS",
+      "rationale": "The active set_stationary_spectrum caller passes s%ntheta_s directly, and grid_bathy imposes no ntarget>=2 condition. A narrow valid angular range can produce one target bin, making xtarg(2) out of bounds even without supplying a zero spacing."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__math_tools.F90#0",
+      "verdict": "NARROWED",
+      "rationale": "The flip=1 implementation really indexes columns with the row extent, but every located model call uses flip=2; waveparams.F90 even changes its flag from 1 to 2 before calling. Retain MED latent public flip=1 corruption; for M1<M2 the untouched columns are zero-initialized, not undefined.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/waveparams.F90:L673-L677",
+        "quote": "      ! If angles were decreasing, flip S_array as also dir is flipped\n      if (flipped == 1) then\n         flipped=2\n         call flipa(wp%S_array,nfreq,ndir,flipped)\n      end if"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__math_tools.F90#1",
+      "verdict": "STANDS",
+      "rationale": "The npass<=1 return precedes every allocation/deallocation that defines stat, and fftn immediately tests stat after the call. A singleton transformed dimension is a legitimate shape and no wrapper rejects it, so the undefined-status path is not confined to invalid input."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__math_tools.F90#2",
+      "verdict": "REFUTED",
+      "rationale": "The routine constructs an analytic signal from real data in-place, which explains why its input/output buffer is complex. The actual envelope callers explicitly replace the buffer with real water-level series immediately before the call, so no imaginary input information is lost in the intended operation.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/waveparamsnew.F90:L2436-L2443",
+        "quote": "         do iy=1,s%ny+1\n            ! Integrate instantaneous water level excitation of wave components over directions\n            eta(iy,:) = sum(zeta(iy,:,:),2)\n            tempcmplx=eta(iy,:)\n            !\n            ! Hilbert transformation to determine envelope of all total\n            ! non-directional wave components\n            call hilbert(tempcmplx,size(tempcmplx))"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__math_tools.F90#3",
+      "verdict": "NARROWED",
+      "rationale": "The documented dim contract is a subset of available dimensions with size no greater than the rank, and stat reports temporary-allocation errors rather than argument validation. Invalid, duplicate, or oversized selectors therefore amount to LOW unchecked contract misuse, with no such model call found; the truncation is not evidence of a valid-input FFT defect.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/math_tools.F90:L72-L82",
+        "quote": "   !   dim      One dimensional integer array, containing the dimensions to be\n   !            transformed. Default is (/1,...,N/) with N being the rank of\n   !            array, i.e. complete transform. dim can restrict transformation\n   !            to a subset of available dimensions. Its size must not exceed the\n   !            rank of array or the size of shape respectivly.\n   !\n   !   inv      If .true., inverse transformation will be performed. Default is\n   !            .false., i.e. forward transformation.\n   !\n   !   stat     If present, a system dependent nonzero status value will be\n   !            returned in stat, if allocation of temporary storage failed."
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__math_tools.F90#4",
+      "verdict": "STANDS",
+      "rationale": "An empty dim subset executes no fftradix call and leaves a present INTENT(OUT) stat undefined. PRODUCT of that empty subset is one, so the identity transform itself is harmless, but it does not define the returned status."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__math_tools.F90#5",
+      "verdict": "NARROWED",
+      "rationale": "m<=0 is unguarded and would fail before meaningful Hilbert processing, but all located model calls pass the size of a generated signal buffer. Retain LOW robustness for empty/invalid input rather than MED corruption of a valid positive-length signal."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__math_tools.F90#6",
+      "verdict": "STANDS",
+      "rationale": "The zero-seed repair happens after IABS and MOD, so it cannot make negation of the most-negative default integer representable. The public routine has no exclusion for that input; later generator arithmetic may produce a positive value, but the overflowing IABS operation remains."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__math_tools.F90#7",
+      "verdict": "NARROWED",
+      "rationale": "Arbitrary shape/data disagreement violates the explicit caller contract, and fft wrappers supply SHAPE(array). The remaining MED issue is unchecked default-integer PRODUCT overflow for genuinely very large valid arrays, plus unsupported empty extents; a general assumed-size traversal bug cannot be inferred merely from fabricated shape values.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/math_tools.F90:L49-L53",
+        "quote": "   !   shape    With subroutine fftn, the shape of the array to be transformed\n   !            has to be passed separately, since fftradix - the internal trans-\n   !            formation routine - will treat array always as one dimensional.\n   !            The product of elements in shape must be the number of\n   !            elements in array."
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__mnemonic.F90#0",
+      "verdict": "REFUTED",
+      "rationale": "arraytype is a tagged descriptor: generated indextos defines the selected pointer, including explicit NULL for an unavailable source, and defines the matching type/rank. Consumers dispatch on those tags (output.F90:L237-L279), so undefined inactive alternatives do not establish an association-status defect.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/templates/indextos.mako:L31-L38",
+        "quote": " case(  ${i+1})\n   if (associated(s%${var[\"name\"]})) then\n      t%${typecodes[var[\"type\"]]}${rank(var)}  => s%${var[\"name\"]}\n   else\n      t%${typecodes[var[\"type\"]]}${rank(var)}  => NULL()\n   endif\n   t%rank =  ${rank(var)}\n   t%type = '${typecodes[var[\"type\"]]}'"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__mnemoniciso.F90#0",
+      "verdict": "REFUTED",
+      "rationale": "An entity array specification overrides the DIMENSION attribute's default shape; this is not a duplicate-shape syntax error. A minimal BIND(C) derived type containing this exact declaration passed gfortran -std=f2018 -pedantic-errors -fsyntax-only, and its effective component extent is 20.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/mnemoniciso.F90:L16-L16",
+        "quote": "      character(kind=c_char), dimension(maxrank) :: dimensions(20) ! the dimensions of the variable, for example (s%nx, s%ny)"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__mnemoniciso.F90#1",
+      "verdict": "STANDS",
+      "rationale": "arrayf2c returns C_LOC of a local unsaved array unrelated to farray's selected storage; the module SAVE statement does not give procedure locals SAVE. introspection.F90:L486-L506 exposes this result through getarray, so the bogus pointer reaches the foreign API."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__mnemoniciso.F90#2",
+      "verdict": "NARROWED",
+      "rationale": "The unconditional final assignment makes stringlength return the buffer size irrespective of NUL placement. No call to this helper was found, and the active C string conversion is supplied separately by iso_c_utils, so retain LOW latent utility logic failure rather than HIGH model impact."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__params.F90#2",
+      "verdict": "NARROWED",
+      "rationale": "Only the automatic-computation notice is skipped at epsi=-1. The actual boundary update tests epsi<0 and computes factime for that sentinel, so this is a LOW logging-threshold issue, not loss of automatic tide relaxation.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/boundaryconditions.F90:L1137-L1146",
+        "quote": "      ! jaap: compute epsi based on offshore boundary conditions if epsi = -1\n      if (par%epsi<0.d0) then\n         if (par%swave==1) then\n            if(par%tidetype==TIDETYPE_VELOCITY) then\n               factime = 1.d0/par%cats/par%Trep*par%dt\n            elseif (par%tidetype==TIDETYPE_HYBRID) then\n               factime = hybf1*1.d0/par%cats/par%Trep*par%dt\n            else\n               ! do we need this?\n               factime = 0.1d0/par%cats/par%Trep*par%dt"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__params.F90#4",
+      "verdict": "NARROWED",
+      "rationale": "A wholly absent count keyword defaults to zero and does not call this reader, but a differently cased positive count is accepted by readkey and then missed by this case-sensitive scan. Retain MED mixed-case/section parsing failure and unchecked EOF, rather than the broader HIGH missing-keyword scenario.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.F90:L2239-L2242",
+        "quote": "         par%pointvars=''\n         if (par%npoints>0) then\n            call readPointPosition(par,'point',xpointsw,ypointsw)\n            ! Is the keyword npointvar specified?"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__params.F90#10",
+      "verdict": "STANDS",
+      "rationale": "Generated parameter declarations initialize hotstart to -123 (params.def:L92), not to the user's requested value. all_input tests it for depfile at L160 and reads hotstart only at L312, with no earlier hotstart assignment or caller pre-read; a normal fresh hotstart request therefore unnecessarily requires depfile."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__params.F90#11",
+      "verdict": "NARROWED",
+      "rationale": "The advisory bounds really permit zero/negative gravity, periods and active grid spacings to reach unsafe arithmetic, but some negative dx/dy values intentionally request metric fallback on variable grids. The claimed nonterminating angular normalization is not established by these parameters: its increment is the fixed positive px constant; retain the concrete HIGH division/invalid-grid failures.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.def:L502-L502",
+        "quote": "      double precision                  :: px                       = 4.d0*atan(1.d0)      !  [-] Pi"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__params.F90#12",
+      "verdict": "STANDS",
+      "rationale": "The external header parser checks READ success and a Cartesian marker, not dimension bounds. mmax/nmax feed nx/ny directly, then grid_bathy/gridprops allocate and index boundaries without a subsequent minimum-size gate."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__params.F90#16",
+      "verdict": "STANDS",
+      "rationale": "Strict range checks use value<minimum, so zero is accepted for each listed interval. The output-category and schedule-file gates avoid unused divisors, but selecting any corresponding generated schedule with interval zero reaches the division in timestep_init; morphological rescaling preserves zero."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__params.F90#17",
+      "verdict": "STANDS",
+      "rationale": "The parser accepts fractional posdwn values and the later <0.1 conversion changes their sign semantics discontinuously. No discrete-sign validation or normalization of the remaining positive values follows, and grid_bathy then multiplies depth by the resulting magnitude squared."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__readkey.F90#1",
+      "verdict": "NARROWED",
+      "rationale": "An unpaired optional name does cause an absent-value reference, but every located setallowednames call supplies complete positional name/value pairs as the documented setup pattern requires. Retain LOW defensive API-contract checking for malformed keyword calls, not HIGH failure from model input.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/readkey.F90:L739-L744",
+        "quote": "   !  integer NAME1, NAME2, NAME3\n   !  call setallowednames('name1',NAME1,'name2',NAME2,'name3',NAME3)\n   !   this defines the allowed names ('name1', 'name2', 'name3') and\n   !   the to-be associated integer values (NAME1, NAME2, NAME3)\n   !  call setoldname('0','1')\n   !   this defines alternate allowed names for 'name1' and 'name2'"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__readkey.F90#2",
+      "verdict": "NARROWED",
+      "rationale": "Independent setup calls can construct nov>nv, but the located params registrations keep legacy-name counts within canonical counts. Retain MED latent API misuse: allowed(j) is outside its dummy extent when j>nv, although the actual backing allowednames array still has 20 entries, so this is not automatically a heap-buffer overrun.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/readkey.F90:L43-L47",
+        "quote": "   integer, parameter, private                   :: maxnames = 20\n   character(slen), dimension(maxnames), private :: allowednames\n   character(slen), dimension(maxnames), private :: oldnames\n   character(slen), private                      :: varname\n   integer,         dimension(maxnames), private :: intvalues"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__readkey.F90#3",
+      "verdict": "STANDS",
+      "rationale": "The complete cache loader counts all lines, then increments ikey for every line with '=' without limiting it to 1024. Neither strippedline nor caller validation filters excess records, so 1025 such lines can overrun both fixed arrays before normal parameter validation."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__readkey.F90#4",
+      "verdict": "NARROWED",
+      "rationale": "With USEMPI and bcast=.false., non-master results are indeed undefined, but this option is used for master-only file-reading paths rather than as a promise to compute a value on every rank. Retain LOW latent API misuse; for example vegetation's nonbroadcast reads are inside its xmaster block, and the default readers broadcast.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vegetation.F90:L105-L109",
+        "quote": "         if (xmaster) then\n            allocate(veg(par%nveg))\n            fid=create_new_fid()\n            call check_file_exist(par%veggiefile)\n            open(fid,file=par%veggiefile)"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__readkey.F90#5",
+      "verdict": "NARROWED",
+      "rationale": "A keyword call that skips an earlier optional scalar triggers the stated absent-argument access. All actual read_v scalar calls in ship.F90:L181-L200 pass a contiguous positional prefix, so retain LOW public API robustness rather than HIGH failure in the current file readers.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/ship.F90:L181-L186",
+        "quote": "                     call read_v(fid,sh(i)%track_t(it),sh(i)%track_x(it),sh(i)%track_y(it))\n                  enddo\n               else\n                  do it=1,sh(i)%track_nt\n                     ! also read in track_dir, in nautical deg\n                     call read_v(fid,sh(i)%track_t(it),sh(i)%track_x(it),sh(i)%track_y(it),sh(i)%track_dir(it))"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__readkey.F90#6",
+      "verdict": "STANDS",
+      "rationale": "The numeric value buffer is parsed with F10.0 and no second parse verifies the full text. A value such as 1.234567890123 is limited to its first ten characters, and strict range handling occurs only after that truncation."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__readkey.F90#7",
+      "verdict": "STANDS",
+      "rationale": "The double and integer vector readers only halt for negative conversion status, and malformed numeric tokens normally produce positive status. No earlier token validation or initialization defines the unread tail before the range checks and return."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__readkey.F90#9",
+      "verdict": "STANDS",
+      "rationale": "The helpers section the result using unchecked vlength and define only that prefix. The strict ngd bound protects grain-size calls, but nrugdepth is non-strict at params.F90:L1260-L1261 and can exceed its fixed result capacity; later tail initialization does not undo an earlier overflow."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__readkey.F90#10",
+      "verdict": "STANDS",
+      "rationale": "fnameold is the sole cache invalidation key and there is no public reset or same-name refresh path. Switching filenames can incidentally refresh it, but consecutive reads of a modified same-name file necessarily retain the old values and readindex state as claimed."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__readkey.F90#12",
+      "verdict": "NARROWED",
+      "rationale": "parm_str is undefined immediately on a non-master return from parmapply, but all_input later broadcasts the entire parameter structure before the normal initialization consumers use these strings (params.F90:L1976-L1978). Retain LOW standalone API return-contract failure rather than HIGH persistent MPI parameter corruption.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.F90:L2012-L2018",
+        "quote": "      call xmpi_bcast(par%swave,toall)\n      parlen = int(sizeof(par))\n\n      if (toall) then\n         call MPI_Bcast(par,parlen,MPI_BYTE,xmpi_imaster,xmpi_ocomm,ierror)\n      else\n         call MPI_Bcast(par,parlen,MPI_BYTE,xmpi_master,xmpi_comm,ierror)"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__readkey.F90#14",
+      "verdict": "STANDS",
+      "rationale": "strippedline blanks every byte outside 32..126 before the cache stores any value, and readkey_name subsequently returns that modified string. No encoding-aware path preserves non-ASCII filename bytes, so this affects actual file-valued parameters."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__spaceparams.F90#0",
+      "verdict": "STANDS",
+      "rationale": "The MPI collector reallocates the global selected array, performs no gather for real rank one, then sets collected=true. Rank-one global NetCDF output is explicitly accepted (ncoutput.F90:L388-L392), so it can reach this path; resetting collected on the next output cycle does not recover the missing current data."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__spaceparams.F90#1",
+      "verdict": "STANDS",
+      "rationale": "The generated include templates add only recognized variable cases and do not provide a default error handler. An invalid index therefore leaves r=true or does nothing, while indextos rejects it; the claimed LOW inconsistency is real."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__spaceparams.F90#2",
+      "verdict": "REFUTED",
+      "rationale": "The vector routine explicitly documents x versus the other case as its selector contract; the rank-two block routine explicitly limits implementation to y. Located callers use lowercase y, so differing supported operations for different array ranks do not establish an erroneous distribution path.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/spaceparams.F90:L311-L319",
+        "quote": "      ! Ok, the master process holds a vector of length ny+1 or nx+1\n      ! This vector will be distributed among all processes.\n      ! if xy .eq. 'x', the distribution is done according\n      ! to the values in is and lm, i.e. the global vector\n      ! has a size equal to the size of the first dimension of the\n      ! global area: nx+1.\n      ! In the other case, the distribution is done according to\n      ! the values in js and ln, i.e. the global vector has a size\n      ! equal to the second dimension of the global area: ny+1"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__spaceparams.F90#3",
+      "verdict": "NARROWED",
+      "rationale": "A direct unknown-mnemonic or invalid-index call can access collected out of bounds before validation, but user output names are validated by readOutputStrings and built-in collection names are generated constants. Retain LOW latent public API bounds failure rather than a demonstrated malformed-output-name path in the normal parser.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.F90:L2389-L2396",
+        "quote": "            ! Check if this is a valid variable name\n            index = chartoindex(line)\n            if (index/=-1) then\n               tempnames(i)=trim(line) ! wwvv use trim() to avoid compiler warning\n               call writelog('ls','',trim(okline),trim(tempnames(i)))\n            else\n               call writelog('sle','',trim(errline),trim(line),'''')\n               call halt_program"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__spaceparams.F90#5",
+      "verdict": "STANDS",
+      "rationale": "Absolute polygon cross-products prevent negative areas, not zero areas, and no earlier grid validation rejects repeated coordinates or zero spacing. The 1D transverse metric defaults of 100 do not prevent zero cross-shore factors, so inverse areas can still divide by zero."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__spaceparams.F90#11",
+      "verdict": "STANDS",
+      "rationale": "With nx=1, the alfaz interior loop is empty and the two boundary assignments copy undefined values between its two elements. nx's recommended minimum of 2 is not strict in the XBeach reader and external Delft3D dimensions are unchecked, so the normal input path does not exclude this case."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__spaceparamsdef.F90#0",
+      "verdict": "REFUTED",
+      "rationale": "The lifecycle calls ranges_init after decomposition and before nonhydrostatic setup, means/output initialization, and all computation steps. ranges_init assigns every declared bound on all relevant branches, and no earlier active stencil use was found; merely being public and undefined before required setup is not a demonstrated defect.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/libxbeach.F90:L207-L218",
+        "quote": "      call space_distribute_space (sglobal,s,par)\n#endif\n\n      call ranges_init(s)\n\n      ! nonh_init does not always need to be called\n      if (par%wavemodel==WAVEMODEL_NONH) call nonh_init(s,par)\n\n      ! initialize output\n      call means_init             (sglobal,s,par     )\n\n      call output_init            (sglobal,s,par,tpar)"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__timestep.F90#0",
+      "verdict": "NARROWED",
+      "rationale": "Zero generated-output intervals and non-strict wavint remain real division hazards, but the normal parser rejects negative explicit output intervals and constrains tstart. Mean/hotstart builders also reject some invalid counts after division; retain the enabled generated-schedule zero/advisory-wavint cases rather than claiming every invalid time range bypasses validation.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.F90:L1227-L1231",
+        "quote": "      par%tstart  = readkey_dbl ('params.txt','tstart',   0.d0,      0.d0,par%tstop,strict=.true.)\n      par%tint    = readkey_dbl ('params.txt','tint',     900.d0,     .0d0, par%tstop-par%tstart,strict=.true.)  ! Robert\n      par%tsglobal = readkey_name('params.txt','tsglobal')\n      if (par%tsglobal==' ') then\n         par%tintg   = readkey_dbl ('params.txt','tintg', par%tint,     0.d0, par%tstop-par%tstart,strict=.true.)  ! Robert"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__timestep.F90#1",
+      "verdict": "STANDS",
+      "rationale": "par%dy is a length in params.def and grid construction, with no upstream squaring. In the ny<=2 wet-cell viscosity path it is combined directly with squared mdx; the final MIN with other limits can mask the effect in some runs but does not correct the erroneous candidate stability limit."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__timestep.F90#2",
+      "verdict": "NARROWED",
+      "rationale": "Ordinary cold and hot starts set par%t=0 in timestep_init, and both t<=0 compute_dt branches explicitly set dtref=0 before testing it (timestep.F90:L462-L476). The residual defect requires starting timestep through the library after setting time positive, which the introspection/BMI setters permit; it is not an uninitialized first-step failure of the normal driver.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/timestep.F90:L143-L144",
+        "quote": "      ! initialize the time to 0\n      par%t = 0.0d0"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__timestep.F90#3",
+      "verdict": "STANDS",
+      "rationale": "Schedule files are stored in input order and no sorting or monotonicity check follows. For times [0,2,1,3], MINVAL can select 1 while the category counter expects 2, and after 2 the counter remains waiting for the past 1, suppressing subsequent outputs."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__timestep.F90#5",
+      "verdict": "STANDS",
+      "rationale": "Neither the timepars component declarations nor any other initialization assigns ith/outputh. outputtimes_update reads ith when hotstart times exist and always includes outputh in the aggregate and counter update, so schedule-size checks do not eliminate the undefined-state use."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__timestep.F90#11",
+      "verdict": "STANDS",
+      "rationale": "The update routine advances each category only once and excludes all current-time duplicates from the next-time minimum. A file schedule [0,1,1,2] leaves its counter expecting the second 1 after time advances, preventing output at 2; this stalls the category, not necessarily the simulation's time loop."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__timestep.F90#15",
+      "verdict": "STANDS",
+      "rationale": "The groundwater branches divide by par%kx and, for the alongshore branch, par%ky; their positive minima in params.F90:L829-L835 are advisory. gw_init copies these values to local permeability fields rather than validating or repairing the parameter divisors, so zero/negative inputs can reach the stated arithmetic."
+    }
+  ]
+}

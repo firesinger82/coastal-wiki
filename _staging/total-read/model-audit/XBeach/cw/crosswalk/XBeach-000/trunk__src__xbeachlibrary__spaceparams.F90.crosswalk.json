@@ -37,7 +37,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The MPI collector reallocates the global selected array, performs no gather for real rank one, then sets collected=true. Rank-one global NetCDF output is explicitly accepted (ncoutput.F90:L388-L392), so it can reach this path; resetting collected on the next output cycle does not recover the missing current data.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -58,7 +65,14 @@
    "representative": "audit",
    "rationale": "blinded SAME (many-to-one)",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The generated include templates add only recognized variable cases and do not provide a default error handler. An invalid index therefore leaves r=true or does nothing, while indextos rejects it; the claimed LOW inconsistency is real.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -77,7 +91,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "The vector routine explicitly documents x versus the other case as its selector contract; the rank-two block routine explicitly limits implementation to y. Located callers use lowercase y, so differing supported operations for different array ranks do not establish an erroneous distribution path.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/spaceparams.F90:L311-L319",
+     "quote": "      ! Ok, the master process holds a vector of length ny+1 or nx+1\n      ! This vector will be distributed among all processes.\n      ! if xy .eq. 'x', the distribution is done according\n      ! to the values in is and lm, i.e. the global vector\n      ! has a size equal to the size of the first dimension of the\n      ! global area: nx+1.\n      ! In the other case, the distribution is done according to\n      ! the values in js and ln, i.e. the global vector has a size\n      ! equal to the second dimension of the global area: ny+1"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -96,7 +120,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "A direct unknown-mnemonic or invalid-index call can access collected out of bounds before validation, but user output names are validated by readOutputStrings and built-in collection names are generated constants. Retain LOW latent public API bounds failure rather than a demonstrated malformed-output-name path in the normal parser.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.F90:L2389-L2396",
+     "quote": "            ! Check if this is a valid variable name\n            index = chartoindex(line)\n            if (index/=-1) then\n               tempnames(i)=trim(line) ! wwvv use trim() to avoid compiler warning\n               call writelog('ls','',trim(okline),trim(tempnames(i)))\n            else\n               call writelog('sle','',trim(errline),trim(line),'''')\n               call halt_program"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -134,7 +168,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Absolute polygon cross-products prevent negative areas, not zero areas, and no earlier grid validation rejects repeated coordinates or zero spacing. The 1D transverse metric defaults of 100 do not prevent zero cross-shore factors, so inverse areas can still divide by zero.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "base_only",
@@ -230,6 +271,13 @@
     "quote": "      do j=1,s%ny+1\r\n         do i=2,s%nx\r\n            s%alfaz(i,j)=atan2(s%yz(i+1,j)-s%yz(i-1,j),s%xz(i+1,j)-s%xz(i-1,j))\r\n         enddo\r\n         s%alfaz(1,j)=s%alfaz(2,j)\r\n         s%alfaz(s%nx+1,j)=s%alfaz(s%nx,j)",
     "verified_at_lines": "L1404-L1409",
     "source_sha256": "e13f4e604ba812b76b9b67101356e4419a38f2787b4f6655cc23c88b3ac5e2b0"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "With nx=1, the alfaz interior loop is empty and the two boundary assignments copy undefined values between its two elements. nx's recommended minimum of 2 is not strict in the XBeach reader and external Delft3D dimensions are unchecked, so the normal input path does not exclude this case.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {

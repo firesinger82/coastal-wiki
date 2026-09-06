@@ -37,7 +37,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "This is a LOW extension/validation gap for recognized but unsupported mapped types such as bool or float: all 394 current parameters map to double, int, or char, matching getkey_module's c/i/r storage contract. A misspelled Fortran type does not silently reach getkey.mako at all: generate.py rejects an unmatched parameter declaration and exits.",
+    "neutralizer": {
+     "where": "trunk/scripts/generate.py:L193-L199",
+     "quote": "                else:\n                    raise RuntimeError('Something wrong while parsing parameters')\n            except Exception as e:\n                print (e)\n                print (\"Error while parsing line \"+str(lineno)+\" in \"+parameter_file+\":\")\n                print (line)\n                sys.exit(1)"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -56,7 +66,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "All 13 currently array-valued parameters are covered by the name exclusions, and getkey.F90:32 explicitly limits lookup to rank zero. Nevertheless the claimed change-triggered defect remains: a newly named array passes these name-only filters even though generate.py computes rank, and getkey.mako:38/45/52 then emits a scalar-element assignment from that array without a rank guard.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",

@@ -39,7 +39,14 @@
    "representative": "audit",
    "rationale": "blinded SAME (many-to-one)",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Both theta and theta_s can represent a full-circle sector with energy concentrated at its two ends. Their arithmetic weighted means then point toward the middle of the sector, and the nonzero-energy guard does not correct this angular discontinuity.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -58,7 +65,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The relative-height metric really divides by zero for a wet zero-energy cell. The ignored EE wetmask alone is not a demonstrated error: dry ee_local is cleared before eeprev is saved and again after updates, so those dry-cell differences are normally zero.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_stationary_directions.F90:L192-L200",
+     "quote": "      do itheta=1,ntheta_local\n         where(s%wete==0)\n            ee_local(:,:,itheta) = 0.d0\n         endwhere\n      enddo\n      where(s%wete==0)\n         s%E=0.d0\n         s%H=0.d0\n      endwhere"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -77,7 +94,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "The upstream wave_dispersion call floors sigm to 0.010 for WCI and otherwise sets it to 2*pi/Trep. Nothing in this solver's action round trip reassigns it to zero.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_functions.F90:L1080-L1085",
+     "quote": "         s%sigm = sqrt( par%g*km*tanh(arg)*fac)\n         s%sigm = max(s%sigm,0.010d0)\n         !  update intrinsic frequency\n         do itheta=1,s%ntheta\n            s%sigt(:,:,itheta) = s%sigm\n         enddo"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -98,7 +125,17 @@
    "representative": "audit",
    "rationale": "blinded SAME (many-to-one)",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "A changed-grid or changed-callType reentry can leave saved auxiliary arrays incompatible, but normal stepping never alternates these callTypes: stationary uses 0 and single_dir Surfbeat uses 1 for a fixed model configuration. Invalid callType has no repository caller.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_timestep.F90:L75-L91",
+     "quote": "      select case (par%wavemodel)\n       case(WAVEMODEL_STATIONARY)\n         ! call update_means_wave_flow not required: stationary always uses instantaneous water depth s%hhw\n         if ((abs(mod(par%t,par%wavint))<0.001d0*par%dt) .or. s%newstatbc==1) then\n            call wave_dispersion(s,par,0)  ! use instantaneous water depth (and velocity)\n            call wave_stationary_directions(s,par,0)\n            s%newstatbc   = 0\n         endif\n       case(WAVEMODEL_SURFBEAT)\n         if (par%single_dir==1) then\n            ! always need to update depths for wave directions model, as well as in case of wci (dealt with in subroutine)\n            call update_means_wave_flow(s,par)\n            !\n            ! if necessary, update wave directions\n            if ((abs(mod(par%t,par%wavint))<0.001d0*par%dt) .or. s%newstatbc==1 .or. par%t==par%dt) then\n               call wave_dispersion(s,par,1)  ! use s%hhws water depth (and velocity)\n               call wave_stationary_directions(s,par,1)"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -117,7 +154,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "RH is explicitly sqrt(R/rhog8), and the scaled rr energy is followed by R=RH*gammafac_i. No final summation repairs R before compute_stokes_drift, so the active limiter stores a length in an energy field.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -136,7 +180,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The wet-cell guard eliminates the dry zero-speed path, and non-WCI phase speed is positive. The remaining zero denominator requires roller=1 and WCI current cancellation of the intrinsic propagation vector.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_functions.F90:L1178-L1187",
+     "quote": "                  if (par%wci==1) then\n                     cgx(i,j,itheta)= s%cg(i,j)*cs+uwci(i,j)\n                     cgy(i,j,itheta)= s%cg(i,j)*sn+vwci(i,j)\n                     cx(i,j,itheta) =  s%c(i,j)*cs+uwci(i,j)\n                     cy(i,j,itheta) =  s%c(i,j)*sn+vwci(i,j)\n                  else\n                     cgx(i,j,itheta)= s%cg(i,j)*cs\n                     cgy(i,j,itheta)= s%cg(i,j)*sn\n                     cx(i,j,itheta) =  s%c(i,j)*cs\n                     cy(i,j,itheta) =  s%c(i,j)*sn"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "base_only",

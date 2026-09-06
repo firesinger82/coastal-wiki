@@ -37,7 +37,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "dhdx and dhdy are local variables with no assignment before their use in the profile formula. Neither the VSM argument list nor its sole caller supplies them, and module SAVE does not furnish defined initial values.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -56,7 +63,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "For ordinary finite positive roughness, the caller fixes facdel=5, ks/h is below 12, and the delta clamp establishes sigma0<delta<=0.5; the viscosity construction likewise keeps sigmas above one, defeating a generic shallow/rough ordering failure. Singularities remain only for degenerate or extreme inputs, such as ks underflowing to zero or a viscosity ratio so small that sigmas rounds to one, rather than the broadly claimed admissible shallow regime.",
+    "neutralizer": {
+     "where": "trunk/src/xbeachlibrary/vsm_u_XB.f90:L80-L87",
+     "quote": "      if (omega.gt.0.) then\n         aorb   = uorb/omega\n         delta  = 0.09*(aorb/ks)**0.82*ks/h\n         !   fw     = min(1.39 * (uorb/(omega*z0))**(-.52),0.3)\n      endif\n\n      delta  = facdel*max(delta,exp(1.)*z0/h)\n      delta  = min(delta,0.5)"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -94,7 +111,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED_UNVERIFIED",
+    "rationale": "The sole caller invokes VSM only when nz>1 and passes that same nz as n. Consequently n=1 cannot reach the n-1 division through the model, even though the standalone routine does not repeat the precondition.",
+    "neutralizer": {
+     "where": "trunk/src/xbeachlibrary/flow_timestep.F90:L957-L972",
+     "quote": "      if (par%nz>1 .and. par%form /= FORM_VANRIJN1993) then\n         do j=1,s%ny+1\n            do i=1,s%nx+1\n               if (s%wetz(i,j) .eq. 1) then\n                  ks=12.d0*s%hh(i,j)/10.d0**(sqrt(par%g/s%cfu(i,j))/18.d0)\n                  tauw=par%rhoa*par%Cd*sqrt(s%windsu(i,j)**2+s%windnv(i,j)**2)\n                  tauwx=s%windsu(i,j)*tauw\n                  tauwy=s%windnv(i,j)*tauw\n\n                  call vsm_u_XB (  s%ue(i,j)    ,s%ve(i,j)    ,s%hh(i,j) ,ks  ,                &\n                  par%rho      ,tauwx ,tauwy ,s%thetamean(i,j)-s%alfaz(i,j),  &\n                  s%urms(i,j)  ,s%sigm(i,j)  ,s%k(i,j)       ,s%Dr(i,j)  ,    &\n                  s%E(i,j)     ,s%R(i,j)     ,fcvisc,facdel  ,par%ws     ,    &\n                  s%fw(i,j)    ,facdf ,swglm ,par%nz       ,s%sigz       ,    &\n                  s%uz(i,j,:)  ,s%vz(i,j,:)  ,s%ustz(i,j,:)  ,s%nutz(i,j,:),  &\n                  s%ue_sed(i,j),s%ve_sed(i,j)  )"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -113,7 +140,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "Ordinary initialization sets sigm=2*pi/Trep even when waves are inactive, and wave-current updates impose a positive frequency floor, so turning waves off does not by itself make omega zero. The undefined delta branch requires invalid/nonpositive frequency input or external state replacement; its local omission remains under that narrower contract.",
+    "neutralizer": {
+     "where": "trunk/src/xbeachlibrary/initialize.F90:L619-L623",
+     "quote": "      do itheta=1,s%ntheta\n         s%sigt(:,:,itheta) = 2*par%px/par%Trep\n      end do\n      s%sigm = sum(s%sigt,3)/s%ntheta\n      call dispersion(par,s,s%hh)"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -132,7 +169,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "When ast<1 the sigma=1 endpoint enters the Rouse expression and evaluates a division by zero before exponentiation. There is no explicit endpoint limit before summation, so the LOW floating-point exception/portability finding survives even on platforms that subsequently produce the intended zero weight.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -153,7 +197,17 @@
    "representative": "audit",
    "rationale": "blinded SAME (many-to-one)",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "Initialization supplies positive nominal frequency and a dispersion-derived wave number, so generic calm or wave-disabled operation is not itself a zero-division proof. A zero resultant k from wave-current interaction or invalid supplied frequency still reaches cw=omega/k before the cw branch, and that branch does not guard all later frequency/celerity divisions.",
+    "neutralizer": {
+     "where": "trunk/src/xbeachlibrary/initialize.F90:L619-L623",
+     "quote": "      do itheta=1,s%ntheta\n         s%sigt(:,:,itheta) = 2*par%px/par%Trep\n      end do\n      s%sigm = sum(s%sigt,3)/s%ntheta\n      call dispersion(par,s,s%hh)"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "base_only",

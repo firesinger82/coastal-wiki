@@ -56,7 +56,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "The generated components are POINTERs, not ALLOCATABLEs: allocating an already associated pointer is permitted and redirects it to a new target, potentially leaking the old target rather than raising an already-allocated error. Moreover the only actual index_allocate calls found, varianceupdate.F90:87 and spaceparams.F90:1096, select reallocation ('r'); absence of STAT does not establish the claimed repeated-allocation failure.",
+    "neutralizer": {
+     "where": "trunk/src/xbeachlibrary/templates/spacedecl.mako:L15-L17",
+     "quote": "%for variable in variables:\n    ${variable['fortrantype']}, ${dimstr(variable)} pointer :: ${variable['name']} => NULL()\n%endfor"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",

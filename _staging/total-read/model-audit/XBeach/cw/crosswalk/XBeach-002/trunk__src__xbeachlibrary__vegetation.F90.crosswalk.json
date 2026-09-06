@@ -37,7 +37,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "swvegatt adds ahtold to each ahveg section value, whereas momeqveg uses that value directly as the section height and only updates ahtold afterward. The reader passes the same unconverted section heights to both routines, so multi-section vegetation receives inconsistent vertical geometry.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -56,7 +63,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The standard driver starts at t=0 and advances the clock before the first vegetation update, which normally makes t equal dt and initializes totT. The persistent-state failure therefore needs a delayed first activation, externally changed time, or first-step floating-point clipping that breaks that equality; no explicit first-call flag protects those cases.",
+    "neutralizer": {
+     "where": "trunk/src/xbeachlibrary/timestep.F90:L710-L716",
+     "quote": "      call compute_dt(s,par, tpar, it, ilim, jlim, dtref, dt=dt, ierr=ierr,limtypeout=limtype)\n\n      par%t=par%t+par%dt\n\n      if(par%t >= tpar%tnext) then\n         par%dt  = par%dt-(par%t-tpar%tnext)\n         par%t   = tpar%tnext"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -75,7 +92,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Several saved arrays, including the explicitly allocation-guarded nonlinear workspaces, keep their first grid shape without a reset path. Intrinsic assignment may reallocate some other allocatables, but it does not repair all of these retained arrays or their indexed uses.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -94,7 +118,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The per-call zeroing of the section forces does not reset them for each later section. After a submerged section sets them, an above-crest section can reuse those forces; the separate canopy-porosity restriction does not limit this multi-section vegetation-force path.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -113,7 +144,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "The model maintains hh=max(zs-zb,eps) before the vegetation call, including at dry vegetated cells. Therefore lack of a local wet mask does not permit the asserted ordinary zero-depth division; an invalid nonpositive eps would violate the numerical-depth input contract.",
+    "neutralizer": {
+     "where": "trunk/src/xbeachlibrary/initialize.F90:L1012-L1012",
+     "quote": "      s%hh=max(s%zs-s%zb,par%eps)"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -132,7 +173,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED_UNVERIFIED",
+    "rationale": "nveg is obtained by counting the same file immediately before reading exactly that many records, and the reads use character format (a), so a static short or nonnumeric list cannot produce the claimed undefined names. Invalid referenced property filenames are checked subsequently; a file changing or failing between the count and read would be a separate I/O-failure condition.",
+    "neutralizer": {
+     "where": "trunk/src/xbeachlibrary/vegetation.F90:L102-L113",
+     "quote": "         ! 1) Read veggiefile with veggie species\n         par%nveg = count_lines(par%veggiefile)\n\n         if (xmaster) then\n            allocate(veg(par%nveg))\n            fid=create_new_fid()\n            call check_file_exist(par%veggiefile)\n            open(fid,file=par%veggiefile)\n            do i=1,par%nveg\n               read(fid,'(a)',iostat=ier) veg(i)%name\n            enddo\n            close(fid)"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -151,7 +202,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "The upstream numerical-depth floor applies to the entire grid, so the quoted hh divisions and sqrt(g/hh) do not encounter zero merely because a cell is physically dry. Other possible singular wave/roughness inputs do not establish this specifically claimed zero-depth path.",
+    "neutralizer": {
+     "where": "trunk/src/xbeachlibrary/flow_timestep.F90:L940-L940",
+     "quote": "      s%hh  = max(s%zs-s%zb,par%eps)    ! water depth"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -170,7 +231,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Positive vegetation-map values are used as species indices without an upper check against nveg. The nonvegetation branch excludes nonpositive values but not an excessive positive index, and initialization does not validate all map entries against the allocated species list.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -189,7 +257,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The singular drag formula is reached only when automatic bulk drag is requested, not for every vegetation cell with a prescribed positive drag coefficient. The ordinary hh floor removes dry-depth division, but zero vegetation width, an exposed/buried section with zero effective height, or a zero wavevector can still invalidate its unguarded denominators.",
+    "neutralizer": {
+     "where": "trunk/src/xbeachlibrary/vegetation.F90:L323-L330",
+     "quote": "          do j=jmin_zs,jmax_zs\n             do i=imin_zs,imax_zs\n                if (s%nsecveg(i,j) > 0) then ! only in case vegetation is present\n                   do m=1,s%nsecveg(i,j) ! for each vertical vegetation section\n                      if (s%Cdveg(i,j,m) < 0.d0) then ! If Cd is not user specified: call subroutine of M. Bendoni\n                         call bulkdragcoeff(s,par,s%ahveg(i,j,m)+s%zb0(i,j)-s%zb(i,j),m,i,j,Cdterm)\n                         s%Cdveg(i,j,m) = Cdterm\n                      endif"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "base_only",

@@ -37,7 +37,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "initialize converts c_configfile into a local string but calls parameterless init without using that string or changing directories. libxbeach.F90:102-104 and params.F90's input routines still read params.txt, and no later initializer receives the caller's configuration path.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -56,7 +63,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "Passing C_NULL_PTR leaves the converted pointer unassociated and the subsequent assignment invalid, but the exported setter's purpose presumes a pointer to a double. Retain a lower-severity robustness gap for invalid external calls; no valid-pointer failure or contract promising null acceptance was found.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -77,7 +91,17 @@
    "representative": "audit",
    "rationale": "blinded SAME (many-to-one)",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "Unknown names genuinely leave get_var_type/get_var_rank output undefined with no returned status. The extra unexpected-type-code scenario is not reachable for recognized variables in the current generated integer/real registry, so retain only the unknown-name query defect.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/templates/indextos.mako:L37-L38",
+     "quote": "   t%rank =  ${rank(var)}\n   t%type = '${typecodes[var[\"type\"]]}'"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -115,7 +139,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "executestep always returns zero at libxbeach.F90:315-316, so there is no nonzero step return for BMI update to overwrite. Actual timestep failure is retained separately in module error and outputext checks it, invoking output_error/halt_program; the direct executestep status bug is distinct from the claimed BMI masking.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/libxbeach.F90:L232-L237",
+     "quote": "      if(error==0) then\n         outputext = 0\n      elseif(error==1) then\n         call output_error(s,sglobal,par,tpar)\n         outputext = 1\n      endif"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "base_only",

@@ -37,7 +37,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The interpolated writer really supplies three values per point to a four-field record contract, leaving the fourth field unspecified. The present Surfbeat consumer uses only q columns 1 and 2, so a HIGH hydrodynamic consequence from the omitted elevation is not demonstrated; the file-format defect remains.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/boundaryconditions.F90:L659-L664",
+     "quote": "               q = (dtbcfile-(tnew-par%t))/dtbcfile*q2 + &          !Jaap\n               (tnew-par%t)/dtbcfile*q1\n               ! be aware: ui and vi are defined w.r.t. the grid, not w.r.t. the coordinate system!\n               s%ui(1,:) = (q(:,1)*dcos(s%alfau(1,:)) + q(:,2)*dsin(s%alfau(1,:)))/ht(1,:)*min(par%t/par%taper,1.0d0)\n               s%vi(1,:) = (-q(:,1)*dsin(s%alfau(1,:)) + q(:,2)*dcos(s%alfau(1,:)))/ht(1,:)*min(par%t/par%taper,1.0d0)\n               if (xmpi_istop) s%ee(1,:,:)=s%ee(1,:,:)*min(par%t/par%taper,1.0d0)"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -56,7 +66,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The first-order generator establishes layer thicknesses h0+z and -z, but the second-order accumulation divides by z and h0+z instead. With nhlay in (0,1), z is negative, so the lower-layer correction even acquires the wrong sign; no subsequent velocity update reverses this.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -75,7 +92,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "PRindex is a POINTER, so allocating it while associated is legal and does not itself cause the claimed already-allocated runtime failure. Each iteration loses the previous target, leaving a memory leak for ny>0; final cleanup can free only the last target.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/waveparamsnew.F90:L57-L60",
+     "quote": "      integer, dimension(:),pointer          :: Findex     ! Index of wave train component locations on frequency/Fourier axis\n      integer, dimension(:),pointer          :: WDindex    ! Index of wave train component locations on wave directional bin axis\n      integer, dimension(:),pointer          :: PRindex    ! Index of wave train components to be phase-resolved (rather than\n      ! using energy balance)"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -98,7 +125,14 @@
    "representative": "audit",
    "rationale": "blinded SAME (many-to-one)",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The zero-height input is explicitly accepted and creates a zero spectrum; interpolation, representative-period calculation and directional normalization do not reject or special-case it. SWAN's ZERO-record rejection does not cover the permitted zero-height parametric input.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -117,7 +151,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "k3 is initialized to zero and rows above K+1 populate only columns greater than one. Their k3(m,1) therefore remains zero during the cutoff test, and no later pass applies the missing cutoff to populated columns.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -136,7 +177,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "In the enabled 3D second-order branch, KKx/KKy are wavenumber components rather than dimensionless depth products. The other layer terms use those components multiplied by depths, and no caller nondimensionalizes them to justify the isolated sinh(KKx)/sinh(KKy) subtraction.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -157,7 +205,14 @@
    "representative": "audit",
    "rationale": "blinded SAME (many-to-one)",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Neither the SWAN reader nor its caller sorts the frequency axis or rejects descending frequencies. The angular cyclic interpolation repairs only the angle axis; the later first/last-frequency bounds and signed frequency increments still mishandle a descending input.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -176,7 +231,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "For valid positive endpoint spectra, linear interpolation commutes with summation, so sfimp equals sfnow and the denominator cannot vanish. The unguarded expression is only hazardous with zero/invalid endpoint variance or degenerate spatial coordinates, states normally already broken by earlier spectral normalization; interpolation itself does not create the zero.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/waveparamsnew.F90:L2050-L2068",
+     "quote": "            positions(1) = s%ndist(1,n_index_loc(interpindex(1)))\n            positions(2) = s%ndist(1,n_index_loc(interpindex(2)))\n            here = s%ndist(1,i)\n            do ii=1,wp%K\n               sf(1) = wp%vargen(interpindex(1))%Sf(ii)\n               sf(2) = wp%vargen(interpindex(2))%Sf(ii)\n               call LINEAR_INTERP(positions,sf,2,here,wp%Sfinterp(i,ii),dummy)\n               sf(1) = wp%vargenq(interpindex(1))%Sf(ii)\n               sf(2) = wp%vargenq(interpindex(2))%Sf(ii)\n               call LINEAR_INTERP(positions,sf,2,here,wp%Sfinterpq(i,ii),dummy)\n            enddo\n            ! Ensure that the total amount of variance has not been reduced/increased\n            ! during interpolation for short wave energy only. This is not done for\n            ! Sf for bound long wave generation\n            sfnow = sum(wp%Sfinterp(i,:))  ! integration over fixed bin df size unnecessary\n            sf(1) = sum(wp%vargen(interpindex(1))%Sf)\n            sf(2) = sum(wp%vargen(interpindex(2))%Sf)\n            call LINEAR_INTERP(positions,sf,2,here,sfimp,dummy)\n            wp%Sfinterp(i,:)=wp%Sfinterp(i,:)*sfimp/sfnow"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -195,7 +260,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Both readers use angular entries 1 and 2 before any minimum-count validation, and interp_in_cyclic_function likewise requires x(2). The cyclic padding therefore does not neutralize a one-direction input.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -214,7 +286,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The spectrum arrays are POINTER components, so a second ALLOCATE is legal and does not cause the claimed already-associated allocation failure. Repeated reads instead abandon previous pointer targets, producing a memory leak during multi-interval catch-up.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/waveparamsnew.F90:L13-L17",
+     "quote": "   type spectrum                                         ! These are related to input spectra\n      real*8,dimension(:,:),pointer          :: S        ! 2D variance density spectrum\n      real*8,dimension(:),pointer            :: f,ang    ! 1D frequency and direction vectors for S\n      real*8,dimension(:),pointer            :: Sf       ! S integrated over all directions\n      real*8,dimension(:),pointer            :: Sd       ! S integrated over all frequencies"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -252,7 +334,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Component indices are constructed consecutively with Findex(ii)=Findex(1)+ii-1, but the phase expression adds ii without subtracting one. The final component reads outside the generated-component span even when still within the larger Fourier allocation; no later phase adjustment restores the intended bins.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -271,7 +360,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The initial CDF value was missed: CDF(last)=1+(p_first-p_last)/2, so a deficit requires unequal endpoints with p_last>p_first, not merely trapezoidal accumulation after sum normalization. Cyclic interpolation normally supplies equal endpoints; inconsistent endpoint data or numerical endpoint discrepancies can retain the narrower sampling defect, and LINEAR_INTERP clamps excess draws.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/waveparamsnew.F90:L1640-L1647",
+     "quote": "         ! Boundary condition, which may be nonzero:\n         cdflocal(1) = pdflocal(1)\n         do ii=2,naint\n            cdflocal(ii) = cdflocal(ii-1) + (pdflocal(ii)+pdflocal(ii-1))/2\n            ! Note: this only works if the directional\n            ! bins are constant in size. Assumed multiplication\n            ! by one.\n         enddo"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -290,7 +389,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "g*k*tanh(k*h) has units of angular frequency squared, so dividing it directly by 2*pi does not produce frequency. This value directly limits the generated frequency range and is never square-rooted later.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -309,7 +415,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The 3D superharmonic branch calculates and transforms both qy layer fields, but its accumulation updates only uits and duits. The output writer subsequently emits vits/dvits without any corresponding transverse superharmonic addition.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -328,7 +441,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The shared selected component band can miss all energy at one spectrum location even when another location keeps the combined spectrum nonzero. The per-location interpolator then returns zero for every component, and the unconditional hm0/hm0post rescaling has no fallback or guard.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -347,7 +467,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The parameter reader permits nhlay=0 while leaving nonhq3d=1, and the nonhydrostatic highcomp/order path still calls generate_secondorder. Its allocations then select four-field storage, but the later nonhq3d-only branch references unallocated layer arrays and fields 5-6.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -366,7 +493,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The t>tstop-dt return follows the bccount increment but precedes the only curline assignment. Boundary regeneration has no matching guard that prevents a call in that final-step interval, so INTENT(OUT) leaves the caller's sequence selector undefined on that path.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",

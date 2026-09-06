@@ -1,0 +1,99 @@
+{
+  "shard": "XBeach-004",
+  "verdicts": [
+    {
+      "vid": "trunk__scripts__generate.py#0",
+      "verdict": "STANDS",
+      "rationale": "Executing the actual parameter regex in isolation reproduces unit=None, description=\"\", and json=None for a populated declaration; all 394 current parameters also lose these fields. generate.py:175-192 performs no later metadata recovery, and the greedy remainder has no mandatory trailing metadata token that would force backtracking."
+    },
+    {
+      "vid": "trunk__scripts__generate.py#2",
+      "verdict": "STANDS",
+      "rationale": "generate.py:240 loads/compiles the template before opening the destination, so template-loading errors do not truncate it, but rendering still occurs after truncation and six header writes at lines 243-250. A render-time missing metadata key therefore leaves a header-only replacement; neither the generator nor the Makefile.am:91-92 invocation provides rollback or atomic replacement."
+    },
+    {
+      "vid": "trunk__scripts__generate.py#6",
+      "verdict": "STANDS",
+      "rationale": "The parser accepts a variable declaration without JSON and accepts mismatched dimension/shape ranks; no uniqueness or required-key validation intervenes before rendering. spacedecl.mako:7-16 uses parsed rank while index_allocate.mako:7-20 uses JSON shape, so inconsistent input can generate incompatible declarations/allocations; the 327 current variables happen to have complete keys, matching ranks, and unique names, which does not validate future input."
+    },
+    {
+      "vid": "trunk__scripts__generate.py#7",
+      "verdict": "NARROWED",
+      "rationale": "Structural overrides are reproducible for variables: JSON name and rank replace the parsed values at generate.py:165 without revalidation. The parameter half is presently unreachable because parameter_re consumes the entire comment before its optional JSON group, so parameter[\"json\"] is None and lines 190-191 never apply such an override.",
+      "neutralizer": {
+        "where": "trunk/scripts/generate.py:L120-L129",
+        "quote": "        (?P<value>(=\\s*[^\\s]+)?)                  # value\n        .*                                        # anything\n        (!<?\\s*)?                                 # comment\n        (\\[(?P<unit>[\\^\\w\\-\\._]+)\\])?             # unit\n        \\s*                                       # space\n        (?P<description>.*?)                      # description\n        \\s*                                       # space\n        ((?P<json>\\{.*\\}))?                       # JSON key-value pairs\n        \\s*                                       # space\n        $                                         # end of line"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__params.def#6",
+      "verdict": "STANDS",
+      "rationale": "typesandkinds.F90:4 fixes slen at 1024; readkey.F90:597-635 also reads each input record into a character(slen) buffer without a length rejection, so long projection text can already be truncated before params.F90:1299-1300 assigns it. ncoutput.F90:329-341 writes the retained projection directly, with no alternate full-length storage or reconstruction; the limitation affects metadata rather than model coordinates."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__templates__getkey.mako#0",
+      "verdict": "NARROWED",
+      "rationale": "This is a LOW extension/validation gap for recognized but unsupported mapped types such as bool or float: all 394 current parameters map to double, int, or char, matching getkey_module's c/i/r storage contract. A misspelled Fortran type does not silently reach getkey.mako at all: generate.py rejects an unmatched parameter declaration and exits.",
+      "neutralizer": {
+        "where": "trunk/scripts/generate.py:L193-L199",
+        "quote": "                else:\n                    raise RuntimeError('Something wrong while parsing parameters')\n            except Exception as e:\n                print (e)\n                print (\"Error while parsing line \"+str(lineno)+\" in \"+parameter_file+\":\")\n                print (line)\n                sys.exit(1)"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__templates__getkey.mako#1",
+      "verdict": "STANDS",
+      "rationale": "All 13 currently array-valued parameters are covered by the name exclusions, and getkey.F90:32 explicitly limits lookup to rank zero. Nevertheless the claimed change-triggered defect remains: a newly named array passes these name-only filters even though generate.py computes rank, and getkey.mako:38/45/52 then emits a scalar-element assignment from that array without a rank guard."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__templates__index_allocate.mako#1",
+      "verdict": "REFUTED",
+      "rationale": "The generated components are POINTERs, not ALLOCATABLEs: allocating an already associated pointer is permitted and redirects it to a new target, potentially leaking the old target rather than raising an already-allocated error. Moreover the only actual index_allocate calls found, varianceupdate.F90:87 and spaceparams.F90:1096, select reallocation ('r'); absence of STAT does not establish the claimed repeated-allocation failure.",
+      "neutralizer": {
+        "where": "trunk/src/xbeachlibrary/templates/spacedecl.mako:L15-L17",
+        "quote": "%for variable in variables:\n    ${variable['fortrantype']}, ${dimstr(variable)} pointer :: ${variable['name']} => NULL()\n%endfor"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__templates__index_deallocate.mako#0",
+      "verdict": "NARROWED",
+      "rationale": "The unchecked deallocation is a latent public-API hazard for a valid array index with a null or previously deallocated component, but no repository caller selects choice='d': both actual calls select 'r'. Out-of-range indices and scalar indices are silently skipped by the dispatcher/template rather than deallocated, so an arbitrary invalid index does not produce the stated error.",
+      "neutralizer": {
+        "where": "trunk/src/xbeachlibrary/spaceparams.F90:L89-L94",
+        "quote": "       case ('d','D')\n         select case(index)\n          case default\n            continue\n            include 'index_deallocate.inc'\n         end select"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__templates__index_reallocate.mako#1",
+      "verdict": "NARROWED",
+      "rationale": "An associated array target is indeed discarded before an allocation without STAT, so allocation failure is fatal and there is no rollback. The existing MPI callers use this on the output process to size output buffers (varianceupdate.F90:84-90) or immediately collect replacement values (spaceparams.F90:1094-1125); preserving their old contents is not their contract, so the supported issue is LOW allocation-failure robustness rather than loss of authoritative simulation data."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__templates__indextos.mako#1",
+      "verdict": "NARROWED",
+      "rationale": "The char/character mismatch and direct KeyError on additional mapped types are real latent extension problems, but all 327 current variables are double or int. mnemonic.F90:10-33 also provides only real/integer pointer members, so a type merely accepted by generate.py is not already supported by the introspection contract; this requires a coordinated type-system extension, not just correction of one dictionary key."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__templates__indextos.mako#3",
+      "verdict": "STANDS",
+      "rationale": "The actual variable regex preserves an apostrophe in a description such as water's depth, and indextos.mako:43 then inserts it inside a single-quoted Fortran literal without doubling it. No parser sanitization or Mako lookup filter escapes Fortran literals; existing descriptions contain no apostrophes, but a legitimate new description directly triggers malformed output."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__templates__space_alloc_scalars.mako#0",
+      "verdict": "REFUTED",
+      "rationale": "Scalar components are initialized null POINTERs, so repeated ALLOCATE changes their association and can leak the old target; it does not itself incur the already-allocated runtime error assumed by this claim. The current initialization calls allocate distinct global/local objects (libxbeach.F90:107,193-207 and spaceparams.F90:397), and the standalone demo allocates once; an ordinary resource-exhaustion failure without STAT is separate from the asserted repeated-allocation failure.",
+      "neutralizer": {
+        "where": "trunk/src/xbeachlibrary/templates/spacedecl.mako:L15-L17",
+        "quote": "%for variable in variables:\n    ${variable['fortrantype']}, ${dimstr(variable)} pointer :: ${variable['name']} => NULL()\n%endfor"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__templates__space_distribute.mako#0",
+      "verdict": "NARROWED",
+      "rationale": "The latent USEMPI/toall=.true. path is broken, but xmpi_imaster is computational-master outer rank 1 (xmpi.F90:28,270), not xomaster/output rank 0; iamsrc and src therefore disagree. All repository distribution callers omit toall, and if that option is used the helpers explicitly abort on root!=0 before their collective, so an existing-run collective hang is not established.",
+      "neutralizer": {
+        "where": "trunk/src/xbeachlibrary/templates/genmpi_distr.mako:L6-L9",
+        "quote": "if (root /= 0) then\n  print *,'Error in matrix_distr_real8: root must be 0, but is:',root\n  call MPI_Abort(MPI_COMM_WORLD,1,ier)\nendif"
+      }
+    }
+  ]
+}

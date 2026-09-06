@@ -37,7 +37,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "Zero generated-output intervals and non-strict wavint remain real division hazards, but the normal parser rejects negative explicit output intervals and constrains tstart. Mean/hotstart builders also reject some invalid counts after division; retain the enabled generated-schedule zero/advisory-wavint cases rather than claiming every invalid time range bypasses validation.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.F90:L1227-L1231",
+     "quote": "      par%tstart  = readkey_dbl ('params.txt','tstart',   0.d0,      0.d0,par%tstop,strict=.true.)\n      par%tint    = readkey_dbl ('params.txt','tint',     900.d0,     .0d0, par%tstop-par%tstart,strict=.true.)  ! Robert\n      par%tsglobal = readkey_name('params.txt','tsglobal')\n      if (par%tsglobal==' ') then\n         par%tintg   = readkey_dbl ('params.txt','tintg', par%tint,     0.d0, par%tstop-par%tstart,strict=.true.)  ! Robert"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -56,7 +66,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "par%dy is a length in params.def and grid construction, with no upstream squaring. In the ny<=2 wet-cell viscosity path it is combined directly with squared mdx; the final MIN with other limits can mask the effect in some runs but does not correct the erroneous candidate stability limit.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -75,7 +92,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "Ordinary cold and hot starts set par%t=0 in timestep_init, and both t<=0 compute_dt branches explicitly set dtref=0 before testing it (timestep.F90:L462-L476). The residual defect requires starting timestep through the library after setting time positive, which the introspection/BMI setters permit; it is not an uninitialized first-step failure of the normal driver.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/timestep.F90:L143-L144",
+     "quote": "      ! initialize the time to 0\n      par%t = 0.0d0"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -94,7 +121,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Schedule files are stored in input order and no sorting or monotonicity check follows. For times [0,2,1,3], MINVAL can select 1 while the category counter expects 2, and after 2 the counter remains waiting for the past 1, suppressing subsequent outputs.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -132,7 +166,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Neither the timepars component declarations nor any other initialization assigns ith/outputh. outputtimes_update reads ith when hotstart times exist and always includes outputh in the aggregate and counter update, so schedule-size checks do not eliminate the undefined-state use.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -232,6 +273,13 @@
     "quote": "      if (tpar%outputg) tpar%itg = tpar%itg + 1\r\n      if (tpar%outputp) tpar%itp = tpar%itp + 1\r\n      if (tpar%outputm) tpar%itm = tpar%itm + 1\r\n      if (tpar%outputw) tpar%itw = tpar%itw + 1\r\n      if (tpar%outputh) tpar%ith = tpar%ith + 1",
     "verified_at_lines": "L390-L394",
     "source_sha256": "24f600029a975b520c837bbcdb0109853df0c6d6b14b00e198d315a9230e1578"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The update routine advances each category only once and excludes all current-time duplicates from the next-time minimum. A file schedule [0,1,1,2] leaves its counter expecting the second 1 after time advances, preventing output at 2; this stalls the category, not necessarily the simulation's time loop.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {
@@ -298,6 +346,13 @@
     "quote": "                  par%dt=min(par%dt,par%CFL*s%dsc(i,j)**2*par%por/(2*par%kx))",
     "verified_at_lines": "L606-L606",
     "source_sha256": "24f600029a975b520c837bbcdb0109853df0c6d6b14b00e198d315a9230e1578"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The groundwater branches divide by par%kx and, for the alongshore branch, par%ky; their positive minima in params.F90:L829-L835 are advisory. gw_init copies these values to local permeability fields rather than validating or repairing the parameter divisors, so zero/negative inputs can reach the stated arithmetic.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {

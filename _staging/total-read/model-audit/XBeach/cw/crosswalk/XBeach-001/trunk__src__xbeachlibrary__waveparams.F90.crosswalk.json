@@ -37,7 +37,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "Nbin is not initialized, the interval test excludes the upper edge, and one-sided wrapping can leave directions outside the opposite edge before maxval/indexing. However, makebcf has no repository caller: the live boundary path invokes spectral_wave_bc from waveparamsnew, so this is latent legacy-code behavior.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/boundaryconditions.F90:L239-L247",
+     "quote": "         elseif ((par%wbctype==WBCTYPE_PARAMETRIC .or. par%wbctype==WBCTYPE_JONS_TABLE) .and. &\n         (par%wavemodel/=WAVEMODEL_STATIONARY .and. xmaster)) then\n            call spectral_wave_bc(sg,par,curline)\n            ! 5) SWAN\n         elseif (par%wbctype==WBCTYPE_SWAN.and.xmaster) then\n            call spectral_wave_bc(sg,par,curline)\n            ! 6) vardens\n         elseif (par%wbctype==WBCTYPE_VARDENS.and.xmaster) then\n            call spectral_wave_bc(sg,par,curline)"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -56,7 +66,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "Clamping negative qx before ATAN loses the quadrant, and qy additionally uses the already overwritten qx in the next rotation expression. However, makebcf has no repository caller: the live boundary path invokes spectral_wave_bc from waveparamsnew, so this is latent legacy-code behavior.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/boundaryconditions.F90:L239-L247",
+     "quote": "         elseif ((par%wbctype==WBCTYPE_PARAMETRIC .or. par%wbctype==WBCTYPE_JONS_TABLE) .and. &\n         (par%wavemodel/=WAVEMODEL_STATIONARY .and. xmaster)) then\n            call spectral_wave_bc(sg,par,curline)\n            ! 5) SWAN\n         elseif (par%wbctype==WBCTYPE_SWAN.and.xmaster) then\n            call spectral_wave_bc(sg,par,curline)\n            ! 6) vardens\n         elseif (par%wbctype==WBCTYPE_VARDENS.and.xmaster) then\n            call spectral_wave_bc(sg,par,curline)"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -77,7 +97,17 @@
    "representative": "audit",
    "rationale": "blinded SAME (many-to-one)",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "A zero-height spectrum is accepted and reaches zero spectral moments/normalization denominators; the local S0 floor does not make those moments positive. However, makebcf has no repository caller: the live boundary path invokes spectral_wave_bc from waveparamsnew, so this is latent legacy-code behavior.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/boundaryconditions.F90:L239-L247",
+     "quote": "         elseif ((par%wbctype==WBCTYPE_PARAMETRIC .or. par%wbctype==WBCTYPE_JONS_TABLE) .and. &\n         (par%wavemodel/=WAVEMODEL_STATIONARY .and. xmaster)) then\n            call spectral_wave_bc(sg,par,curline)\n            ! 5) SWAN\n         elseif (par%wbctype==WBCTYPE_SWAN.and.xmaster) then\n            call spectral_wave_bc(sg,par,curline)\n            ! 6) vardens\n         elseif (par%wbctype==WBCTYPE_VARDENS.and.xmaster) then\n            call spectral_wave_bc(sg,par,curline)"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -96,7 +126,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "No repository caller invokes the legacy makebcf or its private readers, so non-master ranks do not execute the alleged input path. The active spectral generator is instead invoked explicitly under xmaster and its results are distributed by boundaryconditions.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/boundaryconditions.F90:L239-L247",
+     "quote": "         elseif ((par%wbctype==WBCTYPE_PARAMETRIC .or. par%wbctype==WBCTYPE_JONS_TABLE) .and. &\n         (par%wavemodel/=WAVEMODEL_STATIONARY .and. xmaster)) then\n            call spectral_wave_bc(sg,par,curline)\n            ! 5) SWAN\n         elseif (par%wbctype==WBCTYPE_SWAN.and.xmaster) then\n            call spectral_wave_bc(sg,par,curline)\n            ! 6) vardens\n         elseif (par%wbctype==WBCTYPE_VARDENS.and.xmaster) then\n            call spectral_wave_bc(sg,par,curline)"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -115,7 +155,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "Both arrays have the same time extent and these two quantities are used only through stdzeta/stdeta. Replacing both N denominators by N-1 cancels exactly in that ratio, so the parentheses do not cause a statistical weighting defect.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/waveparams.F90:L1453-L1457",
+     "quote": "               stdzeta = sqrt(sum(zeta(index2,:,ii)**2)/(size(zeta(index2,:,ii)-1)))\n               stdeta = sqrt(sum(eta(index2,:)**2)/(size(eta(index2,:)-1)))\n               !\n               ! Calculate amplitude of directional wave envelope\n               Ampzeta(index2,:,ii)= Amp(index2,:)*stdzeta/stdeta"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -153,7 +203,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "An unhandled Fortran end-of-file condition on these READ statements terminates execution; it does not silently continue the loop or repeatedly read past EOF. A missing tailored diagnostic is a different issue from the claimed hang.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/waveparams.F90:L465-L472",
+     "quote": "         do while (switch==0)\n            read(44,'(a)')rtext\n            if (rtext == 'RFREQ ') then\n               switch = 1\n            elseif (rtext == 'AFREQ ') then\n               switch = 2\n            end if\n         end do"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -172,7 +232,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The difference-wave vector can have negative KKx, and ATAN(KKy/KKx) discards that quadrant with no later directional correction. However, makebcf has no repository caller: the live boundary path invokes spectral_wave_bc from waveparamsnew, so this is latent legacy-code behavior.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/boundaryconditions.F90:L239-L247",
+     "quote": "         elseif ((par%wbctype==WBCTYPE_PARAMETRIC .or. par%wbctype==WBCTYPE_JONS_TABLE) .and. &\n         (par%wavemodel/=WAVEMODEL_STATIONARY .and. xmaster)) then\n            call spectral_wave_bc(sg,par,curline)\n            ! 5) SWAN\n         elseif (par%wbctype==WBCTYPE_SWAN.and.xmaster) then\n            call spectral_wave_bc(sg,par,curline)\n            ! 6) vardens\n         elseif (par%wbctype==WBCTYPE_VARDENS.and.xmaster) then\n            call spectral_wave_bc(sg,par,curline)"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -191,7 +261,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "Neither reader rejects ndir=1 before accessing theta(2); the directional orientation adjustment occurs after that access. However, makebcf has no repository caller: the live boundary path invokes spectral_wave_bc from waveparamsnew, so this is latent legacy-code behavior.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/boundaryconditions.F90:L239-L247",
+     "quote": "         elseif ((par%wbctype==WBCTYPE_PARAMETRIC .or. par%wbctype==WBCTYPE_JONS_TABLE) .and. &\n         (par%wavemodel/=WAVEMODEL_STATIONARY .and. xmaster)) then\n            call spectral_wave_bc(sg,par,curline)\n            ! 5) SWAN\n         elseif (par%wbctype==WBCTYPE_SWAN.and.xmaster) then\n            call spectral_wave_bc(sg,par,curline)\n            ! 6) vardens\n         elseif (par%wbctype==WBCTYPE_VARDENS.and.xmaster) then\n            call spectral_wave_bc(sg,par,curline)"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -210,7 +290,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "ny=1 takes the ny>0 branch but makes its 2:ny averaging slices empty, and no denominator floor repairs the resulting quotient. However, makebcf has no repository caller: the live boundary path invokes spectral_wave_bc from waveparamsnew, so this is latent legacy-code behavior.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/boundaryconditions.F90:L239-L247",
+     "quote": "         elseif ((par%wbctype==WBCTYPE_PARAMETRIC .or. par%wbctype==WBCTYPE_JONS_TABLE) .and. &\n         (par%wavemodel/=WAVEMODEL_STATIONARY .and. xmaster)) then\n            call spectral_wave_bc(sg,par,curline)\n            ! 5) SWAN\n         elseif (par%wbctype==WBCTYPE_SWAN.and.xmaster) then\n            call spectral_wave_bc(sg,par,curline)\n            ! 6) vardens\n         elseif (par%wbctype==WBCTYPE_VARDENS.and.xmaster) then\n            call spectral_wave_bc(sg,par,curline)"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -229,7 +319,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "Descending frequency input is not sorted, and RFREQ is treated as AFREQ even when a nonzero ambient current would distinguish them; zero-current ordered input is not affected. However, makebcf has no repository caller: the live boundary path invokes spectral_wave_bc from waveparamsnew, so this is latent legacy-code behavior.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/boundaryconditions.F90:L239-L247",
+     "quote": "         elseif ((par%wbctype==WBCTYPE_PARAMETRIC .or. par%wbctype==WBCTYPE_JONS_TABLE) .and. &\n         (par%wavemodel/=WAVEMODEL_STATIONARY .and. xmaster)) then\n            call spectral_wave_bc(sg,par,curline)\n            ! 5) SWAN\n         elseif (par%wbctype==WBCTYPE_SWAN.and.xmaster) then\n            call spectral_wave_bc(sg,par,curline)\n            ! 6) vardens\n         elseif (par%wbctype==WBCTYPE_VARDENS.and.xmaster) then\n            call spectral_wave_bc(sg,par,curline)"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -248,7 +348,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The range-to-K calculation has no minimum of two, so a degenerate retained frequency range reaches divisions by K-1 and zero df. However, makebcf has no repository caller: the live boundary path invokes spectral_wave_bc from waveparamsnew, so this is latent legacy-code behavior.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/boundaryconditions.F90:L239-L247",
+     "quote": "         elseif ((par%wbctype==WBCTYPE_PARAMETRIC .or. par%wbctype==WBCTYPE_JONS_TABLE) .and. &\n         (par%wavemodel/=WAVEMODEL_STATIONARY .and. xmaster)) then\n            call spectral_wave_bc(sg,par,curline)\n            ! 5) SWAN\n         elseif (par%wbctype==WBCTYPE_SWAN.and.xmaster) then\n            call spectral_wave_bc(sg,par,curline)\n            ! 6) vardens\n         elseif (par%wbctype==WBCTYPE_VARDENS.and.xmaster) then\n            call spectral_wave_bc(sg,par,curline)"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "base_only",
@@ -449,6 +559,16 @@
     "quote": "               ! Integrate instantaneous water level excitation of wave\n               ! components over directions\n               eta(index2,:) = sum(zeta(index2,:,:),2)\n               Comptemp=eta(index2,:)\n               !\n               ! Hilbert transformation to determine envelope of all total non-directional wave components",
     "verified_at_lines": "L1438-L1443",
     "source_sha256": "f224c5c31d15b2e6e9615c9d82bfb4d59aed16039b35c7399422177a7c148cfc"
+   },
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The intermediate Ampzeta values are order-dependent, but WBCTYPE_PARAMS/JONS_TABLE output bypasses them and uses the final total Amp with rD. Other output modes retain the defect in legacy makebcf, which has no repository caller.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/waveparams.F90:L1499-L1509",
+     "quote": "      if (par%wbctype==WBCTYPE_PARAMS .or. par%wbctype==WBCTYPE_JONS_TABLE) then\n         call writelog('ls','','Apply symmetric energy distribution w.r.t mean wave direction')\n         do ii=1,Ns\n            do index2=1,wp%Npy\n               E_tdir(index2,:,ii)=0.0d0\n               E_tdir(index2,:,ii)=0.5d0*(par%rho)*(par%g)*Amp(index2,:)**2*rD(ii)\n            enddo\n         enddo\n      else\n         E_tdir=0.0d0\n         E_tdir=0.5d0*(par%rho)*(par%g)*Ampzeta**2"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   }
  ]

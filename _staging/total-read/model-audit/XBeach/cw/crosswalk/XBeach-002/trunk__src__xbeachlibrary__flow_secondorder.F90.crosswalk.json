@@ -39,7 +39,17 @@
    "representative": "audit",
    "rationale": "blinded SAME (many-to-one)",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The active advUV and huhv routines still use first-row/first-column metrics on a grid whose metrics can vary in both directions. The continuity-correction examples do not establish an additional runtime defect because its only call is commented out.",
+    "neutralizer": {
+     "where": "trunk/src/xbeachlibrary/flow_timestep.F90:L754-L759",
+     "quote": "      if (par%secorder == 1) then\n         !\n         ! P.B. Smit: The second order McCormack correction to the cont. eq. introduced\n         ! minor damping. For this reason I removed it (Nov. 2014).\n         !  call flow_secondorder_con(s,par,zs_old)\n      endif"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -58,7 +68,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The module initialization flags outlive the supplied spacepars instance, and the workspace allocations are neither shape-checked nor released. A later initialization with a different grid therefore retains the first allocation; no teardown caller resets these private workspaces.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -77,7 +94,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "The only call to flow_secondorder_con is commented out, and no other source caller exists. Its local boundary defect cannot affect the executed continuity update in this build.",
+    "neutralizer": {
+     "where": "trunk/src/xbeachlibrary/flow_timestep.F90:L754-L759",
+     "quote": "      if (par%secorder == 1) then\n         !\n         ! P.B. Smit: The second order McCormack correction to the cont. eq. introduced\n         ! minor damping. For this reason I removed it (Nov. 2014).\n         !  call flow_secondorder_con(s,par,zs_old)\n      endif"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "base_only",

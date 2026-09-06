@@ -37,7 +37,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "wave always calls wave_dispersion before wave_instationary, and WCI sigm is floored at 0.010 then copied into every sigt slice. Without WCI sigt is initialized from a positive representative period.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_functions.F90:L1080-L1085",
+     "quote": "         s%sigm = sqrt( par%g*km*tanh(arg)*fac)\n         s%sigm = max(s%sigm,0.010d0)\n         !  update intrinsic frequency\n         do itheta=1,s%ntheta\n            s%sigt(:,:,itheta) = s%sigm\n         enddo"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -75,7 +85,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "wcrestpos has nx+1 elements, so the two sentinels make nx+3; linear_interp's explicit n-sized dummy honors the passed nx+1. The omitted terminal points are therefore genuinely inaccessible to interpolation.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -94,7 +111,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The wet-cell and roller guards exclude the dry zero velocities. A zero directional speed remains possible with WCI when the current cancels the positive intrinsic phase-velocity vector; without WCI its magnitude is the positive c.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_functions.F90:L1178-L1187",
+     "quote": "                  if (par%wci==1) then\n                     cgx(i,j,itheta)= s%cg(i,j)*cs+uwci(i,j)\n                     cgy(i,j,itheta)= s%cg(i,j)*sn+vwci(i,j)\n                     cx(i,j,itheta) =  s%c(i,j)*cs+uwci(i,j)\n                     cy(i,j,itheta) =  s%c(i,j)*sn+vwci(i,j)\n                  else\n                     cgx(i,j,itheta)= s%cg(i,j)*cs\n                     cgy(i,j,itheta)= s%cg(i,j)*sn\n                     cx(i,j,itheta) =  s%c(i,j)*cs\n                     cy(i,j,itheta) =  s%c(i,j)*sn"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -113,7 +140,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Within the activated roller limit, rr is rescaled as energy while R is clipped against a depth-times-gamma length. R is not recomputed before compute_stokes_drift consumes it, so the dimensional mismatch affects the resulting roller drift.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -132,7 +166,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The configured angular sector can cover -pi to pi, and Fortran MOD in initialization preserves negative angles. Equal energy near those two stored endpoints is consequently averaged toward zero; neither the energy denominator nor the ordinary multidirectional branch performs a circular mean.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "base_only",

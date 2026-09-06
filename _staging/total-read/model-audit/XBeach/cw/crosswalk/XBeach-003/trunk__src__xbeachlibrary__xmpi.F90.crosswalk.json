@@ -56,7 +56,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The I/O process explicitly replaces xmpi_comm with MPI_COMM_NULL, while default halt and the installed communicator handler route to xmpi_abort using that communicator. Intel/native-backtrace builds can reach this call, so the fallback diagnostic crash does not universally neutralize the invalid-communicator abort path.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -75,7 +82,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "No production call to xmpi_getrow exists; the located getrowtest caller loops prow over 1..xmpi_m and supplies arrays/sections sized from the same nlocal (testgenmodule.F90:903,959-970). The inconsistent metadata assumed by this finding is therefore excluded by the actual caller contract.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/test/testgenmodule.F90:L302-L306",
+     "quote": "  do i = 1,xmpi_m         !loop over source processes\n    do j = 1,2            !loop over top, bot\n      b = xmpi_prow\n      x=-1\n      call xmpi_getrow(b,nlocal,rows(j),i,x)"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -94,7 +111,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "Every located active caller passes opposite-edge sections of the same array, with identical retained dimensions and equal section widths. In ranged shifts both widths are i2-i1+1 by construction, so reusing the send size does not overrun a smaller local receive object in these calls.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xmpi.F90:L1063-L1067",
+     "quote": "         s1 = n - nover + i1\n         s2 = n - nover + i2\n         r1 = i1\n         r2 = i2\n         call xmpi_sendrecv(x(:,s1:s2),xmpi_right,x(:,r1:r2),xmpi_left)"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -113,7 +140,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "XPREF is an accepted decomposition mode, n may be zero for a 1-D model, and the local-domain checks occur only after the nmin condition. Since evaluation of the right .and. operand is permitted even when nmin>4 is false, m/nmin remains an integer division-by-zero path on eager-evaluation builds.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -132,7 +166,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "xmpi_send_sleep uses xmpi_ocomm=MPI_COMM_WORLD, on which initialization installs comm_errhandler. That handler calls halt_program (xmpi.F90:1711-1726), so reported MPI_Irecv/Test errors leave through centralized fatal handling rather than silently continuing this polling loop; separate abort-handler defects do not establish the asserted unchecked polling path.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xmpi.F90:L211-L214",
+     "quote": "      ! Use comm_world as a variable for compatibility with SGI MPI\n      comm_world = MPI_COMM_WORLD\n      call MPI_Comm_create_errhandler(comm_errhandler,errhandler,ierr)\n      call MPI_Comm_set_errhandler(comm_world,errhandler,ierr)"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -151,7 +195,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "The located character broadcasts use identically declared fixed-length objects on every rank: readkey's character(slen) results, the same parameter-name components, ship names, and boundary filenames. No caller supplies the differing receiver capacities required by the claim, and len_trim(root) cannot exceed that shared declared capacity.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/readkey.F90:L330-L335",
+     "quote": "      character*(*)  :: fname,key\n      character(slen)  :: value_str\n      character(slen)   :: value\n      logical, intent(in), optional :: bcast,required,silent\n      logical        :: lbcast,lrequired,lsilent\n      character(slen)  :: printkey"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -189,7 +243,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The preprocessor requires both major>=4 and minor>=8 instead of accepting every later major release, leaving MBACKTRACE defined for GNU versions such as 10.2 or 12.1. With no Intel override the fallback assigns through a null pointer; this affects default error halts, whereas successful finalization does not call halt_program.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -208,7 +269,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "Actual paired calls use synchronized scalar metadata, equally sized drifter/runup arrays, or point buffers allocated with matching trailing dimensions; point source ranks come from space_who_has after grid snapping. The claimed independently mismatched shapes/endpoints are not supplied by these callers, and the inactive debug send loop is enclosed in #if 0.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/ncoutput.F90:L1075-L1081",
+     "quote": "                     if (xmpi_orank .eq. pii) then\n                        allocate(r3(1,1,size(t%r3,3)))\n                        call gridrotate(par, sl, t, r3, ilocal, jlocal)\n                        call xmpi_send(pii,xmpi_omaster,r3)\n                     elseif(xomaster) then\n                        allocate(pointoutputs(i,ii)%r3(1,1,size(t%r3,3)))\n                        call xmpi_send(pii,xmpi_omaster,pointoutputs(i,ii)%r3)"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "base_only",
@@ -259,6 +330,13 @@
     "quote": "            if (mm * nn .eq. xmpi_size) then\r\n               borderlength = (mm - 1)*n + (nn -1)*m\r\n               if (borderlength .lt. min_borderlength) then\r\n                  xmpi_m = mm\r\n                  xmpi_n = nn\r\n                  min_borderlength = borderlength\r\n",
     "verified_at_lines": "L350-L355",
     "source_sha256": "68c0cec030f136e8edd2024248284fb43c03c171fc5f23a1496ff40d52ced140"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The score and sentinel are default integers and there is no wide conversion or overflow check before the multiplication/addition. Later domain-size validation cannot repair an overflowed score or initialize a factorization skipped because every score exceeds the sentinel; the parameter size recommendations are not hard limits.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {
@@ -280,6 +358,13 @@
     "quote": "         if (mmanual * nmanual .ne. xmpi_size) then\r\n            error = 2\r\n            return\r\n         endif\r\n         xmpi_m = mmanual\r\n         xmpi_n = nmanual\r\n",
     "verified_at_lines": "L360-L365",
     "source_sha256": "68c0cec030f136e8edd2024248284fb43c03c171fc5f23a1496ff40d52ced140"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "params.F90:1469-1470 appears to require positive manual dimensions, but those readkey_int calls omit strict, whose default is false (readkey.F90:185-188). Negative values merely warn, so two negatives with the correct positive product reach the invalid decomposition and are not rejected by the subsequent minimum-domain comparisons.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {

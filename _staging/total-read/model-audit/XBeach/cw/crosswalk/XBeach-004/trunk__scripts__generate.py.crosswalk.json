@@ -37,7 +37,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Executing the actual parameter regex in isolation reproduces unit=None, description=\"\", and json=None for a populated declaration; all 394 current parameters also lose these fields. generate.py:175-192 performs no later metadata recovery, and the greedy remainder has no mandatory trailing metadata token that would force backtracking.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -75,7 +82,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "generate.py:240 loads/compiles the template before opening the destination, so template-loading errors do not truncate it, but rendering still occurs after truncation and six header writes at lines 243-250. A render-time missing metadata key therefore leaves a header-only replacement; neither the generator nor the Makefile.am:91-92 invocation provides rollback or atomic replacement.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "base_only",
@@ -141,6 +155,13 @@
     "quote": "                        if \"json\" in variable and variable[\"json\"]:\n                            variable.update(json.loads(variable[\"json\"]))\n                        variables.append(variable)",
     "verified_at_lines": "L164-L166",
     "source_sha256": "a9e13e75f2bb36213e2ca87eb3106e34aeae3a6d27dbb57c26aaf1c4b2690adb"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The parser accepts a variable declaration without JSON and accepts mismatched dimension/shape ranks; no uniqueness or required-key validation intervenes before rendering. spacedecl.mako:7-16 uses parsed rank while index_allocate.mako:7-20 uses JSON shape, so inconsistent input can generate incompatible declarations/allocations; the 327 current variables happen to have complete keys, matching ranks, and unique names, which does not validate future input.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {
@@ -162,6 +183,16 @@
     "quote": "                        if \"json\" in variable and variable[\"json\"]:\n                            variable.update(json.loads(variable[\"json\"]))\n                        variables.append(variable)",
     "verified_at_lines": "L164-L166",
     "source_sha256": "a9e13e75f2bb36213e2ca87eb3106e34aeae3a6d27dbb57c26aaf1c4b2690adb"
+   },
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "Structural overrides are reproducible for variables: JSON name and rank replace the parsed values at generate.py:165 without revalidation. The parameter half is presently unreachable because parameter_re consumes the entire comment before its optional JSON group, so parameter[\"json\"] is None and lines 190-191 never apply such an override.",
+    "neutralizer": {
+     "where": "trunk/scripts/generate.py:L120-L129",
+     "quote": "        (?P<value>(=\\s*[^\\s]+)?)                  # value\n        .*                                        # anything\n        (!<?\\s*)?                                 # comment\n        (\\[(?P<unit>[\\^\\w\\-\\._]+)\\])?             # unit\n        \\s*                                       # space\n        (?P<description>.*?)                      # description\n        \\s*                                       # space\n        ((?P<json>\\{.*\\}))?                       # JSON key-value pairs\n        \\s*                                       # space\n        $                                         # end of line"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {

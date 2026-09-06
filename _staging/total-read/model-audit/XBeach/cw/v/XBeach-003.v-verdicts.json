@@ -1,0 +1,517 @@
+{
+  "shard": "XBeach-003",
+  "verdicts": [
+    {
+      "vid": "trunk__src__pybeach__xbeach__libxbeach.py#0",
+      "verdict": "STANDS",
+      "rationale": "get_parametertype and get_arraytype return c_char.value unchanged (libxbeach.py:114-119,169-175), and no decoding layer precedes the text comparisons. With Python 3 byte-string names accepted by create_string_buffer, valid b'r'/b'i' codes still miss those branches."
+    },
+    {
+      "vid": "trunk__src__pybeach__xbeach__libxbeach.py#1",
+      "verdict": "STANDS",
+      "rationale": "Both library loading and suffix selection advertise Windows support, but finalize uses the shell lsof/grep probe and the Unix libdl-based dlclose implementation. No platform-specific unload or reference-count tracking neutralizes the repeated-close/missing-tool problem."
+    },
+    {
+      "vid": "trunk__src__pybeach__xbeach__libxbeach.py#3",
+      "verdict": "STANDS",
+      "rationale": "The integer scalar branch explicitly chooses c_double, while introspection.F90:915,924-926 interprets the supplied storage as integer(c_int). The shape assertion accepts scalar shape () and does not correct the native representation; this is reachable in the Python version where text type-code comparisons work."
+    },
+    {
+      "vid": "trunk__src__pybeach__xbeach__libxbeach.py#6",
+      "verdict": "STANDS",
+      "rationale": "introspection.F90:323,334-335 declares value(slen) and assigns a whole converted character array, with slen=1024 in typesandkinds.F90:4. A single c_char is therefore insufficient even though the returned logical string length is obtained after the write; no native capacity argument or clamp protects it."
+    },
+    {
+      "vid": "trunk__src__pybeach__xbeach__libxbeach.py#15",
+      "verdict": "STANDS",
+      "rationale": "The only comparison against the supplied ndarray's actual shape is the assert at libxbeach.py:252. The later data_as cast passes a pointer object by reference rather than checking the ndarray through ndpointer.from_param, and the native setters use the model shape without a supplied buffer extent."
+    },
+    {
+      "vid": "trunk__src__pybeach__xbeach__libxbeach.py#16",
+      "verdict": "STANDS",
+      "rationale": "No default initializes dtype or typename, and the native type query's return status is ignored. An unknown mnemonic leaves the initially empty c_char unchanged in introspection.F90:401-403, while Python 3 also produces unmatched byte codes for valid names, so the unsupported-code path is not excluded."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__general_mpi_new.F90#0",
+      "verdict": "REFUTED",
+      "rationale": "This alternate module is excluded from the checked-in library builds: Makefile.am selects general_mpi.F90, and both Intel library projects select the same active file. The captured-but-unchecked statuses in general_mpi_new.F90 cannot cause the claimed runtime failure in those builds.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am:L4-L9",
+        "quote": "libxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__general_mpi_new.F90#2",
+      "verdict": "REFUTED",
+      "rationale": "The zero-column loops are present, but general_mpi_new.F90 is not compiled by the supplied Autotools or Intel projects; general_mpi.F90 supplies the module instead. In addition, the alternate file's matrix_distr interface selects sendmat routines rather than these column-send routines (general_mpi_new.F90:59-66).",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am:L4-L9",
+        "quote": "libxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__introspection.F90#0",
+      "verdict": "STANDS",
+      "rationale": "The exported function checks only array%rank < dim, and indextos validates the variable index, not DIM. Thus a valid rank-2 variable such as zb with dim=0 reaches SIZE with invalid DIM; the Python wrapper's +1 conversion does not protect direct C callers."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__introspection.F90#1",
+      "verdict": "NARROWED",
+      "rationale": "The parameter-name getter really indexes keys(index) unchecked, but the array-name getter delegates to indextos, which validates 1..numvars and halts before selecting storage. Retain the bounds finding only for getparametername_c.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/spaceparams.F90:L54-L57",
+        "quote": "      if (index .lt. 1 .or. index .gt. numvars) then\n         call writelog('els','(a,i3,a)','invalid index ',index,' in indextos. Program will stop')\n         call halt_program\n      endif"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__introspection.F90#2",
+      "verdict": "STANDS",
+      "rationale": "After setting getarraydimsize_c=-1, every successful rank/type branch only assigns dimsize and falls through to the function end. The Fortran wrapper propagates this status, although the Python wrapper ignores it; no callee assignment changes the function result."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__introspection.F90#3",
+      "verdict": "NARROWED",
+      "rationale": "Unknown parameters do return success without checking index=-1, but the returned type code is deterministically blank rather than undefined. getkey_indextype initializes both outputs before searching, so retain only the misleading success-status defect.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/getkey.F90:L42-L43",
+        "quote": "      index = -1\n      type = ''"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__introspection.F90#4",
+      "verdict": "NARROWED",
+      "rationale": "The scratch lifetime hazard affects direct native clients that retain a pointer across the next successful call to the same getter, separately for each rank and numeric type. The shipped Python wrapper copies non-scalar results into an ndarray before returning, so its previously returned arrays are not invalidated.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/pybeach/xbeach/libxbeach.py:L231-L236",
+        "quote": "        if rank == 0:\n            # Just return the number\n            result = arrayp.contents.value\n        else:\n            result = array(arrayp)\n        return result"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__introspection.F90#5",
+      "verdict": "NARROWED",
+      "rationale": "Rank-specific getters/setters do select rN/iN after checking only the mnemonic, and the generated indextos code associates only the selected component. Exclude generic getarray from this specific claim: its arrayf2c callee in mnemoniciso.F90:32-45 returns an unrelated local scratch pointer rather than dereferencing a mismatched selected component."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__introspection.F90#6",
+      "verdict": "NARROWED",
+      "rationale": "Null or undersized buffers are unsafe for direct C setter calls with a valid mnemonic, but this is an invalid-caller-input robustness issue rather than a demonstrated failure with conforming buffers. Retain a lower-severity native API validation gap: pointer conversion and model-derived shapes cannot establish the incoming allocation's extent."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__introspection.F90#7",
+      "verdict": "STANDS",
+      "rationale": "r0 and i0 are unsaved procedure-local TARGET scalars whose addresses escape at introspection.F90:550 and 785. The SAVE statement at module scope saves module variables, not these procedure locals, and the array metadata pointers do not extend the copied scalars' lifetimes."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__introspection.F90#10",
+      "verdict": "STANDS",
+      "rationale": "The length-sized name dummies are passed to a helper that scans MAXSTRINGLEN elements for NUL and does not use the supplied length. Existing Python buffers usually contain an extra physical terminator, but a direct C caller supplying exactly length bytes without NUL can be read beyond its allocation; the Fortran wrappers also contain length-sized conversion buffers."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__introspection.F90#11",
+      "verdict": "STANDS",
+      "rationale": "getkey.F90:90-100 associates only c0, i0, or r0 according to the parameter type and returns success for any recognized name. The numeric getters check only that success status, so requesting an integer parameter with the double getter, or vice versa, dereferences a component that getkey did not associate."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__iso_c_utils.f90#0",
+      "verdict": "STANDS",
+      "rationale": "strlen initializes its result to zero and changes it only on encountering C_NULL_CHAR. Neither char_array_to_string nor the C-facing query wrappers distinguish a full unterminated buffer from a valid empty string, so the malformed-input ambiguity is real."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__iso_c_utils.f90#1",
+      "verdict": "NARROWED",
+      "rationale": "The second conversion incorrectly reads char_array1, but equality is not universal: string2 has the length derived from char_array2, so a shorter second argument can truncate the copied first string and produce a nonzero comparison. Retain the wrong-argument defect without the assertion that every comparison reports equality.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/iso_c_utils.f90:L27-L31",
+        "quote": "      character(len=strlen(char_array1)) :: string1\n      character(len=strlen(char_array2)) :: string2\n\n      string1 = trim(char_array_to_string(char_array1))\n      string2 = trim(char_array_to_string(char_array1))"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__iso_c_utils.f90#2",
+      "verdict": "STANDS",
+      "rationale": "The result has MAXSTRINGLEN=1024 elements, while the copy bound is unrestricted len_trim(string) and the terminator is placed at len_trim(string)+1. A 1024-character nonblank value already overruns at the terminator; slen is also 1024, so the surrounding string declarations do not guarantee a spare terminator slot."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__iso_c_utils.f90#4",
+      "verdict": "NARROWED",
+      "rationale": "Ignoring the independent wrong-source bug, trimming and Fortran blank-padding comparisons do collapse meaningful trailing spaces relative to C strcmp. The repository contains no calls to this utility, so this is a latent compatibility defect rather than a demonstrated model or BMI execution failure."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__libxbeach.F90#1",
+      "verdict": "NARROWED",
+      "rationale": "Ordinary timesteps set error to 0 or 1, so this is not a general post-step failure. However, MPI decomposition warnings 5/6 survive init (xmpi.F90:404-406; logging.F90:274-279), and a direct outputext call before the first executestep can encounter them and leave its result undefined.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/timestep.F90:L456-L458",
+        "quote": "      if (present(ierr)) then\n         ierr = 0\n      endif"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__libxbeach.F90#2",
+      "verdict": "STANDS",
+      "rationale": "timestep can set ierr=1 on its defuse path (timestep.F90:727-760), after which executestep skips physics but still increments n and assigns result 0. outputext subsequently consults the shared error flag, but direct executestep clients receive the wrong success status and completed-step count."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__libxbeach.F90#6",
+      "verdict": "STANDS",
+      "rationale": "execute_counter starts at zero in loopcounters.F90:6, so t01 is assigned only on the second executestep entry. final unconditionally passes t01 in MPI builds, and writelog_finalize checks only argument presence, not initialization; zero- or one-step library runs remain exposed."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__logging.F90#0",
+      "verdict": "NARROWED",
+      "rationale": "All located callers pass the constants dper=5 and dt=2, which neutralize the claimed dper=0 model path. The unchecked SYSTEM_CLOCK count_rate remains a narrower failure on systems where the clock is unavailable and returns zero; nonpositive dt itself is not used as a divisor.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_stationary_directions.F90:L247-L254",
+        "quote": "      call progress_indicator(.true.,0.d0,5.d0,2.d0)\n      imax=s%nx\n      itermax = 0\n      !\n      !\n      ! Start of loop of the grid\n      do i=2,imax\n         call progress_indicator(.false.,dble(i)/imax*100,5.d0,2.d0)"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__logging.F90#1",
+      "verdict": "STANDS",
+      "rationale": "libxbeach.F90 initializes n=0 and permits final without any executestep calls, passing that zero directly to writelog_finalize. The xmaster gate does not establish n>0, so both divisions remain reachable in a legitimate initialize/finalize lifecycle."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__logging.F90#3",
+      "verdict": "NARROWED",
+      "rationale": "Without IOSTAT or ERR, a Fortran OPEN failure triggers runtime error termination; it does not silently evade all detection. The remaining issue is the library's failure to translate that fatal I/O error into its own error result or coordinated handling, rather than a HIGH silent-open-failure defect.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/logging.F90:L84-L93",
+        "quote": "         logfileid       = generate_logfileid()\n         if (xmaster)    open(logfileid,     file='XBlog.txt',       status='replace')\n\n         errorfileid     = generate_logfileid()\n         if (xmaster)    open(errorfileid,   file='XBerror.txt',     status='replace')\n\n         warningfileid   = generate_logfileid()\n         if (xmaster)    open(warningfileid, file='XBwarning.txt',   status='replace')\n\n         if (logfileid < 0 .or. errorfileid < 0 .or. warningfileid < 0) error = 1"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__ncoutput.F90#0",
+      "verdict": "STANDS",
+      "rationale": "The point extraction section allocates pointoutputs, whereas r3/r4 are either never allocated on the writer or are deallocated before output; any global-output scratch is also deallocated at ncoutput.F90:1270,1288. The ordinary-point guard only limits the failure to npoints>0 and does not supply either temporary."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__ncoutput.F90#1",
+      "verdict": "REFUTED",
+      "rationale": "Unknown names are rejected by readOutputStrings and indextos itself range-checks before accessing the generated table. The current variables.def supplies only integer and real state entries, so neither an unchecked mnemonic access nor the claimed unsupported-type attribute path is reachable with this registry.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/spaceparams.F90:L54-L57",
+        "quote": "      if (index .lt. 1 .or. index .gt. numvars) then\n         call writelog('els','(a,i3,a)','invalid index ',index,' in indextos. Program will stop')\n         call halt_program\n      endif"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__ncoutput.F90#2",
+      "verdict": "NARROWED",
+      "rationale": "The three writers genuinely discard OPEN's IOSTAT and proceed, so failed opens can lead to erroneous implicit-unit output or fatal writes. Omission of STATUS='REPLACE' alone does not establish stale trailing records here: these are sequential formatted writes followed by CLOSE, unlike the direct-access global files."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__ncoutput.F90#5",
+      "verdict": "NARROWED",
+      "rationale": "There are no rank-4 integer state variables, and the only rank-1 integer is pntdisch (variables.def:243), whose par%ndischarge dimension is rejected by NetCDF dimensionid before definition. Retain the missing rank-1 write for Fortran global output of allocated pntdisch, not the claimed already-defined NetCDF rank-1/rank-4 records.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/ncoutput.F90:L1689-L1692",
+        "quote": "       case default\n         call writelog('els','','Unknown dimension expression:'  // expression)\n         stop 1\n      end select"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__ncoutput.F90#6",
+      "verdict": "STANDS",
+      "rationale": "readOutputStrings validates names only and permits integer spatial variables such as wetz; the allocation check in output.F90 covers globals, not point types. pointsvarids is allocated without initialization, and the integer/default point branch reaches attribute calls without defining that entry."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__ncoutput.F90#7",
+      "verdict": "STANDS",
+      "rationale": "The trailing dimensions are explicitly retained in NetCDF definitions, but the writes pass a single scalar at their first indices with no enclosing loop over those dimensions. A rank-3 field with multiple wave directions or sediment classes therefore leaves the remaining components unwritten; warning messages do not reject that selection."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__ncoutput.F90#8",
+      "verdict": "STANDS",
+      "rationale": "The serial branch uses size(t%r3,3) for a rank-4 selection, while templates/indextos.mako associates only the component corresponding to the selected rank. pbbed is a real allocated rank-4 field (variables.def:204; initialize.F90:1286), so this is not an unreachable type/rank combination."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__ncoutput.F90#13",
+      "verdict": "STANDS",
+      "rationale": "Only fortoutput_init assigns the saved counters, and output.F90:61-65 selects ncoutput_init alone for NetCDF output. timestep_init initializes distinct tpar counters rather than these module variables; global/point indexing uses tpar, but itd remains the uninitialized drifter index identified by the claim."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__ncoutput.F90#16",
+      "verdict": "STANDS",
+      "rationale": "A supported non-spatial rank-2 variable such as tideinpz has known dimension IDs but fails the x/y test only by logging; name parsing imposes no spatial-shape contract. It is still defined as point-by-time and later sampled with grid indices, so dimensionid's rejection of unknown expressions does not neutralize known non-spatial shapes."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__ncoutput.F90#19",
+      "verdict": "NARROWED",
+      "rationale": "The inconsistency occurs when morfacopt=0 and morfac>1; with morfacopt=1 the multiplication is intended, and max(morfac,1) makes factors at or below one harmless. params.F90:1187-1188 permits the problematic combination and does not reset morfac merely because morfacopt is zero.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/ncoutput.F90:L1137-L1140",
+        "quote": "#ifdef USENETCDF\n         if(donetcdf) then\n            NF90(nf90_put_var(ncid, globaltimevarid, CONVREAL(par%t*max(par%morfac,1.d0)), (/tpar%itg/)))\n         endif"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__ncoutput.F90#21",
+      "verdict": "STANDS",
+      "rationale": "makeaverage stores atan2(tvar2d_sin,tvar2d_cos) directly, and the packed assignment immediately below it is commented out (varianceupdate.F90:351-354). Neither means_collect nor the serial pointer assignment repacks the value, so both legacy decoding expressions consume the wrong representation."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__ncoutput.F90#22",
+      "verdict": "NARROWED",
+      "rationale": "The missing NetCDF interval update affects nonuniform supplied averaging schedules, for which mult continues to use a stale par%tintm. Automatically generated tpm values are uniformly spaced by par%tintm, so ordinary fixed-interval schedules do not need this update; no active update exists in outputtimes_update.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/timestep.F90:L282-L285",
+        "quote": "               allocate(tpar%tpm(ii))\n               do i=1,ii\n                  tpar%tpm(i)=par%tstart+par%tintm*real(i-1)\n               enddo"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__ncoutput.F90#23",
+      "verdict": "STANDS",
+      "rationale": "Drifter initialization divides release/end times by the morphological factor when morfacopt=1 (initialize.F90:1670-1673), confirming that par%t is then internal hydrodynamic time. Writing it raw for drifters while other axes multiply by the factor creates the claimed inconsistency when the factor exceeds one."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__ncoutput.F90#25",
+      "verdict": "STANDS",
+      "rationale": "Integer rank-2 mean variables such as wetz are accepted by readmeans and means_init, but fortoutput_init always uses t%r2 for their record length. The generated metadata associates i2 only, and neither makeaveragenames nor wordsize supplies a conversion; the earlier integer initialization bug is an additional fault, not a reliable guard."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__ncoutput.F90#26",
+      "verdict": "STANDS",
+      "rationale": "checkfile opens direct-access global output with default STATUS='UNKNOWN' and does not truncate it elsewhere. Overwriting fewer records leaves older higher-numbered records physically present, even though dims.dat may tell careful consumers how many new records to read."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__output.F90#0",
+      "verdict": "NARROWED",
+      "rationale": "The division requires a later log_progress call with timings enabled and at least five seconds since the prior report; a zero-duration run that never steps does not execute it. A library client can set tstop=0 through introspection.F90:261-262, and the input reader's positive recommended bound is non-strict, so the gated division is still possible.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/output.F90:L326-L336",
+        "quote": "      else\n         if (par%timings .ne. 0) then\n            ndt=ndt+1\n            sumdt=sumdt+par%dt\n            call date_and_time(VALUES=datetime)\n            ! Current time in seconds\n            tnow=day*24.d0*3600.d0+datetime(5)*3600.d0+60.d0*datetime(6)+1.d0*datetime(7)+0.001d0*datetime(8)\n            ! Is it time to update the log again?\n            if (tnow>=tprev+5.d0) then\n               ! Percentage complete\n               percnow = 100.d0*par%t/par%tstop"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__postprocess.F90#0",
+      "verdict": "NARROWED",
+      "rationale": "The helper does leave ordinary-point result entries undefined, but a repository-wide caller search finds no use of this function. Active output computes runup independently inside ncoutput, so downgrade this to a latent helper defect rather than HIGH corruption of ordinary point output.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/ncoutput.F90:L927-L937",
+        "quote": "            do ii = par%npoints+1, par%npoints+par%nrugauge\n               iru         = ii-par%npoints   !  iru will run from 1 to par%nrugauge\n               tempvectorr = huge(0.d0)\n               ! for netcdf output:\n               do ird=1,par%nrugdepth\n#ifdef USEMPI\n                  call space_global_to_local(sl,1,rugrowindex(iru),rugx,rugy)\n#else\n                  rugx = 1\n                  rugy = rugrowindex(iru)\n#endif"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__postprocess.F90#1",
+      "verdict": "STANDS",
+      "rationale": "The rotate=0 transport cases compute scratch arrays but never assign x, and the only default assignment belongs to a different SELECT CASE branch. rotate=0 is explicitly accepted by params.F90:1301, and ordinary global/point/mean output calls this routine without filling x afterward."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__postprocess.F90#2",
+      "verdict": "REFUTED",
+      "rationale": "alfazr3 is dimensioned from alfaz itself, so the whole-plane assignment at lines 343-345 is conforming even when t%r3 differs; that claimed immediate shape requirement is a misreading. Registered rank-3 fields all use nx+1,ny+1 horizontally, and active rotated global output collects alfaz before the call (ncoutput.F90:837-839); the unrotated/default copy does not combine the mismatched fields.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/postprocess.F90:L300-L300",
+        "quote": "      real*8, dimension(size(s%alfaz,1), size(s%alfaz,2), size(t%r3,3)) :: alfazr3,Susg,Svsg,Subg,Svbg"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__postprocess.F90#3",
+      "verdict": "NARROWED",
+      "rationale": "Five full-sized temporaries impose genuine memory/work overhead, although only four are zeroed and alfazr3 is filled from alfaz. The Intel project configurations explicitly use /heap-arrays, so the specific stack-exhaustion claim is limited to other storage/compiler configurations; retain LOW memory-scaling overhead.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xbeachlibrary.vfproj:L8-L8",
+        "quote": "\t\t\t\t<Tool Name=\"VFFortranCompilerTool\" AdditionalOptions=\"/heap-arrays\" SuppressStartupBanner=\"true\" DebugInformationFormat=\"debugEnabled\" Optimization=\"optimizeDisabled\" Preprocess=\"preprocessYes\" AdditionalIncludeDirectories=\"includes\\version\\;includes\\genfiles\\\" Diagnostics=\"diagnosticsShowAll\" WarnInterfaces=\"true\" ModulePath=\"bin\\static\\win32\\$(ConfigurationName)\\\" ObjectFile=\"bin\\static\\win32\\$(ConfigurationName)\\\" PdbFile=\"bin\\static\\win32\\$(ConfigurationName)\\vc100.pdb\" Traceback=\"true\" BoundsCheck=\"true\" RuntimeLibrary=\"rtMultiThreadedDebug\" Interfaces=\"true\"/>"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__postprocess.F90#4",
+      "verdict": "NARROWED",
+      "rationale": "The primary claim's malformed-optional-argument paths are real in the helpers, but located output calls supply both positive local indices or omit both, so HIGH runtime impact is not demonstrated. Also, contrary to other_wording, rank-2 bounds are initialized before the row test; only ranks 3/4 have the nonpositive-row uninitialized-bounds case.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/postprocess.F90:L177-L184",
+        "quote": "      is  = 1\n      ie  = size(x,1)\n      js  = 1\n      je  = size(x,2)\n      isx = is\n      iex = ie\n      jsx = js\n      jex = je"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__postprocess.F90#9",
+      "verdict": "NARROWED",
+      "rationale": "The unused helper does broadcast a single incorrect global-minimum-derived index to all gauge slots. Active runup output instead iterates each gauge's rugrowindex and searches that line for the depth crossing, so retain only a latent helper logic defect with reduced severity.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/ncoutput.F90:L955-L963",
+        "quote": "                     if (rugrowindex(iru)>0) then  ! master domain always contains this runup gauge\n                        ! local index of minimum location where hh<rugdepth\n                        do j=xmin+1,xmax\n                           if ((sl%hh(j,  rugy)<=par%rugdepth(ird)) .and. &\n                           &   (sl%hh(j-1,rugy)> par%rugdepth(ird)) ) then\n                              idumhl=j-1\n                              exit\n                           endif\n                        enddo"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__varianceupdate.F90#0",
+      "verdict": "NARROWED",
+      "rationale": "makecrossvector assumes rank-2 fields and a matching section extent without validating them, but a repository-wide search finds no caller. The issue is therefore a latent public-helper contract defect under an invalid direct call, not a demonstrated failure of current cross-section output."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__varianceupdate.F90#1",
+      "verdict": "STANDS",
+      "rationale": "The sine/cosine arrays and initialization flag are saved locals of makeaverage, initialized only once and inaccessible to clearaverage. output.F90:167-168 calls clearaverage after every averaging output, but it resets only meansparslocal, leaving the circular sums from earlier windows intact."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__varianceupdate.F90#2",
+      "verdict": "REFUTED",
+      "rationale": "The current generated state registry contains no rank-3 or rank-4 integer variables; variables.def's integer arrays have rank 1 or 2, and indextos derives type/rank directly from those declarations. Thus a user cannot make the alleged integer rank-3/4 selection through readmeans in this source tree, despite the unused generic initialization branches.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/templates/indextos.mako:L30-L38",
+        "quote": "%for i, var in enumerate(variables):\n case(  ${i+1})\n   if (associated(s%${var[\"name\"]})) then\n      t%${typecodes[var[\"type\"]]}${rank(var)}  => s%${var[\"name\"]}\n   else\n      t%${typecodes[var[\"type\"]]}${rank(var)}  => NULL()\n   endif\n   t%rank =  ${rank(var)}\n   t%type = '${typecodes[var[\"type\"]]}'"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__varianceupdate.F90#3",
+      "verdict": "STANDS",
+      "rationale": "The wrong real-component dimension lookup is reachable for current integer rank-2 variables such as wetz, which readmeans accepts by name. The generator associates i2 only, and serial builds reuse the same integer metadata rather than manufacturing a real view, so neither serial operation nor prior global initialization repairs the local branch."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__varianceupdate.F90#5",
+      "verdict": "STANDS",
+      "rationale": "pbbed is an existing allocated rank-4 real field, and means_init permits it without a later rank restriction. indextos associates its r4 component only, while makeaverage reads r3 for three sizes before rotation or accumulation; no initializer gives r3 a corresponding rank-4 view."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__varianceupdate.F90#12",
+      "verdict": "STANDS",
+      "rationale": "SIGN takes its magnitude from the first argument, so the expression is epsilon*abs(cos_sum), not a signed epsilon floor. Exact zero remains zero and small values shrink further; the output-time gate removes the usual t=0 call but neither forbids repeated zero-dt API output nor establishes nonzero circular sums."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__xbeach_bmi.f90#0",
+      "verdict": "STANDS",
+      "rationale": "initialize converts c_configfile into a local string but calls parameterless init without using that string or changing directories. libxbeach.F90:102-104 and params.F90's input routines still read params.txt, and no later initializer receives the caller's configuration path."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__xbeach_bmi.f90#1",
+      "verdict": "NARROWED",
+      "rationale": "Passing C_NULL_PTR leaves the converted pointer unassociated and the subsequent assignment invalid, but the exported setter's purpose presumes a pointer to a double. Retain a lower-severity robustness gap for invalid external calls; no valid-pointer failure or contract promising null acceptance was found."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__xbeach_bmi.f90#2",
+      "verdict": "NARROWED",
+      "rationale": "Unknown names genuinely leave get_var_type/get_var_rank output undefined with no returned status. The extra unexpected-type-code scenario is not reachable for recognized variables in the current generated integer/real registry, so retain only the unknown-name query defect.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/templates/indextos.mako:L37-L38",
+        "quote": "   t%rank =  ${rank(var)}\n   t%type = '${typecodes[var[\"type\"]]}'"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__xbeach_bmi.f90#4",
+      "verdict": "REFUTED",
+      "rationale": "executestep always returns zero at libxbeach.F90:315-316, so there is no nonzero step return for BMI update to overwrite. Actual timestep failure is retained separately in module error and outputext checks it, invoking output_error/halt_program; the direct executestep status bug is distinct from the claimed BMI masking.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/libxbeach.F90:L232-L237",
+        "quote": "      if(error==0) then\n         outputext = 0\n      elseif(error==1) then\n         call output_error(s,sglobal,par,tpar)\n         outputext = 1\n      endif"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__xmpi.F90#1",
+      "verdict": "STANDS",
+      "rationale": "The I/O process explicitly replaces xmpi_comm with MPI_COMM_NULL, while default halt and the installed communicator handler route to xmpi_abort using that communicator. Intel/native-backtrace builds can reach this call, so the fallback diagnostic crash does not universally neutralize the invalid-communicator abort path."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__xmpi.F90#2",
+      "verdict": "REFUTED",
+      "rationale": "No production call to xmpi_getrow exists; the located getrowtest caller loops prow over 1..xmpi_m and supplies arrays/sections sized from the same nlocal (testgenmodule.F90:903,959-970). The inconsistent metadata assumed by this finding is therefore excluded by the actual caller contract.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/test/testgenmodule.F90:L302-L306",
+        "quote": "  do i = 1,xmpi_m         !loop over source processes\n    do j = 1,2            !loop over top, bot\n      b = xmpi_prow\n      x=-1\n      call xmpi_getrow(b,nlocal,rows(j),i,x)"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__xmpi.F90#3",
+      "verdict": "REFUTED",
+      "rationale": "Every located active caller passes opposite-edge sections of the same array, with identical retained dimensions and equal section widths. In ranged shifts both widths are i2-i1+1 by construction, so reusing the send size does not overrun a smaller local receive object in these calls.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xmpi.F90:L1063-L1067",
+        "quote": "         s1 = n - nover + i1\n         s2 = n - nover + i2\n         r1 = i1\n         r2 = i2\n         call xmpi_sendrecv(x(:,s1:s2),xmpi_right,x(:,r1:r2),xmpi_left)"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__xmpi.F90#4",
+      "verdict": "STANDS",
+      "rationale": "XPREF is an accepted decomposition mode, n may be zero for a 1-D model, and the local-domain checks occur only after the nmin condition. Since evaluation of the right .and. operand is permitted even when nmin>4 is false, m/nmin remains an integer division-by-zero path on eager-evaluation builds."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__xmpi.F90#5",
+      "verdict": "REFUTED",
+      "rationale": "xmpi_send_sleep uses xmpi_ocomm=MPI_COMM_WORLD, on which initialization installs comm_errhandler. That handler calls halt_program (xmpi.F90:1711-1726), so reported MPI_Irecv/Test errors leave through centralized fatal handling rather than silently continuing this polling loop; separate abort-handler defects do not establish the asserted unchecked polling path.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xmpi.F90:L211-L214",
+        "quote": "      ! Use comm_world as a variable for compatibility with SGI MPI\n      comm_world = MPI_COMM_WORLD\n      call MPI_Comm_create_errhandler(comm_errhandler,errhandler,ierr)\n      call MPI_Comm_set_errhandler(comm_world,errhandler,ierr)"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__xmpi.F90#6",
+      "verdict": "REFUTED",
+      "rationale": "The located character broadcasts use identically declared fixed-length objects on every rank: readkey's character(slen) results, the same parameter-name components, ship names, and boundary filenames. No caller supplies the differing receiver capacities required by the claim, and len_trim(root) cannot exceed that shared declared capacity.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/readkey.F90:L330-L335",
+        "quote": "      character*(*)  :: fname,key\n      character(slen)  :: value_str\n      character(slen)   :: value\n      logical, intent(in), optional :: bcast,required,silent\n      logical        :: lbcast,lrequired,lsilent\n      character(slen)  :: printkey"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__xmpi.F90#8",
+      "verdict": "STANDS",
+      "rationale": "The preprocessor requires both major>=4 and minor>=8 instead of accepting every later major release, leaving MBACKTRACE defined for GNU versions such as 10.2 or 12.1. With no Intel override the fallback assigns through a null pointer; this affects default error halts, whereas successful finalization does not call halt_program."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__xmpi.F90#9",
+      "verdict": "REFUTED",
+      "rationale": "Actual paired calls use synchronized scalar metadata, equally sized drifter/runup arrays, or point buffers allocated with matching trailing dimensions; point source ranks come from space_who_has after grid snapping. The claimed independently mismatched shapes/endpoints are not supplied by these callers, and the inactive debug send loop is enclosed in #if 0.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/ncoutput.F90:L1075-L1081",
+        "quote": "                     if (xmpi_orank .eq. pii) then\n                        allocate(r3(1,1,size(t%r3,3)))\n                        call gridrotate(par, sl, t, r3, ilocal, jlocal)\n                        call xmpi_send(pii,xmpi_omaster,r3)\n                     elseif(xomaster) then\n                        allocate(pointoutputs(i,ii)%r3(1,1,size(t%r3,3)))\n                        call xmpi_send(pii,xmpi_omaster,pointoutputs(i,ii)%r3)"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__xmpi.F90#12",
+      "verdict": "STANDS",
+      "rationale": "The score and sentinel are default integers and there is no wide conversion or overflow check before the multiplication/addition. Later domain-size validation cannot repair an overflowed score or initialize a factorization skipped because every score exceeds the sentinel; the parameter size recommendations are not hard limits."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__xmpi.F90#13",
+      "verdict": "STANDS",
+      "rationale": "params.F90:1469-1470 appears to require positive manual dimensions, but those readkey_int calls omit strict, whose default is false (readkey.F90:185-188). Negative values merely warn, so two negatives with the correct positive product reach the invalid decomposition and are not rejected by the subsequent minimum-domain comparisons."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__xmpinew.F90#0",
+      "verdict": "REFUTED",
+      "rationale": "The equal-count wrapper implementation is present only in this unused alternate xmpi_module source. Both the Autotools library source list and Intel projects compile xmpi.F90 instead, so mismatched arguments cannot exercise xmpinew.F90 in the supplied builds.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am:L4-L9",
+        "quote": "libxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__xmpinew.F90#1",
+      "verdict": "REFUTED",
+      "rationale": "This alternative character broadcast is not part of the supplied builds, which select xmpi.F90 rather than xmpinew.F90. Inspection confirms the missing capacity check locally, but build exclusion neutralizes it as a defect of the running model.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am:L4-L9",
+        "quote": "libxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__xmpinew.F90#2",
+      "verdict": "REFUTED",
+      "rationale": "The alternate ranged shifts and its processor-grid constructor are excluded from the supplied builds. Current builds use xmpi.F90, including its own domain-size checks at lines 393-407, so this finding cannot attribute the old implementation's missing check or stale comment to the active model.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am:L4-L9",
+        "quote": "libxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__xmpinew.F90#3",
+      "verdict": "REFUTED",
+      "rationale": "xmpinew.F90 does not supply the xmpi_module in any checked-in library build; xmpi.F90 does. The only located getrow call is a correctly dimensioned test of the selected module, not an execution path into this alternate routine.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am:L4-L9",
+        "quote": "libxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__xmpinew.F90#4",
+      "verdict": "REFUTED",
+      "rationale": "The supplied builds exclude this implementation and select xmpi.F90, which installs a communicator error handler during initialization. Even the alternate source does not install MPI_ERRORS_RETURN, so unchecked local status variables alone do not establish the claimed silent MPI-error continuation.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am:L4-L9",
+        "quote": "libxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__xmpinew.F90#9",
+      "verdict": "REFUTED",
+      "rationale": "The integer score/sentinel issue exists textually in this alternate constructor, but xmpinew.F90 is not compiled by the supplied Autotools or Intel projects. Any analogous active-code issue belongs to xmpi.F90's separately checked finding, not this excluded implementation.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am:L4-L9",
+        "quote": "libxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\"
+      }
+    }
+  ]
+}

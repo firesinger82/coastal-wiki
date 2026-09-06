@@ -37,7 +37,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "All cited scratch allocations are saved and only tested for allocation status. No caller or finalizer frees those procedure-local arrays, so a different row/domain size in a later model instance leaves the original bounds.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -56,7 +63,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "The caller supplies hh floored to eps, including dry cells, so the claimed missing positive-depth protection is present upstream. Daly also receives zero dry-cell energy, making its ordinary dry-cell dissipation zero rather than a 0/0.",
+    "neutralizer": {
+     "where": "trunk/src/xbeachlibrary/flow_timestep.F90:L940-L940",
+     "quote": "      s%hh  = max(s%zs-s%zb,par%eps)    ! water depth"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -75,7 +92,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "Wave stepping explicitly computes hhw with a positive eps floor before the breaking formulas. Thus a zero physical water depth does not give a zero breaking limit with the configured positive gamma; invalid gamma/eps input would be a different parameter-domain condition, not the claimed dry-cell path.",
+    "neutralizer": {
+     "where": "trunk/src/xbeachlibrary/wave_timestep.F90:L58-L62",
+     "quote": "      if (par%delta>0.d0) then\n         s%hhw = max(s%hh+par%delta*s%H,par%eps)\n      else\n         s%hhw = max(s%hh,par%eps) ! hh can be less than eps after morphevolution?\n      endif"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -94,7 +121,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "Qb is initialized to zero and deliberately retains its advected state in the Daly hysteresis model, as roelvink.F90:159 documents. The caller zeros E at dry cells before computing H and dissipation, so retained Qb cannot create the claimed stale dry-cell D under the maintained positive-depth contract.",
+    "neutralizer": {
+     "where": "trunk/src/xbeachlibrary/wave_instationary.F90:L224-L229",
+     "quote": "      where(s%wete == 1)\n         s%E=sum(s%ee,3)*s%dtheta\n      elsewhere\n         s%E = 0.d0\n      endwhere\n      s%H=sqrt(s%E/par%rhog8)"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -113,7 +150,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "Normal calm/dry cells do not imply k=0: dispersion assigns dry cells k=25 and hh is floored. The unguarded Janssen-Battjes division can still fail if wave-current interaction cancels the resultant wavevector, which is assigned to k without a positive lower bound.",
+    "neutralizer": {
+     "where": "trunk/src/xbeachlibrary/wave_functions.F90:L784-L794",
+     "quote": "      where(s%wete==1)\n         s%k  = 2*par%px/s%L1\n         s%c  = s%sigm/s%k\n         kh   = min(s%k*h,10.0d0)\n         s%n=0.5d0+kh/sinh(2*kh)\n         s%cg=s%c*s%n\n      elsewhere\n         s%k = 25.d0\n         s%c = sqrt(par%g*par%eps)\n         s%n = 1.d0\n         s%cg= sqrt(par%g*par%eps)"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "base_only",

@@ -39,7 +39,17 @@
    "representative": "audit",
    "rationale": "blinded SAME (many-to-one)",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The old solver uses an arithmetic angular mean and can fail for a wrapped stored direction array. It is excluded and uncalled in the present library, whose dispatcher selects wave_stationary_directions instead.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_timestep.F90:L75-L81",
+     "quote": "      select case (par%wavemodel)\n       case(WAVEMODEL_STATIONARY)\n         ! call update_means_wave_flow not required: stationary always uses instantaneous water depth s%hhw\n         if ((abs(mod(par%t,par%wavint))<0.001d0*par%dt) .or. s%newstatbc==1) then\n            call wave_dispersion(s,par,0)  ! use instantaneous water depth (and velocity)\n            call wave_stationary_directions(s,par,0)\n            s%newstatbc   = 0"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -58,7 +68,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "The model's dispersion producer floors intrinsic frequency and fills sigt before the active solvers; the old solver is additionally absent from the build/call graph. Lack of a repeated local floor does not establish a zero-frequency defect.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_functions.F90:L1080-L1085",
+     "quote": "         s%sigm = sqrt( par%g*km*tanh(arg)*fac)\n         s%sigm = max(s%sigm,0.010d0)\n         !  update intrinsic frequency\n         do itheta=1,s%ntheta\n            s%sigt(:,:,itheta) = s%sigm\n         enddo"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -77,7 +97,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "s%hh is already floored at par%eps by initialization and each flow/morphology update, so a dry cell does not supply zero depth here. The cited old solver is also not selected by the active dispatcher.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/flow_timestep.F90:L940-L940",
+     "quote": "      s%hh  = max(s%zs-s%zb,par%eps)    ! water depth"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -115,7 +145,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "Only a wet WCI cell whose current cancels intrinsic phase velocity can make this denominator zero; dry cells and non-WCI positive phase speed do not. In addition this older stationary routine is excluded and uncalled.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_timestep.F90:L75-L81",
+     "quote": "      select case (par%wavemodel)\n       case(WAVEMODEL_STATIONARY)\n         ! call update_means_wave_flow not required: stationary always uses instantaneous water depth s%hhw\n         if ((abs(mod(par%t,par%wavint))<0.001d0*par%dt) .or. s%newstatbc==1) then\n            call wave_dispersion(s,par,0)  ! use instantaneous water depth (and velocity)\n            call wave_stationary_directions(s,par,0)\n            s%newstatbc   = 0"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -134,7 +174,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The missing absolute value is real in the old routine, but the selected replacement uses maxval(abs(cgx)). Even in the old routine the y and theta timestep minima may cap dtw, so an excessively large final timestep additionally requires those constraints to be weak.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_stationary_directions.F90:L257-L265",
+     "quote": "         select case (callType)\n          case(callTypeStationary)\n            dtw=        .5d0*minval(s%dsu(i-1:i+1,jmin_ee:jmax_ee))/max(1.0d-6,maxval(abs(s%cgx(i-1:i+1,jmin_ee:jmax_ee,:))))\n            dtw=min(dtw,.5d0*minval(s%dnv(i,jmin_ee:jmax_ee))      /max(1.0d-6,maxval(abs(s%cgy(i,jmin_ee:jmax_ee,:)      ))))\n            dtw=min(dtw,.5d0*dtheta_local                          /max(1.0d-6,maxval(abs(s%ctheta(i,jmin_ee:jmax_ee,:)   ))))\n          case(callTypeDirections)\n            dtw=        .5d0*minval(s%dsu(i-1:i+1,jmin_ee:jmax_ee))/max(1.0d-6,maxval(abs(s%cgx_s(i-1:i+1,jmin_ee:jmax_ee,:))))\n            dtw=min(dtw,.5d0*minval(s%dnv(i,jmin_ee:jmax_ee))      /max(1.0d-6,maxval(abs(s%cgy_s(i,jmin_ee:jmax_ee,:)      ))))\n            dtw=min(dtw,.5d0*dtheta_local                          /max(1.0d-6,maxval(abs(s%ctheta_s(i,jmin_ee:jmax_ee,:)   ))))"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -153,7 +203,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "Fy has a global zero initialization before wave propagation; absent extrapolation does not imply undefined boundary storage. This older routine is also not called by the current wave dispatcher.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/initialize.F90:L550-L551",
+     "quote": "      s%Fx        = 0.d0\n      s%Fy        = 0.d0"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "base_only",

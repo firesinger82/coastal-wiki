@@ -37,7 +37,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "Both nonlinear loops lack an iteration ceiling and a non-finite/stagnation exit, but the damped updates can converge normally for positive finite physical coefficients. The surviving issue is robustness for pathological or poorly scaled conductivity/input states; absence of a cap alone does not establish routine nontermination.",
+    "neutralizer": {
+     "where": "trunk/src/xbeachlibrary/groundwater.F90:L1415-L1424",
+     "quote": "            vest = -Kin*headgrad\n            if (abs(vest)>vcr) then\n               err = 1.d0\n               do while (err>0.001d0)\n                  fac = min(sqrt(vcr/max(abs(vest),vcr)),1.d0)\n                  kest = Kin*fac\n                  vupd = -kest*headgrad\n                  vest = (vest+vupd)/2\n                  err = abs(vupd-vest)/abs(vest)\n               enddo"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -75,7 +85,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Groundwater initialization allows the groundwater level to equal the aquifer bottom, producing zero gwheight. The exponential head expressions subsequently divide by that height without a positive-height branch, so initialization does not enforce the needed contract.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -94,7 +111,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The final division by infil is protected for positive dt and depth at least eps by the water-availability IF, so it is not an independent zero-rate failure. Earlier divisions by conductivity-derived quantities, porosity, dt and dis remain vulnerable to zero conductivity or invalid input values, which the non-strict numeric reader does not reject.",
+    "neutralizer": {
+     "where": "trunk/src/xbeachlibrary/groundwater.F90:L1631-L1642",
+     "quote": "      ! now compute depth of infiltration at this rate\n      dis = vest*par%dt/par%por\n      ! what part of timestep is unsaturated, assuming\n      ! (incorrectly) that this is linear?\n      fracdt = max(0.d0,min((zb-gwlevel)/dis,1.d0))\n      infil = vest*fracdt  ! this is the average over the WHOLE TIMESTEP\n      ! check to see that the amount of water available is larger than the amount\n      ! infiltrating\n      if (infil > (hh-par%eps)/par%dt) then\n         newinfil = max((hh-par%eps)/par%dt,0.d0)\n         fracdt = fracdt*newinfil/infil\n         infil = newinfil"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -113,7 +140,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The wet-layer correction divides by dwetlayer, while its parameter read does not use strict validation. A zero supplied thickness is therefore warned about rather than replaced or rejected, and the caller supplies no positive fallback.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -132,7 +166,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "In the fast exponential path i retains its preceding zero initialization while the loop advances k. The referenced i-indexed fields consequently access index zero; neither the loop bounds nor a preprocessor branch corrects the index.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -151,7 +192,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The full two-dimensional branch constructs and solves curvature only for GWHEADMODEL_PARABOLIC. The later exponential head case nevertheless uses gwcurv, so selecting the exponential model with that solver path retains initialization or previous curvature instead of solving it.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -170,7 +218,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The one-dimensional work vector is sized to nx+1 while the cited array-section assignment combines it with a section of length nx-1. No slice, reshape or alternate declaration makes those expression shapes conformable.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -208,7 +263,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The fast parabolic path loops over i while the referenced k remains zero from initialization. The input arrays have ordinary one-based bounds and no surrounding reassignment supplies the intended column index.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -227,7 +289,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The horizontal exchange helper receives Kx but no Ky and uses that conductivity for its V-direction calculation as well. Ky is independently configurable in the caller, and the cross-direction grid metric is not guaranteed equal either, so isotropic square grids only conceal the defect.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -246,7 +315,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "The groundwater model options are supplied through setallowednames/parmapply in params.F90:859-873. readkey_str rejects values outside those enumerations and halts, so an unsupported configured selector cannot reach the apparently unhandled case.",
+    "neutralizer": {
+     "where": "trunk/src/xbeachlibrary/readkey.F90:L301-L312",
+     "quote": "            if (passed) then\n               call writelog('l','(a24,a,a)',printkey,' = ',trim(value_str))\n            else\n               call writelog('sle','(a24,a,a,a)','Invalid option for ',trim(printkey),' : ',trim(value))\n               call writelog('sle','(a24,a,a)','Valid options for ',trim(printkey),' are:')\n               do i=1,nv\n                  call writelog('sle','(a24)',trim(allowed(i)))\n               enddo\n               do j=1,nov\n                  call writelog('sle','(a24)',trim(old(j)))\n               enddo\n               call halt_program"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -265,7 +344,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The face-depth routine leaves terminal faces unassigned before a whole-array expression reads them. Earlier allocation and zeroing in groundwater initialization do not define those elements after entry through the INTENT(OUT) dummy, and there is no terminal assignment or exchange in the routine.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "base_only",

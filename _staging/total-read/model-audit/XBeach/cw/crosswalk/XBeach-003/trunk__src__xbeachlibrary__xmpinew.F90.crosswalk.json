@@ -37,7 +37,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "The equal-count wrapper implementation is present only in this unused alternate xmpi_module source. Both the Autotools library source list and Intel projects compile xmpi.F90 instead, so mismatched arguments cannot exercise xmpinew.F90 in the supplied builds.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am:L4-L9",
+     "quote": "libxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -56,7 +66,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "This alternative character broadcast is not part of the supplied builds, which select xmpi.F90 rather than xmpinew.F90. Inspection confirms the missing capacity check locally, but build exclusion neutralizes it as a defect of the running model.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am:L4-L9",
+     "quote": "libxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -75,7 +95,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "The alternate ranged shifts and its processor-grid constructor are excluded from the supplied builds. Current builds use xmpi.F90, including its own domain-size checks at lines 393-407, so this finding cannot attribute the old implementation's missing check or stale comment to the active model.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am:L4-L9",
+     "quote": "libxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -94,7 +124,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "xmpinew.F90 does not supply the xmpi_module in any checked-in library build; xmpi.F90 does. The only located getrow call is a correctly dimensioned test of the selected module, not an execution path into this alternate routine.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am:L4-L9",
+     "quote": "libxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -113,7 +153,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "The supplied builds exclude this implementation and select xmpi.F90, which installs a communicator error handler during initialization. Even the alternate source does not install MPI_ERRORS_RETURN, so unchecked local status variables alone do not establish the claimed silent MPI-error continuation.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am:L4-L9",
+     "quote": "libxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "base_only",
@@ -176,7 +226,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "confirmed_delta",
+   "disposition": "rejected",
    "base_ids": [],
    "audit_ids": [
     "B2"
@@ -186,14 +236,18 @@
     "[L201-L220] (LOW/integer-range) Automatic processor-grid selection computes border lengths in default integers and uses a hard-coded 1000000000 sentinel, so sufficiently large grid dimensions can overflow or fail to select a factorization."
    ],
    "representative": "audit",
-   "rationale": "span-confirmed: The strict comparison against a fixed 1000000000 sentinel can leave every factorization unselected: for two processes and m=n=1000000000, both scores equal the sentinel. There is no fallback selection, and the default-integer products also have no overflow protection.",
+   "rationale": "adversarially refuted after span-confirmation: The integer score/sentinel issue exists textually in this alternate constructor, but xmpinew.F90 is not compiled by the supplied Autotools or Intel projects. Any analogous active-code issue belongs to xmpi.F90's separately checked finding, not this excluded implementation.",
    "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
    "decided_at": "2026-09-06",
-   "evidence_span": {
-    "lines": "L213-L218",
-    "quote": "            if (mm * nn .eq. xmpi_size) then\r\n               borderlength = (mm - 1)*n + (nn -1)*m\r\n               if (borderlength .lt. min_borderlength) then\r\n                  xmpi_m = mm\r\n                  xmpi_n = nn\r\n                  min_borderlength = borderlength\r\n",
-    "verified_at_lines": "L213-L218",
-    "source_sha256": "0d699318af66a7e342e4f643ef924207182110f9dddad9fe2de44ee223851475"
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "The integer score/sentinel issue exists textually in this alternate constructor, but xmpinew.F90 is not compiled by the supplied Autotools or Intel projects. Any analogous active-code issue belongs to xmpi.F90's separately checked finding, not this excluded implementation.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am:L4-L9",
+     "quote": "libxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {

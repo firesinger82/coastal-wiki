@@ -37,7 +37,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "There is no active caller of this superseded solver; moreover, its assumed zero intrinsic frequency is neutralized in the shared dispersion producer by a 0.010 floor before action conversion. The non-WCI producer uses 2*pi/Trep.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_functions.F90:L1080-L1085",
+     "quote": "         s%sigm = sqrt( par%g*km*tanh(arg)*fac)\n         s%sigm = max(s%sigm,0.010d0)\n         !  update intrinsic frequency\n         do itheta=1,s%ntheta\n            s%sigt(:,:,itheta) = s%sigm\n         enddo"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -56,7 +66,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "Dveg is indeed absent from this older routine, but it has no active caller and is excluded from the library source list. The selected replacement wave_stationary_directions includes Dveg at 444, so this is a latent inconsistency in superseded code.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_stationary_directions.F90:L438-L448",
+     "quote": "            do itheta=1,ntheta_local\n               where(s%wete(i,:)==1)\n                  ! just dissipation due to breaking, used for roller energy balance (in callTypeStationary only)\n                  dder(i,:,itheta)=ee_local(i,:,itheta)*s%D(i,:)/max(s%E(i,:),0.00001d0)\n                  ! Then all short wave energy dissipation, including bed friction and vegetation, used to reduce wave height\n                  ! Robert: note Dveg needs update for callTypeDirections, because based on only instantaneous H\n                  dd(i,:,itheta)=dder(i,:,itheta) + ee_local(i,:,itheta)*(s%Df(i,:)+s%Dveg(i,:))/max(s%E(i,:),0.00001d0)\n               elsewhere\n                  dder(i,:,itheta)=0.d0\n                  dd(i,:,itheta)=0.d0\n               endwhere"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -75,7 +95,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The arithmetic mean really fails when energy straddles the ends of a stored full-circle sector, such as -pi to pi. This older solver is excluded and uncalled; the current dispatcher selects wave_stationary_directions.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_timestep.F90:L89-L91",
+     "quote": "            if ((abs(mod(par%t,par%wavint))<0.001d0*par%dt) .or. s%newstatbc==1 .or. par%t==par%dt) then\n               call wave_dispersion(s,par,1)  ! use s%hhws water depth (and velocity)\n               call wave_stationary_directions(s,par,1)"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -145,6 +175,16 @@
     "quote": "            Herr=maxval(abs(Hprev(jmin_ee:jmax_ee)-s%H(i,jmin_ee:jmax_ee)),mask=s%wete(i,:)==1)",
     "verified_at_lines": "L360-L360",
     "source_sha256": "c8c7f311e88154c6392c6063830b2885a2c1ed85a654182178ffe0537114a140"
+   },
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The full-row mask genuinely has a different extent when j bounds omit columns, including ordinary non-MPI interior bounds. This is confined to the uncalled older solver; the active replacement slices the mask consistently.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_stationary_directions.F90:L620-L624",
+     "quote": "            select case (par%truncationType)\n             case (TRUNCATIONTYPE_ABSOLUTE)\n               Herr=maxval(abs(Hprev(jmin_ee:jmax_ee)-s%H(i,jmin_ee:jmax_ee)),mask=s%wete(i,jmin_ee:jmax_ee)==1)\n             case (TRUNCATIONTYPE_RELATIVE)\n               Herr=maxval(abs(Hprev(jmin_ee:jmax_ee)-s%H(i,jmin_ee:jmax_ee))/s%H(i,jmin_ee:jmax_ee),mask=s%wete(i,jmin_ee:jmax_ee)==1)"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   }
  ]

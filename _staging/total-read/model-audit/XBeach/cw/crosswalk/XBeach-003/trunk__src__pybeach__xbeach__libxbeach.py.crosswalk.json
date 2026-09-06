@@ -37,7 +37,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "get_parametertype and get_arraytype return c_char.value unchanged (libxbeach.py:114-119,169-175), and no decoding layer precedes the text comparisons. With Python 3 byte-string names accepted by create_string_buffer, valid b'r'/b'i' codes still miss those branches.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -62,7 +69,14 @@
    "representative": "audit",
    "rationale": "blinded SAME (many-to-one)",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Both library loading and suffix selection advertise Windows support, but finalize uses the shell lsof/grep probe and the Unix libdl-based dlclose implementation. No platform-specific unload or reference-count tracking neutralizes the repeated-close/missing-tool problem.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -100,7 +114,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The integer scalar branch explicitly chooses c_double, while introspection.F90:915,924-926 interprets the supplied storage as integer(c_int). The shape assertion accepts scalar shape () and does not correct the native representation; this is reachable in the Python version where text type-code comparisons work.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
@@ -157,7 +178,14 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "introspection.F90:323,334-335 declares value(slen) and assigns a whole converted character array, with slen=1024 in typesandkinds.F90:4. A single c_char is therefore insufficient even though the returned logical string length is obtained after the write; no native capacity argument or clamp protects it.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "base_only",
@@ -298,6 +326,13 @@
     "quote": "        shape = self.get_arrayshape(name)\n        assert shape == array(value).shape, \"Shapes not equal {} versus {} for variable {}\".format(shape, value.shape, name)\n",
     "verified_at_lines": "L251-L252",
     "source_sha256": "55640d609c20815d0b3cf24e0cbf42c48e7a52d8aea701f41d6e3e1c20d5027f"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The only comparison against the supplied ndarray's actual shape is the assert at libxbeach.py:252. The later data_as cast passes a pointer object by reference rather than checking the ndarray through ndpointer.from_param, and the native setters use the model shape without a supplied buffer extent.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {
@@ -319,6 +354,13 @@
     "quote": "            dtype = float64 if rank > 0 else c_double\n            typename = 'double'\n        elif typecode == 'i':\n            dtype = int32 if rank > 0 else c_double\n            typename = 'int'\n        fun = getattr(self._lib, 'set{}d{}array'.format(rank, typename))\n",
     "verified_at_lines": "L259-L264",
     "source_sha256": "55640d609c20815d0b3cf24e0cbf42c48e7a52d8aea701f41d6e3e1c20d5027f"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "No default initializes dtype or typename, and the native type query's return status is ignored. An unknown mnemonic leaves the initially empty c_char unchanged in introspection.F90:401-403, while Python 3 also produces unmatched byte codes for valid names, so the unsupported-code path is not excluded.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
    }
   },
   {

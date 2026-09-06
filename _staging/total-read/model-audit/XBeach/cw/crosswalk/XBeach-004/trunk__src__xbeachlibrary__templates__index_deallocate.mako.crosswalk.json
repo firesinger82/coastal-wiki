@@ -37,7 +37,17 @@
    "representative": "audit",
    "rationale": "blinded SAME",
    "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The unchecked deallocation is a latent public-API hazard for a valid array index with a null or previously deallocated component, but no repository caller selects choice='d': both actual calls select 'r'. Out-of-range indices and scalar indices are silently skipped by the dispatcher/template rather than deallocated, so an arbitrary invalid index does not produce the stated error.",
+    "neutralizer": {
+     "where": "trunk/src/xbeachlibrary/spaceparams.F90:L89-L94",
+     "quote": "       case ('d','D')\n         select case(index)\n          case default\n            continue\n            include 'index_deallocate.inc'\n         end select"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
   },
   {
    "disposition": "equivalent",
