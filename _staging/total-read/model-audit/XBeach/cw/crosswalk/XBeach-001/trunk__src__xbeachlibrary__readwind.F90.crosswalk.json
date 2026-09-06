@@ -1,0 +1,103 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-001",
+ "source_path": "trunk/src/xbeachlibrary/readwind.F90",
+ "source_sha256": "6c3c76f1046245f82d786ddcba988287d53cbebaa81eef789c71a8f470c4f6b9",
+ "base_run_id": "xbeach-r1-XBeach-001-codex-01a05a5b-a17d-7cd0-8b9b-49a161c8810c",
+ "audit_run_id": "xbeach-r2-XBeach-001-codex-01a05aa6-f6db-7991-802e-4d57ae64a826",
+ "base_record_file": "5caf4ebf289ba795de2cf98613e46a64b2cdc433e53690753d8bdb73797180ed.json",
+ "audit_record_file": "5caf4ebf289ba795de2cf98613e46a64b2cdc433e53690753d8bdb73797180ed.json",
+ "base_record_sha256_bytes": "8a5dfc049934472fbc5619cc915a77f4a003145831868e2be9e2e273955f6353",
+ "audit_record_sha256_bytes": "3e1c7e35eaedb79ee1e15e6799270dacbbc7b83d0df3c93ac61aa162630d9ae0",
+ "base_finding_count": 2,
+ "audit_finding_count": 4,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "[L80-L87, L104] (HIGH/empty-input handling) An empty or unreadable non-stationary wind file yields s%windlen=0 and is then indexed as s%windinpt(0) in the duration check."
+   ],
+   "audit_member_text": [
+    "[L80-L104] (HIGH/empty-input bounds) An empty wind file produces windlen=0 and then indexes windinpt(0) in the duration check."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L92-L104] (MED/input contract validation) Non-stationary wind timestamps are not checked for strict monotonicity before later time interpolation."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L51-L59] (MED/MPI initialization contract) Non-master ranks return before allocating or initializing any wind fields, and this routine contains no distribution step."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L56-L67,L87-L91] (LOW/allocation lifetime) All wind arrays are allocated unconditionally with no associated/allocated checks, requiring readwind to be called exactly once."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L80-L97] (MED/input validation) The record-count pass treats any nonzero IOSTAT as end-of-file, so a malformed record silently truncates the series rather than being reported."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

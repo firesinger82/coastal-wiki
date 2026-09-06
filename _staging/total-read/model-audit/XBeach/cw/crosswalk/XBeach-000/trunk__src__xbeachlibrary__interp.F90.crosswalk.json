@@ -1,0 +1,377 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-000",
+ "source_path": "trunk/src/xbeachlibrary/interp.F90",
+ "source_sha256": "e586d5dca63b7111263f6d555485456227f97d7519707ad7457a98854da63241",
+ "base_run_id": "xbeach-r1-XBeach-000-codex-01a05a52-c773-7170-b126-7a88b545d9e6",
+ "audit_run_id": "xbeach-r2-XBeach-000-codex-01a05a9c-78d9-7eb0-9d9e-e5e019072cda",
+ "base_record_file": "13423d5deebff9c611dacb9af95cfa09d5a19128a5fe308ea1c4e1286c4c98a8.json",
+ "audit_record_file": "13423d5deebff9c611dacb9af95cfa09d5a19128a5fe308ea1c4e1286c4c98a8.json",
+ "base_record_sha256_bytes": "738cce789720b590c470442845332179cfa3bd6230ccb48653e66a162ca647c2",
+ "audit_record_sha256_bytes": "f9411d2cb553f78a4cc255f2574bc647442bf491488855ee85c6dd20f9984648",
+ "base_finding_count": 21,
+ "audit_finding_count": 18,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A18"
+   ],
+   "audit_ids": [
+    "B16"
+   ],
+   "base_member_text": [
+    "[L1487-L1516] (HIGH/invalid-cycle) interp_in_cyclic_function assumes n>=2 and a positive nonzero dx/xcycle; zero or negative icycle leads invalid allocation/indexing and can make the wrap loops nonterminating."
+   ],
+   "audit_member_text": [
+    "[L1487-L1525] (HIGH/nontermination / invalid extent) A zero, negative, or incompatible dx/xcycle can make icycle nonpositive, leading to invalid allocations and wrapping loops that cannot progress because they add or subtract icycle."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A10",
+    "A11"
+   ],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [
+    "[L879-L898] (HIGH/bounds) grmap validates only the first reference as positive; subsequent references are not bounded above by n1, and nonpositive references are coerced to f1(1) rather than rejected.",
+    "[L939-L945] (HIGH/bounds) grmap2 checks that references are positive but never checks iref<=n1 before indexing f1 and cellsz1i."
+   ],
+   "audit_member_text": [
+    "[L879-L898,L939-L945] (MED/insufficient index validation) grmap and grmap2 validate references only as positive (and grmap only gates on the first reference), so references greater than n1 directly index f1 and zero or negative later grmap references are silently redirected to f1(1)."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A12"
+   ],
+   "audit_ids": [
+    "B8"
+   ],
+   "base_member_text": [
+    "[L989-L1013] (MED/precision-loss) ipon converts coordinate offsets from real*8 to real*4 before edge/intersection tests, making polygon classification sensitive to large-coordinate cancellation and small cells."
+   ],
+   "audit_member_text": [
+    "[L995-L1030] (MED/precision-dependent geometry) ipon reduces translated double-precision polygon coordinates to real kind 4 before edge and crossing tests, making containment results lose precision and depend on absolute coordinate scale."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "[L263-L274,L316-L332,L440-L481] (HIGH/uninitialized-output) mkmap documents covered=0 as the default but never initializes covered, so targets not found inside any source cell retain undefined status."
+   ],
+   "audit_member_text": [
+    "[L266-L280,L325-L332,L440-L483] (HIGH/undefined output state) mkmap never initializes covered, so any target not processed as lying in a source cell retains undefined or caller-supplied status despite the documented default of zero."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2",
+    "A6",
+    "A13"
+   ],
+   "audit_ids": [
+    "B4",
+    "B10"
+   ],
+   "base_member_text": [
+    "[L458-L464] (HIGH/ignored-error) mkmap ignores bilin5's error flag and stores hbuff and reference indices even when the bilinear solver exits without defining its output weights.",
+    "[L726-L732] (HIGH/ignored-error) make_map also ignores bilin5's error flag and commits potentially undefined hbuff weights and valid-looking indices.",
+    "[L1291-L1344] (HIGH/undefined-error-output) bilin5 returns ier=1 through label 99999 without assigning INTENT(OUT) w, while its two callers in this module use the weight buffer regardless."
+   ],
+   "audit_member_text": [
+    "[L443-L480,L458-L459,L711-L749,L726-L727,L1291-L1344] (HIGH/ignored error / undefined weights) Both mapping routines ignore bilin5's ier and copy hbuff even though bilin5 exits on several error paths without defining its INTENT(OUT) weight array, while also marking the target covered.",
+    "[L1291-L1344] (MED/undefined output contract) bilin5 leaves its INTENT(OUT) w array undefined whenever it returns ier=1, making even correct error-aware callers unable to rely on a deterministic failure value."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A14"
+   ],
+   "audit_ids": [
+    "B11"
+   ],
+   "base_member_text": [
+    "[L1385-L1410] (HIGH/same-cell-integration) trapezoidal double-counts when both integration limits fall in the same source interval: it adds a first partial trapezoid plus a middle full-cell contribution instead of integrating only x1 to x2."
+   ],
+   "audit_member_text": [
+    "[L1379-L1409] (HIGH/integration defect) trapezoidal double-counts a full grid-cell contribution when both limits lie in the same cell or adjacent cells because Imid is formed even when there is no middle interval."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A15"
+   ],
+   "audit_ids": [
+    "B12"
+   ],
+   "base_member_text": [
+    "[L1379-L1393] (MED/input-domain) trapezoidal has no n>=2, ascending/equidistant, nonzero-dx, or x1<=x2 validation before endpoint access, division, and index construction."
+   ],
+   "audit_member_text": [
+    "[L1379-L1397] (MED/unchecked grid contract) trapezoidal assumes n>=2, nonzero ascending spacing, ordered limits, and equidistance but validates none of these before division and index calculation."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A19"
+   ],
+   "audit_ids": [
+    "B15"
+   ],
+   "base_member_text": [
+    "[L1491-L1493,L1516-L1545] (HIGH/unhandled-error) When n>icycle+1 the routine labels the case nonsense but performs no error return and proceeds with uninitialized xc/yc arrays."
+   ],
+   "audit_member_text": [
+    "[L1487-L1516] (HIGH/unhandled invalid branch) interp_in_cyclic_function's n>icycle+1 branch contains only a comment and leaves xc and yc uninitialized before they are used."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A20"
+   ],
+   "audit_ids": [
+    "B17"
+   ],
+   "base_member_text": [
+    "[L1518-L1545] (HIGH/cyclic-phase) The interpolation fraction uses mod(xp,dx)/dx instead of the offset from xc(1), and MOD can be negative, producing wrong or extrapolative weights for shifted grids and negative target coordinates."
+   ],
+   "audit_member_text": [
+    "[L1518-L1545] (MED/cyclic interpolation defect) The interpolation fraction uses mod(xp,dx)/dx without subtracting the grid origin and uses sign-preserving mod for negative coordinates, so shifted grids or negative query coordinates can receive incorrect or extrapolative weights even though indices are cyclically wrapped."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "[L524-L535,L593-L600,L708-L750] (HIGH/uninitialized-output) make_map declares covered INTENT(OUT) but never initializes it globally, assigning it only for targets that pass a cell polygon test."
+   ],
+   "audit_member_text": [
+    "[L525-L535,L593-L600,L708-L751] (HIGH/undefined output state) make_map declares covered INTENT(OUT) but never initializes entries for targets not found in any source cell, leaving those output elements undefined."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [
+    "B1",
+    "B9"
+   ],
+   "base_member_text": [
+    "[L336-L400,L574-L605,L651-L700,L1051-L1077,L1120-L1191] (HIGH/zero-size) The mapping/sort path has no n2>0 guard; with zero targets it still calls hunt/indexx, whose implementations access xx(n), xx(1), or indx(0)."
+   ],
+   "audit_member_text": [
+    "[L263-L280,L318-L337,L383-L405] (MED/zero-size bounds) mkmap accepts n2 without validation but initializes search positions to one and calls hunt on zero-length arrays when n2 is zero, where hunt reads xx(n) and xx(1).",
+    "[L1159-L1191,L1346-L1371] (MED/zero-size bounds) sort calls indexx for n=0, for which indexx reaches indx(0) and arrin(indx(0)) rather than returning on an empty input."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "[L458-L459,L725-L727] (LOW/precision-loss) Both mapping builders explicitly convert double-precision bilinear weights to kind-4 real before assigning them back into real*8 arrays."
+   ],
+   "audit_member_text": [
+    "[L458-L459,L726-L727] (LOW/precision loss) Both mapping routines explicitly round double-precision interpolation weights to real kind 4 before storing them back into double-precision w."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A8",
+    "A9"
+   ],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [
+    "[L812-L833] (HIGH/bounds) mkmap_step updates source-cell indices using unconstrained FLOOR offsets and builds four linear indices without clamping i1/j1 to 1:m1-1 and 1:n1-1.",
+    "[L816-L825] (MED/division-by-zero) mkmap_step divides by local dsu and dnv without checking for zero or degenerate grid metrics."
+   ],
+   "audit_member_text": [
+    "[L812-L833] (HIGH/unchecked division and reference bounds) mkmap_step divides by dsu and dnv without zero checks and applies unrestricted floor offsets without ensuring the updated i1,j1 still identify a valid cell, so it can emit invalid flattened references."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A17"
+   ],
+   "audit_ids": [
+    "B14"
+   ],
+   "base_member_text": [
+    "[L1457-L1470] (HIGH/bounds) interp_using_trapez_rule unconditionally accesses xtarg(2) and divides by its spacing, with no ntarg>=2 or nonzero-spacing guard."
+   ],
+   "audit_member_text": [
+    "[L1457-L1470] (MED/target-size contract) interp_using_trapez_rule unconditionally reads xtarg(2) and divides by the inferred spacing, so ntarg<2 or equal first targets cause bounds or divide-by-zero failures."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L26-L68] (MED/grid-order-contract) linear_interp_2d uses global masked extrema to choose brackets without requiring X and Y to be monotonic; a nonmonotonic coordinate array can select nonadjacent indices and interpolate across unrelated Z cells."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L440-L481,L708-L750] (MED/overlapping-cell-state) A target on shared/overlapping cell boundaries can be processed repeatedly, and a later invalid or boundary cell can overwrite covered after an earlier valid cell set weights and references, leaving status and mapping data inconsistent."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A16"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L1426-L1434] (MED/grid-origin) trapezoidal_cyclic constructs internal breakpoints at absolute multiples of dx rather than x(1)+k*dx, so an equidistant source grid with a nonzero phase origin is integrated across missed piecewise-linear breakpoints."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L12-L15,L26-L47] (MED/empty-array bounds) linear_interp_2d does not require nx and ny to be positive before applying reductions and using the resulting indices to access X, Y, and Z."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B13"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L1418-L1434] (MED/invalid allocation / bounds contract) trapezoidal_cyclic reads x(2), divides by dx, and indexes xp(1) and xp(np) without guarding n<2, zero spacing, reversed limits, or a resulting nonpositive np."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

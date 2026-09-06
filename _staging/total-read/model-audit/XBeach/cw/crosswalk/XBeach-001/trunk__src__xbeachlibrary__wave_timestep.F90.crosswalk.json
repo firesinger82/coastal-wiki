@@ -1,0 +1,107 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-001",
+ "source_path": "trunk/src/xbeachlibrary/wave_timestep.F90",
+ "source_sha256": "13297e7ff3b23640c1697f25e7af980aff5e169fe0be0b9d665dd32f3170c0ac",
+ "base_run_id": "xbeach-r1-XBeach-001-codex-01a05a5b-a17d-7cd0-8b9b-49a161c8810c",
+ "audit_run_id": "xbeach-r2-XBeach-001-codex-01a05aa6-f6db-7991-802e-4d57ae64a826",
+ "base_record_file": "3bb272b1bf0e12d9319676fa7a0b360bcf48adba3cfb80043c8f3d016b35fb43.json",
+ "audit_record_file": "3bb272b1bf0e12d9319676fa7a0b360bcf48adba3cfb80043c8f3d016b35fb43.json",
+ "base_record_sha256_bytes": "73b4475412c6938d7d8cb74c8fb551b61bed000fc21de1d0c68946ea809ad4a6",
+ "audit_record_sha256_bytes": "77168a875a3fb3a4d76cef6f0adde546af3f399530b1fdc0b683868d2ccb5ee6",
+ "base_finding_count": 4,
+ "audit_finding_count": 3,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L64-L73] (HIGH/dry-cell division) The new hstokes path computes H/hh across the full grid without a positive depth floor, so dry zero-depth cells can produce invalid gamma and zero hstokes."
+   ],
+   "audit_member_text": [
+    "[L56-L72] (MED/numerical robustness) Although hhw is protected against dry or negative depth, gamma is computed with the unclamped s%hh, so zero-depth cells can produce infinities or NaNs in hstokes."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L50-L54] (MED/saved-shape state) The saved gamma work array is never resized if the grid dimensions change."
+   ],
+   "audit_member_text": [
+    "[L50-L54,L67] (LOW/persistent allocation) The saved gamma workspace is allocated only once and never checked against later grid dimensions, leaving an undocumented fixed-grid-size lifetime contract."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L78-L80, L89-L91] (HIGH/periodic scheduling) Wave updates depend on the timestep landing within 0.001*dt of an exact wavint multiple, so non-commensurate dt and wavint values can skip all later scheduled updates."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L78, L89] (MED/unguarded modulo) The update schedule evaluates mod(t,wavint) without validating a positive nonzero wavint."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L75-L115] (MED/configuration validation) The wavemodel select has no default case, so an unsupported value silently performs no wave update."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

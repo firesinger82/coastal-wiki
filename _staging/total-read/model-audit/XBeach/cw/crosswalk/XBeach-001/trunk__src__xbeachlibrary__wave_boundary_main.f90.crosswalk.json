@@ -1,0 +1,242 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-001",
+ "source_path": "trunk/src/xbeachlibrary/wave_boundary_main.f90",
+ "source_sha256": "5457f45f75df3500f6bfc00c584128aa9d61e969170fe53ca5874842252d24d9",
+ "base_run_id": "xbeach-r1-XBeach-001-codex-01a05a5b-a17d-7cd0-8b9b-49a161c8810c",
+ "audit_run_id": "xbeach-r2-XBeach-001-codex-01a05aa6-f6db-7991-802e-4d57ae64a826",
+ "base_record_file": "ca3351533710065d3ad8a7bcf2d93a0e1a95a4dcea7add2d00ad20c29a4071c3.json",
+ "audit_record_file": "ca3351533710065d3ad8a7bcf2d93a0e1a95a4dcea7add2d00ad20c29a4071c3.json",
+ "base_record_sha256_bytes": "47bb5bbf8c2e5c6e172a034b1196b1305399b4c67ca34a3b8b3f64c6f2fcfd0e",
+ "audit_record_sha256_bytes": "4b53cc6adf12991b70527cf3e9cfffb1bd3508e8fd2c4f058e8c0bdf717e8a28",
+ "base_finding_count": 11,
+ "audit_finding_count": 11,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L193-L235] (MED/singleton state contract) After first initialization, changed geometry, dimensions, file name, reference position, depth, or random seed are silently ignored while optional controls continue to change, leaving a mixed old/new configuration."
+   ],
+   "audit_member_text": [
+    "[L193-L235] (MED/persistent configuration) After first initialization, changed np, coordinates, directional grid, boundary file, or reference/depth inputs are silently ignored with no invariant check."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "[L239-L250] (MED/time-jump handling) A time jump spanning multiple series durations generates only one new series rather than advancing until startComputeNewSeries exceeds t, leaving administration and interpolation potentially behind the requested time."
+   ],
+   "audit_member_text": [
+    "[L238-L254] (MED/time catch-up) A single IF generates at most one series when t has advanced past multiple durations, so startComputeNewSeries can remain behind the requested time."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A8",
+    "A9"
+   ],
+   "audit_ids": [
+    "B9"
+   ],
+   "base_member_text": [
+    "[L313-L319] (HIGH/conditional initialization) fid is assigned only inside BUILDXBEACH but the OPEN and subsequent I/O are outside that guard, so the non-XBeach build uses an undefined unit number.",
+    "[L319-L328] (HIGH/uninitialized loop control) err is tested by the LOCLIST counting loop before it has been assigned."
+   ],
+   "audit_member_text": [
+    "[L290-L325] (HIGH/uninitialized I/O state) fid is assigned only under BUILDXBEACH although OPEN is unconditional, and err is tested in the LOCLIST counting loop before it is initialized."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A10"
+   ],
+   "audit_ids": [
+    "B10"
+   ],
+   "base_member_text": [
+    "[L365-L374] (HIGH/uninitialized administration field) The single-spectrum branch sets local nspectra=1 but never assigns waveSpectrumAdministration%nspectra, leaving the stored count undefined."
+   ],
+   "audit_member_text": [
+    "[L365-L374] (HIGH/administration state) The single-spectrum branch sets only local nspectra=1 and never stores waveSpectrumAdministration%nspectra, leaving the generator's spectrum count stale or undefined."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "[L238-L254] (HIGH/undefined output) isRecomputed is intent(out) but is assigned only when a new series is generated, so calls before the next generation deadline return it undefined."
+   ],
+   "audit_member_text": [
+    "[L238-L254] (HIGH/output contract) isRecomputed is INTENT(OUT) but is assigned only when recomputation occurs, leaving it undefined on ordinary interpolation calls."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [
+    "B8"
+   ],
+   "base_member_text": [
+    "[L308-L312] (MED/uninitialized continuation state) lastwaveelevation is allocated under a comment saying it is initialized to zero, but no value is assigned before later reuse as spectral continuation state."
+   ],
+   "audit_member_text": [
+    "[L308-L311] (HIGH/uninitialized state) lastwaveelevation is allocated but never initialized despite the stated zero-initialization intent, so the first taper can consume undefined values."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L52-L60, L142-L175] (HIGH/compile-time declaration defect) Dummy argument nspr is used with present(nspr) but is never declared, which is invalid under implicit none."
+   ],
+   "audit_member_text": [
+    "[L52-L60,L141-L145,L171-L175] (HIGH/build failure) nspr is present in the procedure signature and used with PRESENT but has no declaration under implicit none."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "[L217-L220] (MED/angle normalization) MOD does not map negative input angles into [0,2π), contrary to the stated invariant, because a negative dividend produces a negative remainder."
+   ],
+   "audit_member_text": [
+    "[L217-L220] (MED/angle normalization) MOD does not map negative angles into [0,2pi), contrary to the comment, so negative theta inputs remain negative."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "conflict",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "[L221-L224] (HIGH/compile-time type mismatch) waveBoundaryParameters%randomseed is declared as a scalar integer in the datastore but is passed to allocated/deallocate as if it were allocatable."
+   ],
+   "audit_member_text": [
+    "[L221-L224] (HIGH/allocation/rank) The allocatable randomseed vector is deallocated and then assigned the scalar randomseed without allocating or constructing a conforming seed array."
+   ],
+   "representative": "audit",
+   "rationale": "blinded CONFLICT: Same seed component is claimed to be an allocatable vector versus a non-allocatable scalar",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L256-L273] (HIGH/undefined outputs in advertised build) When BUILDXBEACH is not defined, the advertised cross-model path contains no interpolation implementation and returns eebc, qsbc, and qnbc without assignment."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L256-L270] (HIGH/array indexing) Energy interpolation slices eebct(i,itheta,:) even though generation stores it as (point,time,direction); this supplies a direction-length vector while passing the time-axis length."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L142-L190,L256-L270] (HIGH/mode contract) The nonhydrostatic option still unconditionally interpolates hydrostatic eebct, qxbct, and qybct arrays that its generation path does not allocate."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

@@ -1,0 +1,164 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-002",
+ "source_path": "trunk/src/xbeachlibrary/roelvink.F90",
+ "source_sha256": "ebaf7cb8be5ad72921f5105bb429c62fa110475de07e255f4865fc5177df7c3f",
+ "base_run_id": "xbeach-r1-XBeach-002-codex-01a05a67-e2d6-7e11-b2eb-ed7a4a8bc0af",
+ "audit_run_id": "xbeach-r2-XBeach-002-codex-01a05ab3-8036-7660-84fb-58c476606a27",
+ "base_record_file": "ce8d692aae48e97676869cc49b89ee764b149b9676af40ba08510158c62dc329.json",
+ "audit_record_file": "ce8d692aae48e97676869cc49b89ee764b149b9676af40ba08510158c62dc329.json",
+ "base_record_sha256_bytes": "5a6e62dc5ac8ac0d6b52b672567d01bdde9ae74e3ccde71e6fdf36ea6e094821",
+ "audit_record_sha256_bytes": "1f07ffe41a67364421b492ad3ae0766f427dd72295e2480b25dff06d75195b6d",
+ "base_finding_count": 7,
+ "audit_finding_count": 6,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L63-L70,L132-L137,L197-L207,L267-L276] (MED/saved-workspace shape) All saved allocatable workspaces are sized only on their first call and never checked against the current grid dimensions, so reuse after a grid-size change is unsafe."
+   ],
+   "audit_member_text": [
+    "[L63-L70,L132-L137,L197-L207,L267-L276] (LOW/state/dimension lifecycle) Saved scratch arrays in all formulations are allocated only once and never resized, so reuse with a different grid shape has stale bounds."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "[L105-L111,L173-L179] (HIGH/dry-depth division) ROELVINK2 and ROELVINK_DALY multiply dissipation by H/hh without a local wet mask or positive hh guard."
+   ],
+   "audit_member_text": [
+    "[L99-L111,L167-L179] (HIGH/dry-cell division) BREAK_ROELVINK2 and Daly scale dissipation by H/hh without a wet mask or positive-depth guard."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L77-L84,L143-L150] (HIGH/dry-depth division) The non-Daly Roelvink formulas divide by hhw over complete rows or full arrays before restricting the result to an active region, with no wet mask or positive-depth floor in this routine."
+   ],
+   "audit_member_text": [
+    "[L77-L84,L143-L150] (HIGH/dry-cell invalid arithmetic) Roelvink breaking computes H divided by depth-dependent limits over unmasked arrays, so zero-depth cells can evaluate 0/0 and contaminate Qb."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "[L86-L97,L151-L165] (MED/stale state) The Daly branch deliberately retains Qb inside the hysteresis band but also leaves dry-cell Qb unchanged, after which dissipation is recomputed from that potentially stale value."
+   ],
+   "audit_member_text": [
+    "[L86-L97,L151-L165] (MED/stale dry-cell output) The Daly branch updates Qb only at wet cells but then computes D for the full addressed row/domain, leaving dry-cell Qb and potentially D dependent on prior state."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "[L282-L298] (HIGH/unchecked singular denominator) The Janssen-Battjes implementation divides by raw k when forming Hb and by raw hh when forming D, unlike the neighboring Baldock implementation's k floor."
+   ],
+   "audit_member_text": [
+    "[L282-L298] (HIGH/unchecked wave-number/depth denominator) Janssen-Battjes divides directly by k when forming Hb and by hh when forming D, unlike the guarded k division in Baldock, so calm or dry points can generate infinities/NaNs."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L211-L231] (LOW/parameter-domain contract) The Baldock calculation floors k only in the Hb denominator while kh and the spatial gamma use the raw k, leaving negative or otherwise invalid wave-number inputs inconsistently treated."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L79-L84,L145-L150] (MED/real-power domain) The breaking argument raises an unconstrained H-to-depth ratio to the real-valued parameter n, so a negative ratio with non-integer n would produce an invalid result unless positivity is guaranteed externally."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L101-L110,L169-L178,L213-L216,L283-L286] (MED/unchecked period denominator) Frequency conversions divide by par%px or par%Trep without local validation of the required positive-period contract."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

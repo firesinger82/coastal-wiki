@@ -1,0 +1,40 @@
+{
+ "axis": "code",
+ "model": "XBeach",
+ "path": "trunk/src/xbeachlibrary/interp.F90",
+ "source_sha256": "e586d5dca63b7111263f6d555485456227f97d7519707ad7457a98854da63241",
+ "lines_or_pages": 1553,
+ "read_status": "complete",
+ "reader": "codex-R1",
+ "producer": "llm:openai/codex",
+ "read_method": "llm_full_read",
+ "artifact_class": "semantic_read",
+ "run_id": "xbeach-r1-XBeach-000-codex-01a05a52-c773-7170-b126-7a88b545d9e6",
+ "shard": "XBeach-000",
+ "round": "R1",
+ "content": {
+  "unresolved": [
+   "[L26-L68] (MED/grid-order-contract) linear_interp_2d uses global masked extrema to choose brackets without requiring X and Y to be monotonic; a nonmonotonic coordinate array can select nonadjacent indices and interpolate across unrelated Z cells.",
+   "[L263-L274,L316-L332,L440-L481] (HIGH/uninitialized-output) mkmap documents covered=0 as the default but never initializes covered, so targets not found inside any source cell retain undefined status.",
+   "[L458-L464] (HIGH/ignored-error) mkmap ignores bilin5's error flag and stores hbuff and reference indices even when the bilinear solver exits without defining its output weights.",
+   "[L458-L459,L725-L727] (LOW/precision-loss) Both mapping builders explicitly convert double-precision bilinear weights to kind-4 real before assigning them back into real*8 arrays.",
+   "[L440-L481,L708-L750] (MED/overlapping-cell-state) A target on shared/overlapping cell boundaries can be processed repeatedly, and a later invalid or boundary cell can overwrite covered after an earlier valid cell set weights and references, leaving status and mapping data inconsistent.",
+   "[L524-L535,L593-L600,L708-L750] (HIGH/uninitialized-output) make_map declares covered INTENT(OUT) but never initializes it globally, assigning it only for targets that pass a cell polygon test.",
+   "[L726-L732] (HIGH/ignored-error) make_map also ignores bilin5's error flag and commits potentially undefined hbuff weights and valid-looking indices.",
+   "[L336-L400,L574-L605,L651-L700,L1051-L1077,L1120-L1191] (HIGH/zero-size) The mapping/sort path has no n2>0 guard; with zero targets it still calls hunt/indexx, whose implementations access xx(n), xx(1), or indx(0).",
+   "[L812-L833] (HIGH/bounds) mkmap_step updates source-cell indices using unconstrained FLOOR offsets and builds four linear indices without clamping i1/j1 to 1:m1-1 and 1:n1-1.",
+   "[L816-L825] (MED/division-by-zero) mkmap_step divides by local dsu and dnv without checking for zero or degenerate grid metrics.",
+   "[L879-L898] (HIGH/bounds) grmap validates only the first reference as positive; subsequent references are not bounded above by n1, and nonpositive references are coerced to f1(1) rather than rejected.",
+   "[L939-L945] (HIGH/bounds) grmap2 checks that references are positive but never checks iref<=n1 before indexing f1 and cellsz1i.",
+   "[L989-L1013] (MED/precision-loss) ipon converts coordinate offsets from real*8 to real*4 before edge/intersection tests, making polygon classification sensitive to large-coordinate cancellation and small cells.",
+   "[L1291-L1344] (HIGH/undefined-error-output) bilin5 returns ier=1 through label 99999 without assigning INTENT(OUT) w, while its two callers in this module use the weight buffer regardless.",
+   "[L1385-L1410] (HIGH/same-cell-integration) trapezoidal double-counts when both integration limits fall in the same source interval: it adds a first partial trapezoid plus a middle full-cell contribution instead of integrating only x1 to x2.",
+   "[L1379-L1393] (MED/input-domain) trapezoidal has no n>=2, ascending/equidistant, nonzero-dx, or x1<=x2 validation before endpoint access, division, and index construction.",
+   "[L1426-L1434] (MED/grid-origin) trapezoidal_cyclic constructs internal breakpoints at absolute multiples of dx rather than x(1)+k*dx, so an equidistant source grid with a nonzero phase origin is integrated across missed piecewise-linear breakpoints.",
+   "[L1457-L1470] (HIGH/bounds) interp_using_trapez_rule unconditionally accesses xtarg(2) and divides by its spacing, with no ntarg>=2 or nonzero-spacing guard.",
+   "[L1487-L1516] (HIGH/invalid-cycle) interp_in_cyclic_function assumes n>=2 and a positive nonzero dx/xcycle; zero or negative icycle leads invalid allocation/indexing and can make the wrap loops nonterminating.",
+   "[L1491-L1493,L1516-L1545] (HIGH/unhandled-error) When n>icycle+1 the routine labels the case nonsense but performs no error return and proceeds with uninitialized xc/yc arrays.",
+   "[L1518-L1545] (HIGH/cyclic-phase) The interpolation fraction uses mod(xp,dx)/dx instead of the offset from xc(1), and MOD can be negative, producing wrong or extrapolative weights for shifted grids and negative target coordinates."
+  ]
+ }
+}

@@ -1,0 +1,158 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-003",
+ "source_path": "trunk/src/xbeachlibrary/libxbeach.F90",
+ "source_sha256": "1656cceb95c9d87a51b70225a725fc6e544ed56b424c97a9e2806c86f15b6696",
+ "base_run_id": "xbeach-r1-XBeach-003-codex-01a05a73-c44f-73d1-9740-9462379b36f1",
+ "audit_run_id": "xbeach-r2-XBeach-003-codex-01a05ac0-7e92-7031-ae47-79d30eab7b40",
+ "base_record_file": "b36c8532ceb2aec203bdc056ac095296d2786a8c1ef0f9786478009dfb1b555a.json",
+ "audit_record_file": "b36c8532ceb2aec203bdc056ac095296d2786a8c1ef0f9786478009dfb1b555a.json",
+ "base_record_sha256_bytes": "bb6cbdd905185496a9eb6fbe7dfdf94d55ce140ad535784e824e344ea6459644",
+ "audit_record_sha256_bytes": "7cc6dcc771abf3e3e5cb30acd7839592c2b6f582cc3f031d3f2d70d00429cc25",
+ "base_finding_count": 4,
+ "audit_finding_count": 8,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B0",
+    "B6"
+   ],
+   "base_member_text": [
+    "[L19-L33,L45-L341] (LOW/global-state API) The library exposes one saved global model state with no initialized/finalized guard, leaving repeated init, calls before init, and calls after final as undocumented lifecycle hazards."
+   ],
+   "audit_member_text": [
+    "[L19-L33,L45-L225] (MED/lifecycle) Module state is saved globally and init has no already-initialized guard or cleanup path, so repeated initialization can reinitialize MPI and reallocate persistent model/output state.",
+    "[L321-L341] (MED/lifecycle) final has no initialized/finalized guard and always finalizes logging and MPI, making duplicate finalization or finalization before successful init unsafe."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L228-L239] (MED/undefined/stale status) outputext tests the library module's stale error variable rather than receiving a status from output, and leaves its function result undefined for error values other than 0 or 1."
+   ],
+   "audit_member_text": [
+    "[L228-L237] (HIGH/uninitialized-result) outputext assigns its function result only when module error is exactly 0 or 1, leaving the C-visible return value undefined for any other error code."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "[L278-L316] (HIGH/error propagation) executestep suppresses a nonzero timestep error by skipping physics but then unconditionally increments the step count and returns success."
+   ],
+   "audit_member_text": [
+    "[L278-L316] (HIGH/error-propagation) executestep sets error through timestep and skips physics on failure, but then unconditionally increments the completed-step count and returns success zero."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L75-L115,L153-L225] (MED/initialization status) init passes a shared error variable through setup operations but never checks or propagates it and unconditionally returns success after output initialization."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L267-L287] (LOW/argument-contract) The optional custom timestep has neither intent nor value semantics, leaving its mutation and language-binding contract unclear to callers."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L287-L291] (MED/error-side-effect) Output schedules and progress logging are advanced immediately after timestep reports an error, before the error guard that suppresses the physical update."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L269-L274,L330-L336] (MED/uninitialized-timing) MPI finalization passes saved t01 to timing output even though t01 is assigned only when execute_counter equals 1, so short or failed runs can finalize with an undefined loop-start timestamp."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L343-L350] (LOW/string-contract) getversion silently truncates to the caller's fixed length and provides no explicit NUL termination or returned required length despite using c_char storage."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

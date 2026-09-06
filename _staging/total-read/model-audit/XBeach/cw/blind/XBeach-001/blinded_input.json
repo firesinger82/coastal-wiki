@@ -1,0 +1,2654 @@
+{
+ "shard": "XBeach-001",
+ "instructions_ref": "see subagent prompt",
+ "files": [
+  {
+   "file_token": "F00",
+   "lang": ".F90",
+   "listX": [
+    {
+     "id": "F00-X0",
+     "text": "[L629-L630] (HIGH/incorrect state assignment) In the non-MPI multi-record-jump path, both q1 and q2 are assigned from gq2, so the earlier discharge record gq1 read at lines 612-615 is discarded and temporal interpolation uses the later record at both endpoints."
+    },
+    {
+     "id": "F00-X1",
+     "text": "[L409-L416, L426-L434, L448-L472, L657-L664, L863-L866] (MED/unguarded division) Several Surfbeat and nonhydrostatic taper expressions divide by par%taper without the positive-taper guard used by the stationary branch, so an allowed zero taper would produce invalid boundary values."
+    },
+    {
+     "id": "F00-X2",
+     "text": "[L678-L701] (MED/unimplemented option) The par%order==3 nonhydrostatic monochromatic branch contains only commented assignments, leaving s%zi and s%ui stale while accepting the option."
+    },
+    {
+     "id": "F00-X3",
+     "text": "[L880-L884, L903-L907] (HIGH/MPI uninitialized state) The TS_NONH MPI path does not broadcast isSet_V, yet every rank tests it to set s%vi and s%isSet_Vbc, so non-master ranks use an undefined logical."
+    },
+    {
+     "id": "F00-X4",
+     "text": "[L886-L899] (HIGH/MPI/serial inconsistency) TS_NONH discharge-to-velocity conversion guarded by isSet_Q exists only in the non-MPI preprocessor branch, so MPI runs distribute raw discharges as boundary velocities and also never broadcast isSet_Q."
+    },
+    {
+     "id": "F00-X5",
+     "text": "[L1022-L1025, L1035-L1038] (HIGH/incorrect extrema update) All four hybrid-tide minimum updates call min with the corresponding maximum accumulator instead of the minimum accumulator, corrupting the observed ranges used to compute the hybrid coefficients."
+    },
+    {
+     "id": "F00-X6",
+     "text": "[L1049, L1063] (MED/unguarded division) Hybrid relative error divides by the maximum observed range without a positive floor, so constant water-level windows can yield division by zero."
+    },
+    {
+     "id": "F00-X7",
+     "text": "[L1511-L1515, L1551, L1581] (MED/conditional initialization) Saved Coriolis coefficient fc is initialized only when par%t<=par%dt, so a first invocation after a hot start or externally managed time can use an undefined value."
+    },
+    {
+     "id": "F00-X8",
+     "text": "[L1785-L1798] (HIGH/MPI domain ownership) Vertical point discharges are clamped into each local subdomain and applied with no ownership test, causing every MPI rank to inject every point source at a local edge cell."
+    },
+    {
+     "id": "F00-X9",
+     "text": "[L1961-L1973] (MED/invalid-input handling) An unrecognized scalar/vector mode is silently accepted and leaves saved lVarU at its prior value, so malformed or changed files can be parsed using stale layout state."
+    },
+    {
+     "id": "F00-X10",
+     "text": "[L1860-L1868, L1915-L2012] (HIGH/stale parser state) Saved header indices iZ/iU/iV/idU/idV/iQ/iW/iT are not reset when a new boundary file is initialized, so variables absent from the new header can retain indices from the previous file."
+    },
+    {
+     "id": "F00-X11",
+     "text": "[L1988-L2012, L2056-L2065] (MED/unclear file-format contract) Although the time-column index iT is detected, data columns are always addressed as header_index-1, implicitly requiring time to be the first header without validating or documenting that constraint."
+    },
+    {
+     "id": "F00-X12",
+     "text": "[L2067-L2087] (HIGH/division by zero) For a boundary file with only one time level, EOF handling sets t1 equal to t0 and then immediately performs interpolation divided by t1-t0."
+    },
+    {
+     "id": "F00-X13",
+     "text": "[L2171-L2183, L2240-L2253] (HIGH/undefined output flags) When EOF is reached during or before a regular call, values and isSet_Q are assigned but isSet_U/isSet_V/isSet_Z/isSet_W/isSet_dU/isSet_dV are not, despite all being intent(out) and subsequently consumed by callers."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F00-Y0",
+     "text": "[L57-L113,L118-L125] (LOW/lifecycle/state) Saved allocation and `bccreated` state are initialized only for the first grid seen, with no reset or resizing contract for a later grid or reinitialization in the same process."
+    },
+    {
+     "id": "F00-Y1",
+     "text": "[L139-L164,L176-L203] (MED/input validation) The TS readers accept `nt` without requiring it to be positive and then allocate from it and divide `sum(dataE)` by `nt`."
+    },
+    {
+     "id": "F00-Y2",
+     "text": "[L426-L473,L657-L664,L863-L866] (HIGH/numerical robustness) Several Surfbeat and nonhydrostatic boundary branches evaluate `par%t/par%taper` without the zero-taper guard used by the stationary branch, so an allowed zero taper can inject NaNs."
+    },
+    {
+     "id": "F00-Y3",
+     "text": "[L434-L453,L470-L472,L684-L696] (HIGH/numerical robustness) Bound-wave and nonhydrostatic formulas divide by boundary depth, `sinh(kh)`, `tanh(kh)`, and the resonant term `cg**2-g*h` without dry-point or small-denominator protection."
+    },
+    {
+     "id": "F00-Y4",
+     "text": "[L490-L500,L594-L660] (MED/time interpolation) The spectral-record calculation divides by `dtbcfile` and derives direct-access record numbers from it without validating that this file-supplied interval is positive."
+    },
+    {
+     "id": "F00-Y5",
+     "text": "[L627-L631] (HIGH/serial/MPI divergence) In the non-MPI multi-record-jump branch, both `q1` and `q2` are assigned from `gq2`, whereas the MPI branch distributes `gq1` into `q1`, eliminating the intended discharge interpolation only in serial runs."
+    },
+    {
+     "id": "F00-Y6",
+     "text": "[L697-L701] (HIGH/incomplete branch) The `par%order==3` branch contains only commented-out assignments, leaving `s%zi` and `s%ui` at prior or undefined values while execution continues as if a third-order boundary had been generated."
+    },
+    {
+     "id": "F00-Y7",
+     "text": "[L854-L866] (HIGH/vector transformation) The difference-velocity rotation computes only `s%dUi`; `s%dVi` is neither replaced by the rotated transverse component nor included in the subsequent tapering."
+    },
+    {
+     "id": "F00-Y8",
+     "text": "[L868-L913] (HIGH/MPI state propagation) The TS_NONH MPI path broadcasts several `isSet_*` flags but omits `isSet_V`, after which every rank branches on that uninitialized local flag."
+    },
+    {
+     "id": "F00-Y9",
+     "text": "[L873-L899] (HIGH/serial/MPI divergence) When a TS_NONH file supplies discharge `Q`, conversion of `uig` and `duig` from discharge to velocity is compiled only in the non-MPI branch, so MPI runs distribute discharge values into velocity fields."
+    },
+    {
+     "id": "F00-Y10",
+     "text": "[L778-L780,L830-L832,L864,L1310-L1313] (HIGH/reference-level consistency) If a nonhydrostatic boundary file omits `Z`, `s%zi` is set to the absolute neighboring surface `s%zs(2,:)`, but the applied boundary later adds `s%zs0` to `s%zi`, apparently adding the mean level twice."
+    },
+    {
+     "id": "F00-Y11",
+     "text": "[L963-L983] (LOW/lifecycle/state) Flow-boundary work arrays are sized only on the first call, and `zs0old` is allocated only if the first call's tide type is instant or hybrid, leaving later dimension or tide-mode changes unsupported."
+    },
+    {
+     "id": "F00-Y12",
+     "text": "[L998-L999,L1029-L1042,L1141-L1146,L1363-L1365] (MED/parameter validation) Hybrid averaging and relaxation divide by combinations of `cats`, `Trep`, and `hybtavg` without enforcing positive values."
+    },
+    {
+     "id": "F00-Y13",
+     "text": "[L1022-L1038] (HIGH/accumulator defect) All four hybrid minimum updates call `min` with the corresponding maximum accumulator instead of the previous minimum, so historical minima are lost whenever later samples rise."
+    },
+    {
+     "id": "F00-Y14",
+     "text": "[L1047-L1071] (HIGH/numerical robustness) Hybrid relative error divides by the maximum observed surface range without a positive floor, producing a zero denominator for constant-level windows."
+    },
+    {
+     "id": "F00-Y15",
+     "text": "[L1177-L1178,L1386-L1387] (MED/numerical robustness) Boundary mean velocities divide by globally accumulated metric lengths without checking for an empty or zero-width boundary selection."
+    },
+    {
+     "id": "F00-Y16",
+     "text": "[L1202-L1247,L1263-L1271,L1321-L1324,L1399-L1422,L1432-L1451] (MED/boundary numerical robustness) Several absorbing-boundary formulas use unguarded water depths, group velocity, grid spacing, or angular denominators even though these branches do not consistently mask dry or degenerate boundary points."
+    },
+    {
+     "id": "F00-Y17",
+     "text": "[L1250-L1278,L1439-L1444] (MED/angle calculation) Incident and reflected directions are obtained with one-argument `atan` of a quotient, losing quadrant information and becoming discontinuous near zero longitudinal velocity."
+    },
+    {
+     "id": "F00-Y18",
+     "text": "[L1458-L1468] (HIGH/copy/paste indexing) Back-boundary corner water levels use `dzs0dn(1,...)` and `zb(1,...)` instead of the `nx+1` back-boundary row, applying front-boundary geometry at both back corners."
+    },
+    {
+     "id": "F00-Y19",
+     "text": "[L1511-L1515] (LOW/initialization) Saved Coriolis parameter `fc` is initialized only when `par%t<=par%dt`, so a first call after that interval, such as a hot-start entry, uses an undefined value."
+    },
+    {
+     "id": "F00-Y20",
+     "text": "[L1523-L1603] (MED/dispatch contract) The lateral-boundary `select case` has no default assignment, so an unsupported `bctype` returns an undefined `vbc` vector."
+    },
+    {
+     "id": "F00-Y21",
+     "text": "[L1549-L1602] (LOW/small-grid indexing) Three lateral-boundary cases populate only indices `2:s%nx` before copying from indices 2 and `s%nx`, which leaves circular or undefined endpoint values when `s%nx<2`."
+    },
+    {
+     "id": "F00-Y22",
+     "text": "[L1659-L1678] (HIGH/MPI domain intersection) A horizontal discharge segment is considered local only when at least one endpoint lies in the rank's box, so a segment that crosses a subdomain while both endpoints lie outside that subdomain is omitted there."
+    },
+    {
+     "id": "F00-Y23",
+     "text": "[L1777-L1798] (HIGH/MPI source duplication) Vertical point discharge clamps the global point into every rank's local index range without an ownership test, causing every MPI rank to apply the source at some local cell."
+    },
+    {
+     "id": "F00-Y24",
+     "text": "[L1961-L1973] (MED/input validation) An unrecognized scalar/vector mode is silently accepted and leaves saved `lVaru` at its previous-file value."
+    },
+    {
+     "id": "F00-Y25",
+     "text": "[L1860-L1868,L1915-L2012] (HIGH/stale parser state) Saved header indices are not reset when a new boundary file is initialized, so variables omitted by the new file can retain column indices from the previous file."
+    },
+    {
+     "id": "F00-Y26",
+     "text": "[L1868,L1988-L2012,L2056-L2083,L2259-L2311] (MED/file-format contract) Although the header parser records the position of `T`, the data reader always consumes time as the first field and maps every other variable as column index minus one, making non-first time columns unsupported without validation."
+    },
+    {
+     "id": "F00-Y27",
+     "text": "[L1988-L2011] (LOW/input normalization) Multi-character headers are matched against only selected capitalization variants, so otherwise accepted case variants such as `du`, `Dv`, or `DQ` can be silently ignored."
+    },
+    {
+     "id": "F00-Y28",
+     "text": "[L2067-L2127,L2185-L2228] (HIGH/time interpolation) A one-record file sets `t1=t0` and duplicate timestamps are otherwise permitted, yet all initialized variables are interpolated by dividing by `t1-t0`."
+    },
+    {
+     "id": "F00-Y29",
+     "text": "[L2171-L2183,L2240-L2253] (HIGH/output initialization) Both end-of-file return paths assign only `isSet_Q`; the other `intent(out)` presence flags are left undefined even though callers immediately use them to accept or replace returned fields."
+    },
+    {
+     "id": "F00-Y30",
+     "text": "[L274,L420-L421,L914-L916] (MED/dispatch contract) Unsupported wave-boundary combinations fall through empty branches without an error or deterministic reset, allowing boundary arrays to retain values from an earlier condition."
+    },
+    {
+     "id": "F00-Y31",
+     "text": "[L918-L922] (LOW/update scope) Final long-wave scaling is applied to the entire saved `s%ui` field rather than only the boundary row populated here, creating an unclear repeated-scaling contract for interior entries."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F00-X0",
+     "F00-Y5"
+    ],
+    [
+     "F00-X1",
+     "F00-Y2"
+    ],
+    [
+     "F00-X1",
+     "F00-Y3"
+    ],
+    [
+     "F00-X1",
+     "F00-Y4"
+    ],
+    [
+     "F00-X1",
+     "F00-Y7"
+    ],
+    [
+     "F00-X1",
+     "F00-Y8"
+    ],
+    [
+     "F00-X1",
+     "F00-Y10"
+    ],
+    [
+     "F00-X1",
+     "F00-Y30"
+    ],
+    [
+     "F00-X2",
+     "F00-Y3"
+    ],
+    [
+     "F00-X2",
+     "F00-Y6"
+    ],
+    [
+     "F00-X3",
+     "F00-Y8"
+    ],
+    [
+     "F00-X3",
+     "F00-Y9"
+    ],
+    [
+     "F00-X4",
+     "F00-Y5"
+    ],
+    [
+     "F00-X4",
+     "F00-Y9"
+    ],
+    [
+     "F00-X5",
+     "F00-Y12"
+    ],
+    [
+     "F00-X5",
+     "F00-Y13"
+    ],
+    [
+     "F00-X6",
+     "F00-Y14"
+    ],
+    [
+     "F00-X7",
+     "F00-Y19"
+    ],
+    [
+     "F00-X7",
+     "F00-Y21"
+    ],
+    [
+     "F00-X8",
+     "F00-Y23"
+    ],
+    [
+     "F00-X9",
+     "F00-Y24"
+    ],
+    [
+     "F00-X10",
+     "F00-Y25"
+    ],
+    [
+     "F00-X10",
+     "F00-Y26"
+    ],
+    [
+     "F00-X10",
+     "F00-Y27"
+    ],
+    [
+     "F00-X11",
+     "F00-Y25"
+    ],
+    [
+     "F00-X11",
+     "F00-Y26"
+    ],
+    [
+     "F00-X11",
+     "F00-Y27"
+    ],
+    [
+     "F00-X11",
+     "F00-Y28"
+    ],
+    [
+     "F00-X12",
+     "F00-Y26"
+    ],
+    [
+     "F00-X12",
+     "F00-Y28"
+    ],
+    [
+     "F00-X13",
+     "F00-Y26"
+    ],
+    [
+     "F00-X13",
+     "F00-Y28"
+    ],
+    [
+     "F00-X13",
+     "F00-Y29"
+    ]
+   ]
+  },
+  {
+   "file_token": "F01",
+   "lang": ".F90",
+   "listX": [
+    {
+     "id": "F01-X0",
+     "text": "[L50-L54,L67] (LOW/persistent allocation) The saved gamma workspace is allocated only once and never checked against later grid dimensions, leaving an undocumented fixed-grid-size lifetime contract."
+    },
+    {
+     "id": "F01-X1",
+     "text": "[L56-L72] (MED/numerical robustness) Although hhw is protected against dry or negative depth, gamma is computed with the unclamped s%hh, so zero-depth cells can produce infinities or NaNs in hstokes."
+    },
+    {
+     "id": "F01-X2",
+     "text": "[L75-L115] (MED/configuration validation) The wavemodel select has no default case, so an unsupported value silently performs no wave update."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F01-Y0",
+     "text": "[L50-L54] (MED/saved-shape state) The saved gamma work array is never resized if the grid dimensions change."
+    },
+    {
+     "id": "F01-Y1",
+     "text": "[L64-L73] (HIGH/dry-cell division) The new hstokes path computes H/hh across the full grid without a positive depth floor, so dry zero-depth cells can produce invalid gamma and zero hstokes."
+    },
+    {
+     "id": "F01-Y2",
+     "text": "[L78-L80, L89-L91] (HIGH/periodic scheduling) Wave updates depend on the timestep landing within 0.001*dt of an exact wavint multiple, so non-commensurate dt and wavint values can skip all later scheduled updates."
+    },
+    {
+     "id": "F01-Y3",
+     "text": "[L78, L89] (MED/unguarded modulo) The update schedule evaluates mod(t,wavint) without validating a positive nonzero wavint."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F01-X0",
+     "F01-Y0"
+    ],
+    [
+     "F01-X0",
+     "F01-Y1"
+    ],
+    [
+     "F01-X1",
+     "F01-Y0"
+    ],
+    [
+     "F01-X1",
+     "F01-Y1"
+    ],
+    [
+     "F01-X1",
+     "F01-Y2"
+    ],
+    [
+     "F01-X1",
+     "F01-Y3"
+    ],
+    [
+     "F01-X2",
+     "F01-Y1"
+    ],
+    [
+     "F01-X2",
+     "F01-Y2"
+    ],
+    [
+     "F01-X2",
+     "F01-Y3"
+    ]
+   ]
+  },
+  {
+   "file_token": "F02",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F02-X0",
+     "text": "[L73-L80,L234-L242] (HIGH/build failure) generate_wave_boundary_surfbeat assigns misspelled undeclared durantionlength and contains an unmatched endif, so the module cannot compile under implicit none."
+    },
+    {
+     "id": "F02-X1",
+     "text": "[L100-L108,L234-L238] (HIGH/repeat-state contract) The repeatwbc path skips initialization of local wp but returns wp%rtbc, and bccount is incremented only in a local copy rather than written back to waveSpectrumAdministration."
+    },
+    {
+     "id": "F02-X2",
+     "text": "[L127-L135,L315-L328] (MED/input validation) The instat select has no default, so an unsupported value leaves specin pointer components uninitialized before they are dereferenced."
+    },
+    {
+     "id": "F02-X3",
+     "text": "[L197,L2376] (HIGH/build failure) generate_swts is called with two arguments even though its explicit module procedure accepts only wp."
+    },
+    {
+     "id": "F02-X4",
+     "text": "[L208-L225,L1826-L1832] (MED/resource management) Cleanup deallocates pointer-containing spectrum/vargen parents without deallocating their pointed-to arrays, leaking allocations on each generated series."
+    },
+    {
+     "id": "F02-X5",
+     "text": "[L394,L528,L666-L671,L687-L688,L1459,L1476,L1662-L1672] (HIGH/numerical robustness) Zero-energy spectra and removed partitions reach unguarded divisions; in particular a zero scalefac1 can turn the overlap convergence metric into NaN and prevent its unbounded loop from terminating."
+    },
+    {
+     "id": "F02-X6",
+     "text": "[L862-L881,L1293-L1309] (HIGH/spectrum-axis handling) The SWAN reader notes non-monotonic frequencies but performs only no-op conversion before integration and 2-D interpolation assume ordered absolute frequencies."
+    },
+    {
+     "id": "F02-X7",
+     "text": "[L897-L962,L1124-L1172] (MED/bounds/input validation) SWAN and variance-density inputs index angle entries 1 and 2 without enforcing nang>=2."
+    },
+    {
+     "id": "F02-X8",
+     "text": "[L1324-L1340] (HIGH/indexing) When restoring a nonzero Sf into an empty interpolated bin, output-grid index i is used to index specin%S, which can exceed specin%nf and does not identify the corresponding input frequency."
+    },
+    {
+     "id": "F02-X9",
+     "text": "[L1515-L1520] (HIGH/scientific formula) The nonhydrostatic cutoff frequency omits the square root from the dispersion relation, yielding dimensionally incorrect filtering."
+    },
+    {
+     "id": "F02-X10",
+     "text": "[L1578-L1619] (HIGH/conditional implementation) Without BUILDXBEACH the interpolation blocks are empty, leaving pdflocal and thetagen undefined while the routine continues to normalize and use them."
+    },
+    {
+     "id": "F02-X11",
+     "text": "[L1587-L1606] (MED/sampling/CDF) Simple-sum PDF normalization followed by trapezoidal CDF accumulation leaves the final CDF below one, so some random draws fall outside the interpolation range."
+    },
+    {
+     "id": "F02-X12",
+     "text": "[L1766-L1771] (LOW/time-axis contract) rtin is recorded as tslen*dtin although tin ends at (tslen-1)*dtin."
+    },
+    {
+     "id": "F02-X13",
+     "text": "[L1843-L1846] (HIGH/numerical robustness) Variance is rescaled by (hm0/hm0post)^2 without guarding hm0post=0."
+    },
+    {
+     "id": "F02-X14",
+     "text": "[L1948-L1952] (MED/numerical robustness) Spatial spectrum interpolation rescales by sfimp/sfnow without guarding sfnow=0."
+    },
+    {
+     "id": "F02-X15",
+     "text": "[L2035-L2085] (HIGH/uninitialized state/build failure) Direction distribution allocates with uninitialized lntheta, uses uninitialized ldtheta, never allocates WDindex, indexes binedges with wave index i instead of itheta, and references undefined par_px."
+    },
+    {
+     "id": "F02-X16",
+     "text": "[L2167-L2189,L2301-L2304] (HIGH/build failure) BUILDXBEACH logging references s%ntheta and s%ny in generate_ebcf although no s object is in scope."
+    },
+    {
+     "id": "F02-X17",
+     "text": "[L2243-L2256] (HIGH/state corruption) Inside the iy loop, scalar zeta(iy,...) values are assigned to the entire lastwaveelevation(:,itheta) column, so every boundary point is repeatedly overwritten with one point's elevation."
+    },
+    {
+     "id": "F02-X18",
+     "text": "[L2338-L2341] (HIGH/time-axis corruption) Each loop iteration assigns one scalar time to the entire internal tbc slice, leaving all finite time entries equal to the final loop value."
+    },
+    {
+     "id": "F02-X19",
+     "text": "[L2346-L2359] (HIGH/time-series indexing/shape) Interpolated samples use (it-1)*dtbc while storage time uses (it-2)*dtbc, and the no-interpolation whole-array assignment assumes tslen equals tslenbc although Kmin can make those extents differ."
+    },
+    {
+     "id": "F02-X20",
+     "text": "[L2500-L2516] (HIGH/build failure) generate_qbcf allocates q using s%ny even though no s object is declared or passed."
+    },
+    {
+     "id": "F02-X21",
+     "text": "[L2638-L2664] (HIGH/array conformance) The per-point phase shift multiplies K-by-K matrices by whole npb-length distx/disty vectors instead of distx(j)/disty(j), producing nonconformable array expressions."
+    },
+    {
+     "id": "F02-X22",
+     "text": "[L2693-L2698] (HIGH/allocation/build failure) Hydrostatic output uses undeclared tslenbc, allocates qxbct twice, and never allocates qybct before writing it."
+    },
+    {
+     "id": "F02-X23",
+     "text": "[L2698-L2712] (HIGH/time-series indexing/shape) Flux interpolation repeats the one-step time offset, while direct assignments require q's tslen to conform to tslenbc."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F02-Y0",
+     "text": "[L73-L242] (HIGH/compile-time structural defects) The main generator references undeclared par, s, and bcfiles, assigns misspelled undeclared durantionlength, and contains an unmatched endif at line 240, so this routine cannot compile under implicit none."
+    },
+    {
+     "id": "F02-Y1",
+     "text": "[L100-L108, L234-L235] (HIGH/undefined repeat duration) The repeatwbc branch never initializes local wp, yet the routine obtains the returned duration from wp%rtbc after that branch."
+    },
+    {
+     "id": "F02-Y2",
+     "text": "[L120-L142, L247-L330] (MED/multi-location consistency) Each spectrum location can overwrite the shared wp%rtbc and wp%dtbc, but no check requires all locations to use the same series duration and sampling interval."
+    },
+    {
+     "id": "F02-Y3",
+     "text": "[L208-L225, L729-L733, L1469-L1488] (LOW/pointer-target leak) Deallocating containers such as specin, specinterp, scaledspec, vargen, and combspec does not deallocate their pointer components, and tempSf and avgscale are also left allocated, causing repeated-generation memory growth."
+    },
+    {
+     "id": "F02-Y4",
+     "text": "[L237-L238] (HIGH/administration state not persisted) The generator increments only the module shortcut bccount and never writes it back to waveSpectrumAdministration%bccount, so later calls continue to behave as the first boundary series."
+    },
+    {
+     "id": "F02-Y5",
+     "text": "[L624-L671] (HIGH/invalid convergence arithmetic) The partition iteration explicitly permits scalefac1 to become zero and then divides by scalefac1 in its convergence metric, producing infinities or NaNs."
+    },
+    {
+     "id": "F02-Y6",
+     "text": "[L635-L676] (HIGH/spectral overlap logic) After zeroing all but the dominant partition in each overlapping spectral cell, the final assignment rebuilds every scaledspec from the full original partition, discarding the overlap mask."
+    },
+    {
+     "id": "F02-Y7",
+     "text": "[L682-L719] (MED/invalid overlap diagnostic) A fully removed partition can make the peak-based ratio compute 0/0, and the resulting ratio-minus-one is then described as percent energy overlap even though it is a pointwise amplitude scaling."
+    },
+    {
+     "id": "F02-Y8",
+     "text": "[L854-L881] (HIGH/unimplemented frequency conversion) SWAN relative-frequency input (RFREQ) is detected but the documented conversion to absolute frequency is a no-op marked STILL TO BE DONE."
+    },
+    {
+     "id": "F02-Y9",
+     "text": "[L861-L925, L1064-L1078, L1111-L1172, L1224-L1238] (MED/spectral-axis validation) Readers index the second direction element and pass frequency/direction axes onward without enforcing at least two bins and strict monotonic order, despite later integration and interpolation depending on those properties."
+    },
+    {
+     "id": "F02-Y10",
+     "text": "[L1293-L1302, L1305-L1309, L1324-L1327] (HIGH/non-monotonic interpolation inconsistency) The code explicitly allows a non-monotonic input frequency axis but computes signed cell widths and passes that same axis to interpolation routines that require an ordered coordinate."
+    },
+    {
+     "id": "F02-Y11",
+     "text": "[L1334-L1339] (HIGH/out-of-bounds indexing) The zero-directional-interpolation fallback indexes specin%S with the standard-grid index i, which can run to 801 even when the input spectrum has fewer frequency rows."
+    },
+    {
+     "id": "F02-Y12",
+     "text": "[L1344-L1354, L1458-L1476, L1651-L1672] (MED/zero-energy handling) Wave direction, peak frequency, and representative-period calculations divide by spectral sums without guarding an all-zero or threshold-empty spectrum."
+    },
+    {
+     "id": "F02-Y13",
+     "text": "[L1361-L1375] (HIGH/compile-time unresolved symbol) set_repeatwbc references bcfiles without qualifying it through waveSpectrumAdministration or declaring a local alias."
+    },
+    {
+     "id": "F02-Y14",
+     "text": "[L1515-L1520] (HIGH/incorrect dispersion formula) The nonhydrostatic frequency cutoff uses g*k*tanh(kh)/(2π) instead of sqrt(g*k*tanh(kh))/(2π), giving dimensionally and numerically incorrect cutoff frequencies."
+    },
+    {
+     "id": "F02-Y15",
+     "text": "[L1587-L1619] (MED/CDF normalization) The directional PDF is normalized by its discrete sum but its trapezoidal CDF is not renormalized to end at one, so upper-tail random draws lie outside the constructed CDF range."
+    },
+    {
+     "id": "F02-Y16",
+     "text": "[L1618-L1619] (MED/angle normalization) MOD can return a negative generated direction, contradicting the stated 0<=theta<2π invariant."
+    },
+    {
+     "id": "F02-Y17",
+     "text": "[L1697-L1713, L1534-L1549, L1761] (HIGH/empty-frequency-range handling) If no spectral bin survives the threshold and cutoff, frange returns coincident default indices, leading to dfgen=0 and subsequent division by dfgen."
+    },
+    {
+     "id": "F02-Y18",
+     "text": "[L1766-L1771] (LOW/off-by-one duration) wp%rtin is recorded as tslen*dtin while the generated time axis ends at (tslen-1)*dtin."
+    },
+    {
+     "id": "F02-Y19",
+     "text": "[L1795-L1805] (HIGH/compile-time unresolved symbol) generate_wave_time_axis assigns ind_end_taper even though that name is neither declared locally nor present in the datastore."
+    },
+    {
+     "id": "F02-Y20",
+     "text": "[L1843-L1846] (HIGH/division by zero) Wave-train variance rescaling divides by hm0post without guarding a zero interpolated spectrum."
+    },
+    {
+     "id": "F02-Y21",
+     "text": "[L1932-L1952] (MED/unguarded spatial interpolation) Spatial spectrum interpolation neither rejects coincident spectrum positions nor guards sfnow=0 before rescaling by sfimp/sfnow."
+    },
+    {
+     "id": "F02-Y22",
+     "text": "[L197-L198, L2376-L2385] (HIGH/procedure interface mismatch) generate_swts is called with two arguments (wp,s) but is defined with only wp."
+    },
+    {
+     "id": "F02-Y23",
+     "text": "[L2035-L2137] (HIGH/compile-time/uninitialized directional grid) lntheta and ldtheta are never assigned before allocation and looping, wp%WDindex is used without allocation, and par_px is undeclared."
+    },
+    {
+     "id": "F02-Y24",
+     "text": "[L2079-L2096] (HIGH/out-of-bounds/wrong index) The wraparound-bin test uses binedges(i,...) where i is the wave-component index up to K rather than binedges(itheta,...), so it can read outside the directional-bin array and tests the wrong bin."
+    },
+    {
+     "id": "F02-Y25",
+     "text": "[L2124] (MED/division by zero) The lost-energy percentage divides by lostvar+keptvar without a zero-total-energy guard."
+    },
+    {
+     "id": "F02-Y26",
+     "text": "[L2142-L2369] (HIGH/compile-time unresolved symbols) generate_ebcf repeatedly uses undeclared ntheta, s, lastwaveelevation, and ind_end_taper instead of the available datastore-qualified fields."
+    },
+    {
+     "id": "F02-Y27",
+     "text": "[L2249-L2256] (HIGH/cross-point state overwrite) Inside the iy loop, a scalar elevation for point iy is assigned to the entire lastwaveelevation(:,itheta) vector, so each boundary point overwrites continuation state for all points."
+    },
+    {
+     "id": "F02-Y28",
+     "text": "[L2285-L2295] (HIGH/division by zero) Directional envelope scaling divides by stdeta without handling a zero total excitation."
+    },
+    {
+     "id": "F02-Y29",
+     "text": "[L2339-L2341] (HIGH/time-axis construction) Each loop iteration assigns one scalar time to the entire interior tbc slice, leaving all finite time entries equal to the last loop value."
+    },
+    {
+     "id": "F02-Y30",
+     "text": "[L2346-L2358] (HIGH/off-by-one/shape mismatch) The resampling branch queries (it-1)*dtbc for an output slot corresponding to (it-2)*dtbc, while the no-resampling branch assigns a tslen array into a tslenbc slice without ensuring equal extents."
+    },
+    {
+     "id": "F02-Y31",
+     "text": "[L2460-L2729] (HIGH/compile-time unresolved symbols) generate_qbcf uses undeclared s, tslenbc, and non-BUILDXBEACH interpolation symbols, preventing a valid build as written."
+    },
+    {
+     "id": "F02-Y32",
+     "text": "[L2562-L2588] (HIGH/singular interaction coefficients) Difference-wave group velocity and interaction coefficients divide by k3 and a resonance denominator without masks for zero or near-zero values."
+    },
+    {
+     "id": "F02-Y33",
+     "text": "[L2606-L2609] (HIGH/invalid complex logarithm) Phase is computed with log of Fourier coefficients that can be exactly zero for zero-amplitude components, propagating undefined phases into later complex products."
+    },
+    {
+     "id": "F02-Y34",
+     "text": "[L2661-L2669] (HIGH/array-shape defect) Boundary unrolling multiplies K-shaped matrices by whole npb-length distx and disty arrays rather than distx(j) and disty(j), producing nonconformable shapes or unintended element mapping."
+    },
+    {
+     "id": "F02-Y35",
+     "text": "[L2693-L2697] (HIGH/allocation defect) qxbct is allocated twice while qybct is never allocated, so the second allocation fails and later qybct assignments target an unallocated array."
+    },
+    {
+     "id": "F02-Y36",
+     "text": "[L2698-L2712] (HIGH/off-by-one/shape mismatch) Long-wave resampling repeats the one-step time offset and unchecked tslen-to-tslenbc shape assignment used by the energy path."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F02-X0",
+     "F02-Y0"
+    ],
+    [
+     "F02-X0",
+     "F02-Y1"
+    ],
+    [
+     "F02-X0",
+     "F02-Y2"
+    ],
+    [
+     "F02-X0",
+     "F02-Y4"
+    ],
+    [
+     "F02-X1",
+     "F02-Y0"
+    ],
+    [
+     "F02-X1",
+     "F02-Y1"
+    ],
+    [
+     "F02-X1",
+     "F02-Y4"
+    ],
+    [
+     "F02-X2",
+     "F02-Y2"
+    ],
+    [
+     "F02-X3",
+     "F02-Y22"
+    ],
+    [
+     "F02-X4",
+     "F02-Y3"
+    ],
+    [
+     "F02-X5",
+     "F02-Y5"
+    ],
+    [
+     "F02-X5",
+     "F02-Y6"
+    ],
+    [
+     "F02-X5",
+     "F02-Y7"
+    ],
+    [
+     "F02-X5",
+     "F02-Y12"
+    ],
+    [
+     "F02-X6",
+     "F02-Y8"
+    ],
+    [
+     "F02-X6",
+     "F02-Y9"
+    ],
+    [
+     "F02-X6",
+     "F02-Y10"
+    ],
+    [
+     "F02-X7",
+     "F02-Y9"
+    ],
+    [
+     "F02-X8",
+     "F02-Y10"
+    ],
+    [
+     "F02-X8",
+     "F02-Y11"
+    ],
+    [
+     "F02-X8",
+     "F02-Y12"
+    ],
+    [
+     "F02-X9",
+     "F02-Y14"
+    ],
+    [
+     "F02-X10",
+     "F02-Y15"
+    ],
+    [
+     "F02-X10",
+     "F02-Y16"
+    ],
+    [
+     "F02-X11",
+     "F02-Y15"
+    ],
+    [
+     "F02-X12",
+     "F02-Y17"
+    ],
+    [
+     "F02-X12",
+     "F02-Y18"
+    ],
+    [
+     "F02-X13",
+     "F02-Y20"
+    ],
+    [
+     "F02-X14",
+     "F02-Y21"
+    ],
+    [
+     "F02-X15",
+     "F02-Y23"
+    ],
+    [
+     "F02-X15",
+     "F02-Y24"
+    ],
+    [
+     "F02-X16",
+     "F02-Y28"
+    ],
+    [
+     "F02-X17",
+     "F02-Y27"
+    ],
+    [
+     "F02-X18",
+     "F02-Y29"
+    ],
+    [
+     "F02-X18",
+     "F02-Y30"
+    ],
+    [
+     "F02-X19",
+     "F02-Y29"
+    ],
+    [
+     "F02-X19",
+     "F02-Y30"
+    ],
+    [
+     "F02-X21",
+     "F02-Y34"
+    ],
+    [
+     "F02-X22",
+     "F02-Y31"
+    ],
+    [
+     "F02-X22",
+     "F02-Y35"
+    ],
+    [
+     "F02-X22",
+     "F02-Y36"
+    ],
+    [
+     "F02-X23",
+     "F02-Y35"
+    ],
+    [
+     "F02-X23",
+     "F02-Y36"
+    ]
+   ]
+  },
+  {
+   "file_token": "F03",
+   "lang": ".F90",
+   "listX": [
+    {
+     "id": "F03-X0",
+     "text": "[L52-L91, L131-L152] (HIGH/fragile first-call initialization) Saved administration is initialized only when t equals dt within 1e-6, so hot starts or externally managed first calls can use undefined reuse, counter, bcendtime, rt, and dt."
+    },
+    {
+     "id": "F03-X1",
+     "text": "[L69-L86] (HIGH/non-master undefined state) testc is read only by the master but is tested on every rank to set saved reuse, with the corresponding broadcasts explicitly commented out."
+    },
+    {
+     "id": "F03-X2",
+     "text": "[L93-L98] (LOW/unreachable cleanup) The CLOSE intended for the last timestep is placed after RETURN and can never execute."
+    },
+    {
+     "id": "F03-X3",
+     "text": "[L157-L162] (MED/empty weighted average) For a minimal 2-D grid with ny=1, the offshore-depth average uses empty slices and divides by a zero sum."
+    },
+    {
+     "id": "F03-X4",
+     "text": "[L314-L378] (LOW/periodic-grid quadrature) The parametric directional grid includes both -π and π and normalizes them with a rectangular sum, double-counting the identical periodic endpoint."
+    },
+    {
+     "id": "F03-X5",
+     "text": "[L463-L498] (HIGH/unimplemented frequency conversion) SWAN RFREQ input is recognized but its conversion to absolute frequency is a no-op."
+    },
+    {
+     "id": "F03-X6",
+     "text": "[L465-L472, L627-L649] (HIGH/unbounded malformed-input loop) SWAN keyword searches perform reads without IOSTAT or EOF handling and can loop indefinitely on a truncated or malformed file."
+    },
+    {
+     "id": "F03-X7",
+     "text": "[L474-L593, L723-L749, L805-L881] (MED/spectral-axis validation) SWAN and VarDens inputs are used without requiring at least two directions or strictly increasing frequency and direction axes, despite direct second-element indexing, quadrature, and interpolation."
+    },
+    {
+     "id": "F03-X8",
+     "text": "[L981-L1036, L1872-L1905] (HIGH/empty/degenerate spectral range) An empty threshold range makes M zero and a single-bin range makes K=1 and df=0, causing divisions by M, K-1, and df."
+    },
+    {
+     "id": "F03-X9",
+     "text": "[L1194-L1210] (HIGH/zero-energy rescaling) Hm0 correction divides by hm0now and directional-width construction divides by S0 without a zero-energy contract; the small S0 floor does not protect hm0now."
+    },
+    {
+     "id": "F03-X10",
+     "text": "[L1222-L1244] (HIGH/FFT index bounds) Generated frequency indices are written into CompFn without verifying that they lie below the Nyquist slot or within the Nr-length FFT array."
+    },
+    {
+     "id": "F03-X11",
+     "text": "[L1280-L1337] (HIGH/uninitialized directional-bin indices) Nbin is never initialized, and a direction shifted once by 2π can still fall outside a computational sector narrower than 2π, leaving its bin entry undefined before maxval and nspr handling."
+    },
+    {
+     "id": "F03-X12",
+     "text": "[L1342-L1352] (MED/zero window normalization) If no generated time sample is at or below rt, temp is all zero and the taper divides by maxval(temp)=0."
+    },
+    {
+     "id": "F03-X13",
+     "text": "[L1450-L1457] (HIGH/zero-envelope division) Directional envelope amplitude divides by stdeta without handling a zero total elevation signal."
+    },
+    {
+     "id": "F03-X14",
+     "text": "[L1453-L1454] (LOW/standard-deviation denominator) The expressions size(array-1) return the full sample count rather than size(array)-1 as the surrounding standard-deviation comments imply."
+    },
+    {
+     "id": "F03-X15",
+     "text": "[L1497-L1510] (MED/boundary-type mismatch) Symmetric parametric energy redistribution tests WBCTYPE_PARAMS even though this generator is entered for WBCTYPE_PARAMETRIC, so the intended parametric branch may never run."
+    },
+    {
+     "id": "F03-X16",
+     "text": "[L1095-L1105, L1517-L1525] (HIGH/time-origin mismatch) The synthesized record starts at t=dt, but record 1 is written as the first boundary sample and the consumer treats direct-access record 1 as time zero."
+    },
+    {
+     "id": "F03-X17",
+     "text": "[L1637-L1668] (HIGH/singular interaction coefficients) Bound-wave group velocity and interaction coefficients divide by k3 and a resonance denominator without zero or near-resonance masks."
+    },
+    {
+     "id": "F03-X18",
+     "text": "[L1691-L1699] (HIGH/invalid complex logarithm) Bound-wave phase takes the logarithm of Fourier coefficients without excluding exact zero coefficients."
+    },
+    {
+     "id": "F03-X19",
+     "text": "[L1703-L1709] (HIGH/direction quadrant loss) Difference-wave direction uses atan(KKy/KKx) with a signed epsilon instead of atan2, losing the correct quadrant whenever KKx is negative."
+    },
+    {
+     "id": "F03-X20",
+     "text": "[L1789-L1794] (HIGH/curvilinear rotation quadrant loss) Flux rotation derives its angle from atan(qy/max(qx,eps)), which replaces every negative qx with a positive epsilon and therefore gives incorrect quadrants and components."
+    },
+    {
+     "id": "F03-X21",
+     "text": "[L1922-L1932] (MED/zero spectral moment) Representative-period formulas divide by spectral moments without guarding zero energy or, for Tm-1,0, zero frequency."
+    },
+    {
+     "id": "F03-X22",
+     "text": "[L1963-L1993] (MED/zero-frequency/depth dispersion) bc_disper evaluates 0/0 for zero angular frequency and divides by h without enforcing a positive boundary depth."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F03-Y0",
+     "text": "[L69-L89,L107-L118,L478-L489,L502-L533,L613-L666,L801-L850] (HIGH/MPI state distribution) Master-only input populates testc, dimensions, switches, factors, and spectrum arrays while all corresponding broadcasts are commented out, leaving non-master ranks to branch on uninitialized values, allocate with undefined extents, and compute from undefined data."
+    },
+    {
+     "id": "F03-Y1",
+     "text": "[L93-L98] (LOW/resource management) The close(74) intended for the final timestep is unreachable after return, leaving a FILELIST unit open."
+    },
+    {
+     "id": "F03-Y2",
+     "text": "[L157-L162] (HIGH/bounds/numerical robustness) The ny>0 branch uses slices 2:ny, so ny=1 produces empty sums and division by zero instead of using the single offshore point."
+    },
+    {
+     "id": "F03-Y3",
+     "text": "[L164-L179] (MED/input validation) An unsupported wbctype silently skips every spectrum builder but execution still advances list state and writes administration entries from stale or uninitialized wave parameters."
+    },
+    {
+     "id": "F03-Y4",
+     "text": "[L260,L311,L1016-L1017,L1057-L1059,L1194-L1205,L1922-L1932] (HIGH/numerical robustness) Zero wave height is accepted but multiple subsequent spectral normalizations and representative-period calculations divide by zero."
+    },
+    {
+     "id": "F03-Y5",
+     "text": "[L463-L498,L733-L765] (HIGH/spectrum-axis handling) The SWAN frequency-conversion branch is a no-op and never repairs descending or relative-frequency input before moment integration and frequency-range calculations assume an increasing absolute axis."
+    },
+    {
+     "id": "F03-Y6",
+     "text": "[L465-L472,L627-L650] (MED/input error handling) The SWAN keyword-search loops have no I/O status checks, so malformed or truncated files can loop indefinitely or repeatedly read past EOF."
+    },
+    {
+     "id": "F03-Y7",
+     "text": "[L517-L593,L817-L835] (MED/bounds/input validation) Both SWAN and variance-density readers dereference theta(2) without validating ndir>=2."
+    },
+    {
+     "id": "F03-Y8",
+     "text": "[L1016-L1036] (HIGH/degenerate spectrum) If the selected frequency range has one bin, M or wp%K can be one and the code divides by M, wp%K-1, and the resulting zero df."
+    },
+    {
+     "id": "F03-Y9",
+     "text": "[L1057-L1091,L1150-L1178] (HIGH/CDF/indexing) The directional CDF starts above zero; a random draw below P(1) is extrapolated below theta(1), after which stepang can become zero and index S_array at column 0."
+    },
+    {
+     "id": "F03-Y10",
+     "text": "[L1280-L1314] (HIGH/uninitialized indexing) Nbin is never initialized and directions equal to the upper bin edge or still outside the opposite edge after wrapping receive no assignment before maxval and array indexing use."
+    },
+    {
+     "id": "F03-Y11",
+     "text": "[L1367-L1457] (HIGH/order-dependent physics) The total envelope and directional weights are computed inside the directional-bin loop before later bins' zeta values exist, so Ampzeta for early bins depends on processing order and omits later directional components."
+    },
+    {
+     "id": "F03-Y12",
+     "text": "[L1453-L1454] (LOW/statistics) The standard-deviation denominators use size(array-1), which equals N rather than the apparently intended N-1."
+    },
+    {
+     "id": "F03-Y13",
+     "text": "[L1703-L1709] (HIGH/direction calculation) Bound-wave direction uses atan(KKy/KKx) rather than atan2, losing the quadrant whenever KKx is negative."
+    },
+    {
+     "id": "F03-Y14",
+     "text": "[L1789-L1794] (HIGH/vector rotation) Curvilinear flux rotation derives direction with atan(qy/max(qx,eps)), which clamps negative qx and cannot preserve the correct quadrant."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F03-X0",
+     "F03-Y0"
+    ],
+    [
+     "F03-X0",
+     "F03-Y1"
+    ],
+    [
+     "F03-X0",
+     "F03-Y2"
+    ],
+    [
+     "F03-X1",
+     "F03-Y0"
+    ],
+    [
+     "F03-X2",
+     "F03-Y0"
+    ],
+    [
+     "F03-X2",
+     "F03-Y1"
+    ],
+    [
+     "F03-X3",
+     "F03-Y2"
+    ],
+    [
+     "F03-X3",
+     "F03-Y3"
+    ],
+    [
+     "F03-X4",
+     "F03-Y4"
+    ],
+    [
+     "F03-X5",
+     "F03-Y0"
+    ],
+    [
+     "F03-X5",
+     "F03-Y5"
+    ],
+    [
+     "F03-X5",
+     "F03-Y6"
+    ],
+    [
+     "F03-X6",
+     "F03-Y0"
+    ],
+    [
+     "F03-X6",
+     "F03-Y5"
+    ],
+    [
+     "F03-X6",
+     "F03-Y6"
+    ],
+    [
+     "F03-X7",
+     "F03-Y0"
+    ],
+    [
+     "F03-X7",
+     "F03-Y6"
+    ],
+    [
+     "F03-X7",
+     "F03-Y7"
+    ],
+    [
+     "F03-X8",
+     "F03-Y8"
+    ],
+    [
+     "F03-X9",
+     "F03-Y4"
+    ],
+    [
+     "F03-X11",
+     "F03-Y10"
+    ],
+    [
+     "F03-X13",
+     "F03-Y11"
+    ],
+    [
+     "F03-X13",
+     "F03-Y12"
+    ],
+    [
+     "F03-X14",
+     "F03-Y11"
+    ],
+    [
+     "F03-X14",
+     "F03-Y12"
+    ],
+    [
+     "F03-X16",
+     "F03-Y9"
+    ],
+    [
+     "F03-X18",
+     "F03-Y13"
+    ],
+    [
+     "F03-X19",
+     "F03-Y13"
+    ],
+    [
+     "F03-X19",
+     "F03-Y14"
+    ],
+    [
+     "F03-X20",
+     "F03-Y14"
+    ],
+    [
+     "F03-X21",
+     "F03-Y4"
+    ]
+   ]
+  },
+  {
+   "file_token": "F04",
+   "lang": ".F90",
+   "listX": [
+    {
+     "id": "F04-X0",
+     "text": "[L45-L129] (LOW/persistent allocation/state) Saved workspaces are never resized and mask_ee is only set true over the current interior without being reset, imposing fixed grid/decomposition bounds across the process lifetime."
+    },
+    {
+     "id": "F04-X1",
+     "text": "[L144-L165,L460-L466] (HIGH/circular statistics) For multi-directional waves the mean angle is an arithmetic weighted average, producing incorrect directions across the angular wrap."
+    },
+    {
+     "id": "F04-X2",
+     "text": "[L147-L160] (MED/numerical robustness) The Snell branch clamps the asin input but still divides by coffshore without guarding a zero offshore phase speed."
+    },
+    {
+     "id": "F04-X3",
+     "text": "[L189-L195,L212-L220] (MED/numerical robustness) Wave action conversion divides wet-cell energy by sigt with no positive-frequency guard."
+    },
+    {
+     "id": "F04-X4",
+     "text": "[L322-L337] (HIGH/numerical robustness) Roller dissipation divides by sqrt(cx^2+cy^2) without guarding zero propagation speed."
+    },
+    {
+     "id": "F04-X5",
+     "text": "[L379-L388,L402-L412] (HIGH/interpolation contract) Wave-crest boundary interpolation constructs nx+3 point coordinate/value arrays but passes nx+1 as their length, truncating the final interior point and upper sentinel and changing the intended interpolation domain."
+    },
+    {
+     "id": "F04-X6",
+     "text": "[L437-L457] (HIGH/dimensional/state consistency) After roller directional energies are rescaled, s%R is limited directly against gammax*hhw, mixing energy and height units, and is not recomputed from the scaled rr field."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F04-Y0",
+     "text": "[L45-L127] (MED/saved-shape state) All saved work arrays are sized only on the first call, so reuse after a grid or direction-count change retains incompatible shapes."
+    },
+    {
+     "id": "F04-Y1",
+     "text": "[L140-L145, L460-L465] (HIGH/circular-angle averaging) Multi-direction mean wave angles are computed by arithmetic averaging rather than circular vector averaging, failing for spectra spanning the 0/2π boundary."
+    },
+    {
+     "id": "F04-Y2",
+     "text": "[L179-L184] (HIGH/inconsistent hyperbolic limiter) The sinh(2kh) approximation has the same discontinuous <=3000 test with an internal cap at 10 and a fixed 3000 value above the test."
+    },
+    {
+     "id": "F04-Y3",
+     "text": "[L189-L195] (HIGH/unguarded action conversion) Wave energy is divided by per-direction intrinsic frequency s%sigt with no positive-frequency guard."
+    },
+    {
+     "id": "F04-Y4",
+     "text": "[L203-L209] (MED/stale optional tendency) thetaadvec is subtracted every call but is reset only when refraction is enabled, so disabling refraction after prior enabled calls preserves an old refraction tendency."
+    },
+    {
+     "id": "F04-Y5",
+     "text": "[L281-L286, L434-L435] (MED/unguarded dry-cell arithmetic) Orbital velocity is evaluated over the full grid before any wet mask, dividing by sinh(kh) at potentially zero-depth cells."
+    },
+    {
+     "id": "F04-Y6",
+     "text": "[L325-L330] (HIGH/division by zero) Roller dissipation divides by the magnitude of directional phase velocity without guarding a zero-speed wet cell."
+    },
+    {
+     "id": "F04-Y7",
+     "text": "[L378-L388, L402-L412] (HIGH/interpolation extent mismatch) Wave-crest boundary interpolation constructs nx+3 coordinate and value entries by adding two infinite endpoints but passes nx+1 as the interpolation length, silently excluding part of the constructed support."
+    },
+    {
+     "id": "F04-Y8",
+     "text": "[L437-L454] (HIGH/dimensionally incorrect roller cap) After scaling directional roller energy using equivalent height RH, total roller energy s%R is capped directly against gammax*hhw (an energy-versus-length comparison) instead of being recomputed from the scaled rr or converted height."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F04-X0",
+     "F04-Y0"
+    ],
+    [
+     "F04-X1",
+     "F04-Y1"
+    ],
+    [
+     "F04-X1",
+     "F04-Y8"
+    ],
+    [
+     "F04-X2",
+     "F04-Y1"
+    ],
+    [
+     "F04-X2",
+     "F04-Y6"
+    ],
+    [
+     "F04-X3",
+     "F04-Y2"
+    ],
+    [
+     "F04-X3",
+     "F04-Y3"
+    ],
+    [
+     "F04-X3",
+     "F04-Y4"
+    ],
+    [
+     "F04-X4",
+     "F04-Y6"
+    ],
+    [
+     "F04-X5",
+     "F04-Y7"
+    ],
+    [
+     "F04-X6",
+     "F04-Y1"
+    ],
+    [
+     "F04-X6",
+     "F04-Y5"
+    ],
+    [
+     "F04-X6",
+     "F04-Y8"
+    ]
+   ]
+  },
+  {
+   "file_token": "F05",
+   "lang": ".F90",
+   "listX": [
+    {
+     "id": "F05-X0",
+     "text": "[L80-L87, L104] (HIGH/empty-input handling) An empty or unreadable non-stationary wind file yields s%windlen=0 and is then indexed as s%windinpt(0) in the duration check."
+    },
+    {
+     "id": "F05-X1",
+     "text": "[L92-L104] (MED/input contract validation) Non-stationary wind timestamps are not checked for strict monotonicity before later time interpolation."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F05-Y0",
+     "text": "[L51-L59] (MED/MPI initialization contract) Non-master ranks return before allocating or initializing any wind fields, and this routine contains no distribution step."
+    },
+    {
+     "id": "F05-Y1",
+     "text": "[L56-L67,L87-L91] (LOW/allocation lifetime) All wind arrays are allocated unconditionally with no associated/allocated checks, requiring readwind to be called exactly once."
+    },
+    {
+     "id": "F05-Y2",
+     "text": "[L80-L97] (MED/input validation) The record-count pass treats any nonzero IOSTAT as end-of-file, so a malformed record silently truncates the series rather than being reported."
+    },
+    {
+     "id": "F05-Y3",
+     "text": "[L80-L104] (HIGH/empty-input bounds) An empty wind file produces windlen=0 and then indexes windinpt(0) in the duration check."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F05-X0",
+     "F05-Y1"
+    ],
+    [
+     "F05-X0",
+     "F05-Y2"
+    ],
+    [
+     "F05-X0",
+     "F05-Y3"
+    ],
+    [
+     "F05-X1",
+     "F05-Y1"
+    ],
+    [
+     "F05-X1",
+     "F05-Y2"
+    ],
+    [
+     "F05-X1",
+     "F05-Y3"
+    ]
+   ]
+  },
+  {
+   "file_token": "F06",
+   "lang": ".F90",
+   "listX": [
+    {
+     "id": "F06-X0",
+     "text": "[L249-L257, L379-L401] (MED/unguarded geometric division) Tidal gradients divide by boundary distance differences (or s%dnz for 1-D) without validating nonzero spacing, so a degenerate or repeated boundary coordinate produces invalid gradients."
+    },
+    {
+     "id": "F06-X1",
+     "text": "[L420-L428] (MED/inconsistent search extent) The local maximum bed elevation is computed only over imin:imax,jmin:jmax, but maxloc searches the entire row or column, so halo or non-boundary values can supply a distance unrelated to maxzbl in decomposed domains."
+    },
+    {
+     "id": "F06-X2",
+     "text": "[L489-L499, L507-L524, L534-L548, L616-L638] (MED/unguarded interpolation denominator) Spatial interpolation uses reciprocal endpoint or ridge-to-end distances without guarding coincident endpoints or a maximum located exactly at the relevant endpoint."
+    },
+    {
+     "id": "F06-X3",
+     "text": "[L543-L553] (HIGH/incorrect gradient selection) In case 4 on a lateral boundary, points beyond the separating maximum receive tide2 but are assigned tidegradient1 rather than tidegradient2."
+    },
+    {
+     "id": "F06-X4",
+     "text": "[L569-L645] (HIGH/MPI correctness limitation) fill_tide_grid updates each local interior from its local cross-shore maximum and local boundary endpoints with no MPI reduction or global-coordinate reconstruction, and the source itself states this only works for cross-shore-strip decompositions."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F06-Y0",
+     "text": "[L157-L191] (MED/state/dispatch) The `tideloc` and nested `paulrevere` selections have no default branches, so an unsupported value can leave the four module-level tide corner values unchanged from an earlier timestep."
+    },
+    {
+     "id": "F06-Y1",
+     "text": "[L251-L254,L379-L401,L489-L545,L616-L634] (HIGH/numerical robustness) Multiple tide gradients and spatial interpolants divide by grid spacing or endpoint-distance differences without guarding coincident points or zero spacing, allowing infinities or NaNs on degenerate grids or boundary placements."
+    },
+    {
+     "id": "F06-Y2",
+     "text": "[L534-L552] (MED/gradient consistency) In case 4, points beyond `distmaxzbl` receive the tide-2 water level but `tidegradient1`, making the reported gradient inconsistent with the selected side's forcing."
+    },
+    {
+     "id": "F06-Y3",
+     "text": "[L558-L564] (MED/state consistency) Water levels are clipped upward to the bed after gradients have been assigned, but the corresponding tide gradients are not recomputed or neutralized where clipping changes the surface."
+    },
+    {
+     "id": "F06-Y4",
+     "text": "[L569-L572,L584-L634] (MED/MPI correctness) The source explicitly states that `fill_tide_grid` is not fully MPI-compliant for distributed grids, while this routine supplies interior tide levels and gradients for instant and hybrid tide modes."
+    },
+    {
+     "id": "F06-Y5",
+     "text": "[L230,L256,L286] (LOW/dimension contract) Boundary logic tests `par%ny` but indexes extents using `s%ny`, creating an unclear and potentially unsafe contract if parameter and allocated-grid dimensions ever differ."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F06-X0",
+     "F06-Y1"
+    ],
+    [
+     "F06-X0",
+     "F06-Y5"
+    ],
+    [
+     "F06-X2",
+     "F06-Y1"
+    ],
+    [
+     "F06-X2",
+     "F06-Y2"
+    ],
+    [
+     "F06-X2",
+     "F06-Y4"
+    ],
+    [
+     "F06-X3",
+     "F06-Y1"
+    ],
+    [
+     "F06-X3",
+     "F06-Y2"
+    ],
+    [
+     "F06-X3",
+     "F06-Y3"
+    ],
+    [
+     "F06-X4",
+     "F06-Y3"
+    ],
+    [
+     "F06-X4",
+     "F06-Y4"
+    ]
+   ]
+  },
+  {
+   "file_token": "F07",
+   "lang": ".F90",
+   "listX": [
+    {
+     "id": "F07-X0",
+     "text": "[L24-L47] (MED/time filtering) The temporal smoothing factor is not clamped to [0,1], so sufficiently large dt relative to wavint or cats*Trep gives a negative weight to the previous state."
+    },
+    {
+     "id": "F07-X1",
+     "text": "[L69-L100] (MED/geometry robustness) All slope differences divide by metric distances without guarding zero or invalid grid spacing."
+    },
+    {
+     "id": "F07-X2",
+     "text": "[L283-L348] (HIGH/small-dimension bounds) Second-order theta advection is enabled for any ntheta>1, but ntheta=2 makes the boundary stencil reference ee(:,:,3) outside the two-bin array."
+    },
+    {
+     "id": "F07-X3",
+     "text": "[L429-L480] (HIGH/small-dimension bounds) Second-order y advection with ny=1 can evaluate the left-boundary negative-velocity stencil at j+2=3 although the y extent is only 2."
+    },
+    {
+     "id": "F07-X4",
+     "text": "[L721-L724,L936-L974,L1116-L1138,L1315-L1319] (LOW/persistent allocation) Multiple saved/pointer work arrays are allocated once without later shape or option checks, creating undocumented fixed-grid and fixed-WCI configuration lifetime requirements."
+    },
+    {
+     "id": "F07-X5",
+     "text": "[L823-L835] (HIGH/convergence reporting) iteratedispersion can never return its documented negative nonconvergence signal because the loop cannot leave with iter>itermax while the test accepts every iter<=itermax, including exhaustion at 150."
+    },
+    {
+     "id": "F07-X6",
+     "text": "[L864-L897] (MED/small-dimension behavior) For ny=1 the breaker-delay computation loop is empty, so usd is not computed from current roller transport before lateral boundary copies use it."
+    },
+    {
+     "id": "F07-X7",
+     "text": "[L979-L1003] (MED/dispatch validation) An unsupported useAverageDepthSwitch leaves hhlocal and potentially velocities at stale values and continues the dispersion calculation."
+    },
+    {
+     "id": "F07-X8",
+     "text": "[L1026-L1033,L1047-L1048] (HIGH/WCI taper) The current-interaction taper can become negative when depth exceeds hwcimax because it lacks a zero lower clamp, reversing the current contribution to intrinsic frequency and group velocity."
+    },
+    {
+     "id": "F07-X9",
+     "text": "[L1140-L1160] (MED/dispatch validation) compute_wave_direction_velocities has no default flavour case, so an invalid flavour leaves nthetalocal undefined."
+    },
+    {
+     "id": "F07-X10",
+     "text": "[L1250-L1302] (MED/boundary initialization) Fy remains unset on several boundaries, as the code comments acknowledge, with lateral copies commented out and only selected MPI-edge rows assigned."
+    },
+    {
+     "id": "F07-X11",
+     "text": "[L1321-L1329] (HIGH/numerical robustness) Stokes and roller fluxes divide wet-cell energy by c and hstokes without lower bounds, so zero phase speed or zero hstokes yields invalid fluxes."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F07-Y0",
+     "text": "[L24-L48] (MED/unbounded smoothing weight) The wave-flow smoothing factors are not capped at one, so large hydrodynamic timesteps can make the old-state coefficient negative."
+    },
+    {
+     "id": "F07-Y1",
+     "text": "[L283-L348] (HIGH/small-direction-grid bounds) Second-order directional advection is enabled for any ntheta>1 but indexes itheta+2 at the lower boundary, which is out of bounds when ntheta=2."
+    },
+    {
+     "id": "F07-Y2",
+     "text": "[L823-L835] (HIGH/ineffective convergence failure detection) The dispersion loop can only exit with iter<=itermax, so the post-loop test always reports success even when the iteration reaches its limit without satisfying the error tolerance."
+    },
+    {
+     "id": "F07-Y3",
+     "text": "[L839-L923] (HIGH/MPI correctness limitation) breakerdelay operates only on local cross-shore coordinates and history with no inter-rank exchange, and its own source explicitly states that it is not MPI compliant."
+    },
+    {
+     "id": "F07-Y4",
+     "text": "[L856-L859, L947-L974, L1123-L1138, L1317-L1319] (MED/saved-shape/configuration state) Multiple saved work arrays are allocated only on first use, so changed grid dimensions or enabling WCI after an earlier non-WCI call can leave wrong shapes or unallocated WCI arrays."
+    },
+    {
+     "id": "F07-Y5",
+     "text": "[L979-L1003] (MED/invalid option handling) An unsupported useAverageDepthSwitch value is silently accepted and leaves hhlocal and possibly velocity work arrays holding stale values."
+    },
+    {
+     "id": "F07-Y6",
+     "text": "[L1026-L1033, L1047-L1048] (HIGH/current-weight sign reversal) The WCI depth weight uses 1-h/hwcimax without a nonnegative clamp, so depths above hwcimax reverse rather than suppress the current contribution."
+    },
+    {
+     "id": "F07-Y7",
+     "text": "[L1250-L1302] (HIGH/MPI boundary incompleteness) Radiation-stress force stencils leave several subdomain-edge Fx/Fy values unset and perform no neighbor communication, a gap explicitly identified by the inline comments."
+    },
+    {
+     "id": "F07-Y8",
+     "text": "[L1321-L1329] (MED/unguarded physical division) Wet-cell Stokes and roller drift divide by phase speed and hstokes without enforcing positive denominators."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F07-X0",
+     "F07-Y0"
+    ],
+    [
+     "F07-X2",
+     "F07-Y1"
+    ],
+    [
+     "F07-X3",
+     "F07-Y1"
+    ],
+    [
+     "F07-X4",
+     "F07-Y4"
+    ],
+    [
+     "F07-X4",
+     "F07-Y5"
+    ],
+    [
+     "F07-X4",
+     "F07-Y8"
+    ],
+    [
+     "F07-X5",
+     "F07-Y2"
+    ],
+    [
+     "F07-X5",
+     "F07-Y3"
+    ],
+    [
+     "F07-X6",
+     "F07-Y4"
+    ],
+    [
+     "F07-X7",
+     "F07-Y4"
+    ],
+    [
+     "F07-X7",
+     "F07-Y5"
+    ],
+    [
+     "F07-X8",
+     "F07-Y6"
+    ],
+    [
+     "F07-X9",
+     "F07-Y4"
+    ],
+    [
+     "F07-X10",
+     "F07-Y7"
+    ],
+    [
+     "F07-X11",
+     "F07-Y4"
+    ],
+    [
+     "F07-X11",
+     "F07-Y8"
+    ]
+   ]
+  },
+  {
+   "file_token": "F08",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F08-X0",
+     "text": "[L52-L60,L141-L145,L171-L175] (HIGH/build failure) nspr is present in the procedure signature and used with PRESENT but has no declaration under implicit none."
+    },
+    {
+     "id": "F08-X1",
+     "text": "[L193-L235] (MED/persistent configuration) After first initialization, changed np, coordinates, directional grid, boundary file, or reference/depth inputs are silently ignored with no invariant check."
+    },
+    {
+     "id": "F08-X2",
+     "text": "[L217-L220] (MED/angle normalization) MOD does not map negative angles into [0,2pi), contrary to the comment, so negative theta inputs remain negative."
+    },
+    {
+     "id": "F08-X3",
+     "text": "[L221-L224] (HIGH/allocation/rank) The allocatable randomseed vector is deallocated and then assigned the scalar randomseed without allocating or constructing a conforming seed array."
+    },
+    {
+     "id": "F08-X4",
+     "text": "[L238-L254] (HIGH/output contract) isRecomputed is INTENT(OUT) but is assigned only when recomputation occurs, leaving it undefined on ordinary interpolation calls."
+    },
+    {
+     "id": "F08-X5",
+     "text": "[L238-L254] (MED/time catch-up) A single IF generates at most one series when t has advanced past multiple durations, so startComputeNewSeries can remain behind the requested time."
+    },
+    {
+     "id": "F08-X6",
+     "text": "[L256-L270] (HIGH/array indexing) Energy interpolation slices eebct(i,itheta,:) even though generation stores it as (point,time,direction); this supplies a direction-length vector while passing the time-axis length."
+    },
+    {
+     "id": "F08-X7",
+     "text": "[L142-L190,L256-L270] (HIGH/mode contract) The nonhydrostatic option still unconditionally interpolates hydrostatic eebct, qxbct, and qybct arrays that its generation path does not allocate."
+    },
+    {
+     "id": "F08-X8",
+     "text": "[L308-L311] (HIGH/uninitialized state) lastwaveelevation is allocated but never initialized despite the stated zero-initialization intent, so the first taper can consume undefined values."
+    },
+    {
+     "id": "F08-X9",
+     "text": "[L290-L325] (HIGH/uninitialized I/O state) fid is assigned only under BUILDXBEACH although OPEN is unconditional, and err is tested in the LOCLIST counting loop before it is initialized."
+    },
+    {
+     "id": "F08-X10",
+     "text": "[L365-L374] (HIGH/administration state) The single-spectrum branch sets only local nspectra=1 and never stores waveSpectrumAdministration%nspectra, leaving the generator's spectrum count stale or undefined."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F08-Y0",
+     "text": "[L52-L60, L142-L175] (HIGH/compile-time declaration defect) Dummy argument nspr is used with present(nspr) but is never declared, which is invalid under implicit none."
+    },
+    {
+     "id": "F08-Y1",
+     "text": "[L217-L220] (MED/angle normalization) MOD does not map negative input angles into [0,2π), contrary to the stated invariant, because a negative dividend produces a negative remainder."
+    },
+    {
+     "id": "F08-Y2",
+     "text": "[L221-L224] (HIGH/compile-time type mismatch) waveBoundaryParameters%randomseed is declared as a scalar integer in the datastore but is passed to allocated/deallocate as if it were allocatable."
+    },
+    {
+     "id": "F08-Y3",
+     "text": "[L193-L235] (MED/singleton state contract) After first initialization, changed geometry, dimensions, file name, reference position, depth, or random seed are silently ignored while optional controls continue to change, leaving a mixed old/new configuration."
+    },
+    {
+     "id": "F08-Y4",
+     "text": "[L238-L254] (HIGH/undefined output) isRecomputed is intent(out) but is assigned only when a new series is generated, so calls before the next generation deadline return it undefined."
+    },
+    {
+     "id": "F08-Y5",
+     "text": "[L239-L250] (MED/time-jump handling) A time jump spanning multiple series durations generates only one new series rather than advancing until startComputeNewSeries exceeds t, leaving administration and interpolation potentially behind the requested time."
+    },
+    {
+     "id": "F08-Y6",
+     "text": "[L256-L273] (HIGH/undefined outputs in advertised build) When BUILDXBEACH is not defined, the advertised cross-model path contains no interpolation implementation and returns eebc, qsbc, and qnbc without assignment."
+    },
+    {
+     "id": "F08-Y7",
+     "text": "[L308-L312] (MED/uninitialized continuation state) lastwaveelevation is allocated under a comment saying it is initialized to zero, but no value is assigned before later reuse as spectral continuation state."
+    },
+    {
+     "id": "F08-Y8",
+     "text": "[L313-L319] (HIGH/conditional initialization) fid is assigned only inside BUILDXBEACH but the OPEN and subsequent I/O are outside that guard, so the non-XBeach build uses an undefined unit number."
+    },
+    {
+     "id": "F08-Y9",
+     "text": "[L319-L328] (HIGH/uninitialized loop control) err is tested by the LOCLIST counting loop before it has been assigned."
+    },
+    {
+     "id": "F08-Y10",
+     "text": "[L365-L374] (HIGH/uninitialized administration field) The single-spectrum branch sets local nspectra=1 but never assigns waveSpectrumAdministration%nspectra, leaving the stored count undefined."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F08-X0",
+     "F08-Y0"
+    ],
+    [
+     "F08-X1",
+     "F08-Y3"
+    ],
+    [
+     "F08-X1",
+     "F08-Y4"
+    ],
+    [
+     "F08-X1",
+     "F08-Y5"
+    ],
+    [
+     "F08-X2",
+     "F08-Y1"
+    ],
+    [
+     "F08-X2",
+     "F08-Y2"
+    ],
+    [
+     "F08-X3",
+     "F08-Y1"
+    ],
+    [
+     "F08-X3",
+     "F08-Y2"
+    ],
+    [
+     "F08-X4",
+     "F08-Y3"
+    ],
+    [
+     "F08-X4",
+     "F08-Y4"
+    ],
+    [
+     "F08-X4",
+     "F08-Y5"
+    ],
+    [
+     "F08-X4",
+     "F08-Y6"
+    ],
+    [
+     "F08-X5",
+     "F08-Y3"
+    ],
+    [
+     "F08-X5",
+     "F08-Y4"
+    ],
+    [
+     "F08-X5",
+     "F08-Y5"
+    ],
+    [
+     "F08-X5",
+     "F08-Y6"
+    ],
+    [
+     "F08-X6",
+     "F08-Y4"
+    ],
+    [
+     "F08-X6",
+     "F08-Y5"
+    ],
+    [
+     "F08-X6",
+     "F08-Y6"
+    ],
+    [
+     "F08-X7",
+     "F08-Y0"
+    ],
+    [
+     "F08-X7",
+     "F08-Y3"
+    ],
+    [
+     "F08-X7",
+     "F08-Y4"
+    ],
+    [
+     "F08-X7",
+     "F08-Y5"
+    ],
+    [
+     "F08-X7",
+     "F08-Y6"
+    ],
+    [
+     "F08-X8",
+     "F08-Y7"
+    ],
+    [
+     "F08-X8",
+     "F08-Y8"
+    ],
+    [
+     "F08-X9",
+     "F08-Y8"
+    ],
+    [
+     "F08-X9",
+     "F08-Y9"
+    ],
+    [
+     "F08-X10",
+     "F08-Y10"
+    ]
+   ]
+  },
+  {
+   "file_token": "F09",
+   "lang": ".F90",
+   "listX": [
+    {
+     "id": "F09-X0",
+     "text": "[L41-L72] (LOW/persistent allocation) Saved work arrays and the cached advection scheme are initialized only once, imposing an undocumented invariant that grid dimensions and relevant scheme settings never change."
+    },
+    {
+     "id": "F09-X1",
+     "text": "[L120-L126,L209-L211,L324-L329] (HIGH/circular statistics) Mean wave directions are arithmetic angle averages and therefore fail for energy distributed across the angular wrap."
+    },
+    {
+     "id": "F09-X2",
+     "text": "[L122-L125] (HIGH/numerical robustness) The Snell-law asin argument is not clamped and divides by c(1,1) without a zero guard."
+    },
+    {
+     "id": "F09-X3",
+     "text": "[L143-L147] (HIGH/stability timestep) The x-advection timestep denominator uses maxval(cgx) rather than maxval(abs(cgx)), so an all-negative x velocity field selects the 1e-10 floor and an excessively large timestep."
+    },
+    {
+     "id": "F09-X4",
+     "text": "[L161-L165,L192-L195] (MED/numerical robustness) Wave-action conversion divides by sigt without guarding zero intrinsic frequency."
+    },
+    {
+     "id": "F09-X5",
+     "text": "[L203-L207] (MED/dry-cell robustness) The depth-limited breaking rescale divides by gammax*s%hh without a wet mask or positive-depth guard."
+    },
+    {
+     "id": "F09-X6",
+     "text": "[L279-L288] (HIGH/numerical robustness) Roller source and dissipation updates divide twice by sqrt(cx^2+cy^2) without guarding zero propagation speed."
+    },
+    {
+     "id": "F09-X7",
+     "text": "[L393-L426] (MED/boundary initialization) Fy is assigned only on interior i rows and j=1:ny, while its offshore/onshore and final lateral boundary rows are explicitly left unset by commented-out boundary copies."
+    },
+    {
+     "id": "F09-X8",
+     "text": "[L430-L437] (HIGH/numerical robustness) Wave and roller mass-flux expressions divide by sigm without a lower bound, allowing infinities in zero-frequency cells."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F09-Y0",
+     "text": "[L41-L72] (MED/saved-shape/configuration state) Saved arrays and the lateral-advection scheme are fixed on first call, so later grid, direction-count, cyclic, or scheme changes retain stale state."
+    },
+    {
+     "id": "F09-Y1",
+     "text": "[L112-L117] (HIGH/inconsistent hyperbolic limiter) The sinh(2kh) approximation repeats the discontinuous <=3000 test with a cap at 10 and a fixed 3000 value above the threshold."
+    },
+    {
+     "id": "F09-Y2",
+     "text": "[L120-L125, L209-L211, L324-L329] (HIGH/wave-direction calculation) Arithmetic angle averaging mishandles wraparound spectra, while the Snell branch passes an unclamped ratio to asin and can leave its real domain."
+    },
+    {
+     "id": "F09-Y3",
+     "text": "[L145-L147] (HIGH/CFL calculation) The cross-shore CFL denominator uses maxval(cgx) rather than maxval(abs(cgx)), so a field of large negative propagation velocities yields an excessively large timestep."
+    },
+    {
+     "id": "F09-Y4",
+     "text": "[L161-L165] (HIGH/unguarded action conversion) The full row slab is divided by s%sigt without a wet mask or positive-frequency floor."
+    },
+    {
+     "id": "F09-Y5",
+     "text": "[L199-L207] (HIGH/dry-cell division) The breaker-height correction evaluates H/(gammax*hh) over all cells without excluding zero-depth dry cells, allowing 0/0 and NaN energy."
+    },
+    {
+     "id": "F09-Y6",
+     "text": "[L224-L229] (MED/unguarded dry-cell arithmetic) Orbital velocity is computed without a wet/depth guard before its use in bed-friction dissipation."
+    },
+    {
+     "id": "F09-Y7",
+     "text": "[L279-L288] (HIGH/division by zero) Both the roller update and reported roller dissipation divide by directional phase-speed magnitude without a positive floor."
+    },
+    {
+     "id": "F09-Y8",
+     "text": "[L393-L426] (MED/stale force boundaries) Several Fy boundary entries are deliberately not assigned, so the saved model state can retain values from an earlier stationary solve rather than a defined boundary condition."
+    },
+    {
+     "id": "F09-Y9",
+     "text": "[L430-L439] (HIGH/incorrect roller-drift selection) The routine computes current roller drift s%ustr but always forms total drift from s%usd, without calling breakerdelay here or selecting ustr when breaker delay is disabled."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F09-X0",
+     "F09-Y0"
+    ],
+    [
+     "F09-X1",
+     "F09-Y1"
+    ],
+    [
+     "F09-X1",
+     "F09-Y2"
+    ],
+    [
+     "F09-X1",
+     "F09-Y5"
+    ],
+    [
+     "F09-X2",
+     "F09-Y1"
+    ],
+    [
+     "F09-X2",
+     "F09-Y2"
+    ],
+    [
+     "F09-X3",
+     "F09-Y3"
+    ],
+    [
+     "F09-X4",
+     "F09-Y4"
+    ],
+    [
+     "F09-X4",
+     "F09-Y5"
+    ],
+    [
+     "F09-X5",
+     "F09-Y2"
+    ],
+    [
+     "F09-X5",
+     "F09-Y5"
+    ],
+    [
+     "F09-X5",
+     "F09-Y6"
+    ],
+    [
+     "F09-X6",
+     "F09-Y7"
+    ],
+    [
+     "F09-X7",
+     "F09-Y8"
+    ],
+    [
+     "F09-X7",
+     "F09-Y9"
+    ],
+    [
+     "F09-X8",
+     "F09-Y8"
+    ],
+    [
+     "F09-X8",
+     "F09-Y9"
+    ]
+   ]
+  },
+  {
+   "file_token": "F10",
+   "lang": ".F90",
+   "listX": [
+    {
+     "id": "F10-X0",
+     "text": "[L125-L130] (HIGH/output/state contract) The last-step early return occurs after incrementing bccount and before assigning the INTENT(OUT) curline, so the caller receives an undefined line while the global sequence advances."
+    },
+    {
+     "id": "F10-X1",
+     "text": "[L172-L181, L593-L607, L691, L984, L1019, L1092, L1180, L1193, L1206] (HIGH/reallocation of associated pointers) The catch-up loop can call a spectrum reader repeatedly on the same spectrum object, but the readers allocate its pointer components again without first deallocating or nullifying them."
+    },
+    {
+     "id": "F10-X2",
+     "text": "[L167-L181, L294-L296] (MED/multi-location duration contract) Each location may overwrite wp%rtbc and advance its own end time, while the global end time is advanced only from location 1 and the saved/admin duration is taken from the last location, with no equality check."
+    },
+    {
+     "id": "F10-X3",
+     "text": "[L218-L219, L1682-L1713] (MED/suspicious geometry endpoint) Cyclic direction adjustment derives the boundary span from point max(ny-2,1) rather than the far offshore-boundary endpoint, making the intended ghost-cell/physical-span contract unclear."
+    },
+    {
+     "id": "F10-X4",
+     "text": "[L299-L321] (MED/resource lifecycle) Cleanup deallocates containers with pointer components without freeing their pointed-to spectra and variance arrays, and it omits vits, duits, dvits, and the nonhydrostatic WDindex, allowing repeated boundary generation to leak substantial storage."
+    },
+    {
+     "id": "F10-X5",
+     "text": "[L566-L580] (HIGH/unchecked input divisor) JONSWAP-table Tp is read directly with no positivity validation and is immediately used as 1/Tp and to construct dfj."
+    },
+    {
+     "id": "F10-X6",
+     "text": "[L627-L641] (MED/singular shallow-depth formula) The TMA correction divides by tanh(k*h0) and normalizes by sqrt(sum(y)) without guarding zero boundary depth or a collapsed spectrum."
+    },
+    {
+     "id": "F10-X7",
+     "text": "[L965-L998] (HIGH/unimplemented format semantics) SWAN RFREQ input is explicitly marked as still needing conversion to absolute frequency, yet both RFREQ and AFREQ branches currently leave the frequency vector unchanged."
+    },
+    {
+     "id": "F10-X8",
+     "text": "[L980-L990, L1015-L1046, L1175-L1203, L1241-L1249] (HIGH/unchecked array extent) File-provided frequency and direction counts are not validated, while later code unconditionally accesses angle element 2 and adjacent-angle differences."
+    },
+    {
+     "id": "F10-X9",
+     "text": "[L978-L990, L1175-L1203, L1327-L1336, L1353-L1356] (HIGH/axis/interpolation mismatch) The readers do not sort or reject nonmonotone axes—even noting that SWAN frequencies are often nonmonotone—while endpoint range tests and linear_interp calls assume an ordered frequency axis."
+    },
+    {
+     "id": "F10-X10",
+     "text": "[L1307-L1316] (HIGH/invalid spectral integration) Pre-interpolation variance uses signed local df and dang values on axes described as potentially nonmonotone, so m0 can be negative before sqrt(m0)."
+    },
+    {
+     "id": "F10-X11",
+     "text": "[L1372-L1381, L1494-L1517, L1728-L1749] (HIGH/zero-energy singularity) Zero-energy spectra are permitted by the readers but derived direction, peak frequency, and representative-period calculations divide by zero-energy sums without a fallback."
+    },
+    {
+     "id": "F10-X12",
+     "text": "[L1380-L1383] (MED/angle normalization) MOD is used to normalize the mean direction, but Fortran MOD preserves a negative dividend and can leave dirm below zero."
+    },
+    {
+     "id": "F10-X13",
+     "text": "[L1425-L1433] (MED/filename sequence overflow) Boundary filenames encode exactly five decimal digits with CHAR(48+i), so bccount above 99999 produces non-digit characters and possible filename collisions or invalid names."
+    },
+    {
+     "id": "F10-X14",
+     "text": "[L1569-L1572] (HIGH/dispersion formula) The nonhydrostatic frequency cutoff assigns g*k*tanh(kh)/(2*pi) without the square root required to convert dispersion-relation omega-squared to frequency."
+    },
+    {
+     "id": "F10-X15",
+     "text": "[L1637-L1657] (HIGH/CDF construction) The trapezoidal cumulative directional distribution is not normalized after integration, so its final value is generally below one although draws span the full [0,1) interval."
+    },
+    {
+     "id": "F10-X16",
+     "text": "[L1691-L1709] (MED/unguarded geometric division) Cyclic adjustment computes L_wave/sin(alfa_wave) with no branch for a wave parallel to the grid span, relying on floating-point infinity behavior."
+    },
+    {
+     "id": "F10-X17",
+     "text": "[L1775-L1791, L1581-L1600, L1866-L1869] (HIGH/empty frequency selection) If thresholding and fmax remove every component, MAXLOC returns index 1 for both ends, producing dfgen=0 and a later division by dfgen."
+    },
+    {
+     "id": "F10-X18",
+     "text": "[L1866-L1877] (MED/time-axis inconsistency) rtin is set to tslen*dtin although the generated axis ends at (tslen-1)*dtin, leaving duration conventions off by one sample."
+    },
+    {
+     "id": "F10-X19",
+     "text": "[L1956-L1959] (HIGH/zero normalization divisor) Per-location variance is rescaled by (hm0/hm0post)^2 without checking hm0post, which can be zero for a location with no selected-frequency energy."
+    },
+    {
+     "id": "F10-X20",
+     "text": "[L2061-L2068] (HIGH/zero interpolation divisor) Spatial spectral interpolation rescales by sfimp/sfnow without guarding sfnow=0."
+    },
+    {
+     "id": "F10-X21",
+     "text": "[L2006-L2098] (HIGH/repeated pointer allocation) wp%PRindex is allocated inside the offshore-point loop, so the second point attempts to allocate an already-associated pointer."
+    },
+    {
+     "id": "F10-X22",
+     "text": "[L1866-L1877, L2124-L2148] (MED/FFT frequency mapping) Findex is derived from dfgen even though the actual FFT spacing is 1/(tslen*dtin), and ceiling/even-length adjustments do not ensure those spacings are equal."
+    },
+    {
+     "id": "F10-X23",
+     "text": "[L2241-L2257, L2286-L2304] (MED/lost-energy accounting) Components above the upper directional edge receive WDindex=lntheta+1 and are excluded from all physical theta bins, but the diagnostic counts only WDindex=0 as lost."
+    },
+    {
+     "id": "F10-X24",
+     "text": "[L2452-L2462] (HIGH/zero envelope divisor) Directional envelope amplitudes divide by stdeta without guarding a zero total elevation series."
+    },
+    {
+     "id": "F10-X25",
+     "text": "[L2499-L2516] (HIGH/zero energy rescaling) Energy scaling and directional percentage reporting divide by unguarded mean and total energy, including the bclwonly zero-envelope path."
+    },
+    {
+     "id": "F10-X26",
+     "text": "[L2629-L2645] (HIGH/layer-thickness singularity) The two-layer velocity formula guards nhlay>0 but not nhlay=1, where z is zero and the u2 division by -z is singular."
+    },
+    {
+     "id": "F10-X27",
+     "text": "[L2804-L2823] (HIGH/resonant denominator) The bound-long-wave interaction coefficient divides by a dispersion-mismatch term that can approach or equal zero, with no resonance tolerance or cap."
+    },
+    {
+     "id": "F10-X28",
+     "text": "[L2845-L2850] (HIGH/complex logarithm singularity) Bound-wave phase is obtained with LOG of Fourier coefficients without excluding zero-amplitude components, for which complex log is singular."
+    },
+    {
+     "id": "F10-X29",
+     "text": "[L2982-L3009] (HIGH/direct-access record shape) When dtchanged is true qinterp has only three fields although the file record length and reader contract are four fields, unlike the non-interpolated write of q(:,:,:)."
+    },
+    {
+     "id": "F10-X30",
+     "text": "[L3160-L3168] (LOW/ignored I/O status) The nonhydrostatic administration-file open and write collect iostat but never test it, so list-file failure is silently ignored."
+    },
+    {
+     "id": "F10-X31",
+     "text": "[L3271-L3342] (HIGH/wrong cutoff index) The superharmonic cutoff tests k3(m,1), but for m>K+1 valid entries start above column 1 and k3(m,1) remains its initialized zero, disabling the intended cutoff."
+    },
+    {
+     "id": "F10-X32",
+     "text": "[L3348-L3350] (HIGH/off-by-one Fourier index) Superharmonic phases access Findex(1)+ii and +jj instead of the component indices Findex(ii) and Findex(jj), shifting every lookup and reaching beyond the last generated component."
+    },
+    {
+     "id": "F10-X33",
+     "text": "[L3226-L3242, L3406-L3418, L3434-L3447] (HIGH/allocation/branch mismatch) Six-field storage and qx/qy layer arrays are allocated only when nonhq3d=1 and nhlay>0, but later branches test only nonhq3d=1 and can access those arrays when they were never allocated."
+    },
+    {
+     "id": "F10-X34",
+     "text": "[L3411-L3417] (HIGH/zero directional-wavenumber divisor) Layer flux ratios divide by sinh(KKx*h0) and sinh(KKy*h0) without limits for axis-aligned interactions where KKx or KKy is zero."
+    },
+    {
+     "id": "F10-X35",
+     "text": "[L3413, L3417] (HIGH/dimensionally inconsistent layer formula) The upper-layer ratios subtract sinh(KKx) or sinh(KKy) rather than an interface-depth product, leaving a dimensioned wavenumber as a hyperbolic-function argument and omitting z."
+    },
+    {
+     "id": "F10-X36",
+     "text": "[L3524-L3528] (HIGH/incorrect layer flux conversion) Second-order layer flux is converted using q1/z and q2/(h0+z), even though z is negative and the lower and upper layer thicknesses are h0+z and -z respectively."
+    },
+    {
+     "id": "F10-X37",
+     "text": "[L3436-L3441, L3524-L3530] (HIGH/discarded transverse velocity) The second-order routine computes qy1 and qy2 time series but never adds them to vits or dvits when assembling the nonhydrostatic boundary signal."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F10-Y0",
+     "text": "[L125-L131,L331-L332] (MED/state/output contract) The routine increments bccount before the final-timestep early return, and that return leaves the INTENT(OUT) curline unassigned while also consuming a boundary-condition sequence number."
+    },
+    {
+     "id": "F10-Y1",
+     "text": "[L172-L180,L593-L607,L1092,L1180-L1206] (HIGH/allocation/runtime) The external-time catch-up loop can call read_spectrum_input repeatedly on the same specin element, but each reader unconditionally allocates already-associated pointer components, causing an allocation failure when more than one spectrum interval is skipped."
+    },
+    {
+     "id": "F10-Y2",
+     "text": "[L410-L422] (MED/input validation) The WBCTYPE select has no default case, so an unsupported value returns with specin uninitialized and later code dereferences its pointer components."
+    },
+    {
+     "id": "F10-Y3",
+     "text": "[L489,L641,L1495,L1512,L1637] (HIGH/numerical robustness) Hm0=0 is explicitly accepted, but the resulting zero spectrum reaches unguarded normalizations and weighted means whose denominators are zero."
+    },
+    {
+     "id": "F10-Y4",
+     "text": "[L965-L998,L1038-L1046,L1311-L1335] (HIGH/spectrum-axis handling) The SWAN reader acknowledges that frequencies are often non-monotone but performs only no-op assignments, after which interpolation and integration assume ordered endpoints and can reject or negatively integrate a descending frequency axis."
+    },
+    {
+     "id": "F10-Y5",
+     "text": "[L1015-L1046,L1189-L1203,L1132-L1143,L1239-L1250] (MED/bounds/input validation) Both spectrum readers index angular entries 1 and 2 without enforcing nang>=2, so a one-direction input can read out of bounds."
+    },
+    {
+     "id": "F10-Y6",
+     "text": "[L1567-L1572] (HIGH/scientific formula) The nonhydrostatic cutoff frequency is computed as g*k*tanh(kh)/(2*pi), omitting the square root required by the dispersion relation and yielding dimensionally incorrect frequency filtering."
+    },
+    {
+     "id": "F10-Y7",
+     "text": "[L1637-L1657] (MED/sampling/CDF) The PDF is normalized by its simple sum but its CDF is then formed with trapezoidal half-endpoint weights, leaving the last CDF value below one and sending some uniform random draws outside the CDF interpolation range."
+    },
+    {
+     "id": "F10-Y8",
+     "text": "[L1741-L1749] (MED/numerical robustness) tpDcalc divides by unguarded spectral moments, so an empty threshold mask or zero-energy spectrum produces an undefined representative period."
+    },
+    {
+     "id": "F10-Y9",
+     "text": "[L1866-L1877] (LOW/time-axis contract) rtin is stored as tslen*dtin although the generated tin axis ends at (tslen-1)*dtin, creating a one-step inconsistency in the internal duration."
+    },
+    {
+     "id": "F10-Y10",
+     "text": "[L1939-L1959] (HIGH/numerical robustness) Wave-train variance rescales by (hm0/hm0post)^2 without guarding hm0post=0, which occurs when the selected component frequency range contains no energy for a location."
+    },
+    {
+     "id": "F10-Y11",
+     "text": "[L2064-L2068] (MED/numerical robustness) Spatial spectrum interpolation rescales by sfimp/sfnow without guarding sfnow=0."
+    },
+    {
+     "id": "F10-Y12",
+     "text": "[L2006-L2098] (HIGH/allocation/runtime) wp%PRindex is allocated inside the offshore-point loop, so the second iteration attempts to allocate an already-associated pointer."
+    },
+    {
+     "id": "F10-Y13",
+     "text": "[L299-L321,L1932-L1938,L2584-L2588] (MED/resource management) Cleanup deallocates pointer-containing parents without freeing their pointed-to Sf arrays and never deallocates vits, duits, or dvits, leaking substantial memory on each regenerated boundary condition."
+    },
+    {
+     "id": "F10-Y14",
+     "text": "[L2990-L3008] (HIGH/boundary-file schema) When time-step interpolation is active, qinterp has only three fields and the writer omits the fourth elevation field even though the direct-access record length and non-interpolated path use four fields."
+    },
+    {
+     "id": "F10-Y15",
+     "text": "[L3226-L3242,L3407-L3418,L3434-L3441] (HIGH/branch-condition/runtime) Allocation of six-field 3D arrays requires nonhq3d==1 and nhlay>0, but later use tests only nonhq3d==1, so nonhq3d==1 with nhlay<=0 accesses unallocated qx/qy arrays and fields 5-6 of four-field arrays."
+    },
+    {
+     "id": "F10-Y16",
+     "text": "[L3348-L3350] (HIGH/indexing/phase) Second-order component phases use Findex(1)+ii rather than Findex(1)+ii-1 (or Findex(ii)), shifting every primary component by one frequency bin and reading beyond the generated-component span for ii=K."
+    },
+    {
+     "id": "F10-Y17",
+     "text": "[L3341-L3342] (MED/filtering/indexing) The high-wavenumber cutoff tests only k3(m,1), but rows m>K+1 populate columns ii>1 while column 1 remains zero, so those higher rows evade the cutoff."
+    },
+    {
+     "id": "F10-Y18",
+     "text": "[L3411-L3417] (HIGH/scientific formula) The upper-layer qx2/qy2 ratios subtract sinh(KKx) or sinh(KKy) with no depth factor, unlike the surrounding dimensionless sinh(k*depth) terms, producing dimensionally inconsistent layer partitioning."
+    },
+    {
+     "id": "F10-Y19",
+     "text": "[L3524-L3529] (HIGH/layer averaging) The 3D second-order update divides the first-layer flux by z (negative) and the second by h0+z, inconsistent with the layer thicknesses and with the earlier short-wave implementation that uses h0+z for layer 1 and -z for layer 2."
+    },
+    {
+     "id": "F10-Y20",
+     "text": "[L3436-L3441,L3524-L3530] (MED/missing state update) Second-order 3D generation computes qy1 and qy2 fields but the accumulation branch updates only uits and duits, leaving vits and dvits without the corresponding transverse second-order contribution."
+    },
+    {
+     "id": "F10-Y21",
+     "text": "[L3499-L3517] (HIGH/boundary-file schema) The second-order interpolated q-file path repeats the three-field qinterp versus four-field record mismatch, omitting elevation when dtchanged is true."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F10-X0",
+     "F10-Y0"
+    ],
+    [
+     "F10-X1",
+     "F10-Y1"
+    ],
+    [
+     "F10-X1",
+     "F10-Y5"
+    ],
+    [
+     "F10-X2",
+     "F10-Y1"
+    ],
+    [
+     "F10-X2",
+     "F10-Y13"
+    ],
+    [
+     "F10-X4",
+     "F10-Y13"
+    ],
+    [
+     "F10-X6",
+     "F10-Y3"
+    ],
+    [
+     "F10-X7",
+     "F10-Y4"
+    ],
+    [
+     "F10-X8",
+     "F10-Y1"
+    ],
+    [
+     "F10-X8",
+     "F10-Y4"
+    ],
+    [
+     "F10-X8",
+     "F10-Y5"
+    ],
+    [
+     "F10-X9",
+     "F10-Y1"
+    ],
+    [
+     "F10-X9",
+     "F10-Y4"
+    ],
+    [
+     "F10-X9",
+     "F10-Y5"
+    ],
+    [
+     "F10-X10",
+     "F10-Y4"
+    ],
+    [
+     "F10-X11",
+     "F10-Y3"
+    ],
+    [
+     "F10-X11",
+     "F10-Y8"
+    ],
+    [
+     "F10-X14",
+     "F10-Y6"
+    ],
+    [
+     "F10-X15",
+     "F10-Y3"
+    ],
+    [
+     "F10-X15",
+     "F10-Y7"
+    ],
+    [
+     "F10-X17",
+     "F10-Y9"
+    ],
+    [
+     "F10-X18",
+     "F10-Y9"
+    ],
+    [
+     "F10-X19",
+     "F10-Y10"
+    ],
+    [
+     "F10-X20",
+     "F10-Y11"
+    ],
+    [
+     "F10-X21",
+     "F10-Y12"
+    ],
+    [
+     "F10-X22",
+     "F10-Y9"
+    ],
+    [
+     "F10-X29",
+     "F10-Y14"
+    ],
+    [
+     "F10-X29",
+     "F10-Y21"
+    ],
+    [
+     "F10-X31",
+     "F10-Y16"
+    ],
+    [
+     "F10-X31",
+     "F10-Y17"
+    ],
+    [
+     "F10-X32",
+     "F10-Y16"
+    ],
+    [
+     "F10-X32",
+     "F10-Y17"
+    ],
+    [
+     "F10-X33",
+     "F10-Y15"
+    ],
+    [
+     "F10-X33",
+     "F10-Y18"
+    ],
+    [
+     "F10-X33",
+     "F10-Y20"
+    ],
+    [
+     "F10-X34",
+     "F10-Y15"
+    ],
+    [
+     "F10-X34",
+     "F10-Y18"
+    ],
+    [
+     "F10-X35",
+     "F10-Y15"
+    ],
+    [
+     "F10-X35",
+     "F10-Y18"
+    ],
+    [
+     "F10-X36",
+     "F10-Y19"
+    ],
+    [
+     "F10-X36",
+     "F10-Y20"
+    ],
+    [
+     "F10-X37",
+     "F10-Y15"
+    ],
+    [
+     "F10-X37",
+     "F10-Y19"
+    ],
+    [
+     "F10-X37",
+     "F10-Y20"
+    ]
+   ]
+  },
+  {
+   "file_token": "F11",
+   "lang": ".F90",
+   "listX": [
+    {
+     "id": "F11-X0",
+     "text": "[L70-L122] (HIGH/call-mode-dependent saved shape) Common saved arrays are dimensioned using the first callType's direction count and never resized, although the routine is designed to be called in both stationary and directions modes with potentially different ntheta values."
+    },
+    {
+     "id": "F11-X1",
+     "text": "[L70-L76, L146-L156] (MED/invalid mode handling) An unsupported callType leaves ntheta_local, hhwlocal, ee_local, and dtheta_local undefined rather than rejecting the call."
+    },
+    {
+     "id": "F11-X2",
+     "text": "[L184-L189] (HIGH/inconsistent hyperbolic limiter) The sinh(2kh) approximation repeats the discontinuous <=3000 test with a cap at 10 and a fixed 3000 value above the threshold."
+    },
+    {
+     "id": "F11-X3",
+     "text": "[L202-L220, L397-L410, L557-L570] (HIGH/wave-direction calculation) Both modes use arithmetic mean angles that fail across 0/2π, and stationary Snell refraction passes an unclamped value to asin."
+    },
+    {
+     "id": "F11-X4",
+     "text": "[L294-L300] (HIGH/unguarded action conversion) Wet-cell energy is divided by s%sigm without checking for a positive intrinsic frequency."
+    },
+    {
+     "id": "F11-X5",
+     "text": "[L426-L444] (MED/stale vegetation dissipation) The directions-mode dissipation uses s%Dveg even though the source notes it has not been updated for the stationary-direction wave height."
+    },
+    {
+     "id": "F11-X6",
+     "text": "[L473-L478] (HIGH/refraction switch inconsistency) Roller theta-advection is applied unconditionally in stationary mode even when par%refraction disables the corresponding wave-energy theta-advection."
+    },
+    {
+     "id": "F11-X7",
+     "text": "[L509-L514] (HIGH/division by zero) Roller dissipation divides by directional phase-speed magnitude without a positive floor."
+    },
+    {
+     "id": "F11-X8",
+     "text": "[L599-L610] (HIGH/dimensionally incorrect roller state) After scaling rr by a height-based gamma factor, s%R is assigned RH*gammafac, a length, rather than the corresponding roller energy or the sum of scaled rr."
+    },
+    {
+     "id": "F11-X9",
+     "text": "[L620-L643] (HIGH/convergence metric defects) Relative H error divides by zero wave height, while the EE metrics build a wetmask but never apply it, allowing dry or halo cells to control convergence."
+    },
+    {
+     "id": "F11-X10",
+     "text": "[L666-L673] (LOW/misleading diagnostics) Non-convergence logging caps both H error and direction error at 0.99, hiding the true magnitude of larger failures."
+    },
+    {
+     "id": "F11-X11",
+     "text": "[L723-L725] (MED/unguarded dry-cell arithmetic) Final orbital velocity is evaluated over the full grid without a wet/depth guard."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F11-Y0",
+     "text": "[L70-L114] (MED/persistent allocation/dispatch) callType has no default validation and saved work arrays are sized only on the first call, so a later call with a different grid or ntheta_local reuses incompatible shapes."
+    },
+    {
+     "id": "F11-Y1",
+     "text": "[L203-L219,L397-L410,L557-L570] (HIGH/circular statistics) Mean wave direction is calculated as an arithmetic weighted mean of angles, which gives a direction near zero for energy straddling the -pi/+pi wrap instead of the correct circular mean."
+    },
+    {
+     "id": "F11-Y2",
+     "text": "[L210-L214] (HIGH/numerical robustness) The Snell-law asin argument sines times c/c(1,1) is neither denominator-guarded nor clamped to [-1,1], allowing division by zero or NaN directions."
+    },
+    {
+     "id": "F11-Y3",
+     "text": "[L294-L300,L357-L363] (MED/numerical robustness) Wave action conversion divides wet-cell energy by sigm without any positive-frequency guard."
+    },
+    {
+     "id": "F11-Y4",
+     "text": "[L509-L514] (HIGH/numerical robustness) Roller dissipation divides by sqrt(cx^2+cy^2) without guarding zero propagation speed."
+    },
+    {
+     "id": "F11-Y5",
+     "text": "[L601-L610] (HIGH/dimensional/state consistency) After scaling directional roller energy by gammafac squared, s%R is assigned RH*gammafac, a wave-height quantity, instead of a consistently scaled roller energy."
+    },
+    {
+     "id": "F11-Y6",
+     "text": "[L620-L643] (HIGH/convergence metric) Relative height convergence divides by s%H with no zero guard, while the EE branches populate wetmask but never apply it and therefore do not implement their apparent wet-cell-only contract."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F11-X0",
+     "F11-Y0"
+    ],
+    [
+     "F11-X1",
+     "F11-Y0"
+    ],
+    [
+     "F11-X3",
+     "F11-Y1"
+    ],
+    [
+     "F11-X3",
+     "F11-Y2"
+    ],
+    [
+     "F11-X4",
+     "F11-Y3"
+    ],
+    [
+     "F11-X7",
+     "F11-Y4"
+    ],
+    [
+     "F11-X8",
+     "F11-Y5"
+    ],
+    [
+     "F11-X9",
+     "F11-Y6"
+    ]
+   ]
+  },
+  {
+   "file_token": "F12",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F12-X0",
+     "text": "[L9-L12, L14-L198] (LOW/incomplete/dead module) The module exposes no public procedure, its only proposed generator is entirely commented out, and its sole active state variable initialized is unused."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F12-Y0",
+     "text": "[L9-L14,L16-L198] (LOW/incomplete module/API) The purported next-generation boundary module exports nothing and contains no executable procedures because its only interface and implementation are entirely commented out."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F12-X0",
+     "F12-Y0"
+    ]
+   ]
+  },
+  {
+   "file_token": "F13",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F13-X0",
+     "text": "[L24-L26] (HIGH/cross-module type contract) randomseed is declared as a non-allocatable scalar, conflicting with wave_boundary_main's ALLOCATED and DEALLOCATE operations on that component."
+    },
+    {
+     "id": "F13-X1",
+     "text": "[L43-L60] (LOW/initialization contract) Most administration scalars have no default initialization, so correctness depends on every entry path assigning them before use despite several consumers treating the datastore as persistent global state."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F13-Y0",
+     "text": "[L16-L30, L43-L60] (LOW/initialization contract) Nearly all scalar components of the module-global saved state lack default initialization, so safe use depends on every consumer completing an external initialization sequence that the types themselves do not enforce."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F13-X0",
+     "F13-Y0"
+    ],
+    [
+     "F13-X1",
+     "F13-Y0"
+    ]
+   ]
+  },
+  {
+   "file_token": "F14",
+   "lang": ".F90",
+   "listX": [
+    {
+     "id": "F14-X0",
+     "text": "[L65-L98] (LOW/persistent allocation) Saved work arrays and cached scheme choices are initialized only once, requiring fixed grid dimensions, direction count, and schemes without enforcing that contract."
+    },
+    {
+     "id": "F14-X1",
+     "text": "[L150-L152,L259-L263,L339-L349] (HIGH/circular statistics) Mean wave directions use arithmetic angle averages and are incorrect for spectra crossing the angular wrap."
+    },
+    {
+     "id": "F14-X2",
+     "text": "[L195-L202,L227-L234] (MED/numerical robustness) Wave-action conversion divides by sigm without a positive-frequency guard."
+    },
+    {
+     "id": "F14-X3",
+     "text": "[L268-L275] (MED/configuration handling) The breaking-model select omits BREAK_ROELVINK_DALY and has no default, so that configured model yields no breaking dissipation in this solver."
+    },
+    {
+     "id": "F14-X4",
+     "text": "[L286-L294] (MED/physics consistency) Directional dissipation omits Dveg despite other wave solvers including vegetation dissipation, an inconsistency explicitly noted in the source."
+    },
+    {
+     "id": "F14-X5",
+     "text": "[L353-L360] (HIGH/MPI shape conformance) The convergence maxval applies a full-row wete mask to a jmin_ee:jmax_ee slice, which is nonconformable whenever those MPI bounds exclude halo columns."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F14-Y0",
+     "text": "[L65-L98] (MED/saved-shape state) Saved work arrays and scheme selections are initialized only on the first call, so reuse with changed grid dimensions, directional bins, or scheme parameters keeps stale shapes and settings."
+    },
+    {
+     "id": "F14-Y1",
+     "text": "[L131-L137] (HIGH/inconsistent hyperbolic limiter) The condition admits 2kh values up to 3000 but evaluates sinh(min(2kh,10)), while values just above 3000 are set to 3000, creating an inconsistent discontinuous approximation to sinh(2kh)."
+    },
+    {
+     "id": "F14-Y2",
+     "text": "[L150-L152, L259-L263, L339-L345] (HIGH/circular-angle averaging) Mean wave direction is computed as an arithmetic energy-weighted angle, which gives incorrect results for energy distributed across the 0/2π wrap."
+    },
+    {
+     "id": "F14-Y3",
+     "text": "[L195-L201] (HIGH/unguarded action conversion) Wet-cell wave energy is divided by s%sigm without enforcing a positive intrinsic frequency."
+    },
+    {
+     "id": "F14-Y4",
+     "text": "[L286-L293] (MED/missing physical source term) Directional dissipation distributes only breaking and bed-friction losses even though the source comment explicitly identifies missing vegetation dissipation Dveg."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F14-X0",
+     "F14-Y0"
+    ],
+    [
+     "F14-X1",
+     "F14-Y2"
+    ],
+    [
+     "F14-X2",
+     "F14-Y3"
+    ],
+    [
+     "F14-X3",
+     "F14-Y2"
+    ],
+    [
+     "F14-X4",
+     "F14-Y4"
+    ]
+   ]
+  },
+  {
+   "file_token": "F15",
+   "lang": ".F90",
+   "listX": [
+    {
+     "id": "F15-X0",
+     "text": "[L50-L57] (MED/MPI initialization contract) Non-master ranks return before allocating tide arrays, and no distribution occurs in this routine."
+    },
+    {
+     "id": "F15-X1",
+     "text": "[L53-L57] (LOW/initialization contract) For tideloc=0 the routine allocates a two-element tide time vector but returns without initializing it."
+    },
+    {
+     "id": "F15-X2",
+     "text": "[L64-L81] (MED/input validation) The counting pass treats malformed records as end-of-file and therefore silently truncates the tide series."
+    },
+    {
+     "id": "F15-X3",
+     "text": "[L64-L85] (HIGH/empty-input bounds) An empty tide file yields tidelen=0 and the duration check indexes tideinpt(0)."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F15-Y0",
+     "text": "[L64-L71, L85] (HIGH/empty-input handling) An empty or unreadable tide file yields s%tidelen=0 and is then indexed as s%tideinpt(0) in the duration check."
+    },
+    {
+     "id": "F15-Y1",
+     "text": "[L76-L85] (MED/input contract validation) The tide timestamps are accepted without checking that they are strictly increasing, although subsequent linear interpolation depends on a usable ordered time axis."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F15-X2",
+     "F15-Y0"
+    ],
+    [
+     "F15-X2",
+     "F15-Y1"
+    ],
+    [
+     "F15-X3",
+     "F15-Y0"
+    ],
+    [
+     "F15-X3",
+     "F15-Y1"
+    ]
+   ]
+  },
+  {
+   "file_token": "F16",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F16-X0",
+     "text": "[L1] (LOW/missing implementation) The file named as the wave-boundary initialization unit is completely empty despite the datastore contract naming wave_boundary_init as one of its consumers."
+    }
+   ],
+   "listY": [],
+   "candidate_pairs": []
+  }
+ ]
+}

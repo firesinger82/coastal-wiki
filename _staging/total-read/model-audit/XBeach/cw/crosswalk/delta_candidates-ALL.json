@@ -1,0 +1,772 @@
+[
+ {
+  "shard": "XBeach-000",
+  "path": "trunk/src/xbeachlibrary/readkey.F90",
+  "text": "[L384-L463,L465-L544] (HIGH/vector bounds and undefined tail) The vector readers never require 0<=vlength<=tlength, directly section value_vec(1:vlength), and leave result elements vlength+1:tlength undefined."
+ },
+ {
+  "shard": "XBeach-000",
+  "path": "trunk/src/xbeachlibrary/readkey.F90",
+  "text": "[L603-L643] (MED/stale file cache) The parameter cache is invalidated only when the filename string changes, so rereading a modified file under the same name returns stale values and stale used-key tracking."
+ },
+ {
+  "shard": "XBeach-000",
+  "path": "trunk/src/xbeachlibrary/readkey.F90",
+  "text": "[L762-L804] (HIGH/undefined optional MPI output) parmapply assigns optional parm_str only on xmaster and never broadcasts it, so a present parm_str is undefined on non-master ranks even when parameter broadcasting is enabled."
+ },
+ {
+  "shard": "XBeach-000",
+  "path": "trunk/src/xbeachlibrary/readkey.F90",
+  "text": "[L762-L778] (MED/unchecked default index) parmapply indexes allowednames(idefname) without checking idefname against 1:numallowednames."
+ },
+ {
+  "shard": "XBeach-000",
+  "path": "trunk/src/xbeachlibrary/readkey.F90",
+  "text": "[L1136-L1148] (LOW/input corruption) strippedline replaces every byte outside printable 7-bit ASCII with a blank, silently corrupting valid non-ASCII parameter values and filenames."
+ },
+ {
+  "shard": "XBeach-000",
+  "path": "trunk/src/xbeachlibrary/interp.F90",
+  "text": "[L12-L15,L26-L47] (MED/empty-array bounds) linear_interp_2d does not require nx and ny to be positive before applying reductions and using the resulting indices to access X, Y, and Z."
+ },
+ {
+  "shard": "XBeach-000",
+  "path": "trunk/src/xbeachlibrary/interp.F90",
+  "text": "[L1418-L1434] (MED/invalid allocation / bounds contract) trapezoidal_cyclic reads x(2), divides by dx, and indexes xp(1) and xp(np) without guarding n<2, zero spacing, reversed limits, or a resulting nonpositive np."
+ },
+ {
+  "shard": "XBeach-000",
+  "path": "trunk/src/xbeachlibrary/timestep.F90",
+  "text": "[L363-L406] (HIGH/duplicate schedule deadlock) For duplicate scheduled times, each output counter advances only once while tnext excludes all times equal to the current time, leaving the counter pinned on the duplicate and preventing that output category from matching later times."
+ },
+ {
+  "shard": "XBeach-000",
+  "path": "trunk/src/xbeachlibrary/timestep.F90",
+  "text": "[L440,L456-L458,L681-L683] (LOW/undefined optional outputs) compute_dt returns before assigning present ierr or limtypeout when xcompute is false."
+ },
+ {
+  "shard": "XBeach-000",
+  "path": "trunk/src/xbeachlibrary/timestep.F90",
+  "text": "[L462-L469] (MED/zero-depth division) The cold-start timestep divides by sqrt(maxval(hh)*g) without a positive lower bound, despite the branch comment explicitly anticipating zero initialization, so an all-zero depth field yields an infinite or invalid timestep."
+ },
+ {
+  "shard": "XBeach-000",
+  "path": "trunk/src/xbeachlibrary/timestep.F90",
+  "text": "[L488-L523,L541-L574] (MED/unchecked numerical domain) Several active stability expressions take square roots of hu/hv and divide by spacing-derived sums without guarding negative depths or zero cell metrics, allowing NaN or zero-division results to contaminate timestep selection."
+ },
+ {
+  "shard": "XBeach-000",
+  "path": "trunk/src/xbeachlibrary/timestep.F90",
+  "text": "[L595-L629] (MED/unchecked permeability division) Groundwater stability calculations divide directly by par%kx and par%ky without local positivity checks when their respective branches are enabled."
+ },
+ {
+  "shard": "XBeach-000",
+  "path": "trunk/src/xbeachlibrary/timestep.F90",
+  "text": "[L632-L647] (MED/serial/MPI behavior inconsistency) The MPI path skips angular wave limiting when ntheta<=1, whereas the serial path applies it for every nonstationary model, potentially forcing a zero or spurious dt from a meaningless dtheta in the single-direction case."
+ },
+ {
+  "shard": "XBeach-000",
+  "path": "trunk/src/xbeachlibrary/timestep.F90",
+  "text": "[L708-L710] (LOW/undefined optional output) timestep itself returns before defining a present INTENT(OUT) ierr when xcompute is false."
+ },
+ {
+  "shard": "XBeach-000",
+  "path": "trunk/src/xbeachlibrary/spaceparamsdef.F90",
+  "text": "[L51-L52] (HIGH/uninitialized cache flags) The collected and precollected flags have no default initialization in the type definition even though collection logic reads collected(index) to decide whether to skip work."
+ },
+ {
+  "shard": "XBeach-000",
+  "path": "trunk/src/xbeachlibrary/initialize.F90",
+  "text": "[L242-L249,L395-L410,L1464-L1482] (MED/unchecked grid extent and metric) Boundary copies assume nx>=1 and slope calculations divide by dsu/dnv without checking positive nonzero grid metrics."
+ },
+ {
+  "shard": "XBeach-000",
+  "path": "trunk/src/xbeachlibrary/initialize.F90",
+  "text": "[L619-L623] (MED/period division) Wave intrinsic frequency is computed as 2*pi/Trep without a local positive-period guard for boundary types that do not force Trep to 10."
+ },
+ {
+  "shard": "XBeach-000",
+  "path": "trunk/src/xbeachlibrary/initialize.F90",
+  "text": "[L1011-L1012,L1037-L1056] (HIGH/hotstart state destruction) Although hotstart zs, uu, and vv are deliberately preserved during allocation and initial zeroing, flow_init later unconditionally resets uu and vv and all derived flow quantities to zero, discarding the loaded hotstart velocities."
+ },
+ {
+  "shard": "XBeach-000",
+  "path": "trunk/src/xbeachlibrary/initialize.F90",
+  "text": "[L1332-L1341,L1384-L1387] (MED/layer-index bounds) Sediment layer assignments use nd_var and, in the single-grain case, forcibly set nd_var=2 without ensuring nd is at least two or that nd_var lies within 1:nd."
+ },
+ {
+  "shard": "XBeach-000",
+  "path": "trunk/src/xbeachlibrary/filefunctions.F90",
+  "text": "[L163-L176,L227-L246] (MED/uninitialized dispatch state) checkbcfilelength does not assign filetype for wbctype values outside its enumerated branches, yet immediately selects on filetype, whose dummy argument has no declared intent or local default."
+ },
+ {
+  "shard": "XBeach-000",
+  "path": "trunk/src/xbeachlibrary/filefunctions.F90",
+  "text": "[L197-L224] (MED/empty-list validation gap) A LOCLIST file containing only its header produces nlocs=0 and skips all boundary-duration validation, allowing a positive-duration simulation to pass this check without any boundary file."
+ },
+ {
+  "shard": "XBeach-000",
+  "path": "trunk/src/xbeachlibrary/spaceparams.F90",
+  "text": "[L1175-L1253,L1402-L1419] (MED/minimum-grid bounds) gridprops assumes nx>=1 throughout and requires nx>=2 to define alfaz from an interior point; with nx=1 its two boundary-copy assignments merely circulate an uninitialized orientation."
+ },
+ {
+  "shard": "XBeach-000",
+  "path": "trunk/src/xbeachlibrary/params.F90",
+  "text": "[L145-L167,L301-L315] (HIGH/parameter-order defect) The XBeach grid branch decides whether a depth file is required from par%hotstart before the hotstart parameter is read from params.txt, so a requested hotstart can follow stale/default state and unnecessarily require or load depfile."
+ },
+ {
+  "shard": "XBeach-000",
+  "path": "trunk/src/xbeachlibrary/params.F90",
+  "text": "[L170-L175,L247-L266,L283-L296,L419-L434] (HIGH/advisory-only critical bounds) Critical positive quantities including dx, dy, dtheta, dtheta_s, tstop, gravity, and wave periods are read without strict=.true., so zero or negative out-of-range values only warn and can later drive divisions, invalid extents, or nonterminating angle normalization."
+ },
+ {
+  "shard": "XBeach-000",
+  "path": "trunk/src/xbeachlibrary/params.F90",
+  "text": "[L193-L237] (MED/unchecked external grid dimensions) Delft3D mmax and nmax are converted directly to nx=mmax-1 and ny=nmax-1 without validating minimum or maximum grid sizes before downstream allocation and boundary indexing."
+ },
+ {
+  "shard": "XBeach-000",
+  "path": "trunk/src/xbeachlibrary/params.F90",
+  "text": "[L1227-L1248] (HIGH/zero output interval accepted) tint, tintg, tintp, tintm, and tinth use strict lower bounds of zero, allowing zero intervals that timestep_init later uses as divisors when generating schedules."
+ },
+ {
+  "shard": "XBeach-000",
+  "path": "trunk/src/xbeachlibrary/params.F90",
+  "text": "[L1536-L1538] (LOW/nonlinear option coercion) Every posdwn value below 0.1, including allowed small positive values, is coerced to -1 while other positive magnitudes remain unnormalized, making this nominal sign option behave discontinuously."
+ },
+ {
+  "shard": "XBeach-001",
+  "path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+  "text": "[L139-L164,L176-L203] (MED/input validation) The TS readers accept `nt` without requiring it to be positive and then allocate from it and divide `sum(dataE)` by `nt`."
+ },
+ {
+  "shard": "XBeach-001",
+  "path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+  "text": "[L434-L453,L470-L472,L684-L696] (HIGH/numerical robustness) Bound-wave and nonhydrostatic formulas divide by boundary depth, `sinh(kh)`, `tanh(kh)`, and the resonant term `cg**2-g*h` without dry-point or small-denominator protection."
+ },
+ {
+  "shard": "XBeach-001",
+  "path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+  "text": "[L490-L500,L594-L660] (MED/time interpolation) The spectral-record calculation divides by `dtbcfile` and derives direct-access record numbers from it without validating that this file-supplied interval is positive."
+ },
+ {
+  "shard": "XBeach-001",
+  "path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+  "text": "[L854-L866] (HIGH/vector transformation) The difference-velocity rotation computes only `s%dUi`; `s%dVi` is neither replaced by the rotated transverse component nor included in the subsequent tapering."
+ },
+ {
+  "shard": "XBeach-001",
+  "path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+  "text": "[L778-L780,L830-L832,L864,L1310-L1313] (HIGH/reference-level consistency) If a nonhydrostatic boundary file omits `Z`, `s%zi` is set to the absolute neighboring surface `s%zs(2,:)`, but the applied boundary later adds `s%zs0` to `s%zi`, apparently adding the mean level twice."
+ },
+ {
+  "shard": "XBeach-001",
+  "path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+  "text": "[L998-L999,L1029-L1042,L1141-L1146,L1363-L1365] (MED/parameter validation) Hybrid averaging and relaxation divide by combinations of `cats`, `Trep`, and `hybtavg` without enforcing positive values."
+ },
+ {
+  "shard": "XBeach-001",
+  "path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+  "text": "[L1177-L1178,L1386-L1387] (MED/numerical robustness) Boundary mean velocities divide by globally accumulated metric lengths without checking for an empty or zero-width boundary selection."
+ },
+ {
+  "shard": "XBeach-001",
+  "path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+  "text": "[L1202-L1247,L1263-L1271,L1321-L1324,L1399-L1422,L1432-L1451] (MED/boundary numerical robustness) Several absorbing-boundary formulas use unguarded water depths, group velocity, grid spacing, or angular denominators even though these branches do not consistently mask dry or degenerate boundary points."
+ },
+ {
+  "shard": "XBeach-001",
+  "path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+  "text": "[L1250-L1278,L1439-L1444] (MED/angle calculation) Incident and reflected directions are obtained with one-argument `atan` of a quotient, losing quadrant information and becoming discontinuous near zero longitudinal velocity."
+ },
+ {
+  "shard": "XBeach-001",
+  "path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+  "text": "[L1458-L1468] (HIGH/copy/paste indexing) Back-boundary corner water levels use `dzs0dn(1,...)` and `zb(1,...)` instead of the `nx+1` back-boundary row, applying front-boundary geometry at both back corners."
+ },
+ {
+  "shard": "XBeach-001",
+  "path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+  "text": "[L1523-L1603] (MED/dispatch contract) The lateral-boundary `select case` has no default assignment, so an unsupported `bctype` returns an undefined `vbc` vector."
+ },
+ {
+  "shard": "XBeach-001",
+  "path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+  "text": "[L1549-L1602] (LOW/small-grid indexing) Three lateral-boundary cases populate only indices `2:s%nx` before copying from indices 2 and `s%nx`, which leaves circular or undefined endpoint values when `s%nx<2`."
+ },
+ {
+  "shard": "XBeach-001",
+  "path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+  "text": "[L1659-L1678] (HIGH/MPI domain intersection) A horizontal discharge segment is considered local only when at least one endpoint lies in the rank's box, so a segment that crosses a subdomain while both endpoints lie outside that subdomain is omitted there."
+ },
+ {
+  "shard": "XBeach-001",
+  "path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+  "text": "[L274,L420-L421,L914-L916] (MED/dispatch contract) Unsupported wave-boundary combinations fall through empty branches without an error or deterministic reset, allowing boundary arrays to retain values from an earlier condition."
+ },
+ {
+  "shard": "XBeach-001",
+  "path": "trunk/src/xbeachlibrary/wave_boundary_update.f90",
+  "text": "[L127-L135,L315-L328] (MED/input validation) The instat select has no default, so an unsupported value leaves specin pointer components uninitialized before they are dereferenced."
+ },
+ {
+  "shard": "XBeach-001",
+  "path": "trunk/src/xbeachlibrary/wave_boundary_update.f90",
+  "text": "[L1578-L1619] (HIGH/conditional implementation) Without BUILDXBEACH the interpolation blocks are empty, leaving pdflocal and thetagen undefined while the routine continues to normalize and use them."
+ },
+ {
+  "shard": "XBeach-001",
+  "path": "trunk/src/xbeachlibrary/wave_boundary_update.f90",
+  "text": "[L2167-L2189,L2301-L2304] (HIGH/build failure) BUILDXBEACH logging references s%ntheta and s%ny in generate_ebcf although no s object is in scope."
+ },
+ {
+  "shard": "XBeach-001",
+  "path": "trunk/src/xbeachlibrary/wave_boundary_update.f90",
+  "text": "[L2500-L2516] (HIGH/build failure) generate_qbcf allocates q using s%ny even though no s object is declared or passed."
+ },
+ {
+  "shard": "XBeach-001",
+  "path": "trunk/src/xbeachlibrary/waveparams.F90",
+  "text": "[L164-L179] (MED/input validation) An unsupported wbctype silently skips every spectrum builder but execution still advances list state and writes administration entries from stale or uninitialized wave parameters."
+ },
+ {
+  "shard": "XBeach-001",
+  "path": "trunk/src/xbeachlibrary/waveparams.F90",
+  "text": "[L1057-L1091,L1150-L1178] (HIGH/CDF/indexing) The directional CDF starts above zero; a random draw below P(1) is extrapolated below theta(1), after which stepang can become zero and index S_array at column 0."
+ },
+ {
+  "shard": "XBeach-001",
+  "path": "trunk/src/xbeachlibrary/waveparams.F90",
+  "text": "[L1367-L1457] (HIGH/order-dependent physics) The total envelope and directional weights are computed inside the directional-bin loop before later bins' zeta values exist, so Ampzeta for early bins depends on processing order and omits later directional components."
+ },
+ {
+  "shard": "XBeach-001",
+  "path": "trunk/src/xbeachlibrary/wave_instationary.F90",
+  "text": "[L147-L160] (MED/numerical robustness) The Snell branch clamps the asin input but still divides by coffshore without guarding a zero offshore phase speed."
+ },
+ {
+  "shard": "XBeach-001",
+  "path": "trunk/src/xbeachlibrary/compute_tide_zs0.F90",
+  "text": "[L157-L191] (MED/state/dispatch) The `tideloc` and nested `paulrevere` selections have no default branches, so an unsupported value can leave the four module-level tide corner values unchanged from an earlier timestep."
+ },
+ {
+  "shard": "XBeach-001",
+  "path": "trunk/src/xbeachlibrary/compute_tide_zs0.F90",
+  "text": "[L558-L564] (MED/state consistency) Water levels are clipped upward to the bed after gradients have been assigned, but the corresponding tide gradients are not recomputed or neutralized where clipping changes the surface."
+ },
+ {
+  "shard": "XBeach-001",
+  "path": "trunk/src/xbeachlibrary/wave_functions.F90",
+  "text": "[L69-L100] (MED/geometry robustness) All slope differences divide by metric distances without guarding zero or invalid grid spacing."
+ },
+ {
+  "shard": "XBeach-001",
+  "path": "trunk/src/xbeachlibrary/wave_functions.F90",
+  "text": "[L429-L480] (HIGH/small-dimension bounds) Second-order y advection with ny=1 can evaluate the left-boundary negative-velocity stencil at j+2=3 although the y extent is only 2."
+ },
+ {
+  "shard": "XBeach-001",
+  "path": "trunk/src/xbeachlibrary/wave_functions.F90",
+  "text": "[L864-L897] (MED/small-dimension behavior) For ny=1 the breaker-delay computation loop is empty, so usd is not computed from current roller transport before lateral boundary copies use it."
+ },
+ {
+  "shard": "XBeach-001",
+  "path": "trunk/src/xbeachlibrary/wave_functions.F90",
+  "text": "[L1140-L1160] (MED/dispatch validation) compute_wave_direction_velocities has no default flavour case, so an invalid flavour leaves nthetalocal undefined."
+ },
+ {
+  "shard": "XBeach-001",
+  "path": "trunk/src/xbeachlibrary/wave_boundary_main.f90",
+  "text": "[L256-L270] (HIGH/array indexing) Energy interpolation slices eebct(i,itheta,:) even though generation stores it as (point,time,direction); this supplies a direction-length vector while passing the time-axis length."
+ },
+ {
+  "shard": "XBeach-001",
+  "path": "trunk/src/xbeachlibrary/wave_boundary_main.f90",
+  "text": "[L142-L190,L256-L270] (HIGH/mode contract) The nonhydrostatic option still unconditionally interpolates hydrostatic eebct, qxbct, and qybct arrays that its generation path does not allocate."
+ },
+ {
+  "shard": "XBeach-001",
+  "path": "trunk/src/xbeachlibrary/wave_stationary.F90",
+  "text": "[L430-L437] (HIGH/numerical robustness) Wave and roller mass-flux expressions divide by sigm without a lower bound, allowing infinities in zero-frequency cells."
+ },
+ {
+  "shard": "XBeach-001",
+  "path": "trunk/src/xbeachlibrary/waveparamsnew.F90",
+  "text": "[L410-L422] (MED/input validation) The WBCTYPE select has no default case, so an unsupported value returns with specin uninitialized and later code dereferences its pointer components."
+ },
+ {
+  "shard": "XBeach-001",
+  "path": "trunk/src/xbeachlibrary/waveparamsnew.F90",
+  "text": "[L3499-L3517] (HIGH/boundary-file schema) The second-order interpolated q-file path repeats the three-field qinterp versus four-field record mismatch, omitting elevation when dtchanged is true."
+ },
+ {
+  "shard": "XBeach-001",
+  "path": "trunk/src/xbeachlibrary/wave_boundary_datastore.f90",
+  "text": "[L24-L26] (HIGH/cross-module type contract) randomseed is declared as a non-allocatable scalar, conflicting with wave_boundary_main's ALLOCATED and DEALLOCATE operations on that component."
+ },
+ {
+  "shard": "XBeach-001",
+  "path": "trunk/src/xbeachlibrary/wave_directions.F90",
+  "text": "[L268-L275] (MED/configuration handling) The breaking-model select omits BREAK_ROELVINK_DALY and has no default, so that configured model yields no breaking dissipation in this solver."
+ },
+ {
+  "shard": "XBeach-001",
+  "path": "trunk/src/xbeachlibrary/wave_directions.F90",
+  "text": "[L353-L360] (HIGH/MPI shape conformance) The convergence maxval applies a full-row wete mask to a jmin_ee:jmax_ee slice, which is nonconformable whenever those MPI bounds exclude halo columns."
+ },
+ {
+  "shard": "XBeach-002",
+  "path": "trunk/src/xbeachlibrary/beachwizard.F90",
+  "text": "[L15-L39, L484-L485] (HIGH/pointer-state) Pointer components have no default NULL initialization, yet ASSOCIATED is called on fobs1 before any guaranteed association-status definition."
+ },
+ {
+  "shard": "XBeach-002",
+  "path": "trunk/src/xbeachlibrary/beachwizard.F90",
+  "text": "[L80-L103] (HIGH/allocation-lifecycle) bwinit unconditionally allocates eight space-state arrays and provides no deallocation or already-allocated guard, so a repeated initialization fails."
+ },
+ {
+  "shard": "XBeach-002",
+  "path": "trunk/src/xbeachlibrary/beachwizard.F90",
+  "text": "[L148-L166] (LOW/saved-shape-lifecycle) Saved Beach Wizard arrays are allocated only on first use and never resized or released, making reuse with a different grid shape unsafe."
+ },
+ {
+  "shard": "XBeach-002",
+  "path": "trunk/src/xbeachlibrary/beachwizard.F90",
+  "text": "[L476-L487, L527-L548] (HIGH/input-validation/indexing) Observation-grid dimensions and spacings are used for allocation, division, MOD, and indices that assume nx and ny are at least three without validating positive dx, dy, nx, or ny."
+ },
+ {
+  "shard": "XBeach-002",
+  "path": "trunk/src/xbeachlibrary/beachwizard.F90",
+  "text": "[L535-L557] (MED/spatial-extrapolation) All model points outside the observation footprint are clamped to an interior observation cell rather than marked missing, causing implicit constant extrapolation over the entire model domain."
+ },
+ {
+  "shard": "XBeach-002",
+  "path": "trunk/src/xbeachlibrary/beachwizard.F90",
+  "text": "[L264-L335] (HIGH/numerical-domain) Celerity and wavenumber calculations divide by unchecked tradar, hh, rk, and rk plus sigK and are evaluated over dry cells before any wet-cell guard."
+ },
+ {
+  "shard": "XBeach-002",
+  "path": "trunk/src/xbeachlibrary/beachwizard.F90",
+  "text": "[L254-L340, L733-L756] (HIGH/unused-assimilation-sources) Bathymetry, celerity, and wavenumber observations are read or converted, but the final observation variance and depth correction combine only dissipation and shoreline terms, so those advertised sources cannot affect assimilation."
+ },
+ {
+  "shard": "XBeach-002",
+  "path": "trunk/src/xbeachlibrary/beachwizard.F90",
+  "text": "[L668-L686] (HIGH/one-dimensional-bounds) For ny equal to zero the h2 loop is empty and the subsequent assignments reference columns 2 and 0 of a one-column allocation."
+ },
+ {
+  "shard": "XBeach-002",
+  "path": "trunk/src/xbeachlibrary/beachwizard.F90",
+  "text": "[L699, L753-L764] (HIGH/time-parameter-division) Assimilation divides by Trep, dt, and tstop without requiring these time parameters to be positive and nonzero."
+ },
+ {
+  "shard": "XBeach-002",
+  "path": "trunk/src/xbeachlibrary/beachwizard.F90",
+  "text": "[L753-L756, L774] (HIGH/zero-denominator) The weighting and depth-correction formulas lack guards for zero combined variance and for the all-zero dDdh case, where the latter evaluates an explicit zero-over-zero."
+ },
+ {
+  "shard": "XBeach-002",
+  "path": "trunk/src/xbeachlibrary/beachwizard.F90",
+  "text": "[L778-L791] (MED/update-limit-bypass) The dissipation-derived depth change is capped before the shoreline correction is added, allowing the final dassim applied to the bed to bypass the stated ten-percent depth limit."
+ },
+ {
+  "shard": "XBeach-002",
+  "path": "trunk/src/xbeachlibrary/rainfall.F90",
+  "text": "[L25,L31-L37,L66-L67] (LOW/reinitialization lifecycle) rainfall_init allocates all rainfall arrays unconditionally and provides no cleanup or already-allocated guard for a second initialization."
+ },
+ {
+  "shard": "XBeach-002",
+  "path": "trunk/src/xbeachlibrary/drifters.F90",
+  "text": "[L35-L48] (MED/numerical-guard) Drifter displacement divides directly by local dsu and dnv without validating that either grid spacing is positive and nonzero."
+ },
+ {
+  "shard": "XBeach-002",
+  "path": "trunk/src/xbeachlibrary/bedroughness.F90",
+  "text": "[L68-L165, L186-L273] (MED/selector-contract) Both bed-friction select blocks lack a default branch, so an unsupported selector leaves cfu and cfv unchanged or uninitialized without reporting an error."
+ },
+ {
+  "shard": "XBeach-002",
+  "path": "trunk/src/xbeachlibrary/bedroughness.F90",
+  "text": "[L78-L80, L105-L106, L147-L148, L320-L327, L438-L460, L547-L568, L686-L688] (HIGH/allocation-lifecycle) Saved work arrays are allocated without a module teardown or shape check, and several initialization allocations are unguarded, so repeated initialization or reuse at another grid size can fail or retain incompatible storage."
+ },
+ {
+  "shard": "XBeach-002",
+  "path": "trunk/src/xbeachlibrary/bedroughness.F90",
+  "text": "[L357-L378, L398-L418] (HIGH/numerical-domain) The infiltration enhancement divides by cfu or cfv twice without a positive lower-bound guard, which is unsafe for zero-valued constant-friction configurations."
+ },
+ {
+  "shard": "XBeach-002",
+  "path": "trunk/src/xbeachlibrary/bedroughness.F90",
+  "text": "[L365-L373, L406-L414] (LOW/zero-input-bias) Exactly zero infiltration is forced to a nonzero negative blphi and therefore a facbl slightly different from one, so the nominally absent process still adds shear."
+ },
+ {
+  "shard": "XBeach-002",
+  "path": "trunk/src/xbeachlibrary/bedroughness.F90",
+  "text": "[L476-L483, L570-L587, L596, L611] (HIGH/time-scale-division) Acceleration models divide by Trep-derived smoothing and frequency scales and by saved dt without validating Trep and dt as positive."
+ },
+ {
+  "shard": "XBeach-002",
+  "path": "trunk/src/xbeachlibrary/bedroughness.F90",
+  "text": "[L438-L460, L547-L568] (MED/shared-state-contract) The two acceleration implementations use the same allocation sentinel but allocate different array sets and initialize phirad only in one branch, so changing implementations during a process can expose unallocated or uninitialized saved state."
+ },
+ {
+  "shard": "XBeach-002",
+  "path": "trunk/src/xbeachlibrary/bedroughness.F90",
+  "text": "[L701-L727] (MED/directional-bias) Using SIGN with zero velocity assigns positive turbulent bed shear at rest, introducing a fixed directional bias wherever kbl is positive."
+ },
+ {
+  "shard": "XBeach-002",
+  "path": "trunk/src/xbeachlibrary/vegetation.F90",
+  "text": "[L863-L865] (LOW/stale force state) porcanflow deliberately leaves Fcanu/Fcanv unchanged in non-canopy cells, so any runtime change from canopy to non-canopy would retain the prior canopy force."
+ },
+ {
+  "shard": "XBeach-002",
+  "path": "trunk/src/xbeachlibrary/morphevolution.F90",
+  "text": "[L464-L490] (HIGH/uninitialized boundary multiplier) pbbedu(nx+1,:) and pbbedv(:,ny+1) are never assigned before whole-array multiplication into Sub/Svb, so boundary transports can consume undefined values even when a zero transport is expected."
+ },
+ {
+  "shard": "XBeach-002",
+  "path": "trunk/src/xbeachlibrary/morphevolution.F90",
+  "text": "[L494-L531] (MED/unchecked relaxation/depth denominator) Concentration updates divide by Tsg, dt, and hh without explicit positivity checks at the addressed cells."
+ },
+ {
+  "shard": "XBeach-002",
+  "path": "trunk/src/xbeachlibrary/morphevolution.F90",
+  "text": "[L1416-L1424,L1508-L1513] (MED/singular grain/fall-velocity input) Zero or invalid grain size/fall velocity can enter negative powers and divisions when computing Sster, ws, and adaptation time."
+ },
+ {
+  "shard": "XBeach-002",
+  "path": "trunk/src/xbeachlibrary/morphevolution.F90",
+  "text": "[L1593-L1599] (MED/inconsistent dilatancy scaling) Suspended-load critical velocity uses Ucr*(1+sqrt(srfRhee)) while bed load uses Ucr*sqrt(1+srfRhee), an unexplained nonlinear inconsistency for the same Shields correction."
+ },
+ {
+  "shard": "XBeach-002",
+  "path": "trunk/src/xbeachlibrary/morphevolution.F90",
+  "text": "[L3099-L3151] (HIGH/dry-cell invalid arithmetic) vT computes H/hh, sqrt(g/hh), and related bore terms for every grid point without a wet mask, so dry cells can contaminate table indices and outputs."
+ },
+ {
+  "shard": "XBeach-002",
+  "path": "trunk/src/xbeachlibrary/groundwater.F90",
+  "text": "[L52-L72] (LOW/reinitialization lifecycle) gw_init allocates every groundwater field unconditionally and provides no already-allocated guard or cleanup for a second model initialization."
+ },
+ {
+  "shard": "XBeach-002",
+  "path": "trunk/src/xbeachlibrary/groundwater.F90",
+  "text": "[L220-L274,L802-L834,L930-L937,L1028-L1038] (MED/state/dimension/configuration lifecycle) Saved solver and work arrays are allocated only for the first grid and first solver branch, so later changes in dimensions, dimensionality, fast-solve choice, or head model reuse incompatible storage/state."
+ },
+ {
+  "shard": "XBeach-002",
+  "path": "trunk/src/xbeachlibrary/groundwater.F90",
+  "text": "[L299-L301] (MED/unchecked period denominator) Dynamic-pressure smoothing divides by Trep without validating a positive period."
+ },
+ {
+  "shard": "XBeach-002",
+  "path": "trunk/src/xbeachlibrary/groundwater.F90",
+  "text": "[L1127-L1129,L1303-L1306] (MED/grain-size denominator) Critical groundwater velocity divides by D50(1) without validating a positive grain diameter."
+ },
+ {
+  "shard": "XBeach-002",
+  "path": "trunk/src/xbeachlibrary/roelvink.F90",
+  "text": "[L101-L110,L169-L178,L213-L216,L283-L286] (MED/unchecked period denominator) Frequency conversions divide by par%px or par%Trep without local validation of the required positive-period contract."
+ },
+ {
+  "shard": "XBeach-002",
+  "path": "trunk/src/xbeachlibrary/nonh.F90",
+  "text": "[L323-L347] (MED/unchecked grid denominator) The original formulation constructs reciprocal grid spacings without checking for zero or invalid ds/dn metrics."
+ },
+ {
+  "shard": "XBeach-002",
+  "path": "trunk/src/xbeachlibrary/nonh.F90",
+  "text": "[L1172-L1177] (HIGH/directional coefficient mismatch) The y-direction vertical-viscosity flux uses s%hu at lines 1174-1175 even though it is evaluated across V faces, unlike the expected y-face depth s%hv."
+ },
+ {
+  "shard": "XBeach-002",
+  "path": "trunk/src/xbeachlibrary/nonh.F90",
+  "text": "[L1371-L1383,L1453-L1484,L2048-L2150,L2244-L2284] (MED/stale interpolated geometry) Both reduced correctors claim to recalculate zsu/zsv/zbu/zbv but contain no zuzv call, so matrix and kinematic corrections use geometry last computed in the predictor."
+ },
+ {
+  "shard": "XBeach-002",
+  "path": "trunk/src/xbeachlibrary/nonh.F90",
+  "text": "[L3369-L3401] (MED/MPI halo initialization) On non-bottom MPI ranks zbu(nx+1,:) and zsu(nx+1,:) are not assigned or exchanged by zuzv, although nonh mask construction iterates through nx+1 and reads zbu there."
+ },
+ {
+  "shard": "XBeach-002",
+  "path": "trunk/src/xbeachlibrary/ship.F90",
+  "text": "[L333-L358] (MED/time-level inconsistency) For motion-enabled ships, pressure forces are computed from the previous hull position and only then is zhull updated, creating a one-step geometry/force lag even after initialization."
+ },
+ {
+  "shard": "XBeach-002",
+  "path": "trunk/src/xbeachlibrary/flow_secondorder.F90",
+  "text": "[L751-L772, L774-L800, L802-L819] (HIGH/MPI-boundary) The continuity correction is computed with fixed whole-array loops and then unconditionally zeroes every local outer work-array edge without MPI-aware exchange or boundary tests, so subdomain-interface corrections can be discarded and the update can depend on decomposition."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/pybeach/xbeach/libxbeach.py",
+  "text": "[L251-L253] (LOW/validation) Shape compatibility is enforced only with assert, so optimized Python execution removes this guard before native memory is passed."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/pybeach/xbeach/libxbeach.py",
+  "text": "[L258-L264] (MED/input-validation) set_array has no unsupported-type else branch, so an unexpected native type code reaches function-name construction with dtype and typename uninitialized."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/logging.F90",
+  "text": "[L76-L100] (HIGH/uninitialized-status) start_logfiles never initializes error to zero, leaves it untouched on non-master ranks, and later tests it on every rank."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/varianceupdate.F90",
+  "text": "[L94-L185,L194-L267] (MED/rank-contract) Initialization handles only ranks 2 through 4 and has no default rejection, leaving unsupported requested ranks with unallocated accumulator pointers."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/varianceupdate.F90",
+  "text": "[L313] (MED/arithmetic) The averaging weight evaluates par%dt/par%tintm before max can clamp it, so a zero averaging interval still causes division by zero."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/varianceupdate.F90",
+  "text": "[L337-L351] (MED/numerical-guard) The near-zero circular-mean guard computes numeps*sign(tvar2d_cos,1.d0), which remains zero when cosine is zero and is far below numeps otherwise, so it does not reliably prevent the invalid atan2(0,0) case."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/xmpi.F90",
+  "text": "[L338-L387] (LOW/integer-range) Processor-grid scoring uses default-integer products and a fixed 1000000000 sentinel, allowing large domain dimensions to overflow or leave a valid factorization unselected."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/xmpi.F90",
+  "text": "[L359-L365] (MED/input-validation) Manual decomposition checks only the product, so two negative manual dimensions can pass and later become invalid divisors and neighbor geometry."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/xmpi.F90",
+  "text": "[L820-L838,L850-L858] (MED/buffer-size-contract) Array reductions send size(x) elements into y without asserting equal extents, leaving root receive-buffer capacity implicit."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/xmpi.F90",
+  "text": "[L873-L989] (MED/bounds-contract) Basic shift routines directly reference rows or columns 2, m-1, and n-1 without validating minimum local-array extents."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/xmpi.F90",
+  "text": "[L1030-L1208] (MED/bounds-contract) Ranged shift routines accept arbitrary i1/i2 and derive sections from a fixed four-cell overlap without checking ordering or bounds."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/general_mpi_new.F90",
+  "text": "[L80-L137] (MED/bounds-contract) Vector distribution indexes is/lm by communicator size and copies lm elements into b without validating metadata extents, source ranges, or destination capacity."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/general_mpi_new.F90",
+  "text": "[L619-L841] (MED/bounds-contract) Whole-matrix distribution computes array sections from unchecked metadata and root rank before validating that source and destination shapes match."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/general_mpi_new.F90",
+  "text": "[L928-L1024,L1102-L1225] (MED/collection-metadata) Column collection derives counts, receive totals, and array sections from unchecked overlap flags and metadata, so inconsistent flags can produce negative counts, missing receives, or out-of-bounds sections."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/general_mpi_new.F90",
+  "text": "[L1296-L1417,L1449-L1570] (MED/minimum-extent) Whole-submatrix collectors subtract a fixed four-cell overlap without enforcing local dimensions of at least four, allowing negative extents and MPI counts."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/general_mpi_new.F90",
+  "text": "[L1575-L1618] (HIGH/arithmetic-input-contract) decomp divides and takes modulo by numprocs without rejecting zero, and does not validate myid against the process range."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/general_mpi_new.F90",
+  "text": "[L1668-L1710] (MED/output-bounds) det_submatrices assumes all eight output arrays contain at least mp*np elements and that ma/na exceed the fixed overlap, but validates neither condition."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/general_mpi_new.F90",
+  "text": "[L1714-L1753] (MED/minimum-extent) Border shifting forms rows/columns 2 and ma-1/na-1 and uses count ma-2 without checking that the matrix has sufficient dimensions."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/introspection.F90",
+  "text": "[L130-L134,L386-L389,L416-L419,L448-L451] (HIGH/shape-conformance) Several Fortran wrappers assign the fixed 1024-element result of string_to_char_array into automatic arrays sized only len(name) or len(name)+1, which is a nonconforming whole-array assignment."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/introspection.F90",
+  "text": "[L137-L149,L203-L223,L245-L269,L290-L311,L316-L336,L392-L406,L422-L436,L454-L505,L529-L1260] (HIGH/ffi/string-bounds) C entry points pass variable-length name arrays to char_array_to_string, whose dummy contract reads up to 1024 elements, so length-sized buffers without an in-range NUL can be read beyond their declared extent."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/introspection.F90",
+  "text": "[L203-L224,L290-L312] (HIGH/type-confusion) Numeric parameter getters do not verify myparam's type before reading r0 or i0, so calling a getter with a valid name of the wrong type accesses the wrong parameter component."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/introspection.F90",
+  "text": "[L316-L336] (MED/output-on-error) getcharparameter returns early on lookup failure without setting valuelength or initializing the output buffer."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/introspection.F90",
+  "text": "[L392-L407,L422-L437] (MED/output-on-error) Array type and rank queries return on an unknown name without initializing their output arguments."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/xbeach_bmi.f90",
+  "text": "[L150-L166,L195-L199] (LOW/time-scaling-contract) Morphological time conversion silently substitutes 1 for any morfac below 1, making set/get time behavior diverge from the configured factor without reporting invalid configuration."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/libxbeach.F90",
+  "text": "[L287-L291] (MED/error-side-effect) Output schedules and progress logging are advanced immediately after timestep reports an error, before the error guard that suppresses the physical update."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/libxbeach.F90",
+  "text": "[L269-L274,L330-L336] (MED/uninitialized-timing) MPI finalization passes saved t01 to timing output even though t01 is assigned only when execute_counter equals 1, so short or failed runs can finalize with an undefined loop-start timestamp."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/ncoutput.F90",
+  "text": "[L127-L130,L169-L247,L1134-L1136,L1300-L1302,L1554-L1559] (HIGH/uninitialized-state) The NetCDF-only initializer never initializes saved output counters, while ncoutput increments them and uses itd directly as the drifter record index; those counters are initialized only by fortoutput_init."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/ncoutput.F90",
+  "text": "[L481-L517] (HIGH/bounds-before-validation) Point-variable setup reads dimensions(1) and dimensions(2) before verifying rank is at least 2, so a scalar or rank-1 selection accesses dimension metadata out of bounds."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/ncoutput.F90",
+  "text": "[L491-L516] (MED/validation-without-stop) A point variable whose first two dimensions are not x and y only produces a log message and is still defined and later sampled as a spatial field."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/ncoutput.F90",
+  "text": "[L790-L802] (HIGH/feature-gating) Point/runup processing is conditioned on npointvar being positive, so a valid runup-only configuration with gauges but no ordinary point variables never writes point time or runup output."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/ncoutput.F90",
+  "text": "[L1139,L1305,L1415] (HIGH/time-scaling) Global, point, and mean NetCDF times are always multiplied by morfac, whereas the rest of the module and BMI time API apply that scaling only when morfacopt equals 1."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/ncoutput.F90",
+  "text": "[L1432-L1438,L1500-L1505] (HIGH/scientific-output) thetamean output applies a legacy packed-value decoding expression even though the active averaging code stores a direct atan2 angle, corrupting both NetCDF and Fortran angular means."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/ncoutput.F90",
+  "text": "[L1546-L1548] (MED/format-dependent-state) The next averaging interval is updated only inside the Fortran-compatible output branch, so NetCDF-only runs retain the configured nominal interval even when the final or scheduled interval differs."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/ncoutput.F90",
+  "text": "[L1554-L1595] (MED/time-coordinate-consistency) Drifter NetCDF time is written as raw par%t while global, point, and mean time coordinates in the same file use morphological scaling, producing inconsistent time axes when scaling is active."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/ncoutput.F90",
+  "text": "[L1811-L1825] (HIGH/wrong-type-component) Fortran mean-file record lengths are always derived from real pointer components even though the averaging initializer permits integer mean variables."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/ncoutput.F90",
+  "text": "[L1843-L1857] (MED/stale-output) Lazily opened global Fortran files omit status='replace', so an existing longer file from a prior run can retain stale trailing records."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/postprocess.F90",
+  "text": "[L65-L108] (MED/shape-contract) snappointstogrid sizes work storage from parameter counts but does not verify the extents of xpoints, ypoints, coordinate arrays, pointtypes, or optional dmin before indexed or whole-array assignment."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/postprocess.F90",
+  "text": "[L186-L196,L307-L327,L420-L442] (MED/bounds-contract) Row/column point-selection accepts unchecked indices and assumes a destination with at least a 1x1 leading section."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/postprocess.F90",
+  "text": "[L505-L508] (HIGH/scientific-logic) The source itself marks runup incorrect, and its implementation assigns every gauge the same scalar derived from the first global minimum location of wetz rather than determining runup along each gauge line."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/xmpinew.F90",
+  "text": "[L201-L220] (LOW/integer-range) Automatic processor-grid selection computes border lengths in default integers and uses a hard-coded 1000000000 sentinel, so sufficiently large grid dimensions can overflow or fail to select a factorization."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/xmpinew.F90",
+  "text": "[L586-L703] (MED/bounds-contract) The basic shift routines index fixed interior rows or columns such as 2, m-1, and n-1 without enforcing minimum extents, so small local partitions can access outside their arrays."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/iso_c_utils.f90",
+  "text": "[L30-L34] (LOW/semantic-contract) strcmp trims both converted strings and uses Fortran lexical comparison, which does not preserve ordinary C strcmp behavior for spaces preceding the NUL."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/iso_c_utils.f90",
+  "text": "[L40-L49] (MED/unterminated-input) strcpy relies on the ambiguous zero returned by strlen, so an unterminated source copies only its first character and does not guarantee a terminator in the destination."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/general_mpi.F90",
+  "text": "[L67-L137] (MED/bounds-contract) Vector distribution creates subarray datatypes from unchecked is/lm metadata and destination extent, permitting invalid starts or subsizes."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/general_mpi.F90",
+  "text": "[L173-L243] (MED/shape-contract) Block-vector distribution independently uses size(a,2) for send types and size(b,2) for receive types without verifying equality, so sender and receiver type signatures can disagree."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/general_mpi.F90",
+  "text": "[L428-L471] (HIGH/arithmetic-input-contract) decomp divides and takes modulo by numprocs without rejecting zero and does not validate myid."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/general_mpi.F90",
+  "text": "[L521-L563] (MED/output-bounds) det_submatrices assumes output arrays have at least mp*np elements and dimensions exceed the fixed four-cell overlap without validating either condition."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/general_mpi.F90",
+  "text": "[L567-L606] (MED/minimum-extent) Border shifting indexes second and penultimate rows/columns and uses ma-2 counts without checking minimum matrix dimensions."
+ },
+ {
+  "shard": "XBeach-003",
+  "path": "trunk/src/xbeachlibrary/libxbeach_dynamic.F90",
+  "text": "[L49-L60] (HIGH/procedure-pointer) The exported writetolog test calls distributelog unconditionally even though that procedure pointer is initialized null and may never have been assigned."
+ },
+ {
+  "shard": "XBeach-004",
+  "path": "trunk/scripts/generate.py",
+  "text": "[L149-L166,L175-L192] (MED/schema/validation) Parsed declarations are accepted without checking required JSON keys, name uniqueness, or agreement between declaration rank and JSON shape rank, allowing inconsistent definition data to fail later or generate contradictory Fortran."
+ },
+ {
+  "shard": "XBeach-004",
+  "path": "trunk/scripts/generate.py",
+  "text": "[L164-L166,L190-L192] (MED/schema/integrity) Unrestricted dictionary update lets arbitrary JSON metadata overwrite parsed structural fields such as name, type, dimension, or rank."
+ },
+ {
+  "shard": "XBeach-004",
+  "path": "trunk/scripts/generate.py",
+  "text": "[L221-L225] (LOW/CLI/contract) Command-line template paths are reduced to basenames without validation, so the supplied directory is silently ignored and a same-named template from the fixed template directory is used."
+ },
+ {
+  "shard": "XBeach-004",
+  "path": "trunk/src/xbeachlibrary/templates/indextos.mako",
+  "text": "[L39-L43] (MED/code-generation/escaping) Definition strings are interpolated directly inside single-quoted Fortran literals without escaping embedded apostrophes, making a legitimate metadata value capable of producing malformed generated source."
+ },
+ {
+  "shard": "XBeach-005",
+  "path": "trunk/src/xbeachlibrary/templates/genmpi_coll.mako",
+  "text": "[L38-L55,L65-L83] (HIGH/rank-to-decomposition off-by-one) For source rank `i-1` the root uses decomposition entry `i-1`, and rank `ra` sends dimensions from entry `ra`; this conflicts with the shard's distribution template mapping rank `r` to entry `r+1`, so gathered blocks can use the preceding rank's extents, offsets, and boundary flags."
+ }
+]

@@ -1,0 +1,641 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-001",
+ "source_path": "trunk/src/xbeachlibrary/wave_boundary_update.f90",
+ "source_sha256": "9c364a2c916f034338044b542c0231f412553812a16c11346a6bcc98319a80c7",
+ "base_run_id": "xbeach-r1-XBeach-001-codex-01a05a5b-a17d-7cd0-8b9b-49a161c8810c",
+ "audit_run_id": "xbeach-r2-XBeach-001-codex-01a05aa6-f6db-7991-802e-4d57ae64a826",
+ "base_record_file": "3bded2ecbd44b8922c607a1b758ce1792497afdee98a3f0114dfd485c0611d5e.json",
+ "audit_record_file": "3bded2ecbd44b8922c607a1b758ce1792497afdee98a3f0114dfd485c0611d5e.json",
+ "base_record_sha256_bytes": "42e020a7ebbd4787e572d833513e756ba8f608990b55afde2eaf3fe4999c647c",
+ "audit_record_sha256_bytes": "940cf22ea501a3a80a010c6feb8e43f23cd9ecf754c958184e95dfdab5c52fe7",
+ "base_finding_count": 37,
+ "audit_finding_count": 24,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "[L208-L225, L729-L733, L1469-L1488] (LOW/pointer-target leak) Deallocating containers such as specin, specinterp, scaledspec, vargen, and combspec does not deallocate their pointer components, and tempSf and avgscale are also left allocated, causing repeated-generation memory growth."
+   ],
+   "audit_member_text": [
+    "[L208-L225,L1826-L1832] (MED/resource management) Cleanup deallocates pointer-containing spectrum/vargen parents without deallocating their pointed-to arrays, leaking allocations on each generated series."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A30"
+   ],
+   "audit_ids": [
+    "B19"
+   ],
+   "base_member_text": [
+    "[L2346-L2358] (HIGH/off-by-one/shape mismatch) The resampling branch queries (it-1)*dtbc for an output slot corresponding to (it-2)*dtbc, while the no-resampling branch assigns a tslen array into a tslenbc slice without ensuring equal extents."
+   ],
+   "audit_member_text": [
+    "[L2346-L2359] (HIGH/time-series indexing/shape) Interpolated samples use (it-1)*dtbc while storage time uses (it-2)*dtbc, and the no-interpolation whole-array assignment assumes tslen equals tslenbc although Kmin can make those extents differ."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A9"
+   ],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [
+    "[L861-L925, L1064-L1078, L1111-L1172, L1224-L1238] (MED/spectral-axis validation) Readers index the second direction element and pass frequency/direction axes onward without enforcing at least two bins and strict monotonic order, despite later integration and interpolation depending on those properties."
+   ],
+   "audit_member_text": [
+    "[L897-L962,L1124-L1172] (MED/bounds/input validation) SWAN and variance-density inputs index angle entries 1 and 2 without enforcing nang>=2."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A8",
+    "A10"
+   ],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [
+    "[L854-L881] (HIGH/unimplemented frequency conversion) SWAN relative-frequency input (RFREQ) is detected but the documented conversion to absolute frequency is a no-op marked STILL TO BE DONE.",
+    "[L1293-L1302, L1305-L1309, L1324-L1327] (HIGH/non-monotonic interpolation inconsistency) The code explicitly allows a non-monotonic input frequency axis but computes signed cell widths and passes that same axis to interpolation routines that require an ordered coordinate."
+   ],
+   "audit_member_text": [
+    "[L862-L881,L1293-L1309] (HIGH/spectrum-axis handling) The SWAN reader notes non-monotonic frequencies but performs only no-op conversion before integration and 2-D interpolation assume ordered absolute frequencies."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A31",
+    "A35"
+   ],
+   "audit_ids": [
+    "B22"
+   ],
+   "base_member_text": [
+    "[L2460-L2729] (HIGH/compile-time unresolved symbols) generate_qbcf uses undeclared s, tslenbc, and non-BUILDXBEACH interpolation symbols, preventing a valid build as written.",
+    "[L2693-L2697] (HIGH/allocation defect) qxbct is allocated twice while qybct is never allocated, so the second allocation fails and later qybct assignments target an unallocated array."
+   ],
+   "audit_member_text": [
+    "[L2693-L2698] (HIGH/allocation/build failure) Hydrostatic output uses undeclared tslenbc, allocates qxbct twice, and never allocates qybct before writing it."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A20"
+   ],
+   "audit_ids": [
+    "B13"
+   ],
+   "base_member_text": [
+    "[L1843-L1846] (HIGH/division by zero) Wave-train variance rescaling divides by hm0post without guarding a zero interpolated spectrum."
+   ],
+   "audit_member_text": [
+    "[L1843-L1846] (HIGH/numerical robustness) Variance is rescaled by (hm0/hm0post)^2 without guarding hm0post=0."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A14"
+   ],
+   "audit_ids": [
+    "B9"
+   ],
+   "base_member_text": [
+    "[L1515-L1520] (HIGH/incorrect dispersion formula) The nonhydrostatic frequency cutoff uses g*k*tanh(kh)/(2π) instead of sqrt(g*k*tanh(kh))/(2π), giving dimensionally and numerically incorrect cutoff frequencies."
+   ],
+   "audit_member_text": [
+    "[L1515-L1520] (HIGH/scientific formula) The nonhydrostatic cutoff frequency omits the square root from the dispersion relation, yielding dimensionally incorrect filtering."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1",
+    "A4"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L100-L108, L234-L235] (HIGH/undefined repeat duration) The repeatwbc branch never initializes local wp, yet the routine obtains the returned duration from wp%rtbc after that branch.",
+    "[L237-L238] (HIGH/administration state not persisted) The generator increments only the module shortcut bccount and never writes it back to waveSpectrumAdministration%bccount, so later calls continue to behave as the first boundary series."
+   ],
+   "audit_member_text": [
+    "[L100-L108,L234-L238] (HIGH/repeat-state contract) The repeatwbc path skips initialization of local wp but returns wp%rtbc, and bccount is incremented only in a local copy rather than written back to waveSpectrumAdministration."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A29"
+   ],
+   "audit_ids": [
+    "B18"
+   ],
+   "base_member_text": [
+    "[L2339-L2341] (HIGH/time-axis construction) Each loop iteration assigns one scalar time to the entire interior tbc slice, leaving all finite time entries equal to the last loop value."
+   ],
+   "audit_member_text": [
+    "[L2338-L2341] (HIGH/time-axis corruption) Each loop iteration assigns one scalar time to the entire internal tbc slice, leaving all finite time entries equal to the final loop value."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A15"
+   ],
+   "audit_ids": [
+    "B11"
+   ],
+   "base_member_text": [
+    "[L1587-L1619] (MED/CDF normalization) The directional PDF is normalized by its discrete sum but its trapezoidal CDF is not renormalized to end at one, so upper-tail random draws lie outside the constructed CDF range."
+   ],
+   "audit_member_text": [
+    "[L1587-L1606] (MED/sampling/CDF) Simple-sum PDF normalization followed by trapezoidal CDF accumulation leaves the final CDF below one, so some random draws fall outside the interpolation range."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A34"
+   ],
+   "audit_ids": [
+    "B21"
+   ],
+   "base_member_text": [
+    "[L2661-L2669] (HIGH/array-shape defect) Boundary unrolling multiplies K-shaped matrices by whole npb-length distx and disty arrays rather than distx(j) and disty(j), producing nonconformable shapes or unintended element mapping."
+   ],
+   "audit_member_text": [
+    "[L2638-L2664] (HIGH/array conformance) The per-point phase shift multiplies K-by-K matrices by whole npb-length distx/disty vectors instead of distx(j)/disty(j), producing nonconformable array expressions."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5",
+    "A7",
+    "A12"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "[L624-L671] (HIGH/invalid convergence arithmetic) The partition iteration explicitly permits scalefac1 to become zero and then divides by scalefac1 in its convergence metric, producing infinities or NaNs.",
+    "[L682-L719] (MED/invalid overlap diagnostic) A fully removed partition can make the peak-based ratio compute 0/0, and the resulting ratio-minus-one is then described as percent energy overlap even though it is a pointwise amplitude scaling.",
+    "[L1344-L1354, L1458-L1476, L1651-L1672] (MED/zero-energy handling) Wave direction, peak frequency, and representative-period calculations divide by spectral sums without guarding an all-zero or threshold-empty spectrum."
+   ],
+   "audit_member_text": [
+    "[L394,L528,L666-L671,L687-L688,L1459,L1476,L1662-L1672] (HIGH/numerical robustness) Zero-energy spectra and removed partitions reach unguarded divisions; in particular a zero scalefac1 can turn the overlap convergence metric into NaN and prevent its unbounded loop from terminating."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A21"
+   ],
+   "audit_ids": [
+    "B14"
+   ],
+   "base_member_text": [
+    "[L1932-L1952] (MED/unguarded spatial interpolation) Spatial spectrum interpolation neither rejects coincident spectrum positions nor guards sfnow=0 before rescaling by sfimp/sfnow."
+   ],
+   "audit_member_text": [
+    "[L1948-L1952] (MED/numerical robustness) Spatial spectrum interpolation rescales by sfimp/sfnow without guarding sfnow=0."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A22"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "[L197-L198, L2376-L2385] (HIGH/procedure interface mismatch) generate_swts is called with two arguments (wp,s) but is defined with only wp."
+   ],
+   "audit_member_text": [
+    "[L197,L2376] (HIGH/build failure) generate_swts is called with two arguments even though its explicit module procedure accepts only wp."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A36"
+   ],
+   "audit_ids": [
+    "B23"
+   ],
+   "base_member_text": [
+    "[L2698-L2712] (HIGH/off-by-one/shape mismatch) Long-wave resampling repeats the one-step time offset and unchecked tslen-to-tslenbc shape assignment used by the energy path."
+   ],
+   "audit_member_text": [
+    "[L2698-L2712] (HIGH/time-series indexing/shape) Flux interpolation repeats the one-step time offset, while direct assignments require q's tslen to conform to tslenbc."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A18"
+   ],
+   "audit_ids": [
+    "B12"
+   ],
+   "base_member_text": [
+    "[L1766-L1771] (LOW/off-by-one duration) wp%rtin is recorded as tslen*dtin while the generated time axis ends at (tslen-1)*dtin."
+   ],
+   "audit_member_text": [
+    "[L1766-L1771] (LOW/time-axis contract) rtin is recorded as tslen*dtin although tin ends at (tslen-1)*dtin."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A23",
+    "A24"
+   ],
+   "audit_ids": [
+    "B15"
+   ],
+   "base_member_text": [
+    "[L2035-L2137] (HIGH/compile-time/uninitialized directional grid) lntheta and ldtheta are never assigned before allocation and looping, wp%WDindex is used without allocation, and par_px is undeclared.",
+    "[L2079-L2096] (HIGH/out-of-bounds/wrong index) The wraparound-bin test uses binedges(i,...) where i is the wave-component index up to K rather than binedges(itheta,...), so it can read outside the directional-bin array and tests the wrong bin."
+   ],
+   "audit_member_text": [
+    "[L2035-L2085] (HIGH/uninitialized state/build failure) Direction distribution allocates with uninitialized lntheta, uses uninitialized ldtheta, never allocates WDindex, indexes binedges with wave index i instead of itheta, and references undefined par_px."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L73-L242] (HIGH/compile-time structural defects) The main generator references undeclared par, s, and bcfiles, assigns misspelled undeclared durantionlength, and contains an unmatched endif at line 240, so this routine cannot compile under implicit none."
+   ],
+   "audit_member_text": [
+    "[L73-L80,L234-L242] (HIGH/build failure) generate_wave_boundary_surfbeat assigns misspelled undeclared durantionlength and contains an unmatched endif, so the module cannot compile under implicit none."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A11"
+   ],
+   "audit_ids": [
+    "B8"
+   ],
+   "base_member_text": [
+    "[L1334-L1339] (HIGH/out-of-bounds indexing) The zero-directional-interpolation fallback indexes specin%S with the standard-grid index i, which can run to 801 even when the input spectrum has fewer frequency rows."
+   ],
+   "audit_member_text": [
+    "[L1324-L1340] (HIGH/indexing) When restoring a nonzero Sf into an empty interpolated bin, output-grid index i is used to index specin%S, which can exceed specin%nf and does not identify the corresponding input frequency."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A27"
+   ],
+   "audit_ids": [
+    "B17"
+   ],
+   "base_member_text": [
+    "[L2249-L2256] (HIGH/cross-point state overwrite) Inside the iy loop, a scalar elevation for point iy is assigned to the entire lastwaveelevation(:,itheta) vector, so each boundary point overwrites continuation state for all points."
+   ],
+   "audit_member_text": [
+    "[L2243-L2256] (HIGH/state corruption) Inside the iy loop, scalar zeta(iy,...) values are assigned to the entire lastwaveelevation(:,itheta) column, so every boundary point is repeatedly overwritten with one point's elevation."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L120-L142, L247-L330] (MED/multi-location consistency) Each spectrum location can overwrite the shared wp%rtbc and wp%dtbc, but no check requires all locations to use the same series duration and sampling interval."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L635-L676] (HIGH/spectral overlap logic) After zeroing all but the dominant partition in each overlapping spectral cell, the final assignment rebuilds every scaledspec from the full original partition, discarding the overlap mask."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A13"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L1361-L1375] (HIGH/compile-time unresolved symbol) set_repeatwbc references bcfiles without qualifying it through waveSpectrumAdministration or declaring a local alias."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A16"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L1618-L1619] (MED/angle normalization) MOD can return a negative generated direction, contradicting the stated 0<=theta<2π invariant."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A17"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L1697-L1713, L1534-L1549, L1761] (HIGH/empty-frequency-range handling) If no spectral bin survives the threshold and cutoff, frange returns coincident default indices, leading to dfgen=0 and subsequent division by dfgen."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A19"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L1795-L1805] (HIGH/compile-time unresolved symbol) generate_wave_time_axis assigns ind_end_taper even though that name is neither declared locally nor present in the datastore."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A25"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L2124] (MED/division by zero) The lost-energy percentage divides by lostvar+keptvar without a zero-total-energy guard."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A26"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L2142-L2369] (HIGH/compile-time unresolved symbols) generate_ebcf repeatedly uses undeclared ntheta, s, lastwaveelevation, and ind_end_taper instead of the available datastore-qualified fields."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A28"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L2285-L2295] (HIGH/division by zero) Directional envelope scaling divides by stdeta without handling a zero total excitation."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A32"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L2562-L2588] (HIGH/singular interaction coefficients) Difference-wave group velocity and interaction coefficients divide by k3 and a resonance denominator without masks for zero or near-zero values."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A33"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L2606-L2609] (HIGH/invalid complex logarithm) Phase is computed with log of Fourier coefficients that can be exactly zero for zero-amplitude components, propagating undefined phases into later complex products."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L127-L135,L315-L328] (MED/input validation) The instat select has no default, so an unsupported value leaves specin pointer components uninitialized before they are dereferenced."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B10"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L1578-L1619] (HIGH/conditional implementation) Without BUILDXBEACH the interpolation blocks are empty, leaving pdflocal and thetagen undefined while the routine continues to normalize and use them."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B16"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L2167-L2189,L2301-L2304] (HIGH/build failure) BUILDXBEACH logging references s%ntheta and s%ny in generate_ebcf although no s object is in scope."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B20"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L2500-L2516] (HIGH/build failure) generate_qbcf allocates q using s%ny even though no s object is declared or passed."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

@@ -1,0 +1,2720 @@
+{
+ "shard": "XBeach-002",
+ "instructions_ref": "see subagent prompt",
+ "files": [
+  {
+   "file_token": "F00",
+   "lang": ".F90",
+   "listX": [
+    {
+     "id": "F00-X0",
+     "text": "[L15-L39, L484-L485] (HIGH/pointer-state) Pointer components have no default NULL initialization, yet ASSOCIATED is called on fobs1 before any guaranteed association-status definition."
+    },
+    {
+     "id": "F00-X1",
+     "text": "[L80-L103] (HIGH/allocation-lifecycle) bwinit unconditionally allocates eight space-state arrays and provides no deallocation or already-allocated guard, so a repeated initialization fails."
+    },
+    {
+     "id": "F00-X2",
+     "text": "[L148-L166] (LOW/saved-shape-lifecycle) Saved Beach Wizard arrays are allocated only on first use and never resized or released, making reuse with a different grid shape unsafe."
+    },
+    {
+     "id": "F00-X3",
+     "text": "[L89-L100, L105-L115, L375-L379, L589-L604] (MED/MPI-contract) Only bwinit is explicitly master-only while assimilation and update routines have no matching rank guard, leaving non-master allocation and state-update requirements unclear."
+    },
+    {
+     "id": "F00-X4",
+     "text": "[L194-L225, L716, L744] (HIGH/uninitialized-uncertainty) When bwdefaults.inp is absent only scalar defaults are set, not the allocated sig arrays, and sigS is subsequently used even when no shoreline source caused it to be filled."
+    },
+    {
+     "id": "F00-X5",
+     "text": "[L207-L225, L494-L523] (MED/disabled-input) The uncertainty-map read path is entirely commented out and statuserr therefore remains zero, so configured fnameerr files are silently ignored."
+    },
+    {
+     "id": "F00-X6",
+     "text": "[L424-L441, L460-L463] (HIGH/array-bounds) The image schedule count is not constrained to the 1000-row arrays, and the time-advance loop can read itimnew+1 beyond the final slot."
+    },
+    {
+     "id": "F00-X7",
+     "text": "[L428-L446] (MED/library-termination) A missing assimilation information file executes STOP inside library code rather than returning a diagnosable error to the caller."
+    },
+    {
+     "id": "F00-X8",
+     "text": "[L475-L489, L585] (MED/I/O-error-path) Header-read errors jump past CLOSE, potentially leaking unit 31 and leaving partially replaced observation state."
+    },
+    {
+     "id": "F00-X9",
+     "text": "[L476-L487, L527-L548] (HIGH/input-validation/indexing) Observation-grid dimensions and spacings are used for allocation, division, MOD, and indices that assume nx and ny are at least three without validating positive dx, dy, nx, or ny."
+    },
+    {
+     "id": "F00-X10",
+     "text": "[L535-L557] (MED/spatial-extrapolation) All model points outside the observation footprint are clamped to an interior observation cell rather than marked missing, causing implicit constant extrapolation over the entire model domain."
+    },
+    {
+     "id": "F00-X11",
+     "text": "[L293-L339, L570-L574] (HIGH/wrong-destination) The wavenumber source is copied into cobs instead of kobs, after which uninitialized kobs values drive the celerity residual and uncertainty calculations."
+    },
+    {
+     "id": "F00-X12",
+     "text": "[L264-L335] (HIGH/numerical-domain) Celerity and wavenumber calculations divide by unchecked tradar, hh, rk, and rk plus sigK and are evaluated over dry cells before any wet-cell guard."
+    },
+    {
+     "id": "F00-X13",
+     "text": "[L279-L281, L308-L310] (MED/dimensional-consistency) The celerity formula adds dimensional Hrms directly to dimensionless rk times hh inside TANH, indicating an inconsistent or mistranscribed dispersion expression."
+    },
+    {
+     "id": "F00-X14",
+     "text": "[L254-L340, L733-L756] (HIGH/unused-assimilation-sources) Bathymetry, celerity, and wavenumber observations are read or converted, but the final observation variance and depth correction combine only dissipation and shoreline terms, so those advertised sources cannot affect assimilation."
+    },
+    {
+     "id": "F00-X15",
+     "text": "[L668-L682] (HIGH/nontermination/numerical-domain) The backward-distance loop divides by an unchecked average wavelength and has no progress guard, so zero or nonpositive dsc or L1 can make disfac invalid or leave backdis unchanged indefinitely."
+    },
+    {
+     "id": "F00-X16",
+     "text": "[L668-L686] (HIGH/one-dimensional-bounds) For ny equal to zero the h2 loop is empty and the subsequent assignments reference columns 2 and 0 of a one-column allocation."
+    },
+    {
+     "id": "F00-X17",
+     "text": "[L687-L706] (HIGH/singular-wave-derivative) Hb and dHbdh divide by k and by sinh(kh) times cosh(kh) plus kh without protecting the common zero-k or zero-kh limit."
+    },
+    {
+     "id": "F00-X18",
+     "text": "[L699, L753-L764] (HIGH/time-parameter-division) Assimilation divides by Trep, dt, and tstop without requiring these time parameters to be positive and nonzero."
+    },
+    {
+     "id": "F00-X19",
+     "text": "[L753-L756, L774] (HIGH/zero-denominator) The weighting and depth-correction formulas lack guards for zero combined variance and for the all-zero dDdh case, where the latter evaluates an explicit zero-over-zero."
+    },
+    {
+     "id": "F00-X20",
+     "text": "[L778-L791] (MED/update-limit-bypass) The dissipation-derived depth change is capped before the shoreline correction is added, allowing the final dassim applied to the bed to bypass the stated ten-percent depth limit."
+    },
+    {
+     "id": "F00-X21",
+     "text": "[L624-L662] (LOW/allocation-overhead) Local allocatable work arrays are tested for allocation and allocated on every call but automatically deallocate on return, making the guard ineffective and imposing repeated large allocation cost."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F00-Y0",
+     "text": "[L220-L224, L733-L756] (HIGH/uninitialized-state) When bwdefaults.inp is absent only the scalar defaults are assigned, so an absent shoreline source can leave bw%sigS uninitialized even though errS and sig2obs use it unconditionally."
+    },
+    {
+     "id": "F00-Y1",
+     "text": "[L293-L339, L570-L574] (HIGH/wrong-destination/uninitialized-data) Source 4 is documented and processed as observed wavenumber data but assim_rd stores it in bw%cobs rather than bw%kobs, after which bw%kobs is read without any visible initialization."
+    },
+    {
+     "id": "F00-Y2",
+     "text": "[L672-L682] (HIGH/nontermination) The backtracking loop has no guard for zero dsc or zero/invalid averaged L1, so disfac can be zero and backdis can fail to advance indefinitely."
+    },
+    {
+     "id": "F00-Y3",
+     "text": "[L272-L281, L301-L310] (MED/invalid-floating-point) The dispersion calculation divides by s%hh over every grid point before the wet-cell mask is tested, so zero-depth dry cells can produce division by zero or NaNs."
+    },
+    {
+     "id": "F00-Y4",
+     "text": "[L280-L281, L309-L310] (MED/dimensional-consistency) The celerity expression adds dimensional Hrms to dimensionless rk*s%hh inside tanh, making the implemented dispersion relation physically unclear."
+    },
+    {
+     "id": "F00-Y5",
+     "text": "[L431-L441, L460-L462] (MED/bounds-validation) ntimesnew is accepted without a 1..999 bound, while the time-advance loop always reads itimnew+1 and relies on a sentinel that cannot be placed safely for 1000 or more records."
+    },
+    {
+     "id": "F00-Y6",
+     "text": "[L494-L523, L578] (MED/disabled-input-contract) The entire uncertainty-file read path is commented out, leaving statuserr at zero even when fnameerr is supplied and causing configured observation-error maps to be silently ignored."
+    },
+    {
+     "id": "F00-Y7",
+     "text": "[L688-L705] (MED/singular-formula) Hb and its derivative divide by or evaluate singular hyperbolic ratios at s%k or kh without a positive lower bound, so zero-wavenumber cells can generate invalid values."
+    },
+    {
+     "id": "F00-Y8",
+     "text": "[L753-L756] (LOW/unclear-time-scaling) Nassim is computed as tstop/dt although the adjacent change note says it was changed to tstop/wavint, leaving the intended assimilation-count scaling contract contradictory."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F00-X4",
+     "F00-Y0"
+    ],
+    [
+     "F00-X5",
+     "F00-Y0"
+    ],
+    [
+     "F00-X5",
+     "F00-Y6"
+    ],
+    [
+     "F00-X6",
+     "F00-Y5"
+    ],
+    [
+     "F00-X7",
+     "F00-Y5"
+    ],
+    [
+     "F00-X8",
+     "F00-Y6"
+    ],
+    [
+     "F00-X9",
+     "F00-Y6"
+    ],
+    [
+     "F00-X11",
+     "F00-Y1"
+    ],
+    [
+     "F00-X11",
+     "F00-Y6"
+    ],
+    [
+     "F00-X12",
+     "F00-Y1"
+    ],
+    [
+     "F00-X13",
+     "F00-Y3"
+    ],
+    [
+     "F00-X13",
+     "F00-Y4"
+    ],
+    [
+     "F00-X14",
+     "F00-Y0"
+    ],
+    [
+     "F00-X14",
+     "F00-Y1"
+    ],
+    [
+     "F00-X14",
+     "F00-Y8"
+    ],
+    [
+     "F00-X15",
+     "F00-Y2"
+    ],
+    [
+     "F00-X15",
+     "F00-Y7"
+    ],
+    [
+     "F00-X16",
+     "F00-Y2"
+    ],
+    [
+     "F00-X16",
+     "F00-Y7"
+    ],
+    [
+     "F00-X17",
+     "F00-Y2"
+    ],
+    [
+     "F00-X17",
+     "F00-Y7"
+    ],
+    [
+     "F00-X18",
+     "F00-Y0"
+    ],
+    [
+     "F00-X18",
+     "F00-Y7"
+    ],
+    [
+     "F00-X18",
+     "F00-Y8"
+    ],
+    [
+     "F00-X19",
+     "F00-Y0"
+    ],
+    [
+     "F00-X19",
+     "F00-Y8"
+    ]
+   ]
+  },
+  {
+   "file_token": "F01",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F01-X0",
+     "text": "[L79-L86] (HIGH/uninitialized value) delta is assigned only when omega>0 but is used unconditionally at line 86, so a zero/nonpositive omega path consumes an undefined value."
+    },
+    {
+     "id": "F01-X1",
+     "text": "[L79,L96-L110,L129,L173-L188] (HIGH/division by zero) cw=omega/k is formed without guarding k, and several later divisions by omega or cw occur even though the preceding branch explicitly permits cw<=0."
+    },
+    {
+     "id": "F01-X2",
+     "text": "[L136-L145] (HIGH/uninitialized value) The first nonlinear iteration computes tbnw from dhdx and dhdy before either local variable has been initialized."
+    },
+    {
+     "id": "F01-X3",
+     "text": "[L147-L170] (MED/singular analytic formula) Derived denominators and logarithm arguments involving sigmas, sigs1, delta, and sigma0 are used without validating their ordering or separation, allowing singular or invalid evaluations for admissible-looking shallow/rough inputs."
+    },
+    {
+     "id": "F01-X4",
+     "text": "[L201-L203] (MED/error handling) Failure of a local profile iteration terminates the entire process with STOP instead of returning a recoverable status to this library routine's caller."
+    },
+    {
+     "id": "F01-X5",
+     "text": "[L209-L211,L319-L323] (MED/unchecked dimension contract) The implementation requires n>=2 (division by n-1 and references to sigz(2) and sigz(n-1)) but neither checks nor documents that precondition in the interface."
+    },
+    {
+     "id": "F01-X6",
+     "text": "[L311-L325] (LOW/floating-point singularity) The Rouse-profile expression is evaluated at sigz(n)=1 with a zero denominator whenever ast<1, relying on divide-by-zero/infinity behavior before the resulting endpoint weight is summed."
+    },
+    {
+     "id": "F01-X7",
+     "text": "[L334-L359] (LOW/interface contract) The internal stokes routine lacks IMPLICIT NONE and INTENT declarations, weakening compile-time detection of misspelled locals or unintended argument modification."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F01-Y0",
+     "text": "[L79-L86] (HIGH/uninitialized variable) delta is assigned only when omega>0 but is used unconditionally immediately afterward, so a nonpositive frequency reads undefined state."
+    },
+    {
+     "id": "F01-Y1",
+     "text": "[L76-L82,L96-L105] (HIGH/unchecked wave-number division) The phase speed omega/k is formed before either operand is validated, so zero k can fail before the later cw>0 branch provides any neutralization."
+    },
+    {
+     "id": "F01-Y2",
+     "text": "[L52,L132-L140] (HIGH/uninitialized iteration seed) dhdx and dhdy are read to form the first bottom-stress estimate before either variable has been assigned."
+    },
+    {
+     "id": "F01-Y3",
+     "text": "[L86-L88,L129-L131,L172-L188] (HIGH/unchecked singular denominator) The main profile formulas divide by h, omega, and cw outside their protective branches, so zero depth or frequency remains singular even when tauwav and Qw were zeroed."
+    },
+    {
+     "id": "F01-Y4",
+     "text": "[L147-L188,L217-L292] (MED/analytic-profile domain) The viscosity-profile construction takes multiple logarithms and divides by sigmas, sigs1, phis, and their differences without checking the required ordering or nonzero conditions; clipping delta to 0.5 can also undo its lower bound relative to sigma0."
+    },
+    {
+     "id": "F01-Y5",
+     "text": "[L59,L207-L212,L319-L323] (HIGH/layer-count bounds) The routine accepts arbitrary n but divides by n-1 and accesses sigz(2), requiring n>=2 without enforcing it."
+    },
+    {
+     "id": "F01-Y6",
+     "text": "[L75,L118-L120,L175-L179] (MED/model-constant inconsistency) Gravity is hard-coded as 9.81 inside a model that otherwise supplies physical parameters externally, so profiles can be inconsistent with a configured model gravity."
+    },
+    {
+     "id": "F01-Y7",
+     "text": "[L136-L203] (MED/library termination) Failure to converge within 30 iterations executes a bare STOP, terminating the whole host process rather than returning status through the library interface."
+    },
+    {
+     "id": "F01-Y8",
+     "text": "[L98-L102,L239-L251] (HIGH/Stokes-order inconsistency) The bottom Stokes velocity passes swglm as the order selector, for which the usual value 1 enters the third-order fallback, while the vertical profile is always generated with fixed order 2."
+    },
+    {
+     "id": "F01-Y9",
+     "text": "[L308-L326] (MED/Rouse-profile singularity) The sediment weighting divides by h and ast and evaluates a factor containing sigz-1 at the surface point, relying on floating-point infinities and unstated positive roughness/depth assumptions."
+    },
+    {
+     "id": "F01-Y10",
+     "text": "[L334-L355] (HIGH/Stokes-formula singularity) stokes checks only omega>0 while its second- and third-order formulas divide by k and powers of sinh(k*h), so zero k or depth remains singular."
+    },
+    {
+     "id": "F01-Y11",
+     "text": "[L76,L118-L124] (MED/fractional-power domain) Negative wave energy or breaking dissipation reaches square and cube roots without a local nonnegative-domain guard."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F01-X0",
+     "F01-Y0"
+    ],
+    [
+     "F01-X0",
+     "F01-Y1"
+    ],
+    [
+     "F01-X0",
+     "F01-Y3"
+    ],
+    [
+     "F01-X0",
+     "F01-Y6"
+    ],
+    [
+     "F01-X0",
+     "F01-Y11"
+    ],
+    [
+     "F01-X1",
+     "F01-Y0"
+    ],
+    [
+     "F01-X1",
+     "F01-Y1"
+    ],
+    [
+     "F01-X1",
+     "F01-Y2"
+    ],
+    [
+     "F01-X1",
+     "F01-Y3"
+    ],
+    [
+     "F01-X1",
+     "F01-Y4"
+    ],
+    [
+     "F01-X1",
+     "F01-Y6"
+    ],
+    [
+     "F01-X1",
+     "F01-Y8"
+    ],
+    [
+     "F01-X1",
+     "F01-Y11"
+    ],
+    [
+     "F01-X2",
+     "F01-Y2"
+    ],
+    [
+     "F01-X2",
+     "F01-Y3"
+    ],
+    [
+     "F01-X2",
+     "F01-Y4"
+    ],
+    [
+     "F01-X2",
+     "F01-Y7"
+    ],
+    [
+     "F01-X3",
+     "F01-Y3"
+    ],
+    [
+     "F01-X3",
+     "F01-Y4"
+    ],
+    [
+     "F01-X3",
+     "F01-Y6"
+    ],
+    [
+     "F01-X4",
+     "F01-Y5"
+    ],
+    [
+     "F01-X4",
+     "F01-Y7"
+    ],
+    [
+     "F01-X5",
+     "F01-Y4"
+    ],
+    [
+     "F01-X5",
+     "F01-Y5"
+    ],
+    [
+     "F01-X5",
+     "F01-Y7"
+    ],
+    [
+     "F01-X5",
+     "F01-Y9"
+    ],
+    [
+     "F01-X6",
+     "F01-Y5"
+    ],
+    [
+     "F01-X6",
+     "F01-Y9"
+    ],
+    [
+     "F01-X7",
+     "F01-Y10"
+    ]
+   ]
+  },
+  {
+   "file_token": "F02",
+   "lang": ".F90",
+   "listX": [
+    {
+     "id": "F02-X0",
+     "text": "[L22-L25,L86-L100] (HIGH/MPI initialization contract) Non-master ranks return before rainfallrate and the input arrays are allocated, while rainfall_update can subsequently interpolate into those components; this file only broadcasts the scalar constantRainfall flag."
+    },
+    {
+     "id": "F02-X1",
+     "text": "[L86-L92] (MED/initialization ordering) The sole initialization of constantRainfall on non-master ranks is conditional on rainfall_update first being called with t<=dt, leaving it undefined if the first update occurs later."
+    },
+    {
+     "id": "F02-X2",
+     "text": "[L36-L60,L92-L97] (MED/input-domain contract) The time-series path passes nrainfallrate and the file timestamps directly to LINEAR_INTERP without locally requiring at least a usable number of records or ordered, distinct times."
+    },
+    {
+     "id": "F02-X3",
+     "text": "[L41-L54] (LOW/file-error handling) The rainfall file open has no iostat check, and the read-error branches rely on report_file_read_error to terminate before partially filled arrays are used."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F02-Y0",
+     "text": "[L22-L25,L86-L92] (MED/MPI initialization contract) Only the master initializes constantRainfall, and workers receive it only when the first update satisfies t<=dt, so restart or nonstandard first-call timing can leave the worker flag undefined."
+    },
+    {
+     "id": "F02-Y1",
+     "text": "[L25,L31-L37,L66-L67] (LOW/reinitialization lifecycle) rainfall_init allocates all rainfall arrays unconditionally and provides no cleanup or already-allocated guard for a second initialization."
+    },
+    {
+     "id": "F02-Y2",
+     "text": "[L36-L60,L92-L97] (MED/unchecked interpolation input) The file-driven path passes nrainfallrate and timestamps directly to LINEAR_INTERP without checking that at least the required number of records exists or that times are ordered."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F02-X0",
+     "F02-Y0"
+    ],
+    [
+     "F02-X0",
+     "F02-Y1"
+    ],
+    [
+     "F02-X0",
+     "F02-Y2"
+    ],
+    [
+     "F02-X1",
+     "F02-Y0"
+    ],
+    [
+     "F02-X1",
+     "F02-Y2"
+    ],
+    [
+     "F02-X2",
+     "F02-Y0"
+    ],
+    [
+     "F02-X2",
+     "F02-Y1"
+    ],
+    [
+     "F02-X2",
+     "F02-Y2"
+    ],
+    [
+     "F02-X3",
+     "F02-Y1"
+    ],
+    [
+     "F02-X3",
+     "F02-Y2"
+    ]
+   ]
+  },
+  {
+   "file_token": "F03",
+   "lang": ".F90",
+   "listX": [
+    {
+     "id": "F03-X0",
+     "text": "[L35-L44, L53-L62] (HIGH/sentinel-overflow) In MPI mode a drifter outside every subdomain is stored near HUGE(real), but the next active call converts that sentinel with NINT before recognizing it as out of range, which can overflow the default integer."
+    },
+    {
+     "id": "F03-X1",
+     "text": "[L53-L62] (MED/distributed-state-consistency) MPI_MIN is applied independently to idrift and jdrift, so if different overlapping ranks produce the minima the reduced coordinate pair need not come from any single rank's drifter update."
+    },
+    {
+     "id": "F03-X2",
+     "text": "[L40-L51] (LOW/wetness-contract) The update checks only array-domain bounds and never the wet masks, leaving behavior over dry cells dependent on whatever values uu and vv carry there."
+    },
+    {
+     "id": "F03-X3",
+     "text": "[L31-L32] (LOW/endpoint-semantics) Strict time inequalities skip updates exactly at both configured drifter start and end times, an endpoint convention that is not documented locally."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F03-Y0",
+     "text": "[L35-L48] (MED/numerical-guard) Drifter displacement divides directly by local dsu and dnv without validating that either grid spacing is positive and nonzero."
+    },
+    {
+     "id": "F03-Y1",
+     "text": "[L41-L62] (HIGH/MPI-ownership/reduction) Every rank whose local index test succeeds advances the drifter, while idrift and jdrift are reduced independently with MPI_MIN, so overlapping ownership or differing local updates can select coordinates from different ranks and create a position no rank computed."
+    },
+    {
+     "id": "F03-Y2",
+     "text": "[L31-L32] (LOW/time-window) Strict start and end comparisons skip updates exactly at both configured activation times, leaving the endpoint semantics unclear and potentially losing a timestep."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F03-X0",
+     "F03-Y0"
+    ],
+    [
+     "F03-X0",
+     "F03-Y1"
+    ],
+    [
+     "F03-X0",
+     "F03-Y2"
+    ],
+    [
+     "F03-X1",
+     "F03-Y0"
+    ],
+    [
+     "F03-X1",
+     "F03-Y1"
+    ],
+    [
+     "F03-X2",
+     "F03-Y0"
+    ],
+    [
+     "F03-X2",
+     "F03-Y1"
+    ],
+    [
+     "F03-X3",
+     "F03-Y0"
+    ],
+    [
+     "F03-X3",
+     "F03-Y2"
+    ]
+   ]
+  },
+  {
+   "file_token": "F04",
+   "lang": ".F90",
+   "listX": [
+    {
+     "id": "F04-X0",
+     "text": "[L68-L165, L186-L273] (MED/selector-contract) Both bed-friction select blocks lack a default branch, so an unsupported selector leaves cfu and cfv unchanged or uninitialized without reporting an error."
+    },
+    {
+     "id": "F04-X1",
+     "text": "[L78-L80, L105-L106, L147-L148, L320-L327, L438-L460, L547-L568, L686-L688] (HIGH/allocation-lifecycle) Saved work arrays are allocated without a module teardown or shape check, and several initialization allocations are unguarded, so repeated initialization or reuse at another grid size can fail or retain incompatible storage."
+    },
+    {
+     "id": "F04-X2",
+     "text": "[L70-L72, L104-L164, L220-L272] (HIGH/numerical-domain) Chezy and White-Colebrook formulas divide by unchecked bed-friction or roughness coefficients and take logarithms derived from them, allowing zero or nonpositive input to produce invalid coefficients."
+    },
+    {
+     "id": "F04-X3",
+     "text": "[L196-L205] (HIGH/parameter-division) Dynamic Manning roughness divides by dstem and droot without requiring either configured length scale to be nonzero."
+    },
+    {
+     "id": "F04-X4",
+     "text": "[L208-L219, L248-L269] (MED/limit-inconsistency) Update-time friction omits the initialization-time mincf lower clamp, and the grain-size u branch uniquely hard-caps at 0.1 instead of maxcf, producing direction- and timestep-dependent bounds."
+    },
+    {
+     "id": "F04-X5",
+     "text": "[L357-L378, L398-L418] (HIGH/numerical-domain) The infiltration enhancement divides by cfu or cfv twice without a positive lower-bound guard, which is unsafe for zero-valued constant-friction configurations."
+    },
+    {
+     "id": "F04-X6",
+     "text": "[L365-L373, L406-L414] (LOW/zero-input-bias) Exactly zero infiltration is forced to a nonzero negative blphi and therefore a facbl slightly different from one, so the nominally absent process still adds shear."
+    },
+    {
+     "id": "F04-X7",
+     "text": "[L476-L483, L570-L587, L596, L611] (HIGH/time-scale-division) Acceleration models divide by Trep-derived smoothing and frequency scales and by saved dt without validating Trep and dt as positive."
+    },
+    {
+     "id": "F04-X8",
+     "text": "[L438-L460, L547-L568] (MED/shared-state-contract) The two acceleration implementations use the same allocation sentinel but allocate different array sets and initialize phirad only in one branch, so changing implementations during a process can expose unallocated or uninitialized saved state."
+    },
+    {
+     "id": "F04-X9",
+     "text": "[L701-L727] (MED/directional-bias) Using SIGN with zero velocity assigns positive turbulent bed shear at rest, introducing a fixed directional bias wherever kbl is positive."
+    },
+    {
+     "id": "F04-X10",
+     "text": "[L435, L450] (LOW/dead-allocation) The saved Fi array is allocated but never read or written after allocation."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F04-Y0",
+     "text": "[L196-L205] (MED/state-transition) After erosion sets isveggie false, subsequent calls fall through the unconditional elsewhere branch and can rebuild bedfriccoef from the original vegetated nman0, so the apparently permanent vegetation-removal state does not prevent roughness regrowth."
+    },
+    {
+     "id": "F04-Y1",
+     "text": "[L90-L103, L208-L219] (MED/inconsistent-clamping) Manning friction is clamped to both mincf and maxcf at initialization but only to maxcf during updates, allowing the advertised lower bound to be lost after the first update."
+    },
+    {
+     "id": "F04-Y2",
+     "text": "[L248-L259] (MED/directional-inconsistency) The grain-size White-Colebrook update hard-caps cfu at the literal 0.1 while cfv uses par%maxcf, creating an unexplained directional difference and bypassing the configured u-direction cap."
+    },
+    {
+     "id": "F04-Y3",
+     "text": "[L383-L397] (MED/boundary-value-inconsistency) For the last v row the interpolated infilb boundary is assigned directly from s%infil(:,s%ny) rather than copied from the adjacent interpolated v-point as done for the u boundary, producing an asymmetric boundary treatment."
+    },
+    {
+     "id": "F04-Y4",
+     "text": "[L198-L205] (LOW/division-precondition) Dynamic Manning roughness divides by dstem and droot with no local nonzero check, leaving its parameter contract implicit."
+    },
+    {
+     "id": "F04-Y5",
+     "text": "[L104-L164, L220-L272] (LOW/roughness-precondition) White-Colebrook formulas divide by kru/krv and take log10 without locally enforcing positive roughness heights, so validity depends entirely on upstream input constraints."
+    },
+    {
+     "id": "F04-Y6",
+     "text": "[L690-L727] (LOW/staggered-variable-contract) Turbulence stresses use the signs of s%ue and s%ve while neighboring bed-stress code uses s%ueu and s%vev, leaving the intended staggered velocity/sign convention unclear."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F04-X0",
+     "F04-Y5"
+    ],
+    [
+     "F04-X1",
+     "F04-Y1"
+    ],
+    [
+     "F04-X1",
+     "F04-Y5"
+    ],
+    [
+     "F04-X1",
+     "F04-Y6"
+    ],
+    [
+     "F04-X2",
+     "F04-Y1"
+    ],
+    [
+     "F04-X2",
+     "F04-Y5"
+    ],
+    [
+     "F04-X3",
+     "F04-Y0"
+    ],
+    [
+     "F04-X3",
+     "F04-Y1"
+    ],
+    [
+     "F04-X3",
+     "F04-Y4"
+    ],
+    [
+     "F04-X4",
+     "F04-Y0"
+    ],
+    [
+     "F04-X4",
+     "F04-Y1"
+    ],
+    [
+     "F04-X4",
+     "F04-Y2"
+    ],
+    [
+     "F04-X4",
+     "F04-Y4"
+    ],
+    [
+     "F04-X4",
+     "F04-Y5"
+    ],
+    [
+     "F04-X5",
+     "F04-Y3"
+    ],
+    [
+     "F04-X9",
+     "F04-Y6"
+    ]
+   ]
+  },
+  {
+   "file_token": "F05",
+   "lang": ".F90",
+   "listX": [
+    {
+     "id": "F05-X0",
+     "text": "[L135-L154,L223-L239] (HIGH/unchecked map index) Positive vegetation-map values are used directly as veg(ind) subscripts without checking ind<=nveg, so an out-of-range species code causes invalid access."
+    },
+    {
+     "id": "F05-X1",
+     "text": "[L135-L154] (MED/unsupported-option handling) The gridform select has no default branch, leaving vegtype uninitialized if an unsupported grid form reaches this routine."
+    },
+    {
+     "id": "F05-X2",
+     "text": "[L93-L128,L174-L221,L262-L301] (MED/lifecycle/allocation) veggie_init allocates all vegetation state without an existing-allocation or grid-shape guard, so repeated initialization is unsafe."
+    },
+    {
+     "id": "F05-X3",
+     "text": "[L180-L185,L325-L330] (LOW/unreachable option) The automatic bulk-drag path requires Cdveg<0, but initialization constrains every input Cd to the nonnegative range, making that documented path unreachable through this reader."
+    },
+    {
+     "id": "F05-X4",
+     "text": "[L54,L180,L377-L392,L487-L490] (HIGH/vertical-section convention) swvegatt cumulatively adds each ah value as a layer thickness, while momeqveg treats each ah value as an absolute section height corrected by bed change, so the same vegetation profile has incompatible vertical interpretations."
+    },
+    {
+     "id": "F05-X5",
+     "text": "[L370-L399] (HIGH/dry-cell/singular wave calculation) Short-wave vegetation dissipation is evaluated without a wet mask and divides by sigm, while its hyperbolic terms use raw hh, allowing dry or zero-frequency cells to generate invalid values."
+    },
+    {
+     "id": "F05-X6",
+     "text": "[L420-L473,L492-L527] (HIGH/uninitialized saved state) totT is initialized only when t equals dt exactly; otherwise the nonlinear branch tests an undefined saved value and may read the still-unallocated unl and etaw arrays."
+    },
+    {
+     "id": "F05-X7",
+     "text": "[L436-L440,L579-L619,L798-L810] (MED/saved-workspace shape) Saved vegetation work arrays are allocated only on their first call and never checked against later grid dimensions."
+    },
+    {
+     "id": "F05-X8",
+     "text": "[L502-L510,L534-L556] (HIGH/stale section force) The above-wave-crest branch zeros the mean and nonlinear forces but not FvgCau/FvgCav, so enabling vegcanflo can reuse a canopy force from the previous section or cell."
+    },
+    {
+     "id": "F05-X9",
+     "text": "[L525-L536] (HIGH/dry-depth division) Nonlinear and in-canopy force terms divide by raw hh for every vegetated cell without a wet or positive-depth guard."
+    },
+    {
+     "id": "F05-X10",
+     "text": "[L621-L641] (HIGH/whole-array dry-depth division) swvegnonlin divides whole-domain arrays by hh and hh**3 before any wet-cell restriction, including in its Ursell-number and lookup-coordinate calculations."
+    },
+    {
+     "id": "F05-X11",
+     "text": "[L527,L686-L699] (MED/periodic integration) trapz integrates only 49 intervals for the 50-point periodic profile while the caller supplies Trep/50 spacing, omitting the closing interval from the last sample back to the first."
+    },
+    {
+     "id": "F05-X12",
+     "text": "[L730-L769] (MED/unchecked singular denominator) bulkdragcoeff divides by sigm, sinh(k*hh), bveg, and alfav**0.76 without local guards, despite being callable with bed-adjusted plant height and shallow wave state."
+    },
+    {
+     "id": "F05-X13",
+     "text": "[L868-L882] (MED/partial output assignment) porcanflow overwrites vegetation forces only on interior staggered-loop bounds, leaving the remaining boundary entries dependent on initialization or prior calls."
+    },
+    {
+     "id": "F05-X14",
+     "text": "[L109-L113] (LOW/file-error handling) The species-list read records iostat but never checks it before the names are used as filenames."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F05-Y0",
+     "text": "[L103-L112] (MED/input error handling) Species-name reads record iostat in ier but never inspect it, so a short or malformed species list can leave names undefined and fail later in a misleading way."
+    },
+    {
+     "id": "F05-Y1",
+     "text": "[L138-L153,L223-L239] (HIGH/unchecked input index) Spatial vegtype values are never checked against 0..par%nveg before being used as veg(ind), so an oversized map value causes out-of-bounds species access."
+    },
+    {
+     "id": "F05-Y2",
+     "text": "[L379,L489,L543-L544] (MED/inconsistent vertical-section semantics) swvegatt treats each ahveg value as a thickness by adding ahtold, while momeqveg treats it as an absolute section height and only stores ahtold afterward, producing inconsistent layer geometry for multi-section vegetation."
+    },
+    {
+     "id": "F05-Y3",
+     "text": "[L420,L459-L473,L493-L496] (HIGH/uninitialized persistent state) Saved totT is initialized only when floating-point par%dt exactly equals par%t; otherwise its first comparison is undefined and can lead to use of unallocated unl/etaw arrays."
+    },
+    {
+     "id": "F05-Y4",
+     "text": "[L421-L424,L436-L440,L604-L619,L798-L810] (LOW/state/dimension lifecycle) Several saved allocatable work arrays are allocated only once and never resized, so reuse with a changed grid shape retains incompatible bounds."
+    },
+    {
+     "id": "F05-Y5",
+     "text": "[L502-L557] (HIGH/stale per-layer state) When a vegetation section lies wholly above the wave crest, FvgCau and FvgCav are not reset, yet vegcanflo can still add their values from a preceding section or cell."
+    },
+    {
+     "id": "F05-Y6",
+     "text": "[L525-L536] (HIGH/dry-cell division) Nonlinear and canopy-wave forces divide by s%hh for every vegetated cell without a wet-cell guard, so dry vegetated points can generate division-by-zero or NaN values."
+    },
+    {
+     "id": "F05-Y7",
+     "text": "[L621-L622,L637-L641,L648-L680] (HIGH/dry-cell invalid arithmetic) swvegnonlin divides by s%hh and takes sqrt(g/s%hh) over the entire grid with no wet mask, making zero-depth cells feed infinities/NaNs into table interpolation and output profiles."
+    },
+    {
+     "id": "F05-Y8",
+     "text": "[L731-L769] (MED/unchecked physical denominator) bulkdragcoeff divides by sigm, hh, sinh(k*hh), bveg, and alfav powers without guarding calm, dry, zero-height, or zero-width cases."
+    },
+    {
+     "id": "F05-Y9",
+     "text": "[L863-L865] (LOW/stale force state) porcanflow deliberately leaves Fcanu/Fcanv unchanged in non-canopy cells, so any runtime change from canopy to non-canopy would retain the prior canopy force."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F05-X0",
+     "F05-Y1"
+    ],
+    [
+     "F05-X1",
+     "F05-Y1"
+    ],
+    [
+     "F05-X2",
+     "F05-Y1"
+    ],
+    [
+     "F05-X4",
+     "F05-Y2"
+    ],
+    [
+     "F05-X4",
+     "F05-Y3"
+    ],
+    [
+     "F05-X5",
+     "F05-Y6"
+    ],
+    [
+     "F05-X6",
+     "F05-Y2"
+    ],
+    [
+     "F05-X6",
+     "F05-Y3"
+    ],
+    [
+     "F05-X6",
+     "F05-Y4"
+    ],
+    [
+     "F05-X6",
+     "F05-Y6"
+    ],
+    [
+     "F05-X7",
+     "F05-Y4"
+    ],
+    [
+     "F05-X7",
+     "F05-Y7"
+    ],
+    [
+     "F05-X8",
+     "F05-Y3"
+    ],
+    [
+     "F05-X8",
+     "F05-Y5"
+    ],
+    [
+     "F05-X8",
+     "F05-Y6"
+    ],
+    [
+     "F05-X9",
+     "F05-Y6"
+    ],
+    [
+     "F05-X10",
+     "F05-Y4"
+    ],
+    [
+     "F05-X10",
+     "F05-Y7"
+    ],
+    [
+     "F05-X11",
+     "F05-Y6"
+    ],
+    [
+     "F05-X11",
+     "F05-Y7"
+    ],
+    [
+     "F05-X12",
+     "F05-Y8"
+    ],
+    [
+     "F05-X13",
+     "F05-Y9"
+    ],
+    [
+     "F05-X14",
+     "F05-Y0"
+    ]
+   ]
+  },
+  {
+   "file_token": "F06",
+   "lang": ".F90",
+   "listX": [
+    {
+     "id": "F06-X0",
+     "text": "[L32-L35,L195-L198] (LOW/diagnostic accounting) itmin starts at zero and is updated with min(it,itmin), so its reported minimum can never become a positive observed iteration count."
+    },
+    {
+     "id": "F06-X1",
+     "text": "[L113-L121,L186-L216] (MED/solver selection contract) solver_init marks the module initialized even when par%solver matches neither supported branch, after which solver_solvemat silently performs no solve."
+    },
+    {
+     "id": "F06-X2",
+     "text": "[L130-L136,L186-L193] (HIGH/lifecycle/use-after-free) solver_free deallocates the work arrays but does not reset initialized, so a subsequent solve skips reinitialization and accesses unallocated residual/work storage."
+    },
+    {
+     "id": "F06-X3",
+     "text": "[L109-L121,L186-L216] (MED/state/configuration lifecycle) Solver settings and array dimensions are captured only on the first initialization, with no protection against a later call using changed nx, ny, solver choice, or solver parameters."
+    },
+    {
+     "id": "F06-X4",
+     "text": "[L285-L299] (MED/unchecked zero pivot) The Thomas solver divides by each pivot while the normal caller omits fixshallow, so zero or near-zero pivots are not guarded."
+    },
+    {
+     "id": "F06-X5",
+     "text": "[L427-L460,L467-L510] (MED/false nonconvergence) For bnorm=0 the convergence threshold is exactly zero and the strict rnorm<epslin test can never pass even for an exact zero residual, forcing maxit iterations and recording nonconvergence."
+    },
+    {
+     "id": "F06-X6",
+     "text": "[L430-L442] (MED/unchecked factorization denominator) SIP divides by 1+p1, 1+p2, and p3 without finite/near-zero checks; adding a fixed 1e-15 only to p3 does not protect the first two denominators or scale with the matrix."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F06-Y0",
+     "text": "[L30,L113-L121,L130-L136,L186-L193] (HIGH/lifecycle state) solver_free deallocates the work arrays but never resets initialized, so a later solve skips solver_init and uses deallocated storage."
+    },
+    {
+     "id": "F06-Y1",
+     "text": "[L109-L121,L186-L216] (MED/configuration lifecycle) Solver parameters and workspace shape are captured only on the first initialization; repeated initialization can double-allocate, while later solves with changed dimensions or parameters silently reuse the old state."
+    },
+    {
+     "id": "F06-Y2",
+     "text": "[L32-L38,L195-L201] (LOW/diagnostic accounting) itmin starts at zero and is updated with min(it,itmin), so the reported minimum iteration count can never become positive."
+    },
+    {
+     "id": "F06-Y3",
+     "text": "[L113-L121,L188-L216] (MED/unsupported-option handling) An unrecognized solver value still marks the module initialized, and solver_solvemat then takes no branch and returns the input x unchanged without an error."
+    },
+    {
+     "id": "F06-Y4",
+     "text": "[L285-L299] (HIGH/singular pivot) The Thomas solver divides by each pivot with no protection in its normal caller; the optional fix is not passed, and even when enabled it only catches values below machine tiny rather than numerically small pivots."
+    },
+    {
+     "id": "F06-Y5",
+     "text": "[L430-L442] (MED/singular factorization) The SIP factorization divides by 1+p1, 1+p2, and p3 without singularity checks; adding a fixed small value to p3 does not prevent exact or near cancellation."
+    },
+    {
+     "id": "F06-Y6",
+     "text": "[L427-L460,L467-L510] (MED/zero-right-hand-side convergence) When bnorm is zero, epslin remains exactly zero and the strict rnorm<epslin test cannot succeed even for an exactly zero residual, forcing all maxit iterations."
+    },
+    {
+     "id": "F06-Y7",
+     "text": "[L404-L420,L472-L500] (HIGH/MPI loop-bound inconsistency) Under MPI the factorization and forward sweep use the reduced local imin/imax/jmin/jmax bounds, but backward substitution always sweeps 2:nx and 2:ny, including cells whose factors and residuals were not produced in that iteration."
+    },
+    {
+     "id": "F06-Y8",
+     "text": "[L39-L41,L109-L111,L393-L397] (LOW/parameter-domain contract) The documented SIP stability range for alpha and positive accuracy/iteration settings is not enforced locally before those values control factorization and termination."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F06-X0",
+     "F06-Y0"
+    ],
+    [
+     "F06-X0",
+     "F06-Y2"
+    ],
+    [
+     "F06-X0",
+     "F06-Y8"
+    ],
+    [
+     "F06-X1",
+     "F06-Y0"
+    ],
+    [
+     "F06-X1",
+     "F06-Y1"
+    ],
+    [
+     "F06-X1",
+     "F06-Y3"
+    ],
+    [
+     "F06-X1",
+     "F06-Y8"
+    ],
+    [
+     "F06-X2",
+     "F06-Y0"
+    ],
+    [
+     "F06-X2",
+     "F06-Y1"
+    ],
+    [
+     "F06-X2",
+     "F06-Y2"
+    ],
+    [
+     "F06-X2",
+     "F06-Y3"
+    ],
+    [
+     "F06-X3",
+     "F06-Y0"
+    ],
+    [
+     "F06-X3",
+     "F06-Y1"
+    ],
+    [
+     "F06-X3",
+     "F06-Y3"
+    ],
+    [
+     "F06-X3",
+     "F06-Y8"
+    ],
+    [
+     "F06-X4",
+     "F06-Y4"
+    ],
+    [
+     "F06-X5",
+     "F06-Y5"
+    ],
+    [
+     "F06-X5",
+     "F06-Y6"
+    ],
+    [
+     "F06-X5",
+     "F06-Y7"
+    ],
+    [
+     "F06-X6",
+     "F06-Y5"
+    ],
+    [
+     "F06-X6",
+     "F06-Y6"
+    ]
+   ]
+  },
+  {
+   "file_token": "F07",
+   "lang": ".F90",
+   "listX": [
+    {
+     "id": "F07-X0",
+     "text": "[L74-L122,L635-L656,L645-L652,L767-L771] (MED/state/configuration lifecycle) Old-state arrays are allocated only if second-order or nonhydrostatic mode is active on the first call, so enabling either mode later accesses unallocated storage; all saved work arrays also retain the first grid shape."
+    },
+    {
+     "id": "F07-X1",
+     "text": "[L365-L369,L471-L478,L593-L617] (MED/stale disabled-viscosity component) The viscosity-off branch clears nuh and viscu but not viscv, so a runtime transition from enabled to disabled viscosity leaves the prior V-viscous acceleration active."
+    },
+    {
+     "id": "F07-X2",
+     "text": "[L512-L526] (HIGH/wrong wet-mask component) The Smagorinsky cross-stress mask for V momentum multiplies three wetu values but uses wetv(i-1,j) for the fourth point, inconsistent with the U-velocity stencil."
+    },
+    {
+     "id": "F07-X3",
+     "text": "[L621-L627] (MED/boundary-condition mapping) The physical left boundary passes par%right to flow_lat_bc while the physical right boundary passes par%left, an unexplained reversal of boundary configuration."
+    },
+    {
+     "id": "F07-X4",
+     "text": "[L776-L794,L805-L853,L866-L936] (HIGH/stale interpolation boundaries) Multiple cell/face interpolants (vu, vsu, usu, uv, vsv, usv, ue, and ve) leave MPI-internal halo rows/columns or nx+1/ny+1 edges unset, as the inline comments acknowledge, yet whole-array velocity magnitudes consume them."
+    },
+    {
+     "id": "F07-X5",
+     "text": "[L956-L972] (MED/singular profile inputs) The vertical-profile call derives ks using sqrt(g/cfu) without ensuring positive cfu and passes potentially zero sigm/k values into a routine that divides by both."
+    },
+    {
+     "id": "F07-X6",
+     "text": "[L1046-L1063] (MED/boundary stencil contract) The 2-D Smagorinsky stencil reads i±1 and j±1 at generic computational bounds under an explicit MPI-warning comment, without local bounds/halo validation."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F07-Y0",
+     "text": "[L618-L627] (HIGH/boundary-condition-selection) The left global boundary calls flow_lat_bc with par%right while the right global boundary passes par%left, apparently swapping the configured lateral boundary types."
+    },
+    {
+     "id": "F07-Y1",
+     "text": "[L866-L876, L956-L985] (HIGH/unassigned-boundary-state) s%ue at i=nx+1 and, in 2-D, s%ve at j=ny+1 are not assigned, yet the vertical-profile loop consumes both arrays over 1:nx+1 and 1:ny+1, so wet edge cells can use initialization-era or stale velocities."
+    },
+    {
+     "id": "F07-Y2",
+     "text": "[L805-L853, L877-L934] (MED/partial-array-update) Several staggered interpolants (vu/vsu/usu and uv/vsv/usv) update only interior slices and explicitly leave some process-edge rows or columns unresolved; multiplying by a wet mask does not refresh previously wet, still-wet omitted entries."
+    },
+    {
+     "id": "F07-Y3",
+     "text": "[L512-L525] (MED/mask-typo) The Smagorinsky cross-stress dudy term for v uses wetv(i-1,j) as its fourth mask while the other three factors and the differentiated field are u-point quantities, suggesting one wetv should be wetu."
+    },
+    {
+     "id": "F07-Y4",
+     "text": "[L660-L719] (MED/positivity-preservation) hu and hv are clamped nonnegative before flow_secondorder_huhv, but the second-order correction can subtract from them and there is no subsequent positivity clamp before forming qx and qy."
+    },
+    {
+     "id": "F07-Y5",
+     "text": "[L365-L369, L469-L530, L593-L615] (MED/stale-disabled-term) When viscosity is disabled the code zeros nuh and viscu but not viscv, so a reused state that changes viscosity mode can retain the previous y-momentum viscous acceleration."
+    },
+    {
+     "id": "F07-Y6",
+     "text": "[L74-L92, L767-L771] (MED/conditional-allocation) Old-state arrays are allocated only if second-order or nonhydrostatic mode is active on the first call; because later allocation is gated by vsu, enabling either mode on a reused instance would access unallocated uu_old, vv_old, and zs_old."
+    },
+    {
+     "id": "F07-Y7",
+     "text": "[L74-L122] (LOW/lifecycle-contract) All saved work arrays and bed-roughness initialization are keyed to a one-time allocation test with no grid-shape or parameter-change check, making reinitialization semantics implicit."
+    },
+    {
+     "id": "F07-Y8",
+     "text": "[L721-L722] (LOW/staggering-contract) qmag combines qx and qy elementwise even though they are stored at different staggered locations, so the stated output magnitude lacks an explicit interpolation convention."
+    },
+    {
+     "id": "F07-Y9",
+     "text": "[L956-L972] (LOW/roughness-location-contract) The cell-centered vertical-profile call derives ks directly from u-point cfu(i,j) without documenting interpolation or guarding the positive-friction prerequisite."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F07-X0",
+     "F07-Y4"
+    ],
+    [
+     "F07-X0",
+     "F07-Y6"
+    ],
+    [
+     "F07-X0",
+     "F07-Y7"
+    ],
+    [
+     "F07-X1",
+     "F07-Y0"
+    ],
+    [
+     "F07-X1",
+     "F07-Y5"
+    ],
+    [
+     "F07-X2",
+     "F07-Y3"
+    ],
+    [
+     "F07-X2",
+     "F07-Y5"
+    ],
+    [
+     "F07-X3",
+     "F07-Y0"
+    ],
+    [
+     "F07-X3",
+     "F07-Y5"
+    ],
+    [
+     "F07-X4",
+     "F07-Y1"
+    ],
+    [
+     "F07-X4",
+     "F07-Y2"
+    ],
+    [
+     "F07-X4",
+     "F07-Y6"
+    ],
+    [
+     "F07-X5",
+     "F07-Y1"
+    ],
+    [
+     "F07-X5",
+     "F07-Y9"
+    ]
+   ]
+  },
+  {
+   "file_token": "F08",
+   "lang": ".F90",
+   "listX": [
+    {
+     "id": "F08-X0",
+     "text": "[L49] (LOW/state/dimension lifecycle) The saved work array weteb is allocated only on the first call and is never resized, so a later call with different s%nx/s%ny would use stale bounds."
+    },
+    {
+     "id": "F08-X1",
+     "text": "[L51-L71,L82-L92] (MED/parallel halo consistency) The source explicitly notes that boundary hu/hum and hv/hvm values require MPI neighbor communication, but no communication is performed here before those values drive wet/dry masks."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F08-Y0",
+     "text": "[L46-L49] (MED/saved-workspace shape) weteb is allocated only on its first call and is not checked against later grid dimensions."
+    },
+    {
+     "id": "F08-Y1",
+     "text": "[L51-L71,L82-L92] (MED/MPI halo contract) The comments identify required cross-rank communication for hu/hum and hv/hvm, but this routine performs none before using the terminal rows and columns to set wet masks."
+    },
+    {
+     "id": "F08-Y2",
+     "text": "[L124-L129] (LOW/scheme fallback) Every scheme value other than SCHEME_UPWIND_1 silently receives an upwind distance of two, leaving unsupported or newly added scheme values indistinguishable."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F08-X0",
+     "F08-Y0"
+    ],
+    [
+     "F08-X0",
+     "F08-Y1"
+    ],
+    [
+     "F08-X1",
+     "F08-Y0"
+    ],
+    [
+     "F08-X1",
+     "F08-Y1"
+    ]
+   ]
+  },
+  {
+   "file_token": "F09",
+   "lang": ".F90",
+   "listX": [
+    {
+     "id": "F09-X0",
+     "text": "[L70-L138,L619-L630,L1218-L1226,L1361-L1433,L1886-L1942,L2536-L2619,L2863-L2871,L3013-L3030,L3086-L3095,L3183-L3187,L3235-L3238] (LOW/state/dimension lifecycle) Many saved work arrays are allocated only on first use and never resized or reconfigured, so changed grid, grain, layer, or formulation settings in a later lifecycle retain incompatible state."
+    },
+    {
+     "id": "F09-X1",
+     "text": "[L225-L237] (HIGH/uninitialized boundary values) With nz>1, ueu_sed and veu_sed are filled only through nx, while whole-array velocity magnitudes immediately consume their nx+1 boundary; non-bottom MPI ranks do not initialize that boundary."
+    },
+    {
+     "id": "F09-X2",
+     "text": "[L290-L307] (HIGH/nonconformable array assignment) At the right MPI boundary, uev_sed(:,1:ny+1)=uev_sed(:,1:ny) assigns arrays with different extents instead of assigning only the final column."
+    },
+    {
+     "id": "F09-X3",
+     "text": "[L360-L366] (HIGH/dry-face division) The Surfbeat berm-slope mask evaluates H/hu across the full grid without a wet or positive-depth guard."
+    },
+    {
+     "id": "F09-X4",
+     "text": "[L411-L420] (MED/boolean precedence) The bed-slope magnitude condition applies the non-berm mask only to the Svb alternative, so any nontrivial Sub is modified even where bermslopeindexbed is true."
+    },
+    {
+     "id": "F09-X5",
+     "text": "[L437-L453] (MED/angle/quadrant handling) Talmon direction calculations use atan of component ratios rather than atan2, including a possible zero denominator and loss of the correct quadrant for the adjusted transport direction."
+    },
+    {
+     "id": "F09-X6",
+     "text": "[L464-L490] (HIGH/uninitialized boundary multiplier) pbbedu(nx+1,:) and pbbedv(:,ny+1) are never assigned before whole-array multiplication into Sub/Svb, so boundary transports can consume undefined values even when a zero transport is expected."
+    },
+    {
+     "id": "F09-X7",
+     "text": "[L494-L531] (MED/unchecked relaxation/depth denominator) Concentration updates divide by Tsg, dt, and hh without explicit positivity checks at the addressed cells."
+    },
+    {
+     "id": "F09-X8",
+     "text": "[L817-L830] (HIGH/unit/time-scale inconsistency) Groundwater coupling adds accretion exchange to infil as depth divided by dt, but erosion exchange is added without dividing by dt."
+    },
+    {
+     "id": "F09-X9",
+     "text": "[L968-L988,L1073-L1093] (HIGH/layer-bound overrun and double calibration) Avalanche erosion searches depth layers without an nd bound, and deposition multiplies edg2 by sedcal a second time, applying sedcal squared and potentially failing mass conservation."
+    },
+    {
+     "id": "F09-X10",
+     "text": "[L1171-L1177] (HIGH/missing spatial indexing) D50top and D90top are assigned as whole arrays inside the i,j loops, so every iteration overwrites the entire field and the final cell's mixture becomes global."
+    },
+    {
+     "id": "F09-X11",
+     "text": "[L1218-L1226] (HIGH/heterogeneous-layer bounds) update_fractions sizes scratch arrays from s%nd(1,1) but indexes them using each target cell's nd and par%nd_var, which can overrun when layer counts vary spatially."
+    },
+    {
+     "id": "F09-X12",
+     "text": "[L1234-L1240] (HIGH/nonterminating exact-residual loop) The fraction update loops until a floating residual is exactly zero and can make zero progress when a limiting layer thickness is zero, with no tolerance or iteration cap."
+    },
+    {
+     "id": "F09-X13",
+     "text": "[L1416-L1424,L1508-L1513] (MED/singular grain/fall-velocity input) Zero or invalid grain size/fall velocity can enter negative powers and divisions when computing Sster, ws, and adaptation time."
+    },
+    {
+     "id": "F09-X14",
+     "text": "[L1475-L1483] (MED/unchecked period/depth index) Bore turbulence divides by Tbore and the runup jet indexes nint(istruct) and divides by local hh without bounds or positive-value checks."
+    },
+    {
+     "id": "F09-X15",
+     "text": "[L1593-L1599] (MED/inconsistent dilatancy scaling) Suspended-load critical velocity uses Ucr*(1+sqrt(srfRhee)) while bed load uses Ucr*sqrt(1+srfRhee), an unexplained nonlinear inconsistency for the same Shields correction."
+    },
+    {
+     "id": "F09-X16",
+     "text": "[L1672-L1680] (HIGH/zero/negative transport velocity) Van Rijn bed load gates on ue>Ucrb but then divides by used=vmg+ua, which can be zero or negative independently and produce invalid or sign-reversed concentration."
+    },
+    {
+     "id": "F09-X17",
+     "text": "[L1752-L1756] (MED/unchecked vertical resolution) The concentration grid divides by kmax-1 and therefore requires kmax>=2 without checking that contract."
+    },
+    {
+     "id": "F09-X18",
+     "text": "[L1886-L1915] (HIGH/unallocated optional work array) Nielsen2006 allocates fe only when streaming==1 but assigns fe=0 unconditionally, so streaming-disabled initialization accesses an unallocated allocatable array."
+    },
+    {
+     "id": "F09-X19",
+     "text": "[L2094-L2103,L2778-L2785] (HIGH/wrong boundary source index) After the smoothing loop, both transport routines set the top boundary from qsedu(i,:) where loop variable i has advanced to nx+1, copying the opposite boundary rather than qsedu(1,:)."
+    },
+    {
+     "id": "F09-X20",
+     "text": "[L2185-L2198] (HIGH/relative-density formula) intra_sedtr defines ratio_s=(rhos-rho)/rho and then uses ratio_s-1 in dstar, subtracting unity twice relative to the submerged-density ratio used elsewhere."
+    },
+    {
+     "id": "F09-X21",
+     "text": "[L2282-L2303] (HIGH/unguarded concentration division/stale output) ceqbg is formed by dividing bed transport by hh*uu before the low-shear mask is applied, and the bed-disabled branch clears Subg but not ceqbg."
+    },
+    {
+     "id": "F09-X22",
+     "text": "[L2321-L2327] (HIGH/wrong directional condition) The negative y-slope Nielsen branch tests dzbdx<0 instead of dzbdy<0, so many negative y slopes bypass correction."
+    },
+    {
+     "id": "F09-X23",
+     "text": "[L2431-L2473] (HIGH/singular concentration integration) Suspended concentration divides by hh-za and hh without ensuring water depth exceeds the reference height or is positive."
+    },
+    {
+     "id": "F09-X24",
+     "text": "[L2800-L2807] (HIGH/unguarded bulk concentration division) Bulk McCall-Van Rijn concentration divides qsedu by hu*uu over the whole grid, including dry faces and zero-flow wet faces."
+    },
+    {
+     "id": "F09-X25",
+     "text": "[L2918-L2926] (HIGH/self-referential stale interpolation) At zero V velocity, kturbv is averaged from kturbv itself rather than from s%kturb, reusing stale work-array values instead of the neighboring turbulence field."
+    },
+    {
+     "id": "F09-X26",
+     "text": "[L2943-L2956] (HIGH/uninitialized sink term) In 2-D turbulence advection, disturb is used after the betad<=0 branch where its only assignment is commented out."
+    },
+    {
+     "id": "F09-X27",
+     "text": "[L2943-L2967] (HIGH/dry-cell division) Turbulence updates divide by hh over unmasked interior ranges, allowing dry cells to generate invalid values."
+    },
+    {
+     "id": "F09-X28",
+     "text": "[L3032-L3036] (HIGH/dry-cell invalid arithmetic) RvR forms the Ursell number with (k*hh)^3 in the denominator before applying a lower bound, so zero k or depth produces NaN that max does not neutralize."
+    },
+    {
+     "id": "F09-X29",
+     "text": "[L3099-L3151] (HIGH/dry-cell invalid arithmetic) vT computes H/hh, sqrt(g/hh), and related bore terms for every grid point without a wet mask, so dry cells can contaminate table indices and outputs."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F09-Y0",
+     "text": "[L290-L298] (HIGH/shape-mismatch) At a right MPI boundary uev_sed(:,1:ny+1) is assigned from uev_sed(:,1:ny), a nonconformable array assignment that appears intended to copy only the final column."
+    },
+    {
+     "id": "F09-Y1",
+     "text": "[L250-L260, L279, L320-L330, L354, L464-L490] (HIGH/double-fraction-weighting) cub/cvb already include the active-layer pbbed fraction before bed-load transport is formed, but Sub/Svb are multiplied by another upwind pbbed factor afterward, apparently squaring fraction availability."
+    },
+    {
+     "id": "F09-Y2",
+     "text": "[L1170-L1177] (HIGH/whole-array-overwrite) Inside the i,j loop the representative-size update assigns scalar sums to the entire D50top and D90top arrays rather than to (i,j), leaving every cell equal to the last loop cell."
+    },
+    {
+     "id": "F09-Y3",
+     "text": "[L985-L995, L1089-L1099] (HIGH/mass-conservation) Avalanche deposition edg1 multiplies edg2 by sedcal a second time, so erosion and deposition masses differ whenever a sediment calibration factor is not one."
+    },
+    {
+     "id": "F09-Y4",
+     "text": "[L1218-L1239, L1318] (HIGH/nontermination) update_fractions loops until an exact floating-point zero and has no escape when dzbt becomes zero because a limiting layer thickness is zero, so dzb_loc may never decrease."
+    },
+    {
+     "id": "F09-Y5",
+     "text": "[L181-L188, L2151-L2170] (HIGH/repeat-allocation) intra_sedtr allocates SAVE allocatables unconditionally on every call, so its normal use from repeated transus timesteps will attempt to allocate already allocated arrays."
+    },
+    {
+     "id": "F09-Y6",
+     "text": "[L1886-L1916] (HIGH/unallocated-access) Nielsen2006 allocates fe only when streaming is enabled but assigns fe=0 unconditionally, accessing an unallocated array when streaming is off."
+    },
+    {
+     "id": "F09-Y7",
+     "text": "[L2094-L2104, L2778-L2785] (HIGH/stale-loop-index) Both smoothed bed-load implementations set the top boundary from qsedu(i,:) after the i loop has finished, when i is nx+1, instead of using the top boundary or adjacent cell."
+    },
+    {
+     "id": "F09-Y8",
+     "text": "[L2282-L2291] (HIGH/division-before-mask) intra_sedtr computes ceqbg by dividing Subg by hh*uu before zeroing subcritical transport, so zero velocities generate NaN or infinity that the later Subg mask does not remove from ceqbg."
+    },
+    {
+     "id": "F09-Y9",
+     "text": "[L2321-L2327] (HIGH/wrong-component-mask) The negative-slope branch for y-direction Nielsen correction tests dzbdx<0 instead of dzbdy<0, skipping or misapplying the alongshore slope correction."
+    },
+    {
+     "id": "F09-Y10",
+     "text": "[L2799-L2807] (HIGH/division-by-zero) Bulk McCall-Van Rijn concentration is formed as qsedu/(hu*uu) over the whole array without a wet or nonzero-velocity mask."
+    },
+    {
+     "id": "F09-Y11",
+     "text": "[L2943-L2956] (HIGH/uninitialized-variable) In 2-D turbulence advection disturb is assigned only when betad>0 but is used unconditionally in the kturb update, leaving it undefined for betad<=0."
+    },
+    {
+     "id": "F09-Y12",
+     "text": "[L2918-L2926] (HIGH/wrong-source-array) At zero v velocity, kturbv is averaged from its own just-zeroed values rather than from neighboring s%kturb values, forcing the centered face turbulence to zero."
+    },
+    {
+     "id": "F09-Y13",
+     "text": "[L819-L830] (MED/unit-inconsistency) During groundwater-coupled erosion tempexchange is a water-depth amount but is added directly to the infiltration rate without division by dt, unlike the accretion branch."
+    },
+    {
+     "id": "F09-Y14",
+     "text": "[L751-L768, L791-L807, L944-L1005, L1050-L1108, L1322-L1327] (MED/incomplete-rate-accounting) dzbdt is updated only for single-fraction transport before avalanching; multi-fraction changes and all later avalanche changes update zb/dzbnow but are omitted from dzbdt."
+    },
+    {
+     "id": "F09-Y15",
+     "text": "[L1218-L1226] (MED/workspace-shape) update_fractions sizes saved work arrays from nd(1,1) and never checks the current cell's nd(i,j), so spatially varying layer counts can exceed or mismatch the workspace."
+    },
+    {
+     "id": "F09-Y16",
+     "text": "[L413-L419] (MED/operator-precedence) The bed-slope exclusion applies only to the Svb half of an OR expression, so any nontrivial Sub enters the Soulsby adjustment even where bermslopeindexbed is true."
+    },
+    {
+     "id": "F09-Y17",
+     "text": "[L223-L224, L286-L287] (MED/vector-interpolation) Wave-asymmetry velocity components average adjacent ua values but use the first cell's sine/cosine for both terms, rather than rotating each adjacent vector with its own angle."
+    },
+    {
+     "id": "F09-Y18",
+     "text": "[L225-L237, L290-L307] (MED/partial-array-update) Several sediment-velocity interpolants leave nx+1 or ny+1 entries untouched except on selected physical boundaries, yet full-array magnitudes and transports consume those entries."
+    },
+    {
+     "id": "F09-Y19",
+     "text": "[L357-L373] (MED/division-before-mask) The Surfbeat berm-slope condition evaluates H/hu across the array without protecting zero hu before the logical selection."
+    },
+    {
+     "id": "F09-Y20",
+     "text": "[L437-L453, L1557-L1578] (MED/angle-singularity) Transport and slope directions use atan(y/x) with manual quadrant handling and still divide by zero for vertical vectors, rather than a two-argument angle function."
+    },
+    {
+     "id": "F09-Y21",
+     "text": "[L1023-L1033] (MED/directional-inconsistency) Alongshore avalanche scaling omits the max((Sig/grid)^2,1) lower bound used by the cross-shore branch, producing unexplained direction-dependent rates."
+    },
+    {
+     "id": "F09-Y22",
+     "text": "[L1144-L1167] (MED/known-mass-error) The code explicitly notes that copying interior bed state into Neumann boundary cells introduces a bed-volume mass error, and no compensating flux or accounting is present."
+    },
+    {
+     "id": "F09-Y23",
+     "text": "[L1438-L1443] (MED/invalid-power-domain) Fall-velocity reduction raises 1-ccg to a noninteger power without bounding concentration below one, so out-of-range concentration creates NaNs."
+    },
+    {
+     "id": "F09-Y24",
+     "text": "[L1475-L1484] (MED/division-precondition) Bore turbulence divides by Tbore and the runup jet uses indexed hh in a square-root denominator without local positive guards or index validation."
+    },
+    {
+     "id": "F09-Y25",
+     "text": "[L1496-L1502] (MED/unstable-filter-weight) The lagged velocity filter uses dt/(cats*Trep) without clamping it to [0,1], so large timesteps produce negative old-state weights and overshoot."
+    },
+    {
+     "id": "F09-Y26",
+     "text": "[L1580-L1598] (MED/negative-radicand) Slope/dilatancy factors take square roots of algebraic radicands and later sqrt(srfTotal) without enforcing nonnegativity, so steep or roundoff-affected states can become NaN."
+    },
+    {
+     "id": "F09-Y27",
+     "text": "[L1602-L1621] (MED/division-precondition) The Soulsby-Van Rijn velocity cap divides by s%cf without the positive lower bound used by the neighboring Van Thiel branch."
+    },
+    {
+     "id": "F09-Y28",
+     "text": "[L1664-L1682] (MED/signed-concentration) Van Rijn 1993 activates bed load using nonnegative speed ue but computes and divides by signed used=vmg+ua, allowing negative or singular equilibrium concentration."
+    },
+    {
+     "id": "F09-Y29",
+     "text": "[L1752-L1756] (MED/configuration-singularity) The vertical integration grid divides by kmax-1, so kmax=1 is unsupported without an explicit parameter guard."
+    },
+    {
+     "id": "F09-Y30",
+     "text": "[L1972-L1985, L2055-L2073] (MED/zero-amplitude-singularity) Nielsen friction and streaming divide by Arms while its initial or still-water value can be zero; the streaming transition can also divide by abs(umeanupd)=0."
+    },
+    {
+     "id": "F09-Y31",
+     "text": "[L2042-L2050, L2267-L2275, L2663-L2671] (MED/slope-angle-mixup) Fredsoe-Deigaard branches clamp dimensionless bed slope with reposerad (an angle) rather than reposedzdx (its tangent), unlike the corresponding Nielsen implementation."
+    },
+    {
+     "id": "F09-Y32",
+     "text": "[L2060-L2066] (LOW/dimensional-consistency) Streaming regime tests compare uvarupd, a squared-velocity statistic, directly with abs(umeanupd), a velocity."
+    },
+    {
+     "id": "F09-Y33",
+     "text": "[L2138-L2193] (MED/relative-density-inconsistency) intra_sedtr defines ratio_s=(rhos-rho)/rho but then uses ratio_s-1 in dstar, unlike the same standard calculation elsewhere in the file."
+    },
+    {
+     "id": "F09-Y34",
+     "text": "[L2233-L2240] (LOW/zero-flow-direction-bias) Turbulent bed stress uses sign(1,taubxsed), which is positive at exactly zero base stress and therefore imposes a positive x direction in still water."
+    },
+    {
+     "id": "F09-Y35",
+     "text": "[L2381-L2418] (MED/stale-optional-state) Suspended-load calculations use taubx_turb even when lwt is disabled, while this routine assigns that array only inside the lwt branch."
+    },
+    {
+     "id": "F09-Y36",
+     "text": "[L2442-L2473] (MED/concentration-singularity) The analytical concentration profile divides by hh-za and the final depth average divides by hh without handling the hh=za or zero-depth limits."
+    },
+    {
+     "id": "F09-Y37",
+     "text": "[L2638-L2642] (MED/conductivity-singularity) Relative-weight correction divides infiltration by Kzinf with no lower bound, so impermeable cells make facrw invalid."
+    },
+    {
+     "id": "F09-Y38",
+     "text": "[L2873-L2881, L2943-L2967] (MED/depth-division) The turbulence update divides by hh over active loop ranges without an explicit wet/depth guard, relying on an upstream depth floor."
+    },
+    {
+     "id": "F09-Y39",
+     "text": "[L3032-L3036] (MED/zero-wavenumber-singularity) The Ursell number divides by (k*hh)^3 before applying its lower clamp, so zero k or depth yields non-finite intermediate values."
+    },
+    {
+     "id": "F09-Y40",
+     "text": "[L3140-L3152] (MED/wave-parameter-singularity) Bore-slope calculations divide by sigm and, in the mean branch, by an unbounded max(c,sqrt(Hg)), allowing zero-wave states to create invalid values."
+    },
+    {
+     "id": "F09-Y41",
+     "text": "[L70-L138, L619-L630, L1361-L1433, L1886-L1942, L2536-L2619] (LOW/lifecycle-contract) Multiple saved workspaces are allocated once from the first grid and option set with no shape or option-change checks, making library reuse with changed configuration unsafe."
+    },
+    {
+     "id": "F09-Y42",
+     "text": "[L587] (LOW/dimensional-consistency) vmag takes sqrt(max(vmag2,umin)), comparing squared velocity with a velocity-valued threshold."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F09-X0",
+     "F09-Y4"
+    ],
+    [
+     "F09-X0",
+     "F09-Y6"
+    ],
+    [
+     "F09-X0",
+     "F09-Y15"
+    ],
+    [
+     "F09-X0",
+     "F09-Y23"
+    ],
+    [
+     "F09-X0",
+     "F09-Y38"
+    ],
+    [
+     "F09-X0",
+     "F09-Y39"
+    ],
+    [
+     "F09-X0",
+     "F09-Y41"
+    ],
+    [
+     "F09-X1",
+     "F09-Y17"
+    ],
+    [
+     "F09-X1",
+     "F09-Y18"
+    ],
+    [
+     "F09-X2",
+     "F09-Y0"
+    ],
+    [
+     "F09-X2",
+     "F09-Y17"
+    ],
+    [
+     "F09-X2",
+     "F09-Y18"
+    ],
+    [
+     "F09-X3",
+     "F09-Y1"
+    ],
+    [
+     "F09-X3",
+     "F09-Y19"
+    ],
+    [
+     "F09-X4",
+     "F09-Y16"
+    ],
+    [
+     "F09-X5",
+     "F09-Y20"
+    ],
+    [
+     "F09-X6",
+     "F09-Y1"
+    ],
+    [
+     "F09-X7",
+     "F09-Y1"
+    ],
+    [
+     "F09-X7",
+     "F09-Y36"
+    ],
+    [
+     "F09-X8",
+     "F09-Y13"
+    ],
+    [
+     "F09-X9",
+     "F09-Y3"
+    ],
+    [
+     "F09-X10",
+     "F09-Y2"
+    ],
+    [
+     "F09-X10",
+     "F09-Y22"
+    ],
+    [
+     "F09-X11",
+     "F09-Y4"
+    ],
+    [
+     "F09-X11",
+     "F09-Y15"
+    ],
+    [
+     "F09-X12",
+     "F09-Y4"
+    ],
+    [
+     "F09-X13",
+     "F09-Y25"
+    ],
+    [
+     "F09-X14",
+     "F09-Y24"
+    ],
+    [
+     "F09-X15",
+     "F09-Y26"
+    ],
+    [
+     "F09-X15",
+     "F09-Y27"
+    ],
+    [
+     "F09-X16",
+     "F09-Y28"
+    ],
+    [
+     "F09-X17",
+     "F09-Y29"
+    ],
+    [
+     "F09-X17",
+     "F09-Y36"
+    ],
+    [
+     "F09-X18",
+     "F09-Y6"
+    ],
+    [
+     "F09-X18",
+     "F09-Y41"
+    ],
+    [
+     "F09-X19",
+     "F09-Y7"
+    ],
+    [
+     "F09-X20",
+     "F09-Y33"
+    ],
+    [
+     "F09-X21",
+     "F09-Y8"
+    ],
+    [
+     "F09-X22",
+     "F09-Y9"
+    ],
+    [
+     "F09-X23",
+     "F09-Y36"
+    ],
+    [
+     "F09-X24",
+     "F09-Y10"
+    ],
+    [
+     "F09-X25",
+     "F09-Y12"
+    ],
+    [
+     "F09-X26",
+     "F09-Y11"
+    ],
+    [
+     "F09-X26",
+     "F09-Y38"
+    ],
+    [
+     "F09-X27",
+     "F09-Y11"
+    ],
+    [
+     "F09-X27",
+     "F09-Y38"
+    ],
+    [
+     "F09-X28",
+     "F09-Y39"
+    ],
+    [
+     "F09-X29",
+     "F09-Y40"
+    ]
+   ]
+  },
+  {
+   "file_token": "F10",
+   "lang": ".F90",
+   "listX": [
+    {
+     "id": "F10-X0",
+     "text": "[L938-L975] (HIGH/out-of-bounds-index) The fast 2-D parabolic solver loops on i but indexes A and rhs with k, which remains zero from line 817, causing index-zero writes."
+    },
+    {
+     "id": "F10-X1",
+     "text": "[L976-L1009] (HIGH/wrong-loop-index) The fast 2-D exponential solver loops on k but never sets i, then uses the initialized value i=0 in grid and coefficient subscripts, causing invalid indexing."
+    },
+    {
+     "id": "F10-X2",
+     "text": "[L1011-L1020] (HIGH/shape-mismatch) The fast 2-D solver assigns x(:,1), sized nx+1, into gwhead(2:nx,j), sized nx-1, in both head-model branches."
+    },
+    {
+     "id": "F10-X3",
+     "text": "[L1025-L1106] (HIGH/unimplemented-selection) The full 2-D solver builds and solves coefficients only for the parabolic model, but afterward accepts the exponential model and computes a head from gwcurv that this branch never solved."
+    },
+    {
+     "id": "F10-X4",
+     "text": "[L838-L867, L874-L905] (HIGH/dead-boundary-branches) The 1-D matrix builder tests k==-1 and k==-n inside a positive 1..n loop, so both intended endpoint branches are unreachable and endpoint off-diagonal treatment falls through to the interior formula."
+    },
+    {
+     "id": "F10-X5",
+     "text": "[L896-L900, L914-L916, L1001-L1005, L1017-L1019, L1103-L1105] (HIGH/zero-thickness-singularity) Exponential-head formulas divide by groundwater thickness at cells where gwheight can legitimately be zero at the aquifer bottom, with no limiting form or dry-cell guard."
+    },
+    {
+     "id": "F10-X6",
+     "text": "[L1471-L1532, L220-L258, L520-L523] (MED/pointer-alias/leak) infilcon is first allocated as independent storage and later pointer-associated with s%infil through the hydrostatic function, orphaning the original allocation and making later mode behavior depend on aliasing."
+    },
+    {
+     "id": "F10-X7",
+     "text": "[L1203-L1235] (MED/directional-metric-inconsistency) The v-interface infiltration availability limit uses s%hh*s%dsz for the surface-water volume while the groundwater side and all v-direction area scaling use dnz, creating an x/y metric mismatch."
+    },
+    {
+     "id": "F10-X8",
+     "text": "[L1349-L1436] (MED/unbounded-iteration) All turbulent conductivity fixed-point loops have no iteration cap or non-finite escape even though maxiter is declared elsewhere in the module, so a nonconvergent cell can stall the timestep."
+    },
+    {
+     "id": "F10-X9",
+     "text": "[L1568-L1643] (MED/division-by-zero) Local infiltration divides by dt/por and later by dis and infil without guarding zero conductivity, zero timestep, zero porosity, or a zero computed infiltration distance."
+    },
+    {
+     "id": "F10-X10",
+     "text": "[L724-L739, L1478-L1513] (MED/zero-transition-width) dwetlayer is used as a divisor in both the smoothing ratio and hydrostatic infiltration cap without a local positive-width check."
+    },
+    {
+     "id": "F10-X11",
+     "text": "[L907-L919] (MED/solver-size-contract) The 1-D system allocates n unknowns and maps all n entries back to the grid but calls solver_tridiag with n-1, leaving the intended solver dimension ambiguous."
+    },
+    {
+     "id": "F10-X12",
+     "text": "[L643-L721] (LOW/distributed-boundary-state) Interface-height output leaves the last u or v row assigned only on a physical bottom/right rank and performs no halo exchange here, so internal process-edge values rely on unstated caller or solver behavior."
+    },
+    {
+     "id": "F10-X13",
+     "text": "[L400-L418] (LOW/anisotropic-smoothing) Updated Kx, Ky, and Kz are all smoothed only along the i direction, including Ky, with no explanation for the directional treatment."
+    },
+    {
+     "id": "F10-X14",
+     "text": "[L607-L612, L1349-L1436, L1811-L1816] (LOW/enum-validation) Several select-case blocks have no default assignment, so an unsupported groundwater scheme or head model can leave logicals or numeric outputs undefined unless validation is guaranteed upstream."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F10-Y0",
+     "text": "[L52-L72] (LOW/reinitialization lifecycle) gw_init allocates every groundwater field unconditionally and provides no already-allocated guard or cleanup for a second model initialization."
+    },
+    {
+     "id": "F10-Y1",
+     "text": "[L220-L274,L802-L834,L930-L937,L1028-L1038] (MED/state/dimension/configuration lifecycle) Saved solver and work arrays are allocated only for the first grid and first solver branch, so later changes in dimensions, dimensionality, fast-solve choice, or head model reuse incompatible storage/state."
+    },
+    {
+     "id": "F10-Y2",
+     "text": "[L299-L301] (MED/unchecked period denominator) Dynamic-pressure smoothing divides by Trep without validating a positive period."
+    },
+    {
+     "id": "F10-Y3",
+     "text": "[L400-L411] (LOW/anisotropic smoothing) Updated Kx, Ky, and Kz are all smoothed only along the i direction, even for the nominal y-direction conductivity Ky."
+    },
+    {
+     "id": "F10-Y4",
+     "text": "[L523,L210-L242] (LOW/pointer target leak) infilcon is first allocated its own target and later pointer-reassociated to s%infil, permanently losing the original allocation."
+    },
+    {
+     "id": "F10-Y5",
+     "text": "[L607-L612,L1349-L1436,L1811-L1816] (MED/unchecked enum output) Several scheme/model SELECT CASE blocks have no default, so unsupported gwscheme or head-model values leave logicals or result/output variables undefined."
+    },
+    {
+     "id": "F10-Y6",
+     "text": "[L655-L721,L1308-L1323] (HIGH/uninitialized MPI interface boundary) gwhu(nx+1,:) and gwhv(:,ny+1) are assigned only on physical bottom/right ranks, yet velocity and flux loops consume all nx+1 by ny+1 entries on internal MPI ranks."
+    },
+    {
+     "id": "F10-Y7",
+     "text": "[L734-L738] (MED/zero smoothing thickness) The wet-layer ratio divides by dwetlayer with no positive-value guard."
+    },
+    {
+     "id": "F10-Y8",
+     "text": "[L836-L905,L913-L917,L1001-L1005,L1016-L1019,L1103-L1105] (HIGH/zero aquifer-height singularity) The exponential head formulation repeatedly evaluates sinh(h)/h at cells whose groundwater height can be zero, without a limiting-form implementation or mask."
+    },
+    {
+     "id": "F10-Y9",
+     "text": "[L940-L975] (HIGH/out-of-bounds matrix index) The fast 2-D parabolic solver loops on i but writes A and rhs at index k, which remains initialized to zero, causing second-dimension index-zero accesses."
+    },
+    {
+     "id": "F10-Y10",
+     "text": "[L976-L1009] (HIGH/wrong loop variable/index) The fast 2-D exponential solver loops on k but never sets i, so it uses stale/zero i to index all grid fields and metrics."
+    },
+    {
+     "id": "F10-Y11",
+     "text": "[L1011-L1019] (HIGH/nonconformable solution assignment) In the fast 2-D branch x(:,1) has nx+1 elements but is assigned to gwhead(2:nx,j), which has nx-1 elements."
+    },
+    {
+     "id": "F10-Y12",
+     "text": "[L1025-L1106] (HIGH/missing solver implementation) The full 2-D branch builds and solves a matrix only for the parabolic model; selecting exponential skips the solve and then computes gwhead from stale gwcurv."
+    },
+    {
+     "id": "F10-Y13",
+     "text": "[L1127-L1129,L1303-L1306] (MED/grain-size denominator) Critical groundwater velocity divides by D50(1) without validating a positive grain diameter."
+    },
+    {
+     "id": "F10-Y14",
+     "text": "[L1203-L1265] (HIGH/wrong directional conductivity/metric) Both v-interface infiltration calls pass Kx instead of Ky, and the first v-interface surface-water availability limit uses dsz where the surrounding v-direction scaling uses dnz."
+    },
+    {
+     "id": "F10-Y15",
+     "text": "[L1349-L1436,L1575-L1613] (MED/unbounded nonlinear iteration) Turbulent conductivity iterations have no iteration limit or non-finite/stagnation exit."
+    },
+    {
+     "id": "F10-Y16",
+     "text": "[L1567-L1642] (MED/zero timestep/porosity/progress denominator) Local infiltration divides by dt, porosity, twodtp, dis, and infiltration rate without explicit guards, so zero conductivity or invalid timestep/porosity can cause singular intermediate arithmetic."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F10-X0",
+     "F10-Y1"
+    ],
+    [
+     "F10-X0",
+     "F10-Y9"
+    ],
+    [
+     "F10-X0",
+     "F10-Y10"
+    ],
+    [
+     "F10-X1",
+     "F10-Y8"
+    ],
+    [
+     "F10-X1",
+     "F10-Y9"
+    ],
+    [
+     "F10-X1",
+     "F10-Y10"
+    ],
+    [
+     "F10-X1",
+     "F10-Y11"
+    ],
+    [
+     "F10-X2",
+     "F10-Y8"
+    ],
+    [
+     "F10-X2",
+     "F10-Y10"
+    ],
+    [
+     "F10-X2",
+     "F10-Y11"
+    ],
+    [
+     "F10-X2",
+     "F10-Y12"
+    ],
+    [
+     "F10-X3",
+     "F10-Y1"
+    ],
+    [
+     "F10-X3",
+     "F10-Y8"
+    ],
+    [
+     "F10-X3",
+     "F10-Y11"
+    ],
+    [
+     "F10-X3",
+     "F10-Y12"
+    ],
+    [
+     "F10-X4",
+     "F10-Y1"
+    ],
+    [
+     "F10-X4",
+     "F10-Y8"
+    ],
+    [
+     "F10-X5",
+     "F10-Y8"
+    ],
+    [
+     "F10-X5",
+     "F10-Y10"
+    ],
+    [
+     "F10-X5",
+     "F10-Y11"
+    ],
+    [
+     "F10-X5",
+     "F10-Y12"
+    ],
+    [
+     "F10-X6",
+     "F10-Y1"
+    ],
+    [
+     "F10-X6",
+     "F10-Y4"
+    ],
+    [
+     "F10-X7",
+     "F10-Y14"
+    ],
+    [
+     "F10-X8",
+     "F10-Y5"
+    ],
+    [
+     "F10-X8",
+     "F10-Y15"
+    ],
+    [
+     "F10-X9",
+     "F10-Y16"
+    ],
+    [
+     "F10-X10",
+     "F10-Y6"
+    ],
+    [
+     "F10-X10",
+     "F10-Y7"
+    ],
+    [
+     "F10-X11",
+     "F10-Y8"
+    ],
+    [
+     "F10-X12",
+     "F10-Y6"
+    ],
+    [
+     "F10-X13",
+     "F10-Y3"
+    ],
+    [
+     "F10-X14",
+     "F10-Y5"
+    ],
+    [
+     "F10-X14",
+     "F10-Y15"
+    ]
+   ]
+  },
+  {
+   "file_token": "F11",
+   "lang": ".F90",
+   "listX": [
+    {
+     "id": "F11-X0",
+     "text": "[L63-L70,L132-L137,L197-L207,L267-L276] (LOW/state/dimension lifecycle) Saved scratch arrays in all formulations are allocated only once and never resized, so reuse with a different grid shape has stale bounds."
+    },
+    {
+     "id": "F11-X1",
+     "text": "[L77-L84,L143-L150] (HIGH/dry-cell invalid arithmetic) Roelvink breaking computes H divided by depth-dependent limits over unmasked arrays, so zero-depth cells can evaluate 0/0 and contaminate Qb."
+    },
+    {
+     "id": "F11-X2",
+     "text": "[L86-L97,L151-L165] (MED/stale dry-cell output) The Daly branch updates Qb only at wet cells but then computes D for the full addressed row/domain, leaving dry-cell Qb and potentially D dependent on prior state."
+    },
+    {
+     "id": "F11-X3",
+     "text": "[L99-L111,L167-L179] (HIGH/dry-cell division) BREAK_ROELVINK2 and Daly scale dissipation by H/hh without a wet mask or positive-depth guard."
+    },
+    {
+     "id": "F11-X4",
+     "text": "[L101-L110,L169-L178,L213-L216,L283-L286] (MED/unchecked period denominator) Frequency conversions divide by par%px or par%Trep without local validation of the required positive-period contract."
+    },
+    {
+     "id": "F11-X5",
+     "text": "[L282-L298] (HIGH/unchecked wave-number/depth denominator) Janssen-Battjes divides directly by k when forming Hb and by hh when forming D, unlike the guarded k division in Baldock, so calm or dry points can generate infinities/NaNs."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F11-Y0",
+     "text": "[L63-L70,L132-L137,L197-L207,L267-L276] (MED/saved-workspace shape) All saved allocatable workspaces are sized only on their first call and never checked against the current grid dimensions, so reuse after a grid-size change is unsafe."
+    },
+    {
+     "id": "F11-Y1",
+     "text": "[L77-L84,L143-L150] (HIGH/dry-depth division) The non-Daly Roelvink formulas divide by hhw over complete rows or full arrays before restricting the result to an active region, with no wet mask or positive-depth floor in this routine."
+    },
+    {
+     "id": "F11-Y2",
+     "text": "[L86-L97,L151-L165] (MED/stale state) The Daly branch deliberately retains Qb inside the hysteresis band but also leaves dry-cell Qb unchanged, after which dissipation is recomputed from that potentially stale value."
+    },
+    {
+     "id": "F11-Y3",
+     "text": "[L105-L111,L173-L179] (HIGH/dry-depth division) ROELVINK2 and ROELVINK_DALY multiply dissipation by H/hh without a local wet mask or positive hh guard."
+    },
+    {
+     "id": "F11-Y4",
+     "text": "[L211-L231] (LOW/parameter-domain contract) The Baldock calculation floors k only in the Hb denominator while kh and the spatial gamma use the raw k, leaving negative or otherwise invalid wave-number inputs inconsistently treated."
+    },
+    {
+     "id": "F11-Y5",
+     "text": "[L282-L298] (HIGH/unchecked singular denominator) The Janssen-Battjes implementation divides by raw k when forming Hb and by raw hh when forming D, unlike the neighboring Baldock implementation's k floor."
+    },
+    {
+     "id": "F11-Y6",
+     "text": "[L79-L84,L145-L150] (MED/real-power domain) The breaking argument raises an unconstrained H-to-depth ratio to the real-valued parameter n, so a negative ratio with non-integer n would produce an invalid result unless positivity is guaranteed externally."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F11-X0",
+     "F11-Y0"
+    ],
+    [
+     "F11-X0",
+     "F11-Y1"
+    ],
+    [
+     "F11-X0",
+     "F11-Y4"
+    ],
+    [
+     "F11-X0",
+     "F11-Y5"
+    ],
+    [
+     "F11-X1",
+     "F11-Y0"
+    ],
+    [
+     "F11-X1",
+     "F11-Y1"
+    ],
+    [
+     "F11-X1",
+     "F11-Y2"
+    ],
+    [
+     "F11-X1",
+     "F11-Y6"
+    ],
+    [
+     "F11-X2",
+     "F11-Y1"
+    ],
+    [
+     "F11-X2",
+     "F11-Y2"
+    ],
+    [
+     "F11-X2",
+     "F11-Y6"
+    ],
+    [
+     "F11-X3",
+     "F11-Y1"
+    ],
+    [
+     "F11-X3",
+     "F11-Y2"
+    ],
+    [
+     "F11-X3",
+     "F11-Y3"
+    ],
+    [
+     "F11-X4",
+     "F11-Y0"
+    ],
+    [
+     "F11-X4",
+     "F11-Y2"
+    ],
+    [
+     "F11-X4",
+     "F11-Y3"
+    ],
+    [
+     "F11-X4",
+     "F11-Y4"
+    ],
+    [
+     "F11-X4",
+     "F11-Y5"
+    ],
+    [
+     "F11-X5",
+     "F11-Y0"
+    ],
+    [
+     "F11-X5",
+     "F11-Y5"
+    ]
+   ]
+  },
+  {
+   "file_token": "F12",
+   "lang": ".F90",
+   "listX": [
+    {
+     "id": "F12-X0",
+     "text": "[L254-L372] (MED/lifecycle/allocation) nonh_init allocates module work arrays unconditionally, so a second initialization or a grid-size change without an intervening teardown can fail or retain an incompatible module lifecycle."
+    },
+    {
+     "id": "F12-X1",
+     "text": "[L323-L347,L995,L1009] (MED/grid-metric consistency) The legacy solver stores only dsu(:,1) and dnv(1,:) and later uses those fixed cross-sections throughout the domain, leaving the full-2D curvilinear-grid contract unclear."
+    },
+    {
+     "id": "F12-X2",
+     "text": "[L752-L764] (HIGH/variable mix-up) In the one-layer excluded-point bottom-slope correction, the west bottom slope is assigned from dzs_e rather than dzb_e, mixing the surface and bottom geometries."
+    },
+    {
+     "id": "F12-X3",
+     "text": "[L824-L836] (HIGH/variable mix-up/stale state) The two-dimensional excluded-point surface-slope branch assigns dzs_n from dzb_s when both V points are wet and clears dzs_e/dzs_w, rather than dzs_s/dzs_n, in its fallback, so the y slopes can be wrong or stale."
+    },
+    {
+     "id": "F12-X4",
+     "text": "[L853-L879] (HIGH/variable mix-up/stale state) The corresponding bottom-slope branch assigns dzb_w from dzs_e and its final fallback clears the x slopes instead of dzb_s/dzb_n, leaving erroneous y-direction bottom slopes."
+    },
+    {
+     "id": "F12-X5",
+     "text": "[L1694-L1720,L1917-L1922,L2546-L2599,L2974-L3027] (HIGH/unchecked singular denominator) Reduced two-layer formulas divide by wcoef, 1-wcoef, and nhlay-nhlay**2 without a local bound excluding 0 or 1, so endpoint layer coefficients make the predictor or stress terms singular."
+    },
+    {
+     "id": "F12-X6",
+     "text": "[L2362-L2374] (HIGH/boundary-condition typo) The MPI left-boundary clause repeats Wm(1,:)=Wm(2,:) instead of setting Wm(:,1), so the left y boundary is not populated as the surrounding top/bottom/left/right pattern indicates."
+    },
+    {
+     "id": "F12-X7",
+     "text": "[L2494-L2497] (MED/coefficient inconsistency) The 3D U predictor uses wcoef(i,j) for both neighboring pressure coefficients, unlike the analogous 2DV expression which uses wcoef(i+1,j) on the eastern contribution."
+    },
+    {
+     "id": "F12-X8",
+     "text": "[L2569-L2574] (HIGH/sign inconsistency) The 3D V predictor forms its surface-slope coefficient with zs(i,j)-zs(i,j+1), the opposite orientation to both its bottom term and the analogous U-direction expression."
+    },
+    {
+     "id": "F12-X9",
+     "text": "[L3013-L3021] (HIGH/staggered-field mix-up) The lower-layer V-velocity friction calculation uses s%cfu rather than the V-point friction field s%cfv."
+    },
+    {
+     "id": "F12-X10",
+     "text": "[L3031-L3041] (HIGH/staggered-index mix-up) The V-point corrector averages wcoef(i,j) with wcoef(i+1,j), using an x neighbor where the V staggering calls for the j+1 neighbor."
+    },
+    {
+     "id": "F12-X11",
+     "text": "[L3307-L3327] (MED/parameter-domain contract) nonh_init_wcoef accepts an unconstrained explicit dispc and computes the optimized value through a denominator that is neither checked nor bounded, despite downstream singularities at endpoint or invalid coefficients."
+    },
+    {
+     "id": "F12-X12",
+     "text": "[L3453-L3465] (LOW/iteration termination) disper iterates solely on an error tolerance with no iteration cap or invalid-input guard, leaving termination dependent on unstated positive finite inputs."
+    },
+    {
+     "id": "F12-X13",
+     "text": "[L3403-L3414] (MED/one-dimensional indexing) For ny<=2 the V-point free surface is filled from one fixed zs column (column 2 when present) for every j, rather than from the matching column, and the special-case intent is unclear."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F12-Y0",
+     "text": "[L201-L247] (LOW/unchecked selector) Any ipredcor value other than zero silently selects the correction path, so an invalid selector is accepted as a valid corrector request."
+    },
+    {
+     "id": "F12-Y1",
+     "text": "[L288-L372,L453-L455,L961-L963,L1655-L1659,L2479-L2483] (MED/initialization lifecycle) The one-layer routines lazily initialize module storage, but the reduced two-layer predictor paths do not, leaving their correctness dependent on an undocumented external nonh_init call."
+    },
+    {
+     "id": "F12-Y2",
+     "text": "[L290-L356] (MED/reinitialization/configuration lifecycle) nonh_init allocates module arrays unconditionally and never supports cleanup, resizing, or changing nonhq3d mode during a later model lifecycle."
+    },
+    {
+     "id": "F12-Y3",
+     "text": "[L323-L347] (MED/unchecked grid denominator) The original formulation constructs reciprocal grid spacings without checking for zero or invalid ds/dn metrics."
+    },
+    {
+     "id": "F12-Y4",
+     "text": "[L556-L558,L1138-L1157,L1176-L1187,L1254-L1258] (MED/depth denominator contract) Several one-layer pressure, advection, viscosity, and explicit-pressure terms divide by hh based on nonhZ rather than an explicit positive-depth check, relying on the mask contract to guarantee a safe depth."
+    },
+    {
+     "id": "F12-Y5",
+     "text": "[L758-L781] (HIGH/wrong-variable typo) In the 1-D excluded-point bottom boundary calculation, dzb_w is assigned dzs_e instead of dzb_e, mixing free-surface and bed slopes."
+    },
+    {
+     "id": "F12-Y6",
+     "text": "[L824-L841] (HIGH/wrong-variable typo) In the 2-D excluded-point surface condition, the both-wet V branch assigns dzs_n=dzb_s rather than dzs_s, injecting a bed-slope value into the surface condition."
+    },
+    {
+     "id": "F12-Y7",
+     "text": "[L853-L882] (HIGH/wrong-variable typo) In the 2-D excluded-point bottom condition, the both-wet U branch assigns dzb_w=dzs_e rather than dzb_e."
+    },
+    {
+     "id": "F12-Y8",
+     "text": "[L1172-L1177] (HIGH/directional coefficient mismatch) The y-direction vertical-viscosity flux uses s%hu at lines 1174-1175 even though it is evaluated across V faces, unlike the expected y-face depth s%hv."
+    },
+    {
+     "id": "F12-Y9",
+     "text": "[L1371-L1383,L1453-L1484,L2048-L2150,L2244-L2284] (MED/stale interpolated geometry) Both reduced correctors claim to recalculate zsu/zsv/zbu/zbv but contain no zuzv call, so matrix and kinematic corrections use geometry last computed in the predictor."
+    },
+    {
+     "id": "F12-Y10",
+     "text": "[L1694-L1720,L1912-L1925,L2546-L2599,L2968-L3031] (HIGH/singular layer-fraction formulas) Reduced-layer formulas divide by 1-wcoef, 2-wcoef sums, and nhlay-nhlay^2 while only checking nhlay>0, so nhlay/wcoef equal or near one makes the system singular."
+    },
+    {
+     "id": "F12-Y11",
+     "text": "[L2362-L2374] (HIGH/MPI boundary indexing) The xmpi_isleft branch assigns Wm(1,:) instead of Wm(:,1), overwriting the top x row and leaving the left y boundary unset."
+    },
+    {
+     "id": "F12-Y12",
+     "text": "[L2494-L2497] (HIGH/wrong adjacent layer coefficient) The 3-D U-pressure east coefficient uses wcoef(i,j) for the i+1 cell, inconsistent with its hh(i+1,j), the 2-DV implementation, and the analogous V coefficient."
+    },
+    {
+     "id": "F12-Y13",
+     "text": "[L2544-L2550,L2571-L2575] (MED/directional sign inconsistency) The dV pressure correction forms surface and wcoef differences as current-minus-next while dU uses next-minus-current, despite the base U/V pressure gradients sharing the same orientation."
+    },
+    {
+     "id": "F12-Y14",
+     "text": "[L3013-L3046] (HIGH/wrong directional friction data) The dV bottom-friction update uses s%cfu rather than the V-face friction coefficient and averages wcoef across i/i+1 rather than j/j+1."
+    },
+    {
+     "id": "F12-Y15",
+     "text": "[L3311-L3319,L3420-L3465] (MED/unbounded/singular dispersion solve) wcoef initialization does not validate Topt, and disper has singular arithmetic for zero frequency/depth plus an iteration with no maximum-count or stagnation guard."
+    },
+    {
+     "id": "F12-Y16",
+     "text": "[L3369-L3401] (MED/MPI halo initialization) On non-bottom MPI ranks zbu(nx+1,:) and zsu(nx+1,:) are not assigned or exchanged by zuzv, although nonh mask construction iterates through nx+1 and reads zbu there."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F12-X0",
+     "F12-Y1"
+    ],
+    [
+     "F12-X0",
+     "F12-Y2"
+    ],
+    [
+     "F12-X1",
+     "F12-Y3"
+    ],
+    [
+     "F12-X2",
+     "F12-Y5"
+    ],
+    [
+     "F12-X2",
+     "F12-Y6"
+    ],
+    [
+     "F12-X2",
+     "F12-Y7"
+    ],
+    [
+     "F12-X3",
+     "F12-Y5"
+    ],
+    [
+     "F12-X3",
+     "F12-Y6"
+    ],
+    [
+     "F12-X3",
+     "F12-Y7"
+    ],
+    [
+     "F12-X4",
+     "F12-Y5"
+    ],
+    [
+     "F12-X4",
+     "F12-Y7"
+    ],
+    [
+     "F12-X5",
+     "F12-Y10"
+    ],
+    [
+     "F12-X5",
+     "F12-Y13"
+    ],
+    [
+     "F12-X6",
+     "F12-Y11"
+    ],
+    [
+     "F12-X7",
+     "F12-Y12"
+    ],
+    [
+     "F12-X8",
+     "F12-Y12"
+    ],
+    [
+     "F12-X8",
+     "F12-Y13"
+    ],
+    [
+     "F12-X9",
+     "F12-Y14"
+    ],
+    [
+     "F12-X10",
+     "F12-Y10"
+    ],
+    [
+     "F12-X10",
+     "F12-Y14"
+    ],
+    [
+     "F12-X11",
+     "F12-Y15"
+    ],
+    [
+     "F12-X12",
+     "F12-Y15"
+    ],
+    [
+     "F12-X13",
+     "F12-Y15"
+    ],
+    [
+     "F12-X13",
+     "F12-Y16"
+    ]
+   ]
+  },
+  {
+   "file_token": "F13",
+   "lang": ".F90",
+   "listX": [
+    {
+     "id": "F13-X0",
+     "text": "[L116-L119,L305,L314-L315,L372-L373] (MED/degenerate-grid input) Ship-grid dx and dy permit zero, yet they define all coordinates and the cell area passed to grmap2, so a configured zero spacing creates a collapsed mapping grid."
+    },
+    {
+     "id": "F13-X1",
+     "text": "[L98-L145,L172-L176,L223-L258] (MED/lifecycle/allocation) ship_init allocates the ship pointer graph and global ship arrays without an allocated/associated guard or teardown, making repeated initialization unsafe."
+    },
+    {
+     "id": "F13-X2",
+     "text": "[L167-L176,L208-L217] (HIGH/out-of-bounds input case) A track with fewer than two records is accepted by count_lines, but automatic heading calculation unconditionally accesses records 1 and 2 and the final record minus one."
+    },
+    {
+     "id": "F13-X3",
+     "text": "[L130-L163,L330-L368] (HIGH/uninitialized hull state) When compute_motion is enabled, zhull is not initialized, yet shipwave reads it to compute pressure before the later placeholder motion update; with compute_force disabled it is never updated at all."
+    },
+    {
+     "id": "F13-X4",
+     "text": "[L223-L240,L339-L350] (HIGH/uninitialized motion state) shipphi, shipchi, and shippsi are allocated but not initialized, while the unimplemented motion branch immediately uses shipchi and shipphi to position the hull."
+    },
+    {
+     "id": "F13-X5",
+     "text": "[L210-L216,L297-L304] (MED/angular interpolation) Heading is represented as a wrapped angle and then interpolated linearly without unwrap handling, so tracks crossing the angle branch cut can rotate through the long arc."
+    },
+    {
+     "id": "F13-X6",
+     "text": "[L278,L403-L410] (MED/saved lifecycle state) The saved firstship flag is cleared permanently after one call and has no reset path, so a subsequent simulation in the same process will skip its required initial surface adjustment."
+    },
+    {
+     "id": "F13-X7",
+     "text": "[L314-L315,L348-L350,L442-L446] (HIGH/coordinate-frame inconsistency) Hull rotation and force moments subtract ship-local xCG/yCG values from globally positioned x/y coordinates, causing lever arms and rotated elevations to depend on the domain origin."
+    },
+    {
+     "id": "F13-X8",
+     "text": "[L314-L315] (LOW/integer-centering ambiguity) The local-grid origin uses integer division nx/2 and ny/2, producing an asymmetric set of coordinates for odd grid dimensions."
+    },
+    {
+     "id": "F13-X9",
+     "text": "[L101-L107,L149-L156,L169-L206] (LOW/file-error handling) Ship-list, geometry, and track opens and reads have no visible status checks here, so malformed or short input depends entirely on helper-side termination behavior."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F13-Y0",
+     "text": "[L116-L119,L305,L314-L315,L372-L373] (MED/degenerate geometry input) dx and dy accept zero even though they define ship-grid coordinates and the area supplied to grmap2, allowing a degenerate mapping grid."
+    },
+    {
+     "id": "F13-Y1",
+     "text": "[L167-L176,L210-L216] (HIGH/unchecked input length) When heading is derived, the code unconditionally accesses track samples 1 and 2 (and the final sample's predecessor), so a track with fewer than two records is out of bounds."
+    },
+    {
+     "id": "F13-Y2",
+     "text": "[L130-L160,L330-L358] (HIGH/uninitialized hull state) For compute_motion=1, zhull is allocated but not initialized before it is used to compute pressure and force; the hull geometry update occurs only afterward."
+    },
+    {
+     "id": "F13-Y3",
+     "text": "[L223-L240,L346-L350] (HIGH/uninitialized motion state) shipphi, shipchi, and shippsi are allocated without initialization, while shipphi and shipchi are consumed during the first motion-enabled hull update."
+    },
+    {
+     "id": "F13-Y4",
+     "text": "[L297-L304] (MED/angular interpolation) Heading is linearly interpolated as an ordinary scalar after conversion to radians, with no unwrap handling for tracks that cross the 0/360-degree discontinuity."
+    },
+    {
+     "id": "F13-Y5",
+     "text": "[L278,L403-L410] (LOW/cross-instance persistent state) The saved firstship flag is never reset by ship_init, so a second model lifecycle in the same process will skip its initial water-level adjustment."
+    },
+    {
+     "id": "F13-Y6",
+     "text": "[L314-L315] (LOW/grid centering) Integer division nx/2 and ny/2 makes odd-sized ship grids asymmetric about the declared center of gravity."
+    },
+    {
+     "id": "F13-Y7",
+     "text": "[L346-L350,L442-L443] (HIGH/coordinate-frame inconsistency) World-coordinate ship-grid positions are combined with ship-local xCG/yCG when computing hull rotations and roll/pitch moments, making results depend on the global coordinate origin."
+    },
+    {
+     "id": "F13-Y8",
+     "text": "[L333-L358] (MED/time-level inconsistency) For motion-enabled ships, pressure forces are computed from the previous hull position and only then is zhull updated, creating a one-step geometry/force lag even after initialization."
+    },
+    {
+     "id": "F13-Y9",
+     "text": "[L434-L446] (LOW/quadrature inconsistency) Vertical force uses only ph(ix,iy) per panel while horizontal forces average edge pressures, introducing a directional inconsistency in pressure integration."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F13-X0",
+     "F13-Y0"
+    ],
+    [
+     "F13-X0",
+     "F13-Y4"
+    ],
+    [
+     "F13-X0",
+     "F13-Y6"
+    ],
+    [
+     "F13-X1",
+     "F13-Y1"
+    ],
+    [
+     "F13-X1",
+     "F13-Y3"
+    ],
+    [
+     "F13-X2",
+     "F13-Y1"
+    ],
+    [
+     "F13-X2",
+     "F13-Y3"
+    ],
+    [
+     "F13-X3",
+     "F13-Y0"
+    ],
+    [
+     "F13-X3",
+     "F13-Y1"
+    ],
+    [
+     "F13-X3",
+     "F13-Y2"
+    ],
+    [
+     "F13-X3",
+     "F13-Y8"
+    ],
+    [
+     "F13-X4",
+     "F13-Y2"
+    ],
+    [
+     "F13-X4",
+     "F13-Y3"
+    ],
+    [
+     "F13-X4",
+     "F13-Y7"
+    ],
+    [
+     "F13-X4",
+     "F13-Y8"
+    ],
+    [
+     "F13-X5",
+     "F13-Y0"
+    ],
+    [
+     "F13-X5",
+     "F13-Y1"
+    ],
+    [
+     "F13-X5",
+     "F13-Y4"
+    ],
+    [
+     "F13-X6",
+     "F13-Y5"
+    ],
+    [
+     "F13-X7",
+     "F13-Y0"
+    ],
+    [
+     "F13-X7",
+     "F13-Y3"
+    ],
+    [
+     "F13-X7",
+     "F13-Y6"
+    ],
+    [
+     "F13-X7",
+     "F13-Y7"
+    ],
+    [
+     "F13-X7",
+     "F13-Y9"
+    ],
+    [
+     "F13-X8",
+     "F13-Y0"
+    ],
+    [
+     "F13-X8",
+     "F13-Y6"
+    ],
+    [
+     "F13-X9",
+     "F13-Y1"
+    ],
+    [
+     "F13-X9",
+     "F13-Y2"
+    ]
+   ]
+  },
+  {
+   "file_token": "F14",
+   "lang": ".F90",
+   "listX": [
+    {
+     "id": "F14-X0",
+     "text": "[L26-L35, L49-L81, L157-L160, L481-L486, L744-L748] (LOW/lifecycle/state) Module-global work arrays are allocated only once and have no resize or teardown path, so reuse with a different grid shape leaves an incompatible saved allocation."
+    },
+    {
+     "id": "F14-X1",
+     "text": "[L360-L366, L760-L766, L785-L791, L806-L807, L922-L930] (HIGH/grid-metric/indexing) Multiple two-dimensional correction formulas hard-code the transverse metric index to 1 even though neighboring code uses the current i or j, making the scheme inconsistent on spatially varying curvilinear grids."
+    },
+    {
+     "id": "F14-X2",
+     "text": "[L784-L792] (HIGH/numerical-sign) The negative-v qy continuity branch omits the sign reversal used by the corresponding negative-u branch and by the other second-order flux routines, yielding a correction with the opposite sign."
+    },
+    {
+     "id": "F14-X3",
+     "text": "[L751-L772, L774-L800, L802-L819] (HIGH/MPI-boundary) The continuity correction is computed with fixed whole-array loops and then unconditionally zeroes every local outer work-array edge without MPI-aware exchange or boundary tests, so subdomain-interface corrections can be discarded and the update can depend on decomposition."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F14-Y0",
+     "text": "[L622-L676] (HIGH/stale-work-array) The 1-D vertical-momentum path does not clear wrk1 globally and cycles inactive mask cells before zeroing them, so a flux left from an earlier call can enter an active neighbor's divergence."
+    },
+    {
+     "id": "F14-Y1",
+     "text": "[L784-L792] (HIGH/sign-inconsistency) The negative-v continuity correction lacks the leading minus used by the analogous negative-u branch, making the qy correction's sign inconsistent with the qx implementation."
+    },
+    {
+     "id": "F14-Y2",
+     "text": "[L359-L366] (MED/grid-metric-indexing) Cross-advection of v uses s%dsu(...,1) throughout a two-dimensional loop and the first negative-flow gradient uses dsu(ie,1) for the i-to-ie interval, which is inconsistent with local curvilinear spacing."
+    },
+    {
+     "id": "F14-Y3",
+     "text": "[L751-L791, L802-L813] (MED/grid-metric-indexing) The continuity correction repeatedly fixes the unused metric coordinate at 1 (dsu(i,1), dnv(1,j), dsz(i,1), dnz(1,j)), despite the module claiming curvilinear support and looping over the full 2-D grid."
+    },
+    {
+     "id": "F14-Y4",
+     "text": "[L291-L303, L378-L379, L612, L676] (MED/division-precondition) Second-order velocity corrections divide by hum, hvm, or hh without a local positive-depth guard at the update point; the broader stencil mindepth check does not protect every update path."
+    },
+    {
+     "id": "F14-Y5",
+     "text": "[L49-L80, L157-L160] (LOW/lifecycle-contract) Module work arrays are allocated once with the first grid shape and have no reinitialization or shape check, so repeated library initialization with a different grid would retain incompatible storage."
+    },
+    {
+     "id": "F14-Y6",
+     "text": "[L509, L552, L633] (LOW/mask-contract) Neighbor masks are multiplied and used as a real flux factor rather than reduced logically, so the code silently assumes mskZ values are strictly binary rather than merely zero/nonzero."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F14-X0",
+     "F14-Y3"
+    ],
+    [
+     "F14-X0",
+     "F14-Y5"
+    ],
+    [
+     "F14-X1",
+     "F14-Y1"
+    ],
+    [
+     "F14-X1",
+     "F14-Y2"
+    ],
+    [
+     "F14-X1",
+     "F14-Y3"
+    ],
+    [
+     "F14-X2",
+     "F14-Y1"
+    ],
+    [
+     "F14-X2",
+     "F14-Y3"
+    ],
+    [
+     "F14-X3",
+     "F14-Y3"
+    ]
+   ]
+  }
+ ]
+}

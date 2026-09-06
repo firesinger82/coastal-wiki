@@ -1,0 +1,220 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-000",
+ "source_path": "trunk/src/xbeachlibrary/filefunctions.F90",
+ "source_sha256": "d5e4c239d7ecec15ef329769fb187aecaf61bf701d6955850a11dcae52e1fe00",
+ "base_run_id": "xbeach-r1-XBeach-000-codex-01a05a52-c773-7170-b126-7a88b545d9e6",
+ "audit_run_id": "xbeach-r2-XBeach-000-codex-01a05a9c-78d9-7eb0-9d9e-e5e019072cda",
+ "base_record_file": "7d495a326eb7e244e60c4f5f909a9e6e1b8100f952b59683c28d124551605c2b.json",
+ "audit_record_file": "7d495a326eb7e244e60c4f5f909a9e6e1b8100f952b59683c28d124551605c2b.json",
+ "base_record_sha256_bytes": "31c8fd8bc3602f37340ceb670c6a6d709a5de6c43cca0193f9e8e23b48c7d34c",
+ "audit_record_sha256_bytes": "3e615c7201116d09936d8a1ceff997463eaab3b4713bc166224eec2c2b3e0924",
+ "base_finding_count": 9,
+ "audit_finding_count": 7,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L49-L65] (MED/mpi-consistency) File existence is checked only on xmaster and the error flag is never broadcast, so non-master callers requesting the optional exist result always report true even when the master found the file missing."
+   ],
+   "audit_member_text": [
+    "[L49-L65] (MED/MPI result inconsistency) check_file_exist performs the inquiry only on xmaster without broadcasting error, so a present exist output is always reported true on non-master ranks regardless of the file's existence."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "[L295-L325] (MED/unit-collision) get_file_length uses hard-coded unit 11 rather than create_new_fid, so it can close or conflict with another file already connected to that unit."
+   ],
+   "audit_member_text": [
+    "[L295-L321] (MED/fixed-unit collision) get_file_length opens hard-coded unit 11 without checking whether it is already connected, unlike the module's own free-unit allocator, risking interference with unrelated open files or an open failure."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L81-L93,L109-L121,L136-L148] (MED/input-error-handling) The check_file_length overloads open files without OPEN IOSTAT handling, so permission/open failures are reported only indirectly through a subsequent read."
+   ],
+   "audit_member_text": [
+    "[L70-L149] (MED/unchecked I/O and allocation) The three check_file_length variants do not validate extents or capture allocation/open errors, so bad dimensions or an inaccessible file can trigger a raw runtime failure before their intended read-error reporting."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "[L295-L325] (MED/misnamed-contract) get_file_length stops counting at the first nonnumeric/failed list-directed record and counts numeric records rather than physical lines, making the generic name misleading and malformed later records indistinguishable from end-of-file."
+   ],
+   "audit_member_text": [
+    "[L315-L321] (LOW/unchecked I/O classification) get_file_length does not capture OPEN errors and treats every nonzero READ iostat as ordinary end-of-file, so malformed numeric input is silently reported as a shorter file."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L79-L85,L106-L113,L133-L140] (LOW/precision-contract) Length/validity checks parse scientific input into default-real temporary arrays even though the consuming model generally reads real*8, so values valid in double precision can fail or overflow during the preliminary check."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L70-L149] (LOW/misnamed-contract) check_file_length verifies only that at least the requested number of numeric values can be read and never detects trailing records/values, despite its name suggesting an exact dimensional check."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L141-L143] (LOW/diagnostic) The 3D error path passes the error text as writelog's format argument rather than supplying the empty format argument used by the 1D and 2D overloads, yielding an inconsistent/malformed diagnostic call."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L197-L220] (MED/record-counting) LOCLIST sets nlocs to every remaining physical line, including blank/comment lines, and then requires each to parse as a location record, with no filtering or declared file-format guard."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A8"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L345-L360] (LOW/unit-allocation-contract) create_new_fid_generic can return the same unit on consecutive calls if the first caller has not opened it yet, because it reserves no unit and retains only a shared probe value."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L163-L176,L227-L246] (MED/uninitialized dispatch state) checkbcfilelength does not assign filetype for wbctype values outside its enumerated branches, yet immediately selects on filetype, whose dummy argument has no declared intent or local default."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L197-L224] (MED/empty-list validation gap) A LOCLIST file containing only its header produces nlocs=0 and skips all boundary-duration validation, allowing a positive-duration simulation to pass this check without any boundary file."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L345-L360] (HIGH/resource-id exhaustion) create_new_fid_generic's initialized local tryunit has implicit SAVE and only decreases across calls, so closed units are never reconsidered and the allocator eventually reports exhaustion after enough cumulative opens even when nearly all units are free."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

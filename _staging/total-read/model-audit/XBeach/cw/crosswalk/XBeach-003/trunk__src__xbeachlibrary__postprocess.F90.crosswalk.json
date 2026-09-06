@@ -1,0 +1,196 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-003",
+ "source_path": "trunk/src/xbeachlibrary/postprocess.F90",
+ "source_sha256": "3b984856cc8b1f281b6ccee6006fe600a880df9a5470bb04c254f9cab2cdf4c5",
+ "base_run_id": "xbeach-r1-XBeach-003-codex-01a05a73-c44f-73d1-9740-9462379b36f1",
+ "audit_run_id": "xbeach-r2-XBeach-003-codex-01a05ac0-7e92-7031-ae47-79d30eab7b40",
+ "base_record_file": "ca32b04ca2efd788323246c4df1b85e05d86f155acc48839d0ce6e1458d0a4cc.json",
+ "audit_record_file": "ca32b04ca2efd788323246c4df1b85e05d86f155acc48839d0ce6e1458d0a4cc.json",
+ "base_record_sha256_bytes": "e32cf4ae94ab2719b0618c3b7319b9e5185e85a0c7b5c1af2bc5e36dbc30ac81",
+ "audit_record_sha256_bytes": "54d31ed9181e2b6330183e37ea287ecb1fe3ca5fd554f90585fef7f9c971cfb9",
+ "base_finding_count": 7,
+ "audit_finding_count": 9,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [
+    "[L498-L509] (MED/incomplete function) runup is explicitly marked incorrect and assigns results only where pointtypes equals 1, leaving all other elements of its returned array undefined."
+   ],
+   "audit_member_text": [
+    "[L498-L509] (HIGH/uninitialized-result) runup assigns result elements only where pointtypes equals 1, so all ordinary point elements are returned uninitialized."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "[L268-L278] (HIGH/unassigned output) With rotation disabled, the Sutot and Svtot branches compute interpolated transport scratch arrays but never copy them into x, leaving the requested output undefined."
+   ],
+   "audit_member_text": [
+    "[L269-L278] (HIGH/missing-assignment) When rotation is disabled, the Sutot and Svtot cases compute a temporary transport field but never assign it to x, leaving the intent(out) result undefined."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "[L337-L345] (MED/non-enforced shape assertion) gridrotate_r3 only logs mismatched horizontal shapes and then proceeds with whole-array assignments that require those shapes to conform."
+   ],
+   "audit_member_text": [
+    "[L300-L345] (MED/shape-error-handling) gridrotate_r3 merely logs mismatched leading dimensions between alfaz and t%r3 and then continues into conforming-array assignments and indexed expressions that require those dimensions to match."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [
+    "[L300,L329-L345] (MED/memory scaling) Every rank-3 rotation creates five full-grid automatic 3-D scratch arrays even when the selected variable needs none or only a subset, creating a substantial stack/memory exhaustion risk for large scientific grids."
+   ],
+   "audit_member_text": [
+    "[L300-L333] (LOW/resource-use) gridrotate_r3 creates and zeroes five full rank-3 automatic arrays for every call regardless of the selected variable, risking substantial stack use."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1",
+    "A2"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "[L186-L197,L307-L327,L420-L440] (HIGH/uninitialized bounds) All rank-2/3/4 gridrotate routines leave their section bounds uninitialized when row is present but nonpositive, despite the comments making only positive row values special.",
+    "[L186-L191,L307-L312,L420-L425] (MED/optional-argument contract) The routines test only PRESENT(row) and then reference optional col unconditionally, so a caller that supplies row without col triggers an invalid absent-optional access."
+   ],
+   "audit_member_text": [
+    "[L186-L196,L283-L327,L409-L442] (HIGH/optional-argument-contract) The rank-2, rank-3, and rank-4 rotation routines dereference optional col whenever positive row is present without checking col is present; rank 3 and 4 also leave all section indices uninitialized when row is present but nonpositive."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L134-L145,L199-L202,L361-L362] (LOW/angle normalization) Direction conversions use 270 minus the angle in degrees without normalizing the result, so rotated output can fall outside a conventional 0–360 degree range."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L65-L108] (MED/shape-contract) snappointstogrid sizes work storage from parameter counts but does not verify the extents of xpoints, ypoints, coordinate arrays, pointtypes, or optional dmin before indexed or whole-array assignment."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L169-L175] (LOW/resource-use) gridrotate_r2 allocates and zeroes two full-grid automatic transport arrays on every call even for variable names that never use them, creating avoidable stack and runtime pressure for large domains."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L186-L196,L307-L327,L420-L442] (MED/bounds-contract) Row/column point-selection accepts unchecked indices and assumes a destination with at least a 1x1 leading section."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B8"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L505-L508] (HIGH/scientific-logic) The source itself marks runup incorrect, and its implementation assigns every gauge the same scalar derived from the first global minimum location of wetz rather than determining runup along each gauge line."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

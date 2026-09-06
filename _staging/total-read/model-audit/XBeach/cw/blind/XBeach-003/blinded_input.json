@@ -1,0 +1,2299 @@
+{
+ "shard": "XBeach-003",
+ "instructions_ref": "see subagent prompt",
+ "files": [
+  {
+   "file_token": "F00",
+   "lang": ".py",
+   "listX": [
+    {
+     "id": "F00-X0",
+     "text": "[L15-L18] (LOW/logging/global-side-effect) The module unconditionally sets DEBUG level and adds a new stream handler at import time, so reloads or application-level logging configuration can produce duplicate or unexpectedly verbose output."
+    },
+    {
+     "id": "F00-X1",
+     "text": "[L26-L38,L278-L285] (MED/portability/resource-lifecycle) The explicit unload path assumes a Unix-style libdl and repeatedly calls dlclose based on an external lsof/grep probe, which is not a reliable or portable library-lifetime contract (notably on Windows and systems without lsof)."
+    },
+    {
+     "id": "F00-X2",
+     "text": "[L45-L47] (MED/command-construction) isloaded interpolates an unquoted absolute library path into a shell command, so spaces or shell metacharacters in a legitimate path can make the load check incorrect."
+    },
+    {
+     "id": "F00-X3",
+     "text": "[L52-L59,L278-L290] (MED/global-state) Construction changes the process-wide current directory, records the prior directory in olddir, but never restores it during finalize."
+    },
+    {
+     "id": "F00-X4",
+     "text": "[L83-L86,L155-L158] (MED/ffi/error-handling) Name lookup ignores the returned length and any native status while returning name.value, leaving truncation or failed native lookup indistinguishable from a valid name."
+    },
+    {
+     "id": "F00-X5",
+     "text": "[L98-L105] (HIGH/ffi/memory-safety) Character parameter retrieval allocates only one c_char and passes it as the native output buffer even though valuelength is returned after the call, so a multi-character native result can overwrite the Python-owned object."
+    },
+    {
+     "id": "F00-X6",
+     "text": "[L98-L119,L131-L144,L206-L227,L254-L264] (HIGH/python3/ffi-contract) ctypes c_char.value is bytes on Python 3, but all type-code branches compare it with text strings, causing valid native type codes to fall through as unsupported."
+    },
+    {
+     "id": "F00-X7",
+     "text": "[L120-L126] (LOW/api-contract) get_parameters returns a set of (name, value) tuples rather than the mapping implied by the method name and by the neighboring get_arrays implementation."
+    },
+    {
+     "id": "F00-X8",
+     "text": "[L209-L216] (MED/rank-contract) Integer retrieval rejects ranks above 2 while set_array permits integer ranks through 4, leaving the public get/set array capabilities asymmetric without explanation."
+    },
+    {
+     "id": "F00-X9",
+     "text": "[L228-L235,L269-L276] (MED/ffi-signature) The dynamically selected array functions are declared with POINTER(ndpointer) and invoked through an extra byref layer, an unusual pointer-to-pointer signature whose compatibility with the native routines is unclear and is not validated by status or restype declarations."
+    },
+    {
+     "id": "F00-X10",
+     "text": "[L251-L253] (LOW/validation) Shape compatibility is enforced only with assert, so optimized Python execution removes this guard before native memory is passed."
+    },
+    {
+     "id": "F00-X11",
+     "text": "[L256-L263] (HIGH/type-mismatch) For a rank-zero integer array, set_array selects c_double instead of c_int, passing scalar storage with the wrong native representation to set0dintarray."
+    },
+    {
+     "id": "F00-X12",
+     "text": "[L258-L264] (MED/input-validation) set_array has no unsupported-type else branch, so an unexpected native type code reaches function-name construction with dtype and typename uninitialized."
+    },
+    {
+     "id": "F00-X13",
+     "text": "[L268-L276] (MED/array-layout) set_array does not convert or explicitly reject ordinary C-contiguous NumPy arrays before binding them to an F_CONTIGUOUS ndpointer, making accepted ndarray inputs dependent on a late ctypes conversion failure."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F00-Y0",
+     "text": "[L278-L289] (HIGH/missing native finalization) finalize unloads the shared library without calling its exported finalize routine, skipping model cleanup, output closure, and MPI finalization."
+    },
+    {
+     "id": "F00-Y1",
+     "text": "[L228-L235] (HIGH/broken array conversion) Nonscalar getters wrap the returned address in numpy.ctypeslib.ndpointer and then call numpy.array on that ctypes pointer object, which does not expose a valid NumPy buffer and fails instead of copying the model array."
+    },
+    {
+     "id": "F00-Y2",
+     "text": "[L98-L102] (HIGH/output buffer overflow) Character-parameter retrieval allocates only one c_char even though the Fortran entry point writes a full fixed-length character array into that address."
+    },
+    {
+     "id": "F00-Y3",
+     "text": "[L64-L72] (HIGH/ignored native status) Initialization, stepping, and output discard all native return codes, so the Python API continues silently after reported model failures."
+    },
+    {
+     "id": "F00-Y4",
+     "text": "[L261-L276] (HIGH/wrong scalar type) The integer scalar setter uses c_double rather than c_int and passes that address to set0dintarray, causing the Fortran side to reinterpret floating-point bytes as an integer."
+    },
+    {
+     "id": "F00-Y5",
+     "text": "[L21-L23,L93-L119,L127-L144,L166-L184,L192-L227,L243-L276] (HIGH/Python 3 incompatibility) ctypes c_char results are bytes and create_string_buffer requires bytes under Python 3, but the wrapper consistently compares type codes with str literals and assumes string inputs, making core parameter and array dispatch fail."
+    },
+    {
+     "id": "F00-Y6",
+     "text": "[L52-L59,L278-L289] (MED/process working-directory side effect) Construction changes the process-wide working directory and stores olddir but never restores it, including after finalization or a library-load failure."
+    },
+    {
+     "id": "F00-Y7",
+     "text": "[L57-L59] (MED/path resolution) A relative library path is converted to absolute only after changing into workingdir, so it is resolved against a different directory than the caller's original context."
+    },
+    {
+     "id": "F00-Y8",
+     "text": "[L120-L126] (MED/wrong return type) get_parameters constructs a set of (name,value) tuples rather than the mapping implied by the method name and typical parameter API use."
+    },
+    {
+     "id": "F00-Y9",
+     "text": "[L73-L119,L145-L184,L228-L230,L276] (MED/ignored introspection status) Most introspection calls discard their native status codes and return default or undefined ctypes values when lookup or transfer fails."
+    },
+    {
+     "id": "F00-Y10",
+     "text": "[L26-L47,L278-L285] (MED/unsafe unload loop) Finalization repeatedly calls dlclose on one saved handle until a shell-based lsof probe says the path is absent, which can reuse an already-closed handle or unload a library still shared by another wrapper instance."
+    },
+    {
+     "id": "F00-Y11",
+     "text": "[L43-L47] (MED/nonportable shell probe) isloaded depends on external lsof and interpolates an unquoted absolute path into a shell pipeline, so spaces or shell metacharacters break the check and supported non-Unix platforms cannot use it."
+    },
+    {
+     "id": "F00-Y12",
+     "text": "[L26-L38] (LOW/platform/bytes handling) dlclose assumes a loadable libdl plus an unversioned suffix and compares dlerror's bytes result to a str literal, so its error classification is unreliable on Python 3 and several declared platforms."
+    },
+    {
+     "id": "F00-Y13",
+     "text": "[L12-L18] (LOW/logging side effect) Importing the module forces DEBUG level and attaches a new stream handler without checking for an existing handler, causing duplicate or unexpectedly verbose application logging."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F00-X0",
+     "F00-Y5"
+    ],
+    [
+     "F00-X0",
+     "F00-Y13"
+    ],
+    [
+     "F00-X1",
+     "F00-Y0"
+    ],
+    [
+     "F00-X1",
+     "F00-Y4"
+    ],
+    [
+     "F00-X1",
+     "F00-Y5"
+    ],
+    [
+     "F00-X1",
+     "F00-Y6"
+    ],
+    [
+     "F00-X1",
+     "F00-Y9"
+    ],
+    [
+     "F00-X1",
+     "F00-Y10"
+    ],
+    [
+     "F00-X1",
+     "F00-Y11"
+    ],
+    [
+     "F00-X1",
+     "F00-Y12"
+    ],
+    [
+     "F00-X2",
+     "F00-Y6"
+    ],
+    [
+     "F00-X2",
+     "F00-Y10"
+    ],
+    [
+     "F00-X2",
+     "F00-Y11"
+    ],
+    [
+     "F00-X3",
+     "F00-Y0"
+    ],
+    [
+     "F00-X3",
+     "F00-Y3"
+    ],
+    [
+     "F00-X3",
+     "F00-Y4"
+    ],
+    [
+     "F00-X3",
+     "F00-Y5"
+    ],
+    [
+     "F00-X3",
+     "F00-Y6"
+    ],
+    [
+     "F00-X3",
+     "F00-Y7"
+    ],
+    [
+     "F00-X3",
+     "F00-Y9"
+    ],
+    [
+     "F00-X3",
+     "F00-Y10"
+    ],
+    [
+     "F00-X3",
+     "F00-Y11"
+    ],
+    [
+     "F00-X5",
+     "F00-Y2"
+    ],
+    [
+     "F00-X5",
+     "F00-Y5"
+    ],
+    [
+     "F00-X6",
+     "F00-Y1"
+    ],
+    [
+     "F00-X6",
+     "F00-Y2"
+    ],
+    [
+     "F00-X6",
+     "F00-Y4"
+    ],
+    [
+     "F00-X6",
+     "F00-Y5"
+    ],
+    [
+     "F00-X6",
+     "F00-Y8"
+    ],
+    [
+     "F00-X6",
+     "F00-Y9"
+    ],
+    [
+     "F00-X7",
+     "F00-Y5"
+    ],
+    [
+     "F00-X7",
+     "F00-Y8"
+    ],
+    [
+     "F00-X7",
+     "F00-Y9"
+    ],
+    [
+     "F00-X9",
+     "F00-Y0"
+    ],
+    [
+     "F00-X9",
+     "F00-Y1"
+    ],
+    [
+     "F00-X9",
+     "F00-Y4"
+    ],
+    [
+     "F00-X9",
+     "F00-Y5"
+    ],
+    [
+     "F00-X9",
+     "F00-Y6"
+    ],
+    [
+     "F00-X9",
+     "F00-Y9"
+    ],
+    [
+     "F00-X9",
+     "F00-Y10"
+    ],
+    [
+     "F00-X11",
+     "F00-Y4"
+    ],
+    [
+     "F00-X12",
+     "F00-Y4"
+    ],
+    [
+     "F00-X13",
+     "F00-Y0"
+    ],
+    [
+     "F00-X13",
+     "F00-Y4"
+    ],
+    [
+     "F00-X13",
+     "F00-Y5"
+    ],
+    [
+     "F00-X13",
+     "F00-Y6"
+    ],
+    [
+     "F00-X13",
+     "F00-Y9"
+    ],
+    [
+     "F00-X13",
+     "F00-Y10"
+    ]
+   ]
+  },
+  {
+   "file_token": "F01",
+   "lang": ".F90",
+   "listX": [
+    {
+     "id": "F01-X0",
+     "text": "[L61-L65; ncoutput state initialized only at L56-L60,L71-L79] (HIGH/uninitialized output counter) Pure NetCDF initialization does not call fortoutput_init, which is the only initializer for the saved drifter record counter used by ncoutput, so NetCDF drifter output can start from an undefined record index."
+    },
+    {
+     "id": "F01-X1",
+     "text": "[L199-L213] (MED/nonfunctional error output) output_error claims that it creates an extra diagnostic timestep, but the output call is commented out and the routine only logs the claim before halting."
+    },
+    {
+     "id": "F01-X2",
+     "text": "[L232-L295] (MED/incomplete output validation) check_outputvariables_allocated validates only global variables, leaving configured point and mean variables to reach later output paths without equivalent association checks."
+    },
+    {
+     "id": "F01-X3",
+     "text": "[L233-L236] (MED/unchecked mnemonic lookup) The allocation check passes chartoindex directly to indextos without handling an unknown configured mnemonic."
+    },
+    {
+     "id": "F01-X4",
+     "text": "[L336-L345] (MED/division by zero) Progress reporting divides by par%tstop in several expressions without guarding a zero stop time."
+    },
+    {
+     "id": "F01-X5",
+     "text": "[L297-L303] (LOW/MPI validation scope) The output-variable error flag is broadcast only among non-output-master ranks, so the output master does not receive the validation result before its own initialization path."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F01-Y0",
+     "text": "[L54-L80] (MED/configuration-validation) Output-format selection has no default case, so an unexpected format value silently skips all format-specific initialization."
+    },
+    {
+     "id": "F01-Y1",
+     "text": "[L125-L128] (LOW/logging-accuracy) The hotstart message is emitted whenever outputh is set and hotstart writing is enabled, before this module has evidence that creation actually succeeded."
+    },
+    {
+     "id": "F01-Y2",
+     "text": "[L199-L214] (MED/api-behavior) output_error claims an extra output timestep is created, but the output call is commented out and the routine immediately halts without using any of its state arguments."
+    },
+    {
+     "id": "F01-Y3",
+     "text": "[L232-L294] (MED/input-validation) Output-variable validation passes chartoindex results directly to indextos and has no default rejection for unknown types or ranks outside 0 through 4, allowing malformed selections to bypass the association checks."
+    },
+    {
+     "id": "F01-Y4",
+     "text": "[L297-L303] (MED/mpi/error-propagation) Allocation errors are broadcast and halted only within the compute communicator, while the separate I/O rank retains outputError zero, so the I/O process is not explicitly brought into this failure path."
+    },
+    {
+     "id": "F01-Y5",
+     "text": "[L336-L345] (MED/arithmetic) Progress and completion-time calculations divide by par%tstop without guarding a zero stop time."
+    },
+    {
+     "id": "F01-Y6",
+     "text": "[L310-L368] (LOW/state-lifecycle) log_progress keeps firsttime and timing accumulators in saved procedure state with no reset, so a second model run in the same process inherits the prior run's wall-clock baseline."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F01-X0",
+     "F01-Y0"
+    ],
+    [
+     "F01-X1",
+     "F01-Y2"
+    ],
+    [
+     "F01-X2",
+     "F01-Y3"
+    ],
+    [
+     "F01-X2",
+     "F01-Y4"
+    ],
+    [
+     "F01-X3",
+     "F01-Y3"
+    ],
+    [
+     "F01-X4",
+     "F01-Y5"
+    ],
+    [
+     "F01-X5",
+     "F01-Y3"
+    ],
+    [
+     "F01-X5",
+     "F01-Y4"
+    ]
+   ]
+  },
+  {
+   "file_token": "F02",
+   "lang": ".F90",
+   "listX": [
+    {
+     "id": "F02-X0",
+     "text": "[L16-L22,L53-L61] (MED/ffi/calling-convention) The procedure interface used for a C function pointer is not declared bind(C), so c_f_procpointer does not establish a portable interoperable callback calling convention."
+    },
+    {
+     "id": "F02-X1",
+     "text": "[L50,L372] (HIGH/build-completeness) The module includes writeloginterface.inc and writelog.inc, but neither file exists under source_code, leaving the logging API dependent on absent generated artifacts."
+    },
+    {
+     "id": "F02-X2",
+     "text": "[L76-L100] (HIGH/uninitialized-status) start_logfiles never initializes error to zero, leaves it untouched on non-master ranks, and later tests it on every rank."
+    },
+    {
+     "id": "F02-X3",
+     "text": "[L84-L93] (HIGH/io-error-handling) Log-file OPEN statements have no iostat checks, while the reported error is based only on whether a positive unit number was found, so actual open failures are not detected."
+    },
+    {
+     "id": "F02-X4",
+     "text": "[L151-L181] (MED/arithmetic-input-contract) progress_indicator does not require positive dper, dt, or count_rate; in particular dper=0 reaches mod(curper,dper) and divides by zero."
+    },
+    {
+     "id": "F02-X5",
+     "text": "[L161-L181] (LOW/timer-wraparound) The saved system_clock baseline does not account for count_max rollover, which can suppress time-based progress reports after wraparound."
+    },
+    {
+     "id": "F02-X6",
+     "text": "[L274-L280] (LOW/diagnostic-accuracy) The error-6 warning describes an excessive N-direction split but tells the user to reduce MPI domains in the M direction."
+    },
+    {
+     "id": "F02-X7",
+     "text": "[L304-L313] (MED/arithmetic) Final timing divides by timestep count n without guarding n=0, affecting both average timestep and performance calculations."
+    },
+    {
+     "id": "F02-X8",
+     "text": "[L375-L386] (LOW/dead-code) assignlogdelegate_internal declares local integer i but never uses it, suggesting incomplete delegate setup or stale code."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F02-Y0",
+     "text": "[L67-L72] (HIGH/fixed-buffer overflow) logmsg passes an arbitrary-length message directly to string_to_char_array's fixed 1024-byte result without truncation or rejection, so messages of 1024 or more nonblank characters overflow the conversion buffer."
+    },
+    {
+     "id": "F02-Y1",
+     "text": "[L104-L110,L357-L365] (MED/diagnostic loss) Errors are written to XBerror.txt during execution but close_logfiles unconditionally closes that file with STATUS='DELETE', discarding the error log even after errors were recorded."
+    },
+    {
+     "id": "F02-Y2",
+     "text": "[L84-L93] (MED/file-open error handling) The OPEN statements have no IOSTAT handling and the subsequent error test checks only whether a unit number was available, not whether any log file was successfully opened."
+    },
+    {
+     "id": "F02-Y3",
+     "text": "[L166-L180] (MED/division by zero) progress_indicator permits dper equal to zero and then can evaluate mod(curper,dper), which is undefined for a zero divisor."
+    },
+    {
+     "id": "F02-Y4",
+     "text": "[L302-L313] (MED/division by zero) writelog_finalize divides by the timestep count n without guarding the valid lifecycle case in which finalization occurs before any execute step."
+    },
+    {
+     "id": "F02-Y5",
+     "text": "[L274-L280] (LOW/misleading diagnostic) The error==6 branch reports an excessive N-direction domain count but tells the user to reduce the M-direction count."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F02-X0",
+     "F02-Y0"
+    ],
+    [
+     "F02-X2",
+     "F02-Y0"
+    ],
+    [
+     "F02-X2",
+     "F02-Y1"
+    ],
+    [
+     "F02-X3",
+     "F02-Y2"
+    ],
+    [
+     "F02-X4",
+     "F02-Y3"
+    ],
+    [
+     "F02-X5",
+     "F02-Y3"
+    ],
+    [
+     "F02-X6",
+     "F02-Y5"
+    ],
+    [
+     "F02-X7",
+     "F02-Y4"
+    ]
+   ]
+  },
+  {
+   "file_token": "F03",
+   "lang": ".F90",
+   "listX": [],
+   "listY": [
+    {
+     "id": "F03-Y0",
+     "text": "[L2-L3,L633] (LOW/disabled diagnostics) The entire debugging implementation is preprocessor-disabled with an explicit rewrite note, so the compiled module exposes none of its consistency-check or checksum routines."
+    }
+   ],
+   "candidate_pairs": []
+  },
+  {
+   "file_token": "F04",
+   "lang": ".F90",
+   "listX": [
+    {
+     "id": "F04-X0",
+     "text": "[L196-L201,L218-L225,L242-L251] (HIGH/wrong array component) Local mean initialization sizes integer rank-2/3/4 variables through the real pointer components r2/r3/r4 instead of i2/i3/i4, which can dereference unassociated pointers."
+    },
+    {
+     "id": "F04-X1",
+     "text": "[L413-L415] (HIGH/wrong array component) Rank-4 averaging sizes its first three dimensions from t%r3 rather than t%r4, so a normal rank-4 variable can fail before accumulation begins."
+    },
+    {
+     "id": "F04-X2",
+     "text": "[L337-L351,L441-L477] (HIGH/state not reset) The saved sine and cosine accumulators used for thetamean are never cleared by clearaverage, so each nominal averaging period includes all prior periods."
+    },
+    {
+     "id": "F04-X3",
+     "text": "[L330-L351] (HIGH/angle-unit mismatch) When rotation is enabled gridrotate converts thetamean to degrees, but makeaverage immediately passes those values to SIN and COS as though they were radians."
+    },
+    {
+     "id": "F04-X4",
+     "text": "[L351-L354] (HIGH/representation contract mismatch) The live code stores the circular mean directly as atan2(sine,cosine) while the former packed sine/cosine representation is commented out, leaving downstream consumers that decode the packed representation incompatible."
+    },
+    {
+     "id": "F04-X5",
+     "text": "[L389-L412,L423-L424] (HIGH/unsupported integer mean) Although initialization accepts integer rank-3 and rank-4 mean variables, makeaverage unconditionally uses real components and real rotation paths for those ranks."
+    },
+    {
+     "id": "F04-X6",
+     "text": "[L83-L90,L187] (MED/unchecked mnemonic lookup) Mean-variable names are converted to indices and used immediately without checking for an unknown mnemonic."
+    },
+    {
+     "id": "F04-X7",
+     "text": "[L337-L387] (MED/circular-statistics inconsistency) thetamean receives a circular mean but its variance, minimum, and maximum are still computed with linear angle arithmetic, which is discontinuous across the direction wrap."
+    },
+    {
+     "id": "F04-X8",
+     "text": "[L324-L329,L378-L385,L394-L409,L417-L432] (MED/numerical stability) The variance recurrence divides a cross term by an epsilon-substituted old mean, so cancellation near a zero mean can strongly amplify roundoff despite the nominal zero guard."
+    },
+    {
+     "id": "F04-X9",
+     "text": "[L504-L523] (LOW/bounds contract) makecrossvector uses caller-supplied mg directly as a row or column index without validating it against the selected array."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F04-Y0",
+     "text": "[L82-L94] (MED/input-validation) means_init passes chartoindex results directly to index allocation and lookup without rejecting an unknown mean-variable index."
+    },
+    {
+     "id": "F04-Y1",
+     "text": "[L94-L185,L194-L267] (MED/rank-contract) Initialization handles only ranks 2 through 4 and has no default rejection, leaving unsupported requested ranks with unallocated accumulator pointers."
+    },
+    {
+     "id": "F04-Y2",
+     "text": "[L199-L201,L222-L225,L247-L251] (HIGH/wrong-component) All local integer-array initialization branches obtain dimensions from the real pointer components r2/r3/r4 instead of i2/i3/i4, which may be unassociated and is not the selected variable storage."
+    },
+    {
+     "id": "F04-Y3",
+     "text": "[L313] (MED/arithmetic) The averaging weight evaluates par%dt/par%tintm before max can clamp it, so a zero averaging interval still causes division by zero."
+    },
+    {
+     "id": "F04-Y4",
+     "text": "[L337-L351] (MED/numerical-guard) The near-zero circular-mean guard computes numeps*sign(tvar2d_cos,1.d0), which remains zero when cosine is zero and is far below numeps otherwise, so it does not reliably prevent the invalid atan2(0,0) case."
+    },
+    {
+     "id": "F04-Y5",
+     "text": "[L337-L351,L441-L477] (HIGH/state-reset) The saved circular accumulators tvar2d_sin and tvar2d_cos are never reset by clearaverage, so later averaging periods include all prior periods even though the published mean arrays are cleared."
+    },
+    {
+     "id": "F04-Y6",
+     "text": "[L389-L412] (HIGH/type-contract) Rank-3 averaging always sizes temporaries from t%r3 and calls the real grid-rotation path even though means_init explicitly permits rank-3 integer variables, making integer selections dereference the wrong component."
+    },
+    {
+     "id": "F04-Y7",
+     "text": "[L413-L435] (HIGH/wrong-rank-component) Rank-4 temporary dimensions 1 through 3 are taken from t%r3 rather than t%r4, so a normal rank-4 variable can dereference an unassociated rank-3 pointer or allocate the wrong shape."
+    },
+    {
+     "id": "F04-Y8",
+     "text": "[L499-L523] (MED/bounds-rank-contract) makecrossvector indexes every requested variable through r2/i2 at mg and assigns it into a caller section without validating variable rank, mg bounds, or destination extent."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F04-X0",
+     "F04-Y1"
+    ],
+    [
+     "F04-X0",
+     "F04-Y2"
+    ],
+    [
+     "F04-X0",
+     "F04-Y6"
+    ],
+    [
+     "F04-X0",
+     "F04-Y7"
+    ],
+    [
+     "F04-X1",
+     "F04-Y6"
+    ],
+    [
+     "F04-X1",
+     "F04-Y7"
+    ],
+    [
+     "F04-X2",
+     "F04-Y4"
+    ],
+    [
+     "F04-X2",
+     "F04-Y5"
+    ],
+    [
+     "F04-X2",
+     "F04-Y7"
+    ],
+    [
+     "F04-X3",
+     "F04-Y4"
+    ],
+    [
+     "F04-X3",
+     "F04-Y5"
+    ],
+    [
+     "F04-X4",
+     "F04-Y4"
+    ],
+    [
+     "F04-X4",
+     "F04-Y5"
+    ],
+    [
+     "F04-X5",
+     "F04-Y6"
+    ],
+    [
+     "F04-X5",
+     "F04-Y7"
+    ],
+    [
+     "F04-X6",
+     "F04-Y0"
+    ],
+    [
+     "F04-X6",
+     "F04-Y1"
+    ],
+    [
+     "F04-X7",
+     "F04-Y4"
+    ],
+    [
+     "F04-X7",
+     "F04-Y5"
+    ],
+    [
+     "F04-X7",
+     "F04-Y6"
+    ],
+    [
+     "F04-X8",
+     "F04-Y6"
+    ],
+    [
+     "F04-X8",
+     "F04-Y7"
+    ],
+    [
+     "F04-X9",
+     "F04-Y8"
+    ]
+   ]
+  },
+  {
+   "file_token": "F05",
+   "lang": ".F90",
+   "listX": [
+    {
+     "id": "F05-X0",
+     "text": "[L201-L214,L307-L312] (MED/mpi/lifecycle) The module unconditionally initializes and finalizes MPI without checking existing MPI state, conflicting with embedding hosts that own the MPI lifecycle."
+    },
+    {
+     "id": "F05-X1",
+     "text": "[L257-L260,L314-L320,L1696-L1701,L1711-L1727] (HIGH/mpi/error-path) The I/O rank deliberately has xmpi_comm set to MPI_COMM_NULL, yet normal halt and communicator error handling call xmpi_abort on xmpi_comm, so an error on that rank can attempt MPI_Abort with an invalid communicator instead of terminating the full job."
+    },
+    {
+     "id": "F05-X2",
+     "text": "[L338-L387] (LOW/integer-range) Processor-grid scoring uses default-integer products and a fixed 1000000000 sentinel, allowing large domain dimensions to overflow or leave a valid factorization unselected."
+    },
+    {
+     "id": "F05-X3",
+     "text": "[L359-L365] (MED/input-validation) Manual decomposition checks only the product, so two negative manual dimensions can pass and later become invalid divisors and neighbor geometry."
+    },
+    {
+     "id": "F05-X4",
+     "text": "[L371-L372] (HIGH/arithmetic) The XPREF condition can evaluate m/nmin when integer division n/xmpi_size produced zero, because Fortran does not require short-circuit evaluation of .and., yielding a division by zero."
+    },
+    {
+     "id": "F05-X5",
+     "text": "[L425-L449] (MED/input-validation) Cyclic boundary handling has cases only for 0 and 1 and no default, so any other cyclic value leaves negative or out-of-range neighbor ranks marked as non-boundaries."
+    },
+    {
+     "id": "F05-X6",
+     "text": "[L481-L645] (HIGH/build-completeness) Fourteen broadcast wrappers include xmpi_bcast.inc, but that include is absent from the source_code tree, leaving these procedures uncompilable unless an undocumented external generation step supplies it."
+    },
+    {
+     "id": "F05-X7",
+     "text": "[L614-L626] (LOW/mpi/portability) Eight-byte integer broadcast uses nonstandard integer*8 syntax and the nonportable MPI_INTEGER8 datatype rather than a kind-matched MPI type."
+    },
+    {
+     "id": "F05-X8",
+     "text": "[L648-L687] (MED/bounds-contract) Character broadcast does not verify that non-source character variables can hold the source's trimmed length before assigning x(i:i)."
+    },
+    {
+     "id": "F05-X9",
+     "text": "[L690-L773] (MED/buffer-size-contract) All sendrecv overloads reuse size(sendbuf) as the receive count without checking recvbuf size, permitting receive truncation or overwrite for mismatched arguments."
+    },
+    {
+     "id": "F05-X10",
+     "text": "[L820-L838,L850-L858] (MED/buffer-size-contract) Array reductions send size(x) elements into y without asserting equal extents, leaving root receive-buffer capacity implicit."
+    },
+    {
+     "id": "F05-X11",
+     "text": "[L873-L989] (MED/bounds-contract) Basic shift routines directly reference rows or columns 2, m-1, and n-1 without validating minimum local-array extents."
+    },
+    {
+     "id": "F05-X12",
+     "text": "[L1030-L1208] (MED/bounds-contract) Ranged shift routines accept arbitrary i1/i2 and derive sections from a fixed four-cell overlap without checking ordering or bounds."
+    },
+    {
+     "id": "F05-X13",
+     "text": "[L1374-L1560] (MED/mpi/message-contract) The paired send helpers derive counts independently from each rank's local array and do not validate from/to ranks, so shape disagreement or invalid endpoints can cause truncation or indefinite blocking."
+    },
+    {
+     "id": "F05-X14",
+     "text": "[L1568-L1585] (MED/mpi/liveness) xmpi_send_sleep ignores all MPI errors and polls forever until flag becomes true, so a failed Irecv or MPI_Test has no exit path."
+    },
+    {
+     "id": "F05-X15",
+     "text": "[L1603-L1614] (MED/mpi/communicator-contract) xmpi_barrier defaults to xmpi_comm even though that communicator is MPI_COMM_NULL on the I/O process, and the procedure contains no guard against invocation there."
+    },
+    {
+     "id": "F05-X16",
+     "text": "[L1619-L1670] (MED/mpi/input-contract) xmpi_getrow does not validate prow, n, size(a,2), or size(b), so inconsistent metadata can produce invalid ranks, nonconforming assignment, buffer mismatch, or an unmatched blocking receive."
+    },
+    {
+     "id": "F05-X17",
+     "text": "[L1730-L1755] (HIGH/preprocessor/error-path) The GNU-version test checks __GNUC_MINOR__ >= 8 even for major versions above 4, so many modern GNU compilers retain the fallback backtrace routine that intentionally dereferences a null pointer on every normal halt."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F05-Y0",
+     "text": "[L484,L500,L515,L530,L545,L560,L575,L589,L603,L617,L631,L645] (HIGH/build dependency) Twelve active broadcast wrappers include xmpi_bcast.inc, but that include is absent from the source tree and is not listed among the build's generated sources."
+    },
+    {
+     "id": "F05-Y1",
+     "text": "[L145-L151,L961-L980] (HIGH/missing generic implementation) xmpi_shift_i3 calls xmpi_sendrecv with rank-3 integer sections, but the xmpi_sendrecv generic has no rank-3 integer procedure, producing no matching specific routine."
+    },
+    {
+     "id": "F05-Y2",
+     "text": "[L371-L376] (HIGH/division by zero) The XPREF processor-grid branch can set nmin to zero and evaluate m/nmin; Fortran does not guarantee short-circuit evaluation of the preceding nmin>4 condition."
+    },
+    {
+     "id": "F05-Y3",
+     "text": "[L314-L320,L1696-L1701,L1711-L1727] (HIGH/incorrect abort communicator) Normal error handling aborts xmpi_comm, which excludes the output rank and is MPI_COMM_NULL on that rank, so output-rank failures can recurse or hang and compute-rank failures can strand the output process."
+    },
+    {
+     "id": "F05-Y4",
+     "text": "[L1730-L1755] (MED/diagnostic crash) On compiler configurations that leave MBACKTRACE defined, the error reporter deliberately dereferences a null pointer to force a segmentation fault before orderly MPI termination."
+    },
+    {
+     "id": "F05-Y5",
+     "text": "[L648-L683] (MED/string buffer bounds) Character broadcast sends the source's trimmed length but never checks the receiving character capacity before assigning x(i:i), so differing declared lengths can write past the receiver."
+    },
+    {
+     "id": "F05-Y6",
+     "text": "[L690-L771] (MED/message-size contract) All xmpi_sendrecv wrappers use the sender's size as the receive count without verifying that recvbuf has the same number of elements."
+    },
+    {
+     "id": "F05-Y7",
+     "text": "[L1374-L1560] (MED/message-size contract) The paired xmpi_send wrappers derive counts independently from the sender and receiver actual arrays and exchange no shape metadata, so mismatched caller shapes yield truncation or partial data."
+    },
+    {
+     "id": "F05-Y8",
+     "text": "[L1619-L1671] (MED/unchecked row contract) xmpi_getrow does not validate n, prow, or b's extent before assigning a full row and communicating n elements."
+    },
+    {
+     "id": "F05-Y9",
+     "text": "[L425-L449] (LOW/unchecked enum) Cyclic boundary handling has cases only for 0 and 1; any other value leaves out-of-range neighbor ranks in place without setting boundary flags or returning an error."
+    },
+    {
+     "id": "F05-Y10",
+     "text": "[L210-L249,L311,L494-L639,L701-L857,L1387-L1583,L1613,L1660-L1670] (LOW/unchecked MPI status) Most MPI return codes are assigned but not inspected locally, reducing diagnostic context even where a communicator error handler may run."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F05-X0",
+     "F05-Y3"
+    ],
+    [
+     "F05-X0",
+     "F05-Y10"
+    ],
+    [
+     "F05-X1",
+     "F05-Y3"
+    ],
+    [
+     "F05-X1",
+     "F05-Y4"
+    ],
+    [
+     "F05-X1",
+     "F05-Y10"
+    ],
+    [
+     "F05-X3",
+     "F05-Y2"
+    ],
+    [
+     "F05-X4",
+     "F05-Y2"
+    ],
+    [
+     "F05-X5",
+     "F05-Y9"
+    ],
+    [
+     "F05-X6",
+     "F05-Y0"
+    ],
+    [
+     "F05-X6",
+     "F05-Y5"
+    ],
+    [
+     "F05-X6",
+     "F05-Y10"
+    ],
+    [
+     "F05-X7",
+     "F05-Y0"
+    ],
+    [
+     "F05-X8",
+     "F05-Y0"
+    ],
+    [
+     "F05-X8",
+     "F05-Y5"
+    ],
+    [
+     "F05-X8",
+     "F05-Y6"
+    ],
+    [
+     "F05-X8",
+     "F05-Y8"
+    ],
+    [
+     "F05-X9",
+     "F05-Y6"
+    ],
+    [
+     "F05-X10",
+     "F05-Y10"
+    ],
+    [
+     "F05-X13",
+     "F05-Y7"
+    ],
+    [
+     "F05-X14",
+     "F05-Y10"
+    ],
+    [
+     "F05-X15",
+     "F05-Y8"
+    ],
+    [
+     "F05-X15",
+     "F05-Y10"
+    ],
+    [
+     "F05-X16",
+     "F05-Y8"
+    ],
+    [
+     "F05-X16",
+     "F05-Y10"
+    ],
+    [
+     "F05-X17",
+     "F05-Y3"
+    ],
+    [
+     "F05-X17",
+     "F05-Y4"
+    ]
+   ]
+  },
+  {
+   "file_token": "F06",
+   "lang": ".F90",
+   "listX": [
+    {
+     "id": "F06-X0",
+     "text": "[L445-L455,L463;L587-L606] (HIGH/nonblocking buffer lifetime) Both column-wise send routines deallocate the contiguous send buffer aa before all outstanding MPI_Isend requests are completed, violating MPI buffer-lifetime requirements and risking corrupted transfers."
+    },
+    {
+     "id": "F06-X1",
+     "text": "[L421-L454,L563-L596] (MED/nontermination edge case) If sum(ln(1:procs)) is zero on the root, the unconditional loop has no send event that can reach its exit test and runs forever; no positive-dimension precondition is enforced."
+    },
+    {
+     "id": "F06-X2",
+     "text": "[L716-L725,L828-L837,L1403-L1417,L1556-L1570] (MED/MPI error scope) Local size-consistency failures abort MPI_COMM_WORLD rather than the communicator supplied to the routine, potentially terminating unrelated communicator participants."
+    },
+    {
+     "id": "F06-X3",
+     "text": "[L110-L134,L180-L231,L278-L323,L380-L463,L525-L606,L659-L725,L769-L837,L900-L1019,L1092-L1223,L1303-L1417,L1455-L1570,L1730-L1753] (LOW/unchecked MPI status) MPI return codes are stored throughout the module but never tested, so communication failures are not distinguished from valid results."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F06-Y0",
+     "text": "[L110-L134,L180-L231,L278-L323,L380-L463,L525-L606,L659-L725,L769-L837,L900-L1019,L1092-L1223,L1303-L1417,L1455-L1570,L1729-L1753] (MED/mpi/error-handling) MPI status codes are consistently captured but not checked, so communication failures can leave partially populated arrays or enter later waits with invalid requests."
+    },
+    {
+     "id": "F06-Y1",
+     "text": "[L80-L137] (MED/bounds-contract) Vector distribution indexes is/lm by communicator size and copies lm elements into b without validating metadata extents, source ranges, or destination capacity."
+    },
+    {
+     "id": "F06-Y2",
+     "text": "[L142-L326] (MED/scatter-metadata) Scatter variants trust is/lm/js/ln and local matrix shapes completely, allowing invalid displacements, counts, or b columns to be passed to MPI."
+    },
+    {
+     "id": "F06-Y3",
+     "text": "[L389-L454,L534-L596] (HIGH/mpi/liveness) Both column-send root loops terminate only after incrementing sends, so a valid zero-total workload makes the unbounded loop advance j forever."
+    },
+    {
+     "id": "F06-Y4",
+     "text": "[L408-L470,L553-L615] (LOW/resource-use) The send variants allocate a full bb copy on the root even though bb is only read on non-root processes."
+    },
+    {
+     "id": "F06-Y5",
+     "text": "[L619-L841] (MED/bounds-contract) Whole-matrix distribution computes array sections from unchecked metadata and root rank before validating that source and destination shapes match."
+    },
+    {
+     "id": "F06-Y6",
+     "text": "[L716-L722,L828-L834,L1403-L1414,L1556-L1567] (MED/communicator-scope) Shape mismatches abort MPI_COMM_WORLD rather than the communicator passed to the routine, unexpectedly terminating unrelated ranks in an embedded or split-communicator use."
+    },
+    {
+     "id": "F06-Y7",
+     "text": "[L928-L1024,L1102-L1225] (MED/collection-metadata) Column collection derives counts, receive totals, and array sections from unchecked overlap flags and metadata, so inconsistent flags can produce negative counts, missing receives, or out-of-bounds sections."
+    },
+    {
+     "id": "F06-Y8",
+     "text": "[L1296-L1417,L1449-L1570] (MED/minimum-extent) Whole-submatrix collectors subtract a fixed four-cell overlap without enforcing local dimensions of at least four, allowing negative extents and MPI counts."
+    },
+    {
+     "id": "F06-Y9",
+     "text": "[L1575-L1618] (HIGH/arithmetic-input-contract) decomp divides and takes modulo by numprocs without rejecting zero, and does not validate myid against the process range."
+    },
+    {
+     "id": "F06-Y10",
+     "text": "[L1668-L1710] (MED/output-bounds) det_submatrices assumes all eight output arrays contain at least mp*np elements and that ma/na exceed the fixed overlap, but validates neither condition."
+    },
+    {
+     "id": "F06-Y11",
+     "text": "[L1714-L1753] (MED/minimum-extent) Border shifting forms rows/columns 2 and ma-1/na-1 and uses count ma-2 without checking that the matrix has sufficient dimensions."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F06-X0",
+     "F06-Y0"
+    ],
+    [
+     "F06-X0",
+     "F06-Y3"
+    ],
+    [
+     "F06-X1",
+     "F06-Y3"
+    ],
+    [
+     "F06-X2",
+     "F06-Y0"
+    ],
+    [
+     "F06-X2",
+     "F06-Y5"
+    ],
+    [
+     "F06-X2",
+     "F06-Y6"
+    ],
+    [
+     "F06-X2",
+     "F06-Y8"
+    ],
+    [
+     "F06-X2",
+     "F06-Y9"
+    ],
+    [
+     "F06-X3",
+     "F06-Y0"
+    ],
+    [
+     "F06-X3",
+     "F06-Y1"
+    ],
+    [
+     "F06-X3",
+     "F06-Y2"
+    ],
+    [
+     "F06-X3",
+     "F06-Y5"
+    ],
+    [
+     "F06-X3",
+     "F06-Y6"
+    ],
+    [
+     "F06-X3",
+     "F06-Y7"
+    ],
+    [
+     "F06-X3",
+     "F06-Y8"
+    ],
+    [
+     "F06-X3",
+     "F06-Y9"
+    ],
+    [
+     "F06-X3",
+     "F06-Y11"
+    ]
+   ]
+  },
+  {
+   "file_token": "F07",
+   "lang": ".F90",
+   "listX": [
+    {
+     "id": "F07-X0",
+     "text": "[L173-L180,L369-L376] (HIGH/unchecked index) The parameter-name and array-name entry points index keys or call indextos without validating the caller-supplied index, so an out-of-range C/API index can cause an out-of-bounds access."
+    },
+    {
+     "id": "F07-X1",
+     "text": "[L529-L552,L764-L787] (HIGH/dangling C pointer) The scalar C getters return c_loc of an automatic local target (r0 or i0), whose lifetime ends when the function returns, leaving the caller with an invalid pointer."
+    },
+    {
+     "id": "F07-X2",
+     "text": "[L454-L484] (MED/incorrect status contract) getarraydimsize_c initializes its function result to -1 and never changes it to success after computing dimsize, so every successful dimension query is reported as a failure."
+    },
+    {
+     "id": "F07-X3",
+     "text": "[L145-L149] (MED/false success status) getparametertype_c unconditionally returns success and does not propagate whether getkey_indextype found the requested parameter."
+    },
+    {
+     "id": "F07-X4",
+     "text": "[L468-L482] (MED/dimension validation) getarraydimsize_c checks only rank < dim, so dim values of zero or less can reach the SIZE intrinsic with an invalid dimension argument."
+    },
+    {
+     "id": "F07-X5",
+     "text": "[L587-L600,L635-L647,L682-L694,L730-L742,L820-L832,L868-L879] (MED/returned pointer lifetime) Each nonscalar C getter returns a pointer into a saved scratch allocation that is deallocated by the next call of the same rank/type, silently invalidating previously returned data and making the API non-reentrant."
+    },
+    {
+     "id": "F07-X6",
+     "text": "[L520-L524,L565-L569,L613-L617,L660-L664,L708-L712,L756-L760,L799-L803,L847-L851,L894-L898,L941-L945,L988-L992,L1035-L1039,L1082-L1086,L1130-L1134,L1178-L1182,L1226-L1230] (MED/type/rank validation) Typed getters and setters validate only that a name exists, not that its registered type and rank match the selected entry point, so a wrong API choice can dereference an unassociated arraytype component."
+    },
+    {
+     "id": "F07-X7",
+     "text": "[L949-L975,L996-L1022,L1090-L1116,L1138-L1164,L1186-L1212,L1234-L1260] (LOW/buffer-size contract) C array setters infer the model target shape but accept no source-buffer length, leaving no way to reject a caller buffer that is too short before copying that many elements."
+    },
+    {
+     "id": "F07-X8",
+     "text": "[L137-L141,L392-L395,L422-L425,L454-L458] (LOW/inconsistent C ABI) Several BIND(C) query routines omit VALUE on scalar input lengths or dimensions while neighboring C entry points pass analogous inputs by value, creating an inconsistent and undocumented pointer-versus-value calling convention."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F07-Y0",
+     "text": "[L124-L149] (HIGH/error-propagation) getparametertype_c always returns success zero and does not validate the index returned by getkey_indextype, so an unknown parameter can return an undefined type code as a successful query."
+    },
+    {
+     "id": "F07-Y1",
+     "text": "[L130-L134,L386-L389,L416-L419,L448-L451] (HIGH/shape-conformance) Several Fortran wrappers assign the fixed 1024-element result of string_to_char_array into automatic arrays sized only len(name) or len(name)+1, which is a nonconforming whole-array assignment."
+    },
+    {
+     "id": "F07-Y2",
+     "text": "[L164-L180,L359-L376] (HIGH/bounds) Parameter and array name lookup index allocatable key/state tables directly without checking the caller-supplied index range."
+    },
+    {
+     "id": "F07-Y3",
+     "text": "[L137-L149,L203-L223,L245-L269,L290-L311,L316-L336,L392-L406,L422-L436,L454-L505,L529-L1260] (HIGH/ffi/string-bounds) C entry points pass variable-length name arrays to char_array_to_string, whose dummy contract reads up to 1024 elements, so length-sized buffers without an in-range NUL can be read beyond their declared extent."
+    },
+    {
+     "id": "F07-Y4",
+     "text": "[L203-L224,L290-L312] (HIGH/type-confusion) Numeric parameter getters do not verify myparam's type before reading r0 or i0, so calling a getter with a valid name of the wrong type accesses the wrong parameter component."
+    },
+    {
+     "id": "F07-Y5",
+     "text": "[L316-L336] (MED/output-on-error) getcharparameter returns early on lookup failure without setting valuelength or initializing the output buffer."
+    },
+    {
+     "id": "F07-Y6",
+     "text": "[L392-L407,L422-L437] (MED/output-on-error) Array type and rank queries return on an unknown name without initializing their output arguments."
+    },
+    {
+     "id": "F07-Y7",
+     "text": "[L454-L484] (HIGH/status-contract) getarraydimsize_c initializes its status to -1 and never sets it to zero after successfully computing dimsize, so every call reports failure."
+    },
+    {
+     "id": "F07-Y8",
+     "text": "[L454-L483] (HIGH/dimension-validation) Dimension-size lookup rejects only dim values greater than rank; zero or negative dimensions pass through and can reach SIZE with an invalid DIM argument, while rank-1 lookup ignores dim entirely."
+    },
+    {
+     "id": "F07-Y9",
+     "text": "[L486-L507,L510-L1260] (MED/rank-type-validation) Generic and rank-specific array entry points validate only the mnemonic, not that the selected array's type and rank match the routine, before dereferencing a specific pointer component."
+    },
+    {
+     "id": "F07-Y10",
+     "text": "[L529-L552,L764-L787] (HIGH/dangling-pointer) Scalar C getters return c_loc of an unsaved local target, so the pointer becomes undefined as soon as the function returns."
+    },
+    {
+     "id": "F07-Y11",
+     "text": "[L574-L743,L807-L881] (MED/pointer-lifetime) Array C getters return pointers into one saved scratch allocation per rank and deallocate that allocation on the next same-rank getter call, but this short lifetime is not exposed in the API."
+    },
+    {
+     "id": "F07-Y12",
+     "text": "[L902-L1023,L1043-L1260] (HIGH/ffi/pointer-validation) All C array setters convert and dereference the incoming c_ptr without checking c_associated or receiving a buffer length, so null or undersized caller buffers cannot be rejected."
+    },
+    {
+     "id": "F07-Y13",
+     "text": "[L84-L90,L978-L1023] (MED/api-completeness) Integer setters exist through rank 2 only and only ranks 0 and 1 are exposed through the module generic, while array metadata can report higher-rank integer arrays."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F07-X0",
+     "F07-Y2"
+    ],
+    [
+     "F07-X1",
+     "F07-Y3"
+    ],
+    [
+     "F07-X1",
+     "F07-Y10"
+    ],
+    [
+     "F07-X2",
+     "F07-Y1"
+    ],
+    [
+     "F07-X2",
+     "F07-Y3"
+    ],
+    [
+     "F07-X2",
+     "F07-Y7"
+    ],
+    [
+     "F07-X2",
+     "F07-Y8"
+    ],
+    [
+     "F07-X2",
+     "F07-Y9"
+    ],
+    [
+     "F07-X3",
+     "F07-Y0"
+    ],
+    [
+     "F07-X3",
+     "F07-Y3"
+    ],
+    [
+     "F07-X4",
+     "F07-Y7"
+    ],
+    [
+     "F07-X4",
+     "F07-Y8"
+    ],
+    [
+     "F07-X4",
+     "F07-Y9"
+    ],
+    [
+     "F07-X5",
+     "F07-Y11"
+    ],
+    [
+     "F07-X6",
+     "F07-Y3"
+    ],
+    [
+     "F07-X6",
+     "F07-Y9"
+    ],
+    [
+     "F07-X6",
+     "F07-Y10"
+    ],
+    [
+     "F07-X6",
+     "F07-Y11"
+    ],
+    [
+     "F07-X6",
+     "F07-Y12"
+    ],
+    [
+     "F07-X7",
+     "F07-Y3"
+    ],
+    [
+     "F07-X7",
+     "F07-Y9"
+    ],
+    [
+     "F07-X7",
+     "F07-Y12"
+    ],
+    [
+     "F07-X7",
+     "F07-Y13"
+    ],
+    [
+     "F07-X8",
+     "F07-Y1"
+    ],
+    [
+     "F07-X8",
+     "F07-Y3"
+    ],
+    [
+     "F07-X8",
+     "F07-Y6"
+    ],
+    [
+     "F07-X8",
+     "F07-Y7"
+    ],
+    [
+     "F07-X8",
+     "F07-Y8"
+    ]
+   ]
+  },
+  {
+   "file_token": "F08",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F08-X0",
+     "text": "[L43-L56] (HIGH/api-contract) initialize converts the caller-supplied configuration path into configfile but never uses it, so the BMI configuration argument has no effect on model initialization."
+    },
+    {
+     "id": "F08-X1",
+     "text": "[L61-L77] (HIGH/error-propagation) update overwrites the executestep return code with outputext's return code unconditionally, masking a failed timestep whenever outputext returns success."
+    },
+    {
+     "id": "F08-X2",
+     "text": "[L88-L114] (MED/uninitialized-output) get_var_type returns without setting c_type_name when chartoindex fails and also converts an uninitialized type_name for an unexpected type code."
+    },
+    {
+     "id": "F08-X3",
+     "text": "[L118-L136] (MED/uninitialized-output) get_var_rank returns without assigning the output rank when the requested variable name is unknown."
+    },
+    {
+     "id": "F08-X4",
+     "text": "[L138-L140] (HIGH/build-completeness) The module includes get_var_shape.inc, get_var.inc, and set_var.inc, but none is present anywhere under source_code, leaving the BMI variable API dependent on missing generated artifacts."
+    },
+    {
+     "id": "F08-X5",
+     "text": "[L141-L154] (MED/ffi/pointer-contract) set_current_time converts and dereferences an arbitrary incoming c_ptr without checking c_associated, so a null pointer from the C caller is invalid."
+    },
+    {
+     "id": "F08-X6",
+     "text": "[L150-L166,L195-L199] (LOW/time-scaling-contract) Morphological time conversion silently substitutes 1 for any morfac below 1, making set/get time behavior diverge from the configured factor without reporting invalid configuration."
+    },
+    {
+     "id": "F08-X7",
+     "text": "[L178-L189] (MED/query-side-effect) The nominal get_time_step query calls compute_dt on live model state before returning par%dt, so its read-only BMI contract is unclear and repeated queries may alter timestep-related state."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F08-Y0",
+     "text": "[L43-L56] (HIGH/ignored configuration) BMI initialize converts the supplied configuration-file path but never uses it, so initialization silently reads the library's default input rather than the requested file."
+    },
+    {
+     "id": "F08-Y1",
+     "text": "[L67-L77] (HIGH/lost error status) update overwrites the executestep return code with outputext's return code, allowing a failed model step to be reported as successful."
+    },
+    {
+     "id": "F08-Y2",
+     "text": "[L150-L167,L178-L189,L195-L199] (HIGH/inconsistent time units) With morfacopt enabled, current and end time are exposed in morphology-scaled time while get_time_step returns unscaled par%dt and update accepts its dt without inverse scaling, violating a single BMI time-unit contract."
+    },
+    {
+     "id": "F08-Y3",
+     "text": "[L99-L114,L132-L135] (MED/undefined query output) Unknown variable names cause get_var_type and get_var_rank to return without initializing their output arguments or providing an error status."
+    },
+    {
+     "id": "F08-Y4",
+     "text": "[L146-L153] (MED/null pointer handling) set_current_time converts and dereferences the incoming C pointer without checking for C_NULL_PTR."
+    },
+    {
+     "id": "F08-Y5",
+     "text": "[L178-L188] (MED/getter side effect) get_time_step invokes compute_dt with fresh local counters instead of merely returning an established step, so a query can mutate timestep state and may differ across repeated calls."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F08-X0",
+     "F08-Y0"
+    ],
+    [
+     "F08-X1",
+     "F08-Y0"
+    ],
+    [
+     "F08-X1",
+     "F08-Y1"
+    ],
+    [
+     "F08-X2",
+     "F08-Y3"
+    ],
+    [
+     "F08-X3",
+     "F08-Y3"
+    ],
+    [
+     "F08-X4",
+     "F08-Y3"
+    ],
+    [
+     "F08-X4",
+     "F08-Y4"
+    ],
+    [
+     "F08-X5",
+     "F08-Y2"
+    ],
+    [
+     "F08-X5",
+     "F08-Y3"
+    ],
+    [
+     "F08-X5",
+     "F08-Y4"
+    ],
+    [
+     "F08-X6",
+     "F08-Y2"
+    ],
+    [
+     "F08-X6",
+     "F08-Y4"
+    ],
+    [
+     "F08-X7",
+     "F08-Y2"
+    ],
+    [
+     "F08-X7",
+     "F08-Y5"
+    ]
+   ]
+  },
+  {
+   "file_token": "F09",
+   "lang": ".py",
+   "listX": [],
+   "listY": [],
+   "candidate_pairs": []
+  },
+  {
+   "file_token": "F10",
+   "lang": ".F90",
+   "listX": [
+    {
+     "id": "F10-X0",
+     "text": "[L19-L33,L45-L225] (MED/lifecycle) Module state is saved globally and init has no already-initialized guard or cleanup path, so repeated initialization can reinitialize MPI and reallocate persistent model/output state."
+    },
+    {
+     "id": "F10-X1",
+     "text": "[L228-L237] (HIGH/uninitialized-result) outputext assigns its function result only when module error is exactly 0 or 1, leaving the C-visible return value undefined for any other error code."
+    },
+    {
+     "id": "F10-X2",
+     "text": "[L267-L287] (LOW/argument-contract) The optional custom timestep has neither intent nor value semantics, leaving its mutation and language-binding contract unclear to callers."
+    },
+    {
+     "id": "F10-X3",
+     "text": "[L278-L316] (HIGH/error-propagation) executestep sets error through timestep and skips physics on failure, but then unconditionally increments the completed-step count and returns success zero."
+    },
+    {
+     "id": "F10-X4",
+     "text": "[L287-L291] (MED/error-side-effect) Output schedules and progress logging are advanced immediately after timestep reports an error, before the error guard that suppresses the physical update."
+    },
+    {
+     "id": "F10-X5",
+     "text": "[L269-L274,L330-L336] (MED/uninitialized-timing) MPI finalization passes saved t01 to timing output even though t01 is assigned only when execute_counter equals 1, so short or failed runs can finalize with an undefined loop-start timestamp."
+    },
+    {
+     "id": "F10-X6",
+     "text": "[L321-L341] (MED/lifecycle) final has no initialized/finalized guard and always finalizes logging and MPI, making duplicate finalization or finalization before successful init unsafe."
+    },
+    {
+     "id": "F10-X7",
+     "text": "[L343-L350] (LOW/string-contract) getversion silently truncates to the caller's fixed length and provides no explicit NUL termination or returned required length despite using c_char storage."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F10-Y0",
+     "text": "[L278-L316] (HIGH/error propagation) executestep suppresses a nonzero timestep error by skipping physics but then unconditionally increments the step count and returns success."
+    },
+    {
+     "id": "F10-Y1",
+     "text": "[L228-L239] (MED/undefined/stale status) outputext tests the library module's stale error variable rather than receiving a status from output, and leaves its function result undefined for error values other than 0 or 1."
+    },
+    {
+     "id": "F10-Y2",
+     "text": "[L75-L115,L153-L225] (MED/initialization status) init passes a shared error variable through setup operations but never checks or propagates it and unconditionally returns success after output initialization."
+    },
+    {
+     "id": "F10-Y3",
+     "text": "[L19-L33,L45-L341] (LOW/global-state API) The library exposes one saved global model state with no initialized/finalized guard, leaving repeated init, calls before init, and calls after final as undocumented lifecycle hazards."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F10-X0",
+     "F10-Y1"
+    ],
+    [
+     "F10-X0",
+     "F10-Y2"
+    ],
+    [
+     "F10-X0",
+     "F10-Y3"
+    ],
+    [
+     "F10-X1",
+     "F10-Y1"
+    ],
+    [
+     "F10-X1",
+     "F10-Y2"
+    ],
+    [
+     "F10-X3",
+     "F10-Y0"
+    ],
+    [
+     "F10-X5",
+     "F10-Y0"
+    ],
+    [
+     "F10-X5",
+     "F10-Y3"
+    ],
+    [
+     "F10-X6",
+     "F10-Y0"
+    ],
+    [
+     "F10-X6",
+     "F10-Y3"
+    ],
+    [
+     "F10-X7",
+     "F10-Y3"
+    ]
+   ]
+  },
+  {
+   "file_token": "F11",
+   "lang": ".F90",
+   "listX": [
+    {
+     "id": "F11-X0",
+     "text": "[L1099-L1102] (HIGH/wrong array component) The non-MPI rank-4 point path sizes its third dimension from t%r3 instead of t%r4, which can dereference an unassociated rank-3 component and allocates the wrong shape."
+    },
+    {
+     "id": "F11-X1",
+     "text": "[L1350-L1371] (HIGH/truncated scientific output) Rank-3 and rank-4 NetCDF point output passes only the single first scalar of each sampled array, so all other vertical/class dimensions remain unwritten despite being declared in the variable."
+    },
+    {
+     "id": "F11-X2",
+     "text": "[L1357-L1377] (HIGH/unallocated array access) The Fortran-compatible rank-3 and rank-4 point paths read local allocatables r3 and r4 after the sampling phase instead of pointoutputs, but those temporaries are not allocated there."
+    },
+    {
+     "id": "F11-X3",
+     "text": "[L412-L415,L513-L516,L600-L603,L1689-L1691] (HIGH/MPI-unsafe termination) Initialization and dimension errors on the output-master-only path use STOP rather than the coordinated halt routine, which can terminate one MPI rank while leaving the others blocked."
+    },
+    {
+     "id": "F11-X4",
+     "text": "[L481-L527] (MED/uninitialized NetCDF variable id) pointsvarids is not initialized, and an unsupported point-variable type merely prints a message before attributes are written through the unassigned ID."
+    },
+    {
+     "id": "F11-X5",
+     "text": "[L375-L380,L481-L485,L1025-L1029,L1143-L1147,L1319-L1323,L1780-L1784,L1811-L1812] (MED/unchecked mnemonic lookup) Multiple output paths pass chartoindex results directly to indextos or mnemonic indexing without checking for -1, so an invalid configured variable can become an out-of-bounds access rather than a controlled configuration error."
+    },
+    {
+     "id": "F11-X6",
+     "text": "[L1150-L1198] (MED/rank support inconsistency) Integer global variables are declared for ranks 0 through 4 during initialization, but the writer handles only ranks 0, 2, and 3, silently leaving rank-1 or rank-4 variables unwritten."
+    },
+    {
+     "id": "F11-X7",
+     "text": "[L1341-L1370] (MED/point-output shape contract) The point writer supplies no count and uses scalar actuals for multidimensional records, leaving its intended mapping between sampled array dimensions and NetCDF dimensions unclear even when the call succeeds."
+    },
+    {
+     "id": "F11-X8",
+     "text": "[L1396-L1406] (MED/wrong file unit) The runup-gauge loop writes unit ii+par%npoints but flushes unit i+par%npoints, where i is stale from the preceding point-variable loop."
+    },
+    {
+     "id": "F11-X9",
+     "text": "[L531-L554] (MED/invalid coordinate metadata) Each drifter trajectory variable declares coordinates='pointx pointy' even though those coordinate variables use the unrelated fixed points dimension rather than the drifter trajectory dimensions."
+    },
+    {
+     "id": "F11-X10",
+     "text": "[L1510-L1539] (MED/output side effect) Writing legacy mean minima and maxima mutates the live accumulated arrays by replacing sentinel extremes with -999, so output changes model-owned statistics rather than formatting a copy."
+    },
+    {
+     "id": "F11-X11",
+     "text": "[L2127-L2131,L2147-L2151,L2167-L2173] (MED/ignored I/O error) Hotstart writers capture OPEN failures in ierr but never test it and proceed to write and close the unit as if the file were valid."
+    },
+    {
+     "id": "F11-X12",
+     "text": "[L152-L160] (LOW/error-path state) handle_err attempts to close module ncid even when the failing operation may be nf90_create itself, before ncid has necessarily received a valid file identifier."
+    },
+    {
+     "id": "F11-X13",
+     "text": "[L664-L670] (LOW/duplicate write) pointtypes is written twice consecutively during NetCDF initialization."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F11-Y0",
+     "text": "[L152-L160] (MED/error-path) NetCDF error handling always attempts to close module variable ncid, even when the failing operation is file creation and ncid may not yet contain a valid handle."
+    },
+    {
+     "id": "F11-Y1",
+     "text": "[L127-L130,L169-L247,L1134-L1136,L1300-L1302,L1554-L1559] (HIGH/uninitialized-state) The NetCDF-only initializer never initializes saved output counters, while ncoutput increments them and uses itd directly as the drifter record index; those counters are initialized only by fortoutput_init."
+    },
+    {
+     "id": "F11-Y2",
+     "text": "[L268-L270,L1675-L1678] (MED/dimension-contract) The dimension expression s%ntdisch is mapped to a hard-coded NetCDF dimension of length 2, despite the expression denoting runtime state and no equality check being made."
+    },
+    {
+     "id": "F11-Y3",
+     "text": "[L374-L425] (MED/input-validation) Global variable setup passes unchecked mnemonic indices to indextos, and an unsupported type leaves its ID at -1 but still proceeds to attach attributes to that invalid ID."
+    },
+    {
+     "id": "F11-Y4",
+     "text": "[L481-L517] (HIGH/bounds-before-validation) Point-variable setup reads dimensions(1) and dimensions(2) before verifying rank is at least 2, so a scalar or rank-1 selection accesses dimension metadata out of bounds."
+    },
+    {
+     "id": "F11-Y5",
+     "text": "[L491-L516] (MED/validation-without-stop) A point variable whose first two dimensions are not x and y only produces a log message and is still defined and later sampled as a spatial field."
+    },
+    {
+     "id": "F11-Y6",
+     "text": "[L486-L527] (HIGH/unsupported-type) Point initialization creates IDs only for real variables, but the default branch merely prints for other types and then unconditionally uses the uninitialized pointsvarids entry for attributes."
+    },
+    {
+     "id": "F11-Y7",
+     "text": "[L591-L603] (LOW/diagnostic-accuracy) Rank errors while defining mean variables report mnem even though that variable is not assigned in the mean-variable loop and can contain stale text from an earlier loop."
+    },
+    {
+     "id": "F11-Y8",
+     "text": "[L664-L670] (LOW/duplicate-io) pointtypes is written to the same NetCDF variable twice consecutively."
+    },
+    {
+     "id": "F11-Y9",
+     "text": "[L790-L802] (HIGH/feature-gating) Point/runup processing is conditioned on npointvar being positive, so a valid runup-only configuration with gauges but no ordinary point variables never writes point time or runup output."
+    },
+    {
+     "id": "F11-Y10",
+     "text": "[L1025-L1109] (MED/input-validation) Point extraction passes unchecked mnemonic indices to indextos and accepts an unchecked owner rank from space_who_has before point-to-point communication."
+    },
+    {
+     "id": "F11-Y11",
+     "text": "[L1088-L1102] (HIGH/wrong-rank-component) The non-MPI rank-4 point path allocates its third dimension from t%r3 instead of t%r4, potentially dereferencing an unassociated pointer and producing the wrong shape."
+    },
+    {
+     "id": "F11-Y12",
+     "text": "[L1139,L1305,L1415] (HIGH/time-scaling) Global, point, and mean NetCDF times are always multiplied by morfac, whereas the rest of the module and BMI time API apply that scaling only when morfacopt equals 1."
+    },
+    {
+     "id": "F11-Y13",
+     "text": "[L1149-L1198] (HIGH/missing-rank-support) Integer global variables are defined for ranks 0 through 4 during initialization, but writing omits ranks 1 and 4 and only prints a message, leaving their records unwritten."
+    },
+    {
+     "id": "F11-Y14",
+     "text": "[L1215-L1232] (LOW/dead-allocation) Rank-1 real output allocates and deallocates r1 without ever using it, doubling temporary allocation work alongside r1conv."
+    },
+    {
+     "id": "F11-Y15",
+     "text": "[L1350-L1371] (HIGH/partial-write) NetCDF point output for rank-3 and rank-4 variables writes only element (1,1,1) or (1,1,1,1) while the variables were defined with full trailing dimensions, leaving all other components unwritten."
+    },
+    {
+     "id": "F11-Y16",
+     "text": "[L1357-L1377] (HIGH/unallocated-access) Fortran-compatible rank-3 and rank-4 point output reads local temporaries r3 and r4 on the I/O path even though extracted values were stored in pointoutputs and those temporaries have already been deallocated or were never allocated there."
+    },
+    {
+     "id": "F11-Y17",
+     "text": "[L1402-L1406] (MED/wrong-index) The runup-file loop writes unit indexed by ii but flushes unit indexed by stale variable i, potentially flushing an unrelated or unconnected unit."
+    },
+    {
+     "id": "F11-Y18",
+     "text": "[L1432-L1438,L1500-L1505] (HIGH/scientific-output) thetamean output applies a legacy packed-value decoding expression even though the active averaging code stores a direct atan2 angle, corrupting both NetCDF and Fortran angular means."
+    },
+    {
+     "id": "F11-Y19",
+     "text": "[L1546-L1548] (MED/format-dependent-state) The next averaging interval is updated only inside the Fortran-compatible output branch, so NetCDF-only runs retain the configured nominal interval even when the final or scheduled interval differs."
+    },
+    {
+     "id": "F11-Y20",
+     "text": "[L1554-L1595] (MED/time-coordinate-consistency) Drifter NetCDF time is written as raw par%t while global, point, and mean time coordinates in the same file use morphological scaling, producing inconsistent time axes when scaling is active."
+    },
+    {
+     "id": "F11-Y21",
+     "text": "[L1786-L1795] (MED/filename-contract) Fortran point files are opened directly from unchecked station IDs, with no rejection of duplicate, blank, truncated, or path-containing names that can collide or target unintended relative files."
+    },
+    {
+     "id": "F11-Y22",
+     "text": "[L1811-L1825] (HIGH/wrong-type-component) Fortran mean-file record lengths are always derived from real pointer components even though the averaging initializer permits integer mean variables."
+    },
+    {
+     "id": "F11-Y23",
+     "text": "[L1843-L1857] (MED/stale-output) Lazily opened global Fortran files omit status='replace', so an existing longer file from a prior run can retain stale trailing records."
+    },
+    {
+     "id": "F11-Y24",
+     "text": "[L2124-L2131,L2144-L2151,L2164-L2173] (MED/io-error-handling) All hotstart writers capture OPEN iostat but never check it and then perform unguarded writes and close operations; they also omit replacement semantics for existing files."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F11-X0",
+     "F11-Y11"
+    ],
+    [
+     "F11-X1",
+     "F11-Y15"
+    ],
+    [
+     "F11-X1",
+     "F11-Y16"
+    ],
+    [
+     "F11-X2",
+     "F11-Y15"
+    ],
+    [
+     "F11-X2",
+     "F11-Y16"
+    ],
+    [
+     "F11-X3",
+     "F11-Y4"
+    ],
+    [
+     "F11-X3",
+     "F11-Y5"
+    ],
+    [
+     "F11-X3",
+     "F11-Y7"
+    ],
+    [
+     "F11-X4",
+     "F11-Y4"
+    ],
+    [
+     "F11-X4",
+     "F11-Y6"
+    ],
+    [
+     "F11-X5",
+     "F11-Y3"
+    ],
+    [
+     "F11-X5",
+     "F11-Y4"
+    ],
+    [
+     "F11-X5",
+     "F11-Y5"
+    ],
+    [
+     "F11-X5",
+     "F11-Y6"
+    ],
+    [
+     "F11-X5",
+     "F11-Y10"
+    ],
+    [
+     "F11-X5",
+     "F11-Y12"
+    ],
+    [
+     "F11-X5",
+     "F11-Y13"
+    ],
+    [
+     "F11-X5",
+     "F11-Y21"
+    ],
+    [
+     "F11-X5",
+     "F11-Y22"
+    ],
+    [
+     "F11-X6",
+     "F11-Y13"
+    ],
+    [
+     "F11-X7",
+     "F11-Y15"
+    ],
+    [
+     "F11-X8",
+     "F11-Y17"
+    ],
+    [
+     "F11-X9",
+     "F11-Y6"
+    ],
+    [
+     "F11-X10",
+     "F11-Y18"
+    ],
+    [
+     "F11-X11",
+     "F11-Y24"
+    ],
+    [
+     "F11-X12",
+     "F11-Y0"
+    ],
+    [
+     "F11-X13",
+     "F11-Y8"
+    ]
+   ]
+  },
+  {
+   "file_token": "F12",
+   "lang": ".F90",
+   "listX": [
+    {
+     "id": "F12-X0",
+     "text": "[L4-L6,L1158-L1159] (LOW/disabled legacy implementation) The complete legacy output module is enclosed in #if 0 and retained only for reference, so none of its declared public output routines are available to a build."
+    }
+   ],
+   "listY": [],
+   "candidate_pairs": []
+  },
+  {
+   "file_token": "F13",
+   "lang": ".F90",
+   "listX": [
+    {
+     "id": "F13-X0",
+     "text": "[L268-L278] (HIGH/unassigned output) With rotation disabled, the Sutot and Svtot branches compute interpolated transport scratch arrays but never copy them into x, leaving the requested output undefined."
+    },
+    {
+     "id": "F13-X1",
+     "text": "[L186-L197,L307-L327,L420-L440] (HIGH/uninitialized bounds) All rank-2/3/4 gridrotate routines leave their section bounds uninitialized when row is present but nonpositive, despite the comments making only positive row values special."
+    },
+    {
+     "id": "F13-X2",
+     "text": "[L186-L191,L307-L312,L420-L425] (MED/optional-argument contract) The routines test only PRESENT(row) and then reference optional col unconditionally, so a caller that supplies row without col triggers an invalid absent-optional access."
+    },
+    {
+     "id": "F13-X3",
+     "text": "[L337-L345] (MED/non-enforced shape assertion) gridrotate_r3 only logs mismatched horizontal shapes and then proceeds with whole-array assignments that require those shapes to conform."
+    },
+    {
+     "id": "F13-X4",
+     "text": "[L300,L329-L345] (MED/memory scaling) Every rank-3 rotation creates five full-grid automatic 3-D scratch arrays even when the selected variable needs none or only a subset, creating a substantial stack/memory exhaustion risk for large scientific grids."
+    },
+    {
+     "id": "F13-X5",
+     "text": "[L498-L509] (MED/incomplete function) runup is explicitly marked incorrect and assigns results only where pointtypes equals 1, leaving all other elements of its returned array undefined."
+    },
+    {
+     "id": "F13-X6",
+     "text": "[L134-L145,L199-L202,L361-L362] (LOW/angle normalization) Direction conversions use 270 minus the angle in degrees without normalizing the result, so rotated output can fall outside a conventional 0–360 degree range."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F13-Y0",
+     "text": "[L65-L108] (MED/shape-contract) snappointstogrid sizes work storage from parameter counts but does not verify the extents of xpoints, ypoints, coordinate arrays, pointtypes, or optional dmin before indexed or whole-array assignment."
+    },
+    {
+     "id": "F13-Y1",
+     "text": "[L169-L175] (LOW/resource-use) gridrotate_r2 allocates and zeroes two full-grid automatic transport arrays on every call even for variable names that never use them, creating avoidable stack and runtime pressure for large domains."
+    },
+    {
+     "id": "F13-Y2",
+     "text": "[L186-L196,L283-L327,L409-L442] (HIGH/optional-argument-contract) The rank-2, rank-3, and rank-4 rotation routines dereference optional col whenever positive row is present without checking col is present; rank 3 and 4 also leave all section indices uninitialized when row is present but nonpositive."
+    },
+    {
+     "id": "F13-Y3",
+     "text": "[L186-L196,L307-L327,L420-L442] (MED/bounds-contract) Row/column point-selection accepts unchecked indices and assumes a destination with at least a 1x1 leading section."
+    },
+    {
+     "id": "F13-Y4",
+     "text": "[L269-L278] (HIGH/missing-assignment) When rotation is disabled, the Sutot and Svtot cases compute a temporary transport field but never assign it to x, leaving the intent(out) result undefined."
+    },
+    {
+     "id": "F13-Y5",
+     "text": "[L300-L345] (MED/shape-error-handling) gridrotate_r3 merely logs mismatched leading dimensions between alfaz and t%r3 and then continues into conforming-array assignments and indexed expressions that require those dimensions to match."
+    },
+    {
+     "id": "F13-Y6",
+     "text": "[L300-L333] (LOW/resource-use) gridrotate_r3 creates and zeroes five full rank-3 automatic arrays for every call regardless of the selected variable, risking substantial stack use."
+    },
+    {
+     "id": "F13-Y7",
+     "text": "[L498-L509] (HIGH/uninitialized-result) runup assigns result elements only where pointtypes equals 1, so all ordinary point elements are returned uninitialized."
+    },
+    {
+     "id": "F13-Y8",
+     "text": "[L505-L508] (HIGH/scientific-logic) The source itself marks runup incorrect, and its implementation assigns every gauge the same scalar derived from the first global minimum location of wetz rather than determining runup along each gauge line."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F13-X0",
+     "F13-Y2"
+    ],
+    [
+     "F13-X0",
+     "F13-Y4"
+    ],
+    [
+     "F13-X1",
+     "F13-Y2"
+    ],
+    [
+     "F13-X1",
+     "F13-Y3"
+    ],
+    [
+     "F13-X1",
+     "F13-Y6"
+    ],
+    [
+     "F13-X2",
+     "F13-Y2"
+    ],
+    [
+     "F13-X2",
+     "F13-Y3"
+    ],
+    [
+     "F13-X3",
+     "F13-Y5"
+    ],
+    [
+     "F13-X3",
+     "F13-Y6"
+    ],
+    [
+     "F13-X4",
+     "F13-Y1"
+    ],
+    [
+     "F13-X4",
+     "F13-Y2"
+    ],
+    [
+     "F13-X4",
+     "F13-Y3"
+    ],
+    [
+     "F13-X4",
+     "F13-Y5"
+    ],
+    [
+     "F13-X4",
+     "F13-Y6"
+    ],
+    [
+     "F13-X5",
+     "F13-Y7"
+    ],
+    [
+     "F13-X5",
+     "F13-Y8"
+    ],
+    [
+     "F13-X6",
+     "F13-Y2"
+    ],
+    [
+     "F13-X6",
+     "F13-Y3"
+    ]
+   ]
+  },
+  {
+   "file_token": "F14",
+   "lang": ".F90",
+   "listX": [
+    {
+     "id": "F14-X0",
+     "text": "[L143-L178] (MED/mpi/lifecycle) The wrapper unconditionally calls MPI_Init and MPI_Finalize without checking MPI_Initialized or MPI_Finalized, which makes it unsafe to embed in a host that owns the MPI lifecycle."
+    },
+    {
+     "id": "F14-X1",
+     "text": "[L151-L177,L185,L297-L371,L424-L570,L948,L995-L1005] (MED/mpi/error-handling) MPI return codes are repeatedly written to local variables and never checked, so failed collectives or point-to-point operations can silently leave state invalid or ranks divergent."
+    },
+    {
+     "id": "F14-X2",
+     "text": "[L201-L220] (LOW/integer-range) Automatic processor-grid selection computes border lengths in default integers and uses a hard-coded 1000000000 sentinel, so sufficiently large grid dimensions can overflow or fail to select a factorization."
+    },
+    {
+     "id": "F14-X3",
+     "text": "[L360-L365] (LOW/mpi/portability) The integer*8 broadcast relies on the nonstandard MPI_INTEGER8 datatype name and nonstandard kind syntax rather than matching a selected Fortran kind to an MPI datatype."
+    },
+    {
+     "id": "F14-X4",
+     "text": "[L387-L407] (MED/bounds-contract) Character broadcast sends the root's trimmed length but never verifies that receiving character variables are at least that long before assigning x(i:i), so differing declared lengths can write out of bounds."
+    },
+    {
+     "id": "F14-X5",
+     "text": "[L413-L496] (MED/buffer-size-contract) Every sendrecv overload derives both the send and receive MPI counts solely from size(sendbuf) and never checks recvbuf size, so a mismatched caller can overrun or incompletely fill the receive object."
+    },
+    {
+     "id": "F14-X6",
+     "text": "[L586-L703] (MED/bounds-contract) The basic shift routines index fixed interior rows or columns such as 2, m-1, and n-1 without enforcing minimum extents, so small local partitions can access outside their arrays."
+    },
+    {
+     "id": "F14-X7",
+     "text": "[L737-L856] (MED/bounds-contract) The ranged shift routines accept arbitrary i1/i2 and derive sections using a fixed four-cell overlap without validating ordering or array extents; the rank-3 version is additionally marked in-source as not correct."
+    },
+    {
+     "id": "F14-X8",
+     "text": "[L954-L1005] (MED/mpi/input-contract) xmpi_getrow does not validate prow, n, size(a,2), or size(b), so invalid metadata can yield an invalid source rank, shape-nonconforming assignment, buffer mismatch, or a blocking receive that never matches."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F14-Y0",
+     "text": "[L62-L73] (HIGH/serial API mismatch) The non-MPI branch defines xmpirank and xmpisize instead of the subsystem's xmpi_rank and xmpi_size names and omits xomaster, xcompute, and xmpi_orank, making this module incompatible with serial consumers of the current API."
+    },
+    {
+     "id": "F14-Y1",
+     "text": "[L75-L86,L139;L189-L193;L945-L949] (HIGH/MPI API drift) This alternative module provides only one-argument broadcasts, a processor-grid routine without cyclic input, and a zero-argument barrier, while the surrounding subsystem calls the corresponding multi-communicator/cyclic forms."
+    },
+    {
+     "id": "F14-Y2",
+     "text": "[L101-L107,L674-L693] (HIGH/missing generic implementation) xmpi_shift_i3 passes rank-3 integer sections to xmpi_sendrecv, but that generic has no rank-3 integer procedure."
+    },
+    {
+     "id": "F14-Y3",
+     "text": "[L374-L406] (MED/string buffer bounds) Character broadcast does not check that each receiver's character variable is at least as long as the source string before assigning x(i:i)."
+    },
+    {
+     "id": "F14-Y4",
+     "text": "[L413-L494] (MED/message-size contract) Sendrecv wrappers use size(sendbuf) for both send and receive counts without validating recvbuf's extent."
+    },
+    {
+     "id": "F14-Y5",
+     "text": "[L245-L280,L737-L855] (MED/domain-size precondition) Processor-grid construction has no minimum local-domain check even though halo shifts subsequently index fixed positions up to four cells from each boundary."
+    },
+    {
+     "id": "F14-Y6",
+     "text": "[L954-L1005] (MED/unchecked row contract) xmpi_getrow uses n and prow directly without checking the source row length, destination extent, or processor-row range."
+    },
+    {
+     "id": "F14-Y7",
+     "text": "[L151-L177,L297-L570,L948,L995-L1005] (LOW/unchecked MPI status) MPI return codes are stored throughout but never inspected and no communicator error handler is installed in this implementation."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F14-X0",
+     "F14-Y1"
+    ],
+    [
+     "F14-X0",
+     "F14-Y7"
+    ],
+    [
+     "F14-X1",
+     "F14-Y1"
+    ],
+    [
+     "F14-X1",
+     "F14-Y3"
+    ],
+    [
+     "F14-X1",
+     "F14-Y6"
+    ],
+    [
+     "F14-X1",
+     "F14-Y7"
+    ],
+    [
+     "F14-X4",
+     "F14-Y3"
+    ],
+    [
+     "F14-X4",
+     "F14-Y4"
+    ],
+    [
+     "F14-X5",
+     "F14-Y4"
+    ],
+    [
+     "F14-X7",
+     "F14-Y5"
+    ],
+    [
+     "F14-X8",
+     "F14-Y1"
+    ],
+    [
+     "F14-X8",
+     "F14-Y6"
+    ],
+    [
+     "F14-X8",
+     "F14-Y7"
+    ]
+   ]
+  },
+  {
+   "file_token": "F15",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F15-X0",
+     "text": "[L11-L21] (MED/string-validation) strlen returns zero both for an empty string and for a full 1024-byte array with no NUL terminator, so unterminated input is silently misinterpreted as empty."
+    },
+    {
+     "id": "F15-X1",
+     "text": "[L27-L34] (HIGH/wrong-argument) strcmp constructs both string1 and string2 from char_array1, causing every comparison to report equality."
+    },
+    {
+     "id": "F15-X2",
+     "text": "[L30-L34] (LOW/semantic-contract) strcmp trims both converted strings and uses Fortran lexical comparison, which does not preserve ordinary C strcmp behavior for spaces preceding the NUL."
+    },
+    {
+     "id": "F15-X3",
+     "text": "[L40-L49] (MED/unterminated-input) strcpy relies on the ambiguous zero returned by strlen, so an unterminated source copies only its first character and does not guarantee a terminator in the destination."
+    },
+    {
+     "id": "F15-X4",
+     "text": "[L60-L68] (HIGH/bounds) string_to_char_array does not cap len_trim to MAXSTRINGLEN-1, so strings of length 1024 or more write beyond the result when data and the terminator are stored."
+    },
+    {
+     "id": "F15-X5",
+     "text": "[L60-L68] (LOW/uninitialized-tail) string_to_char_array initializes only the payload and one terminator, leaving the remainder of its fixed 1024-element result undefined."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F15-Y0",
+     "text": "[L30-L34] (HIGH/comparison logic) strcmp converts char_array1 into both string1 and string2, so it never compares the second input and always returns equality."
+    },
+    {
+     "id": "F15-Y1",
+     "text": "[L11-L21,L51-L58] (HIGH/buffer bounds contract) strlen and char_array_to_string unconditionally declare and scan a 1024-element input without accepting its actual length, so sequence-associated callers with shorter C buffers can be read out of bounds."
+    },
+    {
+     "id": "F15-Y2",
+     "text": "[L60-L68] (HIGH/buffer overflow) string_to_char_array does not reject or truncate input strings of length 1024 or greater, and writes the terminator at len_trim(string)+1 beyond its fixed 1024-element result."
+    },
+    {
+     "id": "F15-Y3",
+     "text": "[L14-L21] (MED/unterminated string handling) strlen returns zero rather than MAXSTRINGLEN when no NUL byte is present, causing a full nonterminated buffer to be misreported as empty."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F15-X0",
+     "F15-Y1"
+    ],
+    [
+     "F15-X0",
+     "F15-Y3"
+    ],
+    [
+     "F15-X1",
+     "F15-Y0"
+    ],
+    [
+     "F15-X1",
+     "F15-Y1"
+    ],
+    [
+     "F15-X1",
+     "F15-Y3"
+    ],
+    [
+     "F15-X2",
+     "F15-Y0"
+    ],
+    [
+     "F15-X3",
+     "F15-Y0"
+    ],
+    [
+     "F15-X3",
+     "F15-Y1"
+    ],
+    [
+     "F15-X4",
+     "F15-Y1"
+    ],
+    [
+     "F15-X4",
+     "F15-Y2"
+    ],
+    [
+     "F15-X5",
+     "F15-Y1"
+    ],
+    [
+     "F15-X5",
+     "F15-Y2"
+    ]
+   ]
+  },
+  {
+   "file_token": "F16",
+   "lang": ".F90",
+   "listX": [
+    {
+     "id": "F16-X0",
+     "text": "[L295,L338,L391,L421] (HIGH/build dependency) Four active MPI routines include genmpi_distr.inc or genmpi_coll.inc, but neither include file is present anywhere in the supplied source tree, so compiling this implementation with USEMPI would fail unless the build injects undocumented external files."
+    },
+    {
+     "id": "F16-X1",
+     "text": "[L82-L85,L188-L191] (MED/MPI error scope) A communicator-local argument error aborts MPI_COMM_WORLD rather than the passed communicator, unexpectedly terminating unrelated communicator participants."
+    },
+    {
+     "id": "F16-X2",
+     "text": "[L79-L145,L185-L250,L583-L606] (LOW/unchecked MPI status) MPI return codes are repeatedly assigned to ier/ierror but never checked, leaving datatype, collective, or point-to-point failures without local diagnostic handling."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F16-Y0",
+     "text": "[L79-L145,L185-L250,L582-L606] (MED/mpi/error-handling) MPI return codes from communicator, datatype, collective, point-to-point, and free operations are never checked."
+    },
+    {
+     "id": "F16-Y1",
+     "text": "[L82-L85,L188-L191] (MED/communicator-scope) A root-contract violation aborts MPI_COMM_WORLD rather than the communicator supplied by the caller."
+    },
+    {
+     "id": "F16-Y2",
+     "text": "[L67-L137] (MED/bounds-contract) Vector distribution creates subarray datatypes from unchecked is/lm metadata and destination extent, permitting invalid starts or subsizes."
+    },
+    {
+     "id": "F16-Y3",
+     "text": "[L173-L243] (MED/shape-contract) Block-vector distribution independently uses size(a,2) for send types and size(b,2) for receive types without verifying equality, so sender and receiver type signatures can disagree."
+    },
+    {
+     "id": "F16-Y4",
+     "text": "[L295,L338,L391,L421] (HIGH/build-completeness) All matrix distribution and collection implementations depend on genmpi_distr.inc and genmpi_coll.inc, but neither include exists under source_code."
+    },
+    {
+     "id": "F16-Y5",
+     "text": "[L428-L471] (HIGH/arithmetic-input-contract) decomp divides and takes modulo by numprocs without rejecting zero and does not validate myid."
+    },
+    {
+     "id": "F16-Y6",
+     "text": "[L521-L563] (MED/output-bounds) det_submatrices assumes output arrays have at least mp*np elements and dimensions exceed the fixed four-cell overlap without validating either condition."
+    },
+    {
+     "id": "F16-Y7",
+     "text": "[L567-L606] (MED/minimum-extent) Border shifting indexes second and penultimate rows/columns and uses ma-2 counts without checking minimum matrix dimensions."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F16-X0",
+     "F16-Y4"
+    ],
+    [
+     "F16-X1",
+     "F16-Y0"
+    ],
+    [
+     "F16-X1",
+     "F16-Y1"
+    ],
+    [
+     "F16-X2",
+     "F16-Y0"
+    ],
+    [
+     "F16-X2",
+     "F16-Y1"
+    ],
+    [
+     "F16-X2",
+     "F16-Y7"
+    ]
+   ]
+  },
+  {
+   "file_token": "F17",
+   "lang": ".F90",
+   "listX": [
+    {
+     "id": "F17-X0",
+     "text": "[L12-L38] (LOW/kind-conversion) C-int wrapper results are assigned directly from default-integer library functions without an explicit kind conversion or assertion that the kinds match."
+    },
+    {
+     "id": "F17-X1",
+     "text": "[L33-L38] (MED/symbol-contract) This module exports the C symbol finalize with a different wrapper from xbeach_bmi.f90, so the build must keep the two objects mutually exclusive but that requirement is not expressed in the source."
+    },
+    {
+     "id": "F17-X2",
+     "text": "[L49-L60] (HIGH/procedure-pointer) The exported writetolog test calls distributelog unconditionally even though that procedure pointer is initialized null and may never have been assigned."
+    },
+    {
+     "id": "F17-X3",
+     "text": "[L49-L63] (LOW/production-api) A C-exported function emits the same hard-coded test message ten times, exposing apparent test scaffolding as part of the library ABI."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F17-Y0",
+     "text": "[L49-L63] (LOW/debug API exposure) The exported writetolog entry point is hard-coded to emit ten test messages and report success, which appears to be diagnostic scaffolding exposed as part of the shared-library ABI."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F17-X2",
+     "F17-Y0"
+    ],
+    [
+     "F17-X3",
+     "F17-Y0"
+    ]
+   ]
+  }
+ ]
+}

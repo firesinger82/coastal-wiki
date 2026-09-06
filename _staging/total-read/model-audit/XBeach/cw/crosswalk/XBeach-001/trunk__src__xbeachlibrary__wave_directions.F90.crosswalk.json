@@ -1,0 +1,145 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-001",
+ "source_path": "trunk/src/xbeachlibrary/wave_directions.F90",
+ "source_sha256": "c8c7f311e88154c6392c6063830b2885a2c1ed85a654182178ffe0537114a140",
+ "base_run_id": "xbeach-r1-XBeach-001-codex-01a05a5b-a17d-7cd0-8b9b-49a161c8810c",
+ "audit_run_id": "xbeach-r2-XBeach-001-codex-01a05aa6-f6db-7991-802e-4d57ae64a826",
+ "base_record_file": "f16d29690e8d0627279496f00002aaa9fadb6c9e7879947de80ea570ce0f53d9.json",
+ "audit_record_file": "f16d29690e8d0627279496f00002aaa9fadb6c9e7879947de80ea570ce0f53d9.json",
+ "base_record_sha256_bytes": "3064ab984cef09f1df47a52e448dbf363b39d23320f79df75f71f794a280ed13",
+ "audit_record_sha256_bytes": "b2c00847e236df99044f197f285b869ab32bad24eeabdd36bb91821e72043375",
+ "base_finding_count": 5,
+ "audit_finding_count": 6,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "[L195-L201] (HIGH/unguarded action conversion) Wet-cell wave energy is divided by s%sigm without enforcing a positive intrinsic frequency."
+   ],
+   "audit_member_text": [
+    "[L195-L202,L227-L234] (MED/numerical robustness) Wave-action conversion divides by sigm without a positive-frequency guard."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "[L286-L293] (MED/missing physical source term) Directional dissipation distributes only breaking and bed-friction losses even though the source comment explicitly identifies missing vegetation dissipation Dveg."
+   ],
+   "audit_member_text": [
+    "[L286-L294] (MED/physics consistency) Directional dissipation omits Dveg despite other wave solvers including vegetation dissipation, an inconsistency explicitly noted in the source."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L150-L152, L259-L263, L339-L345] (HIGH/circular-angle averaging) Mean wave direction is computed as an arithmetic energy-weighted angle, which gives incorrect results for energy distributed across the 0/2π wrap."
+   ],
+   "audit_member_text": [
+    "[L150-L152,L259-L263,L339-L349] (HIGH/circular statistics) Mean wave directions use arithmetic angle averages and are incorrect for spectra crossing the angular wrap."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L65-L98] (MED/saved-shape state) Saved work arrays and scheme selections are initialized only on the first call, so reuse with changed grid dimensions, directional bins, or scheme parameters keeps stale shapes and settings."
+   ],
+   "audit_member_text": [
+    "[L65-L98] (LOW/persistent allocation) Saved work arrays and cached scheme choices are initialized only once, requiring fixed grid dimensions, direction count, and schemes without enforcing that contract."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L131-L137] (HIGH/inconsistent hyperbolic limiter) The condition admits 2kh values up to 3000 but evaluates sinh(min(2kh,10)), while values just above 3000 are set to 3000, creating an inconsistent discontinuous approximation to sinh(2kh)."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L268-L275] (MED/configuration handling) The breaking-model select omits BREAK_ROELVINK_DALY and has no default, so that configured model yields no breaking dissipation in this solver."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L353-L360] (HIGH/MPI shape conformance) The convergence maxval applies a full-row wete mask to a jmin_ee:jmax_ee slice, which is nonconformable whenever those MPI bounds exclude halo columns."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

@@ -1,0 +1,107 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-005",
+ "source_path": "trunk/src/xbeachlibrary/templates/get_var_shape.mako",
+ "source_sha256": "8d642a98593e998e335623f2620958b6d8d597d63f0c3fd6a7be798a39f52d9a",
+ "base_run_id": "xbeach-r1-XBeach-005-codex-01a05a82-9b09-7e13-97be-a61dffd0da0d",
+ "audit_run_id": "xbeach-r2-XBeach-005-codex-01a05ada-6ee0-72f3-abb0-11672883260c",
+ "base_record_file": "ead9b31efcbb135f827d542f6f56f0bfa90de05be3bb7a2b8ddf7d9a9e8e012d.json",
+ "audit_record_file": "ead9b31efcbb135f827d542f6f56f0bfa90de05be3bb7a2b8ddf7d9a9e8e012d.json",
+ "base_record_sha256_bytes": "7c3cdd0bcb34df3d46389ec686b7898f878ba4c783840040a0890db02e36cfc4",
+ "audit_record_sha256_bytes": "f898e52091e214cb23155d4c2424f33abf67eb87405441ab23a6ee004601e292",
+ "base_finding_count": 5,
+ "audit_finding_count": 2,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L5,L10] (HIGH/shape-conformance) The dummy array extent is MAXDIMS but it is assigned a fixed six-element constructor, which is nonconforming unless MAXDIMS is exactly 6."
+   ],
+   "audit_member_text": [
+    "[L5,L10] (LOW/hard-coded dimension contract) The output extent is declared with `MAXDIMS` but initialized with a fixed six-element constructor, so the template silently assumes `MAXDIMS == 6` and becomes nonconforming if that parameter changes."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L10,L12-L29] (MED/ambiguous-api-result) An unknown variable leaves the all-zero result unchanged, which is indistinguishable from the scalar convention that explicitly reports shape(1)=0."
+   ],
+   "audit_member_text": [
+    "[L10,L12-L29] (LOW/ambiguous API failure result) There is no default case or status result for an unknown name, which therefore returns the same all-zero shape representation used for a scalar and gives the C caller no way to distinguish lookup failure."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L14-L28] (MED/rank-bound-contract) Generated indices are based solely on each metadata rank with no assertion that rank is at most MAXDIMS, so higher-rank metadata would write beyond shape."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L4,L7,L9] (MED/unterminated-c-string-contract) The assumed-size C name is passed to strlen without an explicit bound, relying on an undocumented caller-supplied NUL terminator."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L21-L25] (LOW/metadata-drift) When metadata supplies a shape, the template returns those constants instead of querying the live variable, with no check that the declared metadata still matches the object."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

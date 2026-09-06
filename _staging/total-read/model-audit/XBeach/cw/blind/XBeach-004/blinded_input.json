@@ -1,0 +1,1242 @@
+{
+ "shard": "XBeach-004",
+ "instructions_ref": "see subagent prompt",
+ "files": [
+  {
+   "file_token": "F00",
+   "lang": ".py",
+   "listX": [
+    {
+     "id": "F00-X0",
+     "text": "[L120-L129] (HIGH/parser/metadata-loss) The greedy `.*` after the optional value is followed only by optional metadata groups, so it can consume the entire remainder of every parameter declaration and prevent unit, description, and JSON metadata from being captured."
+    },
+    {
+     "id": "F00-X1",
+     "text": "[L112,L120] (MED/parser/grammar) The parameter grammar accepts only one comma attribute word and a whitespace-free initializer token, so otherwise valid declarations with multiple attributes or spaced expressions have an unclear or lossy parse contract."
+    },
+    {
+     "id": "F00-X2",
+     "text": "[L239-L251] (MED/generation/validation) Template rendering writes directly to the final `.inc` file with no temporary-file or atomic-replace step, so a render exception can leave a truncated generated source file."
+    },
+    {
+     "id": "F00-X3",
+     "text": "[L247] (LOW/diagnostic/provenance) The generated provenance comment misspells `xbeachlibrary` as `xbeachlibray`, making its recorded template path invalid."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F00-Y0",
+     "text": "[L120-L127] (MED/parser/greedy-match) The greedy wildcard after a parameter's initial value consumes the comment, unit, and description, so those named metadata groups resolve empty even for populated declarations."
+    },
+    {
+     "id": "F00-Y1",
+     "text": "[L123] (LOW/parser/schema) The parameter-unit character class excludes slash and question-mark characters that are used by units in params.def, independently making the declared unit grammar inconsistent with its input."
+    },
+    {
+     "id": "F00-Y2",
+     "text": "[L134-L147,L201-L209] (MED/type-system/contract) The parser accepts logical, float, and complex source types and maps them to ISO types, but generation performs no capability check that the selected templates can represent those types in their introspection dispatch."
+    },
+    {
+     "id": "F00-Y3",
+     "text": "[L149-L166,L175-L192] (MED/schema/validation) Parsed declarations are accepted without checking required JSON keys, name uniqueness, or agreement between declaration rank and JSON shape rank, allowing inconsistent definition data to fail later or generate contradictory Fortran."
+    },
+    {
+     "id": "F00-Y4",
+     "text": "[L164-L166,L190-L192] (MED/schema/integrity) Unrestricted dictionary update lets arbitrary JSON metadata overwrite parsed structural fields such as name, type, dimension, or rank."
+    },
+    {
+     "id": "F00-Y5",
+     "text": "[L226-L227] (LOW/build/portability) Default template discovery deliberately relies on the undocumented glob.glob1 API."
+    },
+    {
+     "id": "F00-Y6",
+     "text": "[L221-L225] (LOW/CLI/contract) Command-line template paths are reduced to basenames without validation, so the supplied directory is silently ignored and a same-named template from the fixed template directory is used."
+    },
+    {
+     "id": "F00-Y7",
+     "text": "[L239-L251] (MED/generation/atomicity) Each destination is opened with truncating mode before template rendering, so a render exception can destroy the last valid generated include and leave a partial file."
+    },
+    {
+     "id": "F00-Y8",
+     "text": "[L241] (LOW/filename/derivation) Output naming replaces every occurrence of '.mako' rather than requiring it as a suffix, permitting surprising output names for malformed CLI inputs."
+    },
+    {
+     "id": "F00-Y9",
+     "text": "[L244-L248] (LOW/generated-documentation) The generated provenance header misspells xbeachlibrary as xbeachlibray."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F00-X0",
+     "F00-Y0"
+    ],
+    [
+     "F00-X0",
+     "F00-Y1"
+    ],
+    [
+     "F00-X0",
+     "F00-Y2"
+    ],
+    [
+     "F00-X1",
+     "F00-Y0"
+    ],
+    [
+     "F00-X1",
+     "F00-Y1"
+    ],
+    [
+     "F00-X2",
+     "F00-Y7"
+    ],
+    [
+     "F00-X2",
+     "F00-Y8"
+    ],
+    [
+     "F00-X2",
+     "F00-Y9"
+    ],
+    [
+     "F00-X3",
+     "F00-Y7"
+    ],
+    [
+     "F00-X3",
+     "F00-Y8"
+    ],
+    [
+     "F00-X3",
+     "F00-Y9"
+    ]
+   ]
+  },
+  {
+   "file_token": "F01",
+   "lang": ".mako",
+   "listX": [
+    {
+     "id": "F01-X0",
+     "text": "[L7-L14] (HIGH/mpi/collective-participation) When `toall` is true the code selects the outer communicator and its computational-master root, then immediately returns the outer/output master, leaving a communicator member absent from the following collective distribution and using a nonzero root in helpers that require root zero."
+    },
+    {
+     "id": "F01-X1",
+     "text": "[L1-L13] (LOW/api/boolean-contract) The optional `toall` argument changes three coupled MPI identities only when both present and true, but the template provides no local statement of the communicator-membership assumptions required by that mode."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F01-Y0",
+     "text": "[L7-L14] (MED/control-flow/collective-contract) When toall is true the template selects xomaster as the source via iamsrc and xmpi_imaster, but then unconditionally returns on xomaster before any generated distribution body can use that selected source."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F01-X0",
+     "F01-Y0"
+    ],
+    [
+     "F01-X1",
+     "F01-Y0"
+    ]
+   ]
+  },
+  {
+   "file_token": "F02",
+   "lang": ".def",
+   "listX": [
+    {
+     "id": "F02-X0",
+     "text": "[L30] (MED/metadata/standard-name) The y-coordinate origin yzg11 is assigned the x-coordinate standard name projection_x_coordinate."
+    },
+    {
+     "id": "F02-X1",
+     "text": "[L34] (LOW/metadata/description) thetamaх is described as the minimum wave-grid angle even though its name and pairing with thetamin identify it as the maximum."
+    },
+    {
+     "id": "F02-X2",
+     "text": "[L46] (LOW/metadata/description) windlen is described as the length of the tide time series rather than the wind time series."
+    },
+    {
+     "id": "F02-X3",
+     "text": "[L100-L101] (MED/metadata/units) The spatial water-surface gradients dzsdx and dzsdy are labeled m/s, although a level derivative with respect to distance is dimensionless."
+    },
+    {
+     "id": "F02-X4",
+     "text": "[L111] (LOW/metadata/description) qy is described as a y-component discharge at u-points, inconsistent with the adjacent staggered-grid u/v naming."
+    },
+    {
+     "id": "F02-X5",
+     "text": "[L126] (LOW/metadata/description) vev is described as the Eulerian y-velocity at u-points even though its paired name indicates the v-point field."
+    },
+    {
+     "id": "F02-X6",
+     "text": "[L136] (MED/metadata/standard-name) The y-component sediment advection velocity ve_sed is assigned the x-velocity standard name sea_water_x_velocity."
+    },
+    {
+     "id": "F02-X7",
+     "text": "[L216-L217] (MED/metadata/units) dU and dV are explicitly described as velocity differences but carry acceleration-like units m2/s2 instead of m/s."
+    },
+    {
+     "id": "F02-X8",
+     "text": "[L237-L238] (MED/metadata/copy-paste) D50top and D90top are both labeled dimensionless friction coefficients, which conflicts with their grain-size names and the meter units used for D50 and D90 elsewhere in the same file."
+    },
+    {
+     "id": "F02-X9",
+     "text": "[L241] (LOW/metadata/units) tdisch is described as the discharge time series but is marked dimensionless rather than with time units."
+    },
+    {
+     "id": "F02-X10",
+     "text": "[L292-L295] (MED/metadata/units) The Q3D velocity fields uz, vz, and ustz and turbulence-viscosity field nutz are all labeled dimensionless despite their physical descriptions."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F02-Y0",
+     "text": "[L30] (MED/metadata/standard-name) The y-coordinate `yzg11` is labeled with `projection_x_coordinate` rather than a y-coordinate standard name."
+    },
+    {
+     "id": "F02-Y1",
+     "text": "[L34] (LOW/documentation/copy-paste) `thetamax` is described as the minimum angle, duplicating the `thetamin` contract."
+    },
+    {
+     "id": "F02-Y2",
+     "text": "[L41-L44] (LOW/metadata/units) The four global x/y corner-coordinate vectors are labeled dimensionless even though they contain spatial coordinates."
+    },
+    {
+     "id": "F02-Y3",
+     "text": "[L46] (LOW/documentation/copy-paste) `windlen` is described as the length of the tide time series rather than the wind time series."
+    },
+    {
+     "id": "F02-Y4",
+     "text": "[L59] (LOW/documentation/semantics) The off-diagonal radiation stress `Sxy` is described merely as the y-component, obscuring its tensor component semantics."
+    },
+    {
+     "id": "F02-Y5",
+     "text": "[L100-L101] (MED/metadata/units) The spatial water-surface gradients `dzsdx` and `dzsdy` are assigned rate units `[m/s]` despite being described as spatial derivatives."
+    },
+    {
+     "id": "F02-Y6",
+     "text": "[L111] (LOW/documentation/staggering) `qy` is described as y-discharge at u-points, inconsistent with the usual paired u/v staggering implied by adjacent `qx`."
+    },
+    {
+     "id": "F02-Y7",
+     "text": "[L136] (MED/metadata/standard-name) The y-component sediment advection velocity `ve_sed` is mislabeled with the x-velocity standard name."
+    },
+    {
+     "id": "F02-Y8",
+     "text": "[L204-L206] (MED/state/contract) The bed-composition arrays `pbbed`, `dzbed`, and `z0bed` retain literal `NO DESCRIPTION` text and dimensionless units, leaving central bed-state meanings and units unspecified."
+    },
+    {
+     "id": "F02-Y9",
+     "text": "[L216-L217] (MED/metadata/units) `dU` and `dV` are described as velocity differences but carry squared-velocity units `[m2/s2]`."
+    },
+    {
+     "id": "F02-Y10",
+     "text": "[L237-L238] (MED/metadata/copy-paste) `D50top` and `D90top` are both documented as dimensionless flow-friction coefficients, which conflicts with their grain-diameter names and neighboring sediment state."
+    },
+    {
+     "id": "F02-Y11",
+     "text": "[L241] (LOW/metadata/units) `tdisch` is described as a discharge time series but is labeled dimensionless rather than with time units."
+    },
+    {
+     "id": "F02-Y12",
+     "text": "[L292-L295] (MED/metadata/units) Q3D velocity arrays `uz`, `vz`, and `ustz` plus turbulence viscosity `nutz` are all labeled dimensionless despite their physical descriptions."
+    },
+    {
+     "id": "F02-Y13",
+     "text": "[L300,L316] (MED/metadata/standard-name) `zswet`, described only as wet-point water level, uses the `without_tide` standard name reserved explicitly for `zs1`, so exported semantics are inconsistent."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F02-X0",
+     "F02-Y0"
+    ],
+    [
+     "F02-X0",
+     "F02-Y1"
+    ],
+    [
+     "F02-X0",
+     "F02-Y7"
+    ],
+    [
+     "F02-X1",
+     "F02-Y0"
+    ],
+    [
+     "F02-X1",
+     "F02-Y1"
+    ],
+    [
+     "F02-X2",
+     "F02-Y2"
+    ],
+    [
+     "F02-X2",
+     "F02-Y3"
+    ],
+    [
+     "F02-X2",
+     "F02-Y11"
+    ],
+    [
+     "F02-X3",
+     "F02-Y2"
+    ],
+    [
+     "F02-X3",
+     "F02-Y5"
+    ],
+    [
+     "F02-X3",
+     "F02-Y12"
+    ],
+    [
+     "F02-X4",
+     "F02-Y6"
+    ],
+    [
+     "F02-X4",
+     "F02-Y11"
+    ],
+    [
+     "F02-X5",
+     "F02-Y6"
+    ],
+    [
+     "F02-X6",
+     "F02-Y0"
+    ],
+    [
+     "F02-X6",
+     "F02-Y7"
+    ],
+    [
+     "F02-X7",
+     "F02-Y5"
+    ],
+    [
+     "F02-X7",
+     "F02-Y9"
+    ],
+    [
+     "F02-X7",
+     "F02-Y12"
+    ],
+    [
+     "F02-X8",
+     "F02-Y10"
+    ],
+    [
+     "F02-X8",
+     "F02-Y11"
+    ],
+    [
+     "F02-X9",
+     "F02-Y0"
+    ],
+    [
+     "F02-X9",
+     "F02-Y3"
+    ],
+    [
+     "F02-X9",
+     "F02-Y6"
+    ],
+    [
+     "F02-X9",
+     "F02-Y10"
+    ],
+    [
+     "F02-X9",
+     "F02-Y11"
+    ],
+    [
+     "F02-X10",
+     "F02-Y5"
+    ],
+    [
+     "F02-X10",
+     "F02-Y9"
+    ],
+    [
+     "F02-X10",
+     "F02-Y12"
+    ],
+    [
+     "F02-X10",
+     "F02-Y13"
+    ]
+   ]
+  },
+  {
+   "file_token": "F03",
+   "lang": ".mako",
+   "listX": [
+    {
+     "id": "F03-X0",
+     "text": "[L1-L4] (LOW/generation-contract/documentation) The header identifies spaceparams.tmpl and makeincludes.F90 as edit/build inputs, which is inconsistent with this Mako template's variables-driven interface and leaves the actual source of truth unclear."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F03-Y0",
+     "text": "[L1-L4] (LOW/provenance/stale-instruction) The generated-file guidance names `spaceparams.tmpl` and `makeincludes.F90`, not the `variables.def` and Mako generation path that produces this declaration block."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F03-X0",
+     "F03-Y0"
+    ]
+   ]
+  },
+  {
+   "file_token": "F04",
+   "lang": ".mako",
+   "listX": [
+    {
+     "id": "F04-X0",
+     "text": "[L1-L3] (LOW/provenance/stale-instruction) The edit instruction refers to `variable.f90` rather than `variables.def`."
+    },
+    {
+     "id": "F04-X1",
+     "text": "[L18-L23] (MED/allocation/precondition) Bulk allocation unconditionally allocates every array pointer with no association guard or status handling, requiring an unstated fresh-space precondition."
+    },
+    {
+     "id": "F04-X2",
+     "text": "[L21] (MED/initialization/undefined-state) Allocated scientific state arrays receive no initialization, leaving their contents undefined until every element is populated elsewhere."
+    },
+    {
+     "id": "F04-X3",
+     "text": "[L19-L20] (LOW/comment/code-mismatch) The comment says this branch is only for rank-1 variables, but the condition includes every positive rank."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F04-Y0",
+     "text": "[L1-L3] (LOW/generation-contract/documentation) The header points maintainers to variable.f90 rather than clearly identifying the variables definition input that supplies this template."
+    },
+    {
+     "id": "F04-Y1",
+     "text": "[L18-L22] (MED/allocation/lifecycle) All array components are allocated unconditionally and without STAT handling, leaving repeated calls or invalid/nonpositive generated extents dependent on an undocumented caller precondition."
+    },
+    {
+     "id": "F04-Y2",
+     "text": "[L19-L20] (LOW/documentation/implementation-mismatch) The branch is documented as rank-1-only but actually emits allocations for every positive rank."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F04-X0",
+     "F04-Y0"
+    ],
+    [
+     "F04-X1",
+     "F04-Y1"
+    ],
+    [
+     "F04-X1",
+     "F04-Y2"
+    ],
+    [
+     "F04-X2",
+     "F04-Y1"
+    ],
+    [
+     "F04-X2",
+     "F04-Y2"
+    ],
+    [
+     "F04-X3",
+     "F04-Y1"
+    ],
+    [
+     "F04-X3",
+     "F04-Y2"
+    ]
+   ]
+  },
+  {
+   "file_token": "F05",
+   "lang": ".mako",
+   "listX": [],
+   "listY": [],
+   "candidate_pairs": []
+  },
+  {
+   "file_token": "F06",
+   "lang": ".mako",
+   "listX": [
+    {
+     "id": "F06-X0",
+     "text": "[L1-L3] (LOW/provenance/stale-instruction) The edit instruction refers to `variable.f90` instead of the actual `variables.def` source."
+    },
+    {
+     "id": "F06-X1",
+     "text": "[L17-L21,L33,L38] (MED/generation/type-map) The type map expects the key `character`, while `generate.py` maps Fortran character declarations to `char`, and it also omits other generator-supported mapped types, so a newly supported variable type can fail generation with a key error."
+    },
+    {
+     "id": "F06-X2",
+     "text": "[L37-L46] (LOW/state/reuse) Rank-specific dimensions are written only for positive rank and unused dimension slots are never cleared, leaving stale dimension text possible when an introspection object is reused unless every consumer strictly honors `t%rank`."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F06-Y0",
+     "text": "[L1-L3] (LOW/generation-contract/documentation) The header names variable.f90 as the editable source although the template consumes generated variable metadata."
+    },
+    {
+     "id": "F06-Y1",
+     "text": "[L17-L21,L33,L38] (LOW/schema/extensibility) The type-to-code mapping is a closed three-entry dictionary with direct lookup, so any definition using an otherwise valid new type causes generation to fail with no validation-oriented diagnostic."
+    },
+    {
+     "id": "F06-Y2",
+     "text": "[L39-L43] (MED/code-generation/escaping) Definition strings are interpolated directly inside single-quoted Fortran literals without escaping embedded apostrophes, making a legitimate metadata value capable of producing malformed generated source."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F06-X0",
+     "F06-Y0"
+    ],
+    [
+     "F06-X1",
+     "F06-Y1"
+    ],
+    [
+     "F06-X1",
+     "F06-Y2"
+    ],
+    [
+     "F06-X2",
+     "F06-Y1"
+    ],
+    [
+     "F06-X2",
+     "F06-Y2"
+    ]
+   ]
+  },
+  {
+   "file_token": "F07",
+   "lang": ".mako",
+   "listX": [
+    {
+     "id": "F07-X0",
+     "text": "[L1-L3] (LOW/provenance/stale-instruction) The edit instruction points to `variable.f90`, while this generator is actually driven by the `.def` files and the named file is not this template's source of truth."
+    },
+    {
+     "id": "F07-X1",
+     "text": "[L9-L18,L38,L45,L52] (MED/generation/array-filter) Non-scalar parameters are excluded through a hard-coded name list rather than the available rank metadata, so adding or renaming any array parameter can generate an invalid array-to-scalar assignment."
+    },
+    {
+     "id": "F07-X2",
+     "text": "[L9-L18] (LOW/generation/type-coverage) Only `double`, `int`, and `char` mapped types enter introspection, with no explicit rejection or handling contract for the other types supported by `generate.py`."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F07-Y0",
+     "text": "[L1-L3] (LOW/generation-contract/documentation) The header names variable.f90 rather than the parameter-definition input that actually drives the emitted key tables."
+    },
+    {
+     "id": "F07-Y1",
+     "text": "[L9-L18] (MED/schema/validation) Parameter classification silently ignores every type other than the three hard-coded spellings and provides no error for an unsupported or misspelled type."
+    },
+    {
+     "id": "F07-Y2",
+     "text": "[L11-L18] (MED/schema/maintainability) Array-valued parameters are excluded through manually maintained name lists instead of a rank/shape property, so adding or renaming an array can silently omit it or generate an invalid scalar assignment."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F07-X0",
+     "F07-Y0"
+    ],
+    [
+     "F07-X0",
+     "F07-Y1"
+    ],
+    [
+     "F07-X1",
+     "F07-Y0"
+    ],
+    [
+     "F07-X1",
+     "F07-Y1"
+    ],
+    [
+     "F07-X1",
+     "F07-Y2"
+    ],
+    [
+     "F07-X2",
+     "F07-Y0"
+    ],
+    [
+     "F07-X2",
+     "F07-Y1"
+    ],
+    [
+     "F07-X2",
+     "F07-Y2"
+    ]
+   ]
+  },
+  {
+   "file_token": "F08",
+   "lang": ".mako",
+   "listX": [
+    {
+     "id": "F08-X0",
+     "text": "[L1-L3] (LOW/provenance/stale-instruction) The edit instruction refers to `variable.f90` rather than `variables.def`."
+    },
+    {
+     "id": "F08-X1",
+     "text": "[L5-L9] (MED/allocation/precondition) Scalar allocation is unconditional and has neither an association guard nor allocation-status handling."
+    },
+    {
+     "id": "F08-X2",
+     "text": "[L7] (MED/initialization/undefined-state) Every newly allocated scalar pointer has an undefined value until separately initialized."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F08-Y0",
+     "text": "[L1-L3] (LOW/generation-contract/documentation) The generated-file header directs maintainers to edit variable.f90 even though this template is driven by the variables definition input, making the stated source-of-truth contract ambiguous."
+    },
+    {
+     "id": "F08-Y1",
+     "text": "[L5-L9] (MED/allocation/lifecycle) Every scalar component is allocated unconditionally without an allocated/associated guard or STAT handling, so a repeated allocation call can terminate at runtime unless an unstated fresh-object precondition always holds."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F08-X0",
+     "F08-Y0"
+    ],
+    [
+     "F08-X0",
+     "F08-Y1"
+    ],
+    [
+     "F08-X1",
+     "F08-Y0"
+    ],
+    [
+     "F08-X1",
+     "F08-Y1"
+    ],
+    [
+     "F08-X2",
+     "F08-Y0"
+    ],
+    [
+     "F08-X2",
+     "F08-Y1"
+    ]
+   ]
+  },
+  {
+   "file_token": "F09",
+   "lang": ".mako",
+   "listX": [
+    {
+     "id": "F09-X0",
+     "text": "[L1-L3] (LOW/provenance/stale-instruction) The edit instruction refers to `variable.f90` rather than `variables.def`."
+    },
+    {
+     "id": "F09-X1",
+     "text": "[L12-L17] (MED/api/unhandled-index) Only array indices assign result `r`; scalar or otherwise unmatched indices have no generated assignment, so defined behavior depends on unstated surrounding initialization or validation."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F09-Y0",
+     "text": "[L1-L3] (LOW/generation-contract/documentation) The header points to variable.f90 as the editable source rather than clearly naming the definitions consumed by generation."
+    },
+    {
+     "id": "F09-Y1",
+     "text": "[L12-L16] (LOW/API/semantic-mismatch) An operation named allocated reports pointer association instead, which also returns true for association with a non-owned target and has no emitted case for scalar indices."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F09-X0",
+     "F09-Y0"
+    ],
+    [
+     "F09-X1",
+     "F09-Y1"
+    ]
+   ]
+  },
+  {
+   "file_token": "F10",
+   "lang": ".mako",
+   "listX": [],
+   "listY": [],
+   "candidate_pairs": []
+  },
+  {
+   "file_token": "F11",
+   "lang": ".def",
+   "listX": [
+    {
+     "id": "F11-X0",
+     "text": "[L3-L10,L25,L77,L101-L103,L128,L147] (MED/schema/documentation-contract) The parsing rules require all-lowercase declarations, but the file contains many mixed-case parameter names, leaving external script-reader compatibility dependent on undocumented tolerance."
+    },
+    {
+     "id": "F11-X1",
+     "text": "[L17-L19,L410-L411] (LOW/documentation/name-mismatch) The adjacency rule refers to nglobalvars, while the declared count parameter is nglobalvar."
+    },
+    {
+     "id": "F11-X2",
+     "text": "[L57,L273] (MED/parameter-contract/duplication) Both nz and kmax are described as controlling vertical/Q3D layer counts, without explaining which count is authoritative for Q3D allocations."
+    },
+    {
+     "id": "F11-X3",
+     "text": "[L78] (MED/metadata/units) dtset is a fixed timestep but is labeled dimensionless rather than in seconds."
+    },
+    {
+     "id": "F11-X4",
+     "text": "[L148-L149] (MED/parameter-type/contract) order is declared double precision even though its description defines a discrete first-order versus second-order switch."
+    },
+    {
+     "id": "F11-X5",
+     "text": "[L198] (MED/metadata/units) fwcutoff is described as a depth threshold but is labeled dimensionless."
+    },
+    {
+     "id": "F11-X6",
+     "text": "[L229-L231,L354-L360,L363-L370,L467] (LOW/Fortran/portability) Several declarations use nonstandard legacy spellings integer*4 and real*8 instead of portable kind-based types."
+    },
+    {
+     "id": "F11-X7",
+     "text": "[L272,L275] (MED/metadata/units) The molecular viscosity vicmol and estimated ripple height deltar are both labeled dimensionless despite requiring viscosity and length units respectively."
+    },
+    {
+     "id": "F11-X8",
+     "text": "[L287] (LOW/metadata/incomplete) dispc retains a literal unknown-unit marker [?] in the source-of-truth declaration."
+    },
+    {
+     "id": "F11-X9",
+     "text": "[L338-L339] (MED/metadata/parameter-semantics) The integer parameters sus and bed are described as calibration factors, obscuring that their declared type permits only discrete values."
+    },
+    {
+     "id": "F11-X10",
+     "text": "[L361-L362] (LOW/metadata/copy-paste) sedfricfac is described as a wave shape model even though its name and paired string parameter identify a sediment-friction selection."
+    },
+    {
+     "id": "F11-X11",
+     "text": "[L376] (MED/metadata/units) bermslopedepth is described as a water depth but is labeled dimensionless."
+    },
+    {
+     "id": "F11-X12",
+     "text": "[L405-L408,L448-L449] (LOW/metadata/units) Several parameters explicitly described as file names are labeled dimensionless instead of with the file unit marker used elsewhere."
+    },
+    {
+     "id": "F11-X13",
+     "text": "[L419-L421] (MED/pointer/lifecycle) The three pointer components have no default NULL initialization, leaving newly created parameter objects with undefined association status until an allocation path is completed."
+    },
+    {
+     "id": "F11-X14",
+     "text": "[L424,L430] (MED/capacity/contract) Runup depths and station identifiers use fixed capacities of 9999 while their user-controlled counts have no local bound contract."
+    },
+    {
+     "id": "F11-X15",
+     "text": "[L432-L435] (MED/data-loss/string-capacity) The file explicitly acknowledges that the projection string capacity is too short for WKT, so valid projection metadata can be truncated."
+    },
+    {
+     "id": "F11-X16",
+     "text": "[L453] (LOW/metadata/truncation) The veguntow description is visibly truncated at 'vegetati'."
+    },
+    {
+     "id": "F11-X17",
+     "text": "[L512] (LOW/metadata/semantic-mismatch) cf_transport is named and typed as a dimensionless coefficient but is described as bed shear stress."
+    },
+    {
+     "id": "F11-X18",
+     "text": "[L515] (MED/metadata/units) max_dzsdt is described as a maximum bed-level change rate but is labeled dimensionless."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F11-Y0",
+     "text": "[L17-L19,L410-L416] (LOW/generation/contract) The maintenance rule names `nglobalvars`, but the actual count declaration is singular `nglobalvar`, leaving the documented adjacency contract inconsistent with the source."
+    },
+    {
+     "id": "F11-Y1",
+     "text": "[L28-L50] (MED/initialization/sentinel) Core process switches are initialized to the same validly typed magic value `-123` without a declared validity check at this source-of-truth layer, so omission detection depends on an unstated downstream contract."
+    },
+    {
+     "id": "F11-Y2",
+     "text": "[L77-L81] (LOW/metadata/units) `dtset` is documented with dimensionless units even though it is a fixed timestep alongside second-valued time parameters."
+    },
+    {
+     "id": "F11-Y3",
+     "text": "[L122] (LOW/documentation/incomplete) The `trepfac` description ends with `and`, leaving the user-facing parameter contract visibly incomplete."
+    },
+    {
+     "id": "F11-Y4",
+     "text": "[L148-L150] (MED/type/contract) `order` is a double-precision value described as a first- versus second-order switch, with no stated semantics for nonintegral values."
+    },
+    {
+     "id": "F11-Y5",
+     "text": "[L199] (MED/type/contract) `breakerdelay` is a double-precision value described only as an enable switch, leaving its numeric domain and meaning unclear."
+    },
+    {
+     "id": "F11-Y6",
+     "text": "[L227] (LOW/scientific-provenance) The `nuhv` formulation is attributed only to `Svendsen (?)`, explicitly leaving the scientific basis unresolved."
+    },
+    {
+     "id": "F11-Y7",
+     "text": "[L287] (LOW/metadata/units) The non-hydrostatic pressure-gradient coefficient `dispc` has the literal unit marker `[?]`."
+    },
+    {
+     "id": "F11-Y8",
+     "text": "[L300,L306-L311] (MED/bounds/contract) Per-grain arrays are fixed at 99 entries while `ngd` is independently configurable and no maximum or validation relationship is declared here."
+    },
+    {
+     "id": "F11-Y9",
+     "text": "[L338-L339] (MED/type/precision) `sus` and `bed` are integer declarations but are documented as calibration factors, preventing fractional calibration unless downstream code supplies an undocumented reinterpretation."
+    },
+    {
+     "id": "F11-Y10",
+     "text": "[L361-L362] (LOW/metadata/copy-paste) `sedfricfac` is documented as `Wave shape model`, duplicating unrelated terminology and obscuring this option's actual contract."
+    },
+    {
+     "id": "F11-Y11",
+     "text": "[L365] (LOW/scientific-provenance) The slope-correction description cites Hughes and Masselink with the unresolved placeholder year `xxxx`."
+    },
+    {
+     "id": "F11-Y12",
+     "text": "[L419-L421] (MED/pointer/initialization) The three pointer parameters are declared without `=> null()`, so their initial association status is undefined unless an unstated initialization path runs before any association query or cleanup."
+    },
+    {
+     "id": "F11-Y13",
+     "text": "[L417-L430] (MED/bounds/contract) Point and runup counts are independently configurable while `rugdepth` and `stationid` have hard-coded capacity 9999 and no stated upper-bound validation contract."
+    },
+    {
+     "id": "F11-Y14",
+     "text": "[L432-L435] (MED/data-truncation) The file explicitly acknowledges that `slen` is too short for WKT yet still stores the projection string in `character(slen)`, so valid projection metadata can be truncated."
+    },
+    {
+     "id": "F11-Y15",
+     "text": "[L453] (LOW/documentation/truncation) The `veguntow` description is truncated at `vegetati`, leaving the stated scope incomplete."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F11-X0",
+     "F11-Y0"
+    ],
+    [
+     "F11-X0",
+     "F11-Y1"
+    ],
+    [
+     "F11-X0",
+     "F11-Y2"
+    ],
+    [
+     "F11-X0",
+     "F11-Y3"
+    ],
+    [
+     "F11-X0",
+     "F11-Y4"
+    ],
+    [
+     "F11-X1",
+     "F11-Y0"
+    ],
+    [
+     "F11-X1",
+     "F11-Y13"
+    ],
+    [
+     "F11-X3",
+     "F11-Y2"
+    ],
+    [
+     "F11-X4",
+     "F11-Y4"
+    ],
+    [
+     "F11-X4",
+     "F11-Y5"
+    ],
+    [
+     "F11-X5",
+     "F11-Y5"
+    ],
+    [
+     "F11-X6",
+     "F11-Y6"
+    ],
+    [
+     "F11-X6",
+     "F11-Y10"
+    ],
+    [
+     "F11-X6",
+     "F11-Y11"
+    ],
+    [
+     "F11-X8",
+     "F11-Y7"
+    ],
+    [
+     "F11-X9",
+     "F11-Y9"
+    ],
+    [
+     "F11-X10",
+     "F11-Y10"
+    ],
+    [
+     "F11-X10",
+     "F11-Y11"
+    ],
+    [
+     "F11-X12",
+     "F11-Y0"
+    ],
+    [
+     "F11-X12",
+     "F11-Y7"
+    ],
+    [
+     "F11-X12",
+     "F11-Y15"
+    ],
+    [
+     "F11-X13",
+     "F11-Y0"
+    ],
+    [
+     "F11-X13",
+     "F11-Y12"
+    ],
+    [
+     "F11-X13",
+     "F11-Y13"
+    ],
+    [
+     "F11-X14",
+     "F11-Y12"
+    ],
+    [
+     "F11-X14",
+     "F11-Y13"
+    ],
+    [
+     "F11-X14",
+     "F11-Y14"
+    ],
+    [
+     "F11-X15",
+     "F11-Y13"
+    ],
+    [
+     "F11-X15",
+     "F11-Y14"
+    ],
+    [
+     "F11-X16",
+     "F11-Y3"
+    ],
+    [
+     "F11-X16",
+     "F11-Y15"
+    ]
+   ]
+  },
+  {
+   "file_token": "F12",
+   "lang": ".mako",
+   "listX": [
+    {
+     "id": "F12-X0",
+     "text": "[L1-L3] (LOW/provenance/stale-instruction) The edit instruction refers to `variable.f90` rather than `variables.def`."
+    },
+    {
+     "id": "F12-X1",
+     "text": "[L17-L21] (MED/allocation/precondition) Generated cases allocate the target pointer without checking whether it is already associated or exposing a failure status, so the caller must satisfy an unstated one-shot precondition."
+    },
+    {
+     "id": "F12-X2",
+     "text": "[L19-L21] (MED/initialization/undefined-state) Index-based allocation does not initialize newly allocated elements, leaving all values undefined until a separate caller-side initialization occurs."
+    },
+    {
+     "id": "F12-X3",
+     "text": "[L17-L22] (LOW/api/scalar-coverage) No cases are emitted for scalar variables, leaving scalar-index behavior to unspecified surrounding control flow."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F12-Y0",
+     "text": "[L1-L3] (LOW/generation-contract/documentation) The header names variable.f90 as the edit point instead of clearly identifying the generator's variable-definition source."
+    },
+    {
+     "id": "F12-Y1",
+     "text": "[L17-L21] (MED/allocation/lifecycle) Indexed allocation is unconditional and has no ASSOCIATED guard or STAT handling, so allocating an already associated component can fail at runtime without a recoverable status."
+    },
+    {
+     "id": "F12-Y2",
+     "text": "[L17-L21] (LOW/dispatch/contract) No cases are emitted for scalar indices, leaving the behavior of the nominal allocate-by-index API inconsistent across entries in the shared index space."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F12-X0",
+     "F12-Y0"
+    ],
+    [
+     "F12-X1",
+     "F12-Y1"
+    ],
+    [
+     "F12-X1",
+     "F12-Y2"
+    ],
+    [
+     "F12-X2",
+     "F12-Y1"
+    ],
+    [
+     "F12-X2",
+     "F12-Y2"
+    ],
+    [
+     "F12-X3",
+     "F12-Y1"
+    ],
+    [
+     "F12-X3",
+     "F12-Y2"
+    ]
+   ]
+  },
+  {
+   "file_token": "F13",
+   "lang": ".mako",
+   "listX": [
+    {
+     "id": "F13-X0",
+     "text": "[L1-L3] (LOW/provenance/stale-instruction) The edit instruction refers to `variable.f90` rather than `variables.def`."
+    },
+    {
+     "id": "F13-X1",
+     "text": "[L17-L22] (MED/allocation/data-loss) Reallocation deallocates the old target before allocating the new one, discarding all prior values and leaving no recovery path if allocation fails."
+    },
+    {
+     "id": "F13-X2",
+     "text": "[L20-L21] (MED/pointer/ownership) The code assumes every associated space pointer owns a deallocatable target, but the pointer-based state model does not express or check that ownership contract."
+    },
+    {
+     "id": "F13-X3",
+     "text": "[L21] (MED/initialization/undefined-state) The replacement allocation is not initialized, so all reallocated state becomes undefined."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F13-Y0",
+     "text": "[L1-L3] (LOW/generation-contract/documentation) The header identifies variable.f90 as the edit point instead of clearly naming the definition data that drives generation."
+    },
+    {
+     "id": "F13-Y1",
+     "text": "[L17-L22] (MED/allocation/error-handling) Reallocation destroys the existing target before attempting an unchecked allocation, so allocation failure loses the prior data and is not surfaced through STAT."
+    },
+    {
+     "id": "F13-Y2",
+     "text": "[L20] (MED/pointer-ownership) The code treats ASSOCIATED as proof that the pointer owns a deallocatable target, although an associated pointer can legally reference a target it does not own unless that ownership invariant is enforced elsewhere."
+    },
+    {
+     "id": "F13-Y3",
+     "text": "[L18-L22] (LOW/dispatch/contract) A case is emitted for every variable index but scalar cases contain no operation, so requesting reallocation of a scalar silently succeeds as a no-op."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F13-X0",
+     "F13-Y0"
+    ],
+    [
+     "F13-X1",
+     "F13-Y1"
+    ],
+    [
+     "F13-X1",
+     "F13-Y2"
+    ],
+    [
+     "F13-X1",
+     "F13-Y3"
+    ],
+    [
+     "F13-X2",
+     "F13-Y1"
+    ],
+    [
+     "F13-X2",
+     "F13-Y2"
+    ],
+    [
+     "F13-X2",
+     "F13-Y3"
+    ],
+    [
+     "F13-X3",
+     "F13-Y1"
+    ],
+    [
+     "F13-X3",
+     "F13-Y2"
+    ],
+    [
+     "F13-X3",
+     "F13-Y3"
+    ]
+   ]
+  },
+  {
+   "file_token": "F14",
+   "lang": ".mako",
+   "listX": [
+    {
+     "id": "F14-X0",
+     "text": "[L1-L3] (LOW/provenance/stale-instruction) The edit instruction refers to `variable.f90` rather than `variables.def`."
+    },
+    {
+     "id": "F14-X1",
+     "text": "[L12-L17] (MED/deallocation/precondition) Generated cases deallocate pointers without an `associated` guard or status result, so repeated or invalid deallocation can raise a runtime error."
+    },
+    {
+     "id": "F14-X2",
+     "text": "[L12-L17] (LOW/api/scalar-coverage) No deallocation cases are generated for scalar indices, leaving that input class dependent on surrounding undocumented handling."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F14-Y0",
+     "text": "[L1-L3] (LOW/generation-contract/documentation) The generated-file header directs edits to variable.f90 rather than clearly identifying the definition input used by the generator."
+    },
+    {
+     "id": "F14-Y1",
+     "text": "[L12-L16] (MED/allocation/lifecycle) The indexed deallocator performs an unconditional DEALLOCATE with no ASSOCIATED check or STAT result, so a repeated call or an index whose component was never allocated can raise a Fortran runtime error."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F14-X0",
+     "F14-Y0"
+    ],
+    [
+     "F14-X1",
+     "F14-Y1"
+    ],
+    [
+     "F14-X2",
+     "F14-Y1"
+    ]
+   ]
+  },
+  {
+   "file_token": "F15",
+   "lang": ".mako",
+   "listX": [
+    {
+     "id": "F15-X0",
+     "text": "[L1-L3] (LOW/provenance/stale-instruction) The edit instruction refers to `variable.f90` rather than `variables.def`."
+    },
+    {
+     "id": "F15-X1",
+     "text": "[L18-L23] (MED/allocation/precondition) Dummy allocation also unconditionally allocates every array pointer without checking prior association or reporting allocation status."
+    },
+    {
+     "id": "F15-X2",
+     "text": "[L19-L20] (LOW/comment/code-mismatch) The comment says rank-1 only, while the condition emits zero-sized allocations for arrays of every positive rank."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F15-Y0",
+     "text": "[L1-L3] (LOW/generation-contract/documentation) The header names variable.f90 as the editable source even though component allocation is generated from the variables definition input."
+    },
+    {
+     "id": "F15-Y1",
+     "text": "[L18-L22] (MED/allocation/lifecycle) All positive-rank components are unconditionally allocated as zero-size arrays without guarding against an already allocated component or reporting allocation failure."
+    },
+    {
+     "id": "F15-Y2",
+     "text": "[L19-L20] (LOW/documentation/implementation-mismatch) The comment says the branch is only for rank-1 variables, while the actual condition includes every rank greater than zero."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F15-X0",
+     "F15-Y0"
+    ],
+    [
+     "F15-X1",
+     "F15-Y1"
+    ],
+    [
+     "F15-X1",
+     "F15-Y2"
+    ],
+    [
+     "F15-X2",
+     "F15-Y1"
+    ],
+    [
+     "F15-X2",
+     "F15-Y2"
+    ]
+   ]
+  },
+  {
+   "file_token": "F16",
+   "lang": ".mako",
+   "listX": [
+    {
+     "id": "F16-X0",
+     "text": "[L1-L3] (LOW/provenance/stale-instruction) The edit instruction points to `variables.f90` rather than the `variables.def` source used by the generator."
+    },
+    {
+     "id": "F16-X1",
+     "text": "[L9-L14] (MED/control-flow/unmatched-input) The generated `select case` has no `case default` and assigns `chartoindex` only on a match, leaving unmatched-input behavior dependent on unstated initialization in surrounding code."
+    },
+    {
+     "id": "F16-X2",
+     "text": "[L9-L12] (LOW/lookup/normalization) Character matching is generated directly from mnemonics with no visible case or whitespace normalization, so the accepted spelling contract is unclear at this layer."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F16-Y0",
+     "text": "[L1-L3] (LOW/generation-contract/documentation) The header tells maintainers to edit variables.f90 instead of identifying the variables definition file that supplies the generated cases."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F16-X0",
+     "F16-Y0"
+    ],
+    [
+     "F16-X1",
+     "F16-Y0"
+    ],
+    [
+     "F16-X2",
+     "F16-Y0"
+    ]
+   ]
+  }
+ ]
+}

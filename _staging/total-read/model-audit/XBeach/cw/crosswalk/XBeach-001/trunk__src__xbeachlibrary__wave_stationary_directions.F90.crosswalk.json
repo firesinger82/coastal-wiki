@@ -1,0 +1,217 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-001",
+ "source_path": "trunk/src/xbeachlibrary/wave_stationary_directions.F90",
+ "source_sha256": "60a3e8b6e89861caa462535aefdb4b11aee3c6a5b31a4174ef1ac6e34eb54b71",
+ "base_run_id": "xbeach-r1-XBeach-001-codex-01a05a5b-a17d-7cd0-8b9b-49a161c8810c",
+ "audit_run_id": "xbeach-r2-XBeach-001-codex-01a05aa6-f6db-7991-802e-4d57ae64a826",
+ "base_record_file": "edc2e7ac80ca8dceaa3e28a9cfcc9d9912fc6bca5dda583b778ae574a8b4bb7d.json",
+ "audit_record_file": "edc2e7ac80ca8dceaa3e28a9cfcc9d9912fc6bca5dda583b778ae574a8b4bb7d.json",
+ "base_record_sha256_bytes": "bb1c4d55e3a59230774af9f013f0d2308d485a267ae5a62d843f95b9e7234ec0",
+ "audit_record_sha256_bytes": "eadb37e3bbe8fc2f2484e5e47efda01dc16b3dc00b73747dfbe4386a02d09cad",
+ "base_finding_count": 12,
+ "audit_finding_count": 7,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B1",
+    "B2"
+   ],
+   "base_member_text": [
+    "[L202-L220, L397-L410, L557-L570] (HIGH/wave-direction calculation) Both modes use arithmetic mean angles that fail across 0/2π, and stationary Snell refraction passes an unclamped value to asin."
+   ],
+   "audit_member_text": [
+    "[L203-L219,L397-L410,L557-L570] (HIGH/circular statistics) Mean wave direction is calculated as an arithmetic weighted mean of angles, which gives a direction near zero for energy straddling the -pi/+pi wrap instead of the correct circular mean.",
+    "[L210-L214] (HIGH/numerical robustness) The Snell-law asin argument sines times c/c(1,1) is neither denominator-guarded nor clamped to [-1,1], allowing division by zero or NaN directions."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A9"
+   ],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [
+    "[L620-L643] (HIGH/convergence metric defects) Relative H error divides by zero wave height, while the EE metrics build a wetmask but never apply it, allowing dry or halo cells to control convergence."
+   ],
+   "audit_member_text": [
+    "[L620-L643] (HIGH/convergence metric) Relative height convergence divides by s%H with no zero guard, while the EE branches populate wetmask but never apply it and therefore do not implement their apparent wet-cell-only contract."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "[L294-L300] (HIGH/unguarded action conversion) Wet-cell energy is divided by s%sigm without checking for a positive intrinsic frequency."
+   ],
+   "audit_member_text": [
+    "[L294-L300,L357-L363] (MED/numerical robustness) Wave action conversion divides wet-cell energy by sigm without any positive-frequency guard."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0",
+    "A1"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L70-L122] (HIGH/call-mode-dependent saved shape) Common saved arrays are dimensioned using the first callType's direction count and never resized, although the routine is designed to be called in both stationary and directions modes with potentially different ntheta values.",
+    "[L70-L76, L146-L156] (MED/invalid mode handling) An unsupported callType leaves ntheta_local, hhwlocal, ee_local, and dtheta_local undefined rather than rejecting the call."
+   ],
+   "audit_member_text": [
+    "[L70-L114] (MED/persistent allocation/dispatch) callType has no default validation and saved work arrays are sized only on the first call, so a later call with a different grid or ntheta_local reuses incompatible shapes."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A8"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "[L599-L610] (HIGH/dimensionally incorrect roller state) After scaling rr by a height-based gamma factor, s%R is assigned RH*gammafac, a length, rather than the corresponding roller energy or the sum of scaled rr."
+   ],
+   "audit_member_text": [
+    "[L601-L610] (HIGH/dimensional/state consistency) After scaling directional roller energy by gammafac squared, s%R is assigned RH*gammafac, a wave-height quantity, instead of a consistently scaled roller energy."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "[L509-L514] (HIGH/division by zero) Roller dissipation divides by directional phase-speed magnitude without a positive floor."
+   ],
+   "audit_member_text": [
+    "[L509-L514] (HIGH/numerical robustness) Roller dissipation divides by sqrt(cx^2+cy^2) without guarding zero propagation speed."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L184-L189] (HIGH/inconsistent hyperbolic limiter) The sinh(2kh) approximation repeats the discontinuous <=3000 test with a cap at 10 and a fixed 3000 value above the threshold."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L426-L444] (MED/stale vegetation dissipation) The directions-mode dissipation uses s%Dveg even though the source notes it has not been updated for the stationary-direction wave height."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L473-L478] (HIGH/refraction switch inconsistency) Roller theta-advection is applied unconditionally in stationary mode even when par%refraction disables the corresponding wave-energy theta-advection."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A10"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L666-L673] (LOW/misleading diagnostics) Non-convergence logging caps both H error and direction error at 0.99, hiding the true magnitude of larger failures."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A11"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L723-L725] (MED/unguarded dry-cell arithmetic) Final orbital velocity is evaluated over the full grid without a wet/depth guard."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

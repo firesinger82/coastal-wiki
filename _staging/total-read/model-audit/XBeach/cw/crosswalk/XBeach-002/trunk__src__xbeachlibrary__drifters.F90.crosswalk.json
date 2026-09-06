@@ -1,0 +1,107 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-002",
+ "source_path": "trunk/src/xbeachlibrary/drifters.F90",
+ "source_sha256": "42c0e8bae3a881126deaa48617848576cfcfad387a1eb9c5be185d899bda76c9",
+ "base_run_id": "xbeach-r1-XBeach-002-codex-01a05a67-e2d6-7e11-b2eb-ed7a4a8bc0af",
+ "audit_run_id": "xbeach-r2-XBeach-002-codex-01a05ab3-8036-7660-84fb-58c476606a27",
+ "base_record_file": "80a71dbc927ece0b1bcec736fe70ca20f9d49a9d75d6468b3ac7cdabfdd59e1d.json",
+ "audit_record_file": "80a71dbc927ece0b1bcec736fe70ca20f9d49a9d75d6468b3ac7cdabfdd59e1d.json",
+ "base_record_sha256_bytes": "e80ff4e46e447c85a80a1bd7900fb3be849137223ad1ad170e46bcaff34101cd",
+ "audit_record_sha256_bytes": "86ddbacb748a6879b2e7b3f85f7914e53c472b7bb75826ec793f87e1ce7ef54f",
+ "base_finding_count": 4,
+ "audit_finding_count": 3,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L53-L62] (MED/distributed-state-consistency) MPI_MIN is applied independently to idrift and jdrift, so if different overlapping ranks produce the minima the reduced coordinate pair need not come from any single rank's drifter update."
+   ],
+   "audit_member_text": [
+    "[L41-L62] (HIGH/MPI-ownership/reduction) Every rank whose local index test succeeds advances the drifter, while idrift and jdrift are reduced independently with MPI_MIN, so overlapping ownership or differing local updates can select coordinates from different ranks and create a position no rank computed."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "[L31-L32] (LOW/endpoint-semantics) Strict time inequalities skip updates exactly at both configured drifter start and end times, an endpoint convention that is not documented locally."
+   ],
+   "audit_member_text": [
+    "[L31-L32] (LOW/time-window) Strict start and end comparisons skip updates exactly at both configured activation times, leaving the endpoint semantics unclear and potentially losing a timestep."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L35-L44, L53-L62] (HIGH/sentinel-overflow) In MPI mode a drifter outside every subdomain is stored near HUGE(real), but the next active call converts that sentinel with NINT before recognizing it as out of range, which can overflow the default integer."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L40-L51] (LOW/wetness-contract) The update checks only array-domain bounds and never the wet masks, leaving behavior over dry cells dependent on whatever values uu and vv carry there."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L35-L48] (MED/numerical-guard) Drifter displacement divides directly by local dsu and dnv without validating that either grid spacing is positive and nonzero."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

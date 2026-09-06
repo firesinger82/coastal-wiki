@@ -1,0 +1,206 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-000",
+ "source_path": "trunk/src/xbeachlibrary/math_tools.F90",
+ "source_sha256": "bb1e640e73cab7f79530547e84c803404459937d11a5da5e0e0348ab298a8dd0",
+ "base_run_id": "xbeach-r1-XBeach-000-codex-01a05a52-c773-7170-b126-7a88b545d9e6",
+ "audit_run_id": "xbeach-r2-XBeach-000-codex-01a05a9c-78d9-7eb0-9d9e-e5e019072cda",
+ "base_record_file": "6a43edbb65883fd65c26d8e87ed62995390a15300402726682dccf090bb5f79c.json",
+ "audit_record_file": "6a43edbb65883fd65c26d8e87ed62995390a15300402726682dccf090bb5f79c.json",
+ "base_record_sha256_bytes": "2418192932b2a9fa129d1f487ec0860f5f0c666dd74af32129615dfb35316a8b",
+ "audit_record_sha256_bytes": "33ae1838eb4745d19d23d1f8f6286d34b57e0c828c8f91c3a3e8954573750cfc",
+ "base_finding_count": 9,
+ "audit_finding_count": 9,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [
+    "[L1099-L1128] (HIGH/bounds-and-axis) flipa's flip==1 branch loops to M1 while indexing the second dimension and assigns whole columns, causing out-of-bounds access when M1>M2 and duplicating column-flip behavior instead of flipping rows."
+   ],
+   "audit_member_text": [
+    "[L1117-L1121] (HIGH/array-bounds / dimension defect) flipa's flip==1 branch loops to M1 while indexing the second dimension temp3a(:,ii) and M1+1-ii, so a nonsquare M1-by-M2 array can be indexed out of bounds or only partly assigned and the branch does not actually reverse the first dimension."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L337-L342,L348-L372] (HIGH/uninitialized-status) fftradix returns immediately for npass<=1 without defining optional INTENT(OUT) stat, after which fftn tests that undefined status value."
+   ],
+   "audit_member_text": [
+    "[L337-L341,L348-L353,L372] (HIGH/undefined output status) fftradix returns for npass <= 1 without defining its INTENT(OUT) optional stat, after which fftn reads that undefined value when stat is present."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "[L983,L999] (MED/data-loss) hilbert accepts a complex input array but explicitly copies only real(xi) into the transform buffer, silently discarding any imaginary component."
+   ],
+   "audit_member_text": [
+    "[L983,L999] (LOW/unclear data contract) hilbert declares xi complex but deliberately initializes the transform from only real(xi), silently discarding any input imaginary component without documenting that xi must represent real data."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L323-L339] (HIGH/dimension-validation) fftn truncates an overlong dim list but never validates each dimension index or rejects duplicates, so zero/out-of-range entries index shape illegally and repeated entries are transformed/scaled multiple times."
+   ],
+   "audit_member_text": [
+    "[L323-L332,L337-L339] (MED/unchecked dimension contract) fftn neither rejects nor reports zero, duplicate, or out-of-range dim entries (and silently truncates an oversized dim array), allowing invalid shape indexing, repeated transforms, or a zero-length normalization product."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "[L323-L343] (MED/empty-transform-status) When a present dim array has zero length, fftn performs no fftradix call and never defines the caller's optional INTENT(OUT) stat."
+   ],
+   "audit_member_text": [
+    "[L323-L345] (MED/undefined output status) When a present dim array has size zero, fftn performs no fftradix call and returns without ever defining its INTENT(OUT) stat argument."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "[L976-L999] (HIGH/zero-size) hilbert evaluates log(real(m)) and derives an FFT allocation size without checking m>0, so a zero-length input enters log(0) and invalid integer/exponent calculations."
+   ],
+   "audit_member_text": [
+    "[L976-L1018] (MED/input-domain contract) hilbert accepts m without validation, and m <= 0 reaches log(real(m)) and subsequent invalid exponent/allocation/index calculations."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A8"
+   ],
+   "audit_ids": [
+    "B8"
+   ],
+   "base_member_text": [
+    "[L1288-L1293] (MED/integer-overflow) random seeds with iabs(j) without handling the most-negative integer, whose absolute value is not representable and can leave an invalid negative seed."
+   ],
+   "audit_member_text": [
+    "[L1288-L1293] (LOW/integer edge case) random applies iabs to an unrestricted default integer seed, for which the most-negative representable integer is not representable after negation and can yield overflow or a nonpositive seed."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "[L331-L339] (HIGH/shape-validation) fftn does not require positive shape entries or guard PRODUCT overflow before using the product for scaling, loop bounds, and transform strides."
+   ],
+   "audit_member_text": [
+    "[L331-L338] (MED/integer overflow / bounds contract) The products of caller-provided shape values are computed in default integer without validation, so nonpositive or overflowing extents can produce invalid scaling and assumed-size array traversal."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L1235-L1263] (LOW/nonfinite-input) xerf maps NaN inputs to +1 because both magnitude comparisons are false and the fallback branch is selected, masking the non-finite input."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L1002,L1016] (LOW/precision loss) hilbert computes both normalization factors through default-real real(n) and sqrt rather than fftkind precision."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

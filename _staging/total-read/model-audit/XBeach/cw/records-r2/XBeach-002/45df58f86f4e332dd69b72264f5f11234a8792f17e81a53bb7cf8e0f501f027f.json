@@ -1,0 +1,41 @@
+{
+ "axis": "code",
+ "model": "XBeach",
+ "path": "trunk/src/xbeachlibrary/beachwizard.F90",
+ "source_sha256": "94039fd11198d6c41102e44687abe0bedfa8def6536a3b9d6a9b0a72928deb32",
+ "lines_or_pages": 806,
+ "read_status": "complete",
+ "reader": "codex-R2",
+ "producer": "llm:openai/codex",
+ "read_method": "llm_full_read",
+ "artifact_class": "semantic_read",
+ "run_id": "xbeach-r2-XBeach-002-codex-01a05ab3-8036-7660-84fb-58c476606a27",
+ "shard": "XBeach-002",
+ "round": "R2",
+ "content": {
+  "unresolved": [
+   "[L15-L39, L484-L485] (HIGH/pointer-state) Pointer components have no default NULL initialization, yet ASSOCIATED is called on fobs1 before any guaranteed association-status definition.",
+   "[L80-L103] (HIGH/allocation-lifecycle) bwinit unconditionally allocates eight space-state arrays and provides no deallocation or already-allocated guard, so a repeated initialization fails.",
+   "[L148-L166] (LOW/saved-shape-lifecycle) Saved Beach Wizard arrays are allocated only on first use and never resized or released, making reuse with a different grid shape unsafe.",
+   "[L89-L100, L105-L115, L375-L379, L589-L604] (MED/MPI-contract) Only bwinit is explicitly master-only while assimilation and update routines have no matching rank guard, leaving non-master allocation and state-update requirements unclear.",
+   "[L194-L225, L716, L744] (HIGH/uninitialized-uncertainty) When bwdefaults.inp is absent only scalar defaults are set, not the allocated sig arrays, and sigS is subsequently used even when no shoreline source caused it to be filled.",
+   "[L207-L225, L494-L523] (MED/disabled-input) The uncertainty-map read path is entirely commented out and statuserr therefore remains zero, so configured fnameerr files are silently ignored.",
+   "[L424-L441, L460-L463] (HIGH/array-bounds) The image schedule count is not constrained to the 1000-row arrays, and the time-advance loop can read itimnew+1 beyond the final slot.",
+   "[L428-L446] (MED/library-termination) A missing assimilation information file executes STOP inside library code rather than returning a diagnosable error to the caller.",
+   "[L475-L489, L585] (MED/I/O-error-path) Header-read errors jump past CLOSE, potentially leaking unit 31 and leaving partially replaced observation state.",
+   "[L476-L487, L527-L548] (HIGH/input-validation/indexing) Observation-grid dimensions and spacings are used for allocation, division, MOD, and indices that assume nx and ny are at least three without validating positive dx, dy, nx, or ny.",
+   "[L535-L557] (MED/spatial-extrapolation) All model points outside the observation footprint are clamped to an interior observation cell rather than marked missing, causing implicit constant extrapolation over the entire model domain.",
+   "[L293-L339, L570-L574] (HIGH/wrong-destination) The wavenumber source is copied into cobs instead of kobs, after which uninitialized kobs values drive the celerity residual and uncertainty calculations.",
+   "[L264-L335] (HIGH/numerical-domain) Celerity and wavenumber calculations divide by unchecked tradar, hh, rk, and rk plus sigK and are evaluated over dry cells before any wet-cell guard.",
+   "[L279-L281, L308-L310] (MED/dimensional-consistency) The celerity formula adds dimensional Hrms directly to dimensionless rk times hh inside TANH, indicating an inconsistent or mistranscribed dispersion expression.",
+   "[L254-L340, L733-L756] (HIGH/unused-assimilation-sources) Bathymetry, celerity, and wavenumber observations are read or converted, but the final observation variance and depth correction combine only dissipation and shoreline terms, so those advertised sources cannot affect assimilation.",
+   "[L668-L682] (HIGH/nontermination/numerical-domain) The backward-distance loop divides by an unchecked average wavelength and has no progress guard, so zero or nonpositive dsc or L1 can make disfac invalid or leave backdis unchanged indefinitely.",
+   "[L668-L686] (HIGH/one-dimensional-bounds) For ny equal to zero the h2 loop is empty and the subsequent assignments reference columns 2 and 0 of a one-column allocation.",
+   "[L687-L706] (HIGH/singular-wave-derivative) Hb and dHbdh divide by k and by sinh(kh) times cosh(kh) plus kh without protecting the common zero-k or zero-kh limit.",
+   "[L699, L753-L764] (HIGH/time-parameter-division) Assimilation divides by Trep, dt, and tstop without requiring these time parameters to be positive and nonzero.",
+   "[L753-L756, L774] (HIGH/zero-denominator) The weighting and depth-correction formulas lack guards for zero combined variance and for the all-zero dDdh case, where the latter evaluates an explicit zero-over-zero.",
+   "[L778-L791] (MED/update-limit-bypass) The dissipation-derived depth change is capped before the shoreline correction is added, allowing the final dassim applied to the bed to bypass the stated ten-percent depth limit.",
+   "[L624-L662] (LOW/allocation-overhead) Local allocatable work arrays are tested for allocation and allocated on every call but automatically deallocate on return, making the guard ineffective and imposing repeated large allocation cost."
+  ]
+ }
+}

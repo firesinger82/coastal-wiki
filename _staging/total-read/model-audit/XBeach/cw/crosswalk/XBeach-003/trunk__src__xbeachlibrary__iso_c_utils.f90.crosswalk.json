@@ -1,0 +1,141 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-003",
+ "source_path": "trunk/src/xbeachlibrary/iso_c_utils.f90",
+ "source_sha256": "b63c219fb525ae5463f47044c1b5f8cc05b134cbfee88ae221357952902a424b",
+ "base_run_id": "xbeach-r1-XBeach-003-codex-01a05a73-c44f-73d1-9740-9462379b36f1",
+ "audit_run_id": "xbeach-r2-XBeach-003-codex-01a05ac0-7e92-7031-ae47-79d30eab7b40",
+ "base_record_file": "e6a9a1c2106bcffd7a50630b14b90b70af909a594a7efbeebbbcd05ec03436fa.json",
+ "audit_record_file": "e6a9a1c2106bcffd7a50630b14b90b70af909a594a7efbeebbbcd05ec03436fa.json",
+ "base_record_sha256_bytes": "b50c998ec2c321f13eb98e60254ffda0d8020278ed1a107a887bd29c44425c74",
+ "audit_record_sha256_bytes": "10d57804ca41dc6b993eb57f870a20522a6f879eaf9584293c56d7364d66d89f",
+ "base_finding_count": 4,
+ "audit_finding_count": 6,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L14-L21] (MED/unterminated string handling) strlen returns zero rather than MAXSTRINGLEN when no NUL byte is present, causing a full nonterminated buffer to be misreported as empty."
+   ],
+   "audit_member_text": [
+    "[L11-L21] (MED/string-validation) strlen returns zero both for an empty string and for a full 1024-byte array with no NUL terminator, so unterminated input is silently misinterpreted as empty."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L30-L34] (HIGH/comparison logic) strcmp converts char_array1 into both string1 and string2, so it never compares the second input and always returns equality."
+   ],
+   "audit_member_text": [
+    "[L27-L34] (HIGH/wrong-argument) strcmp constructs both string1 and string2 from char_array1, causing every comparison to report equality."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "[L60-L68] (HIGH/buffer overflow) string_to_char_array does not reject or truncate input strings of length 1024 or greater, and writes the terminator at len_trim(string)+1 beyond its fixed 1024-element result."
+   ],
+   "audit_member_text": [
+    "[L60-L68] (HIGH/bounds) string_to_char_array does not cap len_trim to MAXSTRINGLEN-1, so strings of length 1024 or more write beyond the result when data and the terminator are stored."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L11-L21,L51-L58] (HIGH/buffer bounds contract) strlen and char_array_to_string unconditionally declare and scan a 1024-element input without accepting its actual length, so sequence-associated callers with shorter C buffers can be read out of bounds."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L30-L34] (LOW/semantic-contract) strcmp trims both converted strings and uses Fortran lexical comparison, which does not preserve ordinary C strcmp behavior for spaces preceding the NUL."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L40-L49] (MED/unterminated-input) strcpy relies on the ambiguous zero returned by strlen, so an unterminated source copies only its first character and does not guarantee a terminator in the destination."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L60-L68] (LOW/uninitialized-tail) string_to_char_array initializes only the payload and one terminator, leaving the remainder of its fixed 1024-element result undefined."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

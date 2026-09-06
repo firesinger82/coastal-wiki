@@ -1,0 +1,77 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-002",
+ "source_path": "trunk/src/xbeachlibrary/wetcells.F90",
+ "source_sha256": "f1a55183428c7d940ddc5cd13d26bcbbc093d6e223ea451ba277f5a2064b462b",
+ "base_run_id": "xbeach-r1-XBeach-002-codex-01a05a67-e2d6-7e11-b2eb-ed7a4a8bc0af",
+ "audit_run_id": "xbeach-r2-XBeach-002-codex-01a05ab3-8036-7660-84fb-58c476606a27",
+ "base_record_file": "c0544db9a90584c131e508a6aa61560edbb4371dd8c2e7e4eb80b8cc466fec99.json",
+ "audit_record_file": "c0544db9a90584c131e508a6aa61560edbb4371dd8c2e7e4eb80b8cc466fec99.json",
+ "base_record_sha256_bytes": "eeb037130e0b893e7aa15d4decd9b583ea2050c475aa68c3ad950b1f78baa06a",
+ "audit_record_sha256_bytes": "1a1a5b67284b18d4770394f1d43091474986ead7f9fe2e004f39b6230ab01af6",
+ "base_finding_count": 3,
+ "audit_finding_count": 2,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L46-L49] (MED/saved-workspace shape) weteb is allocated only on its first call and is not checked against later grid dimensions."
+   ],
+   "audit_member_text": [
+    "[L49] (LOW/state/dimension lifecycle) The saved work array weteb is allocated only on the first call and is never resized, so a later call with different s%nx/s%ny would use stale bounds."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L51-L71,L82-L92] (MED/MPI halo contract) The comments identify required cross-rank communication for hu/hum and hv/hvm, but this routine performs none before using the terminal rows and columns to set wet masks."
+   ],
+   "audit_member_text": [
+    "[L51-L71,L82-L92] (MED/parallel halo consistency) The source explicitly notes that boundary hu/hum and hv/hvm values require MPI neighbor communication, but no communication is performed here before those values drive wet/dry masks."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L124-L129] (LOW/scheme fallback) Every scheme value other than SCHEME_UPWIND_1 silently receives an upwind distance of two, leaving unsupported or newly added scheme values indistinguishable."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

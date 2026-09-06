@@ -1,0 +1,245 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-000",
+ "source_path": "trunk/src/xbeachlibrary/spaceparams.F90",
+ "source_sha256": "e13f4e604ba812b76b9b67101356e4419a38f2787b4f6655cc23c88b3ac5e2b0",
+ "base_run_id": "xbeach-r1-XBeach-000-codex-01a05a52-c773-7170-b126-7a88b545d9e6",
+ "audit_run_id": "xbeach-r2-XBeach-000-codex-01a05a9c-78d9-7eb0-9d9e-e5e019072cda",
+ "base_record_file": "815cdd7a37c7ee6877547361cd0a17d9774ebeaa7cb5acd55a030e802694379b.json",
+ "audit_record_file": "815cdd7a37c7ee6877547361cd0a17d9774ebeaa7cb5acd55a030e802694379b.json",
+ "base_record_sha256_bytes": "f2f4e61bdeb4a8f27bf3aa8ad522fca8619e5ef51bd2a4e5daaf48fd7c017e06",
+ "audit_record_sha256_bytes": "25a77e09ff12352028747b353a7fd46d026997a3880fcc103ed62027ebf58b36",
+ "base_finding_count": 10,
+ "audit_finding_count": 10,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [
+    "[L1114-L1135] (HIGH/false-success) Real variables of unhandled rank (notably rank 1) and unknown real cases fall through without collection but are still marked sg%collected(index)=.true., suppressing future attempts."
+   ],
+   "audit_member_text": [
+    "[L1114-L1129,L1135] (HIGH/false collection state) For real rank-1 arrays and unsupported real ranks/types, space_collect_index performs no collection yet still marks sg%collected(index) true, suppressing future attempts."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0",
+    "B1"
+   ],
+   "base_member_text": [
+    "[L82-L101,L104-L121] (MED/index-validation) index_allocate and index_allocated do not validate index or reject an unknown choice, unlike indextos, so invalid requests can silently no-op or report a scalar-like allocated result."
+   ],
+   "audit_member_text": [
+    "[L65-L101,L104-L122] (LOW/inconsistent index validation) index_allocate and index_allocated do not validate index as indextos does, and an invalid index can silently no-op or be reported allocated because the default result is true.",
+    "[L78-L101] (LOW/unchecked string contract) index_allocate unconditionally takes choice(1:1), which is invalid for a zero-length actual argument, and silently ignores nonempty unsupported choices."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "[L329-L336] (MED/selector-contract) space_distribute_vector treats every selector other than lowercase 'x' as 'y', allowing typos or unsupported selectors to choose the wrong decomposition silently."
+   ],
+   "audit_member_text": [
+    "[L306-L365] (LOW/asymmetric API contract) space_distribute_vector treats every xy value other than lowercase 'x' as a y distribution, while space_distribute_block_vector accepts only lowercase 'y' and aborts for all other values."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "[L1083-L1101,L1147-L1156] (HIGH/bounds) space_collect_mnem passes chartoindex's -1 failure result to space_collect_index, which indexes sg%collected(index) before the later indextos range check can reject it."
+   ],
+   "audit_member_text": [
+    "[L1065-L1087,L1135] (MED/unchecked collection index) space_collect_index uses index directly in sg%collected before indextos can validate it, and space_collect_mnem passes through chartoindex results without checking for an unknown mnemonic."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "[L760-L768] (LOW/sentinel-contract) space_who_has returns the undocumented magic value -123 when no computational domain contains a coordinate and emits no diagnostic, leaving callers to infer failure."
+   ],
+   "audit_member_text": [
+    "[L745-L770] (LOW/unreported lookup failure) space_who_has returns the undocumented sentinel -123 when a point has no owning computational region and provides no status or diagnostic."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A9"
+   ],
+   "audit_ids": [
+    "B8"
+   ],
+   "base_member_text": [
+    "[L1335-L1399] (MED/division-by-zero) Grid-cell inverse areas are formed by unconditional division by computed polygon areas (or metric products) with no local degeneracy/zero-area guard."
+   ],
+   "audit_member_text": [
+    "[L1335-L1398] (HIGH/degenerate-cell division) gridprops inverts computed cell areas, and in 1D products of metrics, without rejecting zero-area or repeated-coordinate cells, producing infinite geometric factors."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L707-L729] (MED/memory-leak) The btype '2' distribution path allocates vectorg on every rank but deallocates it only on xmaster, leaking the pointer allocation on each non-master invocation."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L980-L1005] (LOW/dead-selector) All four loc cases in space_collect_vector_real8 execute the identical collection and there is no default case, so loc currently has no semantic effect while invalid values silently do nothing."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L1079-L1092,L1131-L1133] (LOW/instrumentation) The collection end marker logs event_coll_start again, and the already-collected early return skips an end marker entirely, producing unbalanced or mislabeled MPE traces."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A8"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L1186-L1189] (MED/distributed-grid-contract) gridprops labels xzg11/yzg11 as the global grid origin but assigns them from the local array element (1,1), which is not the global origin on non-top/non-left MPI subdomains unless callers prevent local invocation."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L440-L521,L578-L588] (MED/subdomain-size contract) The MPI decomposition subtracts fixed two-cell borders and immediately allocates local state without checking that every lm and ln is large enough, so an over-decomposed small grid can produce inverted computational ranges."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L1175-L1253,L1402-L1419] (MED/minimum-grid bounds) gridprops assumes nx>=1 throughout and requires nx>=2 to define alfaz from an interior point; with nx=1 its two boundary-copy assignments merely circulate an uninitialized orientation."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B9"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L1453-L1529] (MED/empty computational ranges) ranges_init can produce lower bounds greater than upper bounds for small global or local nx/ny values, with no validation before those ranges are consumed by array sections and reductions."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

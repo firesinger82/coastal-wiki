@@ -1,0 +1,349 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-003",
+ "source_path": "trunk/src/xbeachlibrary/xmpi.F90",
+ "source_sha256": "68c0cec030f136e8edd2024248284fb43c03c171fc5f23a1496ff40d52ced140",
+ "base_run_id": "xbeach-r1-XBeach-003-codex-01a05a73-c44f-73d1-9740-9462379b36f1",
+ "audit_run_id": "xbeach-r2-XBeach-003-codex-01a05ac0-7e92-7031-ae47-79d30eab7b40",
+ "base_record_file": "5a42a58e6273ef5f48adcde509aa83eb594bb2c8c5af58c01f9e08650f77110b.json",
+ "audit_record_file": "5a42a58e6273ef5f48adcde509aa83eb594bb2c8c5af58c01f9e08650f77110b.json",
+ "base_record_sha256_bytes": "fb3310ec1aa9007ac14fe355e5d7e179b739ad8eba27bda669ba945b31004e2e",
+ "audit_record_sha256_bytes": "0edbaa52f7742d8c2775e816d559bfd5ad12caf3ac3f91098677c15ff5f150a5",
+ "base_finding_count": 11,
+ "audit_finding_count": 18,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A9"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "[L425-L449] (LOW/unchecked enum) Cyclic boundary handling has cases only for 0 and 1; any other value leaves out-of-range neighbor ranks in place without setting boundary flags or returning an error."
+   ],
+   "audit_member_text": [
+    "[L425-L449] (MED/input-validation) Cyclic boundary handling has cases only for 0 and 1 and no default, so any other cyclic value leaves negative or out-of-range neighbor ranks marked as non-boundaries."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L314-L320,L1696-L1701,L1711-L1727] (HIGH/incorrect abort communicator) Normal error handling aborts xmpi_comm, which excludes the output rank and is MPI_COMM_NULL on that rank, so output-rank failures can recurse or hang and compute-rank failures can strand the output process."
+   ],
+   "audit_member_text": [
+    "[L257-L260,L314-L320,L1696-L1701,L1711-L1727] (HIGH/mpi/error-path) The I/O rank deliberately has xmpi_comm set to MPI_COMM_NULL, yet normal halt and communicator error handling call xmpi_abort on xmpi_comm, so an error on that rank can attempt MPI_Abort with an invalid communicator instead of terminating the full job."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A8"
+   ],
+   "audit_ids": [
+    "B16"
+   ],
+   "base_member_text": [
+    "[L1619-L1671] (MED/unchecked row contract) xmpi_getrow does not validate n, prow, or b's extent before assigning a full row and communicating n elements."
+   ],
+   "audit_member_text": [
+    "[L1619-L1670] (MED/mpi/input-contract) xmpi_getrow does not validate prow, n, size(a,2), or size(b), so inconsistent metadata can produce invalid ranks, nonconforming assignment, buffer mismatch, or an unmatched blocking receive."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [
+    "B9"
+   ],
+   "base_member_text": [
+    "[L690-L771] (MED/message-size contract) All xmpi_sendrecv wrappers use the sender's size as the receive count without verifying that recvbuf has the same number of elements."
+   ],
+   "audit_member_text": [
+    "[L690-L773] (MED/buffer-size-contract) All sendrecv overloads reuse size(sendbuf) as the receive count without checking recvbuf size, permitting receive truncation or overwrite for mismatched arguments."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "[L371-L376] (HIGH/division by zero) The XPREF processor-grid branch can set nmin to zero and evaluate m/nmin; Fortran does not guarantee short-circuit evaluation of the preceding nmin>4 condition."
+   ],
+   "audit_member_text": [
+    "[L371-L372] (HIGH/arithmetic) The XPREF condition can evaluate m/nmin when integer division n/xmpi_size produced zero, because Fortran does not require short-circuit evaluation of .and., yielding a division by zero."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A10"
+   ],
+   "audit_ids": [
+    "B14"
+   ],
+   "base_member_text": [
+    "[L210-L249,L311,L494-L639,L701-L857,L1387-L1583,L1613,L1660-L1670] (LOW/unchecked MPI status) Most MPI return codes are assigned but not inspected locally, reducing diagnostic context even where a communicator error handler may run."
+   ],
+   "audit_member_text": [
+    "[L1568-L1585] (MED/mpi/liveness) xmpi_send_sleep ignores all MPI errors and polls forever until flag becomes true, so a failed Irecv or MPI_Test has no exit path."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [
+    "B8"
+   ],
+   "base_member_text": [
+    "[L648-L683] (MED/string buffer bounds) Character broadcast sends the source's trimmed length but never checks the receiving character capacity before assigning x(i:i), so differing declared lengths can write past the receiver."
+   ],
+   "audit_member_text": [
+    "[L648-L687] (MED/bounds-contract) Character broadcast does not verify that non-source character variables can hold the source's trimmed length before assigning x(i:i)."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [
+    "[L484,L500,L515,L530,L545,L560,L575,L589,L603,L617,L631,L645] (HIGH/build dependency) Twelve active broadcast wrappers include xmpi_bcast.inc, but that include is absent from the source tree and is not listed among the build's generated sources."
+   ],
+   "audit_member_text": [
+    "[L481-L645] (HIGH/build-completeness) Fourteen broadcast wrappers include xmpi_bcast.inc, but that include is absent from the source_code tree, leaving these procedures uncompilable unless an undocumented external generation step supplies it."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B17"
+   ],
+   "base_member_text": [
+    "[L1730-L1755] (MED/diagnostic crash) On compiler configurations that leave MBACKTRACE defined, the error reporter deliberately dereferences a null pointer to force a segmentation fault before orderly MPI termination."
+   ],
+   "audit_member_text": [
+    "[L1730-L1755] (HIGH/preprocessor/error-path) The GNU-version test checks __GNUC_MINOR__ >= 8 even for major versions above 4, so many modern GNU compilers retain the fallback backtrace routine that intentionally dereferences a null pointer on every normal halt."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [
+    "B13"
+   ],
+   "base_member_text": [
+    "[L1374-L1560] (MED/message-size contract) The paired xmpi_send wrappers derive counts independently from the sender and receiver actual arrays and exchange no shape metadata, so mismatched caller shapes yield truncation or partial data."
+   ],
+   "audit_member_text": [
+    "[L1374-L1560] (MED/mpi/message-contract) The paired send helpers derive counts independently from each rank's local array and do not validate from/to ranks, so shape disagreement or invalid endpoints can cause truncation or indefinite blocking."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L145-L151,L961-L980] (HIGH/missing generic implementation) xmpi_shift_i3 calls xmpi_sendrecv with rank-3 integer sections, but the xmpi_sendrecv generic has no rank-3 integer procedure, producing no matching specific routine."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L201-L214,L307-L312] (MED/mpi/lifecycle) The module unconditionally initializes and finalizes MPI without checking existing MPI state, conflicting with embedding hosts that own the MPI lifecycle."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L338-L387] (LOW/integer-range) Processor-grid scoring uses default-integer products and a fixed 1000000000 sentinel, allowing large domain dimensions to overflow or leave a valid factorization unselected."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L359-L365] (MED/input-validation) Manual decomposition checks only the product, so two negative manual dimensions can pass and later become invalid divisors and neighbor geometry."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L614-L626] (LOW/mpi/portability) Eight-byte integer broadcast uses nonstandard integer*8 syntax and the nonportable MPI_INTEGER8 datatype rather than a kind-matched MPI type."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B10"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L820-L838,L850-L858] (MED/buffer-size-contract) Array reductions send size(x) elements into y without asserting equal extents, leaving root receive-buffer capacity implicit."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B11"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L873-L989] (MED/bounds-contract) Basic shift routines directly reference rows or columns 2, m-1, and n-1 without validating minimum local-array extents."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B12"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L1030-L1208] (MED/bounds-contract) Ranged shift routines accept arbitrary i1/i2 and derive sections from a fixed four-cell overlap without checking ordering or bounds."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B15"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L1603-L1614] (MED/mpi/communicator-contract) xmpi_barrier defaults to xmpi_comm even though that communicator is MPI_COMM_NULL on the I/O process, and the procedure contains no guard against invocation there."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

@@ -1,0 +1,187 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-002",
+ "source_path": "trunk/src/xbeachlibrary/flow_timestep.F90",
+ "source_sha256": "50742b601cc8feccd513cf742ca772b6021f1d4f5ffe074c4e8ffc90907dd2b2",
+ "base_run_id": "xbeach-r1-XBeach-002-codex-01a05a67-e2d6-7e11-b2eb-ed7a4a8bc0af",
+ "audit_run_id": "xbeach-r2-XBeach-002-codex-01a05ab3-8036-7660-84fb-58c476606a27",
+ "base_record_file": "bf833712d59d52f1cb5ec311ba86a3d39d7b6c275ac181e8917734c505080f0d.json",
+ "audit_record_file": "bf833712d59d52f1cb5ec311ba86a3d39d7b6c275ac181e8917734c505080f0d.json",
+ "base_record_sha256_bytes": "faf283e1a707848796ed00f424ad3c11918a49640b01a6368659272512244560",
+ "audit_record_sha256_bytes": "88fcdc14f94fe87daf1ab40e3b2d525ce5240ad09bfd784599401c6d25769a50",
+ "base_finding_count": 10,
+ "audit_finding_count": 7,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A6",
+    "A7"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L74-L92, L767-L771] (MED/conditional-allocation) Old-state arrays are allocated only if second-order or nonhydrostatic mode is active on the first call; because later allocation is gated by vsu, enabling either mode on a reused instance would access unallocated uu_old, vv_old, and zs_old.",
+    "[L74-L122] (LOW/lifecycle-contract) All saved work arrays and bed-roughness initialization are keyed to a one-time allocation test with no grid-shape or parameter-change check, making reinitialization semantics implicit."
+   ],
+   "audit_member_text": [
+    "[L74-L122,L635-L656,L645-L652,L767-L771] (MED/state/configuration lifecycle) Old-state arrays are allocated only if second-order or nonhydrostatic mode is active on the first call, so enabling either mode later accesses unallocated storage; all saved work arrays also retain the first grid shape."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "[L618-L627] (HIGH/boundary-condition-selection) The left global boundary calls flow_lat_bc with par%right while the right global boundary passes par%left, apparently swapping the configured lateral boundary types."
+   ],
+   "audit_member_text": [
+    "[L621-L627] (MED/boundary-condition mapping) The physical left boundary passes par%right to flow_lat_bc while the physical right boundary passes par%left, an unexplained reversal of boundary configuration."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "[L512-L525] (MED/mask-typo) The Smagorinsky cross-stress dudy term for v uses wetv(i-1,j) as its fourth mask while the other three factors and the differentiated field are u-point quantities, suggesting one wetv should be wetu."
+   ],
+   "audit_member_text": [
+    "[L512-L526] (HIGH/wrong wet-mask component) The Smagorinsky cross-stress mask for V momentum multiplies three wetu values but uses wetv(i-1,j) for the fourth point, inconsistent with the U-velocity stencil."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1",
+    "A2"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "[L866-L876, L956-L985] (HIGH/unassigned-boundary-state) s%ue at i=nx+1 and, in 2-D, s%ve at j=ny+1 are not assigned, yet the vertical-profile loop consumes both arrays over 1:nx+1 and 1:ny+1, so wet edge cells can use initialization-era or stale velocities.",
+    "[L805-L853, L877-L934] (MED/partial-array-update) Several staggered interpolants (vu/vsu/usu and uv/vsv/usv) update only interior slices and explicitly leave some process-edge rows or columns unresolved; multiplying by a wet mask does not refresh previously wet, still-wet omitted entries."
+   ],
+   "audit_member_text": [
+    "[L776-L794,L805-L853,L866-L936] (HIGH/stale interpolation boundaries) Multiple cell/face interpolants (vu, vsu, usu, uv, vsv, usv, ue, and ve) leave MPI-internal halo rows/columns or nx+1/ny+1 edges unset, as the inline comments acknowledge, yet whole-array velocity magnitudes consume them."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L365-L369, L469-L530, L593-L615] (MED/stale-disabled-term) When viscosity is disabled the code zeros nuh and viscu but not viscv, so a reused state that changes viscosity mode can retain the previous y-momentum viscous acceleration."
+   ],
+   "audit_member_text": [
+    "[L365-L369,L471-L478,L593-L617] (MED/stale disabled-viscosity component) The viscosity-off branch clears nuh and viscu but not viscv, so a runtime transition from enabled to disabled viscosity leaves the prior V-viscous acceleration active."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A9"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "[L956-L972] (LOW/roughness-location-contract) The cell-centered vertical-profile call derives ks directly from u-point cfu(i,j) without documenting interpolation or guarding the positive-friction prerequisite."
+   ],
+   "audit_member_text": [
+    "[L956-L972] (MED/singular profile inputs) The vertical-profile call derives ks using sqrt(g/cfu) without ensuring positive cfu and passes potentially zero sigm/k values into a routine that divides by both."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L660-L719] (MED/positivity-preservation) hu and hv are clamped nonnegative before flow_secondorder_huhv, but the second-order correction can subtract from them and there is no subsequent positivity clamp before forming qx and qy."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A8"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L721-L722] (LOW/staggering-contract) qmag combines qx and qy elementwise even though they are stored at different staggered locations, so the stated output magnitude lacks an explicit interpolation convention."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L1046-L1063] (MED/boundary stencil contract) The 2-D Smagorinsky stencil reads i±1 and j±1 at generic computational bounds under an explicit MPI-warning comment, without local bounds/halo validation."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

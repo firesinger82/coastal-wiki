@@ -1,0 +1,473 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-003",
+ "source_path": "trunk/src/xbeachlibrary/ncoutput.F90",
+ "source_sha256": "04a33fdba34ee869590e0a7bb898d5edc8c7fd1b6ca9dc9634c727e74afaaa7b",
+ "base_run_id": "xbeach-r1-XBeach-003-codex-01a05a73-c44f-73d1-9740-9462379b36f1",
+ "audit_run_id": "xbeach-r2-XBeach-003-codex-01a05ac0-7e92-7031-ae47-79d30eab7b40",
+ "base_record_file": "b8acaa691aea87320948e1e1fc3798cd5ec09fd62b64eebfdee9866d8cb6d214.json",
+ "audit_record_file": "b8acaa691aea87320948e1e1fc3798cd5ec09fd62b64eebfdee9866d8cb6d214.json",
+ "base_record_sha256_bytes": "cbda394ef4150f7b4da3d793652e9f8d3b344f996e286b8aa0b863f9cded2852",
+ "audit_record_sha256_bytes": "2b24d91bc79f0b742850b2559f1731979541d8edb7a0e1b88109ef406d174f34",
+ "base_finding_count": 14,
+ "audit_finding_count": 25,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B16"
+   ],
+   "base_member_text": [
+    "[L1357-L1377] (HIGH/unallocated array access) The Fortran-compatible rank-3 and rank-4 point paths read local allocatables r3 and r4 after the sampling phase instead of pointoutputs, but those temporaries are not allocated there."
+   ],
+   "audit_member_text": [
+    "[L1357-L1377] (HIGH/unallocated-access) Fortran-compatible rank-3 and rank-4 point output reads local temporaries r3 and r4 on the I/O path even though extracted values were stored in pointoutputs and those temporaries have already been deallocated or were never allocated there."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [
+    "B3",
+    "B10"
+   ],
+   "base_member_text": [
+    "[L375-L380,L481-L485,L1025-L1029,L1143-L1147,L1319-L1323,L1780-L1784,L1811-L1812] (MED/unchecked mnemonic lookup) Multiple output paths pass chartoindex results directly to indextos or mnemonic indexing without checking for -1, so an invalid configured variable can become an out-of-bounds access rather than a controlled configuration error."
+   ],
+   "audit_member_text": [
+    "[L374-L425] (MED/input-validation) Global variable setup passes unchecked mnemonic indices to indextos, and an unsupported type leaves its ID at -1 but still proceeds to attach attributes to that invalid ID.",
+    "[L1025-L1109] (MED/input-validation) Point extraction passes unchecked mnemonic indices to indextos and accepts an unchecked owner rank from space_who_has before point-to-point communication."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A11"
+   ],
+   "audit_ids": [
+    "B24"
+   ],
+   "base_member_text": [
+    "[L2127-L2131,L2147-L2151,L2167-L2173] (MED/ignored I/O error) Hotstart writers capture OPEN failures in ierr but never test it and proceed to write and close the unit as if the file were valid."
+   ],
+   "audit_member_text": [
+    "[L2124-L2131,L2144-L2151,L2164-L2173] (MED/io-error-handling) All hotstart writers capture OPEN iostat but never check it and then perform unguarded writes and close operations; they also omit replacement semantics for existing files."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A12"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L152-L160] (LOW/error-path state) handle_err attempts to close module ncid even when the failing operation may be nf90_create itself, before ncid has necessarily received a valid file identifier."
+   ],
+   "audit_member_text": [
+    "[L152-L160] (MED/error-path) NetCDF error handling always attempts to close module variable ncid, even when the failing operation is file creation and ncid may not yet contain a valid handle."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A13"
+   ],
+   "audit_ids": [
+    "B8"
+   ],
+   "base_member_text": [
+    "[L664-L670] (LOW/duplicate write) pointtypes is written twice consecutively during NetCDF initialization."
+   ],
+   "audit_member_text": [
+    "[L664-L670] (LOW/duplicate-io) pointtypes is written to the same NetCDF variable twice consecutively."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [
+    "B13"
+   ],
+   "base_member_text": [
+    "[L1150-L1198] (MED/rank support inconsistency) Integer global variables are declared for ranks 0 through 4 during initialization, but the writer handles only ranks 0, 2, and 3, silently leaving rank-1 or rank-4 variables unwritten."
+   ],
+   "audit_member_text": [
+    "[L1149-L1198] (HIGH/missing-rank-support) Integer global variables are defined for ranks 0 through 4 during initialization, but writing omits ranks 1 and 4 and only prints a message, leaving their records unwritten."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [
+    "[L481-L527] (MED/uninitialized NetCDF variable id) pointsvarids is not initialized, and an unsupported point-variable type merely prints a message before attributes are written through the unassigned ID."
+   ],
+   "audit_member_text": [
+    "[L486-L527] (HIGH/unsupported-type) Point initialization creates IDs only for real variables, but the default branch merely prints for other types and then unconditionally uses the uninitialized pointsvarids entry for attributes."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1",
+    "A7"
+   ],
+   "audit_ids": [
+    "B15"
+   ],
+   "base_member_text": [
+    "[L1350-L1371] (HIGH/truncated scientific output) Rank-3 and rank-4 NetCDF point output passes only the single first scalar of each sampled array, so all other vertical/class dimensions remain unwritten despite being declared in the variable.",
+    "[L1341-L1370] (MED/point-output shape contract) The point writer supplies no count and uses scalar actuals for multidimensional records, leaving its intended mapping between sampled array dimensions and NetCDF dimensions unclear even when the call succeeds."
+   ],
+   "audit_member_text": [
+    "[L1350-L1371] (HIGH/partial-write) NetCDF point output for rank-3 and rank-4 variables writes only element (1,1,1) or (1,1,1,1) while the variables were defined with full trailing dimensions, leaving all other components unwritten."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B11"
+   ],
+   "base_member_text": [
+    "[L1099-L1102] (HIGH/wrong array component) The non-MPI rank-4 point path sizes its third dimension from t%r3 instead of t%r4, which can dereference an unassociated rank-3 component and allocates the wrong shape."
+   ],
+   "audit_member_text": [
+    "[L1088-L1102] (HIGH/wrong-rank-component) The non-MPI rank-4 point path allocates its third dimension from t%r3 instead of t%r4, potentially dereferencing an unassociated pointer and producing the wrong shape."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A8"
+   ],
+   "audit_ids": [
+    "B17"
+   ],
+   "base_member_text": [
+    "[L1396-L1406] (MED/wrong file unit) The runup-gauge loop writes unit ii+par%npoints but flushes unit i+par%npoints, where i is stale from the preceding point-variable loop."
+   ],
+   "audit_member_text": [
+    "[L1402-L1406] (MED/wrong-index) The runup-file loop writes unit indexed by ii but flushes unit indexed by stale variable i, potentially flushing an unrelated or unconnected unit."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L412-L415,L513-L516,L600-L603,L1689-L1691] (HIGH/MPI-unsafe termination) Initialization and dimension errors on the output-master-only path use STOP rather than the coordinated halt routine, which can terminate one MPI rank while leaving the others blocked."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A9"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L531-L554] (MED/invalid coordinate metadata) Each drifter trajectory variable declares coordinates='pointx pointy' even though those coordinate variables use the unrelated fixed points dimension rather than the drifter trajectory dimensions."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A10"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L1510-L1539] (MED/output side effect) Writing legacy mean minima and maxima mutates the live accumulated arrays by replacing sentinel extremes with -999, so output changes model-owned statistics rather than formatting a copy."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L127-L130,L169-L247,L1134-L1136,L1300-L1302,L1554-L1559] (HIGH/uninitialized-state) The NetCDF-only initializer never initializes saved output counters, while ncoutput increments them and uses itd directly as the drifter record index; those counters are initialized only by fortoutput_init."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L268-L270,L1675-L1678] (MED/dimension-contract) The dimension expression s%ntdisch is mapped to a hard-coded NetCDF dimension of length 2, despite the expression denoting runtime state and no equality check being made."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L481-L517] (HIGH/bounds-before-validation) Point-variable setup reads dimensions(1) and dimensions(2) before verifying rank is at least 2, so a scalar or rank-1 selection accesses dimension metadata out of bounds."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L491-L516] (MED/validation-without-stop) A point variable whose first two dimensions are not x and y only produces a log message and is still defined and later sampled as a spatial field."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L591-L603] (LOW/diagnostic-accuracy) Rank errors while defining mean variables report mnem even though that variable is not assigned in the mean-variable loop and can contain stale text from an earlier loop."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B9"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L790-L802] (HIGH/feature-gating) Point/runup processing is conditioned on npointvar being positive, so a valid runup-only configuration with gauges but no ordinary point variables never writes point time or runup output."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B12"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L1139,L1305,L1415] (HIGH/time-scaling) Global, point, and mean NetCDF times are always multiplied by morfac, whereas the rest of the module and BMI time API apply that scaling only when morfacopt equals 1."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B14"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L1215-L1232] (LOW/dead-allocation) Rank-1 real output allocates and deallocates r1 without ever using it, doubling temporary allocation work alongside r1conv."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B18"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L1432-L1438,L1500-L1505] (HIGH/scientific-output) thetamean output applies a legacy packed-value decoding expression even though the active averaging code stores a direct atan2 angle, corrupting both NetCDF and Fortran angular means."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B19"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L1546-L1548] (MED/format-dependent-state) The next averaging interval is updated only inside the Fortran-compatible output branch, so NetCDF-only runs retain the configured nominal interval even when the final or scheduled interval differs."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B20"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L1554-L1595] (MED/time-coordinate-consistency) Drifter NetCDF time is written as raw par%t while global, point, and mean time coordinates in the same file use morphological scaling, producing inconsistent time axes when scaling is active."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B21"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L1786-L1795] (MED/filename-contract) Fortran point files are opened directly from unchecked station IDs, with no rejection of duplicate, blank, truncated, or path-containing names that can collide or target unintended relative files."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B22"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L1811-L1825] (HIGH/wrong-type-component) Fortran mean-file record lengths are always derived from real pointer components even though the averaging initializer permits integer mean variables."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B23"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L1843-L1857] (MED/stale-output) Lazily opened global Fortran files omit status='replace', so an existing longer file from a prior run can retain stale trailing records."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

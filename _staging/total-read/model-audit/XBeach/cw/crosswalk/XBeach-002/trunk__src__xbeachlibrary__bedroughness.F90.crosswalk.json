@@ -1,0 +1,248 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-002",
+ "source_path": "trunk/src/xbeachlibrary/bedroughness.F90",
+ "source_sha256": "508ccef2919d203a716f831f4ffd80a57068562eab747a00a94da802a840dfef",
+ "base_run_id": "xbeach-r1-XBeach-002-codex-01a05a67-e2d6-7e11-b2eb-ed7a4a8bc0af",
+ "audit_run_id": "xbeach-r2-XBeach-002-codex-01a05ab3-8036-7660-84fb-58c476606a27",
+ "base_record_file": "957528fea6e192aff9d6fc3f01666d906126f61354c64d17d76a7a6ee95ad3cb.json",
+ "audit_record_file": "957528fea6e192aff9d6fc3f01666d906126f61354c64d17d76a7a6ee95ad3cb.json",
+ "base_record_sha256_bytes": "5282c0934ce99d04809eb88079828e1a82637910539985bedc3cd029ea531a63",
+ "audit_record_sha256_bytes": "76751c0b322943bb64481c4d23aecbc69c46a5c3899907000513f8d49e0842f0",
+ "base_finding_count": 7,
+ "audit_finding_count": 11,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1",
+    "A2"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "[L90-L103, L208-L219] (MED/inconsistent-clamping) Manning friction is clamped to both mincf and maxcf at initialization but only to maxcf during updates, allowing the advertised lower bound to be lost after the first update.",
+    "[L248-L259] (MED/directional-inconsistency) The grain-size White-Colebrook update hard-caps cfu at the literal 0.1 while cfv uses par%maxcf, creating an unexplained directional difference and bypassing the configured u-direction cap."
+   ],
+   "audit_member_text": [
+    "[L208-L219, L248-L269] (MED/limit-inconsistency) Update-time friction omits the initialization-time mincf lower clamp, and the grain-size u branch uniquely hard-caps at 0.1 instead of maxcf, producing direction- and timestep-dependent bounds."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "[L198-L205] (LOW/division-precondition) Dynamic Manning roughness divides by dstem and droot with no local nonzero check, leaving its parameter contract implicit."
+   ],
+   "audit_member_text": [
+    "[L196-L205] (HIGH/parameter-division) Dynamic Manning roughness divides by dstem and droot without requiring either configured length scale to be nonzero."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "[L104-L164, L220-L272] (LOW/roughness-precondition) White-Colebrook formulas divide by kru/krv and take log10 without locally enforcing positive roughness heights, so validity depends entirely on upstream input constraints."
+   ],
+   "audit_member_text": [
+    "[L70-L72, L104-L164, L220-L272] (HIGH/numerical-domain) Chezy and White-Colebrook formulas divide by unchecked bed-friction or roughness coefficients and take logarithms derived from them, allowing zero or nonpositive input to produce invalid coefficients."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L196-L205] (MED/state-transition) After erosion sets isveggie false, subsequent calls fall through the unconditional elsewhere branch and can rebuild bedfriccoef from the original vegetated nman0, so the apparently permanent vegetation-removal state does not prevent roughness regrowth."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L383-L397] (MED/boundary-value-inconsistency) For the last v row the interpolated infilb boundary is assigned directly from s%infil(:,s%ny) rather than copied from the adjacent interpolated v-point as done for the u boundary, producing an asymmetric boundary treatment."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L690-L727] (LOW/staggered-variable-contract) Turbulence stresses use the signs of s%ue and s%ve while neighboring bed-stress code uses s%ueu and s%vev, leaving the intended staggered velocity/sign convention unclear."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L68-L165, L186-L273] (MED/selector-contract) Both bed-friction select blocks lack a default branch, so an unsupported selector leaves cfu and cfv unchanged or uninitialized without reporting an error."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L78-L80, L105-L106, L147-L148, L320-L327, L438-L460, L547-L568, L686-L688] (HIGH/allocation-lifecycle) Saved work arrays are allocated without a module teardown or shape check, and several initialization allocations are unguarded, so repeated initialization or reuse at another grid size can fail or retain incompatible storage."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L357-L378, L398-L418] (HIGH/numerical-domain) The infiltration enhancement divides by cfu or cfv twice without a positive lower-bound guard, which is unsafe for zero-valued constant-friction configurations."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L365-L373, L406-L414] (LOW/zero-input-bias) Exactly zero infiltration is forced to a nonzero negative blphi and therefore a facbl slightly different from one, so the nominally absent process still adds shear."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L476-L483, L570-L587, L596, L611] (HIGH/time-scale-division) Acceleration models divide by Trep-derived smoothing and frequency scales and by saved dt without validating Trep and dt as positive."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B8"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L438-L460, L547-L568] (MED/shared-state-contract) The two acceleration implementations use the same allocation sentinel but allocate different array sets and initialize phirad only in one branch, so changing implementations during a process can expose unallocated or uninitialized saved state."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B9"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L701-L727] (MED/directional-bias) Using SIGN with zero velocity assigns positive turbulent bed shear at rest, introducing a fixed directional bias wherever kbl is positive."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B10"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L435, L450] (LOW/dead-allocation) The saved Fi array is allocated but never read or written after allocation."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

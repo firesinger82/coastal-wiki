@@ -1,0 +1,281 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-003",
+ "source_path": "trunk/src/xbeachlibrary/introspection.F90",
+ "source_sha256": "870a8c3214b3642de9315de935dd5cd3c06ba38e694e7080410ffe572fb8e08e",
+ "base_run_id": "xbeach-r1-XBeach-003-codex-01a05a73-c44f-73d1-9740-9462379b36f1",
+ "audit_run_id": "xbeach-r2-XBeach-003-codex-01a05ac0-7e92-7031-ae47-79d30eab7b40",
+ "base_record_file": "9b549ed3e0f1adad30414bcd60f34a3b1b3ff9d1fbcf8552e8df2b35b3f55f1b.json",
+ "audit_record_file": "9b549ed3e0f1adad30414bcd60f34a3b1b3ff9d1fbcf8552e8df2b35b3f55f1b.json",
+ "base_record_sha256_bytes": "fd1c331fb99ce051ae17a5621b3dca53a013dfc97e33646b8c868def4ac023be",
+ "audit_record_sha256_bytes": "fb237f9ec4a4eecfaea9db158f487642ff8176ff24911fe9e5a9968db4eb9f6d",
+ "base_finding_count": 9,
+ "audit_finding_count": 14,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B8"
+   ],
+   "base_member_text": [
+    "[L468-L482] (MED/dimension validation) getarraydimsize_c checks only rank < dim, so dim values of zero or less can reach the SIZE intrinsic with an invalid dimension argument."
+   ],
+   "audit_member_text": [
+    "[L454-L483] (HIGH/dimension-validation) Dimension-size lookup rejects only dim values greater than rank; zero or negative dimensions pass through and can reach SIZE with an invalid DIM argument, while rank-1 lookup ignores dim entirely."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "[L173-L180,L369-L376] (HIGH/unchecked index) The parameter-name and array-name entry points index keys or call indextos without validating the caller-supplied index, so an out-of-range C/API index can cause an out-of-bounds access."
+   ],
+   "audit_member_text": [
+    "[L164-L180,L359-L376] (HIGH/bounds) Parameter and array name lookup index allocatable key/state tables directly without checking the caller-supplied index range."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [
+    "[L454-L484] (MED/incorrect status contract) getarraydimsize_c initializes its function result to -1 and never changes it to success after computing dimsize, so every successful dimension query is reported as a failure."
+   ],
+   "audit_member_text": [
+    "[L454-L484] (HIGH/status-contract) getarraydimsize_c initializes its status to -1 and never sets it to zero after successfully computing dimsize, so every call reports failure."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L145-L149] (MED/false success status) getparametertype_c unconditionally returns success and does not propagate whether getkey_indextype found the requested parameter."
+   ],
+   "audit_member_text": [
+    "[L124-L149] (HIGH/error-propagation) getparametertype_c always returns success zero and does not validate the index returned by getkey_indextype, so an unknown parameter can return an undefined type code as a successful query."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [
+    "B11"
+   ],
+   "base_member_text": [
+    "[L587-L600,L635-L647,L682-L694,L730-L742,L820-L832,L868-L879] (MED/returned pointer lifetime) Each nonscalar C getter returns a pointer into a saved scratch allocation that is deallocated by the next call of the same rank/type, silently invalidating previously returned data and making the API non-reentrant."
+   ],
+   "audit_member_text": [
+    "[L574-L743,L807-L881] (MED/pointer-lifetime) Array C getters return pointers into one saved scratch allocation per rank and deallocate that allocation on the next same-rank getter call, but this short lifetime is not exposed in the API."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [
+    "B9"
+   ],
+   "base_member_text": [
+    "[L520-L524,L565-L569,L613-L617,L660-L664,L708-L712,L756-L760,L799-L803,L847-L851,L894-L898,L941-L945,L988-L992,L1035-L1039,L1082-L1086,L1130-L1134,L1178-L1182,L1226-L1230] (MED/type/rank validation) Typed getters and setters validate only that a name exists, not that its registered type and rank match the selected entry point, so a wrong API choice can dereference an unassociated arraytype component."
+   ],
+   "audit_member_text": [
+    "[L486-L507,L510-L1260] (MED/rank-type-validation) Generic and rank-specific array entry points validate only the mnemonic, not that the selected array's type and rank match the routine, before dereferencing a specific pointer component."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [
+    "B12"
+   ],
+   "base_member_text": [
+    "[L949-L975,L996-L1022,L1090-L1116,L1138-L1164,L1186-L1212,L1234-L1260] (LOW/buffer-size contract) C array setters infer the model target shape but accept no source-buffer length, leaving no way to reject a caller buffer that is too short before copying that many elements."
+   ],
+   "audit_member_text": [
+    "[L902-L1023,L1043-L1260] (HIGH/ffi/pointer-validation) All C array setters convert and dereference the incoming c_ptr without checking c_associated or receiving a buffer length, so null or undersized caller buffers cannot be rejected."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B10"
+   ],
+   "base_member_text": [
+    "[L529-L552,L764-L787] (HIGH/dangling C pointer) The scalar C getters return c_loc of an automatic local target (r0 or i0), whose lifetime ends when the function returns, leaving the caller with an invalid pointer."
+   ],
+   "audit_member_text": [
+    "[L529-L552,L764-L787] (HIGH/dangling-pointer) Scalar C getters return c_loc of an unsaved local target, so the pointer becomes undefined as soon as the function returns."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A8"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L137-L141,L392-L395,L422-L425,L454-L458] (LOW/inconsistent C ABI) Several BIND(C) query routines omit VALUE on scalar input lengths or dimensions while neighboring C entry points pass analogous inputs by value, creating an inconsistent and undocumented pointer-versus-value calling convention."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L130-L134,L386-L389,L416-L419,L448-L451] (HIGH/shape-conformance) Several Fortran wrappers assign the fixed 1024-element result of string_to_char_array into automatic arrays sized only len(name) or len(name)+1, which is a nonconforming whole-array assignment."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L137-L149,L203-L223,L245-L269,L290-L311,L316-L336,L392-L406,L422-L436,L454-L505,L529-L1260] (HIGH/ffi/string-bounds) C entry points pass variable-length name arrays to char_array_to_string, whose dummy contract reads up to 1024 elements, so length-sized buffers without an in-range NUL can be read beyond their declared extent."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L203-L224,L290-L312] (HIGH/type-confusion) Numeric parameter getters do not verify myparam's type before reading r0 or i0, so calling a getter with a valid name of the wrong type accesses the wrong parameter component."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L316-L336] (MED/output-on-error) getcharparameter returns early on lookup failure without setting valuelength or initializing the output buffer."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L392-L407,L422-L437] (MED/output-on-error) Array type and rank queries return on an unknown name without initializing their output arguments."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B13"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L84-L90,L978-L1023] (MED/api-completeness) Integer setters exist through rank 2 only and only ranks 0 and 1 are exposed through the module generic, while array metadata can report higher-rank integer arrays."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

@@ -1,0 +1,560 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-001",
+ "source_path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+ "source_sha256": "0cbaa20cd8dd147005ec6b01d13ec05ac46bb98d181e0a7fec1025cd9fe30b71",
+ "base_run_id": "xbeach-r1-XBeach-001-codex-01a05a5b-a17d-7cd0-8b9b-49a161c8810c",
+ "audit_run_id": "xbeach-r2-XBeach-001-codex-01a05aa6-f6db-7991-802e-4d57ae64a826",
+ "base_record_file": "150b6cf07ef1563bee8f79ad5aa4bebb4503eae0710f2c60ed61cec7dffe2783.json",
+ "audit_record_file": "150b6cf07ef1563bee8f79ad5aa4bebb4503eae0710f2c60ed61cec7dffe2783.json",
+ "base_record_sha256_bytes": "e38e2785099bff65287b1adc3136c1387b9bff91463abd07acf5f9dd6cf6ebc3",
+ "audit_record_sha256_bytes": "ecc44841c8e46c361bbec76b8115e01d4d45b1d8811d4421c8ffeb370022502c",
+ "base_finding_count": 14,
+ "audit_finding_count": 32,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [
+    "[L678-L701] (MED/unimplemented option) The par%order==3 nonhydrostatic monochromatic branch contains only commented assignments, leaving s%zi and s%ui stale while accepting the option."
+   ],
+   "audit_member_text": [
+    "[L697-L701] (HIGH/incomplete branch) The `par%order==3` branch contains only commented-out assignments, leaving `s%zi` and `s%ui` at prior or undefined values while execution continues as if a third-order boundary had been generated."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B8"
+   ],
+   "base_member_text": [
+    "[L880-L884, L903-L907] (HIGH/MPI uninitialized state) The TS_NONH MPI path does not broadcast isSet_V, yet every rank tests it to set s%vi and s%isSet_Vbc, so non-master ranks use an undefined logical."
+   ],
+   "audit_member_text": [
+    "[L868-L913] (HIGH/MPI state propagation) The TS_NONH MPI path broadcasts several `isSet_*` flags but omits `isSet_V`, after which every rank branches on that uninitialized local flag."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "[L629-L630] (HIGH/incorrect state assignment) In the non-MPI multi-record-jump path, both q1 and q2 are assigned from gq2, so the earlier discharge record gq1 read at lines 612-615 is discarded and temporal interpolation uses the later record at both endpoints."
+   ],
+   "audit_member_text": [
+    "[L627-L631] (HIGH/serial/MPI divergence) In the non-MPI multi-record-jump branch, both `q1` and `q2` are assigned from `gq2`, whereas the MPI branch distributes `gq1` into `q1`, eliminating the intended discharge interpolation only in serial runs."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A11"
+   ],
+   "audit_ids": [
+    "B26"
+   ],
+   "base_member_text": [
+    "[L1988-L2012, L2056-L2065] (MED/unclear file-format contract) Although the time-column index iT is detected, data columns are always addressed as header_index-1, implicitly requiring time to be the first header without validating or documenting that constraint."
+   ],
+   "audit_member_text": [
+    "[L1868,L1988-L2012,L2056-L2083,L2259-L2311] (MED/file-format contract) Although the header parser records the position of `T`, the data reader always consumes time as the first field and maps every other variable as column index minus one, making non-first time columns unsupported without validation."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A10"
+   ],
+   "audit_ids": [
+    "B25"
+   ],
+   "base_member_text": [
+    "[L1860-L1868, L1915-L2012] (HIGH/stale parser state) Saved header indices iZ/iU/iV/idU/idV/iQ/iW/iT are not reset when a new boundary file is initialized, so variables absent from the new header can retain indices from the previous file."
+   ],
+   "audit_member_text": [
+    "[L1860-L1868,L1915-L2012] (HIGH/stale parser state) Saved header indices are not reset when a new boundary file is initialized, so variables omitted by the new file can retain column indices from the previous file."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A13"
+   ],
+   "audit_ids": [
+    "B29"
+   ],
+   "base_member_text": [
+    "[L2171-L2183, L2240-L2253] (HIGH/undefined output flags) When EOF is reached during or before a regular call, values and isSet_Q are assigned but isSet_U/isSet_V/isSet_Z/isSet_W/isSet_dU/isSet_dV are not, despite all being intent(out) and subsequently consumed by callers."
+   ],
+   "audit_member_text": [
+    "[L2171-L2183,L2240-L2253] (HIGH/output initialization) Both end-of-file return paths assign only `isSet_Q`; the other `intent(out)` presence flags are left undefined even though callers immediately use them to accept or replace returned fields."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "[L409-L416, L426-L434, L448-L472, L657-L664, L863-L866] (MED/unguarded division) Several Surfbeat and nonhydrostatic taper expressions divide by par%taper without the positive-taper guard used by the stationary branch, so an allowed zero taper would produce invalid boundary values."
+   ],
+   "audit_member_text": [
+    "[L426-L473,L657-L664,L863-L866] (HIGH/numerical robustness) Several Surfbeat and nonhydrostatic boundary branches evaluate `par%t/par%taper` without the zero-taper guard used by the stationary branch, so an allowed zero taper can inject NaNs."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [
+    "B13"
+   ],
+   "base_member_text": [
+    "[L1022-L1025, L1035-L1038] (HIGH/incorrect extrema update) All four hybrid-tide minimum updates call min with the corresponding maximum accumulator instead of the minimum accumulator, corrupting the observed ranges used to compute the hybrid coefficients."
+   ],
+   "audit_member_text": [
+    "[L1022-L1038] (HIGH/accumulator defect) All four hybrid minimum updates call `min` with the corresponding maximum accumulator instead of the previous minimum, so historical minima are lost whenever later samples rise."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [
+    "B14"
+   ],
+   "base_member_text": [
+    "[L1049, L1063] (MED/unguarded division) Hybrid relative error divides by the maximum observed range without a positive floor, so constant water-level windows can yield division by zero."
+   ],
+   "audit_member_text": [
+    "[L1047-L1071] (HIGH/numerical robustness) Hybrid relative error divides by the maximum observed surface range without a positive floor, producing a zero denominator for constant-level windows."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B9"
+   ],
+   "base_member_text": [
+    "[L886-L899] (HIGH/MPI/serial inconsistency) TS_NONH discharge-to-velocity conversion guarded by isSet_Q exists only in the non-MPI preprocessor branch, so MPI runs distribute raw discharges as boundary velocities and also never broadcast isSet_Q."
+   ],
+   "audit_member_text": [
+    "[L873-L899] (HIGH/serial/MPI divergence) When a TS_NONH file supplies discharge `Q`, conversion of `uig` and `duig` from discharge to velocity is compiled only in the non-MPI branch, so MPI runs distribute discharge values into velocity fields."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [
+    "B19"
+   ],
+   "base_member_text": [
+    "[L1511-L1515, L1551, L1581] (MED/conditional initialization) Saved Coriolis coefficient fc is initialized only when par%t<=par%dt, so a first invocation after a hot start or externally managed time can use an undefined value."
+   ],
+   "audit_member_text": [
+    "[L1511-L1515] (LOW/initialization) Saved Coriolis parameter `fc` is initialized only when `par%t<=par%dt`, so a first call after that interval, such as a hot-start entry, uses an undefined value."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A8"
+   ],
+   "audit_ids": [
+    "B23"
+   ],
+   "base_member_text": [
+    "[L1785-L1798] (HIGH/MPI domain ownership) Vertical point discharges are clamped into each local subdomain and applied with no ownership test, causing every MPI rank to inject every point source at a local edge cell."
+   ],
+   "audit_member_text": [
+    "[L1777-L1798] (HIGH/MPI source duplication) Vertical point discharge clamps the global point into every rank's local index range without an ownership test, causing every MPI rank to apply the source at some local cell."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A12"
+   ],
+   "audit_ids": [
+    "B28"
+   ],
+   "base_member_text": [
+    "[L2067-L2087] (HIGH/division by zero) For a boundary file with only one time level, EOF handling sets t1 equal to t0 and then immediately performs interpolation divided by t1-t0."
+   ],
+   "audit_member_text": [
+    "[L2067-L2127,L2185-L2228] (HIGH/time interpolation) A one-record file sets `t1=t0` and duplicate timestamps are otherwise permitted, yet all initialized variables are interpolated by dividing by `t1-t0`."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A9"
+   ],
+   "audit_ids": [
+    "B24"
+   ],
+   "base_member_text": [
+    "[L1961-L1973] (MED/invalid-input handling) An unrecognized scalar/vector mode is silently accepted and leaves saved lVarU at its prior value, so malformed or changed files can be parsed using stale layout state."
+   ],
+   "audit_member_text": [
+    "[L1961-L1973] (MED/input validation) An unrecognized scalar/vector mode is silently accepted and leaves saved `lVaru` at its previous-file value."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L57-L113,L118-L125] (LOW/lifecycle/state) Saved allocation and `bccreated` state are initialized only for the first grid seen, with no reset or resizing contract for a later grid or reinitialization in the same process."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L139-L164,L176-L203] (MED/input validation) The TS readers accept `nt` without requiring it to be positive and then allocate from it and divide `sum(dataE)` by `nt`."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L434-L453,L470-L472,L684-L696] (HIGH/numerical robustness) Bound-wave and nonhydrostatic formulas divide by boundary depth, `sinh(kh)`, `tanh(kh)`, and the resonant term `cg**2-g*h` without dry-point or small-denominator protection."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L490-L500,L594-L660] (MED/time interpolation) The spectral-record calculation divides by `dtbcfile` and derives direct-access record numbers from it without validating that this file-supplied interval is positive."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L854-L866] (HIGH/vector transformation) The difference-velocity rotation computes only `s%dUi`; `s%dVi` is neither replaced by the rotated transverse component nor included in the subsequent tapering."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B10"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L778-L780,L830-L832,L864,L1310-L1313] (HIGH/reference-level consistency) If a nonhydrostatic boundary file omits `Z`, `s%zi` is set to the absolute neighboring surface `s%zs(2,:)`, but the applied boundary later adds `s%zs0` to `s%zi`, apparently adding the mean level twice."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B11"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L963-L983] (LOW/lifecycle/state) Flow-boundary work arrays are sized only on the first call, and `zs0old` is allocated only if the first call's tide type is instant or hybrid, leaving later dimension or tide-mode changes unsupported."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B12"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L998-L999,L1029-L1042,L1141-L1146,L1363-L1365] (MED/parameter validation) Hybrid averaging and relaxation divide by combinations of `cats`, `Trep`, and `hybtavg` without enforcing positive values."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B15"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L1177-L1178,L1386-L1387] (MED/numerical robustness) Boundary mean velocities divide by globally accumulated metric lengths without checking for an empty or zero-width boundary selection."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B16"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L1202-L1247,L1263-L1271,L1321-L1324,L1399-L1422,L1432-L1451] (MED/boundary numerical robustness) Several absorbing-boundary formulas use unguarded water depths, group velocity, grid spacing, or angular denominators even though these branches do not consistently mask dry or degenerate boundary points."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B17"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L1250-L1278,L1439-L1444] (MED/angle calculation) Incident and reflected directions are obtained with one-argument `atan` of a quotient, losing quadrant information and becoming discontinuous near zero longitudinal velocity."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B18"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L1458-L1468] (HIGH/copy/paste indexing) Back-boundary corner water levels use `dzs0dn(1,...)` and `zb(1,...)` instead of the `nx+1` back-boundary row, applying front-boundary geometry at both back corners."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B20"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L1523-L1603] (MED/dispatch contract) The lateral-boundary `select case` has no default assignment, so an unsupported `bctype` returns an undefined `vbc` vector."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B21"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L1549-L1602] (LOW/small-grid indexing) Three lateral-boundary cases populate only indices `2:s%nx` before copying from indices 2 and `s%nx`, which leaves circular or undefined endpoint values when `s%nx<2`."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B22"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L1659-L1678] (HIGH/MPI domain intersection) A horizontal discharge segment is considered local only when at least one endpoint lies in the rank's box, so a segment that crosses a subdomain while both endpoints lie outside that subdomain is omitted there."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B27"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L1988-L2011] (LOW/input normalization) Multi-character headers are matched against only selected capitalization variants, so otherwise accepted case variants such as `du`, `Dv`, or `DQ` can be silently ignored."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B30"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L274,L420-L421,L914-L916] (MED/dispatch contract) Unsupported wave-boundary combinations fall through empty branches without an error or deterministic reset, allowing boundary arrays to retain values from an earlier condition."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B31"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L918-L922] (LOW/update scope) Final long-wave scaling is applied to the entire saved `s%ui` field rather than only the boundary row populated here, creating an unclear repeated-scaling contract for interior entries."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

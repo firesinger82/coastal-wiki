@@ -1,0 +1,81 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-000",
+ "source_path": "trunk/src/xbeachlibrary/getkey.F90",
+ "source_sha256": "bb61b4f99eb19be9231ee7ba7ec1c102a0ed47fc834e53aeffefefac19f89f1e",
+ "base_run_id": "xbeach-r1-XBeach-000-codex-01a05a52-c773-7170-b126-7a88b545d9e6",
+ "audit_run_id": "xbeach-r2-XBeach-000-codex-01a05a9c-78d9-7eb0-9d9e-e5e019072cda",
+ "base_record_file": "77db89cfc0c103b908c7bb579594a99c1988d2f1450526fbe096b083cbbcbf1f.json",
+ "audit_record_file": "77db89cfc0c103b908c7bb579594a99c1988d2f1450526fbe096b083cbbcbf1f.json",
+ "base_record_sha256_bytes": "67f18241da8c339192e2b6eb294e705ce7a2425707ff91738b525163e50d3d8b",
+ "audit_record_sha256_bytes": "078f0d2db15d71ad45923becaf4858046c62569c88dba01b3aca24336f5e6b8a",
+ "base_finding_count": 4,
+ "audit_finding_count": 3,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0",
+    "A3"
+   ],
+   "audit_ids": [
+    "B0",
+    "B2"
+   ],
+   "base_member_text": [
+    "[L13-L29,L88-L100] (MED/pointer-state) parameter pointer components have no default NULL initialization, and getkey associates only the pointer matching the current type, leaving the other pointer components with undefined or stale association state.",
+    "[L13-L19,L88-L100] (LOW/incomplete-metadata) The exported parameter type advertises units, description, and dimension metadata, but getkey initializes none of those fields for a successful scalar lookup."
+   ],
+   "audit_member_text": [
+    "[L21-L28] (LOW/undefined pointer state) parameter pointer components have no default NULL() association, leaving unused components undefined or stale across descriptor reuse.",
+    "[L88-L100] (MED/incomplete result metadata) Successful getkey calls set only name, rank, type, and one value pointer, leaving the public units, description, dimensions, and nonselected pointer fields undefined or inherited from a previous use."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L76-L100] (MED/aliasing-contract) All returned scalar pointers alias one of three shared SAVE temporaries, so a later getkey call of the same type silently changes the value observed through every earlier result and makes the API non-reentrant."
+   ],
+   "audit_member_text": [
+    "[L76-L100] (MED/shared-result aliasing) Every getkey result of a given type points to one module-saved scratch scalar, so a later call silently changes the value observed through all earlier descriptors and the routine is not reentrant or thread-safe."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L44-L63] (LOW/case-consistency) Introspection key lookup is case-sensitive even though the parameter-file reader performs case-insensitive key matching, creating two different naming contracts for the same parameters."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

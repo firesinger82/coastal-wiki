@@ -1,0 +1,461 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-000",
+ "source_path": "trunk/src/xbeachlibrary/initialize.F90",
+ "source_sha256": "9803067bd2fa4962d9e2247f6e8b5f87e18a9860802595424183994a715523cd",
+ "base_run_id": "xbeach-r1-XBeach-000-codex-01a05a52-c773-7170-b126-7a88b545d9e6",
+ "audit_run_id": "xbeach-r2-XBeach-000-codex-01a05a9c-78d9-7eb0-9d9e-e5e019072cda",
+ "base_record_file": "57a47d676ac7b9e66db06e2029570c25d455cff294107751a056a0918973484e.json",
+ "audit_record_file": "57a47d676ac7b9e66db06e2029570c25d455cff294107751a056a0918973484e.json",
+ "base_record_sha256_bytes": "a3d95ecf5bd0e07aa4dde00b4ebbb479496799ab74345399cd643c41ce051463",
+ "audit_record_sha256_bytes": "12b7a7426bafa84f9bb1602fbab07acfc41c345a65b8614afa780800dd209e49",
+ "base_finding_count": 21,
+ "audit_finding_count": 20,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [
+    "[L438-L456] (MED/interpolation-contract) Prescribed-bathymetry timestamps are not checked for ordering or coverage of time zero, and the interpolation status returned in dummy is ignored when constructing the initial bed."
+   ],
+   "audit_member_text": [
+    "[L424-L458] (MED/unchecked bathymetry schedule) setbathy_init accepts nonpositive or unsorted nsetbathy/time values without validation, allowing an empty schedule to silently initialize every bathymetry value to zero or a nonmonotonic schedule to violate linear_interp's ordering contract."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A10",
+    "A12"
+   ],
+   "audit_ids": [
+    "B12"
+   ],
+   "base_member_text": [
+    "[L1076-L1156] (HIGH/division-by-zero) The hotstartflow iteration divides by s%cf even though flow_init explicitly set s%cf to zero and has not computed a friction coefficient before entering this block.",
+    "[L1104-L1156] (MED/nontermination) The stationary-flow fixed-point loop has no iteration limit or non-finite residual check, so a divergent or NaN-producing initialization can run indefinitely or exit with invalid state."
+   ],
+   "audit_member_text": [
+    "[L930,L1076-L1156] (HIGH/divide by zero / nontermination) The hotstartflow fixed-point solver divides by s%cf immediately after flow_init explicitly sets s%cf to zero, and its convergence loop has no iteration cap or nonfinite-value exit."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A16"
+   ],
+   "audit_ids": [
+    "B16"
+   ],
+   "base_member_text": [
+    "[L1367-L1377] (MED/input-validation) Sediment-fraction normalization handles a near-zero total but never rejects negative individual fractions, so a positive total containing negatives is normalized into still-negative bed fractions."
+   ],
+   "audit_member_text": [
+    "[L1362-L1377] (MED/invalid fraction acceptance) Multi-grain initialization normalizes any positive-sum fractions without rejecting individual negative fractions, so physically invalid negative bed composition can survive normalization."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A19"
+   ],
+   "audit_ids": [
+    "B18"
+   ],
+   "base_member_text": [
+    "[L1658-L1666] (MED/bounds) Drifter indices are formed by adding unconstrained fractional offsets to the nearest grid index and converting to integer without clamping, so out-of-domain drifter coordinates can produce indices outside the arrays."
+   ],
+   "audit_member_text": [
+    "[L1658-L1667] (MED/drifter index bounds) Drifter positions are converted to integer indices by implicit truncation after metric division and are never clamped to the grid, so offsets outside the nearest cell or zero metrics can yield invalid indices."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A8"
+   ],
+   "audit_ids": [
+    "B9"
+   ],
+   "base_member_text": [
+    "[L683-L687] (MED/input-error-handling) spectral_wave_init opens the boundary file and reads its header without IOSTAT handling, despite later records having explicit format-error checks."
+   ],
+   "audit_member_text": [
+    "[L683-L704] (MED/unchecked boundary-file open/read) spectral_wave_init opens and reads the boundary file header without iostat handling, so missing or malformed input can fail outside the routine's structured logging path."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A20"
+   ],
+   "audit_ids": [
+    "B19"
+   ],
+   "base_member_text": [
+    "[L1795-L1801,L1819-L1825,L1843-L1851] (HIGH/input-error-handling) All low-level hotstart readers capture OPEN/READ IOSTAT but never inspect it, allowing format or I/O failures to leave restart fields partially undefined after existence/length checks pass."
+   ],
+   "audit_member_text": [
+    "[L1791-L1801,L1815-L1825,L1839-L1851] (HIGH/ignored hotstart I/O errors) All low-level hotstart readers capture open and per-row read iostat values but never test them, so fixed-format mismatches or I/O failures can silently leave restart arrays partially undefined despite the earlier list-directed length check."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L48-L55] (MED/parameter-transform) posdwn is transformed as posdwn*abs(posdwn), so permitted fractional inputs change magnitude (for example 0.5 becomes 0.25) rather than merely being normalized or sign-adjusted."
+   ],
+   "audit_member_text": [
+    "[L38-L55,L242] (MED/parameter transformation ambiguity) posdwn is transformed to posdwn*abs(posdwn), so any value other than exactly -1, 0, or 1 unexpectedly rescales bathymetry rather than merely enforcing a sign convention."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [
+    "[L524,L533-L535,L546-L598] (MED/uninitialized-arrays) wave_init allocates Dp, umwci, vmwci, and zswci but the subsequent initialization block never assigns them."
+   ],
+   "audit_member_text": [
+    "[L485-L596] (MED/uninitialized allocated state) wave_init allocates Dp, umwci, vmwci, zswci, and fw-related wave state but does not initialize Dp or the three WCI arrays before returning."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "[L175-L180] (MED/input-error-handling) The Delft3D comment-skip loop does not inspect READ IOSTAT before testing line(1:1), so EOF or a read failure before a non-comment line has no controlled exit."
+   ],
+   "audit_member_text": [
+    "[L169-L180] (HIGH/EOF nontermination) The Delft3D comment-skip loop tests line(1:1) without first handling a nonzero read iostat, so EOF after comment lines can leave the previous '*' line in place and loop indefinitely."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A17"
+   ],
+   "audit_ids": [
+    "B14"
+   ],
+   "base_member_text": [
+    "[L1309-L1318,L1425-L1462] (MED/uninitialized-arrays) sed_init allocates iwl, Tsg, vmag, ccz, ca, and refA but omits them from the subsequent initialization assignments (iwl is notably adjacent to initialized istruct)."
+   ],
+   "audit_member_text": [
+    "[L1256-L1318,L1425-L1462] (MED/partially initialized sediment state) sed_init returns with several allocated arrays uninitialized, including Tsg, vmag, vreps, vrepb, iwl, ccz, ca, and refA (and D15 when dilatancy is disabled)."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A9"
+   ],
+   "audit_ids": [
+    "B10"
+   ],
+   "base_member_text": [
+    "[L781,L820-L829,L844-L848,L879-L973] (MED/uninitialized-arrays) flow_init allocates qmag, dUi, dVi, cfu, cfv, zs1, sigz, and the vertical-profile arrays but does not initialize them in its extensive initialization block."
+   ],
+   "audit_member_text": [
+    "[L781-L848,L879-L977] (MED/partially initialized flow state) flow_init leaves several allocated arrays without initialization, including qmag, dUi, dVi, cfu, cfv, zs1, sigz, uz, vz, ustz, and nutz, creating an implicit requirement that every consumer wait for another producer."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "[L315-L347,L619-L623] (HIGH/zero-dimension) Directional bin counts are computed with NINT and are not constrained to at least one; equal/narrow angle bounds can yield ntheta or ntheta_s zero, followed by zero-sized wave arrays and division by s%ntheta."
+   ],
+   "audit_member_text": [
+    "[L315-L347,L619-L623] (HIGH/angular-grid zero division) dtheta and dtheta_s are used as divisors without validation and rounded counts can become zero, after which allocations and sigm=sum(...)/ntheta operate on an invalid or empty angular grid."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L109-L133,L203-L212,L240-L253,L395-L410] (MED/hotstart-initialization) When hotstart is enabled the bathymetry reads are skipped, but grid_bathy still negates, boundary-copies, snapshots, and differentiates the allocated zb array before hotstart_init_1 later supplies its values."
+   ],
+   "audit_member_text": [
+    "[L104-L133,L203-L214,L226-L253,L393-L412] (HIGH/uninitialized bathymetry use) For setbathy==1 the initial depth read is skipped, and for XBeach-format hotstart==1 it is also skipped, yet zb is sent, negated, boundary-copied, copied to zb0, and used for slopes before the later bathymetry/hotstart loaders define it."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A13"
+   ],
+   "audit_ids": [
+    "B13"
+   ],
+   "base_member_text": [
+    "[L1211-L1215] (HIGH/disabled-logic) For a completely wet domain under instantaneous tide, the only code intended to populate zs0fac is commented out, leaving both tide weights at the earlier all-zero initialization."
+   ],
+   "audit_member_text": [
+    "[L1211-L1224] (HIGH/missing tide initialization) For a completely wet domain under instant tide, the intended interpolation branch contains only comments and leaves both zs0fac weights zero everywhere, suppressing offshore and bay tide contributions."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A18"
+   ],
+   "audit_ids": [
+    "B17"
+   ],
+   "base_member_text": [
+    "[L1580-L1594] (MED/bounds) For a v-oriented discharge in a ny==0 model, the n1 clamp first raises the index to 1 and then lowers it to s%ny==0, storing a zero grid index in pdisch."
+   ],
+   "audit_member_text": [
+    "[L1580-L1594] (MED/one-dimensional index defect) For a line discharge classified in the v direction on a ny=0 grid, n1 is clamped down to zero and stored as a grid index."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L220-L237] (LOW/mpi-error-handling) All three MPI sends/receives overwrite the same ier and none is checked, so transfer failures are silently ignored."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L322-L332] (MED/conditional-initialization) The swave==0 branch computes theta0 from par%dir0 even though all_input assigns dir0 only for selected boundary-condition types, leaving this path dependent on external/default initialization."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A11"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L1076-L1156] (HIGH/conditional-parameter-use) The hotstartflow force balance unconditionally uses rhoa, Cd, windsu, and windnv although rhoa/Cd are read only when wind is enabled and no wind-disabled guard is present here."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A14"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L1325-L1329] (LOW/conditional-initialization) D15 is always allocated but assigned only when dilatancy is enabled, leaving the array undefined in the other configuration even though it remains part of distributed state."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A15"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L1332-L1341,L1384-L1387] (MED/model-inconsistency) Single-fraction sediment forces every layer thickness to at least 10 m, whereas multi-fraction sediment uses dzg1/dzg2/dzg3 directly, creating a large unexplained behavior change solely from ngd."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L203-L212] (LOW/format-path inconsistency) The Delft3D branch skips the depth file for setbathy but not for hotstart, unlike the XBeach-format branch, causing a hotstart run to require and read a depth file that will be replaced."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED) | CONFLICT vs a matched finding: Delft3D hotstart depth read is retained in X but claimed skipped in Y",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L242-L249,L395-L410,L1464-L1482] (MED/unchecked grid extent and metric) Boundary copies assume nx>=1 and slope calculations divide by dsu/dnv without checking positive nonzero grid metrics."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B8"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L619-L623] (MED/period division) Wave intrinsic frequency is computed as 2*pi/Trep without a local positive-period guard for boundary types that do not force Trep to 10."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B11"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L1011-L1012,L1037-L1056] (HIGH/hotstart state destruction) Although hotstart zs, uu, and vv are deliberately preserved during allocation and initial zeroing, flow_init later unconditionally resets uu and vv and all derived flow quantities to zero, discarding the loaded hotstart velocities."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B15"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L1332-L1341,L1384-L1387] (MED/layer-index bounds) Sediment layer assignments use nd_var and, in the single-grain case, forcibly set nd_var=2 without ensuring nd is at least two or that nd_var lies within 1:nd."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

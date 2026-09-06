@@ -1,0 +1,231 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-003",
+ "source_path": "trunk/src/xbeachlibrary/general_mpi_new.F90",
+ "source_sha256": "9529fbbaae9120c317ec18e49f3f5f133bee78f5649a1f1cf2f0f55391cf2837",
+ "base_run_id": "xbeach-r1-XBeach-003-codex-01a05a73-c44f-73d1-9740-9462379b36f1",
+ "audit_run_id": "xbeach-r2-XBeach-003-codex-01a05ac0-7e92-7031-ae47-79d30eab7b40",
+ "base_record_file": "5dc09dad49ce76c913b831459e51914da3b579bfe24ffa7991cf6706937ef080.json",
+ "audit_record_file": "5dc09dad49ce76c913b831459e51914da3b579bfe24ffa7991cf6706937ef080.json",
+ "base_record_sha256_bytes": "095f672ccd9c2b0b66788fea757e47d591c58cc7ad4e9dac251234b3ce1cfc38",
+ "audit_record_sha256_bytes": "02dbe7385e9436dd07507b9ab00cff16d01e9454a5de3b3e46e5a112b666e251",
+ "base_finding_count": 4,
+ "audit_finding_count": 12,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L110-L134,L180-L231,L278-L323,L380-L463,L525-L606,L659-L725,L769-L837,L900-L1019,L1092-L1223,L1303-L1417,L1455-L1570,L1730-L1753] (LOW/unchecked MPI status) MPI return codes are stored throughout the module but never tested, so communication failures are not distinguished from valid results."
+   ],
+   "audit_member_text": [
+    "[L110-L134,L180-L231,L278-L323,L380-L463,L525-L606,L659-L725,L769-L837,L900-L1019,L1092-L1223,L1303-L1417,L1455-L1570,L1729-L1753] (MED/mpi/error-handling) MPI status codes are consistently captured but not checked, so communication failures can leave partially populated arrays or enter later waits with invalid requests."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [
+    "[L716-L725,L828-L837,L1403-L1417,L1556-L1570] (MED/MPI error scope) Local size-consistency failures abort MPI_COMM_WORLD rather than the communicator supplied to the routine, potentially terminating unrelated communicator participants."
+   ],
+   "audit_member_text": [
+    "[L716-L722,L828-L834,L1403-L1414,L1556-L1567] (MED/communicator-scope) Shape mismatches abort MPI_COMM_WORLD rather than the communicator passed to the routine, unexpectedly terminating unrelated ranks in an embedded or split-communicator use."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "[L421-L454,L563-L596] (MED/nontermination edge case) If sum(ln(1:procs)) is zero on the root, the unconditional loop has no send event that can reach its exit test and runs forever; no positive-dimension precondition is enforced."
+   ],
+   "audit_member_text": [
+    "[L389-L454,L534-L596] (HIGH/mpi/liveness) Both column-send root loops terminate only after incrementing sends, so a valid zero-total workload makes the unbounded loop advance j forever."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L445-L455,L463;L587-L606] (HIGH/nonblocking buffer lifetime) Both column-wise send routines deallocate the contiguous send buffer aa before all outstanding MPI_Isend requests are completed, violating MPI buffer-lifetime requirements and risking corrupted transfers."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L80-L137] (MED/bounds-contract) Vector distribution indexes is/lm by communicator size and copies lm elements into b without validating metadata extents, source ranges, or destination capacity."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L142-L326] (MED/scatter-metadata) Scatter variants trust is/lm/js/ln and local matrix shapes completely, allowing invalid displacements, counts, or b columns to be passed to MPI."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L408-L470,L553-L615] (LOW/resource-use) The send variants allocate a full bb copy on the root even though bb is only read on non-root processes."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L619-L841] (MED/bounds-contract) Whole-matrix distribution computes array sections from unchecked metadata and root rank before validating that source and destination shapes match."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L928-L1024,L1102-L1225] (MED/collection-metadata) Column collection derives counts, receive totals, and array sections from unchecked overlap flags and metadata, so inconsistent flags can produce negative counts, missing receives, or out-of-bounds sections."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B8"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L1296-L1417,L1449-L1570] (MED/minimum-extent) Whole-submatrix collectors subtract a fixed four-cell overlap without enforcing local dimensions of at least four, allowing negative extents and MPI counts."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B9"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L1575-L1618] (HIGH/arithmetic-input-contract) decomp divides and takes modulo by numprocs without rejecting zero, and does not validate myid against the process range."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B10"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L1668-L1710] (MED/output-bounds) det_submatrices assumes all eight output arrays contain at least mp*np elements and that ma/na exceed the fixed overlap, but validates neither condition."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B11"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L1714-L1753] (MED/minimum-extent) Border shifting forms rows/columns 2 and ma-1/na-1 and uses count ma-2 without checking that the matrix has sufficient dimensions."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

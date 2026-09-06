@@ -1,0 +1,28 @@
+{
+ "axis": "code",
+ "model": "XBeach",
+ "path": "trunk/src/xbeachlibrary/solver.F90",
+ "source_sha256": "be97d575b3d32f1e0788b713123d0e0630997c2142e2d2990eab10201f9f90f7",
+ "lines_or_pages": 514,
+ "read_status": "complete",
+ "reader": "codex-R1",
+ "producer": "llm:openai/codex",
+ "read_method": "llm_full_read",
+ "artifact_class": "semantic_read",
+ "run_id": "xbeach-r1-XBeach-002-codex-01a05a67-e2d6-7e11-b2eb-ed7a4a8bc0af",
+ "shard": "XBeach-002",
+ "round": "R1",
+ "content": {
+  "unresolved": [
+   "[L30,L113-L121,L130-L136,L186-L193] (HIGH/lifecycle state) solver_free deallocates the work arrays but never resets initialized, so a later solve skips solver_init and uses deallocated storage.",
+   "[L109-L121,L186-L216] (MED/configuration lifecycle) Solver parameters and workspace shape are captured only on the first initialization; repeated initialization can double-allocate, while later solves with changed dimensions or parameters silently reuse the old state.",
+   "[L32-L38,L195-L201] (LOW/diagnostic accounting) itmin starts at zero and is updated with min(it,itmin), so the reported minimum iteration count can never become positive.",
+   "[L113-L121,L188-L216] (MED/unsupported-option handling) An unrecognized solver value still marks the module initialized, and solver_solvemat then takes no branch and returns the input x unchanged without an error.",
+   "[L285-L299] (HIGH/singular pivot) The Thomas solver divides by each pivot with no protection in its normal caller; the optional fix is not passed, and even when enabled it only catches values below machine tiny rather than numerically small pivots.",
+   "[L430-L442] (MED/singular factorization) The SIP factorization divides by 1+p1, 1+p2, and p3 without singularity checks; adding a fixed small value to p3 does not prevent exact or near cancellation.",
+   "[L427-L460,L467-L510] (MED/zero-right-hand-side convergence) When bnorm is zero, epslin remains exactly zero and the strict rnorm<epslin test cannot succeed even for an exactly zero residual, forcing all maxit iterations.",
+   "[L404-L420,L472-L500] (HIGH/MPI loop-bound inconsistency) Under MPI the factorization and forward sweep use the reduced local imin/imax/jmin/jmax bounds, but backward substitution always sweeps 2:nx and 2:ny, including cells whose factors and residuals were not produced in that iteration.",
+   "[L39-L41,L109-L111,L393-L397] (LOW/parameter-domain contract) The documented SIP stability range for alpha and positive accuracy/iteration settings is not enforced locally before those values control factorization and termination."
+  ]
+ }
+}

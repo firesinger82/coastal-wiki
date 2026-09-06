@@ -1,0 +1,251 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-001",
+ "source_path": "trunk/src/xbeachlibrary/wave_functions.F90",
+ "source_sha256": "2fda65c76091b855aee55b458b34625ab021136f63455bfe3190d3377ff8a205",
+ "base_run_id": "xbeach-r1-XBeach-001-codex-01a05a5b-a17d-7cd0-8b9b-49a161c8810c",
+ "audit_run_id": "xbeach-r2-XBeach-001-codex-01a05aa6-f6db-7991-802e-4d57ae64a826",
+ "base_record_file": "9c21db6106fa96efb0185109a9c466d1c5786b3834a1d9080e7b171ff930ec9b.json",
+ "audit_record_file": "9c21db6106fa96efb0185109a9c466d1c5786b3834a1d9080e7b171ff930ec9b.json",
+ "base_record_sha256_bytes": "0e2b8421744717727e11434b0f65b79c6f15571a0e81630fc35ff7d2c4bb2521",
+ "audit_record_sha256_bytes": "5bcdb0cef12d58c09a6472166a9f7592689b18b83345e8ac8c0a87efe94fd999",
+ "base_finding_count": 9,
+ "audit_finding_count": 12,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "[L283-L348] (HIGH/small-direction-grid bounds) Second-order directional advection is enabled for any ntheta>1 but indexes itheta+2 at the lower boundary, which is out of bounds when ntheta=2."
+   ],
+   "audit_member_text": [
+    "[L283-L348] (HIGH/small-dimension bounds) Second-order theta advection is enabled for any ntheta>1, but ntheta=2 makes the boundary stencil reference ee(:,:,3) outside the two-bin array."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L24-L48] (MED/unbounded smoothing weight) The wave-flow smoothing factors are not capped at one, so large hydrodynamic timesteps can make the old-state coefficient negative."
+   ],
+   "audit_member_text": [
+    "[L24-L47] (MED/time filtering) The temporal smoothing factor is not clamped to [0,1], so sufficiently large dt relative to wavint or cats*Trep gives a negative weight to the previous state."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "[L823-L835] (HIGH/ineffective convergence failure detection) The dispersion loop can only exit with iter<=itermax, so the post-loop test always reports success even when the iteration reaches its limit without satisfying the error tolerance."
+   ],
+   "audit_member_text": [
+    "[L823-L835] (HIGH/convergence reporting) iteratedispersion can never return its documented negative nonconvergence signal because the loop cannot leave with iter>itermax while the test accepts every iter<=itermax, including exhaustion at 150."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [
+    "[L979-L1003] (MED/invalid option handling) An unsupported useAverageDepthSwitch value is silently accepted and leaves hhlocal and possibly velocity work arrays holding stale values."
+   ],
+   "audit_member_text": [
+    "[L979-L1003] (MED/dispatch validation) An unsupported useAverageDepthSwitch leaves hhlocal and potentially velocities at stale values and continues the dispersion calculation."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [
+    "B8"
+   ],
+   "base_member_text": [
+    "[L1026-L1033, L1047-L1048] (HIGH/current-weight sign reversal) The WCI depth weight uses 1-h/hwcimax without a nonnegative clamp, so depths above hwcimax reverse rather than suppress the current contribution."
+   ],
+   "audit_member_text": [
+    "[L1026-L1033,L1047-L1048] (HIGH/WCI taper) The current-interaction taper can become negative when depth exceeds hwcimax because it lacks a zero lower clamp, reversing the current contribution to intrinsic frequency and group velocity."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A8"
+   ],
+   "audit_ids": [
+    "B11"
+   ],
+   "base_member_text": [
+    "[L1321-L1329] (MED/unguarded physical division) Wet-cell Stokes and roller drift divide by phase speed and hstokes without enforcing positive denominators."
+   ],
+   "audit_member_text": [
+    "[L1321-L1329] (HIGH/numerical robustness) Stokes and roller fluxes divide wet-cell energy by c and hstokes without lower bounds, so zero phase speed or zero hstokes yields invalid fluxes."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "[L856-L859, L947-L974, L1123-L1138, L1317-L1319] (MED/saved-shape/configuration state) Multiple saved work arrays are allocated only on first use, so changed grid dimensions or enabling WCI after an earlier non-WCI call can leave wrong shapes or unallocated WCI arrays."
+   ],
+   "audit_member_text": [
+    "[L721-L724,L936-L974,L1116-L1138,L1315-L1319] (LOW/persistent allocation) Multiple saved/pointer work arrays are allocated once without later shape or option checks, creating undocumented fixed-grid and fixed-WCI configuration lifetime requirements."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [
+    "B10"
+   ],
+   "base_member_text": [
+    "[L1250-L1302] (HIGH/MPI boundary incompleteness) Radiation-stress force stencils leave several subdomain-edge Fx/Fy values unset and perform no neighbor communication, a gap explicitly identified by the inline comments."
+   ],
+   "audit_member_text": [
+    "[L1250-L1302] (MED/boundary initialization) Fy remains unset on several boundaries, as the code comments acknowledge, with lateral copies commented out and only selected MPI-edge rows assigned."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L839-L923] (HIGH/MPI correctness limitation) breakerdelay operates only on local cross-shore coordinates and history with no inter-rank exchange, and its own source explicitly states that it is not MPI compliant."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L69-L100] (MED/geometry robustness) All slope differences divide by metric distances without guarding zero or invalid grid spacing."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L429-L480] (HIGH/small-dimension bounds) Second-order y advection with ny=1 can evaluate the left-boundary negative-velocity stencil at j+2=3 although the y extent is only 2."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L864-L897] (MED/small-dimension behavior) For ny=1 the breaker-delay computation loop is empty, so usd is not computed from current roller transport before lateral boundary copies use it."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B9"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L1140-L1160] (MED/dispatch validation) compute_wave_direction_velocities has no default flavour case, so an invalid flavour leaves nthetalocal undefined."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

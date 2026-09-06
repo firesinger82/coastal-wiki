@@ -1,0 +1,143 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-001",
+ "source_path": "trunk/src/xbeachlibrary/compute_tide_zs0.F90",
+ "source_sha256": "54a76088cc149de5d6b041cee66a76f3f3ed41c435f770e07835f4b96e1fb9ad",
+ "base_run_id": "xbeach-r1-XBeach-001-codex-01a05a5b-a17d-7cd0-8b9b-49a161c8810c",
+ "audit_run_id": "xbeach-r2-XBeach-001-codex-01a05aa6-f6db-7991-802e-4d57ae64a826",
+ "base_record_file": "7e50ad7fea7286d9432937747d557d658101b681f086f4e98c19f6cb19ac3761.json",
+ "audit_record_file": "7e50ad7fea7286d9432937747d557d658101b681f086f4e98c19f6cb19ac3761.json",
+ "base_record_sha256_bytes": "a1cb1a2ec829febf7830e05fd06d06e19f9eb45a94c3bb185ab22578eaaae324",
+ "audit_record_sha256_bytes": "bf5469b28238c33f47fd4bd531875669260e574fde28782a4350bf48bf6e78b6",
+ "base_finding_count": 5,
+ "audit_finding_count": 6,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "[L569-L645] (HIGH/MPI correctness limitation) fill_tide_grid updates each local interior from its local cross-shore maximum and local boundary endpoints with no MPI reduction or global-coordinate reconstruction, and the source itself states this only works for cross-shore-strip decompositions."
+   ],
+   "audit_member_text": [
+    "[L569-L572,L584-L634] (MED/MPI correctness) The source explicitly states that `fill_tide_grid` is not fully MPI-compliant for distributed grids, while this routine supplies interior tide levels and gradients for instant and hybrid tide modes."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0",
+    "A2"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L249-L257, L379-L401] (MED/unguarded geometric division) Tidal gradients divide by boundary distance differences (or s%dnz for 1-D) without validating nonzero spacing, so a degenerate or repeated boundary coordinate produces invalid gradients.",
+    "[L489-L499, L507-L524, L534-L548, L616-L638] (MED/unguarded interpolation denominator) Spatial interpolation uses reciprocal endpoint or ridge-to-end distances without guarding coincident endpoints or a maximum located exactly at the relevant endpoint."
+   ],
+   "audit_member_text": [
+    "[L251-L254,L379-L401,L489-L545,L616-L634] (HIGH/numerical robustness) Multiple tide gradients and spatial interpolants divide by grid spacing or endpoint-distance differences without guarding coincident points or zero spacing, allowing infinities or NaNs on degenerate grids or boundary placements."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "[L543-L553] (HIGH/incorrect gradient selection) In case 4 on a lateral boundary, points beyond the separating maximum receive tide2 but are assigned tidegradient1 rather than tidegradient2."
+   ],
+   "audit_member_text": [
+    "[L534-L552] (MED/gradient consistency) In case 4, points beyond `distmaxzbl` receive the tide-2 water level but `tidegradient1`, making the reported gradient inconsistent with the selected side's forcing."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L420-L428] (MED/inconsistent search extent) The local maximum bed elevation is computed only over imin:imax,jmin:jmax, but maxloc searches the entire row or column, so halo or non-boundary values can supply a distance unrelated to maxzbl in decomposed domains."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L157-L191] (MED/state/dispatch) The `tideloc` and nested `paulrevere` selections have no default branches, so an unsupported value can leave the four module-level tide corner values unchanged from an earlier timestep."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L558-L564] (MED/state consistency) Water levels are clipped upward to the bed after gradients have been assigned, but the corresponding tide gradients are not recomputed or neutralized where clipping changes the surface."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L230,L256,L286] (LOW/dimension contract) Boundary logic tests `par%ny` but indexes extents using `s%ny`, creating an unclear and potentially unsafe contract if parameter and allocated-grid dimensions ever differ."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

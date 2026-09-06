@@ -1,0 +1,34 @@
+{
+ "axis": "code",
+ "model": "XBeach",
+ "path": "trunk/src/xbeachlibrary/timestep.F90",
+ "source_sha256": "24f600029a975b520c837bbcdb0109853df0c6d6b14b00e198d315a9230e1578",
+ "lines_or_pages": 764,
+ "read_status": "complete",
+ "reader": "codex-R2",
+ "producer": "llm:openai/codex",
+ "read_method": "llm_full_read",
+ "artifact_class": "semantic_read",
+ "run_id": "xbeach-r2-XBeach-000-codex-01a05a9c-78d9-7eb0-9d9e-e5e019072cda",
+ "shard": "XBeach-000",
+ "round": "R2",
+ "content": {
+  "unresolved": [
+   "[L143-L158] (HIGH/uninitialized lifecycle state) timestep_init initializes the other counters and output flags but omits tpar%ith and tpar%outputh, which are subsequently read and incremented by outputtimes_update.",
+   "[L162-L168,L200-L205,L238-L243,L276-L285,L319-L328] (MED/unchecked interval arithmetic) Generated schedules divide by wavint/tintg/tintp/tintm/tinth and allocate from the result without local checks for zero, negative, or otherwise invalid intervals and time ranges.",
+   "[L184-L199,L222-L237,L260-L275,L303-L318] (MED/unchecked schedule count) File-supplied schedule counts are read as real values, rounded with nint, and used as allocation extents without rejecting negative, nonintegral, or unreasonable counts.",
+   "[L185,L223,L261,L304] (LOW/fixed-unit collision) All schedule files are opened on hard-coded unit 10 without checking whether that unit is already connected.",
+   "[L363-L406] (HIGH/duplicate schedule deadlock) For duplicate scheduled times, each output counter advances only once while tnext excludes all times equal to the current time, leaving the counter pinned on the duplicate and preventing that output category from matching later times.",
+   "[L363-L406] (MED/unsorted schedule inconsistency) Current-output tests follow each array's counter order while next-time selection takes a masked minval over the full array, so unsorted file schedules can be stepped to without being emitted and counters can become permanently misaligned.",
+   "[L437,L661-L668,L706-L710] (MED/implicit initialization contract) timestep's saved dtref has no explicit initial value and compute_dt initializes it only when it happens to equal zero or enters a t<=0 branch, making calls that begin at positive time depend on undefined saved state.",
+   "[L440,L456-L458,L681-L683] (LOW/undefined optional outputs) compute_dt returns before assigning present ierr or limtypeout when xcompute is false.",
+   "[L462-L469] (MED/zero-depth division) The cold-start timestep divides by sqrt(maxval(hh)*g) without a positive lower bound, despite the branch comment explicitly anticipating zero initialization, so an all-zero depth field yields an infinite or invalid timestep.",
+   "[L488-L523,L541-L574] (MED/unchecked numerical domain) Several active stability expressions take square roots of hu/hv and divide by spacing-derived sums without guarding negative depths or zero cell metrics, allowing NaN or zero-division results to contaminate timestep selection.",
+   "[L566-L574] (HIGH/dimensional timestep defect) In the 1D viscosity criterion mdx is a squared spacing but positive par%dy is assigned to mdy without squaring, unlike the 2D branch, producing a dimensionally inconsistent and incorrect stability limit.",
+   "[L551-L554,L581-L583] (LOW/stale limiter diagnostics) Bed-celerity and sediment-diffusion reductions of par%dt do not update ilim, jlim, limtype, or dtold, so instability diagnostics can attribute the limiting timestep to an earlier criterion.",
+   "[L595-L629] (MED/unchecked permeability division) Groundwater stability calculations divide directly by par%kx and par%ky without local positivity checks when their respective branches are enabled.",
+   "[L632-L647] (MED/serial/MPI behavior inconsistency) The MPI path skips angular wave limiting when ntheta<=1, whereas the serial path applies it for every nonstationary model, potentially forcing a zero or spurious dt from a meaningless dtheta in the single-direction case.",
+   "[L708-L710] (LOW/undefined optional output) timestep itself returns before defining a present INTENT(OUT) ierr when xcompute is false."
+  ]
+ }
+}

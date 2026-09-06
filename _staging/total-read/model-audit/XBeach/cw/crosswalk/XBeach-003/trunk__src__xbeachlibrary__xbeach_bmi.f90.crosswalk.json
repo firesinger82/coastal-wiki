@@ -1,0 +1,166 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-003",
+ "source_path": "trunk/src/xbeachlibrary/xbeach_bmi.f90",
+ "source_sha256": "47408c2943edd5a7feff23fa0bc0b0f17f7610747044a354d55fde16232baa5b",
+ "base_run_id": "xbeach-r1-XBeach-003-codex-01a05a73-c44f-73d1-9740-9462379b36f1",
+ "audit_run_id": "xbeach-r2-XBeach-003-codex-01a05ac0-7e92-7031-ae47-79d30eab7b40",
+ "base_record_file": "a17a4b4ffaf744cf39f9d26249fbcb3b33cc0834b4c727c96471ba337b804766.json",
+ "audit_record_file": "a17a4b4ffaf744cf39f9d26249fbcb3b33cc0834b4c727c96471ba337b804766.json",
+ "base_record_sha256_bytes": "491b1bf8e8a1c14eeca53e544b9aa856610c2e6c29a689ee49038efdb9b49db1",
+ "audit_record_sha256_bytes": "b7367b5d7d468c54ef4f7ca52139a1151f02e7deb3980ff29a90dd9aff64103e",
+ "base_finding_count": 6,
+ "audit_finding_count": 8,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L43-L56] (HIGH/ignored configuration) BMI initialize converts the supplied configuration-file path but never uses it, so initialization silently reads the library's default input rather than the requested file."
+   ],
+   "audit_member_text": [
+    "[L43-L56] (HIGH/api-contract) initialize converts the caller-supplied configuration path into configfile but never uses it, so the BMI configuration argument has no effect on model initialization."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "[L146-L153] (MED/null pointer handling) set_current_time converts and dereferences the incoming C pointer without checking for C_NULL_PTR."
+   ],
+   "audit_member_text": [
+    "[L141-L154] (MED/ffi/pointer-contract) set_current_time converts and dereferences an arbitrary incoming c_ptr without checking c_associated, so a null pointer from the C caller is invalid."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B2",
+    "B3"
+   ],
+   "base_member_text": [
+    "[L99-L114,L132-L135] (MED/undefined query output) Unknown variable names cause get_var_type and get_var_rank to return without initializing their output arguments or providing an error status."
+   ],
+   "audit_member_text": [
+    "[L88-L114] (MED/uninitialized-output) get_var_type returns without setting c_type_name when chartoindex fails and also converts an uninitialized type_name for an unexpected type code.",
+    "[L118-L136] (MED/uninitialized-output) get_var_rank returns without assigning the output rank when the requested variable name is unknown."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [
+    "[L178-L188] (MED/getter side effect) get_time_step invokes compute_dt with fresh local counters instead of merely returning an established step, so a query can mutate timestep state and may differ across repeated calls."
+   ],
+   "audit_member_text": [
+    "[L178-L189] (MED/query-side-effect) The nominal get_time_step query calls compute_dt on live model state before returning par%dt, so its read-only BMI contract is unclear and repeated queries may alter timestep-related state."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L67-L77] (HIGH/lost error status) update overwrites the executestep return code with outputext's return code, allowing a failed model step to be reported as successful."
+   ],
+   "audit_member_text": [
+    "[L61-L77] (HIGH/error-propagation) update overwrites the executestep return code with outputext's return code unconditionally, masking a failed timestep whenever outputext returns success."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L150-L167,L178-L189,L195-L199] (HIGH/inconsistent time units) With morfacopt enabled, current and end time are exposed in morphology-scaled time while get_time_step returns unscaled par%dt and update accepts its dt without inverse scaling, violating a single BMI time-unit contract."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L138-L140] (HIGH/build-completeness) The module includes get_var_shape.inc, get_var.inc, and set_var.inc, but none is present anywhere under source_code, leaving the BMI variable API dependent on missing generated artifacts."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L150-L166,L195-L199] (LOW/time-scaling-contract) Morphological time conversion silently substitutes 1 for any morfac below 1, making set/get time behavior diverge from the configured factor without reporting invalid configuration."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

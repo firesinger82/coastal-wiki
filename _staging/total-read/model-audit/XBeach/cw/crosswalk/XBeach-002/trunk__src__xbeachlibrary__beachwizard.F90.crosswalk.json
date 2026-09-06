@@ -1,0 +1,412 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-002",
+ "source_path": "trunk/src/xbeachlibrary/beachwizard.F90",
+ "source_sha256": "94039fd11198d6c41102e44687abe0bedfa8def6536a3b9d6a9b0a72928deb32",
+ "base_run_id": "xbeach-r1-XBeach-002-codex-01a05a67-e2d6-7e11-b2eb-ed7a4a8bc0af",
+ "audit_run_id": "xbeach-r2-XBeach-002-codex-01a05ab3-8036-7660-84fb-58c476606a27",
+ "base_record_file": "45df58f86f4e332dd69b72264f5f11234a8792f17e81a53bb7cf8e0f501f027f.json",
+ "audit_record_file": "45df58f86f4e332dd69b72264f5f11234a8792f17e81a53bb7cf8e0f501f027f.json",
+ "base_record_sha256_bytes": "c3c17024348ca436413b305c55f004dd6888edb3d80274c20536e0f760b1b014",
+ "audit_record_sha256_bytes": "cbc2eb56630691c3bd95abb4b1b4f19e8ce6532632da14561c39baef06d6ff65",
+ "base_finding_count": 9,
+ "audit_finding_count": 22,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "[L494-L523, L578] (MED/disabled-input-contract) The entire uncertainty-file read path is commented out, leaving statuserr at zero even when fnameerr is supplied and causing configured observation-error maps to be silently ignored."
+   ],
+   "audit_member_text": [
+    "[L207-L225, L494-L523] (MED/disabled-input) The uncertainty-map read path is entirely commented out and statuserr therefore remains zero, so configured fnameerr files are silently ignored."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "[L220-L224, L733-L756] (HIGH/uninitialized-state) When bwdefaults.inp is absent only the scalar defaults are assigned, so an absent shoreline source can leave bw%sigS uninitialized even though errS and sig2obs use it unconditionally."
+   ],
+   "audit_member_text": [
+    "[L194-L225, L716, L744] (HIGH/uninitialized-uncertainty) When bwdefaults.inp is absent only scalar defaults are set, not the allocated sig arrays, and sigS is subsequently used even when no shoreline source caused it to be filled."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [
+    "[L431-L441, L460-L462] (MED/bounds-validation) ntimesnew is accepted without a 1..999 bound, while the time-advance loop always reads itimnew+1 and relies on a sentinel that cannot be placed safely for 1000 or more records."
+   ],
+   "audit_member_text": [
+    "[L424-L441, L460-L463] (HIGH/array-bounds) The image schedule count is not constrained to the 1000-row arrays, and the time-advance loop can read itimnew+1 beyond the final slot."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B13"
+   ],
+   "base_member_text": [
+    "[L280-L281, L309-L310] (MED/dimensional-consistency) The celerity expression adds dimensional Hrms to dimensionless rk*s%hh inside tanh, making the implemented dispersion relation physically unclear."
+   ],
+   "audit_member_text": [
+    "[L279-L281, L308-L310] (MED/dimensional-consistency) The celerity formula adds dimensional Hrms directly to dimensionless rk times hh inside TANH, indicating an inconsistent or mistranscribed dispersion expression."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B15"
+   ],
+   "base_member_text": [
+    "[L672-L682] (HIGH/nontermination) The backtracking loop has no guard for zero dsc or zero/invalid averaged L1, so disfac can be zero and backdis can fail to advance indefinitely."
+   ],
+   "audit_member_text": [
+    "[L668-L682] (HIGH/nontermination/numerical-domain) The backward-distance loop divides by an unchecked average wavelength and has no progress guard, so zero or nonpositive dsc or L1 can make disfac invalid or leave backdis unchanged indefinitely."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B11"
+   ],
+   "base_member_text": [
+    "[L293-L339, L570-L574] (HIGH/wrong-destination/uninitialized-data) Source 4 is documented and processed as observed wavenumber data but assim_rd stores it in bw%cobs rather than bw%kobs, after which bw%kobs is read without any visible initialization."
+   ],
+   "audit_member_text": [
+    "[L293-L339, L570-L574] (HIGH/wrong-destination) The wavenumber source is copied into cobs instead of kobs, after which uninitialized kobs values drive the celerity residual and uncertainty calculations."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [
+    "B17"
+   ],
+   "base_member_text": [
+    "[L688-L705] (MED/singular-formula) Hb and its derivative divide by or evaluate singular hyperbolic ratios at s%k or kh without a positive lower bound, so zero-wavenumber cells can generate invalid values."
+   ],
+   "audit_member_text": [
+    "[L687-L706] (HIGH/singular-wave-derivative) Hb and dHbdh divide by k and by sinh(kh) times cosh(kh) plus kh without protecting the common zero-k or zero-kh limit."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L272-L281, L301-L310] (MED/invalid-floating-point) The dispersion calculation divides by s%hh over every grid point before the wet-cell mask is tested, so zero-depth dry cells can produce division by zero or NaNs."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A8"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L753-L756] (LOW/unclear-time-scaling) Nassim is computed as tstop/dt although the adjacent change note says it was changed to tstop/wavint, leaving the intended assimilation-count scaling contract contradictory."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L15-L39, L484-L485] (HIGH/pointer-state) Pointer components have no default NULL initialization, yet ASSOCIATED is called on fobs1 before any guaranteed association-status definition."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L80-L103] (HIGH/allocation-lifecycle) bwinit unconditionally allocates eight space-state arrays and provides no deallocation or already-allocated guard, so a repeated initialization fails."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L148-L166] (LOW/saved-shape-lifecycle) Saved Beach Wizard arrays are allocated only on first use and never resized or released, making reuse with a different grid shape unsafe."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L89-L100, L105-L115, L375-L379, L589-L604] (MED/MPI-contract) Only bwinit is explicitly master-only while assimilation and update routines have no matching rank guard, leaving non-master allocation and state-update requirements unclear."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L428-L446] (MED/library-termination) A missing assimilation information file executes STOP inside library code rather than returning a diagnosable error to the caller."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B8"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L475-L489, L585] (MED/I/O-error-path) Header-read errors jump past CLOSE, potentially leaking unit 31 and leaving partially replaced observation state."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B9"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L476-L487, L527-L548] (HIGH/input-validation/indexing) Observation-grid dimensions and spacings are used for allocation, division, MOD, and indices that assume nx and ny are at least three without validating positive dx, dy, nx, or ny."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B10"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L535-L557] (MED/spatial-extrapolation) All model points outside the observation footprint are clamped to an interior observation cell rather than marked missing, causing implicit constant extrapolation over the entire model domain."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B12"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L264-L335] (HIGH/numerical-domain) Celerity and wavenumber calculations divide by unchecked tradar, hh, rk, and rk plus sigK and are evaluated over dry cells before any wet-cell guard."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B14"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L254-L340, L733-L756] (HIGH/unused-assimilation-sources) Bathymetry, celerity, and wavenumber observations are read or converted, but the final observation variance and depth correction combine only dissipation and shoreline terms, so those advertised sources cannot affect assimilation."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B16"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L668-L686] (HIGH/one-dimensional-bounds) For ny equal to zero the h2 loop is empty and the subsequent assignments reference columns 2 and 0 of a one-column allocation."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B18"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L699, L753-L764] (HIGH/time-parameter-division) Assimilation divides by Trep, dt, and tstop without requiring these time parameters to be positive and nonzero."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B19"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L753-L756, L774] (HIGH/zero-denominator) The weighting and depth-correction formulas lack guards for zero combined variance and for the all-zero dDdh case, where the latter evaluates an explicit zero-over-zero."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B20"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L778-L791] (MED/update-limit-bypass) The dissipation-derived depth change is capped before the shoreline correction is added, allowing the final dassim applied to the bed to bypass the stated ten-percent depth limit."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B21"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L624-L662] (LOW/allocation-overhead) Local allocatable work arrays are tested for allocation and allocated on every call but automatically deallocate on return, making the guard ineffective and imposing repeated large allocation cost."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

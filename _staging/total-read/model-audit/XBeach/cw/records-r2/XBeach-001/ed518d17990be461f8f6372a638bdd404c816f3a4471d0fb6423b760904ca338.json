@@ -1,0 +1,41 @@
+{
+ "axis": "code",
+ "model": "XBeach",
+ "path": "trunk/src/xbeachlibrary/waveparamsnew.F90",
+ "source_sha256": "5d75862e40a1bcf86f40315585f528b9438837a29bf66538f9fc5fd9e5d76113",
+ "lines_or_pages": 3551,
+ "read_status": "complete",
+ "reader": "codex-R2",
+ "producer": "llm:openai/codex",
+ "read_method": "llm_full_read",
+ "artifact_class": "semantic_read",
+ "run_id": "xbeach-r2-XBeach-001-codex-01a05aa6-f6db-7991-802e-4d57ae64a826",
+ "shard": "XBeach-001",
+ "round": "R2",
+ "content": {
+  "unresolved": [
+   "[L125-L131,L331-L332] (MED/state/output contract) The routine increments bccount before the final-timestep early return, and that return leaves the INTENT(OUT) curline unassigned while also consuming a boundary-condition sequence number.",
+   "[L172-L180,L593-L607,L1092,L1180-L1206] (HIGH/allocation/runtime) The external-time catch-up loop can call read_spectrum_input repeatedly on the same specin element, but each reader unconditionally allocates already-associated pointer components, causing an allocation failure when more than one spectrum interval is skipped.",
+   "[L410-L422] (MED/input validation) The WBCTYPE select has no default case, so an unsupported value returns with specin uninitialized and later code dereferences its pointer components.",
+   "[L489,L641,L1495,L1512,L1637] (HIGH/numerical robustness) Hm0=0 is explicitly accepted, but the resulting zero spectrum reaches unguarded normalizations and weighted means whose denominators are zero.",
+   "[L965-L998,L1038-L1046,L1311-L1335] (HIGH/spectrum-axis handling) The SWAN reader acknowledges that frequencies are often non-monotone but performs only no-op assignments, after which interpolation and integration assume ordered endpoints and can reject or negatively integrate a descending frequency axis.",
+   "[L1015-L1046,L1189-L1203,L1132-L1143,L1239-L1250] (MED/bounds/input validation) Both spectrum readers index angular entries 1 and 2 without enforcing nang>=2, so a one-direction input can read out of bounds.",
+   "[L1567-L1572] (HIGH/scientific formula) The nonhydrostatic cutoff frequency is computed as g*k*tanh(kh)/(2*pi), omitting the square root required by the dispersion relation and yielding dimensionally incorrect frequency filtering.",
+   "[L1637-L1657] (MED/sampling/CDF) The PDF is normalized by its simple sum but its CDF is then formed with trapezoidal half-endpoint weights, leaving the last CDF value below one and sending some uniform random draws outside the CDF interpolation range.",
+   "[L1741-L1749] (MED/numerical robustness) tpDcalc divides by unguarded spectral moments, so an empty threshold mask or zero-energy spectrum produces an undefined representative period.",
+   "[L1866-L1877] (LOW/time-axis contract) rtin is stored as tslen*dtin although the generated tin axis ends at (tslen-1)*dtin, creating a one-step inconsistency in the internal duration.",
+   "[L1939-L1959] (HIGH/numerical robustness) Wave-train variance rescales by (hm0/hm0post)^2 without guarding hm0post=0, which occurs when the selected component frequency range contains no energy for a location.",
+   "[L2064-L2068] (MED/numerical robustness) Spatial spectrum interpolation rescales by sfimp/sfnow without guarding sfnow=0.",
+   "[L2006-L2098] (HIGH/allocation/runtime) wp%PRindex is allocated inside the offshore-point loop, so the second iteration attempts to allocate an already-associated pointer.",
+   "[L299-L321,L1932-L1938,L2584-L2588] (MED/resource management) Cleanup deallocates pointer-containing parents without freeing their pointed-to Sf arrays and never deallocates vits, duits, or dvits, leaking substantial memory on each regenerated boundary condition.",
+   "[L2990-L3008] (HIGH/boundary-file schema) When time-step interpolation is active, qinterp has only three fields and the writer omits the fourth elevation field even though the direct-access record length and non-interpolated path use four fields.",
+   "[L3226-L3242,L3407-L3418,L3434-L3441] (HIGH/branch-condition/runtime) Allocation of six-field 3D arrays requires nonhq3d==1 and nhlay>0, but later use tests only nonhq3d==1, so nonhq3d==1 with nhlay<=0 accesses unallocated qx/qy arrays and fields 5-6 of four-field arrays.",
+   "[L3348-L3350] (HIGH/indexing/phase) Second-order component phases use Findex(1)+ii rather than Findex(1)+ii-1 (or Findex(ii)), shifting every primary component by one frequency bin and reading beyond the generated-component span for ii=K.",
+   "[L3341-L3342] (MED/filtering/indexing) The high-wavenumber cutoff tests only k3(m,1), but rows m>K+1 populate columns ii>1 while column 1 remains zero, so those higher rows evade the cutoff.",
+   "[L3411-L3417] (HIGH/scientific formula) The upper-layer qx2/qy2 ratios subtract sinh(KKx) or sinh(KKy) with no depth factor, unlike the surrounding dimensionless sinh(k*depth) terms, producing dimensionally inconsistent layer partitioning.",
+   "[L3524-L3529] (HIGH/layer averaging) The 3D second-order update divides the first-layer flux by z (negative) and the second by h0+z, inconsistent with the layer thicknesses and with the earlier short-wave implementation that uses h0+z for layer 1 and -z for layer 2.",
+   "[L3436-L3441,L3524-L3530] (MED/missing state update) Second-order 3D generation computes qy1 and qy2 fields but the accumulation branch updates only uits and duits, leaving vits and dvits without the corresponding transverse second-order contribution.",
+   "[L3499-L3517] (HIGH/boundary-file schema) The second-order interpolated q-file path repeats the three-field qinterp versus four-field record mismatch, omitting elevation when dtchanged is true."
+  ]
+ }
+}

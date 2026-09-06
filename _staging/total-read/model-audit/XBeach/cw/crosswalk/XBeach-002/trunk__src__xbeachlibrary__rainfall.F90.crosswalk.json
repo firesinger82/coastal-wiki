@@ -1,0 +1,107 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-002",
+ "source_path": "trunk/src/xbeachlibrary/rainfall.F90",
+ "source_sha256": "449f0024b36fc7235bcf96d45639de046e2e2eb9a2e6083d5acc04f4486d06d1",
+ "base_run_id": "xbeach-r1-XBeach-002-codex-01a05a67-e2d6-7e11-b2eb-ed7a4a8bc0af",
+ "audit_run_id": "xbeach-r2-XBeach-002-codex-01a05ab3-8036-7660-84fb-58c476606a27",
+ "base_record_file": "7227b81ea6ff11aa579ff1ee31d27fe4e8d7c405c8485a52b306059d80520104.json",
+ "audit_record_file": "7227b81ea6ff11aa579ff1ee31d27fe4e8d7c405c8485a52b306059d80520104.json",
+ "base_record_sha256_bytes": "b531913f0587b5c09fb8c08673c355d2a0283234e82a12dc4705e7229801f621",
+ "audit_record_sha256_bytes": "8257160af1ccbcfa468fd4d7438965c760b5a800c4d292ba25b0f4f4c9207fca",
+ "base_finding_count": 4,
+ "audit_finding_count": 3,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L86-L92] (MED/initialization ordering) The sole initialization of constantRainfall on non-master ranks is conditional on rainfall_update first being called with t<=dt, leaving it undefined if the first update occurs later."
+   ],
+   "audit_member_text": [
+    "[L22-L25,L86-L92] (MED/MPI initialization contract) Only the master initializes constantRainfall, and workers receive it only when the first update satisfies t<=dt, so restart or nonstandard first-call timing can leave the worker flag undefined."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "[L36-L60,L92-L97] (MED/input-domain contract) The time-series path passes nrainfallrate and the file timestamps directly to LINEAR_INTERP without locally requiring at least a usable number of records or ordered, distinct times."
+   ],
+   "audit_member_text": [
+    "[L36-L60,L92-L97] (MED/unchecked interpolation input) The file-driven path passes nrainfallrate and timestamps directly to LINEAR_INTERP without checking that at least the required number of records exists or that times are ordered."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L22-L25,L86-L100] (HIGH/MPI initialization contract) Non-master ranks return before rainfallrate and the input arrays are allocated, while rainfall_update can subsequently interpolate into those components; this file only broadcasts the scalar constantRainfall flag."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L41-L54] (LOW/file-error handling) The rainfall file open has no iostat check, and the read-error branches rely on report_file_read_error to terminate before partially filled arrays are used."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L25,L31-L37,L66-L67] (LOW/reinitialization lifecycle) rainfall_init allocates all rainfall arrays unconditionally and provides no cleanup or already-allocated guard for a second initialization."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

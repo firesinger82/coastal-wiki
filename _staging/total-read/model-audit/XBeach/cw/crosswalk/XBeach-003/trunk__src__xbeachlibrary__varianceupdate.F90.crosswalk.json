@@ -1,0 +1,243 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-003",
+ "source_path": "trunk/src/xbeachlibrary/varianceupdate.F90",
+ "source_sha256": "04276e4292cef22fca94de2f725ee5ebe9abec9e88effb55b670296c9f0a5789",
+ "base_run_id": "xbeach-r1-XBeach-003-codex-01a05a73-c44f-73d1-9740-9462379b36f1",
+ "audit_run_id": "xbeach-r2-XBeach-003-codex-01a05ac0-7e92-7031-ae47-79d30eab7b40",
+ "base_record_file": "4201530ad955f9bee6b529399a23d69eb45562a6224020027bc04270de92535a.json",
+ "audit_record_file": "4201530ad955f9bee6b529399a23d69eb45562a6224020027bc04270de92535a.json",
+ "base_record_sha256_bytes": "ee840a02bd310342d1ebfe01dbb746bea78d3a74bbe647910ee03f54ed8b90d9",
+ "audit_record_sha256_bytes": "a127bac073f86a677cde1838e28669a6011883fad3250b525f62764c84cea236",
+ "base_finding_count": 10,
+ "audit_finding_count": 9,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A9"
+   ],
+   "audit_ids": [
+    "B8"
+   ],
+   "base_member_text": [
+    "[L504-L523] (LOW/bounds contract) makecrossvector uses caller-supplied mg directly as a row or column index without validating it against the selected array."
+   ],
+   "audit_member_text": [
+    "[L499-L523] (MED/bounds-rank-contract) makecrossvector indexes every requested variable through r2/i2 at mg and assigns it into a caller section without validating variable rank, mg bounds, or destination extent."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "[L337-L351,L441-L477] (HIGH/state not reset) The saved sine and cosine accumulators used for thetamean are never cleared by clearaverage, so each nominal averaging period includes all prior periods."
+   ],
+   "audit_member_text": [
+    "[L337-L351,L441-L477] (HIGH/state-reset) The saved circular accumulators tvar2d_sin and tvar2d_cos are never reset by clearaverage, so later averaging periods include all prior periods even though the published mean arrays are cleared."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [
+    "[L389-L412,L423-L424] (HIGH/unsupported integer mean) Although initialization accepts integer rank-3 and rank-4 mean variables, makeaverage unconditionally uses real components and real rotation paths for those ranks."
+   ],
+   "audit_member_text": [
+    "[L389-L412] (HIGH/type-contract) Rank-3 averaging always sizes temporaries from t%r3 and calls the real grid-rotation path even though means_init explicitly permits rank-3 integer variables, making integer selections dereference the wrong component."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "[L196-L201,L218-L225,L242-L251] (HIGH/wrong array component) Local mean initialization sizes integer rank-2/3/4 variables through the real pointer components r2/r3/r4 instead of i2/i3/i4, which can dereference unassociated pointers."
+   ],
+   "audit_member_text": [
+    "[L199-L201,L222-L225,L247-L251] (HIGH/wrong-component) All local integer-array initialization branches obtain dimensions from the real pointer components r2/r3/r4 instead of i2/i3/i4, which may be unassociated and is not the selected variable storage."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L83-L90,L187] (MED/unchecked mnemonic lookup) Mean-variable names are converted to indices and used immediately without checking for an unknown mnemonic."
+   ],
+   "audit_member_text": [
+    "[L82-L94] (MED/input-validation) means_init passes chartoindex results directly to index allocation and lookup without rejecting an unknown mean-variable index."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [
+    "[L413-L415] (HIGH/wrong array component) Rank-4 averaging sizes its first three dimensions from t%r3 rather than t%r4, so a normal rank-4 variable can fail before accumulation begins."
+   ],
+   "audit_member_text": [
+    "[L413-L435] (HIGH/wrong-rank-component) Rank-4 temporary dimensions 1 through 3 are taken from t%r3 rather than t%r4, so a normal rank-4 variable can dereference an unassociated rank-3 pointer or allocate the wrong shape."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L330-L351] (HIGH/angle-unit mismatch) When rotation is enabled gridrotate converts thetamean to degrees, but makeaverage immediately passes those values to SIN and COS as though they were radians."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L351-L354] (HIGH/representation contract mismatch) The live code stores the circular mean directly as atan2(sine,cosine) while the former packed sine/cosine representation is commented out, leaving downstream consumers that decode the packed representation incompatible."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L337-L387] (MED/circular-statistics inconsistency) thetamean receives a circular mean but its variance, minimum, and maximum are still computed with linear angle arithmetic, which is discontinuous across the direction wrap."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A8"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L324-L329,L378-L385,L394-L409,L417-L432] (MED/numerical stability) The variance recurrence divides a cross term by an epsilon-substituted old mean, so cancellation near a zero mean can strongly amplify roundoff despite the nominal zero guard."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L94-L185,L194-L267] (MED/rank-contract) Initialization handles only ranks 2 through 4 and has no default rejection, leaving unsupported requested ranks with unallocated accumulator pointers."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L313] (MED/arithmetic) The averaging weight evaluates par%dt/par%tintm before max can clamp it, so a zero averaging interval still causes division by zero."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L337-L351] (MED/numerical-guard) The near-zero circular-mean guard computes numeps*sign(tvar2d_cos,1.d0), which remains zero when cosine is zero and is far below numeps otherwise, so it does not reliably prevent the invalid atan2(0,0) case."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

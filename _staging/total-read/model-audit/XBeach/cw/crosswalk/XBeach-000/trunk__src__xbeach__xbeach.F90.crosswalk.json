@@ -1,0 +1,47 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-000",
+ "source_path": "trunk/src/xbeach/xbeach.F90",
+ "source_sha256": "5b8347e6df5b68eceb7127964a6424cd8a14aa463aca949827b1051d45c634d6",
+ "base_run_id": "xbeach-r1-XBeach-000-codex-01a056f9-9d41-7cf1-972b-2992f7eaf5c6",
+ "audit_run_id": "xbeach-r2-XBeach-000-codex-01a05a9c-78d9-7eb0-9d9e-e5e019072cda",
+ "base_record_file": "30597fe7d6b7a6632f99564dca2f10a22e3500fba5346a81031cae81e68f2da1.json",
+ "audit_record_file": "30597fe7d6b7a6632f99564dca2f10a22e3500fba5346a81031cae81e68f2da1.json",
+ "base_record_sha256_bytes": "e47d93cc87111b5283f6bbb2dd57bc735cfaf153680ed71ba4116fc4ea1e2ad4",
+ "audit_record_sha256_bytes": "cf2674eaf915d97c7946f5cdd0842db7322ccae7f52e07b564705f2725aa9804",
+ "base_finding_count": 1,
+ "audit_finding_count": 3,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0",
+    "B1",
+    "B2"
+   ],
+   "base_member_text": [
+    "[L19-L28] (HIGH/unchecked status / lifecycle) All return codes from initialization, parameter lookup, time stepping, and output are overwritten without validation, so failed initialization can leave t or tstop undefined and failed steps can still loop or emit output."
+   ],
+   "audit_member_text": [
+    "[L14-L32] (HIGH/ignored lifecycle errors) Every return code after readinput is overwritten without inspection, so initialization, parameter lookup, step, output, or finalization failures cannot stop or alter the driver.",
+    "[L22-L24] (HIGH/undefined loop control) If either getdoubleparameter call fails, the ignored status leaves t or tstop potentially undefined before the main-loop comparison.",
+    "[L24-L29] (MED/nonprogress loop) The main loop has no guard that executestep successfully advances t, so a failed or zero-timestep step can run forever because its status is ignored."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

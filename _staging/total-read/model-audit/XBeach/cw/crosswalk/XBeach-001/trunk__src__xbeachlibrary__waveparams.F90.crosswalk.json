@@ -1,0 +1,449 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-001",
+ "source_path": "trunk/src/xbeachlibrary/waveparams.F90",
+ "source_sha256": "f224c5c31d15b2e6e9615c9d82bfb4d59aed16039b35c7399422177a7c148cfc",
+ "base_run_id": "xbeach-r1-XBeach-001-codex-01a05a5b-a17d-7cd0-8b9b-49a161c8810c",
+ "audit_run_id": "xbeach-r2-XBeach-001-codex-01a05aa6-f6db-7991-802e-4d57ae64a826",
+ "base_record_file": "427f08fae2a50aab680eb11415b28a8bd3c2ab893bacf0e6cec5ac7305021262.json",
+ "audit_record_file": "427f08fae2a50aab680eb11415b28a8bd3c2ab893bacf0e6cec5ac7305021262.json",
+ "base_record_sha256_bytes": "8ead653f45e68af7f902b3b6a2f7345ce12d0ed1df44f8a9aa993df614d7557d",
+ "audit_record_sha256_bytes": "e9ad3d6183e9e0faaaad06f61b70b4d61a85a8668014613cc66a2d9e4dc368fe",
+ "base_finding_count": 23,
+ "audit_finding_count": 15,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A11"
+   ],
+   "audit_ids": [
+    "B10"
+   ],
+   "base_member_text": [
+    "[L1280-L1337] (HIGH/uninitialized directional-bin indices) Nbin is never initialized, and a direction shifted once by 2π can still fall outside a computational sector narrower than 2π, leaving its bin entry undefined before maxval and nspr handling."
+   ],
+   "audit_member_text": [
+    "[L1280-L1314] (HIGH/uninitialized indexing) Nbin is never initialized and directions equal to the upper bin edge or still outside the opposite edge after wrapping receive no assignment before maxval and array indexing use."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A20"
+   ],
+   "audit_ids": [
+    "B14"
+   ],
+   "base_member_text": [
+    "[L1789-L1794] (HIGH/curvilinear rotation quadrant loss) Flux rotation derives its angle from atan(qy/max(qx,eps)), which replaces every negative qx with a positive epsilon and therefore gives incorrect quadrants and components."
+   ],
+   "audit_member_text": [
+    "[L1789-L1794] (HIGH/vector rotation) Curvilinear flux rotation derives direction with atan(qy/max(qx,eps)), which clamps negative qx and cannot preserve the correct quadrant."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A9",
+    "A21"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "[L1194-L1210] (HIGH/zero-energy rescaling) Hm0 correction divides by hm0now and directional-width construction divides by S0 without a zero-energy contract; the small S0 floor does not protect hm0now.",
+    "[L1922-L1932] (MED/zero spectral moment) Representative-period formulas divide by spectral moments without guarding zero energy or, for Tm-1,0, zero frequency."
+   ],
+   "audit_member_text": [
+    "[L260,L311,L1016-L1017,L1057-L1059,L1194-L1205,L1922-L1932] (HIGH/numerical robustness) Zero wave height is accepted but multiple subsequent spectral normalizations and representative-period calculations divide by zero."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L69-L86] (HIGH/non-master undefined state) testc is read only by the master but is tested on every rank to set saved reuse, with the corresponding broadcasts explicitly commented out."
+   ],
+   "audit_member_text": [
+    "[L69-L89,L107-L118,L478-L489,L502-L533,L613-L666,L801-L850] (HIGH/MPI state distribution) Master-only input populates testc, dimensions, switches, factors, and spectrum arrays while all corresponding broadcasts are commented out, leaving non-master ranks to branch on uninitialized values, allocate with undefined extents, and compute from undefined data."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A14"
+   ],
+   "audit_ids": [
+    "B12"
+   ],
+   "base_member_text": [
+    "[L1453-L1454] (LOW/standard-deviation denominator) The expressions size(array-1) return the full sample count rather than size(array)-1 as the surrounding standard-deviation comments imply."
+   ],
+   "audit_member_text": [
+    "[L1453-L1454] (LOW/statistics) The standard-deviation denominators use size(array-1), which equals N rather than the apparently intended N-1."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L93-L98] (LOW/unreachable cleanup) The CLOSE intended for the last timestep is placed after RETURN and can never execute."
+   ],
+   "audit_member_text": [
+    "[L93-L98] (LOW/resource management) The close(74) intended for the final timestep is unreachable after return, leaving a FILELIST unit open."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [
+    "[L465-L472, L627-L649] (HIGH/unbounded malformed-input loop) SWAN keyword searches perform reads without IOSTAT or EOF handling and can loop indefinitely on a truncated or malformed file."
+   ],
+   "audit_member_text": [
+    "[L465-L472,L627-L650] (MED/input error handling) The SWAN keyword-search loops have no I/O status checks, so malformed or truncated files can loop indefinitely or repeatedly read past EOF."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A19"
+   ],
+   "audit_ids": [
+    "B13"
+   ],
+   "base_member_text": [
+    "[L1703-L1709] (HIGH/direction quadrant loss) Difference-wave direction uses atan(KKy/KKx) with a signed epsilon instead of atan2, losing the correct quadrant whenever KKx is negative."
+   ],
+   "audit_member_text": [
+    "[L1703-L1709] (HIGH/direction calculation) Bound-wave direction uses atan(KKy/KKx) rather than atan2, losing the quadrant whenever KKx is negative."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [
+    "[L474-L593, L723-L749, L805-L881] (MED/spectral-axis validation) SWAN and VarDens inputs are used without requiring at least two directions or strictly increasing frequency and direction axes, despite direct second-element indexing, quadrature, and interpolation."
+   ],
+   "audit_member_text": [
+    "[L517-L593,L817-L835] (MED/bounds/input validation) Both SWAN and variance-density readers dereference theta(2) without validating ndir>=2."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "[L157-L162] (MED/empty weighted average) For a minimal 2-D grid with ny=1, the offshore-depth average uses empty slices and divides by a zero sum."
+   ],
+   "audit_member_text": [
+    "[L157-L162] (HIGH/bounds/numerical robustness) The ny>0 branch uses slices 2:ny, so ny=1 produces empty sums and division by zero instead of using the single offshore point."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "[L463-L498] (HIGH/unimplemented frequency conversion) SWAN RFREQ input is recognized but its conversion to absolute frequency is a no-op."
+   ],
+   "audit_member_text": [
+    "[L463-L498,L733-L765] (HIGH/spectrum-axis handling) The SWAN frequency-conversion branch is a no-op and never repairs descending or relative-frequency input before moment integration and frequency-range calculations assume an increasing absolute axis."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A8"
+   ],
+   "audit_ids": [
+    "B8"
+   ],
+   "base_member_text": [
+    "[L981-L1036, L1872-L1905] (HIGH/empty/degenerate spectral range) An empty threshold range makes M zero and a single-bin range makes K=1 and df=0, causing divisions by M, K-1, and df."
+   ],
+   "audit_member_text": [
+    "[L1016-L1036] (HIGH/degenerate spectrum) If the selected frequency range has one bin, M or wp%K can be one and the code divides by M, wp%K-1, and the resulting zero df."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L52-L91, L131-L152] (HIGH/fragile first-call initialization) Saved administration is initialized only when t equals dt within 1e-6, so hot starts or externally managed first calls can use undefined reuse, counter, bcendtime, rt, and dt."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L314-L378] (LOW/periodic-grid quadrature) The parametric directional grid includes both -π and π and normalizes them with a rectangular sum, double-counting the identical periodic endpoint."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A10"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L1222-L1244] (HIGH/FFT index bounds) Generated frequency indices are written into CompFn without verifying that they lie below the Nyquist slot or within the Nr-length FFT array."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A12"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L1342-L1352] (MED/zero window normalization) If no generated time sample is at or below rt, temp is all zero and the taper divides by maxval(temp)=0."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A13"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L1450-L1457] (HIGH/zero-envelope division) Directional envelope amplitude divides by stdeta without handling a zero total elevation signal."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A15"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L1497-L1510] (MED/boundary-type mismatch) Symmetric parametric energy redistribution tests WBCTYPE_PARAMS even though this generator is entered for WBCTYPE_PARAMETRIC, so the intended parametric branch may never run."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A16"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L1095-L1105, L1517-L1525] (HIGH/time-origin mismatch) The synthesized record starts at t=dt, but record 1 is written as the first boundary sample and the consumer treats direct-access record 1 as time zero."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A17"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L1637-L1668] (HIGH/singular interaction coefficients) Bound-wave group velocity and interaction coefficients divide by k3 and a resonance denominator without zero or near-resonance masks."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A18"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L1691-L1699] (HIGH/invalid complex logarithm) Bound-wave phase takes the logarithm of Fourier coefficients without excluding exact zero coefficients."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A22"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L1963-L1993] (MED/zero-frequency/depth dispersion) bc_disper evaluates 0/0 for zero angular frequency and divides by h without enforcing a positive boundary depth."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L164-L179] (MED/input validation) An unsupported wbctype silently skips every spectrum builder but execution still advances list state and writes administration entries from stale or uninitialized wave parameters."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B9"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L1057-L1091,L1150-L1178] (HIGH/CDF/indexing) The directional CDF starts above zero; a random draw below P(1) is extrapolated below theta(1), after which stepang can become zero and index S_array at column 0."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B11"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L1367-L1457] (HIGH/order-dependent physics) The total envelope and directional weights are computed inside the directional-bin loop before later bins' zeta values exist, so Ampzeta for early bins depends on processing order and omits later directional components."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

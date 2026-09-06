@@ -1,0 +1,187 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-002",
+ "source_path": "trunk/src/xbeachlibrary/solver.F90",
+ "source_sha256": "be97d575b3d32f1e0788b713123d0e0630997c2142e2d2990eab10201f9f90f7",
+ "base_run_id": "xbeach-r1-XBeach-002-codex-01a05a67-e2d6-7e11-b2eb-ed7a4a8bc0af",
+ "audit_run_id": "xbeach-r2-XBeach-002-codex-01a05ab3-8036-7660-84fb-58c476606a27",
+ "base_record_file": "aa505bca2a87bdc2ef07149463f4708fc1a52c1363b038e4123557411f4ac31b.json",
+ "audit_record_file": "aa505bca2a87bdc2ef07149463f4708fc1a52c1363b038e4123557411f4ac31b.json",
+ "base_record_sha256_bytes": "fda2a5c43b1b2141b6e6c7c620f2544bfd6e26ab7f51b9baff442cc9a2b60b1b",
+ "audit_record_sha256_bytes": "d46ef6198dd5eb02cd3df02287f1032bd2c97e3e4af7b0a2707dedbce8306811",
+ "base_finding_count": 9,
+ "audit_finding_count": 7,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [
+    "[L430-L442] (MED/singular factorization) The SIP factorization divides by 1+p1, 1+p2, and p3 without singularity checks; adding a fixed small value to p3 does not prevent exact or near cancellation."
+   ],
+   "audit_member_text": [
+    "[L430-L442] (MED/unchecked factorization denominator) SIP divides by 1+p1, 1+p2, and p3 without finite/near-zero checks; adding a fixed 1e-15 only to p3 does not protect the first two denominators or scale with the matrix."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L32-L38,L195-L201] (LOW/diagnostic accounting) itmin starts at zero and is updated with min(it,itmin), so the reported minimum iteration count can never become positive."
+   ],
+   "audit_member_text": [
+    "[L32-L35,L195-L198] (LOW/diagnostic accounting) itmin starts at zero and is updated with min(it,itmin), so its reported minimum can never become a positive observed iteration count."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "[L427-L460,L467-L510] (MED/zero-right-hand-side convergence) When bnorm is zero, epslin remains exactly zero and the strict rnorm<epslin test cannot succeed even for an exactly zero residual, forcing all maxit iterations."
+   ],
+   "audit_member_text": [
+    "[L427-L460,L467-L510] (MED/false nonconvergence) For bnorm=0 the convergence threshold is exactly zero and the strict rnorm<epslin test can never pass even for an exact zero residual, forcing maxit iterations and recording nonconvergence."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L113-L121,L188-L216] (MED/unsupported-option handling) An unrecognized solver value still marks the module initialized, and solver_solvemat then takes no branch and returns the input x unchanged without an error."
+   ],
+   "audit_member_text": [
+    "[L113-L121,L186-L216] (MED/solver selection contract) solver_init marks the module initialized even when par%solver matches neither supported branch, after which solver_solvemat silently performs no solve."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "[L30,L113-L121,L130-L136,L186-L193] (HIGH/lifecycle state) solver_free deallocates the work arrays but never resets initialized, so a later solve skips solver_init and uses deallocated storage."
+   ],
+   "audit_member_text": [
+    "[L130-L136,L186-L193] (HIGH/lifecycle/use-after-free) solver_free deallocates the work arrays but does not reset initialized, so a subsequent solve skips reinitialization and accesses unallocated residual/work storage."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "[L109-L121,L186-L216] (MED/configuration lifecycle) Solver parameters and workspace shape are captured only on the first initialization; repeated initialization can double-allocate, while later solves with changed dimensions or parameters silently reuse the old state."
+   ],
+   "audit_member_text": [
+    "[L109-L121,L186-L216] (MED/state/configuration lifecycle) Solver settings and array dimensions are captured only on the first initialization, with no protection against a later call using changed nx, ny, solver choice, or solver parameters."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "[L285-L299] (HIGH/singular pivot) The Thomas solver divides by each pivot with no protection in its normal caller; the optional fix is not passed, and even when enabled it only catches values below machine tiny rather than numerically small pivots."
+   ],
+   "audit_member_text": [
+    "[L285-L299] (MED/unchecked zero pivot) The Thomas solver divides by each pivot while the normal caller omits fixshallow, so zero or near-zero pivots are not guarded."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L404-L420,L472-L500] (HIGH/MPI loop-bound inconsistency) Under MPI the factorization and forward sweep use the reduced local imin/imax/jmin/jmax bounds, but backward substitution always sweeps 2:nx and 2:ny, including cells whose factors and residuals were not produced in that iteration."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A8"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L39-L41,L109-L111,L393-L397] (LOW/parameter-domain contract) The documented SIP stability range for alpha and positive accuracy/iteration settings is not enforced locally before those values control factorization and termination."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

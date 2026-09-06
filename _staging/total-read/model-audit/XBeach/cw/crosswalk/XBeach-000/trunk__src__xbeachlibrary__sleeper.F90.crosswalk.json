@@ -1,0 +1,73 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-000",
+ "source_path": "trunk/src/xbeachlibrary/sleeper.F90",
+ "source_sha256": "b72c55685d6429c2c93c19d3477e5caf9d8295f2d5d44d2eba5d22cabf9f7a70",
+ "base_run_id": "xbeach-r1-XBeach-000-codex-01a056f9-9d41-7cf1-972b-2992f7eaf5c6",
+ "audit_run_id": "xbeach-r2-XBeach-000-codex-01a05a9c-78d9-7eb0-9d9e-e5e019072cda",
+ "base_record_file": "1219bf4a9f0ae98ea3e1c4c1483d3936fdb6080c8f82f4833e8fa56f21d4649a.json",
+ "audit_record_file": "1219bf4a9f0ae98ea3e1c4c1483d3936fdb6080c8f82f4833e8fa56f21d4649a.json",
+ "base_record_sha256_bytes": "792d9df05548ac47a8773e4de2dcb53e050d5b6e344a70650752969cdeaee647",
+ "audit_record_sha256_bytes": "3ed945eb6c2a3d494c324047b0602b550ed9f60f4257fd95d44c39cdd2e3f2c8",
+ "base_finding_count": 2,
+ "audit_finding_count": 2,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L8-L13,L23-L26] (MED/C interoperability) POSIX usleep is declared as a void subroutine with a signed c_int argument even though the C function returns int and takes useconds_t, leaving the binding nonconforming and allowing negative or overflowing delays."
+   ],
+   "audit_member_text": [
+    "[L9-L12] (MED/foreign-interface mismatch) The POSIX usleep routine is declared as a C-interoperable subroutine even though the C API returns an integer status, so the binding does not match the external function's prototype."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L43-L52] (LOW/portability / timing semantics) The fallback calls a nonstandard sleep routine after truncating microseconds to whole seconds, so unsupported compilers silently lose subsecond throttling and depend on an undeclared platform-specific interface."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L23-L25,L28-L33,L36-L41,L44-L51] (LOW/input-contract inconsistency) myusleep does not reject negative durations and applies backend-dependent coercion, while the Intel/PGI paths also force zero or sub-millisecond requests to sleep at least one millisecond."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

@@ -1,0 +1,236 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-002",
+ "source_path": "trunk/src/xbeachlibrary/ship.F90",
+ "source_sha256": "3de3ac9f8f31964fb511e526cb401a0531fb0d523906f0623d0c2481014f25aa",
+ "base_run_id": "xbeach-r1-XBeach-002-codex-01a05a67-e2d6-7e11-b2eb-ed7a4a8bc0af",
+ "audit_run_id": "xbeach-r2-XBeach-002-codex-01a05ab3-8036-7660-84fb-58c476606a27",
+ "base_record_file": "dc872d026c447c8146632f223f2e4d9269fc0bbe474917ef4c29d8c9118b874b.json",
+ "audit_record_file": "dc872d026c447c8146632f223f2e4d9269fc0bbe474917ef4c29d8c9118b874b.json",
+ "base_record_sha256_bytes": "f2ed0c82be3b852dafbd5d26f31f22824bcb8555a7880e4cea8d01d4f9c77116",
+ "audit_record_sha256_bytes": "21f7b41957526c1654b26c0f2bee6130afb6995d2569bc467e7b3314e1201389",
+ "base_finding_count": 10,
+ "audit_finding_count": 10,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "[L278,L403-L410] (MED/saved lifecycle state) The saved firstship flag is cleared permanently after one call and has no reset path, so a subsequent simulation in the same process will skip its required initial surface adjustment."
+   ],
+   "audit_member_text": [
+    "[L278,L403-L410] (LOW/cross-instance persistent state) The saved firstship flag is never reset by ship_init, so a second model lifecycle in the same process will skip its initial water-level adjustment."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "[L210-L216,L297-L304] (MED/angular interpolation) Heading is represented as a wrapped angle and then interpolated linearly without unwrap handling, so tracks crossing the angle branch cut can rotate through the long arc."
+   ],
+   "audit_member_text": [
+    "[L297-L304] (MED/angular interpolation) Heading is linearly interpolated as an ordinary scalar after conversion to radians, with no unwrap handling for tracks that cross the 0/360-degree discontinuity."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [
+    "[L314-L315,L348-L350,L442-L446] (HIGH/coordinate-frame inconsistency) Hull rotation and force moments subtract ship-local xCG/yCG values from globally positioned x/y coordinates, causing lever arms and rotated elevations to depend on the domain origin."
+   ],
+   "audit_member_text": [
+    "[L346-L350,L442-L443] (HIGH/coordinate-frame inconsistency) World-coordinate ship-grid positions are combined with ship-local xCG/yCG when computing hull rotations and roll/pitch moments, making results depend on the global coordinate origin."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L167-L176,L208-L217] (HIGH/out-of-bounds input case) A track with fewer than two records is accepted by count_lines, but automatic heading calculation unconditionally accesses records 1 and 2 and the final record minus one."
+   ],
+   "audit_member_text": [
+    "[L167-L176,L210-L216] (HIGH/unchecked input length) When heading is derived, the code unconditionally accesses track samples 1 and 2 (and the final sample's predecessor), so a track with fewer than two records is out of bounds."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "[L130-L163,L330-L368] (HIGH/uninitialized hull state) When compute_motion is enabled, zhull is not initialized, yet shipwave reads it to compute pressure before the later placeholder motion update; with compute_force disabled it is never updated at all."
+   ],
+   "audit_member_text": [
+    "[L130-L160,L330-L358] (HIGH/uninitialized hull state) For compute_motion=1, zhull is allocated but not initialized before it is used to compute pressure and force; the hull geometry update occurs only afterward."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A8"
+   ],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [
+    "[L314-L315] (LOW/integer-centering ambiguity) The local-grid origin uses integer division nx/2 and ny/2, producing an asymmetric set of coordinates for odd grid dimensions."
+   ],
+   "audit_member_text": [
+    "[L314-L315] (LOW/grid centering) Integer division nx/2 and ny/2 makes odd-sized ship grids asymmetric about the declared center of gravity."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L116-L119,L305,L314-L315,L372-L373] (MED/degenerate-grid input) Ship-grid dx and dy permit zero, yet they define all coordinates and the cell area passed to grmap2, so a configured zero spacing creates a collapsed mapping grid."
+   ],
+   "audit_member_text": [
+    "[L116-L119,L305,L314-L315,L372-L373] (MED/degenerate geometry input) dx and dy accept zero even though they define ship-grid coordinates and the area supplied to grmap2, allowing a degenerate mapping grid."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "[L223-L240,L339-L350] (HIGH/uninitialized motion state) shipphi, shipchi, and shippsi are allocated but not initialized, while the unimplemented motion branch immediately uses shipchi and shipphi to position the hull."
+   ],
+   "audit_member_text": [
+    "[L223-L240,L346-L350] (HIGH/uninitialized motion state) shipphi, shipchi, and shippsi are allocated without initialization, while shipphi and shipchi are consumed during the first motion-enabled hull update."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L98-L145,L172-L176,L223-L258] (MED/lifecycle/allocation) ship_init allocates the ship pointer graph and global ship arrays without an allocated/associated guard or teardown, making repeated initialization unsafe."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A9"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L101-L107,L149-L156,L169-L206] (LOW/file-error handling) Ship-list, geometry, and track opens and reads have no visible status checks here, so malformed or short input depends entirely on helper-side termination behavior."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B8"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L333-L358] (MED/time-level inconsistency) For motion-enabled ships, pressure forces are computed from the previous hull position and only then is zhull updated, creating a one-step geometry/force lag even after initialization."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B9"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L434-L446] (LOW/quadrature inconsistency) Vertical force uses only ph(ix,iy) per panel while horizontal forces average edge pressures, introducing a directional inconsistency in pressure integration."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

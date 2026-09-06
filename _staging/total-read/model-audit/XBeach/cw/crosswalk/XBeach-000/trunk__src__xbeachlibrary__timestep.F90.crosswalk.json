@@ -1,0 +1,322 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-000",
+ "source_path": "trunk/src/xbeachlibrary/timestep.F90",
+ "source_sha256": "24f600029a975b520c837bbcdb0109853df0c6d6b14b00e198d315a9230e1578",
+ "base_run_id": "xbeach-r1-XBeach-000-codex-01a05a52-c773-7170-b126-7a88b545d9e6",
+ "audit_run_id": "xbeach-r2-XBeach-000-codex-01a05a9c-78d9-7eb0-9d9e-e5e019072cda",
+ "base_record_file": "1adb9322e1a775bc711f4b1db74b6e4db23e9dcf0eea3941fbf377cb05577812.json",
+ "audit_record_file": "1adb9322e1a775bc711f4b1db74b6e4db23e9dcf0eea3941fbf377cb05577812.json",
+ "base_record_sha256_bytes": "d93cdf258dd17be14fb8aa7adc053a5208e371a28b64de4a1d8bffcebadf7ac8",
+ "audit_record_sha256_bytes": "786992af0efb99d0c5f1f7e1e091e0a2f86ebf6ab138367f7f38be0711863c00",
+ "base_finding_count": 10,
+ "audit_finding_count": 15,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L201-L205,L239-L243,L277-L285,L320-L328] (HIGH/division-by-zero) Fixed schedule construction divides by tintg, tintp, tintm, or tinth even though the parameter reader allows each interval to be zero."
+   ],
+   "audit_member_text": [
+    "[L162-L168,L200-L205,L238-L243,L276-L285,L319-L328] (MED/unchecked interval arithmetic) Generated schedules divide by wavint/tintg/tintp/tintm/tinth and allocate from the result without local checks for zero, negative, or otherwise invalid intervals and time ranges."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [
+    "B10"
+   ],
+   "base_member_text": [
+    "[L566-L574] (HIGH/dimensional-consistency) In the 1D viscosity criterion mdx is a squared spacing, but when par%dy>0 mdy is assigned the unsquared spacing before mdx*mdy/(mdx+mdy), unlike the squared-spacing formulation used in 2D."
+   ],
+   "audit_member_text": [
+    "[L566-L574] (HIGH/dimensional timestep defect) In the 1D viscosity criterion mdx is a squared spacing but positive par%dy is assigned to mdy without squaring, unlike the 2D branch, producing a dimensionally inconsistent and incorrect stability limit."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A8"
+   ],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [
+    "[L706,L710,L661-L668] (HIGH/uninitialized-state) The SAVE variable dtref in timestep has no initialization before its first call to compute_dt, whose only initialization path requires dtref to compare equal to exactly zero."
+   ],
+   "audit_member_text": [
+    "[L437,L661-L668,L706-L710] (MED/implicit initialization contract) timestep's saved dtref has no explicit initial value and compute_dt initializes it only when it happens to equal zero or enters a t<=0 branch, making calls that begin at positive time depend on undefined saved state."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "[L184-L199,L222-L237,L260-L275,L303-L318,L363-L404] (MED/schedule-ordering) Schedule files are neither sorted nor checked for monotonicity, while current-event detection advances in file order but tnext uses MINVAL over all future values, so an unsorted file can schedule a time that the index-based detector will not emit."
+   ],
+   "audit_member_text": [
+    "[L363-L406] (MED/unsorted schedule inconsistency) Current-output tests follow each array's counter order while next-time selection takes a masked minval over the full array, so unsorted file schedules can be stepped to without being emitted and counters can become permanently misaligned."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [
+    "B11"
+   ],
+   "base_member_text": [
+    "[L552-L553,L581-L583] (LOW/limiter-diagnostic) Bed-celerity and sediment-diffusion reductions of par%dt do not update dtold, ilim, jlim, or limtype, so a later timestep-collapse report can attribute the limiting condition to the wrong cell/type."
+   ],
+   "audit_member_text": [
+    "[L551-L554,L581-L583] (LOW/stale limiter diagnostics) Bed-celerity and sediment-diffusion reductions of par%dt do not update ilim, jlim, limtype, or dtold, so instability diagnostics can attribute the limiting timestep to an earlier criterion."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L103-L116,L146-L157] (HIGH/uninitialized-state) timestep_init initializes four counters and four specific output flags but omits ith and outputh, which are later used to index tph and determine output."
+   ],
+   "audit_member_text": [
+    "[L143-L158] (HIGH/uninitialized lifecycle state) timestep_init initializes the other counters and output flags but omits tpar%ith and tpar%outputh, which are subsequently read and incremented by outputtimes_update."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "[L184-L199,L222-L237,L260-L275,L303-L318] (MED/schedule-validation) File-supplied schedule counts are obtained by NINT from a real value with no nonnegative/integer validation, permitting negative allocation extents or a silently rounded record count."
+   ],
+   "audit_member_text": [
+    "[L184-L199,L222-L237,L260-L275,L303-L318] (MED/unchecked schedule count) File-supplied schedule counts are read as real values, rounded with nint, and used as allocation extents without rejecting negative, nonintegral, or unreasonable counts."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L400-L408] (LOW/empty-reduction-contract) outputtimes_update relies on MINVAL over zero-sized arrays and all-false masks returning the huge-value identity; the subsequent special-case comparison checks only huge(tpg), making this behavior implicit and compiler-semantics-sensitive."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L462-L475] (MED/empty-domain) Initial CFL calculations apply MINVAL/MAXVAL to stencil slices without checking that ranges_init produced nonempty ranges, which can occur for very small local MPI subdomains and yield reduction identities or invalid square roots."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A9"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L652-L678,L712-L727] (MED/nonfinite-timestep) No explicit positive/finite guard is applied to computed or caller-supplied dt before CEILING, time advancement, and dtref/dt ratio checks, so zero, NaN, or infinity can propagate into control logic."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L185,L223,L261,L304] (LOW/fixed-unit collision) All schedule files are opened on hard-coded unit 10 without checking whether that unit is already connected."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L363-L406] (HIGH/duplicate schedule deadlock) For duplicate scheduled times, each output counter advances only once while tnext excludes all times equal to the current time, leaving the counter pinned on the duplicate and preventing that output category from matching later times."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L440,L456-L458,L681-L683] (LOW/undefined optional outputs) compute_dt returns before assigning present ierr or limtypeout when xcompute is false."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B8"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L462-L469] (MED/zero-depth division) The cold-start timestep divides by sqrt(maxval(hh)*g) without a positive lower bound, despite the branch comment explicitly anticipating zero initialization, so an all-zero depth field yields an infinite or invalid timestep."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B9"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L488-L523,L541-L574] (MED/unchecked numerical domain) Several active stability expressions take square roots of hu/hv and divide by spacing-derived sums without guarding negative depths or zero cell metrics, allowing NaN or zero-division results to contaminate timestep selection."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B12"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L595-L629] (MED/unchecked permeability division) Groundwater stability calculations divide directly by par%kx and par%ky without local positivity checks when their respective branches are enabled."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B13"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L632-L647] (MED/serial/MPI behavior inconsistency) The MPI path skips angular wave limiting when ntheta<=1, whereas the serial path applies it for every nonstationary model, potentially forcing a zero or spurious dt from a meaningless dtheta in the single-direction case."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B14"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L708-L710] (LOW/undefined optional output) timestep itself returns before defining a present INTENT(OUT) ierr when xcompute is false."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

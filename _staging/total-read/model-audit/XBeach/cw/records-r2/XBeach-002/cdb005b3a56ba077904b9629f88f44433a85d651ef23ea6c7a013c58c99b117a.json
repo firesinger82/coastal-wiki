@@ -1,0 +1,36 @@
+{
+ "axis": "code",
+ "model": "XBeach",
+ "path": "trunk/src/xbeachlibrary/groundwater.F90",
+ "source_sha256": "e941accf34fb9b4f21256dcb59b986ad2df2976a8bc151af926e3ce38c8cf494",
+ "lines_or_pages": 1820,
+ "read_status": "complete",
+ "reader": "codex-R2",
+ "producer": "llm:openai/codex",
+ "read_method": "llm_full_read",
+ "artifact_class": "semantic_read",
+ "run_id": "xbeach-r2-XBeach-002-codex-01a05ab3-8036-7660-84fb-58c476606a27",
+ "shard": "XBeach-002",
+ "round": "R2",
+ "content": {
+  "unresolved": [
+   "[L52-L72] (LOW/reinitialization lifecycle) gw_init allocates every groundwater field unconditionally and provides no already-allocated guard or cleanup for a second model initialization.",
+   "[L220-L274,L802-L834,L930-L937,L1028-L1038] (MED/state/dimension/configuration lifecycle) Saved solver and work arrays are allocated only for the first grid and first solver branch, so later changes in dimensions, dimensionality, fast-solve choice, or head model reuse incompatible storage/state.",
+   "[L299-L301] (MED/unchecked period denominator) Dynamic-pressure smoothing divides by Trep without validating a positive period.",
+   "[L400-L411] (LOW/anisotropic smoothing) Updated Kx, Ky, and Kz are all smoothed only along the i direction, even for the nominal y-direction conductivity Ky.",
+   "[L523,L210-L242] (LOW/pointer target leak) infilcon is first allocated its own target and later pointer-reassociated to s%infil, permanently losing the original allocation.",
+   "[L607-L612,L1349-L1436,L1811-L1816] (MED/unchecked enum output) Several scheme/model SELECT CASE blocks have no default, so unsupported gwscheme or head-model values leave logicals or result/output variables undefined.",
+   "[L655-L721,L1308-L1323] (HIGH/uninitialized MPI interface boundary) gwhu(nx+1,:) and gwhv(:,ny+1) are assigned only on physical bottom/right ranks, yet velocity and flux loops consume all nx+1 by ny+1 entries on internal MPI ranks.",
+   "[L734-L738] (MED/zero smoothing thickness) The wet-layer ratio divides by dwetlayer with no positive-value guard.",
+   "[L836-L905,L913-L917,L1001-L1005,L1016-L1019,L1103-L1105] (HIGH/zero aquifer-height singularity) The exponential head formulation repeatedly evaluates sinh(h)/h at cells whose groundwater height can be zero, without a limiting-form implementation or mask.",
+   "[L940-L975] (HIGH/out-of-bounds matrix index) The fast 2-D parabolic solver loops on i but writes A and rhs at index k, which remains initialized to zero, causing second-dimension index-zero accesses.",
+   "[L976-L1009] (HIGH/wrong loop variable/index) The fast 2-D exponential solver loops on k but never sets i, so it uses stale/zero i to index all grid fields and metrics.",
+   "[L1011-L1019] (HIGH/nonconformable solution assignment) In the fast 2-D branch x(:,1) has nx+1 elements but is assigned to gwhead(2:nx,j), which has nx-1 elements.",
+   "[L1025-L1106] (HIGH/missing solver implementation) The full 2-D branch builds and solves a matrix only for the parabolic model; selecting exponential skips the solve and then computes gwhead from stale gwcurv.",
+   "[L1127-L1129,L1303-L1306] (MED/grain-size denominator) Critical groundwater velocity divides by D50(1) without validating a positive grain diameter.",
+   "[L1203-L1265] (HIGH/wrong directional conductivity/metric) Both v-interface infiltration calls pass Kx instead of Ky, and the first v-interface surface-water availability limit uses dsz where the surrounding v-direction scaling uses dnz.",
+   "[L1349-L1436,L1575-L1613] (MED/unbounded nonlinear iteration) Turbulent conductivity iterations have no iteration limit or non-finite/stagnation exit.",
+   "[L1567-L1642] (MED/zero timestep/porosity/progress denominator) Local infiltration divides by dt, porosity, twodtp, dis, and infiltration rate without explicit guards, so zero conductivity or invalid timestep/porosity can cause singular intermediate arithmetic."
+  ]
+ }
+}

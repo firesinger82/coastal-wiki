@@ -1,0 +1,37 @@
+{
+ "axis": "code",
+ "model": "XBeach",
+ "path": "trunk/src/xbeachlibrary/xmpi.F90",
+ "source_sha256": "68c0cec030f136e8edd2024248284fb43c03c171fc5f23a1496ff40d52ced140",
+ "lines_or_pages": 1756,
+ "read_status": "complete",
+ "reader": "codex-R2",
+ "producer": "llm:openai/codex",
+ "read_method": "llm_full_read",
+ "artifact_class": "semantic_read",
+ "run_id": "xbeach-r2-XBeach-003-codex-01a05ac0-7e92-7031-ae47-79d30eab7b40",
+ "shard": "XBeach-003",
+ "round": "R2",
+ "content": {
+  "unresolved": [
+   "[L201-L214,L307-L312] (MED/mpi/lifecycle) The module unconditionally initializes and finalizes MPI without checking existing MPI state, conflicting with embedding hosts that own the MPI lifecycle.",
+   "[L257-L260,L314-L320,L1696-L1701,L1711-L1727] (HIGH/mpi/error-path) The I/O rank deliberately has xmpi_comm set to MPI_COMM_NULL, yet normal halt and communicator error handling call xmpi_abort on xmpi_comm, so an error on that rank can attempt MPI_Abort with an invalid communicator instead of terminating the full job.",
+   "[L338-L387] (LOW/integer-range) Processor-grid scoring uses default-integer products and a fixed 1000000000 sentinel, allowing large domain dimensions to overflow or leave a valid factorization unselected.",
+   "[L359-L365] (MED/input-validation) Manual decomposition checks only the product, so two negative manual dimensions can pass and later become invalid divisors and neighbor geometry.",
+   "[L371-L372] (HIGH/arithmetic) The XPREF condition can evaluate m/nmin when integer division n/xmpi_size produced zero, because Fortran does not require short-circuit evaluation of .and., yielding a division by zero.",
+   "[L425-L449] (MED/input-validation) Cyclic boundary handling has cases only for 0 and 1 and no default, so any other cyclic value leaves negative or out-of-range neighbor ranks marked as non-boundaries.",
+   "[L481-L645] (HIGH/build-completeness) Fourteen broadcast wrappers include xmpi_bcast.inc, but that include is absent from the source_code tree, leaving these procedures uncompilable unless an undocumented external generation step supplies it.",
+   "[L614-L626] (LOW/mpi/portability) Eight-byte integer broadcast uses nonstandard integer*8 syntax and the nonportable MPI_INTEGER8 datatype rather than a kind-matched MPI type.",
+   "[L648-L687] (MED/bounds-contract) Character broadcast does not verify that non-source character variables can hold the source's trimmed length before assigning x(i:i).",
+   "[L690-L773] (MED/buffer-size-contract) All sendrecv overloads reuse size(sendbuf) as the receive count without checking recvbuf size, permitting receive truncation or overwrite for mismatched arguments.",
+   "[L820-L838,L850-L858] (MED/buffer-size-contract) Array reductions send size(x) elements into y without asserting equal extents, leaving root receive-buffer capacity implicit.",
+   "[L873-L989] (MED/bounds-contract) Basic shift routines directly reference rows or columns 2, m-1, and n-1 without validating minimum local-array extents.",
+   "[L1030-L1208] (MED/bounds-contract) Ranged shift routines accept arbitrary i1/i2 and derive sections from a fixed four-cell overlap without checking ordering or bounds.",
+   "[L1374-L1560] (MED/mpi/message-contract) The paired send helpers derive counts independently from each rank's local array and do not validate from/to ranks, so shape disagreement or invalid endpoints can cause truncation or indefinite blocking.",
+   "[L1568-L1585] (MED/mpi/liveness) xmpi_send_sleep ignores all MPI errors and polls forever until flag becomes true, so a failed Irecv or MPI_Test has no exit path.",
+   "[L1603-L1614] (MED/mpi/communicator-contract) xmpi_barrier defaults to xmpi_comm even though that communicator is MPI_COMM_NULL on the I/O process, and the procedure contains no guard against invocation there.",
+   "[L1619-L1670] (MED/mpi/input-contract) xmpi_getrow does not validate prow, n, size(a,2), or size(b), so inconsistent metadata can produce invalid ranks, nonconforming assignment, buffer mismatch, or an unmatched blocking receive.",
+   "[L1730-L1755] (HIGH/preprocessor/error-path) The GNU-version test checks __GNUC_MINOR__ >= 8 even for major versions above 4, so many modern GNU compilers retain the fallback backtrace routine that intentionally dereferences a null pointer on every normal halt."
+  ]
+ }
+}
