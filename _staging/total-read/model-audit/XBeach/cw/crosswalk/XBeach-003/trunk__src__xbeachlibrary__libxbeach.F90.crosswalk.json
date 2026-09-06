@@ -110,7 +110,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "rejected",
    "base_ids": [],
    "audit_ids": [
     "B4"
@@ -120,12 +120,12 @@
     "[L287-L291] (MED/error-side-effect) Output schedules and progress logging are advanced immediately after timestep reports an error, before the error guard that suppresses the physical update."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-refuted: The ordering exists, but timestep.F90:L747-L759 deliberately forces final diagnostic output and moves scheduled times to the failure time before setting ierr=1. Updating output counters before skipping physics serves that error-output path; advancing diagnostic logging is not evidence of the claimed erroneous side effect.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B5"
@@ -135,9 +135,15 @@
     "[L269-L274,L330-L336] (MED/uninitialized-timing) MPI finalization passes saved t01 to timing output even though t01 is assigned only when execute_counter equals 1, so short or failed runs can finalize with an undefined loop-start timestamp."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: t01 has no initializer and is first set on the second executestep call because execute_counter starts at zero. A one-step MPI run reaches final and passes t01 to writelog_finalize, which subtracts it without a step-count guard.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L269-L274",
+    "quote": "#ifdef USEMPI\r\n      if (execute_counter .eq. 1) then\r\n         ! exclude first pass from time measurement\r\n         call xmpi_barrier\r\n         t01 = MPI_Wtime()\r\n      endif\r\n",
+    "verified_at_lines": "L269-L274",
+    "source_sha256": "1656cceb95c9d87a51b70225a725fc6e544ed56b424c97a9e2806c86f15b6696"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",

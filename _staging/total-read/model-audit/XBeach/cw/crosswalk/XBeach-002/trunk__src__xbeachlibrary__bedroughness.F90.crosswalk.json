@@ -125,7 +125,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "rejected",
    "base_ids": [],
    "audit_ids": [
     "B0"
@@ -135,9 +135,9 @@
     "[L68-L165, L186-L273] (MED/selector-contract) Both bed-friction select blocks lack a default branch, so an unsupported selector leaves cfu and cfv unchanged or uninitialized without reporting an error."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-refuted: The normal parameter path restricts bedfriction to exactly the five handled selectors in params.F90 L683-L691 through parmapply. readkey.F90 L287-L312 rejects unsupported names and halts, so the absent default does not silently accept an unsupported user selector.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06"
   },
   {
    "disposition": "distinct_unconfirmed",
@@ -155,7 +155,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B5"
@@ -165,12 +165,18 @@
     "[L357-L378, L398-L418] (HIGH/numerical-domain) The infiltration enhancement divides by cfu or cfv twice without a positive lower-bound guard, which is unsafe for zero-valued constant-friction configurations."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: The wet-face mask does not exclude zero friction: the CF initialization branch copies bedfriccoef directly, without a minimum. Infiltration enhancement then divides by cfu or cfv both in blphi and in the enhancement cap; the ventilation clamp does not protect either friction denominator.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L360-L365",
+    "quote": "         Ubed = abs(s%vmageu)\r\n         Ventilation  = -infilb/max(Ubed,1.d-6)\r\n         Ventilation  = max(min(Ventilation,epsVentilation),-epsVentilation)\r\n         blphi = 0.9d0/2/s%cfu*Ventilation\r\n         ! need to account for devision by zero\r\n         where(infilb>=0.d0)\r\n",
+    "verified_at_lines": "L360-L365",
+    "source_sha256": "508ccef2919d203a716f831f4ffd80a57068562eab747a00a94da802a840dfef"
+   }
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B6"
@@ -180,9 +186,15 @@
     "[L365-L373, L406-L414] (LOW/zero-input-bias) Exactly zero infiltration is forced to a nonzero negative blphi and therefore a facbl slightly different from one, so the nominally absent process still adds shear."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: For zero infiltration and positive friction, blphi starts at zero but the nonnegative-infiltration branch replaces it with -1e-4. This gives facbl greater than one and a nonzero added shear for a flowing wet face with nonzero friction, even though infiltration is absent.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L365-L368",
+    "quote": "         where(infilb>=0.d0)\r\n            blphi = min(blphi,-1d-4)\r\n            facbl = blphi/(exp(blphi)-1.d0)\r\n            facbl = min(facbl,maxEnhancement1)\r\n",
+    "verified_at_lines": "L365-L368",
+    "source_sha256": "508ccef2919d203a716f831f4ffd80a57068562eab747a00a94da802a840dfef"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",
@@ -215,7 +227,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B9"
@@ -225,9 +237,15 @@
     "[L701-L727] (MED/directional-bias) Using SIGN with zero velocity assigns positive turbulent bed shear at rest, introducing a fixed directional bias wherever kbl is positive."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: On a wet face with positive kbl and nonzero friction/turbulence coefficients, SIGN(1,0) contributes a positive shear even at zero velocity. Neither the wet mask nor the kbl test excludes that resting state.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L701-L703",
+    "quote": "      where(s%wetu==1 .and. kbl>0.d0)\r\n         ! New way:\r\n         s%taubx_add = s%taubx_add + s%cfu*par%rho*par%gamma_turb*kbl*sign(1.d0,s%ue)\r\n",
+    "verified_at_lines": "L701-L703",
+    "source_sha256": "508ccef2919d203a716f831f4ffd80a57068562eab747a00a94da802a840dfef"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",

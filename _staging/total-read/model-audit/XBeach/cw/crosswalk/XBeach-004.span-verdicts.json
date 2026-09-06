@@ -1,0 +1,41 @@
+{
+  "shard": "XBeach-004",
+  "verdicts": [
+    {
+      "audit_id": "B3",
+      "source_path": "trunk/scripts/generate.py",
+      "verdict": "CONFIRM",
+      "rationale": "Both parsing loops append declarations after regex/type parsing and an optional JSON merge, without checking required metadata, duplicate names, or declaration-rank/shape consistency; the exception handlers only catch errors already raised. No validation occurs before rendering, and indextos.mako directly requires shape and broadcast and derives its pointer rank from shape, allowing missing keys to fail during rendering and inconsistent shapes to generate incompatible pointer assignments.",
+      "evidence_span": {
+        "lines": "L164-L166",
+        "quote": "                        if \"json\" in variable and variable[\"json\"]:\n                            variable.update(json.loads(variable[\"json\"]))\n                        variables.append(variable)"
+      }
+    },
+    {
+      "audit_id": "B4",
+      "source_path": "trunk/scripts/generate.py",
+      "verdict": "CONFIRM",
+      "rationale": "At L164-L166 and L190-L192, json.loads results are merged directly into the parsed dictionaries after name, dimension, type, and rank have been established. There is no reserved-key restriction or subsequent restoration, so metadata keys can replace these structural fields before rendering.",
+      "evidence_span": {
+        "lines": "L164-L166",
+        "quote": "                        if \"json\" in variable and variable[\"json\"]:\n                            variable.update(json.loads(variable[\"json\"]))\n                        variables.append(variable)"
+      }
+    },
+    {
+      "audit_id": "B6",
+      "source_path": "trunk/scripts/generate.py",
+      "verdict": "REFUTE",
+      "rationale": "Basename stripping is present, but the nearby CLI contract at L218-L220 explicitly expects names like x.mako and says the file comes from the templates directory; the fixed TemplateLookup at L231 implements that contract. This documented name-selection interface neutralizes the alleged arbitrary-path contract violation: the source does not promise to load templates from supplied directories."
+    },
+    {
+      "audit_id": "B2",
+      "source_path": "trunk/src/xbeachlibrary/templates/indextos.mako",
+      "verdict": "CONFIRM",
+      "rationale": "L39-L43 embed metadata directly in single-quoted Fortran literals, with no escaping helper or filter in the enclosing template. generate.py also preserves apostrophes in descriptions and JSON strings without sanitization, so a value such as beach's elevation produces an undoubled apostrophe and a malformed Fortran literal.",
+      "evidence_span": {
+        "lines": "L39-L43",
+        "quote": "   t%name = '${var[\"name\"]}'\n   t%btype = '${var[\"broadcast\"]}'\n   t%units= '${var[\"unit\"]}'\n   t%standardname= '${var.get(\"standard_name\", \"\")}'\n   t%description= '${var[\"description\"]}'"
+      }
+    }
+  ]
+}

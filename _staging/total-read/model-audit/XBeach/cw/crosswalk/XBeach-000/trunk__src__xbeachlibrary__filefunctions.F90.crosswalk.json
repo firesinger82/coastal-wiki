@@ -172,7 +172,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "rejected",
    "base_ids": [],
    "audit_ids": [
     "B2"
@@ -182,12 +182,12 @@
     "[L163-L176,L227-L246] (MED/uninitialized dispatch state) checkbcfilelength does not assign filetype for wbctype values outside its enumerated branches, yet immediately selects on filetype, whose dummy argument has no declared intent or local default."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-refuted: The unsupported-wbctype path exists syntactically, but every repository call is guarded to pass a handled type: params.F90 L365-L372 allows PARAMETRIC/SWAN/VARDENS/JONS_TABLE and L1959-L1967 allows REUSE. For these calls filetype is assigned before select case; the lack of INTENT does not itself make a dummy argument uninitialized.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B3"
@@ -197,9 +197,15 @@
     "[L197-L224] (MED/empty-list validation gap) A LOCLIST file containing only its header produces nlocs=0 and skips all boundary-duration validation, allowing a positive-duration simulation to pass this check without any boundary file."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: A header-only LOCLIST sets nlocs=0, for which the zero-sized allocation is valid and both do loops are skipped. The total<tstop rejection is inside the second loop (L224-L290), so this routine returns without any duration validation or boundary file.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L197-L200",
+    "quote": "         if (trim(testc)=='LOCLIST') then\r\n            nlocs = nlines-1\r\n            allocate(bcfiles(nlocs))\r\n            do ifid = 1,nlocs",
+    "verified_at_lines": "L197-L200",
+    "source_sha256": "d5e4c239d7ecec15ef329769fb187aecaf61bf701d6955850a11dcae52e1fe00"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",

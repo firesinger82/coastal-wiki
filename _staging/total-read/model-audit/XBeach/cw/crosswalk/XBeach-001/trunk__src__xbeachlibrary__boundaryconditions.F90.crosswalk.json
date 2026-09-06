@@ -302,7 +302,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B1"
@@ -312,12 +312,18 @@
     "[L139-L164,L176-L203] (MED/input validation) The TS readers accept `nt` without requiring it to be positive and then allocate from it and divide `sum(dataE)` by `nt`."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: Both TS readers check only I/O status for nt, then allocate nt elements and compute sum(dataE)/nt (139-164 and 176-203). A successfully read zero count reaches division by zero without a count guard.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L164-L164",
+    "quote": "            Emean=sum(dataE)/nt",
+    "verified_at_lines": "L164-L164",
+    "source_sha256": "0cbaa20cd8dd147005ec6b01d13ec05ac46bb98d181e0a7fec1025cd9fe30b71"
+   }
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B3"
@@ -327,12 +333,18 @@
     "[L434-L453,L470-L472,L684-L696] (HIGH/numerical robustness) Bound-wave and nonhydrostatic formulas divide by boundary depth, `sinh(kh)`, `tanh(kh)`, and the resonant term `cg**2-g*h` without dry-point or small-denominator protection."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: The TS_1 branch forms ht directly from zs0-zb and divides by it, as well as by cg**2-g*hh, without a wet mask or denominator floor. The Emean floor at 448 protects a different expression; the nonhydrostatic branches likewise contain the cited unprotected hyperbolic denominators.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L451-L453",
+    "quote": "               s%bi(1) = -(2*s%cg(1,j)/s%c(1,j)-0.5d0)*(em-ei)/(s%cg(1,j)**2-par%g*s%hh(1,j))/par%rho\n               ht=s%zs0(1:2,:)-s%zb(1:2,:)\n               s%ui(1,j) = s%cg(1,j)*s%bi(1)/ht(1,j)*cos(s%theta0-s%alfaz(1,j))",
+    "verified_at_lines": "L451-L453",
+    "source_sha256": "0cbaa20cd8dd147005ec6b01d13ec05ac46bb98d181e0a7fec1025cd9fe30b71"
+   }
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B4"
@@ -342,9 +354,15 @@
     "[L490-L500,L594-L660] (MED/time interpolation) The spectral-record calculation divides by `dtbcfile` and derives direct-access record numbers from it without validating that this file-supplied interval is positive."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: dtbcfile is read from the administration files with only I/O-status checks and is not constrained before record indices and interpolation weights are calculated. Zero therefore reaches the division in FLOOR, and a negative value reverses the record progression.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L594-L597",
+    "quote": "                  old=floor((par%t/dtbcfile)+1)\n                  recpos=1\n               end if\n               new=floor((par%t/dtbcfile)+1)",
+    "verified_at_lines": "L594-L597",
+    "source_sha256": "0cbaa20cd8dd147005ec6b01d13ec05ac46bb98d181e0a7fec1025cd9fe30b71"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",
@@ -362,7 +380,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B10"
@@ -372,9 +390,15 @@
     "[L778-L780,L830-L832,L864,L1310-L1313] (HIGH/reference-level consistency) If a nonhydrostatic boundary file omits `Z`, `s%zi` is set to the absolute neighboring surface `s%zs(2,:)`, but the applied boundary later adds `s%zs0` to `s%zi`, apparently adding the mean level twice."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: When Z is absent, the spectral branch copies zs(2,:) directly into zi at 779 and 831; tapering does not subtract the mean level. With FRONT_NONH_1D and ARC=0, line 1312 adds zs0 to that absolute surface, duplicating the reference level once tapering reaches one.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L1310-L1313",
+    "quote": "                  s%uu(1,jmin_zs:jmax_zs) = s%ui(1,jmin_zs:jmax_zs)\n                  s%vv(1,jmin_zs:jmax_zs) = s%vi(1,jmin_zs:jmax_zs)\n                  s%zs(1,jmin_zs:jmax_zs) = s%zi(1,jmin_zs:jmax_zs)+s%zs0(1,jmin_zs:jmax_zs)\n                  s%ws(1,jmin_zs:jmax_zs) = s%wi(1,jmin_zs:jmax_zs)",
+    "verified_at_lines": "L1310-L1313",
+    "source_sha256": "0cbaa20cd8dd147005ec6b01d13ec05ac46bb98d181e0a7fec1025cd9fe30b71"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",
@@ -392,7 +416,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B12"
@@ -402,12 +426,18 @@
     "[L998-L999,L1029-L1042,L1141-L1146,L1363-L1365] (MED/parameter validation) Hybrid averaging and relaxation divide by combinations of `cats`, `Trep`, and `hybtavg` without enforcing positive values."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: The relaxation calculation divides directly by cats and Trep, including in the hybrid branch; a zero cats is not neutralized by hybf1. The parameter reader supplies recommended cats bounds but its non-strict read does not enforce them, and this routine has no positive-value check.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L1141-L1146",
+    "quote": "               factime = 1.d0/par%cats/par%Trep*par%dt\n            elseif (par%tidetype==TIDETYPE_HYBRID) then\n               factime = hybf1*1.d0/par%cats/par%Trep*par%dt\n            else\n               ! do we need this?\n               factime = 0.1d0/par%cats/par%Trep*par%dt",
+    "verified_at_lines": "L1141-L1146",
+    "source_sha256": "0cbaa20cd8dd147005ec6b01d13ec05ac46bb98d181e0a7fec1025cd9fe30b71"
+   }
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B15"
@@ -417,9 +447,15 @@
     "[L1177-L1178,L1386-L1387] (MED/numerical robustness) Boundary mean velocities divide by globally accumulated metric lengths without checking for an empty or zero-width boundary selection."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: The globally summed lengths are used as divisors without a nonzero check. In particular, ranges_init defines jmin_vv=2 and jmax_vv=ny-1, so the supported ny=2 grid gives an empty transverse-velocity sum even with positive grid metrics.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L1177-L1178",
+    "quote": "         s%umean(1,:)=factime*udnusum/dnusum+(1.0d0-factime)*s%umean(1,:)\n         s%vmean(1,:)=factime*vdnvsum/dnvsum+(1.0d0-factime)*s%vmean(1,:)",
+    "verified_at_lines": "L1177-L1178",
+    "source_sha256": "0cbaa20cd8dd147005ec6b01d13ec05ac46bb98d181e0a7fec1025cd9fe30b71"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",
@@ -437,7 +473,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "rejected",
    "base_ids": [],
    "audit_ids": [
     "B17"
@@ -447,12 +483,12 @@
     "[L1250-L1278,L1439-L1444] (MED/angle calculation) Incident and reflected directions are obtained with one-argument `atan` of a quotient, losing quadrant information and becoming discontinuous near zero longitudinal velocity."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-refuted: The reflected angle is explicitly folded into a half-plane at 1277-1278 and 1442-1443, so preserving the opposite velocity quadrant with atan2 would be undone by the intended angle convention. Oscillatory velocity reversal does not by itself establish an incorrect propagation direction; the claimed quadrant loss is not evidence of a defect here.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B18"
@@ -462,9 +498,15 @@
     "[L1458-L1468] (HIGH/copy/paste indexing) Back-boundary corner water levels use `dzs0dn(1,...)` and `zb(1,...)` instead of the `nx+1` back-boundary row, applying front-boundary geometry at both back corners."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: Both back corners use front-row dzs0dn, dnv and zb while assigning the nx+1 row. The later lateral correction uses imin_zs:imax_zs, which excludes these corner rows, so it does not overwrite the erroneous corner values.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L1462-L1467",
+    "quote": "               s%zs(s%nx+1,1)=max(s%zs(s%nx+1,2) - s%dzs0dn(1,1)*s%dnv(1,1),s%zb(1,1))\n            endif\n            if (xmpi_isright) then\n               s%uu(s%nx+1,s%ny+1)=s%uu(s%nx+1,s%ny)\n               s%vv(s%nx+1,s%ny+1)=s%vv(s%nx+1,s%ny)\n               s%zs(s%nx+1,s%ny+1)=max(s%zs(s%nx+1,s%ny) + s%dzs0dn(1,s%ny+1)*s%dnv(1,s%ny),s%zb(1,s%ny+1))",
+    "verified_at_lines": "L1462-L1467",
+    "source_sha256": "0cbaa20cd8dd147005ec6b01d13ec05ac46bb98d181e0a7fec1025cd9fe30b71"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",
@@ -497,7 +539,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B22"
@@ -507,9 +549,15 @@
     "[L1659-L1678] (HIGH/MPI domain intersection) A horizontal discharge segment is considered local only when at least one endpoint lies in the rank's box, so a segment that crosses a subdomain while both endpoints lie outside that subdomain is omitted there."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: indomain tests only endpoint membership before clipping the endpoints, and both area accumulation and discharge assignment are subsequently conditional on indomain. A segment crossing a rank with neither endpoint inside is therefore omitted; the later clipping and global area reduction do not repair this exclusion.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L1670-L1673",
+    "quote": "            indomain =  (   m1l >= iminl .and. m1l <= imaxl .and.         &\n            n1l >=jminl .and. n1l <= jmaxl       ) .or.  &\n            (   m2l >=iminl .and. m2l <= imaxl .and.         &\n            n2l >=jminl  .and. n2l <= jmaxl       )",
+    "verified_at_lines": "L1670-L1673",
+    "source_sha256": "0cbaa20cd8dd147005ec6b01d13ec05ac46bb98d181e0a7fec1025cd9fe30b71"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",

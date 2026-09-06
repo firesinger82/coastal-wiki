@@ -40,7 +40,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B0"
@@ -50,9 +50,15 @@
     "[L24-L26] (HIGH/cross-module type contract) randomseed is declared as a non-allocatable scalar, conflicting with wave_boundary_main's ALLOCATED and DEALLOCATE operations on that component."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: randomseed is a plain integer component, whereas wave_boundary_main.f90:223 applies both ALLOCATED and DEALLOCATE to it. Those operations require an allocatable component (or, for DEALLOCATE alone, a pointer), so the declaration and consumer are incompatible.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L24-L26",
+    "quote": "      real*8,dimension(:),allocatable  :: xb,yb,theta     ! Note, can these be changed to pointers?\n      integer                          :: randomseed\n      integer                          :: nspr",
+    "verified_at_lines": "L24-L26",
+    "source_sha256": "189a137244043330e3b3a33bd8ea3d0b8d015e5c0e863c7f93492fafab5c77a2"
+   }
   }
  ]
 }

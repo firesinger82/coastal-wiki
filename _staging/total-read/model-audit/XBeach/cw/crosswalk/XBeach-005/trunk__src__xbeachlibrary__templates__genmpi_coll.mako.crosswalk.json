@@ -108,7 +108,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "rejected",
    "base_ids": [],
    "audit_ids": [
     "B0"
@@ -118,9 +118,9 @@
     "[L38-L55,L65-L83] (HIGH/rank-to-decomposition off-by-one) For source rank `i-1` the root uses decomposition entry `i-1`, and rank `ra` sends dimensions from entry `ra`; this conflicts with the shard's distribution template mapping rank `r` to entry `r+1`, so gathered blocks can use the preceding rank's extents, offsets, and boundary flags."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-refuted: The neutralizer is the separate I/O communicator: collection uses xmpi_ocomm (spaceparams.F90:974-976), whose rank 0 is excluded from the compute communicator and whose non-root rank ra maps to compute rank ra-1 (xmpi.F90:236-247,288-304). Decomposition entry compute_rank+1 therefore equals ra (spaceparams.F90:578-580), so collection entries ra and i-1 are correct; distribution uses the compute communicator (templates/space_distribute.mako:4-5), making its rank+1 indexing consistent rather than conflicting.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06"
   }
  ]
 }

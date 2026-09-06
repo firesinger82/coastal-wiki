@@ -398,7 +398,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B4"
@@ -408,12 +408,18 @@
     "[L242-L249,L395-L410,L1464-L1482] (MED/unchecked grid extent and metric) Boundary copies assume nx>=1 and slope calculations divide by dsu/dnv without checking positive nonzero grid metrics."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: The x-boundary copies directly access columns 2 and nx, and the slope loops divide by dsu/dnv without validation. params.F90 L150 checks nx only advisorially and L171-L172 accepts zero dx/dy, while gridprops forms metrics from those coordinates without a positive floor, leaving the cited invalid-grid cases unneutralized.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L395-L400",
+    "quote": "         ! Initialize dzbdx, dzbdy\r\n         do j=1,s%ny+1\r\n            do i=1,s%nx\r\n               s%dzbdx(i,j)=(s%zb(i+1,j)-s%zb(i,j))/s%dsu(i,j)\r\n            enddo\r\n         enddo",
+    "verified_at_lines": "L395-L400",
+    "source_sha256": "9803067bd2fa4962d9e2247f6e8b5f87e18a9860802595424183994a715523cd"
+   }
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B8"
@@ -423,12 +429,18 @@
     "[L619-L623] (MED/period division) Wave intrinsic frequency is computed as 2*pi/Trep without a local positive-period guard for boundary types that do not force Trep to 10."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: The boundary-type reset to Trep=10 at L602-L608 excludes WBCTYPE_PARAMS and TS_1/TS_2, after which the frequency loop divides directly by Trep. Their period reads in params.F90 L425-L432 are non-strict, so a supplied zero period survives to this division.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L619-L623",
+    "quote": "      do itheta=1,s%ntheta\r\n         s%sigt(:,:,itheta) = 2*par%px/par%Trep\r\n      end do\r\n      s%sigm = sum(s%sigt,3)/s%ntheta\r\n      call dispersion(par,s,s%hh)",
+    "verified_at_lines": "L619-L623",
+    "source_sha256": "9803067bd2fa4962d9e2247f6e8b5f87e18a9860802595424183994a715523cd"
+   }
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B11"
@@ -438,9 +450,15 @@
     "[L1011-L1012,L1037-L1056] (HIGH/hotstart state destruction) Although hotstart zs, uu, and vv are deliberately preserved during allocation and initial zeroing, flow_init later unconditionally resets uu and vv and all derived flow quantities to zero, discarding the loaded hotstart velocities."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: The earlier hotstart guards preserve allocated and loaded uu/vv, but L1042-L1044 resets both unconditionally. hotstart_init_1 reads those velocities before flow_init (libxbeach.F90 L164-L172), and hotstart_init_2 does not reload them; optional hotstartflow computes a new field rather than restoring the loaded one.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L1042-L1047",
+    "quote": "      s%uu=0.d0\r\n      s%u=0.d0\r\n      s%vv=0.d0\r\n      s%v=0.d0\r\n      s%vu=0.d0\r\n      s%uv=0.d0",
+    "verified_at_lines": "L1042-L1047",
+    "source_sha256": "9803067bd2fa4962d9e2247f6e8b5f87e18a9860802595424183994a715523cd"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",

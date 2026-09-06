@@ -1,0 +1,239 @@
+{
+  "shard": "XBeach-000",
+  "verdicts": [
+    {
+      "audit_id": "B3",
+      "source_path": "trunk/src/xbeachlibrary/readkey.F90",
+      "verdict": "CONFIRM",
+      "rationale": "Both vector functions declare a tlength-element result but assign and broadcast only 1:vlength, with no length check or whole-result initialization (L384-L544). Thus the tail is undefined when vlength<tlength, and vlength>tlength overruns the declared result; caller discipline can prevent the overrun but does not initialize the returned tail.",
+      "evidence_span": {
+        "lines": "L447-L451",
+        "quote": "               value_vec(1:vlength)=defval\r\n               do i=1,vlength\r\n                  if (.not. lsilent) call writelog('l','(a,a,f0.4,a)',(printkey),' = ', &\r\n                  value_vec(i),' (no record found, default value used)')\r\n               enddo"
+      }
+    },
+    {
+      "audit_id": "B6",
+      "source_path": "trunk/src/xbeachlibrary/readkey.F90",
+      "verdict": "CONFIRM",
+      "rationale": "The saved filename is the sole reload condition, enclosing both file reads and readindex initialization (L597-L643). Replacing or editing the same pathname between calls therefore leaves both cached values and usage bookkeeping from the previous contents.",
+      "evidence_span": {
+        "lines": "L603-L607",
+        "quote": "      ! If the file name of the input file changes, the file should be reread\r\n      if (fname/=fnameold) then\r\n         ! Make sure this reset only recurs when the input file name changes\r\n         fnameold=fname\r\n         nkeys=0"
+      }
+    },
+    {
+      "audit_id": "B8",
+      "source_path": "trunk/src/xbeachlibrary/readkey.F90",
+      "verdict": "CONFIRM",
+      "rationale": "parm_str is INTENT(OUT) and its only assignment is inside the xmaster branch; the USEMPI block broadcasts only parm (L769-L802). Broadcasting the local string d through readkey_str does not assign the non-master caller's parm_str.",
+      "evidence_span": {
+        "lines": "L786-L791",
+        "quote": "      if (xmaster) then\r\n         do i=1,numallowednames\r\n            if (d .eq. allowednames(i)) then\r\n               parm = intvalues(i)\r\n               if (present(parm_str)) then\r\n                  parm_str = d"
+      }
+    },
+    {
+      "audit_id": "B9",
+      "source_path": "trunk/src/xbeachlibrary/readkey.F90",
+      "verdict": "UNCERTAIN",
+      "rationale": "L776 indexes allowednames(idefname) without a local check, but idefname is supplied by the programmer after setallowednames, not read from user input. An out-of-range call or a contract requiring this routine to validate that index is missing; the unchecked expression alone does not establish a defect."
+    },
+    {
+      "audit_id": "B13",
+      "source_path": "trunk/src/xbeachlibrary/readkey.F90",
+      "verdict": "CONFIRM",
+      "rationale": "strippedline replaces each character code outside 32:126 with a space, and readkey applies it to the entire record before splitting key and value (L628-L635). Consequently non-ASCII bytes inside a value or filename are changed without any diagnostic.",
+      "evidence_span": {
+        "lines": "L1141-L1146",
+        "quote": "      do itab=1,slen\r\n         if (ichar(line(itab:itab))<32 .or. ichar(line(itab:itab))>126) then  ! this is anything not in standard\r\n            ! alphanumeric\r\n            strippedline(itab:itab) = ' '\r\n         else\r\n            strippedline(itab:itab) = line(itab:itab)"
+      }
+    },
+    {
+      "audit_id": "B0",
+      "source_path": "trunk/src/xbeachlibrary/interp.F90",
+      "verdict": "UNCERTAIN",
+      "rationale": "For an empty axis the minval/maxval range test prevents the main interpolation accesses, and method=interp or the default returns exception (L26-L38, L70-L83); only extendclosest can use a zero minloc result to index Z. Whether an empty axis is permitted with extendclosest depends on the caller contract, which this file does not establish."
+    },
+    {
+      "audit_id": "B13",
+      "source_path": "trunk/src/xbeachlibrary/interp.F90",
+      "verdict": "UNCERTAIN",
+      "rationale": "The routine assumes an equidistant sampling grid and performs the cited accesses and division without checks; its local caller constructs limits from the target spacing (L1465-L1469). Establishing a defect requires the caller guarantees for n>=2, positive source/target spacing and ordered integration limits, which are not specified here."
+    },
+    {
+      "audit_id": "B4",
+      "source_path": "trunk/src/xbeachlibrary/timestep.F90",
+      "verdict": "CONFIRM",
+      "rationale": "The schedule readers accept duplicate entries, and outputtimes_update advances each matching counter only once while the next-time mask excludes all entries at the current time (L181-L343, L363-L406). For a schedule [1,1,2], after processing time 1 the next comparison remains against the second 1 even when tnext advances to 2, suppressing later output in that category.",
+      "evidence_span": {
+        "lines": "L390-L394",
+        "quote": "      if (tpar%outputg) tpar%itg = tpar%itg + 1\r\n      if (tpar%outputp) tpar%itp = tpar%itp + 1\r\n      if (tpar%outputm) tpar%itm = tpar%itm + 1\r\n      if (tpar%outputw) tpar%itw = tpar%itw + 1\r\n      if (tpar%outputh) tpar%ith = tpar%ith + 1"
+      }
+    },
+    {
+      "audit_id": "B7",
+      "source_path": "trunk/src/xbeachlibrary/timestep.F90",
+      "verdict": "CONFIRM",
+      "rationale": "Both optional outputs are INTENT(OUT) at L429, but the non-compute return at L440 precedes ierr initialization at L456-L458 and limtypeout assignment at L681-L683. A present actual argument therefore becomes undefined on that return path.",
+      "evidence_span": {
+        "lines": "L440-L443",
+        "quote": "      if(.not. xcompute) return\r\n\r\n      celeru  = 0.d0\r\n      limtype = 0"
+      }
+    },
+    {
+      "audit_id": "B8",
+      "source_path": "trunk/src/xbeachlibrary/timestep.F90",
+      "verdict": "REFUTE",
+      "rationale": "The zeros-initialization comment does not imply that hh is still zero: flow_init sets hh=max(zs-zb,par%eps) at initialize.F90 L1011-L1012 before compute_dt is used (libxbeach.F90 L172). With the positive depth tolerance, even an entirely dry domain has positive hh; obtaining an all-zero field requires a different, invalid-input or caller-state scenario."
+    },
+    {
+      "audit_id": "B9",
+      "source_path": "trunk/src/xbeachlibrary/timestep.F90",
+      "verdict": "UNCERTAIN",
+      "rationale": "The square roots are under wet-cell masks and flow_timestep.F90 additionally clamps hu and hv to nonnegative values at L682 and L704, so lack of a local max is not evidence of negative-depth failure. The spacing-sum division remains unguarded, but proving the combined numerical-domain defect requires a reachable degenerate wet grid and the state/metric invariants supplied by the caller."
+    },
+    {
+      "audit_id": "B12",
+      "source_path": "trunk/src/xbeachlibrary/timestep.F90",
+      "verdict": "CONFIRM",
+      "rationale": "The enabled groundwater branch divides by 2*kx and, for ny>2, by 2*ky without a zero check (L595-L629). The parameter reads in params.F90 L825-L835 use advisory bounds only, so zero permeability is not rejected by those input checks.",
+      "evidence_span": {
+        "lines": "L606-L606",
+        "quote": "                  par%dt=min(par%dt,par%CFL*s%dsc(i,j)**2*par%por/(2*par%kx))"
+      }
+    },
+    {
+      "audit_id": "B13",
+      "source_path": "trunk/src/xbeachlibrary/timestep.F90",
+      "verdict": "UNCERTAIN",
+      "rationale": "The USEMPI and serial guards genuinely differ at L633-L647, but a different guard alone does not demonstrate a spurious timestep: ctheta may be zero, and initialize.F90 L315-L320 assigns an actual angular width for ntheta=1. Establishing the claimed timestep defect needs the single-direction ctheta evolution and an input state in which the extra serial limit actually binds."
+    },
+    {
+      "audit_id": "B14",
+      "source_path": "trunk/src/xbeachlibrary/timestep.F90",
+      "verdict": "CONFIRM",
+      "rationale": "ierr is an optional INTENT(OUT) dummy at L700 and the non-compute branch returns before the only call that could define it. There is no initialization before this return.",
+      "evidence_span": {
+        "lines": "L708-L710",
+        "quote": "      if(.not. xcompute) return\r\n\r\n      call compute_dt(s,par, tpar, it, ilim, jlim, dtref, dt=dt, ierr=ierr,limtypeout=limtype)"
+      }
+    },
+    {
+      "audit_id": "B0",
+      "source_path": "trunk/src/xbeachlibrary/spaceparamsdef.F90",
+      "verdict": "REFUTE",
+      "rationale": "Absence of a type-component initializer is neutralized by explicit runtime initialization: output.F90 L37 sets collected=.false. before collection and L43-L44 copies the resulting flags into precollected on the output master. spaceparams.F90 L1083-L1087 reads collected on that master and broadcasts the decision, so the cited declarations alone do not establish uninitialized cache use."
+    },
+    {
+      "audit_id": "B4",
+      "source_path": "trunk/src/xbeachlibrary/initialize.F90",
+      "verdict": "CONFIRM",
+      "rationale": "The x-boundary copies directly access columns 2 and nx, and the slope loops divide by dsu/dnv without validation. params.F90 L150 checks nx only advisorially and L171-L172 accepts zero dx/dy, while gridprops forms metrics from those coordinates without a positive floor, leaving the cited invalid-grid cases unneutralized.",
+      "evidence_span": {
+        "lines": "L395-L400",
+        "quote": "         ! Initialize dzbdx, dzbdy\r\n         do j=1,s%ny+1\r\n            do i=1,s%nx\r\n               s%dzbdx(i,j)=(s%zb(i+1,j)-s%zb(i,j))/s%dsu(i,j)\r\n            enddo\r\n         enddo"
+      }
+    },
+    {
+      "audit_id": "B8",
+      "source_path": "trunk/src/xbeachlibrary/initialize.F90",
+      "verdict": "CONFIRM",
+      "rationale": "The boundary-type reset to Trep=10 at L602-L608 excludes WBCTYPE_PARAMS and TS_1/TS_2, after which the frequency loop divides directly by Trep. Their period reads in params.F90 L425-L432 are non-strict, so a supplied zero period survives to this division.",
+      "evidence_span": {
+        "lines": "L619-L623",
+        "quote": "      do itheta=1,s%ntheta\r\n         s%sigt(:,:,itheta) = 2*par%px/par%Trep\r\n      end do\r\n      s%sigm = sum(s%sigt,3)/s%ntheta\r\n      call dispersion(par,s,s%hh)"
+      }
+    },
+    {
+      "audit_id": "B11",
+      "source_path": "trunk/src/xbeachlibrary/initialize.F90",
+      "verdict": "CONFIRM",
+      "rationale": "The earlier hotstart guards preserve allocated and loaded uu/vv, but L1042-L1044 resets both unconditionally. hotstart_init_1 reads those velocities before flow_init (libxbeach.F90 L164-L172), and hotstart_init_2 does not reload them; optional hotstartflow computes a new field rather than restoring the loaded one.",
+      "evidence_span": {
+        "lines": "L1042-L1047",
+        "quote": "      s%uu=0.d0\r\n      s%u=0.d0\r\n      s%vv=0.d0\r\n      s%v=0.d0\r\n      s%vu=0.d0\r\n      s%uv=0.d0"
+      }
+    },
+    {
+      "audit_id": "B15",
+      "source_path": "trunk/src/xbeachlibrary/initialize.F90",
+      "verdict": "UNCERTAIN",
+      "rationale": "The single-grain nd<2 scenario is neutralized by params.F90 L1159 and L1791-L1794 enforcing nd>=3, and morphology-enabled runs strictly bound nd_var at L1434. The remaining multi-grain case with morphology disabled depends on how nd_var is initialized outside sed_init; this file alone does not establish that contract, so the broader candidate cannot be accepted as stated."
+    },
+    {
+      "audit_id": "B2",
+      "source_path": "trunk/src/xbeachlibrary/filefunctions.F90",
+      "verdict": "REFUTE",
+      "rationale": "The unsupported-wbctype path exists syntactically, but every repository call is guarded to pass a handled type: params.F90 L365-L372 allows PARAMETRIC/SWAN/VARDENS/JONS_TABLE and L1959-L1967 allows REUSE. For these calls filetype is assigned before select case; the lack of INTENT does not itself make a dummy argument uninitialized."
+    },
+    {
+      "audit_id": "B3",
+      "source_path": "trunk/src/xbeachlibrary/filefunctions.F90",
+      "verdict": "CONFIRM",
+      "rationale": "A header-only LOCLIST sets nlocs=0, for which the zero-sized allocation is valid and both do loops are skipped. The total<tstop rejection is inside the second loop (L224-L290), so this routine returns without any duration validation or boundary file.",
+      "evidence_span": {
+        "lines": "L197-L200",
+        "quote": "         if (trim(testc)=='LOCLIST') then\r\n            nlocs = nlines-1\r\n            allocate(bcfiles(nlocs))\r\n            do ifid = 1,nlocs"
+      }
+    },
+    {
+      "audit_id": "B7",
+      "source_path": "trunk/src/xbeachlibrary/spaceparams.F90",
+      "verdict": "CONFIRM",
+      "rationale": "For nx=1 the interior alfaz loop is empty and the two boundary assignments copy the undefined second column to the first and back. No earlier assignment to alfaz occurs in gridprops, and the nx input lower bound in params.F90 L150 is advisory rather than strict.",
+      "evidence_span": {
+        "lines": "L1404-L1409",
+        "quote": "      do j=1,s%ny+1\r\n         do i=2,s%nx\r\n            s%alfaz(i,j)=atan2(s%yz(i+1,j)-s%yz(i-1,j),s%xz(i+1,j)-s%xz(i-1,j))\r\n         enddo\r\n         s%alfaz(1,j)=s%alfaz(2,j)\r\n         s%alfaz(s%nx+1,j)=s%alfaz(s%nx,j)"
+      }
+    },
+    {
+      "audit_id": "B0",
+      "source_path": "trunk/src/xbeachlibrary/params.F90",
+      "verdict": "CONFIRM",
+      "rationale": "The depfile requirement tests par%hotstart at L160, but the input value is not read until L312. Thus the decision uses the preexisting value (params.def L92 defaults it to -123), so hotstart=1 in params.txt cannot suppress this earlier depth-file requirement.",
+      "evidence_span": {
+        "lines": "L160-L163",
+        "quote": "         if (par%setbathy .ne. 1 .and. par%hotstart .ne. 1) then\r\n            par%depfile = readkey_name('params.txt','depfile',required=.true.)\r\n            call check_file_exist(par%depfile)\r\n            call check_file_length(par%depfile,par%nx+1,par%ny+1)"
+      }
+    },
+    {
+      "audit_id": "B1",
+      "source_path": "trunk/src/xbeachlibrary/params.F90",
+      "verdict": "CONFIRM",
+      "rationale": "The cited reads omit strict, and readkey_dbl defaults strict to false and only warns for out-of-range values (readkey.F90 L95-L125). This permits zero/negative physical inputs, including zero directional spacing used as a divisor at params.F90 L1380 and initialize.F90 L317; this confirms the input-validation defect without assuming every listed downstream consequence occurs.",
+      "evidence_span": {
+        "lines": "L263-L266",
+        "quote": "            par%dtheta_s   = readkey_dbl ('params.txt','dtheta_s',    10.d0,      0.1d0,   20.d0,required=.true.)\r\n         else\r\n            par%dtheta   = readkey_dbl ('params.txt','dtheta',    10.d0,      0.1d0,   180.d0,required=.true.)\r\n         endif"
+      }
+    },
+    {
+      "audit_id": "B2",
+      "source_path": "trunk/src/xbeachlibrary/params.F90",
+      "verdict": "CONFIRM",
+      "rationale": "Successful integer parsing is the only validation of mmax/nmax; they are broadcast and reduced by one without dimension bounds (L220-L237). For example mmax=1 becomes nx=0, incompatible with the column-2 and column-nx boundary accesses in initialize.F90 L248-L249, with no intervening dimension rejection in all_input.",
+      "evidence_span": {
+        "lines": "L232-L237",
+        "quote": "#ifdef USEMPI\r\n         call xmpi_bcast(mmax,toall)\r\n         call xmpi_bcast(nmax,toall)\r\n#endif\r\n         par%nx = mmax-1\r\n         par%ny = nmax-1"
+      }
+    },
+    {
+      "audit_id": "B7",
+      "source_path": "trunk/src/xbeachlibrary/params.F90",
+      "verdict": "CONFIRM",
+      "rationale": "Strict checking rejects only values below the minimum, so these zero lower bounds accept zero intervals (readkey.F90 L115). When the corresponding output is enabled, timestep_init divides by tintg/tintp/tintm/tinth at L201/L239/L277/L320 before any resulting-count checks; tint can supply the zero default for tintg.",
+      "evidence_span": {
+        "lines": "L1227-L1231",
+        "quote": "      par%tstart  = readkey_dbl ('params.txt','tstart',   0.d0,      0.d0,par%tstop,strict=.true.)\r\n      par%tint    = readkey_dbl ('params.txt','tint',     900.d0,     .0d0, par%tstop-par%tstart,strict=.true.)  ! Robert\r\n      par%tsglobal = readkey_name('params.txt','tsglobal')\r\n      if (par%tsglobal==' ') then\r\n         par%tintg   = readkey_dbl ('params.txt','tintg', par%tint,     0.d0, par%tstop-par%tstart,strict=.true.)  ! Robert"
+      }
+    },
+    {
+      "audit_id": "B8",
+      "source_path": "trunk/src/xbeachlibrary/params.F90",
+      "verdict": "CONFIRM",
+      "rationale": "The allowed numeric interval for posdwn includes small positive values, yet this block maps every value below 0.1 to -1 and leaves the others unchanged. The backward-compatibility comment explains accepting zero but does not neutralize the discontinuous treatment of positive values such as 0.05 versus 0.1.",
+      "evidence_span": {
+        "lines": "L1536-L1538",
+        "quote": "      if (par%posdwn<0.1d0) then\r\n         par%posdwn=-1.d0  ! Backward compatibility, now posdwn = 0 also works in input (i.e. posdwn = false)\r\n      endif"
+      }
+    }
+  ]
+}

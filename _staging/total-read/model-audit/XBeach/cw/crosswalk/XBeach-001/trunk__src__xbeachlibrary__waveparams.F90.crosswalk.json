@@ -416,7 +416,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "rejected",
    "base_ids": [],
    "audit_ids": [
     "B9"
@@ -426,12 +426,12 @@
     "[L1057-L1091,L1150-L1178] (HIGH/CDF/indexing) The directional CDF starts above zero; a random draw below P(1) is extrapolated below theta(1), after which stepang can become zero and index S_array at column 0."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-refuted: LINEAR_INTERP clamps a query below its first abscissa to y(1), rather than extrapolating (interp.F90:135-140). Thus a draw below P(1) returns theta(1), and the explicit equality branch at 1163-1164 assigns stepang=1, neutralizing the claimed column-zero path.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B11"
@@ -441,9 +441,15 @@
     "[L1367-L1457] (HIGH/order-dependent physics) The total envelope and directional weights are computed inside the directional-bin loop before later bins' zeta values exist, so Ampzeta for early bins depends on processing order and omits later directional components."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: zeta is zero-initialized and populated one directional bin at a time, but eta and Ampzeta are computed inside that same bin loop. Later bins are still zero when an early bin is weighted, and the non-symmetric output branch at 1507-1509 uses those unrecomputed Ampzeta values.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L1438-L1443",
+    "quote": "               ! Integrate instantaneous water level excitation of wave\n               ! components over directions\n               eta(index2,:) = sum(zeta(index2,:,:),2)\n               Comptemp=eta(index2,:)\n               !\n               ! Hilbert transformation to determine envelope of all total non-directional wave components",
+    "verified_at_lines": "L1438-L1443",
+    "source_sha256": "f224c5c31d15b2e6e9615c9d82bfb4d59aed16039b35c7399422177a7c148cfc"
+   }
   }
  ]
 }

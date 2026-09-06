@@ -74,7 +74,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B2"
@@ -84,9 +84,15 @@
     "[L39-L43] (MED/code-generation/escaping) Definition strings are interpolated directly inside single-quoted Fortran literals without escaping embedded apostrophes, making a legitimate metadata value capable of producing malformed generated source."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: L39-L43 embed metadata directly in single-quoted Fortran literals, with no escaping helper or filter in the enclosing template. generate.py also preserves apostrophes in descriptions and JSON strings without sanitization, so a value such as beach's elevation produces an undoubled apostrophe and a malformed Fortran literal.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L39-L43",
+    "quote": "   t%name = '${var[\"name\"]}'\n   t%btype = '${var[\"broadcast\"]}'\n   t%units= '${var[\"unit\"]}'\n   t%standardname= '${var.get(\"standard_name\", \"\")}'\n   t%description= '${var[\"description\"]}'",
+    "verified_at_lines": "L39-L43",
+    "source_sha256": "cd839a46134c87e02a9c7a841bd8704ab62b3223b87f043ccecec7a7a87f4d6f"
+   }
   }
  ]
 }

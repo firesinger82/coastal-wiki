@@ -212,7 +212,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B7"
@@ -222,9 +222,15 @@
     "[L1175-L1253,L1402-L1419] (MED/minimum-grid bounds) gridprops assumes nx>=1 throughout and requires nx>=2 to define alfaz from an interior point; with nx=1 its two boundary-copy assignments merely circulate an uninitialized orientation."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: For nx=1 the interior alfaz loop is empty and the two boundary assignments copy the undefined second column to the first and back. No earlier assignment to alfaz occurs in gridprops, and the nx input lower bound in params.F90 L150 is advisory rather than strict.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L1404-L1409",
+    "quote": "      do j=1,s%ny+1\r\n         do i=2,s%nx\r\n            s%alfaz(i,j)=atan2(s%yz(i+1,j)-s%yz(i-1,j),s%xz(i+1,j)-s%xz(i-1,j))\r\n         enddo\r\n         s%alfaz(1,j)=s%alfaz(2,j)\r\n         s%alfaz(s%nx+1,j)=s%alfaz(s%nx,j)",
+    "verified_at_lines": "L1404-L1409",
+    "source_sha256": "e13f4e604ba812b76b9b67101356e4419a38f2787b4f6655cc23c88b3ac5e2b0"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",

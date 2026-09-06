@@ -280,7 +280,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B10"
@@ -290,12 +290,18 @@
     "[L251-L253] (LOW/validation) Shape compatibility is enforced only with assert, so optimized Python execution removes this guard before native memory is passed."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: The sole comparison with the actual value shape is the assert at L252. The later data_as cast and byref pass a pointer, so the ndpointer declaration does not recheck the original ndarray shape after assertions are removed.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L251-L252",
+    "quote": "        shape = self.get_arrayshape(name)\n        assert shape == array(value).shape, \"Shapes not equal {} versus {} for variable {}\".format(shape, value.shape, name)\n",
+    "verified_at_lines": "L251-L252",
+    "source_sha256": "55640d609c20815d0b3cf24e0cbf42c48e7a52d8aea701f41d6e3e1c20d5027f"
+   }
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B12"
@@ -305,9 +311,15 @@
     "[L258-L264] (MED/input-validation) set_array has no unsupported-type else branch, so an unexpected native type code reaches function-name construction with dtype and typename uninitialized."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: After the character-type rejection, only r and i initialize typename; an unexpected type reaches L264 with typename unbound. There is no default rejection as there is in get_array.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L259-L264",
+    "quote": "            dtype = float64 if rank > 0 else c_double\n            typename = 'double'\n        elif typecode == 'i':\n            dtype = int32 if rank > 0 else c_double\n            typename = 'int'\n        fun = getattr(self._lib, 'set{}d{}array'.format(rank, typename))\n",
+    "verified_at_lines": "L259-L264",
+    "source_sha256": "55640d609c20815d0b3cf24e0cbf42c48e7a52d8aea701f41d6e3e1c20d5027f"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",

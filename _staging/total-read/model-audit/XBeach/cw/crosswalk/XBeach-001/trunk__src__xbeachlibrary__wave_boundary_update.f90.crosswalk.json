@@ -593,7 +593,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B10"
@@ -603,12 +603,18 @@
     "[L1578-L1619] (HIGH/conditional implementation) Without BUILDXBEACH the interpolation blocks are empty, leaving pdflocal and thetagen undefined while the routine continues to normalize and use them."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: With BUILDXBEACH absent, both interpolation alternatives are comments, while the newly allocated pdflocal is still normalized and the newly allocated thetagen is subsequently used. There is no alternative assignment in the routine for that explicitly described preprocessing branch.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L1583-L1588",
+    "quote": "#else\n         ! interpolate in other systems\n#endif\n      enddo\n      ! convert to pdf by ensuring total integral == 1, assuming constant directional bin size\n      pdflocal = pdflocal/sum(pdflocal)",
+    "verified_at_lines": "L1583-L1588",
+    "source_sha256": "9c364a2c916f034338044b542c0231f412553812a16c11346a6bcc98319a80c7"
+   }
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B16"
@@ -618,12 +624,18 @@
     "[L2167-L2189,L2301-L2304] (HIGH/build failure) BUILDXBEACH logging references s%ntheta and s%ny in generate_ebcf although no s object is in scope."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: generate_ebcf takes only wp and declares no s; neither the enclosing module nor its imported datastore supplies such an object. The BUILDXBEACH logging statement nevertheless dereferences s%ntheta (and the later status statement s%ny), producing an unresolved derived-type object in that branch.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L2186-L2189",
+    "quote": "   do itheta=1,ntheta\n#ifdef BUILDXBEACH\n      call writelog('ls','(A,I0,A,I0)','Calculating short wave time series for theta bin ',itheta,' of ',s%ntheta)\n#endif",
+    "verified_at_lines": "L2186-L2189",
+    "source_sha256": "9c364a2c916f034338044b542c0231f412553812a16c11346a6bcc98319a80c7"
+   }
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B20"
@@ -633,9 +645,15 @@
     "[L2500-L2516] (HIGH/build failure) generate_qbcf allocates q using s%ny even though no s object is declared or passed."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: generate_qbcf takes only wp and uses npb elsewhere for the boundary size, but this unconditional allocation dereferences undeclared s%ny. No local, host or imported s object supplies that reference.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L2514-L2516",
+    "quote": "   allocate(Ftemp(K-1,K,3)) ! Jaap qx, qy, zeta\n   ! Storage for output discharge\n   allocate(q(s%ny+1,wp%tslen,4))   ! qx qy qtot, zeta",
+    "verified_at_lines": "L2514-L2516",
+    "source_sha256": "9c364a2c916f034338044b542c0231f412553812a16c11346a6bcc98319a80c7"
+   }
   }
  ]
 }

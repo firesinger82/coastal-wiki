@@ -1,0 +1,379 @@
+{
+  "shard": "XBeach-003",
+  "verdicts": [
+    {
+      "audit_id": "B10",
+      "source_path": "trunk/src/pybeach/xbeach/libxbeach.py",
+      "verdict": "CONFIRM",
+      "rationale": "The sole comparison with the actual value shape is the assert at L252. The later data_as cast and byref pass a pointer, so the ndpointer declaration does not recheck the original ndarray shape after assertions are removed.",
+      "evidence_span": {
+        "lines": "L251-L252",
+        "quote": "        shape = self.get_arrayshape(name)\n        assert shape == array(value).shape, \"Shapes not equal {} versus {} for variable {}\".format(shape, value.shape, name)\n"
+      }
+    },
+    {
+      "audit_id": "B12",
+      "source_path": "trunk/src/pybeach/xbeach/libxbeach.py",
+      "verdict": "CONFIRM",
+      "rationale": "After the character-type rejection, only r and i initialize typename; an unexpected type reaches L264 with typename unbound. There is no default rejection as there is in get_array.",
+      "evidence_span": {
+        "lines": "L259-L264",
+        "quote": "            dtype = float64 if rank > 0 else c_double\n            typename = 'double'\n        elif typecode == 'i':\n            dtype = int32 if rank > 0 else c_double\n            typename = 'int'\n        fun = getattr(self._lib, 'set{}d{}array'.format(rank, typename))\n"
+      }
+    },
+    {
+      "audit_id": "B2",
+      "source_path": "trunk/src/xbeachlibrary/logging.F90",
+      "verdict": "REFUTE",
+      "rationale": "error is a dummy argument, not an uninitialized local or INTENT(OUT) argument. The actual call in libxbeach.F90:L75-L87 initializes it to zero on every rank before start_logfiles, neutralizing the claimed undefined status."
+    },
+    {
+      "audit_id": "B1",
+      "source_path": "trunk/src/xbeachlibrary/varianceupdate.F90",
+      "verdict": "UNCERTAIN",
+      "rationale": "Both rank selections omit a default and leave their initially null accumulators unassociated for other ranks. Establishing a defect requires the supported mean-variable rank contract and generated variable registry; the allocation omission alone does not establish that an unsupported rank must be processed."
+    },
+    {
+      "audit_id": "B3",
+      "source_path": "trunk/src/xbeachlibrary/varianceupdate.F90",
+      "verdict": "UNCERTAIN",
+      "rationale": "MAX does not protect the division if tintm is zero, and makeaverage has no local denominator guard. A successful initialization/caller path delivering zero is needed: ordinary schedule construction already divides by tintm, while subsequent Fortran output floors it to a positive tiny value."
+    },
+    {
+      "audit_id": "B4",
+      "source_path": "trunk/src/xbeachlibrary/varianceupdate.F90",
+      "verdict": "CONFIRM",
+      "rationale": "SIGN takes its magnitude from the first argument, so this assignment multiplies abs(cosine) by epsilon instead of installing an epsilon-sized value. When both accumulators are zero it leaves them zero immediately before ATAN2.",
+      "evidence_span": {
+        "lines": "L346-L351",
+        "quote": "               tvar2d_sin = tvar2d_sin + mult*sin(tvar2d)\r\n               tvar2d_cos = tvar2d_cos + mult*cos(tvar2d)\r\n               where (abs(tvar2d_sin)<numeps .and. abs(tvar2d_cos)<numeps)\r\n                  tvar2d_cos = numeps*sign(tvar2d_cos,1.d0)\r\n               endwhere\r\n               meansparslocal(i)%mean2d = atan2(tvar2d_sin,tvar2d_cos)\r\n"
+      }
+    },
+    {
+      "audit_id": "B2",
+      "source_path": "trunk/src/xbeachlibrary/xmpi.F90",
+      "verdict": "CONFIRM",
+      "rationale": "The fixed sentinel can prevent selection even without integer overflow: with two processes and m=n=1000000000 both candidate scores equal the sentinel, so neither satisfies the strict comparison. The subsequent minimum-domain tests do not repair an unselected processor grid.",
+      "evidence_span": {
+        "lines": "L350-L355",
+        "quote": "            if (mm * nn .eq. xmpi_size) then\r\n               borderlength = (mm - 1)*n + (nn -1)*m\r\n               if (borderlength .lt. min_borderlength) then\r\n                  xmpi_m = mm\r\n                  xmpi_n = nn\r\n                  min_borderlength = borderlength\r\n"
+      }
+    },
+    {
+      "audit_id": "B3",
+      "source_path": "trunk/src/xbeachlibrary/xmpi.F90",
+      "verdict": "CONFIRM",
+      "rationale": "Two negative factors whose product equals xmpi_size pass this branch, and the later minimum-domain comparisons against negative processor dimensions do not reject them. params.F90 reads mmpi/nmpi without strict checking, and readkey_int only warns for values below its recommended minimum.",
+      "evidence_span": {
+        "lines": "L360-L365",
+        "quote": "         if (mmanual * nmanual .ne. xmpi_size) then\r\n            error = 2\r\n            return\r\n         endif\r\n         xmpi_m = mmanual\r\n         xmpi_n = nmanual\r\n"
+      }
+    },
+    {
+      "audit_id": "B10",
+      "source_path": "trunk/src/xbeachlibrary/xmpi.F90",
+      "verdict": "UNCERTAIN",
+      "rationale": "The reductions use size(x) and do not inspect the capacity of y. Whether this overruns a receive buffer depends on caller allocation and matching collective counts, neither of which is established by these wrappers."
+    },
+    {
+      "audit_id": "B11",
+      "source_path": "trunk/src/xbeachlibrary/xmpi.F90",
+      "verdict": "UNCERTAIN",
+      "rationale": "The fixed interior indices are present, but processor-grid setup in this same file includes minimum-subdomain checks at L393-L407. Actual shift argument shapes and the directions used for degenerate dimensions are needed to establish an out-of-bounds call."
+    },
+    {
+      "audit_id": "B12",
+      "source_path": "trunk/src/xbeachlibrary/xmpi.F90",
+      "verdict": "UNCERTAIN",
+      "rationale": "Only the direction is validated; i1/i2 are used in four-cell-overlap formulas. The adjacent documented calls use bounded overlap indices, so a defect requires evidence that a caller supplies an invalid range or an undersized array."
+    },
+    {
+      "audit_id": "B1",
+      "source_path": "trunk/src/xbeachlibrary/general_mpi_new.F90",
+      "verdict": "UNCERTAIN",
+      "rationale": "The copy and MPI counts rely on is/lm and b capacity without runtime checks. The routine explicitly documents communicator-sized metadata and the slice assigned to each process, so caller metadata and allocation are needed to demonstrate a violation."
+    },
+    {
+      "audit_id": "B5",
+      "source_path": "trunk/src/xbeachlibrary/general_mpi_new.F90",
+      "verdict": "UNCERTAIN",
+      "rationale": "Root slicing trusts the documented submatrix metadata, while non-root reception checks the announced element count against size(b) and aborts on mismatch at L714-L724 and L826-L836. Invalid source ranges or root metadata remain caller-dependent; the absence of additional checks does not establish an actual bad distribution."
+    },
+    {
+      "audit_id": "B7",
+      "source_path": "trunk/src/xbeachlibrary/general_mpi_new.F90",
+      "verdict": "UNCERTAIN",
+      "rationale": "The gather variant clamps reduced counts with MAX(...,0), and both variants derive border handling from the supplied flags. Demonstrating negative counts or inconsistent receive totals requires actual inconsistent metadata/flags; the file documents their geometric contract but does not establish such inputs."
+    },
+    {
+      "audit_id": "B8",
+      "source_path": "trunk/src/xbeachlibrary/general_mpi_new.F90",
+      "verdict": "UNCERTAIN",
+      "rationale": "The four-cell subtraction is followed by border corrections that add cells back, so a dimension below four is not automatically invalid when it spans both external borders. Actual local dimensions and border flags are required to show a negative final MPI count; the existing count-equality check does not by itself prove or disprove that case."
+    },
+    {
+      "audit_id": "B9",
+      "source_path": "trunk/src/xbeachlibrary/general_mpi_new.F90",
+      "verdict": "UNCERTAIN",
+      "rationale": "Division and MOD by numprocs are unguarded, but the documented inputs are a process count and a valid process id. The in-file det_submatrices calls use positive loop counts and ids in range whenever executed; another caller supplying zero or an invalid id is needed to establish the claimed defect."
+    },
+    {
+      "audit_id": "B10",
+      "source_path": "trunk/src/xbeachlibrary/general_mpi_new.F90",
+      "verdict": "UNCERTAIN",
+      "rationale": "The output extents mp*np are explicitly documented, and the implementation trusts that caller allocation. Actual undersized outputs or invalid decomposition dimensions must be established; subtraction of the overlap alone does not prove a bounds failure."
+    },
+    {
+      "audit_id": "B11",
+      "source_path": "trunk/src/xbeachlibrary/general_mpi_new.F90",
+      "verdict": "UNCERTAIN",
+      "rationale": "The routine uses second and penultimate rows/columns and ma-2 counts without local extent checks. A call with insufficient matrix dimensions is not shown, so the caller allocation and halo-size contract are missing."
+    },
+    {
+      "audit_id": "B1",
+      "source_path": "trunk/src/xbeachlibrary/introspection.F90",
+      "verdict": "CONFIRM",
+      "rationale": "These automatic arrays have len(name) elements, yet string_to_char_array returns a fixed MAXSTRINGLEN=1024 array (iso_c_utils.f90:L60-L67). Whole-array assignment is nonconforming for ordinary shorter names; automatic arrays do not resize to the result.",
+      "evidence_span": {
+        "lines": "L130-L134",
+        "quote": "      character(1), dimension(len(name)) :: cname\r\n      length  = len(name)\r\n      cname = string_to_char_array(name)\r\n\r\n      getparametertype_fortran = getparametertype_c(cname, typecode, length)\r\n"
+      }
+    },
+    {
+      "audit_id": "B3",
+      "source_path": "trunk/src/xbeachlibrary/introspection.F90",
+      "verdict": "CONFIRM",
+      "rationale": "The C entry point declares only length elements but passes the array to the fixed-1024-element converter, whose strlen scans until a NUL. A length-sized buffer without a NUL is therefore read beyond its supplied extent; the Fortran wrappers also sometimes put the terminator at length+1, outside that declared extent.",
+      "evidence_span": {
+        "lines": "L137-L142",
+        "quote": "   integer(c_int) function getparametertype_c(name, typecode, length) bind(C,name=\"getparametertype\")\r\n      use getkey_module, only: getkey_indextype\r\n      character(kind=c_char,len=1),intent(in) :: name(length)\r\n      character(kind=c_char, len=1), intent(out) :: typecode\r\n      integer(c_int) :: length\r\n      character(len=length) :: key\r\n"
+      }
+    },
+    {
+      "audit_id": "B4",
+      "source_path": "trunk/src/xbeachlibrary/introspection.F90",
+      "verdict": "CONFIRM",
+      "rationale": "Successful lookup checks only name existence, then dereferences r0 or i0 without checking the parameter type. getkey.F90:L90-L100 associates only the matching component, so a valid name of the other numeric type leaves the dereferenced component undefined.",
+      "evidence_span": {
+        "lines": "L218-L223",
+        "quote": "      getdoubleparameter_c = -1\r\n      myname = char_array_to_string(name)\r\n      getdoubleparameter_c =  getkey(par, myname, myparam)\r\n      if (getdoubleparameter_c .eq. -1) return\r\n      value = myparam%r0\r\n      getdoubleparameter_c = 0\r\n"
+      }
+    },
+    {
+      "audit_id": "B5",
+      "source_path": "trunk/src/xbeachlibrary/introspection.F90",
+      "verdict": "UNCERTAIN",
+      "rationale": "On lookup failure the function returns -1 before assigning either output, as claimed. Whether this is a defect depends on the API error contract and whether callers consume outputs after failure; no requirement for defined failure outputs is established here."
+    },
+    {
+      "audit_id": "B6",
+      "source_path": "trunk/src/xbeachlibrary/introspection.F90",
+      "verdict": "UNCERTAIN",
+      "rationale": "Both functions leave their INTENT(OUT) values undefined on unknown names, but return -1 to signal failure. The missing information is whether the API promises initialized outputs on failure or a caller uses those outputs despite the error status."
+    },
+    {
+      "audit_id": "B6",
+      "source_path": "trunk/src/xbeachlibrary/xbeach_bmi.f90",
+      "verdict": "REFUTE",
+      "rationale": "The floor is intentional time-scale behavior rather than an inconsistent BMI conversion: set and get use the same factor and only for morfacopt=1. params.F90:L1942-L1952 uses the identical floor for internal times, and timestep.F90:L57-L60 documents a time-scale factor of at least one."
+    },
+    {
+      "audit_id": "B4",
+      "source_path": "trunk/src/xbeachlibrary/libxbeach.F90",
+      "verdict": "REFUTE",
+      "rationale": "The ordering exists, but timestep.F90:L747-L759 deliberately forces final diagnostic output and moves scheduled times to the failure time before setting ierr=1. Updating output counters before skipping physics serves that error-output path; advancing diagnostic logging is not evidence of the claimed erroneous side effect."
+    },
+    {
+      "audit_id": "B5",
+      "source_path": "trunk/src/xbeachlibrary/libxbeach.F90",
+      "verdict": "CONFIRM",
+      "rationale": "t01 has no initializer and is first set on the second executestep call because execute_counter starts at zero. A one-step MPI run reaches final and passes t01 to writelog_finalize, which subtracts it without a step-count guard.",
+      "evidence_span": {
+        "lines": "L269-L274",
+        "quote": "#ifdef USEMPI\r\n      if (execute_counter .eq. 1) then\r\n         ! exclude first pass from time measurement\r\n         call xmpi_barrier\r\n         t01 = MPI_Wtime()\r\n      endif\r\n"
+      }
+    },
+    {
+      "audit_id": "B1",
+      "source_path": "trunk/src/xbeachlibrary/ncoutput.F90",
+      "verdict": "CONFIRM",
+      "rationale": "The saved counters are initialized only in fortoutput_init:L1759-L1765, which output.F90 does not call for NetCDF-only output. ncoutput increments the undefined itd and uses it directly as the NetCDF drifter record index; tpar counters used for other coordinates do not neutralize that read.",
+      "evidence_span": {
+        "lines": "L1554-L1559",
+        "quote": "      if (dooutput_drifter) then\r\n         itd = itd+1\r\n#ifdef USENETCDF\r\n         if (donetcdf) then\r\n            ! output time:\r\n            NF90(nf90_put_var(ncid, drifterstimevarid, CONVREAL(par%t), start=(/itd/)))\r\n"
+      }
+    },
+    {
+      "audit_id": "B4",
+      "source_path": "trunk/src/xbeachlibrary/ncoutput.F90",
+      "verdict": "REFUTE",
+      "rationale": "t%dimensions is a fixed maxrank array, not an array allocated to t%rank (mnemonic.F90:L19). Thus scalar/rank-1 metadata does not by itself put dimensions(1:2) out of bounds, and the rank default at L513-L515 stops unsupported ranks; undefined metadata would be a different claim."
+    },
+    {
+      "audit_id": "B5",
+      "source_path": "trunk/src/xbeachlibrary/ncoutput.F90",
+      "verdict": "CONFIRM",
+      "rationale": "For a supported rank with recognized but non-x/y dimension expressions, the mismatch branch only logs and then continues into dimension construction and variable definition. Neither the rank-default STOP nor dimensionid's unknown-expression STOP rejects this recognized-dimension mismatch.",
+      "evidence_span": {
+        "lines": "L491-L496",
+        "quote": "               ! Make sure the variable has x and y as the first 2 dimensions\r\n               if ((dimensionid(t%dimensions(1)) .ne. xdimid) .or. (dimensionid(t%dimensions(2)) .ne. ydimid)) then\r\n                  call writelog('lse','', 'Tried to store variable ' // trim(mnem) // ', but it is not a function of x,y')\r\n               endif\r\n               select case(t%rank)\r\n                case(2)\r\n"
+      }
+    },
+    {
+      "audit_id": "B9",
+      "source_path": "trunk/src/xbeachlibrary/ncoutput.F90",
+      "verdict": "REFUTE",
+      "rationale": "The premise npointvar=0 with initialized runup gauges is neutralized by params.F90:L2259-L2280: readpoints adds xz, yz and zs to pointvars and increments npointvar whenever runup gauges exist. A normal runup-only configuration therefore passes the npointvar gate."
+    },
+    {
+      "audit_id": "B12",
+      "source_path": "trunk/src/xbeachlibrary/ncoutput.F90",
+      "verdict": "CONFIRM",
+      "rationale": "The NetCDF global, point and mean writes multiply by max(morfac,1) without testing morfacopt. In this same routine the Fortran point and dims.dat time paths explicitly test morfacopt, so morfacopt=0 with morfac>1 yields inconsistent time scaling.",
+      "evidence_span": {
+        "lines": "L1136-L1140",
+        "quote": "         ! Store the time (in morphological time)\r\n#ifdef USENETCDF\r\n         if(donetcdf) then\r\n            NF90(nf90_put_var(ncid, globaltimevarid, CONVREAL(par%t*max(par%morfac,1.d0)), (/tpar%itg/)))\r\n         endif\r\n"
+      }
+    },
+    {
+      "audit_id": "B18",
+      "source_path": "trunk/src/xbeachlibrary/ncoutput.F90",
+      "verdict": "CONFIRM",
+      "rationale": "Both output branches still decode mean2d with NINT/MOD as a packed sine/cosine value, while varianceupdate.F90:L346-L351 stores the direct ATAN2 result. The intervening collection/copy does not repack it, so the output angle is corrupted.",
+      "evidence_span": {
+        "lines": "L1500-L1505",
+        "quote": "               elseif (par%meanvars(i)=='thetamean') then       ! thetamean\r\n                  write(indextomeanunit(i),rec=itm) &\r\n                  &  CONVREAL( &\r\n                  &            mod(2.d0*par%px + atan2(nint(meansparsglobal(i)%mean2d)/1d7, &\r\n                  &            mod(meansparsglobal(i)%mean2d,1.d0)*1d1), 2.d0*par%px) / par%px * 180 &\r\n                  &  )\r\n"
+      }
+    },
+    {
+      "audit_id": "B19",
+      "source_path": "trunk/src/xbeachlibrary/ncoutput.F90",
+      "verdict": "CONFIRM",
+      "rationale": "The only active next-interval update is inside dooutput_mean AND dofortran_compat; NetCDF-only runs skip it. The corresponding update in timestep.F90:L355-L358 is commented out, leaving no equivalent adjustment for changing scheduled averaging intervals.",
+      "evidence_span": {
+        "lines": "L1546-L1548",
+        "quote": "         par%tintm = tpar%tpm(min(itm+2,stpm))-tpar%tpm(itm+1)  ! Next averaging period (min to stop array out of bounds)\r\n         par%tintm = max(par%tintm,tiny(0.d0))                  ! to prevent par%tintm=0 after last output\r\n      endif  ! dooutput_mean .and. dofortran_compat\r\n"
+      }
+    },
+    {
+      "audit_id": "B20",
+      "source_path": "trunk/src/xbeachlibrary/ncoutput.F90",
+      "verdict": "CONFIRM",
+      "rationale": "Drifter time is written as par%t, whereas the same routine writes global, point and mean times as par%t*max(morfac,1). No surrounding morfacopt branch reconciles these writes when the morphological factor exceeds one.",
+      "evidence_span": {
+        "lines": "L1554-L1559",
+        "quote": "      if (dooutput_drifter) then\r\n         itd = itd+1\r\n#ifdef USENETCDF\r\n         if (donetcdf) then\r\n            ! output time:\r\n            NF90(nf90_put_var(ncid, drifterstimevarid, CONVREAL(par%t), start=(/itd/)))\r\n"
+      }
+    },
+    {
+      "audit_id": "B22",
+      "source_path": "trunk/src/xbeachlibrary/ncoutput.F90",
+      "verdict": "CONFIRM",
+      "rationale": "Record lengths select only by rank and always call SIZE on real pointer components, with no integer-type branch. Integer mean variables are accepted by means_init, whose global allocation path uses i2/i3/i4, so this real-component access is not justified for them.",
+      "evidence_span": {
+        "lines": "L1815-L1820",
+        "quote": "             case (2)\r\n               reclenm = wordsize*size(t%r2)\r\n             case (3)\r\n               reclenm = wordsize*size(t%r3)\r\n             case (4)\r\n               reclenm = wordsize*size(t%r4)\r\n"
+      }
+    },
+    {
+      "audit_id": "B23",
+      "source_path": "trunk/src/xbeachlibrary/ncoutput.F90",
+      "verdict": "CONFIRM",
+      "rationale": "The lazy open uses direct access without replacement and subsequently writes records using NEXTREC. Existing global files are not replaced in fortoutput_init, so overwriting fewer records can leave the previous run's trailing records intact.",
+      "evidence_span": {
+        "lines": "L1852-L1857",
+        "quote": "      if ( .not. lopen ) then\r\n         filename = trim(mnemonics(outnumbers(index)))//'.dat'\r\n         open(unit, file=filename,form='unformatted',&\r\n         &    access='direct',recl=reclen)\r\n      endif\r\n      inquire(unit=unit,nextrec=jtg)\r\n"
+      }
+    },
+    {
+      "audit_id": "B0",
+      "source_path": "trunk/src/xbeachlibrary/postprocess.F90",
+      "verdict": "UNCERTAIN",
+      "rationale": "snappointstogrid trusts the parameter counts and the supplied coordinate/output extents. The normal points_output_init caller allocates xpoints/ypoints to exactly npoints+nrugauge, so an actual failure requires another mismatched argument or inconsistent space/parameter allocation, not just the absent local checks."
+    },
+    {
+      "audit_id": "B3",
+      "source_path": "trunk/src/xbeachlibrary/postprocess.F90",
+      "verdict": "UNCERTAIN",
+      "rationale": "The point branches trust row/col and a 1x1 leading output section; row>0 is the only local index test. ncoutput allocates such leading sections and derives point indices from the grid, so actual invalid caller indices or shapes are needed to establish this bounds-contract defect."
+    },
+    {
+      "audit_id": "B8",
+      "source_path": "trunk/src/xbeachlibrary/postprocess.F90",
+      "verdict": "CONFIRM",
+      "rationale": "MINLOC searches the entire wetz array and MAXVAL reduces the resulting location vector to one scalar, broadcast to every element selected by pointtypes==1. There is no per-gauge line or position in this calculation, consistent with the explicit incorrectness comment.",
+      "evidence_span": {
+        "lines": "L505-L508",
+        "quote": "      ! This is not correct....\r\n      where (par%pointtypes == 1)\r\n         runup = max(maxval(minloc(s%wetz(:,:)))-1,1)\r\n      end where\r\n"
+      }
+    },
+    {
+      "audit_id": "B2",
+      "source_path": "trunk/src/xbeachlibrary/xmpinew.F90",
+      "verdict": "CONFIRM",
+      "rationale": "The strict comparison against a fixed 1000000000 sentinel can leave every factorization unselected: for two processes and m=n=1000000000, both scores equal the sentinel. There is no fallback selection, and the default-integer products also have no overflow protection.",
+      "evidence_span": {
+        "lines": "L213-L218",
+        "quote": "            if (mm * nn .eq. xmpi_size) then\r\n               borderlength = (mm - 1)*n + (nn -1)*m\r\n               if (borderlength .lt. min_borderlength) then\r\n                  xmpi_m = mm\r\n                  xmpi_n = nn\r\n                  min_borderlength = borderlength\r\n"
+      }
+    },
+    {
+      "audit_id": "B6",
+      "source_path": "trunk/src/xbeachlibrary/xmpinew.F90",
+      "verdict": "UNCERTAIN",
+      "rationale": "All four basic shifts use fixed interior indices without extent guards. The file alone does not show a caller providing a local array smaller than those indices; allocation and selected shift directions for small partitions are needed."
+    },
+    {
+      "audit_id": "B2",
+      "source_path": "trunk/src/xbeachlibrary/iso_c_utils.f90",
+      "verdict": "CONFIRM",
+      "rationale": "For NUL-terminated inputs a and a followed by a space, the trimmed/blank-padded Fortran comparisons return equality rather than the C ordering. L31 additionally converts char_array1 again instead of char_array2, which is another error and does not neutralize the claimed trailing-space discrepancy.",
+      "evidence_span": {
+        "lines": "L30-L34",
+        "quote": "      string1 = trim(char_array_to_string(char_array1))\r\n      string2 = trim(char_array_to_string(char_array1))\r\n      strcmp = 0\r\n      if (llt(string1,string2)) strcmp = -1\r\n      if (lgt(string1,string2)) strcmp = 1\r\n"
+      }
+    },
+    {
+      "audit_id": "B3",
+      "source_path": "trunk/src/xbeachlibrary/iso_c_utils.f90",
+      "verdict": "UNCERTAIN",
+      "rationale": "An unterminated 1024-character source makes strlen return zero and strcpy copies one character into an otherwise blank destination. This input violates the usual NUL-terminated string contract; evidence that this utility must accept unterminated buffers or that a caller supplies one is missing."
+    },
+    {
+      "audit_id": "B2",
+      "source_path": "trunk/src/xbeachlibrary/general_mpi.F90",
+      "verdict": "UNCERTAIN",
+      "rationale": "The subarray starts and subsizes trust is/lm and destination extent, although root is explicitly validated. Actual metadata and destination allocations are needed to show invalid datatypes under the documented distribution contract."
+    },
+    {
+      "audit_id": "B3",
+      "source_path": "trunk/src/xbeachlibrary/general_mpi.F90",
+      "verdict": "UNCERTAIN",
+      "rationale": "The send and receive type signatures independently use the second dimensions of a and b. The documented operation distributes full rows, implying equal widths; a caller violating that implied shape contract is needed to demonstrate a mismatch."
+    },
+    {
+      "audit_id": "B5",
+      "source_path": "trunk/src/xbeachlibrary/general_mpi.F90",
+      "verdict": "UNCERTAIN",
+      "rationale": "The arithmetic is unguarded but numprocs/myid are documented as a process count and process id. In-file det_submatrices calls are bounded by their positive loop counts; a zero process count or invalid id from another caller is not established here."
+    },
+    {
+      "audit_id": "B6",
+      "source_path": "trunk/src/xbeachlibrary/general_mpi.F90",
+      "verdict": "UNCERTAIN",
+      "rationale": "The routine documents mp*np-sized output arrays and writes according to that contract without checking sizes. Actual caller allocations and dimensions are required to establish a bounds failure; an omitted defensive check alone does not demonstrate one."
+    },
+    {
+      "audit_id": "B7",
+      "source_path": "trunk/src/xbeachlibrary/general_mpi.F90",
+      "verdict": "UNCERTAIN",
+      "rationale": "The second/penultimate indices and ma-2 counts are present with no extent validation. Whether the routine is called on a matrix too small for its border exchange depends on the caller's local allocation and halo contract, which are not demonstrated here."
+    },
+    {
+      "audit_id": "B2",
+      "source_path": "trunk/src/xbeachlibrary/libxbeach_dynamic.F90",
+      "verdict": "UNCERTAIN",
+      "rationale": "writetolog invokes distributelog without ASSOCIATED checking, and logging_module initializes it null. However this file also exports assignlogdelegate to register it; the missing API call-order contract determines whether invoking the test before registration is a supported operation or caller misuse."
+    }
+  ]
+}

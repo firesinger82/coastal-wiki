@@ -260,7 +260,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B1"
@@ -270,9 +270,15 @@
     "[L127-L130,L169-L247,L1134-L1136,L1300-L1302,L1554-L1559] (HIGH/uninitialized-state) The NetCDF-only initializer never initializes saved output counters, while ncoutput increments them and uses itd directly as the drifter record index; those counters are initialized only by fortoutput_init."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: The saved counters are initialized only in fortoutput_init:L1759-L1765, which output.F90 does not call for NetCDF-only output. ncoutput increments the undefined itd and uses it directly as the NetCDF drifter record index; tpar counters used for other coordinates do not neutralize that read.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L1554-L1559",
+    "quote": "      if (dooutput_drifter) then\r\n         itd = itd+1\r\n#ifdef USENETCDF\r\n         if (donetcdf) then\r\n            ! output time:\r\n            NF90(nf90_put_var(ncid, drifterstimevarid, CONVREAL(par%t), start=(/itd/)))\r\n",
+    "verified_at_lines": "L1554-L1559",
+    "source_sha256": "04a33fdba34ee869590e0a7bb898d5edc8c7fd1b6ca9dc9634c727e74afaaa7b"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",
@@ -290,7 +296,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "rejected",
    "base_ids": [],
    "audit_ids": [
     "B4"
@@ -300,12 +306,12 @@
     "[L481-L517] (HIGH/bounds-before-validation) Point-variable setup reads dimensions(1) and dimensions(2) before verifying rank is at least 2, so a scalar or rank-1 selection accesses dimension metadata out of bounds."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-refuted: t%dimensions is a fixed maxrank array, not an array allocated to t%rank (mnemonic.F90:L19). Thus scalar/rank-1 metadata does not by itself put dimensions(1:2) out of bounds, and the rank default at L513-L515 stops unsupported ranks; undefined metadata would be a different claim.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B5"
@@ -315,9 +321,15 @@
     "[L491-L516] (MED/validation-without-stop) A point variable whose first two dimensions are not x and y only produces a log message and is still defined and later sampled as a spatial field."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: For a supported rank with recognized but non-x/y dimension expressions, the mismatch branch only logs and then continues into dimension construction and variable definition. Neither the rank-default STOP nor dimensionid's unknown-expression STOP rejects this recognized-dimension mismatch.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L491-L496",
+    "quote": "               ! Make sure the variable has x and y as the first 2 dimensions\r\n               if ((dimensionid(t%dimensions(1)) .ne. xdimid) .or. (dimensionid(t%dimensions(2)) .ne. ydimid)) then\r\n                  call writelog('lse','', 'Tried to store variable ' // trim(mnem) // ', but it is not a function of x,y')\r\n               endif\r\n               select case(t%rank)\r\n                case(2)\r\n",
+    "verified_at_lines": "L491-L496",
+    "source_sha256": "04a33fdba34ee869590e0a7bb898d5edc8c7fd1b6ca9dc9634c727e74afaaa7b"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",
@@ -335,7 +347,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "rejected",
    "base_ids": [],
    "audit_ids": [
     "B9"
@@ -345,12 +357,12 @@
     "[L790-L802] (HIGH/feature-gating) Point/runup processing is conditioned on npointvar being positive, so a valid runup-only configuration with gauges but no ordinary point variables never writes point time or runup output."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-refuted: The premise npointvar=0 with initialized runup gauges is neutralized by params.F90:L2259-L2280: readpoints adds xz, yz and zs to pointvars and increments npointvar whenever runup gauges exist. A normal runup-only configuration therefore passes the npointvar gate.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B12"
@@ -360,9 +372,15 @@
     "[L1139,L1305,L1415] (HIGH/time-scaling) Global, point, and mean NetCDF times are always multiplied by morfac, whereas the rest of the module and BMI time API apply that scaling only when morfacopt equals 1."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: The NetCDF global, point and mean writes multiply by max(morfac,1) without testing morfacopt. In this same routine the Fortran point and dims.dat time paths explicitly test morfacopt, so morfacopt=0 with morfac>1 yields inconsistent time scaling.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L1136-L1140",
+    "quote": "         ! Store the time (in morphological time)\r\n#ifdef USENETCDF\r\n         if(donetcdf) then\r\n            NF90(nf90_put_var(ncid, globaltimevarid, CONVREAL(par%t*max(par%morfac,1.d0)), (/tpar%itg/)))\r\n         endif\r\n",
+    "verified_at_lines": "L1136-L1140",
+    "source_sha256": "04a33fdba34ee869590e0a7bb898d5edc8c7fd1b6ca9dc9634c727e74afaaa7b"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",
@@ -380,7 +398,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B18"
@@ -390,12 +408,18 @@
     "[L1432-L1438,L1500-L1505] (HIGH/scientific-output) thetamean output applies a legacy packed-value decoding expression even though the active averaging code stores a direct atan2 angle, corrupting both NetCDF and Fortran angular means."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: Both output branches still decode mean2d with NINT/MOD as a packed sine/cosine value, while varianceupdate.F90:L346-L351 stores the direct ATAN2 result. The intervening collection/copy does not repack it, so the output angle is corrupted.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L1500-L1505",
+    "quote": "               elseif (par%meanvars(i)=='thetamean') then       ! thetamean\r\n                  write(indextomeanunit(i),rec=itm) &\r\n                  &  CONVREAL( &\r\n                  &            mod(2.d0*par%px + atan2(nint(meansparsglobal(i)%mean2d)/1d7, &\r\n                  &            mod(meansparsglobal(i)%mean2d,1.d0)*1d1), 2.d0*par%px) / par%px * 180 &\r\n                  &  )\r\n",
+    "verified_at_lines": "L1500-L1505",
+    "source_sha256": "04a33fdba34ee869590e0a7bb898d5edc8c7fd1b6ca9dc9634c727e74afaaa7b"
+   }
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B19"
@@ -405,12 +429,18 @@
     "[L1546-L1548] (MED/format-dependent-state) The next averaging interval is updated only inside the Fortran-compatible output branch, so NetCDF-only runs retain the configured nominal interval even when the final or scheduled interval differs."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: The only active next-interval update is inside dooutput_mean AND dofortran_compat; NetCDF-only runs skip it. The corresponding update in timestep.F90:L355-L358 is commented out, leaving no equivalent adjustment for changing scheduled averaging intervals.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L1546-L1548",
+    "quote": "         par%tintm = tpar%tpm(min(itm+2,stpm))-tpar%tpm(itm+1)  ! Next averaging period (min to stop array out of bounds)\r\n         par%tintm = max(par%tintm,tiny(0.d0))                  ! to prevent par%tintm=0 after last output\r\n      endif  ! dooutput_mean .and. dofortran_compat\r\n",
+    "verified_at_lines": "L1546-L1548",
+    "source_sha256": "04a33fdba34ee869590e0a7bb898d5edc8c7fd1b6ca9dc9634c727e74afaaa7b"
+   }
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B20"
@@ -420,9 +450,15 @@
     "[L1554-L1595] (MED/time-coordinate-consistency) Drifter NetCDF time is written as raw par%t while global, point, and mean time coordinates in the same file use morphological scaling, producing inconsistent time axes when scaling is active."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: Drifter time is written as par%t, whereas the same routine writes global, point and mean times as par%t*max(morfac,1). No surrounding morfacopt branch reconciles these writes when the morphological factor exceeds one.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L1554-L1559",
+    "quote": "      if (dooutput_drifter) then\r\n         itd = itd+1\r\n#ifdef USENETCDF\r\n         if (donetcdf) then\r\n            ! output time:\r\n            NF90(nf90_put_var(ncid, drifterstimevarid, CONVREAL(par%t), start=(/itd/)))\r\n",
+    "verified_at_lines": "L1554-L1559",
+    "source_sha256": "04a33fdba34ee869590e0a7bb898d5edc8c7fd1b6ca9dc9634c727e74afaaa7b"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",
@@ -440,7 +476,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B22"
@@ -450,12 +486,18 @@
     "[L1811-L1825] (HIGH/wrong-type-component) Fortran mean-file record lengths are always derived from real pointer components even though the averaging initializer permits integer mean variables."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: Record lengths select only by rank and always call SIZE on real pointer components, with no integer-type branch. Integer mean variables are accepted by means_init, whose global allocation path uses i2/i3/i4, so this real-component access is not justified for them.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L1815-L1820",
+    "quote": "             case (2)\r\n               reclenm = wordsize*size(t%r2)\r\n             case (3)\r\n               reclenm = wordsize*size(t%r3)\r\n             case (4)\r\n               reclenm = wordsize*size(t%r4)\r\n",
+    "verified_at_lines": "L1815-L1820",
+    "source_sha256": "04a33fdba34ee869590e0a7bb898d5edc8c7fd1b6ca9dc9634c727e74afaaa7b"
+   }
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B23"
@@ -465,9 +507,15 @@
     "[L1843-L1857] (MED/stale-output) Lazily opened global Fortran files omit status='replace', so an existing longer file from a prior run can retain stale trailing records."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: The lazy open uses direct access without replacement and subsequently writes records using NEXTREC. Existing global files are not replaced in fortoutput_init, so overwriting fewer records can leave the previous run's trailing records intact.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L1852-L1857",
+    "quote": "      if ( .not. lopen ) then\r\n         filename = trim(mnemonics(outnumbers(index)))//'.dat'\r\n         open(unit, file=filename,form='unformatted',&\r\n         &    access='direct',recl=reclen)\r\n      endif\r\n      inquire(unit=unit,nextrec=jtg)\r\n",
+    "verified_at_lines": "L1852-L1857",
+    "source_sha256": "04a33fdba34ee869590e0a7bb898d5edc8c7fd1b6ca9dc9634c727e74afaaa7b"
+   }
   }
  ]
 }

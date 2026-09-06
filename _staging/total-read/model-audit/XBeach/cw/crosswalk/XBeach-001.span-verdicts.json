@@ -1,0 +1,297 @@
+{
+  "shard": "XBeach-001",
+  "verdicts": [
+    {
+      "audit_id": "B1",
+      "source_path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+      "verdict": "CONFIRM",
+      "rationale": "Both TS readers check only I/O status for nt, then allocate nt elements and compute sum(dataE)/nt (139-164 and 176-203). A successfully read zero count reaches division by zero without a count guard.",
+      "evidence_span": {
+        "lines": "L164-L164",
+        "quote": "            Emean=sum(dataE)/nt"
+      }
+    },
+    {
+      "audit_id": "B3",
+      "source_path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+      "verdict": "CONFIRM",
+      "rationale": "The TS_1 branch forms ht directly from zs0-zb and divides by it, as well as by cg**2-g*hh, without a wet mask or denominator floor. The Emean floor at 448 protects a different expression; the nonhydrostatic branches likewise contain the cited unprotected hyperbolic denominators.",
+      "evidence_span": {
+        "lines": "L451-L453",
+        "quote": "               s%bi(1) = -(2*s%cg(1,j)/s%c(1,j)-0.5d0)*(em-ei)/(s%cg(1,j)**2-par%g*s%hh(1,j))/par%rho\n               ht=s%zs0(1:2,:)-s%zb(1:2,:)\n               s%ui(1,j) = s%cg(1,j)*s%bi(1)/ht(1,j)*cos(s%theta0-s%alfaz(1,j))"
+      }
+    },
+    {
+      "audit_id": "B4",
+      "source_path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+      "verdict": "CONFIRM",
+      "rationale": "dtbcfile is read from the administration files with only I/O-status checks and is not constrained before record indices and interpolation weights are calculated. Zero therefore reaches the division in FLOOR, and a negative value reverses the record progression.",
+      "evidence_span": {
+        "lines": "L594-L597",
+        "quote": "                  old=floor((par%t/dtbcfile)+1)\n                  recpos=1\n               end if\n               new=floor((par%t/dtbcfile)+1)"
+      }
+    },
+    {
+      "audit_id": "B7",
+      "source_path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+      "verdict": "CONFIRM",
+      "rationale": "The rotation updates ui, vi and dUi but never supplies the corresponding rotated dVi; the following taper block also updates dUi alone. No later statement in wave_bc repairs dVi for this spectral branch.",
+      "evidence_span": {
+        "lines": "L858-L863",
+        "quote": "            ! rotate to grid directions\n            s%ui(1,:) = tempu*dcos(s%alfau(1,:)) + tempv*dsin(s%alfau(1,:))\n            s%vi(1,:) = -tempu*dsin(s%alfau(1,:)) + tempv*dcos(s%alfau(1,:))\n            s%dUi(1,:) = tempdu*dcos(s%alfau(1,:)) + tempdv*dsin(s%alfau(1,:))\n\n            s%ui(1,:) = s%ui(1,:)*min(par%t/par%taper,1.0d0)"
+      }
+    },
+    {
+      "audit_id": "B10",
+      "source_path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+      "verdict": "CONFIRM",
+      "rationale": "When Z is absent, the spectral branch copies zs(2,:) directly into zi at 779 and 831; tapering does not subtract the mean level. With FRONT_NONH_1D and ARC=0, line 1312 adds zs0 to that absolute surface, duplicating the reference level once tapering reaches one.",
+      "evidence_span": {
+        "lines": "L1310-L1313",
+        "quote": "                  s%uu(1,jmin_zs:jmax_zs) = s%ui(1,jmin_zs:jmax_zs)\n                  s%vv(1,jmin_zs:jmax_zs) = s%vi(1,jmin_zs:jmax_zs)\n                  s%zs(1,jmin_zs:jmax_zs) = s%zi(1,jmin_zs:jmax_zs)+s%zs0(1,jmin_zs:jmax_zs)\n                  s%ws(1,jmin_zs:jmax_zs) = s%wi(1,jmin_zs:jmax_zs)"
+      }
+    },
+    {
+      "audit_id": "B12",
+      "source_path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+      "verdict": "CONFIRM",
+      "rationale": "The relaxation calculation divides directly by cats and Trep, including in the hybrid branch; a zero cats is not neutralized by hybf1. The parameter reader supplies recommended cats bounds but its non-strict read does not enforce them, and this routine has no positive-value check.",
+      "evidence_span": {
+        "lines": "L1141-L1146",
+        "quote": "               factime = 1.d0/par%cats/par%Trep*par%dt\n            elseif (par%tidetype==TIDETYPE_HYBRID) then\n               factime = hybf1*1.d0/par%cats/par%Trep*par%dt\n            else\n               ! do we need this?\n               factime = 0.1d0/par%cats/par%Trep*par%dt"
+      }
+    },
+    {
+      "audit_id": "B15",
+      "source_path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+      "verdict": "CONFIRM",
+      "rationale": "The globally summed lengths are used as divisors without a nonzero check. In particular, ranges_init defines jmin_vv=2 and jmax_vv=ny-1, so the supported ny=2 grid gives an empty transverse-velocity sum even with positive grid metrics.",
+      "evidence_span": {
+        "lines": "L1177-L1178",
+        "quote": "         s%umean(1,:)=factime*udnusum/dnusum+(1.0d0-factime)*s%umean(1,:)\n         s%vmean(1,:)=factime*vdnvsum/dnvsum+(1.0d0-factime)*s%vmean(1,:)"
+      }
+    },
+    {
+      "audit_id": "B16",
+      "source_path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+      "verdict": "UNCERTAIN",
+      "rationale": "There are raw divisions, but ht is floored at 1223 and 1403 and the back ABS_2D calculations are guarded by wetu at 1408 and 1427; hh is also floored by the flow update. Establishing a remaining singularity requires the hum/cg/grid invariants and admissible initial boundary angles, so the broad claim is not established by these spans alone."
+    },
+    {
+      "audit_id": "B17",
+      "source_path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+      "verdict": "REFUTE",
+      "rationale": "The reflected angle is explicitly folded into a half-plane at 1277-1278 and 1442-1443, so preserving the opposite velocity quadrant with atan2 would be undone by the intended angle convention. Oscillatory velocity reversal does not by itself establish an incorrect propagation direction; the claimed quadrant loss is not evidence of a defect here."
+    },
+    {
+      "audit_id": "B18",
+      "source_path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+      "verdict": "CONFIRM",
+      "rationale": "Both back corners use front-row dzs0dn, dnv and zb while assigning the nx+1 row. The later lateral correction uses imin_zs:imax_zs, which excludes these corner rows, so it does not overwrite the erroneous corner values.",
+      "evidence_span": {
+        "lines": "L1462-L1467",
+        "quote": "               s%zs(s%nx+1,1)=max(s%zs(s%nx+1,2) - s%dzs0dn(1,1)*s%dnv(1,1),s%zb(1,1))\n            endif\n            if (xmpi_isright) then\n               s%uu(s%nx+1,s%ny+1)=s%uu(s%nx+1,s%ny)\n               s%vv(s%nx+1,s%ny+1)=s%vv(s%nx+1,s%ny)\n               s%zs(s%nx+1,s%ny+1)=max(s%zs(s%nx+1,s%ny) + s%dzs0dn(1,s%ny+1)*s%dnv(1,s%ny),s%zb(1,s%ny+1))"
+      }
+    },
+    {
+      "audit_id": "B20",
+      "source_path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+      "verdict": "UNCERTAIN",
+      "rationale": "For ny>0 an unmatched bctype does leave the result unassigned, whereas the ny==0 branch assigns a result for every value. Whether an unmatched value is possible requires the caller and boundary-enumeration validation contract; missing CASE DEFAULT alone does not establish an operational defect."
+    },
+    {
+      "audit_id": "B21",
+      "source_path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+      "verdict": "UNCERTAIN",
+      "rationale": "For nx=1 these three loops are empty and the endpoint copies read unassigned vbc values; neither the wet multipliers nor the ny==0 special case guarantees safety for a two-dimensional call. Whether such a local grid can reach flow_lat_bc requires the grid-size and MPI decomposition contract, which is not established in this function."
+    },
+    {
+      "audit_id": "B22",
+      "source_path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+      "verdict": "CONFIRM",
+      "rationale": "indomain tests only endpoint membership before clipping the endpoints, and both area accumulation and discharge assignment are subsequently conditional on indomain. A segment crossing a rank with neither endpoint inside is therefore omitted; the later clipping and global area reduction do not repair this exclusion.",
+      "evidence_span": {
+        "lines": "L1670-L1673",
+        "quote": "            indomain =  (   m1l >= iminl .and. m1l <= imaxl .and.         &\n            n1l >=jminl .and. n1l <= jmaxl       ) .or.  &\n            (   m2l >=iminl .and. m2l <= imaxl .and.         &\n            n2l >=jminl  .and. n2l <= jmaxl       )"
+      }
+    },
+    {
+      "audit_id": "B30",
+      "source_path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+      "verdict": "UNCERTAIN",
+      "rationale": "The empty fallthrough branches exist, but some no-op combinations are intentional (including no wave forcing), and the final swave/lwave factors may suppress retained values. A defect requires an admitted unsupported combination and a reachable condition change; neither follows from these branches alone."
+    },
+    {
+      "audit_id": "B2",
+      "source_path": "trunk/src/xbeachlibrary/wave_boundary_update.f90",
+      "verdict": "UNCERTAIN",
+      "rationale": "The instat SELECT has no fallback, and the immediate caller uses specin%f after it returns. Establishing an unsupported instat reaching this incomplete module requires its caller/configuration contract; moreover par is not declared in the shown reader, so this is not independently demonstrated as a runnable input-validation failure."
+    },
+    {
+      "audit_id": "B10",
+      "source_path": "trunk/src/xbeachlibrary/wave_boundary_update.f90",
+      "verdict": "CONFIRM",
+      "rationale": "With BUILDXBEACH absent, both interpolation alternatives are comments, while the newly allocated pdflocal is still normalized and the newly allocated thetagen is subsequently used. There is no alternative assignment in the routine for that explicitly described preprocessing branch.",
+      "evidence_span": {
+        "lines": "L1583-L1588",
+        "quote": "#else\n         ! interpolate in other systems\n#endif\n      enddo\n      ! convert to pdf by ensuring total integral == 1, assuming constant directional bin size\n      pdflocal = pdflocal/sum(pdflocal)"
+      }
+    },
+    {
+      "audit_id": "B16",
+      "source_path": "trunk/src/xbeachlibrary/wave_boundary_update.f90",
+      "verdict": "CONFIRM",
+      "rationale": "generate_ebcf takes only wp and declares no s; neither the enclosing module nor its imported datastore supplies such an object. The BUILDXBEACH logging statement nevertheless dereferences s%ntheta (and the later status statement s%ny), producing an unresolved derived-type object in that branch.",
+      "evidence_span": {
+        "lines": "L2186-L2189",
+        "quote": "   do itheta=1,ntheta\n#ifdef BUILDXBEACH\n      call writelog('ls','(A,I0,A,I0)','Calculating short wave time series for theta bin ',itheta,' of ',s%ntheta)\n#endif"
+      }
+    },
+    {
+      "audit_id": "B20",
+      "source_path": "trunk/src/xbeachlibrary/wave_boundary_update.f90",
+      "verdict": "CONFIRM",
+      "rationale": "generate_qbcf takes only wp and uses npb elsewhere for the boundary size, but this unconditional allocation dereferences undeclared s%ny. No local, host or imported s object supplies that reference.",
+      "evidence_span": {
+        "lines": "L2514-L2516",
+        "quote": "   allocate(Ftemp(K-1,K,3)) ! Jaap qx, qy, zeta\n   ! Storage for output discharge\n   allocate(q(s%ny+1,wp%tslen,4))   ! qx qy qtot, zeta"
+      }
+    },
+    {
+      "audit_id": "B3",
+      "source_path": "trunk/src/xbeachlibrary/waveparams.F90",
+      "verdict": "UNCERTAIN",
+      "rationale": "makebcf does fall through the builders and continue updating administration for an unmatched wbctype. Whether it can be invoked with such a type, rather than only the four supported spectral types, depends on its caller contract; the absent fallback alone is insufficient."
+    },
+    {
+      "audit_id": "B9",
+      "source_path": "trunk/src/xbeachlibrary/waveparams.F90",
+      "verdict": "REFUTE",
+      "rationale": "LINEAR_INTERP clamps a query below its first abscissa to y(1), rather than extrapolating (interp.F90:135-140). Thus a draw below P(1) returns theta(1), and the explicit equality branch at 1163-1164 assigns stepang=1, neutralizing the claimed column-zero path."
+    },
+    {
+      "audit_id": "B11",
+      "source_path": "trunk/src/xbeachlibrary/waveparams.F90",
+      "verdict": "CONFIRM",
+      "rationale": "zeta is zero-initialized and populated one directional bin at a time, but eta and Ampzeta are computed inside that same bin loop. Later bins are still zero when an early bin is weighted, and the non-symmetric output branch at 1507-1509 uses those unrecomputed Ampzeta values.",
+      "evidence_span": {
+        "lines": "L1438-L1443",
+        "quote": "               ! Integrate instantaneous water level excitation of wave\n               ! components over directions\n               eta(index2,:) = sum(zeta(index2,:,:),2)\n               Comptemp=eta(index2,:)\n               !\n               ! Hilbert transformation to determine envelope of all total non-directional wave components"
+      }
+    },
+    {
+      "audit_id": "B2",
+      "source_path": "trunk/src/xbeachlibrary/wave_instationary.F90",
+      "verdict": "UNCERTAIN",
+      "rationale": "The division by coffshore precedes the ASIN clamp, but coffshore comes from the caller-supplied phase-speed field and the refraction==1 branch. This file does not establish that a zero offshore phase speed can occur; the dispersion and initialization invariants are needed."
+    },
+    {
+      "audit_id": "B0",
+      "source_path": "trunk/src/xbeachlibrary/compute_tide_zs0.F90",
+      "verdict": "UNCERTAIN",
+      "rationale": "Both selections lack defaults and could retain s%zs01 through s%zs04 for unsupported values; these are spacepars components, not four module-level tide variables. Whether unsupported tideloc/paulrevere values reach this private routine requires the input-validation contract and cannot be decided from the selections alone."
+    },
+    {
+      "audit_id": "B3",
+      "source_path": "trunk/src/xbeachlibrary/compute_tide_zs0.F90",
+      "verdict": "UNCERTAIN",
+      "rationale": "Clipping occurs after gradient assignment, but every lateral gradient assignment is already multiplied by wetz, neutralizing dry points. A remaining inconsistency requires a point that is wet despite zs0 clipping and a contract requiring this imposed normal tide gradient to match the clipped surface; those conditions are not established here."
+    },
+    {
+      "audit_id": "B1",
+      "source_path": "trunk/src/xbeachlibrary/wave_functions.F90",
+      "verdict": "UNCERTAIN",
+      "rationale": "Slope divisions are restricted to wete==1 and dry-point slopes are explicitly zeroed; there is no positive-spacing test for wet points. Whether a zero or invalid metric can coexist with a wet point depends on the grid construction contract, not on these expressions alone."
+    },
+    {
+      "audit_id": "B3",
+      "source_path": "trunk/src/xbeachlibrary/wave_functions.F90",
+      "verdict": "CONFIRM",
+      "rationale": "For ny=1, the left boundary sets j=1 and its nonpositive-cgyv branch reads ee(i,j+2,itheta), although ee is declared with y extent ny+1=2. The wet-point and boundary-rank guards do not exclude this case, and the later right-boundary calculation cannot undo the out-of-bounds read.",
+      "evidence_span": {
+        "lines": "L456-L460",
+        "quote": "                     else\n                        ! eupw=((dnv(i,j+1)+.5*dnv(i,j+2))*ee(i,j+1,itheta)-.5*dnv(i,j+2)*ee(i,j+2,itheta))/dnv(i,j+1)\n                        eupw=((dnv(i,j+1)+.5*dnv(i,j))*ee(i,j+1,itheta)-.5*dnv(i,j)*ee(i,j+2,itheta))/dnv(i,j+1)\n                        if (eupw<0.d0) eupw=ee(i,j+1,itheta)\n                        fluxy(i,j)=eupw*cgyv*dsv(i,j)"
+      }
+    },
+    {
+      "audit_id": "B6",
+      "source_path": "trunk/src/xbeachlibrary/wave_functions.F90",
+      "verdict": "CONFIRM",
+      "rationale": "For ny=1 the routine sets j1=2, making do jy=j1,max(1,ny) empty. The subsequent boundary copies consequently reuse existing usd values without computing the current roller-transport delay, and there is no ny=1 fallback.",
+      "evidence_span": {
+        "lines": "L866-L871",
+        "quote": "         j1 = 2\n      else\n         j1 = 1\n      endif\n\n      do jy = j1,max(1,s%ny)"
+      }
+    },
+    {
+      "audit_id": "B9",
+      "source_path": "trunk/src/xbeachlibrary/wave_functions.F90",
+      "verdict": "UNCERTAIN",
+      "rationale": "An unsupported flavour would leave nthetalocal unassigned, but the argument documents the supported values 0, 1 and 2 and the model call sites inspected use those values. An actual failure requires a caller outside that contract; no such caller is established by this function."
+    },
+    {
+      "audit_id": "B6",
+      "source_path": "trunk/src/xbeachlibrary/wave_boundary_main.f90",
+      "verdict": "CONFIRM",
+      "rationale": "The producer allocates eebct(npb,tslenbc+2,ntheta) and fills eebct(iy,it,itheta), whereas this consumer fixes its second index to itheta and passes the third-axis slice to a time interpolation. The supplied l is the time-vector length, so both the axis and generally the length are wrong.",
+      "evidence_span": {
+        "lines": "L258-L262",
+        "quote": "      l = size(waveBoundaryTimeSeries%tbc)\n      do itheta=1,ntheta\n         do i=1,np\n            call linear_interp(waveBoundaryTimeSeries%tbc,waveBoundaryTimeSeries%eebct(i,itheta,:),l,&\n            t,eebc(i,itheta),dummy)"
+      }
+    },
+    {
+      "audit_id": "B7",
+      "source_path": "trunk/src/xbeachlibrary/wave_boundary_main.f90",
+      "verdict": "CONFIRM",
+      "rationale": "The optional nonhspectrum value is accepted, but the BUILDXBEACH interpolation block has no mode guard. The producer skips generate_ebcf and the hydrostatic discharge allocations when nonhspectrum is true, so the first nonhydrostatic call reaches these references without those arrays being allocated.",
+      "evidence_span": {
+        "lines": "L259-L264",
+        "quote": "      do itheta=1,ntheta\n         do i=1,np\n            call linear_interp(waveBoundaryTimeSeries%tbc,waveBoundaryTimeSeries%eebct(i,itheta,:),l,&\n            t,eebc(i,itheta),dummy)\n         enddo\n      enddo"
+      }
+    },
+    {
+      "audit_id": "B8",
+      "source_path": "trunk/src/xbeachlibrary/wave_stationary.F90",
+      "verdict": "UNCERTAIN",
+      "rationale": "The two mass-flux expressions lack a local sigm floor, but sigm is supplied by the wave-dispersion setup rather than generated as zero by this routine. The shared dispersion code includes a 0.01 floor for evolving intrinsic frequency; a reachable zero-frequency state would require an initialization/caller violation that these spans do not establish."
+    },
+    {
+      "audit_id": "B2",
+      "source_path": "trunk/src/xbeachlibrary/waveparamsnew.F90",
+      "verdict": "UNCERTAIN",
+      "rationale": "The private reader lacks a default and leaves specin untouched for unmatched wbctype values, while its spectral driver later consumes it. Whether an unsupported type can reach that driver requires its external dispatch contract, so the conditional uninitialized-pointer scenario is not confirmed from this file alone."
+    },
+    {
+      "audit_id": "B21",
+      "source_path": "trunk/src/xbeachlibrary/waveparamsnew.F90",
+      "verdict": "REFUTE",
+      "rationale": "The mismatched three-field write is inside nonhspectrum==0, but generate_secondorder is private and its only call in this module is guarded by nonhspectrum==1 at 282-283. par is INTENT(IN), so the cited file-writing branch is unreachable and cannot omit elevation in the actual call path."
+    },
+    {
+      "audit_id": "B0",
+      "source_path": "trunk/src/xbeachlibrary/wave_boundary_datastore.f90",
+      "verdict": "CONFIRM",
+      "rationale": "randomseed is a plain integer component, whereas wave_boundary_main.f90:223 applies both ALLOCATED and DEALLOCATE to it. Those operations require an allocatable component (or, for DEALLOCATE alone, a pointer), so the declaration and consumer are incompatible.",
+      "evidence_span": {
+        "lines": "L24-L26",
+        "quote": "      real*8,dimension(:),allocatable  :: xb,yb,theta     ! Note, can these be changed to pointers?\n      integer                          :: randomseed\n      integer                          :: nspr"
+      }
+    },
+    {
+      "audit_id": "B3",
+      "source_path": "trunk/src/xbeachlibrary/wave_directions.F90",
+      "verdict": "UNCERTAIN",
+      "rationale": "The SELECT omits Roelvink-Daly, but the solver does not clear s%D before using it at 290, so omission does not necessarily mean zero breaking dissipation: it can reuse incoming dissipation. Determining the actual consequence requires the calling solver sequence and whether this legacy directions routine is selected for that configuration."
+    },
+    {
+      "audit_id": "B5",
+      "source_path": "trunk/src/xbeachlibrary/wave_directions.F90",
+      "verdict": "CONFIRM",
+      "rationale": "The MAXVAL array argument is sliced to jmin_ee:jmax_ee but its mask spans the entire row. No shape adjustment follows; ranges_init excludes boundary/halo columns in two-dimensional runs, so the mask and argument are nonconformable under the claimed MPI bounds.",
+      "evidence_span": {
+        "lines": "L360-L360",
+        "quote": "            Herr=maxval(abs(Hprev(jmin_ee:jmax_ee)-s%H(i,jmin_ee:jmax_ee)),mask=s%wete(i,:)==1)"
+      }
+    }
+  ]
+}

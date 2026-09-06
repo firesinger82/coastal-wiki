@@ -209,7 +209,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B6"
@@ -219,12 +219,18 @@
     "[L256-L270] (HIGH/array indexing) Energy interpolation slices eebct(i,itheta,:) even though generation stores it as (point,time,direction); this supplies a direction-length vector while passing the time-axis length."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: The producer allocates eebct(npb,tslenbc+2,ntheta) and fills eebct(iy,it,itheta), whereas this consumer fixes its second index to itheta and passes the third-axis slice to a time interpolation. The supplied l is the time-vector length, so both the axis and generally the length are wrong.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L258-L262",
+    "quote": "      l = size(waveBoundaryTimeSeries%tbc)\n      do itheta=1,ntheta\n         do i=1,np\n            call linear_interp(waveBoundaryTimeSeries%tbc,waveBoundaryTimeSeries%eebct(i,itheta,:),l,&\n            t,eebc(i,itheta),dummy)",
+    "verified_at_lines": "L258-L262",
+    "source_sha256": "5457f45f75df3500f6bfc00c584128aa9d61e969170fe53ca5874842252d24d9"
+   }
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B7"
@@ -234,9 +240,15 @@
     "[L142-L190,L256-L270] (HIGH/mode contract) The nonhydrostatic option still unconditionally interpolates hydrostatic eebct, qxbct, and qybct arrays that its generation path does not allocate."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: The optional nonhspectrum value is accepted, but the BUILDXBEACH interpolation block has no mode guard. The producer skips generate_ebcf and the hydrostatic discharge allocations when nonhspectrum is true, so the first nonhydrostatic call reaches these references without those arrays being allocated.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L259-L264",
+    "quote": "      do itheta=1,ntheta\n         do i=1,np\n            call linear_interp(waveBoundaryTimeSeries%tbc,waveBoundaryTimeSeries%eebct(i,itheta,:),l,&\n            t,eebc(i,itheta),dummy)\n         enddo\n      enddo",
+    "verified_at_lines": "L259-L264",
+    "source_sha256": "5457f45f75df3500f6bfc00c584128aa9d61e969170fe53ca5874842252d24d9"
+   }
   }
  ]
 }

@@ -203,7 +203,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B3"
@@ -213,12 +213,18 @@
     "[L137-L149,L203-L223,L245-L269,L290-L311,L316-L336,L392-L406,L422-L436,L454-L505,L529-L1260] (HIGH/ffi/string-bounds) C entry points pass variable-length name arrays to char_array_to_string, whose dummy contract reads up to 1024 elements, so length-sized buffers without an in-range NUL can be read beyond their declared extent."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: The C entry point declares only length elements but passes the array to the fixed-1024-element converter, whose strlen scans until a NUL. A length-sized buffer without a NUL is therefore read beyond its supplied extent; the Fortran wrappers also sometimes put the terminator at length+1, outside that declared extent.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L137-L142",
+    "quote": "   integer(c_int) function getparametertype_c(name, typecode, length) bind(C,name=\"getparametertype\")\r\n      use getkey_module, only: getkey_indextype\r\n      character(kind=c_char,len=1),intent(in) :: name(length)\r\n      character(kind=c_char, len=1), intent(out) :: typecode\r\n      integer(c_int) :: length\r\n      character(len=length) :: key\r\n",
+    "verified_at_lines": "L137-L142",
+    "source_sha256": "870a8c3214b3642de9315de935dd5cd3c06ba38e694e7080410ffe572fb8e08e"
+   }
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B4"
@@ -228,9 +234,15 @@
     "[L203-L224,L290-L312] (HIGH/type-confusion) Numeric parameter getters do not verify myparam's type before reading r0 or i0, so calling a getter with a valid name of the wrong type accesses the wrong parameter component."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: Successful lookup checks only name existence, then dereferences r0 or i0 without checking the parameter type. getkey.F90:L90-L100 associates only the matching component, so a valid name of the other numeric type leaves the dereferenced component undefined.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L218-L223",
+    "quote": "      getdoubleparameter_c = -1\r\n      myname = char_array_to_string(name)\r\n      getdoubleparameter_c =  getkey(par, myname, myparam)\r\n      if (getdoubleparameter_c .eq. -1) return\r\n      value = myparam%r0\r\n      getdoubleparameter_c = 0\r\n",
+    "verified_at_lines": "L218-L223",
+    "source_sha256": "870a8c3214b3642de9315de935dd5cd3c06ba38e694e7080410ffe572fb8e08e"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",

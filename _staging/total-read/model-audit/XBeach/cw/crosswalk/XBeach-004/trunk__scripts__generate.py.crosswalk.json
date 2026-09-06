@@ -123,7 +123,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B3"
@@ -133,12 +133,18 @@
     "[L149-L166,L175-L192] (MED/schema/validation) Parsed declarations are accepted without checking required JSON keys, name uniqueness, or agreement between declaration rank and JSON shape rank, allowing inconsistent definition data to fail later or generate contradictory Fortran."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: Both parsing loops append declarations after regex/type parsing and an optional JSON merge, without checking required metadata, duplicate names, or declaration-rank/shape consistency; the exception handlers only catch errors already raised. No validation occurs before rendering, and indextos.mako directly requires shape and broadcast and derives its pointer rank from shape, allowing missing keys to fail during rendering and inconsistent shapes to generate incompatible pointer assignments.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L164-L166",
+    "quote": "                        if \"json\" in variable and variable[\"json\"]:\n                            variable.update(json.loads(variable[\"json\"]))\n                        variables.append(variable)",
+    "verified_at_lines": "L164-L166",
+    "source_sha256": "a9e13e75f2bb36213e2ca87eb3106e34aeae3a6d27dbb57c26aaf1c4b2690adb"
+   }
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B4"
@@ -148,9 +154,15 @@
     "[L164-L166,L190-L192] (MED/schema/integrity) Unrestricted dictionary update lets arbitrary JSON metadata overwrite parsed structural fields such as name, type, dimension, or rank."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: At L164-L166 and L190-L192, json.loads results are merged directly into the parsed dictionaries after name, dimension, type, and rank have been established. There is no reserved-key restriction or subsequent restoration, so metadata keys can replace these structural fields before rendering.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L164-L166",
+    "quote": "                        if \"json\" in variable and variable[\"json\"]:\n                            variable.update(json.loads(variable[\"json\"]))\n                        variables.append(variable)",
+    "verified_at_lines": "L164-L166",
+    "source_sha256": "a9e13e75f2bb36213e2ca87eb3106e34aeae3a6d27dbb57c26aaf1c4b2690adb"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",
@@ -168,7 +180,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "rejected",
    "base_ids": [],
    "audit_ids": [
     "B6"
@@ -178,9 +190,9 @@
     "[L221-L225] (LOW/CLI/contract) Command-line template paths are reduced to basenames without validation, so the supplied directory is silently ignored and a same-named template from the fixed template directory is used."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-refuted: Basename stripping is present, but the nearby CLI contract at L218-L220 explicitly expects names like x.mako and says the file comes from the templates directory; the fixed TemplateLookup at L231 implements that contract. This documented name-selection interface neutralizes the alleged arbitrary-path contract violation: the source does not promise to load templates from supplied directories.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06"
   },
   {
    "disposition": "distinct_unconfirmed",

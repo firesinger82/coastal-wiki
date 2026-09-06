@@ -241,7 +241,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B2"
@@ -251,12 +251,18 @@
     "[L338-L387] (LOW/integer-range) Processor-grid scoring uses default-integer products and a fixed 1000000000 sentinel, allowing large domain dimensions to overflow or leave a valid factorization unselected."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: The fixed sentinel can prevent selection even without integer overflow: with two processes and m=n=1000000000 both candidate scores equal the sentinel, so neither satisfies the strict comparison. The subsequent minimum-domain tests do not repair an unselected processor grid.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L350-L355",
+    "quote": "            if (mm * nn .eq. xmpi_size) then\r\n               borderlength = (mm - 1)*n + (nn -1)*m\r\n               if (borderlength .lt. min_borderlength) then\r\n                  xmpi_m = mm\r\n                  xmpi_n = nn\r\n                  min_borderlength = borderlength\r\n",
+    "verified_at_lines": "L350-L355",
+    "source_sha256": "68c0cec030f136e8edd2024248284fb43c03c171fc5f23a1496ff40d52ced140"
+   }
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B3"
@@ -266,9 +272,15 @@
     "[L359-L365] (MED/input-validation) Manual decomposition checks only the product, so two negative manual dimensions can pass and later become invalid divisors and neighbor geometry."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: Two negative factors whose product equals xmpi_size pass this branch, and the later minimum-domain comparisons against negative processor dimensions do not reject them. params.F90 reads mmpi/nmpi without strict checking, and readkey_int only warns for values below its recommended minimum.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L360-L365",
+    "quote": "         if (mmanual * nmanual .ne. xmpi_size) then\r\n            error = 2\r\n            return\r\n         endif\r\n         xmpi_m = mmanual\r\n         xmpi_n = nmanual\r\n",
+    "verified_at_lines": "L360-L365",
+    "source_sha256": "68c0cec030f136e8edd2024248284fb43c03c171fc5f23a1496ff40d52ced140"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",

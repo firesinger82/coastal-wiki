@@ -190,7 +190,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B3"
@@ -200,12 +200,18 @@
     "[L384-L463,L465-L544] (HIGH/vector bounds and undefined tail) The vector readers never require 0<=vlength<=tlength, directly section value_vec(1:vlength), and leave result elements vlength+1:tlength undefined."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: Both vector functions declare a tlength-element result but assign and broadcast only 1:vlength, with no length check or whole-result initialization (L384-L544). Thus the tail is undefined when vlength<tlength, and vlength>tlength overruns the declared result; caller discipline can prevent the overrun but does not initialize the returned tail.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L447-L451",
+    "quote": "               value_vec(1:vlength)=defval\r\n               do i=1,vlength\r\n                  if (.not. lsilent) call writelog('l','(a,a,f0.4,a)',(printkey),' = ', &\r\n                  value_vec(i),' (no record found, default value used)')\r\n               enddo",
+    "verified_at_lines": "L447-L451",
+    "source_sha256": "1a95b6c3f57b3144ac3b6d251d22b74e3183eb276ed7b8b75144d8d8aaa39031"
+   }
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B6"
@@ -215,9 +221,15 @@
     "[L603-L643] (MED/stale file cache) The parameter cache is invalidated only when the filename string changes, so rereading a modified file under the same name returns stale values and stale used-key tracking."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: The saved filename is the sole reload condition, enclosing both file reads and readindex initialization (L597-L643). Replacing or editing the same pathname between calls therefore leaves both cached values and usage bookkeeping from the previous contents.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L603-L607",
+    "quote": "      ! If the file name of the input file changes, the file should be reread\r\n      if (fname/=fnameold) then\r\n         ! Make sure this reset only recurs when the input file name changes\r\n         fnameold=fname\r\n         nkeys=0",
+    "verified_at_lines": "L603-L607",
+    "source_sha256": "1a95b6c3f57b3144ac3b6d251d22b74e3183eb276ed7b8b75144d8d8aaa39031"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",
@@ -235,7 +247,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B8"
@@ -245,9 +257,15 @@
     "[L762-L804] (HIGH/undefined optional MPI output) parmapply assigns optional parm_str only on xmaster and never broadcasts it, so a present parm_str is undefined on non-master ranks even when parameter broadcasting is enabled."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: parm_str is INTENT(OUT) and its only assignment is inside the xmaster branch; the USEMPI block broadcasts only parm (L769-L802). Broadcasting the local string d through readkey_str does not assign the non-master caller's parm_str.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L786-L791",
+    "quote": "      if (xmaster) then\r\n         do i=1,numallowednames\r\n            if (d .eq. allowednames(i)) then\r\n               parm = intvalues(i)\r\n               if (present(parm_str)) then\r\n                  parm_str = d",
+    "verified_at_lines": "L786-L791",
+    "source_sha256": "1a95b6c3f57b3144ac3b6d251d22b74e3183eb276ed7b8b75144d8d8aaa39031"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",
@@ -265,7 +283,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B13"
@@ -275,9 +293,15 @@
     "[L1136-L1148] (LOW/input corruption) strippedline replaces every byte outside printable 7-bit ASCII with a blank, silently corrupting valid non-ASCII parameter values and filenames."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: strippedline replaces each character code outside 32:126 with a space, and readkey applies it to the entire record before splitting key and value (L628-L635). Consequently non-ASCII bytes inside a value or filename are changed without any diagnostic.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L1141-L1146",
+    "quote": "      do itab=1,slen\r\n         if (ichar(line(itab:itab))<32 .or. ichar(line(itab:itab))>126) then  ! this is anything not in standard\r\n            ! alphanumeric\r\n            strippedline(itab:itab) = ' '\r\n         else\r\n            strippedline(itab:itab) = line(itab:itab)",
+    "verified_at_lines": "L1141-L1146",
+    "source_sha256": "1a95b6c3f57b3144ac3b6d251d22b74e3183eb276ed7b8b75144d8d8aaa39031"
+   }
   }
  ]
 }

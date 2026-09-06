@@ -191,7 +191,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B0"
@@ -201,12 +201,18 @@
     "[L145-L167,L301-L315] (HIGH/parameter-order defect) The XBeach grid branch decides whether a depth file is required from par%hotstart before the hotstart parameter is read from params.txt, so a requested hotstart can follow stale/default state and unnecessarily require or load depfile."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: The depfile requirement tests par%hotstart at L160, but the input value is not read until L312. Thus the decision uses the preexisting value (params.def L92 defaults it to -123), so hotstart=1 in params.txt cannot suppress this earlier depth-file requirement.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L160-L163",
+    "quote": "         if (par%setbathy .ne. 1 .and. par%hotstart .ne. 1) then\r\n            par%depfile = readkey_name('params.txt','depfile',required=.true.)\r\n            call check_file_exist(par%depfile)\r\n            call check_file_length(par%depfile,par%nx+1,par%ny+1)",
+    "verified_at_lines": "L160-L163",
+    "source_sha256": "73648b5733a8f90a8f18cda32743bdc2ef42f649e39c521e28e06584ee63c359"
+   }
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B1"
@@ -216,12 +222,18 @@
     "[L170-L175,L247-L266,L283-L296,L419-L434] (HIGH/advisory-only critical bounds) Critical positive quantities including dx, dy, dtheta, dtheta_s, tstop, gravity, and wave periods are read without strict=.true., so zero or negative out-of-range values only warn and can later drive divisions, invalid extents, or nonterminating angle normalization."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: The cited reads omit strict, and readkey_dbl defaults strict to false and only warns for out-of-range values (readkey.F90 L95-L125). This permits zero/negative physical inputs, including zero directional spacing used as a divisor at params.F90 L1380 and initialize.F90 L317; this confirms the input-validation defect without assuming every listed downstream consequence occurs.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L263-L266",
+    "quote": "            par%dtheta_s   = readkey_dbl ('params.txt','dtheta_s',    10.d0,      0.1d0,   20.d0,required=.true.)\r\n         else\r\n            par%dtheta   = readkey_dbl ('params.txt','dtheta',    10.d0,      0.1d0,   180.d0,required=.true.)\r\n         endif",
+    "verified_at_lines": "L263-L266",
+    "source_sha256": "73648b5733a8f90a8f18cda32743bdc2ef42f649e39c521e28e06584ee63c359"
+   }
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B2"
@@ -231,9 +243,15 @@
     "[L193-L237] (MED/unchecked external grid dimensions) Delft3D mmax and nmax are converted directly to nx=mmax-1 and ny=nmax-1 without validating minimum or maximum grid sizes before downstream allocation and boundary indexing."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: Successful integer parsing is the only validation of mmax/nmax; they are broadcast and reduced by one without dimension bounds (L220-L237). For example mmax=1 becomes nx=0, incompatible with the column-2 and column-nx boundary accesses in initialize.F90 L248-L249, with no intervening dimension rejection in all_input.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L232-L237",
+    "quote": "#ifdef USEMPI\r\n         call xmpi_bcast(mmax,toall)\r\n         call xmpi_bcast(nmax,toall)\r\n#endif\r\n         par%nx = mmax-1\r\n         par%ny = nmax-1",
+    "verified_at_lines": "L232-L237",
+    "source_sha256": "73648b5733a8f90a8f18cda32743bdc2ef42f649e39c521e28e06584ee63c359"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",
@@ -281,7 +299,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B7"
@@ -291,12 +309,18 @@
     "[L1227-L1248] (HIGH/zero output interval accepted) tint, tintg, tintp, tintm, and tinth use strict lower bounds of zero, allowing zero intervals that timestep_init later uses as divisors when generating schedules."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: Strict checking rejects only values below the minimum, so these zero lower bounds accept zero intervals (readkey.F90 L115). When the corresponding output is enabled, timestep_init divides by tintg/tintp/tintm/tinth at L201/L239/L277/L320 before any resulting-count checks; tint can supply the zero default for tintg.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L1227-L1231",
+    "quote": "      par%tstart  = readkey_dbl ('params.txt','tstart',   0.d0,      0.d0,par%tstop,strict=.true.)\r\n      par%tint    = readkey_dbl ('params.txt','tint',     900.d0,     .0d0, par%tstop-par%tstart,strict=.true.)  ! Robert\r\n      par%tsglobal = readkey_name('params.txt','tsglobal')\r\n      if (par%tsglobal==' ') then\r\n         par%tintg   = readkey_dbl ('params.txt','tintg', par%tint,     0.d0, par%tstop-par%tstart,strict=.true.)  ! Robert",
+    "verified_at_lines": "L1227-L1231",
+    "source_sha256": "73648b5733a8f90a8f18cda32743bdc2ef42f649e39c521e28e06584ee63c359"
+   }
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B8"
@@ -306,9 +330,15 @@
     "[L1536-L1538] (LOW/nonlinear option coercion) Every posdwn value below 0.1, including allowed small positive values, is coerced to -1 while other positive magnitudes remain unnormalized, making this nominal sign option behave discontinuously."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: The allowed numeric interval for posdwn includes small positive values, yet this block maps every value below 0.1 to -1 and leaves the others unchanged. The backward-compatibility comment explains accepting zero but does not neutralize the discontinuous treatment of positive values such as 0.05 versus 0.1.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L1536-L1538",
+    "quote": "      if (par%posdwn<0.1d0) then\r\n         par%posdwn=-1.d0  ! Backward compatibility, now posdwn = 0 also works in input (i.e. posdwn = false)\r\n      endif",
+    "verified_at_lines": "L1536-L1538",
+    "source_sha256": "73648b5733a8f90a8f18cda32743bdc2ef42f649e39c521e28e06584ee63c359"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",

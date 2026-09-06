@@ -93,7 +93,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B2"
@@ -103,9 +103,15 @@
     "[L30-L34] (LOW/semantic-contract) strcmp trims both converted strings and uses Fortran lexical comparison, which does not preserve ordinary C strcmp behavior for spaces preceding the NUL."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: For NUL-terminated inputs a and a followed by a space, the trimmed/blank-padded Fortran comparisons return equality rather than the C ordering. L31 additionally converts char_array1 again instead of char_array2, which is another error and does not neutralize the claimed trailing-space discrepancy.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L30-L34",
+    "quote": "      string1 = trim(char_array_to_string(char_array1))\r\n      string2 = trim(char_array_to_string(char_array1))\r\n      strcmp = 0\r\n      if (llt(string1,string2)) strcmp = -1\r\n      if (lgt(string1,string2)) strcmp = 1\r\n",
+    "verified_at_lines": "L30-L34",
+    "source_sha256": "b63c219fb525ae5463f47044c1b5f8cc05b134cbfee88ae221357952902a424b"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",

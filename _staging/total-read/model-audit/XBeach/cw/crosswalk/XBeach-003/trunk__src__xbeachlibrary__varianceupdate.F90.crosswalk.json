@@ -225,7 +225,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B4"
@@ -235,9 +235,15 @@
     "[L337-L351] (MED/numerical-guard) The near-zero circular-mean guard computes numeps*sign(tvar2d_cos,1.d0), which remains zero when cosine is zero and is far below numeps otherwise, so it does not reliably prevent the invalid atan2(0,0) case."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: SIGN takes its magnitude from the first argument, so this assignment multiplies abs(cosine) by epsilon instead of installing an epsilon-sized value. When both accumulators are zero it leaves them zero immediately before ATAN2.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L346-L351",
+    "quote": "               tvar2d_sin = tvar2d_sin + mult*sin(tvar2d)\r\n               tvar2d_cos = tvar2d_cos + mult*cos(tvar2d)\r\n               where (abs(tvar2d_sin)<numeps .and. abs(tvar2d_cos)<numeps)\r\n                  tvar2d_cos = numeps*sign(tvar2d_cos,1.d0)\r\n               endwhere\r\n               meansparslocal(i)%mean2d = atan2(tvar2d_sin,tvar2d_cos)\r\n",
+    "verified_at_lines": "L346-L351",
+    "source_sha256": "04276e4292cef22fca94de2f725ee5ebe9abec9e88effb55b670296c9f0a5789"
+   }
   }
  ]
 }

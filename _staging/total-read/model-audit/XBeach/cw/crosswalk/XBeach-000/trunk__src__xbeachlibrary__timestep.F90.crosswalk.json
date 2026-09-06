@@ -214,7 +214,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B4"
@@ -224,9 +224,15 @@
     "[L363-L406] (HIGH/duplicate schedule deadlock) For duplicate scheduled times, each output counter advances only once while tnext excludes all times equal to the current time, leaving the counter pinned on the duplicate and preventing that output category from matching later times."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: The schedule readers accept duplicate entries, and outputtimes_update advances each matching counter only once while the next-time mask excludes all entries at the current time (L181-L343, L363-L406). For a schedule [1,1,2], after processing time 1 the next comparison remains against the second 1 even when tnext advances to 2, suppressing later output in that category.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L390-L394",
+    "quote": "      if (tpar%outputg) tpar%itg = tpar%itg + 1\r\n      if (tpar%outputp) tpar%itp = tpar%itp + 1\r\n      if (tpar%outputm) tpar%itm = tpar%itm + 1\r\n      if (tpar%outputw) tpar%itw = tpar%itw + 1\r\n      if (tpar%outputh) tpar%ith = tpar%ith + 1",
+    "verified_at_lines": "L390-L394",
+    "source_sha256": "24f600029a975b520c837bbcdb0109853df0c6d6b14b00e198d315a9230e1578"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",
@@ -244,7 +250,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "rejected",
    "base_ids": [],
    "audit_ids": [
     "B8"
@@ -254,9 +260,9 @@
     "[L462-L469] (MED/zero-depth division) The cold-start timestep divides by sqrt(maxval(hh)*g) without a positive lower bound, despite the branch comment explicitly anticipating zero initialization, so an all-zero depth field yields an infinite or invalid timestep."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-refuted: The zeros-initialization comment does not imply that hh is still zero: flow_init sets hh=max(zs-zb,par%eps) at initialize.F90 L1011-L1012 before compute_dt is used (libxbeach.F90 L172). With the positive depth tolerance, even an entirely dry domain has positive hh; obtaining an all-zero field requires a different, invalid-input or caller-state scenario.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06"
   },
   {
    "disposition": "distinct_unconfirmed",
@@ -274,7 +280,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B12"
@@ -284,9 +290,15 @@
     "[L595-L629] (MED/unchecked permeability division) Groundwater stability calculations divide directly by par%kx and par%ky without local positivity checks when their respective branches are enabled."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: The enabled groundwater branch divides by 2*kx and, for ny>2, by 2*ky without a zero check (L595-L629). The parameter reads in params.F90 L825-L835 use advisory bounds only, so zero permeability is not rejected by those input checks.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L606-L606",
+    "quote": "                  par%dt=min(par%dt,par%CFL*s%dsc(i,j)**2*par%por/(2*par%kx))",
+    "verified_at_lines": "L606-L606",
+    "source_sha256": "24f600029a975b520c837bbcdb0109853df0c6d6b14b00e198d315a9230e1578"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",

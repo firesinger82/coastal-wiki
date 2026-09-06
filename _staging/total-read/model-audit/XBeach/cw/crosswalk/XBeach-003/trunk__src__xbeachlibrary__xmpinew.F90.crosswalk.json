@@ -176,7 +176,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B2"
@@ -186,9 +186,15 @@
     "[L201-L220] (LOW/integer-range) Automatic processor-grid selection computes border lengths in default integers and uses a hard-coded 1000000000 sentinel, so sufficiently large grid dimensions can overflow or fail to select a factorization."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: The strict comparison against a fixed 1000000000 sentinel can leave every factorization unselected: for two processes and m=n=1000000000, both scores equal the sentinel. There is no fallback selection, and the default-integer products also have no overflow protection.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L213-L218",
+    "quote": "            if (mm * nn .eq. xmpi_size) then\r\n               borderlength = (mm - 1)*n + (nn -1)*m\r\n               if (borderlength .lt. min_borderlength) then\r\n                  xmpi_m = mm\r\n                  xmpi_n = nn\r\n                  min_borderlength = borderlength\r\n",
+    "verified_at_lines": "L213-L218",
+    "source_sha256": "0d699318af66a7e342e4f643ef924207182110f9dddad9fe2de44ee223851475"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",

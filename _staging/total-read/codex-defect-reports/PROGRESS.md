@@ -12,7 +12,7 @@
 | Delft3D | 24,748 | ⬜ | 🟡(코어34) | ⬜ | ⬜ | ⬜ | ✅(HIGH9) | ⬜ | ~0.1% | 🟡(코어 부분·third-party 미분리) |
 | CADMAS-SURF | 1,310 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 0% | ⬜ |
 | SFINCS | 241 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 0% | ⬜ |
-| XBeach | 102(승인) | ✅ | ✅(102/102·6shard·H260/M306/L130) | ✅(102/102·blind·H257/M303/L136) | ✅(102파일·908처분·verify PASS) | ⬜ | ⬜ | ⬜ | R1·R2·CW 100% | 🟡(CW 완료·SUP 대기) |
+| XBeach | 102(승인) | ✅ | ✅(102/102·6shard·H260/M306/L130) | ✅(102/102·blind·H257/M303/L136) | ✅(102파일·908처분·verify PASS) | ✅(154 span확인·confirmed_delta 66) | ⬜ | ⬜ | R1·R2·CW·SUP 100% | 🟡(SUP 완료·V 대기) |
 | SWAN | 82 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 0% | ⬜ |
 | SWASH | 162 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 0% | ⬜ |
 | LISFLOOD-FP | 868 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 0% | ⬜ (C/CUDA) |
@@ -24,16 +24,17 @@
 현재 **어떤 모델도 완료 아님**. FUNWAVE 가 코드축 실질완료(3독립판독·신규HIGH0)로 가장 근접.
 
 ## 다음 착수
-공정표 1진: **XBeach P0·R1·R2·CW 완료(2026-09-06)**. CW = blinded crosswalk(MERGE-PLAN §2): R1 696 findings ↔ R2 696 findings, 후보쌍 1,241건을 판정 전용 Codex 스레드(keymap·원본레코드·소스 접근 금지)가 SAME/CONFLICT/DIFFERENT 판정 + materiality 부여 → `finalize_shard.py` 처분 → **`verify_crosswalk.py` 6/6 PASS(유실 0·처분 전건·부모해시 정합)**.
+공정표 1진: **XBeach P0·R1·R2·CW·SUP 완료(2026-09-06)**.
 
-| 처분 | 건수 |
+SUP = delta 후보 154건(HIGH 미매칭 R2 단독)의 **원문 span 재확인**(판정전용 Codex 스레드가 실제 소스 라인 열람 → CONFIRM 시 verbatim 인용 제출) + **caller 독립 인용대조**(인용문이 소스에 그대로 존재하는지·인용 라인 근처인지 재검증, `promote_deltas.py`). 인용대조 실패 9건은 **승격하지 않고** distinct_unconfirmed 로 남겼다(자기신고 인용 불신 원칙).
+
+| SUP 결과 | 건수 |
 |---|---|
-| equivalent (양 리더 일치) | 440 |
-| conflict (사람 확정 대상) | 2 |
-| base_only (R1 단독) | 225 |
-| distinct_unconfirmed (R2 단독) | 241 |
-| **처분 합계** | **908** (102 파일) |
+| CONFIRM → **confirmed_delta 승격** | **66** |
+| REFUTE → rejected | 19 |
+| UNCERTAIN (파일 단독 판단 불가) | 60 |
+| CONFIRM 주장했으나 **인용대조 실패**(미승격) | 9 |
 
-산출 `model-audit/XBeach/cw/`: `records-r1|r2/`(어댑터 `cw_adapt.py` 변환 레코드)·`blind/<shard>/{blinded_input,keymap,verdicts}.json`·`crosswalk/<shard>/*.crosswalk.json`·`crosswalk/delta_candidates-ALL.json`.
+**102파일 최종 처분(908)**: equivalent 440 · base_only 225 · distinct_unconfirmed 156 · **confirmed_delta 66** · rejected 19 · conflict 2. `verify_crosswalk.py` 6/6 재PASS.
 
-**다음 = SUP supplement**: `delta_candidates-ALL.json` 154건(HIGH 미매칭 R2 단독)의 **원문 span 재확인** → 통과분만 `confirmed_delta` 승격(제안≠확정, MERGE-PLAN §3). 이어 V(확정 HIGH 적대검증)·HG(사람 승인). ★conflict 2건은 사람 확정 대상: `wave_boundary_main.f90`(randomseed allocatable vector vs 비할당 scalar)·`morphevolution.F90`(자기보간 stale vs just-zeroed).
+**다음 = V 적대검증**: 대상 = confirmed_delta 66 + equivalent 중 HIGH materiality 341 = **407건**을 독립 skeptic 이 REFUTE 시도. 이어 HG(사람 승인, producer 자기승인 금지). ★사람 확정 대기: conflict 2건 + 인용대조 실패 9건(재인용 요구 여부).

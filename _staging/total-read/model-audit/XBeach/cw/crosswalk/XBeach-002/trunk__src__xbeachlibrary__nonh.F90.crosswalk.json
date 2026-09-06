@@ -318,7 +318,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B8"
@@ -328,12 +328,18 @@
     "[L1172-L1177] (HIGH/directional coefficient mismatch) The y-direction vertical-viscosity flux uses s%hu at lines 1174-1175 even though it is evaluated across V faces, unlike the expected y-face depth s%hv."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: Both y-direction vertical-viscosity fluxes multiply by hu while differencing Wm along j and using ddyv. The wetv factors on the resulting divergence do not substitute the missing V-face depth hv on wet, directionally varying bathymetry.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L1172-L1177",
+    "quote": "               dwdx1 = .5d0*(s%nuh(i-1,j  )+s%nuh(i,j  ))*s%hu(i-1,j  )*(Wm_old(i  ,j  )-Wm_old(i-1,j  ))*ddxu(i-1)\r\n               dwdx2 = .5d0*(s%nuh(i+1,j  )+s%nuh(i,j  ))*s%hu(i  ,j  )*(Wm_old(i+1,j  )-Wm_old(i  ,j  ))*ddxu(i)\r\n               dwdy1 = s%nuh(i  ,j-1)*s%hu(i  ,j-1)*(Wm_old(i  ,j  )-Wm_old(i  ,j-1))*ddyv(j-1)\r\n               dwdy2 = s%nuh(i  ,j  )*s%hu(i  ,j  )*(Wm_old(i  ,j+1)-Wm_old(i  ,j  ))*ddyv(j)\r\n               Wm(i,j) = Wm(i,j)   + (1.0_rKind/s%hh(i,j))*par%dt*(dwdx2-dwdx1)*ddxz(i)*real(s%wetu(i,j)*s%wetu(i-1,j),rKind) &\r\n               + (1.0_rKind/s%hh(i,j))*par%dt*(dwdy2-dwdy1)*ddyz(j)*real(s%wetv(i,j)*s%wetv(i,j-1),rKind)\r\n",
+    "verified_at_lines": "L1172-L1177",
+    "source_sha256": "18f471b386e5905a78c98c24fc2f6252ae4fc66c9e2010665e5f35a59d324583"
+   }
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "rejected",
    "base_ids": [],
    "audit_ids": [
     "B9"
@@ -343,12 +349,12 @@
     "[L1371-L1383,L1453-L1484,L2048-L2150,L2244-L2284] (MED/stale interpolated geometry) Both reduced correctors claim to recalculate zsu/zsv/zbu/zbv but contain no zuzv call, so matrix and kinematic corrections use geometry last computed in the predictor."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-refuted: The predictor does compute these interpolants, and flow_timestep.F90 L635-L658 changes velocities but not zs, zb, hu or hv between predictor and corrector. Geometry/depth updates follow at L660 onward, so the omitted zuzv calls are redundant in this calling sequence despite the stale comments.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "rejected",
    "base_ids": [],
    "audit_ids": [
     "B16"
@@ -358,9 +364,9 @@
     "[L3369-L3401] (MED/MPI halo initialization) On non-bottom MPI ranks zbu(nx+1,:) and zsu(nx+1,:) are not assigned or exchanged by zuzv, although nonh mask construction iterates through nx+1 and reads zbu there."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-refuted: nonh_init explicitly initializes zbu and zsu to zero at L294-L296, so their terminal row is not undefined. Although the halo mask loop reads zbu(nx+1,:), active U coefficients and pressure/mask stencils use indices no greater than nx (with imax_zs reduced on internal MPI boundaries in spaceparams.F90), so that unused terminal U-mask entry does not establish an MPI halo defect.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06"
   }
  ]
 }

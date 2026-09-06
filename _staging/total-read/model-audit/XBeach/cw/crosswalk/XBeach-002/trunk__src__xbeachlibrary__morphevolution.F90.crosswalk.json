@@ -766,7 +766,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B6"
@@ -776,9 +776,15 @@
     "[L464-L490] (HIGH/uninitialized boundary multiplier) pbbedu(nx+1,:) and pbbedv(:,ny+1) are never assigned before whole-array multiplication into Sub/Svb, so boundary transports can consume undefined values even when a zero transport is expected."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: The saved pbbedu/pbbedv allocations have no initialization, and their only assignment loops stop at nx and ny respectively. The subsequent whole-array products read the unassigned terminal row/column, and multiplying by an expected zero transport does not define an undefined multiplier.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L485-L490",
+    "quote": "                  pbbedv(i,j)=0.5d0*(s%pbbed(i,j,1,jg)+s%pbbed(i,j+1,1,jg))\r\n               end if\r\n            end do\r\n         end do\r\n         !\r\n         Svb = pbbedv*Svb\r\n",
+    "verified_at_lines": "L485-L490",
+    "source_sha256": "765f474008f7cb843353dc0790cc3f3ebdc00631353da7592e2bb0508e968391"
+   }
   },
   {
    "disposition": "distinct_unconfirmed",
@@ -811,7 +817,7 @@
    "decided_at": "2026-08-27"
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "confirmed_delta",
    "base_ids": [],
    "audit_ids": [
     "B15"
@@ -821,12 +827,18 @@
     "[L1593-L1599] (MED/inconsistent dilatancy scaling) Suspended-load critical velocity uses Ucr*(1+sqrt(srfRhee)) while bed load uses Ucr*sqrt(1+srfRhee), an unexplained nonlinear inconsistency for the same Shields correction."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-confirmed: With bed-slope initiation disabled, L1552 sets srfTotal=1+srfRhee, so bed load receives sqrt(1+srfRhee) while suspended load receives 1+sqrt(srfRhee). For positive dilatancy these give different critical velocities even with no bed-slope effect, despite being corrections of the same Shields factor.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L1594-L1599",
+    "quote": "         Ucrb(:,:) = Ucr(:,:)*sqrt(srfTotal) ! Lodewijk\r\n         if (par%bdslpeffini == BDSLPEFFINI_TOTAL) then\r\n            Ucrs = Ucrb\r\n         else\r\n            Ucrs = Ucr*(1.d0+sqrt(srfRhee)) ! Lodewijk, no effect on suspended load by bed slope\r\n         endif\r\n",
+    "verified_at_lines": "L1594-L1599",
+    "source_sha256": "765f474008f7cb843353dc0790cc3f3ebdc00631353da7592e2bb0508e968391"
+   }
   },
   {
-   "disposition": "distinct_unconfirmed",
+   "disposition": "rejected",
    "base_ids": [],
    "audit_ids": [
     "B29"
@@ -836,9 +848,9 @@
     "[L3099-L3151] (HIGH/dry-cell invalid arithmetic) vT computes H/hh, sqrt(g/hh), and related bore terms for every grid point without a wet mask, so dry cells can contaminate table indices and outputs."
    ],
    "representative": "audit",
-   "rationale": "unmatched audit finding (mat=HIGH)",
-   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
-   "decided_at": "2026-08-27"
+   "rationale": "span-refuted: Dry cells do not imply zero hh: initialize.F90 L1012 and flow_timestep.F90 L940 floor hh at par%eps, as does this file at L3200-L3207. The dimensionless table arguments are also clamped at L3100-L3101, so missing a wet mask alone does not establish the claimed dry-cell singularity or invalid table indices.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06"
   }
  ]
 }
