@@ -1,0 +1,136 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-B00",
+ "source_path": "trunk/config/example_install_new_version_H7.sh",
+ "source_sha256": "7c3879f1d8bdba2c743f67da435e35a1991d2286600358a6a0ea9a6bf1cce563",
+ "base_run_id": "xbeach-r1-XBeach-B00-gpt-5.6-luna-01a079a6-7103-7312-a441-5309a7d01425",
+ "audit_run_id": "xbeach-r2-XBeach-B00-gpt-5.6-luna-01a07a19-bf73-7b91-afe4-1b0868a2795d",
+ "base_record_file": "b1aeb991c3831cfe3e98c2944e6159a05eedaff6cc7197d3a267b50a6af7e2f8.json",
+ "audit_record_file": "b1aeb991c3831cfe3e98c2944e6159a05eedaff6cc7197d3a267b50a6af7e2f8.json",
+ "base_record_sha256_bytes": "affdf102ee95d08cec684d9d2c83437a5cc57e504e56a19e59c85666c3111727",
+ "audit_record_sha256_bytes": "7afbbff7d7d80b2fd04d5f1e335cc9fa3e405597d0e8b4ff501bc89d074cfedb",
+ "base_finding_count": 4,
+ "audit_finding_count": 5,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L21-L30] (MED/error-handling/reproducibility) The build and install pipeline has no failure checks or `set -e`, so failed cleanup, generation, configure, compilation, or installation can still be followed by module publication."
+   ],
+   "audit_member_text": [
+    "[L13-L38] (HIGH/build-failure-propagation) Dependency loading and build failures do not stop installation or module generation, allowing a failed build to produce a published module."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "Unchecked build-to-publication fall-through exists when the H7 body is interpreted by Bash without errexit, but the stored file has CRLF on lines 1-39: ordinary direct Unix execution fails at the shebang before reaching any build. A correctly named published module requires line-ending normalization (or a CR-tolerant environment) and a usable module generator/input; raw Bash execution also appends a carriage return to the redirected module filename at line 38, so normal successful publication is not established for the raw file.",
+    "neutralizer": {
+     "where": "trunk/config/example_install_new_version_H7.sh:L1-L1",
+     "quote": "#!/bin/bash\r\n"
+    },
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "[L40] (LOW/permissions) The generated module file is made mode 777, granting unnecessary write/execute permissions to all users."
+   ],
+   "audit_member_text": [
+    "[L40] (HIGH/shared-file-permissions) chmod 777 makes the installed shared environment module writable by every user, allowing accidental or unauthorized changes to other users' execution environment."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "[L36-L38] (MED/path/contract) The script changes to absolute `/config/` and then references `./teamcity-env.sh`, making module generation depend on an external directory rather than the checkout’s config directory."
+   ],
+   "audit_member_text": [
+    "[L36-L38] (MED/working-directory) The script changes to absolute /config/ rather than the checkout's config directory before reading teamcity-env.sh."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L27] (LOW/flags/contract) The configure invocation places curl library/include flags in FCFLAGS, including a `bin` directory as an include path, leaving the Fortran/compiler flag contract suspicious and toolchain-dependent."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L1-L39] (HIGH/shell-line-endings) CRLF line endings break the Unix shebang and add carriage returns to commands and variable values when the file is run through Bash."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L27] (MED/scientific-compiler-semantics) Unconditional -ffast-math permits finite-value assumptions and numerical transformations that can undermine NaN diagnostics and alter scientific results."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

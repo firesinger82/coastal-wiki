@@ -1,0 +1,105 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-B00",
+ "source_path": "trunk/config/create-keys.sh",
+ "source_sha256": "f9f52ed52b8575fb9c46e4721f0838ab0fb711590a22a1fef7562422775d60e0",
+ "base_run_id": "xbeach-r1-XBeach-B00-gpt-5.6-luna-01a079a6-7103-7312-a441-5309a7d01425",
+ "audit_run_id": "xbeach-r2-XBeach-B00-gpt-5.6-luna-01a07a19-bf73-7b91-afe4-1b0868a2795d",
+ "base_record_file": "0387a0ac8b5df99abc3ce0bcb67e2018265f8c466c8b59fa9378403ed14cf7ff.json",
+ "audit_record_file": "0387a0ac8b5df99abc3ce0bcb67e2018265f8c466c8b59fa9378403ed14cf7ff.json",
+ "base_record_sha256_bytes": "637868bd7a248188641b7c9c49e522bdc9543015332085113bbc35ef5fccd7ca",
+ "audit_record_sha256_bytes": "921ba03eb8fdb04145f50c3b115f6143e8572ce1b1505ad2685db5735b9d5f18",
+ "base_finding_count": 2,
+ "audit_finding_count": 4,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "[L5] (LOW/quoting/input-contract) The remote target is assembled from an unquoted environment variable, so whitespace or shell-significant hostname content is not handled robustly."
+   ],
+   "audit_member_text": [
+    "[L5] (LOW/argument-validation) CLUSTER_HOSTNAME is neither required nor quoted before constructing the remote destination."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L3-L5] (MED/error-handling/side-effect) The script interactively generates the default RSA key path and then copies it using CLUSTER_HOSTNAME without validating either operation; absent/failed commands can still be followed by the unconditional success messages."
+   ],
+   "audit_member_text": [
+    "[L3-L6] (MED/error-handling) Key generation and key-copy failures are ignored and followed by success messages, with the final echo returning success."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "confirmed_delta",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L1-L5] (HIGH/shell-line-endings) CRLF endings break direct Unix execution and append carriage returns to the rsa key-type argument and remote hostname under Bash."
+   ],
+   "representative": "audit",
+   "rationale": "span-confirmed: Byte inspection shows CRLF on L1-L5: the interpreter name ends in a carriage return, and Bash passes rsa\\r at L3 and a carriage-return-suffixed hostname at L5. No conversion or stripping occurs in this script.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L1-L5",
+    "quote": "#!/bin/bash\r\necho \"start\"\r\nssh-keygen -t rsa\r\necho \"key created\"\r\nssh-copy-id -i ~/.ssh/id_rsa.pub xbeach@$CLUSTER_HOSTNAME\r\n",
+    "verified_at_lines": "L1-L5",
+    "source_sha256": "f9f52ed52b8575fb9c46e4721f0838ab0fb711590a22a1fef7562422775d60e0"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Byte inspection confirms CRLF on trunk/config/create-keys.sh:1-5, including the interpreter line, which names /bin/bash followed by a carriage return during direct Unix execution. A Bash run with harmless in-memory replacements for both SSH commands captured rsa\\r and xbeach@test.invalid\\r as arguments, confirming that explicit Bash invocation does not remove the argument corruption; no source-tree normalization wrapper was found.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "rejected",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L3,L5] (MED/key-selection-contract) ssh-keygen lets the user choose a key filename but ssh-copy-id always installs id_rsa.pub, potentially copying a different existing key."
+   ],
+   "representative": "audit",
+   "rationale": "span-refuted: In the actual file, L3 passes rsa followed by a literal carriage return, an invalid key type that stops ssh-keygen before the filename prompt; L5 also appends a carriage return to the remote hostname. The claimed selectable-key/install mismatch requires first fixing these line endings and is not reachable as described in this source.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06"
+  }
+ ]
+}

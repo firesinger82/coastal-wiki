@@ -1,0 +1,150 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-B01",
+ "source_path": "trunk/lib/win32/netcdff90/Makefile.in",
+ "source_sha256": "6b8b36b9838fa91b4f9dbc03e77f73c6f1cfc3c62a57b40dff012add833fa5d2",
+ "base_run_id": "xbeach-r1-XBeach-B01-gpt-5.6-luna-01a079ab-98f6-7ba2-9380-3c78010a3f81",
+ "audit_run_id": "xbeach-r2-XBeach-B01-gpt-5.6-luna-01a07a20-9cee-7323-9aa4-758354e89851",
+ "base_record_file": "cc57acc98173c5f8a4fca45420b2ce493498aba1db7fbade4067a4a239e69323.json",
+ "audit_record_file": "cc57acc98173c5f8a4fca45420b2ce493498aba1db7fbade4067a4a239e69323.json",
+ "base_record_sha256_bytes": "9d77fb9b25d1232cbd44a058817e0d6636790764487de588ef8f5ec5a864929a",
+ "audit_record_sha256_bytes": "b6106d921c35a1b06e580f66dded89ddf76993eda582fb125a405cb72f8012f6",
+ "base_finding_count": 1,
+ "audit_finding_count": 6,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "[L283-L291,L602-L605] (LOW/build-cleanup) The uppercase-module configuration installs and builds TYPESIZES.mod/NETCDF.mod, but CLEANFILES is fixed to lowercase typesizes.mod/netcdf.mod, leaving uppercase module files outside clean cleanup on case-sensitive systems."
+   ],
+   "audit_member_text": [
+    "[L283-L291,L517-L518] (LOW/cleanup) CLEANFILES removes only lowercase module names even when the selected compiler generates uppercase module names."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "confirmed_delta",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L256-L260,L334-L335,L343-L350] (MED/incremental-dependencies) Included Fortran files are prerequisites of the archive rather than its compiled objects, so changing an include can relink stale object code."
+   ],
+   "representative": "audit",
+   "rationale": "span-confirmed: The include list is attached to libnetcdff90.la, while the .f90.o and .f90.lo rules only compile their primary source. No object-level include prerequisites or included dependency files appear here, so an include edit can run the link recipe with unchanged objects.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L334-L335",
+    "quote": "libnetcdff90.la: $(libnetcdff90_la_OBJECTS) $(libnetcdff90_la_DEPENDENCIES) \n\t$(FCLINK)  $(libnetcdff90_la_OBJECTS) $(libnetcdff90_la_LIBADD) $(LIBS)",
+    "verified_at_lines": "L334-L335",
+    "source_sha256": "6b8b36b9838fa91b4f9dbc03e77f73c6f1cfc3c62a57b40dff012add833fa5d2"
+   },
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "Makefile.in has neither include prerequisites on netcdf.lo nor generated Fortran dependency inclusion, so its archive can relink stale code. This is latent upstream-build behavior only: XBeach does not generate this makefile, and its Visual Studio project owns compilation of the vendored sources.",
+    "neutralizer": {
+     "where": "trunk/configure.ac:L89-L93",
+     "quote": "AC_CONFIG_FILES([Makefile\n                 src/Makefile\n                 src/xbeachlibrary/Makefile\n                 src/xbeach/Makefile])\nAC_OUTPUT"
+    },
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L76-L78,L334,L602-L605] (MED/module-dependencies) The build graph does not require the typeSizes module before compiling either netcdf object."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "confirmed_delta",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L76-L78,L343-L350,L496,L602-L605] (MED/parallel-build) Module targets trigger ordinary .o compilation while the library independently triggers .lo compilation of the same sources, allowing concurrent writes to the same module files."
+   ],
+   "representative": "audit",
+   "rationale": "span-confirmed: all-am independently requests the library and module headers; the library uses typeSizes.lo and netcdf[4].lo, while header prerequisites request typeSizes.o and netcdf[4].o. The separate compile rules share the working directory and contain no ordering or module-output isolation, allowing concurrent generation of the same module files.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L602-L605",
+    "quote": "@UPPER_CASE_MOD_TRUE@TYPESIZES.mod: typeSizes.o\n@UPPER_CASE_MOD_TRUE@NETCDF.mod: $(NETCDF_O)\n@UPPER_CASE_MOD_FALSE@typesizes.mod: typeSizes.o\n@UPPER_CASE_MOD_FALSE@netcdf.mod: $(NETCDF_O)",
+    "verified_at_lines": "L602-L605",
+    "source_sha256": "6b8b36b9838fa91b4f9dbc03e77f73c6f1cfc3c62a57b40dff012add833fa5d2"
+   },
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "all-am requests both LTLIBRARIES and HEADERS, allowing the independent .f90.lo and .f90.o recipes to write the same module files concurrently. The supplied XBeach build does not invoke this vendored makefile, so the race requires separately configuring/using the upstream netCDF rules.",
+    "neutralizer": {
+     "where": "trunk/configure.ac:L89-L93",
+     "quote": "AC_CONFIG_FILES([Makefile\n                 src/Makefile\n                 src/xbeachlibrary/Makefile\n                 src/xbeach/Makefile])\nAC_OUTPUT"
+    },
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L602-L605] (MED/generated-file-recovery) Module targets have prerequisites but no recovery recipes, so deleting a module while retaining its object does not cause regeneration."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L405-L410] (MED/error-propagation) The header installation loop does not stop on a failed copy, allowing successful installation of the second module to hide failure of the first."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

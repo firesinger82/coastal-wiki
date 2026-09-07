@@ -1,0 +1,1468 @@
+{
+ "shard": "XBeach-V01",
+ "instructions_ref": "see subagent prompt",
+ "files": [
+  {
+   "file_token": "F00",
+   "lang": ".f90",
+   "listX": [],
+   "listY": [],
+   "candidate_pairs": []
+  },
+  {
+   "file_token": "F01",
+   "lang": ".h",
+   "listX": [
+    {
+     "id": "F01-X0",
+     "text": "[L409,L1471,L1904] (HIGH/attribute-callback) NULL_COPY_FN sets flag=true without initializing attr_out, allowing duplication to install an indeterminate attribute pointer instead of suppressing the copy."
+    },
+    {
+     "id": "F01-X1",
+     "text": "[L2414-L2424] (HIGH/bounds) Cartcomm::Sub always reads ten input booleans and allocates ten entries regardless of the actual Cartesian dimension count, causing out-of-bounds reads for smaller input arrays or larger topologies."
+    },
+    {
+     "id": "F01-X2",
+     "text": "[L1369-L1385,L1545-L1548] (HIGH/collective-bounds) Alltoallw sizes and fills datatype arrays using the local Get_size even on intercommunicators, where the arrays must cover the remote group."
+    },
+    {
+     "id": "F01-X3",
+     "text": "[L1373-L1377] (MED/ignored-argument-access) Alltoallw dereferences every send datatype even when MPI_IN_PLACE makes the send-side arguments insignificant."
+    },
+    {
+     "id": "F01-X4",
+     "text": "[L1690-L1716] (MED/ignored-argument-access) Both Spawn_multiple overloads copy array_of_info on every rank even though only the root's spawning arguments are significant."
+    },
+    {
+     "id": "F01-X5",
+     "text": "[L323-L332] (MED/uninitialized-read) Get_contents copies max_datatypes entries from an uninitialized temporary even when the datatype contains fewer datatype entries."
+    },
+    {
+     "id": "F01-X6",
+     "text": "[L827-L851,L935-L959] (MED/uninitialized-read) Waitsome and Testsome copy incount status entries instead of only the returned outcount, reading unwritten temporary statuses when fewer requests complete."
+    },
+    {
+     "id": "F01-X7",
+     "text": "[L879-L905] (MED/uninitialized-read) Testall copies the temporary status array even when its returned flag is false and the C routine has not defined those statuses."
+    },
+    {
+     "id": "F01-X8",
+     "text": "[L2382-L2396] (MED/uninitialized-read) Cartcomm::Get_topo converts maxdims temporary period entries even when the topology has fewer dimensions."
+    },
+    {
+     "id": "F01-X9",
+     "text": "[L236-L244,L830-L851,L985-L1006,L1371-L1387] (MED/exception-safety) Raw temporary arrays are released only after MPI calls and subsequent allocations, so thrown MPI errors or allocation failures bypass cleanup and can also bypass request-handle copyback."
+    },
+    {
+     "id": "F01-X10",
+     "text": "[L1575-L1579,L1666-L1670,L2336-L2340,L2451-L2455] (MED/error-handling) Clone implementations ignore MPI_Comm_dup's return code and construct a communicator from an uninitialized ncomm if duplication fails and the C error handler returns."
+    },
+    {
+     "id": "F01-X11",
+     "text": "[L249-L253,L1185-L1189,L2018-L2022] (MED/error-handling) Value-returning wrappers return uninitialized output locals if the MPI call fails and the invoked error handler returns normally."
+    },
+    {
+     "id": "F01-X12",
+     "text": "[L703-L711,L2540-L2553] (LOW/const-contract) Op::Is_commutative and Reduce_local are non-const and therefore cannot be called directly on the predefined const operation objects."
+    },
+    {
+     "id": "F01-X13",
+     "text": "[L1758-L1761] (MED/api-contract) Grequest::Start is declared as an instance method rather than a static factory, preventing a class-qualified MPI::Grequest::Start call."
+    },
+    {
+     "id": "F01-X14",
+     "text": "[L27-L40,L2716] (LOW/macro-hygiene) MPIR_ARGUNUSED remains defined at the end of the file despite the comment promising its removal."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F01-Y0",
+     "text": "[L409,L1471,L1904] (HIGH/attribute-copy) NULL_COPY_FN sets flag=true without defining attr_out, reporting a successful attribute copy with an indeterminate output pointer."
+    },
+    {
+     "id": "F01-Y1",
+     "text": "[L2414-L2424] (HIGH/array-bounds) Cartcomm::Sub always reads ten booleans and allocates ten integers regardless of topology dimension, overreading smaller input arrays and undersizing larger topologies."
+    },
+    {
+     "id": "F01-Y2",
+     "text": "[L1369-L1385,L1545-L1549] (HIGH/intercommunicator-size) Alltoallw sizes and fills datatype temporaries using local Get_size rather than remote size, producing out-of-bounds accesses for unequal intercommunicator groups."
+    },
+    {
+     "id": "F01-Y3",
+     "text": "[L1369-L1385] (MED/ignored-argument-access) Alltoallw dereferences send datatype entries even for an in-place call whose send-side arguments are ignored by the underlying collective."
+    },
+    {
+     "id": "F01-Y4",
+     "text": "[L323-L332] (MED/uninitialized-read) Datatype::Get_contents copies max_datatypes entries from its temporary rather than the actual datatype count, reading an uninitialized tail when capacity exceeds the envelope count."
+    },
+    {
+     "id": "F01-Y5",
+     "text": "[L827-L853,L935-L961] (MED/uninitialized-status) Waitsome and Testsome copy every temporary status instead of only the returned completion count, including undefined entries when no requests complete or all are inactive."
+    },
+    {
+     "id": "F01-Y6",
+     "text": "[L879-L905] (MED/uninitialized-status) Testall copies its uninitialized status temporary even when the returned completion flag is false."
+    },
+    {
+     "id": "F01-Y7",
+     "text": "[L2382-L2396] (MED/uninitialized-read) Cartcomm::Get_topo converts maxdims temporary entries to bool instead of the actual dimension count, reading an uninitialized tail for oversized output capacity."
+    },
+    {
+     "id": "F01-Y8",
+     "text": "[L84-L90,L236-L244,L790-L803,L985-L1006,L1371-L1387] (MED/exception-safety) Raw temporary allocations lack exception cleanup, and throwing error handlers skip both deallocation and request/status copyback after MPI has potentially changed them."
+    },
+    {
+     "id": "F01-Y9",
+     "text": "[L249-L253,L1185-L1189,L2018-L2022] (LOW/error-path-output) Scalar getters return uninitialized local outputs if the underlying MPI operation fails and the invoked error handler returns normally."
+    },
+    {
+     "id": "F01-Y10",
+     "text": "[L1567-L1580,L1658-L1671,L2328-L2341,L2443-L2456] (MED/unchecked-duplication) Clone implementations ignore MPI_Comm_dup status and construct a wrapper from uninitialized ncomm when duplication fails with a returning handler."
+    },
+    {
+     "id": "F01-Y11",
+     "text": "[L1690-L1716] (MED/root-only-argument) Spawn_multiple allocates from count and dereferences array_of_info on every rank although these inputs are significant only at root."
+    },
+    {
+     "id": "F01-Y12",
+     "text": "[L1758-L1761] (MED/api-declaration) Grequest::Start is declared as an instance member rather than a static factory, preventing the expected MPI::Grequest::Start invocation without an object."
+    },
+    {
+     "id": "F01-Y13",
+     "text": "[L11-L40,L82,L2716] (LOW/header-hygiene) The header has no include guard and leaves MPIR_ARGUNUSED defined despite promising its removal, so a repeated direct include triggers an error and redefinitions."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F01-X0",
+     "F01-Y0"
+    ],
+    [
+     "F01-X1",
+     "F01-Y1"
+    ],
+    [
+     "F01-X2",
+     "F01-Y2"
+    ],
+    [
+     "F01-X2",
+     "F01-Y3"
+    ],
+    [
+     "F01-X2",
+     "F01-Y8"
+    ],
+    [
+     "F01-X3",
+     "F01-Y2"
+    ],
+    [
+     "F01-X3",
+     "F01-Y3"
+    ],
+    [
+     "F01-X3",
+     "F01-Y8"
+    ],
+    [
+     "F01-X4",
+     "F01-Y3"
+    ],
+    [
+     "F01-X4",
+     "F01-Y11"
+    ],
+    [
+     "F01-X5",
+     "F01-Y4"
+    ],
+    [
+     "F01-X5",
+     "F01-Y6"
+    ],
+    [
+     "F01-X6",
+     "F01-Y4"
+    ],
+    [
+     "F01-X6",
+     "F01-Y5"
+    ],
+    [
+     "F01-X6",
+     "F01-Y6"
+    ],
+    [
+     "F01-X6",
+     "F01-Y7"
+    ],
+    [
+     "F01-X7",
+     "F01-Y4"
+    ],
+    [
+     "F01-X7",
+     "F01-Y5"
+    ],
+    [
+     "F01-X7",
+     "F01-Y6"
+    ],
+    [
+     "F01-X8",
+     "F01-Y4"
+    ],
+    [
+     "F01-X8",
+     "F01-Y6"
+    ],
+    [
+     "F01-X8",
+     "F01-Y7"
+    ],
+    [
+     "F01-X9",
+     "F01-Y2"
+    ],
+    [
+     "F01-X9",
+     "F01-Y3"
+    ],
+    [
+     "F01-X9",
+     "F01-Y5"
+    ],
+    [
+     "F01-X9",
+     "F01-Y8"
+    ],
+    [
+     "F01-X9",
+     "F01-Y9"
+    ],
+    [
+     "F01-X10",
+     "F01-Y10"
+    ],
+    [
+     "F01-X11",
+     "F01-Y8"
+    ],
+    [
+     "F01-X11",
+     "F01-Y9"
+    ],
+    [
+     "F01-X13",
+     "F01-Y12"
+    ],
+    [
+     "F01-X14",
+     "F01-Y13"
+    ]
+   ]
+  },
+  {
+   "file_token": "F02",
+   "lang": ".f90",
+   "listX": [],
+   "listY": [],
+   "candidate_pairs": []
+  },
+  {
+   "file_token": "F03",
+   "lang": ".h",
+   "listX": [
+    {
+     "id": "F03-X0",
+     "text": "[L42-L47] (MED/language-linkage) MPE_Errors_to_dbx is declared outside the extern-C block, unlike the other C routines, creating a C++ linkage mismatch."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F03-Y0",
+     "text": "[L42-L50] (MED/language-linkage) MPE_Errors_to_dbx is declared after the extern C block closes, giving C++ callers C++ linkage for an apparent C library callback."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F03-X0",
+     "F03-Y0"
+    ]
+   ]
+  },
+  {
+   "file_token": "F04",
+   "lang": ".c",
+   "listX": [
+    {
+     "id": "F04-X0",
+     "text": "[L50-L64] (LOW/input-validation) Negative interval counts enter the calculation branch and print a zero approximation instead of being rejected or treated as quit."
+    },
+    {
+     "id": "F04-X1",
+     "text": "[L21,L43,L55] (LOW/integer-overflow) An accepted interval count near INT_MAX can overflow the signed loop increment i += numprocs."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F04-Y0",
+     "text": "[L43-L55] (LOW/input-validation) Negative interval counts pass the zero-only exit check and produce a meaningless zero approximation without reporting invalid input."
+    },
+    {
+     "id": "F04-Y1",
+     "text": "[L55] (MED/integer-overflow) For accepted interval counts near INT_MAX, the final i += numprocs can overflow signed int and prevent reliable loop termination."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F04-X0",
+     "F04-Y0"
+    ],
+    [
+     "F04-X0",
+     "F04-Y1"
+    ],
+    [
+     "F04-X1",
+     "F04-Y0"
+    ],
+    [
+     "F04-X1",
+     "F04-Y1"
+    ]
+   ]
+  },
+  {
+   "file_token": "F05",
+   "lang": ".h",
+   "listX": [
+    {
+     "id": "F05-X0",
+     "text": "[L25] (LOW/sentinel-contract) CLOG_MAXTIME is a finite 100000000.0 value labeled later than all times without specifying a clock origin or maximum supported trace duration."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F05-Y0",
+     "text": "[L25] (LOW/time-sentinel-contract) CLOG_MAXTIME is asserted to be later than all times although its finite value requires an undocumented bound and time origin."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F05-X0",
+     "F05-Y0"
+    ]
+   ]
+  },
+  {
+   "file_token": "F06",
+   "lang": ".cxx",
+   "listX": [],
+   "listY": [
+    {
+     "id": "F06-Y0",
+     "text": "[L57-L58] (LOW/numeric-reporting) The pi estimate is printed with the stream's default precision, hiding most of the double-precision result while separately reporting a much smaller numerical error."
+    }
+   ],
+   "candidate_pairs": []
+  },
+  {
+   "file_token": "F07",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F07-X0",
+     "text": "[L56-L62,L79-L85] (MED/intent-contract) The multiprocess create/open wrappers declare chunk-size hints INTENT(IN) while passing them directly to routines that return the selected chunk size, unlike the INOUT contract used by the ordinary wrappers."
+    },
+    {
+     "id": "F07-X1",
+     "text": "[L161-L170] (MED/error-handling) nf90_inquire copies uninitialized local outputs after failed inquiries and overwrites the first inquiry status with the format-query status when formatNum is present."
+    },
+    {
+     "id": "F07-X2",
+     "text": "[L56,L58,L79,L81] (LOW/keyword-contract) The public multiprocess wrappers expose inconsistent misspelled keyword names initalsz and chunksizeint, making keyword-based calls prone to incompatibility."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F07-Y0",
+     "text": "[L56-L62,L79-L85] (MED/intent-contract) The multiprocess create/open wrappers declare chunk-size hints INTENT(IN) although the corresponding ordinary wrappers treat these underlying library arguments as writable INOUT values."
+    },
+    {
+     "id": "F07-Y1",
+     "text": "[L161-L170] (LOW/error-path-output) nf90_inquire copies local inquiry outputs without checking success and overwrites the first status with nf_inq_format when formatNum is requested."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F07-X0",
+     "F07-Y0"
+    ],
+    [
+     "F07-X1",
+     "F07-Y1"
+    ],
+    [
+     "F07-X2",
+     "F07-Y0"
+    ]
+   ]
+  },
+  {
+   "file_token": "F08",
+   "lang": ".h",
+   "listX": [
+    {
+     "id": "F08-X0",
+     "text": "[L494-L500,L508] (MED/dll-linkage) MPIFCMB6 containing MPI_ERRCODES_IGNORE lacks the DLLIMPORT directive supplied for every other sentinel common block, potentially preventing the caller from sharing the library's sentinel address."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F08-Y0",
+     "text": "[L494-L500,L508] (MED/dll-sentinel-linkage) DLLIMPORT annotations cover every sentinel COMMON block except MPIFCMB6 containing MPI_ERRCODES_IGNORE, leaving that sentinel's DLL address identity inconsistent."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F08-X0",
+     "F08-Y0"
+    ]
+   ]
+  },
+  {
+   "file_token": "F09",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F09-X0",
+     "text": "[L1-L18,L21-L38] (MED/ignored-argument) The scalar text put/get interfaces accept map but never use it, silently performing strided rather than mapped transfers."
+    },
+    {
+     "id": "F09-X1",
+     "text": "[L11,L15,L18] (MED/buffer-contract) Scalar text writes always pass trim(values), even when an explicit count requests trailing characters that were removed from the actual buffer."
+    },
+    {
+     "id": "F09-X2",
+     "text": "[L14-L16,L60-L64,L284-L288,L476-L480] (MED/bounds) Optional index vectors are copied into fixed-size local arrays without checking their lengths against nf90_max_var_dims."
+    },
+    {
+     "id": "F09-X3",
+     "text": "[L55-L66,L279-L290,L471-L482] (HIGH/uninitialized-map) Array text wrappers initialize only numDims map entries despite transferring numDims+1 character dimensions, so a partial map leaves an active mapping entry uninitialized."
+    },
+    {
+     "id": "F09-X4",
+     "text": "[L56,L88,L120,L152,L184,L216,L248,L280,L312,L344,L376,L408,L440,L472] (MED/default-count) Trailing file dimensions default to zero counts, so writing or reading an array slice of a higher-rank variable can silently transfer no data unless every extra count is supplied."
+    },
+    {
+     "id": "F09-X5",
+     "text": "[L66-L69,L98-L101,L290-L293,L482-L485] (MED/contiguity-contract) Assumed-shape character arrays are passed to the legacy routines by their first scalar element without packing or requiring contiguity, so noncontiguous array sections can access the wrong storage."
+    },
+    {
+     "id": "F09-X6",
+     "text": "[L66-L69,L290-L293] (LOW/empty-array-contract) The wrappers form values(1) even for zero-length arrays, leaving empty transfers dependent on an out-of-bounds element reference before the backend can honor a zero count."
+    },
+    {
+     "id": "F09-X7",
+     "text": "[L15-L18,L35-L38,L285-L293] (MED/buffer-capacity) Explicit counts and maps are forwarded without checking their addressed span against the character buffer, allowing oversized otherwise-valid file selections to exceed values storage."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F09-Y0",
+     "text": "[L1-L18,L21-L38] (MED/ignored-argument) Scalar text get/put accepts map but never uses it or rejects it, silently performing an unmapped strided transfer."
+    },
+    {
+     "id": "F09-Y1",
+     "text": "[L11-L18] (MED/buffer-extent) Scalar text put always passes trim(values), so an explicit count including trailing blanks can request more characters than the temporary contains."
+    },
+    {
+     "id": "F09-Y2",
+     "text": "[L7-L16,L50-L64,L466-L480] (MED/array-bounds) Optional indexing vectors are copied into fixed-size arrays without validating their lengths."
+    },
+    {
+     "id": "F09-Y3",
+     "text": "[L55-L66,L279-L290,L471-L482] (MED/uninitialized-map) Array text wrappers initialize only numDims map entries although character storage needs numDims+1, leaving the last active stride undefined when the supplied map is shorter."
+    },
+    {
+     "id": "F09-Y4",
+     "text": "[L56,L88,L248,L280,L472] (MED/default-count-inconsistency) Array text wrappers default trailing file-dimension counts to zero instead of one, so selecting a record of a higher-rank variable using start alone can transfer no data."
+    },
+    {
+     "id": "F09-Y5",
+     "text": "[L44-L45,L66-L69,L268-L269,L290-L293] (MED/contiguity-contract) Array text wrappers pass only the first scalar element of an assumed-shape array to bulk I/O, without packing or requiring contiguous actual arrays."
+    },
+    {
+     "id": "F09-Y6",
+     "text": "[L66-L69,L290-L293,L482-L485] (LOW/empty-array) Array text wrappers form the first-element actual argument even for empty arrays, before a zero transfer count can neutralize the lower-level operation."
+    },
+    {
+     "id": "F09-Y7",
+     "text": "[L31-L38,L60-L69,L284-L293] (MED/buffer-extent-contract) Explicit count and map selections are forwarded without checking whether the requested character footprint fits the supplied string or array."
+    },
+    {
+     "id": "F09-Y8",
+     "text": "[L186,L218,L410,L442,L474] (LOW/integer-overflow) Default character map strides use default-INTEGER products that can overflow for large string arrays."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F09-X0",
+     "F09-Y0"
+    ],
+    [
+     "F09-X0",
+     "F09-Y1"
+    ],
+    [
+     "F09-X0",
+     "F09-Y2"
+    ],
+    [
+     "F09-X0",
+     "F09-Y5"
+    ],
+    [
+     "F09-X0",
+     "F09-Y7"
+    ],
+    [
+     "F09-X1",
+     "F09-Y0"
+    ],
+    [
+     "F09-X1",
+     "F09-Y1"
+    ],
+    [
+     "F09-X1",
+     "F09-Y2"
+    ],
+    [
+     "F09-X2",
+     "F09-Y0"
+    ],
+    [
+     "F09-X2",
+     "F09-Y1"
+    ],
+    [
+     "F09-X2",
+     "F09-Y2"
+    ],
+    [
+     "F09-X2",
+     "F09-Y3"
+    ],
+    [
+     "F09-X2",
+     "F09-Y4"
+    ],
+    [
+     "F09-X2",
+     "F09-Y5"
+    ],
+    [
+     "F09-X2",
+     "F09-Y6"
+    ],
+    [
+     "F09-X2",
+     "F09-Y7"
+    ],
+    [
+     "F09-X2",
+     "F09-Y8"
+    ],
+    [
+     "F09-X3",
+     "F09-Y2"
+    ],
+    [
+     "F09-X3",
+     "F09-Y3"
+    ],
+    [
+     "F09-X3",
+     "F09-Y4"
+    ],
+    [
+     "F09-X3",
+     "F09-Y5"
+    ],
+    [
+     "F09-X3",
+     "F09-Y6"
+    ],
+    [
+     "F09-X3",
+     "F09-Y7"
+    ],
+    [
+     "F09-X3",
+     "F09-Y8"
+    ],
+    [
+     "F09-X4",
+     "F09-Y2"
+    ],
+    [
+     "F09-X4",
+     "F09-Y3"
+    ],
+    [
+     "F09-X4",
+     "F09-Y4"
+    ],
+    [
+     "F09-X4",
+     "F09-Y7"
+    ],
+    [
+     "F09-X4",
+     "F09-Y8"
+    ],
+    [
+     "F09-X5",
+     "F09-Y2"
+    ],
+    [
+     "F09-X5",
+     "F09-Y3"
+    ],
+    [
+     "F09-X5",
+     "F09-Y5"
+    ],
+    [
+     "F09-X5",
+     "F09-Y6"
+    ],
+    [
+     "F09-X5",
+     "F09-Y7"
+    ],
+    [
+     "F09-X6",
+     "F09-Y2"
+    ],
+    [
+     "F09-X6",
+     "F09-Y3"
+    ],
+    [
+     "F09-X6",
+     "F09-Y5"
+    ],
+    [
+     "F09-X6",
+     "F09-Y6"
+    ],
+    [
+     "F09-X6",
+     "F09-Y7"
+    ],
+    [
+     "F09-X7",
+     "F09-Y0"
+    ],
+    [
+     "F09-X7",
+     "F09-Y1"
+    ],
+    [
+     "F09-X7",
+     "F09-Y2"
+    ],
+    [
+     "F09-X7",
+     "F09-Y3"
+    ],
+    [
+     "F09-X7",
+     "F09-Y4"
+    ],
+    [
+     "F09-X7",
+     "F09-Y5"
+    ],
+    [
+     "F09-X7",
+     "F09-Y6"
+    ],
+    [
+     "F09-X7",
+     "F09-Y7"
+    ]
+   ]
+  },
+  {
+   "file_token": "F10",
+   "lang": ".h",
+   "listX": [],
+   "listY": [
+    {
+     "id": "F10-Y0",
+     "text": "[L13-L14] (LOW/configuration-consistency) The umbrella header combines mpe_misc.h's MPE_NOMPI switch with mpe_log.h's distinct CLOG_NOMPI switch, so defining MPE_NOMPI alone still pulls in MPI through logging."
+    }
+   ],
+   "candidate_pairs": []
+  },
+  {
+   "file_token": "F11",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F11-X0",
+     "text": "[L36,L42-L58] (LOW/incomplete-validation) byteSizesOK never checks EightByteInt availability or bit size despite claiming to validate the module's selected integer kinds."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F11-Y0",
+     "text": "[L36,L51-L58] (MED/kind-validation) byteSizesOK never validates EightByteInt, so it can report success when the advertised eight-byte integer kind is unavailable or has a different width."
+    },
+    {
+     "id": "F11-Y1",
+     "text": "[L33-L35,L51-L55] (LOW/validation-contract) Unavailable small integer kinds are used in local declarations before byteSizesOK can run, turning an advertised availability check into a compilation failure."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F11-X0",
+     "F11-Y0"
+    ],
+    [
+     "F11-X0",
+     "F11-Y1"
+    ]
+   ]
+  },
+  {
+   "file_token": "F12",
+   "lang": ".py",
+   "listX": [],
+   "listY": [],
+   "candidate_pairs": []
+  },
+  {
+   "file_token": "F13",
+   "lang": ".py",
+   "listX": [
+    {
+     "id": "F13-X0",
+     "text": "[L46-L47] (MED/missing-dependency) O:FH mode omits src[f] even though its stated output contract includes the source file prerequisite."
+    },
+    {
+     "id": "F13-X1",
+     "text": "[L58,L80-L81] (LOW/filename-parsing) The suffix regex begins with an unescaped dot and removes the entire name for a dotless source path, collapsing its object target to prefix plus suffix."
+    },
+    {
+     "id": "F13-X2",
+     "text": "[L87-L106] (MED/fortran-use-parsing) Whitespace tokenization recognizes only bare USE followed immediately by the module name, missing USE-qualified forms and misparsing USE :: module."
+    },
+    {
+     "id": "F13-X3",
+     "text": "[L94-L101] (MED/fortran-module-parsing) Module-provider detection excludes only MODULE PROCEDURE, so MODULE FUNCTION and MODULE SUBROUTINE are incorrectly registered as modules named function and subroutine."
+    },
+    {
+     "id": "F13-X4",
+     "text": "[L107-L112] (MED/include-parsing) Include detection is case-sensitive and recognizes neither uppercase Fortran INCLUDE nor preprocessor #include directives."
+    },
+    {
+     "id": "F13-X5",
+     "text": "[L86-L113] (MED/transitive-dependencies) Included files are recorded but never scanned, so module USE dependencies and nested includes inside them are absent from the generated build graph."
+    },
+    {
+     "id": "F13-X6",
+     "text": "[L77-L79,L114-L115] (MED/silent-input-failure) Unreadable source files are silently skipped on IOError, allowing an incomplete dependency graph to be emitted successfully."
+    },
+    {
+     "id": "F13-X7",
+     "text": "[L97] (LOW/duplicate-provider) A second provider of the same module silently overwrites the first, making dependency resolution depend on input order."
+    },
+    {
+     "id": "F13-X8",
+     "text": "[L32,L45,L47,L49,L87,L109-L112] (LOW/make-path-escaping) Source and include paths are whitespace-tokenized or emitted without make escaping, so paths containing spaces or make metacharacters produce incorrect rules."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F13-Y0",
+     "text": "[L46-L47] (MED/dependency-generation) O:FH mode omits src[f] despite promising a dependency on the source file."
+    },
+    {
+     "id": "F13-Y1",
+     "text": "[L58,L80] (LOW/filename-parsing) The suffix expression uses an unescaped dot and therefore erases an entire extensionless filename rather than leaving its basename intact."
+    },
+    {
+     "id": "F13-Y2",
+     "text": "[L87-L106] (MED/fortran-parsing) Whitespace-token parsing misses valid USE forms such as use::m and use, non_intrinsic :: m and misreads use :: m as a dependency on ::.mod."
+    },
+    {
+     "id": "F13-Y3",
+     "text": "[L94-L101] (MED/fortran-parsing) Only module procedure is excluded, so module function and module subroutine declarations are incorrectly registered as providers of function.mod and subroutine.mod."
+    },
+    {
+     "id": "F13-Y4",
+     "text": "[L107-L112] (MED/dependency-generation) Include detection is case-sensitive and ignores uppercase Fortran INCLUDE and preprocessor #include directives."
+    },
+    {
+     "id": "F13-Y5",
+     "text": "[L86-L112] (MED/dependency-generation) Included files are recorded but never parsed, so module uses or further includes inside them cannot contribute transitive build dependencies."
+    },
+    {
+     "id": "F13-Y6",
+     "text": "[L114-L115] (MED/error-handling) Source-file I/O failures are silently ignored and the script can emit an incomplete dependency graph with a successful exit."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F13-X0",
+     "F13-Y0"
+    ],
+    [
+     "F13-X1",
+     "F13-Y1"
+    ],
+    [
+     "F13-X1",
+     "F13-Y2"
+    ],
+    [
+     "F13-X1",
+     "F13-Y5"
+    ],
+    [
+     "F13-X2",
+     "F13-Y2"
+    ],
+    [
+     "F13-X2",
+     "F13-Y3"
+    ],
+    [
+     "F13-X2",
+     "F13-Y4"
+    ],
+    [
+     "F13-X2",
+     "F13-Y5"
+    ],
+    [
+     "F13-X3",
+     "F13-Y2"
+    ],
+    [
+     "F13-X3",
+     "F13-Y3"
+    ],
+    [
+     "F13-X3",
+     "F13-Y4"
+    ],
+    [
+     "F13-X4",
+     "F13-Y2"
+    ],
+    [
+     "F13-X4",
+     "F13-Y3"
+    ],
+    [
+     "F13-X4",
+     "F13-Y4"
+    ],
+    [
+     "F13-X4",
+     "F13-Y5"
+    ],
+    [
+     "F13-X4",
+     "F13-Y6"
+    ],
+    [
+     "F13-X5",
+     "F13-Y1"
+    ],
+    [
+     "F13-X5",
+     "F13-Y2"
+    ],
+    [
+     "F13-X5",
+     "F13-Y4"
+    ],
+    [
+     "F13-X5",
+     "F13-Y5"
+    ],
+    [
+     "F13-X5",
+     "F13-Y6"
+    ],
+    [
+     "F13-X6",
+     "F13-Y1"
+    ],
+    [
+     "F13-X6",
+     "F13-Y4"
+    ],
+    [
+     "F13-X6",
+     "F13-Y5"
+    ],
+    [
+     "F13-X6",
+     "F13-Y6"
+    ],
+    [
+     "F13-X7",
+     "F13-Y3"
+    ],
+    [
+     "F13-X8",
+     "F13-Y0"
+    ],
+    [
+     "F13-X8",
+     "F13-Y2"
+    ],
+    [
+     "F13-X8",
+     "F13-Y4"
+    ],
+    [
+     "F13-X8",
+     "F13-Y5"
+    ],
+    [
+     "F13-X8",
+     "F13-Y6"
+    ]
+   ]
+  },
+  {
+   "file_token": "F14",
+   "lang": ".f90",
+   "listX": [],
+   "listY": [],
+   "candidate_pairs": []
+  },
+  {
+   "file_token": "F15",
+   "lang": ".h",
+   "listX": [
+    {
+     "id": "F15-X0",
+     "text": "[L23-L24] (LOW/macro-precedence) CLOG_UUID_SIZE expands to an unparenthesized sum, so expressions such as 2*CLOG_UUID_SIZE compute an incorrect size."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F15-Y0",
+     "text": "[L23-L24] (LOW/macro-precedence) CLOG_UUID_SIZE expands to an unparenthesized sum, so expressions such as 2 * CLOG_UUID_SIZE compute an incorrect size."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F15-X0",
+     "F15-Y0"
+    ]
+   ]
+  },
+  {
+   "file_token": "F16",
+   "lang": ".h",
+   "listX": [
+    {
+     "id": "F16-X0",
+     "text": "[L20-L24] (HIGH/pointer-width) CLOG_Pint is explicitly described as address-sized but is typedefed to 32 bits in this x64 library, making pointer-to-integer attribute conversions truncate addresses."
+    },
+    {
+     "id": "F16-X1",
+     "text": "[L15-L18,L26-L29] (LOW/format-contract) The printf formats mix Microsoft integer extensions with C99 length modifiers and use %ld for __int32, leaving compatibility with the intended Windows CRT and exact variadic types unclear."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F16-Y0",
+     "text": "[L20-L24] (MED/pointer-width) CLOG_Pint is defined as 32-bit despite being described as address-sized in this x64 header, risking truncation in attribute pointer conversions."
+    },
+    {
+     "id": "F16-Y1",
+     "text": "[L17,L28] (LOW/format-type-mismatch) i32fmt uses %ld for CLOG_int32_t defined as __int32, leaving an int-versus-long variadic type mismatch even where both types occupy four bytes."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F16-X0",
+     "F16-Y0"
+    ],
+    [
+     "F16-X0",
+     "F16-Y1"
+    ],
+    [
+     "F16-X1",
+     "F16-Y0"
+    ],
+    [
+     "F16-X1",
+     "F16-Y1"
+    ]
+   ]
+  },
+  {
+   "file_token": "F17",
+   "lang": ".f",
+   "listX": [
+    {
+     "id": "F17-X0",
+     "text": "[L43-L50] (MED/input-error-handling) The root's READ has no IOSTAT, END or ERR handling, so EOF or malformed input can terminate the root while other ranks wait in MPI_BCAST."
+    },
+    {
+     "id": "F17-X1",
+     "text": "[L31,L46-L47,L59-L62] (LOW/integer-overflow) The ten-digit input permits interval counts near the default integer limit, where the DO iteration-count or terminal-index arithmetic can overflow."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F17-Y0",
+     "text": "[L43-L50] (LOW/input-error-handling) The root's interactive READ has no IOSTAT, END, or ERR handling, so EOF or malformed input terminates it while other ranks are entering MPI_BCAST."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F17-X0",
+     "F17-Y0"
+    ],
+    [
+     "F17-X1",
+     "F17-Y0"
+    ]
+   ]
+  },
+  {
+   "file_token": "F18",
+   "lang": ".py",
+   "listX": [
+    {
+     "id": "F18-X0",
+     "text": "[L10,L16,L22] (LOW/metadata-consistency) The description calls the model public-domain while the package license and classifier identify GPLv3, leaving the licensing contract inconsistent."
+    },
+    {
+     "id": "F18-X1",
+     "text": "[L26-L30] (LOW/packaging) The Deltares CI-only teamcity-nose dependency is installed unconditionally for every package user."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F18-Y0",
+     "text": "[L10,L16,L22] (LOW/license-metadata-consistency) The long description calls XBeach public-domain while the classifier and license fields declare GPLv3, leaving the distribution's licensing description contradictory."
+    },
+    {
+     "id": "F18-Y1",
+     "text": "[L26-L30] (LOW/dependency-scope) nose and teamcity-nose are mandatory installation dependencies even though the latter is explicitly identified as a CI requirement."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F18-X0",
+     "F18-Y0"
+    ],
+    [
+     "F18-X0",
+     "F18-Y1"
+    ],
+    [
+     "F18-X1",
+     "F18-Y0"
+    ],
+    [
+     "F18-X1",
+     "F18-Y1"
+    ]
+   ]
+  },
+  {
+   "file_token": "F19",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F19-X0",
+     "text": "[L39-L44] (LOW/error-path-output) nf90_inquire_dimension copies uninitialized local outputs when nf_inq_dim fails, without checking its returned status."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F19-Y0",
+     "text": "[L39-L44] (MED/error-handling) nf90_inquire_dimension trims and copies uninitialized local outputs when nf_inq_dim fails instead of guarding those assignments on success."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F19-X0",
+     "F19-Y0"
+    ]
+   ]
+  },
+  {
+   "file_token": "F20",
+   "lang": ".h",
+   "listX": [],
+   "listY": [],
+   "candidate_pairs": []
+  },
+  {
+   "file_token": "F21",
+   "lang": ".h",
+   "listX": [
+    {
+     "id": "F21-X0",
+     "text": "[L77-L79,L105-L116] (LOW/pointer-lifetime-contract) The API returns pointers to communicator ID records without documenting whether subsequent additions, synchronization, or merging invalidate them."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F21-Y0",
+     "text": "[L77-L79,L105-L116] (LOW/lifetime-contract) The API returns pointers to communicator IDs while exposing a growable table, but does not specify whether later additions invalidate those pointers."
+    },
+    {
+     "id": "F21-Y1",
+     "text": "[L120-L127] (LOW/header-dependency) The CLOG_IMPL declaration uses FILE without including stdio.h, leaving compilation dependent on prior includes, particularly with CLOG_NOMPI."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F21-X0",
+     "F21-Y0"
+    ],
+    [
+     "F21-X0",
+     "F21-Y1"
+    ]
+   ]
+  },
+  {
+   "file_token": "F22",
+   "lang": ".h",
+   "listX": [
+    {
+     "id": "F22-X0",
+     "text": "[L27-L37,L93] (MED/handle-consistency) MPIO_Request aliases MPI_Request but MPIO_REQUEST_NULL is hardcoded to zero instead of MPI_REQUEST_NULL, leaving the null-handle contract dependent on an unverified representation assumption."
+    },
+    {
+     "id": "F22-X1",
+     "text": "[L27-L37,L150-L152,L165-L167,L336-L338,L351-L353] (LOW/documentation-consistency) The nonblocking-I/O comments claim generalized requests are unimplemented although this configuration explicitly enables them and aliases completion routines to MPI."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F22-Y0",
+     "text": "[L27-L37,L93] (MED/null-handle-mismatch) MPIO_Request aliases MPI_Request but MPIO_REQUEST_NULL remains zero instead of the nonzero MPI_REQUEST_NULL handle."
+    },
+    {
+     "id": "F22-Y1",
+     "text": "[L10-L13,L75-L83,L123-L218] (MED/include-order) Including mpio.h first in C++ loads mpi.h and its C++ bindings before MPI_MODE_RDONLY and I/O declarations exist, causing the guarded MPI::File methods to be omitted."
+    },
+    {
+     "id": "F22-Y2",
+     "text": "[L27-L37,L150-L152,L165-L167,L336-L338,L351-L353] (LOW/stale-contract-documentation) Nonblocking-I/O comments claim generalized requests are unimplemented although this header explicitly enables them and aliases MPIO requests to MPI requests."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F22-X0",
+     "F22-Y0"
+    ],
+    [
+     "F22-X0",
+     "F22-Y2"
+    ],
+    [
+     "F22-X1",
+     "F22-Y0"
+    ],
+    [
+     "F22-X1",
+     "F22-Y2"
+    ]
+   ]
+  },
+  {
+   "file_token": "F23",
+   "lang": ".h",
+   "listX": [
+    {
+     "id": "F23-X0",
+     "text": "[L154-L175] (LOW/buffer-contract) Event logging accepts an unbounded const char pointer without documenting whether it must reference MPE_LOG_BYTESIZE readable bytes, a string, or a nullable buffer."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F23-Y0",
+     "text": "[L8-L20,L67-L192] (LOW/dll-export-contract) MPEU_DLL_SPEC is defined for Windows import/export but is never applied to any logging declaration in this header."
+    },
+    {
+     "id": "F23-Y1",
+     "text": "[L154-L175] (LOW/buffer-contract) Event logging accepts an unbounded const char pointer without specifying whether it must reference MPE_LOG_BYTESIZE bytes or may be null."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F23-X0",
+     "F23-Y1"
+    ]
+   ]
+  },
+  {
+   "file_token": "F24",
+   "lang": ".f90",
+   "listX": [],
+   "listY": [],
+   "candidate_pairs": []
+  },
+  {
+   "file_token": "F25",
+   "lang": ".h",
+   "listX": [
+    {
+     "id": "F25-X0",
+     "text": "[L84,L118-L120,L229-L246,L303-L327] (MED/architecture-detection) MS_WIN64 is derived from _WIN64 only inside the MSVC branch, so a 64-bit GNU Windows build falls through to four-byte pointer and size_t definitions."
+    },
+    {
+     "id": "F25-X1",
+     "text": "[L198] (LOW/macro-side-effects) Py_IS_INFINITY evaluates its argument twice on the non-finite path, producing inconsistent results or duplicate side effects for expressions such as function calls."
+    },
+    {
+     "id": "F25-X2",
+     "text": "[L658-L665] (LOW/configuration-consistency) The Windows configuration advertises Unix-style libnsl and libsocket availability without a compiler or platform guard."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F25-Y0",
+     "text": "[L118-L120,L229-L246,L303-L327] (MED/platform-configuration) MS_WIN64 is detected only inside the MSVC branch, so a 64-bit GNU Windows build falls through to four-byte pointer, size_t and HKEY definitions."
+    },
+    {
+     "id": "F25-Y1",
+     "text": "[L328-L333] (LOW/configuration-contract) The time_t size is selected solely from the MSVC version without accounting for a caller defining _USE_32BIT_TIME_T."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F25-X0",
+     "F25-Y0"
+    ],
+    [
+     "F25-X0",
+     "F25-Y1"
+    ]
+   ]
+  },
+  {
+   "file_token": "F26",
+   "lang": ".h",
+   "listX": [
+    {
+     "id": "F26-X0",
+     "text": "[L1210-L1211,L1232-L1267] (MED/language-linkage) MPIX and PMPIX generalized-request declarations appear after the extern-C block closes, giving C++ callers mangled linkage for C library entry points."
+    },
+    {
+     "id": "F26-X1",
+     "text": "[L1199-L1202] (LOW/feature-advertisement) The subarray feature section repeats MPIIMPL_HAVE_MPI_TYPE_CREATE_DARRAY instead of advertising MPIIMPL_HAVE_MPI_TYPE_CREATE_SUBARRAY."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F26-Y0",
+     "text": "[L1199-L1202] (LOW/feature-advertisement) The feature list defines MPIIMPL_HAVE_MPI_TYPE_CREATE_DARRAY twice and omits the corresponding TYPE_CREATE_SUBARRAY advertisement beside COMBINER_SUBARRAY."
+    },
+    {
+     "id": "F26-Y1",
+     "text": "[L1210-L1211,L1232-L1267] (MED/language-linkage) MPIX and PMPIX generalized-request extension declarations occur outside extern C, causing C++ callers to request C++ linkage for the C extension functions."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F26-X0",
+     "F26-Y1"
+    ],
+    [
+     "F26-X1",
+     "F26-Y0"
+    ]
+   ]
+  },
+  {
+   "file_token": "F27",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F27-X0",
+     "text": "[L55-L67,L939-L1181] (MED/integer-narrowing) Every EightByteInt put wrapper converts values to default INTEGER before netCDF sees them, allowing out-of-range 64-bit values to be corrupted without a netCDF range error."
+    },
+    {
+     "id": "F27-X1",
+     "text": "[L153-L167,L2423-L2679] (MED/numeric-range-contract) EightByteInt get wrappers read through default-INTEGER temporaries, preventing retrieval of otherwise representable 64-bit integer results from wider numeric variables."
+    },
+    {
+     "id": "F27-X2",
+     "text": "[L13-L17,L211-L226,L3144-L3159] (MED/array-bounds) Optional start/count/stride/map vectors are copied into fixed-size local arrays without checking their lengths against nf90_max_var_dims."
+    },
+    {
+     "id": "F27-X3",
+     "text": "[L2173-L2197,L2432-L2456] (MED/uninitialized-read) Integer array getters reshape the entire uninitialized temporary after partial, sparse, zero-count, or failed reads, evaluating elements the underlying call did not populate."
+    },
+    {
+     "id": "F27-X4",
+     "text": "[L141-L149,L159-L167] (LOW/error-path-output) Scalar integer getters assign defaultInteger to values even when the underlying read fails without defining the temporary."
+    },
+    {
+     "id": "F27-X5",
+     "text": "[L217-L234,L1687-L1704,L2173-L2195] (MED/buffer-extent-contract) Caller-supplied count and map are forwarded without checking that their memory footprint fits values or defaultIntArray, permitting out-of-bounds transfers for inconsistent selections."
+    },
+    {
+     "id": "F27-X6",
+     "text": "[L215-L228,L1685-L1698] (LOW/uninitialized-map-contract) localMap is initialized only through the memory-array rank, leaving trailing map entries undefined when a shorter supplied map is used with a higher-rank file variable."
+    },
+    {
+     "id": "F27-X7",
+     "text": "[L255,L430,L2662,L3153] (LOW/integer-overflow) Default map strides are calculated with default-INTEGER products that can overflow for large multidimensional arrays."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F27-Y0",
+     "text": "[L55-L67,L939-L969,L1149-L1179] (HIGH/numeric-narrowing) Every EightByteInt write converts values to default integer before netCDF sees them, silently losing out-of-range bits and preventing the backend from reporting the original value's range error."
+    },
+    {
+     "id": "F27-Y1",
+     "text": "[L153-L167,L2423-L2456,L2645-L2678] (MED/numeric-range) EightByteInt reads go through default-integer temporaries, unnecessarily restricting values read from floating-point variables to the default integer range before widening them."
+    },
+    {
+     "id": "F27-Y2",
+     "text": "[L13-L17,L211-L226,L3144-L3159] (MED/bounds) Scalar and array wrappers copy optional vectors into fixed-size local arrays without checking that their lengths fit nf90_max_var_dims."
+    },
+    {
+     "id": "F27-Y3",
+     "text": "[L217-L228,L2181-L2189,L3150-L3161] (MED/uninitialized-map) Map entries above the values rank remain uninitialized when a partial map is supplied, yet explicit counts can activate those additional file dimensions with counts greater than one."
+    },
+    {
+     "id": "F27-Y4",
+     "text": "[L142-L149,L160-L167,L2173-L2197,L2654-L2678] (MED/uninitialized-read) Integer getters copy their entire uninitialized temporary after errors, partial-count reads or mapped reads with holes, including entries the backend never wrote."
+    },
+    {
+     "id": "F27-Y5",
+     "text": "[L223-L234,L2184-L2195,L3156-L3167] (MED/buffer-capacity) Explicit counts and memory maps are forwarded without validating their addressed span against values or defaultIntArray, permitting file-valid selections that exceed the supplied storage."
+    },
+    {
+     "id": "F27-Y6",
+     "text": "[L2173,L2197,L2432,L2456] (LOW/memory-use) FourByteInt and EightByteInt array getters allocate a full-size default-integer temporary and reshape it for every read, adding substantial memory demand even for small requested subsets."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F27-X0",
+     "F27-Y0"
+    ],
+    [
+     "F27-X0",
+     "F27-Y1"
+    ],
+    [
+     "F27-X1",
+     "F27-Y1"
+    ],
+    [
+     "F27-X1",
+     "F27-Y4"
+    ],
+    [
+     "F27-X2",
+     "F27-Y2"
+    ],
+    [
+     "F27-X2",
+     "F27-Y3"
+    ],
+    [
+     "F27-X2",
+     "F27-Y5"
+    ],
+    [
+     "F27-X3",
+     "F27-Y1"
+    ],
+    [
+     "F27-X3",
+     "F27-Y4"
+    ],
+    [
+     "F27-X3",
+     "F27-Y5"
+    ],
+    [
+     "F27-X3",
+     "F27-Y6"
+    ],
+    [
+     "F27-X4",
+     "F27-Y1"
+    ],
+    [
+     "F27-X4",
+     "F27-Y4"
+    ],
+    [
+     "F27-X5",
+     "F27-Y2"
+    ],
+    [
+     "F27-X5",
+     "F27-Y3"
+    ],
+    [
+     "F27-X5",
+     "F27-Y4"
+    ],
+    [
+     "F27-X5",
+     "F27-Y5"
+    ],
+    [
+     "F27-X5",
+     "F27-Y6"
+    ],
+    [
+     "F27-X6",
+     "F27-Y2"
+    ],
+    [
+     "F27-X6",
+     "F27-Y3"
+    ],
+    [
+     "F27-X6",
+     "F27-Y5"
+    ],
+    [
+     "F27-X7",
+     "F27-Y2"
+    ],
+    [
+     "F27-X7",
+     "F27-Y3"
+    ],
+    [
+     "F27-X7",
+     "F27-Y5"
+    ]
+   ]
+  }
+ ]
+}

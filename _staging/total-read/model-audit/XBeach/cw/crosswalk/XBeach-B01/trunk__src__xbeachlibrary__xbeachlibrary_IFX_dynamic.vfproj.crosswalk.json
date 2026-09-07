@@ -1,0 +1,143 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-B01",
+ "source_path": "trunk/src/xbeachlibrary/xbeachlibrary_IFX_dynamic.vfproj",
+ "source_sha256": "945da8bf58cebafc9049cfffe831feec2a2efad5b89e7b0f6a2733e3d80a80e8",
+ "base_run_id": "xbeach-r1-XBeach-B01-gpt-5.6-luna-01a079ab-98f6-7ba2-9380-3c78010a3f81",
+ "audit_run_id": "xbeach-r2-XBeach-B01-gpt-5.6-luna-01a07a20-9cee-7323-9aa4-758354e89851",
+ "base_record_file": "d6848f4dfb86fef81116413f560bb944576ea3e5c579b97ec9ab0fabbe34b331.json",
+ "audit_record_file": "d6848f4dfb86fef81116413f560bb944576ea3e5c579b97ec9ab0fabbe34b331.json",
+ "base_record_sha256_bytes": "19cfdab46a93a770f865adb2589be746d34eae234b9d5cb8de36d5b8ee08feee",
+ "audit_record_sha256_bytes": "b5bf496b0b4edf9f006765c2d5017df892a7f62e48613f5b692d610e1627ee4b",
+ "base_finding_count": 3,
+ "audit_finding_count": 6,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "[L140-L142] (MED/configuration-path) MPI_Debug|x64 writes module files to bin\\dynamic\\win32\\$(ConfigurationName) while its output/object paths are x64, mixing architecture-specific module artifacts."
+   ],
+   "audit_member_text": [
+    "[L141] (MED/configuration-contamination) MPI_Debug|x64 writes modules into the win32 dynamic directory."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "MPI_Debug|x64 explicitly directs module files to bin\\dynamic\\win32\\$(ConfigurationName), also used by MPI_Debug|Win32. Both compiled files define modules (introspection.F90:1 and libxbeach_dynamic.F90:1), so the setting applies to real generated artifacts; x64 object/output directories and static-library include paths do not neutralize it.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "[L74-L86,L162-L179] (MED/configuration-contract) The MPI_netcdf configurations have no USEMPI or USENETCDF-related PreprocessorDefinitions, so their feature-combined names are not reflected in the compiler settings."
+   ],
+   "audit_member_text": [
+    "[L75,L86,L163,L174] (MED/feature-configuration) Combined MPI_netcdf configurations omit the MPI and netCDF preprocessor definitions supplied in single-feature builds."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED_UNVERIFIED",
+    "rationale": "This DLL project compiles only introspection.F90 and libxbeach_dynamic.F90, neither of which tests USEMPI, USENETCDF or their related feature macros. The wrapper calls the already compiled libxbeach_module, and the IFX static-library combined configurations explicitly enable both features (xbeachlibrary_IFX.vfproj:75,86,163,174), so missing unused DLL-local definitions do not remove feature support.",
+    "neutralizer": {
+     "where": "trunk/src/xbeachlibrary/libxbeach_dynamic.F90:L12-L17",
+     "quote": "   integer(c_int) function xbeach_init() bind(C, name=\"init\")\n      !DEC$ ATTRIBUTES DLLEXPORT::xbeach_init\n\n      xbeach_init = init()\n\n   end function xbeach_init"
+    },
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L31-L42,L75-L86] (MED/configuration-path) The Win32 MPI and MPI_netcdf configurations reference bin\\static\\x64\\$(ConfigurationName) as an include directory, so 32-bit dynamic-library builds depend on x64 static artifacts."
+   ],
+   "audit_member_text": [
+    "[L31,L42,L75,L86] (MED/architecture-mismatch) Win32 MPI configurations search the x64 static module directory."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L16,L27,L38,L49,L60,L71,L82,L93,L104,L115,L126,L137,L148,L159,L170,L181] (MED/path-quoting) Distribution commands pass directory macros without quotes, breaking builds in paths containing spaces."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L31-L32,L42-L43,L141-L142,L152-L153] (MED/dependency-location) MPI include and library paths are rooted directly at ONEAPI_ROOT with no MPI component or version directory, leaving dependency discovery dependent on an unexplained installation layout."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L96-L97,L107-L108] (MED/configuration-contamination) IFX builds reuse the classic project's intermediate and module directories, allowing stale compiler-specific build products to be reused when switching projects."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

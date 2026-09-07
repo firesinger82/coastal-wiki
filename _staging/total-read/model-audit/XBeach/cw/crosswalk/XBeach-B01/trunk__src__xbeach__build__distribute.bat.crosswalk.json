@@ -1,0 +1,99 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-B01",
+ "source_path": "trunk/src/xbeach/build/distribute.bat",
+ "source_sha256": "6e9775ed73ee31a84ab1a1804ccf51e73a093801d89b828e79cff3cd07321c0b",
+ "base_run_id": "xbeach-r1-XBeach-B01-gpt-5.6-luna-01a079ab-98f6-7ba2-9380-3c78010a3f81",
+ "audit_run_id": "xbeach-r2-XBeach-B01-gpt-5.6-luna-01a07a20-9cee-7323-9aa4-758354e89851",
+ "base_record_file": "05b6d4ee2034baf33912ba5b9842f1c41dcfb19fd213de9e0813f2db867765b4.json",
+ "audit_record_file": "05b6d4ee2034baf33912ba5b9842f1c41dcfb19fd213de9e0813f2db867765b4.json",
+ "base_record_sha256_bytes": "1611a992a3445b0fd2bc5bf3cfb46e929c042d9ab95aa2f68ffecde4eb70ea47",
+ "audit_record_sha256_bytes": "df3d4ca69596b5240bb7bf89cbc2b6a2d3681da886ce40b59e52f27af95eb3d4",
+ "base_finding_count": 1,
+ "audit_finding_count": 3,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L17-L32] (LOW/error-handling) The distribution script performs destructive recursive removal and multiple wildcard copies without checking command success, so a missing input, failed mkdir, or copy error can still yield an apparently completed but incomplete distribution."
+   ],
+   "audit_member_text": [
+    "[L18-L32] (MED/error-propagation) The previous distribution is removed before validating inputs and copy failures are unchecked, so a final successful license copy can conceal an incomplete package."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "confirmed_delta",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L18-L19] (MED/build-order-coupling) The executable post-build deletes the entire shared distribution directory, including library DLLs published by the library post-build scripts."
+   ],
+   "representative": "audit",
+   "rationale": "span-confirmed: Lines 18-19 recursively remove and recreate the entire configuration distribution directory, without preserving library artifacts. The subsequent copies use only the executable TargetDir and static-library DLL directory, whereas the library publisher places XBeach.Library.dll and XBeach.BMI.dll in this same distribution directory.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L18-L19",
+    "quote": "if exist \"%SolutionDir%\\dist\\%Platform%\\%ConfigurationName%\\\" rmdir \"%SolutionDir%\\dist\\%Platform%\\%ConfigurationName%\\\" /q /s\r\nmkdir \"%SolutionDir%\\dist\\%Platform%\\%ConfigurationName%\\\"",
+    "verified_at_lines": "L18-L19",
+    "source_sha256": "6e9775ed73ee31a84ab1a1804ccf51e73a093801d89b828e79cff3cd07321c0b"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Both executable projects call this script as their post-build event, and the solution makes the executable, dynamic DLL and BMI DLL siblings depending on the static library (XBeach_VS2010.sln:3-30). The recursive distribution-directory removal therefore can erase DLLs already published by a sibling, while the following copy reads only the static-library/runtime DLL directory and executable TargetDir, not the published dynamic/BMI DLLs.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "confirmed_delta",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L22,L25-L26] (MED/stale-packaging) TargetDir is never cleared before wildcard packaging, allowing stale executables and DLLs from earlier builds to enter the new distribution."
+   ],
+   "representative": "audit",
+   "rationale": "span-confirmed: The script clears dist but never clears TargetDir; line 22 only adds or overwrites DLLs there. Lines 25-26 then copy every executable and DLL in TargetDir, including files left by earlier builds.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L25-L26",
+    "quote": "copy \"%TargetDir%\\*.exe\" \"%SolutionDir%\\dist\\%Platform%\\%ConfigurationName%\\\"\r\ncopy \"%TargetDir%\\*.dll\" \"%SolutionDir%\\dist\\%Platform%\\%ConfigurationName%\\\"",
+    "verified_at_lines": "L25-L26",
+    "source_sha256": "6e9775ed73ee31a84ab1a1804ccf51e73a093801d89b828e79cff3cd07321c0b"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Only the distribution destination is removed; TargetDir receives additional DLLs and is then copied with *.exe and *.dll, without an inventory or purge. config/build_configuration.bat:59 performs a normal project clean, but it does not establish removal of obsolete or manually copied wildcard-matching files, and ordinary project post-build invocations also bypass that wrapper.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  }
+ ]
+}

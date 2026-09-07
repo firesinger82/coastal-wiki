@@ -1,0 +1,244 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-M00",
+ "source_path": "trunk/doc/README.parallel",
+ "source_sha256": "3f94ad22f2a162e324ccd6ec972405e86124b8959f7c564388ae90726a80c944",
+ "base_run_id": "xbeach-r1-XBeach-M00-gpt-5.6-luna-01a079b2-ab4e-7223-8458-eccb1baa0c34",
+ "audit_run_id": "xbeach-r2-XBeach-M00-gpt-5.6-luna-01a07a31-08f8-7912-905f-a9265bb1e88d",
+ "base_record_file": "0a12edfedd949c254356f284e637e355d1a6c797a5fdc0536bcf4ef82533a691.json",
+ "audit_record_file": "0a12edfedd949c254356f284e637e355d1a6c797a5fdc0536bcf4ef82533a691.json",
+ "base_record_sha256_bytes": "147d83d8378c49b7169a54e1b6fc090ab009d7d3adb7e399ed646ec426d8deb7",
+ "audit_record_sha256_bytes": "6d94af52840794b41629420a44d2ddcdf03fdd99920cdae1622229c4218f9bd2",
+ "base_finding_count": 10,
+ "audit_finding_count": 5,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "[L164-L169] (MED/Fortran-semantics) The claim that post-allocation initialization such as `xyz = 0` is superfluous is unsafe: allocatable numeric arrays are not generally initialized by allocation, so removing it can expose undefined values."
+   ],
+   "audit_member_text": [
+    "[L164-L169] (MED/unsafe-initialization-guidance) The recommendation to omit zero initialization provides no requirement that every array element be assigned before use, although allocation alone does not initialize real values."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The complete allocation discussion gives no assignment-before-read condition for omitting initialization, and xyz is only a documentation placeholder, so no caller or initializer supplies a missing guarantee. Some scratch arrays are fully overwritten (for example trunk/src/xbeachlibrary/roelvink.F90:73-84), but that does not justify the unrestricted recommendation; the build flags in trunk/src/xbeachlibrary/Makefile.am:99-105 likewise provide no allocation-time zeroing guarantee. This stands as unsafe documentation guidance, not evidence that an existing execution necessarily reads undefined v",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "[L139-L162] (MED/Fortran-semantics) The proposed replacement for saved scratch arrays omits a deallocation example and assumes automatic removal at subroutine exit, while the original saved allocation can retain dimensions across calls; callers with changing local-grid sizes therefore lack a safe lifecycle contract."
+   ],
+   "audit_member_text": [
+    "[L139-L154] (MED/documented-allocation-limitation) The documented saved scratch-array pattern allocates only once and explicitly leaves wrong-sized arrays possible when subsequent spacepar instances have different dimensions."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED_UNVERIFIED",
+    "rationale": "The finding treats a deliberately criticized example as the recommended lifecycle: lines 152-154 explicitly warn that SAVE can retain the wrong dimensions, and lines 156-162 replace it with a local allocatable without SAVE. Such a local allocatable is automatically deallocated on procedure exit, so the replacement allocates the current dimensions on each call and needs no explicit deallocation example; the cited passage does not establish a defect in that guidance.",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/doc/README.parallel:L152-L162",
+     "quote": "This solution, however, is not good when one should define more than\none spacepar variable (apart from sglobal and slocal). Then the size\nof the 'saved' matrices could be wrong.\n\nI suggest to simply allocate these scratch arrays:\n\n  real*8, dimension(:,:), allocatable :: xyz\n  allocate(xyz(s%nx+1,s%ny+1))\n\nAccording to the fortran95 standard, these allocated arrays are \nautomatically removed at the exit of the subroutine."
+    },
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L41-L49] (MED/build-contract) The MPI build instructions name `--with-mpi` but do not state the MPI implementation/compiler wrapper, NetCDF/MPI prerequisites, or how this option changes the generated build."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L51-L54] (MED/build-robustness) The instruction to run only `make clean` between MPI configurations may leave configure-generated state and dependency files from the previous configuration."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L58-L62] (MED/build-robustness) The dependency generator is explicitly described as not bullet-proof, but no known failure modes or required manual dependency checks are provided."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L74-L75] (LOW/build-contract) `USEMPI` is described as a macro without specifying its exact compiler-definition syntax or whether it is generated exclusively by configure."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L126-L134] (MED/parallel-state) The document says `sglobal` is unfilled on non-master processes while also saying distribution descriptors are available in both `sglobal` and `slocal`; the valid fields and access rules are not clearly distinguished."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L171-L197] (MED/platform-staleness) The Windows MPI guidance is tied to MPICH2, Visual Fortran project tabs, fixed `C:\\Program Files\\MPICH2\\` paths, and legacy symbol/decorated-library names without identifying the supported toolchain or snapshot."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A8"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L202-L204] (LOW/maintenance) The document says unresolved code locations are marked `wwvv`, but does not enumerate them or provide a cross-reference, making the warning markers difficult to audit."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A9"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L215] (LOW/maintenance) The promised comprehensive parallelization report is stated as future work with no date or linked artifact."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L43-L48] (MED/build-instruction-order) The displayed installation sequence runs make distclean after configure and then immediately runs make without regenerating the configuration and Makefiles."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L92-L98] (MED/parallel-input-contract) The master-only readkey example does not explain how its result reaches other ranks when the parameter is needed outside the master."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L182-L197] (MED/abi-selection-guidance) The suggested trial substitution of MPI libraries changes the documented calling convention without requiring matching compiler ABI settings."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

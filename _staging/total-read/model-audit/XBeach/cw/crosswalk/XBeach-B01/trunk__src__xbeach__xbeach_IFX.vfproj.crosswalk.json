@@ -1,0 +1,175 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-B01",
+ "source_path": "trunk/src/xbeach/xbeach_IFX.vfproj",
+ "source_sha256": "86e74cc1324c0f9568c3bcb3b85f6df1a5cb798b82c5b5f150ed4d079a660aac",
+ "base_run_id": "xbeach-r1-XBeach-B01-gpt-5.6-luna-01a079ab-98f6-7ba2-9380-3c78010a3f81",
+ "audit_run_id": "xbeach-r2-XBeach-B01-gpt-5.6-luna-01a07a20-9cee-7323-9aa4-758354e89851",
+ "base_record_file": "5d59a107da5e5135319dbce632cb2741ffcd91a9a46a8cea37acce75b4260320.json",
+ "audit_record_file": "5d59a107da5e5135319dbce632cb2741ffcd91a9a46a8cea37acce75b4260320.json",
+ "base_record_sha256_bytes": "966419539f2b1f66bf6385bbf91702ec2052eab75489ba0c5ecff13c5d683fc4",
+ "audit_record_sha256_bytes": "10991c19c7fed2705083096bfaf7c560a844d9780a78215fac7168a5bcc1abfb",
+ "base_finding_count": 4,
+ "audit_finding_count": 8,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1",
+    "A3"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "[L130] (MED/configuration-path) The netcdf_Release|x64 configuration writes object files to bin\\win32\\$(ConfigurationName) while its output/module paths are bin\\x64, mixing architectures/configuration directories.",
+    "[L163] (MED/configuration-path) MPI_netcdf_Debug|x64 uses bin\\win32\\$(ConfigurationName) for ModulePath and ObjectFile despite being an x64 configuration, causing cross-configuration artifacts."
+   ],
+   "audit_member_text": [
+    "[L130,L163] (MED/configuration-contamination) Several x64 configurations write objects or modules into Win32 output directories, creating architecture collisions."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The IFX project repeats the explicit Win32 object destination for netcdf_Release|x64 and Win32 module/object/PDB destinations for MPI_netcdf_Debug|x64. Inspection of all file entries, configuration attributes and solution mappings found no override redirecting those compiler outputs to x64.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "[L152] (MED/configuration-path) MPI_Release|x64 searches ..\\xbeachlibrary\\bin\\static\\$(ConfigurationName) for the library include directory instead of the x64 path used elsewhere in that configuration."
+   ],
+   "audit_member_text": [
+    "[L152] (MED/missing-include-path) MPI_Release|x64 omits the x64 component from its static-library module search path."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [
+    "[L74-L86,L162-L174] (MED/configuration-contract) The MPI_netcdf configurations contain no PreprocessorDefinitions for USEMPI or USENETCDF, unlike the separate MPI and netcdf configurations, so their names do not match the feature flags they appear intended to enable."
+   ],
+   "audit_member_text": [
+    "[L75,L86,L163,L174] (MED/feature-configuration) Combined MPI_netcdf configurations enable preprocessing but omit MPI and netCDF definitions, unlike the corresponding static-library builds."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "The IFX executable has the same three unconditional wrapper sources as the classic project, so preprocessing does not consume these feature definitions in this project. Its static-library dependency supplies feature selection and explicitly enables both flags in xbeachlibrary_IFX.vfproj:75,86,163,174; omission in the executable is not a functional configuration defect.",
+    "neutralizer": {
+     "where": "trunk/src/xbeach/xbeach.F90:L1-L6",
+     "quote": "program xbeach\n   use libxbeach_module,     only: executestep, init, final, outputext\n   use introspection_module, only: getdoubleparameter\n   use iso_c_binding,        only: c_double\n   use process_input,        only: readinput\n   use xmpi_module,          only: halt_program"
+    },
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L8,L19,L30,L41,L52,L63,L74,L85] (MED/compiler-target) Win32 configurations select ifxCompiler despite the companion library retaining ifortCompiler for Win32, leaving the 32-bit compiler target unsupported or inconsistent."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L16,L27,L38,L49,L60,L71,L82,L93,L104,L115,L126,L137,L148,L159,L170,L181] (MED/path-quoting) Post-build distribution receives directory macros unquoted and therefore breaks for paths containing spaces."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L31,L42,L75,L86] (MED/include-path-syntax) Win32 MPI include lists separate the MPI and library paths with a space instead of the semicolon used elsewhere."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L31-L32,L141-L142,L152-L153,L163-L164,L174-L175] (MED/dependency-location) MPI paths assume include/mpi and lib directly below ONEAPI_ROOT without locating the MPI component installation."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L96-L108] (MED/configuration-contamination) IFX executable builds reuse classic intermediate directories, permitting stale objects when switching compiler projects."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

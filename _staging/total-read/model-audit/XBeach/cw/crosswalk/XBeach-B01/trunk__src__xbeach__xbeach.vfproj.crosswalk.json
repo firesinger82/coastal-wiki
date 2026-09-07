@@ -1,0 +1,115 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-B01",
+ "source_path": "trunk/src/xbeach/xbeach.vfproj",
+ "source_sha256": "75740ba38ab01659f0a6af281fcbcf3d5dc80fe20a93f5224ffa90f8d2ba7111",
+ "base_run_id": "xbeach-r1-XBeach-B01-gpt-5.6-luna-01a079ab-98f6-7ba2-9380-3c78010a3f81",
+ "audit_run_id": "xbeach-r2-XBeach-B01-gpt-5.6-luna-01a07a20-9cee-7323-9aa4-758354e89851",
+ "base_record_file": "d084ba5092aedb9ca6efe82fced9bfe1c9fa77cd4ae41a9cad360f1474c43d6f.json",
+ "audit_record_file": "d084ba5092aedb9ca6efe82fced9bfe1c9fa77cd4ae41a9cad360f1474c43d6f.json",
+ "base_record_sha256_bytes": "44fadbcb86d6c1bb689f9a803ec140457f842d33805fcc8197f56e591cef9dcb",
+ "audit_record_sha256_bytes": "950f179375909ba093f6e996822449b297f958a57931c0c7c5433fb1b0e2be6b",
+ "base_finding_count": 4,
+ "audit_finding_count": 4,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "[L67-L78,L147-L158] (MED/configuration-contract) The MPI_netcdf configurations contain no PreprocessorDefinitions for USEMPI or USENETCDF, unlike the separate MPI and netcdf configurations, so their names do not match the feature flags they appear intended to enable."
+   ],
+   "audit_member_text": [
+    "[L68,L78,L148,L158] (MED/feature-configuration) Combined MPI_netcdf configurations omit feature preprocessor definitions despite compiling against libraries built with both features enabled."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "The executable project compiles only input.F90, introspection.F90 and xbeach.F90, none of which contains USEMPI/USENETCDF conditionals or includes requiring those definitions. Its feature-dependent operations are delegated to the static library, whose combined configurations explicitly define both flags (xbeachlibrary.vfproj:68,78,148,158), so omitting unused wrapper definitions does not disable or mismatch those features.",
+    "neutralizer": {
+     "where": "trunk/src/xbeach/xbeach.F90:L1-L6",
+     "quote": "program xbeach\n   use libxbeach_module,     only: executestep, init, final, outputext\n   use introspection_module, only: getdoubleparameter\n   use iso_c_binding,        only: c_double\n   use process_input,        only: readinput\n   use xmpi_module,          only: halt_program"
+    },
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "[L138] (MED/configuration-path) MPI_Release|x64 searches ..\\xbeachlibrary\\bin\\static\\$(ConfigurationName) for the second include directory instead of the x64 path used by the same configuration's first directory."
+   ],
+   "audit_member_text": [
+    "[L138] (MED/missing-include-path) MPI_Release|x64 omits x64 from its static-library module include directory."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1",
+    "A3"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L118] (MED/configuration-path) The netcdf_Release|x64 configuration writes object files to bin\\win32\\$(ConfigurationName) while its output/module paths are bin\\x64, mixing architectures/configuration directories.",
+    "[L148] (MED/configuration-path) MPI_netcdf_Debug|x64 uses bin\\win32\\$(ConfigurationName) for both ModulePath and ObjectFile despite being an x64 configuration, causing cross-configuration artifacts."
+   ],
+   "audit_member_text": [
+    "[L118,L148] (MED/configuration-contamination) x64 netCDF Release objects and MPI_netcdf Debug objects, modules, and PDB files are directed into Win32 directories."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The netcdf_Release|x64 ObjectFile explicitly selects bin\\win32, and MPI_netcdf_Debug|x64 explicitly selects Win32 ModulePath, ObjectFile and PdbFile. The same-named Win32 configurations use those destinations too; correct x64 OutputDirectory/IntermediateDirectory values do not override the explicit compiler paths, and there are no per-file overrides.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L15,L25,L35,L45,L55,L65,L75,L85,L95,L105,L115,L125,L135,L145,L155,L165] (MED/path-quoting) Distribution commands pass directory macros unquoted, breaking argument boundaries for checkout paths containing spaces."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

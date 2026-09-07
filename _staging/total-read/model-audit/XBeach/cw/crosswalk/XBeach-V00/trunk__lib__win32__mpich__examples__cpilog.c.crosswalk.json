@@ -1,0 +1,67 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-V00",
+ "source_path": "trunk/lib/win32/mpich/examples/cpilog.c",
+ "source_sha256": "286e888f63ea993a2caf3181dd11a3cb9f0da2ef58ff78eda5b2d288da2dd80c",
+ "base_run_id": "xbeach-r1-XBeach-V00-gpt-6-astra-01a079b6-2340-70c1-8a95-292af5f92813",
+ "audit_run_id": "xbeach-r2-XBeach-V00-gpt-6-astra-01a07a34-5e0e-7073-ac88-2789f15c46ce",
+ "base_record_file": "d01728a2079d84e1b81b28156a8f9f5a5d91bae29f4dc4060e86fdf369eea6fc.json",
+ "audit_record_file": "d01728a2079d84e1b81b28156a8f9f5a5d91bae29f4dc4060e86fdf369eea6fc.json",
+ "base_record_sha256_bytes": "005cf5ef27b295aed522ba975d9b986cea9c0bf77904216c6403bbcc3b0abf91",
+ "audit_record_sha256_bytes": "dfb23e68b78d9c13f5f15005f9a90913be1190706a11594088ca1e033d0d72ba",
+ "base_finding_count": 0,
+ "audit_finding_count": 2,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "confirmed_delta",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L44,L53-L68,L88-L115,L117-L121] (LOW/error-propagation) All MPE status returns are ignored, so event-ID allocation or log-writing failures can remain invisible while the example reports successful numerical output."
+   ],
+   "representative": "audit",
+   "rationale": "span-confirmed: Event-ID, description, event-logging and clock-sync return values are discarded, and the explicit MPE_Finish_log return is also ignored when NO_MPI_LOGGING is defined. That preprocessor condition only selects explicit initialization/finalization; it does not guard the other unchecked calls or prevent numerical output followed by return(0) at L124-L131 after a returned logging error.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L53-L56",
+    "quote": "    MPE_Log_get_state_eventIDs( &event1a, &event1b );\n    MPE_Log_get_state_eventIDs( &event2a, &event2b );\n    MPE_Log_get_state_eventIDs( &event3a, &event3b );\n    MPE_Log_get_state_eventIDs( &event4a, &event4b );",
+    "verified_at_lines": "L53-L56",
+    "source_sha256": "286e888f63ea993a2caf3181dd11a3cb9f0da2ef58ff78eda5b2d288da2dd80c"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "NO_MPI_LOGGING guards only explicit initialization/finalization; event-ID acquisition and event logging remain unconditional and their statuses remain unchecked. The bundled mpe_log.h declares integer status returns and file/memory failure codes, while the example prints its numerical result and returns zero without consulting any of them.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L118-L119] (LOW/argument-validation) The filename fallback checks argv but not argc or argv[0], allowing a null filename when the argument vector is present but empty."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

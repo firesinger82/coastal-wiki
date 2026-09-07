@@ -1,0 +1,91 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-V01",
+ "source_path": "trunk/lib/win32/netcdff90/netcdf_file.f90",
+ "source_sha256": "e00fb4609f84661bbfa716f2740a5d35e5661b3c2c3d1f17720826c8384d1247",
+ "base_run_id": "xbeach-r1-XBeach-V01-gpt-6-astra-01a079bd-fbb5-7cd3-8c47-5d906cc55970",
+ "audit_run_id": "xbeach-r2-XBeach-V01-gpt-6-astra-01a07a3b-b349-7061-aef2-9b392a6fc7c6",
+ "base_record_file": "2fcd4312f1511e950d20283ace12757e886bd54d2d0ce5949cbea8c4195b5263.json",
+ "audit_record_file": "2fcd4312f1511e950d20283ace12757e886bd54d2d0ce5949cbea8c4195b5263.json",
+ "base_record_sha256_bytes": "fb24c3edc0730075cb91535a8f0052ee3f4c2a089c3fa743faf11760655dc795",
+ "audit_record_sha256_bytes": "53fe2685c816c960402c769c6521fff92257b0fc67d0771360ee4ae9910016a1",
+ "base_finding_count": 2,
+ "audit_finding_count": 3,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L161-L170] (LOW/error-path-output) nf90_inquire copies local inquiry outputs without checking success and overwrites the first status with nf_inq_format when formatNum is requested."
+   ],
+   "audit_member_text": [
+    "[L161-L170] (MED/error-handling) nf90_inquire copies uninitialized local outputs after failed inquiries and overwrites the first inquiry status with the format-query status when formatNum is present."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "nf90_inquire has uninitialized automatic output locals and unconditional presence-based copies, then assigns the format-query status over the first status (netcdf_file.f90:156-172). No success guard or initializer exists in the enclosing module; although an invalid ncid normally makes both calls fail, that does not remove the unconditional undefined-output copies or the status overwrite.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L56-L62,L79-L85] (MED/intent-contract) The multiprocess create/open wrappers declare chunk-size hints INTENT(IN) although the corresponding ordinary wrappers treat these underlying library arguments as writable INOUT values."
+   ],
+   "audit_member_text": [
+    "[L56-L62,L79-L85] (MED/intent-contract) The multiprocess create/open wrappers declare chunk-size hints INTENT(IN) while passing them directly to routines that return the selected chunk size, unlike the INOUT contract used by the ordinary wrappers."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The mp wrappers pass their INTENT(IN) chunk hint itself, with no local copy, to the legacy routines (netcdf_file.f90:56-86). The bundled manual says those routines behave like nf__create/nf__open except for the base PE (netcdf_f90.3:925-938), while the ordinary wrappers explicitly use INOUT and return the selected hint; netcdf_visibility.f90:7 exposes the mp wrappers and no platform exclusion removes them.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L56,L58,L79,L81] (LOW/keyword-contract) The public multiprocess wrappers expose inconsistent misspelled keyword names initalsz and chunksizeint, making keyword-based calls prone to incompatibility."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

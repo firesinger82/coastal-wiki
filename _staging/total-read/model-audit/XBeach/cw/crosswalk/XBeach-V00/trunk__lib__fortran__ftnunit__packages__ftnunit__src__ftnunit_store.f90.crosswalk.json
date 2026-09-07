@@ -1,0 +1,185 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-V00",
+ "source_path": "trunk/lib/fortran/ftnunit/packages/ftnunit/src/ftnunit_store.f90",
+ "source_sha256": "73fd456110bc0ce32c4732d57491ebdd118a786f380bc84532899b3febb8e607",
+ "base_run_id": "xbeach-r1-XBeach-V00-gpt-6-astra-01a079b6-2340-70c1-8a95-292af5f92813",
+ "audit_run_id": "xbeach-r2-XBeach-V00-gpt-6-astra-01a07a34-5e0e-7073-ac88-2789f15c46ce",
+ "base_record_file": "118ddea0a8fca655f39c257c7f41f72ef9f58450fa1037320fa333ad5ebb711b.json",
+ "audit_record_file": "118ddea0a8fca655f39c257c7f41f72ef9f58450fa1037320fa333ad5ebb711b.json",
+ "base_record_sha256_bytes": "6894568017063a73591a8fb63ed528d15f431e504a762544c4f526ef39ca3046",
+ "audit_record_sha256_bytes": "fdb1af07851aa0385b0688643e26f6f43bd2a59d8f832881c59aa9f50943922e",
+ "base_finding_count": 7,
+ "audit_finding_count": 7,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [
+    "[L1655,L1697] (LOW/diagnostics) Character-array retrieval reports complex-data errors in two copy-pasted diagnostic messages."
+   ],
+   "audit_member_text": [
+    "[L1655,L1697] (LOW/diagnostic-mismatch) Character retrieval error messages incorrectly identify the expected or retrieved data as complex."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "[L163,L176,L184,L190,L198,L328-L342] (MED/error-propagation) Detected storage errors terminate through plain STOP without returning an error or signaling assertion failure, which can appear as successful process termination."
+   ],
+   "audit_member_text": [
+    "[L160-L163,L173-L176,L181-L198,L328-L342] (MED/failure-signaling) Detected open and format failures use bare STOP, which normally exits successfully and can make a failed test-data load appear successful to a process-level test runner."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Storage errors call bare STOP without a status argument, assertion hook, or error result in the public interfaces. A restart-aware ftnunit driver may later recognize an interrupted test, but a runner using only the immediate process exit status can still see normal termination after a failed load.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "[L53-L59,L158,L245-L246,L491-L492,L737-L738] (LOW/format-portability) The fixed format identifier records no kind widths, byte order or record-marker format even though payloads use compiler-native unformatted representations."
+   ],
+   "audit_member_text": [
+    "[L50-L59,L158,L245,L491,L737] (LOW/serialization-contract) The fixed format version records default-kind binary values without recording their widths, endianness, or record-marker format, leaving cross-compiler and compiler-option compatibility unspecified."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "[L166-L168,L245-L246,L345,L383-L385,L1582,L1723] (MED/io-error-handling) Payload reads and all writes lack IOSTAT handling despite metadata-read checks, so truncated payloads or write failures bypass the module's controlled diagnostics."
+   ],
+   "audit_member_text": [
+    "[L166-L168,L245-L246,L345,L385,L1629,L1723] (MED/io-error-handling) Payload reads and all writes omit IOSTAT handling, so truncated data or output failures abort in the runtime instead of producing a controlled storage error."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The opening/header and per-record metadata checks do not cover the subsequent payload read, and writes throughout the serializers have no IOSTAT/ERR handler. A valid metadata record followed by a missing payload therefore bypasses the custom diagnostic branches and raises a Fortran runtime I/O error.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "[L351-L385,L597-L631,L843-L877,L1089-L1123,L1335-L1369,L1588-L1629] (MED/ownership-contract) Retrieval unconditionally allocates pointer outputs without documenting or enforcing that their existing targets have been released, allowing repeated retrieval to leak prior allocations."
+   ],
+   "audit_member_text": [
+    "[L353,L383,L393,L423,L433,L463,L599,L629,L1684,L1721] (MED/ownership-contract) Array retrieval unconditionally allocates a new pointer target without releasing an existing target or documenting that the incoming pointer must not own storage, permitting leaks on repeated retrieval."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L539-L545,L684-L689,L709] (HIGH/serialization-type-mismatch) The rank-three real writer serializes dimensions as REAL while its reader interprets them as INTEGER, producing invalid extents and potentially enormous allocations on ordinary round trips."
+   ],
+   "audit_member_text": [
+    "[L539-L545,L684-L709] (HIGH/serialization-type-mismatch) The three-dimensional real writer serializes dimensions as REAL while its reader interprets them as INTEGER, corrupting array extents and potentially causing enormous allocations."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The public generic dispatch includes the rank-three REAL writer and reader; the file is explicitly opened unformatted, so no formatted numeric conversion can reconcile REAL dimensions at L539 with INTEGER dimensions at L684. For the usual four-byte representation, even extent 1.0 has integer bit pattern 1065353216, which passes the separate type/rank checks before allocation.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L383,L423,L463,L629,L669,L709,L875,L915,L955,L1121,L1161,L1201,L1367,L1407,L1447,L1627,L1674,L1721] (MED/allocation-validation) Array readers allocate directly from file extents without checking negative values, reasonable size limits or allocation status."
+   ],
+   "audit_member_text": [
+    "[L363-L385,L403-L425,L443-L465,L609-L631,L689-L711,L1694-L1723] (MED/metadata-validation) Array readers validate type and rank but allocate directly from unchecked file extents, allowing negative dimensions to become empty arrays or excessive dimensions to terminate allocation."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Every examined array reader checks metadata I/O status, type and rank, but then allocates directly from dimensions without extent validation or STAT. Writers normally derive valid dimensions from shape(data), but corrupted/external records and the rank-three REAL serialization mismatch still reach these allocations through a valid header and rank.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  }
+ ]
+}

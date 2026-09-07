@@ -1,0 +1,250 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-V01",
+ "source_path": "trunk/lib/win32/netcdff90/netcdf_text_variables.f90",
+ "source_sha256": "49c6b8fb59c4a396b202b0440f2cc6cf81db2a3898c51d33abc1141b896c10d6",
+ "base_run_id": "xbeach-r1-XBeach-V01-gpt-6-astra-01a079bd-fbb5-7cd3-8c47-5d906cc55970",
+ "audit_run_id": "xbeach-r2-XBeach-V01-gpt-6-astra-01a07a3b-b349-7061-aef2-9b392a6fc7c6",
+ "base_record_file": "3ff0cdecaa20994ebb38e08d6377b5e2055259cab8366e1c71559434047d3da3.json",
+ "audit_record_file": "3ff0cdecaa20994ebb38e08d6377b5e2055259cab8366e1c71559434047d3da3.json",
+ "base_record_sha256_bytes": "4deda893cc7d6b61553139a0c5dbc465ad53f093a89f57f4f5a0cf643649277b",
+ "audit_record_sha256_bytes": "3d4ec896e1258f78bb48e592111260f9631b13d7cc74fc43ef33e26181779748",
+ "base_finding_count": 9,
+ "audit_finding_count": 8,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L1-L18,L21-L38] (MED/ignored-argument) Scalar text get/put accepts map but never uses it or rejects it, silently performing an unmapped strided transfer."
+   ],
+   "audit_member_text": [
+    "[L1-L18,L21-L38] (MED/ignored-argument) The scalar text put/get interfaces accept map but never use it, silently performing strided rather than mapped transfers."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Both complete scalar character procedures accept map but call only nf_*_vars_text and never reference map (netcdf_text_variables.f90:1-39). A scalar Fortran string still represents a character dimension, as netcdf.f90:30-34 explains, so scalar rank does not make a nonunit character-memory mapping meaningless.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "[L44-L45,L66-L69,L268-L269,L290-L293] (MED/contiguity-contract) Array text wrappers pass only the first scalar element of an assumed-shape array to bulk I/O, without packing or requiring contiguous actual arrays."
+   ],
+   "audit_member_text": [
+    "[L66-L69,L98-L101,L290-L293,L482-L485] (MED/contiguity-contract) Assumed-shape character arrays are passed to the legacy routines by their first scalar element without packing or requiring contiguity, so noncontiguous array sections can access the wrong storage."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The character dummy arrays are assumed-shape and have no CONTIGUOUS requirement, but each backend argument is a single first element (netcdf_text_variables.f90:42-71,266-295 and the higher-rank equivalents). The legacy routines are only EXTERNAL declarations in netcdf_externals.f90:32-46, so they receive neither the array descriptor nor its section strides; packing the scalar element cannot pack the remaining noncontiguous array.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [
+    "[L31-L38,L60-L69,L284-L293] (MED/buffer-extent-contract) Explicit count and map selections are forwarded without checking whether the requested character footprint fits the supplied string or array."
+   ],
+   "audit_member_text": [
+    "[L15-L18,L35-L38,L285-L293] (MED/buffer-capacity) Explicit counts and maps are forwarded without checking their addressed span against the character buffer, allowing oversized otherwise-valid file selections to exceed values storage."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "Explicit count/map selections can exceed character storage and no wrapper checks their memory footprint, but oversized selections are a caller memory-contract violation; classify that generic omission as LOW defensive validation. The scalar put case involving an otherwise adequately sized string that is shortened by trim is a separate, stronger finding, and scalar map arguments are ignored rather than forwarded.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "[L56,L88,L248,L280,L472] (MED/default-count-inconsistency) Array text wrappers default trailing file-dimension counts to zero instead of one, so selecting a record of a higher-rank variable using start alone can transfer no data."
+   ],
+   "audit_member_text": [
+    "[L56,L88,L120,L152,L184,L216,L248,L280,L312,L344,L376,L408,L440,L472] (MED/default-count) Trailing file dimensions default to zero counts, so writing or reading an array slice of a higher-rank variable can silently transfer no data unless every extra count is supplied."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "All fourteen array-text wrappers set counts above numDims+1 to zero, and a start-only call does not change them; scalar text and numeric wrappers instead use one. Thus an extra record dimension makes the selection empty even when the character-length and array dimensions are correctly sized; the backend zero-count behavior is documented in the [Unidata interface guide](https://docs.unidata.ucar.edu/netcdf-fortran/current/nc_f77_interface_guide.html).",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "[L55-L66,L279-L290,L471-L482] (MED/uninitialized-map) Array text wrappers initialize only numDims map entries although character storage needs numDims+1, leaving the last active stride undefined when the supplied map is shorter."
+   ],
+   "audit_member_text": [
+    "[L55-L66,L279-L290,L471-L482] (HIGH/uninitialized-map) Array text wrappers initialize only numDims map entries despite transferring numDims+1 character dimensions, so a partial map leaves an active mapping entry uninitialized."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "Retain at MED for mapped calls whose supplied map omits an active character-array dimension, particularly when that dimension has more than one selected element. Unmapped calls bypass localMap entirely and a full map replaces the missing entry, so the HIGH wording should not imply a general array-text failure.",
+    "neutralizer": {
+     "where": "trunk/lib/win32/netcdff90/netcdf_text_variables.f90:L63-L70",
+     "quote": "     if(present(map))  then\n       localMap   (:size(map))    = map(:)\n       nf90_put_var_1D_text = &\n          nf_put_varm_text(ncid, varid, localStart, localCount, localStride, localMap, values(1))\n     else\n       nf90_put_var_1D_text = &\n          nf_put_vars_text(ncid, varid, localStart, localCount, localStride, values(1))\n     end if"
+    },
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L11-L18] (MED/buffer-extent) Scalar text put always passes trim(values), so an explicit count including trailing blanks can request more characters than the temporary contains."
+   ],
+   "audit_member_text": [
+    "[L11,L15,L18] (MED/buffer-contract) Scalar text writes always pass trim(values), even when an explicit count requests trailing characters that were removed from the actual buffer."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "An explicit count overwrites len_trim(values), but the backend actual remains trim(values) unconditionally (netcdf_text_variables.f90:9-18). For example a length-two value ending in a blank with count=(/2/) supplies only a length-one temporary; neither the default-count assignment nor another module restores the removed blank.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [
+    "[L66-L69,L290-L293,L482-L485] (LOW/empty-array) Array text wrappers form the first-element actual argument even for empty arrays, before a zero transfer count can neutralize the lower-level operation."
+   ],
+   "audit_member_text": [
+    "[L66-L69,L290-L293] (LOW/empty-array-contract) The wrappers form values(1) even for zero-length arrays, leaving empty transfers dependent on an out-of-bounds element reference before the backend can honor a zero count."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Each array-text transfer forms values(1) or its higher-rank equivalent without testing size(values), in both mapped and unmapped branches (netcdf_text_variables.f90:63-70,287-294). A zero selection can prevent backend I/O but cannot make that first-element argument designate an existing element of an empty array; this is correctly limited to a LOW language/bounds-contract issue.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "[L7-L16,L50-L64,L466-L480] (MED/array-bounds) Optional indexing vectors are copied into fixed-size arrays without validating their lengths."
+   ],
+   "audit_member_text": [
+    "[L14-L16,L60-L64,L284-L288,L476-L480] (MED/bounds) Optional index vectors are copied into fixed-size local arrays without checking their lengths against nf90_max_var_dims."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The fixed-vector copies are unchecked, but the overrun requires caller vectors longer than nf90_max_var_dims=1024, not a valid file rank. Retain as LOW input-contract validation; scalar map is ignored and therefore is not itself copied into a fixed local array.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A8"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L186,L218,L410,L442,L474] (LOW/integer-overflow) Default character map strides use default-INTEGER products that can overflow for large string arrays."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

@@ -1,0 +1,94 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-B01",
+ "source_path": "trunk/src/xbeachlibrary/xbeachlibrary_dynamic.vfproj",
+ "source_sha256": "efe55390d88fd5ba27980de59b7646a48a2e59a0b22b554639b88824d3a907f2",
+ "base_run_id": "xbeach-r1-XBeach-B01-gpt-5.6-luna-01a079ab-98f6-7ba2-9380-3c78010a3f81",
+ "audit_run_id": "xbeach-r2-XBeach-B01-gpt-5.6-luna-01a07a20-9cee-7323-9aa4-758354e89851",
+ "base_record_file": "e28a9dbd80d38e7c9d503ad2a838dab01a1b6e2872d01833a443e4aa76d3012c.json",
+ "audit_record_file": "e28a9dbd80d38e7c9d503ad2a838dab01a1b6e2872d01833a443e4aa76d3012c.json",
+ "base_record_sha256_bytes": "0b9b1d862f7310ba39cc2afd877928e11ccf438481cd59e5c23f748e0c5fa584",
+ "audit_record_sha256_bytes": "9e51a4c64c35d33d28321c22f05260ef57f2584e70b7577a869fa5e8e33bfb53",
+ "base_finding_count": 2,
+ "audit_finding_count": 3,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "[L67-L78,L147-L159] (MED/configuration-contract) The MPI_netcdf configurations have no USEMPI or USENETCDF-related PreprocessorDefinitions, so their feature-combined names are not reflected in the compiler settings."
+   ],
+   "audit_member_text": [
+    "[L68,L78,L148,L158] (MED/feature-configuration) Combined MPI_netcdf configurations omit the feature preprocessor definitions provided by the separate MPI and netCDF configurations, leaving wrapper feature selection inconsistent with the configuration name."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED_UNVERIFIED",
+    "rationale": "The dynamic DLL sources have no MPI/netCDF preprocessing selection at all: libxbeach_dynamic.F90 delegates to libxbeach_module and introspection.F90 accesses that library through module interfaces. Both features are selected while compiling the dependent static library (xbeachlibrary.vfproj:68,78,148,158), so the wrapper definitions are redundant and their omission is not a feature mismatch.",
+    "neutralizer": {
+     "where": "trunk/src/xbeachlibrary/libxbeach_dynamic.F90:L12-L17",
+     "quote": "   integer(c_int) function xbeach_init() bind(C, name=\"init\")\n      !DEC$ ATTRIBUTES DLLEXPORT::xbeach_init\n\n      xbeach_init = init()\n\n   end function xbeach_init"
+    },
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L127-L129] (MED/configuration-path) MPI_Debug|x64 writes module files to bin\\dynamic\\win32\\$(ConfigurationName) while its output/object paths are x64, mixing architecture-specific module artifacts."
+   ],
+   "audit_member_text": [
+    "[L128] (MED/configuration-contamination) MPI_Debug|x64 writes module files into the win32 directory, allowing architecture builds to overwrite one another's modules."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The full MPI_Debug|x64 configuration assigns the Win32 dynamic ModulePath even though it uses x64 intermediates and objects. Its two source files generate modules with the same names as the Win32 configuration, and there is no per-file override, separate module naming, or solution remapping preventing the destination overlap.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L15,L25,L35,L45,L55,L65,L75,L85,L95,L105,L115,L125,L135,L145,L155,L165] (MED/path-quoting) Post-build commands pass SolutionDir and TargetDir without quotes, so paths containing spaces split into separate batch arguments."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

@@ -1,0 +1,208 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-V01",
+ "source_path": "trunk/lib/win32/netcdff90/netcdf_expanded.f90",
+ "source_sha256": "ab6dac8f87c260c65a778eaf5450bc6c76890ef1a66469e6f6882784ea261a38",
+ "base_run_id": "xbeach-r1-XBeach-V01-gpt-6-astra-01a079bd-fbb5-7cd3-8c47-5d906cc55970",
+ "audit_run_id": "xbeach-r2-XBeach-V01-gpt-6-astra-01a07a3b-b349-7061-aef2-9b392a6fc7c6",
+ "base_record_file": "fa1bfd234283307d50d7c12cbfe7ae8a5c3da85aba12b9bcebcc087edb4aacbb.json",
+ "audit_record_file": "fa1bfd234283307d50d7c12cbfe7ae8a5c3da85aba12b9bcebcc087edb4aacbb.json",
+ "base_record_sha256_bytes": "f2512f2676e15612cbd1b5c39afd7d990d10701e90e4566942f4d79a7b1999f5",
+ "audit_record_sha256_bytes": "90851e1427be00977b27e25daabfeb25f02c98211c4430a246516ea8fb02d111",
+ "base_finding_count": 8,
+ "audit_finding_count": 7,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "[L217-L234,L1687-L1704,L2173-L2195] (MED/buffer-extent-contract) Caller-supplied count and map are forwarded without checking that their memory footprint fits values or defaultIntArray, permitting out-of-bounds transfers for inconsistent selections."
+   ],
+   "audit_member_text": [
+    "[L223-L234,L2184-L2195,L3156-L3167] (MED/buffer-capacity) Explicit counts and memory maps are forwarded without validating their addressed span against values or defaultIntArray, permitting file-valid selections that exceed the supplied storage."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The missing capacity checks are real, but this is a caller-supplied memory-selection violation, not an overflow caused by the default selection: shape(values) supplies the default counts and all trailing counts are one (netcdf_expanded.f90:215-218). Retain as a LOW defensive-validation issue for explicit count/map combinations whose addressed memory footprint exceeds the actual buffer; the legacy external interface cannot see that buffer extent.",
+    "neutralizer": {
+     "where": "trunk/lib/win32/netcdff90/netcdf_expanded.f90:L215-L220",
+     "quote": "     numDims                 = size(shape(values))\n     localStart (:         ) = 1\n     localCount (:numDims  ) = shape(values)\n     localCount (numDims+1:) = 1\n     localStride(:         ) = 1\n     localMap   (:numDims  ) = (/ 1, (product(localCount(:counter)), counter = 1, numDims - 1) /)"
+    },
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3",
+    "A4"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "[L2173-L2197,L2432-L2456] (MED/uninitialized-read) Integer array getters reshape the entire uninitialized temporary after partial, sparse, zero-count, or failed reads, evaluating elements the underlying call did not populate.",
+    "[L141-L149,L159-L167] (LOW/error-path-output) Scalar integer getters assign defaultInteger to values even when the underlying read fails without defining the temporary."
+   ],
+   "audit_member_text": [
+    "[L142-L149,L160-L167,L2173-L2197,L2654-L2678] (MED/uninitialized-read) Integer getters copy their entire uninitialized temporary after errors, partial-count reads or mapped reads with holes, including entries the backend never wrote."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The FourByteInt and EightByteInt getters allocate automatic defaultIntArray(size(values)) without initialization, then unconditionally reshape the entire array after every backend branch (netcdf_expanded.f90:2164-2198,2645-2679). A successful read with count=(/1/) into a larger values array already leaves an unwritten tail, so neither error handling nor backend file-bound checks break the finding; the direct OneByteInt/TwoByteInt paths do not repair these overloads.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "[L13-L17,L211-L226,L3144-L3159] (MED/array-bounds) Optional start/count/stride/map vectors are copied into fixed-size local arrays without checking their lengths against nf90_max_var_dims."
+   ],
+   "audit_member_text": [
+    "[L13-L17,L211-L226,L3144-L3159] (MED/bounds) Scalar and array wrappers copy optional vectors into fixed-size local arrays without checking that their lengths fit nf90_max_var_dims."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "All cited copies are unchecked, but exceeding these arrays requires optional vectors longer than the library limit of 1024 (netcdf_constants.f90:70-75), rather than an ordinary valid-rank selection. Retain as LOW validation of oversized caller vectors; no source-tree caller was found supplying such a vector.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L153-L167,L2423-L2679] (MED/numeric-range-contract) EightByteInt get wrappers read through default-INTEGER temporaries, preventing retrieval of otherwise representable 64-bit integer results from wider numeric variables."
+   ],
+   "audit_member_text": [
+    "[L153-L167,L2423-L2456,L2645-L2678] (MED/numeric-range) EightByteInt reads go through default-integer temporaries, unnecessarily restricting values read from floating-point variables to the default integer range before widening them."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "[L215-L228,L1685-L1698] (LOW/uninitialized-map-contract) localMap is initialized only through the memory-array rank, leaving trailing map entries undefined when a shorter supplied map is used with a higher-rank file variable."
+   ],
+   "audit_member_text": [
+    "[L217-L228,L2181-L2189,L3150-L3161] (MED/uninitialized-map) Map entries above the values rank remain uninitialized when a partial map is supplied, yet explicit counts can activate those additional file dimensions with counts greater than one."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "localMap is automatic storage and only entries through the values rank are initialized; present(map) overwrites only its supplied prefix (netcdf_expanded.f90:211-228). The default trailing count of one is a partial protection, but the claim explicitly activates extra dimensions using count greater than one, and neither module initialization nor an external interface supplies the missing map entries.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L55-L67,L939-L1181] (MED/integer-narrowing) Every EightByteInt put wrapper converts values to default INTEGER before netCDF sees them, allowing out-of-range 64-bit values to be corrupted without a netCDF range error."
+   ],
+   "audit_member_text": [
+    "[L55-L67,L939-L969,L1149-L1179] (HIGH/numeric-narrowing) Every EightByteInt write converts values to default integer before netCDF sees them, silently losing out-of-range bits and preventing the backend from reporting the original value's range error."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Every EightByteInt scalar/array write reaches nf_put_var*_int with int(values), including all three array dispatch branches (netcdf_expanded.f90:55-68,939-971,1149-1181). With the bundled ordinary default-integer build, a value such as 4294967296 is narrowed before backend conversion even when a netCDF double variable could represent it; typeSizes.f90:36 selects the input kind but provides no range guard or wider conversion path.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L255,L430,L2662,L3153] (LOW/integer-overflow) Default map strides are calculated with default-INTEGER products that can overflow for large multidimensional arrays."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L2173,L2197,L2432,L2456] (LOW/memory-use) FourByteInt and EightByteInt array getters allocate a full-size default-integer temporary and reshape it for every read, adding substantial memory demand even for small requested subsets."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

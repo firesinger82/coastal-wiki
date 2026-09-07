@@ -1,0 +1,80 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-M00",
+ "source_path": "trunk/rmdiv",
+ "source_sha256": "efcefa4472aaf6a4a651de7567b2c3168e8c3dc37f37eeb010f20bdf7d291fb7",
+ "base_run_id": "xbeach-r1-XBeach-M00-gpt-5.6-luna-01a079b2-ab4e-7223-8458-eccb1baa0c34",
+ "audit_run_id": "xbeach-r2-XBeach-M00-gpt-5.6-luna-01a07a31-08f8-7912-905f-a9265bb1e88d",
+ "base_record_file": "331d5b37b7f55832db5bdedf695c426ccb33e7d133502fc2d3090c39a93dab58.json",
+ "audit_record_file": "331d5b37b7f55832db5bdedf695c426ccb33e7d133502fc2d3090c39a93dab58.json",
+ "base_record_sha256_bytes": "ce59e64a295aed0396a71505a5deb02588de6edda1fcc29b46531f45c87774ec",
+ "audit_record_sha256_bytes": "d0d962bec05fe0f23da2f9b33c7c3b65659f7f1f942aed1a194b7e7c8b3bfad9",
+ "base_finding_count": 3,
+ "audit_finding_count": 3,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0",
+    "A1"
+   ],
+   "audit_ids": [
+    "B1",
+    "B2"
+   ],
+   "base_member_text": [
+    "[L3-L6] (HIGH/destructive-script) The cleanup script recursively targets `Makefile.in` and unconditionally removes all files under `config/*` plus selected build files, but does not verify the working tree or protect hand-maintained files.",
+    "[L1-L6] (MED/cleanup-contract) The script operates relative to the caller's current directory rather than its own repository location and has no strict mode or confirmation, so invoking it from the wrong directory can affect unrelated files."
+   ],
+   "audit_member_text": [
+    "[L5] (MED/overbroad-cleanup) The config/* removal also targets the shard's config/index_bin.html.tmpl source template although the script claims to remove autoconf-generated files.",
+    "[L3-L6] (MED/working-directory-contract) All removal targets are relative to the caller's current directory without a repository-root check, so invoking the script from another directory can delete unrelated matching files."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The entire six-line script contains no exclusion or working-directory check, and invoking it from trunk makes config/* include the existing regular file config/index_bin.html.tmpl. Cross-file inspection shows that trunk/config/teamcity-distribute.py:87-93 reads this template to generate index_bin.html, while configure.ac does not declare it as a generated output; the autoconf cleanup therefore removes source input as claimed.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L3] (LOW/portability) The `find ... | xargs rm -f` pipeline depends on POSIX/GNU command behavior and does not handle unusual filenames safely."
+   ],
+   "audit_member_text": [
+    "[L3] (MED/pathname-handling) The newline-delimited find output is passed to whitespace-splitting xargs, so filenames containing spaces, quotes, or newlines can be split or rejected during removal."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Although find restricts the basename to Makefile.in, parent directory names can contain spaces, quotes, or newlines, and the complete script supplies neither NUL delimiters nor another escaping mechanism. A read-only reproduction replacing rm with printf split a space-containing path into three arguments, rejected a quoted path, and split a newline-containing path; no repository caller or wrapper was found that enforces safe pathnames.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  }
+ ]
+}

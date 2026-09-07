@@ -1,0 +1,155 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-B00",
+ "source_path": "trunk/config/teamcity-build.sh",
+ "source_sha256": "0abb01cf5512a2510b9684892a6a0cf08f71bf969a5725ad05cfabf1359ffb13",
+ "base_run_id": "xbeach-r1-XBeach-B00-gpt-5.6-luna-01a079a6-7103-7312-a441-5309a7d01425",
+ "audit_run_id": "xbeach-r2-XBeach-B00-gpt-5.6-luna-01a07a19-bf73-7b91-afe4-1b0868a2795d",
+ "base_record_file": "cbc0549a01baa4d9407f3cde40f9ec48f9a476133f5f91af71f0e16ebcea562e.json",
+ "audit_record_file": "cbc0549a01baa4d9407f3cde40f9ec48f9a476133f5f91af71f0e16ebcea562e.json",
+ "base_record_sha256_bytes": "37a21e30775c276693f13ba3d8092d7cfe66fcf0d98db4d091b39847ec1f3608",
+ "audit_record_sha256_bytes": "ac52b9e5d82149b39a0ec1fa0988458a9629fbc87b3fc8d08e00e018255b456e",
+ "base_finding_count": 4,
+ "audit_finding_count": 5,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0",
+    "A2"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L5-L7] (MED/working-directory/contract) The script assumes it starts in a directory whose parent contains `trunk/`; it does not anchor paths to the script location or check either `cd`, so invocation from another directory changes the build target.",
+    "[L22-L35] (MED/error-handling/reproducibility) Cleanup, generation, configure, build, install, and artifact creation have no failure checks or `set -e`, so stale or partial artifacts can be published after an earlier failure."
+   ],
+   "audit_member_text": [
+    "[L5-L39] (HIGH/build-failure-propagation) The script never stops on failed directory changes, module loads, configuration, compilation or installation, allowing stale binaries to be packaged and a later successful command to mask the failed build."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "trunk/config/teamcity-build.sh:5-39 never checks the directory changes or build/install results, retains the existing installation prefix, and archives that same prefix at lines 33-35. The backup at line 19 does not clean the live installation, and no source-tree caller establishes errexit, so failed builds can leave old installed binaries available for packaging while a successful final module-generation command supplies a zero script status.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L19] (MED/error-handling/path) The unconditional recursive copy of the prior installation has no existence check or failure handling, and with no `set -e` a missing prior installation does not stop the publication pipeline."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L28] (LOW/flags/contract) The configure invocation places curl library/include flags in FCFLAGS, including a `bin` directory as an include path, leaving the Fortran/compiler flag contract suspicious and toolchain-dependent."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "confirmed_delta",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L19] (MED/backup-semantics) Repeated cp -r into an existing _prev directory nests the current installation beneath it instead of replacing the previous snapshot."
+   ],
+   "representative": "audit",
+   "rationale": "span-confirmed: L19 uses cp -r with a fixed previous-installation destination and never removes that destination or requests replacement semantics. Once that destination directory exists, cp places the source directory beneath it, leaving the earlier snapshot at the destination root.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L19-L19",
+    "quote": "cp -r \"/opt/apps/xbeach/\"$XBEACH_PROJECT_ID\"_gcc_12.2.0_openmpi_4.1.5_HEAD\" \"/opt/apps/xbeach/\"$XBEACH_PROJECT_ID\"_prev_gcc_12.2.0_openmpi_4.1.5_HEAD\"\n",
+    "verified_at_lines": "L19-L19",
+    "source_sha256": "0abb01cf5512a2510b9684892a6a0cf08f71bf969a5725ad05cfabf1359ffb13"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The complete script neither removes nor replaces the _prev destination before cp -r at trunk/config/teamcity-build.sh:19, and no other source-tree code manages that destination. The first copy to an absent destination produces the expected snapshot, but subsequent copies to the existing directory place or merge the source basename beneath it, leaving the original top-level snapshot stale; this is not ever-deepening nesting.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L26,L28,L31] (MED/artifact-layout) The install staging directory is created but installation goes directly to /opt/apps, leaving the install/bin and install/lib expected by teamcity-distribute.sh unpopulated."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L28] (MED/scientific-compiler-semantics) The scientific build unconditionally enables -ffast-math, permitting transformations and finite-value assumptions that can invalidate NaN handling and change numerical results."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L19,L26,L28,L33-L39] (LOW/shell-argument-validation) Project and workspace variables are used without validation and with partially unquoted expansions, making paths containing whitespace or an empty project identifier unreliable."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

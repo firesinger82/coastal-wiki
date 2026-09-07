@@ -1,0 +1,51 @@
+{
+  "shard": "XBeach-V00",
+  "verdicts": [
+    {
+      "audit_id": "B8",
+      "source_path": "trunk/config/teamcity-distribute.py",
+      "verdict": "REFUTE",
+      "rationale": "Although L77 concatenates targetdir and 'bin/', the in-file entry point fixes targetdir to '/htdocs/xbeach/testbed/' at L150 and passes it unchanged at L164-L169. That trailing slash neutralizes the alleged malformed destination on the script's actual call path; a failure would require a different external caller."
+    },
+    {
+      "audit_id": "B8",
+      "source_path": "trunk/config/teamcity-distribute-windows.py",
+      "verdict": "CONFIRM",
+      "rationale": "L57 inserts source directly into a single-quoted TeamCity message without any escaping; source comes from globbed paths or workdir-derived workhtml, and neither caller sanitizes it. A path containing an apostrophe or service-message control character can therefore corrupt the emitted message.",
+      "evidence_span": {
+        "lines": "L57-L57",
+        "quote": "\tprint \"##teamcity[message text='Copying %s']\"%(source)"
+      }
+    },
+    {
+      "audit_id": "B1",
+      "source_path": "trunk/lib/win32/mpich/examples/fpilog.f",
+      "verdict": "CONFIRM",
+      "rationale": "The event-ID calls at L60-L64 repeatedly overwrite ierr without testing it, and the description and event-logging calls follow the same pattern throughout the program. Numerical reduction and result printing at L124-L133 proceed independently of those statuses, so a returned logging failure is not propagated or reported by this example.",
+      "evidence_span": {
+        "lines": "L60-L64",
+        "quote": "      ierr = MPE_Log_get_state_eventIDs( event1a, event1b )\n      ierr = MPE_Log_get_state_eventIDs( event2a, event2b )\n      ierr = MPE_Log_get_solo_eventID( event3a )\n      ierr = MPE_Log_get_solo_eventID( event3b )\n      ierr = MPE_Log_get_state_eventIDs( event4a, event4b )"
+      }
+    },
+    {
+      "audit_id": "B0",
+      "source_path": "trunk/lib/win32/mpich/examples/cpilog.c",
+      "verdict": "CONFIRM",
+      "rationale": "Event-ID, description, event-logging and clock-sync return values are discarded, and the explicit MPE_Finish_log return is also ignored when NO_MPI_LOGGING is defined. That preprocessor condition only selects explicit initialization/finalization; it does not guard the other unchecked calls or prevent numerical output followed by return(0) at L124-L131 after a returned logging error.",
+      "evidence_span": {
+        "lines": "L53-L56",
+        "quote": "    MPE_Log_get_state_eventIDs( &event1a, &event1b );\n    MPE_Log_get_state_eventIDs( &event2a, &event2b );\n    MPE_Log_get_state_eventIDs( &event3a, &event3b );\n    MPE_Log_get_state_eventIDs( &event4a, &event4b );"
+      }
+    },
+    {
+      "audit_id": "B6",
+      "source_path": "trunk/doc/misc/generate_boundary_condition_limits_figures.m",
+      "verdict": "CONFIRM",
+      "rationale": "L41 initializes pp as a numeric empty array, then L43 assigns a plot handle into it by indexed assignment; the same pattern recurs at L59-L64 and L87-L92. There is no graphics-object preallocation or version guard, so these assignments are incompatible with MATLAB versions whose plot returns graphics objects instead of numeric handles.",
+      "evidence_span": {
+        "lines": "L41-L43",
+        "quote": "pp =[];\r\nfor i=2:length(xt)-1;\r\n    pp(end+1) = plot([xt(i) xt(i)],[yl(1) yl(2)],'k:');"
+      }
+    }
+  ]
+}

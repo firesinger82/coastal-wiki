@@ -1,0 +1,88 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-B00",
+ "source_path": "trunk/config/teamcity-distribute.sh",
+ "source_sha256": "3003d4a7212ee22a81277e1ad9994021dcc0a02fdc07d8c0a059fb4f86bbd07b",
+ "base_run_id": "xbeach-r1-XBeach-B00-gpt-5.6-luna-01a079a6-7103-7312-a441-5309a7d01425",
+ "audit_run_id": "xbeach-r2-XBeach-B00-gpt-5.6-luna-01a07a19-bf73-7b91-afe4-1b0868a2795d",
+ "base_record_file": "5634d2a434fe1bb2608f7521e88cbe89ed7672b6233686d7861b7ddada11999c.json",
+ "audit_record_file": "5634d2a434fe1bb2608f7521e88cbe89ed7672b6233686d7861b7ddada11999c.json",
+ "base_record_sha256_bytes": "6cf30d57c807094d711fdee5d783fd1c0588825c46a0670301f544f11cae53d0",
+ "audit_record_sha256_bytes": "6debf538a138fc05dbc64efadc89e69abe4e94677324074fcb0ae69c3a11124f",
+ "base_finding_count": 3,
+ "audit_finding_count": 3,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L4-L12] (MED/working-directory/contract) The script assumes its current directory is the installation parent and does not check `chmod`, `cd`, or `scp`, so a missing install tree or transfer failure can be reported as success."
+   ],
+   "audit_member_text": [
+    "[L6-L12] (MED/error-handling) A failed cd does not stop scp, allowing bin and lib from the previous working directory to be distributed."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "After a failed cd at trunk/config/teamcity-distribute.sh:8, the final scp still resolves relative bin and lib against the preceding working directory, with no repository-supplied caller or profile guaranteeing errexit. The primary claim holds when those entries exist and the transfer succeeds; the alternate wording overstates failure masking because scp is the last executable command and its own nonzero exit status is propagated.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L10] (MED/configuration/inconsistency) The distribution destination is hard-coded to the gcc 7.3.0/OpenMPI 1.8.3 naming scheme, which conflicts with the newer toolchain naming used by the adjacent TeamCity build script."
+   ],
+   "audit_member_text": [
+    "[L10] (MED/deployment-path-mismatch) Distribution targets gcc_7.3.0_1.8.3_HEAD while teamcity-env.sh selects gcc_12.2.0_openmpi_4.1.5_HEAD, so the environment does not point to this script's deployed installation."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "[L12] (LOW/quoting/input-contract) The SSH key, source arguments, hostname, and destination are assembled from unquoted expansions, leaving whitespace and shell-significant values unsupported."
+   ],
+   "audit_member_text": [
+    "[L6,L8,L10,L12] (MED/shell-argument-validation) Unquoted path and destination expansions and unchecked project and host variables allow whitespace or missing values to misdirect or break deployment."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

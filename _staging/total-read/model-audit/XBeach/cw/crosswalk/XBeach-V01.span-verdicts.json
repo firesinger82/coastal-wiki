@@ -1,0 +1,17 @@
+{
+  "shard": "XBeach-V01",
+  "verdicts": [
+    {
+      "audit_id": "B1",
+      "source_path": "trunk/lib/x64/mpich/examples/fpi.f",
+      "verdict": "UNCERTAIN",
+      "rationale": "L31 declares default-kind INTEGER variables, L46-L47 accept an I10 field, and the only input guard at L53 rejects n <= 0; with 32-bit integers, n = 2147483647 and numprocs = 1 would require an unrepresentable terminal i increment in L59-L62. However, this file does not establish the default integer width or compiler options (a 64-bit default integer puts the I10 input range well below its limit), so the claimed overflow cannot be accepted without the example build configuration."
+    },
+    {
+      "audit_id": "B1",
+      "source_path": "trunk/scripts/dist/Include/pyconfig.h",
+      "verdict": "UNCERTAIN",
+      "rationale": "In the 32-bit Windows branch, L328-L333 select SIZEOF_TIME_T solely from _MSC_VER, and this header contains no _USE_32BIT_TIME_T check; the separate Win64 branch sets the size to 8 at L309. Establishing a defect requires the caller/build contract and CRT configuration showing that _USE_32BIT_TIME_T is permitted and produces a 32-bit time_t in a supported consumer; this file alone does not establish that configuration."
+    }
+  ]
+}

@@ -1,0 +1,211 @@
+{
+  "shard": "XBeach-D00",
+  "verdicts": [
+    {
+      "audit_id": "B0",
+      "source_path": "trunk/doc/man/copying.texinfo",
+      "verdict": "UNCERTAIN",
+      "rationale": "The fragment does contain a second, different @setfilename, but trunk/config/texinfo.tex:1052 explicitly ignores subsequent directives, neutralizing the conflict in TeX output. An Info-build defect requires the makeinfo implementation/version and invocation, which are not established by this fragment or its parent manual."
+    },
+    {
+      "audit_id": "B0",
+      "source_path": "trunk/config/texinfo.tex",
+      "verdict": "CONFIRM",
+      "rationale": "gettopheadingmarks falls back only to firstmark when thischapter is empty; it does not search past an intervening color mark for the chapter mark. setcolor calls domark at L1151-L1154, so the intervening-mark case described at L289-L293 can leave the first chapter heading empty.",
+      "evidence_span": {
+        "lines": "L294-L297",
+        "quote": "\\def\\gettopheadingmarks{%\n  \\ifcase0\\topmark\\fi\n  \\ifx\\thischapter\\empty \\ifcase0\\firstmark\\fi \\fi\n}"
+      }
+    },
+    {
+      "audit_id": "B1",
+      "source_path": "trunk/config/texinfo.tex",
+      "verdict": "CONFIRM",
+      "rationale": "The undefined-pdfescapestring branch has no replacement escaping or diagnostic; destination and outline callers still use the unchanged string at L1237-L1245 and L1271-L1287. This confirms the claimed fallback defect specifically on engines without that primitive.",
+      "evidence_span": {
+        "lines": "L1120-L1124",
+        "quote": "\\def\\txiescapepdf#1{%\n  \\ifx\\pdfescapestring\\thisisundefined\n    % No primitive available; should we give a warning or log?\n    % Many times it won't matter.\n  \\else"
+      }
+    },
+    {
+      "audit_id": "B2",
+      "source_path": "trunk/config/texinfo.tex",
+      "verdict": "CONFIRM",
+      "rationale": "pdfurl inserts its argument directly into the URI literal without calling txiescapepdf, and urefbreakfinish passes the URL unchanged. The active-character setup does not escape parentheses, so a URL containing an unmatched literal parenthesis can break the PDF string.",
+      "evidence_span": {
+        "lines": "L1403-L1406",
+        "quote": "      \\leavevmode\\setcolor{\\urlcolor}%\n      \\startlink attr{/Border [0 0 0]}%\n        user{/Subtype /Link /A << /S /URI /URI (#1) >>}%\n    \\endgroup}"
+      }
+    },
+    {
+      "audit_id": "B3",
+      "source_path": "trunk/config/texinfo.tex",
+      "verdict": "CONFIRM",
+      "rationale": "The 10-point font definition divides the existing parskip instead of setting a baseline value, and fonttextsize invokes it under globaldefs=1 at L2079-L2086. There is no parskip reset in that definition, so repeated selection cumulatively halves paragraph spacing.",
+      "evidence_span": {
+        "lines": "L2057-L2061",
+        "quote": "\\divide\\parskip by 2  % reduce space between paragraphs\n\\textleading = 12pt   % line spacing for 10pt CM\n\\textfonts            % reset the current fonts\n\\rm\n} % end of 10pt text font size definitions, \\definetextfontsizex"
+      }
+    },
+    {
+      "audit_id": "B4",
+      "source_path": "trunk/config/texinfo.tex",
+      "verdict": "CONFIRM",
+      "rationale": "reducedfonts assigns reducedcaps, whereas sc reads smallcaps at L2406 and the other font selectors assign smallcaps. Nothing in reducedfonts or resetmathfonts updates that binding, so reduced sc text retains the previous small-cap font.",
+      "evidence_span": {
+        "lines": "L2155-L2158",
+        "quote": "\\def\\reducedfonts{%\n  \\let\\tenrm=\\reducedrm \\let\\tenit=\\reducedit \\let\\tensl=\\reducedsl\n  \\let\\tenbf=\\reducedbf \\let\\tentt=\\reducedtt \\let\\reducedcaps=\\reducedsc\n  \\let\\tensf=\\reducedsf \\let\\teni=\\reducedi \\let\\tensy=\\reducedsy"
+      }
+    },
+    {
+      "audit_id": "B5",
+      "source_path": "trunk/config/texinfo.tex",
+      "verdict": "CONFIRM",
+      "rationale": "oddfootingyyy unconditionally decrements both dimensions on every assignment; everyfooting calls the same routine at L3372. There is no reservation flag or restoration of the previous 12pt deduction.",
+      "evidence_span": {
+        "lines": "L3366-L3370",
+        "quote": "  % Leave some space for the footline.  Hopefully ok to assume\n  % @evenfooting will not be used by itself.\n  \\global\\advance\\pageheight by -12pt\n  \\global\\advance\\vsize by -12pt\n}"
+      }
+    },
+    {
+      "audit_id": "B6",
+      "source_path": "trunk/config/texinfo.tex",
+      "verdict": "CONFIRM",
+      "rationale": "Alphabetic itemno holds a character code and advances at L3659, so the value after z is 123, not zero. The guard therefore misses the zero lccode mapping and emits character zero; the uppercase branch repeats the same mistake.",
+      "evidence_span": {
+        "lines": "L3737-L3742",
+        "quote": "    % Be sure we're not beyond the end of the alphabet.\n    \\ifnum\\itemno=0\n      \\errmessage{No more lowercase letters in @enumerate; get a bigger\n                  alphabet}%\n    \\fi\n    \\char\\lccode\\itemno"
+      }
+    },
+    {
+      "audit_id": "B7",
+      "source_path": "trunk/config/texinfo.tex",
+      "verdict": "CONFIRM",
+      "rationale": "Column widths are globally defined and colcount is globally reset and advanced, while Emultitable globally clears fraction mode instead of restoring the outer value. The environment group does not undo these global assignments, and subsequent outer cells read the overwritten state at L3958-L3986.",
+      "evidence_span": {
+        "lines": "L3856-L3859",
+        "quote": "\\def\\pickupwholefraction#1 {%\n  \\global\\advance\\colcount by 1\n  \\expandafter\\xdef\\csname col\\the\\colcount\\endcsname{#1\\hsize}%\n  \\setuptable"
+      }
+    },
+    {
+      "audit_id": "B8",
+      "source_path": "trunk/config/texinfo.tex",
+      "verdict": "CONFIRM",
+      "rationale": "novalidate skips index-stream allocation, but dosynindex still closes the resulting undefined stream identifier; its donesynindex check does not test links. The other cited violations also remain: TOC opening precedes the links guard and a labeled float writes to auxfile without that guard.",
+      "evidence_span": {
+        "lines": "L4335-L4339",
+        "quote": "  \\expandafter \\ifx\\csname donesynindex#2\\endcsname \\relax\n    % The \\closeout helps reduce unnecessary open files; the limit on the\n    % Acorn RISC OS is a mere 16 files.\n    \\expandafter\\closeout\\csname#2indfile\\endcsname\n    \\expandafter\\let\\csname donesynindex#2\\endcsname = 1"
+      }
+    },
+    {
+      "audit_id": "B9",
+      "source_path": "trunk/config/texinfo.tex",
+      "verdict": "CONFIRM",
+      "rationale": "The condition uses TeX character comparison on the paramno control sequence and the greater-than character, rather than reading a numeric register value. Consequently the intended numeric limit test is not performed and the nested eTeX diagnostic is bypassed.",
+      "evidence_span": {
+        "lines": "L7365-L7370",
+        "quote": "     \\expandafter\\parsemargdef \\argl;%\n     \\if\\paramno>256\\relax\n       \\ifx\\eTeXversion\\thisisundefined\n         \\errhelp = \\EMsimple\n         \\errmessage{You need eTeX to compile a file with macros with more than 256 arguments}\n       \\fi"
+      }
+    },
+    {
+      "audit_id": "B10",
+      "source_path": "trunk/config/texinfo.tex",
+      "verdict": "CONFIRM",
+      "rationale": "The delimited argument is substituted unbraced into the character comparison, so aa becomes a true comparison of a with a and takes the sentinel branch before recording the parameter. The same unsafe test occurs in the many-argument definition and token-assignment parsers.",
+      "evidence_span": {
+        "lines": "L7469-L7474",
+        "quote": "\\def\\parsemargdefxxx#1,{%\n  \\if#1;\\let\\next=\\relax\n  \\else \\let\\next=\\parsemargdefxxx\n    \\advance\\paramno by 1\n    \\expandafter\\edef\\csname macarg.\\eatspaces{#1}\\endcsname\n        {\\xeatspaces{\\hash\\the\\paramno}}%"
+      }
+    },
+    {
+      "audit_id": "B11",
+      "source_path": "trunk/config/texinfo.tex",
+      "verdict": "CONFIRM",
+      "rationale": "getfilename feeds the expanded filename through an undelimited-token scanner that skips interior spaces, while pdfxrefdest directly retains the node argument whitespace. PDF escaping and the identity pdfmkpgn do not repair either normalization mismatch before the link is emitted.",
+      "evidence_span": {
+        "lines": "L7942-L7947",
+        "quote": "     % #4, including (wrongly) those in the middle of the filename.\n     \\getfilename{#4}%\n     %\n     % This (wrongly) does not take account of leading or trailing\n     % spaces in #1, which should be ignored.\n     \\edef\\pdfxrefdest{#1}%"
+      }
+    },
+    {
+      "audit_id": "B12",
+      "source_path": "trunk/config/texinfo.tex",
+      "verdict": "CONFIRM",
+      "rationale": "crossmanualxref compares box widths rather than node text, with the same 7sp added to both boxes. An equal-width non-Top label, such as another three-character name in a monospaced font, therefore suppresses the section label.",
+      "evidence_span": {
+        "lines": "L8054-L8059",
+        "quote": "\\def\\crossmanualxref#1{%\n  \\setbox\\toprefbox = \\hbox{Top\\kern7sp}%\n  \\setbox2 = \\hbox{\\ignorespaces \\printedrefname \\unskip \\kern7sp}%\n  \\ifdim \\wd2 > 7sp  % nonempty?\n    \\ifdim \\wd2 = \\wd\\toprefbox \\else  % same as Top?\n      \\putwordSection{} ``\\printedrefname'' \\putwordin{}\\space"
+      }
+    },
+    {
+      "audit_id": "B13",
+      "source_path": "trunk/config/texinfo.tex",
+      "verdict": "CONFIRM",
+      "rationale": "The high-byte block only defines loop and closes its group without invoking it, so none of the intended catcode assignments executes. Even an invocation inside that group would make only local assignments that disappear when the block closes.",
+      "evidence_span": {
+        "lines": "L8248-L8253",
+        "quote": "    \\def\\loop{%\n      \\catcode\\count1=\\other\n      \\advance\\count1 by 1\n      \\ifnum \\count1<256 \\loop \\fi\n    }%\n  }%"
+      }
+    },
+    {
+      "audit_id": "B14",
+      "source_path": "trunk/config/texinfo.tex",
+      "verdict": "CONFIRM",
+      "rationale": "image rejects an undefined epsfbox before reaching imagexxx, regardless of PDF mode. The PDF branch at L8481-L8482 calls dopdfimage, whose implementation uses PDF image primitives and does not require epsfbox.",
+      "evidence_span": {
+        "lines": "L8431-L8436",
+        "quote": "\\def\\image#1{%\n  \\ifx\\epsfbox\\thisisundefined\n    \\ifwarnednoepsf \\else\n      \\errhelp = \\noepsfhelp\n      \\errmessage{epsf.tex not found, images will be ignored}%\n      \\global\\warnednoepsftrue"
+      }
+    },
+    {
+      "audit_id": "B15",
+      "source_path": "trunk/config/texinfo.tex",
+      "verdict": "CONFIRM",
+      "rationale": "Latin character definitions globally replace active lead bytes, including C2 and C3 at L8949-L8950, but the UTF-8 selection only sets catcodes and installs Unicode lookup mappings. The byte-decoder installation at L9163-L9193 executes once during loading and is not rerun when switching back to UTF-8.",
+      "evidence_span": {
+        "lines": "L8882-L8884",
+        "quote": "  \\else \\ifx \\declaredencoding \\utfeight\n     \\setnonasciicharscatcode\\active\n     \\utfeightchardefs"
+      }
+    },
+    {
+      "audit_id": "B16",
+      "source_path": "trunk/config/texinfo.tex",
+      "verdict": "CONFIRM",
+      "rationale": "UTFviiiLoop increments the byte and recurses only while it is strictly below countUTFy, so this initialization covers F0 through F3 and excludes F4. No later decoder assignment supplies F4, leaving valid F4-prefixed sequences undecoded.",
+      "evidence_span": {
+        "lines": "L9188-L9192",
+        "quote": "  \\countUTFx = \"F0\n  \\countUTFy = \"F4\n  \\def\\UTFviiiTmp{%\n    \\xdef~{\\noexpand\\UTFviiiFourOctets\\string~}}\n  \\UTFviiiLoop"
+      }
+    },
+    {
+      "audit_id": "B17",
+      "source_path": "trunk/config/texinfo.tex",
+      "verdict": "CONFIRM",
+      "rationale": "utfeightchardefs contains no mappings for U+00B1, U+00B5, U+00D7, or U+00F7, although latonechardefs renders their Latin-1 bytes with math symbols. For these undefined UTF-8 lookups, UTFviiiDefined emits only a message and no replacement glyph.",
+      "evidence_span": {
+        "lines": "L9155-L9160",
+        "quote": "\\gdef\\UTFviiiDefined#1{%\n  \\ifx #1\\relax\n    \\message{\\linenumber Unicode char \\string #1 not defined for Texinfo}%\n  \\else\n    \\expandafter #1%\n  \\fi"
+      }
+    },
+    {
+      "audit_id": "B18",
+      "source_path": "trunk/config/texinfo.tex",
+      "verdict": "CONFIRM",
+      "rationale": "U+0162 is assigned a lowercase t and U+0163 an uppercase T, reversing the required cases. The cedilla helper preserves its argument case, so it does not neutralize the swapped mappings.",
+      "evidence_span": {
+        "lines": "L9419-L9420",
+        "quote": "  \\DeclareUnicodeCharacter{0162}{\\cedilla{t}}\n  \\DeclareUnicodeCharacter{0163}{\\cedilla{T}}"
+      }
+    },
+    {
+      "audit_id": "B19",
+      "source_path": "trunk/config/texinfo.tex",
+      "verdict": "CONFIRM",
+      "rationale": "The U+2192 mapping selects expansion, which is explicitly defined as mapsto at L3017. The distinct arrow macro at L3015 renders rightarrow, so the Unicode rightwards arrow receives the wrong symbol.",
+      "evidence_span": {
+        "lines": "L9642-L9643",
+        "quote": "  \\DeclareUnicodeCharacter{2192}{\\expansion}\n  \\DeclareUnicodeCharacter{21D2}{\\result}"
+      }
+    }
+  ]
+}

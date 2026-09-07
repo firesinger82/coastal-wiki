@@ -1,0 +1,72 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-B00",
+ "source_path": "trunk/lib/fortran/ftnunit/doc/runtests.bat",
+ "source_sha256": "cfd16536bbee6769923aeeb2274ea48d54147fa4ccb771eb1a19ceda8aafd898",
+ "base_run_id": "xbeach-r1-XBeach-B00-gpt-5.6-luna-01a079a6-7103-7312-a441-5309a7d01425",
+ "audit_run_id": "xbeach-r2-XBeach-B00-gpt-5.6-luna-01a07a19-bf73-7b91-afe4-1b0868a2795d",
+ "base_record_file": "9b6bf479e265567fa7328ded6f7c33a2fb0242f3f296895b265c6f4ec1934406.json",
+ "audit_record_file": "9b6bf479e265567fa7328ded6f7c33a2fb0242f3f296895b265c6f4ec1934406.json",
+ "base_record_sha256_bytes": "ea51f614254bcd9df247db79bf0fab3abec846a543f0cd8e147c015c553d4ee4",
+ "audit_record_sha256_bytes": "579c12a33128fb21c1c96bfd0fda7e1ce5d4e6dd30ee803d7563820bdccdb84a",
+ "base_finding_count": 2,
+ "audit_finding_count": 2,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L12-L15] (LOW/error-handling) The invoked test program’s exit status is never checked and output files are overwritten on each iteration, leaving pass/fail and diagnostic retention contracts unclear."
+   ],
+   "audit_member_text": [
+    "[L12-L19] (MED/exit-status) The program's exit status is neither saved nor returned and subsequent logging and deletion commands can hide test execution failures from the caller."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L11-L15] (MED/loop/termination) The test runner repeats the program while `ftnunit.lst` exists without a timeout, iteration limit, or exit-status check, so a stale list file or non-terminating test can loop indefinitely."
+   ],
+   "audit_member_text": [
+    "[L12-L15] (MED/termination) The restart loop has no progress or failure check, so a stale ftnunit.lst combined with a launch failure or repeated crash can loop indefinitely."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "Indefinite relaunch remains possible for launch failures or repeated failures before the framework advances or removes ftnunit.lst, but ordinary crashes inside successive tests are not sufficient. ftnunit.f90:109-120 checkpoints each test before calling it, lines 228-238 restore that checkpoint so the next run skips the crashed test, and runtests_final removes the list at line 177; the batch loop lacks protection only when this progress/cleanup mechanism cannot complete.",
+    "neutralizer": {
+     "where": "trunk/lib/fortran/ftnunit/packages/ftnunit/src/ftnunit.f90:L109-L120",
+     "quote": "    testno = testno + 1\r\n    if ( testno <= last_test ) then\r\n        return\r\n    endif\r\n\r\n    !\r\n    ! Record the fact that we started the test\r\n    !\r\n    has_run = .true.\r\n    open( newunit = lun, file = 'ftnunit.lst' )\r\n    write( lun, * ) testno, nofails, noruns, ' ', .true.\r\n    close( lun )\r\n"
+    },
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  }
+ ]
+}

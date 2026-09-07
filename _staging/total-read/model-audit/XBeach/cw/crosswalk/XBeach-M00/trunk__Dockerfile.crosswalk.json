@@ -1,0 +1,120 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-M00",
+ "source_path": "trunk/Dockerfile",
+ "source_sha256": "6c611f2296248580e63ef87638969ac0f163c63899574fdd1119b1f085fdc8a5",
+ "base_run_id": "xbeach-r1-XBeach-M00-gpt-5.6-luna-01a079b2-ab4e-7223-8458-eccb1baa0c34",
+ "audit_run_id": "xbeach-r2-XBeach-M00-gpt-5.6-luna-01a07a31-08f8-7912-905f-a9265bb1e88d",
+ "base_record_file": "afb204cbfc049751d4d554438b0bd83c3500456d4b97603434f83af268f4e113.json",
+ "audit_record_file": "afb204cbfc049751d4d554438b0bd83c3500456d4b97603434f83af268f4e113.json",
+ "base_record_sha256_bytes": "e664e3200e13bf40d3731a128304f9923a80e2ef59ee919d005d651870361de2",
+ "audit_record_sha256_bytes": "871125271e6bcfdd0f0ab4aa8ad0b19261f43eb83b92bc835664516858e6d009",
+ "base_finding_count": 5,
+ "audit_finding_count": 3,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1",
+    "A3"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L2-L3,L32-L42] (MED/reproducibility) `yum update` and unversioned package installs are used without repository snapshots or package pins, so identical image builds can change over time.",
+    "[L46-L47] (MED/reproducibility) The image clones the mutable GitHub `mmi` branch and installs it without a commit or release pin."
+   ],
+   "audit_member_text": [
+    "[L1-L14,L30-L47] (MED/build-reproducibility) The image tags, yum packages, pip mmi dependency, and xbeach-mi branch are all unpinned, so identical source builds can resolve to different binary and Python dependency sets."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L1,L30] (MED/maintenance) Both stages pin to the EOL CentOS 7 image, leaving the build/runtime base dependent on an unsupported distribution."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L23-L27] (MED/configuration-consistency) The image installs OpenMPI development/runtime packages but configures XBeach with `--without-mpi`; the intentional reason and supported parallel-mode contract are not stated."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L44,L58] (LOW/runtime-contract) The container installs the `mmi` Python package and invokes `mmi-runner` with a hard-coded port range, but does not document required input layout or how the exposed ports are used."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L40-L47] (MED/python-compatibility-contract) The runtime fixes Python at 3.4 while installing unrestricted mmi and a moving xbeach-mi branch, without constraining either package to versions supporting that interpreter."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L58] (MED/container-signal-handling) The shell-form CMD launches mmi-runner without exec, leaving a shell as PID 1 that may not forward container termination signals to the simulation."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

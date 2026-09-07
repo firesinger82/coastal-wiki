@@ -1,0 +1,103 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-B01",
+ "source_path": "trunk/src/xbeachlibrary/build/copy_mpich.bat",
+ "source_sha256": "82f148ce3215d81b1b0780af65c5ac55b2d5d660377637d081022c9ae6acd5e5",
+ "base_run_id": "xbeach-r1-XBeach-B01-gpt-5.6-luna-01a079ab-98f6-7ba2-9380-3c78010a3f81",
+ "audit_run_id": "xbeach-r2-XBeach-B01-gpt-5.6-luna-01a07a20-9cee-7323-9aa4-758354e89851",
+ "base_record_file": "3d1f78c78f75ccd078d875beb84ae297d81c8139680ca5488dda8583ac0501b9.json",
+ "audit_record_file": "3d1f78c78f75ccd078d875beb84ae297d81c8139680ca5488dda8583ac0501b9.json",
+ "base_record_sha256_bytes": "659686ca1a99de1905764cfd854b353477b51d0419dc0c3670f4ce482e591a16",
+ "audit_record_sha256_bytes": "c27552d02dd13123e75b8394bef7199113a4557a6748ba5fe0bee8c7ed1b55ff",
+ "base_finding_count": 2,
+ "audit_finding_count": 4,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L7] (LOW/path-quoting) The rmdir command leaves the %2\\mpich path unquoted even though the same script accepts a SolutionDir/TargetDir path that may contain spaces."
+   ],
+   "audit_member_text": [
+    "[L7,L13,L20,L28,L33] (MED/path-quoting) Deletion and XCOPY destination paths use raw unquoted %2, so space-containing target paths can be split or misinterpreted."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L9-L23] (MED/architecture-selection) For a 32-bit build on a 64-bit machine, if the x86 MPICH2 installation is absent the fallback copies C:\\Program Files\\MPICH2, which is likely the 64-bit installation, into the Win32 target without validating its architecture."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L9-L23] (LOW/conditional-logic) The ELSE belongs to the inner platform test, so a machine without Program Files (x86) never tries the documented default Program Files installation."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L7,L13-L14,L20-L21,L28-L29,L33] (MED/destructive-staging) Existing MPICH files are removed before replacement succeeds, and failed local copies return immediately instead of trying bundled dependencies."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L9,L26,L32-L33] (LOW/argument-validation) Platform is compared unquoted and unvalidated, so missing arguments produce malformed IF commands and unknown platforms fall through to Win32 dependencies."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

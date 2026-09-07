@@ -1,0 +1,632 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-D00",
+ "source_path": "trunk/config/texinfo.tex",
+ "source_sha256": "64c8cf3d25ce6ca6209f221afd3d055cc5853af8116ba35d08b122454154c5ae",
+ "base_run_id": "xbeach-r1-XBeach-D00-gpt-5.6-luna-01a079af-17ec-78c2-9919-92cf919b7a00",
+ "audit_run_id": "xbeach-r2-XBeach-D00-gpt-5.6-luna-01a07a29-c1c4-7541-b337-11d6516c706f",
+ "base_record_file": "175f9589de1fd43afbf5b5d036a66d8269b7c5cfd02e0bf44cca15ac05416152.json",
+ "audit_record_file": "175f9589de1fd43afbf5b5d036a66d8269b7c5cfd02e0bf44cca15ac05416152.json",
+ "base_record_sha256_bytes": "131c6682a255e612eb0f192e6030b23863bf21b7831f4b0c6a902530a9eef01b",
+ "audit_record_sha256_bytes": "17b577260a7705a2a7dbbf5cb5938ef35c813b44491f763fd502a23c848eb9b3",
+ "base_finding_count": 2,
+ "audit_finding_count": 21,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L38] (LOW/documentation-typo) The bug-report instruction says 'Please include including a complete document', containing a duplicated word."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L1347] (LOW/documentation-typo) The comment begins 'TODO this right' and is grammatically incomplete, making the intended TODO unclear."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "confirmed_delta",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L289-L304] (LOW/page-heading) The first-chapter heading fallback explicitly fails when a color or link mark intervenes after the contents, potentially leaving incorrect running headings."
+   ],
+   "representative": "audit",
+   "rationale": "span-confirmed: gettopheadingmarks falls back only to firstmark when thischapter is empty; it does not search past an intervening color mark for the chapter mark. setcolor calls domark at L1151-L1154, so the intervening-mark case described at L289-L293 can leave the first chapter heading empty.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L294-L297",
+    "quote": "\\def\\gettopheadingmarks{%\n  \\ifcase0\\topmark\\fi\n  \\ifx\\thischapter\\empty \\ifcase0\\firstmark\\fi \\fi\n}",
+    "verified_at_lines": "L294-L297",
+    "source_sha256": "64c8cf3d25ce6ca6209f221afd3d055cc5853af8116ba35d08b122454154c5ae"
+   },
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The failure requires top-based heading or footing marks and an intervening mark without chapter definitions remaining the first mark on the relevant page; merely inserting a link does not guarantee failure. The default selects bottom marks (trunk/config/texinfo.tex:L3399-L3400), while setcolor really inserts the problematic mark at L1151-L1154 and the top fallback has no further recovery at L294-L297.",
+    "neutralizer": {
+     "where": "trunk/config/texinfo.tex:L3399-L3400",
+     "quote": "\\everyheadingmarks bottom\n\\everyfootingmarks bottom"
+    },
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "confirmed_delta",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L1120-L1128] (LOW/pdf-escaping) When pdfescapestring is unavailable, txiescapepdf silently performs no escaping despite accepting destination and outline strings containing PDF special characters."
+   ],
+   "representative": "audit",
+   "rationale": "span-confirmed: The undefined-pdfescapestring branch has no replacement escaping or diagnostic; destination and outline callers still use the unchanged string at L1237-L1245 and L1271-L1287. This confirms the claimed fallback defect specifically on engines without that primitive.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L1120-L1124",
+    "quote": "\\def\\txiescapepdf#1{%\n  \\ifx\\pdfescapestring\\thisisundefined\n    % No primitive available; should we give a warning or log?\n    % Many times it won't matter.\n  \\else",
+    "verified_at_lines": "L1120-L1124",
+    "source_sha256": "64c8cf3d25ce6ca6209f221afd3d055cc5853af8116ba35d08b122454154c5ae"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The missing-primitive branch at trunk/config/texinfo.tex:L1120-L1128 neither escapes nor reports anything; destination and outline callers at L1237-L1245 and L1271-L1287 supply strings without another escaping pass. PDF-mode detection does not enforce an engine version providing pdfescapestring, and the explicit older-engine branches at L1221-L1234 and L1382-L1386 do not neutralize this compatibility defect.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "confirmed_delta",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L1388-L1406,L2583-L2585] (MED/pdf-escaping) pdfurl interpolates the URL directly into a PDF literal string without escaping parentheses or backslashes, so otherwise valid URL text can produce a malformed or altered link target."
+   ],
+   "representative": "audit",
+   "rationale": "span-confirmed: pdfurl inserts its argument directly into the URI literal without calling txiescapepdf, and urefbreakfinish passes the URL unchanged. The active-character setup does not escape parentheses, so a URL containing an unmatched literal parenthesis can break the PDF string.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L1403-L1406",
+    "quote": "      \\leavevmode\\setcolor{\\urlcolor}%\n      \\startlink attr{/Border [0 0 0]}%\n        user{/Subtype /Link /A << /S /URI /URI (#1) >>}%\n    \\endgroup}",
+    "verified_at_lines": "L1403-L1406",
+    "source_sha256": "64c8cf3d25ce6ca6209f221afd3d055cc5853af8116ba35d08b122454154c5ae"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The active uref caller passes its URL unchanged at trunk/config/texinfo.tex:L2583-L2585, and pdfurl inserts it into the raw user annotation at L1404-L1405. Neither urefcatcodes nor normalturnoffactive escapes PDF parentheses, so a URL containing an unmatched literal parenthesis can break the PDF string even when pdfescapestring exists.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "confirmed_delta",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L2057,L2072-L2086] (MED/non-idempotent-formatting) Each invocation of fonttextsize 10 halves the current paragraph spacing globally, so repeated size selection progressively changes layout instead of setting a stable size configuration."
+   ],
+   "representative": "audit",
+   "rationale": "span-confirmed: The 10-point font definition divides the existing parskip instead of setting a baseline value, and fonttextsize invokes it under globaldefs=1 at L2079-L2086. There is no parskip reset in that definition, so repeated selection cumulatively halves paragraph spacing.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L2057-L2061",
+    "quote": "\\divide\\parskip by 2  % reduce space between paragraphs\n\\textleading = 12pt   % line spacing for 10pt CM\n\\textfonts            % reset the current fonts\n\\rm\n} % end of 10pt text font size definitions, \\definetextfontsizex",
+    "verified_at_lines": "L2057-L2061",
+    "source_sha256": "64c8cf3d25ce6ca6209f221afd3d055cc5853af8116ba35d08b122454154c5ae"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The whole 10-point definition contains no reset of parskip before its division at trunk/config/texinfo.tex:L2057, and fonttextsize runs that definition with globaldefs=1 at L2079-L2086 on every matching call. The initial letterpaper setup supplies nonzero spacing at L9738/L9877; later explicit paper-size changes can reset it, but consecutive fonttextsize calls have no such intervening reset.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "confirmed_delta",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L2155-L2158,L2406] (LOW/font-selection) reducedfonts assigns reducedcaps instead of smallcaps, leaving sc text at the previously selected small-cap size inside reduced text."
+   ],
+   "representative": "audit",
+   "rationale": "span-confirmed: reducedfonts assigns reducedcaps, whereas sc reads smallcaps at L2406 and the other font selectors assign smallcaps. Nothing in reducedfonts or resetmathfonts updates that binding, so reduced sc text retains the previous small-cap font.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L2155-L2158",
+    "quote": "\\def\\reducedfonts{%\n  \\let\\tenrm=\\reducedrm \\let\\tenit=\\reducedit \\let\\tensl=\\reducedsl\n  \\let\\tenbf=\\reducedbf \\let\\tentt=\\reducedtt \\let\\reducedcaps=\\reducedsc\n  \\let\\tensf=\\reducedsf \\let\\teni=\\reducedi \\let\\tensy=\\reducedsy",
+    "verified_at_lines": "L2155-L2158",
+    "source_sha256": "64c8cf3d25ce6ca6209f221afd3d055cc5853af8116ba35d08b122454154c5ae"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The reducedfonts definition assigns only reducedcaps at trunk/config/texinfo.tex:L2157, whereas sc reads smallcaps at L2406 and textfonts initializes that separate binding at L2115. The real acronym path through selectfonts (L1456, L2773-L2774) performs no additional smallcaps selection, so enclosing sc text retains its prior size.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "confirmed_delta",
+   "base_ids": [],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L3362-L3372] (MED/non-idempotent-layout) Every oddfooting or everyfooting assignment subtracts another 12pt from pageheight and vsize without tracking an existing footer reservation."
+   ],
+   "representative": "audit",
+   "rationale": "span-confirmed: oddfootingyyy unconditionally decrements both dimensions on every assignment; everyfooting calls the same routine at L3372. There is no reservation flag or restoration of the previous 12pt deduction.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L3366-L3370",
+    "quote": "  % Leave some space for the footline.  Hopefully ok to assume\n  % @evenfooting will not be used by itself.\n  \\global\\advance\\pageheight by -12pt\n  \\global\\advance\\vsize by -12pt\n}",
+    "verified_at_lines": "L3366-L3370",
+    "source_sha256": "64c8cf3d25ce6ca6209f221afd3d055cc5853af8116ba35d08b122454154c5ae"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Both public entry points reach the unconditional global decrements at trunk/config/texinfo.tex:L3363-L3372; neither the footer tokens nor any reservation flag is tested. The output routine conditionally inserts visible footer spacing at L368-L374 but never restores pageheight or vsize, and only an independently requested page-size reset can erase accumulated decrements.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "confirmed_delta",
+   "base_ids": [],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L3659,L3734-L3755] (MED/ineffective-range-guard) Alphabetic enumeration checks itemno against zero instead of checking its case-code mapping, so advancing beyond z or Z bypasses the intended exhaustion error and emits inappropriate characters."
+   ],
+   "representative": "audit",
+   "rationale": "span-confirmed: Alphabetic itemno holds a character code and advances at L3659, so the value after z is 123, not zero. The guard therefore misses the zero lccode mapping and emits character zero; the uppercase branch repeats the same mistake.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L3737-L3742",
+    "quote": "    % Be sure we're not beyond the end of the alphabet.\n    \\ifnum\\itemno=0\n      \\errmessage{No more lowercase letters in @enumerate; get a bigger\n                  alphabet}%\n    \\fi\n    \\char\\lccode\\itemno",
+    "verified_at_lines": "L3737-L3742",
+    "source_sha256": "64c8cf3d25ce6ca6209f221afd3d055cc5853af8116ba35d08b122454154c5ae"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Enumeration starts from the character code and increments itemno directly (trunk/config/texinfo.tex:L3659, L3734-L3765), so moving past z produces 123 rather than zero. Initial letter validation at L3709-L3716 applies only to the starting argument; the emission guard never tests the resulting lccode/uccode and therefore allows character zero or another inappropriate mapped character.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "confirmed_delta",
+   "base_ids": [],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L3856-L3858,L3869,L3874-L3877,L3931-L3936,L4002-L4005] (MED/nested-state-corruption) Multitable column widths, column count, and fraction mode are global and not saved across nested tables, allowing an inner table to corrupt the outer table's subsequent columns."
+   ],
+   "representative": "audit",
+   "rationale": "span-confirmed: Column widths are globally defined and colcount is globally reset and advanced, while Emultitable globally clears fraction mode instead of restoring the outer value. The environment group does not undo these global assignments, and subsequent outer cells read the overwritten state at L3958-L3986.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L3856-L3859",
+    "quote": "\\def\\pickupwholefraction#1 {%\n  \\global\\advance\\colcount by 1\n  \\expandafter\\xdef\\csname col\\the\\colcount\\endcsname{#1\\hsize}%\n  \\setuptable",
+    "verified_at_lines": "L3856-L3859",
+    "source_sha256": "64c8cf3d25ce6ca6209f221afd3d055cc5853af8116ba35d08b122454154c5ae"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Environment grouping at trunk/config/texinfo.tex:L535/L575 cannot restore the global column definitions, counter, or percentage flag assigned at L3857-L3877 and L3931-L3936. Nested multitable is not rejected by startenvironment, and the outer alignment consults these shared values again at L3958-L3985 after the inner table resets them at L4002-L4005.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "confirmed_delta",
+   "base_ids": [],
+   "audit_ids": [
+    "B8"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L1034-L1050,L4294-L4298,L4332-L4339,L5976-L5990,L8628-L8648] (MED/disabled-mode-contract) novalidate suppresses stream initialization but leaves synindex closing undefined index streams, TOC creation outside the links guard, and float metadata writes to an unopened auxiliary stream."
+   ],
+   "representative": "audit",
+   "rationale": "span-confirmed: novalidate skips index-stream allocation, but dosynindex still closes the resulting undefined stream identifier; its donesynindex check does not test links. The other cited violations also remain: TOC opening precedes the links guard and a labeled float writes to auxfile without that guard.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L4335-L4339",
+    "quote": "  \\expandafter \\ifx\\csname donesynindex#2\\endcsname \\relax\n    % The \\closeout helps reduce unnecessary open files; the limit on the\n    % Acorn RISC OS is a mere 16 files.\n    \\expandafter\\closeout\\csname#2indfile\\endcsname\n    \\expandafter\\let\\csname donesynindex#2\\endcsname = 1",
+    "verified_at_lines": "L4335-L4339",
+    "source_sha256": "64c8cf3d25ce6ca6209f221afd3d055cc5853af8116ba35d08b122454154c5ae"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The links guards on setfilename/newindex (trunk/config/texinfo.tex:L1046-L1050, L4294-L4298) leave index stream control sequences unallocated, yet dosynindex still uses one as the numeric closeout operand at L4338. Independently, L5979-L5984 opens the TOC before checking links and Efloat writes labeled-float metadata at L8628-L8648 without that guard; auxfile is allocated at L7789 but is not opened under novalidate, so allocation does not rescue the write.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "confirmed_delta",
+   "base_ids": [],
+   "audit_ids": [
+    "B9"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L7365-L7371] (MED/incorrect-conditional) The macro argument limit uses character comparison if rather than numeric ifnum, making the intended greater-than-256 check ineffective."
+   ],
+   "representative": "audit",
+   "rationale": "span-confirmed: The condition uses TeX character comparison on the paramno control sequence and the greater-than character, rather than reading a numeric register value. Consequently the intended numeric limit test is not performed and the nested eTeX diagnostic is bypassed.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L7365-L7370",
+    "quote": "     \\expandafter\\parsemargdef \\argl;%\n     \\if\\paramno>256\\relax\n       \\ifx\\eTeXversion\\thisisundefined\n         \\errhelp = \\EMsimple\n         \\errmessage{You need eTeX to compile a file with macros with more than 256 arguments}\n       \\fi",
+    "verified_at_lines": "L7365-L7370",
+    "source_sha256": "64c8cf3d25ce6ca6209f221afd3d055cc5853af8116ba35d08b122454154c5ae"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "paramno is a count register (trunk/config/texinfo.tex:L7237), not an expandable character string, so the if at L7366 compares the register token with the greater-than character instead of its numeric value. The eTeX check is inside this unreachable true branch, and the separate too-many-invocation-arguments check at L7533-L7539 compares supplied values with formal names rather than enforcing this legacy-engine register limit.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "confirmed_delta",
+   "base_ids": [],
+   "audit_ids": [
+    "B10"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L7469-L7476,L7478-L7491,L7623-L7635] (MED/macro-parser) The if#1; sentinel tests compare the first two characters of multi-character parameter names, so names beginning with repeated letters such as aa can prematurely terminate parameter processing."
+   ],
+   "representative": "audit",
+   "rationale": "span-confirmed: The delimited argument is substituted unbraced into the character comparison, so aa becomes a true comparison of a with a and takes the sentinel branch before recording the parameter. The same unsafe test occurs in the many-argument definition and token-assignment parsers.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L7469-L7474",
+    "quote": "\\def\\parsemargdefxxx#1,{%\n  \\if#1;\\let\\next=\\relax\n  \\else \\let\\next=\\parsemargdefxxx\n    \\advance\\paramno by 1\n    \\expandafter\\edef\\csname macarg.\\eatspaces{#1}\\endcsname\n        {\\xeatspaces{\\hash\\the\\paramno}}%",
+    "verified_at_lines": "L7469-L7474",
+    "source_sha256": "64c8cf3d25ce6ca6209f221afd3d055cc5853af8116ba35d08b122454154c5ae"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "getmacargs preserves the complete formal-name list at trunk/config/texinfo.tex:L7419 and parsemargdef supplies its names directly to the comma-delimited parser at L7457. For aa, the test at L7470 becomes a true comparison of a with a, leaving the semicolon in the executed branch and stopping recursion; the later eatspaces call and the many-argument/invocation parsers at L7478-L7491 and L7623-L7635 supply no prior token-length guard.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "confirmed_delta",
+   "base_ids": [],
+   "audit_ids": [
+    "B11"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L1368-L1380,L7940-L7959] (MED/cross-reference-target) PDF cross-references strip interior spaces from external filenames but retain surrounding spaces in node targets, producing destinations that can disagree with the intended file or node."
+   ],
+   "representative": "audit",
+   "rationale": "span-confirmed: getfilename feeds the expanded filename through an undelimited-token scanner that skips interior spaces, while pdfxrefdest directly retains the node argument whitespace. PDF escaping and the identity pdfmkpgn do not repair either normalization mismatch before the link is emitted.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L7942-L7947",
+    "quote": "     % #4, including (wrongly) those in the middle of the filename.\n     \\getfilename{#4}%\n     %\n     % This (wrongly) does not take account of leading or trailing\n     % spaces in #1, which should be ignored.\n     \\edef\\pdfxrefdest{#1}%",
+    "verified_at_lines": "L7943-L7948",
+    "source_sha256": "64c8cf3d25ce6ca6209f221afd3d055cc5853af8116ba35d08b122454154c5ae"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The braced xref entry points preserve argument whitespace (trunk/config/texinfo.tex:L7888-L7897); the ignorespaces/unskip boxes normalize display, not the tokens later used for the PDF target. getfilename skips ordinary spaces throughout the filename at L1368-L1380, while L7947 copies the node argument verbatim; node definition parsing at L7805-L7810 removes trailing spacing, so matching malformed normalization at the destination does not reliably neutralize the mismatch.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "confirmed_delta",
+   "base_ids": [],
+   "audit_ids": [
+    "B12"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L8045-L8059] (LOW/cross-reference-display) crossmanualxref identifies Top by rendered width rather than text equality, and adding the same 7sp to both boxes does not prevent equal-width non-Top names from losing their section label."
+   ],
+   "representative": "audit",
+   "rationale": "span-confirmed: crossmanualxref compares box widths rather than node text, with the same 7sp added to both boxes. An equal-width non-Top label, such as another three-character name in a monospaced font, therefore suppresses the section label.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L8054-L8059",
+    "quote": "\\def\\crossmanualxref#1{%\n  \\setbox\\toprefbox = \\hbox{Top\\kern7sp}%\n  \\setbox2 = \\hbox{\\ignorespaces \\printedrefname \\unskip \\kern7sp}%\n  \\ifdim \\wd2 > 7sp  % nonempty?\n    \\ifdim \\wd2 = \\wd\\toprefbox \\else  % same as Top?\n      \\putwordSection{} ``\\printedrefname'' \\putwordin{}\\space",
+    "verified_at_lines": "L8055-L8060",
+    "source_sha256": "64c8cf3d25ce6ca6209f221afd3d055cc5853af8116ba35d08b122454154c5ae"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The complete crossmanualxref routine at trunk/config/texinfo.tex:L8054-L8063 compares only box widths, and both boxes receive the identical 7sp kern. Callers do not restrict the current font, so a three-character non-Top name in a monospaced context has the same width and loses the Section label; the preceding nonempty test does not distinguish it.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "confirmed_delta",
+   "base_ids": [],
+   "audit_ids": [
+    "B13"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L8245-L8253] (MED/dead-initialization) setupdatafile defines but never invokes its loop for resetting bytes 128–255, and the surrounding group would discard those local catcode changes even if the loop were invoked there."
+   ],
+   "representative": "audit",
+   "rationale": "span-confirmed: The high-byte block only defines loop and closes its group without invoking it, so none of the intended catcode assignments executes. Even an invocation inside that group would make only local assignments that disappear when the block closes.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L8248-L8253",
+    "quote": "    \\def\\loop{%\n      \\catcode\\count1=\\other\n      \\advance\\count1 by 1\n      \\ifnum \\count1<256 \\loop \\fi\n    }%\n  }%",
+    "verified_at_lines": "L8249-L8254",
+    "source_sha256": "64c8cf3d25ce6ca6209f221afd3d055cc5853af8116ba35d08b122454154c5ae"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The complete setupdatafile body at trunk/config/texinfo.tex:L8178-L8259 merely defines the resetting loop inside a group at L8246-L8253, with no invocation or global catcode assignments. Its readers at L6020-L6024 and L8261-L8265 supply no replacement reset; the load-time reset at L9660 only masks the omission until documentencoding activates high bytes again.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "confirmed_delta",
+   "base_ids": [],
+   "audit_ids": [
+    "B14"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L8431-L8440,L8480-L8487] (MED/unnecessary-dependency) The image entry point rejects all images when epsfbox is unavailable even in PDF mode, whose dopdfimage path does not use epsfbox."
+   ],
+   "representative": "audit",
+   "rationale": "span-confirmed: image rejects an undefined epsfbox before reaching imagexxx, regardless of PDF mode. The PDF branch at L8481-L8482 calls dopdfimage, whose implementation uses PDF image primitives and does not require epsfbox.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L8431-L8436",
+    "quote": "\\def\\image#1{%\n  \\ifx\\epsfbox\\thisisundefined\n    \\ifwarnednoepsf \\else\n      \\errhelp = \\noepsfhelp\n      \\errmessage{epsf.tex not found, images will be ignored}%\n      \\global\\warnednoepsftrue",
+    "verified_at_lines": "L8432-L8437",
+    "source_sha256": "64c8cf3d25ce6ca6209f221afd3d055cc5853af8116ba35d08b122454154c5ae"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The upfront epsf.tex probe at trunk/config/texinfo.tex:L8416-L8423 tolerates an absent file, but image then rejects the request before reaching the PDF/DVI split at L8431-L8441. The full dopdfimage implementation at L1186-L1235 uses PDF image primitives and no epsfbox, so the PDF branch at L8481-L8483 could otherwise handle an available supported image.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "confirmed_delta",
+   "base_ids": [],
+   "audit_ids": [
+    "B15"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L8855-L8884,L8910-L9013,L9163-L9193,L9255-L9256] (MED/encoding-state) Selecting a Latin encoding overwrites active UTF-8 lead-byte definitions, while subsequently selecting UTF-8 only installs character mappings and does not restore those byte decoders."
+   ],
+   "representative": "audit",
+   "rationale": "span-confirmed: Latin character definitions globally replace active lead bytes, including C2 and C3 at L8949-L8950, but the UTF-8 selection only sets catcodes and installs Unicode lookup mappings. The byte-decoder installation at L9163-L9193 executes once during loading and is not rerun when switching back to UTF-8.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L8882-L8884",
+    "quote": "  \\else \\ifx \\declaredencoding \\utfeight\n     \\setnonasciicharscatcode\\active\n     \\utfeightchardefs",
+    "verified_at_lines": "L8883-L8885",
+    "source_sha256": "64c8cf3d25ce6ca6209f221afd3d055cc5853af8116ba35d08b122454154c5ae"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "UTF lead-byte decoders are installed only once during file loading at trunk/config/texinfo.tex:L9163-L9193, before documentencoding can run. Latin definitions globally overwrite those active bytes, while the UTF-8 selection at L8882-L8884 only activates catcodes and calls utfeightchardefs; DeclareUnicodeCharacter defines u8: mappings through temporary decoder macros, not the overwritten active-byte entry points.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "confirmed_delta",
+   "base_ids": [],
+   "audit_ids": [
+    "B16"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L9171-L9173,L9188-L9192] (LOW/encoding-boundary) The four-byte UTF-8 initialization stops before lead byte F4, leaving valid sequences for the highest Unicode plane without the four-byte decoder."
+   ],
+   "representative": "audit",
+   "rationale": "span-confirmed: UTFviiiLoop increments the byte and recurses only while it is strictly below countUTFy, so this initialization covers F0 through F3 and excludes F4. No later decoder assignment supplies F4, leaving valid F4-prefixed sequences undecoded.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L9188-L9192",
+    "quote": "  \\countUTFx = \"F0\n  \\countUTFy = \"F4\n  \\def\\UTFviiiTmp{%\n    \\xdef~{\\noexpand\\UTFviiiFourOctets\\string~}}\n  \\UTFviiiLoop",
+    "verified_at_lines": "L9189-L9193",
+    "source_sha256": "64c8cf3d25ce6ca6209f221afd3d055cc5853af8116ba35d08b122454154c5ae"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The loop increments the lead byte before testing the strict upper bound (trunk/config/texinfo.tex:L9167-L9174), so the F0/F4 setup at L9188-L9192 installs only F0 through F3. Neither the later blanket catcode activation nor DeclareUnicodeCharacter defines the active F4 decoder, leaving the U+100000-U+10FFFF sequence range outside this decoder initialization.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "confirmed_delta",
+   "base_ids": [],
+   "audit_ids": [
+    "B17"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L9155-L9160,L9255-L9338] (MED/scientific-text-loss) The UTF-8 mapping omits scientific characters such as ±, µ, ×, and ÷ that the Latin-1 mapping supports, and undefined characters are dropped from output with only a log message."
+   ],
+   "representative": "audit",
+   "rationale": "span-confirmed: utfeightchardefs contains no mappings for U+00B1, U+00B5, U+00D7, or U+00F7, although latonechardefs renders their Latin-1 bytes with math symbols. For these undefined UTF-8 lookups, UTFviiiDefined emits only a message and no replacement glyph.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L9155-L9160",
+    "quote": "\\gdef\\UTFviiiDefined#1{%\n  \\ifx #1\\relax\n    \\message{\\linenumber Unicode char \\string #1 not defined for Texinfo}%\n  \\else\n    \\expandafter #1%\n  \\fi",
+    "verified_at_lines": "L9156-L9161",
+    "source_sha256": "64c8cf3d25ce6ca6209f221afd3d055cc5853af8116ba35d08b122454154c5ae"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The complete UTF mapping body at trunk/config/texinfo.tex:L9255-L9648 contains no declarations for 00B1, 00B5, 00D7, or 00F7, while the Latin-1 body explicitly supplies these symbols at L8930, L8934, L8972, and L9006. UTFviiiDefined consumes an unmapped sequence and only emits a message at L9155-L9161; neither the decoder nor callers fall back to the Latin-1 replacements.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "confirmed_delta",
+   "base_ids": [],
+   "audit_ids": [
+    "B18"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L9419-L9420] (MED/incorrect-unicode-mapping) The mappings for U+0162 and U+0163 swap uppercase and lowercase T with cedilla."
+   ],
+   "representative": "audit",
+   "rationale": "span-confirmed: U+0162 is assigned a lowercase t and U+0163 an uppercase T, reversing the required cases. The cedilla helper preserves its argument case, so it does not neutralize the swapped mappings.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L9419-L9420",
+    "quote": "  \\DeclareUnicodeCharacter{0162}{\\cedilla{t}}\n  \\DeclareUnicodeCharacter{0163}{\\cedilla{T}}",
+    "verified_at_lines": "L9420-L9421",
+    "source_sha256": "64c8cf3d25ce6ca6209f221afd3d055cc5853af8116ba35d08b122454154c5ae"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The actual declarations at trunk/config/texinfo.tex:L9419-L9420 give lowercase t to 0162 and uppercase T to 0163, and no later declaration overrides either entry. The cedilla helper at L8902 preserves the supplied letter case, as also demonstrated by the correctly cased Latin-2 T/t mappings at L9098 and L9132, so it does not reverse the erroneous arguments back.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "confirmed_delta",
+   "base_ids": [],
+   "audit_ids": [
+    "B19"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L3015-L3017,L9642] (MED/incorrect-symbol-mapping) U+2192 RIGHTWARDS ARROW is mapped to expansion, which renders mapsto rather than the right arrow provided by arrow."
+   ],
+   "representative": "audit",
+   "rationale": "span-confirmed: The U+2192 mapping selects expansion, which is explicitly defined as mapsto at L3017. The distinct arrow macro at L3015 renders rightarrow, so the Unicode rightwards arrow receives the wrong symbol.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L9642-L9643",
+    "quote": "  \\DeclareUnicodeCharacter{2192}{\\expansion}\n  \\DeclareUnicodeCharacter{21D2}{\\result}",
+    "verified_at_lines": "L9643-L9644",
+    "source_sha256": "64c8cf3d25ce6ca6209f221afd3d055cc5853af8116ba35d08b122454154c5ae"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The UTF-8 mapping at trunk/config/texinfo.tex:L9642 selects expansion, whose normal rendering is explicitly mapsto at L3017; arrow separately renders rightarrow at L3015. No later mapping or normal-text override changes this choice, and the index-only dummy replacements at L4664/L4673 are not a correction to the typeset glyph.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B20"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L9841-L9847] (LOW/documentation-layout-mismatch) afourwide is described as landscape but configures a 297mm-high by 210mm-wide portrait page."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

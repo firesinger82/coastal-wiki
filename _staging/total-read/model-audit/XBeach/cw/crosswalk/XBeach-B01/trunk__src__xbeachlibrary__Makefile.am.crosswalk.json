@@ -1,0 +1,178 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-B01",
+ "source_path": "trunk/src/xbeachlibrary/Makefile.am",
+ "source_sha256": "1b313d0ba88701c16f6805114d7d6b5d406fb9026a03d091c2d49b97b8ee8d21",
+ "base_run_id": "xbeach-r1-XBeach-B01-gpt-5.6-luna-01a079ab-98f6-7ba2-9380-3c78010a3f81",
+ "audit_run_id": "xbeach-r2-XBeach-B01-gpt-5.6-luna-01a07a20-9cee-7323-9aa4-758354e89851",
+ "base_record_file": "8ace0e7b181a9f14926837cfd1ed88a824ad3a97b398f92b9d2a5ca52a345cb4.json",
+ "audit_record_file": "8ace0e7b181a9f14926837cfd1ed88a824ad3a97b398f92b9d2a5ca52a345cb4.json",
+ "base_record_sha256_bytes": "5cea513427ca170fec1aba6769bbc7a6fca55fadc15df1ce8e179e54ce8f9c2c",
+ "audit_record_sha256_bytes": "27822cbe772de59713dd9ba07c8c471eeb2eb2e71625ed7f3d4af5cb74efd3e1",
+ "base_finding_count": 1,
+ "audit_finding_count": 8,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "[L84-L87] (MED/reproducibility) version.dat is generated from live svnversion, svn info, and date commands with no fallback or command-failure handling, so builds outside an SVN checkout can produce empty metadata or fail depending on shell/error policy."
+   ],
+   "audit_member_text": [
+    "[L85-L87] (LOW/error-propagation) SVN command failures occur inside successful echo recipes and can silently produce empty or invalid provenance fields."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Each metadata command runs inside command substitution in an echo recipe, whose successful status masks a failing svnversion or svn-info/grep pipeline. The Makefile has no fallback or validation, and the consumers include version.dat directly (logging.F90:220, libxbeach.F90:347), so empty or non-revision text can be accepted as provenance.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L62-L82,L91-L92] (MED/generated-dependencies) Only spacedecl.inc has a generation rule, so missing sibling generated includes are not recoverable when spacedecl.inc already exists."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "confirmed_delta",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L84-L87] (MED/stale-provenance) version.dat has no prerequisites or forced refresh, so incremental rebuilds retain obsolete revision and build-date metadata."
+   ],
+   "representative": "audit",
+   "rationale": "span-confirmed: version.dat is a normal target with no prerequisites or phony/forced refresh rule. Once it exists, incremental builds do not rerun the revision and date commands merely because repository revision or build time changed.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L84-L87",
+    "quote": "version.dat: \n\techo \"Build_Revision = '`svnversion $(top_srcdir)`'\" > version.dat\n\techo \"Build_URL = '`svn info $(top_srcdir) | grep -m 1 URL`'\" >> version.dat\n\techo \"Build_Date = '`date`'\" >> version.dat",
+    "verified_at_lines": "L84-L87",
+    "source_sha256": "1b313d0ba88701c16f6805114d7d6b5d406fb9026a03d091c2d49b97b8ee8d21"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "BUILT_SOURCES schedules version.dat to exist but does not force its recipe to rerun once the file exists. Neither the complete Makefile nor the parent makefiles add revision/source/phony prerequisites or a refresh hook; CLEANFILES removes it only during clean, leaving normal incremental rebuild metadata unchanged.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L4-L60,L114-L120] (MED/parallel-build-dependencies) The library lists interdependent Fortran sources while module dependency generation and inclusion are commented out, leaving parallel compilation ordering unspecified."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L99] (MED/compiler-portability) The library unconditionally supplies -fPIC despite the build scaffolding supporting compilers with different PIC flag conventions."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L107] (MED/dependency-linking) The netCDF branch unconditionally appends -lnetcdff after detected library variables, assuming a separately named Fortran library even when discovery selected another linkage layout."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "rejected",
+   "base_ids": [],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L111-L112] (MED/clean-rule) CLEANFILES includes every local *.inc file and therefore removes the distributed nh_pars.inc during an in-source clean."
+   ],
+   "representative": "audit",
+   "rationale": "adversarially refuted after span-confirmation: nh_pars.inc is generated from templates/nh_pars.mako, not an irreplaceable handwritten source: generate.py selects all *.mako templates at line 227 and writes corresponding .inc files. Cleaning also removes spacedecl.inc, whose Makefile.am:91-92 rule reruns that generator before the next normal build, recreating nh_pars.inc; its EXTRA_DIST listing does not make this deletion a source-loss defect.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "nh_pars.inc is generated from templates/nh_pars.mako, not an irreplaceable handwritten source: generate.py selects all *.mako templates at line 227 and writes corresponding .inc files. Cleaning also removes spacedecl.inc, whose Makefile.am:91-92 rule reruns that generator before the next normal build, recreating nh_pars.inc; its EXTRA_DIST listing does not make this deletion a source-loss defect.",
+    "neutralizer": {
+     "where": "trunk/scripts/generate.py:L239-L251",
+     "quote": "    for template_name in templates:\n        template = lookup.get_template(template_name)\n        filename = template_name.replace('.mako', '.inc')\n        logger.info(\"MAKO: %s -> %s\", template_name, filename)\n        with open(os.path.join(srcdir, filename), 'w') as f:\n            f.write(\"! This file is generated by 'scripts/generate.py' using\"+newline)\n            f.write(\"!    /src/xbeachlibrary/\"+os.path.basename(variables_file)+newline)\n            f.write(\"!    /src/xbeachlibrary/\"+os.path.basename(parameter_file)+newline)\n            f.write(\"!    src/xbeachlibray/templates/\"+template_name+newline)\n            f.write(\"! Advice: do not edit this file, but above mentioned files.\"+newline)\n            f.write(newline);\n            rendered = template.render(**locals())\n            f.write(rendered)"
+    },
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L40,L46] (MED/source-name-case) The source list names rainfall.F90 and bedroughness.F90 whereas the IDE projects name lowercase .f90 files, leaving case-sensitive builds with inconsistent source identities."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

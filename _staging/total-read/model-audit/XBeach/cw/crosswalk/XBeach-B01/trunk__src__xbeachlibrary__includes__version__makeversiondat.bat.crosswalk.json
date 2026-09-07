@@ -1,0 +1,111 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-B01",
+ "source_path": "trunk/src/xbeachlibrary/includes/version/makeversiondat.bat",
+ "source_sha256": "092e389ba2ba06acd9cbab261fb058a437e931bc457c4f67d1d1a600b32e8e8b",
+ "base_run_id": "xbeach-r1-XBeach-B01-gpt-5.6-luna-01a079ab-98f6-7ba2-9380-3c78010a3f81",
+ "audit_run_id": "xbeach-r2-XBeach-B01-gpt-5.6-luna-01a07a20-9cee-7323-9aa4-758354e89851",
+ "base_record_file": "790d51c014b2784b2c4706cfac125db4c7b7c06acf348da70e5da270d29591a8.json",
+ "audit_record_file": "790d51c014b2784b2c4706cfac125db4c7b7c06acf348da70e5da270d29591a8.json",
+ "base_record_sha256_bytes": "2fd5febbf8edda7198a14c3ac226dcbb884d50e4be2e9e455abf46645cb69783",
+ "audit_record_sha256_bytes": "e583bc2535eb8bb09deebcb6a9da0e93e118c42d615aa5c49cc78e147cbede3f",
+ "base_finding_count": 2,
+ "audit_finding_count": 3,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L11-L15,L18-L19] (MED/output-path) When RevisionNumber is defined the script writes version.dat in the current directory, whereas the normal and fallback paths target includes\\version\\version.dat, so the same script can produce metadata in different locations."
+   ],
+   "audit_member_text": [
+    "[L8,L12-L15,L19] (MED/generated-file-location) The RevisionNumber branch writes version.dat in the working directory instead of includes/version/version.dat and marks success, leaving the compiler's version include stale or missing."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The two output locations are inconsistent, but the claimed immediate stale/missing compiler include is not generally true: all consumers use bare version.dat, and the pre-build caller runs in the library source directory, where this branch creates it. Intel searches the including source directory first ([Intel include-file documentation](https://www.intel.com/content/www/us/en/docs/fortran-compiler/developer-guide-reference/2024-2/use-include-files.html)), so the narrower defect is split metadata locations and possible stale root-file shadowing after a later build switches back to the normal/f",
+    "neutralizer": {
+     "where": "trunk/src/xbeachlibrary/libxbeach.F90:L343-L349",
+     "quote": "   subroutine getversion(version)\n      character(kind=c_char,len=*),intent(inout) :: version\n\n      include 'version.def'\n      include 'version.dat'\n\n      version = trim(Build_Revision)"
+    },
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L3-L10] (LOW/portability) Automatic version generation depends exclusively on the hard-coded TortoiseSVN executable path C:\\Program Files\\TortoiseSVN\\bin\\SubWCRev.exe, with no configurable override or alternate VCS path."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "confirmed_delta",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L13] (LOW/locale-dependence) Build_Date slices DATE at fixed character offsets, producing malformed dates under different Windows locale formats."
+   ],
+   "representative": "audit",
+   "rationale": "span-confirmed: The RevisionNumber branch takes a fixed ten-character substring starting at offset three of DATE. No locale normalization precedes it, so a date without a three-character weekday prefix loses actual date characters.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L13-L13",
+    "quote": "  echo Build_Date     = '%DATE:~3,10% %TIME:~0,8%' >> version.dat",
+    "verified_at_lines": "L13-L13",
+    "source_sha256": "092e389ba2ba06acd9cbab261fb058a437e931bc457c4f67d1d1a600b32e8e8b"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The RevisionNumber branch directly slices DATE and TIME without establishing a locale or normalizing the date. Applying the exact character slice to representative DATE strings such as 2026-09-07 or Mon 09/07/2026 truncates the date, and no caller supplies a compensating DATE format.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L6-L15] (MED/batch-expansion) RevisionNumber is interpolated directly into an echoed Fortran literal without escaping, so quotes or command metacharacters can corrupt generation."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

@@ -1,0 +1,77 @@
+{
+  "shard": "XBeach-B00",
+  "verdicts": [
+    {
+      "vid": "trunk__autogen.sh#2",
+      "verdict": "STANDS",
+      "rationale": "The complete version_check procedure converts a major-only current version such as 3 to 3., then resets its nonempty major to zero at trunk/autogen.sh:205-206; the following fallback only sets the minor and does not restore the major. Executing the extracted procedure in memory rejected current 3 against minimum 2.52 but accepted 3.0, and the callers at lines 555-560, 596-601 and 698-703 neither require a minor component nor append one."
+    },
+    {
+      "vid": "trunk__config__build_configuration.bat#2",
+      "verdict": "STANDS",
+      "rationale": "The VS2008/2010/2012/2015 branches assign literal quote characters with SET, whereas only VS2017 assigns an unquoted value (trunk/config/build_configuration.bat:21-44). Expansion at lines 59 and 74 therefore starts with two quotes before the space-containing executable path; the intervening code does not strip the stored quotes, and later ERRORLEVEL handling cannot repair the malformed invocation."
+    },
+    {
+      "vid": "trunk__config__clean_distribute.bat#1",
+      "verdict": "STANDS",
+      "rationale": "With no first argument, trunk/config/clean_distribute.bat:6-12 expands the targets to \\dist\\win32 and \\dist\\x64 on the current drive. The IF EXIST tests only require those directories to exist, after which recursive quiet deletion runs; the complete script contains no argument validation, and no validating caller was found in the source tree."
+    },
+    {
+      "vid": "trunk__config__create-keys.sh#2",
+      "verdict": "STANDS",
+      "rationale": "Byte inspection confirms CRLF on trunk/config/create-keys.sh:1-5, including the interpreter line, which names /bin/bash followed by a carriage return during direct Unix execution. A Bash run with harmless in-memory replacements for both SSH commands captured rsa\\r and xbeach@test.invalid\\r as arguments, confirming that explicit Bash invocation does not remove the argument corruption; no source-tree normalization wrapper was found."
+    },
+    {
+      "vid": "trunk__config__example_install_new_version_H6.sh#1",
+      "verdict": "STANDS",
+      "rationale": "The full H6 script has no status checks between its directory changes, dependency loads, autogen/configure/make/install, tar, module generation and final chmod (trunk/config/example_install_new_version_H6.sh:12-41). Sourcing /etc/profile could supply external errexit policy, but no repository caller or supplied profile guarantees it, and a child autogen failure cannot terminate an ordinary parent Bash; successful later publication/chmod can therefore mask an earlier failure."
+    },
+    {
+      "vid": "trunk__config__example_install_new_version_H7.sh#0",
+      "verdict": "NARROWED",
+      "rationale": "Unchecked build-to-publication fall-through exists when the H7 body is interpreted by Bash without errexit, but the stored file has CRLF on lines 1-39: ordinary direct Unix execution fails at the shebang before reaching any build. A correctly named published module requires line-ending normalization (or a CR-tolerant environment) and a usable module generator/input; raw Bash execution also appends a carriage return to the redirected module filename at line 38, so normal successful publication is not established for the raw file.",
+      "neutralizer": {
+        "where": "trunk/config/example_install_new_version_H7.sh:L1-L1",
+        "quote": "#!/bin/bash\r\n"
+      }
+    },
+    {
+      "vid": "trunk__config__teamcity-build.sh#0",
+      "verdict": "STANDS",
+      "rationale": "trunk/config/teamcity-build.sh:5-39 never checks the directory changes or build/install results, retains the existing installation prefix, and archives that same prefix at lines 33-35. The backup at line 19 does not clean the live installation, and no source-tree caller establishes errexit, so failed builds can leave old installed binaries available for packaging while a successful final module-generation command supplies a zero script status."
+    },
+    {
+      "vid": "trunk__config__teamcity-build.sh#3",
+      "verdict": "STANDS",
+      "rationale": "The complete script neither removes nor replaces the _prev destination before cp -r at trunk/config/teamcity-build.sh:19, and no other source-tree code manages that destination. The first copy to an absent destination produces the expected snapshot, but subsequent copies to the existing directory place or merge the source basename beneath it, leaving the original top-level snapshot stale; this is not ever-deepening nesting."
+    },
+    {
+      "vid": "trunk__config__teamcity-distribute.sh#0",
+      "verdict": "STANDS",
+      "rationale": "After a failed cd at trunk/config/teamcity-distribute.sh:8, the final scp still resolves relative bin and lib against the preceding working directory, with no repository-supplied caller or profile guaranteeing errexit. The primary claim holds when those entries exist and the transfer succeeds; the alternate wording overstates failure masking because scp is the last executable command and its own nonzero exit status is propagated."
+    },
+    {
+      "vid": "trunk__configure.ac#0",
+      "verdict": "REFUTED",
+      "rationale": "The quote inside the AC_SUBST value opens the shell string, and the quote after the macro invocation closes it: expansion using the installed Autoconf macro emitted MAKEDEPO= followed by a single-quoted $(top_srcdir)/makedepo.py and a trailing newline, and that assignment passed sh -n and executed successfully. Thus the claimed unmatched-quote/configure-syntax failure is false; the embedded newline is a separate value issue rather than broken shell quoting.",
+      "neutralizer": {
+        "where": "trunk/configure.ac:L21-L21",
+        "quote": "AC_SUBST(MAKEDEPO,['$(top_srcdir)/makedepo.py])'\n"
+      }
+    },
+    {
+      "vid": "trunk__lib__fortran__findent__indentcode.bat#1",
+      "verdict": "STANDS",
+      "rationale": "All 64 formatter commands in trunk/lib/fortran/findent/indentcode.bat are followed by unconditional move /Y, and the generator make_indentcodebat.m:19-23 emits the same unchecked pattern. A bundled findent.exe reduces the ordinary missing-executable scenario but provides no failure guard: with existing readable inputs and writable output paths, command redirection can leave empty or partial .new files that the next command overwrites the originals with."
+    },
+    {
+      "vid": "trunk__lib__fortran__ftnunit__doc__runtests.bat#1",
+      "verdict": "NARROWED",
+      "rationale": "Indefinite relaunch remains possible for launch failures or repeated failures before the framework advances or removes ftnunit.lst, but ordinary crashes inside successive tests are not sufficient. ftnunit.f90:109-120 checkpoints each test before calling it, lines 228-238 restore that checkpoint so the next run skips the crashed test, and runtests_final removes the list at line 177; the batch loop lacks protection only when this progress/cleanup mechanism cannot complete.",
+      "neutralizer": {
+        "where": "trunk/lib/fortran/ftnunit/packages/ftnunit/src/ftnunit.f90:L109-L120",
+        "quote": "    testno = testno + 1\r\n    if ( testno <= last_test ) then\r\n        return\r\n    endif\r\n\r\n    !\r\n    ! Record the fact that we started the test\r\n    !\r\n    has_run = .true.\r\n    open( newunit = lun, file = 'ftnunit.lst' )\r\n    write( lun, * ) testno, nofails, noruns, ' ', .true.\r\n    close( lun )\r\n"
+      }
+    }
+  ]
+}

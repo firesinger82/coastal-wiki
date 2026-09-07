@@ -1,0 +1,135 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-B00",
+ "source_path": "trunk/config/build_configuration.bat",
+ "source_sha256": "24edee19c259d497c175c79f9d17301c879c27b6405c0ea678707977afdf74cc",
+ "base_run_id": "xbeach-r1-XBeach-B00-gpt-5.6-luna-01a079a6-7103-7312-a441-5309a7d01425",
+ "audit_run_id": "xbeach-r2-XBeach-B00-gpt-5.6-luna-01a07a19-bf73-7b91-afe4-1b0868a2795d",
+ "base_record_file": "4959ca0ae5956f4d98008cd9958c8c20f17aeef335659e6f28a07ba9b614cd34.json",
+ "audit_record_file": "4959ca0ae5956f4d98008cd9958c8c20f17aeef335659e6f28a07ba9b614cd34.json",
+ "base_record_sha256_bytes": "2ae5bc92f81ccbeb7ab5c84cafab18efa13ab8dcf356362b412c3a4be0473934",
+ "audit_record_sha256_bytes": "ddec8ded3050c0223457a7e69682aa44a4b854b841668b80eb0e557e703f46a0",
+ "base_finding_count": 2,
+ "audit_finding_count": 6,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "[L3-L6,L10-L16,L51] (LOW/input-contract) The batch file dereferences positional arguments without presence checks and constructs the solution path with a forward slash, leaving invocation and path-format contracts implicit and fragile."
+   ],
+   "audit_member_text": [
+    "[L10-L16] (LOW/argument-validation) Missing version arguments produce invalid unquoted IF comparisons rather than a controlled argument error."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "[L8-L16,L21-L23] (MED/version/dispatch) The dispatcher recognizes VS2010/2012/2015/2017 but has no VS2008 label and no VS2019/VS2022 cases, so an unsupported or newer version falls through to the VS2008 toolchain while the repository contains newer solution files."
+   ],
+   "audit_member_text": [
+    "[L10-L23,L51] (MED/unsupported-version-fallback) Unrecognized versions silently fall back to VS2008 while still constructing a solution name from that version, including the supplied newer IFX solutions."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "confirmed_delta",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L21-L37,L59,L74] (HIGH/command-quoting) Older-version branches store quotes inside devenv_path and the invocation adds another pair, producing malformed executable quoting for paths containing spaces."
+   ],
+   "representative": "audit",
+   "rationale": "span-confirmed: L21-L37 include literal surrounding quotes in the older-version devenv_path values, and L59/L74 wrap the expansion in another pair without stripping them. This produces an executable token beginning with doubled quotes before a space-containing path; the unquoted VS2017 assignment does not neutralize the older branches.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L59-L59",
+    "quote": "\"%devenv_path%\\devenv.com\" %solutionpath% /Clean \"%3|%4\" /Out clean.log\r\n",
+    "verified_at_lines": "L59-L59",
+    "source_sha256": "24edee19c259d497c175c79f9d17301c879c27b6405c0ea678707977afdf74cc"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The VS2008/2010/2012/2015 branches assign literal quote characters with SET, whereas only VS2017 assigns an unquoted value (trunk/config/build_configuration.bat:21-44). Expansion at lines 59 and 74 therefore starts with two quotes before the space-containing executable path; the intervening code does not strip the stored quotes, and later ERRORLEVEL handling cannot repair the malformed invocation.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L59-L65,L74-L87] (HIGH/exit-status) Build and cleanup exit codes are checked only after type and del commands, which can replace the status and hide compilation failures."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L30-L32] (MED/toolchain-selection) The VS2012 branch selects Visual Studio 12.0, corresponding to VS2013 rather than VS2012's 11.0 installation."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L35-L38] (MED/toolchain-initialization) The VS2015 environment setup uses a VC/Auxiliary/Build path and fixed Program Files location inconsistent with the selected legacy installation layout."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

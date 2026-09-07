@@ -1,0 +1,68 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-V01",
+ "source_path": "trunk/lib/win32/netcdff90/typeSizes.f90",
+ "source_sha256": "32884fc1dd4c42ec40a25385d0f3c62147bdcedc6300386cbb1ae847f912c21a",
+ "base_run_id": "xbeach-r1-XBeach-V01-gpt-6-astra-01a079bd-fbb5-7cd3-8c47-5d906cc55970",
+ "audit_run_id": "xbeach-r2-XBeach-V01-gpt-6-astra-01a07a3b-b349-7061-aef2-9b392a6fc7c6",
+ "base_record_file": "4e5da8e7a0cb8b12162ee68f3d911310dd0915c819eeaf0127ba7aa6e31d12a8.json",
+ "audit_record_file": "4e5da8e7a0cb8b12162ee68f3d911310dd0915c819eeaf0127ba7aa6e31d12a8.json",
+ "base_record_sha256_bytes": "795378306ed72a7b2a3edb9ca32b6419017dc0fe8a66d8fc34e31068c453bbaa",
+ "audit_record_sha256_bytes": "79d40a3612135373c6ec2a04875a6d58a649fff2b96a86697472278a3c6fcddd",
+ "base_finding_count": 1,
+ "audit_finding_count": 2,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L36,L42-L58] (LOW/incomplete-validation) byteSizesOK never checks EightByteInt availability or bit size despite claiming to validate the module's selected integer kinds."
+   ],
+   "audit_member_text": [
+    "[L36,L51-L58] (MED/kind-validation) byteSizesOK never validates EightByteInt, so it can report success when the advertised eight-byte integer kind is unavailable or has a different width."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The standalone byteSizesOK function omits EightByteInt and can incorrectly endorse an unavailable or non-eight-byte selection, but this is a LOW portability-validation omission. In a complete netCDF-module build an unavailable kind is already rejected by declarations such as netcdf_expanded.f90:57, so a successfully built ordinary bundled library cannot reach the claimed unavailable-kind case.",
+    "neutralizer": {
+     "where": "trunk/lib/win32/netcdff90/netcdf_expanded.f90:L55-L57",
+     "quote": "   function nf90_put_var_EightByteInt(ncid, varid, values, start)\n     integer,                         intent( in) :: ncid, varid\n     integer (kind = EightByteInt), intent( in) :: values"
+    },
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L33-L35,L51-L55] (LOW/validation-contract) Unavailable small integer kinds are used in local declarations before byteSizesOK can run, turning an advertised availability check into a compilation failure."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

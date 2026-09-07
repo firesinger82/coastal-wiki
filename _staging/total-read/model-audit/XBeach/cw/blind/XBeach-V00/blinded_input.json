@@ -1,0 +1,2005 @@
+{
+ "shard": "XBeach-V00",
+ "instructions_ref": "see subagent prompt",
+ "files": [
+  {
+   "file_token": "F00",
+   "lang": ".f90",
+   "listX": [],
+   "listY": [],
+   "candidate_pairs": []
+  },
+  {
+   "file_token": "F01",
+   "lang": ".h",
+   "listX": [
+    {
+     "id": "F01-X0",
+     "text": "[L27-L38,L93] (MED/null-handle-mismatch) MPIO_Request aliases MPI_Request but MPIO_REQUEST_NULL remains zero instead of this implementation's nonzero MPI_REQUEST_NULL."
+    },
+    {
+     "id": "F01-X1",
+     "text": "[L10-L13,L27-L38,L75-L83] (MED/include-order) Including mpio.h first in C++ sets its guard before recursively including mpi.h, so mpi.h loads the C++ bindings before MPIO_Request and MPI-IO constants are available and the File interface is conditionally omitted."
+    },
+    {
+     "id": "F01-X2",
+     "text": "[L27-L38,L150-L152,L165-L167,L336-L338,L351-L353] (LOW/stale-documentation) Comments claim generalized requests are unimplemented despite this configured header enabling them and aliasing I/O requests to MPI requests."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F01-Y0",
+     "text": "[L27-L37,L93] (MED/handle-contract) MPIO_Request aliases MPI_Request and its wait/test routines, but MPIO_REQUEST_NULL is hard-coded to zero instead of MPI_REQUEST_NULL, requiring a null-handle equivalence the header does not establish."
+    },
+    {
+     "id": "F01-Y1",
+     "text": "[L150-L152,L165-L167,L336-L338,L351-L353] (LOW/stale-documentation) The nonblocking-I/O comments claim generalized requests are unimplemented even though this configuration explicitly enables them and aliases the request operations."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F01-X0",
+     "F01-Y0"
+    ],
+    [
+     "F01-X1",
+     "F01-Y0"
+    ],
+    [
+     "F01-X2",
+     "F01-Y0"
+    ],
+    [
+     "F01-X2",
+     "F01-Y1"
+    ]
+   ]
+  },
+  {
+   "file_token": "F02",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F02-X0",
+     "text": "[L539-L545,L684-L689,L709] (HIGH/serialization-type-mismatch) The rank-three real writer serializes dimensions as REAL while its reader interprets them as INTEGER, producing invalid extents and potentially enormous allocations on ordinary round trips."
+    },
+    {
+     "id": "F02-X1",
+     "text": "[L383,L423,L463,L629,L669,L709,L875,L915,L955,L1121,L1161,L1201,L1367,L1407,L1447,L1627,L1674,L1721] (MED/allocation-validation) Array readers allocate directly from file extents without checking negative values, reasonable size limits or allocation status."
+    },
+    {
+     "id": "F02-X2",
+     "text": "[L351-L385,L597-L631,L843-L877,L1089-L1123,L1335-L1369,L1588-L1629] (MED/ownership-contract) Retrieval unconditionally allocates pointer outputs without documenting or enforcing that their existing targets have been released, allowing repeated retrieval to leak prior allocations."
+    },
+    {
+     "id": "F02-X3",
+     "text": "[L163,L176,L184,L190,L198,L328-L342] (MED/error-propagation) Detected storage errors terminate through plain STOP without returning an error or signaling assertion failure, which can appear as successful process termination."
+    },
+    {
+     "id": "F02-X4",
+     "text": "[L166-L168,L245-L246,L345,L383-L385,L1582,L1723] (MED/io-error-handling) Payload reads and all writes lack IOSTAT handling despite metadata-read checks, so truncated payloads or write failures bypass the module's controlled diagnostics."
+    },
+    {
+     "id": "F02-X5",
+     "text": "[L53-L59,L158,L245-L246,L491-L492,L737-L738] (LOW/format-portability) The fixed format identifier records no kind widths, byte order or record-marker format even though payloads use compiler-native unformatted representations."
+    },
+    {
+     "id": "F02-X6",
+     "text": "[L1655,L1697] (LOW/diagnostics) Character-array retrieval reports complex-data errors in two copy-pasted diagnostic messages."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F02-Y0",
+     "text": "[L539-L545,L684-L709] (HIGH/serialization-type-mismatch) The three-dimensional real writer serializes dimensions as REAL while its reader interprets them as INTEGER, corrupting array extents and potentially causing enormous allocations."
+    },
+    {
+     "id": "F02-Y1",
+     "text": "[L363-L385,L403-L425,L443-L465,L609-L631,L689-L711,L1694-L1723] (MED/metadata-validation) Array readers validate type and rank but allocate directly from unchecked file extents, allowing negative dimensions to become empty arrays or excessive dimensions to terminate allocation."
+    },
+    {
+     "id": "F02-Y2",
+     "text": "[L353,L383,L393,L423,L433,L463,L599,L629,L1684,L1721] (MED/ownership-contract) Array retrieval unconditionally allocates a new pointer target without releasing an existing target or documenting that the incoming pointer must not own storage, permitting leaks on repeated retrieval."
+    },
+    {
+     "id": "F02-Y3",
+     "text": "[L160-L163,L173-L176,L181-L198,L328-L342] (MED/failure-signaling) Detected open and format failures use bare STOP, which normally exits successfully and can make a failed test-data load appear successful to a process-level test runner."
+    },
+    {
+     "id": "F02-Y4",
+     "text": "[L166-L168,L245-L246,L345,L385,L1629,L1723] (MED/io-error-handling) Payload reads and all writes omit IOSTAT handling, so truncated data or output failures abort in the runtime instead of producing a controlled storage error."
+    },
+    {
+     "id": "F02-Y5",
+     "text": "[L50-L59,L158,L245,L491,L737] (LOW/serialization-contract) The fixed format version records default-kind binary values without recording their widths, endianness, or record-marker format, leaving cross-compiler and compiler-option compatibility unspecified."
+    },
+    {
+     "id": "F02-Y6",
+     "text": "[L1655,L1697] (LOW/diagnostic-mismatch) Character retrieval error messages incorrectly identify the expected or retrieved data as complex."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F02-X0",
+     "F02-Y0"
+    ],
+    [
+     "F02-X0",
+     "F02-Y1"
+    ],
+    [
+     "F02-X1",
+     "F02-Y0"
+    ],
+    [
+     "F02-X1",
+     "F02-Y1"
+    ],
+    [
+     "F02-X1",
+     "F02-Y2"
+    ],
+    [
+     "F02-X1",
+     "F02-Y4"
+    ],
+    [
+     "F02-X2",
+     "F02-Y1"
+    ],
+    [
+     "F02-X2",
+     "F02-Y2"
+    ],
+    [
+     "F02-X2",
+     "F02-Y4"
+    ],
+    [
+     "F02-X3",
+     "F02-Y3"
+    ],
+    [
+     "F02-X3",
+     "F02-Y4"
+    ],
+    [
+     "F02-X3",
+     "F02-Y5"
+    ],
+    [
+     "F02-X4",
+     "F02-Y1"
+    ],
+    [
+     "F02-X4",
+     "F02-Y2"
+    ],
+    [
+     "F02-X4",
+     "F02-Y3"
+    ],
+    [
+     "F02-X4",
+     "F02-Y4"
+    ],
+    [
+     "F02-X4",
+     "F02-Y5"
+    ],
+    [
+     "F02-X5",
+     "F02-Y3"
+    ],
+    [
+     "F02-X5",
+     "F02-Y4"
+    ],
+    [
+     "F02-X5",
+     "F02-Y5"
+    ],
+    [
+     "F02-X6",
+     "F02-Y1"
+    ],
+    [
+     "F02-X6",
+     "F02-Y6"
+    ]
+   ]
+  },
+  {
+   "file_token": "F03",
+   "lang": ".cxx",
+   "listX": [],
+   "listY": [
+    {
+     "id": "F03-Y0",
+     "text": "[L41,L53] (LOW/binding-portability) C++ collective calls use C datatype and operation constants, relying on implementation-specific implicit conversions instead of the C++ binding constants."
+    },
+    {
+     "id": "F03-Y1",
+     "text": "[L57-L58] (LOW/diagnostics) The computed pi value is printed with default stream precision, concealing most of the numerical accuracy demonstrated by the example."
+    }
+   ],
+   "candidate_pairs": []
+  },
+  {
+   "file_token": "F04",
+   "lang": ".h",
+   "listX": [
+    {
+     "id": "F04-X0",
+     "text": "[L25] (LOW/time-domain-contract) CLOG_MAXTIME is claimed to exceed all times but is a finite 100000000-second sentinel without a stated bound or time origin that guarantees the claim."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F04-Y0",
+     "text": "[L25] (LOW/sentinel-contract) The finite CLOG_MAXTIME sentinel is described as later than all times without specifying the timestamp origin or maximum supported duration."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F04-X0",
+     "F04-Y0"
+    ]
+   ]
+  },
+  {
+   "file_token": "F05",
+   "lang": ".h",
+   "listX": [
+    {
+     "id": "F05-X0",
+     "text": "[L1200-L1201,L1222-L1257] (MED/language-linkage) MPIX and PMPIX generalized-request extensions are declared after the extern-C block closes, giving C++ callers incompatible linkage for C implementations."
+    },
+    {
+     "id": "F05-X1",
+     "text": "[L1189-L1192] (LOW/feature-advertisement) The feature list defines MPIIMPL_HAVE_MPI_TYPE_CREATE_DARRAY twice and omits the corresponding TYPE_CREATE_SUBARRAY feature beside COMBINER_SUBARRAY."
+    },
+    {
+     "id": "F05-X2",
+     "text": "[L372,L453,L583-L595] (LOW/abi-contract) The configured header fixes MPI_Aint to 32-bit int and defines MPI_CALL as cdecl without applying it to prototypes, so correct use depends on a 32-bit target and the compiler's default calling convention."
+    },
+    {
+     "id": "F05-X3",
+     "text": "[L580,L898-L905] (LOW/preprocessor-contract) MPICH_SUPPRESS_PROTOTYPES suppresses MPI prototypes but leaves the PMPI prototype block enabled despite the comment describing suppression of prototypes generally."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F05-Y0",
+     "text": "[L1200-L1201,L1226-L1257] (MED/language-linkage) MPIX and PMPIX generalized-request extension prototypes appear after extern-C closes, giving C++ callers mangled linkage for functions exposed by a C library."
+    },
+    {
+     "id": "F05-Y1",
+     "text": "[L1189-L1192] (LOW/feature-advertisement) The feature list defines MPIIMPL_HAVE_MPI_TYPE_CREATE_DARRAY twice and omits the corresponding subarray-constructor feature despite declaring that constructor."
+    },
+    {
+     "id": "F05-Y2",
+     "text": "[L1198,L1210-L1214] (MED/include-order) Including mpio.h first from C++ can reach mpicxx.h through this circular include before mpio.h has defined MPIO_Request, while the C++ File methods require that type."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F05-X0",
+     "F05-Y0"
+    ],
+    [
+     "F05-X0",
+     "F05-Y2"
+    ],
+    [
+     "F05-X1",
+     "F05-Y1"
+    ],
+    [
+     "F05-X1",
+     "F05-Y2"
+    ]
+   ]
+  },
+  {
+   "file_token": "F06",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F06-X0",
+     "text": "[L50,L64,L82-L83] (MED/protocol-escaping) Test names and failure messages are inserted into quoted TeamCity service-message fields without escaping quotes, pipes, brackets or line breaks, which can corrupt test reporting."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F06-Y0",
+     "text": "[L50,L64,L82-L83] (MED/output-escaping) Test names and failure text are inserted into TeamCity service messages without escaping quotes, pipes, brackets, or line breaks, allowing ordinary descriptions to break CI test reporting."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F06-X0",
+     "F06-Y0"
+    ]
+   ]
+  },
+  {
+   "file_token": "F07",
+   "lang": ".h",
+   "listX": [
+    {
+     "id": "F07-X0",
+     "text": "[L42-L49] (MED/language-linkage) MPE_Errors_to_dbx is declared outside the extern-C block, giving C++ callers incompatible linkage for the C library symbol."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F07-Y0",
+     "text": "[L42-L47] (MED/language-linkage) MPE_Errors_to_dbx is declared outside the extern-C block, unlike the other C MPE routines, risking unresolved C++ linkage when used as an error handler."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F07-X0",
+     "F07-Y0"
+    ]
+   ]
+  },
+  {
+   "file_token": "F08",
+   "lang": ".h",
+   "listX": [
+    {
+     "id": "F08-X0",
+     "text": "[L17,L28] (LOW/format-type-mismatch) CLOG_int32_t is __int32 while i32fmt requests long, leaving a variadic type mismatch on compilers where __int32 aliases int even though Win32 gives both types equal width."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F08-Y0",
+     "text": "[L20-L24] (LOW/abi-contract) CLOG_Pint is fixed at 32 bits despite being described as address-sized, restricting safe use to the intended 32-bit target."
+    },
+    {
+     "id": "F08-Y1",
+     "text": "[L15-L18,L26-L29] (LOW/format-abi) The printf formats assume hhd and lld support and use ld for __int32, so compatibility with the Microsoft compiler and CRT version needs confirmation."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F08-X0",
+     "F08-Y0"
+    ],
+    [
+     "F08-X0",
+     "F08-Y1"
+    ]
+   ]
+  },
+  {
+   "file_token": "F09",
+   "lang": ".h",
+   "listX": [],
+   "listY": [],
+   "candidate_pairs": []
+  },
+  {
+   "file_token": "F10",
+   "lang": ".h",
+   "listX": [
+    {
+     "id": "F10-X0",
+     "text": "[L8-L20,L67-L192] (LOW/dll-interface) The header defines MPEU_DLL_SPEC for import/export decoration but applies it to none of its function declarations."
+    },
+    {
+     "id": "F10-X1",
+     "text": "[L154-L175] (LOW/buffer-contract) Logging entry points accept byte-buffer pointers without documenting required readable length or null handling, while the pack interface implies a fixed MPE_LOG_BYTESIZE buffer."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F10-Y0",
+     "text": "[L154-L175] (LOW/buffer-contract) Event APIs accept an un-sized const char pointer without stating whether callers must supply a full MPE_LOG_BYTES buffer or may pass shorter strings, leaving the required readable extent unclear."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F10-X1",
+     "F10-Y0"
+    ]
+   ]
+  },
+  {
+   "file_token": "F11",
+   "lang": ".c",
+   "listX": [
+    {
+     "id": "F11-X0",
+     "text": "[L50-L59] (LOW/input-validation) Negative interval counts enter the calculation branch and report zero as the approximation instead of rejecting the input."
+    },
+    {
+     "id": "F11-X1",
+     "text": "[L43,L55] (MED/integer-overflow) An accepted interval count near INT_MAX can overflow the signed loop index on its final increment, causing undefined behavior."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F11-Y0",
+     "text": "[L50-L59] (LOW/input-validation) Negative interval counts pass the zero-only exit check and produce an empty integral reported as a pi approximation."
+    },
+    {
+     "id": "F11-Y1",
+     "text": "[L55] (MED/integer-overflow) For interval counts near INT_MAX, the final i += numprocs can overflow signed int before the loop condition is rechecked."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F11-X0",
+     "F11-Y0"
+    ],
+    [
+     "F11-X0",
+     "F11-Y1"
+    ],
+    [
+     "F11-X1",
+     "F11-Y0"
+    ],
+    [
+     "F11-X1",
+     "F11-Y1"
+    ]
+   ]
+  },
+  {
+   "file_token": "F12",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F12-X0",
+     "text": "[L119,L138,L220-L242] (MED/restart-state) Successful tests persist the same previous=true marker as started tests, so a subsequent runtests call can label a completed test as crashed and skip tests using a reset local numbering sequence."
+    },
+    {
+     "id": "F12-X1",
+     "text": "[L1073-L1079] (MED/failure-accounting) A recovered crash sets failed_asserts but neither increments nofails nor invokes the failure hook."
+    },
+    {
+     "id": "F12-X2",
+     "text": "[L1002-L1004,L240-L242] (LOW/report-state) A run that executes no tests unconditionally appends a crash row, potentially duplicating a recovered-crash row or reporting a crash for an empty suite."
+    },
+    {
+     "id": "F12-X3",
+     "text": "[L174-L180] (MED/exit-status) Finalization executes a plain STOP regardless of failed assertions, leaving process-exit-based automation without a failure status."
+    },
+    {
+     "id": "F12-X4",
+     "text": "[L399-L403,L474-L478,L527-L531,L607-L611,L660-L664] (MED/report-consistency) Array shape or size failures update nofails and hooks but do not update HTML failure state, allowing the affected test to appear OK in HTML."
+    },
+    {
+     "id": "F12-X5",
+     "text": "[L397,L417,L472,L493,L525,L547,L605,L626,L658,L680,L1237-L1242] (LOW/diagnostics) Array assertion helpers always pass addtext=false, so their HTML difference rows omit the assertion description."
+    },
+    {
+     "id": "F12-X6",
+     "text": "[L443,L479,L532,L576,L612,L665,L824] (MED/nonfinite-comparison) Greater-than-only tolerance checks accept NaNs and can accept finite-versus-infinite values because neither nonfinite operands nor nonfinite thresholds are rejected."
+    },
+    {
+     "id": "F12-X7",
+     "text": "[L443,L479,L532,L576,L612,L665] (MED/numerical-overflow) The sum of operand magnitudes can overflow before multiplication by the tolerance and falsely accept materially different large finite values."
+    },
+    {
+     "id": "F12-X8",
+     "text": "[L713-L715,L767-L768,L811-L812] (MED/comparison-truncation) File comparisons silently discard content after 200 characters per line or 20 characters per token, so differences beyond those limits can pass."
+    },
+    {
+     "id": "F12-X9",
+     "text": "[L808-L824] (MED/parser-contract) Ignored list-directed tokenization errors and a literal question-mark sentinel can hide malformed or missing tokens, while numeric conversion uses only default-real precision."
+    },
+    {
+     "id": "F12-X10",
+     "text": "[L780-L795] (MED/failure-accounting) Premature EOF or a read error reports a failed comparison without incrementing nofails."
+    },
+    {
+     "id": "F12-X11",
+     "text": "[L742-L763,L780-L795] (LOW/resource-lifetime) Early returns on open or read failures leave any successfully opened comparison files connected."
+    },
+    {
+     "id": "F12-X12",
+     "text": "[L1050,L1124,L1175-L1178,L1493-L1498] (MED/output-escaping) Test descriptions and compared strings are embedded directly in HTML without escaping markup characters."
+    },
+    {
+     "id": "F12-X13",
+     "text": "[L118-L120,L137-L139,L969-L989,L1034-L1051] (LOW/io-error-handling) State and HTML report writes lack IOSTAT handling, so an output failure can terminate the test framework itself."
+    },
+    {
+     "id": "F12-X14",
+     "text": "[L64-L67,L109-L110,L274,L278] (LOW/initialization-contract) Public test and assertion entry points rely on runtests having initialized counters and test having allocated testname, but do not enforce or document those preconditions locally."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F12-Y0",
+     "text": "[L443,L479,L532,L576,L612,L665,L824] (HIGH/numeric-false-pass) Approximate comparisons only fail on a greater-than test, so NaNs and unequal infinities can pass without recording an assertion failure."
+    },
+    {
+     "id": "F12-Y1",
+     "text": "[L443,L576,L824] (MED/numeric-overflow) The relative-error threshold sums absolute magnitudes before scaling, allowing large finite inputs to overflow the threshold and pass despite substantial differences."
+    },
+    {
+     "id": "F12-Y2",
+     "text": "[L155-L160,L220-L245,L109-L111,L137-L138] (HIGH/multi-suite-state) Every runtests call resets test numbering and reloads the previous suite's last_test, so the documented multiple-call workflow can skip tests in later suites and label completed work as crashed."
+    },
+    {
+     "id": "F12-Y3",
+     "text": "[L118-L119,L137-L138,L240-L241,L1073-L1079] (MED/restart-failure-accounting) Started and completed tests persist the same true marker, while crash recovery only updates failed_asserts and neither increments nofails nor emits a failure hook."
+    },
+    {
+     "id": "F12-Y4",
+     "text": "[L1002-L1004,L1073-L1075] (MED/empty-suite-reporting) The footer marks the previous test as crashed whenever no test ran, including a legitimate empty suite, and can duplicate the crash marker already emitted during restart."
+    },
+    {
+     "id": "F12-Y5",
+     "text": "[L399-L402,L474-L477,L527-L530,L607-L610,L660-L663,L1008-L1009,L1036-L1039] (MED/report-false-pass) Array size and shape mismatches increment nofails and invoke the hook but never update HTML failure state, so their test rows can be rendered as OK."
+    },
+    {
+     "id": "F12-Y6",
+     "text": "[L397,L417,L472,L493,L525,L547,L605,L626,L658,L680,L1237-L1242] (LOW/missing-diagnostic) Array comparison routines always pass addtext=false, suppressing the assertion description on every HTML difference row."
+    },
+    {
+     "id": "F12-Y7",
+     "text": "[L780-L795] (MED/failure-accounting) Premature EOF or read errors report a file comparison failure without incrementing nofails, leaving the overall failed-assertion total incorrect."
+    },
+    {
+     "id": "F12-Y8",
+     "text": "[L742-L763,L780-L795,L886-L887] (MED/resource-leak) File-comparison early returns leave whichever input files opened successfully connected instead of closing them."
+    },
+    {
+     "id": "F12-Y9",
+     "text": "[L713-L715,L767-L768,L801-L802,L811-L812] (MED/comparison-truncation) Fixed-length line and token reads silently discard text beyond 200 characters per line or 20 characters per token, allowing differing files to compare equal."
+    },
+    {
+     "id": "F12-Y10",
+     "text": "[L808-L824] (MED/parser-contract) List-directed tokenization errors are ignored and missing tokens use the real text sentinel '?', so malformed or slash-terminated records and literal question-mark tokens can hide differences."
+    },
+    {
+     "id": "F12-Y11",
+     "text": "[L723-L724,L820-L824] (MED/comparison-precision) File numbers are parsed into default REAL, so differences below single-precision resolution disappear even when the requested tolerance is tighter."
+    },
+    {
+     "id": "F12-Y12",
+     "text": "[L174-L180] (MED/process-exit-status) The runner terminates with bare STOP regardless of nofails, so process-exit-based CI can report success after failed assertions."
+    },
+    {
+     "id": "F12-Y13",
+     "text": "[L1050,L1124,L1175-L1178,L1493-L1498] (MED/output-escaping) Test descriptions, compared strings, and file contents are emitted as raw HTML, allowing ordinary angle brackets and ampersands to alter or conceal report content."
+    },
+    {
+     "id": "F12-Y14",
+     "text": "[L1388-L1389,L1428-L1430,L1470-L1472] (LOW/diagnostic-precision) Double-precision comparison failures are printed with only five to eight significant digits, which can display distinct failing values as identical."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F12-X0",
+     "F12-Y2"
+    ],
+    [
+     "F12-X0",
+     "F12-Y3"
+    ],
+    [
+     "F12-X0",
+     "F12-Y4"
+    ],
+    [
+     "F12-X1",
+     "F12-Y3"
+    ],
+    [
+     "F12-X1",
+     "F12-Y4"
+    ],
+    [
+     "F12-X2",
+     "F12-Y2"
+    ],
+    [
+     "F12-X2",
+     "F12-Y3"
+    ],
+    [
+     "F12-X2",
+     "F12-Y4"
+    ],
+    [
+     "F12-X2",
+     "F12-Y5"
+    ],
+    [
+     "F12-X3",
+     "F12-Y12"
+    ],
+    [
+     "F12-X4",
+     "F12-Y0"
+    ],
+    [
+     "F12-X4",
+     "F12-Y5"
+    ],
+    [
+     "F12-X4",
+     "F12-Y6"
+    ],
+    [
+     "F12-X5",
+     "F12-Y5"
+    ],
+    [
+     "F12-X5",
+     "F12-Y6"
+    ],
+    [
+     "F12-X6",
+     "F12-Y0"
+    ],
+    [
+     "F12-X6",
+     "F12-Y1"
+    ],
+    [
+     "F12-X6",
+     "F12-Y5"
+    ],
+    [
+     "F12-X6",
+     "F12-Y10"
+    ],
+    [
+     "F12-X6",
+     "F12-Y11"
+    ],
+    [
+     "F12-X7",
+     "F12-Y0"
+    ],
+    [
+     "F12-X7",
+     "F12-Y1"
+    ],
+    [
+     "F12-X7",
+     "F12-Y5"
+    ],
+    [
+     "F12-X8",
+     "F12-Y8"
+    ],
+    [
+     "F12-X8",
+     "F12-Y9"
+    ],
+    [
+     "F12-X8",
+     "F12-Y10"
+    ],
+    [
+     "F12-X9",
+     "F12-Y0"
+    ],
+    [
+     "F12-X9",
+     "F12-Y1"
+    ],
+    [
+     "F12-X9",
+     "F12-Y9"
+    ],
+    [
+     "F12-X9",
+     "F12-Y10"
+    ],
+    [
+     "F12-X9",
+     "F12-Y11"
+    ],
+    [
+     "F12-X10",
+     "F12-Y7"
+    ],
+    [
+     "F12-X10",
+     "F12-Y8"
+    ],
+    [
+     "F12-X10",
+     "F12-Y9"
+    ],
+    [
+     "F12-X11",
+     "F12-Y7"
+    ],
+    [
+     "F12-X11",
+     "F12-Y8"
+    ],
+    [
+     "F12-X11",
+     "F12-Y9"
+    ],
+    [
+     "F12-X12",
+     "F12-Y13"
+    ],
+    [
+     "F12-X13",
+     "F12-Y2"
+    ],
+    [
+     "F12-X13",
+     "F12-Y3"
+    ],
+    [
+     "F12-X13",
+     "F12-Y5"
+    ],
+    [
+     "F12-X13",
+     "F12-Y13"
+    ],
+    [
+     "F12-X14",
+     "F12-Y2"
+    ]
+   ]
+  },
+  {
+   "file_token": "F13",
+   "lang": ".f",
+   "listX": [
+    {
+     "id": "F13-X0",
+     "text": "[L43-L50] (MED/collective-input-error) Root reads interactive input without EOF or conversion-error handling before broadcasting, so input failure can terminate root while peers wait in the collective."
+    },
+    {
+     "id": "F13-X1",
+     "text": "[L59-L62] (LOW/integer-overflow) Unbounded positive input permits a DO-loop terminal increment beyond the default-integer range for sufficiently large n."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F13-Y0",
+     "text": "[L46-L50] (MED/input-error-handling) The root's formatted input has no IOSTAT or end/error branch, so EOF or malformed input terminates that process while other ranks can remain waiting in MPI_BCAST."
+    },
+    {
+     "id": "F13-Y1",
+     "text": "[L59-L62] (MED/integer-overflow) An interval count near the default integer limit can overflow the DO iteration count or final induction-variable increment."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F13-X0",
+     "F13-Y0"
+    ],
+    [
+     "F13-X1",
+     "F13-Y1"
+    ]
+   ]
+  },
+  {
+   "file_token": "F14",
+   "lang": ".py",
+   "listX": [
+    {
+     "id": "F14-X0",
+     "text": "[L38-L41] (HIGH/shell-command-construction) Executable paths, credentials, and transfer paths are interpolated unquoted into a shell command, so spaces or shell metacharacters can corrupt arguments or execute unintended commands."
+    },
+    {
+     "id": "F14-X1",
+     "text": "[L40-L41] (HIGH/upload-failure-propagation) The upload subprocess return code is ignored and both output streams are discarded, allowing failed binary transfers to be reported as finished and listed in the published index."
+    },
+    {
+     "id": "F14-X2",
+     "text": "[L40] (MED/host-authentication) Piping an unconditional yes to pscp accepts an unverified host-key prompt instead of requiring a known server identity."
+    },
+    {
+     "id": "F14-X3",
+     "text": "[L40,L154] (MED/credential-handling) The password is supplied through process arguments and embedded in the shell command line, exposing it to command-line inspection."
+    },
+    {
+     "id": "F14-X4",
+     "text": "[L24-L26,L40] (MED/ignored-configuration) connect stores the requested port but put never passes it to pscp, so nondefault SSH ports are ignored."
+    },
+    {
+     "id": "F14-X5",
+     "text": "[L119-L125] (MED/archive-layout) Every archive entry uses only fname, flattening nested directories and creating duplicate names or breaking relative-path dependencies."
+    },
+    {
+     "id": "F14-X6",
+     "text": "[L68,L81,L90-L96] (MED/publication-completeness) Missing configuration directories are silently skipped and the download index is still replaced, so incomplete or entirely absent build outputs can publish an incomplete or empty release page."
+    },
+    {
+     "id": "F14-X7",
+     "text": "[L37-L41,L44-L45] (LOW/resource-lifecycle) Each upload opens a devnull stream without explicitly closing it, relying on interpreter cleanup rather than the client's no-op close method."
+    },
+    {
+     "id": "F14-X8",
+     "text": "[L77] (LOW/path-contract) The binary destination is built by concatenating targetdir and 'bin/' without requiring or adding a trailing separator."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F14-Y0",
+     "text": "[L40-L41] (MED/shell-quoting) Unquoted interpolation of executable paths, credentials and transfer paths into a shell command breaks on spaces or shell metacharacters."
+    },
+    {
+     "id": "F14-Y1",
+     "text": "[L40] (MED/host-verification) The unconditional yes piped into pscp accepts an initial host-key prompt without identity verification."
+    },
+    {
+     "id": "F14-Y2",
+     "text": "[L40,L154] (MED/credential-handling) Passwords are conveyed in process command-line arguments for both the distribution script and pscp."
+    },
+    {
+     "id": "F14-Y3",
+     "text": "[L37-L41,L77-L83,L96] (MED/error-handling) Discarded transfer status and diagnostics allow failed uploads to appear successful and leave the published index pointing at absent artifacts."
+    },
+    {
+     "id": "F14-Y4",
+     "text": "[L24-L28,L40] (MED/ignored-argument) The connection port is stored but never supplied to pscp, so a nondefault port is silently ignored."
+    },
+    {
+     "id": "F14-Y5",
+     "text": "[L121-L125] (MED/archive-layout) Every archived file uses only its basename, flattening subdirectories and permitting duplicate member names that lose the original directory structure."
+    },
+    {
+     "id": "F14-Y6",
+     "text": "[L68,L85-L96] (LOW/empty-input) Missing configuration directories are silently skipped and an empty index is still uploaded when none exist."
+    },
+    {
+     "id": "F14-Y7",
+     "text": "[L37-L45] (LOW/resource-lifetime) Each put opens a null-output file without an explicit close, while the client close method does nothing."
+    },
+    {
+     "id": "F14-Y8",
+     "text": "[L123-L124] (LOW/archive-contract) The advertised entire-directory archive excludes every ZIP file, including ZIP resources unrelated to the generated output archive."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F14-X0",
+     "F14-Y0"
+    ],
+    [
+     "F14-X0",
+     "F14-Y1"
+    ],
+    [
+     "F14-X0",
+     "F14-Y2"
+    ],
+    [
+     "F14-X0",
+     "F14-Y3"
+    ],
+    [
+     "F14-X0",
+     "F14-Y4"
+    ],
+    [
+     "F14-X0",
+     "F14-Y7"
+    ],
+    [
+     "F14-X1",
+     "F14-Y0"
+    ],
+    [
+     "F14-X1",
+     "F14-Y1"
+    ],
+    [
+     "F14-X1",
+     "F14-Y2"
+    ],
+    [
+     "F14-X1",
+     "F14-Y3"
+    ],
+    [
+     "F14-X1",
+     "F14-Y4"
+    ],
+    [
+     "F14-X1",
+     "F14-Y7"
+    ],
+    [
+     "F14-X2",
+     "F14-Y0"
+    ],
+    [
+     "F14-X2",
+     "F14-Y1"
+    ],
+    [
+     "F14-X2",
+     "F14-Y2"
+    ],
+    [
+     "F14-X2",
+     "F14-Y3"
+    ],
+    [
+     "F14-X2",
+     "F14-Y4"
+    ],
+    [
+     "F14-X2",
+     "F14-Y7"
+    ],
+    [
+     "F14-X3",
+     "F14-Y0"
+    ],
+    [
+     "F14-X3",
+     "F14-Y1"
+    ],
+    [
+     "F14-X3",
+     "F14-Y2"
+    ],
+    [
+     "F14-X3",
+     "F14-Y3"
+    ],
+    [
+     "F14-X3",
+     "F14-Y4"
+    ],
+    [
+     "F14-X3",
+     "F14-Y7"
+    ],
+    [
+     "F14-X4",
+     "F14-Y0"
+    ],
+    [
+     "F14-X4",
+     "F14-Y1"
+    ],
+    [
+     "F14-X4",
+     "F14-Y2"
+    ],
+    [
+     "F14-X4",
+     "F14-Y3"
+    ],
+    [
+     "F14-X4",
+     "F14-Y4"
+    ],
+    [
+     "F14-X4",
+     "F14-Y7"
+    ],
+    [
+     "F14-X5",
+     "F14-Y5"
+    ],
+    [
+     "F14-X5",
+     "F14-Y8"
+    ],
+    [
+     "F14-X6",
+     "F14-Y3"
+    ],
+    [
+     "F14-X6",
+     "F14-Y6"
+    ],
+    [
+     "F14-X7",
+     "F14-Y0"
+    ],
+    [
+     "F14-X7",
+     "F14-Y1"
+    ],
+    [
+     "F14-X7",
+     "F14-Y2"
+    ],
+    [
+     "F14-X7",
+     "F14-Y3"
+    ],
+    [
+     "F14-X7",
+     "F14-Y4"
+    ],
+    [
+     "F14-X7",
+     "F14-Y7"
+    ],
+    [
+     "F14-X8",
+     "F14-Y3"
+    ]
+   ]
+  },
+  {
+   "file_token": "F15",
+   "lang": ".f90",
+   "listX": [],
+   "listY": [],
+   "candidate_pairs": []
+  },
+  {
+   "file_token": "F16",
+   "lang": ".h",
+   "listX": [
+    {
+     "id": "F16-X0",
+     "text": "[L23-L24] (LOW/macro-precedence) CLOG_UUID_SIZE expands to an unparenthesized sum, so multiplication or division involving the macro can compute the wrong size."
+    },
+    {
+     "id": "F16-X1",
+     "text": "[L27,L41] (LOW/buffer-contract) CLOG_Uuid_sprint accepts no destination capacity and does not explicitly state that callers must provide CLOG_UUID_STR_SIZE bytes."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F16-Y0",
+     "text": "[L23-L24] (LOW/macro-precedence) CLOG_UUID_SIZE expands to an unparenthesized sum, so expressions multiplying or dividing by this public size macro evaluate incorrectly."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F16-X0",
+     "F16-Y0"
+    ],
+    [
+     "F16-X1",
+     "F16-Y0"
+    ]
+   ]
+  },
+  {
+   "file_token": "F17",
+   "lang": ".h",
+   "listX": [
+    {
+     "id": "F17-X0",
+     "text": "[L494-L500,L508] (MED/dll-interop) MPIFCMB6 containing MPI_ERRCODES_IGNORE lacks the DLLIMPORT directive supplied for every other sentinel common block, risking a separate local sentinel address or unresolved import in Windows Fortran clients."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F17-Y0",
+     "text": "[L494-L500,L508] (MED/dll-sentinel-linkage) MPIFCMB6 containing MPI_ERRCODES_IGNORE lacks the DLLIMPORT directive applied to the other sentinel common blocks, potentially preventing recognition of the shared-library sentinel."
+    },
+    {
+     "id": "F17-Y1",
+     "text": "[L306-L308,L479,L494-L510] (LOW/abi-contract) Kind values, eight-byte integer syntax, DLL imports and common-block padding are compiler-specific with no local guard against an incompatible Fortran compiler or static-library configuration."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F17-X0",
+     "F17-Y0"
+    ],
+    [
+     "F17-X0",
+     "F17-Y1"
+    ]
+   ]
+  },
+  {
+   "file_token": "F18",
+   "lang": ".py",
+   "listX": [
+    {
+     "id": "F18-X0",
+     "text": "[L14-L27] (MED/input-contract) Glob results are parsed using a raw prefix replacement and fixed path positions without validating the platform/configuration layout or supported configuration names."
+    },
+    {
+     "id": "F18-X1",
+     "text": "[L20-L33] (MED/artifact-collision) Multiple ZIP files in one platform/configuration directory receive the same destination name and overwrite each other."
+    },
+    {
+     "id": "F18-X2",
+     "text": "[L55-L58] (MED/shell-quoting) Paths, credentials and destination are concatenated unquoted into a shell command, so spaces or shell metacharacters can alter command interpretation."
+    },
+    {
+     "id": "F18-X3",
+     "text": "[L55] (MED/host-verification) Piping an unconditional yes into pscp accepts an initial host-key prompt without verifying the remote host identity."
+    },
+    {
+     "id": "F18-X4",
+     "text": "[L55,L68] (MED/credential-handling) The password is passed through command-line arguments to both the script and pscp, exposing it to process-command-line inspection."
+    },
+    {
+     "id": "F18-X5",
+     "text": "[L52-L58] (MED/error-handling) Transfer output and exit status are discarded, allowing failed uploads to be reported as finished and an index to be published for missing artifacts."
+    },
+    {
+     "id": "F18-X6",
+     "text": "[L14-L15,L37-L46] (LOW/empty-input) An empty artifact glob still publishes an empty download index without reporting that no binaries were found."
+    },
+    {
+     "id": "F18-X7",
+     "text": "[L52-L58] (LOW/resource-lifetime) Each transfer opens a null-output file without explicitly closing it."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F18-Y0",
+     "text": "[L55-L58] (HIGH/shell-command-construction) Paths, username, and password are concatenated unquoted into a shell command, so spaces or metacharacters can change transfer arguments or execute unintended commands."
+    },
+    {
+     "id": "F18-Y1",
+     "text": "[L29,L35,L46,L58] (HIGH/upload-failure-propagation) Transfer return codes are ignored and diagnostics discarded, allowing failed uploads to produce success messages and a download index containing unavailable binaries."
+    },
+    {
+     "id": "F18-Y2",
+     "text": "[L55] (MED/host-authentication) An unconditional yes is piped to pscp, accepting an unverified host-key prompt without establishing the intended server identity."
+    },
+    {
+     "id": "F18-Y3",
+     "text": "[L55,L68] (MED/credential-handling) The password is carried in process arguments and the generated shell command line, exposing it to command-line inspection."
+    },
+    {
+     "id": "F18-Y4",
+     "text": "[L14,L21-L24] (MED/path-parsing) Discovery and path splitting assume bindir ends with a separator, so a normal directory argument without that suffix can shift platform and configuration fields or match sibling prefixes."
+    },
+    {
+     "id": "F18-Y5",
+     "text": "[L14-L15,L20-L29] (MED/artifact-identity) Every zip in a configuration directory is uploaded under the same revision-derived name without checking its provenance, so stale or multiple archives can overwrite the intended release."
+    },
+    {
+     "id": "F18-Y6",
+     "text": "[L14-L15,L19-L20,L40-L46] (MED/publication-completeness) An empty glob result still replaces the download page with an empty list and reports copying complete."
+    },
+    {
+     "id": "F18-Y7",
+     "text": "[L60-L78] (MED/import-side-effects) Argument parsing and distribution run unconditionally at module import, so importing the helper can raise an argument error or trigger publication."
+    },
+    {
+     "id": "F18-Y8",
+     "text": "[L57] (LOW/output-escaping) The source path is interpolated into a TeamCity message without escaping service-message delimiters or line breaks."
+    },
+    {
+     "id": "F18-Y9",
+     "text": "[L52-L58] (LOW/resource-lifecycle) The devnull stream opened for each transfer is never explicitly closed."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F18-X0",
+     "F18-Y1"
+    ],
+    [
+     "F18-X0",
+     "F18-Y4"
+    ],
+    [
+     "F18-X0",
+     "F18-Y5"
+    ],
+    [
+     "F18-X0",
+     "F18-Y6"
+    ],
+    [
+     "F18-X1",
+     "F18-Y1"
+    ],
+    [
+     "F18-X1",
+     "F18-Y4"
+    ],
+    [
+     "F18-X1",
+     "F18-Y5"
+    ],
+    [
+     "F18-X1",
+     "F18-Y6"
+    ],
+    [
+     "F18-X2",
+     "F18-Y0"
+    ],
+    [
+     "F18-X2",
+     "F18-Y1"
+    ],
+    [
+     "F18-X2",
+     "F18-Y2"
+    ],
+    [
+     "F18-X2",
+     "F18-Y3"
+    ],
+    [
+     "F18-X2",
+     "F18-Y7"
+    ],
+    [
+     "F18-X2",
+     "F18-Y8"
+    ],
+    [
+     "F18-X2",
+     "F18-Y9"
+    ],
+    [
+     "F18-X3",
+     "F18-Y0"
+    ],
+    [
+     "F18-X3",
+     "F18-Y1"
+    ],
+    [
+     "F18-X3",
+     "F18-Y2"
+    ],
+    [
+     "F18-X3",
+     "F18-Y3"
+    ],
+    [
+     "F18-X3",
+     "F18-Y7"
+    ],
+    [
+     "F18-X3",
+     "F18-Y8"
+    ],
+    [
+     "F18-X3",
+     "F18-Y9"
+    ],
+    [
+     "F18-X4",
+     "F18-Y0"
+    ],
+    [
+     "F18-X4",
+     "F18-Y1"
+    ],
+    [
+     "F18-X4",
+     "F18-Y2"
+    ],
+    [
+     "F18-X4",
+     "F18-Y3"
+    ],
+    [
+     "F18-X4",
+     "F18-Y7"
+    ],
+    [
+     "F18-X4",
+     "F18-Y8"
+    ],
+    [
+     "F18-X4",
+     "F18-Y9"
+    ],
+    [
+     "F18-X5",
+     "F18-Y0"
+    ],
+    [
+     "F18-X5",
+     "F18-Y1"
+    ],
+    [
+     "F18-X5",
+     "F18-Y2"
+    ],
+    [
+     "F18-X5",
+     "F18-Y3"
+    ],
+    [
+     "F18-X5",
+     "F18-Y6"
+    ],
+    [
+     "F18-X5",
+     "F18-Y7"
+    ],
+    [
+     "F18-X5",
+     "F18-Y8"
+    ],
+    [
+     "F18-X5",
+     "F18-Y9"
+    ],
+    [
+     "F18-X6",
+     "F18-Y1"
+    ],
+    [
+     "F18-X6",
+     "F18-Y4"
+    ],
+    [
+     "F18-X6",
+     "F18-Y5"
+    ],
+    [
+     "F18-X6",
+     "F18-Y6"
+    ],
+    [
+     "F18-X6",
+     "F18-Y9"
+    ],
+    [
+     "F18-X7",
+     "F18-Y0"
+    ],
+    [
+     "F18-X7",
+     "F18-Y1"
+    ],
+    [
+     "F18-X7",
+     "F18-Y2"
+    ],
+    [
+     "F18-X7",
+     "F18-Y3"
+    ],
+    [
+     "F18-X7",
+     "F18-Y6"
+    ],
+    [
+     "F18-X7",
+     "F18-Y7"
+    ],
+    [
+     "F18-X7",
+     "F18-Y8"
+    ],
+    [
+     "F18-X7",
+     "F18-Y9"
+    ]
+   ]
+  },
+  {
+   "file_token": "F19",
+   "lang": ".f",
+   "listX": [
+    {
+     "id": "F19-X0",
+     "text": "[L51,L60-L64,L143] (LOW/initialization-contract) The example uses logging without MPE_Init_log or MPE_Finish_log and does not state that it requires an MPI profiling wrapper to initialize and flush logging."
+    },
+    {
+     "id": "F19-X1",
+     "text": "[L60-L64,L71-L80,L102-L128] (LOW/error-propagation) MPE return codes are repeatedly overwritten without checks, so logging failures can leave undefined event IDs or missing output while numerical execution appears successful."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F19-Y0",
+     "text": "[L51,L60-L64,L143] (LOW/linkage-contract) MPE logging calls rely on an MPI profiling library to initialize and finish logging, but this file neither performs those calls explicitly nor states that link requirement."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F19-X0",
+     "F19-Y0"
+    ],
+    [
+     "F19-X1",
+     "F19-Y0"
+    ]
+   ]
+  },
+  {
+   "file_token": "F20",
+   "lang": ".c",
+   "listX": [
+    {
+     "id": "F20-X0",
+     "text": "[L44,L53-L68,L88-L115,L117-L121] (LOW/error-propagation) All MPE status returns are ignored, so event-ID allocation or log-writing failures can remain invisible while the example reports successful numerical output."
+    },
+    {
+     "id": "F20-X1",
+     "text": "[L118-L119] (LOW/argument-validation) The filename fallback checks argv but not argc or argv[0], allowing a null filename when the argument vector is present but empty."
+    }
+   ],
+   "listY": [],
+   "candidate_pairs": []
+  },
+  {
+   "file_token": "F21",
+   "lang": ".f90",
+   "listX": [
+    {
+     "id": "F21-X0",
+     "text": "[L104-L107,L144-L147,L187-L190,L231-L234,L274-L277,L314-L317] (HIGH/buffer-capacity) Numeric array getters pass buffers to F77 routines that receive no capacity without first checking attribute length, allowing an oversized attribute to overwrite caller or temporary storage."
+    },
+    {
+     "id": "F21-X1",
+     "text": "[L116-L118,L156-L158,L199-L202,L243-L246,L286-L288,L326-L328] (HIGH/scalar-buffer-overflow) Scalar getters read an entire attribute into a one-element temporary without verifying that the attribute contains exactly one element."
+    },
+    {
+     "id": "F21-X2",
+     "text": "[L211,L220-L222] (MED/integer-narrowing) Eight-byte integer writes narrow values to default integer before netCDF can range-check them, allowing out-of-range values to be silently corrupted."
+    },
+    {
+     "id": "F21-X3",
+     "text": "[L231-L246] (MED/integer-range) Eight-byte integer getters first convert through default-integer temporaries, unnecessarily limiting the range that the wider destination can receive."
+    },
+    {
+     "id": "F21-X4",
+     "text": "[L117-L118,L157-L158,L189-L190,L201-L202,L233-L234,L245-L246,L287-L288,L327-L328] (MED/uninitialized-copy) Getters copy temporary outputs regardless of read status and copy full temporary arrays even when the attribute is shorter, propagating undefined values on errors or unwritten elements."
+    },
+    {
+     "id": "F21-X5",
+     "text": "[L49-L53] (MED/inquiry-error-handling) Attribute inquiry overwrites the attnum lookup status and copies local type and length outputs even when their inquiry fails."
+    },
+    {
+     "id": "F21-X6",
+     "text": "[L66] (LOW/text-roundtrip-contract) Text attribute writes strip trailing spaces, preventing exact round trips for strings whose trailing blanks are meaningful."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F21-Y0",
+     "text": "[L107,L117,L147,L157,L189,L201,L233,L245,L277,L287,L317,L327] (HIGH/buffer-bounds) Numeric getters pass buffers to legacy routines without checking attribute length, so an attribute longer than the supplied array or scalar temporary can overwrite memory."
+    },
+    {
+     "id": "F21-Y1",
+     "text": "[L211,L220-L222] (MED/numeric-conversion) Eight-byte integer setters narrow values to default integer before the library can report range errors, allowing out-of-range values to be silently corrupted."
+    },
+    {
+     "id": "F21-Y2",
+     "text": "[L49-L51] (LOW/error-propagation) The attribute-ID lookup status is unconditionally overwritten by the subsequent attribute inquiry, obscuring any distinct failure of the requested attnum lookup."
+    },
+    {
+     "id": "F21-Y3",
+     "text": "[L52-L53,L117-L118,L157-L158,L189-L190,L201-L202,L233-L234,L245-L246,L287-L288,L327-L328] (MED/undefined-value) Inquiry and getter wrappers copy uninitialized local outputs after failed calls, and integer array getters also copy undefined tail elements when the destination exceeds the attribute length."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F21-X0",
+     "F21-Y0"
+    ],
+    [
+     "F21-X0",
+     "F21-Y3"
+    ],
+    [
+     "F21-X1",
+     "F21-Y0"
+    ],
+    [
+     "F21-X1",
+     "F21-Y3"
+    ],
+    [
+     "F21-X2",
+     "F21-Y1"
+    ],
+    [
+     "F21-X3",
+     "F21-Y0"
+    ],
+    [
+     "F21-X3",
+     "F21-Y1"
+    ],
+    [
+     "F21-X3",
+     "F21-Y3"
+    ],
+    [
+     "F21-X4",
+     "F21-Y0"
+    ],
+    [
+     "F21-X4",
+     "F21-Y3"
+    ],
+    [
+     "F21-X5",
+     "F21-Y2"
+    ],
+    [
+     "F21-X5",
+     "F21-Y3"
+    ]
+   ]
+  },
+  {
+   "file_token": "F22",
+   "lang": ".h",
+   "listX": [
+    {
+     "id": "F22-X0",
+     "text": "[L409,L1471,L1904] (MED/attribute-copy) NULL_COPY_FN sets flag=true without initializing attr_out, falsely reporting an attribute copy and potentially propagating an indeterminate attribute pointer."
+    },
+    {
+     "id": "F22-X1",
+     "text": "[L2414-L2424] (HIGH/array-bounds) Cartcomm::Sub always reads ten retain-dimension flags and allocates ten integers regardless of topology dimension, reading beyond ordinary short input arrays and undersizing the buffer for higher-dimensional topologies."
+    },
+    {
+     "id": "F22-X2",
+     "text": "[L1369-L1385,L1516,L1545-L1548] (HIGH/intercommunicator-size) Alltoallw sizes and copies datatype arrays using local Get_size although an intercommunicator requires remote-group lengths, causing out-of-bounds accesses when group sizes differ."
+    },
+    {
+     "id": "F22-X3",
+     "text": "[L1369-L1385] (MED/ignored-argument-access) Alltoallw dereferences the send-datatype array even for an in-place intracommunicator call where send arguments are ignored."
+    },
+    {
+     "id": "F22-X4",
+     "text": "[L1690-L1716] (MED/collective-root-contract) Spawn_multiple reads array_of_info on every rank even though those inputs are only significant on root, so valid nonroot placeholder arguments can be dereferenced."
+    },
+    {
+     "id": "F22-X5",
+     "text": "[L827-L851,L935-L959] (MED/uninitialized-copy) Waitsome and Testsome copy incount status records instead of the returned outcount, reading temporary entries that MPI did not initialize."
+    },
+    {
+     "id": "F22-X6",
+     "text": "[L879-L905] (MED/uninitialized-copy) Testall copies temporary statuses even when the completion flag is false and MPI leaves those statuses undefined."
+    },
+    {
+     "id": "F22-X7",
+     "text": "[L323-L330,L2382-L2394] (MED/output-count) Datatype::Get_contents and Cartcomm::Get_topo copy the requested maximum count rather than the actual returned datatype or topology count, potentially reading uninitialized temporary entries."
+    },
+    {
+     "id": "F22-X8",
+     "text": "[L236-L244,L790-L803,L830-L851,L1371-L1387,L1692-L1702] (MED/exception-safety) Raw temporary arrays are deleted only after MPI calls and error-handler dispatch, so exceptions from allocation or MPI error handlers leak earlier allocations."
+    },
+    {
+     "id": "F22-X9",
+     "text": "[L993-L1004,L1037-L1043] (MED/request-state-on-error) Throwing from multi-request completion error handling occurs before updated handles and statuses are copied back, leaving caller requests stale after partial completion."
+    },
+    {
+     "id": "F22-X10",
+     "text": "[L249-L253,L1185-L1189,L2018-L2022] (MED/error-return-contract) Scalar wrappers return uninitialized output locals if the MPI call fails and the configured error handler returns normally."
+    },
+    {
+     "id": "F22-X11",
+     "text": "[L1568-L1579,L1659-L1670,L2329-L2340,L2444-L2455] (MED/clone-error-handling) Clone methods ignore MPI_Comm_dup status and construct objects from an uninitialized ncomm on a returned error, unlike the checked Dup methods."
+    },
+    {
+     "id": "F22-X12",
+     "text": "[L1758-L1761] (LOW/binding-signature) Grequest::Start is declared as an instance method rather than a static factory, preventing the expected class-qualified creation call."
+    },
+    {
+     "id": "F22-X13",
+     "text": "[L703-L711,L2540-L2553] (LOW/const-interface) Op query and local-reduction methods are non-const even though predefined operations are declared const, preventing direct calls on those objects."
+    },
+    {
+     "id": "F22-X14",
+     "text": "[L27-L40,L2716] (LOW/macro-hygiene) MPIR_ARGUNUSED is never undefined despite the comment promising its removal at the end of the header."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F22-Y0",
+     "text": "[L409,L1471,L1904] (HIGH/callback-contract) NULL_COPY_FN sets flag=true without initializing attr_out, advertising a successful attribute copy with an undefined output pointer."
+    },
+    {
+     "id": "F22-Y1",
+     "text": "[L2414-L2424] (HIGH/buffer-bounds) Cartcomm::Sub always copies ten remain-dimension flags, reading past shorter valid inputs and supplying an undersized temporary for topologies with more than ten dimensions."
+    },
+    {
+     "id": "F22-Y2",
+     "text": "[L1369-L1385,L1545-L1549] (HIGH/collective-buffer-sizing) Alltoallw sizes and copies datatype arrays using local Get_size even on an Intercomm, although unequal remote-group sizes require different array lengths."
+    },
+    {
+     "id": "F22-Y3",
+     "text": "[L1373-L1377,L1385] (MED/ignored-argument-access) Alltoallw dereferences the send-datatype array before MPI can ignore it for an in-place operation, so an otherwise valid ignored null argument can fail in the wrapper."
+    },
+    {
+     "id": "F22-Y4",
+     "text": "[L1690-L1716] (MED/collective-root-contract) Spawn_multiple copies array_of_info on every rank even though spawn inputs are only significant at the root, potentially dereferencing ignored arguments on nonroot ranks."
+    },
+    {
+     "id": "F22-Y5",
+     "text": "[L323-L330,L827-L851,L879-L903,L935-L959,L2382-L2394] (MED/undefined-value) Temporary-output copy loops use supplied capacities rather than actual result counts or completion flags, reading uninitialized datatype, status, or topology entries on valid partial-result calls."
+    },
+    {
+     "id": "F22-Y6",
+     "text": "[L236-L244,L790-L803,L985-L1006,L1371-L1387,L1692-L1702] (MED/exception-safety) Raw temporary arrays are freed and modified request handles copied back only after error-handler calls, so a thrown MPI exception leaks allocations and can leave caller request handles stale."
+    },
+    {
+     "id": "F22-Y7",
+     "text": "[L84-L89,L249-L253,L478-L494,L1185-L1189,L2018-L2022] (MED/error-path-undefined-value) Scalar-returning wrappers return uninitialized output locals if the invoked error handler returns after an MPI failure."
+    },
+    {
+     "id": "F22-Y8",
+     "text": "[L1568-L1578,L1659-L1669,L2329-L2339,L2444-L2454] (MED/error-propagation) Clone ignores MPI_Comm_dup status and constructs a communicator from potentially uninitialized ncomm instead of applying the error-handling path used by Dup."
+    },
+    {
+     "id": "F22-Y9",
+     "text": "[L1758-L1761] (MED/api-contract) Grequest::Start is declared as an instance member, preventing the class-level factory invocation expected from a request-creation operation."
+    },
+    {
+     "id": "F22-Y10",
+     "text": "[L28-L32,L36-L39,L2716] (LOW/preprocessor-hygiene) MPIR_ARGUNUSED is documented as removed at the end of the header but remains defined after the namespace closes."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F22-X0",
+     "F22-Y0"
+    ],
+    [
+     "F22-X1",
+     "F22-Y1"
+    ],
+    [
+     "F22-X2",
+     "F22-Y2"
+    ],
+    [
+     "F22-X2",
+     "F22-Y3"
+    ],
+    [
+     "F22-X2",
+     "F22-Y6"
+    ],
+    [
+     "F22-X3",
+     "F22-Y2"
+    ],
+    [
+     "F22-X3",
+     "F22-Y3"
+    ],
+    [
+     "F22-X3",
+     "F22-Y6"
+    ],
+    [
+     "F22-X4",
+     "F22-Y4"
+    ],
+    [
+     "F22-X4",
+     "F22-Y6"
+    ],
+    [
+     "F22-X5",
+     "F22-Y5"
+    ],
+    [
+     "F22-X6",
+     "F22-Y5"
+    ],
+    [
+     "F22-X7",
+     "F22-Y5"
+    ],
+    [
+     "F22-X8",
+     "F22-Y2"
+    ],
+    [
+     "F22-X8",
+     "F22-Y3"
+    ],
+    [
+     "F22-X8",
+     "F22-Y4"
+    ],
+    [
+     "F22-X8",
+     "F22-Y5"
+    ],
+    [
+     "F22-X8",
+     "F22-Y6"
+    ],
+    [
+     "F22-X8",
+     "F22-Y7"
+    ],
+    [
+     "F22-X9",
+     "F22-Y6"
+    ],
+    [
+     "F22-X10",
+     "F22-Y6"
+    ],
+    [
+     "F22-X10",
+     "F22-Y7"
+    ],
+    [
+     "F22-X11",
+     "F22-Y8"
+    ],
+    [
+     "F22-X12",
+     "F22-Y9"
+    ],
+    [
+     "F22-X14",
+     "F22-Y10"
+    ]
+   ]
+  },
+  {
+   "file_token": "F23",
+   "lang": ".h",
+   "listX": [
+    {
+     "id": "F23-X0",
+     "text": "[L43-L50] (LOW/buffer-contract) Fortran logging and packing declarations provide neither argument interfaces nor a buffer-size constant, leaving callers without a local specification of the required byte-buffer storage."
+    }
+   ],
+   "listY": [],
+   "candidate_pairs": []
+  },
+  {
+   "file_token": "F24",
+   "lang": ".f90",
+   "listX": [],
+   "listY": [
+    {
+     "id": "F24-Y0",
+     "text": "[L25] (LOW/documentation-contract) The claim that attribute external and internal types are identical omits the eight-byte integer setters' conversion to nf90_int in the included attribute implementation."
+    }
+   ],
+   "candidate_pairs": []
+  },
+  {
+   "file_token": "F25",
+   "lang": ".h",
+   "listX": [
+    {
+     "id": "F25-X0",
+     "text": "[L120-L127] (LOW/header-dependency) The CLOG_IMPL interface uses FILE without including stdio.h, making compilation depend on an undocumented prior include."
+    },
+    {
+     "id": "F25-X1",
+     "text": "[L77-L79,L105-L116] (LOW/pointer-lifetime-contract) APIs return pointers to communicator-ID records while the exposed set contains a growable table, but no lifetime or invalidation rule is stated for those returned pointers."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F25-Y0",
+     "text": "[L77-L79,L105-L116] (LOW/pointer-lifetime-contract) Functions return pointers to communicator ID records without documenting whether adding or merging communicators can invalidate those pointers."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F25-X0",
+     "F25-Y0"
+    ],
+    [
+     "F25-X1",
+     "F25-Y0"
+    ]
+   ]
+  },
+  {
+   "file_token": "F26",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F26-X0",
+     "text": "[L19-L20] (LOW/numerical-boundary) Relative depth multiplies the dispersion result by zero at the included zero-depth boundary without the explicit NaN treatment used for the velocity ratio."
+    },
+    {
+     "id": "F26-X1",
+     "text": "[L135-L136,L233-L234] (LOW/output-consistency) Three-panel figures use different aspect ratios for PNG and EPS exports."
+    },
+    {
+     "id": "F26-X2",
+     "text": "[L151-L152,L249-L250] (MED/graphics-contract) Combined plots select exactly four patches by child order without validating their count or associated contour levels."
+    },
+    {
+     "id": "F26-X3",
+     "text": "[L287-L298] (MED/graphics-portability) Contour reconstruction assumes contour objects expose patch children with scalar FaceVertexCData, making the helper dependent on a particular graphics-object representation."
+    },
+    {
+     "id": "F26-X4",
+     "text": "[L300-L305] (MED/contour-mapping) Reordering patches by contour level alone collapses distinct same-level contours and uses unchecked zero indices when a level has no match."
+    },
+    {
+     "id": "F26-X5",
+     "text": "[L316-L322] (MED/polygon-topology) Removing NaN separators before creating a patch joins disconnected polygon segments and can fill regions that should remain separate."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F26-Y0",
+     "text": "[L287-L305] (MED/graphics-api-assumption) Contour extraction assumes contourf exposes patch children with scalar FaceVertexCData, so graphics implementations with different contour objects can leave the polygon arrays empty and make reindexing fail."
+    },
+    {
+     "id": "F26-Y1",
+     "text": "[L300-L305] (MED/contour-identity) Polygons are matched only by contour level, so multiple disconnected polygons at the same level reuse one matching patch and can lose or duplicate geometry."
+    },
+    {
+     "id": "F26-Y2",
+     "text": "[L301-L305] (MED/index-validation) The ismember result is used directly as an index without checking for zero, so any contour level absent from the extracted patch data causes invalid indexing."
+    },
+    {
+     "id": "F26-Y3",
+     "text": "[L316-L322] (MED/polygon-topology) Removing all NaN separators before creating one patch joins separate polygon rings and can fill regions or holes that the original contour kept separate."
+    },
+    {
+     "id": "F26-Y4",
+     "text": "[L151-L152,L249-L250] (MED/plot-selection-contract) Combined plots copy exactly four patches by child order rather than threshold identity, making the selected boundary regions depend on contour count and graphics stacking order."
+    },
+    {
+     "id": "F26-Y5",
+     "text": "[L135-L136,L233-L234] (LOW/export-consistency) Three-panel PNG exports use a 3:1 size while their EPS counterparts use 2:1, yielding inconsistent aspect ratios and layout across output formats."
+    },
+    {
+     "id": "F26-Y6",
+     "text": "[L41-L46,L59-L64,L87-L92] (MED/graphics-handle-portability) Line handles are assigned into arrays initialized as numeric empty arrays, which is incompatible with MATLAB graphics versions that return object handles."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F26-X1",
+     "F26-Y5"
+    ],
+    [
+     "F26-X2",
+     "F26-Y4"
+    ],
+    [
+     "F26-X3",
+     "F26-Y0"
+    ],
+    [
+     "F26-X3",
+     "F26-Y1"
+    ],
+    [
+     "F26-X3",
+     "F26-Y2"
+    ],
+    [
+     "F26-X4",
+     "F26-Y0"
+    ],
+    [
+     "F26-X4",
+     "F26-Y1"
+    ],
+    [
+     "F26-X4",
+     "F26-Y2"
+    ],
+    [
+     "F26-X5",
+     "F26-Y3"
+    ]
+   ]
+  },
+  {
+   "file_token": "F27",
+   "lang": ".m",
+   "listX": [
+    {
+     "id": "F27-X0",
+     "text": "[L21-L22] (HIGH/generated-script-data-loss) The generated batch file unconditionally moves the redirected .new file over the original even if findent fails or is unavailable, potentially replacing source with empty or partial output."
+    },
+    {
+     "id": "F27-X1",
+     "text": "[L21-L22] (MED/path-quoting) Generated redirection and move operands are unquoted, so source filenames containing spaces or shell metacharacters are parsed incorrectly."
+    },
+    {
+     "id": "F27-X2",
+     "text": "[L5,L9,L13,L19] (LOW/working-directory-contract) Input discovery and output location depend on the caller's current directory rather than the MATLAB function's location, allowing invocation elsewhere to generate an empty or misplaced batch file."
+    },
+    {
+     "id": "F27-X3",
+     "text": "[L19-L24] (LOW/io-error-handling) The script does not check fopen or fprintf results, so an unwritable destination or partial output is not handled explicitly."
+    }
+   ],
+   "listY": [
+    {
+     "id": "F27-Y0",
+     "text": "[L5-L15] (LOW/working-directory-contract) Source discovery depends on the caller's working directory without checking that the expected source directories exist."
+    },
+    {
+     "id": "F27-Y1",
+     "text": "[L19-L22] (LOW/io-error-handling) The output file handle is used without checking whether fopen succeeded."
+    },
+    {
+     "id": "F27-Y2",
+     "text": "[L21-L22] (MED/shell-quoting) Generated redirection and move commands do not quote filenames, so spaces or shell metacharacters in discovered filenames break the commands."
+    },
+    {
+     "id": "F27-Y3",
+     "text": "[L21-L22] (MED/destructive-error-handling) The generated batch script overwrites each original source with the temporary output even when findent fails or produces incomplete output."
+    }
+   ],
+   "candidate_pairs": [
+    [
+     "F27-X0",
+     "F27-Y0"
+    ],
+    [
+     "F27-X0",
+     "F27-Y1"
+    ],
+    [
+     "F27-X0",
+     "F27-Y2"
+    ],
+    [
+     "F27-X0",
+     "F27-Y3"
+    ],
+    [
+     "F27-X1",
+     "F27-Y0"
+    ],
+    [
+     "F27-X1",
+     "F27-Y1"
+    ],
+    [
+     "F27-X1",
+     "F27-Y2"
+    ],
+    [
+     "F27-X1",
+     "F27-Y3"
+    ],
+    [
+     "F27-X2",
+     "F27-Y0"
+    ],
+    [
+     "F27-X2",
+     "F27-Y1"
+    ],
+    [
+     "F27-X2",
+     "F27-Y2"
+    ],
+    [
+     "F27-X2",
+     "F27-Y3"
+    ],
+    [
+     "F27-X3",
+     "F27-Y0"
+    ],
+    [
+     "F27-X3",
+     "F27-Y1"
+    ],
+    [
+     "F27-X3",
+     "F27-Y2"
+    ],
+    [
+     "F27-X3",
+     "F27-Y3"
+    ]
+   ]
+  }
+ ]
+}

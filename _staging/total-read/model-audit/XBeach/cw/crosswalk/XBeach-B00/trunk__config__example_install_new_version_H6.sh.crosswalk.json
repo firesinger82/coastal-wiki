@@ -1,0 +1,133 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-B00",
+ "source_path": "trunk/config/example_install_new_version_H6.sh",
+ "source_sha256": "6b515043b4a1be2a72640b9ac6b4bdd332a9584f04055bbf01dfd4f0796d98eb",
+ "base_run_id": "xbeach-r1-XBeach-B00-gpt-5.6-luna-01a079a6-7103-7312-a441-5309a7d01425",
+ "audit_run_id": "xbeach-r2-XBeach-B00-gpt-5.6-luna-01a07a19-bf73-7b91-afe4-1b0868a2795d",
+ "base_record_file": "dfc04ab1ed087def1e2ee105b9745c4f6fe9f9890e6942925216069b41405cde.json",
+ "audit_record_file": "dfc04ab1ed087def1e2ee105b9745c4f6fe9f9890e6942925216069b41405cde.json",
+ "base_record_sha256_bytes": "0fa4735f52f07d84398c83dbb12b9185c4497b57f5e1cdbd09fd19a4d6db40bb",
+ "audit_record_sha256_bytes": "4dde00cc0bd5d94e05be21a931f656235aaa81157d26f4a1a32ca4635b8a2267",
+ "base_finding_count": 3,
+ "audit_finding_count": 6,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "[L41] (LOW/permissions) The generated module file is made mode 777, granting unnecessary write/execute permissions to all users."
+   ],
+   "audit_member_text": [
+    "[L41] (HIGH/shared-file-permissions) The installed environment module is made world-writable with chmod 777."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L22-L35] (MED/error-handling/reproducibility) The build, install, archive, and directory transitions have no failure checks or `set -e`, allowing a failed build or missing install directory to proceed to artifact publication."
+   ],
+   "audit_member_text": [
+    "[L12-L41] (HIGH/build-failure-propagation) Unchecked directory changes, module loads and build commands allow packaging and module publication to proceed after failure and mask the failed build."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The full H6 script has no status checks between its directory changes, dependency loads, autogen/configure/make/install, tar, module generation and final chmod (trunk/config/example_install_new_version_H6.sh:12-41). Sourcing /etc/profile could supply external errexit policy, but no repository caller or supplied profile guarantees it, and a child autogen failure cannot terminate an ordinary parent Bash; successful later publication/chmod can therefore mask an earlier failure.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "[L9-L12,L33,L37] (LOW/quoting/path-contract) Directory and environment-variable expansions are unquoted in `cd` and path construction, so a checkout path containing whitespace is not supported."
+   ],
+   "audit_member_text": [
+    "[L33-L39] (LOW/path-quoting) Workspace and project paths use partially unquoted expansions, so whitespace in the checkout path breaks packaging or module generation."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L26-L35] (MED/artifact-layout) Installation targets /opt/xbeach but archiving reads a workspace install directory that this script neither creates nor populates."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L28] (MED/scientific-compiler-semantics) Unconditional -ffast-math permits assumptions and arithmetic transformations that can invalidate NaN diagnostics and alter scientific results."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L39] (MED/environment-path-mismatch) The module uses teamcity-env.sh even though that file selects /opt/apps and gcc_12.2.0_openmpi_4.1.5_HEAD instead of this installation's /opt/xbeach and gcc_4.9.2_1.8.3_HEAD."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

@@ -1,0 +1,82 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-B01",
+ "source_path": "trunk/src/xbeachlibrary/build/distribute.bat",
+ "source_sha256": "8095e2951bae4a5e6f3d5e810a4f0a39bd8034cce8acd01ce8c881f87ec79648",
+ "base_run_id": "xbeach-r1-XBeach-B01-gpt-5.6-luna-01a079ab-98f6-7ba2-9380-3c78010a3f81",
+ "audit_run_id": "xbeach-r2-XBeach-B01-gpt-5.6-luna-01a07a20-9cee-7323-9aa4-758354e89851",
+ "base_record_file": "655a60c35146807e932dde727d52151e2cad60b6d992a89ffe3ef69a04d85dfa.json",
+ "audit_record_file": "655a60c35146807e932dde727d52151e2cad60b6d992a89ffe3ef69a04d85dfa.json",
+ "base_record_sha256_bytes": "d2ffeabbdf1eef25a3487839183b853a52d82d1ab09988d269f1015110e01656",
+ "audit_record_sha256_bytes": "835213e88f4d373bdfc7430bad6acd9ca5349755db1ffbe81bcfd29e683bb930",
+ "base_finding_count": 0,
+ "audit_finding_count": 3,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L17-L18,L28-L29] (MED/artifact-name-mismatch) Only classic DLL filenames are accepted, although IFX callers default to project names containing IFX and therefore may produce no matching distribution input."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L23-L29] (MED/destructive-staging) Both distributed DLLs are deleted before source existence or copy success is established, so missing inputs can erase previously usable artifacts without failing explicitly."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "confirmed_delta",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L6,L17-L18,L23-L29] (MED/build-order-coupling) Each library's post-build invocation republishes both libraries from fixed directories while ignoring TargetDir, allowing stale counterpart binaries or concurrent post-build interference."
+   ],
+   "representative": "audit",
+   "rationale": "span-confirmed: TargetDir is parsed but never used after quote removal, while SrcDir1 and SrcDir2 always designate the dynamic and BMI output directories. Each invocation conditionally copies both existing binaries without checking the counterpart's freshness or coordinating access to the shared destinations.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L28-L29",
+    "quote": "if exist \"%SrcDir1%\\xbeachlibrary_dynamic.dll\" copy \"%SrcDir1%\\xbeachlibrary_dynamic.dll\" \"%DstDir%\\XBeach.Library.dll\"\r\nif exist \"%SrcDir2%\\xbeachlibrary_bmi.dll\" copy \"%SrcDir2%\\xbeachlibrary_bmi.dll\" \"%DstDir%\\XBeach.BMI.dll\"",
+    "verified_at_lines": "L28-L29",
+    "source_sha256": "8095e2951bae4a5e6f3d5e810a4f0a39bd8034cce8acd01ce8c881f87ec79648"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Both dynamic and BMI projects invoke the same script, which deletes both published names and conditionally recopies both fixed source paths regardless of the supplied TargetDir. Their solution dependencies order each after the static library but impose no order between these two post-build events, so counterpart staleness during single-project builds and interference during simultaneous publication remain possible.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  }
+ ]
+}

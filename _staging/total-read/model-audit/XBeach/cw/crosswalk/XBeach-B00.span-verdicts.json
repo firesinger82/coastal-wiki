@@ -1,0 +1,115 @@
+{
+  "shard": "XBeach-B00",
+  "verdicts": [
+    {
+      "audit_id": "B0",
+      "source_path": "trunk/config/create-keys.sh",
+      "verdict": "CONFIRM",
+      "rationale": "Byte inspection shows CRLF on L1-L5: the interpreter name ends in a carriage return, and Bash passes rsa\\r at L3 and a carriage-return-suffixed hostname at L5. No conversion or stripping occurs in this script.",
+      "evidence_span": {
+        "lines": "L1-L5",
+        "quote": "#!/bin/bash\r\necho \"start\"\r\nssh-keygen -t rsa\r\necho \"key created\"\r\nssh-copy-id -i ~/.ssh/id_rsa.pub xbeach@$CLUSTER_HOSTNAME\r\n"
+      }
+    },
+    {
+      "audit_id": "B2",
+      "source_path": "trunk/config/create-keys.sh",
+      "verdict": "REFUTE",
+      "rationale": "In the actual file, L3 passes rsa followed by a literal carriage return, an invalid key type that stops ssh-keygen before the filename prompt; L5 also appends a carriage return to the remote hostname. The claimed selectable-key/install mismatch requires first fixing these line endings and is not reachable as described in this source."
+    },
+    {
+      "audit_id": "B0",
+      "source_path": "trunk/config/clean_distribute.bat",
+      "verdict": "CONFIRM",
+      "rationale": "With an omitted first argument, L6-L12 expand the targets to \\dist\\win32 and \\dist\\x64 on the current drive. The IF EXIST tests only check existence, so they do not prevent recursive deletion of those drive-root directories.",
+      "evidence_span": {
+        "lines": "L6-L11",
+        "quote": "IF EXIST \"%1\\dist\\win32\" (\r\nrmdir \"%1\\dist\\win32\" /s /q\r\nmkdir \"%1\\dist\\win32\"\r\n)\r\nIF EXIST \"%1\\dist\\x64\" (\r\nrmdir \"%1\\dist\\x64\" /s /q\r\n"
+      }
+    },
+    {
+      "audit_id": "B0",
+      "source_path": "trunk/config/build_configuration.bat",
+      "verdict": "CONFIRM",
+      "rationale": "L21-L37 include literal surrounding quotes in the older-version devenv_path values, and L59/L74 wrap the expansion in another pair without stripping them. This produces an executable token beginning with doubled quotes before a space-containing path; the unquoted VS2017 assignment does not neutralize the older branches.",
+      "evidence_span": {
+        "lines": "L59-L59",
+        "quote": "\"%devenv_path%\\devenv.com\" %solutionpath% /Clean \"%3|%4\" /Out clean.log\r\n"
+      }
+    },
+    {
+      "audit_id": "B4",
+      "source_path": "trunk/autogen.sh",
+      "verdict": "CONFIRM",
+      "rationale": "The backup cp at L780 has no status check, and restore_clobbered unconditionally reaches backup removal at L873 after its mv attempts, including a failed mv at L868. The exit trap calls the same restore routine and cannot recover a backup already removed; no local errexit or success guard protects it.",
+      "evidence_span": {
+        "lines": "L868-L873",
+        "quote": "\t\tmv ${file}.$$.protect_from_automake.backup ${file}\n\t    fi # -f ${file}\n\t\n\t    # just in case\n\t    $VERBOSE_ECHO \"rm -f ${file}.$$.protect_from_automake.backup\"\n\t    rm -f ${file}.$$.protect_from_automake.backup\n"
+      }
+    },
+    {
+      "audit_id": "B0",
+      "source_path": "trunk/config/example_install_new_version_H6-C7.sh",
+      "verdict": "CONFIRM",
+      "rationale": "Byte inspection shows CRLF on L1-L39, including the shebang, assignments and commands. Direct interpreter lookup therefore includes a carriage return, while Bash retains carriage returns in command tokens and exported values; this file performs no normalization.",
+      "evidence_span": {
+        "lines": "L1-L6",
+        "quote": "#!/bin/bash\r\n\r\n\r\n## start with:  svn checkout url foldername\r\n## cd foldername\r\n\r\n"
+      }
+    },
+    {
+      "audit_id": "B1",
+      "source_path": "trunk/config/example_install_new_version_H6-C7.sh",
+      "verdict": "CONFIRM",
+      "rationale": "Dependency loads, configure and make/install are sequential commands without exit-status checks or errexit, and L38 unconditionally attempts module generation with output redirection. Even when Bash encounters failures caused by the existing CRLF bytes, there is no control-flow guard preventing that publication attempt; successful publication itself is not guaranteed.",
+      "evidence_span": {
+        "lines": "L25-L30",
+        "quote": "mkdir -p \"/opt/apps/xbeach/\"$XBEACH_PROJECT_ID\"_gcc_7.3.0_openmpi_4.0.4_HEAD\"\r\n\r\nFCFLAGS=\"-mtune=corei7-avx -funroll-loops --param max-unroll-times=4 -ffree-line-length-none -O3 -ffast-math\" ./configure  --with-netcdf --with-mpi --prefix=\"/opt/apps/xbeach/\"$XBEACH_PROJECT_ID\"_gcc_7.3.0_openmpi_4.0.4_HEAD\"\r\n\r\nmake\r\nmake install\r\n"
+      }
+    },
+    {
+      "audit_id": "B3",
+      "source_path": "trunk/config/example_install_new_version_H6-C7.sh",
+      "verdict": "UNCERTAIN",
+      "rationale": "The cited FCFLAGS assignment contains -ffast-math, but this script alone does not establish that an affected NaN diagnostic or numerical result violates a required contract. Confirmation needs the effective compiler commands (including downstream overrides), affected model code, and its numerical/NaN requirements."
+    },
+    {
+      "audit_id": "B0",
+      "source_path": "trunk/config/example_install_new_version_H7.sh",
+      "verdict": "CONFIRM",
+      "rationale": "Byte inspection shows CRLF on L1-L39, including the shebang and exported assignments. The carriage return breaks direct Unix interpreter lookup and is retained in Bash command arguments and variable values, with no local stripping step.",
+      "evidence_span": {
+        "lines": "L1-L6",
+        "quote": "#!/bin/bash\r\n\r\n\r\n## start with:  svn checkout url foldername\r\n## cd foldername\r\n\r\n"
+      }
+    },
+    {
+      "audit_id": "B3",
+      "source_path": "trunk/config/example_install_new_version_H7.sh",
+      "verdict": "UNCERTAIN",
+      "rationale": "The cited FCFLAGS assignment contains -ffast-math, but this script alone does not establish that an affected NaN diagnostic or numerical result violates a required contract. Confirmation needs the effective compiler commands (including downstream overrides), affected model code, and its numerical/NaN requirements."
+    },
+    {
+      "audit_id": "B1",
+      "source_path": "trunk/config/teamcity-build.sh",
+      "verdict": "CONFIRM",
+      "rationale": "L19 uses cp -r with a fixed previous-installation destination and never removes that destination or requests replacement semantics. Once that destination directory exists, cp places the source directory beneath it, leaving the earlier snapshot at the destination root.",
+      "evidence_span": {
+        "lines": "L19-L19",
+        "quote": "cp -r \"/opt/apps/xbeach/\"$XBEACH_PROJECT_ID\"_gcc_12.2.0_openmpi_4.1.5_HEAD\" \"/opt/apps/xbeach/\"$XBEACH_PROJECT_ID\"_prev_gcc_12.2.0_openmpi_4.1.5_HEAD\"\n"
+      }
+    },
+    {
+      "audit_id": "B3",
+      "source_path": "trunk/config/teamcity-build.sh",
+      "verdict": "UNCERTAIN",
+      "rationale": "The cited FCFLAGS assignment contains -ffast-math, but this script alone does not establish that an affected NaN diagnostic or numerical result violates a required contract. Confirmation needs the effective compiler commands (including downstream overrides), affected model code, and its numerical/NaN requirements."
+    },
+    {
+      "audit_id": "B2",
+      "source_path": "trunk/config/example_install_new_version_H6.sh",
+      "verdict": "UNCERTAIN",
+      "rationale": "The cited FCFLAGS assignment contains -ffast-math, but this script alone does not establish that an affected NaN diagnostic or numerical result violates a required contract. Confirmation needs the effective compiler commands (including downstream overrides), affected model code, and its numerical/NaN requirements."
+    }
+  ]
+}

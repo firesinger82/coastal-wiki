@@ -1,0 +1,144 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-V00",
+ "source_path": "trunk/lib/win32/netcdff90/netcdf_attributes.f90",
+ "source_sha256": "540ff2a616aad0cfc018365bdd58ca059ed0c918cb7c853d67c3abf04d0a2523",
+ "base_run_id": "xbeach-r1-XBeach-V00-gpt-6-astra-01a079b6-2340-70c1-8a95-292af5f92813",
+ "audit_run_id": "xbeach-r2-XBeach-V00-gpt-6-astra-01a07a34-5e0e-7073-ac88-2789f15c46ce",
+ "base_record_file": "d42bc56e11acefce103ef700c6dca202577097323f17145ee2425ed60dc0763f.json",
+ "audit_record_file": "d42bc56e11acefce103ef700c6dca202577097323f17145ee2425ed60dc0763f.json",
+ "base_record_sha256_bytes": "cd589785e043cdacb9ff2160232f9c9953f89854c7c8017796fe595e32cd987d",
+ "audit_record_sha256_bytes": "1a028b8846f9fb9220a5a2fa8d20bded3a75aa0d2d4f42192c36cd3ac29e5389",
+ "base_finding_count": 7,
+ "audit_finding_count": 4,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L211,L220-L222] (MED/integer-narrowing) Eight-byte integer writes narrow values to default integer before netCDF can range-check them, allowing out-of-range values to be silently corrupted."
+   ],
+   "audit_member_text": [
+    "[L211,L220-L222] (MED/numeric-conversion) Eight-byte integer setters narrow values to default integer before the library can report range errors, allowing out-of-range values to be silently corrupted."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "typeSizes selects an eighteen-digit EightByteInt, but the setter passes int(values) without KIND or assigns into a default-INTEGER temporary before nf_put_att_int. Neither the generic interface nor the external declarations add range checks, so ordinary Win32 four-byte default integers lose out-of-range values before the netCDF conversion routine can inspect them.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0",
+    "A1"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L104-L107,L144-L147,L187-L190,L231-L234,L274-L277,L314-L317] (HIGH/buffer-capacity) Numeric array getters pass buffers to F77 routines that receive no capacity without first checking attribute length, allowing an oversized attribute to overwrite caller or temporary storage.",
+    "[L116-L118,L156-L158,L199-L202,L243-L246,L286-L288,L326-L328] (HIGH/scalar-buffer-overflow) Scalar getters read an entire attribute into a one-element temporary without verifying that the attribute contains exactly one element."
+   ],
+   "audit_member_text": [
+    "[L107,L117,L147,L157,L189,L201,L233,L245,L277,L287,L317,L327] (HIGH/buffer-bounds) Numeric getters pass buffers to legacy routines without checking attribute length, so an attribute longer than the supplied array or scalar temporary can overwrite memory."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "The claimed oversized-buffer call violates the explicitly documented public API precondition: the bundled manual requires enough storage for every attribute value and directs callers to inquire about the length first. Numeric getters preserve that caller-capacity contract, and the source-tree caller search supplies no concrete violating XBeach call; missing redundant validation is not itself a HIGH library buffer defect.",
+    "neutralizer": {
+     "where": "trunk/lib/win32/netcdff90/netcdf_f90.3:L676-L680",
+     "quote": "All values of the attribute\nare returned, so you must allocate enough space to hold\nthem.  If you don't know how much space to reserve, call\n\\fBnf90_inquire_attribute(\\|)\\fR\nfirst to find out the length of the attribute."
+    },
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4",
+    "A5"
+   ],
+   "audit_ids": [
+    "B2",
+    "B3"
+   ],
+   "base_member_text": [
+    "[L117-L118,L157-L158,L189-L190,L201-L202,L233-L234,L245-L246,L287-L288,L327-L328] (MED/uninitialized-copy) Getters copy temporary outputs regardless of read status and copy full temporary arrays even when the attribute is shorter, propagating undefined values on errors or unwritten elements.",
+    "[L49-L53] (MED/inquiry-error-handling) Attribute inquiry overwrites the attnum lookup status and copies local type and length outputs even when their inquiry fails."
+   ],
+   "audit_member_text": [
+    "[L49-L51] (LOW/error-propagation) The attribute-ID lookup status is unconditionally overwritten by the subsequent attribute inquiry, obscuring any distinct failure of the requested attnum lookup.",
+    "[L52-L53,L117-L118,L157-L158,L189-L190,L201-L202,L233-L234,L245-L246,L287-L288,L327-L328] (MED/undefined-value) Inquiry and getter wrappers copy uninitialized local outputs after failed calls, and integer array getters also copy undefined tail elements when the destination exceeds the attribute length."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED_UNVERIFIED",
+    "rationale": "attnum is an output here, not an independently requested attribute-number input: both calls query exactly the same ncid, varid and name. The [F77 inquiry-family contract](https://docs.unidata.ucar.edu/netcdf-fortran/current/nc_f77_interface_guide.html) gives these two name-based inquiries the same invalid-ID/missing-attribute failure conditions, so the second inquiry preserves those failures rather than hiding a demonstrated distinct attnum lookup error; the supplied other_wording concerns a different issue.",
+    "neutralizer": {
+     "where": "trunk/lib/win32/netcdff90/netcdf_attributes.f90:L40-L51",
+     "quote": "  function nf90_inquire_attribute(ncid, varid, name, xtype, len, attnum)\n    integer,             intent( in)           :: ncid, varid\n    character (len = *), intent( in)           :: name\n    integer,             intent(out), optional :: xtype, len, attnum\n    integer                                    :: nf90_inquire_attribute\n\n    integer                          :: local_xtype, local_len\n\n    ! Do we need to worry about not saving the state from this call?\n    if(present(attnum)) &\n      nf90_inquire_attribute = nf_inq_attid(ncid, varid, name, attnum)\n    nf90_inquire_attribute   = nf_inq_att  (ncid, varid, name, local_xtype, local_len)"
+    },
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L231-L246] (MED/integer-range) Eight-byte integer getters first convert through default-integer temporaries, unnecessarily limiting the range that the wider destination can receive."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L66] (LOW/text-roundtrip-contract) Text attribute writes strip trailing spaces, preventing exact round trips for strings whose trailing blanks are meaningful."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

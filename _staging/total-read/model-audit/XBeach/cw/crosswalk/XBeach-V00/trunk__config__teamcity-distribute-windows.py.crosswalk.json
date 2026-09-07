@@ -1,0 +1,254 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-V00",
+ "source_path": "trunk/config/teamcity-distribute-windows.py",
+ "source_sha256": "38d58c224edbfaccf4f6a8d8f6b28eaf518bf415e3625b4bd37b1ab1fe9d2183",
+ "base_run_id": "xbeach-r1-XBeach-V00-gpt-6-astra-01a079b6-2340-70c1-8a95-292af5f92813",
+ "audit_run_id": "xbeach-r2-XBeach-V00-gpt-6-astra-01a07a34-5e0e-7073-ac88-2789f15c46ce",
+ "base_record_file": "b71970d1383cabad03dac11ff3c246d03cefee066d4e2c1c5a727ce3c9f58435.json",
+ "audit_record_file": "b71970d1383cabad03dac11ff3c246d03cefee066d4e2c1c5a727ce3c9f58435.json",
+ "base_record_sha256_bytes": "1a1083f10330c5645155bfb3a1f9f33076a04032703e3f9c529c445ff979f90a",
+ "audit_record_sha256_bytes": "aec3b9994056227aa090263e9c28b7c5655f6f3aee3c503287f31447a50ed96c",
+ "base_finding_count": 8,
+ "audit_finding_count": 10,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L52-L58] (MED/error-handling) Transfer output and exit status are discarded, allowing failed uploads to be reported as finished and an index to be published for missing artifacts."
+   ],
+   "audit_member_text": [
+    "[L29,L35,L46,L58] (HIGH/upload-failure-propagation) Transfer return codes are ignored and diagnostics discarded, allowing failed uploads to produce success messages and a download index containing unavailable binaries."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "scpcopyfile discards subprocess.call status at L58 and returns normally; distribute then appends the binary link and uploads the index at L29-L46. Neither its command-line entry point nor the surrounding configuration scripts check binary-transfer success, so a failed binary upload followed by a successful index upload exposes unavailable downloads.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "[L14-L27] (MED/input-contract) Glob results are parsed using a raw prefix replacement and fixed path positions without validating the platform/configuration layout or supported configuration names."
+   ],
+   "audit_member_text": [
+    "[L14,L21-L24] (MED/path-parsing) Discovery and path splitting assume bindir ends with a separator, so a normal directory argument without that suffix can shift platform and configuration fields or match sibling prefixes."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The command-line entry point passes bindir unchanged (L65,L78), with no separator normalization. Without the suffix, the glob loses one directory level and can match sibling prefixes; replace/split at L21 also preserves a leading empty component for ordinary paths, with no subsequent validation.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L55-L58] (MED/shell-quoting) Paths, credentials and destination are concatenated unquoted into a shell command, so spaces or shell metacharacters can alter command interpretation."
+   ],
+   "audit_member_text": [
+    "[L55-L58] (HIGH/shell-command-construction) Paths, username, and password are concatenated unquoted into a shell command, so spaces or metacharacters can change transfer arguments or execute unintended commands."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The full helper constructs one shell string from the executable, credentials and paths at L53-L58, without quoting or escaping at either caller. A space in workdir splits the executable path, and shell metacharacters in password or source remain active before pscp runs.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [
+    "B9"
+   ],
+   "base_member_text": [
+    "[L52-L58] (LOW/resource-lifetime) Each transfer opens a null-output file without explicitly closing it."
+   ],
+   "audit_member_text": [
+    "[L52-L58] (LOW/resource-lifecycle) The devnull stream opened for each transfer is never explicitly closed."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "[L55] (MED/host-verification) Piping an unconditional yes into pscp accepts an initial host-key prompt without verifying the remote host identity."
+   ],
+   "audit_member_text": [
+    "[L55] (MED/host-authentication) An unconditional yes is piped to pscp, accepting an unverified host-key prompt without establishing the intended server identity."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [
+    "[L14-L15,L37-L46] (LOW/empty-input) An empty artifact glob still publishes an empty download index without reporting that no binaries were found."
+   ],
+   "audit_member_text": [
+    "[L14-L15,L19-L20,L40-L46] (MED/publication-completeness) An empty glob result still replaces the download page with an empty list and reports copying complete."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "files may be empty while ln remains empty, but neither the loop nor the entry point tests that condition. With an available template and successful final transfer, L40-L46 publishes the empty replacement page and L35 has already announced completion.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "[L20-L33] (MED/artifact-collision) Multiple ZIP files in one platform/configuration directory receive the same destination name and overwrite each other."
+   ],
+   "audit_member_text": [
+    "[L14-L15,L20-L29] (MED/artifact-identity) Every zip in a configuration directory is uploaded under the same revision-derived name without checking its provenance, so stale or multiple archives can overwrite the intended release."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The glob accepts every zip and newname uses only revision, platform and configuration (L14-L27), never the discovered archive name or embedded revision. Two archives in the same recognized configuration therefore target exactly the same remote file, and no producer/provenance check was found in the source tree.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "[L55,L68] (MED/credential-handling) The password is passed through command-line arguments to both the script and pscp, exposing it to process-command-line inspection."
+   ],
+   "audit_member_text": [
+    "[L55,L68] (MED/credential-handling) The password is carried in process arguments and the generated shell command line, exposing it to command-line inspection."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L60-L78] (MED/import-side-effects) Argument parsing and distribution run unconditionally at module import, so importing the helper can raise an argument error or trigger publication."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "confirmed_delta",
+   "base_ids": [],
+   "audit_ids": [
+    "B8"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L57] (LOW/output-escaping) The source path is interpolated into a TeamCity message without escaping service-message delimiters or line breaks."
+   ],
+   "representative": "audit",
+   "rationale": "span-confirmed: L57 inserts source directly into a single-quoted TeamCity message without any escaping; source comes from globbed paths or workdir-derived workhtml, and neither caller sanitizes it. A path containing an apostrophe or service-message control character can therefore corrupt the emitted message.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L57-L57",
+    "quote": "\tprint \"##teamcity[message text='Copying %s']\"%(source)",
+    "verified_at_lines": "L57-L57",
+    "source_sha256": "38d58c224edbfaccf4f6a8d8f6b28eaf518bf415e3625b4bd37b1ab1fe9d2183"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The L57 TeamCity message interpolates the discovered filename directly; the caller neither restricts filenames to service-message-safe characters nor escapes them. A legal apostrophe or closing bracket in a filename can terminate or change the message field.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  }
+ ]
+}

@@ -1,0 +1,323 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-V00",
+ "source_path": "trunk/lib/win32/mpich/include/mpicxx.h",
+ "source_sha256": "8b17786533310be2ca0e2d58f64bb2731ecdc18e3a3a31b5e586a9952ee3bc03",
+ "base_run_id": "xbeach-r1-XBeach-V00-gpt-6-astra-01a079b6-2340-70c1-8a95-292af5f92813",
+ "audit_run_id": "xbeach-r2-XBeach-V00-gpt-6-astra-01a07a34-5e0e-7073-ac88-2789f15c46ce",
+ "base_record_file": "d753bb86ac3f7e4fdae158e40f3ca9f662e56001434f409a6dcb400d62ded7c4.json",
+ "audit_record_file": "d753bb86ac3f7e4fdae158e40f3ca9f662e56001434f409a6dcb400d62ded7c4.json",
+ "base_record_sha256_bytes": "e55338a494ff69fc69bceb6f2fd236cbde43e631cea6c839cca40152b78b2bab",
+ "audit_record_sha256_bytes": "21538b662f8a1c75aac04a742c37faaa47ef5e0073b88f0a93666ab7219eb401",
+ "base_finding_count": 15,
+ "audit_finding_count": 11,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "[L1369-L1385] (MED/ignored-argument-access) Alltoallw dereferences the send-datatype array even for an in-place intracommunicator call where send arguments are ignored."
+   ],
+   "audit_member_text": [
+    "[L1373-L1377,L1385] (MED/ignored-argument-access) Alltoallw dereferences the send-datatype array before MPI can ignore it for an in-place operation, so an otherwise valid ignored null argument can fail in the wrapper."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The bundled mpi.h advertises MPI 2.2, whose [Alltoallw contract](https://www.mpi-forum.org/docs/mpi-2.2/mpi22-report/node101.htm) permits in-place intracommunicator calls with ignored sendtypes. The wrapper unconditionally reads v4 for Get_size entries before the C call, and neither the class hierarchy nor a preprocessor branch adds an MPI_IN_PLACE guard.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "[L1369-L1385,L1516,L1545-L1548] (HIGH/intercommunicator-size) Alltoallw sizes and copies datatype arrays using local Get_size although an intercommunicator requires remote-group lengths, causing out-of-bounds accesses when group sizes differ."
+   ],
+   "audit_member_text": [
+    "[L1369-L1385,L1545-L1549] (HIGH/collective-buffer-sizing) Alltoallw sizes and copies datatype arrays using local Get_size even on an Intercomm, although unequal remote-group sizes require different array lengths."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Intercomm inherits Comm::Alltoallw without overriding Get_size, which calls MPI_Comm_size at L1285-L1289; Get_remote_size is a distinct method. Unequal groups therefore produce an overread of caller arrays on the larger local group and undersized C datatype temporaries on the smaller group; the [MPI 2.2 intercommunicator contract](https://www.mpi-forum.org/docs/mpi-2.2/mpi22-report/node101.htm) requires communication with the remote group.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A12"
+   ],
+   "audit_ids": [
+    "B9"
+   ],
+   "base_member_text": [
+    "[L1758-L1761] (LOW/binding-signature) Grequest::Start is declared as an instance method rather than a static factory, preventing the expected class-qualified creation call."
+   ],
+   "audit_member_text": [
+    "[L1758-L1761] (MED/api-contract) Grequest::Start is declared as an instance member, preventing the class-level factory invocation expected from a request-creation operation."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A8",
+    "A9"
+   ],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [
+    "[L236-L244,L790-L803,L830-L851,L1371-L1387,L1692-L1702] (MED/exception-safety) Raw temporary arrays are deleted only after MPI calls and error-handler dispatch, so exceptions from allocation or MPI error handlers leak earlier allocations.",
+    "[L993-L1004,L1037-L1043] (MED/request-state-on-error) Throwing from multi-request completion error handling occurs before updated handles and statuses are copied back, leaving caller requests stale after partial completion."
+   ],
+   "audit_member_text": [
+    "[L236-L244,L790-L803,L985-L1006,L1371-L1387,L1692-L1702] (MED/exception-safety) Raw temporary arrays are freed and modified request handles copied back only after error-handler calls, so a thrown MPI exception leaks allocations and can leave caller request handles stale."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "All cited temporaries are raw allocations, with copy-back and deletion after the MPIX_CALL macros, and there are no catch/RAII cleanup blocks. The shipped cxx.lib Call_errhandler implementation does throw for ERRORS_THROW_EXCEPTIONS, so an error can skip request copy-back and frees; failure of a second new also leaks the first allocation.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L2414-L2424] (HIGH/array-bounds) Cartcomm::Sub always reads ten retain-dimension flags and allocates ten integers regardless of topology dimension, reading beyond ordinary short input arrays and undersizing the buffer for higher-dimensional topologies."
+   ],
+   "audit_member_text": [
+    "[L2414-L2424] (HIGH/buffer-bounds) Cartcomm::Sub always copies ten remain-dimension flags, reading past shorter valid inputs and supplying an undersized temporary for topologies with more than ten dimensions."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The complete Sub body allocates and reads exactly ten flags without querying Get_dim; Cartcomm construction and Create_cart impose no matching ten-element input contract. A valid two-dimensional remain_dims array is already overread before MPI_Cart_sub can apply any topology validation, independently of whether very high-dimensional topologies are used.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A11"
+   ],
+   "audit_ids": [
+    "B8"
+   ],
+   "base_member_text": [
+    "[L1568-L1579,L1659-L1670,L2329-L2340,L2444-L2455] (MED/clone-error-handling) Clone methods ignore MPI_Comm_dup status and construct objects from an uninitialized ncomm on a returned error, unlike the checked Dup methods."
+   ],
+   "audit_member_text": [
+    "[L1568-L1578,L1659-L1669,L2329-L2339,L2444-L2454] (MED/error-propagation) Clone ignores MPI_Comm_dup status and constructs a communicator from potentially uninitialized ncomm instead of applying the error-handling path used by Dup."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "Both Clone preprocessor variants ignore MPI_Comm_dup status, but the C routine itself invokes its configured error handler, so Clone does not bypass every error-handling path. Retain MED only for returned-error configurations: wrapper-side dispatch, especially the C++ exception translation seen in cxx.lib, is skipped and ncomm is used without a guaranteed successful initialization; fatal C error handling prevents that continuation.",
+    "neutralizer": {
+     "where": "trunk/lib/win32/mpich/include/mpi.h:L248-L254",
+     "quote": "#define MPI_ERRORS_ARE_FATAL ((MPI_Errhandler)0x54000000)\n#define MPI_ERRORS_RETURN    ((MPI_Errhandler)0x54000001)\n/* MPIR_ERRORS_THROW_EXCEPTIONS is not part of the MPI standard, it is here to\n   facilitate the c++ binding which has MPI::ERRORS_THROW_EXCEPTIONS. \n   Using the MPIR prefix preserved the MPI_ names for objects defined by\n   the standard. */\n#define MPIR_ERRORS_THROW_EXCEPTIONS ((MPI_Errhandler)0x54000002)"
+    },
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L409,L1471,L1904] (MED/attribute-copy) NULL_COPY_FN sets flag=true without initializing attr_out, falsely reporting an attribute copy and potentially propagating an indeterminate attribute pointer."
+   ],
+   "audit_member_text": [
+    "[L409,L1471,L1904] (HIGH/callback-contract) NULL_COPY_FN sets flag=true without initializing attr_out, advertising a successful attribute copy with an undefined output pointer."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The advertised HIGH ordinary attribute-copy failure is neutralized: disassembly of the shipped trunk/lib/win32/mpich/lib/cxx.lib shows Comm, Datatype and Win Create_keyval comparing the callback with NULL_COPY_FN at +0x04 and replacing it with zero at +0x0c, matching the C null callbacks below. Retain only a LOW defect when user code directly invokes the helper body or registers a different forwarding callback, thereby bypassing this pointer-identity guard; the header body then really sets flag=true without assigning attr_out.",
+    "neutralizer": {
+     "where": "trunk/lib/win32/mpich/include/mpi.h:L265-L271",
+     "quote": "#define MPI_COMM_NULL_COPY_FN ((MPI_Comm_copy_attr_function*)0)\n#define MPI_COMM_NULL_DELETE_FN ((MPI_Comm_delete_attr_function*)0)\n#define MPI_COMM_DUP_FN  ((MPI_Comm_copy_attr_function *)MPI_DUP_FN)\n#define MPI_WIN_NULL_COPY_FN ((MPI_Win_copy_attr_function*)0)\n#define MPI_WIN_NULL_DELETE_FN ((MPI_Win_delete_attr_function*)0)\n#define MPI_WIN_DUP_FN   ((MPI_Win_copy_attr_function*)MPI_DUP_FN)\n#define MPI_TYPE_NULL_COPY_FN ((MPI_Type_copy_attr_function*)0)"
+    },
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5",
+    "A6",
+    "A7"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "[L827-L851,L935-L959] (MED/uninitialized-copy) Waitsome and Testsome copy incount status records instead of the returned outcount, reading temporary entries that MPI did not initialize.",
+    "[L879-L905] (MED/uninitialized-copy) Testall copies temporary statuses even when the completion flag is false and MPI leaves those statuses undefined.",
+    "[L323-L330,L2382-L2394] (MED/output-count) Datatype::Get_contents and Cartcomm::Get_topo copy the requested maximum count rather than the actual returned datatype or topology count, potentially reading uninitialized temporary entries."
+   ],
+   "audit_member_text": [
+    "[L323-L330,L827-L851,L879-L903,L935-L959,L2382-L2394] (MED/undefined-value) Temporary-output copy loops use supplied capacities rather than actual result counts or completion flags, reading uninitialized datatype, status, or topology entries on valid partial-result calls."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The allocated C arrays have no value initialization, and Waitsome/Testsome copy incount statuses rather than returned outcount; Testall copies statuses even when completion is false. Neither initialized C++ Request objects nor the status wrapper repairs those unwritten C temporary elements, and the analogous datatype/topology copy loops also use capacities rather than actual result sizes.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "[L1690-L1716] (MED/collective-root-contract) Spawn_multiple reads array_of_info on every rank even though those inputs are only significant on root, so valid nonroot placeholder arguments can be dereferenced."
+   ],
+   "audit_member_text": [
+    "[L1690-L1716] (MED/collective-root-contract) Spawn_multiple copies array_of_info on every rank even though spawn inputs are only significant at the root, potentially dereferencing ignored arguments on nonroot ranks."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Both Spawn_multiple overloads allocate and copy count info objects before any rank/root test. A nonroot rank may legally supply ignored spawn inputs, including a positive placeholder count and null info pointer; no caller-side or C-library guard can prevent this earlier C++ dereference.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A14"
+   ],
+   "audit_ids": [
+    "B10"
+   ],
+   "base_member_text": [
+    "[L27-L40,L2716] (LOW/macro-hygiene) MPIR_ARGUNUSED is never undefined despite the comment promising its removal at the end of the header."
+   ],
+   "audit_member_text": [
+    "[L28-L32,L36-L39,L2716] (LOW/preprocessor-hygiene) MPIR_ARGUNUSED is documented as removed at the end of the header but remains defined after the namespace closes."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A10"
+   ],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [
+    "[L249-L253,L1185-L1189,L2018-L2022] (MED/error-return-contract) Scalar wrappers return uninitialized output locals if the MPI call fails and the configured error handler returns normally."
+   ],
+   "audit_member_text": [
+    "[L84-L89,L249-L253,L478-L494,L1185-L1189,L2018-L2022] (MED/error-path-undefined-value) Scalar-returning wrappers return uninitialized output locals if the invoked error handler returns after an MPI failure."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The scalar output locals are plain uninitialized integers or offsets, unlike the separately initialized handle-wrapper objects. MPIX_CALLREF/WORLD do not assign fallbacks, and the shipped Call_errhandler can return through MPI_Comm_call_errhandler for a returning handler, leaving the cited wrappers to evaluate an unwritten output after a failure.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A13"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L703-L711,L2540-L2553] (LOW/const-interface) Op query and local-reduction methods are non-const even though predefined operations are declared const, preventing direct calls on those objects."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

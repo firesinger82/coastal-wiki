@@ -1,0 +1,50 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-V01",
+ "source_path": "trunk/lib/win32/netcdff90/netcdf_dims.f90",
+ "source_sha256": "f28a465cbd9f8dd336c4ad8ba042e1fd272582769bd41878b6b371a25e1e1eb1",
+ "base_run_id": "xbeach-r1-XBeach-V01-gpt-6-astra-01a079bd-fbb5-7cd3-8c47-5d906cc55970",
+ "audit_run_id": "xbeach-r2-XBeach-V01-gpt-6-astra-01a07a3b-b349-7061-aef2-9b392a6fc7c6",
+ "base_record_file": "c09455f37097bc0e6731963ae4a6534e332af0869b667c12bcb5db9b9556cb40.json",
+ "audit_record_file": "c09455f37097bc0e6731963ae4a6534e332af0869b667c12bcb5db9b9556cb40.json",
+ "base_record_sha256_bytes": "f002d416f39e1ba9274bbf3ebb237d76947670ee8536e4a56f65b03b96920400",
+ "audit_record_sha256_bytes": "58c589ee51807032d26edae7f7035715103f0d9e88cdf2a80c97d3b1eabe2d9f",
+ "base_finding_count": 1,
+ "audit_finding_count": 1,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L39-L44] (LOW/error-path-output) nf90_inquire_dimension copies uninitialized local outputs when nf_inq_dim fails, without checking its returned status."
+   ],
+   "audit_member_text": [
+    "[L39-L44] (MED/error-handling) nf90_inquire_dimension trims and copies uninitialized local outputs when nf_inq_dim fails instead of guarding those assignments on success."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The complete function has no initialization of dimName or length and checks only argument presence after nf_inq_dim returns (netcdf_dims.f90:39-44); the external declaration supplies no output-initialization contract. The ncoutput.F90:38-39 error handler runs only after this wrapper has already copied the locals, so it cannot neutralize the internal reads.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  }
+ ]
+}

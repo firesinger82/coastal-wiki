@@ -12,7 +12,7 @@
 | Delft3D | 24,748 | ⬜ | 🟡(코어34) | ⬜ | ⬜ | ⬜ | ✅(HIGH9) | ⬜ | ~0.1% | 🟡(코어 부분·third-party 미분리) |
 | CADMAS-SURF | 1,310 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 0% | ⬜ |
 | SFINCS | 241 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 0% | ⬜ |
-| XBeach | **111**(P0 개정) | ✅ | ✅ 111/111 | ✅ 111/111 | ✅ 932처분 PASS | 🟡(manifest 60·**미승인 1**) | ✅ 415/415 | 🟡(59/60) | 판독 100% | 🟡 **DONE 취소** — P0 개정으로 재개 |
+| XBeach | **456**(P0 v3 전량) | ✅ | ✅ 281 2독립 + 22 단독 + 153 인벤토리 | ✅ 281/281 | ✅ 1,472처분 PASS | 🟡(delta 103·재승인 대기) | ✅ 571/571 | ⏳사용자 | **미판독 0** | 🟡 판독완주·HG 대기 |
 | SWAN | 82 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 0% | ⬜ |
 | SWASH | 162 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 0% | ⬜ |
 | LISFLOOD-FP | 868 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 0% | ⬜ (C/CUDA) |
@@ -24,20 +24,22 @@
 **XBeach 는 2026-09-07 DONE 판정 후 같은 날 P0 개정으로 DONE 취소**(분모 102→111, test 9파일 편입). 신규 confirmed_delta 1건이 미승인이라 `verify_supplement` FAIL. **현재 완결 모델 0.**
 
 ## 다음 착수
-### ⚠ XBeach DONE 취소 (2026-09-07) — 분모 개정
-사용자 지적: **사전 배제 대신 전량 판독 후 사후 판단**. test 9파일(1,731줄)을 EXCLUDE→INCLUDE 로 이동, 분모 **102→111파일 / 73,299줄**. 신규 shard `XBeach-T00` 를 동일 파이프라인으로 전량 처리:
-- R1 9/9(H0/M12/L14) · R2 blind 9/9(H0/M12/L12), real-read·blind 검증 PASS
-- CW 24처분(equivalent 20·base_only 2·distinct 2) → `verify_crosswalk` PASS (전체 **932처분**)
-- SUP: delta 후보 1 → **CONFIRM 1**(인용 원문대조 통과) → confirmed_delta **60**
-- V: 8건 적대검증 → STANDS 3·NARROWED 5·REFUTED 0 (신규 delta 생존)
-- `verify_supplement_modelaudit.py`: 기계적 검사 전건 PASS, **미승인 1건으로 FAIL**(UNAPPROVED: trunk/test/testgenmodule.F90 B8)
+### XBeach — 트리 전량 456파일 판독 완주 (2026-09-07), HG 재승인만 남음
+사용자 원칙(**전량 판독 → 분류 → 사후 판단**)에 따라 P0 v3 로 분모를 트리 전체로 확대. **미판독 0.**
 
-**★배제했으면 놓쳤을 결함 발견**: `testgenmodule.F90` L878 — 배열 `a`/`ia` 를 초기화 없이 할당하고 L910-911 에서 master 가 복사, 입력 초기화(`scattertest` L38-45)는 그 뒤에 수행 → MPI 수집 테스트가 미정의 값으로 동작(적대검증 STANDS).
+| 처리 | 파일 | 방식 |
+|---|---|---|
+| 2독립판독 + CW·SUP·V | **281** | R1/R2 blind → crosswalk → span 확인 → 적대검증 (13 shard) |
+| 단독판독 | **22** | 도해 8(시각 판독) · 문서 14(PDF→opendataloader-pdf, Office→docx/OLE 변환 후 판독) |
+| 메타데이터 인벤토리 | **153** | 컴파일 산출물(.dll 72·.lib 26·.exe 20·.mod 13·.pyd 10·.jar 8 등) sha256·타입·버전문자열 |
+| **합** | **456** | 트리 전량 |
 
-### HG 재승인 대기 (1건)
-`XBeach-supplement-decisions.json` 의 `trunk/test/testgenmodule.F90 B8` = `pending`. 승인 시 supplement 60 전건 PASS → DONE 복귀.
+**281파일 처분 1,472건**: equivalent 682 · confirmed_delta **103** · base_only 335 · distinct_unconfirmed 319 · rejected 30 · conflict 3. `verify_crosswalk.py` 13/13 PASS.
+**V 적대검증 571건**(407+164): STANDS 305 · NARROWED 178 · REFUTED 78 · 인용미검증 10(기각 불인정).
+**신규 그룹 특기**: 벤더(mpich·netCDF·ftnunit) findings 는 `vendor` 태그 분리집계 대상 — XBeach 결함으로 집계 금지. 빌드 스캐폴딩 shard 는 두 리더 편차가 커(B00 HIGH 0 vs 16) CW 에서 distinct 로 다수 잔류.
+**문서축 수확**: 매뉴얼·비정수압 보고서에서 인용 가능한 정량 사실 HIGH 207건. 도해 5장은 **모드별 적용한계 판정도**(NH 1층 kh≲1.0-1.1 / NH+ 2층 kh≈3.0-3.5).
 
-### 잔여 미판독 (P0 재승인 필요)
-트리 실측 **456파일**(구 "252 inventory"는 바이너리·산문 미포함 수치). 판독 111 / **미판독 텍스트 171파일·65,693줄** / 바이너리 174.
-- 미판독 텍스트: 벤더 65(mpich 40·netcdff90 13·ftnunit 11·pyconfig.h 1) · build 65 · docs 9 · generated 2 · 기타 30
-- 결정 필요: ①벤더 65 분모 포함 여부(포함 시 `vendor` 태그 분리집계 권고) ②바이너리 174 처리(sha256 인벤토리 vs 판독)
+**모델 배분**(사용자 지시): 소스판독·판정·적대검증 = `gpt-6-astra` / 빌드·문서 = `gpt-5.6-luna` / 인벤토리·시각판독 = 모델 불요. ★기존 111파일의 R1·R2 는 `--model` 미지정으로 `gpt-5.6-sol` 에서 수행됨(사후 실사로 확인, 재판독 불요 판정).
+
+### HG 재승인 대기
+분모 확대로 confirmed_delta 60 → **103**(신규 43). supplement manifest·영수증 재작성 후 사용자 승인 필요. 승인 전 XBeach 미완결.

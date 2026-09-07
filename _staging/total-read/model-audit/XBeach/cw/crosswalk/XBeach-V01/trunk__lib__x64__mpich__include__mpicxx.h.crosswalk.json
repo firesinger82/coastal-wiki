@@ -1,0 +1,388 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-V01",
+ "source_path": "trunk/lib/x64/mpich/include/mpicxx.h",
+ "source_sha256": "8b17786533310be2ca0e2d58f64bb2731ecdc18e3a3a31b5e586a9952ee3bc03",
+ "base_run_id": "xbeach-r1-XBeach-V01-gpt-6-astra-01a079bd-fbb5-7cd3-8c47-5d906cc55970",
+ "audit_run_id": "xbeach-r2-XBeach-V01-gpt-6-astra-01a07a3b-b349-7061-aef2-9b392a6fc7c6",
+ "base_record_file": "0ac7a343e14fe225e450681405b1087e03386a1d0b2b72349d4423606d312522.json",
+ "audit_record_file": "0ac7a343e14fe225e450681405b1087e03386a1d0b2b72349d4423606d312522.json",
+ "base_record_sha256_bytes": "3b3dd425af0873c64596fcab6d99a78de9a502d8ba242d7f2af00a22f13eedf9",
+ "audit_record_sha256_bytes": "26cd345f4410baac91383c8f677b5e2af679ac7355dfa2064e7c8dd569a489e2",
+ "base_finding_count": 14,
+ "audit_finding_count": 15,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "[L1369-L1385,L1545-L1549] (HIGH/intercommunicator-size) Alltoallw sizes and fills datatype temporaries using local Get_size rather than remote size, producing out-of-bounds accesses for unequal intercommunicator groups."
+   ],
+   "audit_member_text": [
+    "[L1369-L1385,L1545-L1548] (HIGH/collective-bounds) Alltoallw sizes and fills datatype arrays using the local Get_size even on intercommunicators, where the arrays must cover the remote group."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Alltoallw belongs to Comm and is inherited by Intercomm, while Comm::Get_size calls MPI_Comm_size (mpicxx.h:1285-1289) and Intercomm separately provides Get_remote_size (1545-1549). No override or intercommunicator branch changes the allocation/iteration counts, so unequal groups cause either backend reads past undersized temporaries or wrapper reads past correctly remote-sized caller arrays.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L2414-L2424] (HIGH/array-bounds) Cartcomm::Sub always reads ten booleans and allocates ten integers regardless of topology dimension, overreading smaller input arrays and undersizing larger topologies."
+   ],
+   "audit_member_text": [
+    "[L2414-L2424] (HIGH/bounds) Cartcomm::Sub always reads ten input booleans and allocates ten entries regardless of the actual Cartesian dimension count, causing out-of-bounds reads for smaller input arrays or larger topologies."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Cartcomm::Sub allocates and reads exactly ten entries without calling the available Get_dim (mpicxx.h:2376-2380,2414-2427). The constructors merely wrap communicator handles and impose no ten-dimensional invariant, so a valid one-dimensional bool[1] input is enough to overread before MPI_Cart_sub executes.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A8"
+   ],
+   "audit_ids": [
+    "B9"
+   ],
+   "base_member_text": [
+    "[L84-L90,L236-L244,L790-L803,L985-L1006,L1371-L1387] (MED/exception-safety) Raw temporary allocations lack exception cleanup, and throwing error handlers skip both deallocation and request/status copyback after MPI has potentially changed them."
+   ],
+   "audit_member_text": [
+    "[L236-L244,L830-L851,L985-L1006,L1371-L1387] (MED/exception-safety) Raw temporary arrays are released only after MPI calls and subsequent allocations, so thrown MPI errors or allocation failures bypass cleanup and can also bypass request-handle copyback."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A10"
+   ],
+   "audit_ids": [
+    "B10"
+   ],
+   "base_member_text": [
+    "[L1567-L1580,L1658-L1671,L2328-L2341,L2443-L2456] (MED/unchecked-duplication) Clone implementations ignore MPI_Comm_dup status and construct a wrapper from uninitialized ncomm when duplication fails with a returning handler."
+   ],
+   "audit_member_text": [
+    "[L1575-L1579,L1666-L1670,L2336-L2340,L2451-L2455] (MED/error-handling) Clone implementations ignore MPI_Comm_dup's return code and construct a communicator from an uninitialized ncomm if duplication fails and the C error handler returns."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED_UNVERIFIED",
+    "rationale": "The packaged MPICH2 1.4.1p1 runtime explicitly stores MPI_COMM_NULL through newcomm on the error path before returning through the communicator error handler: mpich2mpi.dll RVA 0x6fee0, in cabinet member _1BE96E15F472462586C19E8C77FF7927 of the bundled x64 MSI, disassembled entirely in memory. This matches the quoted upstream error-path assignment, so these Clone calls can discard status but do not construct a wrapper from an uninitialized ncomm with the bundled runtime.",
+    "neutralizer": {
+     "where": "https://fossies.org/linux/mpich2/src/mpi/comm/comm_dup.c:L179-L180",
+     "quote": "    *newcomm = MPI_COMM_NULL;\n    mpi_errno = MPIR_Err_return_comm( comm_ptr, FCNAME, mpi_errno );"
+    },
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "[L323-L332] (MED/uninitialized-read) Datatype::Get_contents copies max_datatypes entries from its temporary rather than the actual datatype count, reading an uninitialized tail when capacity exceeds the envelope count."
+   ],
+   "audit_member_text": [
+    "[L323-L332] (MED/uninitialized-read) Get_contents copies max_datatypes entries from an uninitialized temporary even when the datatype contains fewer datatype entries."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "MPI_Datatype is typedef int in the companion mpi.h:23, so new MPI_Datatype[v4] does not run a null-initializing wrapper constructor. Get_contents never queries the envelope and copies all capacity entries at mpicxx.h:325-332; extra capacity beyond the actual datatype count remains uninitialized even on success.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [
+    "[L827-L853,L935-L961] (MED/uninitialized-status) Waitsome and Testsome copy every temporary status instead of only the returned completion count, including undefined entries when no requests complete or all are inactive."
+   ],
+   "audit_member_text": [
+    "[L827-L851,L935-L959] (MED/uninitialized-read) Waitsome and Testsome copy incount status entries instead of only the returned outcount, reading unwritten temporary statuses when fewer requests complete."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The temporaries are raw MPI_Status structs with integer fields (mpi.h:402-409), not MPI::Status objects with initialization. Waitsome/Testsome copy v1 entries regardless of returned v3, including the all-null-request case where no status entries are produced; request copyback and the separate status-ignoring overloads do not initialize or guard this tail.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [
+    "[L879-L905] (MED/uninitialized-status) Testall copies its uninitialized status temporary even when the returned completion flag is false."
+   ],
+   "audit_member_text": [
+    "[L879-L905] (MED/uninitialized-read) Testall copies the temporary status array even when its returned flag is false and the C routine has not defined those statuses."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The complete status-returning Testall overload copies l4 before inspecting v3, with no initialization of the raw MPI_Status array (mpicxx.h:879-905). A false completion flag leaves statuses undefined under the [MPI_Testall contract](https://www.open-mpi.org/doc/v4.0/man3/MPI_Testall.3.php), so neither successful return status nor initialized MPI::Request wrappers neutralize the internal copies.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A13"
+   ],
+   "audit_ids": [
+    "B14"
+   ],
+   "base_member_text": [
+    "[L11-L40,L82,L2716] (LOW/header-hygiene) The header has no include guard and leaves MPIR_ARGUNUSED defined despite promising its removal, so a repeated direct include triggers an error and redefinitions."
+   ],
+   "audit_member_text": [
+    "[L27-L40,L2716] (LOW/macro-hygiene) MPIR_ARGUNUSED remains defined at the end of the file despite the comment promising its removal."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L409,L1471,L1904] (HIGH/attribute-copy) NULL_COPY_FN sets flag=true without defining attr_out, reporting a successful attribute copy with an indeterminate output pointer."
+   ],
+   "audit_member_text": [
+    "[L409,L1471,L1904] (HIGH/attribute-callback) NULL_COPY_FN sets flag=true without initializing attr_out, allowing duplication to install an indeterminate attribute pointer instead of suppressing the copy."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED_UNVERIFIED",
+    "rationale": "The supplied cxx.lib implementation of each Comm/Datatype/Win Create_keyval compares the copy-function pointer with its NULL_COPY_FN and conditionally replaces it with zero before calling the C registration routine; objdump relocations and the compare/cmove sequence at function offsets 0x4-0x18 verify all three. Thus ordinary registration never executes these helper bodies during duplication, defeating the claimed indeterminate-attribute installation path; the quoted upstream implementation expresses the same concrete neutralizer.",
+    "neutralizer": {
+     "where": "https://fossies.org/linux/mpich2/src/binding/cxx/initcxx.cxx:L502-L504",
+     "quote": "    if (cf == MPI::Comm::NULL_COPY_FN) cf = 0;\n    if (df == MPI::Comm::NULL_DELETE_FN) df = 0;\n    MPIX_CALLWORLD( MPI_Comm_create_keyval( (MPI_Comm_copy_attr_function *)cf,"
+    },
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A12"
+   ],
+   "audit_ids": [
+    "B13"
+   ],
+   "base_member_text": [
+    "[L1758-L1761] (MED/api-declaration) Grequest::Start is declared as an instance member rather than a static factory, preventing the expected MPI::Grequest::Start invocation without an object."
+   ],
+   "audit_member_text": [
+    "[L1758-L1761] (MED/api-contract) Grequest::Start is declared as an instance method rather than a static factory, preventing a class-qualified MPI::Grequest::Start call."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A11"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "[L1690-L1716] (MED/root-only-argument) Spawn_multiple allocates from count and dereferences array_of_info on every rank although these inputs are significant only at root."
+   ],
+   "audit_member_text": [
+    "[L1690-L1716] (MED/ignored-argument-access) Both Spawn_multiple overloads copy array_of_info on every rank even though only the root's spawning arguments are significant."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Both complete Spawn_multiple overloads allocate from count and dereference array_of_info before calling the collective, with no Get_rank/root check (mpicxx.h:1690-1719). A nonroot with count>0 and an otherwise insignificant null info-array argument therefore fails in the wrapper before the C implementation can ignore it; providing count=0 on nonroot is only a caller workaround.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "[L1369-L1385] (MED/ignored-argument-access) Alltoallw dereferences send datatype entries even for an in-place call whose send-side arguments are ignored by the underlying collective."
+   ],
+   "audit_member_text": [
+    "[L1373-L1377] (MED/ignored-argument-access) Alltoallw dereferences every send datatype even when MPI_IN_PLACE makes the send-side arguments insignificant."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The inherited Alltoallw implementation always copies v4[i4].the_real_datatype before MPI_Alltoallw, without comparing v1 to MPI_IN_PLACE (mpicxx.h:1369-1388). On a valid in-place intracommunicator call the send-side array may be insignificant, but backend handling occurs too late to protect a null or short send datatype array.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A9"
+   ],
+   "audit_ids": [
+    "B11"
+   ],
+   "base_member_text": [
+    "[L249-L253,L1185-L1189,L2018-L2022] (LOW/error-path-output) Scalar getters return uninitialized local outputs if the underlying MPI operation fails and the invoked error handler returns normally."
+   ],
+   "audit_member_text": [
+    "[L249-L253,L1185-L1189,L2018-L2022] (MED/error-handling) Value-returning wrappers return uninitialized output locals if the MPI call fails and the invoked error handler returns normally."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The scalar outputs v2 have no initializer, and MPIX_CALLWORLD/MPIX_CALLREF call the error handler but do not force a return or throw after it returns (mpicxx.h:83-95,249-253,1185-1189,2018-2022). The claim already requires a returning handler, so default fatal/throwing behavior is not a refutation; unlike communicator duplication, no universal null-output assignment protects these scalar getters.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [
+    "B8"
+   ],
+   "base_member_text": [
+    "[L2382-L2396] (MED/uninitialized-read) Cartcomm::Get_topo converts maxdims temporary entries to bool instead of the actual dimension count, reading an uninitialized tail for oversized output capacity."
+   ],
+   "audit_member_text": [
+    "[L2382-L2396] (MED/uninitialized-read) Cartcomm::Get_topo converts maxdims temporary period entries even when the topology has fewer dimensions."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Get_topo allocates raw int[v2] and converts all v2 entries without consulting Get_dim, even though v2 is only the caller's capacity (mpicxx.h:2376-2398). The topology constructor imposes no capacity-equals-dimension invariant, so a successful one-dimensional topology query with capacity two leaves a converted unwritten tail.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B12"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L703-L711,L2540-L2553] (LOW/const-contract) Op::Is_commutative and Reduce_local are non-const and therefore cannot be called directly on the predefined const operation objects."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

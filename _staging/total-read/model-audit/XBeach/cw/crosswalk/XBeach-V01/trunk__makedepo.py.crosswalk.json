@@ -1,0 +1,236 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-V01",
+ "source_path": "trunk/makedepo.py",
+ "source_sha256": "6b4163cb31d5489e9421dfb1188c8f773df187802a51a77705621035cdc1aa1e",
+ "base_run_id": "xbeach-r1-XBeach-V01-gpt-6-astra-01a079bd-fbb5-7cd3-8c47-5d906cc55970",
+ "audit_run_id": "xbeach-r2-XBeach-V01-gpt-6-astra-01a07a3b-b349-7061-aef2-9b392a6fc7c6",
+ "base_record_file": "5d3a05bee1338ab1e1b4cfd7c6cf5f098c410ebe332a36cd43f056e63b955c58.json",
+ "audit_record_file": "5d3a05bee1338ab1e1b4cfd7c6cf5f098c410ebe332a36cd43f056e63b955c58.json",
+ "base_record_sha256_bytes": "68e28f2febb9ad6cac44f6261f351a319646c7f5aaab04224c1636657ca0e51e",
+ "audit_record_sha256_bytes": "8d0719ff3a6d69434f38d83ba5a7736ef374a890a24e6d5a3d5a5b1d0efe6431",
+ "base_finding_count": 9,
+ "audit_finding_count": 7,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "[L87-L106] (MED/fortran-use-parsing) Whitespace tokenization recognizes only bare USE followed immediately by the module name, missing USE-qualified forms and misparsing USE :: module."
+   ],
+   "audit_member_text": [
+    "[L87-L106] (MED/fortran-parsing) Whitespace-token parsing misses valid USE forms such as use::m and use, non_intrinsic :: m and misreads use :: m as a dependency on ::.mod."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "In-memory execution of the unchanged script with USE :: m, USE::n and USE, NON_INTRINSIC :: q emits only ::.mod in O:M mode, reproducing both omission and misparsing. The complete parser has no normalization beyond whitespace splitting and lowercase comparisons, and the Makefile caller supplies raw sources without a preprocessing step.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L46-L47] (MED/missing-dependency) O:FH mode omits src[f] even though its stated output contract includes the source file prerequisite."
+   ],
+   "audit_member_text": [
+    "[L46-L47] (MED/dependency-generation) O:FH mode omits src[f] despite promising a dependency on the source file."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "An in-memory O:FH run emits only the include prerequisite, matching makedepo.py:46-47 and contradicting that branch's explicit source-plus-include contract. The repository caller selects the default O:FHO mode, but that protects that caller only and does not repair the independently selectable O:FH output mode.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L58,L80-L81] (LOW/filename-parsing) The suffix regex begins with an unescaped dot and removes the entire name for a dotless source path, collapsing its object target to prefix plus suffix."
+   ],
+   "audit_member_text": [
+    "[L58,L80] (LOW/filename-parsing) The suffix expression uses an unescaped dot and therefore erases an entire extensionless filename rather than leaving its basename intact."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The unchanged regex removes all of the supplied dotless name plain, and an in-memory run emits .o: plain rather than plain.o: plain. No extension check precedes substitution; normal .F90 inputs from the current Makefile avoid the edge case but the reported extensionless-input behavior is real.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [
+    "[L77-L79,L114-L115] (MED/silent-input-failure) Unreadable source files are silently skipped on IOError, allowing an incomplete dependency graph to be emitted successfully."
+   ],
+   "audit_member_text": [
+    "[L114-L115] (MED/error-handling) Source-file I/O failures are silently ignored and the script can emit an incomplete dependency graph with a successful exit."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "An in-memory unreadable-file case reaches the except IOError: pass and exits successfully with no dependency output; there is no later missing-input check in deps or the main program. The Makefile redirects stdout straight into the dependency file, so its shell command cannot distinguish that incomplete-success result from valid output.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "[L107-L112] (MED/include-parsing) Include detection is case-sensitive and recognizes neither uppercase Fortran INCLUDE nor preprocessor #include directives."
+   ],
+   "audit_member_text": [
+    "[L107-L112] (MED/dependency-generation) Include detection is case-sensitive and ignores uppercase Fortran INCLUDE and preprocessor #include directives."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The unchanged parser recognizes lowercase include only; an in-memory fixture containing uppercase INCLUDE, #include and lowercase include records only the last. Existing raw sources contain preprocessor includes, and neither the complete parser nor its Makefile invocation preprocesses or lowercases the include directive before this test.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "[L86-L113] (MED/transitive-dependencies) Included files are recorded but never scanned, so module USE dependencies and nested includes inside them are absent from the generated build graph."
+   ],
+   "audit_member_text": [
+    "[L86-L112] (MED/dependency-generation) Included files are recorded but never parsed, so module uses or further includes inside them cannot contribute transitive build dependencies."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Only files in the command-line args loop are opened; recognized includes are appended as names and are never recursively opened (makedepo.py:77-115). Ordinary make transitivity can help if separate rules already exist, but this script generates no nested-include rule or hidden USE edge, and no caller supplies a universal recursive scanner that neutralizes its standalone omission.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "[L94-L101] (MED/fortran-module-parsing) Module-provider detection excludes only MODULE PROCEDURE, so MODULE FUNCTION and MODULE SUBROUTINE are incorrectly registered as modules named function and subroutine."
+   ],
+   "audit_member_text": [
+    "[L94-L101] (MED/fortran-parsing) Only module procedure is excluded, so module function and module subroutine declarations are incorrectly registered as providers of function.mod and subroutine.mod."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "In-memory M:F execution with MODULE FUNCTION and MODULE SUBROUTINE emits function.mod and subroutine.mod as providers, exactly following makedepo.py:94-101. The sole MODULE PROCEDURE exclusion and subsequent dictionary cleanup do not remove these false providers; no language-version gate limits inputs to older syntax.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L97] (LOW/duplicate-provider) A second provider of the same module silently overwrites the first, making dependency resolution depend on input order."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A8"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L32,L45,L47,L49,L87,L109-L112] (LOW/make-path-escaping) Source and include paths are whitespace-tokenized or emitted without make escaping, so paths containing spaces or make metacharacters produce incorrect rules."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

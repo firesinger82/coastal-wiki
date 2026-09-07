@@ -1,0 +1,204 @@
+{
+  "shard": "XBeach-B01",
+  "verdicts": [
+    {
+      "vid": "trunk__lib__win32__netcdff90__Makefile.am#1",
+      "verdict": "NARROWED",
+      "rationale": "The include-to-archive dependency error is real in this vendored netCDF makefile, but it is not on the supplied XBeach build path: configure.ac generates only the src makefiles, and the Windows static-library project compiles netcdf.f90 directly (xbeachlibrary.vfproj:170-187). It can affect a separately reconstructed upstream netCDF Automake build, not ordinary XBeach incremental builds.",
+      "neutralizer": {
+        "where": "trunk/configure.ac:L89-L93",
+        "quote": "AC_CONFIG_FILES([Makefile\n                 src/Makefile\n                 src/xbeachlibrary/Makefile\n                 src/xbeach/Makefile])\nAC_OUTPUT"
+      }
+    },
+    {
+      "vid": "trunk__lib__win32__netcdff90__Makefile.am#3",
+      "verdict": "NARROWED",
+      "rationale": "The module/header prerequisites request .o while the convenience archive requests .lo, with no ordering edge between those compilations; the generated Makefile.in:343-350,496,602-605 confirms the race. However, these netCDF makefiles are not configured or traversed by XBeach, and its Windows project compiles the sources directly, so the defect is limited to separately using the vendored upstream build rules.",
+      "neutralizer": {
+        "where": "trunk/configure.ac:L89-L93",
+        "quote": "AC_CONFIG_FILES([Makefile\n                 src/Makefile\n                 src/xbeachlibrary/Makefile\n                 src/xbeach/Makefile])\nAC_OUTPUT"
+      }
+    },
+    {
+      "vid": "trunk__lib__win32__netcdff90__Makefile.in#1",
+      "verdict": "NARROWED",
+      "rationale": "Makefile.in has neither include prerequisites on netcdf.lo nor generated Fortran dependency inclusion, so its archive can relink stale code. This is latent upstream-build behavior only: XBeach does not generate this makefile, and its Visual Studio project owns compilation of the vendored sources.",
+      "neutralizer": {
+        "where": "trunk/configure.ac:L89-L93",
+        "quote": "AC_CONFIG_FILES([Makefile\n                 src/Makefile\n                 src/xbeachlibrary/Makefile\n                 src/xbeach/Makefile])\nAC_OUTPUT"
+      }
+    },
+    {
+      "vid": "trunk__lib__win32__netcdff90__Makefile.in#3",
+      "verdict": "NARROWED",
+      "rationale": "all-am requests both LTLIBRARIES and HEADERS, allowing the independent .f90.lo and .f90.o recipes to write the same module files concurrently. The supplied XBeach build does not invoke this vendored makefile, so the race requires separately configuring/using the upstream netCDF rules.",
+      "neutralizer": {
+        "where": "trunk/configure.ac:L89-L93",
+        "quote": "AC_CONFIG_FILES([Makefile\n                 src/Makefile\n                 src/xbeachlibrary/Makefile\n                 src/xbeach/Makefile])\nAC_OUTPUT"
+      }
+    },
+    {
+      "vid": "trunk__m4__fortranextra.m4#1",
+      "verdict": "NARROWED",
+      "rationale": "The macro really caches every argument under ax_cv_fc_has_module and never invalidates it, so different module probes can reuse the first result. A source-tree search found no AX_FC_HAS_MODULE invocation: this is a latent reusable-macro defect, not an active XBeach configure failure, and requires introducing multiple calls without clearing that cache."
+    },
+    {
+      "vid": "trunk__m4__fortranextra.m4#2",
+      "verdict": "NARROWED",
+      "rationale": "AC_DEFINE does not assign a shell variable, and neither HAVE_$1 nor the documented FC_HAS_MODULE output is assigned anywhere in this macro. No caller of AX_FC_HAS_MODULE exists in the supplied tree, so the broken output/conditional contract is latent and becomes observable only if the macro is used."
+    },
+    {
+      "vid": "trunk__m4__fortranextra.m4#3",
+      "verdict": "NARROWED",
+      "rationale": "Both definitions use AC_DEFUN, despite the DEFUN_ONCE comment, and their cache keys omit requested length and source format. XBeach calls only AC_FC_LINE_LENGTH([unlimited]) once after AC_FC_FREEFORM and never calls the F77 variant, so incorrect reuse requires additional calls or a persisted cache reused under different format/length settings.",
+      "neutralizer": {
+        "where": "trunk/configure.ac:L55-L60",
+        "quote": "# check for functions\nAC_LANG_PUSH([Fortran])\nAC_FC_FREEFORM\nAC_FC_LINE_LENGTH([unlimited])\nACX_FORTRAN_ISNAN\nACX_FORTRAN_IEEE_ARITHMETIC"
+      }
+    },
+    {
+      "vid": "trunk__m4__libtool.m4#2",
+      "verdict": "STANDS",
+      "rationale": "The complete Darwin case has only 10.x deployment-target alternatives and no default, and no other assignment supplies _lt_dar_allow_undefined for an explicit 11.x-or-later target. _LT_DARWIN_LINKER_FEATURES then copies it into allow_undefined_flag at libtool.m4:1120 and uses it in shared/module link commands at 1127-1130."
+    },
+    {
+      "vid": "trunk__m4__libtool.m4#4",
+      "verdict": "STANDS",
+      "rationale": "All three OS/2 assignments use the distinct uppercase-F shell variable, whereas initialization at libtool.m4:4964 and serialization at 6128-6129 use lowercase old_archive_from_new_cmds. Searching the supplied tree found no alias or copying assignment that connects the misspelled variable to the consumed one."
+    },
+    {
+      "vid": "trunk__m4__libtool.m4#6",
+      "verdict": "STANDS",
+      "rationale": "Libtool requires AC_CANONICAL_HOST (libtool.m4:153), and the affected cases use $host rather than $host_os with no local reassignment stripping the CPU/vendor prefix. The outer host_vendor/OS/compiler guards select the intended systems but do not make a canonical triplet match bare sysv4* or osf3*, so the special branches remain unreachable."
+    },
+    {
+      "vid": "trunk__m4__libtool.m4#7",
+      "verdict": "STANDS",
+      "rationale": "Evaluating the exact tests with p=-L and p=-R confirms both are false. The later stripping code at libtool.m4:7544-7548 turns a separated flag into an empty path, and prev is cleared at 7576 before the directory token reaches the ignore-default branch; no subsequent recovery joins that directory to its flag."
+    },
+    {
+      "vid": "trunk__src__xbeach__build__distribute.bat#1",
+      "verdict": "STANDS",
+      "rationale": "Both executable projects call this script as their post-build event, and the solution makes the executable, dynamic DLL and BMI DLL siblings depending on the static library (XBeach_VS2010.sln:3-30). The recursive distribution-directory removal therefore can erase DLLs already published by a sibling, while the following copy reads only the static-library/runtime DLL directory and executable TargetDir, not the published dynamic/BMI DLLs."
+    },
+    {
+      "vid": "trunk__src__xbeach__build__distribute.bat#2",
+      "verdict": "STANDS",
+      "rationale": "Only the distribution destination is removed; TargetDir receives additional DLLs and is then copied with *.exe and *.dll, without an inventory or purge. config/build_configuration.bat:59 performs a normal project clean, but it does not establish removal of obsolete or manually copied wildcard-matching files, and ordinary project post-build invocations also bypass that wrapper."
+    },
+    {
+      "vid": "trunk__src__xbeach__build__zip.bat#1",
+      "verdict": "STANDS",
+      "rationale": "The complete ZIP script adds into the same archive name and deletes only the 7za.exe archive member afterward; it neither removes the previous archive nor requests synchronization of deleted source entries. No in-tree caller enforces distribute.bat before each ZIP invocation, so directly repeating packaging against an existing ZIP preserves removed artifacts."
+    },
+    {
+      "vid": "trunk__src__xbeach__build__zip.bat#2",
+      "verdict": "STANDS",
+      "rationale": "The script has no existence check, backup, or ownership flag for the destination 7za.exe before copying and later deleting it. Deleting the 7za.exe archive member at line 21 does not protect the pre-existing filesystem file from the unconditional deletion at line 26."
+    },
+    {
+      "vid": "trunk__src__xbeach__xbeach.vfproj#0",
+      "verdict": "REFUTED",
+      "rationale": "The executable project compiles only input.F90, introspection.F90 and xbeach.F90, none of which contains USEMPI/USENETCDF conditionals or includes requiring those definitions. Its feature-dependent operations are delegated to the static library, whose combined configurations explicitly define both flags (xbeachlibrary.vfproj:68,78,148,158), so omitting unused wrapper definitions does not disable or mismatch those features.",
+      "neutralizer": {
+        "where": "trunk/src/xbeach/xbeach.F90:L1-L6",
+        "quote": "program xbeach\n   use libxbeach_module,     only: executestep, init, final, outputext\n   use introspection_module, only: getdoubleparameter\n   use iso_c_binding,        only: c_double\n   use process_input,        only: readinput\n   use xmpi_module,          only: halt_program"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeach__xbeach.vfproj#2",
+      "verdict": "STANDS",
+      "rationale": "The netcdf_Release|x64 ObjectFile explicitly selects bin\\win32, and MPI_netcdf_Debug|x64 explicitly selects Win32 ModulePath, ObjectFile and PdbFile. The same-named Win32 configurations use those destinations too; correct x64 OutputDirectory/IntermediateDirectory values do not override the explicit compiler paths, and there are no per-file overrides."
+    },
+    {
+      "vid": "trunk__src__xbeach__xbeach_IFX.vfproj#0",
+      "verdict": "STANDS",
+      "rationale": "The IFX project repeats the explicit Win32 object destination for netcdf_Release|x64 and Win32 module/object/PDB destinations for MPI_netcdf_Debug|x64. Inspection of all file entries, configuration attributes and solution mappings found no override redirecting those compiler outputs to x64."
+    },
+    {
+      "vid": "trunk__src__xbeach__xbeach_IFX.vfproj#2",
+      "verdict": "REFUTED",
+      "rationale": "The IFX executable has the same three unconditional wrapper sources as the classic project, so preprocessing does not consume these feature definitions in this project. Its static-library dependency supplies feature selection and explicitly enables both flags in xbeachlibrary_IFX.vfproj:75,86,163,174; omission in the executable is not a functional configuration defect.",
+      "neutralizer": {
+        "where": "trunk/src/xbeach/xbeach.F90:L1-L6",
+        "quote": "program xbeach\n   use libxbeach_module,     only: executestep, init, final, outputext\n   use introspection_module, only: getdoubleparameter\n   use iso_c_binding,        only: c_double\n   use process_input,        only: readinput\n   use xmpi_module,          only: halt_program"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__Makefile.am#0",
+      "verdict": "STANDS",
+      "rationale": "Each metadata command runs inside command substitution in an echo recipe, whose successful status masks a failing svnversion or svn-info/grep pipeline. The Makefile has no fallback or validation, and the consumers include version.dat directly (logging.F90:220, libxbeach.F90:347), so empty or non-revision text can be accepted as provenance."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__Makefile.am#2",
+      "verdict": "STANDS",
+      "rationale": "BUILT_SOURCES schedules version.dat to exist but does not force its recipe to rerun once the file exists. Neither the complete Makefile nor the parent makefiles add revision/source/phony prerequisites or a refresh hook; CLEANFILES removes it only during clean, leaving normal incremental rebuild metadata unchanged."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__Makefile.am#6",
+      "verdict": "REFUTED",
+      "rationale": "nh_pars.inc is generated from templates/nh_pars.mako, not an irreplaceable handwritten source: generate.py selects all *.mako templates at line 227 and writes corresponding .inc files. Cleaning also removes spacedecl.inc, whose Makefile.am:91-92 rule reruns that generator before the next normal build, recreating nh_pars.inc; its EXTRA_DIST listing does not make this deletion a source-loss defect.",
+      "neutralizer": {
+        "where": "trunk/scripts/generate.py:L239-L251",
+        "quote": "    for template_name in templates:\n        template = lookup.get_template(template_name)\n        filename = template_name.replace('.mako', '.inc')\n        logger.info(\"MAKO: %s -> %s\", template_name, filename)\n        with open(os.path.join(srcdir, filename), 'w') as f:\n            f.write(\"! This file is generated by 'scripts/generate.py' using\"+newline)\n            f.write(\"!    /src/xbeachlibrary/\"+os.path.basename(variables_file)+newline)\n            f.write(\"!    /src/xbeachlibrary/\"+os.path.basename(parameter_file)+newline)\n            f.write(\"!    src/xbeachlibray/templates/\"+template_name+newline)\n            f.write(\"! Advice: do not edit this file, but above mentioned files.\"+newline)\n            f.write(newline);\n            rendered = template.render(**locals())\n            f.write(rendered)"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__build__distribute.bat#2",
+      "verdict": "STANDS",
+      "rationale": "Both dynamic and BMI projects invoke the same script, which deletes both published names and conditionally recopies both fixed source paths regardless of the supplied TargetDir. Their solution dependencies order each after the static library but impose no order between these two post-build events, so counterpart staleness during single-project builds and interference during simultaneous publication remain possible."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__includes__version__makeversiondat.bat#0",
+      "verdict": "NARROWED",
+      "rationale": "The two output locations are inconsistent, but the claimed immediate stale/missing compiler include is not generally true: all consumers use bare version.dat, and the pre-build caller runs in the library source directory, where this branch creates it. Intel searches the including source directory first ([Intel include-file documentation](https://www.intel.com/content/www/us/en/docs/fortran-compiler/developer-guide-reference/2024-2/use-include-files.html)), so the narrower defect is split metadata locations and possible stale root-file shadowing after a later build switches back to the normal/fallback branch.",
+      "neutralizer": {
+        "where": "trunk/src/xbeachlibrary/libxbeach.F90:L343-L349",
+        "quote": "   subroutine getversion(version)\n      character(kind=c_char,len=*),intent(inout) :: version\n\n      include 'version.def'\n      include 'version.dat'\n\n      version = trim(Build_Revision)"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__includes__version__makeversiondat.bat#2",
+      "verdict": "STANDS",
+      "rationale": "The RevisionNumber branch directly slices DATE and TIME without establishing a locale or normalizing the date. Applying the exact character slice to representative DATE strings such as 2026-09-07 or Mon 09/07/2026 truncates the date, and no caller supplies a compensating DATE format."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__xbeachlibrary_IFX_bmi.vfproj#1",
+      "verdict": "STANDS",
+      "rationale": "MPI_Debug|x64 explicitly sets ModulePath to bin\\bmi\\win32\\$(ConfigurationName), matching the Win32 BMI configuration while its objects and intermediate directory remain x64. The compiled xbeach_bmi.f90 defines a module at line 1, and neither file settings nor solution mappings replace that module-output path."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__xbeachlibrary_IFX_dynamic.vfproj#0",
+      "verdict": "STANDS",
+      "rationale": "MPI_Debug|x64 explicitly directs module files to bin\\dynamic\\win32\\$(ConfigurationName), also used by MPI_Debug|Win32. Both compiled files define modules (introspection.F90:1 and libxbeach_dynamic.F90:1), so the setting applies to real generated artifacts; x64 object/output directories and static-library include paths do not neutralize it."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__xbeachlibrary_IFX_dynamic.vfproj#1",
+      "verdict": "REFUTED",
+      "rationale": "This DLL project compiles only introspection.F90 and libxbeach_dynamic.F90, neither of which tests USEMPI, USENETCDF or their related feature macros. The wrapper calls the already compiled libxbeach_module, and the IFX static-library combined configurations explicitly enable both features (xbeachlibrary_IFX.vfproj:75,86,163,174), so missing unused DLL-local definitions do not remove feature support.",
+      "neutralizer": {
+        "where": "trunk/src/xbeachlibrary/libxbeach_dynamic.F90:L12-L17",
+        "quote": "   integer(c_int) function xbeach_init() bind(C, name=\"init\")\n      !DEC$ ATTRIBUTES DLLEXPORT::xbeach_init\n\n      xbeach_init = init()\n\n   end function xbeach_init"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__xbeachlibrary_bmi.vfproj#1",
+      "verdict": "STANDS",
+      "rationale": "The BMI x64 debug configuration explicitly writes modules into the exact Win32 BMI directory used by MPI_Debug|Win32. xbeach_bmi.f90 actually declares module xbeach_bmi and has no file-level configuration override; the correct x64 object and output paths therefore do not prevent this shared module destination."
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__xbeachlibrary_dynamic.vfproj#0",
+      "verdict": "REFUTED",
+      "rationale": "The dynamic DLL sources have no MPI/netCDF preprocessing selection at all: libxbeach_dynamic.F90 delegates to libxbeach_module and introspection.F90 accesses that library through module interfaces. Both features are selected while compiling the dependent static library (xbeachlibrary.vfproj:68,78,148,158), so the wrapper definitions are redundant and their omission is not a feature mismatch.",
+      "neutralizer": {
+        "where": "trunk/src/xbeachlibrary/libxbeach_dynamic.F90:L12-L17",
+        "quote": "   integer(c_int) function xbeach_init() bind(C, name=\"init\")\n      !DEC$ ATTRIBUTES DLLEXPORT::xbeach_init\n\n      xbeach_init = init()\n\n   end function xbeach_init"
+      }
+    },
+    {
+      "vid": "trunk__src__xbeachlibrary__xbeachlibrary_dynamic.vfproj#1",
+      "verdict": "STANDS",
+      "rationale": "The full MPI_Debug|x64 configuration assigns the Win32 dynamic ModulePath even though it uses x64 intermediates and objects. Its two source files generate modules with the same names as the Win32 configuration, and there is no per-file override, separate module naming, or solution remapping preventing the destination overlap."
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-V00",
+ "source_path": "trunk/lib/win32/mpich/include/clog_inttypes.h",
+ "source_sha256": "ecdb55f4347dac8ebda1af869d8613a178763730edd4e8a92ee0bceb4712531e",
+ "base_run_id": "xbeach-r1-XBeach-V00-gpt-6-astra-01a079b6-2340-70c1-8a95-292af5f92813",
+ "audit_run_id": "xbeach-r2-XBeach-V00-gpt-6-astra-01a07a34-5e0e-7073-ac88-2789f15c46ce",
+ "base_record_file": "3882613fe2452f31a1ddd97c34b897de7defd161b9605e1f23a021719e9f2ce4.json",
+ "audit_record_file": "3882613fe2452f31a1ddd97c34b897de7defd161b9605e1f23a021719e9f2ce4.json",
+ "base_record_sha256_bytes": "5cb5155cf9d39882edb559536c8fad8f465d4d3cf0fd588418b9516ee48ecb84",
+ "audit_record_sha256_bytes": "ece6490a7dde5ac1fa513f5cb473ca00d0bc9aab4f9cb65c8394ccb4c463dab0",
+ "base_finding_count": 2,
+ "audit_finding_count": 1,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L15-L18,L26-L29] (LOW/format-abi) The printf formats assume hhd and lld support and use ld for __int32, so compatibility with the Microsoft compiler and CRT version needs confirmation."
+   ],
+   "audit_member_text": [
+    "[L17,L28] (LOW/format-type-mismatch) CLOG_int32_t is __int32 while i32fmt requests long, leaving a variadic type mismatch on compilers where __int32 aliases int even though Win32 gives both types equal width."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The active header typedef is __int32 and i32fmt is %ld, with no format cast or compiler-specific correction elsewhere in the tree. [Microsoft documents __int32 as int](https://learn.microsoft.com/en-us/cpp/cpp/int8-int16-int32-int64?view=msvc-170), so equal Win32 widths do not remove the variadic type mismatch; the finding is appropriately limited to LOW portability/format correctness.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L20-L24] (LOW/abi-contract) CLOG_Pint is fixed at 32 bits despite being described as address-sized, restricting safe use to the intended 32-bit target."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

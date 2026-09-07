@@ -1,0 +1,76 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-V00",
+ "source_path": "trunk/lib/win32/mpich/examples/fpi.f",
+ "source_sha256": "d9d09b61edb2ce52beb0c5ca45645a7b0a3fb419b3a4f110c639c5b25971a670",
+ "base_run_id": "xbeach-r1-XBeach-V00-gpt-6-astra-01a079b6-2340-70c1-8a95-292af5f92813",
+ "audit_run_id": "xbeach-r2-XBeach-V00-gpt-6-astra-01a07a34-5e0e-7073-ac88-2789f15c46ce",
+ "base_record_file": "73b2e1651da1abe1f4debd49c067623b6cc110781f40e5cd5762268259d0eab5.json",
+ "audit_record_file": "73b2e1651da1abe1f4debd49c067623b6cc110781f40e5cd5762268259d0eab5.json",
+ "base_record_sha256_bytes": "eacbf2272ec5533d1daa8912a6e50afff5571c6a124bedf91ecaa298d7e3c343",
+ "audit_record_sha256_bytes": "c8fbc51905c39b5f1b6b09e42164cb683ca413b864ec306dd887fd8a0e5313f1",
+ "base_finding_count": 2,
+ "audit_finding_count": 2,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L43-L50] (MED/collective-input-error) Root reads interactive input without EOF or conversion-error handling before broadcasting, so input failure can terminate root while peers wait in the collective."
+   ],
+   "audit_member_text": [
+    "[L46-L50] (MED/input-error-handling) The root's formatted input has no IOSTAT or end/error branch, so EOF or malformed input terminates that process while other ranks can remain waiting in MPI_BCAST."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Root performs the formatted i10 read before the broadcast, with no IOSTAT, END or ERR branch; the n<=0 exit check happens only after successful input and broadcast. An MPI launcher may subsequently tear down the job, but the example has no collective handling of root EOF/conversion failure and peers can be left waiting until that cleanup.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L59-L62] (LOW/integer-overflow) Unbounded positive input permits a DO-loop terminal increment beyond the default-integer range for sufficiently large n."
+   ],
+   "audit_member_text": [
+    "[L59-L62] (MED/integer-overflow) An interval count near the default integer limit can overflow the DO iteration count or final induction-variable increment."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The overflow possibility survives the n<=0 guard: i10 accepts 2147483647 and, with one process, the final default-integer induction value would be 2147483648. Reduce severity to LOW because this is an extreme-input portability defect in an interactive demonstration, with actual termination/overflow behavior depending on how the compiler implements or eliminates the DO control variable.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  }
+ ]
+}

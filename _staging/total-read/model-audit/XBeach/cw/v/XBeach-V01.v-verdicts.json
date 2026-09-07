@@ -1,0 +1,244 @@
+{
+  "shard": "XBeach-V01",
+  "verdicts": [
+    {
+      "vid": "trunk__lib__win32__netcdff90__netcdf_dims.f90#0",
+      "verdict": "STANDS",
+      "rationale": "The complete function has no initialization of dimName or length and checks only argument presence after nf_inq_dim returns (netcdf_dims.f90:39-44); the external declaration supplies no output-initialization contract. The ncoutput.F90:38-39 error handler runs only after this wrapper has already copied the locals, so it cannot neutralize the internal reads."
+    },
+    {
+      "vid": "trunk__lib__win32__netcdff90__netcdf_expanded.f90#0",
+      "verdict": "NARROWED",
+      "rationale": "The missing capacity checks are real, but this is a caller-supplied memory-selection violation, not an overflow caused by the default selection: shape(values) supplies the default counts and all trailing counts are one (netcdf_expanded.f90:215-218). Retain as a LOW defensive-validation issue for explicit count/map combinations whose addressed memory footprint exceeds the actual buffer; the legacy external interface cannot see that buffer extent.",
+      "neutralizer": {
+        "where": "trunk/lib/win32/netcdff90/netcdf_expanded.f90:L215-L220",
+        "quote": "     numDims                 = size(shape(values))\n     localStart (:         ) = 1\n     localCount (:numDims  ) = shape(values)\n     localCount (numDims+1:) = 1\n     localStride(:         ) = 1\n     localMap   (:numDims  ) = (/ 1, (product(localCount(:counter)), counter = 1, numDims - 1) /)"
+      }
+    },
+    {
+      "vid": "trunk__lib__win32__netcdff90__netcdf_expanded.f90#1",
+      "verdict": "STANDS",
+      "rationale": "The FourByteInt and EightByteInt getters allocate automatic defaultIntArray(size(values)) without initialization, then unconditionally reshape the entire array after every backend branch (netcdf_expanded.f90:2164-2198,2645-2679). A successful read with count=(/1/) into a larger values array already leaves an unwritten tail, so neither error handling nor backend file-bound checks break the finding; the direct OneByteInt/TwoByteInt paths do not repair these overloads."
+    },
+    {
+      "vid": "trunk__lib__win32__netcdff90__netcdf_expanded.f90#2",
+      "verdict": "NARROWED",
+      "rationale": "All cited copies are unchecked, but exceeding these arrays requires optional vectors longer than the library limit of 1024 (netcdf_constants.f90:70-75), rather than an ordinary valid-rank selection. Retain as LOW validation of oversized caller vectors; no source-tree caller was found supplying such a vector."
+    },
+    {
+      "vid": "trunk__lib__win32__netcdff90__netcdf_expanded.f90#4",
+      "verdict": "STANDS",
+      "rationale": "localMap is automatic storage and only entries through the values rank are initialized; present(map) overwrites only its supplied prefix (netcdf_expanded.f90:211-228). The default trailing count of one is a partial protection, but the claim explicitly activates extra dimensions using count greater than one, and neither module initialization nor an external interface supplies the missing map entries."
+    },
+    {
+      "vid": "trunk__lib__win32__netcdff90__netcdf_expanded.f90#5",
+      "verdict": "STANDS",
+      "rationale": "Every EightByteInt scalar/array write reaches nf_put_var*_int with int(values), including all three array dispatch branches (netcdf_expanded.f90:55-68,939-971,1149-1181). With the bundled ordinary default-integer build, a value such as 4294967296 is narrowed before backend conversion even when a netCDF double variable could represent it; typeSizes.f90:36 selects the input kind but provides no range guard or wider conversion path."
+    },
+    {
+      "vid": "trunk__lib__win32__netcdff90__netcdf_file.f90#0",
+      "verdict": "STANDS",
+      "rationale": "nf90_inquire has uninitialized automatic output locals and unconditional presence-based copies, then assigns the format-query status over the first status (netcdf_file.f90:156-172). No success guard or initializer exists in the enclosing module; although an invalid ncid normally makes both calls fail, that does not remove the unconditional undefined-output copies or the status overwrite."
+    },
+    {
+      "vid": "trunk__lib__win32__netcdff90__netcdf_file.f90#1",
+      "verdict": "STANDS",
+      "rationale": "The mp wrappers pass their INTENT(IN) chunk hint itself, with no local copy, to the legacy routines (netcdf_file.f90:56-86). The bundled manual says those routines behave like nf__create/nf__open except for the base PE (netcdf_f90.3:925-938), while the ordinary wrappers explicitly use INOUT and return the selected hint; netcdf_visibility.f90:7 exposes the mp wrappers and no platform exclusion removes them."
+    },
+    {
+      "vid": "trunk__lib__win32__netcdff90__netcdf_text_variables.f90#0",
+      "verdict": "STANDS",
+      "rationale": "Both complete scalar character procedures accept map but call only nf_*_vars_text and never reference map (netcdf_text_variables.f90:1-39). A scalar Fortran string still represents a character dimension, as netcdf.f90:30-34 explains, so scalar rank does not make a nonunit character-memory mapping meaningless."
+    },
+    {
+      "vid": "trunk__lib__win32__netcdff90__netcdf_text_variables.f90#1",
+      "verdict": "STANDS",
+      "rationale": "The character dummy arrays are assumed-shape and have no CONTIGUOUS requirement, but each backend argument is a single first element (netcdf_text_variables.f90:42-71,266-295 and the higher-rank equivalents). The legacy routines are only EXTERNAL declarations in netcdf_externals.f90:32-46, so they receive neither the array descriptor nor its section strides; packing the scalar element cannot pack the remaining noncontiguous array."
+    },
+    {
+      "vid": "trunk__lib__win32__netcdff90__netcdf_text_variables.f90#2",
+      "verdict": "NARROWED",
+      "rationale": "Explicit count/map selections can exceed character storage and no wrapper checks their memory footprint, but oversized selections are a caller memory-contract violation; classify that generic omission as LOW defensive validation. The scalar put case involving an otherwise adequately sized string that is shortened by trim is a separate, stronger finding, and scalar map arguments are ignored rather than forwarded."
+    },
+    {
+      "vid": "trunk__lib__win32__netcdff90__netcdf_text_variables.f90#3",
+      "verdict": "STANDS",
+      "rationale": "All fourteen array-text wrappers set counts above numDims+1 to zero, and a start-only call does not change them; scalar text and numeric wrappers instead use one. Thus an extra record dimension makes the selection empty even when the character-length and array dimensions are correctly sized; the backend zero-count behavior is documented in the [Unidata interface guide](https://docs.unidata.ucar.edu/netcdf-fortran/current/nc_f77_interface_guide.html)."
+    },
+    {
+      "vid": "trunk__lib__win32__netcdff90__netcdf_text_variables.f90#4",
+      "verdict": "NARROWED",
+      "rationale": "Retain at MED for mapped calls whose supplied map omits an active character-array dimension, particularly when that dimension has more than one selected element. Unmapped calls bypass localMap entirely and a full map replaces the missing entry, so the HIGH wording should not imply a general array-text failure.",
+      "neutralizer": {
+        "where": "trunk/lib/win32/netcdff90/netcdf_text_variables.f90:L63-L70",
+        "quote": "     if(present(map))  then\n       localMap   (:size(map))    = map(:)\n       nf90_put_var_1D_text = &\n          nf_put_varm_text(ncid, varid, localStart, localCount, localStride, localMap, values(1))\n     else\n       nf90_put_var_1D_text = &\n          nf_put_vars_text(ncid, varid, localStart, localCount, localStride, values(1))\n     end if"
+      }
+    },
+    {
+      "vid": "trunk__lib__win32__netcdff90__netcdf_text_variables.f90#5",
+      "verdict": "STANDS",
+      "rationale": "An explicit count overwrites len_trim(values), but the backend actual remains trim(values) unconditionally (netcdf_text_variables.f90:9-18). For example a length-two value ending in a blank with count=(/2/) supplies only a length-one temporary; neither the default-count assignment nor another module restores the removed blank."
+    },
+    {
+      "vid": "trunk__lib__win32__netcdff90__netcdf_text_variables.f90#6",
+      "verdict": "STANDS",
+      "rationale": "Each array-text transfer forms values(1) or its higher-rank equivalent without testing size(values), in both mapped and unmapped branches (netcdf_text_variables.f90:63-70,287-294). A zero selection can prevent backend I/O but cannot make that first-element argument designate an existing element of an empty array; this is correctly limited to a LOW language/bounds-contract issue."
+    },
+    {
+      "vid": "trunk__lib__win32__netcdff90__netcdf_text_variables.f90#7",
+      "verdict": "NARROWED",
+      "rationale": "The fixed-vector copies are unchecked, but the overrun requires caller vectors longer than nf90_max_var_dims=1024, not a valid file rank. Retain as LOW input-contract validation; scalar map is ignored and therefore is not itself copied into a fixed local array."
+    },
+    {
+      "vid": "trunk__lib__win32__netcdff90__typeSizes.f90#0",
+      "verdict": "NARROWED",
+      "rationale": "The standalone byteSizesOK function omits EightByteInt and can incorrectly endorse an unavailable or non-eight-byte selection, but this is a LOW portability-validation omission. In a complete netCDF-module build an unavailable kind is already rejected by declarations such as netcdf_expanded.f90:57, so a successfully built ordinary bundled library cannot reach the claimed unavailable-kind case.",
+      "neutralizer": {
+        "where": "trunk/lib/win32/netcdff90/netcdf_expanded.f90:L55-L57",
+        "quote": "   function nf90_put_var_EightByteInt(ncid, varid, values, start)\n     integer,                         intent( in) :: ncid, varid\n     integer (kind = EightByteInt), intent( in) :: values"
+      }
+    },
+    {
+      "vid": "trunk__lib__x64__mpich__examples__fpi.f#0",
+      "verdict": "NARROWED",
+      "rationale": "The READ is indeed unhandled and precedes MPI_BCAST; the n<=0 exit test at fpi.f:53 only protects successfully read nonpositive integers. Reduce to LOW robustness of this interactive example: EOF/malformed input can abort the root, but whether peers remain waiting or the launcher tears down the job is runtime-dependent, not a demonstrated persistent MPI deadlock."
+    },
+    {
+      "vid": "trunk__lib__x64__mpich__examples__icpi.c#0",
+      "verdict": "NARROWED",
+      "rationale": "The positive interval count is an int accepted by scanf and the final i += numprocs has no overflow protection; INT_MAX with one rank is already a counterexample (icpi.c:21,43-55). Retain as LOW for this interactive demonstration at extreme interval counts, rather than a MED defect in XBeach numerical execution."
+    },
+    {
+      "vid": "trunk__lib__x64__mpich__examples__icpi.c#1",
+      "verdict": "STANDS",
+      "rationale": "Only n==0 ends the C loop; for n<0 all positive rank-based starting indices exceed n, sum stays zero and the reduction/printing branch still runs (icpi.c:49-68). The scanf failure fallback handles malformed input, not a successfully parsed negative integer, and the Fortran example's n<=0 guard is in a different executable."
+    },
+    {
+      "vid": "trunk__lib__x64__mpich__include__clog_inttypes.h#0",
+      "verdict": "NARROWED",
+      "rationale": "The concrete surviving issue is i32fmt=%ld paired with __int32, which Microsoft defines as int, not long; equal Windows widths do not make those variadic types identical ([Microsoft type documentation](https://learn.microsoft.com/en-us/cpp/cpp/int8-int16-int32-int64?view=msvc-170)). Retain LOW format/type portability; mixing Microsoft type spellings with C99 modifiers alone does not establish CRT incompatibility or a wrong result on the shipped ABI."
+    },
+    {
+      "vid": "trunk__lib__x64__mpich__include__clog_inttypes.h#1",
+      "verdict": "NARROWED",
+      "rationale": "The header really violates its advertised address-sized type, but the upstream consumer stores small local communicator IDs as attribute values, not heap addresses, so truncation of live addresses is not established. The concrete consumer risk is a pointer-sized MPI_Comm_get_attr write into CLOG_Pint storage if compiled from this header; see [clog_commset.c:309-310,440-468](https://fossies.org/linux/mpich2/src/mpe2/src/logging/src/clog_commset.c), and distinguish this header defect from proof that the prebuilt MPE DLL used the same configuration."
+    },
+    {
+      "vid": "trunk__lib__x64__mpich__include__clog_uuid.h#0",
+      "verdict": "STANDS",
+      "rationale": "The active macro at clog_uuid.h:23-24 is an unparenthesized sum, distinct from the commented older definition, and 2*CLOG_UUID_SIZE therefore multiplies only its first term. The actual local typedef at line 33 uses it safely, so no current buffer overflow is established, but that does not refute the specifically LOW macro-composition defect."
+    },
+    {
+      "vid": "trunk__lib__x64__mpich__include__mpicxx.h#0",
+      "verdict": "STANDS",
+      "rationale": "Alltoallw belongs to Comm and is inherited by Intercomm, while Comm::Get_size calls MPI_Comm_size (mpicxx.h:1285-1289) and Intercomm separately provides Get_remote_size (1545-1549). No override or intercommunicator branch changes the allocation/iteration counts, so unequal groups cause either backend reads past undersized temporaries or wrapper reads past correctly remote-sized caller arrays."
+    },
+    {
+      "vid": "trunk__lib__x64__mpich__include__mpicxx.h#1",
+      "verdict": "STANDS",
+      "rationale": "Cartcomm::Sub allocates and reads exactly ten entries without calling the available Get_dim (mpicxx.h:2376-2380,2414-2427). The constructors merely wrap communicator handles and impose no ten-dimensional invariant, so a valid one-dimensional bool[1] input is enough to overread before MPI_Cart_sub executes."
+    },
+    {
+      "vid": "trunk__lib__x64__mpich__include__mpicxx.h#3",
+      "verdict": "REFUTED",
+      "rationale": "The packaged MPICH2 1.4.1p1 runtime explicitly stores MPI_COMM_NULL through newcomm on the error path before returning through the communicator error handler: mpich2mpi.dll RVA 0x6fee0, in cabinet member _1BE96E15F472462586C19E8C77FF7927 of the bundled x64 MSI, disassembled entirely in memory. This matches the quoted upstream error-path assignment, so these Clone calls can discard status but do not construct a wrapper from an uninitialized ncomm with the bundled runtime.",
+      "neutralizer": {
+        "where": "https://fossies.org/linux/mpich2/src/mpi/comm/comm_dup.c:L179-L180",
+        "quote": "    *newcomm = MPI_COMM_NULL;\n    mpi_errno = MPIR_Err_return_comm( comm_ptr, FCNAME, mpi_errno );"
+      }
+    },
+    {
+      "vid": "trunk__lib__x64__mpich__include__mpicxx.h#4",
+      "verdict": "STANDS",
+      "rationale": "MPI_Datatype is typedef int in the companion mpi.h:23, so new MPI_Datatype[v4] does not run a null-initializing wrapper constructor. Get_contents never queries the envelope and copies all capacity entries at mpicxx.h:325-332; extra capacity beyond the actual datatype count remains uninitialized even on success."
+    },
+    {
+      "vid": "trunk__lib__x64__mpich__include__mpicxx.h#5",
+      "verdict": "STANDS",
+      "rationale": "The temporaries are raw MPI_Status structs with integer fields (mpi.h:402-409), not MPI::Status objects with initialization. Waitsome/Testsome copy v1 entries regardless of returned v3, including the all-null-request case where no status entries are produced; request copyback and the separate status-ignoring overloads do not initialize or guard this tail."
+    },
+    {
+      "vid": "trunk__lib__x64__mpich__include__mpicxx.h#6",
+      "verdict": "STANDS",
+      "rationale": "The complete status-returning Testall overload copies l4 before inspecting v3, with no initialization of the raw MPI_Status array (mpicxx.h:879-905). A false completion flag leaves statuses undefined under the [MPI_Testall contract](https://www.open-mpi.org/doc/v4.0/man3/MPI_Testall.3.php), so neither successful return status nor initialized MPI::Request wrappers neutralize the internal copies."
+    },
+    {
+      "vid": "trunk__lib__x64__mpich__include__mpicxx.h#8",
+      "verdict": "REFUTED",
+      "rationale": "The supplied cxx.lib implementation of each Comm/Datatype/Win Create_keyval compares the copy-function pointer with its NULL_COPY_FN and conditionally replaces it with zero before calling the C registration routine; objdump relocations and the compare/cmove sequence at function offsets 0x4-0x18 verify all three. Thus ordinary registration never executes these helper bodies during duplication, defeating the claimed indeterminate-attribute installation path; the quoted upstream implementation expresses the same concrete neutralizer.",
+      "neutralizer": {
+        "where": "https://fossies.org/linux/mpich2/src/binding/cxx/initcxx.cxx:L502-L504",
+        "quote": "    if (cf == MPI::Comm::NULL_COPY_FN) cf = 0;\n    if (df == MPI::Comm::NULL_DELETE_FN) df = 0;\n    MPIX_CALLWORLD( MPI_Comm_create_keyval( (MPI_Comm_copy_attr_function *)cf,"
+      }
+    },
+    {
+      "vid": "trunk__lib__x64__mpich__include__mpicxx.h#10",
+      "verdict": "STANDS",
+      "rationale": "Both complete Spawn_multiple overloads allocate from count and dereference array_of_info before calling the collective, with no Get_rank/root check (mpicxx.h:1690-1719). A nonroot with count>0 and an otherwise insignificant null info-array argument therefore fails in the wrapper before the C implementation can ignore it; providing count=0 on nonroot is only a caller workaround."
+    },
+    {
+      "vid": "trunk__lib__x64__mpich__include__mpicxx.h#11",
+      "verdict": "STANDS",
+      "rationale": "The inherited Alltoallw implementation always copies v4[i4].the_real_datatype before MPI_Alltoallw, without comparing v1 to MPI_IN_PLACE (mpicxx.h:1369-1388). On a valid in-place intracommunicator call the send-side array may be insignificant, but backend handling occurs too late to protect a null or short send datatype array."
+    },
+    {
+      "vid": "trunk__lib__x64__mpich__include__mpicxx.h#12",
+      "verdict": "STANDS",
+      "rationale": "The scalar outputs v2 have no initializer, and MPIX_CALLWORLD/MPIX_CALLREF call the error handler but do not force a return or throw after it returns (mpicxx.h:83-95,249-253,1185-1189,2018-2022). The claim already requires a returning handler, so default fatal/throwing behavior is not a refutation; unlike communicator duplication, no universal null-output assignment protects these scalar getters."
+    },
+    {
+      "vid": "trunk__lib__x64__mpich__include__mpicxx.h#13",
+      "verdict": "STANDS",
+      "rationale": "Get_topo allocates raw int[v2] and converts all v2 entries without consulting Get_dim, even though v2 is only the caller's capacity (mpicxx.h:2376-2398). The topology constructor imposes no capacity-equals-dimension invariant, so a successful one-dimensional topology query with capacity two leaves a converted unwritten tail."
+    },
+    {
+      "vid": "trunk__lib__x64__mpich__include__mpio.h#1",
+      "verdict": "STANDS",
+      "rationale": "HAVE_MPI_GREQUEST is explicitly defined, so MPIO_Request and MPIO_Wait/Test resolve to MPI_Request and MPI_Wait/Test (mpio.h:27-37). The included mpi.h:193 defines MPI_REQUEST_NULL as 0x2c000000, whereas MPIO_REQUEST_NULL remains zero at mpio.h:93; the MPI_FILE_NULL guard is unrelated and cannot repair this concrete handle mismatch."
+    },
+    {
+      "vid": "trunk__makedepo.py#0",
+      "verdict": "STANDS",
+      "rationale": "In-memory execution of the unchanged script with USE :: m, USE::n and USE, NON_INTRINSIC :: q emits only ::.mod in O:M mode, reproducing both omission and misparsing. The complete parser has no normalization beyond whitespace splitting and lowercase comparisons, and the Makefile caller supplies raw sources without a preprocessing step."
+    },
+    {
+      "vid": "trunk__makedepo.py#1",
+      "verdict": "STANDS",
+      "rationale": "An in-memory O:FH run emits only the include prerequisite, matching makedepo.py:46-47 and contradicting that branch's explicit source-plus-include contract. The repository caller selects the default O:FHO mode, but that protects that caller only and does not repair the independently selectable O:FH output mode."
+    },
+    {
+      "vid": "trunk__makedepo.py#2",
+      "verdict": "STANDS",
+      "rationale": "The unchanged regex removes all of the supplied dotless name plain, and an in-memory run emits .o: plain rather than plain.o: plain. No extension check precedes substitution; normal .F90 inputs from the current Makefile avoid the edge case but the reported extensionless-input behavior is real."
+    },
+    {
+      "vid": "trunk__makedepo.py#3",
+      "verdict": "STANDS",
+      "rationale": "An in-memory unreadable-file case reaches the except IOError: pass and exits successfully with no dependency output; there is no later missing-input check in deps or the main program. The Makefile redirects stdout straight into the dependency file, so its shell command cannot distinguish that incomplete-success result from valid output."
+    },
+    {
+      "vid": "trunk__makedepo.py#4",
+      "verdict": "STANDS",
+      "rationale": "The unchanged parser recognizes lowercase include only; an in-memory fixture containing uppercase INCLUDE, #include and lowercase include records only the last. Existing raw sources contain preprocessor includes, and neither the complete parser nor its Makefile invocation preprocesses or lowercases the include directive before this test."
+    },
+    {
+      "vid": "trunk__makedepo.py#5",
+      "verdict": "STANDS",
+      "rationale": "Only files in the command-line args loop are opened; recognized includes are appended as names and are never recursively opened (makedepo.py:77-115). Ordinary make transitivity can help if separate rules already exist, but this script generates no nested-include rule or hidden USE edge, and no caller supplies a universal recursive scanner that neutralizes its standalone omission."
+    },
+    {
+      "vid": "trunk__makedepo.py#6",
+      "verdict": "STANDS",
+      "rationale": "In-memory M:F execution with MODULE FUNCTION and MODULE SUBROUTINE emits function.mod and subroutine.mod as providers, exactly following makedepo.py:94-101. The sole MODULE PROCEDURE exclusion and subsequent dictionary cleanup do not remove these false providers; no language-version gate limits inputs to older syntax."
+    },
+    {
+      "vid": "trunk__scripts__dist__Include__pyconfig.h#0",
+      "verdict": "NARROWED",
+      "rationale": "The wrong four-byte configuration is real when this distributed header is reused for GNU Windows x64 without an externally supplied MS_WIN64: _WIN64 is translated only within the _MSC_VER block, and the GNU branch supplies no equivalent. Scope this to such extension/core builds, not the already compiled bundled Python executable; externally defining MS_WIN64 selects the correct eight-byte branch.",
+      "neutralizer": {
+        "where": "trunk/scripts/dist/Include/pyconfig.h:L303-L313",
+        "quote": "#if defined(MS_WIN64)\n/* maintain \"win32\" sys.platform for backward compatibility of Python code,\n   the Win64 API should be close enough to the Win32 API to make this\n   preferable */\n#\tdefine PLATFORM \"win32\"\n#\tdefine SIZEOF_VOID_P 8\n#\tdefine SIZEOF_TIME_T 8\n#\tdefine SIZEOF_OFF_T 4\n#\tdefine SIZEOF_FPOS_T 8\n#\tdefine SIZEOF_HKEY 8\n#\tdefine SIZEOF_SIZE_T 8"
+      }
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-V00",
+ "source_path": "trunk/lib/win32/mpich/examples/icpi.c",
+ "source_sha256": "d7a7d4f8fd4e7028bcea09c200d551ebca0187fa47673fa4259d5a5f780c6107",
+ "base_run_id": "xbeach-r1-XBeach-V00-gpt-6-astra-01a079b6-2340-70c1-8a95-292af5f92813",
+ "audit_run_id": "xbeach-r2-XBeach-V00-gpt-6-astra-01a07a34-5e0e-7073-ac88-2789f15c46ce",
+ "base_record_file": "6abe9651966e45e61af3cbdd46a7e230570faaed776e45627925f26cabf5460b.json",
+ "audit_record_file": "6abe9651966e45e61af3cbdd46a7e230570faaed776e45627925f26cabf5460b.json",
+ "base_record_sha256_bytes": "df7563e0589b283cee265db7ee24d77ef2bf5c85151f8ba25c8da524891dcee7",
+ "audit_record_sha256_bytes": "7cae1f33a3173b3fac3e0860cbcea18fb4f3f1de28b464afe50332f926972d86",
+ "base_finding_count": 2,
+ "audit_finding_count": 2,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L43,L55] (MED/integer-overflow) An accepted interval count near INT_MAX can overflow the signed loop index on its final increment, causing undefined behavior."
+   ],
+   "audit_member_text": [
+    "[L55] (MED/integer-overflow) For interval counts near INT_MAX, the final i += numprocs can overflow signed int before the loop condition is rechecked."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The scanf check handles failed conversion but accepts a representable INT_MAX, and the only numerical exit check is n==0. With one process, the last iteration at i=INT_MAX executes i+=1 before retesting, overflowing signed int; no wider loop-index declaration or cap exists.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L50-L59] (LOW/input-validation) Negative interval counts enter the calculation branch and report zero as the approximation instead of rejecting the input."
+   ],
+   "audit_member_text": [
+    "[L50-L59] (LOW/input-validation) Negative interval counts pass the zero-only exit check and produce an empty integral reported as a pi approximation."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "A successfully scanned negative n is broadcast and enters the else branch because the guard tests equality with zero only. Every rank starts with a positive i, skips the integration loop and reduces a signed-zero partial sum, which root prints as its pi approximation.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  }
+ ]
+}

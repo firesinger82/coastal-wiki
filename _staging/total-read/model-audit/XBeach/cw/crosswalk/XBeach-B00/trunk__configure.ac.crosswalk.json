@@ -1,0 +1,83 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-B00",
+ "source_path": "trunk/configure.ac",
+ "source_sha256": "3bcc40e18b5767054858667fddc01c668c443e7f2423680c06097027913b8dc8",
+ "base_run_id": "xbeach-r1-XBeach-B00-gpt-5.6-luna-01a079a6-7103-7312-a441-5309a7d01425",
+ "audit_run_id": "xbeach-r2-XBeach-B00-gpt-5.6-luna-01a07a19-bf73-7b91-afe4-1b0868a2795d",
+ "base_record_file": "76e6c988a190255192050d658f46a04a315f22321bd82979e78ed0aa8b47fe38.json",
+ "audit_record_file": "76e6c988a190255192050d658f46a04a315f22321bd82979e78ed0aa8b47fe38.json",
+ "base_record_sha256_bytes": "2ccd070bebe2b0e07cbb5d471fab034f3634d142372fc00c9518b0e6a9ed9b80",
+ "audit_record_sha256_bytes": "7b2335cfa3aa38a6ca4eed42335e5cdf369f9d17820a02672b9c80876853a752",
+ "base_finding_count": 1,
+ "audit_finding_count": 3,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L21] (MED/autoconf/syntax) The AC_SUBST call has an unusual unmatched-looking quote/bracket sequence (`['$(top_srcdir)/makedepo.py])'`), leaving the generated MAKEDEPO value and macro parsing contract unclear."
+   ],
+   "audit_member_text": [
+    "[L21] (HIGH/configure-syntax) A stray single quote follows AC_SUBST and is emitted into configure shell code, corrupting shell quoting and preventing reliable configuration."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "The quote inside the AC_SUBST value opens the shell string, and the quote after the macro invocation closes it: expansion using the installed Autoconf macro emitted MAKEDEPO= followed by a single-quoted $(top_srcdir)/makedepo.py and a trailing newline, and that assignment passed sh -n and executed successfully. Thus the claimed unmatched-quote/configure-syntax failure is false; the embedded newline is a separate value issue rather than broken shell quoting.",
+    "neutralizer": {
+     "where": "trunk/configure.ac:L21-L21",
+     "quote": "AC_SUBST(MAKEDEPO,['$(top_srcdir)/makedepo.py])'\n"
+    },
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L43-L53] (MED/dependency-detection-contract) MPI mode and FC replacement depend on the requested option rather than an explicitly checked successful ACX_MPI result, leaving failed MPI discovery without a local failure guard."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L73-L76] (MED/dependency-validation) The NetCDF fallback accepts netcdf >= 4 package metadata without checking that its Fortran module and library are present and usable by the selected compiler."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

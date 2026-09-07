@@ -1,0 +1,307 @@
+{
+  "shard": "XBeach-V00",
+  "verdicts": [
+    {
+      "vid": "trunk__config__teamcity-distribute-windows.py#0",
+      "verdict": "STANDS",
+      "rationale": "scpcopyfile discards subprocess.call status at L58 and returns normally; distribute then appends the binary link and uploads the index at L29-L46. Neither its command-line entry point nor the surrounding configuration scripts check binary-transfer success, so a failed binary upload followed by a successful index upload exposes unavailable downloads."
+    },
+    {
+      "vid": "trunk__config__teamcity-distribute-windows.py#1",
+      "verdict": "STANDS",
+      "rationale": "The command-line entry point passes bindir unchanged (L65,L78), with no separator normalization. Without the suffix, the glob loses one directory level and can match sibling prefixes; replace/split at L21 also preserves a leading empty component for ordinary paths, with no subsequent validation."
+    },
+    {
+      "vid": "trunk__config__teamcity-distribute-windows.py#2",
+      "verdict": "STANDS",
+      "rationale": "The full helper constructs one shell string from the executable, credentials and paths at L53-L58, without quoting or escaping at either caller. A space in workdir splits the executable path, and shell metacharacters in password or source remain active before pscp runs."
+    },
+    {
+      "vid": "trunk__config__teamcity-distribute-windows.py#5",
+      "verdict": "STANDS",
+      "rationale": "files may be empty while ln remains empty, but neither the loop nor the entry point tests that condition. With an available template and successful final transfer, L40-L46 publishes the empty replacement page and L35 has already announced completion."
+    },
+    {
+      "vid": "trunk__config__teamcity-distribute-windows.py#6",
+      "verdict": "STANDS",
+      "rationale": "The glob accepts every zip and newname uses only revision, platform and configuration (L14-L27), never the discovered archive name or embedded revision. Two archives in the same recognized configuration therefore target exactly the same remote file, and no producer/provenance check was found in the source tree."
+    },
+    {
+      "vid": "trunk__config__teamcity-distribute-windows.py#9",
+      "verdict": "STANDS",
+      "rationale": "The L57 TeamCity message interpolates the discovered filename directly; the caller neither restricts filenames to service-message-safe characters nor escapes them. A legal apostrophe or closing bracket in a filename can terminate or change the message field."
+    },
+    {
+      "vid": "trunk__config__teamcity-distribute.py#1",
+      "verdict": "STANDS",
+      "rationale": "The exists check has no failure branch, and index generation/upload follows the loops regardless of how many configurations exist. An in-memory execution of the actual function with all exists checks false produced an empty list and still called the upload path; no external completeness guard was found."
+    },
+    {
+      "vid": "trunk__config__teamcity-distribute.py#3",
+      "verdict": "STANDS",
+      "rationale": "The active client is the local SSHClient at L52, not the commented Paramiko implementation that could raise transfer errors. Its put method ignores a nonzero subprocess result, and an in-memory run with every transfer returning failure still generated eight binary links and the finished message."
+    },
+    {
+      "vid": "trunk__config__teamcity-distribute.py#4",
+      "verdict": "STANDS",
+      "rationale": "The complete archive helper recursively walks cpath but passes only fname as arcname at L125. The zip exclusion prevents self-inclusion but does not preserve directory prefixes, so two non-zip files with the same basename in different directories collide inside the archive."
+    },
+    {
+      "vid": "trunk__config__teamcity-distribute.py#5",
+      "verdict": "STANDS",
+      "rationale": "SSHClient.put assembles and executes an unquoted shell string at L38-L41, and connect merely stores the supplied strings. Neither the distribute caller nor the CLI sanitizes those values, so ordinary spaces and shell metacharacters affect command parsing."
+    },
+    {
+      "vid": "trunk__config__teamcity-distribute.py#6",
+      "verdict": "STANDS",
+      "rationale": "distribute forwards its port argument to connect at L54, but put constructs pscp arguments without either that stored value or a -P option. The CLI happens to use port 22, but the explicitly exposed nondefault-port function argument is ineffective."
+    },
+    {
+      "vid": "trunk__doc__misc__generate_boundary_condition_limits_figures.m#1",
+      "verdict": "STANDS",
+      "rationale": "The enclosing helper only collects patch children and has no fallback from an empty xp/lp before ismember and reindexing. The [MathWorks R2014b compatibility explanation](https://blogs.mathworks.com/loren/2014/11/05/matlab-r2014b-graphics-part-3-compatibility-considerations-in-the-new-graphics-system/) confirms Contour objects no longer expose those children; the fixed callers supply nonempty contour levels and have no version guard."
+    },
+    {
+      "vid": "trunk__doc__misc__generate_boundary_condition_limits_figures.m#2",
+      "verdict": "NARROWED",
+      "rationale": "This is a latent LOW topology limitation only when a collected patch actually contains multiple rings separated by NaNs; deleting a lone trailing separator does not join rings. The only callers use fixed rectangular meshes and smooth depth/period or height/depth fields, so the cited lines do not establish ring corruption in the generated figures; changed inputs or a different contour representation are needed.",
+      "neutralizer": {
+        "where": "trunk/doc/misc/generate_boundary_condition_limits_figures.m:L8-L20",
+        "quote": "Hrange = [2:0.1:8];\nDrange = [0:1:40];\nTrange = [6:0.25:18];\n\n[HD,DH] = meshgrid(Hrange,Drange);\n[TD,DT] = meshgrid(Trange,Drange);\n\n%% Factors\nHiD = HD./DH;\n[c,cg] = wavevelocity(TD,DT);\nCgiC = cg./c;CgiC(isnan(CgiC)) = 1;\nk = disper(2*pi./TD,DT,9.81);\nKH = k.*DT;"
+      }
+    },
+    {
+      "vid": "trunk__doc__misc__generate_boundary_condition_limits_figures.m#4",
+      "verdict": "NARROWED",
+      "rationale": "The level-only ismember lookup really reuses one index when lp contains duplicate levels, but that requires multiple collected patches at the same level. Narrow to a LOW latent limitation for disconnected contour components: the actual callers use the fixed smooth fields at L8-L20, rather than an arbitrary multi-island surface, and no such duplicate-component case is established.",
+      "neutralizer": {
+        "where": "trunk/doc/misc/generate_boundary_condition_limits_figures.m:L8-L20",
+        "quote": "Hrange = [2:0.1:8];\nDrange = [0:1:40];\nTrange = [6:0.25:18];\n\n[HD,DH] = meshgrid(Hrange,Drange);\n[TD,DT] = meshgrid(Trange,Drange);\n\n%% Factors\nHiD = HD./DH;\n[c,cg] = wavevelocity(TD,DT);\nCgiC = cg./c;CgiC(isnan(CgiC)) = 1;\nk = disper(2*pi./TD,DT,9.81);\nKH = k.*DT;"
+      }
+    },
+    {
+      "vid": "trunk__doc__misc__generate_boundary_condition_limits_figures.m#6",
+      "verdict": "REFUTED",
+      "rationale": "Object handles alone do not make these indexed assignments invalid: MATLAB retains conversion to numeric graphics handles for compatibility, and the consumer uses set(pp,...) rather than object-only dot access. The [MathWorks graphics compatibility documentation](https://blogs.mathworks.com/loren/2014/11/05/matlab-r2014b-graphics-part-3-compatibility-considerations-in-the-new-graphics-system/) describes the numeric-handle compatibility path; the actual R2014b failure is the separate contour-child assumption, not an unavoidable error from pp=[].",
+      "neutralizer": {
+        "where": "trunk/doc/misc/generate_boundary_condition_limits_figures.m:L41-L48",
+        "quote": "pp =[];\nfor i=2:length(xt)-1;\n    pp(end+1) = plot([xt(i) xt(i)],[yl(1) yl(2)],'k:');\nend\nfor i=2:length(yt)-1;\n    pp(end+1) = plot([xl(1) xl(2)],[yt(i) yt(i)],'k:');\nend\nset(pp,'color',sil);"
+      }
+    },
+    {
+      "vid": "trunk__lib__fortran__findent__make_indentcodebat.m#0",
+      "verdict": "STANDS",
+      "rationale": "Both generated commands insert names directly into redirection/move operands, and discovery accepts arbitrary matching directory entries without checking their characters. The checked-in indentcode.bat has safe current basenames, but neither it nor the generator quotes a newly discovered basename containing a space or ampersand."
+    },
+    {
+      "vid": "trunk__lib__fortran__findent__make_indentcodebat.m#1",
+      "verdict": "STANDS",
+      "rationale": "The generated findent command and move /Y are separate unconditional lines, with no errorlevel or output validation in either the generator or checked-in batch file. Shell redirection can create/truncate the .new file before an unavailable or failing findent completes, after which move overwrites the original."
+    },
+    {
+      "vid": "trunk__lib__fortran__findent__make_indentcodebat.m#3",
+      "verdict": "STANDS",
+      "rationale": "The function has no input directory argument, mfilename-based resolution or working-directory change; all three discovery paths and fopen are relative. The generated batch file preserves the same relative paths, so invoking the function from another directory can indeed create an empty or misplaced batch file; the source tree supplies no caller that enforces the directory."
+    },
+    {
+      "vid": "trunk__lib__fortran__ftnunit__packages__ftnunit__src__ftnunit.f90#0",
+      "verdict": "STANDS",
+      "rationale": "has_run starts false and is set true only inside an actually executed test; the footer calls previous_failed solely on .not.has_run. That routine unconditionally emits Crashed, without checking whether a previous test exists or was already marked during restart at L240-L242."
+    },
+    {
+      "vid": "trunk__lib__fortran__ftnunit__packages__ftnunit__src__ftnunit.f90#2",
+      "verdict": "STANDS",
+      "rationale": "The mismatch branches update nofails and call the hook, but failed_asserts is a separate private module variable updated by HTML failure helpers. Both hook implementations were checked: neither changes it, and the TeamCity hook only prints a service message, leaving the HTML begin/footer paths free to mark the row OK."
+    },
+    {
+      "vid": "trunk__lib__fortran__ftnunit__packages__ftnunit__src__ftnunit.f90#3",
+      "verdict": "STANDS",
+      "rationale": "runtests_final removes the restart file, writes results and executes bare STOP independent of nofails. The selected TeamCity hook can separately report failures, but its completion hook is empty, so it does not repair the claimed process-exit-only CI failure mode."
+    },
+    {
+      "vid": "trunk__lib__fortran__ftnunit__packages__ftnunit__src__ftnunit.f90#4",
+      "verdict": "NARROWED",
+      "rationale": "Silent truncation is real for records longer than 200 characters or tokens longer than 20 characters, but these storage limits are disclosed in the routine comments. Narrow to LOW out-of-contract input handling rather than a false comparison within the documented record/token bounds; there is still no runtime rejection of oversized input.",
+      "neutralizer": {
+        "where": "trunk/lib/fortran/ftnunit/packages/ftnunit/src/ftnunit.f90:L702-L708",
+        "quote": "! Note:\n!     The files are compared line by line and the items\n!     within each line are compared too for numbers that\n!     are almost equal.\n!     The lines are read into a variable of length line_length\n!     Each line may contain up to max_items items (character\n!     strings) of length item_length."
+      }
+    },
+    {
+      "vid": "trunk__lib__fortran__ftnunit__packages__ftnunit__src__ftnunit.f90#5",
+      "verdict": "STANDS",
+      "rationale": "The read-error/premature-EOF branch returns immediately after the HTML and hook calls at L780-L795. write_header only prints a heading and the HTML helper increments failed_asserts rather than nofails, so no later accounting path restores the missing assertion increment."
+    },
+    {
+      "vid": "trunk__lib__fortran__ftnunit__packages__ftnunit__src__ftnunit.f90#6",
+      "verdict": "STANDS",
+      "rationale": "runtests_init only disables automatic finalization, while each runtests invocation resets testno and reloads last_test from the file left by the preceding suite. A successful first suite ending at test 2 makes a second two-test suite skip both tests and emit a restart crash marker; the existing single-suite XBeach caller avoids the trigger but does not fix the explicitly documented multiple-call API."
+    },
+    {
+      "vid": "trunk__lib__fortran__ftnunit__packages__ftnunit__src__ftnunit.f90#8",
+      "verdict": "STANDS",
+      "rationale": "All scalar and array comparison bodies lack finite-value checks, and shape guards do not reject NaN elements in equal-shaped arrays. With ordinary nontrapping IEEE arithmetic and a positive finite margin, NaN-versus-finite and infinity-versus-finite make the greater-than predicate false; neither callers nor build instructions impose a universal trap or finite-input precondition."
+    },
+    {
+      "vid": "trunk__lib__fortran__ftnunit__packages__ftnunit__src__ftnunit.f90#9",
+      "verdict": "STANDS",
+      "rationale": "The parenthesized sum of magnitudes is evaluated before the tolerance scaling; no max-based rescaling or saturation guard exists in the enclosing comparators. For double values 1.6e308 and 1.0e308 with margin 0.01, the difference is finite but the threshold becomes infinity under nontrapping IEEE arithmetic, so the comparison passes."
+    },
+    {
+      "vid": "trunk__lib__fortran__ftnunit__packages__ftnunit__src__ftnunit.f90#10",
+      "verdict": "STANDS",
+      "rationale": "The complete tokenizer resets all slots to literal question marks and deliberately ignores both tokenization statuses before comparing slots. Equal prefixes followed by slash-terminated differing text, or an extra literal question-mark token versus a missing token, can therefore leave identical item arrays; numeric conversion checks occur only after unequal item strings and cannot repair this."
+    },
+    {
+      "vid": "trunk__lib__fortran__ftnunit__packages__ftnunit__src__ftnunit.f90#11",
+      "verdict": "STANDS",
+      "rationale": "The enclosing HTML writers interpolate description and compared-string arguments directly between markup fragments, and their callers pass original text. Neither trim nor the row-state helpers escape ampersands or angle brackets, so text containing HTML markup can alter the rendered report."
+    },
+    {
+      "vid": "trunk__lib__fortran__ftnunit__packages__ftnunit__src__ftnunit_hooks_teamcity.f90#0",
+      "verdict": "STANDS",
+      "rationale": "All three hook bodies write their input arguments directly into quoted service-message fields, without an escape helper or caller-side encoding. This file is explicitly selected by the ftnunit CMake/Automake and Visual Studio configurations, so it is not neutralized by the alternative empty hooks module."
+    },
+    {
+      "vid": "trunk__lib__fortran__ftnunit__packages__ftnunit__src__ftnunit_store.f90#1",
+      "verdict": "STANDS",
+      "rationale": "Storage errors call bare STOP without a status argument, assertion hook, or error result in the public interfaces. A restart-aware ftnunit driver may later recognize an interrupted test, but a runner using only the immediate process exit status can still see normal termination after a failed load."
+    },
+    {
+      "vid": "trunk__lib__fortran__ftnunit__packages__ftnunit__src__ftnunit_store.f90#3",
+      "verdict": "STANDS",
+      "rationale": "The opening/header and per-record metadata checks do not cover the subsequent payload read, and writes throughout the serializers have no IOSTAT/ERR handler. A valid metadata record followed by a missing payload therefore bypasses the custom diagnostic branches and raises a Fortran runtime I/O error."
+    },
+    {
+      "vid": "trunk__lib__fortran__ftnunit__packages__ftnunit__src__ftnunit_store.f90#5",
+      "verdict": "STANDS",
+      "rationale": "The public generic dispatch includes the rank-three REAL writer and reader; the file is explicitly opened unformatted, so no formatted numeric conversion can reconcile REAL dimensions at L539 with INTEGER dimensions at L684. For the usual four-byte representation, even extent 1.0 has integer bit pattern 1065353216, which passes the separate type/rank checks before allocation."
+    },
+    {
+      "vid": "trunk__lib__fortran__ftnunit__packages__ftnunit__src__ftnunit_store.f90#6",
+      "verdict": "STANDS",
+      "rationale": "Every examined array reader checks metadata I/O status, type and rank, but then allocates directly from dimensions without extent validation or STAT. Writers normally derive valid dimensions from shape(data), but corrupted/external records and the rank-three REAL serialization mismatch still reach these allocations through a valid header and rank."
+    },
+    {
+      "vid": "trunk__lib__win32__mpich__examples__cpilog.c#0",
+      "verdict": "STANDS",
+      "rationale": "NO_MPI_LOGGING guards only explicit initialization/finalization; event-ID acquisition and event logging remain unconditional and their statuses remain unchecked. The bundled mpe_log.h declares integer status returns and file/memory failure codes, while the example prints its numerical result and returns zero without consulting any of them."
+    },
+    {
+      "vid": "trunk__lib__win32__mpich__examples__fpi.f#0",
+      "verdict": "STANDS",
+      "rationale": "Root performs the formatted i10 read before the broadcast, with no IOSTAT, END or ERR branch; the n<=0 exit check happens only after successful input and broadcast. An MPI launcher may subsequently tear down the job, but the example has no collective handling of root EOF/conversion failure and peers can be left waiting until that cleanup."
+    },
+    {
+      "vid": "trunk__lib__win32__mpich__examples__fpi.f#1",
+      "verdict": "NARROWED",
+      "rationale": "The overflow possibility survives the n<=0 guard: i10 accepts 2147483647 and, with one process, the final default-integer induction value would be 2147483648. Reduce severity to LOW because this is an extreme-input portability defect in an interactive demonstration, with actual termination/overflow behavior depending on how the compiler implements or eliminates the DO control variable."
+    },
+    {
+      "vid": "trunk__lib__win32__mpich__examples__fpilog.f#1",
+      "verdict": "STANDS",
+      "rationale": "mpe_logf.h declares these functions as integer status-returning externals, but every assignment to ierr is overwritten without a test. MPI_Pcontrol only changes logging activity and does not check prior MPE failures; the fixed integration count and successful reduction do not establish that event IDs or log output were produced successfully."
+    },
+    {
+      "vid": "trunk__lib__win32__mpich__examples__icpi.c#0",
+      "verdict": "STANDS",
+      "rationale": "The scanf check handles failed conversion but accepts a representable INT_MAX, and the only numerical exit check is n==0. With one process, the last iteration at i=INT_MAX executes i+=1 before retesting, overflowing signed int; no wider loop-index declaration or cap exists."
+    },
+    {
+      "vid": "trunk__lib__win32__mpich__examples__icpi.c#1",
+      "verdict": "STANDS",
+      "rationale": "A successfully scanned negative n is broadcast and enters the else branch because the guard tests equality with zero only. Every rank starts with a positive i, skips the integration loop and reduces a signed-zero partial sum, which root prints as its pi approximation."
+    },
+    {
+      "vid": "trunk__lib__win32__mpich__include__clog_inttypes.h#0",
+      "verdict": "STANDS",
+      "rationale": "The active header typedef is __int32 and i32fmt is %ld, with no format cast or compiler-specific correction elsewhere in the tree. [Microsoft documents __int32 as int](https://learn.microsoft.com/en-us/cpp/cpp/int8-int16-int32-int64?view=msvc-170), so equal Win32 widths do not remove the variadic type mismatch; the finding is appropriately limited to LOW portability/format correctness."
+    },
+    {
+      "vid": "trunk__lib__win32__mpich__include__clog_uuid.h#0",
+      "verdict": "STANDS",
+      "rationale": "The live macro at L23-L24, unlike the commented earlier definition, is an unparenthesized additive expression. Its current typedef-array use is safe, but the public macro still makes 2*CLOG_UUID_SIZE scale only the first sizeof term; no alternate definition neutralizes that expansion."
+    },
+    {
+      "vid": "trunk__lib__win32__mpich__include__mpicxx.h#0",
+      "verdict": "STANDS",
+      "rationale": "The bundled mpi.h advertises MPI 2.2, whose [Alltoallw contract](https://www.mpi-forum.org/docs/mpi-2.2/mpi22-report/node101.htm) permits in-place intracommunicator calls with ignored sendtypes. The wrapper unconditionally reads v4 for Get_size entries before the C call, and neither the class hierarchy nor a preprocessor branch adds an MPI_IN_PLACE guard."
+    },
+    {
+      "vid": "trunk__lib__win32__mpich__include__mpicxx.h#1",
+      "verdict": "STANDS",
+      "rationale": "Intercomm inherits Comm::Alltoallw without overriding Get_size, which calls MPI_Comm_size at L1285-L1289; Get_remote_size is a distinct method. Unequal groups therefore produce an overread of caller arrays on the larger local group and undersized C datatype temporaries on the smaller group; the [MPI 2.2 intercommunicator contract](https://www.mpi-forum.org/docs/mpi-2.2/mpi22-report/node101.htm) requires communication with the remote group."
+    },
+    {
+      "vid": "trunk__lib__win32__mpich__include__mpicxx.h#3",
+      "verdict": "STANDS",
+      "rationale": "All cited temporaries are raw allocations, with copy-back and deletion after the MPIX_CALL macros, and there are no catch/RAII cleanup blocks. The shipped cxx.lib Call_errhandler implementation does throw for ERRORS_THROW_EXCEPTIONS, so an error can skip request copy-back and frees; failure of a second new also leaks the first allocation."
+    },
+    {
+      "vid": "trunk__lib__win32__mpich__include__mpicxx.h#4",
+      "verdict": "STANDS",
+      "rationale": "The complete Sub body allocates and reads exactly ten flags without querying Get_dim; Cartcomm construction and Create_cart impose no matching ten-element input contract. A valid two-dimensional remain_dims array is already overread before MPI_Cart_sub can apply any topology validation, independently of whether very high-dimensional topologies are used."
+    },
+    {
+      "vid": "trunk__lib__win32__mpich__include__mpicxx.h#5",
+      "verdict": "NARROWED",
+      "rationale": "Both Clone preprocessor variants ignore MPI_Comm_dup status, but the C routine itself invokes its configured error handler, so Clone does not bypass every error-handling path. Retain MED only for returned-error configurations: wrapper-side dispatch, especially the C++ exception translation seen in cxx.lib, is skipped and ncomm is used without a guaranteed successful initialization; fatal C error handling prevents that continuation.",
+      "neutralizer": {
+        "where": "trunk/lib/win32/mpich/include/mpi.h:L248-L254",
+        "quote": "#define MPI_ERRORS_ARE_FATAL ((MPI_Errhandler)0x54000000)\n#define MPI_ERRORS_RETURN    ((MPI_Errhandler)0x54000001)\n/* MPIR_ERRORS_THROW_EXCEPTIONS is not part of the MPI standard, it is here to\n   facilitate the c++ binding which has MPI::ERRORS_THROW_EXCEPTIONS. \n   Using the MPIR prefix preserved the MPI_ names for objects defined by\n   the standard. */\n#define MPIR_ERRORS_THROW_EXCEPTIONS ((MPI_Errhandler)0x54000002)"
+      }
+    },
+    {
+      "vid": "trunk__lib__win32__mpich__include__mpicxx.h#6",
+      "verdict": "NARROWED",
+      "rationale": "The advertised HIGH ordinary attribute-copy failure is neutralized: disassembly of the shipped trunk/lib/win32/mpich/lib/cxx.lib shows Comm, Datatype and Win Create_keyval comparing the callback with NULL_COPY_FN at +0x04 and replacing it with zero at +0x0c, matching the C null callbacks below. Retain only a LOW defect when user code directly invokes the helper body or registers a different forwarding callback, thereby bypassing this pointer-identity guard; the header body then really sets flag=true without assigning attr_out.",
+      "neutralizer": {
+        "where": "trunk/lib/win32/mpich/include/mpi.h:L265-L271",
+        "quote": "#define MPI_COMM_NULL_COPY_FN ((MPI_Comm_copy_attr_function*)0)\n#define MPI_COMM_NULL_DELETE_FN ((MPI_Comm_delete_attr_function*)0)\n#define MPI_COMM_DUP_FN  ((MPI_Comm_copy_attr_function *)MPI_DUP_FN)\n#define MPI_WIN_NULL_COPY_FN ((MPI_Win_copy_attr_function*)0)\n#define MPI_WIN_NULL_DELETE_FN ((MPI_Win_delete_attr_function*)0)\n#define MPI_WIN_DUP_FN   ((MPI_Win_copy_attr_function*)MPI_DUP_FN)\n#define MPI_TYPE_NULL_COPY_FN ((MPI_Type_copy_attr_function*)0)"
+      }
+    },
+    {
+      "vid": "trunk__lib__win32__mpich__include__mpicxx.h#7",
+      "verdict": "STANDS",
+      "rationale": "The allocated C arrays have no value initialization, and Waitsome/Testsome copy incount statuses rather than returned outcount; Testall copies statuses even when completion is false. Neither initialized C++ Request objects nor the status wrapper repairs those unwritten C temporary elements, and the analogous datatype/topology copy loops also use capacities rather than actual result sizes."
+    },
+    {
+      "vid": "trunk__lib__win32__mpich__include__mpicxx.h#8",
+      "verdict": "STANDS",
+      "rationale": "Both Spawn_multiple overloads allocate and copy count info objects before any rank/root test. A nonroot rank may legally supply ignored spawn inputs, including a positive placeholder count and null info pointer; no caller-side or C-library guard can prevent this earlier C++ dereference."
+    },
+    {
+      "vid": "trunk__lib__win32__mpich__include__mpicxx.h#10",
+      "verdict": "STANDS",
+      "rationale": "The scalar output locals are plain uninitialized integers or offsets, unlike the separately initialized handle-wrapper objects. MPIX_CALLREF/WORLD do not assign fallbacks, and the shipped Call_errhandler can return through MPI_Comm_call_errhandler for a returning handler, leaving the cited wrappers to evaluate an unwritten output after a failure."
+    },
+    {
+      "vid": "trunk__lib__win32__mpich__include__mpio.h#0",
+      "verdict": "STANDS",
+      "rationale": "HAVE_MPI_GREQUEST is explicitly defined to 1 in this header, so MPIO_Request and MPIO_Wait/Test really map to MPI types/functions. The included mpi.h:L193 defines MPI_REQUEST_NULL as 0x2c000000, not zero, and neither include order nor a later macro redefinition repairs MPIO_REQUEST_NULL."
+    },
+    {
+      "vid": "trunk__lib__win32__netcdff90__netcdf_attributes.f90#0",
+      "verdict": "STANDS",
+      "rationale": "typeSizes selects an eighteen-digit EightByteInt, but the setter passes int(values) without KIND or assigns into a default-INTEGER temporary before nf_put_att_int. Neither the generic interface nor the external declarations add range checks, so ordinary Win32 four-byte default integers lose out-of-range values before the netCDF conversion routine can inspect them."
+    },
+    {
+      "vid": "trunk__lib__win32__netcdff90__netcdf_attributes.f90#1",
+      "verdict": "REFUTED",
+      "rationale": "The claimed oversized-buffer call violates the explicitly documented public API precondition: the bundled manual requires enough storage for every attribute value and directs callers to inquire about the length first. Numeric getters preserve that caller-capacity contract, and the source-tree caller search supplies no concrete violating XBeach call; missing redundant validation is not itself a HIGH library buffer defect.",
+      "neutralizer": {
+        "where": "trunk/lib/win32/netcdff90/netcdf_f90.3:L676-L680",
+        "quote": "All values of the attribute\nare returned, so you must allocate enough space to hold\nthem.  If you don't know how much space to reserve, call\n\\fBnf90_inquire_attribute(\\|)\\fR\nfirst to find out the length of the attribute."
+      }
+    },
+    {
+      "vid": "trunk__lib__win32__netcdff90__netcdf_attributes.f90#2",
+      "verdict": "REFUTED",
+      "rationale": "attnum is an output here, not an independently requested attribute-number input: both calls query exactly the same ncid, varid and name. The [F77 inquiry-family contract](https://docs.unidata.ucar.edu/netcdf-fortran/current/nc_f77_interface_guide.html) gives these two name-based inquiries the same invalid-ID/missing-attribute failure conditions, so the second inquiry preserves those failures rather than hiding a demonstrated distinct attnum lookup error; the supplied other_wording concerns a different issue.",
+      "neutralizer": {
+        "where": "trunk/lib/win32/netcdff90/netcdf_attributes.f90:L40-L51",
+        "quote": "  function nf90_inquire_attribute(ncid, varid, name, xtype, len, attnum)\n    integer,             intent( in)           :: ncid, varid\n    character (len = *), intent( in)           :: name\n    integer,             intent(out), optional :: xtype, len, attnum\n    integer                                    :: nf90_inquire_attribute\n\n    integer                          :: local_xtype, local_len\n\n    ! Do we need to worry about not saving the state from this call?\n    if(present(attnum)) &\n      nf90_inquire_attribute = nf_inq_attid(ncid, varid, name, attnum)\n    nf90_inquire_attribute   = nf_inq_att  (ncid, varid, name, local_xtype, local_len)"
+      }
+    }
+  ]
+}

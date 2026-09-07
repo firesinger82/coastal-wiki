@@ -1,0 +1,227 @@
+{
+  "shard": "XBeach-B01",
+  "verdicts": [
+    {
+      "audit_id": "B0",
+      "source_path": "trunk/src/xbeach/build/distribute.bat",
+      "verdict": "CONFIRM",
+      "rationale": "Lines 18-19 recursively remove and recreate the entire configuration distribution directory, without preserving library artifacts. The subsequent copies use only the executable TargetDir and static-library DLL directory, whereas the library publisher places XBeach.Library.dll and XBeach.BMI.dll in this same distribution directory.",
+      "evidence_span": {
+        "lines": "L18-L19",
+        "quote": "if exist \"%SolutionDir%\\dist\\%Platform%\\%ConfigurationName%\\\" rmdir \"%SolutionDir%\\dist\\%Platform%\\%ConfigurationName%\\\" /q /s\r\nmkdir \"%SolutionDir%\\dist\\%Platform%\\%ConfigurationName%\\\""
+      }
+    },
+    {
+      "audit_id": "B2",
+      "source_path": "trunk/src/xbeach/build/distribute.bat",
+      "verdict": "CONFIRM",
+      "rationale": "The script clears dist but never clears TargetDir; line 22 only adds or overwrites DLLs there. Lines 25-26 then copy every executable and DLL in TargetDir, including files left by earlier builds.",
+      "evidence_span": {
+        "lines": "L25-L26",
+        "quote": "copy \"%TargetDir%\\*.exe\" \"%SolutionDir%\\dist\\%Platform%\\%ConfigurationName%\\\"\r\ncopy \"%TargetDir%\\*.dll\" \"%SolutionDir%\\dist\\%Platform%\\%ConfigurationName%\\\""
+      }
+    },
+    {
+      "audit_id": "B2",
+      "source_path": "trunk/m4/libtool.m4",
+      "verdict": "CONFIRM",
+      "rationale": "The deployment-target case at 1074-1081 contains only 10.x patterns and no default branch, so an explicit 11.x or later target on the darwin* path leaves the policy unassigned. Line 1120 subsequently transfers that value to allow_undefined_flag without supplying a fallback.",
+      "evidence_span": {
+        "lines": "L1077-L1081",
+        "quote": "\t10.[[012]][[,.]]*)\n\t  _lt_dar_allow_undefined='$wl-flat_namespace $wl-undefined ${wl}suppress' ;;\n\t10.*)\n\t  _lt_dar_allow_undefined='$wl-undefined ${wl}dynamic_lookup' ;;\n      esac"
+      }
+    },
+    {
+      "audit_id": "B4",
+      "source_path": "trunk/m4/libtool.m4",
+      "verdict": "CONFIRM",
+      "rationale": "All three OS/2 branches spell old_archive_From_new_cmds with an uppercase F. The initialized variable at 4964 and the exported tag declaration at 6128 are old_archive_from_new_cmds, and no assignment bridges the two names.",
+      "evidence_span": {
+        "lines": "L5157-L5157",
+        "quote": "      _LT_TAGVAR(old_archive_From_new_cmds, $1)='emximp -o $output_objdir/${libname}_dll.a $output_objdir/$libname.def'"
+      }
+    },
+    {
+      "audit_id": "B5",
+      "source_path": "trunk/m4/libtool.m4",
+      "verdict": "UNCERTAIN",
+      "rationale": "The quoted sed expression and $prefix_cmds invocation occur inside a deferred archive_expsym_cmds string, rather than commands executed directly by this macro. Whether the embedded quotes remain literal depends on the generated libtool runner's expansion/eval stages; that runner is absent from this source snapshot, so the claimed lack of eval is not established."
+    },
+    {
+      "audit_id": "B6",
+      "source_path": "trunk/m4/libtool.m4",
+      "verdict": "CONFIRM",
+      "rationale": "The macro requires a canonical host, but these nested cases compare $host with patterns beginning directly with sysv4 or osf3 instead of matching $host_os. The cited SNI and OSF branches therefore miss their intended CPU-vendor-OS triplets, with the OSF cases taking the generic alternative.",
+      "evidence_span": {
+        "lines": "L6043-L6048",
+        "quote": "    if test sni = \"$host_vendor\"; then\n      case $host in\n      sysv4 | sysv4.2uw2* | sysv4.3* | sysv5*)\n\t_LT_TAGVAR(export_dynamic_flag_spec, $1)='$wl-Blargedynsym'\n\t;;\n      esac"
+      }
+    },
+    {
+      "audit_id": "B7",
+      "source_path": "trunk/m4/libtool.m4",
+      "verdict": "CONFIRM",
+      "rationale": "The comparisons use x-L and x-R against the unprefixed token $p, so a separate -L or -R never enters the directory-continuation branch. Later processing strips the bare flag and resets prev at 7576, leaving its following directory token to be ignored.",
+      "evidence_span": {
+        "lines": "L7537-L7541",
+        "quote": "       if test x-L = \"$p\" ||\n          test x-R = \"$p\"; then\n\t prev=$p\n\t continue\n       fi"
+      }
+    },
+    {
+      "audit_id": "B7",
+      "source_path": "trunk/src/xbeach/xbeach_IFX.vfproj",
+      "verdict": "UNCERTAIN",
+      "rationale": "The x64 intermediate, object and module paths match the classic executable project, so path sharing is real. Whether a compiler switch actually reuses stale objects depends on Intel Visual Studio build tracking and compiler-change invalidation, which this project file does not establish."
+    },
+    {
+      "audit_id": "B1",
+      "source_path": "trunk/src/xbeachlibrary/build/distribute.bat",
+      "verdict": "CONFIRM",
+      "rationale": "Both destination DLLs are deleted before either input is checked; the subsequent IF EXIST commands silently skip missing source DLLs. There is no rollback or explicit missing-input failure, so a successful deletion can leave a previously usable DLL absent.",
+      "evidence_span": {
+        "lines": "L23-L28",
+        "quote": "if exist \"%DstDir%\\XBeach.Library.dll\" del \"%DstDir%\\XBeach.Library.dll\" /q /f\r\nif exist \"%DstDir%\\XBeach.BMI.dll\" del \"%DstDir%\\XBeach.BMI.dll\" /q /f\r\nif not exist \"%DstDir%\" mkdir \"%DstDir%\"\r\n\r\nrem copy dll files\r\nif exist \"%SrcDir1%\\xbeachlibrary_dynamic.dll\" copy \"%SrcDir1%\\xbeachlibrary_dynamic.dll\" \"%DstDir%\\XBeach.Library.dll\""
+      }
+    },
+    {
+      "audit_id": "B2",
+      "source_path": "trunk/src/xbeachlibrary/build/distribute.bat",
+      "verdict": "CONFIRM",
+      "rationale": "TargetDir is parsed but never used after quote removal, while SrcDir1 and SrcDir2 always designate the dynamic and BMI output directories. Each invocation conditionally copies both existing binaries without checking the counterpart's freshness or coordinating access to the shared destinations.",
+      "evidence_span": {
+        "lines": "L28-L29",
+        "quote": "if exist \"%SrcDir1%\\xbeachlibrary_dynamic.dll\" copy \"%SrcDir1%\\xbeachlibrary_dynamic.dll\" \"%DstDir%\\XBeach.Library.dll\"\r\nif exist \"%SrcDir2%\\xbeachlibrary_bmi.dll\" copy \"%SrcDir2%\\xbeachlibrary_bmi.dll\" \"%DstDir%\\XBeach.BMI.dll\""
+      }
+    },
+    {
+      "audit_id": "B1",
+      "source_path": "trunk/src/xbeachlibrary/includes/version/makeversiondat.bat",
+      "verdict": "CONFIRM",
+      "rationale": "The RevisionNumber branch takes a fixed ten-character substring starting at offset three of DATE. No locale normalization precedes it, so a date without a three-character weekday prefix loses actual date characters.",
+      "evidence_span": {
+        "lines": "L13-L13",
+        "quote": "  echo Build_Date     = '%DATE:~3,10% %TIME:~0,8%' >> version.dat"
+      }
+    },
+    {
+      "audit_id": "B2",
+      "source_path": "trunk/src/xbeachlibrary/includes/version/makeversiondat.bat",
+      "verdict": "UNCERTAIN",
+      "rationale": "RevisionNumber is expanded without escaping into a quoted Fortran literal, so apostrophes or batch metacharacters would be problematic. The file does not define the caller's allowed revision-value contract, and no producer was found in the checked build scripts; a numeric/SVN-safe value would not exhibit the claimed failure."
+    },
+    {
+      "audit_id": "B1",
+      "source_path": "trunk/src/xbeach/build/zip.bat",
+      "verdict": "CONFIRM",
+      "rationale": "The script adds to the named ZIP without deleting or recreating an existing archive first, and its only archive deletion explicitly removes 7za.exe. On repeated invocation against an existing ZIP, entries missing from the current source directory are therefore not removed.",
+      "evidence_span": {
+        "lines": "L20-L21",
+        "quote": "7za.exe a \"xbeach_%ConfigurationName%_%Platform%.zip\" *\r\n7za.exe d \"xbeach_%ConfigurationName%_%Platform%.zip\" 7za.exe"
+      }
+    },
+    {
+      "audit_id": "B2",
+      "source_path": "trunk/src/xbeach/build/zip.bat",
+      "verdict": "CONFIRM",
+      "rationale": "The helper is copied to the fixed destination name at line 16 and that name is deleted unconditionally at line 26. There is no pre-existing-file check, backup or ownership marker, so a pre-existing 7za.exe is not preserved even if replacement prompts or fails.",
+      "evidence_span": {
+        "lines": "L26-L26",
+        "quote": "del \"%SolutionDir%\\dist\\%Platform%\\%ConfigurationName%\\7za.exe\""
+      }
+    },
+    {
+      "audit_id": "B1",
+      "source_path": "trunk/src/xbeachlibrary/Makefile.am",
+      "verdict": "CONFIRM",
+      "rationale": "version.dat is a normal target with no prerequisites or phony/forced refresh rule. Once it exists, incremental builds do not rerun the revision and date commands merely because repository revision or build time changed.",
+      "evidence_span": {
+        "lines": "L84-L87",
+        "quote": "version.dat: \n\techo \"Build_Revision = '`svnversion $(top_srcdir)`'\" > version.dat\n\techo \"Build_URL = '`svn info $(top_srcdir) | grep -m 1 URL`'\" >> version.dat\n\techo \"Build_Date = '`date`'\" >> version.dat"
+      }
+    },
+    {
+      "audit_id": "B6",
+      "source_path": "trunk/src/xbeachlibrary/Makefile.am",
+      "verdict": "CONFIRM",
+      "rationale": "nh_pars.inc is explicitly distributed on line 111, while CLEANFILES on the next line matches every local .inc file. An in-source clean therefore removes this distributed include along with generated includes.",
+      "evidence_span": {
+        "lines": "L111-L112",
+        "quote": "EXTRA_DIST=s.ind s.inp nh_pars.inc version.def\nCLEANFILES=*.mod *.MOD *.inc version.dat"
+      }
+    },
+    {
+      "audit_id": "B4",
+      "source_path": "trunk/src/xbeachlibrary/xbeachlibrary_IFX_bmi.vfproj",
+      "verdict": "UNCERTAIN",
+      "rationale": "The x64 intermediate, object and module directories match those in the classic BMI project. Stale reuse across compiler switches still depends on the Intel Visual Studio build engine's tracking and invalidation behavior, which is not specified in this file."
+    },
+    {
+      "audit_id": "B0",
+      "source_path": "trunk/lib/win32/netcdff90/Makefile.in",
+      "verdict": "CONFIRM",
+      "rationale": "The include list is attached to libnetcdff90.la, while the .f90.o and .f90.lo rules only compile their primary source. No object-level include prerequisites or included dependency files appear here, so an include edit can run the link recipe with unchanged objects.",
+      "evidence_span": {
+        "lines": "L334-L335",
+        "quote": "libnetcdff90.la: $(libnetcdff90_la_OBJECTS) $(libnetcdff90_la_DEPENDENCIES) \n\t$(FCLINK)  $(libnetcdff90_la_OBJECTS) $(libnetcdff90_la_LIBADD) $(LIBS)"
+      }
+    },
+    {
+      "audit_id": "B2",
+      "source_path": "trunk/lib/win32/netcdff90/Makefile.in",
+      "verdict": "CONFIRM",
+      "rationale": "all-am independently requests the library and module headers; the library uses typeSizes.lo and netcdf[4].lo, while header prerequisites request typeSizes.o and netcdf[4].o. The separate compile rules share the working directory and contain no ordering or module-output isolation, allowing concurrent generation of the same module files.",
+      "evidence_span": {
+        "lines": "L602-L605",
+        "quote": "@UPPER_CASE_MOD_TRUE@TYPESIZES.mod: typeSizes.o\n@UPPER_CASE_MOD_TRUE@NETCDF.mod: $(NETCDF_O)\n@UPPER_CASE_MOD_FALSE@typesizes.mod: typeSizes.o\n@UPPER_CASE_MOD_FALSE@netcdf.mod: $(NETCDF_O)"
+      }
+    },
+    {
+      "audit_id": "B0",
+      "source_path": "trunk/m4/fortranextra.m4",
+      "verdict": "CONFIRM",
+      "rationale": "Both macros use repeatable AC_DEFUN despite their DEFUN_ONCE comments, and each language uses a single fixed cache key regardless of requested length or source format. A later invocation therefore reuses the earlier cached flag instead of testing its new requirement.",
+      "evidence_span": {
+        "lines": "L48-L53",
+        "quote": "AC_CACHE_CHECK(\n[for Fortran flag needed to accept $ac_fc_line_len_string column source lines],\n               [ac_cv_fc_line_length],\n[ac_cv_fc_line_length=unknown\nac_fc_line_length_FCFLAGS_save=$FCFLAGS\nfor ac_flag in none \\"
+      }
+    },
+    {
+      "audit_id": "B1",
+      "source_path": "trunk/m4/fortranextra.m4",
+      "verdict": "UNCERTAIN",
+      "rationale": "The test program contains only an empty conditional, but line 113 also adds -Werror, which can reject ignored directives or unsupported-option warnings. A false positive requires a compiler that silently ignores them or does not enforce that option; the necessary compiler diagnostic behavior is not established by this file."
+    },
+    {
+      "audit_id": "B5",
+      "source_path": "trunk/src/xbeachlibrary/xbeachlibrary_IFX_dynamic.vfproj",
+      "verdict": "UNCERTAIN",
+      "rationale": "The IFX dynamic project uses the same x64 intermediate, object and module paths as the classic dynamic project. Whether those shared products survive a compiler switch without recompilation depends on Intel Visual Studio build tracking and invalidation, which this file alone cannot settle."
+    },
+    {
+      "audit_id": "B5",
+      "source_path": "trunk/src/xbeachlibrary/xbeachlibrary_IFX.vfproj",
+      "verdict": "UNCERTAIN",
+      "rationale": "The IFX static project shares x64 intermediate, object and module directories with the classic static project. Its pre-build event generates metadata/includes rather than explicitly cleaning compiler products, but actual stale reuse still depends on the build engine's compiler-change invalidation behavior."
+    },
+    {
+      "audit_id": "B0",
+      "source_path": "trunk/lib/win32/netcdff90/Makefile.am",
+      "verdict": "CONFIRM",
+      "rationale": "The included Fortran files are assigned to libnetcdff90_la_DEPENDENCIES, and there are no object-level include prerequisites in this Makefile.am. The corresponding Makefile.in confirms these dependencies feed the library link target only, so an include edit can relink stale objects.",
+      "evidence_span": {
+        "lines": "L21-L24",
+        "quote": "libnetcdff90_la_DEPENDENCIES = netcdf_attributes.f90\t\t\t\\\nnetcdf_constants.f90 netcdf_dims.f90 netcdf_expanded.f90\t\t\\\nnetcdf_externals.f90 netcdf_file.f90 netcdf_overloads.f90\t\t\\\nnetcdf_text_variables.f90 netcdf_variables.f90 netcdf_visibility.f90"
+      }
+    },
+    {
+      "audit_id": "B2",
+      "source_path": "trunk/lib/win32/netcdff90/Makefile.am",
+      "verdict": "CONFIRM",
+      "rationale": "The convenience library sources produce libtool .lo objects, but both case variants of the module-header rules independently depend on ordinary .o objects. The generated Makefile.in exposes both sets under all-am with no ordering or separate module-output directory, permitting concurrent writes of the same modules.",
+      "evidence_span": {
+        "lines": "L65-L70",
+        "quote": "TYPESIZES.mod: typeSizes.o\nNETCDF.mod: $(NETCDF_O)\nelse\nnodist_include_HEADERS = typesizes.mod netcdf.mod \ntypesizes.mod: typeSizes.o\nnetcdf.mod: $(NETCDF_O)"
+      }
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "shard": "XBeach-M00",
+  "verdicts": [
+    {
+      "vid": "trunk__doc__README.parallel#0",
+      "verdict": "STANDS",
+      "rationale": "The complete allocation discussion gives no assignment-before-read condition for omitting initialization, and xyz is only a documentation placeholder, so no caller or initializer supplies a missing guarantee. Some scratch arrays are fully overwritten (for example trunk/src/xbeachlibrary/roelvink.F90:73-84), but that does not justify the unrestricted recommendation; the build flags in trunk/src/xbeachlibrary/Makefile.am:99-105 likewise provide no allocation-time zeroing guarantee. This stands as unsafe documentation guidance, not evidence that an existing execution necessarily reads undefined values."
+    },
+    {
+      "vid": "trunk__doc__README.parallel#1",
+      "verdict": "REFUTED",
+      "rationale": "The finding treats a deliberately criticized example as the recommended lifecycle: lines 152-154 explicitly warn that SAVE can retain the wrong dimensions, and lines 156-162 replace it with a local allocatable without SAVE. Such a local allocatable is automatically deallocated on procedure exit, so the replacement allocates the current dimensions on each call and needs no explicit deallocation example; the cited passage does not establish a defect in that guidance.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/doc/README.parallel:L152-L162",
+        "quote": "This solution, however, is not good when one should define more than\none spacepar variable (apart from sglobal and slocal). Then the size\nof the 'saved' matrices could be wrong.\n\nI suggest to simply allocate these scratch arrays:\n\n  real*8, dimension(:,:), allocatable :: xyz\n  allocate(xyz(s%nx+1,s%ny+1))\n\nAccording to the fortran95 standard, these allocated arrays are \nautomatically removed at the exit of the subroutine."
+      }
+    },
+    {
+      "vid": "trunk__rmdiv#0",
+      "verdict": "STANDS",
+      "rationale": "The entire six-line script contains no exclusion or working-directory check, and invoking it from trunk makes config/* include the existing regular file config/index_bin.html.tmpl. Cross-file inspection shows that trunk/config/teamcity-distribute.py:87-93 reads this template to generate index_bin.html, while configure.ac does not declare it as a generated output; the autoconf cleanup therefore removes source input as claimed."
+    },
+    {
+      "vid": "trunk__rmdiv#1",
+      "verdict": "STANDS",
+      "rationale": "Although find restricts the basename to Makefile.in, parent directory names can contain spaces, quotes, or newlines, and the complete script supplies neither NUL delimiters nor another escaping mechanism. A read-only reproduction replacing rm with printf split a space-containing path into three arguments, rejected a quoted path, and split a newline-containing path; no repository caller or wrapper was found that enforces safe pathnames."
+    }
+  ]
+}

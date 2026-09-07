@@ -1,0 +1,65 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-V01",
+ "source_path": "trunk/lib/x64/mpich/examples/fpi.f",
+ "source_sha256": "d9d09b61edb2ce52beb0c5ca45645a7b0a3fb419b3a4f110c639c5b25971a670",
+ "base_run_id": "xbeach-r1-XBeach-V01-gpt-6-astra-01a079bd-fbb5-7cd3-8c47-5d906cc55970",
+ "audit_run_id": "xbeach-r2-XBeach-V01-gpt-6-astra-01a07a3b-b349-7061-aef2-9b392a6fc7c6",
+ "base_record_file": "a1964acb700d161bb9b6025564f7a50e32e8bfb74a994a387db50b5656e56068.json",
+ "audit_record_file": "a1964acb700d161bb9b6025564f7a50e32e8bfb74a994a387db50b5656e56068.json",
+ "base_record_sha256_bytes": "3f4d61866d95ab9b7d42db120738ec6efffe973f5d6d601d23670eeb282e69f7",
+ "audit_record_sha256_bytes": "0e3a88251bf73c9ea56508ad02b2d9d73f616be1b4dfb8f9df06dcb5029c1377",
+ "base_finding_count": 1,
+ "audit_finding_count": 2,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L43-L50] (LOW/input-error-handling) The root's interactive READ has no IOSTAT, END, or ERR handling, so EOF or malformed input terminates it while other ranks are entering MPI_BCAST."
+   ],
+   "audit_member_text": [
+    "[L43-L50] (MED/input-error-handling) The root's READ has no IOSTAT, END or ERR handling, so EOF or malformed input can terminate the root while other ranks wait in MPI_BCAST."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The READ is indeed unhandled and precedes MPI_BCAST; the n<=0 exit test at fpi.f:53 only protects successfully read nonpositive integers. Reduce to LOW robustness of this interactive example: EOF/malformed input can abort the root, but whether peers remain waiting or the launcher tears down the job is runtime-dependent, not a demonstrated persistent MPI deadlock.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L31,L46-L47,L59-L62] (LOW/integer-overflow) The ten-digit input permits interval counts near the default integer limit, where the DO iteration-count or terminal-index arithmetic can overflow."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

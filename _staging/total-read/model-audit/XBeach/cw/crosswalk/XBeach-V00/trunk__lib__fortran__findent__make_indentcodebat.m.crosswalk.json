@@ -1,0 +1,121 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-V00",
+ "source_path": "trunk/lib/fortran/findent/make_indentcodebat.m",
+ "source_sha256": "13069a80648aa2fce8841503e55861bacfb177c3dbf52802928266e9f940ea85",
+ "base_run_id": "xbeach-r1-XBeach-V00-gpt-6-astra-01a079b6-2340-70c1-8a95-292af5f92813",
+ "audit_run_id": "xbeach-r2-XBeach-V00-gpt-6-astra-01a07a34-5e0e-7073-ac88-2789f15c46ce",
+ "base_record_file": "f5fe89ee844d34b13788cb2d8815bfba8b984e99712f867c72d85eb55e377e97.json",
+ "audit_record_file": "f5fe89ee844d34b13788cb2d8815bfba8b984e99712f867c72d85eb55e377e97.json",
+ "base_record_sha256_bytes": "1f771bacce485936606e33bc6ea085ea9650bfe07441c1eb93dc2beac71b290d",
+ "audit_record_sha256_bytes": "2b05f915859b86ba2e233911411d8b8e0f126c5e4c1e1ff3360e87a19e5a7560",
+ "base_finding_count": 4,
+ "audit_finding_count": 4,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L21-L22] (MED/shell-quoting) Generated redirection and move commands do not quote filenames, so spaces or shell metacharacters in discovered filenames break the commands."
+   ],
+   "audit_member_text": [
+    "[L21-L22] (MED/path-quoting) Generated redirection and move operands are unquoted, so source filenames containing spaces or shell metacharacters are parsed incorrectly."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Both generated commands insert names directly into redirection/move operands, and discovery accepts arbitrary matching directory entries without checking their characters. The checked-in indentcode.bat has safe current basenames, but neither it nor the generator quotes a newly discovered basename containing a space or ampersand.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L21-L22] (MED/destructive-error-handling) The generated batch script overwrites each original source with the temporary output even when findent fails or produces incomplete output."
+   ],
+   "audit_member_text": [
+    "[L21-L22] (HIGH/generated-script-data-loss) The generated batch file unconditionally moves the redirected .new file over the original even if findent fails or is unavailable, potentially replacing source with empty or partial output."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The generated findent command and move /Y are separate unconditional lines, with no errorlevel or output validation in either the generator or checked-in batch file. Shell redirection can create/truncate the .new file before an unavailable or failing findent completes, after which move overwrites the original.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "[L19-L22] (LOW/io-error-handling) The output file handle is used without checking whether fopen succeeded."
+   ],
+   "audit_member_text": [
+    "[L19-L24] (LOW/io-error-handling) The script does not check fopen or fprintf results, so an unwritable destination or partial output is not handled explicitly."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "[L5-L15] (LOW/working-directory-contract) Source discovery depends on the caller's working directory without checking that the expected source directories exist."
+   ],
+   "audit_member_text": [
+    "[L5,L9,L13,L19] (LOW/working-directory-contract) Input discovery and output location depend on the caller's current directory rather than the MATLAB function's location, allowing invocation elsewhere to generate an empty or misplaced batch file."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The function has no input directory argument, mfilename-based resolution or working-directory change; all three discovery paths and fopen are relative. The generated batch file preserves the same relative paths, so invoking the function from another directory can indeed create an empty or misplaced batch file; the source tree supplies no caller that enforces the directory.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  }
+ ]
+}

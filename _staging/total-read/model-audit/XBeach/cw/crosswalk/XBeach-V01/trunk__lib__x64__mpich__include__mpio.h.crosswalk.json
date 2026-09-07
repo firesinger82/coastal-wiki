@@ -1,0 +1,84 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-V01",
+ "source_path": "trunk/lib/x64/mpich/include/mpio.h",
+ "source_sha256": "9a5e21caef4182ed59977c34b0de29983e23c33c8706d982afdda5425a11f5ad",
+ "base_run_id": "xbeach-r1-XBeach-V01-gpt-6-astra-01a079bd-fbb5-7cd3-8c47-5d906cc55970",
+ "audit_run_id": "xbeach-r2-XBeach-V01-gpt-6-astra-01a07a3b-b349-7061-aef2-9b392a6fc7c6",
+ "base_record_file": "daf3f1302fc6e34949b1c0634f8a5f5307271c57a63d3913085558b3b2fb8fe9.json",
+ "audit_record_file": "daf3f1302fc6e34949b1c0634f8a5f5307271c57a63d3913085558b3b2fb8fe9.json",
+ "base_record_sha256_bytes": "87f6e6d70d091182fd5516ddc398fa5a0ae9bad0645f2793b9104eca65e285bb",
+ "audit_record_sha256_bytes": "508f9c939692b8b7d94c8e020f9639a08f75c6f86f8a1f686878c61b004318c0",
+ "base_finding_count": 3,
+ "audit_finding_count": 2,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L27-L37,L150-L152,L165-L167,L336-L338,L351-L353] (LOW/stale-contract-documentation) Nonblocking-I/O comments claim generalized requests are unimplemented although this header explicitly enables them and aliases MPIO requests to MPI requests."
+   ],
+   "audit_member_text": [
+    "[L27-L37,L150-L152,L165-L167,L336-L338,L351-L353] (LOW/documentation-consistency) The nonblocking-I/O comments claim generalized requests are unimplemented although this configuration explicitly enables them and aliases completion routines to MPI."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L27-L37,L93] (MED/null-handle-mismatch) MPIO_Request aliases MPI_Request but MPIO_REQUEST_NULL remains zero instead of the nonzero MPI_REQUEST_NULL handle."
+   ],
+   "audit_member_text": [
+    "[L27-L37,L93] (MED/handle-consistency) MPIO_Request aliases MPI_Request but MPIO_REQUEST_NULL is hardcoded to zero instead of MPI_REQUEST_NULL, leaving the null-handle contract dependent on an unverified representation assumption."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "HAVE_MPI_GREQUEST is explicitly defined, so MPIO_Request and MPIO_Wait/Test resolve to MPI_Request and MPI_Wait/Test (mpio.h:27-37). The included mpi.h:193 defines MPI_REQUEST_NULL as 0x2c000000, whereas MPIO_REQUEST_NULL remains zero at mpio.h:93; the MPI_FILE_NULL guard is unrelated and cannot repair this concrete handle mismatch.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L10-L13,L75-L83,L123-L218] (MED/include-order) Including mpio.h first in C++ loads mpi.h and its C++ bindings before MPI_MODE_RDONLY and I/O declarations exist, causing the guarded MPI::File methods to be omitted."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

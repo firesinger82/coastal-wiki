@@ -1,0 +1,86 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-B00",
+ "source_path": "trunk/config/clean_distribute.bat",
+ "source_sha256": "ee7420be4039f418e38619f4a721d2d6f84a5d9d9a3e697ba12c564c929ce5cc",
+ "base_run_id": "xbeach-r1-XBeach-B00-gpt-5.6-luna-01a079a6-7103-7312-a441-5309a7d01425",
+ "audit_run_id": "xbeach-r2-XBeach-B00-gpt-5.6-luna-01a07a19-bf73-7b91-afe4-1b0868a2795d",
+ "base_record_file": "13b98585760da413e2e72d56dd6fcd1cd39d555cf66949b73a28e195d55d0db1.json",
+ "audit_record_file": "13b98585760da413e2e72d56dd6fcd1cd39d555cf66949b73a28e195d55d0db1.json",
+ "base_record_sha256_bytes": "d75bfbd9b3068b93b471047378901a494a302696c678292afa6b433144e8fd1a",
+ "audit_record_sha256_bytes": "b79bf5ac90577fdb1c17bd4218b57e47d88b4e717e6603ae4ef5819158493885",
+ "base_finding_count": 1,
+ "audit_finding_count": 3,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "[L6-L13] (LOW/postcondition/unclear) The script recreates dist\\win32 and dist\\x64 only when those directories already exist, so its apparent clean-directory postcondition is not met on a fresh checkout."
+   ],
+   "audit_member_text": [
+    "[L6-L13] (LOW/directory-initialization) Output directories are created only if they already existed, so this cleanup script does not initialize a fresh distribution tree."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "confirmed_delta",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L6-L12] (MED/destructive-input-validation) The recursive deletion root comes from unchecked %1, so an omitted argument targets drive-root dist directories instead of a validated solution directory."
+   ],
+   "representative": "audit",
+   "rationale": "span-confirmed: With an omitted first argument, L6-L12 expand the targets to \\dist\\win32 and \\dist\\x64 on the current drive. The IF EXIST tests only check existence, so they do not prevent recursive deletion of those drive-root directories.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L6-L11",
+    "quote": "IF EXIST \"%1\\dist\\win32\" (\r\nrmdir \"%1\\dist\\win32\" /s /q\r\nmkdir \"%1\\dist\\win32\"\r\n)\r\nIF EXIST \"%1\\dist\\x64\" (\r\nrmdir \"%1\\dist\\x64\" /s /q\r\n",
+    "verified_at_lines": "L6-L11",
+    "source_sha256": "ee7420be4039f418e38619f4a721d2d6f84a5d9d9a3e697ba12c564c929ce5cc"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "With no first argument, trunk/config/clean_distribute.bat:6-12 expands the targets to \\dist\\win32 and \\dist\\x64 on the current drive. The IF EXIST tests only require those directories to exist, after which recursive quiet deletion runs; the complete script contains no argument validation, and no validating caller was found in the source tree.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L6-L13] (MED/cleanup-error-handling) Directory removal failures are unchecked, allowing stale build artifacts to remain while the script proceeds."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

@@ -1,0 +1,76 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-V01",
+ "source_path": "trunk/lib/x64/mpich/include/clog_inttypes.h",
+ "source_sha256": "ecdb55f4347dac8ebda1af869d8613a178763730edd4e8a92ee0bceb4712531e",
+ "base_run_id": "xbeach-r1-XBeach-V01-gpt-6-astra-01a079bd-fbb5-7cd3-8c47-5d906cc55970",
+ "audit_run_id": "xbeach-r2-XBeach-V01-gpt-6-astra-01a07a3b-b349-7061-aef2-9b392a6fc7c6",
+ "base_record_file": "a148328d346b1e433563718dd04134d30710b95c328c6d134338f36c72d24d3d.json",
+ "audit_record_file": "a148328d346b1e433563718dd04134d30710b95c328c6d134338f36c72d24d3d.json",
+ "base_record_sha256_bytes": "6d68778cd25ac8c455cf6d45190db057574ed91b2015a146cf9daa4ed7b7b622",
+ "audit_record_sha256_bytes": "8e501b8d535477118c27dd563df401f40be00c63c6cafb10ca357ea3ff8e9f95",
+ "base_finding_count": 2,
+ "audit_finding_count": 2,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L17,L28] (LOW/format-type-mismatch) i32fmt uses %ld for CLOG_int32_t defined as __int32, leaving an int-versus-long variadic type mismatch even where both types occupy four bytes."
+   ],
+   "audit_member_text": [
+    "[L15-L18,L26-L29] (LOW/format-contract) The printf formats mix Microsoft integer extensions with C99 length modifiers and use %ld for __int32, leaving compatibility with the intended Windows CRT and exact variadic types unclear."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The concrete surviving issue is i32fmt=%ld paired with __int32, which Microsoft defines as int, not long; equal Windows widths do not make those variadic types identical ([Microsoft type documentation](https://learn.microsoft.com/en-us/cpp/cpp/int8-int16-int32-int64?view=msvc-170)). Retain LOW format/type portability; mixing Microsoft type spellings with C99 modifiers alone does not establish CRT incompatibility or a wrong result on the shipped ABI.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L20-L24] (MED/pointer-width) CLOG_Pint is defined as 32-bit despite being described as address-sized in this x64 header, risking truncation in attribute pointer conversions."
+   ],
+   "audit_member_text": [
+    "[L20-L24] (HIGH/pointer-width) CLOG_Pint is explicitly described as address-sized but is typedefed to 32 bits in this x64 library, making pointer-to-integer attribute conversions truncate addresses."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The header really violates its advertised address-sized type, but the upstream consumer stores small local communicator IDs as attribute values, not heap addresses, so truncation of live addresses is not established. The concrete consumer risk is a pointer-sized MPI_Comm_get_attr write into CLOG_Pint storage if compiled from this header; see [clog_commset.c:309-310,440-468](https://fossies.org/linux/mpich2/src/mpe2/src/logging/src/clog_commset.c), and distinguish this header defect from proof that the prebuilt MPE DLL used the same configuration.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  }
+ ]
+}

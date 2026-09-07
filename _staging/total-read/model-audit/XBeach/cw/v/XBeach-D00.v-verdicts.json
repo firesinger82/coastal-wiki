@@ -1,0 +1,109 @@
+{
+  "shard": "XBeach-D00",
+  "verdicts": [
+    {
+      "vid": "trunk__config__texinfo.tex#2",
+      "verdict": "NARROWED",
+      "rationale": "The failure requires top-based heading or footing marks and an intervening mark without chapter definitions remaining the first mark on the relevant page; merely inserting a link does not guarantee failure. The default selects bottom marks (trunk/config/texinfo.tex:L3399-L3400), while setcolor really inserts the problematic mark at L1151-L1154 and the top fallback has no further recovery at L294-L297.",
+      "neutralizer": {
+        "where": "trunk/config/texinfo.tex:L3399-L3400",
+        "quote": "\\everyheadingmarks bottom\n\\everyfootingmarks bottom"
+      }
+    },
+    {
+      "vid": "trunk__config__texinfo.tex#3",
+      "verdict": "STANDS",
+      "rationale": "The missing-primitive branch at trunk/config/texinfo.tex:L1120-L1128 neither escapes nor reports anything; destination and outline callers at L1237-L1245 and L1271-L1287 supply strings without another escaping pass. PDF-mode detection does not enforce an engine version providing pdfescapestring, and the explicit older-engine branches at L1221-L1234 and L1382-L1386 do not neutralize this compatibility defect."
+    },
+    {
+      "vid": "trunk__config__texinfo.tex#4",
+      "verdict": "STANDS",
+      "rationale": "The active uref caller passes its URL unchanged at trunk/config/texinfo.tex:L2583-L2585, and pdfurl inserts it into the raw user annotation at L1404-L1405. Neither urefcatcodes nor normalturnoffactive escapes PDF parentheses, so a URL containing an unmatched literal parenthesis can break the PDF string even when pdfescapestring exists."
+    },
+    {
+      "vid": "trunk__config__texinfo.tex#5",
+      "verdict": "STANDS",
+      "rationale": "The whole 10-point definition contains no reset of parskip before its division at trunk/config/texinfo.tex:L2057, and fonttextsize runs that definition with globaldefs=1 at L2079-L2086 on every matching call. The initial letterpaper setup supplies nonzero spacing at L9738/L9877; later explicit paper-size changes can reset it, but consecutive fonttextsize calls have no such intervening reset."
+    },
+    {
+      "vid": "trunk__config__texinfo.tex#6",
+      "verdict": "STANDS",
+      "rationale": "The reducedfonts definition assigns only reducedcaps at trunk/config/texinfo.tex:L2157, whereas sc reads smallcaps at L2406 and textfonts initializes that separate binding at L2115. The real acronym path through selectfonts (L1456, L2773-L2774) performs no additional smallcaps selection, so enclosing sc text retains its prior size."
+    },
+    {
+      "vid": "trunk__config__texinfo.tex#7",
+      "verdict": "STANDS",
+      "rationale": "Both public entry points reach the unconditional global decrements at trunk/config/texinfo.tex:L3363-L3372; neither the footer tokens nor any reservation flag is tested. The output routine conditionally inserts visible footer spacing at L368-L374 but never restores pageheight or vsize, and only an independently requested page-size reset can erase accumulated decrements."
+    },
+    {
+      "vid": "trunk__config__texinfo.tex#8",
+      "verdict": "STANDS",
+      "rationale": "Enumeration starts from the character code and increments itemno directly (trunk/config/texinfo.tex:L3659, L3734-L3765), so moving past z produces 123 rather than zero. Initial letter validation at L3709-L3716 applies only to the starting argument; the emission guard never tests the resulting lccode/uccode and therefore allows character zero or another inappropriate mapped character."
+    },
+    {
+      "vid": "trunk__config__texinfo.tex#9",
+      "verdict": "STANDS",
+      "rationale": "Environment grouping at trunk/config/texinfo.tex:L535/L575 cannot restore the global column definitions, counter, or percentage flag assigned at L3857-L3877 and L3931-L3936. Nested multitable is not rejected by startenvironment, and the outer alignment consults these shared values again at L3958-L3985 after the inner table resets them at L4002-L4005."
+    },
+    {
+      "vid": "trunk__config__texinfo.tex#10",
+      "verdict": "STANDS",
+      "rationale": "The links guards on setfilename/newindex (trunk/config/texinfo.tex:L1046-L1050, L4294-L4298) leave index stream control sequences unallocated, yet dosynindex still uses one as the numeric closeout operand at L4338. Independently, L5979-L5984 opens the TOC before checking links and Efloat writes labeled-float metadata at L8628-L8648 without that guard; auxfile is allocated at L7789 but is not opened under novalidate, so allocation does not rescue the write."
+    },
+    {
+      "vid": "trunk__config__texinfo.tex#11",
+      "verdict": "STANDS",
+      "rationale": "paramno is a count register (trunk/config/texinfo.tex:L7237), not an expandable character string, so the if at L7366 compares the register token with the greater-than character instead of its numeric value. The eTeX check is inside this unreachable true branch, and the separate too-many-invocation-arguments check at L7533-L7539 compares supplied values with formal names rather than enforcing this legacy-engine register limit."
+    },
+    {
+      "vid": "trunk__config__texinfo.tex#12",
+      "verdict": "STANDS",
+      "rationale": "getmacargs preserves the complete formal-name list at trunk/config/texinfo.tex:L7419 and parsemargdef supplies its names directly to the comma-delimited parser at L7457. For aa, the test at L7470 becomes a true comparison of a with a, leaving the semicolon in the executed branch and stopping recursion; the later eatspaces call and the many-argument/invocation parsers at L7478-L7491 and L7623-L7635 supply no prior token-length guard."
+    },
+    {
+      "vid": "trunk__config__texinfo.tex#13",
+      "verdict": "STANDS",
+      "rationale": "The braced xref entry points preserve argument whitespace (trunk/config/texinfo.tex:L7888-L7897); the ignorespaces/unskip boxes normalize display, not the tokens later used for the PDF target. getfilename skips ordinary spaces throughout the filename at L1368-L1380, while L7947 copies the node argument verbatim; node definition parsing at L7805-L7810 removes trailing spacing, so matching malformed normalization at the destination does not reliably neutralize the mismatch."
+    },
+    {
+      "vid": "trunk__config__texinfo.tex#14",
+      "verdict": "STANDS",
+      "rationale": "The complete crossmanualxref routine at trunk/config/texinfo.tex:L8054-L8063 compares only box widths, and both boxes receive the identical 7sp kern. Callers do not restrict the current font, so a three-character non-Top name in a monospaced context has the same width and loses the Section label; the preceding nonempty test does not distinguish it."
+    },
+    {
+      "vid": "trunk__config__texinfo.tex#15",
+      "verdict": "STANDS",
+      "rationale": "The complete setupdatafile body at trunk/config/texinfo.tex:L8178-L8259 merely defines the resetting loop inside a group at L8246-L8253, with no invocation or global catcode assignments. Its readers at L6020-L6024 and L8261-L8265 supply no replacement reset; the load-time reset at L9660 only masks the omission until documentencoding activates high bytes again."
+    },
+    {
+      "vid": "trunk__config__texinfo.tex#16",
+      "verdict": "STANDS",
+      "rationale": "The upfront epsf.tex probe at trunk/config/texinfo.tex:L8416-L8423 tolerates an absent file, but image then rejects the request before reaching the PDF/DVI split at L8431-L8441. The full dopdfimage implementation at L1186-L1235 uses PDF image primitives and no epsfbox, so the PDF branch at L8481-L8483 could otherwise handle an available supported image."
+    },
+    {
+      "vid": "trunk__config__texinfo.tex#17",
+      "verdict": "STANDS",
+      "rationale": "UTF lead-byte decoders are installed only once during file loading at trunk/config/texinfo.tex:L9163-L9193, before documentencoding can run. Latin definitions globally overwrite those active bytes, while the UTF-8 selection at L8882-L8884 only activates catcodes and calls utfeightchardefs; DeclareUnicodeCharacter defines u8: mappings through temporary decoder macros, not the overwritten active-byte entry points."
+    },
+    {
+      "vid": "trunk__config__texinfo.tex#18",
+      "verdict": "STANDS",
+      "rationale": "The loop increments the lead byte before testing the strict upper bound (trunk/config/texinfo.tex:L9167-L9174), so the F0/F4 setup at L9188-L9192 installs only F0 through F3. Neither the later blanket catcode activation nor DeclareUnicodeCharacter defines the active F4 decoder, leaving the U+100000-U+10FFFF sequence range outside this decoder initialization."
+    },
+    {
+      "vid": "trunk__config__texinfo.tex#19",
+      "verdict": "STANDS",
+      "rationale": "The complete UTF mapping body at trunk/config/texinfo.tex:L9255-L9648 contains no declarations for 00B1, 00B5, 00D7, or 00F7, while the Latin-1 body explicitly supplies these symbols at L8930, L8934, L8972, and L9006. UTFviiiDefined consumes an unmapped sequence and only emits a message at L9155-L9161; neither the decoder nor callers fall back to the Latin-1 replacements."
+    },
+    {
+      "vid": "trunk__config__texinfo.tex#20",
+      "verdict": "STANDS",
+      "rationale": "The actual declarations at trunk/config/texinfo.tex:L9419-L9420 give lowercase t to 0162 and uppercase T to 0163, and no later declaration overrides either entry. The cedilla helper at L8902 preserves the supplied letter case, as also demonstrated by the correctly cased Latin-2 T/t mappings at L9098 and L9132, so it does not reverse the erroneous arguments back."
+    },
+    {
+      "vid": "trunk__config__texinfo.tex#21",
+      "verdict": "STANDS",
+      "rationale": "The UTF-8 mapping at trunk/config/texinfo.tex:L9642 selects expansion, whose normal rendering is explicitly mapsto at L3017; arrow separately renders rightarrow at L3015. No later mapping or normal-text override changes this choice, and the index-only dummy replacements at L4664/L4673 are not a correction to the typeset glyph."
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-B00",
+ "source_path": "trunk/lib/fortran/findent/indentcode.bat",
+ "source_sha256": "003974822e2a06ffbdc51757f0f3bb72f6b566f845a412105606a856aac8b669",
+ "base_run_id": "xbeach-r1-XBeach-B00-gpt-5.6-luna-01a079a6-7103-7312-a441-5309a7d01425",
+ "audit_run_id": "xbeach-r2-XBeach-B00-gpt-5.6-luna-01a07a19-bf73-7b91-afe4-1b0868a2795d",
+ "base_record_file": "b8729a35f0681559454b2ddaee322c5e68b4496f398cb2a844f77e8e4ce029a1.json",
+ "audit_record_file": "b8729a35f0681559454b2ddaee322c5e68b4496f398cb2a844f77e8e4ce029a1.json",
+ "base_record_sha256_bytes": "9dc4307b41aa49f44d6f132552c9cf5fb2425ac5ebc6a569c2de4657df18b904",
+ "audit_record_sha256_bytes": "513362d6a18bd7b4f4ae676c3033692a6f98beec1d7c976142c6d51b1cb1386c",
+ "base_finding_count": 2,
+ "audit_finding_count": 2,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L1-L128] (LOW/working-directory/contract) All source paths are hard-coded relative paths and the batch file does not establish its own directory, so execution from any other working directory targets the wrong locations."
+   ],
+   "audit_member_text": [
+    "[L1-L4] (MED/working-directory-contract) Source paths are resolved from the caller's working directory without anchoring to the batch location, so launching the script elsewhere targets the wrong tree or fails."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L1-L128] (MED/destructive/error-handling) Every formatter output is moved over the original source immediately, with no per-command error check or rollback, so a missing findent executable or failed formatting step can leave the source set partially transformed or replaced."
+   ],
+   "audit_member_text": [
+    "[L1-L128] (HIGH/destructive-error-handling) Every formatter invocation is followed by unconditional move /Y, so a missing or failing findent can replace original sources with empty or incomplete redirected output."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "All 64 formatter commands in trunk/lib/fortran/findent/indentcode.bat are followed by unconditional move /Y, and the generator make_indentcodebat.m:19-23 emits the same unchecked pattern. A bundled findent.exe reduces the ordinary missing-executable scenario but provides no failure guard: with existing readable inputs and writable output paths, command redirection can leave empty or partial .new files that the next command overwrites the originals with.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  }
+ ]
+}

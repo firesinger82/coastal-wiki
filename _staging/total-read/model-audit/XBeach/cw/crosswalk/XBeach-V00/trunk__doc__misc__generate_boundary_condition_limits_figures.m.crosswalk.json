@@ -1,0 +1,188 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-V00",
+ "source_path": "trunk/doc/misc/generate_boundary_condition_limits_figures.m",
+ "source_sha256": "e1ac7ab28631fcbd3106c5b979a7887594fab964fc054730bc265ed5c1558444",
+ "base_run_id": "xbeach-r1-XBeach-V00-gpt-6-astra-01a079b6-2340-70c1-8a95-292af5f92813",
+ "audit_run_id": "xbeach-r2-XBeach-V00-gpt-6-astra-01a07a34-5e0e-7073-ac88-2789f15c46ce",
+ "base_record_file": "f50589b4f07551e75804e517906952fb2e471925fa40c53f46cc14ca3268f637.json",
+ "audit_record_file": "f50589b4f07551e75804e517906952fb2e471925fa40c53f46cc14ca3268f637.json",
+ "base_record_sha256_bytes": "57fb0ca88012597dbb4a84dcf3a7aa2de8be01955ccab276440bd8fe1720cdc2",
+ "audit_record_sha256_bytes": "b3d41091ad945693055db342a5ca2387351402d96de6cbe8c59b610493dd02f3",
+ "base_finding_count": 6,
+ "audit_finding_count": 7,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "[L135-L136,L233-L234] (LOW/output-consistency) Three-panel figures use different aspect ratios for PNG and EPS exports."
+   ],
+   "audit_member_text": [
+    "[L135-L136,L233-L234] (LOW/export-consistency) Three-panel PNG exports use a 3:1 size while their EPS counterparts use 2:1, yielding inconsistent aspect ratios and layout across output formats."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L287-L298] (MED/graphics-portability) Contour reconstruction assumes contour objects expose patch children with scalar FaceVertexCData, making the helper dependent on a particular graphics-object representation."
+   ],
+   "audit_member_text": [
+    "[L287-L305] (MED/graphics-api-assumption) Contour extraction assumes contourf exposes patch children with scalar FaceVertexCData, so graphics implementations with different contour objects can leave the polygon arrays empty and make reindexing fail."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The enclosing helper only collects patch children and has no fallback from an empty xp/lp before ismember and reindexing. The [MathWorks R2014b compatibility explanation](https://blogs.mathworks.com/loren/2014/11/05/matlab-r2014b-graphics-part-3-compatibility-considerations-in-the-new-graphics-system/) confirms Contour objects no longer expose those children; the fixed callers supply nonempty contour levels and have no version guard.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "[L316-L322] (MED/polygon-topology) Removing NaN separators before creating a patch joins disconnected polygon segments and can fill regions that should remain separate."
+   ],
+   "audit_member_text": [
+    "[L316-L322] (MED/polygon-topology) Removing all NaN separators before creating one patch joins separate polygon rings and can fill regions or holes that the original contour kept separate."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "This is a latent LOW topology limitation only when a collected patch actually contains multiple rings separated by NaNs; deleting a lone trailing separator does not join rings. The only callers use fixed rectangular meshes and smooth depth/period or height/depth fields, so the cited lines do not establish ring corruption in the generated figures; changed inputs or a different contour representation are needed.",
+    "neutralizer": {
+     "where": "trunk/doc/misc/generate_boundary_condition_limits_figures.m:L8-L20",
+     "quote": "Hrange = [2:0.1:8];\nDrange = [0:1:40];\nTrange = [6:0.25:18];\n\n[HD,DH] = meshgrid(Hrange,Drange);\n[TD,DT] = meshgrid(Trange,Drange);\n\n%% Factors\nHiD = HD./DH;\n[c,cg] = wavevelocity(TD,DT);\nCgiC = cg./c;CgiC(isnan(CgiC)) = 1;\nk = disper(2*pi./TD,DT,9.81);\nKH = k.*DT;"
+    },
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "[L151-L152,L249-L250] (MED/graphics-contract) Combined plots select exactly four patches by child order without validating their count or associated contour levels."
+   ],
+   "audit_member_text": [
+    "[L151-L152,L249-L250] (MED/plot-selection-contract) Combined plots copy exactly four patches by child order rather than threshold identity, making the selected boundary regions depend on contour count and graphics stacking order."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B1",
+    "B2"
+   ],
+   "base_member_text": [
+    "[L300-L305] (MED/contour-mapping) Reordering patches by contour level alone collapses distinct same-level contours and uses unchecked zero indices when a level has no match."
+   ],
+   "audit_member_text": [
+    "[L300-L305] (MED/contour-identity) Polygons are matched only by contour level, so multiple disconnected polygons at the same level reuse one matching patch and can lose or duplicate geometry.",
+    "[L301-L305] (MED/index-validation) The ismember result is used directly as an index without checking for zero, so any contour level absent from the extracted patch data causes invalid indexing."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The level-only ismember lookup really reuses one index when lp contains duplicate levels, but that requires multiple collected patches at the same level. Narrow to a LOW latent limitation for disconnected contour components: the actual callers use the fixed smooth fields at L8-L20, rather than an arbitrary multi-island surface, and no such duplicate-component case is established.",
+    "neutralizer": {
+     "where": "trunk/doc/misc/generate_boundary_condition_limits_figures.m:L8-L20",
+     "quote": "Hrange = [2:0.1:8];\nDrange = [0:1:40];\nTrange = [6:0.25:18];\n\n[HD,DH] = meshgrid(Hrange,Drange);\n[TD,DT] = meshgrid(Trange,Drange);\n\n%% Factors\nHiD = HD./DH;\n[c,cg] = wavevelocity(TD,DT);\nCgiC = cg./c;CgiC(isnan(CgiC)) = 1;\nk = disper(2*pi./TD,DT,9.81);\nKH = k.*DT;"
+    },
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L19-L20] (LOW/numerical-boundary) Relative depth multiplies the dispersion result by zero at the included zero-depth boundary without the explicit NaN treatment used for the velocity ratio."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "rejected",
+   "base_ids": [],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L41-L46,L59-L64,L87-L92] (MED/graphics-handle-portability) Line handles are assigned into arrays initialized as numeric empty arrays, which is incompatible with MATLAB graphics versions that return object handles."
+   ],
+   "representative": "audit",
+   "rationale": "adversarially refuted after span-confirmation: Object handles alone do not make these indexed assignments invalid: MATLAB retains conversion to numeric graphics handles for compatibility, and the consumer uses set(pp,...) rather than object-only dot access. The [MathWorks graphics compatibility documentation](https://blogs.mathworks.com/loren/2014/11/05/matlab-r2014b-graphics-part-3-compatibility-considerations-in-the-new-graphics-system/) des",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "adversarial": {
+    "verdict": "REFUTED",
+    "rationale": "Object handles alone do not make these indexed assignments invalid: MATLAB retains conversion to numeric graphics handles for compatibility, and the consumer uses set(pp,...) rather than object-only dot access. The [MathWorks graphics compatibility documentation](https://blogs.mathworks.com/loren/2014/11/05/matlab-r2014b-graphics-part-3-compatibility-considerations-in-the-new-graphics-system/) describes the numeric-handle compatibility path; the actual R2014b failure is the separate contour-child assumption, not an unavoidable error from pp=[].",
+    "neutralizer": {
+     "where": "trunk/doc/misc/generate_boundary_condition_limits_figures.m:L41-L48",
+     "quote": "pp =[];\nfor i=2:length(xt)-1;\n    pp(end+1) = plot([xt(i) xt(i)],[yl(1) yl(2)],'k:');\nend\nfor i=2:length(yt)-1;\n    pp(end+1) = plot([xl(1) xl(2)],[yt(i) yt(i)],'k:');\nend\nset(pp,'color',sil);"
+    },
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  }
+ ]
+}

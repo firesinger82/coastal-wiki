@@ -1,0 +1,186 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-B01",
+ "source_path": "trunk/m4/fortranextra.m4",
+ "source_sha256": "1021cf266125ef0b6f247236d84a05efebb71fa5f811ea7bd70c372c1a54873c",
+ "base_run_id": "xbeach-r1-XBeach-B01-gpt-5.6-luna-01a079ab-98f6-7ba2-9380-3c78010a3f81",
+ "audit_run_id": "xbeach-r2-XBeach-B01-gpt-5.6-luna-01a07a20-9cee-7323-9aa4-758354e89851",
+ "base_record_file": "d0928c6fa794da9592b5500f5a6f4168f5175a44f4d503553aec09dd82d8d6ed.json",
+ "audit_record_file": "d0928c6fa794da9592b5500f5a6f4168f5175a44f4d503553aec09dd82d8d6ed.json",
+ "base_record_sha256_bytes": "6412df47f5074a15da79c7a9151134f4e0df719c772ca1dae715c97bb25c74d9",
+ "audit_record_sha256_bytes": "e41e01ecf3e23f8501c43ea8eb1a7fa914e788ac350731af01826e1a756e660c",
+ "base_finding_count": 3,
+ "audit_finding_count": 8,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "[L120-L123] (LOW/diagnostics) The preprocessing failure message says 'Fortran does do preprocessing', which is grammatically incorrect and obscures the intended configure failure reason."
+   ],
+   "audit_member_text": [
+    "[L122] (LOW/diagnostic) The failure diagnostic says Fortran does do preprocessing when detection has failed."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "[L220-L231] (MED/configure-cache) AX_FC_HAS_MODULE uses the single cache key ax_cv_fc_has_module for every module argument, so the result of the first module probe can be incorrectly reused for later different modules."
+   ],
+   "audit_member_text": [
+    "[L221-L231] (MED/cache-key) All module names share ax_cv_fc_has_module, so subsequent module checks reuse the first module's result."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The macro really caches every argument under ax_cv_fc_has_module and never invalidates it, so different module probes can reuse the first result. A source-tree search found no AX_FC_HAS_MODULE invocation: this is a latent reusable-macro defect, not an active XBeach configure failure, and requires introducing multiple calls without clearing that cache.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [
+    "[L233-L236] (MED/configure-conditional) The macro defines HAVE_$1 via AC_DEFINE but tests the shell variable HAVE_$1 in AM_CONDITIONAL without assigning it, so the generated conditional can remain false even when the module probe succeeds."
+   ],
+   "audit_member_text": [
+    "[L218,L233-L236] (MED/output-contract) The module check defines a preprocessor symbol but never assigns the shell variable used by AM_CONDITIONAL or the documented FC_HAS_MODULE output."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "AC_DEFINE does not assign a shell variable, and neither HAVE_$1 nor the documented FC_HAS_MODULE output is assigned anywhere in this macro. No caller of AX_FC_HAS_MODULE exists in the supplied tree, so the broken output/conditional contract is latent and becomes observable only if the macro is used.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "confirmed_delta",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L31,L50,L164,L183] (MED/cache-key) The repeatable line-length macros share one cache entry per language across different requested lengths and source formats."
+   ],
+   "representative": "audit",
+   "rationale": "span-confirmed: Both macros use repeatable AC_DEFUN despite their DEFUN_ONCE comments, and each language uses a single fixed cache key regardless of requested length or source format. A later invocation therefore reuses the earlier cached flag instead of testing its new requirement.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L48-L53",
+    "quote": "AC_CACHE_CHECK(\n[for Fortran flag needed to accept $ac_fc_line_len_string column source lines],\n               [ac_cv_fc_line_length],\n[ac_cv_fc_line_length=unknown\nac_fc_line_length_FCFLAGS_save=$FCFLAGS\nfor ac_flag in none \\",
+    "verified_at_lines": "L48-L53",
+    "source_sha256": "1021cf266125ef0b6f247236d84a05efebb71fa5f811ea7bd70c372c1a54873c"
+   },
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "Both definitions use AC_DEFUN, despite the DEFUN_ONCE comment, and their cache keys omit requested length and source format. XBeach calls only AC_FC_LINE_LENGTH([unlimited]) once after AC_FC_FREEFORM and never calls the F77 variant, so incorrect reuse requires additional calls or a persisted cache reused under different format/length settings.",
+    "neutralizer": {
+     "where": "trunk/configure.ac:L55-L60",
+     "quote": "# check for functions\nAC_LANG_PUSH([Fortran])\nAC_FC_FREEFORM\nAC_FC_LINE_LENGTH([unlimited])\nACX_FORTRAN_ISNAN\nACX_FORTRAN_IEEE_ARITHMETIC"
+    },
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L104-L115] (MED/feature-probe) The preprocessing test contains no code that requires preprocessing, allowing compilers that ignore directives and unknown options to produce a false positive."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L113] (MED/compiler-portability) Every preprocessing candidate is tested with the unprobed -Werror option, which can reject otherwise supported preprocessing flags."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L224] (MED/language-state) AX_FC_HAS_MODULE changes the current language without restoring it and does so only on cache misses."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L11-L12,L31,L87-L88,L96,L144-L145,L164] (LOW/documentation-contract) The macros claim DEFUN_ONCE protection against duplicate flags but are implemented with ordinary AC_DEFUN."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

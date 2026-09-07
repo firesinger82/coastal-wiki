@@ -1,0 +1,135 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-B01",
+ "source_path": "trunk/lib/win32/netcdff90/Makefile.am",
+ "source_sha256": "972a9311b44d2b8e9c4cc0983ef33544f7b3fa4518eccf65461dfa3e6a05edea",
+ "base_run_id": "xbeach-r1-XBeach-B01-gpt-5.6-luna-01a079ab-98f6-7ba2-9380-3c78010a3f81",
+ "audit_run_id": "xbeach-r2-XBeach-B01-gpt-5.6-luna-01a07a20-9cee-7323-9aa4-758354e89851",
+ "base_record_file": "ec3a99f59a458242ce8552986dfe6c4494b437ebe58b12ac44eb114e83743418.json",
+ "audit_record_file": "ec3a99f59a458242ce8552986dfe6c4494b437ebe58b12ac44eb114e83743418.json",
+ "base_record_sha256_bytes": "8006e3656dabafb264fde159ddff1769d3bfa26284b183b18586394c060c46f9",
+ "audit_record_sha256_bytes": "b4273fc9cdcad619593ca23dc9315b78a8ceec47f9520b644b7bcdcd568e3f20",
+ "base_finding_count": 1,
+ "audit_finding_count": 5,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "[L63-L70,L84] (LOW/build-cleanup) When UPPER_CASE_MOD is enabled, the generated TYPESIZES.mod and NETCDF.mod files are declared as installed headers but CLEANFILES removes only lowercase typesizes.mod and netcdf.mod, so uppercase module artifacts may remain after cleanup."
+   ],
+   "audit_member_text": [
+    "[L63-L70,L84] (LOW/cleanup) The cleanup list omits the uppercase module filenames explicitly supported by the installation rules."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "confirmed_delta",
+   "base_ids": [],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L21-L24,L37-L38,L49] (MED/incremental-dependencies) Included Fortran sources are declared as library dependencies instead of object dependencies, so edits can relink the library without recompiling the affected code."
+   ],
+   "representative": "audit",
+   "rationale": "span-confirmed: The included Fortran files are assigned to libnetcdff90_la_DEPENDENCIES, and there are no object-level include prerequisites in this Makefile.am. The corresponding Makefile.in confirms these dependencies feed the library link target only, so an include edit can relink stale objects.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L21-L24",
+    "quote": "libnetcdff90_la_DEPENDENCIES = netcdf_attributes.f90\t\t\t\\\nnetcdf_constants.f90 netcdf_dims.f90 netcdf_expanded.f90\t\t\\\nnetcdf_externals.f90 netcdf_file.f90 netcdf_overloads.f90\t\t\\\nnetcdf_text_variables.f90 netcdf_variables.f90 netcdf_visibility.f90",
+    "verified_at_lines": "L21-L24",
+    "source_sha256": "972a9311b44d2b8e9c4cc0983ef33544f7b3fa4518eccf65461dfa3e6a05edea"
+   },
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The include-to-archive dependency error is real in this vendored netCDF makefile, but it is not on the supplied XBeach build path: configure.ac generates only the src makefiles, and the Windows static-library project compiles netcdf.f90 directly (xbeachlibrary.vfproj:170-187). It can affect a separately reconstructed upstream netCDF Automake build, not ordinary XBeach incremental builds.",
+    "neutralizer": {
+     "where": "trunk/configure.ac:L89-L93",
+     "quote": "AC_CONFIG_FILES([Makefile\n                 src/Makefile\n                 src/xbeachlibrary/Makefile\n                 src/xbeach/Makefile])\nAC_OUTPUT"
+    },
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L18,L34,L48,L65-L70] (MED/module-dependencies) No prerequisite orders compilation of netcdf or netcdf4 after generation of the typeSizes module."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "confirmed_delta",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L18,L34,L40,L48,L51,L65-L74] (MED/parallel-build) The convenience library generates .lo objects while module targets request separate .o objects from the same sources, allowing competing module-file generation."
+   ],
+   "representative": "audit",
+   "rationale": "span-confirmed: The convenience library sources produce libtool .lo objects, but both case variants of the module-header rules independently depend on ordinary .o objects. The generated Makefile.in exposes both sets under all-am with no ordering or separate module-output directory, permitting concurrent writes of the same modules.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L65-L70",
+    "quote": "TYPESIZES.mod: typeSizes.o\nNETCDF.mod: $(NETCDF_O)\nelse\nnodist_include_HEADERS = typesizes.mod netcdf.mod \ntypesizes.mod: typeSizes.o\nnetcdf.mod: $(NETCDF_O)",
+    "verified_at_lines": "L65-L70",
+    "source_sha256": "972a9311b44d2b8e9c4cc0983ef33544f7b3fa4518eccf65461dfa3e6a05edea"
+   },
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The module/header prerequisites request .o while the convenience archive requests .lo, with no ordering edge between those compilations; the generated Makefile.in:343-350,496,602-605 confirms the race. However, these netCDF makefiles are not configured or traversed by XBeach, and its Windows project compiles the sources directly, so the defect is limited to separately using the vendored upstream build rules.",
+    "neutralizer": {
+     "where": "trunk/configure.ac:L89-L93",
+     "quote": "AC_CONFIG_FILES([Makefile\n                 src/Makefile\n                 src/xbeachlibrary/Makefile\n                 src/xbeach/Makefile])\nAC_OUTPUT"
+    },
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L65-L70] (MED/generated-file-recovery) The module targets provide no recipe to regenerate a missing module when the corresponding object remains up to date."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

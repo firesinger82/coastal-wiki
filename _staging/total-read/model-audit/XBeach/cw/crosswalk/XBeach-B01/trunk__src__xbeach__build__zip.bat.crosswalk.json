@@ -1,0 +1,99 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-B01",
+ "source_path": "trunk/src/xbeach/build/zip.bat",
+ "source_sha256": "291266134d43ca97e8c32d63f44bfc29fbc7fec1143246722d83c40bb5a1a91d",
+ "base_run_id": "xbeach-r1-XBeach-B01-gpt-5.6-luna-01a079ab-98f6-7ba2-9380-3c78010a3f81",
+ "audit_run_id": "xbeach-r2-XBeach-B01-gpt-5.6-luna-01a07a20-9cee-7323-9aa4-758354e89851",
+ "base_record_file": "79bd30d961e44e9942a7fea37708d1aa1739bf729eef533b06f91e0f69faf515.json",
+ "audit_record_file": "79bd30d961e44e9942a7fea37708d1aa1739bf729eef533b06f91e0f69faf515.json",
+ "base_record_sha256_bytes": "9b2151da744d3727a944c3b9429f1d40f536ac861d70a9caffff94737fa0840c",
+ "audit_record_sha256_bytes": "b8c3126df3383d34c049a5aaa5754f810b550b4a7817b0c195f5074607296e43",
+ "base_finding_count": 1,
+ "audit_finding_count": 3,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L15-L26] (LOW/error-handling) The zip script does not check whether copying 7za.exe, changing directory, archive creation, or deletion succeeded, so it can silently leave a missing or incomplete archive."
+   ],
+   "audit_member_text": [
+    "[L16-L26] (MED/error-propagation) Copy, directory-change, and archive failures are unchecked and can be hidden by the final successful deletion."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "confirmed_delta",
+   "base_ids": [],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L20] (MED/stale-packaging) Adding into an existing ZIP does not remove entries whose source files disappeared, so repeated packaging can retain obsolete artifacts."
+   ],
+   "representative": "audit",
+   "rationale": "span-confirmed: The script adds to the named ZIP without deleting or recreating an existing archive first, and its only archive deletion explicitly removes 7za.exe. On repeated invocation against an existing ZIP, entries missing from the current source directory are therefore not removed.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L20-L21",
+    "quote": "7za.exe a \"xbeach_%ConfigurationName%_%Platform%.zip\" *\r\n7za.exe d \"xbeach_%ConfigurationName%_%Platform%.zip\" 7za.exe",
+    "verified_at_lines": "L20-L21",
+    "source_sha256": "291266134d43ca97e8c32d63f44bfc29fbc7fec1143246722d83c40bb5a1a91d"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The complete ZIP script adds into the same archive name and deletes only the 7za.exe archive member afterward; it neither removes the previous archive nor requests synchronization of deleted source entries. No in-tree caller enforces distribute.bat before each ZIP invocation, so directly repeating packaging against an existing ZIP preserves removed artifacts.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "confirmed_delta",
+   "base_ids": [],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L16,L20,L26] (LOW/packaging-side-effects) The script temporarily overwrites a destination 7za.exe and then deletes it unconditionally, with no distinction between its temporary copy and a pre-existing file."
+   ],
+   "representative": "audit",
+   "rationale": "span-confirmed: The helper is copied to the fixed destination name at line 16 and that name is deleted unconditionally at line 26. There is no pre-existing-file check, backup or ownership marker, so a pre-existing 7za.exe is not preserved even if replacement prompts or fails.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "lines": "L26-L26",
+    "quote": "del \"%SolutionDir%\\dist\\%Platform%\\%ConfigurationName%\\7za.exe\"",
+    "verified_at_lines": "L26-L26",
+    "source_sha256": "291266134d43ca97e8c32d63f44bfc29fbc7fec1143246722d83c40bb5a1a91d"
+   },
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The script has no existence check, backup, or ownership flag for the destination 7za.exe before copying and later deleting it. Deleting the 7za.exe archive member at line 21 does not protect the pre-existing filesystem file from the unconditional deletion at line 26.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  }
+ ]
+}

@@ -1,0 +1,76 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-V01",
+ "source_path": "trunk/lib/x64/mpich/examples/icpi.c",
+ "source_sha256": "d7a7d4f8fd4e7028bcea09c200d551ebca0187fa47673fa4259d5a5f780c6107",
+ "base_run_id": "xbeach-r1-XBeach-V01-gpt-6-astra-01a079bd-fbb5-7cd3-8c47-5d906cc55970",
+ "audit_run_id": "xbeach-r2-XBeach-V01-gpt-6-astra-01a07a3b-b349-7061-aef2-9b392a6fc7c6",
+ "base_record_file": "2a8acba70f52c1acb9b4ec20d2a425cf0a10ec0d6283638406c50d6e29afcc16.json",
+ "audit_record_file": "2a8acba70f52c1acb9b4ec20d2a425cf0a10ec0d6283638406c50d6e29afcc16.json",
+ "base_record_sha256_bytes": "307359f06d2777547e5604bbd5a897fc6d0cbb4874bc6eea3e8a0119c016f06b",
+ "audit_record_sha256_bytes": "31cb6c269c610eed4965882468830afc6853ba6589f8072c5a910267e35b69e7",
+ "base_finding_count": 2,
+ "audit_finding_count": 2,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L21,L43,L55] (LOW/integer-overflow) An accepted interval count near INT_MAX can overflow the signed loop increment i += numprocs."
+   ],
+   "audit_member_text": [
+    "[L55] (MED/integer-overflow) For accepted interval counts near INT_MAX, the final i += numprocs can overflow signed int and prevent reliable loop termination."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The positive interval count is an int accepted by scanf and the final i += numprocs has no overflow protection; INT_MAX with one rank is already a counterexample (icpi.c:21,43-55). Retain as LOW for this interactive demonstration at extreme interval counts, rather than a MED defect in XBeach numerical execution.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L50-L64] (LOW/input-validation) Negative interval counts enter the calculation branch and print a zero approximation instead of being rejected or treated as quit."
+   ],
+   "audit_member_text": [
+    "[L43-L55] (LOW/input-validation) Negative interval counts pass the zero-only exit check and produce a meaningless zero approximation without reporting invalid input."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "Only n==0 ends the C loop; for n<0 all positive rank-based starting indices exceed n, sum stays zero and the reduction/printing branch still runs (icpi.c:49-68). The scanf failure fallback handles malformed input, not a successfully parsed negative integer, and the Fortran example's n<=0 guard is in a different executable.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  }
+ ]
+}

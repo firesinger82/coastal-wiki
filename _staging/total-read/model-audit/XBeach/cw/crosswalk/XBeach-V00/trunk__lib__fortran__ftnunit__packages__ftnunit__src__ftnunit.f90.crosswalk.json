@@ -1,0 +1,376 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-V00",
+ "source_path": "trunk/lib/fortran/ftnunit/packages/ftnunit/src/ftnunit.f90",
+ "source_sha256": "ef89083ce77cc0e49c5c796fbeb3f3a5dead3140624bd376e5e26e2a4907f55b",
+ "base_run_id": "xbeach-r1-XBeach-V00-gpt-6-astra-01a079b6-2340-70c1-8a95-292af5f92813",
+ "audit_run_id": "xbeach-r2-XBeach-V00-gpt-6-astra-01a07a34-5e0e-7073-ac88-2789f15c46ce",
+ "base_record_file": "6d8523559b175c7a48a267c52ad09fb9bc567748d4b545602371796e103efd17.json",
+ "audit_record_file": "6d8523559b175c7a48a267c52ad09fb9bc567748d4b545602371796e103efd17.json",
+ "base_record_sha256_bytes": "5a601daaa8132480bfd31ab55714d6b47a633ea2ce8740ccd0f8d74b6ff418b9",
+ "audit_record_sha256_bytes": "ff3a2aeb66d67afc42a6b7157269a09ab3749a29c11740f33ff440f51db07f4d",
+ "base_finding_count": 15,
+ "audit_finding_count": 15,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "[L1002-L1004,L240-L242] (LOW/report-state) A run that executes no tests unconditionally appends a crash row, potentially duplicating a recovered-crash row or reporting a crash for an empty suite."
+   ],
+   "audit_member_text": [
+    "[L1002-L1004,L1073-L1075] (MED/empty-suite-reporting) The footer marks the previous test as crashed whenever no test ran, including a legitimate empty suite, and can duplicate the crash marker already emitted during restart."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "has_run starts false and is set true only inside an actually executed test; the footer calls previous_failed solely on .not.has_run. That routine unconditionally emits Crashed, without checking whether a previous test exists or was already marked during restart at L240-L242.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A11"
+   ],
+   "audit_ids": [
+    "B8"
+   ],
+   "base_member_text": [
+    "[L742-L763,L780-L795] (LOW/resource-lifetime) Early returns on open or read failures leave any successfully opened comparison files connected."
+   ],
+   "audit_member_text": [
+    "[L742-L763,L780-L795,L886-L887] (MED/resource-leak) File-comparison early returns leave whichever input files opened successfully connected instead of closing them."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "[L399-L403,L474-L478,L527-L531,L607-L611,L660-L664] (MED/report-consistency) Array shape or size failures update nofails and hooks but do not update HTML failure state, allowing the affected test to appear OK in HTML."
+   ],
+   "audit_member_text": [
+    "[L399-L402,L474-L477,L527-L530,L607-L610,L660-L663,L1008-L1009,L1036-L1039] (MED/report-false-pass) Array size and shape mismatches increment nofails and invoke the hook but never update HTML failure state, so their test rows can be rendered as OK."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The mismatch branches update nofails and call the hook, but failed_asserts is a separate private module variable updated by HTML failure helpers. Both hook implementations were checked: neither changes it, and the TeamCity hook only prints a service message, leaving the HTML begin/footer paths free to mark the row OK.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B12"
+   ],
+   "base_member_text": [
+    "[L174-L180] (MED/exit-status) Finalization executes a plain STOP regardless of failed assertions, leaving process-exit-based automation without a failure status."
+   ],
+   "audit_member_text": [
+    "[L174-L180] (MED/process-exit-status) The runner terminates with bare STOP regardless of nofails, so process-exit-based CI can report success after failed assertions."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "runtests_final removes the restart file, writes results and executes bare STOP independent of nofails. The selected TeamCity hook can separately report failures, but its completion hook is empty, so it does not repair the claimed process-exit-only CI failure mode.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A8"
+   ],
+   "audit_ids": [
+    "B9"
+   ],
+   "base_member_text": [
+    "[L713-L715,L767-L768,L811-L812] (MED/comparison-truncation) File comparisons silently discard content after 200 characters per line or 20 characters per token, so differences beyond those limits can pass."
+   ],
+   "audit_member_text": [
+    "[L713-L715,L767-L768,L801-L802,L811-L812] (MED/comparison-truncation) Fixed-length line and token reads silently discard text beyond 200 characters per line or 20 characters per token, allowing differing files to compare equal."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "Silent truncation is real for records longer than 200 characters or tokens longer than 20 characters, but these storage limits are disclosed in the routine comments. Narrow to LOW out-of-contract input handling rather than a false comparison within the documented record/token bounds; there is still no runtime rejection of oversized input.",
+    "neutralizer": {
+     "where": "trunk/lib/fortran/ftnunit/packages/ftnunit/src/ftnunit.f90:L702-L708",
+     "quote": "! Note:\n!     The files are compared line by line and the items\n!     within each line are compared too for numbers that\n!     are almost equal.\n!     The lines are read into a variable of length line_length\n!     Each line may contain up to max_items items (character\n!     strings) of length item_length."
+    },
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A10"
+   ],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [
+    "[L780-L795] (MED/failure-accounting) Premature EOF or a read error reports a failed comparison without incrementing nofails."
+   ],
+   "audit_member_text": [
+    "[L780-L795] (MED/failure-accounting) Premature EOF or read errors report a file comparison failure without incrementing nofails, leaving the overall failed-assertion total incorrect."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The read-error/premature-EOF branch returns immediately after the HTML and hook calls at L780-L795. write_header only prints a heading and the HTML helper increments failed_asserts rather than nofails, so no later accounting path restores the missing assertion increment.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0",
+    "A1"
+   ],
+   "audit_ids": [
+    "B2",
+    "B3"
+   ],
+   "base_member_text": [
+    "[L119,L138,L220-L242] (MED/restart-state) Successful tests persist the same previous=true marker as started tests, so a subsequent runtests call can label a completed test as crashed and skip tests using a reset local numbering sequence.",
+    "[L1073-L1079] (MED/failure-accounting) A recovered crash sets failed_asserts but neither increments nofails nor invokes the failure hook."
+   ],
+   "audit_member_text": [
+    "[L155-L160,L220-L245,L109-L111,L137-L138] (HIGH/multi-suite-state) Every runtests call resets test numbering and reloads the previous suite's last_test, so the documented multiple-call workflow can skip tests in later suites and label completed work as crashed.",
+    "[L118-L119,L137-L138,L240-L241,L1073-L1079] (MED/restart-failure-accounting) Started and completed tests persist the same true marker, while crash recovery only updates failed_asserts and neither increments nofails nor emits a failure hook."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "runtests_init only disables automatic finalization, while each runtests invocation resets testno and reloads last_test from the file left by the preceding suite. A successful first suite ending at test 2 makes a second two-test suite skip both tests and emit a restart crash marker; the existing single-suite XBeach caller avoids the trigger but does not fix the explicitly documented multiple-call API.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [
+    "[L397,L417,L472,L493,L525,L547,L605,L626,L658,L680,L1237-L1242] (LOW/diagnostics) Array assertion helpers always pass addtext=false, so their HTML difference rows omit the assertion description."
+   ],
+   "audit_member_text": [
+    "[L397,L417,L472,L493,L525,L547,L605,L626,L658,L680,L1237-L1242] (LOW/missing-diagnostic) Array comparison routines always pass addtext=false, suppressing the assertion description on every HTML difference row."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L443,L479,L532,L576,L612,L665,L824] (MED/nonfinite-comparison) Greater-than-only tolerance checks accept NaNs and can accept finite-versus-infinite values because neither nonfinite operands nor nonfinite thresholds are rejected."
+   ],
+   "audit_member_text": [
+    "[L443,L479,L532,L576,L612,L665,L824] (HIGH/numeric-false-pass) Approximate comparisons only fail on a greater-than test, so NaNs and unequal infinities can pass without recording an assertion failure."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "All scalar and array comparison bodies lack finite-value checks, and shape guards do not reject NaN elements in equal-shaped arrays. With ordinary nontrapping IEEE arithmetic and a positive finite margin, NaN-versus-finite and infinity-versus-finite make the greater-than predicate false; neither callers nor build instructions impose a universal trap or finite-input precondition.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L443,L479,L532,L576,L612,L665] (MED/numerical-overflow) The sum of operand magnitudes can overflow before multiplication by the tolerance and falsely accept materially different large finite values."
+   ],
+   "audit_member_text": [
+    "[L443,L576,L824] (MED/numeric-overflow) The relative-error threshold sums absolute magnitudes before scaling, allowing large finite inputs to overflow the threshold and pass despite substantial differences."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The parenthesized sum of magnitudes is evaluated before the tolerance scaling; no max-based rescaling or saturation guard exists in the enclosing comparators. For double values 1.6e308 and 1.0e308 with margin 0.01, the difference is finite but the threshold becomes infinity under nontrapping IEEE arithmetic, so the comparison passes.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A9"
+   ],
+   "audit_ids": [
+    "B10",
+    "B11"
+   ],
+   "base_member_text": [
+    "[L808-L824] (MED/parser-contract) Ignored list-directed tokenization errors and a literal question-mark sentinel can hide malformed or missing tokens, while numeric conversion uses only default-real precision."
+   ],
+   "audit_member_text": [
+    "[L808-L824] (MED/parser-contract) List-directed tokenization errors are ignored and missing tokens use the real text sentinel '?', so malformed or slash-terminated records and literal question-mark tokens can hide differences.",
+    "[L723-L724,L820-L824] (MED/comparison-precision) File numbers are parsed into default REAL, so differences below single-precision resolution disappear even when the requested tolerance is tighter."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The complete tokenizer resets all slots to literal question marks and deliberately ignores both tokenization statuses before comparing slots. Equal prefixes followed by slash-terminated differing text, or an extra literal question-mark token versus a missing token, can therefore leave identical item arrays; numeric conversion checks occur only after unequal item strings and cannot repair this.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A12"
+   ],
+   "audit_ids": [
+    "B13"
+   ],
+   "base_member_text": [
+    "[L1050,L1124,L1175-L1178,L1493-L1498] (MED/output-escaping) Test descriptions and compared strings are embedded directly in HTML without escaping markup characters."
+   ],
+   "audit_member_text": [
+    "[L1050,L1124,L1175-L1178,L1493-L1498] (MED/output-escaping) Test descriptions, compared strings, and file contents are emitted as raw HTML, allowing ordinary angle brackets and ampersands to alter or conceal report content."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The enclosing HTML writers interpolate description and compared-string arguments directly between markup fragments, and their callers pass original text. Neither trim nor the row-state helpers escape ampersands or angle brackets, so text containing HTML markup can alter the rendered report.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A13"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L118-L120,L137-L139,L969-L989,L1034-L1051] (LOW/io-error-handling) State and HTML report writes lack IOSTAT handling, so an output failure can terminate the test framework itself."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A14"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L64-L67,L109-L110,L274,L278] (LOW/initialization-contract) Public test and assertion entry points rely on runtests having initialized counters and test having allocated testname, but do not enforce or document those preconditions locally."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B14"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L1388-L1389,L1428-L1430,L1470-L1472] (LOW/diagnostic-precision) Double-precision comparison failures are printed with only five to eight significant digits, which can display distinct failing values as identical."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=LOW)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

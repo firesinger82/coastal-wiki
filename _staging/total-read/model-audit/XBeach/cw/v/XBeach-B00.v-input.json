@@ -1,0 +1,86 @@
+[
+ {
+  "vid": "trunk__autogen.sh#2",
+  "source_path": "trunk/autogen.sh",
+  "kind": "equivalent_high",
+  "claim": "[L205-L206] (MED/version-comparison) The empty-minor check resets _cur_major instead of checking whether _cur_major is empty, misclassifying a major-only version.",
+  "other_wording": "[L205-L207] (MED/logic/defect) The version-check fallback tests whether _cur_minor is empty but then assigns _cur_major=0, so a current version lacking a minor component can have its major component incorrectly reset."
+ },
+ {
+  "vid": "trunk__config__build_configuration.bat#2",
+  "source_path": "trunk/config/build_configuration.bat",
+  "kind": "confirmed_delta",
+  "claim": "[L21-L37,L59,L74] (HIGH/command-quoting) Older-version branches store quotes inside devenv_path and the invocation adds another pair, producing malformed executable quoting for paths containing spaces.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__config__clean_distribute.bat#1",
+  "source_path": "trunk/config/clean_distribute.bat",
+  "kind": "confirmed_delta",
+  "claim": "[L6-L12] (MED/destructive-input-validation) The recursive deletion root comes from unchecked %1, so an omitted argument targets drive-root dist directories instead of a validated solution directory.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__config__create-keys.sh#2",
+  "source_path": "trunk/config/create-keys.sh",
+  "kind": "confirmed_delta",
+  "claim": "[L1-L5] (HIGH/shell-line-endings) CRLF endings break direct Unix execution and append carriage returns to the rsa key-type argument and remote hostname under Bash.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__config__example_install_new_version_H6.sh#1",
+  "source_path": "trunk/config/example_install_new_version_H6.sh",
+  "kind": "equivalent_high",
+  "claim": "[L12-L41] (HIGH/build-failure-propagation) Unchecked directory changes, module loads and build commands allow packaging and module publication to proceed after failure and mask the failed build.",
+  "other_wording": "[L22-L35] (MED/error-handling/reproducibility) The build, install, archive, and directory transitions have no failure checks or `set -e`, allowing a failed build or missing install directory to proceed to artifact publication."
+ },
+ {
+  "vid": "trunk__config__example_install_new_version_H7.sh#0",
+  "source_path": "trunk/config/example_install_new_version_H7.sh",
+  "kind": "equivalent_high",
+  "claim": "[L13-L38] (HIGH/build-failure-propagation) Dependency loading and build failures do not stop installation or module generation, allowing a failed build to produce a published module.",
+  "other_wording": "[L21-L30] (MED/error-handling/reproducibility) The build and install pipeline has no failure checks or `set -e`, so failed cleanup, generation, configure, compilation, or installation can still be followed by module publication."
+ },
+ {
+  "vid": "trunk__config__teamcity-build.sh#0",
+  "source_path": "trunk/config/teamcity-build.sh",
+  "kind": "equivalent_high",
+  "claim": "[L5-L39] (HIGH/build-failure-propagation) The script never stops on failed directory changes, module loads, configuration, compilation or installation, allowing stale binaries to be packaged and a later successful command to mask the failed build.",
+  "other_wording": "[L5-L7] (MED/working-directory/contract) The script assumes it starts in a directory whose parent contains `trunk/`; it does not anchor paths to the script location or check either `cd`, so invocation from another directory changes the build target."
+ },
+ {
+  "vid": "trunk__config__teamcity-build.sh#3",
+  "source_path": "trunk/config/teamcity-build.sh",
+  "kind": "confirmed_delta",
+  "claim": "[L19] (MED/backup-semantics) Repeated cp -r into an existing _prev directory nests the current installation beneath it instead of replacing the previous snapshot.",
+  "other_wording": null
+ },
+ {
+  "vid": "trunk__config__teamcity-distribute.sh#0",
+  "source_path": "trunk/config/teamcity-distribute.sh",
+  "kind": "equivalent_high",
+  "claim": "[L6-L12] (MED/error-handling) A failed cd does not stop scp, allowing bin and lib from the previous working directory to be distributed.",
+  "other_wording": "[L4-L12] (MED/working-directory/contract) The script assumes its current directory is the installation parent and does not check `chmod`, `cd`, or `scp`, so a missing install tree or transfer failure can be reported as success."
+ },
+ {
+  "vid": "trunk__configure.ac#0",
+  "source_path": "trunk/configure.ac",
+  "kind": "equivalent_high",
+  "claim": "[L21] (HIGH/configure-syntax) A stray single quote follows AC_SUBST and is emitted into configure shell code, corrupting shell quoting and preventing reliable configuration.",
+  "other_wording": "[L21] (MED/autoconf/syntax) The AC_SUBST call has an unusual unmatched-looking quote/bracket sequence (`['$(top_srcdir)/makedepo.py])'`), leaving the generated MAKEDEPO value and macro parsing contract unclear."
+ },
+ {
+  "vid": "trunk__lib__fortran__findent__indentcode.bat#1",
+  "source_path": "trunk/lib/fortran/findent/indentcode.bat",
+  "kind": "equivalent_high",
+  "claim": "[L1-L128] (HIGH/destructive-error-handling) Every formatter invocation is followed by unconditional move /Y, so a missing or failing findent can replace original sources with empty or incomplete redirected output.",
+  "other_wording": "[L1-L128] (MED/destructive/error-handling) Every formatter output is moved over the original source immediately, with no per-command error check or rollback, so a missing findent executable or failed formatting step can leave the source set partially transformed or replaced."
+ },
+ {
+  "vid": "trunk__lib__fortran__ftnunit__doc__runtests.bat#1",
+  "source_path": "trunk/lib/fortran/ftnunit/doc/runtests.bat",
+  "kind": "equivalent_high",
+  "claim": "[L12-L15] (MED/termination) The restart loop has no progress or failure check, so a stale ftnunit.lst combined with a launch failure or repeated crash can loop indefinitely.",
+  "other_wording": "[L11-L15] (MED/loop/termination) The test runner repeats the program while `ftnunit.lst` exists without a timeout, iteration limit, or exit-status check, so a stale list file or non-terminating test can loop indefinitely."
+ }
+]

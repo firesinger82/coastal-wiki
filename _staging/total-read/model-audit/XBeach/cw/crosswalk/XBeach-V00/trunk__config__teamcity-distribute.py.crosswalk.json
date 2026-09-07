@@ -1,0 +1,241 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-V00",
+ "source_path": "trunk/config/teamcity-distribute.py",
+ "source_sha256": "5c40143e23be53535939aeb5a589a80a0b71fdcfa399295f34cb87237010ed4e",
+ "base_run_id": "xbeach-r1-XBeach-V00-gpt-6-astra-01a079b6-2340-70c1-8a95-292af5f92813",
+ "audit_run_id": "xbeach-r2-XBeach-V00-gpt-6-astra-01a07a34-5e0e-7073-ac88-2789f15c46ce",
+ "base_record_file": "915eb4e6f80e5a618547c453d7b5b8d29ee295eeaae0b7d58cb45fb1aa4d3ca0.json",
+ "audit_record_file": "915eb4e6f80e5a618547c453d7b5b8d29ee295eeaae0b7d58cb45fb1aa4d3ca0.json",
+ "base_record_sha256_bytes": "c1996da06ba98f459278623629430ed00066f34d7903c978e3149f3fc9d7a827",
+ "audit_record_sha256_bytes": "a9bce16bf3d10c378330ed8ff38901d43d98d12c5f8e6052569c8f3099b6a05a",
+ "base_finding_count": 9,
+ "audit_finding_count": 9,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "[L40] (MED/host-verification) The unconditional yes piped into pscp accepts an initial host-key prompt without identity verification."
+   ],
+   "audit_member_text": [
+    "[L40] (MED/host-authentication) Piping an unconditional yes to pscp accepts an unverified host-key prompt instead of requiring a known server identity."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [
+    "[L68,L85-L96] (LOW/empty-input) Missing configuration directories are silently skipped and an empty index is still uploaded when none exist."
+   ],
+   "audit_member_text": [
+    "[L68,L81,L90-L96] (MED/publication-completeness) Missing configuration directories are silently skipped and the download index is still replaced, so incomplete or entirely absent build outputs can publish an incomplete or empty release page."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The exists check has no failure branch, and index generation/upload follows the loops regardless of how many configurations exist. An in-memory execution of the actual function with all exists checks false produced an empty list and still called the upload path; no external completeness guard was found.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [
+    "[L37-L45] (LOW/resource-lifetime) Each put opens a null-output file without an explicit close, while the client close method does nothing."
+   ],
+   "audit_member_text": [
+    "[L37-L41,L44-L45] (LOW/resource-lifecycle) Each upload opens a devnull stream without explicitly closing it, relying on interpreter cleanup rather than the client's no-op close method."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L37-L41,L77-L83,L96] (MED/error-handling) Discarded transfer status and diagnostics allow failed uploads to appear successful and leave the published index pointing at absent artifacts."
+   ],
+   "audit_member_text": [
+    "[L40-L41] (HIGH/upload-failure-propagation) The upload subprocess return code is ignored and both output streams are discarded, allowing failed binary transfers to be reported as finished and listed in the published index."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The active client is the local SSHClient at L52, not the commented Paramiko implementation that could raise transfer errors. Its put method ignores a nonzero subprocess result, and an in-memory run with every transfer returning failure still generated eight binary links and the finished message.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "[L121-L125] (MED/archive-layout) Every archived file uses only its basename, flattening subdirectories and permitting duplicate member names that lose the original directory structure."
+   ],
+   "audit_member_text": [
+    "[L119-L125] (MED/archive-layout) Every archive entry uses only fname, flattening nested directories and creating duplicate names or breaking relative-path dependencies."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The complete archive helper recursively walks cpath but passes only fname as arcname at L125. The zip exclusion prevents self-inclusion but does not preserve directory prefixes, so two non-zip files with the same basename in different directories collide inside the archive.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L40-L41] (MED/shell-quoting) Unquoted interpolation of executable paths, credentials and transfer paths into a shell command breaks on spaces or shell metacharacters."
+   ],
+   "audit_member_text": [
+    "[L38-L41] (HIGH/shell-command-construction) Executable paths, credentials, and transfer paths are interpolated unquoted into a shell command, so spaces or shell metacharacters can corrupt arguments or execute unintended commands."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "SSHClient.put assembles and executes an unquoted shell string at L38-L41, and connect merely stores the supplied strings. Neither the distribute caller nor the CLI sanitizes those values, so ordinary spaces and shell metacharacters affect command parsing.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [
+    "[L24-L28,L40] (MED/ignored-argument) The connection port is stored but never supplied to pscp, so a nondefault port is silently ignored."
+   ],
+   "audit_member_text": [
+    "[L24-L26,L40] (MED/ignored-configuration) connect stores the requested port but put never passes it to pscp, so nondefault SSH ports are ignored."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "distribute forwards its port argument to connect at L54, but put constructs pscp arguments without either that stored value or a -P option. The CLI happens to use port 22, but the explicitly exposed nondefault-port function argument is ineffective.",
+    "neutralizer": null,
+    "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "[L40,L154] (MED/credential-handling) Passwords are conveyed in process command-line arguments for both the distribution script and pscp."
+   ],
+   "audit_member_text": [
+    "[L40,L154] (MED/credential-handling) The password is supplied through process arguments and embedded in the shell command line, exposing it to command-line inspection."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A8"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L123-L124] (LOW/archive-contract) The advertised entire-directory archive excludes every ZIP file, including ZIP resources unrelated to the generated output archive."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "rejected",
+   "base_ids": [],
+   "audit_ids": [
+    "B8"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L77] (LOW/path-contract) The binary destination is built by concatenating targetdir and 'bin/' without requiring or adding a trailing separator."
+   ],
+   "representative": "audit",
+   "rationale": "span-refuted: Although L77 concatenates targetdir and 'bin/', the in-file entry point fixes targetdir to '/htdocs/xbeach/testbed/' at L150 and passes it unchanged at L164-L169. That trailing slash neutralizes the alleged malformed destination on the script's actual call path; a failure would require a different external caller.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06"
+  }
+ ]
+}
