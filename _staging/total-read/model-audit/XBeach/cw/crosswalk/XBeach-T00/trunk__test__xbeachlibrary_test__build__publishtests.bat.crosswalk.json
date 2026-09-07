@@ -1,0 +1,79 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-T00",
+ "source_path": "trunk/test/xbeachlibrary_test/build/publishtests.bat",
+ "source_sha256": "1662d30617251c8287a4f83814b2e26fe5b1521d1d80ebe864efe67e4abeea47",
+ "base_run_id": "xbeach-r1-XBeach-T00-codex-01a0797f-1e2e-72a2-90ca-4cf8e93e4105",
+ "audit_run_id": "xbeach-r2-XBeach-T00-codex-01a07984-56cc-7043-bc32-c35fdf4494d8",
+ "base_record_file": "53cfd01f361376ea26a89449ce8abe066d9f51ab5e7f62d418730de4da1a97a4.json",
+ "audit_record_file": "53cfd01f361376ea26a89449ce8abe066d9f51ab5e7f62d418730de4da1a97a4.json",
+ "base_record_sha256_bytes": "7f25b4d092c7bbc7dce58a5e94b38529ffd7b1515a9412312dae2f76d70f9e66",
+ "audit_record_sha256_bytes": "cba772f9f120dc953497c7aa14842b6fc3dd978a4946858b0c992e9c8256dc79",
+ "base_finding_count": 5,
+ "audit_finding_count": 4,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0",
+    "A1",
+    "A2",
+    "A3"
+   ],
+   "audit_ids": [
+    "B1",
+    "B2",
+    "B3"
+   ],
+   "base_member_text": [
+    "[L13,L16,L23] (MED/unchecked-command-failure) The script runs the executable and opens the report without checking directory-change or launch success, allowing a failed invocation to display an old report.",
+    "[L16,L20-L21] (MED/process-synchronization) Completion is inferred from all processes with the executable name rather than the launched process, so concurrent runs interfere and no test exit status is captured.",
+    "[L18-L21] (LOW/busy-wait) The tasklist polling loop has neither a delay nor a timeout and can spin indefinitely while a matching process remains.",
+    "[L13,L25] (LOW/working-directory) Both directory changes omit cd /d, so a SolutionDir on another Windows drive does not switch the active drive."
+   ],
+   "audit_member_text": [
+    "[L13-L16,L25] (MED/working-directory) The script uses cd without /d and does not check whether it succeeded, so a solution on another drive or a missing directory leaves execution in the wrong working directory.",
+    "[L16-L23] (MED/failure-propagation) The asynchronous test launch never captures the test process exit status and opens ftnunit.html even after launch or execution failure, potentially presenting a stale report.",
+    "[L18-L21] (LOW/process-wait) The wait loop polls without a delay or timeout and matches every process with the executable name, so an unrelated or hung test process can keep the script spinning indefinitely."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME (many-to-one)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "STANDS",
+    "rationale": "The entire batch file contains neither a drive switch nor a directory-change success check: lines 13 and 25 use plain cd, and line 16 launches from the resulting current directory. The ERRORLEVEL check at 20-21 concerns only tasklist/find after launch and cannot validate the earlier cd; repository-wide caller/build searches found no wrapper guaranteeing the correct active drive or an existing target directory.",
+    "neutralizer": null,
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L13] (MED/build-path-mismatch) The script searches bin/ConfigurationName although the test project places executables under bin/win32/ConfigurationName or bin/x64/ConfigurationName."
+   ],
+   "audit_member_text": [
+    "[L13] (MED/build-path) The executable directory omits the Win32 or x64 component used by xbeachlibrary_test.vfproj, so ordinary configuration names select the wrong build directory."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  }
+ ]
+}

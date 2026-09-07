@@ -5,8 +5,8 @@
  "generated_by": "llm:claude-opus-5 (supplement gate; span-reconfirm only — NOT completion authority)",
  "generated_at": "2026-09-07",
  "note": "selected_record=base(Claude 1차, unchanged). supplements=span-reconfirmed audit confirmed_delta, bound to crosswalk+audit-record+evidence-source hashes. Canonical validity requires verify_supplement.py PASS AND an approved human decision receipt (supplement-decisions.json). Supplements are neither necessary nor sufficient for the completion gate.",
- "entry_count": 25,
- "supplement_count": 59,
+ "entry_count": 26,
+ "supplement_count": 60,
  "entries": [
   {
    "canonical_key": {
@@ -2466,6 +2466,61 @@
      "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
      "decided_at": "2026-09-06",
      "rationale": "span-confirmed: L39-L43 embed metadata directly in single-quoted Fortran literals, with no escaping helper or filter in the enclosing template. generate.py also preserves apostrophes in descriptions and JSON strings without sanitization, so a value such as beach's elevation produces an undoubled apostrophe and a malformed Fortran literal.",
+     "reconfirmed_at": "2026-09-07",
+     "reconfirm_method": "span re-extracted (bounds-checked) from exact live source; audit_id/finding_text membership + crosswalk + record hashes verified by verify_supplement.py"
+    }
+   ]
+  },
+  {
+   "canonical_key": {
+    "model": "XBeach",
+    "normalized_path": "trunk/test/testgenmodule.F90",
+    "source_sha256": "df3206df26937b2be81b291545a5ab5361656ab3309e07c659a288f06350eaf2"
+   },
+   "shard": "XBeach-T00",
+   "selected_record": {
+    "layer": "base_1차",
+    "reader": "codex-R1",
+    "run_id": "xbeach-r1-XBeach-T00-codex-01a0797f-1e2e-72a2-90ca-4cf8e93e4105",
+    "record_file": "cc7fbaaf4b97b654ef03b2a16386331a0db43dba7d25ceabf4375c356e834e2f.json",
+    "record_path": "total-read/model-audit/XBeach/cw/records-by-run/xbeach-r1-XBeach-T00-codex-01a0797f-1e2e-72a2-90ca-4cf8e93e4105/cc7fbaaf4b97b654ef03b2a16386331a0db43dba7d25ceabf4375c356e834e2f.json",
+    "record_sha256_bytes": "778384b914b415e98c297e6f99ccba3348fbe0e7e007105b9006601434a0e901",
+    "record_source_sha256": "df3206df26937b2be81b291545a5ab5361656ab3309e07c659a288f06350eaf2"
+   },
+   "crosswalk": {
+    "path": "total-read/model-audit/XBeach/cw/crosswalk/XBeach-T00/trunk__test__testgenmodule.F90.crosswalk.json",
+    "sha256_bytes": "2576a6c90d406b0288fa45bf27f753e5102918591bef17a7911fb8d7822e4423"
+   },
+   "supplements": [
+    {
+     "member_input_ids": [
+      "B8"
+     ],
+     "finding_texts": {
+      "B8": "[L878,L909-L913] (LOW/uninitialized-read) The master copies uninitialized a and ia into aa and iaa before scattertest initializes them, creating undefined reads even though the later scattertest overwrites the copied region."
+     },
+     "audit_record": {
+      "run_id": "xbeach-r2-XBeach-T00-codex-01a07984-56cc-7043-bc32-c35fdf4494d8",
+      "record_path": "total-read/model-audit/XBeach/cw/records-by-run/xbeach-r2-XBeach-T00-codex-01a07984-56cc-7043-bc32-c35fdf4494d8/cc7fbaaf4b97b654ef03b2a16386331a0db43dba7d25ceabf4375c356e834e2f.json",
+      "record_sha256_bytes": "0b1e722b7874b869a7fd5e89eacdd155a36e3d96afcbdb5678dd4847f4ca2444",
+      "record_source_sha256": "df3206df26937b2be81b291545a5ab5361656ab3309e07c659a288f06350eaf2"
+     },
+     "evidence_sources": [
+      {
+       "path": "XBeach/raw/source_code/trunk/test/testgenmodule.F90",
+       "sha256": "df3206df26937b2be81b291545a5ab5361656ab3309e07c659a288f06350eaf2"
+      }
+     ],
+     "source_span": {
+      "path": "XBeach/raw/source_code/trunk/test/testgenmodule.F90",
+      "lines": "909-913"
+     },
+     "authoritative_quote": "if (xmaster) then\n  aa(1:ma,1:na) = a\n  iaa(1:ma,1:na) = ia\nendif\ncall scattertest(a,ia,b,ib)",
+     "source_span_hash": "84ab5b89d10c6c7058e0b283dd7685c12a8a033cda62e19884c73ed03e1d716e",
+     "decision": "confirmed_delta",
+     "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+     "decided_at": "2026-09-06",
+     "rationale": "span-confirmed: The arrays a and ia are allocated without initialization at L878, and no intervening assignment or call receiving them defines their elements before the master copies them at L910-L911. scattertest initializes its inputs at L38-L45 only after these reads (calls at L913 and L917-L918); the later overwrite prevents propagation into the scatter checks but does not neutralize the preceding undefined reads.",
      "reconfirmed_at": "2026-09-07",
      "reconfirm_method": "span re-extracted (bounds-checked) from exact live source; audit_id/finding_text membership + crosswalk + record hashes verified by verify_supplement.py"
     }

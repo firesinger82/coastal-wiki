@@ -1,0 +1,15 @@
+{
+  "shard": "XBeach-T00",
+  "verdicts": [
+    {
+      "audit_id": "B8",
+      "source_path": "trunk/test/testgenmodule.F90",
+      "verdict": "CONFIRM",
+      "rationale": "The arrays a and ia are allocated without initialization at L878, and no intervening assignment or call receiving them defines their elements before the master copies them at L910-L911. scattertest initializes its inputs at L38-L45 only after these reads (calls at L913 and L917-L918); the later overwrite prevents propagation into the scatter checks but does not neutralize the preceding undefined reads.",
+      "evidence_span": {
+        "lines": "L909-L913",
+        "quote": "if (xmaster) then\r\n  aa(1:ma,1:na) = a\r\n  iaa(1:ma,1:na) = ia\r\nendif\r\ncall scattertest(a,ia,b,ib)"
+      }
+    }
+  ]
+}

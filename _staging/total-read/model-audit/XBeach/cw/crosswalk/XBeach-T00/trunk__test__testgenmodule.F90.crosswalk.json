@@ -1,0 +1,262 @@
+{
+ "schema": "crosswalk/v1",
+ "model": "XBeach",
+ "shard": "XBeach-T00",
+ "source_path": "trunk/test/testgenmodule.F90",
+ "source_sha256": "df3206df26937b2be81b291545a5ab5361656ab3309e07c659a288f06350eaf2",
+ "base_run_id": "xbeach-r1-XBeach-T00-codex-01a0797f-1e2e-72a2-90ca-4cf8e93e4105",
+ "audit_run_id": "xbeach-r2-XBeach-T00-codex-01a07984-56cc-7043-bc32-c35fdf4494d8",
+ "base_record_file": "cc7fbaaf4b97b654ef03b2a16386331a0db43dba7d25ceabf4375c356e834e2f.json",
+ "audit_record_file": "cc7fbaaf4b97b654ef03b2a16386331a0db43dba7d25ceabf4375c356e834e2f.json",
+ "base_record_sha256_bytes": "778384b914b415e98c297e6f99ccba3348fbe0e7e007105b9006601434a0e901",
+ "audit_record_sha256_bytes": "0b1e722b7874b869a7fd5e89eacdd155a36e3d96afcbdb5678dd4847f4ca2444",
+ "base_finding_count": 8,
+ "audit_finding_count": 9,
+ "provenance": {
+  "pilot": false,
+  "blinded": true,
+  "note": "Blinded single-subagent adjudication (MERGE-PLAN §2): vendor labels stripped, A/B randomized per file, candidate-pair focus. confirmed_delta promoted only after caller original-span confirmation.",
+  "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+  "decided_at": "2026-08-27"
+ },
+ "dispositions": [
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A6"
+   ],
+   "audit_ids": [
+    "B7"
+   ],
+   "base_member_text": [
+    "[L349-L361,L448-L460,L550-L568,L674-L692] (LOW/weak-test-oracle) Shift payloads add rank and indices without distinct positional weights, allowing some wrong-source and index-offset combinations to produce the same expected value."
+   ],
+   "audit_member_text": [
+    "[L550,L556,L562,L568,L587,L608,L629,L650,L674,L680,L686,L692] (LOW/test-coverage) The three-dimensional shift fixtures encode both varying indices as their sum, so swapping those indices over overlapping ranges preserves expected values and can hide layout errors."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A1"
+   ],
+   "audit_ids": [
+    "B1"
+   ],
+   "base_member_text": [
+    "[L339,L438,L539,L663,L785-L788] (MED/lost-error-count) xshiftest resets errors before each array type and rank, so the final reduced total includes only the last integer rank-three case."
+   ],
+   "audit_member_text": [
+    "[L438,L539,L663,L785-L788] (MED/error-accounting) xshiftest resets errors before each subsequent datatype/rank variant without reporting the previous count, so its final total includes only the three-dimensional integer checks."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "Within xshiftest, errors is local, resets at lines 438, 539 and 663 discard the earlier counts, and the sole reduction at 785-788 therefore totals only integer rank-three checks, although individual earlier mismatches are printed. The supplied harness is not runnable unchanged: trunk/test/testgenmodule.F90:831 calls xmpi_determine_processor_grid without arguments, whereas xmpi.F90:325-330 requires seven and the alternative xmpinew.F90:189-193 requires six; the supplied build manifests also do not include testgenmodule.F90. This is a latent error-accounting defect in a harness requiring interfa",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xmpi.F90:L325-L330",
+     "quote": "   subroutine xmpi_determine_processor_grid(m,n,divtype,mmanual,nmanual,cyclic,error)\n      implicit none\n      integer, intent(in) :: m,n,mmanual,nmanual  ! the dimensions of the global domain\n      integer, intent(in)     :: cyclic\n      integer, intent(in)     :: divtype\n      integer, intent(out)    :: error"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A0"
+   ],
+   "audit_ids": [
+    "B0"
+   ],
+   "base_member_text": [
+    "[L880-L883,L917-L918,L927,L937,L944-L947,L957] (MED/out-of-bounds-section) Non-master ranks allocate aa and iaa as 1-by-1 and vvs with two elements but pass global-sized sections of those arrays, exceeding their allocated bounds before any callee master guard applies."
+   ],
+   "audit_member_text": [
+    "[L881-L882,L917-L918,L927,L937,L945-L946,L957] (MED/out-of-bounds) Non-master ranks allocate aa and iaa as 1-by-1 arrays and vvs with two elements but subsequently form full-domain sections of those arrays, violating their bounds even when the receiving routine ignores non-master send data."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "With ma=101 and na=501, the non-master allocations at 881-882 and 945-946 cannot support the nonempty sections at 917, 927, 937 and 957; root-only data access in general_mpi_new.F90:117-135,676-726 does not legalize invalid actual-argument sections. The supplied harness is not runnable unchanged: trunk/test/testgenmodule.F90:831 calls xmpi_determine_processor_grid without arguments, whereas xmpi.F90:325-330 requires seven and the alternative xmpinew.F90:189-193 requires six; the supplied build manifests also do not include testgenmodule.F90. The bounds defect is therefore latent and becomes a ",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xmpi.F90:L325-L330",
+     "quote": "   subroutine xmpi_determine_processor_grid(m,n,divtype,mmanual,nmanual,cyclic,error)\n      implicit none\n      integer, intent(in) :: m,n,mmanual,nmanual  ! the dimensions of the global domain\n      integer, intent(in)     :: cyclic\n      integer, intent(in)     :: divtype\n      integer, intent(out)    :: error"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A5"
+   ],
+   "audit_ids": [
+    "B5"
+   ],
+   "base_member_text": [
+    "[L276-L278] (LOW/misleading-diagnostic) The vector mismatch diagnostic prints fill1(is(rank+1)) instead of the indexed expected value actually used in the comparison."
+   ],
+   "audit_member_text": [
+    "[L276-L278] (LOW/diagnostic) The vector-distribution failure message omits the i-1 offset from its printed expected value, so failures beyond the first element report the wrong expectation."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The comparison at 276 uses fill1(is(xmpi_rank+1)+i-1), but the diagnostic at 278 omits i-1; fill1 at 20-26 is ten times its argument, so a mismatch at i>1 prints an expectation too small by 10*(i-1). The supplied harness is not runnable unchanged: trunk/test/testgenmodule.F90:831 calls xmpi_determine_processor_grid without arguments, whereas xmpi.F90:325-330 requires seven and the alternative xmpinew.F90:189-193 requires six; the supplied build manifests also do not include testgenmodule.F90. The LOW diagnostic defect remains in the source, with observable misleading output conditional on a co",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xmpi.F90:L325-L330",
+     "quote": "   subroutine xmpi_determine_processor_grid(m,n,divtype,mmanual,nmanual,cyclic,error)\n      implicit none\n      integer, intent(in) :: m,n,mmanual,nmanual  ! the dimensions of the global domain\n      integer, intent(in)     :: cyclic\n      integer, intent(in)     :: divtype\n      integer, intent(out)    :: error"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A4"
+   ],
+   "audit_ids": [
+    "B6"
+   ],
+   "base_member_text": [
+    "[L299-L308] (LOW/weak-test-oracle) getrowtest fills every cell on a process with the same process-row value, so selecting the wrong local row or permuting its columns can pass."
+   ],
+   "audit_member_text": [
+    "[L299-L308] (LOW/test-coverage) getrowtest fills every local matrix element with the same process-row value, so it cannot distinguish the requested first versus last row or detect permutations within the returned row."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A3"
+   ],
+   "audit_ids": [
+    "B3"
+   ],
+   "base_member_text": [
+    "[L231-L240] (MED/test-masking) shifttest repeats border exchange 100 times after poisoning halos only once, allowing a defect that requires multiple exchanges to repair the halos to pass."
+   ],
+   "audit_member_text": [
+    "[L218-L232,L235-L246] (MED/test-coverage) shifttest performs 100 exchanges before checking values, so a defective exchange that needs multiple calls to propagate corner data can pass the test."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "equivalent",
+   "base_ids": [
+    "A2"
+   ],
+   "audit_ids": [
+    "B2"
+   ],
+   "base_member_text": [
+    "[L85-L110,L167,L248-L253,L282-L287,L316-L321,L785-L790,L990-L992] (MED/failure-propagation) Detected comparison failures are only printed and never propagated to a failing program exit status."
+   ],
+   "audit_member_text": [
+    "[L85-L110,L167-L170,L248-L254,L282-L288,L316-L322,L785-L792,L990-L992] (MED/failure-propagation) Detected numerical mismatches are only printed and never propagated to a program failure status, allowing an automated run to exit normally after failed checks."
+   ],
+   "representative": "audit",
+   "rationale": "blinded SAME",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27",
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "All numerical error counters are local and only printed/reduced, and neither xmpi.F90:307-312 nor xmpinew.F90:173-178 passes these counters to MPI_Finalize or converts them into failure status. The supplied harness is not runnable unchanged: trunk/test/testgenmodule.F90:831 calls xmpi_determine_processor_grid without arguments, whereas xmpi.F90:325-330 requires seven and the alternative xmpinew.F90:189-193 requires six; the supplied build manifests also do not include testgenmodule.F90. Thus the failure-propagation omission is real at source level, but an automated execution exiting normally a",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xmpi.F90:L325-L330",
+     "quote": "   subroutine xmpi_determine_processor_grid(m,n,divtype,mmanual,nmanual,cyclic,error)\n      implicit none\n      integer, intent(in) :: m,n,mmanual,nmanual  ! the dimensions of the global domain\n      integer, intent(in)     :: cyclic\n      integer, intent(in)     :: divtype\n      integer, intent(out)    :: error"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  },
+  {
+   "disposition": "base_only",
+   "base_ids": [
+    "A7"
+   ],
+   "audit_ids": [],
+   "base_member_text": [
+    "[L337-L361,L536-L568,L660-L692,L850-L854,L903-L904] (LOW/unclear-size-contract) The shift tests access index 2 and size-minus-one without establishing a minimum local extent, while the explicit processor-grid guard checks only the process-count product."
+   ],
+   "audit_member_text": [],
+   "representative": "base",
+   "rationale": "unmatched base finding (mat=HIGH)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "distinct_unconfirmed",
+   "base_ids": [],
+   "audit_ids": [
+    "B4"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L205-L228] (LOW/test-coverage) Corner sentinels are assigned only when both adjacent neighbors exist, leaving interface endpoints on physical domain boundaries prefilled with correct values and unable to expose missing updates there."
+   ],
+   "representative": "audit",
+   "rationale": "unmatched audit finding (mat=MED)",
+   "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+   "decided_at": "2026-08-27"
+  },
+  {
+   "disposition": "confirmed_delta",
+   "base_ids": [],
+   "audit_ids": [
+    "B8"
+   ],
+   "base_member_text": [],
+   "audit_member_text": [
+    "[L878,L909-L913] (LOW/uninitialized-read) The master copies uninitialized a and ia into aa and iaa before scattertest initializes them, creating undefined reads even though the later scattertest overwrites the copied region."
+   ],
+   "representative": "audit",
+   "rationale": "span-confirmed: The arrays a and ia are allocated without initialization at L878, and no intervening assignment or call receiving them defines their elements before the master copies them at L910-L911. scattertest initializes its inputs at L38-L45 only after these reads (calls at L913 and L917-L918); the later overwrite prevents propagation into the scatter checks but does not neutralize the preceding undefined reads.",
+   "decided_by": "llm:codex span-confirmation + caller verbatim-quote re-verification",
+   "decided_at": "2026-09-06",
+   "evidence_span": {
+    "path": "XBeach/raw/source_code/trunk/test/testgenmodule.F90",
+    "lines": "909-913",
+    "claimed_lines": "L909-L913",
+    "reported_quote": "if (xmaster) then\r\n  aa(1:ma,1:na) = a\r\n  iaa(1:ma,1:na) = ia\r\nendif\r\ncall scattertest(a,ia,b,ib)",
+    "verified_at_lines": "L909-L913",
+    "source_sha256": "df3206df26937b2be81b291545a5ab5361656ab3309e07c659a288f06350eaf2",
+    "quote": "if (xmaster) then\n  aa(1:ma,1:na) = a\n  iaa(1:ma,1:na) = ia\nendif\ncall scattertest(a,ia,b,ib)",
+    "quote_source": "live source extract at verified lines (authoritative)"
+   },
+   "adversarial": {
+    "verdict": "NARROWED",
+    "rationale": "The master allocations at 878 have no initializer, no intervening call receives a or ia, and the assignments at 910-911 precede their first initialization in scattertest at 38-45; the second scattertest overwrites the copied region but cannot retroactively define those reads. The supplied harness is not runnable unchanged: trunk/test/testgenmodule.F90:831 calls xmpi_determine_processor_grid without arguments, whereas xmpi.F90:325-330 requires seven and the alternative xmpinew.F90:189-193 requires six; the supplied build manifests also do not include testgenmodule.F90. This remains a LOW latent",
+    "neutralizer": {
+     "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xmpi.F90:L325-L330",
+     "quote": "   subroutine xmpi_determine_processor_grid(m,n,divtype,mmanual,nmanual,cyclic,error)\n      implicit none\n      integer, intent(in) :: m,n,mmanual,nmanual  ! the dimensions of the global domain\n      integer, intent(in)     :: cyclic\n      integer, intent(in)     :: divtype\n      integer, intent(out)    :: error"
+    },
+    "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+    "verified_at": "2026-09-07"
+   }
+  }
+ ]
+}

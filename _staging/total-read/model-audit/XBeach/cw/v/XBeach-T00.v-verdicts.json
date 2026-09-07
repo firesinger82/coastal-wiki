@@ -1,0 +1,65 @@
+{
+  "shard": "XBeach-T00",
+  "verdicts": [
+    {
+      "vid": "trunk__src__pybeach__xbeach__test__test_libxbeach.py#2",
+      "verdict": "STANDS",
+      "rationale": "The complete test_rewind procedure ends with only the name-set assertion and diagnostic prints; get_arrays/get_array and tearDown in trunk/src/pybeach/xbeach/libxbeach.py provide no replay-value assertion. Executing the extracted comparison with matching names and a 1000000-valued difference completed without assertion failure, so the numerical-validation gap stands."
+    },
+    {
+      "vid": "trunk__src__pybeach__xbeach__test__test_libxbeach.py#5",
+      "verdict": "STANDS",
+      "rationale": "The size guard protects only the ndarray reduction from empty input, and neither the test nor libxbeach.get_array/get_arrays filters nonfinite values. In an isolated execution of lines 167-174, comparing [0.0] with [NaN] completed without failure or diagnostic output; the primary LOW NaN claim stands independently of the alternate empty-array wording."
+    },
+    {
+      "vid": "trunk__test__testgenmodule.F90#1",
+      "verdict": "NARROWED",
+      "rationale": "Within xshiftest, errors is local, resets at lines 438, 539 and 663 discard the earlier counts, and the sole reduction at 785-788 therefore totals only integer rank-three checks, although individual earlier mismatches are printed. The supplied harness is not runnable unchanged: trunk/test/testgenmodule.F90:831 calls xmpi_determine_processor_grid without arguments, whereas xmpi.F90:325-330 requires seven and the alternative xmpinew.F90:189-193 requires six; the supplied build manifests also do not include testgenmodule.F90. This is a latent error-accounting defect in a harness requiring interface/build repair, rather than an established MED failure of a currently runnable test.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xmpi.F90:L325-L330",
+        "quote": "   subroutine xmpi_determine_processor_grid(m,n,divtype,mmanual,nmanual,cyclic,error)\n      implicit none\n      integer, intent(in) :: m,n,mmanual,nmanual  ! the dimensions of the global domain\n      integer, intent(in)     :: cyclic\n      integer, intent(in)     :: divtype\n      integer, intent(out)    :: error"
+      }
+    },
+    {
+      "vid": "trunk__test__testgenmodule.F90#2",
+      "verdict": "NARROWED",
+      "rationale": "With ma=101 and na=501, the non-master allocations at 881-882 and 945-946 cannot support the nonempty sections at 917, 927, 937 and 957; root-only data access in general_mpi_new.F90:117-135,676-726 does not legalize invalid actual-argument sections. The supplied harness is not runnable unchanged: trunk/test/testgenmodule.F90:831 calls xmpi_determine_processor_grid without arguments, whereas xmpi.F90:325-330 requires seven and the alternative xmpinew.F90:189-193 requires six; the supplied build manifests also do not include testgenmodule.F90. The bounds defect is therefore latent and becomes a runtime concern only if this harness is made runnable with multiple participating ranks; a crash without bounds checking is not guaranteed.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xmpi.F90:L325-L330",
+        "quote": "   subroutine xmpi_determine_processor_grid(m,n,divtype,mmanual,nmanual,cyclic,error)\n      implicit none\n      integer, intent(in) :: m,n,mmanual,nmanual  ! the dimensions of the global domain\n      integer, intent(in)     :: cyclic\n      integer, intent(in)     :: divtype\n      integer, intent(out)    :: error"
+      }
+    },
+    {
+      "vid": "trunk__test__testgenmodule.F90#3",
+      "verdict": "NARROWED",
+      "rationale": "The comparison at 276 uses fill1(is(xmpi_rank+1)+i-1), but the diagnostic at 278 omits i-1; fill1 at 20-26 is ten times its argument, so a mismatch at i>1 prints an expectation too small by 10*(i-1). The supplied harness is not runnable unchanged: trunk/test/testgenmodule.F90:831 calls xmpi_determine_processor_grid without arguments, whereas xmpi.F90:325-330 requires seven and the alternative xmpinew.F90:189-193 requires six; the supplied build manifests also do not include testgenmodule.F90. The LOW diagnostic defect remains in the source, with observable misleading output conditional on a compatible or repaired harness reaching such a mismatch.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xmpi.F90:L325-L330",
+        "quote": "   subroutine xmpi_determine_processor_grid(m,n,divtype,mmanual,nmanual,cyclic,error)\n      implicit none\n      integer, intent(in) :: m,n,mmanual,nmanual  ! the dimensions of the global domain\n      integer, intent(in)     :: cyclic\n      integer, intent(in)     :: divtype\n      integer, intent(out)    :: error"
+      }
+    },
+    {
+      "vid": "trunk__test__testgenmodule.F90#6",
+      "verdict": "NARROWED",
+      "rationale": "All numerical error counters are local and only printed/reduced, and neither xmpi.F90:307-312 nor xmpinew.F90:173-178 passes these counters to MPI_Finalize or converts them into failure status. The supplied harness is not runnable unchanged: trunk/test/testgenmodule.F90:831 calls xmpi_determine_processor_grid without arguments, whereas xmpi.F90:325-330 requires seven and the alternative xmpinew.F90:189-193 requires six; the supplied build manifests also do not include testgenmodule.F90. Thus the failure-propagation omission is real at source level, but an automated execution exiting normally after failed comparisons requires a compatible or repaired harness and is not established for the current build.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xmpi.F90:L325-L330",
+        "quote": "   subroutine xmpi_determine_processor_grid(m,n,divtype,mmanual,nmanual,cyclic,error)\n      implicit none\n      integer, intent(in) :: m,n,mmanual,nmanual  ! the dimensions of the global domain\n      integer, intent(in)     :: cyclic\n      integer, intent(in)     :: divtype\n      integer, intent(out)    :: error"
+      }
+    },
+    {
+      "vid": "trunk__test__testgenmodule.F90#9",
+      "verdict": "NARROWED",
+      "rationale": "The master allocations at 878 have no initializer, no intervening call receives a or ia, and the assignments at 910-911 precede their first initialization in scattertest at 38-45; the second scattertest overwrites the copied region but cannot retroactively define those reads. The supplied harness is not runnable unchanged: trunk/test/testgenmodule.F90:831 calls xmpi_determine_processor_grid without arguments, whereas xmpi.F90:325-330 requires seven and the alternative xmpinew.F90:189-193 requires six; the supplied build manifests also do not include testgenmodule.F90. This remains a LOW latent undefined-value copy, observable only after the harness is made runnable, without evidence that it contaminates subsequent scatter results.",
+      "neutralizer": {
+        "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xmpi.F90:L325-L330",
+        "quote": "   subroutine xmpi_determine_processor_grid(m,n,divtype,mmanual,nmanual,cyclic,error)\n      implicit none\n      integer, intent(in) :: m,n,mmanual,nmanual  ! the dimensions of the global domain\n      integer, intent(in)     :: cyclic\n      integer, intent(in)     :: divtype\n      integer, intent(out)    :: error"
+      }
+    },
+    {
+      "vid": "trunk__test__xbeachlibrary_test__build__publishtests.bat#0",
+      "verdict": "STANDS",
+      "rationale": "The entire batch file contains neither a drive switch nor a directory-change success check: lines 13 and 25 use plain cd, and line 16 launches from the resulting current directory. The ERRORLEVEL check at 20-21 concerns only tasklist/find after launch and cannot validate the earlier cd; repository-wide caller/build searches found no wrapper guaranteeing the correct active drive or an existing target directory."
+    }
+  ]
+}
