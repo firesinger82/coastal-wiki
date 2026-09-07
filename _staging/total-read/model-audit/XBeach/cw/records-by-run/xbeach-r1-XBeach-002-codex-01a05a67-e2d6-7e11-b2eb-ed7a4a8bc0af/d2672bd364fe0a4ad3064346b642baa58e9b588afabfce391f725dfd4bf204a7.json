@@ -1,0 +1,33 @@
+{
+ "axis": "code",
+ "model": "XBeach",
+ "path": "trunk/src/xbeachlibrary/nonh.F90",
+ "source_sha256": "18f471b386e5905a78c98c24fc2f6252ae4fc66c9e2010665e5f35a59d324583",
+ "lines_or_pages": 3471,
+ "read_status": "complete",
+ "reader": "codex-R1",
+ "producer": "llm:openai/codex",
+ "read_method": "llm_full_read",
+ "artifact_class": "semantic_read",
+ "run_id": "xbeach-r1-XBeach-002-codex-01a05a67-e2d6-7e11-b2eb-ed7a4a8bc0af",
+ "shard": "XBeach-002",
+ "round": "R1",
+ "content": {
+  "unresolved": [
+   "[L254-L372] (MED/lifecycle/allocation) nonh_init allocates module work arrays unconditionally, so a second initialization or a grid-size change without an intervening teardown can fail or retain an incompatible module lifecycle.",
+   "[L323-L347,L995,L1009] (MED/grid-metric consistency) The legacy solver stores only dsu(:,1) and dnv(1,:) and later uses those fixed cross-sections throughout the domain, leaving the full-2D curvilinear-grid contract unclear.",
+   "[L752-L764] (HIGH/variable mix-up) In the one-layer excluded-point bottom-slope correction, the west bottom slope is assigned from dzs_e rather than dzb_e, mixing the surface and bottom geometries.",
+   "[L824-L836] (HIGH/variable mix-up/stale state) The two-dimensional excluded-point surface-slope branch assigns dzs_n from dzb_s when both V points are wet and clears dzs_e/dzs_w, rather than dzs_s/dzs_n, in its fallback, so the y slopes can be wrong or stale.",
+   "[L853-L879] (HIGH/variable mix-up/stale state) The corresponding bottom-slope branch assigns dzb_w from dzs_e and its final fallback clears the x slopes instead of dzb_s/dzb_n, leaving erroneous y-direction bottom slopes.",
+   "[L1694-L1720,L1917-L1922,L2546-L2599,L2974-L3027] (HIGH/unchecked singular denominator) Reduced two-layer formulas divide by wcoef, 1-wcoef, and nhlay-nhlay**2 without a local bound excluding 0 or 1, so endpoint layer coefficients make the predictor or stress terms singular.",
+   "[L2362-L2374] (HIGH/boundary-condition typo) The MPI left-boundary clause repeats Wm(1,:)=Wm(2,:) instead of setting Wm(:,1), so the left y boundary is not populated as the surrounding top/bottom/left/right pattern indicates.",
+   "[L2494-L2497] (MED/coefficient inconsistency) The 3D U predictor uses wcoef(i,j) for both neighboring pressure coefficients, unlike the analogous 2DV expression which uses wcoef(i+1,j) on the eastern contribution.",
+   "[L2569-L2574] (HIGH/sign inconsistency) The 3D V predictor forms its surface-slope coefficient with zs(i,j)-zs(i,j+1), the opposite orientation to both its bottom term and the analogous U-direction expression.",
+   "[L3013-L3021] (HIGH/staggered-field mix-up) The lower-layer V-velocity friction calculation uses s%cfu rather than the V-point friction field s%cfv.",
+   "[L3031-L3041] (HIGH/staggered-index mix-up) The V-point corrector averages wcoef(i,j) with wcoef(i+1,j), using an x neighbor where the V staggering calls for the j+1 neighbor.",
+   "[L3307-L3327] (MED/parameter-domain contract) nonh_init_wcoef accepts an unconstrained explicit dispc and computes the optimized value through a denominator that is neither checked nor bounded, despite downstream singularities at endpoint or invalid coefficients.",
+   "[L3453-L3465] (LOW/iteration termination) disper iterates solely on an error tolerance with no iteration cap or invalid-input guard, leaving termination dependent on unstated positive finite inputs.",
+   "[L3403-L3414] (MED/one-dimensional indexing) For ny<=2 the V-point free surface is filled from one fixed zs column (column 2 when present) for every j, rather than from the matching column, and the special-case intent is unclear."
+  ]
+ }
+}

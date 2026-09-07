@@ -1,0 +1,40 @@
+{
+ "axis": "code",
+ "model": "XBeach",
+ "path": "trunk/src/xbeachlibrary/initialize.F90",
+ "source_sha256": "9803067bd2fa4962d9e2247f6e8b5f87e18a9860802595424183994a715523cd",
+ "lines_or_pages": 1855,
+ "read_status": "complete",
+ "reader": "codex-R1",
+ "producer": "llm:openai/codex",
+ "read_method": "llm_full_read",
+ "artifact_class": "semantic_read",
+ "run_id": "xbeach-r1-XBeach-000-codex-01a05a52-c773-7170-b126-7a88b545d9e6",
+ "shard": "XBeach-000",
+ "round": "R1",
+ "content": {
+  "unresolved": [
+   "[L48-L55] (MED/parameter-transform) posdwn is transformed as posdwn*abs(posdwn), so permitted fractional inputs change magnitude (for example 0.5 becomes 0.25) rather than merely being normalized or sign-adjusted.",
+   "[L109-L133,L203-L212,L240-L253,L395-L410] (MED/hotstart-initialization) When hotstart is enabled the bathymetry reads are skipped, but grid_bathy still negates, boundary-copies, snapshots, and differentiates the allocated zb array before hotstart_init_1 later supplies its values.",
+   "[L175-L180] (MED/input-error-handling) The Delft3D comment-skip loop does not inspect READ IOSTAT before testing line(1:1), so EOF or a read failure before a non-comment line has no controlled exit.",
+   "[L220-L237] (LOW/mpi-error-handling) All three MPI sends/receives overwrite the same ier and none is checked, so transfer failures are silently ignored.",
+   "[L315-L347,L619-L623] (HIGH/zero-dimension) Directional bin counts are computed with NINT and are not constrained to at least one; equal/narrow angle bounds can yield ntheta or ntheta_s zero, followed by zero-sized wave arrays and division by s%ntheta.",
+   "[L322-L332] (MED/conditional-initialization) The swave==0 branch computes theta0 from par%dir0 even though all_input assigns dir0 only for selected boundary-condition types, leaving this path dependent on external/default initialization.",
+   "[L438-L456] (MED/interpolation-contract) Prescribed-bathymetry timestamps are not checked for ordering or coverage of time zero, and the interpolation status returned in dummy is ignored when constructing the initial bed.",
+   "[L524,L533-L535,L546-L598] (MED/uninitialized-arrays) wave_init allocates Dp, umwci, vmwci, and zswci but the subsequent initialization block never assigns them.",
+   "[L683-L687] (MED/input-error-handling) spectral_wave_init opens the boundary file and reads its header without IOSTAT handling, despite later records having explicit format-error checks.",
+   "[L781,L820-L829,L844-L848,L879-L973] (MED/uninitialized-arrays) flow_init allocates qmag, dUi, dVi, cfu, cfv, zs1, sigz, and the vertical-profile arrays but does not initialize them in its extensive initialization block.",
+   "[L1076-L1156] (HIGH/division-by-zero) The hotstartflow iteration divides by s%cf even though flow_init explicitly set s%cf to zero and has not computed a friction coefficient before entering this block.",
+   "[L1076-L1156] (HIGH/conditional-parameter-use) The hotstartflow force balance unconditionally uses rhoa, Cd, windsu, and windnv although rhoa/Cd are read only when wind is enabled and no wind-disabled guard is present here.",
+   "[L1104-L1156] (MED/nontermination) The stationary-flow fixed-point loop has no iteration limit or non-finite residual check, so a divergent or NaN-producing initialization can run indefinitely or exit with invalid state.",
+   "[L1211-L1215] (HIGH/disabled-logic) For a completely wet domain under instantaneous tide, the only code intended to populate zs0fac is commented out, leaving both tide weights at the earlier all-zero initialization.",
+   "[L1325-L1329] (LOW/conditional-initialization) D15 is always allocated but assigned only when dilatancy is enabled, leaving the array undefined in the other configuration even though it remains part of distributed state.",
+   "[L1332-L1341,L1384-L1387] (MED/model-inconsistency) Single-fraction sediment forces every layer thickness to at least 10 m, whereas multi-fraction sediment uses dzg1/dzg2/dzg3 directly, creating a large unexplained behavior change solely from ngd.",
+   "[L1367-L1377] (MED/input-validation) Sediment-fraction normalization handles a near-zero total but never rejects negative individual fractions, so a positive total containing negatives is normalized into still-negative bed fractions.",
+   "[L1309-L1318,L1425-L1462] (MED/uninitialized-arrays) sed_init allocates iwl, Tsg, vmag, ccz, ca, and refA but omits them from the subsequent initialization assignments (iwl is notably adjacent to initialized istruct).",
+   "[L1580-L1594] (MED/bounds) For a v-oriented discharge in a ny==0 model, the n1 clamp first raises the index to 1 and then lowers it to s%ny==0, storing a zero grid index in pdisch.",
+   "[L1658-L1666] (MED/bounds) Drifter indices are formed by adding unconstrained fractional offsets to the nearest grid index and converting to integer without clamping, so out-of-domain drifter coordinates can produce indices outside the arrays.",
+   "[L1795-L1801,L1819-L1825,L1843-L1851] (HIGH/input-error-handling) All low-level hotstart readers capture OPEN/READ IOSTAT but never inspect it, allowing format or I/O failures to leave restart fields partially undefined after existence/length checks pass."
+  ]
+ }
+}

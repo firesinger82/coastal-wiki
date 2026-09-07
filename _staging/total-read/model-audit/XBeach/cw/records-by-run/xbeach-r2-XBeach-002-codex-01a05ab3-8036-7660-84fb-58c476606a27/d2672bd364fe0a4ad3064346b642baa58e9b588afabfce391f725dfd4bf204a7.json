@@ -1,0 +1,36 @@
+{
+ "axis": "code",
+ "model": "XBeach",
+ "path": "trunk/src/xbeachlibrary/nonh.F90",
+ "source_sha256": "18f471b386e5905a78c98c24fc2f6252ae4fc66c9e2010665e5f35a59d324583",
+ "lines_or_pages": 3471,
+ "read_status": "complete",
+ "reader": "codex-R2",
+ "producer": "llm:openai/codex",
+ "read_method": "llm_full_read",
+ "artifact_class": "semantic_read",
+ "run_id": "xbeach-r2-XBeach-002-codex-01a05ab3-8036-7660-84fb-58c476606a27",
+ "shard": "XBeach-002",
+ "round": "R2",
+ "content": {
+  "unresolved": [
+   "[L201-L247] (LOW/unchecked selector) Any ipredcor value other than zero silently selects the correction path, so an invalid selector is accepted as a valid corrector request.",
+   "[L288-L372,L453-L455,L961-L963,L1655-L1659,L2479-L2483] (MED/initialization lifecycle) The one-layer routines lazily initialize module storage, but the reduced two-layer predictor paths do not, leaving their correctness dependent on an undocumented external nonh_init call.",
+   "[L290-L356] (MED/reinitialization/configuration lifecycle) nonh_init allocates module arrays unconditionally and never supports cleanup, resizing, or changing nonhq3d mode during a later model lifecycle.",
+   "[L323-L347] (MED/unchecked grid denominator) The original formulation constructs reciprocal grid spacings without checking for zero or invalid ds/dn metrics.",
+   "[L556-L558,L1138-L1157,L1176-L1187,L1254-L1258] (MED/depth denominator contract) Several one-layer pressure, advection, viscosity, and explicit-pressure terms divide by hh based on nonhZ rather than an explicit positive-depth check, relying on the mask contract to guarantee a safe depth.",
+   "[L758-L781] (HIGH/wrong-variable typo) In the 1-D excluded-point bottom boundary calculation, dzb_w is assigned dzs_e instead of dzb_e, mixing free-surface and bed slopes.",
+   "[L824-L841] (HIGH/wrong-variable typo) In the 2-D excluded-point surface condition, the both-wet V branch assigns dzs_n=dzb_s rather than dzs_s, injecting a bed-slope value into the surface condition.",
+   "[L853-L882] (HIGH/wrong-variable typo) In the 2-D excluded-point bottom condition, the both-wet U branch assigns dzb_w=dzs_e rather than dzb_e.",
+   "[L1172-L1177] (HIGH/directional coefficient mismatch) The y-direction vertical-viscosity flux uses s%hu at lines 1174-1175 even though it is evaluated across V faces, unlike the expected y-face depth s%hv.",
+   "[L1371-L1383,L1453-L1484,L2048-L2150,L2244-L2284] (MED/stale interpolated geometry) Both reduced correctors claim to recalculate zsu/zsv/zbu/zbv but contain no zuzv call, so matrix and kinematic corrections use geometry last computed in the predictor.",
+   "[L1694-L1720,L1912-L1925,L2546-L2599,L2968-L3031] (HIGH/singular layer-fraction formulas) Reduced-layer formulas divide by 1-wcoef, 2-wcoef sums, and nhlay-nhlay^2 while only checking nhlay>0, so nhlay/wcoef equal or near one makes the system singular.",
+   "[L2362-L2374] (HIGH/MPI boundary indexing) The xmpi_isleft branch assigns Wm(1,:) instead of Wm(:,1), overwriting the top x row and leaving the left y boundary unset.",
+   "[L2494-L2497] (HIGH/wrong adjacent layer coefficient) The 3-D U-pressure east coefficient uses wcoef(i,j) for the i+1 cell, inconsistent with its hh(i+1,j), the 2-DV implementation, and the analogous V coefficient.",
+   "[L2544-L2550,L2571-L2575] (MED/directional sign inconsistency) The dV pressure correction forms surface and wcoef differences as current-minus-next while dU uses next-minus-current, despite the base U/V pressure gradients sharing the same orientation.",
+   "[L3013-L3046] (HIGH/wrong directional friction data) The dV bottom-friction update uses s%cfu rather than the V-face friction coefficient and averages wcoef across i/i+1 rather than j/j+1.",
+   "[L3311-L3319,L3420-L3465] (MED/unbounded/singular dispersion solve) wcoef initialization does not validate Topt, and disper has singular arithmetic for zero frequency/depth plus an iteration with no maximum-count or stagnation guard.",
+   "[L3369-L3401] (MED/MPI halo initialization) On non-bottom MPI ranks zbu(nx+1,:) and zsu(nx+1,:) are not assigned or exchanged by zuzv, although nonh mask construction iterates through nx+1 and reads zbu there."
+  ]
+ }
+}

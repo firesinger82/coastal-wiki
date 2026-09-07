@@ -1,0 +1,29 @@
+{
+ "axis": "code",
+ "model": "XBeach",
+ "path": "trunk/src/xbeachlibrary/flow_timestep.F90",
+ "source_sha256": "50742b601cc8feccd513cf742ca772b6021f1d4f5ffe074c4e8ffc90907dd2b2",
+ "lines_or_pages": 1102,
+ "read_status": "complete",
+ "reader": "codex-R1",
+ "producer": "llm:openai/codex",
+ "read_method": "llm_full_read",
+ "artifact_class": "semantic_read",
+ "run_id": "xbeach-r1-XBeach-002-codex-01a05a67-e2d6-7e11-b2eb-ed7a4a8bc0af",
+ "shard": "XBeach-002",
+ "round": "R1",
+ "content": {
+  "unresolved": [
+   "[L618-L627] (HIGH/boundary-condition-selection) The left global boundary calls flow_lat_bc with par%right while the right global boundary passes par%left, apparently swapping the configured lateral boundary types.",
+   "[L866-L876, L956-L985] (HIGH/unassigned-boundary-state) s%ue at i=nx+1 and, in 2-D, s%ve at j=ny+1 are not assigned, yet the vertical-profile loop consumes both arrays over 1:nx+1 and 1:ny+1, so wet edge cells can use initialization-era or stale velocities.",
+   "[L805-L853, L877-L934] (MED/partial-array-update) Several staggered interpolants (vu/vsu/usu and uv/vsv/usv) update only interior slices and explicitly leave some process-edge rows or columns unresolved; multiplying by a wet mask does not refresh previously wet, still-wet omitted entries.",
+   "[L512-L525] (MED/mask-typo) The Smagorinsky cross-stress dudy term for v uses wetv(i-1,j) as its fourth mask while the other three factors and the differentiated field are u-point quantities, suggesting one wetv should be wetu.",
+   "[L660-L719] (MED/positivity-preservation) hu and hv are clamped nonnegative before flow_secondorder_huhv, but the second-order correction can subtract from them and there is no subsequent positivity clamp before forming qx and qy.",
+   "[L365-L369, L469-L530, L593-L615] (MED/stale-disabled-term) When viscosity is disabled the code zeros nuh and viscu but not viscv, so a reused state that changes viscosity mode can retain the previous y-momentum viscous acceleration.",
+   "[L74-L92, L767-L771] (MED/conditional-allocation) Old-state arrays are allocated only if second-order or nonhydrostatic mode is active on the first call; because later allocation is gated by vsu, enabling either mode on a reused instance would access unallocated uu_old, vv_old, and zs_old.",
+   "[L74-L122] (LOW/lifecycle-contract) All saved work arrays and bed-roughness initialization are keyed to a one-time allocation test with no grid-shape or parameter-change check, making reinitialization semantics implicit.",
+   "[L721-L722] (LOW/staggering-contract) qmag combines qx and qy elementwise even though they are stored at different staggered locations, so the stated output magnitude lacks an explicit interpolation convention.",
+   "[L956-L972] (LOW/roughness-location-contract) The cell-centered vertical-profile call derives ks directly from u-point cfu(i,j) without documenting interpolation or guarding the positive-friction prerequisite."
+  ]
+ }
+}

@@ -9,7 +9,7 @@
   "CW_verify_pass": "6/6",
   "SUP_span_confirmed": true,
   "V_adversarial": "407/407",
-  "HG_user_approval": false
+  "HG_user_approval": true
  },
  "counts": {
   "confirmed_delta": 59,
@@ -25,7 +25,7 @@
    "evidence_span": "L197-L200",
    "adversarial": "NARROWED",
    "adversarial_note": "The helper does accept header-only LOCLIST, but spectral_wave_init subsequently requires nspectrumloc>=1 and reads that many location records, halting on the missing first record (initialize.F90:L678-L704). This is a LOW early-validation gap, not evidence that the spectral simulation can run without",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-000",
@@ -35,7 +35,7 @@
    "evidence_span": "L395-L400",
    "adversarial": "STANDS",
    "adversarial_note": "The XBeach nx minimum in params.F90:L150 is advisory, Delft3D dimensions bypass it, and gridprops forms distances without rejecting coincident coordinates. Neither the later repeated slope initialization nor the ny>0 guards protect the cross-shore boundary copies and divisions from invalid nx or zer",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-000",
@@ -45,7 +45,7 @@
    "evidence_span": "L619-L623",
    "adversarial": "STANDS",
    "adversarial_note": "WBCTYPE_PARAMS and the TS_1/TS_2 paths can retain a zero Trep accepted by non-strict reads at params.F90:L422-L432. They are outside the Trep=10 override in wave_init, so the intrinsic-frequency division is reached without a positive-period check.",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-000",
@@ -55,7 +55,7 @@
    "evidence_span": "L1042-L1047",
    "adversarial": "STANDS",
    "adversarial_note": "hotstart_init_1 loads uu/vv before flow_init, whose later assignments overwrite both regardless of hotstart. hotstart_init_2 reloads other restart fields but never uu/vv, so no subsequent loader restores the discarded velocities.",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-000",
@@ -65,7 +65,7 @@
    "evidence_span": "L160-L163",
    "adversarial": "STANDS",
    "adversarial_note": "Generated parameter declarations initialize hotstart to -123 (params.def:L92), not to the user's requested value. all_input tests it for depfile at L160 and reads hotstart only at L312, with no earlier hotstart assignment or caller pre-read; a normal fresh hotstart request therefore unnecessarily re",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-000",
@@ -75,7 +75,7 @@
    "evidence_span": "L263-L266",
    "adversarial": "NARROWED",
    "adversarial_note": "The advisory bounds really permit zero/negative gravity, periods and active grid spacings to reach unsafe arithmetic, but some negative dx/dy values intentionally request metric fallback on variable grids. The claimed nonterminating angular normalization is not established by these parameters: its i",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-000",
@@ -85,7 +85,7 @@
    "evidence_span": "L232-L237",
    "adversarial": "STANDS",
    "adversarial_note": "The external header parser checks READ success and a Cartesian marker, not dimension bounds. mmax/nmax feed nx/ny directly, then grid_bathy/gridprops allocate and index boundaries without a subsequent minimum-size gate.",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-000",
@@ -95,7 +95,7 @@
    "evidence_span": "L1227-L1231",
    "adversarial": "STANDS",
    "adversarial_note": "Strict range checks use value<minimum, so zero is accepted for each listed interval. The output-category and schedule-file gates avoid unused divisors, but selecting any corresponding generated schedule with interval zero reaches the division in timestep_init; morphological rescaling preserves zero.",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-000",
@@ -105,7 +105,7 @@
    "evidence_span": "L1536-L1538",
    "adversarial": "STANDS",
    "adversarial_note": "The parser accepts fractional posdwn values and the later <0.1 conversion changes their sign semantics discontinuously. No discrete-sign validation or normalization of the remaining positive values follows, and grid_bathy then multiplies depth by the resulting magnitude squared.",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-000",
@@ -115,7 +115,7 @@
    "evidence_span": "L447-L451",
    "adversarial": "STANDS",
    "adversarial_note": "The helpers section the result using unchecked vlength and define only that prefix. The strict ngd bound protects grain-size calls, but nrugdepth is non-strict at params.F90:L1260-L1261 and can exceed its fixed result capacity; later tail initialization does not undo an earlier overflow.",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-000",
@@ -125,7 +125,7 @@
    "evidence_span": "L603-L607",
    "adversarial": "STANDS",
    "adversarial_note": "fnameold is the sole cache invalidation key and there is no public reset or same-name refresh path. Switching filenames can incidentally refresh it, but consecutive reads of a modified same-name file necessarily retain the old values and readindex state as claimed.",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-000",
@@ -135,7 +135,7 @@
    "evidence_span": "L786-L791",
    "adversarial": "NARROWED",
    "adversarial_note": "parm_str is undefined immediately on a non-master return from parmapply, but all_input later broadcasts the entire parameter structure before the normal initialization consumers use these strings (params.F90:L1976-L1978). Retain LOW standalone API return-contract failure rather than HIGH persistent ",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-000",
@@ -145,7 +145,7 @@
    "evidence_span": "L1141-L1146",
    "adversarial": "STANDS",
    "adversarial_note": "strippedline blanks every byte outside 32..126 before the cache stores any value, and readkey_name subsequently returns that modified string. No encoding-aware path preserves non-ASCII filename bytes, so this affects actual file-valued parameters.",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-000",
@@ -155,7 +155,7 @@
    "evidence_span": "L1404-L1409",
    "adversarial": "STANDS",
    "adversarial_note": "With nx=1, the alfaz interior loop is empty and the two boundary assignments copy undefined values between its two elements. nx's recommended minimum of 2 is not strict in the XBeach reader and external Delft3D dimensions are unchecked, so the normal input path does not exclude this case.",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-000",
@@ -165,7 +165,7 @@
    "evidence_span": "L390-L394",
    "adversarial": "STANDS",
    "adversarial_note": "The update routine advances each category only once and excludes all current-time duplicates from the next-time minimum. A file schedule [0,1,1,2] leaves its counter expecting the second 1 after time advances, preventing output at 2; this stalls the category, not necessarily the simulation's time lo",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-000",
@@ -175,7 +175,7 @@
    "evidence_span": "L606-L606",
    "adversarial": "STANDS",
    "adversarial_note": "The groundwater branches divide by par%kx and, for the alongshore branch, par%ky; their positive minima in params.F90:L829-L835 are advisory. gw_init copies these values to local permeability fields rather than validating or repairing the parameter divisors, so zero/negative inputs can reach the sta",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-001",
@@ -185,7 +185,7 @@
    "evidence_span": "L164-L164",
    "adversarial": "STANDS",
    "adversarial_note": "Successful reads of nt are followed directly by allocations and sum(dataE)/nt. The IOSTAT checks do not reject a syntactically valid zero count.",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-001",
@@ -195,7 +195,7 @@
    "evidence_span": "L451-L453",
    "adversarial": "NARROWED",
    "adversarial_note": "The unprotected mean boundary depth ht=zs0-zb remains a real dry-boundary hazard in the Surfbeat branches. The nonhydrostatic s%hh divisions are partly protected by the model's positive-depth invariant, and a finite positive-depth linear dispersion solution does not have an exact cg^2=g*h resonance.",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-001",
@@ -205,7 +205,7 @@
    "evidence_span": "L594-L597",
    "adversarial": "STANDS",
    "adversarial_note": "The reuse/list reader accepts a syntactically valid zero or negative dtbcfile without a positivity check, and later record calculations divide by that value. The ordinary generator's positive step does not protect externally supplied reuse files, which are a supported boundary source.",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-001",
@@ -215,7 +215,7 @@
    "evidence_span": "L1310-L1313",
    "adversarial": "STANDS",
    "adversarial_note": "The missing-Z fallback copies absolute zs(2,:) into zi; the FRONT_NONH application adds zs0 to zi without subtracting it first. Tapering does not restore a relative elevation datum.",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-001",
@@ -225,7 +225,7 @@
    "evidence_span": "L1141-L1146",
    "adversarial": "NARROWED",
    "adversarial_note": "cats and Trep have positive recommended bounds, but these readkey calls are not strict and table-supplied Trep is not checked. The failure is restricted to zero/invalid user or external forcing parameters, rather than the default hybrid configuration.",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-001",
@@ -235,7 +235,7 @@
    "evidence_span": "L1177-L1178",
    "adversarial": "STANDS",
    "adversarial_note": "The global reductions address ownership but not empty global selections: ranges_init sets jmin_vv=2 and jmax_vv=ny-1, so an allowed ny=2 grid has no terms in dnvsum. The unguarded vdnvsum/dnvsum therefore remains 0/0 even with nonzero cell metrics.",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-001",
@@ -245,7 +245,7 @@
    "evidence_span": "L1462-L1467",
    "adversarial": "STANDS",
    "adversarial_note": "The back-corner assignments explicitly select front-row dzs0dn, dnv and zb. Later lateral updates run only over the interior zs i bounds and do not generally overwrite these corners.",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-001",
@@ -255,7 +255,7 @@
    "evidence_span": "L1670-L1673",
    "adversarial": "STANDS",
    "adversarial_note": "indomain tests only endpoint inclusion before every local momentum update. Clamping endpoints afterward cannot recover a crossing subdomain for which indomain is false.",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-001",
@@ -265,7 +265,7 @@
    "evidence_span": "L24-L26",
    "adversarial": "NARROWED",
    "adversarial_note": "randomseed is indeed a scalar without ALLOCATABLE or POINTER, making the consumer's ALLOCATED/DEALLOCATE expressions invalid. These prototype modules are absent from both checked project source lists and the active call graph, so this is a latent integration defect, not a failure of the shipped exec",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-001",
@@ -275,7 +275,7 @@
    "evidence_span": "L258-L262",
    "adversarial": "NARROWED",
    "adversarial_note": "Generation uses point,time,direction ordering while the consumer fixes the time subscript using itheta and passes the remaining direction slice as a time series. These prototype modules are absent from both checked project source lists and the active call graph, so this is a latent integration defec",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-001",
@@ -285,7 +285,7 @@
    "evidence_span": "L259-L264",
    "adversarial": "NARROWED",
    "adversarial_note": "The nonhydrostatic generation branch does not allocate the hydrostatic arrays, whereas the BUILDXBEACH interpolation block still references them. These prototype modules are absent from both checked project source lists and the active call graph, so this is a latent integration defect, not a failure",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-001",
@@ -295,7 +295,7 @@
    "evidence_span": "L1583-L1588",
    "adversarial": "NARROWED",
    "adversarial_note": "Without BUILDXBEACH neither interpolation block supplies its output, and subsequent normalization/direction use is unconditional. These prototype modules are absent from both checked project source lists and the active call graph, so this is a latent integration defect, not a failure of the shipped ",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-001",
@@ -305,7 +305,7 @@
    "evidence_span": "L2186-L2189",
    "adversarial": "NARROWED",
    "adversarial_note": "No local declaration, argument, or module variable supplies the referenced s object in the enabled logging branch. These prototype modules are absent from both checked project source lists and the active call graph, so this is a latent integration defect, not a failure of the shipped executable.",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-001",
@@ -315,7 +315,7 @@
    "evidence_span": "L2514-L2516",
    "adversarial": "NARROWED",
    "adversarial_note": "generate_qbcf has no s object in scope, so s%ny is invalid in that allocation. These prototype modules are absent from both checked project source lists and the active call graph, so this is a latent integration defect, not a failure of the shipped executable.",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-001",
@@ -325,7 +325,7 @@
    "evidence_span": "L360-L360",
    "adversarial": "NARROWED",
    "adversarial_note": "The full-row mask genuinely has a different extent when j bounds omit columns, including ordinary non-MPI interior bounds. This is confined to the uncalled older solver; the active replacement slices the mask consistently.",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-001",
@@ -335,7 +335,7 @@
    "evidence_span": "L1438-L1443",
    "adversarial": "NARROWED",
    "adversarial_note": "The intermediate Ampzeta values are order-dependent, but WBCTYPE_PARAMS/JONS_TABLE output bypasses them and uses the final total Amp with rD. Other output modes retain the defect in legacy makebcf, which has no repository caller.",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-002",
@@ -345,7 +345,7 @@
    "evidence_span": "L360-L365",
    "adversarial": "STANDS",
    "adversarial_note": "The ventilation formula divides by cfu before its blphi regularization, and subsequently also evaluates 1/cfu. Wetu tests depth rather than friction, while zero friction can enter through the coefficient input, so the wet mask does not neutralize the singularity.",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-002",
@@ -355,7 +355,7 @@
    "evidence_span": "L365-L368",
    "adversarial": "STANDS",
    "adversarial_note": "For zero infiltration, the nonnegative branch replaces zero blphi by -1e-4, giving a factor greater than one rather than its exact limit of one. With nonzero flow and ordinary cfu below one, the subsequent cap and multiplication retain the small spurious shear increment.",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-002",
@@ -365,7 +365,7 @@
    "evidence_span": "L701-L703",
    "adversarial": "STANDS",
    "adversarial_note": "The turbulence contribution uses SIGN with the velocity and therefore chooses a positive sign at exactly zero velocity. With positive boundary-layer turbulent energy the added stress survives even though the velocity-dependent baseline stress vanishes; no zero-velocity guard precedes its use.",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-002",
@@ -375,7 +375,7 @@
    "evidence_span": "L485-L490",
    "adversarial": "STANDS",
    "adversarial_note": "pbbedu and pbbedv are scratch arrays whose terminal faces are not filled before full-array multiplication into Sub/Svb. Neither initial sediment fractions nor zero boundary transport initializes those scratch elements, and zero times undefined data is not a valid neutralizer.",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-002",
@@ -385,7 +385,7 @@
    "evidence_span": "L1594-L1599",
    "adversarial": "NARROWED",
    "adversarial_note": "The unequal factors matter only for nonzero dilatancy correction outside BDSLPEFFINI_TOTAL. TOTAL explicitly copies Ucrb into Ucrs, while zero srfRhee makes both dilatancy factors unity; the other branch retains the different nonlinear correction.",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-002",
@@ -395,7 +395,7 @@
    "evidence_span": "L1172-L1177",
    "adversarial": "STANDS",
    "adversarial_note": "The V viscosity contribution uses hu at the cited locations even though the corresponding directional depth is hv. The wetv mask establishes wetness, not equality of those independently calculated upwind depths, and viscosity can be nonzero on that path.",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-003",
@@ -405,7 +405,7 @@
    "evidence_span": "L251-L252",
    "adversarial": "STANDS",
    "adversarial_note": "The only comparison against the supplied ndarray's actual shape is the assert at libxbeach.py:252. The later data_as cast passes a pointer object by reference rather than checking the ndarray through ndpointer.from_param, and the native setters use the model shape without a supplied buffer extent.",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-003",
@@ -415,7 +415,7 @@
    "evidence_span": "L259-L264",
    "adversarial": "STANDS",
    "adversarial_note": "No default initializes dtype or typename, and the native type query's return status is ignored. An unknown mnemonic leaves the initially empty c_char unchanged in introspection.F90:401-403, while Python 3 also produces unmatched byte codes for valid names, so the unsupported-code path is not exclude",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-003",
@@ -425,7 +425,7 @@
    "evidence_span": "L137-L142",
    "adversarial": "STANDS",
    "adversarial_note": "The length-sized name dummies are passed to a helper that scans MAXSTRINGLEN elements for NUL and does not use the supplied length. Existing Python buffers usually contain an extra physical terminator, but a direct C caller supplying exactly length bytes without NUL can be read beyond its allocation",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-003",
@@ -435,7 +435,7 @@
    "evidence_span": "L218-L223",
    "adversarial": "STANDS",
    "adversarial_note": "getkey.F90:90-100 associates only c0, i0, or r0 according to the parameter type and returns success for any recognized name. The numeric getters check only that success status, so requesting an integer parameter with the double getter, or vice versa, dereferences a component that getkey did not asso",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-003",
@@ -445,7 +445,7 @@
    "evidence_span": "L30-L34",
    "adversarial": "NARROWED",
    "adversarial_note": "Ignoring the independent wrong-source bug, trimming and Fortran blank-padding comparisons do collapse meaningful trailing spaces relative to C strcmp. The repository contains no calls to this utility, so this is a latent compatibility defect rather than a demonstrated model or BMI execution failure.",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-003",
@@ -455,7 +455,7 @@
    "evidence_span": "L269-L274",
    "adversarial": "STANDS",
    "adversarial_note": "execute_counter starts at zero in loopcounters.F90:6, so t01 is assigned only on the second executestep entry. final unconditionally passes t01 in MPI builds, and writelog_finalize checks only argument presence, not initialization; zero- or one-step library runs remain exposed.",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-003",
@@ -465,7 +465,7 @@
    "evidence_span": "L1554-L1559",
    "adversarial": "STANDS",
    "adversarial_note": "Only fortoutput_init assigns the saved counters, and output.F90:61-65 selects ncoutput_init alone for NetCDF output. timestep_init initializes distinct tpar counters rather than these module variables; global/point indexing uses tpar, but itd remains the uninitialized drifter index identified by the",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-003",
@@ -475,7 +475,7 @@
    "evidence_span": "L491-L496",
    "adversarial": "STANDS",
    "adversarial_note": "A supported non-spatial rank-2 variable such as tideinpz has known dimension IDs but fails the x/y test only by logging; name parsing imposes no spatial-shape contract. It is still defined as point-by-time and later sampled with grid indices, so dimensionid's rejection of unknown expressions does no",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-003",
@@ -485,7 +485,7 @@
    "evidence_span": "L1136-L1140",
    "adversarial": "NARROWED",
    "adversarial_note": "The inconsistency occurs when morfacopt=0 and morfac>1; with morfacopt=1 the multiplication is intended, and max(morfac,1) makes factors at or below one harmless. params.F90:1187-1188 permits the problematic combination and does not reset morfac merely because morfacopt is zero.",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-003",
@@ -495,7 +495,7 @@
    "evidence_span": "L1500-L1505",
    "adversarial": "STANDS",
    "adversarial_note": "makeaverage stores atan2(tvar2d_sin,tvar2d_cos) directly, and the packed assignment immediately below it is commented out (varianceupdate.F90:351-354). Neither means_collect nor the serial pointer assignment repacks the value, so both legacy decoding expressions consume the wrong representation.",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-003",
@@ -505,7 +505,7 @@
    "evidence_span": "L1546-L1548",
    "adversarial": "NARROWED",
    "adversarial_note": "The missing NetCDF interval update affects nonuniform supplied averaging schedules, for which mult continues to use a stale par%tintm. Automatically generated tpm values are uniformly spaced by par%tintm, so ordinary fixed-interval schedules do not need this update; no active update exists in output",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-003",
@@ -515,7 +515,7 @@
    "evidence_span": "L1554-L1559",
    "adversarial": "STANDS",
    "adversarial_note": "Drifter initialization divides release/end times by the morphological factor when morfacopt=1 (initialize.F90:1670-1673), confirming that par%t is then internal hydrodynamic time. Writing it raw for drifters while other axes multiply by the factor creates the claimed inconsistency when the factor ex",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-003",
@@ -525,7 +525,7 @@
    "evidence_span": "L1815-L1820",
    "adversarial": "STANDS",
    "adversarial_note": "Integer rank-2 mean variables such as wetz are accepted by readmeans and means_init, but fortoutput_init always uses t%r2 for their record length. The generated metadata associates i2 only, and neither makeaveragenames nor wordsize supplies a conversion; the earlier integer initialization bug is an ",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-003",
@@ -535,7 +535,7 @@
    "evidence_span": "L1852-L1857",
    "adversarial": "STANDS",
    "adversarial_note": "checkfile opens direct-access global output with default STATUS='UNKNOWN' and does not truncate it elsewhere. Overwriting fewer records leaves older higher-numbered records physically present, even though dims.dat may tell careful consumers how many new records to read.",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-003",
@@ -545,7 +545,7 @@
    "evidence_span": "L505-L508",
    "adversarial": "NARROWED",
    "adversarial_note": "The unused helper does broadcast a single incorrect global-minimum-derived index to all gauge slots. Active runup output instead iterates each gauge's rugrowindex and searches that line for the depth crossing, so retain only a latent helper logic defect with reduced severity.",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-003",
@@ -555,7 +555,7 @@
    "evidence_span": "L346-L351",
    "adversarial": "STANDS",
    "adversarial_note": "SIGN takes its magnitude from the first argument, so the expression is epsilon*abs(cos_sum), not a signed epsilon floor. Exact zero remains zero and small values shrink further; the output-time gate removes the usual t=0 call but neither forbids repeated zero-dt API output nor establishes nonzero ci",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-003",
@@ -565,7 +565,7 @@
    "evidence_span": "L350-L355",
    "adversarial": "STANDS",
    "adversarial_note": "The score and sentinel are default integers and there is no wide conversion or overflow check before the multiplication/addition. Later domain-size validation cannot repair an overflowed score or initialize a factorization skipped because every score exceeds the sentinel; the parameter size recommen",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-003",
@@ -575,7 +575,7 @@
    "evidence_span": "L360-L365",
    "adversarial": "STANDS",
    "adversarial_note": "params.F90:1469-1470 appears to require positive manual dimensions, but those readkey_int calls omit strict, whose default is false (readkey.F90:185-188). Negative values merely warn, so two negatives with the correct positive product reach the invalid decomposition and are not rejected by the subse",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-004",
@@ -585,7 +585,7 @@
    "evidence_span": "L164-L166",
    "adversarial": "STANDS",
    "adversarial_note": "The parser accepts a variable declaration without JSON and accepts mismatched dimension/shape ranks; no uniqueness or required-key validation intervenes before rendering. spacedecl.mako:7-16 uses parsed rank while index_allocate.mako:7-20 uses JSON shape, so inconsistent input can generate incompati",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-004",
@@ -595,7 +595,7 @@
    "evidence_span": "L164-L166",
    "adversarial": "NARROWED",
    "adversarial_note": "Structural overrides are reproducible for variables: JSON name and rank replace the parsed values at generate.py:165 without revalidation. The parameter half is presently unreachable because parameter_re consumes the entire comment before its optional JSON group, so parameter[\"json\"] is None and lin",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   },
   {
    "shard": "XBeach-004",
@@ -605,7 +605,7 @@
    "evidence_span": "L39-L43",
    "adversarial": "STANDS",
    "adversarial_note": "The actual variable regex preserves an apostrophe in a description such as water's depth, and indextos.mako:43 then inserts it inside a single-quoted Fortran literal without doubling it. No parser sanitization or Mako lookup filter escapes Fortran literals; existing descriptions contain no apostroph",
-   "decision": "PENDING"
+   "decision": "APPROVED"
   }
  ],
  "conflict": [
@@ -619,7 +619,7 @@
     "[L221-L224] (HIGH/allocation/rank) The allocatable randomseed vector is deallocated and then assigned the scalar randomseed without allocating or constructing a conforming seed array."
    ],
    "rationale": "blinded CONFLICT: Same seed component is claimed to be an allocatable vector versus a non-allocatable scalar",
-   "decision": "PENDING"
+   "decision": "APPROVED-AS-RECORDED (미해결 항목으로 이월 — 완결게이트 조건 아님)"
   },
   {
    "shard": "XBeach-002",
@@ -631,7 +631,7 @@
     "[L2918-L2926] (HIGH/self-referential stale interpolation) At zero V velocity, kturbv is averaged from kturbv itself rather than from s%kturb, reusing stale work-array values instead of the neighboring turbulence field."
    ],
    "rationale": "blinded CONFLICT: Same self-interpolation, but prior stale values versus just-zeroed values",
-   "decision": "PENDING"
+   "decision": "APPROVED-AS-RECORDED (미해결 항목으로 이월 — 완결게이트 조건 아님)"
   }
  ],
  "refuted_unverified": [
@@ -642,7 +642,7 @@
    "claim": "[L57-L60] (MED/uninitialized global ranges) All exported computational range bounds lack initial values, so any use before ranges_init receives undefined indices.",
    "claimed_neutralizer": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/libxbeach.F90:L207-L218",
    "note": "skeptic REFUTED 이나 중화 인용문이 원문 대조 실패 — 기각 불인정",
-   "decision": "PENDING"
+   "decision": "APPROVED-AS-RECORDED (기각 불인정 유지 = 주장 존치, 이월)"
   },
   {
    "shard": "XBeach-002",
@@ -651,7 +651,7 @@
    "claim": "[L41-L62] (HIGH/MPI-ownership/reduction) Every rank whose local index test succeeds advances the drifter, while idrift and jdrift are reduced independently with MPI_MIN, so overlapping ownership or di",
    "claimed_neutralizer": "trunk/src/xbeachlibrary/flow_timestep.F90:L630-L650",
    "note": "skeptic REFUTED 이나 중화 인용문이 원문 대조 실패 — 기각 불인정",
-   "decision": "PENDING"
+   "decision": "APPROVED-AS-RECORDED (기각 불인정 유지 = 주장 존치, 이월)"
   },
   {
    "shard": "XBeach-002",
@@ -660,7 +660,7 @@
    "claim": "[L103-L112] (MED/input error handling) Species-name reads record iostat in ier but never inspect it, so a short or malformed species list can leave names undefined and fail later in a misleading way.",
    "claimed_neutralizer": "trunk/src/xbeachlibrary/vegetation.F90:L102-L113",
    "note": "skeptic REFUTED 이나 중화 인용문이 원문 대조 실패 — 기각 불인정",
-   "decision": "PENDING"
+   "decision": "APPROVED-AS-RECORDED (기각 불인정 유지 = 주장 존치, 이월)"
   },
   {
    "shard": "XBeach-002",
@@ -669,7 +669,13 @@
    "claim": "[L209-L211,L319-L323] (MED/unchecked dimension contract) The implementation requires n>=2 (division by n-1 and references to sigz(2) and sigz(n-1)) but neither checks nor documents that precondition i",
    "claimed_neutralizer": "trunk/src/xbeachlibrary/flow_timestep.F90:L957-L972",
    "note": "skeptic REFUTED 이나 중화 인용문이 원문 대조 실패 — 기각 불인정",
-   "decision": "PENDING"
+   "decision": "APPROVED-AS-RECORDED (기각 불인정 유지 = 주장 존치, 이월)"
   }
- ]
+ ],
+ "approval": {
+  "approver": "firesinger",
+  "approved_at": "2026-09-07",
+  "form": "in-session batch approval (\"승인\") of the packet as presented",
+  "note": "delta 59 승격 승인. conflict 2 · REFUTED 인용미검증 4 는 기록된 상태 그대로 이월(향후 트리거형 처리)."
+ }
 }

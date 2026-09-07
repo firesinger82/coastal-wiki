@@ -1,0 +1,34 @@
+{
+ "axis": "code",
+ "model": "XBeach",
+ "path": "trunk/src/xbeachlibrary/groundwater.F90",
+ "source_sha256": "e941accf34fb9b4f21256dcb59b986ad2df2976a8bc151af926e3ce38c8cf494",
+ "lines_or_pages": 1820,
+ "read_status": "complete",
+ "reader": "codex-R1",
+ "producer": "llm:openai/codex",
+ "read_method": "llm_full_read",
+ "artifact_class": "semantic_read",
+ "run_id": "xbeach-r1-XBeach-002-codex-01a05a67-e2d6-7e11-b2eb-ed7a4a8bc0af",
+ "shard": "XBeach-002",
+ "round": "R1",
+ "content": {
+  "unresolved": [
+   "[L938-L975] (HIGH/out-of-bounds-index) The fast 2-D parabolic solver loops on i but indexes A and rhs with k, which remains zero from line 817, causing index-zero writes.",
+   "[L976-L1009] (HIGH/wrong-loop-index) The fast 2-D exponential solver loops on k but never sets i, then uses the initialized value i=0 in grid and coefficient subscripts, causing invalid indexing.",
+   "[L1011-L1020] (HIGH/shape-mismatch) The fast 2-D solver assigns x(:,1), sized nx+1, into gwhead(2:nx,j), sized nx-1, in both head-model branches.",
+   "[L1025-L1106] (HIGH/unimplemented-selection) The full 2-D solver builds and solves coefficients only for the parabolic model, but afterward accepts the exponential model and computes a head from gwcurv that this branch never solved.",
+   "[L838-L867, L874-L905] (HIGH/dead-boundary-branches) The 1-D matrix builder tests k==-1 and k==-n inside a positive 1..n loop, so both intended endpoint branches are unreachable and endpoint off-diagonal treatment falls through to the interior formula.",
+   "[L896-L900, L914-L916, L1001-L1005, L1017-L1019, L1103-L1105] (HIGH/zero-thickness-singularity) Exponential-head formulas divide by groundwater thickness at cells where gwheight can legitimately be zero at the aquifer bottom, with no limiting form or dry-cell guard.",
+   "[L1471-L1532, L220-L258, L520-L523] (MED/pointer-alias/leak) infilcon is first allocated as independent storage and later pointer-associated with s%infil through the hydrostatic function, orphaning the original allocation and making later mode behavior depend on aliasing.",
+   "[L1203-L1235] (MED/directional-metric-inconsistency) The v-interface infiltration availability limit uses s%hh*s%dsz for the surface-water volume while the groundwater side and all v-direction area scaling use dnz, creating an x/y metric mismatch.",
+   "[L1349-L1436] (MED/unbounded-iteration) All turbulent conductivity fixed-point loops have no iteration cap or non-finite escape even though maxiter is declared elsewhere in the module, so a nonconvergent cell can stall the timestep.",
+   "[L1568-L1643] (MED/division-by-zero) Local infiltration divides by dt/por and later by dis and infil without guarding zero conductivity, zero timestep, zero porosity, or a zero computed infiltration distance.",
+   "[L724-L739, L1478-L1513] (MED/zero-transition-width) dwetlayer is used as a divisor in both the smoothing ratio and hydrostatic infiltration cap without a local positive-width check.",
+   "[L907-L919] (MED/solver-size-contract) The 1-D system allocates n unknowns and maps all n entries back to the grid but calls solver_tridiag with n-1, leaving the intended solver dimension ambiguous.",
+   "[L643-L721] (LOW/distributed-boundary-state) Interface-height output leaves the last u or v row assigned only on a physical bottom/right rank and performs no halo exchange here, so internal process-edge values rely on unstated caller or solver behavior.",
+   "[L400-L418] (LOW/anisotropic-smoothing) Updated Kx, Ky, and Kz are all smoothed only along the i direction, including Ky, with no explanation for the directional treatment.",
+   "[L607-L612, L1349-L1436, L1811-L1816] (LOW/enum-validation) Several select-case blocks have no default assignment, so an unsupported groundwater scheme or head model can leave logicals or numeric outputs undefined unless validation is guaranteed upstream."
+  ]
+ }
+}

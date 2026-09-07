@@ -1,0 +1,34 @@
+{
+ "axis": "code",
+ "model": "XBeach",
+ "path": "trunk/src/xbeachlibrary/vegetation.F90",
+ "source_sha256": "e58ebd47d62d4637baae7bee4e90570a859b1eb0467e486a599f877b380df2c2",
+ "lines_or_pages": 886,
+ "read_status": "complete",
+ "reader": "codex-R1",
+ "producer": "llm:openai/codex",
+ "read_method": "llm_full_read",
+ "artifact_class": "semantic_read",
+ "run_id": "xbeach-r1-XBeach-002-codex-01a05a67-e2d6-7e11-b2eb-ed7a4a8bc0af",
+ "shard": "XBeach-002",
+ "round": "R1",
+ "content": {
+  "unresolved": [
+   "[L135-L154,L223-L239] (HIGH/unchecked map index) Positive vegetation-map values are used directly as veg(ind) subscripts without checking ind<=nveg, so an out-of-range species code causes invalid access.",
+   "[L135-L154] (MED/unsupported-option handling) The gridform select has no default branch, leaving vegtype uninitialized if an unsupported grid form reaches this routine.",
+   "[L93-L128,L174-L221,L262-L301] (MED/lifecycle/allocation) veggie_init allocates all vegetation state without an existing-allocation or grid-shape guard, so repeated initialization is unsafe.",
+   "[L180-L185,L325-L330] (LOW/unreachable option) The automatic bulk-drag path requires Cdveg<0, but initialization constrains every input Cd to the nonnegative range, making that documented path unreachable through this reader.",
+   "[L54,L180,L377-L392,L487-L490] (HIGH/vertical-section convention) swvegatt cumulatively adds each ah value as a layer thickness, while momeqveg treats each ah value as an absolute section height corrected by bed change, so the same vegetation profile has incompatible vertical interpretations.",
+   "[L370-L399] (HIGH/dry-cell/singular wave calculation) Short-wave vegetation dissipation is evaluated without a wet mask and divides by sigm, while its hyperbolic terms use raw hh, allowing dry or zero-frequency cells to generate invalid values.",
+   "[L420-L473,L492-L527] (HIGH/uninitialized saved state) totT is initialized only when t equals dt exactly; otherwise the nonlinear branch tests an undefined saved value and may read the still-unallocated unl and etaw arrays.",
+   "[L436-L440,L579-L619,L798-L810] (MED/saved-workspace shape) Saved vegetation work arrays are allocated only on their first call and never checked against later grid dimensions.",
+   "[L502-L510,L534-L556] (HIGH/stale section force) The above-wave-crest branch zeros the mean and nonlinear forces but not FvgCau/FvgCav, so enabling vegcanflo can reuse a canopy force from the previous section or cell.",
+   "[L525-L536] (HIGH/dry-depth division) Nonlinear and in-canopy force terms divide by raw hh for every vegetated cell without a wet or positive-depth guard.",
+   "[L621-L641] (HIGH/whole-array dry-depth division) swvegnonlin divides whole-domain arrays by hh and hh**3 before any wet-cell restriction, including in its Ursell-number and lookup-coordinate calculations.",
+   "[L527,L686-L699] (MED/periodic integration) trapz integrates only 49 intervals for the 50-point periodic profile while the caller supplies Trep/50 spacing, omitting the closing interval from the last sample back to the first.",
+   "[L730-L769] (MED/unchecked singular denominator) bulkdragcoeff divides by sigm, sinh(k*hh), bveg, and alfav**0.76 without local guards, despite being callable with bed-adjusted plant height and shallow wave state.",
+   "[L868-L882] (MED/partial output assignment) porcanflow overwrites vegetation forces only on interior staggered-loop bounds, leaving the remaining boundary entries dependent on initialization or prior calls.",
+   "[L109-L113] (LOW/file-error handling) The species-list read records iostat but never checks it before the names are used as filenames."
+  ]
+ }
+}

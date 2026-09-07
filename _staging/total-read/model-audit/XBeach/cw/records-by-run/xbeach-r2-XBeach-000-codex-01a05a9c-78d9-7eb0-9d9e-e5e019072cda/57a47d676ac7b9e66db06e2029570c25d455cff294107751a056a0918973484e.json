@@ -1,0 +1,39 @@
+{
+ "axis": "code",
+ "model": "XBeach",
+ "path": "trunk/src/xbeachlibrary/initialize.F90",
+ "source_sha256": "9803067bd2fa4962d9e2247f6e8b5f87e18a9860802595424183994a715523cd",
+ "lines_or_pages": 1855,
+ "read_status": "complete",
+ "reader": "codex-R2",
+ "producer": "llm:openai/codex",
+ "read_method": "llm_full_read",
+ "artifact_class": "semantic_read",
+ "run_id": "xbeach-r2-XBeach-000-codex-01a05a9c-78d9-7eb0-9d9e-e5e019072cda",
+ "shard": "XBeach-000",
+ "round": "R2",
+ "content": {
+  "unresolved": [
+   "[L38-L55,L242] (MED/parameter transformation ambiguity) posdwn is transformed to posdwn*abs(posdwn), so any value other than exactly -1, 0, or 1 unexpectedly rescales bathymetry rather than merely enforcing a sign convention.",
+   "[L104-L133,L203-L214,L226-L253,L393-L412] (HIGH/uninitialized bathymetry use) For setbathy==1 the initial depth read is skipped, and for XBeach-format hotstart==1 it is also skipped, yet zb is sent, negated, boundary-copied, copied to zb0, and used for slopes before the later bathymetry/hotstart loaders define it.",
+   "[L169-L180] (HIGH/EOF nontermination) The Delft3D comment-skip loop tests line(1:1) without first handling a nonzero read iostat, so EOF after comment lines can leave the previous '*' line in place and loop indefinitely.",
+   "[L203-L212] (LOW/format-path inconsistency) The Delft3D branch skips the depth file for setbathy but not for hotstart, unlike the XBeach-format branch, causing a hotstart run to require and read a depth file that will be replaced.",
+   "[L242-L249,L395-L410,L1464-L1482] (MED/unchecked grid extent and metric) Boundary copies assume nx>=1 and slope calculations divide by dsu/dnv without checking positive nonzero grid metrics.",
+   "[L315-L347,L619-L623] (HIGH/angular-grid zero division) dtheta and dtheta_s are used as divisors without validation and rounded counts can become zero, after which allocations and sigm=sum(...)/ntheta operate on an invalid or empty angular grid.",
+   "[L424-L458] (MED/unchecked bathymetry schedule) setbathy_init accepts nonpositive or unsorted nsetbathy/time values without validation, allowing an empty schedule to silently initialize every bathymetry value to zero or a nonmonotonic schedule to violate linear_interp's ordering contract.",
+   "[L485-L596] (MED/uninitialized allocated state) wave_init allocates Dp, umwci, vmwci, zswci, and fw-related wave state but does not initialize Dp or the three WCI arrays before returning.",
+   "[L619-L623] (MED/period division) Wave intrinsic frequency is computed as 2*pi/Trep without a local positive-period guard for boundary types that do not force Trep to 10.",
+   "[L683-L704] (MED/unchecked boundary-file open/read) spectral_wave_init opens and reads the boundary file header without iostat handling, so missing or malformed input can fail outside the routine's structured logging path.",
+   "[L781-L848,L879-L977] (MED/partially initialized flow state) flow_init leaves several allocated arrays without initialization, including qmag, dUi, dVi, cfu, cfv, zs1, sigz, uz, vz, ustz, and nutz, creating an implicit requirement that every consumer wait for another producer.",
+   "[L1011-L1012,L1037-L1056] (HIGH/hotstart state destruction) Although hotstart zs, uu, and vv are deliberately preserved during allocation and initial zeroing, flow_init later unconditionally resets uu and vv and all derived flow quantities to zero, discarding the loaded hotstart velocities.",
+   "[L930,L1076-L1156] (HIGH/divide by zero / nontermination) The hotstartflow fixed-point solver divides by s%cf immediately after flow_init explicitly sets s%cf to zero, and its convergence loop has no iteration cap or nonfinite-value exit.",
+   "[L1211-L1224] (HIGH/missing tide initialization) For a completely wet domain under instant tide, the intended interpolation branch contains only comments and leaves both zs0fac weights zero everywhere, suppressing offshore and bay tide contributions.",
+   "[L1256-L1318,L1425-L1462] (MED/partially initialized sediment state) sed_init returns with several allocated arrays uninitialized, including Tsg, vmag, vreps, vrepb, iwl, ccz, ca, and refA (and D15 when dilatancy is disabled).",
+   "[L1332-L1341,L1384-L1387] (MED/layer-index bounds) Sediment layer assignments use nd_var and, in the single-grain case, forcibly set nd_var=2 without ensuring nd is at least two or that nd_var lies within 1:nd.",
+   "[L1362-L1377] (MED/invalid fraction acceptance) Multi-grain initialization normalizes any positive-sum fractions without rejecting individual negative fractions, so physically invalid negative bed composition can survive normalization.",
+   "[L1580-L1594] (MED/one-dimensional index defect) For a line discharge classified in the v direction on a ny=0 grid, n1 is clamped down to zero and stored as a grid index.",
+   "[L1658-L1667] (MED/drifter index bounds) Drifter positions are converted to integer indices by implicit truncation after metric division and are never clamped to the grid, so offsets outside the nearest cell or zero metrics can yield invalid indices.",
+   "[L1791-L1801,L1815-L1825,L1839-L1851] (HIGH/ignored hotstart I/O errors) All low-level hotstart readers capture open and per-row read iostat values but never test them, so fixed-format mismatches or I/O failures can silently leave restart arrays partially undefined despite the earlier list-directed length check."
+  ]
+ }
+}

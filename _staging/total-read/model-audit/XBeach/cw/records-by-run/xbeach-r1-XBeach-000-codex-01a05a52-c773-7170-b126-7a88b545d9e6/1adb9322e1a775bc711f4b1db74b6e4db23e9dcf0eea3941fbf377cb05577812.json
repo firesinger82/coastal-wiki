@@ -1,0 +1,29 @@
+{
+ "axis": "code",
+ "model": "XBeach",
+ "path": "trunk/src/xbeachlibrary/timestep.F90",
+ "source_sha256": "24f600029a975b520c837bbcdb0109853df0c6d6b14b00e198d315a9230e1578",
+ "lines_or_pages": 764,
+ "read_status": "complete",
+ "reader": "codex-R1",
+ "producer": "llm:openai/codex",
+ "read_method": "llm_full_read",
+ "artifact_class": "semantic_read",
+ "run_id": "xbeach-r1-XBeach-000-codex-01a05a52-c773-7170-b126-7a88b545d9e6",
+ "shard": "XBeach-000",
+ "round": "R1",
+ "content": {
+  "unresolved": [
+   "[L103-L116,L146-L157] (HIGH/uninitialized-state) timestep_init initializes four counters and four specific output flags but omits ith and outputh, which are later used to index tph and determine output.",
+   "[L184-L199,L222-L237,L260-L275,L303-L318] (MED/schedule-validation) File-supplied schedule counts are obtained by NINT from a real value with no nonnegative/integer validation, permitting negative allocation extents or a silently rounded record count.",
+   "[L184-L199,L222-L237,L260-L275,L303-L318,L363-L404] (MED/schedule-ordering) Schedule files are neither sorted nor checked for monotonicity, while current-event detection advances in file order but tnext uses MINVAL over all future values, so an unsorted file can schedule a time that the index-based detector will not emit.",
+   "[L201-L205,L239-L243,L277-L285,L320-L328] (HIGH/division-by-zero) Fixed schedule construction divides by tintg, tintp, tintm, or tinth even though the parameter reader allows each interval to be zero.",
+   "[L400-L408] (LOW/empty-reduction-contract) outputtimes_update relies on MINVAL over zero-sized arrays and all-false masks returning the huge-value identity; the subsequent special-case comparison checks only huge(tpg), making this behavior implicit and compiler-semantics-sensitive.",
+   "[L462-L475] (MED/empty-domain) Initial CFL calculations apply MINVAL/MAXVAL to stencil slices without checking that ranges_init produced nonempty ranges, which can occur for very small local MPI subdomains and yield reduction identities or invalid square roots.",
+   "[L552-L553,L581-L583] (LOW/limiter-diagnostic) Bed-celerity and sediment-diffusion reductions of par%dt do not update dtold, ilim, jlim, or limtype, so a later timestep-collapse report can attribute the limiting condition to the wrong cell/type.",
+   "[L566-L574] (HIGH/dimensional-consistency) In the 1D viscosity criterion mdx is a squared spacing, but when par%dy>0 mdy is assigned the unsquared spacing before mdx*mdy/(mdx+mdy), unlike the squared-spacing formulation used in 2D.",
+   "[L706,L710,L661-L668] (HIGH/uninitialized-state) The SAVE variable dtref in timestep has no initialization before its first call to compute_dt, whose only initialization path requires dtref to compare equal to exactly zero.",
+   "[L652-L678,L712-L727] (MED/nonfinite-timestep) No explicit positive/finite guard is applied to computed or caller-supplied dt before CEILING, time advancement, and dtref/dt ratio checks, so zero, NaN, or infinity can propagate into control logic."
+  ]
+ }
+}

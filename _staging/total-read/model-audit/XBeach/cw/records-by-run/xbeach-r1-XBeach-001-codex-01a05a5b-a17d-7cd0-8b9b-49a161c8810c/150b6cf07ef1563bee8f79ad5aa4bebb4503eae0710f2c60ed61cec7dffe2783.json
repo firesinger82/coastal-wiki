@@ -1,0 +1,33 @@
+{
+ "axis": "code",
+ "model": "XBeach",
+ "path": "trunk/src/xbeachlibrary/boundaryconditions.F90",
+ "source_sha256": "0cbaa20cd8dd147005ec6b01d13ec05ac46bb98d181e0a7fec1025cd9fe30b71",
+ "lines_or_pages": 2324,
+ "read_status": "complete",
+ "reader": "codex-R1",
+ "producer": "llm:openai/codex",
+ "read_method": "llm_full_read",
+ "artifact_class": "semantic_read",
+ "run_id": "xbeach-r1-XBeach-001-codex-01a05a5b-a17d-7cd0-8b9b-49a161c8810c",
+ "shard": "XBeach-001",
+ "round": "R1",
+ "content": {
+  "unresolved": [
+   "[L629-L630] (HIGH/incorrect state assignment) In the non-MPI multi-record-jump path, both q1 and q2 are assigned from gq2, so the earlier discharge record gq1 read at lines 612-615 is discarded and temporal interpolation uses the later record at both endpoints.",
+   "[L409-L416, L426-L434, L448-L472, L657-L664, L863-L866] (MED/unguarded division) Several Surfbeat and nonhydrostatic taper expressions divide by par%taper without the positive-taper guard used by the stationary branch, so an allowed zero taper would produce invalid boundary values.",
+   "[L678-L701] (MED/unimplemented option) The par%order==3 nonhydrostatic monochromatic branch contains only commented assignments, leaving s%zi and s%ui stale while accepting the option.",
+   "[L880-L884, L903-L907] (HIGH/MPI uninitialized state) The TS_NONH MPI path does not broadcast isSet_V, yet every rank tests it to set s%vi and s%isSet_Vbc, so non-master ranks use an undefined logical.",
+   "[L886-L899] (HIGH/MPI/serial inconsistency) TS_NONH discharge-to-velocity conversion guarded by isSet_Q exists only in the non-MPI preprocessor branch, so MPI runs distribute raw discharges as boundary velocities and also never broadcast isSet_Q.",
+   "[L1022-L1025, L1035-L1038] (HIGH/incorrect extrema update) All four hybrid-tide minimum updates call min with the corresponding maximum accumulator instead of the minimum accumulator, corrupting the observed ranges used to compute the hybrid coefficients.",
+   "[L1049, L1063] (MED/unguarded division) Hybrid relative error divides by the maximum observed range without a positive floor, so constant water-level windows can yield division by zero.",
+   "[L1511-L1515, L1551, L1581] (MED/conditional initialization) Saved Coriolis coefficient fc is initialized only when par%t<=par%dt, so a first invocation after a hot start or externally managed time can use an undefined value.",
+   "[L1785-L1798] (HIGH/MPI domain ownership) Vertical point discharges are clamped into each local subdomain and applied with no ownership test, causing every MPI rank to inject every point source at a local edge cell.",
+   "[L1961-L1973] (MED/invalid-input handling) An unrecognized scalar/vector mode is silently accepted and leaves saved lVarU at its prior value, so malformed or changed files can be parsed using stale layout state.",
+   "[L1860-L1868, L1915-L2012] (HIGH/stale parser state) Saved header indices iZ/iU/iV/idU/idV/iQ/iW/iT are not reset when a new boundary file is initialized, so variables absent from the new header can retain indices from the previous file.",
+   "[L1988-L2012, L2056-L2065] (MED/unclear file-format contract) Although the time-column index iT is detected, data columns are always addressed as header_index-1, implicitly requiring time to be the first header without validating or documenting that constraint.",
+   "[L2067-L2087] (HIGH/division by zero) For a boundary file with only one time level, EOF handling sets t1 equal to t0 and then immediately performs interpolation divided by t1-t0.",
+   "[L2171-L2183, L2240-L2253] (HIGH/undefined output flags) When EOF is reached during or before a regular call, values and isSet_Q are assigned but isSet_U/isSet_V/isSet_Z/isSet_W/isSet_dU/isSet_dV are not, despite all being intent(out) and subsequently consumed by callers."
+  ]
+ }
+}

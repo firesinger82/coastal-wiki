@@ -1,0 +1,37 @@
+{
+ "axis": "code",
+ "model": "XBeach",
+ "path": "trunk/src/xbeachlibrary/interp.F90",
+ "source_sha256": "e586d5dca63b7111263f6d555485456227f97d7519707ad7457a98854da63241",
+ "lines_or_pages": 1553,
+ "read_status": "complete",
+ "reader": "codex-R2",
+ "producer": "llm:openai/codex",
+ "read_method": "llm_full_read",
+ "artifact_class": "semantic_read",
+ "run_id": "xbeach-r2-XBeach-000-codex-01a05a9c-78d9-7eb0-9d9e-e5e019072cda",
+ "shard": "XBeach-000",
+ "round": "R2",
+ "content": {
+  "unresolved": [
+   "[L12-L15,L26-L47] (MED/empty-array bounds) linear_interp_2d does not require nx and ny to be positive before applying reductions and using the resulting indices to access X, Y, and Z.",
+   "[L263-L280,L318-L337,L383-L405] (MED/zero-size bounds) mkmap accepts n2 without validation but initializes search positions to one and calls hunt on zero-length arrays when n2 is zero, where hunt reads xx(n) and xx(1).",
+   "[L266-L280,L325-L332,L440-L483] (HIGH/undefined output state) mkmap never initializes covered, so any target not processed as lying in a source cell retains undefined or caller-supplied status despite the documented default of zero.",
+   "[L525-L535,L593-L600,L708-L751] (HIGH/undefined output state) make_map declares covered INTENT(OUT) but never initializes entries for targets not found in any source cell, leaving those output elements undefined.",
+   "[L443-L480,L458-L459,L711-L749,L726-L727,L1291-L1344] (HIGH/ignored error / undefined weights) Both mapping routines ignore bilin5's ier and copy hbuff even though bilin5 exits on several error paths without defining its INTENT(OUT) weight array, while also marking the target covered.",
+   "[L458-L459,L726-L727] (LOW/precision loss) Both mapping routines explicitly round double-precision interpolation weights to real kind 4 before storing them back into double-precision w.",
+   "[L812-L833] (HIGH/unchecked division and reference bounds) mkmap_step divides by dsu and dnv without zero checks and applies unrestricted floor offsets without ensuring the updated i1,j1 still identify a valid cell, so it can emit invalid flattened references.",
+   "[L879-L898,L939-L945] (MED/insufficient index validation) grmap and grmap2 validate references only as positive (and grmap only gates on the first reference), so references greater than n1 directly index f1 and zero or negative later grmap references are silently redirected to f1(1).",
+   "[L995-L1030] (MED/precision-dependent geometry) ipon reduces translated double-precision polygon coordinates to real kind 4 before edge and crossing tests, making containment results lose precision and depend on absolute coordinate scale.",
+   "[L1159-L1191,L1346-L1371] (MED/zero-size bounds) sort calls indexx for n=0, for which indexx reaches indx(0) and arrin(indx(0)) rather than returning on an empty input.",
+   "[L1291-L1344] (MED/undefined output contract) bilin5 leaves its INTENT(OUT) w array undefined whenever it returns ier=1, making even correct error-aware callers unable to rely on a deterministic failure value.",
+   "[L1379-L1409] (HIGH/integration defect) trapezoidal double-counts a full grid-cell contribution when both limits lie in the same cell or adjacent cells because Imid is formed even when there is no middle interval.",
+   "[L1379-L1397] (MED/unchecked grid contract) trapezoidal assumes n>=2, nonzero ascending spacing, ordered limits, and equidistance but validates none of these before division and index calculation.",
+   "[L1418-L1434] (MED/invalid allocation / bounds contract) trapezoidal_cyclic reads x(2), divides by dx, and indexes xp(1) and xp(np) without guarding n<2, zero spacing, reversed limits, or a resulting nonpositive np.",
+   "[L1457-L1470] (MED/target-size contract) interp_using_trapez_rule unconditionally reads xtarg(2) and divides by the inferred spacing, so ntarg<2 or equal first targets cause bounds or divide-by-zero failures.",
+   "[L1487-L1516] (HIGH/unhandled invalid branch) interp_in_cyclic_function's n>icycle+1 branch contains only a comment and leaves xc and yc uninitialized before they are used.",
+   "[L1487-L1525] (HIGH/nontermination / invalid extent) A zero, negative, or incompatible dx/xcycle can make icycle nonpositive, leading to invalid allocations and wrapping loops that cannot progress because they add or subtract icycle.",
+   "[L1518-L1545] (MED/cyclic interpolation defect) The interpolation fraction uses mod(xp,dx)/dx without subtracting the grid origin and uses sign-preserving mod for negative coordinates, so shifted grids or negative query coordinates can receive incorrect or extrapolative weights even though indices are cyclically wrapped."
+  ]
+ }
+}

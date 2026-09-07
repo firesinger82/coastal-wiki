@@ -12,7 +12,7 @@
 | Delft3D | 24,748 | ⬜ | 🟡(코어34) | ⬜ | ⬜ | ⬜ | ✅(HIGH9) | ⬜ | ~0.1% | 🟡(코어 부분·third-party 미분리) |
 | CADMAS-SURF | 1,310 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 0% | ⬜ |
 | SFINCS | 241 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 0% | ⬜ |
-| XBeach | 102(승인) | ✅ | ✅(102/102·6shard·H260/M306/L130) | ✅(102/102·blind·H257/M303/L136) | ✅(102파일·908처분·verify PASS) | ✅(154 span확인→59 확정) | ✅(407/407 적대검증) | ⏳사용자 | 6/7 단계 | 🟡(V 완료·**HG 사용자 승인 대기**) |
+| XBeach | 102(승인) | ✅ | ✅ | ✅ | ✅ | ✅(manifest 59·verify_supplement PASS) | ✅(407/407) | ✅(firesinger 09-07) | **100%** | ✅ **DONE** |
 | SWAN | 82 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 0% | ⬜ |
 | SWASH | 162 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 0% | ⬜ |
 | LISFLOOD-FP | 868 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 0% | ⬜ (C/CUDA) |
@@ -21,27 +21,16 @@
 
 ## 완료(✅ 전건 참) 정의
 분모 사람승인 + R1·R2 2독립판독 100% + CW PASS + confirmed_delta span재확인 + HIGH 적대검증 + supplement 사람승인.
-현재 **어떤 모델도 완료 아님**. FUNWAVE 가 코드축 실질완료(3독립판독·신규HIGH0)로 가장 근접.
+**XBeach = 최초 완결 모델(2026-09-07)** — 7단계 전건 충족(분모 사람승인·2독립판독 102/102·CW verify PASS·span 재확인·HIGH 전건 적대검증·supplement 사람승인·리포트/커밋 동기). 나머지 12모델은 미완료.
 
 ## 다음 착수
-공정표 1진: **XBeach V 적대검증 완료(2026-09-07) — 남은 것은 HG(사용자 승인) 하나.**
+**XBeach 완결(2026-09-07) — 공정표 최초의 DONE 모델.**
 
-V = 독립 skeptic Codex 스레드가 **확정 findings 407건(confirmed_delta 66 + equivalent-HIGH 341)에 REFUTE 시도**(교차파일 중화·#ifdef·초기화 누락·인덱스 base 탐색 지시). caller 가 REFUTED 의 중화 인용문을 원문 verbatim 재대조 → 미검증 4건은 **기각 불인정**.
+완결 게이트 7/7: ①분모 사람승인(102파일/71,568줄) ②R1·R2 2독립판독 각 102/102·71,568줄(real-read·blind 검증) ③`verify_crosswalk.py` 6/6 PASS(유실 0·908처분) ④confirmed_delta span 재확인(라이브 소스 재추출·해시 고정) ⑤확정 HIGH 407건 전건 적대검증 ⑥`verify_supplement_modelaudit.py` **PASS**(supplement 59, 사람승인 영수증 hash-bound, approver=firesinger≠producer) ⑦PROGRESS·리포트·커밋 동기.
 
-| V 판정 | 전체 407 | confirmed_delta 66 | equivalent-HIGH 341 |
-|---|---|---|---|
-| STANDS | 181 | 40 | 141 |
-| NARROWED (조건 한정) | 150 | 19 | 131 |
-| REFUTED (중화 인용 검증) | 72 | 7 | 65 |
-| REFUTED 인용 미검증(불인정) | 4 | 0 | 4 |
+산출: `model-audit/XBeach/` — R1/R2 jsonl·`cw/`(records·blind·crosswalk·v)·`XBeach-supplement-manifest.json`·`XBeach-supplement-decisions.json`·`supplement-decisions.json`(HG 패킷).
+도구 추가: `cw_adapt.py`·`check_verdicts.py`·`promote_deltas.py`·`check_v.py` + corpus 상수만 바꾼 사본 `build_supplement_manifest_modelaudit.py`·`verify_supplement_modelaudit.py`(diff = EXPECT_CORPUS/provenance 3줄, 검사 로직 무변경).
 
-적대검증 결과 반영: **confirmed_delta 66 → 59**(REFUTED 7건 rejected 강등, evidence_span 회수). 전 disposition 에 `adversarial` 필드 기록. `verify_crosswalk.py` 6/6 재PASS.
+**이월(완결게이트 조건 아님, 트리거형 처리)**: conflict 2건(wave_boundary_main.f90 randomseed 형·morphevolution.F90 자기보간 stale 여부) · REFUTED 인용 미검증 4건(기각 불인정 = 주장 존치).
 
-**102파일 최종 처분(908)**: equivalent 440 · base_only 225 · distinct_unconfirmed 156 · **confirmed_delta 59** · rejected 26 · conflict 2.
-
-### HG — 사용자 승인 대기 (producer 자기승인 금지)
-결정 패킷 `model-audit/XBeach/supplement-decisions.json` (모든 항목 `decision: PENDING`):
-1. **confirmed_delta 59건 승격 승인** (STANDS 40 / NARROWED 19) — supplement 로 canonical 보강할 대상.
-2. **conflict 2건 확정** — wave_boundary_main.f90(randomseed 형) · morphevolution.F90(자기보간 stale 여부).
-3. **REFUTED 인용 미검증 4건** — 재인용 요구 / 기각 인정 / 보류 중 택일.
-승인 후 PROGRESS=DONE·완결게이트 7/7 충족. **승인 전에는 XBeach 미완결.**
+**다음 모델 = SFINCS(241파일) P0 scope** — 1진 순서 XBeach→SFINCS→EFDC→ADCIRC.

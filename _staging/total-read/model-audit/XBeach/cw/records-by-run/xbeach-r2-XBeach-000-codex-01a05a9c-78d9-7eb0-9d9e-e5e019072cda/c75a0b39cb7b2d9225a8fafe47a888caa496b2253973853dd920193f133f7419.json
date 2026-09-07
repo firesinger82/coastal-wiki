@@ -1,0 +1,36 @@
+{
+ "axis": "code",
+ "model": "XBeach",
+ "path": "trunk/src/xbeachlibrary/params.F90",
+ "source_sha256": "73648b5733a8f90a8f18cda32743bdc2ef42f649e39c521e28e06584ee63c359",
+ "lines_or_pages": 2712,
+ "read_status": "complete",
+ "reader": "codex-R2",
+ "producer": "llm:openai/codex",
+ "read_method": "llm_full_read",
+ "artifact_class": "semantic_read",
+ "run_id": "xbeach-r2-XBeach-000-codex-01a05a9c-78d9-7eb0-9d9e-e5e019072cda",
+ "shard": "XBeach-000",
+ "round": "R2",
+ "content": {
+  "unresolved": [
+   "[L145-L167,L301-L315] (HIGH/parameter-order defect) The XBeach grid branch decides whether a depth file is required from par%hotstart before the hotstart parameter is read from params.txt, so a requested hotstart can follow stale/default state and unnecessarily require or load depfile.",
+   "[L170-L175,L247-L266,L283-L296,L419-L434] (HIGH/advisory-only critical bounds) Critical positive quantities including dx, dy, dtheta, dtheta_s, tstop, gravity, and wave periods are read without strict=.true., so zero or negative out-of-range values only warn and can later drive divisions, invalid extents, or nonterminating angle normalization.",
+   "[L193-L237] (MED/unchecked external grid dimensions) Delft3D mmax and nmax are converted directly to nx=mmax-1 and ny=nmax-1 without validating minimum or maximum grid sizes before downstream allocation and boundary indexing.",
+   "[L733] (LOW/suspicious parameter key) The dynamicroughness lookup embeds a trailing blank in the key literal, unlike the externally documented spelling and neighboring lookups, relying on blank-padding equality for recognition.",
+   "[L737-L742] (MED/inconsistent friction bounds) maxcf and mincf are read independently without enforcing mincf<=maxcf, permitting an inverted clamp interval.",
+   "[L1041-L1045] (MED/wrong metadata target) The slopecorr parmapply call stores its selected option string into par%sedfricfac_str, overwriting the sediment-friction description instead of a slope-correction field.",
+   "[L1187-L1190] (MED/morphology time-order contract) morstart and morstop are bounded independently but never checked for morstop>=morstart, allowing an inverted morphology interval.",
+   "[L1227-L1248] (HIGH/zero output interval accepted) tint, tintg, tintp, tintm, and tinth use strict lower bounds of zero, allowing zero intervals that timestep_init later uses as divisors when generating schedules.",
+   "[L1536-L1538] (LOW/nonlinear option coercion) Every posdwn value below 0.1, including allowed small positive values, is coerced to -1 while other positive magnitudes remain unnormalized, making this nominal sign option behave discontinuously.",
+   "[L1709-L1714] (LOW/boundary-condition threshold) The tide auto-epsi branch tests epsi<-1 even though the configured default is exactly -1, so the documented automatic path is not entered at the default sentinel.",
+   "[L1848-L1853] (LOW/inverted diagnostic) The warning text says wave-current interaction with non-stationary waves is experimental, but the condition emits it only for the stationary wave model.",
+   "[L1937-L1954] (MED/conditional-state dependence) Post-processing unconditionally reads tintg, tintp, tintm, tinth, wavint, morfac, morstart, morstop, and rt although several are assigned in all_input only under feature-specific branches, leaving correctness dependent on hidden defaults in the generated parameter declaration.",
+   "[L2009-L2019] (HIGH/nonportable MPI serialization) distribute_par broadcasts raw sizeof(par) bytes for a non-C-interoperable Fortran derived type containing pointer descriptors, copying process-local addresses and compiler-dependent representation across ranks before repairing only selected pointers.",
+   "[L2124-L2166] (MED/output-count inconsistency) The documented/default nglobalvar limit is 20, but the default global-output branch writes 21 names and sets nglobalvar=21, creating an inconsistent public count contract.",
+   "[L2323-L2415] (MED/case-sensitive parser inconsistency) readOutputStrings searches parameter keys with exact case and without strippedline normalization even though the main readkey parser is case-insensitive, so inputs accepted for the count can fail when their following variable list is located.",
+   "[L2366-L2399,L2454-L2521] (MED/fixed-unit collision) Output-list and point-position readers open hard-coded unit 10 rather than obtaining a free unit, risking collision with another connected file.",
+   "[L2454-L2464] (HIGH/unchecked EOF) readPointPosition searches indefinitely with external READ statements that have no iostat, so a missing or differently cased count keyword terminates on raw end-of-file instead of reporting a controlled input error."
+  ]
+ }
+}
