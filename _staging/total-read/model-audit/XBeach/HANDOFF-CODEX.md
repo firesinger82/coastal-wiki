@@ -4,6 +4,12 @@
 
 ---
 
+> **2026-09-09 Codex 후속 상태**: §2-1~2-4 준비 완료. 현재 manifest 103 / 기존 approved 60(모든 필드 보존) / 신규 pending 43. [승인용 수정본](HG-REVIEW-20260909.md) 및 [Claude 적대적 검토](HG-ADVERSARIAL-20260909.md)를 우선 읽는다. 아래 준비 명령은 최초 인수인계 당시 절차이므로 현재 산출물에 다시 실행하지 않는다. 특히 단순 manifest 빌드는 후속 추가한 `physical_source_span`·좌표계·적대검증 메타데이터를 보존하지 않는다. 다음 단계는 수정본의 사람 승인이다.
+>
+> **추가 함정**: `str.splitlines()`는 LF뿐 아니라 form-feed도 분리한다. `texinfo.tex` 7882행 이후 9건은 게이트 좌표와 실제 LF 라인이 1 차이 난다. 게이트 원본은 유지하고 crosswalk `physical_lines` 및 manifest `physical_source_span`에 실제 위치를 명시했다. 사용자용 file:line은 실제 LF 라인만 사용한다. 인용의 LF 정규화 표현과 원본 CRLF 바이트 근거도 구분한다.
+>
+> **모델 배분 갱신**: Astra는 가장 높은 추론이 필요한 판단에만, 일반 작업은 하위 모델을 우선 활용한다. Claude는 적대적 검토자로 활용한다(2026-09-09 사용자 지시).
+
 ## 1. 지금 상태 한 줄
 
 **XBeach 트리 전량 456파일 판독 완주(미판독 0). 남은 것은 HG(사람 승인) 하나이며, 그 전 준비작업 2건이 미완이다.**
@@ -113,7 +119,7 @@ python3 - <<'EOF'
 import json
 T="_staging/total-read"
 M=json.load(open(f"{T}/model-audit/XBeach/XBeach-supplement-manifest.json"))
-old={(d["canonical_source_sha256"],d["audit_id"])
+old={(d["canonical_source_sha256"],d["audit_id"]):d
      for d in json.load(open(f"{T}/model-audit/XBeach/XBeach-supplement-decisions.json"))["decisions"]
      if d.get("status")=="approved"}
 dec=[]; npend=0
@@ -123,16 +129,18 @@ for e in M["entries"]:
         for aid in sp["member_input_ids"]:
             k=(ck["source_sha256"],aid); ap=k in old
             if not ap: npend+=1
-            dec.append({"canonical_source_sha256":ck["source_sha256"],"audit_id":aid,
+            bound={"canonical_source_sha256":ck["source_sha256"],"audit_id":aid,
               "canonical_path":ck["normalized_path"],
               "crosswalk_sha256_bytes":e["crosswalk"]["sha256_bytes"],
               "source_span_hash":sp["source_span_hash"],
               "audit_record_sha256_bytes":sp["audit_record"]["record_sha256_bytes"],
-              "evidence_sha256":sorted(x["sha256"] for x in sp["evidence_sources"]),
-              "status":"approved" if ap else "pending",
-              **({"approver":"firesinger","approved_at":"2026-09-07",
-                  "scope":"batch approval of the XBeach packet presented 2026-09-07"} if ap
-                 else {"note":"P0 v3(트리 전량 456) 편입으로 생긴 신규 delta — 사용자 승인 대기"})})
+              "evidence_sha256":sorted(x["sha256"] for x in sp["evidence_sources"])}
+            if ap:
+                assert all(old[k][field]==value for field,value in bound.items()), (k,"approved binding drift")
+                dec.append(old[k])  # 승인자·일자·59건 batch/P0 개정 scope까지 원문 보존
+            else:
+                dec.append({**bound,"status":"pending",
+                    "note":"P0 v3 신규 delta — 사용자 승인 대기"})
 D={"schema":"supplement-decisions/v2","corpus":"model-audit-20260831","model":"XBeach",
    "gate":"MERGE-PLAN §3 / 작업규범 #4 — producer 자기승인 금지",
    "decision_count":len(dec),"decisions":dec}
@@ -144,7 +152,7 @@ EOF
 ### 2-5. 사용자에게 신규 43건 제시 → 승인 → 게이트
 
 - **Codex 가 임의로 `status:"approved"` 로 바꾸면 안 된다.** 이 게이트의 존재 이유가 producer 자기승인 금지다(CLAUDE.md 작업규범 #4).
-- 사용자에게 43건을 파일·라인·주장 요약으로 제시하고 명시 승인을 받은 뒤에만 `approved`/`approver`/`approved_at` 기입.
+- 사용자에게 43건을 파일·라인·주장 요약으로 제시하고 명시 승인을 받은 뒤에만 `approved`/`approver`/`approved_at` 기입. 신규 영수증 `scope`에는 승인 직전 `HG-REVIEW-20260909.md`의 SHA-256을 함께 고정하고 기존 60개 scope는 그대로 보존.
 - 승인 후:
 
 ```bash
