@@ -4,9 +4,12 @@ model: XBeach
 doc: XBeach_manual_master.pdf
 canonical_source: manual
 citation_status: verified
+has_source_needed: false
 verification_method: "XBeach_manual_master.pdf pdftotext -layout 직접 추출(/tmp/xbeach-master-manual.txt, 145p) 후 TOC(p.1-3) + Ch2 Processes and model formulation(p.6-41) + Ch3 Boundary conditions(p.43-48) + Ch4 Input description(p.49-92) + Appendix B Advanced coefficients(p.103-113) 페이지 인용. 지배방정식(wave action 2.1, GLM-SWE 2.50, 비정수압 q 2.60-2.64, groundwater 2.65-2.75, A-D sediment 2.76, bed update 2.110)·dissipation/roller 식·params.txt 구조·physical-process 스위치 표·grid/wave-bc keyword 표·time/wave-dissipation/roller/sediment/morphology 기본값 표 인용."
-note_author: "Claude Opus 4.8 (1M context)"
-note_date: 2026-06-18
+note_author: "Claude Opus 4.8 (original); Codex (207-finding closure supplement)"
+note_date: 2026-09-09
+verification_by: "Codex (closure cross-ref; original note attribution retained)"
+verification_date: 2026-09-09
 related:
   - models/XBeach/README.md
 ---
@@ -132,7 +135,7 @@ depth-averaged A-D + source-sink(평형농도 기반, Galappatti & Vreugdenhil 1
 
 $$\frac{\partial hC}{\partial t}+\frac{\partial hCu^E}{\partial x}+\frac{\partial hCv^E}{\partial y}-\frac{\partial}{\partial x}\Big(D_h h\frac{\partial C}{\partial x}\Big)-\frac{\partial}{\partial y}\Big(D_h h\frac{\partial C}{\partial y}\Big)=\frac{hC_{eq}-hC}{T_s}\quad(2.76)$$
 
-적응시간 $T_s=\max(f_{Ts}\,h/w_s,\,T_{s,min})$ (2.77), `tsfac`($f_{Ts}$), `Tsmin`.
+매뉴얼 판본의 적응시간 식은 $T_s=\max(f_{Ts}\,h/w_s,\,T_{s,min})$ (2.77)로 적혀 있다. 보관 소스 snapshot은 `oldTsmin` 분기에 따라 `Tsmin` 또는 `dtlimTs*dt` 하한을 선택하므로, 이 식을 현재 코드의 무조건 하한으로 일반화하지 않는다([[xbeach-document-discrepancies-and-version-drift#xh138]]).
 
 ### 9.2 일반 파라미터 (§2.7.2, p.32)
 
@@ -148,7 +151,7 @@ $$\frac{\partial hC}{\partial t}+\frac{\partial hCu^E}{\partial x}+\frac{\partia
 ### 9.4 비선형·dilatancy·bed slope
 
 - **wave nonlinearity** (§2.7.4, p.36): skewness/asymmetry로 advection velocity $u_a=(f_{Sk}S_k+f_{As}A_s)u_{rms}$ (2.100), `facSk`/`facAs`(alias `facua`). 높을수록 강한 onshore transport.
-- **dilatancy** (§2.7.5, p.36, `dilatancy = 1`): Van Rhee(2010) 임계 Shields 감소 (2.101), `pormax`($n_l$), `rheeA`(A, 단입자 0.75/연속체~1.7). permeability $k_l$ Den Adel(1987) (2.102).
+- **dilatancy** (§2.7.5, p.36, `dilatancy = 1`): 매뉴얼 본문은 임계 Shields 감소라고 서술하지만 식·문구와 보관 소스 snapshot이 충돌한다. 현재 snapshot은 양의 조건에서 임계 bed-load 속도를 증가시킨다. 문서 양측과 소스 판정은 [[xbeach-document-discrepancies-and-version-drift#xh103]] 참조. `pormax`($n_l$), `rheeA`(단입자 0.75/연속체~1.7), permeability $k_l$은 Den Adel(1987) 식 (2.102)에 따른다.
 - **bed slope** (§2.7.6, p.37): magnitude는 Roelvink(2.104, `bdslpeffmag = roelvink_total/roelvink_bed`) 또는 Soulsby(2.105, `soulsby_total`); direction은 Talmon(1995) (`bdslpeffdir = talmon`, 2.106-2.108); initiation Soulsby(2.109, `bdslpeffini = total/bed`).
 
 ## 10. Bottom updating (§2.8, p.38)
@@ -165,7 +168,7 @@ $$\frac{\partial hC}{\partial t}+\frac{\partial hCu^E}{\partial x}+\frac{\partia
 
 - **offshore(front)** (§3.2.1, p.45): 기본 absorbing-generating(Method of Characteristics), `epsi`(Kalman-update, 기본 자동 `epsi=-1`). 대안: `front = wall`(no flux)/`wlevel`/`nonh_1d`/`waveflume`(continuity, 실험실 set-up용).
 - **lateral(left/right)** (§3.2.2, p.46): 기본 **Neumann**(no-gradient, `left = neumann`). 대안 `wall`/`no_advec`/`neumann_v`.
-- **tide** (§3.2.3, p.46): `tideloc` = 0(uniform `zs0`)/1/2/4 시계열, `zs0file`.
+- **tide** (§3.2.3, p.46): `tideloc` = 0(uniform `zs0`)/1/2/4 시계열, `zs0file`. 같은 판본은 `tideloc=1`의 landward 적용과 corner 순서, `tideloc=3` 허용 여부를 서로 다르게 적으므로 그 세부값은 [[xbeach-document-discrepancies-and-version-drift#xh110]]에서 양측 진술로만 보존한다.
 - **river/point discharge** (§3.2.4, p.47): 다중 위치, m³/s 시계열.
 - **sediment** (§3.3, p.47): 모든 곳 Neumann(경계횡단 gradient=0).
 - **cyclic** (§3.4, p.48, `cyclic=1`): 두 lateral 경계를 물리적으로 연결(shadow zone 제거), MPI 루틴 사용. 양측 두 grid row bathy 동일 필요.
@@ -176,7 +179,7 @@ $$\frac{\partial hC}{\partial t}+\frac{\partial hCu^E}{\partial x}+\frac{\partia
 
 실행 `xbeach.exe`가 작업디렉토리 `params.txt`를 읽음(없으면 미실행). 한 줄당 `keyword = value` 1쌍, 순서 무관, `=` 없는 줄은 주석. 대부분 keyword는 default 보유. log: `xbeach.log`/`XBlog.txt`에 설정·미설정(default) 전부 기록. 매뉴얼 표기: `*`=필수, `+`=advanced expert(일반 적용에 비권장) (p.49). JONSWAP 필수: grid(`xfile`/`yfile` 또는 `xyfile`, `nx`/`ny`), `depfile`, `tstop`, 방향격자(`thetamin`/`thetamax`/`dtheta`), `wbctype=jons`+`bcfile` (p.49).
 
-1D params.txt 예시(p.49): `depfile`, `posdwn=0`, `nx=265`, `ny=0`, `vardx=1`, `thetamin=-90`/`thetamax=90`/`dtheta=15`, `tstop=3600`, `rho=1025`, `tideloc=2`/`zs0file`, `wbctype=jons`/`bcfile`, `outputformat=netcdf`/`tint`/`tstart`, `nglobalvar`.
+1D params.txt 예시(p.49)는 `depfile`, `posdwn=0`, `nx=265`, `ny=0`, `vardx=1`, `thetamin=-90`/`thetamax=90`/`dtheta=15`, `tstop=3600`, `rho=1025`, `tideloc=2`/`zs0file`, `wbctype=jons`/`bcfile`, `outputformat=netcdf`/`tint`/`tstart`, `nglobalvar`를 싣는다. 이 예시의 `posdwn=0`은 표의 positive-up 값 `-1`과 충돌하며 보관 snapshot에서는 바닥고를 0으로 만들므로 재사용하지 않는다([[xbeach-document-discrepancies-and-version-drift#xh112]]).
 
 ### 13.2 Physical processes 스위치 (§4.2 Table, p.50)
 
@@ -205,7 +208,7 @@ $$\frac{\partial hC}{\partial t}+\frac{\partial hCu^E}{\partial x}+\frac{\partia
 
 ### 13.4 Wave 입력 (§4.4, p.54)
 
-`wbctype` 종류(§3.1/Table, p.54-55): `off`, `stat`(stationary sea state), `bichrom`, `ts_1`/`ts_2`(1·2차 시계열), `jons`(JONSWAP), `swan`(SWAN 2D 출력), `vardens`(formatted), `ts_nonh`(비정수압용 elev+velocity), `reuse`, `stat_table`, `jons_table`. spectral(`jons`/`swan`/`vardens`/`jons_table`)은 `bcfile`로 정의, 시계열 길이 `rt`(기본 3600s)·해상도 `dtbc`(기본 1.0s, morfac 무영향)로 생성·재사용 (p.57). JONSWAP 파일 예: `Hm0`/`Tp`/`mainang`/`gammajsp`/`s`/`fnyq` (p.59). 기타 spectral keyword: `random`(기본 1, random seed), `fcutoff`(기본 0.0), `sprdthr`(0.08), `Tm01switch`(0), `nspr`(0) (p.57-58).
+`wbctype` 종류(§3.1/Table, p.54-55): `off`, `stat`(stationary sea state), `bichrom`, `ts_1`/`ts_2`(1·2차 시계열), `jons`(JONSWAP), `swan`(SWAN 2D 출력), `vardens`(formatted), `ts_nonh`(비정수압용 시계열; 열의 필수성·순서는 문서 내부가 충돌하므로 [[xbeach-document-discrepancies-and-version-drift#xh109]] 참조), `reuse`, `stat_table`, `jons_table`. spectral(`jons`/`swan`/`vardens`/`jons_table`)은 `bcfile`로 정의, 시계열 길이 `rt`(기본 3600s)·해상도 `dtbc`(기본 1.0s, morfac 무영향)로 생성·재사용 (p.57). JONSWAP 파일 예: `Hm0`/`Tp`/`mainang`/`gammajsp`/`s`/`fnyq` (p.59). 기타 spectral keyword: `random`(기본 1, random seed), `fcutoff`(기본 0.0), `sprdthr`(0.08), `Tm01switch`(표 기본값 0; Kingsday 산문의 기본값 1 주장과 충돌하므로 [[xbeach-document-discrepancies-and-version-drift#xh147]] 참조), `nspr`(0) (p.57-58).
 
 ### 13.5 Time parameters (§4.14, p.92)
 
@@ -290,3 +293,294 @@ TOC 기준(p.3): C.1 grid set-up, C.2 wave action(surfbeat·stationary solver), 
 ## 16. 주요 참고문헌 (§5 Bibliography, p.93-)
 
 핵심: Andrews & McIntyre (1978, GLM), Baldock et al. (1998), Battjes (1975), Daly et al. (2010/2012), Galappatti & Vreugdenhil (1985, A-D), Holthuijsen et al. (1989, HISWA), Janssen & Battjes (2007), Roelvink et al. (2009, 원논문)·Roelvink (1993a), Soulsby (1997), van Rijn (1984/2007), van Thiel de Vries (2009), Ruessink et al. (2012), Smit et al. (2013, HFA), Zijlema et al. (2011, SWASH), Van Rhee (2010, dilatancy), Suzuki et al. (2011, vegetation) (p.93-).
+
+## 17. 2026-09-09 document-audit closure supplement
+
+이 절의 2015 Master Manual 사실은 기존 본문과 함께 읽는다. 충돌·변환 손상·현재 소스 판정은 [[xbeach-document-discrepancies-and-version-drift]]가 canonical이며, 이 절에는 충돌하지 않는 판본 사실만 둔다. 신규 locator는 OpenDataLoader v2.4.7 page-aware PDF 결과를 사용했다. 같은 work의 reciprocal DOCX↔PDF 후보는 공동검토 묶음으로 배치했지만 두 finding은 독립 원장 항목이며 묶음이 의미 동일성을 주장하지 않는다.
+
+### 17.1 검증 범위
+
+XH001-XH207의 원본 정체·해시·표현 행·페이지 또는 문서 block locator는 전수 확인했다. `cross-format-partial` 15건은 불완전한 PDF 정렬을 citation으로 쓰지 않고 DOCX 원본 block 또는 원본에 결박된 OLE DOC text-extract로 대체했다. 의미 판정은 immutable X00 전수독해를 보존하며 별도 독립 의미 재독해는 posdwn, 손상된 vardens, standing-wave, 1D solver, NetCDF와 DOCX retrieval 표본에 집중했다.
+
+## 출처 고정
+
+- `models/XBeach/raw/source_code/trunk/doc/manual/XBeach_manual_master.docx` — SHA-256 `9f142b89e0659e71066054c3d61b4d6f29ba3c10c5984e26e9a2d37d2fae3236`
+- `models/XBeach/raw/source_code/trunk/doc/manual/XBeach_manual_master.pdf` — SHA-256 `6e594e6fff7cf285c74c1877573061fed460f70658541cd29dd986475517c7f7`
+
+## 비정수압 물리·수치법
+
+<a id="xh098"></a>
+### M-001 — XH098
+
+**판정:** 판본 한정 사실로 채택.
+
+- roelvink2 dissipation scales with H³/h instead of H², reef fw may exceed flow cf by at least an order of magnitude, and the eight-harmonic waveform has skewness at w=1 and asymmetry at w=0.
+
+**출처 locator:**
+
+- XH098: XBeach_manual_master.docx, DOC/DOCX→동일 work PDF 정렬, physical PDF p.19, 20, 23, 24, printed page/frontmatter 15, 16, 19, 20, audit extract lines 290,315,372-386; 원본 SHA-256 `9f142b89e0659e71066054c3d61b4d6f29ba3c10c5984e26e9a2d37d2fae3236`.
+<a id="xh124"></a>
+<a id="xh154"></a>
+### M-002 — XH124, XH154
+
+**판정:** 판본 한정 사실로 채택.
+
+- Defaults include beta=0.1, roller=1, cats=4, hwci=0.1 m, eps=0.005 m, eps_sd=0.5 m/s, hmin=0.2 m and secorder=0.
+- Flow/numerical defaults include abs_2d boundaries, epsi=-1, order=2, CFL=0.7, tstop=2000 s, stationary tolerance 5×10^-5 m, maxiter=500, scheme=upwind_2, eps=0.005 m, hmin=0.2 m and secorder=0.
+
+**출처 locator:**
+
+- XH124: XBeach_manual_master.docx, 원본 DOCX 문서순 block B918, B919, B920, B921, B922, B923, B924, B1471, B1472, B1473, B559, B1624, B1625, B1626, B1627, B1675, B1676, B1677, B1678, B1679 (SHA-256 `9f142b89e0659e71066054c3d61b4d6f29ba3c10c5984e26e9a2d37d2fae3236`; audit extract lines 2282-2288,2542-2549,2581-2585); 직접 인용: “eps_sd | Threshold velocity difference to determine conservation of energy head versus momentum | 0.5 | 0.0 - 1.0 | m/s”; “wavint | Interval between wave module calls (only in stationary wave mode) | 60.0 | 1.0 - 3600.0 | s”; “maxerror+ | Maximum wave height error in wave stationary iteration | 5e-05 | 1e-05 - 0.001 | m”. PDF page는 주장하지 않음.
+- XH154: XBeach_manual_master.pdf, 직접 PDF, physical PDF p.109, 110, 111, printed page/frontmatter 105, 106, 107, audit extract lines 5040-5142; 원본 SHA-256 `6e594e6fff7cf285c74c1877573061fed460f70658541cd29dd986475517c7f7`.
+<a id="xh132"></a>
+### M-003 — XH132
+
+**판정:** 판본 한정 사실로 채택.
+
+- The breaking discussion distinguishes H³/h from H² scaling, uses gamma and gamma2 as Daly breaking thresholds, and gives friction-dissipation coefficients 0.21 for random waves and 0.28 for stationary waves.
+
+**출처 locator:**
+
+- XH132: XBeach_manual_master.pdf, 직접 PDF, physical PDF p.19, 20, 21, printed page/frontmatter 15, 16, 17, audit extract lines 640-670,789-863; 원본 SHA-256 `6e594e6fff7cf285c74c1877573061fed460f70658541cd29dd986475517c7f7`.
+<a id="xh160"></a>
+### M-004 — XH160
+
+**판정:** 판본 한정 사실로 채택.
+
+- The limiter is minmod, the predictor-corrector scheme is second order for smooth solutions and first order at sharp gradients, source integration can reduce formal order to one, and the pressure discretization is stated to be equivalent to Keller-box or Hermitian relations.
+
+**출처 locator:**
+
+- XH160: XBeach_manual_master.pdf, 직접 PDF, physical PDF p.139, 140, 142, 143, 145, printed page/frontmatter 135, 136, 138, 139, 141, audit extract lines 7710-7854,8669-8998,9362; 원본 SHA-256 `6e594e6fff7cf285c74c1877573061fed460f70658541cd29dd986475517c7f7`.
+## 빌드·MPI·버전 범위
+
+<a id="xh115"></a>
+<a id="xh149"></a>
+### M-005 — XH115, XH149
+
+**판정:** 판본 한정 새 사실로 채택.
+
+- Multiple spectrum locations require wbcversion=3 and the documented interpolation does not support mixing spectral formats or incompatible time definitions.
+- Individual bichromatic frequencies remain planned work, while spatial spectra require wbcversion=3 and matching FILELIST time grids, prohibit mixed formats and interpolate energy linearly.
+
+**출처 locator:**
+
+- XH115: XBeach_manual_master.docx, DOC/DOCX→동일 work PDF 정렬, physical PDF p.70, 71, printed page/frontmatter 66, 67, audit extract lines 1212,1226-1235; 원본 SHA-256 `9f142b89e0659e71066054c3d61b4d6f29ba3c10c5984e26e9a2d37d2fae3236`.
+- XH149: XBeach_manual_master.pdf, 직접 PDF, physical PDF p.70, 71, printed page/frontmatter 66, 67, audit extract lines 3501-3515; 원본 SHA-256 `6e594e6fff7cf285c74c1877573061fed460f70658541cd29dd986475517c7f7`.
+<a id="xh122"></a>
+<a id="xh148"></a>
+### M-006 — XH122, XH148
+
+**판정:** 판본 한정 새 사실로 채택.
+
+- Wave-input defaults include rt=3600, sprdthr=0.08, trepfac=0.01, wbcversion=3, fp=0.083, gammajsp=3.3, s=10, fnyq=0.3, dfj=fnyq/200, Tlong=80 and taper=100.
+- Defaults include 10° directional bins spanning -90° to 90°, Tm01switch=0, wbctype=bichrom, rt=3600 s, taper=100 s, Hrms=1 m, Trep=10 s, Tlong=80 s, nmax=0.8, sprdthr=0.08 and wbcversion=3.
+
+**출처 locator:**
+
+- XH122: XBeach_manual_master.docx, 원본 DOCX 문서순 block B599, B600, B601, B602, B603, B604, B605, B606, B607, B608, B609, B639, B640, B641, B642, B643, B644, B645, B646, B647, B648, B649, B650, B651, B652, B653, B654, B679, B680, B681, B682, B683, B684, B685, B686, B559, B844, B845, B846, B847, B645, B849, B850, B851, B852 (SHA-256 `9f142b89e0659e71066054c3d61b4d6f29ba3c10c5984e26e9a2d37d2fae3236`; audit extract lines 2194-2204,2225-2258); 직접 인용: “m | Power in cos^m directional distribution for wbctype = stat, bichrom, ts_1 or ts_2 | 10 | 2 - 128 | -”; “s | Directional spreading coefficient, cos2s law [-] | 10. | 1.0 | 1000.”; “… | Compute mean wave period over energy band: for wbctype jons, swan or vardens; converges to Tm01 for trepfac = 0.0 and | 0.01 …”. PDF page는 주장하지 않음.
+- XH148: XBeach_manual_master.pdf, 직접 PDF, physical PDF p.62, 63, 64, 68, 69, printed page/frontmatter 58, 59, 60, 64, 65, audit extract lines 3222-3236,3330-3356,3418-3458; 원본 SHA-256 `6e594e6fff7cf285c74c1877573061fed460f70658541cd29dd986475517c7f7`.
+<a id="xh127"></a>
+<a id="xh158"></a>
+### M-007 — XH127, XH158
+
+**판정:** 판본 한정 새 사실로 채택; 판본 한정 사실로 채택.
+
+- Non-hydrostatic defaults include Topt=10, viscfac=1.5, maxbrsteep=0.6, nhbreaker=2, solver accuracy 0.005, 30 iterations and relaxation 0.92, while physical defaults include g=9.81 and rho=1025.
+- Final defaults include Topt=10 s, breakviscfac=1.5, maxbrsteep=0.6, nhbreaker=2, solver_acc=0.005, 30 solver iterations, relaxation 0.92, g=9.81 m/s², rho=1025 kg/m³, Earth rotation 0.0417 hour^-1, automatic 2×4 MPI settings and rotate=1.
+
+**출처 locator:**
+
+- XH127: XBeach_manual_master.docx, 원본 DOCX 문서순 block B1816, B1817, B1818, B1819, B1820, B1821, B1822, B1825, B1826, B1827, B1828, B559, B1833, B1834, B1835, B559, B1840, B1841, B559, B1846, B1847, B1848, B559, B1853, B1854 (SHA-256 `9f142b89e0659e71066054c3d61b4d6f29ba3c10c5984e26e9a2d37d2fae3236`; audit extract lines 2663-2691); 직접 인용: “wearth+ | Angular velocity of earth calculated as: 1/rotation_time (in hours) | 0.0417 | 0.0 - 1.0 | hour^-1”; “solver_maxit+ | Maximum number of iterations in the linear sip solver | 30 | 1 - 1000 | -”; “nmpi+ | Number of domains in alongshore direction when manually specifying mpi domains | 4 | 1 - 100 | -”. PDF page는 주장하지 않음.
+- XH158: XBeach_manual_master.pdf, 직접 PDF, physical PDF p.121, 122, 123, 124, printed page/frontmatter 117, 118, 119, 120, audit extract lines 5547-5705; 원본 SHA-256 `6e594e6fff7cf285c74c1877573061fed460f70658541cd29dd986475517c7f7`.
+## 식생·선박
+
+<a id="xh133"></a>
+### M-008 — XH133
+
+**판정:** 판본 한정 사실로 채택.
+
+- Vegetation submergence is represented by alpha_i=h_v/h, the waveform reconstruction uses eight harmonics, and the Ruessink waveform option is incompatible with bore-averaged turbulence.
+
+**출처 locator:**
+
+- XH133: XBeach_manual_master.pdf, 직접 PDF, physical PDF p.22, 23, 24, printed page/frontmatter 18, 19, 20, audit extract lines 919,1022-1121; 원본 SHA-256 `6e594e6fff7cf285c74c1877573061fed460f70658541cd29dd986475517c7f7`.
+## 지하수
+
+<a id="xh102"></a>
+<a id="xh137"></a>
+### M-009 — XH102, XH137
+
+**판정:** 판본 한정 사실로 채택.
+
+- The non-hydrostatic description uses waveform=nonh with swave=0, neglects groundwater exchange in momentum, and describes instantaneous infiltration and zero outer groundwater flux.
+- The model assumes linear dynamic pressure with zero surface pressure, neglects vertical momentum advection/diffusion in this derivation, adds infiltration instantaneously and imposes zero groundwater flux at outer boundaries.
+
+**출처 locator:**
+
+- XH102: XBeach_manual_master.docx, DOC/DOCX→동일 work PDF 정렬, physical PDF p.30, 31, 32, 33, 34, 35, printed page/frontmatter 26, 27, 28, 29, 30, 31, audit extract lines 520,546-636; 원본 SHA-256 `9f142b89e0659e71066054c3d61b4d6f29ba3c10c5984e26e9a2d37d2fae3236`.
+- XH137: XBeach_manual_master.pdf, 직접 PDF, physical PDF p.30, 31, 32, 33, 34, 35, printed page/frontmatter 26, 27, 28, 29, 30, 31, audit extract lines 1603,1684-1802,1872-1929; 원본 SHA-256 `6e594e6fff7cf285c74c1877573061fed460f70658541cd29dd986475517c7f7`.
+<a id="xh120"></a>
+<a id="xh159"></a>
+### M-010 — XH120, XH159
+
+**판정:** 판본 한정 사실로 채택.
+
+- The numerical description uses backward Euler for groundwater, a 4/Trep filter cutoff, Thomas solution in 1D and SIP in 2D, explicit erosion with implicit deposition, theta=1 for upwind and 0.5 for central transport, and excludes boundary avalanching and bed diffusion.
+- Numerics use second-order upwind wave advection, explicit second-order leapfrog flow stepping, first-order backward Euler infiltration, a stated 4/Trep high-pass filter and Thomas/SIP groundwater solvers in 1D/2D.
+
+**출처 locator:**
+
+- XH120: XBeach_manual_master.docx, DOC/DOCX→동일 work PDF 정렬, physical PDF p.125, 126, 129, 130, 133, printed page/frontmatter 121, 122, 125, 126, 129, audit extract lines 1817-1823,1872,1884-1888,1952; 원본 SHA-256 `9f142b89e0659e71066054c3d61b4d6f29ba3c10c5984e26e9a2d37d2fae3236`.
+- XH159: XBeach_manual_master.pdf, 직접 PDF, physical PDF p.129, 130, 133, 134, 135, 136, printed page/frontmatter 125, 126, 129, 130, 131, 132, audit extract lines 6304-6414,6911-6916,7006-7314; 원본 SHA-256 `6e594e6fff7cf285c74c1877573061fed460f70658541cd29dd986475517c7f7`.
+<a id="xh126"></a>
+<a id="xh157"></a>
+### M-011 — XH126, XH157
+
+**판정:** 판본 한정 사실로 채택.
+
+- Groundwater defaults include aquiferbot=-10, dwet=0.1, gw0=0, critical Reynolds number 100, gwfastsolve=0, gwnonh=0 and directional permeabilities of 1e-4 m/s.
+- Groundwater defaults include aquiferbot=-10 m, dwetlayer=0.1 m, gwReturb=100, gwfastsolve=0, hydrostatic laminar flow and kx=ky=kz=10^-4 m/s.
+
+**출처 locator:**
+
+- XH126: XBeach_manual_master.docx, 원본 DOCX 문서순 block B1798, B1799, B1800, B1801, B1802, B1803, B1804, B1805, B1806, B1807, B1808, B1809, B1810, B1811 (SHA-256 `9f142b89e0659e71066054c3d61b4d6f29ba3c10c5984e26e9a2d37d2fae3236`; audit extract lines 2648-2661); 직접 인용: “gwhorinfil+ | Switch to include horizontal infiltration from surface water to groundwater | 0 | 0 - 1 | -”; “gw0+ | Level initial groundwater level | 0.0 | -5.0 - 5.0 | m”; “gwscheme+ | Scheme for momentum equation | laminar | laminar, turbulent”. PDF page는 주장하지 않음.
+- XH157: XBeach_manual_master.pdf, 직접 PDF, physical PDF p.119, 120, printed page/frontmatter 115, 116, audit extract lines 5474-5533; 원본 SHA-256 `6e594e6fff7cf285c74c1877573061fed460f70658541cd29dd986475517c7f7`.
+## 지형변화·지층·avalanching
+
+<a id="xh096"></a>
+<a id="xh130"></a>
+### M-012 — XH096, XH130
+
+**판정:** 판본 한정 사실로 채택.
+
+- Stationary mode excludes infragravity waves and wave growth, ny=0 selects a one-dimensional model, and non-hydrostatic sediment transport is explicitly unvalidated.
+- Stationary mode omits infragravity waves, 1D surfbeat uses ny=0, one directional bin omits refraction unless snells=1, and non-hydrostatic sandy morphology remains insufficiently validated.
+
+**출처 locator:**
+
+- XH096: XBeach_manual_master.docx, DOC/DOCX→동일 work PDF 정렬, physical PDF p.12, 13, 14, 15, 16, printed page/frontmatter 8, 9, 10, 11, 12, audit extract lines 194-229; 원본 SHA-256 `9f142b89e0659e71066054c3d61b4d6f29ba3c10c5984e26e9a2d37d2fae3236`.
+- XH130: XBeach_manual_master.pdf, 직접 PDF, physical PDF p.12, 13, 14, 15, 16, printed page/frontmatter 8, 9, 10, 11, 12, audit extract lines 297-356; 원본 SHA-256 `6e594e6fff7cf285c74c1877573061fed460f70658541cd29dd986475517c7f7`.
+<a id="xh105"></a>
+<a id="xh142"></a>
+### M-013 — XH105, XH142
+
+**판정:** 판본 한정 사실로 채택.
+
+- Morphological acceleration is described as order 1–10 with 10 minutes at morfac=6 representing one hour, cannot accelerate alongshore tides, and uses default dry/wet avalanche slopes 1 and 0.3.
+- Morphological acceleration is described as order 1–10 and unsuitable for accelerated alongshore tides, with defaults dryslp=1, wetslp=0.3, hswitch=0.1 m, dzmax=0.05, morfac=1 and morfacopt=1.
+
+**출처 locator:**
+
+- XH105: XBeach_manual_master.docx, DOC/DOCX→동일 work PDF 정렬, physical PDF p.42, 43, 116, printed page/frontmatter 38, 39, 112, audit extract lines 791-807,1741,2630-2639; 원본 SHA-256 `9f142b89e0659e71066054c3d61b4d6f29ba3c10c5984e26e9a2d37d2fae3236`.
+- XH142: XBeach_manual_master.pdf, 직접 PDF, physical PDF p.42, 43, 116, 117, printed page/frontmatter 38, 39, 112, 113, audit extract lines 2647-2659,5354-5407; 원본 SHA-256 `6e594e6fff7cf285c74c1877573061fed460f70658541cd29dd986475517c7f7`.
+<a id="xh119"></a>
+### M-014 — XH119
+
+**판정:** 판본 한정 사실로 채택.
+
+- ne_layer=0 prohibits erosion and 10 means 10 m of erodible cover over an infinitely deep structure, setbathy overrides depfile/morphology, and layer controls default to frac_dz=0.7, merge=0.01 and split=1.01.
+
+**출처 locator:**
+
+- XH119: XBeach_manual_master.docx, DOC/DOCX→동일 work PDF 정렬, physical PDF p.116, 118, printed page/frontmatter 112, 114, audit extract lines 1742,1781,2641-2646; 원본 SHA-256 `9f142b89e0659e71066054c3d61b4d6f29ba3c10c5984e26e9a2d37d2fae3236`.
+<a id="xh121"></a>
+### M-015 — XH121
+
+**판정:** 판본 한정 사실로 채택.
+
+- Erosion is explicit and deposition implicit, water-column sediment storage can be distorted at high morfac, boundary avalanching and bed diffusion are omitted, and limited MacCormack order falls from two to one near discontinuities.
+
+**출처 locator:**
+
+- XH121: XBeach_manual_master.docx, DOC/DOCX→동일 work PDF 정렬, physical PDF p.134, 135, 136, 138, 140, printed page/frontmatter 130, 131, 132, 134, 136, audit extract lines 1968,2003-2015,2037,2069-2081; 원본 SHA-256 `9f142b89e0659e71066054c3d61b4d6f29ba3c10c5984e26e9a2d37d2fae3236`.
+## 파동작용·쇄파·롤러·단파 마찰
+
+<a id="xh099"></a>
+### M-016 — XH099
+
+**판정:** 판본 한정 사실로 채택.
+
+- Ruessink waveforms cannot supply bore-averaged turbulence, whose parameter names now use wave_averaged and bore_averaged rather than the Kingsday spellings.
+
+**출처 locator:**
+
+- XH099: XBeach_manual_master.docx, DOC/DOCX→동일 work PDF 정렬, physical PDF p.24, printed page/frontmatter 20, audit extract lines 386,396-402,2616; 원본 SHA-256 `9f142b89e0659e71066054c3d61b4d6f29ba3c10c5984e26e9a2d37d2fae3236`.
+<a id="xh118"></a>
+<a id="xh153"></a>
+### M-017 — XH118, XH153
+
+**판정:** 판본 한정 사실로 채택.
+
+- Defaults include CFL=0.7, tstop=2000, maxerror=5e-5 m, maxiter=500, wavint=60, alpha=1, gamma=0.55, gamma2=0.3, gammax=2 and n=10, although the calibration discussion names roelvink1 while the default is roelvink2.
+- Wave defaults include roelvink2, alpha=1, gamma=0.55, gamma2=0.3, gammax=2, n=10, fw=0, fwcutoff=1000, beta=0.1, roller=1, cats=4 and hwci=0.1 m, although gamma/n calibration is explicitly for roelvink1.
+
+**출처 locator:**
+
+- XH118: XBeach_manual_master.docx, 원본 DOCX 문서순 block B1629, B1632, B1633, B1634, B1635, B1636, B1637, B1638, B1639, B1640, B1641, B1642, B1643, B1644, B559, B1649, B1650, B1651, B559, B1656, B1657, B1658 (SHA-256 `9f142b89e0659e71066054c3d61b4d6f29ba3c10c5984e26e9a2d37d2fae3236`; audit extract lines 1714,2551-2571); 직접 인용: “facrun+ | Calibration coefficient for short wave runup | 1.0 | 0.0 - 2.0 | -”; “… for option break=roelvink1. For break=roelvink2 the wave dissipation is proportional to H3/h instead of H2; this affects the calibration. For stationary runs the break=baldock …”; “hwci+ | Minimum depth until which wave-current interaction is used | 0.1 | 0.001 - 1.0 | m”. PDF page는 주장하지 않음. 불완전한 PDF 정렬은 citation에서 폐기함.
+- XH153: XBeach_manual_master.pdf, 직접 PDF, physical PDF p.96, 107, 108, printed page/frontmatter 92, 103, 104, audit extract lines 4669-4675,4949-5022; 원본 SHA-256 `6e594e6fff7cf285c74c1877573061fed460f70658541cd29dd986475517c7f7`.
+<a id="xh134"></a>
+### M-018 — XH134
+
+**판정:** 판본 한정 사실로 채택.
+
+- The roller discussion contrasts an upper-limit coefficient of 2 with an argued value of 0.22 and a preferred value of 1, and identifies roller slope beta as order 0.1.
+
+**출처 locator:**
+
+- XH134: XBeach_manual_master.pdf, 직접 PDF, physical PDF p.25, 26, printed page/frontmatter 21, 22, audit extract lines 1228-1256; 원본 SHA-256 `6e594e6fff7cf285c74c1877573061fed460f70658541cd29dd986475517c7f7`.
+## 파랑 경계·스펙트럼
+
+<a id="xh123"></a>
+<a id="xh150"></a>
+### M-019 — XH123, XH150
+
+**판정:** 판본 한정 사실로 채택.
+
+- Defaults include Cd=0.002, rhoa=1.25, wind=0, D15=0.00015 m, D50=0.0002 m, D90=0.0003 m, nd=3, ngd=1, por=0.4 and rhos=2650 kg/m³.
+- Defaults include JONSWAP fp=0.08 Hz, gammajsp=3.3, s=10, fnyq=0.3 Hz, dfj=fnyq/200, Cd=0.002, rhoa=1.25 kg/m³, grain sizes 0.00015/0.0002/0.0003 m, por=0.4 and rhos=2650 kg/m³.
+
+**출처 locator:**
+
+- XH123: XBeach_manual_master.docx, 원본 DOCX 문서순 block B680, B681, B682, B683, B684, B685, B686, B965, B966, B967, B968, B969, B559, B1001, B1002, B1003, B1004, B1005, B1006, B1007, B1008, B1009, B1010, B1011, B1012 (SHA-256 `9f142b89e0659e71066054c3d61b4d6f29ba3c10c5984e26e9a2d37d2fae3236`; audit extract lines 2242-2248,2301-2318); 직접 인용: “D90 | D90 grain size per grain type | 0.0003 | 0.0001-0.0015 | m”; “D50 | D50 grain size per grain type | 0.0002 | 0.0001-0.0008 | m”; “D15 | D15 grain size per grain type | 0.00015 | 0.0001-0.0008 | m”. PDF page는 주장하지 않음.
+- XH150: XBeach_manual_master.pdf, 직접 PDF, physical PDF p.75, 76, 77, printed page/frontmatter 71, 72, 73, audit extract lines 3688-3774; 원본 SHA-256 `6e594e6fff7cf285c74c1877573061fed460f70658541cd29dd986475517c7f7`.
+## 표사이동
+
+<a id="xh125"></a>
+<a id="xh155"></a>
+### M-020 — XH125, XH155
+
+**판정:** 판본 한정 사실로 채택.
+
+- Transport defaults include Tsmin=0.5, As=0.1, Sk=0.1, sl=1.6, ua=0.1, pormax=0.5, repose=30, rheeA=0.75, cmax=0.1, kmax=1, sigfac=1.3 and vicmol=1e-6.
+- Transport defaults include Tsmin=0.5 s, facAs=facSk=facua=0.1, facsl=1.6, pormax=0.5, reposeangle=30°, z0=0.006 m, cmax=0.1, thetanum=1 and quasi-3D kmax=1, sigfac=1.3, vicmol=10^-6 and vonkar=0.4.
+
+**출처 locator:**
+
+- XH125: XBeach_manual_master.docx, 원본 DOCX 문서순 block B1687, B1688, B1689, B1690, B1691, B1692, B1693, B1694, B1695, B1696, B1697, B1698, B1699, B1700, B1701, B1702, B1703, B1704, B1705, B1706, B1707, B1708, B1709, B1710, B1711, B1712, B1713, B1714, B1715, B1716, B559, B1721, B1722, B1723, B559, B1728, B1729, B1730, B1731 (SHA-256 `9f142b89e0659e71066054c3d61b4d6f29ba3c10c5984e26e9a2d37d2fae3236`; audit extract lines 2590-2628); 직접 인용: “… of sigma layers in Quasi-3D model; kmax = 1 is without vertical structure of flow and suspensions | 1 | 1 - 1000 | …”; “z0+ | Zero flow velocity level in Soulsby and van Rijn (1997) sediment concentration | 0.006 | 0.0001 - 0.05 | m”; “bulk+ | Switch to compute bulk transport rather than bed and suspended load separately | 0 | 0 - 1 | -”. PDF page는 주장하지 않음.
+- XH155: XBeach_manual_master.pdf, 직접 PDF, physical PDF p.112, 113, 114, 115, 116, printed page/frontmatter 108, 109, 110, 111, 112, audit extract lines 5164-5346; 원본 SHA-256 `6e594e6fff7cf285c74c1877573061fed460f70658541cd29dd986475517c7f7`.
+<a id="xh139"></a>
+### M-021 — XH139
+
+**판정:** 판본 한정 사실로 채택.
+
+- The sediment formulation adds 1.45*k_b to orbital-velocity variance, uses ws_red=(1-C)^alpha*ws for hindered settling, and caps each equilibrium-concentration component at half of cmax.
+
+**출처 locator:**
+
+- XH139: XBeach_manual_master.pdf, 직접 PDF, physical PDF p.37, 38, printed page/frontmatter 33, 34, audit extract lines 2030-2069,2093; 원본 SHA-256 `6e594e6fff7cf285c74c1877573061fed460f70658541cd29dd986475517c7f7`.
+## 흐름·조석·유량 경계
+
+<a id="xh111"></a>
+<a id="xh146"></a>
+### M-022 — XH111, XH146
+
+**판정:** 판본 한정 사실로 채택.
+
+- Discharge is specified in m³/s without injected momentum, grids contain (nx+1)*(ny+1) points, ny=0 selects fast 1D operation, and 2DH operation requires ny>2.
+- Discharges use m³/s with inward-positive domain-boundary flow and no momentum for vertical injection, grid files contain (nx+1)×(ny+1) values, and vardens angles increase from 0° along +x toward 90° along +y.
+
+**출처 locator:**
+
+- XH111: XBeach_manual_master.docx, DOC/DOCX→동일 work PDF 정렬, physical PDF p.51, 55, 56, 67, printed page/frontmatter 47, 51, 52, 63, audit extract lines 904-906,984-995,1144; 원본 SHA-256 `9f142b89e0659e71066054c3d61b4d6f29ba3c10c5984e26e9a2d37d2fae3236`.
+- XH146: XBeach_manual_master.pdf, 직접 PDF, physical PDF p.51, 55, 56, printed page/frontmatter 47, 51, 52, audit extract lines 2856-2860,2979-2983; 원본 SHA-256 `6e594e6fff7cf285c74c1877573061fed460f70658541cd29dd986475517c7f7`.

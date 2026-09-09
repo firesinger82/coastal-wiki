@@ -1,144 +1,25 @@
 ---
-title: "xbeach first baseline case selection"
-topic: general
+title: "XBeach 예제와 검증 자료 연결"
 canonical_source: self
 citation_status: verified
-verification_method: "XBeach source code 직접 분석 (models/XBeach/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/xbeach-first-baseline-case-selection.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
-note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
-note_date: 2026-04~05 (original) / 2026-05-23 (promote)
-verification_by: "사용자 + codex source-code analysis"
-verification_date: 2026-04
+has_source_needed: false
+verification_by: "Codex source cross-ref; Claude Sonnet adversarial review"
+verification_date: 2026-09-09
+verification_method: "Source and referenced-note cross-reference; independent MSI identity/disassembly where applicable"
+note_author: "Codex"
+note_date: 2026-09-09
 ---
 
-# XBeach First Baseline Case Selection
+# XBeach 예제와 검증 자료 연결
 
-Date: 2026-04-30
+공식 예제의 입력 구성·관측 비교와 소스 테스트를 구분해 찾는 연결 문서다. 개별 실행의 성공 여부나 특정 작업 환경에서의 우선순위는 담지 않는다.
 
-This note chooses how the first XBeach baseline cases should be used in this workspace.
+| 자료 | 확인할 내용 | 근거 노트 |
+|---|---|---|
+| DELILAH | 공식 예제의 2D 수리 비교 설정과 관측 자료 | [DELILAH reference](../manual-notes/02-delilah-reference.md) |
+| Holland Coast | 공식 예제의 1D 폭풍·사구 침식 구성 | [Holland Coast reference](../manual-notes/03-holland-coast-reference.md) |
+| 매뉴얼 예제·계수 | 문서의 버전, 입력 시간, morfac 등 조건 | [Master manual](../manual-notes/xbeach-master-manual.md) |
+| 모드별 수치 구현 | stationary·surfbeat·nonh의 분기 및 지원 경로 | [Mode dispatch](xbeach_mode_dispatch.md) |
+| 경계 수심 도해 | 파고/수심·상대수심·주기 범위의 설명용 그림 | [경계 도해](xbeach-boundary-limit-figures.md) |
 
-Scope note:
-- the goal is not to pick one case for everything
-- the goal is to separate:
-  - smoke/regression baseline
-  - hydrodynamic reference baseline
-  - first morphology-oriented baseline
-
-## Candidate Pool
-
-Confirmed local and documented candidates:
-- local smoke-test case: `models/example_1d`
-- local additional candidate: `models/example_2d`
-- documented reference example: DELILAH
-- documented reference example: Holland Coast
-
-## Selection Criteria
-
-A good first baseline should score well on:
-- reproducibility
-- low setup ambiguity
-- easy rerun path
-- good documentation of forcing and intent
-- good match to the question type being tested
-
-## Baseline Roles
-
-### 1. Smoke / Regression Baseline
-
-Selected case:
-- `models/example_1d`
-
-Why:
-- already executed successfully with the rebuilt operating executable
-- short runtime
-- simple local packaging
-- useful for post-build sanity checks and binary regression checks
-
-What it is good for:
-- confirming the executable launches
-- checking that params parsing still works
-- checking that boundary setup still runs
-- checking that netCDF output generation still completes
-
-What it is not good for:
-- scientific validation of coastal erosion skill
-- judging advanced 2D directional behavior
-- choosing final morphology parameter defaults
-
-Linked evidence:
-- `experiments/2026/xbeach/2026-04-30-example-1d-smoke-test.md`
-
-### 2. First Hydrodynamic Reference Baseline
-
-Preferred candidate:
-- DELILAH
-
-Why:
-- explicitly framed in the local note and official examples as a 2D surfbeat directional-spreading hydrodynamic comparison case
-- better aligned with checking whether wave/current response is credible before morphology interpretation expands
-
-What it is good for:
-- hydrodynamic comparison mindset
-- 2D surfbeat behavior
-- directional wave forcing context
-
-What it is not ideal for:
-- first morphology-centric baseline if the main question is dune or profile erosion evolution
-
-### 3. First Morphology-Oriented Baseline
-
-Preferred candidate:
-- Holland Coast
-
-Why:
-- explicitly documented as a 1D dune-erosion style example
-- local note frames it as a 42-hour storm case
-- `morfac = 1` in the local note makes it attractive as an event-faithful early morphology reference
-- more natural fit for profile-change and storm-erosion interpretation than DELILAH
-
-What it is good for:
-- first morphology foundation work
-- dune/profile erosion framing
-- checking how transport, avalanching, and slope logic affect interpretable outcomes
-
-What it is not ideal for:
-- representing all 2D directional-coast problems
-- acting as the only XBeach baseline for the whole lane
-
-## Decision
-
-Use a two-layer baseline strategy.
-
-### Operational decision
-- first quick regression baseline: `models/example_1d`
-- first hydrodynamic reference baseline: DELILAH
-- first morphology-oriented reference baseline: Holland Coast
-
-This is better than forcing one case to do all jobs.
-
-## Why Not `example_2d` First?
-
-`example_2d` may still become useful, but right now it is not yet better justified than the documented examples.
-
-Current reasons to defer it:
-- no successful run or note has yet anchored it in this workspace
-- DELILAH and Holland Coast already provide clearer role definitions from the local documentation
-
-## Immediate Next Actions
-
-1. keep `example_1d` as the standard smoke/regression case after rebuilds
-2. create a DELILAH source note or method note for hydrodynamic reference usage
-3. create a Holland Coast source note or method note for morphology reference usage
-4. only after that decide whether `example_2d` should become a local 2D baseline in its own right
-
-## Working Rule For This Wiki
-
-Do not use one XBeach case as the baseline for every question type. Use:
-- one small local smoke test
-- one hydrodynamic reference case
-- one morphology-oriented reference case
-
-## Follow-On Notes
-
-- future source note for DELILAH
-- future source note for Holland Coast
-- future heuristic on baseline role separation in XBeach
+저장소 테스트의 적용 한계는 [승인 소스 보충의 테스트 절](xbeach-source-audit-supplements.md)을, 비교 관측 자료는 위 공식 예제 노트를 따른다.
