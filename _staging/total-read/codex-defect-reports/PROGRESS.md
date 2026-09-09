@@ -41,5 +41,8 @@
 
 **모델 배분**(사용자 지시): 소스판독·판정·적대검증 = `gpt-6-astra` / 빌드·문서 = `gpt-5.6-luna` / 인벤토리·시각판독 = 모델 불요. ★기존 111파일의 R1·R2 는 `--model` 미지정으로 `gpt-5.6-sol` 에서 수행됨(사후 실사로 확인, 재판독 불요 판정).
 
+### ★ Codex 인수인계서
+`model-audit/XBeach/HANDOFF-CODEX.md` (2026-09-09) — 남은 HG 절차 5단계(records-by-run 12개 복사 → 신규 43건 evidence_span 정규화 → manifest 재작성 → 영수증 재생성 → 사용자 승인 → 게이트), 게이트 무결성 원칙, 이번 세션에 밟은 함정 7종(--model/--write 생략·경로 기준·PDF 처리 등), 도구 49개 위치, 이월 5건.
+
 ### HG 재승인 대기
 분모 확대로 confirmed_delta 60 → **103**(신규 43). supplement manifest·영수증 재작성 후 사용자 승인 필요. 승인 전 XBeach 미완결.
