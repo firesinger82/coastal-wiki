@@ -1,0 +1,530 @@
+{
+  "schema": "xbeach-hard-resolution/v1",
+  "date": "2026-09-09",
+  "author": "Codex (gpt-6-astra)",
+  "scope": "Exactly three disposition conflicts plus two XBeach-V01 REFUTED_UNVERIFIED rows.",
+  "status": "Five evidence-backed scoped dispositions; external governance completion remains parent responsibility.",
+  "line_numbering": "Physical LF separators in raw bytes; no splitlines() conversion; quote_exact_utf8 retains CR.",
+  "items": [
+    {
+      "id": "XB-HARD-01",
+      "closure_status": "CLOSED_WITH_SCOPED_DISPOSITION",
+      "deferred_input_id": "XBeach-001:trunk/src/xbeachlibrary/wave_boundary_main.f90:8",
+      "deferred_input_path": "_staging/total-read/model-audit/XBeach/closure/deferred-inputs.json",
+      "deferred_input_sha256": "4d26742329d7e0eca01e1eec00738e7bcc6bb729cf83edb63548ad83ce95663c",
+      "original_crosswalk_path": "_staging/total-read/model-audit/XBeach/cw/crosswalk/XBeach-001/trunk__src__xbeachlibrary__wave_boundary_main.f90.crosswalk.json",
+      "original_crosswalk_sha256": "6983672a072bbb64cad0977f66baa59ed8fe65fce0cb833ad67080e292f39693",
+      "disposition_index_zero_based": 8,
+      "base_ids": [
+        "A2"
+      ],
+      "audit_ids": [
+        "B3"
+      ],
+      "original_disposition": {
+        "disposition": "conflict",
+        "base_ids": [
+          "A2"
+        ],
+        "audit_ids": [
+          "B3"
+        ],
+        "base_member_text": [
+          "[L221-L224] (HIGH/compile-time type mismatch) waveBoundaryParameters%randomseed is declared as a scalar integer in the datastore but is passed to allocated/deallocate as if it were allocatable."
+        ],
+        "audit_member_text": [
+          "[L221-L224] (HIGH/allocation/rank) The allocatable randomseed vector is deallocated and then assigned the scalar randomseed without allocating or constructing a conforming seed array."
+        ],
+        "representative": "audit",
+        "rationale": "blinded CONFLICT: Same seed component is claimed to be an allocatable vector versus a non-allocatable scalar",
+        "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+        "decided_at": "2026-08-27"
+      },
+      "source_path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_boundary_main.f90",
+      "source_sha256": "5457f45f75df3500f6bfc00c584128aa9d61e969170fe53ca5874842252d24d9",
+      "supersedes": "Only this row interpretation; original crosswalk, source and receipts remain immutable.",
+      "final_disposition": "NARROWED",
+      "conflict_resolution": "BASE_CORRECT_AUDIT_REFUTED",
+      "base_truth": "TRUE: the component is a scalar INTEGER without ALLOCATABLE or POINTER; ALLOCATED and DEALLOCATE are invalid.",
+      "audit_truth": "FALSE: neither the component nor input randomseed is an allocatable vector. The comment about 40 integers is stale, not a declaration.",
+      "severity": "HIGH if this prototype is compiled; no failure claimed for the seven checked build manifests",
+      "reasoning": "waveBoundaryParameters has waveBoundaryParametersType from the directly USE-associated datastore. Its scalar component declaration contradicts the vector hypothesis. An isolated compile using the complete original datastore and the exact original failing statement emits both required-ALLOCATABLE diagnostics. Makefile.am and six vfproj manifests omit main/datastore; therefore this is an integration-time defect in an excluded prototype, not an observed shipped-build failure.",
+      "canonical_ready_ko": "`wave_boundary_main`의 seed 처리에는 잠재적 컴파일 결함이 있다. 저장소 타입의 `randomseed`는 비할당 정수 스칼라인데 `ALLOCATED`와 `DEALLOCATE`에 전달된다. 따라서 “미할당 seed 벡터 대입” 해석은 기각한다. 확인한 Makefile.am과 6개 vfproj에는 이 모듈이 없으므로 해당 빌드의 실행 결함으로 확대하지 않는다. (`models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_boundary_datastore.f90:16-30`; `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_boundary_main.f90:121-135,221-224`; `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am:4-60`.)",
+      "evidence": [
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_boundary_datastore.f90",
+          "sha256": "189a137244043330e3b3a33bd8ea3d0b8d015e5c0e863c7f93492fafab5c77a2",
+          "line_start": 16,
+          "line_end": 30,
+          "line_numbering": "physical LF-delimited; CR retained in quote",
+          "quote_exact_utf8": "   type waveBoundaryParametersType\r\n      character(1024)                  :: masterFileName\r\n      integer                          :: np,ntheta\r\n      real*8                           :: x0,y0\r\n      real*8                           :: hboundary\r\n      logical                          :: nonhspectrum\r\n      real*8                           :: sprdthr,trepfac\r\n      integer                          :: Tm01switch\r\n      real*8,dimension(:),allocatable  :: xb,yb,theta     ! Note, can these be changed to pointers?\r\n      integer                          :: randomseed\r\n      integer                          :: nspr\r\n      real*8                           :: rho\r\n      real*8                           :: nmax\r\n      real*8                           :: fcutoff\r\n   end type waveBoundaryParametersType\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_boundary_datastore.f90",
+          "sha256": "189a137244043330e3b3a33bd8ea3d0b8d015e5c0e863c7f93492fafab5c77a2",
+          "line_start": 73,
+          "line_end": 77,
+          "line_numbering": "physical LF-delimited; CR retained in quote",
+          "quote_exact_utf8": "   type(waveBoundaryParametersType)       :: waveBoundaryParameters\r\n   type(waveBoundaryAdministrationType)   :: waveBoundaryAdministration\r\n   type(waveBoundaryTimeSeriesType)       :: waveBoundaryTimeSeries\r\n   type(waveSpectrumAdministrationType)   :: waveSpectrumAdministration\r\n\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_boundary_main.f90",
+          "sha256": "5457f45f75df3500f6bfc00c584128aa9d61e969170fe53ca5874842252d24d9",
+          "line_start": 121,
+          "line_end": 135,
+          "line_numbering": "physical LF-delimited; CR retained in quote",
+          "quote_exact_utf8": "      use wave_boundary_datastore\r\n      use wave_boundary_update_module, only: generate_wave_boundary_surfbeat\r\n#ifdef BUILDXBEACH\r\n      use interp\r\n#endif\r\n      !\r\n      implicit none\r\n      !\r\n      ! Input variables\r\n      integer,intent(in)                     :: np,ntheta,bctype\r\n      real*8,intent(in)                      :: t,x0,y0,hboundary,dtheta\r\n      character(len=*),intent(in)            :: bcfile\r\n      real*8,dimension(np),intent(in)        :: xb,yb\r\n      real*8,dimension(ntheta),intent(in)    :: theta\r\n      integer,intent(in)                     :: randomseed\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_boundary_main.f90",
+          "sha256": "5457f45f75df3500f6bfc00c584128aa9d61e969170fe53ca5874842252d24d9",
+          "line_start": 221,
+          "line_end": 224,
+          "line_numbering": "physical LF-delimited; CR retained in quote",
+          "quote_exact_utf8": "         ! Allocate space for the random seed. This seed is set to 40 integers and\r\n         ! should be identical on all processes\r\n         if(allocated(waveBoundaryParameters%randomseed)) deallocate(waveBoundaryParameters%randomseed)\r\n         waveBoundaryParameters%randomseed = randomseed\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am",
+          "sha256": "1b313d0ba88701c16f6805114d7d6b5d406fb9026a03d091c2d49b97b8ee8d21",
+          "line_start": 4,
+          "line_end": 60,
+          "line_numbering": "physical LF-delimited; CR retained in quote",
+          "quote_exact_utf8": "libxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\\n\tconstants.F90 \\\n\ttypesandkinds.F90 \\\n\tiso_c_utils.f90 \\\n\tlogging.F90 \\\n\tparamsconst.F90 \\\n\tfilefunctions.F90 \\\n\treadkey.F90 \\\n\tmnemonic.F90 \\\n\tinterp.F90 \\\n\tmath_tools.F90 \\\n\tparams.F90 \\\n\tgetkey.F90 \\\n\tspaceparamsdef.F90 \\\n\tspaceparams.F90 \\\n\tcompute_tide_zs0.F90 \\\n\twetcells.F90 \\\n\tvegetation.F90 \\\n\twave_functions.F90 \\\n\twaveparams.F90 \\\n\twaveparamsnew.F90 \\\n\troelvink.F90 \\\n\twave_stationary_directions.F90 \\\n\twave_instationary.F90 \\\n\twave_timestep.F90 \\\n\tsolver.F90 \\\n\tflow_secondorder.F90 \\\n\tnonh.F90 \\\n\tboundaryconditions.F90 \\\n\tmorphevolution.F90 \\\n\tgroundwater.F90 \\\n\trainfall.F90 \\\n\tdrifters.F90 \\\n\treadtide.F90 \\\n\treadwind.F90 \\\n\tinitialize.F90 \\\n\ttimestep.F90 \\\n\tbedroughness.F90 \\\n\tvsm_u_XB.f90 \\\n\tflow_timestep.F90 \\\n\tpostprocess.F90 \\\n\tvarianceupdate.F90 \\\n\tvaroutput.F90 \\\n\tncoutput.F90 \\\n\toutput.F90 \\\n\tship.F90 \\\n\tmnemoniciso.F90 \\\n\tloopcounters.F90 \\\n\tlibxbeach.F90 \\\n\tdebugging.F90 \\\n\tintrospection.F90 \\\n\txbeach_bmi.f90"
+        }
+      ],
+      "experiment_artifacts": [
+        {
+          "path": "_staging/total-read/model-audit/XBeach/closure/hard-resolutions/randomseed-probe.f90",
+          "sha256": "b3911f5ad8d28012b3c4a4a01ed7a8dcaa71126697080b49b606db41b1931079"
+        },
+        {
+          "path": "_staging/total-read/model-audit/XBeach/closure/hard-resolutions/randomseed-probe-results.json",
+          "sha256": "121064293dbc020bbf009b28cb9f27bff5d759a57a567cd0ea64b60d744c6006"
+        },
+        {
+          "path": "_staging/total-read/model-audit/XBeach/closure/hard-resolutions/checked-build-manifests.json",
+          "sha256": "b95feb53a74434139b37113470bcc69b6158948e66a5211e21a0740325e8b416"
+        }
+      ]
+    },
+    {
+      "id": "XB-HARD-02",
+      "closure_status": "CLOSED_WITH_SCOPED_DISPOSITION",
+      "deferred_input_id": "XBeach-002:trunk/src/xbeachlibrary/morphevolution.F90:24",
+      "deferred_input_path": "_staging/total-read/model-audit/XBeach/closure/deferred-inputs.json",
+      "deferred_input_sha256": "4d26742329d7e0eca01e1eec00738e7bcc6bb729cf83edb63548ad83ce95663c",
+      "original_crosswalk_path": "_staging/total-read/model-audit/XBeach/cw/crosswalk/XBeach-002/trunk__src__xbeachlibrary__morphevolution.F90.crosswalk.json",
+      "original_crosswalk_sha256": "50c963c451b342572c346a1184fb748acb94d84e013b27ba7ea376167b966e6c",
+      "disposition_index_zero_based": 24,
+      "base_ids": [
+        "A12"
+      ],
+      "audit_ids": [
+        "B25"
+      ],
+      "original_disposition": {
+        "disposition": "conflict",
+        "base_ids": [
+          "A12"
+        ],
+        "audit_ids": [
+          "B25"
+        ],
+        "base_member_text": [
+          "[L2918-L2926] (HIGH/wrong-source-array) At zero v velocity, kturbv is averaged from its own just-zeroed values rather than from neighboring s%kturb values, forcing the centered face turbulence to zero."
+        ],
+        "audit_member_text": [
+          "[L2918-L2926] (HIGH/self-referential stale interpolation) At zero V velocity, kturbv is averaged from kturbv itself rather than from s%kturb, reusing stale work-array values instead of the neighboring turbulence field."
+        ],
+        "representative": "audit",
+        "rationale": "blinded CONFLICT: Same self-interpolation, but prior stale values versus just-zeroed values",
+        "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+        "decided_at": "2026-08-27"
+      },
+      "source_path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/morphevolution.F90",
+      "source_sha256": "765f474008f7cb843353dc0790cc3f3ebdc00631353da7592e2bb0508e968391",
+      "supersedes": "Only this row interpretation; original crosswalk, source and receipts remain immutable.",
+      "final_disposition": "NARROWED",
+      "conflict_resolution": "BASE_CORRECT_AUDIT_STALE_STATE_REFUTED",
+      "base_truth": "TRUE for finite vv==0: kturbv is cleared on every call; forward j iteration reads the current and next not-yet-written row, both zero.",
+      "audit_truth": "PARTLY TRUE: the wrong work array is read; FALSE that values survive from a previous call or previous processing of this cell.",
+      "severity": "MED/scoped zero-velocity interpolation defect; HIGH effect not established",
+      "reasoning": "The SAVE attribute does not preserve nonzero values across the unconditional whole-array zero assignment. For increasing j, kturbv(i,j) has not been assigned yet and kturbv(i,j+1) is a future row; the last boundary row is only overwritten after the loop. Thus the branch computes exactly zero, independently of nonzero neighboring s%kturb. Sturbv multiplies this by vv in Lagrangian mode: when vv is exactly zero, replacing interpolation would not change that flux. Eulerian mode multiplies by vev instead, so the defect can affect flux when vv==0 and vev!=0; no case-specific effect size is asserted.",
+      "canonical_ready_ko": "`waveturb`의 `vv==0` 분기는 `s%kturb` 대신 작업배열 `kturbv`를 평균한다. 배열은 호출마다 0으로 초기화되고 j가 증가하는 순서로 갱신되므로 두 피연산자는 모두 0이다. “이전 호출의 잔존값 사용” 해석은 기각한다. Lagrangian 이류에서는 같은 0의 `vv`를 곱해 이 면의 flux 차이가 없지만, Eulerian 이류는 `vev`를 곱하므로 `vv==0`, `vev!=0` 조건에서 잘못된 0이 영향을 줄 수 있다. (`models/XBeach/raw/source_code/trunk/src/xbeachlibrary/morphevolution.F90:2863-2874,2918-2938`.)",
+      "evidence": [
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/morphevolution.F90",
+          "sha256": "765f474008f7cb843353dc0790cc3f3ebdc00631353da7592e2bb0508e968391",
+          "line_start": 2858,
+          "line_end": 2874,
+          "line_numbering": "physical LF-delimited; CR retained in quote",
+          "quote_exact_utf8": "      real*8,dimension(:,:),allocatable,save   :: ksource, kturbu,kturbv,Sturbu,Sturbv,dzsdt_cr\r\n\r\n      !include 's.ind'\r\n      !include 's.inp'\r\n\r\n      if (.not. allocated(kturbu)) then\r\n         allocate(ksource (s%nx+1,s%ny+1))\r\n         allocate(kturbu (s%nx+1,s%ny+1))\r\n         allocate(kturbv (s%nx+1,s%ny+1))\r\n         allocate(Sturbu (s%nx+1,s%ny+1))\r\n         allocate(Sturbv (s%nx+1,s%ny+1))\r\n         allocate(dzsdt_cr (s%nx+1,s%ny+1))\r\n         twothird=2.d0/3.d0\r\n      endif\r\n      ! use lagrangian velocities\r\n      kturbu       = 0.0d0  !Jaap\r\n      kturbv       = 0.0d0  !Jaap\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/morphevolution.F90",
+          "sha256": "765f474008f7cb843353dc0790cc3f3ebdc00631353da7592e2bb0508e968391",
+          "line_start": 2903,
+          "line_end": 2938,
+          "line_numbering": "physical LF-delimited; CR retained in quote",
+          "quote_exact_utf8": "         do j=1,s%ny+1\r\n            do i=1,s%nx\r\n               if(s%uu(i,j)>0.d0) then\r\n                  kturbu(i,j)=par%thetanum*s%kturb(i,j)+(1.d0-par%thetanum)*s%kturb(min(i+1,s%nx),j)\r\n               elseif(s%uu(i,j)<0.d0) then\r\n                  kturbu(i,j)=par%thetanum*s%kturb(i+1,j)+(1.d0-par%thetanum)*s%kturb(max(i,2),j)\r\n               else\r\n                  kturbu(i,j)=0.5d0*(s%kturb(i,j)+s%kturb(i+1,j))\r\n               endif\r\n            enddo\r\n         enddo\r\n         if (xmpi_isbot) kturbu(s%nx+1,:) = s%kturb(s%nx+1,:)\r\n         !\r\n         ! Turbulence in vv-points\r\n         !\r\n         do j=1,s%ny\r\n            do i=1,s%nx+1\r\n               if(s%vv(i,j)>0) then\r\n                  kturbv(i,j)=par%thetanum*s%kturb(i,j)+(1.d0-par%thetanum)*s%kturb(i,min(j+1,s%ny))\r\n               else if(s%vv(i,j)<0) then\r\n                  kturbv(i,j)=par%thetanum*s%kturb(i,j+1)+(1.d0-par%thetanum)*s%kturb(i,max(j,2))\r\n               else\r\n                  kturbv(i,j)=0.5d0*(kturbv(i,j)+kturbv(i,j+1))\r\n               endif\r\n            enddo\r\n         enddo\r\n         kturbv(:,s%ny+1) = s%kturb(:,s%ny+1) !Robert\r\n         !\r\n         ! Turbulence advection in X and Y direction\r\n         !\r\n         if (par%turbadv == TURBADV_LAGRANGIAN) then\r\n            Sturbu=kturbu*s%uu*s%hu*s%wetu\r\n            Sturbv=kturbv*s%vv*s%hv*s%wetv\r\n         elseif (par%turbadv == TURBADV_EULERIAN) then\r\n            Sturbu=kturbu*s%ueu*s%hu*s%wetu\r\n            Sturbv=kturbv*s%vev*s%hv*s%wetv\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/morphevolution.F90",
+          "sha256": "765f474008f7cb843353dc0790cc3f3ebdc00631353da7592e2bb0508e968391",
+          "line_start": 2952,
+          "line_end": 2955,
+          "line_numbering": "physical LF-delimited; CR retained in quote",
+          "quote_exact_utf8": "                  s%kturb(i,j) = (s%hold(i,j)*s%kturb(i,j)-par%dt*(       &\r\n                  (Sturbu(i,j)*s%dnu(i,j)-Sturbu(i-1,j)*s%dnu(i-1,j)+&\r\n                  Sturbv(i,j)*s%dsv(i,j)-Sturbv(i,j-1)*s%dsv(i,j-1))*s%dsdnzi(i,j)-&\r\n                  (ksource(i,j)-disturb)))/s%hh(i,j)\r"
+        }
+      ]
+    },
+    {
+      "id": "XB-HARD-03",
+      "closure_status": "CLOSED_WITH_SCOPED_DISPOSITION",
+      "deferred_input_id": "XBeach-D00:trunk/lib/README.txt.txt:0",
+      "deferred_input_path": "_staging/total-read/model-audit/XBeach/closure/deferred-inputs.json",
+      "deferred_input_sha256": "4d26742329d7e0eca01e1eec00738e7bcc6bb729cf83edb63548ad83ce95663c",
+      "original_crosswalk_path": "_staging/total-read/model-audit/XBeach/cw/crosswalk/XBeach-D00/trunk__lib__README.txt.txt.crosswalk.json",
+      "original_crosswalk_sha256": "bbcd0b1bd1c578ea2c1f6aa313e2dfe0a4286f5f38691e782c20393752d17522",
+      "disposition_index_zero_based": 0,
+      "base_ids": [
+        "A0"
+      ],
+      "audit_ids": [
+        "B0"
+      ],
+      "original_disposition": {
+        "disposition": "conflict",
+        "base_ids": [
+          "A0"
+        ],
+        "audit_ids": [
+          "B0"
+        ],
+        "base_member_text": [
+          "[L1] (LOW/missing-documentation) The sole line is blank, so this README provides no information about the library directory or its contents."
+        ],
+        "audit_member_text": [
+          "[L1-L2] (LOW/documentation-coverage) The library inventory lists only win32 despite the shard also containing an x64 MPICH distribution, leaving the architecture choices incompletely documented."
+        ],
+        "representative": "audit",
+        "rationale": "blinded CONFLICT: One claims the inventory lists win32; the other claims its sole line is blank.",
+        "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+        "decided_at": "2026-08-27"
+      },
+      "source_path": "models/XBeach/raw/source_code/trunk/lib/README.txt.txt",
+      "source_sha256": "3471cc33922e7dd6821b25769ead10a7b9aa5b640d951b5fca383f1ec80bb7e4",
+      "supersedes": "Only this row interpretation; original crosswalk, source and receipts remain immutable.",
+      "final_disposition": "STANDS",
+      "conflict_resolution": "AUDIT_CORRECT_BASE_REFUTED",
+      "base_truth": "FALSE: the file has two nonblank physical LF-delimited lines, not one blank line.",
+      "audit_truth": "TRUE: its architecture inventory names only win32; the local x64 distribution exists.",
+      "severity": "LOW/documentation coverage",
+      "reasoning": "Exact bytes start with the library introduction and name the win32 folder. They contain one LF separator and no final LF. The x64 header and supplied x64 archive are independently hashed local evidence of the additional distribution.",
+      "canonical_ready_ko": "`trunk/lib/README.txt.txt`는 빈 파일이 아니다. 2개 비어 있지 않은 줄에서 win32 사전 빌드 라이브러리만 안내하며, 함께 제공되는 x64 MPICH를 안내하지 않는다. 이는 아키텍처 목록의 누락이다. (`models/XBeach/raw/source_code/trunk/lib/README.txt.txt:1-2`; `models/XBeach/raw/source_code/trunk/lib/x64/mpich/include/mpi.h:1-15`.)",
+      "evidence": [
+        {
+          "path": "models/XBeach/raw/source_code/trunk/lib/README.txt.txt",
+          "sha256": "3471cc33922e7dd6821b25769ead10a7b9aa5b640d951b5fca383f1ec80bb7e4",
+          "line_start": 1,
+          "line_end": 2,
+          "line_numbering": "physical LF-delimited; CR retained in quote",
+          "quote_exact_utf8": "This directory contains prebuild libraries:\r\n- for windows 32bit in the win32 folder"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/include/mpi.h",
+          "sha256": "715c67d4ab1c5c2557729548c2d6be82437aaa92df606c64ae9fb0596b45899a",
+          "line_start": 1,
+          "line_end": 15,
+          "line_numbering": "physical LF-delimited; CR retained in quote",
+          "quote_exact_utf8": "/* -*- Mode: C; c-basic-offset:4 ; -*- */\r\n/*  \r\n *  (C) 2001 by Argonne National Laboratory.\r\n *      See COPYRIGHT in top-level directory.\r\n */\r\n/* @configure_input@ */\r\n#ifndef MPI_INCLUDED\r\n#define MPI_INCLUDED\r\n\r\n/* user include file for MPI programs */\r\n\r\n/* Keep C++ compilers from getting confused */\r\n#if defined(__cplusplus)\r\nextern \"C\" {\r\n#endif\r"
+        }
+      ],
+      "binary_sources": [
+        {
+          "path": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/lib/cxx.lib",
+          "sha256": "6fd6a3e6a61347ec912ee96b0b0031d2c672be916277dc693d6efdac5c6127dc"
+        }
+      ]
+    },
+    {
+      "id": "XB-HARD-04",
+      "closure_status": "CLOSED_WITH_SCOPED_DISPOSITION",
+      "deferred_input_id": "XBeach-V01:trunk/lib/x64/mpich/include/mpicxx.h:3",
+      "deferred_input_path": "_staging/total-read/model-audit/XBeach/closure/deferred-inputs.json",
+      "deferred_input_sha256": "4d26742329d7e0eca01e1eec00738e7bcc6bb729cf83edb63548ad83ce95663c",
+      "original_crosswalk_path": "_staging/total-read/model-audit/XBeach/cw/crosswalk/XBeach-V01/trunk__lib__x64__mpich__include__mpicxx.h.crosswalk.json",
+      "original_crosswalk_sha256": "b43d49e46fd591d0e04142e34e8903dfeab1e7e7d793164b4c7b209bba1b9760",
+      "disposition_index_zero_based": 3,
+      "base_ids": [
+        "A10"
+      ],
+      "audit_ids": [
+        "B10"
+      ],
+      "original_disposition": {
+        "disposition": "equivalent",
+        "base_ids": [
+          "A10"
+        ],
+        "audit_ids": [
+          "B10"
+        ],
+        "base_member_text": [
+          "[L1567-L1580,L1658-L1671,L2328-L2341,L2443-L2456] (MED/unchecked-duplication) Clone implementations ignore MPI_Comm_dup status and construct a wrapper from uninitialized ncomm when duplication fails with a returning handler."
+        ],
+        "audit_member_text": [
+          "[L1575-L1579,L1666-L1670,L2336-L2340,L2451-L2455] (MED/error-handling) Clone implementations ignore MPI_Comm_dup's return code and construct a communicator from an uninitialized ncomm if duplication fails and the C error handler returns."
+        ],
+        "representative": "audit",
+        "rationale": "blinded SAME",
+        "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+        "decided_at": "2026-08-27",
+        "adversarial": {
+          "verdict": "REFUTED_UNVERIFIED",
+          "rationale": "The packaged MPICH2 1.4.1p1 runtime explicitly stores MPI_COMM_NULL through newcomm on the error path before returning through the communicator error handler: mpich2mpi.dll RVA 0x6fee0, in cabinet member _1BE96E15F472462586C19E8C77FF7927 of the bundled x64 MSI, disassembled entirely in memory. This matches the quoted upstream error-path assignment, so these Clone calls can discard status but do not construct a wrapper from an uninitialized ncomm with the bundled runtime.",
+          "neutralizer": {
+            "where": "https://fossies.org/linux/mpich2/src/mpi/comm/comm_dup.c:L179-L180",
+            "quote": "    *newcomm = MPI_COMM_NULL;\n    mpi_errno = MPIR_Err_return_comm( comm_ptr, FCNAME, mpi_errno );"
+          },
+          "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+          "verified_at": "2026-09-07"
+        }
+      },
+      "source_path": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/include/mpicxx.h",
+      "source_sha256": "8b17786533310be2ca0e2d58f64bb2731ecdc18e3a3a31b5e586a9952ee3bc03",
+      "supersedes": "Only this row interpretation; original crosswalk, source and receipts remain immutable.",
+      "final_disposition": "NARROWED",
+      "conflict_resolution": "UNINITIALIZED_OUTPUT_REFUTED_FOR_BUNDLED_RUNTIME_UNCHECKED_STATUS_RETAINED",
+      "base_truth": "PARTLY TRUE: all four Clone implementations and both return-type branches discard MPI_Comm_dup status; FALSE that bundled runtime returned-error paths leave ncomm uninitialized.",
+      "audit_truth": "PARTLY TRUE for the same reason. Automatic local ncomm has no initializer in the header, but the supplied C runtime writes the pointed-to object before return.",
+      "severity": "LOW/unchecked status in bundled runtime; no indeterminate-handle claim",
+      "reasoning": "MSI decompression independently yields a PE whose MPI_Comm_dup and PMPI_Comm_dup exports both map to RVA 0x6fb20. Windows x64 entry RDX (MPI_Comm* output) is preserved in R12 at RVA 0x6fb4b. Every visible ordinary error path joins RVA 0x6fe94, then at 0x6fee0 stores literal 0x04000000 through R12 before the call at 0x6fee8 and shared return at 0x700c7. The supplied mpi.h defines that literal as MPI_COMM_NULL. Success stores the allocated handle through R12 at 0x6fe5a. Therefore the original uninitialized-handle allegation is disproven for this binary and a valid output pointer as supplied by Clone. Status is still discarded and a null-handle wrapper can be returned. The DLL was inspected statically, not installed or executed; behavior of replacement runtimes is outside this refutation. The earlier unverifiable external source quotation is not used.",
+      "canonical_ready_ko": "제공된 x64 MPICH의 `Clone`은 `MPI_Comm_dup` 반환 코드를 확인하지 않아, 오류 핸들러가 복귀하면 null communicator wrapper를 반환할 수 있다. 다만 “초기화되지 않은 ncomm 사용”은 이 배포본에는 해당하지 않는다. MSI에 포함된 DLL의 `MPI_Comm_dup` 오류 경로가 출력 포인터에 `MPI_COMM_NULL`을 쓴 뒤 복귀한다. (`models/XBeach/raw/source_code/trunk/lib/x64/mpich/include/mpicxx.h:1567-1580,1658-1671,2328-2341,2443-2456`; `models/XBeach/raw/source_code/trunk/lib/x64/mpich/include/mpi.h:189`; 제공 MSI의 MPI_Comm_dup RVA 0x6fb20, 출력 대입 RVA 0x6fee0.)",
+      "evidence": [
+        {
+          "path": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/include/mpicxx.h",
+          "sha256": "8b17786533310be2ca0e2d58f64bb2731ecdc18e3a3a31b5e586a9952ee3bc03",
+          "line_start": 1567,
+          "line_end": 1580,
+          "line_numbering": "physical LF-delimited; CR retained in quote",
+          "quote_exact_utf8": "#ifdef HAVE_NO_VARIABLE_RETURN_TYPE_SUPPORT\n    virtual Comm & Clone(void) const { \n        MPI_Comm ncomm;\n        MPI_Comm_dup( (MPI_Comm)the_real_comm, &ncomm); \n        Comm *clone = new Intercomm(ncomm); \n        return *clone; \n    };\n#else\n    virtual Intercomm & Clone(void) const { \n        MPI_Comm ncomm;\n        MPI_Comm_dup( (MPI_Comm)the_real_comm, &ncomm); \n        Intercomm *clone = new Intercomm(ncomm); \n        return *clone; \n    };"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/include/mpicxx.h",
+          "sha256": "8b17786533310be2ca0e2d58f64bb2731ecdc18e3a3a31b5e586a9952ee3bc03",
+          "line_start": 1658,
+          "line_end": 1671,
+          "line_numbering": "physical LF-delimited; CR retained in quote",
+          "quote_exact_utf8": "#ifdef HAVE_NO_VARIABLE_RETURN_TYPE_SUPPORT\n    virtual Comm & Clone(void) const { \n        MPI_Comm ncomm;\n        MPI_Comm_dup( (MPI_Comm)the_real_comm, &ncomm); \n        Comm *clone = new Intracomm(ncomm); \n        return *clone; \n    };\n#else\n    virtual Intracomm & Clone(void) const { \n        MPI_Comm ncomm;\n        MPI_Comm_dup( (MPI_Comm)the_real_comm, &ncomm); \n        Intracomm *clone = new Intracomm(ncomm); \n        return *clone; \n    };"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/include/mpicxx.h",
+          "sha256": "8b17786533310be2ca0e2d58f64bb2731ecdc18e3a3a31b5e586a9952ee3bc03",
+          "line_start": 2328,
+          "line_end": 2341,
+          "line_numbering": "physical LF-delimited; CR retained in quote",
+          "quote_exact_utf8": "#ifdef HAVE_NO_VARIABLE_RETURN_TYPE_SUPPORT\n    virtual Comm & Clone(void) const { \n        MPI_Comm ncomm;\n        MPI_Comm_dup( (MPI_Comm)the_real_comm, &ncomm); \n        Comm *clone = new Graphcomm(ncomm); \n        return *clone; \n    };\n#else\n    virtual Graphcomm & Clone(void) const { \n        MPI_Comm ncomm;\n        MPI_Comm_dup( (MPI_Comm)the_real_comm, &ncomm); \n        Graphcomm *clone = new Graphcomm(ncomm); \n        return *clone; \n    };"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/include/mpicxx.h",
+          "sha256": "8b17786533310be2ca0e2d58f64bb2731ecdc18e3a3a31b5e586a9952ee3bc03",
+          "line_start": 2443,
+          "line_end": 2456,
+          "line_numbering": "physical LF-delimited; CR retained in quote",
+          "quote_exact_utf8": "#ifdef HAVE_NO_VARIABLE_RETURN_TYPE_SUPPORT\n    virtual Comm & Clone(void) const { \n        MPI_Comm ncomm;\n        MPI_Comm_dup( (MPI_Comm)the_real_comm, &ncomm); \n        Comm *clone = new Cartcomm(ncomm); \n        return *clone; \n    };\n#else\n    virtual Cartcomm & Clone(void) const { \n        MPI_Comm ncomm;\n        MPI_Comm_dup( (MPI_Comm)the_real_comm, &ncomm); \n        Cartcomm *clone = new Cartcomm(ncomm); \n        return *clone; \n    };"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/include/mpi.h",
+          "sha256": "715c67d4ab1c5c2557729548c2d6be82437aaa92df606c64ae9fb0596b45899a",
+          "line_start": 189,
+          "line_end": 189,
+          "line_numbering": "physical LF-delimited; CR retained in quote",
+          "quote_exact_utf8": "#define MPI_COMM_NULL      ((MPI_Comm)0x04000000)\r"
+        },
+        {
+          "path": "_staging/total-read/model-audit/XBeach/closure/hard-resolutions/runtime-export-map.txt",
+          "sha256": "a71c2fac51dabe65346227cd258a961e74bd651c7fd2425eaf0556de51548ff0",
+          "line_start": 1,
+          "line_end": 7,
+          "line_numbering": "physical LF-delimited; CR retained in quote",
+          "quote_exact_utf8": "ImageBase\t\t0000000180000000\n\t[  57] +base[  58] b10c0 Export RVA\n\t[  58] +base[  59] 6fb20 Export RVA\n\t[ 355] +base[ 356] b10c0 Export RVA\n\t[ 356] +base[ 357] 6fb20 Export RVA\n\t[  58] MPI_Comm_dup\n\t[ 356] PMPI_Comm_dup"
+        },
+        {
+          "path": "_staging/total-read/model-audit/XBeach/closure/hard-resolutions/runtime-comm-dup.disassembly.txt",
+          "sha256": "7cac35fc233339f70e8cfd9ac798473e05fa22ead8aff58ba6e79bc4848f589b",
+          "line_start": 19,
+          "line_end": 20,
+          "line_numbering": "physical LF-delimited; CR retained in quote",
+          "quote_exact_utf8": "   18006fb4b:\t4c 8b e2             \tmov    %rdx,%r12\n   18006fb4e:\t8b e9                \tmov    %ecx,%ebp"
+        },
+        {
+          "path": "_staging/total-read/model-audit/XBeach/closure/hard-resolutions/runtime-comm-dup.disassembly.txt",
+          "sha256": "7cac35fc233339f70e8cfd9ac798473e05fa22ead8aff58ba6e79bc4848f589b",
+          "line_start": 211,
+          "line_end": 212,
+          "line_numbering": "physical LF-delimited; CR retained in quote",
+          "quote_exact_utf8": "   18006fe5a:\t41 89 0c 24          \tmov    %ecx,(%r12)\n   18006fe5e:\te9 8c 00 00 00       \tjmp    0x18006feef"
+        },
+        {
+          "path": "_staging/total-read/model-audit/XBeach/closure/hard-resolutions/runtime-comm-dup.disassembly.txt",
+          "sha256": "7cac35fc233339f70e8cfd9ac798473e05fa22ead8aff58ba6e79bc4848f589b",
+          "line_start": 237,
+          "line_end": 243,
+          "line_numbering": "physical LF-delimited; CR retained in quote",
+          "quote_exact_utf8": "   18006fed3:\t48 8d 15 d6 9e 10 00 \tlea    0x109ed6(%rip),%rdx        # 0x180179db0\n   18006feda:\t48 8b cb             \tmov    %rbx,%rcx\n   18006fedd:\t44 8b c0             \tmov    %eax,%r8d\n   18006fee0:\t41 c7 04 24 00 00 00 \tmovl   $0x4000000,(%r12)\n   18006fee7:\t04 \n   18006fee8:\te8 93 f8 01 00       \tcall   0x18008f780\n   18006feed:\t8b f8                \tmov    %eax,%edi"
+        },
+        {
+          "path": "_staging/total-read/model-audit/XBeach/closure/hard-resolutions/runtime-comm-dup.disassembly.txt",
+          "sha256": "7cac35fc233339f70e8cfd9ac798473e05fa22ead8aff58ba6e79bc4848f589b",
+          "line_start": 334,
+          "line_end": 338,
+          "line_numbering": "physical LF-delimited; CR retained in quote",
+          "quote_exact_utf8": "   1800700b8:\t8b c7                \tmov    %edi,%eax\n   1800700ba:\t48 8b 7c 24 70       \tmov    0x70(%rsp),%rdi\n   1800700bf:\t48 81 c4 80 00 00 00 \tadd    $0x80,%rsp\n   1800700c6:\t5b                   \tpop    %rbx\n   1800700c7:\tc3                   \tret"
+        }
+      ],
+      "binary_validation": {
+        "runtime_provenance": {
+          "path": "_staging/total-read/model-audit/XBeach/closure/hard-resolutions/runtime-provenance.json",
+          "sha256": "24ff7cdc6ae8b96c5c67dce727b9eac2590876fbea58470c54b7ef4c1e96a6f4"
+        },
+        "extracted_binary": {
+          "location": "scratch only; regenerate with extract-runtime.py; excluded from git",
+          "sha256": "df1cb786d8054c5f730f1f1ea1e97b3099d76f6935302ae6d4f2232efbace87a"
+        },
+        "export_map": {
+          "path": "_staging/total-read/model-audit/XBeach/closure/hard-resolutions/runtime-export-map.txt",
+          "sha256": "a71c2fac51dabe65346227cd258a961e74bd651c7fd2425eaf0556de51548ff0"
+        },
+        "disassembly": {
+          "path": "_staging/total-read/model-audit/XBeach/closure/hard-resolutions/runtime-comm-dup.disassembly.txt",
+          "sha256": "7cac35fc233339f70e8cfd9ac798473e05fa22ead8aff58ba6e79bc4848f589b"
+        },
+        "claim_refuted": "returned-error use of indeterminate ncomm with the supplied runtime",
+        "all_return_paths_checked": "single RET at VA 0x1800700c7; success output store at VA 0x18006fe5a or error output store at VA 0x18006fee0 precedes shared epilogue"
+      }
+    },
+    {
+      "id": "XB-HARD-05",
+      "closure_status": "CLOSED_WITH_SCOPED_DISPOSITION",
+      "deferred_input_id": "XBeach-V01:trunk/lib/x64/mpich/include/mpicxx.h:8",
+      "deferred_input_path": "_staging/total-read/model-audit/XBeach/closure/deferred-inputs.json",
+      "deferred_input_sha256": "4d26742329d7e0eca01e1eec00738e7bcc6bb729cf83edb63548ad83ce95663c",
+      "original_crosswalk_path": "_staging/total-read/model-audit/XBeach/cw/crosswalk/XBeach-V01/trunk__lib__x64__mpich__include__mpicxx.h.crosswalk.json",
+      "original_crosswalk_sha256": "b43d49e46fd591d0e04142e34e8903dfeab1e7e7d793164b4c7b209bba1b9760",
+      "disposition_index_zero_based": 8,
+      "base_ids": [
+        "A0"
+      ],
+      "audit_ids": [
+        "B0"
+      ],
+      "original_disposition": {
+        "disposition": "equivalent",
+        "base_ids": [
+          "A0"
+        ],
+        "audit_ids": [
+          "B0"
+        ],
+        "base_member_text": [
+          "[L409,L1471,L1904] (HIGH/attribute-copy) NULL_COPY_FN sets flag=true without defining attr_out, reporting a successful attribute copy with an indeterminate output pointer."
+        ],
+        "audit_member_text": [
+          "[L409,L1471,L1904] (HIGH/attribute-callback) NULL_COPY_FN sets flag=true without initializing attr_out, allowing duplication to install an indeterminate attribute pointer instead of suppressing the copy."
+        ],
+        "representative": "audit",
+        "rationale": "blinded SAME",
+        "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+        "decided_at": "2026-08-27",
+        "adversarial": {
+          "verdict": "REFUTED_UNVERIFIED",
+          "rationale": "The supplied cxx.lib implementation of each Comm/Datatype/Win Create_keyval compares the copy-function pointer with its NULL_COPY_FN and conditionally replaces it with zero before calling the C registration routine; objdump relocations and the compare/cmove sequence at function offsets 0x4-0x18 verify all three. Thus ordinary registration never executes these helper bodies during duplication, defeating the claimed indeterminate-attribute installation path; the quoted upstream implementation expresses the same concrete neutralizer.",
+          "neutralizer": {
+            "where": "https://fossies.org/linux/mpich2/src/binding/cxx/initcxx.cxx:L502-L504",
+            "quote": "    if (cf == MPI::Comm::NULL_COPY_FN) cf = 0;\n    if (df == MPI::Comm::NULL_DELETE_FN) df = 0;\n    MPIX_CALLWORLD( MPI_Comm_create_keyval( (MPI_Comm_copy_attr_function *)cf,"
+          },
+          "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+          "verified_at": "2026-09-07"
+        }
+      },
+      "source_path": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/include/mpicxx.h",
+      "source_sha256": "8b17786533310be2ca0e2d58f64bb2731ecdc18e3a3a31b5e586a9952ee3bc03",
+      "supersedes": "Only this row interpretation; original crosswalk, source and receipts remain immutable.",
+      "final_disposition": "NARROWED",
+      "conflict_resolution": "ORDINARY_REGISTRATION_FAILURE_REFUTED_DIRECT_HELPER_DEFECT_RETAINED",
+      "base_truth": "PARTLY TRUE: every helper sets flag=1 and leaves attr_out untouched; ordinary Create_keyval registration does not invoke that body.",
+      "audit_truth": "PARTLY TRUE: body observation is correct; the stated ordinary duplication installation path is defeated by callback pointer-identity guards in supplied cxx.lib.",
+      "severity": "LOW/direct helper or forwarding callback only",
+      "reasoning": "Each of Comm/Datatype/Win Create_keyval has the matching NULL_COPY_FN relocation at offset 0x0a, compares it with RCX at 0x0e, zeroes R9D at 0x04 and conditionally moves R9 to RCX at 0x18 before calling its C create_keyval at offset 0x2b. Thus the exact helper pointer is converted to the C null callback, matching the zero-valued macros in mpi.h. This directly validates the neutralizer for the supplied x64 archive. It does not correct the inline helper body: direct calls, or registration of a distinct function which forwards to that body, bypass the identity check. Retain only this explicit scope; no XBeach call site or observed model failure is claimed. No external quote is needed.",
+      "canonical_ready_ko": "x64 `mpicxx.h`의 `NULL_COPY_FN` 본문은 `attr_out`을 대입하지 않고 `flag=1`로 만든다. 그러나 함께 제공된 `cxx.lib`의 Comm/Datatype/Win `Create_keyval`은 이 함수 포인터를 C null callback(0)으로 치환하므로 일반 등록 뒤 복제에서 미정의 포인터가 설치된다는 주장은 기각한다. 본문 직접 호출이나 별도 전달 callback은 이 치환을 거치지 않으므로 낮은 우선순위의 결함으로 남긴다. (`models/XBeach/raw/source_code/trunk/lib/x64/mpich/include/mpicxx.h:409,1471,1904`; `models/XBeach/raw/source_code/trunk/lib/x64/mpich/include/mpi.h:265-271`; `models/XBeach/raw/source_code/trunk/lib/x64/mpich/lib/cxx.lib`, 각 Create_keyval 함수 +0x04–+0x2c의 relocation 포함 역어셈블리.)",
+      "evidence": [
+        {
+          "path": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/include/mpicxx.h",
+          "sha256": "8b17786533310be2ca0e2d58f64bb2731ecdc18e3a3a31b5e586a9952ee3bc03",
+          "line_start": 409,
+          "line_end": 409,
+          "line_numbering": "physical LF-delimited; CR retained in quote",
+          "quote_exact_utf8": "    static int NULL_COPY_FN( const Datatype &oldtype, int keyval, void *ex, void *attr_in, void *attr_out, bool &flag ) { oldtype; keyval; ex; attr_in; attr_out; flag = 1; return 0; }"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/include/mpicxx.h",
+          "sha256": "8b17786533310be2ca0e2d58f64bb2731ecdc18e3a3a31b5e586a9952ee3bc03",
+          "line_start": 1471,
+          "line_end": 1471,
+          "line_numbering": "physical LF-delimited; CR retained in quote",
+          "quote_exact_utf8": "    static int NULL_COPY_FN( const Comm &oldcomm, int keyval, void *ex, void *attr_in, void *attr_out, bool &flag ) { oldcomm; keyval; ex; attr_in; attr_out; flag = 1; return 0; }"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/include/mpicxx.h",
+          "sha256": "8b17786533310be2ca0e2d58f64bb2731ecdc18e3a3a31b5e586a9952ee3bc03",
+          "line_start": 1904,
+          "line_end": 1904,
+          "line_numbering": "physical LF-delimited; CR retained in quote",
+          "quote_exact_utf8": "    static int NULL_COPY_FN( const Win &oldwin, int keyval, void *ex, void *attr_in, void *attr_out, bool &flag ) { oldwin; keyval; ex; attr_in; attr_out; flag = 1; return 0; }"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/include/mpi.h",
+          "sha256": "715c67d4ab1c5c2557729548c2d6be82437aaa92df606c64ae9fb0596b45899a",
+          "line_start": 265,
+          "line_end": 271,
+          "line_numbering": "physical LF-delimited; CR retained in quote",
+          "quote_exact_utf8": "#define MPI_COMM_NULL_COPY_FN ((MPI_Comm_copy_attr_function*)0)\r\n#define MPI_COMM_NULL_DELETE_FN ((MPI_Comm_delete_attr_function*)0)\r\n#define MPI_COMM_DUP_FN  ((MPI_Comm_copy_attr_function *)MPI_DUP_FN)\r\n#define MPI_WIN_NULL_COPY_FN ((MPI_Win_copy_attr_function*)0)\r\n#define MPI_WIN_NULL_DELETE_FN ((MPI_Win_delete_attr_function*)0)\r\n#define MPI_WIN_DUP_FN   ((MPI_Win_copy_attr_function*)MPI_DUP_FN)\r\n#define MPI_TYPE_NULL_COPY_FN ((MPI_Type_copy_attr_function*)0)\r"
+        },
+        {
+          "path": "_staging/total-read/model-audit/XBeach/closure/hard-resolutions/cxx-create-keyval.disassembly.txt",
+          "sha256": "1001eba1e55671926bed4e8e8fc3eeb3ff9b5473911b7c3a46e6f93a75e41a5b",
+          "line_start": 3,
+          "line_end": 23,
+          "line_numbering": "physical LF-delimited; CR retained in quote",
+          "quote_exact_utf8": "0000000000000000 <?Create_keyval@Comm@MPI@@SAHP6AHAEBV12@HPEAX11AEA_N@ZP6AHAEAV12@H11@Z1@Z>:\n   0:\t48 83 ec 28          \tsub    $0x28,%rsp\n   4:\t45 33 c9             \txor    %r9d,%r9d\n   7:\t48 8d 05 00 00 00 00 \tlea    0x0(%rip),%rax        # e <?Create_keyval@Comm@MPI@@SAHP6AHAEBV12@HPEAX11AEA_N@ZP6AHAEAV12@H11@Z1@Z+0xe>\n\t\t\ta: IMAGE_REL_AMD64_REL32\t?NULL_COPY_FN@Comm@MPI@@SAHAEBV12@HPEAX11AEA_N@Z\n   e:\t48 3b c8             \tcmp    %rax,%rcx\n  11:\t48 8d 05 00 00 00 00 \tlea    0x0(%rip),%rax        # 18 <?Create_keyval@Comm@MPI@@SAHP6AHAEBV12@HPEAX11AEA_N@ZP6AHAEAV12@H11@Z1@Z+0x18>\n\t\t\t14: IMAGE_REL_AMD64_REL32\t?NULL_DELETE_FN@Comm@MPI@@SAHAEAV12@HPEAX1@Z\n  18:\t49 0f 44 c9          \tcmove  %r9,%rcx\n  1c:\t48 3b d0             \tcmp    %rax,%rdx\n  1f:\t49 0f 44 d1          \tcmove  %r9,%rdx\n  23:\t4d 8b c8             \tmov    %r8,%r9\n  26:\t4c 8d 44 24 30       \tlea    0x30(%rsp),%r8\n  2b:\te8 00 00 00 00       \tcall   30 <?Create_keyval@Comm@MPI@@SAHP6AHAEBV12@HPEAX11AEA_N@ZP6AHAEAV12@H11@Z1@Z+0x30>\n\t\t\t2c: IMAGE_REL_AMD64_REL32\tMPI_Comm_create_keyval\n  30:\t85 c0                \ttest   %eax,%eax\n  32:\t74 07                \tje     3b <?Create_keyval@Comm@MPI@@SAHP6AHAEBV12@HPEAX11AEA_N@ZP6AHAEAV12@H11@Z1@Z+0x3b>\n  34:\t8b c8                \tmov    %eax,%ecx\n  36:\te8 00 00 00 00       \tcall   3b <?Create_keyval@Comm@MPI@@SAHP6AHAEBV12@HPEAX11AEA_N@ZP6AHAEAV12@H11@Z1@Z+0x3b>\n\t\t\t37: IMAGE_REL_AMD64_REL32\t?MPIR_Call_world_errhand@MPI@@YAXH@Z\n  3b:\t8b 4c 24 30          \tmov    0x30(%rsp),%ecx"
+        },
+        {
+          "path": "_staging/total-read/model-audit/XBeach/closure/hard-resolutions/cxx-create-keyval.disassembly.txt",
+          "sha256": "1001eba1e55671926bed4e8e8fc3eeb3ff9b5473911b7c3a46e6f93a75e41a5b",
+          "line_start": 38,
+          "line_end": 58,
+          "line_numbering": "physical LF-delimited; CR retained in quote",
+          "quote_exact_utf8": "0000000000000000 <?Create_keyval@Datatype@MPI@@SAHP6AHAEBV12@HPEAX11AEA_N@ZP6AHAEAV12@H11@Z1@Z>:\n   0:\t48 83 ec 28          \tsub    $0x28,%rsp\n   4:\t45 33 c9             \txor    %r9d,%r9d\n   7:\t48 8d 05 00 00 00 00 \tlea    0x0(%rip),%rax        # e <?Create_keyval@Datatype@MPI@@SAHP6AHAEBV12@HPEAX11AEA_N@ZP6AHAEAV12@H11@Z1@Z+0xe>\n\t\t\ta: IMAGE_REL_AMD64_REL32\t?NULL_COPY_FN@Datatype@MPI@@SAHAEBV12@HPEAX11AEA_N@Z\n   e:\t48 3b c8             \tcmp    %rax,%rcx\n  11:\t48 8d 05 00 00 00 00 \tlea    0x0(%rip),%rax        # 18 <?Create_keyval@Datatype@MPI@@SAHP6AHAEBV12@HPEAX11AEA_N@ZP6AHAEAV12@H11@Z1@Z+0x18>\n\t\t\t14: IMAGE_REL_AMD64_REL32\t?NULL_DELETE_FN@Datatype@MPI@@SAHAEAV12@HPEAX1@Z\n  18:\t49 0f 44 c9          \tcmove  %r9,%rcx\n  1c:\t48 3b d0             \tcmp    %rax,%rdx\n  1f:\t49 0f 44 d1          \tcmove  %r9,%rdx\n  23:\t4d 8b c8             \tmov    %r8,%r9\n  26:\t4c 8d 44 24 30       \tlea    0x30(%rsp),%r8\n  2b:\te8 00 00 00 00       \tcall   30 <?Create_keyval@Datatype@MPI@@SAHP6AHAEBV12@HPEAX11AEA_N@ZP6AHAEAV12@H11@Z1@Z+0x30>\n\t\t\t2c: IMAGE_REL_AMD64_REL32\tMPI_Type_create_keyval\n  30:\t85 c0                \ttest   %eax,%eax\n  32:\t74 07                \tje     3b <?Create_keyval@Datatype@MPI@@SAHP6AHAEBV12@HPEAX11AEA_N@ZP6AHAEAV12@H11@Z1@Z+0x3b>\n  34:\t8b c8                \tmov    %eax,%ecx\n  36:\te8 00 00 00 00       \tcall   3b <?Create_keyval@Datatype@MPI@@SAHP6AHAEBV12@HPEAX11AEA_N@ZP6AHAEAV12@H11@Z1@Z+0x3b>\n\t\t\t37: IMAGE_REL_AMD64_REL32\t?MPIR_Call_world_errhand@MPI@@YAXH@Z\n  3b:\t8b 4c 24 30          \tmov    0x30(%rsp),%ecx"
+        },
+        {
+          "path": "_staging/total-read/model-audit/XBeach/closure/hard-resolutions/cxx-create-keyval.disassembly.txt",
+          "sha256": "1001eba1e55671926bed4e8e8fc3eeb3ff9b5473911b7c3a46e6f93a75e41a5b",
+          "line_start": 73,
+          "line_end": 93,
+          "line_numbering": "physical LF-delimited; CR retained in quote",
+          "quote_exact_utf8": "0000000000000000 <?Create_keyval@Win@MPI@@SAHP6AHAEBV12@HPEAX11AEA_N@ZP6AHAEAV12@H11@Z1@Z>:\n   0:\t48 83 ec 28          \tsub    $0x28,%rsp\n   4:\t45 33 c9             \txor    %r9d,%r9d\n   7:\t48 8d 05 00 00 00 00 \tlea    0x0(%rip),%rax        # e <?Create_keyval@Win@MPI@@SAHP6AHAEBV12@HPEAX11AEA_N@ZP6AHAEAV12@H11@Z1@Z+0xe>\n\t\t\ta: IMAGE_REL_AMD64_REL32\t?NULL_COPY_FN@Win@MPI@@SAHAEBV12@HPEAX11AEA_N@Z\n   e:\t48 3b c8             \tcmp    %rax,%rcx\n  11:\t48 8d 05 00 00 00 00 \tlea    0x0(%rip),%rax        # 18 <?Create_keyval@Win@MPI@@SAHP6AHAEBV12@HPEAX11AEA_N@ZP6AHAEAV12@H11@Z1@Z+0x18>\n\t\t\t14: IMAGE_REL_AMD64_REL32\t?NULL_DELETE_FN@Win@MPI@@SAHAEAV12@HPEAX1@Z\n  18:\t49 0f 44 c9          \tcmove  %r9,%rcx\n  1c:\t48 3b d0             \tcmp    %rax,%rdx\n  1f:\t49 0f 44 d1          \tcmove  %r9,%rdx\n  23:\t4d 8b c8             \tmov    %r8,%r9\n  26:\t4c 8d 44 24 30       \tlea    0x30(%rsp),%r8\n  2b:\te8 00 00 00 00       \tcall   30 <?Create_keyval@Win@MPI@@SAHP6AHAEBV12@HPEAX11AEA_N@ZP6AHAEAV12@H11@Z1@Z+0x30>\n\t\t\t2c: IMAGE_REL_AMD64_REL32\tMPI_Win_create_keyval\n  30:\t85 c0                \ttest   %eax,%eax\n  32:\t74 07                \tje     3b <?Create_keyval@Win@MPI@@SAHP6AHAEBV12@HPEAX11AEA_N@ZP6AHAEAV12@H11@Z1@Z+0x3b>\n  34:\t8b c8                \tmov    %eax,%ecx\n  36:\te8 00 00 00 00       \tcall   3b <?Create_keyval@Win@MPI@@SAHP6AHAEBV12@HPEAX11AEA_N@ZP6AHAEAV12@H11@Z1@Z+0x3b>\n\t\t\t37: IMAGE_REL_AMD64_REL32\t?MPIR_Call_world_errhand@MPI@@YAXH@Z\n  3b:\t8b 4c 24 30          \tmov    0x30(%rsp),%ecx"
+        }
+      ],
+      "binary_validation": {
+        "source_path": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/lib/cxx.lib",
+        "source_sha256": "6fd6a3e6a61347ec912ee96b0b0031d2c672be916277dc693d6efdac5c6127dc",
+        "disassembly": {
+          "path": "_staging/total-read/model-audit/XBeach/closure/hard-resolutions/cxx-create-keyval.disassembly.txt",
+          "sha256": "1001eba1e55671926bed4e8e8fc3eeb3ff9b5473911b7c3a46e6f93a75e41a5b"
+        },
+        "claim_refuted": "indeterminate attribute installation following ordinary exact-pointer Create_keyval registration with supplied cxx.lib"
+      }
+    }
+  ]
+}

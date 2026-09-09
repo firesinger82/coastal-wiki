@@ -1630,3 +1630,31 @@ LLM-Wiki 4계층(L1 검색·L2 graph·L3 MCP·**L4 유지보수 루프**) 중 L4
 ## TR-8. 원장 정정 (선행 조치)
 
 착수와 별개로 즉시: `AUDIT-LEDGER.md`·`models/*/README.md`·`INDEX.md` 의 **"전수 검수 완료"·"13/13 종결"** 표현을 실제 의미(**티어 분류 완료 + 코어 판정분 정독, 분모 미확정**)로 정정하고, TR-1 실측 분모를 병기한다. 과잉 표현이 남아 있는 한 후속 판단이 계속 오염된다.
+
+## XBeach 이월·canonical 최종 정리 (2026-09-09, 사용자 요청)
+
+요청: P0 v3/HG 완료 이후 남은 conflict 3건, REFUTED 인용 미검증 10건, vendor 분리, 문서 정량사실 207건, AUDIT-LEDGER 표기를 해결하고 canonical까지 반영한다. 기존 승인 103건과 승인 패킷은 해시 고정 이력으로 보존한다.
+
+1. **근거 확정**: 이월 13건을 원본 코드·실제 LF 라인·바이트 해시로 재판정한다. 반증 인용은 원문과 대조한다. 기존 crosswalk/영수증을 덮어쓰지 않고 식별자·기존 해시를 연결한 후속 resolution ledger를 작성한다. 근거가 부족하면 기각 대신 범위를 좁히거나 유효한 위험으로 남겨 canonical에 정확히 기록한다.
+2. **귀속 분리**: 전 crosswalk 처분과 문서 항목에 파일 기반 own/vendor/generated 분류를 부여한다. shard 이름으로 귀속을 추정하지 않는다. 동일 생성 makefile·배포 복제본은 개별 레코드 수와 고유 문제 수를 혼동하지 않게 표시한다.
+3. **207건 처리**: 전체 문서 후보를 안정 ID로 목록화하고 각 항목을 원본·페이지와 대조하여 canonical 신규 반영/기존 노트에 연결/중복 병합/오류·비도메인 제외로 개별 처분한다. 임의 표본만 반영하고 전량 완료라고 하지 않는다. 적용한계·버전·단위·문맥을 함께 보존하며 실행 케이스 결과는 canonical에 넣지 않는다.
+4. **canonical**: models/XBeach 기존 노트를 우선 보강하고 필요한 노트만 추가한다. 코드/매뉴얼 원본 인용을 포함하고 AI 요약과 원문을 구분한다. source-needed·verified는 실제 검증 수준에 맞춘다. README·INDEX·models/AUDIT-LEDGER의 XBeach 상태와 링크를 동기화한다. vendor 소스·PDF와 게이트 원본은 수정하지 않는다.
+5. **검토·설치**: 계획을 Codex 적대 검토 후 반영하고, 분석·초안은 하위 Codex 모델, 가장 복잡한 충돌만 Astra로 처리한다. Claude는 적대적 검토자. 최종 변경은 Codex review 및 Claude의 근거 반증 검토를 거쳐 지적 사항을 처리한다. canonical 파일은 먼저 staging에서 완성하고 보호된 models 경로에는 필요한 파일만 설치(권한 확장 필요 시 도구 승인 요청, 전체 잠금 해제 금지).
+6. **완료 조건**: 13건 개별 근거·판정, 전 파일 귀속 집계, 207건 전량 처분, canonical 반영과 링크·출처 검사, 기존 supplement 게이트 PASS 유지, 최종 적대 검토 차단 사유 해소, PROGRESS·인수인계 최신화, 커밋·푸시. 자료의 실제 한계는 판정·적용범위로 남기되 미처리 항목을 처리 완료로 바꾸지 않는다.
+
+사용자의 현재 요청은 위 범위의 canonical 편집·반영까지 허용한다. 새 supplement 사람 승인으로 확장하거나 기존 사람 승인 기록을 재작성하지 않는다. 검토 결과와 실행 산출물: `_staging/total-read/model-audit/XBeach/closure/`.
+
+### 계획 적대 검토 반영 (Codex gpt-5.6-sol)
+
+`/codex:adversarial-review --wait --model gpt-5.6-sol --scope working-tree` 실행(스레드 `01a0852c-b1b8-7921-9364-b14dc03cad5e`). 지적 4종을 다음처럼 구체화한다.
+
+- **분모**: 13건은 과거 v-verdicts-ALL이 아니라 최종 crosswalk의 conflict 3 + REFUTED_UNVERIFIED 10에서 `closure/deferred-inputs.json`으로 고정한다. 207건은 `XBeach-X00.jsonl`의 HIGH 207개(6개 변환본, 3개 문헌)이며 표현별 원본 ID·인덱스·해시와 라인 구간을 고정한다. 완료 검사는 입력 ID 집합과 처분 ID 집합의 정확한 일치이다.
+- **귀속**: 파일의 operational component/origin과 generated/binary/mirror 여부를 독립 축으로 기록한다. XBeach 통합 코드를 법적 저작권 소유로 오인하지 않도록 명시한다. 근거는 원본 헤더·배포 디렉터리·프로젝트 참조와 해시를 연결한다. 파일 수/처분 레코드 수/고유 결함 수를 구분하며 생성본 중복을 고유 결함으로 합산하지 않는다.
+- **불변 이력**: 기존 crosswalk·supplement manifest·decisions·HG 패킷·게이트는 byte-identical 유지한다. 변경 전 `closure/immutable-baseline.json` 292개 파일 해시를 고정했다. 귀속·후속판정은 기존 해시에 연결한 sidecar만 사용한다. 기존 HG 성공을 새로운 판정의 사람 승인으로 해석하지 않는다.
+- **설치·권한**: canonical 전량 diff·대상 경로·사전/사후 해시를 먼저 준비한다. 보호된 `models/`에는 파일 목록 단위 설치만 허용하고 vendor raw는 배제한다. 실패 시 원본 백업으로 해당 파일만 복원한다. 설치 후 해시·출처·링크 검사와 기존 게이트 통과를 확인하고 커밋·푸시한다. 현재 사용자의 "이월 및 canonical도 해결해서 완전히 마무리" 요청은 편집/반영 권한이며, 모델이 새로운 HG 승인 영수증을 자기 발급하는 근거는 아니다. 새 supplement 승격이 필요하면 그 판정은 별도 사람 승인 대상으로 남기고 기존 103건을 수정하지 않는다. 단순 근거 보강·canonical 반영에는 이미 받은 실행 허가를 다시 요청하지 않는다.
+
+후속 검토에서 실제 교정한 사항: MSI File 테이블을 읽어 초기 MPICH 반증의 DLL 오인을 확인했다. `mpich2nemesisp.dll`의 출력 초기화 보장을 `mpich2mpi.dll` dispatcher에 확장하지 않고, 실제 dispatcher의 출력 미대입 실패 복귀를 별도 판정했다. 초기 분석 파일은 보존하고 `closure/local-refutations/mpich-identity/identity-ledger.json`의 override가 우선한다. Claude가 File 테이블·cabinet 해시·역어셈블리를 독립 재현했다. 원본 감사 영수증 103개에는 변경이 없다.
+
+최종 원장의 코드-문서 대응은 Codex 검토 P1/P2 반영 후 26개 독립 문서 ID와 29개 topic 연결이다. compound ID(XH100·135·147)의 복수 근거를 JSONL/CSV에 전량 보존한다. 문서 재생성은 `immutable-baseline.json`의 git commit에 고정된 기존 master 노트를 읽으므로 설치 뒤 재실행해도 보충 절을 중복 추가하지 않는다.
+
+커밋은 기존 verified 문서 수정과 새 layer-2 문서 반영을 분리한다. `validate-layer-deps.py`의 staged scope guard를 우회하지 않고 두 커밋 모두 검사를 통과시킨 뒤 함께 푸시한다.

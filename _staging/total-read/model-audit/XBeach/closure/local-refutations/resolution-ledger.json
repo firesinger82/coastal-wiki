@@ -1,0 +1,457 @@
+{
+  "schema": "xbeach-local-refutation-resolution/v1",
+  "created_at": "2026-09-09",
+  "input": {
+    "path": "_staging/total-read/model-audit/XBeach/closure/deferred-inputs.json",
+    "sha256": "4d26742329d7e0eca01e1eec00738e7bcc6bb729cf83edb63548ad83ce95663c",
+    "selection": "kind=refuted-unverified excluding both XBeach-V01 mpicxx.h binary cases",
+    "expected_count": 8
+  },
+  "line_quote_policy": "Source files with CRLF are split into logical lines and quoted with LF separators; source_sha256 values hash the immutable original bytes.",
+  "summary": {
+    "resolved_count": 8,
+    "refutation_confirmed": 5,
+    "narrowed_warning_retained": 2,
+    "split_partial_refutation_warning_retained": 1
+  },
+  "items": [
+    {
+      "id": "XBeach-000:trunk/src/xbeachlibrary/spaceparamsdef.F90:0",
+      "crosswalk": {
+        "path": "_staging/total-read/model-audit/XBeach/cw/crosswalk/XBeach-000/trunk__src__xbeachlibrary__spaceparamsdef.F90.crosswalk.json",
+        "sha256": "efa99ed5ad6268e58bbf245be5fa7ce3a60ba2223efbb243ea854a64daff6e57",
+        "disposition_index": 0,
+        "base_ids": ["A1"],
+        "audit_ids": ["B1"]
+      },
+      "source": {
+        "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/spaceparamsdef.F90",
+        "sha256": "55e083d7b10e36da434e9c5e752b0603cf20c7aa6a639fab267a6af9031803b0"
+      },
+      "original_claims": {
+        "base": "[L57-L60] (MED/global-state-initialization) The public module-wide stencil-bound integers have no initialization, so any caller that observes them before the separate setup routine assigns every bound receives undefined state.",
+        "audit": "[L57-L60] (MED/uninitialized global ranges) All exported computational range bounds lack initial values, so any use before ranges_init receives undefined indices."
+      },
+      "prior_unverified_refutation": {
+        "rationale": "The lifecycle calls ranges_init after decomposition and before nonhydrostatic setup, means/output initialization, and all computation steps. ranges_init assigns every declared bound on all relevant branches, and no earlier active stencil use was found; merely being public and undefined before required setup is not a demonstrated defect.",
+        "neutralizer_where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/libxbeach.F90:L207-L218",
+        "neutralizer_quote": "      call space_distribute_space (sglobal,s,par)\n#endif\n\n      call ranges_init(s)\n\n      ! nonh_init does not always need to be called\n      if (par%wavemodel==WAVEMODEL_NONH) call nonh_init(s,par)\n\n      ! initialize output\n      call means_init             (sglobal,s,par     )\n\n      call output_init            (sglobal,s,par,tpar)",
+        "assessment": "The quote was exact but insufficient alone because it did not show that ranges_init assigns all sixteen bounds. The corrected evidence adds the complete initializer."
+      },
+      "evidence": [
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/spaceparamsdef.F90",
+          "sha256": "55e083d7b10e36da434e9c5e752b0603cf20c7aa6a639fab267a6af9031803b0",
+          "lines": "57-60",
+          "quote": "   integer, public :: imin_ee,imax_ee,jmin_ee,jmax_ee\n   integer, public :: imin_uu,imax_uu,jmin_uu,jmax_uu\n   integer, public :: imin_vv,imax_vv,jmin_vv,jmax_vv\n   integer, public :: imin_zs,imax_zs,jmin_zs,jmax_zs"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/spaceparams.F90",
+          "sha256": "e13f4e604ba812b76b9b67101356e4419a38f2787b4f6655cc23c88b3ac5e2b0",
+          "lines": "1453-1496",
+          "quote": "   subroutine ranges_init(s)\n      use xmpi_module\n      implicit none\n      type(spacepars)    :: s\n\n      imin_ee = 2\n      imax_ee = s%nx\n      if (s%ny>0) then\n         jmin_ee = 2\n         jmax_ee = s%ny\n      else\n         jmin_ee = 1\n         jmax_ee = 1\n      endif\n\n      imin_uu = 2\n      imax_uu = s%nx-1\n      if (s%ny>0) then\n         jmin_uu = 2\n         jmax_uu = s%ny\n      else\n         jmin_uu = 1\n         jmax_uu = 1\n      endif\n\n      imin_vv = 2\n      imax_vv = s%nx\n      if (s%ny>0) then\n         jmin_vv = 2\n         jmax_vv = s%ny-1\n      else\n         jmin_vv = 1\n         jmax_vv = 1\n      endif\n\n      imin_zs = 2\n      imax_zs = s%nx\n      if (s%ny>0) then\n         jmin_zs = 2\n         jmax_zs = s%ny\n      else\n         jmin_zs = 1\n         jmax_zs = 1\n      endif"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/libxbeach.F90",
+          "sha256": "1656cceb95c9d87a51b70225a725fc6e544ed56b424c97a9e2806c86f15b6696",
+          "lines": "207-218",
+          "quote": "      call space_distribute_space (sglobal,s,par)\n#endif\n\n      call ranges_init(s)\n\n      ! nonh_init does not always need to be called\n      if (par%wavemodel==WAVEMODEL_NONH) call nonh_init(s,par)\n\n      ! initialize output\n      call means_init             (sglobal,s,par     )\n\n      call output_init            (sglobal,s,par,tpar)"
+        }
+      ],
+      "call_path": "libxbeach_module:init -> optional space_distribute_space -> ranges_init -> nonh/means/output initialization -> executestep computations",
+      "final_disposition": "REFUTATION_CONFIRMED",
+      "reason": "The declarations are uninitialized, but the supported model lifecycle assigns every bound before the first initialization or computation consumer. The conditional statement about an out-of-lifecycle observer is true language semantics, not a demonstrated XBeach execution defect.",
+      "canonical_ready_ko": "계산 범위 전역 정수는 선언 시 초기값이 없지만, XBeach의 지원 초기화 경로는 공간 분할 직후 `ranges_init`에서 16개 범위를 모두 지정한 다음 비정수압·평균·출력 초기화와 시간 적분으로 진행한다 (`models/XBeach/raw/source_code/trunk/src/xbeachlibrary/spaceparamsdef.F90:57`, `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/spaceparams.F90:1453`, `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/libxbeach.F90:207`). 따라서 정상 lifecycle의 미초기화 사용 결함으로 보지 않으며, 초기화 전 직접 모듈 접근은 지원 계약 밖이다."
+    },
+    {
+      "id": "XBeach-002:trunk/src/xbeachlibrary/drifters.F90:0",
+      "crosswalk": {
+        "path": "_staging/total-read/model-audit/XBeach/cw/crosswalk/XBeach-002/trunk__src__xbeachlibrary__drifters.F90.crosswalk.json",
+        "sha256": "2aa88dc92872c120730b85105b6e7beb44709268084a7271593ae02490734d39",
+        "disposition_index": 0,
+        "base_ids": ["A1"],
+        "audit_ids": ["B1"]
+      },
+      "source": {
+        "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/drifters.F90",
+        "sha256": "42c0e8bae3a881126deaa48617848576cfcfad387a1eb9c5be185d899bda76c9"
+      },
+      "original_claims": {
+        "base": "[L53-L62] (MED/distributed-state-consistency) MPI_MIN is applied independently to idrift and jdrift, so if different overlapping ranks produce the minima the reduced coordinate pair need not come from any single rank's drifter update.",
+        "audit": "[L41-L62] (HIGH/MPI-ownership/reduction) Every rank whose local index test succeeds advances the drifter, while idrift and jdrift are reduced independently with MPI_MIN, so overlapping ownership or differing local updates can select coordinates from different ranks and create a position no rank computed."
+      },
+      "prior_unverified_refutation": {
+        "rationale": "Overlapping ranks use the same global drifter indices and distributed grid metrics, and flow synchronizes both velocity components before drifter is called. The predictor and second-order branches repeat those exchanges, and the final nonhydrostatic correction exchanges them internally, so overlapping updates are identical and independent minima cannot splice differing positions on this path.",
+        "neutralizer_where": "trunk/src/xbeachlibrary/flow_timestep.F90:L630-L650",
+        "neutralizer_quote": "#ifdef USEMPI\n      call xmpi_shift_ee(s%uu)\n      call xmpi_shift_ee(s%vv)\n#endif\n\n      if (par%wavemodel==WAVEMODEL_NONH) then\n         !Do explicit predictor step with pressure\n         call nonh_cor(s,par,0,uu_old,vv_old)\n\n#ifdef USEMPI\n         call xmpi_shift_ee(s%uu)\n         call xmpi_shift_ee(s%vv)\n#endif\n      end if\n\n      if (par%secorder==1) then\n         !Call second order correction to the advection\n         call flow_secondorder_advUV(s,par,uu_old,vv_old)\n#ifdef USEMPI\n         call xmpi_shift_ee(s%uu)\n         call xmpi_shift_ee(s%vv)",
+        "assessment": "The quote omitted the final nonhydrostatic exchange and the joint ownership test. Corrected evidence includes both, plus the flow-to-drifter call order."
+      },
+      "evidence": [
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/drifters.F90",
+          "sha256": "42c0e8bae3a881126deaa48617848576cfcfad387a1eb9c5be185d899bda76c9",
+          "lines": "40-62",
+          "quote": "            ! update drifter if still inside domain\n            if (    iu >= 1 .and. iu <= s%nx .and.  &\n            ju >= 1 .and. ju <= s%ny .and.  &\n            iv >= 1 .and. iv <= s%nx .and.  &\n            jv >= 1 .and. jv <= s%ny            ) then\n\n               ! determine movement of drifter relative to grid size\n               di      = s%uu(iu,ju)/s%dsu(iu,ju)*par%dt\n               dj      = s%vv(iv,jv)/s%dnv(iv,jv)*par%dt\n\n               s%idrift(i) = s%idrift(i) + di\n               s%jdrift(i) = s%jdrift(i) + dj\n\n#ifdef USEMPI\n            else\n               s%idrift(i)  = huge(0.0d0)-10000.d0\n               s%jdrift(i)  = huge(0.0d0)-10000.d0\n#endif\n            endif\n\n#ifdef USEMPI\n            call xmpi_allreduce(s%idrift(i),MPI_MIN)\n            call xmpi_allreduce(s%jdrift(i),MPI_MIN)"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/flow_timestep.F90",
+          "sha256": "50742b601cc8feccd513cf742ca772b6021f1d4f5ffe074c4e8ffc90907dd2b2",
+          "lines": "630-658",
+          "quote": "#ifdef USEMPI\n      call xmpi_shift_ee(s%uu)\n      call xmpi_shift_ee(s%vv)\n#endif\n\n      if (par%wavemodel==WAVEMODEL_NONH) then\n         !Do explicit predictor step with pressure\n         call nonh_cor(s,par,0,uu_old,vv_old)\n\n#ifdef USEMPI\n         call xmpi_shift_ee(s%uu)\n         call xmpi_shift_ee(s%vv)\n#endif\n      end if\n\n      if (par%secorder==1) then\n         !Call second order correction to the advection\n         call flow_secondorder_advUV(s,par,uu_old,vv_old)\n#ifdef USEMPI\n         call xmpi_shift_ee(s%uu)\n         call xmpi_shift_ee(s%vv)\n#endif\n      end if\n\n      if (par%wavemodel==WAVEMODEL_NONH) then\n         ! do non-hydrostatic pressure compensation to solve short waves\n         call nonh_cor(s,par,1,uu_old,vv_old)\n         ! note: MPI shift in subroutine nonh_cor\n      end if"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/libxbeach.F90",
+          "sha256": "1656cceb95c9d87a51b70225a725fc6e544ed56b424c97a9e2806c86f15b6696",
+          "lines": "301-307",
+          "quote": "            if (par%ships==1)                                       call shipwave       (s,par,sh)\n            if (par%swave==1)                                       call wave           (s,par)\n            if (par%vegetation==1)                                  call vegatt         (s,par)\n            if (par%gwflow==1)                                      call gwflow         (s,par)\n            if ((par%flow==1).or.(par%wavemodel==WAVEMODEL_NONH))   call flow           (s,par)\n            if (par%ndrifter>0)                                     call drifter        (s,par)\n            if (par%sedtrans==1)                                    call transus        (s,par)"
+        }
+      ],
+      "call_path": "libxbeach_module:executestep -> flow (velocity halo exchanges on every active branch) -> drifter; each rank either updates both coordinates under one joint bounds test or replaces both with the same sentinel",
+      "final_disposition": "REFUTATION_CONFIRMED",
+      "reason": "Independent reductions could splice coordinates only if qualifying ranks supplied different coordinate pairs. The active call path synchronizes uu and vv before drifter and uses the same distributed metrics for the same global locations; the joint bounds test prevents a rank from supplying only one coordinate. The source does not demonstrate differing overlapping updates.",
+      "canonical_ready_ko": "MPI drifter는 `flow` 직후 호출되며, 활성 유동 분기마다 `uu`와 `vv` halo를 교환한다 (`models/XBeach/raw/source_code/trunk/src/xbeachlibrary/flow_timestep.F90:630`, `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/libxbeach.F90:301`). 각 rank는 하나의 결합 경계검사로 두 좌표를 함께 갱신하거나 두 좌표를 모두 sentinel로 바꾼 뒤 각각 `MPI_MIN`을 적용한다 (`models/XBeach/raw/source_code/trunk/src/xbeachlibrary/drifters.F90:40`). 따라서 제공된 경로에서는 서로 다른 rank의 좌표 성분이 섞인다는 결함이 입증되지 않는다."
+    },
+    {
+      "id": "XBeach-002:trunk/src/xbeachlibrary/vegetation.F90:5",
+      "crosswalk": {
+        "path": "_staging/total-read/model-audit/XBeach/cw/crosswalk/XBeach-002/trunk__src__xbeachlibrary__vegetation.F90.crosswalk.json",
+        "sha256": "65380b541eef42a81b92aa2dd9f76647d3397344095f22a0883b3c91f5786536",
+        "disposition_index": 5,
+        "base_ids": ["A14"],
+        "audit_ids": ["B0"]
+      },
+      "source": {
+        "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vegetation.F90",
+        "sha256": "e58ebd47d62d4637baae7bee4e90570a859b1eb0467e486a599f877b380df2c2"
+      },
+      "original_claims": {
+        "base": "[L109-L113] (LOW/file-error handling) The species-list read records iostat but never checks it before the names are used as filenames.",
+        "audit": "[L103-L112] (MED/input error handling) Species-name reads record iostat in ier but never inspect it, so a short or malformed species list can leave names undefined and fail later in a misleading way."
+      },
+      "prior_unverified_refutation": {
+        "rationale": "nveg is obtained by counting the same file immediately before reading exactly that many records, and the reads use character format (a), so a static short or nonnumeric list cannot produce the claimed undefined names. Invalid referenced property filenames are checked subsequently; a file changing or failing between the count and read would be a separate I/O-failure condition.",
+        "neutralizer_where": "trunk/src/xbeachlibrary/vegetation.F90:L102-L113",
+        "neutralizer_quote": "         ! 1) Read veggiefile with veggie species\n         par%nveg = count_lines(par%veggiefile)\n\n         if (xmaster) then\n            allocate(veg(par%nveg))\n            fid=create_new_fid()\n            call check_file_exist(par%veggiefile)\n            open(fid,file=par%veggiefile)\n            do i=1,par%nveg\n               read(fid,'(a)',iostat=ier) veg(i)%name\n            enddo\n            close(fid)",
+        "assessment": "The static short/malformed scenario is neutralized, but the quote itself confirms that the second-pass iostat is ignored. It cannot refute the narrower I/O-error-handling warning."
+      },
+      "evidence": [
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/readkey.F90",
+          "sha256": "1a95b6c3f57b3144ac3b6d251d22b74e3183eb276ed7b8b75144d8d8aaa39031",
+          "lines": "1108-1132",
+          "quote": "   integer function count_lines(f)\n      !\n      ! returns number of lines in file f\n      ! to be called by all, xmaster will count\n      ! result is broadcasted to all\n      !\n      use xmpi_module\n      use filefunctions\n      character(len=*), intent(in) :: f\n      integer lines,fid,ierr\n      if(xmaster) then\n         fid = create_new_fid()\n         open(fid,file=f)\n         lines = 0\n         ierr = 0\n         do while(ierr == 0)\n            read(fid,*,iostat=ierr)\n            if (ierr == 0) lines = lines+1\n         enddo\n         close(fid)\n      endif\n#ifdef USEMPI\n      call xmpi_bcast(lines,readkey_inio)\n#endif\n      count_lines = lines"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vegetation.F90",
+          "sha256": "e58ebd47d62d4637baae7bee4e90570a859b1eb0467e486a599f877b380df2c2",
+          "lines": "102-113",
+          "quote": "         ! 1) Read veggiefile with veggie species\n         par%nveg = count_lines(par%veggiefile)\n\n         if (xmaster) then\n            allocate(veg(par%nveg))\n            fid=create_new_fid()\n            call check_file_exist(par%veggiefile)\n            open(fid,file=par%veggiefile)\n            do i=1,par%nveg\n               read(fid,'(a)',iostat=ier) veg(i)%name\n            enddo\n            close(fid)"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vegetation.F90",
+          "sha256": "e58ebd47d62d4637baae7bee4e90570a859b1eb0467e486a599f877b380df2c2",
+          "lines": "156-161",
+          "quote": "            ! 3)  Allocate and read vegetation properties for every species\n            do is=1,par%nveg  ! for each species\n               ! read vegetation file name\n               call check_file_exist(veg(is)%name)\n               ! Check if it is canopy flow model type\n               veg(is)%isCanopy = readkey_int(veg(is)%name,'isCanopy',0,0,1,bcast=.false.,strict=.true.)"
+        }
+      ],
+      "call_path": "veggie_init -> count_lines(first open/read pass) -> second open and fixed-count '(a)' reads -> check_file_exist for each resulting name",
+      "final_disposition": "NARROWED_WARNING_RETAINED",
+      "reason": "For an unchanged ordinary text file, the first pass determines the exact number of records and '(a)' accepts nonnumeric text, so the claimed static short/malformed-list undefined-name path does not stand. The second pass nevertheless records and ignores iostat; an intervening file change or read failure is reported only later, potentially against a stale or undefined name.",
+      "canonical_ready_ko": "정적인 species 목록은 `count_lines`로 레코드 수를 센 뒤 같은 수만큼 문자 형식 `(a)`로 다시 읽으므로, 단순히 목록이 짧거나 비수치 텍스트라는 이유로 이름이 미정의가 되는 경로는 성립하지 않는다 (`models/XBeach/raw/source_code/trunk/src/xbeachlibrary/readkey.F90:1108`, `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vegetation.F90:102`). 다만 두 번째 읽기의 `iostat`를 검사하지 않으므로 두 pass 사이 파일 변경이나 실제 읽기 오류는 즉시 보고되지 않는 낮은 수준의 I/O 진단 위험으로 남는다 (`models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vegetation.F90:110`)."
+    },
+    {
+      "id": "XBeach-002:trunk/src/xbeachlibrary/vsm_u_XB.f90:3",
+      "crosswalk": {
+        "path": "_staging/total-read/model-audit/XBeach/cw/crosswalk/XBeach-002/trunk__src__xbeachlibrary__vsm_u_XB.f90.crosswalk.json",
+        "sha256": "33d427cbe898c6fa514f92a79fd67bde329006ff489f8c8281f506d5d171be5c",
+        "disposition_index": 3,
+        "base_ids": ["A5"],
+        "audit_ids": ["B5"]
+      },
+      "source": {
+        "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vsm_u_XB.f90",
+        "sha256": "d9a27c6103c5008e511c29e0fc965f14aa8b71a7f297354788687d94b9fb1556"
+      },
+      "original_claims": {
+        "base": "[L59,L207-L212,L319-L323] (HIGH/layer-count bounds) The routine accepts arbitrary n but divides by n-1 and accesses sigz(2), requiring n>=2 without enforcing it.",
+        "audit": "[L209-L211,L319-L323] (MED/unchecked dimension contract) The implementation requires n>=2 (division by n-1 and references to sigz(2) and sigz(n-1)) but neither checks nor documents that precondition in the interface."
+      },
+      "prior_unverified_refutation": {
+        "rationale": "The sole caller invokes VSM only when nz>1 and passes that same nz as n. Consequently n=1 cannot reach the n-1 division through the model, even though the standalone routine does not repeat the precondition.",
+        "neutralizer_where": "trunk/src/xbeachlibrary/flow_timestep.F90:L957-L972",
+        "neutralizer_quote": "      if (par%nz>1 .and. par%form /= FORM_VANRIJN1993) then\n         do j=1,s%ny+1\n            do i=1,s%nx+1\n               if (s%wetz(i,j) .eq. 1) then\n                  ks=12.d0*s%hh(i,j)/10.d0**(sqrt(par%g/s%cfu(i,j))/18.d0)\n                  tauw=par%rhoa*par%Cd*sqrt(s%windsu(i,j)**2+s%windnv(i,j)**2)\n                  tauwx=s%windsu(i,j)*tauw\n                  tauwy=s%windnv(i,j)*tauw\n\n                  call vsm_u_XB (  s%ue(i,j)    ,s%ve(i,j)    ,s%hh(i,j) ,ks  ,                &\n                  par%rho      ,tauwx ,tauwy ,s%thetamean(i,j)-s%alfaz(i,j),  &\n                  s%urms(i,j)  ,s%sigm(i,j)  ,s%k(i,j)       ,s%Dr(i,j)  ,    &\n                  s%E(i,j)     ,s%R(i,j)     ,fcvisc,facdel  ,par%ws     ,    &\n                  s%fw(i,j)    ,facdf ,swglm ,par%nz       ,s%sigz       ,    &\n                  s%uz(i,j,:)  ,s%vz(i,j,:)  ,s%ustz(i,j,:)  ,s%nutz(i,j,:),  &\n                  s%ue_sed(i,j),s%ve_sed(i,j)  )",
+        "assessment": "This proves the in-tree call path safe, but not the original local-interface claim. The module explicitly exports vsm_u_XB and its interface documents n only as a layer count without n>=2 or a runtime guard."
+      },
+      "evidence": [
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vsm_u_XB.f90",
+          "sha256": "d9a27c6103c5008e511c29e0fc965f14aa8b71a7f297354788687d94b9fb1556",
+          "lines": "1-13",
+          "quote": "module vsm_u_xb_module\n   implicit none\n   save\n   private\n   public vsm_u_XB\ncontains\n   subroutine vsm_u_XB (  ue    ,ve    ,h     ,ks    ,               &\n   rho   ,tauwx ,tauwy ,theta ,               &\n   urms  ,omega ,k     ,diss  ,               &\n   e ,er ,fcvisc,facdel,ws    ,               &\n   fw    ,facdf ,swglm ,n     ,sigz  ,        &\n   uz    ,vz    ,ustz  ,nutz  ,               &\n   ue_sed,ve_sed )"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vsm_u_XB.f90",
+          "sha256": "d9a27c6103c5008e511c29e0fc965f14aa8b71a7f297354788687d94b9fb1556",
+          "lines": "38-39",
+          "quote": "      integer, intent(in)   :: n                 ! number of vertical layers\n      real*8,  intent(out)  :: sigz(n)           ! vertical sigma grid (0 at bottom, 1 at surface)"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vsm_u_XB.f90",
+          "sha256": "d9a27c6103c5008e511c29e0fc965f14aa8b71a7f297354788687d94b9fb1556",
+          "lines": "207-212",
+          "quote": "      !   generate vertical grid\n\n      hd=1.d0\n      do i=1,n\n         sigz(i)=0.01d0*(hd/0.01d0)**(float(i-1)/float(n-1))/hd\n      enddo"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vsm_u_XB.f90",
+          "sha256": "d9a27c6103c5008e511c29e0fc965f14aa8b71a7f297354788687d94b9fb1556",
+          "lines": "319-323",
+          "quote": "      dsig(1)=0.5d0*sigz(2)\n      do i=2,n-1\n         dsig(i)=(sigz(i+1)-sigz(i-1))*0.5d0\n      enddo\n      dsig(n)=0.5d0*(sigz(n)-sigz(n-1))"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/flow_timestep.F90",
+          "sha256": "50742b601cc8feccd513cf742ca772b6021f1d4f5ffe074c4e8ffc90907dd2b2",
+          "lines": "956-970",
+          "quote": "      ! XBeach uses same input for Van Rijn, 1993 (quasi 3d), but doesn't use this module\n      if (par%nz>1 .and. par%form /= FORM_VANRIJN1993) then\n         do j=1,s%ny+1\n            do i=1,s%nx+1\n               if (s%wetz(i,j) .eq. 1) then\n                  ks=12.d0*s%hh(i,j)/10.d0**(sqrt(par%g/s%cfu(i,j))/18.d0)\n                  tauw=par%rhoa*par%Cd*sqrt(s%windsu(i,j)**2+s%windnv(i,j)**2)\n                  tauwx=s%windsu(i,j)*tauw\n                  tauwy=s%windnv(i,j)*tauw\n\n                  call vsm_u_XB (  s%ue(i,j)    ,s%ve(i,j)    ,s%hh(i,j) ,ks  ,                &\n                  par%rho      ,tauwx ,tauwy ,s%thetamean(i,j)-s%alfaz(i,j),  &\n                  s%urms(i,j)  ,s%sigm(i,j)  ,s%k(i,j)       ,s%Dr(i,j)  ,    &\n                  s%E(i,j)     ,s%R(i,j)     ,fcvisc,facdel  ,par%ws     ,    &\n                  s%fw(i,j)    ,facdf ,swglm ,par%nz       ,s%sigz       ,    &"
+        }
+      ],
+      "call_path": "flow -> only in-tree call to public vsm_u_XB under par%nz>1, passing par%nz as n; direct public-module callers are not guarded",
+      "final_disposition": "NARROWED_WARNING_RETAINED",
+      "reason": "The XBeach solver call path excludes n<2, so this is not a default solver failure. The routine is nevertheless public and its local interface neither states nor checks n>=2, while its arithmetic requires it. The original interface-contract warning stands at reduced scope and severity.",
+      "canonical_ready_ko": "XBeach 내부 호출은 `par%nz>1`일 때만 `par%nz`를 `n`으로 전달하므로 기본 solver 경로에서 `n=1`은 도달하지 않는다 (`models/XBeach/raw/source_code/trunk/src/xbeachlibrary/flow_timestep.F90:956`). 그러나 `vsm_u_XB`는 공개 모듈 절차이고, 인터페이스에는 `n>=2` 조건이나 실행 검사가 없는데 구현은 `n-1`로 나누고 `sigz(2)`·`sigz(n-1)`을 참조한다 (`models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vsm_u_XB.f90:5`, `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vsm_u_XB.f90:38`, `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vsm_u_XB.f90:209`, `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vsm_u_XB.f90:319`). 외부 직접 호출 시 `n>=2`가 필요한 인터페이스 계약 경고로 유지한다."
+    },
+    {
+      "id": "XBeach-B01:trunk/src/xbeachlibrary/xbeachlibrary_IFX_dynamic.vfproj:1",
+      "crosswalk": {
+        "path": "_staging/total-read/model-audit/XBeach/cw/crosswalk/XBeach-B01/trunk__src__xbeachlibrary__xbeachlibrary_IFX_dynamic.vfproj.crosswalk.json",
+        "sha256": "f8a3165838690a863e6894e00d058368e930ecf04dbc881323e14d6b21ac54cf",
+        "disposition_index": 1,
+        "base_ids": ["A1"],
+        "audit_ids": ["B3"]
+      },
+      "source": {
+        "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xbeachlibrary_IFX_dynamic.vfproj",
+        "sha256": "945da8bf58cebafc9049cfffe831feec2a2efad5b89e7b0f6a2733e3d80a80e8"
+      },
+      "original_claims": {
+        "base": "[L74-L86,L162-L179] (MED/configuration-contract) The MPI_netcdf configurations have no USEMPI or USENETCDF-related PreprocessorDefinitions, so their feature-combined names are not reflected in the compiler settings.",
+        "audit": "[L75,L86,L163,L174] (MED/feature-configuration) Combined MPI_netcdf configurations omit the MPI and netCDF preprocessor definitions supplied in single-feature builds."
+      },
+      "prior_unverified_refutation": {
+        "rationale": "This DLL project compiles only introspection.F90 and libxbeach_dynamic.F90, neither of which tests USEMPI, USENETCDF or their related feature macros. The wrapper calls the already compiled libxbeach_module, and the IFX static-library combined configurations explicitly enable both features, so missing unused DLL-local definitions do not remove feature support.",
+        "neutralizer_where": "trunk/src/xbeachlibrary/libxbeach_dynamic.F90:L12-L17",
+        "neutralizer_quote": "   integer(c_int) function xbeach_init() bind(C, name=\"init\")\n      !DEC$ ATTRIBUTES DLLEXPORT::xbeach_init\n\n      xbeach_init = init()\n\n   end function xbeach_init",
+        "assessment": "The wrapper quote alone was insufficient. The corrected evidence adds the complete two-file project inventory, matching solution dependency/configuration, and the static library's combined-feature definitions."
+      },
+      "evidence": [
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xbeachlibrary_IFX_dynamic.vfproj",
+          "sha256": "945da8bf58cebafc9049cfffe831feec2a2efad5b89e7b0f6a2733e3d80a80e8",
+          "lines": "163-163",
+          "quote": "\t\t\t<Tool Name=\"VFFortranCompilerTool\" SuppressStartupBanner=\"true\" DebugInformationFormat=\"debugEnabled\" Optimization=\"optimizeDisabled\" AdditionalIncludeDirectories=\"&quot;$(ONEAPI_ROOT)\\include\\mpi&quot;; bin\\static\\x64\\$(ConfigurationName)\" Diagnostics=\"diagnosticsShowAll\" WarnInterfaces=\"true\" ModulePath=\"bin\\dynamic\\x64\\$(ConfigurationName)\\\" ObjectFile=\"bin\\dynamic\\x64\\$(ConfigurationName)\\\" PdbFile=\"bin\\dynamic\\x64\\$(ConfigurationName)\\vc100.pdb\" Traceback=\"true\" BoundsCheck=\"true\" RuntimeLibrary=\"rtMultiThreadedDebug\" Interfaces=\"true\"/>"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xbeachlibrary_IFX_dynamic.vfproj",
+          "sha256": "945da8bf58cebafc9049cfffe831feec2a2efad5b89e7b0f6a2733e3d80a80e8",
+          "lines": "189-190",
+          "quote": "\t\t\t<File RelativePath=\".\\introspection.F90\"/>\n\t\t\t<File RelativePath=\".\\libxbeach_dynamic.F90\"/>"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xbeachlibrary_IFX.vfproj",
+          "sha256": "40de5133dfef72e703ca57453a59a68fd3ef0d58f98ce9c7516a66d8a1e86ea6",
+          "lines": "163-163",
+          "quote": "\t\t\t<Tool Name=\"VFFortranCompilerTool\" AdditionalOptions=\"/heap-arrays\" SuppressStartupBanner=\"true\" DebugInformationFormat=\"debugEnabled\" Optimization=\"optimizeDisabled\" Preprocess=\"preprocessYes\" AdditionalIncludeDirectories=\"includes\\version\\; includes\\genfiles\\; &quot;$(ONEAPI_ROOT)\\include\\mpi&quot;\" PreprocessorDefinitions=\"USEMPI;HAVE_MPI_WTIME;HAVE_IFPORT;USENETCDF;DLL_NETCDF\" Diagnostics=\"diagnosticsShowAll\" WarnInterfaces=\"true\" ModulePath=\"bin\\static\\x64\\$(ConfigurationName)\\\" ObjectFile=\"bin\\static\\x64\\$(ConfigurationName)\\\" PdbFile=\"bin\\static\\x64\\$(ConfigurationName)\\vc100.pdb\" Traceback=\"true\" NullPointerCheck=\"true\" BoundsCheck=\"true\" UninitializedVariablesCheck=\"true\" DescriptorDataTypeCheck=\"true\" DescriptorDataSizeCheck=\"true\" RuntimeLibrary=\"rtMultiThreadedDebug\" Interfaces=\"true\"/>"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/XBeach_VS2022_IFX.sln",
+          "sha256": "33525d16ae8faca43985ce8df3b62dc603e462f97319396612fa8b3e466be3a4",
+          "lines": "22-25",
+          "quote": "Project(\"{6989167D-11E4-40FE-8C1A-2192A86A7E90}\") = \"xbeachlibrary_IFX_dynamic\", \"src\\xbeachlibrary\\xbeachlibrary_IFX_dynamic.vfproj\", \"{C00053C4-E4CD-4A74-8674-E2C54BEAA9A0}\"\n\tProjectSection(ProjectDependencies) = postProject\n\t\t{4BD9BE9F-E0F6-4977-B042-D44A63283AE3} = {4BD9BE9F-E0F6-4977-B042-D44A63283AE3}\n\tEndProjectSection"
+        }
+      ],
+      "call_path": "XBeach_VS2022_IFX solution maps the dynamic configuration to the same-named static-library dependency; dynamic sources import/delegate to compiled library modules and contain no USEMPI/USENETCDF conditional",
+      "final_disposition": "REFUTATION_CONFIRMED",
+      "reason": "The combined dynamic configurations factually omit the macros, but those macros select implementation code in the dependent static library, where both are set. The dynamic project compiles only two macro-independent wrappers against the matching static module directory and links MPI. Macro omission in this wrapper project is therefore not the claimed feature mismatch. Separate path/configuration defects are outside this item.",
+      "canonical_ready_ko": "IFX dynamic wrapper의 `MPI_netcdf_*` 구성에는 `USEMPI`·`USENETCDF` 정의가 없지만, 이 프로젝트는 macro 분기가 없는 `introspection.F90`와 `libxbeach_dynamic.F90`만 컴파일하고 같은 구성명의 static library에 의존한다 (`models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xbeachlibrary_IFX_dynamic.vfproj:162`, `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xbeachlibrary_IFX_dynamic.vfproj:185`, `models/XBeach/raw/source_code/trunk/XBeach_VS2022_IFX.sln:22`). 실제 기능 선택은 static library 구성에서 두 macro를 모두 정의해 수행한다 (`models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xbeachlibrary_IFX.vfproj:162`). 따라서 wrapper-local macro 누락을 MPI+netCDF 기능 불일치로 보지 않는다."
+    },
+    {
+      "id": "XBeach-B01:trunk/src/xbeachlibrary/xbeachlibrary_dynamic.vfproj:0",
+      "crosswalk": {
+        "path": "_staging/total-read/model-audit/XBeach/cw/crosswalk/XBeach-B01/trunk__src__xbeachlibrary__xbeachlibrary_dynamic.vfproj.crosswalk.json",
+        "sha256": "a7dfb5d29553f94d3fb22e81d9e933579ff223ed18a77f563421ee7bae2d83f7",
+        "disposition_index": 0,
+        "base_ids": ["A0"],
+        "audit_ids": ["B2"]
+      },
+      "source": {
+        "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xbeachlibrary_dynamic.vfproj",
+        "sha256": "efe55390d88fd5ba27980de59b7646a48a2e59a0b22b554639b88824d3a907f2"
+      },
+      "original_claims": {
+        "base": "[L67-L78,L147-L159] (MED/configuration-contract) The MPI_netcdf configurations have no USEMPI or USENETCDF-related PreprocessorDefinitions, so their feature-combined names are not reflected in the compiler settings.",
+        "audit": "[L68,L78,L148,L158] (MED/feature-configuration) Combined MPI_netcdf configurations omit the feature preprocessor definitions provided by the separate MPI and netCDF configurations, leaving wrapper feature selection inconsistent with the configuration name."
+      },
+      "prior_unverified_refutation": {
+        "rationale": "The dynamic DLL sources have no MPI/netCDF preprocessing selection at all: libxbeach_dynamic.F90 delegates to libxbeach_module and introspection.F90 accesses that library through module interfaces. Both features are selected while compiling the dependent static library, so the wrapper definitions are redundant and their omission is not a feature mismatch.",
+        "neutralizer_where": "trunk/src/xbeachlibrary/libxbeach_dynamic.F90:L12-L17",
+        "neutralizer_quote": "   integer(c_int) function xbeach_init() bind(C, name=\"init\")\n      !DEC$ ATTRIBUTES DLLEXPORT::xbeach_init\n\n      xbeach_init = init()\n\n   end function xbeach_init",
+        "assessment": "The wrapper quote alone was insufficient. The corrected evidence adds the two-file project inventory, solution dependency/configuration mapping, and legacy static-library feature definitions."
+      },
+      "evidence": [
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xbeachlibrary_dynamic.vfproj",
+          "sha256": "efe55390d88fd5ba27980de59b7646a48a2e59a0b22b554639b88824d3a907f2",
+          "lines": "148-148",
+          "quote": "\t\t\t\t<Tool Name=\"VFFortranCompilerTool\" SuppressStartupBanner=\"true\" DebugInformationFormat=\"debugEnabled\" Optimization=\"optimizeDisabled\" AdditionalIncludeDirectories=\"..\\..\\lib\\x64\\mpich\\include; bin\\static\\x64\\$(ConfigurationName)\" Diagnostics=\"diagnosticsShowAll\" WarnInterfaces=\"true\" ModulePath=\"bin\\dynamic\\x64\\$(ConfigurationName)\\\" ObjectFile=\"bin\\dynamic\\x64\\$(ConfigurationName)\\\" PdbFile=\"bin\\dynamic\\x64\\$(ConfigurationName)\\vc100.pdb\" Traceback=\"true\" BoundsCheck=\"true\" RuntimeLibrary=\"rtMultiThreadedDebug\" Interfaces=\"true\"/>"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xbeachlibrary_dynamic.vfproj",
+          "sha256": "efe55390d88fd5ba27980de59b7646a48a2e59a0b22b554639b88824d3a907f2",
+          "lines": "170-172",
+          "quote": "\t\t<Filter Name=\"Source Files\" Filter=\"f90;for;f;fpp;ftn;def;odl;idl\">\n\t\t<File RelativePath=\".\\introspection.F90\"/>\n\t\t<File RelativePath=\".\\libxbeach_dynamic.F90\"/></Filter></Files>"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xbeachlibrary.vfproj",
+          "sha256": "9eabc84d276853548f724bcdf0d95a6f5e4e4de008f0170f96990efe30b2a1c5",
+          "lines": "148-148",
+          "quote": "\t\t\t\t<Tool Name=\"VFFortranCompilerTool\" AdditionalOptions=\"/heap-arrays\" SuppressStartupBanner=\"true\" DebugInformationFormat=\"debugEnabled\" Optimization=\"optimizeDisabled\" Preprocess=\"preprocessYes\" AdditionalIncludeDirectories=\"bin\\static\\x64\\MPI_netcdf_Debug\\mpich\\include; includes\\version\\; includes\\genfiles\\\" PreprocessorDefinitions=\"USEMPI;HAVE_MPI_WTIME;HAVE_IFPORT;USENETCDF;DLL_NETCDF\" Diagnostics=\"diagnosticsShowAll\" WarnInterfaces=\"true\" ModulePath=\"bin\\static\\x64\\$(ConfigurationName)\\\" ObjectFile=\"bin\\static\\x64\\$(ConfigurationName)\\\" PdbFile=\"bin\\static\\x64\\$(ConfigurationName)\\vc100.pdb\" Traceback=\"true\" NullPointerCheck=\"true\" BoundsCheck=\"true\" UninitializedVariablesCheck=\"true\" DescriptorDataTypeCheck=\"true\" DescriptorDataSizeCheck=\"true\" RuntimeLibrary=\"rtMultiThreadedDebug\" Interfaces=\"true\"/>"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/XBeach_VS2017.sln",
+          "sha256": "012aa674799d0701df394b6a2af87f104a12e686b26a7b30f86da8aff1992f90",
+          "lines": "22-25",
+          "quote": "Project(\"{6989167D-11E4-40FE-8C1A-2192A86A7E90}\") = \"xbeachlibrary_dynamic\", \"src\\xbeachlibrary\\xbeachlibrary_dynamic.vfproj\", \"{C00053C4-E4CD-4A74-8674-E2C54BEAA9A0}\"\n\tProjectSection(ProjectDependencies) = postProject\n\t\t{4BD9BE9F-E0F6-4977-B042-D44A63283AE3} = {4BD9BE9F-E0F6-4977-B042-D44A63283AE3}\n\tEndProjectSection"
+        }
+      ],
+      "call_path": "XBeach_VS2017 solution maps the dynamic configuration to the same-named static-library dependency; dynamic sources use/delegate to compiled modules and contain no USEMPI/USENETCDF conditional",
+      "final_disposition": "REFUTATION_CONFIRMED",
+      "reason": "The macro omission is literal but does not select wrapper behavior. The matching dependent static configuration carries both feature macros and libraries; the dynamic project consumes its modules and contains only macro-independent wrappers. The claimed configuration-name/feature mismatch is therefore not established.",
+      "canonical_ready_ko": "legacy dynamic wrapper의 `MPI_netcdf_*` 구성에도 `USEMPI`·`USENETCDF` 정의는 없지만, 프로젝트는 macro 분기가 없는 두 wrapper 소스만 컴파일하며 같은 구성명의 static library에 의존한다 (`models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xbeachlibrary_dynamic.vfproj:147`, `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xbeachlibrary_dynamic.vfproj:184`, `models/XBeach/raw/source_code/trunk/XBeach_VS2017.sln:22`). 기능 macro와 MPI/netCDF library 선택은 static 구성에 들어 있다 (`models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xbeachlibrary.vfproj:147`). 따라서 wrapper-local macro 누락만으로 기능 불일치를 주장할 수 없다."
+    },
+    {
+      "id": "XBeach-M00:trunk/doc/README.parallel:1",
+      "crosswalk": {
+        "path": "_staging/total-read/model-audit/XBeach/cw/crosswalk/XBeach-M00/trunk__doc__README.parallel.crosswalk.json",
+        "sha256": "17201136e834d500f46ecaa093bd1f60612de086571ce88b58114a828e468e0b",
+        "disposition_index": 1,
+        "base_ids": ["A5"],
+        "audit_ids": ["B2"]
+      },
+      "source": {
+        "path": "models/XBeach/raw/source_code/trunk/doc/README.parallel",
+        "sha256": "3f94ad22f2a162e324ccd6ec972405e86124b8959f7c564388ae90726a80c944"
+      },
+      "original_claims": {
+        "base": "[L139-L162] (MED/Fortran-semantics) The proposed replacement for saved scratch arrays omits a deallocation example and assumes automatic removal at subroutine exit, while the original saved allocation can retain dimensions across calls; callers with changing local-grid sizes therefore lack a safe lifecycle contract.",
+        "audit": "[L139-L154] (MED/documented-allocation-limitation) The documented saved scratch-array pattern allocates only once and explicitly leaves wrong-sized arrays possible when subsequent spacepar instances have different dimensions."
+      },
+      "prior_unverified_refutation": {
+        "rationale": "The finding treats a deliberately criticized example as the recommended lifecycle: lines 152-154 explicitly warn that SAVE can retain the wrong dimensions, and lines 156-162 replace it with a local allocatable without SAVE. Such a local allocatable is automatically deallocated on procedure exit, so the replacement allocates the current dimensions on each call and needs no explicit deallocation example; the cited passage does not establish a defect in that guidance.",
+        "neutralizer_where": "models/XBeach/raw/source_code/trunk/doc/README.parallel:L152-L162",
+        "neutralizer_quote": "This solution, however, is not good when one should define more than\none spacepar variable (apart from sglobal and slocal). Then the size\nof the 'saved' matrices could be wrong.\n\nI suggest to simply allocate these scratch arrays:\n\n  real*8, dimension(:,:), allocatable :: xyz\n  allocate(xyz(s%nx+1,s%ny+1))\n\nAccording to the fortran95 standard, these allocated arrays are \nautomatically removed at the exit of the subroutine.",
+        "assessment": "The neutralizer is exact and dispositive once the immediately preceding criticized SAVE example is included."
+      },
+      "evidence": [
+        {
+          "path": "models/XBeach/raw/source_code/trunk/doc/README.parallel",
+          "sha256": "3f94ad22f2a162e324ccd6ec972405e86124b8959f7c564388ae90726a80c944",
+          "lines": "139-162",
+          "quote": "In a number of subroutines, some scratch arrays are declared save, \nas in:\n\n  real*8, dimension(:,:), allocatable, save :: xyz\n  if ( .not. allocated(xyz)) allocate(xyz(nx+1,ny+1))\n\nIn almost all cases, an automatic declaration would suffice, like\n\n  real*8, dimension(s%nx+1,s%ny+1) :: xyz\n\nHowever, I understand that some compilers/linkers have difficulties\nwith large program stacks, so that explains the 'save' solution.\n\nThis solution, however, is not good when one should define more than\none spacepar variable (apart from sglobal and slocal). Then the size\nof the 'saved' matrices could be wrong.\n\nI suggest to simply allocate these scratch arrays:\n\n  real*8, dimension(:,:), allocatable :: xyz\n  allocate(xyz(s%nx+1,s%ny+1))\n\nAccording to the fortran95 standard, these allocated arrays are \nautomatically removed at the exit of the subroutine."
+        }
+      ],
+      "call_path": "documentation example only: saved allocatable anti-pattern -> explicit warning -> local unsaved allocatable replacement",
+      "final_disposition": "REFUTATION_CONFIRMED",
+      "reason": "The finding reverses the document's recommendation. The retained-dimension SAVE pattern is presented and then explicitly rejected; the proposed local allocatable has no SAVE and is intended to be allocated for the current s dimensions on each invocation. The absence of an explicit deallocate example is not the claimed lifecycle defect.",
+      "canonical_ready_ko": "`README.parallel`은 SAVE allocatable 패턴을 권장하는 것이 아니라, 여러 `spacepar` 크기를 사용할 때 저장 배열의 크기가 틀릴 수 있다고 명시적으로 경고한 뒤 SAVE가 없는 지역 allocatable을 대안으로 제시한다 (`models/XBeach/raw/source_code/trunk/doc/README.parallel:139`). 따라서 이 문단을 saved workspace lifecycle 결함으로 분류한 주장은 문맥을 반대로 읽은 것으로 기각한다."
+    },
+    {
+      "id": "XBeach-V00:trunk/lib/win32/netcdff90/netcdf_attributes.f90:2",
+      "crosswalk": {
+        "path": "_staging/total-read/model-audit/XBeach/cw/crosswalk/XBeach-V00/trunk__lib__win32__netcdff90__netcdf_attributes.f90.crosswalk.json",
+        "sha256": "3db26106119c01edddc6d826885716eba2cbbde94dd7cc500d1a24adcc43049d",
+        "disposition_index": 2,
+        "base_ids": ["A4", "A5"],
+        "audit_ids": ["B2", "B3"]
+      },
+      "source": {
+        "path": "models/XBeach/raw/source_code/trunk/lib/win32/netcdff90/netcdf_attributes.f90",
+        "sha256": "540ff2a616aad0cfc018365bdd58ca059ed0c918cb7c853d67c3abf04d0a2523",
+        "attribution": "bundled legacy netCDF-Fortran wrapper; not XBeach solver logic"
+      },
+      "original_claims": {
+        "base": [
+          "[L117-L118,L157-L158,L189-L190,L201-L202,L233-L234,L245-L246,L287-L288,L327-L328] (MED/uninitialized-copy) Getters copy temporary outputs regardless of read status and copy full temporary arrays even when the attribute is shorter, propagating undefined values on errors or unwritten elements.",
+          "[L49-L53] (MED/inquiry-error-handling) Attribute inquiry overwrites the attnum lookup status and copies local type and length outputs even when their inquiry fails."
+        ],
+        "audit": [
+          "[L49-L51] (LOW/error-propagation) The attribute-ID lookup status is unconditionally overwritten by the subsequent attribute inquiry, obscuring any distinct failure of the requested attnum lookup.",
+          "[L52-L53,L117-L118,L157-L158,L189-L190,L201-L202,L233-L234,L245-L246,L287-L288,L327-L328] (MED/undefined-value) Inquiry and getter wrappers copy uninitialized local outputs after failed calls, and integer array getters also copy undefined tail elements when the destination exceeds the attribute length."
+        ]
+      },
+      "prior_unverified_refutation": {
+        "rationale": "attnum is an output here, not an independently requested attribute-number input: both calls query exactly the same ncid, varid and name. The F77 inquiry-family contract gives these two name-based inquiries the same invalid-ID/missing-attribute failure conditions, so the second inquiry preserves those failures rather than hiding a demonstrated distinct attnum lookup error; the supplied other_wording concerns a different issue.",
+        "neutralizer_where": "trunk/lib/win32/netcdff90/netcdf_attributes.f90:L40-L51",
+        "neutralizer_quote": "  function nf90_inquire_attribute(ncid, varid, name, xtype, len, attnum)\n    integer,             intent( in)           :: ncid, varid\n    character (len = *), intent( in)           :: name\n    integer,             intent(out), optional :: xtype, len, attnum\n    integer                                    :: nf90_inquire_attribute\n\n    integer                          :: local_xtype, local_len\n\n    ! Do we need to worry about not saving the state from this call?\n    if(present(attnum)) &\n      nf90_inquire_attribute = nf_inq_attid(ncid, varid, name, attnum)\n    nf90_inquire_attribute   = nf_inq_att  (ncid, varid, name, local_xtype, local_len)",
+        "assessment": "It addresses only audit B2. It does not neutralize base A4/A5 or audit B3, and lines 52-53 plus every scalar/converting getter directly confirm unconditional copies after the status-returning call."
+      },
+      "external_primary_sources": [
+        {
+          "publisher": "Unidata",
+          "title": "NetCDF-Fortran: The NetCDF Fortran 77 Interface Guide, section 7.3 NF_INQ_ATT Family",
+          "url": "https://docs.unidata.ucar.edu/netcdf-fortran/current/nc_f77_interface_guide.html#nf_005finq_005fatt-family",
+          "accessed": "2026-09-09",
+          "use": "NF_INQ_ATT and NF_INQ_ATTID share the documented invalid ncid, invalid varid, and missing-attribute failure conditions. This supports refuting only the alleged distinct attnum lookup failure in a stable dataset."
+        },
+        {
+          "publisher": "Unidata",
+          "title": "NetCDF-Fortran: 7 Attributes, section 7.4 NF90_GET_ATT",
+          "url": "https://docs.unidata.ucar.edu/netcdf-fortran/current/f90-attributes.html#nf90_005fget_005fatt",
+          "accessed": "2026-09-09",
+          "quote": "All elements of the vector of attribute values are returned, so you must provide enough space to hold them.",
+          "use": "The external library returns the attribute's elements; it does not define extra caller elements. The wrapper must not copy uninitialized temporary tails as if they were outputs."
+        }
+      ],
+      "evidence": [
+        {
+          "path": "models/XBeach/raw/source_code/trunk/lib/win32/netcdff90/netcdf_attributes.f90",
+          "sha256": "540ff2a616aad0cfc018365bdd58ca059ed0c918cb7c853d67c3abf04d0a2523",
+          "lines": "40-53",
+          "quote": "  function nf90_inquire_attribute(ncid, varid, name, xtype, len, attnum)\n    integer,             intent( in)           :: ncid, varid\n    character (len = *), intent( in)           :: name\n    integer,             intent(out), optional :: xtype, len, attnum\n    integer                                    :: nf90_inquire_attribute\n\n    integer                          :: local_xtype, local_len\n\n    ! Do we need to worry about not saving the state from this call?\n    if(present(attnum)) &\n      nf90_inquire_attribute = nf_inq_attid(ncid, varid, name, attnum)\n    nf90_inquire_attribute   = nf_inq_att  (ncid, varid, name, local_xtype, local_len)\n    if(present(xtype)) xtype = local_xtype\n    if(present(len  )) len   = local_len"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/lib/win32/netcdff90/netcdf_attributes.f90",
+          "sha256": "540ff2a616aad0cfc018365bdd58ca059ed0c918cb7c853d67c3abf04d0a2523",
+          "lines": "187-202",
+          "quote": "    integer, dimension(size(values)) :: defaultInteger\n\n    nf90_get_att_FourByteInt = nf_get_att_int(ncid, varid, name, defaultInteger)\n    values(:) = defaultInteger(:)\n  end function nf90_get_att_FourByteInt\n  ! -------\n  function nf90_get_att_one_FourByteInt(ncid, varid, name, values)\n    integer,                                    intent( in) :: ncid, varid\n    character(len = *),                         intent( in) :: name\n    integer (kind = FourByteInt),               intent(out) :: values\n    integer                                                 :: nf90_get_att_one_FourByteInt\n\n    integer, dimension(1) :: defaultInteger\n\n    nf90_get_att_one_FourByteInt = nf_get_att_int(ncid, varid, name, defaultInteger)\n    values = defaultInteger(1)"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/lib/win32/netcdff90/netcdf_attributes.f90",
+          "sha256": "540ff2a616aad0cfc018365bdd58ca059ed0c918cb7c853d67c3abf04d0a2523",
+          "lines": "231-246",
+          "quote": "    integer, dimension(size(values)) :: defaultInteger\n\n    nf90_get_att_EightByteInt = nf_get_att_int(ncid, varid, name, defaultInteger)\n    values(:) = defaultInteger(:)\n  end function nf90_get_att_EightByteInt\n  ! -------\n  function nf90_get_att_one_EightByteInt(ncid, varid, name, values)\n    integer,                                     intent( in) :: ncid, varid\n    character(len = *),                          intent( in) :: name\n    integer (kind = EightByteInt),               intent(out) :: values\n    integer                                                 :: nf90_get_att_one_EightByteInt\n\n    integer, dimension(1) :: defaultInteger\n\n    nf90_get_att_one_EightByteInt = nf_get_att_int(ncid, varid, name, defaultInteger)\n    values = defaultInteger(1)"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/lib/win32/netcdff90/netcdf_attributes.f90",
+          "sha256": "540ff2a616aad0cfc018365bdd58ca059ed0c918cb7c853d67c3abf04d0a2523",
+          "lines": "280-288",
+          "quote": "  function nf90_get_att_one_FourByteReal(ncid, varid, name, values)\n    integer,                                   intent( in) :: ncid, varid\n    character(len = *),                        intent( in) :: name\n    real (kind =  FourByteReal),               intent(out) :: values\n    integer                                                :: nf90_get_att_one_FourByteReal\n\n    real (kind =  FourByteReal), dimension(1) :: valuesA\n    nf90_get_att_one_FourByteReal = nf_get_att_real(ncid, varid, name, valuesA)\n    values = valuesA(1)"
+        }
+      ],
+      "call_path": "bundled nf90 wrapper -> status-returning F77 nf_inq_att/nf_get_att_* -> unconditional assignment of local temporaries to optional/scalar/full-array outputs",
+      "subdispositions": [
+        {
+          "claim_ids": ["B2"],
+          "disposition": "REFUTATION_CONFIRMED_SCOPED",
+          "reason": "In a stable dataset, both name-based inquiry calls have the same documented lookup failure conditions, so overwriting the first status does not hide a demonstrated distinct attnum lookup error."
+        },
+        {
+          "claim_ids": ["A4", "A5", "B3"],
+          "disposition": "STANDS_BUNDLED_LIBRARY_WARNING",
+          "reason": "The wrapper copies local_xtype/local_len and getter temporaries regardless of returned status. Converting integer array wrappers additionally copy size(values) elements although the external API defines only the attribute elements, leaving any excess temporary tail undefined."
+        }
+      ],
+      "final_disposition": "SPLIT_PARTIAL_REFUTATION_WARNING_RETAINED",
+      "reason": "The prior refutation is valid only for the narrow B2 status-overwrite theory. The merged disposition's undefined-output claims remain directly supported. Attribution is to the bundled legacy netCDF-Fortran wrapper, not the XBeach solver.",
+      "canonical_ready_ko": "번들된 legacy netCDF-Fortran 래퍼의 `nf90_inquire_attribute`는 같은 이름을 조회하는 `nf_inq_attid`와 `nf_inq_att`의 상태 중 뒤의 상태를 반환한다. 안정된 dataset에서는 두 호출의 공식 실패 조건이 같으므로 별도의 `attnum` 오류가 가려진다는 주장은 기각한다 (Unidata netCDF-Fortran F77 Interface Guide §7.3, acc. 2026-09-09; `models/XBeach/raw/source_code/trunk/lib/win32/netcdff90/netcdf_attributes.f90:40`). 그러나 래퍼는 실패 상태에서도 미초기화된 type·length 및 scalar 임시값을 출력에 복사하고, 정수 변환 배열은 실제 속성 길이보다 큰 임시 배열 전체를 복사한다 (`models/XBeach/raw/source_code/trunk/lib/win32/netcdff90/netcdf_attributes.f90:52`, `models/XBeach/raw/source_code/trunk/lib/win32/netcdff90/netcdf_attributes.f90:187`, `models/XBeach/raw/source_code/trunk/lib/win32/netcdff90/netcdf_attributes.f90:231`). 이는 XBeach solver 결함이 아니라 포함된 외부 netCDF 래퍼의 오류·출력 계약 위험이다."
+    }
+  ]
+}

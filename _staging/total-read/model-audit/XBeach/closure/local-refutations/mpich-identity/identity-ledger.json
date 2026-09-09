@@ -1,0 +1,171 @@
+{
+  "schema": "xbeach-mpich-msi-identity-correction-v1",
+  "status": "REVIEW_EVIDENCE_ONLY_NO_APPROVAL",
+  "purpose": "Supply the missing MSI File-table identifier-to-filename mapping for XB-HARD-04 and XB-HARD-05, and state its effect without changing the frozen hard-resolution record.",
+  "immutable_inputs": [
+    {
+      "path": "_staging/total-read/model-audit/XBeach/closure/hard-resolutions/hard-resolutions.json",
+      "sha256": "4de1adc6ed4d78c35504f3181368f3211f2f6ba0901e63777fb96b813cec0ea4"
+    },
+    {
+      "path": "_staging/total-read/model-audit/XBeach/closure/hard-resolutions/runtime-provenance.json",
+      "sha256": "24ff7cdc6ae8b96c5c67dce727b9eac2590876fbea58470c54b7ef4c1e96a6f4"
+    },
+    {
+      "path": "_staging/total-read/model-audit/XBeach/closure/hard-resolutions/extract-runtime.py",
+      "sha256": "9a69e720cde9580bfb90a8079bef7e0092a6b5092949db182c3390f9ee1cd2c7"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/mpich2-1.4.1p1-win-x86-64.msi",
+      "sha256": "ac0399228624f48f143245caa26a79fadda1214d8368942c5f37ff4aed27fa47"
+    }
+  ],
+  "terminology": "The underscore-prefixed values are primary-key identifiers in the MSI File table. They resemble GUID-derived identifiers but are recorded here as File identifiers rather than MSI Product/Component GUIDs.",
+  "method": {
+    "summary": "Decode the MSI compound-file stream names, decode code-page-1252 _StringPool/_StringData, validate the File schema through _Columns, read the column-major File table, and only then label members extracted from the embedded cabinet.",
+    "installation_or_execution": false,
+    "script": {
+      "path": "_staging/total-read/model-audit/XBeach/closure/local-refutations/mpich-identity/extract_mpich_identity.py",
+      "sha256": "3633804a69148cfd6443ff113651f7ea1acf42e0fba5b804dbc49a685e2e7795"
+    },
+    "available_without_system_package_install": {
+      "python": "3.12.3",
+      "python_olefile": "0.47",
+      "system_libarchive": "libarchive.so.13",
+      "gnu_objdump": "2.42"
+    }
+  },
+  "msi_stream_evidence": {
+    "StringPool": {
+      "size": 6220,
+      "sha256": "443db20d79228c8f0faec8ad08be3d7c9ffaad5a90a31a94e8889db31b4e31a6"
+    },
+    "StringData": {
+      "size": 83515,
+      "sha256": "2acc4bb2a5eecc9d7f335a5a72f574755cbd60e0a8eeaac0ac27a47da9db9f94"
+    },
+    "Columns": {
+      "size": 3328,
+      "sha256": "e69695bb303ba865ff260f091e506adfe77c25d4c1ce33eb7b57b2f2dc5a58ad"
+    },
+    "File": {
+      "size": 1080,
+      "sha256": "82399c3989214329b01a1296ede1319774bd50bbf2bd074b30512b7b4c664666"
+    },
+    "cabinet": {
+      "decoded_stream_name": "_8044643BEC4185DDC900919168CD915F",
+      "size": 9313690,
+      "sha256": "33900b850200b016aef43d68391d0404632ee8b97b8638453b9f069ee781065e"
+    }
+  },
+  "file_table_mapping": {
+    "artifact": {
+      "path": "_staging/total-read/model-audit/XBeach/closure/local-refutations/mpich-identity/msi-file-identity.tsv",
+      "sha256": "e0fd53507adb13133d555d686ef1426358a9a4c9c88434ed35012c696cd74709"
+    },
+    "rows": [
+      {
+        "line": 2,
+        "File": "_00D89EB1B52A45B79628A8A91613E9C1",
+        "FileName_raw": "CXX.LIB|cxx.lib",
+        "long_name": "cxx.lib",
+        "FileSize": 324322,
+        "Sequence": 1,
+        "cabinet_member_sha256": "6fd6a3e6a61347ec912ee96b0b0031d2c672be916277dc693d6efdac5c6127dc"
+      },
+      {
+        "line": 3,
+        "File": "_1BE96E15F472462586C19E8C77FF7927",
+        "FileName_raw": "MPICH2~1.DLL|mpich2nemesisp.dll",
+        "long_name": "mpich2nemesisp.dll",
+        "FileSize": 2089984,
+        "Sequence": 6,
+        "cabinet_member_sha256": "df1cb786d8054c5f730f1f1ea1e97b3099d76f6935302ae6d4f2232efbace87a"
+      },
+      {
+        "line": 4,
+        "File": "_7D9F6BC68D3B438D9D6834EF34F3754F",
+        "FileName_raw": "MPICH2~5.DLL|mpich2mpi.dll",
+        "long_name": "mpich2mpi.dll",
+        "FileSize": 230912,
+        "Sequence": 36,
+        "cabinet_member_sha256": "feca14fe75d28ba1a3f8e229b41c7b3eb0680124600ef1a55ee8d3faa8c5c795"
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "hard_id": "XB-HARD-04",
+      "deferred_input_id": "XBeach-V01:trunk/lib/x64/mpich/include/mpicxx.h:3",
+      "prior_hard_final_disposition": "NARROWED",
+      "prior_conflict_resolution": "UNINITIALIZED_OUTPUT_REFUTED_FOR_BUNDLED_RUNTIME_UNCHECKED_STATUS_RETAINED",
+      "identity_finding": "The prior proof disassembled cabinet member _1BE96E15F472462586C19E8C77FF7927 while treating it as mpich2mpi.dll. The MSI File table names that member mpich2nemesisp.dll. It names _7D9F6BC68D3B438D9D6834EF34F3754F as mpich2mpi.dll. The old backend disassembly therefore cannot prove a distribution-wide output-store guarantee.",
+      "corrected_binary_observation": "The actual MSI member named mpich2mpi.dll exports MPI_Comm_dup at RVA 0x97a0 and PMPI_Comm_dup at RVA 0x10f30. Each is a dispatcher: when its target pointer exists it tail-jumps through that pointer; otherwise it calls a common initializer. If that call returns zero, the dispatcher returns literal 0x10 without a store through the saved RDX output pointer. If initialization returns nonzero, it reloads and tail-jumps through the target. The previously inspected mpich2nemesisp.dll establishes its own backend behavior only.",
+      "final_disposition": "NARROWED_WARNING_RETAINED",
+      "conflict_resolution": "PRIOR_BINARY_REFUTATION_WITHDRAWN_FRONT_DISPATCH_INIT_FAILURE_LEAVES_OUTPUT_UNSET",
+      "severity": "MED/scoped to supplied front-DLL dispatch initialization failure or other unverified selected-backend failure paths",
+      "final_reasoning": "The original C++ Clone code still ignores MPI_Comm_dup status. The supplied distribution's front DLL contains a concrete pre-dispatch nonzero-return path that does not define the output, and the prior backend-only inspection cannot cover whichever backend the dispatcher selects. This is enough to reject the universal neutralizer, while remaining insufficient to claim that an XBeach executable loaded this DLL, that the conditional path occurred, or that every supplied backend leaves output unset.",
+      "canonical_ready_ko": "x64 `mpicxx.h`의 네 `Clone` 구현은 `MPI_Comm_dup` 반환값을 확인하지 않는다. 제공 MSI의 실제 `mpich2mpi.dll`은 dispatcher이며, 전달 대상이 아직 없고 공통 초기화 호출이 0을 반환하면 출력 포인터를 쓰지 않은 채 `0x10`을 반환한다. 기존 반증이 검사한 `_1BE…` 멤버는 MSI File 테이블상 `mpich2mpi.dll`이 아니라 `mpich2nemesisp.dll`이므로, 그 backend의 null 대입을 전체 배포본에 일반화할 수 없다. 따라서 초기화 실패 또는 아직 검증되지 않은 선택 backend의 오류 복귀에서는 미정의 `ncomm` wrapper 위험을 유지한다. 이는 제공 아티팩트의 정적 가능성 판정이며 XBeach 실행 중 해당 DLL 로드나 분기 실행을 주장하지 않는다. (`models/XBeach/raw/source_code/trunk/lib/x64/mpich/include/mpicxx.h:1567-1580,1658-1671,2328-2341,2443-2456`; MSI File 행 `_1BE…`/`_7D9…`; 실제 `mpich2mpi.dll` RVA `0x97a0`, `0x10f30`.)",
+      "evidence": [
+        {
+          "path": "_staging/total-read/model-audit/XBeach/closure/local-refutations/mpich-identity/msi-file-identity.tsv",
+          "sha256": "e0fd53507adb13133d555d686ef1426358a9a4c9c88434ed35012c696cd74709",
+          "lines": "3-4"
+        },
+        {
+          "path": "_staging/total-read/model-audit/XBeach/closure/local-refutations/mpich-identity/mpich2mpi-export-map.txt",
+          "sha256": "19de571b4f5cd954a1432502a10952c096087e9ed9d9761c663c441f18766aa2",
+          "lines": "1-3"
+        },
+        {
+          "path": "_staging/total-read/model-audit/XBeach/closure/local-refutations/mpich-identity/mpich2mpi-comm-dup.disassembly.txt",
+          "sha256": "8de9a3cc75b64bb6d0e904777e1080ef23d7e289331818a43321e8fab5ee5fd9",
+          "lines": "7-30,41-64"
+        },
+        {
+          "path": "_staging/total-read/model-audit/XBeach/closure/local-refutations/mpich-identity/mpich2mpi-dispatcher-strings.txt",
+          "sha256": "53a1e419708e4d1cf6e1d1ead0a3515ec8cc01564b4ee30993d8a77729c4c67d",
+          "lines": "1-7",
+          "scope": "Literal selection/loading names only; does not prove runtime choice."
+        }
+      ]
+    },
+    {
+      "hard_id": "XB-HARD-05",
+      "deferred_input_id": "XBeach-V01:trunk/lib/x64/mpich/include/mpicxx.h:8",
+      "prior_hard_final_disposition": "NARROWED",
+      "identity_finding": "The MSI File table maps _00D89EB1B52A45B79628A8A91613E9C1 to cxx.lib. Its extracted bytes are identical to the repository cxx.lib used for the existing relocation-aware Create_keyval disassembly.",
+      "final_disposition": "NARROWED_IDENTITY_CONFIRMED",
+      "conflict_resolution": "NO_SEMANTIC_OVERRIDE_CXX_ARCHIVE_IDENTITY_CONFIRMED",
+      "final_reasoning": "The missing identity link is now supplied: both copies have SHA-256 6fd6a3e6a61347ec912ee96b0b0031d2c672be916277dc693d6efdac5c6127dc. This supports the prior exact-pointer registration neutralizer for the supplied archive. It does not prove that a particular XBeach executable linked that archive or exercised the path.",
+      "canonical_ready_ko": "제공 MSI의 File 테이블은 `_00D89EB1B52A45B79628A8A91613E9C1`을 `cxx.lib`로 지정하며, 추출 멤버는 저장소의 `models/XBeach/raw/source_code/trunk/lib/x64/mpich/lib/cxx.lib`와 SHA-256이 같다. 따라서 기존 Comm/Datatype/Win `Create_keyval`의 정확 포인터 치환 반증은 제공 archive에 연결된다. 직접 helper 호출이나 별도 전달 callback 위험을 남기는 기존 범위 판정은 유지한다. 특정 XBeach 실행 파일의 실제 링크·실행은 이 동일성 검사로 입증하지 않는다.",
+      "evidence": [
+        {
+          "path": "_staging/total-read/model-audit/XBeach/closure/local-refutations/mpich-identity/msi-file-identity.tsv",
+          "sha256": "e0fd53507adb13133d555d686ef1426358a9a4c9c88434ed35012c696cd74709",
+          "lines": "1-2"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/lib/cxx.lib",
+          "sha256": "6fd6a3e6a61347ec912ee96b0b0031d2c672be916277dc693d6efdac5c6127dc"
+        }
+      ]
+    }
+  ],
+  "supplemental_import_archive_observation": {
+    "source_path": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/lib/mpi.lib",
+    "source_sha256": "0c1f8f8c0433451c0b3918fcf22ade14289156a56aa2a40c21385f5399a6b292",
+    "evidence_path": "_staging/total-read/model-audit/XBeach/closure/local-refutations/mpich-identity/mpi-import-target.txt",
+    "evidence_sha256": "e2088c7456cc238d3fcb48dd70d79b2a9ef59a3863f259fa5412c931a8b5b966",
+    "observation": "The supplied mpi.lib contains MPI_Comm_dup/PMPI_Comm_dup import objects and an mpich2mpi import descriptor.",
+    "limit": "This archive-level association does not establish which library a concrete XBeach executable linked or which DLL the Windows loader selected at runtime."
+  },
+  "reproduction": {
+    "instructions": "_staging/total-read/model-audit/XBeach/closure/local-refutations/mpich-identity/README.md",
+    "scratch_only_outputs": [
+      "/tmp/xbeach-mpich-identity/cxx.lib",
+      "/tmp/xbeach-mpich-identity/mpich2nemesisp.dll",
+      "/tmp/xbeach-mpich-identity/mpich2mpi.dll"
+    ]
+  }
+}

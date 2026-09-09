@@ -1,0 +1,554 @@
+{
+  "schema": "xbeach-deferred-inputs/v1",
+  "count": 13,
+  "items": [
+    {
+      "id": "XBeach-000:trunk/src/xbeachlibrary/spaceparamsdef.F90:0",
+      "crosswalk_path": "_staging/total-read/model-audit/XBeach/cw/crosswalk/XBeach-000/trunk__src__xbeachlibrary__spaceparamsdef.F90.crosswalk.json",
+      "crosswalk_sha256": "efa99ed5ad6268e58bbf245be5fa7ce3a60ba2223efbb243ea854a64daff6e57",
+      "index": 0,
+      "source_path": "trunk/src/xbeachlibrary/spaceparamsdef.F90",
+      "source_sha256": "55e083d7b10e36da434e9c5e752b0603cf20c7aa6a639fab267a6af9031803b0",
+      "base_ids": [
+        "A1"
+      ],
+      "audit_ids": [
+        "B1"
+      ],
+      "kind": "refuted-unverified",
+      "original_disposition": {
+        "disposition": "equivalent",
+        "base_ids": [
+          "A1"
+        ],
+        "audit_ids": [
+          "B1"
+        ],
+        "base_member_text": [
+          "[L57-L60] (MED/global-state-initialization) The public module-wide stencil-bound integers have no initialization, so any caller that observes them before the separate setup routine assigns every bound receives undefined state."
+        ],
+        "audit_member_text": [
+          "[L57-L60] (MED/uninitialized global ranges) All exported computational range bounds lack initial values, so any use before ranges_init receives undefined indices."
+        ],
+        "representative": "audit",
+        "rationale": "blinded SAME",
+        "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+        "decided_at": "2026-08-27",
+        "adversarial": {
+          "verdict": "REFUTED_UNVERIFIED",
+          "rationale": "The lifecycle calls ranges_init after decomposition and before nonhydrostatic setup, means/output initialization, and all computation steps. ranges_init assigns every declared bound on all relevant branches, and no earlier active stencil use was found; merely being public and undefined before required setup is not a demonstrated defect.",
+          "neutralizer": {
+            "where": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/libxbeach.F90:L207-L218",
+            "quote": "      call space_distribute_space (sglobal,s,par)\n#endif\n\n      call ranges_init(s)\n\n      ! nonh_init does not always need to be called\n      if (par%wavemodel==WAVEMODEL_NONH) call nonh_init(s,par)\n\n      ! initialize output\n      call means_init             (sglobal,s,par     )\n\n      call output_init            (sglobal,s,par,tpar)"
+          },
+          "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+          "verified_at": "2026-09-07"
+        }
+      }
+    },
+    {
+      "id": "XBeach-001:trunk/src/xbeachlibrary/wave_boundary_main.f90:8",
+      "crosswalk_path": "_staging/total-read/model-audit/XBeach/cw/crosswalk/XBeach-001/trunk__src__xbeachlibrary__wave_boundary_main.f90.crosswalk.json",
+      "crosswalk_sha256": "6983672a072bbb64cad0977f66baa59ed8fe65fce0cb833ad67080e292f39693",
+      "index": 8,
+      "source_path": "trunk/src/xbeachlibrary/wave_boundary_main.f90",
+      "source_sha256": "5457f45f75df3500f6bfc00c584128aa9d61e969170fe53ca5874842252d24d9",
+      "base_ids": [
+        "A2"
+      ],
+      "audit_ids": [
+        "B3"
+      ],
+      "kind": "conflict",
+      "original_disposition": {
+        "disposition": "conflict",
+        "base_ids": [
+          "A2"
+        ],
+        "audit_ids": [
+          "B3"
+        ],
+        "base_member_text": [
+          "[L221-L224] (HIGH/compile-time type mismatch) waveBoundaryParameters%randomseed is declared as a scalar integer in the datastore but is passed to allocated/deallocate as if it were allocatable."
+        ],
+        "audit_member_text": [
+          "[L221-L224] (HIGH/allocation/rank) The allocatable randomseed vector is deallocated and then assigned the scalar randomseed without allocating or constructing a conforming seed array."
+        ],
+        "representative": "audit",
+        "rationale": "blinded CONFLICT: Same seed component is claimed to be an allocatable vector versus a non-allocatable scalar",
+        "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+        "decided_at": "2026-08-27"
+      }
+    },
+    {
+      "id": "XBeach-002:trunk/src/xbeachlibrary/drifters.F90:0",
+      "crosswalk_path": "_staging/total-read/model-audit/XBeach/cw/crosswalk/XBeach-002/trunk__src__xbeachlibrary__drifters.F90.crosswalk.json",
+      "crosswalk_sha256": "2aa88dc92872c120730b85105b6e7beb44709268084a7271593ae02490734d39",
+      "index": 0,
+      "source_path": "trunk/src/xbeachlibrary/drifters.F90",
+      "source_sha256": "42c0e8bae3a881126deaa48617848576cfcfad387a1eb9c5be185d899bda76c9",
+      "base_ids": [
+        "A1"
+      ],
+      "audit_ids": [
+        "B1"
+      ],
+      "kind": "refuted-unverified",
+      "original_disposition": {
+        "disposition": "equivalent",
+        "base_ids": [
+          "A1"
+        ],
+        "audit_ids": [
+          "B1"
+        ],
+        "base_member_text": [
+          "[L53-L62] (MED/distributed-state-consistency) MPI_MIN is applied independently to idrift and jdrift, so if different overlapping ranks produce the minima the reduced coordinate pair need not come from any single rank's drifter update."
+        ],
+        "audit_member_text": [
+          "[L41-L62] (HIGH/MPI-ownership/reduction) Every rank whose local index test succeeds advances the drifter, while idrift and jdrift are reduced independently with MPI_MIN, so overlapping ownership or differing local updates can select coordinates from different ranks and create a position no rank computed."
+        ],
+        "representative": "audit",
+        "rationale": "blinded SAME",
+        "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+        "decided_at": "2026-08-27",
+        "adversarial": {
+          "verdict": "REFUTED_UNVERIFIED",
+          "rationale": "Overlapping ranks use the same global drifter indices and distributed grid metrics, and flow synchronizes both velocity components before drifter is called. The predictor and second-order branches repeat those exchanges, and the final nonhydrostatic correction exchanges them internally (nonh.F90:2238-2239), so overlapping updates are identical and independent minima cannot splice differing positions on this path.",
+          "neutralizer": {
+            "where": "trunk/src/xbeachlibrary/flow_timestep.F90:L630-L650",
+            "quote": "#ifdef USEMPI\n      call xmpi_shift_ee(s%uu)\n      call xmpi_shift_ee(s%vv)\n#endif\n\n      if (par%wavemodel==WAVEMODEL_NONH) then\n         !Do explicit predictor step with pressure\n         call nonh_cor(s,par,0,uu_old,vv_old)\n\n#ifdef USEMPI\n         call xmpi_shift_ee(s%uu)\n         call xmpi_shift_ee(s%vv)\n#endif\n      end if\n\n      if (par%secorder==1) then\n         !Call second order correction to the advection\n         call flow_secondorder_advUV(s,par,uu_old,vv_old)\n#ifdef USEMPI\n         call xmpi_shift_ee(s%uu)\n         call xmpi_shift_ee(s%vv)"
+          },
+          "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+          "verified_at": "2026-09-07"
+        }
+      }
+    },
+    {
+      "id": "XBeach-002:trunk/src/xbeachlibrary/morphevolution.F90:24",
+      "crosswalk_path": "_staging/total-read/model-audit/XBeach/cw/crosswalk/XBeach-002/trunk__src__xbeachlibrary__morphevolution.F90.crosswalk.json",
+      "crosswalk_sha256": "50c963c451b342572c346a1184fb748acb94d84e013b27ba7ea376167b966e6c",
+      "index": 24,
+      "source_path": "trunk/src/xbeachlibrary/morphevolution.F90",
+      "source_sha256": "765f474008f7cb843353dc0790cc3f3ebdc00631353da7592e2bb0508e968391",
+      "base_ids": [
+        "A12"
+      ],
+      "audit_ids": [
+        "B25"
+      ],
+      "kind": "conflict",
+      "original_disposition": {
+        "disposition": "conflict",
+        "base_ids": [
+          "A12"
+        ],
+        "audit_ids": [
+          "B25"
+        ],
+        "base_member_text": [
+          "[L2918-L2926] (HIGH/wrong-source-array) At zero v velocity, kturbv is averaged from its own just-zeroed values rather than from neighboring s%kturb values, forcing the centered face turbulence to zero."
+        ],
+        "audit_member_text": [
+          "[L2918-L2926] (HIGH/self-referential stale interpolation) At zero V velocity, kturbv is averaged from kturbv itself rather than from s%kturb, reusing stale work-array values instead of the neighboring turbulence field."
+        ],
+        "representative": "audit",
+        "rationale": "blinded CONFLICT: Same self-interpolation, but prior stale values versus just-zeroed values",
+        "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+        "decided_at": "2026-08-27"
+      }
+    },
+    {
+      "id": "XBeach-002:trunk/src/xbeachlibrary/vegetation.F90:5",
+      "crosswalk_path": "_staging/total-read/model-audit/XBeach/cw/crosswalk/XBeach-002/trunk__src__xbeachlibrary__vegetation.F90.crosswalk.json",
+      "crosswalk_sha256": "65380b541eef42a81b92aa2dd9f76647d3397344095f22a0883b3c91f5786536",
+      "index": 5,
+      "source_path": "trunk/src/xbeachlibrary/vegetation.F90",
+      "source_sha256": "e58ebd47d62d4637baae7bee4e90570a859b1eb0467e486a599f877b380df2c2",
+      "base_ids": [
+        "A14"
+      ],
+      "audit_ids": [
+        "B0"
+      ],
+      "kind": "refuted-unverified",
+      "original_disposition": {
+        "disposition": "equivalent",
+        "base_ids": [
+          "A14"
+        ],
+        "audit_ids": [
+          "B0"
+        ],
+        "base_member_text": [
+          "[L109-L113] (LOW/file-error handling) The species-list read records iostat but never checks it before the names are used as filenames."
+        ],
+        "audit_member_text": [
+          "[L103-L112] (MED/input error handling) Species-name reads record iostat in ier but never inspect it, so a short or malformed species list can leave names undefined and fail later in a misleading way."
+        ],
+        "representative": "audit",
+        "rationale": "blinded SAME",
+        "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+        "decided_at": "2026-08-27",
+        "adversarial": {
+          "verdict": "REFUTED_UNVERIFIED",
+          "rationale": "nveg is obtained by counting the same file immediately before reading exactly that many records, and the reads use character format (a), so a static short or nonnumeric list cannot produce the claimed undefined names. Invalid referenced property filenames are checked subsequently; a file changing or failing between the count and read would be a separate I/O-failure condition.",
+          "neutralizer": {
+            "where": "trunk/src/xbeachlibrary/vegetation.F90:L102-L113",
+            "quote": "         ! 1) Read veggiefile with veggie species\n         par%nveg = count_lines(par%veggiefile)\n\n         if (xmaster) then\n            allocate(veg(par%nveg))\n            fid=create_new_fid()\n            call check_file_exist(par%veggiefile)\n            open(fid,file=par%veggiefile)\n            do i=1,par%nveg\n               read(fid,'(a)',iostat=ier) veg(i)%name\n            enddo\n            close(fid)"
+          },
+          "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+          "verified_at": "2026-09-07"
+        }
+      }
+    },
+    {
+      "id": "XBeach-002:trunk/src/xbeachlibrary/vsm_u_XB.f90:3",
+      "crosswalk_path": "_staging/total-read/model-audit/XBeach/cw/crosswalk/XBeach-002/trunk__src__xbeachlibrary__vsm_u_XB.f90.crosswalk.json",
+      "crosswalk_sha256": "33d427cbe898c6fa514f92a79fd67bde329006ff489f8c8281f506d5d171be5c",
+      "index": 3,
+      "source_path": "trunk/src/xbeachlibrary/vsm_u_XB.f90",
+      "source_sha256": "d9a27c6103c5008e511c29e0fc965f14aa8b71a7f297354788687d94b9fb1556",
+      "base_ids": [
+        "A5"
+      ],
+      "audit_ids": [
+        "B5"
+      ],
+      "kind": "refuted-unverified",
+      "original_disposition": {
+        "disposition": "equivalent",
+        "base_ids": [
+          "A5"
+        ],
+        "audit_ids": [
+          "B5"
+        ],
+        "base_member_text": [
+          "[L59,L207-L212,L319-L323] (HIGH/layer-count bounds) The routine accepts arbitrary n but divides by n-1 and accesses sigz(2), requiring n>=2 without enforcing it."
+        ],
+        "audit_member_text": [
+          "[L209-L211,L319-L323] (MED/unchecked dimension contract) The implementation requires n>=2 (division by n-1 and references to sigz(2) and sigz(n-1)) but neither checks nor documents that precondition in the interface."
+        ],
+        "representative": "audit",
+        "rationale": "blinded SAME",
+        "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+        "decided_at": "2026-08-27",
+        "adversarial": {
+          "verdict": "REFUTED_UNVERIFIED",
+          "rationale": "The sole caller invokes VSM only when nz>1 and passes that same nz as n. Consequently n=1 cannot reach the n-1 division through the model, even though the standalone routine does not repeat the precondition.",
+          "neutralizer": {
+            "where": "trunk/src/xbeachlibrary/flow_timestep.F90:L957-L972",
+            "quote": "      if (par%nz>1 .and. par%form /= FORM_VANRIJN1993) then\n         do j=1,s%ny+1\n            do i=1,s%nx+1\n               if (s%wetz(i,j) .eq. 1) then\n                  ks=12.d0*s%hh(i,j)/10.d0**(sqrt(par%g/s%cfu(i,j))/18.d0)\n                  tauw=par%rhoa*par%Cd*sqrt(s%windsu(i,j)**2+s%windnv(i,j)**2)\n                  tauwx=s%windsu(i,j)*tauw\n                  tauwy=s%windnv(i,j)*tauw\n\n                  call vsm_u_XB (  s%ue(i,j)    ,s%ve(i,j)    ,s%hh(i,j) ,ks  ,                &\n                  par%rho      ,tauwx ,tauwy ,s%thetamean(i,j)-s%alfaz(i,j),  &\n                  s%urms(i,j)  ,s%sigm(i,j)  ,s%k(i,j)       ,s%Dr(i,j)  ,    &\n                  s%E(i,j)     ,s%R(i,j)     ,fcvisc,facdel  ,par%ws     ,    &\n                  s%fw(i,j)    ,facdf ,swglm ,par%nz       ,s%sigz       ,    &\n                  s%uz(i,j,:)  ,s%vz(i,j,:)  ,s%ustz(i,j,:)  ,s%nutz(i,j,:),  &\n                  s%ue_sed(i,j),s%ve_sed(i,j)  )"
+          },
+          "verified_by": "llm:codex independent skeptic + caller verbatim neutralizer re-check",
+          "verified_at": "2026-09-07"
+        }
+      }
+    },
+    {
+      "id": "XBeach-B01:trunk/src/xbeachlibrary/xbeachlibrary_IFX_dynamic.vfproj:1",
+      "crosswalk_path": "_staging/total-read/model-audit/XBeach/cw/crosswalk/XBeach-B01/trunk__src__xbeachlibrary__xbeachlibrary_IFX_dynamic.vfproj.crosswalk.json",
+      "crosswalk_sha256": "f8a3165838690a863e6894e00d058368e930ecf04dbc881323e14d6b21ac54cf",
+      "index": 1,
+      "source_path": "trunk/src/xbeachlibrary/xbeachlibrary_IFX_dynamic.vfproj",
+      "source_sha256": "945da8bf58cebafc9049cfffe831feec2a2efad5b89e7b0f6a2733e3d80a80e8",
+      "base_ids": [
+        "A1"
+      ],
+      "audit_ids": [
+        "B3"
+      ],
+      "kind": "refuted-unverified",
+      "original_disposition": {
+        "disposition": "equivalent",
+        "base_ids": [
+          "A1"
+        ],
+        "audit_ids": [
+          "B3"
+        ],
+        "base_member_text": [
+          "[L74-L86,L162-L179] (MED/configuration-contract) The MPI_netcdf configurations have no USEMPI or USENETCDF-related PreprocessorDefinitions, so their feature-combined names are not reflected in the compiler settings."
+        ],
+        "audit_member_text": [
+          "[L75,L86,L163,L174] (MED/feature-configuration) Combined MPI_netcdf configurations omit the MPI and netCDF preprocessor definitions supplied in single-feature builds."
+        ],
+        "representative": "audit",
+        "rationale": "blinded SAME",
+        "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+        "decided_at": "2026-08-27",
+        "adversarial": {
+          "verdict": "REFUTED_UNVERIFIED",
+          "rationale": "This DLL project compiles only introspection.F90 and libxbeach_dynamic.F90, neither of which tests USEMPI, USENETCDF or their related feature macros. The wrapper calls the already compiled libxbeach_module, and the IFX static-library combined configurations explicitly enable both features (xbeachlibrary_IFX.vfproj:75,86,163,174), so missing unused DLL-local definitions do not remove feature support.",
+          "neutralizer": {
+            "where": "trunk/src/xbeachlibrary/libxbeach_dynamic.F90:L12-L17",
+            "quote": "   integer(c_int) function xbeach_init() bind(C, name=\"init\")\n      !DEC$ ATTRIBUTES DLLEXPORT::xbeach_init\n\n      xbeach_init = init()\n\n   end function xbeach_init"
+          },
+          "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+          "verified_at": "2026-09-07"
+        }
+      }
+    },
+    {
+      "id": "XBeach-B01:trunk/src/xbeachlibrary/xbeachlibrary_dynamic.vfproj:0",
+      "crosswalk_path": "_staging/total-read/model-audit/XBeach/cw/crosswalk/XBeach-B01/trunk__src__xbeachlibrary__xbeachlibrary_dynamic.vfproj.crosswalk.json",
+      "crosswalk_sha256": "a7dfb5d29553f94d3fb22e81d9e933579ff223ed18a77f563421ee7bae2d83f7",
+      "index": 0,
+      "source_path": "trunk/src/xbeachlibrary/xbeachlibrary_dynamic.vfproj",
+      "source_sha256": "efe55390d88fd5ba27980de59b7646a48a2e59a0b22b554639b88824d3a907f2",
+      "base_ids": [
+        "A0"
+      ],
+      "audit_ids": [
+        "B2"
+      ],
+      "kind": "refuted-unverified",
+      "original_disposition": {
+        "disposition": "equivalent",
+        "base_ids": [
+          "A0"
+        ],
+        "audit_ids": [
+          "B2"
+        ],
+        "base_member_text": [
+          "[L67-L78,L147-L159] (MED/configuration-contract) The MPI_netcdf configurations have no USEMPI or USENETCDF-related PreprocessorDefinitions, so their feature-combined names are not reflected in the compiler settings."
+        ],
+        "audit_member_text": [
+          "[L68,L78,L148,L158] (MED/feature-configuration) Combined MPI_netcdf configurations omit the feature preprocessor definitions provided by the separate MPI and netCDF configurations, leaving wrapper feature selection inconsistent with the configuration name."
+        ],
+        "representative": "audit",
+        "rationale": "blinded SAME",
+        "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+        "decided_at": "2026-08-27",
+        "adversarial": {
+          "verdict": "REFUTED_UNVERIFIED",
+          "rationale": "The dynamic DLL sources have no MPI/netCDF preprocessing selection at all: libxbeach_dynamic.F90 delegates to libxbeach_module and introspection.F90 accesses that library through module interfaces. Both features are selected while compiling the dependent static library (xbeachlibrary.vfproj:68,78,148,158), so the wrapper definitions are redundant and their omission is not a feature mismatch.",
+          "neutralizer": {
+            "where": "trunk/src/xbeachlibrary/libxbeach_dynamic.F90:L12-L17",
+            "quote": "   integer(c_int) function xbeach_init() bind(C, name=\"init\")\n      !DEC$ ATTRIBUTES DLLEXPORT::xbeach_init\n\n      xbeach_init = init()\n\n   end function xbeach_init"
+          },
+          "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+          "verified_at": "2026-09-07"
+        }
+      }
+    },
+    {
+      "id": "XBeach-D00:trunk/lib/README.txt.txt:0",
+      "crosswalk_path": "_staging/total-read/model-audit/XBeach/cw/crosswalk/XBeach-D00/trunk__lib__README.txt.txt.crosswalk.json",
+      "crosswalk_sha256": "bbcd0b1bd1c578ea2c1f6aa313e2dfe0a4286f5f38691e782c20393752d17522",
+      "index": 0,
+      "source_path": "trunk/lib/README.txt.txt",
+      "source_sha256": "3471cc33922e7dd6821b25769ead10a7b9aa5b640d951b5fca383f1ec80bb7e4",
+      "base_ids": [
+        "A0"
+      ],
+      "audit_ids": [
+        "B0"
+      ],
+      "kind": "conflict",
+      "original_disposition": {
+        "disposition": "conflict",
+        "base_ids": [
+          "A0"
+        ],
+        "audit_ids": [
+          "B0"
+        ],
+        "base_member_text": [
+          "[L1] (LOW/missing-documentation) The sole line is blank, so this README provides no information about the library directory or its contents."
+        ],
+        "audit_member_text": [
+          "[L1-L2] (LOW/documentation-coverage) The library inventory lists only win32 despite the shard also containing an x64 MPICH distribution, leaving the architecture choices incompletely documented."
+        ],
+        "representative": "audit",
+        "rationale": "blinded CONFLICT: One claims the inventory lists win32; the other claims its sole line is blank.",
+        "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+        "decided_at": "2026-08-27"
+      }
+    },
+    {
+      "id": "XBeach-M00:trunk/doc/README.parallel:1",
+      "crosswalk_path": "_staging/total-read/model-audit/XBeach/cw/crosswalk/XBeach-M00/trunk__doc__README.parallel.crosswalk.json",
+      "crosswalk_sha256": "17201136e834d500f46ecaa093bd1f60612de086571ce88b58114a828e468e0b",
+      "index": 1,
+      "source_path": "trunk/doc/README.parallel",
+      "source_sha256": "3f94ad22f2a162e324ccd6ec972405e86124b8959f7c564388ae90726a80c944",
+      "base_ids": [
+        "A5"
+      ],
+      "audit_ids": [
+        "B2"
+      ],
+      "kind": "refuted-unverified",
+      "original_disposition": {
+        "disposition": "equivalent",
+        "base_ids": [
+          "A5"
+        ],
+        "audit_ids": [
+          "B2"
+        ],
+        "base_member_text": [
+          "[L139-L162] (MED/Fortran-semantics) The proposed replacement for saved scratch arrays omits a deallocation example and assumes automatic removal at subroutine exit, while the original saved allocation can retain dimensions across calls; callers with changing local-grid sizes therefore lack a safe lifecycle contract."
+        ],
+        "audit_member_text": [
+          "[L139-L154] (MED/documented-allocation-limitation) The documented saved scratch-array pattern allocates only once and explicitly leaves wrong-sized arrays possible when subsequent spacepar instances have different dimensions."
+        ],
+        "representative": "audit",
+        "rationale": "blinded SAME",
+        "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+        "decided_at": "2026-08-27",
+        "adversarial": {
+          "verdict": "REFUTED_UNVERIFIED",
+          "rationale": "The finding treats a deliberately criticized example as the recommended lifecycle: lines 152-154 explicitly warn that SAVE can retain the wrong dimensions, and lines 156-162 replace it with a local allocatable without SAVE. Such a local allocatable is automatically deallocated on procedure exit, so the replacement allocates the current dimensions on each call and needs no explicit deallocation example; the cited passage does not establish a defect in that guidance.",
+          "neutralizer": {
+            "where": "models/XBeach/raw/source_code/trunk/doc/README.parallel:L152-L162",
+            "quote": "This solution, however, is not good when one should define more than\none spacepar variable (apart from sglobal and slocal). Then the size\nof the 'saved' matrices could be wrong.\n\nI suggest to simply allocate these scratch arrays:\n\n  real*8, dimension(:,:), allocatable :: xyz\n  allocate(xyz(s%nx+1,s%ny+1))\n\nAccording to the fortran95 standard, these allocated arrays are \nautomatically removed at the exit of the subroutine."
+          },
+          "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+          "verified_at": "2026-09-07"
+        }
+      }
+    },
+    {
+      "id": "XBeach-V00:trunk/lib/win32/netcdff90/netcdf_attributes.f90:2",
+      "crosswalk_path": "_staging/total-read/model-audit/XBeach/cw/crosswalk/XBeach-V00/trunk__lib__win32__netcdff90__netcdf_attributes.f90.crosswalk.json",
+      "crosswalk_sha256": "3db26106119c01edddc6d826885716eba2cbbde94dd7cc500d1a24adcc43049d",
+      "index": 2,
+      "source_path": "trunk/lib/win32/netcdff90/netcdf_attributes.f90",
+      "source_sha256": "540ff2a616aad0cfc018365bdd58ca059ed0c918cb7c853d67c3abf04d0a2523",
+      "base_ids": [
+        "A4",
+        "A5"
+      ],
+      "audit_ids": [
+        "B2",
+        "B3"
+      ],
+      "kind": "refuted-unverified",
+      "original_disposition": {
+        "disposition": "equivalent",
+        "base_ids": [
+          "A4",
+          "A5"
+        ],
+        "audit_ids": [
+          "B2",
+          "B3"
+        ],
+        "base_member_text": [
+          "[L117-L118,L157-L158,L189-L190,L201-L202,L233-L234,L245-L246,L287-L288,L327-L328] (MED/uninitialized-copy) Getters copy temporary outputs regardless of read status and copy full temporary arrays even when the attribute is shorter, propagating undefined values on errors or unwritten elements.",
+          "[L49-L53] (MED/inquiry-error-handling) Attribute inquiry overwrites the attnum lookup status and copies local type and length outputs even when their inquiry fails."
+        ],
+        "audit_member_text": [
+          "[L49-L51] (LOW/error-propagation) The attribute-ID lookup status is unconditionally overwritten by the subsequent attribute inquiry, obscuring any distinct failure of the requested attnum lookup.",
+          "[L52-L53,L117-L118,L157-L158,L189-L190,L201-L202,L233-L234,L245-L246,L287-L288,L327-L328] (MED/undefined-value) Inquiry and getter wrappers copy uninitialized local outputs after failed calls, and integer array getters also copy undefined tail elements when the destination exceeds the attribute length."
+        ],
+        "representative": "audit",
+        "rationale": "blinded SAME (many-to-one)",
+        "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+        "decided_at": "2026-08-27",
+        "adversarial": {
+          "verdict": "REFUTED_UNVERIFIED",
+          "rationale": "attnum is an output here, not an independently requested attribute-number input: both calls query exactly the same ncid, varid and name. The [F77 inquiry-family contract](https://docs.unidata.ucar.edu/netcdf-fortran/current/nc_f77_interface_guide.html) gives these two name-based inquiries the same invalid-ID/missing-attribute failure conditions, so the second inquiry preserves those failures rather than hiding a demonstrated distinct attnum lookup error; the supplied other_wording concerns a different issue.",
+          "neutralizer": {
+            "where": "trunk/lib/win32/netcdff90/netcdf_attributes.f90:L40-L51",
+            "quote": "  function nf90_inquire_attribute(ncid, varid, name, xtype, len, attnum)\n    integer,             intent( in)           :: ncid, varid\n    character (len = *), intent( in)           :: name\n    integer,             intent(out), optional :: xtype, len, attnum\n    integer                                    :: nf90_inquire_attribute\n\n    integer                          :: local_xtype, local_len\n\n    ! Do we need to worry about not saving the state from this call?\n    if(present(attnum)) &\n      nf90_inquire_attribute = nf_inq_attid(ncid, varid, name, attnum)\n    nf90_inquire_attribute   = nf_inq_att  (ncid, varid, name, local_xtype, local_len)"
+          },
+          "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+          "verified_at": "2026-09-07"
+        }
+      }
+    },
+    {
+      "id": "XBeach-V01:trunk/lib/x64/mpich/include/mpicxx.h:3",
+      "crosswalk_path": "_staging/total-read/model-audit/XBeach/cw/crosswalk/XBeach-V01/trunk__lib__x64__mpich__include__mpicxx.h.crosswalk.json",
+      "crosswalk_sha256": "b43d49e46fd591d0e04142e34e8903dfeab1e7e7d793164b4c7b209bba1b9760",
+      "index": 3,
+      "source_path": "trunk/lib/x64/mpich/include/mpicxx.h",
+      "source_sha256": "8b17786533310be2ca0e2d58f64bb2731ecdc18e3a3a31b5e586a9952ee3bc03",
+      "base_ids": [
+        "A10"
+      ],
+      "audit_ids": [
+        "B10"
+      ],
+      "kind": "refuted-unverified",
+      "original_disposition": {
+        "disposition": "equivalent",
+        "base_ids": [
+          "A10"
+        ],
+        "audit_ids": [
+          "B10"
+        ],
+        "base_member_text": [
+          "[L1567-L1580,L1658-L1671,L2328-L2341,L2443-L2456] (MED/unchecked-duplication) Clone implementations ignore MPI_Comm_dup status and construct a wrapper from uninitialized ncomm when duplication fails with a returning handler."
+        ],
+        "audit_member_text": [
+          "[L1575-L1579,L1666-L1670,L2336-L2340,L2451-L2455] (MED/error-handling) Clone implementations ignore MPI_Comm_dup's return code and construct a communicator from an uninitialized ncomm if duplication fails and the C error handler returns."
+        ],
+        "representative": "audit",
+        "rationale": "blinded SAME",
+        "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+        "decided_at": "2026-08-27",
+        "adversarial": {
+          "verdict": "REFUTED_UNVERIFIED",
+          "rationale": "The packaged MPICH2 1.4.1p1 runtime explicitly stores MPI_COMM_NULL through newcomm on the error path before returning through the communicator error handler: mpich2mpi.dll RVA 0x6fee0, in cabinet member _1BE96E15F472462586C19E8C77FF7927 of the bundled x64 MSI, disassembled entirely in memory. This matches the quoted upstream error-path assignment, so these Clone calls can discard status but do not construct a wrapper from an uninitialized ncomm with the bundled runtime.",
+          "neutralizer": {
+            "where": "https://fossies.org/linux/mpich2/src/mpi/comm/comm_dup.c:L179-L180",
+            "quote": "    *newcomm = MPI_COMM_NULL;\n    mpi_errno = MPIR_Err_return_comm( comm_ptr, FCNAME, mpi_errno );"
+          },
+          "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+          "verified_at": "2026-09-07"
+        }
+      }
+    },
+    {
+      "id": "XBeach-V01:trunk/lib/x64/mpich/include/mpicxx.h:8",
+      "crosswalk_path": "_staging/total-read/model-audit/XBeach/cw/crosswalk/XBeach-V01/trunk__lib__x64__mpich__include__mpicxx.h.crosswalk.json",
+      "crosswalk_sha256": "b43d49e46fd591d0e04142e34e8903dfeab1e7e7d793164b4c7b209bba1b9760",
+      "index": 8,
+      "source_path": "trunk/lib/x64/mpich/include/mpicxx.h",
+      "source_sha256": "8b17786533310be2ca0e2d58f64bb2731ecdc18e3a3a31b5e586a9952ee3bc03",
+      "base_ids": [
+        "A0"
+      ],
+      "audit_ids": [
+        "B0"
+      ],
+      "kind": "refuted-unverified",
+      "original_disposition": {
+        "disposition": "equivalent",
+        "base_ids": [
+          "A0"
+        ],
+        "audit_ids": [
+          "B0"
+        ],
+        "base_member_text": [
+          "[L409,L1471,L1904] (HIGH/attribute-copy) NULL_COPY_FN sets flag=true without defining attr_out, reporting a successful attribute copy with an indeterminate output pointer."
+        ],
+        "audit_member_text": [
+          "[L409,L1471,L1904] (HIGH/attribute-callback) NULL_COPY_FN sets flag=true without initializing attr_out, allowing duplication to install an indeterminate attribute pointer instead of suppressing the copy."
+        ],
+        "representative": "audit",
+        "rationale": "blinded SAME",
+        "decided_by": "llm:blinded-subagent (general-purpose, vendor-blind, A/B-randomized) + caller span-confirm",
+        "decided_at": "2026-08-27",
+        "adversarial": {
+          "verdict": "REFUTED_UNVERIFIED",
+          "rationale": "The supplied cxx.lib implementation of each Comm/Datatype/Win Create_keyval compares the copy-function pointer with its NULL_COPY_FN and conditionally replaces it with zero before calling the C registration routine; objdump relocations and the compare/cmove sequence at function offsets 0x4-0x18 verify all three. Thus ordinary registration never executes these helper bodies during duplication, defeating the claimed indeterminate-attribute installation path; the quoted upstream implementation expresses the same concrete neutralizer.",
+          "neutralizer": {
+            "where": "https://fossies.org/linux/mpich2/src/binding/cxx/initcxx.cxx:L502-L504",
+            "quote": "    if (cf == MPI::Comm::NULL_COPY_FN) cf = 0;\n    if (df == MPI::Comm::NULL_DELETE_FN) df = 0;\n    MPIX_CALLWORLD( MPI_Comm_create_keyval( (MPI_Comm_copy_attr_function *)cf,"
+          },
+          "verified_by": "llm:codex gpt-6-astra skeptic + caller verbatim neutralizer re-check",
+          "verified_at": "2026-09-07"
+        }
+      }
+    }
+  ]
+}

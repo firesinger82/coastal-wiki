@@ -1,0 +1,476 @@
+{
+  "schema": "xbeach-manual-code-adjudications/v1",
+  "author": "Codex",
+  "date": "2026-09-09",
+  "note": "Source behavior adjudication only. Document quotations/pages are independently tracked in document-inventory; source alignment does not reconstruct damaged document equations.",
+  "items": [
+    {
+      "topic": "wci",
+      "finding_ids": [
+        "XH003",
+        "XH053",
+        "XH097",
+        "XH131"
+      ],
+      "scope": "frozen local source snapshot; historical PDF/DOC contradictions remain edition-specific",
+      "canonical_ready_ko": "기록된 소스 snapshot의 surfbeat 경로에서 wci=1은 흐름에 따른 파랑 굴절/수심 처리를 활성화하고, 0은 흐름 유속 기울기를 0으로 둔다. 입력 기본값은 0이다. 문서의 wci=1을 no interaction으로 설명한 문구를 현재 구현 설명으로 사용하지 않는다.",
+      "evidence": [
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_instationary.F90",
+          "sha256": "9584b6ec2138353aba65991a4ec570b4b794554485cea43915c6071e9e2ed45a",
+          "line_start": 131,
+          "line_end": 138,
+          "quote_exact_utf8": "      ! the local water depth to use in this subroutine generally depend on whether we're using wci or not\r\n      ! both options include par%delta*s%H effect\r\n      ! dispersion routine in wave_timestep already accounts for these differences\r\n      if (par%wci==1) then\r\n         hhwlocal = s%hhwcins\r\n      else\r\n         hhwlocal = s%hhw\r\n      endif\r",
+          "line_numbering": "physical LF, CR retained"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_instationary.F90",
+          "sha256": "9584b6ec2138353aba65991a4ec570b4b794554485cea43915c6071e9e2ed45a",
+          "line_start": 167,
+          "line_end": 177,
+          "quote_exact_utf8": "      ! Slopes of water depth\r\n      call slope2D(hhwlocal,s%nx,s%ny,s%dsu,s%dnv,dhdx,dhdy,s%wete)\r\n      if (par%wci==1) then\r\n         call slope2D(s%uwcins,s%nx,s%ny,s%dsu,s%dnv,dudx,dudy,s%wete)\r\n         call slope2D(s%vwcins,s%nx,s%ny,s%dsu,s%dnv,dvdx,dvdy,s%wete)\r\n      else\r\n         dudx = 0.d0\r\n         dudy = 0.d0\r\n         dvdx = 0.d0\r\n         dvdy = 0.d0\r\n      endif\r",
+          "line_numbering": "physical LF, CR retained"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.F90",
+          "sha256": "73648b5733a8f90a8f18cda32743bdc2ef42f649e39c521e28e06584ee63c359",
+          "line_start": 669,
+          "line_end": 674,
+          "quote_exact_utf8": "         call writelog('l','','--------------------------------')\r\n         call writelog('l','','Wave-current interaction parameters: ')\r\n         par%wci      = readkey_int ('params.txt','wci',        0,        0,     1,strict=.true.)\r\n         par%hwci     = readkey_dbl ('params.txt','hwci',   0.1d0,   0.001d0,      1.d0)\r\n         par%hwcimax  = readkey_dbl ('params.txt','hwcimax',   100.d0,   0.01d0,      100.d0)\r\n         par%cats     = readkey_dbl ('params.txt','cats',   4.d0,     1.d0,      50.d0)\r",
+          "line_numbering": "physical LF, CR retained"
+        }
+      ],
+      "finding_bindings": [
+        {
+          "finding_id": "XH003",
+          "finding_exact": "The prose associates 'wci=1' with no wave-current interaction, whereas the parameter table describes wci as enabling interaction and gives default '0'.",
+          "finding_sha256": "ee356c93be53cb3abfe9a25c5aa6fa15f9eaa5b18b51fab8fc5d25458468d0f8",
+          "scope": "Only the named parameter or algorithm within this compound finding is adjudicated; other clauses retain their documentary disposition."
+        },
+        {
+          "finding_id": "XH053",
+          "finding_exact": "The physics prose says wci=1 disables wave-current interaction, whereas the parameter table gives wci=0 as the default disabling switch.",
+          "finding_sha256": "258af82a5ac387feb8d18f0f3d7bcd129e45481aa517753345a893c0ecc46f1b",
+          "scope": "Only the named parameter or algorithm within this compound finding is adjudicated; other clauses retain their documentary disposition."
+        },
+        {
+          "finding_id": "XH097",
+          "finding_exact": "The wave-action prose associates wci=1 with no interaction, whereas the exercise and parameter table associate it with enabled interaction.",
+          "finding_sha256": "ec58c60aa98007f12e5db0419a51ef8acfeb353e710cd6f21e16e87d13a79bec",
+          "scope": "Only the named parameter or algorithm within this compound finding is adjudicated; other clauses retain their documentary disposition."
+        },
+        {
+          "finding_id": "XH131",
+          "finding_exact": "The physics text associates wci=1 with no wave-current interaction, whereas the parameter table describes switching interaction on and gives default wci=0.",
+          "finding_sha256": "fb2255b28d1c8bf409df74f74c05aa155f8e62eb2704fb4f99da672e8691b469",
+          "scope": "Only the named parameter or algorithm within this compound finding is adjudicated; other clauses retain their documentary disposition."
+        }
+      ]
+    },
+    {
+      "topic": "nuh",
+      "finding_ids": [
+        "XH008",
+        "XH059",
+        "XH100",
+        "XH135"
+      ],
+      "scope": "frozen local source snapshot; historical PDF/DOC contradictions remain edition-specific",
+      "canonical_ready_ko": "nuh는 smag 분기에 따라 의미가 달라진다. smag=1에서 par%nuh는 무차원 Smagorinsky 계수로 제곱되어 격자면적·변형률에 곱해지고, smag=0에서는 출력 점성계수 s%nuh에 직접 대입되어 m²/s 값으로 쓰인다. 해당 snapshot 입력 기본값은 nuh=0.1, smag=1이다. s%nuh 출력의 단위와 par%nuh 입력의 조건부 단위를 구분한다.",
+      "evidence": [
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/flow_timestep.F90",
+          "sha256": "50742b601cc8feccd513cf742ca772b6021f1d4f5ffe074c4e8ffc90907dd2b2",
+          "line_start": 365,
+          "line_end": 377,
+          "quote_exact_utf8": "      ! There is a possibility to turn viscosity off\r\n      if (par%viscosity==0) then ! Dano: put it here so it actualy saves a lot of computation time\r\n         s%nuh = 0.d0\r\n         s%viscu = 0.d0\r\n      else\r\n\r\n         ! Jaap: Slightly changes approach; 1) background viscosity is user defined or obtained from Smagorinsky, 2) nuh = max(nuh,roller induced viscosity)\r\n         if (par%smag == 1) then\r\n            !Use smagorinsky subgrid model\r\n            call visc_smagorinsky(s,par)\r\n         else\r\n            s%nuh = par%nuh\r\n         endif\r",
+          "line_numbering": "physical LF, CR retained"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/flow_timestep.F90",
+          "sha256": "50742b601cc8feccd513cf742ca772b6021f1d4f5ffe074c4e8ffc90907dd2b2",
+          "line_start": 1008,
+          "line_end": 1023,
+          "quote_exact_utf8": "      !  Calculates the turbulent viscocity coefficient nuh according to the smagorinsky\r\n      !  subgrid model.\r\n      !\r\n      !--------------------------        METHOD          ----------------------------\r\n      !\r\n      ! The turbulent viscocity is given as:\r\n      !\r\n      ! nuh = C^2*dx*dy*Tau\r\n      !\r\n      ! Tau =2^(1/2) *  [ (du/dx)^2 + (dv/dy)^2 + 1/2 * (du/dy + dv/dx)^2 ] ^ (1/2)\r\n      !\r\n      ! Where\r\n      !\r\n      ! dx,dy : grid size\r\n      ! C     : Constant ~0.15 (set by par%nuh)\r\n      ! Tau   : Measure for the magnitude of the turbulent stresses\r",
+          "line_numbering": "physical LF, CR retained"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/flow_timestep.F90",
+          "sha256": "50742b601cc8feccd513cf742ca772b6021f1d4f5ffe074c4e8ffc90907dd2b2",
+          "line_start": 1047,
+          "line_end": 1062,
+          "quote_exact_utf8": "      if (s%ny>2) then\r\n         do j=jmin_zs,jmax_zs\r\n            do i=imin_zs,imax_zs\r\n               dudx = (s%uu(i,j)-s%uu(i-1,j))/s%dsz(i,j)\r\n               dudy = .5d0*(s%uu(i,j+1) - s%uu(i,j-1) + s%uu(i-1,j+1) - s%uu(i-1,j-1))/(s%dnv(i,j)+s%dnv(i,j-1))\r\n               dvdx = .5d0*(s%vv(i+1,j) - s%vv(i-1,j) + s%vv(i+1,j-1) - s%vv(i-1,j-1))/(s%dsu(i,j)+s%dsu(i-1,j))\r\n               dvdy = (s%vv(i,j)-s%vv(i,j-1))/s%dnz(i,j)\r\n               Tau  = sqrt(2.0d0 * dudx**2+2.0d0 * dvdy**2 + (dvdx+dudy)**2)\r\n               l    = 1.d0/s%dsdnzi(i,j)\r\n               ! Robert: probably need something like nuh = max(par%nuh,par%nuhfac*s%hh(i,j)*(s%DR(i,j)/par%rho)**(1.0d0/3.0d0))\r\n               ! Robert: this doesn't seem to be consistent with Smag approach\r\n               !nuhlocal = max(par%nuh,par%nuhfac*s%hh(i,j)*(s%DR(i,j)/par%rho)**(1.0d0/3.0d0))\r\n               !s%nuh(i,j) = nuhlocal**2 * l * Tau * real(s%wetu(i,j)*s%wetu(i-1,j)*s%wetv(i,j)*s%wetv(i,j-1),kind=8)\r\n               ! s%nuh(i,j) = nuh**2 * l * Tau * real(s%wetu(i,j)*s%wetu(i-1,j)*s%wetv(i,j)*s%wetv(i,j-1),kind=8)\r\n               s%nuh(i,j) = par%nuh**2 * l * Tau * real(s%wetu(i,j)*s%wetu(i-1,j)*s%wetv(i,j)*s%wetv(i,j-1),kind=8)\r\n            enddo\r",
+          "line_numbering": "physical LF, CR retained"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.F90",
+          "sha256": "73648b5733a8f90a8f18cda32743bdc2ef42f649e39c521e28e06584ee63c359",
+          "line_start": 743,
+          "line_end": 748,
+          "quote_exact_utf8": "               \r\n      par%nuh     = readkey_dbl ('params.txt','nuh',       0.1d0,     0.0d0,   1.0d0)\r\n      par%nuhfac  = readkey_dbl ('params.txt','nuhfac',    0.0d0,     0.0d0,   1.0d0)\r\n      par%nuhv    = readkey_dbl ('params.txt','nuhv',      1.d0,      1.d0,    20.d0,silent=.true.)\r\n      par%smag    = readkey_int ('params.txt','smag',      1,         0,       1,strict=.true.)\r\n\r",
+          "line_numbering": "physical LF, CR retained"
+        }
+      ],
+      "finding_bindings": [
+        {
+          "finding_id": "XH008",
+          "finding_exact": "The prose identifies 'nuh=0.1' as the dimensionless Smagorinsky constant when 'smag=1', but the table labels the same input as background viscosity in m²/s.",
+          "finding_sha256": "7b02b86d2485948aff3e766b0f50ccf1b293176f1837781ad12fd17a29eee13b",
+          "scope": "Only the named parameter or algorithm within this compound finding is adjudicated; other clauses retain their documentary disposition."
+        },
+        {
+          "finding_id": "XH059",
+          "finding_exact": "The Smagorinsky description treats nuh=0.1 as a dimensionless coefficient, whereas its parameter table assigns nuh units of m²/s.",
+          "finding_sha256": "8cebacefbced2769bf64ed6098b87b15d7592f15a6fcb5f9402c6be1e9430914",
+          "scope": "Only the named parameter or algorithm within this compound finding is adjudicated; other clauses retain their documentary disposition."
+        },
+        {
+          "finding_id": "XH100",
+          "finding_exact": "Typical Chezy C=55, Manning n=0.02 and ks=0.01–0.15 m conflict with default chezy/bedfriccoef=0.01, changed from Kingsday 0.003, while nuh=0.1 is described both as a Smagorinsky constant and dimensional viscosity.",
+          "finding_sha256": "7ff3d3b0c111ba454ed89b506c8e80c0efff9873cb38a56ae3b6b174c67492fd",
+          "scope": "Only the named parameter or algorithm within this compound finding is adjudicated; other clauses retain their documentary disposition."
+        },
+        {
+          "finding_id": "XH135",
+          "finding_exact": "The text gives Chezy C=55 and Manning n=0.02, while the default bedfriccoef is 0.01 rather than Kingsday's 0.003 and nuh=0.1 is described both as a coefficient and as a dimensional viscosity.",
+          "finding_sha256": "07ad19ea57c3ab7f209570a9601bb0e673dca02e147bed5149643301fa4dc9aa",
+          "scope": "Only the named parameter or algorithm within this compound finding is adjudicated; other clauses retain their documentary disposition."
+        }
+      ]
+    },
+    {
+      "topic": "bedfriction",
+      "finding_ids": [
+        "XH009",
+        "XH060",
+        "XH100",
+        "XH135",
+        "XH136"
+      ],
+      "scope": "frozen local source snapshot; historical PDF/DOC contradictions remain edition-specific",
+      "canonical_ready_ko": "마찰 파일을 쓰지 않는 조건에서 기본 계수는 선택한 마찰식에 종속된다: Chezy는 55, cf는 0.003, Manning은 0.02, White-Colebrook은 0.01이다. Chezy 분기는 g/C²로 cf를 계산하므로 Chezy C에 0.003을 넣는 것은 cf=0.003과 동등하지 않다. 문서 변환으로 깨진 마찰 공식은 이 소스식으로 원문을 복원했다고 주장하지 않고 별도 제외한다.",
+      "evidence": [
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.F90",
+          "sha256": "73648b5733a8f90a8f18cda32743bdc2ef42f649e39c521e28e06584ee63c359",
+          "line_start": 707,
+          "line_end": 727,
+          "quote_exact_utf8": "         ! try to read a bed friction file\r\n         par%bedfricfile = readkey_name('params.txt','bedfricfile')\r\n         if (par%bedfricfile .ne. ' ') then\r\n            call check_file_exist(par%bedfricfile)\r\n            if (par%gridform==GRIDFORM_XBEACH) then\r\n               call check_file_length(par%bedfricfile,par%nx+1,par%ny+1)\r\n            endif\r\n            call writelog('lws','(a,a,a)','Warning: bed friction coefficient values from file ''',&\r\n            trim(par%bedfricfile), &\r\n            ''' will be used in computation')\r\n         else\r\n            if (par%bedfriction==BEDFRICTION_CHEZY) then\r\n               par%bedfriccoef = readkey_dbl('params.txt','bedfriccoef', 55.d0, 20.d0, 100.d0)\r\n            elseif (par%bedfriction==BEDFRICTION_CF) then\r\n               par%bedfriccoef = readkey_dbl('params.txt','bedfriccoef', 3.d-3, 1.d-3,  0.1d0)\r\n            elseif (par%bedfriction==BEDFRICTION_MANNING) then\r\n               par%bedfriccoef = readkey_dbl('params.txt','bedfriccoef', 0.02d0, 0.01d0, 0.05d0)\r\n            elseif (par%bedfriction==BEDFRICTION_WHITE_COLEBROOK) then\r\n               par%bedfriccoef = readkey_dbl('params.txt','bedfriccoef', 0.01d0, 3.5d-5, 0.9d0)\r\n            endif\r\n         endif\r",
+          "line_numbering": "physical LF, CR retained"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/bedroughness.F90",
+          "sha256": "508ccef2919d203a716f831f4ffd80a57068562eab747a00a94da802a840dfef",
+          "line_start": 68,
+          "line_end": 75,
+          "quote_exact_utf8": "      select case (par%bedfriction)\r\n\r\n       case(BEDFRICTION_CHEZY)\r\n         s%cfu = par%g/s%bedfriccoef**2\r\n         s%cfv = par%g/s%bedfriccoef**2\r\n       case(BEDFRICTION_CF)\r\n         s%cfu = s%bedfriccoef\r\n         s%cfv = s%bedfriccoef\r",
+          "line_numbering": "physical LF, CR retained"
+        }
+      ],
+      "finding_bindings": [
+        {
+          "finding_id": "XH009",
+          "finding_exact": "The friction table pairs 'chezy' with '55 m½/s' and 'cf' with '0.003', but the input table defaults to 'bedfriction=chezy' and 'bedfriccoef=0.003'.",
+          "finding_sha256": "00d69e076c2179faab7bec3d67de4522696dcc50a673d696cf4a19d6d2d1a07e",
+          "scope": "Only the named parameter or algorithm within this compound finding is adjudicated; other clauses retain their documentary disposition."
+        },
+        {
+          "finding_id": "XH060",
+          "finding_exact": "The prose gives cf=0.003 and Chezy C=55 with cf=g/C², but the table pairs default bedfriction=chezy with bedfriccoef=0.003.",
+          "finding_sha256": "c1854c066319a31f4ec22c996427b910710e17301f62934c218fa135bc5bcc4c",
+          "scope": "Only the named parameter or algorithm within this compound finding is adjudicated; other clauses retain their documentary disposition."
+        },
+        {
+          "finding_id": "XH100",
+          "finding_exact": "Typical Chezy C=55, Manning n=0.02 and ks=0.01–0.15 m conflict with default chezy/bedfriccoef=0.01, changed from Kingsday 0.003, while nuh=0.1 is described both as a Smagorinsky constant and dimensional viscosity.",
+          "finding_sha256": "7ff3d3b0c111ba454ed89b506c8e80c0efff9873cb38a56ae3b6b174c67492fd",
+          "scope": "Only the named parameter or algorithm within this compound finding is adjudicated; other clauses retain their documentary disposition."
+        },
+        {
+          "finding_id": "XH135",
+          "finding_exact": "The text gives Chezy C=55 and Manning n=0.02, while the default bedfriccoef is 0.01 rather than Kingsday's 0.003 and nuh=0.1 is described both as a coefficient and as a dimensional viscosity.",
+          "finding_sha256": "07ad19ea57c3ab7f209570a9601bb0e673dca02e147bed5149643301fa4dc9aa",
+          "scope": "Only the named parameter or algorithm within this compound finding is adjudicated; other clauses retain their documentary disposition."
+        },
+        {
+          "finding_id": "XH136",
+          "finding_exact": "The extracted friction formulas show cf=g/C and a Manning exponent of 1/12, differing from expected squared-C notation and Kingsday's 1/3 exponent, requiring verification against the original equations before use.",
+          "finding_sha256": "c3150634994a4b05ea608a625be7efa726de2db5ed104f63b28894a74ac81cdc",
+          "scope": "Only the named parameter or algorithm within this compound finding is adjudicated; other clauses retain their documentary disposition."
+        }
+      ]
+    },
+    {
+      "topic": "dilatancy",
+      "finding_ids": [
+        "XH013",
+        "XH067",
+        "XH103",
+        "XH141"
+      ],
+      "scope": "frozen local source snapshot; historical PDF/DOC contradictions remain edition-specific",
+      "canonical_ready_ko": "이 snapshot에서 dilatancy=1일 때 srfRhee는 erosion velocity와 (pormax-por), rheeA 등에 비례한다. 양의 침투계수·밀도비 및 pormax>=por 조건에서는 srfRhee>=0이고, 경사 효과를 끄면 srfTotal=1+srfRhee이다. 이에 따라 임계 bed-load 속도는 Ucr*sqrt(srfTotal), 경사 total 모드가 아닌 suspended-load 속도는 Ucr*(1+sqrt(srfRhee))로 증가한다. 코드 주석의 A는 단일입자 3/4, 연속체 1/(1-n0)이며 입력 rheeA 기본값은 0.75이다. 문서의 감소 설명과 수식/주석 모순은 이 구현과 구분해 기록한다.",
+      "evidence": [
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/morphevolution.F90",
+          "sha256": "765f474008f7cb843353dc0790cc3f3ebdc00631353da7592e2bb0508e968391",
+          "line_start": 1539,
+          "line_end": 1553,
+          "quote_exact_utf8": "         ! Lodewijk: implementation Rhee (2010), reduction sediment transport due dilatancy\r\n         srfRhee(:,:)  = 0.d0\r\n         srfTotal(:,:) = 1.d0\r\n         if (par%dilatancy == 1) then\r\n            vero(:,:) = max(0.d0,-1.d0*s%dzbdt)      ! Erosion velocity, for now asume it equal to -s%dzbdt of the previous time step\r\n            kl = par%g/(160.d0*kvis)*(s%D15(jg)**2.d0)*((par%por**3.d0)/(1.d0-par%por)**2.d0) ! Permeability, Adel \u00011987\u0002, which is based on the Ergun equation\r\n            ! bed porosity, estimated here as maximum porosity, to be added to user input\r\n            ! A=3/4 for single particles and A=1/(1-n0) for a continuum\r\n            ! Reduction factor on the critical Shields parameter by dilatancy (Van Rhee, 2010)\r\n            srfRhee(:,:) = vero(:,:)/kl*(par%pormax-par%por)/(1.d0-par%pormax)*par%rheeA/delta\r\n         endif\r\n         ! Lodewijk: implementation bed slope reduction on critical flow velocity\r\n         if (par%bdslpeffini == BDSLPEFFINI_NONE) then\r\n            srfTotal(:,:) = 1.d0 + srfRhee(:,:)\r\n         elseif (par%bdslpeffini == BDSLPEFFINI_TOTAL .or. par%bdslpeffini == BDSLPEFFINI_BED) then\r",
+          "line_numbering": "physical LF, CR retained"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/morphevolution.F90",
+          "sha256": "765f474008f7cb843353dc0790cc3f3ebdc00631353da7592e2bb0508e968391",
+          "line_start": 1593,
+          "line_end": 1599,
+          "quote_exact_utf8": "         ! Calculate the new critical velocity based on the modification factors on the Shields parameter, bed slope only on bed load\r\n         Ucrb(:,:) = Ucr(:,:)*sqrt(srfTotal) ! Lodewijk\r\n         if (par%bdslpeffini == BDSLPEFFINI_TOTAL) then\r\n            Ucrs = Ucrb\r\n         else\r\n            Ucrs = Ucr*(1.d0+sqrt(srfRhee)) ! Lodewijk, no effect on suspended load by bed slope\r\n         endif\r",
+          "line_numbering": "physical LF, CR retained"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.F90",
+          "sha256": "73648b5733a8f90a8f18cda32743bdc2ef42f649e39c521e28e06584ee63c359",
+          "line_start": 1114,
+          "line_end": 1119,
+          "quote_exact_utf8": "         par%fallvelred          = readkey_int ('params.txt','fallvelred',    0,        0,     1,strict=.true.)\r\n         par%dilatancy           = readkey_int ('params.txt','dilatancy', 0,    0,     1,strict=.true.)\r\n         if (par%dilatancy==1) then\r\n            par%rheeA               = readkey_dbl ('params.txt','rheeA',         0.75d0,   0.75d0, 2.d0) ! Between 3/4 and 1/(1-n), see paper Van Rhee (2010)\r\n            par%pormax              = readkey_dbl ('params.txt','pormax',        0.5d0,    0.3d0, 0.6d0)\r\n         endif\r",
+          "line_numbering": "physical LF, CR retained"
+        }
+      ],
+      "finding_bindings": [
+        {
+          "finding_id": "XH013",
+          "finding_exact": "Dilatancy is said to hinder erosion by reducing the critical Shields number, a direction requiring verification, with 'rheeA=0.75' by default versus approximately '1.7' for a continuum and 'pormax=0.5'.",
+          "finding_sha256": "8c8a96f02e0eb7058ee1076bd69616b0f026e8018088869a1cb62c65b919d262",
+          "scope": "Only the named parameter or algorithm within this compound finding is adjudicated; other clauses retain their documentary disposition."
+        },
+        {
+          "finding_id": "XH067",
+          "finding_exact": "The dilatancy prose says critical Shields stress is reduced while describing inhibited erosion, and the accompanying positive correction uses rheeA=0.75 for continuum motion or 1.7 otherwise with pormax=0.5.",
+          "finding_sha256": "73cbe62ffb43df801b5c386695c488b8c471ce772e981187856206f3ae67a8bc",
+          "scope": "Only the named parameter or algorithm within this compound finding is adjudicated; other clauses retain their documentary disposition."
+        },
+        {
+          "finding_id": "XH103",
+          "finding_exact": "The sediment calculation fixes T=20°C and ν=10^-6 m²/s, while dilatancy still claims to reduce critical Shields stress and assigns A=0.75 to individual particles and 1.7 to a continuum, reversing the Kingsday assignment.",
+          "finding_sha256": "9a9be952de8857b973c1754d1731db3637eb434d7e5c6c52fa744f6190457aea",
+          "scope": "Only the named parameter or algorithm within this compound finding is adjudicated; other clauses retain their documentary disposition."
+        },
+        {
+          "finding_id": "XH141",
+          "finding_exact": "The text assumes T=20 and nu=1e-6, defines ua=(fSk*Sk-fAs*As)*urms, and assigns dilatancy A=0.75 to a single particle and A=1.7 to a continuum, reversing the Kingsday assignments.",
+          "finding_sha256": "4e0e8b0bd5465b280ce9289957885308a3bcf69a9fa152e97e0c7c1bd67c4d1c",
+          "scope": "Only the named parameter or algorithm within this compound finding is adjudicated; other clauses retain their documentary disposition."
+        }
+      ]
+    },
+    {
+      "topic": "adaptation-time",
+      "finding_ids": [
+        "XH063",
+        "XH138"
+      ],
+      "scope": "frozen local source snapshot; historical PDF/DOC contradictions remain edition-specific",
+      "canonical_ready_ko": "기록된 구현은 먼저 Ts=tsfac*hloc/w를 계산하고 oldTsmin=1이면 max(Ts,Tsmin), 그 밖에는 max(Ts,dtlimTs*dt)를 취한다. 더하기가 아니다. snapshot의 oldTsmin 기본값은 0, dtlimTs는 5이며 이 조건에서 Tsmin을 공통 고정 하한이라고 설명하지 않는다.",
+      "evidence": [
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/morphevolution.F90",
+          "sha256": "765f474008f7cb843353dc0790cc3f3ebdc00631353da7592e2bb0508e968391",
+          "line_start": 1506,
+          "line_end": 1513,
+          "quote_exact_utf8": "      do jg = 1,par%ngd\r\n\r\n         Ts       = par%tsfac*hloc/w(:,:,jg)\r\n         if (par%oldTsmin==1) then\r\n            s%Tsg(:,:,jg) = max(Ts,par%Tsmin)\r\n         else\r\n            s%Tsg(:,:,jg) = max(Ts,par%dtlimTs*par%dt)\r\n         endif\r",
+          "line_numbering": "physical LF, CR retained"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.F90",
+          "sha256": "73648b5733a8f90a8f18cda32743bdc2ef42f649e39c521e28e06584ee63c359",
+          "line_start": 1420,
+          "line_end": 1425,
+          "quote_exact_utf8": "         par%sourcesink = readkey_int ('params.txt','sourcesink    ',0,     0,         1,silent=.true.,strict=.true.)\r\n         par%cmax       = readkey_dbl ('params.txt','cmax',      0.1d0,    0.05d0,   0.4d0)\r\n         par%oldTsmin   = readkey_int ('params.txt','oldTsmin    ',0,     0,         1,silent=.true.,strict=.true.)\r\n         if (par%oldTsmin==0) then\r\n            par%dtlimTs   = readkey_dbl ('params.txt','dtlimTs', 5.0d0,    0.0d0,   20.d0)\r\n         endif\r",
+          "line_numbering": "physical LF, CR retained"
+        }
+      ],
+      "finding_bindings": [
+        {
+          "finding_id": "XH063",
+          "finding_exact": "The adaptation-time equation uses Ts=max(fTs h/ws,Tsmin), whereas the parameter description prints Ts=tsfac+h/ws, an operator discrepancy requiring original-page verification.",
+          "finding_sha256": "f25b8e217e5a374f6d649c1c46f87b6af8d95ebfee43ea74769135f39a6f2911",
+          "scope": "Only the named parameter or algorithm within this compound finding is adjudicated; other clauses retain their documentary disposition."
+        },
+        {
+          "finding_id": "XH138",
+          "finding_exact": "The adaptation-time formulation uses max(fTs*h/ws,Tsmin), but the parameter table prints tsfac+h/ws with default tsfac=0.1.",
+          "finding_sha256": "6a8c66c632cc158f0a7cb3ef3bbac1ab580742b27c61100cf0d7b919eccc1c8c",
+          "scope": "Only the named parameter or algorithm within this compound finding is adjudicated; other clauses retain their documentary disposition."
+        }
+      ]
+    },
+    {
+      "topic": "posdwn",
+      "finding_ids": [
+        "XH022",
+        "XH075",
+        "XH112",
+        "XH147"
+      ],
+      "scope": "frozen local source snapshot; historical PDF/DOC contradictions remain edition-specific",
+      "canonical_ready_ko": "문서의 규약은 양의 아래 방향 수심 posdwn=1, 양의 위 방향 고도 posdwn=-1로 구분해야 한다. 실제 snapshot은 s%zb=-s%zb*s%posdwn으로 내부 바닥고를 만들며 ±1에서 이 규약을 따른다. 예제의 posdwn=0을 그대로 넣으면 변환 곱이 0이 되어 해당 초기화 경로의 바닥고가 0으로 소거된다. 0을 -1의 별칭으로 보지 않는다.",
+      "evidence": [
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.F90",
+          "sha256": "73648b5733a8f90a8f18cda32743bdc2ef42f649e39c521e28e06584ee63c359",
+          "line_start": 155,
+          "line_end": 160,
+          "quote_exact_utf8": "               call writelog('lws','(a)','Set model to ny=0')\r\n               call halt_program\r\n            endif\r\n         endif\r\n         par%posdwn= readkey_dbl('params.txt','posdwn', 1.d0,     -1.d0,     1.d0)\r\n         if (par%setbathy .ne. 1 .and. par%hotstart .ne. 1) then\r",
+          "line_numbering": "physical LF, CR retained"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/initialize.F90",
+          "sha256": "9803067bd2fa4962d9e2247f6e8b5f87e18a9860802595424183994a715523cd",
+          "line_start": 40,
+          "line_end": 55,
+          "quote_exact_utf8": "      s%dx      = par%dx\r\n      s%dy      = par%dy\r\n      s%xori    = par%xori\r\n      s%yori    = par%yori\r\n      s%alfa    = par%alfa\r\n      s%posdwn  = par%posdwn\r\n      s%vardx   = par%vardx\r\n\r\n      if (s%alfa.lt.0) then\r\n         s%alfa = 360.d0+s%alfa\r\n      endif\r\n\r\n      s%alfa  = s%alfa*atan(1.0d0)/45.d0\r\n      ! Robert: huh?\r\n      s%posdwn = s%posdwn*sign(s%posdwn,1.d0)\r\n      ! end huh?\r",
+          "line_numbering": "physical LF, CR retained"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/initialize.F90",
+          "sha256": "9803067bd2fa4962d9e2247f6e8b5f87e18a9860802595424183994a715523cd",
+          "line_start": 240,
+          "line_end": 249,
+          "quote_exact_utf8": "      if(.true.) then\r\n\r\n         s%zb=-s%zb*s%posdwn\r\n         ! Make sure that at the lateral boundaries the bathymetry is alongshore uniform\r\n         if (s%ny>0) then\r\n            s%zb(:,1) = s%zb(:,2)\r\n            s%zb(:,s%ny+1) = s%zb(:,s%ny)\r\n         endif\r\n         s%zb(1,:)=s%zb(2,:)\r\n         s%zb(s%nx+1,:)=s%zb(s%nx,:)\r",
+          "line_numbering": "physical LF, CR retained"
+        }
+      ],
+      "finding_bindings": [
+        {
+          "finding_id": "XH022",
+          "finding_exact": "The example uses negative underwater elevations with 'posdwn=0', while the table specifies '−1' for positive-up data.",
+          "finding_sha256": "f82111f2f0dafe3cb2f5f0d4ec87cce5d2d3b945f77e13290b8b776ff3d1bc81",
+          "scope": "Only the named parameter or algorithm within this compound finding is adjudicated; other clauses retain their documentary disposition."
+        },
+        {
+          "finding_id": "XH075",
+          "finding_exact": "Grid arrays require (nx+1)×(ny+1) entries and positive-up bathymetry is documented as posdwn=-1, but the example uses posdwn=0.",
+          "finding_sha256": "c6e6d5b995927ef10cf37f559226dee3584e3d1c02b514631008afaa85e984ab",
+          "scope": "Only the named parameter or algorithm within this compound finding is adjudicated; other clauses retain their documentary disposition."
+        },
+        {
+          "finding_id": "XH112",
+          "finding_exact": "The negative-depth example sets posdwn=0 although the parameter definition requires -1 for positive-up bathymetry.",
+          "finding_sha256": "db85c7e2d52ca769abdc1cb873c5be60b35ccabc845b2cef8e0adad6664fbe9a",
+          "scope": "Only the named parameter or algorithm within this compound finding is adjudicated; other clauses retain their documentary disposition."
+        },
+        {
+          "finding_id": "XH147",
+          "finding_exact": "The examples and tables disagree on the upward-positive posdwn value and the angular reference axis, while Tm01switch defaults to 0 here versus 1 in Kingsday's prose.",
+          "finding_sha256": "a0b993cd5bab11e9a7457ddeb2548278a2aac9d00f4f56749bfb35aaa28b988f",
+          "scope": "Only the named parameter or algorithm within this compound finding is adjudicated; other clauses retain their documentary disposition."
+        }
+      ]
+    },
+    {
+      "topic": "dthetaS_XB",
+      "finding_ids": [
+        "XH023",
+        "XH078",
+        "XH113",
+        "XH147"
+      ],
+      "scope": "frozen local source snapshot; historical PDF/DOC contradictions remain edition-specific",
+      "canonical_ready_ko": "SWAN 스펙트럼을 읽는 이 코드에서 dthetaS_XB는 Cartesian SWAN x축에서 East x축으로 회전하는 반시계 각도이다. Cartesian 입력은 specin%ang에서 이 값을 빼고, nautical 입력은 270-angle로 변환하는 별도 분기를 쓴다. 매뉴얼 산문의 XBeach x축 표기를 이 매개변수의 실제 참조축으로 일반화하지 않는다.",
+      "evidence": [
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_boundary_update.f90",
+          "sha256": "9c364a2c916f034338044b542c0231f412553812a16c11346a6bcc98319a80c7",
+          "line_start": 910,
+          "line_end": 919,
+          "quote_exact_utf8": "   ! Convert angles to cartesian degrees relative to East\r\n   if (switch == 1) then\r\n      ! nautical to cartesian East\r\n      specin%ang = 270.d0-specin%ang\r\n   else\r\n      ! cartesian to cartesian East\r\n      specin%ang = specin%ang-par%dthetaS_XB\r\n      ! dthetaS_XB is the (counter-clockwise) angle in the degrees to rotate from the x-axis in SWAN to the\r\n      ! x-axis pointing East\r\n   end if\r",
+          "line_numbering": "physical LF, CR retained"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.F90",
+          "sha256": "73648b5733a8f90a8f18cda32743bdc2ef42f649e39c521e28e06584ee63c359",
+          "line_start": 481,
+          "line_end": 485,
+          "quote_exact_utf8": "         !\r\n         if (par%wbctype==WBCTYPE_SWAN) then\r\n            par%dthetaS_XB  = readkey_dbl ('params.txt','dthetaS_XB',   0.0d0,      -360.d0,    360.0d0,strict=.true. )\r\n         endif\r\n         !\r",
+          "line_numbering": "physical LF, CR retained"
+        }
+      ],
+      "finding_bindings": [
+        {
+          "finding_id": "XH023",
+          "finding_exact": "The prose defines dthetaS_XB as rotation from SWAN to the XBeach x-axis, whereas the parameter table defines rotation to the east-pointing axis.",
+          "finding_sha256": "15a3a8294bf3ca2e48719f5303322b824bd74b75c2858e553715cf2292275d14",
+          "scope": "Only the named parameter or algorithm within this compound finding is adjudicated; other clauses retain their documentary disposition."
+        },
+        {
+          "finding_id": "XH078",
+          "finding_exact": "dthetaS_XB is described relative to East in one place and model x in another, while vardens uses Cartesian directions 0° along +x and 90° along +y.",
+          "finding_sha256": "13bd927829c9991b94feac5df08e8b54a5af97a6cb25b06f55cdd168ea937fb7",
+          "scope": "Only the named parameter or algorithm within this compound finding is adjudicated; other clauses retain their documentary disposition."
+        },
+        {
+          "finding_id": "XH113",
+          "finding_exact": "dthetaS_XB rotates SWAN x into model x in the prose but into East in the table.",
+          "finding_sha256": "c0b97ca803666b848ca1ee14eb8089f3154b8047a15470ef479cc14038e8f6f4",
+          "scope": "Only the named parameter or algorithm within this compound finding is adjudicated; other clauses retain their documentary disposition."
+        },
+        {
+          "finding_id": "XH147",
+          "finding_exact": "The examples and tables disagree on the upward-positive posdwn value and the angular reference axis, while Tm01switch defaults to 0 here versus 1 in Kingsday's prose.",
+          "finding_sha256": "a0b993cd5bab11e9a7457ddeb2548278a2aac9d00f4f56749bfb35aaa28b988f",
+          "scope": "Only the named parameter or algorithm within this compound finding is adjudicated; other clauses retain their documentary disposition."
+        }
+      ]
+    },
+    {
+      "topic": "secorder",
+      "finding_ids": [
+        "XH179",
+        "XH204"
+      ],
+      "scope": "frozen local source snapshot; historical PDF/DOC contradictions remain edition-specific",
+      "canonical_ready_ko": "2010 보고서의 sec_order 표기는 현재 보관 snapshot의 secorder와 구분한다. 소스는 secorder=1일 때 2차 이류 보정을 호출하며 nonh 입력 기본값은 1(그 밖은 0)이다. nonh에서 0을 넣어도 일관성 검사에서 1로 강제한다. 이 사실은 2010 코드의 동작을 역으로 입증하지 않으며 보고서 안의 상반된 옵션 설명은 역사적 문서 모순으로 기록한다.",
+      "evidence": [
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.F90",
+          "sha256": "73648b5733a8f90a8f18cda32743bdc2ef42f649e39c521e28e06584ee63c359",
+          "line_start": 1406,
+          "line_end": 1410,
+          "quote_exact_utf8": "      if (par%wavemodel==WAVEMODEL_NONH) then\r\n         par%secorder = readkey_int('params.txt','secorder' ,1,0,1,strict=.true.)\r\n      else\r\n         par%secorder = readkey_int('params.txt','secorder' ,0,0,1,strict=.true.)\r\n      endif\r",
+          "line_numbering": "physical LF, CR retained"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.F90",
+          "sha256": "73648b5733a8f90a8f18cda32743bdc2ef42f649e39c521e28e06584ee63c359",
+          "line_start": 1739,
+          "line_end": 1746,
+          "quote_exact_utf8": "      ! If using nonh, secorder should always be on\r\n      if (par%wavemodel==WAVEMODEL_NONH) then\r\n         if (par%secorder==0) then\r\n            call writelog('lws','','Warning: Automatically turning on 2nd order correction in flow for')\r\n            call writelog('lws','','         non-hydrostatic module [secorder=1]')\r\n            par%secorder = 1\r\n         endif\r\n      endif\r",
+          "line_numbering": "physical LF, CR retained"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/flow_timestep.F90",
+          "sha256": "50742b601cc8feccd513cf742ca772b6021f1d4f5ffe074c4e8ffc90907dd2b2",
+          "line_start": 645,
+          "line_end": 652,
+          "quote_exact_utf8": "      if (par%secorder==1) then\r\n         !Call second order correction to the advection\r\n         call flow_secondorder_advUV(s,par,uu_old,vv_old)\r\n#ifdef USEMPI\r\n         call xmpi_shift_ee(s%uu)\r\n         call xmpi_shift_ee(s%vv)\r\n#endif\r\n      end if\r",
+          "line_numbering": "physical LF, CR retained"
+        }
+      ],
+      "finding_bindings": [
+        {
+          "finding_id": "XH179",
+          "finding_exact": "Procedure descriptions say second-order corrections are 'Not called when sec_order=1', contradicting the documented enabling value secorder=1 and introducing an underscore spelling drift.",
+          "finding_sha256": "b1b7cf2f2f3bfde3482e5755f2248e7d30cb5da45d03345ceb58c95f419a7e3d",
+          "scope": "Only the named parameter or algorithm within this compound finding is adjudicated; other clauses retain their documentary disposition."
+        },
+        {
+          "finding_id": "XH204",
+          "finding_exact": "The procedure descriptions say corrections are 'Not called when sec_order=1', contradicting the recommendation and parameter table that 'secorder=1' enables them and also changing the keyword spelling.",
+          "finding_sha256": "281e39d721c36edd15b598913ed407765717b779aa73cb1ea52219d7e252e4c4",
+          "scope": "Only the named parameter or algorithm within this compound finding is adjudicated; other clauses retain their documentary disposition."
+        }
+      ]
+    }
+  ],
+  "id_mapping_correction": "2026-09-09 final Codex review: matched every topic to exact-207 finding text; retained compound memberships and removed unrelated ordinal guesses."
+}
