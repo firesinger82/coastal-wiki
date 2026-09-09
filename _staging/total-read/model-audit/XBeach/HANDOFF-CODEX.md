@@ -4,7 +4,9 @@
 
 ---
 
-> **2026-09-09 Codex 후속 상태**: §2-1~2-4 준비 완료. 현재 manifest 103 / 기존 approved 60(모든 필드 보존) / 신규 pending 43. [승인용 수정본](HG-REVIEW-20260909.md) 및 [Claude 적대적 검토](HG-ADVERSARIAL-20260909.md)를 우선 읽는다. 아래 준비 명령은 최초 인수인계 당시 절차이므로 현재 산출물에 다시 실행하지 않는다. 특히 단순 manifest 빌드는 후속 추가한 `physical_source_span`·좌표계·적대검증 메타데이터를 보존하지 않는다. 다음 단계는 수정본의 사람 승인이다.
+> **최신 상태 — HG 완료(2026-09-09)**: 사용자가 신규 43건 감사 기록 편입을 명시 승인했다. 기존 승인 60건 원문 보존, 합계 103 approved·0 pending, 최종 supplement 게이트 PASS. [승인·게이트 기록](HG-APPROVAL-20260909.json). PROGRESS는 P0 v3 기준 DONE이며 이월 5종은 열린 상태다. 다음 단계는 SFINCS P0. 아래 준비 상태와 최초 인수인계 본문은 과거 이력이다. 승인 직전 HG-REVIEW 문서는 해시 고정 대상으로 그대로 유지한다.
+
+> **2026-09-09 Codex 후속 상태(승인 전 이력)**: §2-1~2-4 준비 완료. 현재 manifest 103 / 기존 approved 60(모든 필드 보존) / 신규 pending 43. [승인용 수정본](HG-REVIEW-20260909.md) 및 [Claude 적대적 검토](HG-ADVERSARIAL-20260909.md)를 우선 읽는다. 아래 준비 명령은 최초 인수인계 당시 절차이므로 현재 산출물에 다시 실행하지 않는다. 특히 단순 manifest 빌드는 후속 추가한 `physical_source_span`·좌표계·적대검증 메타데이터를 보존하지 않는다. 다음 단계는 수정본의 사람 승인이다.
 >
 > **추가 함정**: `str.splitlines()`는 LF뿐 아니라 form-feed도 분리한다. `texinfo.tex` 7882행 이후 9건은 게이트 좌표와 실제 LF 라인이 1 차이 난다. 게이트 원본은 유지하고 crosswalk `physical_lines` 및 manifest `physical_source_span`에 실제 위치를 명시했다. 사용자용 file:line은 실제 LF 라인만 사용한다. 인용의 LF 정규화 표현과 원본 CRLF 바이트 근거도 구분한다.
 >

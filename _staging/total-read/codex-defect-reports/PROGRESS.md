@@ -12,7 +12,7 @@
 | Delft3D | 24,748 | ⬜ | 🟡(코어34) | ⬜ | ⬜ | ⬜ | ✅(HIGH9) | ⬜ | ~0.1% | 🟡(코어 부분·third-party 미분리) |
 | CADMAS-SURF | 1,310 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 0% | ⬜ |
 | SFINCS | 241 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 0% | ⬜ |
-| XBeach | **456**(P0 v3 전량) | ✅ | ✅ 281 2독립 + 22 단독 + 153 인벤토리 | ✅ 281/281 | ✅ 1,472처분 PASS | 🟡(delta 103·재승인 대기) | ✅ 571/571 | ⏳사용자 | **미판독 0** | 🟡 판독완주·HG 대기 |
+| XBeach | **456**(P0 v3 전량) | ✅ | ✅ 281 2독립 + 22 단독 + 153 인벤토리 | ✅ 281/281 | ✅ 1,472처분 PASS | ✅ delta 103 PASS | ✅ 571/571 | ✅ 103승인 | **미판독 0** | ✅ DONE 2026-09-09(P0 v3) |
 | SWAN | 82 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 0% | ⬜ |
 | SWASH | 162 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 0% | ⬜ |
 | LISFLOOD-FP | 868 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 0% | ⬜ (C/CUDA) |
@@ -21,10 +21,12 @@
 
 ## 완료(✅ 전건 참) 정의
 분모 사람승인 + R1·R2 2독립판독 100% + CW PASS + confirmed_delta span재확인 + HIGH 적대검증 + supplement 사람승인.
-**XBeach 는 2026-09-07 DONE 판정 후 같은 날 P0 개정으로 DONE 취소**(분모 102→111, test 9파일 편입). 이후 P0 v3(456파일) 확대로 신규 confirmed_delta 43건이 미승인이라 `verify_supplement_modelaudit` FAIL(2026-09-09: 기계적 오류 0, 기존 승인 60건 보존). **현재 완결 모델 0.**
+**현재 완결 모델 1: XBeach(P0 v3, 2026-09-09).** 2026-09-07의 구 분모 DONE은 범위 확대 때문에 취소됐으며, P0 v3 트리 전량 456파일 처리 후 2026-09-09 사용자가 신규 supplement 43건의 감사 기록 편입을 명시 승인했다. 기존 60건과 합쳐 `approved=103 pending=0 mechanical_fails=0`, `verify_supplement_modelaudit` **PASS**. 완료 범위는 아래 P0 v3 처리 방식(281 2독립·22 단독·153 인벤토리)이며 456개 모두의 2독립 의미 판독이나 이월 문제 해결을 뜻하지 않는다.
 
 ## 다음 착수
-### XBeach — 트리 전량 456파일 판독 완주 (2026-09-07), HG 재승인만 남음
+**SFINCS P0 scope** — 사전 배제 없이 트리 전량을 인벤토리화하고 파일별 처리 유형을 분류한다. 기존 241은 이전 소스 집계이므로 전량 분모로 가정하지 않는다. 분모 확정은 별도 사람 게이트를 따른다.
+
+### XBeach — P0 v3 완료 (2026-09-09)
 사용자 원칙(**전량 판독 → 분류 → 사후 판단**)에 따라 P0 v3 로 분모를 트리 전체로 확대. **미판독 0.**
 
 | 처리 | 파일 | 방식 |
@@ -44,12 +46,18 @@
 ### ★ Codex 인수인계서
 `model-audit/XBeach/HANDOFF-CODEX.md` (2026-09-09) — 남은 HG 절차 5단계(records-by-run 12개 복사 → 신규 43건 evidence_span 정규화 → manifest 재작성 → 영수증 재생성 → 사용자 승인 → 게이트), 게이트 무결성 원칙, 이번 세션에 밟은 함정 7종(--model/--write 생략·경로 기준·PDF 처리 등), 도구 49개 위치, 이월 5건.
 
-### HG 재승인 대기
+### HG 준비 이력 (승인 전 스냅샷)
 분모 확대로 confirmed_delta 60 → **103**(신규 43). **2026-09-09 준비 완료**: records-by-run 12개 디렉터리·340개 레코드 복사, 신규 evidence_span 43건 원본 해시·제출 인용 대조 후 정규화, manifest·영수증 재생성. 기존 60개 영수증의 승인 정보와 해시 전체 보존, 신규 43개 pending. Crosswalk 13/13 PASS; supplement gate `authority=103 approved=60 pending=43 mechanical_fails=0` — 사람 승인 미충족으로 FAIL.
 
-[사용자 승인 목록: 파일·라인·한국어 요약·감사 원문·소스 인용 43건](../model-audit/XBeach/HG-REVIEW-20260909.md). 외부 구성요소 관련 항목은 목록에서 별도 표시하며 전체 vendor 태깅 완료와 구분한다. 승인 전 XBeach 미완결; SFINCS P0는 HG 통과 후 착수한다.
+[사용자 승인 목록: 파일·라인·한국어 요약·감사 원문·소스 인용 43건](../model-audit/XBeach/HG-REVIEW-20260909.md). 외부 구성요소 관련 항목은 목록에서 별도 표시하며 전체 vendor 태깅 완료와 구분한다. 이 문서는 승인 직전 스냅샷으로 해시를 고정했으며 수정하지 않는다. 현재 승인 결과는 아래 HG 완료 기록을 따른다.
 
 
-2026-09-09 Claude 적대적 검토 반영: form-feed 이후 9건의 실제 LF 라인과 레거시 게이트 좌표를 분리 명시(게이트 무수정), NARROWED 6건의 적용 조건·근거 공개, 외부 구성요소 31 / 자체 빌드·배포 12로 승인 목록 분류 정정, 생성 makefile 중복·CRLF 바이트 근거·심각도 공개. [검토 원문](../model-audit/XBeach/HG-ADVERSARIAL-20260909.md) · [라인 좌표 대응](../model-audit/XBeach/HG-LINE-MAPPING-20260909.json) · [기계 검증 기록](../model-audit/XBeach/HG-PREPARATION-CHECKS-20260909.json). 기존 60건 보존과 신규 43건 pending 유지.
+2026-09-09 Claude 적대적 검토 반영: form-feed 이후 9건의 실제 LF 라인과 레거시 게이트 좌표를 분리 명시(게이트 무수정), NARROWED 6건의 적용 조건·근거 공개, 외부 구성요소 31 / 자체 빌드·배포 12로 승인 목록 분류 정정, 생성 makefile 중복·CRLF 바이트 근거·심각도 공개. [검토 원문](../model-audit/XBeach/HG-ADVERSARIAL-20260909.md) · [라인 좌표 대응](../model-audit/XBeach/HG-LINE-MAPPING-20260909.json) · [기계 검증 기록](../model-audit/XBeach/HG-PREPARATION-CHECKS-20260909.json). 당시 기존 60건 보존과 신규 43건 pending 유지.
 
-Claude Sonnet 5의 [한정 재검토](../model-audit/XBeach/HG-ADVERSARIAL-RECHECK-20260909.md)에서 B1·B2 해소 확인. 실제 LF span 43/43 원문 일치, STANDS 37·NARROWED 6 공개. 사람 승인은 별도 대기.
+Claude Sonnet 5의 [한정 재검토](../model-audit/XBeach/HG-ADVERSARIAL-RECHECK-20260909.md)에서 B1·B2 해소 확인. 실제 LF span 43/43 원문 일치, STANDS 37·NARROWED 6 공개. 이후 아래 명시 승인으로 HG를 마쳤다.
+
+### HG 완료 — 2026-09-09
+
+사용자 `승인` 응답으로 신규 43개 영수증에 `firesinger`, 승인일, 승인 직전 검토 문서 SHA-256을 기록했다. 기존 60개 영수증은 모든 필드 그대로 보존했다. 최종 게이트 **PASS: authority=103 approved=103 pending=0 mechanical_fails=0**. [승인·게이트 실행 기록](../model-audit/XBeach/HG-APPROVAL-20260909.json).
+
+이월 5종(conflict 3·REFUTED 인용 미검증 10·전체 vendor 태깅·문서 정량사실 207·AUDIT-LEDGER 구 감사 표기)은 계속 열려 있다. 이번 승인은 감사 기록 편입이며 canonical 반영·이월 종결을 포함하지 않는다. `models/`와 게이트 코드는 변경하지 않았다.
