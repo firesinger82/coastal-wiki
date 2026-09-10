@@ -5,6 +5,10 @@ import json
 from pathlib import Path
 import zipfile
 import olefile
+import importlib.util
+import re
+import tempfile
+from collections import Counter
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[4]
@@ -110,6 +114,29 @@ def main():
     check('nonhydro-doc-container', actual == {p['path']: (p['bytes'], p['sha256']) for p in inventory['streams']})
     check('nonhydro-doc-fidelity-remains-open', doc['read_status'] == 'all-render-pages-inspected-with-unresolved-rendering-fidelity' and
           doc['equation_native_streams'] == sum(p.endswith('/Equation Native') for p in actual))
+    repair = json.loads((HERE / 'nonhydro-read/field-recovery/receipt.json').read_text())
+    check('field-repair-artifacts', all(digest(ROOT / p['path']) == p['sha256']
+          for p in repair['artifacts'] + [repair['field_evidence'], repair['recovery_script']]))
+    spec = importlib.util.spec_from_file_location('nonhydro_cached_fields', ROOT / repair['recovery_script']['path'])
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    recovered = module.extract()
+    check('field-repair-source-reextraction', recovered == json.loads((ROOT / repair['field_evidence']['path']).read_text()))
+    folder = HERE / 'nonhydro-read/field-recovery'
+    with zipfile.ZipFile(folder / 'converted.docx') as before, zipfile.ZipFile(folder / 'cached-field-restored.docx') as after:
+        check('field-repair-other-members-unchanged', before.namelist() == after.namelist() and
+              all(before.read(n) == after.read(n) for n in before.namelist() if n != 'word/document.xml'))
+    with tempfile.TemporaryDirectory(prefix='nonhydro-field-check-') as scratch:
+        rebuilt = Path(scratch) / 'restored.docx'
+        module.restore(folder / 'converted.docx', rebuilt, recovered)
+        with zipfile.ZipFile(rebuilt) as expected_zip, zipfile.ZipFile(folder / 'cached-field-restored.docx') as saved_zip:
+            check('field-repair-reproducible-document-xml', expected_zip.namelist() == saved_zip.namelist() and
+                  all(expected_zip.read(n) == saved_zip.read(n) for n in expected_zip.namelist()))
+    expected = Counter(r['cached_display'] for r in recovered['records']
+                       if not r['nested_in_target'] and r['cached_display'])
+    observed = Counter(re.findall(r'\([1-3C]\.\d+\)', (folder / 'cached-field-restored.txt').read_text()))
+    check('field-repair-rendered-cache-counts', not expected - observed)
+    check('field-repair-no-gate-pass', repair['whole_model_read_gate'] == 'NOT_PASSED' and repair['human_approval_issued'] is False)
     reconciliation = json.loads((HERE / 'resume-reconciliation.json').read_text())
     check('reconciliation-input-bindings', all(digest(ROOT / p) == h for p, h in reconciliation['input_evidence_sha256'].items()))
     check('no-overall-or-human-pass', reconciliation['whole_model_read_gate'] == 'NOT_PASSED' and

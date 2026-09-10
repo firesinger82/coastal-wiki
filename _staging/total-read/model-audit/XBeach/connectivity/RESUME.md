@@ -16,7 +16,7 @@
 
 ## 다음 작업
 
-1. 보고서 DOC의 수식 참조 필드와 기호 표시 문제를 원시 오브젝트/다른 렌더와 대조해 남은 충실도 공백을 해소한다. 70쪽 표시 내용 확인을 원본의 모든 기호 복원과 동일시하지 않는다.
+1. 보고서 DOC의 관측된 묶음 기호 깨짐은 기존 로컬 MT Extra/Symbol 글꼴을 임시 적용해 복원했다. 원본 main-text piece의 MathType 필드 167개(중첩 1개 포함)를 추출해 outer 166개 중 165개 저장 표시값을 검토 사본에 복원했다. 원본에서도 빈 outer 1개는 그대로 남겼다. `nonhydro-read/field-recovery/receipt.json` 참조. 복원 사본은 71쪽이며 새 시각 확인은 13·32·33쪽에 한정한다. 이후 필요 작업은 원본 388개 Equation Native의 충실도와 사본의 나머지 표시 상태 점검이다. 기존 70쪽 판독이나 캐시 복원을 모든 원시 기호 판독과 동일시하지 않는다.
 2. Kingsday PDF 141쪽 중 기존 판독 10–45쪽 외 1–9·46–141쪽, master PDF 145쪽 중 기존 판독 10–46쪽 외 1–9·47–145쪽을 시각 보충한다. 두 DOCX는 독립 렌더 판독이 남아 있다. 현재 매뉴얼 6경로(PDF 4·DOCX 2)와 보고서 DOC 1경로가 불완전 상태다. 다른 확장자의 같은 제목을 근거로 판독을 승계하지 않는다.
 3. 외부 바이너리의 리소스 payload와 AR 내부 member·JAR bytecode의 처리 범위를 계속 명시한다. `msi-interface-review.json`은 의존성 관측과 추출 인덱스이며 의미 판독 완료가 아니다. 기존 interim interface/resource 범위로 진행하되 전체 gate 예외나 전체 역어셈블리 승인을 발급하지 않는다.
 4. 위 전제가 충족된 뒤 연결 후보를 확정한다. FUNWAVE는 읽기 전용 preflight 이외 단계로 넘어가지 않았다.
@@ -34,4 +34,6 @@ python3 _staging/total-read/model-audit/XBeach/connectivity/validate_resume_evid
 
 필요 도구: Python olefile, cabextract 1.11, objdump. Office 변환은 LibreOffice 24.2.7의 headless PDF/Text export, 페이지 렌더는 pdftoppm scale-to 1600을 사용했다. WMF 수식은 Draw PDF export로 겹침 없이 따로 판독했다. 원문에서 가져온 셸 예제나 VBA를 실행하지 않았다.
 
-validator의 178개 PASS는 구조·원본 SHA·이미지 SHA·입력 집합 검증만 뜻한다. 독립 의미 검증이나 사람 승인이 아니다. 이전 사람 승인·crosswalk·closure 기록은 그대로 보존했다.
+수식 필드 복원은 `nonhydro-read/recover_cached_fields.py`로 재현한다. `--converted-docx`와 `--output-docx`를 주면 DOCX 변환본의 동일 순서 필드 명령 166개를 대조하고 검토 사본의 빈 필드만 저장값의 고정 텍스트로 바꾼다. 매크로 실행·원본 수정·수식 번호 재계산은 없다. 글꼴은 PC의 기존 파일을 임시 fontconfig로 사용하며 글꼴 바이너리는 커밋하지 않았다.
+
+validator의 184개 PASS는 구조·원본 SHA·이미지 SHA·입력 집합·필드 복원 재현 검증만 뜻한다. 독립 의미 검증이나 사람 승인이 아니다. 이전 사람 승인·crosswalk·closure 기록은 그대로 보존했다.

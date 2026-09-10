@@ -141,6 +141,11 @@ def main():
     for item in doc['page_records'] + [doc['render_pdf'], doc['container_inventory']]:
         assert sha(ROOT / item['path']) == item['sha256']
     supplement(doc, nonhydro_name, doc['read_status'], doc['limitations'])
+    recovery_name = 'nonhydro-read/field-recovery/receipt.json'
+    recovery = read(recovery_name)
+    for item in recovery['artifacts'] + [recovery['field_evidence'], recovery['recovery_script']]:
+        assert sha(ROOT / item['path']) == item['sha256']
+    supplement(recovery['source'], recovery_name, doc['read_status'], recovery['remaining'])
     formula_name = 'workbook-formula-read.json'
     if (HERE / formula_name).is_file():
         formula = read(formula_name)

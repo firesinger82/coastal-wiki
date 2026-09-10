@@ -83,3 +83,5 @@ Claude Sonnet 5의 [한정 재검토](../model-audit/XBeach/HG-ADVERSARIAL-RECHE
 이월 5종(conflict 3·REFUTED 인용 미검증 10·전체 vendor 태깅·문서 정량사실 207·AUDIT-LEDGER 구 감사 표기)은 계속 열려 있다. 이번 승인은 감사 기록 편입이며 canonical 반영·이월 종결을 포함하지 않는다. `models/`와 게이트 코드는 변경하지 않았다.
 
 2026-09-10 비정수압 보고서 시각 보충: 원 PDF 69쪽은 기존 13–68쪽 판독 기록과 신규 1–12·69쪽을 결합해 전 페이지 근거를 연결했다. DOC는 별도 렌더 70쪽의 표시 내용을 확인했으나 수식 참조 공백·묶음 기호 깨짐이 남아 `all-render-pages-inspected-with-unresolved-rendering-fidelity`다. 원시 Equation Native 388개는 인벤토리만 작성했다. 새 페이지 이미지 83개와 DOC 렌더 PDF를 저장했고 구조·SHA 검증 178개 PASS. 전체 판독 gate는 NOT_PASSED, 신규 사람 승인 없음. 상세·다음 단계: [재개 지점](../model-audit/XBeach/connectivity/RESUME.md), [판독 기록](../model-audit/XBeach/connectivity/nonhydro-read/read-receipt.json).
+
+2026-09-10 DOC 수식 복원 후속: 기존 로컬 수식 글꼴을 임시 적용해 관측된 묶음 기호 깨짐을 복원했다. 원본 WordDocument main-text piece에서 MathType 필드 167개(중첩 1개)를 해시·바이트 좌표로 결속하고 outer 166개 중 165개 저장 표시값을 검토 사본에 복원했다. 1개는 원본 캐시도 비어 있다. DOCX의 나머지 ZIP member는 동일 바이트이며 복원 재현·PDF 표시값 출현 횟수를 검증했다. 복원 PDF 71쪽 중 신규 시각 확인은 13·32·33쪽으로 한정, 원시 수식 오브젝트와 전체 자료 판독 gate는 미완료. [복원 근거](../model-audit/XBeach/connectivity/nonhydro-read/field-recovery/receipt.json).
