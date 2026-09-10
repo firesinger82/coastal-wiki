@@ -81,3 +81,5 @@ Claude Sonnet 5의 [한정 재검토](../model-audit/XBeach/HG-ADVERSARIAL-RECHE
 사용자 `승인` 응답으로 신규 43개 영수증에 `firesinger`, 승인일, 승인 직전 검토 문서 SHA-256을 기록했다. 기존 60개 영수증은 모든 필드 그대로 보존했다. 최종 게이트 **PASS: authority=103 approved=103 pending=0 mechanical_fails=0**. [승인·게이트 실행 기록](../model-audit/XBeach/HG-APPROVAL-20260909.json).
 
 이월 5종(conflict 3·REFUTED 인용 미검증 10·전체 vendor 태깅·문서 정량사실 207·AUDIT-LEDGER 구 감사 표기)은 계속 열려 있다. 이번 승인은 감사 기록 편입이며 canonical 반영·이월 종결을 포함하지 않는다. `models/`와 게이트 코드는 변경하지 않았다.
+
+2026-09-10 비정수압 보고서 시각 보충: 원 PDF 69쪽은 기존 13–68쪽 판독 기록과 신규 1–12·69쪽을 결합해 전 페이지 근거를 연결했다. DOC는 별도 렌더 70쪽의 표시 내용을 확인했으나 수식 참조 공백·묶음 기호 깨짐이 남아 `all-render-pages-inspected-with-unresolved-rendering-fidelity`다. 원시 Equation Native 388개는 인벤토리만 작성했다. 새 페이지 이미지 83개와 DOC 렌더 PDF를 저장했고 구조·SHA 검증 178개 PASS. 전체 판독 gate는 NOT_PASSED, 신규 사람 승인 없음. 상세·다음 단계: [재개 지점](../model-audit/XBeach/connectivity/RESUME.md), [판독 기록](../model-audit/XBeach/connectivity/nonhydro-read/read-receipt.json).

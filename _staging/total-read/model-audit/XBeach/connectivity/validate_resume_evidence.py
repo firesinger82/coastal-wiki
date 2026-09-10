@@ -80,7 +80,38 @@ def main():
     check('MSI-interface-set', {(r['archive'], r['member_id']) for r in interfaces['members']} ==
           {(a['path'], r['id']) for a in recovery['archives'] for r in a['members'] if r['interface_extraction'] is not None})
     check('MSI-interface-artifacts', all(digest(HERE / r['evidence_file']) == r['evidence_sha256'] for r in interfaces['members']))
+    nonhydro = json.loads((HERE / 'nonhydro-read/read-receipt.json').read_text())
+    pdf = nonhydro['pdf']
+    prior = pdf['prior_evidence']
+    check('nonhydro-prior-binding', digest(ROOT / prior['path']) == prior['sha256'])
+    premise = json.loads((ROOT / prior['path']).read_text())
+    saved_source = next(s for w in premise['documents'] for s in w['sources']
+                        if s.get('covered_pdf_physical_pages') == '13-68 inclusive')
+    check('nonhydro-prior-source-and-range', saved_source['sha256'] == prior['source_sha256'] and
+          prior['physical_pages'] == list(range(13, 69)))
+    check('nonhydro-pdf-sources', all(digest(ROOT / s['path']) == s['sha256'] == prior['source_sha256'] for s in pdf['sources']))
+    new = pdf['new_page_records']
+    check('nonhydro-new-pages-13', len(new) == 13 and {p['physical_page'] for p in new} == set(range(1, 13)) | {69})
+    check('nonhydro-combined-pages-69', set(prior['physical_pages']) | {p['physical_page'] for p in new} ==
+          set(pdf['combined_physical_pages']) == set(range(1, 70)))
+    check('nonhydro-pdf-images', all(digest(ROOT / p['path']) == p['sha256'] for p in new))
+    doc = nonhydro['doc']
+    check('nonhydro-doc-source', digest(ROOT / doc['path']) == doc['sha256'])
+    check('nonhydro-doc-pages-70', len(doc['page_records']) == 70 and
+          {p['physical_render_page'] for p in doc['page_records']} == set(range(1, 71)))
+    check('nonhydro-doc-artifacts', all(digest(ROOT / p['path']) == p['sha256']
+          for p in doc['page_records'] + [doc['render_pdf'], doc['container_inventory']]))
+    inventory = json.loads((ROOT / doc['container_inventory']['path']).read_text())
+    with olefile.OleFileIO(ROOT / doc['path']) as handle:
+        actual = {}
+        for member in handle.listdir():
+            data = handle.openstream(member).read()
+            actual['/'.join(member)] = (len(data), hashlib.sha256(data).hexdigest())
+    check('nonhydro-doc-container', actual == {p['path']: (p['bytes'], p['sha256']) for p in inventory['streams']})
+    check('nonhydro-doc-fidelity-remains-open', doc['read_status'] == 'all-render-pages-inspected-with-unresolved-rendering-fidelity' and
+          doc['equation_native_streams'] == sum(p.endswith('/Equation Native') for p in actual))
     reconciliation = json.loads((HERE / 'resume-reconciliation.json').read_text())
+    check('reconciliation-input-bindings', all(digest(ROOT / p) == h for p, h in reconciliation['input_evidence_sha256'].items()))
     check('no-overall-or-human-pass', reconciliation['whole_model_read_gate'] == 'NOT_PASSED' and
           reconciliation['human_approval_issued'] is False)
     result = {'scope': 'Structural/source/hash checks only; no independent semantic or human approval.',

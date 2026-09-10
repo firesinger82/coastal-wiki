@@ -115,6 +115,32 @@ def main():
                         'source_map_sha256': sha(HERE / source_map_name),
                         'audit_extract': rep['audit_extract'], 'audit_extract_sha256': sha(extract),
                         'limitation': damage})
+    premise_name = 'physics/document-read-premise.json'
+    premise = read(premise_name)
+    for work in premise['documents']:
+        for item in work['sources']:
+            if item.get('new_visual_status') != 'physics-block-visual-read':
+                continue
+            limitation = ('Saved visual ranges only: ' + item['covered_pdf_physical_pages'] +
+                          '. ' + item['coverage_note'])
+            for copy in (item, item['exact_duplicate']):
+                supplement(copy, premise_name, 'text-read-with-partial-pdf-visual-supplement', limitation)
+    nonhydro_name = 'nonhydro-read/read-receipt.json'
+    nonhydro = read(nonhydro_name)
+    pdf = nonhydro['pdf']
+    assert pdf['prior_evidence']['sha256'] == sha(HERE / premise_name)
+    assert set(pdf['prior_evidence']['physical_pages']) == set(range(13, 69))
+    assert set(pdf['prior_evidence']['physical_pages']) | {p['physical_page'] for p in pdf['new_page_records']} == set(range(1, 70))
+    for item in pdf['new_page_records']:
+        assert sha(ROOT / item['path']) == item['sha256']
+    for item in pdf['sources']:
+        assert item['sha256'] == pdf['prior_evidence']['source_sha256']
+        supplement(item, nonhydro_name, pdf['read_status'], pdf['limitations'])
+    doc = nonhydro['doc']
+    assert {p['physical_render_page'] for p in doc['page_records']} == set(range(1, 71))
+    for item in doc['page_records'] + [doc['render_pdf'], doc['container_inventory']]:
+        assert sha(ROOT / item['path']) == item['sha256']
+    supplement(doc, nonhydro_name, doc['read_status'], doc['limitations'])
     formula_name = 'workbook-formula-read.json'
     if (HERE / formula_name).is_file():
         formula = read(formula_name)
