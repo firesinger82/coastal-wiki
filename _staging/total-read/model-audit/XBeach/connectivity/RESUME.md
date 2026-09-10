@@ -1,4 +1,4 @@
-# 2026-09-10 재개 지점
+# 2026-09-11 재개 지점
 
 현재 작업은 plan.md의 **XBeach 전수 판독 → 연결 분석 → 검증 → canonical → 필요한 신규 HG, 이후 FUNWAVE**다. 연결 후보는 lifecycle/ 및 physics/에 남아 있다. 전체 판독 gate는 **NOT_PASSED**다. 이 문서는 완료 또는 승인 영수증이 아니다.
 
@@ -16,14 +16,14 @@
 
 ## 다음 작업
 
-1. 보고서 DOC의 관측된 묶음 기호 깨짐은 기존 로컬 MT Extra/Symbol 글꼴을 임시 적용해 복원했다. 원본 main-text piece의 MathType 필드 167개(중첩 1개 포함)를 추출해 outer 166개 중 165개 저장 표시값을 검토 사본에 복원했다. 원본에서도 빈 outer 1개는 그대로 남겼다. `nonhydro-read/field-recovery/receipt.json` 참조. 복원 사본은 71쪽이며 새 시각 확인은 13·32·33쪽에 한정한다. 이후 필요 작업은 원본 388개 Equation Native의 충실도와 사본의 나머지 표시 상태 점검이다. 기존 70쪽 판독이나 캐시 복원을 모든 원시 기호 판독과 동일시하지 않는다.
-2. Kingsday PDF 141쪽 중 기존 판독 10–45쪽 외 1–9·46–141쪽, master PDF 145쪽 중 기존 판독 10–46쪽 외 1–9·47–145쪽을 시각 보충한다. 두 DOCX는 독립 렌더 판독이 남아 있다. 현재 매뉴얼 6경로(PDF 4·DOCX 2)와 보고서 DOC 1경로가 불완전 상태다. 다른 확장자의 같은 제목을 근거로 판독을 승계하지 않는다.
+1. 두 매뉴얼 DOCX의 독립 렌더 판독을 진행한다. Kingsday PDF는 기존 10–45쪽에 신규 1–9·46–141쪽(105쪽), master PDF는 기존 10–46쪽에 신규 1–9·47–145쪽(108쪽)을 결합해 각각 141·145쪽 전체의 시각 보충 근거를 연결했다. `manuals-visual-read/read-receipts.json`과 신규 이미지 213개 참조. 동일 SHA인 manuals PDF 2경로에만 승계했다. PDF 판독은 DOCX 판독을 대신하지 않는다.
+2. 보고서 DOC의 잔여 수식 글리프·388개 Equation Native 충실도를 확인한다. MathType outer 166개 중 165개 저장 표시값 복원은 이전 기록에 보존했다. 이번에는 후속 렌더에서 발견된 그림 번호의 장 제목 치환을 막기 위해 본문 필드 제어 노드 652개만 제거하고 표시값을 고정했다. 머리말·꼬리말을 포함한 나머지 ZIP member는 동일 바이트다. `nonhydro-read/body-field-recovery/receipt.json` 참조. 71쪽 전체 본문을 확인했으며 최종본과 판독 중간본은 모든 페이지 y<1680 RGB가 동일하다. 차이는 쪽 번호 영역뿐이며 별도 확인했다. 최종본 p.11 그림 2-1/2-2도 직접 확인했다. p.15·41·42의 작은 네모 글리프, inline 수식 배치, 원래 빈 필드 1개는 남는다. 저장 목차/참조 쪽 번호는 재페이지화와 일치한다고 보장하지 않으며 물리 페이지 번호로 인용한다.
 3. 외부 바이너리의 리소스 payload와 AR 내부 member·JAR bytecode의 처리 범위를 계속 명시한다. `msi-interface-review.json`은 의존성 관측과 추출 인덱스이며 의미 판독 완료가 아니다. 기존 interim interface/resource 범위로 진행하되 전체 gate 예외나 전체 역어셈블리 승인을 발급하지 않는다.
 4. 위 전제가 충족된 뒤 연결 후보를 확정한다. FUNWAVE는 읽기 전용 preflight 이외 단계로 넘어가지 않았다.
 
 ## 재현 및 검증
 
-저장된 문서 페이지 이미지는 `office-read/`, `jumpshot-pdf-read/`, `nonhydro-read/`에 있어 재부팅 후에도 남는다. 원본을 재생성하거나 수정하지 않는다.
+저장된 문서 페이지 이미지는 `office-read/`, `jumpshot-pdf-read/`, `nonhydro-read/`, `manuals-visual-read/`에 있어 재부팅 후에도 남는다. 원본을 재생성하거나 수정하지 않는다.
 
 ```sh
 python3 _staging/total-read/model-audit/XBeach/connectivity/recover_msi.py
@@ -36,4 +36,8 @@ python3 _staging/total-read/model-audit/XBeach/connectivity/validate_resume_evid
 
 수식 필드 복원은 `nonhydro-read/recover_cached_fields.py`로 재현한다. `--converted-docx`와 `--output-docx`를 주면 DOCX 변환본의 동일 순서 필드 명령 166개를 대조하고 검토 사본의 빈 필드만 저장값의 고정 텍스트로 바꾼다. 매크로 실행·원본 수정·수식 번호 재계산은 없다. 글꼴은 PC의 기존 파일을 임시 fontconfig로 사용하며 글꼴 바이너리는 커밋하지 않았다.
 
-validator의 184개 PASS는 구조·원본 SHA·이미지 SHA·입력 집합·필드 복원 재현 검증만 뜻한다. 독립 의미 검증이나 사람 승인이 아니다. 이전 사람 승인·crosswalk·closure 기록은 그대로 보존했다.
+후속 본문 필드 고정은 `nonhydro-read/freeze_body_fields.py INPUT.docx OUTPUT.docx`로 재현한다. 검토 중간본과 최종본·각 페이지 이미지를 모두 저장했다. 매뉴얼과 이번 보고서 보충 이미지는 pdftoppm scale-to 1800을 사용했다. 매뉴얼 p.60 의사결정도는 회전해 별도 확인했다.
+
+문서 오류도 판독 근거에 남겼다. Kingsday의 instat 설명과 wbctype 그림, tideloc 설명/표 불일치, Master p.125의 원본 참조 오류·반복된 A.1 표 번호, 두 판본의 bedfriccoef 기본값 차이는 구현 사실로 승격하지 않았다. 전체 PDF 시각 보충은 작은 기호의 완전 전사나 수식의 수학적 검증을 뜻하지 않는다.
+
+validator의 213개 PASS는 구조·원본 SHA·이미지 SHA·입력 집합·필드 복원 재현·중간/최종 본문 픽셀 일치 검증만 뜻한다. 독립 의미 검증이나 사람 승인이 아니다. 이전 사람 승인·crosswalk·closure 기록은 그대로 보존했다.

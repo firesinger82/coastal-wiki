@@ -9,6 +9,8 @@ import importlib.util
 import re
 import tempfile
 from collections import Counter
+from PIL import Image, ImageChops
+from lxml import etree
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[4]
@@ -137,6 +139,74 @@ def main():
     observed = Counter(re.findall(r'\([1-3C]\.\d+\)', (folder / 'cached-field-restored.txt').read_text()))
     check('field-repair-rendered-cache-counts', not expected - observed)
     check('field-repair-no-gate-pass', repair['whole_model_read_gate'] == 'NOT_PASSED' and repair['human_approval_issued'] is False)
+    body = json.loads((HERE / 'nonhydro-read/body-field-recovery/receipt.json').read_text())
+    check('body-freeze-provenance', all(digest(ROOT / r['path']) == r['sha256'] for r in
+          [body['source'], body['prior_recovery'], body['input_docx'], body['recovery_script']]))
+    check('body-freeze-artifacts', all(digest(ROOT / r['path']) == r['sha256'] for r in
+          body['artifacts'] + [body['footer_contact_sheet']]))
+    body_folder = HERE / 'nonhydro-read/body-field-recovery'
+    spec = importlib.util.spec_from_file_location('nonhydro_body_fields', ROOT / body['recovery_script']['path'])
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    with tempfile.TemporaryDirectory(prefix='nonhydro-body-check-') as scratch:
+        rebuilt = Path(scratch) / 'body.docx'
+        removed = module.freeze(ROOT / body['input_docx']['path'], rebuilt)
+        with zipfile.ZipFile(rebuilt) as a, zipfile.ZipFile(body_folder / 'body-cached.docx') as b:
+            check('body-freeze-member-reproduction', a.namelist() == b.namelist() and
+                  all(a.read(n) == b.read(n) for n in a.namelist()))
+        check('body-freeze-removes-652-controls', removed == body['transformation']['removed_field_nodes'] == 652)
+    with zipfile.ZipFile(ROOT / body['input_docx']['path']) as before, zipfile.ZipFile(body_folder / 'body-cached.docx') as after:
+        check('body-freeze-preserves-all-other-members', before.namelist() == after.namelist() and
+              all(before.read(n) == after.read(n) for n in before.namelist() if n != 'word/document.xml'))
+        a, b = [etree.fromstring(z.read('word/document.xml')) for z in (before, after)]
+        ns = {'w': module.W}
+        check('body-freeze-preserves-display-runs', a.xpath('//w:t/text()', namespaces=ns) == b.xpath('//w:t/text()', namespaces=ns))
+        check('body-freeze-preserves-objects', [etree.tostring(n) for n in a.xpath('//w:object', namespaces=ns)] ==
+              [etree.tostring(n) for n in b.xpath('//w:object', namespaces=ns)])
+        check('body-freeze-no-body-fields', not b.xpath('//w:instrText | //w:fldChar | //w:fldSimple', namespaces=ns))
+        check('body-freeze-instruction-inventory', a.xpath('//w:instrText/text()', namespaces=ns) ==
+              body['transformation']['instructions_before'])
+    page_records = body['page_records']
+    check('body-71-pages-exact', len(page_records) == 71 and {p['physical_render_page'] for p in page_records} == set(range(1, 72)))
+    images_ok, bodies_ok, boxes_ok = True, True, True
+    for page in page_records:
+        images_ok &= all(digest(ROOT / page[k]['path']) == page[k]['sha256'] for k in ('read_intermediate_image', 'final_image'))
+        a, b = [Image.open(ROOT / page[k]['path']).convert('RGB') for k in ('read_intermediate_image', 'final_image')]
+        box = ImageChops.difference(a, b).getbbox()
+        boxes_ok &= (list(box) if box else None) == page['difference_bbox'] and (box is None or box[1] >= 1680)
+        crop = (0, 0, 1391, 1680)
+        bodies_ok &= a.size == b.size == (1391, 1800) and a.crop(crop).tobytes() == b.crop(crop).tobytes()
+        bodies_ok &= hashlib.sha256(b.crop(crop).tobytes()).hexdigest() == page['body_rgb_sha256']
+    check('body-page-image-hashes', images_ok)
+    check('body-all-71-reviewed-bodies-identical', bodies_ok)
+    check('body-differences-limited-to-footer-region', boxes_ok)
+    final_text = (body_folder / 'body-cached.txt').read_text()
+    check('body-final-equation-caches-retained', not expected - Counter(re.findall(r'\([1-3C]\.\d+\)', final_text)))
+    check('body-final-caption-regression-fixed', 'Figure 2-1' in final_text and 'Figure 2-2' in final_text and
+          'Figure Theoretical background' not in final_text and 'Equation Chapter (Next)' not in final_text)
+    check('body-fidelity-and-gate-remain-open', body['read_status'] == doc['read_status'] and
+          body['whole_model_read_gate'] == 'NOT_PASSED' and body['human_approval_issued'] is False)
+    manuals = json.loads((HERE / 'manuals-visual-read/read-receipts.json').read_text())
+    check('manuals-two-independent-pdf-receipts', len(manuals['records']) == 2 and
+          {r['work_id'] for r in manuals['records']} == {'XBeach-manual-kingsday', 'XBeach-manual-master'})
+    check('manuals-213-new-pages', sum(len(r['new_page_records']) for r in manuals['records']) == manuals['new_pages'] == 213)
+    for record in manuals['records']:
+        label = record['work_id']
+        prior = record['prior_evidence']
+        premise = json.loads((ROOT / prior['path']).read_text())
+        saved = next(s for w in premise['documents'] if w['work_id'] == label for s in w['sources'] if s['path'].endswith('.pdf'))
+        stop, total = (45, 141) if label.endswith('kingsday') else (46, 145)
+        check(label + '-prior-binding', digest(ROOT / prior['path']) == prior['sha256'] and
+              prior['source_sha256'] == saved['sha256'] and prior['physical_pages'] == list(range(10, stop + 1)) and
+              saved['covered_pdf_physical_pages'] == f'10-{stop} inclusive')
+        check(label + '-sources', record['sources'] == [{'path': s['path'], 'sha256': s['sha256']} for s in (saved, saved['exact_duplicate'])] and
+              all(digest(ROOT / s['path']) == s['sha256'] for s in record['sources']))
+        new = record['new_page_records']
+        check(label + '-new-page-range', [p['physical_page'] for p in new] == list(range(1, 10)) + list(range(stop + 1, total + 1)))
+        check(label + '-full-combined-coverage', record['combined_physical_pages'] == list(range(1, total + 1)) and
+              record['pdf_physical_pages_total'] == total and set(prior['physical_pages']) | {p['physical_page'] for p in new} == set(range(1, total + 1)))
+        check(label + '-page-artifacts', all(digest(ROOT / p['path']) == p['sha256'] for p in new + record['extra_visuals']))
+    check('manuals-no-gate-pass', manuals['whole_model_read_gate'] == 'NOT_PASSED' and manuals['human_approval_issued'] is False)
     reconciliation = json.loads((HERE / 'resume-reconciliation.json').read_text())
     check('reconciliation-input-bindings', all(digest(ROOT / p) == h for p, h in reconciliation['input_evidence_sha256'].items()))
     check('no-overall-or-human-pass', reconciliation['whole_model_read_gate'] == 'NOT_PASSED' and

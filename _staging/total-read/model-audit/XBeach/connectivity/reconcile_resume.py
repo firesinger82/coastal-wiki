@@ -146,6 +146,30 @@ def main():
     for item in recovery['artifacts'] + [recovery['field_evidence'], recovery['recovery_script']]:
         assert sha(ROOT / item['path']) == item['sha256']
     supplement(recovery['source'], recovery_name, doc['read_status'], recovery['remaining'])
+    body_name = 'nonhydro-read/body-field-recovery/receipt.json'
+    body = read(body_name)
+    assert body['prior_recovery']['sha256'] == sha(HERE / recovery_name)
+    assert {p['physical_render_page'] for p in body['page_records']} == set(range(1, 72))
+    for item in body['artifacts'] + [body['recovery_script'], body['footer_contact_sheet']]:
+        assert sha(ROOT / item['path']) == item['sha256']
+    for page in body['page_records']:
+        for key in ('read_intermediate_image', 'final_image'):
+            assert sha(ROOT / page[key]['path']) == page[key]['sha256']
+    supplement(body['source'], body_name, body['read_status'], body['remaining'])
+    manual_name = 'manuals-visual-read/read-receipts.json'
+    manual_visual = read(manual_name)
+    for item in manual_visual['records']:
+        prior = item['prior_evidence']
+        assert prior['sha256'] == sha(HERE / premise_name)
+        old = set(prior['physical_pages'])
+        new = {p['physical_page'] for p in item['new_page_records']}
+        assert not old & new
+        assert old | new == set(range(1, item['pdf_physical_pages_total'] + 1))
+        for page in item['new_page_records'] + item['extra_visuals']:
+            assert sha(ROOT / page['path']) == page['sha256']
+        for copy in item['sources']:
+            assert copy['sha256'] == prior['source_sha256']
+            supplement(copy, manual_name, item['read_status'], item['limitations'])
     formula_name = 'workbook-formula-read.json'
     if (HERE / formula_name).is_file():
         formula = read(formula_name)
