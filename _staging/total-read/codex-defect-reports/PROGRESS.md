@@ -1,5 +1,19 @@
 # 전 모델 감사 진행표 (단일 추적, 공정표 MODEL-AUDIT-PLAN-20260831 준거)
 
+2026-09-10 다운 후 복구·후속 판독: XBeach 원본 543개·기존 불변 기록 292개·ZIP/JAR member 1,722개 해시 대조 통과. Office 5문서 36페이지와 Jumpshot PDF 61페이지를 보충 판독했고, workbook 수식 1개를 복원했다. MSI 123개 내부 파일을 재추출·검증하고 PE/AR 59개 인터페이스 인덱스를 저장했다. 보충 근거는 27개 원본 경로에 연결했다. 매뉴얼·보고서 9개 경로의 수식·도표 손실과 바이너리 내부 미판독을 유지하며 전체 판독 gate는 NOT_PASSED. [복구 지점](../model-audit/XBeach/connectivity/RESUME.md).
+
+## 2026-09-09 사용자 지정 후속 단계: XBeach → FUNWAVE 연결 분석
+
+전수 판독을 먼저 마친 뒤 파일 사이 계산 흐름을 별도로 검토한다. **XBeach의 파일별 감사·이월·canonical 완료 기록은 유효하지만, 모델 전체 연결 분석은 진행 중이다. FUNWAVE는 판독 누락 재확인·보충이 선행된다.** 기존 표의 DONE/승인 수는 해당 과거 파일별 감사 단계의 상태이며 새 연결 분석 완료나 승인을 뜻하지 않는다.
+
+
+| 모델 | 판독 전제 | 전수 판독 | 연결 검토 | 검증 | canonical | 신규 HG |
+|---|---|---|---|---|---|---|
+| XBeach | JAR 내부 자료 누락 확인·보충 중 | 재확인 중, 완료 아님 | 판독 gate까지 확정 보류 | 미착수 | 새 연결 분석 미반영 | 미발급 |
+| FUNWAVE | 읽기 전용 인벤토리 준비 | XBeach 완료 후 | XBeach 완료 후 | 미착수 | 새 분석 미반영 | 미발급 |
+
+증거: `_staging/total-read/model-audit/XBeach/connectivity/`, `_staging/total-read/model-audit/FUNWAVE/connectivity-preflight/`. 아래 과거 공정표의 “미판독 0”은 컨테이너 내부 의미 판독까지 입증하지 못하므로 이번 전수 판독 완료 근거로 사용하지 않는다.
+
 > 상태 기호: ⬜미착수 · 🟡진행 · ✅완료(사람게이트 통과). 단계: P0 scope→R1 1차→R2 감사→CW→SUP→V→HG.
 > % = 분모(전 언어 소스파일) 대비 판독완료 파일. R1·R2 는 2 독립판독.
 

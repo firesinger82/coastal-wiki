@@ -1,0 +1,973 @@
+{
+  "schema": "xbeach-connected-physics/v1",
+  "date": "2026-09-09",
+  "scope": "Bounded XBeach wave -> flow/nonh/q3d -> sediment/morphology -> wet/dry/groundwater/vegetation/ship feedback connectivity; no full-model completion claim.",
+  "coverage_semantics": "The 14 edges are representative state-transfer contracts for the bounded connected-physics question. They are not a denominator or exhaustive inventory of every subroutine call in XBeach.",
+  "read_basis": "The 281-source dual-read baseline and closure ledger were used only as orientation. Phase-2 conclusions were rechecked against complete relevant modules and cross-file call/assignment contexts in the frozen source snapshot; cited raw-byte spans are independently reproducible below.",
+  "source_root": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary",
+  "source_line_endings": "Most Fortran inputs are CRLF. SHA-256 is over raw bytes; line numbers split only on LF and quotes retain CR before LF.",
+  "build_inclusion": {
+    "finding": "All runtime modules cited by these edges are listed in libxbeach_la_SOURCES. USEMPI only adds compile definitions; the cited physics modules are not conditionally omitted in Makefile.am.",
+    "evidence": [
+      {
+        "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am",
+        "sha256": "1b313d0ba88701c16f6805114d7d6b5d406fb9026a03d091c2d49b97b8ee8d21",
+        "line_start": 3,
+        "line_end": 60,
+        "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+        "quote_exact_utf8": "lib_LTLIBRARIES=libxbeach.la\nlibxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\\n\tconstants.F90 \\\n\ttypesandkinds.F90 \\\n\tiso_c_utils.f90 \\\n\tlogging.F90 \\\n\tparamsconst.F90 \\\n\tfilefunctions.F90 \\\n\treadkey.F90 \\\n\tmnemonic.F90 \\\n\tinterp.F90 \\\n\tmath_tools.F90 \\\n\tparams.F90 \\\n\tgetkey.F90 \\\n\tspaceparamsdef.F90 \\\n\tspaceparams.F90 \\\n\tcompute_tide_zs0.F90 \\\n\twetcells.F90 \\\n\tvegetation.F90 \\\n\twave_functions.F90 \\\n\twaveparams.F90 \\\n\twaveparamsnew.F90 \\\n\troelvink.F90 \\\n\twave_stationary_directions.F90 \\\n\twave_instationary.F90 \\\n\twave_timestep.F90 \\\n\tsolver.F90 \\\n\tflow_secondorder.F90 \\\n\tnonh.F90 \\\n\tboundaryconditions.F90 \\\n\tmorphevolution.F90 \\\n\tgroundwater.F90 \\\n\trainfall.F90 \\\n\tdrifters.F90 \\\n\treadtide.F90 \\\n\treadwind.F90 \\\n\tinitialize.F90 \\\n\ttimestep.F90 \\\n\tbedroughness.F90 \\\n\tvsm_u_XB.f90 \\\n\tflow_timestep.F90 \\\n\tpostprocess.F90 \\\n\tvarianceupdate.F90 \\\n\tvaroutput.F90 \\\n\tncoutput.F90 \\\n\toutput.F90 \\\n\tship.F90 \\\n\tmnemoniciso.F90 \\\n\tloopcounters.F90 \\\n\tlibxbeach.F90 \\\n\tdebugging.F90 \\\n\tintrospection.F90 \\\n\txbeach_bmi.f90"
+      },
+      {
+        "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am",
+        "sha256": "1b313d0ba88701c16f6805114d7d6b5d406fb9026a03d091c2d49b97b8ee8d21",
+        "line_start": 94,
+        "line_end": 107,
+        "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+        "quote_exact_utf8": "# Set flags off by default\n# include link to top_srcdir so it can find config.h, or should this be builddir\n# wwvv changed following\n#libxbeach_la_FCFLAGS=-I$(top_builddir) -ffree-line-length-none -fPIC\n# into\nlibxbeach_la_FCFLAGS=-I$(top_builddir) -fPIC\n# if mpi, then add some flags\nif USEMPI\nlibxbeach_la_FCFLAGS+=-DUSEMPI -DHAVE_MPI_WTIME\nendif\nif USENETCDF\nlibxbeach_la_FCFLAGS+=-DUSENETCDF ${NETCDF_CFLAGS} ${NETCDF_FORTRAN_CFLAGS}\n# Manualy add the netcdff (fortran dll)\nLIBS+=${NETCDF_LIBS} ${NETCDF_FORTRAN_LIBS} -lnetcdff"
+      }
+    ]
+  },
+  "edges": [
+    {
+      "id": "XB-PHY-001",
+      "producer": "libxbeach.executestep",
+      "consumer": "all connected physics",
+      "states": [
+        "wetz/wetu/wetv/wete",
+        "dt,t",
+        "boundary states",
+        "ph",
+        "wave states",
+        "Dveg/Fveg",
+        "infil/gwlevel",
+        "uu/vv/zs",
+        "sediment flux",
+        "zb"
+      ],
+      "timing": "One executable step is ordered wet masks -> timestep -> output schedule -> wave/gw/flow boundaries -> ship -> short-wave -> vegetation -> groundwater -> flow/nonh -> drifter -> sediment -> morphology.",
+      "mode_guards": "Every optional call is guarded in executestep; flow is forced on for wavemodel=NONH even if flow=0.",
+      "grid_and_bounds": "Shared arrays are (nx+1,ny+1); producer-specific interior and halo ranges appear in later edges.",
+      "units_and_sign": "t and dt are seconds; the listed states retain their declared units.",
+      "summary_ko": "전체 결합의 기준 순서다. 같은 스텝 피드백인지 다음 스텝 피드백인지는 이 호출 순서로 판정했다.",
+      "evidence": [
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/libxbeach.F90",
+          "sha256": "1656cceb95c9d87a51b70225a725fc6e544ed56b424c97a9e2806c86f15b6696",
+          "line_start": 280,
+          "line_end": 312,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      ! determine timestep\r\n      if(xcompute) then\r\n\r\n         ! determine this time step's wet points\r\n         call compute_wetcells(s,par)\r\n         !\r\n         ! determine time step\r\n         call timestep(s,par,tpar,it,dt=dt,ierr=error)\r\n         call outputtimes_update(par, tpar)\r\n\r\n         ! update log\r\n         call log_progress(par)\r\n\r\n         if (error==0) then\r\n            !\r\n            ! Boundary conditions\r\n            call wave_bc        (sglobal,s,par)\r\n            if (par%gwflow==1)                                      call gw_bc          (s,par)\r\n            if ((par%flow==1).or.(par%wavemodel==WAVEMODEL_NONH))   call flow_bc        (s,par)\r\n            !\r\n            ! Compute timestep\r\n            if (par%ships==1)                                       call shipwave       (s,par,sh)\r\n            if (par%swave==1)                                       call wave           (s,par)\r\n            if (par%vegetation==1)                                  call vegatt         (s,par)\r\n            if (par%gwflow==1)                                      call gwflow         (s,par)\r\n            if ((par%flow==1).or.(par%wavemodel==WAVEMODEL_NONH))   call flow           (s,par)\r\n            if (par%ndrifter>0)                                     call drifter        (s,par)\r\n            if (par%sedtrans==1)                                    call transus        (s,par)\r\n            !\r\n            ! Bed level update\r\n            if ((par%morphology==1).and.(.not. par%setbathy==1)) call bed_update(s,par)\r\n            if (par%setbathy==1)     call setbathy_update(s, par)\r\n         endif\r"
+        }
+      ]
+    },
+    {
+      "id": "XB-PHY-002",
+      "producer": "bed/water state from prior step",
+      "consumer": "wave and flow masks",
+      "states": [
+        "hh,hu,hv,H",
+        "wetu,wetv,wetz,wete"
+      ],
+      "timing": "Computed before the new dt and before any boundary or physics update; morphology changes late in step n affect masks at step n+1.",
+      "mode_guards": "Always called on compute ranks; wete additionally depends on delta*H and expands around wet cells by 1 or 2 cells according to wave scheme.",
+      "grid_and_bounds": "All loops cover 1:nx+1,1:ny+1. wetu/hu are u points, wetv/hv are v points, wetz and wete are eta/wave points.",
+      "units_and_sign": "hh,hu,hv,H [m]; masks dimensionless. Wet threshold is eps plus machine epsilon.",
+      "summary_ko": "지형·수위가 만든 수심이 다음 스텝의 유속점·수위점·파랑점 활성영역을 결정한다.",
+      "evidence": [
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wetcells.F90",
+          "sha256": "f1a55183428c7d940ddc5cd13d26bcbbc093d6e223ea451ba277f5a2064b462b",
+          "line_start": 49,
+          "line_end": 143,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      if(.not.allocated(weteb)) allocate(weteb(s%nx+1,s%ny+1))\r\n\r\n      ! wwvv in the next lines\r\n      !  hu(i,j) is more or less a function of hh(i+1,j)\r\n      !  In the parallel case, this needs some action because\r\n      !  for processes not at the bottom, the last row of\r\n      !  hu (hu(nx+1,:)) has to be taken from the neighbour below\r\n      !  hu is used later on in this subroutine, so we have to insert\r\n      !  an mpi call.\r\n      !  The same for hum\r\n      ! Of course, no action is necessary if hu(nx+1:) is never used...\r\n      do j=1,s%ny+1\r\n         do i=1,s%nx+1 !Ap\r\n            ! Water depth in u-points do momentum equation: mean\r\n            !!\r\n            !! ARBJ: mean water depth or weighted water depth? How to deal with this in curvi-linear?\r\n            !!\r\n            s%hum(i,j)=max(.5d0*(s%hh(i,j)+s%hh(min(s%nx,i)+1,j)),par%eps)\r\n         end do\r\n      end do\r\n      ! wwvv here the mpi code to communicate a row of hu\r\n      ! we send to the neighbour above and receive from the neighbour\r\n      ! below:\r\n      ! Wetting and drying criterion (only do momentum balance)\r\n      do j=1,s%ny+1\r\n         do i=1,s%nx+1\r\n            if(s%hu(i,j)>par%eps+numeps .and. s%hum(i,j)>par%eps+numeps) then  ! Jaap and Pieter: If you want to compute correct advection term\r\n               s%wetu(i,j)=1                                  ! then both s%hu and s%hum should be larger than par%eps. It is not\r\n            else                                             ! necessarily true that if s%hu>par%eps also s%hum>par%eps.\r\n               s%wetu(i,j)=0\r\n            end if\r\n         end do\r\n      end do\r\n      ! wwvv about the same for hv, only in the left-right direction\r\n      ! hv(i,j) is more or less a function of hh(i,j+1)\r\n      ! so in the parallel case, hv(:,ny+1) has to be collected\r\n      ! from the right neighbour\r\n      ! the same for hvm\r\n      do j=1,s%ny+1\r\n         do i=1,s%nx+1\r\n            ! Water depth in v-points do momentum equation: mean\r\n            s%hvm(i,j)=max(.5d0*(s%hh(i,j)+s%hh(i,min(s%ny,j)+1)),par%eps)\r\n         end do\r\n      end do\r\n      ! Wetting and drying criterion (only do momentum balance)\r\n      do j=1,s%ny+1\r\n         do i=1,s%nx+1\r\n            if(s%hv(i,j)>par%eps+numeps .and. s%hvm(i,j)>par%eps+numeps) then\r\n               s%wetv(i,j)=1\r\n            else\r\n               s%wetv(i,j)=0\r\n            end if\r\n         end do\r\n      end do\r\n      ! Jaap Wetting and drying criterion eta points\r\n      do j=1,s%ny+1\r\n         do i=1,s%nx+1\r\n            !A eta point is wet if any of the surrounding velocity points is wet...\r\n            !            wetz(i,j) = min(1,wetu(max(i,2)-1,j)+wetu(i,j)+wetv(i,j)+wetv(i,max(j,2)-1))\r\n            if(s%hh(i,j)>par%eps+numeps) then\r\n               s%wetz(i,j)=1\r\n            else\r\n               s%wetz(i,j)=0\r\n            end if\r\n         end do\r\n      end do\r\n\r\n      ! Wetting and drying for wave module\r\n      where(s%hh+par%delta*s%H>par%eps .or. s%wetz==1)\r\n         s%wete = 1\r\n      elsewhere\r\n         s%wete = 0\r\n      endwhere\r\n      ! also need to surround wet cells\r\n      weteb = 0\r\n      ! upwind distance in wave propagation routine\r\n      if (par%scheme==SCHEME_UPWIND_1) then\r\n         upwinddist = 1\r\n      else\r\n         upwinddist = 2\r\n      endif\r\n      forall(i=1:s%nx+1,j=1:s%ny+1,s%wete(i,j)==0)\r\n         weteb(i,j) = max(   maxval(  s%wetz( max(i-upwinddist,1):min(i+upwinddist,s%nx+1) ,j )   ), &\r\n         maxval(  s%wetz( i, max(j-upwinddist,1):min(j+upwinddist,s%ny+1) )   ), &\r\n         maxval(  s%wetu( max(i-1,1):min(i,s%nx+1) ,j                     )   ), &\r\n         maxval(  s%wetv( i, max(j-1,1):min(j,s%ny+1)                     )   ) &\r\n         )\r\n         !weteb(i,j) = maxval(s%wete(max(i-2,1):min(i+2,s%nx+1),max(j-2,1):min(j+2,s%ny+1))\r\n         !weteb(i,j) = max(   maxval(  s%wete( max(i-2,1):min(i+2,s%nx+1) ,j                          )   ), &\r\n         !                    maxval(  s%wete( i                          ,max(j-2,1):min(j+2,s%ny+1) )   ) &\r\n         !            )\r\n      endforall\r\n      where(s%wete==0)\r\n         s%wete=weteb\r\n      endwhere\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/variables.def",
+          "sha256": "628090517242909cb5cd2343158e2e004d2dc669d0f46140f322538d0d7276ff",
+          "line_start": 87,
+          "line_end": 88,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "   double precision, allocatable, target :: hh(:,:)          !< [m] water depth {\"shape\": [\"s%nx+1\", \"s%ny+1\"], \"standard_name\": \"\", \"broadcast\": \"d\"}\r\n   double precision, allocatable, target :: zs(:,:)          !< [m] water level {\"shape\": [\"s%nx+1\", \"s%ny+1\"], \"standard_name\": \"sea_surface_height_above_sea_level\", \"broadcast\": \"d\"}\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/variables.def",
+          "sha256": "628090517242909cb5cd2343158e2e004d2dc669d0f46140f322538d0d7276ff",
+          "line_start": 138,
+          "line_end": 141,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "   integer,          allocatable, target :: wetu(:,:)        !< [-] mask wet/dry u-points {\"shape\": [\"s%nx+1\", \"s%ny+1\"], \"standard_name\": \"\", \"broadcast\": \"d\"}\r\n   integer,          allocatable, target :: wetv(:,:)        !< [-] mask wet/dry v-points {\"shape\": [\"s%nx+1\", \"s%ny+1\"], \"standard_name\": \"\", \"broadcast\": \"d\"}\r\n   integer,          allocatable, target :: wetz(:,:)        !< [-] mask wet/dry eta-points {\"shape\": [\"s%nx+1\", \"s%ny+1\"], \"standard_name\": \"\", \"broadcast\": \"d\"}\r\n   integer,          allocatable, target :: wete(:,:)        !< [-] mask wet/dry wave-points {\"shape\": [\"s%nx+1\", \"s%ny+1\"], \"standard_name\": \"\", \"broadcast\": \"d\"}\r"
+        }
+      ]
+    },
+    {
+      "id": "XB-PHY-003",
+      "producer": "wave_timestep.wave",
+      "consumer": "stationary/surfbeat wave solvers",
+      "states": [
+        "hh -> hhw/hstokes",
+        "E,H,k,c,cg",
+        "ee,rr"
+      ],
+      "timing": "Stationary is recomputed only at wavint alignment or newstatbc; surfbeat advances every hydrodynamic step. single_dir periodically recomputes directions and otherwise advances instationary energy.",
+      "mode_guards": "wavemodel STATIONARY vs SURFBEAT. NONH has swave reset to 0 during parameter post-processing and does not enter this dispatcher.",
+      "grid_and_bounds": "hhw/hstokes and wave state arrays are eta/wave arrays (nx+1,ny+1); directional ee/rr have theta dimension.",
+      "units_and_sign": "depth [m], energy E/R [N m/m2], phase/group velocity [m/s].",
+      "summary_ko": "stationary는 `wavint` 간격으로 힘을 고정하고 surfbeat는 매 유체 스텝에 에너지를 전진시킨다. nonh는 별도 short-wave 호출이 없다.",
+      "evidence": [
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_timestep.F90",
+          "sha256": "13297e7ff3b23640c1697f25e7af980aff5e169fe0be0b9d665dd32f3170c0ac",
+          "line_start": 56,
+          "line_end": 115,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      ! set basic water depth for all wave calculations: note that depending on wci setting, other water depths may be used in\r\n      ! dispersion routine etc.\r\n      if (par%delta>0.d0) then\r\n         s%hhw = max(s%hh+par%delta*s%H,par%eps)\r\n      else\r\n         s%hhw = max(s%hh,par%eps) ! hh can be less than eps after morphevolution?\r\n      endif\r\n\r\n      if (par%oldhmin==1) then\r\n         s%hstokes = max(s%hh,par%hmin)\r\n      else\r\n         gamma = s%H/s%hh\r\n         where (gamma>1.d0)\r\n            s%hstokes = par%deltahmin*(gamma-1.d0)*s%H+s%hh\r\n         elsewhere\r\n            s%hstokes = s%hh\r\n         endwhere\r\n      endif\r\n\r\n      select case (par%wavemodel)\r\n       case(WAVEMODEL_STATIONARY)\r\n         ! call update_means_wave_flow not required: stationary always uses instantaneous water depth s%hhw\r\n         if ((abs(mod(par%t,par%wavint))<0.001d0*par%dt) .or. s%newstatbc==1) then\r\n            call wave_dispersion(s,par,0)  ! use instantaneous water depth (and velocity)\r\n            call wave_stationary_directions(s,par,0)\r\n            s%newstatbc   = 0\r\n         endif\r\n       case(WAVEMODEL_SURFBEAT)\r\n         if (par%single_dir==1) then\r\n            ! always need to update depths for wave directions model, as well as in case of wci (dealt with in subroutine)\r\n            call update_means_wave_flow(s,par)\r\n            !\r\n            ! if necessary, update wave directions\r\n            if ((abs(mod(par%t,par%wavint))<0.001d0*par%dt) .or. s%newstatbc==1 .or. par%t==par%dt) then\r\n               call wave_dispersion(s,par,1)  ! use s%hhws water depth (and velocity)\r\n               call wave_stationary_directions(s,par,1)\r\n               s%newstatbc   = 0\r\n            endif\r\n            !\r\n            s%newstatbc       = 0 ! not sure if this is needed every timestep, but no overhead to keep in ...\r\n            !\r\n            ! need to call dispersion again, because dispersion is different in timestep and direction computation\r\n            if (par%wci==1) then\r\n               call wave_dispersion(s,par,2) ! use s%hhwcins water depth (and velocity)\r\n            else\r\n               call wave_dispersion(s,par,0) ! use s%hhw water depth\r\n            endif\r\n            call wave_instationary(s,par)\r\n         else\r\n            s%newstatbc       = 0\r\n            if (par%wci==1) then\r\n               ! in this case we only need to update flow depth in case of wci\r\n               call update_means_wave_flow(s,par)\r\n               call wave_dispersion(s,par,2) ! use s%hhwcins water depth (and velocity)\r\n            else\r\n               call wave_dispersion(s,par,0) ! use s%hhw water depth\r\n            endif\r\n            call wave_instationary(s,par)\r\n         endif\r\n      end select\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.F90",
+          "sha256": "73648b5733a8f90a8f18cda32743bdc2ef42f649e39c521e28e06584ee63c359",
+          "line_start": 98,
+          "line_end": 107,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      if (par%wavemodel==WAVEMODEL_NONH) then\r\n         par%swave       = readkey_int ('params.txt','swave',         0, 0, 1,strict=.true.)\r\n      else\r\n         par%swave       = readkey_int ('params.txt','swave',      1, 0, 1,strict=.true.)\r\n      endif\r\n      if(par%wavemodel==WAVEMODEL_SURFBEAT) then\r\n         par%single_dir  = readkey_int ('params.txt','single_dir',    0,        0,     1,strict=.true.)\r\n      else\r\n         par%single_dir  = 0\r\n      endif\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.F90",
+          "sha256": "73648b5733a8f90a8f18cda32743bdc2ef42f649e39c521e28e06584ee63c359",
+          "line_start": 1558,
+          "line_end": 1563,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      ! Wavemodel and wbctypes: warnings\r\n      ! swave and nonh\r\n      if (par%swave == 1 .and. par%wavemodel == WAVEMODEL_NONH) then\r\n         call writelog('lsw','(a)','Warning: swave with wavemodel = nonh not possible')\r\n         par%swave     = 0\r\n      endif\r"
+        }
+      ]
+    },
+    {
+      "id": "XB-PHY-004",
+      "producer": "stationary/surfbeat wave energy and roller",
+      "consumer": "depth-averaged momentum",
+      "states": [
+        "ee,rr -> Sxx,Syy,Sxy -> Fx,Fy",
+        "E,R -> ust"
+      ],
+      "timing": "Wave force and Stokes drift are produced before vegetation, groundwater and flow in the same step. Stationary values persist between wavint calls.",
+      "mode_guards": "Produced by stationary callTypeStationary and each surfbeat call; flow uses them only through lwave*Fx/Fy and Stokes/Eulerian velocity decomposition.",
+      "grid_and_bounds": "Fx is evaluated at u-point stencil i=1:nx; Fy at v-point stencil j=1:ny. 2DH includes cross derivatives; 1D Fx is x-gradient and Fy is centered x-gradient of Sxy.",
+      "units_and_sign": "S components [N/m], Fx/Fy [N/m2]. Flow subtracts lwave*F/(rho*h) inside dudt/dvdt and then subtracts dt*dudt, so positive Fx accelerates positive u.",
+      "summary_ko": "파·롤러 복사응력 발산이 `Fx/Fy`가 되어 같은 스텝 운동량에 들어가며, stationary에서는 다음 파 재계산까지 유지된다.",
+      "evidence": [
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_functions.F90",
+          "sha256": "2fda65c76091b855aee55b458b34625ab021136f63455bfe3190d3377ff8a205",
+          "line_start": 1237,
+          "line_end": 1274,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      !\r\n      ! wave radiation stress\r\n      s%Sxx=(s%n*sum((1.d0+s%costh**2)*s%ee,3)-.5d0*sum(s%ee,3))*s%dtheta\r\n      s%Syy=(s%n*sum((1.d0+s%sinth**2)*s%ee,3)-.5d0*sum(s%ee,3))*s%dtheta\r\n      s%Sxy=s%n*sum(s%sinth*s%costh*s%ee,3)*s%dtheta\r\n      !\r\n      !\r\n      ! add roller contribution\r\n      s%Sxx = s%Sxx + sum((s%costh**2)*s%rr,3)*s%dtheta\r\n      s%Syy = s%Syy + sum((s%sinth**2)*s%rr,3)*s%dtheta\r\n      s%Sxy = s%Sxy + sum(s%sinth*s%costh*s%rr,3)*s%dtheta\r\n      !\r\n      !\r\n      ! Wave forces\r\n      if (s%ny>0) then\r\n         do j=2,s%ny\r\n            do i=1,s%nx\r\n               s%Fx(i,j)=-(s%Sxx(i+1,j)-s%Sxx(i,j))/s%dsu(i,j)                        &\r\n               -(s%Sxy(i,j+1)+s%Sxy(i+1,j+1)-s%Sxy(i,j-1)-s%Sxy(i+1,j-1))/    &\r\n               (s%dnv(i,j-1)+s%dnv(i,j)+s%dnv(i+1,j-1)+s%dnv(i+1,j))\r\n            enddo\r\n         enddo\r\n\r\n         do j=1,s%ny\r\n            do i=2,s%nx\r\n               s%Fy(i,j)=-(s%Syy(i,j+1)-s%Syy(i,j))/s%dnv(i,j)            &\r\n               -(s%Sxy(i+1,j)+s%Sxy(i+1,j+1)-s%Sxy(i-1,j)-s%Sxy(i-1,j+1))/                    &\r\n               (s%dsu(i-1,j)+s%dsu(i,j)+s%dsu(i-1,j+1)+s%dsu(i,j+1))\r\n            enddo\r\n         enddo\r\n      else\r\n         j=1\r\n         do i=1,s%nx\r\n            s%Fx(i,j)=-(s%Sxx(i+1,j)-s%Sxx(i,j))/s%dsu(i,j)\r\n         enddo\r\n         do i=2,s%nx\r\n            s%Fy(i,j)=-(s%Sxy(i+1,j)-s%Sxy(i-1,j))/ (s%dsu(i-1,j)+s%dsu(i,j))\r\n         enddo\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_stationary_directions.F90",
+          "sha256": "60a3e8b6e89861caa462535aefdb4b11aee3c6a5b31a4174ef1ac6e34eb54b71",
+          "line_start": 717,
+          "line_end": 728,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      ! Compute radiation stress and forcing terms (callType=callTypeStationary only)\r\n      if (callType==callTypeStationary) then\r\n         !\r\n         ! wave forces\r\n         call compute_wave_forces(s)\r\n         !\r\n         ! orbital velocity\r\n         uorb=par%px*s%H/par%Trep/sinh(min(max(s%k,0.01d0)*s%hhw,10.0d0))!%ML this caused dzb changes that are strange\r\n         s%urms=uorb/sqrt(2.d0)\r\n         !\r\n         ! Stokes drift and orbital velocities\r\n         call compute_stokes_drift(s,par)\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_instationary.F90",
+          "sha256": "9584b6ec2138353aba65991a4ec570b4b794554485cea43915c6071e9e2ed45a",
+          "line_start": 428,
+          "line_end": 475,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      ! Energy integrated over wave directions,Hrms\r\n      !\r\n      s%E  = sum(s%ee,3)*s%dtheta\r\n      s%R  = sum(s%rr,3)*s%dtheta\r\n      s%DR = sum(drr,3)*s%dtheta\r\n      s%H  = sqrt(s%E/par%rhog8)\r\n      !Dano: recompute uorb as it is affected by the MPI shifts and time stepping\r\n      uorb=par%px*s%H/par%Trep/sinh(min(max(s%k,0.01d0)*s%hhw,10.0d0))\r\n      !\r\n      ! Correct roller for gammax in these areas\r\n      if (par%rollergammax==1) then\r\n         RH = sqrt(s%R/par%rhog8)\r\n         where(RH>par%gammax*s%hhw .and. s%wete==1 .and. mask_ee)\r\n            gammax_correct = .true.\r\n         elsewhere\r\n            gammax_correct = .false.\r\n         endwhere\r\n         !\r\n         do itheta=1,s%ntheta\r\n            ! note: here we do use instantaneous water depth (and excluding par%delta*s%H effect)\r\n            where(gammax_correct)\r\n               s%rr(:,:,itheta)=s%rr(:,:,itheta)/(RH/(par%gammax*s%hhw))**2\r\n            endwhere\r\n         enddo\r\n         where(gammax_correct)\r\n            s%R=min(s%R,par%gammax*s%hhw)\r\n         endwhere\r\n#ifdef USEMPI\r\n         call xmpi_shift_ee(s%rr)\r\n#endif         \r\n      endif\r\n      !\r\n      ! Compute mean wave direction\r\n      !\r\n      if (par%snells==0 .and. par%single_dir==0) then\r\n         where(s%wete == 1)\r\n            s%thetamean=(sum(s%ee*s%thet,3)/s%ntheta)/(max(sum(s%ee,3),0.00001d0)/s%ntheta)\r\n         endwhere\r\n      endif\r\n      !\r\n      ! compute wave forces\r\n      call compute_wave_forces(s)\r\n      !\r\n      ! orbital velocity\r\n      s%urms=uorb/sqrt(2.d0)\r\n      !\r\n      ! Stokes drift and orbital velocities\r\n      call compute_stokes_drift(s,par)\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/flow_timestep.F90",
+          "sha256": "50742b601cc8feccd513cf742ca772b6021f1d4f5ffe074c4e8ffc90907dd2b2",
+          "line_start": 559,
+          "line_end": 612,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      ! Explicit Euler step momentum u-direction\r\n      !\r\n      do j=jmin_uu,jmax_uu\r\n         do i=imin_uu,imax_uu\r\n            if(s%wetu(i,j)==1) then\r\n                dudt = (s%ududx(i,j)+s%vdudy(i,j)-s%viscu(i,j) & !Ap,Robert,Jaap\r\n                       + par%g*s%dzsdx(i,j) &\r\n                       + s%taubx(i,j)/(par%rho*s%hu(i,j)) &  ! Dano: changed s%hum to s%hu NOT s%cf volume approach\r\n                       + s%Fvegu(i,j)/(par%rho*s%hu(i,j)) &\r\n                       - par%lwave*s%Fx(i,j)/(par%rho*s%hum(i,j)) &\r\n                       - fc*s%vu(i,j) &\r\n                       - par%rhoa*par%Cd*s%windsu(i,j)*sqrt(s%windsu(i,j)**2+s%windnv(i,j)**2)/(par%rho*s%hum(i,j)))    ! Kees: wind correction\r\n                if (dudt>par%maxfacg*par%g) then\r\n                    dudt=par%maxfacg*par%g\r\n                elseif (dudt<-par%maxfacg*par%g) then\r\n                    dudt=-par%maxfacg*par%g\r\n                endif\r\n                s%uu(i,j)=s%uu(i,j)-par%dt*dudt\r\n            else\r\n               s%uu(i,j)=0.0d0\r\n            end if\r\n         end do\r\n      end do\r\n      ! Lateral boundary conditions for uu\r\n      if (s%ny>0) then\r\n         if (xmpi_isleft) then !Dano/Robert only on outer boundary\r\n            s%uu(1:s%nx+1,1)=s%uu(1:s%nx+1,2) ! RJ: can also be done after continuity but more appropriate here\r\n         endif\r\n         ! Lateral boundary at y=ny*dy\r\n         if (xmpi_isright) then !Dano/Robert only at outer boundary\r\n            s%uu(1:s%nx+1,s%ny+1)=s%uu(1:s%nx+1,s%ny) ! RJ: can also be done after continuity but more appropriate here\r\n         endif\r\n      endif\r\n      !\r\n      ! Explicit Euler step momentum v-direction\r\n      !\r\n      do j=jmin_vv,jmax_vv\r\n         do i=imin_vv,imax_vv\r\n            if(s%wetv(i,j)==1) then\r\n               ! Robert: ensure taubx always has the same sign as uu (always decelerates)\r\n               ! Dano: I don't agree\r\n               dvdt = (s%udvdx(i,j)+s%vdvdy(i,j)-s%viscv(i,j)& !Ap,Robert,Jaap\r\n                       + par%g*s%dzsdy(i,j)&\r\n                       + s%tauby(i,j)/(par%rho*s%hv(i,j)) &  ! Dano: s%hv instead of s%hvm, NOT cf volume approach\r\n                       + s%Fvegv(i,j)/(par%rho*s%hv(i,j)) &\r\n                       - par%lwave*s%Fy(i,j)/(par%rho*s%hvm(i,j)) &\r\n                       + fc*s%uv(i,j) &\r\n                       - par%rhoa*par%Cd*s%windnv(i,j)*sqrt(s%windsu(i,j)**2+s%windnv(i,j)**2)/(par%rho*s%hvm(i,j)))    ! Kees: wind correction\r\n               if (dvdt>par%maxfacg*par%g) then\r\n                    dvdt=par%maxfacg*par%g\r\n                elseif (dvdt<-par%maxfacg*par%g) then\r\n                    dvdt=-par%maxfacg*par%g\r\n                endif\r\n               s%vv(i,j)=s%vv(i,j)-par%dt*dvdt\r"
+        }
+      ]
+    },
+    {
+      "id": "XB-PHY-005",
+      "producer": "wave Stokes/orbital/asymmetry state plus post-flow Eulerian state",
+      "consumer": "sediment transport",
+      "states": [
+        "E,R,c,hstokes -> ust",
+        "uu/vv-ust -> ue/ve",
+        "ua,ue_sed,ve_sed,urms,DR,nuh -> ceq and Sus/Svs/Sub/Svb"
+      ],
+      "timing": "Flow refreshes cell-centre and sediment velocities before transus in the same step; transus then writes class fluxes for bed_update.",
+      "mode_guards": "sedtrans=1. nz>1 and form != VANRIJN1993 calls vsm_u_XB; otherwise ue_sed=ue and ve_sed=ve. Waveform and turbulence subbranches alter stirring/advection.",
+      "grid_and_bounds": "Flow velocities are staggered u/v then averaged to eta points; sediment fluxes are stored on u/v faces and concentration at eta points, each with ngd class dimension.",
+      "units_and_sign": "velocity [m/s], DR [W/m2], class transport [m2/s] excluding pores. Positive face transport follows positive grid coordinate.",
+      "summary_ko": "파랑의 궤도·Stokes·비대칭 성분과 유동의 Eulerian 성분이 합쳐져 표사 이송속도와 평형농도를 만든다.",
+      "evidence": [
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_functions.F90",
+          "sha256": "2fda65c76091b855aee55b458b34625ab021136f63455bfe3190d3377ff8a205",
+          "line_start": 1321,
+          "line_end": 1345,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      where(s%wete==1)\r\n         ! wave induced mass flux\r\n         ustw=s%E/s%c/par%rho/s%hstokes   ! Jaap (Robert: used in wave instationary)\r\n         ! ustw=s%E*s%k/s%sigm/par%rho/max(s%hh,.001d0)   ! Robert: old version used in wave stationary. Superceded?\r\n         s%uwf = ustw*cos(s%thetamean-s%alfaz)\r\n         s%vwf = ustw*sin(s%thetamean-s%alfaz)\r\n         !\r\n         ! roller contribution\r\n         s%ustr=2*s%R/s%c/par%rho/s%hstokes ! Jaap (Robert: used in wave instationary)\r\n         !s%ustr = 0.d0\r\n         !s%ustr=2*s%R*s%k/s%sigm/par%rho/max(s%hh,.001d0) ! Robert: old version used in wave stationary. Superceded?\r\n      elsewhere\r\n         ustw = 0.d0\r\n         s%uwf = 0.d0\r\n         s%vwf = 0.d0\r\n         s%ustr = 0.d0\r\n      endwhere\r\n      !\r\n      ! introduce breaker delay\r\n      if (par%breakerdelay>0.d0) then\r\n         call breakerdelay(par,s)\r\n         s%ust = ustw+s%usd\r\n      else\r\n         s%ust = ustw+s%ustr\r\n      endif\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/flow_timestep.F90",
+          "sha256": "50742b601cc8feccd513cf742ca772b6021f1d4f5ffe074c4e8ffc90907dd2b2",
+          "line_start": 774,
+          "line_end": 797,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      ! U and V in cell centre; do output and sediment stirring\r\n      !\r\n      s%u(2:s%nx,:)=0.5d0*(s%uu(1:s%nx-1,:)+s%uu(2:s%nx,:))\r\n      ! offshore boundary\r\n      if(xmpi_istop) then\r\n         s%u(1,:)=s%uu(1,:)\r\n      endif\r\n      if(xmpi_isbot) then\r\n         s%u(s%nx+1,:)=s%u(s%nx,:)\r\n      endif\r\n\r\n      if (s%ny>0) then\r\n         s%v(:,2:s%ny)=0.5d0*(s%vv(:,1:s%ny-1)+s%vv(:,2:s%ny))\r\n         if(xmpi_isleft) then\r\n            s%v(:,1)=s%vv(:,1)\r\n         endif\r\n         if(xmpi_isright) then\r\n            s%v(:,s%ny+1)=s%v(:,s%ny)        ! bas: need this for calculation of s%ee in wci routine\r\n         endif\r\n         !Ap\r\n         s%v(s%nx+1,:)=s%v(s%nx,:)\r\n      else ! Dano\r\n         s%v=s%vv\r\n      endif !s%ny>0\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/flow_timestep.F90",
+          "sha256": "50742b601cc8feccd513cf742ca772b6021f1d4f5ffe074c4e8ffc90907dd2b2",
+          "line_start": 956,
+          "line_end": 986,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      ! XBeach uses same input for Van Rijn, 1993 (quasi 3d), but doesn't use this module\r\n      if (par%nz>1 .and. par%form /= FORM_VANRIJN1993) then\r\n         do j=1,s%ny+1\r\n            do i=1,s%nx+1\r\n               if (s%wetz(i,j) .eq. 1) then\r\n                  ks=12.d0*s%hh(i,j)/10.d0**(sqrt(par%g/s%cfu(i,j))/18.d0)\r\n                  tauw=par%rhoa*par%Cd*sqrt(s%windsu(i,j)**2+s%windnv(i,j)**2)\r\n                  tauwx=s%windsu(i,j)*tauw\r\n                  tauwy=s%windnv(i,j)*tauw\r\n\r\n                  call vsm_u_XB (  s%ue(i,j)    ,s%ve(i,j)    ,s%hh(i,j) ,ks  ,                &\r\n                  par%rho      ,tauwx ,tauwy ,s%thetamean(i,j)-s%alfaz(i,j),  &\r\n                  s%urms(i,j)  ,s%sigm(i,j)  ,s%k(i,j)       ,s%Dr(i,j)  ,    &\r\n                  s%E(i,j)     ,s%R(i,j)     ,fcvisc,facdel  ,par%ws     ,    &\r\n                  s%fw(i,j)    ,facdf ,swglm ,par%nz       ,s%sigz       ,    &\r\n                  s%uz(i,j,:)  ,s%vz(i,j,:)  ,s%ustz(i,j,:)  ,s%nutz(i,j,:),  &\r\n                  s%ue_sed(i,j),s%ve_sed(i,j)  )\r\n               else\r\n                  s%uz(i,j,:)=0.d0\r\n                  s%vz(i,j,:)=0.d0\r\n                  s%ustz(i,j,:)=0.d0\r\n                  s%nutz(i,j,:)=0.d0\r\n                  s%ue_sed(i,j)=0.d0\r\n                  s%ve_sed(i,j)=0.d0\r\n               endif\r\n            enddo\r\n         enddo\r\n      else\r\n         s%ue_sed=s%ue\r\n         s%ve_sed=s%ve\r\n      endif\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/morphevolution.F90",
+          "sha256": "765f474008f7cb843353dc0790cc3f3ebdc00631353da7592e2bb0508e968391",
+          "line_start": 140,
+          "line_end": 190,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      ! use eulerian velocities\r\n      vmag2     = s%ue**2+s%ve**2\r\n      cu        = 0.0d0\r\n      cv        = 0.0d0\r\n      cub       = 0.0d0\r\n      cvb       = 0.0d0\r\n      s%dcsdx     = 0.0d0\r\n      s%dcsdy     = 0.0d0\r\n\r\n      sinthm = sin(s%thetamean-s%alfaz)\r\n      costhm = cos(s%thetamean-s%alfaz)\r\n\r\n      ! short wave runup\r\n      if (par%swrunup==1 .and. par%struct==1) then\r\n         call hybrid(s,par)\r\n      endif\r\n\r\n      ! compute turbulence due to wave breaking\r\n      if (par%lwt==1 .or. par%turb == TURB_BORE_AVERAGED .or. par%turb == TURB_WAVE_AVERAGED) then\r\n         call waveturb(s,par)\r\n      endif\r\n\r\n      if (par%swave==1) then\r\n         ! include wave skewness and assymetry in sediment advection velocity\r\n         if (par%waveform==WAVEFORM_RUESSINK_VANRIJN)then\r\n            call RvR(s,par)\r\n         elseif (par%waveform==WAVEFORM_VANTHIEL) then\r\n            call vT(s,par)\r\n         endif\r\n\r\n      endif\r\n\r\n      ! calculate equilibrium concentration/sediment source\r\n      select case (par%form)\r\n       case (FORM_SOULSBY_VANRIJN,FORM_VANTHIEL_VANRIJN,FORM_VANRIJN1993)\r\n         ! Soulsby van Rijn and Van Thiel de Vries & Reniers 2008 formulations\r\n         call sedtransform(s,par)\r\n       case (FORM_NIELSEN2006)\r\n         call Nielsen2006(s,par)\r\n         if (par%bulk==0) then\r\n            return\r\n         endif\r\n       case (FORM_INTRASEDTR)\r\n         call intra_sedtr(s,par)       \r\n\r\n       case (FORM_MCCALL_VANRIJN)\r\n         call mccall_vanrijn(s,par)\r\n         if (par%bulk==0) then\r\n            return\r\n         endif\r\n      end select\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/morphevolution.F90",
+          "sha256": "765f474008f7cb843353dc0790cc3f3ebdc00631353da7592e2bb0508e968391",
+          "line_start": 220,
+          "line_end": 279,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "         ! X-direction\r\n         !\r\n         ! Get ua in u points and split out in u and v direction\r\n         uau(1:s%nx,:) = 0.5*(s%ua(1:s%nx,:)*costhm(1:s%nx,:)+s%ua(2:s%nx+1,:)*costhm(1:s%nx,:))\r\n         uav(1:s%nx,:) = 0.5*(s%ua(1:s%nx,:)*sinthm(1:s%nx,:)+s%ua(2:s%nx+1,:)*sinthm(1:s%nx,:))\r\n         if (par%nz>1) then\r\n            ueu_sed(1:s%nx,:) = 0.5*(s%ue_sed(1:s%nx,:)+s%ue_sed(2:s%nx+1,:))\r\n         else\r\n            ueu_sed=s%ueu\r\n         endif\r\n         veu_sed(1:s%nx,:) = 0.5*(s%ve_sed(1:s%nx,:)+s%ve_sed(2:s%nx+1,:))\r\n         if (xmpi_isbot) then\r\n            veu_sed(s%nx+1,:) = veu_sed(s%nx,:)\r\n         endif\r\n\r\n         ! Compute vmagu including ua\r\n         !         s%vmagu = sqrt((s%uu+uau)**2+(s%vu+uav)**2)\r\n         s%vmagu = sqrt((ueu_sed+uau)**2+(veu_sed+uav)**2)\r\n         ! sediment advection velocity for suspended load and bed load respectively\r\n         ! REMARK: when vreps does not equal vv; no mass conservation\r\n         !         s%ureps = s%ueu+uau\r\n         !         s%urepb = s%ueu+uau  ! RJ maybe reduce this velocity?\r\n         s%ureps = ueu_sed+uau\r\n         s%urepb = ueu_sed+uau\r\n         !\r\n         do j=1,s%ny+1\r\n            do i=1,s%nx\r\n               if(s%ureps(i,j)>0.d0) then\r\n                  ! test cu(i,j)=cc(i,j)\r\n                  cu(i,j)=par%thetanum*cc(i,j)+(1.d0-par%thetanum)*cc(min(i+1,s%nx),j)\r\n                  cub(i,j)=par%thetanum*s%pbbed(i,j,1,jg)*s%ceqbg(i,j,jg)+(1.d0-par%thetanum)&\r\n                  *s%pbbed(min(i+1,s%nx),j,1,jg)*s%ceqbg(min(i+1,s%nx),j,jg)\r\n                  !cub(i,j)=par%thetanum*ccb(i,j)+(1.d0-par%thetanum)*ccb(min(i+1,nx),j)\r\n               elseif(s%ureps(i,j)<0.d0) then\r\n                  cu(i,j)=par%thetanum*cc(i+1,j)+(1.d0-par%thetanum)*cc(max(i,2),j)\r\n                  cub(i,j)=par%thetanum*s%pbbed(i+1,j,1,jg)*s%ceqbg(i+1,j,jg)+(1.d0-par%thetanum)&\r\n                  *s%pbbed(max(i,2),j,1,jg)*s%ceqbg(max(i,2),j,jg)\r\n                  !cub(i,j)=par%thetanum*ccb(i+1,j)+(1.d0-par%thetanum)*ccb(max(i,2),j)\r\n               else\r\n                  cu(i,j)=0.5d0*(cc(i,j)+cc(i+1,j))\r\n                  cub(i,j)=0.5d0*(s%pbbed(i,j,1,jg)*s%ceqbg(i,j,jg)+s%pbbed(i+1,j,1,jg)*s%ceqbg(i+1,j,jg))\r\n                  !cub(i,j)=0.5d0*(ccb(i,j)+ccb(i+1,j))\r\n               endif\r\n               s%dcsdx(i,j)=(cc(i+1,j)-cc(i,j))/s%dsu(i,j)\r\n            enddo\r\n         enddo\r\n         ! wwvv dcdx(nx:1,:) is still untouched, correct this ofr the parallel case\r\n         cu(s%nx+1,:) = cc(s%nx+1,:) !Robert\r\n         ! wwvv fix this in parallel case\r\n         ! wwvv in parallel version, there will be a discrepancy between the values\r\n         ! of dzbdx(nx+1,:).\r\n         !wwvv so fix that\r\n         !\r\n         Sus = 0.d0\r\n         Sub = 0.d0\r\n         !\r\n         ! suspended load, Lodewijk: no bed slope effect (yet)\r\n         Sus=par%sus*(cu*s%ureps*s%hu-s%Dc*s%hu*s%dcsdx)*s%wetu\r\n         ! bed load, Lodewijk: no bed slope effect (yet)\r\n         Sub=par%bed*(cub*s%urepb*s%hu)*s%wetu\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/morphevolution.F90",
+          "sha256": "765f474008f7cb843353dc0790cc3f3ebdc00631353da7592e2bb0508e968391",
+          "line_start": 305,
+          "line_end": 354,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "         ! Jaap: compute vmagv including ua\r\n         !         s%vmagv = sqrt((s%uv+uau)**2+(s%vv+uav)**2)\r\n         s%vmagv = sqrt((uev_sed+uau)**2+(vev_sed+uav)**2)\r\n         ! sediment advection velocity for suspended load and bed load respectively\r\n         ! REMARK: when vreps does not equal vv; no mass conservation\r\n         !         s%vreps = s%vev+uav\r\n         !         s%vrepb = s%vev+uav   ! RJ maybe reduce this velocity? Should be s%vv instead of s%vev?\r\n         s%vreps = vev_sed+uav\r\n         s%vrepb = vev_sed+uav   ! RJ maybe reduce this velocity? Should be s%vv instead of s%vev?\r\n         !\r\n         if (s%ny>0) then\r\n            do j=1,s%ny\r\n               do i=1,s%nx+1\r\n                  if(s%vreps(i,j)>0) then\r\n                     cv(i,j)=par%thetanum*cc(i,j)+(1.d0-par%thetanum)*cc(i,min(j+1,s%ny))\r\n                     cvb(i,j)=par%thetanum*s%pbbed(i,j,1,jg)*s%ceqbg(i,j,jg)+(1.d0-par%thetanum)&\r\n                     *s%pbbed(i,min(j+1,s%ny),1,jg)*s%ceqbg(i,min(j+1,s%ny),jg)\r\n                     !cvb(i,j)=par%thetanum*ccb(i,j)+(1.d0-par%thetanum)*ccb(i,min(j+1,ny))\r\n                  elseif(s%vreps(i,j)<0) then\r\n                     cv(i,j)=par%thetanum*cc(i,j+1)+(1.d0-par%thetanum)*cc(i,max(j,2))\r\n                     cvb(i,j)=par%thetanum*s%pbbed(i,j+1,1,jg)*s%ceqbg(i,j+1,jg)+(1.d0-par%thetanum)&\r\n                     *s%pbbed(i,max(j,2),1,jg)*s%ceqbg(i,max(j,2),jg)\r\n                     !cvb(i,j)=par%thetanum*ccb(i,j+1)+(1.d0-par%thetanum)*ccb(i,max(j,2))\r\n                  else\r\n                     cv(i,j)=0.5d0*(cc(i,j)+cc(i,j+1)) !Jaap: cc instead of cv\r\n                     cvb(i,j)=0.5d0*(s%pbbed(i,j,1,jg)*s%ceqbg(i,j,jg)+s%pbbed(i,j+1,1,jg)*s%ceqbg(i,j+1,jg))\r\n                     !cvb(i,j)=0.5d0*(ccb(i,j)+ccb(i,j+1))\r\n                  end if\r\n                  s%dcsdy(i,j)=(cc(i,j+1)-cc(i,j))/s%dnv(i,j) !Jaap\r\n\r\n               end do\r\n            end do\r\n            ! wwvv dcdy(:,ny+1) is not filled in, so in parallel case:\r\n            cv(:,s%ny+1) = cc(:,s%ny+1) !Robert\r\n            ! wwvv in parallel version, there will be a discrepancy between the values\r\n            ! of dzbdy(:,ny+1).\r\n            ! wwvv so fix that\r\n         else\r\n            cv = cc\r\n            cvb = s%ceqbg(:,:,jg)\r\n         endif ! s%ny>0\r\n         !\r\n         ! Compute sedimnent transport in v-direction\r\n         !\r\n         Svs = 0.d0\r\n         Svb = 0.d0\r\n         ! Suspended load\r\n         Svs=par%sus*(cv*s%vreps*s%hv-s%Dc*s%hv*s%dcsdy)*s%wetv\r\n         ! Bed load\r\n         Svb=par%bed*(cvb*s%vrepb*s%hv)*s%wetv\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/variables.def",
+          "sha256": "628090517242909cb5cd2343158e2e004d2dc669d0f46140f322538d0d7276ff",
+          "line_start": 165,
+          "line_end": 171,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "   double precision, allocatable, target :: Susg(:,:,:)      !< [m2/s] suspended sediment transport for each sediment class (excluding pores), x-component {\"shape\": [\"s%nx+1\", \"s%ny+1\", \"par%ngd\"], \"standard_name\": \"\", \"broadcast\": \"d\"}\r\n   double precision, allocatable, target :: Svsg(:,:,:)      !< [m2/s] suspended sediment transport for each sediment class (excluding pores), y-component {\"shape\": [\"s%nx+1\", \"s%ny+1\", \"par%ngd\"], \"standard_name\": \"\", \"broadcast\": \"d\"}\r\n   double precision, allocatable, target :: Subg(:,:,:)      !< [m2/s] bed sediment transport for each sediment class (excluding pores), x-component {\"shape\": [\"s%nx+1\", \"s%ny+1\", \"par%ngd\"], \"standard_name\": \"\", \"broadcast\": \"d\"}\r\n   double precision, allocatable, target :: Svbg(:,:,:)      !< [m2/s] bed sediment transport for each sediment class (excluding pores), y-component {\"shape\": [\"s%nx+1\", \"s%ny+1\", \"par%ngd\"], \"standard_name\": \"\", \"broadcast\": \"d\"}\r\n   double precision, allocatable, target :: ceqbg(:,:,:)     !< [m3/m3] depth-averaged bed equilibrium concentration for each sediment class {\"shape\": [\"s%nx+1\", \"s%ny+1\", \"par%ngd\"], \"standard_name\": \"\", \"broadcast\": \"d\"}\r\n   double precision, allocatable, target :: ceqsg(:,:,:)     !< [m3/m3] depth-averaged suspended equilibrium concentration for each sediment class {\"shape\": [\"s%nx+1\", \"s%ny+1\", \"par%ngd\"], \"standard_name\": \"\", \"broadcast\": \"d\"}\r\n   double precision, allocatable, target :: ua(:,:)          !< [m/s] time averaged flow velocity due to wave assymetry {\"shape\": [\"s%nx+1\", \"s%ny+1\"], \"standard_name\": \"\", \"broadcast\": \"d\"}\r"
+        }
+      ]
+    },
+    {
+      "id": "XB-PHY-006",
+      "producer": "nonhydrostatic dispatcher",
+      "consumer": "one-layer or reduced two-layer pressure correction",
+      "states": [
+        "uu,vv,zs,zb,hh,pres,ws,wb",
+        "nonhU/nonhV/nonhZ"
+      ],
+      "timing": "Called twice inside flow: predictor after hydrostatic momentum and MPI velocity shift, then implicit pressure corrector after optional second-order advection. The corrector performs its own MPI shift.",
+      "mode_guards": "wavemodel=NONH. nonhq3d=0 selects one-layer; nonhq3d=1 selects reduced two-layer, with ny=0 selecting 2DV and ny>0 selecting the 3D-named 2DH path.",
+      "grid_and_bounds": "Arrays are nx+1 by ny+1. The two-layer 3D path loops interior 2:nx,2:ny for several pressure relations; 1D uses ny=0 and j=1.",
+      "units_and_sign": "pressure `pres` is normalized [m2/s2]; velocities [m/s], elevations/depth [m].",
+      "summary_ko": "nonh 모드는 `flow` 안의 예측·보정 두 호출로 단파를 직접 해상한다. `nonhq3d`는 표사 q3d와 다른, 축약 2층 비정수압 스위치다.",
+      "evidence": [
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/flow_timestep.F90",
+          "sha256": "50742b601cc8feccd513cf742ca772b6021f1d4f5ffe074c4e8ffc90907dd2b2",
+          "line_start": 630,
+          "line_end": 658,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "#ifdef USEMPI\r\n      call xmpi_shift_ee(s%uu)\r\n      call xmpi_shift_ee(s%vv)\r\n#endif\r\n\r\n      if (par%wavemodel==WAVEMODEL_NONH) then\r\n         !Do explicit predictor step with pressure\r\n         call nonh_cor(s,par,0,uu_old,vv_old)\r\n\r\n#ifdef USEMPI\r\n         call xmpi_shift_ee(s%uu)\r\n         call xmpi_shift_ee(s%vv)\r\n#endif\r\n      end if\r\n\r\n      if (par%secorder==1) then\r\n         !Call second order correction to the advection\r\n         call flow_secondorder_advUV(s,par,uu_old,vv_old)\r\n#ifdef USEMPI\r\n         call xmpi_shift_ee(s%uu)\r\n         call xmpi_shift_ee(s%vv)\r\n#endif\r\n      end if\r\n\r\n      if (par%wavemodel==WAVEMODEL_NONH) then\r\n         ! do non-hydrostatic pressure compensation to solve short waves\r\n         call nonh_cor(s,par,1,uu_old,vv_old)\r\n         ! note: MPI shift in subroutine nonh_cor\r\n      end if\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/nonh.F90",
+          "sha256": "18f471b386e5905a78c98c24fc2f6252ae4fc66c9e2010665e5f35a59d324583",
+          "line_start": 158,
+          "line_end": 249,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      !--------------------------        PURPOSE         ----------------------------\r\n\r\n      !  This is the new entry routine for the non-hydrostatic module. It is called twice during each timestep by the\r\n      !  flow module, (I) (withe path=0) before the second-order corrections are applied (if applicable) to include the known pressure\r\n      !  explicitly in the momentum equations,  and (II) (path=1) just after the second order advection correction to calculate\r\n      !  the new pressures implicitly. The codepath taken is specified with the path parameter (path=0 for step I, and path=1 for\r\n      !  step II).\r\n      !\r\n      !  Moreover, depending on the parameter nonhq3d, which activates the new reduced 2 layer model, again different codepaths\r\n      !  are taken:\r\n      !\r\n      !  IF nonhq3d=0\r\n      !         call the \"old\" versions of the non-hydrostatic routines\r\n      !             (path=0)  nonh_1lay_pred  (renamed from nonh_explicit)\r\n      !             (path=1)  nonh_1lay_cor   (renamed from nonh_cor)\r\n      !  IF nonhq3d=1\r\n      !         call the \"old\" versions of the non-hydrostatic routine\r\n      !            IF 1D\r\n      !               (path=0)  nonh_2lay_pred_2DV  (renamed from nonh_explicit)\r\n      !               (path=1)  nonh_2lay_cor_2DV   (renamed from nonh_cor)\r\n      !            ELSE\r\n      !               (path=0)  nonh_2lay_pred_3D  (renamed from nonh_explicit)\r\n      !               (path=1)  nonh_2lay_cor_3D   (renamed from nonh_cor)\r\n      !\r\n      !--------------------------     DEPENDENCIES       ----------------------------\r\n\r\n      use spaceparams\r\n      use params,         only: parameters\r\n      use xmpi_module\r\n\r\n      !--------------------------     ARGUMENTS          ----------------------------\r\n\r\n      type(spacepars) ,intent(inout)                       :: s\r\n      type(parameters),intent(in)                          :: par\r\n      integer         ,intent(in)                          :: ipredcor !Select if we want to apply the explicit predicition / or the implicit correction\r\n\r\n      real(kind=rkind),dimension(s%nx+1,s%ny+1),intent(in) :: uu0\r\n      real(kind=rkind),dimension(s%nx+1,s%ny+1),intent(in) :: vv0\r\n\r\n      !-------------------------------------------------------------------------------\r\n      !                             IMPLEMENTATION\r\n      !-------------------------------------------------------------------------------\r\n\r\n      select case ( par%nonhq3d )\r\n         !\r\n       case (1)\r\n         !\r\n         ! The \"new\" reduced two-layer formulations are used\r\n         !\r\n         if ( ipredcor == 0 ) then\r\n            ! -- Predictor\r\n            if ( s%ny == 0 ) then\r\n               ! -- 2dv code path\r\n               call nonh_2lay_pred_2dV(s,par,uu0)\r\n               !\r\n            else\r\n               ! -- \"3d\" code path\r\n               call nonh_2lay_pred_3d(s,par,uu0,vv0)\r\n               !\r\n            endif\r\n            !\r\n         else\r\n            !\r\n            if ( s%ny == 0 ) then\r\n               !\r\n               call nonh_2lay_cor_2dV(s,par)\r\n               !\r\n            else\r\n               !\r\n               call nonh_2lay_cor_3d(s,par)\r\n               !\r\n            endif\r\n            !\r\n         endif\r\n         !\r\n       case default\r\n         !\r\n         ! The \"old\" code is used\r\n         !\r\n         if ( ipredcor == 0 ) then\r\n            ! -- Predictor\r\n            call nonh_1lay_pred(s,par)\r\n            !\r\n         else\r\n            ! -- Corrector\r\n            call nonh_1lay_cor(s,par)\r\n            !\r\n         endif\r\n         !\r\n      end select\r\n      !\r\n   end subroutine nonh_cor\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/nonh.F90",
+          "sha256": "18f471b386e5905a78c98c24fc2f6252ae4fc66c9e2010665e5f35a59d324583",
+          "line_start": 288,
+          "line_end": 370,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      if(.not. xcompute) return\r\n\r\n      allocate(au (0:1,s%nx+1,s%ny+1)); au = 0.0_rKind\r\n      allocate(av (0:1,s%nx+1,s%ny+1)); av = 0.0_rKind\r\n      allocate(mat(5,s%nx+1,s%ny+1))  ;  mat = 0.0_rKind\r\n      allocate(rhs(  s%nx+1,s%ny+1))  ;  rhs = 0.0_rKind\r\n      allocate(zbu(  s%nx+1,s%ny+1))  ;  zbu = 0.0_rKind\r\n      allocate(zbv(  s%nx+1,s%ny+1))  ;  zbv = 0.0_rKind\r\n      allocate(zsu(  s%nx+1,s%ny+1))  ;  zsu = 0.0_rKind\r\n      allocate(zsv(  s%nx+1,s%ny+1))  ;  zsv = 0.0_rKind\r\n      allocate(nonhU(  s%nx+1,s%ny+1)); nonhU = 1\r\n      allocate(nonhV(  s%nx+1,s%ny+1)); nonhV = 1\r\n      allocate(nonhZ(  s%nx+1,s%ny+1)); nonhZ = 1\r\n      allocate(lbreakcond(s%nx+1,s%ny+1)); lbreakcond = par%maxbrsteep\r\n      allocate(dp(s%nx+1,s%ny+1))     ; dp = 0.0_rKind\r\n      allocate(Wm(s%nx+1,s%ny+1))     ;Wm     = 0.0_rKind\r\n      allocate(Wm_old(s%nx+1,s%ny+1)) ;Wm_old = 0.0_rKind\r\n      allocate(Wcoef(s%nx+1,s%ny+1))  ;Wcoef = 1.0_rKind\r\n      allocate(aws (5,s%nx+1,s%ny+1)) ; aws = 0.0_rKind\r\n      !\r\n      ! The reduced two-layer model\r\n      !\r\n      if ( par%nonhq3d == 1 ) then\r\n         !\r\n         allocate(omega(s%nx+1,s%ny+1));  omega = 0.0_rKind\r\n         allocate(adu (0:1,s%nx+1,s%ny+1)); adu = 0.0_rKind\r\n         allocate(adv (0:1,s%nx+1,s%ny+1)); adv = 0.0_rKind\r\n         allocate(Wm0(s%nx+1,s%ny+1))     ;Wm0     = 0.0_rKind\r\n         allocate(dU0(s%nx+1,s%ny+1))     ;dU0 = 0.0_rKind\r\n         allocate(dV0(s%nx+1,s%ny+1))     ;dV0 = 0.0_rKind\r\n         !\r\n      else\r\n         !\r\n         ! These grid variables are obsolete in the new reduced model\r\n         !\r\n         allocate(dxz (  s%nx+1))        ;  dxz  = 0.0_rKind\r\n         allocate(dyz (  s%ny+1))        ;  dyz  = 0.0_rKind\r\n         allocate(dxu (  s%nx+1))        ;  dxu  = 0.0_rKind\r\n         allocate(dyv (  s%ny+1))        ;  dyv  = 0.0_rKind\r\n\r\n         allocate(ddxz (  s%nx+1))       ;  ddxz  = 0.0_rKind\r\n         allocate(ddyz (  s%ny+1))       ;  ddyz  = 0.0_rKind\r\n         allocate(ddxu (  s%nx+1))       ;  ddxu  = 0.0_rKind\r\n         allocate(ddyv (  s%ny+1))       ;  ddyv  = 0.0_rKind\r\n         allocate(awb (5,s%nx+1,s%ny+1)) ; awb = 0.0_rKind\r\n         allocate(aur(   s%nx+1,s%ny+1)) ; aur = 0.0_rKind\r\n         allocate(avr(   s%nx+1,s%ny+1)) ; avr = 0.0_rKind\r\n         allocate(awbr(s%nx+1,s%ny+1))   ; awbr = 0.0_rKind\r\n         allocate(awsr(s%nx+1,s%ny+1))   ; awsr = 0.0_rKind\r\n\r\n         !Initialize grid variables\r\n         dyz  = s%dnz(1,:)\r\n         dyv  = s%dnv(1,:)\r\n         ddyz = 1.0_rKind/dyz\r\n         ddyv = 1.0_rKind/dyv\r\n\r\n         dxu  = s%dsu(:,1)\r\n         dxz  = s%dsz(:,1)\r\n         ddxu = 1.0_rKind/dxu\r\n         ddxz = 1.0_rKind/dxz\r\n         !\r\n      endif\r\n\r\n      mat(1,1,:)      = 1.0_rKind\r\n      mat(1,s%nx+1,:) = 1.0_rKind\r\n      mat(1,:,1)      = 1.0_rKind\r\n      mat(1,:,s%ny+1) = 1.0_rKind\r\n\r\n      initialized   = .true.\r\n\r\n      if ( par%nonhq3d == 1 ) then\r\n         !\r\n         wcoef = par%nhlay\r\n         !\r\n      else\r\n         !\r\n         call nonh_init_wcoef(s,par)\r\n         !\r\n      endif\r\n      !\r\n\r\n      !Initialize levels at u/v points (zu,zbu etc.)\r\n      call zuzv(s)\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/variables.def",
+          "sha256": "628090517242909cb5cd2343158e2e004d2dc669d0f46140f322538d0d7276ff",
+          "line_start": 215,
+          "line_end": 215,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "   double precision, allocatable, target :: pres(:,:)        !< [m2/s2] normalized dynamic pressure {\"shape\": [\"s%nx+1\", \"s%ny+1\"], \"standard_name\": \"\", \"broadcast\": \"d\"}\r"
+        }
+      ]
+    },
+    {
+      "id": "XB-PHY-007",
+      "producer": "nonhydrostatic dynamic pressure",
+      "consumer": "groundwater head boundary",
+      "states": [
+        "pres -> dynpresupd -> gwheadtop -> gwhead/gww/infil"
+      ],
+      "timing": "Groundwater runs before the current flow/nonh solve, so it time-filters `pres` left from the previous nonh correction; its resulting infil is consumed by the current flow continuity equation.",
+      "mode_guards": "gwflow=1 and wavemodel=NONH enables dynamic pressure in head top. gwnonh chooses averaged-head vs groundwater Poisson solve.",
+      "grid_and_bounds": "Eta arrays nx+1,ny+1. Groundwater interior continuity uses 2:nx and 2:ny in 2DH, j=1 in true 1D; halos for gwlevel/head/curv are shifted before outer boundary copies.",
+      "units_and_sign": "pres [m2/s2] divided by g contributes metres of head. infil [m/s], positive sea -> groundwater; gww [m/s], positive groundwater -> sea.",
+      "summary_ko": "비정수압 압력은 한 유체 스텝 늦게 지하수 상단수두에 들어가고, 계산된 침투율은 같은 스텝 표면수 연속식에 들어간다.",
+      "evidence": [
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/groundwater.F90",
+          "sha256": "e941accf34fb9b4f21256dcb59b986ad2df2976a8bc151af926e3ce38c8cf494",
+          "line_start": 276,
+          "line_end": 302,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      ! Definition of horizontal groundwater velocity:\r\n      ! Because there is not simple way of measuring flow in pores, Darcy relates to the\r\n      ! flow velocity through the ground in terms of surface water (not pore water).\r\n      ! Therefore, after the flux has been calculated the groundwater level change is\r\n      ! divided by the porosity to get changes in terms of pore water.\r\n      !\r\n      ! Definition of vertical groundwater/surface water exchange:\r\n      ! infil is defined positive from sea to groundwater, gww is defined positive up\r\n      ! (from groundwater to sea!). Both infil and gww are in volumes of surface water\r\n      ! (not pore water). gwu and gwv are also in terms of surface water volume.\r\n      !\r\n      ! Initialize\r\n      s%gww = 0.d0\r\n      s%infil = 0.d0\r\n      infiluncon = 0.d0\r\n      infilcon = 0.d0\r\n      infilhorgw = 0.d0\r\n      infilhorsw = 0.d0\r\n      fracdt = 0.d0\r\n      !\r\n      ! If using dynamic pressure (nonh==1), very short wave lengths mess things\r\n      ! up because they are not resolved properly in the nonh pressure solver.\r\n      ! To surpress this, carry out pressure averaging over time scale ~ 1/4 Trep\r\n      if (par%wavemodel==WAVEMODEL_NONH) then\r\n         factime = min(4*par%dt/par%Trep,1.d0)\r\n         dynpresupd = (1-factime) * dynpresupd + factime * s%pres\r\n      endif\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/groundwater.F90",
+          "sha256": "e941accf34fb9b4f21256dcb59b986ad2df2976a8bc151af926e3ce38c8cf494",
+          "line_start": 330,
+          "line_end": 397,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      ! Update groundwater level and water surface level to account for\r\n      ! infiltration and exfiltration effects. Note infil is avarage\r\n      ! infiltration rate over whole timestep\r\n      s%gwlevel = s%gwlevel+par%dt*infiluncon/par%por\r\n      zsupd = s%zs-par%dt*infiluncon\r\n      !\r\n      ! Recalculate connected property, this is needed further on in the code\r\n      where(zsupd-s%zb>=par%eps .and. s%zb-s%gwlevel<connectcrit)\r\n         connected = .true.\r\n      elsewhere\r\n         connected = .false.\r\n      endwhere\r\n      !\r\n      ! Thickness of groundwater layer\r\n      s%gwheight=s%gwlevel-s%gwbottom\r\n      !\r\n      ! Determine intermediate aquifer depths (upwind scheme)\r\n      call gw_calculate_interfaceheight(s,gwhu,gwhv,initial)\r\n      !\r\n      ! Calculate head smoothing function over dwetlayer\r\n      ratio = gw_calculate_smoothwetlayer(s,par%dwetlayer,par%px)\r\n      !\r\n      ! Calculate top boundary condition for head (pressure on groundwater\r\n      ! from surface water, or atmospheric pressure when dry). Takes into\r\n      ! account a transition layer, specified by user to smooth transition\r\n      ! from surface water head to atmospheric head\r\n      if (par%wavemodel==WAVEMODEL_NONH) then\r\n         gwheadtop = gwCalculateHeadTop(s%nx,s%ny,zsupd,s%gwlevel,s%wetz,ratio,1,par%g,dynpresupd)\r\n      else\r\n         gwheadtop = gwCalculateHeadTop(s%nx,s%ny,zsupd,s%gwlevel,s%wetz,ratio,0,par%g,dynpresupd)\r\n      endif\r\n      !\r\n      ! Compute groundwater head in cell centres\r\n      ! In case of hydrostatic this is the same as the surface water head,\r\n      ! or groundwater level. In order to ensure small errors do not explode\r\n      ! minimum time averaging is done.\r\n      ! In case of non-hydrostatic computations, the head is solved by the\r\n      ! Poisson solver. In the case of a turbulent/modflow groundwater scheme\r\n      ! the solver is forced using the estimate of the hydraulic conductivity\r\n      ! from the previous time step. The estimate from the previous time step\r\n      ! is also used to compute velocities (else no convervation of mass). The\r\n      ! computation of the velocity also returns a new update of the hydraulic\r\n      ! conductivity to be used in the next time step\r\n      if (par%gwnonh == 0) then\r\n         ! hydrostatic pressure assumption, with time delay required for\r\n         ! stability\r\n         !     factime = min(par%dt/0.2d0,1.d0)\r\n         !     gwhead = (1.d0-factime)*gwhead + factime*gwheadtop\r\n         s%gwhead = (s%gwhead + gwheadtop)/2\r\n      else\r\n         ! non-hydrostatic pressure, solve using Poisson solver. Kxupd is the\r\n         ! updated hydraulic conductivity from the previous time step\r\n         call gw_solver(par,s,gwheadtop,Kxupd,Kyupd,Kzupd,gwhu,gwhv,fracdt)\r\n      endif\r\n      !\r\n      !\r\n      ! Calculate groundwater velocities\r\n      ! We use Kxupd input which is the same value as sent into the Poisson solver in\r\n      ! the previous command. In the case of the non-hydrostatic solver, we must force\r\n      ! the computation of the velocities to use the hydraulic conductivity estimate\r\n      ! put into the Poisson solver. In practice this is only important is the hydraulic\r\n      ! conductivity varies due to the turbulent/modflow scheme.\r\n      !\r\n      ! Input Kx is the basic initial hydaulic conductivity\r\n      ! Input Kxupd is the updated hydraulic conductivity from the previous time step\r\n      !             used in the Poisson solver\r\n      ! Output Kxupd is the new updated hydraulic conductivity for the next time step\r\n      call gw_calculate_velocities(s,par,fracdt,s%gwu,s%gwv,s%gww,Kx,Ky,Kz,Kxupd,Kyupd,Kzupd)\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/groundwater.F90",
+          "sha256": "e941accf34fb9b4f21256dcb59b986ad2df2976a8bc151af926e3ce38c8cf494",
+          "line_start": 448,
+          "line_end": 539,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      ! Force continuity, where gww is computed for hydrostatic computation and\r\n      ! gww strictly enforced (no roundoff errors) for nonhydrostatic computation\r\n      if (s%ny>2) then\r\n         do j=2,s%ny\r\n            do i=2,s%nx\r\n               s%gww(i,j) = (-s%gwqx(i,j)*s%dnu(i,j)+s%gwqx(i-1,j)*s%dnu(i-1,j)   &\r\n               -s%gwqy(i,j)*s%dsv(i,j)+s%gwqy(i,j-1)*s%dsv(i,j-1))*s%dsdnzi(i,j)\r\n            enddo\r\n         enddo\r\n      else\r\n         if (s%ny>0) then\r\n            do i=2,s%nx\r\n               s%gww(i,2) = (-s%gwqx(i,2)+s%gwqx(i-1,2))/s%dsz(i,2)\r\n            enddo\r\n            s%gww(:,1) = s%gww(:,2)\r\n            s%gww(:,3) = s%gww(:,2)\r\n         else\r\n            do i=2,s%nx\r\n               s%gww(i,1) = (-s%gwqx(i,1)+s%gwqx(i-1,1))/s%dsz(i,1)\r\n            enddo\r\n         endif\r\n      endif\r\n      !\r\n      !\r\n      ! updating groundwater level is complicated:\r\n      ! - in sections that are unconnected : dz/dt = -w/por == grad(qx,qy)/por\r\n      ! - in sections that are connected:\r\n      !           if w > 0 (exfiltration) : dz/dt = 0 (rise until gwlevel == zb, remainder is\r\n      !                                                sent to zs)\r\n      !           if w < 0 (infiltration) : dz/dt = 0 (unless available zs is less than w*dt,\r\n      !                                                then drop water level on remainder)\r\n      !\r\n      if (par%gwnonh==1) then\r\n         ! non-hydrostatic computation\r\n         do j=min(2,s%ny+1),max(s%ny,1)\r\n            do i=2,s%nx\r\n               ! exfiltration terms, same for connected and unconnected cells\r\n               if (s%gww(i,j)>0.d0) then\r\n                  if (connected(i,j)) then\r\n                     dzr = max(s%zb(i,j)-s%gwlevel(i,j),0.d0)\r\n                     wdt = s%gww(i,j)*par%dt/par%por\r\n                     if (wdt>=dzr) then\r\n                        infilcon(i,j) = -s%gww(i,j)*(1.d0-dzr/wdt)\r\n                     else\r\n                        ! nothing\r\n                     endif\r\n                  endif\r\n                  ! connected infiltration terms, unconnected cells already computed\r\n                  ! infiltration at the start of the groundwater flow subroutine\r\n               elseif (s%gww(i,j)<0.d0) then\r\n                  if (connected(i,j)) then\r\n                     dzr = max(s%zs(i,j)-s%zb(i,j)-par%eps,0.d0)\r\n                     wdt = -s%gww(i,j)*par%dt\r\n                     if (wdt>=dzr) then\r\n                        infilcon(i,j) = -s%gww(i,j)*(dzr/wdt)\r\n                     else\r\n                        infilcon(i,j) = -s%gww(i,j)\r\n                     endif\r\n                  endif\r\n               else\r\n                  infilcon(i,j) = 0.d0\r\n               endif\r\n            enddo\r\n         enddo\r\n      else\r\n         ! hydrostatic computation\r\n         where(s%wetz==0)\r\n            s%dinfil=par%dwetlayer/3.d0        ! Centroid of area influenced instantly by free surface level lies at dwetlayer/3\r\n         elsewhere\r\n            s%dinfil=min(s%dinfil,s%zb-s%gwlevel)\r\n            s%dinfil=max(s%dinfil,par%dwetlayer/3.d0)\r\n         endwhere\r\n         ! wwvv since gw_calculate_hydrostatic_w returns a pointer:\r\n         ! wwvv changed '=' into '=>'\r\n         ! wwvv see also the declaration of infilcon\r\n         infilcon => gw_calculate_hydrostatic_w(s,par,ratio)\r\n         where (infilcon*par%dt>s%hh-par%eps)\r\n            infilcon=(s%hh-par%eps)/par%dt\r\n         endwhere\r\n         s%dinfil=s%dinfil+infilcon*par%dt/par%por\r\n         if (par%gwhorinfil==1) then\r\n            call gw_horizontal_infil_exfil(s,par,infilhorgw,infilhorsw,Kx,dynpresupd)\r\n         endif\r\n      endif\r\n      ! Compute new water level\r\n      s%gwlevel = s%gwlevel + (s%gww+infilcon+infilhorgw)*par%dt/par%por\r\n      !\r\n      ! In case of hydrostatic approach, try to fix the connected cells\r\n\r\n      !\r\n      ! Update total infiltration contribution\r\n      s%infil = infiluncon+infilcon+infilhorsw\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/groundwater.F90",
+          "sha256": "e941accf34fb9b4f21256dcb59b986ad2df2976a8bc151af926e3ce38c8cf494",
+          "line_start": 541,
+          "line_end": 575,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      ! Model boundaries\r\n      ! Robert: check if all these are actually needed\r\n#ifdef USEMPI\r\n      call xmpi_shift_ee(s%gwlevel)\r\n      call xmpi_shift_ee(s%gwhead)\r\n      call xmpi_shift_ee(s%gwcurv)\r\n#endif\r\n      if (xmpi_istop) then\r\n         s%gwlevel(1,:) = s%gwlevel(2,:)\r\n         s%gwhead(1,:) = s%gwhead(2,:)\r\n         s%gwcurv(1,:) = s%gwcurv(2,:)\r\n         s%gwbottom(1,:) = s%gwbottom(2,:)\r\n         s%gww(1,:) = s%gww(2,:)\r\n      endif\r\n      if (xmpi_isbot) then\r\n         s%gwlevel(s%nx+1,:) = s%gwlevel(s%nx,:)\r\n         s%gwhead(s%nx+1,:) = s%gwhead(s%nx,:)\r\n         s%gwcurv(s%nx+1,:) = s%gwcurv(s%nx,:)\r\n         s%gwbottom(s%nx+1,:) = s%gwbottom(s%nx,:)\r\n         s%gww(s%nx+1,:) = s%gww(s%nx,:)\r\n      endif\r\n      if (xmpi_isleft .and. s%ny>0) then\r\n         s%gwlevel(:,1) = s%gwlevel(:,2)\r\n         s%gwhead(:,1) = s%gwhead(:,2)\r\n         s%gwcurv(:,1) = s%gwcurv(:,2)\r\n         s%gwbottom(:,1) = s%gwbottom(:,2)\r\n         s%gww(:,1) = s%gww(:,2)\r\n      endif\r\n      if (xmpi_isright .and. s%ny>0) then\r\n         s%gwlevel(:,s%ny+1) = s%gwlevel(:,s%ny)\r\n         s%gwhead(:,s%ny+1) = s%gwhead(:,s%ny)\r\n         s%gwcurv(:,s%ny+1) = s%gwcurv(:,s%ny)\r\n         s%gwbottom(:,s%ny+1) = s%gwbottom(:,s%ny)\r\n         s%gww(:,s%ny+1) = s%gww(:,s%ny)\r\n      endif\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/flow_timestep.F90",
+          "sha256": "50742b601cc8feccd513cf742ca772b6021f1d4f5ffe074c4e8ffc90907dd2b2",
+          "line_start": 733,
+          "line_end": 751,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      ! Update water level using continuity eq.\r\n      !\r\n      if (s%ny>0) then\r\n         do j=jmin_zs,jmax_zs\r\n            do i=imin_zs,imax_zs\r\n               s%dzsdt(i,j) = (-1.d0)*( s%qx(i,j)*s%dnu(i,j)-s%qx(i-1,j)*s%dnu(i-1,j)  &\r\n               + s%qy(i,j)*s%dsv(i,j)-s%qy(i,j-1)*s%dsv(i,j-1) )*s%dsdnzi(i,j) &\r\n               - s%infil(i,j) + s%rainfallrate(i,j)\r\n            end do\r\n         end do\r\n         s%zs(imin_zs:imax_zs,jmin_zs:jmax_zs) = s%zs(imin_zs:imax_zs,jmin_zs:jmax_zs) &\r\n         +s%dzsdt(imin_zs:imax_zs,jmin_zs:jmax_zs)*par%dt\r\n      else\r\n         j=1\r\n         do i=imin_zs,imax_zs\r\n            s%dzsdt(i,j) = (-1.d0)*( s%qx(i,j)*s%dnu(i,j)-s%qx(i-1,j)*s%dnu(i-1,j) )*s%dsdnzi(i,j) &\r\n            - s%infil(i,j) + s%rainfallrate(i,j)\r\n         end do\r\n         s%zs(imin_zs:imax_zs,1) = s%zs(imin_zs:imax_zs,1)+s%dzsdt(imin_zs:imax_zs,1)*par%dt\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/variables.def",
+          "sha256": "628090517242909cb5cd2343158e2e004d2dc669d0f46140f322538d0d7276ff",
+          "line_start": 181,
+          "line_end": 193,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "   double precision, allocatable, target :: gwhead(:,:)      !< [m] groundwater head (differs from gwlevel) {\"shape\": [\"s%nx+1\", \"s%ny+1\"], \"standard_name\": \"\", \"broadcast\": \"d\"}\r\n   double precision, allocatable, target :: gwheadb(:,:)     !< [m] groundwater head at bottom (differs from gwlevel) {\"shape\": [\"s%nx+1\", \"s%ny+1\"], \"standard_name\": \"\", \"broadcast\": \"d\"}\r\n   double precision, allocatable, target :: gwlevel(:,:)     !< [m] groundwater table (min(zb,gwhead)) {\"shape\": [\"s%nx+1\", \"s%ny+1\"], \"standard_name\": \"\", \"broadcast\": \"d\"}\r\n   double precision, allocatable, target :: gwheight(:,:)    !< [m] vertical size of aquifer through which groundwater can flow {\"shape\": [\"s%nx+1\", \"s%ny+1\"], \"standard_name\": \"\", \"broadcast\": \"d\"}\r\n   double precision, allocatable, target :: gwbottom(:,:)    !< [m] level of the bottom of the aquifer {\"shape\": [\"s%nx+1\", \"s%ny+1\"], \"standard_name\": \"\", \"broadcast\": \"d\"}\r\n   double precision, allocatable, target :: gwu(:,:)         !< [m/s] groundwater flow in x-direction {\"shape\": [\"s%nx+1\", \"s%ny+1\"], \"standard_name\": \"\", \"broadcast\": \"d\"}\r\n   double precision, allocatable, target :: gwv(:,:)         !< [m/s] groundwater flow in y-direction {\"shape\": [\"s%nx+1\", \"s%ny+1\"], \"standard_name\": \"\", \"broadcast\": \"d\"}\r\n   double precision, allocatable, target :: gwqx(:,:)        !< [m/s] groundwater discharge in x-direction {\"shape\": [\"s%nx+1\", \"s%ny+1\"], \"standard_name\": \"\", \"broadcast\": \"d\"}\r\n   double precision, allocatable, target :: gwqy(:,:)        !< [m/s] groundwater discharge in y-direction {\"shape\": [\"s%nx+1\", \"s%ny+1\"], \"standard_name\": \"\", \"broadcast\": \"d\"}\r\n   double precision, allocatable, target :: gww(:,:)         !< [m/s] groundwater flow in z-direction (interaction between surface and ground water) {\"shape\": [\"s%nx+1\", \"s%ny+1\"], \"standard_name\": \"\", \"broadcast\": \"d\"}\r\n   double precision, allocatable, target :: gwcurv(:,:)      !< [-] curvature coefficient of groundwater head function {\"shape\": [\"s%nx+1\", \"s%ny+1\"], \"standard_name\": \"\", \"broadcast\": \"d\"}\r\n   double precision, allocatable, target :: dinfil(:,:)      !< [m] Infiltration layer depth used in quasi-vertical flow model for groundwater {\"shape\": [\"s%nx+1\", \"s%ny+1\"], \"standard_name\": \"\", \"broadcast\": \"d\"}\r\n   double precision, allocatable, target :: infil(:,:)       !< [m/s] Rate of exchange of water between surface and groundwater (positive from sea to groundwater) {\"shape\": [\"s%nx+1\", \"s%ny+1\"], \"standard_name\": \"\", \"broadcast\": \"d\"}\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/variables.def",
+          "sha256": "628090517242909cb5cd2343158e2e004d2dc669d0f46140f322538d0d7276ff",
+          "line_start": 215,
+          "line_end": 215,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "   double precision, allocatable, target :: pres(:,:)        !< [m2/s2] normalized dynamic pressure {\"shape\": [\"s%nx+1\", \"s%ny+1\"], \"standard_name\": \"\", \"broadcast\": \"d\"}\r"
+        }
+      ]
+    },
+    {
+      "id": "XB-PHY-008",
+      "producer": "vegetation",
+      "consumer": "wave attenuation and flow momentum",
+      "states": [
+        "H,k,sigm,hh,Cdveg,bveg,Nveg -> Dveg",
+        "uu,vv,urms,ust,ua,ue,ve -> Fvegu/Fvegv"
+      ],
+      "timing": "vegatt executes after wave and before flow. Fveg therefore acts in current flow; Dveg is too late for current wave and acts at the next surfbeat step or next stationary wavint solve.",
+      "mode_guards": "vegetation=1. porcanflow=1 replaces standard swvegatt+momeqveg. vegnonlin is disabled in NONH; vegcanflo adds canopy contribution.",
+      "grid_and_bounds": "Vegetation loops eta interior for drag coefficients/Dveg; Fveg is mapped to u/v momentum locations. Arrays are nx+1,ny+1.",
+      "units_and_sign": "Dveg [W/m2]. Fvegu/Fvegv [N/m2], then flow divides by rho*h inside acceleration and subtracts the resulting dudt/dvdt, opposing signed velocity when drag shares velocity sign.",
+      "summary_ko": "식생의 유동 항력은 같은 스텝에 작용하지만 단파 감쇠 `Dveg`는 호출 순서상 한 파랑 갱신 늦게 작용한다.",
+      "evidence": [
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vegetation.F90",
+          "sha256": "e58ebd47d62d4637baae7bee4e90570a859b1eb0467e486a599f877b380df2c2",
+          "line_start": 318,
+          "line_end": 345,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      ! Skip in case of using porous in-canopy model\r\n      if (par%porcanflow == 1) then\r\n         call porcanflow(s,par)\r\n      else ! use standard vegetation module\r\n          ! First compute drag coefficient (if not user-defined)\r\n          do j=jmin_zs,jmax_zs\r\n             do i=imin_zs,imax_zs\r\n                if (s%nsecveg(i,j) > 0) then ! only in case vegetation is present\r\n                   do m=1,s%nsecveg(i,j) ! for each vertical vegetation section\r\n                      if (s%Cdveg(i,j,m) < 0.d0) then ! If Cd is not user specified: call subroutine of M. Bendoni\r\n                         call bulkdragcoeff(s,par,s%ahveg(i,j,m)+s%zb0(i,j)-s%zb(i,j),m,i,j,Cdterm)\r\n                         s%Cdveg(i,j,m) = Cdterm\r\n                      endif\r\n                   enddo\r\n                endif\r\n             enddo\r\n          enddo\r\n\r\n          ! Attenuation by vegetation is computed in wave action balance (swvegatt) and the momentum balance (momeqveg);\r\n          !\r\n          ! 1) Short wave dissipation by vegetation\r\n          call swvegatt(s,par)\r\n\r\n          ! 2) Mom.Eq.: Long wave dissipation, mean flow dissipation, nonlinear short wave effects, effect of emerged vegetation\r\n          call momeqveg(s,par)\r\n      endif\r\n\r\n   end subroutine vegatt\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vegetation.F90",
+          "sha256": "e58ebd47d62d4637baae7bee4e90570a859b1eb0467e486a599f877b380df2c2",
+          "line_start": 366,
+          "line_end": 400,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      kmr = min(max(s%k, 0.01d0), 100.d0)\r\n\r\n      ! Set dissipation in vegetation to zero everywhere for a start\r\n      Dvg = 0.d0\r\n      do j=jmin_zs,jmax_zs\r\n         do i=imin_zs,imax_zs\r\n            htermold = 0.d0\r\n            ahtold = 0.d0\r\n            if (s%nsecveg(i,j)>0) then ! only if vegetation is present at (i,j)\r\n               do m=1,s%nsecveg(i,j)\r\n\r\n                  ! Determine height of vegetation section (restricted to current bed level)\r\n                  !aht = veg(ind)%ah(m)+ahtold !+s%zb0(i,j)-s%zb(i,j)!(max(veg(ind)%zv(m)+s%zb0(i,j),s%zb(i,j)))\r\n                  aht = s%ahveg(i,j,m)+ahtold\r\n\r\n                  ! restrict vegetation height to local water depth\r\n                  aht = min(aht,s%hh(i,j))\r\n\r\n                  ! compute hterm based on ah\r\n                  hterm = (sinh(kmr(i,j)*aht)**3+3*sinh(kmr(i,j)*aht))/(3.d0*kmr(i,j)*cosh(kmr(i,j)*s%hh(i,j))**3)\r\n\r\n                  ! compute dissipation based on aht and correct for lower elevated dissipation layers (following Suzuki et al. 2012)\r\n                  Dvgt = 0.5d0/sqrt(par%px)*par%rho*s%Cdveg(i,j,m)*s%bveg(i,j,m)*s%Nveg(i,j,m)*(0.5d0*kmr(i,j)*par%g/s%sigm(i,j))**3*(hterm-htermold)*s%H(i,j)**3\r\n\r\n                  ! save hterm to htermold to correct possibly in next vegetation section\r\n                  htermold = hterm\r\n                  ahtold   = aht\r\n\r\n                  ! add dissipation current vegetation section\r\n                  Dvg(i,j) = Dvg(i,j) + Dvgt\r\n               enddo\r\n            endif\r\n         enddo\r\n      enddo\r\n      s%Dveg = Dvg\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vegetation.F90",
+          "sha256": "e58ebd47d62d4637baae7bee4e90570a859b1eb0467e486a599f877b380df2c2",
+          "line_start": 429,
+          "line_end": 473,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      ! Compute one force related to vegetation present in the water column:\r\n      ! 1) Long wave velocity (ul)\r\n      ! 2) Stokes velocity (us)\r\n      ! 3) Non linear short wave velocity residual (ua)\r\n      ! 4) return flow / undertow (ue)\r\n      ! 5) wave-induced in-canopy flow (?)\r\n\r\n      ! only allocate in 1st timestep\r\n      if (.not. allocated(sinthm)) then\r\n         allocate (sinthm(s%nx+1,s%ny+1))\r\n         allocate (costhm(s%nx+1,s%ny+1))\r\n      endif\r\n      kmr = min(max(s%k, 0.01d0), 100.d0)\r\n\r\n      Fvgu = 0.d0\r\n      Fvgv = 0.d0\r\n      Fvgnlt = 0.d0\r\n      Fvgnlu = 0.d0\r\n      Fvgnlv = 0.d0\r\n      FvgStu = 0.d0\r\n      FvgStv = 0.d0\r\n      ucan   = 0.d0\r\n      FvgCan = 0.d0\r\n      FvgCav = 0.d0\r\n      FvgCau = 0.d0\r\n      uabsunl = 0.d0\r\n\r\n      costhm = cos(s%thetamean-s%alfaz)\r\n      sinthm = sin(s%thetamean-s%alfaz)\r\n\r\n      ! initialize totT\r\n      if (par%dt == par%t) then\r\n         totT = par%Trep\r\n      endif\r\n      if (par%vegnonlin == 1 .and. par%wavemodel/=WAVEMODEL_NONH) then\r\n         ! only compute new nonlinear velocity profile every Trep s\r\n         if(totT >= par%Trep) then\r\n            call swvegnonlin(s,par,unl0,etaw0)\r\n            unl  = unl0\r\n            etaw = etaw0\r\n            totT = 0.d0\r\n         else\r\n            totT = totT + par%dt\r\n         endif\r\n      endif\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vegetation.F90",
+          "sha256": "e58ebd47d62d4637baae7bee4e90570a859b1eb0467e486a599f877b380df2c2",
+          "line_start": 475,
+          "line_end": 564,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      do j=1,s%ny+1\r\n         do i=1,s%nx+1\r\n            ahtold = 0.d0\r\n            if (s%nsecveg(i,j)>0) then ! Only if vegetation is present\r\n\r\n               ! Compute uabsu for calculation of Fveg\r\n               uabsu = 0.d0\r\n               vabsv = 0.d0\r\n               Fvgnlu0 = 0.d0\r\n\r\n               watr = 0d0\r\n               wacr = 0d0\r\n               do m=1,s%nsecveg(i,j)\r\n                  ! Determine height of vegetation section (restricted to current bed level)\r\n                  aht = s%ahveg(i,j,m)+s%zb0(i,j)-s%zb(i,j)\r\n\r\n                  ! Determine which part of the vegetation is below the wave trough, and between trough and crest\r\n                  if (par%vegnonlin == 1 .and. par%wavemodel/=WAVEMODEL_NONH) then\r\n                     watr = minval(etaw(i,j,:))\r\n                     watr = s%hh(i,j) + watr ! wave trough level\r\n                     wacr = maxval(etaw(i,j,:))\r\n                     wacr = s%hh(i,j) + wacr ! wave crest level\r\n                  else\r\n                     watr = s%hh(i,j)\r\n                     wacr = s%hh(i,j)\r\n                  endif\r\n\r\n                  if (ahtold > wacr) then ! if plant section is entirely above wave crest, then do nothing\r\n\r\n                     ! mean and long wave flow (ue)\r\n                     Fvgtu = 0d0\r\n                     Fvgtv = 0d0\r\n\r\n                     ! nonlinear waves\r\n                     Fvgnlu = 0.d0\r\n                     Fvgnlv = 0.d0\r\n\r\n                  else ! vegetation section is located (partly) in between wave trough and crest level\r\n                     if (par%veguntow == 1) then\r\n                        ! mean and long wave flow (ue, ve)\r\n                        Fvgtu = max((min(aht,watr)-ahtold),0d0)*0.5d0*s%Cdveg(i,j,m)*s%bveg(i,j,m)*s%Nveg(i,j,m)*(s%ueu(i,j)*s%vmageu(i,j))\r\n                        Fvgtv = max((min(aht,watr)-ahtold),0d0)*0.5d0*s%Cdveg(i,j,m)*s%bveg(i,j,m)*s%Nveg(i,j,m)*(s%vev(i,j)*s%vmageu(i,j))\r\n                     else\r\n                        ! Only long wave velocity (assume undertow is diverted over vegetation)\r\n                        Fvgtu = max((min(aht,watr)-ahtold),0d0)*0.5d0*s%Cdveg(i,j,m)*s%bveg(i,j,m)*s%Nveg(i,j,m)*(s%uu(i,j)*s%vmagu(i,j))\r\n                        Fvgtv = max((min(aht,watr)-ahtold),0d0)*0.5d0*s%Cdveg(i,j,m)*s%bveg(i,j,m)*s%Nveg(i,j,m)*(s%vv(i,j)*s%vmagu(i,j))\r\n                     endif\r\n\r\n                     ! nonlinear waves (including emerged vegetation effect)\r\n                     !etaw    = 0.d0\r\n                     if (par%vegnonlin == 1 .and. par%wavemodel/=WAVEMODEL_NONH) then\r\n                        hvegeff = max(etaw(i,j,:) + s%hh(i,j)-ahtold,0.d0) ! effective vegetation height over a wave cycle\r\n                        Fvgnlt  = trapz(((0.5d0*s%Cdveg(i,j,m)*s%bveg(i,j,m)*s%Nveg(i,j,m))*min(hvegeff,aht)*unl(i,j,:)*abs(unl(i,j,:))),par%Trep/50)/s%hh(i,j)\r\n\r\n                        ! decompose in u and v-direction\r\n                        Fvgnlu  = Fvgnlt*costhm(i,j)\r\n                        Fvgnlv  = Fvgnlt*sinthm(i,j)\r\n                     endif\r\n\r\n                     ! wave induced incanopy flow (Luhar et al., 2010)\r\n                     ucan   = sqrt(4.d0*kmr(i,j)*par%Trep*s%urms(i,j)**3/(6.d0*par%px**2))\r\n                     FvgCan = max((min(aht,watr)-ahtold),0d0)/s%hh(i,j)*0.5d0*s%Cdveg(i,j,m)*s%bveg(i,j,m)*s%Nveg(i,j,m)*ucan**2\r\n\r\n                     ! decompose in u and v-direction\r\n                     FvgCau = FvgCan*costhm(i,j)\r\n                     FvgCav = FvgCan*sinthm(i,j)\r\n                  endif\r\n\r\n                  ! save aht to ahtold to correct possibly in next vegetation section\r\n                  ahtold = aht\r\n\r\n                  ! add Forcing current layer\r\n                  Fvgu(i,j) = Fvgu(i,j) + Fvgtu\r\n                  Fvgv(i,j) = Fvgv(i,j) + Fvgtv\r\n\r\n                  if (par%vegnonlin == 1 .and. par%wavemodel/=WAVEMODEL_NONH) then ! add nonlin wave effect\r\n                     Fvgu(i,j) = Fvgu(i,j) + Fvgnlu\r\n                     Fvgv(i,j) = Fvgv(i,j) + Fvgnlv\r\n                  endif\r\n                  if (par%vegcanflo == 1) then ! add in canopy flow (Luhar et al., 2010)\r\n                     Fvgu(i,j) = Fvgu(i,j) + FvgCau\r\n                     Fvgv(i,j) = Fvgv(i,j) + FvgCav\r\n                  endif\r\n               enddo\r\n            endif\r\n         enddo\r\n      enddo\r\n\r\n      s%Fvegu = Fvgu*par%rho ! make sure units of drag force are consistent (N/m2)\r\n      s%Fvegv = Fvgv*par%rho ! make sure units of drag force are consistent (N/m2)\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_instationary.F90",
+          "sha256": "9584b6ec2138353aba65991a4ec570b4b794554485cea43915c6071e9e2ed45a",
+          "line_start": 288,
+          "line_end": 336,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      ! Distribution of dissipation over directions and frequencies\r\n      !\r\n      do itheta=1,s%ntheta\r\n         ! Only calculate for E>0 FB\r\n         ! First just the dissipation that is fed to the roller\r\n         dder(:,:,itheta)=s%ee(:,:,itheta)*s%D/max(s%E,0.00001d0)\r\n         ! Then all short wave energy dissipation, including bed friction and vegetation\r\n         dd(:,:,itheta)=dder(:,:,itheta) + s%ee(:,:,itheta)*(s%Df+s%Dveg)/max(s%E,0.00001d0)\r\n      enddo\r\n      !\r\n      ! Euler step dissipation\r\n      !\r\n      ! calculate roller energy balance\r\n      !\r\n      call advecxho(s%rr,s%cx,xradvec,s%nx,s%ny,s%ntheta,s%dnu,s%dsu,s%dsdnzi,par%scheme,s%wete,par%dt,s%dsz)\r\n      if (s%ny>0) then\r\n         call advecyho(s%rr,s%cy,yradvec,s%nx,s%ny,s%ntheta,s%dsv,s%dnv,s%dsdnzi,par%scheme,s%wete,par%dt,s%dnz)\r\n      endif\r\n      !call advectheta(rr*ctheta,thetaradvec,nx,ny,ntheta,dtheta)\r\n      if (par%refraction==1) call advecthetaho(s%rr,s%ctheta,thetaradvec,s%nx,s%ny,s%ntheta,s%dtheta,par%scheme,s%wete)\r\n      do itheta=1,s%ntheta\r\n         where(s%wete==1 .and. mask_ee)\r\n            s%rr(:,:,itheta)=s%rr(:,:,itheta) &\r\n            -par%dt*(xradvec(:,:,itheta) &\r\n            +yradvec(:,:,itheta) &\r\n            +thetaradvec(:,:,itheta))\r\n            s%rr(:,:,itheta)=max(s%rr(:,:,itheta),0.0d0)\r\n         elsewhere (s%wete==1)\r\n            s%rr(:,:,itheta) = 0.d0\r\n         endwhere\r\n      enddo\r\n      !\r\n      ! euler step roller energy dissipation (source and sink function)\r\n      !\r\n      do itheta=1,s%ntheta\r\n         do j=jmin_ee,jmax_ee\r\n            do i=imin_ee,imax_ee\r\n               if(s%wete(i,j)==1) then\r\n                  s%ee(i,j,itheta)=s%ee(i,j,itheta)-par%dt*dd(i,j,itheta)\r\n                  if(par%roller==1) then\r\n                     drr(i,j,itheta) = 2*par%g*s%BR(i,j)*max(s%rr(i,j,itheta),0.0d0)/   &\r\n                     sqrt(s%cx(i,j,itheta)**2 +s%cy(i,j,itheta)**2)\r\n                     s%rr(i,j,itheta)=s%rr(i,j,itheta)+par%dt*(dder(i,j,itheta)         &  ! Robert: changed from dd to dder\r\n                     -drr(i,j,itheta))                                            ! (only from wave breaking,\r\n                  else                                                           !  not vegetation or bed friction)\r\n                     s%rr(i,j,itheta)= 0.0d0\r\n                     drr(i,j,itheta)= 0.0d0\r\n                  endif\r\n                  s%ee(i,j,itheta)=max(s%ee(i,j,itheta),0.0d0)\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/flow_timestep.F90",
+          "sha256": "50742b601cc8feccd513cf742ca772b6021f1d4f5ffe074c4e8ffc90907dd2b2",
+          "line_start": 559,
+          "line_end": 612,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      ! Explicit Euler step momentum u-direction\r\n      !\r\n      do j=jmin_uu,jmax_uu\r\n         do i=imin_uu,imax_uu\r\n            if(s%wetu(i,j)==1) then\r\n                dudt = (s%ududx(i,j)+s%vdudy(i,j)-s%viscu(i,j) & !Ap,Robert,Jaap\r\n                       + par%g*s%dzsdx(i,j) &\r\n                       + s%taubx(i,j)/(par%rho*s%hu(i,j)) &  ! Dano: changed s%hum to s%hu NOT s%cf volume approach\r\n                       + s%Fvegu(i,j)/(par%rho*s%hu(i,j)) &\r\n                       - par%lwave*s%Fx(i,j)/(par%rho*s%hum(i,j)) &\r\n                       - fc*s%vu(i,j) &\r\n                       - par%rhoa*par%Cd*s%windsu(i,j)*sqrt(s%windsu(i,j)**2+s%windnv(i,j)**2)/(par%rho*s%hum(i,j)))    ! Kees: wind correction\r\n                if (dudt>par%maxfacg*par%g) then\r\n                    dudt=par%maxfacg*par%g\r\n                elseif (dudt<-par%maxfacg*par%g) then\r\n                    dudt=-par%maxfacg*par%g\r\n                endif\r\n                s%uu(i,j)=s%uu(i,j)-par%dt*dudt\r\n            else\r\n               s%uu(i,j)=0.0d0\r\n            end if\r\n         end do\r\n      end do\r\n      ! Lateral boundary conditions for uu\r\n      if (s%ny>0) then\r\n         if (xmpi_isleft) then !Dano/Robert only on outer boundary\r\n            s%uu(1:s%nx+1,1)=s%uu(1:s%nx+1,2) ! RJ: can also be done after continuity but more appropriate here\r\n         endif\r\n         ! Lateral boundary at y=ny*dy\r\n         if (xmpi_isright) then !Dano/Robert only at outer boundary\r\n            s%uu(1:s%nx+1,s%ny+1)=s%uu(1:s%nx+1,s%ny) ! RJ: can also be done after continuity but more appropriate here\r\n         endif\r\n      endif\r\n      !\r\n      ! Explicit Euler step momentum v-direction\r\n      !\r\n      do j=jmin_vv,jmax_vv\r\n         do i=imin_vv,imax_vv\r\n            if(s%wetv(i,j)==1) then\r\n               ! Robert: ensure taubx always has the same sign as uu (always decelerates)\r\n               ! Dano: I don't agree\r\n               dvdt = (s%udvdx(i,j)+s%vdvdy(i,j)-s%viscv(i,j)& !Ap,Robert,Jaap\r\n                       + par%g*s%dzsdy(i,j)&\r\n                       + s%tauby(i,j)/(par%rho*s%hv(i,j)) &  ! Dano: s%hv instead of s%hvm, NOT cf volume approach\r\n                       + s%Fvegv(i,j)/(par%rho*s%hv(i,j)) &\r\n                       - par%lwave*s%Fy(i,j)/(par%rho*s%hvm(i,j)) &\r\n                       + fc*s%uv(i,j) &\r\n                       - par%rhoa*par%Cd*s%windnv(i,j)*sqrt(s%windsu(i,j)**2+s%windnv(i,j)**2)/(par%rho*s%hvm(i,j)))    ! Kees: wind correction\r\n               if (dvdt>par%maxfacg*par%g) then\r\n                    dvdt=par%maxfacg*par%g\r\n                elseif (dvdt<-par%maxfacg*par%g) then\r\n                    dvdt=-par%maxfacg*par%g\r\n                endif\r\n               s%vv(i,j)=s%vv(i,j)-par%dt*dvdt\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/variables.def",
+          "sha256": "628090517242909cb5cd2343158e2e004d2dc669d0f46140f322538d0d7276ff",
+          "line_start": 278,
+          "line_end": 280,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "   double precision, allocatable, target :: Dveg(:,:)        !< [W/m2] dissipation due to short wave attenuation by vegetation {\"shape\": [\"s%nx+1\", \"s%ny+1\"], \"standard_name\": \"\", \"broadcast\": \"d\"}\r\n   double precision, allocatable, target :: Fvegu(:,:)       !< [N/m2] x-forcing due to long wave attenuation by vegetation {\"shape\": [\"s%nx+1\", \"s%ny+1\"], \"standard_name\": \"\", \"broadcast\": \"d\"}\r\n   double precision, allocatable, target :: Fvegv(:,:)       !< [N/m2] y-forcing due to long wave attenuation by vegetation {\"shape\": [\"s%nx+1\", \"s%ny+1\"], \"standard_name\": \"\", \"broadcast\": \"d\"}\r"
+        }
+      ]
+    },
+    {
+      "id": "XB-PHY-009",
+      "producer": "groundwater",
+      "consumer": "surface-water continuity and morphology",
+      "states": [
+        "gwlevel,gwhead,gww -> infil",
+        "infil -> dzsdt",
+        "zb change -> gwlevel,zs,infil correction"
+      ],
+      "timing": "gwflow produces infil before flow, flow applies -infil*dt to zs, then morphology adjusts zb/zs/gwlevel late in the step. New masks and groundwater boundary consistency occur next step.",
+      "mode_guards": "gwflow=1; gwnonh selects groundwater formulation; morphology=1 and t in [morstart,morstop) selects bed feedback.",
+      "grid_and_bounds": "Groundwater and surface states are eta arrays. Flow continuity updates jmin_zs:jmax_zs,imin_zs:imax_zs; morphology applies eta-point bed changes and shifts changed halos.",
+      "units_and_sign": "infil [m/s] positive downward, hence continuity uses `-infil`; bed accretion dzbnow>0 raises zb and partitions pore water using porosity.",
+      "summary_ko": "지하수-표면수 교환은 표면 연속식과 지형 갱신 양쪽에 연결된다. 지형이 바뀐 뒤 수위·지하수위를 보정하지만 wet/dry 재판정은 다음 스텝이다.",
+      "evidence": [
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/groundwater.F90",
+          "sha256": "e941accf34fb9b4f21256dcb59b986ad2df2976a8bc151af926e3ce38c8cf494",
+          "line_start": 282,
+          "line_end": 285,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      ! Definition of vertical groundwater/surface water exchange:\r\n      ! infil is defined positive from sea to groundwater, gww is defined positive up\r\n      ! (from groundwater to sea!). Both infil and gww are in volumes of surface water\r\n      ! (not pore water). gwu and gwv are also in terms of surface water volume.\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/groundwater.F90",
+          "sha256": "e941accf34fb9b4f21256dcb59b986ad2df2976a8bc151af926e3ce38c8cf494",
+          "line_start": 532,
+          "line_end": 539,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      ! Compute new water level\r\n      s%gwlevel = s%gwlevel + (s%gww+infilcon+infilhorgw)*par%dt/par%por\r\n      !\r\n      ! In case of hydrostatic approach, try to fix the connected cells\r\n\r\n      !\r\n      ! Update total infiltration contribution\r\n      s%infil = infiluncon+infilcon+infilhorsw\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/flow_timestep.F90",
+          "sha256": "50742b601cc8feccd513cf742ca772b6021f1d4f5ffe074c4e8ffc90907dd2b2",
+          "line_start": 733,
+          "line_end": 751,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      ! Update water level using continuity eq.\r\n      !\r\n      if (s%ny>0) then\r\n         do j=jmin_zs,jmax_zs\r\n            do i=imin_zs,imax_zs\r\n               s%dzsdt(i,j) = (-1.d0)*( s%qx(i,j)*s%dnu(i,j)-s%qx(i-1,j)*s%dnu(i-1,j)  &\r\n               + s%qy(i,j)*s%dsv(i,j)-s%qy(i,j-1)*s%dsv(i,j-1) )*s%dsdnzi(i,j) &\r\n               - s%infil(i,j) + s%rainfallrate(i,j)\r\n            end do\r\n         end do\r\n         s%zs(imin_zs:imax_zs,jmin_zs:jmax_zs) = s%zs(imin_zs:imax_zs,jmin_zs:jmax_zs) &\r\n         +s%dzsdt(imin_zs:imax_zs,jmin_zs:jmax_zs)*par%dt\r\n      else\r\n         j=1\r\n         do i=imin_zs,imax_zs\r\n            s%dzsdt(i,j) = (-1.d0)*( s%qx(i,j)*s%dnu(i,j)-s%qx(i-1,j)*s%dnu(i-1,j) )*s%dsdnzi(i,j) &\r\n            - s%infil(i,j) + s%rainfallrate(i,j)\r\n         end do\r\n         s%zs(imin_zs:imax_zs,1) = s%zs(imin_zs:imax_zs,1)+s%dzsdt(imin_zs:imax_zs,1)*par%dt\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/morphevolution.F90",
+          "sha256": "765f474008f7cb843353dc0790cc3f3ebdc00631353da7592e2bb0508e968391",
+          "line_start": 813,
+          "line_end": 843,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "#ifdef USEMPI\r\n         call xmpi_shift_ee(s%zb)\r\n         call xmpi_shift_ee(s%structdepth)\r\n#endif\r\n         ! In case of groundwater, we need to update groundwater levels and surface water\r\n         if(par%gwflow==1) then\r\n            where (s%wetz==1 .and. s%dzbnow>0.d0) ! accretion in wet areas\r\n               s%zs = s%zs + s%dzbnow*(1.d0-par%por)  ! zs = zs + dzbnow - dzbnow*par%por\r\n               s%gwlevel = s%gwlevel+s%dzbnow\r\n               s%infil = s%infil + s%dzbnow*par%por/par%dt\r\n            elsewhere (s%wetz==1 .and. s%dzbnow<0.d0) ! erosion in wet areas\r\n               ! maximum water leaving groundwater = gwlevel(not updated) - zb(updated)\r\n               ! note that exfiltration is negative infil\r\n               tempexchange = min((s%zb-s%gwlevel)*par%por,0.d0)\r\n               s%zs = s%zs + s%dzbnow - tempexchange\r\n               s%gwlevel = s%gwlevel + tempexchange/par%por\r\n               s%infil = s%infil + tempexchange\r\n            endwhere\r\n#ifdef USEMPI\r\n            call xmpi_shift_ee(s%gwlevel)\r\n            call xmpi_shift_ee(s%infil)\r\n            call xmpi_shift_ee(s%zs)\r\n#endif\r\n         else ! only need to update water levels\r\n            where (s%wetz(imin_zs:imax_zs,jmin_zs:jmax_zs)==1)\r\n               s%zs(imin_zs:imax_zs,jmin_zs:jmax_zs) = s%zs(imin_zs:imax_zs,jmin_zs:jmax_zs)+s%dzbnow(imin_zs:imax_zs,jmin_zs:jmax_zs)\r\n            endwhere\r\n#ifdef USEMPI\r\n            call xmpi_shift_ee(s%zs)\r\n#endif\r\n         endif\r"
+        }
+      ]
+    },
+    {
+      "id": "XB-PHY-010",
+      "producer": "sediment transport",
+      "consumer": "morphological Exner update",
+      "states": [
+        "Susg,Svsg,Subg,Svbg or ero/depo_ex -> dzg -> zb,dzbnow,dzbdt"
+      ],
+      "timing": "bed_update immediately follows transus each step but only updates for t>=morstart, t<morstop and morfac>0.999. The effective morphological increment is morfac*dt. With morfacopt=1, input/output/wave/morph stop times are first divided by morfac to express them on hydrodynamic time.",
+      "mode_guards": "sedtrans=1 produces transport; morphology=1 and setbathy!=1 invokes bed_update. sourcesink=0 uses all flux divergences; sourcesink=1 uses erosion-deposition plus bedload divergence.",
+      "grid_and_bounds": "2DH eta interiors use both u and v face fluxes; 1D uses x divergence plus lsgrad parameterization. Halo zb/structdepth are shifted after core update.",
+      "units_and_sign": "transport [m2/s] excluding pores; dzg [m] includes morfac*dt/(1-por). Positive divergence gives positive dzg and code applies zb=zb-dzg, so positive dzg is erosion/lowering.",
+      "summary_ko": "표사 플럭스는 같은 스텝 Exner형 지형변화로 전환된다. `morfacopt=1`은 입력 시간축도 유체시간으로 축소하고, 지형 증분에는 다시 `morfac*dt/(1-por)`를 적용한다.",
+      "evidence": [
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/libxbeach.F90",
+          "sha256": "1656cceb95c9d87a51b70225a725fc6e544ed56b424c97a9e2806c86f15b6696",
+          "line_start": 307,
+          "line_end": 311,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "            if (par%sedtrans==1)                                    call transus        (s,par)\r\n            !\r\n            ! Bed level update\r\n            if ((par%morphology==1).and.(.not. par%setbathy==1)) call bed_update(s,par)\r\n            if (par%setbathy==1)     call setbathy_update(s, par)\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/morphevolution.F90",
+          "sha256": "765f474008f7cb843353dc0790cc3f3ebdc00631353da7592e2bb0508e968391",
+          "line_start": 638,
+          "line_end": 640,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      s%dzbnow  = 0.d0\r\n      dzb    = 0.d0\r\n      if (par%t>=par%morstart .and. par%t < par%morstop .and. par%morfac > .999d0) then\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/morphevolution.F90",
+          "sha256": "765f474008f7cb843353dc0790cc3f3ebdc00631353da7592e2bb0508e968391",
+          "line_start": 731,
+          "line_end": 816,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "         if (s%ny>0) then\r\n            do j=jmin_zs,jmax_zs\r\n               do i=imin_zs,imax_zs\r\n\r\n                  ! bed level changes per fraction in this morphological time step in meters sand including pores\r\n                  ! positive in case of erosion\r\n                  if (par%sourcesink==0) then\r\n                     dzg=par%morfac*par%dt/(1.d0-par%por)*( & ! Dano, dz from sus transport gradients\r\n                     ( s%Susg(i,j,:)*s%dnu(i,j)-s%Susg(i-1,j,:)*s%dnu(i-1,j) +&\r\n                     s%Svsg(i,j,:)*s%dsv(i,j)-s%Svsg(i,j-1,:)*s%dsv(i,j-1) +&\r\n                     ! dz from bed load transport gradients\r\n                     s%Subg(i,j,:)*s%dnu(i,j)-s%Subg(i-1,j,:)*s%dnu(i-1,j)+&\r\n                     s%Svbg(i,j,:)*s%dsv(i,j)-s%Svbg(i,j-1,:)*s%dsv(i,j-1) )*s%dsdnzi(i,j)    )\r\n                  elseif (par%sourcesink==1) then\r\n                     dzg=par%morfac*par%dt/(1.d0-par%por)*( &\r\n                     s%ero(i,j,:)-s%depo_ex(i,j,:)   +&\r\n                     ( s%Subg(i,j,:)*s%dnu(i,j)-s%Subg(i-1,j,:)*s%dnu(i-1,j)+&\r\n                     s%Svbg(i,j,:)*s%dsv(i,j)-s%Svbg(i,j-1,:)*s%dsv(i,j-1) )*s%dsdnzi(i,j)    )\r\n                  endif\r\n\r\n                  if (par%ngd==1) then ! Simple bed update in case one fraction\r\n\r\n                     s%zb(i,j) = s%zb(i,j)-sum(dzg)\r\n                     s%dzbnow(i,j) = s%dzbnow(i,j)-sum(dzg) ! naamgeveing?\r\n                     s%dzbdt(i,j) = s%dzbnow(i,j)/par%dt\r\n                     s%sedero(i,j) = s%sedero(i,j)-sum(dzg)\r\n                     s%structdepth(i,j) = max(0.d0,s%structdepth(i,j)-sum(dzg))\r\n\r\n                  else\r\n                     ! erosion/deposition rate of sand mass (m/s)\r\n                     ! positive in case of erosion\r\n                     edg = dzg*(1.d0-par%por)/par%dt\r\n\r\n\r\n                     dz=>s%dzbed(i,j,:)\r\n                     pb=>s%pbbed(i,j,:,:)\r\n\r\n                     call update_fractions(par,s,i,j,dz,pb,edg,sum(dzg))\r\n\r\n                  endif\r\n\r\n               enddo ! s%nx+1\r\n            enddo ! s%ny+1\r\n         else\r\n            j=1\r\n            do i=imin_zs,imax_zs\r\n               ! bed level changes per fraction in this morphological time step in meters sand including pores\r\n               ! positive in case of erosion\r\n               if (par%sourcesink==0) then\r\n                  dzg=par%morfac*par%dt/(1.d0-par%por)*( & ! Dano, dz from sus transport gradients\r\n                  ( s%Susg(i,j,:)*s%dnu(i,j)-s%Susg(i-1,j,:)*s%dnu(i-1,j) +&\r\n                  s%Subg(i,j,:)*s%dnu(i,j)-s%Subg(i-1,j,:)*s%dnu(i-1,j) )*s%dsdnzi(i,j) +&\r\n                  (s%Svsg(i,j,:)+s%Svbg(i,j,:))*par%lsgrad)\r\n               elseif (par%sourcesink==1) then\r\n                  dzg=par%morfac*par%dt/(1.d0-par%por)*( &\r\n                  s%ero(i,j,:)-s%depo_ex(i,j,:)       +&\r\n                  ( s%Subg(i,j,:)*s%dnu(i,j)-s%Subg(i-1,j,:)*s%dnu(i-1,j) )*s%dsdnzi(i,j) +&\r\n                  (s%Svsg(i,j,:)+s%Svbg(i,j,:))*par%lsgrad)\r\n               endif\r\n\r\n               if (par%ngd==1) then ! Simple bed update in case one fraction\r\n\r\n                  s%zb(i,j) = s%zb(i,j)-sum(dzg)\r\n                  s%dzbnow(i,j) = s%dzbnow(i,j)-sum(dzg)\r\n                  s%dzbdt(i,j) = s%dzbnow(i,j)/par%dt\r\n                  s%sedero(i,j) = s%sedero(i,j)-sum(dzg)\r\n                  s%structdepth(i,j) = max(0.d0,s%structdepth(i,j)-sum(dzg))\r\n\r\n               else ! multiple fractions...\r\n                  ! erosion/deposition rate of sand mass (m/s)\r\n                  ! positive in case of erosion\r\n                  edg = dzg*(1.d0-par%por)/par%dt\r\n\r\n                  dz=>s%dzbed(i,j,:)\r\n                  pb=>s%pbbed(i,j,:,:)\r\n\r\n                  call update_fractions(par,s,i,j,dz,pb,edg,sum(dzg))\r\n\r\n               endif\r\n\r\n            enddo ! s%nx+1\r\n         endif !s%ny>0\r\n#ifdef USEMPI\r\n         call xmpi_shift_ee(s%zb)\r\n         call xmpi_shift_ee(s%structdepth)\r\n#endif\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.F90",
+          "sha256": "73648b5733a8f90a8f18cda32743bdc2ef42f649e39c521e28e06584ee63c359",
+          "line_start": 1937,
+          "line_end": 1954,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      ! fix tint\r\n      par%tint    = min(par%tintg,par%tintp,par%tintm,par%tinth)\r\n      !\r\n      !\r\n      ! All input time frames converted to XBeach hydrodynamic time\r\n      if (par%morfacopt==1) then\r\n         par%tstart  = par%tstart / max(par%morfac,1.d0)\r\n         par%tint    = par%tint   / max(par%morfac,1.d0)\r\n         par%tintg   = par%tintg  / max(par%morfac,1.d0)\r\n         par%tintp   = par%tintp  / max(par%morfac,1.d0)\r\n         par%tintm   = par%tintm  / max(par%morfac,1.d0)\r\n         par%tinth   = par%tinth  / max(par%morfac,1.d0)\r\n         par%wavint  = par%wavint / max(par%morfac,1.d0)\r\n         par%tstop   = par%tstop  / max(par%morfac,1.d0)\r\n         par%morstart= par%morstart / max(par%morfac,1.d0)\r\n         par%morstop = par%morstop / max(par%morfac,1.d0)\r\n         par%rt      = par%rt / max(par%morfac,1.d0)\r\n      endif\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/variables.def",
+          "sha256": "628090517242909cb5cd2343158e2e004d2dc669d0f46140f322538d0d7276ff",
+          "line_start": 165,
+          "line_end": 168,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "   double precision, allocatable, target :: Susg(:,:,:)      !< [m2/s] suspended sediment transport for each sediment class (excluding pores), x-component {\"shape\": [\"s%nx+1\", \"s%ny+1\", \"par%ngd\"], \"standard_name\": \"\", \"broadcast\": \"d\"}\r\n   double precision, allocatable, target :: Svsg(:,:,:)      !< [m2/s] suspended sediment transport for each sediment class (excluding pores), y-component {\"shape\": [\"s%nx+1\", \"s%ny+1\", \"par%ngd\"], \"standard_name\": \"\", \"broadcast\": \"d\"}\r\n   double precision, allocatable, target :: Subg(:,:,:)      !< [m2/s] bed sediment transport for each sediment class (excluding pores), x-component {\"shape\": [\"s%nx+1\", \"s%ny+1\", \"par%ngd\"], \"standard_name\": \"\", \"broadcast\": \"d\"}\r\n   double precision, allocatable, target :: Svbg(:,:,:)      !< [m2/s] bed sediment transport for each sediment class (excluding pores), y-component {\"shape\": [\"s%nx+1\", \"s%ny+1\", \"par%ngd\"], \"standard_name\": \"\", \"broadcast\": \"d\"}\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.def",
+          "sha256": "1be94d981193e1ca06f00c3ff4476f1df4ae5f8ccab4e8d26d9ef171cdddfcf0",
+          "line_start": 380,
+          "line_end": 383,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      double precision                  :: morfac                   = -123                 !  [-] Morphological acceleration factor\r\n      integer                           :: morfacopt                = -123                 !  [-] (advanced) Switch to adjusting output times for morfac\r\n      double precision                  :: morstart                 = -123                 !  [s] Start time morphology, in morphological time\r\n      double precision                  :: morstop                  = -123                 !  [s] Stop time morphology, in morphological time\r"
+        }
+      ]
+    },
+    {
+      "id": "XB-PHY-011",
+      "producer": "morphology",
+      "consumer": "next-step waves, flow, sediment, vegetation and groundwater",
+      "states": [
+        "zb,dzbnow,zs,gwlevel,D50top,structdepth",
+        "hh=zs-zb on next flow; wave hhw; bed slopes; vegetation effective height; gwbottom/head connection"
+      ],
+      "timing": "bed_update is last physics call. It shifts zb (and coupled zs/gw states where enabled). Without groundwater, its equal zb/zs translations preserve hh; groundwater pore-volume corrections can change zs-zb but hh is not recomputed until the subsequent flow end.",
+      "mode_guards": "morphology=1; avalanching and multiple fractions add branches. Vegetation effective height uses zb0-zb on next veg call.",
+      "grid_and_bounds": "Bed and coupled levels are eta arrays; halo shifts follow bed core update and groundwater coupling. Boundary Neumann copies occur later inside bed_update.",
+      "units_and_sign": "zb,zs,gwlevel,dzbnow [m]. Positive dzbnow is accretion; negative is erosion.",
+      "summary_ko": "지형은 후속 파랑·식생·지하수·표사 입력을 모두 바꾼다. 지하수 결합 시 공극수 보정으로 `zs-zb`가 바뀔 수 있지만 `hh`는 즉시 다시 계산되지 않는다.",
+      "evidence": [
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/libxbeach.F90",
+          "sha256": "1656cceb95c9d87a51b70225a725fc6e544ed56b424c97a9e2806c86f15b6696",
+          "line_start": 307,
+          "line_end": 312,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "            if (par%sedtrans==1)                                    call transus        (s,par)\r\n            !\r\n            ! Bed level update\r\n            if ((par%morphology==1).and.(.not. par%setbathy==1)) call bed_update(s,par)\r\n            if (par%setbathy==1)     call setbathy_update(s, par)\r\n         endif\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/flow_timestep.F90",
+          "sha256": "50742b601cc8feccd513cf742ca772b6021f1d4f5ffe074c4e8ffc90907dd2b2",
+          "line_start": 938,
+          "line_end": 941,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      s%hold =s%hh    ! wwvv ?  s%hold is never else used\r\n      !\r\n      s%hh  = max(s%zs-s%zb,par%eps)    ! water depth\r\n      s%zs1 = s%zs-s%zs0                ! water level minus tide\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/morphevolution.F90",
+          "sha256": "765f474008f7cb843353dc0790cc3f3ebdc00631353da7592e2bb0508e968391",
+          "line_start": 813,
+          "line_end": 843,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "#ifdef USEMPI\r\n         call xmpi_shift_ee(s%zb)\r\n         call xmpi_shift_ee(s%structdepth)\r\n#endif\r\n         ! In case of groundwater, we need to update groundwater levels and surface water\r\n         if(par%gwflow==1) then\r\n            where (s%wetz==1 .and. s%dzbnow>0.d0) ! accretion in wet areas\r\n               s%zs = s%zs + s%dzbnow*(1.d0-par%por)  ! zs = zs + dzbnow - dzbnow*par%por\r\n               s%gwlevel = s%gwlevel+s%dzbnow\r\n               s%infil = s%infil + s%dzbnow*par%por/par%dt\r\n            elsewhere (s%wetz==1 .and. s%dzbnow<0.d0) ! erosion in wet areas\r\n               ! maximum water leaving groundwater = gwlevel(not updated) - zb(updated)\r\n               ! note that exfiltration is negative infil\r\n               tempexchange = min((s%zb-s%gwlevel)*par%por,0.d0)\r\n               s%zs = s%zs + s%dzbnow - tempexchange\r\n               s%gwlevel = s%gwlevel + tempexchange/par%por\r\n               s%infil = s%infil + tempexchange\r\n            endwhere\r\n#ifdef USEMPI\r\n            call xmpi_shift_ee(s%gwlevel)\r\n            call xmpi_shift_ee(s%infil)\r\n            call xmpi_shift_ee(s%zs)\r\n#endif\r\n         else ! only need to update water levels\r\n            where (s%wetz(imin_zs:imax_zs,jmin_zs:jmax_zs)==1)\r\n               s%zs(imin_zs:imax_zs,jmin_zs:jmax_zs) = s%zs(imin_zs:imax_zs,jmin_zs:jmax_zs)+s%dzbnow(imin_zs:imax_zs,jmin_zs:jmax_zs)\r\n            endwhere\r\n#ifdef USEMPI\r\n            call xmpi_shift_ee(s%zs)\r\n#endif\r\n         endif\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/morphevolution.F90",
+          "sha256": "765f474008f7cb843353dc0790cc3f3ebdc00631353da7592e2bb0508e968391",
+          "line_start": 1170,
+          "line_end": 1180,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "         ! Update representative sed.diameter at the bed for flow friction and output\r\n         if (par%ngd>1) then\r\n            do j=j1,max(s%ny,1)\r\n               do i=2,s%nx\r\n                  s%D50top =  sum(s%pbbed(i,j,1,:)*s%D50)\r\n                  s%D90top =  sum(s%pbbed(i,j,1,:)*s%D90)\r\n               enddo\r\n            enddo\r\n         endif\r\n\r\n      endif ! if par%t>par%morstart\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vegetation.F90",
+          "sha256": "e58ebd47d62d4637baae7bee4e90570a859b1eb0467e486a599f877b380df2c2",
+          "line_start": 485,
+          "line_end": 500,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "               watr = 0d0\r\n               wacr = 0d0\r\n               do m=1,s%nsecveg(i,j)\r\n                  ! Determine height of vegetation section (restricted to current bed level)\r\n                  aht = s%ahveg(i,j,m)+s%zb0(i,j)-s%zb(i,j)\r\n\r\n                  ! Determine which part of the vegetation is below the wave trough, and between trough and crest\r\n                  if (par%vegnonlin == 1 .and. par%wavemodel/=WAVEMODEL_NONH) then\r\n                     watr = minval(etaw(i,j,:))\r\n                     watr = s%hh(i,j) + watr ! wave trough level\r\n                     wacr = maxval(etaw(i,j,:))\r\n                     wacr = s%hh(i,j) + wacr ! wave crest level\r\n                  else\r\n                     watr = s%hh(i,j)\r\n                     wacr = s%hh(i,j)\r\n                  endif\r"
+        }
+      ]
+    },
+    {
+      "id": "XB-PHY-012",
+      "producer": "ship hull/track",
+      "consumer": "flow pressure gradient and wet-domain initialization",
+      "states": [
+        "track and hull -> ph",
+        "zs+old ph -> hull force",
+        "zs+ph -> dzsdx/dzsdy"
+      ],
+      "timing": "shipwave runs after flow boundary conditions and before wave/groundwater/flow. It removes old ph from the force-interpolation surface, creates current ph, and on the first call subtracts ph from zs. Current flow then differentiates zs+ph.",
+      "mode_guards": "ships=1. Per-ship compute_force and compute_motion branches control force and hull updates.",
+      "grid_and_bounds": "Ship and XBeach grids are mapped by MKMAP/GRMAP/GRMAP2. ph is eta-centred; flow gradients map it to u/v faces.",
+      "units_and_sign": "ph and zs [m]. Flow pressure slope uses +(zs+ph) gradient inside dudt and subtracts dt*dudt. Ship forces are multiplied by rho*g to N; moments by the same factor after geometric integration.",
+      "summary_ko": "선박은 수두 `ph`로 유동 압력경사를 만들며, 첫 호출에는 정수면을 `ph`만큼 낮춰 초기 자유수면과 선체 배제를 맞춘다.",
+      "evidence": [
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/ship.F90",
+          "sha256": "3de3ac9f8f31964fb511e526cb401a0531fb0d523906f0623d0c2481014f25aa",
+          "line_start": 287,
+          "line_end": 337,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      if (.not. allocated(zsvirt)) allocate(zsvirt(s%nx+1,s%ny+1))\r\n      zsvirt=s%zs+s%ph\r\n      s%ph=0.d0\r\n\r\n      do i=1,par%nship\r\n\r\n         ! Find actual position and orientation of ship\r\n\r\n         shipx_old = s%shipxCG(i)\r\n         shipy_old = s%shipyCG(i)\r\n         call linear_interp(sh(i)%track_t,sh(i)%track_x,sh(i)%track_nt,par%t,s%shipxCG(i),shp_indx)\r\n         call linear_interp(sh(i)%track_t,sh(i)%track_y,sh(i)%track_nt,par%t,s%shipyCG(i),shp_indx)\r\n         if (sh(i)%flying==1) then\r\n            call linear_interp(sh(i)%track_t,sh(i)%track_z,sh(i)%track_nt,par%t,s%shipzCG(i),shp_indx)\r\n         else\r\n            s%shipzCG(i) = 0.d0\r\n         endif\r\n         call linear_interp(sh(i)%track_t,sh(i)%track_dir,sh(i)%track_nt,par%t,dirship,shp_indx)\r\n         radius=max(sh(i)%nx*sh(i)%dx,sh(i)%ny*sh(i)%dy)/2\r\n         cosdir=cos(dirship)\r\n         sindir=sin(dirship)\r\n\r\n         ! Compute pressures on ship based on water levels from XBeach\r\n         !------------------------------------------------------------\r\n         ! Update locations of x ship grid points\r\n         do iy=1,sh(i)%ny+1\r\n            do ix=1,sh(i)%nx+1\r\n               sh(i)%x(ix,iy)=s%shipxCG(i)+(ix-sh(i)%nx/2-1)*sh(i)%dx*cosdir - (iy-sh(i)%ny/2-1)*sh(i)%dy*sindir\r\n               sh(i)%y(ix,iy)=s%shipyCG(i)+(ix-sh(i)%nx/2-1)*sh(i)%dx*sindir + (iy-sh(i)%ny/2-1)*sh(i)%dy*cosdir\r\n            end do\r\n         end do\r\n         ! Interpolate XBeach water levels to ship grid when required\r\n         n1=(s%nx+1)*(s%ny+1)\r\n         n2=(sh(i)%nx+1)*(sh(i)%ny+1)\r\n         ! Only carry out (costly) MKMAP once when ship is not moving\r\n         !! If XBeach grid is regular rectangular a more efficient mapper can be used; TBD\r\n         call MKMAP (s%wetz    ,s%xz      ,s%yz          ,s%nx+1     ,s%ny+1  , &\r\n         & sh(i)%x   ,sh(i)%y   ,n2            ,sh(i)%xs   ,sh(i)%ys, &\r\n         & sh(i)%nrx ,sh(i)%nry ,sh(i)%iflag   ,sh(i)%nrin ,sh(i)%w , &\r\n         & sh(i)%iref,iprint    ,sh(i)%covered ,xymiss)\r\n         call GRMAP (zsvirt   ,n1      ,sh(i)%zs      ,n2         ,sh(i)%iref, &\r\n         & sh(i)%w     ,4       ,iprint    )\r\n\r\n         if (sh(i)%compute_force==1) then\r\n            ! Compute pressure head (m) on ship grid including small-scale motions\r\n            !-----------------------------------------------------\r\n            sh(i)%ph = sh(i)%zs-sh(i)%zhull\r\n\r\n            ! Compute forces on ship when required\r\n            !-------------------------------------\r\n            call ship_force(i,sh(i),s,par)\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/ship.F90",
+          "sha256": "3de3ac9f8f31964fb511e526cb401a0531fb0d523906f0623d0c2481014f25aa",
+          "line_start": 354,
+          "line_end": 373,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "            ! Compute pressure head (m) on ship grid ti feed back into XBeach\r\n            !-----------------------------------------------------\r\n            ! Next line to be implemented in combination with vertical motion only\r\n            ! sh(i)%ph = sum(sh(i)%zs)/((sh(i)%nx+1)*(sh(i)%ny+1))-sh(i)%zhull\r\n            sh(i)%ph = -sh(i)%zhull\r\n            sh(i)%ph = max(sh(i)%ph,0.d0)\r\n            do iy=1,sh(i)%ny+1\r\n               do ix=1,sh(i)%nx+1\r\n                  if (sh(i)%depth(ix,iy)==0) sh(i)%ph(ix,iy)=0.d0\r\n               enddo\r\n            enddo\r\n         else\r\n            sh(i)%ph = -sh(i)%zhull-s%shipzCG(i)\r\n            sh(i)%ph = max(sh(i)%ph,0.d0)\r\n         endif ! compute_forces\r\n\r\n         ! Compute pressure head (m) on XBeach grid\r\n         !-----------------------------------------\r\n         call grmap2(s%ph,  s%dsdnzi ,n1      ,sh(i)%ph, sh(i)%dx*sh(i)%dy      ,n2         ,sh(i)%iref, &\r\n         & sh(i)%w     ,4          )\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/ship.F90",
+          "sha256": "3de3ac9f8f31964fb511e526cb401a0531fb0d523906f0623d0c2481014f25aa",
+          "line_start": 398,
+          "line_end": 410,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      enddo\r\n\r\n\r\n      ! Compute\r\n\r\n      if (firstship) then\r\n\r\n         ! apply initial condition\r\n\r\n         s%zs=s%zs-s%ph\r\n      endif\r\n\r\n      firstship=.false.\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/flow_timestep.F90",
+          "sha256": "50742b601cc8feccd513cf742ca772b6021f1d4f5ffe074c4e8ffc90907dd2b2",
+          "line_start": 131,
+          "line_end": 149,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      ! Add vertical discharges\r\n      call discharge_boundary_v(s,par)\r\n\r\n      !\r\n      ! s%zs=s%zs*s%wetz\r\n      ! Water level slopes\r\n      do j=jmin_uu,jmax_uu\r\n         do i=imin_uu,imax_uu\r\n            s%dzsdx(i,j)=(s%zs(i+1,j)+s%ph(i+1,j)-s%zs(i,j)-s%ph(i,j))/s%dsu(i,j)\r\n         end do\r\n      end do\r\n      !    do j=2,ny\r\n      if (s%ny>0) then\r\n          do j=jmin_vv,jmax_vv ! Dano need to get correct slope on boundary s%y=0\r\n             do i=imin_vv,imax_vv\r\n                s%dzsdy(i,j)=(s%zs(i,j+1)+s%ph(i,j+1)-s%zs(i,j)-s%ph(i,j))/s%dnv(i,j)\r\n             end do\r\n          end do\r\n      endif\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/variables.def",
+          "sha256": "628090517242909cb5cd2343158e2e004d2dc669d0f46140f322538d0d7276ff",
+          "line_start": 256,
+          "line_end": 256,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "   double precision, allocatable, target :: ph(:,:)          !< [m] pressure head due to ship {\"shape\": [\"s%nx+1\", \"s%ny+1\"], \"standard_name\": \"\", \"broadcast\": \"d\"}\r"
+        }
+      ]
+    },
+    {
+      "id": "XB-PHY-013",
+      "producer": "boundary and MPI exchange",
+      "consumer": "physics consumers",
+      "states": [
+        "wave_bc",
+        "gw_bc",
+        "flow_bc",
+        "ee/rr halos",
+        "uu/vv/zs halos",
+        "sediment concentration halos",
+        "zb/gw/zs halos"
+      ],
+      "timing": "External boundaries are imposed before physics; internal halos are refreshed at dependency points: wave energy before integrated force, velocity before nonh, zs after continuity, concentration before storage/use, and bed/coupled levels after morphology.",
+      "mode_guards": "USEMPI compiles halo calls. Outer boundary copies are conditioned on xmpi_istop/isbot/isleft/isright and ny>0 where applicable.",
+      "grid_and_bounds": "Global arrays are nx+1,ny+1 with edge/dummy rows and columns. 1D ny=0 uses j=1 and bypasses y-direction branches.",
+      "units_and_sign": "No unit conversion in halo exchange; copied fields retain declared units.",
+      "summary_ko": "외부 경계는 계산 전, 내부 halo는 각 의존 계산 직전에 갱신된다. 1D는 `j=1`, 2DH는 내부범위와 외곽 dummy/halo를 구분한다.",
+      "evidence": [
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/libxbeach.F90",
+          "sha256": "1656cceb95c9d87a51b70225a725fc6e544ed56b424c97a9e2806c86f15b6696",
+          "line_start": 293,
+          "line_end": 305,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "         if (error==0) then\r\n            !\r\n            ! Boundary conditions\r\n            call wave_bc        (sglobal,s,par)\r\n            if (par%gwflow==1)                                      call gw_bc          (s,par)\r\n            if ((par%flow==1).or.(par%wavemodel==WAVEMODEL_NONH))   call flow_bc        (s,par)\r\n            !\r\n            ! Compute timestep\r\n            if (par%ships==1)                                       call shipwave       (s,par,sh)\r\n            if (par%swave==1)                                       call wave           (s,par)\r\n            if (par%vegetation==1)                                  call vegatt         (s,par)\r\n            if (par%gwflow==1)                                      call gwflow         (s,par)\r\n            if ((par%flow==1).or.(par%wavemodel==WAVEMODEL_NONH))   call flow           (s,par)\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_instationary.F90",
+          "sha256": "9584b6ec2138353aba65991a4ec570b4b794554485cea43915c6071e9e2ed45a",
+          "line_start": 354,
+          "line_end": 469,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      ! Bay boundary Robert + Jaap\r\n      !\r\n      ! wwvv\r\n      ! this has consequences for the parallel version,\r\n      ! but also, if we do  nothing, there are discrepancies\r\n      ! between ee and rr in the different processes. We need to\r\n      ! get valid values for ee(nx+1,:,:) and rr(nx+1,:,:) from\r\n      ! the neighbour below. We cannot postpone this until this\r\n      ! subroutine ends, because ee and rr are used in this subroutine\r\n\r\n      if (xmpi_isbot) then\r\n         s%ee(s%nx+1,:,:) =s%ee(s%nx,:,:)\r\n         s%rr(s%nx+1,:,:) =s%rr(s%nx,:,:)\r\n      endif\r\n\r\n      if (par%t>0.0d0) then\r\n         if (s%ny>0) then\r\n            if (xmpi_isleft)then ! Jaap\r\n               if (par%lateralwave==LATERALWAVE_NEUMANN) then\r\n                  !\r\n                  ! Lateral boundary at y=0;\r\n                  !\r\n                  s%ee(1:s%nx+1,1,:)=s%ee(1:s%nx+1,2,:)\r\n                  s%rr(1:s%nx+1,1,:)=s%rr(1:s%nx+1,2,:)\r\n               elseif (par%lateralwave==LATERALWAVE_WAVECREST) then\r\n                  !   wcrestpos=xz+tan(thetamean(:,2))*(yz(2)-yz(1))\r\n                  wcrestpos=s%sdist(:,1)+tan(s%thetamean(:,2)-s%alfaz(:,2))*s%dnv(:,1)\r\n                  do itheta=1,s%ntheta\r\n                     do i=1,s%nx+1\r\n                        call Linear_interp((/-huge(0.d0)   ,wcrestpos     ,huge(0.d0)/),&\r\n                        (/s%ee(1,2,itheta),s%ee(:,2,itheta),s%ee(s%nx+1,2,itheta)/),&\r\n                        s%nx+1,s%sdist(i,1),s%ee(i,1,itheta),dummy)\r\n                        call Linear_interp((/-huge(0.d0)   ,wcrestpos     ,huge(0.d0)/),&\r\n                        (/s%rr(1,2,itheta),s%rr(:,2,itheta),s%rr(s%nx+1,2,itheta)/),&\r\n                        s%nx+1,s%sdist(i,1),s%rr(i,1,itheta),dummy)\r\n                        s%ee(i,1,itheta)=max(s%ee(i,1,itheta),0.d0)\r\n                        s%rr(i,1,itheta)=max(s%rr(i,1,itheta),0.d0)\r\n                     enddo\r\n                  enddo\r\n               endif\r\n            endif\r\n            if (xmpi_isright)then\r\n               if (par%lateralwave==LATERALWAVE_NEUMANN) then\r\n                  !\r\n                  ! lateral; boundary at y=ny*dy\r\n                  !\r\n                  s%ee(1:s%nx+1,s%ny+1,:)=s%ee(1:s%nx+1,s%ny,:)\r\n                  s%rr(1:s%nx+1,s%ny+1,:)=s%rr(1:s%nx+1,s%ny,:)\r\n               elseif (par%lateralwave==LATERALWAVE_WAVECREST) then\r\n                  !  wcrestpos=xz-tan(thetamean(:,ny))*(yz(ny+1)-yz(ny))\r\n                  wcrestpos=s%sdist(:,s%ny+1)-tan(s%thetamean(:,s%ny)-s%alfaz(:,s%ny))*s%dnv(:,s%ny)\r\n                  do itheta=1,s%ntheta\r\n                     do i=1,s%nx+1\r\n                        call Linear_interp((/-huge(0.d0)   ,wcrestpos     ,huge(0.d0)/),&\r\n                        (/s%ee(1,s%ny,itheta),s%ee(:,s%ny,itheta),s%ee(s%nx+1,s%ny,itheta)/),&\r\n                        s%nx+1,s%sdist(i,s%ny+1),s%ee(i,s%ny+1,itheta),dummy)\r\n                        call Linear_interp((/-huge(0.d0)   ,wcrestpos     ,huge(0.d0)/),&\r\n                        (/s%rr(1,s%ny,itheta),s%rr(:,s%ny,itheta),s%rr(s%nx+1,s%ny,itheta)/),&\r\n                        s%nx+1,s%sdist(i,s%ny+1),s%rr(i,s%ny+1,itheta),dummy)\r\n                        s%ee(i,s%ny+1,itheta)=max(s%ee(i,s%ny+1,itheta),0.d0)\r\n                        s%rr(i,s%ny+1,itheta)=max(s%rr(i,s%ny+1,itheta),0.d0)\r\n                     enddo\r\n                  enddo\r\n               endif\r\n            endif\r\n         endif\r\n      endif\r\n      ! wwvv communicate ee(:,1,:)\r\n#ifdef USEMPI\r\n      call xmpi_shift_ee(s%ee)\r\n      call xmpi_shift_ee(s%rr)\r\n#endif\r\n\r\n      !\r\n      ! Energy integrated over wave directions,Hrms\r\n      !\r\n      s%E  = sum(s%ee,3)*s%dtheta\r\n      s%R  = sum(s%rr,3)*s%dtheta\r\n      s%DR = sum(drr,3)*s%dtheta\r\n      s%H  = sqrt(s%E/par%rhog8)\r\n      !Dano: recompute uorb as it is affected by the MPI shifts and time stepping\r\n      uorb=par%px*s%H/par%Trep/sinh(min(max(s%k,0.01d0)*s%hhw,10.0d0))\r\n      !\r\n      ! Correct roller for gammax in these areas\r\n      if (par%rollergammax==1) then\r\n         RH = sqrt(s%R/par%rhog8)\r\n         where(RH>par%gammax*s%hhw .and. s%wete==1 .and. mask_ee)\r\n            gammax_correct = .true.\r\n         elsewhere\r\n            gammax_correct = .false.\r\n         endwhere\r\n         !\r\n         do itheta=1,s%ntheta\r\n            ! note: here we do use instantaneous water depth (and excluding par%delta*s%H effect)\r\n            where(gammax_correct)\r\n               s%rr(:,:,itheta)=s%rr(:,:,itheta)/(RH/(par%gammax*s%hhw))**2\r\n            endwhere\r\n         enddo\r\n         where(gammax_correct)\r\n            s%R=min(s%R,par%gammax*s%hhw)\r\n         endwhere\r\n#ifdef USEMPI\r\n         call xmpi_shift_ee(s%rr)\r\n#endif         \r\n      endif\r\n      !\r\n      ! Compute mean wave direction\r\n      !\r\n      if (par%snells==0 .and. par%single_dir==0) then\r\n         where(s%wete == 1)\r\n            s%thetamean=(sum(s%ee*s%thet,3)/s%ntheta)/(max(sum(s%ee,3),0.00001d0)/s%ntheta)\r\n         endwhere\r\n      endif\r\n      !\r\n      ! compute wave forces\r\n      call compute_wave_forces(s)\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/flow_timestep.F90",
+          "sha256": "50742b601cc8feccd513cf742ca772b6021f1d4f5ffe074c4e8ffc90907dd2b2",
+          "line_start": 630,
+          "line_end": 657,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "#ifdef USEMPI\r\n      call xmpi_shift_ee(s%uu)\r\n      call xmpi_shift_ee(s%vv)\r\n#endif\r\n\r\n      if (par%wavemodel==WAVEMODEL_NONH) then\r\n         !Do explicit predictor step with pressure\r\n         call nonh_cor(s,par,0,uu_old,vv_old)\r\n\r\n#ifdef USEMPI\r\n         call xmpi_shift_ee(s%uu)\r\n         call xmpi_shift_ee(s%vv)\r\n#endif\r\n      end if\r\n\r\n      if (par%secorder==1) then\r\n         !Call second order correction to the advection\r\n         call flow_secondorder_advUV(s,par,uu_old,vv_old)\r\n#ifdef USEMPI\r\n         call xmpi_shift_ee(s%uu)\r\n         call xmpi_shift_ee(s%vv)\r\n#endif\r\n      end if\r\n\r\n      if (par%wavemodel==WAVEMODEL_NONH) then\r\n         ! do non-hydrostatic pressure compensation to solve short waves\r\n         call nonh_cor(s,par,1,uu_old,vv_old)\r\n         ! note: MPI shift in subroutine nonh_cor\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/flow_timestep.F90",
+          "sha256": "50742b601cc8feccd513cf742ca772b6021f1d4f5ffe074c4e8ffc90907dd2b2",
+          "line_start": 761,
+          "line_end": 770,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      ! wwvv zs, uu, vv have to be communicated now, because they are used later on\r\n#ifdef USEMPI\r\n      call xmpi_shift_ee(s%zs)\r\n#endif\r\n\r\n\r\n      if (par%secorder == 1 .or. par%wavemodel==WAVEMODEL_NONH) then\r\n         vv_old = s%vv\r\n         uu_old = s%uu\r\n         zs_old = s%zs\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/groundwater.F90",
+          "sha256": "e941accf34fb9b4f21256dcb59b986ad2df2976a8bc151af926e3ce38c8cf494",
+          "line_start": 541,
+          "line_end": 575,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      ! Model boundaries\r\n      ! Robert: check if all these are actually needed\r\n#ifdef USEMPI\r\n      call xmpi_shift_ee(s%gwlevel)\r\n      call xmpi_shift_ee(s%gwhead)\r\n      call xmpi_shift_ee(s%gwcurv)\r\n#endif\r\n      if (xmpi_istop) then\r\n         s%gwlevel(1,:) = s%gwlevel(2,:)\r\n         s%gwhead(1,:) = s%gwhead(2,:)\r\n         s%gwcurv(1,:) = s%gwcurv(2,:)\r\n         s%gwbottom(1,:) = s%gwbottom(2,:)\r\n         s%gww(1,:) = s%gww(2,:)\r\n      endif\r\n      if (xmpi_isbot) then\r\n         s%gwlevel(s%nx+1,:) = s%gwlevel(s%nx,:)\r\n         s%gwhead(s%nx+1,:) = s%gwhead(s%nx,:)\r\n         s%gwcurv(s%nx+1,:) = s%gwcurv(s%nx,:)\r\n         s%gwbottom(s%nx+1,:) = s%gwbottom(s%nx,:)\r\n         s%gww(s%nx+1,:) = s%gww(s%nx,:)\r\n      endif\r\n      if (xmpi_isleft .and. s%ny>0) then\r\n         s%gwlevel(:,1) = s%gwlevel(:,2)\r\n         s%gwhead(:,1) = s%gwhead(:,2)\r\n         s%gwcurv(:,1) = s%gwcurv(:,2)\r\n         s%gwbottom(:,1) = s%gwbottom(:,2)\r\n         s%gww(:,1) = s%gww(:,2)\r\n      endif\r\n      if (xmpi_isright .and. s%ny>0) then\r\n         s%gwlevel(:,s%ny+1) = s%gwlevel(:,s%ny)\r\n         s%gwhead(:,s%ny+1) = s%gwhead(:,s%ny)\r\n         s%gwcurv(:,s%ny+1) = s%gwcurv(:,s%ny)\r\n         s%gwbottom(:,s%ny+1) = s%gwbottom(:,s%ny)\r\n         s%gww(:,s%ny+1) = s%gww(:,s%ny)\r\n      endif\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/morphevolution.F90",
+          "sha256": "765f474008f7cb843353dc0790cc3f3ebdc00631353da7592e2bb0508e968391",
+          "line_start": 813,
+          "line_end": 841,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "#ifdef USEMPI\r\n         call xmpi_shift_ee(s%zb)\r\n         call xmpi_shift_ee(s%structdepth)\r\n#endif\r\n         ! In case of groundwater, we need to update groundwater levels and surface water\r\n         if(par%gwflow==1) then\r\n            where (s%wetz==1 .and. s%dzbnow>0.d0) ! accretion in wet areas\r\n               s%zs = s%zs + s%dzbnow*(1.d0-par%por)  ! zs = zs + dzbnow - dzbnow*par%por\r\n               s%gwlevel = s%gwlevel+s%dzbnow\r\n               s%infil = s%infil + s%dzbnow*par%por/par%dt\r\n            elsewhere (s%wetz==1 .and. s%dzbnow<0.d0) ! erosion in wet areas\r\n               ! maximum water leaving groundwater = gwlevel(not updated) - zb(updated)\r\n               ! note that exfiltration is negative infil\r\n               tempexchange = min((s%zb-s%gwlevel)*par%por,0.d0)\r\n               s%zs = s%zs + s%dzbnow - tempexchange\r\n               s%gwlevel = s%gwlevel + tempexchange/par%por\r\n               s%infil = s%infil + tempexchange\r\n            endwhere\r\n#ifdef USEMPI\r\n            call xmpi_shift_ee(s%gwlevel)\r\n            call xmpi_shift_ee(s%infil)\r\n            call xmpi_shift_ee(s%zs)\r\n#endif\r\n         else ! only need to update water levels\r\n            where (s%wetz(imin_zs:imax_zs,jmin_zs:jmax_zs)==1)\r\n               s%zs(imin_zs:imax_zs,jmin_zs:jmax_zs) = s%zs(imin_zs:imax_zs,jmin_zs:jmax_zs)+s%dzbnow(imin_zs:imax_zs,jmin_zs:jmax_zs)\r\n            endwhere\r\n#ifdef USEMPI\r\n            call xmpi_shift_ee(s%zs)\r"
+        }
+      ]
+    },
+    {
+      "id": "XB-PHY-014",
+      "producer": "q3d parameter parsing",
+      "consumer": "vertical velocity profile used by sediment",
+      "states": [
+        "q3d or form=VANRIJN1993 -> kmax,nz",
+        "nz>1 -> vsm_u_XB -> ue_sed,ve_sed"
+      ],
+      "timing": "Parameter parsing sets nz=kmax. Later flow checks nz>1, not q3d, and computes vertical profiles before transus.",
+      "mode_guards": "q3d=1 or form=VANRIJN1993 activates parameters; however flow explicitly excludes FORM_VANRIJN1993 from vsm_u_XB. No executable `par%q3d` branch exists outside params.F90 in the searched xbeachlibrary sources.",
+      "grid_and_bounds": "Vertical arrays are nx+1,ny+1,nz; sediment consumes cell-centre ue_sed/ve_sed.",
+      "units_and_sign": "uz/vz/ustz comments declare [-] despite velocity use; ue_sed/ve_sed are [m/s]. This unit metadata mismatch remains unresolved.",
+      "summary_ko": "`q3d`는 직접 계산 분기를 선택하지 않고 `nz`를 늘리는 간접 스위치다. 동시에 Van Rijn 1993은 같은 입력을 읽지만 VSM 호출에서는 명시적으로 제외된다.",
+      "evidence": [
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.F90",
+          "sha256": "73648b5733a8f90a8f18cda32743bdc2ef42f649e39c521e28e06584ee63c359",
+          "line_start": 1139,
+          "line_end": 1153,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      ! Q3D sediment transport parameters\r\n      ! -> also make this part active if van Rijn, 1993 is used as ceq solver\r\n      if (par%q3d==1 .or. par%form==FORM_VANRIJN1993) then\r\n         call writelog('l','','--------------------------------')\r\n         call writelog('l','','Q3D sediment transport parameters: ')\r\n         par%vonkar  = readkey_dbl ('params.txt','vonkar',   0.4d0,     0.01d0,  1.d0)\r\n         par%vicmol  = readkey_dbl ('params.txt','vicmol',   0.000001d0,   0.d0,    0.001d0)\r\n         par%kmax    = readkey_int ('params.txt','kmax ',      100,        1,        1000)\r\n         par%nz      = par%kmax     ! work-around; discuss with Dano later difference nz / kmax\r\n         par%sigfac  = readkey_dbl ('params.txt','sigfac ',1.3d0,     0.00d0,   10.d0)\r\n         par%deltar  = readkey_dbl ('params.txt','deltar ',0.025d0,     0.001d0,   1.0d0)\r\n         par%rwave  = readkey_dbl ('params.txt','rwave ',2.0d0,     0.1d0,   10.0d0)\r\n      else ! workaround, needed for array allocation\r\n         par%kmax = 1\r\n      endif\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/flow_timestep.F90",
+          "sha256": "50742b601cc8feccd513cf742ca772b6021f1d4f5ffe074c4e8ffc90907dd2b2",
+          "line_start": 956,
+          "line_end": 986,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      ! XBeach uses same input for Van Rijn, 1993 (quasi 3d), but doesn't use this module\r\n      if (par%nz>1 .and. par%form /= FORM_VANRIJN1993) then\r\n         do j=1,s%ny+1\r\n            do i=1,s%nx+1\r\n               if (s%wetz(i,j) .eq. 1) then\r\n                  ks=12.d0*s%hh(i,j)/10.d0**(sqrt(par%g/s%cfu(i,j))/18.d0)\r\n                  tauw=par%rhoa*par%Cd*sqrt(s%windsu(i,j)**2+s%windnv(i,j)**2)\r\n                  tauwx=s%windsu(i,j)*tauw\r\n                  tauwy=s%windnv(i,j)*tauw\r\n\r\n                  call vsm_u_XB (  s%ue(i,j)    ,s%ve(i,j)    ,s%hh(i,j) ,ks  ,                &\r\n                  par%rho      ,tauwx ,tauwy ,s%thetamean(i,j)-s%alfaz(i,j),  &\r\n                  s%urms(i,j)  ,s%sigm(i,j)  ,s%k(i,j)       ,s%Dr(i,j)  ,    &\r\n                  s%E(i,j)     ,s%R(i,j)     ,fcvisc,facdel  ,par%ws     ,    &\r\n                  s%fw(i,j)    ,facdf ,swglm ,par%nz       ,s%sigz       ,    &\r\n                  s%uz(i,j,:)  ,s%vz(i,j,:)  ,s%ustz(i,j,:)  ,s%nutz(i,j,:),  &\r\n                  s%ue_sed(i,j),s%ve_sed(i,j)  )\r\n               else\r\n                  s%uz(i,j,:)=0.d0\r\n                  s%vz(i,j,:)=0.d0\r\n                  s%ustz(i,j,:)=0.d0\r\n                  s%nutz(i,j,:)=0.d0\r\n                  s%ue_sed(i,j)=0.d0\r\n                  s%ve_sed(i,j)=0.d0\r\n               endif\r\n            enddo\r\n         enddo\r\n      else\r\n         s%ue_sed=s%ue\r\n         s%ve_sed=s%ve\r\n      endif\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/variables.def",
+          "sha256": "628090517242909cb5cd2343158e2e004d2dc669d0f46140f322538d0d7276ff",
+          "line_start": 291,
+          "line_end": 294,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "   double precision, allocatable, target :: sigz(:)          !< [-] vertical distribution of sigma layers Q3D {\"shape\": [\"par%nz\"], \"standard_name\": \"\", \"broadcast\": \"b\"}\r\n   double precision, allocatable, target :: uz(:,:,:)        !< [-] velocity (Q3D) ksi-comp {\"shape\": [\"s%nx+1\",\"s%ny+1\",\"par%nz\"], \"standard_name\": \"\", \"broadcast\": \"d\"}\r\n   double precision, allocatable, target :: vz(:,:,:)        !< [-] velocity (Q3D) eta-comp {\"shape\": [\"s%nx+1\",\"s%ny+1\",\"par%nz\"], \"standard_name\": \"\", \"broadcast\": \"d\"}\r\n   double precision, allocatable, target :: ustz(:,:,:)      !< [-] stokes velocity (Q3D) {\"shape\": [\"s%nx+1\",\"s%ny+1\",\"par%nz\"], \"standard_name\": \"\", \"broadcast\": \"d\"}\r"
+        }
+      ]
+    }
+  ],
+  "mode_contracts": [
+    {
+      "mode": "stationary",
+      "guards": "wavemodel=0; swave defaults 1",
+      "wave": "wave dispersion and stationary directions only at wavint/newstatbc",
+      "flow": "flow=1",
+      "sediment_morph": "sedtrans defaults 1; morphology defaults sedtrans",
+      "feedback": "Fx/Fy, urms and Stokes drift are piecewise constant between wave calls; Dveg computed every step is sampled at next wave call"
+    },
+    {
+      "mode": "surfbeat multidirectional",
+      "guards": "wavemodel=1; swave=1; single_dir=0",
+      "wave": "directional action and roller advance every dt",
+      "flow": "wave forcing feeds depth-averaged GLM flow",
+      "sediment_morph": "post-flow Eulerian plus wave asymmetry/orbital state feeds transus",
+      "feedback": "flow/water-depth changes feed next wave step; vegetation Dveg is one dt late"
+    },
+    {
+      "mode": "surfbeat single_dir",
+      "guards": "wavemodel=1; single_dir=1",
+      "wave": "stationary direction field updated at wavint/newstatbc/first step, instationary energy every dt",
+      "flow": "same force path",
+      "sediment_morph": "same as surfbeat",
+      "feedback": "mean depth/current used for direction/dispersion according to wci"
+    },
+    {
+      "mode": "nonh one-layer",
+      "guards": "wavemodel=2; nonhq3d=0; swave forced 0",
+      "wave": "resolved by predictor/corrector pressure within flow",
+      "flow": "flow called even if flow=0",
+      "sediment_morph": "sedtrans defaults 0 outside XBeach-G settings but may be enabled",
+      "feedback": "pres feeds groundwater with one-step lag; breaking mask may increase viscosity"
+    },
+    {
+      "mode": "nonh reduced two-layer 1D",
+      "guards": "wavemodel=2; nonhq3d=1; ny=0",
+      "wave": "nonh_2lay_pred_2dV then nonh_2lay_cor_2dV",
+      "flow": "j=1 true-1D branches",
+      "sediment_morph": "y transport absent except lsgrad term in 1D bed update",
+      "feedback": "same pressure-groundwater chronology"
+    },
+    {
+      "mode": "nonh reduced two-layer 2DH",
+      "guards": "wavemodel=2; nonhq3d=1; ny>0",
+      "wave": "nonh_2lay_pred_3d then nonh_2lay_cor_3d (names denote horizontal 2D plus two layers)",
+      "flow": "u/v staggered and 2D pressure matrix",
+      "sediment_morph": "both u/v class flux divergences",
+      "feedback": "same pressure-groundwater chronology"
+    }
+  ],
+  "unresolved_contradictions": [
+    {
+      "id": "XB-PHY-U01",
+      "severity": "high for multi-fraction morphology coupled to sediment/groundwater",
+      "finding": "Inside i,j loops, the intended local representative grain diameters are assigned to the entire D50top and D90top arrays because the left sides omit (i,j). The next groundwater call reads D50top(i,j), so every cell can receive the final loop cell's scalar after a multi-fraction bed update.",
+      "evidence": [
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/morphevolution.F90",
+          "sha256": "765f474008f7cb843353dc0790cc3f3ebdc00631353da7592e2bb0508e968391",
+          "line_start": 1170,
+          "line_end": 1177,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "         ! Update representative sed.diameter at the bed for flow friction and output\r\n         if (par%ngd>1) then\r\n            do j=j1,max(s%ny,1)\r\n               do i=2,s%nx\r\n                  s%D50top =  sum(s%pbbed(i,j,1,:)*s%D50)\r\n                  s%D90top =  sum(s%pbbed(i,j,1,:)*s%D90)\r\n               enddo\r\n            enddo\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/groundwater.F90",
+          "sha256": "e941accf34fb9b4f21256dcb59b986ad2df2976a8bc151af926e3ce38c8cf494",
+          "line_start": 617,
+          "line_end": 624,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      do j=1,s%ny+1\r\n         do i=1,s%nx+1\r\n            if (.not. connected(i,j)) then\r\n               if (s%wetz(i,j)==1 .and. s%gwlevel(i,j)<s%zb(i,j)) then\r\n                  call gw_calc_local_infil(par,s%zb(i,j),s%hh(i,j),s%gwlevel(i,j),Kzinf(i,j),&\r\n                  s%dinfil(i,j),s%D50top(i,j),turbapprox, &\r\n                  fracdt(i,j),infil(i,j),Kzupd(i,j))\r\n               endif\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/variables.def",
+          "sha256": "628090517242909cb5cd2343158e2e004d2dc669d0f46140f322538d0d7276ff",
+          "line_start": 237,
+          "line_end": 237,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "   double precision, allocatable, target :: D50top(:,:)      !< [-] Friction coefficient flow {\"shape\": [\"s%nx+1\", \"s%ny+1\"], \"standard_name\": \"\", \"broadcast\": \"d\"}\r"
+        }
+      ]
+    },
+    {
+      "id": "XB-PHY-U02",
+      "severity": "medium dimensional inconsistency in exposed post-step state",
+      "finding": "tempexchange is formed as an elevation times porosity [m] and is added directly to infil [m/s] in the erosion branch. The adjacent accretion branch divides by dt. No later division repairs this assignment in bed_update. Because the next gwflow call resets infil before flow consumes it, the demonstrated impact is the post-step/BMI/output state rather than a confirmed next-step continuity forcing error.",
+      "evidence": [
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/morphevolution.F90",
+          "sha256": "765f474008f7cb843353dc0790cc3f3ebdc00631353da7592e2bb0508e968391",
+          "line_start": 817,
+          "line_end": 835,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "         ! In case of groundwater, we need to update groundwater levels and surface water\r\n         if(par%gwflow==1) then\r\n            where (s%wetz==1 .and. s%dzbnow>0.d0) ! accretion in wet areas\r\n               s%zs = s%zs + s%dzbnow*(1.d0-par%por)  ! zs = zs + dzbnow - dzbnow*par%por\r\n               s%gwlevel = s%gwlevel+s%dzbnow\r\n               s%infil = s%infil + s%dzbnow*par%por/par%dt\r\n            elsewhere (s%wetz==1 .and. s%dzbnow<0.d0) ! erosion in wet areas\r\n               ! maximum water leaving groundwater = gwlevel(not updated) - zb(updated)\r\n               ! note that exfiltration is negative infil\r\n               tempexchange = min((s%zb-s%gwlevel)*par%por,0.d0)\r\n               s%zs = s%zs + s%dzbnow - tempexchange\r\n               s%gwlevel = s%gwlevel + tempexchange/par%por\r\n               s%infil = s%infil + tempexchange\r\n            endwhere\r\n#ifdef USEMPI\r\n            call xmpi_shift_ee(s%gwlevel)\r\n            call xmpi_shift_ee(s%infil)\r\n            call xmpi_shift_ee(s%zs)\r\n#endif\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/variables.def",
+          "sha256": "628090517242909cb5cd2343158e2e004d2dc669d0f46140f322538d0d7276ff",
+          "line_start": 193,
+          "line_end": 193,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "   double precision, allocatable, target :: infil(:,:)       !< [m/s] Rate of exchange of water between surface and groundwater (positive from sea to groundwater) {\"shape\": [\"s%nx+1\", \"s%ny+1\"], \"standard_name\": \"\", \"broadcast\": \"d\"}\r"
+        }
+      ]
+    },
+    {
+      "id": "XB-PHY-U03",
+      "severity": "medium coupling chronology/stale state",
+      "finding": "With gwflow enabled, bed_update's pore-volume correction can change zs-zb after flow has set hh=zs-zb, but bed_update does not recompute hh and the next executestep computes wet masks before flow recomputes hh. This exposes a one-step stale hh mask/wave-depth input specifically in morphology-groundwater coupling. Without groundwater, the core equal zb/zs translations preserve hh.",
+      "evidence": [
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/flow_timestep.F90",
+          "sha256": "50742b601cc8feccd513cf742ca772b6021f1d4f5ffe074c4e8ffc90907dd2b2",
+          "line_start": 938,
+          "line_end": 941,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      s%hold =s%hh    ! wwvv ?  s%hold is never else used\r\n      !\r\n      s%hh  = max(s%zs-s%zb,par%eps)    ! water depth\r\n      s%zs1 = s%zs-s%zs0                ! water level minus tide\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/morphevolution.F90",
+          "sha256": "765f474008f7cb843353dc0790cc3f3ebdc00631353da7592e2bb0508e968391",
+          "line_start": 817,
+          "line_end": 843,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "         ! In case of groundwater, we need to update groundwater levels and surface water\r\n         if(par%gwflow==1) then\r\n            where (s%wetz==1 .and. s%dzbnow>0.d0) ! accretion in wet areas\r\n               s%zs = s%zs + s%dzbnow*(1.d0-par%por)  ! zs = zs + dzbnow - dzbnow*par%por\r\n               s%gwlevel = s%gwlevel+s%dzbnow\r\n               s%infil = s%infil + s%dzbnow*par%por/par%dt\r\n            elsewhere (s%wetz==1 .and. s%dzbnow<0.d0) ! erosion in wet areas\r\n               ! maximum water leaving groundwater = gwlevel(not updated) - zb(updated)\r\n               ! note that exfiltration is negative infil\r\n               tempexchange = min((s%zb-s%gwlevel)*par%por,0.d0)\r\n               s%zs = s%zs + s%dzbnow - tempexchange\r\n               s%gwlevel = s%gwlevel + tempexchange/par%por\r\n               s%infil = s%infil + tempexchange\r\n            endwhere\r\n#ifdef USEMPI\r\n            call xmpi_shift_ee(s%gwlevel)\r\n            call xmpi_shift_ee(s%infil)\r\n            call xmpi_shift_ee(s%zs)\r\n#endif\r\n         else ! only need to update water levels\r\n            where (s%wetz(imin_zs:imax_zs,jmin_zs:jmax_zs)==1)\r\n               s%zs(imin_zs:imax_zs,jmin_zs:jmax_zs) = s%zs(imin_zs:imax_zs,jmin_zs:jmax_zs)+s%dzbnow(imin_zs:imax_zs,jmin_zs:jmax_zs)\r\n            endwhere\r\n#ifdef USEMPI\r\n            call xmpi_shift_ee(s%zs)\r\n#endif\r\n         endif\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/libxbeach.F90",
+          "sha256": "1656cceb95c9d87a51b70225a725fc6e544ed56b424c97a9e2806c86f15b6696",
+          "line_start": 280,
+          "line_end": 305,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      ! determine timestep\r\n      if(xcompute) then\r\n\r\n         ! determine this time step's wet points\r\n         call compute_wetcells(s,par)\r\n         !\r\n         ! determine time step\r\n         call timestep(s,par,tpar,it,dt=dt,ierr=error)\r\n         call outputtimes_update(par, tpar)\r\n\r\n         ! update log\r\n         call log_progress(par)\r\n\r\n         if (error==0) then\r\n            !\r\n            ! Boundary conditions\r\n            call wave_bc        (sglobal,s,par)\r\n            if (par%gwflow==1)                                      call gw_bc          (s,par)\r\n            if ((par%flow==1).or.(par%wavemodel==WAVEMODEL_NONH))   call flow_bc        (s,par)\r\n            !\r\n            ! Compute timestep\r\n            if (par%ships==1)                                       call shipwave       (s,par,sh)\r\n            if (par%swave==1)                                       call wave           (s,par)\r\n            if (par%vegetation==1)                                  call vegatt         (s,par)\r\n            if (par%gwflow==1)                                      call gwflow         (s,par)\r\n            if ((par%flow==1).or.(par%wavemodel==WAVEMODEL_NONH))   call flow           (s,par)\r"
+        }
+      ]
+    },
+    {
+      "id": "XB-PHY-U04",
+      "severity": "scope-limited feature ambiguity",
+      "finding": "The q3d input has no executable guard outside params.F90 in xbeachlibrary; its only observed computational activation is indirect through nz>1. FORM_VANRIJN1993 reads the same parameters but is excluded from vsm_u_XB. The allocated q3d locals in transus are not referenced after allocation.",
+      "absence_check": "rg -n -i 'q3d' over xbeachlibrary *.[Ff]90, *.f90 and *.def; occurrences are recorded in params/initialize/nonh metadata and unused morphevolution declarations. This is an absence result for this source snapshot, not a claim about other XBeach versions.",
+      "evidence": [
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.F90",
+          "sha256": "73648b5733a8f90a8f18cda32743bdc2ef42f649e39c521e28e06584ee63c359",
+          "line_start": 1139,
+          "line_end": 1153,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      ! Q3D sediment transport parameters\r\n      ! -> also make this part active if van Rijn, 1993 is used as ceq solver\r\n      if (par%q3d==1 .or. par%form==FORM_VANRIJN1993) then\r\n         call writelog('l','','--------------------------------')\r\n         call writelog('l','','Q3D sediment transport parameters: ')\r\n         par%vonkar  = readkey_dbl ('params.txt','vonkar',   0.4d0,     0.01d0,  1.d0)\r\n         par%vicmol  = readkey_dbl ('params.txt','vicmol',   0.000001d0,   0.d0,    0.001d0)\r\n         par%kmax    = readkey_int ('params.txt','kmax ',      100,        1,        1000)\r\n         par%nz      = par%kmax     ! work-around; discuss with Dano later difference nz / kmax\r\n         par%sigfac  = readkey_dbl ('params.txt','sigfac ',1.3d0,     0.00d0,   10.d0)\r\n         par%deltar  = readkey_dbl ('params.txt','deltar ',0.025d0,     0.001d0,   1.0d0)\r\n         par%rwave  = readkey_dbl ('params.txt','rwave ',2.0d0,     0.1d0,   10.0d0)\r\n      else ! workaround, needed for array allocation\r\n         par%kmax = 1\r\n      endif\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/flow_timestep.F90",
+          "sha256": "50742b601cc8feccd513cf742ca772b6021f1d4f5ffe074c4e8ffc90907dd2b2",
+          "line_start": 956,
+          "line_end": 986,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      ! XBeach uses same input for Van Rijn, 1993 (quasi 3d), but doesn't use this module\r\n      if (par%nz>1 .and. par%form /= FORM_VANRIJN1993) then\r\n         do j=1,s%ny+1\r\n            do i=1,s%nx+1\r\n               if (s%wetz(i,j) .eq. 1) then\r\n                  ks=12.d0*s%hh(i,j)/10.d0**(sqrt(par%g/s%cfu(i,j))/18.d0)\r\n                  tauw=par%rhoa*par%Cd*sqrt(s%windsu(i,j)**2+s%windnv(i,j)**2)\r\n                  tauwx=s%windsu(i,j)*tauw\r\n                  tauwy=s%windnv(i,j)*tauw\r\n\r\n                  call vsm_u_XB (  s%ue(i,j)    ,s%ve(i,j)    ,s%hh(i,j) ,ks  ,                &\r\n                  par%rho      ,tauwx ,tauwy ,s%thetamean(i,j)-s%alfaz(i,j),  &\r\n                  s%urms(i,j)  ,s%sigm(i,j)  ,s%k(i,j)       ,s%Dr(i,j)  ,    &\r\n                  s%E(i,j)     ,s%R(i,j)     ,fcvisc,facdel  ,par%ws     ,    &\r\n                  s%fw(i,j)    ,facdf ,swglm ,par%nz       ,s%sigz       ,    &\r\n                  s%uz(i,j,:)  ,s%vz(i,j,:)  ,s%ustz(i,j,:)  ,s%nutz(i,j,:),  &\r\n                  s%ue_sed(i,j),s%ve_sed(i,j)  )\r\n               else\r\n                  s%uz(i,j,:)=0.d0\r\n                  s%vz(i,j,:)=0.d0\r\n                  s%ustz(i,j,:)=0.d0\r\n                  s%nutz(i,j,:)=0.d0\r\n                  s%ue_sed(i,j)=0.d0\r\n                  s%ve_sed(i,j)=0.d0\r\n               endif\r\n            enddo\r\n         enddo\r\n      else\r\n         s%ue_sed=s%ue\r\n         s%ve_sed=s%ve\r\n      endif\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/morphevolution.F90",
+          "sha256": "765f474008f7cb843353dc0790cc3f3ebdc00631353da7592e2bb0508e968391",
+          "line_start": 52,
+          "line_end": 58,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "      real*8,dimension(:),allocatable,save     :: chain,cumchain\r\n      real*8,dimension(:,:),allocatable,save   :: vmag2,uau,uav,um,vm,ueu_sed,uev_sed,veu_sed,vev_sed\r\n      real*8,dimension(:,:),allocatable,save   :: ccvt,dcdz,dsigt,aref\r\n      real*8,dimension(:,:),allocatable,save   :: cc,ccb,cu,cv,Sus,Svs\r\n      real*8,dimension(:,:),allocatable,save   :: cub,cvb,Sub,Svb,pbbedu,pbbedv\r\n      real*8,dimension(:,:),allocatable,save   :: suq3d,svq3d,eswmax,eswbed,sigs,deltas\r\n      real*8,dimension(:,:,:),allocatable,save :: dsig,ccv,sdif,cuq3d,cvq3d,fac\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/morphevolution.F90",
+          "sha256": "765f474008f7cb843353dc0790cc3f3ebdc00631353da7592e2bb0508e968391",
+          "line_start": 91,
+          "line_end": 107,
+          "line_numbering": "physical LF-delimited raw bytes; CR retained in quote_exact_utf8",
+          "quote_exact_utf8": "         allocate(ccvt (s%nx+1,s%ny+1))\r\n         allocate(dcdz (s%nx+1,s%ny+1))\r\n         allocate(dsigt (s%nx+1,s%ny+1))\r\n         allocate(dsig(s%nx+1,s%ny+1,par%kmax))\r\n         allocate(ccv(s%nx+1,s%ny+1,par%kmax))\r\n         allocate(sdif(s%nx+1,s%ny+1,par%kmax))\r\n         allocate(um (s%nx+1,s%ny+1))\r\n         allocate(vm (s%nx+1,s%ny+1))\r\n         allocate(deltas(s%nx+1,s%ny+1))\r\n         allocate(sigs(s%nx+1,s%ny+1))\r\n         allocate(eswmax(s%nx+1,s%ny+1))\r\n         allocate(eswbed(s%nx+1,s%ny+1))\r\n         allocate(suq3d(s%nx+1,s%ny+1))\r\n         allocate(svq3d(s%nx+1,s%ny+1))\r\n         allocate(cuq3d(s%nx+1,s%ny+1,par%kmax))\r\n         allocate(cvq3d(s%nx+1,s%ny+1,par%kmax))\r\n         allocate(aref(s%nx+1,s%ny+1))\r"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "This artifact traces connected runtime physics in the specified xbeachlibrary snapshot. It does not supersede closure dispositions, raw files, canonical notes, HG decisions or crosswalks.",
+    "Exact physical-unit interpretation follows variables.def and in-code comments. Where those disagree with executable use, the discrepancy is retained rather than silently normalized.",
+    "Embedded help/JAR materials being inventoried by the parent task are not used to close or override these source-derived edges."
+  ]
+}

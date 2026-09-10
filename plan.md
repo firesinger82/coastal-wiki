@@ -1658,3 +1658,25 @@ LLM-Wiki 4계층(L1 검색·L2 graph·L3 MCP·**L4 유지보수 루프**) 중 L4
 최종 원장의 코드-문서 대응은 Codex 검토 P1/P2 반영 후 26개 독립 문서 ID와 29개 topic 연결이다. compound ID(XH100·135·147)의 복수 근거를 JSONL/CSV에 전량 보존한다. 문서 재생성은 `immutable-baseline.json`의 git commit에 고정된 기존 master 노트를 읽으므로 설치 뒤 재실행해도 보충 절을 중복 추가하지 않는다.
 
 커밋은 기존 verified 문서 수정과 새 layer-2 문서 반영을 분리한다. `validate-layer-deps.py`의 staged scope guard를 우회하지 않고 두 커밋 모두 검사를 통과시킨 뒤 함께 푸시한다.
+
+## XBeach → FUNWAVE: 전수 판독 뒤 계산 연결성 검토 (2026-09-09 사용자 지시)
+
+사용자는 모든 자료를 사전 배제 없이 먼저 전수 판독하고, 그 뒤 파일 사이 계산 흐름의 연결성을 검토하도록 순서를 명시했다. 기존의 파일 판독·쟁점 정리·canonical 반영 완료를 모델 전체의 연결 분석 완료와 혼용하지 않는다. 순서는 XBeach, 이어서 FUNWAVE다.
+
+1. **판독 전제 재확인**: 트리 전량 파일 인벤토리와 원본 SHA를 기존 R1/R2·문서 판독 기록에 연결한다. 파일별 미판독/본문 범위 누락을 먼저 채운다. 바이너리·컨테이너는 원본 소스와 중복 관계 및 내부 자료 존재 여부를 확인하고 처리 방법을 명시하며, 단순 확장자만으로 자료를 배제하지 않는다. XBeach는 기존281 dual-read와22 문서/도해 기록을 검증·재사용한다. FUNWAVE의 과거94 코드 판독과277 분모 및 스크립트/doc 잔여를 새 인벤토리로 재조정한다.
+2. **연결 분석의 분모 고정**: 모든 판독 파일을 역할에 배치하고, 각 실행 진입점·build 구성·모드에서 실제 도달 가능한 호출 경로와 비활성 경로를 나눈다. 단일 흐름도 표본만으로 전체 완료를 선언하지 않는다. build/source-generation→input/init→time integration→boundary/halo→physics feedback→output/restart/finalize를 대상으로 한다.
+3. **상태·수치 계약**: 핵심 공유 변수마다 생성/초기화/갱신/소비 시점, 단위·부호, 배열 위치/범위, MPI 소유·halo 갱신, 시간·morfac 척도와 모드 가드를 원문에 연결한다. 문서·테스트가 설명하는 계약과 실제 호출 순서를 대조한다. 파일별 기존 findings가 다른 파일에서 중화·확대되는지 확인한다.
+4. **검증**: 원본 파일·물리LF 인용·SHA를 갖춘 edge/contract 원장, 전체파일 역할 대응, 경로·모드 커버리지 원장을 만든다. 중요한 모순은 최소 재현 또는 직접 source tracing으로 확정/축소/기각한다. 불확실성을 임의 성공 처리하지 않는다. Claude는 적대적 검토, 일반 판독·정리는 하위 Codex, 최고 난도 판단만 Astra로 배분한다.
+5. **반영과 상태**: 기존 승인103(XBeach)·38(FUNWAVE) 및 crosswalk/원본 게이트는 불변으로 보존한다. 새 분석은 별도 sidecar와 출처 기반 canonical에 반영한다. 판독완료/연결검토/쟁점검증/canonical반영/외부승인 상태를 각각 기록한다. 새 주장에 기존 사람 승인을 재사용하지 않는다. 보호된 models에는 해시 고정한 검토본만 설치하고 raw는 수정하지 않는다.
+
+산출 위치: `_staging/total-read/model-audit/XBeach/connectivity/`, FUNWAVE 판독전제 조사 `_staging/total-read/model-audit/FUNWAVE/connectivity-preflight/`. 계획 적대검토 후 반영·최종 검토를 수행하며, 이미 완료된 파일별 감사 산출물은 다시 만들지 않는다.
+
+### 계획 적대검토 반영 — thread 01a08656-89d7-7550-95d3-8fa23a091b5b
+
+계획 검토 결과 needs-attention(분모·컨테이너·순서·불변 검사)을 반영한다.
+
+- 판독 분모는 파일과 재귀 컨테이너 member의 원본 경로·SHA·크기·유형·판독 범위·근거·상태를 포함한다. 중복은 동일 SHA로만 판독 증거를 재사용한다. source 없는 실행물은 imports/strings/resources 및 source/build 대응 범위를 기록하고 내부 의미 판독 미확인은 unresolved로 남긴다. 메타데이터 조사만으로 의미 판독 완료를 올리지 않는다.
+- 연결 분모는 entry/build/mode 원장과 파일 역할 원장이다. edge 필수 필드: caller/callee, 양단 path/SHA/physical-LF, guard, build/mode, 상태와 근거. contract 필수 필드: 변수/배열, 생성·초기화·갱신·소비의 원문 위치, 단위/부호/격자/시간/halo, 모드, 미확인 항목. discovery index와 검토된 edge는 분리한다.
+- 판독 gate는 고정 입력 집합과 처리 집합 일치 및 unread/unresolved=0, 연결 gate는 모든 entry/build/mode와 도달 파일 대응 및 orphan/unknown=0이다. 미해결이 있으면 전체 완료를 선언하지 않는다. validator는 실제 원문 해시·인용과 집합을 검사한다. 단순 스키마 충족을 의미 검증으로 취급하지 않는다.
+- 기존 closure/immutable-baseline.json 292개를 시작·설치 후·종결 전에 검사한다. 기존 승인 패킷·crosswalk·게이트 변경은 허용하지 않는다. canonical 변경은 새 설치 manifest에 고정하며 기존 설치 검증 결과는 과거 snapshot으로 보존한다.
+- XBeach 판독→연결→검증→canonical→필요한 신규 HG가 완료되어야 FUNWAVE 본 판독/연결 단계로 넘어간다. 이미 시작한 FUNWAVE 읽기 전용 인벤토리는 후속 준비에 한정하며 완료 판정이나 본 분석으로 확대하지 않는다. 계획 검토의 preflight 전면 금지 제안은 준비 조사와 본 분석을 구분하는 것으로 조정했다.

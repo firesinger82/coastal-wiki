@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "scope": "Two Perl members newly discovered inside the bundled Jumpshot JAR; standalone read evidence only",
+  "phase": "phase1_supplement_read",
+  "phase2_connectivity_status": "archive members reconciled; parent full-read gate still pending",
+  "read_date": "2026-09-09",
+  "reader": "Codex /root/xbeach_lifecycle",
+  "archives": [
+    {
+      "path": "models/XBeach/raw/source_code/trunk/lib/win32/mpich/bin/jumpshot.jar",
+      "sha256": "b257b7e22cd4a1819052e0505b095f8522ec582f7111ebcfed48ac8c8754da10",
+      "member_count": 566
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/bin/jumpshot.jar",
+      "sha256": "b257b7e22cd4a1819052e0505b095f8522ec582f7111ebcfed48ac8c8754da10",
+      "member_count": 566
+    }
+  ],
+  "archive_comparison": {
+    "member_names_equal_in_order": true,
+    "archive_bytes_equal_by_sha256": true,
+    "target_member_bytes_equal": true,
+    "fact": "The Win32 and x64 paths contain byte-identical JARs, and both target Perl members are byte-identical."
+  },
+  "records": [
+    {
+      "id": "XB-EMBED-PL-001",
+      "member_path": "html/internals.pl",
+      "bytes": 5535,
+      "physical_lf_lines": 206,
+      "sha256": "395c312242bd4a457ed1f66dac9ba7b0d4258479befd591066977ba7a504c777",
+      "read_extent": "lines 1-206, complete",
+      "read_method": "Python zipfile read of member bytes, Latin-1 decode, splitlines display with 1-based physical line numbers",
+      "source_facts": [
+        "The header identifies LaTeX2HTML 2002-2-1 (1.70) and says the file associates internal original text with physical files.",
+        "The body repeatedly assigns a label key to $ref_files using $dir plus a nodeNN.html filename and sets $noresave for that key.",
+        "The final expression is 1;, the conventional true return value for a Perl file loaded with require/do."
+      ],
+      "evidence": [
+        {
+          "lines": "1-2",
+          "quote": "# LaTeX2HTML 2002-2-1 (1.70)\n# Associate internals original text with physical files."
+        },
+        {
+          "lines": "5-7",
+          "quote": "$key = q/fig:timeline_nesting_detail/;\n$ref_files{$key} = \"$dir\".q|node7.html|; \n$noresave{$key} = \"$nosave\";"
+        },
+        {
+          "lines": "201-205",
+          "quote": "$key = q/fig:pthread_sendrecv_legend/;\n$ref_files{$key} = \"$dir\".q|node34.html|; \n$noresave{$key} = \"$nosave\";\n\n1;"
+        }
+      ],
+      "role_assessment": {
+        "classification": "generated LaTeX2HTML documentation lookup data",
+        "basis": "Header and repeated hash assignments map figure/subsection identifiers to HTML nodes; there are no subroutine definitions, process launches, file writes, or XBeach model symbols in the complete member.",
+        "execution_possibility": "Syntactically loadable Perl data fragment because it consists of assignments and ends in 1;. The member itself contains no shebang or entry-point routine. Whether another Jumpshot documentation tool loads it is not established by this member alone."
+      }
+    },
+    {
+      "id": "XB-EMBED-PL-002",
+      "member_path": "html/labels.pl",
+      "bytes": 12923,
+      "physical_lf_lines": 469,
+      "sha256": "6643f70323d59c9febe30b077aa1633d403c6164fb697832687532154fd2d826",
+      "read_extent": "lines 1-469, complete",
+      "read_method": "Python zipfile read of member bytes, Latin-1 decode, splitlines display with 1-based physical line numbers",
+      "source_facts": [
+        "The first generated section maps labels to $URL/nodeNN.html through $external_labels and ends with 1; at line 205.",
+        "A second LaTeX2HTML-generated section starts at line 208 and maps the same kind of keys to printed section/table/figure numbers through $external_latex_labels.",
+        "The complete file ends with 1; at line 468."
+      ],
+      "evidence": [
+        {
+          "lines": "1-2",
+          "quote": "# LaTeX2HTML 2002-2-1 (1.70)\n# Associate labels original text with physical files."
+        },
+        {
+          "lines": "5-7",
+          "quote": "$key = q/fig:timeline_nesting_detail/;\n$external_labels{$key} = \"$URL/\" . q|node7.html|; \n$noresave{$key} = \"$nosave\";"
+        },
+        {
+          "lines": "208-214",
+          "quote": "# LaTeX2HTML 2002-2-1 (1.70)\n# labels from external_latex_labels array.\n\n\n$key = q/fig:timeline_nesting_detail/;\n$external_latex_labels{$key} = q|2.6|; \n$noresave{$key} = \"$nosave\";"
+        },
+        {
+          "lines": "464-468",
+          "quote": "$key = q/fig:pthread_sendrecv_legend/;\n$external_latex_labels{$key} = q|4.6|; \n$noresave{$key} = \"$nosave\";\n\n1;"
+        }
+      ],
+      "role_assessment": {
+        "classification": "generated LaTeX2HTML documentation lookup data",
+        "basis": "Header and all executable statements populate label lookup hashes; no XBeach solver call, MPI call, process launch, or standalone command-line body appears in the complete member.",
+        "execution_possibility": "Syntactically loadable Perl data fragment and likely consumed only in a LaTeX2HTML documentation context. The lack of shebang and entry point means this file alone does not establish direct execution."
+      }
+    }
+  ],
+  "connectivity_boundary": {
+    "source_fact": "Both files are embedded under html/ in a bundled MPICH Jumpshot archive and describe Jumpshot documentation labels.",
+    "not_established": "No source evidence in these two members connects them to XBeach initialization, stepping, BMI/Python APIs, output, or finalization.",
+    "assumption_policy": "Do not convert archive co-location into an XBeach runtime edge."
+  }
+}

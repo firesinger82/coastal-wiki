@@ -1,0 +1,180 @@
+{
+  "schema_version": 1,
+  "scope": "Critical lifecycle state contracts visible in the checked XBeach source",
+  "source_root": "models/XBeach/raw/source_code/trunk",
+  "status": "source_verified_bounded_lifecycle_findings; overall phase-2 closure withheld pending the parent full-read gate",
+  "line_basis": "1-based physical LF lines",
+  "classification_policy": {
+    "source_fact": "Directly established by the quoted source at the recorded SHA-256.",
+    "static_consequence": "A necessary consequence of the quoted code, without asserting observed runtime impact.",
+    "unresolved": "The source exposes an interface or ordering ambiguity whose intended semantics are not established in this bounded review."
+  },
+  "sources": {
+    "src/xbeachlibrary/libxbeach.F90": "1656cceb95c9d87a51b70225a725fc6e544ed56b424c97a9e2806c86f15b6696",
+    "src/xbeachlibrary/params.F90": "73648b5733a8f90a8f18cda32743bdc2ef42f649e39c521e28e06584ee63c359",
+    "src/xbeachlibrary/params.def": "1be94d981193e1ca06f00c3ff4476f1df4ae5f8ccab4e8d26d9ef171cdddfcf0",
+    "src/xbeachlibrary/initialize.F90": "9803067bd2fa4962d9e2247f6e8b5f87e18a9860802595424183994a715523cd",
+    "src/xbeachlibrary/timestep.F90": "24f600029a975b520c837bbcdb0109853df0c6d6b14b00e198d315a9230e1578",
+    "src/xbeachlibrary/xbeach_bmi.f90": "47408c2943edd5a7feff23fa0bc0b0f17f7610747044a354d55fde16232baa5b",
+    "src/xbeachlibrary/xmpi.F90": "68c0cec030f136e8edd2024248284fb43c03c171fc5f23a1496ff40d52ced140",
+    "src/xbeachlibrary/logging.F90": "bce674aa627966352d8e32b68e4503cd85fc0aa701ad40dc76f4aa8055974271",
+    "src/xbeachlibrary/loopcounters.F90": "603dd16a5d2f4766446c4c3e6d1d0dc8cc3e198e0c9b5eff973d21b2619ab7c8",
+    "src/pybeach/xbeach/libxbeach.py": "55640d609c20815d0b3cf24e0cbf42c48e7a52d8aea701f41d6e3e1c20d5027f"
+  },
+  "contracts": [
+    {
+      "id": "XB-SC-001",
+      "topic": "saved singleton model state",
+      "severity": "interface_constraint",
+      "source_fact": "The core library stores parameters, time parameters, state pointers, counters, and error as saved module variables.",
+      "static_consequence": "All exported lifecycle functions operate on one process-global model instance.",
+      "unresolved": "No second-instance or repeat-init contract is stated here; this bounded review found no lifecycle guard or deallocation/reset path in the traced core entry points.",
+      "evidence": [
+        {"path":"src/xbeachlibrary/libxbeach.F90","lines":"10-25","quote":"   implicit none\n   private\n   public executestep, outputext, final, init, getversion\n   public par, tpar, s, sglobal\n#ifdef USEMPI\n   public slocal\n#endif\n   save\n\n   type(parameters)                     :: par\n   type(timepars)                       :: tpar\n   type(spacepars), pointer             :: s\n   type(spacepars), target              :: sglobal\n   type(ship), dimension(:), pointer    :: sh\n\n   integer                              :: n,it,error"}
+      ]
+    },
+    {
+      "id": "XB-SC-002",
+      "topic": "fixed params.txt input versus BMI configuration argument",
+      "severity": "interface_mismatch",
+      "source_fact": "Core init calls all_input after a comment that names params.txt. BMI initialize converts its C configuration argument to configfile, then calls init without consuming configfile.",
+      "static_consequence": "The BMI configuration argument does not select the parameter file in this implementation.",
+      "unresolved": "A caller-side working-directory convention may have been intended, but it is not expressed by the BMI Fortran interface.",
+      "evidence": [
+        {"path":"src/xbeachlibrary/libxbeach.F90","lines":"99-104","quote":"      ! initialize time counter\n      it      = 0\n\n      ! read input from params.txt\n      params_inio = .false.\n      call all_input(par)"},
+        {"path":"src/xbeachlibrary/xbeach_bmi.f90","lines":"49-55","quote":"      character(kind=c_char), intent(in) :: c_configfile(*)\n      character(len=strlen(c_configfile)) :: configfile\n\n      ! Convert c string to fortran string\n      configfile = char_array_to_string(c_configfile)\n\n      ierr = init()"}
+      ]
+    },
+    {
+      "id": "XB-SC-003",
+      "topic": "hotstart flag read after dependency-file decision",
+      "severity": "critical_ordering",
+      "source_fact": "hotstart defaults to -123; the depfile branch tests hotstart at lines 160-167; hotstart is first read from params.txt at lines 311-315.",
+      "static_consequence": "With setbathy unequal to 1, the pre-read value -123 is unequal to 1 and the depfile is required even when params.txt later requests hotstart=1.",
+      "unresolved": "None for the static order; runtime coverage of alternative gridform/setbathy combinations is outside this ledger.",
+      "evidence": [
+        {"path":"src/xbeachlibrary/params.def","lines":"88-93","quote":"      ! [Section] Initial conditions\n      double precision                  :: zs0                      = -123                 !  [m] Inital water level\n      character(slen)                   :: zsinitfile               = 'abc'                !  [file] Name of inital water level file\n      integer                           :: hotstartflow             = -123                 !  [-] (advanced) Switch for hotstart flow conditions with pressure gradient balanced by wind and bed stress\n      integer                           :: hotstart                 = -123                 !  [-] Switch to turn on hotstart from files\n      integer                           :: hotstartfileno           = -123                 !  [-] Hotstart file number to read"},
+        {"path":"src/xbeachlibrary/params.F90","lines":"159-167","quote":"         par%posdwn= readkey_dbl('params.txt','posdwn', 1.d0,     -1.d0,     1.d0)\n         if (par%setbathy .ne. 1 .and. par%hotstart .ne. 1) then\n            par%depfile = readkey_name('params.txt','depfile',required=.true.)\n            call check_file_exist(par%depfile)\n            call check_file_length(par%depfile,par%nx+1,par%ny+1)\n         else\n            !par%depfile = readkey_name('params.txt','depfile')\n            ! don't read this file\n         endif"},
+        {"path":"src/xbeachlibrary/params.F90","lines":"311-315","quote":"      par%hotstartflow = readkey_int ('params.txt','hotstartflow',    0,        0,     1,strict=.true.,silent=.true.)\n      par%hotstart = readkey_int ('params.txt','hotstart',    0,        0,     1,strict=.true.,silent=.true.)\n      if (par%hotstart==1) then\n         par%hotstartfileno = readkey_int ('params.txt','hotstartfileno', 0, 0,999,required=.true.)\n      endif"}
+      ]
+    },
+    {
+      "id": "XB-SC-004",
+      "topic": "hotstart velocity overwrite during init",
+      "severity": "critical_state_loss",
+      "source_fact": "hotstart_init_1 reads uu and vv, core init then calls flow_init, and flow_init zeros uu and vv. hotstart_init_2 restores optional subsystem arrays and mean velocities but has no uu/vv read.",
+      "static_consequence": "The uu/vv values read by hotstart_init_1 do not survive flow_init on the traced initialization path.",
+      "unresolved": "Whether a later untraced calculation is intended to reconstruct an equivalent velocity state is not established by these hotstart routines.",
+      "evidence": [
+        {"path":"src/xbeachlibrary/libxbeach.F90","lines":"163-188","quote":"      if (xmaster) then\n         if(par%hotstart==1) then\n            call hotstart_init_1(s,par)\n         endif\n      endif\n      call setbathy_init      (s,par)\n      ! initialize physics\n      call readtide           (s,par)\n      call readwind           (s,par)\n      call flow_init          (s,par)\n      call discharge_init     (s,par)\n      call drifter_init       (s,par)\n      call wave_init          (s,par)\n      call gw_init            (s,par)\n      call rainfall_init      (s,par)\n      ! TODO, fix ordening of arguments....\n      call sed_init           (s,par)\n      call ship_init          (s,par,sh)   ! always need to call initialise in order\n      ! to reserve memory on MPI subprocesses.\n      ! Note: if par%ships==0 then don't allocate\n      ! and read stuff for sh structures\n      call veggie_init         (s,par)\n      !\n      if (xmaster) then\n         if(par%hotstart==1) then\n            call hotstart_init_2(s,par)"},
+        {"path":"src/xbeachlibrary/initialize.F90","lines":"1706-1711","quote":"      ! all models\n      call lowlevel_read_hotstart_2d(s%zs,s%nx,s%ny,'zs',par%hotstartfileno)\n      call lowlevel_read_hotstart_2d(s%zb,s%nx,s%ny,'zb',par%hotstartfileno)\n      call lowlevel_read_hotstart_2d(s%uu,s%nx,s%ny,'uu',par%hotstartfileno)\n      call lowlevel_read_hotstart_2d(s%vv,s%nx,s%ny,'vv',par%hotstartfileno)\n      s%zb0 = s%zb"},
+        {"path":"src/xbeachlibrary/initialize.F90","lines":"1037-1051","quote":"      ! R+L: Why are these variable reinitialise?\n      s%dzsdt=0.d0\n      s%dzsdx=0.d0\n      s%dzsdy=0.d0\n      s%dzbdt=0.d0\n      s%uu=0.d0\n      s%u=0.d0\n      s%vv=0.d0\n      s%v=0.d0\n      s%vu=0.d0\n      s%uv=0.d0\n      s%ueu=0.d0\n      s%vev=0.d0\n      s%qx=0.d0\n      s%qy=0.d0"},
+        {"path":"src/xbeachlibrary/initialize.F90","lines":"1773-1777","quote":"      ! umean and vmean\n      if ((par%flow==1).or.(par%wavemodel==WAVEMODEL_NONH)) then\n         call lowlevel_read_hotstart_2d(s%umean,s%nx,s%ny,'umean',par%hotstartfileno)\n         call lowlevel_read_hotstart_2d(s%vmean,s%nx,s%ny,'vmean',par%hotstartfileno)\n      endif"}
+      ]
+    },
+    {
+      "id": "XB-SC-005",
+      "topic": "hotstart time origin",
+      "severity": "semantic_ambiguity",
+      "source_fact": "timestep_init sets par%t to zero unconditionally before the later hotstart calls; the two hotstart routines traced in XB-SC-004 do not read par%t.",
+      "static_consequence": "The lifecycle starts its time counter at zero even on the hotstart path represented by these routines.",
+      "unresolved": "The source does not establish whether hotstart files are intentionally re-based to t=0 or should restore an absolute/model time.",
+      "evidence": [
+        {"path":"src/xbeachlibrary/timestep.F90","lines":"143-157","quote":"      ! initialize the time to 0\n      par%t = 0.0d0\n\n      tpar%tnext = 0.0d0\n      ! initialize timestep counters\n      tpar%itg = 0\n      tpar%itp = 0\n      tpar%itm = 0\n      tpar%itw = 0\n      ! initialize output, default no output\n      tpar%outputg = .FALSE.\n      tpar%outputp = .FALSE.\n      tpar%outputm = .FALSE.\n      tpar%outputw = .FALSE.\n      tpar%output  = .FALSE."}
+      ]
+    },
+    {
+      "id": "XB-SC-006",
+      "topic": "time/output schedule precedes physics update",
+      "severity": "temporal_contract",
+      "source_fact": "executestep computes wet cells, calls timestep, updates output-time flags, then runs boundary conditions and physics. timestep advances and possibly clamps par%t before returning.",
+      "static_consequence": "Physics executed in a step observes the already advanced par%t and output schedule.",
+      "unresolved": "Whether arrays after physics semantically represent the advanced time or an update from the prior time requires solver-specific temporal conventions beyond this lifecycle trace.",
+      "evidence": [
+        {"path":"src/xbeachlibrary/libxbeach.F90","lines":"283-305","quote":"         ! determine this time step's wet points\n         call compute_wetcells(s,par)\n         !\n         ! determine time step\n         call timestep(s,par,tpar,it,dt=dt,ierr=error)\n         call outputtimes_update(par, tpar)\n\n         ! update log\n         call log_progress(par)\n\n         if (error==0) then\n            !\n            ! Boundary conditions\n            call wave_bc        (sglobal,s,par)\n            if (par%gwflow==1)                                      call gw_bc          (s,par)\n            if ((par%flow==1).or.(par%wavemodel==WAVEMODEL_NONH))   call flow_bc        (s,par)\n            !\n            ! Compute timestep\n            if (par%ships==1)                                       call shipwave       (s,par,sh)\n            if (par%swave==1)                                       call wave           (s,par)\n            if (par%vegetation==1)                                  call vegatt         (s,par)\n            if (par%gwflow==1)                                      call gwflow         (s,par)\n            if ((par%flow==1).or.(par%wavemodel==WAVEMODEL_NONH))   call flow           (s,par)"},
+        {"path":"src/xbeachlibrary/timestep.F90","lines":"710-718","quote":"      call compute_dt(s,par, tpar, it, ilim, jlim, dtref, dt=dt, ierr=ierr,limtypeout=limtype)\n\n      par%t=par%t+par%dt\n\n      if(par%t >= tpar%tnext) then\n         par%dt  = par%dt-(par%t-tpar%tnext)\n         par%t   = tpar%tnext\n         it      = it+1\n      end if"}
+      ]
+    },
+    {
+      "id": "XB-SC-007",
+      "topic": "step and output error propagation",
+      "severity": "critical_interface_contract",
+      "source_fact": "executestep suppresses physics when error is nonzero, but then always increments n and returns 0. outputext assigns a result only for error 0 or 1.",
+      "static_consequence": "Callers cannot learn the timestep error from executestep's return value; an error outside {0,1} leaves outputext's function result unassigned on that path.",
+      "unresolved": "The traced timestep routine sets only 0 or 1, but this does not prove every possible producer of saved error is restricted to those values across re-entry or future changes.",
+      "evidence": [
+        {"path":"src/xbeachlibrary/libxbeach.F90","lines":"293-316","quote":"         if (error==0) then\n            !\n            ! Boundary conditions\n            call wave_bc        (sglobal,s,par)\n            if (par%gwflow==1)                                      call gw_bc          (s,par)\n            if ((par%flow==1).or.(par%wavemodel==WAVEMODEL_NONH))   call flow_bc        (s,par)\n            !\n            ! Compute timestep\n            if (par%ships==1)                                       call shipwave       (s,par,sh)\n            if (par%swave==1)                                       call wave           (s,par)\n            if (par%vegetation==1)                                  call vegatt         (s,par)\n            if (par%gwflow==1)                                      call gwflow         (s,par)\n            if ((par%flow==1).or.(par%wavemodel==WAVEMODEL_NONH))   call flow           (s,par)\n            if (par%ndrifter>0)                                     call drifter        (s,par)\n            if (par%sedtrans==1)                                    call transus        (s,par)\n            !\n            ! Bed level update\n            if ((par%morphology==1).and.(.not. par%setbathy==1)) call bed_update(s,par)\n            if (par%setbathy==1)     call setbathy_update(s, par)\n         endif\n      endif\n\n      n = n + 1\n      executestep = 0"},
+        {"path":"src/xbeachlibrary/libxbeach.F90","lines":"228-237","quote":"   integer(c_int) function outputext()\n      use output_module,        only: output, output_error\n      ! store first timestep\n      call output(sglobal,s,par,tpar,.false.)\n      if(error==0) then\n         outputext = 0\n      elseif(error==1) then\n         call output_error(s,sglobal,par,tpar)\n         outputext = 1\n      endif"},
+        {"path":"src/xbeachlibrary/timestep.F90","lines":"756-760","quote":"         if (tpar%outputh) tpar%tph=min(tpar%tph,par%t)\n         tpar%output = (tpar%outputg .or. tpar%outputp .or. tpar%outputm  .or. tpar%outputh)\n         if (present(ierr)) then\n            ierr = 1\n         endif"}
+      ]
+    },
+    {
+      "id": "XB-SC-008",
+      "topic": "BMI update return overwrite",
+      "severity": "interface_mismatch",
+      "source_fact": "BMI update stores executestep's result in ierr and then unconditionally overwrites ierr with outputext's result.",
+      "static_consequence": "BMI update returns only the later outputext status.",
+      "unresolved": "None for the assignment order.",
+      "evidence": [
+        {"path":"src/xbeachlibrary/xbeach_bmi.f90","lines":"67-76","quote":"      if (dt >= 0) then\n         ierr = executestep(dt)\n      else\n         ierr = executestep()\n      end if\n\n      ! enable output to be able to use aggregated variable values (min,\n      ! max, mean, var) through BMI. user can still control output\n      ! through params.txt file\n      ierr = outputext()"}
+      ]
+    },
+    {
+      "id": "XB-SC-009",
+      "topic": "BMI time-step getter has model and collective side effects",
+      "severity": "interface_constraint",
+      "source_fact": "get_time_step creates fresh local counters/reference values, calls compute_dt with par as intent(inout), then returns par%dt. compute_dt imports xmpi_module.",
+      "static_consequence": "The getter recomputes and mutates par%dt and follows compute_dt's compute-rank/MPI behavior rather than being a pure scalar read.",
+      "unresolved": "Host coupling code must establish whether every MPI rank calls this getter consistently; no host contract is present in this tree.",
+      "evidence": [
+        {"path":"src/xbeachlibrary/xbeach_bmi.f90","lines":"178-189","quote":"   subroutine get_time_step(timestep) bind(C, name=\"get_time_step\")\n      !DEC$ ATTRIBUTES DLLEXPORT :: get_time_step\n\n      real(c_double) :: timestep\n      integer :: ilim = 0\n      integer :: jlim = 0\n      integer :: it = 0\n      real*8 :: dtref = 0.d0\n\n      call compute_dt(s,par, tpar, it, ilim, jlim, dtref)\n      timestep = par%dt\n   end subroutine get_time_step"},
+        {"path":"src/xbeachlibrary/timestep.F90","lines":"416-440","quote":"   subroutine compute_dt(s,par, tpar, it, ilim, jlim, dtref, dt, ierr, limtypeout)\n      use params,         only: parameters\n      use spaceparams\n      use xmpi_module\n      use logging_module\n      use paramsconst\n\n      IMPLICIT NONE\n\n      type(spacepars), intent(inout)   :: s\n      type(parameters), intent(inout)  :: par\n      type(timepars), intent(inout)    :: tpar\n      integer, intent(inout)           :: it\n      integer, intent(out), optional   :: ierr,limtypeout\n      real*8, intent(in), optional :: dt\n      real*8, intent(inout) :: dtref\n      integer, intent(inout) :: ilim, jlim\n      integer                     :: i\n      integer                     :: j,j1,j2\n      integer                     :: n,limtype\n      real*8                              :: mdx,mdy,tny\n      real*8,save                         :: dtold\n      real*8                              :: celeru\n\n      if(.not. xcompute) return"},
+        {"path":"src/xbeachlibrary/timestep.F90","lines":"661-673","quote":"      if (dtref .eq. 0.0d0) then\n         ! If dtref is not yet set.\n         dtref = par%dt\n#ifdef USEMPI\n         ! Use the same dtref everywhere.\n         call xmpi_allreduce(dtref,MPI_MIN)\n#endif\n      end if\n\n      ! wwvv: In the mpi version par%dt will be calculated different\n      ! on different processes. So, we take the minimum of all dt's\n#ifdef USEMPI\n      call xmpi_allreduce(par%dt,MPI_MIN)"}
+      ]
+    },
+    {
+      "id": "XB-SC-010",
+      "topic": "MPI lifecycle ownership and rank split",
+      "severity": "embedding_constraint",
+      "source_fact": "The USEMPI implementation calls MPI_Init and MPI_Finalize directly. World rank 0 is xomaster/output-only; all other ranks compute; world rank 1 is xmpi_imaster and compute rank 0 is xmaster.",
+      "static_consequence": "A USEMPI host cannot treat the library as neutral with respect to an already-owned MPI lifecycle, and at least two world ranks are required.",
+      "unresolved": "No MPI_Initialized/MPI_Finalized interoperability branch is present in the traced routines.",
+      "evidence": [
+        {"path":"src/xbeachlibrary/xmpi.F90","lines":"201-210","quote":"   subroutine xmpi_initialize\n      ! initialize mpi environment\n      implicit none\n      integer ierr,color,errhandler,r,comm_world\n      external comm_errhandler\n      ierr = 0\n      ! Message buffers in openmpi are not initialized so this call can give a vallgrind error\n      ! http://www.open-mpi.org/community/lists/users/2009/06/9566.php\n      ! http://valgrind.org/docs/manual/manual-core.html#manual-core.suppress\n      call MPI_Init(ierr)"},
+        {"path":"src/xbeachlibrary/xmpi.F90","lines":"229-251","quote":"      xmpi_ocomm = MPI_COMM_WORLD\n      call MPI_Comm_rank(xmpi_ocomm,xmpi_orank,ierr)\n      call MPI_Comm_size(xmpi_ocomm,xmpi_osize,ierr)\n      if (xmpi_osize < 2) then\n         print *,'Number of MPI processes must be 2 or greater, but is:',xmpi_osize\n         call halt_program(.false.)\n      endif\n      xmpi_omaster = 0\n      xomaster     = (xmpi_orank == xmpi_omaster)\n      xcompute     = .not. xomaster\n      !\n      ! Create the compute communicator. This will contain all\n      ! processes in xmpi_iocomm except process xmpi_master\n      !\n      color = 1\n      if(xmpi_orank == xmpi_omaster) color = 0\n      call MPI_Comm_split(xmpi_ocomm,color,1,xmpi_comm,ierr)\n      call MPI_Comm_rank(xmpi_comm,xmpi_rank,ierr)\n      call MPI_Comm_size(xmpi_comm,xmpi_size,ierr)\n      call MPI_Comm_set_name(xmpi_comm,'xmpi_comm',ierr)\n      call MPI_Comm_set_name(xmpi_ocomm,'xmpi_ocomm',ierr)\n      xmpi_master = 0\n      xmaster     = (xmpi_rank == xmpi_master)"},
+        {"path":"src/xbeachlibrary/xmpi.F90","lines":"307-312","quote":"   subroutine xmpi_finalize\n      ! ends mpi environment, collective subroutine\n      implicit none\n      integer ierr\n      call MPI_Finalize(ierr)\n   end subroutine xmpi_finalize"}
+      ]
+    },
+    {
+      "id": "XB-SC-011",
+      "topic": "finalization before enough steps",
+      "severity": "critical_finalization",
+      "source_fact": "execute_counter starts at zero and t01 is assigned only when execute_counter equals 1, before the counter increments. final always passes n and t01 to writelog_finalize in USEMPI, where t/n and duration/.../n are evaluated.",
+      "static_consequence": "Finalizing with zero executed steps divides by zero in logging; under USEMPI, finalizing before the second executestep also supplies an unassigned t01 to the MPI loop-time expression.",
+      "unresolved": "The standalone driver normally steps while t<tstop, but exported BMI/dynamic callers can choose a shorter lifecycle and no guard is visible here.",
+      "evidence": [
+        {"path":"src/xbeachlibrary/loopcounters.F90","lines":"1-7","quote":"module loopcounters_module\n   implicit none\n   private\n   save\n   public execute_counter\n   integer :: execute_counter = 0\nend module loopcounters_module"},
+        {"path":"src/xbeachlibrary/libxbeach.F90","lines":"269-276","quote":"#ifdef USEMPI\n      if (execute_counter .eq. 1) then\n         ! exclude first pass from time measurement\n         call xmpi_barrier\n         t01 = MPI_Wtime()\n      endif\n#endif\n      execute_counter = execute_counter + 1"},
+        {"path":"src/xbeachlibrary/libxbeach.F90","lines":"330-339","quote":"#ifdef USEMPI\n      end_program = .true.\n      call xmpi_send_sleep(xmpi_imaster,xmpi_omaster) ! wake up omaster\n      call xmpi_bcast(end_program,toall)\n      call xmpi_barrier(toall)\n      call writelog_finalize(tbegin,n,par%t,par%nx,par%ny,t0,t01)\n      call xmpi_finalize\n#else\n      call writelog_finalize(tbegin,n,par%t,par%nx,par%ny)\n#endif"},
+        {"path":"src/xbeachlibrary/logging.F90","lines":"302-320","quote":"      if (xmaster) then\n\n         call cpu_time(tend)\n\n         duration    = tend-tbegin\n         dt          = t/n\n         performance = duration/(nx+1)/(ny+1)/n\n\n         call writelog('ls','','Duration   : ',duration,' seconds'       )\n         call writelog('ls','','Timesteps  : ',n                         )\n         call writelog('ls','','Average dt : ',dt,' seconds'             )\n         call writelog('ls','','Unit speed : ',performance,' seconds/1'  )\n\n#ifdef USEMPI\n         if (present(t0) .and. present(t01)) then\n            t1 = MPI_Wtime()\n            call writelog('ls','','MPI timing : procs      : ',xmpi_size                )\n            call writelog('ls','','             seconds    : total : ',t1-t0, ' seconds')\n            call writelog('ls','','                          loop  : ',t1-t01,' seconds')"}
+      ]
+    },
+    {
+      "id": "XB-SC-012",
+      "topic": "Python wrapper cleanup does not invoke native finalization",
+      "severity": "critical_interface_contract",
+      "source_fact": "The Python constructor changes process cwd and remembers olddir. Its finalize method unloads the shared library and resets only shouldinitialize; it does not call self._lib.finalize() or restore olddir.",
+      "static_consequence": "Using this wrapper's finalize bypasses core log/MPI finalization and leaves the process working directory changed.",
+      "unresolved": "The wrapper may have been intended for serial experiments with process teardown, but that restriction is not encoded in the class.",
+      "evidence": [
+        {"path":"src/pybeach/xbeach/libxbeach.py","lines":"51-60","quote":"    def __init__(self, libpath, workingdir=None):\n        self.olddir = os.getcwd()\n        if workingdir is None:\n            self.workingdir = os.getcwd()\n        else:\n            self.workingdir = workingdir\n        os.chdir(self.workingdir)\n        self.libpath = os.path.abspath(libpath)\n        self._lib = CDLL(self.libpath)\n        self.shouldinitialize = True"},
+        {"path":"src/pybeach/xbeach/libxbeach.py","lines":"278-289","quote":"    def finalize(self):\n        logger.debug('Explicitly deleting library at {}'.format(self._lib))\n        handle = self._lib._handle\n        del self._lib\n        logger.debug('Checking if %s is loaded %s', self.libpath, isloaded(self.libpath))\n        while isloaded(self.libpath):\n            dlclose(handle)\n            logger.debug('Checking if %s is loaded %s', self.libpath, isloaded(self.libpath))\n        # openfiles = subprocess.check_output(['lsof', '-p', str(os.getpid())])\n        # logger.debug('Open files:\\n%s',  openfiles)\n        # reset the init method\n        self.shouldinitialize = True"}
+      ]
+    }
+  ],
+  "cross_version_resolution": {
+    "historical_document_fact": "The 2008 parallelization report describes a master performing input/output and does not describe the current distinct output-only world rank.",
+    "current_source_fact": "At the checked source SHA, xmpi.F90 assigns world rank 0 to xomaster and world rank 1 to xmpi_imaster, while compute rank 0 is xmaster.",
+    "adjudication": "Treat the report as historical design context and the current source/build manifests as authoritative for this ledger. This is version drift, not evidence that both current topologies execute simultaneously."
+  }
+}
