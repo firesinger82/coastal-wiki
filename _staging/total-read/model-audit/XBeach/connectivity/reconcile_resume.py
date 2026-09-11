@@ -261,6 +261,13 @@ def main():
         assert sha(ROOT / artifact['path']) == artifact['sha256']
     for item in full_docx['records']:
         supplement(item['source'], layout_name, item['read_status'], layout['limitations'])
+    nudge_name = 'manuals-docx-read/native-nudge-survey.json'
+    nudge = read(nudge_name)
+    for key in ('prior_receipt', 'generator', 'decoder'):
+        artifact = nudge[key]
+        assert sha(ROOT / artifact['path']) == artifact['sha256']
+    for item in full_docx['records']:
+        supplement(item['source'], nudge_name, item['read_status'], nudge['limitations'])
     formula_name = 'workbook-formula-read.json'
     if (HERE / formula_name).is_file():
         formula = read(formula_name)
