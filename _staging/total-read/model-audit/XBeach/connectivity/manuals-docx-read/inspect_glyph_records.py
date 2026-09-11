@@ -1,0 +1,93 @@
+"""Bounded MTEF5 structure/character reader for four selected equations.
+
+Uses the previously consulted Wiris MTEF5 record specification. Does not render
+equations or infer the mathematical intent of stored characters. Unsupported
+records/options fail closed. OLE prefix and explicit body offset are caller data.
+"""
+import hashlib
+import importlib.util
+from pathlib import Path
+
+
+def inspect(data, body_offset=220):
+    spec = importlib.util.spec_from_file_location('empty_prefix', Path(__file__).with_name('inspect_empty_native.py'))
+    prefix = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(prefix)
+    # Validate the entire settings prefix with a synthetic top-level terminator.
+    # This result is NOT evidence that the actual equation is empty.
+    settings = prefix.inspect(data[:body_offset] + b'\x00', 28)
+    pos = body_offset
+    chars = []
+
+    def byte():
+        nonlocal pos
+        if pos >= len(data):
+            raise ValueError('truncated at ' + str(pos))
+        v = data[pos]
+        pos += 1
+        return v
+
+    def word():
+        return byte() | byte() << 8
+
+    def objects(depth=0):
+        if depth > 64:
+            raise ValueError('nesting too deep')
+        nodes = []
+        while True:
+            start = pos
+            tag = byte()
+            node = {'offset': start, 'tag': tag}
+            if tag == 0:
+                nodes.append({**node, 'end_offset': pos})
+                return nodes
+            if 10 <= tag <= 14:
+                node['size_code'] = tag - 10
+            elif tag in (1, 2, 3, 4):
+                options = byte()
+                node['options'] = options
+                allowed = {1: 1, 2: 0x36, 3: 0, 4: 0}[tag]
+                if options & ~allowed:
+                    raise ValueError(f'unsupported options {options} at {start}')
+                if tag == 1:
+                    if not options & 1:
+                        node['children'] = objects(depth+1)
+                elif tag == 2:
+                    face = byte()
+                    node['typeface'] = word() - 32768 if face == 255 else face - 128
+                    if not options & 32:
+                        node['mtcode'] = word()
+                    if options & 4 and options & 16:
+                        raise ValueError('mutually exclusive font encodings')
+                    if options & 4:
+                        node['font_position'] = byte()
+                    if options & 16:
+                        node['font_position'] = word()
+                    if 'mtcode' not in node:
+                        raise ValueError('font-only character unsupported')
+                    chars.append(node)
+                elif tag == 3:
+                    node['selector'] = byte()
+                    variation = byte()
+                    node['variation'] = (variation & 127) | byte() << 8 if variation & 128 else variation
+                    node['template_options'] = byte()
+                    node['children'] = objects(depth+1)
+                else:
+                    node['horizontal_alignment'] = byte()
+                    node['vertical_alignment'] = byte()
+                    node['children'] = objects(depth+1)
+            else:
+                raise ValueError(f'unsupported record {tag} at {start}')
+            node['end_offset'] = pos
+            nodes.append(node)
+
+    tree = objects()
+    if pos != len(data):
+        raise ValueError('trailing bytes')
+    return {'stream_sha256': hashlib.sha256(data).hexdigest(), 'stream_bytes': len(data),
+            'body_offset': body_offset, 'prefix_validation': {
+                'method': 'settings bytes followed by a synthetic END for prefix validation only',
+                'application_key': settings['application_key'], 'header': settings['header'],
+                'settings_records': settings['records'][:-1]},
+            'tree': tree, 'characters': chars,
+            'scope': 'Stored record structure and MTCode values only; no general mathematical interpretation or font rendering equivalence.'}

@@ -223,6 +223,17 @@ def main():
             assert sha(ROOT / artifact['path']) == artifact['sha256']
     for item in full_docx['records']:
         supplement(item['source'], native_name, item['read_status'], native['limitations'])
+    glyph_name = 'manuals-docx-read/glyph-record-read/receipt.json'
+    glyph = read(glyph_name)
+    assert glyph['whole_model_read_gate'] == 'NOT_PASSED' and glyph['human_approval_issued'] is False
+    for artifact in [glyph['prior_receipt'], glyph['decoder'], glyph['prefix_decoder']]:
+        assert sha(ROOT / artifact['path']) == artifact['sha256']
+    for item in glyph['records']:
+        assert sha(ROOT / item['source']['path']) == item['source']['sha256']
+        for artifact in item['artifacts'].values():
+            assert sha(ROOT / artifact['path']) == artifact['sha256']
+    for item in full_docx['records']:
+        supplement(item['source'], glyph_name, item['read_status'], glyph['limitations'])
     formula_name = 'workbook-formula-read.json'
     if (HERE / formula_name).is_file():
         formula = read(formula_name)

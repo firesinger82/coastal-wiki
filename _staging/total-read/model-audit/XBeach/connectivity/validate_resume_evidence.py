@@ -358,6 +358,10 @@ def main():
     native_probe_checks = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(native_probe_checks)
     checks.extend(native_probe_checks.validate(ROOT, HERE / 'manuals-docx-read'))
+    spec = importlib.util.spec_from_file_location('glyph_checks', HERE / 'manuals-docx-read/validate_glyph_records.py')
+    glyph_checks = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(glyph_checks)
+    checks.extend(glyph_checks.validate(ROOT, HERE / 'manuals-docx-read'))
     reconciliation = json.loads((HERE / 'resume-reconciliation.json').read_text())
     check('reconciliation-input-bindings', all(digest(ROOT / p) == h for p, h in reconciliation['input_evidence_sha256'].items()))
     check('no-overall-or-human-pass', reconciliation['whole_model_read_gate'] == 'NOT_PASSED' and
