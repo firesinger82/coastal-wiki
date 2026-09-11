@@ -16,7 +16,9 @@
 
 ## 다음 작업
 
-1. 두 매뉴얼 DOCX의 **복원본 전체 시각 판독**을 이어간다. `manuals-docx-read/receipt.json`의 `display-recovered`가 다음 판독 대상이며 Kingsday 145쪽 중 6·10·18·125·145쪽, Master 148쪽 중 10·18·44·128·148쪽만 이번에 시각 확인했다. 나머지 쪽은 각 variant의 `uninspected_pages`에 명시했다. 직접 변환본과 단순 필드 제거본은 손상 비교 자료이며 최종 판독 사본으로 사용하지 않는다.
+1. 두 매뉴얼 DOCX의 복원본은 **145·148쪽 전체 시각 판독 근거를 연결했다**. 기존 5쪽씩에 신규 Kingsday 140쪽·Master 143쪽을 추가했다. `manuals-docx-read/full-visual-read/receipt.json`에 신규 이미지 283개·관측 기록·원본/최종 PDF SHA를 저장했다. 이전 `receipt.json`은 당시의 부분 판독·변환 실패 비교 기록으로 보존하며, 현재 전체 시각 범위는 새 영수증을 따른다. 다음은 **잔여 수식 충실도 확인**이다.
+   - Master p.27 (2.40)·p.28 (2.43)의 Writer 본문은 비어 있지만 원본 EMF를 별도 Draw 렌더하여 에너지 평형식과 roller 응력식을 확인했다. Kingsday p.27 (2.38)의 원본 WMF도 별도 렌더에서 빈 화면이며 OLE 해독은 미완료다. Kingsday p.25 (2.27)·p.28 (2.41)/(2.42)의 원본 문단에는 수식 본체가 없고 번호 필드만 있다. 문단 XML과 preview/OLE 추출·관계 ID를 새 영수증에 저장했다. 다른 판본의 수식으로 채우지 않았다.
+   - 두 문서 p.19 작은 네모 위첨자와 Kingsday p.15의 o/0 표시, B.37/C.37의 0 뒤 a 표시, OLE 486개 원시 수식 의미 판독은 열려 있다. 모든 페이지를 보았다는 사실을 모든 글리프와 수학적 내용의 검증으로 해석하지 않는다.
    - `recover_display.py`는 원본 DOCX의 MathType 표시 인수와 중첩 SEQ/REF의 저장 결과만 읽어 Kingsday 251개, Master 265개를 복원한다. 각 원본의 빈 인수 4개는 그대로 남는다. 모든 원래 `w:t`·수식 오브젝트·본문 이외 ZIP member 바이트를 보존했다. 문서별 ZIP member 530·562개와 삽입 OLE 238·248개의 stream 해시를 저장했으나 원시 수식 의미 판독은 아니다.
    - 직접 변환 시 장 제목이 그림 번호에 들어가고 숨은 Equation/MERGEFORMAT 명령이 표시된다. 단순 필드 제거는 수식 번호와 참조를 잃는다. 세 단계의 PDF·검토 DOCX·텍스트와 진단 페이지를 저장했다. 최종 표시값 516개는 PDF에서 출현 횟수까지 검사했다.
    - Master 복원본 p.18 식 (2.1)은 본체가 비어 있다. 원본 `word/media/image13.emf`를 별도로 Draw 렌더링해 파랑작용 평형식을 확인했다. `master/equation-2-1/`의 원본 추출·PDF·이미지로 보충했으며 Writer 본문 렌더는 수정하지 않았다. Master p.10의 Figure A.1 참조/2.1 캡션 불일치와 p.128의 원래 참조 오류 2개도 보존했다. 직접 변환의 Error: 문구는 오류 소멸이 아니라 표시 변경이었다.
@@ -44,6 +46,6 @@ python3 _staging/total-read/model-audit/XBeach/connectivity/validate_resume_evid
 
 문서 오류도 판독 근거에 남겼다. Kingsday의 instat 설명과 wbctype 그림, tideloc 설명/표 불일치, Master p.125의 원본 참조 오류·반복된 A.1 표 번호, 두 판본의 bedfriccoef 기본값 차이는 구현 사실로 승격하지 않았다. 전체 PDF 시각 보충은 작은 기호의 완전 전사나 수식의 수학적 검증을 뜻하지 않는다.
 
-DOCX 표시값 복원은 `manuals-docx-read/recover_display.py SOURCE.docx REVIEW.docx EVIDENCE.json`으로 재현한다. 입력을 원본 DOCX에 결속하며 다른 판본 PDF에서 번호를 가져오지 않는다. 복원본의 나머지 ZIP member가 원본과 같은지, 저장 표시값과 원문 텍스트가 보존되는지, 모든 복원 표시값이 PDF에 남는지 검증한다. 293쪽을 렌더링한 것과 293쪽을 판독한 것은 다르다. 이번 최종본 시각 판독은 명시된 10쪽뿐이다.
+DOCX 표시값 복원은 `manuals-docx-read/recover_display.py SOURCE.docx REVIEW.docx EVIDENCE.json`으로 재현한다. 입력을 원본 DOCX에 결속하며 다른 판본 PDF에서 번호를 가져오지 않는다. 복원본의 나머지 ZIP member가 원본과 같은지, 저장 표시값과 원문 텍스트가 보존되는지, 모든 복원 표시값이 PDF에 남는지 검증한다. 이전 최종본 10쪽 부분 판독에 이번 283쪽을 더해 293쪽 전체 시각 확인을 연결했다. 이전 영수증을 덮어쓰지 않았으며, 새 영수증은 원본 DOCX 및 동일 최종 PDF에 결속된다. Kingsday p.63·Master p.62 의사결정도는 회전해 확인했다.
 
-validator의 270개 PASS는 구조·원본 SHA·이미지 SHA·입력 집합·필드 복원 재현·PDF 텍스트/쪽 수 결속·기존 보고서 중간/최종 본문 픽셀 일치 검증만 뜻한다. 독립 의미 검증이나 사람 승인이 아니다. 이전 사람 승인·crosswalk·closure 기록은 그대로 보존했다.
+validator의 306개 PASS는 구조·원본 SHA·이미지 SHA·입력 집합·필드 복원 재현·PDF 텍스트/쪽 수 결속·DOCX 신규 페이지 집합/관측·회전도 픽셀·보충 preview/OLE 및 빈 문단 원본 결속·기존 보고서 중간/최종 본문 픽셀 일치 검증만 뜻한다. 독립 의미 검증이나 사람 승인이 아니다. 이전 사람 승인·crosswalk·closure 기록은 그대로 보존했다.

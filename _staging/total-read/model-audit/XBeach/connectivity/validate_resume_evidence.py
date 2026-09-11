@@ -284,6 +284,76 @@ def main():
               package.read(eq['preview_member']) == (ROOT / eq['artifacts']['emf']['path']).read_bytes() and
               package.read(eq['ole_member']) == (ROOT / eq['artifacts']['bin']['path']).read_bytes())
     check('docx-no-gate-pass', docx_review['whole_model_read_gate'] == 'NOT_PASSED' and docx_review['human_approval_issued'] is False)
+    full_docx = json.loads((HERE / 'manuals-docx-read/full-visual-read/receipt.json').read_text())
+    check('docx-full-prior-receipt-binding', full_docx['prior_receipt'] == {
+        'path': str((HERE / 'manuals-docx-read/receipt.json').relative_to(ROOT)),
+        'sha256': digest(HERE / 'manuals-docx-read/receipt.json')})
+    check('docx-full-two-independent-sources', [r['source'] for r in full_docx['records']] ==
+          [r['source'] for r in docx_review['records']])
+    for record, prior in zip(full_docx['records'], docx_review['records'], strict=True):
+        label = record['work_id'] + '-docx-full'
+        final = prior['variants'][-1]
+        check(label + '-render-binding', record['render_pdf'] == final['artifacts']['pdf'] and
+              digest(ROOT / record['render_pdf']['path']) == record['render_pdf']['sha256'] and
+              record['render_pages'] == final['render_pages'])
+        pages = record['newly_inspected_pages']
+        check(label + '-prior-and-new-coverage', record['prior_inspected_pages'] == final['visually_inspected_pages'] and
+              pages == final['uninspected_pages'] and
+              [p['physical_render_page'] for p in record['page_records']] == pages and
+              sorted(pages + record['prior_inspected_pages']) == record['combined_inspected_pages'] ==
+              list(range(1, record['render_pages'] + 1)) and not record['uninspected_pages'])
+        check(label + '-observations-cover-new-pages', sorted(p for n in record['observations']
+              for p in n['physical_render_pages']) == pages and all(n['observation'] for n in record['observations']))
+        check(label + '-page-image-hashes', all(digest(ROOT / a['path']) == a['sha256'] for a in record['page_records']))
+        rotated = record['rotated_diagram']
+        original = next(p for p in record['page_records'] if p['physical_render_page'] == rotated['physical_render_page'])
+        with Image.open(ROOT / original['path']) as a, Image.open(ROOT / rotated['path']) as b:
+            check(label + '-rotated-diagram-pixels', digest(ROOT / rotated['path']) == rotated['sha256'] and
+                  a.rotate(-90, expand=True).tobytes() == b.tobytes())
+        with tempfile.TemporaryDirectory() as scratch:
+            for page in (record['page_records'][0], record['page_records'][-1]):
+                n = str(page['physical_render_page'])
+                output = Path(scratch) / n
+                subprocess.run(['pdftoppm', '-f', n, '-l', n, '-singlefile', '-scale-to', '1800', '-png',
+                                str(ROOT / record['render_pdf']['path']), str(output)], check=True)
+                check(label + '-rendered-endpoint-' + n, digest(output.with_suffix('.png')) == page['sha256'])
+        check(label + '-qualified-coverage', record['read_status'] == 'all-render-pages-inspected-with-unresolved-docx-fidelity' and
+              any('undecoded Equation Native' in x for x in record['limitations']))
+    source_ns = dict(ns, w14='http://schemas.microsoft.com/office/word/2010/wordml',
+                     v='urn:schemas-microsoft-com:vml', o='urn:schemas-microsoft-com:office:office',
+                     r='http://schemas.openxmlformats.org/officeDocument/2006/relationships')
+    check('docx-full-three-preview-supplements', [(r['equation_label'], r['physical_render_page'])
+          for r in full_docx['equation_supplements']] == [('2.40', 27), ('2.43', 28), ('2.38', 27)])
+    for item in full_docx['equation_supplements']:
+        label = 'docx-preview-' + item['equation_label']
+        artifacts = item['artifacts']
+        check(label + '-hashes', digest(ROOT / item['source']['path']) == item['source']['sha256'] and
+              all(digest(ROOT / a['path']) == a['sha256'] for a in artifacts.values()))
+        with zipfile.ZipFile(ROOT / item['source']['path']) as package:
+            relationships = {n.get('Id'): n.get('Target') for n in etree.fromstring(package.read('word/_rels/document.xml.rels'))}
+            root = etree.fromstring(package.read('word/document.xml'))
+            p = root.xpath('//w:p[@w14:paraId="' + item['paragraph_id'] + '"]', namespaces=source_ns)[0]
+            check(label + '-paragraph-and-relationships', etree.tostring(p) == (ROOT / artifacts['paragraph']['path']).read_bytes() and
+                  p.xpath('.//v:imagedata/@r:id', namespaces=source_ns) == [item['preview_relationship']] and
+                  p.xpath('.//o:OLEObject/@r:id', namespaces=source_ns) == [item['ole_relationship']] and
+                  p.xpath('.//o:OLEObject/@ProgID', namespaces=source_ns) == [item['prog_id']] and
+                  'word/' + relationships[item['preview_relationship']] == item['preview_member'] and
+                  'word/' + relationships[item['ole_relationship']] == item['ole_member'])
+            check(label + '-exact-source-bytes', package.read(item['preview_member']) == (ROOT / artifacts['preview']['path']).read_bytes() and
+                  package.read(item['ole_member']) == (ROOT / artifacts['ole']['path']).read_bytes())
+        check(label + '-ole-not-claimed-decoded', item['ole_semantically_decoded'] is False)
+    check('docx-full-three-source-empty-paragraphs', [r['equation_label'] for r in full_docx['source_empty_paragraphs']] ==
+          ['2.27', '2.41', '2.42'])
+    for item in full_docx['source_empty_paragraphs']:
+        with zipfile.ZipFile(ROOT / item['source']['path']) as package:
+            p = etree.fromstring(package.read('word/document.xml')).xpath(
+                '//w:p[@w14:paraId="' + item['paragraph_id'] + '"]', namespaces=source_ns)[0]
+            a = item['artifact']
+            check('docx-source-empty-' + item['equation_label'], digest(ROOT / item['source']['path']) == item['source']['sha256'] and
+                  digest(ROOT / a['path']) == a['sha256'] and etree.tostring(p) == (ROOT / a['path']).read_bytes() and
+                  not p.xpath('.//w:object | .//w:drawing | .//w:pict | .//*[local-name()="oMath"]', namespaces=source_ns))
+    check('docx-full-not-semantic-or-human-pass', full_docx['whole_model_read_gate'] == 'NOT_PASSED' and
+          full_docx['human_approval_issued'] is False)
     reconciliation = json.loads((HERE / 'resume-reconciliation.json').read_text())
     check('reconciliation-input-bindings', all(digest(ROOT / p) == h for p, h in reconciliation['input_evidence_sha256'].items()))
     check('no-overall-or-human-pass', reconciliation['whole_model_read_gate'] == 'NOT_PASSED' and

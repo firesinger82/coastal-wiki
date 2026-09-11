@@ -186,6 +186,32 @@ def main():
     for artifact in list(docx_review['equation_preview_supplement']['artifacts'].values()) + [
             docx_review['recovery_script'], docx_review['controls_only_script']]:
         assert sha(ROOT / artifact['path']) == artifact['sha256']
+    full_docx_name = 'manuals-docx-read/full-visual-read/receipt.json'
+    full_docx = read(full_docx_name)
+    assert full_docx['prior_receipt']['sha256'] == sha(HERE / docx_name)
+    assert full_docx['whole_model_read_gate'] == 'NOT_PASSED'
+    assert full_docx['human_approval_issued'] is False
+    for item, prior in zip(full_docx['records'], docx_review['records'], strict=True):
+        final = prior['variants'][-1]
+        assert item['source'] == prior['source']
+        assert item['render_pdf'] == final['artifacts']['pdf']
+        assert item['render_pages'] == final['render_pages']
+        assert item['prior_inspected_pages'] == final['visually_inspected_pages']
+        assert item['newly_inspected_pages'] == final['uninspected_pages']
+        assert [p['physical_render_page'] for p in item['page_records']] == item['newly_inspected_pages']
+        assert sorted(item['prior_inspected_pages'] + item['newly_inspected_pages']) == item['combined_inspected_pages'] == list(range(1, item['render_pages'] + 1))
+        assert not item['uninspected_pages']
+        assert sorted(p for n in item['observations'] for p in n['physical_render_pages']) == item['newly_inspected_pages']
+        for artifact in item['page_records'] + [item['rotated_diagram']]:
+            assert sha(ROOT / artifact['path']) == artifact['sha256']
+        supplement(item['source'], full_docx_name, item['read_status'], item['limitations'])
+    for item in full_docx['equation_supplements']:
+        assert sha(ROOT / item['source']['path']) == item['source']['sha256']
+        for artifact in item['artifacts'].values():
+            assert sha(ROOT / artifact['path']) == artifact['sha256']
+    for item in full_docx['source_empty_paragraphs']:
+        artifact = item['artifact']
+        assert sha(ROOT / artifact['path']) == artifact['sha256']
     formula_name = 'workbook-formula-read.json'
     if (HERE / formula_name).is_file():
         formula = read(formula_name)
