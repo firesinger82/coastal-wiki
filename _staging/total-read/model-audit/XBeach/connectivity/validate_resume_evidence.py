@@ -362,6 +362,19 @@ def main():
     glyph_checks = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(glyph_checks)
     checks.extend(glyph_checks.validate(ROOT, HERE / 'manuals-docx-read'))
+    import sys
+    sys.path.insert(0, str(HERE / 'manuals-docx-read'))
+    from survey_native import build as survey_build
+    survey = json.loads((HERE / 'manuals-docx-read/native-survey.json').read_text())
+    check('native-survey-reproduction', survey_build() == survey)
+    check('native-survey-complete-set', len(survey['records']) == 486 and
+          len({(r['document'], r['member']) for r in survey['records']}) == 486)
+    bullet = survey['kingsday_page15']
+    check('native-survey-bullet-source', bullet['text_nodes'] == [] and
+          bullet['level_format'] == 'bullet' and bullet['level_text'] == 'o' and
+          digest(ROOT / bullet['viewed_page']['path']) == bullet['viewed_page']['sha256'])
+    check('native-survey-no-pass', survey['whole_model_read_gate'] == 'NOT_PASSED' and
+          survey['human_approval_issued'] is False)
     reconciliation = json.loads((HERE / 'resume-reconciliation.json').read_text())
     check('reconciliation-input-bindings', all(digest(ROOT / p) == h for p, h in reconciliation['input_evidence_sha256'].items()))
     check('no-overall-or-human-pass', reconciliation['whole_model_read_gate'] == 'NOT_PASSED' and
