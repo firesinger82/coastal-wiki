@@ -268,6 +268,16 @@ def main():
         assert sha(ROOT / artifact['path']) == artifact['sha256']
     for item in full_docx['records']:
         supplement(item['source'], nudge_name, item['read_status'], nudge['limitations'])
+    future_name = 'manuals-docx-read/native-future-probe.json'
+    future = read(future_name)
+    for key in ('prior_receipt', 'generator', 'prefix_decoder', 'body_decoder'):
+        artifact = future[key]
+        assert sha(ROOT / artifact['path']) == artifact['sha256']
+    master = next(item for item in full_docx['records'] if 'master' in item['source']['path'])
+    supplement(master['source'], future_name, master['read_status'], ['Three bodies parsed; FUTURE payload semantics unresolved.'])
+    report_name = 'nonhydro-read/native-survey.json'
+    report = read(report_name)
+    supplement(report['source'], report_name, 'all-render-pages-inspected-with-unresolved-rendering-fidelity', [report['scope']])
     formula_name = 'workbook-formula-read.json'
     if (HERE / formula_name).is_file():
         formula = read(formula_name)

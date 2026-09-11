@@ -405,6 +405,15 @@ def main():
     checks.extend(validate_layout(ROOT, HERE / 'manuals-docx-read'))
     from validate_native_nudge import validate as validate_nudge
     checks.extend(validate_nudge(ROOT, HERE / 'manuals-docx-read'))
+    from validate_future_probe import validate as validate_future
+    checks.extend(validate_future(ROOT, HERE / 'manuals-docx-read'))
+    spec = importlib.util.spec_from_file_location('nonhydro_native_survey', HERE / 'nonhydro-read/survey_native.py')
+    report_survey = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(report_survey)
+    report = json.loads((HERE / 'nonhydro-read/native-survey.json').read_text())
+    check('report-native-reproduction', report_survey.build() == report)
+    check('report-native-stream-set', len(report['records']) == 388 and len({tuple(r['stream']) for r in report['records']}) == 388)
+    check('report-native-no-approval', report['whole_model_read_gate'] == 'NOT_PASSED' and report['human_approval_issued'] is False)
     reconciliation = json.loads((HERE / 'resume-reconciliation.json').read_text())
     check('reconciliation-input-bindings', all(digest(ROOT / p) == h for p, h in reconciliation['input_evidence_sha256'].items()))
     check('no-overall-or-human-pass', reconciliation['whole_model_read_gate'] == 'NOT_PASSED' and
