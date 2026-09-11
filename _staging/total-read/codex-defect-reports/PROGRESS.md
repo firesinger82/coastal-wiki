@@ -107,3 +107,5 @@ Claude Sonnet 5의 [한정 재검토](../model-audit/XBeach/HG-ADVERSARIAL-RECHE
 2026-09-11 사용자 요청으로 XBeach 마무리 GOAL 활성화. Native 이동 보정의 2/6바이트 및 LINE 간격 판독을 추가해 463개 기계적 수용·미해결 23개, 통합 구조 검증 457개 PASS. 기존 459개 출력과 원본·과거 기록 보존. 전체 판독/연결/canonical/필요 HG는 미완료이며 GOAL active. [전체 추적](../model-audit/XBeach/connectivity/GOAL-STATUS.md), [이동 보정 근거](../model-audit/XBeach/connectivity/manuals-docx-read/NATIVE-NUDGE-SURVEY.md).
 
 2026-09-11 Master 확장 접두부·보고서 Native 조사: Master 3개는 길이 3의 FUTURE payload를 보존한 채 offset 204에서 본문을 판독했으며 payload 의미는 미확정이다. 보고서 DOC의 388개 Native는 386개 구조 판독·2개 본문 인코딩 정의 미지원으로 분류했다. 통합 검증 473개 PASS, 원본·기존 기록 보존. 수학적 의미/렌더 충실도·전체 판독 gate는 여전히 미완료이며 GOAL active. [Master 근거](../model-audit/XBeach/connectivity/manuals-docx-read/NATIVE-FUTURE-PROBE.md), [보고서 근거](../model-audit/XBeach/connectivity/nonhydro-read/NATIVE-SURVEY.md).
+
+2026-09-11 보고서 Native 본문 글꼴 정의 지원: 두 미지원 스트림의 인코딩·글꼴·스타일 정의를 읽어 보고서 388개 전체가 기계적으로 판독된다. 이전 386개 출력 동일, 두 F093 글리프의 시각/의미는 미확정. 통합 검증 485개 PASS, 전체 gate NOT_PASSED·GOAL active. [근거](../model-audit/XBeach/connectivity/nonhydro-read/NATIVE-FONT-SURVEY.md).

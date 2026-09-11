@@ -414,6 +414,13 @@ def main():
     check('report-native-reproduction', report_survey.build() == report)
     check('report-native-stream-set', len(report['records']) == 388 and len({tuple(r['stream']) for r in report['records']}) == 388)
     check('report-native-no-approval', report['whole_model_read_gate'] == 'NOT_PASSED' and report['human_approval_issued'] is False)
+    spec = importlib.util.spec_from_file_location('report_font_survey', HERE / 'nonhydro-read/survey_native_fonts.py')
+    font_survey = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(font_survey)
+    spec = importlib.util.spec_from_file_location('report_font_checks', HERE / 'nonhydro-read/validate_native_fonts.py')
+    font_checks = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(font_checks)
+    checks.extend(font_checks.validate(ROOT, HERE / 'nonhydro-read', font_survey.build))
     reconciliation = json.loads((HERE / 'resume-reconciliation.json').read_text())
     check('reconciliation-input-bindings', all(digest(ROOT / p) == h for p, h in reconciliation['input_evidence_sha256'].items()))
     check('no-overall-or-human-pass', reconciliation['whole_model_read_gate'] == 'NOT_PASSED' and

@@ -278,6 +278,12 @@ def main():
     report_name = 'nonhydro-read/native-survey.json'
     report = read(report_name)
     supplement(report['source'], report_name, 'all-render-pages-inspected-with-unresolved-rendering-fidelity', [report['scope']])
+    font_name = 'nonhydro-read/native-font-survey.json'
+    fonts = read(font_name)
+    for key in ('prior_receipt', 'generator', 'prefix_decoder', 'body_decoder', 'candidate_finder'):
+        artifact = fonts[key]
+        assert sha(ROOT / artifact['path']) == artifact['sha256']
+    supplement(fonts['source'], font_name, 'all-render-pages-inspected-with-unresolved-rendering-fidelity', [fonts['scope']])
     formula_name = 'workbook-formula-read.json'
     if (HERE / formula_name).is_file():
         formula = read(formula_name)
