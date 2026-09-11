@@ -8,6 +8,7 @@ import olefile
 import importlib.util
 import re
 import tempfile
+import subprocess
 from collections import Counter
 from PIL import Image, ImageChops
 from lxml import etree
@@ -207,6 +208,82 @@ def main():
               record['pdf_physical_pages_total'] == total and set(prior['physical_pages']) | {p['physical_page'] for p in new} == set(range(1, total + 1)))
         check(label + '-page-artifacts', all(digest(ROOT / p['path']) == p['sha256'] for p in new + record['extra_visuals']))
     check('manuals-no-gate-pass', manuals['whole_model_read_gate'] == 'NOT_PASSED' and manuals['human_approval_issued'] is False)
+    docx_review = json.loads((HERE / 'manuals-docx-read/receipt.json').read_text())
+    spec = importlib.util.spec_from_file_location('manual_display', ROOT / docx_review['recovery_script']['path'])
+    display_module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(display_module)
+    check('docx-two-independent-sources', [r['work_id'] for r in docx_review['records']] ==
+          ['XBeach-manual-kingsday', 'XBeach-manual-master'])
+    check('docx-script-bindings', all(digest(ROOT / docx_review[k]['path']) == docx_review[k]['sha256']
+          for k in ('recovery_script', 'controls_only_script')))
+    for record in docx_review['records']:
+        label = record['work_id'] + '-docx'
+        source = ROOT / record['source']['path']
+        kingsday = record['work_id'].endswith('kingsday')
+        check(label + '-source-sha', digest(source) == record['source']['sha256'])
+        inv_art, fields_art = record['container_inventory'], record['display_fields']
+        check(label + '-evidence-hashes', all(digest(ROOT / a['path']) == a['sha256'] for a in (inv_art, fields_art)))
+        inv = json.loads((ROOT / inv_art['path']).read_text())
+        check(label + '-package-and-ole-stream-inventory', display_module.inventory(source) == inv)
+        check(label + '-object-denominator', inv['body_object_count'] == len(inv['embeddings']) == (238 if kingsday else 248)
+              and len(inv['members']) == (530 if kingsday else 562) and inv['omml_count'] == 0)
+        fields = json.loads((ROOT / fields_art['path']).read_text())
+        check(label + '-source-bound-display-counts', fields['source_sha256'] == digest(source) and
+              fields['target_fields'] == (255 if kingsday else 269) and
+              fields['display_arguments_recovered'] == (251 if kingsday else 265) and
+              fields['empty_display_arguments'] == sum(not f['display'] for f in fields['fields']) == 4)
+        check(label + '-receipt-counts', record['recovery_counts'] ==
+              {k: v for k, v in fields.items() if k not in ('fields', 'scope', 'source_sha256')})
+        variants = record['variants']
+        check(label + '-three-render-stages', [v['stage'] for v in variants] ==
+              ['direct', 'controls-only', 'display-recovered'])
+        for variant in variants:
+            tag = label + '-' + variant['stage']
+            artifacts = variant['artifacts']
+            check(tag + '-artifacts', all(digest(ROOT / a['path']) == a['sha256']
+                  for a in list(artifacts.values()) + variant['page_records']))
+            pages = variant['visually_inspected_pages']
+            unseen = variant['uninspected_pages']
+            check(tag + '-explicit-partial-coverage', bool(unseen) and
+                  [p['physical_render_page'] for p in variant['page_records']] == pages and
+                  len(pages) == len(set(pages)) and len(unseen) == len(set(unseen)) and
+                  not set(pages) & set(unseen) and set(pages + unseen) == set(range(1, variant['render_pages'] + 1)))
+            info = subprocess.check_output(['pdfinfo', str(ROOT / artifacts['pdf']['path'])], text=True)
+            text_value = subprocess.check_output(['pdftotext', '-layout', str(ROOT / artifacts['pdf']['path']), '-'], text=True)
+            check(tag + '-pdf-page-and-text-binding', int(re.search(r'^Pages:\s+(\d+)', info, re.M).group(1)) ==
+                  variant['render_pages'] and text_value == (ROOT / artifacts['txt']['path']).read_text())
+        final = variants[-1]['artifacts']
+        with tempfile.TemporaryDirectory() as tmp:
+            output = Path(tmp) / 'reproduced.docx'
+            check(label + '-saved-display-tree-reproduces', display_module.recover(source, output) == fields)
+            check(label + '-derivative-byte-reproduction', digest(output) == final['docx']['sha256'])
+        with zipfile.ZipFile(source) as before, zipfile.ZipFile(ROOT / final['docx']['path']) as after:
+            check(label + '-all-other-package-bytes-preserved', before.namelist() == after.namelist() and
+                  all(before.read(n) == after.read(n) for n in before.namelist() if n != 'word/document.xml'))
+            a, b = [etree.fromstring(z.read('word/document.xml')) for z in (before, after)]
+            check(label + '-objects-preserved', [etree.tostring(n) for n in a.xpath('//w:object', namespaces=ns)] ==
+                  [etree.tostring(n) for n in b.xpath('//w:object', namespaces=ns)])
+            check(label + '-text-preserved-plus-cached-displays', Counter(b.xpath('//w:t/text()', namespaces=ns)) ==
+                  Counter(a.xpath('//w:t/text()', namespaces=ns)) + Counter(f['display'] for f in fields['fields'] if f['display']))
+            check(label + '-no-body-field-controls', not b.xpath('//w:instrText | //w:fldChar | //w:fldSimple', namespaces=ns))
+        final_text = (ROOT / final['txt']['path']).read_text()
+        counts = Counter(re.findall(r'\((?:2|B|C)\.\d+\)', final_text))
+        expected_displays = Counter(f['display'] for f in fields['fields'] if f['display'])
+        check(label + '-pdf-contains-all-saved-displays', not expected_displays - counts)
+        check(label + '-no-instruction-debris', all(s not in final_text for s in ('Equation Chapter', 'Equation Section', 'MERGEFORMAT', 'Figure Processes and model formulation')))
+        check(label + '-original-errors-retained', final_text.count('Error! Reference source not found.') == (0 if kingsday else 2))
+        check(label + '-no-full-visual-claim', record['read_status'] ==
+              'text-read-with-partial-docx-visual-supplement-and-unresolved-fidelity')
+    eq = docx_review['equation_preview_supplement']
+    check('docx-equation-preview-artifacts', all(digest(ROOT / a['path']) == a['sha256'] for a in eq['artifacts'].values()))
+    with zipfile.ZipFile(ROOT / eq['source']['path']) as package:
+        relationships = {n.get('Id'): n.get('Target') for n in etree.fromstring(package.read('word/_rels/document.xml.rels'))}
+        check('docx-equation-preview-source-binding', digest(ROOT / eq['source']['path']) == eq['source']['sha256'] and
+              'word/' + relationships[eq['preview_relationship']] == eq['preview_member'] and
+              'word/' + relationships[eq['ole_relationship']] == eq['ole_member'] and
+              package.read(eq['preview_member']) == (ROOT / eq['artifacts']['emf']['path']).read_bytes() and
+              package.read(eq['ole_member']) == (ROOT / eq['artifacts']['bin']['path']).read_bytes())
+    check('docx-no-gate-pass', docx_review['whole_model_read_gate'] == 'NOT_PASSED' and docx_review['human_approval_issued'] is False)
     reconciliation = json.loads((HERE / 'resume-reconciliation.json').read_text())
     check('reconciliation-input-bindings', all(digest(ROOT / p) == h for p, h in reconciliation['input_evidence_sha256'].items()))
     check('no-overall-or-human-pass', reconciliation['whole_model_read_gate'] == 'NOT_PASSED' and

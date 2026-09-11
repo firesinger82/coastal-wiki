@@ -170,6 +170,22 @@ def main():
         for copy in item['sources']:
             assert copy['sha256'] == prior['source_sha256']
             supplement(copy, manual_name, item['read_status'], item['limitations'])
+    docx_name = 'manuals-docx-read/receipt.json'
+    docx_review = read(docx_name)
+    for item in docx_review['records']:
+        for artifact in [item['container_inventory'], item['display_fields']]:
+            assert sha(ROOT / artifact['path']) == artifact['sha256']
+        for variant in item['variants']:
+            pages = variant['visually_inspected_pages']
+            assert [p['physical_render_page'] for p in variant['page_records']] == pages
+            assert set(pages).isdisjoint(variant['uninspected_pages'])
+            assert set(pages + variant['uninspected_pages']) == set(range(1, variant['render_pages'] + 1))
+            for artifact in list(variant['artifacts'].values()) + variant['page_records']:
+                assert sha(ROOT / artifact['path']) == artifact['sha256']
+        supplement(item['source'], docx_name, item['read_status'], item['limitations'])
+    for artifact in list(docx_review['equation_preview_supplement']['artifacts'].values()) + [
+            docx_review['recovery_script'], docx_review['controls_only_script']]:
+        assert sha(ROOT / artifact['path']) == artifact['sha256']
     formula_name = 'workbook-formula-read.json'
     if (HERE / formula_name).is_file():
         formula = read(formula_name)
@@ -204,7 +220,7 @@ def main():
                 member_count += 1
                 member_statuses[member['semantic_status']] += 1
     result = {
-        'date': '2026-09-10',
+        'date': '2026-09-11',
         'scope': '543 top-level files only; recursive container members remain separate inventories.',
         'validation': {'path_set_exact': True, 'source_hashes_checked': len(rows),
                        'immutable_files_checked': len(baseline['files']), 'immutable_errors': errors,
