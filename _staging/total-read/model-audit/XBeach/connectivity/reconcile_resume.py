@@ -240,6 +240,13 @@ def main():
         assert sha(ROOT / artifact['path']) == artifact['sha256']
     for item in full_docx['records']:
         supplement(item['source'], survey_name, item['read_status'], survey['limitations'])
+    prefix_name = 'manuals-docx-read/native-prefix-survey.json'
+    prefix_survey = read(prefix_name)
+    for key in ('prior_receipt', 'generator', 'prefix_decoder', 'body_decoder'):
+        artifact = prefix_survey[key]
+        assert sha(ROOT / artifact['path']) == artifact['sha256']
+    for item in full_docx['records']:
+        supplement(item['source'], prefix_name, item['read_status'], prefix_survey['limitations'])
     formula_name = 'workbook-formula-read.json'
     if (HERE / formula_name).is_file():
         formula = read(formula_name)

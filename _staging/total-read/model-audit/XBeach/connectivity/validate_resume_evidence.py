@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Check persisted supplemental evidence; this is not a semantic read gate."""
+import io
 import hashlib
 import json
 from pathlib import Path
@@ -375,6 +376,29 @@ def main():
           digest(ROOT / bullet['viewed_page']['path']) == bullet['viewed_page']['sha256'])
     check('native-survey-no-pass', survey['whole_model_read_gate'] == 'NOT_PASSED' and
           survey['human_approval_issued'] is False)
+    from survey_native_prefixes import build as prefix_build, candidates
+    prefix_survey = json.loads((HERE / 'manuals-docx-read/native-prefix-survey.json').read_text())
+    check('prefix-survey-reproduction', prefix_build() == prefix_survey)
+    check('prefix-survey-input-hashes', all(digest(ROOT / prefix_survey[k]['path']) == prefix_survey[k]['sha256']
+          for k in ('prior_receipt', 'generator', 'prefix_decoder', 'body_decoder')))
+    check('prefix-survey-exact-set', {(r['document'], r['member']) for r in prefix_survey['records']} ==
+          {(r['document'], r['member']) for r in survey['records']} and len(prefix_survey['records']) == 486)
+    check('prefix-survey-preserves-accepted', all(r['status'] == r['prior_status'] for r in prefix_survey['records']
+          if r['prior_status'] == 'mechanically-accepted-not-semantically-reviewed'))
+    prefix_examples = {}
+    for r in prefix_survey['records']:
+        if 'body_offset' in r and r['body_offset'] not in prefix_examples:
+            a = next(x for x in survey['records'] if (x['document'], x['member']) == (r['document'], r['member']))
+            with zipfile.ZipFile(ROOT / a['source']['path']) as z:
+                with olefile.OleFileIO(io.BytesIO(z.read(a['member']))) as ole:
+                    prefix_examples[r['body_offset']] = ole.openstream('Equation Native').read()
+    for offset, data in prefix_examples.items():
+        check('prefix-candidate-' + str(offset), candidates(data) == [offset] and
+              all(not candidates(data[:i]) for i in range(offset)) and
+              not candidates(data[:offset-1] + b'\x64' + data[offset:]) and
+              not candidates(data[:28] + b'\x03' + data[29:]))
+    check('prefix-survey-no-pass', prefix_survey['whole_model_read_gate'] == 'NOT_PASSED' and
+          prefix_survey['human_approval_issued'] is False)
     reconciliation = json.loads((HERE / 'resume-reconciliation.json').read_text())
     check('reconciliation-input-bindings', all(digest(ROOT / p) == h for p, h in reconciliation['input_evidence_sha256'].items()))
     check('no-overall-or-human-pass', reconciliation['whole_model_read_gate'] == 'NOT_PASSED' and
