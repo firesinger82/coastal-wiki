@@ -212,6 +212,17 @@ def main():
     for item in full_docx['source_empty_paragraphs']:
         artifact = item['artifact']
         assert sha(ROOT / artifact['path']) == artifact['sha256']
+    native_name = 'manuals-docx-read/native-probe/receipt.json'
+    native = read(native_name)
+    assert native['whole_model_read_gate'] == 'NOT_PASSED' and native['human_approval_issued'] is False
+    for artifact in [native['prior_visual_receipt'], native['decoder'], native['viewed_contact_sheet']]:
+        assert sha(ROOT / artifact['path']) == artifact['sha256']
+    for item in native['empty_native_records'] + native['preview_records']:
+        assert sha(ROOT / item['source']['path']) == item['source']['sha256']
+        for artifact in item['artifacts'].values():
+            assert sha(ROOT / artifact['path']) == artifact['sha256']
+    for item in full_docx['records']:
+        supplement(item['source'], native_name, item['read_status'], native['limitations'])
     formula_name = 'workbook-formula-read.json'
     if (HERE / formula_name).is_file():
         formula = read(formula_name)

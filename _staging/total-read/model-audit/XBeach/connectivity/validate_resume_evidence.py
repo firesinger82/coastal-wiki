@@ -354,6 +354,10 @@ def main():
                   not p.xpath('.//w:object | .//w:drawing | .//w:pict | .//*[local-name()="oMath"]', namespaces=source_ns))
     check('docx-full-not-semantic-or-human-pass', full_docx['whole_model_read_gate'] == 'NOT_PASSED' and
           full_docx['human_approval_issued'] is False)
+    spec = importlib.util.spec_from_file_location('native_probe_checks', HERE / 'manuals-docx-read/validate_native_probe.py')
+    native_probe_checks = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(native_probe_checks)
+    checks.extend(native_probe_checks.validate(ROOT, HERE / 'manuals-docx-read'))
     reconciliation = json.loads((HERE / 'resume-reconciliation.json').read_text())
     check('reconciliation-input-bindings', all(digest(ROOT / p) == h for p, h in reconciliation['input_evidence_sha256'].items()))
     check('no-overall-or-human-pass', reconciliation['whole_model_read_gate'] == 'NOT_PASSED' and
