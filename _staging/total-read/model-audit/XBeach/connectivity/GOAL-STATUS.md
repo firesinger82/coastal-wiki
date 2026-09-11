@@ -2,7 +2,7 @@
 
 2026-09-11 사용자 요청으로 GOAL 활성화: XBeach 전수 판독 → 연결 분석 → 검증 → canonical → 필요한 신규 HG를 끝까지 진행한다. 기준은 plan.md의 기존 전수 판독/연결 계획이다. 전체 gate는 NOT_PASSED이며 아래는 완료 영수증이 아니다.
 
-- DOCX Native 486개: 현재 463개 기계적 수용. 색상 0 참조 12개·RULER 불일치 8개·Master 3개는 길이 있는 확장 payload를 보존하고 본문 구조를 판독했으나 payload 의미는 미해결. 수용된 식도 의미/렌더 대조는 별도다.
+- DOCX Native 486개: 현재 463개 기계적 수용. 색상 0 참조 12개·RULER 불일치 8개·Master 3개는 길이 있는 확장 payload를 보존하고 본문 구조를 판독했으나 payload 의미는 미해결. 색상/정렬 20개도 별도 진단 옵션으로 구조를 확보했으나 strict에서는 계속 거부한다. 전체 486개 구조 대응은 strict 463 + opaque 3 + 조건부 20이다. 수용된 식도 의미/렌더 대조는 별도다.
 - 비정수압 보고서 DOC: 388개 Native 전체 구조 판독. 새 두 스트림의 Euclid Math Two/F093 글리프는 시각/의미 미확정. 작은 글리프/inline 배치 및 의미 대조 필요.
 - ZIP/JAR: 1,284개 unread member와 PE/AR/MSI 내부 처리 범위 미완료. 단순 인덱스/중복 SHA를 판독 완료로 바꾸지 않는다.
 - 기존 lifecycle/physics 연결 후보: 판독 전제 충족 후 entry/build/mode 및 orphan/unknown을 검증하고 확정한다.
