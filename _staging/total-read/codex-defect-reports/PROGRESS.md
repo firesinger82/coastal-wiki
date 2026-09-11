@@ -101,3 +101,5 @@ Claude Sonnet 5의 [한정 재검토](../model-audit/XBeach/HG-ADVERSARIAL-RECHE
 2026-09-11 Native 접두부 경계 조사: 설정 파서로 유일한 본체 시작 위치를 검증해 offset 218/219/220/228/229를 구분했다. 기존 본체 파서 수정 없이 이전 거부분 60개를 추가 수용, 총 361개 기계적 수용·본문 미지원 122개·접두부 미해결 3개다. 의미 판독 완료로 승격하지 않았다. 기존 원본·영수증 유지, 전체 gate NOT_PASSED·신규 사람 승인 없음. [경계 조사 근거](../model-audit/XBeach/connectivity/manuals-docx-read/NATIVE-PREFIX-SURVEY.md).
 
 2026-09-11 Native 문자 장식 지원: 공식 MTEF5 형식을 대조해 CHAR 장식 목록과 nudge 없는 EMBELL의 한정 판독기를 별도로 추가했다. 80개 추가 수용으로 441개 기계적 수용·본문 미지원 42개·접두부 미해결 3개다. 기존 수용 361개의 구조 출력 동일, 원본 및 과거 영수증 보존. 의미/렌더 검증은 별도이며 전체 gate NOT_PASSED·신규 사람 승인 없음. [장식 판독 근거](../model-audit/XBeach/connectivity/manuals-docx-read/NATIVE-EMBELL-SURVEY.md).
+
+2026-09-11 Native 배치 레코드 지원: 행렬·RGB·SIZE·명시적 RULER의 한정 지원으로 18개 추가 수용, 총 459개 기계적 수용·본문 미지원 24개·접두부 미해결 3개다. 색상 인덱스 0의 의미를 가정하지 않아 12개는 미해결로 남겼다. 기존 441개 출력 동일·원본/과거 기록 보존, 전체 gate NOT_PASSED·신규 사람 승인 없음. [배치 판독 근거](../model-audit/XBeach/connectivity/manuals-docx-read/NATIVE-LAYOUT-SURVEY.md).
