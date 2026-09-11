@@ -399,6 +399,8 @@ def main():
               not candidates(data[:28] + b'\x03' + data[29:]))
     check('prefix-survey-no-pass', prefix_survey['whole_model_read_gate'] == 'NOT_PASSED' and
           prefix_survey['human_approval_issued'] is False)
+    from validate_native_embell import validate as validate_embell
+    checks.extend(validate_embell(ROOT, HERE / 'manuals-docx-read'))
     reconciliation = json.loads((HERE / 'resume-reconciliation.json').read_text())
     check('reconciliation-input-bindings', all(digest(ROOT / p) == h for p, h in reconciliation['input_evidence_sha256'].items()))
     check('no-overall-or-human-pass', reconciliation['whole_model_read_gate'] == 'NOT_PASSED' and
