@@ -1,0 +1,57 @@
+{
+  "date": "2026-09-12",
+  "attribution": "AI direct bytecode reading; not independent semantic approval.",
+  "prior_receipt": {
+    "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/disassembly-receipt.json",
+    "sha256": "1cc8b2657a74f3f5904e9d0a40648b1c98f6e031b056b7c6e19122beb632aaa8"
+  },
+  "records": [
+    {
+      "sha256": "6697bfbcad1d85fdaba2a34a2de787b9dacd5a3f1211734f002a3b8d9259986a",
+      "instances": [
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/win32/mpich/bin/jumpshot.jar",
+          "member": "base/drawable/ColorAlpha.class"
+        },
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/win32/mpich/bin/clog2TOslog2.jar",
+          "member": "base/drawable/ColorAlpha.class"
+        },
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/win32/mpich/bin/traceTOslog2.jar",
+          "member": "base/drawable/ColorAlpha.class"
+        },
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/bin/jumpshot.jar",
+          "member": "base/drawable/ColorAlpha.class"
+        },
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/bin/clog2TOslog2.jar",
+          "member": "base/drawable/ColorAlpha.class"
+        },
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/bin/traceTOslog2.jar",
+          "member": "base/drawable/ColorAlpha.class"
+        }
+      ],
+      "class_file": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/classes/6697bfbcad1d85fdaba2a34a2de787b9dacd5a3f1211734f002a3b8d9259986a.class",
+        "sha256": "6697bfbcad1d85fdaba2a34a2de787b9dacd5a3f1211734f002a3b8d9259986a"
+      },
+      "disassembly": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/disassembly/6697bfbcad1d85fdaba2a34a2de787b9dacd5a3f1211734f002a3b8d9259986a.txt",
+        "sha256": "abc2bc31b2eafdc84acb808f51e3bdea7fe825635275084f526f4baebcd4149b"
+      },
+      "read_lines": [
+        1,
+        400
+      ],
+      "scope": "Entire javap display, all constructors, comparison/IO/default-color methods and demo/static initialization; no archived execution.",
+      "observation": "Extends java.awt.Color implements Comparable/DataIO. BYTESIZE5: write packed getRGB int then modifiable boolean. DataInput constructor reads packed int with hasAlpha=true then boolean; readObject(DataInput) only logs should NOT called and consumes nothing, so generic DataIO read usage would not deserialize. Default constructor opaque pink255/192/203, RGB ctor alpha255, Color copy preservesRGBA, Color+alpha replaces alpha; these set modifiabletrue, explicit RGBA/bool accepts flag, no flag accessors/setters here. Flag does not itself enforce mutation policy in this class. Typed equals(ColorAlpha) compares RGB only (ignores alpha/flag), no equals(Object) override shown, so overload differs from inherited dispatch. compareTo casts ColorAlpha; if RGB equal0 else other lengthSq minus own, thus descending R²+G²+B² with different same-norm RGB also0. Null/wrong type unguarded; channel square sums bounded for ordinary Color. Default palette creates216 triples from0,51,102,153,204,255 and sorts array, retains all despite comparison ties; sets global next index1. getNext uses index%(length-1)=mod215, increments signed int, returns shared palette entry: visits1..214,0 repeatedly, excludes index215 (black minimum norm), includes white index0 on wrap. Counter overflow eventually gives negative remainder/index; no synchronization or per-name mapping. ColorNameMap fallback calls this each unknown lookup, so same unknown name can receive successive colors. Static white191,white255,yellow255 instances modifiabletrue. Demo prints500 default colors, read not executed. No runtime GUI/color pipeline approval."
+    }
+  ],
+  "unique_classes_read": 1,
+  "instances_covered": 6,
+  "whole_model_read_gate": "NOT_PASSED",
+  "human_approval_issued": false
+}
