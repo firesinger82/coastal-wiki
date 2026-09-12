@@ -1,0 +1,68 @@
+{
+  "date": "2026-09-12",
+  "attribution": "AI direct bytecode reading; not independent semantic approval.",
+  "prior_receipt": {
+    "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/disassembly-receipt.json",
+    "sha256": "1cc8b2657a74f3f5904e9d0a40648b1c98f6e031b056b7c6e19122beb632aaa8"
+  },
+  "records": [
+    {
+      "sha256": "5b0a408d86899bfa78f35338e482de8ff42d8dd2985e91cba4f6860d9e6c859f",
+      "instances": [
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/win32/mpich/bin/jumpshot.jar",
+          "member": "viewer/first/FirstFrame$1.class"
+        },
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/bin/jumpshot.jar",
+          "member": "viewer/first/FirstFrame$1.class"
+        }
+      ],
+      "class_file": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/classes/5b0a408d86899bfa78f35338e482de8ff42d8dd2985e91cba4f6860d9e6c859f.class",
+        "sha256": "5b0a408d86899bfa78f35338e482de8ff42d8dd2985e91cba4f6860d9e6c859f"
+      },
+      "disassembly": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/disassembly/5b0a408d86899bfa78f35338e482de8ff42d8dd2985e91cba4f6860d9e6c859f.txt",
+        "sha256": "36fb440f2bc1a47255582444d912bf6ef4776038b77d56e8854745dda7bee0fb"
+      },
+      "read_lines": [
+        1,
+        27
+      ],
+      "scope": "Entire untruncated javap display, all methods and initializer; no archived execution.",
+      "observation": "WindowAdapter captures outer frame but closing callback uses current global TopWindow.First rather than captured frame. Uses current First.getWindow as parent of Dialogs.confirm exit prompt, then if true calls current TopWindow.First.disposeAll, which previously read wrapper cascades Legend/Timeline/Preference and exits0; false leaves window open under DO_NOTHING default. Captured obsolete frame can therefore act on newer registered First, no identity check. No direct file close/save prompt/worker join here; exceptions propagate and actual panel/log disposal remains separate evidence. No archived execution."
+    },
+    {
+      "sha256": "393781bb1fd092a7a43123e0c6d5ce36a92f80dabbf11c02f6ac8f22d4f3c1a7",
+      "instances": [
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/win32/mpich/bin/jumpshot.jar",
+          "member": "viewer/first/FirstFrame.class"
+        },
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/bin/jumpshot.jar",
+          "member": "viewer/first/FirstFrame.class"
+        }
+      ],
+      "class_file": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/classes/393781bb1fd092a7a43123e0c6d5ce36a92f80dabbf11c02f6ac8f22d4f3c1a7.class",
+        "sha256": "393781bb1fd092a7a43123e0c6d5ce36a92f80dabbf11c02f6ac8f22d4f3c1a7"
+      },
+      "disassembly": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/disassembly/393781bb1fd092a7a43123e0c6d5ce36a92f80dabbf11c02f6ac8f22d4f3c1a7.txt",
+        "sha256": "303f51acde3bd3eb08178c2db52fceba41474d79ed2b7896515144b4b00d2bc2"
+      },
+      "read_lines": [
+        1,
+        392
+      ],
+      "scope": "Entire untruncated javap display, all methods and initializer; no archived execution.",
+      "observation": "JFrame Jumpshot-4 implements TopControl; default close DO_NOTHING. Registers itself in TopWindow.First before constructing FirstPanel(isApplet,filename,view_ID) and FirstMenuBar(isApplet,panel), without disposing prior First; failures leave partial registry and no rollback. Installs closing listener; constructor does not pack/show/init. init delegates panel.init only. Three TopControl setters retrieve respective panel JButton and setEnabled; no explicit menu synchronization, null/EDT guard. checkVersion prints java.version and lexically String.compareTo 1.2.0, warns if less but does not reject; not semantic version/classfile compatibility validation, null property unchecked. main sequence checkVersion, parse args, Debug.initTextArea, print start, construct frame, pack, TopWindow.layoutIdealLocations, setVisible(true), init. No invokeLater/thread handoff here. Thus TopWindow layout normally establishes Control only under its AUTO_WINDOWS_LOCATION branch, before panel.init; FirstPanel constructor may have earlier side effects still pending reading. No direct Parameters initialization or renderer propagation here. CLI static defaults isApplet=false, filename=null, view_ID=-1, no reset per invocation. Last non-option filename wins; filename optional; leading hyphen always option, no -- escape. Help -h/-help/--help prints stale Usage java timelines.MainFrame and exits0; -debug/-profile set corresponding global flags true; -v increments index then Integer.parseInt into view_ID with no range validation; missing argument AIOOB uncaught. Unknown option reports 1-based position, exits1. NumberFormatException catch spans whole argument loop: prints prior successful view assignments plus failing option and stacktrace, returns normally, remaining args skipped and prior static assignments retained, main proceeds to GUI construction. For example -v bad file skips file and retains earlier/default view ID; negative numeric view accepted as consumed value. indexOrderStr uses st/nd/rd only for exact1/2/3 else th, so21th; diagnostic only. No archived execution or GUI behavior measured."
+    }
+  ],
+  "unique_classes_read": 2,
+  "instances_covered": 4,
+  "whole_model_read_gate": "NOT_PASSED",
+  "human_approval_issued": false
+}

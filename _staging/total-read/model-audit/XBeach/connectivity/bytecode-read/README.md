@@ -275,3 +275,5 @@ Method는 4바이트 정수 식별자로 1을 CONNECT_COMPOSITE_STATE로 정의�
 2026-09-12 viewer Parameters 전체 1,401줄 판독. ACTIVE_REFRESH 저장/복원 비대칭, 저장 취소 전 메모리 갱신, 설정 순차 대입 중 변환 실패 시 부분 상태 유지, 파일 IO와 렌더러 설정 전파의 분리를 연결했다. 누적 Java 208/413종·724경로, 잔여 Java 205종/Python 150종. 근거: `viewer-parameters-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
 
 2026-09-12 viewer PreferencePanel 전체 1,593줄 판독. UI 입력 순차 대입, 비활성 ACTIVE_REFRESH의 복사 포함, 툴팁 조건 미검증, 슬라이더 텍스트 직접 파싱 및 렌더러 전파 호출 부재를 설정 창/Parameters에 연결했다. 누적 Java 209/413종·726경로, 잔여 Java 204종/Python 150종. viewer/common 잔여 클래스는 없다. 근거: `viewer-preference-panel-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer FirstFrame/종료 리스너 2종 전체 419줄 판독. 초기화 순서와 TopControl 버튼 위임, 숫자 인자 오류 후 GUI 진행, 현재 전역 First를 대상으로 하는 종료 콜백을 연결했다. 누적 Java 211/413종·730경로, 잔여 Java 202종/Python 150종. FirstPanel의 생성/초기화와 로그 열기는 후속 범위다. 근거: `viewer-first-frame-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
