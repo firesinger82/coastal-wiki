@@ -237,3 +237,5 @@ Claude Sonnet 5의 [한정 재검토](../model-audit/XBeach/HG-ADVERSARIAL-RECHE
 2026-09-12 CLOG2 상수 내부 클래스/고정 길이 선언 9종 전체 186줄 판독. 레코드 종류0..11, 통신 종류와 메시지 SEND/RECV 번호, 24/32/40바이트 선언을 기존 실제 레코드 처리 판독과 구분해 연결했다. 자체 IO/검증은 없다. 누적 Java 183/413종·674경로, 잔여 Java 230종은 viewer 계열이며 Python 150종도 미판독이다. 근거: `clog2-constant-companions-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
 
 2026-09-12 viewer SwingWorker 계열/Routines 5종 전체 665줄 판독. interrupt 후 즉시 참조 제거와 실제 작업 종료를 구분하고 예외 시 finished 미예약, 시작 전 get 순환 가능성, 시간 눈금/색상/마우스 보조 연산의 경계 조건을 기록했다. 누적 Java 188/413종·684경로, 잔여 Java 225종/Python 150종. 근거: `viewer-worker-routines-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer LogFileChooser/디렉터리 필터 3종 전체 363줄 판독. applet/일반 모드의 필터·탐색 차이, 확장자 기본 로케일 소문자 처리와 설정값 대소문자 비대칭, 숨김/끝점 파일명 조건을 기록했다. 필터 통과는 존재·읽기 가능·로그 내용 검증이 아니다. 누적 Java 191/413종·690경로, 잔여 Java 222종/Python 150종. 근거: `viewer-filechooser-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.

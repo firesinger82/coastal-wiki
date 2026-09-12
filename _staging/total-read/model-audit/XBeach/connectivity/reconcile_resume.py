@@ -360,6 +360,7 @@ def main():
     read('bytecode-read/slog-navigator-read.json')
     read('bytecode-read/clog2-constant-companions-read.json')
     read('bytecode-read/viewer-worker-routines-read.json')
+    read('bytecode-read/viewer-filechooser-read.json')
     read('bytecode-read/coverage.json')
     formula_name = 'workbook-formula-read.json'
     if (HERE / formula_name).is_file():
