@@ -1,0 +1,68 @@
+{
+  "date": "2026-09-12",
+  "attribution": "AI direct bytecode reading; not independent semantic approval.",
+  "prior_receipt": {
+    "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/disassembly-receipt.json",
+    "sha256": "1cc8b2657a74f3f5904e9d0a40648b1c98f6e031b056b7c6e19122beb632aaa8"
+  },
+  "records": [
+    {
+      "sha256": "a7389086500735cc93e782f3af3873b34cb2be4060ead83b3287273ea2a8557c",
+      "instances": [
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/win32/mpich/bin/jumpshot.jar",
+          "member": "viewer/first/LogFileOperations$1.class"
+        },
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/bin/jumpshot.jar",
+          "member": "viewer/first/LogFileOperations$1.class"
+        }
+      ],
+      "class_file": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/classes/a7389086500735cc93e782f3af3873b34cb2be4060ead83b3287273ea2a8557c.class",
+        "sha256": "a7389086500735cc93e782f3af3873b34cb2be4060ead83b3287273ea2a8557c"
+      },
+      "disassembly": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/disassembly/a7389086500735cc93e782f3af3873b34cb2be4060ead83b3287273ea2a8557c.txt",
+        "sha256": "a7067f36ca15893b153638c7f9f1bc3ae791a5bda30dbbd2563398145cfbad4f"
+      },
+      "read_lines": [
+        1,
+        58
+      ],
+      "scope": "Entire untruncated javap display, all methods and initializer; no archived execution.",
+      "observation": "SwingWorker captures outer operations and int view_ID, not InputLog snapshot. construct on worker thread reads current outer.slog_ins at execution time, constructs Swing TimelineFrame(log,index), assigns outer.timeline_frame, returns null. finished from previously read SwingWorker invokeLater path repeatedly reads current outer.timeline_frame for pack, layout, show and init, not a captured per-worker frame/result. Thus concurrent workers can overwrite shared frame and completion act on another worker frame; log disposal/reopen between scheduling and construct changes supplied log, disposal between assignment/completion can leave null dereference or late frame resurrection. No synchronization, generation identity, cancellation check, null guard, exception handling or finally here. Superclass on construct failure clears thread but skips finished, no failure UI in this subclass. Actual TimelineFrame constructor/init bodies and resulting resource effects remain pending; these are static race paths, not reproduced GUI failures. Captured fields assigned before superclass constructor (super starts no thread), start called by caller. No archived execution."
+    },
+    {
+      "sha256": "3e80908b1b02323c06880d76372b3578b826946a3b4c0fbbc1ad1cc658d1ab3e",
+      "instances": [
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/win32/mpich/bin/jumpshot.jar",
+          "member": "viewer/first/LogFileOperations.class"
+        },
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/bin/jumpshot.jar",
+          "member": "viewer/first/LogFileOperations.class"
+        }
+      ],
+      "class_file": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/classes/3e80908b1b02323c06880d76372b3578b826946a3b4c0fbbc1ad1cc658d1ab3e.class",
+        "sha256": "3e80908b1b02323c06880d76372b3578b826946a3b4c0fbbc1ad1cc658d1ab3e"
+      },
+      "disassembly": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/disassembly/3e80908b1b02323c06880d76372b3578b826946a3b4c0fbbc1ad1cc658d1ab3e.txt",
+        "sha256": "bd4c8cb6fbfbc8036ef50358c62674fc2777596d507429c579096670749e65e4"
+      },
+      "read_lines": [
+        1,
+        451
+      ],
+      "scope": "Entire untruncated javap display, all methods and initializer; no archived execution.",
+      "observation": "Constructor creates LogFileChooser(applet), null log/legend/timeline; preference initially implicit null. init: Parameters.initSetupFile, readFromSetupFile(current TopWindow.First), initStaticClasses, new PreferenceFrame, hide it. This supplies initial renderer propagation after reading preferences, not on later preference Update/Save. FirstFrame main lays out before this load, so fresh normal default AUTO_WINDOWS_LOCATION=true already set Control before setup false is read; earlier missing-Control finding is conditional for nonstandard initialization/current globals, not inevitable with a config false. init repeat re-reads globals/replaces preference, no guard. createInputLog trims input BEFORE null check, so null-path diagnostic unreachable for null argument. Nonempty path checked exists, not directory, canRead; then InputLog constructor catches NPE specifically and any Exception otherwise, latter misleadingly says EOFException regardless type. Prechecks not atomic, no isFile requirement; constructor internal System.exit on IO remains earlier InputLog evidence. Empty/error returns null, outer open then also shows Null InputLog error. openLogFile reads text, assigns new input without disposing previous internally (FirstPanel caller disposes first). Failed signature sets slog_ins=null WITHOUT close then optionally conversion; nonnull conversion output replaces text and recursively calls openLogFile, even empty string, no cycle/depth guard or guarantee output converted. Refused compatibility sets log null WITHOUT close; no deterministic close on either rejection (InputLog finalizer separate eventual fallback). Compatibility history is prompt text, not proof of compatible decoding; user confirmation may continue with mismatch. Accepted input initializes metadata, constructs LegendFrame, packs/layout/shows then returns actual LineIDMapList. Exceptions leave partial state, no finally/rollback. dispose only acts if slog_ins nonnull: global Legend.disposeAll (including Timeline), then log.close then null log/legend/timeline. No combo clearing; confirms failed-open caller can retain stale ViewMap, but createTimelineWindow checks log nonnull and thus suppresses normal null-log stale selection. No worker cancellation/join or preference disposal; no-log path leaves other refs untouched. selectLogFile: approve0 and nonnull chosen file sets chooser parent when nonnull then returns getPath; cancelled/error choice shows No file chosen, approve-null silently null. convert delegates ConvertorDialog using current First and chooser. createTimelineWindow requires nonnull log and index>=0 only, no upper bound, creates/starts worker in local variable, no retained handle/debounce/busy guard. showLegend guards log+legend then pack/layout/show. showPreference guards frame then pack/layout/show/toFront WITHOUT updateAllFieldsFromParameters, so hidden un-applied edits persist on reopening. Synthetic accessors read mutable log/timeline and assign timeline, unsynchronized. No archived GUI or conversion execution."
+    }
+  ],
+  "unique_classes_read": 2,
+  "instances_covered": 4,
+  "whole_model_read_gate": "NOT_PASSED",
+  "human_approval_issued": false
+}
