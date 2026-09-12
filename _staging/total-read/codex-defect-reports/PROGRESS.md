@@ -241,3 +241,5 @@ Claude Sonnet 5의 [한정 재검토](../model-audit/XBeach/HG-ADVERSARIAL-RECHE
 2026-09-12 viewer LogFileChooser/디렉터리 필터 3종 전체 363줄 판독. applet/일반 모드의 필터·탐색 차이, 확장자 기본 로케일 소문자 처리와 설정값 대소문자 비대칭, 숨김/끝점 파일명 조건을 기록했다. 필터 통과는 존재·읽기 가능·로그 내용 검증이 아니다. 누적 Java 191/413종·690경로, 잔여 Java 222종/Python 150종. 근거: `viewer-filechooser-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
 
 2026-09-12 viewer TopControl/TopWindow 계열 6종 전체 327줄 판독. Legend→Timeline 및 First→Legend/Preference→exit 종료 연결, 창 교체 시 남는 Control 참조와 자동 배치의 화면 크기 캐시/경계 조건을 기록했다. 이 계층에는 직접 작업 취소·로그 닫기 처리가 없으며 실제 프레임 구현은 후속 판독한다. 누적 Java 197/413종·702경로, 잔여 Java 216종/Python 150종. 근거: `viewer-topwindow-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer ActableTextField/Alias/LabeledComboBox 3종 전체 291줄 판독. 액션 전달의 위임, 별칭의 원본 참조 보존, 콤보 Boolean 선택의 직접 형변환과 활성화 상태의 내부 위임 범위를 기록했다. 누적 Java 200/413종·708경로, 잔여 Java 213종/Python 150종. 근거: `viewer-combo-alias-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
