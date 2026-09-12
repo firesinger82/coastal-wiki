@@ -792,6 +792,14 @@ def validate(root,here):
         output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
         check(x['sha256'][:10]+'-viewer-scrollable-coordinates-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
     check('viewer_scrollable_coordinates-no-approval',viewer_scrollable_coordinates['whole_model_read_gate']=='NOT_PASSED' and viewer_scrollable_coordinates['human_approval_issued'] is False)
+    viewer_time_viewport=json.loads((here/'bytecode-read/viewer-time-viewport-read.json').read_text())
+    check('viewer-time-viewport-five-exact',bound(viewer_time_viewport['prior_receipt']) and len(viewer_time_viewport['records'])==viewer_time_viewport['unique_classes_read']==5 and [x['instances'][0]['member'] for x in viewer_time_viewport['records']]==['viewer/zoomable/ViewportTime$1.class', 'viewer/zoomable/ViewportTime$2.class', 'viewer/zoomable/ViewportTime.class', 'viewer/zoomable/ViewportTime$InfoDialogActionListener.class', 'viewer/zoomable/ViewportTime$InfoDialogWindowListener.class'] and viewer_time_viewport['instances_covered']==10)
+    for x in viewer_time_viewport['records']:
+        original=next(a for a in r['records'] if a['sha256']==x['sha256'])
+        args=['java','-m','jdk.jdeps/com.sun.tools.javap.Main','-c','-p','-s','-constants',str(root/x['class_file']['path'])]
+        output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
+        check(x['sha256'][:10]+'-viewer-time-viewport-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
+    check('viewer_time_viewport-no-approval',viewer_time_viewport['whole_model_read_gate']=='NOT_PASSED' and viewer_time_viewport['human_approval_issued'] is False)
     spec=importlib.util.spec_from_file_location('bytecode_coverage',here/'reconcile_bytecode_coverage.py')
     module=importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)

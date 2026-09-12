@@ -305,3 +305,5 @@ Claude Sonnet 5의 [한정 재검토](../model-audit/XBeach/HG-ADVERSARIAL-RECHE
 2026-09-12 viewer CanvasTimeline 전체 1079줄 판독. 그리기·클릭 판정 순서와 표시/검색 필터 차이, 정보 창 및 실제 시간 평균 통계 생성 경로, 공유 트리·선택 조건 참조를 연결했다. 누적 Java 335/413종·978경로, 잔여 Java 78종/Python 150종. 근거: `viewer-timeline-canvas-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
 
 2026-09-12 viewer ScrollableObject/CoordPixelImage/SearchableView/InitializableDialog 4종 전체 1444줄 판독. 3장·6뷰 이미지 재사용과 반올림 좌표 변환을 연결했으며, CanvasTimeline 자체 setCursor는 상속된 무동작 override라는 보충을 남겼다. 누적 Java 339/413종·986경로, 잔여 Java 74종/Python 150종. 근거: `viewer-scrollable-coordinates-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer ViewportTime/4개 리스너 5종 전체 1676줄 판독. 정보 창 버튼·창 닫기 처리 연결을 해결하고, 시작점을 넘는 드래그의 반대쪽 경계 잔존과 setView 반복 시 리스너·창 목록 교체를 기록했다. 누적 Java 344/413종·996경로, 잔여 Java 69종/Python 150종. 근거: `viewer-time-viewport-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
