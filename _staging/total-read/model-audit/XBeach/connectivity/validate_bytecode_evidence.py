@@ -800,6 +800,14 @@ def validate(root,here):
         output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
         check(x['sha256'][:10]+'-viewer-time-viewport-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
     check('viewer_time_viewport-no-approval',viewer_time_viewport['whole_model_read_gate']=='NOT_PASSED' and viewer_time_viewport['human_approval_issued'] is False)
+    viewer_search_dialog_panel=json.loads((here/'bytecode-read/viewer-search-dialog-panel-read.json').read_text())
+    check('viewer-search-dialog-panel-four-exact',bound(viewer_search_dialog_panel['prior_receipt']) and len(viewer_search_dialog_panel['records'])==viewer_search_dialog_panel['unique_classes_read']==4 and [x['instances'][0]['member'] for x in viewer_search_dialog_panel['records']]==['viewer/zoomable/ScrollableView.class', 'viewer/zoomable/SearchDialog$1.class', 'viewer/zoomable/SearchDialog.class', 'viewer/zoomable/ViewportTimePanel.class'] and viewer_search_dialog_panel['instances_covered']==8)
+    for x in viewer_search_dialog_panel['records']:
+        original=next(a for a in r['records'] if a['sha256']==x['sha256'])
+        args=['java','-m','jdk.jdeps/com.sun.tools.javap.Main','-c','-p','-s','-constants',str(root/x['class_file']['path'])]
+        output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
+        check(x['sha256'][:10]+'-viewer-search-dialog-panel-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
+    check('viewer_search_dialog_panel-no-approval',viewer_search_dialog_panel['whole_model_read_gate']=='NOT_PASSED' and viewer_search_dialog_panel['human_approval_issued'] is False)
     spec=importlib.util.spec_from_file_location('bytecode_coverage',here/'reconcile_bytecode_coverage.py')
     module=importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
