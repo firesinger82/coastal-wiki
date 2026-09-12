@@ -385,6 +385,7 @@ def main():
     read('bytecode-read/viewer-convertor-windows-read.json')
     read('bytecode-read/viewer-convertor-process-read.json')
     read('bytecode-read/viewer-convertor-const-read.json')
+    read('bytecode-read/viewer-convertor-panel-read.json')
     read('bytecode-read/coverage.json')
     formula_name = 'workbook-formula-read.json'
     if (HERE / formula_name).is_file():

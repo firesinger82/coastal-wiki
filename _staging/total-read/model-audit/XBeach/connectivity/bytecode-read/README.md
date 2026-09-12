@@ -305,3 +305,5 @@ Method는 4바이트 정수 식별자로 1을 CONNECT_COMPOSITE_STATE로 정의�
 2026-09-12 viewer InputStreamThread/ProgressAction/SwingProcessWorker 3종 전체 570줄 판독. 초기화 중 프로세스 실행 실패 시 status0 잔존, 출력 수집의 비EDT 갱신·미대기 종료, 파일 크기 기반 진행률을 연결했다. 누적 Java 299/413종·906경로, 잔여 Java 114종/Python 150종. 근거: `viewer-convertor-process-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
 
 2026-09-12 viewer ConvertorConst 전체 484줄 판독. 형식별 JAR/라이브러리 경로와 시스템 속성 초기화, 구분자 변경 시 TXT 경로를 UTE 경로로 덮는 참조 오류를 연결했다. 누적 Java 300/413종·908경로, 잔여 Java 113종/Python 150종. 근거: `viewer-convertor-const-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer ConvertorPanel 및 중첩 9종 전체 2424줄 판독. JAR 검사 전 출력 삭제, 현재 출력 필드 반환, 실행 실패 후 OK 활성화, Stop의 직접 finished 호출과 중복 완료 경로를 연결했다. 독립 Frame에는 실제 OK 버튼이 없음을 보충했다. 누적 Java 310/413종·928경로, 잔여 Java 103종/Python 150종. 근거: `viewer-convertor-panel-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
