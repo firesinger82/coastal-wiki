@@ -151,3 +151,7 @@ Method는 4바이트 정수 식별자로 1을 CONNECT_COMPOSITE_STATE로 정의�
 ## Primitive 판독 보충
 
 `primitive-read.json`은 전체 955줄과 6개 동일 SHA 경로를 결박한다. 복사 생성자의 Coord 복사와 setter의 참조 공유를 구분했다. 배열 입력 생성자는 last_vtx_idx를 설정하지 않으며, 직렬화의 vertex 수는 signed short로 축소한다. 실제 호출에서의 영향은 별도 확인 대상이다. line ID 목록은 vertex 순서와 중복을 보존하므로 shadow 집계 키와 연결된다. 누적 Java 71/413종·414경로, 전체 gate NOT_PASSED.
+
+## Composite 판독 보충
+
+`composite-read.json`은 두 클래스 전체 1049줄·12개 경로를 결박한다. write는 공유 primitive 배열을 정렬하고 read는 child parent를 설정하지만 setter는 parent를 설정하지 않는다. 내부 iterator는 overlap=false에서 인덱스를 증가시키지 않고 반복한다. 생성자/next의 prefetch도 이 경로에 들어갈 수 있다. 정상 호출 도달 여부는 미확정이다. 누적 Java 73/413종·426경로, 전체 gate NOT_PASSED.
