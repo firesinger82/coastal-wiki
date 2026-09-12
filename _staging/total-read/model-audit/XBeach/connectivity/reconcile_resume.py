@@ -302,6 +302,7 @@ def main():
     read('bytecode-read/launcher-read.json')
     read('bytecode-read/base-io-read.json')
     read('bytecode-read/slog2-header-read.json')
+    read('bytecode-read/slog2-node-read.json')
     formula_name = 'workbook-formula-read.json'
     if (HERE / formula_name).is_file():
         formula = read(formula_name)

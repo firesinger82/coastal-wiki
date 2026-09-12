@@ -31,3 +31,11 @@ Header는 버전, 자식 수(short), leaf 크기(int), 최대 깊이(short), 버
 CategoryMap은 범주 index로 map을 구성하고 미사용 범주 제거 메서드를 제공한다. LineIDMapList는 목록 순서대로 읽고 쓴다. TreeDir는 노드 ID와 시간 경계/블록 포인터 값을 연결한다. 세 컨테이너 모두 readObject가 기존 내용을 먼저 지우지 않으며 음수 개수에 명시적 오류를 내지 않는다. TreeDir의 전용 put은 possible-root이고 깊이가 더 클 때 root를 복사해 갱신한다. 상속된 map 수정 경로의 root 일관성은 이 클래스에 보완 코드가 없다.
 
 Const의 버전 이력은 원본에 실린 호환성 설명으로 읽었다. 실제 호환성 시험으로 간주하지 않는다. TreeNodeID·TimeBoundingBox·Category·LineIDMap 내부와 파일 입력 진입점의 검증 순서는 후속 판독 대상이다. 전체 gate NOT_PASSED, 신규 사람 승인 없음.
+
+## TreeNodeID와 정렬 5종
+
+[slog2-node-read.json](slog2-node-read.json)에 본체와 내부 클래스 4종의 전체 표시 588줄을 기록했다. 동일 SHA 30경로에 대응하며 누적 Java 25/413종·138경로다. Java 388종·Python 150종은 미판독이다.
+
+노드 ID는 depth(short)와 xpos(int)의 6바이트다. leaf는 depth=0, 가능한 root는 xpos=0이다. 부모 이동은 depth를 1 늘리고 xpos를 전달받은 분기 수로 정수 나눗셈한다. TreeDir의 전용 put과 연결하면 xpos=0인 후보 중 기존보다 큰 depth만 root로 복사한다.
+
+두 comparator 모두 depth 내림차순이다. 같은 depth 안에서만 Increasing은 xpos 오름차순, Decreasing은 내림차순이다. 따라서 둘은 전체 순서를 뒤집은 관계가 아니다. 필드는 public mutable이고 equals는 TreeNodeID 인수의 overload만 표시된다. 키를 삽입한 뒤 수정하는 호출 경로는 후속 확인이 필요하다. 원본 main은 comparator 없는 TreeMap과 두 comparator TreeSet을 순서대로 구성하지만, 이를 실행 결과로 간주하지 않는다. 모든 표시 메서드·초기화·빈 marker 클래스까지 판독했으며 외부 의미 승인이나 전체 gate 통과는 아니다.
