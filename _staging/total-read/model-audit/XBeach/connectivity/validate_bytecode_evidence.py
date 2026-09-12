@@ -864,6 +864,14 @@ def validate(root,here):
         output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
         check(x['sha256'][:10]+'-viewer-yaxis-maps-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
     check('viewer_yaxis_maps-no-approval',viewer_yaxis_maps['whole_model_read_gate']=='NOT_PASSED' and viewer_yaxis_maps['human_approval_issued'] is False)
+    viewer_diagnostics=json.loads((here/'bytecode-read/viewer-diagnostics-read.json').read_text())
+    check('viewer-diagnostics-three-exact',bound(viewer_diagnostics['prior_receipt']) and len(viewer_diagnostics['records'])==viewer_diagnostics['unique_classes_read']==3 and [x['instances'][0]['member'] for x in viewer_diagnostics['records']]==['viewer/zoomable/Debug.class', 'viewer/zoomable/Diagnosis.class', 'viewer/zoomable/Profile.class'] and viewer_diagnostics['instances_covered']==6)
+    for x in viewer_diagnostics['records']:
+        original=next(a for a in r['records'] if a['sha256']==x['sha256'])
+        args=['java','-m','jdk.jdeps/com.sun.tools.javap.Main','-c','-p','-s','-constants',str(root/x['class_file']['path'])]
+        output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
+        check(x['sha256'][:10]+'-viewer-diagnostics-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
+    check('viewer_diagnostics-no-approval',viewer_diagnostics['whole_model_read_gate']=='NOT_PASSED' and viewer_diagnostics['human_approval_issued'] is False)
     spec=importlib.util.spec_from_file_location('bytecode_coverage',here/'reconcile_bytecode_coverage.py')
     module=importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)

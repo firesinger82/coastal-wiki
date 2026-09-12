@@ -1,0 +1,95 @@
+{
+  "date": "2026-09-12",
+  "attribution": "AI direct bytecode reading; not independent semantic approval.",
+  "prior_receipt": {
+    "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/disassembly-receipt.json",
+    "sha256": "1cc8b2657a74f3f5904e9d0a40648b1c98f6e031b056b7c6e19122beb632aaa8"
+  },
+  "records": [
+    {
+      "sha256": "ac4eb5aebaa0505a93ec8984ba32640845da74070dfd6cd99ea6ae390e89d0d6",
+      "instances": [
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/win32/mpich/bin/jumpshot.jar",
+          "member": "viewer/zoomable/Debug.class"
+        },
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/bin/jumpshot.jar",
+          "member": "viewer/zoomable/Debug.class"
+        }
+      ],
+      "class_file": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/classes/ac4eb5aebaa0505a93ec8984ba32640845da74070dfd6cd99ea6ae390e89d0d6.class",
+        "sha256": "ac4eb5aebaa0505a93ec8984ba32640845da74070dfd6cd99ea6ae390e89d0d6"
+      },
+      "disassembly": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/disassembly/ac4eb5aebaa0505a93ec8984ba32640845da74070dfd6cd99ea6ae390e89d0d6.txt",
+        "sha256": "a07e940c53bf671b1a91df6a00f975b1aaaa3bc4722a0379c0f520c99564d33c"
+      },
+      "read_lines": [
+        1,
+        68
+      ],
+      "scope": "Three full javap classes,393 lines; complete Debug, Diagnosis and Profile displays.",
+      "observation": "Complete68-line javap. Static initializer allocates one Diagnosis; wrapper initTextArea uses title Debugging Output, setActive/isActive/setFilename/print/println directly delegate. Constructor Objectonly, no per-instance sink. print/println do not check active themselves (Diagnosis also does not); earlier callsites explicitly guard Debug.isActive. No extra thread safety, timestamp, exception handling or cleanup. setFilename propagates IOException and redirects global System.out through delegate, not only debug messages."
+    },
+    {
+      "sha256": "7d1cfc094a1263b5fc2a3985ca5d022aa2acb2d7b40fbb20d3458f0e6cfa5208",
+      "instances": [
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/win32/mpich/bin/jumpshot.jar",
+          "member": "viewer/zoomable/Diagnosis.class"
+        },
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/bin/jumpshot.jar",
+          "member": "viewer/zoomable/Diagnosis.class"
+        }
+      ],
+      "class_file": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/classes/7d1cfc094a1263b5fc2a3985ca5d022aa2acb2d7b40fbb20d3458f0e6cfa5208.class",
+        "sha256": "7d1cfc094a1263b5fc2a3985ca5d022aa2acb2d7b40fbb20d3458f0e6cfa5208"
+      },
+      "disassembly": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/disassembly/7d1cfc094a1263b5fc2a3985ca5d022aa2acb2d7b40fbb20d3458f0e6cfa5208.txt",
+        "sha256": "f1bf56f58a783395d43ecd5a9aa745356122594ab11efe7e0d2bceb6ae0208a7"
+      },
+      "read_lines": [
+        1,
+        257
+      ],
+      "scope": "Three full javap classes,393 lines; complete Debug, Diagnosis and Profile displays.",
+      "observation": "Complete257-line javap. Constructor initializers then redundant assignments result isOnfalse, ilevel0, lineHeadtrue, new StringBuffer, text_areanull. setActive only changes plain nonvolatile boolean; isActive only reads. print/println NEVER consult isOn, so activity gating is caller responsibility. No synchronized method/EDT marshalling despite StringBuffer individual methods being synchronized; multi-step shared level/head/buffer operations can race.\ninitTextArea(title) returns immediately if inactive; active creates NEW JTextArea10x30 and JScrollPane/JFrame, adds/packs/shows. Does not make readonly, cap log size, set close operation/listener, retain JFrame handle, dispose oldframe or preserve visible old output. Repeated init replaces text_area reference, leaving earlier windows and their old text intact; setActive(false) neither hides window nor clears buffer. GUI actions run on caller thread.\nsetFilename unconditionally creates FileOutputStream(filename) without append then PrintStream and System.setOut. Thus creates/truncates file and redirects process-global stdout even when inactive; no own stream retention, prior stream close/restore, stderr redirection, charset choice or exception recovery. Method declares IOException; no security/argument validation. This is static analysis only; no archived output routine executed or file truncated during review.\nprint(s) tests s.indexOf(END)>0, not>=0: marker at start ignored, first occurrenceat0 means later occurrences do not count either; any embedded positive-position occurrence decrements indent before text, no token boundary check. If lineHead, appends UnitIndentStr four spaces ilevel times only while>0; appends s and lineHeadfalse; tests first START index>0 and increments after append. One increment/decrement max per call even repeated markers. No nullguard (indexOf first), negative-level clamp, reset, overflow/size bound or newline inspection within s. print NEVERflushes even if resulting level0.\nprintln uses same END-before-indent/START-after-append policy, appends literal newline and sets lineHeadtrue. ONLY if resulting ilevel EXACT0: sends full buffer to current System.out.print then flush when no text_area, otherwise JTextArea.append then caret=documentlength; afterward replaces StringBuffer. At positive OR negative level retains buffer with no size limit, no timeout/close flush. Unbalanced markers or incidental substrings can defer output indefinitely; incomplete print-only lines also remain buffered. Both END and START in same message decrement then increment, netzero but affects indentation. Sink errors can skip buffer replacement; no finally. Connects caller debug/profiling START/END strings to buffered output, not reliable independent execution-completion evidence. No approved semantic completion or runtime GUI test."
+    },
+    {
+      "sha256": "e5acd8082c762d6d17364bde5f16079ae3bff002b83609c82a6f5fac7d31a0b6",
+      "instances": [
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/win32/mpich/bin/jumpshot.jar",
+          "member": "viewer/zoomable/Profile.class"
+        },
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/bin/jumpshot.jar",
+          "member": "viewer/zoomable/Profile.class"
+        }
+      ],
+      "class_file": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/classes/e5acd8082c762d6d17364bde5f16079ae3bff002b83609c82a6f5fac7d31a0b6.class",
+        "sha256": "e5acd8082c762d6d17364bde5f16079ae3bff002b83609c82a6f5fac7d31a0b6"
+      },
+      "disassembly": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/disassembly/e5acd8082c762d6d17364bde5f16079ae3bff002b83609c82a6f5fac7d31a0b6.txt",
+        "sha256": "24d33ea364be995af4cb9a95140422c5eb585722bf5faa23aa26f18abf12a4b3"
+      },
+      "read_lines": [
+        1,
+        68
+      ],
+      "scope": "Three full javap classes,393 lines; complete Debug, Diagnosis and Profile displays.",
+      "observation": "Complete68-line javap. Separate static initializer allocates its OWN Diagnosis, independent from Debug for active flag/indent/buffer/text area. Same six direct delegates, initTextArea title Profiling Output. No timer or measurement calculation in wrapper; caller Canvas code computes timing/counters. Output methods do not check active internally. Although state separate, setFilename shares process-global System.out with Debug and all other stdout writers; whichever last sets it affects both when they use stdout. No close/restore or exception handling."
+    }
+  ],
+  "unique_classes_read": 3,
+  "instances_covered": 6,
+  "whole_model_read_gate": "NOT_PASSED",
+  "human_approval_issued": false
+}

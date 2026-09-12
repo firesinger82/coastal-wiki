@@ -341,3 +341,5 @@ Method는 4바이트 정수 식별자로 1을 CONNECT_COMPOSITE_STATE로 정의�
 2026-09-12 YaxisTree/named_vector/YaxisTreeNode 3종 전체641줄 판독. 깊이만 비교하는 선택 버퍼·재표시 실패 전 기존 버퍼 소거·루트 및 자기 이동 대상 허용을 앞선 action과 연결했다. 마지막 leaf 깊이 기반 레벨 배열·루트 단독의 음수 확대 cursor와 명시적 canvas commit 부재를 기록했다. 누적 Java379/413종·1066경로, 잔여 Java34종/Python150종. 근거: `viewer-yaxis-tree-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
 
 2026-09-12 YaxisMaps/IntegerArrayComparator 2종 전체739줄 판독. 좌표 배열 정렬·공통 노드 구성, 캐시된 노드의 현재 조상에서 보이는 행 검색, 삭제 뒤 null 행 저장·실패 반환과 Commit의 계속 진행을 연결했다. 배열 비교는 int 차감으로 overflow 가능하며 갱신은 원래 line→node 매핑을 재구성하지 않는다. 누적 Java381/413종·1070경로, 잔여 Java32종/Python150종. 근거: `viewer-yaxis-maps-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 Debug/Diagnosis/Profile 3종 전체393줄 판독. 호출자에게 맡긴 active 검사, 별도 상태와 공통 System.out, 파일 설정의 전역 stdout 교체, START/END 위치>0 검사와 level0에서만 출력하는 무제한 버퍼를 연결했다. 누적 Java384/413종·1076경로, 잔여 Java29종/Python150종. 근거: `viewer-diagnostics-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
