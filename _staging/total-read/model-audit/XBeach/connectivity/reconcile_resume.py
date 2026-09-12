@@ -306,6 +306,7 @@ def main():
     read('bytecode-read/slog2-iteration-read.json')
     read('bytecode-read/time-coord-read.json')
     read('bytecode-read/drawable-order-read.json')
+    read('bytecode-read/infobox-read.json')
     formula_name = 'workbook-formula-read.json'
     if (HERE / formula_name).is_file():
         formula = read(formula_name)

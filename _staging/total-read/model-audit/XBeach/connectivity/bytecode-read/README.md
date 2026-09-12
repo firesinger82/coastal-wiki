@@ -74,3 +74,13 @@ Drawable.Order는 시간 비교가 동률일 때 객체 identity, category index
 Drawable은 InfoBox를 상속하며 overlap을 직접 재정의하지 않는다. [InfoBox 선언](disassembly/032382185c66e318384f74fbf2bb7dd791bd2f4cad288a807e3c04e78e58055a.txt) 2줄은 TimeBoundingBox 상속을 확인해 주지만 InfoBox 전체 판독은 아직 하지 않았다. initExclusion은 전체 길이에서 전달된 구간별 교집합 길이를 각각 빼며 구간의 합집합을 만들거나 결과를 0으로 제한하지 않는다. 중복되는 구간을 전달하는 호출 여부는 후속 확인 대상이다.
 
 그리기는 범주의 Topology에 따라 Event(0), State(1), Arrow(2) 순서로 분기하고 각 추상 draw/hit 메서드에 위임한다. Topology의 readObject는 int 값을 검사 없이 저장한다. Drawable 생성자에는 row_ID를 INVALID_ROW로 설정하는 명령이 없지만 미초기화 판정은 그 sentinel을 검사한다. 하위 클래스·호출자의 초기화까지 읽은 뒤 실제 영향을 판단한다. 전체 gate NOT_PASSED·신규 사람 승인 없음.
+
+## InfoBox 메타데이터 전체 판독
+
+[infobox-read.json](infobox-read.json)에 967줄 전체·동일 SHA 6경로를 기록했다. 누적 Java 47/413종·270경로, 남은 Java 366종/Python 150종이다.
+
+InfoBox는 TimeBoundingBox를 상속하고 overlap을 재정의하지 않는다. Drawable → InfoBox → TimeBoundingBox의 기반 상속 관계는 확인됐으며 하위 구현의 재정의는 별도다. InfoBox의 직렬화 메서드는 상속된 시간 경계를 기록하지 않고 category index(int), 정보 바이트 수(short), 정보 바이트만 처리한다. 하위 클래스가 시간 경계를 어떻게 저장하는지는 해당 구현에서 확인해야 한다.
+
+resolveCategory는 유효한 index의 범주를 찾지 못하면 UnknownType-index라는 State 범주를 기본 색·폭 1로 만들어 map에 등록한다. releaseCategory는 공유 범주의 used를 false로 바꾸고 참조를 비우며 index는 유지한다. CategoryMap의 미사용 범주 제거와 연결되는 동작이다.
+
+정보 해석은 최초 접근 시 플래그를 먼저 올리고 InfoType별 InfoValue 읽기에 위임한다. 정보 바이트를 바꾸는 setter나 readObject에는 이 플래그·기존 해석값의 초기화가 없다. 해석 도중 IOException이면 스택을 출력하고 System.exit(1)을 호출한다. 출력 문자열 생성도 해석을 유발하므로 단순 toString이라고 무조건 부작용 없는 경로로 취급할 수 없다. 실제 종료나 오래된 값 표시를 재현한 것은 아니며 호출 순서는 후속 판독 범위다. writer는 전체 배열을 쓰고 reader는 양수 signed short 길이만 읽는다. 전체 gate NOT_PASSED·신규 사람 승인 없음.

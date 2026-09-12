@@ -84,5 +84,13 @@ def validate(root,here):
         output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
         check(x['sha256'][:10]+'-drawable-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
     check('drawable-no-approval',drawable['whole_model_read_gate']=='NOT_PASSED' and drawable['human_approval_issued'] is False)
+    info=json.loads((here/'bytecode-read/infobox-read.json').read_text())
+    check('infobox-exact',bound(info['prior_receipt']) and len(info['records'])==info['unique_classes_read']==1 and info['records'][0]['instances'][0]['member']=='base/drawable/InfoBox.class' and info['instances_covered']==6)
+    for x in info['records']:
+        original=next(a for a in r['records'] if a['sha256']==x['sha256'])
+        args=['java','-m','jdk.jdeps/com.sun.tools.javap.Main','-c','-p','-s','-constants',str(root/x['class_file']['path'])]
+        output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
+        check('infobox-reproduce',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
+    check('infobox-no-approval',info['whole_model_read_gate']=='NOT_PASSED' and info['human_approval_issued'] is False)
     check('no-approval',all(x['whole_model_read_gate']=='NOT_PASSED' and x['human_approval_issued'] is False for x in (r,read)))
     return checks
