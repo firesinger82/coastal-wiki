@@ -19,7 +19,15 @@
 
 [최소 재현](lifecycle/resolution-20260912/probe-results.json)은 정상 출력 반환·오류 출력 STOP 1·getter local 유지만 확인한다. 전체 모델 또는 MPI 실행 검증을 뜻하지 않는다. [연결 검토본](../../../../../models/XBeach/source-analysis/xbeach-lifecycle-state-contracts.md)은 draft-unsourced이며 새 사람 승인을 발급하지 않는다. 기존 원장과 승인 이력은 그대로 보존한다. [설치 manifest](lifecycle/resolution-20260912/install-manifest.json)의 다섯 문서를 반영하고 [인용·프로브·설치 검증](lifecycle/resolution-20260912/validation.json)을 통과했다. 원본 인용 67곳과 기존 불변 이력 292개가 일치한다.
 
-다음 작업은 **XBeach 자체 entry/build/mode별 도달 경로와 파일 역할 대응의 누락 확인**, 아직 대조하지 않은 모델 수식의 의미 확인 및 결과 검토다. 이번 12개 계약과 이미 판정한 물리 쟁점 4개를 최초 미검토 항목으로 다시 세지 않는다. 네 진입점 계열이나 기존 대표 edge 수를 전체 호출 범위의 완료 근거로 쓰지 않는다. 부속 도구 내부 판독은 재개하지 않는다.
+## 2026-09-12 빌드·모드·수식 대응 후속
+
+[모델 빌드·파일 역할](build-mode-20260912/build-map.json)은 Autotools, 여덟 모델 프로젝트와 일곱 solution, 전체 src 파일 집합을 대조한다. 별도 Windows BMI 대상과 코어 의존, 대상별 정의·제외 파일, 생성 include 소비자를 기록했다. Python 소스 생성기는 임시 복사본에서 실행해 출력 집합을 확인했다. [분기·수식 계약](build-mode-20260912/contracts.json)은 기존 여섯 dispatcher 경로를 다시 빌드 대상과 연결하고, (2.5)~(2.10)의 파수 보정 및 B.37/C.37의 지형 갱신을 원문과 대조한다. 기존 과거 원장을 덮어쓰지 않는다.
+
+파수 보정량의 모델 의미와 `sourcesink`/침식 부호는 판정이 있는 상태다. B.37/C.37의 `a`는 원문에 남겨 둔 저자 의도 미정 표기이며, 대응 코드에 별도 a 의존 항이 없음을 기록했다. 글꼴 문제의 내부 원인이나 이 a의 출처를 찾기 위해 부속 도구로 확장하지 않는다.
+
+[독립 Codex 원문 검토·반영](build-mode-20260912/review-response.json)을 마쳤다. Claude 시도는 사용량 한도로 중단된 이력이며 실제 검토 제공자와 구분한다. [설치 manifest](build-mode-20260912/install-manifest.json)의 여섯 문서에 새 빌드·수식 검토본, 기존 wave dispatcher/input 계약 정정, 목차를 반영했다. [인용·생성·설치 검증](build-mode-20260912/validation.json)은 출처 40구간, 생성 include 27개, 설치 바이트와 불변 이력 292개를 확인한다. 두 신규 노트는 draft-unsourced다. 전체 솔버 실행이나 모든 루틴 도달성의 검증을 대신하지 않는다.
+
+다음 실행 연결 작업은 **경계 종류·표사 공식·선택 기능별 호출 조건과 루틴 도달성**이다. 이번 빌드 목록/파일 역할과 이미 검토한 lifecycle 12개·physics 네 쟁점·여섯 dispatcher를 처음부터 다시 만들지 않는다. 매뉴얼은 이번 두 수식 묶음 밖의 의미 대응을 이어간다. 최종 새 주장 검토·필요한 사람 승인은 남으며, 전체 모델 완료나 기존 승인 승계를 주장하지 않는다. 부속 도구 내부 판독은 재개하지 않는다.
 
 2026-09-12 도구 상태 확인: GOAL은 **paused**다. 이 문서는 상태 추적이며 도구를 자동 재개하거나 완료 처리하지 않는다. 아래 활성화 문구는 당시 이력이다.
 

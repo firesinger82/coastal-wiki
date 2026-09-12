@@ -1,0 +1,149 @@
+--- a/models/XBeach/source-analysis/xbeach-build-mode-connectivity.md
++++ b/models/XBeach/source-analysis/xbeach-build-mode-connectivity.md
+@@ -0,0 +1,57 @@
++---
++title: "XBeach 빌드 대상·소스 생성·모드 연결"
++canonical_source: self
++citation_status: draft-unsourced
++note_author: "Codex"
++note_date: 2026-09-12
++verification_method: "원본 빌드 선언·호출·피호출 정의 대조와 임시 복사본 소스 생성; 새 연결 주장 검토본"
++---
++
++AI가 작성한 연결 검토본이다. 소스 기준은 `models/XBeach/raw/source_code/trunk/`이며, 아래 짧은 경로는 이 루트를 기준으로 한다. [빌드·파일 역할 원장](../../../_staging/total-read/model-audit/XBeach/connectivity/build-mode-20260912/build-map.json)과 [분기 계약](../../../_staging/total-read/model-audit/XBeach/connectivity/build-mode-20260912/contracts.json)에 원본 SHA와 행을 연결했다. **컴파일 목록 포함, 모듈 의존, 실제 루틴 실행 도달성은 각각 다른 증거다.**
++
++## 빌드 대상과 API
++
++| 계열 | 소스 배치 | 모델 진입점 |
++|---|---|---|
++| Autotools | `src/xbeachlibrary/Makefile.am:3-60`은 코어·`introspection`·BMI를 한 라이브러리 소스 목록에 둔다. `src/xbeach/Makefile.am:2-8`은 입력/프로그램을 이 라이브러리에 연결한다. | 프로그램 또는 BMI |
++| Visual Fortran / IFX static | `xbeachlibrary.vfproj`와 `xbeachlibrary_IFX.vfproj`는 코어를 static library로 선언한다. `introspection`과 BMI는 이 목록에 없다. | 해당 static library를 사용하는 아래 세 대상 |
++| Windows 실행 파일 | `xbeach.vfproj` 및 `xbeach_IFX.vfproj`의 `Files`에는 `input.F90`, `xbeach.F90`, `introspection.F90`이 있다. | `readinput → init → executestep/outputext → final` |
++| Windows dynamic API | `xbeachlibrary_dynamic.vfproj` 및 `xbeachlibrary_IFX_dynamic.vfproj`의 `Files`에는 `introspection.F90`, `libxbeach_dynamic.F90`이 있다. | C 이름 `init/executestep/outputext/finalize` |
++| Windows BMI API | `xbeachlibrary_bmi.vfproj` 및 `xbeachlibrary_IFX_bmi.vfproj`의 `Files`에는 `xbeach_bmi.f90`이 있다. | C 이름 `initialize/update/finalize` 및 변수/시간 API |
++
++Windows 프로젝트 경로는 `src/xbeach/` 또는 `src/xbeachlibrary/`다. 일곱 `XBeach_VS*.sln`의 `ProjectDependencies`에서 실행·dynamic·BMI 대상의 static 코어 의존을 확인했다. IFX solution은 IFX 프로젝트를 선택한다. 이 선언으로 실제 Windows 링크 성공이나 DLL export 검사를 대신하지 않는다. 프로젝트별 파일 행·설정·solution 대응은 위 원장에 보존했다. 함수 본문 근거: `src/xbeach/xbeach.F90:1-33`, `src/xbeachlibrary/libxbeach_dynamic.F90:12-38`, `src/xbeachlibrary/xbeach_bmi.f90:35-78`.
++
++Autotools는 `--with-mpi`와 `--with-netcdf` 두 축을 각각 선택한다. MPI 선택은 `USEMPI/HAVE_MPI_WTIME`, NetCDF 선택은 `USENETCDF` 컴파일 정의로 연결된다. Windows에서는 **대상별** 정의와 제외 파일을 읽어야 한다. 예를 들어 `MPI_netcdf_Release|x64`의 두 static 프로젝트에는 두 기능 정의가 있지만 같은 이름의 실행·dynamic·BMI 프로젝트에는 해당 전처리 정의가 직접 적혀 있지 않다. 설정 이름만으로 모든 번역 단위의 정의를 동일하다고 처리하지 않는다. (`configure.ac:42-54,71-80`; `src/xbeachlibrary/Makefile.am:99-108`; 각 `.vfproj`의 `Configurations/Configuration/Tool`)
++
++XBeach Python wrapper는 제공된 라이브러리의 `init/executestep/outputext`를 호출한다. 별도 솔버 빌드나 BMI의 `initialize` 이름과 자동 호환되는 인터페이스로 세지 않는다. (`src/pybeach/xbeach/libxbeach.py:61-72`; [lifecycle 계약](xbeach-lifecycle-state-contracts.md))
++
++## 생성 파일과 비연결 소스
++
++`generate.py`는 `variables.def`와 `params.def`를 읽고 `templates/*.mako`를 같은 이름의 `.inc`로 렌더한다. 템플릿 인수가 없으면 전체 목록을 생성한다. 원본 생성기를 임시 복사본에서 실행해 생성 파일 집합을 확인했다. (`scripts/generate.py:33-41,215-262`; [생성 재현](../../../_staging/total-read/model-audit/XBeach/connectivity/build-mode-20260912/generation-probe.json))
++
++`BUILT_SOURCES`는 생성 가능한 파일 전체 목록이 아니다. `RF.inc`, `RFveg.inc`, `genmpi_coll.inc`, `genmpi_distr.inc`, `nh_pars.inc`, `paramsdecl.inc`, `space_alloc_arrays_dummies.inc`, `xmpi_bcast.inc`도 템플릿에서 생성되지만 그 목록에는 없다. `spacedecl.inc` 규칙이 인수 없이 생성기를 실행하므로 함께 생성되는 경로를 기록한다. 이 사실만으로 모든 병렬/증분 make 순서가 안전하다고 판정하지 않는다. (`src/xbeachlibrary/Makefile.am:62-92`; `scripts/generate.py:219-231`)
++
++Windows prebuild는 `build/generate_and_copy_gen_files.bat`에서 `scripts/dist/generate.exe`를 호출한다. 이름이 비슷하다는 이유로 이 실행물과 현재 Python 원본의 출력이 동일하다고 보증하지 않는다. 모델이 호출하는 인터페이스까지만 기록했다. (`src/xbeachlibrary/build/generate_and_copy_gen_files.bat:18-23`)
++
++확인한 Autotools와 여덟 모델 프로젝트의 합집합에 없는 Fortran 파일은 다음과 같다: `beachwizard.F90`, `demo.F90`, `general_mpi_new.F90`, `wave_bc_nextgen.f90`, `wave_boundary_datastore.f90`, `wave_boundary_init.f90`, `wave_boundary_main.f90`, `wave_boundary_update.f90`, `wave_directions.F90`, `wave_stationary.F90`, `xmpinew.F90`. 이들은 `src/xbeachlibrary/`에 존재하지만 이 빌드의 활성 솔버로 간주하지 않는다. `demo.F90:1-8`은 상태 이름 조회 예제 프로그램이다. `waveparams.F90`은 Autotools 목록에는 남아 있으나, 조사한 `src`의 활성 `use waveparams` 문은 없다. 컴파일 목록만으로 실행 경로를 추가하지 않는다. (각 `Makefile.am`/`.vfproj` 파일 목록과 원장의 `module_use_index`)
++
++## 물리 모드의 실제 분기
++
++공통 드라이버는 오류가 없을 때 `wave_bc` 이후 `swave==1`이면 `wave`, `flow==1` 또는 NONH이면 `flow`를 호출한다. 그 뒤 표사와 지형 갱신 조건을 검사한다. (`src/xbeachlibrary/libxbeach.F90:293-310`)
++
++| 모드·조건 | 도달하는 계산 | 시간 조건 |
++|---|---|---|
++| stationary | `wave_dispersion(0) → wave_stationary_directions(0)` | `abs(mod(t,wavint)) < 0.001*dt` 또는 새 stationary 경계 |
++| surfbeat, `single_dir!=1` | WCI에 따른 분산 계산 → `wave_instationary` | 정상 물리 스텝마다 |
++| surfbeat, `single_dir==1` | 평균장 갱신 → 조건부 방향 계산 → 에너지용 분산 재계산 → `wave_instationary` | 방향 계산만 `wavint`/새 경계/첫 스텝 조건; 에너지는 매 스텝 |
++| nonh, `nonhq3d!=1` | `nonh_1lay_pred → flow_secondorder_advUV → nonh_1lay_cor` | 정상 물리 스텝마다 |
++| nonh, `nonhq3d==1`, `s%ny==0` | `nonh_2lay_pred_2dV → flow_secondorder_advUV → nonh_2lay_cor_2dV` | 정상 물리 스텝마다 |
++| nonh, `nonhq3d==1`, `s%ny!=0` | `nonh_2lay_pred_3d → flow_secondorder_advUV → nonh_2lay_cor_3d` | 정상 물리 스텝마다 |
++
++근거: `src/xbeachlibrary/wave_timestep.F90:75-115`, `flow_timestep.F90:635-658`, `nonh.F90:201-249`. NONH 입력은 `swave=1`을 경고 후 0으로, `secorder=0`을 경고 후 1로 바꾼다. NONH pressure 경로는 `wave`의 case가 아니라 `flow` 내부다. (`params.F90:1559-1563,1740-1747`)
++
++MPI는 위 물리 모드와 별개의 컴파일 축이다. `solver.F90:14`의 “MPI이면 nonh 제외”라는 오래된 주석을 현재 빌드 조건으로 사용하지 않는다. 빌드 목록에 `nonh/solver/flow_secondorder`가 있고 실제 pressure 호출 및 solver 내부 MPI 분기가 남아 있다. (`flow_timestep.F90:630-658`; `solver.F90:205-214`)
++
++stationary 또는 `single_dir`의 MPI 입력에서는 `swave==1`, 전역 `par%ny>0`일 때 자동 분할이 `MPIBOUNDARY_X`로 설정되며, 작은 `ny`는 종료된다. `MPIBOUNDARY_MAN`은 이 자동 분기의 명시적 예외다. NONH의 2DV/3D dispatcher는 별도로 **로컬 `s%ny`**를 검사한다. (`params.F90:1884-1910`; `nonh.F90:209-230`)
++
++이 문서는 저장된 빌드 선언·전체 `src` 파일 역할과 위 여섯 dispatcher 경로를 연결한다. 경계 종류·표사 공식·선택 기능까지 포함한 모든 루틴의 실행 도달성이나 전체 모델 검증 완료를 뜻하지 않는다.
+--- a/models/XBeach/manual-notes/xbeach-manual-equation-code-contracts.md
++++ b/models/XBeach/manual-notes/xbeach-manual-equation-code-contracts.md
+@@ -0,0 +1,35 @@
++---
++title: "XBeach 매뉴얼 수식과 구현: 파수 보정·지형 갱신"
++canonical_source: self
++citation_status: draft-unsourced
++note_author: "Codex"
++note_date: 2026-09-12
++verification_method: "Kingsday/Master 원본 수식 객체·주변 문단·복원 페이지와 동결 소스의 대조; 새 주장 검토본"
++---
++
++AI 대조 노트다. 원본은 `models/XBeach/raw/source_code/trunk/doc/manual/XBeach_manual_kingsday.docx`와 `XBeach_manual_master.docx`이며, 구현은 같은 `trunk/src/xbeachlibrary/` 기준이다. 원문은 변경하지 않았다. [원본 SHA·수식 객체·페이지·코드 근거](../../../_staging/total-read/model-audit/XBeach/connectivity/build-mode-20260912/contracts.json)를 함께 기록했다.
++
++## (2.5)~(2.10): 파수 보정과 파랑–흐름 상호작용
++
++두 판본의 식 (2.5)는 이전 스텝 파수에 보정량을 더하는 관계다. 위첨자의 네모 위치에는 원본 MathType 데이터의 `∼` 문자가 있고, 식 바로 뒤 문단이 이 항을 **파수 보정량**으로 정의한다. 따라서 이 기호의 모델 의미는 보정량으로 읽을 수 있다. 글꼴 렌더의 네모 현상 자체를 수정했다는 뜻은 아니다. (두 DOCX 복원본 물리 p.19, 식 (2.5)와 직후 문단; 기존 [문자 판독 근거](../../../_staging/total-read/model-audit/XBeach/connectivity/manuals-docx-read/glyph-record-read/receipt.json))
++
++이어지는 식 (2.6)은 Eikonal 관계, (2.7)은 파수 벡터의 크기, (2.8)은 고유 주파수에 흐름의 Doppler 항을 더한 절대 주파수다. (2.9)~(2.10)은 전파·굴절 속도를 설명한다. 현재 코드에서는 `wave_dispersion`의 `kmx/kmy`, `km`, `s%wm`이 이 역할에 대응하지만 다음 구현 조건까지 보아야 한다. (동일 p.19; `wave_functions.F90:978-1108`)
++
++- `wci==1`에서만 파수 보정 경로를 실행한다. 먼저 평균 파향과 격자 방향의 차이로 `kmx/kmy`를 구성한다. 분산 계산의 호출 인수 0/1/2에 따라 순간장·방향 계산용 평균장·비정상 WCI 평균장을 선택한다. (`wave_functions.F90:978-1021`; `wave_timestep.F90:75-114`)
++- 절대 주파수의 흐름 항에는 `hwci/hwcimax`를 이용한 수심 가중이 있다. 파수 갱신에는 `dkmydx-dkmxdy` 교차 미분 항도 있고, 이후 `km<=25`, 유한 파고 보정과 고유 주파수 하한이 적용된다. 매뉴얼의 간결한 식을 이 전체 이산 구현과 직접 동일시하지 않는다. (`wave_functions.F90:1022-1091`)
++- 방향별 전파 속도에는 WCI 유속을 더하고, 굴절 속도에는 수심 경사와 유속 경사 항을 적용한다. 최종 방향 속도는 `0.5*pi/Trep` 크기로 제한한다. (`wave_functions.F90:1176-1211`)
++
++## B.37 / C.37: 지형 갱신과 `sourcesink`
++
++Kingsday B.37과 Master C.37의 첫 줄은 원본 객체와 페이지 모두 `0a`로 끝나고, 둘째 줄은 `0`으로 끝난다. 주변 문단은 첫째 식을 부유사·소류사 수송량의 발산으로, 둘째 식을 부유사의 침식–퇴적항과 소류사 발산으로 설명한다. `a`의 저자 의도는 이 문맥에 정의되어 있지 않으므로 원문을 임의로 고치지 않는다. (Kingsday 복원본 물리 p.135 / 인쇄 p.134; Master 복원본 물리 p.138 / 인쇄 p.135; 각 B.5/C.5와 식 B.37/C.37)
++
++현재 구현의 대응은 다음과 같다. 여기서 `dzg`는 입경별 **침식 방향을 양수로 둔 바닥 변화량**이다.
++
++| 입력 | 계산하는 항 | 이후 지형 갱신 |
++|---|---|---|
++| `sourcesink==0` | 부유사와 소류사의 면 수송량 차이에 격자 면적 역수를 곱함 | `morfac*dt/(1-por)`를 곱해 `dzg` 계산 |
++| `sourcesink==1` | `ero-depo_ex`와 소류사 면 수송량 차이 | 같은 계수를 곱해 `dzg` 계산 |
++
++한 입경에서는 `zb=zb-sum(dzg)`로 갱신한다. 그러므로 양의 수송 발산/침식은 바닥을 낮추며, 이 대응 경로에는 별도의 `a` 의존 항이 없다. 다입경은 `update_fractions`로 이어지고, `ny==0` 분기에는 `lsgrad`에 의한 연안방향 기여가 남는다. `0a`를 삭제하거나 저자 의도를 단정하지 않아도 구현의 부호·공극률·형태 가속계수 계약은 확인할 수 있다. (`morphevolution.F90:731-804`; 실행 시간과 `morfac` guard는 `:640-644`)
++
++이 두 수식 묶음의 의미 대조 결과이며 전체 매뉴얼 수식 검증을 뜻하지 않는다. 앞서 확인한 침투식의 판본 차이와 시간 이산화는 [기존 대조 기록](../../../_staging/total-read/model-audit/XBeach/connectivity/INFILTRATION-DOCUMENT-CODE-COMPARISON.md)을 따른다.
+--- a/models/XBeach/source-analysis/xbeach_infrastructure.md
++++ b/models/XBeach/source-analysis/xbeach_infrastructure.md
+@@ -15,0 +16,4 @@
++dispatch_correction_date: 2026-09-12
++dispatch_correction_by: "Codex; 독립 Codex CLI 원문 대조 검토"
++dispatch_correction_scope: "wave dispatcher의 wavint 적용 범위 정정"
++dispatch_correction_human_approval: not-issued
+@@ -24 +28 @@
+-> XBeach 의 **지원(infrastructure) 모듈** 종합 — 물리 solver 가 아닌 자료구조·수치도구·결합 interface. 전 소스 커버 완결용(개별 deep 대신 역할 map).
++> XBeach 의 **지원(infrastructure) 모듈** 종합 — 물리 solver 가 아닌 자료구조·수치도구·결합 interface. 모듈 역할을 안내하며 개별 루틴의 전체 실행 도달성 검증을 뜻하지 않는다.
+@@ -48 +52 @@
+-- `wave(s,par)`(:34): wave 모델 갱신을 **`wavint` 간격**으로 호출(`mod(t,wavint)<…`, :78) — flow 보다 큰 간격으로 wave 갱신(파는 천천히 변, 계산 절감). [[xbeach_mode_dispatch]] 가 surfbeat/stationary/nonh 중 어느 wave solver 를 부를지 결정, 이 dispatcher 가 timing.
++- `wave(s,par)`(:34)는 stationary를 `wavint` 또는 새 경계조건 때 갱신한다. Surfbeat의 `wave_instationary`는 매 정상 물리 스텝 호출하며, `single_dir=1`일 때만 방향 계산을 별도 간격으로 갱신한다 (`wave_timestep.F90:75-115`). NONH 압력 계산은 `flow` 내부에서 호출한다 (`flow_timestep.F90:635-658`). [[xbeach_mode_dispatch]]와 [[xbeach-build-mode-connectivity]] 참조.
+--- a/models/XBeach/source-analysis/xbeach_mode_dispatch.md
++++ b/models/XBeach/source-analysis/xbeach_mode_dispatch.md
+@@ -10,0 +11,5 @@
++source_correction_date: 2026-09-12
++source_correction_by: "Codex; 독립 Codex CLI 원문 대조 검토"
++source_correction_scope: "wavint 적용 범위와 입력 기본값, unsupported 실행 권고 정정"
++source_correction_human_approval: not-issued
++source_correction_provenance: "기존 verification_*는 이전 검증 이력이며 이번 정정의 새 사람 승인을 뜻하지 않음"
+@@ -149 +154 @@
+-## Working Rules
++## Input contracts
+@@ -151,6 +156,5 @@
+-- For `surfbeat`, set `wavint` 5-30 s; default OK for Hs ≤ 4 m.
+-- Stationary mode reports `maxiter` reached as a warning — if frequent, reduce `maxerror` or increase `maxiter`.
+-- Nonh mode default `swave=0` is correct; ignore short-wave dissipation/breaking parameters in input — they don't apply.
+-- `single_dir=1` in surfbeat is for cases where directional spread is small; reduces refraction CFL cost ~30%.
+-- `wbctype` and `wavemodel` must be compatible; old `instat`+old constants are translated but warnings can be confusing — set `wavemodel` explicitly.
+-- `maxdtfac=500` (nonh default) is very permissive; if your nonh run stalls, reducing to 100 trims explosion checks.
++- `wavint`, `maxerror`, `maxerror_angle`, and `maxiter` are read for stationary or `single_dir==1`. The input default for `wavint` is 600 s; subsequent `morfacopt==1` scaling divides it by `max(morfac,1)` (`params.F90:1359-1369,1940-1954`). These are input/implementation facts, not case-specific tuning recommendations.
++- Surfbeat action/energy advances on each successful physics step. `wavint` schedules the stationary solve or the directional component of `single_dir`, not all surfbeat evolution (`wave_timestep.F90:75-115`).
++- Nonh input forces `swave=0` and `secorder=1` with warnings. It reaches pressure predictor/corrector inside `flow` (`params.F90:1559-1563,1740-1747`; `flow_timestep.F90:635-658`).
++- `maxdtfac` defaults to 50 for stationary/surfbeat and 500 for nonh. The source does not establish a universal tuned replacement or a fixed `single_dir` speedup percentage (`params.F90:286-290`).
++- Build membership, MPI configuration and runtime mode guards are recorded separately in [[xbeach-build-mode-connectivity]].
+--- a/models/XBeach/README.md
++++ b/models/XBeach/README.md
+@@ -25,0 +26,2 @@
++- [빌드 대상·소스 생성·모드 연결](source-analysis/xbeach-build-mode-connectivity.md): **검토본(draft-unsourced)**. 별도 BMI 프로젝트, 생성 include, 비연결 소스와 여섯 dispatcher 경로를 정리했다.
++- [매뉴얼 수식–구현 대응](manual-notes/xbeach-manual-equation-code-contracts.md): **검토본(draft-unsourced)**. (2.5)~(2.10)의 파수 보정과 B.37/C.37의 지형 갱신 부호·sourcesink 분기를 대조했다.
+@@ -35,2 +37,2 @@
+-| source-analysis | 39 |
+-| manual-notes | 7 |
++| source-analysis | 40 |
++| manual-notes | 8 |
+--- a/INDEX.md
++++ b/INDEX.md
+@@ -29 +29 @@
+-| [XBeach](models/XBeach/) | **감사·canonical 반영 2026-09-09** | P0 v3 456파일(281 2독립·22 단독·153 메타데이터), 보충103 canonical 연결, 충돌3·미검증반증10·문서207·vendor 귀속 정리. source-analysis39·manual-notes7·web-refs1. 2026-09-12 연결 보충 2편은 **draft-unsourced·사람 검토 대기**, Q3D 조건·보고서 기호·초기화/hotstart/BMI 계약 보충. [완료 원장](_staging/total-read/model-audit/XBeach/closure/README.md), [모델 목차](models/XBeach/README.md). 구 코어118 감사(2026-07-12)와 분모 구별. |
++| [XBeach](models/XBeach/) | **감사·canonical 반영 2026-09-09** | P0 v3 456파일(281 2독립·22 단독·153 메타데이터), 보충103 canonical 연결, 충돌3·미검증반증10·문서207·vendor 귀속 정리. source-analysis40·manual-notes8·web-refs1. 2026-09-12 연결 보충 4편은 **draft-unsourced·사람 검토 대기**, Q3D 조건·보고서 기호·lifecycle·빌드/모드·매뉴얼 수식 대응 보충. [완료 원장](_staging/total-read/model-audit/XBeach/closure/README.md), [모델 목차](models/XBeach/README.md). 구 코어118 감사(2026-07-12)와 분모 구별. |

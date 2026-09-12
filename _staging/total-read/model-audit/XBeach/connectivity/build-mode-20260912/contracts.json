@@ -1,0 +1,428 @@
+{
+  "date": "2026-09-12",
+  "scope": "Top-level wave/nonhydrostatic dispatch and selected manual semantics; not every numerical option or complete routine reachability",
+  "human_approval_issued": false,
+  "modes": [
+    {
+      "id": "stationary",
+      "guard": "swave==1 and wavemodel==STATIONARY",
+      "sequence": [
+        "wave",
+        "wave_dispersion(0)",
+        "wave_stationary_directions(0)"
+      ],
+      "update_guard": "abs(mod(t,wavint)) < 0.001*dt or newstatbc==1"
+    },
+    {
+      "id": "surfbeat_directional",
+      "guard": "swave==1 and wavemodel==SURFBEAT and single_dir!=1",
+      "sequence": [
+        "wave",
+        "optional update_means_wave_flow if wci==1",
+        "wave_dispersion(2 if wci==1 else 0)",
+        "wave_instationary"
+      ],
+      "update_guard": "each successful physics step"
+    },
+    {
+      "id": "surfbeat_single_dir",
+      "guard": "swave==1 and wavemodel==SURFBEAT and single_dir==1",
+      "sequence": [
+        "wave",
+        "update_means_wave_flow",
+        "conditional wave_dispersion(1), wave_stationary_directions(1)",
+        "wave_dispersion(2 if wci==1 else 0)",
+        "wave_instationary"
+      ],
+      "update_guard": "direction solve at abs(mod(t,wavint)) < 0.001*dt or newstatbc==1 or t==dt; wave_instationary each successful physics step"
+    },
+    {
+      "id": "nonh_one_layer",
+      "guard": "wavemodel==NONH and nonhq3d!=1",
+      "sequence": [
+        "flow",
+        "nonh_cor(0) -> nonh_1lay_pred",
+        "flow_secondorder_advUV",
+        "nonh_cor(1) -> nonh_1lay_cor"
+      ],
+      "update_guard": "each successful physics step; input validation turns secorder on"
+    },
+    {
+      "id": "nonh_two_layer_2dv",
+      "guard": "wavemodel==NONH and nonhq3d==1 and s%ny==0",
+      "sequence": [
+        "flow",
+        "nonh_cor(0) -> nonh_2lay_pred_2dV",
+        "flow_secondorder_advUV",
+        "nonh_cor(1) -> nonh_2lay_cor_2dV"
+      ],
+      "update_guard": "each successful physics step; local s%ny selects the branch"
+    },
+    {
+      "id": "nonh_two_layer_3d",
+      "guard": "wavemodel==NONH and nonhq3d==1 and s%ny!=0",
+      "sequence": [
+        "flow",
+        "nonh_cor(0) -> nonh_2lay_pred_3d",
+        "flow_secondorder_advUV",
+        "nonh_cor(1) -> nonh_2lay_cor_3d"
+      ],
+      "update_guard": "each successful physics step; local s%ny selects the branch"
+    }
+  ],
+  "definitions": [
+    {
+      "name": "wave",
+      "source": {
+        "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_timestep.F90",
+        "line_start": 34,
+        "line_end": 34,
+        "sha256": "13297e7ff3b23640c1697f25e7af980aff5e169fe0be0b9d665dd32f3170c0ac",
+        "quote_exact_utf8": "   subroutine wave(s,par)\r"
+      }
+    },
+    {
+      "name": "wave_dispersion",
+      "source": {
+        "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_functions.F90",
+        "line_start": 925,
+        "line_end": 925,
+        "sha256": "2fda65c76091b855aee55b458b34625ab021136f63455bfe3190d3377ff8a205",
+        "quote_exact_utf8": "   subroutine wave_dispersion(s,par,useAverageDepthSwitch)\r"
+      }
+    },
+    {
+      "name": "update_means_wave_flow",
+      "source": {
+        "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_functions.F90",
+        "line_start": 13,
+        "line_end": 13,
+        "sha256": "2fda65c76091b855aee55b458b34625ab021136f63455bfe3190d3377ff8a205",
+        "quote_exact_utf8": "   subroutine update_means_wave_flow(s,par)\r"
+      }
+    },
+    {
+      "name": "wave_stationary_directions",
+      "source": {
+        "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_stationary_directions.F90",
+        "line_start": 33,
+        "line_end": 33,
+        "sha256": "60a3e8b6e89861caa462535aefdb4b11aee3c6a5b31a4174ef1ac6e34eb54b71",
+        "quote_exact_utf8": "   subroutine wave_stationary_directions(s,par,callType)\r"
+      }
+    },
+    {
+      "name": "wave_instationary",
+      "source": {
+        "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_instationary.F90",
+        "line_start": 9,
+        "line_end": 9,
+        "sha256": "9584b6ec2138353aba65991a4ec570b4b794554485cea43915c6071e9e2ed45a",
+        "quote_exact_utf8": "   subroutine wave_instationary(s,par)\r"
+      }
+    },
+    {
+      "name": "flow",
+      "source": {
+        "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/flow_timestep.F90",
+        "line_start": 7,
+        "line_end": 7,
+        "sha256": "50742b601cc8feccd513cf742ca772b6021f1d4f5ffe074c4e8ffc90907dd2b2",
+        "quote_exact_utf8": "   subroutine flow(s,par)\r"
+      }
+    },
+    {
+      "name": "flow_secondorder_advUV",
+      "source": {
+        "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/flow_secondorder.F90",
+        "line_start": 85,
+        "line_end": 85,
+        "sha256": "33d588f751f2faffb02b0c97854a0a975f67ab7851492d7927c8ff68d545b3de",
+        "quote_exact_utf8": "   subroutine flow_secondorder_advUV(s,par,uu_old,vv_old)\r"
+      }
+    },
+    {
+      "name": "nonh_cor",
+      "source": {
+        "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/nonh.F90",
+        "line_start": 146,
+        "line_end": 146,
+        "sha256": "18f471b386e5905a78c98c24fc2f6252ae4fc66c9e2010665e5f35a59d324583",
+        "quote_exact_utf8": "   subroutine nonh_cor(s,par,ipredcor,uu0,vv0)\r"
+      }
+    },
+    {
+      "name": "nonh_1lay_pred",
+      "source": {
+        "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/nonh.F90",
+        "line_start": 921,
+        "line_end": 921,
+        "sha256": "18f471b386e5905a78c98c24fc2f6252ae4fc66c9e2010665e5f35a59d324583",
+        "quote_exact_utf8": "   subroutine nonh_1lay_pred(s,par)\r"
+      }
+    },
+    {
+      "name": "nonh_1lay_cor",
+      "source": {
+        "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/nonh.F90",
+        "line_start": 384,
+        "line_end": 384,
+        "sha256": "18f471b386e5905a78c98c24fc2f6252ae4fc66c9e2010665e5f35a59d324583",
+        "quote_exact_utf8": "   subroutine nonh_1lay_cor(s,par)\r"
+      }
+    },
+    {
+      "name": "nonh_2lay_pred_2dv",
+      "source": {
+        "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/nonh.F90",
+        "line_start": 1576,
+        "line_end": 1576,
+        "sha256": "18f471b386e5905a78c98c24fc2f6252ae4fc66c9e2010665e5f35a59d324583",
+        "quote_exact_utf8": "   subroutine nonh_2lay_pred_2dV(s,par,uu0)\r"
+      }
+    },
+    {
+      "name": "nonh_2lay_cor_2dv",
+      "source": {
+        "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/nonh.F90",
+        "line_start": 1275,
+        "line_end": 1275,
+        "sha256": "18f471b386e5905a78c98c24fc2f6252ae4fc66c9e2010665e5f35a59d324583",
+        "quote_exact_utf8": "   subroutine nonh_2lay_cor_2dV(s,par)\r"
+      }
+    },
+    {
+      "name": "nonh_2lay_pred_3d",
+      "source": {
+        "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/nonh.F90",
+        "line_start": 2393,
+        "line_end": 2393,
+        "sha256": "18f471b386e5905a78c98c24fc2f6252ae4fc66c9e2010665e5f35a59d324583",
+        "quote_exact_utf8": "   subroutine nonh_2lay_pred_3d(s,par,uu0,vv0)\r"
+      }
+    },
+    {
+      "name": "nonh_2lay_cor_3d",
+      "source": {
+        "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/nonh.F90",
+        "line_start": 1965,
+        "line_end": 1965,
+        "sha256": "18f471b386e5905a78c98c24fc2f6252ae4fc66c9e2010665e5f35a59d324583",
+        "quote_exact_utf8": "   subroutine nonh_2lay_cor_3d(s,par)\r"
+      }
+    }
+  ],
+  "source_evidence": [
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_timestep.F90",
+      "line_start": 34,
+      "line_end": 115,
+      "sha256": "13297e7ff3b23640c1697f25e7af980aff5e169fe0be0b9d665dd32f3170c0ac",
+      "quote_exact_utf8": "   subroutine wave(s,par)\r\n\r\n      use params,                   only: parameters\r\n      use spaceparams\r\n      !use wave_stationary_module\r\n      !use wave_directions_module\r\n      use wave_stationary_directions_module\r\n      use wave_instationary_module\r\n      use paramsconst\r\n      use wave_functions_module, only: wave_dispersion,update_means_wave_flow\r\n\r\n      implicit none\r\n\r\n      type(spacepars)                                 :: s\r\n      type(parameters)                                :: par\r\n\r\n      real*8,dimension(:,:),allocatable,save          :: gamma\r\n\r\n      if (.not.allocated(gamma)) then\r\n         allocate(gamma(s%nx+1,s%ny+1))\r\n      endif\r\n\r\n      ! set basic water depth for all wave calculations: note that depending on wci setting, other water depths may be used in\r\n      ! dispersion routine etc.\r\n      if (par%delta>0.d0) then\r\n         s%hhw = max(s%hh+par%delta*s%H,par%eps)\r\n      else\r\n         s%hhw = max(s%hh,par%eps) ! hh can be less than eps after morphevolution?\r\n      endif\r\n\r\n      if (par%oldhmin==1) then\r\n         s%hstokes = max(s%hh,par%hmin)\r\n      else\r\n         gamma = s%H/s%hh\r\n         where (gamma>1.d0)\r\n            s%hstokes = par%deltahmin*(gamma-1.d0)*s%H+s%hh\r\n         elsewhere\r\n            s%hstokes = s%hh\r\n         endwhere\r\n      endif\r\n\r\n      select case (par%wavemodel)\r\n       case(WAVEMODEL_STATIONARY)\r\n         ! call update_means_wave_flow not required: stationary always uses instantaneous water depth s%hhw\r\n         if ((abs(mod(par%t,par%wavint))<0.001d0*par%dt) .or. s%newstatbc==1) then\r\n            call wave_dispersion(s,par,0)  ! use instantaneous water depth (and velocity)\r\n            call wave_stationary_directions(s,par,0)\r\n            s%newstatbc   = 0\r\n         endif\r\n       case(WAVEMODEL_SURFBEAT)\r\n         if (par%single_dir==1) then\r\n            ! always need to update depths for wave directions model, as well as in case of wci (dealt with in subroutine)\r\n            call update_means_wave_flow(s,par)\r\n            !\r\n            ! if necessary, update wave directions\r\n            if ((abs(mod(par%t,par%wavint))<0.001d0*par%dt) .or. s%newstatbc==1 .or. par%t==par%dt) then\r\n               call wave_dispersion(s,par,1)  ! use s%hhws water depth (and velocity)\r\n               call wave_stationary_directions(s,par,1)\r\n               s%newstatbc   = 0\r\n            endif\r\n            !\r\n            s%newstatbc       = 0 ! not sure if this is needed every timestep, but no overhead to keep in ...\r\n            !\r\n            ! need to call dispersion again, because dispersion is different in timestep and direction computation\r\n            if (par%wci==1) then\r\n               call wave_dispersion(s,par,2) ! use s%hhwcins water depth (and velocity)\r\n            else\r\n               call wave_dispersion(s,par,0) ! use s%hhw water depth\r\n            endif\r\n            call wave_instationary(s,par)\r\n         else\r\n            s%newstatbc       = 0\r\n            if (par%wci==1) then\r\n               ! in this case we only need to update flow depth in case of wci\r\n               call update_means_wave_flow(s,par)\r\n               call wave_dispersion(s,par,2) ! use s%hhwcins water depth (and velocity)\r\n            else\r\n               call wave_dispersion(s,par,0) ! use s%hhw water depth\r\n            endif\r\n            call wave_instationary(s,par)\r\n         endif\r\n      end select\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/libxbeach.F90",
+      "line_start": 283,
+      "line_end": 310,
+      "sha256": "1656cceb95c9d87a51b70225a725fc6e544ed56b424c97a9e2806c86f15b6696",
+      "quote_exact_utf8": "         ! determine this time step's wet points\r\n         call compute_wetcells(s,par)\r\n         !\r\n         ! determine time step\r\n         call timestep(s,par,tpar,it,dt=dt,ierr=error)\r\n         call outputtimes_update(par, tpar)\r\n\r\n         ! update log\r\n         call log_progress(par)\r\n\r\n         if (error==0) then\r\n            !\r\n            ! Boundary conditions\r\n            call wave_bc        (sglobal,s,par)\r\n            if (par%gwflow==1)                                      call gw_bc          (s,par)\r\n            if ((par%flow==1).or.(par%wavemodel==WAVEMODEL_NONH))   call flow_bc        (s,par)\r\n            !\r\n            ! Compute timestep\r\n            if (par%ships==1)                                       call shipwave       (s,par,sh)\r\n            if (par%swave==1)                                       call wave           (s,par)\r\n            if (par%vegetation==1)                                  call vegatt         (s,par)\r\n            if (par%gwflow==1)                                      call gwflow         (s,par)\r\n            if ((par%flow==1).or.(par%wavemodel==WAVEMODEL_NONH))   call flow           (s,par)\r\n            if (par%ndrifter>0)                                     call drifter        (s,par)\r\n            if (par%sedtrans==1)                                    call transus        (s,par)\r\n            !\r\n            ! Bed level update\r\n            if ((par%morphology==1).and.(.not. par%setbathy==1)) call bed_update(s,par)\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/flow_timestep.F90",
+      "line_start": 630,
+      "line_end": 658,
+      "sha256": "50742b601cc8feccd513cf742ca772b6021f1d4f5ffe074c4e8ffc90907dd2b2",
+      "quote_exact_utf8": "#ifdef USEMPI\r\n      call xmpi_shift_ee(s%uu)\r\n      call xmpi_shift_ee(s%vv)\r\n#endif\r\n\r\n      if (par%wavemodel==WAVEMODEL_NONH) then\r\n         !Do explicit predictor step with pressure\r\n         call nonh_cor(s,par,0,uu_old,vv_old)\r\n\r\n#ifdef USEMPI\r\n         call xmpi_shift_ee(s%uu)\r\n         call xmpi_shift_ee(s%vv)\r\n#endif\r\n      end if\r\n\r\n      if (par%secorder==1) then\r\n         !Call second order correction to the advection\r\n         call flow_secondorder_advUV(s,par,uu_old,vv_old)\r\n#ifdef USEMPI\r\n         call xmpi_shift_ee(s%uu)\r\n         call xmpi_shift_ee(s%vv)\r\n#endif\r\n      end if\r\n\r\n      if (par%wavemodel==WAVEMODEL_NONH) then\r\n         ! do non-hydrostatic pressure compensation to solve short waves\r\n         call nonh_cor(s,par,1,uu_old,vv_old)\r\n         ! note: MPI shift in subroutine nonh_cor\r\n      end if\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/nonh.F90",
+      "line_start": 201,
+      "line_end": 249,
+      "sha256": "18f471b386e5905a78c98c24fc2f6252ae4fc66c9e2010665e5f35a59d324583",
+      "quote_exact_utf8": "      select case ( par%nonhq3d )\r\n         !\r\n       case (1)\r\n         !\r\n         ! The \"new\" reduced two-layer formulations are used\r\n         !\r\n         if ( ipredcor == 0 ) then\r\n            ! -- Predictor\r\n            if ( s%ny == 0 ) then\r\n               ! -- 2dv code path\r\n               call nonh_2lay_pred_2dV(s,par,uu0)\r\n               !\r\n            else\r\n               ! -- \"3d\" code path\r\n               call nonh_2lay_pred_3d(s,par,uu0,vv0)\r\n               !\r\n            endif\r\n            !\r\n         else\r\n            !\r\n            if ( s%ny == 0 ) then\r\n               !\r\n               call nonh_2lay_cor_2dV(s,par)\r\n               !\r\n            else\r\n               !\r\n               call nonh_2lay_cor_3d(s,par)\r\n               !\r\n            endif\r\n            !\r\n         endif\r\n         !\r\n       case default\r\n         !\r\n         ! The \"old\" code is used\r\n         !\r\n         if ( ipredcor == 0 ) then\r\n            ! -- Predictor\r\n            call nonh_1lay_pred(s,par)\r\n            !\r\n         else\r\n            ! -- Corrector\r\n            call nonh_1lay_cor(s,par)\r\n            !\r\n         endif\r\n         !\r\n      end select\r\n      !\r\n   end subroutine nonh_cor\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.F90",
+      "line_start": 1359,
+      "line_end": 1369,
+      "sha256": "73648b5733a8f90a8f18cda32743bdc2ef42f649e39c521e28e06584ee63c359",
+      "quote_exact_utf8": "      if (par%wavemodel == WAVEMODEL_STATIONARY .or. par%single_dir==1) then\r\n         par%wavint     = readkey_dbl ('params.txt','wavint',    600.d0,      1.d0,  3600.d0)\r\n         par%maxerror   = readkey_dbl ('params.txt','maxerror', 0.0001d0, 0.00001d0, 0.001d0)\r\n         par%maxerror_angle = readkey_dbl ('params.txt','maxerror_angle', 1.d0, 0.1d0, 5.d0)\r\n         par%maxerror_angle = par%maxerror_angle/180*par%px\r\n         !if (par%single_dir==1) then\r\n         !   par%maxerror   = readkey_dbl ('params.txt','maxerror', 0.005d0, 0.00001d0, 0.001d0)\r\n         !else\r\n         !   par%maxerror   = readkey_dbl ('params.txt','maxerror', 0.0005d0, 0.00001d0, 0.001d0)\r\n         !endif\r\n         par%maxiter    = readkey_int ('params.txt','maxiter',    500,         2,      1000)\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.F90",
+      "line_start": 1559,
+      "line_end": 1563,
+      "sha256": "73648b5733a8f90a8f18cda32743bdc2ef42f649e39c521e28e06584ee63c359",
+      "quote_exact_utf8": "      ! swave and nonh\r\n      if (par%swave == 1 .and. par%wavemodel == WAVEMODEL_NONH) then\r\n         call writelog('lsw','(a)','Warning: swave with wavemodel = nonh not possible')\r\n         par%swave     = 0\r\n      endif\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.F90",
+      "line_start": 1740,
+      "line_end": 1758,
+      "sha256": "73648b5733a8f90a8f18cda32743bdc2ef42f649e39c521e28e06584ee63c359",
+      "quote_exact_utf8": "      if (par%wavemodel==WAVEMODEL_NONH) then\r\n         if (par%secorder==0) then\r\n            call writelog('lws','','Warning: Automatically turning on 2nd order correction in flow for')\r\n            call writelog('lws','','         non-hydrostatic module [secorder=1]')\r\n            par%secorder = 1\r\n         endif\r\n      endif\r\n\r\n      !\r\n      ! If using nonh, then the solver type is set by the grid size\r\n      if (par%wavemodel==WAVEMODEL_NONH) then\r\n         if (par%ny>2 .and. par%solver==SOLVER_TRIDIAGG) then\r\n            call writelog('lswe','','Tri-diagonal solver cannot be used if ny>2')\r\n            call halt_program\r\n         endif\r\n         if (par%ny==0 .and. par%solver==SOLVER_SIPP) then\r\n            call writelog('lse','','SIP solver cannot be used if ny==0')\r\n            call halt_program\r\n         endif\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.F90",
+      "line_start": 1884,
+      "line_end": 1910,
+      "sha256": "73648b5733a8f90a8f18cda32743bdc2ef42f649e39c521e28e06584ee63c359",
+      "quote_exact_utf8": "      ! MPI domains\r\n#ifdef USEMPI\r\n      if (par%swave==1) then\r\n         if ((par%wavemodel == WAVEMODEL_STATIONARY .or. par%single_dir==1) .and. par%ny > 0) then\r\n            ! We need to set to mpiboundary = x to solve the stationary wave model.\r\n            ! However, this requires ny>3*xmpi_osize\r\n            if (par%mpiboundary .ne.  MPIBOUNDARY_MAN) then\r\n               if(par%ny<=2*xmpi_size) then\r\n                  call writelog('ewsl','','This simulation cannot be run in current MPI mode:')\r\n                  call writelog('ewsl','','The stationary and single_dir wave solver requires MPI subdivision by \"x\" (split ny).')\r\n                  call writelog('ewsl','','The number of subdomains selected to run the model is ',xmpi_size,'.')\r\n                  call writelog('ewsl','','The total number of grid cells in y (ny) is ',par%ny,'.')\r\n                  call writelog('ewsl','(a,f0.2,a)','The number of cells per domain is ',dble(par%ny)/xmpi_size, &\r\n                  ', which is less than the minimum value of 3')\r\n                  call writelog('ewsl','','If you really (!) know what you''re doing, use \"mpiboundary = man\" and deal')\r\n                  call writelog('ewsl','','with any unsatisfactory results')\r\n                  call halt_program\r\n               else\r\n                  par%mpiboundary=MPIBOUNDARY_X\r\n                  par%mpiboundary_str='x'\r\n                  call writelog('wsl','','Changing mpiboundary to \"x\" for stationary wave model')\r\n               endif\r\n            else\r\n               call writelog('wsl','','Warning: the stationary wave model only works with \"mpiboundary=x\"!')\r\n            endif\r\n         endif\r\n      endif\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.F90",
+      "line_start": 1940,
+      "line_end": 1954,
+      "sha256": "73648b5733a8f90a8f18cda32743bdc2ef42f649e39c521e28e06584ee63c359",
+      "quote_exact_utf8": "      !\r\n      ! All input time frames converted to XBeach hydrodynamic time\r\n      if (par%morfacopt==1) then\r\n         par%tstart  = par%tstart / max(par%morfac,1.d0)\r\n         par%tint    = par%tint   / max(par%morfac,1.d0)\r\n         par%tintg   = par%tintg  / max(par%morfac,1.d0)\r\n         par%tintp   = par%tintp  / max(par%morfac,1.d0)\r\n         par%tintm   = par%tintm  / max(par%morfac,1.d0)\r\n         par%tinth   = par%tinth  / max(par%morfac,1.d0)\r\n         par%wavint  = par%wavint / max(par%morfac,1.d0)\r\n         par%tstop   = par%tstop  / max(par%morfac,1.d0)\r\n         par%morstart= par%morstart / max(par%morfac,1.d0)\r\n         par%morstop = par%morstop / max(par%morfac,1.d0)\r\n         par%rt      = par%rt / max(par%morfac,1.d0)\r\n      endif\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.F90",
+      "line_start": 286,
+      "line_end": 290,
+      "sha256": "73648b5733a8f90a8f18cda32743bdc2ef42f649e39c521e28e06584ee63c359",
+      "quote_exact_utf8": "      if (par%wavemodel==WAVEMODEL_STATIONARY .or. par%wavemodel==WAVEMODEL_SURFBEAT) then\r\n         par%maxdtfac  = readkey_dbl ('params.txt','maxdtfac', 50.d0,      10.d0, 200.d0)\r\n      else\r\n         par%maxdtfac  = readkey_dbl ('params.txt','maxdtfac', 500.d0,      100.d0, 1000.d0)\r\n      endif\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/scripts/generate.py",
+      "line_start": 33,
+      "line_end": 41,
+      "sha256": "a9e13e75f2bb36213e2ca87eb3106e34aeae3a6d27dbb57c26aaf1c4b2690adb",
+      "quote_exact_utf8": "logger.setLevel(logging.DEBUG)\ndef main():\n    try:\n        curfile = os.path.abspath(__file__)\n    except NameError:\n        curfile = os.path.abspath(inspect.getsourcefile(lambda : None))\n    srcdir = os.path.join(os.path.dirname(curfile), '..', 'src', 'xbeachlibrary')\n    templatedir = os.path.join(srcdir, \"templates\")\n    variables_file = os.path.join(srcdir, 'variables.def')"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/scripts/generate.py",
+      "line_start": 215,
+      "line_end": 262,
+      "sha256": "a9e13e75f2bb36213e2ca87eb3106e34aeae3a6d27dbb57c26aaf1c4b2690adb",
+      "quote_exact_utf8": "            return \"(\" + shapetxt + \")\"\n        else:\n            return \"\"\n    # if parameters are given, we expect these to be like \"x.mako\"\n    # the file from the templates directory will\n    # be converted to \"x.inc\"\n    if (len(sys.argv) > 1):\n        templates = []\n        for i in range(1,len(sys.argv)):\n            templates.append(os.path.basename(sys.argv[i]))\n    else:\n        # not documented function in glob\n        templates = glob.glob1(templatedir, '*.mako')\n\n    # lookup = mako.lookup.TemplateLookup(directories=[templatedir], module_directory='/tmp/mako_modules')\n    # wwvv: do not use module_directory: this clashes when compiling different versions of xbeach\n    lookup = mako.lookup.TemplateLookup(directories=[templatedir])\n\n    #logger.info(\"parsing templates in %s\", templatedir)\n    if (os.name == \"nt\"):  # are we running on widows?\n        newline=\"\\n\"       # then \\n will be output as \\r\\n\n    else:\n        newline = \"\\r\\n\"   # in unix, we also want \\r\\n for newline\n\n    for template_name in templates:\n        template = lookup.get_template(template_name)\n        filename = template_name.replace('.mako', '.inc')\n        logger.info(\"MAKO: %s -> %s\", template_name, filename)\n        with open(os.path.join(srcdir, filename), 'w') as f:\n            f.write(\"! This file is generated by 'scripts/generate.py' using\"+newline)\n            f.write(\"!    /src/xbeachlibrary/\"+os.path.basename(variables_file)+newline)\n            f.write(\"!    /src/xbeachlibrary/\"+os.path.basename(parameter_file)+newline)\n            f.write(\"!    src/xbeachlibray/templates/\"+template_name+newline)\n            f.write(\"! Advice: do not edit this file, but above mentioned files.\"+newline)\n            f.write(newline);\n            rendered = template.render(**locals())\n            f.write(rendered)\n            f.write(newline);\n            f.write(\"! vim: filetype=fortran\"+newline)\n\n    jsondata = {\n        \"comment\": \"do not edit this file, it is autogenerated by generate.py\",\n        \"variables\": variables\n    }\n    if (False):\n        json.dump(jsondata, open('extractedvariables.json', 'w'), indent=4)\nif __name__ == \"__main__\":\n    main()"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/build/generate_and_copy_gen_files.bat",
+      "line_start": 18,
+      "line_end": 23,
+      "sha256": "909adaa10cd24dc1819f137f3455def939cac752468a911558b45c14e1e8593e",
+      "quote_exact_utf8": "\r\nset currentDir=%cd%\r\n\r\ncd \"%SolutionDir%scripts\r\ndist\\generate.exe\r\ncd \"%currentDir%\""
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am",
+      "line_start": 62,
+      "line_end": 113,
+      "sha256": "1b313d0ba88701c16f6805114d7d6b5d406fb9026a03d091c2d49b97b8ee8d21",
+      "quote_exact_utf8": "BUILT_SOURCES= \\\n\tversion.dat  \\\n\tspacedecl.inc \\\n\tchartoindex.inc \\\n\tget_var.inc \\\n\tget_var_shape.inc \\\n\tgetkey.inc \\\n\tindex_allocate.inc \\\n\tindex_allocated.inc \\\n\tindex_deallocate.inc \\\n\tindex_reallocate.inc \\\n\tindextos.inc \\\n\tmnemonic.inc \\\n\tset_var.inc \\\n\tspace_alloc_arrays.inc \\\n\tspace_alloc_scalars.inc \\\n\tspace_distribute.inc \\\n\tspace_ind.inc \\\n\tspace_inp.inc \\\n\twritelog.inc \\\n\twriteloginterface.inc\n\nversion.dat: \n\techo \"Build_Revision = '`svnversion $(top_srcdir)`'\" > version.dat\n\techo \"Build_URL = '`svn info $(top_srcdir) | grep -m 1 URL`'\" >> version.dat\n\techo \"Build_Date = '`date`'\" >> version.dat\n\nlogging.F90: version.dat writelog.inc writeloginterface.inc\n\nspacedecl.inc:\n\t$(top_srcdir)/scripts/generate.py\n\n# Set flags off by default\n# include link to top_srcdir so it can find config.h, or should this be builddir\n# wwvv changed following\n#libxbeach_la_FCFLAGS=-I$(top_builddir) -ffree-line-length-none -fPIC\n# into\nlibxbeach_la_FCFLAGS=-I$(top_builddir) -fPIC\n# if mpi, then add some flags\nif USEMPI\nlibxbeach_la_FCFLAGS+=-DUSEMPI -DHAVE_MPI_WTIME\nendif\nif USENETCDF\nlibxbeach_la_FCFLAGS+=-DUSENETCDF ${NETCDF_CFLAGS} ${NETCDF_FORTRAN_CFLAGS}\n# Manualy add the netcdff (fortran dll)\nLIBS+=${NETCDF_LIBS} ${NETCDF_FORTRAN_LIBS} -lnetcdff\nendif\n\n# EXTRA_DIST=s.ind s.inp\nEXTRA_DIST=s.ind s.inp nh_pars.inc version.def\nCLEANFILES=*.mod *.MOD *.inc version.dat\n"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/solver.F90",
+      "line_start": 9,
+      "line_end": 25,
+      "sha256": "be97d575b3d32f1e0788b713123d0e0630997c2142e2d2990eab10201f9f90f7",
+      "quote_exact_utf8": "module solver_module\r\n\r\n   implicit none\r\n   save\r\n\r\n   ! If mpi is defined, the non-hydrostatic module is NOT included in the compilation\r\n   ! to avoid unwanted side effects.\r\n\r\n\r\n   !******************************************************************************\r\n   !                                 INTERFACE\r\n   !******************************************************************************\r\n\r\n   private\r\n\r\n   !----------------------------- PARAMETERS -----------------------------------\r\n   include 'nh_pars.inc'\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/solver.F90",
+      "line_start": 205,
+      "line_end": 214,
+      "sha256": "be97d575b3d32f1e0788b713123d0e0630997c2142e2d2990eab10201f9f90f7",
+      "quote_exact_utf8": "#ifdef USEMPI\r\n         call xmpi_shift_zs(rhs)\r\n         do it=1,3\r\n            call xmpi_shift_zs(amat(it,:,:))\r\n         enddo\r\n#endif\r\n         call solver_tridiag(amat,rhs,x,work,nx,ny)\r\n#ifdef USEMPI\r\n         call xmpi_shift_zs(x)\r\n#endif\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_functions.F90",
+      "line_start": 978,
+      "line_end": 1019,
+      "sha256": "2fda65c76091b855aee55b458b34625ab021136f63455bfe3190d3377ff8a205",
+      "quote_exact_utf8": "      ! default to use instantaneous water depth and velocities\r\n      if (present(useAverageDepthSwitch)) then\r\n         luseAverageDepthSwitch = useAverageDepthSwitch\r\n      else\r\n         luseAverageDepthSwitch = 0\r\n      endif\r\n\r\n      if (luseAverageDepthSwitch==0) then  ! default: use instantaneous depth and velocities\r\n         hhlocal = s%hhw\r\n         if (par%wci==1) then\r\n            ulocal = s%u\r\n            vlocal = s%v\r\n         endif\r\n      elseif (luseAverageDepthSwitch==1) then ! used averaged depths for single_dir computation\r\n         hhlocal = s%hhws\r\n         if (par%wci==1) then\r\n            ulocal = s%uws\r\n            vlocal = s%vws\r\n         endif\r\n      elseif (luseAverageDepthSwitch==2) then ! used averaged depths for instationary computation with wci\r\n         hhlocal = s%hhwcins\r\n         ulocal = s%uwcins\r\n         vlocal = s%vwcins\r\n      else\r\n         ! this should never occur\r\n      endif\r\n\r\n\r\n      if(par%wci==1) then\r\n         ! Dano NEED TO CHECK THIS FOR CURVI\r\n         !if (xmpi_istop) then\r\n         !   ! requires boundary condition at the offshore boundary, where we assume zero flow\r\n         !   L0 = par%g*par%Trep**2/(2*par%px)\r\n         !   if (any(L1<=0.d0)) then\r\n         !      L1 = L0\r\n         !   endif\r\n         !   do j=1,s%ny+1\r\n         !      L1(j) = iteratedispersion(L0(j),L1(j),par%px,s%hhw(1,j))\r\n         !   enddo\r\n         !   km(1,:)  = 2*par%px/max(L1,0.00001d0)\r\n         !endif\r\n         arg     = min(100.0d0,km*hhlocal)\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_functions.F90",
+      "line_start": 1020,
+      "line_end": 1108,
+      "sha256": "2fda65c76091b855aee55b458b34625ab021136f63455bfe3190d3377ff8a205",
+      "quote_exact_utf8": "         fac = ( 1.d0 + ((km*s%H/2.d0)**2))  ! use deep water correction\r\n         s%sigm(1,:) = sqrt( par%g*km(1,:)*tanh(arg(1,:))) ! *( 1.d0+ ((km(1,:)*s%H(1,:)/2.d0)**2)))\r\n         !  calculate change in intrinsic frequency\r\n         relangle = s%thetamean-s%alfaz\r\n         kmx = km*dcos(relangle)\r\n         kmy = km*dsin(relangle)\r\n         s%wm = s%sigm+kmx*ulocal*min(&\r\n         min(hhlocal/par%hwci,1.d0), &\r\n         min(1.d0,(1.d0-hhlocal/par%hwcimax)) &\r\n         )+ &\r\n         kmy*vlocal*min( &\r\n         min(hhlocal/par%hwci,1.d0), &\r\n         min(1.d0,(1.d0-hhlocal/par%hwcimax)) &\r\n         )\r\n\r\n         where(km>0.01d0)\r\n            s%c  = s%sigm/km\r\n            !          cg = c*(0.5d0+arg/sinh(2.0d0*arg))    ! Linear\r\n            s%cg = s%c*(0.5d0+arg/sinh(2*arg))*sqrt(fac)  ! &  to include more\r\n            !\t\t \t          + km*(H/2)**2*sqrt(max(par%g*km*tanh(arg),0.001d0))/sqrt(max(fac,0.001d0)) ! include wave steepness\r\n            s%n=0.5d0+km*hhlocal/sinh(2*max(km,0.00001d0)*hhlocal)\r\n         elsewhere\r\n            s%c  = 0.01d0\r\n            s%cg = 0.01d0\r\n            s%n  = 1.d0\r\n         endwhere\r\n\r\n         cgym = s%cg*dsin(relangle)+vlocal*min(min(hhlocal/par%hwci,1.d0),min(1.d0,(1.d0-hhlocal/par%hwcimax)))\r\n         cgxm = s%cg*dcos(relangle)+ulocal*min(min(hhlocal/par%hwci,1.d0),min(1.d0,(1.d0-hhlocal/par%hwcimax)))\r\n\r\n         call slope2D(kmx,s%nx,s%ny,s%dsu,s%dnv,dkmxdx,dkmxdy,s%wete)\r\n         call slope2D(kmy,s%nx,s%ny,s%dsu,s%dnv,dkmydx,dkmydy,s%wete)\r\n         call advecwx(s%wm,xwadvec,kmx,s%nx,s%ny,s%dsu,s%wete)   ! cjaap: s%xz or s%xu?         kmx = kmx -par%dt*xwadvec  -par%dt*cgym*(dkmydx-dkmxdy)\r\n         kmx = kmx -par%dt*xwadvec  -par%dt*cgym*(dkmydx-dkmxdy)\r\n         if (s%ny>0) then\r\n            if (xmpi_isright) kmx(:,s%ny+1) = kmx(:,s%ny)  ! lateral bc\r\n            if (xmpi_isleft)  kmx(:,1) = kmx(:,2)  ! lateral bc\r\n         endif\r\n\r\n         call advecwy(s%wm,ywadvec,kmy,s%nx,s%ny,s%dnv,s%wete)   ! cjaap: s%yz or s%yv?\r\n         kmy = kmy-par%dt*ywadvec  + par%dt*cgxm*(dkmydx-dkmxdy)\r\n         if (s%ny>0) then\r\n            if (xmpi_isright) kmy(:,s%ny+1) = kmy(:,s%ny)   ! lateral bc\r\n            if (xmpi_isleft)  kmy(:,1) = kmy(:,2)   ! lateral bc\r\n         endif\r\n\r\n#ifdef USEMPI\r\n         call xmpi_shift_ee(kmx)\r\n         call xmpi_shift_ee(kmy)\r\n#endif\r\n\r\n         ! update km\r\n         km = sqrt(kmx**2+kmy**2)\r\n         km = min(km,25.d0) ! limit to gravity waves\r\n         ! non-linear dispersion\r\n         arg = min(100.0d0,km*hhlocal)\r\n         arg = max(arg,0.0001)\r\n         !       fac = ( 1.d0 + ((km*H/2.d0)**2)*( (8.d0+(cosh(min(4.d0*arg,10.0d0)))**1.d0-2.d0*(tanh(arg))**2.d0 ) /(8.d0*(sinh(arg))**4.d0) ) )\r\n         fac = ( 1.d0 + ((km*s%H/2.d0)**2))  ! use deep water correction instead of expression above (waves are short near blocking point anyway)\r\n         !       fac = 1.d0    ! Linear\r\n         s%sigm = sqrt( par%g*km*tanh(arg)*fac)\r\n         s%sigm = max(s%sigm,0.010d0)\r\n         !  update intrinsic frequency\r\n         do itheta=1,s%ntheta\r\n            s%sigt(:,:,itheta) = s%sigm\r\n         enddo\r\n         !\r\n         !  update k\r\n         s%k = km\r\n      else\r\n         ! check if we need to recompute sigm and sigt\r\n         if (abs(par%Trep-Trepold)/par%Trep > 0.0001d0) then\r\n            Trepold = par%Trep\r\n            do itheta=1,s%ntheta\r\n               s%sigt(:,:,itheta) = 2*par%px/par%Trep\r\n            end do\r\n            s%sigm = 2*par%px/par%Trep\r\n         endif\r\n         call dispersion(par,s,hhlocal)\r\n      endif ! end wave current interaction\r\n\r\n\r\n   end subroutine wave_dispersion\r\n\r\n   subroutine compute_wave_direction_velocities(s,par,flavour,dhdx,dhdy,dudx,dudy,dvdx,dvdy,sinh2kh)\r\n\r\n      use params,         only: parameters\r\n      use spaceparams\r\n\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_functions.F90",
+      "line_start": 1176,
+      "line_end": 1211,
+      "sha256": "2fda65c76091b855aee55b458b34625ab021136f63455bfe3190d3377ff8a205",
+      "quote_exact_utf8": "                  ! split wave velocities over theta bins\r\n                  ! note: cg is already correct for each flavour, as long as wave_dispersion is called before this subroutine\r\n                  if (par%wci==1) then\r\n                     cgx(i,j,itheta)= s%cg(i,j)*cs+uwci(i,j)\r\n                     cgy(i,j,itheta)= s%cg(i,j)*sn+vwci(i,j)\r\n                     cx(i,j,itheta) =  s%c(i,j)*cs+uwci(i,j)\r\n                     cy(i,j,itheta) =  s%c(i,j)*sn+vwci(i,j)\r\n                  else\r\n                     cgx(i,j,itheta)= s%cg(i,j)*cs\r\n                     cgy(i,j,itheta)= s%cg(i,j)*sn\r\n                     cx(i,j,itheta) =  s%c(i,j)*cs\r\n                     cy(i,j,itheta) =  s%c(i,j)*sn\r\n                  endif\r\n\r\n                  ! compute refraction velocity\r\n                  ! note: sigm is already correct for each flavour, as long as wave_dispersion is called before this subroutine\r\n                  if (par%wci==1) then\r\n                     ctheta(i,j,itheta)= s%sigm(i,j)/sinh2kh(i,j)*(dhdx(i,j)*sn-dhdy(i,j)*cs) +  &\r\n                     (cs*(sn*dudx(i,j)-cs*dudy(i,j)) + sn*(sn*dvdx(i,j)-cs*dvdy(i,j)))\r\n                  else\r\n                     ctheta(i,j,itheta)= s%sigm(i,j)/sinh2kh(i,j)*(dhdx(i,j)*sn-dhdy(i,j)*cs)\r\n                  endif\r\n               else\r\n                  cgx(i,j,itheta) = 0.d0\r\n                  cgy(i,j,itheta) = 0.d0\r\n                  cx(i,j,itheta) = 0.d0\r\n                  cy(i,j,itheta) = 0.d0\r\n                  ctheta(i,j,itheta) = 0.d0\r\n               endif\r\n            enddo\r\n         enddo\r\n      enddo\r\n\r\n      ! Dano Limit unrealistic refraction speed to 1/2 pi per wave period\r\n      ctheta=sign(1.d0,ctheta)*min(abs(ctheta),.5*par%px/par%Trep)\r\n\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/morphevolution.F90",
+      "line_start": 731,
+      "line_end": 804,
+      "sha256": "765f474008f7cb843353dc0790cc3f3ebdc00631353da7592e2bb0508e968391",
+      "quote_exact_utf8": "         if (s%ny>0) then\r\n            do j=jmin_zs,jmax_zs\r\n               do i=imin_zs,imax_zs\r\n\r\n                  ! bed level changes per fraction in this morphological time step in meters sand including pores\r\n                  ! positive in case of erosion\r\n                  if (par%sourcesink==0) then\r\n                     dzg=par%morfac*par%dt/(1.d0-par%por)*( & ! Dano, dz from sus transport gradients\r\n                     ( s%Susg(i,j,:)*s%dnu(i,j)-s%Susg(i-1,j,:)*s%dnu(i-1,j) +&\r\n                     s%Svsg(i,j,:)*s%dsv(i,j)-s%Svsg(i,j-1,:)*s%dsv(i,j-1) +&\r\n                     ! dz from bed load transport gradients\r\n                     s%Subg(i,j,:)*s%dnu(i,j)-s%Subg(i-1,j,:)*s%dnu(i-1,j)+&\r\n                     s%Svbg(i,j,:)*s%dsv(i,j)-s%Svbg(i,j-1,:)*s%dsv(i,j-1) )*s%dsdnzi(i,j)    )\r\n                  elseif (par%sourcesink==1) then\r\n                     dzg=par%morfac*par%dt/(1.d0-par%por)*( &\r\n                     s%ero(i,j,:)-s%depo_ex(i,j,:)   +&\r\n                     ( s%Subg(i,j,:)*s%dnu(i,j)-s%Subg(i-1,j,:)*s%dnu(i-1,j)+&\r\n                     s%Svbg(i,j,:)*s%dsv(i,j)-s%Svbg(i,j-1,:)*s%dsv(i,j-1) )*s%dsdnzi(i,j)    )\r\n                  endif\r\n\r\n                  if (par%ngd==1) then ! Simple bed update in case one fraction\r\n\r\n                     s%zb(i,j) = s%zb(i,j)-sum(dzg)\r\n                     s%dzbnow(i,j) = s%dzbnow(i,j)-sum(dzg) ! naamgeveing?\r\n                     s%dzbdt(i,j) = s%dzbnow(i,j)/par%dt\r\n                     s%sedero(i,j) = s%sedero(i,j)-sum(dzg)\r\n                     s%structdepth(i,j) = max(0.d0,s%structdepth(i,j)-sum(dzg))\r\n\r\n                  else\r\n                     ! erosion/deposition rate of sand mass (m/s)\r\n                     ! positive in case of erosion\r\n                     edg = dzg*(1.d0-par%por)/par%dt\r\n\r\n\r\n                     dz=>s%dzbed(i,j,:)\r\n                     pb=>s%pbbed(i,j,:,:)\r\n\r\n                     call update_fractions(par,s,i,j,dz,pb,edg,sum(dzg))\r\n\r\n                  endif\r\n\r\n               enddo ! s%nx+1\r\n            enddo ! s%ny+1\r\n         else\r\n            j=1\r\n            do i=imin_zs,imax_zs\r\n               ! bed level changes per fraction in this morphological time step in meters sand including pores\r\n               ! positive in case of erosion\r\n               if (par%sourcesink==0) then\r\n                  dzg=par%morfac*par%dt/(1.d0-par%por)*( & ! Dano, dz from sus transport gradients\r\n                  ( s%Susg(i,j,:)*s%dnu(i,j)-s%Susg(i-1,j,:)*s%dnu(i-1,j) +&\r\n                  s%Subg(i,j,:)*s%dnu(i,j)-s%Subg(i-1,j,:)*s%dnu(i-1,j) )*s%dsdnzi(i,j) +&\r\n                  (s%Svsg(i,j,:)+s%Svbg(i,j,:))*par%lsgrad)\r\n               elseif (par%sourcesink==1) then\r\n                  dzg=par%morfac*par%dt/(1.d0-par%por)*( &\r\n                  s%ero(i,j,:)-s%depo_ex(i,j,:)       +&\r\n                  ( s%Subg(i,j,:)*s%dnu(i,j)-s%Subg(i-1,j,:)*s%dnu(i-1,j) )*s%dsdnzi(i,j) +&\r\n                  (s%Svsg(i,j,:)+s%Svbg(i,j,:))*par%lsgrad)\r\n               endif\r\n\r\n               if (par%ngd==1) then ! Simple bed update in case one fraction\r\n\r\n                  s%zb(i,j) = s%zb(i,j)-sum(dzg)\r\n                  s%dzbnow(i,j) = s%dzbnow(i,j)-sum(dzg)\r\n                  s%dzbdt(i,j) = s%dzbnow(i,j)/par%dt\r\n                  s%sedero(i,j) = s%sedero(i,j)-sum(dzg)\r\n                  s%structdepth(i,j) = max(0.d0,s%structdepth(i,j)-sum(dzg))\r\n\r\n               else ! multiple fractions...\r\n                  ! erosion/deposition rate of sand mass (m/s)\r\n                  ! positive in case of erosion\r\n                  edg = dzg*(1.d0-par%por)/par%dt\r\n\r\n                  dz=>s%dzbed(i,j,:)\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/morphevolution.F90",
+      "line_start": 640,
+      "line_end": 644,
+      "sha256": "765f474008f7cb843353dc0790cc3f3ebdc00631353da7592e2bb0508e968391",
+      "quote_exact_utf8": "      if (par%t>=par%morstart .and. par%t < par%morstop .and. par%morfac > .999d0) then\r\n         !\r\n         ! bed_predict\r\n         !\r\n         ! reduce sediment transports when hard layer comes to surface\r"
+    }
+  ],
+  "source_notes": [
+    "MPI is a compile configuration; swave/nonhq3d/single_dir are runtime controls and are not independent freely combinable options",
+    "The six dispatch paths do not enumerate sediment forms, boundary types or every numerical option",
+    "Stationary/single_dir automatic MPI partition forces MPIBOUNDARY_X for ny>0 subject to size check; manual partition is an explicit exception",
+    "No runtime exclusion of nonh follows from obsolete solver.F90 header comment; actual files and MPI branches remain compiled"
+  ],
+  "manual_findings": [
+    {
+      "id": "XB-EQ-WCI",
+      "documents": "Kingsday/Master equations (2.5)-(2.10)",
+      "conclusion": "Superscript tilde denotes wave-number correction, explicitly defined in the following paragraph. Current kmx/kmy updates include a cross-derivative term, depth-weighted Doppler contribution, k<=25 and intrinsic-frequency/steepness adjustments; do not claim literal identity to the compact manual equations.",
+      "status": "document_role_resolved_implementation_differences_recorded"
+    },
+    {
+      "id": "XB-EQ-BED",
+      "documents": "Kingsday B.37 / Master C.37",
+      "conclusion": "First line literally ends 0a; no separate a-dependent source exists in the corresponding sourcesink branches. Code computes positive erosion dzg with morfac*dt/(1-por) and subtracts it from zb. sourcesink=0 uses suspended+bed-load flux divergence; sourcesink=1 replaces suspended divergence with ero-depo_ex. ny==0 retains lsgrad terms.",
+      "status": "implementation_contract_resolved_authorial_a_intent_unspecified"
+    }
+  ],
+  "prior_glyph_receipt": {
+    "path": "_staging/total-read/model-audit/XBeach/connectivity/manuals-docx-read/glyph-record-read/receipt.json",
+    "sha256": "2706d05f015042e9a124c690576c618be89ae5d7a21d64b76955c2522b5845b2"
+  },
+  "document_sources": [
+    {
+      "path": "models/XBeach/raw/source_code/trunk/doc/manual/XBeach_manual_kingsday.docx",
+      "sha256": "c78396a23cec17b13be94ab1deef921c89b3d0c6a3d1f7d05e7d741e432c6543"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/doc/manual/XBeach_manual_master.docx",
+      "sha256": "9f142b89e0659e71066054c3d61b4d6f29ba3c10c5984e26e9a2d37d2fae3236"
+    }
+  ],
+  "visual_evidence": [
+    {
+      "path": "_staging/total-read/model-audit/XBeach/connectivity/manuals-docx-read/full-visual-read/master/page-019.png",
+      "sha256": "64405ad92d69effc295188b852f78a94ffe3f7077dbf1a394198b9a67cefed6b",
+      "restored_docx_physical_page": 19,
+      "equations": "2.5-2.10",
+      "inspected": true
+    },
+    {
+      "path": "_staging/total-read/model-audit/XBeach/connectivity/manuals-docx-read/full-visual-read/kingsday/page-019.png",
+      "sha256": "5af6af12394d24282c4230421c41ff858a99da1bc457252e6795a3affdbbb21e",
+      "restored_docx_physical_page": 19,
+      "equations": "2.5-2.10",
+      "inspected": true
+    },
+    {
+      "path": "_staging/total-read/model-audit/XBeach/connectivity/manuals-docx-read/full-visual-read/master/page-138.png",
+      "sha256": "68af50bad5d6241605efa0011679cf2d33871cf0b2db76475e051ee7b279aafa",
+      "restored_docx_physical_page": 138,
+      "equations": "C.37",
+      "inspected": true
+    },
+    {
+      "path": "_staging/total-read/model-audit/XBeach/connectivity/manuals-docx-read/full-visual-read/kingsday/page-135.png",
+      "sha256": "0284ecf284507275cdda06a6c640738f480f503a00c1e11e928ca1708b1f5a33",
+      "restored_docx_physical_page": 135,
+      "equations": "B.37",
+      "inspected": true
+    }
+  ]
+}
