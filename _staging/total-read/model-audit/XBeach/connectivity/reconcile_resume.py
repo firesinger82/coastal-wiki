@@ -404,6 +404,7 @@ def main():
     read('bytecode-read/viewer-yaxis-tree-read.json')
     read('bytecode-read/viewer-yaxis-maps-read.json')
     read('bytecode-read/viewer-diagnostics-read.json')
+    read('bytecode-read/viewer-time-ruler-read.json')
     read('bytecode-read/coverage.json')
     formula_name = 'workbook-formula-read.json'
     if (HERE / formula_name).is_file():

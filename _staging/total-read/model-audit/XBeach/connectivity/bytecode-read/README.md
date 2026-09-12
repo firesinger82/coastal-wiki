@@ -343,3 +343,5 @@ Method는 4바이트 정수 식별자로 1을 CONNECT_COMPOSITE_STATE로 정의�
 2026-09-12 YaxisMaps/IntegerArrayComparator 2종 전체739줄 판독. 좌표 배열 정렬·공통 노드 구성, 캐시된 노드의 현재 조상에서 보이는 행 검색, 삭제 뒤 null 행 저장·실패 반환과 Commit의 계속 진행을 연결했다. 배열 비교는 int 차감으로 overflow 가능하며 갱신은 원래 line→node 매핑을 재구성하지 않는다. 누적 Java381/413종·1070경로, 잔여 Java32종/Python150종. 근거: `viewer-yaxis-maps-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
 
 2026-09-12 Debug/Diagnosis/Profile 3종 전체393줄 판독. 호출자에게 맡긴 active 검사, 별도 상태와 공통 System.out, 파일 설정의 전역 stdout 교체, START/END 위치>0 검사와 level0에서만 출력하는 무제한 버퍼를 연결했다. 누적 Java384/413종·1076경로, 잔여 Java29종/Python150종. 근거: `viewer-diagnostics-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 RulerTime 1종 전체287줄 판독, 기존 Routines 눈금 helper207–286줄 재확인. 버퍼 범위/20 기반 간격·시작 내림·끝+간격 순회와 화면 좌표/서식·고정 폰트를 연결했다. 유효 간격·시간 증가·반복 상한 검사가 없고 Graphics 해제는 정상 끝에만 있다. 누적 Java385/413종·1078경로, 잔여 Java28종/Python150종. 근거: `viewer-time-ruler-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
