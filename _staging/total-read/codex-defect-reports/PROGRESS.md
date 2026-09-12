@@ -123,3 +123,5 @@ Claude Sonnet 5의 [한정 재검토](../model-audit/XBeach/HG-ADVERSARIAL-RECHE
 2026-09-12 SLOG2 헤더·디렉토리 7종 전체 판독: 저장 필드 순서, 버전 검사 분리, map/list 재읽기와 root 갱신 범위를 기록했다. 누적 Java 20/413종·남은 Java 393종/Python 150종. 전체 gate NOT_PASSED·GOAL active. [근거](../model-audit/XBeach/connectivity/bytecode-read/slog2-header-read.json).
 
 2026-09-12 TreeNodeID 5종 전체 판독: 부모·형제 이동, root/leaf 조건, 두 comparator의 공통 depth 내림차순과 xpos 방향 차이를 기록했다. 누적 Java 25/413종(138경로). 전체 gate NOT_PASSED·GOAL active. [근거](../model-audit/XBeach/connectivity/bytecode-read/slog2-node-read.json).
+
+2026-09-12 TraceName/Permutation/순회기 7종 전체 판독: 확장자 변환, 자리수 열거, 시간 필터 및 복합 객체 순회 흐름을 기록했다. 누적 Java 32/413종, 남은 Java 381종/Python 150종. 전체 gate NOT_PASSED·GOAL active. [근거](../model-audit/XBeach/connectivity/bytecode-read/slog2-iteration-read.json).

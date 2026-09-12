@@ -57,5 +57,14 @@ def validate(root,here):
         output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
         check(x['sha256'][:10]+'-node-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
     check('node-no-approval',node['whole_model_read_gate']=='NOT_PASSED' and node['human_approval_issued'] is False)
+    iteration=json.loads((here/'bytecode-read/slog2-iteration-read.json').read_text())
+    names={'TraceName','Permutation','IteratorOfAllDrawables','IteratorOfForeDrawables','IteratorOfBackDrawables','IteratorOfForePrimitives','IteratorOfBackPrimitives'}
+    check('iteration-seven-exact',bound(iteration['prior_receipt']) and len(iteration['records'])==iteration['unique_classes_read']==7 and {x['instances'][0]['member'] for x in iteration['records']}=={'logformat/slog2/'+n+'.class' for n in names} and iteration['instances_covered']==sum(len(x['instances']) for x in iteration['records']))
+    for x in iteration['records']:
+        original=next(a for a in r['records'] if a['sha256']==x['sha256'])
+        args=['java','-m','jdk.jdeps/com.sun.tools.javap.Main','-c','-p','-s','-constants',str(root/x['class_file']['path'])]
+        output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
+        check(x['sha256'][:10]+'-iteration-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
+    check('iteration-no-approval',iteration['whole_model_read_gate']=='NOT_PASSED' and iteration['human_approval_issued'] is False)
     check('no-approval',all(x['whole_model_read_gate']=='NOT_PASSED' and x['human_approval_issued'] is False for x in (r,read)))
     return checks

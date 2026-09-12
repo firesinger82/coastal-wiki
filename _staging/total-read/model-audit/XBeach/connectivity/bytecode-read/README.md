@@ -39,3 +39,13 @@ Const의 버전 이력은 원본에 실린 호환성 설명으로 읽었다. 실
 노드 ID는 depth(short)와 xpos(int)의 6바이트다. leaf는 depth=0, 가능한 root는 xpos=0이다. 부모 이동은 depth를 1 늘리고 xpos를 전달받은 분기 수로 정수 나눗셈한다. TreeDir의 전용 put과 연결하면 xpos=0인 후보 중 기존보다 큰 depth만 root로 복사한다.
 
 두 comparator 모두 depth 내림차순이다. 같은 depth 안에서만 Increasing은 xpos 오름차순, Decreasing은 내림차순이다. 따라서 둘은 전체 순서를 뒤집은 관계가 아니다. 필드는 public mutable이고 equals는 TreeNodeID 인수의 overload만 표시된다. 키를 삽입한 뒤 수정하는 호출 경로는 후속 확인이 필요하다. 원본 main은 comparator 없는 TreeMap과 두 comparator TreeSet을 순서대로 구성하지만, 이를 실행 결과로 간주하지 않는다. 모든 표시 메서드·초기화·빈 marker 클래스까지 판독했으며 외부 의미 승인이나 전체 gate 통과는 아니다.
+
+## 파일명·열거·표시 순회 7종
+
+[slog2-iteration-read.json](slog2-iteration-read.json)에 TraceName, Permutation 및 IteratorOfAll/Fore/BackDrawables, IteratorOfFore/BackPrimitives의 전체 표시 내용을 결속했다. 누적 Java 32/413종, 남은 Java 381종·Python 150종이다.
+
+TraceName은 소문자 확장자를 구분하며 clog2/clog/rlog/txt만 직접 slog2로 바꾼다. 나머지는 delimiter 묶음을 밑줄로 바꾸고 slog2 확장자를 덧붙인다. 이미 slog2인 이름도 이 분기로 들어간다. 빈 문자열 또는 delimiter뿐인 문자열은 내부 charAt(0)에 도달하므로 뒤쪽 기본 파일명 분기만 보고 빈 입력 처리가 보장된다고 할 수 없다. 이는 바이트코드 관측이며 실행 시험은 아니다.
+
+Permutation은 중복 없는 순열이 아니라 각 자리 값이 0부터 children-1까지 변하는 배열 열거다. 0번 자리부터 carry하고 현재 배열의 복사본을 반환한다. 열거 상한은 Math.pow를 long으로 변환하며 nextElement 자체에는 소진 검사가 없다.
+
+Drawables 정방향/역방향 순회는 목록을 해당 방향으로 훑어 시간 구간 overlap 조건을 통과한 항목을 반환한다. AllDrawables는 두 입력의 앞 항목을 비교해 병합하고 동률이면 nestable을 먼저 선택한다. Primitives 순회는 Composite에 기본 객체 추가를 위임하고 같은 시작 시각 비교기의 TreeSet에서 정방향은 first, 역방향은 last를 꺼낸다. 입력이 끝난 뒤 집합의 잔여 항목도 소비한다. 모든 순회기의 remove는 빈 메서드이며 보통의 소진 후 next는 null을 반환한다. 입력 정렬 조건·중복 제거·overlap 의미는 Drawable/Composite의 후속 판독과 함께 검증할 범위다. 전체 gate NOT_PASSED·신규 사람 승인 없음.
