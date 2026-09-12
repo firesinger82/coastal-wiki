@@ -1,5 +1,7 @@
 # XBeach 생명주기·상태·인터페이스 연결 원장
 
+2026-09-12 재개 범위: 상위 판독 전제는 [RESUME.md의 사용자 정정](../RESUME.md)을 적용한다. 부속 MPI/Jumpshot 미판독은 이 연결 후보의 완료 조건이 아니다. 이번 물리 쟁점 보충에서 이 원장의 인용·SHA를 재검사했으나, lifecycle의 12개 계약을 새로 외부 의미 검토하거나 확정한 것은 아니다.
+
 이 디렉터리는 `models/XBeach/raw/source_code/trunk`의 **생명주기 범위**만 다룬다. XBeach 전체 모델 분석 완료를 뜻하지 않는다. 현재 소스 연결은 원문과 빌드 명세로 검증했지만, 상위 전체자료 판독 게이트가 닫혀 있으므로 `edges.json`은 최종 확정이 아닌 `source_verified_candidate_pending_parent_full_read_gate` 상태다.
 
 ## 확인된 실행 흐름

@@ -1,5 +1,7 @@
 # XBeach 연결 물리 추적: wave–flow–sediment–morphology 피드백
 
+2026-09-12 보충: 아래 초기 후보 네 쟁점의 현재 판정은 [재판정 원장](resolution-20260912/adjudication.json)과 [외부 검토 반영](resolution-20260912/review-response.json)을 따른다. [위키 연결 검토본](../../../../../../models/XBeach/source-analysis/xbeach-coupled-physics-contracts.md)을 추가했으며 새 사람 승인은 아직 없다. 원래 connectivity.json은 이력으로 보존한다.
+
 이 문서는 `models/XBeach/raw/source_code/trunk/src/xbeachlibrary`의 동결 소스에서 연결 계산만 추적한 phase-2 작업물이다. 기존 281개 소스의 이중 판독과 closure 원장을 출발점으로 삼되, 판정은 `libxbeach.executestep`의 실제 호출 순서, 각 모듈의 mode guard, 배열 대입, MPI 교환, Makefile 포함 여부를 원문에서 다시 대조했다. 원문 SHA-256, physical-LF 행 번호, CR을 보존한 정확 인용, 상태별 단위·부호·격자 위치는 [connectivity.json](connectivity.json)에 있다. 이 범위 결과는 기존 closure·raw·canonical·HG·crosswalk를 변경하거나 전체 모델 감사를 완료했다고 주장하지 않는다.
 
 한 유체 스텝의 연결 순서는 다음과 같다.

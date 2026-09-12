@@ -7,6 +7,14 @@
 다음 작업은 XBeach 자체의 물리·수치해법·입출력·실행 흐름, 매뉴얼 수식의 의미 대조, lifecycle/physics 연결 검증과 검토본 정리다. 부속 도구 조사 예외와 진행 보고 기준은 [공통 범위 통제](../../../../../CLAUDE.md#모델-분석-범위-통제)를 따른다. 모델 자체의 검토·승인 조건은 유지한다.
 
 
+## 2026-09-12 모델 작업 재개 결과
+
+- **물리 연결 쟁점 XB-PHY-U01~U04:** [재판정](physics/resolution-20260912/adjudication.json)과 [외부 검토·반영](physics/resolution-20260912/review-response.json)을 저장했다. 입경의 로컬 배열 덮어쓰기는 원문 Fortran 반복문으로 1D/2D 재현했다. 침투량 단위 오류는 다음 gwflow 초기화 전 노출 상태로 영향을 한정했다. 지형–지하수의 수심 갱신 시점과 Q3D/Van Rijn 1993 분기를 정리했다. 이 네 쟁점은 정적 판정이 있는 상태이며 원본 솔버 패치나 전체 계산 검증 완료가 아니다.
+- **문서 기호 4곳:** [응력 텐서 𝕋 두 곳](nonhydro-read/stress-tensor-symbol/receipt.json), [고립파 ≪·∼ 두 곳](nonhydro-read/solitary-wave-symbols/receipt.json)의 의미를 원본 PDF 시각 판독 및 DOC Native/문단 결속으로 확인했다. 이 네 곳의 의미는 다시 미확정 과제로 반복하지 않는다. DOC 렌더의 네모·배치 문제와 나머지 수식 의미 대조는 별도다.
+- **위키 반영:** Q3D 실행 조건·설정표·pitfall 정정, 비정수압 보고서 기호 보충, 연결 계약 검토본 1편과 목차를 [설치 manifest](physics/resolution-20260912/install-manifest.json)의 다섯 경로에 반영했다. 새 연결 노트는 draft-unsourced이며 사람 승인을 발급하지 않았다. 기존 승인·crosswalk·closure 292개는 불변이다.
+
+현재 다음 작업은 **lifecycle 상태 계약 12건의 교차파일 쟁점 정리와 entry/build/mode·파일 역할 대응의 누락 확인**, 아직 해소하지 않은 모델 매뉴얼 수식의 의미 대조, 그 결과의 검토·필요한 사람 승인이다. 기존 physics 원장의 대표 edge 14개를 전체 호출 분모로 간주하지 않는다. 부속 도구 내부 판독은 재개하지 않는다.
+
 현재 작업은 plan.md의 **XBeach 전수 판독 → 연결 분석 → 검증 → canonical → 필요한 신규 HG, 이후 FUNWAVE**다. 연결 후보는 lifecycle/ 및 physics/에 남아 있다. 전체 판독 gate는 **NOT_PASSED**다. 이 문서는 완료 또는 승인 영수증이 아니다.
 
 ## 이번에 처리한 범위
@@ -30,7 +38,7 @@
    - 직접 변환 시 장 제목이 그림 번호에 들어가고 숨은 Equation/MERGEFORMAT 명령이 표시된다. 단순 필드 제거는 수식 번호와 참조를 잃는다. 세 단계의 PDF·검토 DOCX·텍스트와 진단 페이지를 저장했다. 최종 표시값 516개는 PDF에서 출현 횟수까지 검사했다.
    - Master 복원본 p.18 식 (2.1)은 본체가 비어 있다. 원본 `word/media/image13.emf`를 별도로 Draw 렌더링해 파랑작용 평형식을 확인했다. `master/equation-2-1/`의 원본 추출·PDF·이미지로 보충했으며 Writer 본문 렌더는 수정하지 않았다. Master p.10의 Figure A.1 참조/2.1 캡션 불일치와 p.128의 원래 참조 오류 2개도 보존했다. 직접 변환의 Error: 문구는 오류 소멸이 아니라 표시 변경이었다.
    - 원 PDF는 Kingsday 기존 10–45쪽+신규 1–9·46–141쪽(105쪽), Master 기존 10–46쪽+신규 1–9·47–145쪽(108쪽)으로 각각 전체 141·145쪽의 시각 보충 근거가 있다. `manuals-visual-read/read-receipts.json`과 신규 이미지 213개 참조. 이 기록은 동일 SHA PDF 경로에만 승계하며 DOCX 판독을 대신하지 않는다.
-2. 보고서 DOC의 잔여 수식 글리프·388개 Equation Native 충실도를 확인한다. 후속 `nonhydro-read/native-survey.json`은 원본 388개 중 386개 본문 기계적 판독, 2개 본문 내 인코딩 정의(tag 19) 미지원 결과다. 후속 `nonhydro-read/native-font-survey.json`에서 본문 인코딩/글꼴/스타일 정의를 지원해 388개 전체가 기계적으로 읽힌다. 이전 386개 출력 동일. 새 두 스트림의 F093/typeface -1/font position 84(Euclid Math Two)는 시각/의미 확인 대상이다. 수학적 의미/렌더 충실도 검증과 구분한다. MathType outer 166개 중 165개 저장 표시값 복원은 이전 기록에 보존했다. 이번에는 후속 렌더에서 발견된 그림 번호의 장 제목 치환을 막기 위해 본문 필드 제어 노드 652개만 제거하고 표시값을 고정했다. 머리말·꼬리말을 포함한 나머지 ZIP member는 동일 바이트다. `nonhydro-read/body-field-recovery/receipt.json` 참조. 71쪽 전체 본문을 확인했으며 최종본과 판독 중간본은 모든 페이지 y<1680 RGB가 동일하다. 차이는 쪽 번호 영역뿐이며 별도 확인했다. 최종본 p.11 그림 2-1/2-2도 직접 확인했다. p.15·41·42의 작은 네모 글리프, inline 수식 배치, 원래 빈 필드 1개는 남는다. 저장 목차/참조 쪽 번호는 재페이지화와 일치한다고 보장하지 않으며 물리 페이지 번호로 인용한다.
+2. 보고서 DOC의 잔여 수식 글리프·388개 Equation Native 충실도를 확인한다. 후속 `nonhydro-read/native-survey.json`은 원본 388개 중 386개 본문 기계적 판독, 2개 본문 내 인코딩 정의(tag 19) 미지원 결과다. 후속 `nonhydro-read/native-font-survey.json`에서 본문 인코딩/글꼴/스타일 정의를 지원해 388개 전체가 기계적으로 읽힌다. 이전 386개 출력 동일. 새 두 스트림의 F093/typeface -1/font position 84(Euclid Math Two)는 2026-09-12 보충에서 식 (1.1)과 정의 문단의 𝕋로 국소 의미를 확인했다(stress-tensor-symbol/receipt.json). 수학적 의미/렌더 충실도 검증과 구분한다. MathType outer 166개 중 165개 저장 표시값 복원은 이전 기록에 보존했다. 이번에는 후속 렌더에서 발견된 그림 번호의 장 제목 치환을 막기 위해 본문 필드 제어 노드 652개만 제거하고 표시값을 고정했다. 머리말·꼬리말을 포함한 나머지 ZIP member는 동일 바이트다. `nonhydro-read/body-field-recovery/receipt.json` 참조. 71쪽 전체 본문을 확인했으며 최종본과 판독 중간본은 모든 페이지 y<1680 RGB가 동일하다. 차이는 쪽 번호 영역뿐이며 별도 확인했다. 최종본 p.11 그림 2-1/2-2도 직접 확인했다. p.15·41·42의 네모 네 곳은 2026-09-12 보충에서 각각 𝕋 두 곳·≪·∼로 의미를 확인했다. DOC 렌더의 네모 자체, inline 수식 배치, 원래 빈 필드 1개는 남는다. 저장 목차/참조 쪽 번호는 재페이지화와 일치한다고 보장하지 않으며 물리 페이지 번호로 인용한다.
 3. 부속 MPI/Jumpshot 뷰어와 범용 의존성 내부 판독은 중단한다. 남은 Java/Python 및 PE/AR/MSI 내부 항목은 자동 재개하지 않는다. 과거 수치·판독 근거는 이력으로만 보존한다.
 4. 모델 자체의 판독·검증 전제가 충족된 뒤 연결 후보를 확정한다. FUNWAVE는 읽기 전용 preflight 이외 단계로 넘어가지 않았다.
 
