@@ -279,3 +279,5 @@ Claude Sonnet 5의 [한정 재검토](../model-audit/XBeach/HG-ADVERSARIAL-RECHE
 2026-09-12 viewer 범례 헤더/컬럼 처리기 4종·OperationBooleanMenu 계열 7종 전체 1041줄 판독. 헤더 view→model 컬럼 변환, 우클릭 시 행 선택 유지, 실행 시 선택행 기반 표시/검색 플래그 일괄 편집, 눌림 표시 해제 누락 경로를 연결했다. 누적 Java 275/413종·858경로, 잔여 Java 138종/Python 150종. 근거: `viewer-legend-handlers-boolean-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
 
 2026-09-12 viewer OperationNumberMenu/OperationStringMenu 계열 10종 전체 658줄 판독. 수치 컬럼별 비교자 선택, Creation Order의 인덱스 기준, 역순 이름 정렬 시 topology/preview 그룹도 함께 반전하는 호출 경로를 연결했다. 누적 Java 285/413종·878경로, 잔여 Java 128종/Python 150종. 근거: `viewer-legend-sort-menus-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer Triangular3DIcon 전체 578줄 판독. 헤더의 두 bool 인자별 UI 색상 분기, 위/아래 삼각형의 전체 선분 루프, Graphics 색상 미복원과 위쪽 아이콘의 우측 경계 1픽셀 초과를 연결했다. viewer/legends 고유 42종 전체 판독 근거 확보. 누적 Java 286/413종·880경로, 잔여 Java 127종/Python 150종. 근거: `viewer-legend-triangle-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
