@@ -281,3 +281,5 @@ Method는 4바이트 정수 식별자로 1을 CONNECT_COMPOSITE_STATE로 정의�
 2026-09-12 viewer FirstPanel/리스너 계열 12종 전체 1,474줄 판독. 기존 로그 정리 후 신규 열기, 실패 시 목록 유지, ViewMap 선택 인덱스로 view_ID 덮어쓰기, 도구모음/도움말 이벤트 경로를 연결했다. 누적 Java 223/413종·754경로, 잔여 Java 190종/Python 150종. 실제 설정/로그 처리 내부는 LogFileOperations 후속 범위다. 근거: `viewer-first-panel-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
 
 2026-09-12 viewer LogFileOperations/worker 2종 전체 509줄 판독. 초기 설정 전파, 거부한 입력의 명시적 close 누락, 오래된 ViewMap의 null-log 차단, 공유 로그/창을 읽는 worker 경쟁 경로를 연결했다. 정상 main의 Control 설정이 설정 파일 로드보다 앞선다는 조건도 보완했다. 누적 Java 225/413종·758경로, 잔여 Java 188종/Python 150종. 근거: `viewer-logfile-operations-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer FirstMenuBar/리스너 11종 전체 554줄 판독. 메뉴→버튼 doClick 위임, 도구모음에 없는 Close/About 버튼의 메뉴 경로, 종료 확인을 거치지 않는 Exit 및 applet 분기를 연결했다. 누적 Java 236/413종·780경로, 잔여 Java 177종/Python 150종. 근거: `viewer-first-menubar-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.

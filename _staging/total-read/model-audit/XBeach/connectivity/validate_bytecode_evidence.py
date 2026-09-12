@@ -624,6 +624,14 @@ def validate(root,here):
         output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
         check(x['sha256'][:10]+'-viewer-logfile-operations-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
     check('viewer_logfile_operations-no-approval',viewer_logfile_operations['whole_model_read_gate']=='NOT_PASSED' and viewer_logfile_operations['human_approval_issued'] is False)
+    viewer_first_menubar=json.loads((here/'bytecode-read/viewer-first-menubar-read.json').read_text())
+    check('viewer-first-menubar-eleven-exact',bound(viewer_first_menubar['prior_receipt']) and len(viewer_first_menubar['records'])==viewer_first_menubar['unique_classes_read']==11 and sorted(x['instances'][0]['member'] for x in viewer_first_menubar['records'])==['viewer/first/FirstMenuBar$1.class', 'viewer/first/FirstMenuBar$10.class', 'viewer/first/FirstMenuBar$2.class', 'viewer/first/FirstMenuBar$3.class', 'viewer/first/FirstMenuBar$4.class', 'viewer/first/FirstMenuBar$5.class', 'viewer/first/FirstMenuBar$6.class', 'viewer/first/FirstMenuBar$7.class', 'viewer/first/FirstMenuBar$8.class', 'viewer/first/FirstMenuBar$9.class', 'viewer/first/FirstMenuBar.class'] and viewer_first_menubar['instances_covered']==22)
+    for x in viewer_first_menubar['records']:
+        original=next(a for a in r['records'] if a['sha256']==x['sha256'])
+        args=['java','-m','jdk.jdeps/com.sun.tools.javap.Main','-c','-p','-s','-constants',str(root/x['class_file']['path'])]
+        output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
+        check(x['sha256'][:10]+'-viewer-first-menubar-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
+    check('viewer_first_menubar-no-approval',viewer_first_menubar['whole_model_read_gate']=='NOT_PASSED' and viewer_first_menubar['human_approval_issued'] is False)
     spec=importlib.util.spec_from_file_location('bytecode_coverage',here/'reconcile_bytecode_coverage.py')
     module=importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
