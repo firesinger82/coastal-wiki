@@ -332,6 +332,7 @@ def main():
     read('bytecode-read/clog2-stream-read.json')
     read('bytecode-read/clog2-comm-read.json')
     read('bytecode-read/clog2-skipped-records-read.json')
+    read('bytecode-read/clog2-definitions-read.json')
     read('bytecode-read/coverage.json')
     formula_name = 'workbook-formula-read.json'
     if (HERE / formula_name).is_file():

@@ -296,6 +296,14 @@ def validate(root,here):
         output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
         check(x['sha256'][:10]+'-clog2-skipped-records-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
     check('clog2-skipped-records-no-approval',clog2_skipped['whole_model_read_gate']=='NOT_PASSED' and clog2_skipped['human_approval_issued'] is False)
+    clog2_defs=json.loads((here/'bytecode-read/clog2-definitions-read.json').read_text())
+    check('clog2-definitions-four-exact',bound(clog2_defs['prior_receipt']) and len(clog2_defs['records'])==clog2_defs['unique_classes_read']==4 and sorted(x['instances'][0]['member'] for x in clog2_defs['records'])==['logformat/clog2/RecDefEvent.class', 'logformat/clog2/RecDefMsg.class', 'logformat/clog2/RecDefState.class', 'logformat/clog2TOdrawable/ObjDef.class'] and clog2_defs['instances_covered']==8)
+    for x in clog2_defs['records']:
+        original=next(a for a in r['records'] if a['sha256']==x['sha256'])
+        args=['java','-m','jdk.jdeps/com.sun.tools.javap.Main','-c','-p','-s','-constants',str(root/x['class_file']['path'])]
+        output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
+        check(x['sha256'][:10]+'-clog2-definitions-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
+    check('clog2-definitions-no-approval',clog2_defs['whole_model_read_gate']=='NOT_PASSED' and clog2_defs['human_approval_issued'] is False)
     spec=importlib.util.spec_from_file_location('bytecode_coverage',here/'reconcile_bytecode_coverage.py')
     module=importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
