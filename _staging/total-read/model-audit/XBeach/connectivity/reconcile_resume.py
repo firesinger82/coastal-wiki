@@ -398,6 +398,7 @@ def main():
     read('bytecode-read/viewer-search-dialog-panel-read.json')
     read('bytecode-read/viewer-yaxis-viewport-read.json')
     read('bytecode-read/viewer-time-model-read.json')
+    read('bytecode-read/viewer-navigation-actions-read.json')
     read('bytecode-read/coverage.json')
     formula_name = 'workbook-formula-read.json'
     if (HERE / formula_name).is_file():

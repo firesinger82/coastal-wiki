@@ -824,6 +824,14 @@ def validate(root,here):
         output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
         check(x['sha256'][:10]+'-viewer-time-model-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
     check('viewer_time_model-no-approval',viewer_time_model['whole_model_read_gate']=='NOT_PASSED' and viewer_time_model['human_approval_issued'] is False)
+    viewer_navigation_actions=json.loads((here/'bytecode-read/viewer-navigation-actions-read.json').read_text())
+    check('viewer-navigation-actions-thirteen-exact',bound(viewer_navigation_actions['prior_receipt']) and len(viewer_navigation_actions['records'])==viewer_navigation_actions['unique_classes_read']==13 and [x['instances'][0]['member'] for x in viewer_navigation_actions['records']]==['viewer/zoomable/ActionSearchBackward.class', 'viewer/zoomable/ActionSearchForward.class', 'viewer/zoomable/ActionSearchInit.class', 'viewer/zoomable/ActionVportBackward.class', 'viewer/zoomable/ActionVportDown.class', 'viewer/zoomable/ActionVportForward.class', 'viewer/zoomable/ActionVportUp.class', 'viewer/zoomable/ActionZoomHome.class', 'viewer/zoomable/ActionZoomIn.class', 'viewer/zoomable/ActionZoomOut.class', 'viewer/zoomable/ActionZoomRedo.class', 'viewer/zoomable/ActionZoomUndo.class', 'viewer/zoomable/ToolBarStatus.class'] and viewer_navigation_actions['instances_covered']==26)
+    for x in viewer_navigation_actions['records']:
+        original=next(a for a in r['records'] if a['sha256']==x['sha256'])
+        args=['java','-m','jdk.jdeps/com.sun.tools.javap.Main','-c','-p','-s','-constants',str(root/x['class_file']['path'])]
+        output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
+        check(x['sha256'][:10]+'-viewer-navigation-actions-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
+    check('viewer_navigation_actions-no-approval',viewer_navigation_actions['whole_model_read_gate']=='NOT_PASSED' and viewer_navigation_actions['human_approval_issued'] is False)
     spec=importlib.util.spec_from_file_location('bytecode_coverage',here/'reconcile_bytecode_coverage.py')
     module=importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
