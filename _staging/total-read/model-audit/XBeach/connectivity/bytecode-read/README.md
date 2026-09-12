@@ -299,3 +299,5 @@ Method는 4바이트 정수 식별자로 1을 CONNECT_COMPOSITE_STATE로 정의�
 2026-09-12 viewer OperationNumberMenu/OperationStringMenu 계열 10종 전체 658줄 판독. 수치 컬럼별 비교자 선택, Creation Order의 인덱스 기준, 역순 이름 정렬 시 topology/preview 그룹도 함께 반전하는 호출 경로를 연결했다. 누적 Java 285/413종·878경로, 잔여 Java 128종/Python 150종. 근거: `viewer-legend-sort-menus-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
 
 2026-09-12 viewer Triangular3DIcon 전체 578줄 판독. 헤더의 두 bool 인자별 UI 색상 분기, 위/아래 삼각형의 전체 선분 루프, Graphics 색상 미복원과 위쪽 아이콘의 우측 경계 1픽셀 초과를 연결했다. viewer/legends 고유 42종 전체 판독 근거 확보. 누적 Java 286/413종·880경로, 잔여 Java 127종/Python 150종. 근거: `viewer-legend-triangle-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer ConvertorDialog/Frame와 listener·AdvancingTextArea·WaitingContainer 10종 전체 606줄 판독. 모달 출력명 반환과 취소 null 경로, 독립 창의 Okay/Cancel/닫기 모두 JVM 종료, 패널/프로세스 취소 미확정 범위를 연결했다. 누적 Java 296/413종·900경로, 잔여 Java 117종/Python 150종. 근거: `viewer-convertor-windows-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.

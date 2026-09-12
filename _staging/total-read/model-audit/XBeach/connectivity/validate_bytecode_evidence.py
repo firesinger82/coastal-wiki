@@ -696,6 +696,14 @@ def validate(root,here):
         output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
         check(x['sha256'][:10]+'-viewer-legend-triangle-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
     check('viewer_legend_triangle-no-approval',viewer_legend_triangle['whole_model_read_gate']=='NOT_PASSED' and viewer_legend_triangle['human_approval_issued'] is False)
+    viewer_convertor_windows=json.loads((here/'bytecode-read/viewer-convertor-windows-read.json').read_text())
+    check('viewer-convertor-windows-ten-exact',bound(viewer_convertor_windows['prior_receipt']) and len(viewer_convertor_windows['records'])==viewer_convertor_windows['unique_classes_read']==10 and [x['instances'][0]['member'] for x in viewer_convertor_windows['records']]==['viewer/convertor/AdvancingTextArea.class', 'viewer/convertor/ConvertorDialog$1.class', 'viewer/convertor/ConvertorDialog.class', 'viewer/convertor/ConvertorDialog$CloseAction.class', 'viewer/convertor/ConvertorDialog$CloseToRetrieveAction.class', 'viewer/convertor/ConvertorFrame$1.class', 'viewer/convertor/ConvertorFrame$2.class', 'viewer/convertor/ConvertorFrame$3.class', 'viewer/convertor/ConvertorFrame.class', 'viewer/convertor/WaitingContainer.class'] and viewer_convertor_windows['instances_covered']==20)
+    for x in viewer_convertor_windows['records']:
+        original=next(a for a in r['records'] if a['sha256']==x['sha256'])
+        args=['java','-m','jdk.jdeps/com.sun.tools.javap.Main','-c','-p','-s','-constants',str(root/x['class_file']['path'])]
+        output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
+        check(x['sha256'][:10]+'-viewer-convertor-windows-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
+    check('viewer_convertor_windows-no-approval',viewer_convertor_windows['whole_model_read_gate']=='NOT_PASSED' and viewer_convertor_windows['human_approval_issued'] is False)
     spec=importlib.util.spec_from_file_location('bytecode_coverage',here/'reconcile_bytecode_coverage.py')
     module=importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
