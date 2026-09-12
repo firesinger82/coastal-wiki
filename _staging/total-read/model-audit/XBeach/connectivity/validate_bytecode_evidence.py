@@ -248,6 +248,14 @@ def validate(root,here):
         output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
         check(x['sha256'][:10]+'-clog2-content-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
     check('clog2-content-no-approval',clog2_content['whole_model_read_gate']=='NOT_PASSED' and clog2_content['human_approval_issued'] is False)
+    clog2_matching=json.loads((here/'bytecode-read/clog2-matching-read.json').read_text())
+    check('clog2-matching-seven-exact',bound(clog2_matching['prior_receipt']) and len(clog2_matching['records'])==clog2_matching['unique_classes_read']==7 and sorted(x['instances'][0]['member'] for x in clog2_matching['records'])==['logformat/clog2TOdrawable/NoMatchingEventException.class', 'logformat/clog2TOdrawable/ObjMethod.class', 'logformat/clog2TOdrawable/Obj_Arrow.class', 'logformat/clog2TOdrawable/Obj_State.class', 'logformat/clog2TOdrawable/Topo_Arrow.class', 'logformat/clog2TOdrawable/Topo_State.class', 'logformat/clog2TOdrawable/TwoEventsMatching.class'] and clog2_matching['instances_covered']==14)
+    for x in clog2_matching['records']:
+        original=next(a for a in r['records'] if a['sha256']==x['sha256'])
+        args=['java','-m','jdk.jdeps/com.sun.tools.javap.Main','-c','-p','-s','-constants',str(root/x['class_file']['path'])]
+        output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
+        check(x['sha256'][:10]+'-clog2-matching-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
+    check('clog2-matching-no-approval',clog2_matching['whole_model_read_gate']=='NOT_PASSED' and clog2_matching['human_approval_issued'] is False)
     spec=importlib.util.spec_from_file_location('bytecode_coverage',here/'reconcile_bytecode_coverage.py')
     module=importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
