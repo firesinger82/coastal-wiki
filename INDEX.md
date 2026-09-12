@@ -97,6 +97,7 @@
 | [research/inbox/](research/inbox/) | X·arXiv·블로그·툴 신규 후보 | empty |
 | [research/digests/](research/digests/) | 주간·월간 Hermes 요약 | empty |
 | [research/watchlist/](research/watchlist/) | 모니터링 대상 계정·저자·기관·repo·키워드 | empty |
+| [위키 목적·전수 범위 조사](research/digests/2026-09-12-wiki-purpose-review.md) | Grok X 검색 4회·논문 8편·구축 사례·Claude 검토 | 2026-09-12 draft, 정책 미채택 |
 
 ## 상태 표기
 
