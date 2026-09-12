@@ -329,3 +329,5 @@ Claude Sonnet 5의 [한정 재검토](../model-audit/XBeach/HG-ADVERSARIAL-RECHE
 2026-09-12 RulerTime 1종 전체287줄 판독, 기존 Routines 눈금 helper207–286줄 재확인. 버퍼 범위/20 기반 간격·시작 내림·끝+간격 순회와 화면 좌표/서식·고정 폰트를 연결했다. 유효 간격·시간 증가·반복 상한 검사가 없고 Graphics 해제는 정상 끝에만 있다. 누적 Java385/413종·1078경로, 잔여 Java28종/Python150종. 근거: `viewer-time-ruler-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
 
 2026-09-12 ScaledSlider 1종 전체477줄 판독. 생성 시 비율0·범위 변경 후 비율 계산, 범위 밖 입력의 상하한 확장, 최대값 기준 눈금 간격과 정수 라벨 반복의 zero-step 방어 부재를 확인했다. setValLabelFully는 강제 이벤트 없이 위임한다. 실제 초기화 순서는 RowAdjustments 후속 판독 대상. 누적 Java386/413종·1080경로, 잔여 Java27종/Python150종. 근거: `viewer-scaled-slider-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 ModelTimePanel/시간 범위·초점·픽셀 입력 listener 4종 전체707줄 판독. 읽기전용·편집 필드와 live 모델 갱신, 범위 검사 후 확대→초점 설정 순서, 픽셀 해상도의 focus 중심 확대, NaN/무한대 거부 부재를 연결했다. 누적 Java390/413종·1088경로, 잔여 Java23종/Python150종. 근거: `viewer-time-panel-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
