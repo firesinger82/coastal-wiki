@@ -1,0 +1,68 @@
+{
+  "date": "2026-09-12",
+  "attribution": "AI direct bytecode reading; not independent semantic approval.",
+  "prior_receipt": {
+    "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/disassembly-receipt.json",
+    "sha256": "1cc8b2657a74f3f5904e9d0a40648b1c98f6e031b056b7c6e19122beb632aaa8"
+  },
+  "records": [
+    {
+      "sha256": "869431869b2bf40bc09bc8f9308d051b6ce680bf5993a64302bbad86c4cdbf12",
+      "instances": [
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/win32/mpich/bin/jumpshot.jar",
+          "member": "viewer/zoomable/IntegerArrayComparator.class"
+        },
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/bin/jumpshot.jar",
+          "member": "viewer/zoomable/IntegerArrayComparator.class"
+        }
+      ],
+      "class_file": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/classes/869431869b2bf40bc09bc8f9308d051b6ce680bf5993a64302bbad86c4cdbf12.class",
+        "sha256": "869431869b2bf40bc09bc8f9308d051b6ce680bf5993a64302bbad86c4cdbf12"
+      },
+      "disassembly": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/disassembly/869431869b2bf40bc09bc8f9308d051b6ce680bf5993a64302bbad86c4cdbf12.txt",
+        "sha256": "36e1a0cc7b2b3764ded5047950029cbce5a4877da70bfda09b545cf5f7d8cc4a"
+      },
+      "read_lines": [
+        1,
+        125
+      ],
+      "scope": "Two full javap classes,739 lines; YaxisMaps displayed in two consecutive slices.",
+      "observation": "Complete125-line javap. Raw Comparator casts both arguments to Integer[], computes min lengths, compares each common-position Integer.intValue by int SUBTRACTION; first nonzero difference returned. Equal prefix then equal lengths0, longer1/shorter-1. No null/type guards or immutable snapshot. Subtraction overflow can reverse ordering and violate comparator antisymmetry (0 minus MIN_VALUE and reverse both MIN_VALUE) or transitivity, affecting TreeSet ordering used by YaxisMaps; not safe Integer.compare. Equal coordinate contents+length compare0 deduplicates arrays, distinct values subtraction cannot become0 unless equal ints. Empty arrays compare by length; twoempty equal. main constructs [2,3,0] and [2,4], prints compare result (statically -1); main not executed. No tie by line ID or node depth."
+    },
+    {
+      "sha256": "406b38000474bf5af544522e7c0fcc78c65c5f3fae99dc430fa38476b9347adf",
+      "instances": [
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/win32/mpich/bin/jumpshot.jar",
+          "member": "viewer/zoomable/YaxisMaps.class"
+        },
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/bin/jumpshot.jar",
+          "member": "viewer/zoomable/YaxisMaps.class"
+        }
+      ],
+      "class_file": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/classes/406b38000474bf5af544522e7c0fcc78c65c5f3fae99dc430fa38476b9347adf.class",
+        "sha256": "406b38000474bf5af544522e7c0fcc78c65c5f3fae99dc430fa38476b9347adf"
+      },
+      "disassembly": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/disassembly/406b38000474bf5af544522e7c0fcc78c65c5f3fae99dc430fa38476b9347adf.txt",
+        "sha256": "4eaa3faf38f8704d5ce93dab17054a1705b625515fda5568121c255eba207da5"
+      },
+      "read_lines": [
+        1,
+        614
+      ],
+      "scope": "Two full javap classes,739 lines; YaxisMaps displayed in two consecutive slices.",
+      "observation": "Complete614-line javap in consecutive1–307/308–614 slices. Constructor retains actual LineIDMap and initializes root/treeview/three mapsNULL. getTreeRoot lazily assigns new root using CURRENT Parameters.Y_AXIS_ROOT_LABEL then converts lineIDmap; root assigned BEFORE conversion, so failure leaves partial cached root and subsequent getter does not retry. Later parameter/input changes do not rebuild root. All getters expose actual mutable refs. setTreeView stores ref, ONLY if line-to-leaf mapnull allocates TreeMap and builds it, discards successboolean. Does not force getTreeRoot or rebuild for a replacement view; calling before root creation with nonempty map can fail and leave nonnull partial cache. No listener registrations, locks or thread dispatch.\nconvertLineIDMapToTree adds all Integer[] values to TreeSet(IntegerArrayComparator), iterates sorted unique coordinate arrays, walks from root for each integer, reuses equal direct child or adds node. Same coordinate arrays share endpoint even different line IDs; empty coordinate array staysroot. Does not store terminal marker, so shorter prefix endpoint may be an internal node despite leaf naming. Comparator length tie only after commonprefix, so sorting is lexicographic not depth order; code does not enforce uniform lengths. Previously read LineIDMap normal serialized paths use format dimensions; do not assume all imported/mutable maps ragged.\nsetMapOfLineIDToTreeLeaf walks EACH original entry coordinate sequence starting cached root; missing child is CREATED+attached, logs Unexpected Error and marksfalse but continues and stores endpoint for every line ID. This fallback does not throw solely because child absent. Key map preserves different line IDs that share coordinates. Endpoint refs retained even after move/delete/edit; later update does NOT reconstruct this map or re-walk original coordinates.\nupdate first rebuilds path-to-row HashMap by createorclear, snapshots tree.getRowCount then each row getPathForRow→Integer row; no nullpath guard/atomic snapshot. Then createorclear line-to-row TreeMap and loops cached line-to-node entries. Builds FRESH path from each retained node.getPath (therefore successful reparenting follows new ancestry), walks from endpoint upward until first nonnull visible row lookup, then stores lineID→row. Nearest visible ancestor collapses multiple lines onto same row; no category/search/selected-row filtering. If no matching path before null, aggregatefalse BUT STILL stores lineID→NULL, does not remove key or detached node, continues other entries. Deleted subtree retains internal links but lacks displayed root ancestry, so no row match normally: update returnsfalse with null rows. Commit action previously read errors but continues resize/row-slider update; downstream drawing handling remains its own contract, not proof all null rows necessarily crash. Moving endpoints follows node identity despite original coordinate arrays staying unchanged; display labels/getLineIDMap source can therefore differ. Map object identity retained via clear+repopulate: consumers retaining maps see modifications, no rollback on partial failure.\nStatic stringFromYaxisRoot breadthfirst nodes inserts newline on level change, stringForYaxisTree uses cached root without lazycreation; stringForMap iterates entries key/value text, leaf-map diagnostic prints CURRENT getPath including root and parenthesized endpoint. TreePath/row and line/row wrappers delegate stringForMap; printMaps prints leaf, pathrow, linerow sequentially. No IO persistence except supplied PrintStream diagnostics, no redraw or custom event delivery. No null/type/overflow handling. Existing Canvas fetch-before-update leafmap reference remains same cached object: ordinary update rebuilds only rowmaps, so no missing leaf-map replacement in that path; input/view replacement still stale. Archived bytecode not executed or independently approved."
+    }
+  ],
+  "unique_classes_read": 2,
+  "instances_covered": 4,
+  "whole_model_read_gate": "NOT_PASSED",
+  "human_approval_issued": false
+}

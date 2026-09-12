@@ -339,3 +339,5 @@ Method는 4바이트 정수 식별자로 1을 CONNECT_COMPOSITE_STATE로 정의�
 2026-09-12 ActionTimelineMark/Move/Delete 3종 전체632줄 판독. 표시는 버퍼 갱신 뒤 레벨 검사, 이동은 전체 분리 후 삽입 위치 계산·확장 경로 복원, 삭제는 확인 뒤 버퍼 조회·순차 제거한다. 정상 끝의 버튼 갱신과 직접 Commit 미호출을 연결했으며 tree 내부 효과·버퍼 불변조건은 후속 판독 대상이다. 누적 Java376/413종·1060경로, 잔여 Java37종/Python150종. 근거: `viewer-timeline-edit-actions-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
 
 2026-09-12 YaxisTree/named_vector/YaxisTreeNode 3종 전체641줄 판독. 깊이만 비교하는 선택 버퍼·재표시 실패 전 기존 버퍼 소거·루트 및 자기 이동 대상 허용을 앞선 action과 연결했다. 마지막 leaf 깊이 기반 레벨 배열·루트 단독의 음수 확대 cursor와 명시적 canvas commit 부재를 기록했다. 누적 Java379/413종·1066경로, 잔여 Java34종/Python150종. 근거: `viewer-yaxis-tree-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 YaxisMaps/IntegerArrayComparator 2종 전체739줄 판독. 좌표 배열 정렬·공통 노드 구성, 캐시된 노드의 현재 조상에서 보이는 행 검색, 삭제 뒤 null 행 저장·실패 반환과 Commit의 계속 진행을 연결했다. 배열 비교는 int 차감으로 overflow 가능하며 갱신은 원래 line→node 매핑을 재구성하지 않는다. 누적 Java381/413종·1070경로, 잔여 Java32종/Python150종. 근거: `viewer-yaxis-maps-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
