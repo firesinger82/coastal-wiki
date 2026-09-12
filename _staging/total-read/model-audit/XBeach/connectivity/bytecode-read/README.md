@@ -185,3 +185,5 @@ Method는 4바이트 정수 식별자로 1을 CONNECT_COMPOSITE_STATE로 정의�
 `trace-input-read.json`은 InputLog/DobjDef 전체 236줄을 결박한다. 초기 EVENT/STATE/ARROW 제공 후 native 정수를 정적 Kind로 바꾸므로 정상 index의 identity 연결이 확인됐다. 미지 index는 null, 초기 세 개 이후 native topology 요청은 null topology로 이어질 수 있다. native 함수는 선언만 있으며 실제 파일/객체 처리 의미는 완료 처리하지 않는다. DobjDef의 shape 검사와 Category 설정도 기록했다.
 
 2026-09-12 CLOG2 InputLog와 TopologyIterator/YCoordMapIterator 전체 437줄 판독. 정적 Kind 반환 및 topology→content→좌표 맵 전환과 최초 arrow category 특례를 확인했다. ContentIterator 본문과 superclass는 미판독으로 남긴다. 누적 Java 86/413종·472경로, 잔여 Java 327종/Python 150종. 근거: `clog2-input-shell-read.json`.
+
+2026-09-12 CLOG2 ContentIterator 전체 1,193줄 판독. hasNext가 레코드를 소비하고 next가 저장 객체를 반환하는 계약, Category/Primitive만 생성하는 경로, reflective handler 오류 처리와 미매칭 통계의 중복 집계 가능성을 기록했다. 저수준 레코드·Topo 매칭·ID 맵은 별도 미판독이다. 누적 Java 87/413종·474경로, 잔여 Java 326종/Python 150종. 근거: `clog2-content-read.json`.

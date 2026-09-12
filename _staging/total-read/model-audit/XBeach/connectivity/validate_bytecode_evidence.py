@@ -240,6 +240,14 @@ def validate(root,here):
         output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
         check(x['sha256'][:10]+'-clog2-input-shell-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
     check('clog2-input-shell-no-approval',clog2_shell['whole_model_read_gate']=='NOT_PASSED' and clog2_shell['human_approval_issued'] is False)
+    clog2_content=json.loads((here/'bytecode-read/clog2-content-read.json').read_text())
+    check('clog2-content-one-exact',bound(clog2_content['prior_receipt']) and len(clog2_content['records'])==clog2_content['unique_classes_read']==1 and clog2_content['records'][0]['instances'][0]['member']=='logformat/clog2TOdrawable/InputLog$ContentIterator.class' and clog2_content['instances_covered']==2)
+    for x in clog2_content['records']:
+        original=next(a for a in r['records'] if a['sha256']==x['sha256'])
+        args=['java','-m','jdk.jdeps/com.sun.tools.javap.Main','-c','-p','-s','-constants',str(root/x['class_file']['path'])]
+        output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
+        check(x['sha256'][:10]+'-clog2-content-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
+    check('clog2-content-no-approval',clog2_content['whole_model_read_gate']=='NOT_PASSED' and clog2_content['human_approval_issued'] is False)
     spec=importlib.util.spec_from_file_location('bytecode_coverage',here/'reconcile_bytecode_coverage.py')
     module=importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
