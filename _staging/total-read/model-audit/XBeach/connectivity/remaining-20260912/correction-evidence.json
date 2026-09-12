@@ -1,0 +1,85 @@
+{
+  "scope": "Specific canonical correction candidates; no installed correction or new solver defect verdict",
+  "candidates": [
+    {
+      "id": "R3-C1",
+      "evidence": [
+        {
+          "path": "models/XBeach/source-analysis/xbeach_wave_boundary_generation.md",
+          "sha256": "121720d5a0f6322b8ed4818cbf7ce3f559aeba6258b16faa348c5e3d9edb5f1e",
+          "line_start": 32,
+          "line_end": 38,
+          "quote_exact_utf8": "## 2. generate_wave_boundary_surfbeat 흐름 (wave_boundary_update.f90:73)\n\n1. **스펙트럼 → XBeach 격자 보간**(naint=401 방향, nfint freq).\n2. **랜덤위상 단파 train**: 스펙트럼을 Fourier component 로 분해 — `wp%fgen`(주파수)/`thetagen`(방향)/`phigen`(랜덤 위상)/`kgen`(파수)/`wgen`(각진동수). 각 성분 진폭 `√(2·S·df·dθ)`.\n3. **에너지 envelope** 시계열: 단파 군(wave group)의 변동(variance) 포락선 계산(directional-spreading 의존, :2168).\n4. **`generate_qbcf`** — bound long wave 생성(§3).\n5. nonh 시계열(`generate_nhtimeseries_file`, nonhspectrum 시)."
+        },
+        {
+          "path": "models/XBeach/source-analysis/xbeach-source-audit-supplements.md",
+          "sha256": "7b5e112356cfcf610036c8bf4f3cd0856514509c445f6b6ca4319b2b9ca5c128",
+          "line_start": 66,
+          "line_end": 68,
+          "quote_exact_utf8": "| <a id=\"xb-sup-wave-boundary-update-f90-b10-9c364a2c\"></a>`B10` `trunk/src/xbeachlibrary/wave_boundary_update.f90` | `NARROWED` | BUILDXBEACH가 없으면 보간부가 pdflocal과 thetagen을 정의하지 않은 채 뒤에서 정규화·사용한다. 확인한 build와 활성 call graph에서 제외된 prototype의 잠재 통합 결함이다. | `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_boundary_update.f90:1583-1588` |\n| <a id=\"xb-sup-wave-boundary-update-f90-b16-9c364a2c\"></a>`B16` `trunk/src/xbeachlibrary/wave_boundary_update.f90` | `NARROWED` | generate_ebcf의 BUILDXBEACH logging은 scope에 없는 s%ntheta·s%ny를 참조한다. 확인한 build와 활성 call graph에서 제외된 prototype의 잠재 build 결함이다. | `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_boundary_update.f90:2186-2189` |\n| <a id=\"xb-sup-wave-boundary-update-f90-b20-9c364a2c\"></a>`B20` `trunk/src/xbeachlibrary/wave_boundary_update.f90` | `NARROWED` | generate_qbcf가 전달받거나 선언하지 않은 s%ny로 q를 할당한다. 확인한 build와 활성 call graph에서 제외된 prototype의 잠재 build 결함이다. | `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_boundary_update.f90:2514-2516` |"
+        }
+      ],
+      "resolution_basis": "../build-mode-20260912/build-map.json"
+    },
+    {
+      "id": "R3-C2",
+      "evidence": [
+        {
+          "path": "models/XBeach/source-analysis/xbeach_wave_action_balance.md",
+          "sha256": "a116c0e8a067879aada473d16f26e2320bb7d4463d2cc12ed7bdd011a2b20469",
+          "line_start": 65,
+          "line_end": 75,
+          "quote_exact_utf8": "## 5. Stationary 모드 (wave_directions.F90, 400)\n\n`wave_directions` = **stationary 모드**의 방향 분해 solver(ntheta_s bins). 반복(`iter`/`itermax`, Herr/thetaerr 수렴)으로 정상상태 파작용·방향(thetamean) 해. instationary 와 달리 시간전진 없이 정상 평형. [[xbeach_single_dir]](single-directional)·[[xbeach_mode_dispatch]] 와 연계.\n\n## 6. 모드별 wave solver\n\n| 모드 | solver | 특징 |\n|---|---|---|\n| **surfbeat(instat)** | `wave_instationary` | 시간전진 파작용+roller, wave-group 변조→bound long wave(infragravity) |\n| **stationary** | `wave_directions` | 반복 정상상태, 평균 wave forcing |\n| **nonh** | (파 직접 해상) | action balance 미사용([[xbeach_flow_solver]] §6) |"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/wave_timestep.F90",
+          "sha256": "13297e7ff3b23640c1697f25e7af980aff5e169fe0be0b9d665dd32f3170c0ac",
+          "line_start": 77,
+          "line_end": 94,
+          "quote_exact_utf8": "         ! call update_means_wave_flow not required: stationary always uses instantaneous water depth s%hhw\r\n         if ((abs(mod(par%t,par%wavint))<0.001d0*par%dt) .or. s%newstatbc==1) then\r\n            call wave_dispersion(s,par,0)  ! use instantaneous water depth (and velocity)\r\n            call wave_stationary_directions(s,par,0)\r\n            s%newstatbc   = 0\r\n         endif\r\n       case(WAVEMODEL_SURFBEAT)\r\n         if (par%single_dir==1) then\r\n            ! always need to update depths for wave directions model, as well as in case of wci (dealt with in subroutine)\r\n            call update_means_wave_flow(s,par)\r\n            !\r\n            ! if necessary, update wave directions\r\n            if ((abs(mod(par%t,par%wavint))<0.001d0*par%dt) .or. s%newstatbc==1 .or. par%t==par%dt) then\r\n               call wave_dispersion(s,par,1)  ! use s%hhws water depth (and velocity)\r\n               call wave_stationary_directions(s,par,1)\r\n               s%newstatbc   = 0\r\n            endif\r\n            !\r"
+        }
+      ],
+      "resolution_basis": "../build-mode-20260912/contracts.json"
+    },
+    {
+      "id": "R3-C3",
+      "evidence": [
+        {
+          "path": "models/XBeach/source-analysis/xbeach_intrawave_sediment_transport.md",
+          "sha256": "41e2edf20d3ddd38a4b7ee2a3437d4d534d2a91f27d89524e5777dfc22339f27",
+          "line_start": 55,
+          "line_end": 66,
+          "quote_exact_utf8": "> ★**`FORM_INTRASEDTR=11` 은 `form=` 키워드로 사용자 설정 불가**(params.F90:933-936 목록에 없음) — 비정수압 run 내부 자동선택. [[xbeach_nonh]](수력만 문서화)의 **유사 짝**.\n\n## 3. mccall_vanrijn (:2502-2817) — XBeach-G 자갈 sheet-flow\n```fortran\nSster = D50/(4ν)·√((rhos/rho-1)·g·D50)                         ! :2581 Soulsby\nwster = 1.06·tanh(0.064·Sster·exp(-7.5/Sster²)) + 0.22·tanh(...)·Sster   ! :2581-2585 침강속도\n! sheet-flow transport (Eq 10, /rhos → m²/s) :2753\n```\n\n## 4. 주요 findings\n- **기존 노트 3형식 주장, 코드 6형식** — [[xbeach_morphology]]:44-49·Decision Guide 가 nielsen2006·mccall_vanrijn·intra_sedtr 누락(transus 는 6 전부 분기).\n- **FORM_INTRASEDTR=11 사용자 미설정**(내부 비정수압 경로) — [[xbeach_nonh]] 유사 짝."
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.F90",
+          "sha256": "73648b5733a8f90a8f18cda32743bdc2ef42f649e39c521e28e06584ee63c359",
+          "line_start": 932,
+          "line_end": 945,
+          "quote_exact_utf8": "         call setallowednames('soulsby_vanrijn',    FORM_SOULSBY_VANRIJN,  &\r\n         'vanthiel_vanrijn',   FORM_VANTHIEL_VANRIJN, &\r\n         'vanrijn1993', FORM_VANRIJN1993, &\r\n         'nielsen2006', FORM_NIELSEN2006, &\r\n         'mccall_vanrijn', FORM_MCCALL_VANRIJN, &\r\n         'wilcock_crow', FORM_WILCOCK_CROW, &\r\n         'engelund_fredsoe', FORM_ENGELUND_FREDSOE, &\r\n         'mpm', FORM_MPM, &\r\n         'wong_parker', FORM_WONG_PARKER, &\r\n         'fl_vb', FORM_FL_VB, &\r\n         'fredsoe_deigaard', FORM_FREDSOE_DEIGAARD, &\r\n         'intrasedtr', FORM_INTRASEDTR)\r\n         call setoldnames('1','2','3','4','5','6','7','8','9','10','11','12')\r\n         if(par%useXBeachGSettings==0) then\r"
+        },
+        {
+          "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/morphevolution.F90",
+          "sha256": "765f474008f7cb843353dc0790cc3f3ebdc00631353da7592e2bb0508e968391",
+          "line_start": 173,
+          "line_end": 190,
+          "quote_exact_utf8": "      select case (par%form)\r\n       case (FORM_SOULSBY_VANRIJN,FORM_VANTHIEL_VANRIJN,FORM_VANRIJN1993)\r\n         ! Soulsby van Rijn and Van Thiel de Vries & Reniers 2008 formulations\r\n         call sedtransform(s,par)\r\n       case (FORM_NIELSEN2006)\r\n         call Nielsen2006(s,par)\r\n         if (par%bulk==0) then\r\n            return\r\n         endif\r\n       case (FORM_INTRASEDTR)\r\n         call intra_sedtr(s,par)       \r\n\r\n       case (FORM_MCCALL_VANRIJN)\r\n         call mccall_vanrijn(s,par)\r\n         if (par%bulk==0) then\r\n            return\r\n         endif\r\n      end select\r"
+        }
+      ],
+      "scope_limit": "Input names and executed cases require reconciliation; no automatic-selection or all-names-active inference."
+    },
+    {
+      "id": "R3-C4",
+      "evidence": [
+        {
+          "path": "_staging/total-read/model-audit/XBeach/connectivity/INFILTRATION-DOCUMENT-CODE-COMPARISON.md",
+          "sha256": "d96051659ee89ecb184615d61e952c8d0a9ed6e02ede0186e9235bfec8028eb5",
+          "line_start": 15,
+          "line_end": 15,
+          "quote_exact_utf8": "기존 canonical `xbeach_groundwater.md`의 교환 분기·부호 설명은 유지한다. 이번 상세 비교는 판독 보충 근거로 남기고 전체 판독 뒤 canonical 검토 대상으로 삼는다. 전체 gate NOT_PASSED·신규 사람 승인 없음. 원본/기존 승인 기록을 수정하지 않는다."
+        }
+      ],
+      "resolution_basis": "../infiltration-document-code-comparison.json"
+    }
+  ]
+}
