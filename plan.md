@@ -1725,3 +1725,15 @@ XB-SC-001~012의 초기화·hotstart·BMI·오류 종료·MPI 소유 계약을 �
 출처 정정본과 전후 해시를 준비해 읽기 전용 Codex 검토를 받은 뒤 exact manifest 경로에 설치한다. 기존 verified 이력과 이번 AI 정정의 범위를 구분하고 새 HG를 발급하지 않는다. 네 초기 정정의 반영 상태만 후속 progress에 기록하며 전체 R1/R2/R3/R4를 완료로 올리지 않는다. 이전 remaining 입력/검증은 원래 snapshot으로 보존한다.
 
 반영 결과: 고정 초기 정정 R3-C1~C4를 기존 8개 문서에 설치했다. 최초·후속 독립 Codex 원문 검토에서 반영 차단 오류는 없었다. 허용 입력 12개와 원본 SELECT 24조합의 한정 재현, 활성 파랑 생성/정상 방향 호출, 기존 침투식 대조를 연결했다. 원문 36구간·링크 32개·설치 바이트·불변 292개 및 소유권/권한 보존을 확인했다. `remaining-20260912/progress.json`은 네 정정만 완료로 표시하며 R1/R2/R3/R4 전체와 새 사람 승인은 미완 상태를 유지한다. 다음은 동결 입력의 미연결 루틴/조건과 수식 위치별 기존 판정 결속이다.
+
+### 2026-09-12 R1 실행 연결 대조
+
+동결 src 집합의 빌드 포함 Fortran 57개와 Python wrapper 두 경로를 기존 이중 판독·빌드/생성·lifecycle/physics·분야 노트에 연결한다. 원문에서 루틴 정의·직접 호출·함수 사용·generic interface·CPP와 실행 조건을 수집하되 기계적 후보를 실제 도달성 확정으로 취급하지 않는다. 진입점은 standalone, dynamic, BMI와 그 Python 호출이며, public utility/interface·생성 include·현재 미호출 루틴의 처분은 근거를 명시한다. 외부 MPI/netCDF/런타임은 모델 쪽 호출 인터페이스에서 멈춘다.
+
+기존 근거에 없는 분기는 호출자·생산자·소비자 구간을 읽어 대조한다. 핵심 상태 전달은 기존 physics/lifecycle 재판정을 재사용하고 강우·외력·선택 기능·출력까지 실행 순서에 연결한다. unresolved를 단순 파일명 매칭이나 graph reachability로 지우지 않는다. 전체 R1 종료 여부는 실제 미연결 의미·조건을 원장에 남겨 독립 검토하고 판정한다. R2는 이 대응을 재사용하되 이번 실행 연결 검사를 수식 대조 완료로 올리지 않는다. 출처 원장·검토본·검증·재개 기록을 저장하고 exact manifest 설치 및 커밋·푸시한다. 기존 승인 292개와 과거 snapshot은 보존한다.
+
+#### 2026-09-12 R1 실행 연결 보강 반영 결과
+
+동결 57개 Fortran·2개 Python의 호출 후보를 생성/외부/C export/콜백 인터페이스와 구분했다. 원문 48구간에 아홉 연결 계약을 결속하고 선박/nonh 압력 귀속, 잔차 부호·실제 2차 보정, 식생·강우·조도 시점, 출력 공급자/rank 설명을 기존 7개 문서에 정정했다. [독립 검토·P2 조건 수정·후속 확인](_staging/total-read/model-audit/XBeach/connectivity/runtime-20260912/review-response.json) 후 [설치 검사](_staging/total-read/model-audit/XBeach/connectivity/runtime-20260912/validation.json)를 통과했다. 기존 승인 292개와 파일 소유자·권한을 보존했다.
+
+R1 전체는 미완이며 후보 수를 도달성 검증이나 진행률로 올리지 않는다. 다음은 [동결 R1-G1/G2/G3](_staging/total-read/model-audit/XBeach/connectivity/runtime-20260912/remaining-gaps.json)의 호출 조건·generic·미분류 정의·동적 wrapper 대조다. R2/R3 전체/R4는 기존 범위와 미완 상태를 유지한다. [실행 메모](_staging/total-read/model-audit/XBeach/connectivity/runtime-20260912/EXECUTION-NOTES.md)에 sandbox 시작 실패와 승인 실행 경로를 남겼다.

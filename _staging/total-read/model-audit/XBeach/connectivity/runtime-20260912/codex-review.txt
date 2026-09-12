@@ -1,0 +1,6 @@
+The seven staged document corrections match the inspected frozen source, but the evidence generator misstates one consumer guard. This read-only, bounded implementation review is not solver validation or human acceptance; R1, R2, R3 overall, and R4 remain open.
+
+Review comment:
+
+- [P2] Preserve the nonh alternative in the ship-consumer guard — /home/firesinger/coastal-wiki/_staging/total-read/model-audit/XBeach/connectivity/runtime-20260912/record_evidence.py:55-55
+  With `ships=1`, `wavemodel=nonh`, and `flow=0` (allowed by `params.F90:109`), the source still calls both `shipwave` and `flow`: `libxbeach.F90:301-305` guards the latter with `flow==1 .or. wavemodel==WAVEMODEL_NONH`. `flow_timestep.F90:139-146` then consumes `ph`. This contract and the emitted `evidence.json` therefore incorrectly exclude a real ship-pressure consumption path. Preserve the full OR predicate; correcting this explicit source guard does not require resolving the lexical index’s deferred reachability questions.

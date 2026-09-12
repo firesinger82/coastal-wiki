@@ -1,0 +1,393 @@
+--- a/models/XBeach/README.md
++++ b/models/XBeach/README.md
+@@ -21,7 +21,7 @@
+
+ ## 2026-09-12 연결 분석 보충
+
+-- [지형·지하수·Q3D 연결 계약](source-analysis/xbeach-coupled-physics-contracts.md): **검토본(draft-unsourced), 새 주장 사람 검토 대기**. 입경 배열 덮어쓰기, 침투량 단위, 수심 갱신 시점, Q3D 실행 조건을 추적했다.
++- [지형·지하수·Q3D 연결 계약](source-analysis/xbeach-coupled-physics-contracts.md): **검토본(draft-unsourced), 새 주장 사람 검토 대기**. 입경 배열 덮어쓰기, 침투량 단위, 수심 갱신 시점, Q3D 실행 조건과 선박·식생·강우·조도의 생산/소비 시점을 추적했다.
+ - [초기화·hotstart·BMI·종료 상태 계약](source-analysis/xbeach-lifecycle-state-contracts.md): **검토본(draft-unsourced), 새 주장 사람 검토 대기**. 기존 12개 계약과 네 진입점 계열을 연결하고 오류 종료·getter 상태 설명을 정정했다.
+ - [빌드 대상·소스 생성·모드 연결](source-analysis/xbeach-build-mode-connectivity.md): **검토본(draft-unsourced)**. 별도 BMI 프로젝트, 생성 include, 비연결 소스와 여섯 dispatcher 경로를 정리했다.
+ - [매뉴얼 수식–구현 대응](manual-notes/xbeach-manual-equation-code-contracts.md): **검토본(draft-unsourced)**. (2.5)~(2.10)의 파수 보정, B.37/C.37의 지형 갱신, 불포화 침투식의 판본 표기·시간 이산화를 대조했다.
+--- a/models/XBeach/source-analysis/xbeach-coupled-physics-contracts.md
++++ b/models/XBeach/source-analysis/xbeach-coupled-physics-contracts.md
+@@ -47,3 +47,16 @@
+ | `q3d=0`, 그 밖의 식, 별도 `nz>1` | 이 호출 guard에는 도달 가능; 전체 설정의 지원·할당 정합성까지 검증한 것은 아님 |
+
+ 표는 위 인용의 입력 대입 및 `flow` guard를 대조한 결과다. Van Rijn 1993의 연직 농도 적분은 `morphevolution`에 따로 존재하므로 수직구조 함수 제외를 연직 농도 적분 부재로 해석하면 안 된다. (`morphevolution.F90:1748-1757,1815-1830`)
++
++## 외력의 생산·소비 시점 (2026-09-12 R1 보강)
++
++아래는 동일한 동결 소스의 추가 연결 판정이다. [원문 구간과 SHA](../../../_staging/total-read/model-audit/XBeach/connectivity/runtime-20260912/evidence.json)에 결속했으며 이 노트의 미승인 상태는 유지한다.
++
++| 상태 | 생산과 조건 | 소비와 시점 |
++|---|---|---|
++| 선박 `ph` [m] | `ships==1`의 `shipwave`, 선박 격자의 압력을 `grmap2`로 모델 격자에 사상 | 같은 스텝 `flow`의 `zs+ph` 경사. nonh 압력은 `pres/dp`라는 별도 상태 |
++| `Dveg` / `Fvegu,Fvegv` | `vegetation==1`의 `vegatt`; 표준 경로는 `swvegatt`·`momeqveg`, `porcanflow==1`은 별도 분기 | 파랑은 `vegatt`보다 앞서므로 마지막 식생 갱신의 `Dveg`, 유동은 뒤에 있어 같은 스텝 항력 소비 |
++| `rainfallrate` [m/s] | 초기 상수/파일 mm/hr 변환; `rainfall==1`의 시간 보간 | 같은 `flow`의 연속식에 가산. `gwflow`는 이 갱신보다 앞서 실행 |
++| `D90top` → `cfu/cfv` | 이전 지형 갱신의 입경 상태; White-Colebrook 입경 옵션과 `ngd>1`에서 조도 계산 | `flow`의 `bedroughness_update`가 운동량 계산 전에 사용. 뒤의 `bed_update` 결과는 이후 유동 호출에 전달 |
++
++선박은 첫 처리에서 `zs -= ph`도 수행한다 (`ship.F90:403-410`). 표의 시점은 해당 옵션이 실행되는 경우의 호출 순서이며 스텝 사이 모든 상태가 재초기화된다는 뜻이 아니다. 입경 배열 덮어쓰기의 기존 판정·한계는 위 절을 그대로 따른다. (`libxbeach.F90:293-312`; `ship.F90:287-337,365-373`; `vegetation.F90:318-345,400,563-564`; `wave_instationary.F90:294-295`; `wave_stationary_directions.F90:442-444`; `rainfall.F90:22-70,86-100`; `flow_timestep.F90:120,131-149,176-177,563-612,724-751`; `bedroughness.F90:220-249`)
+--- a/models/XBeach/source-analysis/xbeach_flow_solver.md
++++ b/models/XBeach/source-analysis/xbeach_flow_solver.md
+@@ -1,5 +1,5 @@
+ ---
+-title: "XBeach NLSWE flow solver (flow_timestep.F90 + flow_secondorder.F90) — 깊이평균 운동량 explicit Euler(advection+g∂(zs+ph)+Ruessink2001 bed friction+wave force Fx+Coriolis+veg) + MacCormack 2nd-order + continuity"
++title: "XBeach 유동 solver — 운동량 잔차·선박 압력수두·비정수압 보정·연속식 연결"
+ topic: xbeach
+ canonical_source: self
+ citation_status: verified
+@@ -13,28 +13,34 @@
+   - models/XBeach/source-analysis/xbeach_bed_friction.md
+   - models/XBeach/source-analysis/xbeach_morphology.md
+   - models/XBeach/source-analysis/xbeach_vegetation.md
++source_correction_date: 2026-09-12
++source_correction_by: "Codex"
++source_correction_scope: "`ph`의 선박 귀속, 운동량 잔차 부호, 실제 2차 보정 호출과 강우 소비를 정정"
++source_correction_human_approval: not-issued
+ ---
++
++> **2026-09-12 AI 출처 정정**: `ph`의 선박 귀속, 운동량 잔차 부호, 실제 2차 보정 호출과 강우 소비를 정정. 기존 `verification_*`는 이전 검증 이력이며 이번 정정의 새 사람 승인이 아니다. [원문 구간·SHA와 연결 판정](../../../_staging/total-read/model-audit/XBeach/connectivity/runtime-20260912/evidence.json)을 따르며 원본 솔버는 수정하지 않았다.
+
+ # XBeach NLSWE flow solver (flow_timestep / flow_secondorder)
+
+ > `flow_timestep.F90`(1102, subroutine `flow`) + `flow_secondorder.F90`(1063) 직접 read. XBeach 의 **깊이평균 비선형 천수방정식(NLSWE) 흐름 solver** — surfbeat(wave-averaged GLM 흐름 + wave force) · nonh(wave-resolving + non-hydrostatic 압력) 모드가 공유([[xbeach_mode_dispatch]]). bed friction 계수 자체는 [[xbeach_bed_friction]], 본 노트는 **운동량·연속 방정식 solver**.
+
+-## 1. Explicit Euler 운동량 (flow_timestep.F90:559-593) ★
++## 1. Explicit Euler 운동량과 압력수두
+
+-u-방향 가속도(GLM/Eulerian velocity uu):
+-```fortran
+-dudt = -advection_u
+-       - par%g*s%dzsdx(i,j)                         ! 압력경사 g·∂(zs+ph)/∂x
+-       - s%taubx(i,j)/(par%rho*s%hu(i,j))           ! bed friction
+-       - s%Fvegu(i,j)/(par%rho*s%hu(i,j))           ! 식생 항력
+-       + par%lwave*s%Fx(i,j)/(par%rho*s%hum(i,j))   ! wave force (radiation stress)
+-       - fc*s%vu(i,j)                               ! Coriolis
+-uu = uu + dt*dudt   ; |dudt| ≤ par%maxfacg*par%g    ! robustness clamp
++아래는 배열 첨자를 생략한 **AI 전사·축약식**이다. 소스의 `dudt`는 속도에 더하는 가속도가 아니라, 갱신에서 **빼는 잔차**다. (`flow_timestep.F90:563-580`)
++
++```text
++dudt = ududx + vdudy - viscu + g*dzsdx
++       + taubx/(rho*hu) + Fvegu/(rho*hu)
++       - lwave*Fx/(rho*hum) - fc*vu
++       - rhoa*Cd*windsu*sqrt(windsu²+windnv²)/(rho*hum)
++dudt = clamp(dudt, -maxfacg*g, maxfacg*g)
++uu = uu - dt*dudt
+ ```
+-- **압력경사** `dzsdx = ∂(zs + ph)/∂s`(:139) — `zs` 수위 + **`ph` 비정수압 pressure head**(nonh 모드 결합, hydrostatic 시 ph=0).
+-- **wave force** `Fx/Fy` = wave action balance 의 radiation stress 경사(`lwave` 토글) — surfbeat 의 흐름 구동원.
+-- **Coriolis** `fc = 2·wearth·sin(lat)`(:118).
+-- `dudt` 를 `±maxfacg·g` 로 clamp(급격 가속 억제, dry/shock 안정).
++
++따라서 u의 Coriolis 속도 증분은 `+dt*fc*vu` 방향이다. v 잔차의 Coriolis 항은 `+fc*uv`이며 `vv -= dt*dvdt`로 갱신한다. 두 식은 각각 `wetu==1`, `wetv==1`에서 적용되고 건조점 속도는 0이 된다. (`flow_timestep.F90:563-580, 597-616`)
++
++`dzsdx/dzsdy`는 `zs+ph`의 격자 방향 경사다. 여기서 **`ph`는 선박에 의한 압력수두 [m]**다. `shipwave`는 선박 위치·방향을 보간하고 선박 격자의 압력수두를 `s%ph`로 사상한다. 이 호출은 `ships==1`일 때 `flow`보다 먼저 실행된다. nonh의 압력은 별도의 `s%pres`와 국소 보정량 `dp`로 계산한다. (`variables.def:256`; `ship.F90:287-337, 365-373`; `libxbeach.F90:293-310`; `flow_timestep.F90:131-149`; [[xbeach_nonh]])
+
+ ## 2. Bed friction — Ruessink et al. 2001 (flow_timestep.F90:535-556) ★
+
+@@ -49,28 +55,28 @@
+ - `par%viscosity==0` 이면 skip(계산 절감).
+ - background(user `nuh` 또는 **Smagorinsky**) + **breaking-induced** viscosity: `where(s%breaking/=0)` 롤러/쇄파 난류로 `nuh` 증가(:379-403) — 쇄파역 momentum 혼합·longshore current 형성. `nuhv` factor 로 d²v/dx² 상호작용 증가.
+
+-## 4. 2nd-order MacCormack (flow_secondorder.F90)
++## 4. 실제 실행되는 2차 보정
+
+-기본 1차 upwind advection 에 **MacCormack predictor-corrector 2차 보정**:
+-- `flow_secondorder_advUV`(:85) — U/V advection 2차 보정(upwind difference `delta2`).
+-- `flow_secondorder_advW`(:390) — W(연직속도) 보정(nonh 전용).
+-- `flow_secondorder_con`(:686) — 연속방정식 2차 보정.
+-- `par%secorder` 토글. 수치확산 감소(파/front sharpness 보존).
++| 루틴 | 현재 호출 조건과 위치 |
++|---|---|
++| `flow_secondorder_advUV` | `secorder==1`, `flow_timestep.F90:645-652` |
++| `flow_secondorder_huhv` | `secorder==1`, 유량 계산 전 수심 보정, `flow_timestep.F90:706-719` |
++| `flow_secondorder_advW` | nonh의 세 predictor에서 `secorder==1`, `nonh.F90:1234-1262, 1844-1883, 2858-2935` |
++| `flow_secondorder_con` | 정의는 `flow_secondorder.F90:686-824`에 있지만 `flow_timestep.F90:754-759`의 호출은 주석 처리됨 |
++
++따라서 `secorder=1`을 연속식 MacCormack 보정까지 실행한다는 뜻으로 읽으면 안 된다. 해당 호출 주석은 감쇠 때문에 제거했다고 기록한다. nonh에서는 압력 predictor → 조건부 U/V 2차 보정 → 압력 corrector 순서로 실행한다. (`flow_timestep.F90:635-658`)
+
+ ## 5. Continuity + 수위 update
+
+-연속방정식 `∂zs/∂t = -∇·(h·u)` 로 수위 `zs` 갱신(`dzsdt`, flux divergence). `wetz` mask(wetting-drying), `hu/hv` = u/v-point 수심, `hum/hvm` = 운동량 수심. boundary 에서 `uu` 외삽(:585-589).
++연속식은 격자 유량 발산에 `-infil + rainfallrate`를 더해 `zs += dt*dzsdt`로 갱신한다. 수평 유량 경계 적용 뒤, `rainfall==1`이면 강우를 갱신하고 연속식이 즉시 소비한다. (`flow_timestep.F90:724-751`; [[xbeach_tide_forcing]]) `wetz` mask(wetting-drying), `hu/hv` = u/v-point 수심, `hum/hvm` = 운동량 수심. boundary 에서 `uu` 외삽(:585-589).
+
+ **마스크 산정(2026-07-12 보강)**: wet/dry 마스크는 본 파일이 아닌 `wetcells.F90 compute_wetcells` 에서 매 스텝 산정 — `hh>eps+numeps`→`wetz=1`(:108-111), `wetu` 는 `hu`·`hum` **둘 다** `>eps+numeps` 요구(:75-77, "correct advection term" 주석), `wete` 는 `hh+delta·H>eps .or. wetz==1`(:117). 임계 `eps` 기본 **0.005 m**(params.F90:1398, 허용 0.001-0.1). 초기화는 `zs>zb+eps`(initialize.F90:1062-1071). 형태학 갱신 후에는 morphevolution.F90:3202-3208 이 **`wetz` 만** 재판정 + dry 셀 `zs=zb+eps`·`hh=eps` 클램프 — `wetu/wetv/wete` 는 그 자리에서 재산정되지 않고 다음 스텝 `compute_wetcells` 에서 갱신(범위 한정 = 2026-07-12 Codex 재검증).
+
+-## 6. 모드별 차이
++## 6. 모드와 외력의 구분
+
+-| 모드 | 흐름 | 압력 |
+-|---|---|---|
+-| **stationary/surfbeat** | wave-averaged GLM 흐름 + `Fx`(radiation stress) | hydrostatic(ph=0) |
+-| **nonh** | wave-resolving + `Fx` 없음(파 직접 해상) | + `ph` 비정수압([[xbeach_nonh]] 후속) |
++`flow`의 nonh 압력 호출 조건은 `wavemodel==WAVEMODEL_NONH`다. 이때 `nonh_cor(...,0)`와 `nonh_cor(...,1)`이 예측·보정을 수행한다. 선박 압력수두 `ph`의 공급 조건은 별도 `ships==1`이다. `ph`를 기준으로 stationary/surfbeat와 nonh를 구분할 수 없다. (`flow_timestep.F90:635-658`; `libxbeach.F90:293-310`)
+
+-→ 동일 `flow` solver 가 압력항 `ph`·wave force `Fx` 유무로 모드 분기.
++`swave`의 nonh 기본값은 0이지만 입력으로 1도 허용하며, 운동량의 `Fx/Fy`에는 `lwave`가 곱해진다. 따라서 모드 이름만으로 모든 구성에서 파력항이 없다고 단정하지 않는다. (`params.F90:98-109`; `flow_timestep.F90:563-612`)
+
+ ## 7. 연결
+
+@@ -78,5 +84,5 @@
+ - [[xbeach_bed_friction]] — `cfu` 계수 산출(본 노트는 taubx 적용)
+ - [[xbeach_vegetation]] — `Fvegu` 식생 항력 항
+ - [[xbeach_morphology]] — `taubx` bed shear → sediment transport(transus)
+-- wave action balance(`Fx` radiation stress 공급) / nonh(`ph` 압력) — 후속 노트
++- [[xbeach_wave_action_balance]] — 파력 공급; [[xbeach_nonh]] — `pres/dp` 압력 보정
+ - Ruessink et al. 2001 (wave-orbital bed friction) / Smagorinsky 1963 (eddy viscosity)
+--- a/models/XBeach/source-analysis/xbeach_nonh.md
++++ b/models/XBeach/source-analysis/xbeach_nonh.md
+@@ -1,5 +1,5 @@
+ ---
+-title: "XBeach non-hydrostatic mode (nonh.F90) — wave-resolving 동압력 보정: projection(5-diagonal Poisson → solver_solvemat) + 1-layer/reduced 2-layer(Keller-box) + predictor-corrector → ph 압력 → flow"
++title: "XBeach nonh — pres/dp 압력 예측·보정, 1층·reduced 2층 및 MPI 호출"
+ topic: xbeach
+ canonical_source: self
+ citation_status: verified
+@@ -12,70 +12,47 @@
+   - models/XBeach/source-analysis/xbeach_flow_solver.md
+   - models/XBeach/source-analysis/xbeach_mode_dispatch.md
+   - models/XBeach/source-analysis/xbeach_wave_action_balance.md
++source_correction_date: 2026-09-12
++source_correction_by: "Codex"
++source_correction_scope: "선박 `ph`와 비정수압 `pres/dp`, 정수 dispatch 및 현재 MPI 구현을 구분"
++source_correction_human_approval: not-issued
+ ---
+
+-# XBeach non-hydrostatic mode (nonh.F90) — XBeach-NH
++> **2026-09-12 AI 출처 정정**: 선박 `ph`와 비정수압 `pres/dp`, 정수 dispatch 및 현재 MPI 구현을 구분. 기존 `verification_*`는 이전 검증 이력이며 이번 정정의 새 사람 승인이 아니다. [원문 구간·SHA와 연결 판정](../../../_staging/total-read/model-audit/XBeach/connectivity/runtime-20260912/evidence.json)을 따르며 원본 솔버는 수정하지 않았다.
+
+-> `nonh.F90`(3471, Pieter Bart Smit 2009/2014) 직접 read. XBeach 의 **wave-resolving 비정수압 모드**(`wavemodel=nonhydrostatic`). 파작용 평형([[xbeach_wave_action_balance]])으로 wave-averaged 하는 surfbeat 와 달리, **개별 단주기파를 직접 해상**(Boussinesq류 frequency dispersion). NLSWE 흐름([[xbeach_flow_solver]])에 **동압력(dynamic pressure) `ph`** 를 더해 비정수압 효과 포함. MPI 시 미포함(`#ifdef CMPI` 제외, :42).
++# XBeach nonh 압력 보정의 실행 연결
+
+-## 1. 역할 — projection method (pressure correction)
++현재 입력 이름은 `wavemodel=nonh`다. 이 모드의 압력 상태는 **`s%pres`**, 선형계의 해·보정 작업 배열은 **`dp`**다. `ph`는 선박 압력수두 [m]이며 nonh 압력의 별칭이 아니다. (`params.F90:70-79`; `variables.def:256`; `nonh.F90:683-697`)
+
+-비정수압 = 정수압(`g·∂zs`)만으로 부족한 **수직가속도(분산)** 를 동압력으로 보정. **projection(예측-보정)**:
+-1. flow 가 동압력 무시하고 예측 유속 산출(`uu0`).
+-2. 연속방정식(divergence-free) 만족하도록 **동압력 `dp` 의 Poisson 방정식** 구성·해.
+-3. `dp` 경사로 u,v,w 보정 → `ph` 누적 → [[xbeach_flow_solver]] §1 의 `g·∂(zs+ph)/∂x` 운동량 항.
++## 1. 유동과 압력의 호출 순서
+
+-## 2. nonh_cor — 진입 (nonh.F90:146-249) ★
++`flow`는 일반 운동량 갱신 뒤 `wavemodel==WAVEMODEL_NONH`이면 `nonh_cor(...,0)`을 호출한다. 이어 `secorder==1`의 `flow_secondorder_advUV`를 거쳐 `nonh_cor(...,1)`을 호출한다. predictor에서 기존 압력의 명시적 기여를 넣는 부분도 `secorder==1` 조건을 가진다. (`flow_timestep.F90:563-658`; `nonh.F90:1234-1262, 1844-1883, 2858-2935`)
+
+-flow 모듈이 **timestep 당 2회** 호출(`ipredcor`):
+-```fortran
+-select case(par%nonhq3d)
+-  case(.true.)   ! 새 reduced 2-layer
+-     predictor: nonh_2lay_pred_2dV(2DV) / nonh_2lay_pred_3d(3D)
+-     corrector: nonh_2lay_cor_2dV     / nonh_2lay_cor_3d
+-  case(.false.)  ! old 1-layer
+-     predictor: nonh_1lay_pred ; corrector: nonh_1lay_cor
+-```
+-- **predictor**(path=0): 알려진 압력으로 explicit 예측. **corrector**(path=1): 새 압력 implicit 보정.
+-- **2DV**(cross-shore 수직단면) vs **3D** 코드패스.
++## 2. `nonhq3d`의 정수 분기
+
+-## 3. 두 vertical 정식 (nonhq3d)
++| `nonhq3d` | 공간 조건 | `ipredcor==0` | 그 외 (`flow`는 1을 전달) |
++|---|---|---|---|
++| 1 | `ny==0` | `nonh_2lay_pred_2dV` | `nonh_2lay_cor_2dV` |
++| 1 | `ny!=0` | `nonh_2lay_pred_3d` | `nonh_2lay_cor_3d` |
++| default (통상 0) | 별도 ny 분기 없음 | `nonh_1lay_pred` | `nonh_1lay_cor` |
+
+-| nonhq3d | 정식 | dispersion |
+-|---|---|---|
+-| `.false.` | **old 1-layer** (Draft report) — 단층 depth-averaged + 동압력 (Keller-box 표면) | kh ≲ 일정 한계 |
+-| `.true.` | **reduced 2-layer**(Smit 2014) — 연직 2층(`wcoef`=하층 상대두께) | 더 깊은 상대수심까지 정확(kh↑) |
++이는 `nonh.F90:201-247`의 `SELECT CASE`와 내부 IF를 전사한 표다. `.true./.false.` 논리형 SELECT가 아니다. 각 루틴 내부의 공간 경계·wet 조건은 별도로 적용된다.
+
+-- **Keller-box** compact scheme(표면 추적) — 적은 층수로 정확한 선형 분산(Boussinesq 대안). 2-layer 는 1-layer 보다 deep-water dispersion 개선(외해 경계 더 깊이 배치 가능).
+-- `wcoef` = reduced 2-layer 하층 상대두께(분산 최적화 파라미터).
++## 3. 압력 저장과 속도 보정
+
+-## 4. Pressure Poisson 풀이 (5-diagonal matrix)
++세 corrector는 `solver_solvemat(mat,rhs,dp,nx,ny,par)`로 압력 선형계를 풀고 속도를 보정한다. 1층 경로는 `s%pres += dp`를 수행한다. 두 reduced 2층 경로는 `secorder==1`이면 `s%pres += dp`, 그 외에는 `s%pres = dp`를 사용한다. (`nonh.F90:683-697, 1411-1422, 2162-2176`)
+
+-```fortran
+-! mat(5-diagonal) · dp = rhs   →
+-call solver_solvemat( mat, rhs, dp, s%nx, s%ny, par )    ! :686/1412/2164
+-```
+-- **`mat`** = 5-diagonal 압력행렬(중앙+동서남북 이웃 계수, 압력계수 `au/av/adu/adv` 로 조립). **`rhs`** = 예측 유속의 divergence(연속 위배량). **`dp`** = 동압력 보정.
+-- `solver_solvemat`(solver_module) — elliptic 선형solver(SIP/iterative). dp 로 u/v/w 보정해 divergence-free.
+-- `aws/awb` = 수직속도 ws(surface)/wb(bottom) 압력계수(old model; 2-layer 는 obsolete).
++이 값은 nonh 루틴 내부의 수평·연직 속도 보정에 쓰인다. 기존 설명의 `dp → ph → g∂(zs+ph)` 연결은 잘못된 귀속이었다. `flow`의 `zs+ph` 경사는 선박 외력 경로이며 비정수압 보정과 별도로 읽어야 한다. (`nonh.F90:1234-1262`; `flow_timestep.F90:131-149`; [[xbeach_flow_solver]])
+
+-## 5. surfbeat vs nonh 비교
++## 4. MPI 빌드와 실제 guard
+
+-| | surfbeat | nonh |
+-|---|---|---|
+-| 단주기파 | wave-averaged(파작용 N=E/σ) | **직접 해상**(phase-resolving) |
+-| 분산 | wave model dispersion | **동압력 Keller-box**(1/2-layer) |
+-| infragravity | bound long wave(파군 변조) | 직접 해상 |
+-| 압력 | hydrostatic(ph=0) | **+동압력 ph** |
+-| 비용 | 저렴(파작용) | 비쌈(파 해상 + Poisson solve) |
+-| 용도 | dissipative beach·storm | reef·steep·runup·harbor(분산 중요) |
++`nonh.F90:42-43`의 MPI 제외 문장은 오래된 주석이다. 현재 조사한 MPI 프로젝트에 이 소스가 포함되고, 구현 안에는 `#ifdef USEMPI`로 감싼 `xmpi_shift_ee` 호출이 있다. 이를 `#ifdef CMPI`에 의해 모듈 전체가 제외된다고 설명할 근거는 없다. (`nonh.F90:1446-1449, 1872-1883, 2237-2241, 2927-2935`; [[xbeach-build-mode-connectivity]])
+
+-→ [[xbeach_flow_solver]] §6 의 모드 분기에서 nonh 가 `ph`≠0 + `Fx` 없음(파 직접) 경로.
++이 판정은 소스와 빌드 포함 관계다. 모든 MPI·nonh 옵션 조합의 수치 실행 검증을 뜻하지 않는다.
+
+-## 6. 연결
++## 5. 연결
+
+-- [[xbeach_flow_solver]] — 동압력 `ph` → `g·∂(zs+ph)` 운동량(§1) + W advection 2nd-order(flow_secondorder_advW)
+-- [[xbeach_mode_dispatch]] — surfbeat/stationary/nonh 모드 선택(`wavemodel`)
+-- [[xbeach_wave_action_balance]] — surfbeat 대안(nonh 는 미사용)
+-- solver_module `solver_solvemat` — 압력 Poisson elliptic solver
+-- Smit, Stelling, Roelvink et al. 2010/2014 (XBeach-NH non-hydrostatic) / Keller-box scheme
++- [[xbeach_flow_solver]] — 운동량·2차 보정·압력 호출 순서
++- [[xbeach_mode_dispatch]] — 파랑 모드 선택
++- [[xbeach_wave_action_balance]] — stationary/surfbeat 파랑 계산
++- [[xbeach-build-mode-connectivity]] — 컴파일 대상과 실행 모드 근거
+--- a/models/XBeach/source-analysis/xbeach_output.md
++++ b/models/XBeach/source-analysis/xbeach_output.md
+@@ -8,7 +8,13 @@
+ note_date: 2026-04~05 (original) / 2026-05-23 (promote)
+ verification_by: "사용자 + codex source-code analysis"
+ verification_date: 2026-04
++source_correction_date: 2026-09-12
++source_correction_by: "Codex"
++source_correction_scope: "활성 `ncoutput_module` 공급자와 두 출력 형식에 공통인 `xomaster` 쓰기 조건을 정정"
++source_correction_human_approval: not-issued
+ ---
++
++> **2026-09-12 AI 출처 정정**: 활성 `ncoutput_module` 공급자와 두 출력 형식에 공통인 `xomaster` 쓰기 조건을 정정. 기존 `verification_*`는 이전 검증 이력이며 이번 정정의 새 사람 승인이 아니다. [원문 구간·SHA와 연결 판정](../../../_staging/total-read/model-audit/XBeach/connectivity/runtime-20260912/evidence.json)을 따르며 원본 솔버는 수정하지 않았다.
+
+ ## Scope
+
+@@ -25,7 +31,7 @@
+ - `timestep.F90:181-742` — output timing, snap.
+ - `initialize.F90:1697-1853` — point snap, hotstart read.
+ - `variables.def:47-198` — variable metadata.
+-- `varoutput.F90` — 출력 변수 registry/선택 (xpoints/ypoints, Avarpoint/Avarcross 점·cross-section별 출력변수 index, mnemmodule mnemonic). 전역/점/단면 출력변수 관리 (2026-06-03).
++- `varoutput.F90` — compiled legacy output implementation. Its `var_output_init` calls in current `output_init` are commented out (`output.F90:54-80`); it is not the active output provider.
+ - `postprocess.F90` — `postprocessvar_r2`: 출력 직전 변수별(mnemonic) fill-value/wetz masking 적용 (dry cell fill). 출력 변수 후처리 (2026-06-03).
+
+ ## A. params.txt output keys
+@@ -39,7 +45,9 @@
+
+ **No `outputfreq` keyword found** — use `tint*` or timing files `tsglobal, tspoints, tsmean` (`params.def:405-408, timestep.F90:181-285`).
+
+-`output_init` dispatches to Fortran, NetCDF, or both (debug mode) (`output.F90:54-80`).
++`output_init` selects `fortoutput_init`, `ncoutput_init`, or both (debug with `USENETCDF`). The active provider is `ncoutput_module`, including the Fortran writer. `OUTPUTFORMAT_NETCDF` without `USENETCDF` logs the missing support and halts. Old `var_output_init` calls are commented out. (`output.F90:5-8, 51-80`)
++
++At runtime `output` calls `ncoutput`; its non-`xomaster` return is before **both** the NetCDF and Fortran write branches. Thus `outputformat=fortran` does not make every MPI rank write the same files in this path. (`output.F90:164`; `ncoutput.F90:1118-1164`)
+
+ ## B. Global output variables
+
+@@ -183,7 +191,7 @@
+ - ▢ Looking for `outputfreq` keyword — doesn't exist; use `tint*`.
+ - ▢ Looking for `rst.???` restart — actually `hotstart_<var><NNNNNN>.dat`.
+ - ▢ Setting `tintg=1` (every second) — disk fills fast.
+-- ▢ MPI run with `outputformat=fortran` — every rank tries to write — collision.
++- ▢ Assuming Fortran output bypasses the MPI output master: both file formats share the `xomaster` guard (`ncoutput.F90:1118-1164`).
+ - ▢ Mean output without `nmeanvar` — silently no mean output.
+ - ▢ Forgetting `morfacopt=1` — output times not aligned with input forcing.
+ - ▢ Hotstart with version mismatch (different XBeach build) — file format incompatible.
+--- a/models/XBeach/source-analysis/xbeach_tide_forcing.md
++++ b/models/XBeach/source-analysis/xbeach_tide_forcing.md
+@@ -11,7 +11,13 @@
+ related:
+   - models/XBeach/source-analysis/xbeach_flow_boundary_conditions.md
+   - models/XBeach/source-analysis/xbeach_groundwater.md
++source_correction_date: 2026-09-12
++source_correction_by: "Codex"
++source_correction_scope: "강우 단위 변환·시각 보간·연속식 소비와 지하수 계산 순서를 결속"
++source_correction_human_approval: not-issued
+ ---
++
++> **2026-09-12 AI 출처 정정**: 강우 단위 변환·시각 보간·연속식 소비와 지하수 계산 순서를 결속. 기존 `verification_*`는 이전 검증 이력이며 이번 정정의 새 사람 승인이 아니다. [원문 구간·SHA와 연결 판정](../../../_staging/total-read/model-audit/XBeach/connectivity/runtime-20260912/evidence.json)을 따르며 원본 솔버는 수정하지 않았다.
+
+ # XBeach tide & 외력 입력 (compute_tide / readtide / readwind / rainfall)
+
+@@ -36,12 +42,16 @@
+
+ wind 시계열(`wind.txt`: t, windv, windth) 읽기 → 시변 wind 속도/방향. [[xbeach_flow_solver]] 의 wind stress(WSX/WSY) + [[xbeach_wave_breaking]]/wind growth 입력. (XBeach 는 주로 wave-driven; wind 은 보조.)
+
+-## 3. Rainfall (rainfall.F90, 104)
++## 3. Rainfall의 단위와 소비 시점
+
+-강우 시계열 → 수위 source(질량 추가). [[xbeach_groundwater]] infiltration 과 연계(육상 침투/지표류). 소규모 모듈.
++`rainfall_init`은 `xmaster`에서 실행하며, 상수 입력과 파일의 강우율을 **mm/hr에서 m/s로 변환**한다 (`/1000/3600`). 파일 입력은 시각 0으로 초기 보간하고, 강우가 꺼져 있으면 `rainfallrate=0`으로 초기화한다. (`rainfall.F90:22-70`; 초기 호출 `libxbeach.F90:177`)
++
++`flow`는 수평 유량 경계를 적용한 뒤 `rainfall==1`이면 `rainfall_update`를 호출한다. 시계열 경로는 현재 `par%t`로 보간하며, 이어지는 1D/2D 연속식 모두 `-infil + rainfallrate`를 사용한다. (`rainfall.F90:92-100`; `flow_timestep.F90:724-751`)
++
++MPI에서 `constantRainfall` 방송은 `t<=dt` 조건을 가진다 (`rainfall.F90:86-90`). 지하수의 `gwflow`는 이 강우 갱신과 `flow`보다 먼저 호출되므로, 여기서 갱신한 강우를 같은 스텝의 앞선 침투 계산에 직접 넘긴다고 해석하지 않는다. 강우는 우선 연속식의 표면수 공급항이다. (`libxbeach.F90:304-307`; [[xbeach-coupled-physics-contracts]])
+
+ ## 4. 연결
+
+ - [[xbeach_flow_boundary_conditions]] — flow_bc 가 tide_boundary_timestep 호출, tidetype 적용
+ - [[xbeach_flow_solver]] — wind stress / rainfall source
+-- [[xbeach_groundwater]] — rainfall infiltration
++- [[xbeach_groundwater]] — 연속식이 함께 소비하는 `infil` 계산
+--- a/models/XBeach/source-analysis/xbeach_vegetation.md
++++ b/models/XBeach/source-analysis/xbeach_vegetation.md
+@@ -8,7 +8,13 @@
+ note_date: 2026-04~05 (original) / 2026-05-23 (promote)
+ verification_by: "사용자 + codex source-code analysis"
+ verification_date: 2026-04
++source_correction_date: 2026-09-12
++source_correction_by: "Codex"
++source_correction_scope: "활성 정상·방향 계산의 `Dveg` 소비와 파랑/식생/유동 갱신 순서를 명시"
++source_correction_human_approval: not-issued
+ ---
++
++> **2026-09-12 AI 출처 정정**: 활성 정상·방향 계산의 `Dveg` 소비와 파랑/식생/유동 갱신 순서를 명시. 기존 `verification_*`는 이전 검증 이력이며 이번 정정의 새 사람 승인이 아니다. [원문 구간·SHA와 연결 판정](../../../_staging/total-read/model-audit/XBeach/connectivity/runtime-20260912/evidence.json)을 따르며 원본 솔버는 수정하지 않았다.
+
+ ## Scope
+
+@@ -22,7 +28,7 @@
+ - `params.def:447-455` — definitions.
+ - `readkey.F90:420-424, 625-635` — species-file `key=value` parser.
+ - `flow_timestep.F90:563-604` — momentum-equation coupling.
+-- `wave_stationary.F90:235-236`, `wave_instationary.F90:294-295`, `wave_stationary_directions.F90:442-444`, `wave_directions.F90:290` — `Dveg` consumption.
++- `wave_instationary.F90:294-295`, `wave_stationary_directions.F90:442-444` — current `Dveg` consumers; see [[xbeach-build-mode-connectivity]] for the excluded legacy files.
+ - `variables.def:271, 277-280` — `vegtype, Nveg, Fvegu/v` definitions.
+
+ ## A. Entry / call sequence
+@@ -120,12 +126,9 @@
+ - Short-wave + IG-wave + flow + setup attenuation.
+ - Nonlinear wave effects per Van Rooijen et al. 2016 (`:29-39`).
+
+-`Dveg` stored in `s%Dveg` (`:400`); consumed in wave dissipation:
+-- Stationary: `s%Df + s%Dveg` (`wave_stationary.F90:235-236`).
+-- Instationary: `s%Df + s%Dveg` (`wave_instationary.F90:294-295`).
+-- Stationary directions: `s%Df + s%Dveg` (`wave_stationary_directions.F90:442-444`).
+-
+-**Note**: `Dveg` is missing in `wave_directions.F90:290` (explicit code comment).
++`Dveg` is stored in `s%Dveg` (`vegetation.F90:400`). Both active wave consumers include `s%Df + s%Dveg`: surfbeat energy propagation (`wave_instationary.F90:294-295`) and the shared stationary/direction calculation (`wave_stationary_directions.F90:442-444`; `wave_timestep.F90:75-114`).
++
++The missing term commented in legacy `wave_directions.F90:290` is not a limitation of the current directional calculation. That file and `wave_stationary.F90` are excluded from the inspected build targets ([[xbeach-build-mode-connectivity]]). Per-step wave calls precede `vegatt`, so the active consumers read the last vegetation update, while `flow` reads the drag computed later in the same step (`libxbeach.F90:293-310`).
+
+ **Bulk drag coefficient** (Mendez-Losada 2004) when `Cdveg < 0`:
+ - `vegatt` calls `bulkdragcoeff` (`:327-329`).
+@@ -149,7 +152,7 @@
+
+ Vegetation forces written to `s%Fvegu, s%Fvegv` (`vegetation.F90:563-564`).
+
+-Flow solver acceleration includes:
++Flow solver residuals (subtracted from velocity in the update) include:
+ - u-momentum: `+ s%Fvegu(i,j)/(par%rho*s%hu(i,j))` (`flow_timestep.F90:563-568`).
+ - v-momentum: `+ s%Fvegv(i,j)/(par%rho*s%hv(i,j))` (`:600-604`).
+
+@@ -187,7 +190,7 @@
+ - `Cd=1.0` is a reasonable default for slender stems (per Mendez-Losada empirical fit). Use `Cdveg=−1` to auto-calibrate from wave conditions.
+ - Vegetation drag **decelerates** flow — verify by output `Fvegu, Fvegv` near vegetated patches.
+ - For storm hindcasts, vegetation persists through inundation; the model handles submergence automatically via `h_layer = min(aht, watr)`.
+-- `Dveg` missing in `wave_directions.F90:290` is a known limitation — directional wave model does not include vegetation dissipation (only standard surfbeat does).
++- Active stationary and surfbeat single-direction calculations include `Dveg`; their invocation and update timing follow §D.
+
+ ## Common Pitfalls
+
+@@ -196,7 +199,7 @@
+ - ▢ Setting `nsec=2` with `isCanopy=1` — rejected, use `nsec=1` for canopy.
+ - ▢ `Cdveg=0` (zero) — completely disables drag silently. Use `Cdveg<0` for auto-calibrate.
+ - ▢ Forgetting `Trep` — vegetation dissipation formula needs representative period.
+-- ▢ Using `wave_directions` (advanced directional wave model) and expecting vegetation dissipation — currently not implemented.
++- ▢ Treating the build-excluded `wave_directions` comment as the behavior of active `wave_stationary_directions`; see §D.
+ - ▢ Single-species runs with multi-species `veggiemapfile` — non-existent vegtype indices silently zero.
+
+ ## Next expansion
