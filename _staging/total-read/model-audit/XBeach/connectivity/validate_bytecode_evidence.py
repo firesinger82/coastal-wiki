@@ -352,6 +352,14 @@ def validate(root,here):
         output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
         check(x['sha256'][:10]+'-clog2-print-twopass-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
     check('clog2_twopass-no-approval',clog2_twopass['whole_model_read_gate']=='NOT_PASSED' and clog2_twopass['human_approval_issued'] is False)
+    lowlevel_print=json.loads((here/'bytecode-read/lowlevel-print-read.json').read_text())
+    check('lowlevel-print-two-exact',bound(lowlevel_print['prior_receipt']) and len(lowlevel_print['records'])==lowlevel_print['unique_classes_read']==2 and sorted(x['instances'][0]['member'] for x in lowlevel_print['records'])==['logformat/clog2/Print.class', 'logformat/trace/Print.class'] and lowlevel_print['instances_covered']==4)
+    for x in lowlevel_print['records']:
+        original=next(a for a in r['records'] if a['sha256']==x['sha256'])
+        args=['java','-m','jdk.jdeps/com.sun.tools.javap.Main','-c','-p','-s','-constants',str(root/x['class_file']['path'])]
+        output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
+        check(x['sha256'][:10]+'-lowlevel-print-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
+    check('lowlevel_print-no-approval',lowlevel_print['whole_model_read_gate']=='NOT_PASSED' and lowlevel_print['human_approval_issued'] is False)
     spec=importlib.util.spec_from_file_location('bytecode_coverage',here/'reconcile_bytecode_coverage.py')
     module=importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
