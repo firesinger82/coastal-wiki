@@ -1,0 +1,95 @@
+{
+  "date": "2026-09-12",
+  "attribution": "AI direct bytecode reading; not independent semantic approval.",
+  "prior_receipt": {
+    "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/disassembly-receipt.json",
+    "sha256": "1cc8b2657a74f3f5904e9d0a40648b1c98f6e031b056b7c6e19122beb632aaa8"
+  },
+  "records": [
+    {
+      "sha256": "0c1544306cef0fed63681aff0651236d38e6d0e5d3268be773681d05bd873e88",
+      "instances": [
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/win32/mpich/bin/jumpshot.jar",
+          "member": "logformat/slog2/input/TreeFloorList.class"
+        },
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/bin/jumpshot.jar",
+          "member": "logformat/slog2/input/TreeFloorList.class"
+        }
+      ],
+      "class_file": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/classes/0c1544306cef0fed63681aff0651236d38e6d0e5d3268be773681d05bd873e88.class",
+        "sha256": "0c1544306cef0fed63681aff0651236d38e6d0e5d3268be773681d05bd873e88"
+      },
+      "disassembly": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/disassembly/0c1544306cef0fed63681aff0651236d38e6d0e5d3268be773681d05bd873e88.txt",
+        "sha256": "e4456d5fab4c6e1245d1296c1544c49be436b608bd14bf29215e91c3a30b7b46"
+      },
+      "read_lines": [
+        1,
+        781
+      ],
+      "scope": "Entire javap display, split where necessary; truncated toFloorString redisplayed completely. Static reading only.",
+      "observation": "Constructor chooses increasing/decreasing INDEX comparator from requested Drawable time direction; lowest=-1, floorsnull. init(short depth) allocates depth+1 floors indexed0..depth, lowest=depth; no validation (-1 empty array, less negative allocation failure). getRoot returns top floor first KEY, not value, ornull only if floorsnull; empty top fails. put uses key depth unchecked and accepts generic BufForObjects value although get casts TreeNode; decreases lowest. get/contains/remove guard empty selected floor but not null/bad depth. remove does not update lowest. updateLowestDepth scans short index from0, changes only on first nonempty; all empty retains stale lowest; maximum short root permits scan index wrap. removeAllChildFloorsBelow clears [0,target), setslowest even if target empty, unchecked. getCoveringFloor scans lowest upward, no empty guard, returns top even if no floor covers. pruneToBarelyCoveringFloor checks coversBarely first, otherwise calls floor prune and advances WITHOUT rechecking just-pruned floor, can return higher floor than newly sufficient one; direction from ctor allows previously recorded decreasing-prune mismatch via this public path. Does not show application calls to this API. Iterator factories require same start/final flag as construction, permit either increasing direction, mismatch logs returnsnull. All=true adds lowest shadows, real=false omits. toStubString traverses floors high tolow, toString includes stubs and values; toString(timeframe) hardcodes increasing START, compositestrue, two real passes nestable/nestless then two shadow passes with counters reset between real/shadow, null iterator on final-time configured instance causes failure. toFloorString directly loops allfloors, only composite nestable START stream, bypasses factory check. Accessors return floorarray/lowest. No archived execution."
+    },
+    {
+      "sha256": "bfa310bffff5021a6a84658619572bb816871e1213118f862c8098889716f2d1",
+      "instances": [
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/win32/mpich/bin/jumpshot.jar",
+          "member": "logformat/slog2/input/TreeFloorList$ItrOfDrawables.class"
+        },
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/bin/jumpshot.jar",
+          "member": "logformat/slog2/input/TreeFloorList$ItrOfDrawables.class"
+        }
+      ],
+      "class_file": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/classes/bfa310bffff5021a6a84658619572bb816871e1213118f862c8098889716f2d1.class",
+        "sha256": "bfa310bffff5021a6a84658619572bb816871e1213118f862c8098889716f2d1"
+      },
+      "disassembly": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/disassembly/bfa310bffff5021a6a84658619572bb816871e1213118f862c8098889716f2d1.txt",
+        "sha256": "71571da4970437c35e47711e5c2c268edd35b40b5b91dfdec6f5c9871b93b4a2"
+      },
+      "read_lines": [
+        1,
+        329
+      ],
+      "scope": "Entire javap display, split where necessary; truncated toFloorString redisplayed completely. Static reading only.",
+      "observation": "Merge iterator snapshots head from each floor root down tolowest, optional additional lowest-floor shadow stream. TreeMap uses requested Drawable comparator with Drawable keys and remaining iterator values; equal comparator keys replace iterator without collision handling, so streams can be lost if comparator returns0; actual equality conditions belong to comparator. Removes first map entry as active; next map first becomes competing head and its start/final border time. Empty map NoSuchElementException handled in two constructor regions with null heads/iterator and +/-Infinity sentinel; hasNext is active head nonnull. next saves active, clears it, advances active stream if possible; switch to competitor when competitor border < newactive for increasing, logical NOT of that comparison for decreasing (ties switch decreasing, ties stay increasing). Uses border only, not full comparator tiebreak, on this fast path. Switch removes competitor, reinserts new active and picks new map first. Exhausted active selects competitor and removes it. Broad NoSuchElementException catch across advancement/map operations resets competitor and sentinel but can mask child iterator failure and leave current null or partly advanced; initial empty next dereferences null iterator, after normal exhaustion can returnnull instead of required exception. No remove implementation. No sentinel-null guard before switch: decreasing stream with next border -Infinity and no competitor satisfies NOT(-Infinity < -Infinity), attempts map remove(null); valid finite data avoids this condition. NaN dcmpg result makes comparisonfalse, so decreasing also takes switch; no finite guards. Merges across floor streams but relies on each floor being sorted; does not repair node-order or composite iterator issues. No archived execution."
+    },
+    {
+      "sha256": "12c786001db26edfa0238f3a13a87327d1cc8da4bbd46feda40a6e4d17d33282",
+      "instances": [
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/win32/mpich/bin/jumpshot.jar",
+          "member": "logformat/slog2/input/TreeTrunk.class"
+        },
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/bin/jumpshot.jar",
+          "member": "logformat/slog2/input/TreeTrunk.class"
+        }
+      ],
+      "class_file": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/classes/12c786001db26edfa0238f3a13a87327d1cc8da4bbd46feda40a6e4d17d33282.class",
+        "sha256": "12c786001db26edfa0238f3a13a87327d1cc8da4bbd46feda40a6e4d17d33282"
+      },
+      "disassembly": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/disassembly/12c786001db26edfa0238f3a13a87327d1cc8da4bbd46feda40a6e4d17d33282.txt",
+        "sha256": "962c2c46f369e2c36b51c218f0b6c42fb162d80a32a723a97688a9604379793e"
+      },
+      "read_lines": [
+        1,
+        738
+      ],
+      "scope": "Entire javap display, split where necessary; truncated toFloorString redisplayed completely. Static reading only.",
+      "observation": "Extends TreeFloorList, retains InputLog, node reorder null for START else INCRE_FINALTIME regardless requested direction. Constructor resets STATIC timeframe_root null: constructing another instance can invalidate existing instance update, and later init overwrites shared root frame although duration/depth perinstance. Debug also static. initFromTreeTop null filepointer-isNULL or readTreeNode null returns leaving prior/uninitialized floors; success optionally reorder, copies root bounds to static frame, caches duration/rootdepth/initdepth, zoom0, zoomfactor children(short), logfactor unchecked, init floors then root->root put. setTimeZoomFactor unchecked log; setNumOfViewsPerUpdate MULTIPLIES existing duration each call, not sets absolute view count. growInTreeWindow setsinitdepth, recursivegrow then updateLowestDepth. grow skipsnull or node depth<=target; otherwise parent must overlap or throws IllegalStateException. Loops actual child stubs (null array unchecked), looks up by stub BEFORE overlap; overlapping uncached child read via pointer, finaltime mode immediately reorder even if returnednull, starttime mode can putnull then recursion skips it. No pointer result/stub-vs-node identity/depth/cycle validation; failures can leave partial maps, recursion assumes descending tree. Nonoverlap cached child recursively removed down to target then its key removed; null-valued entry is not removed by cachednonnull check. removeChildren same depth/null cutoff, no nullchildarray guard. Zoomlevel=short(int(round(log(duration_root/windowduration)/logfactor))), narrowing before later clamp; zero/negative/NaN factors/durations unchecked. zoom computes nextdepth=short(initdepth-level) then clamps0..root. Gets lowest and covering floors; ONLY when nextdepth<coverer depth iterates live coverer values, grows overlapping nodes/removes descendants+iterator.remove for nonoverlap, clears lower floors and setslowest nextdepth. Otherwise no tree mutation even for requested coarser target. scroll does nothing if lowest aggregate covers; otherwise gets coverer and performs analogous update only if currentlowest<coverer. Neither zoom nor scroll calls pruneToBarelyCoveringFloor: previously observed prune defect is not established on these normal paths. update checks STATIC root overlap new frame, exact old/new equality=>0; durationratio abs(ratio-1)<=0.009999999776482582=>scroll1 else zoom2 (NaN dcmpg goeszoom); disjoint=>-1 no modification. Old/new null/init failures unguarded; no clipping newframe to root. Debug emitsSystem.out only when enabled aroundcall; staticdefaultfalse. No archived/native execution; InputLog internals remain next reading."
+    }
+  ],
+  "unique_classes_read": 3,
+  "instances_covered": 6,
+  "whole_model_read_gate": "NOT_PASSED",
+  "human_approval_issued": false
+}

@@ -472,6 +472,14 @@ def validate(root,here):
         output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
         check(x['sha256'][:10]+'-input-treefloor-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
     check('input_treefloor-no-approval',input_treefloor['whole_model_read_gate']=='NOT_PASSED' and input_treefloor['human_approval_issued'] is False)
+    input_floorlist_trunk=json.loads((here/'bytecode-read/input-floorlist-trunk-read.json').read_text())
+    check('input-floorlist-trunk-three-exact',bound(input_floorlist_trunk['prior_receipt']) and len(input_floorlist_trunk['records'])==input_floorlist_trunk['unique_classes_read']==3 and sorted(x['instances'][0]['member'] for x in input_floorlist_trunk['records'])==['logformat/slog2/input/TreeFloorList$ItrOfDrawables.class', 'logformat/slog2/input/TreeFloorList.class', 'logformat/slog2/input/TreeTrunk.class'] and input_floorlist_trunk['instances_covered']==6)
+    for x in input_floorlist_trunk['records']:
+        original=next(a for a in r['records'] if a['sha256']==x['sha256'])
+        args=['java','-m','jdk.jdeps/com.sun.tools.javap.Main','-c','-p','-s','-constants',str(root/x['class_file']['path'])]
+        output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
+        check(x['sha256'][:10]+'-input-floorlist-trunk-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
+    check('input_floorlist_trunk-no-approval',input_floorlist_trunk['whole_model_read_gate']=='NOT_PASSED' and input_floorlist_trunk['human_approval_issued'] is False)
     spec=importlib.util.spec_from_file_location('bytecode_coverage',here/'reconcile_bytecode_coverage.py')
     module=importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
