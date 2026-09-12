@@ -291,3 +291,5 @@ Method는 4바이트 정수 식별자로 1을 CONNECT_COMPOSITE_STATE로 정의�
 2026-09-12 viewer LegendPanel/LegendTable 2종 전체 582줄 판독. 행 선택과 표시 속성의 구분, 전역 범례 숨김, 컬럼별 메뉴/마우스 처리 연결, 초기 렌더러 표본 크기 계산을 기록했다. 누적 Java 248/413종·804경로, 잔여 Java 165종/Python 150종. 실제 데이터/정렬 변경은 LegendTableModel과 메뉴 후속 범위다. 근거: `viewer-legend-panel-table-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
 
 2026-09-12 viewer LegendTableModel 전체 725줄 판독. 공유 Category 편집, 목록 정렬 후 아이콘 재생성, 빈 목록의 초기 폭 계산 실패, 컬럼 반환형/편집 입력형 차이를 연결했다. 누적 Java 249/413종·806경로, 잔여 Java 164종/Python 150종. 비교자 내부와 색상 편집기는 후속 범위다. 근거: `viewer-legend-model-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer LegendComparators 10종과 CategoryIcon/Editor/Renderer/Label/Const 5종 전체 1199줄 판독. 이름 정렬의 topology→preview→name 우선순위, 비율 비교의 NaN 비대칭, 색상 편집 취소 시에도 alpha255로 확정하는 경로와 모델 ColorAlpha 계약을 연결했다. 누적 Java 264/413종·836경로, 잔여 Java 149종/Python 150종. 근거: `viewer-legend-comparators-icons-read.json` (XBeach connectivity/bytecode-read). 이전 모델 receipt의 비교자·편집기 미확정 항목을 보충하며 기존 기록은 보존한다. 실제 실행·독립 의미 승인은 아니다.

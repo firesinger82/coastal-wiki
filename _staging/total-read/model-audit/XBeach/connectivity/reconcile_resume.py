@@ -378,6 +378,7 @@ def main():
     read('bytecode-read/viewer-legend-frame-read.json')
     read('bytecode-read/viewer-legend-panel-table-read.json')
     read('bytecode-read/viewer-legend-model-read.json')
+    read('bytecode-read/viewer-legend-comparators-icons-read.json')
     read('bytecode-read/coverage.json')
     formula_name = 'workbook-formula-read.json'
     if (HERE / formula_name).is_file():
