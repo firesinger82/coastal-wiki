@@ -1,0 +1,402 @@
+--- a/models/XBeach/source-analysis/xbeach_intrawave_sediment_transport.md
++++ b/models/XBeach/source-analysis/xbeach_intrawave_sediment_transport.md
+@@ -14,0 +15,4 @@
++source_correction_date: 2026-09-12
++source_correction_by: "Codex"
++source_correction_scope: "`form`의 허용 입력 12개와 실제 공식 호출 네 루틴, `intrasedtr` 명시 입력을 구분"
++source_correction_human_approval: not-issued
+@@ -15,0 +20,2 @@
++
++> **2026-09-12 AI 출처 정정**: `form`의 허용 입력 12개와 실제 공식 호출 네 루틴, `intrasedtr` 명시 입력을 구분. 위 `verification_*`는 이전 검증 이력이며 이번 정정의 새 사람 승인을 뜻하지 않는다. [원문 구간·SHA와 재사용 근거](../../../_staging/total-read/model-audit/XBeach/connectivity/corrections-20260912/evidence.json)에 결속했다.
+@@ -20,2 +26 @@
+-> **정체**: `transus` 의 `par%form` 6형식 중 **intra-wave(위상해상) 3형식** — 위상평균 equilibrium([[xbeach_morphology]] sedtransform) 밖의 가속-skewness·비정수압·자갈 sheet-flow 유사이동. 코드 ~960줄, 위키 미커버.
+-> ★**기존 노트는 3형식만 명시**([[xbeach_morphology]]:44-49 soulsby/vanthiel/vanrijn1993→sedtransform), **코드는 6형식**.
++> `transus`에서 `sedtransform` 외에 직접 호출하는 `Nielsen2006`, `intra_sedtr`, `mccall_vanrijn`을 다룬다. 입력으로 허용하는 이름 수와 실제 공식 호출 분기는 다르다.
+@@ -23,9 +28,15 @@
+-## 0. transus dispatch (:173-190)
+-```fortran
+-select case(par%form)
+- case(FORM_SOULSBY_VANRIJN,FORM_VANTHIEL_VANRIJN,FORM_VANRIJN1993) → call sedtransform   ! 위상평균(xbeach_morphology 소관)
+- case(FORM_NIELSEN2006)   → call Nielsen2006 ; if(par%bulk==0) return   ! :177-181
+- case(FORM_INTRASEDTR)    → call intra_sedtr                            ! :182-183
+- case(FORM_MCCALL_VANRIJN)→ call mccall_vanrijn ; if(par%bulk==0) return ! :185-189
+-```
+-FORM 상수(paramsconst.F90): `NIELSEN2006=3`(:83)·`MCCALL_VANRIJN=4`(:84)·`INTRASEDTR=11`(:91). ★**Nielsen/McCall 은 `par%bulk==0` 시 early return** — sedtransform 의 equilibrium/advection-diffusion 기계를 우회.
++## 0. `form` 입력과 `transus` 호출
++
++`sedtrans==1`일 때 `params.F90:928-949`는 `intrasedtr`를 포함한 **12개 이름**을 입력 목록에 등록한다. `parmapply`는 이름을 상수 값으로 바꾸며, 과거 숫자 문자열 `1`~`12`는 각각 상수 값 `0`~`11`에 대응한다. 일반 설정의 기본값은 두 번째 이름 `vanthiel_vanrijn`, `useXBeachGSettings!=0`이면 다섯 번째 이름 `mccall_vanrijn`이다. (`paramsconst.F90:80-91`; `readkey.F90:762-804, 806-824, 866-875`)
++
++| 입력 이름 | 상수 값 | `transus`가 직접 호출하는 공식 루틴 |
++|---|---|---|
++| `soulsby_vanrijn`, `vanthiel_vanrijn`, `vanrijn1993` | 0, 1, 2 | `sedtransform` |
++| `nielsen2006` | 3 | `Nielsen2006` |
++| `mccall_vanrijn` | 4 | `mccall_vanrijn` |
++| `intrasedtr` | 11 | `intra_sedtr` |
++| `wilcock_crow`, `engelund_fredsoe`, `mpm`, `wong_parker`, `fl_vb`, `fredsoe_deigaard` | 5~10 (표기 순서) | 해당 SELECT에 공식 호출 분기 없음 |
++
++이 SELECT에는 `DEFAULT`도 없다. 따라서 5~10은 위 네 공식 루틴을 호출하지 않은 채 뒤의 공통 수송 계산으로 진행한다. 이를 입력 오류 종료나 특정 수치 결과로 해석하지 않는다. `Nielsen2006`과 `mccall_vanrijn` 분기만 `bulk==0`이면 호출 직후 `transus`에서 복귀한다. (`morphevolution.F90:173-204`; `transus` 상위 호출 조건은 `libxbeach.F90:293-310`)
++
++`mccall_vanrijn` 내부에 `FORM_WILCOCK_CROW`와 `FORM_ENGELUND_FREDSOE` 비교가 존재하지만, 그것만으로 해당 입력 값이 이 루틴에 도달한다고 볼 수 없다. 직접 호출자는 위 SELECT다. (`morphevolution.F90:2565-2576`)
+@@ -55 +66 @@
+-> ★**`FORM_INTRASEDTR=11` 은 `form=` 키워드로 사용자 설정 불가**(params.F90:933-936 목록에 없음) — 비정수압 run 내부 자동선택. [[xbeach_nonh]](수력만 문서화)의 **유사 짝**.
++> **`form=intrasedtr`는 사용자가 설정할 수 있다.** `params.F90:932-943`의 허용 이름과 `morphevolution.F90:182-183`의 호출이 직접 연결된다. nonh용이라는 루틴 헤더는 모드가 이 공식을 자동 선택한다는 근거가 아니다.
+@@ -64,5 +75,3 @@
+-## 4. 주요 findings
+-- **기존 노트 3형식 주장, 코드 6형식** — [[xbeach_morphology]]:44-49·Decision Guide 가 nielsen2006·mccall_vanrijn·intra_sedtr 누락(transus 는 6 전부 분기).
+-- **FORM_INTRASEDTR=11 사용자 미설정**(내부 비정수압 경로) — [[xbeach_nonh]] 유사 짝.
+-- **equilibrium 기계 우회**: Nielsen/mccall `par%bulk==0` early return(:179,187), bedload=농도 `ceqbg`(morphology §E 의 Sub/Svb flux 아님).
+-- **`par%phaselag`·`par%Ctrans`** 파라미터가 glossary 미등재.
++## 4. 적용 범위
++
++[[xbeach_morphology]]의 평형농도 설명은 `sedtransform`의 세 입력 값에 해당한다. 전체 입력 목록은 12개이고, 현재 `transus`의 직접 공식 호출은 여섯 값에서 네 루틴으로 연결된다. `intrasedtr`의 명시 입력과 Nielsen/McCall의 `bulk==0` 조기 복귀를 구분해야 한다. (§0 원문 근거)
+@@ -78 +87 @@
+-- [[xbeach_morphology]] — 위상평균 equilibrium sedtransform(본 노트가 intra-wave 3형식 보완, 3→6형식 정정)
++- [[xbeach_morphology]] — 위상평균 equilibrium sedtransform(세 평형농도 입력의 계산 설명; 전체 입력·호출 대응은 본 노트 §0)
+--- a/models/XBeach/source-analysis/xbeach_morphology.md
++++ b/models/XBeach/source-analysis/xbeach_morphology.md
+@@ -10,0 +11,4 @@
++source_correction_date: 2026-09-12
++source_correction_by: "Codex"
++source_correction_scope: "세 평형농도 공식의 설명 범위와 전체 `form` 입력·호출 분기를 구분"
++source_correction_human_approval: not-issued
+@@ -11,0 +16,2 @@
++
++> **2026-09-12 AI 출처 정정**: 세 평형농도 공식의 설명 범위와 전체 `form` 입력·호출 분기를 구분. 위 `verification_*`는 이전 검증 이력이며 이번 정정의 새 사람 승인을 뜻하지 않는다. [원문 구간·SHA와 재사용 근거](../../../_staging/total-read/model-audit/XBeach/connectivity/corrections-20260912/evidence.json)에 결속했다.
+@@ -44,6 +50,11 @@
+-Selected in `transus` (`morphevolution.F90:173-176`):
+-- `FORM_SOULSBY_VANRIJN`
+-- `FORM_VANTHIEL_VANRIJN`
+-- `FORM_VANRIJN1993`
+-
+-→ all call `sedtransform`. Names mapped from `form` (`params.F90:932-943`); constants in `paramsconst.F90:80-91`.
++This section describes the three equilibrium-formula inputs that call `sedtransform`: `soulsby_vanrijn`, `vanthiel_vanrijn`, and `vanrijn1993`. They are not the full `form` input list.
++
++| Accepted `form` input | Internal value | Direct formula call in `transus` |
++|---|---|---|
++| `soulsby_vanrijn`, `vanthiel_vanrijn`, `vanrijn1993` | 0, 1, 2 | `sedtransform` |
++| `nielsen2006` | 3 | `Nielsen2006`; returns immediately if `bulk==0` |
++| `mccall_vanrijn` | 4 | `mccall_vanrijn`; returns immediately if `bulk==0` |
++| `intrasedtr` | 11 | `intra_sedtr` |
++| `wilcock_crow`, `engelund_fredsoe`, `mpm`, `wong_parker`, `fl_vb`, `fredsoe_deigaard` | 5~10, in this order | No formula call in this SELECT; continues after it |
++
++The input reader accepts all 12 names, including `intrasedtr`. Legacy numeric strings `1`~`12` map to values `0`~`11`. The default name is `vanthiel_vanrijn` for ordinary settings and `mccall_vanrijn` when `useXBeachGSettings!=0`. This is input/dispatch evidence, not a numerical validation of the six values lacking a SELECT branch. (`params.F90:928-949`; `paramsconst.F90:80-91`; `readkey.F90:762-804`; `morphevolution.F90:173-204`; [[xbeach_intrawave_sediment_transport]] §0)
+@@ -162 +173 @@
+-## Decision Guide
++## Decision Guide — equilibrium transport and morphology settings
+@@ -179 +190 @@
+-- Soulsby-Van Rijn is the default workhorse. Van Thiel-Van Rijn is preferred for surf zone (wave-current interaction in critical velocity).
++- The ordinary input default is `form=vanthiel_vanrijn`; `useXBeachGSettings!=0` changes it to `mccall_vanrijn` (`params.F90:945-949`).
+--- a/models/XBeach/source-analysis/xbeach_wave_boundary_generation.md
++++ b/models/XBeach/source-analysis/xbeach_wave_boundary_generation.md
+@@ -2 +2 @@
+-title: "XBeach wave boundary 생성 & SWAN 연동 — offshore 스펙트럼(JONSWAP/SWAN/vardens) → 랜덤위상 단파 train → bound long-wave(infragravity, Herbers 1994 + Van Dongeren 2003) 경계 forcing"
++title: "XBeach 활성 파랑 경계 생성 — waveparamsnew.F90의 스펙트럼·bound 장파"
+@@ -15,0 +16,4 @@
++source_correction_date: 2026-09-12
++source_correction_by: "Codex"
++source_correction_scope: "활성 파랑 생성 경로와 차주파수 에너지·위상·진폭 부호를 `waveparamsnew.F90`에 맞춤"
++source_correction_human_approval: not-issued
+@@ -18 +22 @@
+-# XBeach wave boundary 생성 & SWAN 연동
++> **2026-09-12 AI 출처 정정**: 활성 파랑 생성 경로와 차주파수 에너지·위상·진폭 부호를 `waveparamsnew.F90`에 맞춤. 위 `verification_*`는 이전 검증 이력이며 이번 정정의 새 사람 승인을 뜻하지 않는다. [원문 구간·SHA와 재사용 근거](../../../_staging/total-read/model-audit/XBeach/connectivity/corrections-20260912/evidence.json)에 결속했다.
+@@ -20 +24 @@
+-> `wave_boundary_update.f90`(2768) + `waveparamsnew.F90`(spectral_wave_bc) 직접 read. offshore 스펙트럼을 surfbeat 경계 forcing 으로 변환하는 **생성 알고리즘** — 특히 **bound long-wave(infragravity) 생성**. [[xbeach_swan_handoff]]/[[xbeach_wave_boundary]] 이 스펙트럼 **읽기·파일구조**를 다뤘고, 본 노트는 그 스펙트럼이 **bound IG 경계파로 변환되는 물리**(SWAN↔XBeach 연동의 심부)와 그 결과가 [[xbeach_wave_action_balance]] 내부 solver 로 들어가는 chain.
++# XBeach 파랑 경계 생성과 SWAN 입력
+@@ -22 +26 @@
+-## 1. 스펙트럼 입력 3 경로 (waveparamsnew.F90:415-421)
++현재 저장 소스의 활성 경로는 `boundaryconditions.F90`의 `wave_bc`가 `waveparamsnew.F90`에 정의된 `spectral_wave_bc_module::spectral_wave_bc`를 호출하는 구조다. `wave_boundary_update.f90`의 `generate_wave_boundary_surfbeat`는 현재 조사한 Autotools/Visual Fortran/IFX 모델 대상의 컴파일 목록에 없다. 이 노트의 생성 알고리즘은 **활성 `waveparamsnew.F90` 기준**이다. (`boundaryconditions.F90:39-44, 205-250`; `waveparamsnew.F90:1-11, 98-106`; [[xbeach-build-mode-connectivity]] 및 결속된 `build-map.json`)
+@@ -24,5 +28,38 @@
+-```fortran
+-spectral_wave_bc → wbctype:
+-  read_jonswap_file   ! 파라메트릭 JONSWAP (Hm0/Tp/mainang/gam/scoeff)
+-  read_swan_file      ! SWAN ASCII spectral output → [[xbeach_swan_handoff]]
+-  read_vardens_file   ! variance density 2D spectrum
++## 1. 입력과 생성 진입
++
++현재 `wbctype` 입력 이름 `jonstable`은 내부 상수 `WBCTYPE_JONS_TABLE`에 대응한다. (`params.F90:321-334`)
++
++초기 경계 생성에서 stationary의 `jonstable`은 테이블을 직접 읽는다. `parametric/jonstable`의 스펙트럼 생성 호출에는 비stationary 조건이 있고, SWAN/vardens 호출과 함께 `xmaster`에서 실행한다. `reuse`와 직접 시계열 입력은 별도 분기다. (`boundaryconditions.F90:205-250`)
++
++`spectral_wave_bc`는 생성 루프에서 `read_spectrum_input`을 호출하고, 그 안에서 다음 reader를 선택한다. `reuseall`이면 새 생성을 건너뛰는 경로가 있으므로 매 호출마다 다시 생성한다고 해석하지 않는다. (`waveparamsnew.F90:128-151, 167-181, 408-426`)
++
++| 입력 | 스펙트럼 reader | 호출 위치 |
++|---|---|---|
++| `parametric`, `jonstable` | `read_jonswap_file` | `waveparamsnew.F90:415` |
++| `swan` | `read_swan_file` | `:418` (정의는 `:936`) |
++| `vardens` | `read_vardens_file` | `:421` |
++
++SWAN 스펙트럼 파일의 해석은 [[xbeach_swan_handoff]], 경계 파일·보간 설정은 [[xbeach_wave_boundary]]를 따른다.
++
++## 2. 활성 생성 순서와 모드 조건
++
++입력 스펙트럼에 대해 `interpolate_spectrum`, 성분과 시간축 선정, 방향분산·성분 특성 계산, Fourier 성분 구성을 차례로 수행한다. 이어지는 생성 호출은 `nonhspectrum`, `swkhmin`, `order`, `highcomp`에 따라 달라진다. (`waveparamsnew.F90:167-290`)
++
++| 조건 | 생성 호출 |
++|---|---|
++| `nonhspectrum==0`, `swkhmin<=0` | `generate_ebcf`로 단파 에너지 시계열 생성 |
++| `nonhspectrum==0`, `swkhmin>0` | `generate_ebcf`와 `generate_swts` 호출 |
++| `nonhspectrum!=0` | 성분 방향 분배 후 `generate_swts` 호출 |
++| `nonhspectrum==0` 또는 `nonhspectrum==1`이면서 `order>1` | `generate_qbcf` 호출 |
++| `nonhspectrum==1`, `highcomp==1`, `order>1` | `generate_secondorder` 추가 호출 |
++| `nonhspectrum==1` | `generate_nhtimeseries_file`로 nonh 시계열 기록 |
++
++## 3. Bound 장파: `generate_qbcf`
++
++이 루틴의 정의는 `waveparamsnew.F90:2695`다. 단파 성분 쌍의 차주파수 `deltaf=m*dfgen`과 파수벡터 차를 구성하고, 차파의 속도를 `nmax`로 제한한다. 코드 주석은 상호작용 계수 `D`가 Okihiro 식의 **수면변위용 계수**임을 명시한다. 예전 바닥압력→수면변위 보정 곱셈은 주석 처리되어 있다. (`:2783-2828`)
++
++에너지 배열의 실제 대입은 다음과 같다. `j`는 경계 위치, `i`와 `i+m`은 서로 다른 주파수 성분이다.
++
++```text
++Eforc(m,i) = 2 D(m,i)^2 S(j,i) S(j,i+m) dfgen
++Abnd(m,i) = sqrt(2 Eforc(m,i) dfgen) sign(1,D(m,i))
+@@ -30 +66,0 @@
+-→ 모두 `specin%S(f,θ)` (variance density 2D 스펙트럼)으로 통일. **SWAN 연동** = `read_swan_file`(SWAN VaDens/EnDens·FACTOR·freq×dir matrix → S(f,θ), 801 freq × 401 dir 보간). SWAN 출력측은 [[swan-output-formats]].
+@@ -32 +68 @@
+-## 2. generate_wave_boundary_surfbeat 흐름 (wave_boundary_update.f90:73)
++`Sfold==1`이면 위 `S`에 `Sfinterpq`, 그 외에는 `Sfinterp`를 쓴다. 따라서 주석의 축약형 `S²`를 같은 주파수 성분의 제곱으로 옮기면 실제 쌍별 곱과 달라진다. (`:2872-2899`)
+@@ -34,5 +70 @@
+-1. **스펙트럼 → XBeach 격자 보간**(naint=401 방향, nfint freq).
+-2. **랜덤위상 단파 train**: 스펙트럼을 Fourier component 로 분해 — `wp%fgen`(주파수)/`thetagen`(방향)/`phigen`(랜덤 위상)/`kgen`(파수)/`wgen`(각진동수). 각 성분 진폭 `√(2·S·df·dθ)`.
+-3. **에너지 envelope** 시계열: 단파 군(wave group)의 변동(variance) 포락선 계산(directional-spreading 의존, :2168).
+-4. **`generate_qbcf`** — bound long wave 생성(§3).
+-5. nonh 시계열(`generate_nhtimeseries_file`, nonhspectrum 시).
++위상도 첫 대입만 읽으면 안 된다. `dphi3=pi+위상차`는 바로 다음 대입에서 **pi 없는 위상차**로 덮어쓴다. `D`의 부호는 위의 진폭에 반영된다. 진행 방향은 `atan2(KKy,KKx)`이고, 공간 위상·역 FFT·taper를 거쳐 시계열을 만든다. 주파수 하한과 `fcutoff`에 의한 상호작용 제외도 적용된다. (`:2831-2854, 2902-2935`)
+@@ -40 +72 @@
+-## 3. Bound long-wave (infragravity) 생성 — generate_qbcf (:2460) ★
++`nonhspectrum==0`의 기록 분기에서 `order==1`은 `q(:,:,1)`(x방향 유량)과 `q(:,:,4)`(수면변위)을 0으로 만든다. 여기서 모든 유량 성분을 0으로 만든다고 일반화하지 않는다. `nonhspectrum==1`의 경로는 계산한 성분을 nonh 속도·수면변위 시계열에 더한다. (`:2964-2982, 3032-3037`)
+@@ -42,10 +74 @@
+-단파 쌍(pair)의 **difference-interaction**(주파수차 Δf)이 만드는 2차 bound 장파(infragravity). 파군(wave group) 아래 묶인 IG 파:
+-- **Energy** (Herbers 1994 eq. 1, :2640):
+-  ```
+-  E_forc = 2·D²·S²·dθ²·df  =  2·D²·Sf²·df
+-  ```
+-  `D` = **difference-interaction coefficient**(상호작용 primary wave 쌍의 2차 강제 계수), `S`/`Sf` = primary wave 에너지밀도. 모든 freq-pair (m=1..K-1) 합산.
+-- **Phase** (Van Dongeren 2003 eq. 21, :2602): primary wave 강제와의 **국소평형** 가정 → bound wave 위상 = `π + imag(log(CompFn*)) 차`(Fourier 켤레곱의 편각).
+-- **Angle** (Van Dongeren 2003 eq. 22, :2612): `theta3 = atan2(KKy, KKx)` (상호작용 파수벡터 차의 방향).
+-- **shallow-water 보정**(`par%nmax`): 얕은 물에서 bound wave variance 과대 방지(:2568).
+-- longshore point(npb)별로 별도 계산(spatial phase: 참조점 거리 `distx/disty` × 파수).
++## 4. 생성 결과의 소비와 구형 코드의 위치
+@@ -53 +76 @@
+-→ 결과: 경계에서 단파(short wave) + **bound 장파(IG flux qbcf)** 시계열 → surfbeat 흐름 경계조건. surfzone 에서 bound IG 가 풀려(release) free IG 로 → swash/runup 의 주 에너지원.
++surfbeat 경계 파일은 `boundaryconditions.F90`에서 시각 보간하고, 유량을 회전·수심 변환하여 `ui/vi`로 소비한다. 내부 에너지 전파는 [[xbeach_wave_action_balance]], 흐름 경계는 [[xbeach_flow_boundary_conditions]]에서 다룬다. (`boundaryconditions.F90:655-671`)
+@@ -55,21 +78 @@
+-## 4. SWAN ↔ XBeach 연동 chain (전체)
+-
+-```
+-SWAN run → 2D spectral output(VaDens/EnDens, FACTOR)
+-  → read_swan_file (specin%S(f,θ))           [[xbeach_swan_handoff]] (읽기·보간)
+-  → generate_wave_boundary_surfbeat (Fourier train + envelope)
+-  → generate_qbcf (bound IG: Herbers/Van Dongeren)   [본 노트]
+-  → 경계 forcing(short + bound IG)
+-  → wave_instationary 파작용 전파 + flow      [[xbeach_wave_action_balance]]/[[xbeach_flow_solver]]
+-```
+-- **one-way nesting**: SWAN(regional 파랑) → XBeach(surfzone). EFDC 의 SWAN 결합([[efdc_waves]] GETSWAN)과 동일 철학(SWAN=offshore 파랑 공급).
+-- SWAN 방향 convention 변환: `dthetaS_XB`(SWAN nautical → XBeach x-axis 반시계, :916).
+-
+-## 5. 연결
+-
+-- [[xbeach_swan_handoff]] — read_swan_file SWAN 스펙트럼 읽기·보간(본 노트의 입력단)
+-- [[xbeach_wave_boundary]] — wbctype·JONSWAP·BCF 파일구조·directional spreading
+-- [[xbeach_wave_action_balance]] — 생성된 경계파가 들어가는 내부 파작용 solver
+-- [[xbeach_flow_solver]] — bound IG → surfbeat 흐름
+-- [[swan-output-formats]] / [[swan-spectral-file-format]] — SWAN 출력측 포맷
+-- Herbers et al. 1994 / Van Dongeren et al. 2003 / Hasselmann 1962 (bound long wave 2차 이론)
++`wave_boundary_main/init/update/datastore`와 `wave_bc_nextgen`은 조사 대상 빌드의 미포함 파일이다. 기존 분석에서 이들의 API·배열을 읽었다는 사실은 현재 실행 경로의 근거가 아니다. 활성 모듈과 구형 구현의 수식·위상 처리가 같다는 판정도 하지 않는다. ([[xbeach-build-mode-connectivity]]; 이 정정의 `evidence.json`에 결속된 `build-map.json`)
+--- a/models/XBeach/source-analysis/wave/xbeach_wave_boundary.md
++++ b/models/XBeach/source-analysis/wave/xbeach_wave_boundary.md
+@@ -10,0 +11,4 @@
++source_correction_date: 2026-09-12
++source_correction_by: "Codex"
++source_correction_scope: "빌드 미포함 경계 prototype의 API·datastore와 활성 스펙트럼 경로를 구분"
++source_correction_human_approval: not-issued
+@@ -12,0 +17,2 @@
++> **2026-09-12 AI 출처 정정**: 빌드 미포함 경계 prototype의 API·datastore와 활성 스펙트럼 경로를 구분. 위 `verification_*`는 이전 검증 이력이며 이번 정정의 새 사람 승인을 뜻하지 않는다. [원문 구간·SHA와 재사용 근거](../../../../_staging/total-read/model-audit/XBeach/connectivity/corrections-20260912/evidence.json)에 결속했다.
++
+@@ -17 +23 @@
+-How XBeach selects a wave-boundary type via `wbctype`, how JONSWAP spectra are generated (legacy `waveparams.F90` vs newer `waveparamsnew.F90`), how BCF files are written and time-interpolated, the role of `wave_bc_nextgen.f90` (scaffold), how directional spreading uses exponent `s`, what the `wave_boundary_datastore.F90` persists, and the front/back boundary options including nonh BC. Use this when configuring incident waves, debugging spectral file structure, or wiring a custom BC time series.
++How XBeach selects a wave-boundary type via `wbctype`, how JONSWAP spectra are generated (legacy `waveparams.F90` vs active `waveparamsnew.F90`), how BCF files are written and time-interpolated, the role of `wave_bc_nextgen.f90` (scaffold), how directional spreading uses exponent `s`, what the build-excluded prototype `wave_boundary_datastore.f90` persists, and the front/back boundary options including nonh BC. Use this when configuring incident waves, debugging spectral file structure, or wiring a custom BC time series.
+@@ -26,4 +32,4 @@
+-- `waveparamsnew.F90:98, 366-2974` — newer spectral path.
+-- `wave_boundary_main.f90:35, 193, 256` — newer interface main.
+-- `wave_boundary_update.f90:312` — spectral reader dispatch.
+-- `wave_boundary_datastore.f90:16-63` — persistent state.
++- `waveparamsnew.F90:98, 340-426` — active spectral entry and reader dispatch.
++- `wave_boundary_main.f90:35, 193, 256` — build-excluded prototype interface main.
++- `wave_boundary_update.f90:312` — build-excluded prototype reader dispatch.
++- `wave_boundary_datastore.f90:16-63` — build-excluded prototype state.
+@@ -32,0 +39,2 @@
++
++The current table-input name is `jonstable`, mapped to `WBCTYPE_JONS_TABLE`; the legacy `instat` spelling below is distinct (`params.F90:321-334`).
+@@ -42,7 +50 @@
+-Files involved:
+-- `wave_boundary_init.f90` — empty placeholder (`:1`).
+-- `wave_boundary_main.f90` — newer interface, exposes `create_incident_waves_surfbeat` (`:35, 193`).
+-- `wave_boundary_update.f90:312` — spectral reader dispatch:
+-  - JONSWAP / `jons_table` → `read_jonswap_file`.
+-  - SWAN → `read_swan_file`.
+-  - vardens → `read_vardens_file`.
++The active spectral provider is `spectral_wave_bc_module` from `waveparamsnew.F90` (`boundaryconditions.F90:43`; `waveparamsnew.F90:1-11, 98-106`). Its `read_spectrum_input` dispatches JONSWAP/table, SWAN and vardens to the respective readers (`waveparamsnew.F90:408-426`). The `wave_boundary_main/init/update/datastore` and `wave_bc_nextgen` files are absent from the model compile lists inspected in [[xbeach-build-mode-connectivity]]. Their API descriptions below are historical prototype descriptions.
+@@ -56,2 +58,2 @@
+-| Stationary `jons_table` | Reads table directly | `:205` |
+-| Spectral `parametric/jons_table/swan/vardens` | Calls `spectral_wave_bc` | `:238` |
++| Stationary `jonstable` | Reads table directly | `:205` |
++| `parametric/jonstable` with nonstationary mode; `swan/vardens` | Calls `spectral_wave_bc` on `xmaster` | `:237-245` |
+@@ -68 +70 @@
+-**Newer** (`waveparamsnew.F90`):
++**Active spectral provider** (`waveparamsnew.F90`):
+@@ -95 +97 @@
+-`wave_boundary_main.f90:256` — in-memory analogue interpolating `waveBoundaryTimeSeries%tbc` to `eebc, qsbc, qnbc` via `linear_interp`.
++**Build-excluded prototype:** `wave_boundary_main.f90:256` — in-memory analogue interpolating `waveBoundaryTimeSeries%tbc` to `eebc, qsbc, qnbc` via `linear_interp`.
+@@ -121,3 +123,3 @@
+-## F. Datastore (`wave_boundary_datastore.F90`)
+-
+-Persists newer-interface state across calls. Holds:
++## F. Prototype datastore (`wave_boundary_datastore.f90`; build-excluded)
++
++This historical prototype declares state across calls. It is not the datastore of the active `spectral_wave_bc_module` path. The build exclusion is recorded in [[xbeach-build-mode-connectivity]]. Its declarations hold:
+@@ -148,2 +150,2 @@
+-- 1st = short-wave energy only.
+-- 2nd = adds bound long-wave steering.
++- The active generation call uses `nonhspectrum` and `order` together; see [[xbeach_wave_boundary_generation]] §2.
++- In `generate_qbcf`, `nonhspectrum==0` and `order==1` zero the x-flux and elevation slots (`waveparamsnew.F90:2964-2979`), not every flux slot.
+@@ -162 +164 @@
+-Spectral and `ts_nonh` forcing reads velocity/elevation time series via `velocity_Boundary` (`boundaryconditions.F90:709, 778, 858`). For surfbeat, `order=1` zeroes generated long-wave flux/elevation in `generate_qbcf` (`waveparamsnew.F90:2974`); runtime also scales `ui` by `lwave*(order−1)` when `nonhspectrum<=0` (`boundaryconditions.F90:918`).
++Spectral and `ts_nonh` forcing reads velocity/elevation time series via `velocity_Boundary` (`boundaryconditions.F90:709, 778, 858`). For surfbeat, `order=1` zeroes the generated x-flux/elevation slots in `generate_qbcf` (`waveparamsnew.F90:2974`); runtime also scales `ui` by `lwave*(order−1)` when `nonhspectrum<=0` (`boundaryconditions.F90:918`).
+@@ -169 +171 @@
+-| Time-varying spectra | `wbctype=jons_table` or `vardens` with `FILELIST` |
++| Time-varying spectra | `wbctype=jonstable` or `vardens` with `FILELIST` |
+@@ -175 +177 @@
+-| Sea-swell only, no IG | `order=1` |
++| First-order boundary steering | `order=1`; observe the component-specific behavior above |
+@@ -183 +185 @@
+-- Use newer `waveparamsnew.F90` path (default) — it accepts `Tp` directly. Legacy uses `fp`.
++- The active `waveparamsnew.F90` provider — it accepts `Tp` directly. Legacy uses `fp`.
+--- a/models/XBeach/source-analysis/xbeach_wave_action_balance.md
++++ b/models/XBeach/source-analysis/xbeach_wave_action_balance.md
+@@ -2 +2 @@
+-title: "XBeach wave action balance (wave_instationary.F90 + wave_directions.F90) — surfbeat 파작용 N=E/σ x·y·θ 전파 + Roelvink/Baldock 쇄파 dissipation + roller energy balance → radiation stress Fx/Fy"
++title: "XBeach wave action balance (wave_instationary.F90 + wave_stationary_directions.F90) — surfbeat 파작용 N=E/σ x·y·θ 전파 + Roelvink/Baldock 쇄파 dissipation + roller energy balance → radiation stress Fx/Fy"
+@@ -15,0 +16,4 @@
++source_correction_date: 2026-09-12
++source_correction_by: "Codex"
++source_correction_scope: "stationary와 surfbeat single_dir의 활성 공유 루틴·callType·방향 격자를 정정"
++source_correction_human_approval: not-issued
+@@ -16,0 +21,2 @@
++
++> **2026-09-12 AI 출처 정정**: stationary와 surfbeat single_dir의 활성 공유 루틴·callType·방향 격자를 정정. 위 `verification_*`는 이전 검증 이력이며 이번 정정의 새 사람 승인을 뜻하지 않는다. [원문 구간·SHA와 재사용 근거](../../../_staging/total-read/model-audit/XBeach/connectivity/corrections-20260912/evidence.json)에 결속했다.
+@@ -20 +26 @@
+-> `wave_instationary.F90`(479) + `wave_directions.F90`(400) 직접 read. XBeach **surfbeat(instationary) 모드의 핵심 파동 solver** — short-wave 에너지의 파작용(action) 평형방정식을 풀어 쇄파 dissipation·roller 를 거쳐 **radiation stress `Fx/Fy`** 산출 → [[xbeach_flow_solver]] 흐름 구동. boundary spectrum→bound wave 는 [[xbeach_wave_boundary]], 본 노트는 **내부 파작용 전파·쇄파·roller**.
++> 활성 surfbeat 에너지 전파는 `wave_instationary.F90`, 조건부 정상 방향 계산은 `wave_stationary_directions.F90`에 연결된다 (`wave_timestep.F90:75-114`). XBeach **surfbeat(instationary) 모드의 핵심 파동 solver** — short-wave 에너지의 파작용(action) 평형방정식을 풀어 쇄파 dissipation·roller 를 거쳐 **radiation stress `Fx/Fy`** 산출 → [[xbeach_flow_solver]] 흐름 구동. boundary spectrum→bound wave 는 [[xbeach_wave_boundary]], 본 노트는 **내부 파작용 전파·쇄파·roller**.
+@@ -65 +71 @@
+-## 5. Stationary 모드 (wave_directions.F90, 400)
++## 5. 활성 정상 계산과 구형 파일
+@@ -67 +73 @@
+-`wave_directions` = **stationary 모드**의 방향 분해 solver(ntheta_s bins). 반복(`iter`/`itermax`, Herr/thetaerr 수렴)으로 정상상태 파작용·방향(thetamean) 해. instationary 와 달리 시간전진 없이 정상 평형. [[xbeach_single_dir]](single-directional)·[[xbeach_mode_dispatch]] 와 연계.
++현재 `wave_timestep`은 stationary에서 `wave_stationary_directions(s,par,0)`을 호출한다. 이때 `callType=0`은 `s%ntheta`를 사용한다. surfbeat의 `single_dir` 경로도 같은 루틴을 `callType=1`로 호출하지만, 이때는 `s%ntheta_s`로 평균 방향을 계산한다. 호출은 `wavint` 간격 조건과 새 stationary 경계 조건으로 제어하며, surfbeat single_dir에는 `t==dt` 조건도 있다. (`wave_timestep.F90:75-114`; `wave_stationary_directions.F90:33-49, 71-76`)
+@@ -69 +75 @@
+-## 6. 모드별 wave solver
++`wave_directions.F90`와 `wave_stationary.F90`는 현재 조사한 빌드 목록에 포함되지 않는다. 두 파일을 읽은 이전 검증 이력은 보존하되 현재 solver로 귀속하지 않는다. ([[xbeach-build-mode-connectivity]]; 상세는 [[xbeach_wave_stationary]])
+@@ -71 +77,3 @@
+-| 모드 | solver | 특징 |
++## 6. 모드별 활성 wave 호출
++
++| 모드 | 호출 | 조건 |
+@@ -73,3 +81,5 @@
+-| **surfbeat(instat)** | `wave_instationary` | 시간전진 파작용+roller, wave-group 변조→bound long wave(infragravity) |
+-| **stationary** | `wave_directions` | 반복 정상상태, 평균 wave forcing |
+-| **nonh** | (파 직접 해상) | action balance 미사용([[xbeach_flow_solver]] §6) |
++| stationary | `wave_dispersion(...,0)` → `wave_stationary_directions(...,0)` | `wavint` 또는 새 경계 조건에 따른 정상 계산 |
++| surfbeat, `single_dir==1` | 평균장 갱신 → 조건부 `wave_dispersion(...,1)`과 `wave_stationary_directions(...,1)` | 정상 방향 계산 (`wavint` 조건, 새 경계 조건 또는 `t==dt`); 이후 에너지 전파는 별도 실행 |
++| surfbeat | `wave_dispersion(...,0 또는 2)` → `wave_instationary` | 매 파랑 스텝의 에너지 전파; WCI 조건에 따라 분산 계산 인수 선택 |
++
++위 표는 `wave_timestep.F90:75-114`의 stationary/surfbeat 분기다. nonh의 수력 계산은 [[xbeach_mode_dispatch]]와 [[xbeach_nonh]]를 따른다.
+--- a/models/XBeach/source-analysis/xbeach_wave_stationary.md
++++ b/models/XBeach/source-analysis/xbeach_wave_stationary.md
+@@ -2 +2 @@
+-title: "XBeach stationary wave 모드(wave_stationary.F90 + wave_stationary_directions.F90) — 정상상태 파작용 반복 cross-shore sweep(Herr/thetaerr 수렴) + Baldock 쇄파 + 방향분해"
++title: "XBeach 정상 파랑 계산 — 활성 wave_stationary_directions와 구형 wave_stationary 구분"
+@@ -14,0 +15,4 @@
++source_correction_date: 2026-09-12
++source_correction_by: "Codex"
++source_correction_scope: "구형 wave_stationary의 역할을 한정하고 현재 정상 계산의 두 호출을 구분"
++source_correction_human_approval: not-issued
+@@ -17 +21 @@
+-# XBeach stationary wave 모드 (wave_stationary)
++> **2026-09-12 AI 출처 정정**: 구형 wave_stationary의 역할을 한정하고 현재 정상 계산의 두 호출을 구분. 위 `verification_*`는 이전 검증 이력이며 이번 정정의 새 사람 승인을 뜻하지 않는다. [원문 구간·SHA와 재사용 근거](../../../_staging/total-read/model-audit/XBeach/connectivity/corrections-20260912/evidence.json)에 결속했다.
+@@ -19 +23 @@
+-> `wave_stationary.F90`(448) + `wave_stationary_directions.F90`(732) 직접 read. XBeach **stationary 모드**의 파동 solver — 시간전진 없이 **정상상태(steady) 파작용**을 반복(iteration)으로 해. surfbeat(시간전진, [[xbeach_wave_action_balance]] wave_instationary)의 자매. 평균 wave forcing 만 필요한 case(긴 simulation·기후·정적 setup)에 경제적.
++# XBeach 정상 파랑 계산
+@@ -21 +25 @@
+-## 1. wave_stationary — 정상 파작용 (wave_stationary.F90:7)
++현재 `wave_timestep`의 stationary 호출 대상은 `wave_stationary_directions(s,par,0)`이다. 같은 루틴을 surfbeat `single_dir`의 평균 방향 계산에도 다른 `callType`으로 사용한다. 이름이 유사한 `wave_stationary.F90`와 `wave_directions.F90`는 조사한 Autotools/Visual Fortran/IFX 모델 빌드 목록에 포함되지 않는다. (`wave_timestep.F90:75-114`; [[xbeach-build-mode-connectivity]])
+@@ -23,4 +27 @@
+-- **반복 cross-shore sweep**: offshore→해안 방향으로 파작용 평형을 iteration(`iter`/`itermax`)으로 수렴. `Herr`(파고 오차)·`thetaerr`(방향 오차) < tol 까지(`stopiterate`).
+-- 쇄파: `roelvink`/`baldock`/`janssen_battjes`([[xbeach_wave_breaking]]) — stationary 는 주로 **Baldock**(확률적, 정상상태 적합).
+-- refraction: slope limit(:96, 비현실 refraction 속도 억제). y-advection 은 수렴 위해 upwind_1 강제(:68).
+-- roller energy balance 도 정상상태로 동시 해 → radiation stress.
++## 1. `wave_stationary` — 구형·빌드 미포함 구현
+@@ -28 +29 @@
+-## 2. wave_stationary_directions — 방향분해 (wave_stationary_directions.F90:33)
++기존 원문 판독은 `wave_stationary.F90`의 `wave_stationary`가 반복 cross-shore sweep과 `Herr/thetaerr` 수렴을 사용하는 구현임을 기록했다 (`wave_stationary.F90:7, 34, 152`). 이 설명은 해당 구형 파일의 내용이며, 현재 stationary 모드의 호출 대상을 뜻하지 않는다. 기존 `verification_*`의 두 파일 판독 이력도 이 구분을 따른다.
+@@ -30,3 +31 @@
+-- `callType` 으로 `ntheta`(주 방향격자) vs `ntheta_s`(stationary 세분 방향) 선택.
+-- 방향(θ) 분해 파작용을 advection(xadvec/yadvec/thetaadvec, [[xbeach_wave_functions]])으로 반복 해. 방향분포(spreading) 정밀.
+-- [[xbeach_single_dir]](single-directional 근사)와 대비 — 이쪽은 full directional.
++## 2. 활성 `wave_stationary_directions`
+@@ -34 +33 @@
+-## 3. instationary vs stationary
++루틴은 `callTypeStationary=0`, `callTypeDirections=1`을 구분하고 사용할 방향 격자를 선택한다. 따라서 이 루틴 자체를 single_dir와 대비되는 전용 full-directional 경로로 설명하면 두 호출 역할을 놓친다. (`wave_stationary_directions.F90:33-49, 71-76`)
+@@ -36,6 +35,4 @@
+-| | surfbeat(wave_instationary) | stationary(wave_stationary) |
+-|---|---|---|
+-| 시간 | 시간전진(IG 변조) | 정상상태 반복 |
+-| IG | bound long wave 직접 | 없음(평균 forcing) |
+-| 비용 | 큼 | 작음 |
+-| 용도 | swash/runup/storm | 평균 wave-driven current·setup·긴 run |
++| 호출자 모드 | 호출 인수 | 방향 격자 | 계산 주기 |
++|---|---|---|---|
++| stationary | `callType=0` | `s%ntheta` | `abs(mod(t,wavint))<0.001*dt` 또는 `newstatbc==1` |
++| surfbeat, `single_dir==1` | `callType=1` | `s%ntheta_s` | 평균장 갱신 뒤 `abs(mod(t,wavint))<0.001*dt`, `newstatbc==1` 또는 `t==dt` |
+@@ -43 +40 @@
+-## 4. 연결
++두 경로 모두 정상 계산 전에 해당 인수의 `wave_dispersion`을 호출한다. surfbeat의 시간에 따른 에너지 전파는 이 방향 계산 뒤 `wave_instationary`에서 별도로 진행한다. (`wave_timestep.F90:75-114`)
+@@ -45,4 +42,6 @@
+-- [[xbeach_wave_action_balance]] — instationary 자매(공유 advection/breaking/roller)
+-- [[xbeach_mode_dispatch]] — stationary/surfbeat/nonh 모드 선택
+-- [[xbeach_wave_functions]] — advection·refraction velocity 공유
+-- [[xbeach_single_dir]] — single-directional 근사
++## 3. 연결
++
++- [[xbeach_wave_action_balance]] — surfbeat 에너지·roller 전파
++- [[xbeach_mode_dispatch]] — stationary/surfbeat/nonh 실행 분기
++- [[xbeach_single_dir]] — surfbeat 평균 방향 계산
++- [[xbeach-build-mode-connectivity]] — 현재 빌드 목록과 비활성 파일의 근거
+--- a/models/XBeach/manual-notes/xbeach-manual-equation-code-contracts.md
++++ b/models/XBeach/manual-notes/xbeach-manual-equation-code-contracts.md
+@@ -2 +2 @@
+-title: "XBeach 매뉴얼 수식과 구현: 파수 보정·지형 갱신"
++title: "XBeach 매뉴얼 수식과 구현: 파수 보정·지형 갱신·침투"
+@@ -35 +35,17 @@
+-이 두 수식 묶음의 의미 대조 결과이며 전체 매뉴얼 수식 검증을 뜻하지 않는다. 앞서 확인한 침투식의 판본 차이와 시간 이산화는 [기존 대조 기록](../../../_staging/total-read/model-audit/XBeach/connectivity/INFILTRATION-DOCUMENT-CODE-COMPARISON.md)을 따른다.
++## 불포화 침투식: 판본 표기와 시간 이산화
++
++원본 WMF와 MathType Native 판독에서 Kingsday `oleObject133`, Master `oleObject143/81`의 분수 뒤 `1` 앞에는 연산자가 없다. Kingsday `oleObject70` 대응식에는 `+1`이 있다. 이 차이는 원본의 표기 차이로 남긴다. 구현이 더하기를 쓴다는 사실로 원본 저자의 미기재 의도를 확정하거나 원본 식을 수정하지 않는다. ([원본 객체·주변 문단·코드와 대수 검산](../../../_staging/total-read/model-audit/XBeach/connectivity/infiltration-document-code-comparison.json), [객체별 복원 PDF p.1 시각 판독](../../../_staging/total-read/model-audit/XBeach/connectivity/manuals-docx-read/conditional-visual-read/receipt.json))
++
++`groundwater.F90:1554-1573`의 기본 관계는 다음과 같다. `d=dinfil`, `h=hh`, `D=dt/por`로 놓으며, 여기서 `D`는 시간 이산화 계수다.
++
++```text
++w = K (1 + h/(d + D w))
++D w² + (d − D K) w − K(d+h) = 0
++w = (−d + D K + sqrt(d² + 2D dK + 4D hK + D² K²))/(2D)
++```
++
++이 양의 근은 `K>0, d>0, h>=0, D>0`에서 코드의 계산과 대수적으로 대응한다. 층류 분기와 난류 첫 추정에는 `par%kz`, 난류 반복에는 갱신한 `kze`가 들어간다. 기존 세 수치 예의 대수 잔차는 0 또는 약 `3.4e-17`이었으며, 이는 전체 Fortran 실행 시험이 아니다. (`groundwater.F90:1574-1630`; 위 대수 검산 기록)
++
++실제 반환 `infil`은 이 순간 식의 `w` 그대로가 아니다. 코드가 불포화 상태로 남는 시간 비율 `fracdt`를 `[0,1]`로 제한하고 `infil=vest*fracdt`를 계산하므로, 반환량은 전체 스텝에 대한 평균 침투속도다. 이어 표층 가용수 `max((hh-eps)/dt,0)`로 제한한다. 호출은 비연결·젖은 셀에서 지하수위가 바닥 아래일 때이며, 양의 `infil`은 해수→지하수 방향이다. 침투층 깊이는 양의 침투 때 `dt*infil/por`만큼 증가하고 그 외에는 리셋된다. (`groundwater.F90:1631-1643, 610-638, 283-285`; [[xbeach_groundwater]])
++
++이 노트는 위 세 수식 묶음의 대응을 기록한다. 전체 매뉴얼 수식의 검증이나 새로운 사람 승인을 뜻하지 않는다.
+--- a/models/XBeach/README.md
++++ b/models/XBeach/README.md
+@@ -27 +27 @@
+-- [매뉴얼 수식–구현 대응](manual-notes/xbeach-manual-equation-code-contracts.md): **검토본(draft-unsourced)**. (2.5)~(2.10)의 파수 보정과 B.37/C.37의 지형 갱신 부호·sourcesink 분기를 대조했다.
++- [매뉴얼 수식–구현 대응](manual-notes/xbeach-manual-equation-code-contracts.md): **검토본(draft-unsourced)**. (2.5)~(2.10)의 파수 보정, B.37/C.37의 지형 갱신, 불포화 침투식의 판본 표기·시간 이산화를 대조했다.
