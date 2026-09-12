@@ -672,6 +672,14 @@ def validate(root,here):
         output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
         check(x['sha256'][:10]+'-viewer-legend-comparators-icons-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
     check('viewer_legend_comparators_icons-no-approval',viewer_legend_comparators_icons['whole_model_read_gate']=='NOT_PASSED' and viewer_legend_comparators_icons['human_approval_issued'] is False)
+    viewer_legend_handlers_boolean=json.loads((here/'bytecode-read/viewer-legend-handlers-boolean-read.json').read_text())
+    check('viewer-legend-handlers-boolean-eleven-exact',bound(viewer_legend_handlers_boolean['prior_receipt']) and len(viewer_legend_handlers_boolean['records'])==viewer_legend_handlers_boolean['unique_classes_read']==11 and [x['instances'][0]['member'] for x in viewer_legend_handlers_boolean['records']]==['viewer/legends/GenericHeaderRenderer.class', 'viewer/legends/GenericHeaderRenderer$RendererMouseHandler.class', 'viewer/legends/OperationBooleanMenu$1.class', 'viewer/legends/OperationBooleanMenu$2.class', 'viewer/legends/OperationBooleanMenu$3.class', 'viewer/legends/OperationBooleanMenu$4.class', 'viewer/legends/OperationBooleanMenu$5.class', 'viewer/legends/OperationBooleanMenu$6.class', 'viewer/legends/OperationBooleanMenu.class', 'viewer/legends/TableColumnHandler.class', 'viewer/legends/TableHeaderHandler.class'] and viewer_legend_handlers_boolean['instances_covered']==22)
+    for x in viewer_legend_handlers_boolean['records']:
+        original=next(a for a in r['records'] if a['sha256']==x['sha256'])
+        args=['java','-m','jdk.jdeps/com.sun.tools.javap.Main','-c','-p','-s','-constants',str(root/x['class_file']['path'])]
+        output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
+        check(x['sha256'][:10]+'-viewer-legend-handlers-boolean-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
+    check('viewer_legend_handlers_boolean-no-approval',viewer_legend_handlers_boolean['whole_model_read_gate']=='NOT_PASSED' and viewer_legend_handlers_boolean['human_approval_issued'] is False)
     spec=importlib.util.spec_from_file_location('bytecode_coverage',here/'reconcile_bytecode_coverage.py')
     module=importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
