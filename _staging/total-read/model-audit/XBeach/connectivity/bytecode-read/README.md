@@ -241,3 +241,5 @@ Method는 4바이트 정수 식별자로 1을 CONNECT_COMPOSITE_STATE로 정의�
 2026-09-12 SLOG2 BufStub/IteratorOfGroupObjects 2종 전체 267줄 판독. 대리 버퍼의 경고·null/초기값 반환과 toString 캐시 변경, 최초 그룹 준비 및 그룹 전환의 hasNext 의존성을 기록했다. 누적 Java 158/413종·624경로, 잔여 Java 255종/Python 150종. 근거: `input-helpers-read.json` (XBeach connectivity/bytecode-read). 독립 의미 승인은 아니다.
 
 2026-09-12 입력 TreeNode/그림자 순회기 5종 전체 596줄 판독. 생성자의 최초 그룹 준비, 겹치지 않는 버퍼 생략, 음수 자식 수의 null 처리와 직접 반환 배열을 확인했다. 누적 Java 163/413종·634경로, 잔여 Java 250종/Python 150종. 근거: `input-treenode-read.json` (XBeach connectivity/bytecode-read). 독립 의미 승인은 아니다.
+
+2026-09-12 입력 TreeFloor/순회기 3종 전체 571줄 판독. 노드 목록의 얕은 복사와 방향 선택을 연결했다. prune의 내림차순 삭제 방향 불일치에 따른 빈 맵 접근 가능성을 정적 흐름으로 기록했으며 실제 호출 조건은 후속 확인한다. TimeBoundingBox.contains(double)는 양쪽 끝점을 포함함을 직접 재확인했다. 누적 Java 166/413종·640경로, 잔여 Java 247종/Python 150종. 근거: `input-treefloor-read.json` (XBeach connectivity/bytecode-read). 독립 의미 승인은 아니다.

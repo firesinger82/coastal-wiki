@@ -464,6 +464,14 @@ def validate(root,here):
         output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
         check(x['sha256'][:10]+'-input-treenode-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
     check('input_treenode-no-approval',input_treenode['whole_model_read_gate']=='NOT_PASSED' and input_treenode['human_approval_issued'] is False)
+    input_treefloor=json.loads((here/'bytecode-read/input-treefloor-read.json').read_text())
+    check('input-treefloor-three-exact',bound(input_treefloor['prior_receipt']) and len(input_treefloor['records'])==input_treefloor['unique_classes_read']==3 and sorted(x['instances'][0]['member'] for x in input_treefloor['records'])==['logformat/slog2/input/TreeFloor$ItrOfDrawables.class', 'logformat/slog2/input/TreeFloor$ItrOfShadows.class', 'logformat/slog2/input/TreeFloor.class'] and input_treefloor['instances_covered']==6)
+    for x in input_treefloor['records']:
+        original=next(a for a in r['records'] if a['sha256']==x['sha256'])
+        args=['java','-m','jdk.jdeps/com.sun.tools.javap.Main','-c','-p','-s','-constants',str(root/x['class_file']['path'])]
+        output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
+        check(x['sha256'][:10]+'-input-treefloor-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
+    check('input_treefloor-no-approval',input_treefloor['whole_model_read_gate']=='NOT_PASSED' and input_treefloor['human_approval_issued'] is False)
     spec=importlib.util.spec_from_file_location('bytecode_coverage',here/'reconcile_bytecode_coverage.py')
     module=importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
