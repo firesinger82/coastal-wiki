@@ -337,6 +337,7 @@ def main():
     read('bytecode-read/color-alpha-read.json')
     read('bytecode-read/category-read.json')
     read('bytecode-read/clog2-print-read.json')
+    read('bytecode-read/clog2-print-onepass-read.json')
     read('bytecode-read/coverage.json')
     formula_name = 'workbook-formula-read.json'
     if (HERE / formula_name).is_file():
