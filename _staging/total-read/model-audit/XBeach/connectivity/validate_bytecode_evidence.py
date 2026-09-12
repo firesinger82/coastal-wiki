@@ -151,6 +151,14 @@ def validate(root,here):
         output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
         check('shadow-reproduce',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
     check('shadow-no-approval',shadow['whole_model_read_gate']=='NOT_PASSED' and shadow['human_approval_issued'] is False)
+    primitive=json.loads((here/'bytecode-read/primitive-read.json').read_text())
+    check('primitive-exact',bound(primitive['prior_receipt']) and len(primitive['records'])==primitive['unique_classes_read']==1 and primitive['records'][0]['instances'][0]['member']=='base/drawable/Primitive.class' and primitive['instances_covered']==6)
+    for x in primitive['records']:
+        original=next(a for a in r['records'] if a['sha256']==x['sha256'])
+        args=['java','-m','jdk.jdeps/com.sun.tools.javap.Main','-c','-p','-s','-constants',str(root/x['class_file']['path'])]
+        output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
+        check('primitive-reproduce',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
+    check('primitive-no-approval',primitive['whole_model_read_gate']=='NOT_PASSED' and primitive['human_approval_issued'] is False)
     weights=json.loads((here/'bytecode-read/category-weight-read.json').read_text())
     expected_weights={x['sha256'] for x in r['records'] if x['instances'][0]['member'].startswith(('base/drawable/CategoryWeight','base/drawable/CategoryRatios','base/drawable/CategorySummary'))}
     check('weights-ten-exact',bound(weights['prior_receipt']) and len(weights['records'])==weights['unique_classes_read']==10 and {x['sha256'] for x in weights['records']}==expected_weights and weights['instances_covered']==60)

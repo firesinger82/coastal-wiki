@@ -315,6 +315,7 @@ def main():
     read('bytecode-read/shadow-buffer-read.json')
     read('bytecode-read/shadow-read.json')
     read('bytecode-read/category-weight-read.json')
+    read('bytecode-read/primitive-read.json')
     read('bytecode-read/coverage.json')
     formula_name = 'workbook-formula-read.json'
     if (HERE / formula_name).is_file():

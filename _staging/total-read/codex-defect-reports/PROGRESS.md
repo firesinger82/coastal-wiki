@@ -147,3 +147,5 @@ Claude Sonnet 5의 [한정 재검토](../model-audit/XBeach/HG-ADVERSARIAL-RECHE
 - XBeach Shadow 1425줄 전체 판독 및 BufForShadows 위임 연결 기록. 누적 Java 60종/348경로, 잔여 Java 353종·Python 150종. 전체 의미 승인 미발급.
 
 - XBeach category weight 계열 10종/909줄 판독. 비율 연산·직렬화·resolve 반환과 Shadow 연결 기록. 누적 Java 70종/408경로, 잔여 Java 343종·Python 150종. 전체 승인 미발급.
+
+- XBeach Primitive 전체 955줄 판독 및 Shadow 복사/집계 연결 기록. 누적 Java 71종/414경로, 잔여 Java 342종·Python 150종. 전체 승인 미발급.

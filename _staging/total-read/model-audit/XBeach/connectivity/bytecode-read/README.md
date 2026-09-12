@@ -147,3 +147,7 @@ Method는 4바이트 정수 식별자로 1을 CONNECT_COMPOSITE_STATE로 정의�
 ## Category weight 계열 판독
 
 `category-weight-read.json`은 CategoryRatios/Summary/Weight 및 내부 comparator·marker 10종의 전체 909줄을 결박한다. 비율은 float 곱셈/덧셈이며 정규화하지 않는다. 직렬화는 index(int), inclusive(float), exclusive(float), count(long)의 20바이트다. 이미 연결된 CategoryWeight의 resolveCategory도 false이므로 Shadow의 short-circuit 조건과 연결된다. comparator의 뺄셈 overflow/NaN 방어는 없다. 정상 입력에서의 도달 여부를 별도로 확인해야 한다. 누적 Java 70/413종·408경로이며 전체 gate NOT_PASSED다.
+
+## Primitive 판독 보충
+
+`primitive-read.json`은 전체 955줄과 6개 동일 SHA 경로를 결박한다. 복사 생성자의 Coord 복사와 setter의 참조 공유를 구분했다. 배열 입력 생성자는 last_vtx_idx를 설정하지 않으며, 직렬화의 vertex 수는 signed short로 축소한다. 실제 호출에서의 영향은 별도 확인 대상이다. line ID 목록은 vertex 순서와 중복을 보존하므로 shadow 집계 키와 연결된다. 누적 Java 71/413종·414경로, 전체 gate NOT_PASSED.
