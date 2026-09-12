@@ -552,6 +552,14 @@ def validate(root,here):
         output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
         check(x['sha256'][:10]+'-viewer-float-slider-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
     check('viewer_float_slider-no-approval',viewer_float_slider['whole_model_read_gate']=='NOT_PASSED' and viewer_float_slider['human_approval_issued'] is False)
+    viewer_textfield=json.loads((here/'bytecode-read/viewer-textfield-read.json').read_text())
+    check('viewer-textfield-two-exact',bound(viewer_textfield['prior_receipt']) and len(viewer_textfield['records'])==viewer_textfield['unique_classes_read']==2 and sorted(x['instances'][0]['member'] for x in viewer_textfield['records'])==['viewer/common/LabeledTextField$FieldDocumentListener.class', 'viewer/common/LabeledTextField.class'] and viewer_textfield['instances_covered']==4)
+    for x in viewer_textfield['records']:
+        original=next(a for a in r['records'] if a['sha256']==x['sha256'])
+        args=['java','-m','jdk.jdeps/com.sun.tools.javap.Main','-c','-p','-s','-constants',str(root/x['class_file']['path'])]
+        output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
+        check(x['sha256'][:10]+'-viewer-textfield-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
+    check('viewer_textfield-no-approval',viewer_textfield['whole_model_read_gate']=='NOT_PASSED' and viewer_textfield['human_approval_issued'] is False)
     spec=importlib.util.spec_from_file_location('bytecode_coverage',here/'reconcile_bytecode_coverage.py')
     module=importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
