@@ -179,3 +179,7 @@ Method는 4바이트 정수 식별자로 1을 CONNECT_COMPOSITE_STATE로 정의�
 ## TRACE converter 판독
 
 `trace-converter-read.json`은 전체 864줄을 결박한다. Composite/YCoordMap을 지원하고 static initializer에서 TraceInput을 로드한다. 도움말/미인식 옵션/위치 인자를 filespec으로 이어 붙이며 빈 문자열을 null 검사로 거르지 못한다. 정상 EOF 출력 순서는 기존 converter와 연결된다. 네이티브 입력 구현과 실행 검증은 별도다.
+
+## TRACE 입력 래퍼 판독
+
+`trace-input-read.json`은 InputLog/DobjDef 전체 236줄을 결박한다. 초기 EVENT/STATE/ARROW 제공 후 native 정수를 정적 Kind로 바꾸므로 정상 index의 identity 연결이 확인됐다. 미지 index는 null, 초기 세 개 이후 native topology 요청은 null topology로 이어질 수 있다. native 함수는 선언만 있으며 실제 파일/객체 처리 의미는 완료 처리하지 않는다. DobjDef의 shape 검사와 Category 설정도 기록했다.

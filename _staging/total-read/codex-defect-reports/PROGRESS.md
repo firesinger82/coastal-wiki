@@ -163,3 +163,5 @@ Claude Sonnet 5의 [한정 재검토](../model-audit/XBeach/HG-ADVERSARIAL-RECHE
 - XBeach InputAPI/Kind 2종·172줄 판독. 값 동등성과 converter identity 분기 연결. 누적 Java 80종/458경로, 잔여 Java 333종·Python 150종. 전체 승인 미발급.
 
 - XBeach TraceToSlog2 864줄 판독. Composite·filespec·native 경계 기록. 누적 Java 81종/462경로, 잔여 Java 332종·Python 150종. 전체 승인 미발급.
+
+- XBeach trace 입력 래퍼 2종·236줄 판독. Kind identity 연결 및 native 미판독 경계 명시. 누적 Java 83종/466경로, 잔여 Java 330종·Python 150종. 전체 승인 미발급.
