@@ -261,3 +261,5 @@ Method는 4바이트 정수 식별자로 1을 CONNECT_COMPOSITE_STATE로 정의�
 2026-09-12 viewer TopControl/TopWindow 계열 6종 전체 327줄 판독. Legend→Timeline 및 First→Legend/Preference→exit 종료 연결, 창 교체 시 남는 Control 참조와 자동 배치의 화면 크기 캐시/경계 조건을 기록했다. 이 계층에는 직접 작업 취소·로그 닫기 처리가 없으며 실제 프레임 구현은 후속 판독한다. 누적 Java 197/413종·702경로, 잔여 Java 216종/Python 150종. 근거: `viewer-topwindow-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
 
 2026-09-12 viewer ActableTextField/Alias/LabeledComboBox 3종 전체 291줄 판독. 액션 전달의 위임, 별칭의 원본 참조 보존, 콤보 Boolean 선택의 직접 형변환과 활성화 상태의 내부 위임 범위를 기록했다. 누적 Java 200/413종·708경로, 잔여 Java 213종/Python 150종. 근거: `viewer-combo-alias-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer LabeledFloatSlider 전체 299줄 판독. 내부 위치0/10000의1/9999 보정, 표시 끝점과 설정 범위의 차이, 같은 위치/변경 위치에 따른 텍스트 정규화 경로를 기록했다. 부모 텍스트 파싱은 후속 확인한다. 누적 Java 201/413종·710경로, 잔여 Java 212종/Python 150종. 근거: `viewer-float-slider-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
