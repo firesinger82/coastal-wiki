@@ -213,3 +213,5 @@ Claude Sonnet 5의 [한정 재검토](../model-audit/XBeach/HG-ADVERSARIAL-RECHE
 2026-09-12 CategoryTimeBox 계열 6종 전체 238줄 판독. 비율·색상·가시성의 원본 가중치/카테고리 위임, 네 정렬기의 시간 구간 비참조, null 가중치 미검사를 확인했다. 누적 Java 146/413종·600경로, 잔여 Java 267종/Python 150종. 근거: `category-timebox-read.json` (XBeach connectivity/bytecode-read). 독립 의미 승인은 아니다.
 
 2026-09-12 TimeAveBox 전체 672줄 판독. 비율/개수 가중 합산, 삽입 순서 중첩 계산, 계산 후 timeblock null 처리, 무필터·일회 생성·직접 반환 카테고리 배열을 확인했다. SummaryState 가시성/오래된 표시 구간 문제의 하위 연결 근거를 추가했다. 누적 Java 147/413종·602경로, 잔여 Java 266종/Python 150종. 근거: `timeave-box-read.json` (XBeach connectivity/bytecode-read). 독립 의미 승인은 아니다.
+
+2026-09-12 CategorySummaryF/CategoryWeightF 및 보조·선택 7종 전체 485줄 판독. double 개수 계산과 float 표시, NaN 개수 정렬 및 인덱스 뺄셈 한계, category 참조/캐시 인덱스 연결을 확인했다. category-timebox 기록의 F 정렬기 “이전 판독” 표현은 정수형 CategoryWeight와 혼동한 것으로 정정한다. F 본체는 이번 최초 판독이며 기존 집계에는 포함되지 않았다. 누적 Java 154/413종·616경로, 잔여 Java 259종/Python 150종. 근거: `float-statistics-read.json` (XBeach connectivity/bytecode-read). 독립 의미 승인은 아니다.

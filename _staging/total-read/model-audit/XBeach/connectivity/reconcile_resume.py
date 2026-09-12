@@ -348,6 +348,7 @@ def main():
     read('bytecode-read/summary-state-read.json')
     read('bytecode-read/category-timebox-read.json')
     read('bytecode-read/timeave-box-read.json')
+    read('bytecode-read/float-statistics-read.json')
     read('bytecode-read/coverage.json')
     formula_name = 'workbook-formula-read.json'
     if (HERE / formula_name).is_file():
