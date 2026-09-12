@@ -312,6 +312,7 @@ def main():
     read('bytecode-read/drawable-buffer-read.json')
     read('bytecode-read/lineid-method-read.json')
     read('bytecode-read/ycoord-read.json')
+    read('bytecode-read/shadow-buffer-read.json')
     read('bytecode-read/coverage.json')
     formula_name = 'workbook-formula-read.json'
     if (HERE / formula_name).is_file():

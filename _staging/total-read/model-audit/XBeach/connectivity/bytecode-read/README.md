@@ -135,3 +135,7 @@ Method는 4바이트 정수 식별자로 1을 CONNECT_COMPOSITE_STATE로 정의�
 [ycoord-read.json](ycoord-read.json)에 YCoordMap 279줄 전체를 기록했다. 행·열 수, 제목, 열 이름과 평탄 int 배열을 보관하고 Method ID를 객체로 만든다. map/label 배열을 복사하거나 크기를 검증하지 않는다. getter와 setMethods도 참조를 직접 전달한다. 따라서 LineIDMap 변환 전후의 메타데이터 배열 공유가 확인됐으며 소비자의 유효성 검사가 별도로 필요하다. 실제 프로그램은 실행하지 않았다.
 
 [coverage.json](coverage.json)은 원본 SHA와 각 직접 판독 영수증을 결속해 누적 집합을 집계한다. Java 58/413종·336경로에 직접 판독 근거가 있고 Java 355종/Python 150종은 남아 있다. 집계는 판독 기록의 존재/중복/범위 확인이며 의미 판독의 외부 승인이 아니다. 원래 추출 영수증과 archive 인벤토리의 당시 상태는 바꾸지 않는다. 전체 gate NOT_PASSED·신규 사람 승인 없음.
+
+## Shadow buffer 판독 보충
+
+`shadow-buffer-read.json`은 BufForShadows 전체 750줄 및 동일 SHA 6개 경로를 결박한다. topology와 vertex line ID 목록별 집계, category weight 위임, 입력/출력 목록과 크기 누적을 확인했다. 반복 write는 목록을 비우지 않으며 empty는 saved 상태에서만 작동한다. 정상 호출자의 순서 보장은 아직 확인하지 않았다. 누적 Java 59/413종, 342개 경로이며 Java 354종·Python 150종이 남는다.
