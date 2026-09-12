@@ -319,3 +319,5 @@ Claude Sonnet 5의 [한정 재검토](../model-audit/XBeach/HG-ADVERSARIAL-RECHE
 2026-09-12 TimelineToolBar 및 새로 고침·종료·트리 action 7종 전체1590줄 판독. 일반 toolbar는 단계0의 축소를 비활성화함을 확인해 앞선 action 단독 분석의 UI 적용 범위를 해소했다. 음수 Home 활성/처리 거부, 비삽입 Commit 버튼 경유 redraw, 환경설정 필드 적용→static 갱신→맵 갱신 오류 후 계속 redraw, Print stub·Stop dispose를 연결했다. 누적 Java373/413종·1054경로, 잔여 Java40종/Python150종. 근거: `viewer-timeline-toolbar-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
 
 2026-09-12 ActionTimelineMark/Move/Delete 3종 전체632줄 판독. 표시는 버퍼 갱신 뒤 레벨 검사, 이동은 전체 분리 후 삽입 위치 계산·확장 경로 복원, 삭제는 확인 뒤 버퍼 조회·순차 제거한다. 정상 끝의 버튼 갱신과 직접 Commit 미호출을 연결했으며 tree 내부 효과·버퍼 불변조건은 후속 판독 대상이다. 누적 Java376/413종·1060경로, 잔여 Java37종/Python150종. 근거: `viewer-timeline-edit-actions-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 YaxisTree/named_vector/YaxisTreeNode 3종 전체641줄 판독. 깊이만 비교하는 선택 버퍼·재표시 실패 전 기존 버퍼 소거·루트 및 자기 이동 대상 허용을 앞선 action과 연결했다. 마지막 leaf 깊이 기반 레벨 배열·루트 단독의 음수 확대 cursor와 명시적 canvas commit 부재를 기록했다. 누적 Java379/413종·1066경로, 잔여 Java34종/Python150종. 근거: `viewer-yaxis-tree-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.

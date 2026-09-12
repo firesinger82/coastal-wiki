@@ -1,0 +1,95 @@
+{
+  "date": "2026-09-12",
+  "attribution": "AI direct bytecode reading; not independent semantic approval.",
+  "prior_receipt": {
+    "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/disassembly-receipt.json",
+    "sha256": "1cc8b2657a74f3f5904e9d0a40648b1c98f6e031b056b7c6e19122beb632aaa8"
+  },
+  "records": [
+    {
+      "sha256": "68ae32157613185a6a7faf498c70e62bb66a10ffaa0a17eeca721353463e6c89",
+      "instances": [
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/win32/mpich/bin/jumpshot.jar",
+          "member": "viewer/zoomable/named_vector.class"
+        },
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/bin/jumpshot.jar",
+          "member": "viewer/zoomable/named_vector.class"
+        }
+      ],
+      "class_file": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/classes/68ae32157613185a6a7faf498c70e62bb66a10ffaa0a17eeca721353463e6c89.class",
+        "sha256": "68ae32157613185a6a7faf498c70e62bb66a10ffaa0a17eeca721353463e6c89"
+      },
+      "disassembly": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/disassembly/68ae32157613185a6a7faf498c70e62bb66a10ffaa0a17eeca721353463e6c89.txt",
+        "sha256": "1f5516cff5561e4cd6056cdf1fafe116884cf0a9fa57fffd3dbd7e1052fe9e4a"
+      },
+      "read_lines": [
+        1,
+        76
+      ],
+      "scope": "Three full javap classes,641 lines; YaxisTree displayed in two consecutive slices.",
+      "observation": "Complete76-line javap. Raw Vector subclass retaining constructor String name; isNameEqualTo(String) invokes storedName.equals(arg), overload invokes storedName.equals(other.name), case-sensitive/no normalization/nullname or nullother guards. Does not override Vector.equals/hashCode: name helper differs from inherited collection equality. toString if nonempty emits name+size+leafnodes wording+superVector.toString, else name wrapped in StringBuilder text. Calls size twice separately, no overall synchronized snapshot or element type validation; inherited mutable Vector stores actual userObjects from tree traversal."
+    },
+    {
+      "sha256": "42a9bfd5cf9e6d06d0f9b22a2691afc2f6eca15aab37f0f32c86c83b817bfc30",
+      "instances": [
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/win32/mpich/bin/jumpshot.jar",
+          "member": "viewer/zoomable/YaxisTree.class"
+        },
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/bin/jumpshot.jar",
+          "member": "viewer/zoomable/YaxisTree.class"
+        }
+      ],
+      "class_file": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/classes/42a9bfd5cf9e6d06d0f9b22a2691afc2f6eca15aab37f0f32c86c83b817bfc30.class",
+        "sha256": "42a9bfd5cf9e6d06d0f9b22a2691afc2f6eca15aab37f0f32c86c83b817bfc30"
+      },
+      "disassembly": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/disassembly/42a9bfd5cf9e6d06d0f9b22a2691afc2f6eca15aab37f0f32c86c83b817bfc30.txt",
+        "sha256": "44c7b44379976093932e4a100014b85dbcf2bd421d84546a4870413aed9e6600"
+      },
+      "read_lines": [
+        1,
+        529
+      ],
+      "scope": "Three full javap classes,641 lines; YaxisTree displayed in two consecutive slices.",
+      "observation": "Complete529-line javap in consecutive1–270/271–529 slices. Extends JTree; constructor passes supplied DefaultMutableTreeNode to superclass, retains same tree_root, sets JTree.lineStyle Angled. No custom model/expansion/selection listeners registered, no model-replacement override or buffer initialization. init explicitly update_leveled_paths then editable=true; before renew buffer listnull and buf_level default0.\ngetNamedVtr(path) captures last DefaultMutableTreeNode.toString as new named_vector name. Only when path NOT expanded recursively visits CHILDREN: leaf child adds actual userObject; nonleaf child recurses. Expanded path returns empty named vector, selected leaf also empty because no children; not a singleton of selected leaf. Descendant traversal includes all leaves regardless individual visibility/search/category flags, no dedup/copy of payloads/null guards.\nupdate_leveled_paths sets max_level from tree_root.getLastLeaf().getLevel(), NOT maximum depth over all leaves. Allocates ArrayList[max_level+1], index0 capacity1/rest default, breadth-first traverses all nodes, builds TreePaths from actual node.getPath and indexes by node.getLevel. An irregular tree with a deeper nonlast leaf can overflow the allocated level array; normal balanced map construction not assumed broken before YaxisMaps read. Retained root may diverge from later inherited setModel/root changes. No checks for detached/nonlevel0 root.\nExpansion cursor scan starts boolean allExpanded=true and i0; scans each level while i<max_level and boolean true, conjunction of JTree.isExpanded over paths, stops inner loop at first false but increments i after processed level. Finally next_expanding_level = max_level if i>max_level else i-1. Hence first notfullyexpanded level k yields k; if every tested level0..max-1 expanded, cursor max-1 (not max); max_level0 yields -1. isLevelExpandable simply cursor<max; expandLevel guard then indexes leveled_paths[cursor], expands collapsed paths, increments cursor if <max (else setsmax). Thus root-only max0→cursor-1 passes expandable then negative array index possible. No lower-bound guard or recalc after inherited individual expand/collapse. isLevelCollapsable tests cursor-1>=0; collapseLevel guarded, collapses expanded paths at cursor-1 then sets cursor to that level. These methods themselves have guards, resolving previous action receipt: actions lack check but delegates enforce these cursor-based predicates. No redraw/Commit/map calls here.\nrenewCutAndPasteBuffer FIRST buf_level=-1 then clear existing list or createArrayList. isCutAndPasteBufferUniformlyLeveled null/empty returnsTRUE WITHOUT setting level; nonempty uses current last node.getLevel, compares every node, mismatch false with unchangedlevel, allsame storesfirstlevel. Depth is actual node ancestry, not TreePath component count, not same parent. No root/self-target/dedup/attachment/model-membership checks; same-depth selection cannot include distinct ancestor+descendant in an intact tree. isPathLevelSameAsThatOfCutAndPasteBuffer compares storedlevel to current targetnodelevel only. addToBuffer does nothing if listnull; otherwise appends supplied pathrefs in input order, duplicates allowed, no level check/update and nullarray unchecked. getFromBuffer returnsNULL when uninitialized; otherwise builds fresh TreePath[] via intermediateObject[] retaining path/node identities. clearBuffer empties only, preserves buf_level.\nConnection to Mark: renew clears OLD valid selection before mixed-level selection fails; Mark remains enabled after success, so remarking mixed depths leaves empty buffer while prior Move/Delete button enablement is untouched. Subsequent Move warns empty; Delete asks confirmation then warns empty. Successful root-only Mark depth0 is allowed; removal cannot safely assume parent. Target being one marked same-level node is admitted by depth check, confirming Move can detach target before parent.getIndex(target)+1 calculation (ordinary DefaultMutableTreeNode returns-1 then base0). These are static call-chain observations, no GUI execution. Normal Mark ensures list exists before Delete, so direct Delete null dereference is not claimed inevitable UI behavior.\nupdate_leveled_paths only builds paths/cursor; no custom listener or explicit canvas synchronization in this class. Combined Move/Delete normal tail still has no explicit Commit call; standard Swing/model events remain external behavior, so no broad claim that any redraw never occurs. Archived classes not executed or independently approved."
+    },
+    {
+      "sha256": "f407a6567af668842c119f621c1d4d351a275ef22799b12d2709e45bbc5f3b1d",
+      "instances": [
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/win32/mpich/bin/jumpshot.jar",
+          "member": "viewer/zoomable/YaxisTreeNode.class"
+        },
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/bin/jumpshot.jar",
+          "member": "viewer/zoomable/YaxisTreeNode.class"
+        }
+      ],
+      "class_file": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/classes/f407a6567af668842c119f621c1d4d351a275ef22799b12d2709e45bbc5f3b1d.class",
+        "sha256": "f407a6567af668842c119f621c1d4d351a275ef22799b12d2709e45bbc5f3b1d"
+      },
+      "disassembly": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/disassembly/f407a6567af668842c119f621c1d4d351a275ef22799b12d2709e45bbc5f3b1d.txt",
+        "sha256": "acb5109701b734c8bc0126e4425902abced7e64ccf05e394349a29e322fb2927"
+      },
+      "read_lines": [
+        1,
+        36
+      ],
+      "scope": "Three full javap classes,641 lines; YaxisTree displayed in two consecutive slices.",
+      "observation": "Complete36-line javap. DefaultMutableTreeNode subclass ctor delegates userObject. getChild(Object) scans direct children in enumeration order, unchecked cast every child to YaxisTreeNode; first child.userObject.equals(request) returns child else null. No recursive search, insertion, cloning or uniqueness check; null stored userObject throws, null requested value follows userObject.equals behavior. Duplicate equal children select first, mixed child types can fail."
+    }
+  ],
+  "unique_classes_read": 3,
+  "instances_covered": 6,
+  "whole_model_read_gate": "NOT_PASSED",
+  "human_approval_issued": false
+}
