@@ -315,3 +315,5 @@ Claude Sonnet 5의 [한정 재검토](../model-audit/XBeach/HG-ADVERSARIAL-RECHE
 2026-09-12 viewer ModelTime/ScrollbarTime/TimeEvent/TimeListener 4종 전체 1331줄 판독. 화면·스크롤바 좌표 분리와 이벤트 환류, 범위 상한 제한·정밀도 경고 후 계속 진행, 새 확대 작업 뒤 redo 보존 및 확대 배율/실제 범위 차이를 연결했다. 누적 Java 353/413종·1014경로, 잔여 Java 60종/Python 150종. 근거: `viewer-time-model-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
 
 2026-09-12 viewer 확대·이동·검색 action 및 ToolBarStatus 13종 전체 618줄 판독. 확대 단계 0의 축소 허용과 음수 단계 Home 거부, 경고 뒤 버튼 갱신, 수평 block/2·수직 component height/2 이동, 검색 반환값 폐기를 기존 모델·viewport와 연결했다. 실제 버튼 활성화 정책은 TimelineToolBar 판독 전 유보. 누적 Java 366/413종·1040경로, 잔여 Java 47종/Python 150종. 근거: `viewer-navigation-actions-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 TimelineToolBar 및 새로 고침·종료·트리 action 7종 전체1590줄 판독. 일반 toolbar는 단계0의 축소를 비활성화함을 확인해 앞선 action 단독 분석의 UI 적용 범위를 해소했다. 음수 Home 활성/처리 거부, 비삽입 Commit 버튼 경유 redraw, 환경설정 필드 적용→static 갱신→맵 갱신 오류 후 계속 redraw, Print stub·Stop dispose를 연결했다. 누적 Java373/413종·1054경로, 잔여 Java40종/Python150종. 근거: `viewer-timeline-toolbar-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.

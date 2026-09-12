@@ -832,6 +832,14 @@ def validate(root,here):
         output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
         check(x['sha256'][:10]+'-viewer-navigation-actions-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
     check('viewer_navigation_actions-no-approval',viewer_navigation_actions['whole_model_read_gate']=='NOT_PASSED' and viewer_navigation_actions['human_approval_issued'] is False)
+    viewer_timeline_toolbar=json.loads((here/'bytecode-read/viewer-timeline-toolbar-read.json').read_text())
+    check('viewer-timeline-toolbar-seven-exact',bound(viewer_timeline_toolbar['prior_receipt']) and len(viewer_timeline_toolbar['records'])==viewer_timeline_toolbar['unique_classes_read']==7 and [x['instances'][0]['member'] for x in viewer_timeline_toolbar['records']]==['viewer/zoomable/ActionPptyPrint.class', 'viewer/zoomable/ActionPptyRefresh.class', 'viewer/zoomable/ActionPptyStop.class', 'viewer/zoomable/ActionYaxisTreeCollapse.class', 'viewer/zoomable/ActionYaxisTreeCommit.class', 'viewer/zoomable/ActionYaxisTreeExpand.class', 'viewer/timelines/TimelineToolBar.class'] and viewer_timeline_toolbar['instances_covered']==14)
+    for x in viewer_timeline_toolbar['records']:
+        original=next(a for a in r['records'] if a['sha256']==x['sha256'])
+        args=['java','-m','jdk.jdeps/com.sun.tools.javap.Main','-c','-p','-s','-constants',str(root/x['class_file']['path'])]
+        output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
+        check(x['sha256'][:10]+'-viewer-timeline-toolbar-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
+    check('viewer_timeline_toolbar-no-approval',viewer_timeline_toolbar['whole_model_read_gate']=='NOT_PASSED' and viewer_timeline_toolbar['human_approval_issued'] is False)
     spec=importlib.util.spec_from_file_location('bytecode_coverage',here/'reconcile_bytecode_coverage.py')
     module=importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
