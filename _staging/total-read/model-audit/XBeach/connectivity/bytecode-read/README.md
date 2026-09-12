@@ -20,4 +20,14 @@ RuntimeExecCommand는 JVM 경로·JAR 경로를 하나의 인수로 추가하고
 
 BufArrayOutputStream은 내부 배열을 직접 반환한다. BufArrayPipedStream은 resize 시점의 배열을 입력과 공유하고, 기본 생성 후 reset에는 null guard가 없다. 용량 확장 이후 호출자 사용은 후속 연결 분석 범위다.
 
-호출자 부분 대조: [Header 역어셈블리](disassembly/4f0bfbf7d7965f95c8cf6740727e53fa0088a2ee7455328f72d07cceff8b1b08.txt) 162–185줄은 SLOG 2.0.6의 길이 10으로 제한 읽기 후 즉시 다음 short를 읽는다. 507–528줄은 같은 문자열로 헤더 크기를 계산한다. 저장된 길이가 제한보다 크다면 초과 바이트가 다음 필드로 넘어가는 조건을 코드에서 추론할 수 있다. Header 전체를 읽었다고 집계하지 않는다. 원본 프로그램과 tmpfile 데모는 실행하지 않았다.
+호출자 부분 대조: [Header 역어셈블리](disassembly/4f0bfbf7d7965f95c8cf6740727e53fa0088a2ee7455328f72d07cceff8b1b08.txt) 162–185줄은 SLOG 2.0.6의 길이 10으로 제한 읽기 후 즉시 다음 short를 읽는다. 507–525줄은 같은 문자열로 헤더 크기를 계산한다. 저장된 길이가 제한보다 크다면 초과 바이트가 다음 필드로 넘어가는 조건을 코드에서 추론할 수 있다. 이 부분 대조 시점에는 Header 전체 판독으로 집계하지 않았다. 원본 프로그램과 tmpfile 데모는 실행하지 않았다.
+
+## SLOG2 헤더와 디렉토리 7종
+
+[slog2-header-read.json](slog2-header-read.json)의 각 원본 SHA·역어셈블리 전체 행 범위·관측에 근거한다. Header, FileBlockPtr, Const, CategoryMap, LineIDMapList, TreeDirValue, TreeDir의 전체 표시 내용을 읽었다. 누적 Java 20/413종이며 393종과 Python 150종은 남아 있다.
+
+Header는 버전, 자식 수(short), leaf 크기(int), 최대 깊이(short), 버퍼 크기(int), 일곱 블록 포인터를 순서대로 쓴다. FileBlockPtr는 long 위치와 int 크기로 12바이트다. Header의 BYTESIZE 계산값은 108이며 버전 문자열의 실제 저장 바이트 수는 기존 입출력 구현의 인코딩에 의존한다. 형식 확인은 SLOG 2 접두부, 호환 메시지는 SLOG 2.0.6 완전 일치 여부를 사용한다. 헤더 읽기 자체에는 버전 거부나 숫자 범위 검사가 없다.
+
+CategoryMap은 범주 index로 map을 구성하고 미사용 범주 제거 메서드를 제공한다. LineIDMapList는 목록 순서대로 읽고 쓴다. TreeDir는 노드 ID와 시간 경계/블록 포인터 값을 연결한다. 세 컨테이너 모두 readObject가 기존 내용을 먼저 지우지 않으며 음수 개수에 명시적 오류를 내지 않는다. TreeDir의 전용 put은 possible-root이고 깊이가 더 클 때 root를 복사해 갱신한다. 상속된 map 수정 경로의 root 일관성은 이 클래스에 보완 코드가 없다.
+
+Const의 버전 이력은 원본에 실린 호환성 설명으로 읽었다. 실제 호환성 시험으로 간주하지 않는다. TreeNodeID·TimeBoundingBox·Category·LineIDMap 내부와 파일 입력 진입점의 검증 순서는 후속 판독 대상이다. 전체 gate NOT_PASSED, 신규 사람 승인 없음.

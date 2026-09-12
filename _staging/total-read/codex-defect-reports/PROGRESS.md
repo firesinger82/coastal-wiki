@@ -119,3 +119,5 @@ Claude Sonnet 5의 [한정 재검토](../model-audit/XBeach/HG-ADVERSARIAL-RECHE
 2026-09-12 바이트코드 판독 시작: 아카이브 unread 1,284경로를 Java 413종/Python 150종에 결속했다. Java 87,653줄 역어셈블리 자료를 저장하고 launcher 4종의 전체 표시 명령을 직접 읽어 동일 SHA 12경로에 연결했다. Java 409종·Python 150종은 미판독. 전체 gate NOT_PASSED·GOAL active. [근거](../model-audit/XBeach/connectivity/bytecode-read/README.md).
 
 2026-09-12 base/io 9종 465줄 직접 판독·54경로 결속. 누적 Java 13/413종(66경로), 나머지 Java 400종/Python 150종 미판독. 문자열 길이·빈 값 반환·제한 읽기 동작 및 Header 호출 구간을 기록했다. 전체 gate NOT_PASSED·GOAL active. [근거](../model-audit/XBeach/connectivity/bytecode-read/base-io-read.json).
+
+2026-09-12 SLOG2 헤더·디렉토리 7종 전체 판독: 저장 필드 순서, 버전 검사 분리, map/list 재읽기와 root 갱신 범위를 기록했다. 누적 Java 20/413종·남은 Java 393종/Python 150종. 전체 gate NOT_PASSED·GOAL active. [근거](../model-audit/XBeach/connectivity/bytecode-read/slog2-header-read.json).
