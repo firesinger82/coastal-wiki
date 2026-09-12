@@ -119,3 +119,13 @@ DrawnBox는 head/tail의 이전 픽셀 위치를 보관한다. State는 폭 t-h�
 쓰기 전 시작 시각 정렬을 요청하지만 reorder는 기록된 comparator와 다를 때만 실제 정렬한다. add는 정렬 상태를 무효화하지 않으므로 쓰기 후 항목 추가 같은 호출 순서는 후속 확인이 필요하다. add는 시간 경계도 늘리지 않는다. empty는 저장 완료 플래그가 있을 때만 비우며 ID·시간·파일 위치는 유지한다.
 
 읽기는 목록을 교체하고 범주를 연결하지만 total_bytesize를 먼저 초기화하지 않는다. 알 수 없는 태그는 오류 출력 후 반복을 계속하며 payload 길이를 건너뛰는 처리가 없다. 입력은 두 목록 모두 composite 태그를 허용하지만 getNumOfPrimitives는 nestless의 개수를 그대로 센다. 소스 수준의 조건과 가정이며 실제 잘못된 로그나 반복 사용을 시험한 결과는 아니다. Primitive/Composite의 내부 IO 및 상위 호출 흐름은 후속 판독 대상이다. 전체 gate NOT_PASSED·신규 사람 승인 없음.
+
+## 행 계층 매핑과 Method
+
+[lineid-method-read.json](lineid-method-read.json)에 LineIDMap 977줄·Method 122줄 전체와 12경로를 기록했다. 누적 Java 57/413종·330경로, 남은 Java 356종/Python 150종이다.
+
+LineIDMap은 LineID → 계층별 Integer 배열의 TreeMap이다. 저장은 title, 계층 수, 각 열 이름, 매핑 수, 각 LineID와 계층 값, Method 수(short)와 Method 목록 순이다. 읽기는 기존 map을 지우지 않고 put하며 같은 키는 대체한다. 이전 BufForObjects의 identity map 생성은 계층 수 1에 id → [id]를 넣는 특수 경우와 연결된다.
+
+YCoordMap에서 가져올 때 열 이름·평탄 배열 크기가 예상과 다르면 경고를 내지만 변환은 계속한다. 반대 변환은 예상 크기로 배열을 할당하고 실제 값 배열 길이만큼 써서, 부족하면 마지막에 명시적 예외를 내고 초과는 그 전에 배열 경계를 넘을 수 있다. 일반 writer는 실제 배열 길이 대신 계층 수만큼 쓴다는 차이가 있다. 입력 유효성 문제의 실제 발생 여부는 시험하지 않았다.
+
+Method는 4바이트 정수 식별자로 1을 CONNECT_COMPOSITE_STATE로 정의한다. 연결 동작 자체의 구현은 이 클래스에 없다. 원본 main의 임시 파일 읽기/쓰기 데모는 실행하지 않았으며 YCoordMap과 실제 연결 호출은 후속 판독 대상이다. 전체 gate NOT_PASSED·신규 사람 승인 없음.

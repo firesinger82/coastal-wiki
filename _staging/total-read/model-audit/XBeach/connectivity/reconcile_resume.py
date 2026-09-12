@@ -310,6 +310,7 @@ def main():
     read('bytecode-read/info-value-read.json')
     read('bytecode-read/nesting-drawn-read.json')
     read('bytecode-read/drawable-buffer-read.json')
+    read('bytecode-read/lineid-method-read.json')
     formula_name = 'workbook-formula-read.json'
     if (HERE / formula_name).is_file():
         formula = read(formula_name)

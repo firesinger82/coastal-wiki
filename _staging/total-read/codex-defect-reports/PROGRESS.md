@@ -137,3 +137,5 @@ Claude Sonnet 5의 [한정 재검토](../model-audit/XBeach/HG-ADVERSARIAL-RECHE
 2026-09-12 NestingStacks/DrawnBox/DrawnBoxSet 전체 판독: 스택 포함 조건과 계수 반환, 1픽셀 비교 규칙 및 행별 저장 구조를 기록했다. 누적 Java 52/413종. 전체 gate NOT_PASSED·GOAL active. [근거](../model-audit/XBeach/connectivity/bytecode-read/nesting-drawn-read.json).
 
 2026-09-12 SLOG2 객체 버퍼 3종 전체 판독: 34바이트 공통 헤더와 두 목록 IO, 정렬 상태/크기 누계/태그 처리 조건을 기록했다. 누적 Java 55/413종. 전체 gate NOT_PASSED·GOAL active. [근거](../model-audit/XBeach/connectivity/bytecode-read/drawable-buffer-read.json).
+
+2026-09-12 LineIDMap/Method 전체 판독: 계층 배열 매핑, YCoordMap 변환의 크기 처리, 직렬화와 Method 식별자를 기록했다. 누적 Java 57/413종. 전체 gate NOT_PASSED·GOAL active. [근거](../model-audit/XBeach/connectivity/bytecode-read/lineid-method-read.json).

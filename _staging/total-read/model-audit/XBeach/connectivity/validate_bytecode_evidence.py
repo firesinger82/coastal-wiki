@@ -118,5 +118,13 @@ def validate(root,here):
         output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
         check(x['sha256'][:10]+'-buffer-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
     check('buffers-no-approval',buffers['whole_model_read_gate']=='NOT_PASSED' and buffers['human_approval_issued'] is False)
+    lineids=json.loads((here/'bytecode-read/lineid-method-read.json').read_text())
+    check('lineids-two-exact',bound(lineids['prior_receipt']) and len(lineids['records'])==lineids['unique_classes_read']==2 and {x['instances'][0]['member'] for x in lineids['records']}=={'logformat/slog2/LineIDMap.class','base/drawable/Method.class'} and lineids['instances_covered']==12)
+    for x in lineids['records']:
+        original=next(a for a in r['records'] if a['sha256']==x['sha256'])
+        args=['java','-m','jdk.jdeps/com.sun.tools.javap.Main','-c','-p','-s','-constants',str(root/x['class_file']['path'])]
+        output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
+        check(x['sha256'][:10]+'-lineid-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
+    check('lineids-no-approval',lineids['whole_model_read_gate']=='NOT_PASSED' and lineids['human_approval_issued'] is False)
     check('no-approval',all(x['whole_model_read_gate']=='NOT_PASSED' and x['human_approval_issued'] is False for x in (r,read)))
     return checks
