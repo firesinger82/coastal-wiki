@@ -12,7 +12,7 @@ verification_date: 2026-04
 
 ## Scope
 
-Q3D activation via `q3d=1` (or auto with `form=FORM_VANRIJN1993`), `vsm_u_XB.f90` building vertical sigma profiles with log + boundary-layer + upper regions, **Rouse-weighted** (not depth-averaged) sediment velocity `ue_sed/ve_sed`, vertical mass-flux/Stokes correction in the profile, the depth-averaged 2DH transport machinery still in `transus` (Q3D feeds different velocities, doesn't replace `par%sus/par%bed`), the Van Rijn 1993 vertical concentration integration over `kmax` layers, and when Q3D justifies the cost (surf-zone undertow, near-bed-concentrated suspended load, asymmetry on vertically structured velocity).
+Q3D parameter loading via `q3d=1` or `form=FORM_VANRIJN1993`, with flow-profile execution restricted to `nz>1` and `form/=FORM_VANRIJN1993` (`params.F90:1139-1153`; `flow_timestep.F90:956-986`), `vsm_u_XB.f90` building vertical sigma profiles with log + boundary-layer + upper regions, **Rouse-weighted** (not depth-averaged) sediment velocity `ue_sed/ve_sed`, vertical mass-flux/Stokes correction in the profile, the depth-averaged 2DH transport machinery still in `transus` (Q3D feeds different velocities, doesn't replace `par%sus/par%bed`), the Van Rijn 1993 vertical concentration integration over `kmax` layers, and when Q3D justifies the cost (surf-zone undertow, near-bed-concentrated suspended load, asymmetry on vertically structured velocity).
 
 ## Source basis
 
@@ -30,7 +30,9 @@ When `q3d=1` OR `form == FORM_VANRIJN1993`, reads Q3D parameters: `vonkar, vicmo
 
 Sets `par%nz = par%kmax`. If Q3D inactive: `par%kmax = 1` for allocation compatibility (`:1146-1152`).
 
-**Switch in flow**: `par%nz > 1` → calls `vsm_u_XB`; otherwise `s%ue_sed = s%ue, s%ve_sed = s%ve` (depth-averaged) (`flow_timestep.F90:957-985`).
+**Switch in flow**: `par%nz > 1 .and. par%form /= FORM_VANRIJN1993` → calls `vsm_u_XB` in wet cells; otherwise `s%ue_sed = s%ue, s%ve_sed = s%ve` (depth-averaged). Van Rijn 1993 loads the shared parameters but explicitly takes this fallback; its vertical concentration integration remains separate (`flow_timestep.F90:956-986`; `morphevolution.F90:1748-1757,1815-1830`).
+
+`nz` also has a separate input (default 1) before the Q3D parameter block. With `q3d=1`, `kmax=1` prevents the profile call. With `q3d=0` and a different formula, an explicit `nz>1` can satisfy the flow guard; this source observation does not establish that every such configuration has consistent allocation or is supported (`params.F90:245,1139-1153`; `flow_timestep.F90:956-986`).
 
 ## B. vsm_u_XB vertical structure
 
@@ -129,7 +131,7 @@ For asymmetric wave currents, XBeach adds skewness/asymmetry velocity `s%ua` via
 |---|---|
 | Standard surf-zone storm | `q3d=1, kmax=20-50` |
 | Plain 2DH (cheap) | `q3d=0` (default) |
-| Van Rijn 1993 transport | Auto Q3D enabled (or set `q3d=1`) |
+| Van Rijn 1993 transport | Shared `kmax` parameters load automatically; `vsm_u_XB` is excluded and vertical concentration integration runs separately (`params.F90:1139-1153`; `flow_timestep.F90:956-986`; `morphevolution.F90:1748-1830`) |
 | Soulsby-Van Rijn (default) | `q3d=0` (Q3D not required) |
 | Long-term morfac | Cost prohibitive — verify Q3D really needed |
 | Validation of vertical concentration profile | `q3d=1, kmax=50+`, output `ccg` |
@@ -148,8 +150,8 @@ For asymmetric wave currents, XBeach adds skewness/asymmetry velocity `s%ua` via
 
 - ▢ Setting `q3d=1` thinking it changes `par%sus/par%bed` — those switches unchanged.
 - ▢ Comparing 2DH and Q3D results expecting same depth-averaged transport — Q3D feeds different effective velocity.
-- ▢ Setting `kmax=1` thinking it's depth-averaged — same as Q3D off.
-- ▢ Running Q3D with `form != FORM_VANRIJN1993` and expecting vertical concentration — only Van Rijn 1993 has vertical concentration integration.
+- ▢ Expecting a vertical velocity profile with `q3d=1, kmax=1` — `nz=1` takes the depth-averaged velocity fallback (`params.F90:1147`; `flow_timestep.F90:957-986`).
+- ▢ Equating shared Q3D parameter loading with the same solver path — Van Rijn 1993 excludes `vsm_u_XB` but performs a separate vertical concentration integration (`flow_timestep.F90:956-986`; `morphevolution.F90:1748-1830`).
 - ▢ Memory blow-up with `kmax > 100` in 2D — cubic scaling.
 
 ## References
@@ -157,6 +159,10 @@ For asymmetric wave currents, XBeach adds skewness/asymmetry velocity `s%ua` via
 - Van Rijn 1993 (Sediment Transport, Parts I-III).
 - Rouse 1937 (suspended load profile).
 - Source: paths above.
+
+## 2026-09-12 source correction
+
+The activation condition, Van Rijn 1993 decision row and related pitfalls were reconciled with the current local source guard. Claude's read-only adversarial review supported the dispatch distinction; this correction does not issue a new human approval or change the original verification record. [Review and responses](../../../_staging/total-read/model-audit/XBeach/connectivity/physics/resolution-20260912/review-response.json).
 
 ## Provenance
 
