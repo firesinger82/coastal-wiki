@@ -139,3 +139,7 @@ Method는 4바이트 정수 식별자로 1을 CONNECT_COMPOSITE_STATE로 정의�
 ## Shadow buffer 판독 보충
 
 `shadow-buffer-read.json`은 BufForShadows 전체 750줄 및 동일 SHA 6개 경로를 결박한다. topology와 vertex line ID 목록별 집계, category weight 위임, 입력/출력 목록과 크기 누적을 확인했다. 반복 write는 목록을 비우지 않으며 empty는 saved 상태에서만 작동한다. 정상 호출자의 순서 보장은 아직 확인하지 않았다. 누적 Java 59/413종, 342개 경로이며 Java 354종·Python 150종이 남는다.
+
+## Shadow 판독 보충
+
+`shadow-read.json`은 Shadow 전체 1425줄과 동일 SHA 6개 경로를 결박한다. 객체 수 가중 평균, 병합 전후 기간에 따른 비율 재조정, 상태 exclusion 계산 후 임시 자료 해제, 직렬화와 preview 호출을 확인했다. output map의 toString에는 Object[]를 CategoryWeight[]로 cast하는 경로가 있다. 정상 호출에서의 도달 여부와 CategoryWeight/Primitive 내부는 별도 확인 대상이다. 누적 Java 60/413종·348경로이며 전체 gate는 NOT_PASSED다.

@@ -143,3 +143,5 @@ Claude Sonnet 5의 [한정 재검토](../model-audit/XBeach/HG-ADVERSARIAL-RECHE
 2026-09-12 YCoordMap 전체 판독 및 영수증 기반 누적 집계 추가. Java 58/413종·336경로 판독 근거, Java 355종/Python 150종 미판독. 전체 gate NOT_PASSED·GOAL active. [근거](../model-audit/XBeach/connectivity/bytecode-read/coverage.json).
 
 - XBeach BufForShadows 750줄 판독: 집계 키, 병합 크기, write/empty 상태 의존성을 기록했다. 누적 Java 59종/342개 경로, 잔여 Java 354종·Python 150종. 전체 gate NOT_PASSED.
+
+- XBeach Shadow 1425줄 전체 판독 및 BufForShadows 위임 연결 기록. 누적 Java 60종/348경로, 잔여 Java 353종·Python 150종. 전체 의미 승인 미발급.

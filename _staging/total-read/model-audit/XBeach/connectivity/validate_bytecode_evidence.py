@@ -143,6 +143,14 @@ def validate(root,here):
         output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
         check('shadow_buffer-reproduce',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
     check('shadow_buffer-no-approval',shadow_buffer['whole_model_read_gate']=='NOT_PASSED' and shadow_buffer['human_approval_issued'] is False)
+    shadow=json.loads((here/'bytecode-read/shadow-read.json').read_text())
+    check('shadow-exact',bound(shadow['prior_receipt']) and len(shadow['records'])==shadow['unique_classes_read']==1 and shadow['records'][0]['instances'][0]['member']=='base/drawable/Shadow.class' and shadow['instances_covered']==6)
+    for x in shadow['records']:
+        original=next(a for a in r['records'] if a['sha256']==x['sha256'])
+        args=['java','-m','jdk.jdeps/com.sun.tools.javap.Main','-c','-p','-s','-constants',str(root/x['class_file']['path'])]
+        output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
+        check('shadow-reproduce',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
+    check('shadow-no-approval',shadow['whole_model_read_gate']=='NOT_PASSED' and shadow['human_approval_issued'] is False)
     spec=importlib.util.spec_from_file_location('bytecode_coverage',here/'reconcile_bytecode_coverage.py')
     module=importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
