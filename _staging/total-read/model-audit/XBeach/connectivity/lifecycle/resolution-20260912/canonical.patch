@@ -1,0 +1,115 @@
+--- /dev/null
++++ b/models/XBeach/source-analysis/xbeach-lifecycle-state-contracts.md
+@@ -0,0 +1,74 @@
++---
++title: "XBeach 초기화·hotstart·BMI·종료 상태 계약"
++canonical_source: self
++citation_status: draft-unsourced
++note_author: "Codex"
++note_date: 2026-09-12
++verification_method: "동결 모델 소스 교차 추적과 오류 종료 최소 재현; 새 연결 주장 사람 검토 대기"
++---
++
++AI가 작성한 모델 연결 검토본이다. 아래 12건은 서로 다른 상태 계약이며 12개 신규 결함을 뜻하지 않는다. 원본 솔버를 수정하거나 새 사람 승인을 발급하지 않았다. 인용 행은 `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/` 기준으로 원본 바이트를 LF로 나눈 행 번호이며 CRLF의 CR도 근거 원문에 보존한다. 다른 경로는 별도로 적는다. [재판정 원장](../../../_staging/total-read/model-audit/XBeach/connectivity/lifecycle/resolution-20260912/adjudication.json)에 원문·SHA를 고정했다.
++
++## 확인한 진입점
++
++| 진입점 | 코어 연결 | 빌드·호출 근거 |
++|---|---|---|
++| 독립 실행 파일 | `init → executestep/outputext → final` | `models/XBeach/raw/source_code/trunk/src/xbeach/xbeach.F90:19-33`; 같은 디렉터리 `Makefile.am:1-14` |
++| BMI C API | `initialize/update/finalize`가 코어 함수를 호출 | `xbeach_bmi.f90:35-78`; 라이브러리 `Makefile.am:3-60` |
++| 기존 dynamic C API | C 이름 `init/executestep/outputext/finalize` | `libxbeach_dynamic.F90:12-38`; `xbeachlibrary_dynamic.vfproj:169-173` |
++| XBeach Python wrapper | `init/executestep/outputext` 이름의 라이브러리 함수를 호출 | `models/XBeach/raw/source_code/trunk/src/pybeach/xbeach/libxbeach.py:61-72` |
++
++Python wrapper의 `init` 이름과 BMI의 `initialize` 이름은 같지 않다. 위 표는 이번 상태 계약을 읽는 네 인터페이스 계열의 대응이며 모든 빌드 구성·도달 파일의 전수 검증을 뜻하지 않는다.
++
++## 입력·초기화·재시작 (SC-001~005)
++
++코어 `par/tpar/s/sglobal/n/it/error`는 `save` 모듈 상태이며, 진입점에 인스턴스 handle이 없다. `init()`은 `error/n/it`를 다시 설정하지만, `final()`은 전체 상태 배열을 해제하거나 `execute_counter`를 초기화하지 않는다. `grid_bathy`의 배열 할당도 반복 초기화 guard가 없다. 따라서 동일 로드 인스턴스의 `final → init`을 새 모델 생성과 같은 계약으로 취급할 수 없다. 과거 library 설계 문서도 종료 단계의 deallocation을 미완 사항으로 적는다. (`libxbeach.F90:10-30,75-104,321-340`; `initialize.F90:57-71`; `loopcounters.F90:1-7`; `models/XBeach/raw/source_code/trunk/doc/reports/libxbeach.tex:92-94`)
++
++BMI `initialize(configfile)`는 C 문자열을 변환한 뒤 사용하지 않고 `init()`을 호출한다. 실제 입력은 작업 디렉터리의 `params.txt`다. XBeach의 Python wrapper는 생성자에서 작업 디렉터리를 바꾸지만, 이는 BMI 인수로 파일을 선택하는 기능과는 별개다. (`xbeach_bmi.f90:43-57`; `libxbeach.F90:99-104`; `params.F90:50-59`; `models/XBeach/raw/source_code/trunk/src/pybeach/xbeach/libxbeach.py:51-60`)
++
++새 인스턴스의 `hotstart` 기본값은 `-123`이다. `GRIDFORM_XBEACH`에서 `setbathy!=1`이면 이 값을 먼저 검사하여 `depfile`을 요구하고, `hotstart=1` 입력은 뒤에서 읽는다. `GRIDFORM_DELFT3D`에는 별도로 무조건 `depfile`을 요구하는 분기가 있다. 따라서 `setbathy=1` 예외를 모든 격자 형식에 일반화하지 않는다. (`params.def:88-93`; `params.F90:139-167,193-199,311-315`)
++
++hotstart 배열은 **변수별 formatted 텍스트 파일 `hotstart_<변수><6자리 번호>.dat`**에서 읽는다. `hotstart_init_1`이 `zs/zb/uu/vv`를 읽은 뒤 `flow_init`은 hotstart 수위를 보존하고 `hh=max(zs-zb,eps)`를 만들지만, `uu/vv`는 먼저 0으로 덮는다. 기본 `hotstartflow=0`에서는 이 값이 유지되고, `hotstartflow=1`이면 뒤의 평형 분기가 `zs0`의 수위 경사·바람·바닥 마찰로 유속을 다시 계산한다. 이는 저장한 유속의 복원이 아니다. 뒤의 `hotstart_init_2`가 읽는 `umean/vmean`은 별도 배열이며 `uu/vv`를 다시 복원하지 않는다. 이후 유동 계산이 속도를 생성할 수 있다는 사실은 초기화 중 저장 속도 복원을 뜻하지 않는다. (`initialize.F90:1005-1051,1076-1138,1699-1779,1781-1803,1829-1853`; `libxbeach.F90:163-188`)
++
++시간은 hotstart보다 앞선 `timestep_init`에서 0으로 초기화되고, hotstart 파일의 쓰기·읽기는 시간 필드를 전달하지 않는다. **이 구현이 t=0에서 시작한다는 사실**과 **절대시각을 복원해야 한다는 설계 요구**를 구분한다. 후자의 요구는 이 경로만으로 확정하지 않는다. (`timestep.F90:143-157`; `libxbeach.F90:156-188`; `initialize.F90:1699-1803,1829-1853`; `ncoutput.F90:2055-2113`)
++
++Host가 BMI `set_current_time`을 호출하면 `morfacopt==1`일 때 `max(morfac,1)`로 나눈 값을, 그 밖에는 전달값을 `par%t`에 설정할 수 있다. 이 setter는 출력 시각의 인덱스 `tpar%it*`를 재배치하지 않으므로, 시간 대입만으로 전체 절대시각 restart 계약을 충족한다고 해석하지 않는다. (`xbeach_bmi.f90:141-156`; `timestep.F90:363-394`)
++
++## 스텝 시간과 오류 종료 (SC-006~008)
++
++`timestep`은 `t`를 전진시키고 다음 출력 시각에 맞춰 `dt/t`를 보정한다. 이후 `executestep`이 출력 flag, 경계조건, 물리 계산을 호출한다. 해당 소비자는 전진된 시간과 보정된 간격을 본다. 이 순서 자체를 모든 물리 solver의 시간 정확도 판정으로 확대하지 않는다. (`timestep.F90:710-718`; `libxbeach.F90:283-310`)
++
++정상 계산 rank의 `compute_dt`는 전달받은 `error`를 0으로 만들고, `timestep`의 시간간격 급변 보호 분기는 이를 1로 바꿀 수 있다. `executestep`은 `error!=0`이면 물리를 건너뛰지만 `n`을 증가시키고 0을 반환한다. (`timestep.F90:456-458,727-760`; `libxbeach.F90:287-316`)
++
++**오류 1의 뒤처리는 반환 가능한 오류 코드가 아니라 프로세스 종료 경로다.** `outputext()`가 `output_error()`를 호출하면 `halt_program()`에 도달한다. 직렬 분기는 `STOP 1`, MPI 분기는 abort 호출이다. 따라서 `outputext=1` 대입과 BMI `update`의 반환까지 정상적으로 돌아오는 경로로 설명하면 안 된다. (`libxbeach.F90:228-237`; `output.F90:199-214`; `xmpi.F90:1680-1705`; `xbeach_bmi.f90:67-78`)
++
++```text
++executestep: 시간 보호 error=1 → 물리 생략 → 반환 0
++outputext: output → output_error → halt_program → STOP 1 / MPI abort
++```
++
++BMI `update`가 두 반환값을 차례로 대입하는 것은 사실이지만, 현재 `executestep`이 항상 0을 반환하므로 그 대입만으로 비영(非零) step 오류가 소실된다고 판정하지 않는다. 위 프로세스 종료가 host 결합의 직접적인 제약이다. (`xbeach_bmi.f90:67-78`; `libxbeach.F90:287-316`)
++
++별도로 MPI 초기화의 processor-grid 경고 5·6은 `writelog_mpi`에서 메시지만 남기며, `init`은 모듈 `error`에 이 값을 남긴 채 0을 반환할 수 있다. 이때 dynamic API 또는 Python wrapper host가 **첫 `executestep` 전에 `outputext`를 호출하면 반환값을 대입하는 분기가 없다.** 종료되는 초기화 오류는 1~4다. BMI `update`는 먼저 step을 실행하여 `compute_dt`가 오류값을 0으로 다시 설정하므로 이 경고 경로와 구분한다. 직렬 빌드의 해당 경고 생산자는 확인되지 않았다. 미대입 반환값의 특정 수치를 예측하지 않는다. (`xmpi.F90:393-407`; `logging.F90:258-282`; `libxbeach.F90:115-153,225-237`; `libxbeach_dynamic.F90:19-24`; `models/XBeach/raw/source_code/trunk/src/pybeach/xbeach/libxbeach.py:70-72`; `timestep.F90:456-458`)
++
++원문 `outputext`·`output_error`·직렬 `halt_program`을 추출하고 출력·로그 주변만 stub으로 둔 [최소 재현](../../../_staging/total-read/model-audit/XBeach/connectivity/lifecycle/resolution-20260912/probe-results.json)에서 정상 분기는 0을 반환했고 오류 분기는 반환 표식 없이 종료 코드 1로 끝났다. 모델 전체나 MPI 실행을 재현한 것은 아니다.
++
++## 시간 간격 조회의 상태 변경 (SC-009)
++
++BMI `get_time_step`은 `par%dt`를 단순히 읽지 않고 `compute_dt()`를 호출한 뒤 반환한다. 내부의 `ilim/jlim/it/dtref`는 선언 시 초기값을 가지므로 Fortran의 암시적 SAVE 대상이다. 이전 원장의 “호출마다 새 local 값” 설명은 정정한다. 단, `compute_dt` 자체의 초기시각 분기는 `dtref=0`으로 재설정한다. getter의 `dtref`는 `timestep` 자체의 saved `dtref`와 다른 변수이므로 시간간격 급변 보호(`maxdtfac`)의 기준값에 전달되지 않는다. 다음 `timestep`은 `par%dt`도 다시 계산한다. (`xbeach_bmi.f90:178-189`; `timestep.F90:425-440,461-480,700-710`)
++
++원문 getter를 그대로 추출하고 `compute_dt`만 검사용 stub으로 대체한 재현에서도 `dtref`가 두 호출 사이 유지됐다. 이 stub의 수치는 XBeach의 실제 시간 간격이 아니다.
++
++MPI에서는 `compute_dt`가 출력 rank에서 즉시 반환하고 계산 rank에서 계산 communicator의 `allreduce`를 수행한다. 호출 host는 참여 계산 rank의 호출 정합성을 고려해야 한다. 출력 rank까지 대칭적으로 BMI getter를 호출해야 한다는 주장은 하지 않는다. 출력 rank는 아래처럼 초기화 중 출력 루프에 남는다. (`timestep.F90:440,661-673`; `libxbeach.F90:218-226`; `output.F90:144-157`)
++
++## MPI 소유권과 짧은 실행의 종료 (SC-010~011)
++
++USEMPI 라이브러리는 host MPI 초기화 여부를 확인하는 분기 없이 `MPI_Init`과 `MPI_Finalize`를 직접 호출한다. 세계 rank 0은 출력 전용, rank 1은 계산 master이며 최소 두 rank를 요구한다. 출력 rank는 최초 `init`의 `output` 안에 머물다가 최종 신호를 받으면 MPI를 종료하고 `stop`한다. 계산 rank가 보는 `init → update → finalize` 흐름을 모든 세계 rank가 동일하게 반환하는 API로 해석할 수 없다. (`xmpi.F90:201-210,229-274,307-312`; `libxbeach.F90:218-226,330-339`; `output.F90:130-157`)
++
++계산 step이 0개이면 master의 종료 로그에서 `t/n`과 `duration/(nx+1)/(ny+1)/n`의 분모가 0이다. 새 MPI 실행의 `t01`은 두 번째 `executestep` 진입 때만 대입되므로 0~1회 뒤 종료하면 미정의 값이 전달될 수 있다. `present(t01)`은 인수 존재 여부만 확인한다. 컴파일러·실행 옵션에 따라 증상이 달라지므로 모든 짧은 실행이 crash한다고 주장하지 않는다. (`logging.F90:288-330`; `loopcounters.F90:1-7`; `libxbeach.F90:269-276,330-339`)
++
++## XBeach Python wrapper의 종료 (SC-012)
++
++이 wrapper는 생성자에서 `olddir`를 저장하고 cwd를 바꾼다. `finalize()`는 `_lib`를 삭제하고 unload 루프를 돈 뒤 `shouldinitialize=True`로 바꾸지만 native `finalize()` 호출, cwd 복원, `_lib` 재생성을 하지 않는다. native BMI/dynamic `finalize`에는 코어 `final()` 호출이 있으므로 wrapper의 unload와 native 정리는 구별해야 한다. 분석 대상은 XBeach가 작성한 호출 코드이며 외부 unload 도구의 내부 구현은 포함하지 않는다. (`models/XBeach/raw/source_code/trunk/src/pybeach/xbeach/libxbeach.py:51-69,278-289`; `xbeach_bmi.f90:35-40`; `libxbeach_dynamic.F90:33-38`)
++
++이 판정은 12개 기존 상태 계약의 교차파일 정리다. 전체 entry/build/mode 및 파일 역할 대응의 누락 검사, 남은 모델 문서 대조, 새 주장에 필요한 사람 검토와는 별개다.
+--- a/models/XBeach/source-analysis/xbeach_initialize.md
++++ b/models/XBeach/source-analysis/xbeach_initialize.md
+@@ -10,0 +11,5 @@
++source_correction_date: 2026-09-12
++source_correction_by: "Codex; Claude 원문 대조 검토"
++source_correction_scope: "flow_init 수심 하한·hotstartflow 조건 및 formatted hotstart 파일 형식 정정"
++source_correction_human_approval: not-issued
++source_correction_provenance: "위 verification_*는 기존 검증 이력이며 이번 보충의 새 사람 승인을 뜻하지 않음"
+@@ -42 +47 @@
+-- **flow_init**: zs(수위)=zs0(tide), uu/vv=0, hh(수심)=max(zs−zb, 0).
++- **flow_init**: hotstart가 아닐 때 `zs=max(zb+epsilon(0.d0),zs0)`를 설정하고, `hh=max(zs−zb,par%eps)`를 계산한다. `uu/vv`는 hotstart 여부와 관계없이 먼저 0으로 초기화한다. `hotstartflow=1`이면 이어서 `zs0`의 수위 경사·바람·바닥 마찰의 평형으로 다시 계산한다 (`initialize.F90:1011-1012,1042-1044,1076-1138`).
+@@ -44 +49 @@
+-- **hotstart**: 이전 run 의 상태 netCDF 복원(restart).
++- **hotstart**: 변수별 formatted 텍스트 `hotstart_<변수><6자리 번호>.dat`에서 상태를 읽는다. NetCDF 복원 경로가 아니다 (`initialize.F90:1781-1803,1829-1853`). `hotstart_init_1 → flow_init → hotstart_init_2` 순서에서 읽은 `uu/vv`는 먼저 0으로 덮이고, `hotstartflow=1`이면 위 평형식으로 다시 계산된다. 마지막 단계는 별도 `umean/vmean`을 읽으며 저장한 `uu/vv`를 재복원하지 않는다 (`libxbeach.F90:163-188`; `initialize.F90:1707-1710,1042-1044,1076-1138,1773-1777`).
+--- a/models/XBeach/source-analysis/xbeach_infrastructure.md
++++ b/models/XBeach/source-analysis/xbeach_infrastructure.md
+@@ -10,0 +11,5 @@
++source_correction_date: 2026-09-12
++source_correction_by: "Codex; Claude 원문 대조 검토"
++source_correction_scope: "BMI 입력 파일 선택·시간간격 조회의 상태 변경·오류 종료 계약 보충"
++source_correction_human_approval: not-issued
++source_correction_provenance: "위 verification_*는 기존 검증 이력이며 이번 보충의 새 사람 승인을 뜻하지 않음"
+@@ -51,0 +57,3 @@
++- 이 소스의 `initialize(configfile)`는 인수 문자열을 사용하지 않고, 코어가 cwd의 `params.txt`를 읽는다 (`xbeach_bmi.f90:43-57`; `libxbeach.F90:99-104`).
++- `get_time_step`은 `compute_dt`를 호출하여 `par%dt`를 갱신한다. 선언 시 초기화한 local 값은 호출 사이 유지되며, USEMPI 계산 rank에서는 collective 경로에 들어간다 (`xbeach_bmi.f90:178-189`; `timestep.F90:440,456-480,661-673`).
++- 시간 보호 오류가 나면 `update → outputext → output_error → halt_program` 경로가 프로세스를 종료할 수 있다. 일반적인 반환 오류 코드만으로 host가 복구하는 계약은 아니다 (`xbeach_bmi.f90:67-78`; `libxbeach.F90:228-237`; `output.F90:199-214`; `xmpi.F90:1680-1705`).
+--- a/models/XBeach/README.md
++++ b/models/XBeach/README.md
+@@ -24,0 +25 @@
++- [초기화·hotstart·BMI·종료 상태 계약](source-analysis/xbeach-lifecycle-state-contracts.md): **검토본(draft-unsourced), 새 주장 사람 검토 대기**. 기존 12개 계약과 네 진입점 계열을 연결하고 오류 종료·getter 상태 설명을 정정했다.
+@@ -34 +35 @@
+-| source-analysis | 38 |
++| source-analysis | 39 |
+--- a/INDEX.md
++++ b/INDEX.md
+@@ -29 +29 @@
+-| [XBeach](models/XBeach/) | **감사·canonical 반영 2026-09-09** | P0 v3 456파일(281 2독립·22 단독·153 메타데이터), 보충103 canonical 연결, 충돌3·미검증반증10·문서207·vendor 귀속 정리. source-analysis38·manual-notes7·web-refs1. 2026-09-12 연결 보충 1편은 **draft-unsourced·사람 검토 대기**, Q3D 조건·보고서 기호 보충. [완료 원장](_staging/total-read/model-audit/XBeach/closure/README.md), [모델 목차](models/XBeach/README.md). 구 코어118 감사(2026-07-12)와 분모 구별. |
++| [XBeach](models/XBeach/) | **감사·canonical 반영 2026-09-09** | P0 v3 456파일(281 2독립·22 단독·153 메타데이터), 보충103 canonical 연결, 충돌3·미검증반증10·문서207·vendor 귀속 정리. source-analysis39·manual-notes7·web-refs1. 2026-09-12 연결 보충 2편은 **draft-unsourced·사람 검토 대기**, Q3D 조건·보고서 기호·초기화/hotstart/BMI 계약 보충. [완료 원장](_staging/total-read/model-audit/XBeach/closure/README.md), [모델 목차](models/XBeach/README.md). 구 코어118 감사(2026-07-12)와 분모 구별. |

@@ -1,6 +1,20 @@
 # XBeach 생명주기·상태·인터페이스 연결 원장
 
-2026-09-12 재개 범위: 상위 판독 전제는 [RESUME.md의 사용자 정정](../RESUME.md)을 적용한다. 부속 MPI/Jumpshot 미판독은 이 연결 후보의 완료 조건이 아니다. 이번 물리 쟁점 보충에서 이 원장의 인용·SHA를 재검사했으나, lifecycle의 12개 계약을 새로 외부 의미 검토하거나 확정한 것은 아니다.
+2026-09-12 재개 범위: 상위 판독 전제는 [RESUME.md의 사용자 정정](../RESUME.md)을 적용한다. 부속 MPI/Jumpshot 미판독은 완료 조건에서 제외한다.
+
+## 현재 판정 — resolution-20260912 우선
+
+기존 12개 계약을 [후속 원장](resolution-20260912/adjudication.json)에 소스 인용·SHA와 함께 재판정했다. [최소 재현](resolution-20260912/probe-results.json)은 원문 오류 종료와 getter local의 저장 수명을 확인한다. 이 기록은 `state-contracts.json`과 `edges.json`을 덮어쓰거나 기존 사람 승인에 편입하지 않는다.
+
+- SC-004: 읽은 `uu/vv`는 먼저 0으로 덮인다. `hotstartflow=1`은 `zs0` 경사·바람·바닥 마찰로 유속을 다시 계산하며, 저장 유속을 복원하는 경로가 아니다.
+- SC-005: 자동 초기화는 t=0이다. BMI 시간 setter는 별도로 존재하지만 출력 인덱스를 재배치하지 않는다.
+- SC-007/008: 오류 1은 `output_error → halt_program`에서 종료된다. MPI 초기화 경고 5·6은 종료되지 않아 첫 step 전 dynamic/Python 출력 호출의 반환값 미대입에 도달할 수 있다. BMI update의 step 선행 경로와 구분한다.
+- SC-009: getter의 선언 초기화 local은 implicit SAVE다. 그 `dtref`는 timestep 자체의 saved `dtref`와 별개다.
+
+[Claude 최초·후속 검토](resolution-20260912/review-response.json)에서 지적한 조건을 반영했고, 수정 범위에 남은 구체적 오류는 없다는 확인을 받았다. [설치 검증](resolution-20260912/validation.json)은 다섯 대상 문서·67개 원문 인용·최소 재현 세 실행·기존 불변 292개를 확인했다. 이는 전체 모델 의미 검증이나 사람 승인이 아니다.
+
+위 정정과 나머지 계약의 정확한 범위는 [연결 검토본](../../../../../../models/XBeach/source-analysis/xbeach-lifecycle-state-contracts.md)에 모았다. 전체 entry/build/mode·도달 파일 검증과 새 사람 승인은 별도로 남는다.
+
 
 이 디렉터리는 `models/XBeach/raw/source_code/trunk`의 **생명주기 범위**만 다룬다. XBeach 전체 모델 분석 완료를 뜻하지 않는다. 현재 소스 연결은 원문과 빌드 명세로 검증했지만, 상위 전체자료 판독 게이트가 닫혀 있으므로 `edges.json`은 최종 확정이 아닌 `source_verified_candidate_pending_parent_full_read_gate` 상태다.
 
@@ -14,9 +28,9 @@ Autotools의 독립 실행 대상은 `src/xbeach/xbeach.F90`을 `libxbeach.la`�
 
 `edges.json`에는 호출·빌드 연결 53개와 정의 앵커 31개가 있다. 각 연결은 1-based 물리 LF 행, 해당 행의 정확한 원문, 소스 SHA-256, 조건부 컴파일·실행 guard, 상태 생산/소비 설명을 포함한다.
 
-## 중요한 상태 계약
+## 기존 상태 계약 요약 (후속 정정 전 이력)
 
-`state-contracts.json`의 12개 검사는 다음 사실을 고정한다.
+`state-contracts.json` 작성 당시의 요약이다. 현재 판정에는 위 후속 원장의 조건과 정정을 우선 적용한다.
 
 - 코어 상태는 Fortran 모듈의 `save` 변수에 저장되는 프로세스 전역 단일 인스턴스다. 추적한 진입점에는 재초기화 guard나 상태 deallocate/reset 절차가 없다.
 - BMI `initialize(configfile)`는 문자열을 변환하지만 사용하지 않고, 코어는 현재 작업 디렉터리의 `params.txt`를 읽는다.
@@ -44,4 +58,4 @@ Autotools의 독립 실행 대상은 `src/xbeach/xbeach.F90`을 `libxbeach.la`�
 - `embedded-perl-read.json`: JAR 내부 Perl 2개 전량 판독·동일성 증거
 - `parallel-report-read.json`: 병렬화 PDF 14페이지 전량 시각 판독·사본 동일성 증거
 
-검증 시점에는 네 JSON의 문법, `edges.json`의 53개 인용과 31개 정의 앵커, `state-contracts.json`의 29개 인용, 기록된 소스 SHA가 모두 현재 원문과 일치했다. 상위 전체자료 판독 게이트가 열린 뒤에만 이 후보 상태를 최종 연결 판정으로 승격할 수 있다.
+기존 원장 검증 시점에는 네 JSON의 문법, `edges.json`의 53개 인용과 31개 정의 앵커, `state-contracts.json`의 29개 인용, 기록된 소스 SHA가 모두 현재 원문과 일치했다. 상위 전체자료 판독 게이트가 열린 뒤에만 이 후보 상태를 최종 연결 판정으로 승격할 수 있다.

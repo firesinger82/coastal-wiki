@@ -13,7 +13,13 @@
 - **문서 기호 4곳:** [응력 텐서 𝕋 두 곳](nonhydro-read/stress-tensor-symbol/receipt.json), [고립파 ≪·∼ 두 곳](nonhydro-read/solitary-wave-symbols/receipt.json)의 의미를 원본 PDF 시각 판독 및 DOC Native/문단 결속으로 확인했다. 이 네 곳의 의미는 다시 미확정 과제로 반복하지 않는다. DOC 렌더의 네모·배치 문제와 나머지 수식 의미 대조는 별도다.
 - **위키 반영:** Q3D 실행 조건·설정표·pitfall 정정, 비정수압 보고서 기호 보충, 연결 계약 검토본 1편과 목차를 [설치 manifest](physics/resolution-20260912/install-manifest.json)의 다섯 경로에 반영했다. 새 연결 노트는 draft-unsourced이며 사람 승인을 발급하지 않았다. 기존 승인·crosswalk·closure 292개는 불변이다.
 
-현재 다음 작업은 **lifecycle 상태 계약 12건의 교차파일 쟁점 정리와 entry/build/mode·파일 역할 대응의 누락 확인**, 아직 해소하지 않은 모델 매뉴얼 수식의 의미 대조, 그 결과의 검토·필요한 사람 승인이다. 기존 physics 원장의 대표 edge 14개를 전체 호출 분모로 간주하지 않는다. 부속 도구 내부 판독은 재개하지 않는다.
+## 2026-09-12 lifecycle 계약 후속 정리
+
+[XB-SC-001~012 재판정](lifecycle/resolution-20260912/adjudication.json)과 [Claude 검토·수정 확인](lifecycle/resolution-20260912/review-response.json)을 완료했다. 초기화·hotstart·스텝·종료와 독립 실행/BMI/dynamic/Python 진입점의 계약을 소스에 연결했다. `hotstartflow=1`의 재계산 유속, MPI 초기화 경고 5·6 후 첫 step 전 출력의 미대입 반환, 오류 1의 프로세스 종료, getter local의 암시적 SAVE를 기존 후보 설명과 구분한다. BMI 시간 setter가 출력 인덱스를 재배치하지 않는다는 한계도 기록했다.
+
+[최소 재현](lifecycle/resolution-20260912/probe-results.json)은 정상 출력 반환·오류 출력 STOP 1·getter local 유지만 확인한다. 전체 모델 또는 MPI 실행 검증을 뜻하지 않는다. [연결 검토본](../../../../../models/XBeach/source-analysis/xbeach-lifecycle-state-contracts.md)은 draft-unsourced이며 새 사람 승인을 발급하지 않는다. 기존 원장과 승인 이력은 그대로 보존한다. [설치 manifest](lifecycle/resolution-20260912/install-manifest.json)의 다섯 문서를 반영하고 [인용·프로브·설치 검증](lifecycle/resolution-20260912/validation.json)을 통과했다. 원본 인용 67곳과 기존 불변 이력 292개가 일치한다.
+
+다음 작업은 **XBeach 자체 entry/build/mode별 도달 경로와 파일 역할 대응의 누락 확인**, 아직 대조하지 않은 모델 수식의 의미 확인 및 결과 검토다. 이번 12개 계약과 이미 판정한 물리 쟁점 4개를 최초 미검토 항목으로 다시 세지 않는다. 네 진입점 계열이나 기존 대표 edge 수를 전체 호출 범위의 완료 근거로 쓰지 않는다. 부속 도구 내부 판독은 재개하지 않는다.
 
 현재 작업은 plan.md의 **XBeach 전수 판독 → 연결 분석 → 검증 → canonical → 필요한 신규 HG, 이후 FUNWAVE**다. 연결 후보는 lifecycle/ 및 physics/에 남아 있다. 전체 판독 gate는 **NOT_PASSED**다. 이 문서는 완료 또는 승인 영수증이 아니다.
 
@@ -29,7 +35,7 @@
 - 비정수압 보고서 PDF는 기존 `physics/document-read-premise.json`의 물리 13–68쪽 기록에 이번 1–12·69쪽 판독을 결합해 69쪽 전체의 시각 판독 근거를 연결했다. manuals의 동일 SHA PDF에도 승계했다. 기존 56쪽은 이번에 재판독한 것이 아니며 기존 기록에는 개별 이미지 해시가 없다.
 - 보고서 DOC를 별도로 70쪽 PDF로 렌더링하고 전체 표시 내용을 확인했다. 격자·습윤건조·검증 그림·흐름도·부록 표를 확인했지만 수식 참조 공백과 p.14 묶음 기호의 네모 표시가 남아 있다. OLE stream 1,571개(Equation Native 388개)는 해시 목록만 작성했으며 원시 수식 오브젝트 판독은 미완료다. `nonhydro-read/read-receipt.json`과 새 페이지 이미지 83개·DOC 렌더 PDF를 저장했다.
 
-## 다음 작업
+## 과거 다음 작업 기록 (현재 우선순위는 위 후속 정리)
 
 1. 두 매뉴얼 DOCX의 복원본은 **145·148쪽 전체 시각 판독 근거를 연결했다**. 기존 5쪽씩에 신규 Kingsday 140쪽·Master 143쪽을 추가했다. `manuals-docx-read/full-visual-read/receipt.json`에 신규 이미지 283개·관측 기록·원본/최종 PDF SHA를 저장했다. 이전 `receipt.json`은 당시의 부분 판독·변환 실패 비교 기록으로 보존하며, 현재 전체 시각 범위는 새 영수증을 따른다. 다음은 **잔여 수식 충실도 확인**이다.
    - Master p.27 (2.40)·p.28 (2.43)의 Writer 본문은 비어 있지만 원본 EMF를 별도 Draw 렌더하여 에너지 평형식과 roller 응력식을 확인했다. Kingsday p.27 (2.38)의 원본 WMF는 빈 화면이며, 후속 Native 판독에서 221바이트 스트림에 설정 레코드와 END만 있고 수식 본체가 없음을 확인했다. Kingsday p.25 (2.27)·p.28 (2.41)/(2.42)의 원본 문단에는 수식 본체가 없고 번호 필드만 있다. 문단 XML과 preview/OLE 추출·관계 ID를 새 영수증에 저장했다. 다른 판본의 수식으로 채우지 않았다.

@@ -13,7 +13,15 @@
 - **문서 기호 4곳:** [응력 텐서 𝕋 두 곳](nonhydro-read/stress-tensor-symbol/receipt.json), [고립파 ≪·∼ 두 곳](nonhydro-read/solitary-wave-symbols/receipt.json)의 의미를 원본 PDF 시각 판독 및 DOC Native/문단 결속으로 확인했다. 이 네 곳의 의미는 다시 미확정 과제로 반복하지 않는다. DOC 렌더의 네모·배치 문제와 나머지 수식 의미 대조는 별도다.
 - **위키 반영:** Q3D 실행 조건·설정표·pitfall 정정, 비정수압 보고서 기호 보충, 연결 계약 검토본 1편과 목차를 [설치 manifest](physics/resolution-20260912/install-manifest.json)의 다섯 경로에 반영했다. 새 연결 노트는 draft-unsourced이며 사람 승인을 발급하지 않았다. 기존 승인·crosswalk·closure 292개는 불변이다.
 
-현재 다음 작업은 **lifecycle 상태 계약 12건의 교차파일 쟁점 정리와 entry/build/mode·파일 역할 대응의 누락 확인**, 아직 해소하지 않은 모델 매뉴얼 수식의 의미 대조, 그 결과의 검토·필요한 사람 승인이다. 기존 physics 원장의 대표 edge 14개를 전체 호출 분모로 간주하지 않는다. 부속 도구 내부 판독은 재개하지 않는다.
+## 2026-09-12 lifecycle 계약 후속 정리
+
+[XB-SC-001~012 재판정](lifecycle/resolution-20260912/adjudication.json)과 [Claude 검토·수정 확인](lifecycle/resolution-20260912/review-response.json)을 완료했다. 초기화·hotstart·스텝·종료와 독립 실행/BMI/dynamic/Python 진입점의 계약을 소스에 연결했다. `hotstartflow=1`의 재계산 유속, MPI 초기화 경고 5·6 후 첫 step 전 출력의 미대입 반환, 오류 1의 프로세스 종료, getter local의 암시적 SAVE를 기존 후보 설명과 구분한다. BMI 시간 setter가 출력 인덱스를 재배치하지 않는다는 한계도 기록했다.
+
+[최소 재현](lifecycle/resolution-20260912/probe-results.json)은 정상 출력 반환·오류 출력 STOP 1·getter local 유지만 확인한다. 전체 모델 또는 MPI 실행 검증을 뜻하지 않는다. [연결 검토본](../../../../../models/XBeach/source-analysis/xbeach-lifecycle-state-contracts.md)은 draft-unsourced이며 새 사람 승인을 발급하지 않는다. 기존 원장과 승인 이력은 그대로 보존한다. [설치 manifest](lifecycle/resolution-20260912/install-manifest.json)의 다섯 문서를 반영하고 [인용·프로브·설치 검증](lifecycle/resolution-20260912/validation.json)을 통과했다. 원본 인용 67곳과 기존 불변 이력 292개가 일치한다.
+
+다음 작업은 **XBeach 자체 entry/build/mode별 도달 경로와 파일 역할 대응의 누락 확인**, 아직 대조하지 않은 모델 수식의 의미 확인 및 결과 검토다. 이번 12개 계약과 이미 판정한 물리 쟁점 4개를 최초 미검토 항목으로 다시 세지 않는다. 네 진입점 계열이나 기존 대표 edge 수를 전체 호출 범위의 완료 근거로 쓰지 않는다. 부속 도구 내부 판독은 재개하지 않는다.
+
+2026-09-12 도구 상태 확인: GOAL은 **paused**다. 이 문서는 상태 추적이며 도구를 자동 재개하거나 완료 처리하지 않는다. 아래 활성화 문구는 당시 이력이다.
 
 2026-09-11 사용자 요청으로 GOAL 활성화: XBeach 전수 판독 → 연결 분석 → 검증 → canonical → 필요한 신규 HG를 끝까지 진행한다. 기준은 plan.md의 전수 판독/연결 계획에 위 사용자 범위 정정을 적용한 것이다. 전체 gate는 NOT_PASSED이며 아래는 완료 영수증이 아니다.
 

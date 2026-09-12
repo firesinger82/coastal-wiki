@@ -1,0 +1,583 @@
+{
+  "schema": "xbeach-lifecycle-adjudication/v1",
+  "date": "2026-09-12",
+  "scope": "Existing 12 model lifecycle state contracts; not whole-model coverage",
+  "source_root": "models/XBeach/raw/source_code/trunk",
+  "original_ledger": {
+    "path": "_staging/total-read/model-audit/XBeach/connectivity/lifecycle/state-contracts.json",
+    "sha256": "ccf8643c8465e05e58315fe70188e76f086d74791b91e976338710bca4e2bef4"
+  },
+  "human_approval_issued": false,
+  "findings": [
+    {
+      "id": "XB-SC-001",
+      "disposition": "confirmed_singleton_not_reentrant",
+      "conclusion": "Saved module state has no instance handle. init resets n/it/error but not all state or execute_counter; unconditional grid allocation remains after final, which only closes logs/MPI. Repeated init on that retained instance is not a supported reset contract.",
+      "limit": "The historical library design note explicitly says deallocation is still a detail to do; no inference of safe re-entry."
+    },
+    {
+      "id": "XB-SC-002",
+      "disposition": "confirmed_fixed_filename",
+      "conclusion": "BMI converts configfile but does not use it. Core all_input reads params.txt from process cwd. Python wrapper deliberately changes cwd; these are different entry interfaces.",
+      "limit": "Passing a different BMI config filename alone does not select it."
+    },
+    {
+      "id": "XB-SC-003",
+      "disposition": "confirmed_conditioned_input_order",
+      "conclusion": "For fresh GRIDFORM_XBEACH initialization and setbathy!=1, sentinel hotstart=-123 triggers depfile before input hotstart=1 is read. GRIDFORM_DELFT3D independently requires depfile.",
+      "limit": "Do not generalize setbathy=1 as eliminating depfile for every gridform; re-entry with retained par values is outside the fresh-start claim."
+    },
+    {
+      "id": "XB-SC-004",
+      "disposition": "confirmed_velocity_state_loss",
+      "conclusion": "hotstart_init_1 restores zs/zb/uu/vv from formatted variable-specific .dat files. flow_init retains hotstart zs, recomputes hh=max(zs-zb,eps), and unconditionally zeros uu/vv. With hotstartflow=1 it then recomputes uu/vv from zs0 gradients, wind and bed friction; hotstart_init_2 reads separate umean/vmean and subsystem arrays, not uu/vv.",
+      "limit": "Stored uu/vv are not preserved through initialization. Zero velocity is the default hotstartflow=0 outcome; the hotstartflow=1 balance supplies newly computed velocities rather than restoring the saved values."
+    },
+    {
+      "id": "XB-SC-005",
+      "disposition": "resolved_implementation_time_origin",
+      "conclusion": "timestep_init resets model time to zero. Both hotstart readers and writer transfer arrays without a time field, so automatic initialization starts at t=0. A host may subsequently call BMI set_current_time, including its morfac conversion.",
+      "limit": "The BMI setter changes par%t but does not reposition index-based output counters tpar%it*. The setter alone does not establish a complete absolute-time restart contract; design intent remains unspecified by these routines."
+    },
+    {
+      "id": "XB-SC-006",
+      "disposition": "confirmed_driver_temporal_contract",
+      "conclusion": "timestep advances/clamps t and adjusts dt before output flags, boundary and physics calls. Consumers see the advanced time and adjusted interval.",
+      "limit": "This is the driver contract, not proof of each solver numerical order or a defect in itself."
+    },
+    {
+      "id": "XB-SC-007",
+      "disposition": "confirmed_fatal_step_error_and_unassigned_warning_return",
+      "conclusion": "executestep returns 0 even when timestep sets error=1 and skips physics. outputext then calls output_error and halt_program (serial STOP 1, MPI abort), so its subsequent result=1 is not recoverable. Separately, MPI processor-grid warnings 5/6 survive writelog_mpi and successful init; a dynamic/Python host calling outputext before the first executestep reaches no result assignment.",
+      "limit": "The unassigned return applies to MPI initialization warning 5/6 followed by outputext before a step; init errors 1-4 halt. BMI update calls executestep first, where compute_dt resets error to 0. No serial producer for the warning route is identified. Undefined outputext result is source-traced, not a claimed specific runtime number."
+    },
+    {
+      "id": "XB-SC-008",
+      "disposition": "resolved_composite_status_and_abort",
+      "conclusion": "BMI update overwrites the step return with outputext status; because the step always returns 0, this assignment alone does not discard a nonzero step return in this snapshot. The time-step error path terminates before update can return it.",
+      "limit": "Embedding hazard is process abort rather than a demonstrated recoverable error-code overwrite."
+    },
+    {
+      "id": "XB-SC-009",
+      "disposition": "corrected_saved_getter_locals",
+      "conclusion": "BMI get_time_step calls compute_dt and mutates par%dt. Declaration-initialized locals ilim/jlim/it/dtref have implicit SAVE; they are not freshly initialized each call as the old ledger claimed. compute ranks can enter compute-communicator collectives; output rank returns early in compute_dt.",
+      "limit": "Not a pure getter; no claim that all world ranks must invoke it. Getter dtref is distinct from timestep saved dtref and does not feed the maxdtfac guard; the next timestep recomputes par%dt."
+    },
+    {
+      "id": "XB-SC-010",
+      "disposition": "confirmed_owned_mpi_lifecycle",
+      "conclusion": "USEMPI init/final directly own MPI_Init/MPI_Finalize without host lifecycle checks. At least two world ranks; output world rank 0 stays in output until final signal; world rank 1 is compute master.",
+      "limit": "The exported init does not return to the host on the output rank during normal operation; all-world-rank symmetric BMI control is not the exposed contract."
+    },
+    {
+      "id": "XB-SC-011",
+      "disposition": "confirmed_short_run_logging_hazard",
+      "conclusion": "Zero-step final evaluates t/n and duration/(nx+1)/(ny+1)/n on xmaster. In a fresh MPI lifecycle t01 is assigned only before the second executestep, but final passes it even after zero/one call; present(t01) checks argument presence, not initialization.",
+      "limit": "Numerical symptom depends on compiler/runtime. Does not claim every short run crashes. execute_counter is not reset by init/final."
+    },
+    {
+      "id": "XB-SC-012",
+      "disposition": "confirmed_python_cleanup_gap",
+      "conclusion": "Python XBeach.finalize deletes/unloads the library but calls neither native finalize nor cwd restoration. It sets shouldinitialize=True after deleting _lib without reloading it. Native dynamic and BMI finalize wrappers both call final when actually invoked.",
+      "limit": "Wrapper unloader implementation is not investigated; only XBeach-owned Python caller behavior is in scope."
+    }
+  ],
+  "evidence": [
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/libxbeach.F90",
+      "line_start": 10,
+      "line_end": 25,
+      "sha256": "1656cceb95c9d87a51b70225a725fc6e544ed56b424c97a9e2806c86f15b6696",
+      "quote_exact_utf8": "   implicit none\r\n   private\r\n   public executestep, outputext, final, init, getversion\r\n   public par, tpar, s, sglobal\r\n#ifdef USEMPI\r\n   public slocal\r\n#endif\r\n   save\r\n\r\n   type(parameters)                     :: par\r\n   type(timepars)                       :: tpar\r\n   type(spacepars), pointer             :: s\r\n   type(spacepars), target              :: sglobal\r\n   type(ship), dimension(:), pointer    :: sh\r\n\r\n   integer                              :: n,it,error\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/libxbeach.F90",
+      "line_start": 99,
+      "line_end": 104,
+      "sha256": "1656cceb95c9d87a51b70225a725fc6e544ed56b424c97a9e2806c86f15b6696",
+      "quote_exact_utf8": "      ! initialize time counter\r\n      it      = 0\r\n\r\n      ! read input from params.txt\r\n      params_inio = .false.\r\n      call all_input(par)\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xbeach_bmi.f90",
+      "line_start": 49,
+      "line_end": 55,
+      "sha256": "47408c2943edd5a7feff23fa0bc0b0f17f7610747044a354d55fde16232baa5b",
+      "quote_exact_utf8": "      character(kind=c_char), intent(in) :: c_configfile(*)\r\n      character(len=strlen(c_configfile)) :: configfile\r\n\r\n      ! Convert c string to fortran string\r\n      configfile = char_array_to_string(c_configfile)\r\n\r\n      ierr = init()\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.def",
+      "line_start": 88,
+      "line_end": 93,
+      "sha256": "1be94d981193e1ca06f00c3ff4476f1df4ae5f8ccab4e8d26d9ef171cdddfcf0",
+      "quote_exact_utf8": "      ! [Section] Initial conditions\r\n      double precision                  :: zs0                      = -123                 !  [m] Inital water level\r\n      character(slen)                   :: zsinitfile               = 'abc'                !  [file] Name of inital water level file\r\n      integer                           :: hotstartflow             = -123                 !  [-] (advanced) Switch for hotstart flow conditions with pressure gradient balanced by wind and bed stress\r\n      integer                           :: hotstart                 = -123                 !  [-] Switch to turn on hotstart from files\r\n      integer                           :: hotstartfileno           = -123                 !  [-] Hotstart file number to read\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.F90",
+      "line_start": 159,
+      "line_end": 167,
+      "sha256": "73648b5733a8f90a8f18cda32743bdc2ef42f649e39c521e28e06584ee63c359",
+      "quote_exact_utf8": "         par%posdwn= readkey_dbl('params.txt','posdwn', 1.d0,     -1.d0,     1.d0)\r\n         if (par%setbathy .ne. 1 .and. par%hotstart .ne. 1) then\r\n            par%depfile = readkey_name('params.txt','depfile',required=.true.)\r\n            call check_file_exist(par%depfile)\r\n            call check_file_length(par%depfile,par%nx+1,par%ny+1)\r\n         else\r\n            !par%depfile = readkey_name('params.txt','depfile')\r\n            ! don't read this file\r\n         endif\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.F90",
+      "line_start": 311,
+      "line_end": 315,
+      "sha256": "73648b5733a8f90a8f18cda32743bdc2ef42f649e39c521e28e06584ee63c359",
+      "quote_exact_utf8": "      par%hotstartflow = readkey_int ('params.txt','hotstartflow',    0,        0,     1,strict=.true.,silent=.true.)\r\n      par%hotstart = readkey_int ('params.txt','hotstart',    0,        0,     1,strict=.true.,silent=.true.)\r\n      if (par%hotstart==1) then\r\n         par%hotstartfileno = readkey_int ('params.txt','hotstartfileno', 0, 0,999,required=.true.)\r\n      endif\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/libxbeach.F90",
+      "line_start": 163,
+      "line_end": 188,
+      "sha256": "1656cceb95c9d87a51b70225a725fc6e544ed56b424c97a9e2806c86f15b6696",
+      "quote_exact_utf8": "      if (xmaster) then\r\n         if(par%hotstart==1) then\r\n            call hotstart_init_1(s,par)\r\n         endif\r\n      endif\r\n      call setbathy_init      (s,par)\r\n      ! initialize physics\r\n      call readtide           (s,par)\r\n      call readwind           (s,par)\r\n      call flow_init          (s,par)\r\n      call discharge_init     (s,par)\r\n      call drifter_init       (s,par)\r\n      call wave_init          (s,par)\r\n      call gw_init            (s,par)\r\n      call rainfall_init      (s,par)\r\n      ! TODO, fix ordening of arguments....\r\n      call sed_init           (s,par)\r\n      call ship_init          (s,par,sh)   ! always need to call initialise in order\r\n      ! to reserve memory on MPI subprocesses.\r\n      ! Note: if par%ships==0 then don't allocate\r\n      ! and read stuff for sh structures\r\n      call veggie_init         (s,par)\r\n      !\r\n      if (xmaster) then\r\n         if(par%hotstart==1) then\r\n            call hotstart_init_2(s,par)\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/initialize.F90",
+      "line_start": 1706,
+      "line_end": 1711,
+      "sha256": "9803067bd2fa4962d9e2247f6e8b5f87e18a9860802595424183994a715523cd",
+      "quote_exact_utf8": "      ! all models\r\n      call lowlevel_read_hotstart_2d(s%zs,s%nx,s%ny,'zs',par%hotstartfileno)\r\n      call lowlevel_read_hotstart_2d(s%zb,s%nx,s%ny,'zb',par%hotstartfileno)\r\n      call lowlevel_read_hotstart_2d(s%uu,s%nx,s%ny,'uu',par%hotstartfileno)\r\n      call lowlevel_read_hotstart_2d(s%vv,s%nx,s%ny,'vv',par%hotstartfileno)\r\n      s%zb0 = s%zb\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/initialize.F90",
+      "line_start": 1037,
+      "line_end": 1051,
+      "sha256": "9803067bd2fa4962d9e2247f6e8b5f87e18a9860802595424183994a715523cd",
+      "quote_exact_utf8": "      ! R+L: Why are these variable reinitialise?\r\n      s%dzsdt=0.d0\r\n      s%dzsdx=0.d0\r\n      s%dzsdy=0.d0\r\n      s%dzbdt=0.d0\r\n      s%uu=0.d0\r\n      s%u=0.d0\r\n      s%vv=0.d0\r\n      s%v=0.d0\r\n      s%vu=0.d0\r\n      s%uv=0.d0\r\n      s%ueu=0.d0\r\n      s%vev=0.d0\r\n      s%qx=0.d0\r\n      s%qy=0.d0\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/initialize.F90",
+      "line_start": 1773,
+      "line_end": 1777,
+      "sha256": "9803067bd2fa4962d9e2247f6e8b5f87e18a9860802595424183994a715523cd",
+      "quote_exact_utf8": "      ! umean and vmean\r\n      if ((par%flow==1).or.(par%wavemodel==WAVEMODEL_NONH)) then\r\n         call lowlevel_read_hotstart_2d(s%umean,s%nx,s%ny,'umean',par%hotstartfileno)\r\n         call lowlevel_read_hotstart_2d(s%vmean,s%nx,s%ny,'vmean',par%hotstartfileno)\r\n      endif\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/timestep.F90",
+      "line_start": 143,
+      "line_end": 157,
+      "sha256": "24f600029a975b520c837bbcdb0109853df0c6d6b14b00e198d315a9230e1578",
+      "quote_exact_utf8": "      ! initialize the time to 0\r\n      par%t = 0.0d0\r\n\r\n      tpar%tnext = 0.0d0\r\n      ! initialize timestep counters\r\n      tpar%itg = 0\r\n      tpar%itp = 0\r\n      tpar%itm = 0\r\n      tpar%itw = 0\r\n      ! initialize output, default no output\r\n      tpar%outputg = .FALSE.\r\n      tpar%outputp = .FALSE.\r\n      tpar%outputm = .FALSE.\r\n      tpar%outputw = .FALSE.\r\n      tpar%output  = .FALSE.\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/libxbeach.F90",
+      "line_start": 283,
+      "line_end": 305,
+      "sha256": "1656cceb95c9d87a51b70225a725fc6e544ed56b424c97a9e2806c86f15b6696",
+      "quote_exact_utf8": "         ! determine this time step's wet points\r\n         call compute_wetcells(s,par)\r\n         !\r\n         ! determine time step\r\n         call timestep(s,par,tpar,it,dt=dt,ierr=error)\r\n         call outputtimes_update(par, tpar)\r\n\r\n         ! update log\r\n         call log_progress(par)\r\n\r\n         if (error==0) then\r\n            !\r\n            ! Boundary conditions\r\n            call wave_bc        (sglobal,s,par)\r\n            if (par%gwflow==1)                                      call gw_bc          (s,par)\r\n            if ((par%flow==1).or.(par%wavemodel==WAVEMODEL_NONH))   call flow_bc        (s,par)\r\n            !\r\n            ! Compute timestep\r\n            if (par%ships==1)                                       call shipwave       (s,par,sh)\r\n            if (par%swave==1)                                       call wave           (s,par)\r\n            if (par%vegetation==1)                                  call vegatt         (s,par)\r\n            if (par%gwflow==1)                                      call gwflow         (s,par)\r\n            if ((par%flow==1).or.(par%wavemodel==WAVEMODEL_NONH))   call flow           (s,par)\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/timestep.F90",
+      "line_start": 710,
+      "line_end": 718,
+      "sha256": "24f600029a975b520c837bbcdb0109853df0c6d6b14b00e198d315a9230e1578",
+      "quote_exact_utf8": "      call compute_dt(s,par, tpar, it, ilim, jlim, dtref, dt=dt, ierr=ierr,limtypeout=limtype)\r\n\r\n      par%t=par%t+par%dt\r\n\r\n      if(par%t >= tpar%tnext) then\r\n         par%dt  = par%dt-(par%t-tpar%tnext)\r\n         par%t   = tpar%tnext\r\n         it      = it+1\r\n      end if\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/libxbeach.F90",
+      "line_start": 293,
+      "line_end": 316,
+      "sha256": "1656cceb95c9d87a51b70225a725fc6e544ed56b424c97a9e2806c86f15b6696",
+      "quote_exact_utf8": "         if (error==0) then\r\n            !\r\n            ! Boundary conditions\r\n            call wave_bc        (sglobal,s,par)\r\n            if (par%gwflow==1)                                      call gw_bc          (s,par)\r\n            if ((par%flow==1).or.(par%wavemodel==WAVEMODEL_NONH))   call flow_bc        (s,par)\r\n            !\r\n            ! Compute timestep\r\n            if (par%ships==1)                                       call shipwave       (s,par,sh)\r\n            if (par%swave==1)                                       call wave           (s,par)\r\n            if (par%vegetation==1)                                  call vegatt         (s,par)\r\n            if (par%gwflow==1)                                      call gwflow         (s,par)\r\n            if ((par%flow==1).or.(par%wavemodel==WAVEMODEL_NONH))   call flow           (s,par)\r\n            if (par%ndrifter>0)                                     call drifter        (s,par)\r\n            if (par%sedtrans==1)                                    call transus        (s,par)\r\n            !\r\n            ! Bed level update\r\n            if ((par%morphology==1).and.(.not. par%setbathy==1)) call bed_update(s,par)\r\n            if (par%setbathy==1)     call setbathy_update(s, par)\r\n         endif\r\n      endif\r\n\r\n      n = n + 1\r\n      executestep = 0\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/libxbeach.F90",
+      "line_start": 228,
+      "line_end": 237,
+      "sha256": "1656cceb95c9d87a51b70225a725fc6e544ed56b424c97a9e2806c86f15b6696",
+      "quote_exact_utf8": "   integer(c_int) function outputext()\r\n      use output_module,        only: output, output_error\r\n      ! store first timestep\r\n      call output(sglobal,s,par,tpar,.false.)\r\n      if(error==0) then\r\n         outputext = 0\r\n      elseif(error==1) then\r\n         call output_error(s,sglobal,par,tpar)\r\n         outputext = 1\r\n      endif\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/timestep.F90",
+      "line_start": 756,
+      "line_end": 760,
+      "sha256": "24f600029a975b520c837bbcdb0109853df0c6d6b14b00e198d315a9230e1578",
+      "quote_exact_utf8": "         if (tpar%outputh) tpar%tph=min(tpar%tph,par%t)\r\n         tpar%output = (tpar%outputg .or. tpar%outputp .or. tpar%outputm  .or. tpar%outputh)\r\n         if (present(ierr)) then\r\n            ierr = 1\r\n         endif\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xbeach_bmi.f90",
+      "line_start": 67,
+      "line_end": 76,
+      "sha256": "47408c2943edd5a7feff23fa0bc0b0f17f7610747044a354d55fde16232baa5b",
+      "quote_exact_utf8": "      if (dt >= 0) then\r\n         ierr = executestep(dt)\r\n      else\r\n         ierr = executestep()\r\n      end if\r\n\r\n      ! enable output to be able to use aggregated variable values (min,\r\n      ! max, mean, var) through BMI. user can still control output\r\n      ! through params.txt file\r\n      ierr = outputext()\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xbeach_bmi.f90",
+      "line_start": 178,
+      "line_end": 189,
+      "sha256": "47408c2943edd5a7feff23fa0bc0b0f17f7610747044a354d55fde16232baa5b",
+      "quote_exact_utf8": "   subroutine get_time_step(timestep) bind(C, name=\"get_time_step\")\r\n      !DEC$ ATTRIBUTES DLLEXPORT :: get_time_step\r\n\r\n      real(c_double) :: timestep\r\n      integer :: ilim = 0\r\n      integer :: jlim = 0\r\n      integer :: it = 0\r\n      real*8 :: dtref = 0.d0\r\n\r\n      call compute_dt(s,par, tpar, it, ilim, jlim, dtref)\r\n      timestep = par%dt\r\n   end subroutine get_time_step\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/timestep.F90",
+      "line_start": 416,
+      "line_end": 440,
+      "sha256": "24f600029a975b520c837bbcdb0109853df0c6d6b14b00e198d315a9230e1578",
+      "quote_exact_utf8": "   subroutine compute_dt(s,par, tpar, it, ilim, jlim, dtref, dt, ierr, limtypeout)\r\n      use params,         only: parameters\r\n      use spaceparams\r\n      use xmpi_module\r\n      use logging_module\r\n      use paramsconst\r\n\r\n      IMPLICIT NONE\r\n\r\n      type(spacepars), intent(inout)   :: s\r\n      type(parameters), intent(inout)  :: par\r\n      type(timepars), intent(inout)    :: tpar\r\n      integer, intent(inout)           :: it\r\n      integer, intent(out), optional   :: ierr,limtypeout\r\n      real*8, intent(in), optional :: dt\r\n      real*8, intent(inout) :: dtref\r\n      integer, intent(inout) :: ilim, jlim\r\n      integer                     :: i\r\n      integer                     :: j,j1,j2\r\n      integer                     :: n,limtype\r\n      real*8                              :: mdx,mdy,tny\r\n      real*8,save                         :: dtold\r\n      real*8                              :: celeru\r\n\r\n      if(.not. xcompute) return\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/timestep.F90",
+      "line_start": 661,
+      "line_end": 673,
+      "sha256": "24f600029a975b520c837bbcdb0109853df0c6d6b14b00e198d315a9230e1578",
+      "quote_exact_utf8": "      if (dtref .eq. 0.0d0) then\r\n         ! If dtref is not yet set.\r\n         dtref = par%dt\r\n#ifdef USEMPI\r\n         ! Use the same dtref everywhere.\r\n         call xmpi_allreduce(dtref,MPI_MIN)\r\n#endif\r\n      end if\r\n\r\n      ! wwvv: In the mpi version par%dt will be calculated different\r\n      ! on different processes. So, we take the minimum of all dt's\r\n#ifdef USEMPI\r\n      call xmpi_allreduce(par%dt,MPI_MIN)\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xmpi.F90",
+      "line_start": 201,
+      "line_end": 210,
+      "sha256": "68c0cec030f136e8edd2024248284fb43c03c171fc5f23a1496ff40d52ced140",
+      "quote_exact_utf8": "   subroutine xmpi_initialize\r\n      ! initialize mpi environment\r\n      implicit none\r\n      integer ierr,color,errhandler,r,comm_world\r\n      external comm_errhandler\r\n      ierr = 0\r\n      ! Message buffers in openmpi are not initialized so this call can give a vallgrind error\r\n      ! http://www.open-mpi.org/community/lists/users/2009/06/9566.php\r\n      ! http://valgrind.org/docs/manual/manual-core.html#manual-core.suppress\r\n      call MPI_Init(ierr)\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xmpi.F90",
+      "line_start": 229,
+      "line_end": 251,
+      "sha256": "68c0cec030f136e8edd2024248284fb43c03c171fc5f23a1496ff40d52ced140",
+      "quote_exact_utf8": "      xmpi_ocomm = MPI_COMM_WORLD\r\n      call MPI_Comm_rank(xmpi_ocomm,xmpi_orank,ierr)\r\n      call MPI_Comm_size(xmpi_ocomm,xmpi_osize,ierr)\r\n      if (xmpi_osize < 2) then\r\n         print *,'Number of MPI processes must be 2 or greater, but is:',xmpi_osize\r\n         call halt_program(.false.)\r\n      endif\r\n      xmpi_omaster = 0\r\n      xomaster     = (xmpi_orank == xmpi_omaster)\r\n      xcompute     = .not. xomaster\r\n      !\r\n      ! Create the compute communicator. This will contain all\r\n      ! processes in xmpi_iocomm except process xmpi_master\r\n      !\r\n      color = 1\r\n      if(xmpi_orank == xmpi_omaster) color = 0\r\n      call MPI_Comm_split(xmpi_ocomm,color,1,xmpi_comm,ierr)\r\n      call MPI_Comm_rank(xmpi_comm,xmpi_rank,ierr)\r\n      call MPI_Comm_size(xmpi_comm,xmpi_size,ierr)\r\n      call MPI_Comm_set_name(xmpi_comm,'xmpi_comm',ierr)\r\n      call MPI_Comm_set_name(xmpi_ocomm,'xmpi_ocomm',ierr)\r\n      xmpi_master = 0\r\n      xmaster     = (xmpi_rank == xmpi_master)\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xmpi.F90",
+      "line_start": 307,
+      "line_end": 312,
+      "sha256": "68c0cec030f136e8edd2024248284fb43c03c171fc5f23a1496ff40d52ced140",
+      "quote_exact_utf8": "   subroutine xmpi_finalize\r\n      ! ends mpi environment, collective subroutine\r\n      implicit none\r\n      integer ierr\r\n      call MPI_Finalize(ierr)\r\n   end subroutine xmpi_finalize\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/loopcounters.F90",
+      "line_start": 1,
+      "line_end": 7,
+      "sha256": "603dd16a5d2f4766446c4c3e6d1d0dc8cc3e198e0c9b5eff973d21b2619ab7c8",
+      "quote_exact_utf8": "module loopcounters_module\r\n   implicit none\r\n   private\r\n   save\r\n   public execute_counter\r\n   integer :: execute_counter = 0\r\nend module loopcounters_module\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/libxbeach.F90",
+      "line_start": 269,
+      "line_end": 276,
+      "sha256": "1656cceb95c9d87a51b70225a725fc6e544ed56b424c97a9e2806c86f15b6696",
+      "quote_exact_utf8": "#ifdef USEMPI\r\n      if (execute_counter .eq. 1) then\r\n         ! exclude first pass from time measurement\r\n         call xmpi_barrier\r\n         t01 = MPI_Wtime()\r\n      endif\r\n#endif\r\n      execute_counter = execute_counter + 1\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/libxbeach.F90",
+      "line_start": 330,
+      "line_end": 339,
+      "sha256": "1656cceb95c9d87a51b70225a725fc6e544ed56b424c97a9e2806c86f15b6696",
+      "quote_exact_utf8": "#ifdef USEMPI\r\n      end_program = .true.\r\n      call xmpi_send_sleep(xmpi_imaster,xmpi_omaster) ! wake up omaster\r\n      call xmpi_bcast(end_program,toall)\r\n      call xmpi_barrier(toall)\r\n      call writelog_finalize(tbegin,n,par%t,par%nx,par%ny,t0,t01)\r\n      call xmpi_finalize\r\n#else\r\n      call writelog_finalize(tbegin,n,par%t,par%nx,par%ny)\r\n#endif\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/logging.F90",
+      "line_start": 302,
+      "line_end": 320,
+      "sha256": "bce674aa627966352d8e32b68e4503cd85fc0aa701ad40dc76f4aa8055974271",
+      "quote_exact_utf8": "      if (xmaster) then\r\n\r\n         call cpu_time(tend)\r\n\r\n         duration    = tend-tbegin\r\n         dt          = t/n\r\n         performance = duration/(nx+1)/(ny+1)/n\r\n\r\n         call writelog('ls','','Duration   : ',duration,' seconds'       )\r\n         call writelog('ls','','Timesteps  : ',n                         )\r\n         call writelog('ls','','Average dt : ',dt,' seconds'             )\r\n         call writelog('ls','','Unit speed : ',performance,' seconds/1'  )\r\n\r\n#ifdef USEMPI\r\n         if (present(t0) .and. present(t01)) then\r\n            t1 = MPI_Wtime()\r\n            call writelog('ls','','MPI timing : procs      : ',xmpi_size                )\r\n            call writelog('ls','','             seconds    : total : ',t1-t0, ' seconds')\r\n            call writelog('ls','','                          loop  : ',t1-t01,' seconds')\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/pybeach/xbeach/libxbeach.py",
+      "line_start": 51,
+      "line_end": 60,
+      "sha256": "55640d609c20815d0b3cf24e0cbf42c48e7a52d8aea701f41d6e3e1c20d5027f",
+      "quote_exact_utf8": "    def __init__(self, libpath, workingdir=None):\n        self.olddir = os.getcwd()\n        if workingdir is None:\n            self.workingdir = os.getcwd()\n        else:\n            self.workingdir = workingdir\n        os.chdir(self.workingdir)\n        self.libpath = os.path.abspath(libpath)\n        self._lib = CDLL(self.libpath)\n        self.shouldinitialize = True"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/pybeach/xbeach/libxbeach.py",
+      "line_start": 278,
+      "line_end": 289,
+      "sha256": "55640d609c20815d0b3cf24e0cbf42c48e7a52d8aea701f41d6e3e1c20d5027f",
+      "quote_exact_utf8": "    def finalize(self):\n        logger.debug('Explicitly deleting library at {}'.format(self._lib))\n        handle = self._lib._handle\n        del self._lib\n        logger.debug('Checking if %s is loaded %s', self.libpath, isloaded(self.libpath))\n        while isloaded(self.libpath):\n            dlclose(handle)\n            logger.debug('Checking if %s is loaded %s', self.libpath, isloaded(self.libpath))\n        # openfiles = subprocess.check_output(['lsof', '-p', str(os.getpid())])\n        # logger.debug('Open files:\\n%s',  openfiles)\n        # reset the init method\n        self.shouldinitialize = True"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/libxbeach.F90",
+      "line_start": 75,
+      "line_end": 104,
+      "sha256": "1656cceb95c9d87a51b70225a725fc6e544ed56b424c97a9e2806c86f15b6696",
+      "quote_exact_utf8": "      error   = 0\r\n      n = 0\r\n\r\n      ! setup of MPI\r\n#ifdef USEMPI\r\n      s=>slocal\r\n      call xmpi_initialize\r\n      call xmpi_barrier(toall)\r\n      t0 = MPI_Wtime()\r\n#endif\r\n\r\n      ! create log files\r\n      call start_logfiles(error)\r\n\r\n      ! set starting time and date\r\n      call cpu_time(tbegin)\r\n\r\n      ! show statup message\r\n      call writelog_startup()\r\n\r\n      !-----------------------------------------------------------------------------!\r\n      ! Initialize simulation                                                       !\r\n      !-----------------------------------------------------------------------------!\r\n\r\n      ! initialize time counter\r\n      it      = 0\r\n\r\n      ! read input from params.txt\r\n      params_inio = .false.\r\n      call all_input(par)\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/libxbeach.F90",
+      "line_start": 191,
+      "line_end": 224,
+      "sha256": "1656cceb95c9d87a51b70225a725fc6e544ed56b424c97a9e2806c86f15b6696",
+      "quote_exact_utf8": "#ifdef USEMPI\r\n      call distribute_par(par)\r\n      s => slocal\r\n      !\r\n      ! here an hack to ensure that sglobal is populated, also on\r\n      ! the not-(o)master processes, just to get valid addresses.\r\n      !\r\n      if (.not. xmaster .and. .not. xomaster) then\r\n         !nxbak = sglobal%nx\r\n         !nybak = sglobal%ny\r\n         !sglobal%nx=0\r\n         !sglobal%ny=0\r\n         call space_alloc_arrays_dummies(sglobal,par)\r\n         !sglobal%nx = nxbak\r\n         !sglobal%ny = nybak\r\n      endif\r\n      call space_distribute_space (sglobal,s,par)\r\n#endif\r\n\r\n      call ranges_init(s)\r\n\r\n      ! nonh_init does not always need to be called\r\n      if (par%wavemodel==WAVEMODEL_NONH) call nonh_init(s,par)\r\n\r\n      ! initialize output\r\n      call means_init             (sglobal,s,par     )\r\n\r\n      call output_init            (sglobal,s,par,tpar)\r\n\r\n\r\n      ! store first timestep\r\n      ! from this point on, xomaster will hang in subroutine output\r\n      ! until a broadcast .true. is received\r\n      call output(sglobal,s,par,tpar)\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/libxbeach.F90",
+      "line_start": 228,
+      "line_end": 239,
+      "sha256": "1656cceb95c9d87a51b70225a725fc6e544ed56b424c97a9e2806c86f15b6696",
+      "quote_exact_utf8": "   integer(c_int) function outputext()\r\n      use output_module,        only: output, output_error\r\n      ! store first timestep\r\n      call output(sglobal,s,par,tpar,.false.)\r\n      if(error==0) then\r\n         outputext = 0\r\n      elseif(error==1) then\r\n         call output_error(s,sglobal,par,tpar)\r\n         outputext = 1\r\n      endif\r\n\r\n   end function outputext\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/initialize.F90",
+      "line_start": 57,
+      "line_end": 71,
+      "sha256": "9803067bd2fa4962d9e2247f6e8b5f87e18a9860802595424183994a715523cd",
+      "quote_exact_utf8": "      if(.not. (xmaster .or. xomaster)) return\r\n      if(.true.) then\r\n         allocate(s%x(1:s%nx+1,1:s%ny+1))\r\n         allocate(s%y(1:s%nx+1,1:s%ny+1))\r\n         allocate(s%xz(1:s%nx+1,1:s%ny+1))\r\n         allocate(s%yz(1:s%nx+1,1:s%ny+1))\r\n         allocate(s%xu(1:s%nx+1,1:s%ny+1))\r\n         allocate(s%yu(1:s%nx+1,1:s%ny+1))\r\n         allocate(s%xv(1:s%nx+1,1:s%ny+1))\r\n         allocate(s%yv(1:s%nx+1,1:s%ny+1))\r\n         allocate(s%zb(1:s%nx+1,1:s%ny+1))\r\n         allocate(s%zb0(1:s%nx+1,1:s%ny+1))\r\n         allocate(s%dzbdx(1:s%nx+1,1:s%ny+1))\r\n         allocate(s%dzbdy(1:s%nx+1,1:s%ny+1))\r\n         allocate(s%dsu(1:s%nx+1,1:s%ny+1))\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/initialize.F90",
+      "line_start": 1005,
+      "line_end": 1051,
+      "sha256": "9803067bd2fa4962d9e2247f6e8b5f87e18a9860802595424183994a715523cd",
+      "quote_exact_utf8": "      !\r\n      ! set zs, hh, wetu, wetv, wetz\r\n      !\r\n\r\n      ! s%zs0 = max(s%zs0,s%zb)  ! RM: why is this statement here?\r\n      ! cjaap: replaced par%hmin by par%eps\r\n      if (par%hotstart .ne. 1) s%zs=max(s%zb+epsilon(0.d0),s%zs0)\r\n      s%hh=max(s%zs-s%zb,par%eps)\r\n\r\n\r\n      !Initialize hu correctly to prevent spurious initial flow (Pieter)\r\n      do j=1,s%ny+1\r\n         do i=1,s%nx\r\n            s%hu(i,j) = max(s%zs(i,j),s%zs(i+1,j))-max(s%zb(i,j),s%zb(i+1,j))\r\n         enddo\r\n      enddo\r\n      s%hu(s%nx+1,:)=s%hu(s%nx,:)\r\n\r\n      if (s%ny>0) then\r\n         do j=1,s%ny\r\n            do i=1,s%nx+1\r\n               s%hv(i,j) = max(s%zs(i,j),s%zs(i,j+1))-max(s%zb(i,j),s%zb(i,j+1))\r\n            enddo\r\n         enddo\r\n         s%hv(:,s%ny+1)=s%hv(:,s%ny)\r\n      else\r\n         s%hv(:,1)=s%zs(:,1)-s%zb(:,1)\r\n      endif\r\n\r\n      s%hum(1:s%nx,:) = 0.5d0*(s%hh(1:s%nx,:)+s%hh(2:s%nx+1,:))\r\n      s%hum(s%nx+1,:)=s%hh(s%nx+1,:)\r\n\r\n      ! R+L: Why are these variable reinitialise?\r\n      s%dzsdt=0.d0\r\n      s%dzsdx=0.d0\r\n      s%dzsdy=0.d0\r\n      s%dzbdt=0.d0\r\n      s%uu=0.d0\r\n      s%u=0.d0\r\n      s%vv=0.d0\r\n      s%v=0.d0\r\n      s%vu=0.d0\r\n      s%uv=0.d0\r\n      s%ueu=0.d0\r\n      s%vev=0.d0\r\n      s%qx=0.d0\r\n      s%qy=0.d0\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/initialize.F90",
+      "line_start": 1699,
+      "line_end": 1712,
+      "sha256": "9803067bd2fa4962d9e2247f6e8b5f87e18a9860802595424183994a715523cd",
+      "quote_exact_utf8": "      integer     :: i,j,ier\r\n\r\n      allocate(s%zs(1:s%nx+1,1:s%ny+1))\r\n      allocate(s%uu(1:s%nx+1,1:s%ny+1))\r\n      allocate(s%vv(1:s%nx+1,1:s%ny+1))\r\n      ! Robert: not zb, that is allocated in grid_bathy called earlier\r\n\r\n      ! all models\r\n      call lowlevel_read_hotstart_2d(s%zs,s%nx,s%ny,'zs',par%hotstartfileno)\r\n      call lowlevel_read_hotstart_2d(s%zb,s%nx,s%ny,'zb',par%hotstartfileno)\r\n      call lowlevel_read_hotstart_2d(s%uu,s%nx,s%ny,'uu',par%hotstartfileno)\r\n      call lowlevel_read_hotstart_2d(s%vv,s%nx,s%ny,'vv',par%hotstartfileno)\r\n      s%zb0 = s%zb\r\n   end subroutine hotstart_init_1\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/initialize.F90",
+      "line_start": 1714,
+      "line_end": 1779,
+      "sha256": "9803067bd2fa4962d9e2247f6e8b5f87e18a9860802595424183994a715523cd",
+      "quote_exact_utf8": "   subroutine hotstart_init_2(s,par)\r\n      use params\r\n      use spaceparams\r\n      use filefunctions\r\n      use logging_module\r\n      use paramsconst\r\n\r\n      implicit none\r\n\r\n      type(spacepars),target                  :: s\r\n      type(parameters)                        :: par\r\n\r\n      integer     :: i,j,ier\r\n      ! groundwater parameters\r\n      if(par%gwflow==1) then\r\n         call lowlevel_read_hotstart_2d(s%gwlevel,s%nx,s%ny,'gwlevel',par%hotstartfileno)\r\n         call lowlevel_read_hotstart_2d(s%gwhead,s%nx,s%ny,'gwhead',par%hotstartfileno)\r\n         if(par%gwnonh==1) call lowlevel_read_hotstart_2d(s%gwcurv,s%nx,s%ny,'gwcurv',par%hotstartfileno)\r\n      endif\r\n\r\n      ! wave energy\r\n      if (par%swave==1) then\r\n         call lowlevel_read_hotstart_3d(s%ee,s%nx,s%ny,s%ntheta,'ee',par%hotstartfileno)\r\n         call lowlevel_read_hotstart_3d(s%rr,s%nx,s%ny,s%ntheta,'rr',par%hotstartfileno)\r\n      endif\r\n\r\n      ! single-dir\r\n      if (par%single_dir==1) then\r\n         call lowlevel_read_hotstart_3d(s%ee_s,s%nx,s%ny,s%ntheta_s,'ee_s',par%hotstartfileno)\r\n      endif\r\n\r\n      ! nonh parameters\r\n      if (par%wavemodel == WAVEMODEL_NONH) then\r\n         call lowlevel_read_hotstart_2d_int(s%breaking,s%nx,s%ny,'breaking',par%hotstartfileno)\r\n         call lowlevel_read_hotstart_2d(s%wb,s%nx,s%ny,'wb',par%hotstartfileno)\r\n         call lowlevel_read_hotstart_2d(s%ws,s%nx,s%ny,'ws',par%hotstartfileno)\r\n      endif\r\n\r\n      ! sediment transport\r\n      if (par%sedtrans==1 .and. (par%sus==1 .or. par%bulk==1)) then\r\n         call lowlevel_read_hotstart_3d(s%ccg,s%nx,s%ny,par%ngd,'ccg',par%hotstartfileno)\r\n      endif\r\n\r\n      ! turbulence\r\n      if (par%turb==1) then\r\n         call lowlevel_read_hotstart_2d(s%kturb,s%nx,s%ny,'kturb',par%hotstartfileno)\r\n      endif\r\n\r\n      ! structures\r\n      if(par%struct==1) then\r\n         call lowlevel_read_hotstart_2d(s%structdepth,s%nx,s%ny,'structdepth',par%hotstartfileno)\r\n      endif\r\n\r\n      ! nhplus\r\n      if (par%nonhq3d==1) then\r\n         call lowlevel_read_hotstart_2d(s%dU,s%nx,s%ny,'dU',par%hotstartfileno)\r\n         call lowlevel_read_hotstart_2d(s%dV,s%nx,s%ny,'dV',par%hotstartfileno)\r\n      endif\r\n\r\n      ! umean and vmean\r\n      if ((par%flow==1).or.(par%wavemodel==WAVEMODEL_NONH)) then\r\n         call lowlevel_read_hotstart_2d(s%umean,s%nx,s%ny,'umean',par%hotstartfileno)\r\n         call lowlevel_read_hotstart_2d(s%vmean,s%nx,s%ny,'vmean',par%hotstartfileno)\r\n      endif\r\n\r\n   end subroutine hotstart_init_2\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/initialize.F90",
+      "line_start": 1781,
+      "line_end": 1803,
+      "sha256": "9803067bd2fa4962d9e2247f6e8b5f87e18a9860802595424183994a715523cd",
+      "quote_exact_utf8": "   subroutine lowlevel_read_hotstart_2d(var,nx,ny,varname,ith)\r\n      use filefunctions\r\n\r\n      integer,intent(in)           :: nx,ny,ith\r\n      real*8,dimension(nx+1,ny+1)  :: var\r\n      character(*), intent(in)     :: varname\r\n\r\n      integer                      :: unit,i,j,ierr\r\n      character(128)               :: fname,rowfmt\r\n\r\n      write(fname,'(a,a,I6.6,a)') 'hotstart_',trim(varname),ith,'.dat'\r\n      call check_file_exist(fname)\r\n      call check_file_length(fname,nx+1,ny+1)\r\n\r\n      unit = create_new_fid()\r\n      write(rowfmt,'(a,I12,a)') '(',nx+1,'(1X,E15.8))'\r\n      open(unit,file=fname,form='FORMATTED', iostat=ierr,status='OLD',action='READ')\r\n      do j=1,ny+1\r\n         read(unit,FMT=rowfmt,iostat=ierr) (var(i,j), i=1,nx+1)\r\n      enddo\r\n      close(unit)\r\n\r\n   end subroutine lowlevel_read_hotstart_2d\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/initialize.F90",
+      "line_start": 1829,
+      "line_end": 1853,
+      "sha256": "9803067bd2fa4962d9e2247f6e8b5f87e18a9860802595424183994a715523cd",
+      "quote_exact_utf8": "   subroutine lowlevel_read_hotstart_3d(var,nx,ny,nd,varname,ith)\r\n      use filefunctions\r\n\r\n      integer,intent(in)           :: nx,ny,nd,ith\r\n      real*8,dimension(nx+1,ny+1,nd) :: var\r\n      character(*), intent(in)     :: varname\r\n\r\n      integer                      :: unit,i,j,k,ierr\r\n      character(128)               :: fname,rowfmt\r\n\r\n      write(fname,'(a,a,I6.6,a)') 'hotstart_',trim(varname),ith,'.dat'\r\n      call check_file_exist(fname)\r\n      call check_file_length(fname,nx+1,ny+1,nd)\r\n\r\n      unit = create_new_fid()\r\n      write(rowfmt,'(a,I12,a)') '(',nx+1,'(1X,E15.8))'\r\n      open(unit,file=fname,form='FORMATTED', iostat=ierr)\r\n      do k=1,nd\r\n         do j=1,ny+1\r\n            read(unit,FMT=rowfmt,iostat=ierr) (var(i,j,k), i=1,nx+1)\r\n         enddo\r\n      enddo\r\n      close(unit)\r\n\r\n   end subroutine lowlevel_read_hotstart_3d\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.F90",
+      "line_start": 139,
+      "line_end": 146,
+      "sha256": "73648b5733a8f90a8f18cda32743bdc2ef42f649e39c521e28e06584ee63c359",
+      "quote_exact_utf8": "      ! check gridform\r\n      call setallowednames('xbeach',GRIDFORM_XBEACH,'delft3d',GRIDFORM_DELFT3D)\r\n      call setoldnames('0','1')\r\n      call parmapply('gridform',1,par%gridform,par%gridform_str)\r\n      !\r\n      ! gridform switch\r\n      if (par%gridform==GRIDFORM_XBEACH) then\r\n         ! XBeach grid parameters\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.F90",
+      "line_start": 193,
+      "line_end": 199,
+      "sha256": "73648b5733a8f90a8f18cda32743bdc2ef42f649e39c521e28e06584ee63c359",
+      "quote_exact_utf8": "      elseif (par%gridform==GRIDFORM_DELFT3D) then\r\n         par%depfile = readkey_name('params.txt','depfile',required=.true.)\r\n         call check_file_exist(par%depfile)\r\n         par%dx = -1.d0   ! Why?\r\n         par%dy = -1.d0   ! Why?\r\n         par%xyfile = readkey_name('params.txt','xyfile',required=.true.)\r\n         call check_file_exist(par%xyfile)\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/timestep.F90",
+      "line_start": 456,
+      "line_end": 480,
+      "sha256": "24f600029a975b520c837bbcdb0109853df0c6d6b14b00e198d315a9230e1578",
+      "quote_exact_utf8": "      if (present(ierr)) then\r\n         ierr = 0\r\n      endif\r\n      tny = tiny(0.d0)\r\n\r\n      ! Robert new time step criterion\r\n      if (par%t<=0.0d0 .and. par%hotstart==0) then          ! conservative estimate in case of zeros initialization\r\n         par%dt    = par%CFL*min(minval(s%dsu(imin_ee:imax_ee,jmin_ee:jmax_ee)),   &\r\n         minval(s%dnv(imin_ee:imax_ee,jmin_ee:jmax_ee)))   &\r\n         /sqrt(maxval(s%hh(imin_ee:imax_ee,jmin_ee:jmax_ee))*par%g)\r\n         dtref = 0.d0\r\n         if (tpar%tnext > par%dt) then\r\n            n = ceiling((tpar%tnext-par%t)/par%dt)\r\n            par%dt = (tpar%tnext-par%t)/n\r\n         end if\r\n      elseif(par%t<=0.0d0 .and. par%hotstart==1) then            ! conservative estimate in case of hotstart initialization\r\n         par%dt    = par%CFL*min(minval(s%dsu(imin_ee:imax_ee,jmin_ee:jmax_ee)),   &\r\n         minval(s%dnv(imin_ee:imax_ee,jmin_ee:jmax_ee)))   &\r\n         /maxval(sqrt(max(s%zs(imin_ee:imax_ee,jmin_ee:jmax_ee)-s%zb(imin_ee:imax_ee,jmin_ee:jmax_ee),par%eps)*par%g)  &\r\n                 +sqrt(s%uu(imin_ee:imax_ee,jmin_ee:jmax_ee)**2+s%vv(imin_ee:imax_ee,jmin_ee:jmax_ee)**2))\r\n         dtref = 0.d0\r\n         if (tpar%tnext > par%dt) then\r\n            n = ceiling((tpar%tnext-par%t)/par%dt)\r\n            par%dt = (tpar%tnext-par%t)/n\r\n         end if\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/timestep.F90",
+      "line_start": 676,
+      "line_end": 684,
+      "sha256": "24f600029a975b520c837bbcdb0109853df0c6d6b14b00e198d315a9230e1578",
+      "quote_exact_utf8": "      ! maximize dt with given dt\r\n      if (present(dt)) then\r\n         par%dt = min(dt, par%dt)\r\n      end if\r\n\r\n      if (present(limtypeout)) then\r\n         limtypeout = limtype\r\n      endif\r\n\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/output.F90",
+      "line_start": 130,
+      "line_end": 157,
+      "sha256": "96c44909bfb926f6907e5f6db8814ca69bf6d1a14e824f49dc1dd8b5ba0885e9",
+      "quote_exact_utf8": "      end_program = .false.\r\n#ifdef USEMPI\r\n      if(xcompute) then\r\n         if(tpar%output) then\r\n            call xmpi_send_sleep(xmpi_imaster,xmpi_omaster) ! wake up omaster\r\n            call xmpi_bcast(end_program,toall) ! matching the xmpi_bcast\r\n            !                                  ! in the do loop a few lines below\r\n            call tell_xomaster_what_time_it_is ! matching the call a few lines below\r\n         else\r\n            return\r\n         endif\r\n      endif\r\n#endif\r\n\r\n      do\r\n         ! xomaster will not leave this loop, except\r\n         ! at the very end of the program\r\n#ifdef USEMPI\r\n         if(xomaster) then\r\n            call xmpi_send_sleep(xmpi_imaster,xmpi_omaster)\r\n            call xmpi_bcast(end_program,toall) ! matching the xmpi_bcast\r\n            !                                  ! above or the xmpi_bcast\r\n            !                                  ! in finalize\r\n            if(end_program) then\r\n               call xmpi_barrier(toall)\r\n               call xmpi_finalize\r\n               stop\r\n            endif\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/output.F90",
+      "line_start": 199,
+      "line_end": 214,
+      "sha256": "96c44909bfb926f6907e5f6db8814ca69bf6d1a14e824f49dc1dd8b5ba0885e9",
+      "quote_exact_utf8": "   subroutine output_error(s, sglobal, par, tpar)\r\n\r\n      use logging_module\r\n\r\n      implicit none\r\n\r\n      type(spacepars)                     :: s,sglobal\r\n      type(parameters)                    :: par\r\n      type(timepars)                      :: tpar\r\n\r\n      !call output(s, sglobal, par, tpar, update=.false.)\r\n      call writelog('lse','','An extra output timestep is created to inquire the last timestep')\r\n      call writelog('lse','','    before an error occured')\r\n      call halt_program\r\n\r\n   end subroutine output_error\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xmpi.F90",
+      "line_start": 255,
+      "line_end": 274,
+      "sha256": "68c0cec030f136e8edd2024248284fb43c03c171fc5f23a1496ff40d52ced140",
+      "quote_exact_utf8": "      ! errors when used:\r\n      !\r\n      if (xomaster) then\r\n         xmpi_comm = MPI_COMM_NULL\r\n         xmpi_rank = -123\r\n         xmaster   = .false.\r\n      endif\r\n      !\r\n      ! Let the I/O process know how many computational processes there are:\r\n      !\r\n\r\n      if(xomaster) then\r\n         xmpi_size = xmpi_osize - 1\r\n      endif\r\n\r\n      xmpi_imaster = 1\r\n\r\n      ! sanity check for xmpi_orank_to_rank and xmpi_rank_to_orank\r\n\r\n      r = xmpi_orank_to_rank(xmpi_orank)\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xmpi.F90",
+      "line_start": 1680,
+      "line_end": 1705,
+      "sha256": "68c0cec030f136e8edd2024248284fb43c03c171fc5f23a1496ff40d52ced140",
+      "quote_exact_utf8": "   subroutine halt_program(normal)\r\n      logical,intent(in),optional :: normal\r\n      logical                     :: lnormal\r\n      integer                     :: ierr\r\n\r\n      if(present(normal)) then\r\n         lnormal = normal\r\n      else\r\n         lnormal = .true.\r\n      endif\r\n\r\n      write(0,*) 'halt_program called by process', xmpi_orank\r\n      if (lnormal) then\r\n         call backtrace\r\n      endif\r\n\r\n#ifdef USEMPI\r\n      if (lnormal) then\r\n         call xmpi_abort\r\n      else\r\n         call MPI_Abort(xmpi_ocomm,1,ierr)\r\n      endif\r\n#else\r\n      stop 1\r\n#endif\r\n   end subroutine halt_program\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/logging.F90",
+      "line_start": 76,
+      "line_end": 102,
+      "sha256": "bce674aa627966352d8e32b68e4503cd85fc0aa701ad40dc76f4aa8055974271",
+      "quote_exact_utf8": "   subroutine start_logfiles(error)\r\n\r\n      implicit none\r\n\r\n      integer         :: error\r\n\r\n      if (xmaster) then\r\n\r\n         logfileid       = generate_logfileid()\r\n         if (xmaster)    open(logfileid,     file='XBlog.txt',       status='replace')\r\n\r\n         errorfileid     = generate_logfileid()\r\n         if (xmaster)    open(errorfileid,   file='XBerror.txt',     status='replace')\r\n\r\n         warningfileid   = generate_logfileid()\r\n         if (xmaster)    open(warningfileid, file='XBwarning.txt',   status='replace')\r\n\r\n         if (logfileid < 0 .or. errorfileid < 0 .or. warningfileid < 0) error = 1\r\n\r\n      endif ! xmaster\r\n\r\n      if (error==1) then\r\n         write(*,*) 'Error: not able to open log file. Stopping simulation'\r\n         stop\r\n      endif\r\n\r\n   end subroutine start_logfiles\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/logging.F90",
+      "line_start": 248,
+      "line_end": 282,
+      "sha256": "bce674aa627966352d8e32b68e4503cd85fc0aa701ad40dc76f4aa8055974271",
+      "quote_exact_utf8": "#ifdef USEMPI\r\n   subroutine writelog_mpi(mpiboundary,error)\r\n      use xmpi_module\r\n\r\n      implicit none\r\n\r\n      integer, intent(in)                             :: error\r\n      integer, intent(in)                             :: mpiboundary\r\n\r\n      if (xmaster) then\r\n         if (error==1) then\r\n            call writelog('elws','','Unknown mpi division ',mpiboundary)\r\n            call halt_program\r\n         elseif (error==2) then\r\n            call writelog('elws','','Number of domains specified does not match available number of computation cores ')\r\n            call halt_program\r\n         elseif (error==3) then\r\n            call writelog('elws','','Number of mpi domains in M-direction is greater than nx/4')\r\n            call writelog('elws','','XBeach cannot split into separate model domains.')\r\n            call writelog('elws','','Reduce number of mpi-domains in M-direction.')\r\n            call halt_program\r\n         elseif (error==4) then\r\n            call writelog('elws','','Number of mpi domains in N-direction is greater than ny/4')\r\n            call writelog('elws','','XBeach cannot split into separate model domains.')\r\n            call writelog('elws','','Reduce number of mpi-domains in N-direction.')\r\n            call halt_program\r\n         elseif (error==5) then\r\n            call writelog('lws','','Number of mpi domains in M-direction is greater than nx/8')\r\n            call writelog('lws','','Reduce number of mpi-domains in M-direction for efficiency.')\r\n         elseif (error==6) then\r\n            call writelog('lws','','Number of mpi domains in N-direction is greater than ny/8')\r\n            call writelog('lws','','Reduce number of mpi-domains in M-direction for efficiency.')\r\n         else\r\n            call writelog('ls','','processor grid: ',xmpi_m,' X ',xmpi_n)\r\n         endif\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/logging.F90",
+      "line_start": 288,
+      "line_end": 330,
+      "sha256": "bce674aa627966352d8e32b68e4503cd85fc0aa701ad40dc76f4aa8055974271",
+      "quote_exact_utf8": "   subroutine writelog_finalize(tbegin, n, t, nx, ny, t0, t01)\r\n\r\n      use xmpi_module\r\n      implicit none\r\n\r\n      integer                                         :: n,nx,ny\r\n      real*8                                          :: tbegin,tend\r\n      real*8                                          :: t,duration,dt,performance\r\n      real*8, optional                                :: t0,t01\r\n\r\n#ifdef USEMPI\r\n      real*8                                          :: t1\r\n#endif\r\n\r\n      if (xmaster) then\r\n\r\n         call cpu_time(tend)\r\n\r\n         duration    = tend-tbegin\r\n         dt          = t/n\r\n         performance = duration/(nx+1)/(ny+1)/n\r\n\r\n         call writelog('ls','','Duration   : ',duration,' seconds'       )\r\n         call writelog('ls','','Timesteps  : ',n                         )\r\n         call writelog('ls','','Average dt : ',dt,' seconds'             )\r\n         call writelog('ls','','Unit speed : ',performance,' seconds/1'  )\r\n\r\n#ifdef USEMPI\r\n         if (present(t0) .and. present(t01)) then\r\n            t1 = MPI_Wtime()\r\n            call writelog('ls','','MPI timing : procs      : ',xmpi_size                )\r\n            call writelog('ls','','             seconds    : total : ',t1-t0, ' seconds')\r\n            call writelog('ls','','                          loop  : ',t1-t01,' seconds')\r\n         endif\r\n#endif\r\n\r\n         call writelog('ls','','End of program xbeach')\r\n      endif\r\n\r\n      call close_logfiles\r\n      ! reset callback\r\n      logging_callback => null()\r\n   end subroutine writelog_finalize\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/libxbeach_dynamic.F90",
+      "line_start": 12,
+      "line_end": 38,
+      "sha256": "013fcef5534f769ab3c8bfbf6a458aa2a83f6894635a68df8c640337f4382546",
+      "quote_exact_utf8": "   integer(c_int) function xbeach_init() bind(C, name=\"init\")\r\n      !DEC$ ATTRIBUTES DLLEXPORT::xbeach_init\r\n\r\n      xbeach_init = init()\r\n\r\n   end function xbeach_init\r\n\r\n   integer(c_int) function xbeach_outputext() bind(C, name=\"outputext\")\r\n      !DEC$ ATTRIBUTES DLLEXPORT::xbeach_outputext\r\n\r\n      xbeach_outputext = outputext()\r\n\r\n   end function xbeach_outputext\r\n\r\n   integer(c_int) function xbeach_executestep() bind(C, name=\"executestep\")\r\n      !DEC$ ATTRIBUTES DLLEXPORT::xbeach_executestep\r\n\r\n      xbeach_executestep = executestep()\r\n\r\n   end function xbeach_executestep\r\n\r\n   integer(c_int) function xbeach_finalize() bind(C, name=\"finalize\")\r\n      !DEC$ ATTRIBUTES DLLEXPORT::xbeach_finalize\r\n\r\n      xbeach_finalize = final()\r\n\r\n   end function xbeach_finalize\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xbeach_bmi.f90",
+      "line_start": 35,
+      "line_end": 57,
+      "sha256": "47408c2943edd5a7feff23fa0bc0b0f17f7610747044a354d55fde16232baa5b",
+      "quote_exact_utf8": "   integer(c_int) function finalize() result(ierr) bind(C, name=\"finalize\")\r\n      !DEC$ ATTRIBUTES DLLEXPORT::finalize\r\n      ierr = 0\r\n      call logmsg(LEVEL_INFO, 'Finalize')\r\n      ierr = final()\r\n   end function finalize\r\n\r\n\r\n   integer(c_int) function initialize(c_configfile) result(ierr) bind(C, name=\"initialize\")\r\n      !DEC$ ATTRIBUTES DLLEXPORT::initialize\r\n\r\n      implicit none\r\n\r\n      ! Variables\r\n      character(kind=c_char), intent(in) :: c_configfile(*)\r\n      character(len=strlen(c_configfile)) :: configfile\r\n\r\n      ! Convert c string to fortran string\r\n      configfile = char_array_to_string(c_configfile)\r\n\r\n      ierr = init()\r\n\r\n   end function initialize\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xbeach_bmi.f90",
+      "line_start": 178,
+      "line_end": 189,
+      "sha256": "47408c2943edd5a7feff23fa0bc0b0f17f7610747044a354d55fde16232baa5b",
+      "quote_exact_utf8": "   subroutine get_time_step(timestep) bind(C, name=\"get_time_step\")\r\n      !DEC$ ATTRIBUTES DLLEXPORT :: get_time_step\r\n\r\n      real(c_double) :: timestep\r\n      integer :: ilim = 0\r\n      integer :: jlim = 0\r\n      integer :: it = 0\r\n      real*8 :: dtref = 0.d0\r\n\r\n      call compute_dt(s,par, tpar, it, ilim, jlim, dtref)\r\n      timestep = par%dt\r\n   end subroutine get_time_step\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeach/xbeach.F90",
+      "line_start": 19,
+      "line_end": 33,
+      "sha256": "5b8347e6df5b68eceb7127964a6424cd8a14aa463aca949827b1051d45c634d6",
+      "quote_exact_utf8": "   rc = init()\r\n\r\n   ! Start simulation                                                            !\r\n   rc = getdoubleparameter(\"t\", t)\r\n   rc = getdoubleparameter(\"tstop\", tstop)\r\n   do while (t<tstop)\r\n      rc = executestep()\r\n      rc = getdoubleparameter(\"t\", t)\r\n      ! output\r\n      rc = outputext()\r\n   enddo\r\n\r\n   ! Cleanup\r\n   rc = final()\r\nend program\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/doc/reports/libxbeach.tex",
+      "line_start": 92,
+      "line_end": 94,
+      "sha256": "d612cec45a7e6c3198317a7dfd871bc48d45bedcc31b3446d35dfd15bd9da011",
+      "quote_exact_utf8": "\\subsection{The finalize section}\nCleanup  and close files. Here also all allocated variables should be deallocated but that's another detail.  \n\\lstinputlisting[linerange={155-165},firstnumber=155]{../xbeach.F90} "
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.F90",
+      "line_start": 50,
+      "line_end": 59,
+      "sha256": "73648b5733a8f90a8f18cda32743bdc2ef42f649e39c521e28e06584ee63c359",
+      "quote_exact_utf8": "      !\r\n      call writelog('sl','','Reading input parameters: ')\r\n      !\r\n      ! Check params.txt exists\r\n      call check_file_exist('params.txt')\r\n      !\r\n      !\r\n      ! Collections of default sets\r\n      par%useXBeachGSettings    = readkey_int ('params.txt','useXBeachGSettings',     0,0,1,strict=.true.,silent=.true.)\r\n      ! par%useXBeachGSettings = 1\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeach/Makefile.am",
+      "line_start": 1,
+      "line_end": 14,
+      "sha256": "fcee7e29eee056656267bcf4bdf273c9ab15db957c178d7657216f4135ecace1",
+      "quote_exact_utf8": "ACLOCAL_AMFLAGS = -I m4 -I config\nbin_PROGRAMS=xbeach\n\nxbeach_SOURCES=\\\n\tinput.F90\\\n\txbeach.F90\nxbeach_LDADD=\\\n\t$(builddir)/../xbeachlibrary/libxbeach.la\n\n# Set flags off by default\nxbeach_FCFLAGS=-I$(builddir)/../xbeachlibrary\nif USEMPI\nxbeach_FCFLAGS+=-DUSEMPI -DHAVE_MPI_WTIME \nendif"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am",
+      "line_start": 3,
+      "line_end": 60,
+      "sha256": "1b313d0ba88701c16f6805114d7d6b5d406fb9026a03d091c2d49b97b8ee8d21",
+      "quote_exact_utf8": "lib_LTLIBRARIES=libxbeach.la\nlibxbeach_la_SOURCES= \\\n\ts.ind \\\n\ts.inp \\\n\tsleeper.F90 \\\n\txmpi.F90 \\\n\tgeneral_mpi.F90 \\\n\tconstants.F90 \\\n\ttypesandkinds.F90 \\\n\tiso_c_utils.f90 \\\n\tlogging.F90 \\\n\tparamsconst.F90 \\\n\tfilefunctions.F90 \\\n\treadkey.F90 \\\n\tmnemonic.F90 \\\n\tinterp.F90 \\\n\tmath_tools.F90 \\\n\tparams.F90 \\\n\tgetkey.F90 \\\n\tspaceparamsdef.F90 \\\n\tspaceparams.F90 \\\n\tcompute_tide_zs0.F90 \\\n\twetcells.F90 \\\n\tvegetation.F90 \\\n\twave_functions.F90 \\\n\twaveparams.F90 \\\n\twaveparamsnew.F90 \\\n\troelvink.F90 \\\n\twave_stationary_directions.F90 \\\n\twave_instationary.F90 \\\n\twave_timestep.F90 \\\n\tsolver.F90 \\\n\tflow_secondorder.F90 \\\n\tnonh.F90 \\\n\tboundaryconditions.F90 \\\n\tmorphevolution.F90 \\\n\tgroundwater.F90 \\\n\trainfall.F90 \\\n\tdrifters.F90 \\\n\treadtide.F90 \\\n\treadwind.F90 \\\n\tinitialize.F90 \\\n\ttimestep.F90 \\\n\tbedroughness.F90 \\\n\tvsm_u_XB.f90 \\\n\tflow_timestep.F90 \\\n\tpostprocess.F90 \\\n\tvarianceupdate.F90 \\\n\tvaroutput.F90 \\\n\tncoutput.F90 \\\n\toutput.F90 \\\n\tship.F90 \\\n\tmnemoniciso.F90 \\\n\tloopcounters.F90 \\\n\tlibxbeach.F90 \\\n\tdebugging.F90 \\\n\tintrospection.F90 \\\n\txbeach_bmi.f90"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/Makefile.am",
+      "line_start": 99,
+      "line_end": 103,
+      "sha256": "1b313d0ba88701c16f6805114d7d6b5d406fb9026a03d091c2d49b97b8ee8d21",
+      "quote_exact_utf8": "libxbeach_la_FCFLAGS=-I$(top_builddir) -fPIC\n# if mpi, then add some flags\nif USEMPI\nlibxbeach_la_FCFLAGS+=-DUSEMPI -DHAVE_MPI_WTIME\nendif"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xbeachlibrary_dynamic.vfproj",
+      "line_start": 169,
+      "line_end": 173,
+      "sha256": "efe55390d88fd5ba27980de59b7646a48a2e59a0b22b554639b88824d3a907f2",
+      "quote_exact_utf8": "\t\t<Filter Name=\"Resource Files\" Filter=\"rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe\"/>\r\n\t\t<Filter Name=\"Source Files\" Filter=\"f90;for;f;fpp;ftn;def;odl;idl\">\r\n\t\t<File RelativePath=\".\\introspection.F90\"/>\r\n\t\t<File RelativePath=\".\\libxbeach_dynamic.F90\"/></Filter></Files>\r\n\t<Globals/></VisualStudioProject>\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/pybeach/xbeach/libxbeach.py",
+      "line_start": 61,
+      "line_end": 72,
+      "sha256": "55640d609c20815d0b3cf24e0cbf42c48e7a52d8aea701f41d6e3e1c20d5027f",
+      "quote_exact_utf8": "    def init(self):\n        \"\"\"Initialise XBeach (only run once)\"\"\"\n        logger.debug('Initializing...')\n        if self.shouldinitialize:\n            self._lib.init()\n        self.shouldinitialize = False\n    def executestep(self):\n        \"\"\"Execute a timestep, stops before or on tnext\"\"\"\n        self._lib.executestep()\n    def output(self):\n        \"\"\"Call XBeach output\"\"\"\n        self._lib.outputext()"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/initialize.F90",
+      "line_start": 1076,
+      "line_end": 1138,
+      "sha256": "9803067bd2fa4962d9e2247f6e8b5f87e18a9860802595424183994a715523cd",
+      "quote_exact_utf8": "      if (par%hotstartflow==1) then\r\n         call writelog('ls','','Calculating stationary flow field for initial condition')\r\n         ! water level gradients\r\n         do j=1,s%ny+1\r\n            do i=2,s%nx\r\n               s%dzsdx(i,j)=(s%zs0(i+1,j)-s%zs0(i,j))/s%dsu(i,j)\r\n            end do\r\n         end do\r\n         do j=1,s%ny ! Dano need to get correct slope on boundary y=0\r\n            do i=1,s%nx+1\r\n               s%dzsdy(i,j)=(s%zs0(i,j+1)-s%zs0(i,j))/s%dnv(i,j)\r\n            end do\r\n         end do\r\n         ! Water depth in u,v-points mean for wind forcing\r\n         do j=1,s%ny+1\r\n            do i=1,s%nx+1 !Ap\r\n               s%hum(i,j)=max(.5d0*(s%hh(i,j)+s%hh(min(s%nx,i)+1,j)),par%eps)\r\n            end do\r\n         end do\r\n         do j=1,s%ny+1\r\n            do i=1,s%nx+1\r\n               s%hvm(i,j)=max(.5d0*(s%hh(i,j)+s%hh(i,min(s%ny,j)+1)),par%eps)\r\n            end do\r\n         end do\r\n         ! residual error\r\n         flowerr = huge(0.d0)\r\n         vmagvold = 0.d0\r\n         vmaguold = 0.d0\r\n         do while (flowerr > 0.00001d0)\r\n            !\r\n            ! Balance in longshore\r\n            vmagvold=0.5d0*(vmagvold+sqrt(s%uv**2+s%vv**2))   ! mean needed for convergence\r\n            ! solve v-balance of pressure gradient, wind forcing and bed friction\r\n            where (s%wetv==1)\r\n               s%vv = s%hv/s%cf/max(vmagvold,0.000001d0) &\r\n               *(-par%g*s%dzsdy+par%rhoa*par%Cd*s%windnv*sqrt(s%windsu**2+s%windnv**2)/(par%rho*s%hvm))  ! Kees: wind correction\r\n            elsewhere\r\n               s%vv = 0.d0\r\n            endwhere\r\n            ! update vmagev\r\n            ! u velocity in v points\r\n            if (s%ny>0) then\r\n               s%uv(2:s%nx,1:s%ny)= .25d0*(s%uu(1:s%nx-1,1:s%ny)+s%uu(2:s%nx,1:s%ny)+ &\r\n               s%uu(1:s%nx-1,2:s%ny+1)+s%uu(2:s%nx,2:s%ny+1))\r\n               ! boundaries?\r\n               ! wwvv and what about uv(:,1) ?\r\n               if(xmpi_isright) then\r\n                  s%uv(:,s%ny+1) = s%uv(:,s%ny)\r\n               endif\r\n            else\r\n               s%uv(2:s%nx,1)= .5d0*(s%uu(1:s%nx-1,1)+s%uu(2:s%nx,1))\r\n            endif !s%ny>0\r\n            s%vmagev = sqrt(s%uv**2+s%vv**2)\r\n            !\r\n            ! Balance in cross shore\r\n            vmaguold= 0.5d0*(vmaguold+sqrt(s%uu**2+s%vu**2)) ! mean needed for convergence\r\n            ! Solve balance of forces\r\n            where (s%wetu==1)\r\n               s%uu = s%hu/s%cf/max(vmaguold,0.000001d0) &\r\n               *(-par%g*s%dzsdx+par%rhoa*par%Cd*s%windsu*sqrt(s%windsu**2+s%windnv**2)/(par%rho*s%hum)) ! Kees: wind correction\r\n            elsewhere\r\n               s%uu = 0.d0\r\n            endwhere\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xmpi.F90",
+      "line_start": 393,
+      "line_end": 407,
+      "sha256": "68c0cec030f136e8edd2024248284fb43c03c171fc5f23a1496ff40d52ced140",
+      "quote_exact_utf8": "      ! Check whether each MPI subdomain is large enough (at least 4 cells in x and y), preferably more\r\n      ! Errors\r\n      if(m+1<4*xmpi_m) then\r\n         error = 3\r\n         return\r\n      endif\r\n      if (n+1<4*xmpi_n .and. n>2) then\r\n         error = 4\r\n         return\r\n      endif\r\n      ! \"Warning\"\r\n      if (m+1<8*xmpi_m .or. (n+1<8*xmpi_n .and. n>2)) then\r\n         if (m+1<8*xmpi_m) error = 5\r\n         if (n+1<8*xmpi_n .and. n>2) error = 6\r\n      endif\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/logging.F90",
+      "line_start": 274,
+      "line_end": 282,
+      "sha256": "bce674aa627966352d8e32b68e4503cd85fc0aa701ad40dc76f4aa8055974271",
+      "quote_exact_utf8": "         elseif (error==5) then\r\n            call writelog('lws','','Number of mpi domains in M-direction is greater than nx/8')\r\n            call writelog('lws','','Reduce number of mpi-domains in M-direction for efficiency.')\r\n         elseif (error==6) then\r\n            call writelog('lws','','Number of mpi domains in N-direction is greater than ny/8')\r\n            call writelog('lws','','Reduce number of mpi-domains in M-direction for efficiency.')\r\n         else\r\n            call writelog('ls','','processor grid: ',xmpi_m,' X ',xmpi_n)\r\n         endif\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/xbeach_bmi.f90",
+      "line_start": 141,
+      "line_end": 156,
+      "sha256": "47408c2943edd5a7feff23fa0bc0b0f17f7610747044a354d55fde16232baa5b",
+      "quote_exact_utf8": "   subroutine set_current_time(xptr) bind(C, name=\"set_current_time\")\r\n      !DEC$ ATTRIBUTES DLLEXPORT :: set_current_time\r\n\r\n      use iso_c_binding, only: c_ptr, c_double, c_f_pointer\r\n\r\n      type(c_ptr), value, intent(in) :: xptr\r\n      real(c_double), pointer :: x_0d_double_ptr\r\n\r\n      call c_f_pointer(xptr, x_0d_double_ptr)\r\n      if (par%morfacopt == 1) then\r\n         par%t = x_0d_double_ptr / max(par%morfac, 1.d0)\r\n      else\r\n         par%t = x_0d_double_ptr\r\n      endif\r\n\r\n   end subroutine set_current_time\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/ncoutput.F90",
+      "line_start": 2055,
+      "line_end": 2113,
+      "sha256": "04a33fdba34ee869590e0a7bb898d5edc8c7fd1b6ca9dc9634c727e74afaaa7b",
+      "quote_exact_utf8": "            call lowlevel_write_hotstart_2d(s%zs,s%nx,s%ny,'zs',tpar%ith)\r\n            call lowlevel_write_hotstart_2d(s%zb,s%nx,s%ny,'zb',tpar%ith)\r\n            call lowlevel_write_hotstart_2d(s%uu,s%nx,s%ny,'uu',tpar%ith)\r\n            call lowlevel_write_hotstart_2d(s%vv,s%nx,s%ny,'vv',tpar%ith)\r\n         endif\r\n\r\n         ! groundwater parameters\r\n         if(par%gwflow==1) then\r\n            call lowlevel_write_hotstart_2d(s%gwlevel,s%nx,s%ny,'gwlevel',tpar%ith)\r\n            call lowlevel_write_hotstart_2d(s%gwhead,s%nx,s%ny,'gwhead',tpar%ith)\r\n            call lowlevel_write_hotstart_2d(s%gwcurv,s%nx,s%ny,'gwcurv',tpar%ith)\r\n         endif\r\n\r\n         ! wave energy\r\n         if (par%swave==1) then\r\n            call lowlevel_write_hotstart_3d(s%ee,s%nx,s%ny,s%ntheta,'ee',tpar%ith)\r\n            call lowlevel_write_hotstart_3d(s%rr,s%nx,s%ny,s%ntheta,'rr',tpar%ith)\r\n         endif\r\n\r\n         ! single-dir\r\n         if (par%single_dir==1) then\r\n            call lowlevel_write_hotstart_3d(s%ee_s,s%nx,s%ny,s%ntheta_s,'ee_s',tpar%ith)\r\n         endif\r\n\r\n         ! nonh parameters\r\n         if (par%wavemodel == WAVEMODEL_NONH) then\r\n            call lowlevel_write_hotstart_2d_int(s%breaking,s%nx,s%ny,'breaking',tpar%ith)\r\n            call lowlevel_write_hotstart_2d(s%wb,s%nx,s%ny,'wb',tpar%ith)\r\n            call lowlevel_write_hotstart_2d(s%ws,s%nx,s%ny,'ws',tpar%ith)\r\n         endif\r\n\r\n         ! sediment transport\r\n         if (par%sedtrans==1 .and. (par%sus==1 .or. par%bulk==1)) then\r\n            call lowlevel_write_hotstart_3d(s%ccg,s%nx,s%ny,par%ngd,'ccg',tpar%ith)\r\n         endif\r\n\r\n         ! turbulence\r\n         if (par%turb==1) then\r\n            call lowlevel_write_hotstart_2d(s%kturb,s%nx,s%ny,'kturb',tpar%ith)\r\n         endif\r\n\r\n         ! structures\r\n         if (par%struct==1) then\r\n            call lowlevel_write_hotstart_2d(s%structdepth,s%nx,s%ny,'structdepth',tpar%ith)\r\n         endif\r\n\r\n         ! nhplus\r\n         if (par%nonhq3d==1) then\r\n            call lowlevel_write_hotstart_2d(s%dU,s%nx,s%ny,'dU',tpar%ith)\r\n            call lowlevel_write_hotstart_2d(s%dV,s%nx,s%ny,'dV',tpar%ith)\r\n         endif\r\n\r\n         ! boundary flow\r\n         if ((par%flow==1).or.(par%wavemodel==WAVEMODEL_NONH)) then\r\n            call lowlevel_write_hotstart_2d(s%umean,s%nx,s%ny,'umean',tpar%ith)\r\n            call lowlevel_write_hotstart_2d(s%vmean,s%nx,s%ny,'vmean',tpar%ith)\r\n         endif\r\n      endif   ! xomaster\r\n   end subroutine hotstartfiles_write\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/timestep.F90",
+      "line_start": 363,
+      "line_end": 394,
+      "sha256": "24f600029a975b520c837bbcdb0109853df0c6d6b14b00e198d315a9230e1578",
+      "quote_exact_utf8": "      if (size(tpar%tpg) .gt. 0) then\r\n         tpar%outputg = abs(tpar%tpg(min(tpar%itg+1,size(tpar%tpg)))-par%t) .le. 0.0000001d0\r\n         ! if global output has last output before tstop, this minimum is necessary\r\n      endif\r\n      if (size(tpar%tpp) .gt. 0) then\r\n         tpar%outputp = abs(tpar%tpp(min(tpar%itp+1,size(tpar%tpp)))-par%t) .le. 0.0000001d0\r\n      endif\r\n      if (size(tpar%tpm) .gt. 0) then\r\n         tpar%outputm = abs(tpar%tpm(min(tpar%itm+1,size(tpar%tpm)))-par%t) .le. 0.0000001d0\r\n      endif\r\n      if (size(tpar%tpw) .gt. 0) then\r\n         tpar%outputw = abs(tpar%tpw(min(tpar%itw+1,size(tpar%tpw)))-par%t) .le. 0.0000001d0\r\n      endif\r\n      if (size(tpar%tph) .gt. 0) then\r\n         tpar%outputh = abs(tpar%tph(min(tpar%ith+1,size(tpar%tph)))-par%t) .le. 0.0000001d0\r\n      endif\r\n\r\n      !  tpar%outputg = (size(tpar%tpg) .gt. tpar%itg) .and. (abs(tpar%tpg(tpar%itg+1)-par%t) .le. 0.0000001d0)\r\n      !  tpar%outputp = (size(tpar%tpp) .gt. tpar%itp) .and. (abs(tpar%tpp(tpar%itp+1)-par%t) .le. 0.0000001d0)\r\n      !  tpar%outputm = (size(tpar%tpm) .gt. tpar%itm) .and. (abs(tpar%tpm(tpar%itm+1)-par%t) .le. 0.0000001d0)\r\n      !  tpar%outputc = (size(tpar%tpc) .gt. tpar%itc) .and. (abs(tpar%tpc(tpar%itc+1)-par%t) .le. 0.0000001d0)\r\n      !  tpar%outputw = (size(tpar%tpw) .gt. tpar%itw) .and. (abs(tpar%tpw(tpar%itw+1)-par%t) .le. 0.0000001d0)\r\n      tpar%output  = (tpar%outputg .or. tpar%outputp .or. tpar%outputm .or. tpar%outputw .or. tpar%outputh)\r\n\r\n      ! if we are updating at the current timestep, increase the counter by 1\r\n      !\r\n      ! update output counter\r\n      if (tpar%outputg) tpar%itg = tpar%itg + 1\r\n      if (tpar%outputp) tpar%itp = tpar%itp + 1\r\n      if (tpar%outputm) tpar%itm = tpar%itm + 1\r\n      if (tpar%outputw) tpar%itw = tpar%itw + 1\r\n      if (tpar%outputh) tpar%ith = tpar%ith + 1\r"
+    },
+    {
+      "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/timestep.F90",
+      "line_start": 700,
+      "line_end": 710,
+      "sha256": "24f600029a975b520c837bbcdb0109853df0c6d6b14b00e198d315a9230e1578",
+      "quote_exact_utf8": "      integer, intent(out), optional   :: ierr\r\n      real*8, intent(in), optional :: dt\r\n      integer                     :: ilim\r\n      integer                     :: jlim\r\n      integer                     :: limtype\r\n      real*8                      :: fac\r\n      real*8,save                         :: dtref\r\n\r\n      if(.not. xcompute) return\r\n\r\n      call compute_dt(s,par, tpar, it, ilim, jlim, dtref, dt=dt, ierr=ierr,limtypeout=limtype)\r"
+    }
+  ],
+  "entry_families": [
+    {
+      "entry": "standalone",
+      "source": "src/xbeach/xbeach.F90",
+      "sequence": "readinput -> init -> executestep/outputext loop -> final",
+      "build": "src/xbeach/Makefile.am links libxbeach.la"
+    },
+    {
+      "entry": "BMI C binding",
+      "source": "src/xbeachlibrary/xbeach_bmi.f90",
+      "sequence": "initialize -> init; update -> executestep/outputext; finalize -> final",
+      "build": "src/xbeachlibrary/Makefile.am includes xbeach_bmi.f90"
+    },
+    {
+      "entry": "legacy dynamic C binding",
+      "source": "src/xbeachlibrary/libxbeach_dynamic.F90",
+      "sequence": "init/outputext/executestep/finalize C names wrap core calls",
+      "build": "xbeachlibrary_dynamic.vfproj lists libxbeach_dynamic.F90; not in checked Autotools source list"
+    },
+    {
+      "entry": "XBeach Python wrapper",
+      "source": "src/pybeach/xbeach/libxbeach.py",
+      "sequence": "expects init/executestep/outputext exports; finalize only unloads",
+      "build": "caller of a provided library, not another solver build; distinct from BMI initialize spelling"
+    }
+  ],
+  "entry_coverage_limit": "These four existing interface families contextualize the 12 contracts. No full build-configuration, mode or reachable-file coverage claim."
+}
