@@ -384,6 +384,14 @@ def validate(root,here):
         output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
         check(x['sha256'][:10]+'-preview-event-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
     check('preview_event-no-approval',preview_event['whole_model_read_gate']=='NOT_PASSED' and preview_event['human_approval_issued'] is False)
+    arrow_render=json.loads((here/'bytecode-read/arrow-render-read.json').read_text())
+    check('arrow-render-one-exact',bound(arrow_render['prior_receipt']) and len(arrow_render['records'])==arrow_render['unique_classes_read']==1 and arrow_render['records'][0]['instances'][0]['member']=='base/topology/Arrow.class' and arrow_render['instances_covered']==2)
+    for x in arrow_render['records']:
+        original=next(a for a in r['records'] if a['sha256']==x['sha256'])
+        args=['java','-m','jdk.jdeps/com.sun.tools.javap.Main','-c','-p','-s','-constants',str(root/x['class_file']['path'])]
+        output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
+        check(x['sha256'][:10]+'-arrow-render-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
+    check('arrow_render-no-approval',arrow_render['whole_model_read_gate']=='NOT_PASSED' and arrow_render['human_approval_issued'] is False)
     spec=importlib.util.spec_from_file_location('bytecode_coverage',here/'reconcile_bytecode_coverage.py')
     module=importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
