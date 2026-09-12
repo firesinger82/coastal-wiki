@@ -155,3 +155,7 @@ Method는 4바이트 정수 식별자로 1을 CONNECT_COMPOSITE_STATE로 정의�
 ## Composite 판독 보충
 
 `composite-read.json`은 두 클래스 전체 1049줄·12개 경로를 결박한다. write는 공유 primitive 배열을 정렬하고 read는 child parent를 설정하지만 setter는 parent를 설정하지 않는다. 내부 iterator는 overlap=false에서 인덱스를 증가시키지 않고 반복한다. 생성자/next의 prefetch도 이 경로에 들어갈 수 있다. 정상 호출 도달 여부는 미확정이다. 누적 Java 73/413종·426경로, 전체 gate NOT_PASSED.
+
+## Output TreeNode 판독
+
+`output-node-read.json`은 전체 TreeNode 표시 내용을 결박한다. category-null Composite 분해, shadow 생성/기간 갱신/가중치 초기화/병합/shift/저장 후 empty를 연결했다. 상위 driver가 이 순서를 보장하는지는 후속 판독 대상이다. 전체 gate NOT_PASSED.

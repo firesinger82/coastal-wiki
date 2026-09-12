@@ -151,3 +151,5 @@ Claude Sonnet 5의 [한정 재검토](../model-audit/XBeach/HG-ADVERSARIAL-RECHE
 - XBeach Primitive 전체 955줄 판독 및 Shadow 복사/집계 연결 기록. 누적 Java 71종/414경로, 잔여 Java 342종·Python 150종. 전체 승인 미발급.
 
 - XBeach Composite/iterator 2종·1049줄 판독. 비중첩 iterator의 인덱스 미증가 경로 기록. 누적 Java 73종/426경로, 잔여 Java 340종·Python 150종. 전체 승인 미발급.
+
+- XBeach output TreeNode 전체 619줄 판독. Composite 분해 및 shadow lifecycle 연결. 누적 Java 74종/430경로, 잔여 Java 339종·Python 150종. 전체 승인 미발급.
