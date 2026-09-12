@@ -309,3 +309,5 @@ Claude Sonnet 5의 [한정 재검토](../model-audit/XBeach/HG-ADVERSARIAL-RECHE
 2026-09-12 viewer ViewportTime/4개 리스너 5종 전체 1676줄 판독. 정보 창 버튼·창 닫기 처리 연결을 해결하고, 시작점을 넘는 드래그의 반대쪽 경계 잔존과 setView 반복 시 리스너·창 목록 교체를 기록했다. 누적 Java 344/413종·996경로, 잔여 Java 69종/Python 150종. 근거: `viewer-time-viewport-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
 
 2026-09-12 viewer SearchDialog/닫기 리스너/ViewportTimePanel/ScrollableView 4종 전체 485줄 판독. 검색 창 숨김·강조 제거와 내용 교체, 전역 First 창 기준 위치, null 제목의 기존 제목 유지 및 테두리 크기 계산을 연결했다. 누적 Java 348/413종·1004경로, 잔여 Java 65종/Python 150종. 근거: `viewer-search-dialog-panel-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer ViewportTimeYaxis 전체 1069줄 판독. 검색 창 닫기는 강조만 제거하며, 검색 실패는 외부 시각 sentinel을 초기화해 다음 버튼에서 명시 시각 검색으로 재진입하는 연결을 확인했다. 검색 시작점·세로 이동·강조 사각형 계산도 기록했다. 누적 Java 349/413종·1006경로, 잔여 Java 64종/Python 150종. 근거: `viewer-yaxis-viewport-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.

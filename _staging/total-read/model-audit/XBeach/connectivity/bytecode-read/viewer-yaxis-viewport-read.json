@@ -1,0 +1,41 @@
+{
+  "date": "2026-09-12",
+  "attribution": "AI direct bytecode reading; not independent semantic approval.",
+  "prior_receipt": {
+    "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/disassembly-receipt.json",
+    "sha256": "1cc8b2657a74f3f5904e9d0a40648b1c98f6e031b056b7c6e19122beb632aaa8"
+  },
+  "records": [
+    {
+      "sha256": "cf316aacfea33d070377bdcffa47ffc64b147bceb423ba28eb86b7cb4ce63282",
+      "instances": [
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/win32/mpich/bin/jumpshot.jar",
+          "member": "viewer/zoomable/ViewportTimeYaxis.class"
+        },
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/bin/jumpshot.jar",
+          "member": "viewer/zoomable/ViewportTimeYaxis.class"
+        }
+      ],
+      "class_file": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/classes/cf316aacfea33d070377bdcffa47ffc64b147bceb423ba28eb86b7cb4ce63282.class",
+        "sha256": "cf316aacfea33d070377bdcffa47ffc64b147bceb423ba28eb86b7cb4ce63282"
+      },
+      "disassembly": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/disassembly/cf316aacfea33d070377bdcffa47ffc64b147bceb423ba28eb86b7cb4ce63282.txt",
+        "sha256": "01437fdad9f963adddf71834e83a3447dd9f34a33e6d0e502528926684f5da0f"
+      },
+      "read_lines": [
+        1,
+        1069
+      ],
+      "scope": "Entire1069-line javap in four consecutive untruncated slices.",
+      "observation": "Entire1069-line javap in consecutive untruncated slices1–270,271–540,541–810,811–1069. Extends ViewportTime, AdjustmentListener. Captures separate model/Yrange/tree/point, cached component-resize event101, searched drawable/dialog/searchable null, searched_time=-Infinity, searching_time=model global minimum. setView runs parent first then stores SearchableView if supported else null; no reset of search cursor/dialog/marker when view changes. Adjustment event uses event.value as y (no source/adjusting guard), x from parent cached point, updates own and parent Y then setViewPosition/repaint. fireComponentResized directly invokes parent with cached event.\nlocalRectangle delegates searchable then converts returned rect origin from searchable cast Component to viewport and MUTATES returned rectangle, no clone/null guard. Marker derives rectangle and viewport width/height; arrowheads drawn if rectangle LEFT edge x in[0,width), no y-bound test: top category-color/darker arc halves90,-15 and75,-15 with brighter edges, bottom yellow/darkGray arcs270,15 and285,15 plus gray/white edges; configured arrowLength L,2L diameter and offsets int(L*sin/cos(pi/6)+0.5), frame thickness unvalidated. Then computeIntersection mutates rectangle to viewport intersection, tests x>=0 only (not positive width/height). Optional SEARCHED_OBJECT_ON_TOP fills intersection in category color without visible/searchable check, draws black top/left atoffset0 then white layers1..thickness, white right/bottom atoffset0 then darkGray layers1..thickness; unchecked config can yield excessive loops or integer overflow, no Graphics color restoration. Paint parent first then yellow searching-time line if contained, marker if searched_dobjnonnull. eraseSearchedDrawable ONLY nulls drawable: does not clear searching_time/searched_time/SearchTreeTrunk cursor, repaint or hide; SearchDialog caller supplies hide/repaint.\nForward/backward symmetric state machine. Lazy SearchDialog only if ancestor instanceof Frame; otherwise error dialog but CONTINUES with null search_dialog, eventually fails when replace/hide rather than safely returning. No searchable-null guard. If searching_time != searched_time (dcmpl incl NaN) call explicit-time next/previous; equality calls continuation no-time. On result save panel.drawable and its earliestTime; scroll model by foundEarliest-oldSearchingTime (relative, not center), update searching_time to searched_time, tree.scrollRowToVisible(rowID), repaint, replace search-dialog content. Only if currently hidden show at default location/pack; visible dialog replacement validates without repacking or toFront, connecting prior SearchDialog receipt. No transactional rollback if rendering/UI creation fails after tree cursor advances.\nOn null result, inspect PREVIOUS highlighted drawable: backward earliest == global minimum yields FIRST info, forward latest == global maximum yields LAST info, otherwise warning says loaded/in-view objects exhausted and scroll for more. This is boundary-equality heuristic, not exhaustive-file proof; delegates all-time query to currently populated tree as previously recorded. Then hide search dialog, clear marker, set searched_time=-Infinity, KEEP searching_time, repaint,false. Prior SearchTreeTrunk clears last on exhaustion; this outer sentinel means next press normally invokes explicit inclusive-time search again and can rediscover last matching result, rather than being permanently unable to continue. Closing SearchDialog only clears marker and leaves both times and tree cursor: next button can continue. Actual -Infinity times collide with sentinel; no finite validation.\nsearchInit gets parent's LAST stored InfoDialog: if present copy getClickedTime to searching_time, doClick its Close button (normal parent wiring removes/disposes), repaint,true; no reset of searched_time/marker before this, equal time still chooses continuation. For duration info clickedTime is captured latest bound from prior constructor. No info dialog warns,false. Parent mouseClicked first; left hand-mode click sets searching_time from inherited transform/repaint, not Y selection. Parent press first; lefthand snapshots y and ratio=Ymodel.extent/viewport.height (zero unchecked). Drag/release first run parent horizontal handling, then lefthand computes delta(lastY-currentY), Math.round(ratio*delta)long→int, Ymodel.setValue(currentValue+delta) then updates lastY; bounds delegated to model, no overflow protection, ratio not refreshed midgesture. No tree selection operation, log close/worker cancellation/thread marshalling/disposal. All static palette/trigonometry read; archive code not executed or independently approved."
+    }
+  ],
+  "unique_classes_read": 1,
+  "instances_covered": 2,
+  "whole_model_read_gate": "NOT_PASSED",
+  "human_approval_issued": false
+}

@@ -808,6 +808,14 @@ def validate(root,here):
         output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
         check(x['sha256'][:10]+'-viewer-search-dialog-panel-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
     check('viewer_search_dialog_panel-no-approval',viewer_search_dialog_panel['whole_model_read_gate']=='NOT_PASSED' and viewer_search_dialog_panel['human_approval_issued'] is False)
+    viewer_yaxis_viewport=json.loads((here/'bytecode-read/viewer-yaxis-viewport-read.json').read_text())
+    check('viewer-yaxis-viewport-one-exact',bound(viewer_yaxis_viewport['prior_receipt']) and len(viewer_yaxis_viewport['records'])==viewer_yaxis_viewport['unique_classes_read']==1 and [x['instances'][0]['member'] for x in viewer_yaxis_viewport['records']]==['viewer/zoomable/ViewportTimeYaxis.class'] and viewer_yaxis_viewport['instances_covered']==2)
+    for x in viewer_yaxis_viewport['records']:
+        original=next(a for a in r['records'] if a['sha256']==x['sha256'])
+        args=['java','-m','jdk.jdeps/com.sun.tools.javap.Main','-c','-p','-s','-constants',str(root/x['class_file']['path'])]
+        output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
+        check(x['sha256'][:10]+'-viewer-yaxis-viewport-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
+    check('viewer_yaxis_viewport-no-approval',viewer_yaxis_viewport['whole_model_read_gate']=='NOT_PASSED' and viewer_yaxis_viewport['human_approval_issued'] is False)
     spec=importlib.util.spec_from_file_location('bytecode_coverage',here/'reconcile_bytecode_coverage.py')
     module=importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
