@@ -259,3 +259,5 @@ Claude Sonnet 5의 [한정 재검토](../model-audit/XBeach/HG-ADVERSARIAL-RECHE
 2026-09-12 viewer PreferencePanel 전체 1,593줄 판독. UI 입력 순차 대입, 비활성 ACTIVE_REFRESH의 복사 포함, 툴팁 조건 미검증, 슬라이더 텍스트 직접 파싱 및 렌더러 전파 호출 부재를 설정 창/Parameters에 연결했다. 누적 Java 209/413종·726경로, 잔여 Java 204종/Python 150종. viewer/common 잔여 클래스는 없다. 근거: `viewer-preference-panel-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
 
 2026-09-12 viewer FirstFrame/종료 리스너 2종 전체 419줄 판독. 초기화 순서와 TopControl 버튼 위임, 숫자 인자 오류 후 GUI 진행, 현재 전역 First를 대상으로 하는 종료 콜백을 연결했다. 누적 Java 211/413종·730경로, 잔여 Java 202종/Python 150종. FirstPanel의 생성/초기화와 로그 열기는 후속 범위다. 근거: `viewer-first-frame-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer FirstPanel/리스너 계열 12종 전체 1,474줄 판독. 기존 로그 정리 후 신규 열기, 실패 시 목록 유지, ViewMap 선택 인덱스로 view_ID 덮어쓰기, 도구모음/도움말 이벤트 경로를 연결했다. 누적 Java 223/413종·754경로, 잔여 Java 190종/Python 150종. 실제 설정/로그 처리 내부는 LogFileOperations 후속 범위다. 근거: `viewer-first-panel-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
