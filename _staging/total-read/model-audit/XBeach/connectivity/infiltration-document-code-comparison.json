@@ -1,0 +1,95 @@
+{
+  "date": "2026-09-12",
+  "attribution": "AI source/document comparison; not an independent or human approval",
+  "source": {
+    "path": "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/groundwater.F90",
+    "sha256": "e941accf34fb9b4f21256dcb59b986ad2df2976a8bc151af926e3ce38c8cf494"
+  },
+  "visual_receipt": {
+    "path": "_staging/total-read/model-audit/XBeach/connectivity/manuals-docx-read/conditional-visual-read/receipt.json",
+    "sha256": "e22fe06cd3161ab86a5d3d74ea07ca6e392b61e5a5b775cc396fd05f03bc445f"
+  },
+  "spans": [
+    {
+      "start_line": 283,
+      "end_line": 285,
+      "claim": "infil positive toward groundwater; gww positive upward",
+      "text": "      ! infil is defined positive from sea to groundwater, gww is defined positive up\r\n      ! (from groundwater to sea!). Both infil and gww are in volumes of surface water\r\n      ! (not pore water). gwu and gwv are also in terms of surface water volume.\r\n",
+      "sha256": "f149530a9e1305fd87b4807e024a9558d9b121ffd1bed4a09f07ecb6e1c5a206"
+    },
+    {
+      "start_line": 610,
+      "end_line": 624,
+      "claim": "laminar/turbulent selection and wet unconnected-cell call",
+      "text": "       case (GWSCHEME_TURBULENT)\r\n         turbapprox = .true.\r\n      end select\r\n      !\r\n      !\r\n      ! Start Kzupd by seeding with Kz.\r\n      Kzupd = Kzinf\r\n      do j=1,s%ny+1\r\n         do i=1,s%nx+1\r\n            if (.not. connected(i,j)) then\r\n               if (s%wetz(i,j)==1 .and. s%gwlevel(i,j)<s%zb(i,j)) then\r\n                  call gw_calc_local_infil(par,s%zb(i,j),s%hh(i,j),s%gwlevel(i,j),Kzinf(i,j),&\r\n                  s%dinfil(i,j),s%D50top(i,j),turbapprox, &\r\n                  fracdt(i,j),infil(i,j),Kzupd(i,j))\r\n               endif\r\n",
+      "sha256": "249239021468158b77d119d4b1c81c8b5927bd24da11368ffe951d6cac569e74"
+    },
+    {
+      "start_line": 628,
+      "end_line": 638,
+      "claim": "positive-infiltration depth update, otherwise reset, bounded time fraction",
+      "text": "      !\r\n      ! Update infiltration layer thickness\r\n      where (infil>0.d0)\r\n         s%dinfil = s%dinfil+par%dt*infil/par%por\r\n      elsewhere\r\n         !     s%dinfil = max(s%dinfil-par%dt*par%kz/par%por,0.d0)\r\n         s%dinfil = 0.d0\r\n         Kzupd = par%kz\r\n      endwhere\r\n      ! Ensure nothing went wrong here with fracdt\r\n      fracdt = min(max(fracdt,0.d0),1.d0)\r\n",
+      "sha256": "33c246ebdb6fd0a856e2a4464156290078acb909161083a63efba6043986bea6"
+    },
+    {
+      "start_line": 1554,
+      "end_line": 1573,
+      "claim": "unsaturated-flow relation and implicit coefficients",
+      "text": "      !\r\n      ! The routine only solves Laminar/Turbulent unsaturated flow,\r\n      ! saturated flow handled later by Poisson solver. The fraction of\r\n      ! time that unsaturated flow occurs is given by fracdt.\r\n      !\r\n      ! Unsaturated flow:\r\n      ! w(n+1) = kz * (1+dp/dz) = kz * (1 + (hh)/(dz(n)+w(n+1)*dt/por) )\r\n      ! w -> (-dzold + dt/por k + Sqrt[dzold^2 + 2 dt/por dzold k + 4 dt/por hold k + dt^2 k^2])/(2 dt/por)\r\n      !\r\n      ! The routine for turbulent flow is the same as for Darcy flow,\r\n      ! but iterate until correct value of vest found\r\n      !\r\n      !\r\n      ! Coefficients for implicit solution\r\n      dtp    = par%dt/par%por\r\n      twodtp = 2*dtp\r\n      twodtpdi = twodtp*dinfil\r\n      fourdtph = 4*dtp*hh\r\n      dtpsq = dtp**2\r\n      disq = dinfil**2\r\n",
+      "sha256": "13a77b4d2447db505edd03fcf803253f20d1f2f70e5aac6e05875a4f905ab9aa"
+    },
+    {
+      "start_line": 1574,
+      "end_line": 1639,
+      "claim": "turbulence iteration or laminar positive-root formula and time-fraction reduction",
+      "text": "      ! Compute infiltration velocity assuming fully-unsaturated flow\r\n      if(turb) then\r\n         ! First estimate without turbulence\r\n         vest = ( (-dinfil + dtp*par%kz + &\r\n         sqrt(disq + &\r\n         twodtpdi*par%kz + &\r\n         fourdtph*par%kz + &\r\n         dtpsq*par%kz**2&\r\n         )&\r\n         )&\r\n         /twodtp &\r\n         )\r\n         Re = abs(vest)*D50top/par%por/visc\r\n         if (Re>par%gwReturb) then\r\n            err = 1.d0\r\n            ! itialize with previous (turbulent) Kzinf\r\n            kze = kzlocal\r\n            firstloop = .true.\r\n            do while (err>0.01d0)\r\n               vupd = ( (-dinfil + dtp*kze + &\r\n               sqrt(disq + &\r\n               twodtpdi*kze + &\r\n               fourdtph*kze + &\r\n               dtpsq*kze**2&\r\n               )&\r\n               )&\r\n               /twodtp &\r\n               )\r\n               if (firstloop) then\r\n                  err = 1.d0\r\n                  firstloop = .false.\r\n               else\r\n                  err = abs(vest-vupd)/abs(vest)\r\n               endif\r\n               ! New estimate of the velocity, using golden ratio\r\n               vest = (vest+alfa*vupd)/beta\r\n               ! update estimate of Kz for next iteration\r\n               Re = abs(vest)*D50top/par%por/visc\r\n               kze = par%kz*sqrt(par%gwReturb/Re)\r\n            enddo\r\n            kzupd = kze\r\n         else\r\n            kzupd = par%kz\r\n         endif\r\n      else\r\n         ! No need to iterate\r\n         vest = ( (-dinfil + dtp*par%kz + &\r\n         sqrt(disq + &\r\n         twodtpdi*par%kz + &\r\n         fourdtph*par%kz + &\r\n         dtpsq*par%kz**2&\r\n         )&\r\n         )&\r\n         /twodtp &\r\n         )\r\n         kzupd = par%kz\r\n      endif\r\n      ! now compute depth of infiltration at this rate\r\n      dis = vest*par%dt/par%por\r\n      ! what part of timestep is unsaturated, assuming\r\n      ! (incorrectly) that this is linear?\r\n      fracdt = max(0.d0,min((zb-gwlevel)/dis,1.d0))\r\n      infil = vest*fracdt  ! this is the average over the WHOLE TIMESTEP\r\n      ! check to see that the amount of water available is larger than the amount\r\n      ! infiltrating\r\n      if (infil > (hh-par%eps)/par%dt) then\r\n",
+      "sha256": "172e0b017bf1e96bc9b9af69c7be848faa05bdf3764e2dbd664fa24c784cb9e3"
+    },
+    {
+      "start_line": 1640,
+      "end_line": 1645,
+      "claim": "available surface-water cap",
+      "text": "         newinfil = max((hh-par%eps)/par%dt,0.d0)\r\n         fracdt = fracdt*newinfil/infil\r\n         infil = newinfil\r\n      endif\r\n\r\n\r\n",
+      "sha256": "bb22b08d3304107c420e92269a7d8e62356fbf2a62473c045139f7fdc4d45e4d"
+    }
+  ],
+  "algebra": {
+    "premise": "w=K*(1+h/(d+D*w)), D=dt/por",
+    "polynomial": "D*w^2+(d-D*K)*w-K*(d+h)=0",
+    "positive_root": "(-d+D*K+sqrt(d^2+2*D*d*K+4*D*h*K+D^2*K^2))/(2*D)",
+    "scope": "K>0,d>0,h>=0,D>0; algebraic comparison only, not a compiled Fortran execution",
+    "examples": [
+      {
+        "K": 1.0,
+        "d": 1.0,
+        "h": 1.0,
+        "D_dt_over_por": 1.0,
+        "w": 1.4142135623730951,
+        "residual": 0.0
+      },
+      {
+        "K": 0.001,
+        "d": 0.2,
+        "h": 0.1,
+        "D_dt_over_por": 0.25,
+        "w": 0.001499064836814834,
+        "residual": 3.382710778154774e-17
+      },
+      {
+        "K": 0.01,
+        "d": 0.02,
+        "h": 0.3,
+        "D_dt_over_por": 2.5,
+        "w": 0.03679106033634656,
+        "residual": 0.0
+      }
+    ]
+  },
+  "finding": "Stored infiltration expressions omit an operator before 1 in three previews; current code explicitly uses a plus-one relation with implicit updated depth and subsequent limits. This supports +1 at the conceptual relation level, not automatic equivalence or source-document rewriting.",
+  "limitations": [
+    "Code uses implicit depth and timestep reduction/water cap; manual equations need not match each intermediate code expression.",
+    "No source execution, calibration, whole model read completion or new approval."
+  ],
+  "whole_model_read_gate": "NOT_PASSED",
+  "human_approval_issued": false
+}

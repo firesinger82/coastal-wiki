@@ -425,6 +425,19 @@ def main():
     checks.extend(validate_conditional(ROOT, HERE / 'manuals-docx-read'))
     from validate_conditional_visual import validate as validate_visual
     checks.extend(validate_visual(ROOT, HERE / 'manuals-docx-read'))
+    infiltration = json.loads((HERE / 'infiltration-document-code-comparison.json').read_text())
+    check('infiltration-source-binding', digest(ROOT / infiltration['source']['path']) == infiltration['source']['sha256'] and
+          digest(ROOT / infiltration['visual_receipt']['path']) == infiltration['visual_receipt']['sha256'])
+    physical_lines = (ROOT / infiltration['source']['path']).read_bytes().splitlines(keepends=True)
+    for span in infiltration['spans']:
+        raw = b''.join(physical_lines[span['start_line']-1:span['end_line']])
+        check('infiltration-span-' + str(span['start_line']), hashlib.sha256(raw).hexdigest() == span['sha256'] and raw.decode() == span['text'])
+    for i, sample in enumerate(infiltration['algebra']['examples']):
+        k, d, h, D, w = (sample[key] for key in ('K', 'd', 'h', 'D_dt_over_por', 'w'))
+        residual = w-k*(1+h/(d+D*w))
+        check('infiltration-algebra-' + str(i), residual == sample['residual'] and abs(residual) < 1e-12 and
+              abs(D*w*w+(d-D*k)*w-k*(d+h)) < 1e-12)
+    check('infiltration-no-approval', infiltration['whole_model_read_gate'] == 'NOT_PASSED' and infiltration['human_approval_issued'] is False)
     reconciliation = json.loads((HERE / 'resume-reconciliation.json').read_text())
     check('reconciliation-input-bindings', all(digest(ROOT / p) == h for p, h in reconciliation['input_evidence_sha256'].items()))
     check('no-overall-or-human-pass', reconciliation['whole_model_read_gate'] == 'NOT_PASSED' and

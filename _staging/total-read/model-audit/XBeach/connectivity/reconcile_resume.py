@@ -295,6 +295,9 @@ def main():
     visual = read(visual_name)
     for item in full_docx['records']:
         supplement(item['source'], visual_name, item['read_status'], visual['limitations'])
+    comparison = read('infiltration-document-code-comparison.json')
+    assert sha(ROOT / comparison['source']['path']) == comparison['source']['sha256']
+    assert sha(ROOT / comparison['visual_receipt']['path']) == comparison['visual_receipt']['sha256']
     formula_name = 'workbook-formula-read.json'
     if (HERE / formula_name).is_file():
         formula = read(formula_name)
