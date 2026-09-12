@@ -496,6 +496,14 @@ def validate(root,here):
         output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
         check(x['sha256'][:10]+'-slog-print-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
     check('slog_print-no-approval',slog_print['whole_model_read_gate']=='NOT_PASSED' and slog_print['human_approval_issued'] is False)
+    slog_navigator=json.loads((here/'bytecode-read/slog-navigator-read.json').read_text())
+    check('slog-navigator-one-exact',bound(slog_navigator['prior_receipt']) and len(slog_navigator['records'])==slog_navigator['unique_classes_read']==1 and slog_navigator['records'][0]['instances'][0]['member']=='logformat/slog2/input/Navigator.class' and slog_navigator['instances_covered']==2)
+    for x in slog_navigator['records']:
+        original=next(a for a in r['records'] if a['sha256']==x['sha256'])
+        args=['java','-m','jdk.jdeps/com.sun.tools.javap.Main','-c','-p','-s','-constants',str(root/x['class_file']['path'])]
+        output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
+        check(x['sha256'][:10]+'-slog-navigator-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
+    check('slog_navigator-no-approval',slog_navigator['whole_model_read_gate']=='NOT_PASSED' and slog_navigator['human_approval_issued'] is False)
     spec=importlib.util.spec_from_file_location('bytecode_coverage',here/'reconcile_bytecode_coverage.py')
     module=importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)

@@ -249,3 +249,5 @@ Method는 4바이트 정수 식별자로 1을 CONNECT_COMPOSITE_STATE로 정의�
 2026-09-12 SLOG2 InputLog/전체 실객체 순회기 2종 전체 1,089줄 판독. 메타데이터 IO 실패 exit와 트리 노드 실패 null 반환의 차이를 TreeTrunk 호출자에 연결했다. 포인터 null 판정과 시작/종료 끝점의 반개구간 필터를 직접 재확인했으며 잘못된 topology 번호, 빈 leaf 집합, 구간 경계 제외 조건을 기록했다. 누적 Java 171/413종·650경로, 잔여 Java 242종/Python 150종. 근거: `slog-inputlog-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
 
 2026-09-12 SLOG2 PrintSerially/PrintRecursively 2종 전체 1,183줄 판독. 옵션 순서 의존성, 숫자 변환 실패 후 계속 진행, NaN 검사 통과, 재귀 출력의 루트 읽기 실패/빈 자료 혼동을 기록했다. 순차 출력의 인접 정렬 표시는 완전성 검증이 아니며 재귀 출력 모드 간 선택 범위도 다르다. 누적 Java 173/413종·654경로, 잔여 Java 240종/Python 150종. 근거: `slog-print-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 SLOG2 Navigator 전체 1,181줄 판독. 출력 모드 변경 시 시간창 갱신 단락 평가, 초기 changedPrintAll 잔존, 첫 숫자 토큰 오류의 catch 내부 배열 접근, EOF 미처리를 확인했다. 현 인벤토리의 SLOG2 input 패키지 판독은 채웠으나 전체 모델 gate는 미통과다. 누적 Java 174/413종·656경로, 잔여 Java 239종/Python 150종. 근거: `slog-navigator-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
