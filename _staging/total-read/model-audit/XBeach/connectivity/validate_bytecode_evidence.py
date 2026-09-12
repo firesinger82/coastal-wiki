@@ -109,5 +109,14 @@ def validate(root,here):
         output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
         check(x['sha256'][:10]+'-nesting-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
     check('nesting-no-approval',nesting['whole_model_read_gate']=='NOT_PASSED' and nesting['human_approval_issued'] is False)
+    buffers=json.loads((here/'bytecode-read/drawable-buffer-read.json').read_text())
+    names={'BufForObjects','BufForObjects$Order','BufForDrawables'}
+    check('buffers-three-exact',bound(buffers['prior_receipt']) and len(buffers['records'])==buffers['unique_classes_read']==3 and {x['instances'][0]['member'] for x in buffers['records']}=={'logformat/slog2/'+n+'.class' for n in names} and buffers['instances_covered']==18)
+    for x in buffers['records']:
+        original=next(a for a in r['records'] if a['sha256']==x['sha256'])
+        args=['java','-m','jdk.jdeps/com.sun.tools.javap.Main','-c','-p','-s','-constants',str(root/x['class_file']['path'])]
+        output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
+        check(x['sha256'][:10]+'-buffer-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
+    check('buffers-no-approval',buffers['whole_model_read_gate']=='NOT_PASSED' and buffers['human_approval_issued'] is False)
     check('no-approval',all(x['whole_model_read_gate']=='NOT_PASSED' and x['human_approval_issued'] is False for x in (r,read)))
     return checks

@@ -109,3 +109,13 @@ setValue는 null type/value를 허용하고 나머지는 wrapper 형식을 검�
 NestingStacks는 펼쳐지지 않은 표시 행에만 스택을 만든다. 현재 구간을 포함하지 않는 스택 꼭대기는 빼고, 포함하는 항목이 있으면 그 중첩 계수에 감소율을 곱한다. 없으면 초기 높이를 사용한다. 초기 높이와 감소율 기본값은 모두 0.8이다. 새 객체는 스택에 넣지만 계수 저장은 호출자 Drawable이 하며 parent 참조는 이 경로에서 설정하지 않는다. initialize 뒤 첫 reset은 플래그만 바꾸고 이후 reset부터 내용을 지운다.
 
 DrawnBox는 head/tail의 이전 픽셀 위치를 보관한다. State는 폭 t-h가 1 이하일 때 두 끝 중 하나만 이전 위치의 1픽셀 이내여도 true다. Arrow는 두 끝 모두, Event는 head만 1픽셀 이내인지 검사한다. 일반적인 기하 포함 검사로 해석하지 않는다. DrawnBoxSet는 행 수 N에 대해 state/event N개와 arrow N²개 배열을 만들며 펼쳐진 행의 항목은 null로 둔다. 사용 시 행 번호·초기화·트리 변경 동기화는 호출자 확인이 필요하다. 실제 GUI 실행이나 표시 정확도 검증은 하지 않았다. 전체 gate NOT_PASSED·신규 사람 승인 없음.
+
+## SLOG2 객체 버퍼 3종
+
+[drawable-buffer-read.json](drawable-buffer-read.json)에 BufForObjects·내부 비교기·BufForDrawables의 전체 934줄과 18경로를 기록했다. 누적 Java 55/413종·318경로, 남은 Java 358종/Python 150종이다.
+
+공통 버퍼는 시간 경계(16), 노드 ID(6), 블록 포인터(12)를 순서대로 저장해 34바이트다. BufForDrawables는 두 목록의 int 개수까지 기본 42바이트이고 각 항목에 Primitive=0/Composite=1 태그를 붙인다. State primitive와 composite는 nestable에, 다른 primitive는 nestless에 추가한다. 쓰기는 공통 헤더 뒤 nestless, nestable 순이다.
+
+쓰기 전 시작 시각 정렬을 요청하지만 reorder는 기록된 comparator와 다를 때만 실제 정렬한다. add는 정렬 상태를 무효화하지 않으므로 쓰기 후 항목 추가 같은 호출 순서는 후속 확인이 필요하다. add는 시간 경계도 늘리지 않는다. empty는 저장 완료 플래그가 있을 때만 비우며 ID·시간·파일 위치는 유지한다.
+
+읽기는 목록을 교체하고 범주를 연결하지만 total_bytesize를 먼저 초기화하지 않는다. 알 수 없는 태그는 오류 출력 후 반복을 계속하며 payload 길이를 건너뛰는 처리가 없다. 입력은 두 목록 모두 composite 태그를 허용하지만 getNumOfPrimitives는 nestless의 개수를 그대로 센다. 소스 수준의 조건과 가정이며 실제 잘못된 로그나 반복 사용을 시험한 결과는 아니다. Primitive/Composite의 내부 IO 및 상위 호출 흐름은 후속 판독 대상이다. 전체 gate NOT_PASSED·신규 사람 승인 없음.
