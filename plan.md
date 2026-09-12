@@ -1737,3 +1737,8 @@ XB-SC-001~012의 초기화·hotstart·BMI·오류 종료·MPI 소유 계약을 �
 동결 57개 Fortran·2개 Python의 호출 후보를 생성/외부/C export/콜백 인터페이스와 구분했다. 원문 48구간에 아홉 연결 계약을 결속하고 선박/nonh 압력 귀속, 잔차 부호·실제 2차 보정, 식생·강우·조도 시점, 출력 공급자/rank 설명을 기존 7개 문서에 정정했다. [독립 검토·P2 조건 수정·후속 확인](_staging/total-read/model-audit/XBeach/connectivity/runtime-20260912/review-response.json) 후 [설치 검사](_staging/total-read/model-audit/XBeach/connectivity/runtime-20260912/validation.json)를 통과했다. 기존 승인 292개와 파일 소유자·권한을 보존했다.
 
 R1 전체는 미완이며 후보 수를 도달성 검증이나 진행률로 올리지 않는다. 다음은 [동결 R1-G1/G2/G3](_staging/total-read/model-audit/XBeach/connectivity/runtime-20260912/remaining-gaps.json)의 호출 조건·generic·미분류 정의·동적 wrapper 대조다. R2/R3 전체/R4는 기존 범위와 미완 상태를 유지한다. [실행 메모](_staging/total-read/model-audit/XBeach/connectivity/runtime-20260912/EXECUTION-NOTES.md)에 sandbox 시작 실패와 승인 실행 경로를 남겼다.
+
+
+### 2026-09-12~13 COASTAL-WIKI 실제 구조 파악·개편 계획 검토
+
+사용자가 이번 조사에 근거한 구조 개편 계획을 Claude와 만들고, 현재 폴더부터 파악하도록 요청했다. [실제 구조](_staging/wiki-structure-20260912/current-structure.md)에 개념 10개·모델 13개, 원자료·기준·데이터·수집·도구·감사 영역, 중복 목차와 검색 경계를 기록했다. [상세 계획](_staging/wiki-structure-20260912/plan.md)은 기존 폴더 유지, 실제 영역 안내·모델 목차·waves–XBeach 탐색 개선, 기존 개별 보강/전체 감사 구분의 공통 명시화를 제안한다. [Claude 공동 검토·후속 대조와 Codex 반증 검토](_staging/wiki-structure-20260912/review-response.md)를 반영했다. 계획만 작성했으며 정책 채택·canonical 개편·XBeach 재개·완료 상태 변경은 수행하지 않았다.

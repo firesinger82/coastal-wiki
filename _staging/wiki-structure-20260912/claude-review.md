@@ -1,0 +1,63 @@
+# Claude 계획 검토 원문
+
+AI 검토 의견이며 정책 채택·구현 승인이 아니다. 초기안에 대한 응답으로, 이후 실제 폴더 조사와 후속 검토로 수정했다.
+
+조사 문서·초안·현재 트리를 읽었다. 아래는 초안에 대한 공동 설계안이며, 채택된 정책이 아니다. 파일은 수정하지 않았다.
+
+## 1. 구조 권고 — 폴더 이동은 불필요, 그러나 빠진 독자 흐름이 있다
+
+폴더 이동 없이 해결 가능하다는 초안의 판단에 동의한다. `concepts/`(1차)·`models/`(2차)·`textbook/`(횡축) 분할은 이미 Diátaxis식 reference 분리와 SSOT를 만족하고, 이동은 링크·`depends_on`·감사 원장 경로를 전부 깨뜨리는 대신 얻는 것이 없다.
+
+다만 초안이 놓친 독자 흐름이 셋 있고, 전부 **링크 추가만으로** 메워진다.
+
+- **개념 → 이론 canonical(레이어①)의 진입로 부재.** `concepts/waves/README.md:7-17`의 상태표는 01–08만 열거하고, 실제 이론 canonical인 `textbook/notes/theory-ch08~ch11`로 가는 링크가 없다. CONVENTIONS §8.1은 상세 이론의 canonical을 ①로 지정했는데, 1차 축 진입점에서 ①이 보이지 않는다. 독자는 `INDEX.md:46-61`의 별도 섹션을 우연히 봐야 한다.
+- **모델 비교 흐름이 한 토픽 안에 묻혀 있다.** cross-model 대조노트 3편(bottom-friction·vertical-mixing·time-integration, 10~12모델)이 `concepts/currents/` 아래에만 있다(`INDEX.md:12`). "XBeach와 SWAN의 바닥마찰 처리 차이"를 묻는 독자가 currents 토픽을 먼저 열 이유가 없다. INDEX에 비교노트 행 하나 + 각 모델 README 역링크로 해결된다.
+- **모델 → 개념 역링크 부재.** `models/XBeach/README.md`는 어떤 개념 토픽이 이 모델을 소비하는지 알려주지 않는다. 반면 tides·sediment-transport·swash-zone 행은 XBeach를 이미 인용한다(`INDEX.md:9,11,16`). 단방향 링크라 모델에서 들어온 독자가 개념 축으로 못 넘어간다.
+
+## 2. 초안의 실질적 문제 5개
+
+**① P1 manifest가 citation_status 전파 규칙을 판정하지 않는다.** 근거: 초안 §6 P1(`plan.md:90`) vs CONVENTIONS §2 "`concepts/`에서 다른 노트 인용 시 그 노트가 `verified`가 아니면 인용측도 `source-needed`로 강등"(CONVENTIONS.md:44). 실패 예 — waves README가 탐색 편의로 XBeach의 2026-09-12 draft-unsourced 노트 4편을 링크하면, 규칙을 문자 그대로 적용할 때 verified README를 강등시켜야 하는지 다툼이 생긴다. 최소 수정: P1 산출물에 "탐색 cross-link는 CONVENTIONS §8.1의 claim 비복제 양방향 허용 조항으로 처리, 근거 인용이 아님" 판정 1줄을 남기고, `layer:`/`depends_on:`는 건드리지 않는다.
+
+**② INDEX "상세 제거"가 §2 상태 컬럼 의무와 유일 정보를 동시에 위협한다.** 근거: 초안 §6 P1 "`INDEX`의 수치·승인 이력 상세는 연결된 원장의 유무를 확인하고 제거" vs CONVENTIONS.md:43 "`INDEX.md`는 비-verified 항목을 상태 컬럼으로 표시". 실패 예 — waves 행의 promote 출처(arXiv 2511.12711·2606.03231)나 storm-surge 05의 disclosed-gap 사유가 어느 원장에도 같은 문자열로 없을 수 있는데, "원장 유무 확인"이 링크 존재 확인으로 느슨하게 집행되면 유일 정보가 사라진다. 최소 수정: 제거 조건을 "대상 문서에서 동일 사실을 grep으로 확인한 경우에만"으로 바꾸고, 상태값(STABLE/DRAFT/verified 수)은 축약 대상에서 제외한다.
+
+**③ 템플릿 수정이 P1에 있는데 근거 정책은 P2에 있다.** 근거: `concepts/_template/README.md:8` "6개 파일 채우기" vs README.md:38-40 "2 파일 우선". 초안은 템플릿 2개를 P1(§6), CONVENTIONS·CLAUDE를 P2(§6)에 둔다. 실패 예 — P1에서 템플릿 문구만 바꾸면, 채택 전 정책 변경을 템플릿으로 집행한 셈이 된다. 최소 수정: P1에서는 템플릿에 "생성 기준은 CONVENTIONS §8이 우선" 포인터 한 줄만 넣고, 문구 정리는 P2로 미룬다.
+
+**④ WORKPLAN은 다섯 번째 현재작업 원장이 된다.** 근거: 이미 `_staging/.../connectivity/GOAL-STATUS.md:3-5`가 "현재 작업 = 위키 목적 재검토"를 선언하고, `remaining-20260912/progress.json`, `codex-defect-reports/PROGRESS.md`, `plan.md:1748`이 각각 상태를 주장한다. 실패 예 — WORKPLAN과 GOAL-STATUS가 서로 다른 "현재 작업"을 가리키고, 다음 세션이 둘 중 먼저 읽은 쪽을 따른다. 최소 수정: 새 파일 대신 `plan.md` 최상단에 3줄 "현재 활성 작업(작업명 / 상태 원장 링크 / 대기 중인 사용자 결정)" 블록을 두고, 상태값은 기존 json을 **인용만** 한다. 새 파일이 꼭 필요하다는 판단이면, WORKPLAN에 "모델측 현재 작업의 기준은 GOAL-STATUS 최상단 절"이라고 못박아 주장 충돌을 구조적으로 막는다.
+
+**⑤ P3의 "회귀 수정 1회"에 범위 앵커가 없다.** 근거: 초안 §6 P3. 실패 예 — 회귀 질문이 XBeach 실행 조건에서 실패하면 수정이 자연스럽게 R1 재개로 미끄러진다. 최소 수정: "수정 대상은 P1 변경 파일 집합 내부로 한정, 그 밖의 발견은 후보 목록에만 기록"을 종료 조건에 명시한다.
+
+## 3. Total Read — 유지할 것과 정확한 delta
+
+유지(약화 금지): TR-3의 `note_worthy=n` 근거 의무(`plan.md:1606`), 게이트 ①·③(`plan.md:1631-1633`), TR-8 원장 표현 정정 의무, `remaining.json`의 `change_control`·`prohibited_reports`·R4 `approval_rule`, CLAUDE 작업규범 4의 외부 게이트.
+
+권고하는 delta는 두 문장뿐이다.
+
+- **착수 분리:** "위키 canonical의 개별 보강 착수·반영은 해당 모델의 전수 연결 감사 완료를 전제로 하지 않는다. 단 보강 노트는 (a) 해당 주장의 원문 대조, (b) 실제 검증 수준에 맞는 `citation_status`, (c) 소속 감사의 미완 상태 링크를 모두 갖춘다." 이는 새 발명이 아니라 `remaining.json` R3의 `execution_rule`("확인된 정정은 R1/R2의 전체 종료를 기다리지 않고 반영할 수 있다. R3 전체 종결만 R1/R2 최종 결과에 의존한다")을 모델 전역 규칙으로 승격하는 것이다. 분리되는 것은 **착수와 반영**이고, 완료 라벨·R4·사람 승인은 그대로다. 따라서 외부/사람 게이트 약화 없이 작업 단위 분리는 가능하다.
+- **축소 금지(재발 방지):** "`scope_frozen=true`인 집합의 항목 삭제 또는 `done_when` 완화는 ① 사용자 명시 결정, ② 기존 snapshot 보존, ③ `plan.md` 기록 셋을 모두 갖춘 별도 변경이다. 위 착수 분리 조항은 이 결정을 대체하지 않는다. 인벤토리·SHA·파일명 인용·그래프 도달성은 의미 판독의 대체물이 아니다."
+
+마지막 문장은 2026-07-24 파서 바꿔치기 사고와 같은 유형(읽기를 기계적 산출물로 치환)을 겨냥한 것이고, 현재 `remaining.json`의 `prohibited_reports`에 모델 국소적으로만 있는 조항을 전역화한다.
+
+## 4. 순서·manifest·INDEX 정합
+
+- **순서 모순 2건:** 문제 ③(템플릿 P1 vs 정책 P2)과, P1이 INDEX 전체(개념 9행·모델 13행)를 손대는데 P3 측정은 waves·XBeach만 하는 **변경 범위 > 측정 범위** 불일치. 후자는 P1을 waves·XBeach 2행으로 좁히고 나머지 행은 P3 결과 후 별도 판단으로 미루면 해소된다.
+- **manifest 불일치:** 초안 §6 P1은 8파일을 "고정"하면서 §3은 `plan.md`·RESUME·AGENTS 포인터까지 손댄다고 읽힌다. AGENTS.md는 8개에 있으나 RESUME·`plan.md`는 P2에 있다. 8개 목록과 §3 서술 중 하나를 기준으로 선언해야 한다.
+- **citation_status 전파:** INDEX 행 축약 시 상태값은 유지, 서술만 축약. 모델 README의 draft 표기(`models/XBeach/README.md:24-27`)는 이미 정확하므로 그대로 둔다.
+
+## 5. waves–XBeach 파일럿의 종료 조건
+
+범위: 변경 4파일(`concepts/waves/README.md`, `models/XBeach/README.md`, `INDEX.md` 2행, 현재작업 블록). **새 도메인 단언 0건**, 링크 추가와 상태 표기만.
+
+수정 예시(전부 기존 파일만 인용):
+- waves README 상태표 아래 "이론 근거(①)": theory-ch08 선형파 / ch09 비선형·스펙트럼 / ch10 연안변형 / ch11 스펙트럼 파랑모델링.
+- waves README "모델 비교": cross-model 3편 + `models/SWAN/`·`models/XBeach/` 링크.
+- XBeach README 최상단 "이 모델을 쓰는 개념": waves·tides·sediment-transport·swash-zone.
+
+종료: 4파일 변경 + 기존 검사(research 격리·링크·로컬경로 경계·layer-deps) PASS + 12문항 전후 1회 + 수정 1회 + 1세션. 파일 수가 늘면 사유와 새 manifest를 별도 제시.
+
+12문항이 무한 감사가 되지 않게 하려면: 질문을 변경 **전에** 동결·해시하고, 채점은 "기대 근거 위치에 도달했는가"의 이진 판정만 하며(자유 서술 평가 금지), 도달 실패는 전부 후보 목록에 기록할 뿐 수정 대상은 위 4파일 내부로 한정한다. 결과가 나빠도 질문을 늘리지 않는다.
+
+## 6. 권고와 남은 사용자 결정
+
+**MODIFY.** 방향(폴더 유지·탐색 개선·착수 분리·유한 파일럿)은 타당하나, 위 5개 지적을 반영하기 전에는 실행 승인 대상이 아니다.
+
+사용자 결정이 필요한 것: ① 개념 중심 탐색 개선 채택 여부, ② §3의 착수 분리 + 축소 금지 delta 채택 여부, ③ 현재작업 포인터를 새 `WORKPLAN.md`로 둘지 `plan.md` 블록으로 둘지, ④ P1 범위를 8파일로 갈지 waves·XBeach 4파일로 좁힐지, ⑤ XBeach R1–R4 재개를 파일럿 전에 둘지 후에 둘지. XBeach는 미완 상태를 그대로 유지한다.
