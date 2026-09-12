@@ -299,3 +299,5 @@ Claude Sonnet 5의 [한정 재검토](../model-audit/XBeach/HG-ADVERSARIAL-RECHE
 2026-09-12 viewer InfoDialogForDrawable 계열과 공통 InfoDialog/Duration/Time 7종 전체 787줄 판독. 시작·클릭·끝점 중심 이동, 정적 시간 표시와 mutable 시간 범위 참조, 호출 측에 위임된 닫기 이벤트 연결을 구분했다. 누적 Java 326/413종·960경로, 잔여 Java 87종/Python 150종. 근거: `viewer-info-dialogs-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
 
 2026-09-12 viewer InfoPanelForDrawable/TextAreaBuffer 2종 전체 1202줄 판독. 선택 하위 카테고리 표식 소거, 공유 여백 Component 재부착, 좌표 duration/전체 범위/평균 좌표와 가중치 표시를 구분했다. 누적 Java 328/413종·964경로, 잔여 Java 85종/Python 150종. 근거: `viewer-info-panel-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer SearchPanel/SummarizableView/TimeFormat/OperationDurationPanel 계열 6종 전체 567줄 판독. 표시 시간의 단위 경계·부호 보존, 구간 통계 요청의 공유 결과 창 및 연속 클릭 경쟁 가능성을 연결했다. 누적 Java 334/413종·976경로, 잔여 Java 79종/Python 150종. 근거: `viewer-duration-operation-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
