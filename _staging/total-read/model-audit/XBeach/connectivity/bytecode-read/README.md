@@ -227,3 +227,5 @@ Method는 4바이트 정수 식별자로 1을 CONNECT_COMPOSITE_STATE로 정의�
 2026-09-12 SummaryArrow 전체 423줄 판독. 카테고리별 공통 시작 시간, 객체 수 정수 나눗셈 기반 선 굵기, 밑 0·빈 배열·0시간 길이의 미검사, 굵기를 반영하지 않는 Line 선택 판정을 기록했다. 누적 Java 139/413종·586경로, 잔여 Java 274종/Python 150종. 근거: `summary-arrow-read.json` (XBeach connectivity/bytecode-read). 실제 화면 검증·독립 의미 승인은 아니다.
 
 2026-09-12 SummaryState 전체 889줄 판독. 표시 방식 4종의 시간/행 배치, 준비 단계와 그리기·선택 단계의 가시성 검사 차이, 배경색 객체 동일성 비교, 카테고리 우선 선택과 전체 상자 fallback을 기록했다. 누적 Java 140/413종·588경로, 잔여 Java 273종/Python 150종. 근거: `summary-state-read.json` (XBeach connectivity/bytecode-read). 실제 화면 검증·독립 의미 승인은 아니다.
+
+2026-09-12 CategoryTimeBox 계열 6종 전체 238줄 판독. 비율·색상·가시성의 원본 가중치/카테고리 위임, 네 정렬기의 시간 구간 비참조, null 가중치 미검사를 확인했다. 누적 Java 146/413종·600경로, 잔여 Java 267종/Python 150종. 근거: `category-timebox-read.json` (XBeach connectivity/bytecode-read). 독립 의미 승인은 아니다.
