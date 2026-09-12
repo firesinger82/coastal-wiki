@@ -167,3 +167,7 @@ Method는 4바이트 정수 식별자로 1을 CONNECT_COMPOSITE_STATE로 정의�
 ## CLOG2 converter 판독
 
 `clog2-converter-read.json`은 전체 764줄을 결박한다. 기본 시간 검사는 off이며 -tc/-tcc에서만 검사한다. 정상 EOF는 trunk flush 후 category/line ID map 기록, output/input close 순서다. 빈 trace는 close 후 output 삭제를 시도한다. parse 오류 일부는 입력명이 있으면 부분 옵션으로 계속될 수 있다. 이 기록은 입력 decoder의 정확성이나 모든 trace의 순서 보장이 아니다.
+
+## CLOG converter 판독
+
+`clog-converter-read.json`은 전체 750줄을 직접 확인한 근거다. CLOG2 converter와 달리 clogTOdrawable decoder를 사용하며 YCoordMap 분기가 없다. 출력 map list는 EOF flush 후 identity map 하나로 구성한다. 시간 검사 기본 off와 flush/map/close 순서는 공통이다. help의 Clog2Slog 표기 차이도 보존했다. 입력 decoder와 실제 자료 검증으로 확대하지 않는다.

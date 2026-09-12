@@ -24,7 +24,7 @@
    - Master 복원본 p.18 식 (2.1)은 본체가 비어 있다. 원본 `word/media/image13.emf`를 별도로 Draw 렌더링해 파랑작용 평형식을 확인했다. `master/equation-2-1/`의 원본 추출·PDF·이미지로 보충했으며 Writer 본문 렌더는 수정하지 않았다. Master p.10의 Figure A.1 참조/2.1 캡션 불일치와 p.128의 원래 참조 오류 2개도 보존했다. 직접 변환의 Error: 문구는 오류 소멸이 아니라 표시 변경이었다.
    - 원 PDF는 Kingsday 기존 10–45쪽+신규 1–9·46–141쪽(105쪽), Master 기존 10–46쪽+신규 1–9·47–145쪽(108쪽)으로 각각 전체 141·145쪽의 시각 보충 근거가 있다. `manuals-visual-read/read-receipts.json`과 신규 이미지 213개 참조. 이 기록은 동일 SHA PDF 경로에만 승계하며 DOCX 판독을 대신하지 않는다.
 2. 보고서 DOC의 잔여 수식 글리프·388개 Equation Native 충실도를 확인한다. 후속 `nonhydro-read/native-survey.json`은 원본 388개 중 386개 본문 기계적 판독, 2개 본문 내 인코딩 정의(tag 19) 미지원 결과다. 후속 `nonhydro-read/native-font-survey.json`에서 본문 인코딩/글꼴/스타일 정의를 지원해 388개 전체가 기계적으로 읽힌다. 이전 386개 출력 동일. 새 두 스트림의 F093/typeface -1/font position 84(Euclid Math Two)는 시각/의미 확인 대상이다. 수학적 의미/렌더 충실도 검증과 구분한다. MathType outer 166개 중 165개 저장 표시값 복원은 이전 기록에 보존했다. 이번에는 후속 렌더에서 발견된 그림 번호의 장 제목 치환을 막기 위해 본문 필드 제어 노드 652개만 제거하고 표시값을 고정했다. 머리말·꼬리말을 포함한 나머지 ZIP member는 동일 바이트다. `nonhydro-read/body-field-recovery/receipt.json` 참조. 71쪽 전체 본문을 확인했으며 최종본과 판독 중간본은 모든 페이지 y<1680 RGB가 동일하다. 차이는 쪽 번호 영역뿐이며 별도 확인했다. 최종본 p.11 그림 2-1/2-2도 직접 확인했다. p.15·41·42의 작은 네모 글리프, inline 수식 배치, 원래 빈 필드 1개는 남는다. 저장 목차/참조 쪽 번호는 재페이지화와 일치한다고 보장하지 않으며 물리 페이지 번호로 인용한다.
-3. 외부 바이너리의 리소스 payload와 AR 내부 member·JAR bytecode의 처리 범위를 계속 명시한다. 후속 `bytecode-read/`에서 unread 1,284개 경로를 Java 413종/Python 150종으로 결속하고 Java 87,653줄을 역어셈블리했다. launcher 4종·base/io 9종·SLOG2 헤더/디렉토리 7종·TreeNodeID 5종·파일명/열거/순회 7종·시간/좌표 11종·Drawable/Topology 3종·InfoBox·InfoType·InfoValue·중첩/표시 위치 3종·객체 버퍼 3종·LineIDMap/Method/YCoordMap·BufForShadows·Shadow·category weight 계열 10종·Primitive·Composite 2종·output TreeNode/TreeTrunk/OutputLog·Clog2ToSlog2의 전체 표시 내용을 읽어 동일 SHA 442개 경로에 연결했다. Java 336종·Python 150종은 미판독이며 기존 인벤토리를 완료로 바꾸지 않는다. `msi-interface-review.json`은 의존성 관측과 추출 인덱스이며 의미 판독 완료가 아니다. 기존 interim interface/resource 범위로 진행하되 전체 gate 예외나 전체 역어셈블리 승인을 발급하지 않는다.
+3. 외부 바이너리의 리소스 payload와 AR 내부 member·JAR bytecode의 처리 범위를 계속 명시한다. 후속 `bytecode-read/`에서 unread 1,284개 경로를 Java 413종/Python 150종으로 결속하고 Java 87,653줄을 역어셈블리했다. launcher 4종·base/io 9종·SLOG2 헤더/디렉토리 7종·TreeNodeID 5종·파일명/열거/순회 7종·시간/좌표 11종·Drawable/Topology 3종·InfoBox·InfoType·InfoValue·중첩/표시 위치 3종·객체 버퍼 3종·LineIDMap/Method/YCoordMap·BufForShadows·Shadow·category weight 계열 10종·Primitive·Composite 2종·output TreeNode/TreeTrunk/OutputLog·Clog2ToSlog2/ClogToSlog2의 전체 표시 내용을 읽어 동일 SHA 446개 경로에 연결했다. Java 335종·Python 150종은 미판독이며 기존 인벤토리를 완료로 바꾸지 않는다. `msi-interface-review.json`은 의존성 관측과 추출 인덱스이며 의미 판독 완료가 아니다. 기존 interim interface/resource 범위로 진행하되 전체 gate 예외나 전체 역어셈블리 승인을 발급하지 않는다.
 4. 위 전제가 충족된 뒤 연결 후보를 확정한다. FUNWAVE는 읽기 전용 preflight 이외 단계로 넘어가지 않았다.
 
 ## 재현 및 검증
@@ -48,7 +48,7 @@ python3 _staging/total-read/model-audit/XBeach/connectivity/validate_resume_evid
 
 DOCX 표시값 복원은 `manuals-docx-read/recover_display.py SOURCE.docx REVIEW.docx EVIDENCE.json`으로 재현한다. 입력을 원본 DOCX에 결속하며 다른 판본 PDF에서 번호를 가져오지 않는다. 복원본의 나머지 ZIP member가 원본과 같은지, 저장 표시값과 원문 텍스트가 보존되는지, 모든 복원 표시값이 PDF에 남는지 검증한다. 이전 최종본 10쪽 부분 판독에 이번 283쪽을 더해 293쪽 전체 시각 확인을 연결했다. 이전 영수증을 덮어쓰지 않았으며, 새 영수증은 원본 DOCX 및 동일 최종 PDF에 결속된다. Kingsday p.63·Master p.62 의사결정도는 회전해 확인했다.
 
-validator의 689개 PASS는 구조·원본 SHA·이미지 SHA·입력 집합·필드 복원 재현·PDF 텍스트/쪽 수 결속·DOCX 신규 페이지 집합/관측·회전도 픽셀·보충 preview/OLE 및 빈 문단 원본 결속·Native 본체 부재 판독 재현/절단·본체 삽입 거부·기존 보고서 중간/최종 본문 픽셀 일치 검증만 뜻한다. 선택 수식 4개의 문자·중첩 위치·원본 재추출 및 변조/절단 거부 검사도 포함한다. 독립 의미 검증이나 사람 승인이 아니다. 이전 사람 승인·crosswalk·closure 기록은 그대로 보존했다.
+validator의 692개 PASS는 구조·원본 SHA·이미지 SHA·입력 집합·필드 복원 재현·PDF 텍스트/쪽 수 결속·DOCX 신규 페이지 집합/관측·회전도 픽셀·보충 preview/OLE 및 빈 문단 원본 결속·Native 본체 부재 판독 재현/절단·본체 삽입 거부·기존 보고서 중간/최종 본문 픽셀 일치 검증만 뜻한다. 선택 수식 4개의 문자·중첩 위치·원본 재추출 및 변조/절단 거부 검사도 포함한다. 독립 의미 검증이나 사람 승인이 아니다. 이전 사람 승인·crosswalk·closure 기록은 그대로 보존했다.
 
 2026-09-12 추가: base/io 9종 465줄을 직접 읽고 동일 SHA 54경로에 결속했다. 누적 Java 13/413종(66경로), Python 150종 미판독. [입출력 판독](bytecode-read/base-io-read.json). 전체 gate NOT_PASSED·GOAL active.
 
@@ -89,3 +89,5 @@ validator의 689개 PASS는 구조·원본 SHA·이미지 SHA·입력 집합·�
 2026-09-12 TreeTrunk/OutputLog 전체 723줄 판독. finalizeLatestTime → merge/shift/write → empty 순서를 확인했다. converter의 입력 순서·flush/close 보장은 후속 대상이다. 누적 Java 76/413종·438경로, 잔여 Java 337종/Python 150종.
 
 2026-09-12 Clog2ToSlog2 전체 764줄 판독. 기본 시간 검사 off, 선택 검사 및 정상 EOF의 flush/map 기록/close 순서를 확인했다. 누적 Java 77/413종·442경로, 잔여 Java 336종/Python 150종. 입력 decoder와 다른 converter는 후속 대상.
+
+2026-09-12 ClogToSlog2 전체 750줄 판독. CLOG2와 달리 YCoordMap 분기가 없고 출력 line map은 identity만 포함한다. 누적 Java 78/413종·446경로, 잔여 Java 335종/Python 150종.
