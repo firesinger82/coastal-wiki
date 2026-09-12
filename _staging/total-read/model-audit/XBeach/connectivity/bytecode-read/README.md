@@ -101,3 +101,11 @@ resolveCategory는 유효한 index의 범주를 찾지 못하면 UnknownType-ind
 InfoValue의 readObject/writeObject는 1바이트 InfoType 태그까지 처리한다. readValue/writeValue는 이미 정해진 type에 따라 값만 처리하며 InfoBox가 사용하는 경로는 readValue다. BYTE4/BYTE8은 정수와 같은 IO를 쓰지만 문자열 표시에서 16진수로 바뀐다. getByteSize의 문자열 계산은 문자 수+3이므로 기존 mixed writer의 인코딩된 바이트 길이와 구분한다.
 
 setValue는 null type/value를 허용하고 나머지는 wrapper 형식을 검사하지만, type/value 생성자는 그대로 저장한다. 알 수 없는 nonnull 태그의 값 IO는 IOException을 던지므로 앞서 읽은 InfoBox의 종료 경로와 이어진다. null type은 이 분기에 앞서 역참조된다. 원본 프로그램 실행이나 실제 입력 오류 발생을 검증한 결과는 아니다. 전체 gate NOT_PASSED·신규 사람 승인 없음.
+
+## 중첩 스택과 표시 위치 3종
+
+[nesting-drawn-read.json](nesting-drawn-read.json)에 NestingStacks·DrawnBox·DrawnBoxSet 655줄 전체를 기록했다. 누적 Java 52/413종이며 361종·Python 150종은 남아 있다.
+
+NestingStacks는 펼쳐지지 않은 표시 행에만 스택을 만든다. 현재 구간을 포함하지 않는 스택 꼭대기는 빼고, 포함하는 항목이 있으면 그 중첩 계수에 감소율을 곱한다. 없으면 초기 높이를 사용한다. 초기 높이와 감소율 기본값은 모두 0.8이다. 새 객체는 스택에 넣지만 계수 저장은 호출자 Drawable이 하며 parent 참조는 이 경로에서 설정하지 않는다. initialize 뒤 첫 reset은 플래그만 바꾸고 이후 reset부터 내용을 지운다.
+
+DrawnBox는 head/tail의 이전 픽셀 위치를 보관한다. State는 폭 t-h가 1 이하일 때 두 끝 중 하나만 이전 위치의 1픽셀 이내여도 true다. Arrow는 두 끝 모두, Event는 head만 1픽셀 이내인지 검사한다. 일반적인 기하 포함 검사로 해석하지 않는다. DrawnBoxSet는 행 수 N에 대해 state/event N개와 arrow N²개 배열을 만들며 펼쳐진 행의 항목은 null로 둔다. 사용 시 행 번호·초기화·트리 변경 동기화는 호출자 확인이 필요하다. 실제 GUI 실행이나 표시 정확도 검증은 하지 않았다. 전체 gate NOT_PASSED·신규 사람 승인 없음.
