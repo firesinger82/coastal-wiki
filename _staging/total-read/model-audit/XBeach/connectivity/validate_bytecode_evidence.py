@@ -416,6 +416,14 @@ def validate(root,here):
         output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
         check(x['sha256'][:10]+'-category-timebox-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
     check('category_timebox-no-approval',category_timebox['whole_model_read_gate']=='NOT_PASSED' and category_timebox['human_approval_issued'] is False)
+    timeave_box=json.loads((here/'bytecode-read/timeave-box-read.json').read_text())
+    check('timeave-box-one-exact',bound(timeave_box['prior_receipt']) and len(timeave_box['records'])==timeave_box['unique_classes_read']==1 and timeave_box['records'][0]['instances'][0]['member']=='base/statistics/TimeAveBox.class' and timeave_box['instances_covered']==2)
+    for x in timeave_box['records']:
+        original=next(a for a in r['records'] if a['sha256']==x['sha256'])
+        args=['java','-m','jdk.jdeps/com.sun.tools.javap.Main','-c','-p','-s','-constants',str(root/x['class_file']['path'])]
+        output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
+        check(x['sha256'][:10]+'-timeave-box-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
+    check('timeave_box-no-approval',timeave_box['whole_model_read_gate']=='NOT_PASSED' and timeave_box['human_approval_issued'] is False)
     spec=importlib.util.spec_from_file_location('bytecode_coverage',here/'reconcile_bytecode_coverage.py')
     module=importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
