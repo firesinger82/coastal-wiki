@@ -345,6 +345,7 @@ def main():
     read('bytecode-read/preview-event-read.json')
     read('bytecode-read/arrow-render-read.json')
     read('bytecode-read/summary-arrow-read.json')
+    read('bytecode-read/summary-state-read.json')
     read('bytecode-read/coverage.json')
     formula_name = 'workbook-formula-read.json'
     if (HERE / formula_name).is_file():

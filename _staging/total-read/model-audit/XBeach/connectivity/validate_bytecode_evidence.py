@@ -400,6 +400,14 @@ def validate(root,here):
         output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
         check(x['sha256'][:10]+'-summary-arrow-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
     check('summary_arrow-no-approval',summary_arrow['whole_model_read_gate']=='NOT_PASSED' and summary_arrow['human_approval_issued'] is False)
+    summary_state=json.loads((here/'bytecode-read/summary-state-read.json').read_text())
+    check('summary-state-one-exact',bound(summary_state['prior_receipt']) and len(summary_state['records'])==summary_state['unique_classes_read']==1 and summary_state['records'][0]['instances'][0]['member']=='base/topology/SummaryState.class' and summary_state['instances_covered']==2)
+    for x in summary_state['records']:
+        original=next(a for a in r['records'] if a['sha256']==x['sha256'])
+        args=['java','-m','jdk.jdeps/com.sun.tools.javap.Main','-c','-p','-s','-constants',str(root/x['class_file']['path'])]
+        output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
+        check(x['sha256'][:10]+'-summary-state-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
+    check('summary_state-no-approval',summary_state['whole_model_read_gate']=='NOT_PASSED' and summary_state['human_approval_issued'] is False)
     spec=importlib.util.spec_from_file_location('bytecode_coverage',here/'reconcile_bytecode_coverage.py')
     module=importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
