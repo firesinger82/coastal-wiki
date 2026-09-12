@@ -165,3 +165,5 @@ Claude Sonnet 5의 [한정 재검토](../model-audit/XBeach/HG-ADVERSARIAL-RECHE
 - XBeach TraceToSlog2 864줄 판독. Composite·filespec·native 경계 기록. 누적 Java 81종/462경로, 잔여 Java 332종·Python 150종. 전체 승인 미발급.
 
 - XBeach trace 입력 래퍼 2종·236줄 판독. Kind identity 연결 및 native 미판독 경계 명시. 누적 Java 83종/466경로, 잔여 Java 330종·Python 150종. 전체 승인 미발급.
+
+2026-09-12 CLOG2 InputLog와 TopologyIterator/YCoordMapIterator 전체 437줄 판독. 정적 Kind 반환 및 topology→content→좌표 맵 전환과 최초 arrow category 특례를 확인했다. ContentIterator 본문과 superclass는 미판독으로 남긴다. 누적 Java 86/413종·472경로, 잔여 Java 327종/Python 150종. 구조 검증은 독립 의미 승인과 구분한다.
