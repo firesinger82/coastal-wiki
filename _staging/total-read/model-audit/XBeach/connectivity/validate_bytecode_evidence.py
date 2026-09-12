@@ -752,6 +752,14 @@ def validate(root,here):
         output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
         check(x['sha256'][:10]+'-viewer-timeline-search-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
     check('viewer_timeline_search-no-approval',viewer_timeline_search['whole_model_read_gate']=='NOT_PASSED' and viewer_timeline_search['human_approval_issued'] is False)
+    viewer_info_dialogs=json.loads((here/'bytecode-read/viewer-info-dialogs-read.json').read_text())
+    check('viewer-info-dialogs-seven-exact',bound(viewer_info_dialogs['prior_receipt']) and len(viewer_info_dialogs['records'])==viewer_info_dialogs['unique_classes_read']==7 and [x['instances'][0]['member'] for x in viewer_info_dialogs['records']]==['viewer/zoomable/InfoDialog.class', 'viewer/zoomable/InfoDialogForDuration.class', 'viewer/zoomable/InfoDialogForTime.class', 'viewer/timelines/InfoDialogForDrawable$1.class', 'viewer/timelines/InfoDialogForDrawable$2.class', 'viewer/timelines/InfoDialogForDrawable$3.class', 'viewer/timelines/InfoDialogForDrawable.class'] and viewer_info_dialogs['instances_covered']==14)
+    for x in viewer_info_dialogs['records']:
+        original=next(a for a in r['records'] if a['sha256']==x['sha256'])
+        args=['java','-m','jdk.jdeps/com.sun.tools.javap.Main','-c','-p','-s','-constants',str(root/x['class_file']['path'])]
+        output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
+        check(x['sha256'][:10]+'-viewer-info-dialogs-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
+    check('viewer_info_dialogs-no-approval',viewer_info_dialogs['whole_model_read_gate']=='NOT_PASSED' and viewer_info_dialogs['human_approval_issued'] is False)
     spec=importlib.util.spec_from_file_location('bytecode_coverage',here/'reconcile_bytecode_coverage.py')
     module=importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
