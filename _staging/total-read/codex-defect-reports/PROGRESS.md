@@ -131,3 +131,5 @@ Claude Sonnet 5의 [한정 재검토](../model-audit/XBeach/HG-ADVERSARIAL-RECHE
 2026-09-12 Drawable/비교기/Topology 3종 전체 판독: 동률 처리에 따른 TreeSet 비교 동등 조건, 표시/선택 분기, exclusion 계산을 기록했다. 누적 Java 46/413종. 전체 gate NOT_PASSED·GOAL active. [근거](../model-audit/XBeach/connectivity/bytecode-read/drawable-order-read.json).
 
 2026-09-12 InfoBox 전체 판독: 누락 범주의 기본 State 생성, 정보 버퍼의 지연 해석과 종료 경로, 직렬화 및 재읽기 상태를 기록했다. 누적 Java 47/413종. 전체 gate NOT_PASSED·GOAL active. [근거](../model-audit/XBeach/connectivity/bytecode-read/infobox-read.json).
+
+2026-09-12 InfoType/InfoValue 전체 판독: 태그 8종, 타입 포함 IO와 값 전용 IO, wrapper 검사와 알 수 없는 태그 예외를 기록했다. 누적 Java 49/413종. 전체 gate NOT_PASSED·GOAL active. [근거](../model-audit/XBeach/connectivity/bytecode-read/info-value-read.json).

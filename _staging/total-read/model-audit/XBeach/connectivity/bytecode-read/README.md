@@ -84,3 +84,20 @@ InfoBox는 TimeBoundingBox를 상속하고 overlap을 재정의하지 않는다.
 resolveCategory는 유효한 index의 범주를 찾지 못하면 UnknownType-index라는 State 범주를 기본 색·폭 1로 만들어 map에 등록한다. releaseCategory는 공유 범주의 used를 false로 바꾸고 참조를 비우며 index는 유지한다. CategoryMap의 미사용 범주 제거와 연결되는 동작이다.
 
 정보 해석은 최초 접근 시 플래그를 먼저 올리고 InfoType별 InfoValue 읽기에 위임한다. 정보 바이트를 바꾸는 setter나 readObject에는 이 플래그·기존 해석값의 초기화가 없다. 해석 도중 IOException이면 스택을 출력하고 System.exit(1)을 호출한다. 출력 문자열 생성도 해석을 유발하므로 단순 toString이라고 무조건 부작용 없는 경로로 취급할 수 없다. 실제 종료나 오래된 값 표시를 재현한 것은 아니며 호출 순서는 후속 판독 범위다. writer는 전체 배열을 쓰고 reader는 양수 signed short 길이만 읽는다. 전체 gate NOT_PASSED·신규 사람 승인 없음.
+
+## 정보 형식과 값
+
+[info-value-read.json](info-value-read.json)에 InfoType 308줄·InfoValue 495줄 전체를 결속했다. 누적 Java 49/413종·282경로, 남은 Java 364종/Python 150종이다.
+
+| 태그 | 이름 | 값의 Java 형식 | 값 IO |
+|---|---|---|---|
+| s | STR | String | mixed 문자열 |
+| h | INT2 | Short | short |
+| d / x | INT4 / BYTE4 | Integer | int |
+| l / X | INT8 / BYTE8 | Long | long |
+| e | FLT4 | Float | float |
+| E | FLT8 | Double | double |
+
+InfoValue의 readObject/writeObject는 1바이트 InfoType 태그까지 처리한다. readValue/writeValue는 이미 정해진 type에 따라 값만 처리하며 InfoBox가 사용하는 경로는 readValue다. BYTE4/BYTE8은 정수와 같은 IO를 쓰지만 문자열 표시에서 16진수로 바뀐다. getByteSize의 문자열 계산은 문자 수+3이므로 기존 mixed writer의 인코딩된 바이트 길이와 구분한다.
+
+setValue는 null type/value를 허용하고 나머지는 wrapper 형식을 검사하지만, type/value 생성자는 그대로 저장한다. 알 수 없는 nonnull 태그의 값 IO는 IOException을 던지므로 앞서 읽은 InfoBox의 종료 경로와 이어진다. null type은 이 분기에 앞서 역참조된다. 원본 프로그램 실행이나 실제 입력 오류 발생을 검증한 결과는 아니다. 전체 gate NOT_PASSED·신규 사람 승인 없음.
