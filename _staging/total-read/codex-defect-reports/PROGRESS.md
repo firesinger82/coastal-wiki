@@ -139,3 +139,5 @@ Claude Sonnet 5의 [한정 재검토](../model-audit/XBeach/HG-ADVERSARIAL-RECHE
 2026-09-12 SLOG2 객체 버퍼 3종 전체 판독: 34바이트 공통 헤더와 두 목록 IO, 정렬 상태/크기 누계/태그 처리 조건을 기록했다. 누적 Java 55/413종. 전체 gate NOT_PASSED·GOAL active. [근거](../model-audit/XBeach/connectivity/bytecode-read/drawable-buffer-read.json).
 
 2026-09-12 LineIDMap/Method 전체 판독: 계층 배열 매핑, YCoordMap 변환의 크기 처리, 직렬화와 Method 식별자를 기록했다. 누적 Java 57/413종. 전체 gate NOT_PASSED·GOAL active. [근거](../model-audit/XBeach/connectivity/bytecode-read/lineid-method-read.json).
+
+2026-09-12 YCoordMap 전체 판독 및 영수증 기반 누적 집계 추가. Java 58/413종·336경로 판독 근거, Java 355종/Python 150종 미판독. 전체 gate NOT_PASSED·GOAL active. [근거](../model-audit/XBeach/connectivity/bytecode-read/coverage.json).

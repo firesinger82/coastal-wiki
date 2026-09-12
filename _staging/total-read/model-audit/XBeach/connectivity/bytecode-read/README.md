@@ -129,3 +129,9 @@ LineIDMap은 LineID → 계층별 Integer 배열의 TreeMap이다. 저장은 tit
 YCoordMap에서 가져올 때 열 이름·평탄 배열 크기가 예상과 다르면 경고를 내지만 변환은 계속한다. 반대 변환은 예상 크기로 배열을 할당하고 실제 값 배열 길이만큼 써서, 부족하면 마지막에 명시적 예외를 내고 초과는 그 전에 배열 경계를 넘을 수 있다. 일반 writer는 실제 배열 길이 대신 계층 수만큼 쓴다는 차이가 있다. 입력 유효성 문제의 실제 발생 여부는 시험하지 않았다.
 
 Method는 4바이트 정수 식별자로 1을 CONNECT_COMPOSITE_STATE로 정의한다. 연결 동작 자체의 구현은 이 클래스에 없다. 원본 main의 임시 파일 읽기/쓰기 데모는 실행하지 않았으며 YCoordMap과 실제 연결 호출은 후속 판독 대상이다. 전체 gate NOT_PASSED·신규 사람 승인 없음.
+
+## YCoordMap과 누적 집계
+
+[ycoord-read.json](ycoord-read.json)에 YCoordMap 279줄 전체를 기록했다. 행·열 수, 제목, 열 이름과 평탄 int 배열을 보관하고 Method ID를 객체로 만든다. map/label 배열을 복사하거나 크기를 검증하지 않는다. getter와 setMethods도 참조를 직접 전달한다. 따라서 LineIDMap 변환 전후의 메타데이터 배열 공유가 확인됐으며 소비자의 유효성 검사가 별도로 필요하다. 실제 프로그램은 실행하지 않았다.
+
+[coverage.json](coverage.json)은 원본 SHA와 각 직접 판독 영수증을 결속해 누적 집합을 집계한다. Java 58/413종·336경로에 직접 판독 근거가 있고 Java 355종/Python 150종은 남아 있다. 집계는 판독 기록의 존재/중복/범위 확인이며 의미 판독의 외부 승인이 아니다. 원래 추출 영수증과 archive 인벤토리의 당시 상태는 바꾸지 않는다. 전체 gate NOT_PASSED·신규 사람 승인 없음.

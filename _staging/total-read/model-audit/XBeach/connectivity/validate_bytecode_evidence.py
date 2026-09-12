@@ -1,5 +1,6 @@
 """Source/disassembly bindings only, not an independent semantic approval."""
 import collections
+import importlib.util
 import hashlib
 import json
 import subprocess
@@ -126,5 +127,19 @@ def validate(root,here):
         output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
         check(x['sha256'][:10]+'-lineid-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
     check('lineids-no-approval',lineids['whole_model_read_gate']=='NOT_PASSED' and lineids['human_approval_issued'] is False)
+    ycoord=json.loads((here/'bytecode-read/ycoord-read.json').read_text())
+    check('ycoord-exact',bound(ycoord['prior_receipt']) and len(ycoord['records'])==ycoord['unique_classes_read']==1 and ycoord['records'][0]['instances'][0]['member']=='base/drawable/YCoordMap.class' and ycoord['instances_covered']==6)
+    for x in ycoord['records']:
+        original=next(a for a in r['records'] if a['sha256']==x['sha256'])
+        args=['java','-m','jdk.jdeps/com.sun.tools.javap.Main','-c','-p','-s','-constants',str(root/x['class_file']['path'])]
+        output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
+        check('ycoord-reproduce',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
+    check('ycoord-no-approval',ycoord['whole_model_read_gate']=='NOT_PASSED' and ycoord['human_approval_issued'] is False)
+    spec=importlib.util.spec_from_file_location('bytecode_coverage',here/'reconcile_bytecode_coverage.py')
+    module=importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    coverage=json.loads((here/'bytecode-read/coverage.json').read_text())
+    check('coverage-reproduce',coverage==module.build())
+    check('coverage-no-approval',coverage['whole_model_read_gate']=='NOT_PASSED' and coverage['human_approval_issued'] is False)
     check('no-approval',all(x['whole_model_read_gate']=='NOT_PASSED' and x['human_approval_issued'] is False for x in (r,read)))
     return checks
