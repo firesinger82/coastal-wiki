@@ -1,0 +1,68 @@
+{
+  "date": "2026-09-12",
+  "attribution": "AI direct bytecode reading; not independent semantic approval.",
+  "prior_receipt": {
+    "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/disassembly-receipt.json",
+    "sha256": "1cc8b2657a74f3f5904e9d0a40648b1c98f6e031b056b7c6e19122beb632aaa8"
+  },
+  "records": [
+    {
+      "sha256": "7f5551f9c367fdf55738990eb2d2fd90d8f322150a2360f18bf9237ceb5869f8",
+      "instances": [
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/win32/mpich/bin/jumpshot.jar",
+          "member": "logformat/slog2/input/InputLog.class"
+        },
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/bin/jumpshot.jar",
+          "member": "logformat/slog2/input/InputLog.class"
+        }
+      ],
+      "class_file": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/classes/7f5551f9c367fdf55738990eb2d2fd90d8f322150a2360f18bf9237ceb5869f8.class",
+        "sha256": "7f5551f9c367fdf55738990eb2d2fd90d8f322150a2360f18bf9237ceb5869f8"
+      },
+      "disassembly": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/disassembly/7f5551f9c367fdf55738990eb2d2fd90d8f322150a2360f18bf9237ceb5869f8.txt",
+        "sha256": "d277fadbba3675f14cee75c224251f7b1236f8d91c3a75a62376bfd7f5dcfb7e"
+      },
+      "read_lines": [
+        1,
+        743
+      ],
+      "scope": "Entire javap display, InputLog split into complete ranges and iterator complete. Static reading only.",
+      "observation": "Read-only MixedRandomAccessFile ctor catchesIOException logs+System.exit1; leaves byte buffer/streamsnull, no header initialization. isSLOG2 seeks0 and constructsHeader then delegates signature check, IOException exit1; compatibility separate getter, initialize neither calls isSLOG2 nor enforces compatibility. initialize allocates header maxbuffer unchecked and sequentially reads TreeDir, CategoryMap, LineIDMapList, replaces respective refs. readFilePart rejects FileBlockPtr.isNULL or size>headermax with string; direct verification of isNULL shows fptr==0 OR size<=0, not negative fptr. Reads exactsize via seek/readFully, bounded ByteArrayInputStream over sharedbuffer, MixedDataIO.readObject thenclose, no allbytes-consumed check. IOException logs exits1; negative pointer seek IOException, runtime errors propagate, no finally/rollback. Each metadata reader preallocates target then exits on nonnullerror string. readTreeNode same pointer/size checks but prints returnsnull; seek/readFully/TreeNode(input,objdefs)/close IOException logs Program continues and returnsnull. Therefore genuine IO failure can reach prior TreeTrunk root earlyreturn or child finaltime NPE/starttime null-map value; no execution required to establish this control-flow connection. No checksum, block overlap, node-ID-vs-pointer or tree ownership check here; sharedbuffer/randomcursor unsynchronized. Header/rootpointer/maps getters return actual refs; external mutation possible. getLineIDMapName guards null/outofrange only; pathname suffix strips separator only when lastIndex>0, so /name retains leading slash on Unix. stdoutConfirmation reads once into10bytes ignores bytecount/EOF, defaultcharset trim accepts exact lowercase y oryes; otherwise exit1, this is archived program behavior only. close IOException exit1, no own closed-state flag; finalize invokesclose then super.finalize in finally. toString alwaysdereferencesheader and chosen maps. Iterator factory forwards unchecked topologyint; treediraccessoractualref. No archived or native execution."
+    },
+    {
+      "sha256": "065e9152ab5b7124581e022e10b08e54bd72c59b07ca3219697bbdd2aca9306a",
+      "instances": [
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/win32/mpich/bin/jumpshot.jar",
+          "member": "logformat/slog2/input/InputLog$ItrOfAllRealDobjs.class"
+        },
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/bin/jumpshot.jar",
+          "member": "logformat/slog2/input/InputLog$ItrOfAllRealDobjs.class"
+        }
+      ],
+      "class_file": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/classes/065e9152ab5b7124581e022e10b08e54bd72c59b07ca3219697bbdd2aca9306a.class",
+        "sha256": "065e9152ab5b7124581e022e10b08e54bd72c59b07ca3219697bbdd2aca9306a"
+      },
+      "disassembly": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/disassembly/065e9152ab5b7124581e022e10b08e54bd72c59b07ca3219697bbdd2aca9306a.txt",
+        "sha256": "a60c5bc81ebde7ea0ec76f796df14014d494aea3019c77d27f0fb6bc835106c5"
+      },
+      "read_lines": [
+        1,
+        346
+      ],
+      "scope": "Entire javap display, InputLog split into complete ranges and iterator complete. Static reading only.",
+      "observation": "Captures input/timeframe/order/topologyint, creates TreeTrunk (resets shared static rootframe), initFromTreeTop/getTreeRoot; null root sets queuednull and earlyreturns, superclass currentgroup remainsnull safelyempty. Copies each leaf directory timebox into TreeSet using requested TimeBoundingBox order, no initial timeframe filter, ignores equal-key add result. Nonnull root with no leaf entries fails first/last unguarded. Extends extreme boxes in-place to root endpoints: increasing first.start=rootstart,last.finish=rootend; decreasing first.finish=rootend,last.start=rootstart; no remove/reinsert after modifying sortedset keys, ordering relies on valid tree bounds. Grows root to depth0 for entire first box even if requested timeframe disjoint; then prepares first group and queued next. nextObjGrpItr advances sorted leafboxes, intersects with requested timeframe, skipsnullintersections, scrolls trunk tointersection. Topology0 builds nestable+nonnestable real iterators,2 nestableonly,1 nonnestableonly; both use compositestrue, combined via IteratorOfAllDrawables. Any otherint returnsnull at first intersecting box and ends superclass iteration, no error; names ARROWS/STATES map nesting flag not direct exact topology test. getNextInQueue filters overlapped real objects by selected boundary: START requires currentintersection.start<=object.start<currentintersection.finish; FINAL requires start<object.finish<=finish, confirmed direct TimeBoundingBox methods. This deduplicates adjacent partition shared boundaries under valid partition assumptions but excludes objects overlapping query whose selected endpoint is outside query, START object at overall final endpoint and FINAL at overall initial endpoint, and zero-width intersections. No adjustment for query/root extreme endpoint inclusion; no checking internal leafbox gaps/overlaps, so gaps can omit/overlaps can duplicate selected endpoints. Filtering updates current_timebox as superclass moves groups. hasNext onlyqueuednonnull, nextreturns savedqueue then prefetch; exhaustion returnsnull instead of NoSuchElementException; inherited remove noop. TreeDir entries copied as bounds only, node loading follows root children through TreeTrunk; no directory-to-child consistency check. No archived execution."
+    }
+  ],
+  "unique_classes_read": 2,
+  "instances_covered": 4,
+  "whole_model_read_gate": "NOT_PASSED",
+  "human_approval_issued": false
+}

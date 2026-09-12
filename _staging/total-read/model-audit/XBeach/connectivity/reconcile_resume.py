@@ -355,6 +355,7 @@ def main():
     read('bytecode-read/input-treenode-read.json')
     read('bytecode-read/input-treefloor-read.json')
     read('bytecode-read/input-floorlist-trunk-read.json')
+    read('bytecode-read/slog-inputlog-read.json')
     read('bytecode-read/coverage.json')
     formula_name = 'workbook-formula-read.json'
     if (HERE / formula_name).is_file():
