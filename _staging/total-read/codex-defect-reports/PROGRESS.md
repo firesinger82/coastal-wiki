@@ -221,3 +221,5 @@ Claude Sonnet 5의 [한정 재검토](../model-audit/XBeach/HG-ADVERSARIAL-RECHE
 2026-09-12 PreviewState 전체 1,035줄 판독. 표시 6방식의 픽셀 배분·가시성 반영, 그리기에서 갱신한 치수에 의존하는 선택 판정, 누적 방식 x 여백 재검사 부재를 기록했다. 인벤토리 base/ 미판독은 0이지만 전체 gate는 미통과다. 누적 Java 156/413종·620경로, 잔여 Java 257종/Python 150종. 근거: `preview-state-read.json` (XBeach connectivity/bytecode-read). 독립 의미 승인은 아니다.
 
 2026-09-12 SLOG2 BufStub/IteratorOfGroupObjects 2종 전체 267줄 판독. 대리 버퍼의 경고·null/초기값 반환과 toString 캐시 변경, 최초 그룹 준비 및 그룹 전환의 hasNext 의존성을 기록했다. 누적 Java 158/413종·624경로, 잔여 Java 255종/Python 150종. 근거: `input-helpers-read.json` (XBeach connectivity/bytecode-read). 독립 의미 승인은 아니다.
+
+2026-09-12 입력 TreeNode/그림자 순회기 5종 전체 596줄 판독. 생성자의 최초 그룹 준비, 겹치지 않는 버퍼 생략, 음수 자식 수의 null 처리와 직접 반환 배열을 확인했다. 누적 Java 163/413종·634경로, 잔여 Java 250종/Python 150종. 근거: `input-treenode-read.json` (XBeach connectivity/bytecode-read). 독립 의미 승인은 아니다.
