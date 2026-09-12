@@ -35,6 +35,8 @@ verification_date: YYYY-MM-DD
 - **AI cross-reference** (자동, 권장 1차): PDF를 markdown으로 변환(`textbook/md/`)한 뒤, 인용 문장을 페이지별로 프로그래밍 lookup. 글자 중복·OCR artifact는 정규화 후 매칭. `verification_method` 필드에 "AI programmatic cross-reference …" 명시, `verification_by`에 모델명 + "cross-ref" 명시.
 - **사용자 직접 검토** (수동, 최종 권위): 원본 PDF 페이지 직접 확인. `verification_by`에 사용자 명시.
 
+위 2종 방법은 그대로 유효하며, 새로 작성·실질 변경하는 단언에는 아래 [대조 범위](#새로-작성실질-변경하는-단언의-대조-범위) 보충과 함께 적용한다.
+
 **사용자 override**: AI 검증된 `verified`는 사용자가 언제든 `source-needed`로 강등 가능. AI는 검증 책임의 1차 게이트, 사용자는 최종 권위.
 
 **규칙**:
@@ -42,6 +44,14 @@ verification_date: YYYY-MM-DD
 - 미검증 노트도 canonical 위치(`concepts/<topic>/01-concept.md` 등)에 둠. frontmatter 상태가 진실
 - `INDEX.md`는 비-`verified` 항목을 **상태 컬럼**으로 표시
 - `concepts/<topic>/`에서 다른 노트 인용 시 그 노트의 `citation_status`가 `verified`가 아니면 인용하는 쪽도 `source-needed`로 강등
+
+### 새로 작성·실질 변경하는 단언의 대조 범위
+
+- **선정 원문 범위를 먼저 고정한다.** 어떤 논문·장·절과 어느 판본을 대조 대상으로 삼는지 명시하고, 그 범위를 충실히 판독한다. 절 단위 판독을 문헌 전권 판독이라고 표현하지 않는다.
+- **인용 위치·문구 매칭만으로 의미 검증이 끝난 것이 아니다.** 해당 수치·식·적용 조건을 원문이 실제로 지지하는지 확인한다.
+- `verification_method`에 실제 수행한 대조 범위와 한계를 기록한다.
+- 이 보충을 기존 전수 승인 집합을 축소하는 근거로 사용하지 않는다.
+- `citation_status` 3종과 `has_source_needed` 상태, 적용되는 독립 검토·사람 게이트는 그대로다. 새 주장에 과거 사람 승인(HG)을 자동 승계하지 않는다.
 
 ### 2.0 disclosed-gap 정책 — `verified`의 부분 미출처 + 기계가독 플래그 (G9)
 
