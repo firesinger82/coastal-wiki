@@ -265,3 +265,5 @@ Method는 4바이트 정수 식별자로 1을 CONNECT_COMPOSITE_STATE로 정의�
 2026-09-12 viewer LabeledFloatSlider 전체 299줄 판독. 내부 위치0/10000의1/9999 보정, 표시 끝점과 설정 범위의 차이, 같은 위치/변경 위치에 따른 텍스트 정규화 경로를 기록했다. 부모 텍스트 파싱은 후속 확인한다. 누적 Java 201/413종·710경로, 잔여 Java 212종/Python 150종. 근거: `viewer-float-slider-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
 
 2026-09-12 viewer LabeledTextField/문서 리스너 2종 전체 579줄 판독. 초기 빈 텍스트, listener 등록 직후 null 및 중복 등록, 숫자 파싱 실패 시 정수 최소값/실수 최소 양수 반환을 슬라이더 입력 처리에 연결했다. 문서 이벤트는 액션을 직접 발행하지 않는다. 누적 Java 203/413종·714경로, 잔여 Java 210종/Python 150종. 근거: `viewer-textfield-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer CustomCursor 전체 224줄 판독. 클래스 초기화 시 커서 리소스4종의 순차 로딩, 고정 hotspot(1,1), 권장 크기 캔버스에 무배율 그리기와 실패 fallback 부재를 기록했다. 실제 플랫폼/리소스 성공 여부를 실행 검증으로 주장하지 않는다. 누적 Java 204/413종·716경로, 잔여 Java 209종/Python 150종. 근거: `viewer-cursor-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
