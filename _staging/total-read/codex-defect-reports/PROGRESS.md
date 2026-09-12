@@ -117,3 +117,5 @@ Claude Sonnet 5의 [한정 재검토](../model-audit/XBeach/HG-ADVERSARIAL-RECHE
 2026-09-12 침투식 구현 대조: 원본의 연산자 부재를 groundwater.F90의 +1 불포화 침투 관계·실제 양의 근 계산과 대조했다. 임계 셀 가드·암시적 침투층·시간 비율·가용 표층수 제한을 구분했고 원본 문서를 자동 수정하지 않았다. 원문 SHA/구간·대수 검산 포함 통합 564개 PASS. 전체 gate NOT_PASSED·GOAL active. [비교 근거](../model-audit/XBeach/connectivity/INFILTRATION-DOCUMENT-CODE-COMPARISON.md).
 
 2026-09-12 바이트코드 판독 시작: 아카이브 unread 1,284경로를 Java 413종/Python 150종에 결속했다. Java 87,653줄 역어셈블리 자료를 저장하고 launcher 4종의 전체 표시 명령을 직접 읽어 동일 SHA 12경로에 연결했다. Java 409종·Python 150종은 미판독. 전체 gate NOT_PASSED·GOAL active. [근거](../model-audit/XBeach/connectivity/bytecode-read/README.md).
+
+2026-09-12 base/io 9종 465줄 직접 판독·54경로 결속. 누적 Java 13/413종(66경로), 나머지 Java 400종/Python 150종 미판독. 문자열 길이·빈 값 반환·제한 읽기 동작 및 Header 호출 구간을 기록했다. 전체 gate NOT_PASSED·GOAL active. [근거](../model-audit/XBeach/connectivity/bytecode-read/base-io-read.json).
