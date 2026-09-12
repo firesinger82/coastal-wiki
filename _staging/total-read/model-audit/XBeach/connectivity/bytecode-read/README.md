@@ -289,3 +289,5 @@ Method는 4바이트 정수 식별자로 1을 CONNECT_COMPOSITE_STATE로 정의�
 2026-09-12 viewer LegendFrame/닫기 리스너 2종 전체 403줄 판독. 기존 범례/타임라인 정리 후 조기 등록, 표시 상태 변경 후 Control 호출, 독립 main 초기화 전제조건과 로그 소유권을 연결했다. 누적 Java 246/413종·800경로, 잔여 Java 167종/Python 150종. LegendPanel 내부는 후속 범위다. 근거: `viewer-legend-frame-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
 
 2026-09-12 viewer LegendPanel/LegendTable 2종 전체 582줄 판독. 행 선택과 표시 속성의 구분, 전역 범례 숨김, 컬럼별 메뉴/마우스 처리 연결, 초기 렌더러 표본 크기 계산을 기록했다. 누적 Java 248/413종·804경로, 잔여 Java 165종/Python 150종. 실제 데이터/정렬 변경은 LegendTableModel과 메뉴 후속 범위다. 근거: `viewer-legend-panel-table-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer LegendTableModel 전체 725줄 판독. 공유 Category 편집, 목록 정렬 후 아이콘 재생성, 빈 목록의 초기 폭 계산 실패, 컬럼 반환형/편집 입력형 차이를 연결했다. 누적 Java 249/413종·806경로, 잔여 Java 164종/Python 150종. 비교자 내부와 색상 편집기는 후속 범위다. 근거: `viewer-legend-model-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
