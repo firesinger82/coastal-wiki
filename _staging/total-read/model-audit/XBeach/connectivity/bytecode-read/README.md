@@ -171,3 +171,7 @@ Method는 4바이트 정수 식별자로 1을 CONNECT_COMPOSITE_STATE로 정의�
 ## CLOG converter 판독
 
 `clog-converter-read.json`은 전체 750줄을 직접 확인한 근거다. CLOG2 converter와 달리 clogTOdrawable decoder를 사용하며 YCoordMap 분기가 없다. 출력 map list는 EOF flush 후 identity map 하나로 구성한다. 시간 검사 기본 off와 flush/map/close 순서는 공통이다. help의 Clog2Slog 표기 차이도 보존했다. 입력 decoder와 실제 자료 검증으로 확대하지 않는다.
+
+## InputAPI/Kind 판독
+
+`input-kind-read.json`은 전체 172줄을 결박한다. InputAPI는 peek와 5개 getter 선언만 제공하며 소비·정렬·close 규약을 구현하지 않는다. Kind는 정수 index의 값 동등성을 구현하지만 converter는 정적 객체 identity로 분기한다. decoder의 반환 방식은 후속 판독 대상이다. 전체 승인 미발급.

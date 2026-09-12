@@ -208,6 +208,14 @@ def validate(root,here):
         output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
         check(x['sha256'][:10]+'-output_flow-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
     check('output_flow-no-approval',output_flow['whole_model_read_gate']=='NOT_PASSED' and output_flow['human_approval_issued'] is False)
+    kinds=json.loads((here/'bytecode-read/input-kind-read.json').read_text())
+    check('input-kind-two-exact',bound(kinds['prior_receipt']) and len(kinds['records'])==kinds['unique_classes_read']==2 and {x['instances'][0]['member'] for x in kinds['records']}=={'base/drawable/InputAPI.class','base/drawable/Kind.class'} and kinds['instances_covered']==12)
+    for x in kinds['records']:
+        original=next(a for a in r['records'] if a['sha256']==x['sha256'])
+        args=['java','-m','jdk.jdeps/com.sun.tools.javap.Main','-c','-p','-s','-constants',str(root/x['class_file']['path'])]
+        output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
+        check(x['sha256'][:10]+'-input-kind-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
+    check('input-kind-no-approval',kinds['whole_model_read_gate']=='NOT_PASSED' and kinds['human_approval_issued'] is False)
     spec=importlib.util.spec_from_file_location('bytecode_coverage',here/'reconcile_bytecode_coverage.py')
     module=importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)

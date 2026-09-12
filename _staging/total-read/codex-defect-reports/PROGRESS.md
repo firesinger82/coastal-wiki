@@ -159,3 +159,5 @@ Claude Sonnet 5의 [한정 재검토](../model-audit/XBeach/HG-ADVERSARIAL-RECHE
 - XBeach Clog2ToSlog2 764줄 판독. 기본 시간 검사 off와 EOF flush/close 연결. 누적 Java 77종/442경로, 잔여 Java 336종·Python 150종. 전체 승인 미발급.
 
 - XBeach ClogToSlog2 전체 750줄 판독. CLOG2와의 YCoordMap 및 decoder 차이 기록. 누적 Java 78종/446경로, 잔여 Java 335종·Python 150종. 전체 승인 미발급.
+
+- XBeach InputAPI/Kind 2종·172줄 판독. 값 동등성과 converter identity 분기 연결. 누적 Java 80종/458경로, 잔여 Java 333종·Python 150종. 전체 승인 미발급.
