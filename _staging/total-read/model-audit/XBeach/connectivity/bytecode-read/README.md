@@ -143,3 +143,7 @@ Method는 4바이트 정수 식별자로 1을 CONNECT_COMPOSITE_STATE로 정의�
 ## Shadow 판독 보충
 
 `shadow-read.json`은 Shadow 전체 1425줄과 동일 SHA 6개 경로를 결박한다. 객체 수 가중 평균, 병합 전후 기간에 따른 비율 재조정, 상태 exclusion 계산 후 임시 자료 해제, 직렬화와 preview 호출을 확인했다. output map의 toString에는 Object[]를 CategoryWeight[]로 cast하는 경로가 있다. 정상 호출에서의 도달 여부와 CategoryWeight/Primitive 내부는 별도 확인 대상이다. 누적 Java 60/413종·348경로이며 전체 gate는 NOT_PASSED다.
+
+## Category weight 계열 판독
+
+`category-weight-read.json`은 CategoryRatios/Summary/Weight 및 내부 comparator·marker 10종의 전체 909줄을 결박한다. 비율은 float 곱셈/덧셈이며 정규화하지 않는다. 직렬화는 index(int), inclusive(float), exclusive(float), count(long)의 20바이트다. 이미 연결된 CategoryWeight의 resolveCategory도 false이므로 Shadow의 short-circuit 조건과 연결된다. comparator의 뺄셈 overflow/NaN 방어는 없다. 정상 입력에서의 도달 여부를 별도로 확인해야 한다. 누적 Java 70/413종·408경로이며 전체 gate NOT_PASSED다.

@@ -151,6 +151,15 @@ def validate(root,here):
         output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
         check('shadow-reproduce',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
     check('shadow-no-approval',shadow['whole_model_read_gate']=='NOT_PASSED' and shadow['human_approval_issued'] is False)
+    weights=json.loads((here/'bytecode-read/category-weight-read.json').read_text())
+    expected_weights={x['sha256'] for x in r['records'] if x['instances'][0]['member'].startswith(('base/drawable/CategoryWeight','base/drawable/CategoryRatios','base/drawable/CategorySummary'))}
+    check('weights-ten-exact',bound(weights['prior_receipt']) and len(weights['records'])==weights['unique_classes_read']==10 and {x['sha256'] for x in weights['records']}==expected_weights and weights['instances_covered']==60)
+    for x in weights['records']:
+        original=next(a for a in r['records'] if a['sha256']==x['sha256'])
+        args=['java','-m','jdk.jdeps/com.sun.tools.javap.Main','-c','-p','-s','-constants',str(root/x['class_file']['path'])]
+        output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
+        check(x['sha256'][:10]+'-weights-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
+    check('weights-no-approval',weights['whole_model_read_gate']=='NOT_PASSED' and weights['human_approval_issued'] is False)
     spec=importlib.util.spec_from_file_location('bytecode_coverage',here/'reconcile_bytecode_coverage.py')
     module=importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
