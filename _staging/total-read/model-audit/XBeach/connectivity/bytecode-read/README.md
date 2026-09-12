@@ -49,3 +49,18 @@ TraceName은 소문자 확장자를 구분하며 clog2/clog/rlog/txt만 직접 s
 Permutation은 중복 없는 순열이 아니라 각 자리 값이 0부터 children-1까지 변하는 배열 열거다. 0번 자리부터 carry하고 현재 배열의 복사본을 반환한다. 열거 상한은 Math.pow를 long으로 변환하며 nextElement 자체에는 소진 검사가 없다.
 
 Drawables 정방향/역방향 순회는 목록을 해당 방향으로 훑어 시간 구간 overlap 조건을 통과한 항목을 반환한다. AllDrawables는 두 입력의 앞 항목을 비교해 병합하고 동률이면 nestable을 먼저 선택한다. Primitives 순회는 Composite에 기본 객체 추가를 위임하고 같은 시작 시각 비교기의 TreeSet에서 정방향은 first, 역방향은 last를 꺼낸다. 입력이 끝난 뒤 집합의 잔여 항목도 소비한다. 모든 순회기의 remove는 빈 메서드이며 보통의 소진 후 next는 null을 반환한다. 입력 정렬 조건·중복 제거·overlap 의미는 Drawable/Composite의 후속 판독과 함께 검증할 범위다. 전체 gate NOT_PASSED·신규 사람 승인 없음.
+
+## 시간 경계와 좌표 11종
+
+[time-coord-read.json](time-coord-read.json)에 TimeBoundingBox 계열 7종·Coord 계열 3종·CoordPixelXform 인터페이스의 전체 표시 내용을 기록했다. 누적 Java 43/413종이며 370종·Python 150종은 남아 있다.
+
+TimeBoundingBox는 earliest/latest double 두 개를 그 순서대로 읽고 쓴다. TreeDirValue의 시간 경계 16바이트와 FileBlockPtr 12바이트를 합하면 앞서 관측한 28바이트다. 기본값은 (+∞,−∞), ALL_TIMES는 (−∞,+∞)다. 정상 순서의 NaN 없는 구간에서 overlap은 양쪽 끝점을 포함한다. 따라서 [0,1]과 [1,2]의 교집합은 [1,1]이고 길이는 0이다. contains는 양끝 포함, WithinLeft는 [시작,끝), WithinRight는 (시작,끝]이다. remove는 대응하는 시작 또는 끝이 정확히 일치할 때 한 경계만 옮기므로 일반 구간 차집합 연산으로 해석하면 안 된다.
+
+| 비교기 | 우선 키 | 동률 키 |
+|---|---|---|
+| IncreasingStarttime | 시작 오름차순 | 끝 내림차순 |
+| DecreasingStarttime | 시작 내림차순 | 끝 오름차순 |
+| IncreasingFinaltime | 끝 오름차순 | 시작 내림차순 |
+| DecreasingFinaltime | 끝 내림차순 | 시작 오름차순 |
+
+표는 NaN 없는 값의 비교다. 입력 유효성/NaN 검사는 없으며 객체 setter는 경계를 정규화하지 않는다. Coord는 time(double)와 lineID(int)의 12바이트다. LineIDOrder는 두 int의 뺄셈을 반환하며 time은 비교하지 않는다. CoordPixelXform은 시간/행과 픽셀 간 변환 등 선언만 포함한다. Drawable/InfoBox 상속 경로 및 Composite 재정의 여부는 후속 판독으로 확인하며 이 기반 클래스만으로 모든 런타임 객체의 overlap을 확정하지 않는다. 전체 gate NOT_PASSED·신규 사람 승인 없음.

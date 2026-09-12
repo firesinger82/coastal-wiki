@@ -66,5 +66,14 @@ def validate(root,here):
         output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
         check(x['sha256'][:10]+'-iteration-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
     check('iteration-no-approval',iteration['whole_model_read_gate']=='NOT_PASSED' and iteration['human_approval_issued'] is False)
+    time_read=json.loads((here/'bytecode-read/time-coord-read.json').read_text())
+    expected_time={x['sha256'] for x in r['records'] if x['instances'][0]['member'].startswith(('base/drawable/TimeBoundingBox','base/drawable/Coord'))}
+    check('time-coord-eleven-exact',bound(time_read['prior_receipt']) and len(time_read['records'])==time_read['unique_classes_read']==11 and {x['sha256'] for x in time_read['records']}==expected_time and time_read['instances_covered']==sum(len(x['instances']) for x in time_read['records']))
+    for x in time_read['records']:
+        original=next(a for a in r['records'] if a['sha256']==x['sha256'])
+        args=['java','-m','jdk.jdeps/com.sun.tools.javap.Main','-c','-p','-s','-constants',str(root/x['class_file']['path'])]
+        output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
+        check(x['sha256'][:10]+'-time-coord-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
+    check('time-coord-no-approval',time_read['whole_model_read_gate']=='NOT_PASSED' and time_read['human_approval_issued'] is False)
     check('no-approval',all(x['whole_model_read_gate']=='NOT_PASSED' and x['human_approval_issued'] is False for x in (r,read)))
     return checks
