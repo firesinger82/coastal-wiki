@@ -205,3 +205,5 @@ Claude Sonnet 5의 [한정 재검토](../model-audit/XBeach/HG-ADVERSARIAL-RECHE
 2026-09-12 PreviewEvent 전체 354줄 판독. 중심 시각만 사용하는 표시 생략, 화면 경계 제외, 두 반타원과 세로선, 표시 높이와 타원 선택 높이의 1픽셀 차이를 기록했다. 누적 Java 137/413종·582경로, 잔여 Java 276종/Python 150종. 근거: `preview-event-read.json` (XBeach connectivity/bytecode-read). 실제 화면 검증·독립 의미 승인은 아니다.
 
 2026-09-12 Arrow 전체 619줄 판독. 방향별 화살촉 stroke 적용 차이, NaN 동등 비교의 도달 불가 분기, 같은 픽셀 끝점의 수직 화살촉 처리와 한쪽 경계 검사 한계를 기록했다. 누적 Java 138/413종·584경로, 잔여 Java 275종/Python 150종. 근거: `arrow-render-read.json` (XBeach connectivity/bytecode-read). 실제 화면 검증·독립 의미 승인은 아니다.
+
+2026-09-12 SummaryArrow 전체 423줄 판독. 카테고리별 공통 시작 시간, 객체 수 정수 나눗셈 기반 선 굵기, 밑 0·빈 배열·0시간 길이의 미검사, 굵기를 반영하지 않는 Line 선택 판정을 기록했다. 누적 Java 139/413종·586경로, 잔여 Java 274종/Python 150종. 근거: `summary-arrow-read.json` (XBeach connectivity/bytecode-read). 실제 화면 검증·독립 의미 승인은 아니다.
