@@ -736,6 +736,14 @@ def validate(root,here):
         output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
         check(x['sha256'][:10]+'-viewer-timeline-frame-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
     check('viewer_timeline_frame-no-approval',viewer_timeline_frame['whole_model_read_gate']=='NOT_PASSED' and viewer_timeline_frame['human_approval_issued'] is False)
+    viewer_timeline_panel=json.loads((here/'bytecode-read/viewer-timeline-panel-read.json').read_text())
+    check('viewer-timeline-panel-five-exact',bound(viewer_timeline_panel['prior_receipt']) and len(viewer_timeline_panel['records'])==viewer_timeline_panel['unique_classes_read']==5 and [x['instances'][0]['member'] for x in viewer_timeline_panel['records']]==['viewer/timelines/PreviewStateComboBox$1.class', 'viewer/timelines/PreviewStateComboBox.class', 'viewer/timelines/PreviewStateComboBox$PreviewModeActionListener.class', 'viewer/timelines/TimelinePanel.class', 'viewer/timelines/TreeTrunkPanel.class'] and viewer_timeline_panel['instances_covered']==10)
+    for x in viewer_timeline_panel['records']:
+        original=next(a for a in r['records'] if a['sha256']==x['sha256'])
+        args=['java','-m','jdk.jdeps/com.sun.tools.javap.Main','-c','-p','-s','-constants',str(root/x['class_file']['path'])]
+        output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
+        check(x['sha256'][:10]+'-viewer-timeline-panel-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
+    check('viewer_timeline_panel-no-approval',viewer_timeline_panel['whole_model_read_gate']=='NOT_PASSED' and viewer_timeline_panel['human_approval_issued'] is False)
     spec=importlib.util.spec_from_file_location('bytecode_coverage',here/'reconcile_bytecode_coverage.py')
     module=importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
