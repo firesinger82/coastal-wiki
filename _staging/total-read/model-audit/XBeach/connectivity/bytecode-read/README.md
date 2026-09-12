@@ -251,3 +251,5 @@ Method는 4바이트 정수 식별자로 1을 CONNECT_COMPOSITE_STATE로 정의�
 2026-09-12 SLOG2 PrintSerially/PrintRecursively 2종 전체 1,183줄 판독. 옵션 순서 의존성, 숫자 변환 실패 후 계속 진행, NaN 검사 통과, 재귀 출력의 루트 읽기 실패/빈 자료 혼동을 기록했다. 순차 출력의 인접 정렬 표시는 완전성 검증이 아니며 재귀 출력 모드 간 선택 범위도 다르다. 누적 Java 173/413종·654경로, 잔여 Java 240종/Python 150종. 근거: `slog-print-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
 
 2026-09-12 SLOG2 Navigator 전체 1,181줄 판독. 출력 모드 변경 시 시간창 갱신 단락 평가, 초기 changedPrintAll 잔존, 첫 숫자 토큰 오류의 catch 내부 배열 접근, EOF 미처리를 확인했다. 현 인벤토리의 SLOG2 input 패키지 판독은 채웠으나 전체 모델 gate는 미통과다. 누적 Java 174/413종·656경로, 잔여 Java 239종/Python 150종. 근거: `slog-navigator-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 CLOG2 상수 내부 클래스/고정 길이 선언 9종 전체 186줄 판독. 레코드 종류0..11, 통신 종류와 메시지 SEND/RECV 번호, 24/32/40바이트 선언을 기존 실제 레코드 처리 판독과 구분해 연결했다. 자체 IO/검증은 없다. 누적 Java 183/413종·674경로, 잔여 Java 230종은 viewer 계열이며 Python 150종도 미판독이다. 근거: `clog2-constant-companions-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
