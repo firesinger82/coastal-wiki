@@ -448,6 +448,14 @@ def validate(root,here):
         output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
         check(x['sha256'][:10]+'-preview-state-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
     check('preview_state-no-approval',preview_state['whole_model_read_gate']=='NOT_PASSED' and preview_state['human_approval_issued'] is False)
+    input_helpers=json.loads((here/'bytecode-read/input-helpers-read.json').read_text())
+    check('input-helpers-two-exact',bound(input_helpers['prior_receipt']) and len(input_helpers['records'])==input_helpers['unique_classes_read']==2 and sorted(x['instances'][0]['member'] for x in input_helpers['records'])==['logformat/slog2/input/BufStub.class', 'logformat/slog2/input/IteratorOfGroupObjects.class'] and input_helpers['instances_covered']==4)
+    for x in input_helpers['records']:
+        original=next(a for a in r['records'] if a['sha256']==x['sha256'])
+        args=['java','-m','jdk.jdeps/com.sun.tools.javap.Main','-c','-p','-s','-constants',str(root/x['class_file']['path'])]
+        output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
+        check(x['sha256'][:10]+'-input-helpers-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
+    check('input_helpers-no-approval',input_helpers['whole_model_read_gate']=='NOT_PASSED' and input_helpers['human_approval_issued'] is False)
     spec=importlib.util.spec_from_file_location('bytecode_coverage',here/'reconcile_bytecode_coverage.py')
     module=importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
