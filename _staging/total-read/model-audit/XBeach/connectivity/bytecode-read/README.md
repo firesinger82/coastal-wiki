@@ -285,3 +285,5 @@ Method는 4바이트 정수 식별자로 1을 CONNECT_COMPOSITE_STATE로 정의�
 2026-09-12 viewer FirstMenuBar/리스너 11종 전체 554줄 판독. 메뉴→버튼 doClick 위임, 도구모음에 없는 Close/About 버튼의 메뉴 경로, 종료 확인을 거치지 않는 Exit 및 applet 분기를 연결했다. 누적 Java 236/413종·780경로, 잔여 Java 177종/Python 150종. 근거: `viewer-first-menubar-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
 
 2026-09-12 viewer HTMLviewer/리스너 8종 전체 910줄 판독. 잘못된 URL 오류 처리의 null 참조, 페이지 로드 전 이력 변경/실패 시 미복원, 새 링크 이동 후 redo 유지, UI 이벤트 큐의 링크 로드를 연결했다. 누적 Java 244/413종·796경로, 잔여 Java 169종/Python 150종. viewer/first 잔여 클래스는 없다. 근거: `viewer-html-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer LegendFrame/닫기 리스너 2종 전체 403줄 판독. 기존 범례/타임라인 정리 후 조기 등록, 표시 상태 변경 후 Control 호출, 독립 main 초기화 전제조건과 로그 소유권을 연결했다. 누적 Java 246/413종·800경로, 잔여 Java 167종/Python 150종. LegendPanel 내부는 후속 범위다. 근거: `viewer-legend-frame-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
