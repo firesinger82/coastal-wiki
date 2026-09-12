@@ -1,0 +1,41 @@
+{
+  "date": "2026-09-12",
+  "attribution": "AI direct bytecode reading; not independent semantic approval.",
+  "prior_receipt": {
+    "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/disassembly-receipt.json",
+    "sha256": "1cc8b2657a74f3f5904e9d0a40648b1c98f6e031b056b7c6e19122beb632aaa8"
+  },
+  "records": [
+    {
+      "sha256": "bb69ce8ebc986a0cc1a24c04d27d6191fce6ada70259c7778de3e1157a557a18",
+      "instances": [
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/win32/mpich/bin/jumpshot.jar",
+          "member": "viewer/zoomable/ScaledSlider.class"
+        },
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/bin/jumpshot.jar",
+          "member": "viewer/zoomable/ScaledSlider.class"
+        }
+      ],
+      "class_file": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/classes/bb69ce8ebc986a0cc1a24c04d27d6191fce6ada70259c7778de3e1157a557a18.class",
+        "sha256": "bb69ce8ebc986a0cc1a24c04d27d6191fce6ada70259c7778de3e1157a557a18"
+      },
+      "disassembly": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/disassembly/bb69ce8ebc986a0cc1a24c04d27d6191fce6ada70259c7778de3e1157a557a18.txt",
+        "sha256": "dd4aabef8263735f4688087fdb8996e0683e13e337906041f878cf531bc18efd"
+      },
+      "read_lines": [
+        1,
+        477
+      ],
+      "scope": "Complete477-line javap in consecutive1–240/241–477 slices.",
+      "observation": "Complete477-line javap in consecutive1–240/241–477 slices. JSlider constructor orientationinput, integer min0/max1,000,000,000/value0, whitebackground, track/labels/ticks true, static captured Const.FONT, loweredbevel. label_min0/max100/fontstatic, DecimalFormat defaultlocale pattern###0.0## via setLabelFormat. DOES NOT initialize ratio_label2model or labeltable in constructor: ratio defaults0 until min/max setter. getValLabel initially0 for any finite integer position; label→model division byzero unsafe until caller setup (RowAdjustments pending).\nConversion model→label ratio*integer+min; label→model Math.round((value-min)/ratio)long narrowedint, interval Math.round(interval/ratio)long→int. Uses constants0/1e9 even if inherited model bounds later changed. No finite/nonzero/positive ratio check or overflowguard. Max/min setter stores new bound, recomputes (max-min)/1e9, immediately regenerates table; no ordered-bound validation, current physical label preservation, explicit fireStateChanged or atomic pair update. Inherited slider integer position remains same, so physical getValLabel changes as range changes even without integer change.\ngetMajorTickIntervalLabel takes ABSOLUTE label_max (not max-min): strict thresholds11/22/55/110/220/440/550 choose1/2/5/10/20/40/50, else100. NaN via dcmpg follows all ifge to final100. Negative max returns1. No scale adaptation above550. setDefaultLabelTable returns if formatterNULL or paintLabelsfalse, also skipping major tick-spacing update. Otherwise computes interval/ratio roundedint, sets majorTickSpacing, createsHashtable, starts intkey0 and loops key<1e9, adds JLabel(format(model2label(key))) with current label_font, key+=integerTickInterval. Endpoint1e9 excluded; no explicit terminal maximum label. Labels anchored atlabel_min even when not a multiple of majorlabelinterval. Rounding can make label increments differ slightly from nominal; no collision, labelcount, zero/negative-step or integer-overflowguard. If majorTickInterval becomes0, key never advances; e.g. infinite positive ratio yields interval/ratio0 and then unbounded loop replacing key0 with newlabels (not completed archived execution). Huge finite span can also round interval to0; reversed/zero ranges can yield negative/narrowedbadsteps. UI appearance depends on callerbounds and Swing behavior, not universal failure.\nsetLabelFormat(null) leaves existing formatter unchanged; nonnull assigns fresh defaultlocale DecimalFormat BEFORE applyPattern (invalid pattern can leave replaced defaultformat) and does not rebuild current labeltable. setLabelFont stores any Font (inclnull), and only if paintLabelstrue+existingtable updates each unchecked JComponent; does not set slider's own font or rebuildtable. Static defaultFONT captured atclassinit; no later parameter refresh. No explicit repaint in these setters beyond inherited methods' effects.\nsetValLabel(value) compares value>max by dcmpl; iftrue logs stderr then calls setMaxLabel(value), else compares<min by dcmpg and logs/calls setMinLabel. NaN input fails upper comparison then fails lower comparison (both branch past expansion), convertedroundNaN0; existing NaN bounds behavior remains comparison dependent. Finite out-of-range values expand bounds, do not clamp physical input or reject it. Range/table mutation occurs BEFORE computing modelposition and can fail/stall before setValue. Convertedinteger outside0..1e9 logs BUT STILL calls superclass.setValue (clamp delegated); no rollback. Default ratio0 can yield +inf→roundLongMAX→int-1 and clamp0 for positive inrange input before initialization. getValLabel uses currentratio/min and inheritedvalue. setValLabelFully ONLY delegates setValLabel, no forced state event despite name. Public fireStateChanged merely calls superclass synchronously, no exceptionisolation/thread marshalling. No listeners installed internally, source files modified or archived code executed; caller initialization/order and redraw logic remain RowAdjustments task. Not external approval."
+    }
+  ],
+  "unique_classes_read": 1,
+  "instances_covered": 2,
+  "whole_model_read_gate": "NOT_PASSED",
+  "human_approval_issued": false
+}

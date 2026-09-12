@@ -880,6 +880,14 @@ def validate(root,here):
         output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
         check(x['sha256'][:10]+'-viewer-time-ruler-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
     check('viewer_time_ruler-no-approval',viewer_time_ruler['whole_model_read_gate']=='NOT_PASSED' and viewer_time_ruler['human_approval_issued'] is False)
+    viewer_scaled_slider=json.loads((here/'bytecode-read/viewer-scaled-slider-read.json').read_text())
+    check('viewer-scaled-slider-one-exact',bound(viewer_scaled_slider['prior_receipt']) and len(viewer_scaled_slider['records'])==viewer_scaled_slider['unique_classes_read']==1 and [x['instances'][0]['member'] for x in viewer_scaled_slider['records']]==['viewer/zoomable/ScaledSlider.class'] and viewer_scaled_slider['instances_covered']==2)
+    for x in viewer_scaled_slider['records']:
+        original=next(a for a in r['records'] if a['sha256']==x['sha256'])
+        args=['java','-m','jdk.jdeps/com.sun.tools.javap.Main','-c','-p','-s','-constants',str(root/x['class_file']['path'])]
+        output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
+        check(x['sha256'][:10]+'-viewer-scaled-slider-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
+    check('viewer_scaled_slider-no-approval',viewer_scaled_slider['whole_model_read_gate']=='NOT_PASSED' and viewer_scaled_slider['human_approval_issued'] is False)
     spec=importlib.util.spec_from_file_location('bytecode_coverage',here/'reconcile_bytecode_coverage.py')
     module=importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)

@@ -345,3 +345,5 @@ Method는 4바이트 정수 식별자로 1을 CONNECT_COMPOSITE_STATE로 정의�
 2026-09-12 Debug/Diagnosis/Profile 3종 전체393줄 판독. 호출자에게 맡긴 active 검사, 별도 상태와 공통 System.out, 파일 설정의 전역 stdout 교체, START/END 위치>0 검사와 level0에서만 출력하는 무제한 버퍼를 연결했다. 누적 Java384/413종·1076경로, 잔여 Java29종/Python150종. 근거: `viewer-diagnostics-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
 
 2026-09-12 RulerTime 1종 전체287줄 판독, 기존 Routines 눈금 helper207–286줄 재확인. 버퍼 범위/20 기반 간격·시작 내림·끝+간격 순회와 화면 좌표/서식·고정 폰트를 연결했다. 유효 간격·시간 증가·반복 상한 검사가 없고 Graphics 해제는 정상 끝에만 있다. 누적 Java385/413종·1078경로, 잔여 Java28종/Python150종. 근거: `viewer-time-ruler-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 ScaledSlider 1종 전체477줄 판독. 생성 시 비율0·범위 변경 후 비율 계산, 범위 밖 입력의 상하한 확장, 최대값 기준 눈금 간격과 정수 라벨 반복의 zero-step 방어 부재를 확인했다. setValLabelFully는 강제 이벤트 없이 위임한다. 실제 초기화 순서는 RowAdjustments 후속 판독 대상. 누적 Java386/413종·1080경로, 잔여 Java27종/Python150종. 근거: `viewer-scaled-slider-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
