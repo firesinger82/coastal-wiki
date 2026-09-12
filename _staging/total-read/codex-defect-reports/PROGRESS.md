@@ -251,3 +251,5 @@ Claude Sonnet 5의 [한정 재검토](../model-audit/XBeach/HG-ADVERSARIAL-RECHE
 2026-09-12 viewer CustomCursor 전체 224줄 판독. 클래스 초기화 시 커서 리소스4종의 순차 로딩, 고정 hotspot(1,1), 권장 크기 캔버스에 무배율 그리기와 실패 fallback 부재를 기록했다. 실제 플랫폼/리소스 성공 여부를 실행 검증으로 주장하지 않는다. 누적 Java 204/413종·716경로, 잔여 Java 209종/Python 150종. 근거: `viewer-cursor-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
 
 2026-09-12 viewer PreferenceFrame/닫기 리스너 2종 전체 305줄 판독. 닫기의 숨김 동작과 저장 전 설정 갱신 순서, setVisible 후 Control 호출, 이전 창 정리와 새 창 조기 등록을 TopWindow 흐름에 연결했다. 실제 값 변환/파일 쓰기는 PreferencePanel/Parameters 후속 판독 범위다. 누적 Java 206/413종·720경로, 잔여 Java 207종/Python 150종. 근거: `viewer-preference-frame-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer Const 전체 213줄 판독. UI 상수와 공유 Alias 초기화, 대소문자 무시/공백 미제거 파서의 기본값 복귀 및 null 예외를 기록했다. STRING/BOOLEAN_FORMAT=null을 기존 LabeledTextField 판독에 연결했다. 누적 Java 207/413종·722경로, 잔여 Java 206종/Python 150종. 근거: `viewer-const-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
