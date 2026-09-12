@@ -155,3 +155,5 @@ Claude Sonnet 5의 [한정 재검토](../model-audit/XBeach/HG-ADVERSARIAL-RECHE
 - XBeach output TreeNode 전체 619줄 판독. Composite 분해 및 shadow lifecycle 연결. 누적 Java 74종/430경로, 잔여 Java 339종·Python 150종. 전체 승인 미발급.
 
 - XBeach TreeTrunk/OutputLog 2종·723줄 판독. 정상 출력의 가중치 초기화/병합/shift/저장/empty 연결. 누적 Java 76종/438경로, 잔여 Java 337종·Python 150종. 전체 승인 미발급.
+
+- XBeach Clog2ToSlog2 764줄 판독. 기본 시간 검사 off와 EOF flush/close 연결. 누적 Java 77종/442경로, 잔여 Java 336종·Python 150종. 전체 승인 미발급.

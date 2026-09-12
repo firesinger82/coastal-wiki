@@ -163,3 +163,7 @@ Method는 4바이트 정수 식별자로 1을 CONNECT_COMPOSITE_STATE로 정의�
 ## 출력 흐름 판독
 
 `output-flow-read.json`은 TreeTrunk/OutputLog 전체 723줄을 결박한다. TreeTrunk가 finalizeLatestTime 후 writeTreeNode를 호출하면 OutputLog가 vertical merge/horizontal shift 후 저장하고, TreeTrunk가 empty한다. flush는 root 요약 후 last marker를 비운다. OutputLog.close는 trunk flush를 호출하지 않으므로 converter 순서가 남은 확인 대상이다. 정상 경로의 순서 근거이며 모든 입력/오류 경로의 승인으로 확대하지 않는다.
+
+## CLOG2 converter 판독
+
+`clog2-converter-read.json`은 전체 764줄을 결박한다. 기본 시간 검사는 off이며 -tc/-tcc에서만 검사한다. 정상 EOF는 trunk flush 후 category/line ID map 기록, output/input close 순서다. 빈 trace는 close 후 output 삭제를 시도한다. parse 오류 일부는 입력명이 있으면 부분 옵션으로 계속될 수 있다. 이 기록은 입력 decoder의 정확성이나 모든 trace의 순서 보장이 아니다.

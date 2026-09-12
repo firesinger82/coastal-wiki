@@ -167,6 +167,14 @@ def validate(root,here):
         output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
         check('output_node-reproduce',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
     check('output_node-no-approval',output_node['whole_model_read_gate']=='NOT_PASSED' and output_node['human_approval_issued'] is False)
+    clog2_converter=json.loads((here/'bytecode-read/clog2-converter-read.json').read_text())
+    check('clog2_converter-exact',bound(clog2_converter['prior_receipt']) and len(clog2_converter['records'])==clog2_converter['unique_classes_read']==1 and clog2_converter['records'][0]['instances'][0]['member']=='logformat/slog2/output/Clog2ToSlog2.class' and clog2_converter['instances_covered']==4)
+    for x in clog2_converter['records']:
+        original=next(a for a in r['records'] if a['sha256']==x['sha256'])
+        args=['java','-m','jdk.jdeps/com.sun.tools.javap.Main','-c','-p','-s','-constants',str(root/x['class_file']['path'])]
+        output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
+        check('clog2_converter-reproduce',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
+    check('clog2_converter-no-approval',clog2_converter['whole_model_read_gate']=='NOT_PASSED' and clog2_converter['human_approval_issued'] is False)
     weights=json.loads((here/'bytecode-read/category-weight-read.json').read_text())
     expected_weights={x['sha256'] for x in r['records'] if x['instances'][0]['member'].startswith(('base/drawable/CategoryWeight','base/drawable/CategoryRatios','base/drawable/CategorySummary'))}
     check('weights-ten-exact',bound(weights['prior_receipt']) and len(weights['records'])==weights['unique_classes_read']==10 and {x['sha256'] for x in weights['records']}==expected_weights and weights['instances_covered']==60)
