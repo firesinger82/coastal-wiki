@@ -329,3 +329,5 @@ Method는 4바이트 정수 식별자로 1을 CONNECT_COMPOSITE_STATE로 정의�
 2026-09-12 viewer SearchDialog/닫기 리스너/ViewportTimePanel/ScrollableView 4종 전체 485줄 판독. 검색 창 숨김·강조 제거와 내용 교체, 전역 First 창 기준 위치, null 제목의 기존 제목 유지 및 테두리 크기 계산을 연결했다. 누적 Java 348/413종·1004경로, 잔여 Java 65종/Python 150종. 근거: `viewer-search-dialog-panel-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
 
 2026-09-12 viewer ViewportTimeYaxis 전체 1069줄 판독. 검색 창 닫기는 강조만 제거하며, 검색 실패는 외부 시각 sentinel을 초기화해 다음 버튼에서 명시 시각 검색으로 재진입하는 연결을 확인했다. 검색 시작점·세로 이동·강조 사각형 계산도 기록했다. 누적 Java 349/413종·1006경로, 잔여 Java 64종/Python 150종. 근거: `viewer-yaxis-viewport-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer ModelTime/ScrollbarTime/TimeEvent/TimeListener 4종 전체 1331줄 판독. 화면·스크롤바 좌표 분리와 이벤트 환류, 범위 상한 제한·정밀도 경고 후 계속 진행, 새 확대 작업 뒤 redo 보존 및 확대 배율/실제 범위 차이를 연결했다. 누적 Java 353/413종·1014경로, 잔여 Java 60종/Python 150종. 근거: `viewer-time-model-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.

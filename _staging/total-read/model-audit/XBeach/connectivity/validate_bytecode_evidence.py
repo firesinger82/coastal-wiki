@@ -816,6 +816,14 @@ def validate(root,here):
         output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
         check(x['sha256'][:10]+'-viewer-yaxis-viewport-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
     check('viewer_yaxis_viewport-no-approval',viewer_yaxis_viewport['whole_model_read_gate']=='NOT_PASSED' and viewer_yaxis_viewport['human_approval_issued'] is False)
+    viewer_time_model=json.loads((here/'bytecode-read/viewer-time-model-read.json').read_text())
+    check('viewer-time-model-four-exact',bound(viewer_time_model['prior_receipt']) and len(viewer_time_model['records'])==viewer_time_model['unique_classes_read']==4 and [x['instances'][0]['member'] for x in viewer_time_model['records']]==['viewer/zoomable/ModelTime.class', 'viewer/zoomable/ScrollbarTime.class', 'viewer/zoomable/TimeEvent.class', 'viewer/zoomable/TimeListener.class'] and viewer_time_model['instances_covered']==8)
+    for x in viewer_time_model['records']:
+        original=next(a for a in r['records'] if a['sha256']==x['sha256'])
+        args=['java','-m','jdk.jdeps/com.sun.tools.javap.Main','-c','-p','-s','-constants',str(root/x['class_file']['path'])]
+        output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
+        check(x['sha256'][:10]+'-viewer-time-model-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
+    check('viewer_time_model-no-approval',viewer_time_model['whole_model_read_gate']=='NOT_PASSED' and viewer_time_model['human_approval_issued'] is False)
     spec=importlib.util.spec_from_file_location('bytecode_coverage',here/'reconcile_bytecode_coverage.py')
     module=importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)

@@ -1,0 +1,122 @@
+{
+  "date": "2026-09-12",
+  "attribution": "AI direct bytecode reading; not independent semantic approval.",
+  "prior_receipt": {
+    "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/disassembly-receipt.json",
+    "sha256": "1cc8b2657a74f3f5904e9d0a40648b1c98f6e031b056b7c6e19122beb632aaa8"
+  },
+  "records": [
+    {
+      "sha256": "54264867b993684d567e3d5d60612bffee845fb284edd35ca9db72c20f34900c",
+      "instances": [
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/win32/mpich/bin/jumpshot.jar",
+          "member": "viewer/zoomable/ModelTime.class"
+        },
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/bin/jumpshot.jar",
+          "member": "viewer/zoomable/ModelTime.class"
+        }
+      ],
+      "class_file": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/classes/54264867b993684d567e3d5d60612bffee845fb284edd35ca9db72c20f34900c.class",
+        "sha256": "54264867b993684d567e3d5d60612bffee845fb284edd35ca9db72c20f34900c"
+      },
+      "disassembly": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/disassembly/54264867b993684d567e3d5d60612bffee845fb284edd35ca9db72c20f34900c.txt",
+        "sha256": "e54f2a29c27d95d84c628ae630949ddb2df1688489ac92bee91646c2e61af6c5"
+      },
+      "read_lines": [
+        1,
+        1240
+      ],
+      "scope": "Four full javap displays totaling1331 lines, ModelTime in four consecutive untruncated slices.",
+      "observation": "Entire1240-line javap in four consecutive untruncated slices1–310,311–620,621–930,931–1240. DefaultBoundedRangeModel+AdjustmentListener. Constructor MAX_SCROLLBAR_PIXELS=2^30, viewWidth=-1, zoomScale1, listener list/undo+redo stacks, root owner; min sets old/current view start, max sets global/view extent and scrollbarScale=2^30/globalExtent, focus midpoint, factor2/log2. No ordered/finite/positive global bounds checks or initial updatePixelCoords call. Screen pixelsPerTime (initial default0) separate scrollbar scale; setViewPixelsPerUnitTime(width) width/viewExtent unguarded, computeTimeViewExtent(timePerPixel)=width*input. Movement direction compares current-old, NaN dcmpl takespositive branch.\nsetTimeViewPosition snapshots old then clamps belowglobalMin, aboveglobalMax-viewExtent, otherwise accepts; NaN first dcmpg takes lower clamp. setTimeViewExtent only upper-limits globalExtent, accepts negative/zero and NaN into smaller branch, adjusts current start if beyond max-extent; >=globalExtent resets extent/start to global. Thus not a complete finite/positive invariant. Zoom factor stores arbitrary value and log, focus noargs midpoint/no display, explicit focus accepts anything and updates panel. getZoomLevel round(log(scale)/log(factor))long→int with no exceptional-value guard.\nScrollbar/setParamDisplay methods store refs; removals null only, removeParamDisplay ignores supplied identity. updateParamDisplay lazily reuses TimeEvent then panel.timeChanged followed zoomLevelChanged. Time listeners add/remove EventListenerList, fire iterates reverse registration order, shared source-only event, synchronously no EDT dispatch or exception isolation. Conversion round((time-globalMin)*scrollScale)long→int and inverse, range conversions no offset. updatePixelCoords calls superclass setRangeProperties(position,extent,min,max,currentAdjusting), no explicit fireTimeChanged. updateTimeCoords tests scale via dcmpl>0 (NaN admitted), first writes converted globalMinimum then converts maximum/currentValue using ALREADY changed minimum (nonzero integer min can double-shift origin); recomputes globalExtent but does NOT recompute scrollbarScale/screenScale/zoomScale, updates old/current/viewExtent then panel. Normally integer min0 so no double shift; do not label all usage broken.\ncenterTimeViewPosition target-extent/2→clamp→updatePixelCoords; scroll(double) current+delta similarly; scroll(int) screen pixels/current screenScale then double scroll. scroll(int,adjusting) snapshots old, converts screen-pixel delta→time→rounded scrollbar delta, setRangeProperties(value+delta,existing extent/min/max,adjusting), then current start from resulting value and panel update; no direct fire or integer overflow guard. ScrollbarTime same model+AdjustmentListener establishes ordinary callback: model change→JScrollBar adjustment→ModelTime.updateTimeCoords then fireTimeChanged. Direct center/scroll/zoom may change double fields without a time event when integer range unchanged; listener callback can quantize time fields and overwrite old-position tracking. No direct assumption of actual runtime scheduling beyond normal Swing wiring.\nScrollbar increments only if refnonnull: block=integer model extent, <=0 errors then STILLset0; unit=round(viewExtent*TIME_SCROLL_UNIT_RATIO*scrollScale), <=0 errors then STILLset0. No reject/rollback of zoom at limit. Home scale1/full extent/globalMin/screenScale/updatePixels/increments then clears BOTH history stacks, no focus reset. In/Out first push current timebox copy undo, scale *=factor or/=factor BEFORE clamped actual extent. Choose explicit focus only STRICTLY inside view else midpoint (does not replace stored focus); preserve focus fraction on new extent, clamp start, refresh screenScale/updatePixels/increments. Scale may diverge from actual global/view extent after clamped zoomOut. Rapid zoom pushes undo, scale*=oldExtent/REQUESTED extent before clamp, then requested start/extent, same updates. No redo clear on new in/out/rapid branch, no stack cap or rollback. zoomBack uses old/requested extent scale ratio without push; Undo/Redo if nonempty push current into opposite stack then pop box/zoomBack. Restore only position/extent, not focus/factor or original scale snapshot; empty no-op. Adjustment callback ignores event payload/adjusting/source beyond debug, always updateTimeCoords then fire. toString prints superclass/ranges/screen+scroll scales, no change. Archived code not executed or independently approved."
+    },
+    {
+      "sha256": "9415aecd3cfc35ce4182f5bac274f4b73760eec8fcdc7a99e29ddef33ed34ac8",
+      "instances": [
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/win32/mpich/bin/jumpshot.jar",
+          "member": "viewer/zoomable/ScrollbarTime.class"
+        },
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/bin/jumpshot.jar",
+          "member": "viewer/zoomable/ScrollbarTime.class"
+        }
+      ],
+      "class_file": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/classes/9415aecd3cfc35ce4182f5bac274f4b73760eec8fcdc7a99e29ddef33ed34ac8.class",
+        "sha256": "9415aecd3cfc35ce4182f5bac274f4b73760eec8fcdc7a99e29ddef33ed34ac8"
+      },
+      "disassembly": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/disassembly/9415aecd3cfc35ce4182f5bac274f4b73760eec8fcdc7a99e29ddef33ed34ac8.txt",
+        "sha256": "eb11906a4aac17d6fbb13ee690fb38191265cc41d52a5711b904cbcaa150c3ce"
+      },
+      "read_lines": [
+        1,
+        73
+      ],
+      "scope": "Four full javap displays totaling1331 lines, ModelTime in four consecutive untruncated slices.",
+      "observation": "Complete73-line javap. Horizontal JScrollBar captures ModelTime, sets as BoundedRangeModel and registers SAME model as AdjustmentListener, initial unit10; captures superclass minimum Dimension and forces height20 only if <=0. getMinimumSize exposes same mutable Dimension, no defensive copy/theme update. setBlockIncrementToModelExtent changes block only if captured modelnonnull and extent>1, otherwise preserves previous. init noop. Does NOT call model.setScrollBar itself (TimelinePanel previously supplies ref); replacing inherited model later does not rebind captured model/listener automatically. No detach/dispose override."
+    },
+    {
+      "sha256": "02609b3bbe177f4d9a23fe5ba9f5ec4c46a711c48076c229a0b996b56de3a7b0",
+      "instances": [
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/win32/mpich/bin/jumpshot.jar",
+          "member": "viewer/zoomable/TimeEvent.class"
+        },
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/bin/jumpshot.jar",
+          "member": "viewer/zoomable/TimeEvent.class"
+        }
+      ],
+      "class_file": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/classes/02609b3bbe177f4d9a23fe5ba9f5ec4c46a711c48076c229a0b996b56de3a7b0.class",
+        "sha256": "02609b3bbe177f4d9a23fe5ba9f5ec4c46a711c48076c229a0b996b56de3a7b0"
+      },
+      "disassembly": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/disassembly/02609b3bbe177f4d9a23fe5ba9f5ec4c46a711c48076c229a0b996b56de3a7b0.txt",
+        "sha256": "90b6b3d42cbcbaa765fedd79c9d97be5ca3ad2df6a9c53cd470760b657fe8977"
+      },
+      "read_lines": [
+        1,
+        13
+      ],
+      "scope": "Four full javap displays totaling1331 lines, ModelTime in four consecutive untruncated slices.",
+      "observation": "Complete13-line javap. EventObject subclass with serial UID3400, constructor delegates source. No position/extent/zoom snapshot or extra fields; listeners query live model state."
+    },
+    {
+      "sha256": "02709ac39fd0ebe00ca8a30524177cd60ec1f200b300ad7f42ce382cdac30731",
+      "instances": [
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/win32/mpich/bin/jumpshot.jar",
+          "member": "viewer/zoomable/TimeListener.class"
+        },
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/bin/jumpshot.jar",
+          "member": "viewer/zoomable/TimeListener.class"
+        }
+      ],
+      "class_file": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/classes/02709ac39fd0ebe00ca8a30524177cd60ec1f200b300ad7f42ce382cdac30731.class",
+        "sha256": "02709ac39fd0ebe00ca8a30524177cd60ec1f200b300ad7f42ce382cdac30731"
+      },
+      "disassembly": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/disassembly/02709ac39fd0ebe00ca8a30524177cd60ec1f200b300ad7f42ce382cdac30731.txt",
+        "sha256": "168d03afb80108c2b4e10711222513ffac9ecece35987f44fd7d08ee8eab9e36"
+      },
+      "read_lines": [
+        1,
+        5
+      ],
+      "scope": "Four full javap displays totaling1331 lines, ModelTime in four consecutive untruncated slices.",
+      "observation": "Complete5-line javap. EventListener interface only abstract timeChanged(TimeEvent); no thread ordering, data snapshot or error handling implementation."
+    }
+  ],
+  "unique_classes_read": 4,
+  "instances_covered": 8,
+  "whole_model_read_gate": "NOT_PASSED",
+  "human_approval_issued": false
+}
