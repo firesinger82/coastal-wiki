@@ -368,6 +368,14 @@ def validate(root,here):
         output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
         check(x['sha256'][:10]+'-basic-topology-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
     check('basic_topology-no-approval',basic_topology['whole_model_read_gate']=='NOT_PASSED' and basic_topology['human_approval_issued'] is False)
+    state_border=json.loads((here/'bytecode-read/state-border-read.json').read_text())
+    check('state-border-eight-exact',bound(state_border['prior_receipt']) and len(state_border['records'])==state_border['unique_classes_read']==8 and sorted(x['instances'][0]['member'] for x in state_border['records'])==['base/topology/StateBorder$ColorLoweredBorder.class', 'base/topology/StateBorder$ColorRaisedBorder.class', 'base/topology/StateBorder$ColorXORBorder.class', 'base/topology/StateBorder$EmptyBorder.class', 'base/topology/StateBorder$WhiteLoweredBorder.class', 'base/topology/StateBorder$WhitePlainBorder.class', 'base/topology/StateBorder$WhiteRaisedBorder.class', 'base/topology/StateBorder.class'] and state_border['instances_covered']==16)
+    for x in state_border['records']:
+        original=next(a for a in r['records'] if a['sha256']==x['sha256'])
+        args=['java','-m','jdk.jdeps/com.sun.tools.javap.Main','-c','-p','-s','-constants',str(root/x['class_file']['path'])]
+        output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
+        check(x['sha256'][:10]+'-state-border-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
+    check('state_border-no-approval',state_border['whole_model_read_gate']=='NOT_PASSED' and state_border['human_approval_issued'] is False)
     spec=importlib.util.spec_from_file_location('bytecode_coverage',here/'reconcile_bytecode_coverage.py')
     module=importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)

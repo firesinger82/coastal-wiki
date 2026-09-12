@@ -199,3 +199,5 @@ Claude Sonnet 5의 [한정 재검토](../model-audit/XBeach/HG-ADVERSARIAL-RECHE
 2026-09-12 하위 CLOG2/TRACE Print 2종 전체 923줄 판독. CLOG2 type0 이후 다음 블록 요청과 레코드 직접 출력, TRACE 선택적 시간 검사·도움말 이전 native load·빈 파일명 검사의 한계를 기록했다. 누적 Java 125/413종·558경로, 잔여 Java 288종/Python 150종. 근거: `lowlevel-print-read.json` (XBeach connectivity/bytecode-read). 독립 의미 승인과 구분한다.
 
 2026-09-12 base.topology Event/Line/State 3종 전체 762줄 판독. DrawnBox 선기록, 경계 잘림 차이, 이벤트 초기 반폭/전체 폭 불일치와 상태 Insets 비반영 선택 판정을 기록했다. 누적 Java 128/413종·564경로, 잔여 Java 285종/Python 150종. 근거: `basic-topology-read.json` (XBeach connectivity/bytecode-read). 실제 화면 검증이나 독립 의미 승인이 아니다.
+
+2026-09-12 StateBorder 선택기·구현 8종 전체 543줄 판독. 좌우 경계 플래그, 위아래 선의 무조건 호출, 색상 변경 잔류와 XOR 모드 비복원, 알 수 없는 이름의 null 반환을 기록했다. 누적 Java 136/413종·580경로, 잔여 Java 277종/Python 150종. 근거: `state-border-read.json` (XBeach connectivity/bytecode-read). 원본 실행·실제 화면 검증·독립 의미 승인은 아니다.
