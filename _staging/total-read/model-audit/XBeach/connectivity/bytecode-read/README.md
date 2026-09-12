@@ -1,5 +1,7 @@
 # 배포 아카이브 바이트코드 판독
 
+> **2026-09-12 사용자 지시로 내부 판독 중단.** 이 디렉토리는 과거 부속 MPI/Jumpshot 분석 이력이다. 남은 클래스·파일을 자동 재개하거나 XBeach 완료 조건으로 삼지 않는다. 현재 범위는 [RESUME.md](../RESUME.md)의 사용자 정정을 따른다.
+
 2026-09-12. [추출/역어셈블리 영수증](disassembly-receipt.json), [launcher 직접 판독](launcher-read.json). 원본 클래스 바이트와 AI 판독/도구 출력은 구분한다.
 
 기존 unread 1,284개 경로를 원본 SHA로 묶으면 Java 413종과 Python 150종, 총 563종이다. Java는 설치된 JDK jdeps 모듈의 javap로 private 선언·메서드 명령·descriptor·상수를 출력했다(87,653줄). JAR 프로그램 자체는 실행하지 않았다. 전체 추출 결과를 자동으로 읽음 처리하지 않는다. Python 150개는 아직 미판독이다.
