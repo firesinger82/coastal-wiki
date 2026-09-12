@@ -127,3 +127,5 @@ Claude Sonnet 5의 [한정 재검토](../model-audit/XBeach/HG-ADVERSARIAL-RECHE
 2026-09-12 TraceName/Permutation/순회기 7종 전체 판독: 확장자 변환, 자리수 열거, 시간 필터 및 복합 객체 순회 흐름을 기록했다. 누적 Java 32/413종, 남은 Java 381종/Python 150종. 전체 gate NOT_PASSED·GOAL active. [근거](../model-audit/XBeach/connectivity/bytecode-read/slog2-iteration-read.json).
 
 2026-09-12 시간 경계/좌표 11종 전체 판독: 구간의 끝점 포함·교집합·제한적 remove, 4개 비교기의 동률 처리, 좌표 직렬화를 기록했다. 누적 Java 43/413종, 남은 Java 370종/Python 150종. 전체 gate NOT_PASSED·GOAL active. [근거](../model-audit/XBeach/connectivity/bytecode-read/time-coord-read.json).
+
+2026-09-12 Drawable/비교기/Topology 3종 전체 판독: 동률 처리에 따른 TreeSet 비교 동등 조건, 표시/선택 분기, exclusion 계산을 기록했다. 누적 Java 46/413종. 전체 gate NOT_PASSED·GOAL active. [근거](../model-audit/XBeach/connectivity/bytecode-read/drawable-order-read.json).

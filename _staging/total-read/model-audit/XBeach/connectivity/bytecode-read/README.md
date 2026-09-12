@@ -64,3 +64,13 @@ TimeBoundingBox는 earliest/latest double 두 개를 그 순서대로 읽고 쓴
 | DecreasingFinaltime | 끝 내림차순 | 시작 오름차순 |
 
 표는 NaN 없는 값의 비교다. 입력 유효성/NaN 검사는 없으며 객체 setter는 경계를 정규화하지 않는다. Coord는 time(double)와 lineID(int)의 12바이트다. LineIDOrder는 두 int의 뺄셈을 반환하며 time은 비교하지 않는다. CoordPixelXform은 시간/행과 픽셀 간 변환 등 선언만 포함한다. Drawable/InfoBox 상속 경로 및 Composite 재정의 여부는 후속 판독으로 확인하며 이 기반 클래스만으로 모든 런타임 객체의 overlap을 확정하지 않는다. 전체 gate NOT_PASSED·신규 사람 승인 없음.
+
+## Drawable 비교와 표시 분기 3종
+
+[drawable-order-read.json](drawable-order-read.json)에 Drawable·Drawable$Order·Topology의 전체 756줄과 동일 SHA 18경로를 결속했다. 누적 Java 46/413종·264경로, 남은 Java 367종/Python 150종이다.
+
+Drawable.Order는 시간 비교가 동률일 때 객체 identity, category index, 시작 vertex lineID, 끝 vertex lineID 순서로 처리한다. 정수 키들은 시간 방향과 관계없이 앞에서 뒤를 뺀다. 다른 객체라도 모든 비교 키가 같으면 경고를 출력하고 0을 반환한다. 앞선 Primitives 순회기의 TreeSet이 이런 객체들을 비교상 같은 항목으로 처리할 조건이 확인됐다. 실제 로그에서 발생했다는 주장은 아니다.
+
+Drawable은 InfoBox를 상속하며 overlap을 직접 재정의하지 않는다. [InfoBox 선언](disassembly/032382185c66e318384f74fbf2bb7dd791bd2f4cad288a807e3c04e78e58055a.txt) 2줄은 TimeBoundingBox 상속을 확인해 주지만 InfoBox 전체 판독은 아직 하지 않았다. initExclusion은 전체 길이에서 전달된 구간별 교집합 길이를 각각 빼며 구간의 합집합을 만들거나 결과를 0으로 제한하지 않는다. 중복되는 구간을 전달하는 호출 여부는 후속 확인 대상이다.
+
+그리기는 범주의 Topology에 따라 Event(0), State(1), Arrow(2) 순서로 분기하고 각 추상 draw/hit 메서드에 위임한다. Topology의 readObject는 int 값을 검사 없이 저장한다. Drawable 생성자에는 row_ID를 INVALID_ROW로 설정하는 명령이 없지만 미초기화 판정은 그 sentinel을 검사한다. 하위 클래스·호출자의 초기화까지 읽은 뒤 실제 영향을 판단한다. 전체 gate NOT_PASSED·신규 사람 승인 없음.
