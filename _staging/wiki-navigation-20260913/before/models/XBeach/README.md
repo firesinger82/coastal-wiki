@@ -1,0 +1,41 @@
+# models/XBeach
+
+이 디렉토리는 XBeach 구현·메커니즘의 canonical이다. 원본과 AI 분석은 각 노트의 인용·frontmatter로 구분한다.
+
+## 모델과 모드
+
+XBeach의 로컬 소스, 공식 문서와 배포처는 [공식 자료](web-refs/xbeach-official-resources.md)와 [문서 스택](manual-notes/01-local-manual-stack.md)에 정리한다. `stationary`, `surfbeat`, `nonh`의 분기와 별도 비정수압 층 설정은 [모드 dispatcher](source-analysis/xbeach_mode_dispatch.md)를 따른다. stationary를 single-layer 모드와 동일시하지 않는다.
+
+## 2026-09-09 전수 감사와 canonical 반영
+
+P0 v3 분모는 456파일이다. 281파일은 독립 2회 판독, 22파일은 문서·도해 단독 판독, 153파일은 바이너리 메타데이터 조사로 처리했다. 456파일 전부의 의미 판독을 뜻하지 않는다. [완료 원장](../../_staging/total-read/model-audit/XBeach/closure/README.md)은 승인된 보충 103건, 이월 충돌 3건·인용 미검증 10건, 문서 207건, 구성요소 귀속의 최종 대응을 기록한다.
+
+- [소스 보충 60건](source-analysis/xbeach-source-audit-supplements.md): 입력·경계·형태·interface·출력의 적용 한계.
+- [빌드·배포 보충 43건](source-analysis/xbeach-build-and-vendor-audit.md): 외부 netCDF·MPICH·Texinfo 등의 범위를 구분한다.
+- [충돌·반증 재판정](source-analysis/xbeach-audit-resolved-claims.md): 기각 근거와 조건부 경고를 함께 보존한다.
+- [문서 모순과 버전 차이](manual-notes/xbeach-document-discrepancies-and-version-drift.md): 2015 Kingsday·master와 2010 비정수압 초안을 별개 출처로 다룬다.
+- [Kingsday 기술 문서](manual-notes/xbeach-kingsday-technical-reference.md), [master 매뉴얼](manual-notes/xbeach-master-manual.md), [2010 비정수압 보고서](manual-notes/xbeach-nonhydrostatic-report-2010.md).
+- [경계 적용 한계 도해](source-analysis/xbeach-boundary-limit-figures.md), [공식 예제 공급원](source-analysis/xbeach-first-baseline-case-selection.md).
+
+구성요소 귀속은 저작권 판정이 아니다. vendor·생성 파일의 기록 수를 XBeach 솔버의 고유 결함 수로 합산하지 않는다. [파일·처분 귀속 원장](../../_staging/total-read/model-audit/XBeach/closure/attribution.json).
+
+## 2026-09-12 연결 분석 보충
+
+- [지형·지하수·Q3D 연결 계약](source-analysis/xbeach-coupled-physics-contracts.md): **검토본(draft-unsourced), 새 주장 사람 검토 대기**. 입경 배열 덮어쓰기, 침투량 단위, 수심 갱신 시점, Q3D 실행 조건과 선박·식생·강우·조도의 생산/소비 시점을 추적했다.
+- [초기화·hotstart·BMI·종료 상태 계약](source-analysis/xbeach-lifecycle-state-contracts.md): **검토본(draft-unsourced), 새 주장 사람 검토 대기**. 기존 12개 계약과 네 진입점 계열을 연결하고 오류 종료·getter 상태 설명을 정정했다.
+- [빌드 대상·소스 생성·모드 연결](source-analysis/xbeach-build-mode-connectivity.md): **검토본(draft-unsourced)**. 별도 BMI 프로젝트, 생성 include, 비연결 소스와 여섯 dispatcher 경로를 정리했다.
+- [매뉴얼 수식–구현 대응](manual-notes/xbeach-manual-equation-code-contracts.md): **검토본(draft-unsourced)**. (2.5)~(2.10)의 파수 보정, B.37/C.37의 지형 갱신, 불포화 침투식의 판본 표기·시간 이산화를 대조했다.
+- [Q3D](source-analysis/xbeach_q3d.md)의 Van Rijn 1993 제외 조건과 설정표를 원문에 맞췄다.
+- [비정수압 보고서](manual-notes/xbeach-nonhydrostatic-report-2010.md)에 원본 PDF와 DOC 수식 객체로 대조한 기호 4곳을 보충했다.
+
+이는 2026-09-09 감사 완료 이력과 별도인 연결 분석 보충이다. 전체 모델 연결 검토·사람 승인 완료를 뜻하지 않는다.
+
+## 노트 현황
+
+| 경로 | 노트 수 |
+|---|---:|
+| source-analysis | 40 |
+| manual-notes | 8 |
+| web-refs | 1 |
+
+2026-07-12의 코어 118파일 감사는 역사적 단계이며 이번 P0 v3 분모와 구별한다. 이번 완료는 감사·지식 반영 범위이며 원본 솔버의 결함을 패치했다는 뜻은 아니다.

@@ -1,0 +1,330 @@
+# 2026-09-11 재개 지점
+
+## 현재 실행 기준
+
+현재 활성 작업은 [전역 현재 작업](../../../../../plan.md#현재-작업)을 따른다. 현재 사용자 지시가 우선하며, 아래 기록의 현재·다음·재개 표기는 당시의 이력으로서 전역 실행 지시가 아니다.
+
+모델의 기존 범위·미완·승인·종료 조건과 GOAL 도구 상태는 이 포인터 추가로 바뀌지 않는다.
+
+## 2026-09-12 위키 목적·범위 재검토 — 현재 작업
+
+사용자가 전수 작업의 필요성과 COASTAL-WIKI 목적을 재검토하고 Grok X 수집·Claude 검토·추가 논문 조사를 요청했다. 현재 결과는 [조사 종합](../../../../../research/digests/2026-09-12-wiki-purpose-review.md)에 있다. **이 조사 중 XBeach 후속 구현은 중단 상태다.** 아래 이전 재개 지시를 근거로 자동 재개하지 않는다. 기존 범위·완료·승인 기준을 바꾼 결정은 아니며 GOAL 도구 상태도 변경하지 않았다.
+
+`interfaces-20260912/`와 plan.md 끝의 R1-G2/G3 계획은 중단 전 작업 흔적이다. 최종 독립 검토·canonical 설치를 마친 성과로 보고하지 않는다. 기존 미완·불변 이력은 보존한다.
+
+## 2026-09-12 R1 실행 연결 보강·7개 문서 정정 — 이전 재개 지점
+
+[실행 연결 보강](runtime-20260912/README.md)에서 선박 `ph`/nonh `pres·dp`, 운동량 잔차 부호·2차 보정 호출, 식생·강우·조도 갱신 시점, 출력 공급자/rank, 생성 로그·콜백을 소스에 결속했다. 기존 문서 7개를 [정확한 manifest](runtime-20260912/install-manifest.json)대로 반영했다. 독립 검토의 선박 소비 OR 조건 누락 P2를 수정하고 [후속 검토](runtime-20260912/codex-followup.txt)를 완료했다. 원문 48구간·생성 출력 27개·문서 링크·설치 바이트·기존 불변 기록 292개와 소유자/권한을 확인했다.
+
+**R1 전체는 아직 미완이다.** 호출 후보 인덱스는 전체 의미 도달성 증명이 아니다. 다음 대조는 [R1-G1/G2/G3](runtime-20260912/remaining-gaps.json)의 generic/가시성/실행 조건, 미분류 정의, 동적 wrapper·생성 interface 연결이다. R2 수식별 대응 및 R3/R4 전체도 미완이며 입력 집합은 늘리지 않았다. [후속 상태](remaining-20260912/progress.json)가 현재 반영 상태다. 과거 C1~C4와 이번 정정을 다시 미완으로 세지 않는다.
+
+Codex 하위 검토 프로세스의 읽기 전용 파일시스템 시작 실패와 승인 실행 경로는 [실행 메모](runtime-20260912/EXECUTION-NOTES.md)에 기록했다. 같은 유형을 기본 sandbox에서 반복 실패시키지 않는다. 전체 모델 완료·새 사람 승인·GOAL 도구 상태는 변경하지 않았다.
+
+## 2026-09-12 초기 정정 R3-C1~C4 반영 — 이전 재개 기록
+
+[정정 네 건](corrections-20260912/README.md)을 기존 위키 문서 8개에 반영했다. `intrasedtr`의 명시 입력과 12개 입력→실제 공식 분기를 구분했고, 활성 파랑 경계·stationary 루틴의 귀속과 위상 처리를 고쳤으며, 기존 침투식 비교를 매뉴얼 노트에 넣었다. [후속 상태](remaining-20260912/progress.json)가 아래 동결 목록의 초기 네 정정 상태보다 우선한다. 과거 입력·검증 snapshot은 원래 해시를 보존한다.
+
+다음은 고정 R1의 기존 루틴·호출 조건·핵심 상태 소비 근거에서 미연결 부분을 대조하고, R2의 기존 수식 판정과 위치를 결속하는 일이다. 처리한 네 정정을 다시 미완으로 세지 않는다. R3 전체는 R1/R2의 최종 결과에 의존하므로 아직 종결하지 않았다. 전체 모델 완료·새 사람 승인·GOAL 도구 상태는 변경하지 않았다.
+
+## 2026-09-12 실제 잔여 고정 — 다음 재개의 기준
+
+현재 잔여의 기준은 [고정 작업표 R1~R4](remaining-20260912/README.md)와 [기계 판독 목록](remaining-20260912/remaining.json)이다. 기존 판독·경계/표사/선택 기능 노트를 미작성으로 다시 세지 않는다. R1은 기존 실행 연결 근거의 전체 대조, R2는 세 기술 문서 수식의 기존 판정·구현 대응 결속, R3는 특정한 위키 충돌 정정·반영, R4는 그 최종 결과의 검토·필요 승인이다. 각 입력 집합·재사용 근거·종료 조건을 고정했다.
+
+이미 확인한 정정은 구형 파랑 코드의 활성 경로 오인, stationary 구현 귀속, intrasedtr 입력 설명, staging 침투식 보충의 미반영이다. 현재 노트와 원문 인용은 [정정 근거](remaining-20260912/correction-evidence.json)에 있다. 새 발견은 동결 입력 안의 해당 R 항목에서 처리한다. 노트의 Next expansion, 새 버전·새 사례, 부속 도구 내부를 필수 잔여로 붙이지 않는다. 목록 작성·검사 성공 자체는 모델 완료가 아니며 R1~R4는 아직 미완이다.
+
+## 2026-09-12 사용자 정정 — 재개 시 우선 적용
+
+**MPI/Jumpshot 뷰어 등 부속 도구 내부 판독은 중단하며 XBeach 완료 조건에서 제외한다.** “전수·완벽·GOAL·계속”을 동봉 의존성 전체 역어셈블리 지시로 해석하지 않는다. 아래 과거 로그의 Java/Python 미판독 수와 컨테이너 내부 판독 지시는 다음 작업이 아니다. 원본과 판독 영수증은 이력으로 보존하며, 제외 항목을 판독 완료로 바꾸지 않는다.
+
+다음 작업은 XBeach 자체의 물리·수치해법·입출력·실행 흐름, 매뉴얼 수식의 의미 대조, lifecycle/physics 연결 검증과 검토본 정리다. 부속 도구 조사 예외와 진행 보고 기준은 [공통 범위 통제](../../../../../CLAUDE.md#모델-분석-범위-통제)를 따른다. 모델 자체의 검토·승인 조건은 유지한다.
+
+
+## 2026-09-12 모델 작업 재개 결과
+
+- **물리 연결 쟁점 XB-PHY-U01~U04:** [재판정](physics/resolution-20260912/adjudication.json)과 [외부 검토·반영](physics/resolution-20260912/review-response.json)을 저장했다. 입경의 로컬 배열 덮어쓰기는 원문 Fortran 반복문으로 1D/2D 재현했다. 침투량 단위 오류는 다음 gwflow 초기화 전 노출 상태로 영향을 한정했다. 지형–지하수의 수심 갱신 시점과 Q3D/Van Rijn 1993 분기를 정리했다. 이 네 쟁점은 정적 판정이 있는 상태이며 원본 솔버 패치나 전체 계산 검증 완료가 아니다.
+- **문서 기호 4곳:** [응력 텐서 𝕋 두 곳](nonhydro-read/stress-tensor-symbol/receipt.json), [고립파 ≪·∼ 두 곳](nonhydro-read/solitary-wave-symbols/receipt.json)의 의미를 원본 PDF 시각 판독 및 DOC Native/문단 결속으로 확인했다. 이 네 곳의 의미는 다시 미확정 과제로 반복하지 않는다. DOC 렌더의 네모·배치 문제와 나머지 수식 의미 대조는 별도다.
+- **위키 반영:** Q3D 실행 조건·설정표·pitfall 정정, 비정수압 보고서 기호 보충, 연결 계약 검토본 1편과 목차를 [설치 manifest](physics/resolution-20260912/install-manifest.json)의 다섯 경로에 반영했다. 새 연결 노트는 draft-unsourced이며 사람 승인을 발급하지 않았다. 기존 승인·crosswalk·closure 292개는 불변이다.
+
+## 2026-09-12 lifecycle 계약 후속 정리
+
+[XB-SC-001~012 재판정](lifecycle/resolution-20260912/adjudication.json)과 [Claude 검토·수정 확인](lifecycle/resolution-20260912/review-response.json)을 완료했다. 초기화·hotstart·스텝·종료와 독립 실행/BMI/dynamic/Python 진입점의 계약을 소스에 연결했다. `hotstartflow=1`의 재계산 유속, MPI 초기화 경고 5·6 후 첫 step 전 출력의 미대입 반환, 오류 1의 프로세스 종료, getter local의 암시적 SAVE를 기존 후보 설명과 구분한다. BMI 시간 setter가 출력 인덱스를 재배치하지 않는다는 한계도 기록했다.
+
+[최소 재현](lifecycle/resolution-20260912/probe-results.json)은 정상 출력 반환·오류 출력 STOP 1·getter local 유지만 확인한다. 전체 모델 또는 MPI 실행 검증을 뜻하지 않는다. [연결 검토본](../../../../../models/XBeach/source-analysis/xbeach-lifecycle-state-contracts.md)은 draft-unsourced이며 새 사람 승인을 발급하지 않는다. 기존 원장과 승인 이력은 그대로 보존한다. [설치 manifest](lifecycle/resolution-20260912/install-manifest.json)의 다섯 문서를 반영하고 [인용·프로브·설치 검증](lifecycle/resolution-20260912/validation.json)을 통과했다. 원본 인용 67곳과 기존 불변 이력 292개가 일치한다.
+
+## 2026-09-12 빌드·모드·수식 대응 후속
+
+[모델 빌드·파일 역할](build-mode-20260912/build-map.json)은 Autotools, 여덟 모델 프로젝트와 일곱 solution, 전체 src 파일 집합을 대조한다. 별도 Windows BMI 대상과 코어 의존, 대상별 정의·제외 파일, 생성 include 소비자를 기록했다. Python 소스 생성기는 임시 복사본에서 실행해 출력 집합을 확인했다. [분기·수식 계약](build-mode-20260912/contracts.json)은 기존 여섯 dispatcher 경로를 다시 빌드 대상과 연결하고, (2.5)~(2.10)의 파수 보정 및 B.37/C.37의 지형 갱신을 원문과 대조한다. 기존 과거 원장을 덮어쓰지 않는다.
+
+파수 보정량의 모델 의미와 `sourcesink`/침식 부호는 판정이 있는 상태다. B.37/C.37의 `a`는 원문에 남겨 둔 저자 의도 미정 표기이며, 대응 코드에 별도 a 의존 항이 없음을 기록했다. 글꼴 문제의 내부 원인이나 이 a의 출처를 찾기 위해 부속 도구로 확장하지 않는다.
+
+[독립 Codex 원문 검토·반영](build-mode-20260912/review-response.json)을 마쳤다. Claude 시도는 사용량 한도로 중단된 이력이며 실제 검토 제공자와 구분한다. [설치 manifest](build-mode-20260912/install-manifest.json)의 여섯 문서에 새 빌드·수식 검토본, 기존 wave dispatcher/input 계약 정정, 목차를 반영했다. [인용·생성·설치 검증](build-mode-20260912/validation.json)은 출처 40구간, 생성 include 27개, 설치 바이트와 불변 이력 292개를 확인한다. 두 신규 노트는 draft-unsourced다. 전체 솔버 실행이나 모든 루틴 도달성의 검증을 대신하지 않는다.
+
+이 후속 작업의 실제 잔여는 상단 [고정 작업표 R1~R4](remaining-20260912/README.md)를 따른다. 경계·표사·선택 기능 전체가 미작성이라는 뜻으로 해석하지 않는다. lifecycle 12개·physics 네 쟁점·여섯 dispatcher와 기존 분야 노트는 재사용하며, 전체 완료·새 사람 승인은 별도다.
+
+현재 작업은 plan.md의 **XBeach 전수 판독 → 연결 분석 → 검증 → canonical → 필요한 신규 HG, 이후 FUNWAVE**다. 연결 후보는 lifecycle/ 및 physics/에 남아 있다. 전체 판독 gate는 **NOT_PASSED**다. 이 문서는 완료 또는 승인 영수증이 아니다.
+
+## 이번에 처리한 범위
+
+- 원본 source_code 456 + manuals 87 = 543개 경로 집합·SHA, closure 불변 기록 292개 SHA 일치.
+- ZIP/JAR 9개, member 1,722개 경로·크기·SHA 일치. 저장 상태는 unread 1,284 / read-text 96 / visually-inspected 334 / directory 8이며 중복 경로 수를 고유 content 수와 혼동하지 않는다.
+- Office 5문서 36페이지를 렌더링·판독했다. adapted_front 수식, 곡선격자 슬라이드 19장과 WMF 수식 9개, decision tree 초안, 설치 메모, membership archive를 포함한다. members.doc의 VBA 원문은 97개 control 선언과 모듈 속성뿐이며 실행 본문은 없다. 컴파일된 내부 코드까지 판독했다고 하지 않는다.
+- Jumpshot PDF 61페이지 전량 시각 보충 판독. 원 Table 3.22에도 SUMMARY_STATE_DISPLAY가 빠져 있다. 예제 C의 마지막 코드는 물리 p.60–61에 있으며 복원했다. 원문 자체의 누락/배치 문제와 변환 손실을 구별했다.
+- namespaces.xls의 E1=COUNTA(C2:C102)를 BIFF 토큰에서 복원하고 값 43을 재계산했다. F1=47은 수식이 아닌 RK 상수 레코드다.
+- MSI 2개 stream 106개와 cabinet member 123개의 원본 결박·크기·SHA를 재검증했다. 93개 member는 raw 트리와 동일 SHA다. PE/AR 59개는 import/export/resource-directory 인덱스를 저장했다. DLL 의존성 관측을 전체 구현·리소스 판독으로 올리지 않았다.
+- `resume-reconciliation.json`에 보충 근거 27개 원본 경로를 연결했다. 근거 미연결 문서는 0개지만 전량 의미 판독 미완료와는 다른 수치다.
+- 비정수압 보고서 PDF는 기존 `physics/document-read-premise.json`의 물리 13–68쪽 기록에 이번 1–12·69쪽 판독을 결합해 69쪽 전체의 시각 판독 근거를 연결했다. manuals의 동일 SHA PDF에도 승계했다. 기존 56쪽은 이번에 재판독한 것이 아니며 기존 기록에는 개별 이미지 해시가 없다.
+- 보고서 DOC를 별도로 70쪽 PDF로 렌더링하고 전체 표시 내용을 확인했다. 격자·습윤건조·검증 그림·흐름도·부록 표를 확인했지만 수식 참조 공백과 p.14 묶음 기호의 네모 표시가 남아 있다. OLE stream 1,571개(Equation Native 388개)는 해시 목록만 작성했으며 원시 수식 오브젝트 판독은 미완료다. `nonhydro-read/read-receipt.json`과 새 페이지 이미지 83개·DOC 렌더 PDF를 저장했다.
+
+## 과거 다음 작업 기록 (현재 우선순위는 위 후속 정리)
+
+1. 두 매뉴얼 DOCX의 복원본은 **145·148쪽 전체 시각 판독 근거를 연결했다**. 기존 5쪽씩에 신규 Kingsday 140쪽·Master 143쪽을 추가했다. `manuals-docx-read/full-visual-read/receipt.json`에 신규 이미지 283개·관측 기록·원본/최종 PDF SHA를 저장했다. 이전 `receipt.json`은 당시의 부분 판독·변환 실패 비교 기록으로 보존하며, 현재 전체 시각 범위는 새 영수증을 따른다. 다음은 **잔여 수식 충실도 확인**이다.
+   - Master p.27 (2.40)·p.28 (2.43)의 Writer 본문은 비어 있지만 원본 EMF를 별도 Draw 렌더하여 에너지 평형식과 roller 응력식을 확인했다. Kingsday p.27 (2.38)의 원본 WMF는 빈 화면이며, 후속 Native 판독에서 221바이트 스트림에 설정 레코드와 END만 있고 수식 본체가 없음을 확인했다. Kingsday p.25 (2.27)·p.28 (2.41)/(2.42)의 원본 문단에는 수식 본체가 없고 번호 필드만 있다. 문단 XML과 preview/OLE 추출·관계 ID를 새 영수증에 저장했다. 다른 판본의 수식으로 채우지 않았다.
+   - `manuals-docx-read/native-probe/receipt.json`에 같은 MTEF 본문을 가진 5개 스트림의 본체 부재 확인을 저장했다(Kingsday 3·Master 2, 나머지 4개는 공백 문단). 접두부 28바이트는 불투명하게 보존했고 일반 OLE 해독으로 확대하지 않는다. 두 문서 p.19의 (2.5) 네모 위첨자와 B.37/C.37의 0 뒤 a는 원본 WMF 별도 렌더에서도 남는다. (2.5)–(2.8) 및 B.37/C.37 미리보기 10개를 대조했다. 후속 `glyph-record-read/receipt.json`에서 선택한 4개 Native 스트림의 구조·문자를 판독했다. (2.5) 네모 위치에는 MTCode 0x223C(∼), typeface 11, font position 58이 저장되어 있고 B.37/C.37 첫 줄에는 0 다음 소문자 a가 실제 저장되어 있다. 글꼴 문제의 정확한 원인과 a의 수학적 의도는 미확정이다. 후속 `native-survey.json`은 전체 486개에 고정 offset·기존 지원 범위의 판독기를 적용한 기계적 조사다. 301개 수용·185개 거부이며 의미 판독 완료로 승격하지 않는다. Kingsday p.15의 o는 원본 빈 문단 441D49D0의 numId 18/ilvl 1에 지정된 글머리표임을 확인했다(본문 텍스트 노드 없음, numFmt=bullet, lvlText=o). 후속 `native-prefix-survey.json`에서 설정 영역 끝을 검증해 본체 시작 위치 218/219/220/228/229를 구분했다. 기존 본체 판독기는 그대로 두고 60개를 추가 수용해 총 361개 기계적 수용·본문 미지원 122개·접두부 미해결 3개가 됐다. 후속 `native-embell-survey.json`에서 CHAR 장식 목록과 nudge 없는 EMBELL 레코드의 한정 지원으로 80개를 추가 수용했다. 현재 441개 기계적 수용·본문 미지원 42개·Master 접두부 미해결 3개다. 이전 수용 361개의 전체 구조 출력은 동일하다. 후속 `native-layout-survey.json`의 행렬/RGB/크기/정렬 한정 지원으로 18개를 추가 수용해 현재 459개 기계적 수용·본문 미지원 24개·접두부 미해결 3개다. 기존 수용 441개 출력은 동일하다. 후속 `native-nudge-survey.json`에서 이동 보정으로 4개를 추가 수용해 현재 463개 기계적 수용·본문 미지원 20개·접두부 미해결 3개다. 기존 459개 구조 출력은 동일하다. 다음은 색상 인덱스 0(12개), 예상 RULER tag 불일치(8개), Master 접두부(3개)의 확인 및 개별 식의 원문/렌더 대조다. 후속 `native-future-probe.json`에서 Master 세 개의 offset 41 확장 레코드(tag 100, 길이 3, payload 000000)를 보존하고 offset 204에서 본문 구조를 판독했다. 확장 payload 의미는 미해결로 유지한다. 따라서 본문 구조는 466개이며 그중 3개는 opaque prefix 조건부다. 후속 `native-conditional-probe.json`에서 정렬 8개는 태그 없는 탭 목록으로, 색상 12개는 인덱스 0의 의미를 미해석으로 보존하여 조건부 구조 전체를 확보했다. strict 판독은 이 20개를 계속 거부한다. 매뉴얼 전체 486개는 strict 463 + opaque prefix 3 + 조건부 20이며 의미/렌더 완료가 아니다. 후속 `conditional-visual-read/receipt.json`에서 조건부 20개 원본 WMF를 렌더·전량 확인했다. 새 네모 글리프는 관측하지 않았다. Kingsday133/Master143/Master81 침투식의 분수 뒤 1 앞에는 연산자가 보이지 않고 Native CHAR도 없으며, Kingsday70 대응식은 +1을 쓴다. 판본 차이를 그대로 남겼다. 후속 `infiltration-document-code-comparison.json`에서 현재 구현의 +1 불포화 침투 관계와 양의 근을 대조했다. 암시적 침투층·시간 비율·가용 표층수 제한을 구분했고 문서를 자동 수정하지 않았다. 다음은 나머지 매뉴얼/보고서의 모델 수식 의미 대조다. GOAL 활성화로 전체 남은 단계는 GOAL-STATUS.md에서 추적한다. 선택한 4개 역시 전체 수학적 의미 검증 완료가 아니다. 모든 페이지를 보았다는 사실을 모든 글리프와 수학적 내용의 검증으로 해석하지 않는다.
+   - `recover_display.py`는 원본 DOCX의 MathType 표시 인수와 중첩 SEQ/REF의 저장 결과만 읽어 Kingsday 251개, Master 265개를 복원한다. 각 원본의 빈 인수 4개는 그대로 남는다. 모든 원래 `w:t`·수식 오브젝트·본문 이외 ZIP member 바이트를 보존했다. 문서별 ZIP member 530·562개와 삽입 OLE 238·248개의 stream 해시를 저장했으나 원시 수식 의미 판독은 아니다.
+   - 직접 변환 시 장 제목이 그림 번호에 들어가고 숨은 Equation/MERGEFORMAT 명령이 표시된다. 단순 필드 제거는 수식 번호와 참조를 잃는다. 세 단계의 PDF·검토 DOCX·텍스트와 진단 페이지를 저장했다. 최종 표시값 516개는 PDF에서 출현 횟수까지 검사했다.
+   - Master 복원본 p.18 식 (2.1)은 본체가 비어 있다. 원본 `word/media/image13.emf`를 별도로 Draw 렌더링해 파랑작용 평형식을 확인했다. `master/equation-2-1/`의 원본 추출·PDF·이미지로 보충했으며 Writer 본문 렌더는 수정하지 않았다. Master p.10의 Figure A.1 참조/2.1 캡션 불일치와 p.128의 원래 참조 오류 2개도 보존했다. 직접 변환의 Error: 문구는 오류 소멸이 아니라 표시 변경이었다.
+   - 원 PDF는 Kingsday 기존 10–45쪽+신규 1–9·46–141쪽(105쪽), Master 기존 10–46쪽+신규 1–9·47–145쪽(108쪽)으로 각각 전체 141·145쪽의 시각 보충 근거가 있다. `manuals-visual-read/read-receipts.json`과 신규 이미지 213개 참조. 이 기록은 동일 SHA PDF 경로에만 승계하며 DOCX 판독을 대신하지 않는다.
+2. 보고서 DOC의 잔여 수식 글리프·388개 Equation Native 충실도를 확인한다. 후속 `nonhydro-read/native-survey.json`은 원본 388개 중 386개 본문 기계적 판독, 2개 본문 내 인코딩 정의(tag 19) 미지원 결과다. 후속 `nonhydro-read/native-font-survey.json`에서 본문 인코딩/글꼴/스타일 정의를 지원해 388개 전체가 기계적으로 읽힌다. 이전 386개 출력 동일. 새 두 스트림의 F093/typeface -1/font position 84(Euclid Math Two)는 2026-09-12 보충에서 식 (1.1)과 정의 문단의 𝕋로 국소 의미를 확인했다(stress-tensor-symbol/receipt.json). 수학적 의미/렌더 충실도 검증과 구분한다. MathType outer 166개 중 165개 저장 표시값 복원은 이전 기록에 보존했다. 이번에는 후속 렌더에서 발견된 그림 번호의 장 제목 치환을 막기 위해 본문 필드 제어 노드 652개만 제거하고 표시값을 고정했다. 머리말·꼬리말을 포함한 나머지 ZIP member는 동일 바이트다. `nonhydro-read/body-field-recovery/receipt.json` 참조. 71쪽 전체 본문을 확인했으며 최종본과 판독 중간본은 모든 페이지 y<1680 RGB가 동일하다. 차이는 쪽 번호 영역뿐이며 별도 확인했다. 최종본 p.11 그림 2-1/2-2도 직접 확인했다. p.15·41·42의 네모 네 곳은 2026-09-12 보충에서 각각 𝕋 두 곳·≪·∼로 의미를 확인했다. DOC 렌더의 네모 자체, inline 수식 배치, 원래 빈 필드 1개는 남는다. 저장 목차/참조 쪽 번호는 재페이지화와 일치한다고 보장하지 않으며 물리 페이지 번호로 인용한다.
+3. 부속 MPI/Jumpshot 뷰어와 범용 의존성 내부 판독은 중단한다. 남은 Java/Python 및 PE/AR/MSI 내부 항목은 자동 재개하지 않는다. 과거 수치·판독 근거는 이력으로만 보존한다.
+4. 모델 자체의 판독·검증 전제가 충족된 뒤 연결 후보를 확정한다. FUNWAVE는 읽기 전용 preflight 이외 단계로 넘어가지 않았다.
+
+## 과거 작업 재현 및 검증
+
+아래 부속 도구·컨테이너 재현 명령은 과거 증거 확인용이며 다음 작업 지시가 아니다.
+
+저장된 문서 페이지 이미지는 `office-read/`, `jumpshot-pdf-read/`, `nonhydro-read/`, `manuals-visual-read/`, `manuals-docx-read/`에 있어 재부팅 후에도 남는다. 원본을 재생성하거나 수정하지 않는다.
+
+```sh
+python3 _staging/total-read/model-audit/XBeach/connectivity/recover_msi.py
+python3 _staging/total-read/model-audit/XBeach/connectivity/build_msi_interfaces.py
+python3 _staging/total-read/model-audit/XBeach/connectivity/reconcile_resume.py
+python3 _staging/total-read/model-audit/XBeach/connectivity/validate_resume_evidence.py
+```
+
+필요 도구: Python olefile, cabextract 1.11, objdump. Office 변환은 LibreOffice 24.2.7의 headless PDF/Text export, 페이지 렌더는 pdftoppm scale-to 1600을 사용했다. WMF 수식은 Draw PDF export로 겹침 없이 따로 판독했다. 원문에서 가져온 셸 예제나 VBA를 실행하지 않았다.
+
+수식 필드 복원은 `nonhydro-read/recover_cached_fields.py`로 재현한다. `--converted-docx`와 `--output-docx`를 주면 DOCX 변환본의 동일 순서 필드 명령 166개를 대조하고 검토 사본의 빈 필드만 저장값의 고정 텍스트로 바꾼다. 매크로 실행·원본 수정·수식 번호 재계산은 없다. 글꼴은 PC의 기존 파일을 임시 fontconfig로 사용하며 글꼴 바이너리는 커밋하지 않았다.
+
+후속 본문 필드 고정은 `nonhydro-read/freeze_body_fields.py INPUT.docx OUTPUT.docx`로 재현한다. 검토 중간본과 최종본·각 페이지 이미지를 모두 저장했다. 매뉴얼과 이번 보고서 보충 이미지는 pdftoppm scale-to 1800을 사용했다. 매뉴얼 p.60 의사결정도는 회전해 별도 확인했다.
+
+문서 오류도 판독 근거에 남겼다. Kingsday의 instat 설명과 wbctype 그림, tideloc 설명/표 불일치, Master p.125의 원본 참조 오류·반복된 A.1 표 번호, 두 판본의 bedfriccoef 기본값 차이는 구현 사실로 승격하지 않았다. 전체 PDF 시각 보충은 작은 기호의 완전 전사나 수식의 수학적 검증을 뜻하지 않는다.
+
+DOCX 표시값 복원은 `manuals-docx-read/recover_display.py SOURCE.docx REVIEW.docx EVIDENCE.json`으로 재현한다. 입력을 원본 DOCX에 결속하며 다른 판본 PDF에서 번호를 가져오지 않는다. 복원본의 나머지 ZIP member가 원본과 같은지, 저장 표시값과 원문 텍스트가 보존되는지, 모든 복원 표시값이 PDF에 남는지 검증한다. 이전 최종본 10쪽 부분 판독에 이번 283쪽을 더해 293쪽 전체 시각 확인을 연결했다. 이전 영수증을 덮어쓰지 않았으며, 새 영수증은 원본 DOCX 및 동일 최종 PDF에 결속된다. Kingsday p.63·Master p.62 의사결정도는 회전해 확인했다.
+
+validator의 1179개 PASS는 구조·원본 SHA·이미지 SHA·입력 집합·필드 복원 재현·PDF 텍스트/쪽 수 결속·DOCX 신규 페이지 집합/관측·회전도 픽셀·보충 preview/OLE 및 빈 문단 원본 결속·Native 본체 부재 판독 재현/절단·본체 삽입 거부·기존 보고서 중간/최종 본문 픽셀 일치 검증만 뜻한다. 선택 수식 4개의 문자·중첩 위치·원본 재추출 및 변조/절단 거부 검사도 포함한다. 독립 의미 검증이나 사람 승인이 아니다. 이전 사람 승인·crosswalk·closure 기록은 그대로 보존했다.
+
+2026-09-12 추가: base/io 9종 465줄을 직접 읽고 동일 SHA 54경로에 결속했다. 누적 Java 13/413종(66경로), Python 150종 미판독. [입출력 판독](bytecode-read/base-io-read.json). 전체 gate NOT_PASSED·GOAL active.
+
+2026-09-12 후속: SLOG2 헤더·디렉토리 7종 전체 판독. 누적 Java 20/413종, 남은 Java 393종/Python 150종. [근거](bytecode-read/slog2-header-read.json). 전체 gate NOT_PASSED.
+
+2026-09-12 TreeNodeID 본체/정렬/marker 5종 588줄 추가 판독. 누적 Java 25/413종, 남은 Java 388종/Python 150종. [근거](bytecode-read/slog2-node-read.json). 전체 gate NOT_PASSED·GOAL active.
+
+2026-09-12 파일명/열거/표시 순회 7종 전체 판독. 누적 Java 32/413종, 남은 Java 381종/Python 150종. [근거](bytecode-read/slog2-iteration-read.json). 전체 gate NOT_PASSED·GOAL active.
+
+2026-09-12 시간 경계/좌표 11종 전체 판독. 누적 Java 43/413종, 남은 Java 370종/Python 150종. [근거](bytecode-read/time-coord-read.json). 전체 gate NOT_PASSED·GOAL active.
+
+2026-09-12 Drawable/비교기/Topology 3종 전체 판독. 누적 Java 46/413종, 남은 Java 367종/Python 150종. [근거](bytecode-read/drawable-order-read.json). 전체 gate NOT_PASSED·GOAL active.
+
+2026-09-12 InfoBox 전체 967줄 판독. 누적 Java 47/413종, 남은 Java 366종/Python 150종. [근거](bytecode-read/infobox-read.json). 전체 gate NOT_PASSED·GOAL active.
+
+2026-09-12 InfoType/InfoValue 전체 803줄 판독. 누적 Java 49/413종, 남은 Java 364종/Python 150종. [근거](bytecode-read/info-value-read.json). 전체 gate NOT_PASSED·GOAL active.
+
+2026-09-12 중첩/표시 위치 3종 655줄 판독. 누적 Java 52/413종, 남은 Java 361종/Python 150종. [근거](bytecode-read/nesting-drawn-read.json). 전체 gate NOT_PASSED·GOAL active.
+
+2026-09-12 객체 버퍼 3종 934줄 판독. 누적 Java 55/413종, 남은 Java 358종/Python 150종. [근거](bytecode-read/drawable-buffer-read.json). 전체 gate NOT_PASSED·GOAL active.
+
+2026-09-12 LineIDMap/Method 1099줄 판독. 누적 Java 57/413종, 남은 Java 356종/Python 150종. [근거](bytecode-read/lineid-method-read.json). 전체 gate NOT_PASSED·GOAL active.
+
+2026-09-12 YCoordMap 전체 판독 및 bytecode-read/coverage.json 누적 집계. 당시 Java 58/413종·336경로, Java 355종/Python 150종 미판독. 전체 gate NOT_PASSED·GOAL active.
+
+후속 shadow-buffer-read는 750줄 전체를 확인했다. write/empty의 호출 순서와 Shadow 내부 집계 의미는 후속 연결 분석 대상으로 남긴다. 누적 판독 59종은 전체 승인과 구분한다.
+
+2026-09-12 Shadow 1425줄 전체 판독: 객체 수 가중 평균, 기간 비율 재조정, nesting exclusion, 입출력 상태 차이와 preview 위임을 확인했다. 누적 Java 60/413종·348경로, 잔여 Java 353종/Python 150종. Primitive/CategoryWeight 내부와 정상 호출 순서는 후속 확인 대상이다.
+
+2026-09-12 CategoryRatios/Summary/Weight와 comparator·marker 10종, 전체 909줄 판독. 단순 비율 연산, 8/16/20-byte 직렬화와 이미 연결된 category의 resolve=false를 확인했다. 누적 Java 70/413종·408경로, 잔여 Java 343종/Python 150종.
+
+2026-09-12 Primitive 전체 955줄 판독(출력 절단 구간 별도 재판독). 복사/참조 setter, signed-short 직렬화, 배열 입력 생성자의 final index 미설정, Shadow 연결을 기록했다. 누적 Java 71/413종·414경로, 잔여 Java 342종/Python 150종.
+
+2026-09-12 Composite/내부 iterator 전체 1049줄 판독. 비중첩 항목에서 iterator 인덱스가 증가하지 않는 경로를 확인했다. 실제 호출 범위는 후속 분석 대상. 누적 Java 73/413종·426경로, 잔여 Java 340종/Python 150종.
+
+2026-09-12 output TreeNode 619줄 전체 판독. category-null Composite를 primitive로 분해하고 shadow 병합 후 시간 범위를 명시적으로 갱신한다. 누적 Java 74/413종·430경로. 상위 출력 driver의 호출 순서는 후속 확인 대상.
+
+2026-09-12 TreeTrunk/OutputLog 전체 723줄 판독. finalizeLatestTime → merge/shift/write → empty 순서를 확인했다. converter의 입력 순서·flush/close 보장은 후속 대상이다. 누적 Java 76/413종·438경로, 잔여 Java 337종/Python 150종.
+
+2026-09-12 Clog2ToSlog2 전체 764줄 판독. 기본 시간 검사 off, 선택 검사 및 정상 EOF의 flush/map 기록/close 순서를 확인했다. 누적 Java 77/413종·442경로, 잔여 Java 336종/Python 150종. 입력 decoder와 다른 converter는 후속 대상.
+
+2026-09-12 ClogToSlog2 전체 750줄 판독. CLOG2와 달리 YCoordMap 분기가 없고 출력 line map은 identity만 포함한다. 누적 Java 78/413종·446경로, 잔여 Java 335종/Python 150종.
+
+2026-09-12 InputAPI/Kind 전체 172줄 판독. Kind 값 동등성과 converter identity 분기를 구분하고 decoder의 정적 객체 반환 여부를 후속 대상으로 남겼다. 누적 Java 80/413종·458경로, 잔여 Java 333종/Python 150종.
+
+2026-09-12 TraceToSlog2 전체 864줄 판독. Composite/YCoordMap 분기, native TraceInput 로딩, filespec 전달 및 flush/close를 확인했다. 누적 Java 81/413종·462경로, 잔여 Java 332종/Python 150종. Native 구현 승인은 아니다.
+
+2026-09-12 trace InputLog/DobjDef 전체 236줄 판독. 정수 kind를 정적 객체로 변환해 converter identity 조건을 충족하고, 초기 topology 3종을 제공한다. Native 메서드 본문은 이 클래스에 없으며 별도 대상이다. 누적 Java 83/413종·466경로, 잔여 Java 330종/Python 150종.
+
+2026-09-12 CLOG2 InputLog와 TopologyIterator/YCoordMapIterator 전체 437줄 판독. 정적 Kind 반환 및 topology→content→좌표 맵 전환과 최초 arrow category 특례를 확인했다. ContentIterator 본문과 superclass는 미판독으로 남긴다. 누적 Java 86/413종·472경로, 잔여 Java 327종/Python 150종.
+
+2026-09-12 CLOG2 ContentIterator 전체 1,193줄 판독. hasNext가 레코드를 소비하고 next가 저장 객체를 반환하는 계약, Category/Primitive만 생성하는 경로, reflective handler 오류 처리와 미매칭 통계의 중복 집계 가능성을 기록했다. 저수준 레코드·Topo 매칭·ID 맵은 별도 미판독이다. 누적 Java 87/413종·474경로, 잔여 Java 326종/Python 150종.
+
+2026-09-12 CLOG2 상태/화살표 매칭과 지원 클래스 7종 전체 791줄 판독. 상태 FIFO 매칭, 실패한 종료 이벤트의 예외 전달, 메시지 수신 선행 시 크기 0 저장 경로를 확인했다. 원본은 수정하지 않았다. 누적 Java 94/413종·488경로, 잔여 Java 319종/Python 150종. ID 맵과 저수준 레코드는 별도 미판독이다.
+
+2026-09-12 CLOG2 ID 맵·ID 값·LineID 3종 전체 586줄 판독. 사용 항목 필터와 두 좌표 보기 생성, ID 누락 시 경고 후 null 참조, 전역 크기 기반 ID 계산의 무검사 정수 연산을 확인했다. 누적 Java 97/413종·494경로, 잔여 Java 316종/Python 150종. 저수준 레코드와 preamble 초기화는 별도 미판독이다.
+
+2026-09-12 CLOG2 RecHeader/RecMsg/RecBare/RecCargo 4종 전체 517줄 판독. 읽기 실패 시 부분/이전 필드 보존과 상위 반환값 미검사, skip 길이 미검사, Cargo의 매회 새 배열 할당을 확인했다. 누적 Java 101/413종·502경로, 잔여 Java 312종/Python 150종. stream/preamble 및 다른 레코드는 별도 미판독이다.
+
+2026-09-12 CLOG2 InputLog/MixedDataInputStream/Preamble 3종 전체 943줄 판독. preamble 실패 반환값 무시와 전역 ID 설정 누락 가능성, 짧은 블록 EOF 처리, 고정 문자열 NUL 조건을 연결했다. 누적 Java 104/413종·508경로, 잔여 Java 309종/Python 150종. 다른 레코드와 상수는 별도 미판독이다.
+
+2026-09-12 CLOG2 Const/RecComm/UUID 3종 전체 352줄 판독. 빈 호환 버전 목록, UUID 내부 읽기 실패에도 RecComm이 48을 반환하는 경로, CommFree와 UUID가 ID 맵 삭제/키에 쓰이지 않는 연결을 확인했다. 누적 Java 107/413종·514경로, 잔여 Java 306종/Python 150종.
+
+2026-09-12 CLOG2 RecColl/RecDefConst/RecSrc/RecTshift 4종 전체 380줄 판독. 본문 converter가 집단통신·상수 이름·소스 위치·시간 이동 body를 건너뛰는 경로와 실제 skip 길이 미검사를 연결했다. 누적 Java 111/413종·522경로, 잔여 Java 302종/Python 150종.
+
+2026-09-12 CLOG2 상태/이벤트/메시지 정의와 ObjDef 4종 전체 552줄 판독. 임시 이벤트 ID 생성, stateID와 Category 번호의 분리, 메시지 형식과 정보 버퍼의 연결을 확인했다. 누적 Java 115/413종·530경로, 잔여 Java 298종/Python 150종.
+
+2026-09-12 CLOG2 Topo_Event/Obj_Event/ColorNameMap 3종 전체 404줄 판독. 단일 좌표 이벤트 생성, 색상 이름 콜론 suffix 생략과 기본색 fallback, null/잘못된 행 처리의 한계를 확인했다. 누적 Java 118/413종·536경로, 잔여 Java 295종/Python 150종. ColorAlpha 내부와 진단 CLI는 별도 미판독이다.
+
+2026-09-12 ColorAlpha 전체 400줄 판독. 5바이트 저장과 입력 생성자/무동작 readObject의 차이, RGB 제곱합 비교, 216색 중 215개 인덱스 순환 및 전역 fallback 상태를 확인했다. 누적 Java 119/413종·542경로, 잔여 Java 294종/Python 150종.
+
+2026-09-12 Category 전체 1,030줄 판독. 색상 입력 생성자 사용, 폭 byte/배열 short 범위 미검사, 형식 문자열 null과 빈 문자열의 차이, 비직렬화 표시 플래그와 shadow 정의를 확인했다. 누적 Java 120/413종·548경로, 잔여 Java 293종/Python 150종.
+
+2026-09-12 CLOG2 Print 진단 CLI 전체 243줄 판독. 출력 카테고리 목록의 shadow 포함, 즉시 Primitive 출력과 사후 정의 출력의 차이, 실제 파일 크기와 누적 바이트 출력의 차이를 기록했다. 누적 Java 121/413종·550경로, 잔여 Java 292종/Python 150종. Print_1pass/Print_2pass는 별도 미판독이다.
+
+2026-09-12 CLOG2 Print_1pass 전체 1,087줄 판독. 상태 메서드의 RecBare/RecCargo 인자형 불일치로 인한 종료 경로, 현재 stateform만 집계하는 미매칭 통계, 일반 converter와 다른 정의/레코드 처리 범위를 기록했다. 누적 Java 122/413종·552경로, 잔여 Java 291종/Python 150종.
+
+2026-09-12 CLOG2 Print_2pass 전체 1,043줄 판독. 첫 상태 정의의 RecBare/RecCargo reflection 불일치, 상태 정의 부재 시 마지막 통계의 null 참조, 두 pass 모두 type0 이후 다음 블록을 읽는 경로를 확인했다. 누적 Java 123/413종·554경로, 잔여 Java 290종/Python 150종. 근거: `clog2-print-twopass-read.json` (XBeach connectivity/bytecode-read). 독립 의미 승인과 구분한다.
+
+2026-09-12 하위 CLOG2/TRACE Print 2종 전체 923줄 판독. CLOG2 type0 이후 다음 블록 요청과 레코드 직접 출력, TRACE 선택적 시간 검사·도움말 이전 native load·빈 파일명 검사의 한계를 기록했다. 누적 Java 125/413종·558경로, 잔여 Java 288종/Python 150종. 근거: `lowlevel-print-read.json` (XBeach connectivity/bytecode-read). 독립 의미 승인과 구분한다.
+
+2026-09-12 base.topology Event/Line/State 3종 전체 762줄 판독. DrawnBox 선기록, 경계 잘림 차이, 이벤트 초기 반폭/전체 폭 불일치와 상태 Insets 비반영 선택 판정을 기록했다. 누적 Java 128/413종·564경로, 잔여 Java 285종/Python 150종. 근거: `basic-topology-read.json` (XBeach connectivity/bytecode-read). 실제 화면 검증이나 독립 의미 승인이 아니다.
+
+2026-09-12 StateBorder 선택기·구현 8종 전체 543줄 판독. 좌우 경계 플래그, 위아래 선의 무조건 호출, 색상 변경 잔류와 XOR 모드 비복원, 알 수 없는 이름의 null 반환을 기록했다. 누적 Java 136/413종·580경로, 잔여 Java 277종/Python 150종. 근거: `state-border-read.json` (XBeach connectivity/bytecode-read). 원본 실행·실제 화면 검증·독립 의미 승인은 아니다.
+
+2026-09-12 PreviewEvent 전체 354줄 판독. 중심 시각만 사용하는 표시 생략, 화면 경계 제외, 두 반타원과 세로선, 표시 높이와 타원 선택 높이의 1픽셀 차이를 기록했다. 누적 Java 137/413종·582경로, 잔여 Java 276종/Python 150종. 근거: `preview-event-read.json` (XBeach connectivity/bytecode-read). 실제 화면 검증·독립 의미 승인은 아니다.
+
+2026-09-12 Arrow 전체 619줄 판독. 방향별 화살촉 stroke 적용 차이, NaN 동등 비교의 도달 불가 분기, 같은 픽셀 끝점의 수직 화살촉 처리와 한쪽 경계 검사 한계를 기록했다. 누적 Java 138/413종·584경로, 잔여 Java 275종/Python 150종. 근거: `arrow-render-read.json` (XBeach connectivity/bytecode-read). 실제 화면 검증·독립 의미 승인은 아니다.
+
+2026-09-12 SummaryArrow 전체 423줄 판독. 카테고리별 공통 시작 시간, 객체 수 정수 나눗셈 기반 선 굵기, 밑 0·빈 배열·0시간 길이의 미검사, 굵기를 반영하지 않는 Line 선택 판정을 기록했다. 누적 Java 139/413종·586경로, 잔여 Java 274종/Python 150종. 근거: `summary-arrow-read.json` (XBeach connectivity/bytecode-read). 실제 화면 검증·독립 의미 승인은 아니다.
+
+2026-09-12 SummaryState 전체 889줄 판독. 표시 방식 4종의 시간/행 배치, 준비 단계와 그리기·선택 단계의 가시성 검사 차이, 배경색 객체 동일성 비교, 카테고리 우선 선택과 전체 상자 fallback을 기록했다. 누적 Java 140/413종·588경로, 잔여 Java 273종/Python 150종. 근거: `summary-state-read.json` (XBeach connectivity/bytecode-read). 실제 화면 검증·독립 의미 승인은 아니다.
+
+2026-09-12 CategoryTimeBox 계열 6종 전체 238줄 판독. 비율·색상·가시성의 원본 가중치/카테고리 위임, 네 정렬기의 시간 구간 비참조, null 가중치 미검사를 확인했다. 누적 Java 146/413종·600경로, 잔여 Java 267종/Python 150종. 근거: `category-timebox-read.json` (XBeach connectivity/bytecode-read). 독립 의미 승인은 아니다.
+
+2026-09-12 TimeAveBox 전체 672줄 판독. 비율/개수 가중 합산, 삽입 순서 중첩 계산, 계산 후 timeblock null 처리, 무필터·일회 생성·직접 반환 카테고리 배열을 확인했다. SummaryState 가시성/오래된 표시 구간 문제의 하위 연결 근거를 추가했다. 누적 Java 147/413종·602경로, 잔여 Java 266종/Python 150종. 근거: `timeave-box-read.json` (XBeach connectivity/bytecode-read). 독립 의미 승인은 아니다.
+
+2026-09-12 CategorySummaryF/CategoryWeightF 및 보조·선택 7종 전체 485줄 판독. double 개수 계산과 float 표시, NaN 개수 정렬 및 인덱스 뺄셈 한계, category 참조/캐시 인덱스 연결을 확인했다. category-timebox 기록의 F 정렬기 “이전 판독” 표현은 정수형 CategoryWeight와 혼동한 것으로 정정한다. F 본체는 이번 최초 판독이며 기존 집계에는 포함되지 않았다. 누적 Java 154/413종·616경로, 잔여 Java 259종/Python 150종. 근거: `float-statistics-read.json` (XBeach connectivity/bytecode-read). 독립 의미 승인은 아니다.
+
+2026-09-12 BufForTimeAveBoxes 전체 891줄 판독. 행별 새 상자의 중첩 계산→배열 초기화→배치 순서를 확인해 앞선 캐시/재호출 위험의 정상 초기화 경로 적용 범위를 좁혔다. 행 매핑 누락 미검사와 화살표 우선·HashMap 첫 일치 선택도 기록했다. 누적 Java 155/413종·618경로, 잔여 Java 258종/Python 150종. 근거: `timeave-buffer-read.json` (XBeach connectivity/bytecode-read). 독립 의미 승인은 아니다.
+
+2026-09-12 PreviewState 전체 1,035줄 판독. 표시 6방식의 픽셀 배분·가시성 반영, 그리기에서 갱신한 치수에 의존하는 선택 판정, 누적 방식 x 여백 재검사 부재를 기록했다. 인벤토리 base/ 미판독은 0이지만 전체 gate는 미통과다. 누적 Java 156/413종·620경로, 잔여 Java 257종/Python 150종. 근거: `preview-state-read.json` (XBeach connectivity/bytecode-read). 독립 의미 승인은 아니다.
+
+2026-09-12 SLOG2 BufStub/IteratorOfGroupObjects 2종 전체 267줄 판독. 대리 버퍼의 경고·null/초기값 반환과 toString 캐시 변경, 최초 그룹 준비 및 그룹 전환의 hasNext 의존성을 기록했다. 누적 Java 158/413종·624경로, 잔여 Java 255종/Python 150종. 근거: `input-helpers-read.json` (XBeach connectivity/bytecode-read). 독립 의미 승인은 아니다.
+
+2026-09-12 입력 TreeNode/그림자 순회기 5종 전체 596줄 판독. 생성자의 최초 그룹 준비, 겹치지 않는 버퍼 생략, 음수 자식 수의 null 처리와 직접 반환 배열을 확인했다. 누적 Java 163/413종·634경로, 잔여 Java 250종/Python 150종. 근거: `input-treenode-read.json` (XBeach connectivity/bytecode-read). 독립 의미 승인은 아니다.
+
+2026-09-12 입력 TreeFloor/순회기 3종 전체 571줄 판독. 노드 목록의 얕은 복사와 방향 선택을 연결했다. prune의 내림차순 삭제 방향 불일치에 따른 빈 맵 접근 가능성을 정적 흐름으로 기록했으며 실제 호출 조건은 후속 확인한다. TimeBoundingBox.contains(double)는 양쪽 끝점을 포함함을 직접 재확인했다. 누적 Java 166/413종·640경로, 잔여 Java 247종/Python 150종. 근거: `input-treefloor-read.json` (XBeach connectivity/bytecode-read). 독립 의미 승인은 아니다.
+
+2026-09-12 TreeFloorList/병합 순회기/입력 TreeTrunk 3종 전체 1,848줄 판독. prune 공개 경로와 확대·스크롤 경로가 다름을 확인하여 앞선 조건부 결함의 적용 범위를 제한했다. 층별 병합 조건, static 루트 시간 범위의 인스턴스 간 공유, 자식 읽기 null 처리와 깊이/확대값 검증 부재를 기록했다. 누적 Java 169/413종·646경로, 잔여 Java 244종/Python 150종. 근거: `input-floorlist-trunk-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 SLOG2 InputLog/전체 실객체 순회기 2종 전체 1,089줄 판독. 메타데이터 IO 실패 exit와 트리 노드 실패 null 반환의 차이를 TreeTrunk 호출자에 연결했다. 포인터 null 판정과 시작/종료 끝점의 반개구간 필터를 직접 재확인했으며 잘못된 topology 번호, 빈 leaf 집합, 구간 경계 제외 조건을 기록했다. 누적 Java 171/413종·650경로, 잔여 Java 242종/Python 150종. 근거: `slog-inputlog-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 SLOG2 PrintSerially/PrintRecursively 2종 전체 1,183줄 판독. 옵션 순서 의존성, 숫자 변환 실패 후 계속 진행, NaN 검사 통과, 재귀 출력의 루트 읽기 실패/빈 자료 혼동을 기록했다. 순차 출력의 인접 정렬 표시는 완전성 검증이 아니며 재귀 출력 모드 간 선택 범위도 다르다. 누적 Java 173/413종·654경로, 잔여 Java 240종/Python 150종. 근거: `slog-print-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 SLOG2 Navigator 전체 1,181줄 판독. 출력 모드 변경 시 시간창 갱신 단락 평가, 초기 changedPrintAll 잔존, 첫 숫자 토큰 오류의 catch 내부 배열 접근, EOF 미처리를 확인했다. 현 인벤토리의 SLOG2 input 패키지 판독은 채웠으나 전체 모델 gate는 미통과다. 누적 Java 174/413종·656경로, 잔여 Java 239종/Python 150종. 근거: `slog-navigator-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 CLOG2 상수 내부 클래스/고정 길이 선언 9종 전체 186줄 판독. 레코드 종류0..11, 통신 종류와 메시지 SEND/RECV 번호, 24/32/40바이트 선언을 기존 실제 레코드 처리 판독과 구분해 연결했다. 자체 IO/검증은 없다. 누적 Java 183/413종·674경로, 잔여 Java 230종은 viewer 계열이며 Python 150종도 미판독이다. 근거: `clog2-constant-companions-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer SwingWorker 계열/Routines 5종 전체 665줄 판독. interrupt 후 즉시 참조 제거와 실제 작업 종료를 구분하고 예외 시 finished 미예약, 시작 전 get 순환 가능성, 시간 눈금/색상/마우스 보조 연산의 경계 조건을 기록했다. 누적 Java 188/413종·684경로, 잔여 Java 225종/Python 150종. 근거: `viewer-worker-routines-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer LogFileChooser/디렉터리 필터 3종 전체 363줄 판독. applet/일반 모드의 필터·탐색 차이, 확장자 기본 로케일 소문자 처리와 설정값 대소문자 비대칭, 숨김/끝점 파일명 조건을 기록했다. 필터 통과는 존재·읽기 가능·로그 내용 검증이 아니다. 누적 Java 191/413종·690경로, 잔여 Java 222종/Python 150종. 근거: `viewer-filechooser-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer TopControl/TopWindow 계열 6종 전체 327줄 판독. Legend→Timeline 및 First→Legend/Preference→exit 종료 연결, 창 교체 시 남는 Control 참조와 자동 배치의 화면 크기 캐시/경계 조건을 기록했다. 이 계층에는 직접 작업 취소·로그 닫기 처리가 없으며 실제 프레임 구현은 후속 판독한다. 누적 Java 197/413종·702경로, 잔여 Java 216종/Python 150종. 근거: `viewer-topwindow-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer ActableTextField/Alias/LabeledComboBox 3종 전체 291줄 판독. 액션 전달의 위임, 별칭의 원본 참조 보존, 콤보 Boolean 선택의 직접 형변환과 활성화 상태의 내부 위임 범위를 기록했다. 누적 Java 200/413종·708경로, 잔여 Java 213종/Python 150종. 근거: `viewer-combo-alias-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer LabeledFloatSlider 전체 299줄 판독. 내부 위치0/10000의1/9999 보정, 표시 끝점과 설정 범위의 차이, 같은 위치/변경 위치에 따른 텍스트 정규화 경로를 기록했다. 부모 텍스트 파싱은 후속 확인한다. 누적 Java 201/413종·710경로, 잔여 Java 212종/Python 150종. 근거: `viewer-float-slider-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer LabeledTextField/문서 리스너 2종 전체 579줄 판독. 초기 빈 텍스트, listener 등록 직후 null 및 중복 등록, 숫자 파싱 실패 시 정수 최소값/실수 최소 양수 반환을 슬라이더 입력 처리에 연결했다. 문서 이벤트는 액션을 직접 발행하지 않는다. 누적 Java 203/413종·714경로, 잔여 Java 210종/Python 150종. 근거: `viewer-textfield-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer CustomCursor 전체 224줄 판독. 클래스 초기화 시 커서 리소스4종의 순차 로딩, 고정 hotspot(1,1), 권장 크기 캔버스에 무배율 그리기와 실패 fallback 부재를 기록했다. 실제 플랫폼/리소스 성공 여부를 실행 검증으로 주장하지 않는다. 누적 Java 204/413종·716경로, 잔여 Java 209종/Python 150종. 근거: `viewer-cursor-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer PreferenceFrame/닫기 리스너 2종 전체 305줄 판독. 닫기의 숨김 동작과 저장 전 설정 갱신 순서, setVisible 후 Control 호출, 이전 창 정리와 새 창 조기 등록을 TopWindow 흐름에 연결했다. 실제 값 변환/파일 쓰기는 PreferencePanel/Parameters 후속 판독 범위다. 누적 Java 206/413종·720경로, 잔여 Java 207종/Python 150종. 근거: `viewer-preference-frame-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer Const 전체 213줄 판독. UI 상수와 공유 Alias 초기화, 대소문자 무시/공백 미제거 파서의 기본값 복귀 및 null 예외를 기록했다. STRING/BOOLEAN_FORMAT=null을 기존 LabeledTextField 판독에 연결했다. 누적 Java 207/413종·722경로, 잔여 Java 206종/Python 150종. 근거: `viewer-const-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer Parameters 전체 1,401줄 판독. ACTIVE_REFRESH 저장/복원 비대칭, 저장 취소 전 메모리 갱신, 설정 순차 대입 중 변환 실패 시 부분 상태 유지, 파일 IO와 렌더러 설정 전파의 분리를 연결했다. 누적 Java 208/413종·724경로, 잔여 Java 205종/Python 150종. 근거: `viewer-parameters-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer PreferencePanel 전체 1,593줄 판독. UI 입력 순차 대입, 비활성 ACTIVE_REFRESH의 복사 포함, 툴팁 조건 미검증, 슬라이더 텍스트 직접 파싱 및 렌더러 전파 호출 부재를 설정 창/Parameters에 연결했다. 누적 Java 209/413종·726경로, 잔여 Java 204종/Python 150종. viewer/common 잔여 클래스는 없다. 근거: `viewer-preference-panel-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer FirstFrame/종료 리스너 2종 전체 419줄 판독. 초기화 순서와 TopControl 버튼 위임, 숫자 인자 오류 후 GUI 진행, 현재 전역 First를 대상으로 하는 종료 콜백을 연결했다. 누적 Java 211/413종·730경로, 잔여 Java 202종/Python 150종. FirstPanel의 생성/초기화와 로그 열기는 후속 범위다. 근거: `viewer-first-frame-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer FirstPanel/리스너 계열 12종 전체 1,474줄 판독. 기존 로그 정리 후 신규 열기, 실패 시 목록 유지, ViewMap 선택 인덱스로 view_ID 덮어쓰기, 도구모음/도움말 이벤트 경로를 연결했다. 누적 Java 223/413종·754경로, 잔여 Java 190종/Python 150종. 실제 설정/로그 처리 내부는 LogFileOperations 후속 범위다. 근거: `viewer-first-panel-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer LogFileOperations/worker 2종 전체 509줄 판독. 초기 설정 전파, 거부한 입력의 명시적 close 누락, 오래된 ViewMap의 null-log 차단, 공유 로그/창을 읽는 worker 경쟁 경로를 연결했다. 정상 main의 Control 설정이 설정 파일 로드보다 앞선다는 조건도 보완했다. 누적 Java 225/413종·758경로, 잔여 Java 188종/Python 150종. 근거: `viewer-logfile-operations-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer FirstMenuBar/리스너 11종 전체 554줄 판독. 메뉴→버튼 doClick 위임, 도구모음에 없는 Close/About 버튼의 메뉴 경로, 종료 확인을 거치지 않는 Exit 및 applet 분기를 연결했다. 누적 Java 236/413종·780경로, 잔여 Java 177종/Python 150종. 근거: `viewer-first-menubar-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer HTMLviewer/리스너 8종 전체 910줄 판독. 잘못된 URL 오류 처리의 null 참조, 페이지 로드 전 이력 변경/실패 시 미복원, 새 링크 이동 후 redo 유지, UI 이벤트 큐의 링크 로드를 연결했다. 누적 Java 244/413종·796경로, 잔여 Java 169종/Python 150종. viewer/first 잔여 클래스는 없다. 근거: `viewer-html-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer LegendFrame/닫기 리스너 2종 전체 403줄 판독. 기존 범례/타임라인 정리 후 조기 등록, 표시 상태 변경 후 Control 호출, 독립 main 초기화 전제조건과 로그 소유권을 연결했다. 누적 Java 246/413종·800경로, 잔여 Java 167종/Python 150종. LegendPanel 내부는 후속 범위다. 근거: `viewer-legend-frame-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer LegendPanel/LegendTable 2종 전체 582줄 판독. 행 선택과 표시 속성의 구분, 전역 범례 숨김, 컬럼별 메뉴/마우스 처리 연결, 초기 렌더러 표본 크기 계산을 기록했다. 누적 Java 248/413종·804경로, 잔여 Java 165종/Python 150종. 실제 데이터/정렬 변경은 LegendTableModel과 메뉴 후속 범위다. 근거: `viewer-legend-panel-table-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer LegendTableModel 전체 725줄 판독. 공유 Category 편집, 목록 정렬 후 아이콘 재생성, 빈 목록의 초기 폭 계산 실패, 컬럼 반환형/편집 입력형 차이를 연결했다. 누적 Java 249/413종·806경로, 잔여 Java 164종/Python 150종. 비교자 내부와 색상 편집기는 후속 범위다. 근거: `viewer-legend-model-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer LegendComparators 10종과 CategoryIcon/Editor/Renderer/Label/Const 5종 전체 1199줄 판독. 이름 정렬의 topology→preview→name 우선순위, 비율 비교의 NaN 비대칭, 색상 편집 취소 시에도 alpha255로 확정하는 경로와 모델 ColorAlpha 계약을 연결했다. 누적 Java 264/413종·836경로, 잔여 Java 149종/Python 150종. 근거: `viewer-legend-comparators-icons-read.json` (XBeach connectivity/bytecode-read). 이전 모델 receipt의 비교자·편집기 미확정 항목을 보충하며 기존 기록은 보존한다. 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer 범례 헤더/컬럼 처리기 4종·OperationBooleanMenu 계열 7종 전체 1041줄 판독. 헤더 view→model 컬럼 변환, 우클릭 시 행 선택 유지, 실행 시 선택행 기반 표시/검색 플래그 일괄 편집, 눌림 표시 해제 누락 경로를 연결했다. 누적 Java 275/413종·858경로, 잔여 Java 138종/Python 150종. 근거: `viewer-legend-handlers-boolean-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer OperationNumberMenu/OperationStringMenu 계열 10종 전체 658줄 판독. 수치 컬럼별 비교자 선택, Creation Order의 인덱스 기준, 역순 이름 정렬 시 topology/preview 그룹도 함께 반전하는 호출 경로를 연결했다. 누적 Java 285/413종·878경로, 잔여 Java 128종/Python 150종. 근거: `viewer-legend-sort-menus-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer Triangular3DIcon 전체 578줄 판독. 헤더의 두 bool 인자별 UI 색상 분기, 위/아래 삼각형의 전체 선분 루프, Graphics 색상 미복원과 위쪽 아이콘의 우측 경계 1픽셀 초과를 연결했다. viewer/legends 고유 42종 전체 판독 근거 확보. 누적 Java 286/413종·880경로, 잔여 Java 127종/Python 150종. 근거: `viewer-legend-triangle-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer ConvertorDialog/Frame와 listener·AdvancingTextArea·WaitingContainer 10종 전체 606줄 판독. 모달 출력명 반환과 취소 null 경로, 독립 창의 Okay/Cancel/닫기 모두 JVM 종료, 패널/프로세스 취소 미확정 범위를 연결했다. 누적 Java 296/413종·900경로, 잔여 Java 117종/Python 150종. 근거: `viewer-convertor-windows-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer InputStreamThread/ProgressAction/SwingProcessWorker 3종 전체 570줄 판독. 초기화 중 프로세스 실행 실패 시 status0 잔존, 출력 수집의 비EDT 갱신·미대기 종료, 파일 크기 기반 진행률을 연결했다. 누적 Java 299/413종·906경로, 잔여 Java 114종/Python 150종. 근거: `viewer-convertor-process-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer ConvertorConst 전체 484줄 판독. 형식별 JAR/라이브러리 경로와 시스템 속성 초기화, 구분자 변경 시 TXT 경로를 UTE 경로로 덮는 참조 오류를 연결했다. 누적 Java 300/413종·908경로, 잔여 Java 113종/Python 150종. 근거: `viewer-convertor-const-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer ConvertorPanel 및 중첩 9종 전체 2424줄 판독. JAR 검사 전 출력 삭제, 현재 출력 필드 반환, 실행 실패 후 OK 활성화, Stop의 직접 finished 호출과 중복 완료 경로를 연결했다. 독립 Frame에는 실제 OK 버튼이 없음을 보충했다. 누적 Java 310/413종·928경로, 잔여 Java 103종/Python 150종. 근거: `viewer-convertor-panel-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer TimelineFrame/닫기 listener 전체 459줄 판독. 패널 생성 전 전역 창 등록, 현재 전역 창을 닫는 이벤트, 독립 main의 설정 초기화와 viewID CLI를 연결했다. 누적 Java 312/413종·932경로, 잔여 Java 101종/Python 150종. 근거: `viewer-timeline-frame-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer TimelinePanel/PreviewStateComboBox 계열/TreeTrunkPanel 5종 전체 1075줄 판독. 로그 트리·시간/행 viewport 연결과 초기화, 미리보기 변경 시 설정 창 전체 필드 덮어쓰기 및 null 참조 후 부분 갱신을 연결했다. 누적 Java 317/413종·942경로, 잔여 Java 96종/Python 150종. 근거: `viewer-timeline-panel-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer SearchCriteria/SearchTreeTrunk 2종 전체 486줄 판독. 전체 시간 검색의 선택 행·카테고리 필터, 연속 검색 커서 소거, 시간 평균 통계의 shadow/실체 병합 순서를 연결했다. 누적 Java 319/413종·946경로, 잔여 Java 94종/Python 150종. 근거: `viewer-timeline-search-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer InfoDialogForDrawable 계열과 공통 InfoDialog/Duration/Time 7종 전체 787줄 판독. 시작·클릭·끝점 중심 이동, 정적 시간 표시와 mutable 시간 범위 참조, 호출 측에 위임된 닫기 이벤트 연결을 구분했다. 누적 Java 326/413종·960경로, 잔여 Java 87종/Python 150종. 근거: `viewer-info-dialogs-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer InfoPanelForDrawable/TextAreaBuffer 2종 전체 1202줄 판독. 선택 하위 카테고리 표식 소거, 공유 여백 Component 재부착, 좌표 duration/전체 범위/평균 좌표와 가중치 표시를 구분했다. 누적 Java 328/413종·964경로, 잔여 Java 85종/Python 150종. 근거: `viewer-info-panel-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer SearchPanel/SummarizableView/TimeFormat/OperationDurationPanel 계열 6종 전체 567줄 판독. 표시 시간의 단위 경계·부호 보존, 구간 통계 요청의 공유 결과 창 및 연속 클릭 경쟁 가능성을 연결했다. 누적 Java 334/413종·976경로, 잔여 Java 79종/Python 150종. 근거: `viewer-duration-operation-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer CanvasTimeline 전체 1079줄 판독. 그리기·클릭 판정 순서와 표시/검색 필터 차이, 정보 창 및 실제 시간 평균 통계 생성 경로, 공유 트리·선택 조건 참조를 연결했다. 누적 Java 335/413종·978경로, 잔여 Java 78종/Python 150종. 근거: `viewer-timeline-canvas-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer ScrollableObject/CoordPixelImage/SearchableView/InitializableDialog 4종 전체 1444줄 판독. 3장·6뷰 이미지 재사용과 반올림 좌표 변환을 연결했으며, CanvasTimeline 자체 setCursor는 상속된 무동작 override라는 보충을 남겼다. 누적 Java 339/413종·986경로, 잔여 Java 74종/Python 150종. 근거: `viewer-scrollable-coordinates-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer ViewportTime/4개 리스너 5종 전체 1676줄 판독. 정보 창 버튼·창 닫기 처리 연결을 해결하고, 시작점을 넘는 드래그의 반대쪽 경계 잔존과 setView 반복 시 리스너·창 목록 교체를 기록했다. 누적 Java 344/413종·996경로, 잔여 Java 69종/Python 150종. 근거: `viewer-time-viewport-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer SearchDialog/닫기 리스너/ViewportTimePanel/ScrollableView 4종 전체 485줄 판독. 검색 창 숨김·강조 제거와 내용 교체, 전역 First 창 기준 위치, null 제목의 기존 제목 유지 및 테두리 크기 계산을 연결했다. 누적 Java 348/413종·1004경로, 잔여 Java 65종/Python 150종. 근거: `viewer-search-dialog-panel-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer ViewportTimeYaxis 전체 1069줄 판독. 검색 창 닫기는 강조만 제거하며, 검색 실패는 외부 시각 sentinel을 초기화해 다음 버튼에서 명시 시각 검색으로 재진입하는 연결을 확인했다. 검색 시작점·세로 이동·강조 사각형 계산도 기록했다. 누적 Java 349/413종·1006경로, 잔여 Java 64종/Python 150종. 근거: `viewer-yaxis-viewport-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer ModelTime/ScrollbarTime/TimeEvent/TimeListener 4종 전체 1331줄 판독. 화면·스크롤바 좌표 분리와 이벤트 환류, 범위 상한 제한·정밀도 경고 후 계속 진행, 새 확대 작업 뒤 redo 보존 및 확대 배율/실제 범위 차이를 연결했다. 누적 Java 353/413종·1014경로, 잔여 Java 60종/Python 150종. 근거: `viewer-time-model-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer 확대·이동·검색 action 및 ToolBarStatus 13종 전체 618줄 판독. 확대 단계 0의 축소 허용과 음수 단계 Home 거부, 경고 뒤 버튼 갱신, 수평 block/2·수직 component height/2 이동, 검색 반환값 폐기를 기존 모델·viewport와 연결했다. 실제 버튼 활성화 정책은 TimelineToolBar 판독 전 유보. 누적 Java 366/413종·1040경로, 잔여 Java 47종/Python 150종. 근거: `viewer-navigation-actions-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 TimelineToolBar 및 새로 고침·종료·트리 action 7종 전체1590줄 판독. 일반 toolbar는 단계0의 축소를 비활성화함을 확인해 앞선 action 단독 분석의 UI 적용 범위를 해소했다. 음수 Home 활성/처리 거부, 비삽입 Commit 버튼 경유 redraw, 환경설정 필드 적용→static 갱신→맵 갱신 오류 후 계속 redraw, Print stub·Stop dispose를 연결했다. 누적 Java373/413종·1054경로, 잔여 Java40종/Python150종. 근거: `viewer-timeline-toolbar-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 ActionTimelineMark/Move/Delete 3종 전체632줄 판독. 표시는 버퍼 갱신 뒤 레벨 검사, 이동은 전체 분리 후 삽입 위치 계산·확장 경로 복원, 삭제는 확인 뒤 버퍼 조회·순차 제거한다. 정상 끝의 버튼 갱신과 직접 Commit 미호출을 연결했으며 tree 내부 효과·버퍼 불변조건은 후속 판독 대상이다. 누적 Java376/413종·1060경로, 잔여 Java37종/Python150종. 근거: `viewer-timeline-edit-actions-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 YaxisTree/named_vector/YaxisTreeNode 3종 전체641줄 판독. 깊이만 비교하는 선택 버퍼·재표시 실패 전 기존 버퍼 소거·루트 및 자기 이동 대상 허용을 앞선 action과 연결했다. 마지막 leaf 깊이 기반 레벨 배열·루트 단독의 음수 확대 cursor와 명시적 canvas commit 부재를 기록했다. 누적 Java379/413종·1066경로, 잔여 Java34종/Python150종. 근거: `viewer-yaxis-tree-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 YaxisMaps/IntegerArrayComparator 2종 전체739줄 판독. 좌표 배열 정렬·공통 노드 구성, 캐시된 노드의 현재 조상에서 보이는 행 검색, 삭제 뒤 null 행 저장·실패 반환과 Commit의 계속 진행을 연결했다. 배열 비교는 int 차감으로 overflow 가능하며 갱신은 원래 line→node 매핑을 재구성하지 않는다. 누적 Java381/413종·1070경로, 잔여 Java32종/Python150종. 근거: `viewer-yaxis-maps-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 Debug/Diagnosis/Profile 3종 전체393줄 판독. 호출자에게 맡긴 active 검사, 별도 상태와 공통 System.out, 파일 설정의 전역 stdout 교체, START/END 위치>0 검사와 level0에서만 출력하는 무제한 버퍼를 연결했다. 누적 Java384/413종·1076경로, 잔여 Java29종/Python150종. 근거: `viewer-diagnostics-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 RulerTime 1종 전체287줄 판독, 기존 Routines 눈금 helper207–286줄 재확인. 버퍼 범위/20 기반 간격·시작 내림·끝+간격 순회와 화면 좌표/서식·고정 폰트를 연결했다. 유효 간격·시간 증가·반복 상한 검사가 없고 Graphics 해제는 정상 끝에만 있다. 누적 Java385/413종·1078경로, 잔여 Java28종/Python150종. 근거: `viewer-time-ruler-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 ScaledSlider 1종 전체477줄 판독. 생성 시 비율0·범위 변경 후 비율 계산, 범위 밖 입력의 상하한 확장, 최대값 기준 눈금 간격과 정수 라벨 반복의 zero-step 방어 부재를 확인했다. setValLabelFully는 강제 이벤트 없이 위임한다. 실제 초기화 순서는 RowAdjustments 후속 판독 대상. 누적 Java386/413종·1080경로, 잔여 Java27종/Python150종. 근거: `viewer-scaled-slider-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 ModelTimePanel/시간 범위·초점·픽셀 입력 listener 4종 전체707줄 판독. 읽기전용·편집 필드와 live 모델 갱신, 범위 검사 후 확대→초점 설정 순서, 픽셀 해상도의 focus 중심 확대, NaN/무한대 거부 부재를 연결했다. 누적 Java390/413종·1088경로, 잔여 Java23종/Python150종. 근거: `viewer-time-panel-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 RowAdjustments 본체1종 전체736줄 판독. 화면 크기 기반 초기 rowheight·최소값 도달 플래그, 실제 viewport 기준 슬라이더 범위 선설정 후 텍스트 이벤트, 트리 변경 후 모드 무관 count 이벤트를 연결했다. 내부 listener8종은 별도 후속 판독 대상. 누적 Java391/413종·1090경로, 잔여 Java22종/Python150종. 근거: `viewer-row-adjustments-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.

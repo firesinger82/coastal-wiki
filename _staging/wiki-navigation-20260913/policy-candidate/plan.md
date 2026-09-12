@@ -2,7 +2,7 @@
 
 ## 현재 작업
 
-구조 개편 P1·P3 — [_staging/wiki-navigation-20260913/README.md](_staging/wiki-navigation-20260913/README.md) 실행 기록 참조; 현재 사용자 지시 우선, 과거 재개 지시를 자동 실행하지 않음.
+구조 개편 P1·P3·P2 — [_staging/wiki-navigation-20260913/README.md](_staging/wiki-navigation-20260913/README.md) 실행 기록 참조; 현재 사용자 지시 우선, 과거 재개 지시를 자동 실행하지 않음.
 
 ## 2026-09-12 사용자 범위 정정 (과거 계획보다 우선)
 
@@ -1742,6 +1742,12 @@ XB-SC-001~012의 초기화·hotstart·BMI·오류 종료·MPI 소유 계약을 �
 
 R1 전체는 미완이며 후보 수를 도달성 검증이나 진행률로 올리지 않는다. 다음은 [동결 R1-G1/G2/G3](_staging/total-read/model-audit/XBeach/connectivity/runtime-20260912/remaining-gaps.json)의 호출 조건·generic·미분류 정의·동적 wrapper 대조다. R2/R3 전체/R4는 기존 범위와 미완 상태를 유지한다. [실행 메모](_staging/total-read/model-audit/XBeach/connectivity/runtime-20260912/EXECUTION-NOTES.md)에 sandbox 시작 실패와 승인 실행 경로를 남겼다.
 
+### 2026-09-12 R1-G2/G3 인터페이스·도움 루틴 판정
+
+기준은 `760413c`와 runtime-20260912의 동결 후보 인덱스다. 미분류 26개 정의는 기존 57개 Fortran·2개 Python과 동일한 27개 생성 출력 안의 이름 참조·공개 인터페이스·실제 호출을 대조하여 도움 루틴/비활성/인터페이스/누락 연결로 처분한다. 이름 검색 부재만으로 전역 사장 코드를 확정하지 않는다. Python의 동적 getter/setter는 타입·rank·shape 조건과 C export/인수/복사·pointer 계약을 결속한다. 생성 include는 재사용 해시 아래에서 정의·generic·호스트 소비자를 확장한다. 외부 라이브러리 구현과 새 입력은 제외한다.
+
+R1-G2/G3의 종료는 해당 고정 목록의 설명 없는 항목이 없어지고 명시된 소스 제약과 근거가 있는 경우에만 한다. R1-G1 전체의 generic 타입·가시성·공동 실행 조건 대조와 R2는 이 작업만으로 닫지 않는다. 필요한 최소 재현은 원문 wrapper 메서드와 표식 native 인터페이스로 범위를 고정하며 전체 솔버 실행으로 표현하지 않는다. 이미 확인된 lifecycle 결론은 재사용한다. 결과를 기존 lifecycle/build 노트에 출처와 함께 보강하고 독립 검토·manifest 설치·불변 292개 검사·커밋·푸시를 마친다.
+
 
 ### 2026-09-12~13 COASTAL-WIKI 실제 구조 파악·개편 계획 검토
 
@@ -1750,3 +1756,8 @@ R1 전체는 미완이며 후보 수를 도달성 검증이나 진행률로 올�
 ### 2026-09-13 구조 개편 P1 구현 착수
 
 2026-09-13 사용자의 "진행해" 지시에 따라 검토된 구조 개편 계획의 구현에 착수했다. 범위는 고정 8파일(`README.md`·`INDEX.md`·`models/INDEX.md`·`concepts/waves/README.md`·`models/XBeach/README.md`·`concepts/_template/README.md`·`plan.md`·`AGENTS.md`)과 P1 이전에 동결한 12문항 전후 확인이다. 정책 개정(P2)은 별도 묶음이며, 이 승인은 XBeach 감사의 자동 재개나 새 모델 주장의 사람 승인이 아니다.
+
+## 2026-09-13 P2 채택 — 정책 패치 검토
+
+사용자의 진행 지시에 따라 기존 R3의 개별 정정과 전체 감사를 구분하는 원칙을 공통 규약에 명시한다. 적용·검토 결과는 [_staging/wiki-navigation-20260913/README.md](_staging/wiki-navigation-20260913/README.md)를 참조한다. 기존 고정 집합·승인·완료 조건 변경은 없다.
+

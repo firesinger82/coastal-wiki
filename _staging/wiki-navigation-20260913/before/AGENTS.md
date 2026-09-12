@@ -13,10 +13,9 @@
 
 ## 작업 진입 시
 
-1. [plan.md 최상단 "현재 작업"](plan.md#현재-작업) 확인 — 활성 작업과 그 실행 기록의 포인터다. **현재 사용자 지시가 이 포인터보다 우선**하며, 포인터나 과거 재개 기록을 자동 실행 명령으로 해석하지 않는다.
-2. [README.md](README.md) → [INDEX.md](INDEX.md) → 해당 디렉토리 확인
-3. 새 토픽: `concepts/_template/`에서 `README.md` + `01-concept.md` 두 파일부터 ([CONVENTIONS.md §8](CONVENTIONS.md)), 02~06은 sourced claim이 생기면 추가
-4. 새 모델: `models/_template/` 복제
+1. [README.md](README.md) → [INDEX.md](INDEX.md) → 해당 디렉토리 확인
+2. 새 토픽: `concepts/_template/` 복제
+3. 새 모델: `models/_template/` 복제
 
 ## 큰 변경 시 워크플로
 

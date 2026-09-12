@@ -1,18 +1,14 @@
 # concepts/_template/
 
-새 토픽 생성용 템플릿. 최소 시작은 **README.md + 01-concept.md 두 파일**이다 ([CONVENTIONS.md §8](../../CONVENTIONS.md)). 필요한 단계 파일만 골라 복사한다:
+새 토픽 생성용 템플릿. 다음과 같이 사용:
 
 ```bash
-mkdir concepts/<topic-name>
-cp concepts/_template/README.md concepts/_template/01-concept.md concepts/<topic-name>/
+cp -r concepts/_template concepts/<topic-name>
 cd concepts/<topic-name>
-# README.md + 01-concept.md 부터 작성 (frontmatter citation_status 명시)
-# 02~06 은 sourced claim 이 쌓이면 그때 _template 에서 복사
+# 6개 파일 채우기
 ```
 
 ## 단계 파일
-
-`01`은 시작 파일, `02`~`06`은 해당 근거를 갖춘 단언이 생겼을 때 선택적으로 추가한다.
 
 | 파일 | 역할 |
 |---|---|

@@ -1,9 +1,5 @@
 # coastal-wiki 초기 구조 결정 기록
 
-## 현재 작업
-
-구조 개편 P1·P3 — [_staging/wiki-navigation-20260913/README.md](_staging/wiki-navigation-20260913/README.md) 실행 기록 참조; 현재 사용자 지시 우선, 과거 재개 지시를 자동 실행하지 않음.
-
 ## 2026-09-12 사용자 범위 정정 (과거 계획보다 우선)
 
 XBeach 분석 중 부속 MPI/Jumpshot 뷰어 내부 판독으로 이탈한 작업을 중단한다. 모델 전수 분석·완벽 마무리·GOAL은 동봉 의존성 전체 역어셈블리를 뜻하지 않는다. 이 문서의 과거 컨테이너·부속 도구 전수 판독 요구는 [CLAUDE.md의 범위 통제](CLAUDE.md#모델-분석-범위-통제)에 따라 제한한다. 부속 도구 미판독 수는 모델 완료의 필수 조건이 아니며, 과거 증거와 모델 자체의 검토·승인 조건은 보존한다.
@@ -1742,11 +1738,13 @@ XB-SC-001~012의 초기화·hotstart·BMI·오류 종료·MPI 소유 계약을 �
 
 R1 전체는 미완이며 후보 수를 도달성 검증이나 진행률로 올리지 않는다. 다음은 [동결 R1-G1/G2/G3](_staging/total-read/model-audit/XBeach/connectivity/runtime-20260912/remaining-gaps.json)의 호출 조건·generic·미분류 정의·동적 wrapper 대조다. R2/R3 전체/R4는 기존 범위와 미완 상태를 유지한다. [실행 메모](_staging/total-read/model-audit/XBeach/connectivity/runtime-20260912/EXECUTION-NOTES.md)에 sandbox 시작 실패와 승인 실행 경로를 남겼다.
 
+### 2026-09-12 R1-G2/G3 인터페이스·도움 루틴 판정
+
+기준은 `760413c`와 runtime-20260912의 동결 후보 인덱스다. 미분류 26개 정의는 기존 57개 Fortran·2개 Python과 동일한 27개 생성 출력 안의 이름 참조·공개 인터페이스·실제 호출을 대조하여 도움 루틴/비활성/인터페이스/누락 연결로 처분한다. 이름 검색 부재만으로 전역 사장 코드를 확정하지 않는다. Python의 동적 getter/setter는 타입·rank·shape 조건과 C export/인수/복사·pointer 계약을 결속한다. 생성 include는 재사용 해시 아래에서 정의·generic·호스트 소비자를 확장한다. 외부 라이브러리 구현과 새 입력은 제외한다.
+
+R1-G2/G3의 종료는 해당 고정 목록의 설명 없는 항목이 없어지고 명시된 소스 제약과 근거가 있는 경우에만 한다. R1-G1 전체의 generic 타입·가시성·공동 실행 조건 대조와 R2는 이 작업만으로 닫지 않는다. 필요한 최소 재현은 원문 wrapper 메서드와 표식 native 인터페이스로 범위를 고정하며 전체 솔버 실행으로 표현하지 않는다. 이미 확인된 lifecycle 결론은 재사용한다. 결과를 기존 lifecycle/build 노트에 출처와 함께 보강하고 독립 검토·manifest 설치·불변 292개 검사·커밋·푸시를 마친다.
+
 
 ### 2026-09-12~13 COASTAL-WIKI 실제 구조 파악·개편 계획 검토
 
 사용자가 이번 조사에 근거한 구조 개편 계획을 Claude와 만들고, 현재 폴더부터 파악하도록 요청했다. [실제 구조](_staging/wiki-structure-20260912/current-structure.md)에 개념 10개·모델 13개, 원자료·기준·데이터·수집·도구·감사 영역, 중복 목차와 검색 경계를 기록했다. [상세 계획](_staging/wiki-structure-20260912/plan.md)은 기존 폴더 유지, 실제 영역 안내·모델 목차·waves–XBeach 탐색 개선, 기존 개별 보강/전체 감사 구분의 공통 명시화를 제안한다. [Claude 공동 검토·후속 대조와 Codex 반증 검토](_staging/wiki-structure-20260912/review-response.md)를 반영했다. 계획만 작성했으며 정책 채택·canonical 개편·XBeach 재개·완료 상태 변경은 수행하지 않았다.
-
-### 2026-09-13 구조 개편 P1 구현 착수
-
-2026-09-13 사용자의 "진행해" 지시에 따라 검토된 구조 개편 계획의 구현에 착수했다. 범위는 고정 8파일(`README.md`·`INDEX.md`·`models/INDEX.md`·`concepts/waves/README.md`·`models/XBeach/README.md`·`concepts/_template/README.md`·`plan.md`·`AGENTS.md`)과 P1 이전에 동결한 12문항 전후 확인이다. 정책 개정(P2)은 별도 묶음이며, 이 승인은 XBeach 감사의 자동 재개나 새 모델 주장의 사람 승인이 아니다.

@@ -22,46 +22,14 @@
 
 ## 디렉토리
 
-아래는 현재 저장소에 **주요 영역**과 그 역할이다. 작성 지식 / 원자료·기준 / 적용·근거 / 수집 / 도구·작업기록의 역할은 서로 다르다. 존재하는 자료, 검색되는 자료, 검증된 근거는 같지 않다.
-
-### 작성 지식 (canonical)
-
 | 경로 | 역할 |
 |---|---|
-| `concepts/<토픽>/` | 도메인 개념 (1차 축). `_template/`에서 README + 01부터 복사 |
-| `models/<모델>/` | 모델별 객관 자료 (2차 축). `source-analysis/`, `manual-notes/`, `web-refs/`. 목차 [models/INDEX.md](models/INDEX.md), 감사 원장 [models/AUDIT-LEDGER.md](models/AUDIT-LEDGER.md) |
-| `textbook/notes/` | 교과서 통합 노트와 인용 (`source_id` 기반, 원본 경로는 [sources.yml](textbook/sources.yml)). 원본 PDF는 wiki에 복사 안 함 |
-| `experience/` | 객관화 통과한 경험. `failure-patterns/`·`heuristics/`·`playbooks/` 포함 |
-
-### 원자료·변환본·기준
-
-| 경로 | 역할 |
-|---|---|
-| `models/<모델>/raw/` | 로컬 모델 원본(`source_code/`, 일부 `manuals/`). 인용은 repo-상대 `file:line`, 검색 대상 아님 |
-| `textbook/md/` | 교과서 텍스트 변환본. 원문 페이지 lookup 용도이며 작성 노트보다 낮게 정렬 |
-| `standards/` | **KDS 설계기준의 변환본** — `kds-64/` 항만·어항 기준 34개와 [안내](standards/README.md). 변환 원자료이며 검증된 AI 노트와 구별한다 |
-
-### 적용·근거
-
-| 경로 | 역할 |
-|---|---|
-| `examples/` | 개념·모델을 가로지르는 실습 시나리오 ([안내](examples/README.md)) |
-| `data/` | **`experience/` 분석 노트의 근거 데이터** — `khoa-analysis/`(원자료 추출·중간 JSON), `sst-global/`(시계열·분석 결과). 개인 run 결과 저장소가 아니다 |
-
-### 수집
-
-| 경로 | 역할 |
-|---|---|
-| `research/` | 자료 수집·후보 검토 공간(`inbox/`·`digests/`·`watchlist/`·`prompts/`·`seeds/`). canonical 본문에서 직접 인용 금지 |
-| `references/collect.py` | **arXiv → `research/inbox` 수집 코드**. 문헌 보관소가 아니라 실행 스크립트다 |
-
-### 도구·작업 기록
-
-| 경로 | 역할 |
-|---|---|
-| `tools/` | 검색(`llm-wiki-poc/`)·자가감사(`llm-wiki-audit/`)·게이트(`resume-gate/`)·검사 스크립트(`validate-*`)·재현 도구 |
-| `_staging/` | 진행 중 작업 및 반영된 작업의 검토·판독 증거 보존 |
-| `_archive/` | 과거 통합본·검토 이력 보존 |
+| `concepts/<토픽>/` | 도메인 개념 (1차 축). `_template/` 복제해서 새 토픽 생성 |
+| `models/<모델>/` | 모델별 객관 자료 (2차 축). `source-analysis/`, `manual-notes/`, `web-refs/` |
+| `textbook/` | 교과서 통합 노트와 인용 (`source_id` 기반, 원본 경로는 [sources.yml](textbook/sources.yml)). 원본 PDF는 wiki에 복사 안 함 |
+| `examples/` | 개념을 가로지르는 실습 |
+| `experience/` | 객관화 통과한 경험 |
+| `research/` | Hermes `coastal-research` 워크벤치. X·arXiv·블로그·툴 후보 수집, digest, watchlist. 본문에서 직접 인용 금지 |
 
 ## 진입 순서
 
@@ -75,17 +43,9 @@
 
 ## 동기화
 
-이 PC = writer, 다른 PC = reader. git push/pull로 sync. 절차·훅 설치는 [SYNC.md](SYNC.md).
+이 PC = writer, 다른 PC = reader. git push/pull로 sync.
 
 신규 계산머신 1회 세팅: `git clone` 후 [RUNS-CHANNEL.md §2.0](RUNS-CHANNEL.md) 체크리스트를 따른다.
-
-## 운영 안내 (지식 목차와 구별)
-
-- [BOUNDARY.md](BOUNDARY.md) — modeling-wiki와의 저장소 경계
-- [RUNS-CHANNEL.md](RUNS-CHANNEL.md) — 개인 run 결과 → `coastal-runs` → `experience/` 채널
-- [SYNC.md](SYNC.md) — writer/reader 동기화·훅
-- [.claude/skills/coastal-audit/SKILL.md](.claude/skills/coastal-audit/SKILL.md) — 감사 절차(Adversary·human gate)
-- [.claude/skills/coastal-promote/SKILL.md](.claude/skills/coastal-promote/SKILL.md) — `research/inbox`·`_archive` → canonical promote 절차
 
 ## 우선 읽을 문서
 
