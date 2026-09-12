@@ -175,3 +175,7 @@ Method는 4바이트 정수 식별자로 1을 CONNECT_COMPOSITE_STATE로 정의�
 ## InputAPI/Kind 판독
 
 `input-kind-read.json`은 전체 172줄을 결박한다. InputAPI는 peek와 5개 getter 선언만 제공하며 소비·정렬·close 규약을 구현하지 않는다. Kind는 정수 index의 값 동등성을 구현하지만 converter는 정적 객체 identity로 분기한다. decoder의 반환 방식은 후속 판독 대상이다. 전체 승인 미발급.
+
+## TRACE converter 판독
+
+`trace-converter-read.json`은 전체 864줄을 결박한다. Composite/YCoordMap을 지원하고 static initializer에서 TraceInput을 로드한다. 도움말/미인식 옵션/위치 인자를 filespec으로 이어 붙이며 빈 문자열을 null 검사로 거르지 못한다. 정상 EOF 출력 순서는 기존 converter와 연결된다. 네이티브 입력 구현과 실행 검증은 별도다.

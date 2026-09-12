@@ -322,6 +322,7 @@ def main():
     read('bytecode-read/clog2-converter-read.json')
     read('bytecode-read/clog-converter-read.json')
     read('bytecode-read/input-kind-read.json')
+    read('bytecode-read/trace-converter-read.json')
     read('bytecode-read/coverage.json')
     formula_name = 'workbook-formula-read.json'
     if (HERE / formula_name).is_file():
