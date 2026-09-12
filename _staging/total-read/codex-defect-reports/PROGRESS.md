@@ -269,3 +269,5 @@ Claude Sonnet 5의 [한정 재검토](../model-audit/XBeach/HG-ADVERSARIAL-RECHE
 2026-09-12 viewer HTMLviewer/리스너 8종 전체 910줄 판독. 잘못된 URL 오류 처리의 null 참조, 페이지 로드 전 이력 변경/실패 시 미복원, 새 링크 이동 후 redo 유지, UI 이벤트 큐의 링크 로드를 연결했다. 누적 Java 244/413종·796경로, 잔여 Java 169종/Python 150종. viewer/first 잔여 클래스는 없다. 근거: `viewer-html-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
 
 2026-09-12 viewer LegendFrame/닫기 리스너 2종 전체 403줄 판독. 기존 범례/타임라인 정리 후 조기 등록, 표시 상태 변경 후 Control 호출, 독립 main 초기화 전제조건과 로그 소유권을 연결했다. 누적 Java 246/413종·800경로, 잔여 Java 167종/Python 150종. LegendPanel 내부는 후속 범위다. 근거: `viewer-legend-frame-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer LegendPanel/LegendTable 2종 전체 582줄 판독. 행 선택과 표시 속성의 구분, 전역 범례 숨김, 컬럼별 메뉴/마우스 처리 연결, 초기 렌더러 표본 크기 계산을 기록했다. 누적 Java 248/413종·804경로, 잔여 Java 165종/Python 150종. 실제 데이터/정렬 변경은 LegendTableModel과 메뉴 후속 범위다. 근거: `viewer-legend-panel-table-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
