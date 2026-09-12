@@ -340,6 +340,7 @@ def main():
     read('bytecode-read/clog2-print-onepass-read.json')
     read('bytecode-read/clog2-print-twopass-read.json')
     read('bytecode-read/lowlevel-print-read.json')
+    read('bytecode-read/basic-topology-read.json')
     read('bytecode-read/coverage.json')
     formula_name = 'workbook-formula-read.json'
     if (HERE / formula_name).is_file():
