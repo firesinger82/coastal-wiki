@@ -111,3 +111,5 @@ Claude Sonnet 5의 [한정 재검토](../model-audit/XBeach/HG-ADVERSARIAL-RECHE
 2026-09-11 보고서 Native 본문 글꼴 정의 지원: 두 미지원 스트림의 인코딩·글꼴·스타일 정의를 읽어 보고서 388개 전체가 기계적으로 판독된다. 이전 386개 출력 동일, 두 F093 글리프의 시각/의미는 미확정. 통합 검증 485개 PASS, 전체 gate NOT_PASSED·GOAL active. [근거](../model-audit/XBeach/connectivity/nonhydro-read/NATIVE-FONT-SURVEY.md).
 
 2026-09-11 매뉴얼 색상·정렬 예외 진단: 8개 태그 없는 탭 목록 해석 및 12개 색상 0 미해석 보존으로 20개 조건부 구조를 확보했다. strict 거부는 유지하며 23개(opaque 3 포함)의 해석/렌더 조건은 미해결이다. 전체 486개 구조 대응을 확보했고 통합 검증 530개 PASS. 전체 gate NOT_PASSED·GOAL active. [진단 근거](../model-audit/XBeach/connectivity/manuals-docx-read/NATIVE-CONDITIONAL-PROBE.md).
+
+2026-09-12 조건부 Native 수식 20개의 원본 WMF를 문단·관계 ID에 결속해 전량 렌더/시각 확인했다. 새 네모 글리프는 관측하지 않았지만 세 침투식의 분수 뒤 1 앞 연산자 부재를 Native CHAR와 함께 확인했고 Kingsday 대응식의 +1과 구분했다. 원본 표기를 수정하지 않았으며 조건부 해석/수학적 검증은 미완료. 전체 gate NOT_PASSED·GOAL active. [시각 대조 근거](../model-audit/XBeach/connectivity/manuals-docx-read/conditional-visual-read/README.md).

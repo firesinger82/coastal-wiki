@@ -423,6 +423,8 @@ def main():
     checks.extend(font_checks.validate(ROOT, HERE / 'nonhydro-read', font_survey.build))
     from validate_conditional_records import validate as validate_conditional
     checks.extend(validate_conditional(ROOT, HERE / 'manuals-docx-read'))
+    from validate_conditional_visual import validate as validate_visual
+    checks.extend(validate_visual(ROOT, HERE / 'manuals-docx-read'))
     reconciliation = json.loads((HERE / 'resume-reconciliation.json').read_text())
     check('reconciliation-input-bindings', all(digest(ROOT / p) == h for p, h in reconciliation['input_evidence_sha256'].items()))
     check('no-overall-or-human-pass', reconciliation['whole_model_read_gate'] == 'NOT_PASSED' and

@@ -291,6 +291,10 @@ def main():
         assert sha(ROOT / artifact['path']) == artifact['sha256']
     for item in full_docx['records']:
         supplement(item['source'], conditional_name, item['read_status'], ['20 conditional structures retain unresolved source exceptions.'])
+    visual_name = 'manuals-docx-read/conditional-visual-read/receipt.json'
+    visual = read(visual_name)
+    for item in full_docx['records']:
+        supplement(item['source'], visual_name, item['read_status'], visual['limitations'])
     formula_name = 'workbook-formula-read.json'
     if (HERE / formula_name).is_file():
         formula = read(formula_name)
