@@ -896,6 +896,14 @@ def validate(root,here):
         output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
         check(x['sha256'][:10]+'-viewer-time-panel-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
     check('viewer_time_panel-no-approval',viewer_time_panel['whole_model_read_gate']=='NOT_PASSED' and viewer_time_panel['human_approval_issued'] is False)
+    viewer_row_adjustments=json.loads((here/'bytecode-read/viewer-row-adjustments-read.json').read_text())
+    check('viewer-row-adjustments-one-exact',bound(viewer_row_adjustments['prior_receipt']) and len(viewer_row_adjustments['records'])==viewer_row_adjustments['unique_classes_read']==1 and [x['instances'][0]['member'] for x in viewer_row_adjustments['records']]==['viewer/zoomable/RowAdjustments.class'] and viewer_row_adjustments['instances_covered']==2)
+    for x in viewer_row_adjustments['records']:
+        original=next(a for a in r['records'] if a['sha256']==x['sha256'])
+        args=['java','-m','jdk.jdeps/com.sun.tools.javap.Main','-c','-p','-s','-constants',str(root/x['class_file']['path'])]
+        output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
+        check(x['sha256'][:10]+'-viewer-row-adjustments-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
+    check('viewer_row_adjustments-no-approval',viewer_row_adjustments['whole_model_read_gate']=='NOT_PASSED' and viewer_row_adjustments['human_approval_issued'] is False)
     spec=importlib.util.spec_from_file_location('bytecode_coverage',here/'reconcile_bytecode_coverage.py')
     module=importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
