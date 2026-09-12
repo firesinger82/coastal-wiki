@@ -318,6 +318,7 @@ def main():
     read('bytecode-read/primitive-read.json')
     read('bytecode-read/composite-read.json')
     read('bytecode-read/output-node-read.json')
+    read('bytecode-read/output-flow-read.json')
     read('bytecode-read/coverage.json')
     formula_name = 'workbook-formula-read.json'
     if (HERE / formula_name).is_file():

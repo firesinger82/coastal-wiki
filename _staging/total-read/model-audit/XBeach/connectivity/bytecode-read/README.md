@@ -159,3 +159,7 @@ Method는 4바이트 정수 식별자로 1을 CONNECT_COMPOSITE_STATE로 정의�
 ## Output TreeNode 판독
 
 `output-node-read.json`은 전체 TreeNode 표시 내용을 결박한다. category-null Composite 분해, shadow 생성/기간 갱신/가중치 초기화/병합/shift/저장 후 empty를 연결했다. 상위 driver가 이 순서를 보장하는지는 후속 판독 대상이다. 전체 gate NOT_PASSED.
+
+## 출력 흐름 판독
+
+`output-flow-read.json`은 TreeTrunk/OutputLog 전체 723줄을 결박한다. TreeTrunk가 finalizeLatestTime 후 writeTreeNode를 호출하면 OutputLog가 vertical merge/horizontal shift 후 저장하고, TreeTrunk가 empty한다. flush는 root 요약 후 last marker를 비운다. OutputLog.close는 trunk flush를 호출하지 않으므로 converter 순서가 남은 확인 대상이다. 정상 경로의 순서 근거이며 모든 입력/오류 경로의 승인으로 확대하지 않는다.

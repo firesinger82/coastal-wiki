@@ -1,0 +1,84 @@
+{
+  "date": "2026-09-12",
+  "attribution": "AI direct bytecode reading; not independent semantic approval.",
+  "prior_receipt": {
+    "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/disassembly-receipt.json",
+    "sha256": "1cc8b2657a74f3f5904e9d0a40648b1c98f6e031b056b7c6e19122beb632aaa8"
+  },
+  "records": [
+    {
+      "sha256": "81add6baa7b8ccfdc216f19bda359d1a813d1eea507642828e3ee33121fdbefd",
+      "instances": [
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/win32/mpich/bin/clog2TOslog2.jar",
+          "member": "logformat/slog2/output/OutputLog.class"
+        },
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/win32/mpich/bin/traceTOslog2.jar",
+          "member": "logformat/slog2/output/OutputLog.class"
+        },
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/bin/clog2TOslog2.jar",
+          "member": "logformat/slog2/output/OutputLog.class"
+        },
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/bin/traceTOslog2.jar",
+          "member": "logformat/slog2/output/OutputLog.class"
+        }
+      ],
+      "class_file": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/classes/81add6baa7b8ccfdc216f19bda359d1a813d1eea507642828e3ee33121fdbefd.class",
+        "sha256": "81add6baa7b8ccfdc216f19bda359d1a813d1eea507642828e3ee33121fdbefd"
+      },
+      "disassembly": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/disassembly/81add6baa7b8ccfdc216f19bda359d1a813d1eea507642828e3ee33121fdbefd.txt",
+        "sha256": "ed94927b820289d56b016149ae431e0999370c9a0082351fca20217487b9832b"
+      },
+      "read_lines": [
+        1,
+        437
+      ],
+      "scope": "Entire javap display including private methods, exception tables and finalizer where present.",
+      "observation": "Constructor opens rw file (no truncate call here), initializes header, reusable byte buffer/data stream, directory, writes initial header. Leaf-size setter replaces buffers; fanout setter delegates header. writeTreeNode captures file pointer and estimated node size, copies node ID/time bounds to directory, sets node block pointer, merges vertical shadows, shifts/finalizes horizontal shadow, resets byte buffer, serializes/flushes/writes actual bytes and updates max buffer size. Estimated pointer size is not compared with actual size here. This fills TreeTrunk finalizeLatestTime -> OutputLog merge/shift/write -> TreeTrunk empty lifecycle. writeFilePart records start, writes buffer, sets int-cast actual pointer delta; category/line maps/directory use it. Header rewrite uses most recently written node pointer as root and TreeDir root depth, seeks zero. close writes directory then header and closes streams; no closed guard, finalize calls close again with super.finalize in finally. IO failures print and System.exit(1), no transaction rollback. No TreeTrunk flush call in close; converter responsible. Existing-file tail and repeated-close effects are local observations, normal caller handling remains to read. Archived application not executed."
+    },
+    {
+      "sha256": "621e25db82123702961cc3471cc2491725767af905a21c9f74daa2e40990afcb",
+      "instances": [
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/win32/mpich/bin/clog2TOslog2.jar",
+          "member": "logformat/slog2/output/TreeTrunk.class"
+        },
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/win32/mpich/bin/traceTOslog2.jar",
+          "member": "logformat/slog2/output/TreeTrunk.class"
+        },
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/bin/clog2TOslog2.jar",
+          "member": "logformat/slog2/output/TreeTrunk.class"
+        },
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/bin/traceTOslog2.jar",
+          "member": "logformat/slog2/output/TreeTrunk.class"
+        }
+      ],
+      "class_file": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/classes/621e25db82123702961cc3471cc2491725767af905a21c9f74daa2e40990afcb.class",
+        "sha256": "621e25db82123702961cc3471cc2491725767af905a21c9f74daa2e40990afcb"
+      },
+      "disassembly": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/disassembly/621e25db82123702961cc3471cc2491725767af905a21c9f74daa2e40990afcb.txt",
+        "sha256": "ca91e9aa3ada4faef29bc9e68b2dc73d39a6d27070d76f24a0fe9a6f7d5046e1"
+      },
+      "read_lines": [
+        1,
+        286
+      ],
+      "scope": "Entire javap display including private methods, exception tables and finalizer where present.",
+      "observation": "Constructor reads fanout/leaf size from OutputLog, creates leaf/root with definitions before ID assignment. addDrawable checks leaf node size+drawable size before insertion and may switch branch; first oversized item can switch with last_dobj null, no guard here. Traverses leaf-to-root placing drawable at first node with earliest<=drawable earliest, otherwise root and expands earliest. No final-time ordering validation here. Branch switch increments copied leaf ID, finalizes latest time, writes node through OutputLog, empties, moves earliest to prior latest, updates ID, promotes ID to parent, creates new root if needed with previous earliest. flush false when no last object; otherwise finalizes/writes bottom-up, final root gets identity map and category summary before empty; clears last marker, repeated immediate flush false. Confirms normal local write-then-empty sequence and definitions-before-lazy-shadow initialization; higher converter must provide ordered/valid data. Identity map getter returns stored reference. Archived application not executed."
+    }
+  ],
+  "unique_classes_read": 2,
+  "instances_covered": 8,
+  "whole_model_read_gate": "NOT_PASSED",
+  "human_approval_issued": false
+}
