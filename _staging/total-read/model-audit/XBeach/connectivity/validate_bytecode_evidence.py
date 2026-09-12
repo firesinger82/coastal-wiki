@@ -320,6 +320,14 @@ def validate(root,here):
         output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
         check(x['sha256'][:10]+'-color-alpha-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
     check('color-alpha-no-approval',color_alpha['whole_model_read_gate']=='NOT_PASSED' and color_alpha['human_approval_issued'] is False)
+    category=json.loads((here/'bytecode-read/category-read.json').read_text())
+    check('category-one-exact',bound(category['prior_receipt']) and len(category['records'])==category['unique_classes_read']==1 and category['records'][0]['instances'][0]['member']=='base/drawable/Category.class' and category['instances_covered']==6)
+    for x in category['records']:
+        original=next(a for a in r['records'] if a['sha256']==x['sha256'])
+        args=['java','-m','jdk.jdeps/com.sun.tools.javap.Main','-c','-p','-s','-constants',str(root/x['class_file']['path'])]
+        output=subprocess.check_output(args,text=True).replace(str(root/x['class_file']['path']),x['class_file']['path'])
+        check(x['sha256'][:10]+'-category-read',all(x[k]==original[k] for k in ('instances','class_file','disassembly')) and x['read_lines']==[1,original['disassembly_lines']] and output==(root/x['disassembly']['path']).read_text() and bool(x['observation']))
+    check('category-no-approval',category['whole_model_read_gate']=='NOT_PASSED' and category['human_approval_issued'] is False)
     spec=importlib.util.spec_from_file_location('bytecode_coverage',here/'reconcile_bytecode_coverage.py')
     module=importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
