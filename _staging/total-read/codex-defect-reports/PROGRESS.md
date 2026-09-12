@@ -289,3 +289,5 @@ Claude Sonnet 5의 [한정 재검토](../model-audit/XBeach/HG-ADVERSARIAL-RECHE
 2026-09-12 viewer ConvertorConst 전체 484줄 판독. 형식별 JAR/라이브러리 경로와 시스템 속성 초기화, 구분자 변경 시 TXT 경로를 UTE 경로로 덮는 참조 오류를 연결했다. 누적 Java 300/413종·908경로, 잔여 Java 113종/Python 150종. 근거: `viewer-convertor-const-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
 
 2026-09-12 viewer ConvertorPanel 및 중첩 9종 전체 2424줄 판독. JAR 검사 전 출력 삭제, 현재 출력 필드 반환, 실행 실패 후 OK 활성화, Stop의 직접 finished 호출과 중복 완료 경로를 연결했다. 독립 Frame에는 실제 OK 버튼이 없음을 보충했다. 누적 Java 310/413종·928경로, 잔여 Java 103종/Python 150종. 근거: `viewer-convertor-panel-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer TimelineFrame/닫기 listener 전체 459줄 판독. 패널 생성 전 전역 창 등록, 현재 전역 창을 닫는 이벤트, 독립 main의 설정 초기화와 viewID CLI를 연결했다. 누적 Java 312/413종·932경로, 잔여 Java 101종/Python 150종. 근거: `viewer-timeline-frame-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
