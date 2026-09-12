@@ -1,0 +1,1222 @@
+Compiled from "ScrollableObject.java"
+public abstract class viewer.zoomable.ScrollableObject extends javax.swing.JComponent implements viewer.zoomable.ScrollableView {
+  private static final int NumImages = 3;
+    descriptor: I
+
+  protected static final int NumViewsPerImage = 2;
+    descriptor: I
+
+  protected static final int NumViewsTotal = 6;
+    descriptor: I
+
+  private viewer.zoomable.ModelTime model;
+    descriptor: Lviewer/zoomable/ModelTime;
+
+  private javax.swing.JViewport src_vport;
+    descriptor: Ljavax/swing/JViewport;
+
+  private java.awt.Image[] offscreenImages;
+    descriptor: [Ljava/awt/Image;
+
+  private base.drawable.TimeBoundingBox[] tImages;
+    descriptor: [Lbase/drawable/TimeBoundingBox;
+
+  private double tImage_extent;
+    descriptor: D
+
+  private base.drawable.TimeBoundingBox tImages_all;
+    descriptor: Lbase/drawable/TimeBoundingBox;
+
+  private int half_NumImages;
+    descriptor: I
+
+  private int cur_img_idx;
+    descriptor: I
+
+  private java.awt.Dimension visible_size;
+    descriptor: Ljava/awt/Dimension;
+
+  private java.awt.Dimension image_size;
+    descriptor: Ljava/awt/Dimension;
+
+  private java.awt.Dimension component_size;
+    descriptor: Ljava/awt/Dimension;
+
+  public viewer.zoomable.ScrollableObject(viewer.zoomable.ModelTime);
+    descriptor: (Lviewer/zoomable/ModelTime;)V
+    Code:
+       0: aload_0
+       1: invokespecial #1                  // Method javax/swing/JComponent."<init>":()V
+       4: aload_0
+       5: aconst_null
+       6: putfield      #2                  // Field model:Lviewer/zoomable/ModelTime;
+       9: aload_0
+      10: aload_1
+      11: putfield      #2                  // Field model:Lviewer/zoomable/ModelTime;
+      14: aload_0
+      15: iconst_3
+      16: anewarray     #3                  // class java/awt/Image
+      19: putfield      #4                  // Field offscreenImages:[Ljava/awt/Image;
+      22: aload_0
+      23: iconst_3
+      24: anewarray     #5                  // class base/drawable/TimeBoundingBox
+      27: putfield      #6                  // Field tImages:[Lbase/drawable/TimeBoundingBox;
+      30: iconst_0
+      31: istore_2
+      32: iload_2
+      33: iconst_3
+      34: if_icmpge     56
+      37: aload_0
+      38: getfield      #6                  // Field tImages:[Lbase/drawable/TimeBoundingBox;
+      41: iload_2
+      42: new           #5                  // class base/drawable/TimeBoundingBox
+      45: dup
+      46: invokespecial #7                  // Method base/drawable/TimeBoundingBox."<init>":()V
+      49: aastore
+      50: iinc          2, 1
+      53: goto          32
+      56: aload_0
+      57: new           #5                  // class base/drawable/TimeBoundingBox
+      60: dup
+      61: invokespecial #7                  // Method base/drawable/TimeBoundingBox."<init>":()V
+      64: putfield      #8                  // Field tImages_all:Lbase/drawable/TimeBoundingBox;
+      67: aload_0
+      68: iconst_0
+      69: invokespecial #9                  // Method javax/swing/JComponent.setDoubleBuffered:(Z)V
+      72: aload_0
+      73: iconst_1
+      74: putfield      #10                 // Field half_NumImages:I
+      77: aload_0
+      78: invokespecial #11                 // Method setImagesInitTimeBounds:()V
+      81: aload_0
+      82: new           #12                 // class java/awt/Dimension
+      85: dup
+      86: iconst_0
+      87: iconst_0
+      88: invokespecial #13                 // Method java/awt/Dimension."<init>":(II)V
+      91: putfield      #14                 // Field image_size:Ljava/awt/Dimension;
+      94: aload_0
+      95: aload_0
+      96: invokespecial #15                 // Method javax/swing/JComponent.getSize:()Ljava/awt/Dimension;
+      99: putfield      #16                 // Field component_size:Ljava/awt/Dimension;
+     102: aload_0
+     103: bipush        7
+     105: invokevirtual #17                 // Method setDebugGraphicsOptions:(I)V
+     108: return
+
+  private void setImagesInitTimeBounds();
+    descriptor: ()V
+    Code:
+       0: aload_0
+       1: getfield      #2                  // Field model:Lviewer/zoomable/ModelTime;
+       4: invokevirtual #18                 // Method viewer/zoomable/ModelTime.getTimeViewExtent:()D
+       7: dstore_1
+       8: aload_0
+       9: ldc2_w        #19                 // double 2.0d
+      12: dload_1
+      13: dmul
+      14: putfield      #21                 // Field tImage_extent:D
+      17: aload_0
+      18: getfield      #8                  // Field tImages_all:Lbase/drawable/TimeBoundingBox;
+      21: invokevirtual #22                 // Method base/drawable/TimeBoundingBox.reinitialize:()V
+      24: iconst_0
+      25: istore_3
+      26: aload_0
+      27: getfield      #6                  // Field tImages:[Lbase/drawable/TimeBoundingBox;
+      30: iload_3
+      31: aaload
+      32: aload_0
+      33: getfield      #2                  // Field model:Lviewer/zoomable/ModelTime;
+      36: invokevirtual #23                 // Method viewer/zoomable/ModelTime.getTimeViewPosition:()D
+      39: ldc2_w        #24                 // double 0.5d
+      42: dload_1
+      43: dmul
+      44: ldc2_w        #26                 // double 5.0d
+      47: dmul
+      48: dsub
+      49: invokevirtual #28                 // Method base/drawable/TimeBoundingBox.setEarliestTime:(D)V
+      52: aload_0
+      53: getfield      #6                  // Field tImages:[Lbase/drawable/TimeBoundingBox;
+      56: iload_3
+      57: aaload
+      58: aload_0
+      59: getfield      #21                 // Field tImage_extent:D
+      62: invokevirtual #29                 // Method base/drawable/TimeBoundingBox.setLatestFromEarliest:(D)V
+      65: aload_0
+      66: getfield      #8                  // Field tImages_all:Lbase/drawable/TimeBoundingBox;
+      69: aload_0
+      70: getfield      #6                  // Field tImages:[Lbase/drawable/TimeBoundingBox;
+      73: iload_3
+      74: aaload
+      75: invokevirtual #30                 // Method base/drawable/TimeBoundingBox.affectTimeBounds:(Lbase/drawable/TimeBoundingBox;)V
+      78: iconst_1
+      79: istore_3
+      80: iload_3
+      81: iconst_3
+      82: if_icmpge     137
+      85: aload_0
+      86: getfield      #6                  // Field tImages:[Lbase/drawable/TimeBoundingBox;
+      89: iload_3
+      90: aaload
+      91: aload_0
+      92: getfield      #6                  // Field tImages:[Lbase/drawable/TimeBoundingBox;
+      95: iload_3
+      96: iconst_1
+      97: isub
+      98: aaload
+      99: invokevirtual #31                 // Method base/drawable/TimeBoundingBox.getLatestTime:()D
+     102: invokevirtual #28                 // Method base/drawable/TimeBoundingBox.setEarliestTime:(D)V
+     105: aload_0
+     106: getfield      #6                  // Field tImages:[Lbase/drawable/TimeBoundingBox;
+     109: iload_3
+     110: aaload
+     111: aload_0
+     112: getfield      #21                 // Field tImage_extent:D
+     115: invokevirtual #29                 // Method base/drawable/TimeBoundingBox.setLatestFromEarliest:(D)V
+     118: aload_0
+     119: getfield      #8                  // Field tImages_all:Lbase/drawable/TimeBoundingBox;
+     122: aload_0
+     123: getfield      #6                  // Field tImages:[Lbase/drawable/TimeBoundingBox;
+     126: iload_3
+     127: aaload
+     128: invokevirtual #30                 // Method base/drawable/TimeBoundingBox.affectTimeBounds:(Lbase/drawable/TimeBoundingBox;)V
+     131: iinc          3, 1
+     134: goto          80
+     137: aload_0
+     138: aload_0
+     139: getfield      #10                 // Field half_NumImages:I
+     142: putfield      #32                 // Field cur_img_idx:I
+     145: return
+
+  public java.lang.String getStringforTimesOfImages();
+    descriptor: ()Ljava/lang/String;
+    Code:
+       0: new           #33                 // class java/lang/StringBuffer
+       3: dup
+       4: invokespecial #34                 // Method java/lang/StringBuffer."<init>":()V
+       7: astore_1
+       8: iconst_0
+       9: istore_2
+      10: iload_2
+      11: iconst_3
+      12: if_icmpge     64
+      15: aload_1
+      16: new           #35                 // class java/lang/StringBuilder
+      19: dup
+      20: invokespecial #36                 // Method java/lang/StringBuilder."<init>":()V
+      23: ldc           #37                 // String tImages[
+      25: invokevirtual #38                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      28: iload_2
+      29: invokevirtual #39                 // Method java/lang/StringBuilder.append:(I)Ljava/lang/StringBuilder;
+      32: ldc           #40                 // String  ] =
+      34: invokevirtual #38                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      37: aload_0
+      38: getfield      #6                  // Field tImages:[Lbase/drawable/TimeBoundingBox;
+      41: iload_2
+      42: aaload
+      43: invokevirtual #41                 // Method java/lang/StringBuilder.append:(Ljava/lang/Object;)Ljava/lang/StringBuilder;
+      46: ldc           #42                 // String \n
+      48: invokevirtual #38                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      51: invokevirtual #43                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+      54: invokevirtual #44                 // Method java/lang/StringBuffer.append:(Ljava/lang/String;)Ljava/lang/StringBuffer;
+      57: pop
+      58: iinc          2, 1
+      61: goto          10
+      64: aload_1
+      65: invokevirtual #45                 // Method java/lang/StringBuffer.toString:()Ljava/lang/String;
+      68: areturn
+
+  public base.drawable.TimeBoundingBox getTimeBoundsOfImages();
+    descriptor: ()Lbase/drawable/TimeBoundingBox;
+    Code:
+       0: new           #5                  // class base/drawable/TimeBoundingBox
+       3: dup
+       4: aload_0
+       5: getfield      #8                  // Field tImages_all:Lbase/drawable/TimeBoundingBox;
+       8: invokespecial #46                 // Method base/drawable/TimeBoundingBox."<init>":(Lbase/drawable/TimeBoundingBox;)V
+      11: areturn
+
+  private int getValidImageIndex(int);
+    descriptor: (I)I
+    Code:
+       0: iload_1
+       1: iconst_3
+       2: irem
+       3: istore_2
+       4: iload_2
+       5: ifge          12
+       8: iload_2
+       9: iconst_3
+      10: iadd
+      11: ireturn
+      12: iload_2
+      13: ireturn
+
+  private int getNearPastImageIndex(int);
+    descriptor: (I)I
+    Code:
+       0: iload_1
+       1: ifne          6
+       4: iconst_2
+       5: ireturn
+       6: iload_1
+       7: iconst_1
+       8: isub
+       9: ireturn
+
+  private int getNearFutureImageIndex(int);
+    descriptor: (I)I
+    Code:
+       0: iload_1
+       1: iconst_2
+       2: if_icmpne     7
+       5: iconst_0
+       6: ireturn
+       7: iload_1
+       8: iconst_1
+       9: iadd
+      10: ireturn
+
+  private java.awt.Image createImage(java.awt.Dimension);
+    descriptor: (Ljava/awt/Dimension;)Ljava/awt/Image;
+    Code:
+       0: invokestatic  #47                 // Method viewer/zoomable/Debug.isActive:()Z
+       3: ifeq          28
+       6: new           #35                 // class java/lang/StringBuilder
+       9: dup
+      10: invokespecial #36                 // Method java/lang/StringBuilder."<init>":()V
+      13: ldc           #48                 // String ScrollableObject: createImage()\'s image_sz =
+      15: invokevirtual #38                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      18: aload_1
+      19: invokevirtual #41                 // Method java/lang/StringBuilder.append:(Ljava/lang/Object;)Ljava/lang/StringBuilder;
+      22: invokevirtual #43                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+      25: invokestatic  #49                 // Method viewer/zoomable/Debug.println:(Ljava/lang/String;)V
+      28: aload_1
+      29: getfield      #50                 // Field java/awt/Dimension.width:I
+      32: ifle          55
+      35: aload_1
+      36: getfield      #51                 // Field java/awt/Dimension.height:I
+      39: ifle          55
+      42: aload_0
+      43: aload_1
+      44: getfield      #50                 // Field java/awt/Dimension.width:I
+      47: aload_1
+      48: getfield      #51                 // Field java/awt/Dimension.height:I
+      51: invokespecial #52                 // Method javax/swing/JComponent.createImage:(II)Ljava/awt/Image;
+      54: areturn
+      55: aconst_null
+      56: areturn
+
+  private int getNumImagesMoved();
+    descriptor: ()I
+    Code:
+       0: aload_0
+       1: getfield      #2                  // Field model:Lviewer/zoomable/ModelTime;
+       4: invokevirtual #23                 // Method viewer/zoomable/ModelTime.getTimeViewPosition:()D
+       7: dstore_1
+       8: aload_0
+       9: getfield      #2                  // Field model:Lviewer/zoomable/ModelTime;
+      12: invokevirtual #18                 // Method viewer/zoomable/ModelTime.getTimeViewExtent:()D
+      15: dstore_3
+      16: dload_1
+      17: dload_3
+      18: dadd
+      19: dstore        5
+      21: invokestatic  #47                 // Method viewer/zoomable/Debug.isActive:()Z
+      24: ifeq          99
+      27: ldc           #53                 // String ScrollableObject: getNumImagesMoved()\'s START:
+      29: invokestatic  #49                 // Method viewer/zoomable/Debug.println:(Ljava/lang/String;)V
+      32: new           #35                 // class java/lang/StringBuilder
+      35: dup
+      36: invokespecial #36                 // Method java/lang/StringBuilder."<init>":()V
+      39: ldc           #54                 // String cur_tView_init  =
+      41: invokevirtual #38                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      44: dload_1
+      45: invokevirtual #55                 // Method java/lang/StringBuilder.append:(D)Ljava/lang/StringBuilder;
+      48: ldc           #56                 // String ,
+      50: invokevirtual #38                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      53: ldc           #57                 // String cur_tView_final =
+      55: invokevirtual #38                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      58: dload         5
+      60: invokevirtual #55                 // Method java/lang/StringBuilder.append:(D)Ljava/lang/StringBuilder;
+      63: invokevirtual #43                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+      66: invokestatic  #49                 // Method viewer/zoomable/Debug.println:(Ljava/lang/String;)V
+      69: new           #35                 // class java/lang/StringBuilder
+      72: dup
+      73: invokespecial #36                 // Method java/lang/StringBuilder."<init>":()V
+      76: ldc           #58                 // String tImages[ cur ] =
+      78: invokevirtual #38                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      81: aload_0
+      82: getfield      #6                  // Field tImages:[Lbase/drawable/TimeBoundingBox;
+      85: aload_0
+      86: getfield      #32                 // Field cur_img_idx:I
+      89: aaload
+      90: invokevirtual #41                 // Method java/lang/StringBuilder.append:(Ljava/lang/Object;)Ljava/lang/StringBuilder;
+      93: invokevirtual #43                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+      96: invokestatic  #49                 // Method viewer/zoomable/Debug.println:(Ljava/lang/String;)V
+      99: aload_0
+     100: getfield      #8                  // Field tImages_all:Lbase/drawable/TimeBoundingBox;
+     103: invokevirtual #59                 // Method base/drawable/TimeBoundingBox.getEarliestTime:()D
+     106: dstore        14
+     108: invokestatic  #47                 // Method viewer/zoomable/Debug.isActive:()Z
+     111: ifeq          137
+     114: new           #35                 // class java/lang/StringBuilder
+     117: dup
+     118: invokespecial #36                 // Method java/lang/StringBuilder."<init>":()V
+     121: ldc           #60                 // String ScrollableObject: getNumImagesMoved() tImages_init =
+     123: invokevirtual #38                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     126: dload         14
+     128: invokevirtual #55                 // Method java/lang/StringBuilder.append:(D)Ljava/lang/StringBuilder;
+     131: invokevirtual #43                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+     134: invokestatic  #49                 // Method viewer/zoomable/Debug.println:(Ljava/lang/String;)V
+     137: dload_1
+     138: dload         14
+     140: dsub
+     141: aload_0
+     142: getfield      #21                 // Field tImage_extent:D
+     145: ddiv
+     146: dstore        7
+     148: dload         7
+     150: invokestatic  #61                 // Method java/lang/Math.floor:(D)D
+     153: d2i
+     154: aload_0
+     155: getfield      #10                 // Field half_NumImages:I
+     158: isub
+     159: istore        11
+     161: dload         5
+     163: dload         14
+     165: dsub
+     166: aload_0
+     167: getfield      #21                 // Field tImage_extent:D
+     170: ddiv
+     171: dstore        9
+     173: dload         9
+     175: invokestatic  #61                 // Method java/lang/Math.floor:(D)D
+     178: d2i
+     179: aload_0
+     180: getfield      #10                 // Field half_NumImages:I
+     183: isub
+     184: istore        12
+     186: iconst_0
+     187: istore        13
+     189: iload         11
+     191: ifle          198
+     194: iload         11
+     196: istore        13
+     198: iload         12
+     200: ifge          207
+     203: iload         12
+     205: istore        13
+     207: invokestatic  #47                 // Method viewer/zoomable/Debug.isActive:()Z
+     210: ifeq          241
+     213: new           #35                 // class java/lang/StringBuilder
+     216: dup
+     217: invokespecial #36                 // Method java/lang/StringBuilder."<init>":()V
+     220: ldc           #62                 // String ScrollableObject: getNumImagesMoved() Nmages_moved =
+     222: invokevirtual #38                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     225: iload         13
+     227: invokevirtual #39                 // Method java/lang/StringBuilder.append:(I)Ljava/lang/StringBuilder;
+     230: invokevirtual #43                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+     233: invokestatic  #49                 // Method viewer/zoomable/Debug.println:(Ljava/lang/String;)V
+     236: ldc           #63                 // String ScrollableObject: getNumImagesMoved()\'s END:
+     238: invokestatic  #49                 // Method viewer/zoomable/Debug.println:(Ljava/lang/String;)V
+     241: iload         13
+     243: ireturn
+
+  public void checkToZoomView();
+    descriptor: ()V
+    Code:
+       0: invokestatic  #47                 // Method viewer/zoomable/Debug.isActive:()Z
+       3: ifeq          11
+       6: ldc           #64                 // String ScrollableObject: checkToZoomView()\'s START:
+       8: invokestatic  #49                 // Method viewer/zoomable/Debug.println:(Ljava/lang/String;)V
+      11: aload_0
+      12: getfield      #2                  // Field model:Lviewer/zoomable/ModelTime;
+      15: invokevirtual #18                 // Method viewer/zoomable/ModelTime.getTimeViewExtent:()D
+      18: dstore_1
+      19: dload_1
+      20: ldc2_w        #19                 // double 2.0d
+      23: dmul
+      24: aload_0
+      25: getfield      #21                 // Field tImage_extent:D
+      28: dcmpl
+      29: ifeq          81
+      32: aload_0
+      33: invokespecial #11                 // Method setImagesInitTimeBounds:()V
+      36: aload_0
+      37: aload_0
+      38: getfield      #8                  // Field tImages_all:Lbase/drawable/TimeBoundingBox;
+      41: invokevirtual #65                 // Method initializeAllOffImages:(Lbase/drawable/TimeBoundingBox;)V
+      44: iconst_0
+      45: istore_3
+      46: iload_3
+      47: iconst_3
+      48: if_icmpge     73
+      51: aload_0
+      52: aload_0
+      53: getfield      #4                  // Field offscreenImages:[Ljava/awt/Image;
+      56: iload_3
+      57: aaload
+      58: aload_0
+      59: getfield      #6                  // Field tImages:[Lbase/drawable/TimeBoundingBox;
+      62: iload_3
+      63: aaload
+      64: invokevirtual #66                 // Method drawOneOffImage:(Ljava/awt/Image;Lbase/drawable/TimeBoundingBox;)V
+      67: iinc          3, 1
+      70: goto          46
+      73: aload_0
+      74: aload_0
+      75: getfield      #8                  // Field tImages_all:Lbase/drawable/TimeBoundingBox;
+      78: invokevirtual #67                 // Method finalizeAllOffImages:(Lbase/drawable/TimeBoundingBox;)V
+      81: invokestatic  #47                 // Method viewer/zoomable/Debug.isActive:()Z
+      84: ifeq          92
+      87: ldc           #68                 // String ScrollableObject: checkToZoomView()\'s END:
+      89: invokestatic  #49                 // Method viewer/zoomable/Debug.println:(Ljava/lang/String;)V
+      92: return
+
+  public void checkToScrollView();
+    descriptor: ()V
+    Code:
+       0: invokestatic  #47                 // Method viewer/zoomable/Debug.isActive:()Z
+       3: ifeq          11
+       6: ldc           #69                 // String ScrollableObject: checkToScrollView()\'s START:
+       8: invokestatic  #49                 // Method viewer/zoomable/Debug.println:(Ljava/lang/String;)V
+      11: iconst_0
+      12: istore_2
+      13: aload_0
+      14: invokespecial #70                 // Method getNumImagesMoved:()I
+      17: istore_1
+      18: iload_1
+      19: ifeq          557
+      22: iload_1
+      23: invokestatic  #71                 // Method java/lang/Math.abs:(I)I
+      26: iconst_3
+      27: if_icmpgt     461
+      30: iload_1
+      31: iload_1
+      32: invokestatic  #71                 // Method java/lang/Math.abs:(I)I
+      35: idiv
+      36: istore_2
+      37: aload_0
+      38: aload_0
+      39: getfield      #32                 // Field cur_img_idx:I
+      42: iload_2
+      43: aload_0
+      44: getfield      #10                 // Field half_NumImages:I
+      47: imul
+      48: iadd
+      49: invokespecial #72                 // Method getValidImageIndex:(I)I
+      52: istore        6
+      54: iconst_1
+      55: istore        7
+      57: iload         7
+      59: iload_1
+      60: invokestatic  #71                 // Method java/lang/Math.abs:(I)I
+      63: if_icmpgt     314
+      66: aload_0
+      67: iload         6
+      69: iload_2
+      70: iload         7
+      72: imul
+      73: iadd
+      74: invokespecial #72                 // Method getValidImageIndex:(I)I
+      77: istore_3
+      78: invokestatic  #47                 // Method viewer/zoomable/Debug.isActive:()Z
+      81: ifeq          138
+      84: new           #35                 // class java/lang/StringBuilder
+      87: dup
+      88: invokespecial #36                 // Method java/lang/StringBuilder."<init>":()V
+      91: ldc           #73                 // String ScrollableObject: checkToScrollView() cur_img_idx =
+      93: invokevirtual #38                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      96: aload_0
+      97: getfield      #32                 // Field cur_img_idx:I
+     100: invokevirtual #39                 // Method java/lang/StringBuilder.append:(I)Ljava/lang/StringBuilder;
+     103: ldc           #74                 // String ,
+     105: invokevirtual #38                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     108: ldc           #75                 // String start_idx =
+     110: invokevirtual #38                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     113: iload         6
+     115: invokevirtual #39                 // Method java/lang/StringBuilder.append:(I)Ljava/lang/StringBuilder;
+     118: ldc           #74                 // String ,
+     120: invokevirtual #38                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     123: ldc           #76                 // String img_idx =
+     125: invokevirtual #38                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     128: iload_3
+     129: invokevirtual #39                 // Method java/lang/StringBuilder.append:(I)Ljava/lang/StringBuilder;
+     132: invokevirtual #43                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+     135: invokestatic  #49                 // Method viewer/zoomable/Debug.println:(Ljava/lang/String;)V
+     138: aload_0
+     139: getfield      #8                  // Field tImages_all:Lbase/drawable/TimeBoundingBox;
+     142: aload_0
+     143: getfield      #6                  // Field tImages:[Lbase/drawable/TimeBoundingBox;
+     146: iload_3
+     147: aaload
+     148: invokevirtual #77                 // Method base/drawable/TimeBoundingBox.remove:(Lbase/drawable/TimeBoundingBox;)Z
+     151: ifne          210
+     154: getstatic     #78                 // Field java/lang/System.err:Ljava/io/PrintStream;
+     157: new           #35                 // class java/lang/StringBuilder
+     160: dup
+     161: invokespecial #36                 // Method java/lang/StringBuilder."<init>":()V
+     164: ldc           #79                 // String ScrollableObject: checkToScrollView() tImages[
+     166: invokevirtual #38                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     169: iload_3
+     170: invokevirtual #39                 // Method java/lang/StringBuilder.append:(I)Ljava/lang/StringBuilder;
+     173: ldc           #80                 // String ] =
+     175: invokevirtual #38                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     178: aload_0
+     179: getfield      #6                  // Field tImages:[Lbase/drawable/TimeBoundingBox;
+     182: iload_3
+     183: aaload
+     184: invokevirtual #41                 // Method java/lang/StringBuilder.append:(Ljava/lang/Object;)Ljava/lang/StringBuilder;
+     187: ldc           #81                 // String  does NOT
+     189: invokevirtual #38                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     192: ldc           #82                 // String cover the end of tImages_all =
+     194: invokevirtual #38                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     197: aload_0
+     198: getfield      #8                  // Field tImages_all:Lbase/drawable/TimeBoundingBox;
+     201: invokevirtual #41                 // Method java/lang/StringBuilder.append:(Ljava/lang/Object;)Ljava/lang/StringBuilder;
+     204: invokevirtual #43                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+     207: invokevirtual #83                 // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+     210: iload_2
+     211: ifle          256
+     214: aload_0
+     215: iload_3
+     216: invokespecial #84                 // Method getNearPastImageIndex:(I)I
+     219: istore        4
+     221: aload_0
+     222: getfield      #6                  // Field tImages:[Lbase/drawable/TimeBoundingBox;
+     225: iload_3
+     226: aaload
+     227: aload_0
+     228: getfield      #6                  // Field tImages:[Lbase/drawable/TimeBoundingBox;
+     231: iload         4
+     233: aaload
+     234: invokevirtual #31                 // Method base/drawable/TimeBoundingBox.getLatestTime:()D
+     237: invokevirtual #28                 // Method base/drawable/TimeBoundingBox.setEarliestTime:(D)V
+     240: aload_0
+     241: getfield      #6                  // Field tImages:[Lbase/drawable/TimeBoundingBox;
+     244: iload_3
+     245: aaload
+     246: aload_0
+     247: getfield      #21                 // Field tImage_extent:D
+     250: invokevirtual #29                 // Method base/drawable/TimeBoundingBox.setLatestFromEarliest:(D)V
+     253: goto          295
+     256: aload_0
+     257: iload_3
+     258: invokespecial #85                 // Method getNearFutureImageIndex:(I)I
+     261: istore        5
+     263: aload_0
+     264: getfield      #6                  // Field tImages:[Lbase/drawable/TimeBoundingBox;
+     267: iload_3
+     268: aaload
+     269: aload_0
+     270: getfield      #6                  // Field tImages:[Lbase/drawable/TimeBoundingBox;
+     273: iload         5
+     275: aaload
+     276: invokevirtual #59                 // Method base/drawable/TimeBoundingBox.getEarliestTime:()D
+     279: invokevirtual #86                 // Method base/drawable/TimeBoundingBox.setLatestTime:(D)V
+     282: aload_0
+     283: getfield      #6                  // Field tImages:[Lbase/drawable/TimeBoundingBox;
+     286: iload_3
+     287: aaload
+     288: aload_0
+     289: getfield      #21                 // Field tImage_extent:D
+     292: invokevirtual #87                 // Method base/drawable/TimeBoundingBox.setEarliestFromLatest:(D)V
+     295: aload_0
+     296: getfield      #8                  // Field tImages_all:Lbase/drawable/TimeBoundingBox;
+     299: aload_0
+     300: getfield      #6                  // Field tImages:[Lbase/drawable/TimeBoundingBox;
+     303: iload_3
+     304: aaload
+     305: invokevirtual #30                 // Method base/drawable/TimeBoundingBox.affectTimeBounds:(Lbase/drawable/TimeBoundingBox;)V
+     308: iinc          7, 1
+     311: goto          57
+     314: aload_0
+     315: aload_0
+     316: getfield      #8                  // Field tImages_all:Lbase/drawable/TimeBoundingBox;
+     319: invokevirtual #65                 // Method initializeAllOffImages:(Lbase/drawable/TimeBoundingBox;)V
+     322: iload_2
+     323: ifle          381
+     326: iload_1
+     327: invokestatic  #71                 // Method java/lang/Math.abs:(I)I
+     330: istore        7
+     332: iload         7
+     334: iconst_1
+     335: if_icmplt     436
+     338: aload_0
+     339: iload         6
+     341: iload_2
+     342: iload         7
+     344: imul
+     345: iadd
+     346: invokespecial #72                 // Method getValidImageIndex:(I)I
+     349: istore_3
+     350: aload_0
+     351: getfield      #4                  // Field offscreenImages:[Ljava/awt/Image;
+     354: iload_3
+     355: aaload
+     356: ifnull        375
+     359: aload_0
+     360: aload_0
+     361: getfield      #4                  // Field offscreenImages:[Ljava/awt/Image;
+     364: iload_3
+     365: aaload
+     366: aload_0
+     367: getfield      #6                  // Field tImages:[Lbase/drawable/TimeBoundingBox;
+     370: iload_3
+     371: aaload
+     372: invokevirtual #66                 // Method drawOneOffImage:(Ljava/awt/Image;Lbase/drawable/TimeBoundingBox;)V
+     375: iinc          7, -1
+     378: goto          332
+     381: iconst_1
+     382: istore        7
+     384: iload         7
+     386: iload_1
+     387: invokestatic  #71                 // Method java/lang/Math.abs:(I)I
+     390: if_icmpgt     436
+     393: aload_0
+     394: iload         6
+     396: iload_2
+     397: iload         7
+     399: imul
+     400: iadd
+     401: invokespecial #72                 // Method getValidImageIndex:(I)I
+     404: istore_3
+     405: aload_0
+     406: getfield      #4                  // Field offscreenImages:[Ljava/awt/Image;
+     409: iload_3
+     410: aaload
+     411: ifnull        430
+     414: aload_0
+     415: aload_0
+     416: getfield      #4                  // Field offscreenImages:[Ljava/awt/Image;
+     419: iload_3
+     420: aaload
+     421: aload_0
+     422: getfield      #6                  // Field tImages:[Lbase/drawable/TimeBoundingBox;
+     425: iload_3
+     426: aaload
+     427: invokevirtual #66                 // Method drawOneOffImage:(Ljava/awt/Image;Lbase/drawable/TimeBoundingBox;)V
+     430: iinc          7, 1
+     433: goto          384
+     436: aload_0
+     437: aload_0
+     438: getfield      #8                  // Field tImages_all:Lbase/drawable/TimeBoundingBox;
+     441: invokevirtual #67                 // Method finalizeAllOffImages:(Lbase/drawable/TimeBoundingBox;)V
+     444: aload_0
+     445: aload_0
+     446: aload_0
+     447: getfield      #32                 // Field cur_img_idx:I
+     450: iload_1
+     451: iadd
+     452: invokespecial #72                 // Method getValidImageIndex:(I)I
+     455: putfield      #32                 // Field cur_img_idx:I
+     458: goto          557
+     461: invokestatic  #47                 // Method viewer/zoomable/Debug.isActive:()Z
+     464: ifeq          508
+     467: ldc           #88                 // String ****************************************
+     469: invokestatic  #49                 // Method viewer/zoomable/Debug.println:(Ljava/lang/String;)V
+     472: new           #35                 // class java/lang/StringBuilder
+     475: dup
+     476: invokespecial #36                 // Method java/lang/StringBuilder."<init>":()V
+     479: ldc           #89                 // String ScrollableObject: checkToScrollView() | Nimages_moved(
+     481: invokevirtual #38                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     484: iload_1
+     485: invokevirtual #39                 // Method java/lang/StringBuilder.append:(I)Ljava/lang/StringBuilder;
+     488: ldc           #90                 // String  ) | >= NumImages(
+     490: invokevirtual #38                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     493: iconst_3
+     494: invokevirtual #39                 // Method java/lang/StringBuilder.append:(I)Ljava/lang/StringBuilder;
+     497: ldc           #91                 // String  )
+     499: invokevirtual #38                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     502: invokevirtual #43                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+     505: invokestatic  #49                 // Method viewer/zoomable/Debug.println:(Ljava/lang/String;)V
+     508: aload_0
+     509: invokespecial #11                 // Method setImagesInitTimeBounds:()V
+     512: aload_0
+     513: aload_0
+     514: getfield      #8                  // Field tImages_all:Lbase/drawable/TimeBoundingBox;
+     517: invokevirtual #65                 // Method initializeAllOffImages:(Lbase/drawable/TimeBoundingBox;)V
+     520: iconst_0
+     521: istore_3
+     522: iload_3
+     523: iconst_3
+     524: if_icmpge     549
+     527: aload_0
+     528: aload_0
+     529: getfield      #4                  // Field offscreenImages:[Ljava/awt/Image;
+     532: iload_3
+     533: aaload
+     534: aload_0
+     535: getfield      #6                  // Field tImages:[Lbase/drawable/TimeBoundingBox;
+     538: iload_3
+     539: aaload
+     540: invokevirtual #66                 // Method drawOneOffImage:(Ljava/awt/Image;Lbase/drawable/TimeBoundingBox;)V
+     543: iinc          3, 1
+     546: goto          522
+     549: aload_0
+     550: aload_0
+     551: getfield      #8                  // Field tImages_all:Lbase/drawable/TimeBoundingBox;
+     554: invokevirtual #67                 // Method finalizeAllOffImages:(Lbase/drawable/TimeBoundingBox;)V
+     557: invokestatic  #47                 // Method viewer/zoomable/Debug.isActive:()Z
+     560: ifeq          568
+     563: ldc           #92                 // String ScrollableObject: checkToScrollView()\'s END:
+     565: invokestatic  #49                 // Method viewer/zoomable/Debug.println:(Ljava/lang/String;)V
+     568: return
+
+  protected int time2pixel(double);
+    descriptor: (D)I
+    Code:
+       0: dload_1
+       1: aload_0
+       2: getfield      #8                  // Field tImages_all:Lbase/drawable/TimeBoundingBox;
+       5: invokevirtual #59                 // Method base/drawable/TimeBoundingBox.getEarliestTime:()D
+       8: dsub
+       9: aload_0
+      10: getfield      #2                  // Field model:Lviewer/zoomable/ModelTime;
+      13: invokevirtual #93                 // Method viewer/zoomable/ModelTime.getViewPixelsPerUnitTime:()D
+      16: dmul
+      17: invokestatic  #94                 // Method java/lang/Math.round:(D)J
+      20: l2i
+      21: ireturn
+
+  protected double pixel2time(int);
+    descriptor: (I)D
+    Code:
+       0: iload_1
+       1: i2d
+       2: aload_0
+       3: getfield      #2                  // Field model:Lviewer/zoomable/ModelTime;
+       6: invokevirtual #93                 // Method viewer/zoomable/ModelTime.getViewPixelsPerUnitTime:()D
+       9: ddiv
+      10: aload_0
+      11: getfield      #8                  // Field tImages_all:Lbase/drawable/TimeBoundingBox;
+      14: invokevirtual #59                 // Method base/drawable/TimeBoundingBox.getEarliestTime:()D
+      17: dadd
+      18: dreturn
+
+  public int getXaxisViewPosition();
+    descriptor: ()I
+    Code:
+       0: invokestatic  #47                 // Method viewer/zoomable/Debug.isActive:()Z
+       3: ifeq          34
+       6: new           #35                 // class java/lang/StringBuilder
+       9: dup
+      10: invokespecial #36                 // Method java/lang/StringBuilder."<init>":()V
+      13: ldc           #95                 // String ScrollableObject: getViewPosition() : model.getTimeViewPosition()=
+      15: invokevirtual #38                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      18: aload_0
+      19: getfield      #2                  // Field model:Lviewer/zoomable/ModelTime;
+      22: invokevirtual #23                 // Method viewer/zoomable/ModelTime.getTimeViewPosition:()D
+      25: invokevirtual #55                 // Method java/lang/StringBuilder.append:(D)Ljava/lang/StringBuilder;
+      28: invokevirtual #43                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+      31: invokestatic  #49                 // Method viewer/zoomable/Debug.println:(Ljava/lang/String;)V
+      34: aload_0
+      35: aload_0
+      36: getfield      #2                  // Field model:Lviewer/zoomable/ModelTime;
+      39: invokevirtual #23                 // Method viewer/zoomable/ModelTime.getTimeViewPosition:()D
+      42: invokevirtual #96                 // Method time2pixel:(D)I
+      45: ireturn
+
+  protected abstract void initializeAllOffImages(base.drawable.TimeBoundingBox);
+    descriptor: (Lbase/drawable/TimeBoundingBox;)V
+
+  protected abstract void drawOneOffImage(java.awt.Image, base.drawable.TimeBoundingBox);
+    descriptor: (Ljava/awt/Image;Lbase/drawable/TimeBoundingBox;)V
+
+  protected abstract void finalizeAllOffImages(base.drawable.TimeBoundingBox);
+    descriptor: (Lbase/drawable/TimeBoundingBox;)V
+
+  public void paintComponent(java.awt.Graphics);
+    descriptor: (Ljava/awt/Graphics;)V
+    Code:
+       0: invokestatic  #47                 // Method viewer/zoomable/Debug.isActive:()Z
+       3: ifeq          93
+       6: ldc           #97                 // String ScrollableObject : paintComponent()\'s START :
+       8: invokestatic  #49                 // Method viewer/zoomable/Debug.println:(Ljava/lang/String;)V
+      11: new           #35                 // class java/lang/StringBuilder
+      14: dup
+      15: invokespecial #36                 // Method java/lang/StringBuilder."<init>":()V
+      18: ldc           #98                 // String ScrollableObject : paintComponent() g.getClipBounds() =
+      20: invokevirtual #38                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      23: aload_1
+      24: invokevirtual #99                 // Method java/awt/Graphics.getClipBounds:()Ljava/awt/Rectangle;
+      27: invokevirtual #41                 // Method java/lang/StringBuilder.append:(Ljava/lang/Object;)Ljava/lang/StringBuilder;
+      30: invokevirtual #43                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+      33: invokestatic  #49                 // Method viewer/zoomable/Debug.println:(Ljava/lang/String;)V
+      36: new           #35                 // class java/lang/StringBuilder
+      39: dup
+      40: invokespecial #36                 // Method java/lang/StringBuilder."<init>":()V
+      43: ldc           #100                // String ScrollableObject : paintComponent() this =
+      45: invokevirtual #38                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      48: aload_0
+      49: invokevirtual #41                 // Method java/lang/StringBuilder.append:(Ljava/lang/Object;)Ljava/lang/StringBuilder;
+      52: invokevirtual #43                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+      55: invokestatic  #49                 // Method viewer/zoomable/Debug.println:(Ljava/lang/String;)V
+      58: aload_0
+      59: getfield      #101                // Field src_vport:Ljavax/swing/JViewport;
+      62: ifnull        93
+      65: new           #35                 // class java/lang/StringBuilder
+      68: dup
+      69: invokespecial #36                 // Method java/lang/StringBuilder."<init>":()V
+      72: ldc           #102                // String ScrollableObject: paintComponent() src_vport.getViewPosition() =
+      74: invokevirtual #38                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      77: aload_0
+      78: getfield      #101                // Field src_vport:Ljavax/swing/JViewport;
+      81: invokevirtual #103                // Method javax/swing/JViewport.getViewPosition:()Ljava/awt/Point;
+      84: invokevirtual #41                 // Method java/lang/StringBuilder.append:(Ljava/lang/Object;)Ljava/lang/StringBuilder;
+      87: invokevirtual #43                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+      90: invokestatic  #49                 // Method viewer/zoomable/Debug.println:(Ljava/lang/String;)V
+      93: aload_0
+      94: getfield      #2                  // Field model:Lviewer/zoomable/ModelTime;
+      97: invokevirtual #104                // Method viewer/zoomable/ModelTime.getViewportMovingDir:()I
+     100: istore_3
+     101: iload_3
+     102: ifge          110
+     105: iconst_m1
+     106: istore_3
+     107: goto          112
+     110: iconst_1
+     111: istore_3
+     112: aload_0
+     113: getfield      #14                 // Field image_size:Ljava/awt/Dimension;
+     116: getfield      #50                 // Field java/awt/Dimension.width:I
+     119: istore_2
+     120: aload_0
+     121: getfield      #32                 // Field cur_img_idx:I
+     124: istore        4
+     126: aload_0
+     127: getfield      #10                 // Field half_NumImages:I
+     130: iload_2
+     131: imul
+     132: istore        5
+     134: aload_0
+     135: getfield      #4                  // Field offscreenImages:[Ljava/awt/Image;
+     138: iload         4
+     140: aaload
+     141: ifnull        160
+     144: aload_1
+     145: aload_0
+     146: getfield      #4                  // Field offscreenImages:[Ljava/awt/Image;
+     149: iload         4
+     151: aaload
+     152: iload         5
+     154: iconst_0
+     155: aload_0
+     156: invokevirtual #105                // Method java/awt/Graphics.drawImage:(Ljava/awt/Image;IILjava/awt/image/ImageObserver;)Z
+     159: pop
+     160: iconst_1
+     161: istore        6
+     163: iload         6
+     165: aload_0
+     166: getfield      #10                 // Field half_NumImages:I
+     169: if_icmpgt     296
+     172: iconst_1
+     173: istore        7
+     175: iload         7
+     177: iconst_m1
+     178: if_icmplt     290
+     181: iload         7
+     183: iload_3
+     184: imul
+     185: iload         6
+     187: imul
+     188: istore        8
+     190: aload_0
+     191: aload_0
+     192: getfield      #32                 // Field cur_img_idx:I
+     195: iload         8
+     197: iadd
+     198: invokespecial #72                 // Method getValidImageIndex:(I)I
+     201: istore        4
+     203: invokestatic  #47                 // Method viewer/zoomable/Debug.isActive:()Z
+     206: ifeq          247
+     209: new           #35                 // class java/lang/StringBuilder
+     212: dup
+     213: invokespecial #36                 // Method java/lang/StringBuilder."<init>":()V
+     216: ldc           #106                // String ScrollableObject: paintComponent() side_offset =
+     218: invokevirtual #38                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     221: iload         8
+     223: invokevirtual #39                 // Method java/lang/StringBuilder.append:(I)Ljava/lang/StringBuilder;
+     226: ldc           #56                 // String ,
+     228: invokevirtual #38                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     231: ldc           #76                 // String img_idx =
+     233: invokevirtual #38                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     236: iload         4
+     238: invokevirtual #39                 // Method java/lang/StringBuilder.append:(I)Ljava/lang/StringBuilder;
+     241: invokevirtual #43                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+     244: invokestatic  #49                 // Method viewer/zoomable/Debug.println:(Ljava/lang/String;)V
+     247: aload_0
+     248: getfield      #10                 // Field half_NumImages:I
+     251: iload         8
+     253: iadd
+     254: iload_2
+     255: imul
+     256: istore        5
+     258: aload_0
+     259: getfield      #4                  // Field offscreenImages:[Ljava/awt/Image;
+     262: iload         4
+     264: aaload
+     265: ifnull        284
+     268: aload_1
+     269: aload_0
+     270: getfield      #4                  // Field offscreenImages:[Ljava/awt/Image;
+     273: iload         4
+     275: aaload
+     276: iload         5
+     278: iconst_0
+     279: aload_0
+     280: invokevirtual #105                // Method java/awt/Graphics.drawImage:(Ljava/awt/Image;IILjava/awt/image/ImageObserver;)Z
+     283: pop
+     284: iinc          7, -2
+     287: goto          175
+     290: iinc          6, 1
+     293: goto          163
+     296: invokestatic  #47                 // Method viewer/zoomable/Debug.isActive:()Z
+     299: ifeq          307
+     302: ldc           #107                // String ScrollableObject : paintComponent()\'s END :
+     304: invokestatic  #49                 // Method viewer/zoomable/Debug.println:(Ljava/lang/String;)V
+     307: return
+
+  public abstract int getJComponentHeight();
+    descriptor: ()I
+
+  public void componentResized(javax.swing.JViewport);
+    descriptor: (Ljavax/swing/JViewport;)V
+    Code:
+       0: invokestatic  #47                 // Method viewer/zoomable/Debug.isActive:()Z
+       3: ifeq          33
+       6: ldc           #108                // String ScrollableObject: componentResized()\'s START:
+       8: invokestatic  #49                 // Method viewer/zoomable/Debug.println:(Ljava/lang/String;)V
+      11: new           #35                 // class java/lang/StringBuilder
+      14: dup
+      15: invokespecial #36                 // Method java/lang/StringBuilder."<init>":()V
+      18: ldc           #109                // String incoming viewport =
+      20: invokevirtual #38                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      23: aload_1
+      24: invokevirtual #41                 // Method java/lang/StringBuilder.append:(Ljava/lang/Object;)Ljava/lang/StringBuilder;
+      27: invokevirtual #43                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+      30: invokestatic  #49                 // Method viewer/zoomable/Debug.println:(Ljava/lang/String;)V
+      33: aload_0
+      34: aload_1
+      35: putfield      #101                // Field src_vport:Ljavax/swing/JViewport;
+      38: aload_0
+      39: getfield      #101                // Field src_vport:Ljavax/swing/JViewport;
+      42: ifnull        93
+      45: aload_0
+      46: aload_0
+      47: getfield      #101                // Field src_vport:Ljavax/swing/JViewport;
+      50: invokevirtual #110                // Method javax/swing/JViewport.getExtentSize:()Ljava/awt/Dimension;
+      53: putfield      #111                // Field visible_size:Ljava/awt/Dimension;
+      56: invokestatic  #47                 // Method viewer/zoomable/Debug.isActive:()Z
+      59: ifeq          104
+      62: new           #35                 // class java/lang/StringBuilder
+      65: dup
+      66: invokespecial #36                 // Method java/lang/StringBuilder."<init>":()V
+      69: ldc           #112                // String ScrollableObject: componentResized()\'s src_vport.getViewPosition() =
+      71: invokevirtual #38                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      74: aload_0
+      75: getfield      #101                // Field src_vport:Ljavax/swing/JViewport;
+      78: invokevirtual #103                // Method javax/swing/JViewport.getViewPosition:()Ljava/awt/Point;
+      81: invokevirtual #41                 // Method java/lang/StringBuilder.append:(Ljava/lang/Object;)Ljava/lang/StringBuilder;
+      84: invokevirtual #43                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+      87: invokestatic  #49                 // Method viewer/zoomable/Debug.println:(Ljava/lang/String;)V
+      90: goto          104
+      93: aload_0
+      94: aload_0
+      95: invokevirtual #113                // Method getVisibleRect:()Ljava/awt/Rectangle;
+      98: invokevirtual #114                // Method java/awt/Rectangle.getSize:()Ljava/awt/Dimension;
+     101: putfield      #111                // Field visible_size:Ljava/awt/Dimension;
+     104: aload_0
+     105: getfield      #14                 // Field image_size:Ljava/awt/Dimension;
+     108: aload_0
+     109: getfield      #111                // Field visible_size:Ljava/awt/Dimension;
+     112: getfield      #50                 // Field java/awt/Dimension.width:I
+     115: iconst_2
+     116: imul
+     117: aload_0
+     118: invokevirtual #115                // Method getJComponentHeight:()I
+     121: invokevirtual #116                // Method java/awt/Dimension.setSize:(II)V
+     124: iconst_0
+     125: istore_2
+     126: iconst_0
+     127: istore_3
+     128: iload_3
+     129: iconst_3
+     130: if_icmpge     165
+     133: aload_0
+     134: getfield      #4                  // Field offscreenImages:[Ljava/awt/Image;
+     137: iload_3
+     138: aload_0
+     139: aload_0
+     140: getfield      #14                 // Field image_size:Ljava/awt/Dimension;
+     143: invokespecial #117                // Method createImage:(Ljava/awt/Dimension;)Ljava/awt/Image;
+     146: aastore
+     147: aload_0
+     148: getfield      #4                  // Field offscreenImages:[Ljava/awt/Image;
+     151: iload_3
+     152: aaload
+     153: ifnull        159
+     156: iinc          2, 1
+     159: iinc          3, 1
+     162: goto          128
+     165: iload_2
+     166: iconst_3
+     167: if_icmpne     201
+     170: aload_0
+     171: getfield      #111                // Field visible_size:Ljava/awt/Dimension;
+     174: getfield      #50                 // Field java/awt/Dimension.width:I
+     177: ifle          201
+     180: aload_0
+     181: getfield      #2                  // Field model:Lviewer/zoomable/ModelTime;
+     184: aload_0
+     185: getfield      #111                // Field visible_size:Ljava/awt/Dimension;
+     188: getfield      #50                 // Field java/awt/Dimension.width:I
+     191: invokevirtual #118                // Method viewer/zoomable/ModelTime.setViewPixelsPerUnitTime:(I)V
+     194: aload_0
+     195: getfield      #2                  // Field model:Lviewer/zoomable/ModelTime;
+     198: invokevirtual #119                // Method viewer/zoomable/ModelTime.updatePixelCoords:()V
+     201: aload_0
+     202: getfield      #16                 // Field component_size:Ljava/awt/Dimension;
+     205: aload_0
+     206: getfield      #14                 // Field image_size:Ljava/awt/Dimension;
+     209: getfield      #50                 // Field java/awt/Dimension.width:I
+     212: iconst_3
+     213: imul
+     214: aload_0
+     215: getfield      #14                 // Field image_size:Ljava/awt/Dimension;
+     218: getfield      #51                 // Field java/awt/Dimension.height:I
+     221: invokevirtual #116                // Method java/awt/Dimension.setSize:(II)V
+     224: aload_0
+     225: aload_0
+     226: getfield      #16                 // Field component_size:Ljava/awt/Dimension;
+     229: invokevirtual #120                // Method setSize:(Ljava/awt/Dimension;)V
+     232: aload_0
+     233: aload_0
+     234: getfield      #32                 // Field cur_img_idx:I
+     237: aload_0
+     238: getfield      #10                 // Field half_NumImages:I
+     241: iadd
+     242: iconst_1
+     243: iadd
+     244: invokespecial #72                 // Method getValidImageIndex:(I)I
+     247: istore_3
+     248: aload_0
+     249: aload_0
+     250: getfield      #8                  // Field tImages_all:Lbase/drawable/TimeBoundingBox;
+     253: invokevirtual #65                 // Method initializeAllOffImages:(Lbase/drawable/TimeBoundingBox;)V
+     256: iconst_0
+     257: istore        4
+     259: iload         4
+     261: iconst_3
+     262: if_icmpge     293
+     265: aload_0
+     266: aload_0
+     267: getfield      #4                  // Field offscreenImages:[Ljava/awt/Image;
+     270: iload_3
+     271: aaload
+     272: aload_0
+     273: getfield      #6                  // Field tImages:[Lbase/drawable/TimeBoundingBox;
+     276: iload_3
+     277: aaload
+     278: invokevirtual #66                 // Method drawOneOffImage:(Ljava/awt/Image;Lbase/drawable/TimeBoundingBox;)V
+     281: aload_0
+     282: iload_3
+     283: invokespecial #85                 // Method getNearFutureImageIndex:(I)I
+     286: istore_3
+     287: iinc          4, 1
+     290: goto          259
+     293: aload_0
+     294: aload_0
+     295: getfield      #8                  // Field tImages_all:Lbase/drawable/TimeBoundingBox;
+     298: invokevirtual #67                 // Method finalizeAllOffImages:(Lbase/drawable/TimeBoundingBox;)V
+     301: invokestatic  #47                 // Method viewer/zoomable/Debug.isActive:()Z
+     304: ifeq          312
+     307: ldc           #121                // String ScrollableObject: componentResized()\'s END:
+     309: invokestatic  #49                 // Method viewer/zoomable/Debug.println:(Ljava/lang/String;)V
+     312: return
+
+  public java.awt.Dimension getPreferredSize();
+    descriptor: ()Ljava/awt/Dimension;
+    Code:
+       0: invokestatic  #47                 // Method viewer/zoomable/Debug.isActive:()Z
+       3: ifeq          31
+       6: new           #35                 // class java/lang/StringBuilder
+       9: dup
+      10: invokespecial #36                 // Method java/lang/StringBuilder."<init>":()V
+      13: ldc           #122                // String ScrollableObject: pref_size =
+      15: invokevirtual #38                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      18: aload_0
+      19: getfield      #16                 // Field component_size:Ljava/awt/Dimension;
+      22: invokevirtual #41                 // Method java/lang/StringBuilder.append:(Ljava/lang/Object;)Ljava/lang/StringBuilder;
+      25: invokevirtual #43                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+      28: invokestatic  #49                 // Method viewer/zoomable/Debug.println:(Ljava/lang/String;)V
+      31: aload_0
+      32: getfield      #16                 // Field component_size:Ljava/awt/Dimension;
+      35: areturn
+
+  public java.awt.Dimension getSize();
+    descriptor: ()Ljava/awt/Dimension;
+    Code:
+       0: invokestatic  #47                 // Method viewer/zoomable/Debug.isActive:()Z
+       3: ifeq          31
+       6: new           #35                 // class java/lang/StringBuilder
+       9: dup
+      10: invokespecial #36                 // Method java/lang/StringBuilder."<init>":()V
+      13: ldc           #123                // String ScrollableObject: size =
+      15: invokevirtual #38                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      18: aload_0
+      19: getfield      #16                 // Field component_size:Ljava/awt/Dimension;
+      22: invokevirtual #41                 // Method java/lang/StringBuilder.append:(Ljava/lang/Object;)Ljava/lang/StringBuilder;
+      25: invokevirtual #43                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+      28: invokestatic  #49                 // Method viewer/zoomable/Debug.println:(Ljava/lang/String;)V
+      31: aload_0
+      32: getfield      #16                 // Field component_size:Ljava/awt/Dimension;
+      35: areturn
+
+  public void setCursor(java.awt.Cursor);
+    descriptor: (Ljava/awt/Cursor;)V
+    Code:
+       0: return
+
+  public abstract viewer.zoomable.InfoDialog getPropertyAt(java.awt.Point, base.drawable.TimeBoundingBox);
+    descriptor: (Ljava/awt/Point;Lbase/drawable/TimeBoundingBox;)Lviewer/zoomable/InfoDialog;
+
+  protected viewer.zoomable.InfoDialog getTimePropertyAt(java.awt.Point);
+    descriptor: (Ljava/awt/Point;)Lviewer/zoomable/InfoDialog;
+    Code:
+       0: new           #124                // class viewer/zoomable/CoordPixelImage
+       3: dup
+       4: aload_0
+       5: iconst_0
+       6: aload_0
+       7: invokevirtual #125                // Method getTimeBoundsOfImages:()Lbase/drawable/TimeBoundingBox;
+      10: invokespecial #126                // Method viewer/zoomable/CoordPixelImage."<init>":(Lviewer/zoomable/ScrollableObject;ILbase/drawable/TimeBoundingBox;)V
+      13: astore_2
+      14: aload_0
+      15: invokestatic  #127                // Method javax/swing/SwingUtilities.windowForComponent:(Ljava/awt/Component;)Ljava/awt/Window;
+      18: astore_3
+      19: aload_3
+      20: instanceof    #128                // class java/awt/Frame
+      23: ifeq          46
+      26: new           #129                // class viewer/zoomable/InfoDialogForTime
+      29: dup
+      30: aload_3
+      31: checkcast     #128                // class java/awt/Frame
+      34: aload_2
+      35: aload_1
+      36: getfield      #130                // Field java/awt/Point.x:I
+      39: invokevirtual #131                // Method viewer/zoomable/CoordPixelImage.convertPixelToTime:(I)D
+      42: invokespecial #132                // Method viewer/zoomable/InfoDialogForTime."<init>":(Ljava/awt/Frame;D)V
+      45: areturn
+      46: new           #129                // class viewer/zoomable/InfoDialogForTime
+      49: dup
+      50: aload_3
+      51: checkcast     #133                // class java/awt/Dialog
+      54: aload_2
+      55: aload_1
+      56: getfield      #130                // Field java/awt/Point.x:I
+      59: invokevirtual #131                // Method viewer/zoomable/CoordPixelImage.convertPixelToTime:(I)D
+      62: invokespecial #134                // Method viewer/zoomable/InfoDialogForTime."<init>":(Ljava/awt/Dialog;D)V
+      65: areturn
+}

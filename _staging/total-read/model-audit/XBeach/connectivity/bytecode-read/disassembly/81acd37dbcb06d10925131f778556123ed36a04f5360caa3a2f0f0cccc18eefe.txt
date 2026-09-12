@@ -1,0 +1,746 @@
+Compiled from "Launcher.java"
+public class viewer.launcher.Launcher {
+  private static java.lang.String setupfile_path;
+    descriptor: Ljava/lang/String;
+
+  private static java.lang.String FileSeparator;
+    descriptor: Ljava/lang/String;
+
+  private static java.lang.String PathSeparator;
+    descriptor: Ljava/lang/String;
+
+  private static java.lang.String JavaHome;
+    descriptor: Ljava/lang/String;
+
+  private static java.lang.String ClassPath;
+    descriptor: Ljava/lang/String;
+
+  private static java.lang.String UserHome;
+    descriptor: Ljava/lang/String;
+
+  private static final java.lang.String VERSION_INFO = "1.0.0.1";
+    descriptor: Ljava/lang/String;
+
+  private static java.lang.String JVM;
+    descriptor: Ljava/lang/String;
+
+  private static java.lang.String JVM_OPTIONS;
+    descriptor: Ljava/lang/String;
+
+  private static java.lang.String VIEWER_JAR;
+    descriptor: Ljava/lang/String;
+
+  private static boolean VERBOSE;
+    descriptor: Z
+
+  private static final java.lang.String CONFIGURATION_HEADER = "# Jumpshot-4 Launcher setup file.\n#VERSION_INFO: version-ID of the jumpshot-launcher.\n#JVM: Java Virtual Machine name, can be absolute path.\n#JVM_OPTIONS: JVM launch parameters.\n#VIEWER_JAR: executable jar file to be launched.\n#VERBOSE: be informative about this setup file change, true(yes) or false(no).\n";
+    descriptor: Ljava/lang/String;
+
+  public viewer.launcher.Launcher();
+    descriptor: ()V
+    Code:
+       0: aload_0
+       1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+       4: return
+
+  private static void initializeSystemProperties();
+    descriptor: ()V
+    Code:
+       0: invokestatic  #2                  // Method java/lang/System.getProperties:()Ljava/util/Properties;
+       3: astore_0
+       4: aload_0
+       5: ldc           #3                  // String file.separator
+       7: invokevirtual #4                  // Method java/util/Properties.getProperty:(Ljava/lang/String;)Ljava/lang/String;
+      10: putstatic     #5                  // Field FileSeparator:Ljava/lang/String;
+      13: aload_0
+      14: ldc           #6                  // String path.separator
+      16: invokevirtual #4                  // Method java/util/Properties.getProperty:(Ljava/lang/String;)Ljava/lang/String;
+      19: putstatic     #7                  // Field PathSeparator:Ljava/lang/String;
+      22: aload_0
+      23: ldc           #8                  // String java.home
+      25: invokevirtual #4                  // Method java/util/Properties.getProperty:(Ljava/lang/String;)Ljava/lang/String;
+      28: putstatic     #9                  // Field JavaHome:Ljava/lang/String;
+      31: aload_0
+      32: ldc           #10                 // String java.class.path
+      34: invokevirtual #4                  // Method java/util/Properties.getProperty:(Ljava/lang/String;)Ljava/lang/String;
+      37: putstatic     #11                 // Field ClassPath:Ljava/lang/String;
+      40: aload_0
+      41: ldc           #12                 // String user.home
+      43: invokevirtual #4                  // Method java/util/Properties.getProperty:(Ljava/lang/String;)Ljava/lang/String;
+      46: putstatic     #13                 // Field UserHome:Ljava/lang/String;
+      49: return
+
+  private static void initializeLauncherConstants();
+    descriptor: ()V
+    Code:
+       0: getstatic     #5                  // Field FileSeparator:Ljava/lang/String;
+       3: ldc           #14                 // String /
+       5: invokevirtual #15                 // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+       8: ifeq          19
+      11: ldc           #16                 // String java
+      13: putstatic     #17                 // Field JVM:Ljava/lang/String;
+      16: goto          24
+      19: ldc           #18                 // String javaw.exe
+      21: putstatic     #17                 // Field JVM:Ljava/lang/String;
+      24: new           #19                 // class java/lang/StringBuilder
+      27: dup
+      28: invokespecial #20                 // Method java/lang/StringBuilder."<init>":()V
+      31: getstatic     #13                 // Field UserHome:Ljava/lang/String;
+      34: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      37: getstatic     #5                  // Field FileSeparator:Ljava/lang/String;
+      40: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      43: ldc           #22                 // String .jumpshot_launcher.conf
+      45: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      48: invokevirtual #23                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+      51: putstatic     #24                 // Field setupfile_path:Ljava/lang/String;
+      54: return
+
+  private static java.lang.String readLauncherConstants();
+    descriptor: ()Ljava/lang/String;
+    Code:
+       0: new           #25                 // class java/util/Properties
+       3: dup
+       4: invokespecial #26                 // Method java/util/Properties."<init>":()V
+       7: astore_0
+       8: new           #27                 // class java/io/FileInputStream
+      11: dup
+      12: getstatic     #24                 // Field setupfile_path:Ljava/lang/String;
+      15: invokespecial #28                 // Method java/io/FileInputStream."<init>":(Ljava/lang/String;)V
+      18: astore_3
+      19: aload_0
+      20: aload_3
+      21: invokevirtual #29                 // Method java/util/Properties.load:(Ljava/io/InputStream;)V
+      24: aload_3
+      25: invokevirtual #30                 // Method java/io/FileInputStream.close:()V
+      28: goto          73
+      31: astore_3
+      32: new           #19                 // class java/lang/StringBuilder
+      35: dup
+      36: invokespecial #20                 // Method java/lang/StringBuilder."<init>":()V
+      39: ldc           #32                 // String This is your first time using the launcher.\nA launcher setup file,
+      41: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      44: getstatic     #24                 // Field setupfile_path:Ljava/lang/String;
+      47: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      50: ldc           #33                 // String ,\n
+      52: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      55: ldc           #34                 // String will be created in your home directory.
+      57: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      60: invokevirtual #23                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+      63: areturn
+      64: astore_3
+      65: aload_3
+      66: invokevirtual #36                 // Method java/io/IOException.printStackTrace:()V
+      69: iconst_1
+      70: invokestatic  #37                 // Method java/lang/System.exit:(I)V
+      73: aconst_null
+      74: astore_2
+      75: aload_0
+      76: ldc           #38                 // String VERSION_INFO
+      78: invokevirtual #4                  // Method java/util/Properties.getProperty:(Ljava/lang/String;)Ljava/lang/String;
+      81: astore_1
+      82: ldc           #39                 // String 1.0.0.1
+      84: aload_1
+      85: invokevirtual #15                 // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+      88: ifne          149
+      91: new           #40                 // class java/lang/StringBuffer
+      94: dup
+      95: invokespecial #41                 // Method java/lang/StringBuffer."<init>":()V
+      98: astore_2
+      99: aload_1
+     100: ifnull        135
+     103: aload_2
+     104: new           #19                 // class java/lang/StringBuilder
+     107: dup
+     108: invokespecial #20                 // Method java/lang/StringBuilder."<init>":()V
+     111: ldc           #42                 // String Your setup file verion is
+     113: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     116: aload_1
+     117: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     120: ldc           #43                 // String .\n
+     122: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     125: invokevirtual #23                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+     128: invokevirtual #44                 // Method java/lang/StringBuffer.append:(Ljava/lang/String;)Ljava/lang/StringBuffer;
+     131: pop
+     132: goto          142
+     135: aload_2
+     136: ldc           #45                 // String Your setup file verion is older.\n
+     138: invokevirtual #44                 // Method java/lang/StringBuffer.append:(Ljava/lang/String;)Ljava/lang/StringBuffer;
+     141: pop
+     142: aload_2
+     143: ldc           #46                 // String This launcher version is 1.0.0.1.\n
+     145: invokevirtual #44                 // Method java/lang/StringBuffer.append:(Ljava/lang/String;)Ljava/lang/StringBuffer;
+     148: pop
+     149: aload_0
+     150: ldc           #47                 // String JVM
+     152: invokevirtual #4                  // Method java/util/Properties.getProperty:(Ljava/lang/String;)Ljava/lang/String;
+     155: astore_1
+     156: aload_1
+     157: ifnull        246
+     160: getstatic     #17                 // Field JVM:Ljava/lang/String;
+     163: aload_1
+     164: invokevirtual #15                 // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+     167: ifne          246
+     170: aload_2
+     171: ifnonnull     185
+     174: new           #40                 // class java/lang/StringBuffer
+     177: dup
+     178: invokespecial #41                 // Method java/lang/StringBuffer."<init>":()V
+     181: astore_2
+     182: goto          192
+     185: aload_2
+     186: ldc           #48                 // String \n
+     188: invokevirtual #44                 // Method java/lang/StringBuffer.append:(Ljava/lang/String;)Ljava/lang/StringBuffer;
+     191: pop
+     192: aload_2
+     193: new           #19                 // class java/lang/StringBuilder
+     196: dup
+     197: invokespecial #20                 // Method java/lang/StringBuilder."<init>":()V
+     200: ldc           #49                 // String The default JVM,
+     202: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     205: getstatic     #17                 // Field JVM:Ljava/lang/String;
+     208: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     211: ldc           #33                 // String ,\n
+     213: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     216: ldc           #50                 // String is overriden by value,
+     218: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     221: aload_1
+     222: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     225: ldc           #33                 // String ,\n
+     227: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     230: ldc           #51                 // String specified in your setup file.\n
+     232: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     235: invokevirtual #23                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+     238: invokevirtual #44                 // Method java/lang/StringBuffer.append:(Ljava/lang/String;)Ljava/lang/StringBuffer;
+     241: pop
+     242: aload_1
+     243: putstatic     #17                 // Field JVM:Ljava/lang/String;
+     246: aload_0
+     247: ldc           #52                 // String JVM_OPTIONS
+     249: invokevirtual #4                  // Method java/util/Properties.getProperty:(Ljava/lang/String;)Ljava/lang/String;
+     252: astore_1
+     253: aload_1
+     254: ifnull        343
+     257: getstatic     #53                 // Field JVM_OPTIONS:Ljava/lang/String;
+     260: aload_1
+     261: invokevirtual #15                 // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+     264: ifne          343
+     267: aload_2
+     268: ifnonnull     282
+     271: new           #40                 // class java/lang/StringBuffer
+     274: dup
+     275: invokespecial #41                 // Method java/lang/StringBuffer."<init>":()V
+     278: astore_2
+     279: goto          289
+     282: aload_2
+     283: ldc           #48                 // String \n
+     285: invokevirtual #44                 // Method java/lang/StringBuffer.append:(Ljava/lang/String;)Ljava/lang/StringBuffer;
+     288: pop
+     289: aload_2
+     290: new           #19                 // class java/lang/StringBuilder
+     293: dup
+     294: invokespecial #20                 // Method java/lang/StringBuilder."<init>":()V
+     297: ldc           #54                 // String The default JVM_OPTIONS,
+     299: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     302: getstatic     #53                 // Field JVM_OPTIONS:Ljava/lang/String;
+     305: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     308: ldc           #33                 // String ,\n
+     310: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     313: ldc           #50                 // String is overriden by value,
+     315: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     318: aload_1
+     319: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     322: ldc           #33                 // String ,\n
+     324: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     327: ldc           #51                 // String specified in your setup file.\n
+     329: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     332: invokevirtual #23                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+     335: invokevirtual #44                 // Method java/lang/StringBuffer.append:(Ljava/lang/String;)Ljava/lang/StringBuffer;
+     338: pop
+     339: aload_1
+     340: putstatic     #53                 // Field JVM_OPTIONS:Ljava/lang/String;
+     343: aload_0
+     344: ldc           #55                 // String VIEWER_JAR
+     346: invokevirtual #4                  // Method java/util/Properties.getProperty:(Ljava/lang/String;)Ljava/lang/String;
+     349: astore_1
+     350: aload_1
+     351: ifnull        440
+     354: getstatic     #56                 // Field VIEWER_JAR:Ljava/lang/String;
+     357: aload_1
+     358: invokevirtual #15                 // Method java/lang/String.equals:(Ljava/lang/Object;)Z
+     361: ifne          440
+     364: aload_2
+     365: ifnonnull     379
+     368: new           #40                 // class java/lang/StringBuffer
+     371: dup
+     372: invokespecial #41                 // Method java/lang/StringBuffer."<init>":()V
+     375: astore_2
+     376: goto          386
+     379: aload_2
+     380: ldc           #48                 // String \n
+     382: invokevirtual #44                 // Method java/lang/StringBuffer.append:(Ljava/lang/String;)Ljava/lang/StringBuffer;
+     385: pop
+     386: aload_2
+     387: new           #19                 // class java/lang/StringBuilder
+     390: dup
+     391: invokespecial #20                 // Method java/lang/StringBuilder."<init>":()V
+     394: ldc           #57                 // String The default VIEWER_JAR,
+     396: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     399: getstatic     #56                 // Field VIEWER_JAR:Ljava/lang/String;
+     402: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     405: ldc           #33                 // String ,\n
+     407: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     410: ldc           #50                 // String is overriden by value,
+     412: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     415: aload_1
+     416: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     419: ldc           #33                 // String ,\n
+     421: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     424: ldc           #51                 // String specified in your setup file.\n
+     426: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     429: invokevirtual #23                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+     432: invokevirtual #44                 // Method java/lang/StringBuffer.append:(Ljava/lang/String;)Ljava/lang/StringBuffer;
+     435: pop
+     436: aload_1
+     437: putstatic     #56                 // Field VIEWER_JAR:Ljava/lang/String;
+     440: aload_0
+     441: ldc           #58                 // String VERBOSE
+     443: invokevirtual #4                  // Method java/util/Properties.getProperty:(Ljava/lang/String;)Ljava/lang/String;
+     446: astore_1
+     447: aload_1
+     448: ifnull        477
+     451: aload_1
+     452: ldc           #59                 // String true
+     454: invokevirtual #60                 // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+     457: ifne          469
+     460: aload_1
+     461: ldc           #61                 // String yes
+     463: invokevirtual #60                 // Method java/lang/String.equalsIgnoreCase:(Ljava/lang/String;)Z
+     466: ifeq          473
+     469: iconst_1
+     470: goto          474
+     473: iconst_0
+     474: putstatic     #62                 // Field VERBOSE:Z
+     477: aload_2
+     478: ifnull        486
+     481: aload_2
+     482: invokevirtual #63                 // Method java/lang/StringBuffer.toString:()Ljava/lang/String;
+     485: areturn
+     486: aconst_null
+     487: areturn
+    Exception table:
+       from    to  target type
+           8    28    31   Class java/io/FileNotFoundException
+           8    28    64   Class java/io/IOException
+
+  private static void writeLauncherConstants();
+    descriptor: ()V
+    Code:
+       0: new           #25                 // class java/util/Properties
+       3: dup
+       4: invokespecial #26                 // Method java/util/Properties."<init>":()V
+       7: astore_0
+       8: new           #64                 // class java/io/FileOutputStream
+      11: dup
+      12: getstatic     #24                 // Field setupfile_path:Ljava/lang/String;
+      15: invokespecial #65                 // Method java/io/FileOutputStream."<init>":(Ljava/lang/String;)V
+      18: astore_1
+      19: aload_0
+      20: ldc           #38                 // String VERSION_INFO
+      22: ldc           #39                 // String 1.0.0.1
+      24: invokevirtual #66                 // Method java/util/Properties.setProperty:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;
+      27: pop
+      28: aload_0
+      29: ldc           #47                 // String JVM
+      31: getstatic     #17                 // Field JVM:Ljava/lang/String;
+      34: invokevirtual #66                 // Method java/util/Properties.setProperty:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;
+      37: pop
+      38: aload_0
+      39: ldc           #52                 // String JVM_OPTIONS
+      41: getstatic     #53                 // Field JVM_OPTIONS:Ljava/lang/String;
+      44: invokevirtual #66                 // Method java/util/Properties.setProperty:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;
+      47: pop
+      48: aload_0
+      49: ldc           #55                 // String VIEWER_JAR
+      51: getstatic     #56                 // Field VIEWER_JAR:Ljava/lang/String;
+      54: invokevirtual #66                 // Method java/util/Properties.setProperty:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;
+      57: pop
+      58: aload_0
+      59: ldc           #58                 // String VERBOSE
+      61: getstatic     #62                 // Field VERBOSE:Z
+      64: invokestatic  #67                 // Method java/lang/String.valueOf:(Z)Ljava/lang/String;
+      67: invokevirtual #66                 // Method java/util/Properties.setProperty:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;
+      70: pop
+      71: aload_0
+      72: aload_1
+      73: ldc           #68                 // String # Jumpshot-4 Launcher setup file.\n#VERSION_INFO: version-ID of the jumpshot-launcher.\n#JVM: Java Virtual Machine name, can be absolute path.\n#JVM_OPTIONS: JVM launch parameters.\n#VIEWER_JAR: executable jar file to be launched.\n#VERBOSE: be informative about this setup file change, true(yes) or false(no).\n
+      75: invokevirtual #69                 // Method java/util/Properties.store:(Ljava/io/OutputStream;Ljava/lang/String;)V
+      78: aload_1
+      79: invokevirtual #70                 // Method java/io/FileOutputStream.close:()V
+      82: goto          94
+      85: astore_1
+      86: aload_1
+      87: invokevirtual #36                 // Method java/io/IOException.printStackTrace:()V
+      90: iconst_1
+      91: invokestatic  #37                 // Method java/lang/System.exit:(I)V
+      94: return
+    Exception table:
+       from    to  target type
+           8    82    85   Class java/io/IOException
+
+  private static java.lang.String getDefaultPathToJVM();
+    descriptor: ()Ljava/lang/String;
+    Code:
+       0: aconst_null
+       1: astore_0
+       2: new           #71                 // class java/io/File
+       5: dup
+       6: getstatic     #17                 // Field JVM:Ljava/lang/String;
+       9: invokespecial #72                 // Method java/io/File."<init>":(Ljava/lang/String;)V
+      12: astore_1
+      13: aload_1
+      14: invokevirtual #73                 // Method java/io/File.isAbsolute:()Z
+      17: ifeq          27
+      20: getstatic     #17                 // Field JVM:Ljava/lang/String;
+      23: astore_0
+      24: goto          67
+      27: new           #19                 // class java/lang/StringBuilder
+      30: dup
+      31: invokespecial #20                 // Method java/lang/StringBuilder."<init>":()V
+      34: getstatic     #9                  // Field JavaHome:Ljava/lang/String;
+      37: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      40: getstatic     #5                  // Field FileSeparator:Ljava/lang/String;
+      43: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      46: ldc           #74                 // String bin
+      48: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      51: getstatic     #5                  // Field FileSeparator:Ljava/lang/String;
+      54: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      57: getstatic     #17                 // Field JVM:Ljava/lang/String;
+      60: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      63: invokevirtual #23                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+      66: astore_0
+      67: aload_0
+      68: areturn
+
+  private static java.lang.String getDefaultPathToJarDir();
+    descriptor: ()Ljava/lang/String;
+    Code:
+       0: aconst_null
+       1: astore_2
+       2: new           #75                 // class java/util/StringTokenizer
+       5: dup
+       6: getstatic     #11                 // Field ClassPath:Ljava/lang/String;
+       9: getstatic     #7                  // Field PathSeparator:Ljava/lang/String;
+      12: invokespecial #76                 // Method java/util/StringTokenizer."<init>":(Ljava/lang/String;Ljava/lang/String;)V
+      15: astore_0
+      16: aload_0
+      17: invokevirtual #77                 // Method java/util/StringTokenizer.hasMoreTokens:()Z
+      20: ifeq          54
+      23: aload_2
+      24: ifnonnull     54
+      27: aload_0
+      28: invokevirtual #78                 // Method java/util/StringTokenizer.nextToken:()Ljava/lang/String;
+      31: astore_1
+      32: aload_1
+      33: getstatic     #5                  // Field FileSeparator:Ljava/lang/String;
+      36: invokevirtual #79                 // Method java/lang/String.lastIndexOf:(Ljava/lang/String;)I
+      39: istore_3
+      40: iload_3
+      41: iflt          16
+      44: aload_1
+      45: iconst_0
+      46: iload_3
+      47: invokevirtual #80                 // Method java/lang/String.substring:(II)Ljava/lang/String;
+      50: astore_2
+      51: goto          16
+      54: aload_2
+      55: areturn
+
+  private static java.lang.String getDefaultJarPath(java.lang.String);
+    descriptor: (Ljava/lang/String;)Ljava/lang/String;
+    Code:
+       0: aload_0
+       1: ifnull        38
+       4: aload_0
+       5: invokevirtual #81                 // Method java/lang/String.length:()I
+       8: ifle          38
+      11: new           #19                 // class java/lang/StringBuilder
+      14: dup
+      15: invokespecial #20                 // Method java/lang/StringBuilder."<init>":()V
+      18: aload_0
+      19: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      22: getstatic     #5                  // Field FileSeparator:Ljava/lang/String;
+      25: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      28: getstatic     #56                 // Field VIEWER_JAR:Ljava/lang/String;
+      31: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      34: invokevirtual #23                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+      37: areturn
+      38: getstatic     #56                 // Field VIEWER_JAR:Ljava/lang/String;
+      41: areturn
+
+  private java.lang.String exec(java.lang.String[]);
+    descriptor: ([Ljava/lang/String;)Ljava/lang/String;
+    Code:
+       0: new           #40                 // class java/lang/StringBuffer
+       3: dup
+       4: invokespecial #41                 // Method java/lang/StringBuffer."<init>":()V
+       7: astore        6
+       9: aconst_null
+      10: astore        7
+      12: iconst_0
+      13: istore        8
+      15: invokestatic  #82                 // Method java/lang/Runtime.getRuntime:()Ljava/lang/Runtime;
+      18: astore_2
+      19: aload_2
+      20: aload_1
+      21: invokevirtual #83                 // Method java/lang/Runtime.exec:([Ljava/lang/String;)Ljava/lang/Process;
+      24: astore_3
+      25: new           #84                 // class viewer/launcher/Launcher$InputStreamThread
+      28: dup
+      29: aload_0
+      30: aload_3
+      31: invokevirtual #85                 // Method java/lang/Process.getErrorStream:()Ljava/io/InputStream;
+      34: ldc           #86                 // String Error
+      36: aload         6
+      38: invokespecial #87                 // Method viewer/launcher/Launcher$InputStreamThread."<init>":(Lviewer/launcher/Launcher;Ljava/io/InputStream;Ljava/lang/String;Ljava/lang/StringBuffer;)V
+      41: astore        4
+      43: new           #84                 // class viewer/launcher/Launcher$InputStreamThread
+      46: dup
+      47: aload_0
+      48: aload_3
+      49: invokevirtual #88                 // Method java/lang/Process.getInputStream:()Ljava/io/InputStream;
+      52: ldc           #89                 // String Output
+      54: aload         7
+      56: invokespecial #87                 // Method viewer/launcher/Launcher$InputStreamThread."<init>":(Lviewer/launcher/Launcher;Ljava/io/InputStream;Ljava/lang/String;Ljava/lang/StringBuffer;)V
+      59: astore        5
+      61: aload         4
+      63: invokevirtual #90                 // Method viewer/launcher/Launcher$InputStreamThread.start:()V
+      66: aload         5
+      68: invokevirtual #90                 // Method viewer/launcher/Launcher$InputStreamThread.start:()V
+      71: aload_3
+      72: invokevirtual #91                 // Method java/lang/Process.waitFor:()I
+      75: istore        8
+      77: aload         4
+      79: invokevirtual #92                 // Method viewer/launcher/Launcher$InputStreamThread.stopRunning:()V
+      82: aconst_null
+      83: astore        4
+      85: aload         5
+      87: invokevirtual #92                 // Method viewer/launcher/Launcher$InputStreamThread.stopRunning:()V
+      90: aconst_null
+      91: astore        5
+      93: iload         8
+      95: ifeq          104
+      98: aload         6
+     100: invokevirtual #63                 // Method java/lang/StringBuffer.toString:()Ljava/lang/String;
+     103: areturn
+     104: goto          114
+     107: astore        9
+     109: aload         9
+     111: invokevirtual #94                 // Method java/lang/Throwable.printStackTrace:()V
+     114: aconst_null
+     115: areturn
+    Exception table:
+       from    to  target type
+          19   103   107   Class java/lang/Throwable
+
+  public static final void main(java.lang.String[]);
+    descriptor: ([Ljava/lang/String;)V
+    Code:
+       0: invokestatic  #95                 // Method initializeSystemProperties:()V
+       3: invokestatic  #96                 // Method initializeLauncherConstants:()V
+       6: invokestatic  #97                 // Method readLauncherConstants:()Ljava/lang/String;
+       9: astore        10
+      11: aload         10
+      13: ifnull        32
+      16: getstatic     #62                 // Field VERBOSE:Z
+      19: ifeq          29
+      22: aconst_null
+      23: aload         10
+      25: aconst_null
+      26: invokestatic  #98                 // Method viewer/common/Dialogs.info:(Ljava/awt/Component;Ljava/lang/String;Ljavax/swing/ImageIcon;)V
+      29: invokestatic  #99                 // Method writeLauncherConstants:()V
+      32: invokestatic  #100                // Method getDefaultPathToJarDir:()Ljava/lang/String;
+      35: astore_1
+      36: aload_1
+      37: invokestatic  #101                // Method getDefaultJarPath:(Ljava/lang/String;)Ljava/lang/String;
+      40: astore        4
+      42: new           #71                 // class java/io/File
+      45: dup
+      46: aload         4
+      48: invokespecial #72                 // Method java/io/File."<init>":(Ljava/lang/String;)V
+      51: astore        6
+      53: aload         6
+      55: invokevirtual #102                // Method java/io/File.exists:()Z
+      58: ifne          115
+      61: aconst_null
+      62: new           #19                 // class java/lang/StringBuilder
+      65: dup
+      66: invokespecial #20                 // Method java/lang/StringBuilder."<init>":()V
+      69: aload         4
+      71: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      74: ldc           #103                // String  does not exist!\n
+      76: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      79: ldc           #104                // String Make sure that
+      81: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      84: getstatic     #56                 // Field VIEWER_JAR:Ljava/lang/String;
+      87: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      90: ldc           #105                // String  is in
+      92: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      95: ldc           #106                // String the same directory as this launcher.\n
+      97: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     100: ldc           #107                // String Then restart this program again.
+     102: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     105: invokevirtual #23                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+     108: invokestatic  #108                // Method viewer/common/Dialogs.error:(Ljava/awt/Component;Ljava/lang/String;)V
+     111: iconst_1
+     112: invokestatic  #37                 // Method java/lang/System.exit:(I)V
+     115: aload         6
+     117: invokevirtual #109                // Method java/io/File.canRead:()Z
+     120: ifne          172
+     123: aconst_null
+     124: new           #19                 // class java/lang/StringBuilder
+     127: dup
+     128: invokespecial #20                 // Method java/lang/StringBuilder."<init>":()V
+     131: aload         4
+     133: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     136: ldc           #110                // String  is NOT readable!\n
+     138: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     141: ldc           #111                // String Reset the read privilege of the file,
+     143: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     146: getstatic     #56                 // Field VIEWER_JAR:Ljava/lang/String;
+     149: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     152: ldc           #43                 // String .\n
+     154: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     157: ldc           #107                // String Then restart this program again.
+     159: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     162: invokevirtual #23                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+     165: invokestatic  #108                // Method viewer/common/Dialogs.error:(Ljava/awt/Component;Ljava/lang/String;)V
+     168: iconst_1
+     169: invokestatic  #37                 // Method java/lang/System.exit:(I)V
+     172: invokestatic  #112                // Method getDefaultPathToJVM:()Ljava/lang/String;
+     175: astore_2
+     176: new           #71                 // class java/io/File
+     179: dup
+     180: aload_2
+     181: invokespecial #72                 // Method java/io/File."<init>":(Ljava/lang/String;)V
+     184: astore        7
+     186: aload         7
+     188: invokevirtual #102                // Method java/io/File.exists:()Z
+     191: ifne          240
+     194: aconst_null
+     195: new           #19                 // class java/lang/StringBuilder
+     198: dup
+     199: invokespecial #20                 // Method java/lang/StringBuilder."<init>":()V
+     202: aload_2
+     203: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     206: ldc           #103                // String  does not exist!\n
+     208: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     211: ldc           #104                // String Make sure that
+     213: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     216: aload_2
+     217: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     220: ldc           #113                // String  exists.\n
+     222: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     225: ldc           #107                // String Then restart this program again.
+     227: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     230: invokevirtual #23                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+     233: invokestatic  #108                // Method viewer/common/Dialogs.error:(Ljava/awt/Component;Ljava/lang/String;)V
+     236: iconst_1
+     237: invokestatic  #37                 // Method java/lang/System.exit:(I)V
+     240: aload         7
+     242: invokevirtual #109                // Method java/io/File.canRead:()Z
+     245: ifne          294
+     248: aconst_null
+     249: new           #19                 // class java/lang/StringBuilder
+     252: dup
+     253: invokespecial #20                 // Method java/lang/StringBuilder."<init>":()V
+     256: aload_2
+     257: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     260: ldc           #110                // String  is NOT readable!\n
+     262: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     265: ldc           #111                // String Reset the read privilege of the file,
+     267: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     270: aload_2
+     271: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     274: ldc           #43                 // String .\n
+     276: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     279: ldc           #107                // String Then restart this program again.
+     281: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     284: invokevirtual #23                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+     287: invokestatic  #108                // Method viewer/common/Dialogs.error:(Ljava/awt/Component;Ljava/lang/String;)V
+     290: iconst_1
+     291: invokestatic  #37                 // Method java/lang/System.exit:(I)V
+     294: getstatic     #53                 // Field JVM_OPTIONS:Ljava/lang/String;
+     297: astore_3
+     298: new           #114                // class viewer/common/RuntimeExecCommand
+     301: dup
+     302: invokespecial #115                // Method viewer/common/RuntimeExecCommand."<init>":()V
+     305: astore        5
+     307: aload         5
+     309: aload_2
+     310: invokevirtual #116                // Method viewer/common/RuntimeExecCommand.addWholeString:(Ljava/lang/String;)V
+     313: aload         5
+     315: aload_3
+     316: invokevirtual #117                // Method viewer/common/RuntimeExecCommand.addTokenizedString:(Ljava/lang/String;)V
+     319: aload         5
+     321: ldc           #118                // String -jar
+     323: invokevirtual #116                // Method viewer/common/RuntimeExecCommand.addWholeString:(Ljava/lang/String;)V
+     326: aload         5
+     328: aload         4
+     330: invokevirtual #116                // Method viewer/common/RuntimeExecCommand.addWholeString:(Ljava/lang/String;)V
+     333: new           #119                // class viewer/launcher/Launcher
+     336: dup
+     337: invokespecial #120                // Method "<init>":()V
+     340: astore        8
+     342: aload         8
+     344: aload         5
+     346: invokevirtual #121                // Method viewer/common/RuntimeExecCommand.toStringArray:()[Ljava/lang/String;
+     349: invokespecial #122                // Method exec:([Ljava/lang/String;)Ljava/lang/String;
+     352: dup
+     353: astore        9
+     355: ifnull        399
+     358: aconst_null
+     359: new           #19                 // class java/lang/StringBuilder
+     362: dup
+     363: invokespecial #20                 // Method java/lang/StringBuilder."<init>":()V
+     366: ldc           #123                // String The following process exits with error:\n
+     368: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     371: aload         5
+     373: invokevirtual #124                // Method viewer/common/RuntimeExecCommand.toString:()Ljava/lang/String;
+     376: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     379: ldc           #48                 // String \n
+     381: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     384: aload         9
+     386: invokevirtual #21                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     389: invokevirtual #23                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+     392: invokestatic  #108                // Method viewer/common/Dialogs.error:(Ljava/awt/Component;Ljava/lang/String;)V
+     395: iconst_1
+     396: invokestatic  #37                 // Method java/lang/System.exit:(I)V
+     399: iconst_0
+     400: invokestatic  #37                 // Method java/lang/System.exit:(I)V
+     403: return
+
+  static {};
+    descriptor: ()V
+    Code:
+       0: aconst_null
+       1: putstatic     #24                 // Field setupfile_path:Ljava/lang/String;
+       4: ldc           #14                 // String /
+       6: putstatic     #5                  // Field FileSeparator:Ljava/lang/String;
+       9: ldc           #125                // String :
+      11: putstatic     #7                  // Field PathSeparator:Ljava/lang/String;
+      14: aconst_null
+      15: putstatic     #9                  // Field JavaHome:Ljava/lang/String;
+      18: aconst_null
+      19: putstatic     #11                 // Field ClassPath:Ljava/lang/String;
+      22: aconst_null
+      23: putstatic     #13                 // Field UserHome:Ljava/lang/String;
+      26: ldc           #16                 // String java
+      28: putstatic     #17                 // Field JVM:Ljava/lang/String;
+      31: ldc           #126                // String -Xms64m -Xmx256m
+      33: putstatic     #53                 // Field JVM_OPTIONS:Ljava/lang/String;
+      36: ldc           #127                // String jumpshot.jar
+      38: putstatic     #56                 // Field VIEWER_JAR:Ljava/lang/String;
+      41: iconst_1
+      42: putstatic     #62                 // Field VERBOSE:Z
+      45: return
+}

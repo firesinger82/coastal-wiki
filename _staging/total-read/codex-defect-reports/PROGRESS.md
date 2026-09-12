@@ -115,3 +115,5 @@ Claude Sonnet 5의 [한정 재검토](../model-audit/XBeach/HG-ADVERSARIAL-RECHE
 2026-09-12 조건부 Native 수식 20개의 원본 WMF를 문단·관계 ID에 결속해 전량 렌더/시각 확인했다. 새 네모 글리프는 관측하지 않았지만 세 침투식의 분수 뒤 1 앞 연산자 부재를 Native CHAR와 함께 확인했고 Kingsday 대응식의 +1과 구분했다. 원본 표기를 수정하지 않았으며 조건부 해석/수학적 검증은 미완료. 전체 gate NOT_PASSED·GOAL active. [시각 대조 근거](../model-audit/XBeach/connectivity/manuals-docx-read/conditional-visual-read/README.md).
 
 2026-09-12 침투식 구현 대조: 원본의 연산자 부재를 groundwater.F90의 +1 불포화 침투 관계·실제 양의 근 계산과 대조했다. 임계 셀 가드·암시적 침투층·시간 비율·가용 표층수 제한을 구분했고 원본 문서를 자동 수정하지 않았다. 원문 SHA/구간·대수 검산 포함 통합 564개 PASS. 전체 gate NOT_PASSED·GOAL active. [비교 근거](../model-audit/XBeach/connectivity/INFILTRATION-DOCUMENT-CODE-COMPARISON.md).
+
+2026-09-12 바이트코드 판독 시작: 아카이브 unread 1,284경로를 Java 413종/Python 150종에 결속했다. Java 87,653줄 역어셈블리 자료를 저장하고 launcher 4종의 전체 표시 명령을 직접 읽어 동일 SHA 12경로에 연결했다. Java 409종·Python 150종은 미판독. 전체 gate NOT_PASSED·GOAL active. [근거](../model-audit/XBeach/connectivity/bytecode-read/README.md).

@@ -1,0 +1,1069 @@
+Compiled from "ViewportTimeYaxis.java"
+public class viewer.zoomable.ViewportTimeYaxis extends viewer.zoomable.ViewportTime implements java.awt.event.AdjustmentListener {
+  private static final long serialVersionUID = 4300l;
+    descriptor: J
+
+  private static final java.awt.Color SEARCH_LINE_COLOR;
+    descriptor: Ljava/awt/Color;
+
+  private static final int SEARCH_ARROW_HALF_ANGLE = 15;
+    descriptor: I
+
+  private static final double SEARCH_ARROW_ANGLE = 0.5235987755982988d;
+    descriptor: D
+
+  private static final double COS_SEARCH_ARROW_ANGLE;
+    descriptor: D
+
+  private static final double SIN_SEARCH_ARROW_ANGLE;
+    descriptor: D
+
+  private viewer.zoomable.ModelTime time_model;
+    descriptor: Lviewer/zoomable/ModelTime;
+
+  private javax.swing.BoundedRangeModel y_model;
+    descriptor: Ljavax/swing/BoundedRangeModel;
+
+  private viewer.zoomable.YaxisTree tree_view;
+    descriptor: Lviewer/zoomable/YaxisTree;
+
+  private java.awt.Point view_pt;
+    descriptor: Ljava/awt/Point;
+
+  private java.awt.event.ComponentEvent resize_evt;
+    descriptor: Ljava/awt/event/ComponentEvent;
+
+  private viewer.zoomable.SearchableView searchable;
+    descriptor: Lviewer/zoomable/SearchableView;
+
+  private viewer.zoomable.SearchDialog search_dialog;
+    descriptor: Lviewer/zoomable/SearchDialog;
+
+  private base.drawable.Drawable searched_dobj;
+    descriptor: Lbase/drawable/Drawable;
+
+  private double searching_time;
+    descriptor: D
+
+  private static final double INVALID_TIME = -Infinityd;
+    descriptor: D
+
+  private double searched_time;
+    descriptor: D
+
+  private int mouse_last_Yloc;
+    descriptor: I
+
+  private double ratio_ymodel2vportH;
+    descriptor: D
+
+  public viewer.zoomable.ViewportTimeYaxis(viewer.zoomable.ModelTime, javax.swing.BoundedRangeModel, viewer.zoomable.YaxisTree);
+    descriptor: (Lviewer/zoomable/ModelTime;Ljavax/swing/BoundedRangeModel;Lviewer/zoomable/YaxisTree;)V
+    Code:
+       0: aload_0
+       1: aload_1
+       2: invokespecial #1                  // Method viewer/zoomable/ViewportTime."<init>":(Lviewer/zoomable/ModelTime;)V
+       5: aload_0
+       6: aconst_null
+       7: putfield      #2                  // Field time_model:Lviewer/zoomable/ModelTime;
+      10: aload_0
+      11: aconst_null
+      12: putfield      #3                  // Field y_model:Ljavax/swing/BoundedRangeModel;
+      15: aload_0
+      16: aconst_null
+      17: putfield      #4                  // Field tree_view:Lviewer/zoomable/YaxisTree;
+      20: aload_0
+      21: aconst_null
+      22: putfield      #5                  // Field view_pt:Ljava/awt/Point;
+      25: aload_0
+      26: aconst_null
+      27: putfield      #6                  // Field resize_evt:Ljava/awt/event/ComponentEvent;
+      30: aload_0
+      31: aconst_null
+      32: putfield      #7                  // Field searchable:Lviewer/zoomable/SearchableView;
+      35: aload_0
+      36: aconst_null
+      37: putfield      #8                  // Field search_dialog:Lviewer/zoomable/SearchDialog;
+      40: aload_0
+      41: aconst_null
+      42: putfield      #9                  // Field searched_dobj:Lbase/drawable/Drawable;
+      45: aload_0
+      46: ldc2_w        #10                 // double -Infinityd
+      49: putfield      #12                 // Field searched_time:D
+      52: aload_0
+      53: aload_1
+      54: putfield      #2                  // Field time_model:Lviewer/zoomable/ModelTime;
+      57: aload_0
+      58: aload_2
+      59: putfield      #3                  // Field y_model:Ljavax/swing/BoundedRangeModel;
+      62: aload_0
+      63: aload_3
+      64: putfield      #4                  // Field tree_view:Lviewer/zoomable/YaxisTree;
+      67: aload_0
+      68: new           #13                 // class java/awt/Point
+      71: dup
+      72: iconst_0
+      73: iconst_0
+      74: invokespecial #14                 // Method java/awt/Point."<init>":(II)V
+      77: putfield      #5                  // Field view_pt:Ljava/awt/Point;
+      80: aload_0
+      81: new           #15                 // class java/awt/event/ComponentEvent
+      84: dup
+      85: aload_0
+      86: bipush        101
+      88: invokespecial #16                 // Method java/awt/event/ComponentEvent."<init>":(Ljava/awt/Component;I)V
+      91: putfield      #6                  // Field resize_evt:Ljava/awt/event/ComponentEvent;
+      94: aload_0
+      95: aload_0
+      96: getfield      #2                  // Field time_model:Lviewer/zoomable/ModelTime;
+      99: invokevirtual #17                 // Method viewer/zoomable/ModelTime.getTimeGlobalMinimum:()D
+     102: putfield      #18                 // Field searching_time:D
+     105: return
+
+  public void setView(java.awt.Component);
+    descriptor: (Ljava/awt/Component;)V
+    Code:
+       0: aload_0
+       1: aload_1
+       2: invokespecial #19                 // Method viewer/zoomable/ViewportTime.setView:(Ljava/awt/Component;)V
+       5: aload_1
+       6: instanceof    #20                 // class viewer/zoomable/SearchableView
+       9: ifeq          23
+      12: aload_0
+      13: aload_1
+      14: checkcast     #20                 // class viewer/zoomable/SearchableView
+      17: putfield      #7                  // Field searchable:Lviewer/zoomable/SearchableView;
+      20: goto          28
+      23: aload_0
+      24: aconst_null
+      25: putfield      #7                  // Field searchable:Lviewer/zoomable/SearchableView;
+      28: return
+
+  public void adjustmentValueChanged(java.awt.event.AdjustmentEvent);
+    descriptor: (Ljava/awt/event/AdjustmentEvent;)V
+    Code:
+       0: invokestatic  #21                 // Method viewer/zoomable/Debug.isActive:()Z
+       3: ifeq          33
+       6: ldc           #22                 // String ViewportTimeYaxis: adjChanged()\'s START:
+       8: invokestatic  #23                 // Method viewer/zoomable/Debug.println:(Ljava/lang/String;)V
+      11: new           #24                 // class java/lang/StringBuilder
+      14: dup
+      15: invokespecial #25                 // Method java/lang/StringBuilder."<init>":()V
+      18: ldc           #26                 // String adj_evt =
+      20: invokevirtual #27                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      23: aload_1
+      24: invokevirtual #28                 // Method java/lang/StringBuilder.append:(Ljava/lang/Object;)Ljava/lang/StringBuilder;
+      27: invokevirtual #29                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+      30: invokestatic  #23                 // Method viewer/zoomable/Debug.println:(Ljava/lang/String;)V
+      33: aload_0
+      34: getfield      #5                  // Field view_pt:Ljava/awt/Point;
+      37: aload_0
+      38: invokespecial #30                 // Method viewer/zoomable/ViewportTime.getXaxisViewPosition:()I
+      41: putfield      #31                 // Field java/awt/Point.x:I
+      44: aload_0
+      45: getfield      #5                  // Field view_pt:Ljava/awt/Point;
+      48: aload_1
+      49: invokevirtual #32                 // Method java/awt/event/AdjustmentEvent.getValue:()I
+      52: putfield      #33                 // Field java/awt/Point.y:I
+      55: aload_0
+      56: aload_0
+      57: getfield      #5                  // Field view_pt:Ljava/awt/Point;
+      60: getfield      #33                 // Field java/awt/Point.y:I
+      63: invokespecial #34                 // Method viewer/zoomable/ViewportTime.setYaxisViewPosition:(I)V
+      66: aload_0
+      67: aload_0
+      68: getfield      #5                  // Field view_pt:Ljava/awt/Point;
+      71: invokespecial #35                 // Method viewer/zoomable/ViewportTime.setViewPosition:(Ljava/awt/Point;)V
+      74: aload_0
+      75: invokespecial #36                 // Method viewer/zoomable/ViewportTime.repaint:()V
+      78: invokestatic  #21                 // Method viewer/zoomable/Debug.isActive:()Z
+      81: ifeq          89
+      84: ldc           #37                 // String ViewportTimeYaxis: adjChanged()\'s END:
+      86: invokestatic  #23                 // Method viewer/zoomable/Debug.println:(Ljava/lang/String;)V
+      89: return
+
+  public void fireComponentResized();
+    descriptor: ()V
+    Code:
+       0: aload_0
+       1: aload_0
+       2: getfield      #6                  // Field resize_evt:Ljava/awt/event/ComponentEvent;
+       5: invokespecial #38                 // Method viewer/zoomable/ViewportTime.componentResized:(Ljava/awt/event/ComponentEvent;)V
+       8: return
+
+  private java.awt.Rectangle localRectangleForDrawable(base.drawable.Drawable);
+    descriptor: (Lbase/drawable/Drawable;)Ljava/awt/Rectangle;
+    Code:
+       0: aload_0
+       1: getfield      #7                  // Field searchable:Lviewer/zoomable/SearchableView;
+       4: aload_1
+       5: invokeinterface #39,  2           // InterfaceMethod viewer/zoomable/SearchableView.localRectangleForDrawable:(Lbase/drawable/Drawable;)Ljava/awt/Rectangle;
+      10: astore_2
+      11: aload_0
+      12: getfield      #7                  // Field searchable:Lviewer/zoomable/SearchableView;
+      15: checkcast     #40                 // class java/awt/Component
+      18: aload_2
+      19: getfield      #41                 // Field java/awt/Rectangle.x:I
+      22: aload_2
+      23: getfield      #42                 // Field java/awt/Rectangle.y:I
+      26: aload_0
+      27: invokestatic  #43                 // Method javax/swing/SwingUtilities.convertPoint:(Ljava/awt/Component;IILjava/awt/Component;)Ljava/awt/Point;
+      30: astore_3
+      31: aload_2
+      32: aload_3
+      33: invokevirtual #44                 // Method java/awt/Rectangle.setLocation:(Ljava/awt/Point;)V
+      36: aload_2
+      37: areturn
+
+  private void drawMarkerForSearchedDrawable(java.awt.Graphics);
+    descriptor: (Ljava/awt/Graphics;)V
+    Code:
+       0: aload_0
+       1: invokevirtual #45                 // Method getWidth:()I
+       4: istore        6
+       6: aload_0
+       7: invokevirtual #46                 // Method getHeight:()I
+      10: istore        7
+      12: aload_0
+      13: aload_0
+      14: getfield      #9                  // Field searched_dobj:Lbase/drawable/Drawable;
+      17: invokespecial #47                 // Method localRectangleForDrawable:(Lbase/drawable/Drawable;)Ljava/awt/Rectangle;
+      20: astore_2
+      21: aload_2
+      22: getfield      #41                 // Field java/awt/Rectangle.x:I
+      25: iflt          344
+      28: aload_2
+      29: getfield      #41                 // Field java/awt/Rectangle.x:I
+      32: iload         6
+      34: if_icmpge     344
+      37: aload_0
+      38: getfield      #9                  // Field searched_dobj:Lbase/drawable/Drawable;
+      41: invokevirtual #48                 // Method base/drawable/Drawable.getCategory:()Lbase/drawable/Category;
+      44: invokevirtual #49                 // Method base/drawable/Category.getColor:()Lbase/drawable/ColorAlpha;
+      47: astore_3
+      48: aload_3
+      49: invokevirtual #50                 // Method java/awt/Color.brighter:()Ljava/awt/Color;
+      52: astore        4
+      54: aload_3
+      55: invokevirtual #51                 // Method java/awt/Color.darker:()Ljava/awt/Color;
+      58: astore        5
+      60: getstatic     #52                 // Field viewer/common/Parameters.SEARCH_FRAME_THICKNESS:I
+      63: istore        12
+      65: getstatic     #53                 // Field viewer/common/Parameters.SEARCH_ARROW_LENGTH:I
+      68: istore        8
+      70: iconst_2
+      71: iload         8
+      73: imul
+      74: istore        9
+      76: iload         8
+      78: i2d
+      79: getstatic     #54                 // Field SIN_SEARCH_ARROW_ANGLE:D
+      82: dmul
+      83: ldc2_w        #55                 // double 0.5d
+      86: dadd
+      87: d2i
+      88: istore        10
+      90: iload         8
+      92: i2d
+      93: getstatic     #57                 // Field COS_SEARCH_ARROW_ANGLE:D
+      96: dmul
+      97: ldc2_w        #55                 // double 0.5d
+     100: dadd
+     101: d2i
+     102: istore        11
+     104: aload_2
+     105: getfield      #41                 // Field java/awt/Rectangle.x:I
+     108: istore        13
+     110: aload_2
+     111: getfield      #42                 // Field java/awt/Rectangle.y:I
+     114: iload         12
+     116: isub
+     117: istore        14
+     119: aload_1
+     120: aload_3
+     121: invokevirtual #58                 // Method java/awt/Graphics.setColor:(Ljava/awt/Color;)V
+     124: aload_1
+     125: iload         13
+     127: iload         8
+     129: isub
+     130: iload         14
+     132: iload         8
+     134: isub
+     135: iload         9
+     137: iload         9
+     139: bipush        90
+     141: bipush        -15
+     143: invokevirtual #59                 // Method java/awt/Graphics.fillArc:(IIIIII)V
+     146: aload_1
+     147: aload         5
+     149: invokevirtual #58                 // Method java/awt/Graphics.setColor:(Ljava/awt/Color;)V
+     152: aload_1
+     153: iload         13
+     155: iload         8
+     157: isub
+     158: iload         14
+     160: iload         8
+     162: isub
+     163: iload         9
+     165: iload         9
+     167: bipush        75
+     169: bipush        -15
+     171: invokevirtual #59                 // Method java/awt/Graphics.fillArc:(IIIIII)V
+     174: aload_1
+     175: aload         4
+     177: invokevirtual #58                 // Method java/awt/Graphics.setColor:(Ljava/awt/Color;)V
+     180: aload_1
+     181: iload         13
+     183: iload         14
+     185: iload         13
+     187: iload         14
+     189: iload         8
+     191: isub
+     192: invokevirtual #60                 // Method java/awt/Graphics.drawLine:(IIII)V
+     195: aload_1
+     196: aload         4
+     198: invokevirtual #58                 // Method java/awt/Graphics.setColor:(Ljava/awt/Color;)V
+     201: aload_1
+     202: iload         13
+     204: iload         14
+     206: iload         13
+     208: iload         10
+     210: iadd
+     211: iload         14
+     213: iload         11
+     215: isub
+     216: invokevirtual #60                 // Method java/awt/Graphics.drawLine:(IIII)V
+     219: iload         13
+     221: istore        15
+     223: aload_2
+     224: getfield      #42                 // Field java/awt/Rectangle.y:I
+     227: aload_2
+     228: getfield      #61                 // Field java/awt/Rectangle.height:I
+     231: iadd
+     232: iload         12
+     234: iadd
+     235: istore        16
+     237: aload_1
+     238: getstatic     #62                 // Field java/awt/Color.yellow:Ljava/awt/Color;
+     241: invokevirtual #58                 // Method java/awt/Graphics.setColor:(Ljava/awt/Color;)V
+     244: aload_1
+     245: iload         15
+     247: iload         8
+     249: isub
+     250: iload         16
+     252: iload         8
+     254: isub
+     255: iload         9
+     257: iload         9
+     259: sipush        270
+     262: bipush        15
+     264: invokevirtual #59                 // Method java/awt/Graphics.fillArc:(IIIIII)V
+     267: aload_1
+     268: getstatic     #63                 // Field java/awt/Color.darkGray:Ljava/awt/Color;
+     271: invokevirtual #58                 // Method java/awt/Graphics.setColor:(Ljava/awt/Color;)V
+     274: aload_1
+     275: iload         15
+     277: iload         8
+     279: isub
+     280: iload         16
+     282: iload         8
+     284: isub
+     285: iload         9
+     287: iload         9
+     289: sipush        285
+     292: bipush        15
+     294: invokevirtual #59                 // Method java/awt/Graphics.fillArc:(IIIIII)V
+     297: aload_1
+     298: getstatic     #64                 // Field java/awt/Color.gray:Ljava/awt/Color;
+     301: invokevirtual #58                 // Method java/awt/Graphics.setColor:(Ljava/awt/Color;)V
+     304: aload_1
+     305: iload         15
+     307: iload         16
+     309: iload         15
+     311: iload         16
+     313: iload         8
+     315: iadd
+     316: invokevirtual #60                 // Method java/awt/Graphics.drawLine:(IIII)V
+     319: aload_1
+     320: getstatic     #65                 // Field java/awt/Color.white:Ljava/awt/Color;
+     323: invokevirtual #58                 // Method java/awt/Graphics.setColor:(Ljava/awt/Color;)V
+     326: aload_1
+     327: iload         15
+     329: iload         16
+     331: iload         15
+     333: iload         10
+     335: iadd
+     336: iload         16
+     338: iload         11
+     340: iadd
+     341: invokevirtual #60                 // Method java/awt/Graphics.drawLine:(IIII)V
+     344: iconst_0
+     345: iconst_0
+     346: iload         6
+     348: iload         7
+     350: aload_2
+     351: invokestatic  #66                 // Method javax/swing/SwingUtilities.computeIntersection:(IIIILjava/awt/Rectangle;)Ljava/awt/Rectangle;
+     354: astore_2
+     355: aload_2
+     356: getfield      #41                 // Field java/awt/Rectangle.x:I
+     359: iflt          695
+     362: getstatic     #67                 // Field viewer/common/Parameters.SEARCHED_OBJECT_ON_TOP:Z
+     365: ifeq          402
+     368: aload_1
+     369: aload_0
+     370: getfield      #9                  // Field searched_dobj:Lbase/drawable/Drawable;
+     373: invokevirtual #48                 // Method base/drawable/Drawable.getCategory:()Lbase/drawable/Category;
+     376: invokevirtual #49                 // Method base/drawable/Category.getColor:()Lbase/drawable/ColorAlpha;
+     379: invokevirtual #58                 // Method java/awt/Graphics.setColor:(Ljava/awt/Color;)V
+     382: aload_1
+     383: aload_2
+     384: getfield      #41                 // Field java/awt/Rectangle.x:I
+     387: aload_2
+     388: getfield      #42                 // Field java/awt/Rectangle.y:I
+     391: aload_2
+     392: getfield      #68                 // Field java/awt/Rectangle.width:I
+     395: aload_2
+     396: getfield      #61                 // Field java/awt/Rectangle.height:I
+     399: invokevirtual #69                 // Method java/awt/Graphics.fillRect:(IIII)V
+     402: getstatic     #52                 // Field viewer/common/Parameters.SEARCH_FRAME_THICKNESS:I
+     405: istore        12
+     407: aload_2
+     408: getfield      #41                 // Field java/awt/Rectangle.x:I
+     411: istore        13
+     413: aload_2
+     414: getfield      #42                 // Field java/awt/Rectangle.y:I
+     417: istore        14
+     419: iload         13
+     421: aload_2
+     422: getfield      #68                 // Field java/awt/Rectangle.width:I
+     425: iadd
+     426: istore        15
+     428: iload         14
+     430: aload_2
+     431: getfield      #61                 // Field java/awt/Rectangle.height:I
+     434: iadd
+     435: istore        16
+     437: aload_1
+     438: getstatic     #70                 // Field java/awt/Color.black:Ljava/awt/Color;
+     441: invokevirtual #58                 // Method java/awt/Graphics.setColor:(Ljava/awt/Color;)V
+     444: iconst_0
+     445: istore        17
+     447: aload_1
+     448: iload         13
+     450: iload         17
+     452: isub
+     453: iload         14
+     455: iload         17
+     457: isub
+     458: iload         13
+     460: iload         17
+     462: isub
+     463: iload         16
+     465: iload         17
+     467: iadd
+     468: invokevirtual #60                 // Method java/awt/Graphics.drawLine:(IIII)V
+     471: aload_1
+     472: iload         13
+     474: iload         17
+     476: isub
+     477: iload         14
+     479: iload         17
+     481: isub
+     482: iload         15
+     484: iload         17
+     486: iadd
+     487: iload         14
+     489: iload         17
+     491: isub
+     492: invokevirtual #60                 // Method java/awt/Graphics.drawLine:(IIII)V
+     495: aload_1
+     496: getstatic     #65                 // Field java/awt/Color.white:Ljava/awt/Color;
+     499: invokevirtual #58                 // Method java/awt/Graphics.setColor:(Ljava/awt/Color;)V
+     502: iconst_1
+     503: istore        17
+     505: iload         17
+     507: iload         12
+     509: if_icmpgt     566
+     512: aload_1
+     513: iload         13
+     515: iload         17
+     517: isub
+     518: iload         14
+     520: iload         17
+     522: isub
+     523: iload         13
+     525: iload         17
+     527: isub
+     528: iload         16
+     530: iload         17
+     532: iadd
+     533: invokevirtual #60                 // Method java/awt/Graphics.drawLine:(IIII)V
+     536: aload_1
+     537: iload         13
+     539: iload         17
+     541: isub
+     542: iload         14
+     544: iload         17
+     546: isub
+     547: iload         15
+     549: iload         17
+     551: iadd
+     552: iload         14
+     554: iload         17
+     556: isub
+     557: invokevirtual #60                 // Method java/awt/Graphics.drawLine:(IIII)V
+     560: iinc          17, 1
+     563: goto          505
+     566: aload_1
+     567: getstatic     #65                 // Field java/awt/Color.white:Ljava/awt/Color;
+     570: invokevirtual #58                 // Method java/awt/Graphics.setColor:(Ljava/awt/Color;)V
+     573: iconst_0
+     574: istore        17
+     576: aload_1
+     577: iload         15
+     579: iload         17
+     581: iadd
+     582: iload         14
+     584: iload         17
+     586: isub
+     587: iload         15
+     589: iload         17
+     591: iadd
+     592: iload         16
+     594: iload         17
+     596: iadd
+     597: invokevirtual #60                 // Method java/awt/Graphics.drawLine:(IIII)V
+     600: aload_1
+     601: iload         13
+     603: iload         17
+     605: isub
+     606: iload         16
+     608: iload         17
+     610: iadd
+     611: iload         15
+     613: iload         17
+     615: iadd
+     616: iload         16
+     618: iload         17
+     620: iadd
+     621: invokevirtual #60                 // Method java/awt/Graphics.drawLine:(IIII)V
+     624: aload_1
+     625: getstatic     #63                 // Field java/awt/Color.darkGray:Ljava/awt/Color;
+     628: invokevirtual #58                 // Method java/awt/Graphics.setColor:(Ljava/awt/Color;)V
+     631: iconst_1
+     632: istore        17
+     634: iload         17
+     636: iload         12
+     638: if_icmpgt     695
+     641: aload_1
+     642: iload         15
+     644: iload         17
+     646: iadd
+     647: iload         14
+     649: iload         17
+     651: isub
+     652: iload         15
+     654: iload         17
+     656: iadd
+     657: iload         16
+     659: iload         17
+     661: iadd
+     662: invokevirtual #60                 // Method java/awt/Graphics.drawLine:(IIII)V
+     665: aload_1
+     666: iload         13
+     668: iload         17
+     670: isub
+     671: iload         16
+     673: iload         17
+     675: iadd
+     676: iload         15
+     678: iload         17
+     680: iadd
+     681: iload         16
+     683: iload         17
+     685: iadd
+     686: invokevirtual #60                 // Method java/awt/Graphics.drawLine:(IIII)V
+     689: iinc          17, 1
+     692: goto          634
+     695: return
+
+  public void paint(java.awt.Graphics);
+    descriptor: (Ljava/awt/Graphics;)V
+    Code:
+       0: invokestatic  #21                 // Method viewer/zoomable/Debug.isActive:()Z
+       3: ifeq          11
+       6: ldc           #71                 // String ViewportTimeYaxis: paint()\'s START:
+       8: invokestatic  #23                 // Method viewer/zoomable/Debug.println:(Ljava/lang/String;)V
+      11: aload_0
+      12: aload_1
+      13: invokespecial #72                 // Method viewer/zoomable/ViewportTime.paint:(Ljava/awt/Graphics;)V
+      16: aload_0
+      17: getfield      #73                 // Field viewer/zoomable/ViewportTime.coord_xform:Lviewer/zoomable/CoordPixelImage;
+      20: aload_0
+      21: getfield      #18                 // Field searching_time:D
+      24: invokevirtual #74                 // Method viewer/zoomable/CoordPixelImage.contains:(D)Z
+      27: ifeq          60
+      30: aload_0
+      31: getfield      #73                 // Field viewer/zoomable/ViewportTime.coord_xform:Lviewer/zoomable/CoordPixelImage;
+      34: aload_0
+      35: getfield      #18                 // Field searching_time:D
+      38: invokevirtual #75                 // Method viewer/zoomable/CoordPixelImage.convertTimeToPixel:(D)I
+      41: istore_2
+      42: aload_1
+      43: getstatic     #76                 // Field SEARCH_LINE_COLOR:Ljava/awt/Color;
+      46: invokevirtual #58                 // Method java/awt/Graphics.setColor:(Ljava/awt/Color;)V
+      49: aload_1
+      50: iload_2
+      51: iconst_0
+      52: iload_2
+      53: aload_0
+      54: invokevirtual #46                 // Method getHeight:()I
+      57: invokevirtual #60                 // Method java/awt/Graphics.drawLine:(IIII)V
+      60: aload_0
+      61: getfield      #9                  // Field searched_dobj:Lbase/drawable/Drawable;
+      64: ifnull        72
+      67: aload_0
+      68: aload_1
+      69: invokespecial #77                 // Method drawMarkerForSearchedDrawable:(Ljava/awt/Graphics;)V
+      72: invokestatic  #21                 // Method viewer/zoomable/Debug.isActive:()Z
+      75: ifeq          83
+      78: ldc           #78                 // String ViewportTimeYaxis: paint()\'s END:
+      80: invokestatic  #23                 // Method viewer/zoomable/Debug.println:(Ljava/lang/String;)V
+      83: return
+
+  public void eraseSearchedDrawable();
+    descriptor: ()V
+    Code:
+       0: aload_0
+       1: aconst_null
+       2: putfield      #9                  // Field searched_dobj:Lbase/drawable/Drawable;
+       5: return
+
+  public boolean searchBackward();
+    descriptor: ()Z
+    Code:
+       0: aconst_null
+       1: astore_1
+       2: aload_0
+       3: getfield      #8                  // Field search_dialog:Lviewer/zoomable/SearchDialog;
+       6: ifnonnull     46
+       9: aload_0
+      10: invokestatic  #79                 // Method javax/swing/SwingUtilities.windowForComponent:(Ljava/awt/Component;)Ljava/awt/Window;
+      13: astore_2
+      14: aload_2
+      15: instanceof    #80                 // class java/awt/Frame
+      18: ifeq          40
+      21: aload_0
+      22: new           #81                 // class viewer/zoomable/SearchDialog
+      25: dup
+      26: aload_2
+      27: checkcast     #80                 // class java/awt/Frame
+      30: aload_0
+      31: invokespecial #82                 // Method viewer/zoomable/SearchDialog."<init>":(Ljava/awt/Frame;Lviewer/zoomable/ViewportTimeYaxis;)V
+      34: putfield      #8                  // Field search_dialog:Lviewer/zoomable/SearchDialog;
+      37: goto          46
+      40: aload_2
+      41: ldc           #83                 // String ViewportTimeYaxis.searchBackward() is meant to be invoked from a top JFrame.
+      43: invokestatic  #84                 // Method viewer/common/Dialogs.error:(Ljava/awt/Component;Ljava/lang/String;)V
+      46: aload_0
+      47: getfield      #18                 // Field searching_time:D
+      50: aload_0
+      51: getfield      #12                 // Field searched_time:D
+      54: dcmpl
+      55: ifeq          75
+      58: aload_0
+      59: getfield      #7                  // Field searchable:Lviewer/zoomable/SearchableView;
+      62: aload_0
+      63: getfield      #18                 // Field searching_time:D
+      66: invokeinterface #85,  3           // InterfaceMethod viewer/zoomable/SearchableView.searchPreviousComponent:(D)Lviewer/zoomable/SearchPanel;
+      71: astore_1
+      72: goto          85
+      75: aload_0
+      76: getfield      #7                  // Field searchable:Lviewer/zoomable/SearchableView;
+      79: invokeinterface #86,  1           // InterfaceMethod viewer/zoomable/SearchableView.searchPreviousComponent:()Lviewer/zoomable/SearchPanel;
+      84: astore_1
+      85: aload_1
+      86: ifnull        177
+      89: aload_0
+      90: aload_1
+      91: invokevirtual #87                 // Method viewer/zoomable/SearchPanel.getSearchedDrawable:()Lbase/drawable/Drawable;
+      94: putfield      #9                  // Field searched_dobj:Lbase/drawable/Drawable;
+      97: aload_0
+      98: aload_0
+      99: getfield      #9                  // Field searched_dobj:Lbase/drawable/Drawable;
+     102: invokevirtual #88                 // Method base/drawable/Drawable.getEarliestTime:()D
+     105: putfield      #12                 // Field searched_time:D
+     108: aload_0
+     109: getfield      #2                  // Field time_model:Lviewer/zoomable/ModelTime;
+     112: aload_0
+     113: getfield      #12                 // Field searched_time:D
+     116: aload_0
+     117: getfield      #18                 // Field searching_time:D
+     120: dsub
+     121: invokevirtual #89                 // Method viewer/zoomable/ModelTime.scroll:(D)V
+     124: aload_0
+     125: aload_0
+     126: getfield      #12                 // Field searched_time:D
+     129: putfield      #18                 // Field searching_time:D
+     132: aload_0
+     133: getfield      #4                  // Field tree_view:Lviewer/zoomable/YaxisTree;
+     136: aload_0
+     137: getfield      #9                  // Field searched_dobj:Lbase/drawable/Drawable;
+     140: invokevirtual #90                 // Method base/drawable/Drawable.getRowID:()I
+     143: invokevirtual #91                 // Method viewer/zoomable/YaxisTree.scrollRowToVisible:(I)V
+     146: aload_0
+     147: invokevirtual #92                 // Method repaint:()V
+     150: aload_0
+     151: getfield      #8                  // Field search_dialog:Lviewer/zoomable/SearchDialog;
+     154: aload_1
+     155: invokevirtual #93                 // Method viewer/zoomable/SearchDialog.replace:(Ljava/awt/Component;)V
+     158: aload_0
+     159: getfield      #8                  // Field search_dialog:Lviewer/zoomable/SearchDialog;
+     162: invokevirtual #94                 // Method viewer/zoomable/SearchDialog.isVisible:()Z
+     165: ifne          175
+     168: aload_0
+     169: getfield      #8                  // Field search_dialog:Lviewer/zoomable/SearchDialog;
+     172: invokevirtual #95                 // Method viewer/zoomable/SearchDialog.setVisibleAtDefaultLocation:()V
+     175: iconst_1
+     176: ireturn
+     177: aload_0
+     178: getfield      #9                  // Field searched_dobj:Lbase/drawable/Drawable;
+     181: ifnull        215
+     184: aload_0
+     185: getfield      #9                  // Field searched_dobj:Lbase/drawable/Drawable;
+     188: invokevirtual #88                 // Method base/drawable/Drawable.getEarliestTime:()D
+     191: aload_0
+     192: getfield      #2                  // Field time_model:Lviewer/zoomable/ModelTime;
+     195: invokevirtual #17                 // Method viewer/zoomable/ModelTime.getTimeGlobalMinimum:()D
+     198: dcmpl
+     199: ifne          215
+     202: aload_0
+     203: invokestatic  #79                 // Method javax/swing/SwingUtilities.windowForComponent:(Ljava/awt/Component;)Ljava/awt/Window;
+     206: ldc           #96                 // String The FIRST drawable in the logfile has been reached.\n  Search backward has no more drawable to return.\n
+     208: aconst_null
+     209: invokestatic  #97                 // Method viewer/common/Dialogs.info:(Ljava/awt/Component;Ljava/lang/String;Ljavax/swing/ImageIcon;)V
+     212: goto          224
+     215: aload_0
+     216: invokestatic  #79                 // Method javax/swing/SwingUtilities.windowForComponent:(Ljava/awt/Component;)Ljava/awt/Window;
+     219: ldc           #98                 // String If the logfile\'s beginning is not within view,\nSCROLL BACKWARD till you see more drawables\nare within view.  All drawables in view or in \nthe memory have been searched.\n
+     221: invokestatic  #99                 // Method viewer/common/Dialogs.warn:(Ljava/awt/Component;Ljava/lang/String;)V
+     224: aload_0
+     225: getfield      #8                  // Field search_dialog:Lviewer/zoomable/SearchDialog;
+     228: iconst_0
+     229: invokevirtual #100                // Method viewer/zoomable/SearchDialog.setVisible:(Z)V
+     232: aload_0
+     233: aconst_null
+     234: putfield      #9                  // Field searched_dobj:Lbase/drawable/Drawable;
+     237: aload_0
+     238: ldc2_w        #10                 // double -Infinityd
+     241: putfield      #12                 // Field searched_time:D
+     244: aload_0
+     245: invokevirtual #92                 // Method repaint:()V
+     248: iconst_0
+     249: ireturn
+
+  public boolean searchForward();
+    descriptor: ()Z
+    Code:
+       0: aconst_null
+       1: astore_1
+       2: aload_0
+       3: getfield      #8                  // Field search_dialog:Lviewer/zoomable/SearchDialog;
+       6: ifnonnull     46
+       9: aload_0
+      10: invokestatic  #79                 // Method javax/swing/SwingUtilities.windowForComponent:(Ljava/awt/Component;)Ljava/awt/Window;
+      13: astore_2
+      14: aload_2
+      15: instanceof    #80                 // class java/awt/Frame
+      18: ifeq          40
+      21: aload_0
+      22: new           #81                 // class viewer/zoomable/SearchDialog
+      25: dup
+      26: aload_2
+      27: checkcast     #80                 // class java/awt/Frame
+      30: aload_0
+      31: invokespecial #82                 // Method viewer/zoomable/SearchDialog."<init>":(Ljava/awt/Frame;Lviewer/zoomable/ViewportTimeYaxis;)V
+      34: putfield      #8                  // Field search_dialog:Lviewer/zoomable/SearchDialog;
+      37: goto          46
+      40: aload_2
+      41: ldc           #101                // String ViewportTimeYaxis.searchForward() is meant to be invoked from a top JFrame.
+      43: invokestatic  #84                 // Method viewer/common/Dialogs.error:(Ljava/awt/Component;Ljava/lang/String;)V
+      46: aload_0
+      47: getfield      #18                 // Field searching_time:D
+      50: aload_0
+      51: getfield      #12                 // Field searched_time:D
+      54: dcmpl
+      55: ifeq          75
+      58: aload_0
+      59: getfield      #7                  // Field searchable:Lviewer/zoomable/SearchableView;
+      62: aload_0
+      63: getfield      #18                 // Field searching_time:D
+      66: invokeinterface #102,  3          // InterfaceMethod viewer/zoomable/SearchableView.searchNextComponent:(D)Lviewer/zoomable/SearchPanel;
+      71: astore_1
+      72: goto          85
+      75: aload_0
+      76: getfield      #7                  // Field searchable:Lviewer/zoomable/SearchableView;
+      79: invokeinterface #103,  1          // InterfaceMethod viewer/zoomable/SearchableView.searchNextComponent:()Lviewer/zoomable/SearchPanel;
+      84: astore_1
+      85: aload_1
+      86: ifnull        177
+      89: aload_0
+      90: aload_1
+      91: invokevirtual #87                 // Method viewer/zoomable/SearchPanel.getSearchedDrawable:()Lbase/drawable/Drawable;
+      94: putfield      #9                  // Field searched_dobj:Lbase/drawable/Drawable;
+      97: aload_0
+      98: aload_0
+      99: getfield      #9                  // Field searched_dobj:Lbase/drawable/Drawable;
+     102: invokevirtual #88                 // Method base/drawable/Drawable.getEarliestTime:()D
+     105: putfield      #12                 // Field searched_time:D
+     108: aload_0
+     109: getfield      #2                  // Field time_model:Lviewer/zoomable/ModelTime;
+     112: aload_0
+     113: getfield      #12                 // Field searched_time:D
+     116: aload_0
+     117: getfield      #18                 // Field searching_time:D
+     120: dsub
+     121: invokevirtual #89                 // Method viewer/zoomable/ModelTime.scroll:(D)V
+     124: aload_0
+     125: aload_0
+     126: getfield      #12                 // Field searched_time:D
+     129: putfield      #18                 // Field searching_time:D
+     132: aload_0
+     133: getfield      #4                  // Field tree_view:Lviewer/zoomable/YaxisTree;
+     136: aload_0
+     137: getfield      #9                  // Field searched_dobj:Lbase/drawable/Drawable;
+     140: invokevirtual #90                 // Method base/drawable/Drawable.getRowID:()I
+     143: invokevirtual #91                 // Method viewer/zoomable/YaxisTree.scrollRowToVisible:(I)V
+     146: aload_0
+     147: invokevirtual #92                 // Method repaint:()V
+     150: aload_0
+     151: getfield      #8                  // Field search_dialog:Lviewer/zoomable/SearchDialog;
+     154: aload_1
+     155: invokevirtual #93                 // Method viewer/zoomable/SearchDialog.replace:(Ljava/awt/Component;)V
+     158: aload_0
+     159: getfield      #8                  // Field search_dialog:Lviewer/zoomable/SearchDialog;
+     162: invokevirtual #94                 // Method viewer/zoomable/SearchDialog.isVisible:()Z
+     165: ifne          175
+     168: aload_0
+     169: getfield      #8                  // Field search_dialog:Lviewer/zoomable/SearchDialog;
+     172: invokevirtual #95                 // Method viewer/zoomable/SearchDialog.setVisibleAtDefaultLocation:()V
+     175: iconst_1
+     176: ireturn
+     177: aload_0
+     178: getfield      #9                  // Field searched_dobj:Lbase/drawable/Drawable;
+     181: ifnull        215
+     184: aload_0
+     185: getfield      #9                  // Field searched_dobj:Lbase/drawable/Drawable;
+     188: invokevirtual #104                // Method base/drawable/Drawable.getLatestTime:()D
+     191: aload_0
+     192: getfield      #2                  // Field time_model:Lviewer/zoomable/ModelTime;
+     195: invokevirtual #105                // Method viewer/zoomable/ModelTime.getTimeGlobalMaximum:()D
+     198: dcmpl
+     199: ifne          215
+     202: aload_0
+     203: invokestatic  #79                 // Method javax/swing/SwingUtilities.windowForComponent:(Ljava/awt/Component;)Ljava/awt/Window;
+     206: ldc           #106                // String The LAST drawable in the logfile has been reached.\n  Search forward has no more drawable to return.\n
+     208: aconst_null
+     209: invokestatic  #97                 // Method viewer/common/Dialogs.info:(Ljava/awt/Component;Ljava/lang/String;Ljavax/swing/ImageIcon;)V
+     212: goto          224
+     215: aload_0
+     216: invokestatic  #79                 // Method javax/swing/SwingUtilities.windowForComponent:(Ljava/awt/Component;)Ljava/awt/Window;
+     219: ldc           #107                // String If the end of the logfile is not within view,\nSCROLL FORWARD till you see more drawables\nare within view.  All drawables in view or in \nthe memory have been searched.\n
+     221: invokestatic  #99                 // Method viewer/common/Dialogs.warn:(Ljava/awt/Component;Ljava/lang/String;)V
+     224: aload_0
+     225: getfield      #8                  // Field search_dialog:Lviewer/zoomable/SearchDialog;
+     228: iconst_0
+     229: invokevirtual #100                // Method viewer/zoomable/SearchDialog.setVisible:(Z)V
+     232: aload_0
+     233: aconst_null
+     234: putfield      #9                  // Field searched_dobj:Lbase/drawable/Drawable;
+     237: aload_0
+     238: ldc2_w        #10                 // double -Infinityd
+     241: putfield      #12                 // Field searched_time:D
+     244: aload_0
+     245: invokevirtual #92                 // Method repaint:()V
+     248: iconst_0
+     249: ireturn
+
+  public boolean searchInit();
+    descriptor: ()Z
+    Code:
+       0: aload_0
+       1: invokespecial #108                // Method viewer/zoomable/ViewportTime.getLastInfoDialog:()Lviewer/zoomable/InfoDialog;
+       4: astore_1
+       5: aload_1
+       6: ifnull        30
+       9: aload_0
+      10: aload_1
+      11: invokevirtual #109                // Method viewer/zoomable/InfoDialog.getClickedTime:()D
+      14: putfield      #18                 // Field searching_time:D
+      17: aload_1
+      18: invokevirtual #110                // Method viewer/zoomable/InfoDialog.getCloseButton:()Ljavax/swing/JButton;
+      21: invokevirtual #111                // Method javax/swing/JButton.doClick:()V
+      24: aload_0
+      25: invokevirtual #92                 // Method repaint:()V
+      28: iconst_1
+      29: ireturn
+      30: aload_0
+      31: invokestatic  #79                 // Method javax/swing/SwingUtilities.windowForComponent:(Ljava/awt/Component;)Ljava/awt/Window;
+      34: ldc           #112                // String No info dialog box! Info dialog box can be set\nby right mouse clicking on the timeline canvas\n
+      36: invokestatic  #99                 // Method viewer/common/Dialogs.warn:(Ljava/awt/Component;Ljava/lang/String;)V
+      39: iconst_0
+      40: ireturn
+
+  public void mouseClicked(java.awt.event.MouseEvent);
+    descriptor: (Ljava/awt/event/MouseEvent;)V
+    Code:
+       0: aload_0
+       1: aload_1
+       2: invokespecial #113                // Method viewer/zoomable/ViewportTime.mouseClicked:(Ljava/awt/event/MouseEvent;)V
+       5: aload_1
+       6: invokestatic  #114                // Method viewer/common/Routines.isLeftMouseButton:(Ljava/awt/event/MouseEvent;)Z
+       9: ifeq          43
+      12: aload_0
+      13: getfield      #115                // Field viewer/zoomable/ViewportTime.isLeftMouseClick4Zoom:Z
+      16: ifne          43
+      19: aload_1
+      20: invokevirtual #116                // Method java/awt/event/MouseEvent.getPoint:()Ljava/awt/Point;
+      23: astore_2
+      24: aload_0
+      25: aload_0
+      26: getfield      #73                 // Field viewer/zoomable/ViewportTime.coord_xform:Lviewer/zoomable/CoordPixelImage;
+      29: aload_2
+      30: getfield      #31                 // Field java/awt/Point.x:I
+      33: invokevirtual #117                // Method viewer/zoomable/CoordPixelImage.convertPixelToTime:(I)D
+      36: putfield      #18                 // Field searching_time:D
+      39: aload_0
+      40: invokevirtual #92                 // Method repaint:()V
+      43: return
+
+  public void mousePressed(java.awt.event.MouseEvent);
+    descriptor: (Ljava/awt/event/MouseEvent;)V
+    Code:
+       0: aload_0
+       1: aload_1
+       2: invokespecial #118                // Method viewer/zoomable/ViewportTime.mousePressed:(Ljava/awt/event/MouseEvent;)V
+       5: aload_1
+       6: invokestatic  #114                // Method viewer/common/Routines.isLeftMouseButton:(Ljava/awt/event/MouseEvent;)Z
+       9: ifeq          52
+      12: aload_0
+      13: getfield      #115                // Field viewer/zoomable/ViewportTime.isLeftMouseClick4Zoom:Z
+      16: ifne          52
+      19: aload_1
+      20: invokevirtual #116                // Method java/awt/event/MouseEvent.getPoint:()Ljava/awt/Point;
+      23: astore_2
+      24: aload_0
+      25: aload_2
+      26: getfield      #33                 // Field java/awt/Point.y:I
+      29: putfield      #119                // Field mouse_last_Yloc:I
+      32: aload_0
+      33: aload_0
+      34: getfield      #3                  // Field y_model:Ljavax/swing/BoundedRangeModel;
+      37: invokeinterface #120,  1          // InterfaceMethod javax/swing/BoundedRangeModel.getExtent:()I
+      42: i2d
+      43: aload_0
+      44: invokevirtual #46                 // Method getHeight:()I
+      47: i2d
+      48: ddiv
+      49: putfield      #121                // Field ratio_ymodel2vportH:D
+      52: return
+
+  public void mouseDragged(java.awt.event.MouseEvent);
+    descriptor: (Ljava/awt/event/MouseEvent;)V
+    Code:
+       0: aload_0
+       1: aload_1
+       2: invokespecial #122                // Method viewer/zoomable/ViewportTime.mouseDragged:(Ljava/awt/event/MouseEvent;)V
+       5: aload_1
+       6: invokestatic  #114                // Method viewer/common/Routines.isLeftMouseButton:(Ljava/awt/event/MouseEvent;)Z
+       9: ifeq          76
+      12: aload_0
+      13: getfield      #115                // Field viewer/zoomable/ViewportTime.isLeftMouseClick4Zoom:Z
+      16: ifne          76
+      19: aload_1
+      20: invokevirtual #116                // Method java/awt/event/MouseEvent.getPoint:()Ljava/awt/Point;
+      23: astore_2
+      24: aload_0
+      25: getfield      #119                // Field mouse_last_Yloc:I
+      28: aload_2
+      29: getfield      #33                 // Field java/awt/Point.y:I
+      32: isub
+      33: istore_3
+      34: aload_0
+      35: getfield      #121                // Field ratio_ymodel2vportH:D
+      38: iload_3
+      39: i2d
+      40: dmul
+      41: invokestatic  #123                // Method java/lang/Math.round:(D)J
+      44: l2i
+      45: istore        4
+      47: aload_0
+      48: getfield      #3                  // Field y_model:Ljavax/swing/BoundedRangeModel;
+      51: aload_0
+      52: getfield      #3                  // Field y_model:Ljavax/swing/BoundedRangeModel;
+      55: invokeinterface #124,  1          // InterfaceMethod javax/swing/BoundedRangeModel.getValue:()I
+      60: iload         4
+      62: iadd
+      63: invokeinterface #125,  2          // InterfaceMethod javax/swing/BoundedRangeModel.setValue:(I)V
+      68: aload_0
+      69: aload_2
+      70: getfield      #33                 // Field java/awt/Point.y:I
+      73: putfield      #119                // Field mouse_last_Yloc:I
+      76: return
+
+  public void mouseReleased(java.awt.event.MouseEvent);
+    descriptor: (Ljava/awt/event/MouseEvent;)V
+    Code:
+       0: aload_0
+       1: aload_1
+       2: invokespecial #126                // Method viewer/zoomable/ViewportTime.mouseReleased:(Ljava/awt/event/MouseEvent;)V
+       5: aload_1
+       6: invokestatic  #114                // Method viewer/common/Routines.isLeftMouseButton:(Ljava/awt/event/MouseEvent;)Z
+       9: ifeq          76
+      12: aload_0
+      13: getfield      #115                // Field viewer/zoomable/ViewportTime.isLeftMouseClick4Zoom:Z
+      16: ifne          76
+      19: aload_1
+      20: invokevirtual #116                // Method java/awt/event/MouseEvent.getPoint:()Ljava/awt/Point;
+      23: astore_2
+      24: aload_0
+      25: getfield      #119                // Field mouse_last_Yloc:I
+      28: aload_2
+      29: getfield      #33                 // Field java/awt/Point.y:I
+      32: isub
+      33: istore_3
+      34: aload_0
+      35: getfield      #121                // Field ratio_ymodel2vportH:D
+      38: iload_3
+      39: i2d
+      40: dmul
+      41: invokestatic  #123                // Method java/lang/Math.round:(D)J
+      44: l2i
+      45: istore        4
+      47: aload_0
+      48: getfield      #3                  // Field y_model:Ljavax/swing/BoundedRangeModel;
+      51: aload_0
+      52: getfield      #3                  // Field y_model:Ljavax/swing/BoundedRangeModel;
+      55: invokeinterface #124,  1          // InterfaceMethod javax/swing/BoundedRangeModel.getValue:()I
+      60: iload         4
+      62: iadd
+      63: invokeinterface #125,  2          // InterfaceMethod javax/swing/BoundedRangeModel.setValue:(I)V
+      68: aload_0
+      69: aload_2
+      70: getfield      #33                 // Field java/awt/Point.y:I
+      73: putfield      #119                // Field mouse_last_Yloc:I
+      76: return
+
+  static {};
+    descriptor: ()V
+    Code:
+       0: getstatic     #62                 // Field java/awt/Color.yellow:Ljava/awt/Color;
+       3: putstatic     #76                 // Field SEARCH_LINE_COLOR:Ljava/awt/Color;
+       6: ldc2_w        #127                // double 0.5235987755982988d
+       9: invokestatic  #129                // Method java/lang/Math.cos:(D)D
+      12: putstatic     #57                 // Field COS_SEARCH_ARROW_ANGLE:D
+      15: ldc2_w        #127                // double 0.5235987755982988d
+      18: invokestatic  #130                // Method java/lang/Math.sin:(D)D
+      21: putstatic     #54                 // Field SIN_SEARCH_ARROW_ANGLE:D
+      24: return
+}

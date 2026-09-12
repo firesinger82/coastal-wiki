@@ -298,6 +298,8 @@ def main():
     comparison = read('infiltration-document-code-comparison.json')
     assert sha(ROOT / comparison['source']['path']) == comparison['source']['sha256']
     assert sha(ROOT / comparison['visual_receipt']['path']) == comparison['visual_receipt']['sha256']
+    read('bytecode-read/disassembly-receipt.json')
+    read('bytecode-read/launcher-read.json')
     formula_name = 'workbook-formula-read.json'
     if (HERE / formula_name).is_file():
         formula = read(formula_name)

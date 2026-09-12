@@ -1,0 +1,432 @@
+Compiled from "Routines.java"
+public class viewer.common.Routines {
+  private static final java.lang.String UnitIndentStr = "   ";
+    descriptor: Ljava/lang/String;
+
+  private static final double MATH_LOG_10;
+    descriptor: D
+
+  private static final double COLOR_FACTOR = 0.85d;
+    descriptor: D
+
+  public viewer.common.Routines();
+    descriptor: ()V
+    Code:
+       0: aload_0
+       1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+       4: return
+
+  public static void listAllComponents(java.awt.Component, int);
+    descriptor: (Ljava/awt/Component;I)V
+    Code:
+       0: aload_0
+       1: ifnonnull     5
+       4: return
+       5: new           #2                  // class java/lang/StringBuffer
+       8: dup
+       9: invokespecial #3                  // Method java/lang/StringBuffer."<init>":()V
+      12: astore_2
+      13: iconst_0
+      14: istore_3
+      15: iload_3
+      16: iload_1
+      17: if_icmpge     33
+      20: aload_2
+      21: ldc           #4                  // String
+      23: invokevirtual #5                  // Method java/lang/StringBuffer.append:(Ljava/lang/String;)Ljava/lang/StringBuffer;
+      26: pop
+      27: iinc          3, 1
+      30: goto          15
+      33: aload_2
+      34: aload_0
+      35: invokevirtual #6                  // Method java/awt/Component.toString:()Ljava/lang/String;
+      38: invokevirtual #5                  // Method java/lang/StringBuffer.append:(Ljava/lang/String;)Ljava/lang/StringBuffer;
+      41: pop
+      42: getstatic     #7                  // Field java/lang/System.out:Ljava/io/PrintStream;
+      45: aload_2
+      46: invokevirtual #8                  // Method java/lang/StringBuffer.toString:()Ljava/lang/String;
+      49: invokevirtual #9                  // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+      52: aload_0
+      53: instanceof    #10                 // class java/awt/Container
+      56: ifeq          93
+      59: aload_0
+      60: checkcast     #10                 // class java/awt/Container
+      63: invokevirtual #11                 // Method java/awt/Container.getComponents:()[Ljava/awt/Component;
+      66: astore_3
+      67: iconst_0
+      68: istore        4
+      70: iload         4
+      72: aload_3
+      73: arraylength
+      74: if_icmpge     93
+      77: aload_3
+      78: iload         4
+      80: aaload
+      81: iload_1
+      82: iconst_1
+      83: iadd
+      84: invokestatic  #12                 // Method listAllComponents:(Ljava/awt/Component;I)V
+      87: iinc          4, 1
+      90: goto          70
+      93: return
+
+  public static void setComponentAndChildrenCursors(java.awt.Component, java.awt.Cursor);
+    descriptor: (Ljava/awt/Component;Ljava/awt/Cursor;)V
+    Code:
+       0: aload_0
+       1: ifnonnull     5
+       4: return
+       5: aload_0
+       6: aload_1
+       7: invokevirtual #13                 // Method java/awt/Component.setCursor:(Ljava/awt/Cursor;)V
+      10: aload_0
+      11: instanceof    #10                 // class java/awt/Container
+      14: ifeq          46
+      17: aload_0
+      18: checkcast     #10                 // class java/awt/Container
+      21: invokevirtual #11                 // Method java/awt/Container.getComponents:()[Ljava/awt/Component;
+      24: astore_2
+      25: iconst_0
+      26: istore_3
+      27: iload_3
+      28: aload_2
+      29: arraylength
+      30: if_icmpge     46
+      33: aload_2
+      34: iload_3
+      35: aaload
+      36: aload_1
+      37: invokestatic  #14                 // Method setComponentAndChildrenCursors:(Ljava/awt/Component;Ljava/awt/Cursor;)V
+      40: iinc          3, 1
+      43: goto          27
+      46: return
+
+  public static void setShortJComponentSizes(javax.swing.JComponent, java.awt.Dimension);
+    descriptor: (Ljavax/swing/JComponent;Ljava/awt/Dimension;)V
+    Code:
+       0: new           #15                 // class java/awt/Dimension
+       3: dup
+       4: iconst_0
+       5: aload_1
+       6: getfield      #16                 // Field java/awt/Dimension.height:I
+       9: invokespecial #17                 // Method java/awt/Dimension."<init>":(II)V
+      12: astore_2
+      13: new           #15                 // class java/awt/Dimension
+      16: dup
+      17: sipush        32767
+      20: aload_1
+      21: getfield      #16                 // Field java/awt/Dimension.height:I
+      24: invokespecial #17                 // Method java/awt/Dimension."<init>":(II)V
+      27: astore_3
+      28: aload_0
+      29: aload_2
+      30: invokevirtual #18                 // Method javax/swing/JComponent.setMinimumSize:(Ljava/awt/Dimension;)V
+      33: aload_0
+      34: aload_3
+      35: invokevirtual #19                 // Method javax/swing/JComponent.setMaximumSize:(Ljava/awt/Dimension;)V
+      38: aload_0
+      39: aload_1
+      40: invokevirtual #20                 // Method javax/swing/JComponent.setPreferredSize:(Ljava/awt/Dimension;)V
+      43: return
+
+  public static java.awt.Dimension getScreenSize();
+    descriptor: ()Ljava/awt/Dimension;
+    Code:
+       0: invokestatic  #21                 // Method java/awt/Toolkit.getDefaultToolkit:()Ljava/awt/Toolkit;
+       3: invokevirtual #22                 // Method java/awt/Toolkit.getScreenSize:()Ljava/awt/Dimension;
+       6: areturn
+
+  public static java.awt.Dimension correctSize(java.awt.Dimension, java.awt.Insets);
+    descriptor: (Ljava/awt/Dimension;Ljava/awt/Insets;)Ljava/awt/Dimension;
+    Code:
+       0: aload_1
+       1: ifnull        74
+       4: aload_0
+       5: dup
+       6: getfield      #23                 // Field java/awt/Dimension.width:I
+       9: aload_1
+      10: getfield      #24                 // Field java/awt/Insets.left:I
+      13: aload_1
+      14: getfield      #25                 // Field java/awt/Insets.right:I
+      17: iadd
+      18: iadd
+      19: putfield      #23                 // Field java/awt/Dimension.width:I
+      22: aload_0
+      23: getfield      #23                 // Field java/awt/Dimension.width:I
+      26: sipush        32767
+      29: if_icmple     39
+      32: aload_0
+      33: sipush        32767
+      36: putfield      #23                 // Field java/awt/Dimension.width:I
+      39: aload_0
+      40: dup
+      41: getfield      #16                 // Field java/awt/Dimension.height:I
+      44: aload_1
+      45: getfield      #26                 // Field java/awt/Insets.top:I
+      48: aload_1
+      49: getfield      #27                 // Field java/awt/Insets.bottom:I
+      52: iadd
+      53: iadd
+      54: putfield      #16                 // Field java/awt/Dimension.height:I
+      57: aload_0
+      58: getfield      #16                 // Field java/awt/Dimension.height:I
+      61: sipush        32767
+      64: if_icmple     74
+      67: aload_0
+      68: sipush        32767
+      71: putfield      #16                 // Field java/awt/Dimension.height:I
+      74: aload_0
+      75: areturn
+
+  public static int getAdjNumOfTextColumns(java.awt.Component, int);
+    descriptor: (Ljava/awt/Component;I)I
+    Code:
+       0: aload_0
+       1: aload_0
+       2: invokevirtual #28                 // Method java/awt/Component.getFont:()Ljava/awt/Font;
+       5: invokevirtual #29                 // Method java/awt/Component.getFontMetrics:(Ljava/awt/Font;)Ljava/awt/FontMetrics;
+       8: astore_2
+       9: iload_1
+      10: i2d
+      11: aload_2
+      12: bipush        49
+      14: invokevirtual #30                 // Method java/awt/FontMetrics.charWidth:(C)I
+      17: i2d
+      18: dmul
+      19: aload_2
+      20: bipush        109
+      22: invokevirtual #30                 // Method java/awt/FontMetrics.charWidth:(C)I
+      25: i2d
+      26: ddiv
+      27: invokestatic  #31                 // Method java/lang/Math.ceil:(D)D
+      30: d2i
+      31: istore_3
+      32: iload_3
+      33: ireturn
+
+  public static double getTimeRulerIncrement(double);
+    descriptor: (D)D
+    Code:
+       0: dload_0
+       1: dstore_2
+       2: dload_2
+       3: invokestatic  #32                 // Method java/lang/Math.log:(D)D
+       6: getstatic     #33                 // Field MATH_LOG_10:D
+       9: ddiv
+      10: invokestatic  #31                 // Method java/lang/Math.ceil:(D)D
+      13: dstore        4
+      15: ldc2_w        #34                 // double 10.0d
+      18: dload         4
+      20: invokestatic  #36                 // Method java/lang/Math.pow:(DD)D
+      23: dstore        6
+      25: dload_2
+      26: dload         6
+      28: ddiv
+      29: dstore        8
+      31: dload         8
+      33: ldc2_w        #37                 // double 0.1125d
+      36: dcmpg
+      37: ifge          48
+      40: ldc2_w        #39                 // double 0.1d
+      43: dstore        10
+      45: goto          136
+      48: dload         8
+      50: ldc2_w        #41                 // double 0.1625d
+      53: dcmpg
+      54: ifge          65
+      57: ldc2_w        #43                 // double 0.125d
+      60: dstore        10
+      62: goto          136
+      65: dload         8
+      67: ldc2_w        #45                 // double 0.225d
+      70: dcmpg
+      71: ifge          82
+      74: ldc2_w        #47                 // double 0.2d
+      77: dstore        10
+      79: goto          136
+      82: dload         8
+      84: ldc2_w        #49                 // double 0.325d
+      87: dcmpg
+      88: ifge          99
+      91: ldc2_w        #51                 // double 0.25d
+      94: dstore        10
+      96: goto          136
+      99: dload         8
+     101: ldc2_w        #53                 // double 0.45d
+     104: dcmpg
+     105: ifge          116
+     108: ldc2_w        #55                 // double 0.4d
+     111: dstore        10
+     113: goto          136
+     116: dload         8
+     118: ldc2_w        #57                 // double 0.75d
+     121: dcmpg
+     122: ifge          133
+     125: ldc2_w        #59                 // double 0.5d
+     128: dstore        10
+     130: goto          136
+     133: dconst_1
+     134: dstore        10
+     136: dload         10
+     138: dload         6
+     140: dmul
+     141: dreturn
+
+  public static double getTimeRulerFirstMark(double, double);
+    descriptor: (DD)D
+    Code:
+       0: dload_0
+       1: dload_2
+       2: ddiv
+       3: invokestatic  #61                 // Method java/lang/Math.floor:(D)D
+       6: dstore        4
+       8: dload         4
+      10: dload_2
+      11: dmul
+      12: dreturn
+
+  public static java.awt.Color getSlightBrighterColor(java.awt.Color);
+    descriptor: (Ljava/awt/Color;)Ljava/awt/Color;
+    Code:
+       0: aload_0
+       1: invokevirtual #62                 // Method java/awt/Color.getRed:()I
+       4: istore_1
+       5: aload_0
+       6: invokevirtual #63                 // Method java/awt/Color.getGreen:()I
+       9: istore_2
+      10: aload_0
+      11: invokevirtual #64                 // Method java/awt/Color.getBlue:()I
+      14: istore_3
+      15: bipush        6
+      17: istore        4
+      19: iload_1
+      20: ifne          45
+      23: iload_2
+      24: ifne          45
+      27: iload_3
+      28: ifne          45
+      31: new           #65                 // class java/awt/Color
+      34: dup
+      35: iload         4
+      37: iload         4
+      39: iload         4
+      41: invokespecial #66                 // Method java/awt/Color."<init>":(III)V
+      44: areturn
+      45: iload_1
+      46: ifle          58
+      49: iload_1
+      50: iload         4
+      52: if_icmpge     58
+      55: iload         4
+      57: istore_1
+      58: iload_2
+      59: ifle          71
+      62: iload_2
+      63: iload         4
+      65: if_icmpge     71
+      68: iload         4
+      70: istore_2
+      71: iload_3
+      72: ifle          84
+      75: iload_3
+      76: iload         4
+      78: if_icmpge     84
+      81: iload         4
+      83: istore_3
+      84: new           #65                 // class java/awt/Color
+      87: dup
+      88: iload_1
+      89: i2d
+      90: ldc2_w        #67                 // double 0.85d
+      93: ddiv
+      94: d2i
+      95: sipush        255
+      98: invokestatic  #69                 // Method java/lang/Math.min:(II)I
+     101: iload_2
+     102: i2d
+     103: ldc2_w        #67                 // double 0.85d
+     106: ddiv
+     107: d2i
+     108: sipush        255
+     111: invokestatic  #69                 // Method java/lang/Math.min:(II)I
+     114: iload_3
+     115: i2d
+     116: ldc2_w        #67                 // double 0.85d
+     119: ddiv
+     120: d2i
+     121: sipush        255
+     124: invokestatic  #69                 // Method java/lang/Math.min:(II)I
+     127: invokespecial #66                 // Method java/awt/Color."<init>":(III)V
+     130: areturn
+
+  public static java.awt.Color getSlightDarkerColor(java.awt.Color);
+    descriptor: (Ljava/awt/Color;)Ljava/awt/Color;
+    Code:
+       0: new           #65                 // class java/awt/Color
+       3: dup
+       4: aload_0
+       5: invokevirtual #62                 // Method java/awt/Color.getRed:()I
+       8: i2d
+       9: ldc2_w        #67                 // double 0.85d
+      12: dmul
+      13: d2i
+      14: iconst_0
+      15: invokestatic  #70                 // Method java/lang/Math.max:(II)I
+      18: aload_0
+      19: invokevirtual #63                 // Method java/awt/Color.getGreen:()I
+      22: i2d
+      23: ldc2_w        #67                 // double 0.85d
+      26: dmul
+      27: d2i
+      28: iconst_0
+      29: invokestatic  #70                 // Method java/lang/Math.max:(II)I
+      32: aload_0
+      33: invokevirtual #64                 // Method java/awt/Color.getBlue:()I
+      36: i2d
+      37: ldc2_w        #67                 // double 0.85d
+      40: dmul
+      41: d2i
+      42: iconst_0
+      43: invokestatic  #70                 // Method java/lang/Math.max:(II)I
+      46: invokespecial #66                 // Method java/awt/Color."<init>":(III)V
+      49: areturn
+
+  public static boolean isLeftMouseButton(java.awt.event.MouseEvent);
+    descriptor: (Ljava/awt/event/MouseEvent;)Z
+    Code:
+       0: aload_0
+       1: invokestatic  #71                 // Method javax/swing/SwingUtilities.isLeftMouseButton:(Ljava/awt/event/MouseEvent;)Z
+       4: ifeq          18
+       7: aload_0
+       8: invokevirtual #72                 // Method java/awt/event/MouseEvent.isControlDown:()Z
+      11: ifne          18
+      14: iconst_1
+      15: goto          19
+      18: iconst_0
+      19: ireturn
+
+  public static boolean isRightMouseButton(java.awt.event.MouseEvent);
+    descriptor: (Ljava/awt/event/MouseEvent;)Z
+    Code:
+       0: aload_0
+       1: invokestatic  #73                 // Method javax/swing/SwingUtilities.isRightMouseButton:(Ljava/awt/event/MouseEvent;)Z
+       4: ifne          21
+       7: aload_0
+       8: invokestatic  #71                 // Method javax/swing/SwingUtilities.isLeftMouseButton:(Ljava/awt/event/MouseEvent;)Z
+      11: ifeq          25
+      14: aload_0
+      15: invokevirtual #72                 // Method java/awt/event/MouseEvent.isControlDown:()Z
+      18: ifeq          25
+      21: iconst_1
+      22: goto          26
+      25: iconst_0
+      26: ireturn
+
+  static {};
+    descriptor: ()V
+    Code:
+       0: ldc2_w        #34                 // double 10.0d
+       3: invokestatic  #32                 // Method java/lang/Math.log:(D)D
+       6: putstatic     #33                 // Field MATH_LOG_10:D
+       9: return
+}

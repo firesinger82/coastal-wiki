@@ -1,0 +1,846 @@
+Compiled from "TimelinePanel.java"
+public class viewer.timelines.TimelinePanel extends javax.swing.JPanel {
+  private static final long serialVersionUID = 13500l;
+    descriptor: J
+
+  private java.awt.Window root_window;
+    descriptor: Ljava/awt/Window;
+
+  private logformat.slog2.input.InputLog slog_ins;
+    descriptor: Llogformat/slog2/input/InputLog;
+
+  private logformat.slog2.input.TreeTrunk treetrunk;
+    descriptor: Llogformat/slog2/input/TreeTrunk;
+
+  private logformat.slog2.input.TreeNode treeroot;
+    descriptor: Llogformat/slog2/input/TreeNode;
+
+  private viewer.timelines.TimelineToolBar toolbar;
+    descriptor: Lviewer/timelines/TimelineToolBar;
+
+  private viewer.timelines.TreeTrunkPanel treetrunk_panel;
+    descriptor: Lviewer/timelines/TreeTrunkPanel;
+
+  private javax.swing.BoundedRangeModel y_model;
+    descriptor: Ljavax/swing/BoundedRangeModel;
+
+  private viewer.zoomable.YaxisMaps y_maps;
+    descriptor: Lviewer/zoomable/YaxisMaps;
+
+  private viewer.zoomable.YaxisTree y_tree;
+    descriptor: Lviewer/zoomable/YaxisTree;
+
+  private base.drawable.Method[] methods;
+    descriptor: [Lbase/drawable/Method;
+
+  private javax.swing.JScrollPane y_scroller;
+    descriptor: Ljavax/swing/JScrollPane;
+
+  private javax.swing.JScrollBar y_scrollbar;
+    descriptor: Ljavax/swing/JScrollBar;
+
+  private viewer.zoomable.ModelTime time_model;
+    descriptor: Lviewer/zoomable/ModelTime;
+
+  private viewer.zoomable.ScrollbarTime time_scrollbar;
+    descriptor: Lviewer/zoomable/ScrollbarTime;
+
+  private viewer.zoomable.ModelTimePanel time_display_panel;
+    descriptor: Lviewer/zoomable/ModelTimePanel;
+
+  private viewer.zoomable.RulerTime time_ruler;
+    descriptor: Lviewer/zoomable/RulerTime;
+
+  private viewer.zoomable.ViewportTime time_ruler_vport;
+    descriptor: Lviewer/zoomable/ViewportTime;
+
+  private viewer.zoomable.ViewportTimePanel time_ruler_panel;
+    descriptor: Lviewer/zoomable/ViewportTimePanel;
+
+  private viewer.timelines.CanvasTimeline time_canvas;
+    descriptor: Lviewer/timelines/CanvasTimeline;
+
+  private viewer.zoomable.ViewportTimeYaxis time_canvas_vport;
+    descriptor: Lviewer/zoomable/ViewportTimeYaxis;
+
+  private viewer.zoomable.ViewportTimePanel time_canvas_panel;
+    descriptor: Lviewer/zoomable/ViewportTimePanel;
+
+  private viewer.timelines.PreviewStateComboBox preview_state_combobox;
+    descriptor: Lviewer/timelines/PreviewStateComboBox;
+
+  private viewer.zoomable.RowAdjustments row_adjs;
+    descriptor: Lviewer/zoomable/RowAdjustments;
+
+  private java.lang.String err_msg;
+    descriptor: Ljava/lang/String;
+
+  public viewer.timelines.TimelinePanel(java.awt.Window, logformat.slog2.input.InputLog, int);
+    descriptor: (Ljava/awt/Window;Llogformat/slog2/input/InputLog;I)V
+    Code:
+       0: aload_0
+       1: invokespecial #1                  // Method javax/swing/JPanel."<init>":()V
+       4: aload_0
+       5: aload_1
+       6: putfield      #2                  // Field root_window:Ljava/awt/Window;
+       9: aload_0
+      10: aload_2
+      11: putfield      #3                  // Field slog_ins:Llogformat/slog2/input/InputLog;
+      14: ldc           #4                  // String ScrollBar.minimumThumbSize
+      16: invokestatic  #5                  // Method javax/swing/UIManager.get:(Ljava/lang/Object;)Ljava/lang/Object;
+      19: checkcast     #6                  // class java/awt/Dimension
+      22: astore        4
+      24: aload         4
+      26: iconst_4
+      27: putfield      #7                  // Field java/awt/Dimension.width:I
+      30: ldc           #4                  // String ScrollBar.minimumThumbSize
+      32: aload         4
+      34: invokestatic  #8                  // Method javax/swing/UIManager.put:(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+      37: pop
+      38: aload_0
+      39: getfield      #3                  // Field slog_ins:Llogformat/slog2/input/InputLog;
+      42: invokevirtual #9                  // Method logformat/slog2/input/InputLog.getLineIDMapList:()Llogformat/slog2/LineIDMapList;
+      45: astore        5
+      47: aload         5
+      49: iload_3
+      50: invokevirtual #10                 // Method logformat/slog2/LineIDMapList.get:(I)Ljava/lang/Object;
+      53: checkcast     #11                 // class logformat/slog2/LineIDMap
+      56: astore        6
+      58: aload         6
+      60: invokevirtual #12                 // Method logformat/slog2/LineIDMap.getColumnLabels:()[Ljava/lang/String;
+      63: astore        7
+      65: aload_0
+      66: new           #13                 // class viewer/zoomable/YaxisMaps
+      69: dup
+      70: aload         6
+      72: invokespecial #14                 // Method viewer/zoomable/YaxisMaps."<init>":(Llogformat/slog2/LineIDMap;)V
+      75: putfield      #15                 // Field y_maps:Lviewer/zoomable/YaxisMaps;
+      78: aload_0
+      79: new           #16                 // class viewer/zoomable/YaxisTree
+      82: dup
+      83: aload_0
+      84: getfield      #15                 // Field y_maps:Lviewer/zoomable/YaxisMaps;
+      87: invokevirtual #17                 // Method viewer/zoomable/YaxisMaps.getTreeRoot:()Lviewer/zoomable/YaxisTreeNode;
+      90: invokespecial #18                 // Method viewer/zoomable/YaxisTree."<init>":(Ljavax/swing/tree/DefaultMutableTreeNode;)V
+      93: putfield      #19                 // Field y_tree:Lviewer/zoomable/YaxisTree;
+      96: aload_0
+      97: getfield      #15                 // Field y_maps:Lviewer/zoomable/YaxisMaps;
+     100: aload_0
+     101: getfield      #19                 // Field y_tree:Lviewer/zoomable/YaxisTree;
+     104: invokevirtual #20                 // Method viewer/zoomable/YaxisMaps.setTreeView:(Lviewer/zoomable/YaxisTree;)V
+     107: aload_0
+     108: aload         6
+     110: invokevirtual #21                 // Method logformat/slog2/LineIDMap.getMethods:()[Lbase/drawable/Method;
+     113: putfield      #22                 // Field methods:[Lbase/drawable/Method;
+     116: aload_0
+     117: new           #23                 // class javax/swing/JScrollPane
+     120: dup
+     121: aload_0
+     122: getfield      #19                 // Field y_tree:Lviewer/zoomable/YaxisTree;
+     125: bipush        22
+     127: bipush        32
+     129: invokespecial #24                 // Method javax/swing/JScrollPane."<init>":(Ljava/awt/Component;II)V
+     132: putfield      #25                 // Field y_scroller:Ljavax/swing/JScrollPane;
+     135: aload_0
+     136: aload_0
+     137: getfield      #25                 // Field y_scroller:Ljavax/swing/JScrollPane;
+     140: invokevirtual #26                 // Method javax/swing/JScrollPane.getVerticalScrollBar:()Ljavax/swing/JScrollBar;
+     143: putfield      #27                 // Field y_scrollbar:Ljavax/swing/JScrollBar;
+     146: aload_0
+     147: aload_0
+     148: getfield      #27                 // Field y_scrollbar:Ljavax/swing/JScrollBar;
+     151: invokevirtual #28                 // Method javax/swing/JScrollBar.getModel:()Ljavax/swing/BoundedRangeModel;
+     154: putfield      #29                 // Field y_model:Ljavax/swing/BoundedRangeModel;
+     157: aload_0
+     158: new           #30                 // class logformat/slog2/input/TreeTrunk
+     161: dup
+     162: aload_0
+     163: getfield      #3                  // Field slog_ins:Llogformat/slog2/input/InputLog;
+     166: getstatic     #31                 // Field base/drawable/Drawable.INCRE_STARTTIME_ORDER:Lbase/drawable/Drawable$Order;
+     169: invokespecial #32                 // Method logformat/slog2/input/TreeTrunk."<init>":(Llogformat/slog2/input/InputLog;Lbase/drawable/Drawable$Order;)V
+     172: putfield      #33                 // Field treetrunk:Llogformat/slog2/input/TreeTrunk;
+     175: aload_0
+     176: getfield      #33                 // Field treetrunk:Llogformat/slog2/input/TreeTrunk;
+     179: invokevirtual #34                 // Method logformat/slog2/input/TreeTrunk.initFromTreeTop:()V
+     182: aload_0
+     183: aload_0
+     184: getfield      #33                 // Field treetrunk:Llogformat/slog2/input/TreeTrunk;
+     187: invokevirtual #35                 // Method logformat/slog2/input/TreeTrunk.getTreeRoot:()Llogformat/slog2/input/TreeNode;
+     190: putfield      #36                 // Field treeroot:Llogformat/slog2/input/TreeNode;
+     193: aload_0
+     194: new           #37                 // class viewer/zoomable/ModelTime
+     197: dup
+     198: aload_0
+     199: getfield      #2                  // Field root_window:Ljava/awt/Window;
+     202: aload_0
+     203: getfield      #36                 // Field treeroot:Llogformat/slog2/input/TreeNode;
+     206: invokevirtual #38                 // Method logformat/slog2/input/TreeNode.getEarliestTime:()D
+     209: aload_0
+     210: getfield      #36                 // Field treeroot:Llogformat/slog2/input/TreeNode;
+     213: invokevirtual #39                 // Method logformat/slog2/input/TreeNode.getLatestTime:()D
+     216: invokespecial #40                 // Method viewer/zoomable/ModelTime."<init>":(Ljava/awt/Window;DD)V
+     219: putfield      #41                 // Field time_model:Lviewer/zoomable/ModelTime;
+     222: aload_0
+     223: getfield      #41                 // Field time_model:Lviewer/zoomable/ModelTime;
+     226: aload_0
+     227: getfield      #33                 // Field treetrunk:Llogformat/slog2/input/TreeTrunk;
+     230: invokevirtual #42                 // Method logformat/slog2/input/TreeTrunk.getTimeZoomFactor:()D
+     233: invokevirtual #43                 // Method viewer/zoomable/ModelTime.setTimeZoomFactor:(D)V
+     236: getstatic     #44                 // Field java/lang/System.out:Ljava/io/PrintStream;
+     239: new           #45                 // class java/lang/StringBuilder
+     242: dup
+     243: invokespecial #46                 // Method java/lang/StringBuilder."<init>":()V
+     246: ldc           #47                 // String slog_ins.tZoomFtr =
+     248: invokevirtual #48                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     251: aload_0
+     252: getfield      #41                 // Field time_model:Lviewer/zoomable/ModelTime;
+     255: invokevirtual #49                 // Method viewer/zoomable/ModelTime.getTimeZoomFactor:()D
+     258: invokevirtual #50                 // Method java/lang/StringBuilder.append:(D)Ljava/lang/StringBuilder;
+     261: invokevirtual #51                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+     264: invokevirtual #52                 // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+     267: aload_0
+     268: new           #53                 // class java/awt/BorderLayout
+     271: dup
+     272: invokespecial #54                 // Method java/awt/BorderLayout."<init>":()V
+     275: invokevirtual #55                 // Method setLayout:(Ljava/awt/LayoutManager;)V
+     278: new           #56                 // class javax/swing/JPanel
+     281: dup
+     282: invokespecial #1                  // Method javax/swing/JPanel."<init>":()V
+     285: astore        8
+     287: aload         8
+     289: new           #57                 // class javax/swing/BoxLayout
+     292: dup
+     293: aload         8
+     295: iconst_1
+     296: invokespecial #58                 // Method javax/swing/BoxLayout."<init>":(Ljava/awt/Container;I)V
+     299: invokevirtual #59                 // Method javax/swing/JPanel.setLayout:(Ljava/awt/LayoutManager;)V
+     302: aload_0
+     303: new           #60                 // class viewer/zoomable/RulerTime
+     306: dup
+     307: aload_0
+     308: getfield      #41                 // Field time_model:Lviewer/zoomable/ModelTime;
+     311: invokespecial #61                 // Method viewer/zoomable/RulerTime."<init>":(Lviewer/zoomable/ModelTime;)V
+     314: putfield      #62                 // Field time_ruler:Lviewer/zoomable/RulerTime;
+     317: aload_0
+     318: new           #63                 // class viewer/zoomable/ViewportTime
+     321: dup
+     322: aload_0
+     323: getfield      #41                 // Field time_model:Lviewer/zoomable/ModelTime;
+     326: invokespecial #64                 // Method viewer/zoomable/ViewportTime."<init>":(Lviewer/zoomable/ModelTime;)V
+     329: putfield      #65                 // Field time_ruler_vport:Lviewer/zoomable/ViewportTime;
+     332: aload_0
+     333: getfield      #65                 // Field time_ruler_vport:Lviewer/zoomable/ViewportTime;
+     336: aload_0
+     337: getfield      #62                 // Field time_ruler:Lviewer/zoomable/RulerTime;
+     340: invokevirtual #66                 // Method viewer/zoomable/ViewportTime.setView:(Ljava/awt/Component;)V
+     343: aload_0
+     344: new           #67                 // class viewer/zoomable/ViewportTimePanel
+     347: dup
+     348: aload_0
+     349: getfield      #65                 // Field time_ruler_vport:Lviewer/zoomable/ViewportTime;
+     352: invokespecial #68                 // Method viewer/zoomable/ViewportTimePanel."<init>":(Lviewer/zoomable/ViewportTime;)V
+     355: putfield      #69                 // Field time_ruler_panel:Lviewer/zoomable/ViewportTimePanel;
+     358: aload_0
+     359: getfield      #69                 // Field time_ruler_panel:Lviewer/zoomable/ViewportTimePanel;
+     362: ldc           #70                 // String  Time (seconds)
+     364: iconst_3
+     365: iconst_5
+     366: getstatic     #71                 // Field viewer/common/Const.FONT:Ljava/awt/Font;
+     369: getstatic     #72                 // Field java/awt/Color.red:Ljava/awt/Color;
+     372: invokevirtual #73                 // Method viewer/zoomable/ViewportTimePanel.setBorderTitle:(Ljava/lang/String;IILjava/awt/Font;Ljava/awt/Color;)V
+     375: aload_0
+     376: getfield      #65                 // Field time_ruler_vport:Lviewer/zoomable/ViewportTime;
+     379: iconst_0
+     380: invokevirtual #74                 // Method viewer/zoomable/ViewportTime.initLeftMouseToZoom:(Z)V
+     383: aload_0
+     384: getfield      #41                 // Field time_model:Lviewer/zoomable/ModelTime;
+     387: aload_0
+     388: getfield      #65                 // Field time_ruler_vport:Lviewer/zoomable/ViewportTime;
+     391: invokevirtual #75                 // Method viewer/zoomable/ModelTime.addTimeListener:(Lviewer/zoomable/TimeListener;)V
+     394: aload_0
+     395: getfield      #69                 // Field time_ruler_panel:Lviewer/zoomable/ViewportTimePanel;
+     398: invokevirtual #76                 // Method viewer/zoomable/ViewportTimePanel.getInsets:()Ljava/awt/Insets;
+     401: astore        9
+     403: aload         9
+     405: getfield      #77                 // Field java/awt/Insets.top:I
+     408: aload_0
+     409: getfield      #62                 // Field time_ruler:Lviewer/zoomable/RulerTime;
+     412: invokevirtual #78                 // Method viewer/zoomable/RulerTime.getJComponentHeight:()I
+     415: iadd
+     416: aload         9
+     418: getfield      #79                 // Field java/awt/Insets.bottom:I
+     421: iadd
+     422: istore        10
+     424: aload_0
+     425: getfield      #69                 // Field time_ruler_panel:Lviewer/zoomable/ViewportTimePanel;
+     428: new           #6                  // class java/awt/Dimension
+     431: dup
+     432: bipush        100
+     434: iload         10
+     436: invokespecial #80                 // Method java/awt/Dimension."<init>":(II)V
+     439: invokevirtual #81                 // Method viewer/zoomable/ViewportTimePanel.setPreferredSize:(Ljava/awt/Dimension;)V
+     442: aload_0
+     443: new           #82                 // class viewer/timelines/CanvasTimeline
+     446: dup
+     447: aload_0
+     448: getfield      #41                 // Field time_model:Lviewer/zoomable/ModelTime;
+     451: aload_0
+     452: getfield      #33                 // Field treetrunk:Llogformat/slog2/input/TreeTrunk;
+     455: aload_0
+     456: getfield      #29                 // Field y_model:Ljavax/swing/BoundedRangeModel;
+     459: aload_0
+     460: getfield      #15                 // Field y_maps:Lviewer/zoomable/YaxisMaps;
+     463: aload         7
+     465: aload_0
+     466: getfield      #22                 // Field methods:[Lbase/drawable/Method;
+     469: invokespecial #83                 // Method viewer/timelines/CanvasTimeline."<init>":(Lviewer/zoomable/ModelTime;Llogformat/slog2/input/TreeTrunk;Ljavax/swing/BoundedRangeModel;Lviewer/zoomable/YaxisMaps;[Ljava/lang/String;[Lbase/drawable/Method;)V
+     472: putfield      #84                 // Field time_canvas:Lviewer/timelines/CanvasTimeline;
+     475: aload_0
+     476: new           #85                 // class viewer/zoomable/ViewportTimeYaxis
+     479: dup
+     480: aload_0
+     481: getfield      #41                 // Field time_model:Lviewer/zoomable/ModelTime;
+     484: aload_0
+     485: getfield      #29                 // Field y_model:Ljavax/swing/BoundedRangeModel;
+     488: aload_0
+     489: getfield      #19                 // Field y_tree:Lviewer/zoomable/YaxisTree;
+     492: invokespecial #86                 // Method viewer/zoomable/ViewportTimeYaxis."<init>":(Lviewer/zoomable/ModelTime;Ljavax/swing/BoundedRangeModel;Lviewer/zoomable/YaxisTree;)V
+     495: putfield      #87                 // Field time_canvas_vport:Lviewer/zoomable/ViewportTimeYaxis;
+     498: aload_0
+     499: getfield      #87                 // Field time_canvas_vport:Lviewer/zoomable/ViewportTimeYaxis;
+     502: aload_0
+     503: getfield      #84                 // Field time_canvas:Lviewer/timelines/CanvasTimeline;
+     506: invokevirtual #88                 // Method viewer/zoomable/ViewportTimeYaxis.setView:(Ljava/awt/Component;)V
+     509: aload_0
+     510: new           #67                 // class viewer/zoomable/ViewportTimePanel
+     513: dup
+     514: aload_0
+     515: getfield      #87                 // Field time_canvas_vport:Lviewer/zoomable/ViewportTimeYaxis;
+     518: invokespecial #68                 // Method viewer/zoomable/ViewportTimePanel."<init>":(Lviewer/zoomable/ViewportTime;)V
+     521: putfield      #89                 // Field time_canvas_panel:Lviewer/zoomable/ViewportTimePanel;
+     524: aload_0
+     525: getfield      #89                 // Field time_canvas_panel:Lviewer/zoomable/ViewportTimePanel;
+     528: ldc           #90                 // String  TimeLines
+     530: iconst_3
+     531: iconst_2
+     532: aconst_null
+     533: getstatic     #91                 // Field java/awt/Color.blue:Ljava/awt/Color;
+     536: invokevirtual #73                 // Method viewer/zoomable/ViewportTimePanel.setBorderTitle:(Ljava/lang/String;IILjava/awt/Font;Ljava/awt/Color;)V
+     539: aload_0
+     540: getfield      #87                 // Field time_canvas_vport:Lviewer/zoomable/ViewportTimeYaxis;
+     543: iconst_1
+     544: invokevirtual #92                 // Method viewer/zoomable/ViewportTimeYaxis.initLeftMouseToZoom:(Z)V
+     547: aload_0
+     548: getfield      #41                 // Field time_model:Lviewer/zoomable/ModelTime;
+     551: aload_0
+     552: getfield      #87                 // Field time_canvas_vport:Lviewer/zoomable/ViewportTimeYaxis;
+     555: invokevirtual #75                 // Method viewer/zoomable/ModelTime.addTimeListener:(Lviewer/zoomable/TimeListener;)V
+     558: aload_0
+     559: new           #93                 // class viewer/zoomable/ModelTimePanel
+     562: dup
+     563: aload_0
+     564: getfield      #41                 // Field time_model:Lviewer/zoomable/ModelTime;
+     567: invokespecial #94                 // Method viewer/zoomable/ModelTimePanel."<init>":(Lviewer/zoomable/ModelTime;)V
+     570: putfield      #95                 // Field time_display_panel:Lviewer/zoomable/ModelTimePanel;
+     573: aload_0
+     574: getfield      #41                 // Field time_model:Lviewer/zoomable/ModelTime;
+     577: aload_0
+     578: getfield      #95                 // Field time_display_panel:Lviewer/zoomable/ModelTimePanel;
+     581: invokevirtual #96                 // Method viewer/zoomable/ModelTime.setParamDisplay:(Lviewer/zoomable/ModelTimePanel;)V
+     584: aload_0
+     585: getfield      #95                 // Field time_display_panel:Lviewer/zoomable/ModelTimePanel;
+     588: aload_0
+     589: getfield      #65                 // Field time_ruler_vport:Lviewer/zoomable/ViewportTime;
+     592: invokevirtual #97                 // Method viewer/zoomable/ModelTimePanel.addViewportTime:(Lviewer/zoomable/ViewportTime;)V
+     595: aload_0
+     596: getfield      #95                 // Field time_display_panel:Lviewer/zoomable/ModelTimePanel;
+     599: aload_0
+     600: getfield      #87                 // Field time_canvas_vport:Lviewer/zoomable/ViewportTimeYaxis;
+     603: invokevirtual #97                 // Method viewer/zoomable/ModelTimePanel.addViewportTime:(Lviewer/zoomable/ViewportTime;)V
+     606: aload_0
+     607: getfield      #87                 // Field time_canvas_vport:Lviewer/zoomable/ViewportTimeYaxis;
+     610: iconst_0
+     611: invokevirtual #98                 // Method viewer/zoomable/ViewportTimeYaxis.createLeftMouseModePanel:(I)Ljavax/swing/JPanel;
+     614: astore        11
+     616: aload         11
+     618: ldc           #99                 // String Operation for left mouse button click on Timeline canvas
+     620: invokevirtual #100                // Method javax/swing/JPanel.setToolTipText:(Ljava/lang/String;)V
+     623: aload_0
+     624: getfield      #95                 // Field time_display_panel:Lviewer/zoomable/ModelTimePanel;
+     627: aload         11
+     629: invokevirtual #101                // Method viewer/zoomable/ModelTimePanel.add:(Ljava/awt/Component;)Ljava/awt/Component;
+     632: pop
+     633: aload_0
+     634: new           #102                // class viewer/zoomable/ScrollbarTime
+     637: dup
+     638: aload_0
+     639: getfield      #41                 // Field time_model:Lviewer/zoomable/ModelTime;
+     642: invokespecial #103                // Method viewer/zoomable/ScrollbarTime."<init>":(Lviewer/zoomable/ModelTime;)V
+     645: putfield      #104                // Field time_scrollbar:Lviewer/zoomable/ScrollbarTime;
+     648: aload_0
+     649: getfield      #104                // Field time_scrollbar:Lviewer/zoomable/ScrollbarTime;
+     652: iconst_1
+     653: invokevirtual #105                // Method viewer/zoomable/ScrollbarTime.setEnabled:(Z)V
+     656: aload_0
+     657: getfield      #41                 // Field time_model:Lviewer/zoomable/ModelTime;
+     660: aload_0
+     661: getfield      #104                // Field time_scrollbar:Lviewer/zoomable/ScrollbarTime;
+     664: invokevirtual #106                // Method viewer/zoomable/ModelTime.setScrollBar:(Ljavax/swing/JScrollBar;)V
+     667: aload         8
+     669: aload_0
+     670: getfield      #95                 // Field time_display_panel:Lviewer/zoomable/ModelTimePanel;
+     673: invokevirtual #107                // Method javax/swing/JPanel.add:(Ljava/awt/Component;)Ljava/awt/Component;
+     676: pop
+     677: aload         8
+     679: aload_0
+     680: getfield      #89                 // Field time_canvas_panel:Lviewer/zoomable/ViewportTimePanel;
+     683: invokevirtual #107                // Method javax/swing/JPanel.add:(Ljava/awt/Component;)Ljava/awt/Component;
+     686: pop
+     687: aload         8
+     689: aload_0
+     690: getfield      #104                // Field time_scrollbar:Lviewer/zoomable/ScrollbarTime;
+     693: invokevirtual #107                // Method javax/swing/JPanel.add:(Ljava/awt/Component;)Ljava/awt/Component;
+     696: pop
+     697: aload         8
+     699: aload_0
+     700: getfield      #69                 // Field time_ruler_panel:Lviewer/zoomable/ViewportTimePanel;
+     703: invokevirtual #107                // Method javax/swing/JPanel.add:(Ljava/awt/Component;)Ljava/awt/Component;
+     706: pop
+     707: new           #56                 // class javax/swing/JPanel
+     710: dup
+     711: invokespecial #1                  // Method javax/swing/JPanel."<init>":()V
+     714: astore        12
+     716: aload         12
+     718: new           #57                 // class javax/swing/BoxLayout
+     721: dup
+     722: aload         12
+     724: iconst_1
+     725: invokespecial #58                 // Method javax/swing/BoxLayout."<init>":(Ljava/awt/Container;I)V
+     728: invokevirtual #59                 // Method javax/swing/JPanel.setLayout:(Ljava/awt/LayoutManager;)V
+     731: aload_0
+     732: new           #108                // class viewer/timelines/TreeTrunkPanel
+     735: dup
+     736: aload_0
+     737: getfield      #33                 // Field treetrunk:Llogformat/slog2/input/TreeTrunk;
+     740: invokespecial #109                // Method viewer/timelines/TreeTrunkPanel."<init>":(Llogformat/slog2/input/TreeTrunk;)V
+     743: putfield      #110                // Field treetrunk_panel:Lviewer/timelines/TreeTrunkPanel;
+     746: aload_0
+     747: getfield      #110                // Field treetrunk_panel:Lviewer/timelines/TreeTrunkPanel;
+     750: ldc           #111                // float 0.5f
+     752: invokevirtual #112                // Method viewer/timelines/TreeTrunkPanel.setAlignmentX:(F)V
+     755: aload_0
+     756: getfield      #84                 // Field time_canvas:Lviewer/timelines/CanvasTimeline;
+     759: aload_0
+     760: getfield      #110                // Field treetrunk_panel:Lviewer/timelines/TreeTrunkPanel;
+     763: invokevirtual #113                // Method viewer/timelines/CanvasTimeline.addChangeListener:(Ljavax/swing/event/ChangeListener;)V
+     766: aload_0
+     767: getfield      #89                 // Field time_canvas_panel:Lviewer/zoomable/ViewportTimePanel;
+     770: invokevirtual #76                 // Method viewer/zoomable/ViewportTimePanel.getInsets:()Ljava/awt/Insets;
+     773: astore        13
+     775: aload_0
+     776: new           #114                // class viewer/timelines/PreviewStateComboBox
+     779: dup
+     780: invokespecial #115                // Method viewer/timelines/PreviewStateComboBox."<init>":()V
+     783: putfield      #116                // Field preview_state_combobox:Lviewer/timelines/PreviewStateComboBox;
+     786: aload_0
+     787: getfield      #116                // Field preview_state_combobox:Lviewer/timelines/PreviewStateComboBox;
+     790: new           #6                  // class java/awt/Dimension
+     793: dup
+     794: iconst_0
+     795: aload         13
+     797: getfield      #77                 // Field java/awt/Insets.top:I
+     800: invokespecial #80                 // Method java/awt/Dimension."<init>":(II)V
+     803: invokevirtual #117                // Method viewer/timelines/PreviewStateComboBox.setMinimumSize:(Ljava/awt/Dimension;)V
+     806: aload_0
+     807: getfield      #116                // Field preview_state_combobox:Lviewer/timelines/PreviewStateComboBox;
+     810: new           #6                  // class java/awt/Dimension
+     813: dup
+     814: sipush        32767
+     817: aload         13
+     819: getfield      #77                 // Field java/awt/Insets.top:I
+     822: invokespecial #80                 // Method java/awt/Dimension."<init>":(II)V
+     825: invokevirtual #118                // Method viewer/timelines/PreviewStateComboBox.setMaximumSize:(Ljava/awt/Dimension;)V
+     828: aload_0
+     829: getfield      #116                // Field preview_state_combobox:Lviewer/timelines/PreviewStateComboBox;
+     832: new           #6                  // class java/awt/Dimension
+     835: dup
+     836: bipush        20
+     838: aload         13
+     840: getfield      #77                 // Field java/awt/Insets.top:I
+     843: invokespecial #80                 // Method java/awt/Dimension."<init>":(II)V
+     846: invokevirtual #119                // Method viewer/timelines/PreviewStateComboBox.setPreferredSize:(Ljava/awt/Dimension;)V
+     849: aload_0
+     850: getfield      #116                // Field preview_state_combobox:Lviewer/timelines/PreviewStateComboBox;
+     853: ldc           #111                // float 0.5f
+     855: invokevirtual #120                // Method viewer/timelines/PreviewStateComboBox.setAlignmentX:(F)V
+     858: aload_0
+     859: getfield      #25                 // Field y_scroller:Ljavax/swing/JScrollPane;
+     862: ldc           #111                // float 0.5f
+     864: invokevirtual #121                // Method javax/swing/JScrollPane.setAlignmentX:(F)V
+     867: aload_0
+     868: getfield      #27                 // Field y_scrollbar:Ljavax/swing/JScrollBar;
+     871: aload_0
+     872: getfield      #87                 // Field time_canvas_vport:Lviewer/zoomable/ViewportTimeYaxis;
+     875: invokevirtual #122                // Method javax/swing/JScrollBar.addAdjustmentListener:(Ljava/awt/event/AdjustmentListener;)V
+     878: iload         10
+     880: aload         13
+     882: getfield      #79                 // Field java/awt/Insets.bottom:I
+     885: iadd
+     886: istore        14
+     888: new           #123                // class javax/swing/JTextArea
+     891: dup
+     892: invokespecial #124                // Method javax/swing/JTextArea."<init>":()V
+     895: astore        15
+     897: new           #125                // class java/lang/StringBuffer
+     900: dup
+     901: ldc           #126                // String
+     903: invokespecial #127                // Method java/lang/StringBuffer."<init>":(Ljava/lang/String;)V
+     906: astore        16
+     908: iconst_0
+     909: istore        17
+     911: iload         17
+     913: aload         7
+     915: arraylength
+     916: if_icmpge     974
+     919: aload         15
+     921: new           #45                 // class java/lang/StringBuilder
+     924: dup
+     925: invokespecial #46                 // Method java/lang/StringBuilder."<init>":()V
+     928: aload         16
+     930: invokevirtual #128                // Method java/lang/StringBuffer.toString:()Ljava/lang/String;
+     933: invokevirtual #48                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     936: ldc           #129                // String @
+     938: invokevirtual #48                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     941: aload         7
+     943: iload         17
+     945: aaload
+     946: invokevirtual #48                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     949: ldc           #130                // String \n
+     951: invokevirtual #48                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     954: invokevirtual #51                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+     957: invokevirtual #131                // Method javax/swing/JTextArea.append:(Ljava/lang/String;)V
+     960: aload         16
+     962: ldc           #132                // String
+     964: invokevirtual #133                // Method java/lang/StringBuffer.append:(Ljava/lang/String;)Ljava/lang/StringBuffer;
+     967: pop
+     968: iinc          17, 1
+     971: goto          911
+     974: new           #23                 // class javax/swing/JScrollPane
+     977: dup
+     978: aload         15
+     980: bipush        22
+     982: bipush        32
+     984: invokespecial #24                 // Method javax/swing/JScrollPane."<init>":(Ljava/awt/Component;II)V
+     987: astore        17
+     989: aload         17
+     991: new           #6                  // class java/awt/Dimension
+     994: dup
+     995: iconst_0
+     996: iload         14
+     998: invokespecial #80                 // Method java/awt/Dimension."<init>":(II)V
+    1001: invokevirtual #134                // Method javax/swing/JScrollPane.setMinimumSize:(Ljava/awt/Dimension;)V
+    1004: aload         17
+    1006: new           #6                  // class java/awt/Dimension
+    1009: dup
+    1010: sipush        32767
+    1013: iload         14
+    1015: invokespecial #80                 // Method java/awt/Dimension."<init>":(II)V
+    1018: invokevirtual #135                // Method javax/swing/JScrollPane.setMaximumSize:(Ljava/awt/Dimension;)V
+    1021: aload         17
+    1023: new           #6                  // class java/awt/Dimension
+    1026: dup
+    1027: bipush        20
+    1029: iload         14
+    1031: invokespecial #80                 // Method java/awt/Dimension."<init>":(II)V
+    1034: invokevirtual #136                // Method javax/swing/JScrollPane.setPreferredSize:(Ljava/awt/Dimension;)V
+    1037: aload         12
+    1039: aload_0
+    1040: getfield      #110                // Field treetrunk_panel:Lviewer/timelines/TreeTrunkPanel;
+    1043: invokevirtual #107                // Method javax/swing/JPanel.add:(Ljava/awt/Component;)Ljava/awt/Component;
+    1046: pop
+    1047: aload         12
+    1049: aload_0
+    1050: getfield      #116                // Field preview_state_combobox:Lviewer/timelines/PreviewStateComboBox;
+    1053: invokevirtual #107                // Method javax/swing/JPanel.add:(Ljava/awt/Component;)Ljava/awt/Component;
+    1056: pop
+    1057: aload         12
+    1059: aload_0
+    1060: getfield      #25                 // Field y_scroller:Ljavax/swing/JScrollPane;
+    1063: invokevirtual #107                // Method javax/swing/JPanel.add:(Ljava/awt/Component;)Ljava/awt/Component;
+    1066: pop
+    1067: aload         12
+    1069: aload         17
+    1071: invokevirtual #107                // Method javax/swing/JPanel.add:(Ljava/awt/Component;)Ljava/awt/Component;
+    1074: pop
+    1075: new           #56                 // class javax/swing/JPanel
+    1078: dup
+    1079: invokespecial #1                  // Method javax/swing/JPanel."<init>":()V
+    1082: astore        18
+    1084: aload         18
+    1086: new           #57                 // class javax/swing/BoxLayout
+    1089: dup
+    1090: aload         18
+    1092: iconst_1
+    1093: invokespecial #58                 // Method javax/swing/BoxLayout."<init>":(Ljava/awt/Container;I)V
+    1096: invokevirtual #59                 // Method javax/swing/JPanel.setLayout:(Ljava/awt/LayoutManager;)V
+    1099: aload_0
+    1100: new           #137                // class viewer/zoomable/RowAdjustments
+    1103: dup
+    1104: aload_0
+    1105: getfield      #87                 // Field time_canvas_vport:Lviewer/zoomable/ViewportTimeYaxis;
+    1108: aload_0
+    1109: getfield      #19                 // Field y_tree:Lviewer/zoomable/YaxisTree;
+    1112: invokespecial #138                // Method viewer/zoomable/RowAdjustments."<init>":(Lviewer/zoomable/ViewportTimeYaxis;Lviewer/zoomable/YaxisTree;)V
+    1115: putfield      #139                // Field row_adjs:Lviewer/zoomable/RowAdjustments;
+    1118: aload_0
+    1119: getfield      #139                // Field row_adjs:Lviewer/zoomable/RowAdjustments;
+    1122: invokevirtual #140                // Method viewer/zoomable/RowAdjustments.getComboBoxPanel:()Ljavax/swing/JPanel;
+    1125: astore        19
+    1127: aload         19
+    1129: new           #6                  // class java/awt/Dimension
+    1132: dup
+    1133: iconst_0
+    1134: aload         13
+    1136: getfield      #77                 // Field java/awt/Insets.top:I
+    1139: invokespecial #80                 // Method java/awt/Dimension."<init>":(II)V
+    1142: invokevirtual #141                // Method javax/swing/JPanel.setMinimumSize:(Ljava/awt/Dimension;)V
+    1145: aload         19
+    1147: new           #6                  // class java/awt/Dimension
+    1150: dup
+    1151: sipush        32767
+    1154: aload         13
+    1156: getfield      #77                 // Field java/awt/Insets.top:I
+    1159: invokespecial #80                 // Method java/awt/Dimension."<init>":(II)V
+    1162: invokevirtual #142                // Method javax/swing/JPanel.setMaximumSize:(Ljava/awt/Dimension;)V
+    1165: aload         19
+    1167: new           #6                  // class java/awt/Dimension
+    1170: dup
+    1171: bipush        20
+    1173: aload         13
+    1175: getfield      #77                 // Field java/awt/Insets.top:I
+    1178: invokespecial #80                 // Method java/awt/Dimension."<init>":(II)V
+    1181: invokevirtual #143                // Method javax/swing/JPanel.setPreferredSize:(Ljava/awt/Dimension;)V
+    1184: aload         19
+    1186: ldc           #111                // float 0.5f
+    1188: invokevirtual #144                // Method javax/swing/JPanel.setAlignmentX:(F)V
+    1191: aload_0
+    1192: getfield      #139                // Field row_adjs:Lviewer/zoomable/RowAdjustments;
+    1195: invokevirtual #145                // Method viewer/zoomable/RowAdjustments.getTextFieldPanel:()Ljavax/swing/JPanel;
+    1198: astore        20
+    1200: aload         20
+    1202: ldc           #111                // float 0.5f
+    1204: invokevirtual #144                // Method javax/swing/JPanel.setAlignmentX:(F)V
+    1207: aload_0
+    1208: getfield      #139                // Field row_adjs:Lviewer/zoomable/RowAdjustments;
+    1211: invokevirtual #146                // Method viewer/zoomable/RowAdjustments.getSliderPanel:()Ljavax/swing/JPanel;
+    1214: astore        21
+    1216: new           #23                 // class javax/swing/JScrollPane
+    1219: dup
+    1220: aload         21
+    1222: bipush        21
+    1224: bipush        32
+    1226: invokespecial #24                 // Method javax/swing/JScrollPane."<init>":(Ljava/awt/Component;II)V
+    1229: astore        22
+    1231: aload         22
+    1233: ldc           #111                // float 0.5f
+    1235: invokevirtual #121                // Method javax/swing/JScrollPane.setAlignmentX:(F)V
+    1238: aload_0
+    1239: getfield      #139                // Field row_adjs:Lviewer/zoomable/RowAdjustments;
+    1242: invokevirtual #147                // Method viewer/zoomable/RowAdjustments.getMiscPanel:()Ljavax/swing/JPanel;
+    1245: astore        23
+    1247: aload         23
+    1249: ldc           #111                // float 0.5f
+    1251: invokevirtual #144                // Method javax/swing/JPanel.setAlignmentX:(F)V
+    1254: aload_0
+    1255: getfield      #65                 // Field time_ruler_vport:Lviewer/zoomable/ViewportTime;
+    1258: iconst_0
+    1259: invokevirtual #148                // Method viewer/zoomable/ViewportTime.createLeftMouseModePanel:(I)Ljavax/swing/JPanel;
+    1262: astore        24
+    1264: aload         24
+    1266: ldc           #149                // String Operation for left mouse button click on Time Ruler
+    1268: invokevirtual #100                // Method javax/swing/JPanel.setToolTipText:(Ljava/lang/String;)V
+    1271: aload         24
+    1273: fconst_0
+    1274: invokevirtual #144                // Method javax/swing/JPanel.setAlignmentX:(F)V
+    1277: aload         23
+    1279: aload         24
+    1281: invokevirtual #107                // Method javax/swing/JPanel.add:(Ljava/awt/Component;)Ljava/awt/Component;
+    1284: pop
+    1285: new           #23                 // class javax/swing/JScrollPane
+    1288: dup
+    1289: aload         23
+    1291: bipush        20
+    1293: bipush        30
+    1295: invokespecial #24                 // Method javax/swing/JScrollPane."<init>":(Ljava/awt/Component;II)V
+    1298: astore        25
+    1300: aload         25
+    1302: new           #6                  // class java/awt/Dimension
+    1305: dup
+    1306: iconst_0
+    1307: iload         14
+    1309: invokespecial #80                 // Method java/awt/Dimension."<init>":(II)V
+    1312: invokevirtual #134                // Method javax/swing/JScrollPane.setMinimumSize:(Ljava/awt/Dimension;)V
+    1315: aload         25
+    1317: new           #6                  // class java/awt/Dimension
+    1320: dup
+    1321: sipush        32767
+    1324: iload         14
+    1326: invokespecial #80                 // Method java/awt/Dimension."<init>":(II)V
+    1329: invokevirtual #135                // Method javax/swing/JScrollPane.setMaximumSize:(Ljava/awt/Dimension;)V
+    1332: aload         25
+    1334: new           #6                  // class java/awt/Dimension
+    1337: dup
+    1338: bipush        20
+    1340: iload         14
+    1342: invokespecial #80                 // Method java/awt/Dimension."<init>":(II)V
+    1345: invokevirtual #136                // Method javax/swing/JScrollPane.setPreferredSize:(Ljava/awt/Dimension;)V
+    1348: aload         18
+    1350: aload         19
+    1352: invokevirtual #107                // Method javax/swing/JPanel.add:(Ljava/awt/Component;)Ljava/awt/Component;
+    1355: pop
+    1356: aload         18
+    1358: aload         20
+    1360: invokevirtual #107                // Method javax/swing/JPanel.add:(Ljava/awt/Component;)Ljava/awt/Component;
+    1363: pop
+    1364: aload         18
+    1366: aload         22
+    1368: invokevirtual #107                // Method javax/swing/JPanel.add:(Ljava/awt/Component;)Ljava/awt/Component;
+    1371: pop
+    1372: aload         18
+    1374: aload         25
+    1376: invokevirtual #107                // Method javax/swing/JPanel.add:(Ljava/awt/Component;)Ljava/awt/Component;
+    1379: pop
+    1380: new           #150                // class javax/swing/JSplitPane
+    1383: dup
+    1384: iconst_1
+    1385: iconst_0
+    1386: aload         12
+    1388: aload         8
+    1390: invokespecial #151                // Method javax/swing/JSplitPane."<init>":(IZLjava/awt/Component;Ljava/awt/Component;)V
+    1393: astore        26
+    1395: new           #150                // class javax/swing/JSplitPane
+    1398: dup
+    1399: iconst_1
+    1400: iconst_0
+    1401: aload         26
+    1403: aload         18
+    1405: invokespecial #151                // Method javax/swing/JSplitPane."<init>":(IZLjava/awt/Component;Ljava/awt/Component;)V
+    1408: astore        27
+    1410: aload         27
+    1412: iconst_1
+    1413: invokevirtual #152                // Method javax/swing/JSplitPane.setOneTouchExpandable:(Z)V
+    1416: aload_0
+    1417: aconst_null
+    1418: putfield      #153                // Field err_msg:Ljava/lang/String;
+    1421: aload         26
+    1423: iconst_1
+    1424: invokevirtual #152                // Method javax/swing/JSplitPane.setOneTouchExpandable:(Z)V
+    1427: aload         27
+    1429: dconst_1
+    1430: invokevirtual #154                // Method javax/swing/JSplitPane.setResizeWeight:(D)V
+    1433: goto          1444
+    1436: astore        28
+    1438: aload_0
+    1439: ldc           #156                // String Method JSplitPane.setResizeWeight() cannot be found.\nThis indicates you are running an older Java2 RunTime,\nlike the one in J2SDK 1.2.2 or older. If this is the case,\nsome features in Timeline window may not work correctly,\nFor instance, automatic resize of the Timeline canvas\nduring window resizing and auto-update of the canvas\nafter adjustment of the slider\'s knob may fail silently,\nmanuel refresh of the canvas will be needed.
+    1441: putfield      #153                // Field err_msg:Ljava/lang/String;
+    1444: aload_0
+    1445: aload         27
+    1447: ldc           #157                // String Center
+    1449: invokevirtual #158                // Method add:(Ljava/awt/Component;Ljava/lang/Object;)V
+    1452: aload_0
+    1453: new           #159                // class viewer/timelines/TimelineToolBar
+    1456: dup
+    1457: aload_0
+    1458: getfield      #2                  // Field root_window:Ljava/awt/Window;
+    1461: aload_0
+    1462: getfield      #87                 // Field time_canvas_vport:Lviewer/zoomable/ViewportTimeYaxis;
+    1465: aload_0
+    1466: getfield      #27                 // Field y_scrollbar:Ljavax/swing/JScrollBar;
+    1469: aload_0
+    1470: getfield      #19                 // Field y_tree:Lviewer/zoomable/YaxisTree;
+    1473: aload_0
+    1474: getfield      #15                 // Field y_maps:Lviewer/zoomable/YaxisMaps;
+    1477: aload_0
+    1478: getfield      #104                // Field time_scrollbar:Lviewer/zoomable/ScrollbarTime;
+    1481: aload_0
+    1482: getfield      #41                 // Field time_model:Lviewer/zoomable/ModelTime;
+    1485: aload_0
+    1486: getfield      #139                // Field row_adjs:Lviewer/zoomable/RowAdjustments;
+    1489: invokespecial #160                // Method viewer/timelines/TimelineToolBar."<init>":(Ljava/awt/Window;Lviewer/zoomable/ViewportTimeYaxis;Ljavax/swing/JScrollBar;Lviewer/zoomable/YaxisTree;Lviewer/zoomable/YaxisMaps;Lviewer/zoomable/ScrollbarTime;Lviewer/zoomable/ModelTime;Lviewer/zoomable/RowAdjustments;)V
+    1492: putfield      #161                // Field toolbar:Lviewer/timelines/TimelineToolBar;
+    1495: aload_0
+    1496: aload_0
+    1497: getfield      #161                // Field toolbar:Lviewer/timelines/TimelineToolBar;
+    1500: ldc           #162                // String North
+    1502: invokevirtual #158                // Method add:(Ljava/awt/Component;Ljava/lang/Object;)V
+    1505: aload_0
+    1506: getfield      #19                 // Field y_tree:Lviewer/zoomable/YaxisTree;
+    1509: invokevirtual #163                // Method viewer/zoomable/YaxisTree.init:()V
+    1512: aload_0
+    1513: getfield      #139                // Field row_adjs:Lviewer/zoomable/RowAdjustments;
+    1516: invokevirtual #164                // Method viewer/zoomable/RowAdjustments.initYLabelTreeSize:()V
+    1519: aload_0
+    1520: getfield      #116                // Field preview_state_combobox:Lviewer/timelines/PreviewStateComboBox;
+    1523: aload_0
+    1524: getfield      #161                // Field toolbar:Lviewer/timelines/TimelineToolBar;
+    1527: invokevirtual #165                // Method viewer/timelines/TimelineToolBar.getPropertyRefreshButton:()Ljavax/swing/JButton;
+    1530: invokevirtual #166                // Method viewer/timelines/PreviewStateComboBox.addRedrawListener:(Ljavax/swing/JButton;)V
+    1533: return
+    Exception table:
+       from    to  target type
+        1421  1433  1436   Class java/lang/NoSuchMethodError
+
+  public void init();
+    descriptor: ()V
+    Code:
+       0: aload_0
+       1: getfield      #161                // Field toolbar:Lviewer/timelines/TimelineToolBar;
+       4: invokevirtual #167                // Method viewer/timelines/TimelineToolBar.init:()V
+       7: aload_0
+       8: getfield      #139                // Field row_adjs:Lviewer/zoomable/RowAdjustments;
+      11: invokevirtual #168                // Method viewer/zoomable/RowAdjustments.initSlidersAndTextFields:()V
+      14: aload_0
+      15: getfield      #116                // Field preview_state_combobox:Lviewer/timelines/PreviewStateComboBox;
+      18: invokevirtual #169                // Method viewer/timelines/PreviewStateComboBox.init:()V
+      21: aload_0
+      22: getfield      #153                // Field err_msg:Ljava/lang/String;
+      25: ifnull        39
+      28: aload_0
+      29: getfield      #2                  // Field root_window:Ljava/awt/Window;
+      32: aload_0
+      33: getfield      #153                // Field err_msg:Ljava/lang/String;
+      36: invokestatic  #170                // Method viewer/common/Dialogs.error:(Ljava/awt/Component;Ljava/lang/String;)V
+      39: invokestatic  #171                // Method viewer/zoomable/Debug.isActive:()Z
+      42: ifeq          120
+      45: new           #45                 // class java/lang/StringBuilder
+      48: dup
+      49: invokespecial #46                 // Method java/lang/StringBuilder."<init>":()V
+      52: ldc           #172                // String TimelinePanel.init(): time_model =
+      54: invokevirtual #48                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      57: aload_0
+      58: getfield      #41                 // Field time_model:Lviewer/zoomable/ModelTime;
+      61: invokevirtual #173                // Method java/lang/StringBuilder.append:(Ljava/lang/Object;)Ljava/lang/StringBuilder;
+      64: invokevirtual #51                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+      67: invokestatic  #174                // Method viewer/zoomable/Debug.println:(Ljava/lang/String;)V
+      70: new           #45                 // class java/lang/StringBuilder
+      73: dup
+      74: invokespecial #46                 // Method java/lang/StringBuilder."<init>":()V
+      77: ldc           #175                // String TimelinePanel.init(): time_scrollbar =
+      79: invokevirtual #48                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      82: aload_0
+      83: getfield      #104                // Field time_scrollbar:Lviewer/zoomable/ScrollbarTime;
+      86: invokevirtual #173                // Method java/lang/StringBuilder.append:(Ljava/lang/Object;)Ljava/lang/StringBuilder;
+      89: invokevirtual #51                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+      92: invokestatic  #174                // Method viewer/zoomable/Debug.println:(Ljava/lang/String;)V
+      95: new           #45                 // class java/lang/StringBuilder
+      98: dup
+      99: invokespecial #46                 // Method java/lang/StringBuilder."<init>":()V
+     102: ldc           #176                // String TimelinePanel.init(): time_ruler =
+     104: invokevirtual #48                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+     107: aload_0
+     108: getfield      #62                 // Field time_ruler:Lviewer/zoomable/RulerTime;
+     111: invokevirtual #173                // Method java/lang/StringBuilder.append:(Ljava/lang/Object;)Ljava/lang/StringBuilder;
+     114: invokevirtual #51                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+     117: invokestatic  #174                // Method viewer/zoomable/Debug.println:(Ljava/lang/String;)V
+     120: return
+}

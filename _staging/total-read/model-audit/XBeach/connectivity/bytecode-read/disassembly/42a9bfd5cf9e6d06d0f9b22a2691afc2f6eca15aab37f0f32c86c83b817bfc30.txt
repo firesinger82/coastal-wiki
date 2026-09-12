@@ -1,0 +1,529 @@
+Compiled from "YaxisTree.java"
+public class viewer.zoomable.YaxisTree extends javax.swing.JTree {
+  private static final long serialVersionUID = 3200l;
+    descriptor: J
+
+  private javax.swing.tree.DefaultMutableTreeNode tree_root;
+    descriptor: Ljavax/swing/tree/DefaultMutableTreeNode;
+
+  private java.util.List[] leveled_paths;
+    descriptor: [Ljava/util/List;
+
+  private int max_level;
+    descriptor: I
+
+  private int next_expanding_level;
+    descriptor: I
+
+  private java.util.List cut_paste_buf;
+    descriptor: Ljava/util/List;
+
+  private int buf_level;
+    descriptor: I
+
+  public viewer.zoomable.YaxisTree(javax.swing.tree.DefaultMutableTreeNode);
+    descriptor: (Ljavax/swing/tree/DefaultMutableTreeNode;)V
+    Code:
+       0: aload_0
+       1: aload_1
+       2: invokespecial #1                  // Method javax/swing/JTree."<init>":(Ljavax/swing/tree/TreeNode;)V
+       5: aload_0
+       6: aload_1
+       7: putfield      #2                  // Field tree_root:Ljavax/swing/tree/DefaultMutableTreeNode;
+      10: aload_0
+      11: ldc           #3                  // String JTree.lineStyle
+      13: ldc           #4                  // String Angled
+      15: invokespecial #5                  // Method javax/swing/JTree.putClientProperty:(Ljava/lang/Object;Ljava/lang/Object;)V
+      18: return
+
+  private void getAllLeavesForNode(viewer.zoomable.named_vector, javax.swing.tree.DefaultMutableTreeNode);
+    descriptor: (Lviewer/zoomable/named_vector;Ljavax/swing/tree/DefaultMutableTreeNode;)V
+    Code:
+       0: aload_2
+       1: invokevirtual #6                  // Method javax/swing/tree/DefaultMutableTreeNode.children:()Ljava/util/Enumeration;
+       4: astore        4
+       6: aload         4
+       8: invokeinterface #7,  1            // InterfaceMethod java/util/Enumeration.hasMoreElements:()Z
+      13: ifeq          55
+      16: aload         4
+      18: invokeinterface #8,  1            // InterfaceMethod java/util/Enumeration.nextElement:()Ljava/lang/Object;
+      23: checkcast     #9                  // class javax/swing/tree/DefaultMutableTreeNode
+      26: astore_3
+      27: aload_3
+      28: invokevirtual #10                 // Method javax/swing/tree/DefaultMutableTreeNode.isLeaf:()Z
+      31: ifeq          46
+      34: aload_1
+      35: aload_3
+      36: invokevirtual #11                 // Method javax/swing/tree/DefaultMutableTreeNode.getUserObject:()Ljava/lang/Object;
+      39: invokevirtual #12                 // Method viewer/zoomable/named_vector.add:(Ljava/lang/Object;)Z
+      42: pop
+      43: goto          6
+      46: aload_0
+      47: aload_1
+      48: aload_3
+      49: invokespecial #13                 // Method getAllLeavesForNode:(Lviewer/zoomable/named_vector;Ljavax/swing/tree/DefaultMutableTreeNode;)V
+      52: goto          6
+      55: return
+
+  public viewer.zoomable.named_vector getNamedVtr(javax.swing.tree.TreePath);
+    descriptor: (Ljavax/swing/tree/TreePath;)Lviewer/zoomable/named_vector;
+    Code:
+       0: aload_1
+       1: invokevirtual #14                 // Method javax/swing/tree/TreePath.getLastPathComponent:()Ljava/lang/Object;
+       4: checkcast     #9                  // class javax/swing/tree/DefaultMutableTreeNode
+       7: astore_2
+       8: new           #15                 // class viewer/zoomable/named_vector
+      11: dup
+      12: aload_2
+      13: invokevirtual #16                 // Method javax/swing/tree/DefaultMutableTreeNode.toString:()Ljava/lang/String;
+      16: invokespecial #17                 // Method viewer/zoomable/named_vector."<init>":(Ljava/lang/String;)V
+      19: astore_3
+      20: aload_0
+      21: aload_1
+      22: invokespecial #18                 // Method javax/swing/JTree.isExpanded:(Ljavax/swing/tree/TreePath;)Z
+      25: ifne          34
+      28: aload_0
+      29: aload_3
+      30: aload_2
+      31: invokespecial #13                 // Method getAllLeavesForNode:(Lviewer/zoomable/named_vector;Ljavax/swing/tree/DefaultMutableTreeNode;)V
+      34: aload_3
+      35: areturn
+
+  public void init();
+    descriptor: ()V
+    Code:
+       0: aload_0
+       1: invokevirtual #19                 // Method update_leveled_paths:()V
+       4: aload_0
+       5: iconst_1
+       6: invokespecial #20                 // Method javax/swing/JTree.setEditable:(Z)V
+       9: return
+
+  public void update_leveled_paths();
+    descriptor: ()V
+    Code:
+       0: aload_0
+       1: aload_0
+       2: getfield      #2                  // Field tree_root:Ljavax/swing/tree/DefaultMutableTreeNode;
+       5: invokevirtual #21                 // Method javax/swing/tree/DefaultMutableTreeNode.getLastLeaf:()Ljavax/swing/tree/DefaultMutableTreeNode;
+       8: invokevirtual #22                 // Method javax/swing/tree/DefaultMutableTreeNode.getLevel:()I
+      11: putfield      #23                 // Field max_level:I
+      14: invokestatic  #24                 // Method viewer/zoomable/Debug.isActive:()Z
+      17: ifeq          100
+      20: new           #25                 // class java/lang/StringBuilder
+      23: dup
+      24: invokespecial #26                 // Method java/lang/StringBuilder."<init>":()V
+      27: ldc           #27                 // String tree_root(
+      29: invokevirtual #28                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      32: aload_0
+      33: getfield      #2                  // Field tree_root:Ljavax/swing/tree/DefaultMutableTreeNode;
+      36: invokevirtual #29                 // Method java/lang/StringBuilder.append:(Ljava/lang/Object;)Ljava/lang/StringBuilder;
+      39: ldc           #30                 // String ).level=
+      41: invokevirtual #28                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      44: aload_0
+      45: getfield      #2                  // Field tree_root:Ljavax/swing/tree/DefaultMutableTreeNode;
+      48: invokevirtual #22                 // Method javax/swing/tree/DefaultMutableTreeNode.getLevel:()I
+      51: invokevirtual #31                 // Method java/lang/StringBuilder.append:(I)Ljava/lang/StringBuilder;
+      54: invokevirtual #32                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+      57: invokestatic  #33                 // Method viewer/zoomable/Debug.println:(Ljava/lang/String;)V
+      60: new           #25                 // class java/lang/StringBuilder
+      63: dup
+      64: invokespecial #26                 // Method java/lang/StringBuilder."<init>":()V
+      67: ldc           #34                 // String last_leaf(
+      69: invokevirtual #28                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      72: aload_0
+      73: getfield      #2                  // Field tree_root:Ljavax/swing/tree/DefaultMutableTreeNode;
+      76: invokevirtual #21                 // Method javax/swing/tree/DefaultMutableTreeNode.getLastLeaf:()Ljavax/swing/tree/DefaultMutableTreeNode;
+      79: invokevirtual #29                 // Method java/lang/StringBuilder.append:(Ljava/lang/Object;)Ljava/lang/StringBuilder;
+      82: ldc           #30                 // String ).level=
+      84: invokevirtual #28                 // Method java/lang/StringBuilder.append:(Ljava/lang/String;)Ljava/lang/StringBuilder;
+      87: aload_0
+      88: getfield      #23                 // Field max_level:I
+      91: invokevirtual #31                 // Method java/lang/StringBuilder.append:(I)Ljava/lang/StringBuilder;
+      94: invokevirtual #32                 // Method java/lang/StringBuilder.toString:()Ljava/lang/String;
+      97: invokestatic  #33                 // Method viewer/zoomable/Debug.println:(Ljava/lang/String;)V
+     100: aload_0
+     101: aload_0
+     102: getfield      #23                 // Field max_level:I
+     105: iconst_1
+     106: iadd
+     107: anewarray     #35                 // class java/util/ArrayList
+     110: putfield      #36                 // Field leveled_paths:[Ljava/util/List;
+     113: aload_0
+     114: getfield      #36                 // Field leveled_paths:[Ljava/util/List;
+     117: iconst_0
+     118: new           #35                 // class java/util/ArrayList
+     121: dup
+     122: iconst_1
+     123: invokespecial #37                 // Method java/util/ArrayList."<init>":(I)V
+     126: aastore
+     127: iconst_1
+     128: istore        5
+     130: iload         5
+     132: aload_0
+     133: getfield      #23                 // Field max_level:I
+     136: if_icmpgt     159
+     139: aload_0
+     140: getfield      #36                 // Field leveled_paths:[Ljava/util/List;
+     143: iload         5
+     145: new           #35                 // class java/util/ArrayList
+     148: dup
+     149: invokespecial #38                 // Method java/util/ArrayList."<init>":()V
+     152: aastore
+     153: iinc          5, 1
+     156: goto          130
+     159: aload_0
+     160: getfield      #2                  // Field tree_root:Ljavax/swing/tree/DefaultMutableTreeNode;
+     163: invokevirtual #39                 // Method javax/swing/tree/DefaultMutableTreeNode.breadthFirstEnumeration:()Ljava/util/Enumeration;
+     166: astore_2
+     167: aload_2
+     168: ifnull        223
+     171: aload_2
+     172: invokeinterface #7,  1            // InterfaceMethod java/util/Enumeration.hasMoreElements:()Z
+     177: ifeq          223
+     180: aload_2
+     181: invokeinterface #8,  1            // InterfaceMethod java/util/Enumeration.nextElement:()Ljava/lang/Object;
+     186: checkcast     #9                  // class javax/swing/tree/DefaultMutableTreeNode
+     189: astore_3
+     190: new           #40                 // class javax/swing/tree/TreePath
+     193: dup
+     194: aload_3
+     195: invokevirtual #41                 // Method javax/swing/tree/DefaultMutableTreeNode.getPath:()[Ljavax/swing/tree/TreeNode;
+     198: invokespecial #42                 // Method javax/swing/tree/TreePath."<init>":([Ljava/lang/Object;)V
+     201: astore        4
+     203: aload_0
+     204: getfield      #36                 // Field leveled_paths:[Ljava/util/List;
+     207: aload_3
+     208: invokevirtual #22                 // Method javax/swing/tree/DefaultMutableTreeNode.getLevel:()I
+     211: aaload
+     212: aload         4
+     214: invokeinterface #43,  2           // InterfaceMethod java/util/List.add:(Ljava/lang/Object;)Z
+     219: pop
+     220: goto          171
+     223: iconst_1
+     224: istore        6
+     226: iconst_0
+     227: istore        5
+     229: aload_0
+     230: iload         5
+     232: putfield      #44                 // Field next_expanding_level:I
+     235: iload         5
+     237: aload_0
+     238: getfield      #23                 // Field max_level:I
+     241: if_icmpge     317
+     244: iload         6
+     246: ifeq          317
+     249: aload_0
+     250: getfield      #36                 // Field leveled_paths:[Ljava/util/List;
+     253: iload         5
+     255: aaload
+     256: invokeinterface #45,  1           // InterfaceMethod java/util/List.iterator:()Ljava/util/Iterator;
+     261: astore_1
+     262: aload_1
+     263: invokeinterface #46,  1           // InterfaceMethod java/util/Iterator.hasNext:()Z
+     268: ifeq          311
+     271: iload         6
+     273: ifeq          311
+     276: aload_1
+     277: invokeinterface #47,  1           // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+     282: checkcast     #40                 // class javax/swing/tree/TreePath
+     285: astore        4
+     287: iload         6
+     289: ifeq          305
+     292: aload_0
+     293: aload         4
+     295: invokespecial #18                 // Method javax/swing/JTree.isExpanded:(Ljavax/swing/tree/TreePath;)Z
+     298: ifeq          305
+     301: iconst_1
+     302: goto          306
+     305: iconst_0
+     306: istore        6
+     308: goto          262
+     311: iinc          5, 1
+     314: goto          235
+     317: iload         5
+     319: aload_0
+     320: getfield      #23                 // Field max_level:I
+     323: if_icmple     337
+     326: aload_0
+     327: aload_0
+     328: getfield      #23                 // Field max_level:I
+     331: putfield      #44                 // Field next_expanding_level:I
+     334: goto          345
+     337: aload_0
+     338: iload         5
+     340: iconst_1
+     341: isub
+     342: putfield      #44                 // Field next_expanding_level:I
+     345: return
+
+  public boolean isLevelExpandable();
+    descriptor: ()Z
+    Code:
+       0: aload_0
+       1: getfield      #44                 // Field next_expanding_level:I
+       4: aload_0
+       5: getfield      #23                 // Field max_level:I
+       8: if_icmpge     15
+      11: iconst_1
+      12: goto          16
+      15: iconst_0
+      16: ireturn
+
+  public void expandLevel();
+    descriptor: ()V
+    Code:
+       0: aload_0
+       1: invokevirtual #48                 // Method isLevelExpandable:()Z
+       4: ifne          8
+       7: return
+       8: aload_0
+       9: getfield      #36                 // Field leveled_paths:[Ljava/util/List;
+      12: aload_0
+      13: getfield      #44                 // Field next_expanding_level:I
+      16: aaload
+      17: invokeinterface #45,  1           // InterfaceMethod java/util/List.iterator:()Ljava/util/Iterator;
+      22: astore_1
+      23: aload_1
+      24: invokeinterface #46,  1           // InterfaceMethod java/util/Iterator.hasNext:()Z
+      29: ifeq          58
+      32: aload_1
+      33: invokeinterface #47,  1           // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+      38: checkcast     #40                 // class javax/swing/tree/TreePath
+      41: astore_2
+      42: aload_0
+      43: aload_2
+      44: invokespecial #49                 // Method javax/swing/JTree.isCollapsed:(Ljavax/swing/tree/TreePath;)Z
+      47: ifeq          23
+      50: aload_0
+      51: aload_2
+      52: invokespecial #50                 // Method javax/swing/JTree.expandPath:(Ljavax/swing/tree/TreePath;)V
+      55: goto          23
+      58: aload_0
+      59: getfield      #44                 // Field next_expanding_level:I
+      62: aload_0
+      63: getfield      #23                 // Field max_level:I
+      66: if_icmpge     82
+      69: aload_0
+      70: dup
+      71: getfield      #44                 // Field next_expanding_level:I
+      74: iconst_1
+      75: iadd
+      76: putfield      #44                 // Field next_expanding_level:I
+      79: goto          90
+      82: aload_0
+      83: aload_0
+      84: getfield      #23                 // Field max_level:I
+      87: putfield      #44                 // Field next_expanding_level:I
+      90: return
+
+  public boolean isLevelCollapsable();
+    descriptor: ()Z
+    Code:
+       0: aload_0
+       1: getfield      #44                 // Field next_expanding_level:I
+       4: iconst_1
+       5: isub
+       6: istore_1
+       7: iload_1
+       8: iflt          15
+      11: iconst_1
+      12: goto          16
+      15: iconst_0
+      16: ireturn
+
+  public void collapseLevel();
+    descriptor: ()V
+    Code:
+       0: aload_0
+       1: invokevirtual #51                 // Method isLevelCollapsable:()Z
+       4: ifne          8
+       7: return
+       8: aload_0
+       9: getfield      #44                 // Field next_expanding_level:I
+      12: iconst_1
+      13: isub
+      14: istore_3
+      15: aload_0
+      16: getfield      #36                 // Field leveled_paths:[Ljava/util/List;
+      19: iload_3
+      20: aaload
+      21: invokeinterface #45,  1           // InterfaceMethod java/util/List.iterator:()Ljava/util/Iterator;
+      26: astore_1
+      27: aload_1
+      28: invokeinterface #46,  1           // InterfaceMethod java/util/Iterator.hasNext:()Z
+      33: ifeq          62
+      36: aload_1
+      37: invokeinterface #47,  1           // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+      42: checkcast     #40                 // class javax/swing/tree/TreePath
+      45: astore_2
+      46: aload_0
+      47: aload_2
+      48: invokespecial #18                 // Method javax/swing/JTree.isExpanded:(Ljavax/swing/tree/TreePath;)Z
+      51: ifeq          27
+      54: aload_0
+      55: aload_2
+      56: invokespecial #52                 // Method javax/swing/JTree.collapsePath:(Ljavax/swing/tree/TreePath;)V
+      59: goto          27
+      62: aload_0
+      63: iload_3
+      64: putfield      #44                 // Field next_expanding_level:I
+      67: return
+
+  public void renewCutAndPasteBuffer();
+    descriptor: ()V
+    Code:
+       0: aload_0
+       1: iconst_m1
+       2: putfield      #53                 // Field buf_level:I
+       5: aload_0
+       6: getfield      #54                 // Field cut_paste_buf:Ljava/util/List;
+       9: ifnull        24
+      12: aload_0
+      13: getfield      #54                 // Field cut_paste_buf:Ljava/util/List;
+      16: invokeinterface #55,  1           // InterfaceMethod java/util/List.clear:()V
+      21: goto          35
+      24: aload_0
+      25: new           #35                 // class java/util/ArrayList
+      28: dup
+      29: invokespecial #38                 // Method java/util/ArrayList."<init>":()V
+      32: putfield      #54                 // Field cut_paste_buf:Ljava/util/List;
+      35: return
+
+  public boolean isPathLevelSameAsThatOfCutAndPasteBuffer(javax.swing.tree.TreePath);
+    descriptor: (Ljavax/swing/tree/TreePath;)Z
+    Code:
+       0: aload_0
+       1: getfield      #53                 // Field buf_level:I
+       4: aload_0
+       5: aload_1
+       6: invokespecial #56                 // Method getLastPathComponentLevel:(Ljavax/swing/tree/TreePath;)I
+       9: if_icmpne     16
+      12: iconst_1
+      13: goto          17
+      16: iconst_0
+      17: ireturn
+
+  private int getLastPathComponentLevel(javax.swing.tree.TreePath);
+    descriptor: (Ljavax/swing/tree/TreePath;)I
+    Code:
+       0: aload_1
+       1: invokevirtual #14                 // Method javax/swing/tree/TreePath.getLastPathComponent:()Ljava/lang/Object;
+       4: checkcast     #9                  // class javax/swing/tree/DefaultMutableTreeNode
+       7: astore_2
+       8: aload_2
+       9: invokevirtual #22                 // Method javax/swing/tree/DefaultMutableTreeNode.getLevel:()I
+      12: ireturn
+
+  public boolean isCutAndPasteBufferUniformlyLeveled(javax.swing.tree.TreePath[]);
+    descriptor: ([Ljavax/swing/tree/TreePath;)Z
+    Code:
+       0: aload_1
+       1: ifnull        49
+       4: aload_1
+       5: arraylength
+       6: ifle          49
+       9: aload_0
+      10: aload_1
+      11: iconst_0
+      12: aaload
+      13: invokespecial #56                 // Method getLastPathComponentLevel:(Ljavax/swing/tree/TreePath;)I
+      16: istore_2
+      17: iconst_1
+      18: istore_3
+      19: iload_3
+      20: aload_1
+      21: arraylength
+      22: if_icmpge     44
+      25: iload_2
+      26: aload_0
+      27: aload_1
+      28: iload_3
+      29: aaload
+      30: invokespecial #56                 // Method getLastPathComponentLevel:(Ljavax/swing/tree/TreePath;)I
+      33: if_icmpeq     38
+      36: iconst_0
+      37: ireturn
+      38: iinc          3, 1
+      41: goto          19
+      44: aload_0
+      45: iload_2
+      46: putfield      #53                 // Field buf_level:I
+      49: iconst_1
+      50: ireturn
+
+  public void addToCutAndPasteBuffer(javax.swing.tree.TreePath[]);
+    descriptor: ([Ljavax/swing/tree/TreePath;)V
+    Code:
+       0: aload_0
+       1: getfield      #54                 // Field cut_paste_buf:Ljava/util/List;
+       4: ifnull        34
+       7: iconst_0
+       8: istore_2
+       9: iload_2
+      10: aload_1
+      11: arraylength
+      12: if_icmpge     34
+      15: aload_0
+      16: getfield      #54                 // Field cut_paste_buf:Ljava/util/List;
+      19: aload_1
+      20: iload_2
+      21: aaload
+      22: invokeinterface #43,  2           // InterfaceMethod java/util/List.add:(Ljava/lang/Object;)Z
+      27: pop
+      28: iinc          2, 1
+      31: goto          9
+      34: return
+
+  public int getLevelOfCutAndPasteBuffer();
+    descriptor: ()I
+    Code:
+       0: aload_0
+       1: getfield      #53                 // Field buf_level:I
+       4: ireturn
+
+  public javax.swing.tree.TreePath[] getFromCutAndPasteBuffer();
+    descriptor: ()[Ljavax/swing/tree/TreePath;
+    Code:
+       0: aload_0
+       1: getfield      #54                 // Field cut_paste_buf:Ljava/util/List;
+       4: ifnull        48
+       7: aload_0
+       8: getfield      #54                 // Field cut_paste_buf:Ljava/util/List;
+      11: invokeinterface #57,  1           // InterfaceMethod java/util/List.toArray:()[Ljava/lang/Object;
+      16: astore_1
+      17: aload_1
+      18: arraylength
+      19: anewarray     #40                 // class javax/swing/tree/TreePath
+      22: astore_2
+      23: iconst_0
+      24: istore_3
+      25: iload_3
+      26: aload_1
+      27: arraylength
+      28: if_icmpge     46
+      31: aload_2
+      32: iload_3
+      33: aload_1
+      34: iload_3
+      35: aaload
+      36: checkcast     #40                 // class javax/swing/tree/TreePath
+      39: aastore
+      40: iinc          3, 1
+      43: goto          25
+      46: aload_2
+      47: areturn
+      48: aconst_null
+      49: areturn
+
+  public void clearCutAndPasteBuffer();
+    descriptor: ()V
+    Code:
+       0: aload_0
+       1: getfield      #54                 // Field cut_paste_buf:Ljava/util/List;
+       4: ifnull        16
+       7: aload_0
+       8: getfield      #54                 // Field cut_paste_buf:Ljava/util/List;
+      11: invokeinterface #55,  1           // InterfaceMethod java/util/List.clear:()V
+      16: return
+}
