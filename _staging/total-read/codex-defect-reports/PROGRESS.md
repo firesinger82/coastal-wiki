@@ -293,3 +293,5 @@ Claude Sonnet 5의 [한정 재검토](../model-audit/XBeach/HG-ADVERSARIAL-RECHE
 2026-09-12 viewer TimelineFrame/닫기 listener 전체 459줄 판독. 패널 생성 전 전역 창 등록, 현재 전역 창을 닫는 이벤트, 독립 main의 설정 초기화와 viewID CLI를 연결했다. 누적 Java 312/413종·932경로, 잔여 Java 101종/Python 150종. 근거: `viewer-timeline-frame-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
 
 2026-09-12 viewer TimelinePanel/PreviewStateComboBox 계열/TreeTrunkPanel 5종 전체 1075줄 판독. 로그 트리·시간/행 viewport 연결과 초기화, 미리보기 변경 시 설정 창 전체 필드 덮어쓰기 및 null 참조 후 부분 갱신을 연결했다. 누적 Java 317/413종·942경로, 잔여 Java 96종/Python 150종. 근거: `viewer-timeline-panel-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.
+
+2026-09-12 viewer SearchCriteria/SearchTreeTrunk 2종 전체 486줄 판독. 전체 시간 검색의 선택 행·카테고리 필터, 연속 검색 커서 소거, 시간 평균 통계의 shadow/실체 병합 순서를 연결했다. 누적 Java 319/413종·946경로, 잔여 Java 94종/Python 150종. 근거: `viewer-timeline-search-read.json` (XBeach connectivity/bytecode-read). 실제 실행·독립 의미 승인은 아니다.

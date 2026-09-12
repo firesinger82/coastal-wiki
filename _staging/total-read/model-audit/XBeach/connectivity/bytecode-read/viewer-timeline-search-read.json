@@ -1,0 +1,68 @@
+{
+  "date": "2026-09-12",
+  "attribution": "AI direct bytecode reading; not independent semantic approval.",
+  "prior_receipt": {
+    "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/disassembly-receipt.json",
+    "sha256": "1cc8b2657a74f3f5904e9d0a40648b1c98f6e031b056b7c6e19122beb632aaa8"
+  },
+  "records": [
+    {
+      "sha256": "f4467fc48eb3e456bde50c0d1626cb811bf2dea7590d290dbcca3ab594f9428d",
+      "instances": [
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/win32/mpich/bin/jumpshot.jar",
+          "member": "viewer/timelines/SearchCriteria.class"
+        },
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/bin/jumpshot.jar",
+          "member": "viewer/timelines/SearchCriteria.class"
+        }
+      ],
+      "class_file": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/classes/f4467fc48eb3e456bde50c0d1626cb811bf2dea7590d290dbcca3ab594f9428d.class",
+        "sha256": "f4467fc48eb3e456bde50c0d1626cb811bf2dea7590d290dbcca3ab594f9428d"
+      },
+      "disassembly": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/disassembly/f4467fc48eb3e456bde50c0d1626cb811bf2dea7590d290dbcca3ab594f9428d.txt",
+        "sha256": "0b9b63ee7cbf9d3cb4a4fc02c9d27b967174c043c51a4f4af96b223b23a3f62f"
+      },
+      "read_lines": [
+        1,
+        70
+      ],
+      "scope": "Entire untruncated javap display: SearchCriteria 70 lines and SearchTreeTrunk 416 lines in two consecutive slices.",
+      "observation": "Entire 70-line javap read. Constructor captures YaxisTree only; initMatch obtains current selection-row array, null/empty means all rows, otherwise sorts returned array in place. isMatched returns true for all-row mode or binarySearch of drawable.getRowID; no descendant expansion, category/time filtering or row remapping here. Calling before initMatch leaves false flag/null array and can fail. Selection is refreshed per search operation, not continuously during its loop; underlying YaxisTree row semantics remain pending."
+    },
+    {
+      "sha256": "d3f05aae382d435d79c3adade00b95ce26f4614b6659690ca736ff984be9b0b1",
+      "instances": [
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/win32/mpich/bin/jumpshot.jar",
+          "member": "viewer/timelines/SearchTreeTrunk.class"
+        },
+        {
+          "archive": "models/XBeach/raw/source_code/trunk/lib/x64/mpich/bin/jumpshot.jar",
+          "member": "viewer/timelines/SearchTreeTrunk.class"
+        }
+      ],
+      "class_file": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/classes/d3f05aae382d435d79c3adade00b95ce26f4614b6659690ca736ff984be9b0b1.class",
+        "sha256": "d3f05aae382d435d79c3adade00b95ce26f4614b6659690ca736ff984be9b0b1"
+      },
+      "disassembly": {
+        "path": "_staging/total-read/model-audit/XBeach/connectivity/bytecode-read/disassembly/d3f05aae382d435d79c3adade00b95ce26f4614b6659690ca736ff984be9b0b1.txt",
+        "sha256": "bf79347bd1c47d9b82620330f3806d675e515acdebaaa83a558b5bcae9cc9569"
+      },
+      "read_lines": [
+        1,
+        416
+      ],
+      "scope": "Entire untruncated javap display: SearchCriteria 70 lines and SearchTreeTrunk 416 lines in two consecutive slices.",
+      "observation": "Entire 416-line javap read in consecutive 1–215 and 216–416 slices. Captures trunk, criteria and connected-composite flag; last result starts null; static orders reference Drawable start-time orders. All four previous/next searches request iteratorOfAllDrawables(ALL_TIMES, descending/ascending start order, connected flag, true/nestable), then refresh row criteria. Each candidate requires category.isVisiblySearchable, containSearchable and row match. Explicit-time previous admits earliest<=time and next earliest>=time, including equality; dcmpg/ifgt and dcmpl/iflt also let NaN bypass respective rejection. No latest-time overlap or viewport bound check here. Continuations restart all-time iterator and require corresponding comparator(candidate,last)>0, not merely a strict scalar timestamp; equal comparator entries are skipped. Null last logs diagnostic/returns null, exhaustion clears last, so no wrap or preserved cursor at end. Changing selection between calls uses new rows against old cursor. Histogram creation initializes BufForTimeAveBoxes with supplied bounds, refreshes selection once, merges filtered lowest-floor nestable shadows then real nestables, calls setNestingExclusion once, then merges real nestless objects and lowest-floor nestless shadows. All four passes apply same category/containSearchable/row filters; real passes use captured connected flag, shadows use nestability flag. Bounds are delegated to iterators/buffer, no explicit validation/cloning, I/O close, synchronization, UI update, or last-result mutation in histogram method. Actual iterator coverage, comparator tie behavior and statistics semantics rely on previously recorded classes; caller initiation and YaxisTree remain pending. Static analysis only, archived classes never executed."
+    }
+  ],
+  "unique_classes_read": 2,
+  "instances_covered": 4,
+  "whole_model_read_gate": "NOT_PASSED",
+  "human_approval_issued": false
+}
