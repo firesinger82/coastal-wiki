@@ -1,0 +1,308 @@
+--- a/models/ADCIRC/source-analysis/tide/adcirc-tide-harmonic-prep.md
++++ b/models/ADCIRC/source-analysis/tide/adcirc-tide-harmonic-prep.md
+@@ -2,6 +2,10 @@
+ title: "adcirc tide harmonic prep"
+ topic: tides
+ canonical_source: self
++external_evidence_date: 2026-09-14
++external_evidence_review: "Claude Fable 5.1 — 외부 제품·변환 확인 방법·독립 관측/지표 원문 대조; 과학적 사람 승인 아님"
++external_evidence_human_approval: not-issued
++external_evidence_scope: "외부 조석 제품 정의·변환 확인 방법·관측 독립성·지표 근거와 관련 무근거 권고 정정. 실제 자료/실행/수치/물리 검증 아님."
+ citation_status: verified
+ has_source_needed: true
+ evidence_extension_date: 2026-09-14
+@@ -24,13 +28,13 @@
+ 
+ ## 2026-09-14 한정 대조 범위
+ 
+-이 보강의 코드 판본은 ADCIRC `6037225ce4573efd3c1f8877a5dc908d01c199a8`이다. 아래 `src/` 인용의 루트는 `models/ADCIRC/raw/source_code/adcirc/`다. **문서 지원·코드 구현** 중 NBFR 입력, 경계 노드 전달, 위상/시간 기준, 전통 분조 경로의 ETRF 항을 대조했다. **실행 확인·수치 검증·물리 검증·개별 입력자료 품질 확인은 수행하지 않았다.** 다른 절과 외부 DB 규약은 이번 검증 범위에 포함하지 않는다. 과거 검증 이력과 이번 정정을 구분하며 이번 정정에 대한 사람 승인은 발급하지 않았다.
++이 보강의 코드 판본은 ADCIRC `6037225ce4573efd3c1f8877a5dc908d01c199a8`이다. 아래 `src/` 인용의 루트는 `models/ADCIRC/raw/source_code/adcirc/`다. **문서 지원·코드 구현** 중 NBFR 입력, 경계 노드 전달, 위상/시간 기준, 전통 분조 경로의 ETRF 항을 대조했다. **실행 확인·수치 검증·물리 검증·개별 입력자료 품질 확인은 수행하지 않았다.** 이 코드 대조는 다른 절과 외부 DB 규약을 포함하지 않는다. 외부 자료에 대한 별도 보강 범위는 harmonic-prep의 「외부 조석 자료」 절을 따른다. 과거 검증 이력과 이번 정정을 구분하며 이번 정정에 대한 사람 승인은 발급하지 않았다.
+ 
+ <a id="input-quality-and-validation"></a>
+ 
+ ## 입력 품질·실행·검증 확인 방법 (2026-09-14 보강)
+ 
+-이 절은 **확인할 증거와 수행 순서**를 정한다. 실제 사용할 조석 DB·지형·관측자료와 허용오차는 아직 선정하지 않았으므로 **입력 품질·실행 확인·수치 검증·물리 검증은 미완**이다. 아래 G/H·Decision Guide의 외부 DB 호환성·지역 성능·권고 기간은 이 보강에서 재검증하지 않았다. 그 설명을 검증된 변환 규약으로 재사용하지 않는다. 필요한 원문이 없는 부분은 `source-needed`로 남긴다.
++이 절은 **확인할 증거와 수행 순서**를 정한다. 실제 사용할 조석 DB·지형·관측자료와 허용오차는 아직 선정하지 않았으므로 **입력 품질·실행 확인·수치 검증·물리 검증은 미완**이다. 외부 DB 정의와 관측·오차 지표의 원문 대조는 아래 별도 절에 정리했다. 확인되지 않은 변환 세부·정량 권고는 `source-needed`로 남긴다.
+ 
+ ### 문서와 코드가 다를 때의 입력 기준
+ 
+@@ -47,12 +51,12 @@
+ 
+ | 확인 대상 | 설정 전에 확보·대조할 증거 | 현재 확인 수준/미확정 |
+ |---|---|---|
+-| 조석 DB·분조 정의 | 제품명·판본·문서 절·분조 목록·각주파수·해수면 조석/하중 조석의 변수 의미·단위 | ADCIRC 소비 형식만 확인. FES/NAO/TPXO의 판본별 정의는 `source-needed` |
++| 조석 DB·분조 정의 | 제품명·판본·문서 절·분조 목록·각주파수·해수면 조석/하중 조석의 변수 의미·단위 | [제품별 정의](#external-data-conventions)에 확인 범위 명시. TPXO 개별 파일 형식과 실제 자료는 미확인 |
+ | 지형·좌표·기준면 | 지형과 조석·관측 자료의 좌표/기준면·수심 부호·변환 이력; fort.14 노드와 원자료 대응 | [fort.14 구조](https://adcirc.github.io/adcirc/technical_reference/input_files/fort14.html) 및 [수심 노트](../adcirc-bathymetry-input-foundation.md)로 진입. 개별 데이터 미확인 |
+ | 공간·시간 범위와 해상도 | 경계 노드가 제품 유효 영역에 포함되는지, 연안 mask/격자 해상도, 제품의 대표 기간·허용 예측 시각과 실행/관측 기간 | 사용할 자료가 미선정. 범위 밖·외삽·대표성 불확실성을 기록해야 함 |
+-| 결측·품질·오차 | 품질 플래그·결측값·제공기관의 오차/불확실성 정의; 제외·대체·보간 정책과 근거 | 형식이 유효해도 품질 통과로 취급하지 않음; 제품별 원문 `source-needed` |
++| 결측·품질·오차 | 품질 플래그·결측값·제공기관의 오차/불확실성 정의; 제외·대체·보간 정책과 근거 | FES mask/결측 정의와 NAO scale/결측 처리, UHSLC QC 원문 확보. 실제 사용할 자료의 품질 판정은 미수행 |
+ | 분조·노드 순서 | NBFR 헤더와 각 분조 블록, 분조당 NETA개 행을 fort.14의 경계 구간/구간 내 순서와 대조 | 아래 §A 및 `src/mesh.F:1822–1834`, `src/read_input.F:3431–3456,3485–3497`. 실제 입력 대조 미수행 |
+-| 위상·시각·노달보정 | 위상 부호/기준 경도·시간대·epoch, STATIM/REFTIM과 FF/FACE 기준; 제공 제품이 이미 포함한 보정과 별도 보정의 중복 여부 | ADCIRC 시간/부호는 §D/F에서 한정 대조. 외부 규약은 `source-needed` |
++| 위상·시각·노달보정 | 위상 부호/기준 경도·시간대·epoch, STATIM/REFTIM과 FF/FACE 기준; 제공 제품이 이미 포함한 보정과 별도 보정의 중복 여부 | ADCIRC §D/F, FES/NAO 부호·예측 정의는 [외부 자료 절](#external-data-conventions). TPXO 규약과 실제 FF/FACE 변환은 미확인 |
+ | 변환·보간의 독립 확인 | 원 격자점과 변환 결과를 대조하고, 별도 계산 또는 제공기관 예측과 몇 위치·시각의 재합성을 비교. 해안 mask·위상 주기 경계 처리의 방법/오차를 기록 | 확인 방법은 계획. 특정 보간법·도구의 적합성/성능은 아직 확정하지 않음 |
+ | 퍼텐셜·SAL·초기 강제 | 경계 수위와 퍼텐셜/SAL을 구분한 선택 이유, NTIP/NTIF·분조·입력파일·ramp·초기시각의 정합 | §A/F와 [퍼텐셜의 한정 대조](adcirc-tide-forcing-implementation.md). SAL/full-formula 전체 재검증은 미수행 |
+ 
+@@ -67,9 +71,70 @@
+ 
+ - **회귀 예제**: 공식 testsuite의 `adcirc_quarterannular-2d-netcdf`는 `test_list.yaml:423–434`에 정의돼 있다. `test_runner/adcirc_test/adcirctest.py:429–445`는 지정된 `control/` 파일과 계산 출력을 비교한다. testsuite 판본은 `72bb573073ea89e538890f9352dd8e92bae562f5`, 루트는 `models/ADCIRC/raw/source_code/adcirc-testsuite/`다. 이 케이스의 `adcirc/adcirc_quarterannular-2d-netcdf/fort.15:15,31–44`는 **NTIP=0, NTIF=0, NBFR=1(M2)**로 경계 조석을 지정한다. 즉 이 입력 예제에서 경계 조석과 퍼텐셜은 별도 선택이다. 기준 출력과 일치했다는 주장에는 실제 실행 결과가 필요하다.
+ - **수치 검증**: 사용할 해석해/기준해의 식·조건·출처, 물수지/보존 진단, 격자·시간간격 민감도와 오차 기준을 결과 전에 정한다. 회귀검사의 기본 tolerance를 해역의 물리 오차 기준으로 사용하지 않는다. 현재 기준해 대조와 허용오차 선정은 미수행이다([BUILD-PLAN §4–6](../../../../BUILD-PLAN.md)).
+-- **물리 검증**: 경계·보정에 사용한 자료와 독립적인 관측/실험을 구분하고, 정점/기간·기준면·시간대·결측·관측오차를 확인한다. 비교할 진폭·주기적인 위상 차이·시계열 오차의 정의와 허용 범위, 분조 분리와 분석창의 근거를 먼저 확보한다. 일반 조화분해 이론은 [조석 분석 방법](../../../../concepts/tides/03-analysis-methods.md), ADCIRC 관측검증 권고는 `docs/user_guide/model_configuration/tides/index.rst:57–65`다. **관측자료·분석 세부 절차·목적별 허용오차는 `source-needed`**이며 관측 대조를 수행했다고 쓰지 않는다.
+-
+-이 묶음의 다음 완료 조건은 외부 자료 규약·변환/보간 확인 방법과 사용할 기준해/관측·오차 기준의 출처를 확보하는 것이다. 실제 실행·검증 완료 판정에는 별도의 재현 가능한 결과가 필요하며, 개인 결과는 [coastal-runs 채널](../../../../RUNS-CHANNEL.md)에 둔다.
++- **물리 검증**: 경계·보정에 사용한 자료와 독립적인 관측/실험을 구분하고, 정점/기간·기준면·시간대·결측·관측오차를 확인한다. 비교할 진폭·주기적인 위상 차이·시계열 오차의 정의와 허용 범위, 분조 분리와 분석창의 근거를 먼저 확보한다. 일반 조화분해 이론은 [조석 분석 방법](../../../../concepts/tides/03-analysis-methods.md), ADCIRC 관측검증 권고는 `docs/user_guide/model_configuration/tides/index.rst:57–65`다. [독립 관측·오차 지표](#independent-observation-and-errors)의 원문·정의는 확보했다. **선정 정점/기간·실제 분석·목적별 허용오차는 미확정**이며 관측 대조를 수행했다고 쓰지 않는다.
++
++외부 자료의 일반 규약과 관측·지표 근거는 아래에 정리했다. 다음 실제 입력 단계에는 atlas 판본·경계 노드·시각과 관측 정점/기간을 지정하고 변환 결과를 대조해야 한다. 기준해·보존/민감도와 목적별 허용치도 별도로 필요하다. 개인 실행 결과는 [coastal-runs 채널](../../../../RUNS-CHANNEL.md)에 둔다.
++
++<a id="external-data-conventions"></a>
++
++## 외부 조석 자료: 판본·변수·변환 근거
++
++아래는 **공급기관 원문을 대조한 AI 요약**이다. 개별 atlas 파일의 값·경계 보간·ADCIRC 실행을 확인한 결과가 아니다. 웹 문서는 2026-09-14 조회판이며, 같은 제품명이라도 배포판과 예측 소프트웨어 설정을 함께 기록한다.
++
++| 자료와 대조 판본 | 확인한 정의 | ADCIRC 입력 준비에서의 의미 |
++|---|---|---|
++| FES2022b, [handbook][fes-hdbk] Issue 2.0, 2026-02-03, 인쇄 pp. 1, 6–7, 15, 17, 24–25 | Cartesian 배포는 1/30°·34분조. `amplitude`는 cm, `phase`는 지각(deg). 해수면 조석과 radial loading을 구분. mask 0=원 해양값, 1=외삽, 2=육지, 3=호수. Appendix A의 예시 결측값은 `1.844674e+19` | 결측을 먼저 제외하고 cm→m. 실제 파일의 좌표·변수·속성을 읽는다. 유한요소 원격자와 Cartesian 형식은 구분하며, mask=1의 유한값을 연안 정확도 보증으로 사용하지 않는다. |
++| NAO99Jb, [공식 README][nao-readme] 2000-09-09, §2/4/5/7 | 일본 주변 110–165°E, 20–65°N, 5분 격자·16단주기 분조. `_gc`는 지심 조석, 일반 제품은 해저에 대한 ocean tide; radial loading은 전지구 0.5° 제품만 있고 지역 모델은 없다. 예측 시각은 UTC, 출력은 cm. §7은 `nao2xyap.f`로 Greenwich phase 형식 변환을 안내 | [공식 패키지][nao-code]의 `nao2xyap.f:90–93,116–122,167`은 헤더의 진폭/위상 scale과 결측을 해석한다. 출력 진폭은 cm, 위상은 deg. 정수 격자를 그대로 EMO로 쓰지 않는다. 단주기 합성의 lag 부호는 `naotidej.f:1112–1117,757–771,807–817`에서 확인했다. |
++| TPXO10-atlas-v2, [OSU 제품 페이지][tpxo-atlas]에 명시된 2024-08-14 배포판 | MSL에 대한 해수면 조화상수, 1/30° atlas. 기본 전지구 해와 지역 patch를 결합. OSU binary/NetCDF와 TMD3 통합 NetCDF는 다른 형식 | [OTPS/OTPSnc][otps]는 상수 추출·예측 도구다. 이번에는 특정 배포 파일의 변수·단위·복소 부호·결측을 대조하지 않았다(`source-needed`). FES/NAO의 scale·위상 변환식을 그대로 적용하지 않는다. |
++
++NAO 코드 인용은 위 `naotidej000909.tar.gz` 안의 `naotidej/` 기준이다(패키지 SHA-256 `f61c3e473c5c40812b76e27063016cec0602c756c86607aee3c8b2108c862328`). 이는 입력 변환·합성 인터페이스의 한정 판독이며 예측 패키지 전체 검증이 아니다.
++
++### FES loading tide와 fort.24의 구분
++
++FES handbook p. 6의 loading atlas는 **radial component**이고, [PyFES 설정][pyfes-guide]도 `tide`와 `radial`을 분리한다. ADCIRC `fort.24`는 self-attraction/earth-load 강제 항이며 `SALTAMP/SALTPHA`를 `TIP2`에 합성한다(`docs/technical_reference/input_files/fort24.rst:1–8`; `src/timestep.F:1543–1555`). **radial 변위 파일을 단위만 바꿔 fort.24로 쓰는 변환은 이 근거로 성립하지 않는다.** 두 변수의 물리량·퍼텐셜 환산·부호·분조를 잇는 정의가 추가로 필요하다(`source-needed`). 경계 수위 EMO/EFA 준비와 별도로 다룬다.
++
++### 변환 결과를 무엇과 대조할 것인가
++
++1. **성분과 단위를 먼저 맞춘다.** FES는 위 handbook의 ocean tide 파일, NAO는 README의 ocean/geocentric/radial 선택을 명시한다. 진폭과 위상은 동일 제품·판본·격자점/보간에서 한 쌍으로 추출한다. NAO의 전체 예측에는 16단주기 외에 추론 분조와 장주기가 포함되므로, NBFR 일부 분조 합성과 전체 예측값을 곧바로 같다고 판정하지 않는다([NAO README §4][nao-readme]).
++2. **공급기관 예측기와 설정을 고정한다.** FES handbook p. 20은 PyFES ≥2025.2.0을 지정한다. 같은 페이지의 Schureman order 3 기본값 설명과 [PyFES 2026.5.3 안내][pyfes-guide]의 `FESSettings` order 1 기본값 설명은 다르므로, 버전·천문식·minor inference·장주기 포함 여부를 명시하고 실제 설정을 확인한다. 공급기관의 특정 판본 설명을 다른 판본의 기본값으로 전파하지 않는다.
++3. **위상은 원형량으로 처리한다.** [PyFES 조화상수 표현][pyfes-analysis]과 NAO `naotidej.f:1112–1117`은 진폭/위상을 cos·sin 성분으로 표현한다. 이 식에서 도출하면 $z=Ae^{ig}$를 보간한 후 $A=\lvert z\rvert,\;g=\operatorname{atan2}(\Im z,\Re z)$로 복원할 수 있다. $g$는 계산 시 radian이다. 359°와 1°를 직접 산술평균하지 않는다. 이 표현 선택만으로 해안 mask·육지를 가로지르는 보간·외삽의 적합성이 보장되지는 않는다.
++4. **같은 위치·실제 UTC 시각에서 같은 분조를 합성한다.** FES의 lag와 Greenwich 천문 인수·노달보정 정의는 [PyFES nodal 식][pyfes-nodal], NAO의 시각·성분은 README §4에 근거한다. ADCIRC 쪽은 아래 §D/F의 `AMIG*TimeH+FACE−EFA`에 맞춰 epoch와 보정의 포함 여부를 대조한다. 단위·시각·분조·보정을 맞춘 뒤 원 격자점/내삽점/연안점 및 시작·중간·끝 시각의 차이를 기록한다. 이는 **변환 확인 계획**이며 실제 비교는 미수행이다.
++5. **품질 표시를 보존한다.** FES 제품 mask와 PyFES 반환 `flags`는 다른 정보다. 후자는 양수=사용한 내삽점 수, 음수=외삽, 0=정의되지 않음이다([PyFES Prediction Functions][pyfes-guide]). 미리 외삽된 atlas를 내삽하면 반환 flag만으로 원 atlas의 외삽 여부를 알 수 없으므로 제품 mask도 함께 확인한다(두 정의에서 도출한 확인 방법).
++
++<a id="independent-observation-and-errors"></a>
++
++## 독립 관측과 오차 기준
++
++**관측 후보**로 [UHSLC Research Quality Data][uhslc-data]의 hourly 자료를 사용할 수 있다. RQD와 기본 QC만 거친 Fast Delivery를 구분하고 정점 metadata·품질 평가·시각 오류 기록을 확인한다. 정점의 zero는 임의의 station datum일 수 있고, 같은 장소의 A/B 시계열은 기준면이 다를 수 있다. 수위의 평균을 맞춘 경우 제거한 평균과 기간을 별도로 남긴다. RQD라는 명칭이 해당 모델에 대한 검증 독립성을 보장하지 않는다.
++
++**독립성**은 관측 정점 ID·별칭·좌표·사용 기간을 경계 DB의 동화 자료와 ADCIRC 보정/경계 구축에 사용한 자료에 각각 대조해 판정한다([BUILD-PLAN §4–6](../../../../BUILD-PLAN.md)). FES handbook p. 6과 Appendix B는 동화 정점 목록을, [TPXO10-atlas 페이지][tpxo-atlas]는 연안 관측 동화와 비동화 자료 검증의 구분을 제공한다. FES는 모든 동화 위치에서 모든 분조를 사용한 것도 아니다. 따라서 이름이 목록에 없거나 검증 기간만 다르다는 이유로 독립성을 확정하지 않고, 정점·분조·기간별 이력이 불명확하면 **독립성 미확정**으로 남긴다. 원래 DB와의 일치는 변환 확인이고, 관측에 대한 물리 검증은 별도다.
++
++**지표 정의**: 동일한 단위·분조·위상/노달보정 규약으로 환산한 진폭 $A$, lag $g$에서 다음을 구분한다. $m,o$는 모델/관측, $i$는 정점, $k$는 분조다. 아래 복소 오차식은 [Wang et al. (2022) §3.1 식(3)][wang2022]의 한 주기 평균식에서 전개한 것이며, 이번 ADCIRC의 검증 결과가 아니다.
++
++| 지표 | 정의와 해석 |
++|---|---|
++| 진폭 차이 | $\Delta A=A_m-A_o$. 진폭이 작은 분조의 상대오차는 분모와 관측 불확실성을 함께 표시한다. |
++| 순환 위상 차이 | $\Delta g=\operatorname{atan2}[\sin(g_m-g_o),\cos(g_m-g_o)]$. 삼각함수 입력은 radian, 보고 시 degree로 바꾼다. $A=0$이면 위상은 정의되지 않으므로 위상 지표에서 제외하고 진폭/복소 지표에는 남긴다(조화표현에서 도출). |
++| 정점·분조 복소 거리 | $E_{ik}=\lvert A_{m,ik}e^{ig_{m,ik}}-A_{o,ik}e^{ig_{o,ik}}\rvert$. 위상 래핑에 연속적이며 진폭과 위상 차이를 함께 반영한다. |
++| 한 분조의 정점군 RMS | $D_k=\sqrt{\frac{1}{2N}\sum_{i=1}^{N}E_{ik}^{2}}$. 동일 가중치 N개 정점에 대해 **한 주기를 평균한 RMS**다. 복소 거리의 RMS보다 $1/\sqrt{2}$ 작다. 가중치/정점군을 바꾸면 정의도 명시한다. |
++| 분조군 RSS | $\mathrm{RSS}=\sqrt{\sum_{k\in K}D_k^2}$. 사용 분조 집합 K와 정점군을 표시한다. 유한·불규칙 관측창의 전체 시계열 RMSE와 자동으로 같지 않다. |
++| 시계열 bias·RMSE | 공통 유효 시각의 $e_j=\eta_{m,j}-\eta_{o,j}$에 대해 $b=M^{-1}\sum_j e_j$, $\mathrm{RMSE}=\sqrt{M^{-1}\sum_j e_j^2}$. 이는 실제 표본에 적용하는 정의이며, 위 한 주기/분조군 평균과 구별한다. 평균 제거·필터·ramp 제외를 했다면 처리와 표본 수를 함께 보고한다. |
++
++관측에서 조석 성분을 추정할 때는 분석창과 분조 분리도 먼저 확인한다. [PyFES 조화분해의 Rayleigh 조건][pyfes-analysis]은 주파수 $\nu$를 cycles/time으로 두면 $T>C_R/\lvert\nu_1-\nu_2\rvert$이며 $C_R\ge1$이다. 충족 여부만으로 결측·잡음·행렬 조건까지 검증되지는 않는다. 모델과 관측에 공통 분석창·분조·노달보정·시간/기준면을 적용하고, 미분리 분조와 추론 성분은 따로 표시한다. 조석만 계산한 출력과 관측 총수위 사이에는 기상 등 잔차가 포함될 수 있다([PyFES Observation Equation][pyfes-analysis]); 이를 모두 조석 경계 오차로 해석하지 않는다.
++
++**허용치 선정은 미완**이다. 정점·기간·목적·관측 불확실성이 정해져야 물리적 합격 기준을 정할 수 있다([BUILD-PLAN §4–6](../../../../BUILD-PLAN.md)). 문헌의 RMS/RSS 수치는 그 자료·해역의 결과이며 ADCIRC 공통 tolerance가 아니다. 현재 확보한 것은 제품 정의·변환 확인 방법·관측 후보·지표 식이다. 실제 atlas/관측 파일의 품질·변환 결과·기준해/관측 대조 및 목적별 허용치는 아직 확인하지 않았다.
++
++[fes-hdbk]: https://www.aviso.altimetry.fr/fileadmin/documents/data/tools/hdbk_FES2022.pdf
++[nao-readme]: https://www.miz.nao.ac.jp/rise/s/nao99/README_NAOTIDE_En.html
++[nao-code]: https://www.miz.nao.ac.jp/rise/s/nao99/data/naotidej000909.tar.gz
++[tpxo-atlas]: https://www.tpxo.net/global/tpxo10-atlas
++[otps]: https://www.tpxo.net/otps
++[pyfes-guide]: https://cnes.github.io/aviso-fes/user_guide.html
++[pyfes-analysis]: https://cnes.github.io/aviso-fes/theory/harmonic_analysis.html
++[pyfes-nodal]: https://cnes.github.io/aviso-fes/theory/nodal_corrections.html
++[uhslc-data]: https://uhslc.soest.hawaii.edu/datainfo/
++[wang2022]: https://doi.org/10.5194/os-18-881-2022
++
+ 
+ ## Scope
+ 
+@@ -174,7 +239,7 @@
+ TIP2 += SALTMUL * SALTAMP * cos(ARGT − SALTPHA)
+ ```
+ 
+-ADCIRC uses **lag-subtracted** phase (`cos(arg − phase)`). FES2022b convention is the same; NAO99jb and TPXO also use lag convention. ⚠ source-needed(외부 DB 위상규약 서술 — FES2022b·NAO99jb·TPXO 공식문서 미인용). **Confirm** before using a database.
++ADCIRC uses **lag-subtracted** phase (`cos(arg − phase)`; `src/gwce.F:1642–1649`). FES/PyFES와 이번 NAO 패키지에서 확인한 lag 합성은 [제품별 근거](#external-data-conventions)에 정리했다. 부호가 같아도 epoch·단위·천문식·노달보정까지 같다는 뜻은 아니다. TPXO의 특정 배포 형식은 아직 대조하지 않았다.
+ 
+ ## E. FF and FACE meaning
+ 
+@@ -183,7 +248,7 @@
+ - `FACE` (boundary): equilibrium argument `(V₀ + u)` (added to argument).
+ - `FACET` (tidal potential): same role for potential.
+ 
+-These come from astronomical theory; standard tools (T_TIDE, UTIDE, pyTMD) compute them per epoch.
++FES의 천문 인수·노달보정 의미는 [PyFES nodal 식][pyfes-nodal]을 참조한다. 실제 FF/FACE 생성에서는 제품과 예측기의 판본·분조·epoch·보정 포함 여부를 맞춘다. T_TIDE/UTIDE/pyTMD의 출력을 동일한 ADCIRC 입력으로 사용할 수 있다는 일괄 호환 주장은 여기서 확정하지 않는다.
+ 
+ ## F. REFTIM and TimeH
+ 
+@@ -198,44 +263,35 @@
+ 
+ Harmonic synthesis uses `timeh`, **not** raw model time (`gwce.F:1642-1644`, `timestep.F:1532-1535`).
+ 
+-**This is the most common source of phase errors**: `FACE`/`FACET` from your database are computed for some epoch (often midnight UTC of a specific day). `REFTIM` must match that epoch, expressed in your run's time-axis convention.
+-
+-## G. NAO99jb / FES2022b workflow
+-
+-ADCIRC has **no native NAO/FES parser**. You preprocess externally:
+-
+-1. Pick run start `STATIM` and epoch `REFTIM`.
+-2. For each constituent (M2, S2, K1, O1, etc.), get astronomical `f` (nodal factor), `(V₀+u)` (eq. arg) for `REFTIM` from T_TIDE / UTIDE / pyTMD.
+-3. From FES/NAO database, extract per-boundary-node amplitude and Greenwich phase lag at the configured constituent set.
+-4. Write `fort.15` NBFR block:
+-   - Header line `NBFR`.
+-   - Per constituent: `BOUNTAG`, then `AMIG, FF, FACE` (FF and FACE both for `REFTIM` epoch, FACE in degrees).
+-   - Per constituent: `ELEVALPHA`, then per-node `EMO  EFA` (EFA in degrees, **lag** convention).
+-
+-For SAL, similar process; write to `fort.24` ASCII or `fort.24.nc` NetCDF.
++`STATIM/REFTIM`은 이 코드에서 수치적인 일(day) 값이다. 시각대/달력 epoch를 자동으로 부여한다고 가정하지 않는다. 외부에서 구한 FACE/FACET의 기준시각과 같은 실제 시각을 나타내도록 연결한다(`src/timestep.F:257–258`; `src/gwce.F:1642–1649`).
++
++## G. 외부 atlas에서 fort.15로
++
++1. [제품별 정의와 변환 대조](#external-data-conventions)를 따라 ocean/geocentric/radial 성분, 판본, 분조, 단위, 유효 영역을 고정한다.
++2. 실제 시작시각과 STATIM/REFTIM을 대응시키고 분조별 AMIG(rad/s), FF, FACE(deg)의 epoch·천문/노달보정을 기록한다. 전체 공급기관 예측과 NBFR 일부 분조의 비교는 성분부터 맞춘다.
++3. 경계 노드마다 동일 자료에서 추출한 진폭·lag를 EMO(m), EFA(deg)로 변환한다. 결측/외삽·보간 처리와 원자료 대응을 보존한다.
++4. §A의 NBFR 레코드와 분조/노드 순서대로 작성하고 fort.16 echo 및 같은 성분의 재합성에 대조한다(`src/read_input.F:3431–3456,3485–3497`; `src/gwce.F:1638–1649`).
++
++이 절차의 실제 변환 실행은 미수행이다. SAL은 위 [loading tide 구분](#external-data-conventions)의 별도 물리량 정의를 확보한 뒤 준비한다.
+ 
+ ## H. Validation pitfalls
+ 
+-- ▢ **Wrong epoch** for `REFTIM` vs `FACE/FACET` — phase off by a constant. Symptom: high phase RMSE but reasonable amplitude.
+-- ▢ **Lead vs lag** phase convention — sign flip. Symptom: phase off by ~180° on some constituents. Confirm `cos(arg − phase)` form.
+-- ▢ **Greenwich vs local** zone phase — many databases give Greenwich (UTC); ADCIRC's `STATIM/REFTIM` defines its own zone (usually UTC by convention).
+-- ▢ **Amplitude in cm not m** — silent factor of 100.
+-- ▢ **Constituent name mismatch** — strict trim; "M2" != "m2" (case sensitive in some compilers).
+-- ▢ **Order mismatch** between `BOUNTAG` and `ELEVALPHA` blocks — `ELEVALPHA` is only printed; you must keep order consistent manually.
+-- ▢ **Forgetting nodal correction** — if you use astronomical reference `(V₀+u)` for *one* date but run for years, `f` and `(V₀+u)` change. ADCIRC applies them as constants — for runs > 1 month, recompute or accept reduced accuracy.
+-- ▢ **NTIP=2 without `fort.24`** — SAL arrays stay zero; the model runs but you lose SAL physics. Check log for "fort.24 not found."
++- **Epoch·시각대**: FACE/FACET의 기준과 TimeH의 기준을 대조한다. 오차를 임의의 90°/180° 증상으로 단정하지 않는다(§D/F 합성식).
++- **Lead/lag**: 부호를 뒤집은 오차는 원래 위상에 의존한다. 순환 위상 차이와 복소 오차를 함께 본다([지표 정의](#independent-observation-and-errors)).
++- **단위·결측**: cm 값을 m로 쓰면 진폭이 100배가 된다. 결측 sentinel에 단위 변환/보간을 적용하기 전에 제외한다([제품별 정의](#external-data-conventions)).
++- **분조/노드 순서**: NBFR의 ELEVALPHA는 echo되지만 BOUNTAG와 대조되지 않는다. SAL의 TIPOTAG 매칭과 혼동하지 않는다(§A/C; `src/read_input.F:3485–3497`).
++- **노달보정**: 이 NBFR 경로는 입력 FF/FACE를 합성에 사용한다. 시간에 따라 변하는 공급기관 예측과의 차이를 대상 기간에서 평가한다. 고정 1개월/분기별 갱신을 공통 정확도 기준으로 사용하지 않는다(`src/gwce.F:1642–1649`; [PyFES nodal 정의][pyfes-nodal]).
++- **관측/atlas 혼동**: 원 DB와의 재합성 일치, 동화/보정에 사용한 관측 일치, 독립 관측 검증을 구분한다([독립성 기준](#independent-observation-and-errors)).
+ 
+ ## Decision Guide
+ 
+ | Need | Setup |
+ |---|---|
+-| Tide-only run | `NTIP=1`, fort.15 NBFR block; **no fort.24** |
+-| Tide + SAL (recommended) | `NTIP=2`, fort.15 NBFR + fort.24 |
+-| FES2022b global | T_TIDE/pyTMD for FF/FACE; FES interpolation for amplitudes/phases at boundary nodes |
+-| NAO99jb regional (Asia/Pacific) | Same workflow; NAO99jb covers M2/S2/K1/O1 well |
+-| Combined FES + tide gauge | Boundary from FES; verify against gauges in interior |
+-| TPXO global | Similar; conventions match |
+-| Long run (>1 yr) | Document FF/FACE epoch; consider re-running with new astronomical reference quarterly |
++| 주기 수위 경계 | NBFR와 EMO/EFA를 준비한다. NTIP/NTIF 퍼텐셜 선택은 별도다. 위 회귀 예제는 NTIP=0, NTIF=0, NBFR=1이다. |
++| 퍼텐셜/SAL도 포함 | NTIP의 0/1/2 정의와 §A/F·forcing 노트를 대조한다. SAL 사용에는 성분·물리량·분조·파일의 추가 근거가 필요하며, 모든 해역에 일괄 권고하지 않는다. |
++| FES2022b / NAO99Jb / TPXO | [제품별 정의](#external-data-conventions)에 따라 변환한다. 제품명·격자 간격·포함 분조 수만으로 특정 해역의 정확도 순위를 정하지 않는다. |
++| 관측과 비교 | [독립성·분석창·지표](#independent-observation-and-errors)를 고정한다. 해역·목적별 허용치는 미선정이다. |
++| 긴 실행 기간 | 고정 FF/FACE 합성과 선택한 공급기관 예측의 기간 내 차이를 확인한다. 보정 변경/재시작 방법과 허용오차는 별도 검증 대상이다. |
+ | Disable tidal potential and periodic elevation forcing | `NTIP=0`; keep the required `NBFR=0` line. Any non-periodic elevation boundary data are a separate input (`src/read_input.F:1705–1731,3410–3444`; [official NBFR definition](https://adcirc.github.io/adcirc/technical_reference/parameter_definitions/index.html)). |
+ 
+ ## Working Rules
+@@ -243,8 +299,8 @@
+ - Always write `STATIM`, `REFTIM`, and the FF/FACE epoch in the run README. These three must align.
+ - Use 8-character constituent names ("M2      ", "S2      ", etc.) padded; ADCIRC trims, but consistent is safer.
+ - Output `fort.51` harmonic analysis at validation stations to compute model-side amplitude/phase, then compare against gauge harmonic constants — this is far more diagnostic than time-series RMSE.
+-- For Korean coast, NAO99jb gives good M2/S2/K1/O1 starting point; FES2022b adds N2, K2, P1 if you need finer accuracy. ⚠ source-needed(지역 정확도 서술 출처 미인용).
+-- SAL from fort.24 typically reduces M2 amplitude by ~5-10% in shelf seas — if your run shows persistent +10% M2 overprediction, missing SAL is a likely cause. ⚠ source-needed(~5-10% 정량값 출처 미인용).
++- 지역별 DB 선택은 해당 정점/기간의 독립 관측 대조로 판단한다. NAO99Jb도 N2/K2/P1을 포함하므로 이 분조들의 존재만으로 FES의 추가 정확도를 주장하지 않는다([NAO README §2][nao-readme]).
++- 기존 SAL의 일괄 5–10% 진폭 감소 권고는 `source-needed`다. 해당 조건·정량 근거를 확인하기 전 특정 과대예측의 원인 판정에 사용하지 않는다.
+ 
+ ## Common Pitfalls
+ 
+@@ -257,9 +313,9 @@
+ 
+ ## Next expansion
+ 
+-- T_TIDE / pyTMD recipe for FF/FACE generation.
++- 판본·천문/노달보정이 명시된 FF/FACE 생성 및 공급기관 예측과의 대조.
+ - FES2022b → fort.15 conversion script.
+-- SAL preparation from FES2022b loading-tide grids.
++- SAL 입력과 외부 제품의 물리량/퍼텐셜 정의 연결. FES radial loading의 직접 이전은 미입증.
+ - Validation harmonic analysis (`fort.51`) post-processing.
+ 
+ ## References
+@@ -268,7 +324,8 @@
+ - Hendershott 1972 (SAL theory).
+ - T_TIDE: Pawlowicz et al. 2002.
+ - UTIDE: Codiga 2011.
+-- FES2022b: Lyard et al. 2024.
++- FES2022b: [CNES dataset DOI](https://doi.org/10.24400/527896/A01-2024.004), [handbook Issue 2.0][fes-hdbk]. 이 handbook p. 1의 FES2022 논문은 in preparation으로 기재돼 있어, 기존의 불명확한 “Lyard et al. 2024” 출판 인용을 대체한다.
++- 외부 자료·검증 지표 출처는 해당 절의 제품 문서, NAO 입력/합성 코드, UHSLC와 Wang et al. (2022)에 명시했다.
+ - Source: paths above.
+ 
+ ## Provenance
+--- a/models/ADCIRC/source-analysis/tide/adcirc-tide-forcing-implementation.md
++++ b/models/ADCIRC/source-analysis/tide/adcirc-tide-forcing-implementation.md
+@@ -2,6 +2,10 @@
+ title: "adcirc tide forcing implementation"
+ topic: tides
+ canonical_source: self
++external_evidence_date: 2026-09-14
++external_evidence_review: "Claude Fable 5.1 — 외부 제품·변환 확인 방법·독립 관측/지표 원문 대조; 과학적 사람 승인 아님"
++external_evidence_human_approval: not-issued
++external_evidence_scope: "외부 조석 제품 정의·변환 확인 방법·관측 독립성·지표 근거와 관련 무근거 권고 정정. 실제 자료/실행/수치/물리 검증 아님."
+ citation_status: verified
+ has_source_needed: true
+ source_correction_date: 2026-09-14
+@@ -21,7 +25,7 @@
+ 
+ ## 2026-09-14 한정 대조 범위
+ 
+-이 보강의 코드 판본은 ADCIRC `6037225ce4573efd3c1f8877a5dc908d01c199a8`이다. 아래 `src/` 인용의 루트는 `models/ADCIRC/raw/source_code/adcirc/`다. **문서 지원·코드 구현** 중 NBFR 입력, 경계 노드 전달, 위상/시간 기준, 전통 분조 경로의 ETRF 항을 대조했다. **실행 확인·수치 검증·물리 검증·개별 입력자료 품질 확인은 수행하지 않았다.** 다른 절과 외부 DB 규약은 이번 검증 범위에 포함하지 않는다. 과거 검증 이력과 이번 정정을 구분하며 이번 정정에 대한 사람 승인은 발급하지 않았다.
++이 보강의 코드 판본은 ADCIRC `6037225ce4573efd3c1f8877a5dc908d01c199a8`이다. 아래 `src/` 인용의 루트는 `models/ADCIRC/raw/source_code/adcirc/`다. **문서 지원·코드 구현** 중 NBFR 입력, 경계 노드 전달, 위상/시간 기준, 전통 분조 경로의 ETRF 항을 대조했다. **실행 확인·수치 검증·물리 검증·개별 입력자료 품질 확인은 수행하지 않았다.** 이 코드 대조는 다른 절과 외부 DB 규약을 포함하지 않는다. 외부 자료에 대한 별도 보강 범위는 harmonic-prep의 「외부 조석 자료」 절을 따른다. 과거 검증 이력과 이번 정정을 구분하며 이번 정정에 대한 사람 승인은 발급하지 않았다.
+ 
+ 실제 입력 준비와 실행/수치/물리 검증에 필요한 증거는 [harmonic-prep의 확인 방법](adcirc-tide-harmonic-prep.md#input-quality-and-validation)을 따른다. 이 링크 추가가 해당 검증의 수행을 뜻하지 않는다.
+ 
+@@ -160,7 +164,7 @@
+ 
+ ## Common Pitfalls
+ 
+-- **Using NAO99jb amplitudes with FES2022b phases** — common cross-mix mistake; phases are referenced to different conventions.
++- **서로 다른 DB의 진폭·위상 혼합** — 동일 제품·판본·공간 추출의 한 쌍을 사용한다. FES와 NAO의 위상 규약이 서로 다르다고 단정한 기존 문장은 철회한다. 확인한 부호·단위와 아직 미확인인 변환 조건은 [제품별 정의](adcirc-tide-harmonic-prep.md#external-data-conventions)에 있다. FES radial loading을 fort.24로 직접 이전할 근거도 이와 별도로 필요하다.
+ - **Wrong NETA in NBFR block** — number of boundary nodes must match fort.14 open boundary listing.
+ - **Missing `ELEVALPHA` line** between constituents — parser desync, all subsequent boundary amplitudes garbage.
+ - **NTIP=2 fort.24 with extra constituent** not in `TIPOTAG` — silently dropped, no error.
+--- a/models/ADCIRC/source-analysis/adcirc-topic-map.md
++++ b/models/ADCIRC/source-analysis/adcirc-topic-map.md
+@@ -2,6 +2,10 @@
+ title: "ADCIRC 기능 지도와 근거 준비 상태"
+ topic: general
+ canonical_source: self
++external_evidence_date: 2026-09-14
++external_evidence_review: "Claude Fable 5.1 — 외부 제품·변환 확인 방법·독립 관측/지표 원문 대조; 과학적 사람 승인 아님"
++external_evidence_human_approval: not-issued
++external_evidence_scope: "외부 조석 제품 정의·변환 확인 방법·관측 독립성·지표 근거와 관련 무근거 권고 정정. 실제 자료/실행/수치/물리 검증 아님."
+ citation_status: source-needed
+ note_author: "Codex — Fable 5.1 계획·독립 검토 반영"
+ note_date: 2026-09-14
+@@ -32,8 +36,8 @@
+ | F01 격자·좌표·수심 | 포함 — 모든 입력과 결과의 공간 기준 | [fort.14][d14]의 격자/경계 구조, [ICS][dics] §Available ICS Values 조건 대조 | [전처리](adcirc-preprocessing-foundation.md), [수심](adcirc-bathymetry-input-foundation.md), [도메인 설계](adcirc-domain-design-process.md): 기존 노트 | 원자료 기준면·해상도·오차, 좌표 변환과 노드 수심의 독립 대조 |
+ | F02 2D 지배식·수치 옵션 | 포함 — 설정에 따른 해법 구분 | [IM][dim] §Default IM Values·Six-digit IM Codes의 분류/일부 조건 대조 | [GWCE](adcirc-gwce-implementation.md), [운동량](adcirc-momentum-implementation.md), [시간 흐름](adcirc-timestep-orchestration.md), [선형해법](adcirc-itpack-solver.md): 기존 노트 | 선택 IM과 TAU0·시간가중·DTDP 조합의 식/분기 및 기준해·보존/민감도 |
+ | F03 마찰·수평 혼합·공간 속성 | 포함 — 운동량·소산 설정 | [설정 분류][dcfg] Model/Physics Parameters 항목 확인; 수치 권고값 미대조 | [운동량](adcirc-momentum-implementation.md), [노드 속성](adcirc-nodal-attributes.md): 기존 노트 | NOLIBF·ESLM·fort.13 속성의 활성 조건/기본값, 물리적 계수 근거 |
+-| F04 조석 수위 경계 | 포함 — 첫 입력 근거 묶음 | [상세 정의][dparam] NBFR·AMIG/FF/FACE·EMO/EFA 조건 대조 | [harmonic-prep](tide/adcirc-tide-harmonic-prep.md), [forcing](tide/adcirc-tide-forcing-implementation.md): NBFR·노드순서·위상/시간 한정 대조 | 외부 DB 규약과 실제 경계 자료의 품질·변환 확인; 아래 조석 진입점 |
+-| F05 조석 퍼텐셜·SAL | 포함 — 경계 수위와 다른 강제 항 | [상세 정의][dparam] NTIP·NTIF 및 [조석 개요][dtide]의 불일치 대조 | [forcing](tide/adcirc-tide-forcing-implementation.md): 전통 분조 ETRF 항 한정 대조. [조석 경로](adcirc-tidal-forcing.md)의 나머지는 기존 노트 | full-formula/SAL 전체 조건·파일·분조 정합, 정량 효과와 외부 SAL 제품 정의 |
++| F04 조석 수위 경계 | 포함 — 첫 입력 근거 묶음 | [상세 정의][dparam] NBFR·AMIG/FF/FACE·EMO/EFA 조건 대조 | [harmonic-prep](tide/adcirc-tide-harmonic-prep.md), [forcing](tide/adcirc-tide-forcing-implementation.md): NBFR·노드순서·위상/시간 한정 대조 | FES/NAO 정의·변환 확인 방법 및 TPXO 확인 한계는 [제품별 근거](tide/adcirc-tide-harmonic-prep.md#external-data-conventions). 실제 경계 파일 품질·변환/합성 결과는 미확인 |
++| F05 조석 퍼텐셜·SAL | 포함 — 경계 수위와 다른 강제 항 | [상세 정의][dparam] NTIP·NTIF 및 [조석 개요][dtide]의 불일치 대조 | [forcing](tide/adcirc-tide-forcing-implementation.md): 전통 분조 ETRF 항 한정 대조. [조석 경로](adcirc-tidal-forcing.md)의 나머지는 기존 노트 | full-formula/SAL 전체 조건·파일·분조 정합과 정량 효과. FES radial 변위를 fort.24로 직접 옮길 물리량 대응은 미입증([구분](tide/adcirc-tide-harmonic-prep.md#external-data-conventions)) |
+ | F06 내부조석 에너지 전환 | 포함 — 공식 조석 분류에 존재 | [조석 개요][dtide] 항목 확인; 수심/소산 권고 수치는 이번 지도의 확정 근거로 쓰지 않음 | [조석 경로](adcirc-tidal-forcing.md), [노드 속성](adcirc-nodal-attributes.md): 기존 노트 | 적용 조건·평균화·소산량 근거와 기존 source-needed 정량 주장 |
+ | F07 바람·기압·폭풍해일 | 포함 — 공식 응용 기능 | [Model Features][dfeatures]·[설정 분류][dcfg] Meteorological Forcing/GAHM 항목 확인 | [NWS 구현](adcirc-met-forcing-implementation.md), [GAHM](adcirc_gahm_vortex_model.md), [폭풍해일](storm-surge/adcirc-storm-surge.md): 기존 노트 | NWS별 시간/공간/단위와 풍응력식, 입력 오차·독립 관측 검증 |
+ | F08 유량·하천·비주기 수위·방사 경계 | 포함 — 물과 운동량의 경계 전달 | [경계 분류][dbc]와 [fort.14][d14] 항목/형식 확인; 세부 IBTYPE 조건은 기존 노트 재대조 필요 | [경계조건](adcirc-boundary-conditions.md), [주기 유량](adcirc-nffr-periodic-flux-boundary.md): 기존 노트 | IBTYPE·NFFR·비주기 입력의 부호/단위/순서와 물수지 |
+@@ -61,14 +65,14 @@
+ | 실행 확인 | [공식 예제][dexamples]·[baseline 선택](adcirc-baseline-selection.md)·[구성](adcirc-baseline-anatomy.md) 위치 | **이번 미수행**. 실행파일·입력·옵션·로그·기대한 출력의 실제 증거 |
+ | 수치 검증 | T의 회귀검사 위치와 [예제 색인](../manual-notes/07-examples-index.md) | **이번 미수행**. 회귀 일치와 별도로 해석해/기준해·보존량·격자/시간 민감도 근거 |
+ | 물리 검증 | [기초 문헌 색인](../web-refs/adcirc-foundational-papers.md) §2/§4의 후보 위치 | **이번 미수행**. 색인은 첫 페이지 서지/초록 확인 범위이므로 논문 결과 대조 완료가 아님. 독립 관측·실험·오차/불확실성·적용 조건 필요 |
+-| 입력 품질·불확실성 | [조석 확인 방법](tide/adcirc-tide-harmonic-prep.md#input-quality-and-validation) | **개별 자료 확인 미수행**. 사용할 DB/지형/관측 판본과 범위·변환·오차를 먼저 고정 |
++| 입력 품질·불확실성 | [조석 확인 방법](tide/adcirc-tide-harmonic-prep.md#input-quality-and-validation)과 [외부 제품 원문·관측/지표 정의](tide/adcirc-tide-harmonic-prep.md#external-data-conventions) | **개별 자료 확인 미수행**. 사용할 DB/지형/관측 판본과 범위·변환·오차를 먼저 고정 |
+ 
+ ## 조석 입력에서 시작하기
+ 
+ 1. **입력 형식·식·코드**: [harmonic-prep의 한정 대조와 확인 방법](tide/adcirc-tide-harmonic-prep.md#input-quality-and-validation). NBFR/노드순서/위상·시간, NTIP와 NTIF 구분을 읽는다. [조석 개요][dtide]의 `NTIP`·`AMIG` 설명 불일치는 상세 정의·코드에 대조한 주의사항이 이 노트에 있다.
+ 2. **실행 확인 후보**: T의 `test_list.yaml:423–434`가 `adcirc_quarterannular-2d-netcdf`와 여섯 비교 출력 파일을 지정한다. `test_runner/adcirc_test/adcirctest.py:429–445`는 해당 `control/`과 계산 출력을 대조한다. 이 회귀 일치가 독립 관측검증을 대신하지 않는다. T README의 허용오차를 해역의 물리 허용오차로 복사하지 않는다.
+ 3. **다른 강제 경로 후보**: [전지구 M2 예제][dglobal]는 퍼텐셜/SAL과 전지구 조화분해를 다루는 v55 이상 예제다. 개방경계 NBFR 예제와 구분한다. 그 예제의 시간간격·계수를 지역 모델 권고값으로 사용하지 않는다.
+-4. **다음 근거 확보**: 외부 DB의 위상·노달보정·단위 원문, 변환/보간 확인, 독립 관측의 기준면·시간·품질 및 목적별 오차 기준. 기준 미확정인 채 실행·물리 검증 준비 완료로 표시하지 않는다.
++4. **외부 자료·관측/오차 근거**: [제품별 정의·변환 대조](tide/adcirc-tide-harmonic-prep.md#external-data-conventions)와 [독립 관측·지표](tide/adcirc-tide-harmonic-prep.md#independent-observation-and-errors)를 확보했다. 다음은 사용할 DB 파일·경계·시각과 관측 정점/기간을 지정한 실제 품질·변환 확인 및 목적별 허용치다. TPXO 개별 배포 형식, SAL 물리량 대응, 기준해·보존/민감도도 미확인이다. 입력/물리 검증 준비 완료로 표시하지 않는다.
+ 
+ ## 공통 자료와 비교 시작 경계
+ 
