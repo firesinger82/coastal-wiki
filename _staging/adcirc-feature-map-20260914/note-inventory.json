@@ -1,0 +1,1910 @@
+{
+  "snapshot": "2026-09-14 before feature-map changes",
+  "count": 61,
+  "notes": [
+    {
+      "path": "models/ADCIRC/source-analysis/adcirc-3d-mode.md",
+      "sha256": "6012ad93fbff371a3c2488e9ee26c11e72cbf1ae4c54afe2f80c3fe84a989155",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": "true",
+        "verification_method": "\"ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-3d-mode.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시.\"",
+        "verification_by": "\"사용자 + codex source-code analysis\"",
+        "verification_date": "2026-04",
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "Scope",
+        "Source basis",
+        "A. Two distinct paths",
+        "B. Sigma layers",
+        "C. Density / EOS",
+        "D. Internal vs external mode",
+        "E. GWCE modification for 3D",
+        "F. Vertical mixing",
+        "G. 3D output (fort.41-46)",
+        "H. Limitations vs full ocean model",
+        "Decision Guide",
+        "Working Rules",
+        "Common Pitfalls",
+        "Next expansion",
+        "References",
+        "Provenance"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F11"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/source-analysis/adcirc-3d-vssol-vertical-scheme.md",
+      "sha256": "6f0f566e596f7bef91d5673c0c03edc56915763d27e5aba2fb984d4a52235439",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": "false",
+        "verification_method": "\"vsmy.F(5281줄) VSSOL(:142-1703)·TRIDIAG(:2097-2130)·InmINT(:2299-2319)·EDDYVIS(:1785-2062) + read_input.F 3D 블록(:5073,5102,5127-5137) + global_3dvs.F(:98,193-195) + timestep.F(:1121-1125) + docs parameter_definitions/index.rst:1309-1316(ALP1/2/3)·fort15.rst:129 직접 read (2026-07-10~11). 모든 식·계수 verbatim 인용.\"",
+        "verification_by": null,
+        "verification_date": null,
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "ADCIRC VSSOL — 3D internal mode 연직 시간적분",
+        "1. 정체 — 무엇을 언제 푸는가",
+        "2. θ³-가중 시간적분 — 항별 3개의 독립 implicitness",
+        "3. 연직 이산화 — linear FE Galerkin (consistent mass)",
+        "4. 해법 — 복소 Thomas (TRIDIAG)",
+        "5. 경계조건",
+        "6. 연직속도 w — 연속식 적분 + ★adjoint 보정",
+        "7. ★Findings / 함정",
+        "연결"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F11"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/source-analysis/adcirc-baroclinic-coupling.md",
+      "sha256": "ee885e82a5c097e483aa96b0b803eba55aed6f8837b47d32e295358cb6d20889",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": null,
+        "verification_method": "\"models/ADCIRC/raw/source_code/adcirc/src/couple2baroclinic3D.F (1168) 직접 read — Module Couple2BC3D + Read_BC3D_NetCDF(113, BPGX/BPGY/SigTS/NB/NM/MLD/CDisp/DispX/DispY) + Put_BC3D_on_ADCIRC_Grid(855 공간보간) + Update_BC3D_Info(714 시간보간) + FBPG_Disp_from_BC3D(1012) + 적용(momentum.F:473-477 VIDBCPDXOH) file:line 인용. WJP(Westerink-Pringle?) 개발.\"",
+        "verification_by": "\"Claude Opus 4.8 (1M context) — BC3D 결합 데이터·보간·적용 verbatim\"",
+        "verification_date": "2026-06-03",
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "ADCIRC 2D-baroclinic 결합 (couple2baroclinic3D.F)",
+        "1. 개념 (module 주석 :39-52)",
+        "2. 입력 — fort.11.nc NetCDF (Read_BC3D_NetCDF :113)",
+        "3. 보간 (공간 + 시간)",
+        "4. 적용 — momentum (FBPG_Disp_from_BC3D :1012 → momentum.F:473)",
+        "5. 위치 — 2D vs 3D",
+        "6. 연결"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F11"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/source-analysis/adcirc-baseline-anatomy.md",
+      "sha256": "20d5f2737772d2484b222282a3baf32aa5a6e9bb2f74e1adb4af5f2ed42f299c",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": null,
+        "verification_method": "\"ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-baseline-anatomy.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시.\"",
+        "verification_by": "\"사용자 + codex source-code analysis\"",
+        "verification_date": "2026-04",
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "ADCIRC Baseline Anatomy",
+        "Selected Baseline",
+        "Why This Anatomy Matters",
+        "Top-Level Files",
+        "Control Folder",
+        "Testsuite Metadata",
+        "Minimum Baseline Manifest",
+        "First Things To Log Against This Baseline",
+        "Not To Do Yet"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "common-validation"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/source-analysis/adcirc-baseline-selection.md",
+      "sha256": "2cb5b0985d6c6a6d8635b91720b2b23b1a215fe059317b6ff91cff87cdb8dfbc",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": null,
+        "verification_method": "\"ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-baseline-selection.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시.\"",
+        "verification_by": "\"사용자 + codex source-code analysis\"",
+        "verification_date": "2026-04",
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "ADCIRC Baseline Selection",
+        "Decision",
+        "Recorded Local Path",
+        "Why This Candidate Is First",
+        "Comparison Candidates",
+        "1. Quarter Annular Harbor",
+        "2. Idealized Inlet",
+        "3. Beaufort Inlet",
+        "4. Global Tide Or Storm Cases",
+        "Reasoning",
+        "Next Step"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "common-validation"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/source-analysis/adcirc-bathymetry-input-foundation.md",
+      "sha256": "67efaed35436510103b8cd585970218906d5ca984c29fe8948dc4e916a2199ba",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": null,
+        "verification_method": "\"ADCIRC 공식 문서(fort.14/fort.13/fort.141 의미·NWS·전처리 도구) 기반. modeling-wiki 마이그레이션(2026-05-23). (2026-06-18 canonical 정화: 개인 로컬 경로·grid 유틸리티 증거 제거, 공개 도구·소스명만 유지.)\"",
+        "verification_by": "\"사용자 + codex source-code analysis\"",
+        "verification_date": "2026-04",
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "ADCIRC Bathymetry Input Foundation",
+        "Core Official Fact",
+        "First Principle",
+        "Bathymetry Input Layers",
+        "1. Base Bathymetry In The Mesh",
+        "2. Nodal Attributes",
+        "3. Time-Varying Bathymetry",
+        "4. Subgrid Terrain Representation",
+        "What The Official Tooling Implies",
+        "What Must Be Controlled",
+        "What We Should Record For Every Bathymetry Workflow",
+        "What The Docs Do Not Give Us Directly",
+        "Current Working Rule"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F01",
+        "F18"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/source-analysis/adcirc-boundary-conditions.md",
+      "sha256": "135533dd8dba80e038321135a0b8d482e28920e3592b9fac1818601ffdcfe40a",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": "false",
+        "verification_method": "\"models/ADCIRC/raw/source_code/adcirc/src/boundaries.F (675) + normal_flow_boundary.F90 (106) + sponge_layer.F90 (880) 직접 read — IBTYPE 분류(specifiedFluxBoundaryTypes=(2,12,22,32,52):179, flux 3/13/23·4/24/64·5/25, weir 64), sponge SSIGMA_ETA/MNX/MNY + momentum SPNGCOEF(momentum.F VCOEFXX) file:line 인용. Luettich-Westerink ADCIRC.\"",
+        "verification_by": "\"Claude Opus 4.8 (1M context) — IBTYPE 카탈로그·flux BC·sponge 메커니즘 verbatim\"",
+        "verification_date": "2026-06-03",
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "ADCIRC 경계조건 — IBTYPE / flux / sponge",
+        "1. 두 경계 부류 (boundaries.F)",
+        "2. IBTYPE 카탈로그 (boundaries.F:100-179) ★",
+        "3. Normal flux BC (normal_flow_boundary.F90, 106)",
+        "4. Sponge (absorbing) layer (sponge_layer.F90, 880) ★",
+        "5. 정리",
+        "6. 연결"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F08",
+        "F10"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/source-analysis/adcirc-dg-continuity-solver.md",
+      "sha256": "b0e28188a2bbeeb83c19a54c3c211f8d7de7b6373bae76264fdd65bb6a11c501",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": "true",
+        "verification_method": "\"GitHub API repos/adcirc/adcirc/pulls/502 (metadata + 25 files diff list) + repos/adcirc/adcirc/contents/src/dg.F90?ref=refs/pull/502/head (5733 lines module header line 1-120) + contents/src/dg_integration.F90 (1324 lines, header line 1-60) + contents/src/slopelimiter.F90 (206 lines, line 1-50 + SL6 body) 직접 fetch (2026-06-01). PR metadata: author namo626, additions 10358, deletions 67, changedFiles 25, createdAt 2026-04-29, state OPEN, body description: 'Work in progress of adding a discontinuous Galerkin solver to the continuity equation'.\"",
+        "verification_by": "\"Claude Opus 4.7 (1M context) — GitHub API verbatim\"",
+        "verification_date": "2026-06-01",
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "Scope",
+        "1. PR #502 metadata (GitHub API verbatim)",
+        "2. File 변경 분류 (25 files)",
+        "2.1 신규 파일 5건 (8,611 lines)",
+        "2.2 Modified 핵심 파일 (1,747 lines net)",
+        "3. DG core module (`dg.F90`)",
+        "3.1 Module structure (line 1-37)",
+        "3.2 핵심 변수 (line 40-105)",
+        "3.3 TVD-Runge-Kutta time integration (line 108-109)",
+        "3.4 Slope limiter flag + Riemann flux type",
+        "3.5 Adaptive p-refinement (line 74)",
+        "4. DG time-step driver (`dg_integration.F90`)",
+        "4.1 Subroutine 구조",
+        "4.2 Hybrid CG-DG 통합",
+        "4.3 호출 순서 (line 50-60)",
+        "5. Slope limiter (`slopelimiter.F90`)",
+        "5.1 Dispatch",
+        "5.2 SlopeLimiter6 algorithm (line 28-90)",
+        "6. Coupling to existing ADCIRC core",
+        "6.1 `momentum.F` 변경 (+32 -18)",
+        "6.2 `timestep.F` 변경 (+9 -3)",
+        "6.3 `wetdry.F` 변경 (+6 -2)",
+        "6.4 `read_input.F` 변경 (+39 -2)",
+        "7. Element MPI messenger (`messenger_elem.F90`, 1189 lines)",
+        "8. Preprocessing 대규모 변경 (`prep/decomp.F` +1303 lines)",
+        "9. 한계 + 다음 단계",
+        "WIP 한계 (PR description + code 직접 인용)",
+        "향후 verified 가능 항목 (PR merge 후)",
+        "10. ADCIRC CG (GWCE) 와의 비교",
+        "11. Cross-references",
+        "12. 후속 추적"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F18"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/source-analysis/adcirc-domain-design-process.md",
+      "sha256": "cc69b023887cae2cf09d6bf7b7ac1f6f9b5804bc3aa1ebc6cd313d680673f124",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": null,
+        "verification_method": "\"ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-domain-design-process.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시.\"",
+        "verification_by": "\"사용자 + codex source-code analysis\"",
+        "verification_date": "2026-04",
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "ADCIRC Domain Design Process",
+        "Problem Statement",
+        "Domain Design Questions",
+        "Five-Gate Process",
+        "Gate 1. Forcing Coverage",
+        "Gate 2. Physics Coverage",
+        "Gate 3. Boundary Bathymetry",
+        "Gate 4. Numerical Survivability",
+        "Gate 5. Validation",
+        "Decision Order",
+        "Allowed Fix Types",
+        "Type A. Domain geometry fix",
+        "Type B. Mesh and bathymetry fix",
+        "Type C. Runtime stabilization fix",
+        "Minimum Deliverables For Any Domain",
+        "Review Questions",
+        "Working Rule"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F01"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/source-analysis/adcirc-fort-files-reference.md",
+      "sha256": "a5972aaba19bf30fcd8961578869361316f2db83a2274bea4de73a41c2a74156",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": "true",
+        "verification_method": "\"ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-fort-files-reference.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시.\"",
+        "verification_by": "\"사용자 + codex source-code analysis\"",
+        "verification_date": "2026-04",
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "ADCIRC fort.* files — purpose, I/O, and connectivity",
+        "Scope note",
+        "Source basis",
+        "Why this note exists",
+        "File inventory",
+        "Required input files",
+        "Optional input files (selected by `fort.15` flags)",
+        "Output files — 2D station / global",
+        "Output files — meteorological",
+        "Output files — 3D station",
+        "Output files — harmonic analysis",
+        "Special / parallel / deprecated",
+        "Connectivity graph",
+        "Decision Guide",
+        "Working Rules",
+        "Common Pitfalls",
+        "Next expansion",
+        "References",
+        "Source code (this scan, 2026-05-05)",
+        "Manuals (curated, retrieved 2026-05-05 against `manuals` collection, model=adcirc)",
+        "Provenance"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "common",
+        "F15",
+        "F16"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/source-analysis/adcirc-fort15-checklist-v1.md",
+      "sha256": "c6d0f19a20e969e3533e6117fa1c8b8d883262ff36a325429d95d20ca5125c19",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": "true",
+        "verification_method": "\"ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-fort15-checklist-v1.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시. L4 2026-07-03 감사: IM 단언은 read_input.F:1133-1162 로 보강(verified), TAU0 0.005-0.1 범위·FAQ triage 2건은 익명 출처 disclosed gap(본문 source-needed 주석) → has_source_needed: true.\"",
+        "verification_by": "\"사용자 + codex source-code analysis\"",
+        "verification_date": "2026-04",
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "ADCIRC fort.15 Checklist V1",
+        "Read Order",
+        "1. Identity And Execution Context",
+        "2. Formulation And Physics Switches",
+        "3. Stability And Time-Stepping Controls",
+        "4. Forcing And Boundary Specification",
+        "5. Output And Analysis Settings",
+        "6. Restart And Solver Controls",
+        "Freeze List For The First Controlled Experiment",
+        "Evidence To Save For Every fort.15 Change"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F02",
+        "F14"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/source-analysis/adcirc-gwce-implementation.md",
+      "sha256": "651d2a0f9a4a7ab3c62adeb721ff8c37775f8c7a783a63439c695c7b8dff4390",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": null,
+        "verification_method": "\"ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-gwce-implementation.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시.\"",
+        "verification_by": "\"사용자 + codex source-code analysis\"",
+        "verification_date": "2026-04",
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "ADCIRC GWCE solver — matrix assembly, time integration, JCG solve",
+        "Scope",
+        "A. Matrix assembly",
+        "B. Time integration",
+        "C. Solver",
+        "D. Boundary contributions",
+        "E. SAL integration (NTIP=2 path)",
+        "F. Wetting-drying mask",
+        "Decision Guide — 진단 (트러블슈팅)",
+        "Working Rules",
+        "Common Pitfalls",
+        "References",
+        "Provenance"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F02"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/source-analysis/adcirc-hotstart.md",
+      "sha256": "e272fab10b7e6d99e7fbf3934470f425c072bc01b19f5af73ff701f109bbbfac",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": null,
+        "verification_method": "\"ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-hotstart.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시.\"",
+        "verification_by": "\"사용자 + codex source-code analysis\"",
+        "verification_date": "2026-04",
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "Scope",
+        "Source basis",
+        "A. IHOT dispatch",
+        "B. fort.67/68 binary structure",
+        "C. hstart.F entry points",
+        "D. NetCDF variant",
+        "E. NHSINC / NHSTAR output control",
+        "F. State preserved",
+        "G. Resolution / mesh change",
+        "H. Restart with NWS forcing",
+        "Decision Guide",
+        "Working Rules",
+        "Common Pitfalls",
+        "Next expansion",
+        "References",
+        "Provenance"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F14"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/source-analysis/adcirc-itpack-solver.md",
+      "sha256": "36864ba5f491911829c72e8216325bff5899fb8d75252263fede45c3546c5049",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": null,
+        "verification_method": "\"models/ADCIRC/raw/source_code/adcirc/src/itpackv.F (2942) 직접 read — jcg(63 driver) + itjcg(459 1-iteration) + pjac(1932 Jacobi precond) + pmult(1970 matvec) + parcon/chgcon(1774/893 가속 param) + pstop(721 수렴) + zbrent/eqrt1s(2521/1402 고유값) + dfault(1071). gwce.F:2003 CALL JCG + IPARM/RPARM(145-151) 인터페이스 file:line 인용. 원본 ITPACKV 2D(1990-01) = Kincaid·Grimes·Respess, UT Austin Center for Numerical Analysis(:41-43); ADCIRC에 MODULE ITPACKV로 편입(vjp 1999)·MPI 적응·LGPL.\"",
+        "verification_by": "\"Claude Opus 4.8 (1M context) — JCG 알고리즘·전처리·adaptive·인터페이스 verbatim\"",
+        "verification_date": "2026-06-03",
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "ADCIRC GWCE 선형 solver — ITPACKV JCG",
+        "1. 호출 인터페이스 (gwce.F:2003)",
+        "2. JCG 알고리즘 (jcg :63 / itjcg :459)",
+        "3. Adaptive 고유값 추정 (itcom3 common)",
+        "4. 수렴 판정 (pstop :721)",
+        "5. 보조 (전처리·정렬·scaling)",
+        "6. 위치·한계",
+        "7. 연결"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F02"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/source-analysis/adcirc-met-forcing-implementation.md",
+      "sha256": "c3a7314cf8580558c934c2026acb196a5db6741af75f47bcadf71d52bca05762",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": null,
+        "verification_method": "\"ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-met-forcing-implementation.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시.\"",
+        "verification_by": "\"사용자 + codex source-code analysis\"",
+        "verification_date": "2026-04",
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "ADCIRC met forcing — NWS dispatch, OWI readers, wind drag",
+        "Scope",
+        "A. NWS dispatch",
+        "Per-value dispatch line map",
+        "A2. NWS=8 (parametric vortex, mod_nws08) — verified 2026-06-04",
+        "B. NWS=2 (single-grid wind/pressure file)",
+        "C. NWS=12 (OWI legacy ASCII)",
+        "Header / time block",
+        "D. NWS=13 (OWI NetCDF) — relevant for JMA-MSM workflow",
+        "E. NWS=14, 15 (newer)",
+        "F. Wind drag",
+        "G. Pressure-only effect (inverse barometer)",
+        "H. fort.71-74 met output",
+        "Decision Guide — JMA-MSM workflow",
+        "Working Rules",
+        "Common Pitfalls",
+        "References",
+        "Provenance"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F07",
+        "F17"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/source-analysis/adcirc-momentum-implementation.md",
+      "sha256": "95d84d67ae535bfc337cf8069c4fb5740b64d3af1b4d431bae986224c60ae821",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": null,
+        "verification_method": "\"models/ADCIRC/raw/source_code/adcirc/src/momentum.F (2686) 직접 read — Mom_Eqs_New_NC/New_Conserv/Non_Conserv_pc subroutine + 항 구성(barotropic pressure :385, atm :394, tidal potential :441, baroclinic :473, advection :581-658, wind stress :705-733, VCOEFXX/YY/XY/YX 2×2 implicit :751-772 Coriolis CorifA) + bottom friction TK 식(gwce.F:2479 hybrid) + NOLIBF(timestep.F:129) file:line 인용.\"",
+        "verification_by": "\"Claude Opus 4.8 (1M context) — 운동량 방정식 항·formulation·friction verbatim\"",
+        "verification_date": "2026-06-03",
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "ADCIRC momentum.F — 2D 운동량 방정식 solver",
+        "1. 운동량 방정식 항 (Mom_Eqs_New_NC, line 166-1208)",
+        "2. Advection 4 formulation (subroutine 분기)",
+        "3. Coriolis + bottom friction 2×2 implicit solve (line 751-772) ★",
+        "4. Bottom friction TK — hybrid (gwce.F:2479, NOLIBF)",
+        "5. GWCE ↔ momentum 결합",
+        "6. 연결"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F02",
+        "F03"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/source-analysis/adcirc-nffr-periodic-flux-boundary.md",
+      "sha256": "49acf819a3e1e308559ce4351f6e35d3466ff3d9dabbd6dda6128ffeeec2b4c6",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": "false",
+        "verification_method": "\"read_input.F NFFR 블록(:3504-3589)·timestep.F QN/EN 합성(:860-880)·gwce.F flux BC 블록(:1725-1810, Note 2 주석 :1727-1733, JCG :2003)·normal_flow_boundary.F90 rotate_normal_flux(:59-104) + 공식 docs fort15.rst:79-90·parameter_definitions/index.rst:806-840 직접 read (2026-07-12). 모든 식·주석 verbatim 인용.\"",
+        "verification_by": null,
+        "verification_date": null,
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "ADCIRC fort.15 NFFR 주기 normal-flux 경계 강제",
+        "1. fort.15 NFFR 레코드 구조 (read_input.F:3504-3589 + docs fort15.rst:79-90)",
+        "2. 런타임 QN·EN 합성 (timestep.F:860-880)",
+        "3. gwce.F flux 경계 이산식 — IBTYPE=32 (gwce.F:1725-1810)",
+        "4. QNAM 부호 규약 — 최종 확정",
+        "5. 연결"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F08"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/source-analysis/adcirc-nodal-attributes.md",
+      "sha256": "e33c4e58ddad1fc2891ffcab06eb314c0da4530507f0e14c2123741734c45df4",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": null,
+        "verification_method": "\"models/ADCIRC/raw/source_code/adcirc/src/nodalattr.F (3193) 직접 read — attribute CASE 카탈로그(636-686) + Apply2DBottomFriction(2271, Manning→Cd FRIC=g·n²/H^(1/3)) + CalculateTimeVaryingTau0(2117) + Apply2DInternalWaveDrag(2516) + ApplyDirectionalWindReduction(2804) + ApplyCanopyCoefficient(2922) file:line 인용. Luettich-Westerink ADCIRC.\"",
+        "verification_by": "\"Claude Opus 4.8 (1M context) — fort.13 attribute 카탈로그·friction 변환·apply 루틴 verbatim\"",
+        "verification_date": "2026-06-03",
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "ADCIRC nodal attributes (fort.13) 시스템",
+        "1. Attribute 카탈로그 (nodalattr.F:636-686)",
+        "2. Bottom friction 적용 (Apply2DBottomFriction, :2271)",
+        "3. Manning's n → Cd 변환 (:2316-2365) ★",
+        "4. tau0 — time-varying primitive weighting (CalculateTimeVaryingTau0, :2117)",
+        "5. Wind roughness·canopy",
+        "6. Internal tide drag (Apply2DInternalWaveDrag, :2516)",
+        "7. 연결"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F03",
+        "F06",
+        "F17"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/source-analysis/adcirc-output-writers-implementation.md",
+      "sha256": "e747b2c62c810fd4c416e9b39cf019dc5739a3e3996fe0e2c83c459771ded936",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": null,
+        "verification_method": "\"ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-output-writers-implementation.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시.\"",
+        "verification_by": "\"사용자 + codex source-code analysis\"",
+        "verification_date": "2026-04",
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "ADCIRC output writers — fort.6X/7X, harmonic, max-value, NetCDF",
+        "Scope",
+        "A. fort.61/63 (elevation)",
+        "ASCII headers",
+        "NetCDF naming",
+        "B. fort.62/64 (velocity)",
+        "C. fort.71-74 (met output)",
+        "D. Harmonic analysis output (fort.51-53)",
+        "E. 3D station output (fort.41-42)",
+        "F. Max-value outputs (maxele.63, maxvel.63)",
+        "G. NetCDF vs ASCII",
+        "G2. XDMF 출력 + 보조 모듈 (전소스 커버, 2026-06-04)",
+        "H. Post-merge (parallel)",
+        "Decision Guide — output stride",
+        "Working Rules",
+        "Common Pitfalls",
+        "References",
+        "Provenance"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F16"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/source-analysis/adcirc-parallel-implementation.md",
+      "sha256": "e15fa435f30a613680227cc9ca02a8eb64b462a6dfb14b6cdbb793f97951e4ab",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": "true",
+        "verification_method": "\"ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-parallel-implementation.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시.\"",
+        "verification_by": "\"사용자 + codex source-code analysis\"",
+        "verification_date": "2026-04",
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "ADCIRC parallel — adcprep partmesh, prepall, fort.80, halo exchange",
+        "Scope",
+        "A. adcprep partmesh phase",
+        "B. adcprep prepall phase",
+        "C. fort.80 structure",
+        "Per-PE node mapping",
+        "Per-PE element mapping",
+        "Boundary fragment ownership",
+        "D. padcirc startup",
+        "E. Halo exchange during run",
+        "Call sites",
+        "Pattern",
+        "F. Reduction / global operations",
+        "G. Output collection",
+        "Master/global merge: 2 paths",
+        "NetCDF path",
+        "H. Debug paths",
+        "Decision Guide — adcprep workflow",
+        "Working Rules",
+        "Common Pitfalls",
+        "References",
+        "Provenance"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F15"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/source-analysis/adcirc-parameter-glossary-v1.md",
+      "sha256": "06f60b36b90f5112c43fde7c96415d672438f39f05e6070a2e9eefd1c6759ab4",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": "false",
+        "verification_method": "\"2026-07-10 재승격: 공식 docs·소스 직접 대조 — parameter_definitions/index.rst(AGRID :10-12·DP(JN) :55-58·IBTYPE(k) :65-113)·tau0.rst(:12-19 GWCE 가중, :204-214 수심의존 값표)·global.F:86-91(WarnElev/ErrorElev 선언·주석 verbatim). 파일·실행파일·출력 항목은 위키 verified 노트([[adcirc-fort-files-reference]]·[[adcirc-parallel-implementation]]) 소급. 원본은 modeling-wiki 2026-04~05 작성분 마이그레이션(2026-05-23) — 당시 본문 인용 0건으로 2026-07-10 L4 감사에서 source-needed 강등 후 당일 보강.\"",
+        "verification_by": "\"사용자 + codex source-code analysis → Claude Fable 5 docs/소스 재검증\"",
+        "verification_date": "2026-07-10",
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "ADCIRC Parameter Glossary V1",
+        "Files",
+        "Core Geometry And Boundary Terms",
+        "Stability-Relevant Terms",
+        "Execution Terms",
+        "Output Terms To Track Early",
+        "Why This Glossary Exists",
+        "Next Expansion Candidates"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "common"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/source-analysis/adcirc-preprocessing-foundation.md",
+      "sha256": "165c2a00db2e57395872a174b05b8e5bd4c7cfdfa3f1ca58c6c7aa7c37709af5",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": null,
+        "verification_method": "\"ADCIRC 공식 문서(adcirc.github.io / adcirc.org) 기반 전처리 레이어 정리. file 의미·NWS·전처리 도구 생태계는 공식 docs 근거. (2026-06-18 canonical 정화: 개인 프로젝트 내용 — wide6·JMA-MSM 로컬 분기·로컬 경로·local-workflow 링크 — 제거. 개인 ADCIRC 운영 자료는 experience/ 레이어.)\"",
+        "verification_by": "\"공식 ADCIRC 문서 cross-ref\"",
+        "verification_date": "2026-06-18",
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "ADCIRC Preprocessing Foundation",
+        "Why This Comes First",
+        "Core Observation From Official Docs",
+        "Three Foundation Axes",
+        "1. Mesh Generation And Boundary Construction",
+        "2. Bathymetry And Topography Assembly",
+        "3. External Forcing Ingestion",
+        "What The Official Tooling Map Implies",
+        "Next Notes To Keep Linked"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F01",
+        "F19"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/source-analysis/adcirc-swan-coupling.md",
+      "sha256": "90b970eb27605a648dbedbd18beb01256866a0d640fccd2c1cd789825268eb3c",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": null,
+        "verification_method": "\"ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-swan-coupling.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시. **SWAN Temporal Controls (PR #498) 절 추가 (2026-05-28)**: GitHub API `gh pr view 498 -R adcirc/adcirc` + `gh pr diff 498` 직접 fetch — PR body verbatim 인용 (SWANTimeControl namelist + RunStartDateTime + fort.26 COMPUTE 카드) + presizes.F / prep.F / couple2swan.F diff hunk 직접 인용 (SwanTimeStep offset 계산 + [1, SWAN_MTC] range gate + sentinel/radiation-stress fallback).\"",
+        "verification_by": "\"사용자 + codex source-code analysis + Claude Opus 4.7 (1M context) — PR #498 GitHub API 직접 fetch\"",
+        "verification_date": "2026-04 (base) / 2026-05-28 (PR #498)",
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "Scope",
+        "Source basis",
+        "A. Entry points",
+        "B. Time stepping",
+        "C. SWAN → ADCIRC (radiation stress)",
+        "D. ADCIRC → SWAN (water level, currents, wind)",
+        "E. Mesh sharing",
+        "F. NWS encoding (NWS=3xx, not 83/84)",
+        "G. Build / link",
+        "H. Hot-start",
+        "Decision Guide",
+        "Working Rules",
+        "Common Pitfalls",
+        "SWAN Temporal Controls (PR #498, phase 1 of 2)",
+        "사용자 입력 (PR body verbatim)",
+        "코드 변경 (PR diff 직접 fetch 2026-05-28)",
+        "Algorithm 요점 (couple2swan.F PADCSWAN_INIT/RUN)",
+        "의의 + 한계",
+        "운영 권고",
+        "Next expansion",
+        "References",
+        "Provenance"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F13"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/source-analysis/adcirc-tidal-forcing.md",
+      "sha256": "e04e45ddf348c8640536e5cbb91bedf123b0d522a929d623c977296fc28c5dba",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": "true",
+        "verification_method": "\"models/ADCIRC/raw/source_code/adcirc/src/timestep.F (조석 potential 1509-1556) + internaltide.F90(249) + harm.F(2071) + astronomic.F90/ephemerides.F90/moon.F90 헤더 + 적용부(momentum.F:441 barotropic, gwce.F:1181/2592, CTIP) 직접 read. TIP2 식·ETRF·species L_N·SAL·NTIP=2 path file:line 인용. Luettich-Westerink ADCIRC.\"",
+        "verification_by": "\"Claude Opus 4.8 (1M context) — 조석 potential·SAL·internal tide·harmonic 식 verbatim\"",
+        "verification_date": "2026-06-03",
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "ADCIRC 조석 forcing & 분석",
+        "1. Tidal potential — constituent 방식 (timestep.F:1527-1556) ★",
+        "2. SAL — Self-Attraction & Loading (NTIP=2)",
+        "3. 직접 luni-solar ephemeris (astronomic/ephemerides/moon.F90)",
+        "4. Internal tide wave drag (internaltide.F90, 249)",
+        "5. Harmonic analysis (harm.F, 2071)",
+        "6. 정리 — 4 조석 경로",
+        "7. 연결"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F05",
+        "F06",
+        "F16"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/source-analysis/adcirc-timestep-orchestration.md",
+      "sha256": "c0527a4c26eec589e75ae67a333681344b2dbaeb74e0f0c9004f7c35b7896341",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": "false",
+        "verification_method": "\"models/ADCIRC/raw/source_code/adcirc/src/timestep.F (TIMESTEP 55-1493, solveGWCE 호출 1069) + gwce.F (solveGWCE 166-226: GWCE_New→UPDATER→Mom_Eqs_New_NC→UPDATER, CPRECOR predictor-corrector) + adcirc.F:476(CALL TIMESTEP) 직접 read. ramp/friction/radiation stress/BPG2D/boundary flux 순서 file:line 인용.\"",
+        "verification_by": "\"Claude Opus 4.8 (1M context) — per-step 실행 순서·predictor-corrector verbatim\"",
+        "verification_date": "2026-06-03",
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "ADCIRC time-step orchestration (timestep.F / solveGWCE)",
+        "1. TIMESTEP per-step 순서 (timestep.F)",
+        "2. solveGWCE — GWCE↔momentum 결합 순서 (gwce.F:166-226) ★",
+        "3. TIMESTEP 내부 helper subroutine",
+        "4. 전체 한 스텝 데이터 흐름",
+        "5. 시간 적분 레벨",
+        "6. 연결"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F02",
+        "F17"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/source-analysis/adcirc-topic-map.md",
+      "sha256": "5364287af8dcb10c5ac5c1cf6a19d5e7312a4af83e7bb6ca01f7d4def7d6635b",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": null,
+        "verification_method": "\"ADCIRC 공식 문서 기반 토픽 조직도. modeling-wiki 마이그레이션(2026-05-23). (2026-06-18 canonical 정화: 삭제된 local-workflow/·forcing-input-foundation 링크 제거.)\"",
+        "verification_by": "\"사용자 + codex source-code analysis\"",
+        "verification_date": "2026-04",
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "ADCIRC Topic Map",
+        "Current Stage",
+        "Core Topics",
+        "1. Baseline Structure",
+        "2. Preprocessing Foundations",
+        "3. Storm Surge",
+        "4. Tides And Boundary Forcing",
+        "5. Meteorological Forcing",
+        "6. Mesh, Geometry, And Stability",
+        "7. Output And Diagnostics",
+        "8. Validation",
+        "9. Automation And Operations",
+        "Topic Order",
+        "Rule"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "common"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/source-analysis/adcirc-transport-solver.md",
+      "sha256": "2396840e32d2ff7c4bb6301522520d8d471d54a6611ffb6c6eca1e81e33b47a9",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": null,
+        "verification_method": "\"ADCIRC raw source 직접 read: src/transport.F(1497, v45.12) — Alp4 semi-implicit DTAlp4/DT1MAlp4(:31-32)·ADC_TRIDAG2 tridiag 호출(:1182) file:line 직접 검증. dispatch vsmy.F:1548-1553. 소스 banner Luettich-Westerink. ★adcirc-3d-mode:59 가 transport 를 vsmy.F:1543 로 오귀속(정정).\"",
+        "verification_by": "\"Claude Opus 4.8 (1M context) — transport.F:28-35·1178-1185 직접 read 검증\"",
+        "verification_date": "2026-07-07",
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "ADCIRC 3D 스칼라 transport solver — `transport.F` / `TRANS_3D`",
+        "0. 구조",
+        "1. Alp4 semi-implicit 연직 시간가중 (:31-32) ★GWCE 와 다른 스킴",
+        "2. Compact tridiagonal 조립 (:137-140)",
+        "3. 연직 tridiagonal solve (:1182)",
+        "4. 경계조건 (기존 미문서)",
+        "5. 기타",
+        "6. 주요 findings",
+        "7. 관련"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F12"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/source-analysis/adcirc-weir-boundary.md",
+      "sha256": "4a0008fbe879754ba1f3bbabb4d813d2e78138753b59f5e9a0d5a404f5cd8e62",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": null,
+        "verification_method": "\"models/ADCIRC/raw/source_code/adcirc/src/weir_boundary.F90 (2715, module WEIR) 직접 read — BARINHT/BARLANHT(internal/external barrier 고도 47-50), BARMIN 0.04m 임계(51), vertical element wall BARMIN64=1.2·H0(259), TVW(time-varying weir) namelist file:line 인용.\"",
+        "verification_by": "\"Claude Opus 4.8 (1M context) — weir 월류·TVW verbatim\"",
+        "verification_date": "2026-06-04",
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "ADCIRC weir/levee 경계 (weir_boundary.F90)",
+        "1. Barrier 고도 (module WEIR, :47-55)",
+        "2. Weir 월류 (overtopping)",
+        "3. Vertical element wall — IBTYPE 64 (:259)",
+        "4. Time-Varying Weir (TVW)",
+        "5. 위치",
+        "6. 연결"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F10",
+        "F18"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/source-analysis/adcirc-wetting-drying-implementation.md",
+      "sha256": "e8f3c0c4e53547d5e15ba5b3ff1606f71f9b6b3e0dcc7f2cf9cf460ddf5da4c7",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": "true",
+        "verification_method": "\"ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-wetting-drying-implementation.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시.\"",
+        "verification_by": "\"사용자 + codex source-code analysis\"",
+        "verification_date": "2026-04",
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "ADCIRC wetting/drying — NOLIFA, H0, NODECODE, transitions",
+        "Scope",
+        "A. NOLIFA flag effect",
+        "B. H0 thresholds",
+        "C. NODECODE (per-node wet/dry status)",
+        "D. Velocity reset on dry nodes",
+        "E. Dry→wet recovery",
+        "F. Edge effects (front handling)",
+        "G. Friction interaction",
+        "Decision Guide — H0 selection (수심 하한별)",
+        "Working Rules",
+        "Common Pitfalls",
+        "References",
+        "Provenance"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F09"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/source-analysis/adcirc.md",
+      "sha256": "8c7352460cae7afa3560a92d9bea71d2c999327636b9856fa5740679b6f00ae4",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": null,
+        "verification_method": "\"ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시.\"",
+        "verification_by": "\"사용자 + codex source-code analysis\"",
+        "verification_date": "2026-04",
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "ADCIRC",
+        "Status",
+        "Why ADCIRC First",
+        "Current Scope",
+        "What This Note Should Eventually Hold",
+        "Foundation References Collected On 2026-04-12",
+        "Not Filled Yet",
+        "First Narrow Theme Candidates",
+        "Foundation Outputs Now Present"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "common"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/source-analysis/adcirc_asgs_operational_system.md",
+      "sha256": "f39ff3002443aede6d218dbf21d15a23f21a5de82991d84ca00a1285e33af5d3",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": "true",
+        "verification_method": "\"소스 직접 read: asgs/DESIGN-DESCRIPTION, asgs/README.md, asgs/asgs_main.sh, asgs/generateDynamicInput.sh, asgs/tides/tide_fac.f, asgs/doc/util/aswip.1.txt, asgs/output/FigureGen/FigureGen.F90, asgs/output/part_track_post.sh, asgs/get_atcf.pl·storm_track_gen.pl·control_file_gen.pl·get_nam.pl. 디렉토리는 ls/find로 카탈로그.\"",
+        "verification_by": null,
+        "verification_date": null,
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "ADCIRC ASGS 운영 시스템 — 실시간 폭풍해일 예보 자동화 구조 (S-tier 요약)",
+        "1. ASGS 정체 — ADCIRC 코드가 아닌 운영 래퍼",
+        "아키텍처 철학 (`DESIGN-DESCRIPTION`)",
+        "2. 최상위 디렉토리 구조",
+        "3. Orchestration 골격 — `asgs_main.sh` (존재만 언급)",
+        "4. 핵심 Fortran 유틸리티",
+        "4.1 `tide_fac` — 조석 nodal factor & equilibrium argument (`tides/tide_fac.f`)",
+        "4.2 `aswip` — asymmetric vortex 전처리 (`doc/util/aswip.1.txt`)",
+        "4.3 기타 tides Fortran",
+        "5. 입력 전처리 카탈로그 (`input/`, `util/input/`, Perl 글루)",
+        "6. 출력 후처리 카탈로그 (`output/`)",
+        "7. 관련 노트와의 경계",
+        "8. 한계 (S-tier 명시)"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F19"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/source-analysis/adcirc_gahm_vortex_model.md",
+      "sha256": "c77c4db483f49d44d1426507ee188454277b46ea5f2200f4772a0fdf15b76609",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": "true",
+        "verification_method": "\"소스 직접 read (gahm/src/). gahm/GahmEquations.{h,cpp}·GahmSolver.cpp·GahmRadiusSolver.cpp·GahmRadiusSolverPrivate.cpp / vortex/Vortex.cpp / atcf/AtcfSnap.cpp·AtcfFile.cpp·AtcfIsotach.h·AtcfQuadrant.h·StormTranslation.h / preprocessor/Preprocessor.cpp / physical/Atmospheric.h·Constants.h·Earth.h / fortran/gahm.F90·gahm_fortran.cpp / output/OwiOutput.h\"",
+        "verification_by": null,
+        "verification_date": null,
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "GAHM 비대칭 Holland 바람 모델 (gahm 라이브러리)",
+        "1. 라이브러리 구조 (디렉토리별 책임)",
+        "2. GAHM 방정식 (`gahm/GahmEquations`)",
+        "2.1 경도풍 함수 $V_g(r)$",
+        "2.2 $\\phi$ 파라미터 (`gahm/GahmEquations.h:68-76`)",
+        "2.3 GAHM 수정 Holland B (`gahm/GahmEquations.h:88-98`)",
+        "2.4 1차 도함수 $V_g'(r)$ (`gahm/GahmEquations.cpp:91-133`)",
+        "2.5 기압장 (`gahm/GahmEquations.cpp:147-154`)",
+        "2.6 풍속 평가 (`gahm/GahmEquations.cpp:156-162`)",
+        "3. 솔버 (`gahm/GahmSolver`, `GahmRadiusSolver*`)",
+        "3.1 GahmSolver — B와 Rmax 동시 수렴 외부 루프",
+        "3.2 GahmRadiusSolver — Newton-Raphson",
+        "3.3 Rmax 초기추정 (`gahm/GahmSolver.cpp:181-189`)",
+        "4. ATCF best-track 입력 (`atcf/`)",
+        "4.1 파일 읽기 (`atcf/AtcfFile.cpp:46-85`)",
+        "4.2 snap 파싱 (`atcf/AtcfSnap.cpp:309-354`)",
+        "4.3 4분면 isotach 자료구조",
+        "5. 전처리 (`preprocessor/Preprocessor`)",
+        "5.1 파이프라인 (`preprocessor/Preprocessor.cpp:54-63`)",
+        "5.2 결측 isotach 반경 보간 (`Preprocessor.cpp:107-201`)",
+        "5.3 이동속도 (`Preprocessor.cpp:206-257`)",
+        "5.4 경계층 풍속 (`Preprocessor.cpp:317-339`)",
+        "5.5 분면별 솔버 구동 (`Preprocessor.cpp:68-102`)",
+        "6. 바람장 합성 (`vortex/Vortex`)",
+        "6.1 시각 솔브 (`vortex/Vortex.cpp:64-114`)",
+        "6.2 점별 해 (`vortex/Vortex.cpp:116-156`)",
+        "6.3 분면·isotach·시간 보간 (파라미터팩)",
+        "6.4 풍속 벡터화·회전·이동 (`vortex/Vortex.cpp:179-214`)",
+        "7. Fortran 바인딩 / ADCIRC 결합 (`fortran/`)",
+        "8. OWI 격자바람 출력 (`output/OwiOutput`)",
+        "9. 핵심 물리 상수 (`physical/Constants.h`)",
+        "10. 요점 정리"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F07"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/source-analysis/storm-surge/adcirc-storm-surge-foundation.md",
+      "sha256": "d05b2407ee389490c28d18859c7f399b5bf34864565d593d8262e1a50b625c14",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": "true",
+        "verification_method": "\"2026-07-10 재승격: 공식 docs 직접 대조 — nws_parameters.rst(NWS=3 :248 / =4 :251 / =8 :272-273 / =12 :298 / =13 :308-310 / =14 :311-312 / =19 discouraged :32)·examples/index.rst:26-36(APES/Isabel/Katrina/Global Storm Tide)·ramping_met_forcing_at_hotstart.rst:4·typical_parameter_selections.rst(존재 확인). ★NWS=13 code≠docs divergence 판정: read_input.F:1782(owiWindNetcdf namelist 강제)·:4721('OWI Netcdf (NWS13) format') = 코드 정본 OWI NetCDF, rst :308-310 의 'ramping(WRAMP)' 서술은 stale. 원본은 modeling-wiki 2026-04 작성분 마이그레이션.\"",
+        "verification_by": "\"사용자 + codex source-code analysis\"",
+        "verification_date": "2026-04",
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "ADCIRC Storm Surge Foundation",
+        "What Storm Surge Adds Beyond The Baseline",
+        "Questions This Topic Must Answer",
+        "Required Source Material Categories",
+        "Official Documentation",
+        "Official Example Cases",
+        "Setup Guidance",
+        "Later But Important",
+        "Parameter Families Involved",
+        "1. Meteorological Forcing Family",
+        "2. Meteorological Timing Family",
+        "3. Ramping Family",
+        "4. Core Numerical Family",
+        "5. Bottom And Surface Drag Family",
+        "6. Tidal And Boundary Family",
+        "Input Materials Typically Needed",
+        "Output And Evaluation Families",
+        "Official Example Pathways",
+        "What To Read First",
+        "What We Know Already",
+        "What We Are Not Deciding Yet",
+        "관련 노트"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F07"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/source-analysis/storm-surge/adcirc-storm-surge-nws-families.md",
+      "sha256": "b51bedcfa05b8cd94023130c152a1599b3b22401422b6e096a13eb2f7beb6bad",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": "false",
+        "verification_method": "\"2026-07-10 재승격: 공식 docs 직접 대조 — nws_parameters.rst(NWS=3 :248 / =4 :251 / =13 :308-310 / =14 :311-312 / =19 discouraged :32 verbatim). NWS=13 실기능은 코드 정본(read_input.F:1782 owiWindNetcdf namelist·:4721 'OWI Netcdf (NWS13) format') — rst :308-310 'ramping' 서술은 stale(code≠docs, [[adcirc-storm-surge-foundation]] 판정 공유). 2026-07-10 L4 감사 후속: 개인 워크플로 서술은 _staging/from-canonical/adcirc-nws13-jma-msm-local-workflow.md 로 추출(절대규칙 #2·#8), 객관 단언은 [[adcirc-met-forcing-implementation]] (file:line 인용 보유) 로 소급.\"",
+        "verification_by": "\"사용자 + codex source-code analysis\"",
+        "verification_date": "2026-04",
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "ADCIRC Storm Surge NWS Families",
+        "Scope",
+        "Main Families Relevant To Storm Surge",
+        "`NWS=3`",
+        "`NWS=4`",
+        "`NWS=13`",
+        "`NWS=20`",
+        "`NWS=-14` / `NWS=14`",
+        "`NWS=13` Facts (docs 귀속 — 인용 소급)",
+        "Layered Separation (구조 원칙)",
+        "Official `NWS=13` Requirements",
+        "Next Step"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F07"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/source-analysis/storm-surge/adcirc-storm-surge-requirements-checklist.md",
+      "sha256": "e90be5c9db15838038beb4d50602feb8fa40e158e7b02722870b920f3f75b748",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": null,
+        "verification_method": "\"ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/adcirc/src/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-storm-surge-requirements-checklist.md (at commit a9618df^) (modeling-wiki 4월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시.\"",
+        "verification_by": "\"사용자 + codex source-code analysis\"",
+        "verification_date": "2026-04",
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "ADCIRC Storm Surge Requirements Checklist",
+        "General Storm Surge Requirements",
+        "`JMA-MSM + NWS=13` Requirements",
+        "Source Data",
+        "Conversion To ADCIRC-Readable Forcing",
+        "ADCIRC fort.15 Interface",
+        "Ramping And Restart",
+        "Outputs And Evaluation",
+        "What This Checklist Is Not"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F07"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/source-analysis/storm-surge/adcirc-storm-surge.md",
+      "sha256": "a55c6b81b751beadc12438293d2637741a1ef44195650da14585781840f18865",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": "true",
+        "verification_method": "\"ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/adcirc/src/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-storm-surge.md (at commit a9618df^) (modeling-wiki 4월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시.\"",
+        "verification_by": "\"사용자 + codex source-code analysis\"",
+        "verification_date": "2026-04",
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "Scope",
+        "Source basis",
+        "A. NWS=20 GAHM (Generalized Asymmetric Holland Model)",
+        "B. NWS=19 AHM (Asymmetric Holland Model)",
+        "C. OWI hybrid: NWS=29, NWS=30",
+        "D. OWI WIN/PRE and NWS=12/13/14",
+        "E. Asymmetry / forward-speed correction",
+        "F. Best Track / ATCF format",
+        "G. Inverse barometer / NOIVB",
+        "H. Vortex spin-up ramp",
+        "Validation / typical combinations",
+        "Decision Guide",
+        "Working Rules",
+        "Common Pitfalls",
+        "Next expansion",
+        "References",
+        "Provenance"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F07"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/source-analysis/tide/adcirc-tide-forcing-implementation.md",
+      "sha256": "a030be40f65a8b49404f801b36256d61b591dab042022caf13bf73dce319e8d4",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": "true",
+        "verification_method": "\"ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-tide-forcing-implementation.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시. 2026-09-14: NBFR 입력·노드/분조 순서·위상/시간·ETRF 항의 한정 대조, 본문 한정 대조 범위 참조. 실제 실행·수치/물리 검증 미수행.\"",
+        "verification_by": "\"사용자 + codex source-code analysis\"",
+        "verification_date": "2026-04",
+        "source_correction_human_approval": "not-issued"
+      },
+      "headings": [
+        "ADCIRC tide forcing — NTIP, fort.15 NBFR, fort.24 SAL",
+        "2026-09-14 한정 대조 범위",
+        "Scope",
+        "A. NTIP flag",
+        "B. Open boundary tide elevations (`fort.15` NBFR block)",
+        "fort.15 NBFR block format",
+        "Per-timestep synthesis",
+        "C. Tide databases (FES2022b, NAO99jb) — ADCIRC consumption",
+        "D. fort.24 (SAL self-attraction loading)",
+        "ASCII fort.24 format",
+        "Application",
+        "E. Tidal potential (NTIP=1)",
+        "ETRF (Earth tide reduction factor)",
+        "Earth potential vs ocean load (SAL)",
+        "F. Equilibrium tide formula",
+        "G. Nodal corrections + REFTIM",
+        "Decision Guide — tide forcing 진단",
+        "Working Rules",
+        "Common Pitfalls",
+        "References",
+        "Provenance"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F04",
+        "F05"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/source-analysis/tide/adcirc-tide-harmonic-prep.md",
+      "sha256": "aabc284ac50811081fd63b606019f78b629655a216679dbbff1456d179641051",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": "true",
+        "verification_method": "\"ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-tide-harmonic-prep.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시. 2026-09-14: NBFR 입력·노드/분조 순서·위상/시간·ETRF 항의 한정 대조, 본문 한정 대조 범위 참조. 실제 실행·수치/물리 검증 미수행.\"",
+        "verification_by": "\"사용자 + codex source-code analysis\"",
+        "verification_date": "2026-04",
+        "source_correction_human_approval": "not-issued"
+      },
+      "headings": [
+        "2026-09-14 한정 대조 범위",
+        "Scope",
+        "Source basis",
+        "A. fort.15 NBFR boundary harmonic block",
+        "B. fort.24 SAL reader",
+        "NetCDF format",
+        "ASCII format (`fort.24`)",
+        "C. Constituent matching",
+        "D. Phase / sign / units",
+        "E. FF and FACE meaning",
+        "F. REFTIM and TimeH",
+        "G. NAO99jb / FES2022b workflow",
+        "H. Validation pitfalls",
+        "Decision Guide",
+        "Working Rules",
+        "Common Pitfalls",
+        "Next expansion",
+        "References",
+        "Provenance"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F04",
+        "F05"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/manual-notes/01-docs-hub.md",
+      "sha256": "b0d3a45b1c9e1a92f71bebb0bb38114d9a95e31bf9a7d4dfe298c68b60d196fe",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": null,
+        "verification_method": null,
+        "verification_by": null,
+        "verification_date": null,
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "ADCIRC Docs Hub",
+        "Metadata",
+        "Why This Matters",
+        "Core Claims",
+        "Practical Value",
+        "Relevance Tags",
+        "Transferability",
+        "Extraction Targets",
+        "Links"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "common"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/manual-notes/02-getting-started.md",
+      "sha256": "daf5a8eb1680df2de4dd0ed6da0369413743b25f2bb9f9eb7c41d110019766d6",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": null,
+        "verification_method": null,
+        "verification_by": null,
+        "verification_date": null,
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "ADCIRC Getting Started",
+        "Metadata",
+        "Why This Matters",
+        "Core Claims",
+        "Practical Value",
+        "Relevance Tags",
+        "Transferability",
+        "Extraction Targets",
+        "Links"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F15"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/manual-notes/03-theory-and-formulation.md",
+      "sha256": "ad8022a4935125ae9165a19ab6176d0ec9e470da4188bf324e50800d28b92668",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": null,
+        "verification_method": null,
+        "verification_by": null,
+        "verification_date": null,
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "ADCIRC Theory And Formulation",
+        "Metadata",
+        "Why This Matters",
+        "Core Claims",
+        "Practical Value",
+        "Relevance Tags",
+        "Transferability",
+        "Extraction Targets",
+        "Links"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F02"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/manual-notes/04-theory-pdf-v44xx.md",
+      "sha256": "d3e6261db8491335a0b061b8db8ca23829e5484d6aa761c59539cbcf52403e78",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": null,
+        "verification_method": null,
+        "verification_by": null,
+        "verification_date": null,
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "ADCIRC Theory PDF V44.xx",
+        "Metadata",
+        "Why This Matters",
+        "Core Claims",
+        "Practical Value",
+        "Relevance Tags",
+        "Transferability",
+        "Extraction Targets",
+        "Links"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F02"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/manual-notes/05-input-files-reference.md",
+      "sha256": "d92d4c5f8092c7e5a773960f447ba9c6944f2c20c901aa8579015af92efc2bb7",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": null,
+        "verification_method": null,
+        "verification_by": null,
+        "verification_date": null,
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "ADCIRC Input Files Reference",
+        "Metadata",
+        "Why This Matters",
+        "Core Claims",
+        "Practical Value",
+        "Relevance Tags",
+        "Transferability",
+        "Extraction Targets",
+        "Links"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F01",
+        "F04",
+        "F07",
+        "F08"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/manual-notes/06-parameter-definitions.md",
+      "sha256": "ded21b2b995728252f56dd283739bb242559e56e3986c10099d03b35c4f715dd",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": null,
+        "verification_method": null,
+        "verification_by": null,
+        "verification_date": null,
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "ADCIRC Parameter Definitions",
+        "Metadata",
+        "Why This Matters",
+        "Core Claims",
+        "Practical Value",
+        "Relevance Tags",
+        "Transferability",
+        "Extraction Targets",
+        "Links"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "common"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/manual-notes/07-examples-index.md",
+      "sha256": "0fb366590843319f3602a2b75b971d5432c8b6ac326dbf8834b1fa77f9bac770",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": null,
+        "verification_method": null,
+        "verification_by": null,
+        "verification_date": null,
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "ADCIRC Examples Index",
+        "Metadata",
+        "Why This Matters",
+        "Core Claims",
+        "Practical Value",
+        "Relevance Tags",
+        "Transferability",
+        "Extraction Targets",
+        "Links"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "common-validation"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/manual-notes/08-official-example-problems.md",
+      "sha256": "38ec63998a889fdbd9ea648f9a533ff28287073dc5abc58c0a5438c950b59cb3",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": null,
+        "verification_method": null,
+        "verification_by": null,
+        "verification_date": null,
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "ADCIRC Official Example Problems",
+        "Metadata",
+        "Why This Matters",
+        "Core Claims",
+        "Practical Value",
+        "Relevance Tags",
+        "Transferability",
+        "Extraction Targets",
+        "Links"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "common-validation"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/manual-notes/09-support-and-faq.md",
+      "sha256": "871a9e50c12b90384915aa4314af2edba9d21695ce89ca0ad5b150ac52903de4",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": null,
+        "verification_method": null,
+        "verification_by": null,
+        "verification_date": null,
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "ADCIRC Support And FAQ",
+        "Metadata",
+        "Why This Matters",
+        "Core Claims",
+        "Practical Value",
+        "Relevance Tags",
+        "Transferability",
+        "Extraction Targets",
+        "Links"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F15"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/manual-notes/10-github-repo-and-releases.md",
+      "sha256": "89db70ea4f92378af3b11d6f8677c8b1bcf027c3764ab6967a49c0cbc117d9d5",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": null,
+        "verification_method": null,
+        "verification_by": null,
+        "verification_date": null,
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "ADCIRC GitHub Repo And Releases",
+        "Metadata",
+        "Why This Matters",
+        "Core Claims",
+        "Practical Value",
+        "Relevance Tags",
+        "Transferability",
+        "Extraction Targets",
+        "Links"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F15"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/manual-notes/11-testsuite.md",
+      "sha256": "09ac6197f64f22e0a5288b49966baf7499ed5096a69870aa6d8590ad50046f56",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": null,
+        "verification_method": null,
+        "verification_by": null,
+        "verification_date": null,
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "ADCIRC Test Suite",
+        "Metadata",
+        "Why This Matters",
+        "Core Claims",
+        "Practical Value",
+        "Relevance Tags",
+        "Transferability",
+        "Extraction Targets",
+        "Links"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "common-validation"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/manual-notes/12-tooling-ecosystem.md",
+      "sha256": "27715097e0c0da46019fc2325ef63bc27215da58529420a07923c6ed8cef8bbb",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": null,
+        "verification_method": null,
+        "verification_by": null,
+        "verification_date": null,
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "ADCIRC Tooling Ecosystem",
+        "Metadata",
+        "Why This Matters",
+        "Core Claims",
+        "Practical Value",
+        "Relevance Tags",
+        "Transferability",
+        "Extraction Targets",
+        "Links"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F19"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/manual-notes/13-nws13-and-jma-msm-path.md",
+      "sha256": "9190a5160efb4a67298ae5bd15538a7e8b6014b3ea142682b6143d5f35dacd1b",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": null,
+        "verification_method": null,
+        "verification_by": null,
+        "verification_date": null,
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "NWS13 And JMA-MSM Path",
+        "Metadata",
+        "Why This Matters",
+        "Core Claims",
+        "Practical Value",
+        "Relevance Tags",
+        "Transferability",
+        "Extraction Targets",
+        "Links"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F07"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/manual-notes/14-fort14-grid-bathymetry-boundaries.md",
+      "sha256": "c7794261c409316d69e129bdc1962dc340617afc912ba0b65946ab14792b9704",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": null,
+        "verification_method": null,
+        "verification_by": null,
+        "verification_date": null,
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "Fort.14 Grid, Bathymetry, And Boundaries",
+        "Metadata",
+        "Why This Matters",
+        "Core Claims",
+        "Practical Value",
+        "Relevance Tags",
+        "Transferability",
+        "Extraction Targets",
+        "Links"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F01",
+        "F08"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/manual-notes/15-mesh-tools-and-grid-editing.md",
+      "sha256": "3938706504cde221d1bdce515dc177672b0f7ee36b1734b9b7034d2d37989e44",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": null,
+        "verification_method": null,
+        "verification_by": null,
+        "verification_date": null,
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "Mesh Tools And Grid Editing",
+        "Metadata",
+        "Why This Matters",
+        "Core Claims",
+        "Practical Value",
+        "Relevance Tags",
+        "Transferability",
+        "Extraction Targets",
+        "Links"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F01",
+        "F19"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/manual-notes/16-bathymetry-and-subgrid-paths.md",
+      "sha256": "40c595d62c04537959330f50e00e6a2e63a7a9db07beb8e8ac211eb941c82327",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": null,
+        "verification_method": null,
+        "verification_by": null,
+        "verification_date": null,
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "Bathymetry And Subgrid Paths",
+        "Metadata",
+        "Why This Matters",
+        "Core Claims",
+        "Practical Value",
+        "Relevance Tags",
+        "Transferability",
+        "Extraction Targets",
+        "Links"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F01",
+        "F18"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/manual-notes/17-boundary-and-forcing-inputs.md",
+      "sha256": "eb23e563ba558b1ed07f5a3af79c00acf8cd77a1179693237ea51005dd560842",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": null,
+        "verification_method": null,
+        "verification_by": null,
+        "verification_date": null,
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "Boundary And Forcing Inputs",
+        "Metadata",
+        "Why This Matters",
+        "Core Claims",
+        "Practical Value",
+        "Relevance Tags",
+        "Transferability",
+        "Extraction Targets",
+        "Links"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F04",
+        "F07",
+        "F08"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/manual-notes/18-nws13-schema-and-local-jma-msm-branch.md",
+      "sha256": "8e768996955571e5b00efa349fe046532e9cd535a7420bf58b8ea4b0892a93cf",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": null,
+        "verification_method": null,
+        "verification_by": null,
+        "verification_date": null,
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "NWS13 Schema And Local JMA-MSM Branch",
+        "Metadata",
+        "Why This Matters",
+        "Core Claims",
+        "Practical Value",
+        "Relevance Tags",
+        "Transferability",
+        "Extraction Targets",
+        "Links"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F07"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/manual-notes/27-github-oceanmesh2d-repo-review.md",
+      "sha256": "c66848126b0034d7c80802919868b59c7883c7d3527bdc4e3fd06c0540f249fc",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": null,
+        "verification_method": null,
+        "verification_by": null,
+        "verification_date": null,
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "GitHub OceanMesh2D Repo Review",
+        "What The Repo Says",
+        "Why It Matters Locally",
+        "Practical Assessment",
+        "Relevance"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F01",
+        "F19"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/manual-notes/28-github-oceanmesh-python-repo-review.md",
+      "sha256": "d3bdf080af7f0b00028e03fa77ea4b8069a91af85b7ceb2ff40c3712e3a70f23",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": null,
+        "verification_method": null,
+        "verification_by": null,
+        "verification_date": null,
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "GitHub oceanmesh Python Repo Review",
+        "What The Repo Says",
+        "Why It Matters Locally",
+        "Practical Assessment",
+        "Local Relevance"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F01",
+        "F19"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/manual-notes/29-github-ocsmesh-repo-review.md",
+      "sha256": "288f83776e053015f8775af142f76499321ce7f5b31bfe5abf53e394f60f74df",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": null,
+        "verification_method": null,
+        "verification_by": null,
+        "verification_date": null,
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "GitHub OCSMesh Repo Review",
+        "What The Repo Says",
+        "Why It Matters Locally",
+        "Practical Assessment",
+        "Local Relevance"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "F01",
+        "F19"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/web-refs/adcirc-foundational-papers.md",
+      "sha256": "64c329f76ca8ee58628c6c1cc26cb93ab8eeb1a727d907386b1d0913ee3dfad1",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": "true",
+        "verification_method": "\"models/ADCIRC/raw/manuals/pdfs/ 하위 30개 foundational PDF 각각의 첫 페이지를 직접 추출하여 서지(제목·저자·연도·발행기관/보고서번호) 인용. 텍스트 임베드된 PDF(1998~2008 NRL/ERDC/논문)는 pdftotext -f 1 -l 1, 스캔 이미지 PDF(1991~1996 DRP-92-6 시리즈·2001_Becker)는 pdftoppm -r 200 후 tesseract OCR로 첫 페이지 표제 확인. 각 항목 기여 요약은 추출된 표제/초록 문장 근거.\"",
+        "verification_by": null,
+        "verification_date": null,
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "ADCIRC Foundational Papers — Annotated Bibliography (1991–2008)",
+        "출처 신뢰도 주의",
+        "1. 핵심 정전 — DRP-92-6 시리즈 (US Army WES, Dredging Research Program)",
+        "2. 조석 (Tides / tidal forcing & databases)",
+        "3. 메소드/수치 — Wetting & Drying, 경계, GWCE, DG",
+        "4. 적용/검증 — 폭풍해일·조석·해류 (validation cases)",
+        "5. 파랑유도 순환 (wave-induced / radiation stress)",
+        "6. 기타 부가 — 교량 piling",
+        "7. Baroclinic / 3D / sediment transport",
+        "8. ADCIRC Theory (2004) — 현행 정식화 참조문서",
+        "색인 통계"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "common-validation"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    },
+    {
+      "path": "models/ADCIRC/web-refs/adcirc-official-resources.md",
+      "sha256": "7807d2bda481a0df9e8aa009bef98da608263c8e8f570ac5856a8ea69ea2301a",
+      "declared_metadata": {
+        "citation_status": "verified",
+        "has_source_needed": "false",
+        "verification_method": "\"공식 도메인 (adcirc.org, adcirc.github.io) WebFetch sampling 2026-05-24 — theory/index.html + parameter_definitions/index.html 본 위키 [[../manual-notes/03-theory-and-formulation]] + [[../manual-notes/06-parameter-definitions]] 작성 시 검증 완료. GitHub URL 은 공개 repo (github.com/adcirc/adcirc, adcirc-testsuite, adcircpy 등). 논문 인용은 publicly-known canonical works.\"",
+        "verification_by": "\"Claude Opus 4.7 (1M context) — URL audit + 공인 논문 인용\"",
+        "verification_date": "2026-05-24",
+        "source_correction_human_approval": null
+      },
+      "headings": [
+        "ADCIRC 공식 자료 큐레이션",
+        "1. 공식 사이트",
+        "2. Code repositories (GitHub)",
+        "3. 핵심 논문 — 시초부터 현재까지",
+        "3.1 Foundation (1991-1994)",
+        "3.2 Theory PDF (operational reference)",
+        "3.3 Storm surge applications",
+        "3.4 Vortex / hurricane forcing (NWS modes)",
+        "4. 한국 적용 (참고)",
+        "5. 운영 자원",
+        "6. 본 위키 내 cross-ref"
+      ],
+      "assessment": "navigation and metadata inventory only; not a full claim audit",
+      "feature_routes": [
+        "common"
+      ],
+      "ready_for_execution_or_validation": "not established by this inventory"
+    }
+  ]
+}

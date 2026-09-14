@@ -23,8 +23,6 @@ verification_date: 2026-04
 
 이 보강의 코드 판본은 ADCIRC `6037225ce4573efd3c1f8877a5dc908d01c199a8`이다. 아래 `src/` 인용의 루트는 `models/ADCIRC/raw/source_code/adcirc/`다. **문서 지원·코드 구현** 중 NBFR 입력, 경계 노드 전달, 위상/시간 기준, 전통 분조 경로의 ETRF 항을 대조했다. **실행 확인·수치 검증·물리 검증·개별 입력자료 품질 확인은 수행하지 않았다.** 다른 절과 외부 DB 규약은 이번 검증 범위에 포함하지 않는다. 과거 검증 이력과 이번 정정을 구분하며 이번 정정에 대한 사람 승인은 발급하지 않았다.
 
-실제 입력 준비와 실행/수치/물리 검증에 필요한 증거는 [harmonic-prep의 확인 방법](adcirc-tide-harmonic-prep.md#input-quality-and-validation)을 따른다. 이 링크 추가가 해당 검증의 수행을 뜻하지 않는다.
-
 ## Scope
 
 How tidal forcing enters ADCIRC: `NTIP` for tidal potential (`fort.15`), open-boundary harmonic constituents (`NBFR/EMO/EFA`), `fort.24` self-attraction & loading (SAL). External tide databases like FES2022b/NAO99jb provide the boundary amplitudes/phases that ADCIRC consumes.

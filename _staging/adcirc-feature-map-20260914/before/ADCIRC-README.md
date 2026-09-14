@@ -2,10 +2,6 @@
 
 > **Canonical source**: 이 디렉토리(`models/ADCIRC/`)가 ADCIRC 모델의 구현·메커닉에 대한 진실의 원천.
 
-## 기능과 근거에서 찾기
-
-[ADCIRC 기능 지도·근거 상태](source-analysis/adcirc-topic-map.md)에서 기능별 문서·식·코드 노트와 미확인 범위를 찾는다. 지도는 `source-needed`이며, [조석 입력 확인 방법](source-analysis/tide/adcirc-tide-harmonic-prep.md#input-quality-and-validation)은 입력 품질부터 실행·수치·물리 검증에 필요한 증거를 안내한다. 실제 자료 검사·모델 실행·물리 검증을 완료했다는 의미는 아니다.
-
 ## 정체 카드
 
 - **이름**: ADCIRC (ADvanced CIRCulation Model)
@@ -23,13 +19,11 @@
 
 ## 하위 디렉토리 현황
 
-노트 수는 2026-09-14 집계다. 아래 종결·audit done과 raw 규모는 이전 기록이며, 현재 기능별 실행·수치/물리 검증 상태는 위 기능 지도의 범위 구분을 따른다.
-
 | 경로 | 노트 수 | 상태 | 비고 |
 |---|---:|---|---|
-| `source-analysis/` | 38편: 37 verified + 기능 지도 1 source-needed (2026-09-14; 하위 디렉터리 포함) | **종결 2026-07-11** (AUDIT-LEDGER §5) | NWS modes·GAHM·mesh tools·source-code 분석. **VSSOL 연직스킴(adcirc-3d-vssol-vertical-scheme, 2026-07-11) 으로 마지막 코어 갭 해소**. (2026-06-18 정화: 개인 local-workflow/ 23 + forcing-input + storm-surge JMA-MSM/NWS13 운영 플레이북 3 제거; 로컬 provenance 중립화) |
+| `source-analysis/` | 38 verified (storm-surge/·tide/ subdir 포함; nffr-periodic-flux-boundary 2026-07-12 포함) | **종결 2026-07-11** (AUDIT-LEDGER §5) | NWS modes·GAHM·mesh tools·source-code 분석. **VSSOL 연직스킴(adcirc-3d-vssol-vertical-scheme, 2026-07-11) 으로 마지막 코어 갭 해소**. (2026-06-18 정화: 개인 local-workflow/ 23 + forcing-input + storm-surge JMA-MSM/NWS13 운영 플레이북 3 제거; 로컬 provenance 중립화) |
 | `manual-notes/` | 21 verified | **M-B audit done 2026-05-24** | 21 외부 docs catalog (adcirc.github.io/adcirc.org/github.com URL 검증, WebFetch 03+06 sampling) verified |
-| `web-refs/` | 2 verified | **신설 2026-05-24** | adcirc-official-resources.md + adcirc-foundational-papers.md — 공식 자원·기초 문헌 색인; 공식 사이트·GitHub repos (adcirc/adcirc·adcircpy·gahm·asgs·OceanMesh2D)·핵심 논문 (Luettich 1991-92·Westerink 1992·Dietrich 2010-11·Holland 1980) |
+| `web-refs/` | 1 verified | **신설 2026-05-24** | adcirc-official-resources.md — 공식 사이트·GitHub repos (adcirc/adcirc·adcircpy·gahm·asgs·OceanMesh2D)·핵심 논문 (Luettich 1991-92·Westerink 1992·Dietrich 2010-11·Holland 1980) |
 | `raw/` | 1090 .md + 98 pdf + 140 fortran (16.9 GB) | archive | source_code + manuals + website mirror |
 
 ## 본 위키에서의 핵심 활용

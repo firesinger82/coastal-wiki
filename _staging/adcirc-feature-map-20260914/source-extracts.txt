@@ -1,0 +1,1252 @@
+
+## models/ADCIRC/raw/source_code/adcirc/docs/introduction/what_is_adcirc.rst:1–84
+1: What is ADCIRC?
+2: ===============
+3: 
+4: **ADCIRC** is a system of computer programs for solving time dependent, free surface circulation and transport problems in two and three dimensions. These programs utilize the finite element method in space allowing the use of highly flexible, unstructured grids. The system has been optimized for parallel computing architectures, making it highly efficient for large-scale simulations.
+5: 
+6: Model Features
+7: --------------
+8: 
+9: ADCIRC can be used to simulate:
+10: 
+11: * Tidal and Wind-Driven Circulation
+12: * Hurricane Storm Surge and Flooding
+13: * Wave-Current Interaction
+14: * Dredging and Material Disposal Studies
+15: * Transport of Materials
+16: * Baroclinic Circulation
+17: * Coastal Inundation and Protection Studies
+18: 
+19: ADCIRC Programs
+20: ---------------
+21: 
+22: The ADCIRC software package provides the following programs:
+23: 
+24: * **ADCIRC**: Serial version of the core circulation model
+25: * **PADCIRC**: Parallel version of ADCIRC for high-performance computing environments
+26: * **ADCPREP**: Domain decomposition utility for preparing parallel simulations
+27: * **SWAN**: Serial unstructured wave model
+28: * **ADCSWAN**: Serial coupled ADCIRC+SWAN model
+29: * **PADCSWAN**: Parallel coupled ADCIRC+SWAN model
+30: * **PUNSWAN**: Parallel unstructured SWAN model
+31: * **ASWIP**: Preprocessor for converting ATCF formatted hurricane forcing data
+32: * **LIBADC**: Library of ADCIRC subroutines for incorporation into other codes
+33: * **Utilities**: Various utility codes for pre- and post-processing
+34: 
+35: System Requirements
+36: -------------------
+37: 
+38: ADCIRC is highly scalable and can be run on a range of platforms, from a standard desktop/laptop computer to high-performance computing (HPC) clusters. The hardware requirements depend on the size and complexity of the computational grid and the length of the simulation.
+39: 
+40: ADCIRC can be compiled and run on:
+41: 
+42: * Linux/Unix systems
+43: * Windows (using compatible compilers)
+44: * MacOS
+45: 
+46: The model is written in Fortran and requires:
+47: 
+48: * Fortran compiler (gfortran, Intel Fortran, etc.)
+49: * MPI library for parallel execution
+50: * Optional: NetCDF libraries for certain output formats
+51: 
+52: Getting Started
+53: ---------------
+54: 
+55: To get started with ADCIRC, you'll need to:
+56: 
+57: 1. Install prerequisites (compiler, MPI, etc.)
+58: 2. Build ADCIRC using either traditional make or CMake method
+59: 3. Prepare input files
+60: 4. Run simulations
+61: 5. Analyze output
+62: 
+63: For detailed installation and running instructions, see :doc:`Getting Started <../getting_started/index>`.
+64: 
+65: For questions and support, please see the :doc:`Questions and Support <../questions_and_support/index>` section.
+66: 
+67: ADCIRC Files
+68: ------------
+69: 
+70: ADCIRC uses a set of input files to define the model domain, boundary conditions, and runtime parameters:
+71: 
+72: * Fort.14: Grid and boundary information
+73: * Fort.15: Model parameters and periodic boundary conditions
+74: * Fort.13: Nodal attributes
+75: * Additional files for meteorological forcing, wave forcing, etc.
+76: 
+77: The model produces various output files containing water levels, currents, and other variables at specified locations and time intervals.
+78: 
+79: For detailed descriptions of all input and output files, and parameters, see the :doc:`Input Files <../technical_reference/input_files/index>`, :doc:`Output Files <../technical_reference/output_files/index>`, and :doc:`Parameters <../technical_reference/parameter_definitions/index>` sections of this documentation. 
+80: 
+81: Contributors
+82: ------------
+83: 
+84: For information about ADCIRC's authors and development team, please refer to the `README <https://github.com/adcirc/adcirc?tab=readme-ov-file>`_ file in the ADCIRC repository.
+
+## models/ADCIRC/raw/source_code/adcirc/docs/user_guide/model_configuration/index.rst:1–14
+1: Model Configuration
+2: ===================
+3: 
+4: .. toctree::
+5:    :maxdepth: 2
+6:    :caption: Contents:
+7: 
+8:    model_parameters/index
+9:    physics_parameters/index
+10:    initial_conditions/index
+11:    boundary_conditions/index
+12:    tides/index
+13:    meteorological_forcing/index
+14:    typical_configurations/typical_parameter_selections
+
+## models/ADCIRC/raw/source_code/adcirc/docs/user_guide/special_features/index.rst:1–15
+1: Special Features
+2: ================
+3: 
+4: This section documents special features available in ADCIRC that extend its modeling capabilities beyond the core functionality.
+5: 
+6: .. toctree::
+7:    :maxdepth: 1
+8:    :caption: Contents:
+9:    
+10:    adcirc2d_plus
+11:    bridge_piers
+12:    dynamic_water_level_correction
+13:    ice_modifications
+14:    ../model_configuration/meteorological_forcing/generalized_asymmetric_holland_model
+15:    vertical_element_walls 
+
+## models/ADCIRC/raw/source_code/adcirc/docs/user_guide/model_configuration/model_parameters/im.rst:10–130
+10: **IM** is an important parameter in the `fort.15 file <fort.15_file>`__ that
+11: defines numerical model formulation and dimension. Among other things, ``IM``
+12: specifies whether ADCIRC is solved in two-dimensional depth-integrated (2DDI) or
+13: in three-dimensions (3D), solution of the governing equations is semi-implicit
+14: or explicit in time, and whether the model formulation is barotropic or
+15: baroclinic. Popular values for 2D barotropic ADCIRC include ``IM=0`` and
+16: ``IM=111112``; users should be aware that the
+17: :ref:`A00 <A00>`, :ref:`B00 <B00>`, and :ref:`C00 <C00>` coefficients must be
+18: specified differently in these two cases.
+19: 
+20: .. _default_im_values:
+21: 
+22: Default IM Values
+23: -----------------
+24: 
+25: Default simulation option combinations can be specified through single or double
+26: digit values, some of which are shortcuts to the six-digit codes described in
+27: the next heading. The available ``IM`` values are specified in the table below
+28: and in the following section on 6-digit values:
+29: 
+30: .. list-table::
+31:    :widths: 10 10 40
+32:    :header-rows: 1
+33:    :class: wrap-table
+34: 
+35:    * - IM Value
+36:      - Six-digit Equivalent
+37:      - Description
+38:    * - 0
+39:      - 111111
+40:      - Barotropic 2DDI
+41:    * - 1
+42:      - 611111
+43:      - Barotropic 3D velocity-based momentum
+44:    * - 2
+45:      - -
+46:      - Barotropic 3D stress-based momentum
+47:    * - 10
+48:      - -
+49:      - Barotropic 2DDI with passive scalar transport
+50:    * - 11
+51:      - -
+52:      - Barotropic 3D velocity-based momentum with passive scalar transport
+53:    * - 20
+54:      - -
+55:      - Baroclinic 2DDI
+56:    * - 21
+57:      - -
+58:      - Baroclinic 3D velocity-based momentum
+59:    * - 30
+60:      - -
+61:      - Baroclinic 2DDI with passive scalar transport
+62:    * - 31
+63:      - -
+64:      - Baroclinic 3D velocity-based momentum with passive scalar transport
+65: 
+66: Note that all default ``IM`` values employ the semi-implicit consistent GWCE
+67: mass matrix solver. It has less numerical error and tends to be more stable than
+68: the explicit mass-lumping approach at the expense of computational time and
+69: memory.
+70: 
+71: .. _six_digit_im_codes:
+72: 
+73: Six-digit IM Codes
+74: ------------------
+75: 
+76: For fine-grained control of various options six-digit codes for ``IM`` can be
+77: specified. Each digit represents a specific option regarding the dimension and
+78: the formulation of certain terms or integration methods in the GWCE or momentum
+79: equations. The available options for each digit are specified below, with the
+80: first digit being the left-most. The internal flags that are set are listed to
+81: help users dig through the code.
+82: 
+83: .. list-table::
+84:    :header-rows: 1
+85:    :widths: 10 15 15 15 15 15 15
+86:    :class: wrap-table tighter-table
+87: 
+88:    * - Value
+89:      - Digit 1: 2DDI/3D, Lateral Stress in GWCE [1]_
+90:      - Digit 2: Advection in GWCE [2]_
+91:      - Digit 3: Lateral Stress in Momentum [1]_
+92:      - Digit 4: Advection in Momentum [2]_
+93:      - Digit 5: Area Integration in Momentum
+94:      - Digit 6: GWCE Mass Matrix, Barotropic/Baroclinic
+95:    * - 1 (default)
+96:      - 2DDI, Kolar-Gray flux-based ``CGWCE_LS_KGQ=.TRUE.``
+97:      - Non conservative ``CGWCE_Advec_NC=.TRUE.``
+98:      - Integration by parts, velocity-based ``CME_LS_IBPV=.TRUE.``
+99:      - Non conservative ``CME_New_NC=.TRUE.``
+100:      - Corrected ``CME_AreaInt_Corr=.TRUE.``
+101:      - Consistent (implicit for linear part of gravity wave term), barotropic ``ILump=0``
+102:    * - 2
+103:      - 2DDI, 2-part flux-based ``CGWCE_LS_2PartQ=.TRUE.``
+104:      - Conservative form 1 ``CGWCE_Advec_C1=.TRUE.``
+105:      - Integration by parts, flux-based ``CME_LS_IBPQ=.TRUE.``
+106:      - Conservative form 1 ``CME_New_C1=.TRUE.``
+107:      - Original ``CME_AreaInt_Orig=.TRUE.``
+108:      - Lumped (explicit), barotropic ``CGWCE_Lump=.TRUE.``, ``ILump=1``
+109:    * - 3
+110:      - 2DDI, 2-part velocity-based ``CGWCE_LS_2PartV=.TRUE.``
+111:      - Conservative form 2 ``CGWCE_Advec_C2=.TRUE.``
+112:      - Integration by parts, velocity-based symmetrical ``CME_LS_IBPSV=.TRUE.``
+113:      - Conservative form 2 ``CME_New_C2=.TRUE.``
+114:      - -
+115:      - Consistent (implicit for full gravity wave term), barotropic ``CGWCE_HDP=.TRUE.``, ``IFNL_HDP=1``, ``ILump=0``
+116:    * - 4
+117:      - 2DDI, 2-part flux-based symmetrical ``CGWCE_LS_2PartSQ=.TRUE.``
+118:      - -
+119:      - Integration by parts, flux-based symmetrical ``CME_LS_IBPSQ=.TRUE.``
+120:      - -
+121:      - -
+122:      - -
+123:    * - 5
+124:      - 2DDI, 2-part velocity-based symmetrical ``CGWCE_LS_2PartSV=.TRUE.``
+125:      - -
+126:      - 2 Part, velocity-based (*not implemented*) ``CME_LS_2PartV=.TRUE.``
+127:      - -
+128:      - -
+129:      - -
+130:    * - 6
+
+## models/ADCIRC/raw/source_code/adcirc/docs/user_guide/model_configuration/model_parameters/ics.rst:10–62
+10: **ICS** is a fundamental parameter in the :ref:`fort.15 file <fort15>`
+11: that defines the coordinate system and the desired projection. The value of ICS
+12: also has an important consequence for the choice of the Coriolis
+13: :ref:`CORI <CORI>` parameter of the :ref:`fort.15 file <fort15>`.
+14: 
+15: .. _available_ics_values:
+16: 
+17: Available ICS Values
+18: --------------------
+19: 
+20: .. list-table::
+21:    :widths: 10 15 40
+22:    :header-rows: 1
+23:    :class: wrap-table
+24: 
+25:    * - ICS Value
+26:      - Short-name
+27:      - Description
+28:    * - 1
+29:      - Cartesian
+30:      - Points in the fort.14 are already mapped onto an arbitrary Cartesian coordinate system, e.g., UTM. Also useful for idealized problems.
+31:    * - 2
+32:      - Geographic, CPP, no curvature
+33:      - Points in the fort.14 are specified in geographic coordinates, which will be projected using the CPP (equidistant) cylindrical mapping by ADCIRC. The curvature of the Earth is not accounted for.
+34:    * - 20
+35:      - Geographic, Equal-area
+36:      - Points in the fort.14 are specified in geographic coordinates, which will be projected using the Equal-area cylindrical mapping by ADCIRC. The curvature of the Earth is correctly accounted for.
+37:    * - 21
+38:      - Geographic, CPP
+39:      - Points in the fort.14 are specified in geographic coordinates, which will be projected using the CPP (equidistant) cylindrical mapping by ADCIRC. The curvature of the Earth is correctly accounted for.
+40:    * - 22
+41:      - Geographic, Mercator
+42:      - Points in the fort.14 are specified in geographic coordinates, which will be projected using the Mercator (conformal) cylindrical mapping by ADCIRC. The curvature of the Earth is correctly accounted for.
+43:    * - 23
+44:      - Geographic, Miller
+45:      - Points in the fort.14 are specified in geographic coordinates, which will be projected using the Miller cylindrical mapping by ADCIRC. The curvature of the Earth is correctly accounted for.
+46:    * - 24
+47:      - Geographic, Gall-Stereographic
+48:      - Points in the fort.14 are specified in geographic coordinates, which will be projected using the Gall-Stereographic cylindrical mapping by ADCIRC. The curvature of the Earth is correctly accounted for.
+49: 
+50: Implications
+51: ------------
+52: 
+53: Beginning from Version 55, ICS values equal to 20-24 will be possible. These are
+54: intended to replace the old method of specifying ICS = 2, but this option is
+55: retained for regression testing. When ICS = 2, the curvature of the Earth is not
+56: correctly accounted for in the Spherical coordinate form of the governing
+57: equations which becomes more important as the geographic size of the
+58: computational domain size increases. In recent years global modeling using
+59: ADCIRC has been successful [1]_, e.g.,
+60: `GLOCOFFS <https://wpringle.github.io/GLOCOFFS/>`__ where it was found that the
+61: old method was deficient. The new options using values ICS = 20-24 now account
+62: for the curvature correctly, and should in general be always used on
+
+## models/ADCIRC/raw/source_code/adcirc/docs/user_guide/model_configuration/physics_parameters/index.rst:1–11
+1: Physics Parameters
+2: ==================
+3: 
+4: This section provides information about configuring physics parameters in ADCIRC.
+5: 
+6: .. toctree::
+7:    :maxdepth: 1
+8:    :caption: Contents:
+9: 
+10:    horizontal_eddy_viscosity
+11:    mannings_n
+
+## models/ADCIRC/raw/source_code/adcirc/docs/user_guide/model_configuration/tides/index.rst:1–72
+1: .. meta::
+2:    :description: ADCIRC Tidal Parameters
+3:    :keywords: adcirc, tides, tidal parameters, tidal forcing
+4: 
+5: .. _astronomical_tides:
+6: 
+7: Astronomical Tides
+8: ==================
+9: 
+10: ADCIRC supports two primary methods for implementing tidal forcings in your model: tidal potential terms and open boundary conditions. These can be used independently or in combination to achieve accurate tidal simulations.
+11: 
+12: Tidal Potential Terms
+13: ---------------------
+14: 
+15: Tidal potential terms represent the direct gravitational effects of celestial bodies (primarily the moon and sun) on the water surface. In ADCIRC, these are specified in the :ref:`fort.15 <fort15>` file through:
+16: 
+17: * ``NTIP``: Number of tidal potential constituents to be included
+18: * ``TIPOTAG``: Name/tag for each tidal potential constituent
+19: * ``TPK``, ``AMIGT``, ``ETRF``, ``FFT``, ``FACET``: Parameters defining amplitude, frequency, earth tide reduction factor, and nodal factor for each constituent
+20: 
+21: Open Boundary Conditions
+22: ------------------------
+23: 
+24: Open boundary conditions allow you to specify water surface elevations at the model domain boundaries. These can be implemented in two ways:
+25: 
+26: 1. **Periodic (Harmonic) Conditions**:
+27:    Specified in the :ref:`fort.15 <fort15>` file using:
+28:    
+29:    * ``NBFR``: Number of forcing frequencies on open boundaries
+30:    * ``BOUNTAG``: Name/tag for each boundary forcing constituent
+31:    * ``AMIG``, ``FF``, ``FACE``: Parameters for amplitude, nodal factor, and equilibrium argument
+32:    * ``EMO``, ``EFA``: Elevation amplitude and phase for each constituent at boundary nodes
+33: 
+34: 2. **Non-periodic Conditions**:
+35:    Time series of water surface elevations are defined in the :ref:`fort.19 <fort19>` file.
+36: 
+37: The locations of open boundaries are defined in the :ref:`fort.14 <fort14>` file through the open boundary node strings.
+38: 
+39: Internal Tide Energy Conversion
+40: -------------------------------
+41: 
+42: For large-scale ocean models, internal tide energy conversion should be considered. This represents the conversion of barotropic to baroclinic energy as surface tides flow over deep ocean topography. It can be implemented through:
+43: 
+44: * A spatially varying nodal attribute called ``internal_tide_friction`` in the fort.13 file
+45: * Typically applied only in deep ocean regions (>100-500m depth)
+46: * Accounts for approximately 30% of global barotropic tidal dissipation
+47: 
+48: See :ref:`internal_tide_energy_conversion` for more details.
+49: 
+50: .. toctree::
+51:    :maxdepth: 1
+52:    :caption: Contents:
+53:    :hidden:
+54:    
+55:    internal_tide_energy_conversion
+56: 
+57: Best Practices
+58: --------------
+59: 
+60: 1. For coastal models, focus on accurate open boundary conditions
+61: 2. For large-scale ocean models, include both tidal potential terms and internal tide energy conversion
+62: 3. Ensure boundary conditions are properly ramped up using the ``NRAMP`` parameter in fort.15
+63: 4. Validate your tidal implementation against known tidal constituents or observations
+64: 
+65: For detailed implementation guidance, refer to the :ref:`fort.14 <fort14>` and :ref:`fort.15 <fort15>` documentation.
+66: 
+67: See also:
+68: 
+69: .. toctree::
+70:    :maxdepth: 1
+71: 
+72:    ali_dispersion_conrtol
+
+## models/ADCIRC/raw/source_code/adcirc/docs/user_guide/special_features/adcirc2d_plus.rst:5–23
+5: ADCIRC2D+
+6: =========
+7: 
+8: \ **⚠ This page is still under development. Content may change or be
+9: incomplete.**\ 
+10: 
+11: **ADCIRC2D+**, is a mode which allows for the inclusion of baroclinic
+12: (density-driven) effects into the traditionally barotropic (depth-averaged)
+13: system. This is achieved by coupling ADCIRC with temperature and salinity fields
+14: from a coarser-resolution Ocean General Circulation Model (OGCM), enabling
+15: improved representation of long-term sea level dynamics. Description of results
+16: using this capability are available in (Pringle et al. 2019) [1]_ and (Blakely
+17: et al. 2024) [2]_
+18: 
+19: Version
+20: -------
+21: 
+22: Some of the capability of **ADCIRC2D+** is available in v55; however
+23: improvements and modifications were made that are present only in v56 and above.
+
+## models/ADCIRC/raw/source_code/adcirc/docs/user_guide/special_features/bridge_piers.rst:1–21
+1: Bridge Piers
+2: ============
+3: 
+4: Given the typical resolution of coastal circulation models, (e.g., in nearshore applications resolved scales are usually 10s to 100s of meters and larger), it is rarely practical to solve explicitly for the small scale flow around obstructions such as bridge pilings (diameters of meters). However, in some situations it may be desirable to include the effects of these subgrid scale obstructions on the resolved scale flow. To accomplish this, a subgrid scale obstruction parameterization has been developed and implemented in ADCIRC. Since the cross-sectional area of these obstructions is usually quite small compared to the cross-sectional area of the flow field (and thus the effect on flow continuity is quite small), their primary effect is to impart additional drag on the resolved scale flow. This section describes the theory behind the obstruction parameterization implemented in ADCIRC.
+5: 
+6: The bridge pier option is turned on by setting the parameter ``NWP`` to add for an additional Nodal Attribute in the Model Parameter and Periodic Boundary Condition File. Required input coefficients are read in at specified nodes from the Nodal Attributes file (fort.13). Additional information can be found in Luettich and Westerink (1999).
+7: 
+8: Theory
+9: ------
+10: 
+11: The two-dimensional, vertically integrated momentum equations used in ADCIRC contain bottom friction (drag) terms. To represent the extra drag caused by subgrid scale obstructions such as bridge piers, a second contribution has been added to the bottom friction terms:
+12: 
+13: * Bottom friction x + obstruction drag x 
+14: * Bottom friction y + obstruction drag y
+15: 
+16: Options in ADCIRC exist to express the bottom friction terms as linear, quadratic or hybrid quadratic/Manning's n functions of flow velocity. The obstruction drag is assumed to be due primarily to form drag and therefore is represented as quadratic in velocity:
+17: 
+18: * obstruction drag x = :math:`C_D \frac{U\sqrt{U^2+V^2}}{H}`
+19: * obstruction drag y = :math:`C_D \frac{V\sqrt{U^2+V^2}}{H}`
+20: 
+21: where :math:`C_D` is an obstruction (piling) drag coefficient.
+
+## models/ADCIRC/raw/source_code/adcirc/docs/user_guide/special_features/dynamic_water_level_correction.rst:7–32
+7: Dynamic water level correction
+8: ==============================
+9: 
+10: **Dynamic Water Level Correction** is a process by which modeled water levels
+11: are dynamically adjusted by use of a forcing term. The correction can be applied
+12: as constant or varying in space and/or time. The correction is applied as a
+13: forcing term in the momentum equations whose mathematical form is equivalent to
+14: that of an atmospheric pressure term. This means that, for gradually-varying
+15: corrections, corrected water levels should closely follow the input correction,
+16: though these may deviate if a correction is applied very quickly or to an area
+17: that has a very weak connection to an open boundary through which water can
+18: flow. Further discussion is below in the :ref:`FAQ <dwlc_frequently_asked_questions>`.
+19: 
+20: Overviews and examples of this capability have been provided in multiple
+21: presentations (Luettich et al. 2017 [1]_, Asher et al. 2018 [2]_) and a journal
+22: article (Asher et al. 2019 [3]_) with details and an application to Hurricane
+23: Matthew. Users looking for ways to generate water level correction surfaces can
+24: look to that same article and this digital publication/data repository [4]_,
+25: which holds the code base used in the aforementioned paper.
+26: 
+27: Version
+28: -------
+29: 
+30: Early versions of this feature were implemented in v53, however important bug
+31: fixes and a renaming of related variables [Note1]_ were done later, so users are
+32: strongly encouraged to not use these earlier versions.
+
+## models/ADCIRC/raw/source_code/adcirc/docs/user_guide/special_features/ice_modifications.rst:1–36
+1: Ice Modifications
+2: =================
+3: 
+4: ADCIRC has been modified to incorporate the effects of ice coverage on hydrodynamic processes. These modifications allow for more accurate simulations in polar and sub-polar regions where ice coverage significantly affects water circulation patterns.
+5: 
+6: Overview
+7: --------
+8: 
+9: The ADCIRC ice modifications enable the model to account for:
+10: 
+11: 1. Ice coverage effects on surface wind stress
+12: 2. Ice friction effects on water flow
+13: 3. Changes in momentum exchange due to ice-water interaction
+14: 4. Modifications to mass conservation equations to account for ice presence
+15: 
+16: Implementation
+17: --------------
+18: 
+19: The implementation of ice modifications in ADCIRC involves several components:
+20: 
+21: * Modification of the governing equations to include ice effects
+22: * Addition of ice-specific parameters in input files
+23: * New output options for ice-related variables
+24: * Special numerical treatments for partially and fully ice-covered regions
+25: 
+26: Usage
+27: -----
+28: 
+29: To enable ice modifications in ADCIRC, specific parameters must be set in the fort.15 file. Additionally, ice coverage data may be provided through dedicated input files.
+30: 
+31: Detailed documentation on the implementation and usage of ice modifications can be found in the ADCIRC documentation: "Modifications to ADCIRC for ICE Coverage" (available at https://adcirc.org/wp-content/uploads/sites/2255/2016/01/adcirc_modifications_for_ice.pdf).
+32: 
+33: References
+34: ----------
+35: 
+36: For complete details on the theoretical foundation, implementation, and usage of ice modifications in ADCIRC, please refer to the official documentation at the ADCIRC website: https://adcirc.org/wp-content/uploads/sites/2255/2016/01/adcirc_modifications_for_ice.pdf 
+
+## models/ADCIRC/raw/source_code/adcirc/docs/user_guide/special_features/vertical_element_walls.rst:1–18
+1: .. _special_features_vertical_element_walls:
+2: 
+3: Vertical Element Walls (VEWs)
+4: =============================
+5: 
+6: What are Vertical Element Walls?
+7: --------------------------------
+8: 
+9: Vertical Element Walls (VEWs) are a special boundary condition in ADCIRC that allow for the representation of steep-sided channels or other vertical features within the mesh. Unlike traditional mesh elements that assume a gradually sloping bathymetry, VEWs provide a way to model abrupt vertical changes in the terrain, which is particularly useful for:
+10: 
+11: 1. Modeling narrow channels with vertical walls where traditional mesh elements would require excessive refinement, 
+12: 2. Representing steep slopes or embankments without the need for complex mesh transitions, and thus,
+13: 3. Simulating compound flooding scenarios involving river channels and floodplains
+14: 
+15: VEWs effectively create internal boundaries that allow water to flow between adjacent elements with different bed elevations, providing a more effective representation of channelized flow while maintaining computational efficiency.
+16: 
+17: .. note::
+18:    VEWs and the :ref:`condensed_nodes` nodal attribute are implemented only for :ref:`IM` values that run ADCIRC in the lumped explicit mode.
+
+## models/ADCIRC/raw/source_code/adcirc/docs/user_guide/examples/index.rst:1–45
+1: .. meta::
+2:    :description: Examples and Test Cases in ADCIRC
+3:    :keywords: adcirc, examples and test cases
+4: 
+5: .. _examples:
+6: 
+7: Examples
+8: ========
+9: 
+10: Below is a list of convenient test cases covering a range of basic uses and
+11: common ADCIRC capabilities. In addition to the test cases shown below, note the
+12: ADCIRC test suite hosted on the GitHub repository,
+13: https://github.com/adcirc/adcirc-testsuite, which has many of the tests below
+14: and more.
+15: 
+16: -  `Quarter Annular Harbor with Tidal Forcing (2D and
+17:    3D) <https://adcirc.org/home/documentation/example-problems/quarter-annular-harbor-with-tidal-forcing-example/>`__
+18: -  `Shinnecock Inlet with Tidal Forcing
+19:    (2D) <https://adcirc.org/home/documentation/example-problems/shinnecock-inlet-ny-with-tidal-forcing-example>`__
+20: -  `Beaufort Inlet
+21:    (2D) <https://adcirc.org/home/documentation/example-problems/beaufort-inlet-nc-example/>`__
+22: -  `Idealized Inlet
+23:    (2D) <https://adcirc.org/home/documentation/example-problems/idealized-inlet-test-cases/>`__
+24: -  `Internal Overflow Boundary
+25:    (2D) <https://adcirc.org/home/documentation/example-problems/internal-overflow-boundaries-example/>`__
+26: -  `APES Wind Run (NWS = 3)
+27:    (2D) <https://adcirc.org/home/documentation/example-problems/apes-wind-run-example/>`__
+28: -  `Hurricane Isabel Wind Run (NWS = 4)
+29:    (2D) <https://adcirc.org/home/documentation/example-problems/hurricane-isabel-example/>`__
+30: -  `Large Grid (~300,000 nodes) Tides
+31:    Only <https://adcirc.org/home/documentation/example-problems/large-grid-tides-example/>`__
+32: -  `Hurricane Katrina
+33:    (NWS=20) <https://adcirc.org/home/documentation/example-problems/katrina-run-2015-nws-20-example/>`__
+34: -  :doc:`Global Astronomical M2 Tide (2D) <global_astronomical_m2_tide>`
+35: -  :doc:`Global Storm Tide - Hurricane Katrina (NWS = -14) (2D) <global_storm_tide_katrina>`
+36: -  :doc:`Alaskan Winter Storm with Ice (NWS = 14) (2D) <alaskan_winter_storm_with_ice>`
+37: -  :doc:`Idealized Channel Problem (2D) <idealized_channel>`
+38: 
+39: .. toctree::
+40:    :hidden:
+41: 
+42:    alaskan_winter_storm_with_ice
+43:    global_astronomical_m2_tide
+44:    global_storm_tide_katrina
+45:    idealized_channel
+
+## models/ADCIRC/raw/source_code/adcirc/docs/user_guide/examples/global_astronomical_m2_tide.rst:1–48
+1: .. meta::
+2:    :description: Global Astronomical M2 Tide in ADCIRC
+3:    :keywords: adcirc, global astronomical m2 tide
+4: 
+5: Global Astronomical M2 Tide
+6: ===========================
+7: 
+8: This example tests ADCIRC version 55 (and beyond). It tests the simulation of
+9: the astronomical M2 tidal constituent on the spherical Earth under equilibrium
+10: tidal forcing with the inclusion of the self-attraction and loading tide. The
+11: results of interest are the M2 tidal constituent amplitudes and phases of
+12: elevations and velocities from the least-squares harmonic analysis. The test
+13: finishes in about 5 minutes in serial ADCIRC for a full month of simulation.
+14: Find the test at the `GitHub test
+15: suite <https://github.com/adcirc/adcirc-cg-testsuite/tree/v55/adcirc/adcirc_global-tide-2d>`__.
+16: 
+17: Mesh
+18: ----
+19: 
+20: The mesh is a coarse representation of the spherical Earth with minimum
+21: resolution of approximately 50 km, comprised of 27,330 vertices and 50,859
+22: triangular elements.
+23: 
+24: Options/Features Tested
+25: -----------------------
+26: 
+27: -  :ref:`ICS <ICS>` = -22: Uses the Mercator projection with a coordinate
+28:    rotation to remove the pole singularity (need to provide a
+29:    :ref:`fort.rotm <fortrotm>`).
+30: -  :ref:`IM <IM>` = 513113: Uses the fully implicit scheme for the gravity wave
+31:    term (computational time step is 12 minutes).
+32: -  :ref:`NTIP <NTIP>` = 2: equilibrium tide + self-attraction and loading tide
+33:    forcing (read from a :ref:`fort.24 file <fort24>`).
+34: -  :ref:`A00 <A00>`, :ref:`B00 <B00>`, :ref:`C00 <C00>` = 0.5, 0.5, 0:
+35:    Ensures that the fully implicit scheme is stable with a large time step.
+36: -  :ref:`ESLM <ESLM>` = -0.2: enables the Smagorinsky turbulence closure with a
+37:    coefficient of 0.2.
+38: -  :ref:`NHAGE <NHAGE>` = 5: outputs the harmonic constituent elevations into a
+39:    netCDF4 :ref:`fort.53 file <fort53>`.
+40: -  :ref:`NHAGV <NHAGV>` = 5: outputs the harmonic constituent velocities into a
+41:    netCDF4 :ref:`fort.54 file <fort54>`.
+42: -  :ref:`internal_tide_friction <internal_tide_friction>`:
+43:    spatially varying linear wave drag :ref:`fort.13 file <fort13>` attribute
+44:    accounting for energy conversion due to internal tide generation in the deep
+45:    ocean.
+46: -  :ref:`quadratic_friction_coefficient <quadratic_friction_coefficient_at_sea_floor>`:
+47:    spatially varying quadratic bottom friction :ref:`fort.13 file <fort13>`
+48:    attribute.
+
+## models/ADCIRC/raw/source_code/adcirc/docs/technical_reference/input_files/fort14.rst:1–52
+1: .. _fort14:
+2: 
+3: Fort.14: Grid and Boundary Information File
+4: ===========================================
+5: 
+6: The fort.14 file contains the finite element grid, the bathymetric data, and the boundary information used by ADCIRC. This file is required to run the ADCIRC model.
+7: 
+8: File Structure
+9: --------------
+10: 
+11: This file contains 4 sections: nodal data, element data, open boundary data, and flow boundary data. The basic file structure is shown below. Each line of input data is represented by a line containing the input variable name(s). Loops indicate multiple lines of input. Conditional input is indicated by a clause following the variable name(s).
+12: 
+13: .. parsed-literal::
+14: 
+15:    :ref:`AGRID <AGRID>`
+16:    :ref:`NE <NE>`, :ref:`NP <NP>`
+17:    for k=1 to :ref:`NP <NP>`
+18:       :ref:`JN(k) <JN>`, :ref:`X(k) <X>`, :ref:`Y(k) <Y>`, :ref:`DP(k) <DP>`
+19:    end k loop
+20:    for k=1 to :ref:`NE <NE>`
+21:       :ref:`JE(k) <JE>`, :ref:`NHY(k) <NHY>`, :ref:`NM(k,1) <NM>`, :ref:`NM(k,2) <NM>`, :ref:`NM(k,3) <NM>`
+22:    end k loop
+23:    :ref:`NOPE <NOPE>`
+24:    :ref:`NETA <NETA>`
+25:    for k=1 to :ref:`NOPE <NOPE>`
+26:       :ref:`NVDLL(k) <NVDLL>`, :ref:`IBTYPEE(k) <IBTYPEE>`
+27:       for j=1 to :ref:`NVDLL(k) <NVDLL>`
+28:          :ref:`NBDV(k,j) <NBDV>`
+29:       end j loop
+30:    end k loop
+31:    :ref:`NBOU <NBOU>`
+32:    :ref:`NVEL <NVEL>`
+33:    for k=1 to :ref:`NBOU <NBOU>`
+34:       :ref:`NVELL(k) <NVELL>`, :ref:`IBTYPE(k) <IBTYPE>`
+35:       for j=1 to :ref:`NVELL(k) <NVELL>`
+36:          :ref:`NBVV(k,j) <NBVV>`      if IBTYPE(k) = 0, 1, 2, 10, 11, 12, 20, 21, 22, 30
+37:          :ref:`NBVV(k,j) <NBVV>`, :ref:`BARLANHT(k,j) <BARLANHT>`, :ref:`BARLANCFSP(k,j) <BARLANCFSP>`      if IBTYPE(k) = 3, 13, 23
+38:          :ref:`NBVV(k,j) <NBVV>`, :ref:`IBCONN(k,j) <IBCONN>`, :ref:`BARINHT(k,j) <BARINHT>`, :ref:`BARINCFSB(k,j) <BARINCFSB>`, :ref:`BARINCFSP(k,j) <BARINCFSP>`      if IBTYPE(k) = 4, 24, 64
+39:          :ref:`NBVV(k,j) <NBVV>`, :ref:`IBCONN(k,j) <IBCONN>`, :ref:`BARINHT(k,j) <BARINHT>`, :ref:`BARINCFSB(k,j) <BARINCFSB>`, :ref:`BARINCFSP(k,j) <BARINCFSP>`, :ref:`PIPEHT(k,j) <PIPEHT>`, :ref:`PIPECOEF(k,j) <PIPECOEF>`, :ref:`PIPEDIAM(k,j) <PIPEDIAM>`      if IBTYPE(k) = 5, 25
+40:       end j loop
+41:    end k loop
+42: 
+43: Open Boundary Data
+44: ------------------
+45: 
+46: See :ref:`open boundaries <open_boundaries>` for details of the open boundary data.
+47: 
+48: 
+49: Normal Flux Boundary Types
+50: --------------------------
+51: 
+52: See :ref:`flux specified boundaries <flux_specified_boundaries>` for details of the normal flux boundary types. See also :ref:`IBTYPE <IBTYPE>` for full details of each boundary type.
+
+## models/ADCIRC/raw/source_code/adcirc/docs/technical_reference/output_files/fort51.rst:1–28
+1: Fort.51: Elevation Harmonic Constituents at Specified Elevation Recording Stations
+2: ==================================================================================
+3: 
+4: Amplitude and phase information obtained from harmonic analysis of the elevation solution at the elevation recording stations and for the frequencies specified in the :doc:`Model Parameter and Periodic Boundary Condition File <../input_files/fort15>`.
+5: 
+6: File Structure
+7: --------------
+8: 
+9: The basic file structure is shown below. Each line of output is represented by a line containing the output variable name(s). Loops indicate multiple lines of output.
+10: 
+11: .. parsed-literal::
+12: 
+13:    :ref:`NFREQ <NFREQ>`
+14:    for k = 1, :ref:`NFREQ <NFREQ>`
+15:       :ref:`HAFREQ(k) <HAFREQ>`, :ref:`HAFF(k) <HAFF>`, :ref:`HAFACE(k) <HAFACE>`, :ref:`NAMEFR(k) <NAMEFR>`
+16:    end k loop
+17: 
+18:    :ref:`NSTAE <NSTAE>`
+19:    for k=1, :ref:`NSTAE <NSTAE>`
+20:       for j=1, :ref:`NFREQ <NFREQ>`
+21:          :ref:`EMAG(k,j) <EMAG>`, :ref:`PHASEDE(k,j) <PHASEDE>`
+22:       end j loop
+23:    end k loop
+24: 
+25: Note
+26: ----
+27: 
+28: * Output format is ascii 
+
+## models/ADCIRC/raw/source_code/adcirc/docs/technical_reference/parameter_definitions/index.rst:452–459
+452: NTIP
+453:    Parameter controlling whether tidal potential and self attraction/load tide forcings will be used to force ADCIRC.
+454: 
+455:    = 0, tidal potential & self attraction/load tide forcings are not used
+456: 
+457:    = 1, tidal potential forcing is used
+458: 
+459:    = 2, tidal potential & self attraction/load tide forcings are used. In this case the self attraction/load tide information is read in for each constituent at each node in the grid from the Self Attraction/Earth Load Tide Forcing File.
+
+## models/ADCIRC/raw/source_code/adcirc/docs/technical_reference/parameter_definitions/index.rst:544–550
+544: STATIM
+545:    Starting simulation time (in days). The first time step computes results at: TIME = STATIM*86400+DTDP. A nonzero value may be useful, for example, to align model output times with a specific time reference.
+546: 
+547: .. _REFTIM:
+548: 
+549: REFTIM
+550:    Reference time (in days). This is used only to compute time for the harmonic forcing and analysis terms. A nonzero value allows equilibrium arguments to be used that have been calculated for a time other than TIME0 = STATIM*86400. The time used for harmonic terms is compute as: TIMEH = (STATIM–REFTIM)*86400.+DTDP*IT.
+
+## models/ADCIRC/raw/source_code/adcirc/docs/technical_reference/parameter_definitions/index.rst:758–801
+758: NTIF
+759:    Number of tidal potential constituents
+760: 
+761: .. _TIPOTAG:
+762: 
+763: TIPOTAG(I)
+764:    See description of TPK(I),AMIGT(I),ETRF(I),FFT(I) and FACET(I)
+765: 
+766: .. _TPK:
+767: .. _AMIGT:
+768: .. _ETRF:
+769: .. _FFT:
+770: .. _FACET:
+771: 
+772: TPK(I),AMIGT(I),ETRF(I),FFT(I),FACET(I), I=1,NTIF
+773:    Tidal potential amplitude, frequency, earth tide potential reduction factor (generally taken to be 0.690 for all constituents (Hendershott) but for more precise calculations can take on slightly different values (e.g. see Wahr, 1981)), nodal factor and equilibrium argument in degrees. These values are preceded by TIPOTAG(I) which is an alphanumeric descriptor (i.e. the constituent name)
+774: 
+775: .. _NBFR:
+776: 
+777: NBFR
+778:    Number of periodic forcing frequencies on elevation specified boundaries. if NBFR=0 and a nonzero number of elevation specified boundary segments are included in the Grid and Boundary Information File, the elevation boundary condition is assumed to be non-periodic and will be read in from the Non-periodic Elevation Boundary Condition File. For reasons of backward compatability, NBFR is included in the Model Parameter and Periodic Boundary Condition File regardless of whether any elevation specified boundaries (IBTYPE=0) are defined in the fort.14 input.
+779: 
+780: .. _BOUNTAG:
+781: 
+782: BOUNTAG(k)
+783:    See description of AMIG(k),FF(k),FACE(k)
+784: 
+785: .. _AMIG:
+786: .. _FF:
+787: .. _FACE:
+788: 
+789: AMIG(k),FF(k),FACE(k) k=1,NBFR
+790:    Forcing frequency, nodal factor, equilibrium argument in degrees for tidal forcing on elevation specified boundaries. These values are preceded by BOUNTAG(k), an alphanumeric descriptor (i.e. the constituent name)
+791: 
+792: .. _ALPHAE:
+793: 
+794: ALPHAE
+795:    See description of EMO(k,j), EFA(k,j) (<= 10 characters)
+796: 
+797: .. _EMO:
+798: .. _EFA:
+799: 
+800: EMO(k,j),EFA(k,j) k=1,NBFR , j=1,NETA
+801:    Amplitude and phase (in degrees) of the harmonic forcing function at the elevation specified boundaries for frequency k and elevation specified boundary forcing node j. NOTE that the parameter NETA is defined and read in from Grid and Boundary Information File: the forcing values are preceded by an alphanumeric descriptor EALPHA to facilitate verifying that the correct data matches a given frequency.
+
+## models/ADCIRC/raw/source_code/adcirc/docs/technical_reference/parameter_definitions/index.rst:1140–1187
+1140: .. _NFREQ:
+1141: 
+1142: NFREQ
+1143:    Number of frequencies included in harmonic analysis of model results. Note: harmonic output is only available for 2DDI elevation and velocity
+1144: 
+1145: .. _NAMEFR:
+1146: 
+1147: NAMEFR(k)
+1148:    An alphanumeric descriptor (i.e. the constituent name) whose length must be <= 10 characters
+1149: 
+1150: .. _HAFREQ:
+1151: .. _HAFF:
+1152: .. _HAFACE:
+1153: 
+1154: HAFREQ(k), HAFF(k), HAFACE(k) k=1,NFREQ
+1155:    Parameters describing the constituents to be included in the harmonic analysis of model results
+1156: 
+1157:    HAFREQ(k) = frequency (rad/s)
+1158: 
+1159:    HAFF(k) = nodal factor
+1160: 
+1161:    HAFACE(k) = equilibrium argument (degrees)
+1162: 
+1163:    If a steady component will be included in the harmonic analysis, this must be the first constituent listed (i.e., the constituent corresponding to k=1) 
+1164: 
+1165: .. _THAS:
+1166: .. _THAF:
+1167: .. _NHAINC:
+1168: .. _FMV:
+1169: 
+1170: THAS, THAF, NHAINC, FMV
+1171:    Parameters that control the calculation of harmonic constituents both at stations and globally
+1172: 
+1173:    THAS = The number of days after which data starts to be harmonically analysed (THAS is relative to STATIM)
+1174: 
+1175:    THAF = The number of days after which data ceases to be harmonically analysed (THAF is relative to STATIM)
+1176: 
+1177:    NHAINC = The number of time steps at which information is harmonically analysed (information every NHAINC time steps after THAS is used in harmonic analysis)
+1178: 
+1179:    FMV = Fraction of the harmonic analysis period (extending back from the end of the harmonic analysis period) to use for comparing the water elevation and velocity means and variances from the raw model time series with corresponding means and variances of a time series resynthesized from the harmonic constituents. This comparison is helpful for identifying numerical instabilities and for determining how complete the harmonic analysis was. Examples:
+1180: 
+1181:       FMV = 0. Do not compute any means and vars.
+1182: 
+1183:       FMV = 0.1 Compute means and vars. over final 10% of period used in harmonic analysis
+1184: 
+1185:       FMV = 1.0 Compute means and vars. over entire period used in harmonic analysis
+1186: 
+1187:       Note: the means and variance calculations are only done if global harmonic calculations are performed. Results are written out to fort.55. A summary of the poorest comparisons throughout the domain and the node numbers where these occurred is given at the end of the fort.16 output file.
+
+## models/ADCIRC/raw/source_code/adcirc/docs/technical_reference/parameter_definitions/index.rst:1191–1213
+1191: .. _NHASE:
+1192: .. _NHASV:
+1193: .. _NHAGE:
+1194: .. _NHAGV:
+1195: 
+1196: NHASE, NHASV, NHAGE, NHAGV
+1197:    Parameters that control the spatial locations where harmonic analysis is performed
+1198: 
+1199:    NHASE = 0 no harmonic analysis is performed at the selected elevation recording stations
+1200: 
+1201:    NHASE = 1 harmonic analysis is performed at the selected elevation recording stations (output on fort.51) Note: the stations are as specified in the section on time series station elevation output
+1202: 
+1203:    NHASV = 0 no harmonic analysis is performed at the selected velocity recording stations
+1204: 
+1205:    NHASV = 1 harmonic analysis is performed at the selected velocity recording stations (output on fort.52) Note: the stations are as specified in the section on time series station velocity output
+1206: 
+1207:    NHAGE = 0 no harmonic analysis is performed for global elevations
+1208: 
+1209:    NHAGE = 1 harmonic analysis is performed for global elevations (output on fort.53)
+1210: 
+1211:    NHAGV = 0 no harmonic analysis is performed for global velocities
+1212: 
+1213:    NHAGV = 1 harmonic analysis is performed for global velocities (output on fort.54)
+
+## models/ADCIRC/raw/source_code/adcirc/src/read_input.F:1703–1732
+1703: C...  READ AND PROCESS NTIP - TIDAL POTENTIAL FORCING
+1704: C...
+1705:       READ(15,*) NTIP
+1706:       IF((NTIP.LT.0).OR.(NTIP.GT.2)) THEN
+1707:          CALL terminate(exit_code=ADCIRC_EXIT_FAILURE,
+1708:      &                  message="Your selection of NTIP (a UNIT 15 input parameter) is not an allowable value.")
+1709:       ENDIF
+1710:       IF((ICS.EQ.1).AND.(NTIP.GE.1)) THEN
+1711:          CALL terminate(exit_code=ADCIRC_EXIT_FAILURE,
+1712:      &                  message="Your selection of NTIP (a UNIT 15 input parameter) "//
+1713:      &                          "is inconsistent with your selection of coordinate systems.  "//
+1714:      &                          "Tidal potential forcing should be used only with Spherical coordinates.")
+1715:       ENDIF
+1716:       IF (NTIP.NE.0) CTIP = .TRUE.
+1717:       IF(NTIP.EQ.0) THEN
+1718:          WRITE(16,235) NTIP
+1719:  235     FORMAT(/,5X,'NTIP = ',I2,/,9X,
+1720:      &        'TIDAL POTENTIAL FORCING IS NOT USED IN THE COMPUTATION')
+1721:       ENDIF
+1722:       IF(NTIP.GE.1) THEN
+1723:          WRITE(16,236) NTIP
+1724:  236     FORMAT(/,5X,'NTIP = ',I2,
+1725:      &    /,9X,'TIDAL POTENTIAL FORCING IS USED IN THE COMPUTATION ',
+1726:      &   'BASED ON INPUT LONGITUDES/LATITUDES')
+1727:       ENDIF
+1728:       IF(NTIP.EQ.2) THEN
+1729:          WRITE(16,239)
+1730:  239     FORMAT(9X,'SELF ATTRACTION/LOAD TIDE FORCING IS ALSO USED ',
+1731:      &        'IN THE COMPUTATION')
+1732:       ENDIF
+
+## models/ADCIRC/raw/source_code/adcirc/src/read_input.F:3335–3354
+3335: C...
+3336: C...  READ AND PROCESS INFORMATION ABOUT THE TIDAL POTENTIAL CONSTITUENTS
+3337: C...
+3338:       READ(15,*) NTIF
+3339:       mntif = ntif
+3340:       if (ntif .eq. 0) mntif = 1
+3341: 
+3342: C...  allocate tidal potential arrays
+3343:       call alloc_main4a()
+3344: C...  READ TIDAL POTENTIAL AMPLITUDE, FREQUENCIES, NODAL FACTORS,
+3345: C...  EQUILIBRIUM ARGUMENTS AND ALPHANUMERIC LABEL
+3346: C....
+3347:       DO I=1,NTIF
+3348:          READ(15,'(A5)')  TIPOTAG(I)
+3349:          READ(15,*)  TPK(I),AMIGT(I),ETRF(I),FFT(I),FACET(I)
+3350:          IF(AMIGT(I).EQ.0.) THEN
+3351:             PERT(I)=0.
+3352:          ELSE
+3353:             PERT(I)=2.D0*PI/AMIGT(I)
+3354:          ENDIF
+
+## models/ADCIRC/raw/source_code/adcirc/src/read_input.F:3431–3456
+3431:       DO I=1,NBFR
+3432:          READ(15,'(A5)') BOUNTAG(I)
+3433:          READ(15,*) AMIG(I),FF(I),FACE(I)
+3434:          WRITE(16,1850) I,AMIG(I),FF(I),FACE(I),BOUNTAG(I)
+3435:  1850    FORMAT(12X,I2,6X,F16.12,2X,F10.7,2X,F10.3,10X,A5)
+3436:          FACE(I)=FACE(I)*DEG2RAD
+3437:          IF(AMIG(I).EQ.0.) THEN
+3438:             PER(I)=0.
+3439:          ELSE
+3440:             PER(I)=2.D0*PI/AMIG(I)
+3441:          ENDIF
+3442:       END DO
+3443:       IF (NPEBC) WRITE(16,*) ' NON-PERIODIC ELEVATION BOUNDARY ',
+3444:      &                       'CONDITION WILL BE READ FROM FORT.19' 
+3445: 
+3446: C...  INPUT FORCING CONDITIONS ON PERIODIC ELEVATION SPECIFIED
+3447: C...  BOUNDARIES FOR EACH OF THE ELEVATION FORCING FREQUENCIES FROM UNIT
+3448: C...  15
+3449: C...
+3450:       ALLOCATE(ELEVALPHA(NBFR))
+3451:       DO I=1,NBFR
+3452:          READ(15,'(A10)') ELEVALPHA(i)
+3453:          DO J=1,NETA
+3454:             READ(15,*) EMO(I,J),EFA(I,J)
+3455:          END DO
+3456:       END DO
+
+## models/ADCIRC/raw/source_code/adcirc/src/read_input.F:3483–3498
+3483:       ! jgf51.21.12: Now write out log messages that include NBD (the
+3484:       ! NBD array was also computed in the call to initializeBoundaries().
+3485:       DO I=1,NBFR
+3486:          WRITE(16,29) I,BOUNTAG(I)
+3487:  29      FORMAT(////,5X,'ELEVATION BOUNDARY TIDAL FORCING FOR',
+3488:      &        ' CONSTITUENT NUMBER',i0,1X,'DESIGNATED : ',A5)
+3489:          WRITE(16,31) ELEVALPHA(i)
+3490:  31      FORMAT(9X,'VERIFICATION OF CONSTITUENT : ',A10,/)
+3491:          WRITE(16,30)
+3492:  30      FORMAT(14X,'NODE',11X,'AMPL.',9X,'PHASE(DEG)',/)
+3493:          DO J=1,NETA
+3494:             WRITE(16,1870) NBD(J),EMO(I,J),EFA(I,J)
+3495:  1870       FORMAT(10X,I8,4X,F14.5,4X,F12.3)
+3496:             EFA(I,J)=EFA(I,J)*DEG2RAD
+3497:          END DO
+3498:       END DO
+
+## models/ADCIRC/raw/source_code/adcirc/src/gwce.F:1633–1651
+1633: C...  At elevation boundary condition nodes, determine the elevation at
+1634: C...  the s+1 time step
+1635: C...
+1636: C...  For periodic elevation boundary conditions
+1637: 
+1638:       DO J=1,NBFR
+1639:          IF(PER(J).EQ.0.) THEN
+1640:             NCYC=0
+1641:          ELSE
+1642:             NCYC=INT(timeh/PER(J))
+1643:          ENDIF
+1644:          ARGJ=AMIG(J)*(timeh-NCYC*PER(J))+FACE(J)
+1645:          RFF=FF(J)*RampElev
+1646:          DO I=1,NETA
+1647:             ARG=ARGJ-EFA(J,I)
+1648:             NBDI=NBD(I)
+1649:             Eta2(NBDI)=Eta2(NBDI)+EMO(J,I)*RFF*COS(ARG)
+1650:          END DO
+1651:       END DO
+
+## models/ADCIRC/raw/source_code/adcirc-testsuite/README.md:1–40
+1: # ADCIRC Model Test Suite
+2: The included suite of tests has been developed to test changes to the ADCIRC model and ensure solutions are consistent across releases. This suite is run any time a change is made to the model code and must pass before the code is allowed to be integrated into the upstream repository.
+3: 
+4: These also encompass a nice set of examples for users to get acquainted with setting up and running the model.
+5: 
+6: ## Running the Suite
+7: ### Compiling for the suite
+8: The automated test scripts may require the following ADCIRC executables to be compiled:
+9:   1. adcirc
+10:   2. padcirc
+11:   3. adcswan
+12:   4. padcswan
+13:   5. adcprep
+14: 
+15: Depending on the modules used within the test suite, you may not need to compile all of these, 
+16: though some tests may require certain features are enabled, such as netCDF or GRIB2 support.
+17: 
+18: ### Running Tests
+19: The test suite uses a python test apparatus. This runner relies on a yaml file to define the testing metadata.
+20: The default test list is `test_list.yaml` and is located in the root directory fo this repository. It is possible
+21: to leverage your own tests by modifying this file or creating a new one. The test suite produces a series of plots
+22: as well to aid diagnosing any issues that may arise.
+23: 
+24: To run the full set of tests, the following command is used:
+25: ```
+26: python3 test_runner/test_runner.py --all --bin <path/to/adcirc/build> --test-yaml test_list.yaml --tolerance 0.00001 --test-root .
+27: ```
+28: 
+29: You can also run a single test by specifying the test name:
+30: ```
+31: python3 test_runner/test_runner.py --test <name_of_test> --bin <path/to/adcirc/build> --test-yaml test_list.yaml --tolerance 0.00001 --test-root .
+32: ```
+33: 
+34: Note that the default testing tolerance is 0.00001. This can be adjusted by changing the `--tolerance` flag. It may be
+35: useful to do so depending on your build settings and compiler. 
+36: 
+37: ## Submitting a new case
+38: New cases are definitely welcomed. Anyone looking to submit a new case should follow one of the other directories as 
+39: an example of how a case should be constructed. Cases should exercise a feature or combination of features that is 
+40: not currently part of the test suite. Cases should be able to be run in under 5 minutes in serial to avoid the suite 
+
+## models/ADCIRC/raw/source_code/adcirc-testsuite/test_list.yaml:399–434
+399:   adcirc_quarterannular-2d:
+400:     path: adcirc/adcirc_quarterannular-2d
+401:     model: adcirc
+402:     parallel: false
+403:     hotstart: false
+404:     output_files:
+405:       - fort.61
+406:       - fort.62
+407:       - fort.63
+408:       - fort.64
+409:       - maxele.63
+410:       - maxvel.63
+411:   adcirc_quarterannular-2d-hotstart:
+412:     path: adcirc/adcirc_quarterannular-2d-hotstart
+413:     model: adcirc
+414:     parallel: false
+415:     hotstart: true
+416:     output_files:
+417:       - fort.61
+418:       - fort.62
+419:       - fort.63
+420:       - fort.64
+421:       - maxele.63
+422:       - maxvel.63
+423:   adcirc_quarterannular-2d-netcdf:
+424:     path: adcirc/adcirc_quarterannular-2d-netcdf
+425:     model: adcirc
+426:     parallel: false
+427:     hotstart: false
+428:     output_files:
+429:       - fort.61.nc
+430:       - fort.62.nc
+431:       - fort.63.nc
+432:       - fort.64.nc
+433:       - maxele.63.nc
+434:       - maxvel.63.nc
+
+## models/ADCIRC/raw/source_code/adcirc-testsuite/test_runner/adcirc_test/adcirctest.py:423–451
+423: 
+424:         all_passed = True
+425:         error_files = []
+426: 
+427:         test_directory = self.__get_test_directory(has_hotstart, is_hotstart)
+428: 
+429:         for file in self.__test_yaml["output_files"]:
+430: 
+431:             logger.info(f"Checking file: {file}")
+432: 
+433:             control_file = os.path.join(test_directory, "control", file)
+434:             test_file = os.path.join(test_directory, file)
+435: 
+436:             if not os.path.exists(control_file):
+437:                 msg = f"Control file {control_file} does not exist"
+438:                 raise FileNotFoundError(msg)
+439: 
+440:             if not os.path.exists(test_file):
+441:                 msg = f"Test file {test_file} does not exist"
+442:                 raise FileNotFoundError(msg)
+443: 
+444:             # Compare the files
+445:             passed = self.__compare_files(control_file, test_file, self.__tolerance)
+446:             if not passed:
+447:                 all_passed = False
+448:                 error_files.append(test_file.split("/")[-1].split("\\")[-1])
+449: 
+450:         if not all_passed:
+451:             logger.error(f"Test {self.__test} failed.")
+
+## models/ADCIRC/raw/source_code/adcirc-testsuite/test_runner/adcirc_test/adcirctest.py:524–545
+524:         import numpy.testing as npt
+525: 
+526:         passed = True
+527:         for var in control.variables:
+528:             if var not in test.variables:
+529:                 msg = f"Variable {var} not found in test file"
+530:                 raise ValueError(msg)
+531: 
+532:             # Only compare numeric types
+533:             if control[var].dtype.kind not in "fi":
+534:                 continue
+535: 
+536:             if "time_of" in var:
+537:                 continue
+538:             else:
+539:                 this_tolerance = tolerance
+540: 
+541:             # Check that the variables are the same and get the maximum difference
+542:             try:
+543:                 npt.assert_allclose(
+544:                     control[var], test[var], atol=this_tolerance, equal_nan=True
+545:                 )
+
+## models/ADCIRC/raw/source_code/adcirc/docs/user_guide/model_configuration/initial_conditions/index.rst:1–11
+1: Initial Conditions
+2: ==================
+3: 
+4: This section provides information about configuring initial conditions in ADCIRC.
+5: 
+6: .. toctree::
+7:    :maxdepth: 1
+8:    :caption: Contents:
+9:    
+10:    initial_conditions
+11:    initial_river_elevation
+
+## models/ADCIRC/raw/source_code/adcirc/docs/user_guide/running_adcirc/index.rst:1–11
+1: Running ADCIRC
+2: ==============
+3: 
+4: This section provides detailed information about running the ADCIRC model, including command line options, execution methods, and other runtime considerations.
+5: 
+6: .. toctree::
+7:    :maxdepth: 2
+8:    :caption: Contents:
+9:    
+10:    command_line_options
+11:    
+
+## models/ADCIRC/raw/source_code/adcirc/src/mesh.F:1822–1834
+1822:       JNMM=0
+1823:       DO K=1,NOPE
+1824:          write(scratchMessage,281) k,nvdll(k)
+1825:  281     format('Total number of nodes on elevation specified',
+1826:      &              ' boundary segment ',2x,i0,2x,'=',1x,i0)
+1827:          call logMessage(ECHO,scratchMessage)
+1828:          DO I=1,NVDLL(K)
+1829:             WRITE(16,1855) NBDV(K,I)
+1830:  1855      FORMAT(7X,I7)
+1831:             NBD(JNMM+I)=NBDV(K,I)
+1832:          END DO
+1833:          JNMM=JNMM+NVDLL(K)
+1834:       END DO !k=1,nope
+
+## models/ADCIRC/raw/source_code/adcirc/src/timestep.F:251–258
+251: C...  TIMEH: HARMONIC CALCULATIONS ARE MADE FOR TIME WHICH INCLUDES THE REFTIM
+252: C...  TO ALLOW FOR THE POSSIBILITY THAT THE EQUILIBRIUM ARGUMENTS MAY
+253: C...  BE FOR A TIME OTHER THAN THE MODEL STARTING TIME.
+254: C...  
+255: C...  Computation of TimeLoc and TimeH are consolidated. SB,ZC,RL 2022-06-22
+256: C...
+257:       TimeLoc=IT*DTDP + StaTim*86400.D0
+258:       TimeH=IT*DTDP + (StaTim - RefTim)*86400.D0
+
+## models/ADCIRC/raw/source_code/adcirc-testsuite/adcirc/adcirc_quarterannular-2d-netcdf/fort.15:1–64
+1:  QUARTER ANNULAR TEST V20051108      ! 32 CHARACTER ALPHANUMERIC RUN DESCRIPTION
+2:  ADCIRC V45.07                       ! 24 CHARACTER ALPANUMERIC RUN IDENTIFICATION
+3:  0                                   ! NFOVER - NONFATAL ERROR OVERRIDE OPTION
+4:  0                                   ! NABOUT - ABREVIATED OUTPUT OPTION PARAMETER
+5:  600                                 ! NSCREEN - UNIT 6 OUTPUT OPTION PARAMETER
+6:  0                                   ! IHOT - HOT START PARAMETER
+7:  1                                   ! ICS - COORDINATE SYSTEM SELECTION PARAMETER
+8:  0                                   ! IM - MODEL SELECTION PARAMETER 
+9:  1                                   ! NOLIBF - BOTTOM FRICTION TERM SELECTION PARAMETER
+10:  1                                   ! NOLIFA - FINITE AMPLITUDE TERM SELECTION PARAMETER
+11:  1                                   ! NOLICA - SPATIAL DERIVATIVE CONVECTIVE SELECTION PARAMETER
+12:  1                                   ! NOLICAT - TIME DERIVATIVE CONVECTIVE TERM SELECTION PARAMETER
+13:  0                                   ! NWP - VARIABLE BOTTOM FRICTION AND LATERAL VISCOSITY OPTION PARAMETER
+14:  0                                   ! NCOR - VARIABLE CORIOLIS IN SPACE OPTION PARAMETER
+15:  0                                   ! NTIP - TIDAL POTENTIAL OPTION PARAMETER
+16:  0                                   ! NWS - WIND STRESS AND BAROMETRIC PRESSURE OPTION PARAMETER
+17:  1                                   ! NRAMP - RAMP FUNCTION OPTION
+18:  9.81                                ! G - ACCELERATION DUE TO GRAVITY - DETERMINES UNITS
+19:  0.005                               ! TAU0 - WEIGHTING FACTOR IN GWCE
+20:  174.656                             ! DT - TIME STEP (IN SECONDS)
+21:  0.00                                ! STATIM - STARTING TIME (IN DAYS)
+22:  0.00                                ! REFTIM - REFERENCE TIME (IN DAYS)
+23:  5.0                                 ! RNDAY - TOTAL LENGTH OF SIMULATION (IN DAYS)
+24:  2.0                                 ! DRAMP - DURATION OF RAMP FUNCTION (IN DAYS)
+25:  0.35 0.30 0.35                      ! TIME WEIGHTING FACTORS FOR THE GWCE EQUATION
+26:  1.0                                 ! H0 - MIMINMUM CUTOFF DEPTH
+27:  0.0 0.0                             ! SLAM0,SFEA0 - CENTER OF CPP PROJECTION (NOT USED IF ICS=1, NTIP=0, NCOR=0)
+28:  0.0025                              ! FFACTOR - HOMOGENEOUS LINEAR OR NONLINEAR BOTTOM FRICTION COEFFICIENT     
+29:  0.0                                 ! ESL - LATERAL EDDY VISCOSITY COEFFICIENT; IGNORED IF NWP =1
+30:  0.0                                 ! CORI - CORIOLIS PARAMETER - IGNORED IF NCOR = 1
+31:  0                                   ! NTIF - TOTAL NUMBER OF TIDAL POTENTIAL CONSTITUENTS BEING FORCED
+32:  1                                   ! NBFR - TOTAL NUMBER OF FORCING FREQUENCIES ON OPEN BOUNDARIES
+33:  M2                                  ! CONSTITUENT. 1  ALPHA DESCRIPTOR
+34:  0.000140525700000 1.0 0.0           ! CONSTITUENT. 1 FREQ., NODAL FACTOR, EQUIL. ARG. 
+35:   M2                                 ! ALPHA NUMERIC DESCRIPTION OF OPEN BOUNDARY FORCING DATA SET WHICH FOLLOWS 
+36:   0.3048  0.00                       ! BOUNDARY FORCING DATA FOR CONSTITUENT NO. 1 AT FIRST NODE
+37:   0.3048  0.00
+38:   0.3048  0.00
+39:   0.3048  0.00
+40:   0.3048  0.00
+41:   0.3048  0.00
+42:   0.3048  0.00
+43:   0.3048  0.00
+44:   0.3048  0.00                       ! BOUNDARY FORCING DATA FOR CONSTITUENT NO. 1 AT LAST NODE
+45:  110.0                               ! ANGINN : INNER ANGLE THRESHOLD
+46:  5 0.0 5.0  3                        ! NOUTE,TOUTSE,TOUTFE,NSPOOLE:ELEV STATION OUTPUT INFO (UNIT  61)
+47:  3                                   ! TOTAL NUMBER OF ELEVATION RECORDING STATIONS
+48:    80668.4   12256.0                 ! COORD. OF ELEVATION STATION
+49:   126205.2   10686.9        
+50:    51131.1   88884.3
+51:  5 0.0 5.0  3                        ! NOUTV,TOUTSV,TOUTFV,NSPOOLV:VEL STATION OUTPUT INFO (UNIT  62)
+52:  3                                   ! TOTAL NUMBER OF VELOCITY RECORDING STATIONS
+53:    80668.4   12256.0                 ! COORD. OF VELOCITY STATION
+54:   126205.2   10686.9        
+55:    51131.1   88884.3
+56:  5 0.0 5.0 3                         ! NOUTGE,TOUTSGE,TOUTFGE,NSPOOLGE : GLOBAL ELEVATION OUTPUT INFO (UNIT  63)
+57:  5 0.0 5.0 3                         ! NOUTGV,TOUTSGV,TOUTFGV,NSPOOLGV : GLOBAL VELOCITY  OUTPUT INFO (UNIT  64)    
+58:  1                                   ! NHARFR - NUMBER OF CONSTITUENTS TO BE INCLUDED IN THE HARMONIC ANALYSIS
+59:  M2                                  ! HAFNAM(I) - ALHPANUMERIC DESCRIPTION OF HARMONIC CONSTITUENT I=1
+60:  0.0001405257 1.0 0.0                ! HAFREQ(I=1),HAFF(I=1),HAFACE(I=1)
+61:  4.00  5.00  1  0.0                  ! THAS,THAF,NHAINC,FMV - HARMONIC ANALYSIS PARAMETERS         
+62:  1 1 1 1                             ! NHASE,NHASV,NHAGE,NHAGV - CONTROL HARMONIC ANALYSIS AND OUTPUT TO UNITS 51,52,53,54
+63:  5 1236                               ! NHSTAR,NHSINC - HOT START FILE GENERATION PARAMETERS                  
+64:  1  0  1.E-10  25                     ! ITITER, ISLDIA, CONVCR, ITMAX - ALGEBRAIC SOLUTION PARAMETERS
+
+## models/ADCIRC/raw/source_code/adcirc/docs/user_guide/model_configuration/model_parameters/index.rst:1–18
+1: Model Parameters
+2: ================
+3: 
+4: This section provides information about configuring parameters for numerical methodsin ADCIRC.
+5: 
+6: .. toctree::
+7:    :maxdepth: 1
+8:    :caption: Contents:
+9: 
+10:    ics
+11:    im
+12:    nolibf
+13:    nolifa
+14:    ntif
+15:    ntip
+16:    a00_b00_c00
+17:    tau0
+18:    ramping
+
+## models/ADCIRC/raw/source_code/adcirc/docs/user_guide/model_configuration/boundary_conditions/index.rst:1–12
+1: Boundary Conditions
+2: ===================
+3: 
+4: This section provides information about configuring boundary conditions in ADCIRC.
+5: 
+6: .. toctree::
+7:    :maxdepth: 1
+8:    :caption: Contents:
+9: 
+10:    boundary_conditions
+11:    open_boundaries
+12:    flux_specified_boundaries
+
+## models/ADCIRC/raw/source_code/adcirc/docs/theory/index.rst:1–8
+1: Theory and Formulation
+2: ======================
+3: 
+4: The theoretical foundation and mathematical formulation of ADCIRC is documented in the following report:
+5: 
+6:     `Formulation and Numerical Implementation of the 2D/3D ADCIRC Finite Element Model Version 44.XX (PDF) <https://adcirc.org/wp-content/uploads/sites/2255/2018/11/adcirc_theory_2004_12_08.pdf>`_
+7: 
+8: Recent updates and enhancements to the ADCIRC model's theoretical formulation are documented throughout the pages of this documentation site. Some of the updates are documented in :doc:`../user_guide/special_features/index`.

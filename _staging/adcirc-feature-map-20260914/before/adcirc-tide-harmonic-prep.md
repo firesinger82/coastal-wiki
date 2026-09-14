@@ -4,11 +4,6 @@ topic: tides
 canonical_source: self
 citation_status: verified
 has_source_needed: true
-evidence_extension_date: 2026-09-14
-evidence_extension_by: "Codex — 입력 품질·검증 확인 방법 보강"
-evidence_extension_scope: "새 확인 방법 절과 NTIP/NTIF·AMIG 상세 정의 대조. 기존 다른 절 재검증 아님; 실제 자료/실행/수치/물리 검증 미수행."
-evidence_extension_review: "Claude Fable 5.1 — 새 확인 방법 원문 대조; 공식 예제의 추가 구분은 Codex 최종 검토 대상"
-evidence_extension_human_approval: not-issued
 source_correction_date: 2026-09-14
 source_correction_by: "Codex — scoped source cross-reference"
 source_correction_human_approval: not-issued
@@ -25,51 +20,6 @@ verification_date: 2026-04
 ## 2026-09-14 한정 대조 범위
 
 이 보강의 코드 판본은 ADCIRC `6037225ce4573efd3c1f8877a5dc908d01c199a8`이다. 아래 `src/` 인용의 루트는 `models/ADCIRC/raw/source_code/adcirc/`다. **문서 지원·코드 구현** 중 NBFR 입력, 경계 노드 전달, 위상/시간 기준, 전통 분조 경로의 ETRF 항을 대조했다. **실행 확인·수치 검증·물리 검증·개별 입력자료 품질 확인은 수행하지 않았다.** 다른 절과 외부 DB 규약은 이번 검증 범위에 포함하지 않는다. 과거 검증 이력과 이번 정정을 구분하며 이번 정정에 대한 사람 승인은 발급하지 않았다.
-
-<a id="input-quality-and-validation"></a>
-
-## 입력 품질·실행·검증 확인 방법 (2026-09-14 보강)
-
-이 절은 **확인할 증거와 수행 순서**를 정한다. 실제 사용할 조석 DB·지형·관측자료와 허용오차는 아직 선정하지 않았으므로 **입력 품질·실행 확인·수치 검증·물리 검증은 미완**이다. 아래 G/H·Decision Guide의 외부 DB 호환성·지역 성능·권고 기간은 이 보강에서 재검증하지 않았다. 그 설명을 검증된 변환 규약으로 재사용하지 않는다. 필요한 원문이 없는 부분은 `source-needed`로 남긴다.
-
-### 문서와 코드가 다를 때의 입력 기준
-
-[공식 조석 개요](https://adcirc.github.io/adcirc/user_guide/model_configuration/tides/index.html)의 두 설명은 [상세 파라미터 정의](https://adcirc.github.io/adcirc/technical_reference/parameter_definitions/index.html) 및 이 노트의 S 판본 코드와 구별해야 한다(S는 위 한정 대조 범위의 전체 SHA).
-
-- 개요의 분조 수 설명은 `NTIP`에 붙어 있지만, 상세 정의에서 **NTIP는 퍼텐셜/SAL 사용 방식**, **NTIF는 퍼텐셜 분조 수**다. 코드도 `NTIP`를 0–2로 검사하고 `NTIF`로 분조 입력을 반복한다. `docs/user_guide/model_configuration/tides/index.rst:15–19`; `docs/technical_reference/parameter_definitions/index.rst:452–459,758–759`; `src/read_input.F:1703–1731,3335–3349`.
-- 개요의 `AMIG` 설명에는 amplitude가 나오지만, 상세 정의와 코드에서 **AMIG는 주파수**, 경계 진폭은 **EMO**다. `PER=2π/AMIG`와 시간 인수에 곱하는 위치를 함께 확인한다. `docs/user_guide/model_configuration/tides/index.rst:29–32`; `docs/technical_reference/parameter_definitions/index.rst:789–801`; `src/read_input.F:3431–3441`; `src/gwce.F:1638–1649`.
-
-위 `docs/`·`src/`의 루트는 `models/ADCIRC/raw/source_code/adcirc/`다. 2026-09-14 웹 조회에서도 개요의 같은 표현을 확인했다. 이 두 불일치의 대조를 문서 사이트 전체의 정확성 판정으로 확대하지 않는다.
-
-### 입력 품질 확인표
-
-다음은 [위키의 입력 품질 기준](../../../../BUILD-PLAN.md)에 따른 확인 계획이다. 실제 자료값을 채우는 공간은 coastal-runs이며, 이 노트는 일반 절차와 출처를 제공한다.
-
-| 확인 대상 | 설정 전에 확보·대조할 증거 | 현재 확인 수준/미확정 |
-|---|---|---|
-| 조석 DB·분조 정의 | 제품명·판본·문서 절·분조 목록·각주파수·해수면 조석/하중 조석의 변수 의미·단위 | ADCIRC 소비 형식만 확인. FES/NAO/TPXO의 판본별 정의는 `source-needed` |
-| 지형·좌표·기준면 | 지형과 조석·관측 자료의 좌표/기준면·수심 부호·변환 이력; fort.14 노드와 원자료 대응 | [fort.14 구조](https://adcirc.github.io/adcirc/technical_reference/input_files/fort14.html) 및 [수심 노트](../adcirc-bathymetry-input-foundation.md)로 진입. 개별 데이터 미확인 |
-| 공간·시간 범위와 해상도 | 경계 노드가 제품 유효 영역에 포함되는지, 연안 mask/격자 해상도, 제품의 대표 기간·허용 예측 시각과 실행/관측 기간 | 사용할 자료가 미선정. 범위 밖·외삽·대표성 불확실성을 기록해야 함 |
-| 결측·품질·오차 | 품질 플래그·결측값·제공기관의 오차/불확실성 정의; 제외·대체·보간 정책과 근거 | 형식이 유효해도 품질 통과로 취급하지 않음; 제품별 원문 `source-needed` |
-| 분조·노드 순서 | NBFR 헤더와 각 분조 블록, 분조당 NETA개 행을 fort.14의 경계 구간/구간 내 순서와 대조 | 아래 §A 및 `src/mesh.F:1822–1834`, `src/read_input.F:3431–3456,3485–3497`. 실제 입력 대조 미수행 |
-| 위상·시각·노달보정 | 위상 부호/기준 경도·시간대·epoch, STATIM/REFTIM과 FF/FACE 기준; 제공 제품이 이미 포함한 보정과 별도 보정의 중복 여부 | ADCIRC 시간/부호는 §D/F에서 한정 대조. 외부 규약은 `source-needed` |
-| 변환·보간의 독립 확인 | 원 격자점과 변환 결과를 대조하고, 별도 계산 또는 제공기관 예측과 몇 위치·시각의 재합성을 비교. 해안 mask·위상 주기 경계 처리의 방법/오차를 기록 | 확인 방법은 계획. 특정 보간법·도구의 적합성/성능은 아직 확정하지 않음 |
-| 퍼텐셜·SAL·초기 강제 | 경계 수위와 퍼텐셜/SAL을 구분한 선택 이유, NTIP/NTIF·분조·입력파일·ramp·초기시각의 정합 | §A/F와 [퍼텐셜의 한정 대조](adcirc-tide-forcing-implementation.md). SAL/full-formula 전체 재검증은 미수행 |
-
-### 실행 확인에서 확보할 것
-
-1. 실행파일의 코드 판본·빌드 옵션, 입력파일 버전, 실행 명령과 종료 상태를 고정한다. 입력 검사와 계산 경로 확인을 분리한다([BUILD-PLAN §4–6](../../../../BUILD-PLAN.md)).
-2. `fort.16`의 NTIP 선택 및 NBFR 분조·노드·진폭·위상 echo를 입력과 대조한다. `src/read_input.F:1717–1731,3431–3435,3485–3497`은 로그 생성 위치다. echo만으로 내부 계산 경로의 실행이나 물리 적합성을 확정하지 않는다.
-3. 순수 주기 수위 경계 예제에서는 선택한 경계점·시각의 출력과 §A/D/F 합성을 대조한다. ramp와 함께 작동하는 다른 경계 항이 있으면 그 항까지 확인해야 한다. 합성 코드의 위치는 `src/gwce.F:1638–1649`이며 **이번에 이 대조 실행은 하지 않았다**.
-4. 출력의 정점·변수·시간 범위와 간격을 확인한다. 조화분해는 강제 입력의 NBFR와 별도로 NFREQ·NAMEFR·HAFREQ/HAFF/HAFACE, THAS/THAF·NHAINC 및 출력 위치 선택을 확인한다. `fort.51`은 지정 수위 정점의 진폭/위상 출력이다. 근거: `docs/technical_reference/parameter_definitions/index.rst:1140–1177,1191–1213`; `docs/technical_reference/output_files/fort51.rst:1–23`. 여기서는 세부 출력 형식 코드의 전체 유효값을 확정하지 않는다.
-
-### 수치 검증과 물리 검증의 분리
-
-- **회귀 예제**: 공식 testsuite의 `adcirc_quarterannular-2d-netcdf`는 `test_list.yaml:423–434`에 정의돼 있다. `test_runner/adcirc_test/adcirctest.py:429–445`는 지정된 `control/` 파일과 계산 출력을 비교한다. testsuite 판본은 `72bb573073ea89e538890f9352dd8e92bae562f5`, 루트는 `models/ADCIRC/raw/source_code/adcirc-testsuite/`다. 이 케이스의 `adcirc/adcirc_quarterannular-2d-netcdf/fort.15:15,31–44`는 **NTIP=0, NTIF=0, NBFR=1(M2)**로 경계 조석을 지정한다. 즉 이 입력 예제에서 경계 조석과 퍼텐셜은 별도 선택이다. 기준 출력과 일치했다는 주장에는 실제 실행 결과가 필요하다.
-- **수치 검증**: 사용할 해석해/기준해의 식·조건·출처, 물수지/보존 진단, 격자·시간간격 민감도와 오차 기준을 결과 전에 정한다. 회귀검사의 기본 tolerance를 해역의 물리 오차 기준으로 사용하지 않는다. 현재 기준해 대조와 허용오차 선정은 미수행이다([BUILD-PLAN §4–6](../../../../BUILD-PLAN.md)).
-- **물리 검증**: 경계·보정에 사용한 자료와 독립적인 관측/실험을 구분하고, 정점/기간·기준면·시간대·결측·관측오차를 확인한다. 비교할 진폭·주기적인 위상 차이·시계열 오차의 정의와 허용 범위, 분조 분리와 분석창의 근거를 먼저 확보한다. 일반 조화분해 이론은 [조석 분석 방법](../../../../concepts/tides/03-analysis-methods.md), ADCIRC 관측검증 권고는 `docs/user_guide/model_configuration/tides/index.rst:57–65`다. **관측자료·분석 세부 절차·목적별 허용오차는 `source-needed`**이며 관측 대조를 수행했다고 쓰지 않는다.
-
-이 묶음의 다음 완료 조건은 외부 자료 규약·변환/보간 확인 방법과 사용할 기준해/관측·오차 기준의 출처를 확보하는 것이다. 실제 실행·검증 완료 판정에는 별도의 재현 가능한 결과가 필요하며, 개인 결과는 [coastal-runs 채널](../../../../RUNS-CHANNEL.md)에 둔다.
 
 ## Scope
 
