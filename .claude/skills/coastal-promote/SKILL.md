@@ -1,6 +1,6 @@
 ---
 name: coastal-promote
-description: research/inbox/_archive 항목을 concepts/<topic>/ 또는 models/<MODEL>/web-refs/manual-notes/source-analysis/ 의 정확한 위치로 promote. 분류→사용자 승인→본문 edit + archive 역추적 마킹. citation_status 자동 verified 부여 금지. 트리거: "promote", "inbox 정리", "W## archive promote".
+description: research/inbox/_archive 자료의 canonical 편입에 사용한다. 분류안과 출처 상태를 확인하고 승인된 항목을 편입한다.
 ---
 
 # coastal-promote

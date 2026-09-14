@@ -21,7 +21,7 @@
 
 모델별 행동 특성 차이를 흡수하기 위한 공통 작업 규범이다. 위 절대 규칙과 충돌하면 절대 규칙이 우선한다.
 
-1. **명시 지시 없이는 수정하지 않는다.** 읽기·조사·보고가 기본값. 요청 범위를 임의로 넓히거나 좁히지 않는다. 인접한 개선점이 보이면 실행 대신 보고한다. 애매하면 신중한 동료처럼 판단하되, 해석에 따라 결과물이 달라지는 지점에서만 묻는다. (근거: 2026-07-24 total-read 사고)
+1. **현재 요청의 범위와 완료 조건을 따른다.** 조사 요청은 조사 결과까지, 변경 요청은 필요한 구현·수정·검증까지 마친다. 조사·질문만 요청된 경우 분석 대상 원문을 임의로 수정하지 않는다. 이미 허가된 범위의 되돌릴 수 있는 작업은 중간 확인 없이 계속한다. 인접 개선점은 별도로 보고하고 범위를 임의로 넓히거나 좁히지 않는다. 결과를 좌우하는 정보가 없거나 적용되는 별도 승인 조건이 충족되지 않은 경우에만 묻는다. 기존 모델 감사의 범위·사람 게이트는 유지한다. (근거: 2026-07-24 total-read 사고와 현재 사용자 지시 우선 원칙)
 2. **응답과 산출물 길이는 과제에 비례.** 노트·리포트에 요약 반복·보일러플레이트 절을 덧붙이지 않는다. 실질이 끝나면 멈춘다. 짧게 쓰려고 문장을 파편·화살표·약어로 압축하지 말고, 넣을 내용을 고르는 쪽으로 줄인다.
 3. **subagent·workflow는 요청 시에만.** 직접 몇 번의 tool call로 끝나는 일을 위임하지 않는다. 검증 목적 위임은 금지 — 검증은 4항 소관.
 4. **완료 판정은 자기신고가 아니다.** [`coastal-audit`](.claude/skills/coastal-audit/SKILL.md)의 Adversary·human gate와 [`tools/resume-gate/`](tools/resume-gate/README.md)의 `decision.json`은 모델 자기검증을 대체하는 장치가 아니라, 자기신고에 완료 권한을 주지 않기 위한 **외부 게이트**다. 모델의 자기검증 능력 향상을 이유로 제거·완화하지 않는다.
@@ -66,15 +66,16 @@
 - 새 토픽: [CONVENTIONS.md](CONVENTIONS.md) §8 (최소 시작 2파일 — 6파일 강제 없음, 템플릿은 `concepts/_template/`에서 작업내용에 맞게 복사)
 - 새 모델: `models/_template/` 복사 → `models/<model>/` (구조·필수 항목은 템플릿 자체 참조)
 
-## 작업 진입 시 우선 읽을 것
+## 작업별 문서 안내
 
-1. [README.md](README.md) — 전반
-2. [INDEX.md](INDEX.md) — 현재 채워진 항목 맵
-3. [CONVENTIONS.md](CONVENTIONS.md) — 작성 규약 (frontmatter, citation_status, canonical source)
-4. [BOUNDARY.md](BOUNDARY.md) — modeling-wiki와의 경계
-5. [textbook/POLICY.md](textbook/POLICY.md) — textbook 통합 규칙
-6. [textbook/sources.yml](textbook/sources.yml) — source_id 매니페스트
-7. [plan.md](plan.md) — 결정 기록 (Governance Decisions G1-G8 포함)
+매 작업마다 아래 문서를 모두 읽지 않는다. 필요한 문서의 관련 절을 찾고, 이미 읽은 지침은 변경되었거나 새 판단에 필요한 경우에만 다시 읽는다.
+
+- 구조를 파악할 때: [README.md](README.md)와 해당 디렉터리 README. 항목을 찾을 때는 [INDEX.md](INDEX.md)의 관련 부분.
+- 모델 기능 근거를 보강·비교·결합할 때: [BUILD-PLAN.md](BUILD-PLAN.md)의 해당 단계와 완료 조건.
+- 노트·인용·frontmatter를 바꿀 때: [CONVENTIONS.md](CONVENTIONS.md)의 해당 규칙.
+- 다른 위키와 책임 경계를 바꿀 때: [BOUNDARY.md](BOUNDARY.md).
+- 교과서를 편입·인용할 때: [textbook/POLICY.md](textbook/POLICY.md)와 [textbook/sources.yml](textbook/sources.yml)의 해당 source_id.
+- 중단 작업을 재개할 때: [plan.md의 현재 작업](plan.md#현재-작업)과 연결된 실행 기록. 과거 결정이 필요한 경우에만 해당 절을 검색한다. 현재 사용자 지시가 우선한다.
 
 ## 검색
 
@@ -85,14 +86,16 @@
 
 ## 사용자 워크플로 (santa-method)
 
+Claude 호출은 계획 작성·변경 작성·검토 모두 사용자 지정 **Fable 5.1 (`claude-fable-5-1`)**을 사용한다. 과거 Opus 지정보다 우선하며 다른 모델로 자동 대체하지 않는다. 실제 응답의 모델 정보를 확인한다.
+
 큰 산출물 작성·구조 변경 시:
-1. `plan.md`에 변경 계획 작성 (Opus, Plan mode)
+1. `plan.md`에 현재 계획 포인터 작성, 상세 계획은 해당 작업 문서에 작성 (Claude Fable 5.1, `claude-fable-5-1`)
 2. `/codex:adversarial-review`로 비판 검토
 3. 피드백 반영
-4. Opus로 실제 변경
+4. 검토를 반영하여 실제 변경 (Claude 작성 시 Fable 5.1, `claude-fable-5-1`)
 5. `/codex:review`로 최종 검토
 
-미세 노트 추가나 출처 인용 보강은 위 사이클 skip 가능.
+미세 노트 추가나 출처 인용 보강은 위 사이클 skip 가능. 검사는 변경한 주장·코드·링크에 맞춰 수행하며, 통과 뒤에는 새 변경·실패·미해결 우려가 있을 때만 확대하거나 반복한다. 적용되는 독립 검토·사람 게이트·필수 훅은 유지한다.
 
 ## 동기화
 

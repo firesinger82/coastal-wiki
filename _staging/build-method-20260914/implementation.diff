@@ -1,0 +1,245 @@
+diff --git a/.claude/skills/coastal-audit/SKILL.md b/.claude/skills/coastal-audit/SKILL.md
+index f49d6f3..26cf75d 100644
+--- a/.claude/skills/coastal-audit/SKILL.md
++++ b/.claude/skills/coastal-audit/SKILL.md
+@@ -1,6 +1,6 @@
+ ---
+ name: coastal-audit
+-description: L4 자가 감사 루프 V1 — canonical(concepts/·models/) 단언에 출처가 있는지 AI가 감사. citation_status: verified 인데 미출처 단언이 있으면 "무결성 위반" 적발(CLAUDE.md 절대규칙 #1). 라운드로빈으로 전 canonical 순환 감사, actionable finding 에 제안 패치(.patch, 미적용) 생성. report-only — canonical 절대 미수정, 사람이 게이트. 트리거: "audit", "L4 감사", "출처 감사", "citation 감사".
++description: canonical 단언의 출처 지지를 감사하고 보고서·미적용 정정안을 만든다. L4·출처·인용 감사에 사용한다.
+ ---
+ 
+ # coastal-audit
+diff --git a/.claude/skills/coastal-promote/SKILL.md b/.claude/skills/coastal-promote/SKILL.md
+index 3fcb152..2358bb5 100644
+--- a/.claude/skills/coastal-promote/SKILL.md
++++ b/.claude/skills/coastal-promote/SKILL.md
+@@ -1,6 +1,6 @@
+ ---
+ name: coastal-promote
+-description: research/inbox/_archive 항목을 concepts/<topic>/ 또는 models/<MODEL>/web-refs/manual-notes/source-analysis/ 의 정확한 위치로 promote. 분류→사용자 승인→본문 edit + archive 역추적 마킹. citation_status 자동 verified 부여 금지. 트리거: "promote", "inbox 정리", "W## archive promote".
++description: research/inbox/_archive 자료의 canonical 편입에 사용한다. 분류안과 출처 상태를 확인하고 승인된 항목을 편입한다.
+ ---
+ 
+ # coastal-promote
+diff --git a/AGENTS.md b/AGENTS.md
+index 7063a43..9c22412 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -13,11 +13,13 @@
+ 
+ ## 작업 진입 시
+ 
+-1. [plan.md 최상단 "현재 작업"](plan.md#현재-작업) 확인 — 활성 작업과 그 실행 기록의 포인터다. **현재 사용자 지시가 이 포인터보다 우선**하며, 포인터나 과거 재개 기록을 자동 실행 명령으로 해석하지 않는다.
+-2. [README.md](README.md) → [INDEX.md](INDEX.md) → 해당 디렉토리 확인
++1. 중단 작업을 재개하거나 현재 범위가 불명확할 때 [plan.md 최상단 "현재 작업"](plan.md#현재-작업)만 확인 — 활성 작업과 그 실행 기록의 포인터다. **현재 사용자 지시가 이 포인터보다 우선**하며, 포인터나 과거 재개 기록을 자동 실행 명령으로 해석하지 않는다.
++2. 작업에 필요한 문서만 읽는다. 구조 파악은 [README.md](README.md)·해당 디렉터리 README, 항목 찾기는 [INDEX.md](INDEX.md)의 관련 부분, 작성 규칙은 [CLAUDE.md](CLAUDE.md)의 문서 안내를 따른다. 이미 확인한 지침은 변경되었거나 새 판단에 필요한 경우에만 다시 읽는다.
+ 3. 새 토픽: `concepts/_template/`에서 `README.md` + `01-concept.md` 두 파일부터 ([CONVENTIONS.md §8](CONVENTIONS.md)), 02~06은 sourced claim이 생기면 추가
+ 4. 새 모델: `models/_template/` 복제
+ 
++모델 기능 근거의 구축·비교·결합은 [BUILD-PLAN.md](BUILD-PLAN.md)의 해당 단계·완료 조건을 따른다. Claude의 계획 작성·변경 작성·검토는 **Fable 5.1 (`claude-fable-5-1`)**이며 과거 Opus 규칙보다 우선한다. 다른 모델로 자동 대체하지 않고 실제 응답 모델을 확인한다.
++
+ ## 큰 변경 시 워크플로
+ 
+ `plan.md` 작성 → `/codex:adversarial-review` → 반영 → 구현 → `/codex:review`
+diff --git a/CLAUDE.md b/CLAUDE.md
+index dd82dae..3c0cc12 100644
+--- a/CLAUDE.md
++++ b/CLAUDE.md
+@@ -21,7 +21,7 @@
+ 
+ 모델별 행동 특성 차이를 흡수하기 위한 공통 작업 규범이다. 위 절대 규칙과 충돌하면 절대 규칙이 우선한다.
+ 
+-1. **명시 지시 없이는 수정하지 않는다.** 읽기·조사·보고가 기본값. 요청 범위를 임의로 넓히거나 좁히지 않는다. 인접한 개선점이 보이면 실행 대신 보고한다. 애매하면 신중한 동료처럼 판단하되, 해석에 따라 결과물이 달라지는 지점에서만 묻는다. (근거: 2026-07-24 total-read 사고)
++1. **현재 요청의 범위와 완료 조건을 따른다.** 조사 요청은 조사 결과까지, 변경 요청은 필요한 구현·수정·검증까지 마친다. 조사·질문만 요청된 경우 분석 대상 원문을 임의로 수정하지 않는다. 이미 허가된 범위의 되돌릴 수 있는 작업은 중간 확인 없이 계속한다. 인접 개선점은 별도로 보고하고 범위를 임의로 넓히거나 좁히지 않는다. 결과를 좌우하는 정보가 없거나 적용되는 별도 승인 조건이 충족되지 않은 경우에만 묻는다. 기존 모델 감사의 범위·사람 게이트는 유지한다. (근거: 2026-07-24 total-read 사고와 현재 사용자 지시 우선 원칙)
+ 2. **응답과 산출물 길이는 과제에 비례.** 노트·리포트에 요약 반복·보일러플레이트 절을 덧붙이지 않는다. 실질이 끝나면 멈춘다. 짧게 쓰려고 문장을 파편·화살표·약어로 압축하지 말고, 넣을 내용을 고르는 쪽으로 줄인다.
+ 3. **subagent·workflow는 요청 시에만.** 직접 몇 번의 tool call로 끝나는 일을 위임하지 않는다. 검증 목적 위임은 금지 — 검증은 4항 소관.
+ 4. **완료 판정은 자기신고가 아니다.** [`coastal-audit`](.claude/skills/coastal-audit/SKILL.md)의 Adversary·human gate와 [`tools/resume-gate/`](tools/resume-gate/README.md)의 `decision.json`은 모델 자기검증을 대체하는 장치가 아니라, 자기신고에 완료 권한을 주지 않기 위한 **외부 게이트**다. 모델의 자기검증 능력 향상을 이유로 제거·완화하지 않는다.
+@@ -66,15 +66,16 @@
+ - 새 토픽: [CONVENTIONS.md](CONVENTIONS.md) §8 (최소 시작 2파일 — 6파일 강제 없음, 템플릿은 `concepts/_template/`에서 작업내용에 맞게 복사)
+ - 새 모델: `models/_template/` 복사 → `models/<model>/` (구조·필수 항목은 템플릿 자체 참조)
+ 
+-## 작업 진입 시 우선 읽을 것
++## 작업별 문서 안내
+ 
+-1. [README.md](README.md) — 전반
+-2. [INDEX.md](INDEX.md) — 현재 채워진 항목 맵
+-3. [CONVENTIONS.md](CONVENTIONS.md) — 작성 규약 (frontmatter, citation_status, canonical source)
+-4. [BOUNDARY.md](BOUNDARY.md) — modeling-wiki와의 경계
+-5. [textbook/POLICY.md](textbook/POLICY.md) — textbook 통합 규칙
+-6. [textbook/sources.yml](textbook/sources.yml) — source_id 매니페스트
+-7. [plan.md](plan.md) — 결정 기록 (Governance Decisions G1-G8 포함)
++매 작업마다 아래 문서를 모두 읽지 않는다. 필요한 문서의 관련 절을 찾고, 이미 읽은 지침은 변경되었거나 새 판단에 필요한 경우에만 다시 읽는다.
++
++- 구조를 파악할 때: [README.md](README.md)와 해당 디렉터리 README. 항목을 찾을 때는 [INDEX.md](INDEX.md)의 관련 부분.
++- 모델 기능 근거를 보강·비교·결합할 때: [BUILD-PLAN.md](BUILD-PLAN.md)의 해당 단계와 완료 조건.
++- 노트·인용·frontmatter를 바꿀 때: [CONVENTIONS.md](CONVENTIONS.md)의 해당 규칙.
++- 다른 위키와 책임 경계를 바꿀 때: [BOUNDARY.md](BOUNDARY.md).
++- 교과서를 편입·인용할 때: [textbook/POLICY.md](textbook/POLICY.md)와 [textbook/sources.yml](textbook/sources.yml)의 해당 source_id.
++- 중단 작업을 재개할 때: [plan.md의 현재 작업](plan.md#현재-작업)과 연결된 실행 기록. 과거 결정이 필요한 경우에만 해당 절을 검색한다. 현재 사용자 지시가 우선한다.
+ 
+ ## 검색
+ 
+@@ -85,14 +86,16 @@
+ 
+ ## 사용자 워크플로 (santa-method)
+ 
++Claude 호출은 계획 작성·변경 작성·검토 모두 사용자 지정 **Fable 5.1 (`claude-fable-5-1`)**을 사용한다. 과거 Opus 지정보다 우선하며 다른 모델로 자동 대체하지 않는다. 실제 응답의 모델 정보를 확인한다.
++
+ 큰 산출물 작성·구조 변경 시:
+-1. `plan.md`에 변경 계획 작성 (Opus, Plan mode)
++1. `plan.md`에 현재 계획 포인터 작성, 상세 계획은 해당 작업 문서에 작성 (Claude Fable 5.1, `claude-fable-5-1`)
+ 2. `/codex:adversarial-review`로 비판 검토
+ 3. 피드백 반영
+-4. Opus로 실제 변경
++4. 검토를 반영하여 실제 변경 (Claude 작성 시 Fable 5.1, `claude-fable-5-1`)
+ 5. `/codex:review`로 최종 검토
+ 
+-미세 노트 추가나 출처 인용 보강은 위 사이클 skip 가능.
++미세 노트 추가나 출처 인용 보강은 위 사이클 skip 가능. 검사는 변경한 주장·코드·링크에 맞춰 수행하며, 통과 뒤에는 새 변경·실패·미해결 우려가 있을 때만 확대하거나 반복한다. 적용되는 독립 검토·사람 게이트·필수 훅은 유지한다.
+ 
+ ## 동기화
+ 
+diff --git a/CONVENTIONS.md b/CONVENTIONS.md
+index 46f915a..33c5d12 100644
+--- a/CONVENTIONS.md
++++ b/CONVENTIONS.md
+@@ -79,7 +79,7 @@ verification_date: YYYY-MM-DD
+ 
+ 다음 문서는 정책·메타 성격이라 frontmatter 의무 면제:
+ 
+-- `README.md`, `CLAUDE.md`, `AGENTS.md`, `INDEX.md`, `plan.md`, `CONVENTIONS.md`, `BOUNDARY.md`
++- `README.md`, `CLAUDE.md`, `AGENTS.md`, `INDEX.md`, `plan.md`, `BUILD-PLAN.md`, `CONVENTIONS.md`, `BOUNDARY.md`
+ - 각 디렉토리의 `README.md`
+ - `_template/` 내 파일
+ - `textbook/POLICY.md`, `textbook/INDEX.md`, `textbook/sources.yml`
+diff --git a/README.md b/README.md
+index 5430c08..d9c959e 100644
+--- a/README.md
++++ b/README.md
+@@ -10,6 +10,12 @@
+ - **연결**: `examples/` — 개념을 가로지르는 통합 실습.
+ - **유보**: `experience/` — 모델링 경험에서 객관화·논리정밀화 검증을 통과한 정보만. 객관 레이어가 어느 정도 자리잡은 후 추가.
+ 
++## 구축 목적과 방법
++
++모델 기능을 올바르게 설정·수행하고 수치적·물리적 적합성을 판단할 근거를 구축한다. 기능·입력자료·매뉴얼·방정식·코드·실행 확인을 연결한 뒤, 준비된 근거로 모델 간 비교·분석·결합을 진행한다. 문서상 지원, 코드 구현, 실제 실행, 수치·물리 검증의 확인 수준을 구분한다.
++
++구축 순서·범위·종료 조건은 [BUILD-PLAN.md](BUILD-PLAN.md)를 따르며 기존 개념 중심 구조를 유지한다.
++
+ ## 핵심 규칙
+ 
+ 1. **객관 레이어 우선**. 개인 경험은 `experience/`에만, 그것도 통과 기준 만족 후.
+@@ -87,12 +93,12 @@
+ - [.claude/skills/coastal-audit/SKILL.md](.claude/skills/coastal-audit/SKILL.md) — 감사 절차(Adversary·human gate)
+ - [.claude/skills/coastal-promote/SKILL.md](.claude/skills/coastal-promote/SKILL.md) — `research/inbox`·`_archive` → canonical promote 절차
+ 
+-## 우선 읽을 문서
++## 작업별 문서 안내
+ 
+-- [CLAUDE.md](CLAUDE.md) — Claude 진입점
+-- [AGENTS.md](AGENTS.md) — Codex 진입점
+-- [INDEX.md](INDEX.md) — 전체 맵
+-- [CONVENTIONS.md](CONVENTIONS.md) — 작성 규약 (frontmatter, citation_status, canonical source)
+-- [BOUNDARY.md](BOUNDARY.md) — modeling-wiki와의 경계 정책
+-- [plan.md](plan.md) — 결정 기록 (Governance Decisions G1-G8 포함)
+-- [textbook/POLICY.md](textbook/POLICY.md), [textbook/sources.yml](textbook/sources.yml) — textbook 통합 정책 + 매니페스트
++- 에이전트 작업 규칙: [CLAUDE.md](CLAUDE.md)·[AGENTS.md](AGENTS.md). 이미 확인한 규칙은 변경되었거나 새 판단에 필요할 때 다시 읽는다.
++- 기능 근거 구축·비교·결합: [BUILD-PLAN.md](BUILD-PLAN.md)의 해당 단계.
++- 항목 찾기: [INDEX.md](INDEX.md)의 관련 부분과 해당 디렉터리 README.
++- 노트·인용·상태 편집: [CONVENTIONS.md](CONVENTIONS.md)의 해당 규칙.
++- 다른 위키와 책임 경계를 바꿀 때: [BOUNDARY.md](BOUNDARY.md).
++- 중단 작업 재개·과거 결정 확인: [plan.md](plan.md)의 현재 작업이나 해당 결정 절.
++- 교과서 편입·인용: [textbook/POLICY.md](textbook/POLICY.md)·[textbook/sources.yml](textbook/sources.yml)의 해당 항목.
+--- /dev/null
++++ b/BUILD-PLAN.md
+@@ -0,0 +1,89 @@
++# BUILD-PLAN — 모델 기능 근거 구축 계획 (2026-09-14)
++
++상태: 사용자 지시에 따라 Fable 5.1 작성·검토와 Codex 비판 검토를 거쳐 채택한 운영 계획. 과학 내용의 사람 승인이나 모델 완료 판정은 아니다. 작성 초안은 Claude Fable 5.1(`claude-fable-5-1`), 검토 보완은 Codex이며 [검토 기록](_staging/build-method-20260914/README.md)에 근거를 보존한다.
++
++## 1. 목적
++
++위키가 답해야 할 사슬은 하나다. 모델이 무엇을 할 수 있는가 → 그 기능을 올바르게 설정하고 입력을 준비하는 법 → 매뉴얼·식·코드·실행 경로가 서로 맞는가 → 수치·물리적으로 적합한가 → 그 위에서 모델 간 비교·분석·결합. 각 단계의 근거는 앞 단계에 기대므로, 뒤 단계를 먼저 채우지 않는다. 개념 우선 구조([concepts/](concepts/) 1차 축, [models/](models/) 2차 축)와 [CONVENTIONS.md](CONVENTIONS.md)의 출처·citation_status·canonical 분리, 기존 사람 게이트는 그대로 유지한다. 배경 조사는 [준비 상태 보고](_staging/model-readiness-20260913/README.md), [지침 점검](_staging/instruction-review-20260914/README.md), [목적 검토](research/digests/2026-09-12-wiki-purpose-review.md)다.
++
++## 2. 모델 기능 지도
++
++모델마다 공식 문서가 나열하는 기능 목록(물리 과정·경계/강제 입력·수치 옵션·실행 모드)을 먼저 지도화한다. 지도는 각 모델 README의 기존 목차를 활용하고 공식 매뉴얼의 전체 기능 분류와 대응시킨다. README는 탐색 포인터를 두고, 실제 지원 기능·판본의 단언은 frontmatter와 출처를 갖춘 기존 모델 노트에 둔다. 개별 경계·forcing 목록은 그 아래의 부분 근거로 연결한다. 기능마다 포함·보류·대상외 중 하나와 그 이유, 기준 판본을 적는다. 일부 질문에 맞춰 고른 기능만으로 모델 전체를 정리했다고 쓰지 않는다. 지도가 있다는 사실과 각 기능의 근거가 준비되었다는 판정은 다르다.
++
++## 3. 기능별 근거 묶음
++
++기능 하나의 근거 묶음은 기존 노트와 링크의 집합이다. 매뉴얼 절(manual-notes), 일반 지배식·이산화(concepts 또는 theory 노트)와 모델 고유 식·옵션(models), 코드 대응(source-analysis `file:line`), 입력 형식과 단위·기준면·시간 규약, 알려진 한계·버전 차이, 공개 검증 절차의 위치를 연결한다. 새 파일을 기능마다 만들지 않고, 기존 노트에 절·링크를 보강한다. 묶음은 다른 기능·모델 비교에서 재사용하며, 재사용 시 원 노트의 갭·미승인 정정 상태를 함께 가져간다.
++
++## 4. 근거 수준
++
++문서상 지원과 코드상 구현, 실제 실행, 수치 검증, 물리 검증은 서로 다른 증거다. 새로 보강하는 근거 묶음에는 아래 표의 수준명으로 어느 부분을 확인했는지 서술한다. 기존 노트 전체에 표기 개편을 소급하지 않고, citation_status에 새 enum을 만들지 않는다.
++
++| 수준 | 무엇을 확인 | 근거 형태 | 기록 위치 |
++|---|---|---|---|
++| 문서 지원 | 매뉴얼·논문이 기능과 조건을 기술 | source_id·페이지, 판본 | manual-notes, web-refs |
++| 코드 구현 | 문서 기술이 코드에 있고 옵션·기본값이 일치 | `file:line`, 판본 태그 | source-analysis |
++| 실행 확인 | 특정 입력으로 해당 경로가 실제로 돌았음 | 재현 가능한 설정·로그 위치 | coastal-runs, 위키에는 절차·조건만 |
++| 수치 검증 | 해석해·기준해·보존량, 격자·시간간격 민감도 | 기준·오차·출처를 비교 전 확정 | 공개 근거는 models/concepts, 재현 절차는 examples; 개인 결과는 runs/experience 규칙 |
++| 물리 검증 | 관측·실험과의 비교, 적용 조건 | 독립 검증자료·불확실성·기준; 보정에 쓴 자료와 구분 | 공개 논문/검증 사례는 models/concepts, 개인 경험만 experience(3조건) |
++| 입력 품질·불확실성 | 지형·경계·강제 자료의 출처·단위·시공간 범위·해상도·결측·오차 | 원자료 품질, 변환/보간·좌표/기준면/시간 규약, 독립 확인·미확정 항목 | 해당 기능 노트에 확인 방법, 개별 자료의 실제 결과는 runs |
++
++실행 로그만으로 물리 타당성을 주장하지 않는다. 실행·검증 근거는 실제 수행했을 때만 기록하며, 수행 예정을 완료로 쓰지 않는다. 검증 기준과 허용 오차는 결과를 보기 전에 정하고, 미확정이면 미확정이라고 적는다.
++
++## 5. 자료 수집과 판독
++
++수집은 목적 주도다. 어떤 기능·주장에 필요한지 먼저 적고 그 원문 범위를 확보한다. 선택한 범위는 식·조건·한계·버전까지 충실히 읽고, 읽지 않은 부분을 이름만 보고 판정하지 않는다. 동봉 파일 전량 소진은 기본 공정이 아니다. 모델 driver·옵션·MPI 실행 경로는 포함하되 부속 MPI/Jumpshot·범용 라이브러리 내부로 확대하지 않는다([CLAUDE.md](CLAUDE.md) 범위 통제). 원문 확보 여부와 판독 여부를 구분하며, 서지만 확인한 논문은 그렇게 표시한다.
++
++## 6. 준비 경계와 완료 조건
++
++준비는 기능과 주장 범위별로 판정한다. 문헌·구현 설명의 준비, 재현 가능한 실행 절차의 준비, 특정 입력으로 수행한 수치·물리 검증을 구분하여 실제 확인 수준을 함께 쓴다. 문헌·구현 설명의 준비 조건은 다음과 같다.
++
++- 핵심 주장마다 출처·조건·판본이 연결되어 있다.
++- 사용할 주장을 바꾸는 문서·코드 모순은 해소하고 적용되는 검토·결정을 마쳤다. 미해결 주장은 확정 근거로 쓰지 않는다.
++- 입력 규약(단위·기준면·위상/시간 기준·노드 순서)이 원문에 대조되어 있다.
++- 남은 외부 자료 갭과 그 영향을 열거하고, 주장에 필요한 갭은 해소했다.
++
++실행 절차 준비에는 입력의 유효성·옵션 활성·기대한 출력/진단의 확인 방법이 필요하다. 실제 실행·수치·물리 검증의 완료에는 §4의 해당 실측 근거가 추가로 필요하다. 필요한 근거가 없으면 그 수준은 미완이다. 중요 갭이 남으면 그 기능의 해당 주장은 미완이다. 보고서를 썼다는 사실이 준비 완료를 대체하지 않는다. N/A는 근거가 있을 때만 쓴다. 기능 묶음의 완료와 모델 전체 완료는 별개이며, 완료율 같은 수치로 진행을 표시하지 않는다. 유용한 연결을 시작하기 위해 13개 모델 전체 감사 완료를 요구하지 않는다.
++
++## 7. 비교·결합 시작 조건
++
++비교 노트의 한 행은 참여 모델의 해당 기능 묶음이 §6 조건을 채운 뒤에만 확정 서술로 채운다. 근거 없는 행은 비워 두거나 갭으로 표시한다. 링크가 해석된다는 사실과 내용이 서로 맞는다는 판정을 구분한다. 실제 결합(coupling)은 비교와 별도로 다음 계약을 확인한다: 변수 의미와 단위, 좌표계·기준면, 시간 기준·시간 간격, 해상도·보간, 전달량의 보존, 피드백 방향과 중복 물리. 계약 확인 없이 결합 결과를 물리 검증으로 쓰지 않는다. 새 비교 노트를 먼저 늘리는 작업은 잡지 않는다.
++
++## 8. 운영 규칙
++
++[지침 점검](_staging/instruction-review-20260914/README.md)의 권고를 다음처럼 적용한다. 과학 근거 요구를 약화하는 근거로는 쓰지 않는다.
++
++- 작업별 최소 읽기. 진입 문서는 작업 종류에 맞는 문서·절만 안내하고, 전체 plan·INDEX 선행 읽기를 요구하지 않는다.
++- 스킬 설명은 적용할 작업을 좁고 정확하게 안내한다. 일반 지침 점검을 L4 출처 감사로 오인하지 않는다. 기존 자동 선택 설정은 유지하고 설명만 정비한다.
++- 여러 단계 작업은 실행자가 목표·대상·완료 조건·제한을 먼저 정리한다. 단순 수정마다 새 계획서를 요구하지 않는다. 조사 요청은 조사 결과까지, 변경 요청은 구현·검사까지 완료한다. 조사·질문만 요청된 경우 분석 대상 원문을 임의로 수정하지 않는다.
++- 이미 허가된 되돌릴 수 있는 작업은 계속 진행한다. 사람 결정이 실제 필요하면 검토 가능한 변경안을 완성한 뒤 그 지점에서 요청한다.
++- 검사는 변경 규모에 비례한다. 통과 뒤에는 새 변경·실패·미해결 우려가 있을 때만 검사를 반복한다. 필수 훅·resume-gate·사람 게이트는 유지한다.
++- Claude의 계획 작성·변경 작성·검토 모델은 Fable 5.1(`claude-fable-5-1`), 비판·최종 검토는 Codex. 검토 대상이 달라지는 최소 단계만 수행한다.
++
++## 9. 이번 반복의 한정 변경
++
++1. 이 문서를 루트 `BUILD-PLAN.md`로 설치.
++2. [README.md](README.md): 목적·계획 포인터 추가, 진입 안내를 상황별로 전환.
++3. [AGENTS.md](AGENTS.md)·[CLAUDE.md](CLAUDE.md): 지침 점검의 [미적용 패치](_staging/instruction-review-20260914/proposed-instructions.patch) 반영. 본문 게이트·범위 통제 유지, 작성 모델 지정 갱신.
++4. [coastal-audit](.claude/skills/coastal-audit/SKILL.md)·[coastal-promote](.claude/skills/coastal-promote/SKILL.md): description만 짧고 정확하게 수정. 본문·승인 조건 불변.
++5. [CONVENTIONS.md](CONVENTIONS.md)의 governance frontmatter 예외에 BUILD-PLAN만 추가. [plan.md](plan.md) 현재 작업 절에 이 계획 포인터. 기존 미커밋 6줄과 `interfaces-20260912` 작업은 이번 커밋에서 제외·보존.
++
++전역 스킬·모델 설정, 다른 모델 노트, 감사 원장은 이번에 바꾸지 않는다.
++
++## 10. 첫 묶음: ADCIRC 조석 입력 두 노트
++
++대상은 [harmonic-prep](models/ADCIRC/source-analysis/tide/adcirc-tide-harmonic-prep.md)과 [forcing-implementation](models/ADCIRC/source-analysis/tide/adcirc-tide-forcing-implementation.md), 그리고 대조에 필요한 원문 구간뿐이다.
++
++범위: fort.14 경계 노드 순서 ↔ fort.15 NBFR/EMO/EFA 대응, 위상·시간 기준과 단위, 경계 조석과 조석 퍼텐셜의 구분, `ETRF=0` 설명 오류의 조건 보존 정정안. 외부 조석 DB 위상 규약·지역 성능·SAL 정량값은 원문 근거 확보 전까지 미확정으로 둔다.
++
++done_when:
++
++- 두 노트의 핵심 입력 절차 주장마다 출처(매뉴얼 페이지 또는 `file:line`)와 조건이 연결된다.
++- ETRF 모순이 검토된 변경안에서 해소되고, 변경안은 기존 per-claim 규칙에 따라 적용되거나 사람 결정 대기로 표시된다.
++- 남은 외부 자료 갭이 노트에 열거된다.
++- 근거 대응표와 정정안이 검토 가능한 형태로 남고, 해당 변경에 대한 독립 검토를 거친다.
++
++제외: ADCIRC 전체 감사, 외부 DB 변환기 제작, 실제 실행·물리 검증 수행 표시. 기존 정정에 대한 과거 사람 승인은 새 주장에 승계되지 않는다.
++
++## 11. 보존 사항
++
++과거 전체 모델 감사([AUDIT-LEDGER](models/AUDIT-LEDGER.md), XBeach R1–R4·불변 292파일, FUNWAVE preflight)는 범위·완료·승인 상태를 바꾸지 않으며 자동 재개하지 않는다. 개인 실행 결과는 [RUNS-CHANNEL.md](RUNS-CHANNEL.md)에 따라 coastal-runs에 두고, 위키에는 근거 위치·적용 조건·공개 검증 절차만 기록한다. 이 계획의 검토·개정 근거는 [_staging/build-method-20260914/](_staging/build-method-20260914/)에 보존하고 [plan.md](plan.md)는 현재 작업과 결정 포인터만 둔다.

@@ -1,6 +1,6 @@
 ---
 name: coastal-audit
-description: L4 자가 감사 루프 V1 — canonical(concepts/·models/) 단언에 출처가 있는지 AI가 감사. citation_status: verified 인데 미출처 단언이 있으면 "무결성 위반" 적발(CLAUDE.md 절대규칙 #1). 라운드로빈으로 전 canonical 순환 감사, actionable finding 에 제안 패치(.patch, 미적용) 생성. report-only — canonical 절대 미수정, 사람이 게이트. 트리거: "audit", "L4 감사", "출처 감사", "citation 감사".
+description: canonical 단언의 출처 지지를 감사하고 보고서·미적용 정정안을 만든다. L4·출처·인용 감사에 사용한다.
 ---
 
 # coastal-audit

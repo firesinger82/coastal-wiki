@@ -1,5 +1,7 @@
 # 작업 지침 점검 — 2026-09-14
 
+후속: 사용자 지시와 Fable 5.1 검토 후 [최종 계획](../../BUILD-PLAN.md)에 따라 수정안을 보완·반영했다. 아래 미적용 표기는 최초 점검 당시의 이력이며 원본 패치는 보존한다.
+
 **가장 먼저 바꿀 것은 모든 작업에 붙는 문서 읽기와 모호한 중단 규칙이다.** 사용자가 제공한 Eric Provencher의 글을 기준으로 저장소 진입 지침 2개, 로컬 스킬 2개의 설명·관련 규칙, 현재 검토 프롬프트를 확인했다. 모델 전수 감사나 설치된 모든 플러그인 감사로 확대하지 않았다.
 
 공식 [GPT-6 Astra 지침](https://developers.openai.com/api/docs/guides/latest-model)의 Instruction following·Initiative and follow-through·Testing and verification 절도 지침 충돌 점검, 요청한 결과까지 지속, 변경에 맞는 검사를 권한다. 이 권고는 아래 수정 방향의 참고 근거다. 모델 성능 향상을 이유로 과학 주장 검증이나 기존 사람 승인 조건을 없애는 근거로 사용하지 않는다. 사용자 제공 글의 원문 전체는 복제하지 않았다.

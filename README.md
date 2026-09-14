@@ -10,6 +10,12 @@
 - **연결**: `examples/` — 개념을 가로지르는 통합 실습.
 - **유보**: `experience/` — 모델링 경험에서 객관화·논리정밀화 검증을 통과한 정보만. 객관 레이어가 어느 정도 자리잡은 후 추가.
 
+## 구축 목적과 방법
+
+모델 기능을 올바르게 설정·수행하고 수치적·물리적 적합성을 판단할 근거를 구축한다. 기능·입력자료·매뉴얼·방정식·코드·실행 확인을 연결한 뒤, 준비된 근거로 모델 간 비교·분석·결합을 진행한다. 문서상 지원, 코드 구현, 실제 실행, 수치·물리 검증의 확인 수준을 구분한다.
+
+구축 순서·범위·종료 조건은 [BUILD-PLAN.md](BUILD-PLAN.md)를 따르며 기존 개념 중심 구조를 유지한다.
+
 ## 핵심 규칙
 
 1. **객관 레이어 우선**. 개인 경험은 `experience/`에만, 그것도 통과 기준 만족 후.
@@ -87,12 +93,12 @@
 - [.claude/skills/coastal-audit/SKILL.md](.claude/skills/coastal-audit/SKILL.md) — 감사 절차(Adversary·human gate)
 - [.claude/skills/coastal-promote/SKILL.md](.claude/skills/coastal-promote/SKILL.md) — `research/inbox`·`_archive` → canonical promote 절차
 
-## 우선 읽을 문서
+## 작업별 문서 안내
 
-- [CLAUDE.md](CLAUDE.md) — Claude 진입점
-- [AGENTS.md](AGENTS.md) — Codex 진입점
-- [INDEX.md](INDEX.md) — 전체 맵
-- [CONVENTIONS.md](CONVENTIONS.md) — 작성 규약 (frontmatter, citation_status, canonical source)
-- [BOUNDARY.md](BOUNDARY.md) — modeling-wiki와의 경계 정책
-- [plan.md](plan.md) — 결정 기록 (Governance Decisions G1-G8 포함)
-- [textbook/POLICY.md](textbook/POLICY.md), [textbook/sources.yml](textbook/sources.yml) — textbook 통합 정책 + 매니페스트
+- 에이전트 작업 규칙: [CLAUDE.md](CLAUDE.md)·[AGENTS.md](AGENTS.md). 이미 확인한 규칙은 변경되었거나 새 판단에 필요할 때 다시 읽는다.
+- 기능 근거 구축·비교·결합: [BUILD-PLAN.md](BUILD-PLAN.md)의 해당 단계.
+- 항목 찾기: [INDEX.md](INDEX.md)의 관련 부분과 해당 디렉터리 README.
+- 노트·인용·상태 편집: [CONVENTIONS.md](CONVENTIONS.md)의 해당 규칙.
+- 다른 위키와 책임 경계를 바꿀 때: [BOUNDARY.md](BOUNDARY.md).
+- 중단 작업 재개·과거 결정 확인: [plan.md](plan.md)의 현재 작업이나 해당 결정 절.
+- 교과서 편입·인용: [textbook/POLICY.md](textbook/POLICY.md)·[textbook/sources.yml](textbook/sources.yml)의 해당 항목.

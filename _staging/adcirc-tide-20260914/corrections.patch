@@ -1,0 +1,115 @@
+--- a/models/ADCIRC/source-analysis/tide/adcirc-tide-harmonic-prep.md
++++ b/models/ADCIRC/source-analysis/tide/adcirc-tide-harmonic-prep.md
+@@ -4,12 +4,22 @@
+ canonical_source: self
+ citation_status: verified
+ has_source_needed: true
+-verification_method: "ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-tide-harmonic-prep.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
++source_correction_date: 2026-09-14
++source_correction_by: "Codex — scoped source cross-reference"
++source_correction_human_approval: not-issued
++source_correction_review: "Claude Fable 5.1 — NBFR/첨자/노드/위상/시간/ETRF 변경 원문 대조; 과학적 사람 승인 아님"
++source_correction_scope: "NBFR 입력 레코드/첨자와 경계 노드 순서·위상/시간 기준, 전통 분조 경로 ETRF 항. 전체 노트 재검증·실제 실행·수치/물리 검증 아님."
++verification_method: "ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-tide-harmonic-prep.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시. 2026-09-14: NBFR 입력·노드/분조 순서·위상/시간·ETRF 항의 한정 대조, 본문 한정 대조 범위 참조. 실제 실행·수치/물리 검증 미수행."
+ note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
+ note_date: 2026-04~05 (original) / 2026-05-23 (promote)
+ verification_by: "사용자 + codex source-code analysis"
+ verification_date: 2026-04
+ ---
++
++
++## 2026-09-14 한정 대조 범위
++
++이 보강의 코드 판본은 ADCIRC `6037225ce4573efd3c1f8877a5dc908d01c199a8`이다. 아래 `src/` 인용의 루트는 `models/ADCIRC/raw/source_code/adcirc/`다. **문서 지원·코드 구현** 중 NBFR 입력, 경계 노드 전달, 위상/시간 기준, 전통 분조 경로의 ETRF 항을 대조했다. **실행 확인·수치 검증·물리 검증·개별 입력자료 품질 확인은 수행하지 않았다.** 다른 절과 외부 DB 규약은 이번 검증 범위에 포함하지 않는다. 과거 검증 이력과 이번 정정을 구분하며 이번 정정에 대한 사람 승인은 발급하지 않았다.
+ 
+ ## Scope
+ 
+@@ -35,7 +45,7 @@
+ do j = 1, NBFR
+    ELEVALPHA(j)                    ! constituent tag (printed only, no validation)
+    do i = 1, NETA
+-      EMO(i,j)  EFA(i,j)           ! amplitude (m), phase lag (deg)
++      EMO(j,i)  EFA(j,i)           ! constituent j, boundary node i; amplitude (m), phase lag (deg)
+    end do
+ end do
+ ```
+@@ -48,6 +58,8 @@
+ - `EFA` deg → rad after logging: `:3493-3497`.
+ 
+ Important: `ELEVALPHA` is **only printed** as "verification"; **no match/validation against `BOUNTAG`** (`:3485-3490`). You must keep the per-constituent ordering consistent yourself.
++
++경계 노드 순서는 전체 격자 번호의 정렬 순서가 아니다. `src/mesh.F:1822–1834`는 `K=1..NOPE`, 각 구간의 `I=1..NVDLL(K)` 순서로 `NBDV(K,I)`를 `NBD`에 이어 붙인다. 분조별 `EMO/EFA` 행은 이 순서에 맞아야 하며 `src/read_input.F:3493–3496`의 노드·진폭·위상 출력과 대조할 수 있다. 공식 [fort.15 구조](https://adcirc.github.io/adcirc/technical_reference/input_files/fort15.html)도 분조를 첫 첨자로 표기한다. 이 절의 도식은 전체 입력 파일 예제가 아니다.
+ 
+ ## B. fort.24 SAL reader
+ 
+@@ -131,6 +143,8 @@
+ TimeH = IT * DTDP + (StaTim − RefTim) * 86400
+ ```
+ (`timestep.F:251-258`).
++
++`STATIM`과 `REFTIM`은 일(day) 단위로 읽히며(`src/read_input.F:2534–2543`), 내부 `TimeH`는 초다(`src/timestep.F:257–258`). 합성은 `AMIG(J)*(TimeH−NCYC*PER(J))+FACE(J)−EFA(J,I)`이며 `EFA`는 입력의 도(degree)에서 radian으로 변환한다(`src/read_input.F:3436,3493–3496`; `src/gwce.F:1642–1649`). 실제 입력을 준비할 때 원자료의 기준시각·위상 규약·단위와 이 정의를 대조해야 한다. 이 코드 확인은 외부 DB의 규약이나 실제 변환 자료의 품질을 검증한 것이 아니다.
+ 
+ Harmonic synthesis uses `timeh`, **not** raw model time (`gwce.F:1642-1644`, `timestep.F:1532-1535`).
+ 
+@@ -172,7 +186,7 @@
+ | Combined FES + tide gauge | Boundary from FES; verify against gauges in interior |
+ | TPXO global | Similar; conventions match |
+ | Long run (>1 yr) | Document FF/FACE epoch; consider re-running with new astronomical reference quarterly |
+-| Storm hindcast (no tide) | `NTIP=0`, no NBFR block |
++| Disable tidal potential and periodic elevation forcing | `NTIP=0`; keep the required `NBFR=0` line. Any non-periodic elevation boundary data are a separate input (`src/read_input.F:1705–1731,3410–3444`; [official NBFR definition](https://adcirc.github.io/adcirc/technical_reference/parameter_definitions/index.html)). |
+ 
+ ## Working Rules
+ 
+--- a/models/ADCIRC/source-analysis/tide/adcirc-tide-forcing-implementation.md
++++ b/models/ADCIRC/source-analysis/tide/adcirc-tide-forcing-implementation.md
+@@ -4,7 +4,12 @@
+ canonical_source: self
+ citation_status: verified
+ has_source_needed: true
+-verification_method: "ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-tide-forcing-implementation.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
++source_correction_date: 2026-09-14
++source_correction_by: "Codex — scoped source cross-reference"
++source_correction_human_approval: not-issued
++source_correction_review: "Claude Fable 5.1 — NBFR/첨자/노드/위상/시간/ETRF 변경 원문 대조; 과학적 사람 승인 아님"
++source_correction_scope: "NBFR 입력 레코드/첨자와 경계 노드 순서·위상/시간 기준, 전통 분조 경로 ETRF 항. 전체 노트 재검증·실제 실행·수치/물리 검증 아님."
++verification_method: "ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-tide-forcing-implementation.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시. 2026-09-14: NBFR 입력·노드/분조 순서·위상/시간·ETRF 항의 한정 대조, 본문 한정 대조 범위 참조. 실제 실행·수치/물리 검증 미수행."
+ note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
+ note_date: 2026-04~05 (original) / 2026-05-23 (promote)
+ verification_by: "사용자 + codex source-code analysis"
+@@ -12,6 +17,11 @@
+ ---
+ 
+ # ADCIRC tide forcing — NTIP, fort.15 NBFR, fort.24 SAL
++
++
++## 2026-09-14 한정 대조 범위
++
++이 보강의 코드 판본은 ADCIRC `6037225ce4573efd3c1f8877a5dc908d01c199a8`이다. 아래 `src/` 인용의 루트는 `models/ADCIRC/raw/source_code/adcirc/`다. **문서 지원·코드 구현** 중 NBFR 입력, 경계 노드 전달, 위상/시간 기준, 전통 분조 경로의 ETRF 항을 대조했다. **실행 확인·수치 검증·물리 검증·개별 입력자료 품질 확인은 수행하지 않았다.** 다른 절과 외부 DB 규약은 이번 검증 범위에 포함하지 않는다. 과거 검증 이력과 이번 정정을 구분하며 이번 정정에 대한 사람 승인은 발급하지 않았다.
+ 
+ ## Scope
+ 
+@@ -40,13 +50,14 @@
+ [for each constituent:]
+   BOUNTAG
+   AMIG  FF  FACE
+-[blank or ELEVALPHA line]
+ [for each constituent:]
+   ELEVALPHA
+   [for each NETA boundary node:]
+     EMO  EFA   ! phase in degrees, converted to rad on read
+ ```
+ At `[file=src/read_input.F line=3431-3456, 3485-3497]`.
++
++위 블록은 반복 순서를 설명한 도식이다. 첫 첨자는 분조, 둘째는 경계 노드이며, 분조 헤더 묶음 뒤에 별도의 선택 입력 줄을 추가하지 않는다. 공식 [fort.15 형식](https://adcirc.github.io/adcirc/technical_reference/input_files/fort15.html)의 `ALPHAE`가 이 로컬 구현에서는 `ELEVALPHA`다. 각 분조의 값은 `mesh.F:1822–1834`가 `NBDV`에서 구성하는 `NBD` 순서로 대응하며 `read_input.F:3493–3496`에 노드 번호와 함께 기록된다. 실제 수위 적용은 `gwce.F:1644–1649`에서 `EMO(J,I)*FF(J)*RampElev*cos(ARG)`를 `Eta2(NBD(I))`에 더한다.
+ 
+ ### Per-timestep synthesis
+ 
+@@ -143,7 +154,7 @@
+ 2. **Phase in fort.15 is degrees** (converted to radians on read). Don't write radians.
+ 3. **NTIP=2 requires fort.24** with constituent names matching `TIPOTAG`.
+ 4. **`REFTIM` should match boundary forcing reference epoch** — typical is `STATIM=REFTIM=0` or both at simulation start time.
+-5. **`ETRF=0` disables Earth-tide reduction** — full tidal potential applied (not standard; for diagnostic only).
++5. **`ETRF(J)=0` makes that constituent’s ETRF-dependent potential coefficient zero in the traditional constituent branch.** Under `CTIP` and `.not.tidePotential%active()`, `TPMUL=RampTip*ETRF(J)*TPK(J)*FFT(J)` multiplies the potential term added to `TIP2` (`src/timestep.F:1517–1556`). This does not mean applying an unreduced full potential. `SALTMUL` is separate; open-boundary `EMO/EFA` synthesis is also separate (`src/gwce.F:1638–1650`). The full-formula `tidePotential%compute` path is a different branch (`src/timestep.F:1520–1521`); its internals are outside this correction.
+ 
+ ## Common Pitfalls
+ 
