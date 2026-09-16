@@ -29,4 +29,11 @@
 
 [선정 원문](source-index.md), [Opus 사실 추출](opus-evidence.md)·[후속 PDF/입력 판독](opus-followup.md), [실제 Opus 모델](claude-model-check.json), [논문 해시](lynch1978-provenance.json), [control header](control-metadata.json), [수식 전사 확인](analytic-expression-check.json), [판정 기록](review-disposition.md), [Codex 독립 최종 검토](codex-final-review.txt), [반영 patch](changes.patch), [설치 manifest](install-manifest.json), [사전 검사](preflight.json), [설치·보존 확인](installation-checks.json).
 
-두 canonical 문서는 후보 SHA와 일치하고 소유권/444 권한을 보존했다. 기존 미커밋 작업은 이번 커밋 대상에서 제외한다. 다섯 필수 staged validator는 커밋 훅에서 수행하며, 실제 커밋·전파 상태는 git 기록과 최종 실행 보고에 따른다. 설정 감사에서 제안한 Codex·스킬 변경은 적용하지 않았다.
+두 canonical 문서는 후보 SHA와 일치하고 소유권/444 권한을 보존했다. 기존 미커밋 작업은 이번 커밋 대상에서 제외했다. 다섯 필수 staged validator는 커밋 훅에서 모두 통과했다. 설정 감사에서 제안한 Codex·스킬 변경은 적용하지 않았다.
+
+## 세션 종료 기록 — 2026-09-16
+
+- 문서 보강과 현재 작업 포인터를 커밋 `ab749343e1220e3e9d8386a6e80c8c1acaed5a93`에 저장하고 `origin/main`에 푸시했다. 이 문서 보강의 완료 조건은 충족했다.
+- Claude는 기존 Claude Code CLI의 Claude Max 구독 인증으로 사용했다. 별도 API 키 호출은 사용하지 않았다.
+- 기존 `plan.md`의 미커밋 6줄과 `_staging/total-read/model-audit/XBeach/connectivity/interfaces-20260912/`는 별도 작업으로 그대로 보존했다.
+- 사용자 요청에 따라 여기서 종료한다. 실제 ADCIRC 실행·수치/물리 검증은 미수행이며, 향후 요청으로 재개할 때 선형 해석해와 동일한 입력·실행 환경·판정 기준부터 고정한다. 과거 전체 감사는 자동 재개하지 않는다.
