@@ -1,0 +1,19 @@
+현재 사용자는 오늘 코드 분석·자료 수집을 Claude Opus에 위임하고, 고급 추론·판단·분석은 상위 Codex가 담당하라고 명시했다. 이 요청은 과거 CLAUDE.md의 Fable 지정 중 이번 사실 추출 역할보다 우선한다. 실제 선택된 Opus로만 작업하며 다른 모델로 대체하거나 subagent를 만들지 말라.
+
+당신의 한정 역할은 ADCIRC quarter-annular 공개 예제의 원문 사실 수집이다. 파일 편집·커밋·모델 실행·환경 설치를 하지 말고 결과만 반환하라. 출처 문장이나 코드의 위치, 관찰한 값, 불확실성을 구분한다. 수치/물리 검증 완료나 과학적 사람 승인을 발급하지 말라. 이전 프로젝트 작업·다른 모델·라이브러리 내부로 범위를 넓히지 말라.
+
+로컬 판본과 범위:
+- S = models/ADCIRC/raw/source_code/adcirc/, 알려진 HEAD 6037225ce4573efd3c1f8877a5dc908d01c199a8
+- T = models/ADCIRC/raw/source_code/adcirc-testsuite/, 알려진 HEAD 72bb573073ea89e538890f9352dd8e92bae562f5
+- T/adcirc/adcirc_quarterannular-2d-netcdf/{fort.14,fort.15,control/fort.51,control/fort.53}; T/test_list.yaml:423-434; T/test_runner/adcirc_test/adcirctest.py:1-31,411-559; T/README.md:18-35
+- S/src/gwce.F:1638-1649, S/src/timestep.F의 TimeH와 RAMP 계산 구간, S/docs/technical_reference/parameter_definitions/index.rst의 NOLIFA/NOLICA/NOLICAT/NOLIBF/DRAMP/THAS/THAF/NHAINC 관련 구간만 필요한 만큼.
+
+수집할 사항:
+1. 위 입력에서 격자/수심/경계 노드 순서, 비선형/마찰/회전/조석 퍼텐셜 여부, M2 진폭/위상/주파수, 시각·ramp, 출력·조화분해 창의 정확한 값과 file:line. 공식 웹 예제의 설명과 달라지는 값은 별도 표시한다(웹 설명 hotstart 512 대 로컬 fort.15 NHSINC 1236 등).
+2. testsuite 비교의 실제 대상 여섯 파일, drop_variables 목록, numeric dtype 및 time_of 제외, assert_allclose 인수; fort.51-54 조화출력은 해당 YAML 비교 목록에 포함되는지. 저장된 control 출력의 생성 모델/빌드/판본 증거가 해당 파일에 있는지 모르면 미확인이라 한다. control이 해석해라고 추정하지 말라.
+3. 아래 공식 원문을 실제로 열어 확인하고 필요한 공개 1차 문헌의 해석해 조건/식이 어디에 있는지 찾아라. 목표는 선택한 비선형 회귀 입력과 선형 해석해의 조건 차이를 판정할 근거를 주는 것. 가능한 경우 Lynch & Gray 1978의 원문 polar quadratic-depth 구간을 확보한다. 접근 불가면 정확히 기록하고, 직접 읽은 원문 범위만 보고한다. 새 연구 주제로 확장하지 말라.
+https://adcirc.org/home/documentation/example-problems/quarter-annular-harbor-with-tidal-forcing-example/
+https://adcirc.org/home/documentation/example-problems/quarter-annular-harbor-with-tidal-forcing-example/2d-quarter-annular-harbor-with-tidal-forcing/
+공개 후보: https://ccht.ccee.ncsu.edu/analytic-solution-for-wind-driven-setup/ 의 Lynch/Gray 원문 링크. 이 페이지의 wind-driven 해를 tidal quadratic-bathymetry 해로 대체하지 말라.
+
+한국어로 다음 네 묶음만 반환: (A) 입력/코드 사실 표와 정확한 file:line, (B) 비교 계약 사실 표, (C) 직접 확인한 1차 출처 URL·해석해 적용 조건·선정 페이지/식 번호, (D) 못 확인한 항목과 문서 간 차이. 원문 전체 복제와 일반 지식 장문 설명은 불필요하다. 구현/정책 변경 권고 대신 판단에 필요한 근거를 제공하라.

@@ -1,0 +1,552 @@
+
+FILE models/ADCIRC/raw/source_code/adcirc-testsuite/README.md
+1: # ADCIRC Model Test Suite
+2: The included suite of tests has been developed to test changes to the ADCIRC model and ensure solutions are consistent across releases. This suite is run any time a change is made to the model code and must pass before the code is allowed to be integrated into the upstream repository.
+3: 
+4: These also encompass a nice set of examples for users to get acquainted with setting up and running the model.
+18: ### Running Tests
+19: The test suite uses a python test apparatus. This runner relies on a yaml file to define the testing metadata.
+20: The default test list is `test_list.yaml` and is located in the root directory fo this repository. It is possible
+21: to leverage your own tests by modifying this file or creating a new one. The test suite produces a series of plots
+22: as well to aid diagnosing any issues that may arise.
+23: 
+24: To run the full set of tests, the following command is used:
+25: ```
+26: python3 test_runner/test_runner.py --all --bin <path/to/adcirc/build> --test-yaml test_list.yaml --tolerance 0.00001 --test-root .
+27: ```
+28: 
+29: You can also run a single test by specifying the test name:
+30: ```
+31: python3 test_runner/test_runner.py --test <name_of_test> --bin <path/to/adcirc/build> --test-yaml test_list.yaml --tolerance 0.00001 --test-root .
+32: ```
+33: 
+34: Note that the default testing tolerance is 0.00001. This can be adjusted by changing the `--tolerance` flag. It may be
+35: useful to do so depending on your build settings and compiler. 
+
+FILE models/ADCIRC/raw/source_code/adcirc-testsuite/test_list.yaml
+423:   adcirc_quarterannular-2d-netcdf:
+424:     path: adcirc/adcirc_quarterannular-2d-netcdf
+425:     model: adcirc
+426:     parallel: false
+427:     hotstart: false
+428:     output_files:
+429:       - fort.61.nc
+430:       - fort.62.nc
+431:       - fort.63.nc
+432:       - fort.64.nc
+433:       - maxele.63.nc
+434:       - maxvel.63.nc
+
+FILE models/ADCIRC/raw/source_code/adcirc-testsuite/adcirc/adcirc_quarterannular-2d-netcdf/fort.14
+1:  Quarter Annular Grid - Example 1           ! ALPHANUMERIC DESCRIPTOR FOR GRID FILE                   
+2:  96  63                                     ! NE,NP - NUMBER OF ELEMENTS AND NUMBER OF NODAL POINTS   
+3:     1     60960.0         0.0    3.0480     ! NODE NO., X, Y, DEPTH
+4:     2     76200.0         0.0    4.7625
+5:     3     91440.0         0.0    6.8580
+6:     4    106680.0         0.0    9.3345
+7:     5    121920.0         0.0   12.1920
+8:     6    137160.0         0.0   15.4305
+9:     7    152400.0         0.0   19.0500
+162:  1                    ! NOPE - TOTAL NUMBER OF OPEN BOUNDARY FORCING SEGMENTS
+163:  9                    ! NETA - TOTAL NUMBER OF OPEN BOUNDARY FORCING NODES
+164:  9                    ! NUMBER OF NODES ON OPEN BOUNDARY FORCING SEGMENT 1
+165:   7                   ! BEGINNING NODE NUMBER ON OPEN BOUNDARY 1
+166:  14  
+167:  21  
+168:  28  
+169:  35  
+170:  42  
+171:  49  
+172:  56  
+173:  63                   ! ENDING NODE NUMBER ON OPEN BOUNDARY 1
+174:  1                    ! NBOU - TOTAL NUMBER OF LAND BOUNDARY SEGMENTS INCLUDING ISLAND SEGMENTS
+175:  21                   ! NVEL - TOTAL NUMBER OF LAND BOUNDARY NODES
+176:  21 0                 ! NUMBER OF NODES IN LAND BOUNDARY NO. 1 AND BOUNDARY TYPE (MAINLAND)
+177:  63                   ! BEGINNING NODE NUMBER OF LAND BOUNDARY NO. 1 
+178:  62
+179:  61
+180:  60
+181:  59
+182:  58
+183:  57
+184:  50
+185:  43
+186:  36 
+187:  29
+188:  22
+189:  15
+190:   8
+191:   1
+192:   2
+193:   3
+194:   4
+195:   5
+196:   6
+197:   7                   ! END NODE NUMBER OF BOUNDARY 1
+
+FILE models/ADCIRC/raw/source_code/adcirc-testsuite/adcirc/adcirc_quarterannular-2d-netcdf/fort.15
+1:  QUARTER ANNULAR TEST V20051108      ! 32 CHARACTER ALPHANUMERIC RUN DESCRIPTION
+2:  ADCIRC V45.07                       ! 24 CHARACTER ALPANUMERIC RUN IDENTIFICATION
+3:  0                                   ! NFOVER - NONFATAL ERROR OVERRIDE OPTION
+4:  0                                   ! NABOUT - ABREVIATED OUTPUT OPTION PARAMETER
+5:  600                                 ! NSCREEN - UNIT 6 OUTPUT OPTION PARAMETER
+6:  0                                   ! IHOT - HOT START PARAMETER
+7:  1                                   ! ICS - COORDINATE SYSTEM SELECTION PARAMETER
+8:  0                                   ! IM - MODEL SELECTION PARAMETER 
+9:  1                                   ! NOLIBF - BOTTOM FRICTION TERM SELECTION PARAMETER
+10:  1                                   ! NOLIFA - FINITE AMPLITUDE TERM SELECTION PARAMETER
+11:  1                                   ! NOLICA - SPATIAL DERIVATIVE CONVECTIVE SELECTION PARAMETER
+12:  1                                   ! NOLICAT - TIME DERIVATIVE CONVECTIVE TERM SELECTION PARAMETER
+13:  0                                   ! NWP - VARIABLE BOTTOM FRICTION AND LATERAL VISCOSITY OPTION PARAMETER
+14:  0                                   ! NCOR - VARIABLE CORIOLIS IN SPACE OPTION PARAMETER
+15:  0                                   ! NTIP - TIDAL POTENTIAL OPTION PARAMETER
+16:  0                                   ! NWS - WIND STRESS AND BAROMETRIC PRESSURE OPTION PARAMETER
+17:  1                                   ! NRAMP - RAMP FUNCTION OPTION
+18:  9.81                                ! G - ACCELERATION DUE TO GRAVITY - DETERMINES UNITS
+19:  0.005                               ! TAU0 - WEIGHTING FACTOR IN GWCE
+20:  174.656                             ! DT - TIME STEP (IN SECONDS)
+21:  0.00                                ! STATIM - STARTING TIME (IN DAYS)
+22:  0.00                                ! REFTIM - REFERENCE TIME (IN DAYS)
+23:  5.0                                 ! RNDAY - TOTAL LENGTH OF SIMULATION (IN DAYS)
+24:  2.0                                 ! DRAMP - DURATION OF RAMP FUNCTION (IN DAYS)
+25:  0.35 0.30 0.35                      ! TIME WEIGHTING FACTORS FOR THE GWCE EQUATION
+26:  1.0                                 ! H0 - MIMINMUM CUTOFF DEPTH
+27:  0.0 0.0                             ! SLAM0,SFEA0 - CENTER OF CPP PROJECTION (NOT USED IF ICS=1, NTIP=0, NCOR=0)
+28:  0.0025                              ! FFACTOR - HOMOGENEOUS LINEAR OR NONLINEAR BOTTOM FRICTION COEFFICIENT     
+29:  0.0                                 ! ESL - LATERAL EDDY VISCOSITY COEFFICIENT; IGNORED IF NWP =1
+30:  0.0                                 ! CORI - CORIOLIS PARAMETER - IGNORED IF NCOR = 1
+31:  0                                   ! NTIF - TOTAL NUMBER OF TIDAL POTENTIAL CONSTITUENTS BEING FORCED
+32:  1                                   ! NBFR - TOTAL NUMBER OF FORCING FREQUENCIES ON OPEN BOUNDARIES
+33:  M2                                  ! CONSTITUENT. 1  ALPHA DESCRIPTOR
+34:  0.000140525700000 1.0 0.0           ! CONSTITUENT. 1 FREQ., NODAL FACTOR, EQUIL. ARG. 
+35:   M2                                 ! ALPHA NUMERIC DESCRIPTION OF OPEN BOUNDARY FORCING DATA SET WHICH FOLLOWS 
+36:   0.3048  0.00                       ! BOUNDARY FORCING DATA FOR CONSTITUENT NO. 1 AT FIRST NODE
+37:   0.3048  0.00
+38:   0.3048  0.00
+39:   0.3048  0.00
+40:   0.3048  0.00
+41:   0.3048  0.00
+42:   0.3048  0.00
+43:   0.3048  0.00
+44:   0.3048  0.00                       ! BOUNDARY FORCING DATA FOR CONSTITUENT NO. 1 AT LAST NODE
+45:  110.0                               ! ANGINN : INNER ANGLE THRESHOLD
+46:  5 0.0 5.0  3                        ! NOUTE,TOUTSE,TOUTFE,NSPOOLE:ELEV STATION OUTPUT INFO (UNIT  61)
+47:  3                                   ! TOTAL NUMBER OF ELEVATION RECORDING STATIONS
+48:    80668.4   12256.0                 ! COORD. OF ELEVATION STATION
+49:   126205.2   10686.9        
+50:    51131.1   88884.3
+51:  5 0.0 5.0  3                        ! NOUTV,TOUTSV,TOUTFV,NSPOOLV:VEL STATION OUTPUT INFO (UNIT  62)
+52:  3                                   ! TOTAL NUMBER OF VELOCITY RECORDING STATIONS
+53:    80668.4   12256.0                 ! COORD. OF VELOCITY STATION
+54:   126205.2   10686.9        
+55:    51131.1   88884.3
+56:  5 0.0 5.0 3                         ! NOUTGE,TOUTSGE,TOUTFGE,NSPOOLGE : GLOBAL ELEVATION OUTPUT INFO (UNIT  63)
+57:  5 0.0 5.0 3                         ! NOUTGV,TOUTSGV,TOUTFGV,NSPOOLGV : GLOBAL VELOCITY  OUTPUT INFO (UNIT  64)    
+58:  1                                   ! NHARFR - NUMBER OF CONSTITUENTS TO BE INCLUDED IN THE HARMONIC ANALYSIS
+59:  M2                                  ! HAFNAM(I) - ALHPANUMERIC DESCRIPTION OF HARMONIC CONSTITUENT I=1
+60:  0.0001405257 1.0 0.0                ! HAFREQ(I=1),HAFF(I=1),HAFACE(I=1)
+61:  4.00  5.00  1  0.0                  ! THAS,THAF,NHAINC,FMV - HARMONIC ANALYSIS PARAMETERS         
+62:  1 1 1 1                             ! NHASE,NHASV,NHAGE,NHAGV - CONTROL HARMONIC ANALYSIS AND OUTPUT TO UNITS 51,52,53,54
+63:  5 1236                               ! NHSTAR,NHSINC - HOT START FILE GENERATION PARAMETERS                  
+64:  1  0  1.E-10  25                     ! ITITER, ISLDIA, CONVCR, ITMAX - ALGEBRAIC SOLUTION PARAMETERS
+65:  ADCIRC Test Suite
+66:  ADCIRC
+67:  CircleCI
+68:  NONE
+69:  ADCIRC.org
+70:  NONE
+71:  Github
+72:  CF3
+73:  github.com/adcirc
+74:  2020-04-28 00:00:00
+
+FILE models/ADCIRC/raw/source_code/adcirc-testsuite/test_runner/adcirc_test/adcirctest.py
+1: import logging
+2: from typing import Tuple, Union, ClassVar
+3: 
+4: import cartopy.crs as ccrs
+5: import cartopy.feature as cfeature
+6: import numpy as np
+7: import xarray as xr
+8: from matplotlib.tri import Triangulation
+9: 
+10: logger = logging.getLogger(__name__)
+11: 
+12: 
+13: class AdcircTest:
+14:     """
+15:     Class to run an ADCIRC test based on a test yaml file
+16:     """
+17: 
+18:     # List of variables dropped to be read in by xarray
+19:     ADCIRC_DROP_VARIABLES_LIST: ClassVar = [
+20:         "neta",
+21:         "nvel",
+22:         "nvdll",
+23:         "max_nvdll",
+24:         "ibtype",
+25:         "nbdv",
+26:         "nvell",
+27:         "nbvv",
+28:         "ibtypee",
+29:         "max_nvell",
+30:     ]
+31: 
+411:     def check_results(self, has_hotstart: bool, is_hotstart: bool) -> Tuple[bool, list]:
+412:         """
+413:         Check the results of the test based on the test yaml file
+414: 
+415:         Args:
+416:             has_hotstart: If the test has a hotstart
+417:             is_hotstart: If the test is a hotstart
+418: 
+419:         Returns:
+420:             Tuple of (True if the test passed, False otherwise, list of error files)
+421:         """
+422:         import os
+423: 
+424:         all_passed = True
+425:         error_files = []
+426: 
+427:         test_directory = self.__get_test_directory(has_hotstart, is_hotstart)
+428: 
+429:         for file in self.__test_yaml["output_files"]:
+430: 
+431:             logger.info(f"Checking file: {file}")
+432: 
+433:             control_file = os.path.join(test_directory, "control", file)
+434:             test_file = os.path.join(test_directory, file)
+435: 
+436:             if not os.path.exists(control_file):
+437:                 msg = f"Control file {control_file} does not exist"
+438:                 raise FileNotFoundError(msg)
+439: 
+440:             if not os.path.exists(test_file):
+441:                 msg = f"Test file {test_file} does not exist"
+442:                 raise FileNotFoundError(msg)
+443: 
+444:             # Compare the files
+445:             passed = self.__compare_files(control_file, test_file, self.__tolerance)
+446:             if not passed:
+447:                 all_passed = False
+448:                 error_files.append(test_file.split("/")[-1].split("\\")[-1])
+449: 
+450:         if not all_passed:
+451:             logger.error(f"Test {self.__test} failed.")
+452:             logger.error(f"Error files: {error_files}")
+453:         else:
+454:             logger.info(f"Test {self.__test} passed")
+455: 
+456:         return all_passed, error_files
+457: 
+458:     @staticmethod
+459:     def __compare_files(control_file: str, test_file: str, tolerance: float) -> bool:
+460:         """
+461:         Compare the control and test files
+462: 
+463:         Args:
+464:             control_file: Name of the control file
+465:             test_file: Name of the test file
+466:             tolerance: Tolerance for the comparison
+467: 
+468:         Returns:
+469:             True if the files match within spec, False otherwise
+470:         """
+471:         if control_file.endswith(".nc") and test_file.endswith(".nc"):
+472:             return AdcircTest.__compare_files_netcdf(control_file, test_file, tolerance)
+473:         else:
+474:             return AdcircTest.__compare_files_ascii(control_file, test_file, tolerance)
+475: 
+476:     @staticmethod
+477:     def __compare_files_netcdf(
+478:         control_file: str, test_file: str, tolerance: float
+479:     ) -> bool:
+480:         """
+481:         Compare the control and test files in netcdf format
+482: 
+483:         Args:
+484:             control_file: Name of the control file
+485:             test_file: Name of the test file
+486:             tolerance: Tolerance for the comparison
+487: 
+488:         Returns:
+489:             True if the files match within spec, False otherwise
+490:         """
+491:         control = xr.open_dataset(
+492:             control_file,
+493:             drop_variables=AdcircTest.ADCIRC_DROP_VARIABLES_LIST,
+494:             decode_times=False,
+495:         )
+496:         test = xr.open_dataset(
+497:             test_file,
+498:             drop_variables=AdcircTest.ADCIRC_DROP_VARIABLES_LIST,
+499:             decode_times=False,
+500:         )
+501: 
+502:         passed_test = AdcircTest.__compare_datasets(control, test, tolerance)
+503: 
+504:         control.close()
+505:         test.close()
+506: 
+507:         return passed_test
+508: 
+509:     @staticmethod
+510:     def __compare_datasets(
+511:         control: xr.Dataset, test: xr.Dataset, tolerance: float
+512:     ) -> bool:
+513:         """
+514:         Compare the control and test datasets using xarray and numpy
+515: 
+516:         Args:
+517:             control: xarray dataset for the control
+518:             test: xarray dataset for the test
+519:             tolerance: Tolerance for the comparison
+520: 
+521:         Returns:
+522:             True if the datasets match within spec, False otherwise
+523:         """
+524:         import numpy.testing as npt
+525: 
+526:         passed = True
+527:         for var in control.variables:
+528:             if var not in test.variables:
+529:                 msg = f"Variable {var} not found in test file"
+530:                 raise ValueError(msg)
+531: 
+532:             # Only compare numeric types
+533:             if control[var].dtype.kind not in "fi":
+534:                 continue
+535: 
+536:             if "time_of" in var:
+537:                 continue
+538:             else:
+539:                 this_tolerance = tolerance
+540: 
+541:             # Check that the variables are the same and get the maximum difference
+542:             try:
+543:                 npt.assert_allclose(
+544:                     control[var], test[var], atol=this_tolerance, equal_nan=True
+545:                 )
+546:             except AssertionError:
+547:                 max_difference = np.nanmax(
+548:                     np.abs(control[var].to_numpy() - test[var].to_numpy())
+549:                 )
+550:                 if var != "v":
+551:                     logger.error(
+552:                         f"Error in variable: {var} with tolerance {this_tolerance} and maximum difference: {max_difference}"
+553:                     )
+554:                 else:
+555:                     logger.error(
+556:                         f"Error with tolerance {this_tolerance} and maximum difference: {max_difference}"
+557:                     )
+558:                 passed = False
+559:         return passed
+
+FILE models/ADCIRC/raw/source_code/adcirc-testsuite/adcirc/adcirc_quarterannular-2d-netcdf/control/fort.53
+1:            1
+2:      0.1405257000E-03  1.0000000   0.00000000  M2       
+3:           63
+4:            1
+5:    6.16410235E-001     27.0148
+6:            2
+7:    5.82162205E-001     21.6739
+8:            3
+9:    5.17651353E-001     16.4412
+10:            4
+11:    4.57016189E-001     10.6576
+12:            5
+13:    3.99641409E-001      6.7659
+14:            6
+15:    3.47450379E-001      2.5929
+16:            7
+17:    3.04715709E-001      0.0011
+
+FILE models/ADCIRC/raw/source_code/adcirc/src/gwce.F
+1638:       DO J=1,NBFR
+1639:          IF(PER(J).EQ.0.) THEN
+1640:             NCYC=0
+1641:          ELSE
+1642:             NCYC=INT(timeh/PER(J))
+1643:          ENDIF
+1644:          ARGJ=AMIG(J)*(timeh-NCYC*PER(J))+FACE(J)
+1645:          RFF=FF(J)*RampElev
+1646:          DO I=1,NETA
+1647:             ARG=ARGJ-EFA(J,I)
+1648:             NBDI=NBD(I)
+1649:             Eta2(NBDI)=Eta2(NBDI)+EMO(J,I)*RFF*COS(ARG)
+1650:          END DO
+1651:       END DO
+
+FILE models/ADCIRC/raw/source_code/adcirc/src/timestep.F
+247: 
+248: C...  COMPUTE MASTER TIME WHICH IS REFERENCED TO THE BEGINNING TIME OF
+249: C...  THE MODEL RUN
+250: C...
+251: C...  TIMEH: HARMONIC CALCULATIONS ARE MADE FOR TIME WHICH INCLUDES THE REFTIM
+252: C...  TO ALLOW FOR THE POSSIBILITY THAT THE EQUILIBRIUM ARGUMENTS MAY
+253: C...  BE FOR A TIME OTHER THAN THE MODEL STARTING TIME.
+254: C...  
+255: C...  Computation of TimeLoc and TimeH are consolidated. SB,ZC,RL 2022-06-22
+256: C...
+257:       TimeLoc=IT*DTDP + StaTim*86400.D0
+258:       TimeH=IT*DTDP + (StaTim - RefTim)*86400.D0
+301:          Ramp=TANH((2.D0*TimeLoc/86400.D0)/DRamp)
+302:          RampExtFlux=TANH((2.D0*TimeLoc/86400.D0)/DRampExtFlux)
+303:          RampIntFlux=TANH((2.D0*TimeLoc/86400.D0)/DRampIntFlux)
+304:          RampElev=TANH((2.D0*TimeLoc/86400.D0)/DRampElev)
+305:          RampTip=TANH((2.D0*TimeLoc/86400.D0)/DRampTip)
+306:          RampMete=TANH((2.D0*(TimeLoc/86400.D0-DUnRampMete))/DRampMete)
+307:          RampWRad=TANH((2.D0*TimeLoc/86400.D0)/DRampWRad)
+308:       ENDIF
+
+FILE models/ADCIRC/raw/source_code/adcirc/src/read_input.F
+2894:       CASE(0,1)! Either no ramp, or same ramp for all forcings
+2895: C     ---------
+2896:          READ(15,*) DRamp
+2897:          DRampIntFlux=DRamp
+2898:          DRampExtFlux=DRamp
+2899:          DRampElev=DRamp
+2900:          DRampTip=DRamp
+2901:          DRampMete=DRamp
+2902:          DRampWRad=DRamp
+3628:          CASE(5)
+3629:             useNetCDF = .true.
+3630:             useNetCDFOutput = .true.
+3631:             CALL logMessage(INFO,
+3632:      &  'UNIT 61 WILL BE NETCDF CLASSIC MODEL / NETCDF4 (HDF5) FORMAT.')
+3633:          CASE(4,6:)
+3634:             write(scratchMessage, '(A,I0,A)') 'NOUTE value of ', NOUTE,
+3635:      &                           " is invalid for elevation recording station output."
+3636:             call terminate(exit_code=ADCIRC_EXIT_FAILURE, message=scratchMessage)
+3757:          CASE(5)
+3758:             useNetCDF = .true.
+3759:             useNetCDFOutput = .true.
+3760:             CALL logMessage(INFO,
+3761:      &  'UNIT 62 WILL BE NETCDF CLASSIC MODEL / NETCDF4 (HDF5) FORMAT.')
+4143:          CASE(5)
+4144:             useNetCDF = .true.
+4145:             useNetCDFOutput = .true.
+4146:             CALL logMessage(INFO,
+4147:      &         'UNIT 63 FORMAT WILL BE NETCDF CLASSIC MODEL'
+4148:      &         //' / NETCDF4 (HDF5) FORMAT.')
+4217:          CASE(5)
+4218:             useNetCDF = .true.
+4219:             useNetCDFOutput = .true.
+4220:             CALL logMessage(INFO,
+4221:      &         'UNIT 64 FORMAT WILL BE NETCDF CLASSIC MODEL'
+4222:      &         //' / NETCDF4 (HDF5) FORMAT.')
+4508:       READ(15,*) NHSTAR,NHSINC
+4509: 
+4510:       CALL logMessage(INFO,'HOT START OUTPUT INFORMATION : ')
+4511:       WRITE(scratchMessage,'("NHSTAR=",I3," NHSINC=",I8,".")')
+4512:      &      NHSTAR, NHSINC
+4513:       CALL logMessage(ECHO,scratchMessage)
+4514: C
+4515: C     ! Only output hotstart once at first NHSINC 
+4516:       IF (NHSTAR.lt.-1) then
+4517:          NHOUTONCE = .true.
+4518:          NHSTAR = -NHSTAR
+4519:       endif
+4520: 
+4521:       SELECT CASE(NHSTAR)
+4522:       CASE(0)
+4523:          CALL logMessage(INFO,'HOT START OUTPUT WILL NOT BE GENERATED.')
+4524:       CASE(1,67,68)
+4525:          CALL logMessage(INFO,'HOT START OUTPUT WILL BE GENERATED'
+4526:      &        //' IN NON-PORTABLE BINARY FORMAT.')
+4527:       CASE(-1)  !tcm v51.26 added for time-stamped hotstart files
+4528:          CALL logMessage(INFO,'HOT START OUTPUT WILL BE GENERATED'
+4529:      &        //' IN NON-PORTABLE BINARY FORMAT IN TIME-STAMPED FILES.')
+4530:       CASE(3,367,368)
+4531:          useNetCDF = .true.
+4532:          CALL logMessage(INFO,'HOT START OUTPUT WILL BE GENERATED'
+4533:      &        //' IN PORTABLE NETCDF CLASSIC / NETCDF3 FORMAT.')
+4534:       CASE(5,567,568)
+4535:          useNetCDF = .true.
+4536:          CALL logMessage(INFO,'HOT START OUTPUT WILL BE GENERATED'
+4537:      &        //' IN PORTABLE NETCDF CLASSIC / NETCDF4 (HDF5) FORMAT.')
+4538:       CASE DEFAULT
+4539:          CALL terminate(exit_code=ADCIRC_EXIT_FAILURE, message="Input value of NHSTAR is invalid.")
+4540:       END SELECT
+4541: 
+4542:       IF((NHSINC.EQ.0).AND.(NHSTAR.NE.0)) THEN
+4543:          CALL terminate(exit_code=ADCIRC_EXIT_FAILURE,
+4544:      &                  message="Invalid input value of NHSINC is 0 but the input value of NHSTAR is nonzero")
+4545:       ENDIF
+4546: C
+4547:       WRITE(16,34636) NHSINC
+4548: 34636 FORMAT(/,5X,'HOT START OUTPUT WILL BE WRITTEN TO UNIT',
+4549:      &        ' 67 OR 68 EVERY ',I10,' TIME STEPS')
+
+FILE models/ADCIRC/raw/source_code/adcirc/docs/technical_reference/parameter_definitions/index.rst
+383: 
+384: .. _NOLIBF:
+385: 
+386: NOLIBF
+387:    Parameter controlling the type of bottom stress parameterization used in a 2DDI ADCIRC run. This parameter must be specified but is ignored in a 3D run. Note: In the NWP section, if the user selects quadratic_friction_coefficient_at_sea_floor, mannings_n_at_sea_floor, or chezy_friction_coefficient_at_sea_floor, then NOLIBF must be 1 (nonlinear friction formulation) since all those formulations are nonlinear. If the NOLIBF were anything other than 1, it is an error that will cause ADCIRC to stop.
+388: 
+389:    = 0 linear bottom friction law. The friction coefficient (FFACTOR) is specified below.
+390: 
+391:    = 1 quadratic bottom friction law. The friction coefficient (FFACTOR) is specified below.
+392: 
+393:    = 2 hybrid nonlinear bottom friction law. In deep water, the friction coefficient is constant and a quadratic bottom friction law results. In shallow water the friction coefficient increases as the depth decreases (e.g. as in a Manning-type friction law). The friction coefficient is determined as: FFACTOR=FFACTORMIN*[1+(HBREAK/H)**FTHETA]**(FGAMMA/FTHETA). The required parameters (FFACTORMIN, HBREAK, FTHETA, FGAMMA) are specified below.
+394: 
+395:    For 3D ADCIRC runs, spatially varying bottom friction should be specified using the bottom_roughness_length nodal attribute.
+396: 
+397: .. _NOLIFA:
+398: 
+399: NOLIFA
+400:    Parameter controlling the finite amplitude terms in ADCIRC. The value of NOLIFA effects the meaning of the minimum water depth parameter(H0) and requires the specification of additional parameters together with H0, (see below). When the finite amplitude terms are turned on, the time derivative portion of the advective terms should also be turned on for proper mass conservation and consistency (i.e. when NOLIFA>0, then NOLICAT=1).
+401: 
+402:    = 0 finite amplitude terms ARE NOT included in the model run (i.e., the depth is linearized by using the bathymetric depth, rather than the total depth, in all terms except the transient term in the continuity equation) and wetting and drying of elements is disabled. Initial water depths are assumed equal to the bathymetric water depth specified in the grid file (fort.14).
+403: 
+404:    = 1 finite amplitude terms ARE included in the model run and wetting and drying of elements is disabled. Initial water depths are assumed equal to the bathymetric water depth specified in the grid file (fort.14).
+405: 
+406:    = 2 finite amplitude terms ARE included in the model run and wetting and drying of elements is enabled. Initial water depths are assumed equal to the bathymetric water depth specified in the grid file (fort.14).
+407: 
+408: .. _NOLICA:
+409: 
+410: NOLICA
+411:    Parameter controlling the advective terms in ADCIRC (with the exception of a time derivative portion that occurs in the GWCE form of the continuity equation and is controlled by NOLICAT). When these (spatial derivative) portions of the advective terms are included, the time derivative portion of the advective terms in the GWCE should also be included (i.e. when NOLICA=1, NOLICAT=1).
+412: 
+413:    = 0 advective terms ARE NOT included in the computations
+414: 
+415:    = 1 advective terms ARE included in the computations
+416: 
+417:    The NOLICA and NOLICAT parameters by themselves will activate or deactivate the advective terms over the full domain; however, these terms can also be activated or deactivated on an element-by-element basis. Please see the definition of the advection_state nodal attribute in the documentation for the Nodal Attributes File (fort.13) for details.
+418: 
+419: .. _NOLICAT:
+420: 
+421: NOLICAT
+422:    Parameter controlling the time derivative portion of the advective terms that occurs in the GWCE form of the continuity equation in ADCIRC. The remainder of the advective terms in the GWCE and the entire advective terms in the momentum equation are controlled by NOLICA. These terms should be included if either the finite amplitude or the remainder of the advective terms are included to maintain mass conservation and solution consistency.
+423: 
+424:    = 0 the time derivative portion of the advective terms that occur in the GWCE continuity equation ARE NOT included in the computations.
+425: 
+426:    = 1 the time derivative portion of the advective terms that occur in the GWCE continuity equation ARE included in the computations.
+427: 
+428:    The NOLICA and NOLICAT parameters by themselves will activate or deactivate the advective terms over the full domain; however, these terms can also be activated or deactivated on an element-by-element basis. Please see the definition of the advection_state nodal attribute in the documentation for the Nodal Attributes File (fort.13) for details.
+
+FILE models/ADCIRC/raw/manuals/website_markdown/home/documentation/example-problems/quarter-annular-harbor-with-tidal-forcing-example/index.md
+405: # Quarter Annular Harbor with Tidal Forcing Example
+406: 
+407: This example problem was developed to assess the performance of finite element numerical schemes applied to the shallow-water equations (Lynch and Gray, 1979). The problem contains spatially varying geometry and bathymetry, simultaneously tests the model in both horizontal coordinate directions, is radially symmetric and permits analytical solutions for the linear 2DDI and 3D problems (Lynch and Gray, 1978, Lynch and Officer, 1985). Poor numerical schemes will show spurious modes (oscillations) and/or excessive numerical dissipation for this problem.
+408: 
+409: **PROBLEM SETUP:** The problem geometry is shown in Fig. E1.1. The domain consists of a quarter of an annulus enclosed with land boundaries on three sides and an open ocean boundary on the outer edge. The inner radius has r1 = 60,960 m and the outer radius has r2 = 152,400 m. The bathymetric depth along the inner radius is h1 = 3.048 m and drops quadratically (h= h1r2/r12) to the outer radius where h2 = 19.05 m. The finite element grid is shown in Fig. E1.2 (including both node and element numbers). The discretization uses a radial spacing of 15,240 m and an angular spacing of 11.25 deg.
+410: 
+411: ![](https://adcirc.org/wp-content/uploads/sites/2255/2018/11/Ex1_F1.png "Ex1_F1")  
+412: [![](https://adcirc.org/wp-content/uploads/sites/2255/2018/11/Ex1_F2.png "Ex1_F2")](https://adcirc.org/wp-content/uploads/sites/2255/2018/11/Ex1_F2.png)
+413: 
+414: **ADCIRC INPUT:** Two input files are required by ADCIRC to run this test problem. Their format and contents are described in detail in the input file section of the user’s manual. A very brief summary follows. The Grid and Boundary Information File (fort.14) indicates that the grid contains 96 elements and 63 nodes. This information is followed by tables of nodal information (node number, horizontal coordinates and depth) and elemental information (element number, number of nodes in an element and node numbers that comprise the element). An elevation specified (open) boundary (1 segment that contains 9 nodes beginning with node number 7 and ending with node number 63) and a normal flow (zero normal flow) mainland boundary (1 segment that contains 21 nodes beginning with node 63 and ending with node 7) complete the file. The Model Parameter and Periodic Boundary Condition File (fort.15) indicates that the model is started from a state of rest (cold started), a Cartesian coordinate system is specified, finite amplitude, advection and quadratic bottom friction nonlinearities are included, tidal potential or wind stress forcings are not active, and gravity is in units of m/s2 (indicating distance units of meters and velocity units of m/s). The elevation boundary is forced with a spatially uniform sinusoidal elevation having a period of 44,712 s (~12.42 hrs), amplitude of 0.3048 m, and phase of 0 deg. This forcing is ramped up over the first two days of the run. The run lasts for 5 days using a time step of 174.656 s. Model water level and velocity time series are output every three time steps at 3 locations in the domain and every three time steps at all nodes in the domain. Every time step over the final day of the run, the model elevation and velocity fields are harmonically analyzed to extract one constituent (M2). Hot start files are generated every 512 time steps during the course of the simulation.
+415: 
+416: **ADCIRC OUTPUT:** This example run will generate 10 files containing various forms of output information. Their format and contents are described in detail in the output file section of the user’s manual. A very brief summary follows. The General Diagnostic Output file (fort.16) echo prints much of the information from the input files, provides information on processing of input data by ADCIRC and records error messages from ADCIRC. The Iterative Solver ITPACKV 2D Diagnostic Output file (fort.33) contains diagnostic information from the solver if it has difficulty converging. Normally, this file is empty on completion of a model run. The Elevation Harmonic Constituents at Specified Elevation Recording Stations file (fort.51) contains harmonic constituent data for elevation for the specified constituents at the three specified elevation recording stations. The Depth-averaged Velocity Harmonic Constituents at Specified Velocity Recording Stations file (fort.52) contains harmonic constituent data for velocity for the specified constituents at the three specified velocity recording stations. The Elevation Harmonic Constituents at All Nodes in the Model Grid file (fort.53) contains harmonic constituent data for elevation for the specified constituents at all nodes in the domain. The Depth-averaged Velocity Harmonic Constituents at All Nodes in the Model Grid file (fort.54) contains harmonic constituent data for velocity for the specified constituents at all nodes in the domain. The Elevation Time Series at Specified Elevation Recording Stations file (fort.61) contains elevation time series output every 3 time steps at the three specified elevation recording stations. The Depth-averaged Velocity Time Series at Specified Velocity Recording Stations file (fort.62) contains velocity time series output at every 3 time steps at the three specified velocity recording stations. The Elevation Time Series at All Nodes in the Model Grid file (fort.63) contains elevation time series output every 3 time steps at all nodes in the domain. The Depth-averaged Velocity Time Series at All Nodes in the Model Grid file (fort.64) contains velocity time series output every 3 time steps at all nodes in the domain. Finally, limited run time information is printed on the screen during model execution. In addition to the 10 files described above, ADCIRC also outputs two Hot Start Output files (fort.67, fort.68).
+417: 
+418: **[2D Test Case](https://adcirc.org/home/documentation/example-problems/quarter-annular-harbor-with-tidal-forcing-example/2d-quarter-annular-harbor-with-tidal-forcing/)**
+419: 
+420: **[3D Test Case](https://adcirc.org/home/documentation/example-problems/quarter-annular-harbor-with-tidal-forcing-example/3d-quarter-annular-harbor-with-tidal-forcing/)**
+421: 
+422: References  
+423: Lynch, D.R., and W.G. Gray. 1978. Analytical solutions for computer flow model testing. ASCE Journal of the Hydraulics Division. 104:1409-28.
+424: 
+425: Lynch, D.R. and W.G. Gray. 1979. A wave equation model for finite element tidal computations. Computers and Fluids. 7:207-228.
+426: 
+427: Lynch, D.R. and C.B. Officer. 1985. Analytic test cases for three-dimensional hydrodynamic models. International Journal of Numerical Methods in Fluids. 5:529-543.

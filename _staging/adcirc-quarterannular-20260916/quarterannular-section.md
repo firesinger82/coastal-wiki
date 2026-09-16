@@ -1,0 +1,67 @@
+<a id="quarterannular-reference-contract"></a>
+
+## 공개 quarter-annular 예제의 기준과 비교 계약 (2026-09-16)
+
+이 절은 **공식 예제 설명·입력·비교 코드의 한정 대조**다. ADCIRC를 실행하거나 해석해 오차·수렴률·관측 적합성을 측정한 결과가 아니다. S는 위 ADCIRC 판본, T는 `models/ADCIRC/raw/source_code/adcirc-testsuite/`의 `72bb573073ea89e538890f9352dd8e92bae562f5`다. 아래 Q는 T의 `adcirc/adcirc_quarterannular-2d-netcdf/`를 뜻한다.
+
+### 기준해와 저장된 control 출력의 역할
+
+[공식 quarter-annular 설명][quarterannular-official]은 방사 대칭의 수심 변화 영역에서 **선형 2DDI·3D 문제의 해석해**가 가능하다고 설명한다. 같은 페이지의 실행 예제는 유한 진폭·이류·이차 저면마찰을 포함한다고 명시한다. Q의 `fort.15:8–12,28–30`도 해당 비선형 항을 켜고 회전 계수를 0으로 지정한다. 따라서 선형 해석해가 존재한다는 사실을 이 비선형 입력의 정확한 기준해가 확보됐다는 뜻으로 쓰지 않는다. 해석해와 계산을 비교하려면 지배식·마찰·강제·초기/경계 조건을 먼저 맞춰야 한다(앞 두 근거에서 도출한 적용 조건).
+
+T는 릴리스 사이의 계산 일관성을 확인하는 testsuite다(`README.md:1–4`). 이 케이스의 자동 비교 기준은 Q의 `control/`에 저장된 출력이며, 비교기는 해석해를 계산하지 않는다(`test_runner/adcirc_test/adcirctest.py:429–445`). 저장된 control을 독립 관측이나 해석해로 표시하지 않는다. 해석해의 원문·조건은 다음 절에 연결했으며, **그 조건을 맞춘 ADCIRC 실행과 수치 검증은 미완(`source-needed`)**이다.
+
+### 선형 조석해: 원문 조건과 이차 수심의 특수형
+
+[Lynch & Gray (1978)][lynch1978-polar]의 선정 판독 범위는 인쇄면 1410–1412, 1414–1415(PDF 3–5, 7–8쪽)다. 식 (1)–(2)는 이류를 제외하고 미소 수위 진동·상수 선형 마찰률 $\tau$를 사용하는 수심평균 선형 방정식이다. 판독한 운동량식에는 Coriolis 항이 없다. 극좌표 조석 문제는 바람 없는 성분을 따로 풀며, $h=H_0r^n$, 안쪽 $r_1$과 측면 $\theta=0,\phi$에서 무유량, 바깥 $r_2$에서 $\Re\{\zeta_0(\theta)e^{i\omega t}\}$를 준다(식 (6)–(9)). 이 해는 주기 조석 응답이며 cold-start와 ramp를 포함한 전 시간 이력의 해가 아니다.
+
+원문의 식 (20)–(25)를 **$n=2$, 각도에 무관한 한 분조 경계($j=0$)**로 제한하면 다음과 같이 무차원 반경으로 정리할 수 있다. 이는 원문 멱함수 해와 두 반경 경계조건에서 도출한 표기이며 새로운 실측 결과가 아니다. $A$는 바깥 경계의 복소 진폭, $H_0=h_1/r_1^2$, $\omega>0$이며 $x=r/r_1$, $x_2=r_2/r_1$로 둔다.
+
+$$
+\beta^2=\frac{\omega^2-i\omega\tau}{gH_0},\qquad
+m_\pm=-1\pm\sqrt{1-\beta^2},\qquad
+B(x)=m_-x^{m_+}-m_+x^{m_-}.
+$$
+
+$$
+Z(r)=A\frac{B(r/r_1)}{B(x_2)},\qquad
+\eta(r,t)=\Re\{Z(r)e^{i\omega t}\},\qquad
+U_r(r)=-\frac{g}{\tau+i\omega}\frac{dZ}{dr}.
+$$
+
+$U_r$는 방사 방향 수심평균 속도의 복소 진폭이며 $u_r=\Re\{U_re^{i\omega t}\}$, 각도 방향 속도는 0이다. 속도식은 원문의 운동량식 (2)에서 도출했다. 이 표기는 $m_+\ne m_-$, $B(x_2)\ne0$인 경우에 한정한다. 중근에는 별도의 극한형이 필요하고, 감쇠 없는 공진에서 분모가 0인 경우 유한한 주기 정상해로 사용하지 않는다. $B'(1)=0$, $Z(r_2)=A$가 두 반경 경계조건을 만족하며, $Z$는 $r^2Z''+3rZ'+\beta^2Z=0$을 따른다(식 (20a), (23), (25d–e)에서 도출).
+
+Q와 공유하는 **기하·주파수**는 $r_1=60960$ m, $r_2=152400$ m, $h_1=3.048$ m, $\phi=\pi/2$, $\omega=0.0001405257$ rad/s이며, 경계 진폭을 $A=0.3048$ m로 둘 수 있다. 그러나 원문의 $\tau$는 일정한 선형 마찰률이고 Q의 `FFACTOR=0.0025`는 이차 마찰계수다. **0.0025를 위 식의 $\tau$에 그대로 대입하지 않는다.** 또한 `NOLIFA/NOLICA/NOLICAT=1`인 Q를 그대로 이 선형 방정식의 입력으로 간주하지 않는다. 해석해 대조용 입력에서는 선택한 선형 항·마찰·회전·정상주기 비교창을 별도로 고정해야 한다(원문 식 (1)–(2), Q `fort.15:9–12,28–30`; S `docs/technical_reference/parameter_definitions/index.rst:383–428`).
+
+### 선택한 입력과 확인할 출력
+
+| 항목 | T 판본의 실제 입력 | 근거 |
+|---|---|---|
+| 격자·경계 | 96요소·63노드. x축의 안쪽/바깥쪽 반경은 60,960/152,400 m, 수심은 3.048/19.05 m. 수위 경계는 1구간 9노드로 `7,14,21,28,35,42,49,56,63` 순서 | Q `fort.14:1–9,162–173` |
+| 해법·강제 선택 | `IHOT=0`, `ICS=1`, `IM=0`; `NOLIBF=NOLIFA=NOLICA=NOLICAT=1`, `CORI=0`; `NTIP=NTIF=NWS=0`, `NBFR=1` | Q `fort.15:6–16,28–34` |
+| 경계 M2 | 각주파수 `0.0001405257 rad/s`, `FF=1`, `FACE=0°`; 9개 경계점 모두 `EMO=0.3048 m`, `EFA=0°`. 입력의 분조 수위와 조석 퍼텐셜 사용 여부는 별개 | Q `fort.15:31–44`; S `src/gwce.F:1638–1649` |
+| 시간·ramp | `DTDP=174.656 s`, `STATIM=REFTIM=0 day`, `RNDAY=5 day`, `NRAMP=1`, `DRAMP=2 day` | Q `fort.15:17–24` |
+| 시계열 출력 | 수위·속도 정점 각 3곳과 전체 노드 출력을 0–5 day, 3 time step 간격으로 요청. 코드/출력 시간축의 실제 시각은 별도 확인 대상 | Q `fort.15:46–57` |
+| 조화분해·재시작 | M2 한 분조, `THAS=4`, `THAF=5 day`, `NHAINC=1`, `NHASE=NHASV=NHAGE=NHAGV=1`; `NHSTAR=5`, `NHSINC=1236` | Q `fort.15:58–64` |
+
+`DRAMP=2 day`를 2일 뒤 강제가 정확히 1이 되는 선형 ramp로 읽지 않는다. S는 이 설정에서 `DRampElev=DRAMP`, `RampElev=tanh(2 TimeLoc/(86400 DRampElev))`를 사용한다. 경계 합성에는 이 계수가 곱해지고, `TimeH=IT*DTDP+(STATIM−REFTIM)*86400`이다(S `src/read_input.F:2894–2902`; `src/timestep.F:257–258,301–308`; `src/gwce.F:1638–1651`). 선형 주기해와 비교할 때에는 ramp와 초기 과도응답의 영향을 별도로 확인한다.
+
+Q의 출력 선택값 `NOUTE/NOUTV/NOUTGE/NOUTGV=5`, `NHSTAR=5`는 S의 입력 코드에서 NetCDF4(HDF5) 출력 선택으로 처리된다. 문서의 일부 값 열거만 보고 미지원이라고 판단하지 않는다. 여기서 확인한 것은 입력 분기이며 실제 출력 라이브러리 실행이 아니다(S `src/read_input.F:3628–3632,3757–3761,4143–4148,4217–4222,4534–4537`).
+
+공식 웹 설명의 hotstart 주기는 512 step이지만 선택한 T 입력은 **1236 step**이다. 웹 예제 설명을 다른 testsuite 판본의 입력값으로 그대로 복사하지 않는다([공식 설명][quarterannular-official]; Q `fort.15:63`). `fort.15:2`의 `ADCIRC V45.07`은 실행 식별 문자열이다. 아래 여섯 NetCDF control 파일의 global attribute `version`은 모두 `v56.0.1-21-gbcb79a8`, `source`는 `CircleCI`다. 이 파일 내 판본 표기는 현재 S의 코드 SHA와 구분하며, 정확한 컴파일러·빌드 옵션까지 입증하지는 않는다(근거: Q `control/{fort.61.nc,fort.62.nc,fort.63.nc,fort.64.nc,maxele.63.nc,maxvel.63.nc}`의 해당 속성).
+
+### 자동 회귀 비교가 확인하는 범위
+
+`test_list.yaml:423–434`에 등록된 출력은 `fort.61.nc`, `fort.62.nc`, `fort.63.nc`, `fort.64.nc`, `maxele.63.nc`, `maxvel.63.nc` **여섯 개**다. `fort.51`–`fort.54` 조화출력은 입력에서 요청하더라도 이 목록의 자동 비교 대상은 아니다. 필요한 분조 진폭·위상 검증은 별도로 설계해야 한다(Q `fort.15:58–62`; 위 YAML).
+
+비교기는 각 등록 파일이 control과 계산 위치에 모두 존재하는지 확인하고 NetCDF를 읽어 수치 배열을 비교한다. 기준 쪽 변수 목록을 순회하므로 기준에 없는 추가 변수의 존재를 검사하는 구조는 아니다. 수치 dtype인 `f`·`i`만 비교하고 이름에 `time_of`가 들어간 변수는 건너뛴다. `numpy.testing.assert_allclose(control[var], test[var], atol=tolerance, equal_nan=True)` 호출에서 **`rtol`은 명시하지 않는다**. 따라서 CLI의 `--tolerance`를 모든 출력의 순수 절대오차나 해역의 물리 허용오차로 해석하지 않는다. 런타임 NumPy의 상대오차 기본값과 변수 단위·제외 항목을 함께 고정해야 한다. 근거: T `test_runner/adcirc_test/adcirctest.py:429–445,491–505,527–545`; `README.md:29–35`. 읽을 때 제외하는 경계 관련 변수는 `neta, nvel, nvdll, max_nvdll, ibtype, nbdv, nvell, nbvv, ibtypee, max_nvell`이며, global attribute의 동일성을 검사하는 루프는 아니다(동 코드 `19–30,491–500,527–545`).
+
+### 실제 검증으로 이어가기 위한 조건
+
+1. **회귀 재현**: 선택한 S/T 판본, 실행파일·빌드, Python 의존성, 입력 SHA와 control SHA를 고정하고 별도 실행 공간에서 해당 한 케이스를 실행한다. 여섯 파일의 비교 결과와 종료 상태를 보존한다. 위 README의 단일 테스트 실행 인터페이스를 사용하며 vendor 원본 디렉터리를 실행 결과로 덮어쓰지 않는다.
+2. **출력/강제 확인**: 경계 노드 순서와 시각·ramp를 맞춰 M2 합성과 경계 수위 출력을 비교한다. 조화분해 진폭·위상은 요청한 분석창·분조·단위·위상 규약을 대조하고 자동 회귀 비교와 별도 결과로 기록한다. 근거: Q 입력의 위 항목들과 S `src/gwce.F:1638–1649`.
+3. **해석해 검증**: 위 원문 식·조건과 동일한 선형/마찰/강제 조건을 갖춘 입력을 별도로 고정하고 주기 응답과 대조한다. 격자·시간간격 변화에 따른 오차·보존량과 판정 기준은 실행 전에 정한다. 이는 [BUILD-PLAN §4–6](../../../../BUILD-PLAN.md)에 따른 다음 검증 조건이며 수행 기록이 아니다.
+
+현재 확보한 것은 선택한 회귀 입력과 출력 비교 계약, control 파일에 기록된 판본 표기, 선형 해석해의 원문 조건과 위 특수형이다. control의 정확한 빌드 환경, 선형 해석해와 동일 조건인 ADCIRC 입력·계산, 보존/민감도 결과, 실제 해역 관측 검증은 아직 확보하지 않았다. 이 미확인 사항을 회귀 PASS나 문서 보강 완료로 대체하지 않는다.
+
+[quarterannular-official]: https://adcirc.org/home/documentation/example-problems/quarter-annular-harbor-with-tidal-forcing-example/
+[lynch1978-polar]: https://ccht.ccee.ncsu.edu/wp-content/uploads/sites/10/2019/05/Lynch-1978-JHY.pdf

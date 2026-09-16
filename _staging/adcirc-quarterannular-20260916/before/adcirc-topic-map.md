@@ -2,11 +2,6 @@
 title: "ADCIRC 기능 지도와 근거 준비 상태"
 topic: general
 canonical_source: self
-reference_contract_date: 2026-09-16
-reference_contract_evidence_by: "Claude Opus (claude-opus-5) — 선정 원문·코드 사실 추출"
-reference_contract_by: "Codex — 근거 판정·회귀/해석해 구분·문서 보강"
-reference_contract_human_approval: not-issued
-reference_contract_scope: "quarter-annular 입력·출력 비교 계약과 해석해 적용 경계의 한정 대조. 실제 모델 실행·수치/물리 검증·기존 전체 노트 재검증 아님."
 external_evidence_date: 2026-09-14
 external_evidence_review: "Claude Fable 5.1 — 외부 제품·변환 확인 방법·독립 관측/지표 원문 대조; 과학적 사람 승인 아님"
 external_evidence_human_approval: not-issued
@@ -68,14 +63,14 @@ source_correction_human_approval: not-issued
 | 문서 지원 | 표의 공식 분류·선정 절과 조건 | 목차만 확인한 기능의 상세 지원 조건, 판본 차이 |
 | 코드 구현 | 기존 노트로 경로 연결; 조석 입력의 명시 구간만 한정 대조 | 그 외 노트의 코드/식/기본값을 실제 사용할 주장별로 재대조 |
 | 실행 확인 | [공식 예제][dexamples]·[baseline 선택](adcirc-baseline-selection.md)·[구성](adcirc-baseline-anatomy.md) 위치 | **이번 미수행**. 실행파일·입력·옵션·로그·기대한 출력의 실제 증거 |
-| 수치 검증 | [quarter-annular 입력·control·출력 비교 계약](tide/adcirc-tide-harmonic-prep.md#quarterannular-reference-contract)과 [예제 색인](../manual-notes/07-examples-index.md) | **실제 검증 미수행**. 비선형 회귀 입력과 선형 해석해의 조건을 구분. 동일 조건의 기준해·보존량·격자/시간 민감도 근거 필요 |
+| 수치 검증 | T의 회귀검사 위치와 [예제 색인](../manual-notes/07-examples-index.md) | **이번 미수행**. 회귀 일치와 별도로 해석해/기준해·보존량·격자/시간 민감도 근거 |
 | 물리 검증 | [기초 문헌 색인](../web-refs/adcirc-foundational-papers.md) §2/§4의 후보 위치 | **이번 미수행**. 색인은 첫 페이지 서지/초록 확인 범위이므로 논문 결과 대조 완료가 아님. 독립 관측·실험·오차/불확실성·적용 조건 필요 |
 | 입력 품질·불확실성 | [조석 확인 방법](tide/adcirc-tide-harmonic-prep.md#input-quality-and-validation)과 [외부 제품 원문·관측/지표 정의](tide/adcirc-tide-harmonic-prep.md#external-data-conventions) | **개별 자료 확인 미수행**. 사용할 DB/지형/관측 판본과 범위·변환·오차를 먼저 고정 |
 
 ## 조석 입력에서 시작하기
 
 1. **입력 형식·식·코드**: [harmonic-prep의 한정 대조와 확인 방법](tide/adcirc-tide-harmonic-prep.md#input-quality-and-validation). NBFR/노드순서/위상·시간, NTIP와 NTIF 구분을 읽는다. [조석 개요][dtide]의 `NTIP`·`AMIG` 설명 불일치는 상세 정의·코드에 대조한 주의사항이 이 노트에 있다.
-2. **공개 회귀 예제**: [quarter-annular의 고정 입력과 출력 비교 계약](tide/adcirc-tide-harmonic-prep.md#quarterannular-reference-contract)을 확보했다. T의 자동 비교는 저장된 control에 대한 여섯 NetCDF 출력이며, 조화출력 `fort.51`–`fort.54`는 해당 YAML 목록 밖이다. 회귀 실행·해석해 대조·독립 관측검증은 미수행이다. testsuite tolerance를 해역의 물리 허용오차로 복사하지 않는다.
+2. **실행 확인 후보**: T의 `test_list.yaml:423–434`가 `adcirc_quarterannular-2d-netcdf`와 여섯 비교 출력 파일을 지정한다. `test_runner/adcirc_test/adcirctest.py:429–445`는 해당 `control/`과 계산 출력을 대조한다. 이 회귀 일치가 독립 관측검증을 대신하지 않는다. T README의 허용오차를 해역의 물리 허용오차로 복사하지 않는다.
 3. **다른 강제 경로 후보**: [전지구 M2 예제][dglobal]는 퍼텐셜/SAL과 전지구 조화분해를 다루는 v55 이상 예제다. 개방경계 NBFR 예제와 구분한다. 그 예제의 시간간격·계수를 지역 모델 권고값으로 사용하지 않는다.
 4. **외부 자료·관측/오차 근거**: [제품별 정의·변환 대조](tide/adcirc-tide-harmonic-prep.md#external-data-conventions)와 [독립 관측·지표](tide/adcirc-tide-harmonic-prep.md#independent-observation-and-errors)를 확보했다. 다음은 사용할 DB 파일·경계·시각과 관측 정점/기간을 지정한 실제 품질·변환 확인 및 목적별 허용치다. TPXO 개별 배포 형식, SAL 물리량 대응, 기준해·보존/민감도도 미확인이다. 입력/물리 검증 준비 완료로 표시하지 않는다.
 
