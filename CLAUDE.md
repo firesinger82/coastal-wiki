@@ -4,7 +4,7 @@
 
 연안공학 도메인 지식의 **객관(canonical) 레이어**를 모은 single-writer 위키. 1차 축은 도메인 개념(concepts), 2차 축은 모델(models). 교과서(textbook)와 실습(examples)이 횡축. 개인 경험(experience)은 객관화 통과 후 별도 레이어로 추가.
 
-전반은 [README.md](README.md) 참조.
+전반은 [README.md](README.md) 참조. 요구사항·범위·운영 제약의 기준선(SSOT)은 [PROJECT_REQUIREMENTS.md](PROJECT_REQUIREMENTS.md)다. 문서 간 충돌 시 **최신 사용자 명시 지시 > PROJECT_REQUIREMENTS.md > CLAUDE.md·AGENTS.md·BUILD-PLAN.md > 기타 문서**.
 
 ## 절대 규칙 (위키 무결성)
 
@@ -23,7 +23,7 @@
 
 1. **현재 요청의 범위와 완료 조건을 따른다.** 조사 요청은 조사 결과까지, 변경 요청은 필요한 구현·수정·검증까지 마친다. 조사·질문만 요청된 경우 분석 대상 원문을 임의로 수정하지 않는다. 이미 허가된 범위의 되돌릴 수 있는 작업은 중간 확인 없이 계속한다. 인접 개선점은 별도로 보고하고 범위를 임의로 넓히거나 좁히지 않는다. 결과를 좌우하는 정보가 없거나 적용되는 별도 승인 조건이 충족되지 않은 경우에만 묻는다. 기존 모델 감사의 범위·사람 게이트는 유지한다. (근거: 2026-07-24 total-read 사고와 현재 사용자 지시 우선 원칙)
 2. **응답과 산출물 길이는 과제에 비례.** 노트·리포트에 요약 반복·보일러플레이트 절을 덧붙이지 않는다. 실질이 끝나면 멈춘다. 짧게 쓰려고 문장을 파편·화살표·약어로 압축하지 말고, 넣을 내용을 고르는 쪽으로 줄인다.
-3. **subagent·workflow는 요청 시에만.** 직접 몇 번의 tool call로 끝나는 일을 위임하지 않는다. 검증 목적 위임은 금지 — 검증은 4항 소관.
+3. **위임은 아래 [역할 분담](#역할-분담-claude--codex)의 Codex 계약으로.** 그 밖의 subagent·workflow는 요청 시에만 쓴다. 직접 몇 번의 tool call로 끝나는 일은 위임하지 않는다. 검증 *실행*(테스트·검사·evidence 수집)은 Codex에 맡길 수 있으나 완료 *판정*은 위임하지 않는다 — 판정은 4항 소관.
 4. **완료 판정은 자기신고가 아니다.** [`coastal-audit`](.claude/skills/coastal-audit/SKILL.md)의 Adversary·human gate와 [`tools/resume-gate/`](tools/resume-gate/README.md)의 `decision.json`은 모델 자기검증을 대체하는 장치가 아니라, 자기신고에 완료 권한을 주지 않기 위한 **외부 게이트**다. 모델의 자기검증 능력 향상을 이유로 제거·완화하지 않는다.
 5. **자기수정은 짧게.** 사용자의 판단·코드·결론을 바꾸는 오류만 정정하고 계속 진행한다. 경위 서술·자책·오류 집계는 하지 않는다. 후속 질문이 곧 지적은 아니다 — 물은 것에 답한다.
 6. **장기 작업은 첫 턴에 전체 사양을.** 자율·다단계 작업(전수 감사, 마이그레이션, 파일럿)은 목표·제약·완료조건을 처음에 모두 주는 편이 여러 턴에 걸쳐 점증적으로 지시하는 것보다 결과가 낫다. 사용자·AI 양쪽에 해당.
@@ -84,16 +84,36 @@
 - 토픽·상태 필터: frontmatter 검색 — `rg "citation_status: verified" -l ~/coastal-wiki`
 - 큰 출력은 `ctx_execute(language: "shell", code: "rg ...")` 경유
 
-## 사용자 워크플로 (santa-method)
+## 역할 분담 (Claude ↔ Codex)
 
-Claude 호출은 계획 작성·변경 작성·검토 모두 사용자 지정 **Fable 5.1 (`claude-fable-5-1`)**을 사용한다. 과거 Opus 지정보다 우선하며 다른 모델로 자동 대체하지 않는다. 실제 응답의 모델 정보를 확인한다.
+2026-09-19 사용자 지시. 기본 역할이며 기계적으로 적용하지 않는다.
+
+- **Claude = Lead / Planner / Reviewer** — objective·scope 관리, 요구사항 해석, 작업 분해, engineering/content decision, acceptance criteria·stop condition 설정, Codex 결과 검증, 최종 판단.
+- **Codex = Executor / Investigator** — 저장소 조사, 코드·문서 수정, 반복 작업, 테스트·검증 실행, evidence 수집, bounded task 결과 반환.
+
+Codex 위임 우선: 대량 파일 조사, 여러 파일에 걸친 수정, 반복적 refactor, 테스트·검증, 코드 구현, 로그·데이터 분석. Claude가 직접 하는 편이 더 싸고 단순한 소규모 작업은 위임하지 않아도 된다.
+
+Codex 호출은 항상 다음 계약으로 한다.
+
+```
+OBJECTIVE:      달성할 결과
+SCOPE:          대상 경로·파일, 허용 동작(읽기/쓰기), 금지 사항
+STOP CONDITION: 종료 조건. 범위 밖 판단이 필요하면 확대하지 않고 Claude에게 반환
+DELIVERABLE:    반환 형식(diff·표·로그 요약)과 근거(파일:줄·명령 출력)
+```
+
+Codex 결과는 그대로 채택하지 않는다. Claude가 evidence와 [PROJECT_REQUIREMENTS.md](PROJECT_REQUIREMENTS.md)·이 문서·[CONVENTIONS.md](CONVENTIONS.md)에 대조해 검증한 뒤 판단한다.
+
+**`models/` 잠금**: `models/`는 root 소유 읽기 전용이며 현재 운영 제약으로 유지한다. Claude·Codex 모두 우회하지 않는다. 절차: 기본 잠금 → 변경안(diff/script) 생성 → 사용자 승인 → 사용자 sudo 적용 → `validate-all` → 결과 검증 → 재잠금 ([PROJECT_REQUIREMENTS.md](PROJECT_REQUIREMENTS.md#models-잠금-절차)).
+
+**Claude 모델 지정** (역할 규칙과 별개 설정): 현재 기본 모델은 **Fable 5.1 (`claude-fable-5-1`)**. 자동 fallback 금지 — 다른 모델로 대체하지 않고 실제 응답의 모델 정보를 확인한다. 모델명은 사용자 지시로 변경하며, 사용자가 특정 작업에 한해 승인한 예외는 그 작업에만 적용된다.
 
 큰 산출물 작성·구조 변경 시:
-1. `plan.md`에 현재 계획 포인터 작성, 상세 계획은 해당 작업 문서에 작성 (Claude Fable 5.1, `claude-fable-5-1`)
-2. `/codex:adversarial-review`로 비판 검토
-3. 피드백 반영
-4. 검토를 반영하여 실제 변경 (Claude 작성 시 Fable 5.1, `claude-fable-5-1`)
-5. `/codex:review`로 최종 검토
+1. `plan.md`에 현재 계획 포인터, 상세 계획·acceptance criteria는 해당 작업 문서에 작성 (Claude)
+2. `/codex:adversarial-review`로 계획 비판 검토, Claude가 반영 여부 판단
+3. 구현을 Codex에 bounded task로 위임 (`models/`는 diff/script까지)
+4. Claude가 결과 검증 — diff·검사 출력·요구사항 대조
+5. 사람 게이트(해당 시 sudo 적용·승인) 후 커밋
 
 미세 노트 추가나 출처 인용 보강은 위 사이클 skip 가능. 검사는 변경한 주장·코드·링크에 맞춰 수행하며, 통과 뒤에는 새 변경·실패·미해결 우려가 있을 때만 확대하거나 반복한다. 적용되는 독립 검토·사람 게이트·필수 훅은 유지한다.
 

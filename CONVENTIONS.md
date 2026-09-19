@@ -79,7 +79,7 @@ verification_date: YYYY-MM-DD
 
 다음 문서는 정책·메타 성격이라 frontmatter 의무 면제:
 
-- `README.md`, `CLAUDE.md`, `AGENTS.md`, `INDEX.md`, `plan.md`, `BUILD-PLAN.md`, `CONVENTIONS.md`, `BOUNDARY.md`
+- `README.md`, `CLAUDE.md`, `AGENTS.md`, `INDEX.md`, `plan.md`, `BUILD-PLAN.md`, `CONVENTIONS.md`, `BOUNDARY.md`, `PROJECT_REQUIREMENTS.md`
 - 각 디렉토리의 `README.md`
 - `_template/` 내 파일
 - `textbook/POLICY.md`, `textbook/INDEX.md`, `textbook/sources.yml`

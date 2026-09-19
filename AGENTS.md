@@ -1,6 +1,6 @@
 # coastal-wiki — Codex/Agents 진입점
 
-상세는 [CLAUDE.md](CLAUDE.md), [README.md](README.md) 참조. 이 파일은 thin pointer.
+상세는 [CLAUDE.md](CLAUDE.md), [README.md](README.md) 참조. 요구사항·범위·운영 제약 기준선은 [PROJECT_REQUIREMENTS.md](PROJECT_REQUIREMENTS.md) (충돌 시 최신 사용자 명시 지시 > PROJECT_REQUIREMENTS.md > CLAUDE.md·AGENTS.md·BUILD-PLAN.md > 기타). 이 파일은 thin pointer.
 
 ## 핵심 규칙 (재인용)
 
@@ -18,8 +18,10 @@
 3. 새 토픽: `concepts/_template/`에서 `README.md` + `01-concept.md` 두 파일부터 ([CONVENTIONS.md §8](CONVENTIONS.md)), 02~06은 sourced claim이 생기면 추가
 4. 새 모델: `models/_template/` 복제
 
-모델 기능 근거의 구축·비교·결합은 [BUILD-PLAN.md](BUILD-PLAN.md)의 해당 단계·완료 조건을 따른다. Claude의 계획 작성·변경 작성·검토는 **Fable 5.1 (`claude-fable-5-1`)**이며 과거 Opus 규칙보다 우선한다. 다른 모델로 자동 대체하지 않고 실제 응답 모델을 확인한다.
+모델 기능 근거의 구축·비교·결합은 [BUILD-PLAN.md](BUILD-PLAN.md)의 해당 단계·완료 조건을 따른다.
+
+**역할** ([CLAUDE.md 역할 분담](CLAUDE.md#역할-분담-claude--codex)): Claude = Lead / Planner / Reviewer, Codex = Executor / Investigator. Codex는 OBJECTIVE / SCOPE / STOP CONDITION / DELIVERABLE 계약 범위에서 조사·수정·검사를 수행하고 evidence와 함께 반환한다. 범위 밖 판단이 필요하면 작업을 확대하지 않고 Claude에게 반환한다. `models/`는 root 잠금 — 우회하지 않고 diff/script까지만 만든다. Claude 모델 지정은 CLAUDE.md를 따른다.
 
 ## 큰 변경 시 워크플로
 
-`plan.md` 작성 → `/codex:adversarial-review` → 반영 → 구현 → `/codex:review`
+Claude 계획(`plan.md` 포인터 + 작업 문서) → `/codex:adversarial-review`(계획 비판) → Claude 반영 판단 → Codex 구현(bounded task, `models/`는 diff/script까지) → Claude 검증 → 사람 게이트 → 커밋
