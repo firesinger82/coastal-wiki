@@ -1,0 +1,37 @@
+--- a/prep/presizes.F
++++ b/prep/presizes.F
+status=modified +13 -0
+@@ -146,6 +146,8 @@ MODULE PRESIZES
+      &    SWAN_OutputHS,SWAN_OutputDIR,SWAN_OutputTM01,
+      &    SWAN_OutputTPS,SWAN_OutputWIND,SWAN_OutputTM02,
+      &    SWAN_OutputTMM10
++Casey 251212: Adding time control.
++     &   ,RunStartDateTime
+ 
+       USE WIND, ONLY :  WindDragLimit,DragLawString,rhoAir,
+      &                  initWindModule, 
+@@ -270,6 +272,8 @@ MODULE PRESIZES
+       NAMELIST /SWANOutputControl/ SWAN_OutputHS, SWAN_OutputDIR,
+      &    SWAN_OutputTM01, SWAN_OutputTPS, SWAN_OutputWIND,
+      &    SWAN_OutputTM02, SWAN_OutputTMM10
++Casey 251212: Adding time control.
++      NAMELIST /SWANTimeControl/ RunStartDateTime
+ 
+       NAMELIST /metControl/ WindDragLimit,DragLawString,outputWindDrag,rhoAir,
+      &                       invertedBarometerOnElevationBoundary,nPowellSearchDomains
+@@ -733,6 +737,15 @@ SUBROUTINE SIZEUP15()
+       ENDIF
+       REWIND(15)
+ 
++Casey 251212: Adding time control.
++      IOS = 0
++      READ(UNIT=15,NML=SWANTimeControl,IOSTAT=IOS)
++      IF (IOS.ne.0) THEN
++         write(*,*)"INFO: The SWANTimeControl namelist was not found."
++         RunStartDateTime = "-99999"
++      ENDIF
++      REWIND(15)
++
+       ! jgf50.60.13: Add a namelist for the user to control met forcing.
+       ! Similar to tcm's timevaryingbathy namelist.
+       call initWindModule()

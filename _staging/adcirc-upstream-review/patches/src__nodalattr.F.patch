@@ -1,0 +1,273 @@
+--- a/src/nodalattr.F
++++ b/src/nodalattr.F
+status=modified +80 -4
+@@ -82,6 +82,12 @@
+ C      Fric                  "quadratic_friction_coefficient_at_sea_floor"
+ C      z0Land                "surface_directional_effective_roughness_length"
+ C                            (z0Land has ValuesPerNode = 12)
++!Nicole 260220: Allow SWAN to be activated for selective regions of the 
++! ADCIRC mesh and identified using a nodal attribute. The nodal attribute 
++! controls which nodes are active vs inactive and which nodes should be 
++! used as internal source nodes to apply spectral 'boundary' conditions at. 
++C      SwanLocalControl      "swan_local_control"
++C                            (SwanLocalControl has ValuesPerNode = 2)
+ C      VCanopy               "surface_canopy_coefficient"
+ C      BK,BAlpha,BDelX,POAN  "bridge_pilings_friction_parameters"
+ C                            (bridge_pilings... has ValuesPerNode=4)
+@@ -132,7 +138,7 @@ MODULE NodalAttributes
+       LOGICAL              :: FoundCondensedNodes
+       CHARACTER(LEN=80)    :: CondensedNodesUnits
+       INTEGER              :: CondensedNodesNoOfVals
+-      INTEGER              :: CondensedNodesDefVal(4)
++      INTEGER,ALLOCATABLE  :: CondensedNodesDefVal(:)
+       INTEGER,ALLOCATABLE  :: CondensedNodes(:,:)
+       INTEGER,ALLOCATABLE  :: NCondensedNodes(:)
+       INTEGER,ALLOCATABLE  :: ListCondensedNodes(:,:)
+@@ -144,6 +150,8 @@ MODULE NodalAttributes
+       LOGICAL LoadTau0
+       LOGICAL LoadStartDry
+       LOGICAL LoadDirEffRLen
++! Nicole 250327: Allow SWAN to use a different spatial domain and inputs
++      LOGICAL LoadSwanLocalControl
+       LOGICAL LoadCanopyCoef
+       LOGICAL LoadQuadraticFric
+       LOGICAL LoadBridgePilings
+@@ -164,7 +172,8 @@ MODULE NodalAttributes
+ C     corresponding label in the unit 13 file.
+       LOGICAL FoundTau0
+       LOGICAL FoundStartDry
+-      LOGICAL FoundDirEffRLen
++      LOGICAL FoundDirEffRLen 
++      LOGICAL FoundSwanLocalControl
+       LOGICAL FoundCanopyCoef
+       LOGICAL FoundQuadraticFric
+       LOGICAL FoundBridgePilings
+@@ -187,6 +196,7 @@ MODULE NodalAttributes
+       CHARACTER(len=80) Tau0Units
+       CHARACTER(len=80) StartDryUnits
+       CHARACTER(len=80) DirEffRLenUnits
++      CHARACTER(len=80) SwanLocalControlUnits
+       CHARACTER(len=80) CanopyCoefUnits
+       CHARACTER(len=80) QuadraticFricUnits
+       CHARACTER(len=80) BridgePilingsUnits
+@@ -208,6 +218,7 @@ MODULE NodalAttributes
+       INTEGER Tau0NoOfVals
+       INTEGER StartDryNoOfVals
+       INTEGER DirEffRLenNoOfVals
++      INTEGER SwanLocalControlNoOfVals
+       INTEGER CanopyCoefNoOfVals
+       INTEGER QuadraticFricNoOfVals
+       INTEGER BridgePilingsNoOfVals
+@@ -228,6 +239,7 @@ MODULE NodalAttributes
+       REAL(8) Tau0DefVal
+       REAL(8) StartDryDefVal
+       REAL(8) DirEffRLenDefVal(12)
++      REAL(8) SwanLocalControlDefVal(2)
+       REAL(8) CanopyCoefDefVal
+       REAL(8) QuadraticFricDefVal
+       REAL(8) BridgePilingsDefVal(4)
+@@ -294,6 +306,7 @@ MODULE NodalAttributes
+                                                                    ! exceeded, used for gradient warnings
+ 
+       REAL(8), ALLOCATABLE :: z0land(:,:) ! directional wind speed red. fac.
++      REAL(8), ALLOCATABLE :: SwanLocalControl(:,:) !swan local control
+       REAL(8), ALLOCATABLE :: vcanopy(:)  ! canopy coefficient
+ C     The following attribute contains BK(I),BALPHA(I),BDELX(I), and POAN(I)
+       REAL(8), ALLOCATABLE :: BridgePilings(:,:)
+@@ -416,11 +429,14 @@ SUBROUTINE InitNAModule()
+       LoadCondensedNodes     = .False.
+       FoundCondensedNodes    = .FALSE.
+       CondensedNodesNoOfVals = 3
+-      CondensedNodesDefVal   = 0
++      IF ( ALLOCATED(CondensedNodesDefVal) ) DEALLOCATE(CondensedNodesDefVal)
++      ALLOCATE(CondensedNodesDefVal(CondensedNodesNoOfVals))
++      CondensedNodesDefVal(:) = 0.D0
+ C
+       LoadTau0           = .False.
+       LoadStartDry       = .False.
+       LoadDirEffRLen     = .False.
++      LoadSwanLocalControl = .False.
+       LoadManningsN      = .False.
+       LoadQuadraticFric  = .False.
+       LoadChezy          = .False.
+@@ -440,6 +456,7 @@ SUBROUTINE InitNAModule()
+       FoundTau0           = .False.
+       FoundStartDry       = .False.
+       FoundDirEffRLen     = .False.
++      FoundSwanLocalControl = .False.
+       FoundManningsN      = .False.
+       FoundQuadraticFric  = .False.
+       FoundChezy          = .False.
+@@ -460,6 +477,7 @@ SUBROUTINE InitNAModule()
+       Tau0NoOfVals          = 1
+       StartDryNoOfVals      = 1
+       DirEffRLenNoOfVals    = 12
++      SwanLocalControlNoOfVals = 2
+       QuadraticFricNoOfVals = 1
+       ChezyNoOfVals         = 1
+       ManningsNNoOfVals     = 1
+@@ -481,6 +499,9 @@ SUBROUTINE InitNAModule()
+       DO j=1, DirEffRLenNoOfVals
+          DirEffRLenDefVal(j) = 0.0
+       END DO
++! Nicole 250327 set SwanOn default to 1 (on) and IntSource default to 0 
++      SwanLocalControlDefVal(1) = 1.0
++      SwanLocalControlDefVal(2) = 0.0
+       CanopyCoefDefVal       = 1.0 ! jgf49.1001 default is now full wind stress
+       QuadraticFricDefVal    = 0.0
+       DO j=1, BridgePilingsNoOfVals
+@@ -645,6 +666,8 @@ SUBROUTINE readNodalAttrXDMF()
+             FoundQuadraticFric = .True.
+          CASE("surface_directional_effective_roughness_length")
+             FoundDirEffRLen = .True.
++         CASE("swan_local_control")
++            FoundSwanLocalControl = .True.
+          CASE("surface_canopy_coefficient")
+             FoundCanopyCoef = .True.
+          CASE("bridge_pilings_friction_parameters")
+@@ -788,6 +811,10 @@ SUBROUTINE readNodalAttrXDMF()
+             IF (LoadDirEffRLen) THEN
+                z0land  = na(i)%xdmfMatrix
+             ENDIF
++         CASE("swan_local_control")
++            IF (LoadSwanLocalControl) THEN
++               SwanLocalControl = na(i)%xdmfMatrix
++            ENDIF
+          CASE("surface_canopy_coefficient")
+             IF (LoadCanopyCoef) THEN
+                vcanopy = na(i)%xdmfArray
+@@ -892,6 +919,8 @@ subroutine checkForMissingNodalAttributes()
+      &    (.not.FoundQuadraticFric)).or.
+      &   ((LoadDirEffRLen).and.
+      &    (.not.FoundDirEffRLen)).or.
++     &   ((LoadSwanLocalControl) .and.
++     &    (.not.FoundSwanLocalControl)).or. 
+      &   ((LoadCanopyCoef).and.
+      &    (.not.FoundCanopyCoef)).or.
+      &   ((LoadBridgePilings).and.
+@@ -942,6 +971,7 @@ subroutine allocateNodalAttributes()
+       ALLOCATE(STARTDRY(NumOfNodes))
+       ALLOCATE(FRIC(NumOfNodes))
+       ALLOCATE(z0land(NumOfNodes,DirEffRLenNoOfVals))
++      ALLOCATE(SwanLocalControl(NumOfNodes,SwanLocalControlNoOfVals))
+       ALLOCATE(vcanopy(NumOfNodes))
+       ALLOCATE(BridgePilings(NumOfNodes,BridgePilingsNoOfVals))
+       ALLOCATE(GeoidOffset(NumOfNodes))
+@@ -1059,6 +1089,8 @@ SUBROUTINE ReadNodalAttr(NScreen, ScreenUnit, MyProc, NAbOut)
+             LoadQuadraticFric = .True.
+          CASE("surface_directional_effective_roughness_length")
+             LoadDirEffRLen = .True.
++         CASE("swan_local_control")
++            LoadSwanLocalControl = .True.
+          CASE("surface_canopy_coefficient")
+             LoadCanopyCoef = .True.
+          CASE("bridge_pilings_friction_parameters")
+@@ -1198,6 +1230,12 @@ SUBROUTINE ReadNodalAttr(NScreen, ScreenUnit, MyProc, NAbOut)
+             READ(13,*) DirEffRLenNoOfVals
+             READ(13,*)
+      &      (DirEffRLenDefVal(j),j=1,DirEffRLenNoOfVals)
++         CASE("swan_local_control")
++            FoundSwanLocalControl = .True.
++            READ(13,'(A80)') SwanLocalControlUnits
++            READ(13,*) SwanLocalControlNoOfVals
++            READ(13,*) 
++     &      (SwanLocalControlDefVal(j),j=1,SwanLocalControlNoOfVals)
+          CASE("surface_canopy_coefficient")
+             FoundCanopyCoef = .True.
+             READ(13,'(A80)') CanopyCoefUnits
+@@ -1262,6 +1300,8 @@ SUBROUTINE ReadNodalAttr(NScreen, ScreenUnit, MyProc, NAbOut)
+             FoundCondensedNodes = .TRUE.
+             READ(13,'(A80)') CondensedNodesUnits
+             READ(13,*) CondensedNodesNoOfVals
++            IF(ALLOCATED(CondensedNodesDefVal)) DEALLOCATE(CondensedNodesDefVal)
++            ALLOCATE(CondensedNodesDefVal(CondensedNodesNoOfVals))
+             READ(13,*) (CondensedNodesDefVal(j),
+      &                  j=1,CondensedNodesNoOfVals)
+          CASE("elemental_slope_limiter")
+@@ -1358,6 +1398,15 @@ SUBROUTINE ReadNodalAttr(NScreen, ScreenUnit, MyProc, NAbOut)
+             ELSE
+                SkipDataSet = .True.
+             ENDIF
++         CASE("swan_local_control")
++            IF (LoadSwanLocalControl) THEN
++               CALL LoadAttrMat(SwanLocalControl,
++     &             SwanLocalControlNoOfVals,
++     &             SwanLocalControlDefVal, NumNodesNotDefault,
++     &             NScreen, MyProc, NAbOut)   
++            ELSE
++               SkipDataSet = .True.
++            ENDIF
+          CASE("surface_canopy_coefficient")
+             IF (LoadCanopyCoef) THEN
+                CALL LoadAttrVec(vcanopy, CanopyCoefDefVal,
+@@ -1987,6 +2036,17 @@ SUBROUTINE InitNodalAttr(DP, NP, G, NScreen, ScreenUnit,
+          IFHYBF=1
+       ENDIF
+ C
++! Nicole 20260211 Initialize SwanLocalControl if not loaded 13
++      IF(.not.LoadSwanLocalControl) THEN
++         IF(.not.ALLOCATED(SwanLocalControl)) THEN
++           ALLOCATE(SwanLocalControl(NP,SwanLocalControlNoOfVals))
++         ENDIF
++         DO I=1,NP
++            DO J=1, SwanLocalControlNoOfVals
++               SwanLocalControl(I,J)=SwanLocalControlDefVal(J)
++            ENDDO
++         ENDDO
++      ENDIF
+ C     Initialize bottom friction if it was not loaded from unit 13.
+       IF(C2DDI) THEN
+          IF((.not.LoadQuadraticFric).and.(.not.LoadManningsN).and.
+@@ -2445,7 +2505,14 @@ END SUBROUTINE Apply2DBottomFriction
+ C     ----------------------------------------------------------------
+ C     ----------------------------------------------------------------
+       SUBROUTINE Apply3DBottomFriction(Q, SIGMA, DP, ETA2, G,
+-     &     IFNLFA, NP, TK, NFEN, Z0B)
++     &     IFNLFA, NP, TK, NFEN, Z0B, KP)
++Casey 140701: Prevent the depths from becoming negative in the bottom roughness calculations.
++      USE GLOBAL, ONLY: H0
++      USE SIZES
++! arash May 31 2016
++CSeun 260619: KP is passed from timestep.F to avoid requiring
++C             global_3dvs.mod when compiling nodalattr.F in legacy builds.
++C     USE GLOBAL_3DVS, ONLY : KP
+       IMPLICIT NONE
+       INTEGER, intent(in) :: NP, NFEN             ! number of nodes in grid Horizontal and Vertical
+       COMPLEX(8), intent(in), dimension(NP,NFEN) :: Q  ! x-dir velocities
+@@ -2456,6 +2523,7 @@ SUBROUTINE Apply3DBottomFriction(Q, SIGMA, DP, ETA2, G,
+       INTEGER, intent(in) :: IFNLFA               ! nonlin. finite amp. flag
+       REAL(8), intent(inout), dimension(NP) :: TK! depth avg. fric.
+       REAL(8), intent(in) :: Z0B
++      REAL(8), intent(in) :: KP                  ! 3D bottom friction coefficient
+ C
+       INTEGER NH
+       REAL(8) Z0B1  ! velocity magnitude (speed)
+@@ -2474,6 +2542,9 @@ SUBROUTINE Apply3DBottomFriction(Q, SIGMA, DP, ETA2, G,
+          IF (LoadZ0B_var) THEN
+             Z0B1 = Z0B_var(NH)
+          ELSEIF (LoadManningsN) THEN
++Casey 140701: Prevent the depths from becoming negative.  Cannot raise
++C             a negative number to the 1/6 power.
++            IF(H1.LT.H0) H1=H0
+             Z0B1 = ( H1 )* exp(-(1.0D0+
+      &             ( (0.41D0*( H1 )**(1.0D0/6.0D0) )/
+      &                            (ManningsN(NH)*sqrt(g)) ) ))
+@@ -2496,6 +2567,9 @@ SUBROUTINE Apply3DBottomFriction(Q, SIGMA, DP, ETA2, G,
+      &           *(BALPHA+15.d0*BALPHA**4)
+             TK(I)=TK(I)+FricBP*ABS(Q(NH,1))/H1
+          ENDIF
++! arash May 31 2016 added this based on Rosemary's work
++         If ( TK(NH) > abs( Q(NH,1) ) ) TK(NH) = abs( Q(NH,1) )
++         If ( TK(NH) < KP * abs( Q(NH,1) ) ) TK(NH) = KP * abs( Q(NH,1) )
+       ENDDO
+ C
+       RETURN
+@@ -3140,6 +3214,8 @@ SUBROUTINE PrepCondensedNodes()
+                NCondensedNodes(I) = J+1
+                ListCondensedNodes(K,J+1) = II
+                NNodesListCondensedNodes(K) = J+1
++               WRITE(16,*) 'Node ', I, ' is condensed with node ', II, ' at ', J
++               WRITE(16,*) 'CondensedNodesDefVal(J) = ', CondensedNodesDefVal(J)
+                CondensedNodes(II,1) = -I ! To tell that node II is one of condensed nodes
+             ENDDO
+             DO J=1,CondensedNodesNoOfVals

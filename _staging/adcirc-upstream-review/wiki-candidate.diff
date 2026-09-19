@@ -1,0 +1,366 @@
+--- a/models/ADCIRC/source-analysis/adcirc-3d-mode.md
++++ b/models/ADCIRC/source-analysis/adcirc-3d-mode.md
+@@ -20 +20 @@
+-- `read_input.F:1176-1191, 3072, 5139-5482, 5682` — `IM, IDEN, IGC/NFEN, EQNSTATE`, 3D output controls.
++- `read_input.F:1190-1205, 3072, 5139-5482, 5682` — `IM, IDEN, IGC/NFEN, EQNSTATE`, 3D output controls.
+@@ -24 +24 @@
+-- `timestep.F:1121, 1125, 1918, 2150-2355` — VSSOL call, BPG3D, dispersion.
++- `timestep.F:1125-1125, 1125, 1918, 2150-2355` — VSSOL call, BPG3D, dispersion.
+@@ -28 +28 @@
+-- `write_output.F:2993-3331` — 3D output dispatch.
++- `write_output.F:3053-3391` — 3D output dispatch.
+@@ -37 +37 @@
+-| True ADCIRC-3D | `IM=1, 11, 21, 31` (sets `C3D=.TRUE.`, `C3DVS=.TRUE.`); `IM=21, 31` also set `CBaroclinic=.TRUE.` | Prognostic 3D velocity (VSSOL), optional T/S transport, baroclinic pressure (BPG3D), MY2.5 turbulence (`read_input.F:1176-1191`) |
++| True ADCIRC-3D | `IM=1, 11, 21, 31` (sets `C3D=.TRUE.`, `C3DVS=.TRUE.`); `IM=21, 31` also set `CBaroclinic=.TRUE.` | Prognostic 3D velocity (VSSOL), optional T/S transport, baroclinic pressure (BPG3D), MY2.5 turbulence (`read_input.F:1190-1205`) |
+@@ -44 +44 @@
+-- `NFEN` = number of vertical finite-element nodes (`read_input.F:5139`).
++- `NFEN` = number of vertical finite-element nodes (`read_input.F:5153-5153`).
+@@ -60 +60 @@
+-Salinity/temperature transport when `C3D_BTrans=.TRUE.` (`vsmy.F:1548-1553` 은 **dispatch만** — 실제 solver 는 `transport.F`/`TRANS_3D`, [[adcirc-transport-solver]] 참조):
++Salinity/temperature transport when `C3D_BTrans=.TRUE.` (`vsmy.F:1550-1555` 은 **dispatch만** — 실제 solver 는 `transport.F`/`TRANS_3D`, [[adcirc-transport-solver]] 참조):
+@@ -68,3 +68,3 @@
+-After transport, `CALC_SIGMAT_3D()` for `IDEN > 1` (`vsmy.F:1630`).
+-
+-`Eqnstate` from input (`read_input.F:5682`):
++After transport, `CALC_SIGMAT_3D()` for `IDEN > 1` (`vsmy.F:1632-1632`).
++
++`Eqnstate` from input (`read_input.F:5720-5720`):
+@@ -74 +74 @@
+-| `1` | Simple linear (Mellor / Cushman-Roisin) | `vsmy.F:4061` |
++| `1` | Simple linear (Mellor / Cushman-Roisin) | `vsmy.F:4081-4081` |
+@@ -84 +84 @@
+-Internal (3D shear): `VSSOL()` (`timestep.F:1121`), called only when `C3DVS=.TRUE.`.
++Internal (3D shear): `VSSOL()` (`timestep.F:1125-1125`), called only when `C3DVS=.TRUE.`.
+@@ -88 +88 @@
+-Before VSSOL, barotropic pressure terms loaded into `MOM_LV_X`, aliased as `BTP` (`timestep.F:1125`, `global_3dvs.F:94`).
++Before VSSOL, barotropic pressure terms loaded into `MOM_LV_X`, aliased as `BTP` (`timestep.F:1129-1129`, `global_3dvs.F:94`).
+@@ -112 +112 @@
+-- `BPG3D()` computes vertical baroclinic pressure `BCP`, profiles `BPG`, depth-integrated `VIDBCPDXOH/VIDBCPDYOH` (`timestep.F:2150-2355`).
++- `BPG3D()` computes vertical baroclinic pressure `BCP`, profiles `BPG`, depth-integrated `VIDBCPDXOH/VIDBCPDYOH` (`timestep.F:2154-2359`).
+@@ -116 +116 @@
+-Vertical eddy viscosity controlled by `IEVC, EVMin, EVCon` (`read_input.F:5235`).
++Vertical eddy viscosity controlled by `IEVC, EVMin, EVCon` (`read_input.F:5249-5249`).
+@@ -121,2 +121,2 @@
+-| (other) | Empirical: constant, `ω H²`, `κ u* z`, `H Uavg`, `Uavg²` (`vsmy.F:1823, 1840, 1870, 1931, 1983`) |
+-| `50, 51` | **MY2.5 quasi-equilibrium** (`vsmy.F:2035, 2403`) |
++| (other) | Empirical: constant, `ω H²`, `κ u* z`, `H Uavg`, `Uavg²` (`vsmy.F:1825-1825, 1840, 1870, 1931, 1983`) |
++| `50, 51` | **MY2.5 quasi-equilibrium** (`vsmy.F:2037-2037, 2403`) |
+@@ -127 +127 @@
+-- Stratification through `SIGT` gradients; shear from `Q` (`vsmy.F:2740`).
++- Stratification through `SIGT` gradients; shear from `Q` (`vsmy.F:2742-2742`).
+@@ -135 +135 @@
+-- `fort.41` — 3D density/salinity/temperature stations (`read_input.F:5296`, `write_output.F:2993`).
++- `fort.41` — 3D density/salinity/temperature stations (`read_input.F:5310-5310`, `write_output.F:3053-3053`).
+@@ -144 +144 @@
+-Optional: `fort.48` — internal BPG output (`global_3dvs.F:335`, `write_output.F:3331`).
++Optional: `fort.48` — internal BPG output (`global_3dvs.F:335`, `write_output.F:3391-3391`).
+--- a/models/ADCIRC/source-analysis/adcirc-3d-vssol-vertical-scheme.md
++++ b/models/ADCIRC/source-analysis/adcirc-3d-vssol-vertical-scheme.md
+@@ -23 +23 @@
+-- `VSSOL(IT,TimeLoc)` = 3D internal mode **수평속도의 연직구조** 솔버 (vsmy.F:142-1703). `C3DVS` 시 매 timestep 호출 (timestep.F:1121-1123; 직전에 barotropic 압력 `MOM_LV_X`→`BTP` 를 **time level s·s+1 평균**으로 적재, timestep.F 주석 "averaged between time levels s and s+1").
++- `VSSOL(IT,TimeLoc)` = 3D internal mode **수평속도의 연직구조** 솔버 (vsmy.F:142-1705). `C3DVS` 시 매 timestep 호출 (timestep.F:1125-1127; 직전에 barotropic 압력 `MOM_LV_X`→`BTP` 를 **time level s·s+1 평균**으로 적재, timestep.F 주석 "averaged between time levels s and s+1").
+@@ -25 +25 @@
+-- 시간간격: `DelT => DTDP` (read_input.F:5073, POINTER alias — global_3dvs.F:98) — **2D 와 동일 dt, 별도 subcycling 없음**. 2-time-level(s → s+1) 스킴.
++- 시간간격: `DelT => DTDP` (read_input.F:5087-5087, POINTER alias — global_3dvs.F:98) — **2D 와 동일 dt, 별도 subcycling 없음**. 2-time-level(s → s+1) 스킴.
+@@ -30 +30 @@
+-fort.15 3D 블록에서 `READ(15,*) Alp1,Alp2,Alp3` (read_input.F:5127), 계수 조립 :5132-5137:
++fort.15 3D 블록에서 `READ(15,*) Alp1,Alp2,Alp3` (read_input.F:5141-5141), 계수 조립 :5132-5137:
+@@ -53 +53 @@
+-- **질량행렬 `Inm`** (InmINT, vsmy.F:2299-2319): 선형 요소 `∫ψₙψₘ dσ` — `Inm(k,3)=(σ(k+1)−σ(k))/6`, `Inm(k,2)=2(Inm(k,1)+Inm(k,3))` 의 고전 1D FE 3-band. **lumped 아님** — RHS 에서 이웃층 값이 `Inm(k,1)/(k,3)` 로 가중됨 (:1020-1025).
++- **질량행렬 `Inm`** (InmINT, vsmy.F:2301-2321): 선형 요소 `∫ψₙψₘ dσ` — `Inm(k,3)=(σ(k+1)−σ(k))/6`, `Inm(k,2)=2(Inm(k,1)+Inm(k,3))` 의 고전 1D FE 3-band. **lumped 아님** — RHS 에서 이웃층 값이 `Inm(k,1)/(k,3)` 로 가중됨 (:1020-1025).
+@@ -65 +65 @@
+-- **바닥**: `ISlip=0` no-slip → Dirichlet 행 `Fr(1)=0, Mk(1)=(1,−1)` (:997-1001; 주석 "-I*IV=V") / `ISlip≥1` slip → 저면응력을 `TK(NH)` 로 LHS(Alp2)·RHS(1−Alp2) 분배 (:1010,:1015). `ISlip=1` 선형 slip 계수, `=2` 최소 2차, `=3` 2차 (헤더 :946-948; `READ(15,*) ISlip,KP` read_input.F:5102). ※2016 개정으로 `KSlip` 대신 2D 마찰 `TK` 재사용 (":1009-1010 주석 arash May 31 2016 based on Rosemary's work" — 구식 KSlip 코드 주석잔존).
++- **바닥**: `ISlip=0` no-slip → Dirichlet 행 `Fr(1)=0, Mk(1)=(1,−1)` (:997-1001; 주석 "-I*IV=V") / `ISlip≥1` slip → 저면응력을 `TK(NH)` 로 LHS(Alp2)·RHS(1−Alp2) 분배 (:1010,:1015). `ISlip=1` 선형 slip 계수, `=2` 최소 2차, `=3` 2차 (헤더 :946-948; `READ(15,*) ISlip,KP` read_input.F:5116-5116). ※2016 개정으로 `KSlip` 대신 2D 마찰 `TK` 재사용 (":1009-1010 주석 arash May 31 2016 based on Rosemary's work" — 구식 KSlip 코드 주석잔존).
+--- a/models/ADCIRC/source-analysis/adcirc-fort15-checklist-v1.md
++++ b/models/ADCIRC/source-analysis/adcirc-fort15-checklist-v1.md
+@@ -7 +7 @@
+-verification_method: "ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-fort15-checklist-v1.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시. L4 2026-07-03 감사: IM 단언은 read_input.F:1133-1162 로 보강(verified), TAU0 0.005-0.1 범위·FAQ triage 2건은 익명 출처 disclosed gap(본문 source-needed 주석) → has_source_needed: true."
++verification_method: "ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-fort15-checklist-v1.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시. L4 2026-07-03 감사: IM 단언은 read_input.F:1147-1176 로 보강(verified), TAU0 0.005-0.1 범위·FAQ triage 2건은 익명 출처 disclosed gap(본문 source-needed 주석) → has_source_needed: true."
+@@ -88 +88 @@
+-- `IM` is the "2D/3D MODEL FORMULATION OPTION" switch; `IM=0` configures "Barotropic 2DDI run using: New GWCE and Momentum Eq formulations" (`models/ADCIRC/raw/source_code/adcirc/src/read_input.F:1133-1135` READ/PROCESS IM, `:1158-1162` `IF (IM.EQ.0)` → `C2DDI=.TRUE.`; IM=20/30 은 deprecated·terminate, `:1170-1175`)
++- `IM` is the "2D/3D MODEL FORMULATION OPTION" switch; `IM=0` configures "Barotropic 2DDI run using: New GWCE and Momentum Eq formulations" (`models/ADCIRC/raw/source_code/adcirc/src/read_input.F:1147-1149` READ/PROCESS IM, `:1158-1162` `IF (IM.EQ.0)` → `C2DDI=.TRUE.`; IM=20/30 은 deprecated·terminate, `:1170-1175`)
+--- a/models/ADCIRC/source-analysis/adcirc-gwce-implementation.md
++++ b/models/ADCIRC/source-analysis/adcirc-gwce-implementation.md
+@@ -97 +97 @@
+-- **Boundary ELEVALPHA wrong** — phases shifted across NBFR block; check `read_input.F:3431-3456` parse order.
++- **Boundary ELEVALPHA wrong** — phases shifted across NBFR block; check `read_input.F:3445-3470` parse order.
+--- a/models/ADCIRC/source-analysis/adcirc-hotstart.md
++++ b/models/ADCIRC/source-analysis/adcirc-hotstart.md
+@@ -19 +19 @@
+-- `read_input.F:1050-1075, 4504-4544` — `IHOT`, `NHSTAR`, `NHSINC` reads.
++- `read_input.F:1064-1089, 4504-4544` — `IHOT`, `NHSTAR`, `NHSINC` reads.
+@@ -21,3 +21,3 @@
+-- `hstart.F:47-3048` — main reader, mappers, 3D reader.
+-- `write_output.F:4429, 4920-5374` — binary writer, full vs local.
+-- `writer.F:1069`, `vsmy.F:3254, 3531-3778` — dedicated writers, 3D.
++- `hstart.F:47-3076` — main reader, mappers, 3D reader.
++- `write_output.F:4518-4518, 4920-5374` — binary writer, full vs local.
++- `writer.F:1069`, `vsmy.F:3261-3261, 3531-3778` — dedicated writers, 3D.
+@@ -25 +25 @@
+-- `timestep.F:1192-1211` — runtime hot-start trigger.
++- `timestep.F:1196-1215` — runtime hot-start trigger.
+@@ -30 +30 @@
+-`IHOT` is read from `fort.15` (`read_input.F:1050-1053`).
++`IHOT` is read from `fort.15` (`read_input.F:1064-1067`).
+@@ -41 +41 @@
+-After `IHOT=67`, output flips to unit/file `68`, and vice versa (alternating ping-pong) (`read_input.F:1063-1075`).
++After `IHOT=67`, output flips to unit/file `68`, and vice versa (alternating ping-pong) (`read_input.F:1077-1089`).
+@@ -45,3 +45,3 @@
+-Direct-access, `RECL=8` (`hstart.F:485-492`, `write_output.F:4920-4923`).
+-
+-**Header order** (`write_output.F:4922-4931`):
++Direct-access, `RECL=8` (`hstart.F:485-492`, `write_output.F:5009-5012`).
++
++**Header order** (`write_output.F:5011-5020`):
+@@ -84 +84 @@
+-- 2D: `writeHotstart(TimeLoc, IT)` in `write_output.F:4429`.
++- 2D: `writeHotstart(TimeLoc, IT)` in `write_output.F:4518-4518`.
+@@ -86 +86 @@
+-- 3D: `HSTART3D_OUT(IT)` in `vsmy.F:3254`.
++- 3D: `HSTART3D_OUT(IT)` in `vsmy.F:3261-3261`.
+@@ -104 +104 @@
+-Read together (`read_input.F:4504-4508`):
++Read together (`read_input.F:4518-4522`):
+@@ -116 +116 @@
+-Trigger (`timestep.F:1192-1197`): hot-start fires when `IT` is exact multiple of `NHSINC`, or when `-IHOT==IT` (special end-of-run case).
++Trigger (`timestep.F:1196-1201`): hot-start fires when `IT` is exact multiple of `NHSINC`, or when `-IHOT==IT` (special end-of-run case).
+@@ -122 +122 @@
+-| `ETA1, ETA2, EtaDisc` | `hstart.F:526-536` | `write_output.F:4935-4945` |
++| `ETA1, ETA2, EtaDisc` | `hstart.F:526-536` | `write_output.F:5024-5034` |
+@@ -127 +127 @@
+-| 3D state (if `C3D`): `DUU/DUV/DVV, UU/VV, BSX/BSY, Q, WZ, q20, l, SigT/Sal/Temp` | `:568-645` | `vsmy.F:3531-3778` |
++| 3D state (if `C3D`): `DUU/DUV/DVV, UU/VV, BSX/BSY, Q, WZ, q20, l, SigT/Sal/Temp` | `:568-645` | `vsmy.F:3538-3785` |
+@@ -130 +130 @@
+-Meteorology is **not preserved** — reconstructed at `TimeLoc` from forcing files (`hstart.F:1440-1444`).
++Meteorology is **not preserved** — reconstructed at `TimeLoc` from forcing files (`hstart.F:1445-1449`).
+@@ -144 +144 @@
+-After dynamic state read, `HOTSTART` repositions time-dependent forcing using `TimeLoc` and `ITHS` (`hstart.F:1442-1444`).
++After dynamic state read, `HOTSTART` repositions time-dependent forcing using `TimeLoc` and `ITHS` (`hstart.F:1447-1449`).
+--- a/models/ADCIRC/source-analysis/adcirc-met-forcing-implementation.md
++++ b/models/ADCIRC/source-analysis/adcirc-met-forcing-implementation.md
+@@ -33,14 +33,14 @@
+-| 0 | (skip) | `wind.F:2135-2146` | `read_input.F:1819-1824` |
+-| +1 | -- | `wind.F:2149-2164` | `read_input.F:1825-1832` |
+-| ±2 | -- | `wind.F:2170-2201` (NWS=2), `wind.F:2203-2217` (NWS=-2) | `read_input.F:1833-1852` |
+-| +3 | -- | `wind.F:2223-2291` | `read_input.F:1853-1864` |
+-| ±4 | -- | `wind.F:2298-2346, 2348-2381` | `read_input.F:1865-1890` |
+-| ±5 | -- | `wind.F:2387-2436, 2438-2472` | `read_input.F:1891-1916` |
+-| +6 | -- | `wind.F:2481-2526` | `read_input.F:1917-1929` |
+-| ±7 | -- | `wind.F:2535-2558, 2560-2585` | `read_input.F:1933-1952` |
+-| +10 | -- | `wind.F:2693-2741` | `read_input.F:1976-1989` |
+-| +11 | -- | `wind.F:2751-2796` | `read_input.F:1990-2002` |
+-| ±12 | -- | `wind.F:2800-2848` | `read_input.F:2004-2031` |
+-| ±13 | -- | `wind.F:2852-2885, 3032-3067` | `read_input.F:2658, 4671` |
+-| ±14 | -- | `wind.F:2937-3027` | `read_input.F:2033-2058` |
+-| ±15 | -- | `wind.F:3071-3096` | `read_input.F:2059-2069, 2767-2774` |
++| 0 | (skip) | `wind.F:2135-2146` | `read_input.F:1833-1838` |
++| +1 | -- | `wind.F:2149-2164` | `read_input.F:1839-1846` |
++| ±2 | -- | `wind.F:2170-2201` (NWS=2), `wind.F:2203-2217` (NWS=-2) | `read_input.F:1847-1866` |
++| +3 | -- | `wind.F:2223-2291` | `read_input.F:1867-1878` |
++| ±4 | -- | `wind.F:2298-2346, 2348-2381` | `read_input.F:1879-1904` |
++| ±5 | -- | `wind.F:2387-2436, 2438-2472` | `read_input.F:1905-1930` |
++| +6 | -- | `wind.F:2481-2526` | `read_input.F:1931-1943` |
++| ±7 | -- | `wind.F:2535-2558, 2560-2585` | `read_input.F:1947-1966` |
++| +10 | -- | `wind.F:2693-2741` | `read_input.F:1990-2003` |
++| +11 | -- | `wind.F:2751-2796` | `read_input.F:2004-2016` |
++| ±12 | -- | `wind.F:2800-2848` | `read_input.F:2018-2045` |
++| ±13 | -- | `wind.F:2852-2885, 3032-3067` | `read_input.F:2672-2672, 4671` |
++| ±14 | -- | `wind.F:2937-3027` | `read_input.F:2047-2072` |
++| ±15 | -- | `wind.F:3071-3096` | `read_input.F:2073-2083, 2767-2774` |
+--- a/models/ADCIRC/source-analysis/adcirc-momentum-implementation.md
++++ b/models/ADCIRC/source-analysis/adcirc-momentum-implementation.md
+@@ -69 +69 @@
+-- BEDSTR = `H·|U|·TK·ρ` (bed shear N/m², timestep.F:1634).
++- BEDSTR = `H·|U|·TK·ρ` (bed shear N/m², timestep.F:1638-1638).
+--- a/models/ADCIRC/source-analysis/adcirc-nffr-periodic-flux-boundary.md
++++ b/models/ADCIRC/source-analysis/adcirc-nffr-periodic-flux-boundary.md
+@@ -20 +20 @@
+-## 1. fort.15 NFFR 레코드 구조 (read_input.F:3504-3589 + docs fort15.rst:79-90)
++## 1. fort.15 NFFR 레코드 구조 (read_input.F:3518-3603 + docs fort15.rst:79-90)
+@@ -22 +22 @@
+-NFFR 라인은 mesh(fort.14)에 flux 경계(IBTYPE 2/12/22/32/52)가 있어 `NFLUXF=1`일 때만 포함 (read_input.F:3505, docs fort15.rst:79 "include this line only if IBTYPE = 2, 12, 22, 32 or 52").
++NFFR 라인은 mesh(fort.14)에 flux 경계(IBTYPE 2/12/22/32/52)가 있어 `NFLUXF=1`일 때만 포함 (read_input.F:3519-3519, docs fort15.rst:79 "include this line only if IBTYPE = 2, 12, 22, 32 or 52").
+@@ -40 +40 @@
+-## 2. 런타임 QN·EN 합성 (timestep.F:860-880)
++## 2. 런타임 QN·EN 합성 (timestep.F:864-884)
+--- a/models/ADCIRC/source-analysis/adcirc-nodal-attributes.md
++++ b/models/ADCIRC/source-analysis/adcirc-nodal-attributes.md
+@@ -21 +21 @@
+-## 1. Attribute 카탈로그 (nodalattr.F:636-686)
++## 1. Attribute 카탈로그 (nodalattr.F:657-709)
+@@ -43,0 +44 @@
++| `swan_local_control` | SWAN 활성 노드 / 내부 source 노드 지정 (ValuesPerNode = 2) — 코드 주석 "Allow SWAN to be activated for selective regions of the ADCIRC mesh"(`:85-90`). baseline `e8b62a70`(커밋 `976fc5b6`) 에서 추가 | SWAN 결합 ([[adcirc-swan-coupling]]) |
+--- a/models/ADCIRC/source-analysis/adcirc-swan-coupling.md
++++ b/models/ADCIRC/source-analysis/adcirc-swan-coupling.md
+@@ -19 +19 @@
+-- `couple2swan.F:67-1236` — main coupling module: init, run, finalize, RS computation.
++- `couple2swan.F:67-1313` — main coupling module: init, run, finalize, RS computation.
+@@ -22 +22 @@
+-- `read_input.F:1080-1083, 1790-1817, 2255-2261` — `NRS` parsing and encoding.
++- `read_input.F:1094-1097, 1790-1817, 2255-2261` — `NRS` parsing and encoding.
+@@ -24,2 +24,2 @@
+-- `timestep.F:664-682, 695-725, 1214-1218` — wind passing, RS interpolation, hotfile timing.
+-- `hstart.F:325-337`, `write_output.F:4969-5112`, `netcdfio.F90:5555-7045, 8017-8085` — hot-start.
++- `timestep.F:668-686, 695-725, 1214-1218` — wind passing, RS interpolation, hotfile timing.
++- `hstart.F:325-337`, `write_output.F:5058-5201`, `netcdfio.F90:5555-7045, 8017-8085` — hot-start.
+@@ -52 +52 @@
+-- **Coupling interval = integer ratio** `SWAN_DT / DT` (`:1079-1081`).
++- **Coupling interval = integer ratio** `SWAN_DT / DT` (`:1085-1087`).
+@@ -54 +54 @@
+-- During SWAN run, interpolation midpoint used for time-centering (`couple2swan.F:1212-1215`).
++- During SWAN run, interpolation midpoint used for time-centering (`couple2swan.F:1241-1243`); `SWMAIN` 호출은 temporal control gate 안(`:1245-1247`).
+@@ -62,2 +62,2 @@
+-3. ADCIRC extrapolates/interpolates into `RSNX2/RSNY2` for `NRS=3` (`timestep.F:695-703`).
+-4. Added to wind stress in momentum (`timestep.F:721-725`).
++3. ADCIRC extrapolates/interpolates into `RSNX2/RSNY2` for `NRS=3` (`timestep.F:699-707`).
++4. Added to wind stress in momentum (`timestep.F:725-729`).
+@@ -77 +77 @@
+-- Wind passed from ADCIRC met → SWAN if `COUPWIND` (`timestep.F:664-682`).
++- Wind passed from ADCIRC met → SWAN if `COUPWIND` (`timestep.F:668-686`).
+@@ -94 +94 @@
+-Instead, `read_input.F:1790-1817` parses radiation-stress coupling from **hundreds digit**:
++Instead, `read_input.F:1804-1831` parses radiation-stress coupling from **hundreds digit**:
+@@ -133 +133 @@
+-- If `NRS=3`: SWAN RS arrays (`write_output.F:4969-5112`).
++- If `NRS=3`: SWAN RS arrays (`write_output.F:5058-5201`).
+@@ -138,2 +138,2 @@
+-- ADCIRC sets `SwanHotStartUnit` (`read_input.F:1080-1083`).
+-- `timestep.F:1214-1218` defers SWAN hotfile write until after next SWAN step.
++- ADCIRC sets `SwanHotStartUnit` (`read_input.F:1094-1097`).
++- `timestep.F:1218-1222` defers SWAN hotfile write until after next SWAN step.
+@@ -176,3 +176,3 @@
+-## SWAN Temporal Controls (PR #498, phase 1 of 2)
+-
+-PR [#498](https://github.com/adcirc/adcirc/pull/498) (OPEN, branch `Spatial-and-Temporal-Controls`, +274 -30, 17 files). 사용자가 ADCIRC+SWAN coupled simulation 의 SWAN computation 시간을 storm landfall 즈음으로 제한 가능 → 전체 mesh + 전체 timeframe SWAN 호출 회피로 wall-clock 절감. Spatial controls 은 phase 2 예정. 외부 docs: [CCHT-NCSU/Spatial-Temporal-Controls](https://github.com/ccht-ncsu/Spatial-Temporal-Controls).
++## SWAN Temporal Controls (upstream 반영, phase 1 of 2)
++
++PR [#498](https://github.com/adcirc/adcirc/pull/498) 의 phase 1 은 **upstream `main` 에 반영됨** — 커밋 `976fc5b6`("Adding SWAN temporal controls", 17 files), 본 노트 baseline `e8b62a70` 에 포함. 런루프 gate 는 `couple2swan.F:1245-1247`(`SwanTimeStep` 이 `[1, SWAN_MTC]` 일 때만 `SWMAIN` 호출), 미호출 구간은 출력값을 초기화(`:1252-1261`)하고 radiation stress 를 할당·이월(`:1267-1291`). fort.15 namelist 파싱은 `prep/presizes.F:276,742-745`(기본 sentinel `"-99999"`). 사용자가 ADCIRC+SWAN coupled simulation 의 SWAN computation 시간을 storm landfall 즈음으로 제한 가능 → 전체 mesh + 전체 timeframe SWAN 호출 회피로 wall-clock 절감. Spatial controls 은 phase 2 예정 — 다만 같은 커밋이 nodal attribute `swan_local_control` 정의를 추가했다(`src/nodalattr.F:89-90,669`). 그 경로의 완결 여부는 본 baseline 에서 미확인. → [[adcirc-nodal-attributes]] §1. 외부 docs: [CCHT-NCSU/Spatial-Temporal-Controls](https://github.com/ccht-ncsu/Spatial-Temporal-Controls).
+--- a/models/ADCIRC/source-analysis/adcirc-tidal-forcing.md
++++ b/models/ADCIRC/source-analysis/adcirc-tidal-forcing.md
+@@ -22 +22 @@
+-## 1. Tidal potential — constituent 방식 (timestep.F:1527-1556) ★
++## 1. Tidal potential — constituent 방식 (timestep.F:1531-1560) ★
+@@ -36 +36 @@
+-- 적용(`CTIP`): [[adcirc-momentum-implementation]] momentum.F:441 (barotropic pressure 에 합산) + [[adcirc-gwce-implementation]] gwce.F:1181/2592. timestep.F:1133 `MOM_LV_X −= TIP1+TIP2`.
++- 적용(`CTIP`): [[adcirc-momentum-implementation]] momentum.F:441 (barotropic pressure 에 합산) + [[adcirc-gwce-implementation]] gwce.F:1181/2592. timestep.F:1137-1137 `MOM_LV_X −= TIP1+TIP2`.
+@@ -45 +45 @@
+-- `NTIP==2` 또는 `tidePotential` 비활성 시 적용(timestep.F:1527). 대양 규모 조석 정확도(~5-10%)에 중요`[source-needed]`.
++- `NTIP==2` 또는 `tidePotential` 비활성 시 적용(timestep.F:1531-1531). 대양 규모 조석 정확도(~5-10%)에 중요`[source-needed]`.
+@@ -51 +51 @@
+-- 이 경우 SAL 만 constituent 방식(`SALTAMP`)으로 더해짐(timestep.F:1543-1547).
++- 이 경우 SAL 만 constituent 방식(`SALTAMP`)으로 더해짐(timestep.F:1547-1551).
+--- a/models/ADCIRC/source-analysis/adcirc-timestep-orchestration.md
++++ b/models/ADCIRC/source-analysis/adcirc-timestep-orchestration.md
+@@ -82 +82 @@
+-- **시간 가중**: fort.15 입력 `A00,B00,C00`(read_input.F:2996) — RHS 에 `C00`(n−1)·`(A00+B00)`(n) 가중(`gwce.F:1540-1543`, `A00pB00` 조립 `:1444`). 별도 θ 파라미터 없음(§B "No semi-implicit Theta").
++- **시간 가중**: fort.15 입력 `A00,B00,C00`(read_input.F:3010-3010) — RHS 에 `C00`(n−1)·`(A00+B00)`(n) 가중(`gwce.F:1540-1543`, `A00pB00` 조립 `:1444`). 별도 θ 파라미터 없음(§B "No semi-implicit Theta").
+--- a/models/ADCIRC/source-analysis/adcirc-transport-solver.md
++++ b/models/ADCIRC/source-analysis/adcirc-transport-solver.md
+@@ -6 +6 @@
+-verification_method: "ADCIRC raw source 직접 read: src/transport.F(1497, v45.12) — Alp4 semi-implicit DTAlp4/DT1MAlp4(:31-32)·ADC_TRIDAG2 tridiag 호출(:1182) file:line 직접 검증. dispatch vsmy.F:1548-1553. 소스 banner Luettich-Westerink. ★adcirc-3d-mode:59 가 transport 를 vsmy.F:1543 로 오귀속(정정)."
++verification_method: "ADCIRC raw source 직접 read: src/transport.F(1497, v45.12) — Alp4 semi-implicit DTAlp4/DT1MAlp4(:31-32)·ADC_TRIDAG2 tridiag 호출(:1182) file:line 직접 검증. dispatch vsmy.F:1550-1555. 소스 banner Luettich-Westerink. ★adcirc-3d-mode:59 가 transport 를 vsmy.F:1545-1545 로 오귀속(정정)."
+@@ -20,2 +20,2 @@
+-> **정체**: 3D baroclinic **염분/수온 이류-확산** solver(sigma 좌표). 하나의 generic in/out 배열로 S·T 모두 처리 — ADCIRC prognostic 성층 엔진(하구 성층·thermohaline surge). dispatch: `vsmy.F:1548-1553` `CALL TRANS_3D(SAL,NLSD,NVSD,...)` + `(TEMP,NLTD,NVTD,...)`.
+-> ★**오귀속 정정**: [[adcirc-3d-mode]]:59 는 "S/T transport (`vsmy.F:1543`)" 라 적었으나 vsmy.F 는 **dispatch만**(:1548-1553), 알고리즘 전체는 `transport.F:44-1229`. cross-model: ROMS [[roms_tracer_timestep_step3d_t]]·Delft3D [[delft3d_difu_transport]]·EFDC CALTRAN 의 ADCIRC 판.
++> **정체**: 3D baroclinic **염분/수온 이류-확산** solver(sigma 좌표). 하나의 generic in/out 배열로 S·T 모두 처리 — ADCIRC prognostic 성층 엔진(하구 성층·thermohaline surge). dispatch: `vsmy.F:1550-1555` `CALL TRANS_3D(SAL,NLSD,NVSD,...)` + `(TEMP,NLTD,NVTD,...)`.
++> ★**오귀속 정정**: [[adcirc-3d-mode]]:59 는 "S/T transport (`vsmy.F:1545-1545`)" 라 적었으나 vsmy.F 는 **dispatch만**(:1548-1553), 알고리즘 전체는 `transport.F:44-1229`. cross-model: ROMS [[roms_tracer_timestep_step3d_t]]·Delft3D [[delft3d_difu_transport]]·EFDC CALTRAN 의 ADCIRC 판.
+@@ -59 +59 @@
+-- diffusion 계수 입력: `NLSD/NVSD`(염분)·`NLTD/NVTD`(수온) per-field(vsmy.F:1548-1553).
++- diffusion 계수 입력: `NLSD/NVSD`(염분)·`NLTD/NVTD`(수온) per-field(vsmy.F:1550-1555).
+--- a/models/ADCIRC/source-analysis/storm-surge/README.md
++++ b/models/ADCIRC/source-analysis/storm-surge/README.md
+@@ -16 +16 @@
+-각 노트의 본문에 ADCIRC source code 의 file:line 인용 (`read_input.F:2157`, `wind.F:1501` 등). source 위치: [`models/ADCIRC/raw/source_code/adcirc/src/`](../../raw/source_code/) (raw/ .gitignore — 별도 clone 으로 재현 가능).
++각 노트의 본문에 ADCIRC source code 의 file:line 인용 (`read_input.F:2171-2171`, `wind.F:1501` 등). source 위치: [`models/ADCIRC/raw/source_code/adcirc/src/`](../../raw/source_code/) (raw/ .gitignore — 별도 clone 으로 재현 가능).
+--- a/models/ADCIRC/source-analysis/storm-surge/adcirc-storm-surge-foundation.md
++++ b/models/ADCIRC/source-analysis/storm-surge/adcirc-storm-surge-foundation.md
+@@ -7 +7 @@
+-verification_method: "2026-07-10 재승격: 공식 docs 직접 대조 — nws_parameters.rst(NWS=3 :248 / =4 :251 / =8 :272-273 / =12 :298 / =13 :308-310 / =14 :311-312 / =19 discouraged :32)·examples/index.rst:26-36(APES/Isabel/Katrina/Global Storm Tide)·ramping_met_forcing_at_hotstart.rst:4·typical_parameter_selections.rst(존재 확인). ★NWS=13 code≠docs divergence 판정: read_input.F:1782(owiWindNetcdf namelist 강제)·:4721('OWI Netcdf (NWS13) format') = 코드 정본 OWI NetCDF, rst :308-310 의 'ramping(WRAMP)' 서술은 stale. 원본은 modeling-wiki 2026-04 작성분 마이그레이션."
++verification_method: "2026-07-10 재승격: 공식 docs 직접 대조 — nws_parameters.rst(NWS=3 :248 / =4 :251 / =8 :272-273 / =12 :298 / =13 :308-310 / =14 :311-312 / =19 discouraged :32)·examples/index.rst:26-36(APES/Isabel/Katrina/Global Storm Tide)·ramping_met_forcing_at_hotstart.rst:4·typical_parameter_selections.rst(존재 확인). ★NWS=13 code≠docs divergence 판정: read_input.F:1796-1796(owiWindNetcdf namelist 강제)·:4721('OWI Netcdf (NWS13) format') = 코드 정본 OWI NetCDF, rst :308-310 의 'ramping(WRAMP)' 서술은 stale. 원본은 modeling-wiki 2026-04 작성분 마이그레이션."
+@@ -95 +95 @@
+-  - OWI NetCDF gridded wind/pressure — **코드 정본**: `read_input.F:1782`(owiWindNetcdf namelist 필수)·`:4721`("OWI Netcdf (NWS13) format wind/pres used"), reader = [[adcirc-met-forcing-implementation]] §D
++  - OWI NetCDF gridded wind/pressure — **코드 정본**: `read_input.F:1796-1796`(owiWindNetcdf namelist 필수)·`:4721`("OWI Netcdf (NWS13) format wind/pres used"), reader = [[adcirc-met-forcing-implementation]] §D
+--- a/models/ADCIRC/source-analysis/storm-surge/adcirc-storm-surge-nws-families.md
++++ b/models/ADCIRC/source-analysis/storm-surge/adcirc-storm-surge-nws-families.md
+@@ -7 +7 @@
+-verification_method: "2026-07-10 재승격: 공식 docs 직접 대조 — nws_parameters.rst(NWS=3 :248 / =4 :251 / =13 :308-310 / =14 :311-312 / =19 discouraged :32 verbatim). NWS=13 실기능은 코드 정본(read_input.F:1782 owiWindNetcdf namelist·:4721 'OWI Netcdf (NWS13) format') — rst :308-310 'ramping' 서술은 stale(code≠docs, [[adcirc-storm-surge-foundation]] 판정 공유). 2026-07-10 L4 감사 후속: 개인 워크플로 서술은 _staging/from-canonical/adcirc-nws13-jma-msm-local-workflow.md 로 추출(절대규칙 #2·#8), 객관 단언은 [[adcirc-met-forcing-implementation]] (file:line 인용 보유) 로 소급."
++verification_method: "2026-07-10 재승격: 공식 docs 직접 대조 — nws_parameters.rst(NWS=3 :248 / =4 :251 / =13 :308-310 / =14 :311-312 / =19 discouraged :32 verbatim). NWS=13 실기능은 코드 정본(read_input.F:1796-1796 owiWindNetcdf namelist·:4721 'OWI Netcdf (NWS13) format') — rst :308-310 'ramping' 서술은 stale(code≠docs, [[adcirc-storm-surge-foundation]] 판정 공유). 2026-07-10 L4 감사 후속: 개인 워크플로 서술은 _staging/from-canonical/adcirc-nws13-jma-msm-local-workflow.md 로 추출(절대규칙 #2·#8), 객관 단언은 [[adcirc-met-forcing-implementation]] (file:line 인용 보유) 로 소급."
+@@ -55 +55 @@
+-- type: OWI-style NetCDF gridded wind and pressure — **코드 정본** `read_input.F:1782`(owiWindNetcdf namelist 필수)·`:4721`("OWI Netcdf (NWS13) format wind/pres used")
++- type: OWI-style NetCDF gridded wind and pressure — **코드 정본** `read_input.F:1796-1796`(owiWindNetcdf namelist 필수)·`:4721`("OWI Netcdf (NWS13) format wind/pres used")
+--- a/models/ADCIRC/source-analysis/storm-surge/adcirc-storm-surge.md
++++ b/models/ADCIRC/source-analysis/storm-surge/adcirc-storm-surge.md
+@@ -24 +24 @@
+-- `read_input.F:2157, 2190, 2255-2261, 2430, 2884, 2706, 2975` — NWS modes, `BLAdj/GEOFACTOR`, `RampMete`.
++- `read_input.F:2171-2171, 2190, 2255-2261, 2430, 2884, 2706, 2975` — NWS modes, `BLAdj/GEOFACTOR`, `RampMete`.
+@@ -36 +36 @@
+-`fort.15` line for NWS=20 (`read_input.F:2706`):
++`fort.15` line for NWS=20 (`read_input.F:2720-2720`):
+@@ -61 +61 @@
+-NWS=29 = NWS=19 (AHM) embedded in **OWI/NWS12 background** (`read_input.F:2157`).
++NWS=29 = NWS=19 (AHM) embedded in **OWI/NWS12 background** (`read_input.F:2171-2171`).
+@@ -157 +157 @@
+-- `NRAMP, DRAMP` (`read_input.F:2430`).
++- `NRAMP, DRAMP` (`read_input.F:2444-2444`).
+--- a/models/ADCIRC/source-analysis/tide/adcirc-tide-forcing-implementation.md
++++ b/models/ADCIRC/source-analysis/tide/adcirc-tide-forcing-implementation.md
+@@ -66 +66 @@
+-위 블록은 반복 순서를 설명한 도식이다. 첫 첨자는 분조, 둘째는 경계 노드이며, 분조 헤더 묶음 뒤에 별도의 선택 입력 줄을 추가하지 않는다. 공식 [fort.15 형식](https://adcirc.github.io/adcirc/technical_reference/input_files/fort15.html)의 `ALPHAE`가 이 로컬 구현에서는 `ELEVALPHA`다. 각 분조의 값은 `mesh.F:1822–1834`가 `NBDV`에서 구성하는 `NBD` 순서로 대응하며 `read_input.F:3493–3496`에 노드 번호와 함께 기록된다. 실제 수위 적용은 `gwce.F:1644–1649`에서 `EMO(J,I)*FF(J)*RampElev*cos(ARG)`를 `Eta2(NBD(I))`에 더한다.
++위 블록은 반복 순서를 설명한 도식이다. 첫 첨자는 분조, 둘째는 경계 노드이며, 분조 헤더 묶음 뒤에 별도의 선택 입력 줄을 추가하지 않는다. 공식 [fort.15 형식](https://adcirc.github.io/adcirc/technical_reference/input_files/fort15.html)의 `ALPHAE`가 이 로컬 구현에서는 `ELEVALPHA`다. 각 분조의 값은 `mesh.F:1822–1834`가 `NBDV`에서 구성하는 `NBD` 순서로 대응하며 `read_input.F:3507–3510`에 노드 번호와 함께 기록된다. 실제 수위 적용은 `gwce.F:1644–1649`에서 `EMO(J,I)*FF(J)*RampElev*cos(ARG)`를 `Eta2(NBD(I))`에 더한다.
+@@ -163 +163 @@
+-5. **`ETRF(J)=0` makes that constituent’s ETRF-dependent potential coefficient zero in the traditional constituent branch.** Under `CTIP` and `.not.tidePotential%active()`, `TPMUL=RampTip*ETRF(J)*TPK(J)*FFT(J)` multiplies the potential term added to `TIP2` (`src/timestep.F:1517–1556`). This does not mean applying an unreduced full potential. `SALTMUL` is separate; open-boundary `EMO/EFA` synthesis is also separate (`src/gwce.F:1638–1650`). The full-formula `tidePotential%compute` path is a different branch (`src/timestep.F:1520–1521`); its internals are outside this correction.
++5. **`ETRF(J)=0` makes that constituent’s ETRF-dependent potential coefficient zero in the traditional constituent branch.** Under `CTIP` and `.not.tidePotential%active()`, `TPMUL=RampTip*ETRF(J)*TPK(J)*FFT(J)` multiplies the potential term added to `TIP2` (`src/timestep.F:1521–1560`). This does not mean applying an unreduced full potential. `SALTMUL` is separate; open-boundary `EMO/EFA` synthesis is also separate (`src/gwce.F:1638–1650`). The full-formula `tidePotential%compute` path is a different branch (`src/timestep.F:1524–1525`); its internals are outside this correction.
+--- a/models/ADCIRC/source-analysis/tide/adcirc-tide-harmonic-prep.md
++++ b/models/ADCIRC/source-analysis/tide/adcirc-tide-harmonic-prep.md
+@@ -48,2 +48,2 @@
+-- 개요의 분조 수 설명은 `NTIP`에 붙어 있지만, 상세 정의에서 **NTIP는 퍼텐셜/SAL 사용 방식**, **NTIF는 퍼텐셜 분조 수**다. 코드도 `NTIP`를 0–2로 검사하고 `NTIF`로 분조 입력을 반복한다. `docs/user_guide/model_configuration/tides/index.rst:15–19`; `docs/technical_reference/parameter_definitions/index.rst:452–459,758–759`; `src/read_input.F:1703–1731,3335–3349`.
+-- 개요의 `AMIG` 설명에는 amplitude가 나오지만, 상세 정의와 코드에서 **AMIG는 주파수**, 경계 진폭은 **EMO**다. `PER=2π/AMIG`와 시간 인수에 곱하는 위치를 함께 확인한다. `docs/user_guide/model_configuration/tides/index.rst:29–32`; `docs/technical_reference/parameter_definitions/index.rst:789–801`; `src/read_input.F:3431–3441`; `src/gwce.F:1638–1649`.
++- 개요의 분조 수 설명은 `NTIP`에 붙어 있지만, 상세 정의에서 **NTIP는 퍼텐셜/SAL 사용 방식**, **NTIF는 퍼텐셜 분조 수**다. 코드도 `NTIP`를 0–2로 검사하고 `NTIF`로 분조 입력을 반복한다. `docs/user_guide/model_configuration/tides/index.rst:15–19`; `docs/technical_reference/parameter_definitions/index.rst:452–459,758–759`; `src/read_input.F:1717–1745,3335–3349`.
++- 개요의 `AMIG` 설명에는 amplitude가 나오지만, 상세 정의와 코드에서 **AMIG는 주파수**, 경계 진폭은 **EMO**다. `PER=2π/AMIG`와 시간 인수에 곱하는 위치를 함께 확인한다. `docs/user_guide/model_configuration/tides/index.rst:29–32`; `docs/technical_reference/parameter_definitions/index.rst:789–801`; `src/read_input.F:3445–3455`; `src/gwce.F:1638–1649`.
+@@ -63 +63 @@
+-| 분조·노드 순서 | NBFR 헤더와 각 분조 블록, 분조당 NETA개 행을 fort.14의 경계 구간/구간 내 순서와 대조 | 아래 §A 및 `src/mesh.F:1822–1834`, `src/read_input.F:3431–3456,3485–3497`. 실제 입력 대조 미수행 |
++| 분조·노드 순서 | NBFR 헤더와 각 분조 블록, 분조당 NETA개 행을 fort.14의 경계 구간/구간 내 순서와 대조 | 아래 §A 및 `src/mesh.F:1822–1834`, `src/read_input.F:3445–3470,3485–3497`. 실제 입력 대조 미수행 |
+@@ -71 +71 @@
+-2. `fort.16`의 NTIP 선택 및 NBFR 분조·노드·진폭·위상 echo를 입력과 대조한다. `src/read_input.F:1717–1731,3431–3435,3485–3497`은 로그 생성 위치다. echo만으로 내부 계산 경로의 실행이나 물리 적합성을 확정하지 않는다.
++2. `fort.16`의 NTIP 선택 및 NBFR 분조·노드·진폭·위상 echo를 입력과 대조한다. `src/read_input.F:1731–1745,3431–3435,3485–3497`은 로그 생성 위치다. echo만으로 내부 계산 경로의 실행이나 물리 적합성을 확정하지 않는다.
+@@ -128,3 +128,3 @@
+-`DRAMP=2 day`를 2일 뒤 강제가 정확히 1이 되는 선형 ramp로 읽지 않는다. S는 이 설정에서 `DRampElev=DRAMP`, `RampElev=tanh(2 TimeLoc/(86400 DRampElev))`를 사용한다. 경계 합성에는 이 계수가 곱해지고, `TimeH=IT*DTDP+(STATIM−REFTIM)*86400`이다(S `src/read_input.F:2894–2902`; `src/timestep.F:257–258,301–308`; `src/gwce.F:1638–1651`). 선형 주기해와 비교할 때에는 ramp와 초기 과도응답의 영향을 별도로 확인한다.
+-
+-Q의 출력 선택값 `NOUTE/NOUTV/NOUTGE/NOUTGV=5`, `NHSTAR=5`는 S의 입력 코드에서 NetCDF4(HDF5) 출력 선택으로 처리된다. 문서의 일부 값 열거만 보고 미지원이라고 판단하지 않는다. 여기서 확인한 것은 입력 분기이며 실제 출력 라이브러리 실행이 아니다(S `src/read_input.F:3628–3632,3757–3761,4143–4148,4217–4222,4534–4537`).
++`DRAMP=2 day`를 2일 뒤 강제가 정확히 1이 되는 선형 ramp로 읽지 않는다. S는 이 설정에서 `DRampElev=DRAMP`, `RampElev=tanh(2 TimeLoc/(86400 DRampElev))`를 사용한다. 경계 합성에는 이 계수가 곱해지고, `TimeH=IT*DTDP+(STATIM−REFTIM)*86400`이다(S `src/read_input.F:2908–2916`; `src/timestep.F:257–258,301–308`; `src/gwce.F:1638–1651`). 선형 주기해와 비교할 때에는 ramp와 초기 과도응답의 영향을 별도로 확인한다.
++
++Q의 출력 선택값 `NOUTE/NOUTV/NOUTGE/NOUTGV=5`, `NHSTAR=5`는 S의 입력 코드에서 NetCDF4(HDF5) 출력 선택으로 처리된다. 문서의 일부 값 열거만 보고 미지원이라고 판단하지 않는다. 여기서 확인한 것은 입력 분기이며 실제 출력 라이브러리 실행이 아니다(S `src/read_input.F:3642–3646,3757–3761,4143–4148,4217–4222,4534–4537`).
+@@ -167 +167 @@
+-FES handbook p. 6의 loading atlas는 **radial component**이고, [PyFES 설정][pyfes-guide]도 `tide`와 `radial`을 분리한다. ADCIRC `fort.24`는 self-attraction/earth-load 강제 항이며 `SALTAMP/SALTPHA`를 `TIP2`에 합성한다(`docs/technical_reference/input_files/fort24.rst:1–8`; `src/timestep.F:1543–1555`). **radial 변위 파일을 단위만 바꿔 fort.24로 쓰는 변환은 이 근거로 성립하지 않는다.** 두 변수의 물리량·퍼텐셜 환산·부호·분조를 잇는 정의가 추가로 필요하다(`source-needed`). 경계 수위 EMO/EFA 준비와 별도로 다룬다.
++FES handbook p. 6의 loading atlas는 **radial component**이고, [PyFES 설정][pyfes-guide]도 `tide`와 `radial`을 분리한다. ADCIRC `fort.24`는 self-attraction/earth-load 강제 항이며 `SALTAMP/SALTPHA`를 `TIP2`에 합성한다(`docs/technical_reference/input_files/fort24.rst:1–8`; `src/timestep.F:1547–1559`). **radial 변위 파일을 단위만 바꿔 fort.24로 쓰는 변환은 이 근거로 성립하지 않는다.** 두 변수의 물리량·퍼텐셜 환산·부호·분조를 잇는 정의가 추가로 필요하다(`source-needed`). 경계 수위 EMO/EFA 준비와 별도로 다룬다.
+@@ -220 +220 @@
+-- `read_input.F:1705-1731, 3344-3497, 6282-6463` — `NTIP`, NBFR boundary block, SAL reader.
++- `read_input.F:1719-1745, 3344-3497, 6282-6463` — `NTIP`, NBFR boundary block, SAL reader.
+@@ -223 +223 @@
+-- `hstart.F:1525-1532` — SAL into TIP2.
++- `hstart.F:1530-1537` — SAL into TIP2.
+@@ -250 +250 @@
+-경계 노드 순서는 전체 격자 번호의 정렬 순서가 아니다. `src/mesh.F:1822–1834`는 `K=1..NOPE`, 각 구간의 `I=1..NVDLL(K)` 순서로 `NBDV(K,I)`를 `NBD`에 이어 붙인다. 분조별 `EMO/EFA` 행은 이 순서에 맞아야 하며 `src/read_input.F:3493–3496`의 노드·진폭·위상 출력과 대조할 수 있다. 공식 [fort.15 구조](https://adcirc.github.io/adcirc/technical_reference/input_files/fort15.html)도 분조를 첫 첨자로 표기한다. 이 절의 도식은 전체 입력 파일 예제가 아니다.
++경계 노드 순서는 전체 격자 번호의 정렬 순서가 아니다. `src/mesh.F:1822–1834`는 `K=1..NOPE`, 각 구간의 `I=1..NVDLL(K)` 순서로 `NBDV(K,I)`를 `NBD`에 이어 붙인다. 분조별 `EMO/EFA` 행은 이 순서에 맞아야 하며 `src/read_input.F:3507–3510`의 노드·진폭·위상 출력과 대조할 수 있다. 공식 [fort.15 구조](https://adcirc.github.io/adcirc/technical_reference/input_files/fort15.html)도 분조를 첫 첨자로 표기한다. 이 절의 도식은 전체 입력 파일 예제가 아니다.
+@@ -254 +254 @@
+-Called from main startup (`adcirc.F:292-293`); reader at `read_input.F:6282-6463`.
++Called from main startup (`adcirc.F:292-293`); reader at `read_input.F:6320-6501`.
+@@ -310 +310 @@
+-SAL synthesis into `TIP2` (`timestep.F:1547-1548`, `hstart.F:1525-1532`):
++SAL synthesis into `TIP2` (`timestep.F:1551-1552`, `hstart.F:1530-1537`):
+@@ -335,3 +335,3 @@
+-`STATIM`과 `REFTIM`은 일(day) 단위로 읽히며(`src/read_input.F:2534–2543`), 내부 `TimeH`는 초다(`src/timestep.F:257–258`). 합성은 `AMIG(J)*(TimeH−NCYC*PER(J))+FACE(J)−EFA(J,I)`이며 `EFA`는 입력의 도(degree)에서 radian으로 변환한다(`src/read_input.F:3436,3493–3496`; `src/gwce.F:1642–1649`). 실제 입력을 준비할 때 원자료의 기준시각·위상 규약·단위와 이 정의를 대조해야 한다. 이 코드 확인은 외부 DB의 규약이나 실제 변환 자료의 품질을 검증한 것이 아니다.
+-
+-Harmonic synthesis uses `timeh`, **not** raw model time (`gwce.F:1642-1644`, `timestep.F:1532-1535`).
++`STATIM`과 `REFTIM`은 일(day) 단위로 읽히며(`src/read_input.F:2548–2557`), 내부 `TimeH`는 초다(`src/timestep.F:257–258`). 합성은 `AMIG(J)*(TimeH−NCYC*PER(J))+FACE(J)−EFA(J,I)`이며 `EFA`는 입력의 도(degree)에서 radian으로 변환한다(`src/read_input.F:3450-3450,3493–3496`; `src/gwce.F:1642–1649`). 실제 입력을 준비할 때 원자료의 기준시각·위상 규약·단위와 이 정의를 대조해야 한다. 이 코드 확인은 외부 DB의 규약이나 실제 변환 자료의 품질을 검증한 것이 아니다.
++
++Harmonic synthesis uses `timeh`, **not** raw model time (`gwce.F:1642-1644`, `timestep.F:1536-1539`).
+@@ -346 +346 @@
+-4. §A의 NBFR 레코드와 분조/노드 순서대로 작성하고 fort.16 echo 및 같은 성분의 재합성에 대조한다(`src/read_input.F:3431–3456,3485–3497`; `src/gwce.F:1638–1649`).
++4. §A의 NBFR 레코드와 분조/노드 순서대로 작성하고 fort.16 echo 및 같은 성분의 재합성에 대조한다(`src/read_input.F:3445–3470,3485–3497`; `src/gwce.F:1638–1649`).
+@@ -355 +355 @@
+-- **분조/노드 순서**: NBFR의 ELEVALPHA는 echo되지만 BOUNTAG와 대조되지 않는다. SAL의 TIPOTAG 매칭과 혼동하지 않는다(§A/C; `src/read_input.F:3485–3497`).
++- **분조/노드 순서**: NBFR의 ELEVALPHA는 echo되지만 BOUNTAG와 대조되지 않는다. SAL의 TIPOTAG 매칭과 혼동하지 않는다(§A/C; `src/read_input.F:3499–3511`).
+@@ -368 +368 @@
+-| Disable tidal potential and periodic elevation forcing | `NTIP=0`; keep the required `NBFR=0` line. Any non-periodic elevation boundary data are a separate input (`src/read_input.F:1705–1731,3410–3444`; [official NBFR definition](https://adcirc.github.io/adcirc/technical_reference/parameter_definitions/index.html)). |
++| Disable tidal potential and periodic elevation forcing | `NTIP=0`; keep the required `NBFR=0` line. Any non-periodic elevation boundary data are a separate input (`src/read_input.F:1719–1745,3410–3444`; [official NBFR definition](https://adcirc.github.io/adcirc/technical_reference/parameter_definitions/index.html)). |
