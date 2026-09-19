@@ -174,7 +174,7 @@ verification_date: YYYY-MM-DD
 `research/` 격리 enforce 와 canonical 무결성 검증은 다음 스크립트로 수행 (정책 출처: [plan.md](plan.md) D3·M10·G8):
 
 - `tools/validate-research-isolation.sh` — concepts/, models/, experience/ 가 research/ 를 직접 참조하는지 + research/ 내 .md 가 `citation_status: draft-unsourced` 인지 검증. exit 0/1/2/3.
-- `tools/validate-canonical-hygiene.sh` — **G8** 강제: canonical(concepts/·models/·textbook/) 에 작성자 로컬 절대경로(G8b) 또는 개인사례 유도 placeholder(G8d) 가 있는지 검증. vendor 경로·repo-상대 file:line·textbook/md 미러·거버넌스(POLICY/INDEX) 면제. exit 0/1/2/3. 회귀: `tools/test_validate_canonical_hygiene.py` (23 case).
+- `tools/validate-canonical-hygiene.sh` — **G8** 강제: canonical(concepts/·models/·textbook/) 에 작성자 로컬 절대경로(G8b) 또는 개인사례 유도 placeholder(G8d) 가 있는지 검증 + concepts/·models/ 의 작성자 작업환경 흔적(G8e: `local path:`·"this workspace"·"current local …"·"locally confirmed"·"local note"·"위키 머신" 류 — `--staged` 는 추가된 줄만 차단, working-tree 는 기존 잔존분 WARN). vendor 경로·repo-상대 file:line·textbook/md 미러·거버넌스(POLICY/INDEX) 면제. exit bit OR 1(G8b)/2(G8d)/4(G8e). 회귀: `tools/test_validate_canonical_hygiene.py` (33 case).
 - `tools/validate-link-integrity.sh` — 내부 링크 무결성: 상대 `.md` 링크 + `[[wikilink]]` 타겟이 실존 노트로 resolve 되는지. 코드·glob·textbook/md 미러 스킵, `(예정)`·`미생성` 마커는 forward-ref 로 통과. exit 0/1/2/3. 회귀: `tools/test_validate_link_integrity.py` (16 case).
 - `tools/validate-layer-deps.sh` — **§8.1** 강제: 4-레이어 근거 의존성 방향(④→③→②→①)·동일 layer 순환 금지·레이어 전용 경로(theory-*·NN-applied-*)의 layer/depends_on 필수·대상 실존성·scope guard(HEAD 기준 verified 오염 차단). 회귀: `tools/test_validate_layer_deps.py`.
 - **`tools/validate-all.sh` — 위 4종의 단일 진입점(SSOT, F-8)**. pre-commit 훅은 이것만 호출 — validator 추가·변경 시 이 목록만 갱신.

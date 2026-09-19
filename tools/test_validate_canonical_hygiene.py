@@ -93,6 +93,50 @@ class TestG8dPlaceholders(unittest.TestCase):
         self.assertFalse(self._hit("- ▢ NWS=8 parametric vortex 보강 (source-code)"))
 
 
+class TestG8eFootprints(unittest.TestCase):
+    def _hit(self, line: str) -> bool:
+        return bool(vch.find_footprints(line))
+
+    # --- 위반 (2026-09-19 스윕 잔존 표현) ---
+    def test_local_path_field(self):
+        self.assertTrue(self._hit("- local path: not downloaded yet"))
+
+    def test_this_workspace(self):
+        self.assertTrue(self._hit("- the exact local runnable DELILAH package is not yet attached in this workspace"))
+
+    def test_current_local_interpretation(self):
+        self.assertTrue(self._hit("Current local interpretation:"))
+
+    def test_locally_confirmed(self):
+        self.assertTrue(self._hit("Locally confirmed values:"))
+
+    def test_local_note(self):
+        self.assertTrue(self._hit("- `vanthiel_vanrijn` is the practical default in the local note"))
+
+    def test_local_machine(self):
+        self.assertTrue(self._hit("- local machine does not currently have the package installed"))
+
+    def test_wiki_machine_korean(self):
+        self.assertTrue(self._hit("> 본 위키 머신(WSL2 Ubuntu 24.04, RTX 5070)에서 직접 build"))
+
+    # --- 비위반 (물리 용어 local) ---
+    def test_physical_local_ok(self):
+        self.assertFalse(self._hit("local wave height H depends on local depth h"))
+        self.assertFalse(self._hit("the local Richardson number controls mixing"))
+        self.assertFalse(self._hit("local time step (LTS) in D-Flow FM"))
+
+    def test_local_scheme_ok(self):
+        self.assertFalse(self._hit("a locally conservative scheme"))
+
+
+class TestStagedAddedLines(unittest.TestCase):
+    def test_hunk_parse(self):
+        m = vch.HUNK_RE.match("@@ -10,2 +12,3 @@ heading")
+        self.assertEqual((m.group(1), m.group(2)), ("12", "3"))
+        m = vch.HUNK_RE.match("@@ -5 +7 @@")
+        self.assertEqual((m.group(1), m.group(2)), ("7", None))
+
+
 class TestExemptions(unittest.TestCase):
     def test_textbook_md_exempt(self):
         self.assertTrue(vch.is_exempt("textbook/md/Stewart.md"))

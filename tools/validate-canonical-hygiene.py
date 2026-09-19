@@ -11,6 +11,12 @@
         `/opt/`, `/usr/`)와 repo-상대 `file:line` 은 비위반.
   (G8d) 개인·프로젝트·실행 사례 기입을 유도하는 placeholder 금지 —
         "User-experience cases" 류, 또는 (체크박스/▢ + 개인사례 keyword) 한 줄.
+  (G8e) 작성자 작업환경 흔적 금지 — `local path:`, "this workspace",
+        "current local interpretation", "locally confirmed", "local note",
+        "local machine/scripts/runnable/calibration/experiments", "위키 머신" 류
+        (CONVENTIONS §4 중립 provenance·§6, 절대규칙 8). 2026-09-19 Jev 전수 스윕에서
+        정화 잔존 흔적으로 확인된 표현만 등록. 기존 잔존분은 tree 모드에서 WARN(비실패),
+        --staged 모드는 *이번에 추가된 줄*만 검사해 신규 유입을 차단.
 
 도구 범위(중요):
   research-isolation validator 와 동일한 **conservative policy scanner** 철학.
@@ -29,11 +35,11 @@
   python3 tools/validate-canonical-hygiene.py            # working tree
   python3 tools/validate-canonical-hygiene.py --staged   # staged snapshot
 
-Exit codes:
+Exit codes (bit OR):
   0 = OK
   1 = G8b(경로) 위반
   2 = G8d(placeholder) 위반
-  3 = 둘 다
+  4 = G8e(작업환경 흔적) 신규 유입 (--staged 만; tree 모드 잔존분은 WARN)
 """
 from __future__ import annotations
 
@@ -73,6 +79,15 @@ G8D_DIRECT_RE = re.compile(r"(?i)user[- ]experience cases")
 G8D_MARKER = r"(?:▢|☐|- \[ \]|to be filled|lead modeler|from project memory|채워\s*넣|기입)"
 G8D_CASE = r"(?:개인\s*사례|내\s*사례|경험\s*사례|project[- ]specific incident|project memory|run result|런\s*결과|실행\s*사례)"
 G8D_INVITE_RE = re.compile(rf"(?i)(?:{G8D_MARKER}).{{0,80}}(?:{G8D_CASE})|(?:{G8D_CASE}).{{0,40}}(?:{G8D_MARKER})")
+
+# ---- G8e: 작성자 작업환경 흔적 ----
+# "local" 단독은 물리 용어(local wave height, local depth…)라 금지하지 않는다 — 작업환경을
+# 가리키는 결합형만 등록.
+G8E_RE = re.compile(
+    r"(?i)\blocal path\s*:|\bthis workspace\b|\bcurrent(?:ly)? local\b|\blocally confirmed\b"
+    r"|\blocal[- ]note\b|\blocal (?:machine|scripts?|runnable|calibration|experiments?|revalidation)\b"
+    r"|(?:위키|writer)\s*머신"
+)
 
 FRONTMATTER_RE = re.compile(r"\A---\n.*?\n---", re.DOTALL)
 
@@ -158,6 +173,32 @@ def find_placeholders(content: str) -> list[tuple[int, str]]:
     return hits
 
 
+def find_footprints(content: str) -> list[tuple[int, str]]:
+    hits: list[tuple[int, str]] = []
+    for i, line in enumerate(content.splitlines(), 1):
+        if G8E_RE.search(line):
+            snippet = line.strip()
+            if len(snippet) > 120:
+                snippet = snippet[:117] + "…"
+            hits.append((i, snippet))
+    return hits
+
+
+HUNK_RE = re.compile(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@")
+
+
+def staged_added_lines(path: str) -> set[int]:
+    """staged diff 에서 새로 추가된 줄 번호(새 파일 기준)."""
+    out = run(["git", "diff", "--cached", "-U0", "--no-color", "--", path])
+    added: set[int] = set()
+    for line in out.stdout.splitlines():
+        m = HUNK_RE.match(line)
+        if m:
+            start, count = int(m.group(1)), int(m.group(2) or "1")
+            added.update(range(start, start + count))
+    return added
+
+
 def main() -> int:
     staged = "--staged" in sys.argv[1:]
     mode_label = "staged" if staged else "working-tree"
@@ -172,7 +213,7 @@ def main() -> int:
         g8d_files = [f for f in tree_files(PLACEHOLDER_ROOTS) if not is_exempt(f)]
 
     # 검사 1 — G8b 경로
-    print(f"[1/2] G8b 작성자 로컬 절대경로 검사 (mode: {mode_label})…")
+    print(f"[1/3] G8b 작성자 로컬 절대경로 검사 (mode: {mode_label})…")
     path_violations: list[tuple[str, int, str, str]] = []
     for f in g8b_files:
         content = reader(f)
@@ -190,7 +231,7 @@ def main() -> int:
         print("  OK: 작성자 로컬 절대경로 없음.")
 
     # 검사 2 — G8d placeholder
-    print("[2/2] G8d 개인사례 유도 placeholder 검사…")
+    print("[2/3] G8d 개인사례 유도 placeholder 검사…")
     ph_violations: list[tuple[str, int, str]] = []
     for f in g8d_files:
         content = reader(f)
@@ -207,20 +248,41 @@ def main() -> int:
     else:
         print("  OK: 개인사례 placeholder 없음.")
 
-    fail_b = bool(path_violations)
-    fail_d = bool(ph_violations)
+    # 검사 3 — G8e 작업환경 흔적 (staged: 추가된 줄만 차단 / tree: 잔존분 WARN)
+    print("[3/3] G8e 작성자 작업환경 흔적 검사…")
+    fp_hits: list[tuple[str, int, str]] = []
+    for f in g8d_files:
+        content = reader(f)
+        if not content:
+            continue
+        hits = find_footprints(content)
+        if staged and hits:
+            added = staged_added_lines(f)
+            hits = [h for h in hits if h[0] in added]
+        fp_hits.extend((f, ln, snip) for ln, snip in hits)
+
+    if fp_hits and staged:
+        print("  FAIL: 이번 커밋이 canonical 노트에 작업환경 흔적을 추가:")
+    elif fp_hits:
+        print(f"  WARN: canonical 노트에 기존 작업환경 흔적 {len(fp_hits)}줄 (비실패 — 정화 대상):")
+    for f, ln, snip in fp_hits:
+        print(f"    {f}:{ln} {snip}")
+    if fp_hits:
+        print("  → 공식 출처 표기로 중립화하거나 개인 운영 기록은 experience/·coastal-runs 로 (CONVENTIONS §4·§6, G8e).")
+    else:
+        print("  OK: 작업환경 흔적 없음.")
+
+    labels = []
+    code = 0
+    if path_violations:
+        code |= 1; labels.append("G8b 경로")
+    if ph_violations:
+        code |= 2; labels.append("G8d placeholder")
+    if staged and fp_hits:
+        code |= 4; labels.append("G8e 작업환경 흔적")
     print()
-    if fail_b and fail_d:
-        print("RESULT: FAIL (G8b 경로 + G8d placeholder)")
-        return 3
-    if fail_b:
-        print("RESULT: FAIL (G8b 경로)")
-        return 1
-    if fail_d:
-        print("RESULT: FAIL (G8d placeholder)")
-        return 2
-    print("RESULT: OK")
-    return 0
+    print(f"RESULT: FAIL ({' + '.join(labels)})" if code else "RESULT: OK")
+    return code
 
 
 if __name__ == "__main__":
