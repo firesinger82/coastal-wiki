@@ -5,22 +5,22 @@ promoted_date: 2026-05-24
 promote_phase: 2a
 classification: manual-notes-catalog
 source_id: models/XBeach
-notes: "P2 catalog audit 2026-05-24 — xbeach.readthedocs.io 공식 docs URL audit confirmed via WebFetch (examples.html: DELILAH 2D directional spreading + Holland Coast 1976 storm morfac=1 모두 local note 인용과 일치). Mixed local  + 외부 공식 URL — primary citation = readthedocs"
+notes: "P2 catalog audit 2026-05-24 — xbeach.readthedocs.io 공식 docs URL audit confirmed via WebFetch (examples.html: DELILAH 2D directional spreading + Holland Coast 1976 storm morfac=1 모두 실무 매뉴얼 노트 인용과 일치). Mixed 실무 매뉴얼 노트 + 외부 공식 URL — primary citation = readthedocs"
 ---
-# XBeach Local Manual Stack
+# XBeach Manual Stack
 
 ## Metadata
 
 - date: 2026-04-30
-- title: XBeach local manual stack
+- title: XBeach manual stack
 - source type: manual
-- authors: XBeach / Deltares documentation plus local practical note author(s)
-- year: mixed; official docs are active and the local note targets XBeach v1.24 Halloween
+- authors: XBeach / Deltares documentation plus practical manual note author(s)
+- year: mixed; official docs are active and the practical manual note targets XBeach v1.24 Halloween
 - link: https://xbeach.readthedocs.io/en/latest/
-- local path:
-  - numerical_models/xbeach/XBEACH_MANUAL.md
-  - numerical_models/xbeach/src/doc/manual/XBeach_manual_master.pdf
-  - numerical_models/xbeach/src/doc/manual/XBeach_manual_kingsday.pdf
+- archived copies:
+  - `XBEACH_MANUAL.md` — not archived in this wiki
+  - `models/XBeach/raw/manuals/pdfs/XBeach_manual_master.pdf`
+  - `models/XBeach/raw/manuals/pdfs/XBeach_manual_kingsday.pdf`
 
 ## Why This Matters
 
@@ -34,15 +34,15 @@ This is the first confirmed XBeach foundation source set for the modeling wiki. 
   - `wavemodel = stationary`
   - `wavemodel = surfbeat`
   - `wavemodel = nonh`
-- local documentation already frames `surfbeat` as the recommended/default practical mode for many storm-impact applications
-- morphology-relevant controls and bed-friction options are explicit enough in the local manual note to seed a first glossary
+- the documentation already frames `surfbeat` as the recommended/default practical mode for many storm-impact applications
+- morphology-relevant controls and bed-friction options are explicit enough in the practical manual note to seed a first glossary
 
 ## Practical Value
 
 - method details: gives a compact overview of XBeach physics, mode structure, grid logic, and major process groups
-- implementation detail: confirms local executable/runtime existence and gives practical run setup framing through `params.txt`
+- implementation detail: gives practical run setup framing through `params.txt`
 - validation detail: states that the model has been validated against analytical, laboratory, and field cases using a standard parameter set
-- limitations: the local note is practical and dense, but it should still be checked against the official manual pages when exact behavior or parameter nuance matters
+- limitations: the practical manual note is practical and dense, but it should still be checked against the official manual pages when exact behavior or parameter nuance matters
 
 ## Relevance Tags
 

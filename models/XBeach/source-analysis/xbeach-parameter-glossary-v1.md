@@ -17,15 +17,15 @@ Date: 2026-04-30
 This is the first-pass XBeach glossary for the modeling wiki.
 
 Scope note:
-- this version is grounded mainly in the confirmed local source stack
+- this version is grounded mainly in the confirmed source stack listed below
 - exact behavior still needs later cross-checking against the full official manual pages when details matter
 - the goal here is to stabilize the first vocabulary and setup buckets, not to exhaust every parameter
 
 ## Source Basis
 
-Primary confirmed local sources:
+Primary confirmed sources:
 - [[01-local-manual-stack]]
-- `numerical_models/xbeach/XBEACH_MANUAL.md`
+- `XBEACH_MANUAL.md` (XBeach v1.24 practical manual note; not archived in this wiki)
 - official docs root: `https://xbeach.readthedocs.io/en/latest/`
 
 ## Why This Glossary Exists
@@ -40,7 +40,7 @@ Primary confirmed local sources:
 
 Primary mode-selection key.
 
-Current locally confirmed values:
+Values confirmed in the source basis above:
 - `wavemodel = stationary`
 - `wavemodel = surfbeat`
 - `wavemodel = nonh`
@@ -53,16 +53,16 @@ Why it matters:
 
 Use when focusing on wave-averaged behavior under relatively mild or simplified forcing.
 
-Current local interpretation:
+Working interpretation:
 - lower cost
 - no infragravity/group-scale variability resolved the way surfbeat does
 - can be useful for simpler morphodynamic studies or tide-plus-wave framing
 
 ### `surfbeat`
 
-Current local practical default / recommended mode for storm-coast response.
+Working practical default / recommended mode for storm-coast response.
 
-Current local interpretation:
+Working interpretation:
 - resolves wave-group-scale forcing and infragravity response
 - suitable for wave-induced setup and unsteady current behavior in many storm-impact problems
 - likely the first mode to prioritize for coastal erosion and storm-scale baseline work
@@ -71,7 +71,7 @@ Current local interpretation:
 
 Non-hydrostatic mode for more detailed wave-resolving situations.
 
-Current local interpretation:
+Working interpretation:
 - higher cost
 - more appropriate for steep settings, structures, gravel beaches, or individual-wave behavior
 - not the first default unless the case really needs it
@@ -91,7 +91,7 @@ Why it matters:
 
 Wave-boundary condition selector.
 
-Locally confirmed examples:
+Examples confirmed in the source basis above:
 - `wbctype = params`
 - `wbctype = jonstable`
 
@@ -111,7 +111,7 @@ Why it matters:
 
 Locally documented as part of 1D/2DH interpretation.
 
-Current local interpretation:
+Working interpretation:
 - `ny = 0` indicates a 1D option in the documented framing
 
 Why it matters:
@@ -123,7 +123,7 @@ Why it matters:
 
 Breaking-model selector.
 
-Locally confirmed values include:
+Values confirmed in the source basis above include:
 - `break = roelvink1`
 - `break = roelvink2`
 - `break = roelvink_daly`
@@ -138,7 +138,7 @@ Why it matters:
 
 Locally documented in the Roelvink-Daly breaking context.
 
-Current local local-note values:
+Values in the practical manual note:
 - breaking start threshold around `gamma = 0.46`
 - secondary threshold around `gamma2 = 0.34`
 
@@ -152,7 +152,7 @@ Why it matters:
 
 Bed-friction formulation selector.
 
-Locally confirmed values:
+Values confirmed in the source basis above:
 - `bedfriction = chezy`
 - `bedfriction = manning`
 - `bedfriction = cf`
@@ -167,7 +167,7 @@ Why it matters:
 
 Locally documented example:
 - `bedfriction = manning`
-- default local-note value: `n = 0.02`
+- default value in the practical manual note: `n = 0.02`
 
 Why it matters:
 - likely to be one of the first practical friction settings revisited in coastal profile or storm-response work
@@ -178,7 +178,7 @@ Why it matters:
 
 Sediment-transport formulation selector.
 
-Locally confirmed values:
+Values confirmed in the source basis above:
 - `form = vanthiel_vanrijn`
 - `form = soulsby_vanrijn`
 - `form = vanrijn1993`
@@ -192,7 +192,7 @@ Why it matters:
 Morphological acceleration factor.
 
 Locally documented range:
-- `morfac` may be used from about 1 to 1000 in the local note framing
+- `morfac` may be used from about 1 to 1000 in the framing of the practical manual note
 
 Why it matters:
 - changes the relationship between hydrodynamic runtime and bed-update evolution
@@ -223,7 +223,7 @@ Why they matter:
 
 Groundwater-flow switch.
 
-Locally confirmed example:
+Example confirmed in the source basis above:
 - `gwflow = 1`
 
 Why it matters:
@@ -234,7 +234,7 @@ Why it matters:
 
 Groundwater scheme selector.
 
-Locally confirmed values:
+Values confirmed in the source basis above:
 - `gwscheme = laminar`
 - `gwscheme = turbulent`
 
@@ -245,7 +245,7 @@ Why it matters:
 
 ### `params.txt`
 
-Current local framing treats `params.txt` as the central early setup file.
+Working framing treats `params.txt` as the central early setup file.
 
 Why it matters:
 - this is the first practical anchor for reproducibility
@@ -253,7 +253,7 @@ Why it matters:
 
 ### Staggered curvilinear grid
 
-Current local note explicitly documents:
+The practical manual note explicitly documents:
 - staggered curvilinear grid layout
 - cell-center versus cell-edge variable placement
 

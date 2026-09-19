@@ -60,7 +60,6 @@ related:
 ## 5. 한국 적용
 
 - (예정) 한국 동해안 (강원도 안목항·낙산·속초) 폭풍 dune erosion 적용
-- (별도 작업) XBeach 의 한국 모래 입경 (D50) calibration
 
 ## 6. 운영 자원
 

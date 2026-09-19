@@ -17,7 +17,6 @@ notes: "P2 catalog audit 2026-05-24 — external URL catalog (adcirc.github.io/a
 - authors: ADCIRC development group
 - year: active repository, latest release surfaced as 2025-11-20
 - link: https://github.com/adcirc/adcirc ; https://github.com/adcirc/adcirc/releases
-- local path: raw/code/adcirc/adcirc
 
 ## Why This Matters
 

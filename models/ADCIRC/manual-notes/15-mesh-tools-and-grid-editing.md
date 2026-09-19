@@ -17,7 +17,6 @@ notes: "P2 catalog audit 2026-05-24 — external URL catalog (adcirc.github.io/a
 - authors: ADCIRC development team
 - year: active documentation site
 - link: https://adcirc.github.io/adcirc/tools/index.html ; https://adcirc.github.io/adcirc/tools/sms.html ; https://adcirc.github.io/adcirc/tools/oceanmesh2d.html ; https://adcirc.github.io/adcirc/user_guide/tips_and_tricks/grid_dev_edit.html
-- local path: raw/code/adcirc/adcirc/docs/tools/index.rst and related pages
 
 ## Why This Matters
 

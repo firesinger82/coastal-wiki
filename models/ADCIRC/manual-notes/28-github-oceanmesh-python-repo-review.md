@@ -40,7 +40,6 @@ Strengths:
 - explicit cleanup functions for degenerate and boundary-related mesh issues
 
 Weaknesses:
-- local machine does not currently have the package installed
 - Windows setup burden is non-trivial because of `CGAL`
 - exact parity with local `edgefx(fs=3)` behavior is not guaranteed
 

@@ -19,7 +19,7 @@ Both `--depth 1`. Total source_code/: 77M.
 
 ## manuals/pdfs/
 
-Imported from `numerical_models/EFDCPlus_Stable/manual/` (canonical DSI distribution; upstream GitHub repo does NOT include manuals).
+Imported from the DSI EFDC+ distribution `manual/` directory (canonical DSI distribution; upstream GitHub repo does NOT include manuals).
 
 | File | Size | Type |
 |------|------|------|

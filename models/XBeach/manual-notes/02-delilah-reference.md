@@ -5,7 +5,7 @@ promoted_date: 2026-05-24
 promote_phase: 2a
 classification: manual-notes-catalog
 source_id: models/XBeach
-notes: "P2 catalog audit 2026-05-24 — xbeach.readthedocs.io 공식 docs URL audit confirmed via WebFetch (examples.html: DELILAH 2D directional spreading + Holland Coast 1976 storm morfac=1 모두 local note 인용과 일치). Mixed local  + 외부 공식 URL — primary citation = readthedocs"
+notes: "P2 catalog audit 2026-05-24 — xbeach.readthedocs.io 공식 docs URL audit confirmed via WebFetch (examples.html: DELILAH 2D directional spreading + Holland Coast 1976 storm morfac=1 모두 실무 매뉴얼 노트 인용과 일치). Mixed 실무 매뉴얼 노트 + 외부 공식 URL — primary citation = readthedocs"
 ---
 # XBeach DELILAH Reference Note
 
@@ -17,25 +17,25 @@ notes: "P2 catalog audit 2026-05-24 — xbeach.readthedocs.io 공식 docs URL au
 - authors: XBeach documentation stack
 - year: active documentation reference
 - link: https://xbeach.readthedocs.io/en/latest/examples.html
-- local path:
-  - numerical_models/xbeach/XBEACH_MANUAL.md
+- archived copies:
+  - `XBEACH_MANUAL.md` — not archived in this wiki
   - official examples page summary
 
 ## Why This Matters
 
-DELILAH is the clearest currently documented hydrodynamic reference case for the XBeach lane in this workspace. It gives a role-specific anchor for answering whether a 2D surfbeat setup with directional forcing behaves credibly before morphology is trusted.
+DELILAH is the clearest currently documented hydrodynamic reference case for the XBeach lane in these notes. It gives a role-specific anchor for answering whether a 2D surfbeat setup with directional forcing behaves credibly before morphology is trusted.
 
 ## Core Claims
 
 - DELILAH is documented as a field-experiment reference case
 - it is framed as a **2D hydrodynamic** case
-- the local note characterizes it as:
+- the practical manual note characterizes it as:
   - grid: `177 x 70`
   - representative grain size: `D50 = 0.0002 m`
   - `surfbeat` mode
   - directional spreading
   - comparison against field observations
-- in this workspace, its strongest role is hydrodynamic reference, not first morphology baseline
+- in these notes, its strongest role is hydrodynamic reference, not first morphology baseline
 
 ## Practical Value
 
@@ -46,8 +46,7 @@ DELILAH is the clearest currently documented hydrodynamic reference case for the
 - validation detail:
   - explicitly tied to field data comparison rather than just internal smoke testing
 - limitations:
-  - the exact local runnable DELILAH package is not yet attached in this workspace
-  - this note currently functions as a documented role reference, not a reproduced case note
+    - this note currently functions as a documented role reference, not a reproduced case note
 
 ## Relevance Tags
 
@@ -71,7 +70,7 @@ It is less transferable when the main question is first-pass dune/profile erosio
 - exact DELILAH boundary setup if obtainable later
 - how directional spreading is parameterized in the documented example
 - what output variables or metrics are used in the field-data comparison
-- whether a local runnable reproduction already exists elsewhere in the workspace or online example assets
+- whether a runnable reproduction exists among the official online example assets
 
 ## Working Role In This Wiki
 

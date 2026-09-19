@@ -162,10 +162,9 @@ The first three pitfalls are extracted from the manuals; the rest are general CF
 
 ## Next Expansion Candidates
 
-- **single-grid vs multi-block topology** — the EFDC manual is largely silent on this. Investigate via the EFDC source tree (`numerical_models/EFDCPlus_Stable/EFDC/MPI_*` directories suggest some multi-block / domain-decomposition is implemented for MPI). Likely worth a separate `efdc-domain-decomposition-foundation.md` once that is examined.
-- **time-varying bathymetry** — referenced in propwash and in some SGZ contexts but never fully specified for general use. Belongs in a `efdc-time-varying-bathymetry.md` once a project case forces the issue.
+- **single-grid vs multi-block topology** — the EFDC manual is largely silent on this. Investigate via the EFDC source tree (`models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/MPI_*` directories suggest some multi-block / domain-decomposition is implemented for MPI). Likely worth a separate `efdc-domain-decomposition-foundation.md` once that is examined.
+- **time-varying bathymetry** — referenced in propwash and in some SGZ contexts but never fully specified for general use. Belongs in a `efdc-time-varying-bathymetry.md` once a documented case requires it.
 - **quantitative layer-count guidelines** — depth-to-vertical-resolution ratios and CFL-vs-layer-thickness tradeoffs are not in the chunks consulted; would need a sensitivity-test study to compile.
-- **Korean estuary case cross-references** — once 2–3 site-specific cases are written, link from this note into the experiment cards.
 
 ## References (manual-backed)
 

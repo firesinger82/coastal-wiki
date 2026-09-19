@@ -204,5 +204,3 @@ XBeach는 **단기 폭풍 시뮬레이션** 위주 (수일~수주). 조석 forci
   - [`models/XBeach/`](../../models/XBeach/) (source-analysis 32 + manual-notes 4, verified)
 - 글로벌 조석 모델 (`04-code-and-tools.md` §6):
   - TPXO, FES, NAO, GOT — 본 페이지의 forcing 데이터 원천
-- 사용자 경험 (검증 통과 시):
-  - `experience/efdc-tidal-forcing-*.md` (미작성, 3조건 통과 시) — EFDC 실제 사용 패턴

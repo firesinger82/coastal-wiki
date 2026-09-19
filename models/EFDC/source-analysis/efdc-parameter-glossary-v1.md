@@ -19,18 +19,18 @@ This is a first-pass glossary for EFDC work in this wiki.
 Important scope note:
 - this note is intentionally calibration-oriented
 - it mixes two levels of confidence:
-  - **manual-backed groups** confirmed through the local EFDC+ manual RAG
-  - **working labels / practical buckets** used to organize future local experiments
+  - **manual-backed groups** confirmed through retrieved EFDC+ manual passages
+  - **working labels / practical buckets** used to organize setup choices
 - the current retrieved manual evidence confirms broad control areas more clearly than exact variable names
 
 ## Source Basis
 
-Manual-backed from local EFDC+ RAG:
+Manual-backed (retrieved EFDC+ manual passages):
 - EFDC+ requires control/configuration style inputs for model setup
 - hydrodynamics depends on governing equations, vertical layering, density effects, and external forcing options
 - harmonic forcing and open-boundary treatment are part of the hydrodynamic setup foundation
 
-Local RAG sources referenced during drafting:
+Manual sources retrieved during drafting:
 - `EFDC_Theory_Document_Ver_12`
 - `EFDC_Implementation_Guide`
 - EFDC+ KB pages under the indexed Confluence spaces
@@ -172,4 +172,3 @@ These should be promoted from "working bucket" to exact glossary entries only af
 - exact EFDC file and control-name mapping from the implementation guide
 - first-pass boundary-condition vocabulary for tidal/coastal cases
 - first-pass wetting/drying term list
-- friction and mixing terms tied to local calibration experiments

@@ -17,7 +17,6 @@ notes: "P2 catalog audit 2026-05-24 — external URL catalog (adcirc.github.io/a
 - authors: ADCIRC project site
 - year: active legacy documentation page
 - link: https://adcirc.org/home/documentation/example-problems/
-- local path: not downloaded yet
 
 ## Why This Matters
 

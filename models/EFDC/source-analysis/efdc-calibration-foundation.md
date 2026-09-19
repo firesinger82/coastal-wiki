@@ -17,7 +17,7 @@ Date: 2026-04-30
 This note defines the current working calibration order for EFDC in coastal and estuarine problems.
 
 Important scope note:
-- the local EFDC+ manual RAG clearly supports the importance of hydrodynamics, vertical layering, density effects, and harmonic/external forcing
+- retrieved EFDC+ manual passages clearly support the importance of hydrodynamics, vertical layering, density effects, and harmonic/external forcing
 - however, the exact step-by-step calibration order below is a **practical operating synthesis** for this wiki, not a claim that the manual gives this sequence word-for-word
 - manual-backed points and working practice are separated below
 
@@ -35,7 +35,7 @@ Treat the problem in this order:
 
 ## Manual-Backed Foundation
 
-The local EFDC+ manual RAG supports these base facts:
+Retrieved EFDC+ manual passages support these base facts:
 - EFDC+ should be built in stages, with hydrodynamics established before more complex coupled behavior is trusted
 - hydrodynamic behavior depends on vertical layering, density effects, and forcing structure
 - harmonic forcing is part of the hydrodynamic setup foundation

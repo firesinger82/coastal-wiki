@@ -17,7 +17,6 @@ notes: "P2 catalog audit 2026-05-24 — external URL catalog (adcirc.github.io/a
 - authors: ADCIRC development team and Jason Fleming
 - year: active docs page plus FAQ last updated 2015-03-27
 - link: https://adcirc.github.io/adcirc/questions_and_support/index.html ; https://adcirc.org/home/adcirc-faq/
-- local path: not downloaded yet
 
 ## Why This Matters
 

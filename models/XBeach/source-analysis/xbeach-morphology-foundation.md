@@ -17,14 +17,14 @@ Date: 2026-04-30
 This note captures the first morphology foundation for XBeach in this wiki.
 
 Scope note:
-- this version is grounded mainly in the confirmed local manual stack and current local example/test context
+- this version is grounded mainly in the XBeach manual stack and example/test context listed below
 - it is intended to separate hydrodynamic credibility from morphology interpretation before later erosion-case work expands
 
 ## Source Basis
 
 Primary sources used for this draft:
 - [[01-local-manual-stack]]
-- `numerical_models/xbeach/XBEACH_MANUAL.md`
+- `XBEACH_MANUAL.md` (XBeach v1.24 practical manual note; not archived in this wiki)
 - [[xbeach-parameter-glossary-v1]]
 - [[xbeach-boundary-and-wave-setup]]
 
@@ -49,7 +49,7 @@ So the first practical rule is:
 
 Locally documented as the on/off switch for sediment transport.
 
-Current local interpretation:
+Working interpretation:
 - `sedtrans = 1` enables sediment transport
 
 Why it matters:
@@ -60,7 +60,7 @@ Why it matters:
 
 Locally documented as the on/off switch for bed evolution.
 
-Current local interpretation:
+Working interpretation:
 - `morphology = 1` enables morphological change
 
 Why it matters:
@@ -73,13 +73,13 @@ Why it matters:
 
 Transport-formulation selector.
 
-Locally confirmed values:
+Values confirmed in the source basis above:
 - `form = vanthiel_vanrijn`
 - `form = soulsby_vanrijn`
 - `form = vanrijn1993`
 
-Current local interpretation:
-- `vanthiel_vanrijn` is the practical default in the local note
+Working interpretation:
+- `vanthiel_vanrijn` is the practical default in the practical manual note
 
 Why it matters:
 - this is a first-order morphology assumption
@@ -95,7 +95,7 @@ Locally documented:
 - practical range about `1-1000`
 - when `morfac > 1`, input time series are effectively scaled relative to morphology evolution
 
-Critical practical implication from the local note:
+Critical practical implication from the practical manual note:
 - large `morfac` can save time
 - but it changes how confidently results can be interpreted as event-faithful rather than accelerated behavior
 
@@ -117,7 +117,7 @@ Why they matter:
 
 Locally documented as the avalanching switch.
 
-Current local interpretation:
+Working interpretation:
 - `avalanching = 1` enables slope redistribution / failure handling
 
 Why it matters:
@@ -128,7 +128,7 @@ Why it matters:
 
 Locally documented as critical slope thresholds.
 
-Current local local-note values:
+Values in the practical manual note:
 - `wetslp = 0.15`
 - `dryslp = 1.0`
 
@@ -183,9 +183,9 @@ Every morphology-capable experiment card should record at minimum:
 - `dryslp`
 - target morphology metric (profile, shoreline, erosion volume, dune response, etc.)
 
-## Example Framing From Local Note
+## Example Framing From the Practical Manual Note
 
-Two useful reference directions already appear in the local note:
+Two useful reference directions already appear in the practical manual note:
 - DELILAH:
   - 2D surfbeat hydrodynamics comparison orientation
   - more useful as a hydrodynamic credibility reference than as the first morphology baseline

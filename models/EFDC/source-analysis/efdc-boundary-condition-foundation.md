@@ -17,13 +17,13 @@ Date: 2026-04-30
 This note captures the current boundary-condition foundation for EFDC coastal and estuarine modeling in this wiki.
 
 Important scope note:
-- this note is based on the local EFDC+ manual/KB RAG
+- this note is based on retrieved EFDC+ manual/KB passages
 - where possible, manual-backed points are separated from practical synthesis
 - this note is meant to stabilize calibration vocabulary and setup discipline, not to replace the original manual pages
 
 ## Manual-Backed Foundation
 
-The local EFDC+ manual RAG clearly supports the following points.
+Retrieved EFDC+ manual passages clearly support the following points.
 
 ### 1. Open Boundaries Can Use Time-Series And Harmonic Forcing
 

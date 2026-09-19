@@ -42,7 +42,7 @@ All cloned with `--depth 1` (latest commit only). Total: ~574M.
 - **Method**: `git clone --depth 1 --branch gh-pages` → `_sources/*.rst.txt` (원본 RST 150개) → pandoc `rst→gfm` 변환 (150/150 성공, 0 실패)
 - **Pages**: 150 md + `SITE-INDEX.md` 색인 (계 151 md, 32M) — technical_reference 입·출력 파일 75(fort.* 전체)·user_guide 53(IM/TAU0/GAHM/NWS 등 파라미터 정의)·tools 11·theory/getting_started/introduction
 - **충실도**: 원문 그대로(요약·가공 없음). 이미지 33링크 전부 `_static/` 로컬 해상 확인. RST cross-reference 롤은 텍스트 잔존
-- **위치**: 위키 밖 로컬 아카이브 `numerical_models/adcirc/docs-site/` (writer 머신; 상세 색인은 그곳의 `SITE-INDEX.md`)
+- **위치**: 위키 repo 밖 보관 (상세 색인 `SITE-INDEX.md` 동봉)
 
 ## manuals/pdfs/
 
@@ -62,5 +62,3 @@ All cloned with `--depth 1` (latest commit only). Total: ~574M.
 
 1. Acquire official PDF manuals (User's Manual v53, Theory) from adcirc.org links
 2. Run same skill on EFDC, XBeach, SWAN, Delft3D, ROMS
-3. Decide what to import from `numerical_models/adcirc/` (legacy, 91GB)
-4. Begin RAG ingest of cleaned corpus

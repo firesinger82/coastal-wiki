@@ -162,7 +162,7 @@ For asymmetric wave currents, XBeach adds skewness/asymmetry velocity `s%ua` via
 
 ## 2026-09-12 source correction
 
-The activation condition, Van Rijn 1993 decision row and related pitfalls were reconciled with the current local source guard. Claude's read-only adversarial review supported the dispatch distinction; this correction does not issue a new human approval or change the original verification record. [Review and responses](../../../_staging/total-read/model-audit/XBeach/connectivity/physics/resolution-20260912/review-response.json).
+The activation condition, Van Rijn 1993 decision row and related pitfalls were reconciled with the current source guard. Claude's read-only adversarial review supported the dispatch distinction; this correction does not issue a new human approval or change the original verification record. [Review and responses](../../../_staging/total-read/model-audit/XBeach/connectivity/physics/resolution-20260912/review-response.json).
 
 ## Provenance
 

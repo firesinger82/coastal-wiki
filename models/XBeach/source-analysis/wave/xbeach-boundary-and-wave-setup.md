@@ -26,9 +26,9 @@ Scope note:
 
 Primary sources used for this draft:
 - [[01-local-manual-stack]]
-- `numerical_models/xbeach/XBEACH_MANUAL.md`
+- `XBEACH_MANUAL.md` (XBeach v1.24 practical manual note; not archived in this wiki)
 - official docs root: `https://xbeach.readthedocs.io/en/latest/`
-- source file: `numerical_models/xbeach/src/src/xbeachlibrary/boundaryconditions.F90`
+- source file: `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/boundaryconditions.F90`
 
 ## First Principle
 
@@ -44,21 +44,21 @@ The first question is not only "what boundary file do I have?" but also:
 
 ### `wavemodel = stationary`
 
-Current local interpretation:
+Working interpretation:
 - lower-cost, wave-averaged framing
 - can use simple parameterized or tabulated wave-boundary descriptions
 - more suitable when the target is not individual-wave behavior
 
 ### `wavemodel = surfbeat`
 
-Current local practical default:
+Working practical default:
 - primary mode for storm-scale nearshore response
 - supports group-scale forcing and infragravity-driven effects
 - likely the first default for erosion and storm-impact baselines
 
 ### `wavemodel = nonh`
 
-Current local interpretation:
+Working interpretation:
 - for more detailed wave-resolving or steep/structure-sensitive cases
 - higher computational cost
 - boundary assumptions should be treated more carefully because the model is resolving more detailed wave behavior
@@ -96,7 +96,7 @@ Use when:
 
 ## Source-Code Confirmation From `boundaryconditions.F90`
 
-The updated local source confirms that boundary logic is mode-sensitive and more varied than the local note alone suggests.
+The source code confirms that boundary logic is mode-sensitive and more varied than the practical manual note alone suggests.
 
 Observed boundary categories in code include handling for:
 - `WBCTYPE_TS_1`
@@ -120,7 +120,7 @@ Locally documented examples include:
 - `tideloc = 0`
 - `tideloc = 2`
 
-Working interpretation from the local note:
+Working interpretation from the practical manual note:
 - `tideloc` controls how tide/water level is imposed spatially
 - corner-point tide specification is one practical pattern for 2D setups
 
@@ -145,7 +145,7 @@ Why it matters:
 
 ### `ny`
 
-Current local interpretation:
+Working interpretation:
 - `ny = 0` indicates a 1D framing
 
 Why it matters:
@@ -154,7 +154,7 @@ Why it matters:
 
 ### `single_dir`
 
-Current local interpretation:
+Working interpretation:
 - can be used to simplify directional treatment in the surfbeat context
 
 Why it matters:

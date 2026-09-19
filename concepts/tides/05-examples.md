@@ -335,11 +335,6 @@ UTide 분석 결과는 §3.2의 KHOA 공식값과 다음 오차 범위 내여야
 - 시계열 < 1년 → nodal correction 적용 (`nodal=True`)
 - 시계열 < 14.77일 → M₂·S₂ Rayleigh 미분리 (§3 분석 자체 불가)
 
-`experience/`로 승격 조건 ([CONVENTIONS.md §2](../../CONVENTIONS.md), [BOUNDARY.md](../../BOUNDARY.md)):
-- [ ] 실제 인천 KHOA 시계열 (예: 2024년 시간별) 다운로드·실행
-- [ ] UTide 결과 ↔ §3.2 KHOA 공식값 ±2% 이내 일치 확인
-- [ ] 약최저저조위 산출값을 KHOA 공식 인천 약최저저조위와 비교
-- [ ] 두 차례 이상 독립 검증 (다른 연도 시계열)
 
 ## 4. 글로벌 모델 적용 (pyTMD) — 외부 정점 추출
 

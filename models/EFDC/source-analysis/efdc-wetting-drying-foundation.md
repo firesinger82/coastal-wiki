@@ -17,12 +17,12 @@ Date: 2026-04-30
 This note captures the current wetting/drying foundation for EFDC coastal and estuarine setup in this wiki.
 
 Important scope note:
-- unlike some earlier EFDC notes, the local EFDC+ manual RAG did return concrete wetting/drying control names and behavior
+- unlike some earlier EFDC notes, retrieved EFDC+ manual passages did include concrete wetting/drying control names and behavior
 - therefore this note contains both manual-backed control details and practical synthesis for calibration use
 
 ## Manual-Backed Controls
 
-The local EFDC+ manual RAG explicitly returned the following wetting/drying controls.
+Retrieved EFDC+ manual passages explicitly list the following wetting/drying controls.
 
 ### 1. ISDRY Options
 

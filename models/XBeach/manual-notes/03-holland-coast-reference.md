@@ -5,7 +5,7 @@ promoted_date: 2026-05-24
 promote_phase: 2a
 classification: manual-notes-catalog
 source_id: models/XBeach
-notes: "P2 catalog audit 2026-05-24 — xbeach.readthedocs.io 공식 docs URL audit confirmed via WebFetch (examples.html: DELILAH 2D directional spreading + Holland Coast 1976 storm morfac=1 모두 local note 인용과 일치). Mixed local  + 외부 공식 URL — primary citation = readthedocs"
+notes: "P2 catalog audit 2026-05-24 — xbeach.readthedocs.io 공식 docs URL audit confirmed via WebFetch (examples.html: DELILAH 2D directional spreading + Holland Coast 1976 storm morfac=1 모두 실무 매뉴얼 노트 인용과 일치). Mixed 실무 매뉴얼 노트 + 외부 공식 URL — primary citation = readthedocs"
 ---
 # XBeach Holland Coast Reference Note
 
@@ -17,18 +17,18 @@ notes: "P2 catalog audit 2026-05-24 — xbeach.readthedocs.io 공식 docs URL au
 - authors: XBeach documentation stack
 - year: active documentation reference
 - link: https://xbeach.readthedocs.io/en/latest/examples.html
-- local path:
-  - numerical_models/xbeach/XBEACH_MANUAL.md
+- archived copies:
+  - `XBEACH_MANUAL.md` — not archived in this wiki
   - official examples page summary
 
 ## Why This Matters
 
-Holland Coast is the strongest currently documented morphology-oriented reference case for the XBeach lane in this workspace. It is the best first anchor for dune/profile erosion interpretation because the documentation already frames it as an event-scale erosion case rather than just a hydrodynamic comparison.
+Holland Coast is the strongest currently documented morphology-oriented reference case for the XBeach lane in these notes. It is the best first anchor for dune/profile erosion interpretation because the documentation already frames it as an event-scale erosion case rather than just a hydrodynamic comparison.
 
 ## Core Claims
 
 - Holland Coast is documented as a **1D dune-erosion** style example
-- the local note characterizes it as:
+- the practical manual note characterizes it as:
   - grid: `1564 x 0`
   - representative grain size: `D50 = 0.000245 m`
   - storm duration: `42 hours` (`tstop = 151200 s`)
@@ -45,8 +45,7 @@ Holland Coast is the strongest currently documented morphology-oriented referenc
 - validation detail:
   - useful for checking whether a custom morphology baseline is closer to profile/dune response logic than to generic smoke testing
 - limitations:
-  - the exact local runnable Holland Coast package is not yet attached in this workspace
-  - this note is still a documented reference note rather than a reproduced local case note
+    - this note is still a documented reference note rather than a reproduced local case note
 
 ## Relevance Tags
 
@@ -69,7 +68,6 @@ It is less transferable when the main question is 2D directional hydrodynamic va
 
 - exact Holland Coast parameter set if later obtainable from local or official example assets
 - which outputs are most important for dune/profile comparison
-- whether local scripts or notebooks can reproduce a profile-comparison plot similar to the manual note
 - whether the case can become the first local scientific morphology baseline rather than only a conceptual reference
 
 ## Working Role In This Wiki

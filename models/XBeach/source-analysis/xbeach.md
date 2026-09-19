@@ -45,19 +45,17 @@ XBeach is a natural later lane for this wiki because it supports event-scale coa
 - first baseline case-selection note
 - first erosion validation checklist
 
-## Confirmed Local Source Availability
+## Source Availability
 
-Confirmed local source root:
-- `numerical_models/xbeach`
+Archived source root (vendor mirror):
+- `models/XBeach/raw/source_code/trunk/`
 
-Confirmed high-value local sources now known:
-- `src/doc/manual/XBeach_manual_master.pdf`
-- `src/doc/manual/XBeach_manual_kingsday.pdf`
-- `XBEACH_MANUAL.md`
-- `src/doc/misc/DecisionTreeXBeach.docx`
-- source trees under `src/src/xbeach/` and `src/src/xbeachlibrary/`
-
-This means XBeach is no longer blocked by total source absence. The next step is controlled ingest.
+High-value sources:
+- `models/XBeach/raw/source_code/trunk/doc/manual/XBeach_manual_master.pdf`
+- `models/XBeach/raw/source_code/trunk/doc/manual/XBeach_manual_kingsday.pdf`
+- `XBEACH_MANUAL.md` (XBeach v1.24 practical manual note; not archived in this wiki)
+- `models/XBeach/raw/source_code/trunk/doc/misc/DecisionTreeXBeach.docx`
+- source trees under `models/XBeach/raw/source_code/trunk/src/xbeach/` and `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/`
 
 ## Why XBeach Belongs In This Wiki
 

@@ -2,14 +2,14 @@
 title: "FUNWAVE 빌드 + RTX 5070(Blackwell) GPU 포팅 — 직접 수행 검증"
 model: FUNWAVE
 citation_status: verified
-verification_method: "본 위키 WSL2(Ubuntu 24.04)에서 직접 clone·빌드·실행 (2026-06-12). 소스 = models/FUNWAVE/raw/source_code/{FUNWAVE-TVD, FUNWAVE-GPU}/ (gitignore, 로컬). 컴파일러·실행 로그 직접 확인."
+verification_method: "WSL2(Ubuntu 24.04)에서 직접 clone·빌드·실행 (2026-06-12). 소스 = models/FUNWAVE/raw/source_code/{FUNWAVE-TVD, FUNWAVE-GPU}/ (gitignore, 로컬). 컴파일러·실행 로그 직접 확인."
 note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-12
 ---
 
 # FUNWAVE 빌드 + Blackwell GPU 포팅
 
-> 본 위키 머신(WSL2 Ubuntu 24.04, RTX 5070)에서 **직접 clone→build→run** 검증. 소스는 gitignore(로컬)라 위키 repo엔 미포함; 본 노트가 절차·수정점의 1차 기록.
+> 검증 환경: WSL2 Ubuntu 24.04, RTX 5070(sm_120) — **직접 clone→build→run** 검증. 소스는 gitignore(로컬)라 위키 repo엔 미포함; 본 노트가 절차·수정점의 1차 기록.
 
 ## 1. 소스 (clone)
 

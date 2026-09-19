@@ -17,7 +17,6 @@ notes: "P2 catalog audit 2026-05-24 — external URL catalog (adcirc.github.io/a
 - authors: Rick Luettich, Joannes Westerink
 - year: 2004
 - link: https://adcirc.org/wp-content/uploads/sites/2255/2018/11/adcirc_theory_2004_12_08.pdf
-- local path: not downloaded yet
 
 ## Why This Matters
 

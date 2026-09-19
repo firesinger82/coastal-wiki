@@ -15,9 +15,8 @@ notes: "P2 catalog audit 2026-05-24 — external URL catalog (adcirc.github.io/a
 - title: official NWS13 schema and the local JMA-MSM branch
 - source type: manual
 - authors: ADCIRC development team plus local workflow statement
-- year: active documentation site plus current local practice
+- year: active documentation site
 - link: https://adcirc.github.io/adcirc/user_guide/model_configuration/meteorological_forcing/nws13.html ; https://adcirc.github.io/adcirc/technical_reference/input_files/fort22.html
-- local path: raw/code/adcirc/adcirc/docs/user_guide/model_configuration/meteorological_forcing/nws13.rst
 
 ## Why This Matters
 

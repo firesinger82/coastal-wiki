@@ -32,7 +32,6 @@ The local `ocsmesh_test` scripts already use:
 - `MeshDriver`
 
 That means `OCSMesh` is not hypothetical here.
-It is already part of the local revalidation track.
 
 ## Practical Assessment
 
@@ -43,8 +42,6 @@ Strengths:
 
 Weaknesses:
 - not a direct `OceanMesh2D` port
-- local scripts still treat it as a reconstruction attempt rather than the accepted baseline
-- local machine does not currently have the package installed
 
 ## Local Relevance
 

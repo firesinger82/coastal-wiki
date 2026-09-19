@@ -79,4 +79,3 @@ ADCIRC is the first active model for this wiki. The goal is to build a clean fou
 - baseline selection note
 - parameter glossary v1
 - fort.15 checklist v1
-- first controlled DT-sensitivity experiment draft

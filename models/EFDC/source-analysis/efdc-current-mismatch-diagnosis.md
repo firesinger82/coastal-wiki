@@ -78,10 +78,7 @@ If stage is good but currents are bad, first suspect comparison basis, geometry,
 
 ## Candidate Evidence To Add Later
 
-- local EFDC calibration notes
-- harbor or estuary case studies close to the active domain
-- repeated current-mismatch experiments recorded under `experiments/`
-- future failure pattern and playbook notes promoted from those experiments
+- published harbor or estuary case studies
 
 ## Likely Follow-On Notes
 

@@ -15,9 +15,8 @@ notes: "P2 catalog audit 2026-05-24 — external URL catalog (adcirc.github.io/a
 - title: NWS13 path with local JMA-MSM workflow
 - source type: manual
 - authors: ADCIRC docs plus local workflow statement
-- year: active docs plus current local practice
-- link: local synthesis from `nws13.rst`, `fort22.rst`, testsuite `adcirc_katrina-2d-nws13`
-- local path: raw/code/adcirc/adcirc-testsuite/adcirc/adcirc_katrina-2d-nws13
+- year: active docs
+- link: synthesis of ADCIRC docs `nws13.rst`, `fort22.rst` and testsuite `adcirc_katrina-2d-nws13`
 
 ## Why This Matters
 

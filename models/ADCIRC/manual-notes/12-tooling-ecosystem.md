@@ -17,7 +17,6 @@ notes: "P2 catalog audit 2026-05-24 — external URL catalog (adcirc.github.io/a
 - authors: ADCIRC docs team, NOAA ADCIRCpy maintainers, ASGS operators
 - year: active ecosystem
 - link: https://adcirc.github.io/adcirc/tools/index.html ; https://github.com/oceanmodeling/adcircpy ; https://github-wiki-see.page/m/StormSurgeLive/asgs/wiki/ASGS-Operators-Guide
-- local path: not downloaded yet
 
 ## Why This Matters
 
