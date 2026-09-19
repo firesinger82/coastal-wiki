@@ -59,7 +59,7 @@ For most modern hindcasts, NWS=20 (GAHM) is preferred.
 ## C. OWI hybrid: NWS=29, NWS=30
 
 NWS=29 = NWS=19 (AHM) embedded in **OWI/NWS12 background** (`read_input.F:2171-2171`).
-NWS=30 = NWS=20 (GAHM) embedded in OWI/NWS12 background (`:2190`).
+NWS=30 = NWS=20 (GAHM) embedded in OWI/NWS12 background (`:2204`).
 
 Runtime dispatch (`wind.F:1531, 1550`):
 - Vortex computed at near-storm nodes.
@@ -155,8 +155,8 @@ There is **no separate NWS19/20-only spin-up ramp** — common meteorological ra
 
 Ramp duration/configuration:
 - `NRAMP, DRAMP` (`read_input.F:2444-2444`).
-- Fine-grained `DRampMete` (`:2884`).
-- Tanh ramp table generated (`:2975`).
+- Fine-grained `DRampMete` (`:2898`).
+- Tanh ramp table generated (`:2989`).
 
 Applied at `wind.F:1487, 1517` for NWS=19/20.
 

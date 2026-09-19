@@ -42,8 +42,8 @@ The **external coupling** is for ADCIRC users who run an external 3D ocean model
 
 Vertical grid via `IGC, NFEN`:
 - `NFEN` = number of vertical finite-element nodes (`read_input.F:5153-5153`).
-- `IGC=0`: read sigma levels directly; bottom `B=-1`, surface `A=1` required (`:5176`).
-- `IGC≠0`: call `FEGRIDS()` (`:5211`).
+- `IGC=0`: read sigma levels directly; bottom `B=-1`, surface `A=1` required (`:5190`).
+- `IGC≠0`: call `FEGRIDS()` (`:5225`).
 
 `FEGRIDS` supports (`global_3dvs.F:568`):
 - Evenly spaced.
@@ -72,8 +72,8 @@ After transport, `CALC_SIGMAT_3D()` for `IDEN > 1` (`vsmy.F:1632-1632`).
 | `Eqnstate` | EOS | Code lines |
 |---|---|---|
 | `1` | Simple linear (Mellor / Cushman-Roisin) | `vsmy.F:4081-4081` |
-| `2` | McDougall et al. 2003 | `:4154` |
-| `3` | UNESCO 1980 | `:4315` |
+| `2` | McDougall et al. 2003 | `:4174` |
+| `3` | UNESCO 1980 | `:4335` |
 
 **Limitation**: no TEOS-10 (Conservative Temperature, Absolute Salinity). For modern ocean accuracy, this is a gap.
 
@@ -125,7 +125,7 @@ MY2.5 closure:
 - Solves `q²` and `q²L`.
 - `Km = Sm q l`.
 - Stratification through `SIGT` gradients; shear from `Q` (`vsmy.F:2742-2742`).
-- Computes `Km, Kq, Kh` (`:2821`).
+- Computes `Km, Kq, Kh` (`:2823`).
 
 **Limitation**: this is built-in MY2.5 — older, lacks GLS / k-ε / k-ω modern alternatives. For full closure flexibility, ADCIRC would need GOTM-style integration (not present).
 
@@ -133,13 +133,13 @@ MY2.5 closure:
 
 Station output:
 - `fort.41` — 3D density/salinity/temperature stations (`read_input.F:5310-5310`, `write_output.F:3053-3053`).
-- `fort.42` — 3D velocity stations (real/imaginary horizontal + `WZ`) (`:5350`, `:3059, 3623`).
-- `fort.43` — 3D turbulence stations (`q20, l, EV`) (`:5395`, `:3125`).
+- `fort.42` — 3D velocity stations (real/imaginary horizontal + `WZ`) (`:5439`, `:3059, 3623`).
+- `fort.43` — 3D turbulence stations (`q20, l, EV`) (`:5484`, `:3185`).
 
 Global output:
-- `fort.44` — 3D density/salinity/temperature global (`:5438`, `:3209`).
-- `fort.45` — 3D velocity global (`:5460`, `:3254`).
-- `fort.46` — 3D turbulence global (`:5482`, `:3299`).
+- `fort.44` — 3D density/salinity/temperature global (`:5527`, `:3269`).
+- `fort.45` — 3D velocity global (`:5549`, `:3314`).
+- `fort.46` — 3D turbulence global (`:5571`, `:3359`).
 
 Optional: `fort.48` — internal BPG output (`global_3dvs.F:335`, `write_output.F:3391-3391`).
 

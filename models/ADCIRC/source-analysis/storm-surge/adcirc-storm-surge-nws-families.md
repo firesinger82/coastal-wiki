@@ -52,7 +52,7 @@ It does not choose final project parameter values.
 
 ### `NWS=13`
 
-- type: OWI-style NetCDF gridded wind and pressure — **코드 정본** `read_input.F:1796-1796`(owiWindNetcdf namelist 필수)·`:4721`("OWI Netcdf (NWS13) format wind/pres used")
+- type: OWI-style NetCDF gridded wind and pressure — **코드 정본** `read_input.F:1796-1796`(owiWindNetcdf namelist 필수)·`:4735`("OWI Netcdf (NWS13) format wind/pres used")
 - useful for: high-quality gridded forcing with overlays, curvilinear grids, and irregular timesteps
 - reader 경로·namelist 요건: [[adcirc-met-forcing-implementation]] §D (owiwind_netcdf.F file:line 인용)
 - ★code≠docs: `nws_parameters.rst:308-310` 은 NWS=13 을 "NWS=5 유사 + ramping(WRAMP)" 으로 서술 — 코드와 divergent(stale). [[adcirc-storm-surge-foundation]] 판정 참조.

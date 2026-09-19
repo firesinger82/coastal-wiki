@@ -239,13 +239,13 @@ end do
 ```
 
 References (`read_input.F`):
-- `NBFR` read + arrays allocated: `:3410-3418`.
-- Per-constituent header `BOUNTAG, AMIG, FF, FACE`: `:3431-3436`.
-- `FACE` deg → rad after read: `:3436`.
-- Per-constituent boundary block `ELEVALPHA + EMO/EFA`: `:3450-3455`.
-- `EFA` deg → rad after logging: `:3493-3497`.
+- `NBFR` read + arrays allocated: `:3424-3432`.
+- Per-constituent header `BOUNTAG, AMIG, FF, FACE`: `:3445-3450`.
+- `FACE` deg → rad after read: `:3450`.
+- Per-constituent boundary block `ELEVALPHA + EMO/EFA`: `:3464-3469`.
+- `EFA` deg → rad after logging: `:3507-3511`.
 
-Important: `ELEVALPHA` is **only printed** as "verification"; **no match/validation against `BOUNTAG`** (`:3485-3490`). You must keep the per-constituent ordering consistent yourself.
+Important: `ELEVALPHA` is **only printed** as "verification"; **no match/validation against `BOUNTAG`** (`:3499-3504`). You must keep the per-constituent ordering consistent yourself.
 
 경계 노드 순서는 전체 격자 번호의 정렬 순서가 아니다. `src/mesh.F:1822–1834`는 `K=1..NOPE`, 각 구간의 `I=1..NVDLL(K)` 순서로 `NBDV(K,I)`를 `NBD`에 이어 붙인다. 분조별 `EMO/EFA` 행은 이 순서에 맞아야 하며 `src/read_input.F:3507–3510`의 노드·진폭·위상 출력과 대조할 수 있다. 공식 [fort.15 구조](https://adcirc.github.io/adcirc/technical_reference/input_files/fort15.html)도 분조를 첫 첨자로 표기한다. 이 절의 도식은 전체 입력 파일 예제가 아니다.
 
@@ -254,24 +254,24 @@ Important: `ELEVALPHA` is **only printed** as "verification"; **no match/validat
 Called from main startup (`adcirc.F:292-293`); reader at `read_input.F:6320-6501`.
 
 **Active only for `NTIP=2`**:
-- `NTIP < 2`: SAL arrays zeroed (`:6460-6462`).
+- `NTIP < 2`: SAL arrays zeroed (`:6498-6500`).
 - `NTIP=0`: tidal potential entirely off.
 - `NTIP=1`: tidal potential active, no SAL.
 - `NTIP=2`: tidal potential + SAL.
 
-NetCDF preferred if `fort.24.nc` exists (`:6330-6344`).
+NetCDF preferred if `fort.24.nc` exists (`:6368-6382`).
 
 ### NetCDF format
 
-Required dims/vars (`:6353-6365`):
+Required dims/vars (`:6391-6403`):
 - Dimensions: `node`, `num_constituents`, `char_len`.
 - Variables: `constituents`, `frequency`, `sal_amplitude`, `sal_phase`.
 
-Constituent count must equal `NTIF` (`:6367-6371`).
+Constituent count must equal `NTIF` (`:6405-6409`).
 
 ### ASCII format (`fort.24`)
 
-Per-constituent block (`:6429-6455`):
+Per-constituent block (`:6467-6493`):
 ```
 <dummy_char>  <dummy_char>          ! 2 dummy chars
 <dummy_real>                        ! ignored
@@ -286,10 +286,10 @@ end do
 
 ## C. Constituent matching
 
-`fort.15` tidal-potential tags are **`TIPOTAG`** (different from `BOUNTAG`!) (`:3347-3349`).
+`fort.15` tidal-potential tags are **`TIPOTAG`** (different from `BOUNTAG`!) (`:3361-3363`).
 
-- NetCDF SAL: `TRIM(TIPOTAG(I)) == TRIM(const_name)` (`:6378-6385`).
-- ASCII SAL: each SAL `const_name` matched to some `TIPOTAG(J)` (`:6436-6443`).
+- NetCDF SAL: `TRIM(TIPOTAG(I)) == TRIM(const_name)` (`:6416-6423`).
+- ASCII SAL: each SAL `const_name` matched to some `TIPOTAG(J)` (`:6474-6481`).
 
 **Strict, case-sensitive**, no aliasing.
 

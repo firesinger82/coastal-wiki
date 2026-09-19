@@ -85,7 +85,7 @@ Touch policy:
 - red: `NWP`, `NCOR` unless the whole experiment is about those features
 
 Notes:
-- `IM` is the "2D/3D MODEL FORMULATION OPTION" switch; `IM=0` configures "Barotropic 2DDI run using: New GWCE and Momentum Eq formulations" (`models/ADCIRC/raw/source_code/adcirc/src/read_input.F:1147-1149` READ/PROCESS IM, `:1158-1162` `IF (IM.EQ.0)` → `C2DDI=.TRUE.`; IM=20/30 은 deprecated·terminate, `:1170-1175`)
+- `IM` is the "2D/3D MODEL FORMULATION OPTION" switch; `IM=0` configures "Barotropic 2DDI run using: New GWCE and Momentum Eq formulations" (`models/ADCIRC/raw/source_code/adcirc/src/read_input.F:1147-1149` READ/PROCESS IM, `:1172-1176` `IF (IM.EQ.0)` → `C2DDI=.TRUE.`; IM=20/30 은 deprecated·terminate, `:1184-1189`)
 - `NOLIFA` affects finite-amplitude treatment and interacts with `H0`
 
 ## 3. Stability And Time-Stepping Controls

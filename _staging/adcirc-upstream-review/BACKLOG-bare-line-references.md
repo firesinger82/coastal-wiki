@@ -39,3 +39,24 @@
 - 노트 본문의 기술 서술 재작성
 - 파일명 명시 참조(이번 116건에서 처리 완료)
 - 다른 모델의 bare reference
+
+## 진행 기록 (2026-09-20)
+
+snapshot migration 범위에서 **줄 이동 58건만** 갱신했다(9개 노트). 나머지는 그대로 둔다.
+
+| 구분 | 건수 | 처리 |
+|---|---:|---|
+| 줄 이동 발생 (adcirc repo, 이번 변경 파일) | 58 | **갱신 완료** — old/new 줄 내용 동일성 확인 후 번호만 수정 |
+| 대응 위치 동일 (adcirc 무이동 + asgs 등 미교체 repo) | 59 | 미수정 |
+| AMBIGUOUS | 1 | 미수정 |
+
+### 남은 과제 1 — bare reference 정규화 (117건)
+
+`` (`:2271`) `` 형태를 file-qualified 형태로 바꾸는 작업. **문서 품질 개선(reference hygiene)** 이며 snapshot migration 과 분리한다. RESOLVED_CONTEXTUAL 99건은 문맥으로 파일을 특정한 것이라, 파일명을 본문에 박아 넣는 것은 더 강한 변경이다 — 별도 검토·승인 필요. 해석 결과는 `bare-reference-resolution.csv`(status·evidence·confidence 포함).
+
+### 남은 과제 2 — AMBIGUOUS 1건
+
+`models/ADCIRC/source-analysis/adcirc-hotstart.md` 의 `` `:2936-2970` ``.
+- 문맥 후보 파일: `wind.F` (노트 155행에서 마지막 명시)
+- 동명 파일 2곳: `adcirc:src/wind.F`, `asgs:output/wind.F`
+- 현재 문맥만으로 고유 특정 불가 → 이번 migration 에서 선택하지 않음. hotstart 절의 인용 내용과 두 파일의 해당 구간을 사람이 대조해야 확정 가능.

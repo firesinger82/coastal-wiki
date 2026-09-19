@@ -32,8 +32,8 @@ How the `padcswan` binary couples ADCIRC and SWAN over a shared unstructured mes
 | Routine | Purpose | Lines |
 |---|---|---|
 | `PADCSWAN_INIT` | Initialize SWAN, exchange grids/initial state | `couple2swan.F:947` |
-| `PADCSWAN_RUN(ITIME)` | Per-coupling-step SWAN run + RS update | `:1092` |
-| `PADCSWAN_FINAL` | Cleanup | `:1236` |
+| `PADCSWAN_RUN(ITIME)` | Per-coupling-step SWAN run + RS update | `:1110` |
+| `PADCSWAN_FINAL` | Cleanup | `:1313` |
 | `ComputeRadiationStresses` | Integrate SWAN spectra to RS components | `:112` |
 | `ComputeWaveDrivenForces` | Convert RS gradients to nodal forces | `:210` |
 
@@ -49,9 +49,9 @@ SWAN-side hooks activated by `switch.pl -adcirc` — only present in coupled bin
 ## B. Time stepping
 
 - ADCIRC runs every `DT`; SWAN `DT` imported as `SWAN_DT` (`couple2swan.F:950, 965`).
-- **Coupling interval = integer ratio** `SWAN_DT / DT` (`:1085-1087`).
+- **Coupling interval = integer ratio** `SWAN_DT / DT` (`:1103-1105`).
 - ADCIRC calls SWAN only on that interval (`adcirc.F:475-483`).
-- During SWAN run, interpolation midpoint used for time-centering (`couple2swan.F:1241-1243`); `SWMAIN` 호출은 temporal control gate 안(`:1245-1247`).
+- During SWAN run, interpolation midpoint used for time-centering (`couple2swan.F:1241-1243`); `SWMAIN` 호출은 temporal control gate 안(`:1322-1324`).
 
 **Note**: there is **no `CWTIM_INC` symbol** in this tree; coupling interval comes from SWAN `TIMECOMM:DT` block divided by ADCIRC `DT`.
 
@@ -69,10 +69,10 @@ Allocated arrays (`couple2swan.F:67-75, 974-982`):
 - `SWAN_UU2`, `SWAN_VV2` — currents.
 - `SWAN_WX2`, `SWAN_WY2` — winds (if `COUPWIND`).
 
-Init copies ADCIRC `ETA2/UU2/VV2` plus winds (`:993-1009`).
+Init copies ADCIRC `ETA2/UU2/VV2` plus winds (`:999-1015`).
 
 Each coupling step:
-- WL/currents updated from ADCIRC (`:1128-1142`).
+- WL/currents updated from ADCIRC (`:1157-1171`).
 - Dry nodes set depth zero / current zero.
 - Wind passed from ADCIRC met → SWAN if `COUPWIND` (`timestep.F:668-686`).
 
@@ -81,7 +81,7 @@ SWAN-side memory grab post-preprocess (`../thirdparty/swan/swanmain.ftn:8696-898
 ## E. Mesh sharing
 
 SWAN unstructured ADCIRC reader explicitly opens `fort.14` (`SwanReadADCGrid.ftn90:44-103`):
-- Reads `ncells, nverts`, node coords + depth, triangles (`:114-153`).
+- Reads `ncells, nverts`, node coords + depth, triangles (`:119-158`).
 
 Coupler uses SWAN `nverts/xcugrd/ycugrd` for output/exchange (`couple2swan.F:596-598, 800-835`).
 
@@ -97,7 +97,7 @@ NRS = ABS(NWS / 100)        ! strip hundreds
 NWS = NWS − 100*sign*NRS    ! remaining is base met forcing
 ```
 
-`NRS=3` is documented as "WAVES WILL BE COUPLED TO SWAN" (`:2255-2261`).
+`NRS=3` is documented as "WAVES WILL BE COUPLED TO SWAN" (`:2269-2275`).
 
 So:
 
@@ -175,7 +175,7 @@ SWAN spectral hot-start is **separate**:
 
 ## SWAN Temporal Controls (upstream 반영, phase 1 of 2)
 
-PR [#498](https://github.com/adcirc/adcirc/pull/498) 의 phase 1 은 **upstream `main` 에 반영됨** — 커밋 `976fc5b6`("Adding SWAN temporal controls", 17 files), 본 노트 baseline `e8b62a70` 에 포함. 런루프 gate 는 `couple2swan.F:1245-1247`(`SwanTimeStep` 이 `[1, SWAN_MTC]` 일 때만 `SWMAIN` 호출), 미호출 구간은 출력값을 초기화(`:1252-1261`)하고 radiation stress 를 할당·이월(`:1267-1291`). fort.15 namelist 파싱은 `prep/presizes.F:276,742-745`(기본 sentinel `"-99999"`). 사용자가 ADCIRC+SWAN coupled simulation 의 SWAN computation 시간을 storm landfall 즈음으로 제한 가능 → 전체 mesh + 전체 timeframe SWAN 호출 회피로 wall-clock 절감. Spatial controls 은 phase 2 예정 — 다만 같은 커밋이 nodal attribute `swan_local_control` 정의를 추가했다(`src/nodalattr.F:89-90,669`). 그 경로의 완결 여부는 본 baseline 에서 미확인. → [[adcirc-nodal-attributes]] §1. 외부 docs: [CCHT-NCSU/Spatial-Temporal-Controls](https://github.com/ccht-ncsu/Spatial-Temporal-Controls).
+PR [#498](https://github.com/adcirc/adcirc/pull/498) 의 phase 1 은 **upstream `main` 에 반영됨** — 커밋 `976fc5b6`("Adding SWAN temporal controls", 17 files), 본 노트 baseline `e8b62a70` 에 포함. 런루프 gate 는 `couple2swan.F:1245-1247`(`SwanTimeStep` 이 `[1, SWAN_MTC]` 일 때만 `SWMAIN` 호출), 미호출 구간은 출력값을 초기화(`:1290-1299`)하고 radiation stress 를 할당·이월(`:1307-1331`). fort.15 namelist 파싱은 `prep/presizes.F:276,742-745`(기본 sentinel `"-99999"`). 사용자가 ADCIRC+SWAN coupled simulation 의 SWAN computation 시간을 storm landfall 즈음으로 제한 가능 → 전체 mesh + 전체 timeframe SWAN 호출 회피로 wall-clock 절감. Spatial controls 은 phase 2 예정 — 다만 같은 커밋이 nodal attribute `swan_local_control` 정의를 추가했다(`src/nodalattr.F:89-90,669`). 그 경로의 완결 여부는 본 baseline 에서 미확인. → [[adcirc-nodal-attributes]] §1. 외부 docs: [CCHT-NCSU/Spatial-Temporal-Controls](https://github.com/ccht-ncsu/Spatial-Temporal-Controls).
 
 ### 사용자 입력 (PR body verbatim)
 

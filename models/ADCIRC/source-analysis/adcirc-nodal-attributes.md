@@ -41,7 +41,7 @@ fort.13 가 지원하는 nodal attribute (이름 = fort.13 키워드):
 | `overland_reduction_factor` | 육상 흐름 감소 | overland |
 | `condensed_nodes` | 노드 병합 | mesh |
 | (internal tide) | **internal tide friction** | Apply2DInternalWaveDrag |
-| `swan_local_control` | SWAN 활성 노드 / 내부 source 노드 지정 (ValuesPerNode = 2) — 코드 주석 "Allow SWAN to be activated for selective regions of the ADCIRC mesh"(`:85-90`). baseline `e8b62a70`(커밋 `976fc5b6`) 에서 추가 | SWAN 결합 ([[adcirc-swan-coupling]]) |
+| `swan_local_control` | SWAN 활성 노드 / 내부 source 노드 지정 (ValuesPerNode = 2) — 코드 주석 "Allow SWAN to be activated for selective regions of the ADCIRC mesh"(`:91-96`). baseline `e8b62a70`(커밋 `976fc5b6`) 에서 추가 | SWAN 결합 ([[adcirc-swan-coupling]]) |
 
 - 읽기: XDMF(`readNodalAttrXDMF` :552) 또는 legacy fort.13. 각 attr = {units, number_of_values, default_values, per-node 값}. default 로 채우고 지정 node 만 override.
 

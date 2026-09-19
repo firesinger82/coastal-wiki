@@ -49,22 +49,22 @@ Direct-access, `RECL=8` (`hstart.F:485-492`, `write_output.F:5009-5012`).
 FileFmtVersion, IM, TimeLoc, IT, NPX, NEX, NPX, NEX
 ```
 
-**2D state** (full-domain `:4935-4967`; local `:5031-5065`):
+**2D state** (full-domain `:5024-5056`; local `:5120-5154`):
 ```
 ETA1, ETA2, EtaDisc, UU2, VV2,
 [CH1 if applicable], NODECODE, NOFF
 ```
 
-**Radiation stress** (`:4969-4997`):
+**Radiation stress** (`:5058-5086`):
 - `RSNX1, RSNY1, RSNX2, RSNY2` if `NRS≠0`, zeros otherwise.
 
-**SWAN RS** (`:5000-5028`):
+**SWAN RS** (`:5089-5117`):
 - SWAN arrays if `NRS=3`, zeros otherwise.
 
-**Output spool counters** (`:5131-5154`):
+**Output spool counters** (`:5220-5243`):
 - `NSCOUE, NSCOUV, NSCOUC, NSCOUM, NSCOUGE, NSCOUGV, NSCOUGC, NSCOUGW`.
 
-**Harmonic analysis state** (if active, `:5166-5374`):
+**Harmonic analysis state** (if active, `:5255-5463`):
 - Header/counters, constituent metadata + matrix, load vectors, means/variances.
 
 Reader mirror at `hstart.F:506-668` (header → 2D → counters → 3D → harmonic).
@@ -74,11 +74,11 @@ Reader mirror at `hstart.F:506-668` (header → 2D → counters → 3D → harmo
 | Routine | Lines |
 |---|---|
 | `HOTSTART()` (main 2D reader) | `hstart.F:47` |
-| `HOTSTART_3D(TimeLoc, ITHS)` (3D init) | `:2061` |
-| `readAndMapToSubdomain2D` (real 2D mapper) | `:2827` |
-| (integer 2D mapper) | `:2899` |
-| (element integer mapper) | `:2973` |
-| (3D mapper) | `:3048` |
+| `HOTSTART_3D(TimeLoc, ITHS)` (3D init) | `:2066` |
+| `readAndMapToSubdomain2D` (real 2D mapper) | `:2855` |
+| (integer 2D mapper) | `:2927` |
+| (element integer mapper) | `:3001` |
+| (3D mapper) | `:3076` |
 
 Write-side **not in `hstart.F`**:
 - 2D: `writeHotstart(TimeLoc, IT)` in `write_output.F:4518-4518`.
@@ -111,7 +111,7 @@ Read together (`read_input.F:4518-4522`):
 | `5`, `567`, `568` | NetCDF4/HDF5 |
 | `-1` | Timestamped binary files |
 
-`NHSINC=0` is illegal when `NHSTAR≠0` (`:4542-4544`).
+`NHSINC=0` is illegal when `NHSTAR≠0` (`:4556-4558`).
 
 Trigger (`timestep.F:1196-1201`): hot-start fires when `IT` is exact multiple of `NHSINC`, or when `-IHOT==IT` (special end-of-run case).
 

@@ -92,7 +92,7 @@ Relevant official options for surge-related work include (`docs/user_guide/model
 - `NWS = 12`
   - OWI gridded wind and pressure (rst:298)
 - `NWS = 13`
-  - OWI NetCDF gridded wind/pressure — **코드 정본**: `read_input.F:1796-1796`(owiWindNetcdf namelist 필수)·`:4721`("OWI Netcdf (NWS13) format wind/pres used"), reader = [[adcirc-met-forcing-implementation]] §D
+  - OWI NetCDF gridded wind/pressure — **코드 정본**: `read_input.F:1796-1796`(owiWindNetcdf namelist 필수)·`:4735`("OWI Netcdf (NWS13) format wind/pres used"), reader = [[adcirc-met-forcing-implementation]] §D
   - ★**code≠docs divergence (2026-07-10 판정)**: 원문 "ramped meteorological forcing" 은 오기가 아니라 `nws_parameters.rst:308-310`("Similar to NWS=5... ramping... WRAMP") 의 충실한 전사였음 — 그러나 **그 rst 서술 자체가 코드와 divergent(stale)**. 소스가 물리·기능 정본.
 - `NWS = 14`
   - GRIB2/NetCDF gridded forcing (rst:311-312)
