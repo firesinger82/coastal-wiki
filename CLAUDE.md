@@ -104,7 +104,7 @@ DELIVERABLE:    반환 형식(diff·표·로그 요약)과 근거(파일:줄·�
 
 Codex 결과는 그대로 채택하지 않는다. Claude가 evidence와 [PROJECT_REQUIREMENTS.md](PROJECT_REQUIREMENTS.md)·이 문서·[CONVENTIONS.md](CONVENTIONS.md)에 대조해 검증한 뒤 판단한다.
 
-**`models/` 잠금**: `models/`는 root 소유 읽기 전용이며 현재 운영 제약으로 유지한다. Claude·Codex 모두 우회하지 않는다. 절차: 기본 잠금 → 변경안(diff/script) 생성 → 사용자 승인 → 사용자 sudo 적용 → `validate-all` → 결과 검증 → 재잠금 ([PROJECT_REQUIREMENTS.md](PROJECT_REQUIREMENTS.md#models-잠금-절차)).
+**`models/` 잠금**: `models/`는 root 소유 읽기 전용이며 현재 운영 제약으로 유지한다. Claude·Codex 모두 우회하지 않는다. 변경 방식은 둘 중 하나를 **작업 시작 전에 명시**한다 — **A. INSTALL-STYLE**(snapshot 교체·root 소유 파일 배치): 변경안(diff/script) → 사용자 승인 → 사용자 sudo 적용 → `validate-all` → 검증 → 재잠금. **B. SCOPED EDIT**(승인된 제한 범위의 노트·파일 수정): 대상 경로만 최소 unlock → 승인된 수정 → diff·hash·validation 검증 → 즉시 relock → 쓰기 가능 파일 0 확인. 전체 `models/` unlock·범위 밖 수정·relock 생략·장기 해제는 금지 ([PROJECT_REQUIREMENTS.md](PROJECT_REQUIREMENTS.md#models-잠금-절차)).
 
 **Claude 모델 지정** (역할 규칙과 별개 설정): 현재 기본 모델은 **Fable 5.1 (`claude-fable-5-1`)**. 자동 fallback 금지 — 다른 모델로 대체하지 않고 실제 응답의 모델 정보를 확인한다. 모델명은 사용자 지시로 변경하며, 사용자가 특정 작업에 한해 승인한 예외는 그 작업에만 적용된다.
 

@@ -4,7 +4,7 @@ topic: general
 canonical_source: self
 citation_status: verified
 has_source_needed: true
-verification_method: "ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-fort15-checklist-v1.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시. L4 2026-07-03 감사: IM 단언은 read_input.F:1133-1162 로 보강(verified), TAU0 0.005-0.1 범위·FAQ triage 2건은 익명 출처 disclosed gap(본문 source-needed 주석) → has_source_needed: true."
+verification_method: "ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-fort15-checklist-v1.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시. L4 2026-07-03 감사: IM 단언은 read_input.F:1147-1176 로 보강(verified), TAU0 0.005-0.1 범위·FAQ triage 2건은 익명 출처 disclosed gap(본문 source-needed 주석) → has_source_needed: true."
 note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
 note_date: 2026-04~05 (original) / 2026-05-23 (promote)
 verification_by: "사용자 + codex source-code analysis"
@@ -85,7 +85,7 @@ Touch policy:
 - red: `NWP`, `NCOR` unless the whole experiment is about those features
 
 Notes:
-- `IM` is the "2D/3D MODEL FORMULATION OPTION" switch; `IM=0` configures "Barotropic 2DDI run using: New GWCE and Momentum Eq formulations" (`models/ADCIRC/raw/source_code/adcirc/src/read_input.F:1133-1135` READ/PROCESS IM, `:1158-1162` `IF (IM.EQ.0)` → `C2DDI=.TRUE.`; IM=20/30 은 deprecated·terminate, `:1170-1175`)
+- `IM` is the "2D/3D MODEL FORMULATION OPTION" switch; `IM=0` configures "Barotropic 2DDI run using: New GWCE and Momentum Eq formulations" (`models/ADCIRC/raw/source_code/adcirc/src/read_input.F:1147-1149` READ/PROCESS IM, `:1158-1162` `IF (IM.EQ.0)` → `C2DDI=.TRUE.`; IM=20/30 은 deprecated·terminate, `:1170-1175`)
 - `NOLIFA` affects finite-amplitude treatment and interacts with `H0`
 
 ## 3. Stability And Time-Stepping Controls

@@ -66,7 +66,7 @@ TK = FRIC·( IFLINBF + (|U|/H)·( IFNLBF + IFHYBF·(1+(HBREAK/H)^FTHETA)^(FGAMMA
 - `NOLIBF`(timestep.F:129) → `IFLINBF`(0 선형)/`IFNLBF`(1 quadratic)/`IFHYBF`(2 hybrid) 토글.
 - **선형**(NOLIBF=0): `TK=FRIC` (Cf 상수). **quadratic**(1): `TK=FRIC·|U|/H` (= C_d|U|/H). **hybrid**(2): 깊은 물 H≫HBREAK → quadratic, 얕은 물 H<HBREAK → `(HBREAK/H)^FGAMMA` 증가(Manning-like). `FTHETA`/`FGAMMA` 형상, `HBREAK` break depth.
 - `FRIC` = bottom friction 계수 (`nodalattr.F` Manning's n 또는 fort.13 공간변화). 3 time level: TK0/TK/TK2 (gwce.F:2477-2482).
-- BEDSTR = `H·|U|·TK·ρ` (bed shear N/m², timestep.F:1634).
+- BEDSTR = `H·|U|·TK·ρ` (bed shear N/m², timestep.F:1638-1638).
 
 ## 5. GWCE ↔ momentum 결합
 

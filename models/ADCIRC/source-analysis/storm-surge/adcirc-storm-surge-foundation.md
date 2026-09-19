@@ -4,7 +4,7 @@ topic: storm-surge
 canonical_source: self
 citation_status: verified
 has_source_needed: true
-verification_method: "2026-07-10 재승격: 공식 docs 직접 대조 — nws_parameters.rst(NWS=3 :248 / =4 :251 / =8 :272-273 / =12 :298 / =13 :308-310 / =14 :311-312 / =19 discouraged :32)·examples/index.rst:26-36(APES/Isabel/Katrina/Global Storm Tide)·ramping_met_forcing_at_hotstart.rst:4·typical_parameter_selections.rst(존재 확인). ★NWS=13 code≠docs divergence 판정: read_input.F:1782(owiWindNetcdf namelist 강제)·:4721('OWI Netcdf (NWS13) format') = 코드 정본 OWI NetCDF, rst :308-310 의 'ramping(WRAMP)' 서술은 stale. 원본은 modeling-wiki 2026-04 작성분 마이그레이션."
+verification_method: "2026-07-10 재승격: 공식 docs 직접 대조 — nws_parameters.rst(NWS=3 :248 / =4 :251 / =8 :272-273 / =12 :298 / =13 :308-310 / =14 :311-312 / =19 discouraged :32)·examples/index.rst:26-36(APES/Isabel/Katrina/Global Storm Tide)·ramping_met_forcing_at_hotstart.rst:4·typical_parameter_selections.rst(존재 확인). ★NWS=13 code≠docs divergence 판정: read_input.F:1796-1796(owiWindNetcdf namelist 강제)·:4721('OWI Netcdf (NWS13) format') = 코드 정본 OWI NetCDF, rst :308-310 의 'ramping(WRAMP)' 서술은 stale. 원본은 modeling-wiki 2026-04 작성분 마이그레이션."
 note_author: "사용자 + codex source-code 분석 (2026-04 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23 → Claude Fable 5 docs 재검증·재승격 2026-07-10"
 note_date: 2026-04 (original) / 2026-05-23 (promote) / 2026-07-10 (verified 재승격)
 verification_by: "사용자 + codex source-code analysis"
@@ -92,7 +92,7 @@ Relevant official options for surge-related work include (`docs/user_guide/model
 - `NWS = 12`
   - OWI gridded wind and pressure (rst:298)
 - `NWS = 13`
-  - OWI NetCDF gridded wind/pressure — **코드 정본**: `read_input.F:1782`(owiWindNetcdf namelist 필수)·`:4721`("OWI Netcdf (NWS13) format wind/pres used"), reader = [[adcirc-met-forcing-implementation]] §D
+  - OWI NetCDF gridded wind/pressure — **코드 정본**: `read_input.F:1796-1796`(owiWindNetcdf namelist 필수)·`:4721`("OWI Netcdf (NWS13) format wind/pres used"), reader = [[adcirc-met-forcing-implementation]] §D
   - ★**code≠docs divergence (2026-07-10 판정)**: 원문 "ramped meteorological forcing" 은 오기가 아니라 `nws_parameters.rst:308-310`("Similar to NWS=5... ramping... WRAMP") 의 충실한 전사였음 — 그러나 **그 rst 서술 자체가 코드와 divergent(stale)**. 소스가 물리·기능 정본.
 - `NWS = 14`
   - GRIB2/NetCDF gridded forcing (rst:311-312)

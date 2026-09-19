@@ -3,7 +3,7 @@ title: "ADCIRC 3D 스칼라 transport solver source-analysis — transport.F/TRA
 topic: adcirc-transport-solver
 canonical_source: self
 citation_status: verified
-verification_method: "ADCIRC raw source 직접 read: src/transport.F(1497, v45.12) — Alp4 semi-implicit DTAlp4/DT1MAlp4(:31-32)·ADC_TRIDAG2 tridiag 호출(:1182) file:line 직접 검증. dispatch vsmy.F:1548-1553. 소스 banner Luettich-Westerink. ★adcirc-3d-mode:59 가 transport 를 vsmy.F:1543 로 오귀속(정정)."
+verification_method: "ADCIRC raw source 직접 read: src/transport.F(1497, v45.12) — Alp4 semi-implicit DTAlp4/DT1MAlp4(:31-32)·ADC_TRIDAG2 tridiag 호출(:1182) file:line 직접 검증. dispatch vsmy.F:1550-1555. 소스 banner Luettich-Westerink. ★adcirc-3d-mode:59 가 transport 를 vsmy.F:1545-1545 로 오귀속(정정)."
 note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-07-07
 verification_by: "Claude Opus 4.8 (1M context) — transport.F:28-35·1178-1185 직접 read 검증"
@@ -17,8 +17,8 @@ related:
 # ADCIRC 3D 스칼라 transport solver — `transport.F` / `TRANS_3D`
 
 > 소스: [`src/transport.F`](../raw/source_code/adcirc/src/transport.F) (1497, "PADCIRC RELEASE VERSION 45.12", Luettich·Westerink).
-> **정체**: 3D baroclinic **염분/수온 이류-확산** solver(sigma 좌표). 하나의 generic in/out 배열로 S·T 모두 처리 — ADCIRC prognostic 성층 엔진(하구 성층·thermohaline surge). dispatch: `vsmy.F:1548-1553` `CALL TRANS_3D(SAL,NLSD,NVSD,...)` + `(TEMP,NLTD,NVTD,...)`.
-> ★**오귀속 정정**: [[adcirc-3d-mode]]:59 는 "S/T transport (`vsmy.F:1543`)" 라 적었으나 vsmy.F 는 **dispatch만**(:1548-1553), 알고리즘 전체는 `transport.F:44-1229`. cross-model: ROMS [[roms_tracer_timestep_step3d_t]]·Delft3D [[delft3d_difu_transport]]·EFDC CALTRAN 의 ADCIRC 판.
+> **정체**: 3D baroclinic **염분/수온 이류-확산** solver(sigma 좌표). 하나의 generic in/out 배열로 S·T 모두 처리 — ADCIRC prognostic 성층 엔진(하구 성층·thermohaline surge). dispatch: `vsmy.F:1550-1555` `CALL TRANS_3D(SAL,NLSD,NVSD,...)` + `(TEMP,NLTD,NVTD,...)`.
+> ★**오귀속 정정**: [[adcirc-3d-mode]]:59 는 "S/T transport (`vsmy.F:1545-1545`)" 라 적었으나 vsmy.F 는 **dispatch만**(:1548-1553), 알고리즘 전체는 `transport.F:44-1229`. cross-model: ROMS [[roms_tracer_timestep_step3d_t]]·Delft3D [[delft3d_difu_transport]]·EFDC CALTRAN 의 ADCIRC 판.
 
 ## 0. 구조
 
@@ -56,7 +56,7 @@ CALL ADC_TRIDAG2(Mkm1trans,Mktrans,Mkp1trans,Frtrans,Gammatrans,NFEN)   ! Thomas
 ## 5. 기타
 - **wet/dry masking** `NCEle=NODECODE(N1)·NODECODE(N2)·NODECODE(N3)·NOFF(NEle)`(:240, dry element skip, "Casey's wet/dry").
 - **cross-node sigma remapping**(:249-272): 이웃값을 local sigma 로 cubic 보간 후 수평도함수 조립(`cubic_vertical_interpolation` :1318).
-- diffusion 계수 입력: `NLSD/NVSD`(염분)·`NLTD/NVTD`(수온) per-field(vsmy.F:1548-1553).
+- diffusion 계수 입력: `NLSD/NVSD`(염분)·`NLTD/NVTD`(수온) per-field(vsmy.F:1550-1555).
 
 ## 6. 주요 findings
 - **★오귀속**: 3d-mode:59/67 이 transport 를 vsmy.F(:1543/1630) 로 귀속 → 실제 vsmy 는 dispatch만, 엔진은 transport.F. 염분엔진 추적 시 엉뚱한 파일 도달.

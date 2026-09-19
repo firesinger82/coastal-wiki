@@ -30,20 +30,20 @@ Where ADCIRC reads wind/pressure forcing, how `NWS` selects format, exact reader
 
 | NWS | Cold-start init | Hot-start runtime | Print banner |
 |-----|-----------------|-------------------|--------------|
-| 0 | (skip) | `wind.F:2135-2146` | `read_input.F:1819-1824` |
-| +1 | -- | `wind.F:2149-2164` | `read_input.F:1825-1832` |
-| ±2 | -- | `wind.F:2170-2201` (NWS=2), `wind.F:2203-2217` (NWS=-2) | `read_input.F:1833-1852` |
-| +3 | -- | `wind.F:2223-2291` | `read_input.F:1853-1864` |
-| ±4 | -- | `wind.F:2298-2346, 2348-2381` | `read_input.F:1865-1890` |
-| ±5 | -- | `wind.F:2387-2436, 2438-2472` | `read_input.F:1891-1916` |
-| +6 | -- | `wind.F:2481-2526` | `read_input.F:1917-1929` |
-| ±7 | -- | `wind.F:2535-2558, 2560-2585` | `read_input.F:1933-1952` |
-| +10 | -- | `wind.F:2693-2741` | `read_input.F:1976-1989` |
-| +11 | -- | `wind.F:2751-2796` | `read_input.F:1990-2002` |
-| ±12 | -- | `wind.F:2800-2848` | `read_input.F:2004-2031` |
-| ±13 | -- | `wind.F:2852-2885, 3032-3067` | `read_input.F:2658, 4671` |
-| ±14 | -- | `wind.F:2937-3027` | `read_input.F:2033-2058` |
-| ±15 | -- | `wind.F:3071-3096` | `read_input.F:2059-2069, 2767-2774` |
+| 0 | (skip) | `wind.F:2135-2146` | `read_input.F:1833-1838` |
+| +1 | -- | `wind.F:2149-2164` | `read_input.F:1839-1846` |
+| ±2 | -- | `wind.F:2170-2201` (NWS=2), `wind.F:2203-2217` (NWS=-2) | `read_input.F:1847-1866` |
+| +3 | -- | `wind.F:2223-2291` | `read_input.F:1867-1878` |
+| ±4 | -- | `wind.F:2298-2346, 2348-2381` | `read_input.F:1879-1904` |
+| ±5 | -- | `wind.F:2387-2436, 2438-2472` | `read_input.F:1905-1930` |
+| +6 | -- | `wind.F:2481-2526` | `read_input.F:1931-1943` |
+| ±7 | -- | `wind.F:2535-2558, 2560-2585` | `read_input.F:1947-1966` |
+| +10 | -- | `wind.F:2693-2741` | `read_input.F:1990-2003` |
+| +11 | -- | `wind.F:2751-2796` | `read_input.F:2004-2016` |
+| ±12 | -- | `wind.F:2800-2848` | `read_input.F:2018-2045` |
+| ±13 | -- | `wind.F:2852-2885, 3032-3067` | `read_input.F:2672-2672, 4671` |
+| ±14 | -- | `wind.F:2937-3027` | `read_input.F:2047-2072` |
+| ±15 | -- | `wind.F:3071-3096` | `read_input.F:2073-2083, 2767-2774` |
 
 ## A2. NWS=8 (parametric vortex, mod_nws08) — verified 2026-06-04
 

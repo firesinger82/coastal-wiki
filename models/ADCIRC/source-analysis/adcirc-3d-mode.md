@@ -17,15 +17,15 @@ ADCIRC's two distinct 3D paths: (1) `couple2baroclinic3D.F` which **imports exte
 
 ## Source basis
 
-- `read_input.F:1176-1191, 3072, 5139-5482, 5682` — `IM, IDEN, IGC/NFEN, EQNSTATE`, 3D output controls.
+- `read_input.F:1190-1205, 3072, 5139-5482, 5682` — `IM, IDEN, IGC/NFEN, EQNSTATE`, 3D output controls.
 - `adcirc.F:316-319, 348` — top-level dispatch, baroclinic init.
 - `couple2baroclinic3D.F:39-787` — external-coupling module.
 - `cstart.F:348` — `Initial_BC3D_NetCDF` call.
-- `timestep.F:1121, 1125, 1918, 2150-2355` — VSSOL call, BPG3D, dispersion.
+- `timestep.F:1125-1125, 1125, 1918, 2150-2355` — VSSOL call, BPG3D, dispersion.
 - `gwce.F:780-1450` — GWCE 3D additions.
 - `vsmy.F:1168, 1543-3871, 4061-4315` — internal solve, EOS, MY2.5.
 - `global_3dvs.F:94, 193, 568` — symbols, FEGRIDS.
-- `write_output.F:2993-3331` — 3D output dispatch.
+- `write_output.F:3053-3391` — 3D output dispatch.
 
 ## A. Two distinct paths
 
@@ -34,14 +34,14 @@ ADCIRC has **two different 3D paths** that are easy to confuse:
 | Path | Activation | What it does |
 |---|---|---|
 | External baroclinic coupling | `C2DDI .and. CBaroclinic .and. abs(IDEN) >= 5` | Imports `BPGX, BPGY, SigTS, NB, NM, MLD, CDisp, DispX, DispY` from external NetCDF; injects depth-integrated baroclinic terms into 2D ADCIRC. **Not a 3D solver inside ADCIRC.** (`couple2baroclinic3D.F:39-787`, `cstart.F:348`) |
-| True ADCIRC-3D | `IM=1, 11, 21, 31` (sets `C3D=.TRUE.`, `C3DVS=.TRUE.`); `IM=21, 31` also set `CBaroclinic=.TRUE.` | Prognostic 3D velocity (VSSOL), optional T/S transport, baroclinic pressure (BPG3D), MY2.5 turbulence (`read_input.F:1176-1191`) |
+| True ADCIRC-3D | `IM=1, 11, 21, 31` (sets `C3D=.TRUE.`, `C3DVS=.TRUE.`); `IM=21, 31` also set `CBaroclinic=.TRUE.` | Prognostic 3D velocity (VSSOL), optional T/S transport, baroclinic pressure (BPG3D), MY2.5 turbulence (`read_input.F:1190-1205`) |
 
 The **external coupling** is for ADCIRC users who run an external 3D ocean model (e.g., HYCOM, ROMS) and want its baroclinic effects in their 2D ADCIRC tide+surge run. It does **not** require running ADCIRC in 3D mode.
 
 ## B. Sigma layers
 
 Vertical grid via `IGC, NFEN`:
-- `NFEN` = number of vertical finite-element nodes (`read_input.F:5139`).
+- `NFEN` = number of vertical finite-element nodes (`read_input.F:5153-5153`).
 - `IGC=0`: read sigma levels directly; bottom `B=-1`, surface `A=1` required (`:5176`).
 - `IGC≠0`: call `FEGRIDS()` (`:5211`).
 
@@ -57,7 +57,7 @@ Coordinate constants: `A=1`, `B=-1`, `AMB=A-B` (`global_3dvs.F:193`).
 
 ## C. Density / EOS
 
-Salinity/temperature transport when `C3D_BTrans=.TRUE.` (`vsmy.F:1548-1553` 은 **dispatch만** — 실제 solver 는 `transport.F`/`TRANS_3D`, [[adcirc-transport-solver]] 참조):
+Salinity/temperature transport when `C3D_BTrans=.TRUE.` (`vsmy.F:1550-1555` 은 **dispatch만** — 실제 solver 는 `transport.F`/`TRANS_3D`, [[adcirc-transport-solver]] 참조):
 
 | `IDEN` | Transports |
 |---|---|
@@ -65,13 +65,13 @@ Salinity/temperature transport when `C3D_BTrans=.TRUE.` (`vsmy.F:1548-1553` 은 
 | `3` | Temperature only |
 | `4` | Both |
 
-After transport, `CALC_SIGMAT_3D()` for `IDEN > 1` (`vsmy.F:1630`).
+After transport, `CALC_SIGMAT_3D()` for `IDEN > 1` (`vsmy.F:1632-1632`).
 
-`Eqnstate` from input (`read_input.F:5682`):
+`Eqnstate` from input (`read_input.F:5720-5720`):
 
 | `Eqnstate` | EOS | Code lines |
 |---|---|---|
-| `1` | Simple linear (Mellor / Cushman-Roisin) | `vsmy.F:4061` |
+| `1` | Simple linear (Mellor / Cushman-Roisin) | `vsmy.F:4081-4081` |
 | `2` | McDougall et al. 2003 | `:4154` |
 | `3` | UNESCO 1980 | `:4315` |
 
@@ -81,11 +81,11 @@ After transport, `CALC_SIGMAT_3D()` for `IDEN > 1` (`vsmy.F:1630`).
 
 External (depth-integrated): GWCE + 2D momentum (always solved).
 
-Internal (3D shear): `VSSOL()` (`timestep.F:1121`), called only when `C3DVS=.TRUE.`.
+Internal (3D shear): `VSSOL()` (`timestep.F:1125-1125`), called only when `C3DVS=.TRUE.`.
 
 VSSOL 내부의 연직 시간적분(2TL θ³-가중 Alp1/Alp2/Alp3·복소 q=u+iv tridiagonal·연직 linear FE·w adjoint 보정)은 → **[[adcirc-3d-vssol-vertical-scheme]]** (2026-07-11 신설, 본 노트의 미커버 갭 해소).
 
-Before VSSOL, barotropic pressure terms loaded into `MOM_LV_X`, aliased as `BTP` (`timestep.F:1125`, `global_3dvs.F:94`).
+Before VSSOL, barotropic pressure terms loaded into `MOM_LV_X`, aliased as `BTP` (`timestep.F:1129-1129`, `global_3dvs.F:94`).
 
 After internal solve, `Qkp1` vertically integrated for:
 - Depth-averaged `UU, VV`.
@@ -109,22 +109,22 @@ For 3D mode (`gwce.F:1196, 1283, 1405, 1450`):
 - Enter GWCE forcing as `−DispXAvg − BCXAvg` and `−DispYAvg − BCYAvg`.
 
 For true 3D baroclinic (`IM=21/31`):
-- `BPG3D()` computes vertical baroclinic pressure `BCP`, profiles `BPG`, depth-integrated `VIDBCPDXOH/VIDBCPDYOH` (`timestep.F:2150-2355`).
+- `BPG3D()` computes vertical baroclinic pressure `BCP`, profiles `BPG`, depth-integrated `VIDBCPDXOH/VIDBCPDYOH` (`timestep.F:2154-2359`).
 
 ## F. Vertical mixing
 
-Vertical eddy viscosity controlled by `IEVC, EVMin, EVCon` (`read_input.F:5235`).
+Vertical eddy viscosity controlled by `IEVC, EVMin, EVCon` (`read_input.F:5249-5249`).
 
 | `IEVC` | Profile |
 |---|---|
 | `0` | Read profile from input |
-| (other) | Empirical: constant, `ω H²`, `κ u* z`, `H Uavg`, `Uavg²` (`vsmy.F:1823, 1840, 1870, 1931, 1983`) |
-| `50, 51` | **MY2.5 quasi-equilibrium** (`vsmy.F:2035, 2403`) |
+| (other) | Empirical: constant, `ω H²`, `κ u* z`, `H Uavg`, `Uavg²` (`vsmy.F:1825-1825, 1840, 1870, 1931, 1983`) |
+| `50, 51` | **MY2.5 quasi-equilibrium** (`vsmy.F:2037-2037, 2403`) |
 
 MY2.5 closure:
 - Solves `q²` and `q²L`.
 - `Km = Sm q l`.
-- Stratification through `SIGT` gradients; shear from `Q` (`vsmy.F:2740`).
+- Stratification through `SIGT` gradients; shear from `Q` (`vsmy.F:2742-2742`).
 - Computes `Km, Kq, Kh` (`:2821`).
 
 **Limitation**: this is built-in MY2.5 — older, lacks GLS / k-ε / k-ω modern alternatives. For full closure flexibility, ADCIRC would need GOTM-style integration (not present).
@@ -132,7 +132,7 @@ MY2.5 closure:
 ## G. 3D output (fort.41-46)
 
 Station output:
-- `fort.41` — 3D density/salinity/temperature stations (`read_input.F:5296`, `write_output.F:2993`).
+- `fort.41` — 3D density/salinity/temperature stations (`read_input.F:5310-5310`, `write_output.F:3053-3053`).
 - `fort.42` — 3D velocity stations (real/imaginary horizontal + `WZ`) (`:5350`, `:3059, 3623`).
 - `fort.43` — 3D turbulence stations (`q20, l, EV`) (`:5395`, `:3125`).
 
@@ -141,7 +141,7 @@ Global output:
 - `fort.45` — 3D velocity global (`:5460`, `:3254`).
 - `fort.46` — 3D turbulence global (`:5482`, `:3299`).
 
-Optional: `fort.48` — internal BPG output (`global_3dvs.F:335`, `write_output.F:3331`).
+Optional: `fort.48` — internal BPG output (`global_3dvs.F:335`, `write_output.F:3391-3391`).
 
 ## H. Limitations vs full ocean model
 

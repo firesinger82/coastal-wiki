@@ -13,7 +13,7 @@ ADCIRC 의 storm-surge 관련 source-code 분석 노트 (공식 NWS 외력 패�
 
 ## 인용
 
-각 노트의 본문에 ADCIRC source code 의 file:line 인용 (`read_input.F:2157`, `wind.F:1501` 등). source 위치: [`models/ADCIRC/raw/source_code/adcirc/src/`](../../raw/source_code/) (raw/ .gitignore — 별도 clone 으로 재현 가능).
+각 노트의 본문에 ADCIRC source code 의 file:line 인용 (`read_input.F:2171-2171`, `wind.F:1501` 등). source 위치: [`models/ADCIRC/raw/source_code/adcirc/src/`](../../raw/source_code/) (raw/ .gitignore — 별도 clone 으로 재현 가능).
 
 ## 연결
 

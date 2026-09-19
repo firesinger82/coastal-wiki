@@ -17,9 +17,9 @@ related:
 
 > [[adcirc-boundary-conditions]] 가 IBTYPE 분류·mesh 측을 커버하나 fort.15 쪽 NFFR 레코드 구조와 gwce.F 의 flux 경계 이산식은 미커버였던 갭의 해소 노트 (2026-07-12, 사용자 지목 3건).
 
-## 1. fort.15 NFFR 레코드 구조 (read_input.F:3504-3589 + docs fort15.rst:79-90)
+## 1. fort.15 NFFR 레코드 구조 (read_input.F:3518-3603 + docs fort15.rst:79-90)
 
-NFFR 라인은 mesh(fort.14)에 flux 경계(IBTYPE 2/12/22/32/52)가 있어 `NFLUXF=1`일 때만 포함 (read_input.F:3505, docs fort15.rst:79 "include this line only if IBTYPE = 2, 12, 22, 32 or 52").
+NFFR 라인은 mesh(fort.14)에 flux 경계(IBTYPE 2/12/22/32/52)가 있어 `NFLUXF=1`일 때만 포함 (read_input.F:3519-3519, docs fort15.rst:79 "include this line only if IBTYPE = 2, 12, 22, 32 or 52").
 
 ```
 NFFR                              ← 정수. 0/-1 = 비주기(fort.20에서 읽음; 0=coldstart 기점, -1=hotstart 기점, :3509-3516·paramdef:811)
@@ -37,7 +37,7 @@ k = 1..NFFR:                      ← 분조별 노드값 블록
 - **줄 존재 규칙**: `DO J=1,NVEL` 루프 내 `LBCODEI(J)` 조건 READ(:3571-3584) — **flux 경계 노드만 줄이 있고**, land 등 비대상 노드는 줄 자체가 없음. 노드 순서 = fort.14 velocity 경계 나열 순서(NBV).
 - ★**code≠docs 1건**: fort15.rst:87 은 2-필드 줄을 "IBTYPE = 2, 12, 22"로만 표기하나 코드는 **52 도 같은 분기**(:3570 `.OR.(LBCODEI(J).EQ.52)`) — NFFR 포함조건 줄(:79)에는 52 명시, 필드 줄에서만 누락. (※초판의 "QNAM 앵커 `ln` 오염" 지적은 **철회** — 2026-07-12 Codex 표본 재검증에서 검증 도구 오류(`rg -r` 치환 플래그 오용)로 판명, 실제 docs 는 `.. _QNAM:` 정상(:830-834).)
 
-## 2. 런타임 QN·EN 합성 (timestep.F:860-880)
+## 2. 런타임 QN·EN 합성 (timestep.F:864-884)
 
 매 스텝, `NFLUXF=1 & NFFR>0`일 때:
 

@@ -94,7 +94,7 @@ The Generalized Wave Continuity Equation is ADCIRC's mass-conservation equation 
 ## Common Pitfalls
 
 - **TAU0=-5 with no `Tau0FullDomainMin/Max` line** — defaults take over; result depends on sandbox state.
-- **Boundary ELEVALPHA wrong** — phases shifted across NBFR block; check `read_input.F:3431-3456` parse order.
+- **Boundary ELEVALPHA wrong** — phases shifted across NBFR block; check `read_input.F:3445-3470` parse order.
 - **Hot-restart with different `ILump`** — matrix shape differs; restart fails or silently runs lumped.
 - **NTIP=2 without fort.24** — runtime error or zero SAL contribution.
 

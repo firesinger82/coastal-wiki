@@ -16,13 +16,13 @@ How the `padcswan` binary couples ADCIRC and SWAN over a shared unstructured mes
 
 ## Source basis
 
-- `couple2swan.F:67-1236` — main coupling module: init, run, finalize, RS computation.
+- `couple2swan.F:67-1313` — main coupling module: init, run, finalize, RS computation.
 - `driver.F:30-57` — `CSWAN` driver entry/finalize.
 - `adcirc.F:428-483` — main loop coupling call.
-- `read_input.F:1080-1083, 1790-1817, 2255-2261` — `NRS` parsing and encoding.
+- `read_input.F:1094-1097, 1790-1817, 2255-2261` — `NRS` parsing and encoding.
 - `wind.F:52-60` — allowable NWS table.
-- `timestep.F:664-682, 695-725, 1214-1218` — wind passing, RS interpolation, hotfile timing.
-- `hstart.F:325-337`, `write_output.F:4969-5112`, `netcdfio.F90:5555-7045, 8017-8085` — hot-start.
+- `timestep.F:668-686, 695-725, 1214-1218` — wind passing, RS interpolation, hotfile timing.
+- `hstart.F:325-337`, `write_output.F:5058-5201`, `netcdfio.F90:5555-7045, 8017-8085` — hot-start.
 - `../thirdparty/swan/SwanReadADCGrid.ftn90:44-153` — SWAN reads `fort.14`.
 - `../thirdparty/swan/swanmain.ftn:895-902, 8696-8983` — SWAN-side coupling hooks.
 - `../work/makefile:195-663` — build targets.
@@ -49,9 +49,9 @@ SWAN-side hooks activated by `switch.pl -adcirc` — only present in coupled bin
 ## B. Time stepping
 
 - ADCIRC runs every `DT`; SWAN `DT` imported as `SWAN_DT` (`couple2swan.F:950, 965`).
-- **Coupling interval = integer ratio** `SWAN_DT / DT` (`:1079-1081`).
+- **Coupling interval = integer ratio** `SWAN_DT / DT` (`:1085-1087`).
 - ADCIRC calls SWAN only on that interval (`adcirc.F:475-483`).
-- During SWAN run, interpolation midpoint used for time-centering (`couple2swan.F:1212-1215`).
+- During SWAN run, interpolation midpoint used for time-centering (`couple2swan.F:1241-1243`); `SWMAIN` 호출은 temporal control gate 안(`:1245-1247`).
 
 **Note**: there is **no `CWTIM_INC` symbol** in this tree; coupling interval comes from SWAN `TIMECOMM:DT` block divided by ADCIRC `DT`.
 
@@ -59,8 +59,8 @@ SWAN-side hooks activated by `switch.pl -adcirc` — only present in coupled bin
 
 1. SWAN spectra integrated into `ADCIRC_SXX/SXY/SYY` (`couple2swan.F:112-119, 177-196`).
 2. Gradients converted to nodal wave forces in `SWAN_RSNX2/SWAN_RSNY2` (`:360-364, 399-404, 421-427`).
-3. ADCIRC extrapolates/interpolates into `RSNX2/RSNY2` for `NRS=3` (`timestep.F:695-703`).
-4. Added to wind stress in momentum (`timestep.F:721-725`).
+3. ADCIRC extrapolates/interpolates into `RSNX2/RSNY2` for `NRS=3` (`timestep.F:699-707`).
+4. Added to wind stress in momentum (`timestep.F:725-729`).
 
 ## D. ADCIRC → SWAN (water level, currents, wind)
 
@@ -74,7 +74,7 @@ Init copies ADCIRC `ETA2/UU2/VV2` plus winds (`:993-1009`).
 Each coupling step:
 - WL/currents updated from ADCIRC (`:1128-1142`).
 - Dry nodes set depth zero / current zero.
-- Wind passed from ADCIRC met → SWAN if `COUPWIND` (`timestep.F:664-682`).
+- Wind passed from ADCIRC met → SWAN if `COUPWIND` (`timestep.F:668-686`).
 
 SWAN-side memory grab post-preprocess (`../thirdparty/swan/swanmain.ftn:8696-8983`).
 
@@ -91,7 +91,7 @@ So **same `fort.14` is used by both ADCIRC and SWAN** — single mesh, no interp
 
 **Important**: `wind.F:52-60` allowable base `NWS` list **excludes 83/84**.
 
-Instead, `read_input.F:1790-1817` parses radiation-stress coupling from **hundreds digit**:
+Instead, `read_input.F:1804-1831` parses radiation-stress coupling from **hundreds digit**:
 ```
 NRS = ABS(NWS / 100)        ! strip hundreds
 NWS = NWS − 100*sign*NRS    ! remaining is base met forcing
@@ -130,13 +130,13 @@ ADCIRC hot-start reads base `RSNX/RSNY`; for `NRS=3` also reads `SWAN_RSNX/RSNY`
 
 Binary hot-start writes:
 - Base RS arrays.
-- If `NRS=3`: SWAN RS arrays (`write_output.F:4969-5112`).
+- If `NRS=3`: SWAN RS arrays (`write_output.F:5058-5201`).
 
 NetCDF hot-start defines `swan_rsx1/rsy1/rsx2/rsy2` (`netcdfio.F90:5555-5568`); writes for `nrs==3` (`:6966-7045`).
 
 SWAN spectral hot-start is **separate**:
-- ADCIRC sets `SwanHotStartUnit` (`read_input.F:1080-1083`).
-- `timestep.F:1214-1218` defers SWAN hotfile write until after next SWAN step.
+- ADCIRC sets `SwanHotStartUnit` (`read_input.F:1094-1097`).
+- `timestep.F:1218-1222` defers SWAN hotfile write until after next SWAN step.
 - SWAN calls `BACKUP` then clears flag (`swanmain.ftn:895-902`).
 
 **Possible issue noted in code**: NetCDF read path inquires SWAN variable IDs but reads `hs%rs1/rs2` IDs into `swan_*` arrays — not `hs%swan_rs*` (`netcdfio.F90:8017-8085`). This may indicate a latent bug in NetCDF restart of SWAN-coupled runs; verify before relying on it.
@@ -173,9 +173,9 @@ SWAN spectral hot-start is **separate**:
 - ▢ Met forcing time alignment — `STATIM/REFTIM` apply to ADCIRC; SWAN reads `INPGRID` time block independently. Match epochs.
 - ▢ NetCDF restart with `NRS=3` — possible bug at `netcdfio.F90:8017-8085` (`hs%rs1/rs2` vs `hs%swan_rs*`); test on small case before production.
 
-## SWAN Temporal Controls (PR #498, phase 1 of 2)
+## SWAN Temporal Controls (upstream 반영, phase 1 of 2)
 
-PR [#498](https://github.com/adcirc/adcirc/pull/498) (OPEN, branch `Spatial-and-Temporal-Controls`, +274 -30, 17 files). 사용자가 ADCIRC+SWAN coupled simulation 의 SWAN computation 시간을 storm landfall 즈음으로 제한 가능 → 전체 mesh + 전체 timeframe SWAN 호출 회피로 wall-clock 절감. Spatial controls 은 phase 2 예정. 외부 docs: [CCHT-NCSU/Spatial-Temporal-Controls](https://github.com/ccht-ncsu/Spatial-Temporal-Controls).
+PR [#498](https://github.com/adcirc/adcirc/pull/498) 의 phase 1 은 **upstream `main` 에 반영됨** — 커밋 `976fc5b6`("Adding SWAN temporal controls", 17 files), 본 노트 baseline `e8b62a70` 에 포함. 런루프 gate 는 `couple2swan.F:1245-1247`(`SwanTimeStep` 이 `[1, SWAN_MTC]` 일 때만 `SWMAIN` 호출), 미호출 구간은 출력값을 초기화(`:1252-1261`)하고 radiation stress 를 할당·이월(`:1267-1291`). fort.15 namelist 파싱은 `prep/presizes.F:276,742-745`(기본 sentinel `"-99999"`). 사용자가 ADCIRC+SWAN coupled simulation 의 SWAN computation 시간을 storm landfall 즈음으로 제한 가능 → 전체 mesh + 전체 timeframe SWAN 호출 회피로 wall-clock 절감. Spatial controls 은 phase 2 예정 — 다만 같은 커밋이 nodal attribute `swan_local_control` 정의를 추가했다(`src/nodalattr.F:89-90,669`). 그 경로의 완결 여부는 본 baseline 에서 미확인. → [[adcirc-nodal-attributes]] §1. 외부 docs: [CCHT-NCSU/Spatial-Temporal-Controls](https://github.com/ccht-ncsu/Spatial-Temporal-Controls).
 
 ### 사용자 입력 (PR body verbatim)
 

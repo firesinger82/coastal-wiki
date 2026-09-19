@@ -18,7 +18,7 @@ related:
 
 > `src/nodalattr.F`(3193) 직접 read. ADCIRC 의 **공간변화 파라미터**(fort.13) 시스템 — bottom friction·tau0·wind roughness·canopy·internal tide 등을 node별로 지정. [[adcirc-momentum-implementation]] 의 `FRIC`(bottom friction 계수)·[[adcirc-gwce-implementation]] 의 tau0·[[adcirc-tidal-forcing]] 의 internal tide drag 의 **입력 소스**. fort.15 의 `NWP` + fort.13 파일.
 
-## 1. Attribute 카탈로그 (nodalattr.F:636-686)
+## 1. Attribute 카탈로그 (nodalattr.F:657-709)
 
 fort.13 가 지원하는 nodal attribute (이름 = fort.13 키워드):
 
@@ -41,6 +41,7 @@ fort.13 가 지원하는 nodal attribute (이름 = fort.13 키워드):
 | `overland_reduction_factor` | 육상 흐름 감소 | overland |
 | `condensed_nodes` | 노드 병합 | mesh |
 | (internal tide) | **internal tide friction** | Apply2DInternalWaveDrag |
+| `swan_local_control` | SWAN 활성 노드 / 내부 source 노드 지정 (ValuesPerNode = 2) — 코드 주석 "Allow SWAN to be activated for selective regions of the ADCIRC mesh"(`:85-90`). baseline `e8b62a70`(커밋 `976fc5b6`) 에서 추가 | SWAN 결합 ([[adcirc-swan-coupling]]) |
 
 - 읽기: XDMF(`readNodalAttrXDMF` :552) 또는 legacy fort.13. 각 attr = {units, number_of_values, default_values, per-node 값}. default 로 채우고 지정 node 만 override.
 

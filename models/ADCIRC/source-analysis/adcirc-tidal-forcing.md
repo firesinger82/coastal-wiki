@@ -19,7 +19,7 @@ related:
 
 > `timestep.F`(tidal potential) + `internaltide.F90`(249) + `harm.F`(2071) + `astronomic/ephemerides/moon.F90` 직접 read. ADCIRC 조석 구동의 **body-force**(open-BC tidal elevation 과 별개): ① constituent tidal potential ② SAL(self-attraction & loading) ③ 직접 luni-solar ephemeris ④ internal tide wave drag ⑤ harmonic analysis(결과 분석). [[adcirc-momentum-implementation]] §1 의 barotropic pressure 에 합산되는 조석 항의 mechanism.
 
-## 1. Tidal potential — constituent 방식 (timestep.F:1527-1556) ★
+## 1. Tidal potential — constituent 방식 (timestep.F:1531-1560) ★
 
 조석 천체 인력의 평형조위 forcing `TIP2(I)` (node별):
 ```fortran
@@ -33,7 +33,7 @@ TIP2(I) += TPMUL*L_N(NA,I)*COS(ARGT + NA*SLAM(I))          ! tidal potential
 - **ETRF** = earth-tide reduction factor = Love number 조합 `(1 + k − h) ≈ 0.69` (지구 탄성 변형 보정).
 - **TPK** = tidal potential 진폭 × species 계수, **FFT** = nodal factor(18.6년 교점 보정 진폭), `RampTip`=ramp.
 - **species `NA`** (주파수로 분류): 0 long-period/declinational, 1 diurnal, 2 semidiurnal. `L_N(NA,I)` = 위도 의존 geometric 함수(NA=2 → cos²φ 등), `SLAM`=경도(diurnal/semidiurnal 의 경도 의존 NA·λ).
-- 적용(`CTIP`): [[adcirc-momentum-implementation]] momentum.F:441 (barotropic pressure 에 합산) + [[adcirc-gwce-implementation]] gwce.F:1181/2592. timestep.F:1133 `MOM_LV_X −= TIP1+TIP2`.
+- 적용(`CTIP`): [[adcirc-momentum-implementation]] momentum.F:441 (barotropic pressure 에 합산) + [[adcirc-gwce-implementation]] gwce.F:1181/2592. timestep.F:1137-1137 `MOM_LV_X −= TIP1+TIP2`.
 
 ## 2. SAL — Self-Attraction & Loading (NTIP=2)
 
@@ -42,13 +42,13 @@ TIP2(I) += TPMUL*L_N(NA,I)*COS(ARGT + NA*SLAM(I))          ! tidal potential
 TIP2(I) += SALTMUL * SALTAMP(J,I) * COS(ARGT - SALTPHA(J,I))    ! SALTMUL=RampTip*FFT
 ```
 - `SALTAMP(J,I)`/`SALTPHA(J,I)` = **공간변화 SAL 진폭/위상**(constituent J × node I) — 외부 SAL DB(예: FES, GOT) 에서 fort.13/24 로 입력.
-- `NTIP==2` 또는 `tidePotential` 비활성 시 적용(timestep.F:1527). 대양 규모 조석 정확도(~5-10%)에 중요`[source-needed]`.
+- `NTIP==2` 또는 `tidePotential` 비활성 시 적용(timestep.F:1531-1531). 대양 규모 조석 정확도(~5-10%)에 중요`[source-needed]`.
 
 ## 3. 직접 luni-solar ephemeris (astronomic/ephemerides/moon.F90)
 
 `tidePotential%active()` 시 constituent 합 대신 **천체력 직접 계산**(timestep.F:162 "full luni-solar tidal potential"):
 - `moon.F90`(602)/`ephemerides.F90`(438)/`astronomic.F90`(460) + **`sun.F90`·`sun_moon_system.F90`**(태양 위치·해-달 천체계) = 달·태양 위치(적위·거리) 시계열 → 시변 tidal potential 직접. constituent truncation 없이 모든 조석 성분 포함(장기·비선형 조석 모사). VSOP/ELP 류 천체력.
-- 이 경우 SAL 만 constituent 방식(`SALTAMP`)으로 더해짐(timestep.F:1543-1547).
+- 이 경우 SAL 만 constituent 방식(`SALTAMP`)으로 더해짐(timestep.F:1547-1551).
 
 ## 4. Internal tide wave drag (internaltide.F90, 249)
 

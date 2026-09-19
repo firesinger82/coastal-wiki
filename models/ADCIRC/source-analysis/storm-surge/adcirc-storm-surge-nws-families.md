@@ -4,7 +4,7 @@ topic: storm-surge
 canonical_source: self
 citation_status: verified
 has_source_needed: false
-verification_method: "2026-07-10 재승격: 공식 docs 직접 대조 — nws_parameters.rst(NWS=3 :248 / =4 :251 / =13 :308-310 / =14 :311-312 / =19 discouraged :32 verbatim). NWS=13 실기능은 코드 정본(read_input.F:1782 owiWindNetcdf namelist·:4721 'OWI Netcdf (NWS13) format') — rst :308-310 'ramping' 서술은 stale(code≠docs, [[adcirc-storm-surge-foundation]] 판정 공유). 2026-07-10 L4 감사 후속: 개인 워크플로 서술은 _staging/from-canonical/adcirc-nws13-jma-msm-local-workflow.md 로 추출(절대규칙 #2·#8), 객관 단언은 [[adcirc-met-forcing-implementation]] (file:line 인용 보유) 로 소급."
+verification_method: "2026-07-10 재승격: 공식 docs 직접 대조 — nws_parameters.rst(NWS=3 :248 / =4 :251 / =13 :308-310 / =14 :311-312 / =19 discouraged :32 verbatim). NWS=13 실기능은 코드 정본(read_input.F:1796-1796 owiWindNetcdf namelist·:4721 'OWI Netcdf (NWS13) format') — rst :308-310 'ramping' 서술은 stale(code≠docs, [[adcirc-storm-surge-foundation]] 판정 공유). 2026-07-10 L4 감사 후속: 개인 워크플로 서술은 _staging/from-canonical/adcirc-nws13-jma-msm-local-workflow.md 로 추출(절대규칙 #2·#8), 객관 단언은 [[adcirc-met-forcing-implementation]] (file:line 인용 보유) 로 소급."
 note_author: "사용자 + codex source-code 분석 (2026-04 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23 → L4 레이어 정리 2026-07-10"
 note_date: 2026-04 (original) / 2026-05-23 (promote) / 2026-07-10 (layer cleanup)
 verification_by: "사용자 + codex source-code analysis"
@@ -52,7 +52,7 @@ It does not choose final project parameter values.
 
 ### `NWS=13`
 
-- type: OWI-style NetCDF gridded wind and pressure — **코드 정본** `read_input.F:1782`(owiWindNetcdf namelist 필수)·`:4721`("OWI Netcdf (NWS13) format wind/pres used")
+- type: OWI-style NetCDF gridded wind and pressure — **코드 정본** `read_input.F:1796-1796`(owiWindNetcdf namelist 필수)·`:4721`("OWI Netcdf (NWS13) format wind/pres used")
 - useful for: high-quality gridded forcing with overlays, curvilinear grids, and irregular timesteps
 - reader 경로·namelist 요건: [[adcirc-met-forcing-implementation]] §D (owiwind_netcdf.F file:line 인용)
 - ★code≠docs: `nws_parameters.rst:308-310` 은 NWS=13 을 "NWS=5 유사 + ramping(WRAMP)" 으로 서술 — 코드와 divergent(stale). [[adcirc-storm-surge-foundation]] 판정 참조.

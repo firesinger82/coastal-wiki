@@ -21,7 +21,7 @@ ADCIRC's parametric tropical-cyclone forcing (NWS=19 AHM, NWS=20 GAHM), how forw
 
 ## Source basis
 
-- `read_input.F:2157, 2190, 2255-2261, 2430, 2884, 2706, 2975` — NWS modes, `BLAdj/GEOFACTOR`, `RampMete`.
+- `read_input.F:2171-2171, 2190, 2255-2261, 2430, 2884, 2706, 2975` — NWS modes, `BLAdj/GEOFACTOR`, `RampMete`.
 - `wind.F:151, 351, 1415, 1471-1594, 1501-1531, 2798-2970, 3018, 5214-5466, 5798-6097, 8288` — NWS dispatch, IB, vortex, parsers.
 - `wind/aswip.F:413-1034`, `wind/vortex.F:186, 748-932` — ASWIP, GAHM `uvpr`.
 - `owiwind.F:184, 269` — OWI ASCII reader.
@@ -33,7 +33,7 @@ ADCIRC's parametric tropical-cyclone forcing (NWS=19 AHM, NWS=20 GAHM), how forw
 
 Entry: `NWS20GET` in `wind.F:1501-1517`. Fills nodal wind + pressure, converts wind → stress, ramps pressure relative to background.
 
-`fort.15` line for NWS=20 (`read_input.F:2706`):
+`fort.15` line for NWS=20 (`read_input.F:2720-2720`):
 ```
 IREFYR  IREFMO  IREFDAY  IREFHR  StormNumber  BLAdj  GEOFACTOR
 [+ optional ice/restart fields]
@@ -58,7 +58,7 @@ For most modern hindcasts, NWS=20 (GAHM) is preferred.
 
 ## C. OWI hybrid: NWS=29, NWS=30
 
-NWS=29 = NWS=19 (AHM) embedded in **OWI/NWS12 background** (`read_input.F:2157`).
+NWS=29 = NWS=19 (AHM) embedded in **OWI/NWS12 background** (`read_input.F:2171-2171`).
 NWS=30 = NWS=20 (GAHM) embedded in OWI/NWS12 background (`:2190`).
 
 Runtime dispatch (`wind.F:1531, 1550`):
@@ -154,7 +154,7 @@ Use `NOIVB` when comparing against tide-gauge data already corrected for IB (rar
 There is **no separate NWS19/20-only spin-up ramp** — common meteorological ramp `RampMete` applies to wind stress, pressure anomaly, and output winds.
 
 Ramp duration/configuration:
-- `NRAMP, DRAMP` (`read_input.F:2430`).
+- `NRAMP, DRAMP` (`read_input.F:2444-2444`).
 - Fine-grained `DRampMete` (`:2884`).
 - Tanh ramp table generated (`:2975`).
 

@@ -16,18 +16,18 @@ How ADCIRC reads and writes hot-start state via `IHOT` (cold/binary/NetCDF dispa
 
 ## Source basis
 
-- `read_input.F:1050-1075, 4504-4544` — `IHOT`, `NHSTAR`, `NHSINC` reads.
+- `read_input.F:1064-1089, 4504-4544` — `IHOT`, `NHSTAR`, `NHSINC` reads.
 - `adcirc.F:316-322` — top-level dispatch.
-- `hstart.F:47-3048` — main reader, mappers, 3D reader.
-- `write_output.F:4429, 4920-5374` — binary writer, full vs local.
-- `writer.F:1069`, `vsmy.F:3254, 3531-3778` — dedicated writers, 3D.
+- `hstart.F:47-3076` — main reader, mappers, 3D reader.
+- `write_output.F:4518-4518, 4920-5374` — binary writer, full vs local.
+- `writer.F:1069`, `vsmy.F:3261-3261, 3531-3778` — dedicated writers, 3D.
 - `netcdfio.F90:3866-9188` — NetCDF naming, definitions, read/write.
-- `timestep.F:1192-1211` — runtime hot-start trigger.
+- `timestep.F:1196-1215` — runtime hot-start trigger.
 - `wind.F:2170-2970` — meteorological re-alignment per NWS.
 
 ## A. IHOT dispatch
 
-`IHOT` is read from `fort.15` (`read_input.F:1050-1053`).
+`IHOT` is read from `fort.15` (`read_input.F:1064-1067`).
 
 | `IHOT` | Mode | File | Reader |
 |---|---|---|---|
@@ -38,13 +38,13 @@ How ADCIRC reads and writes hot-start state via `IHOT` (cold/binary/NetCDF dispa
 | `367/368` | NetCDF3 classic | `fort.67.nc` / `fort.68.nc` | `readNetCDFHotstart*` (`hstart.F:673-690`) |
 | `567/568` | NetCDF4/HDF5 | same | same path |
 
-After `IHOT=67`, output flips to unit/file `68`, and vice versa (alternating ping-pong) (`read_input.F:1063-1075`).
+After `IHOT=67`, output flips to unit/file `68`, and vice versa (alternating ping-pong) (`read_input.F:1077-1089`).
 
 ## B. fort.67/68 binary structure
 
-Direct-access, `RECL=8` (`hstart.F:485-492`, `write_output.F:4920-4923`).
+Direct-access, `RECL=8` (`hstart.F:485-492`, `write_output.F:5009-5012`).
 
-**Header order** (`write_output.F:4922-4931`):
+**Header order** (`write_output.F:5011-5020`):
 ```
 FileFmtVersion, IM, TimeLoc, IT, NPX, NEX, NPX, NEX
 ```
@@ -81,9 +81,9 @@ Reader mirror at `hstart.F:506-668` (header → 2D → counters → 3D → harmo
 | (3D mapper) | `:3048` |
 
 Write-side **not in `hstart.F`**:
-- 2D: `writeHotstart(TimeLoc, IT)` in `write_output.F:4429`.
+- 2D: `writeHotstart(TimeLoc, IT)` in `write_output.F:4518-4518`.
 - Dedicated writer: `writeHotstart_through_HSwriter` in `writer.F:1069`.
-- 3D: `HSTART3D_OUT(IT)` in `vsmy.F:3254`.
+- 3D: `HSTART3D_OUT(IT)` in `vsmy.F:3261-3261`.
 
 ## D. NetCDF variant
 
@@ -101,7 +101,7 @@ Read opens `fort.<lun>.nc`, reads `time`, then maps state (`:7904-8216`).
 
 ## E. NHSINC / NHSTAR output control
 
-Read together (`read_input.F:4504-4508`):
+Read together (`read_input.F:4518-4522`):
 
 | `NHSTAR` | Behavior |
 |---|---|
@@ -113,21 +113,21 @@ Read together (`read_input.F:4504-4508`):
 
 `NHSINC=0` is illegal when `NHSTAR≠0` (`:4542-4544`).
 
-Trigger (`timestep.F:1192-1197`): hot-start fires when `IT` is exact multiple of `NHSINC`, or when `-IHOT==IT` (special end-of-run case).
+Trigger (`timestep.F:1196-1201`): hot-start fires when `IT` is exact multiple of `NHSINC`, or when `-IHOT==IT` (special end-of-run case).
 
 ## F. State preserved
 
 | State | Read | Write |
 |---|---|---|
-| `ETA1, ETA2, EtaDisc` | `hstart.F:526-536` | `write_output.F:4935-4945` |
+| `ETA1, ETA2, EtaDisc` | `hstart.F:526-536` | `write_output.F:5024-5034` |
 | `H1, H2` | NetCDF only; binary recomputes from `DP + IFNLFA*ETA` (`hstart.F:529-533`) | `netcdfio.F90:5357-5380` |
 | `UU2, VV2` | `:537-538` | `:4947-4953` |
 | `NNODECODE, NODECODE, NOFF` | `:542-545` | `:4961-4967` |
 | Harmonic accumulators, means, variances | `:657-668` | `:5166-5374` |
-| 3D state (if `C3D`): `DUU/DUV/DVV, UU/VV, BSX/BSY, Q, WZ, q20, l, SigT/Sal/Temp` | `:568-645` | `vsmy.F:3531-3778` |
+| 3D state (if `C3D`): `DUU/DUV/DVV, UU/VV, BSX/BSY, Q, WZ, q20, l, SigT/Sal/Temp` | `:568-645` | `vsmy.F:3538-3785` |
 | **Meteorology** | **NOT stored** — reconstructed via `hotstartMeteorologicalForcing` | — |
 
-Meteorology is **not preserved** — reconstructed at `TimeLoc` from forcing files (`hstart.F:1440-1444`).
+Meteorology is **not preserved** — reconstructed at `TimeLoc` from forcing files (`hstart.F:1445-1449`).
 
 ## G. Resolution / mesh change
 
@@ -141,7 +141,7 @@ So **hot-start across processor-count change is supported** (full-domain → sub
 
 ## H. Restart with NWS forcing
 
-After dynamic state read, `HOTSTART` repositions time-dependent forcing using `TimeLoc` and `ITHS` (`hstart.F:1442-1444`).
+After dynamic state read, `HOTSTART` repositions time-dependent forcing using `TimeLoc` and `ITHS` (`hstart.F:1447-1449`).
 
 Inside `hotstartMeteorologicalForcing`, time interpolation explicitly reconstructed from `STATIM, WTIMINC, DTDPHS, TimeLoc`.
 

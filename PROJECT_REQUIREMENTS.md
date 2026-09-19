@@ -77,6 +77,27 @@
 6. **결과 검증** — Claude가 적용 결과를 변경안·검사 출력과 대조.
 7. **재잠금** — 사용자가 root 소유 읽기 전용 상태를 복구·확인.
 
+### 잠금 아래 변경의 두 방식 (2026-09-20 사용자 확정)
+
+기본 원칙은 root·read-only 잠금 유지다. 작업 시작 전에 **어느 방식을 쓸지 명시**한다.
+
+**A. INSTALL-STYLE CHANGE** — snapshot 교체, root 소유 파일 배치 등
+→ 변경안(diff/script) 준비 → 사용자 sudo 적용 → 검증. (기존 절차, 그대로 유지)
+
+**B. SCOPED EDIT** — 이미 승인된 제한된 노트·파일 수정
+→ 최소 경로 unlock → 승인된 수정만 → 검증 → 즉시 relock.
+
+**SCOPED UNLOCK 절차**
+1. 변경 범위와 대상 경로를 먼저 확정한다.
+2. 필요 시 사용자 sudo 로 **대상 경로만** unlock 한다(`chown -R "$USER":"$USER" <경로>` · `chmod -R u+w <경로>`).
+3. 승인된 작업만 수행한다.
+4. diff · hash · validation 으로 변경을 검증한다.
+5. 즉시 relock 한다(`chown -R root:root <경로>` · `chmod -R a-w <경로>`).
+6. relock 후 **쓰기 가능한 파일이 0개**인지 확인한다(`find <경로> -writable | wc -l`).
+
+**금지**: 전체 `models/` 를 불필요하게 unlock · 승인 범위 밖 파일 수정 · 작업 후 relock 생략 · 잠금 해제 상태의 장기 유지.
+
+
 ## ARCHITECTURE / CONTENT RULES
 
 - [L2] Canonical source 분리: 모델 메커닉 → `models/<model>/`, 도메인 개념 → `concepts/<topic>/`, 교과서 발췌 → `textbook/notes/`. 다른 곳은 요약 + 링크. 문서 상단 `Canonical source:` 명시. — `CONVENTIONS.md` §3

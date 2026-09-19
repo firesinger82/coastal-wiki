@@ -20,14 +20,14 @@ related:
 
 ## 1. 정체 — 무엇을 언제 푸는가
 
-- `VSSOL(IT,TimeLoc)` = 3D internal mode **수평속도의 연직구조** 솔버 (vsmy.F:142-1703). `C3DVS` 시 매 timestep 호출 (timestep.F:1121-1123; 직전에 barotropic 압력 `MOM_LV_X`→`BTP` 를 **time level s·s+1 평균**으로 적재, timestep.F 주석 "averaged between time levels s and s+1").
+- `VSSOL(IT,TimeLoc)` = 3D internal mode **수평속도의 연직구조** 솔버 (vsmy.F:142-1705). `C3DVS` 시 매 timestep 호출 (timestep.F:1125-1127; 직전에 barotropic 압력 `MOM_LV_X`→`BTP` 를 **time level s·s+1 평균**으로 적재, timestep.F 주석 "averaged between time levels s and s+1").
 - **복소 속도 정식화**: `q = u + i·v` (`COMPLEX(8)`, 헤더 :124 "3D Complex Velocity field (GAMMA)") — Coriolis 가 복소 회전(스칼라 곱)이 되어 2×2 행렬 불필요.
-- 시간간격: `DelT => DTDP` (read_input.F:5073, POINTER alias — global_3dvs.F:98) — **2D 와 동일 dt, 별도 subcycling 없음**. 2-time-level(s → s+1) 스킴.
+- 시간간격: `DelT => DTDP` (read_input.F:5087-5087, POINTER alias — global_3dvs.F:98) — **2D 와 동일 dt, 별도 subcycling 없음**. 2-time-level(s → s+1) 스킴.
 - 좌표: 무차원 sigma `[b,a] = [-1,+1]` 고정 (global_3dvs.F:193-195, `AMB=A-B=2`).
 
 ## 2. θ³-가중 시간적분 — 항별 3개의 독립 implicitness
 
-fort.15 3D 블록에서 `READ(15,*) Alp1,Alp2,Alp3` (read_input.F:5127), 계수 조립 :5132-5137:
+fort.15 3D 블록에서 `READ(15,*) Alp1,Alp2,Alp3` (read_input.F:5141-5141), 계수 조립 :5132-5137:
 
 ```fortran
 IDTAlp1   = iy*DelT*Alp1      ! Coriolis LHS      (iy = 복소 i)
@@ -50,7 +50,7 @@ DT1MAlp2  = DelT*(1.-Alp2)    ! 저면응력 RHS
 
 ## 3. 연직 이산화 — linear FE Galerkin (consistent mass)
 
-- **질량행렬 `Inm`** (InmINT, vsmy.F:2299-2319): 선형 요소 `∫ψₙψₘ dσ` — `Inm(k,3)=(σ(k+1)−σ(k))/6`, `Inm(k,2)=2(Inm(k,1)+Inm(k,3))` 의 고전 1D FE 3-band. **lumped 아님** — RHS 에서 이웃층 값이 `Inm(k,1)/(k,3)` 로 가중됨 (:1020-1025).
+- **질량행렬 `Inm`** (InmINT, vsmy.F:2301-2321): 선형 요소 `∫ψₙψₘ dσ` — `Inm(k,3)=(σ(k+1)−σ(k))/6`, `Inm(k,2)=2(Inm(k,1)+Inm(k,3))` 의 고전 1D FE 3-band. **lumped 아님** — RHS 에서 이웃층 값이 `Inm(k,1)/(k,3)` 로 가중됨 (:1020-1025).
 - **확산행렬 `KVnm`** (:589-598): `KVnm(k,3) = −½(EVTot(k+1)+EVTot(k))/(σ(k+1)−σ(k))`, `KVnm(k,2) = −(KVnm(k,1)+KVnm(k,3))` — 요소 평균 eddy viscosity 의 flux 형, 행합 0(보존형). `EVTot` 은 매 node·step `EDDYVIS` 호출로 갱신 (:584; IEVC 프로파일 카탈로그·MY2.5 `IEVC=50/51 → CALL TURB` :2038 은 [[adcirc-3d-mode]] §F).
 - 조립: `Mkm1/Mk/Mkp1(k) = CCL·Inm(k,·) + RCL·KVnm(k,·)` (:1027-1029) — 복소 3-band compact storage.
 
@@ -62,7 +62,7 @@ DT1MAlp2  = DelT*(1.-Alp2)    ! 저면응력 RHS
 
 ## 5. 경계조건
 
-- **바닥**: `ISlip=0` no-slip → Dirichlet 행 `Fr(1)=0, Mk(1)=(1,−1)` (:997-1001; 주석 "-I*IV=V") / `ISlip≥1` slip → 저면응력을 `TK(NH)` 로 LHS(Alp2)·RHS(1−Alp2) 분배 (:1010,:1015). `ISlip=1` 선형 slip 계수, `=2` 최소 2차, `=3` 2차 (헤더 :946-948; `READ(15,*) ISlip,KP` read_input.F:5102). ※2016 개정으로 `KSlip` 대신 2D 마찰 `TK` 재사용 (":1009-1010 주석 arash May 31 2016 based on Rosemary's work" — 구식 KSlip 코드 주석잔존).
+- **바닥**: `ISlip=0` no-slip → Dirichlet 행 `Fr(1)=0, Mk(1)=(1,−1)` (:997-1001; 주석 "-I*IV=V") / `ISlip≥1` slip → 저면응력을 `TK(NH)` 로 LHS(Alp2)·RHS(1−Alp2) 분배 (:1010,:1015). `ISlip=1` 선형 slip 계수, `=2` 최소 2차, `=3` 2차 (헤더 :946-948; `READ(15,*) ISlip,KP` read_input.F:5116-5116). ※2016 개정으로 `KSlip` 대신 2D 마찰 `TK` 재사용 (":1009-1010 주석 arash May 31 2016 based on Rosemary's work" — 구식 KSlip 코드 주석잔존).
 - **표면**: 바람응력을 natural BC 로 `Fr(NFEN)` 에 — `+ ΔT·½·(WS^{s+1}/H^{s+1} + WS^s/H^s)` (:1043-1046) = **고정 trapezoidal(½·½)**, Alp 가중과 무관. `NWS≠0` 게이트 (:1042, Casey 220120).
 - **측면 flux 경계**: 법선/접선 회전 후 행 수정 — `LBcodeI 0~9` essential normal flux + free tangential slip, `10~19` zero tangential slip, `20~29` natural (:1053-1090).
 

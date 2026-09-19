@@ -63,7 +63,7 @@ NBFR
 ```
 At `[file=src/read_input.F line=3431-3456, 3485-3497]`.
 
-위 블록은 반복 순서를 설명한 도식이다. 첫 첨자는 분조, 둘째는 경계 노드이며, 분조 헤더 묶음 뒤에 별도의 선택 입력 줄을 추가하지 않는다. 공식 [fort.15 형식](https://adcirc.github.io/adcirc/technical_reference/input_files/fort15.html)의 `ALPHAE`가 이 로컬 구현에서는 `ELEVALPHA`다. 각 분조의 값은 `mesh.F:1822–1834`가 `NBDV`에서 구성하는 `NBD` 순서로 대응하며 `read_input.F:3493–3496`에 노드 번호와 함께 기록된다. 실제 수위 적용은 `gwce.F:1644–1649`에서 `EMO(J,I)*FF(J)*RampElev*cos(ARG)`를 `Eta2(NBD(I))`에 더한다.
+위 블록은 반복 순서를 설명한 도식이다. 첫 첨자는 분조, 둘째는 경계 노드이며, 분조 헤더 묶음 뒤에 별도의 선택 입력 줄을 추가하지 않는다. 공식 [fort.15 형식](https://adcirc.github.io/adcirc/technical_reference/input_files/fort15.html)의 `ALPHAE`가 이 로컬 구현에서는 `ELEVALPHA`다. 각 분조의 값은 `mesh.F:1822–1834`가 `NBDV`에서 구성하는 `NBD` 순서로 대응하며 `read_input.F:3507–3510`에 노드 번호와 함께 기록된다. 실제 수위 적용은 `gwce.F:1644–1649`에서 `EMO(J,I)*FF(J)*RampElev*cos(ARG)`를 `Eta2(NBD(I))`에 더한다.
 
 ### Per-timestep synthesis
 
@@ -160,7 +160,7 @@ Multiplies `TPK` term at `[file=src/timestep.F line=1501-1503, 1536]`. Standard 
 2. **Phase in fort.15 is degrees** (converted to radians on read). Don't write radians.
 3. **NTIP=2 requires fort.24** with constituent names matching `TIPOTAG`.
 4. **`REFTIM` should match boundary forcing reference epoch** — typical is `STATIM=REFTIM=0` or both at simulation start time.
-5. **`ETRF(J)=0` makes that constituent’s ETRF-dependent potential coefficient zero in the traditional constituent branch.** Under `CTIP` and `.not.tidePotential%active()`, `TPMUL=RampTip*ETRF(J)*TPK(J)*FFT(J)` multiplies the potential term added to `TIP2` (`src/timestep.F:1517–1556`). This does not mean applying an unreduced full potential. `SALTMUL` is separate; open-boundary `EMO/EFA` synthesis is also separate (`src/gwce.F:1638–1650`). The full-formula `tidePotential%compute` path is a different branch (`src/timestep.F:1520–1521`); its internals are outside this correction.
+5. **`ETRF(J)=0` makes that constituent’s ETRF-dependent potential coefficient zero in the traditional constituent branch.** Under `CTIP` and `.not.tidePotential%active()`, `TPMUL=RampTip*ETRF(J)*TPK(J)*FFT(J)` multiplies the potential term added to `TIP2` (`src/timestep.F:1521–1560`). This does not mean applying an unreduced full potential. `SALTMUL` is separate; open-boundary `EMO/EFA` synthesis is also separate (`src/gwce.F:1638–1650`). The full-formula `tidePotential%compute` path is a different branch (`src/timestep.F:1524–1525`); its internals are outside this correction.
 
 ## Common Pitfalls
 
