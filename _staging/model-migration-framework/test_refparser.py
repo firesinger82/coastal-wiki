@@ -35,6 +35,15 @@ FIX = [
 SYMBOL_FIX = [("symbol-only", "`PADCSWAN_RUN` 호출", "PADCSWAN_RUN"),
               ("file+symbol", "`nodalattr.F:657` 의 `readNodalAttrXDMF`", "readNodalAttrXDMF")]
 
+# SWAN 파일럿(2026-09-20) 회귀 fixture — 문맥 오탐 3종
+NEGATIVE_FIX = [
+    ("수식-복소공액", r"$$W(\vec{x}) = -\mathrm{i}\,\omega + \mathrm{c.c.}$$"),
+    ("인라인 수식",   r"Fourier $\hat{\Gamma}(c.c.)$ 경유"),
+    ("확장자 언급",   "어떤 `.ftn`/`.ftn90` 이 무슨 역할인지"),
+]
+ANOMALY_FIX = [("슬래시 축약1", "`swancom1/5.ftn`", "NUMERIC_STEM"),
+               ("슬래시 축약2", "`swanpre1/2.ftn`", "NUMERIC_STEM")]
+
 def norm(refs):
     return [(r["kind"], r["path"], r["ranges"]) for r in refs if r["kind"] != "symbol"]
 
@@ -71,8 +80,23 @@ def main():
     # 범위 교집합 계산
     if rp.intervals_overlap((636, 686), [(645, 650)]) == []:
         fails.append("interval intersection failed")
+    # 문맥 오탐 금지 (SWAN 파일럿)
+    for name, line in NEGATIVE_FIX:
+        got = [r for r in rp.parse_line(line) if r["kind"] in ("file", "file-line")]
+        if got:
+            fails.append(f"{name}: 오탐 {[r['path'] for r in got]}")
+    for name, line, want in ANOMALY_FIX:
+        got = [r for r in rp.parse_line(line) if r["kind"] in ("file", "file-line")]
+        if not (len(got) == 1 and got[0].get("anomaly") == want):
+            fails.append(f"{name}: anomaly {[(r['path'], r.get('anomaly')) for r in got]} != {want}")
+    # 여러 줄 수식 블록 펜스
+    mb = [r for r in rp.parse_note("$$\n\\mathrm{c.c.}\n$$\n`calexp.f90:20`\n")
+          if r["kind"] == "file-line"]
+    if len(mb) != 1 or mb[0]["path"] != "calexp.f90":
+        fails.append(f"math fence failed: {[(r['path'], r['ranges']) for r in mb]}")
 
-    print(f"fixtures {len(FIX) + len(SYMBOL_FIX)} + 규칙검사 7 | 실패 {len(fails)}")
+    n = len(FIX) + len(SYMBOL_FIX) + len(NEGATIVE_FIX) + len(ANOMALY_FIX)
+    print(f"fixtures {n} + 규칙검사 8 | 실패 {len(fails)}")
     for f in fails:
         print("  FAIL:", f)
     if fails:
