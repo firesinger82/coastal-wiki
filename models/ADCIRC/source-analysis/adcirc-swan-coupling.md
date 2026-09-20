@@ -23,7 +23,7 @@ How the `padcswan` binary couples ADCIRC and SWAN over a shared unstructured mes
 - `wind.F:52-60` — allowable NWS table.
 - `timestep.F:668-686, 695-725, 1214-1218` — wind passing, RS interpolation, hotfile timing.
 - `hstart.F:325-337`, `write_output.F:5058-5201`, `netcdfio.F90:5555-7045, 8017-8085` — hot-start.
-- `../thirdparty/swan/SwanReadADCGrid.ftn90:44-153` — SWAN reads `fort.14`.
+- `../thirdparty/swan/SwanReadADCGrid.ftn90:44-158` — SWAN reads `fort.14`.
 - `../thirdparty/swan/swanmain.ftn:895-902, 8696-8983` — SWAN-side coupling hooks.
 - `../work/makefile:195-663` — build targets.
 
@@ -80,7 +80,7 @@ SWAN-side memory grab post-preprocess (`../thirdparty/swan/swanmain.ftn:8696-898
 
 ## E. Mesh sharing
 
-SWAN unstructured ADCIRC reader explicitly opens `fort.14` (`SwanReadADCGrid.ftn90:44-103`):
+SWAN unstructured ADCIRC reader explicitly opens `fort.14` (`SwanReadADCGrid.ftn90:44-108`):
 - Reads `ncells, nverts`, node coords + depth, triangles (`:119-158`).
 
 Coupler uses SWAN `nverts/xcugrd/ycugrd` for output/exchange (`couple2swan.F:596-598, 800-835`).
