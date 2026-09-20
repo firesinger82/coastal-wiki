@@ -1,13 +1,15 @@
 # MODEL SNAPSHOT MIGRATION FRAMEWORK — v2.0
 
-> 상태: **FINAL.** 파일럿 3건으로 검증됨 (전부 2026-09-20 종료) —
-> ADCIRC(`6037225`→`e8b62a70`), EFDC/EFDCPlus_Stable(`3ed76b6`→`3b382fd`), SWAN(`5544152`→`43e9bbb`).
+> 상태: **FINAL.** 파일럿 4건으로 검증됨 (전부 2026-09-20 종료) —
+> ADCIRC(`6037225`→`e8b62a70`), EFDC/EFDCPlus_Stable(`3ed76b6`→`3b382fd`), SWAN(`5544152`→`43e9bbb`),
+> ROMS/roms(`32c79b7`→`57aecf5`, Unit A/B 분리 적용).
 > v1(`DESIGN-v1-superseded.md`) + Codex 적대 검토(`DESIGN-REVIEW-codex.md`) + Claude 독립 검증 +
-> 세 파일럿 실측 반영. 변경 이력은 §CHANGELOG.
+> 네 파일럿 실측 반영. 변경 이력은 §CHANGELOG.
 >
 > 파일럿이 드러낸 것은 **설계 결함이 아니라 구현·운영의 누락**이었고 그 교정이 v2.0 에 들어갔다 —
 > EFDC 에서 §UNCITED PROSE SWEEP·§EXCLUDED REFERENCE LEDGER(failure mode 22–25),
-> SWAN 에서 파서 문맥 오탐과 §CROSS-MODEL RESOLUTION(failure mode 26–28).
+> SWAN 에서 파서 문맥 오탐과 §CROSS-MODEL RESOLUTION(failure mode 26–28),
+> ROMS 에서 이중 배치 귀속·모양 기반 억제 금지·`AHEAD_OF_SNAPSHOT`(failure mode 29–31).
 >
 > 구현·게이트: `refparser.py` + `test_refparser.py`(문법), `resolver.py` + `test_resolver.py`(귀속),
 > 좌표 맵 예시 `_staging/efdc-migration/build-inputs.py` · `_staging/swan-prescan/build-phase2.py`.
@@ -146,6 +148,20 @@ v1 동일 + 각 입력에 `collected_at`·`source_method` 필수. 네트워크 �
 | `citation_snapshot` (참조 단위) | 그 인용의 줄 좌표가 어느 snapshot 기준인지 |
 | `worktree_state`, `reproducibility` | v1 동일 |
 
+**노트가 pinned 보다 앞설 수 있다** (2026-09-20, ROMS 파일럿). `citation_snapshot` 은 지금까지
+"인용 좌표가 옛 snapshot 기준"인 경우만 상정했으나, 반대 방향이 실제로 나왔다 —
+`roms_4dvar.md` 가 upstream PR 첨부 PDF 를 근거로 **pinned 에 없는 기능**(`MULTI_SCALE_B`,
+`multiscale_*` 7파일)을 서술했다. 해당 참조 28건이 "미해소"로 잡히지만 원인은 stale 이 아니라 **선행 서술**이다.
+
+| 상태 | 의미 | 처리 |
+|---|---|---|
+| `AHEAD_OF_SNAPSHOT` | 인용 대상이 pinned 에 없고 upstream 에만 존재 | migration 전에는 검증 불가. **UNRESOLVED 와 구분해 기록**하고 자동 NO_ACTION 금지 |
+| — | migration 후 | 해당 노트는 좌표 정비가 아니라 **내용 정정 단위**로 분리한다(ROMS Unit B 선례) |
+
+선행 서술 노트는 근거가 PDF·PR 설명이라 **추론이 섞인다.** ROMS 실측: merge 후 대조하니
+존재하지 않는 파일명 2개, 단위 오기(km↔m), 드라이버 호환 과잉 단정이 확인됐다.
+따라서 이런 노트는 migration 직후 **전체 재대조** 대상이며, 좌표만 맞추고 끝내지 않는다.
+
 `citation_snapshot` 은 **다음 migration 의 이중 이동을 막는 핵심 열**이다(이번 세션에서 갱신된 인용을 옛 좌표로 재매핑해 118건 오탐이 실제 발생). 노트 상태(SEMANTICALLY_UPDATED / LINE_REFERENCE_ONLY / REVIEWED_NO_CHANGE / NO_ACTION)는 유지하되 note 요약이 전체 검증을 뜻하지 않게 한다.
 
 ## LOCKING / APPLY PROCEDURE
@@ -206,6 +222,15 @@ EFDC 파일럿 추가(22–25). 넷 다 설계가 아니라 **구현·운영**�
     실측: Delft3D 가 번들한 SWAN 사본으로 6건 오귀속 위험, ADCIRC `wind.F` 41건 동명 충돌.
 27. **생성 파일 인용을 미해결로 분류** → `switch.pl` 전처리 매핑. 실측 SWAN 8건 + 확장자불일치 1건.
 28. **롤백 자산(`.old-<sha>`)이 색인을 오염** → 색인 제외 규칙. 미적용 시 전 파일이 AMBIGUOUS.
+
+ROMS 파일럿 추가(29–31).
+
+29. **이중 배치 소스를 임의 귀속** → 노트 선언 `component:` 근거, 없으면 AMBIGUOUS 유지.
+    실측: `ana_*.h` 41쌍이 배포본/템플릿으로 내용이 다름, 78건 충돌.
+30. **모양 기반 오탐 억제가 실재 참조를 죽임** → 파서에서 걸러내지 말고 ledger 에서 맥락 분류.
+    실측: "짧은 stem 억제" 규칙이 `io.F`·`bc.F` 등 실재 참조 19건을 함께 제거.
+31. **노트가 pinned 보다 앞선 서술을 stale 로 오분류** → `AHEAD_OF_SNAPSHOT` 로 구분,
+    migration 후 내용 정정 단위로 분리. 실측: `roms_4dvar.md` 28건.
 25. **잠금 검증을 root 로 실행해 무의미해짐** → `find <path> -writable` 은 root 에서 권한 비트와 무관하게
     참이다. 잠금 확인은 **소유자가 아닌 일반 사용자 권한으로** 실행하거나 `-perm` 비트로 검사한다.
     실측: sudo 스크립트 최종 단계가 `82713개 쓰기 가능`으로 오탐 실패, 실제 잠금은 정상이었다.
@@ -272,6 +297,35 @@ ADCIRC 모델 아래 `adcirc` 와 `asgs` 두 저장소가 같은 `wind.F` 를 �
 6. 실패 → `UNRESOLVED_SOURCE_REFERENCE`
 
 **부분 이름은 추측으로 해소하지 않는다** (`Compdata.f90` ← `SwanCompdata.ftn90`, `PDataSets.ftn90` ← `SwanVTKPDataSets.ftn90`).
+
+#### 이중 배치 소스 — 노트 선언 component 로 귀속 (2026-09-20, ROMS 파일럿)
+
+같은 저장소 안에서 **배포본과 사용자 템플릿이 같은 이름·다른 내용**으로 공존할 수 있다.
+ROMS 는 `ana_*.h` 41쌍을 `ROMS/Functionals/`(배포본)와 `User/Functionals/`(템플릿)에 두고
+**전부 내용이 다르다**(`ana_grid.h` 1,221 vs 566줄). 줄 번호 배제도 듣지 않는다(78건 중 74건이 양쪽 가능).
+
+3단계(좁히기)가 실패하면 **노트 frontmatter 의 `component:` 선언**을 귀속 근거로 쓴다.
+노트가 스스로 대상 경로를 밝힌 것이므로 추측이 아니다. 결과는 `RESOLVED_BY_COMPONENT` 로 구분 기록한다.
+선언이 없거나 후보를 가르지 못하면 AMBIGUOUS 를 유지한다 — **임의로 한쪽을 고르지 않는다.**
+실측: ROMS AMBIGUOUS_SAME_MODEL 78 → 1.
+
+#### 모양 기반 억제 금지 (2026-09-20, ROMS 파일럿에서 설계 변경)
+
+참고문헌 이니셜(`Shchepetkin, A.F.` → `A.F`)과 슬래시·플러스 축약(`exchange_2d/3d/4d.F`,
+`nl/ad/tl/rp_roms.h`, `i4dvar.F+i4dvar_roms.h`)이 파일 참조로 오인된다.
+**"짧은 stem 은 참조가 아니다" 같은 모양 규칙으로 억제하면 안 된다** — 검증 결과 그 규칙은
+실재 파일 참조 **19건**(`io.F` 7 · `bc.F` 8 · `gp.c` · `oc.c` · `df.c`)을 함께 죽인다.
+
+따라서 이들은 파서에서 걸러내지 않고, **해소 실패 후 coverage ledger 에서 맥락으로 분류**한다.
+
+| ledger 분류 | 판별 근거 |
+|---|---|
+| `NOT_A_REFERENCE_BIBLIOGRAPHIC` | 미해소 + 같은 줄이 저자·연도 인용 형식 |
+| `NOT_A_REFERENCE_ABBREVIATION` | 미해소 + 슬래시/플러스 축약 표기. **자동 전개 금지**(어느 조합인지 단정 불가) |
+| `UNRESOLVED_SOURCE_REFERENCE` | 나머지 |
+
+숫자 stem 축약(`swancom1/5.ftn`)만 파서의 `NUMERIC_STEM` anomaly 로 남긴다 —
+그 형태는 실재 파일과 충돌하지 않음이 확인됐기 때문이다.
 
 **migration 롤백 자산(`<tree>.old-<sha>`)은 색인에서 제외한다.** 포함하면 모든 파일이 동명 2중이 되어
 전부 AMBIGUOUS 로 오판정된다. 롤백 자산을 트리에 남겨 두는 동안 참조 해소가 오염되는 것은
@@ -340,6 +394,9 @@ v1 1–8 + 추가:
 17. 분류·좌표 산출물의 조인 결과 건수가 입력 건수와 일치함(§FAILURE MODES 24).
 18. 적용 후 **변경 파일 대상 인용이 새 snapshot 에서 전부 해석**됨(파일 존재 + 범위 내). EFDC 실측 374/374.
 19. 잠금 확인이 일반 사용자 권한으로 수행됐고 결과가 0임.
+20. 동명 다중 후보가 남았으면 AMBIGUOUS 로 보고돼 있고 **조용히 RESOLVED 된 건이 없음**.
+    귀속에 쓴 근거(줄 번호 배제 / 주 저장소 / 노트 component)가 건별로 기록돼 있음.
+21. `AHEAD_OF_SNAPSHOT` 참조를 가진 노트는 좌표 정비와 **별도 단위**로 분리돼 있음.
 
 ## PILOT ROLLOUT ORDER
 

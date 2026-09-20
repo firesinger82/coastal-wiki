@@ -28,6 +28,11 @@ FIX = [
     # 같은 모델 안 동명 2개(adcirc/src vs asgs/output): 줄 번호 배제 + 주 저장소 우선
     ("wind.F",        "models/ADCIRC/source-analysis/x.md", 8288, "RESOLVED_NARROWED", "ADCIRC"),
     ("wind.F",        "models/ADCIRC/source-analysis/x.md", 100,  "RESOLVED_NARROWED", "ADCIRC"),
+    # 이중 배치(배포본 vs 사용자 템플릿): 노트 선언 component 로 귀속
+    ("ana_initial.h", "models/ROMS/source-analysis/roms_analytical_functionals.md", 53,
+     "RESOLVED_BY_COMPONENT", "ROMS"),
+    ("ana_grid.h", "models/ROMS/source-analysis/roms_analytical_functionals.md", 200,
+     "RESOLVED_BY_COMPONENT", "ROMS"),
     # 부분 이름은 추측으로 해소하지 않는다
     ("Compdata.f90",  "models/SWAN/source-analysis/x.md", None, "UNRESOLVED", None),
     ("PDataSets.ftn90", "models/SWAN/source-analysis/x.md", None, "UNRESOLVED", None),
@@ -51,8 +56,17 @@ def main():
     r = rv.resolve("wind.F", "models/ADCIRC/source-analysis/x.md", idx, max_line=8288, wiki=W)
     if not (len(r["paths"]) == 1 and "/adcirc/src/" in r["paths"][0]):
         fails.append(f"wind.F 귀속 오류: {r['paths']}")
+    # component 귀속은 ROMS/Functionals 를 고른다(User/Functionals 아님)
+    r = rv.resolve("ana_initial.h", "models/ROMS/source-analysis/roms_analytical_functionals.md",
+                   idx, max_line=53, wiki=W)
+    if not (len(r["paths"]) == 1 and "/ROMS/Functionals/" in r["paths"][0]):
+        fails.append(f"component 귀속 오류: {r['paths']}")
+    # 모양 기반 억제 금지: 짧은 stem 이어도 실재하면 참조다 (io.F·bc.F 19건 선례)
+    for probe in ("io.F", "bc.F"):
+        if rv.resolve(probe, "models/ROMS/source-analysis/x.md", idx, wiki=W)["status"] == "UNRESOLVED":
+            fails.append(f"짧은 stem 실재 파일이 미해소: {probe}")
 
-    print(f"fixtures {len(FIX)} + 규칙검사 2 | 실패 {len(fails)}")
+    print(f"fixtures {len(FIX)} + 규칙검사 4 | 실패 {len(fails)}")
     for f in fails:
         print("  FAIL:", f)
     if fails:

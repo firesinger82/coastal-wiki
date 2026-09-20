@@ -86,9 +86,27 @@ def _narrow(cands, wiki, model, max_line):
     # B. 주 저장소 우선 — 저장소 디렉터리명이 모델명과 일치하면 그쪽
     if len(cands) > 1 and model:
         pri = [c for c in cands if _repo_of(c).lower() == model.lower()]
-        if pri:
+        if pri and len(pri) < len(cands):
             return pri, (note + "; " if note else "") + f"주 저장소({model}) 우선"
+        cands = pri or cands
     return cands, note
+
+
+def declared_component(note_path, wiki):
+    """노트 frontmatter 의 `component:` 선언. 이중 배치 소스의 귀속 근거."""
+    try:
+        lines = (Path(wiki)/note_path).read_text(errors="replace").splitlines()
+    except OSError:
+        return None
+    if lines[:1] != ["---"]:
+        return None
+    for l in lines[1:40]:
+        if l.strip() == "---":
+            break
+        m = re.match(r"\s*component\s*:\s*(.+?)\s*$", l)
+        if m:
+            return m.group(1).strip().strip('"\'')
+    return None
 
 
 def resolve(ref, note_path, index, max_line=None, wiki=None):
@@ -110,6 +128,15 @@ def resolve(ref, note_path, index, max_line=None, wiki=None):
             c = _suffix_hit(c, ref)
             if len(c) > 1:
                 c, why = _narrow(c, wiki, own, max_line)
+                if len(c) > 1 and wiki:
+                    # 이중 배치(배포본 vs 사용자 템플릿 등): 노트가 선언한 component 를 근거로 쓴다
+                    comp = declared_component(note_path, wiki)
+                    if comp:
+                        pref = [x for x in c if f"/{comp.strip('/')}/" in "/" + x + "/"]
+                        if pref and len(pref) < len(c):
+                            return pack("RESOLVED_BY_COMPONENT", own, pref,
+                                        (why + "; " if why else "") +
+                                        f"노트 선언 component={comp}")
                 if len(c) == 1:
                     return pack("RESOLVED_NARROWED", own, c, why)
             return pack("RESOLVED" if len(c) == 1 else "AMBIGUOUS_SAME_MODEL", own, c)
