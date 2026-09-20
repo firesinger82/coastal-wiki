@@ -1,0 +1,897 @@
+batch,id,note,note_line,codex,final,old_evidence
+phase1,1,models/EFDC/source-analysis/sediment/efdc_sediment.md,205,UPDATE_REQUIRED,UPDATE_REQUIRED,"models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Transport/calconc.f90:188-193
+188:   ! *** 3D ADVECTI0N-DIFFUSION TRANSPORT FOR ALL WATER COLUMN CONSITUENTS (SEE VARINIT FOR WCV INITIALIZATION)
+189:   !$OMP PARALLEL DEFAULT(SHARED)
+190:   !$OMP DO PRIVATE(IW,IT,L) SCHEDULE(STATIC,1)
+191:   do IW = 1,NACTIVEWC
+192:     !$  IT = OMP_GET_THREAD_NUM() + 1
+193:     call CALTRAN( IACTIVEWC1(IW), IACTIVEWC2(IW), WCV(IW).VAL0, WCV(IW).VAL1, IW, IT, WCV(IW).WCLIMIT, ISKIP(IW) )
+
+models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Transport/calconc.f90:213-219
+213:   ! *** APPLY ANTI-DIFFUSION AND FLUX CORRECTOR
+214:   !$OMP DO PRIVATE(IW,IT) SCHEDULE(STATIC,1)
+215:   do IW = 1,NACTIVEWC
+216:     if( ISKIP(IW) == 0 )then
+217:       !$  IT = OMP_GET_THREAD_NUM() + 1
+218:       call CALTRAN_AD( IACTIVEWC1(IW), IACTIVEWC2(IW), WCV(IW).VAL0, WCV(IW).VAL1, IW, IT )
+219:     endif"
+phase1,2,models/EFDC/manifest.md,17,UPDATE_REQUIRED,UPDATE_REQUIRED,"models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/aaefdc.f90:22-30
+22: !  RELEASE:         EFDCPlus_12.4
+23: !                   Domain Decomposition with MPI
+24: !                   Propeller Wash 
+25: !                   New WQ kinetics with user defined algal groups and zooplankton
+26: !                   Dynamic time stepping adjustment for 3TL solution
+27: !                   General Ocean Turbulence Model (GOTM)
+28: !                   SIGMA-Zed (SGZ) Vertical Layering
+29: !
+30: !  DATE:            2025-12-29"
+phase1,3,models/EFDC/manual-notes/efdc-implementation-guide.md,211,NO_ACTION,NO_ACTION,"models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:643-650
+643:   ! *** ********************************************************
+644:   if( process_id == master_id )then
+645:     call SEEK('C12A',0)
+646:     read(1,*,IOSTAT = ISO) ISTOPT(0), ISSQL, ISAVBMX, ISFAVB, ISINWV, ISLLIM, IFPROX, XYRATIO, BC_EDGEFACTOR
+647: 
+648:     write(mpi_efdc_out_unit,1002) NCARD
+649:     write(mpi_efdc_out_unit,*) ISTOPT(0), ISSQL, ISAVBMX, ISFAVB, ISINWV, ISLLIM, IFPROX, XYRATIO, BC_EDGEFACTOR
+650:     if( ISO > 0 ) GOTO 100
+
+models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:660-665
+660:   call Broadcast_Scalar(XYRATIO      , master_id)
+661:   call Broadcast_Scalar(BC_EDGEFACTOR, master_id)
+662: 
+663:   if( BC_EDGEFACTOR < 0 ) BC_EDGEFACTOR = 0.0
+664:   if( BC_EDGEFACTOR > 1 ) BC_EDGEFACTOR = 1.0
+665:"
+phase1,4,models/EFDC/source-analysis/efdc_boundary_conditions.md,198,NO_ACTION,NO_ACTION,"models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:904-917
+904:       do NP = 1,NPFOR_Readin
+905:         do M = 1,MTIDE
+906:           if( NPFORT == 0 )then
+907:             read(1,*,IOSTAT = ISO)NDUM,CDUM,PFAM(NP,M),PFPH(NP,M)
+908:             write(mpi_efdc_out_unit,1002) NCARD
+909:             write(mpi_efdc_out_unit,*) NDUM, CDUM, PFAM(NP,M), PFPH(NP,M)
+910:             if( ISO > 0 ) GOTO 100
+911:           elseif( NPFORT >= 1 )then
+912:             read(1,*,IOSTAT = ISO) NDUM, CDUM, PFAM(NP,M), PFPH(NP,M)
+913:             RAD = PI2*PFPH(NP,M)/TCP(M)
+914:             CPFAM0(NP,M) = PFAM(NP,M)*COS(RAD)
+915:             SPFAM0(NP,M) = PFAM(NP,M)*SIN(RAD)
+916:             write(mpi_efdc_out_unit,1002) NCARD
+917:             write(mpi_efdc_out_unit,*) NDUM, CDUM, PFAM(NP,M), PFPH(NP,M), CPFAM0(NP,M), SPFAM0(NP,M)"
+phase1,5,models/EFDC/source-analysis/efdc_water_quality.md,134,REVIEW_ONLY,REVIEW_ONLY,"models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Transport/calconc.f90:213-220
+213:   ! *** APPLY ANTI-DIFFUSION AND FLUX CORRECTOR
+214:   !$OMP DO PRIVATE(IW,IT) SCHEDULE(STATIC,1)
+215:   do IW = 1,NACTIVEWC
+216:     if( ISKIP(IW) == 0 )then
+217:       !$  IT = OMP_GET_THREAD_NUM() + 1
+218:       call CALTRAN_AD( IACTIVEWC1(IW), IACTIVEWC2(IW), WCV(IW).VAL0, WCV(IW).VAL1, IW, IT )
+219:     endif
+220:   enddo"
+phase1,6,models/EFDC/manual-notes/efdc-user-manual-r850.md,105,NO_ACTION,NO_ACTION,"models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:384-389
+384:   ! *** *******************************************************
+385:   if( process_id == master_id )then
+386:     call SEEK('C8',0)
+387:     read(1,*,IOSTAT = ISO) TCON, TBEGIN, TIDALP, CF, ISCORV, ISDCCA, ISCFL, ISCFLM, DTSSFAC, DTSSDHDT, DTMAX
+388:   endif
+389: 
+
+models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:402-405
+402: 
+403:   write(mpi_efdc_out_unit,1002) NCARD
+404:   write(mpi_efdc_out_unit,*) TCON, TBEGIN, TIDALP, CF, ISCORV, ISDCCA, ISCFL, ISCFLM, DTSSFAC, DTSSDHDT, DTMAX
+405:   if( ISO > 0 ) GOTO 100"
+phase1,7,models/EFDC/manual-notes/efdc-user-manual-r850.md,106,NO_ACTION,NO_ACTION,"models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:643-650
+643:   ! *** ********************************************************
+644:   if( process_id == master_id )then
+645:     call SEEK('C12A',0)
+646:     read(1,*,IOSTAT = ISO) ISTOPT(0), ISSQL, ISAVBMX, ISFAVB, ISINWV, ISLLIM, IFPROX, XYRATIO, BC_EDGEFACTOR
+647: 
+648:     write(mpi_efdc_out_unit,1002) NCARD
+649:     write(mpi_efdc_out_unit,*) ISTOPT(0), ISSQL, ISAVBMX, ISFAVB, ISINWV, ISLLIM, IFPROX, XYRATIO, BC_EDGEFACTOR
+650:     if( ISO > 0 ) GOTO 100
+
+models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:660-665
+660:   call Broadcast_Scalar(XYRATIO      , master_id)
+661:   call Broadcast_Scalar(BC_EDGEFACTOR, master_id)
+662: 
+663:   if( BC_EDGEFACTOR < 0 ) BC_EDGEFACTOR = 0.0
+664:   if( BC_EDGEFACTOR > 1 ) BC_EDGEFACTOR = 1.0
+665:"
+phase1,8,models/EFDC/manual-notes/efdc-user-manual-r850.md,108,NO_ACTION,NO_ACTION,"models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:3931-3944
+3931:       FBODYFX(LC,K) = 0.0
+3932:       FBODYFY(LC,K) = 0.0
+3933:     enddo
+3934: 
+3935:     if( process_id == master_id )then
+3936:       close(1)
+3937:     endif
+3938: 
+3939:   endif
+3940: 
+3941:   ! *** Read shellfish farm configuration
+3942:   if( ISFFARM > 0 .and. NSF > 0 )then
+3943:     call READ_SHELLFISH_JSON(LCM,KC)
+3944:   endif"
+phase1,9,models/EFDC/manual-notes/efdc-implementation-guide.md,177,NO_ACTION,NO_ACTION,"models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:3931-3944
+3931:       FBODYFX(LC,K) = 0.0
+3932:       FBODYFY(LC,K) = 0.0
+3933:     enddo
+3934: 
+3935:     if( process_id == master_id )then
+3936:       close(1)
+3937:     endif
+3938: 
+3939:   endif
+3940: 
+3941:   ! *** Read shellfish farm configuration
+3942:   if( ISFFARM > 0 .and. NSF > 0 )then
+3943:     call READ_SHELLFISH_JSON(LCM,KC)
+3944:   endif"
+phase1,10,models/EFDC/manual-notes/efdc-implementation-guide.md,179,NO_ACTION,NO_ACTION,"models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:904-917
+904:       do NP = 1,NPFOR_Readin
+905:         do M = 1,MTIDE
+906:           if( NPFORT == 0 )then
+907:             read(1,*,IOSTAT = ISO)NDUM,CDUM,PFAM(NP,M),PFPH(NP,M)
+908:             write(mpi_efdc_out_unit,1002) NCARD
+909:             write(mpi_efdc_out_unit,*) NDUM, CDUM, PFAM(NP,M), PFPH(NP,M)
+910:             if( ISO > 0 ) GOTO 100
+911:           elseif( NPFORT >= 1 )then
+912:             read(1,*,IOSTAT = ISO) NDUM, CDUM, PFAM(NP,M), PFPH(NP,M)
+913:             RAD = PI2*PFPH(NP,M)/TCP(M)
+914:             CPFAM0(NP,M) = PFAM(NP,M)*COS(RAD)
+915:             SPFAM0(NP,M) = PFAM(NP,M)*SIN(RAD)
+916:             write(mpi_efdc_out_unit,1002) NCARD
+917:             write(mpi_efdc_out_unit,*) NDUM, CDUM, PFAM(NP,M), PFPH(NP,M), CPFAM0(NP,M), SPFAM0(NP,M)"
+phase1,11,models/EFDC/manual-notes/efdc-implementation-guide.md,193,UPDATE_REQUIRED,UPDATE_REQUIRED,"models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:300-312
+300:   NCARD = '6'
+301: 
+302:   ! *** ********************************************************
+303:   if( process_id == master_id )then
+304:     call SEEK('C6',0)
+305:     do NS = 0,8
+306:       read(1,*,IOSTAT = ISO) ISTRAN(NS), ISTOPT(NS), ldum, ISADAC(NS), ISFCT(NS), ldum, ldum, ldum, ISCI(NS), ISCO(NS)
+307:       write(mpi_efdc_out_unit,1002) NCARD
+308:       write(mpi_efdc_out_unit,*) ISTRAN(NS), ISTOPT(NS), ldum, ISADAC(NS), ISFCT(NS), ldum, ldum, ldum, ISCI(NS), ISCO(NS)
+309:       if( ISO > 0 ) GOTO 100
+310:     enddo
+311:   endif
+312:"
+phase1,12,models/EFDC/manual-notes/efdc-implementation-guide.md,199,NO_ACTION,NO_ACTION,"models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:384-389
+384:   ! *** *******************************************************
+385:   if( process_id == master_id )then
+386:     call SEEK('C8',0)
+387:     read(1,*,IOSTAT = ISO) TCON, TBEGIN, TIDALP, CF, ISCORV, ISDCCA, ISCFL, ISCFLM, DTSSFAC, DTSSDHDT, DTMAX
+388:   endif
+389: 
+
+models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:402-405
+402: 
+403:   write(mpi_efdc_out_unit,1002) NCARD
+404:   write(mpi_efdc_out_unit,*) TCON, TBEGIN, TIDALP, CF, ISCORV, ISDCCA, ISCFL, ISCFLM, DTSSFAC, DTSSDHDT, DTMAX
+405:   if( ISO > 0 ) GOTO 100"
+phase1,13,models/EFDC/source-analysis/efdc_ice.md,26,NO_ACTION,NO_ACTION,"models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Transport/calconc.f90:289-307
+289:       eps3d1 (1:LCM,1:KCM) = EPS_TEMP1
+290:     endif
+291:     eps3d = max(eps_min,eps3d)
+292: 
+293:     !$OMP END SECTIONS
+294:   endif
+295:   
+296:   if( ISICE == 4 .and. (IS2TL > 0 .or. (IS2TL == 0 .and. NCTBC /= NTSTBC)) )then
+297:     if( LFRAZIL )then
+298:       ! *** FRAZIL ICE TRANSPORT
+299:       call CALTRANICE(FRAZILICE,FRAZILICE1,1)
+300:       NICE = NICE+1
+301: 
+302:     elseif( NICE > 0 )then
+303:       ! *** ADVANCE THE FRAZIL ICE VARIABLE
+304:       FRAZILICE1 = FRAZILICE
+305:       NICE = 0
+306:     endif
+307:   endif
+
+models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Transport/calconc.f90:467-473
+467:   ! *** SURFACE AND INTERNAL HEAT SOURCE-SINK CALCULATION
+468:   if( ISTRAN(2) >= 1 )then
+469:     TTDS1 = DSTIME(0)
+470:     call CALHEAT
+471: 
+472:     THEAT = THEAT + (DSTIME(0)-TTDS1)
+473:   endif"
+phase1,14,models/EFDC/source-analysis/efdc_water_quality.md,27,REVIEW_ONLY,REVIEW_ONLY,"models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Transport/calconc.f90:188-193
+188:   ! *** 3D ADVECTI0N-DIFFUSION TRANSPORT FOR ALL WATER COLUMN CONSITUENTS (SEE VARINIT FOR WCV INITIALIZATION)
+189:   !$OMP PARALLEL DEFAULT(SHARED)
+190:   !$OMP DO PRIVATE(IW,IT,L) SCHEDULE(STATIC,1)
+191:   do IW = 1,NACTIVEWC
+192:     !$  IT = OMP_GET_THREAD_NUM() + 1
+193:     call CALTRAN( IACTIVEWC1(IW), IACTIVEWC2(IW), WCV(IW).VAL0, WCV(IW).VAL1, IW, IT, WCV(IW).WCLIMIT, ISKIP(IW) )
+
+models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Transport/calconc.f90:213-220
+213:   ! *** APPLY ANTI-DIFFUSION AND FLUX CORRECTOR
+214:   !$OMP DO PRIVATE(IW,IT) SCHEDULE(STATIC,1)
+215:   do IW = 1,NACTIVEWC
+216:     if( ISKIP(IW) == 0 )then
+217:       !$  IT = OMP_GET_THREAD_NUM() + 1
+218:       call CALTRAN_AD( IACTIVEWC1(IW), IACTIVEWC2(IW), WCV(IW).VAL0, WCV(IW).VAL1, IW, IT )
+219:     endif
+220:   enddo"
+phase1,15,models/EFDC/source-analysis/efdc_water_quality.md,27,REVIEW_ONLY,REVIEW_ONLY,"models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Transport/calconc.f90:467-490
+467:   ! *** SURFACE AND INTERNAL HEAT SOURCE-SINK CALCULATION
+468:   if( ISTRAN(2) >= 1 )then
+469:     TTDS1 = DSTIME(0)
+470:     call CALHEAT
+471: 
+472:     THEAT = THEAT + (DSTIME(0)-TTDS1)
+473:   endif
+474: 
+475:   ! *** APPLY DYE PROCESSES
+476:   if( ISTRAN(3) >= 1 ) CALL CALDYE
+477: 
+478:   ! **************************************************************************************************
+479:   ! *** BOTTOM AND INTERNAL SEDIMENT AND TOXIC CONTAMINATION SOURCE-SINK CALCULATION
+480: 
+481:   if( ISPROPWASH == 2 )then
+482:     ! *** If using propeller momentum, compute propeller velocities at every timestep, but skip if computing below
+483:     if( .not. ((SEDTIME+DELT) >= SEDSTEP .and. (ISTRAN(6) >= 1 .or. ISTRAN(7) >= 1 ) .and. TIMEDAY >= SEDSTART) )then
+484:       if( IS2TIM > 0 .or. NCTBC /= 1 )then
+485:         call Propwash_Calc_Sequence(1)
+486:       endif
+487:     endif
+488:   endif
+489: 
+490:   ! *** SEDIMENT AND TOXICS SETTLING,DEPOSITION,RESUSPENSION,ETC
+
+models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Transport/calconc.f90:499-507
+499:         if( propwash_on .and. IFIRST > 0 )then
+500:           call Propwash_Calc_Sequence(0)
+501:         endif
+502:         
+503:         call SSEDTOX
+504:         SEDTIME = 0.0
+505:       endif
+506:     else
+507:       ! *** FOR THREE TIME LEVEL SIMULATION"
+phase1,16,models/EFDC/source-analysis/efdc_transport_scheme.md,28,REVIEW_ONLY,UPDATE_REQUIRED,"models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Transport/calconc.f90:113-131
+113:   ! *** PRESPECIFY THE UPWIND CELLS FOR 3D ADVECTION
+114:   !$OMP PARALLEL DO PRIVATE(ND,K,LP,L,LE,LN)
+115:   do ND = 1,NDM
+116:     do K = 1,KC
+117:       do LP = 1,LLWET(K,ND)
+118:         L = LKWET(LP,K,ND)
+119:         if( UHDY2(L,K) >= 0.0 )then
+120:           LUPU(L,K) = LWC(L)
+121:         else
+122:           LUPU(L,K) = L
+123:         endif
+124:         if( VHDX2(L,K) >= 0.0 )then
+125:           LUPV(L,K) = LSC(L)
+126:         else
+127:           LUPV(L,K) = L
+128:         endif
+129:       enddo
+130:     enddo
+131: 
+
+models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Transport/calconc.f90:141-148
+141:         enddo
+142:       enddo
+143:     endif
+144:   enddo
+145:   !$OMP END PARALLEL DO
+146:   
+147:   ! *** EE7.2 - MUST ZERO ALL THREADS FOR EVERY INSTANCE DO TO POTENTIAL OF DIFFERENT THREADS MAY NOT BE ZEROED FOR CURRENT TIME
+148:   ! *** ZERO DRY CELL FLUXES"
+phase1,17,models/EFDC/source-analysis/sediment/efdc_sediment.md,25,REVIEW_ONLY,REVIEW_ONLY,"models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Transport/calconc.f90:188-193
+188:   ! *** 3D ADVECTI0N-DIFFUSION TRANSPORT FOR ALL WATER COLUMN CONSITUENTS (SEE VARINIT FOR WCV INITIALIZATION)
+189:   !$OMP PARALLEL DEFAULT(SHARED)
+190:   !$OMP DO PRIVATE(IW,IT,L) SCHEDULE(STATIC,1)
+191:   do IW = 1,NACTIVEWC
+192:     !$  IT = OMP_GET_THREAD_NUM() + 1
+193:     call CALTRAN( IACTIVEWC1(IW), IACTIVEWC2(IW), WCV(IW).VAL0, WCV(IW).VAL1, IW, IT, WCV(IW).WCLIMIT, ISKIP(IW) )
+
+models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Transport/calconc.f90:213-220
+213:   ! *** APPLY ANTI-DIFFUSION AND FLUX CORRECTOR
+214:   !$OMP DO PRIVATE(IW,IT) SCHEDULE(STATIC,1)
+215:   do IW = 1,NACTIVEWC
+216:     if( ISKIP(IW) == 0 )then
+217:       !$  IT = OMP_GET_THREAD_NUM() + 1
+218:       call CALTRAN_AD( IACTIVEWC1(IW), IACTIVEWC2(IW), WCV(IW).VAL0, WCV(IW).VAL1, IW, IT )
+219:     endif
+220:   enddo
+
+models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Transport/calconc.f90:235-240
+235: 
+236:   !$OMP DO PRIVATE(IW,K,LP,L,CDTMP) SCHEDULE(STATIC,1)
+237:   do IW = 1,NACTIVEWC
+238:     if( ISADAC(IACTIVEWC1(IW)) == 1 )then 
+239:       ! *** APPLY THE ANTI-DIFFUSIVE ADVECTION CALCULATION TO STANDARD DONOR CELL SCHEME
+240:       if( ISKIP(IW) == 0 )then
+
+models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Transport/calconc.f90:290-299
+290:     endif
+291:     eps3d = max(eps_min,eps3d)
+292: 
+293:     !$OMP END SECTIONS
+294:   endif
+295:   
+296:   if( ISICE == 4 .and. (IS2TL > 0 .or. (IS2TL == 0 .and. NCTBC /= NTSTBC)) )then
+297:     if( LFRAZIL )then
+298:       ! *** FRAZIL ICE TRANSPORT
+299:       call CALTRANICE(FRAZILICE,FRAZILICE1,1)
+
+models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Transport/calconc.f90:480-488
+480: 
+481:   if( ISPROPWASH == 2 )then
+482:     ! *** If using propeller momentum, compute propeller velocities at every timestep, but skip if computing below
+483:     if( .not. ((SEDTIME+DELT) >= SEDSTEP .and. (ISTRAN(6) >= 1 .or. ISTRAN(7) >= 1 ) .and. TIMEDAY >= SEDSTART) )then
+484:       if( IS2TIM > 0 .or. NCTBC /= 1 )then
+485:         call Propwash_Calc_Sequence(1)
+486:       endif
+487:     endif
+488:   endif
+
+models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Transport/calconc.f90:499-507
+499:         if( propwash_on .and. IFIRST > 0 )then
+500:           call Propwash_Calc_Sequence(0)
+501:         endif
+502:         
+503:         call SSEDTOX
+504:         SEDTIME = 0.0
+505:       endif
+506:     else
+507:       ! *** FOR THREE TIME LEVEL SIMULATION"
+phase1,18,models/EFDC/source-analysis/efdc_boundary_conditions.md,19,NO_ACTION,NO_ACTION,"models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:543-550
+543:   !C11*  READ GRID, ROUGHNESS, MASKING AND DEPTH parameterS
+544:   NCARD = '11'
+545:   ! *** ********************************************************
+546:   if( process_id == master_id )then
+547:     call SEEK('C11',0)
+548:     read(1,*,IOSTAT = ISO) DX, DY, DXYCVT, IMDXDY, ZBRADJ, ZBRCVRT, HMIN, HADADJ, HCVRT, HDRY, HWET, BELADJ, BELCVRT, HDRYMOVE
+549:   endif
+550: 
+
+models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:565-569
+565: 
+566:   write(mpi_efdc_out_unit,1002) NCARD
+567:   write(mpi_efdc_out_unit,*) DX, DY, DXYCVT, IMDXDY, ZBRADJ, ZBRCVRT, HMIN, HADADJ, HCVRT, HDRY, HWET, BELADJ, BELCVRT, HDRYMOVE
+568:   if( ISO > 0 ) GOTO 100
+569:"
+phase1,19,models/EFDC/source-analysis/efdc_boundary_conditions.md,19,NO_ACTION,NO_ACTION,"models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:729-754
+729:   call Broadcast_Scalar(QQLMIN   , master_id)
+730:   call Broadcast_Scalar(DMLMIN   , master_id)
+731: 
+732:   !C14*  READ TIDAL & ATMOSPHERIC FORCING, GROUND WATER AND SUBGRID CHANNEL parameterS
+733:   NCARD = '14'
+734:   ! *** ********************************************************
+735:   if( process_id == master_id )then
+736:     call SEEK('C14',0)
+737:     read(1,*,IOSTAT = ISO) MTIDE, NWSER, NASER, ISGWIT, ISCHAN, ISWAVE, ITIDASM, ISPERC, ISBODYF, ISPNHYDS, ISPROPWASH
+738: 
+739:     write(mpi_efdc_out_unit,1002) NCARD
+740:     write(mpi_efdc_out_unit,*) MTIDE, NWSER, NASER, ISGWIT, ISCHAN, ISWAVE, ITIDASM, ISPERC, ISBODYF, ISPNHYDS, ISPROPWASH
+741:     if( ISO > 0 ) GOTO 100
+742:   endif
+743: 
+744:   call Broadcast_Scalar(MTIDE     , master_id)
+745:   call Broadcast_Scalar(NWSER     , master_id)
+746:   call Broadcast_Scalar(NASER     , master_id)
+747:   call Broadcast_Scalar(ISGWIT    , master_id)
+748:   call Broadcast_Scalar(ISCHAN    , master_id)
+749:   call Broadcast_Scalar(ISWAVE    , master_id)
+750:   call Broadcast_Scalar(ITIDASM   , master_id)
+751:   call Broadcast_Scalar(ISPERC    , master_id)
+752:   call Broadcast_Scalar(ISBODYF   , master_id)
+753:   call Broadcast_Scalar(ISPNHYDS  , master_id)
+754:   call Broadcast_Scalar(ISPROPWASH, master_id)"
+phase1,20,models/EFDC/source-analysis/efdc_boundary_conditions.md,19,NO_ACTION,NO_ACTION,"models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:852-869
+852:   if( MTIDE > 0 )then
+853:     !C15*  READ PERIODIC FORCING (TIDAL) CONSTITUENT SYMBOLS AND PERIODS
+854:     NCARD = '15'
+855:     if( process_id == master_id )then
+856:       call SEEK('C15',0)
+857:       do M = 1,MTIDE
+858:         read(1,*,IOSTAT = ISO) SYMBOL(M),TCP(M)
+859: 
+860:         write(mpi_efdc_out_unit,1002) NCARD
+861:         write(mpi_efdc_out_unit,*) SYMBOL(M),TCP(M)
+862:         if( ISO > 0 ) GOTO 100
+863:       enddo
+864:     endif
+865:     call Broadcast_Array(SYMBOL, master_id)
+866:     call Broadcast_Array(TCP,    master_id)
+867: 
+868:   endif
+869:"
+B1,B1-1,models/EFDC/manual-notes/efdc-user-manual-r850.md,104,UPDATE_REQUIRED,UPDATE_REQUIRED,"models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:303-314
+303:   if( process_id == master_id )then
+304:     call SEEK('C6',0)
+305:     do NS = 0,8
+306:       read(1,*,IOSTAT = ISO) ISTRAN(NS), ISTOPT(NS), ldum, ISADAC(NS), ISFCT(NS), ldum, ldum, ldum, ISCI(NS), ISCO(NS)
+307:       write(mpi_efdc_out_unit,1002) NCARD
+308:       write(mpi_efdc_out_unit,*) ISTRAN(NS), ISTOPT(NS), ldum, ISADAC(NS), ISFCT(NS), ldum, ldum, ldum, ISCI(NS), ISCO(NS)
+309:       if( ISO > 0 ) GOTO 100
+310:     enddo
+311:   endif
+312: 
+313:   call Broadcast_Array(ISTRAN, master_id)
+314:   call Broadcast_Array(ISTOPT, master_id)"
+B1,B1-2,models/EFDC/source-analysis/efdc_boundary_conditions.md,19,REVIEW_ONLY,REVIEW_ONLY,"models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:870-889
+870:   !C16*  READ SURFACE ELEVATION OR PRESSURE BOUNDARY CONDITION parameterS
+871:   NCARD = '16'
+872:   ! *** ********************************************************
+873:   if( process_id == master_id )then
+874:     call SEEK('C16',0)
+875:     read(1,*,IOSTAT = ISO) NPBS, NPBW, NPBE, NPBN, NPFOR_Readin, NPFORT, NPSER, PDGINIT
+876: 
+877:     write(mpi_efdc_out_unit,1002) NCARD
+878:     write(mpi_efdc_out_unit,*) NPBS, NPBW, NPBE, NPBN, NPFOR_Readin, NPFORT, NPSER, PDGINIT
+879:     if( ISO > 0 ) GOTO 100
+880:   endif
+881: 
+882:   call Broadcast_Scalar(NPBS        , master_id)
+883:   call Broadcast_Scalar(NPBW        , master_id)
+884:   call Broadcast_Scalar(NPBE        , master_id)
+885:   call Broadcast_Scalar(NPBN        , master_id)
+886:   call Broadcast_Scalar(NPFOR_Readin, master_id)
+887:   call Broadcast_Scalar(NPFORT      , master_id)
+888:   call Broadcast_Scalar(NPSER       , master_id)
+889:   call Broadcast_Scalar(PDGINIT     , master_id)
+
+models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:904-927
+904:       do NP = 1,NPFOR_Readin
+905:         do M = 1,MTIDE
+906:           if( NPFORT == 0 )then
+907:             read(1,*,IOSTAT = ISO)NDUM,CDUM,PFAM(NP,M),PFPH(NP,M)
+908:             write(mpi_efdc_out_unit,1002) NCARD
+909:             write(mpi_efdc_out_unit,*) NDUM, CDUM, PFAM(NP,M), PFPH(NP,M)
+910:             if( ISO > 0 ) GOTO 100
+911:           elseif( NPFORT >= 1 )then
+912:             read(1,*,IOSTAT = ISO) NDUM, CDUM, PFAM(NP,M), PFPH(NP,M)
+913:             RAD = PI2*PFPH(NP,M)/TCP(M)
+914:             CPFAM0(NP,M) = PFAM(NP,M)*COS(RAD)
+915:             SPFAM0(NP,M) = PFAM(NP,M)*SIN(RAD)
+916:             write(mpi_efdc_out_unit,1002) NCARD
+917:             write(mpi_efdc_out_unit,*) NDUM, CDUM, PFAM(NP,M), PFPH(NP,M), CPFAM0(NP,M), SPFAM0(NP,M)
+918:             if( ISO > 0 ) GOTO 100
+919:             read(1,*,IOSTAT = ISO) NDUM, CDUM, PFAM(NP,M), PFPH(NP,M)
+920:             RAD = PI2*PFPH(NP,M)/TCP(M)
+921:             CPFAM1(NP,M) = PFAM(NP,M)*COS(RAD)-CPFAM0(NP,M)
+922:             SPFAM1(NP,M) = PFAM(NP,M)*SIN(RAD)-SPFAM0(NP,M)
+923:             write(mpi_efdc_out_unit,1002) NCARD
+924:             write(mpi_efdc_out_unit,*) NDUM, CDUM, PFAM(NP,M), PFPH(NP,M), CPFAM1(NP,M), SPFAM1(NP,M)
+925:             CPFAM2(NP,M) = 0.0
+926:             SPFAM2(NP,M) = 0.0
+927:           elseif( NPFORT == 2 )then
+
+models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:980-985
+980:           do M = 1,MTIDE
+981:             if( NPFORS == 0) exit
+982:             RAD = PI2*PFPH(NPFORS,M)/TCP(M)
+983:             AMP = G*PFAM(NPFORS,M)
+984:             PCBS_GL(L,M) = AMP*COS(RAD)
+985:             PSBS_GL(L,M) = AMP*SIN(RAD)"
+B1,B1-3,models/EFDC/source-analysis/efdc_boundary_conditions.md,19,REVIEW_ONLY,REVIEW_ONLY,"models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:1352-1378
+1352:   !C23*  READ VELOCITY, VOL SOUR/SINK, FLOW CONTROL, & WITHDRAW/RETURN DATA
+1353:   NCARD = '23'
+1354:   ! *** ********************************************************
+1355:   if( process_id == master_id )then
+1356:     call SEEK('C23',0)
+1357:     read(1,*,IOSTAT = ISO) NQSIJ, NQJPIJ, NQSER, NQCTL, NQCTLT, NHYDST, NQWR, NQWRSR, ISDIQ, NQCTLSER, NQCTRULES
+1358: 
+1359:     write(mpi_efdc_out_unit,1002) NCARD
+1360:     write(mpi_efdc_out_unit,*) NQSIJ, NQJPIJ, NQSER, NQCTL, NQCTLT, NHYDST, NQWR, NQWRSR, ISDIQ, NQCTLSER, NQCTRULES
+1361:     if( ISO > 0 ) GOTO 100
+1362:   endif
+1363:   ! *** Broadcast in Scan_EFDC
+1364: 
+1365:   NGRPID = 0
+1366:   if( NQSIJ > 0 )then
+1367:     !C24*  READ VOLUME SOURCE/SINK LOCATIONS, MAGNITUDES, & VOL & CONC SERIES
+1368:     NCARD = '24'
+1369:     if( process_id == master_id )then
+1370:       call SEEK('C24',0)
+1371:       do NS = 1,NQSIJ
+1372:         read(1,*,IOSTAT = ISO) BCPS_GL(NS).I, BCPS_GL(NS).J, BCPS_GL(NS).QSSE, BCPS_GL(NS).NQSMUL, BCPS_GL(NS).NQSMF, BCPS_GL(NS).NQSERQ,   BCPS_GL(NS).NCSERQ(1), BCPS_GL(NS).NCSERQ(2), BCPS_GL(NS).NCSERQ(3), BCPS_GL(NS).NCSERQ(4), BCPS_GL(NS).NCSERQ(5),  &
+1373:           BCPS_GL(NS).NCSERQ(6), BCPS_GL(NS).NCSERQ(7), BCPS_GL(NS).QWIDTH,   BCPS_GL(NS).QFACTOR,  BCPS_GL(NS).GRPID
+1374: 
+1375:         write(mpi_efdc_out_unit,1002) NCARD
+1376:         write(mpi_efdc_out_unit,*) BCPS_GL(NS).I, BCPS_GL(NS).J, BCPS_GL(NS).QSSE, BCPS_GL(NS).NQSMUL, BCPS_GL(NS).NQSMF, BCPS_GL(NS).NQSERQ,   BCPS_GL(NS).NCSERQ(1), BCPS_GL(NS).NCSERQ(2), BCPS_GL(NS).NCSERQ(3), BCPS_GL(NS).NCSERQ(4), BCPS_GL(NS).NCSERQ(5),  &
+1377:           BCPS_GL(NS).NCSERQ(6), BCPS_GL(NS).NCSERQ(7), BCPS_GL(NS).QWIDTH,   BCPS_GL(NS).QFACTOR,  BCPS_GL(NS).GRPID
+1378:         if( ISO > 0 ) GOTO 100"
+B1,B1-4,models/EFDC/source-analysis/efdc_boundary_conditions.md,19,REVIEW_ONLY,REVIEW_ONLY,"models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:3656-3687
+3656:   ! *** OPEN FILE MODCHAN.INP TO INSERT SUBGRID CHANNELS INTO HOST CELLS
+3657:   MDCHH = 0
+3658:   if( ISCHAN > 0 )then
+3659:     if( process_id == master_id )then
+3660:       write(*,'(A)')'READING MODCHAN.INP'
+3661:       open(1,FILE = 'modchan.inp',STATUS = 'UNKNOWN')
+3662: 
+3663:       ! *** SKIP OVER TITLE AND AND HEADER LINES
+3664:       STR = READSTR(1)
+3665:       if( ISCHAN == 1 )then
+3666:         read(1,*) MDCHH, ldum, ldum
+3667:         read(1,*) ldum, ldum, QCHERR
+3668:         if( MDCHH >= 1 )then
+3669:           do NMD = 1,MDCHH
+3670:             read(1,*)MDCHTYP(NMD),IMDCHH(NMD),JMDCHH(NMD),IMDCHU(NMD),JMDCHU(NMD),IMDCHV(NMD),JMDCHV(NMD)
+3671:             QCHANU(NMD) = 0.
+3672:             QCHANUN(NMD) = 0.
+3673:             QCHANV(NMD) = 0.
+3674:             QCHANVN(NMD) = 0.
+3675:           enddo
+3676:         endif
+3677:       endif
+3678:       if( ISCHAN == 2 )then
+3679:         read(1,*) MDCHH, ldum, ldum
+3680:         read(1,*) ldum, ldum, QCHERR
+3681:         if( MDCHH >= 1 )then
+3682:           do NMD = 1,MDCHH
+3683:             read(1,*)MDCHTYP(NMD),IMDCHH(NMD),JMDCHH(NMD),IMDCHU(NMD),JMDCHU(NMD),IMDCHV(NMD),JMDCHV(NMD),CHANLEN(NMD),PMDCH(NMD)
+3684:             QCHANU(NMD) = 0.
+3685:             QCHANUN(NMD) = 0.
+3686:             QCHANV(NMD) = 0.
+3687:             QCHANVN(NMD) = 0.
+
+models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:3692-3705
+3692:       if( MDCHH >= 1 )then
+3693:         do NMD = 1,MDCHH
+3694:           LMDCHH(NMD) = LIJ(IMDCHH(NMD),JMDCHH(NMD))
+3695:           if( IMDCHU(NMD) == 1 .and. JMDCHU(NMD) == 1 )then
+3696:             LMDCHU(NMD) = 1
+3697:           else
+3698:             LMDCHU(NMD) = LIJ(IMDCHU(NMD),JMDCHU(NMD))
+3699:           endif
+3700:           if( IMDCHV(NMD) == 1 .and. JMDCHV(NMD) == 1 )then
+3701:             LMDCHV(NMD) = 1
+3702:           else
+3703:             LMDCHV(NMD) = LIJ(IMDCHV(NMD),JMDCHV(NMD))
+3704:           endif
+3705:         enddo"
+B1,B1-5,models/EFDC/source-analysis/efdc_boundary_conditions.md,85,REVIEW_ONLY,REVIEW_ONLY,"models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:1352-1363
+1352:   !C23*  READ VELOCITY, VOL SOUR/SINK, FLOW CONTROL, & WITHDRAW/RETURN DATA
+1353:   NCARD = '23'
+1354:   ! *** ********************************************************
+1355:   if( process_id == master_id )then
+1356:     call SEEK('C23',0)
+1357:     read(1,*,IOSTAT = ISO) NQSIJ, NQJPIJ, NQSER, NQCTL, NQCTLT, NHYDST, NQWR, NQWRSR, ISDIQ, NQCTLSER, NQCTRULES
+1358: 
+1359:     write(mpi_efdc_out_unit,1002) NCARD
+1360:     write(mpi_efdc_out_unit,*) NQSIJ, NQJPIJ, NQSER, NQCTL, NQCTLT, NHYDST, NQWR, NQWRSR, ISDIQ, NQCTLSER, NQCTRULES
+1361:     if( ISO > 0 ) GOTO 100
+1362:   endif
+1363:   ! *** Broadcast in Scan_EFDC"
+B1,B1-6,models/EFDC/source-analysis/efdc_boundary_conditions.md,88,NO_ACTION,NO_ACTION,"models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:1365-1378
+1365:   NGRPID = 0
+1366:   if( NQSIJ > 0 )then
+1367:     !C24*  READ VOLUME SOURCE/SINK LOCATIONS, MAGNITUDES, & VOL & CONC SERIES
+1368:     NCARD = '24'
+1369:     if( process_id == master_id )then
+1370:       call SEEK('C24',0)
+1371:       do NS = 1,NQSIJ
+1372:         read(1,*,IOSTAT = ISO) BCPS_GL(NS).I, BCPS_GL(NS).J, BCPS_GL(NS).QSSE, BCPS_GL(NS).NQSMUL, BCPS_GL(NS).NQSMF, BCPS_GL(NS).NQSERQ,   BCPS_GL(NS).NCSERQ(1), BCPS_GL(NS).NCSERQ(2), BCPS_GL(NS).NCSERQ(3), BCPS_GL(NS).NCSERQ(4), BCPS_GL(NS).NCSERQ(5),  &
+1373:           BCPS_GL(NS).NCSERQ(6), BCPS_GL(NS).NCSERQ(7), BCPS_GL(NS).QWIDTH,   BCPS_GL(NS).QFACTOR,  BCPS_GL(NS).GRPID
+1374: 
+1375:         write(mpi_efdc_out_unit,1002) NCARD
+1376:         write(mpi_efdc_out_unit,*) BCPS_GL(NS).I, BCPS_GL(NS).J, BCPS_GL(NS).QSSE, BCPS_GL(NS).NQSMUL, BCPS_GL(NS).NQSMF, BCPS_GL(NS).NQSERQ,   BCPS_GL(NS).NCSERQ(1), BCPS_GL(NS).NCSERQ(2), BCPS_GL(NS).NCSERQ(3), BCPS_GL(NS).NCSERQ(4), BCPS_GL(NS).NCSERQ(5),  &
+1377:           BCPS_GL(NS).NCSERQ(6), BCPS_GL(NS).NCSERQ(7), BCPS_GL(NS).QWIDTH,   BCPS_GL(NS).QFACTOR,  BCPS_GL(NS).GRPID
+1378:         if( ISO > 0 ) GOTO 100"
+B1,B1-7,models/EFDC/source-analysis/efdc_boundary_conditions.md,110,REVIEW_ONLY,REVIEW_ONLY,"models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:870-889
+870:   !C16*  READ SURFACE ELEVATION OR PRESSURE BOUNDARY CONDITION parameterS
+871:   NCARD = '16'
+872:   ! *** ********************************************************
+873:   if( process_id == master_id )then
+874:     call SEEK('C16',0)
+875:     read(1,*,IOSTAT = ISO) NPBS, NPBW, NPBE, NPBN, NPFOR_Readin, NPFORT, NPSER, PDGINIT
+876: 
+877:     write(mpi_efdc_out_unit,1002) NCARD
+878:     write(mpi_efdc_out_unit,*) NPBS, NPBW, NPBE, NPBN, NPFOR_Readin, NPFORT, NPSER, PDGINIT
+879:     if( ISO > 0 ) GOTO 100
+880:   endif
+881: 
+882:   call Broadcast_Scalar(NPBS        , master_id)
+883:   call Broadcast_Scalar(NPBW        , master_id)
+884:   call Broadcast_Scalar(NPBE        , master_id)
+885:   call Broadcast_Scalar(NPBN        , master_id)
+886:   call Broadcast_Scalar(NPFOR_Readin, master_id)
+887:   call Broadcast_Scalar(NPFORT      , master_id)
+888:   call Broadcast_Scalar(NPSER       , master_id)
+889:   call Broadcast_Scalar(PDGINIT     , master_id)"
+B1,B1-8,models/EFDC/source-analysis/efdc_boundary_conditions.md,137,REVIEW_ONLY,REVIEW_ONLY,"models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:3656-3689
+3656:   ! *** OPEN FILE MODCHAN.INP TO INSERT SUBGRID CHANNELS INTO HOST CELLS
+3657:   MDCHH = 0
+3658:   if( ISCHAN > 0 )then
+3659:     if( process_id == master_id )then
+3660:       write(*,'(A)')'READING MODCHAN.INP'
+3661:       open(1,FILE = 'modchan.inp',STATUS = 'UNKNOWN')
+3662: 
+3663:       ! *** SKIP OVER TITLE AND AND HEADER LINES
+3664:       STR = READSTR(1)
+3665:       if( ISCHAN == 1 )then
+3666:         read(1,*) MDCHH, ldum, ldum
+3667:         read(1,*) ldum, ldum, QCHERR
+3668:         if( MDCHH >= 1 )then
+3669:           do NMD = 1,MDCHH
+3670:             read(1,*)MDCHTYP(NMD),IMDCHH(NMD),JMDCHH(NMD),IMDCHU(NMD),JMDCHU(NMD),IMDCHV(NMD),JMDCHV(NMD)
+3671:             QCHANU(NMD) = 0.
+3672:             QCHANUN(NMD) = 0.
+3673:             QCHANV(NMD) = 0.
+3674:             QCHANVN(NMD) = 0.
+3675:           enddo
+3676:         endif
+3677:       endif
+3678:       if( ISCHAN == 2 )then
+3679:         read(1,*) MDCHH, ldum, ldum
+3680:         read(1,*) ldum, ldum, QCHERR
+3681:         if( MDCHH >= 1 )then
+3682:           do NMD = 1,MDCHH
+3683:             read(1,*)MDCHTYP(NMD),IMDCHH(NMD),JMDCHH(NMD),IMDCHU(NMD),JMDCHU(NMD),IMDCHV(NMD),JMDCHV(NMD),CHANLEN(NMD),PMDCH(NMD)
+3684:             QCHANU(NMD) = 0.
+3685:             QCHANUN(NMD) = 0.
+3686:             QCHANV(NMD) = 0.
+3687:             QCHANVN(NMD) = 0.
+3688:           enddo
+3689:         endif"
+B1,B1-9,models/EFDC/source-analysis/efdc_boundary_conditions.md,152,REVIEW_ONLY,REVIEW_ONLY,"models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:732-754
+732:   !C14*  READ TIDAL & ATMOSPHERIC FORCING, GROUND WATER AND SUBGRID CHANNEL parameterS
+733:   NCARD = '14'
+734:   ! *** ********************************************************
+735:   if( process_id == master_id )then
+736:     call SEEK('C14',0)
+737:     read(1,*,IOSTAT = ISO) MTIDE, NWSER, NASER, ISGWIT, ISCHAN, ISWAVE, ITIDASM, ISPERC, ISBODYF, ISPNHYDS, ISPROPWASH
+738: 
+739:     write(mpi_efdc_out_unit,1002) NCARD
+740:     write(mpi_efdc_out_unit,*) MTIDE, NWSER, NASER, ISGWIT, ISCHAN, ISWAVE, ITIDASM, ISPERC, ISBODYF, ISPNHYDS, ISPROPWASH
+741:     if( ISO > 0 ) GOTO 100
+742:   endif
+743: 
+744:   call Broadcast_Scalar(MTIDE     , master_id)
+745:   call Broadcast_Scalar(NWSER     , master_id)
+746:   call Broadcast_Scalar(NASER     , master_id)
+747:   call Broadcast_Scalar(ISGWIT    , master_id)
+748:   call Broadcast_Scalar(ISCHAN    , master_id)
+749:   call Broadcast_Scalar(ISWAVE    , master_id)
+750:   call Broadcast_Scalar(ITIDASM   , master_id)
+751:   call Broadcast_Scalar(ISPERC    , master_id)
+752:   call Broadcast_Scalar(ISBODYF   , master_id)
+753:   call Broadcast_Scalar(ISPNHYDS  , master_id)
+754:   call Broadcast_Scalar(ISPROPWASH, master_id)"
+B1,B1-10,models/EFDC/source-analysis/efdc_boundary_conditions.md,157,REVIEW_ONLY,REVIEW_ONLY,"models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:980-1005
+980:           do M = 1,MTIDE
+981:             if( NPFORS == 0) exit
+982:             RAD = PI2*PFPH(NPFORS,M)/TCP(M)
+983:             AMP = G*PFAM(NPFORS,M)
+984:             PCBS_GL(L,M) = AMP*COS(RAD)
+985:             PSBS_GL(L,M) = AMP*SIN(RAD)
+986:           enddo
+987:         enddo
+988: 
+989:       elseif( NPFORT == 1 )then
+990:         do L = 1,NPBS
+991:           read(1,*,IOSTAT = ISO) IPBS_GL(L), JPBS_GL(L), ISPBS_GL(L), ISPRS_GL(L), NPFORS, NPSERS_GL(L), NPSERS1_GL(L), TPCOORDS_GL(L)
+992: 
+993:           write(mpi_efdc_out_unit,1002) NCARD
+994:           write(mpi_efdc_out_unit,*) IPBS_GL(L), JPBS_GL(L), ISPBS_GL(L), ISPRS_GL(L), NPFORS, NPSERS_GL(L), NPSERS1_GL(L), TPCOORDS_GL(L)
+995:           if( ISO > 0 ) GOTO 100
+996:           do M = 1,MTIDE
+997:             if( NPFORS == 0) exit
+998:             PCBS_GL(L,M) = CPFAM0(NPFORS,M)+TPCOORDS_GL(L)*CPFAM1(NPFORS,M) + TPCOORDS_GL(L)*TPCOORDS_GL(L)*CPFAM2(NPFORS,M)
+999:             PSBS_GL(L,M) = SPFAM0(NPFORS,M)+TPCOORDS_GL(L)*SPFAM1(NPFORS,M) + TPCOORDS_GL(L)*TPCOORDS_GL(L)*SPFAM2(NPFORS,M)
+1000:             TMPAMP = SQRT(PCBS(L,M)*PCBS(L,M)+PSBS_GL(L,M)*PSBS_GL(L,M))
+1001:             TMPPHS = ATAN2(PSBS_GL(L,M),PCBS_GL(L,M))
+1002:             TMPPHS = TMPPHS*TCP(M)/PI2
+1003:             if( TMPPHS<0.0)TMPPHS = TMPPHS+TCP(M)
+1004:             PCBS_GL(L,M) = G*PCBS_GL(L,M)
+1005:             PSBS_GL(L,M) = G*PSBS_GL(L,M)"
+B1,B1-11,models/EFDC/source-analysis/efdc_ice.md,19,REVIEW_ONLY,REVIEW_ONLY,"models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:7000-7024
+7000:   ! *** Read in externally specified ice cover from the file ISER.INP
+7001:   if( ISICE == 1 .and. NISER >= 1 )then
+7002:     if( process_id == master_id )then
+7003:       write(*,'(A)')'READING ISER.INP'
+7004:       open(1,FILE = 'iser.inp')
+7005:       STR = READSTR(1)
+7006: 
+7007:       do NS = 1,NISER
+7008:         RICECOVT(NS) = 0.
+7009:         RICETHKT(NS) = 0.
+7010:         MITLAST(NS)  = 2
+7011: 
+7012:         read(1,*,IOSTAT = ISO) M,TSICE(NS).TMULT,TOFFSET,RMULADJCOV
+7013:         if( ISO > 0 ) CALL STOPP('ISER.INP: READING ERROR')
+7014: 
+7015:         do M = 1,TSICE(NS).NREC
+7016:           ! *** TSICE(NS).VAL(M,1) ice on/off flag.
+7017:           ! *** TSICE(NS).VAL(M,2) is ice thickness, a legacy approach that was never used in EFDC
+7018:           read(1,*,IOSTAT = ISO) TSICE(NS).TIM(M),TSICE(NS).VAL(M,1)
+7019: 
+7020:           if( TSICE(NS).VAL(M,1) > 0.0 )then    ! *** VAL(M,2) is not used, for display only
+7021:             TSICE(NS).VAL(M,2) = RICETHK0       ! *** VAL(M,2) is not used, for display only
+7022:           else                                  ! *** VAL(M,2) is not used, for display only
+7023:             TSICE(NS).VAL(M,2) = 0.0            ! *** VAL(M,2) is not used, for display only
+7024:           endif                                 ! *** VAL(M,2) is not used, for display only
+
+models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:7034-7042
+7034: 
+7035:       close(1)
+7036:     endif
+7037: 
+7038:   elseif( ISICE == 2 )then
+7039:     if( process_id == master_id )then
+7040:       write(*,'(A)')'READING ISTAT.INP'
+7041:       open(1,FILE = 'istat.inp')
+7042:       STR = READSTR(1)
+
+models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:7068-7074
+7068:   if( ISICE == 1 .and. NISER > 1 )then
+7069:     ! *** Read ice time series weighting
+7070:     if(process_id == master_id )then
+7071:       write(*,'(A)')'READING ICEMAP.INP'
+7072:       open(1,FILE = 'icemap.inp')
+7073:       STR = READSTR(1)
+7074:       read(1,*) NICEMAP
+
+models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:7093-7099
+7093:         RICEWHT(:,L,:) = RICEWHT_GLOBAL(:,LG,:)
+7094:       endif
+7095:     enddo
+7096: 
+7097:     if( process_id == master_id )then
+7098:       close(1)
+7099:     endif"
+B1,B1-12,models/EFDC/source-analysis/efdc_ice.md,128,REVIEW_ONLY,REVIEW_ONLY,"models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:7000-7031
+7000:   ! *** Read in externally specified ice cover from the file ISER.INP
+7001:   if( ISICE == 1 .and. NISER >= 1 )then
+7002:     if( process_id == master_id )then
+7003:       write(*,'(A)')'READING ISER.INP'
+7004:       open(1,FILE = 'iser.inp')
+7005:       STR = READSTR(1)
+7006: 
+7007:       do NS = 1,NISER
+7008:         RICECOVT(NS) = 0.
+7009:         RICETHKT(NS) = 0.
+7010:         MITLAST(NS)  = 2
+7011: 
+7012:         read(1,*,IOSTAT = ISO) M,TSICE(NS).TMULT,TOFFSET,RMULADJCOV
+7013:         if( ISO > 0 ) CALL STOPP('ISER.INP: READING ERROR')
+7014: 
+7015:         do M = 1,TSICE(NS).NREC
+7016:           ! *** TSICE(NS).VAL(M,1) ice on/off flag.
+7017:           ! *** TSICE(NS).VAL(M,2) is ice thickness, a legacy approach that was never used in EFDC
+7018:           read(1,*,IOSTAT = ISO) TSICE(NS).TIM(M),TSICE(NS).VAL(M,1)
+7019: 
+7020:           if( TSICE(NS).VAL(M,1) > 0.0 )then    ! *** VAL(M,2) is not used, for display only
+7021:             TSICE(NS).VAL(M,2) = RICETHK0       ! *** VAL(M,2) is not used, for display only
+7022:           else                                  ! *** VAL(M,2) is not used, for display only
+7023:             TSICE(NS).VAL(M,2) = 0.0            ! *** VAL(M,2) is not used, for display only
+7024:           endif                                 ! *** VAL(M,2) is not used, for display only
+7025:           if( ISO > 0 ) CALL STOPP('ISER.INP: READING ERROR')
+7026:         enddo
+7027: 
+7028:         do M = 1,TSICE(NS).NREC
+7029:           TSICE(NS).TIM(M)   = TSICE(NS).TIM(M) + TOFFSET
+7030:           TSICE(NS).VAL(M,1) = RMULADJCOV*TSICE(NS).VAL(M,1)
+7031:         enddo"
+B1,B1-13,models/EFDC/source-analysis/efdc_dispersion.md,23,NO_ACTION,NO_ACTION,"models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:621-621
+621:     read(1,*,IOSTAT = ISO) AHO, AHD, AVO, ABO, AVMX, ABMX, VISMUD, AVCON, ZBRWALL"
+B1,B1-14,models/EFDC/source-analysis/efdc_dispersion.md,23,REVIEW_ONLY,REVIEW_ONLY,"models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:3722-3745
+3722:   ! *** ENABLE SPATIALLY VARIABLE BACKGROUND AHO
+3723:   if( AHO < 0. )then
+3724:     AHMAX = ABS(AHO)
+3725:     AHMIN = 1.0E32
+3726:     do L = 2,LA
+3727:       AHOXY(L) = ABS(AHO)*DXP(L)*DYP(L)
+3728:       AHMAX    = max(AHOXY(L),AHMAX)
+3729:       AHMIN    = min(AHOXY(L),AHMIN)
+3730:     enddo
+3731: 
+3732:     if( process_id == master_id )then
+3733:       PRINT '(A,2E16.5)','VARIABLE AHO USED (MIN,MAX): ', AHMIN, AHMAX
+3734:     endif
+3735: 
+3736:   else
+3737:     AHOXY = AHO
+3738:   endif
+3739: 
+3740:   ! *** SMAGORINSKY AND BACKGROUND DIFFUSIVITY
+3741:   ! *** Constant and/or default values
+3742:   AHO = ABS(AHO)
+3743: 
+3744:   ! *** ENABLE SPATIALLY VARIABLE SMAGORINSKY AND BACKGROUND DIFFUSIVITY
+3745:   if( AHD < 0. )then
+
+models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:3761-3786
+3761:       do LL = 2,LA_Global
+3762:         read(1,*,END = 200) LG, ITMP, JTMP, T1, T2
+3763: 
+3764:         R2D_Global(LG,1) = T1
+3765:         R2D_Global(LG,2) = T2
+3766:       enddo
+3767: 200   close(1)
+3768:     endif
+3769: 
+3770:     call Broadcast_Array(R2D_Global, master_id)
+3771: 
+3772:     ! *** Map to Local Domain
+3773:     do LG = 2,LA_GLOBAL
+3774:       L = Map2Local(LG).LL
+3775:       if( L > 1 )then
+3776:         if( R2D_Global(LG,1) < 0. )then
+3777:           AHOXY(L) = ABS(R2D_Global(LG,1))*DXP(L)*DYP(L)
+3778:         else
+3779:           AHOXY(L) = R2D_Global(LG,1)
+3780:         endif
+3781:         AHDXY(L) = R2D_Global(LG,2)
+3782: 
+3783:         AHMAX = max(AHOXY(L),AHMAX)
+3784:         AHMIN = min(AHOXY(L),AHMIN)
+3785:         ADMAX = max(AHDXY(L),ADMAX)
+3786:         ADMIN = min(AHDXY(L),ADMIN)
+
+models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:3789-3795
+3789:     deallocate(R2D_Global)
+3790: 
+3791:     AHD = ABS(AHD)
+3792:     PRINT '(A,4E12.4)','VARIABLE AHO & AHD USED (MIN,MAX): ',AHMIN,AHMAX,ADMIN,ADMAX
+3793:   else
+3794:     AHDXY = AHD       ! *** Constant value
+3795:   endif"
+B1,B1-15,models/EFDC/source-analysis/efdc_dispersion.md,239,NO_ACTION,NO_ACTION,"models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:621-621
+621:     read(1,*,IOSTAT = ISO) AHO, AHD, AVO, ABO, AVMX, ABMX, VISMUD, AVCON, ZBRWALL
+
+models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:3736-3742
+3736:   else
+3737:     AHOXY = AHO
+3738:   endif
+3739: 
+3740:   ! *** SMAGORINSKY AND BACKGROUND DIFFUSIVITY
+3741:   ! *** Constant and/or default values
+3742:   AHO = ABS(AHO)"
+B1,B1-16,models/EFDC/source-analysis/efdc_dispersion.md,240,NO_ACTION,NO_ACTION,"models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:621-621
+621:     read(1,*,IOSTAT = ISO) AHO, AHD, AVO, ABO, AVMX, ABMX, VISMUD, AVCON, ZBRWALL"
+B1,B1-17,models/EFDC/source-analysis/efdc_dispersion.md,240,REVIEW_ONLY,REVIEW_ONLY,"models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:3789-3795
+3789:     deallocate(R2D_Global)
+3790: 
+3791:     AHD = ABS(AHD)
+3792:     PRINT '(A,4E12.4)','VARIABLE AHO & AHD USED (MIN,MAX): ',AHMIN,AHMAX,ADMIN,ADMAX
+3793:   else
+3794:     AHDXY = AHD       ! *** Constant value
+3795:   endif"
+B2,B2-1,models/EFDC/source-analysis/efdc_dispersion.md,241,REVIEW_ONLY,REVIEW_ONLY,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:618-625; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:635-636
+B2,B2-2,models/EFDC/source-analysis/efdc_dispersion.md,256,REVIEW_ONLY,REVIEW_ONLY,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:3722-3729; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:3744-3746; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:3755-3781; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:3789-3795
+B2,B2-3,models/EFDC/source-analysis/efdc_hydraulic_structures.md,21,REVIEW_ONLY,REVIEW_ONLY,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:1352-1364; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:1607-1616; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:1661-1669; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:1702-1714; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:6344-6348; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:6667-6671
+B2,B2-4,models/EFDC/source-analysis/efdc_wetdry.md,19,REVIEW_ONLY,REVIEW_ONLY,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:543-571
+B2,B2-5,models/EFDC/source-analysis/efdc_wetdry.md,45,REVIEW_ONLY,REVIEW_ONLY,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:543-571
+B2,B2-6,models/EFDC/source-analysis/efdc_vertical.md,20,REVIEW_ONLY,REVIEW_ONLY,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:513-525
+B2,B2-7,models/EFDC/source-analysis/efdc_vertical.md,20,REVIEW_ONLY,REVIEW_ONLY,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:527-540
+B2,B2-8,models/EFDC/source-analysis/efdc_vertical.md,30,REVIEW_ONLY,REVIEW_ONLY,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:513-525
+B2,B2-9,models/EFDC/source-analysis/efdc_vertical.md,31,REVIEW_ONLY,REVIEW_ONLY,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:527-540
+B2,B2-10,models/EFDC/source-analysis/efdc_turbulence.md,22,REVIEW_ONLY,REVIEW_ONLY,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:617-685
+B2,B2-11,models/EFDC/source-analysis/efdc_turbulence.md,67,REVIEW_ONLY,REVIEW_ONLY,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:618-636
+B2,B2-12,models/EFDC/source-analysis/efdc_turbulence.md,107,REVIEW_ONLY,REVIEW_ONLY,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:641-661
+B2,B2-13,models/EFDC/source-analysis/efdc_turbulence.md,115,REVIEW_ONLY,REVIEW_ONLY,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:666-685
+B2,B2-14,models/EFDC/source-analysis/efdc-tidal-forcing-conventions-v12.md,28,REVIEW_ONLY,REVIEW_ONLY,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:906-918
+B2,B2-15,models/EFDC/source-analysis/efdc-tidal-forcing-conventions-v12.md,28,REVIEW_ONLY,REVIEW_ONLY,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:972-1005
+B2,B2-16,models/EFDC/source-analysis/efdc_transport_scheme.md,65,UPDATE_REQUIRED,UPDATE_REQUIRED,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:303-321
+C1,C1-1,models/EFDC/source-analysis/efdc_boundary_conditions.md,21,REVIEW_ONLY,REVIEW_ONLY,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/setbcs.f90:203-209; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/setbcs.f90:449-476
+C1,C1-2,models/EFDC/source-analysis/efdc_ice.md,21,REVIEW_ONLY,REVIEW_ONLY,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Transport/mod_heat.f90:405-420
+C1,C1-3,models/EFDC/source-analysis/efdc_ice.md,25,REVIEW_ONLY,REVIEW_ONLY,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp.f90:1091-1097; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp.f90:1206-1208; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp.f90:1225-1227; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp.f90:1262-1264; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp.f90:1374-1385
+C1,C1-4,models/EFDC/source-analysis/efdc_ice.md,25,REVIEW_ONLY,REVIEW_ONLY,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp2t.f90:1011-1019; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp2t.f90:1131-1132; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp2t.f90:1144-1149; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp2t.f90:1162-1163; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp2t.f90:1175-1180; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp2t.f90:1204-1205; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp2t.f90:1216-1217; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp2t.f90:1277-1278; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp2t.f90:1295-1303; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp2t.f90:1400-1405
+C1,C1-5,models/EFDC/source-analysis/efdc_ice.md,28,REVIEW_ONLY,REVIEW_ONLY,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Waves/mod_windwave.f90:270-278; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Waves/mod_windwave.f90:688-699
+C1,C1-6,models/EFDC/source-analysis/efdc_ice.md,29,REVIEW_ONLY,REVIEW_ONLY,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/varalloc.f90:1386-1400
+C1,C1-7,models/EFDC/source-analysis/efdc_ice.md,108,NO_ACTION,NO_ACTION,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp2t.f90:1014-1019
+C1,C1-8,models/EFDC/source-analysis/efdc_ice.md,133,REVIEW_ONLY,REVIEW_ONLY,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/varalloc.f90:1386-1400
+C1,C1-9,models/EFDC/source-analysis/efdc_water_quality.md,19,REVIEW_ONLY,REVIEW_ONLY,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Eutrophication/mod_wq.f90:9-11; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Eutrophication/mod_wq.f90:1884-1892; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Eutrophication/mod_wq.f90:2399-2405; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Eutrophication/mod_wq.f90:2424-2430
+C1,C1-10,models/EFDC/source-analysis/efdc_water_quality.md,22,REVIEW_ONLY,REVIEW_ONLY,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Eutrophication/mod_biota.f90:124; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Eutrophication/mod_biota.f90:144-150
+C1,C1-11,models/EFDC/source-analysis/efdc_water_quality.md,106,UPDATE_REQUIRED,UPDATE_REQUIRED,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Eutrophication/mod_diagen.f90:164-174; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Eutrophication/mod_diagen.f90:336-341
+C1,C1-12,models/EFDC/source-analysis/efdc_dispersion.md,24,NO_ACTION,NO_ACTION,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/mod_var_global.f90:991-992; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/mod_var_global.f90:1098-1099
+C1,C1-13,models/EFDC/source-analysis/efdc_wetdry.md,20,NO_ACTION,NO_ACTION,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/mod_var_global.f90:60; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/mod_var_global.f90:841; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/mod_var_global.f90:1048; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/mod_var_global.f90:1053
+C2,C2-1,models/EFDC/source-analysis/efdc_wetdry.md,48,NO_ACTION,NO_ACTION,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/mod_var_global.f90:1048-1054
+C2,C2-2,models/EFDC/source-analysis/efdc_vertical.md,21,REVIEW_ONLY,REVIEW_ONLY,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/aaefdc.f90:1301-1312
+C2,C2-3,models/EFDC/source-analysis/efdc_vertical.md,24,REVIEW_ONLY,REVIEW_ONLY,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp.f90:1167-1170; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp.f90:1187-1189; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp.f90:1207-1208; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp.f90:1225-1228; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp.f90:1265-1268
+C2,C2-4,models/EFDC/source-analysis/efdc_vertical.md,80,UPDATE_REQUIRED,UPDATE_REQUIRED,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp.f90:1167-1169; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp.f90:1187-1188; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp.f90:1207-1223
+C2,C2-5,models/EFDC/source-analysis/efdc_vertical.md,81,UPDATE_REQUIRED,UPDATE_REQUIRED,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp.f90:1225-1236; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp.f90:1239-1242; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp.f90:1252-1265
+C2,C2-6,models/EFDC/source-analysis/efdc_vertical.md,82,UPDATE_REQUIRED,UPDATE_REQUIRED,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp.f90:1265-1279
+C2,C2-7,models/EFDC/source-analysis/efdc_sediment_diagenesis.md,21,REVIEW_ONLY,REVIEW_ONLY,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Eutrophication/mod_diagen.f90:164-169; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Eutrophication/mod_diagen.f90:336-341; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Eutrophication/mod_diagen.f90:1105-1108; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Eutrophication/mod_diagen.f90:1121-1122; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Eutrophication/mod_diagen.f90:1391-1394
+C2,C2-8,models/EFDC/source-analysis/efdc_hydro_core.md,79,REVIEW_ONLY,REVIEW_ONLY,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp.f90:1010-1028; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp.f90:1052-1055
+C2,C2-9,models/EFDC/source-analysis/efdc_baroclinic_eos.md,75,UPDATE_REQUIRED,UPDATE_REQUIRED,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp.f90:1162-1169; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp.f90:1187-1188; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp.f90:1207-1208; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp.f90:1225-1228; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp.f90:1265-1270; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp.f90:1350-1352
+C2,C2-10,models/EFDC/source-analysis/sediment/efdc_sediment.md,21,REVIEW_ONLY,REVIEW_ONLY,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/SedTran-Original/ssedtox.f90:868-885; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/SedTran-Original/ssedtox.f90:1031-1062; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/SedTran-Original/ssedtox.f90:1078-1100; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/SedTran-Original/ssedtox.f90:1282-1287
+C2,C2-11,models/EFDC/source-analysis/sediment/efdc_sediment.md,178,REVIEW_ONLY,REVIEW_ONLY,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/hdmt2t.f90:409-428
+C2,C2-12,models/EFDC/source-analysis/sediment/efdc_sedzlj.md,416,REVIEW_ONLY,REVIEW_ONLY,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calhdmf.f90:245-253; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calhdmf.f90:266-269; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calhdmf.f90:284-287

@@ -1,0 +1,1175 @@
+--- a/concepts/currents/time-integration-cross-model.md
++++ b/concepts/currents/time-integration-cross-model.md
+@@ -36,7 +36,7 @@
+ | 모델 | 스킴 | stage 구조 | 핵심 anchor | 근거 |
+ |---|---|---|---|---|
+ | **ROMS** | **split-explicit LF-AM3 predictor-corrector** (compile-time 대안 FB LF-AM3/FB AB3-AM4, main3d.F:665,716,810) | pre_step3d(predictor half, AB 기여 pre_step3d.F:16-19) → 2D fast substep `my_iif=1..nfast+1`(step2d_LF_AM3.h:924-2693, AM3 weight 5/12·8/12·−1/12) → step3d_uv/step3d_t(corrector) | weight 설계 set_weights.F:12-182(`nfast≠NDTFAST` — 필터 support 가 NDTFAST 초과 확장), `dtfast=dt/NDTFAST`(read_phypar.F:608) | [[roms_barotropic_2d]]·[[roms_tracer_timestep_step3d_t]]·[[roms_nonlinear_core_remaining]] |
+-| **EFDC+** | **3TL leapfrog + trapezoidal corrector** (기본) / **2TL** 토글 | dispatch `IS2TIM==0→HDMT / ≥1→HDMT2T`(aaefdc.f90:3187-3188, 직접 재확인). 3TL: `ISTL=3` full leapfrog(DELT=DT2, hdmt.f90:1344-1349) + `ISTL=2` trapezoidal corrector 를 **NTSTBC 주기**로(computational mode 감쇠, ROLD=0.5) | external 연속 CALPUV9C=PCG semi-implicit(calpuv9c.f90:693-707) / 2TL 은 dynamic dt(DTDYN) 가능 | [[efdc_hydro_core]]·[[efdc_external_mode_solver]]·[[efdc_transport_scheme]] |
++| **EFDC+** | **3TL leapfrog + trapezoidal corrector** (기본) / **2TL** 토글 | dispatch `IS2TIM==0→HDMT / ≥1→HDMT2T`(aaefdc.f90:3189-3190, 직접 재확인). 3TL: `ISTL=3` full leapfrog(DELT=DT2, hdmt.f90:1344-1349) + `ISTL=2` trapezoidal corrector 를 **NTSTBC 주기**로(computational mode 감쇠, ROLD=0.5) | external 연속 CALPUV9C=PCG semi-implicit(calpuv9c.f90:693-707) / 2TL 은 dynamic dt(DTDYN) 가능 | [[efdc_hydro_core]]·[[efdc_external_mode_solver]]·[[efdc_transport_scheme]] |
+ | **ADCIRC** | **GWCE semi-implicit 3-time-level**: ETA0/1/2 상태 + fort.15 **A00,B00,C00 시간가중**(read_input.F:2996 직접 재확인; RHS 가중 gwce.F:1540-1543) — 별도 θ 파라미터 없음 | ζ(GWCE JCG solve 또는 ILump=1 lumped 대각역산 gwce.F:2001-2017) → U,V(Coriolis+마찰 2×2 implicit momentum.F:751-772) → 옵션 `CPRECOR` predictor-corrector(gwce.F:182 직접 재확인) | time-split 아님 — 순차 semi-implicit 결합. friction 3레벨 TK0/TK/TK2(gwce.F:2477-2482) | [[adcirc-gwce-implementation]]·[[adcirc-timestep-orchestration]]·[[adcirc-momentum-implementation]] |
+ | **Delft3D-FLOW** | **ADI 2-stage 교번**(Leendertse) | stage1(adi.f90:282, 직접 재확인): ξ방향 SUD(운동량+연속 동시 implicit, double-sweep/CG) + η방향 UZD(implicit advection·연직 diffusion) → stage2(:439) 방향 swap. transport 짝 difu 도 반스텝 `timest` 교번([[delft3d_difu_transport]] — 단 수평은 red-black Jacobi 반복) | ADI 무조건 안정 → 큰 dt | [[delft3d_adi_solver]] |
+ | **D-Flow FM** | **semi-implicit staggered FV**(Stelling-Duinmeijer 2003·Kernkamp 2011) + **Nested Newton**(Casulli-Zanolli) | `furu`(fu/ru 계수) → `s1nod`(SPD 연속행렬) → Guus solver → back-substitute u1, wetting-drying 비선형은 Newton 반복으로 양정치 보장 | 수위·barotropic implicit(θ), advection explicit | [[delft3d_dflowfm_kernel_scheme]] |
+--- a/concepts/currents/vertical-mixing-cross-model.md
++++ b/concepts/currents/vertical-mixing-cross-model.md
+@@ -43,7 +43,7 @@
+ |---|---|---|---|
+ | ROMS GLS | Dirichlet + **Charnok/Craig-Banner 옵션**(파랑 dissipation 주입) | log-wall | **있음** — 강풍 시 Charnok 미사용하면 표면 TKE 과소(노트 명시) |
+ | Delft3D | 풍응력 기반 `tkewin`(tratur.f90:942-955) | log-wall `k=U²/(s²√c_μ)`(:978-991), 조도 선택 연동 | 없음(풍 경로만) |
+-| EFDC | `q²=B₁^{2/3}·|τ_s|`(hdmt2t.f90:875-889) | `q²=B₁^{2/3}·|τ_b|` — 파랑은 wave-current 저면응력 경로(:939-964) | 표면 주입 없음(저면 응력 경유만) |
++| EFDC | `q²=B₁^{2/3}·|τ_s|`(hdmt2t.f90:879-893) | `q²=B₁^{2/3}·|τ_b|` — 파랑은 wave-current 저면응력 경로(:939-964) | 표면 주입 없음(저면 응력 경유만) |
+ | SWASH | k Neumann + ε Dirichlet(:748-772) | Dirichlet `k=u*²/√c_μ` 또는 log-law 직접해(`irough=4`, :801-816) | k-ε 주입 없음 — ★breaking 소산은 **수평** HorzVisc(`ihvisc=4`) 경로(위상해상이라 애초 별도) |
+ | ADCIRC | 미커버 | 3D BBL 응력(2D Manning 아님 — pitfall) | 없음 |
+ 
+--- a/concepts/littoral-drift/06-model-application.md
++++ b/concepts/littoral-drift/06-model-application.md
+@@ -47,7 +47,7 @@
+ |---|---|---|---|---|---|
+ | **Delft3D-FLOW + WAVE** | SWAN-기반 WAVE 가 wave force `fxw/fyw` + surface stress `wsu/wsv` 를 COM 파일로 FLOW 에 전달; roller path 가 radiation stress 계산 (`radstr.f90:304`) | FLOW 의 3D 운동량식에 wave force 주입 (`uzd.f90:668`) → alongshore current | Van Rijn 1984/2007 (bed+susp), Partheniades-Krone (점착) — `erosed.f90` | **online morphology** (Exner bed update `bott3d.f90`), MorFac 가속 | breaker zone alongshore current + bed update 직접 — surf-zone 분해 시 roller 권장 |
+ | **XBeach** | surfbeat 모드: short-wave action balance → roller → radiation-stress gradient 가 NLSWE flow 구동 (wave-group scale) | NLSWE shallow-water flow (surf-beat·infragravity 포함) | Soulsby-Van Rijn / Van Thiel-Van Rijn / Van Rijn 1993 (`sedtransform`) — skewness·asymmetry `ua` 포함 | bed update `dzg = morfac·dt/(1−por)·∇·flux` (`morphevolution.F90:737-748`) + **avalanching** (사면붕괴) | dune erosion·overwash·breaching 폭풍 사건 특화 (수일~수주); longshore 보다 cross-shore + 2DH storm impact 강점 |
+-| **EFDC** | hydrodynamic core 가 흐름 계산; wave 는 외부(SWAN) wave-current bottom shear 로 결합 (Christoffersen-Jonsson, SEDZLJ) | EFDC 자체 3D 흐름 solver (조류·바람·밀도 구동) | **SedTran-Original** (`ISTRAN(6)` cohesive `CALSED` / `ISTRAN(7)` noncohesive `CALSND`) 또는 **SEDZLJ** unified multi-bed-layer (`ssedtox.f90:868-880`) | bed-water 결합 + multi-bed-layer 동역학 | 흐름(조류)·하구 표사 주력; 순수 wave-driven longshore current 는 외부 wave coupling 의존 |
++| **EFDC** | hydrodynamic core 가 흐름 계산; wave 는 외부(SWAN) wave-current bottom shear 로 결합 (Christoffersen-Jonsson, SEDZLJ) | EFDC 자체 3D 흐름 solver (조류·바람·밀도 구동) | **SedTran-Original** (`ISTRAN(6)` cohesive `CALSED` / `ISTRAN(7)` noncohesive `CALSND`) 또는 **SEDZLJ** unified multi-bed-layer (`ssedtox.f90:863-875`) | bed-water 결합 + multi-bed-layer 동역학 | 흐름(조류)·하구 표사 주력; 순수 wave-driven longshore current 는 외부 wave coupling 의존 |
+ | **ROMS (+WEC, CSTMS)** | **WEC vortex-force** 정식 (`wec_vf.F`); SWAN coupling 시 spectral Stokes drift + wave dissipation (`mct_roms_swan.h`) | ROMS 3D primitive-equation 흐름 + WEC 가 surf-zone alongshore/rip current 구동 | CSTMS: bedload (Meyer-Peter-Müller·Soulsby-Damgaard·Van der A 2013) + suspended (tracer) — `roms_sediment.md` | active-layer bed model + Exner; COAWST(ROMS+SWAN) 통합 | regional shelf~surf zone 광역; vortex-force 로 longshore·rip current 물리 정밀 (Uchiyama et al. 2010) |
+ 
+ (각 셀의 file:line·서브루틴은 아래 §3-§6 의 canonical 노트에서 검증)
+@@ -77,7 +77,7 @@
+ > Canonical: [`efdc_sediment.md`](../../models/EFDC/source-analysis/sediment/efdc_sediment.md).
+ 
+ **단계 4-5**: 두 분기 system ([`sediment-transport/06 §2`](../sediment-transport/06-model-application.md) 와 동일 canonical):
+-- **SedTran-Original**: `ISTRAN(6)≥1` cohesive → `CALSED` (Krone-Partheniades), `ISTRAN(7)≥1` noncohesive → `CALSND` (Van Rijn 1984·Engelund-Hansen). 분기 `ssedtox.f90:868-880`.
++- **SedTran-Original**: `ISTRAN(6)≥1` cohesive → `CALSED` (Krone-Partheniades), `ISTRAN(7)≥1` noncohesive → `CALSND` (Van Rijn 1984·Engelund-Hansen). 분기 `ssedtox.f90:863-875`.
+ - **SEDZLJ**: size-class unified cohesive+noncohesive, multi-bed-layer, **Christoffersen-Jonsson wave-current shear stress**.
+ 
+ **단계 2 (파→흐름) 한계**: EFDC 의 hydrodynamic core 는 조류·바람·밀도 구동 흐름이 주력. 순수 wave-driven longshore current (radiation stress → surf-zone alongshore current) 는 **외부 SWAN wave coupling 의 wave-current bottom shear** 로만 들어온다 — Delft3D/ROMS 처럼 wave force 를 운동량식에 직접 주입하는 surf-zone radiation-stress driver 는 본 source-analysis 노트 범위에서 확인되지 않음 (source-needed). → 하구·조류 우세 표사에 강점, breaker-zone longshore drift 전용 도구로는 wave coupling 구성 필요.
+--- a/concepts/sediment-transport/06-model-application.md
++++ b/concepts/sediment-transport/06-model-application.md
+@@ -45,13 +45,13 @@
+ - **ISTRAN(7) ≥ 1**: noncohesive 활성 → `CALSND` (Van Rijn 1984, Engelund-Hansen)
+ - 별도 cohesive/noncohesive 처리, bed 모델 단순
+ 
+-Source 분기: `SedTran-Original/ssedtox.f90:868-880`
++Source 분기: `SedTran-Original/ssedtox.f90:863-875`
+ 
+ | Condition | Behavior | File:Line |
+ |---|---|---|
+-| `ISTRAN(6) >= 1 .and. LSEDZLJ` | SEDZLJ 사용 | `ssedtox.f90:868-872` |
+-| `ISTRAN(6) >= 1 .and. !LSEDZLJ` | CALSED (cohesive only) | `ssedtox.f90:872-874` |
+-| `ISTRAN(7) >= 1 .and. !LSEDZLJ` | CALSND (noncohesive only) | `ssedtox.f90:878-880` |
++| `ISTRAN(6) >= 1 .and. LSEDZLJ` | SEDZLJ 사용 | `ssedtox.f90:863-867` |
++| `ISTRAN(6) >= 1 .and. !LSEDZLJ` | CALSED (cohesive only) | `ssedtox.f90:867-869` |
++| `ISTRAN(7) >= 1 .and. !LSEDZLJ` | CALSND (noncohesive only) | `ssedtox.f90:873-875` |
+ 
+ ### 2.2 SEDZLJ (modern, unified)
+ 
+--- a/concepts/sst/06-model-application.md
++++ b/concepts/sst/06-model-application.md
+@@ -72,7 +72,7 @@
+ 
+ EFDC 의 heat budget 계산:
+ - **표층 bulk flux 4개 항** (`calheat.f90`) — **source-needed** (본 위키 calheat.f90 source-analysis 미작성; EFDC v12 는 COARE 3.6 사용, [`models/EFDC/manual-notes/efdc-theory-doc-v12.md`](../../models/EFDC/manual-notes/efdc-theory-doc-v12.md) §4.2 Ch 5.1.2 참조 — manual-notes 확인 권장)
+-- **연직 thermal transport / advection** — 수온은 EFDC 의 일반 tracer 로 연직 upwind advection (`caltran.f90:152-183`) 되며, sigma/Sigma-Zed(SGZ) 연직 격자(`KC`·`IGRIDV`)에 따라 layer thickness `HPK = HP·DZC` 로 분배됨. **verified**: [`models/EFDC/source-analysis/efdc_vertical.md`](../../models/EFDC/source-analysis/efdc_vertical.md) §A·§D (sigma layers·vertical advection). 가파른 지형에서 sigma 좌표 spurious diapycnal mixing 이 인공 성층(SST 연직 구조 왜곡)을 만들 수 있어 `IINTPG=1/2` 권장 (efdc_vertical.md §E·Working Rules).
++- **연직 thermal transport / advection** — 수온은 EFDC 의 일반 tracer 로 연직 upwind advection (`caltran.f90:152-183`) 되며, sigma/Sigma-Zed(SGZ) 연직 격자(`KC`·`IGRIDV`)에 따라 layer thickness `HPK = HP·DZC` 로 분배됨. **verified**: [`models/EFDC/source-analysis/efdc_vertical.md`](../../models/EFDC/source-analysis/efdc_vertical.md) §A·§D (sigma layers·vertical advection). 가파른 지형에서 sigma 좌표 spurious diapycnal mixing 이 인공 성층(SST 연직 구조 왜곡)을 만들 수 있다. **EFDC+ Stable 12.5 기준**으로는 `IINTPG` buoyancy shear 분기가 제거됐으며 급경사 대응은 `IGRIDV>0`(SGZ)을 사용한다. `IINTPG /= 0`은 `setbcs.f90:449`의 2-cell-wide 수로 external density gradient cell-face flag 처리를 끄는 부작용이 있다 (efdc_vertical.md §E·Working Rules).
+ - horizontal advection
+ 
+ > bulk 계수·albedo·방사율 등 EFDC 표층 heat budget 상수의 객관 인용은 `models/EFDC/manual-notes/heat-bulk-flux.md`(calheat.f90·aser.inp) 작성 시 보강 — 현재 source-needed.
+--- a/concepts/tides/06-model-application.md
++++ b/concepts/tides/06-model-application.md
+@@ -71,8 +71,8 @@
+ 
+ 검수완료 노트 [`efdc_boundary_conditions.md`](../../models/EFDC/source-analysis/efdc_boundary_conditions.md) §A·§G 가 확인하는 실제 구현:
+ 
+-- **PSER (수위 시계열)**: `NPSER >= 1`일 때 `PSER.INP` 읽음. 헤더 `ITYPE,NREC,TMULT,...`. 수위 η를 pressure-head `G·η`로 변환해 S/W/E/N 압력셀에 적용 (`input.f90:5650-5685`, `calpser.f90:25-66`, `setopenbc.f90`). `ITYPE=1`은 cross-channel slope용 2-side. → §1.2 시계열 forcing 패턴에 해당.
+-- **MTIDE 조화 합성**: `NWTSER` 심볼은 없고 `MTIDE` + periodic pressure forcing `NPFOR`로 분조 강제 (`input.f90:732-754`). C15가 `SYMBOL(M),TCP(M)`(분조명·주기)을, C17이 각 분조 진폭/위상→cos/sin 계수를 읽어 경계별 `PCB*/PSB*`(× G)로 변환. 런타임 `SETOPENBC`가 `TIMESEC`·`TCP`로 `cos/sin`을 계산해 각 경계 압력에 `PCB·cos + PSB·sin` 가산 (`setopenbc.f90:231-260`). → §1.1 분조 forcing 패턴에 해당.
++- **PSER (수위 시계열)**: `NPSER >= 1`일 때 `PSER.INP` 읽음. 헤더 `ITYPE,NREC,TMULT,...`. 수위 η를 pressure-head `G·η`로 변환해 S/W/E/N 압력셀에 적용 (`input.f90:5801-5836`, `calpser.f90:25-66`, `setopenbc.f90`). `ITYPE=1`은 cross-channel slope용 2-side. → §1.2 시계열 forcing 패턴에 해당.
++- **MTIDE 조화 합성**: `NWTSER` 심볼은 없고 `MTIDE` + periodic pressure forcing `NPFOR`로 분조 강제 (`input.f90:755-778`). C15가 `SYMBOL(M),TCP(M)`(분조명·주기)을, C17이 각 분조 진폭/위상→cos/sin 계수를 읽어 경계별 `PCB*/PSB*`(× G)로 변환. 런타임 `SETOPENBC`가 `TIMESEC`·`TCP`로 `cos/sin`을 계산해 각 경계 압력에 `PCB·cos + PSB·sin` 가산 (`setopenbc.f90:231-260`). → §1.1 분조 forcing 패턴에 해당.
+ - **총 경계 수위 = PSER 시계열 + 조화 합성** (둘 중 하나만 또는 합산 — `efdc_boundary_conditions.md` §G 결론). 조석+기상 surge 결합 시 PSER(관측) + 조화 block(잔차 처리).
+ - 위상은 **degrees**, 진폭 cm 입력 시 `RMULADJ=0.01` 필요 (노트 §G working rule).
+ 
+--- a/models/EFDC/manifest.md
++++ b/models/EFDC/manifest.md
+@@ -14,7 +14,7 @@
+ 
+ ### ★ 버전 provenance 확정 (2026-07-04)
+ 
+-- **EFDCPlus_Stable = `EFDCPlus_12.4`** (릴리스 헤더 `EFDC/aaefdc.f90:22` "RELEASE: EFDCPlus_12.4", DATE 2025-12-29; 솔루션 파일명 `EFDCPlus_MPI_12.sln` 정합). clone HEAD sha **`3ed76b6eb1263921ba99bf23b66bb85c1a5feac1`** (2026-04-02 "update readme"). 12.4 릴리스 피처(헤더 verbatim): MPI Domain Decomposition · Propeller Wash · 신 WQ kinetics(사용자 정의 algal groups+zooplankton) · 3TL 동적 timestep · GOTM · **SIGMA-Zed(SGZ)**. → **위키 EFDC source-analysis 전체 = EFDC+ 12.4 기준.**
++- **EFDCPlus_Stable = `EFDCPlus_12.5`** (릴리스 헤더 `EFDC/aaefdc.f90:22` "RELEASE: EFDCPlus_12.5", DATE 2026-05-26; 솔루션 파일명 `EFDCPlus_MPI_12.sln` 정합). clone HEAD sha **`3ed76b6eb1263921ba99bf23b66bb85c1a5feac1`** (2026-04-02 "update readme"). 12.5 릴리스 피처(헤더 verbatim): MPI Domain Decomposition · Propeller Wash · 신 WQ kinetics(사용자 정의 algal groups+zooplankton) · 3TL 동적 timestep · GOTM · **SIGMA-Zed(SGZ)**. → **위키 EFDC source-analysis 전체 = EFDC+ 12.5 기준.**
+ - **EFDC-GVC** clone HEAD sha **`68dc93fa04c48a785bbe3136e1784ceca2a7a20f`** (2021-11-10) — **repo 동결 4년+**. DSI README 공식: 레거시 테스트용 as-is 무지원, "recommends that users not use the GVC code for on-going models and make the conversion to EFDC+". → GVC 서브루틴 심층 분석 **불요 판정**(계보·구조·GVC↔SGZ 대조는 [source-analysis/efdc_gvc_legacy.md](source-analysis/efdc_gvc_legacy.md) verified 로 충분; SGZ 현행 구현은 mainline 노트 담당).
+ 
+ ## manuals/pdfs/
+--- a/models/EFDC/manual-notes/efdc-implementation-guide.md
++++ b/models/EFDC/manual-notes/efdc-implementation-guide.md
+@@ -173,10 +173,10 @@
+ 
+ > ⚠️ **v12.4 소스 드리프트 (검증 2026-07)** — 위 카드 인덱스는 R8.5.0 매뉴얼(2020)을 정확히 기술하나, EFDC+ v12.4 소스(`EFDCPlus_Stable`, 로컬 clone 직접 확인 2026-07-04)는 다음이 다르다. 상세 규약은 [[efdc-tidal-forcing-conventions-v12]] 참조.
+ >
+-> - **C2A (매뉴얼 미기재)**: v12.4는 `ISRESTI==1 .and. ICONTINUE==1`(continuation restart)일 때 `SEEK('C2A')` 후 2줄 — `Restart_In_Ver`, `RESTARTF`(restart 파일명) — 를 읽는다 (`input.f90:198-200`). 본 매뉴얼 카드 인덱스에는 C2A가 없다.
+-> - **C22B (Shellfish) 미독**: v12.4 `input.f90`의 SEEK 카드 인벤토리에 C22B가 없다 — 이 카드는 읽히지 않는다. Shellfish 설정은 대신 `READ_SHELLFISH_JSON`(JSON 파일)으로 로드 (`input.f90:3941-3943`, `SHELLFISHMOD`).
++> - **C2A (매뉴얼 미기재)**: v12.4는 `ISRESTI==1 .and. ICONTINUE==1`(continuation restart)일 때 `SEEK('C2A')` 후 2줄 — `Restart_In_Ver`, `RESTARTF`(restart 파일명) — 를 읽는다 (`input.f90:203-205`). 본 매뉴얼 카드 인덱스에는 C2A가 없다.
++> - **C22B (Shellfish) 미독**: v12.4 `input.f90`의 SEEK 카드 인벤토리에 C22B가 없다 — 이 카드는 읽히지 않는다. Shellfish 설정은 대신 `READ_SHELLFISH_JSON`(JSON 파일)으로 로드 (`input.f90:4090-4092`, `SHELLFISHMOD`).
+ > - **C67~C91B 계열 대량 미독**: v12.4가 SEEK하지 않는 카드 = **C66A/C66B, C68–C70, C73–C83, C89–C90** (drifter 초기위치·경위도 상수·ASCII dump 계열 등). SEEK 인벤토리에 살아있는 것은 C66, C67, C71/C71A/C71B, C72, C84–C88, C91/C91A/C91B/C91C 뿐 (v12.4 `input.f90` 전수 grep, 2026-07-04).
+-> - **C17 위상 규약**: 레거시 매뉴얼류의 "phase relative to time origin of TBEGIN" 서술과 달리, v12.4는 **절대 시간** `TIMESEC`로 합성한다: `hdmt.f90:89` `TIMESEC = TCON·TBEGIN` → `setopenbc.f90:232` `TN = TIMESEC` → η = PFAM·cos(2π(TIMESEC−PFPH)/TCP) (`input.f90:913-915` CPFAM0/SPFAM0 변환). 즉 PFPH는 **TCP와 같은 시간 단위(초)의 lag**이고 `PFPH = [TCON·TBEGIN + TCP·(G−(V0+u))/360] mod TCP`로 만들어야 한다. 도(°) 단위 위상을 그대로 넣으면 안 된다.
++> - **C17 위상 규약**: 레거시 매뉴얼류의 "phase relative to time origin of TBEGIN" 서술과 달리, v12.4는 **절대 시간** `TIMESEC`로 합성한다: `hdmt.f90:89` `TIMESEC = TCON·TBEGIN` → `setopenbc.f90:232` `TN = TIMESEC` → η = PFAM·cos(2π(TIMESEC−PFPH)/TCP) (`input.f90:944-946` CPFAM0/SPFAM0 변환). 즉 PFPH는 **TCP와 같은 시간 단위(초)의 lag**이고 `PFPH = [TCON·TBEGIN + TCP·(G−(V0+u))/360] mod TCP`로 만들어야 한다. 도(°) 단위 위상을 그대로 넣으면 안 된다.
+ 
+ ### 6.3 핵심 카드 상세 (verbatim 옵션·기본값)
+ 
+@@ -184,19 +184,19 @@
+ 
+ **C3 External mode solver** (p.17): `RP`(over-relaxation), `RSQM`(목표 square residual), `ITERM`(최대 반복), `IRVEC`(0=conjugate gradient 무 scaling, 9=min diagonal scale, 99=normal form scale), `IWDRAG`(0=원 EFDC wind drag, 1=상대 수면속도 보정, 2=**Hersbach 2011 ECMWF**, 3=**simplified COARE 3.6** neutral+상대속도), `IDRYCK`(drying check당 반복, 2≤IDRYCK≤20), `FILT3TL`(3TL explicit filter 계수, `0.0625`).
+ 
+-> ⚠️ **v12.4 소스 드리프트 (검증 2026-07)**: v12.4의 C3 read 목록은 `RP, RSQM, ITERM, IRVEC, IATMP, IWDRAG, ITERHPM, ldum, ISDSOLV, tmp` (`input.f90:225`) — 매뉴얼의 **`IDRYCK`·`FILT3TL` 식별자는 v12.4 소스 어디에도 존재하지 않는다** (전 `.f90` grep 0건, 2026-07-04). 해당 슬롯은 `ITERHPM`/`ldum`/`ISDSOLV`/`tmp`로 대체. 또한 `IRVEC`은 **0 또는 9만 허용** — 99를 넣으면 `STOPP('INVALID IRVEC')`로 즉시 정지한다 (`input.f90:237`).
++> ⚠️ **v12.4 소스 드리프트 (검증 2026-07)**: v12.4의 C3 read 목록은 `RP, RSQM, ITERM, IRVEC, IATMP, IWDRAG, ITERHPM, ldum, ISDSOLV, tmp` (`input.f90:230`) — 매뉴얼의 **`IDRYCK`·`FILT3TL` 식별자는 v12.4 소스 어디에도 존재하지 않는다** (전 `.f90` grep 0건, 2026-07-04). 해당 슬롯은 `ITERHPM`/`ldum`/`ISDSOLV`/`tmp`로 대체. 또한 `IRVEC`은 **0 또는 9만 허용** — 99를 넣으면 `STOPP('INVALID IRVEC')`로 즉시 정지한다 (`input.f90:242`).
+ 
+-**C5 운동량 advection·misc** (p.18): `ISCDMA`(1=central diff momentum advection 3TL, 0=upwind), `ISHDMF`(1=수평 운동량 확산, 2=+water column), `ISDRY`(0=W&D 없음, 11=상수 drying depth HDRY+비선형반복, 99=가변 W&D depth cell-face masking), `ISRLID`(1=rigid lid 모드, 자유표면 없음), `ISVEG`(1=식생 저항, 2=+CBOT.LOG 진단), `IINTPG`(0=원 internal pressure gradient, 1=Jacobian, 2=finite volume).
++**C5 운동량 advection·misc** (p.18): `ISCDMA`(1=central diff momentum advection 3TL, 0=upwind), `ISHDMF`(1=수평 운동량 확산, 2=+water column), `ISDRY`(0=W&D 없음, 11=상수 drying depth HDRY+비선형반복, 99=가변 W&D depth cell-face masking), `ISRLID`(1=rigid lid 모드, 자유표면 없음), `ISVEG`(1=식생 저항, 2=+CBOT.LOG 진단), `IINTPG`(0=원 internal pressure gradient, 1=Jacobian, 2=finite volume). v12.5 C5 read에서는 `ISDISP` 슬롯을 `ldum`으로, `ISQQ` 슬롯을 `ICALTB`로 읽고, 13번째 필드 `ISHDMFILTER`를 읽는다. `IINTPG` 입력 필드는 유지된다 (`input.f90:269`).
+ 
+ **C6 constituent transport** (p.18): index 매핑 — turb intensity=0, SAL=1, TEM=2, DYE=3, SFL=4, TOX=5, SED=6, SND=7, CWQ=8. `ISTRAN`(≥1 transport 활성), `ISCDCA`(0=donor cell upwind 3TL, 1=central diff 3TL), `ISADAC`(1=anti-numerical diffusion 보정), `ISFCT`(1=flux limiting 추가).
+ 
+-> ⚠️ **v12.4 소스 드리프트 (검증 2026-07)**: v12.4의 C6 read는 `ISTRAN(NS), ISTOPT(NS), ldum, ISADAC(NS), ISFCT(NS), ldum, ldum, ldum, ISCI(NS), ISCO(NS)` (`input.f90:306`) — **3·6·7·8번째 슬롯은 더미(`ldum`)로 읽고 버린다**. 즉 매뉴얼이 3번째 슬롯에 문서화한 `ISCDCA` 등은 v12.4에서 **무시**된다 (자리는 유지해야 파싱이 맞음).
++> ⚠️ **v12.5 소스 드리프트**: v12.5의 C6 read는 `ISTRAN(NS), ISTOPT(NS), ISQUICK, ISADAC(NS), ISFCT(NS), ldum, ldum, ldum, ISCI(NS), ISCO(NS)` (`input.f90:311`) — **3번째 슬롯은 scalar `ISQUICK`**, **6·7·8번째 슬롯은 더미(`ldum`)로 읽고 버린다**. `ISQUICK`은 broadcast되며 (`input.f90:316`), 0/1 외 값은 경고 후 0으로 리셋된다 (`input.f90:318-325`).
+ 
+ **C7 시간 정수** (p.19): `NTC`(reference time period 수), `NTSPTC`(reference period당 time step 수), `NTSTBC`(2TL trapezoidal 보정 step 간격, =mass balance print 간격), `NDRYSTP`(>0 시 isolated cell이 dry로 강제되기까지 step 수, 손실수는 QDWASTE 추적), `NRAMPUP`(dynamic time-stepping 시 step 고정 초기 loop 수).
+ 
+ **C8 시간 실수** (p.19): `TCON`(TBEGIN→초 변환 배수), `TBEGIN`(run 시간 원점), `TREF`(reference 주기 sec, 예 44714.16s 또는 86400s), `CORIOLIS`(=2*7.29E-5*SIN(LAT)), `DTSSFAC`(>0이면 dynamic time-stepping), `DTMAX`(dynamic stepping 최대 step 초).
+ 
+-> ⚠️ **v12.4 소스 드리프트 (검증 2026-07)**: v12.4의 C8 read는 `TCON, TBEGIN, TIDALP, CF, ISCORV, ISDCCA, ISCFL, ISCFLM, DTSSFAC, DTSSDHDT, DTMAX` (`input.f90:387`) — 매뉴얼의 `TREF`/`CORIOLIS`는 v12.4에서 **`TIDALP`/`CF`라는 이름**으로 같은 슬롯에 읽힌다 (의미 동일: reference 주기 / Coriolis 상수). 이름만 다르고 자리는 같으므로 파일 호환은 유지.
++> ⚠️ **v12.4 소스 드리프트 (검증 2026-07)**: v12.4의 C8 read는 `TCON, TBEGIN, TIDALP, CF, ISCORV, ISDCCA, ISCFL, ISCFLM, DTSSFAC, DTSSDHDT, DTMAX` (`input.f90:404`) — 매뉴얼의 `TREF`/`CORIOLIS`는 v12.4에서 **`TIDALP`/`CF`라는 이름**으로 같은 슬롯에 읽힌다 (의미 동일: reference 주기 / Coriolis 상수). 이름만 다르고 자리는 같으므로 파일 호환은 유지.
+ 
+ **C9 공간** (p.20): `IC`(I방향 셀 수), `JC`(J방향 셀 수), `LC`(활성 수평셀 수+2), `LVC`(가변크기 수평셀 수), `ISCO`(1=곡선직교 그리드, LVC=LC-2), `NDM`(수평 domain decomposition 수, 단일 프로세서=1), `ISMASK`(1=mask.inp로 셀 land 마스킹/thin barrier), `ISCONNECT`(1=N-S, 2=E-W, 3=양방향 셀 연결).
+ 
+@@ -208,7 +208,7 @@
+ 
+ **C12A 난류폐쇄 옵션** (p.21–22): `ISSTAB`(0=Galperin et al. 안정함수 in CALAVBOLD …). 데이터라인 `C12A ISSTAB ISSQL ISAVBMX ISFAVB ISINWV ISLLIM IFPROX XYRATIO`.
+ 
+-> ⚠️ **v12.4 소스 드리프트 (검증 2026-07)**: v12.4의 C12A 첫 슬롯은 `ISSTAB`이 아니라 **`ISTOPT(0)`** (난류 폐쇄 옵션 배열의 0번 원소)로 읽힌다: `read ... ISTOPT(0), ISSQL, ISAVBMX, ISFAVB, ISINWV, ISLLIM, IFPROX, XYRATIO, BC_EDGEFACTOR` (`input.f90:646`). `ISSTAB` 식별자는 v12.4 소스에 없고, 마지막에 `BC_EDGEFACTOR` 슬롯이 추가되어 9개 값을 읽는다.
++> ⚠️ **v12.4 소스 드리프트 (검증 2026-07)**: v12.4의 C12A 첫 슬롯은 `ISSTAB`이 아니라 **`ISTOPT(0)`** (난류 폐쇄 옵션 배열의 0번 원소)로 읽힌다: `read ... ISTOPT(0), ISSQL, ISAVBMX, ISFAVB, ISINWV, ISLLIM, IFPROX, XYRATIO, BC_EDGEFACTOR` (`input.f90:669`). `ISSTAB` 식별자는 v12.4 소스에 없고, 마지막에 `BC_EDGEFACTOR` 슬롯이 추가되어 9개 값을 읽는다.
+ 
+ **C14 forcing·subgrid channel** (p.22): `MTIDE`, `NWSER`(wind series 수), `NASER`(대기 series 수), `ISGWIT`(지하수), `ISCHAN`(subgrid channel), `ISWAVE`(1=boundary layer 영향만 WAVEBL.INP, …).
+ 
+@@ -254,7 +254,7 @@
+ | Temperature | `TEMP.INP`(IC), `TSER.INP`(BC), `ASER.INP`(대기), `ATMMAP.INP`(NASER>1), `PSHADE.INP`(shading), `SVHTFACT.INP`(ISVHEAT>0 표면열교환), `TEMB.INP`(bed temp) (p.73) |
+ | Ice | `ISER.INP`(ISICE=1), `ICEMAP.INP`(NISER>1), `ISTAT.INP`(ISICE=2), `ICE.INP`(ISICE>2 heat-coupled) (p.73) |
+ 
+-> ⚠️ **v12.4 소스 드리프트 (검증 2026-07)** — `WSER.INP`의 `ISWDINT`: DSI 블로그·wser 헤더는 `ISWDINT=2`를 "동/북 속도 성분 입력"으로 기술하나, v12.4 런타임(`caltsxy.f90:244-251`, TSWND의 유일한 런타임 소비처)은 **항상 1열=풍속, 2열=풍향(불어가는 쪽 나침반 방위, `DEGM=90−방향`으로 수학각 변환)** 으로 해석한다. `ISWDINT=2`의 read 처리는 두 열에 `WINDSCT` 배율만 곱할 뿐이어서 (`input.f90:6934-6939`) **성분 입력은 v12.4에서 조용히 오독된다**. 실재하는 옵션은 `ISWDINT=0`(불어가는 방향) / `=1`(불어오는 방향 — read 시 180° 반전, `input.f90:6923-6933`)뿐. 상세: [[efdc-tidal-forcing-conventions-v12]] §5.
++> ⚠️ **v12.4 소스 드리프트 (검증 2026-07)** — `WSER.INP`의 `ISWDINT`: DSI 블로그·wser 헤더는 `ISWDINT=2`를 "동/북 속도 성분 입력"으로 기술하나, v12.4 런타임(`caltsxy.f90:243-250`, TSWND의 유일한 런타임 소비처)은 **항상 1열=풍속, 2열=풍향(불어가는 쪽 나침반 방위, `DEGM=90−방향`으로 수학각 변환)** 으로 해석한다. `ISWDINT=2`의 read 처리는 두 열에 `WINDSCT` 배율만 곱할 뿐이어서 (`input.f90:7086-7091`) **성분 입력은 v12.4에서 조용히 오독된다**. 실재하는 옵션은 `ISWDINT=0`(불어가는 방향) / `=1`(불어오는 방향 — read 시 180° 반전, `input.f90:7075-7085`)뿐. 상세: [[efdc-tidal-forcing-conventions-v12]] §5.
+ 
+ ## 9. 출력 파일 + GetEFDC (§1.4, p.73–76)
+ 
+--- a/models/EFDC/manual-notes/efdc-sediment-theory-2003.md
++++ b/models/EFDC/manual-notes/efdc-sediment-theory-2003.md
+@@ -180,7 +180,7 @@
+ - [[efdc-manuals-overview]] — 6 manuals 인덱스
+ - [[efdc-theory-doc-v12]] — DSI 2024 modernized theory
+ - [`concepts/sediment-transport/02-theory.md`](../../../concepts/sediment-transport/02-theory.md) — 일반 표사 이론 (cross-reference, 본 doc 식의 도메인 컨텍스트)
+-- [`concepts/sediment-transport/06-model-application.md`](../../../concepts/sediment-transport/06-model-application.md) — EFDC SedTran/SEDZLJ dispatch (ssedtox.f90:868-880)
++- [`concepts/sediment-transport/06-model-application.md`](../../../concepts/sediment-transport/06-model-application.md) — EFDC SedTran/SEDZLJ dispatch (ssedtox.f90:863-875)
+ - [`models/EFDC/source-analysis/efdc_sediment.md`](../source-analysis/sediment/efdc_sediment.md) — codex source-code 직접 분석
+ - `textbook/sources.yml` 의 `efdc-sed-trans-2003` source_id
+ - 외부: Krone (1962), Partheniades (1965) — 본 doc §7 의 cohesive sediment legacy paper
+--- a/models/EFDC/manual-notes/efdc-theory-doc-v12.md
++++ b/models/EFDC/manual-notes/efdc-theory-doc-v12.md
+@@ -184,7 +184,7 @@
+ | Bed Armoring (§6.4.6) | — | active layer + dynamic armoring |
+ | 활용 | legacy·교과서 비교 | modern operational |
+ 
+-source-code dispatch — [`models/EFDC/source-analysis/efdc_sediment.md`](../source-analysis/sediment/efdc_sediment.md) `ssedtox.f90:868-880`.
++source-code dispatch — [`models/EFDC/source-analysis/efdc_sediment.md`](../source-analysis/sediment/efdc_sediment.md) `ssedtox.f90:863-875`.
+ 
+ ### 4.4 Ch 7 CHEMICAL FATE (p.110+)
+ 
+--- a/models/EFDC/manual-notes/efdc-theory-v12-ch5-temperature-heat.md
++++ b/models/EFDC/manual-notes/efdc-theory-v12-ch5-temperature-heat.md
+@@ -61,7 +61,7 @@
+ 
+ $e_s$ = 수면온도 포화증기압, $e_a$ = 실제증기압 (mb), $P_a$ = 대기압, $c_e,c_h$ = turbulent exchange coeff, $W_s$ = 풍속. **소스 근거**: mod_heat.f90:60-61 주석 "The heat flux terms are derived from a paper by Rosati and Miyakoda (1988) 'A General Circulation Model for Upper Ocean'". full heat balance (non-legacy) 는 ice 모듈과 완전 연동 (p.61).
+ 
+-> ⚠ **disclosed-gap (cloud sign, code≠manual, 2026-07-04)**: 소스 [`mod_heat.f90:648`](../source-analysis/efdc_heat_temperature.md)([[efdc_heat_temperature]] §1.1)는 구름인자를 **`(1-0.8·CLOUDT)`** 로 구현하나, 위 Eq 5.2 인쇄본은 `(1+B_cC)`. 구름↑ → 순 장파 냉각↓ 가 물리적으로 옳으므로 **소스 `(1-0.8C)` 가 표준(Rosati-Miyakoda 1988 원형)**, 매뉴얼 `(1+B_cC)` 는 부호 오식으로 판단(`1-B_cC` 여야 함). 실행값은 소스 기준.
++> ⚠ **disclosed-gap (cloud sign, code≠manual, 2026-07-04)**: 소스 [`mod_heat.f90:646`](../source-analysis/efdc_heat_temperature.md)([[efdc_heat_temperature]] §1.1)는 구름인자를 **`(1-0.8·CLOUDT)`** 로 구현하나, 위 Eq 5.2 인쇄본은 `(1+B_cC)`. 구름↑ → 순 장파 냉각↓ 가 물리적으로 옳으므로 **소스 `(1-0.8C)` 가 표준(Rosati-Miyakoda 1988 원형)**, 매뉴얼 `(1+B_cC)` 는 부호 오식으로 판단(`1-B_cC` 여야 함). 실행값은 소스 기준.
+ 
+ ### 1.2 §5.1.2 COARE 3.6 Bulk Algorithm (p.61) — EFDC+ 12.1부터 신규
+ 
+@@ -78,7 +78,7 @@
+ 
+ $$z_0 = \frac{\alpha u_*^2}{g} + \frac{0.11\nu}{u_*} \quad (5.8)$$
+ 
+-$u_*$ = friction velocity, $\nu$ = kinematic viscosity. **소스**: mod_heat.f90:691 `ISTOPT(2)==2 → COARE 3.6`, 입력변환 :704-737 (CDCOARE·EVACOARE evap rate m/s).
++$u_*$ = friction velocity, $\nu$ = kinematic viscosity. **소스**: mod_heat.f90:689 `ISTOPT(2)==2 → COARE 3.6`, 입력변환 :704-737 (CDCOARE·EVACOARE evap rate m/s).
+ 
+ ### 1.3 §5.1.3 Equilibrium Temperature (p.62) — CE-QUAL-W2 (Wells-Cole 2000) / Brady 1969
+ 
+@@ -178,7 +178,7 @@
+ 
+ $$T_f = \begin{cases} -0.0545\,TDS, & TDS<35\ ppt \\ -0.3146-0.0417\,TDS-0.000166\,TDS^2, & TDS>35\ ppt \end{cases} \quad (5.26)$$
+ 
+-**소스 정합 확인** (mod_heat.f90:1180-1184): `SAL<35 → TF=-0.0545*SAL`, `else TF=-0.31462-0.04177*SAL-0.000166*SAL*SAL`. (매뉴얼 반올림형 -0.3146/-0.0417 vs 소스 -0.31462/-0.04177 — 동일식.) `ISTRAN(1)==0` (염분 미모의) 시 `TF=0`.
++**소스 정합 확인** (mod_heat.f90:1178-1182): `SAL<35 → TF=-0.0545*SAL`, `else TF=-0.31462-0.04177*SAL-0.000166*SAL*SAL`. (매뉴얼 반올림형 -0.3146/-0.0417 vs 소스 -0.31462/-0.04177 — 동일식.) `ISTRAN(1)==0` (염분 미모의) 시 `TF=0`.
+ 
+ ### 4.4 §5.4.4–5.4.6 Ice Melt / Growth (p.69)
+ 
+--- a/models/EFDC/manual-notes/efdc-user-manual-r850.md
++++ b/models/EFDC/manual-notes/efdc-user-manual-r850.md
+@@ -100,16 +100,16 @@
+ 
+ > ⚠️ **v12.4 소스 드리프트 (검증 2026-07)**: 이 매뉴얼(R8.5.0, 2021)의 §1.3.1 입력 카드 기술은 EFDC+ **v12.4 소스와 다수 항목에서 어긋난다** — 매뉴얼을 액면 그대로 믿지 말 것. v12.4 `EFDCPlus_Stable` 소스 직접 확인(2026-07-04) 결과 요지:
+ >
+-> - **C3**: `IDRYCK`·`FILT3TL` 식별자는 v12.4에 존재하지 않음. 실제 read = `RP RSQM ITERM IRVEC IATMP IWDRAG ITERHPM ldum ISDSOLV tmp` (`input.f90:225`). `IRVEC`은 0/9만 허용, 99는 `STOPP` (`input.f90:237`).
+-> - **C6**: 3·6·7·8번째 슬롯(`ISCDCA` 등)은 `ldum` 더미로 버려짐 (`input.f90:306`).
+-> - **C8**: `TREF`/`CORIOLIS` → v12.4 이름 `TIDALP`/`CF`, 같은 슬롯 (`input.f90:387`).
+-> - **C12A**: 첫 슬롯 `ISSTAB` → v12.4 `ISTOPT(0)` + 9번째 `BC_EDGEFACTOR` 추가 (`input.f90:646`).
+-> - **C2A**: 매뉴얼 미기재이나 v12.4는 continuation restart(`ISRESTI==1 && ICONTINUE==1`) 시 `Restart_In_Ver`·`RESTARTF` 2줄을 읽음 (`input.f90:198-200`).
+-> - **C22B(Shellfish)**: v12.4는 SEEK하지 않음(미독) — JSON(`READ_SHELLFISH_JSON`)으로 대체 (`input.f90:3941-3943`).
++> - **C3**: `IDRYCK`·`FILT3TL` 식별자는 v12.4에 존재하지 않음. 실제 read = `RP RSQM ITERM IRVEC IATMP IWDRAG ITERHPM ldum ISDSOLV tmp` (`input.f90:230`). `IRVEC`은 0/9만 허용, 99는 `STOPP` (`input.f90:242`).
++> - **C6**: 매뉴얼 r850 기준의 3번째 슬롯은 `ISCDCA`; 위 v12.4 소스 드리프트에서는 3·6·7·8번째 슬롯(`ISCDCA` 등)이 `ldum` 더미로 버려졌다. **v12.5 델타**: 3번째 슬롯은 scalar `ISQUICK`이고 6·7·8번째 슬롯은 계속 `ldum`이다 (`input.f90:311`). `ISQUICK`은 broadcast되며 (`input.f90:316`), 0/1 외 값은 경고 후 0으로 리셋된다 (`input.f90:318-325`).
++> - **C8**: `TREF`/`CORIOLIS` → v12.4 이름 `TIDALP`/`CF`, 같은 슬롯 (`input.f90:404`).
++> - **C12A**: 첫 슬롯 `ISSTAB` → v12.4 `ISTOPT(0)` + 9번째 `BC_EDGEFACTOR` 추가 (`input.f90:669`).
++> - **C2A**: 매뉴얼 미기재이나 v12.4는 continuation restart(`ISRESTI==1 && ICONTINUE==1`) 시 `Restart_In_Ver`·`RESTARTF` 2줄을 읽음 (`input.f90:203-205`).
++> - **C22B(Shellfish)**: v12.4는 SEEK하지 않음(미독) — JSON(`READ_SHELLFISH_JSON`)으로 대체 (`input.f90:4090-4092`).
+ > - **C66A/B·C68–C70·C73–C83·C89–C90**: v12.4가 SEEK하지 않음(미독). C66·C67·C71/A/B·C72·C84–C88·C91/A/B/C만 잔존.
+ > - **mask.inp MTYPE**: v12.4는 1=U, 2=V, 3=U+V, **4=isolated waters(네 면)** (`cellmask.f90:50-66`).
+ > - **C17 조석 위상**: 절대 `TIMESEC` 기준 합성(η=PFAM·cos(2π(TIMESEC−PFPH)/TCP)), PFPH는 초 단위 lag. nodal 보정 내장 없음.
+-> - **wser `ISWDINT=2`(성분 입력)**: 런타임은 항상 풍속/풍향으로 해석 — 성분 입력은 오독됨 (`caltsxy.f90:244-251`).
++> - **wser `ISWDINT=2`(성분 입력)**: 런타임은 항상 풍속/풍향으로 해석 — 성분 입력은 오독됨 (`caltsxy.f90:243-250`).
+ >
+ > 카드별 상세 주석: [[efdc-implementation-guide]] §6.3의 ⚠️ 블록들. 조석·바람 강제력 규약(위상 페어링·nodal fallback 포함): [[efdc-tidal-forcing-conventions-v12]].
+ 
+--- a/models/EFDC/source-analysis/efdc-tidal-forcing-conventions-v12.md
++++ b/models/EFDC/source-analysis/efdc-tidal-forcing-conventions-v12.md
+@@ -24,8 +24,8 @@
+ 
+ 읽기 → 변환 → 런타임 합성:
+ 
+-1. **읽기**: `SEEK('C17')` 후 성분(MTIDE)×경계(NPFOR)별 `PFAM(NP,M), PFPH(NP,M)` (`input.f90:903` 부근, NPFORT 분기별).
+-2. **cos/sin 변환**: `RAD = 2π·PFPH/TCP(M)` → `CPFAM0 = PFAM·cos(RAD)`, `SPFAM0 = PFAM·sin(RAD)` (`input.f90:913-915`, NPFORT≥1 분기; NPFORT=0은 S/W/E/N 경계 카드 처리에서 동일 변환 후 ×G로 `PCB*/PSB*` 생성, `input.f90:980-1005` 등 — [[efdc_boundary_conditions]] §G).
++1. **읽기**: `SEEK('C17')` 후 성분(MTIDE)×경계(NPFOR)별 `PFAM(NP,M), PFPH(NP,M)` (`input.f90:936` 부근, NPFORT 분기별).
++2. **cos/sin 변환**: `RAD = 2π·PFPH/TCP(M)` → `CPFAM0 = PFAM·cos(RAD)`, `SPFAM0 = PFAM·sin(RAD)` (`input.f90:944-946`, NPFORT≥1 분기; NPFORT=0은 S/W/E/N 경계 카드 처리에서 동일 변환 후 ×G로 `PCB*/PSB*` 생성, `input.f90:1021-1044` 등 — [[efdc_boundary_conditions]] §G).
+ 3. **런타임 합성**: `hdmt.f90:89` `TIMESEC = DBLE(TCON)·DBLE(TBEGIN)`(런 시작 시 **절대 시간**으로 초기화) → `setopenbc.f90:232` `TN = TIMESEC`, `:234-237` `CCCOS/SSSIN = cos/sin(2π·mod(TN,TCP)/TCP)` → `:255-260`(남측; 서/동/북 동형) `FP += PCB·cos + PSB·sin`.
+ 
+ cos·cos + sin·sin 합성 항등식으로 정리하면:
+@@ -76,19 +76,19 @@
+ 
+ ## 5. wser 바람 규약 (ISWDINT)
+ 
+-`wser.inp` 헤더의 `ISWDINT` (`input.f90:6903` read):
++`wser.inp` 헤더의 `ISWDINT` (`input.f90:7055` read):
+ 
+ | ISWDINT | 문서상 의미 | v12.4 실제 동작 |
+ |---|---|---|
+-| 0 | 풍속+풍향(불어**가는** 방향) | read: 1열에 `WINDSCT` 배율 (`input.f90:6918-6922`). 런타임 그대로 소비 |
+-| 1 | 풍속+풍향(불어**오는** 방향) | read 시 2열 180° 반전 (`input.f90:6923-6933`) → 이후 0과 동일 |
+-| 2 | 동/북 **속도 성분** (DSI 블로그·wser 헤더 서술) | read는 두 열에 배율만 곱함 (`input.f90:6934-6939`) — **성분→풍속/풍향 변환 없음** |
++| 0 | 풍속+풍향(불어**가는** 방향) | read: 1열에 `WINDSCT` 배율 (`input.f90:7070-7074`). 런타임 그대로 소비 |
++| 1 | 풍속+풍향(불어**오는** 방향) | read 시 2열 180° 반전 (`input.f90:7075-7085`) → 이후 0과 동일 |
++| 2 | 동/북 **속도 성분** (DSI 블로그·wser 헤더 서술) | read는 두 열에 배율만 곱함 (`input.f90:7086-7091`) — **성분→풍속/풍향 변환 없음** |
+ 
+-런타임 유일 소비처 `caltsxy.f90:244-251`(TSWND 사용처는 `caltsxy.f90` 외에 read/선언뿐)은 **무조건** 1열=풍속, 2열=풍향으로 해석한다: `DEGM = 90 − VAL(:,2)`(나침반 방위→수학각), `WINDE = 풍속·cos(DEGM)`, `WINDN = 풍속·sin(DEGM)`. 따라서:
++런타임 유일 소비처 `caltsxy.f90:243-250`(TSWND 사용처는 `caltsxy.f90` 외에 read/선언뿐)은 **무조건** 1열=풍속, 2열=풍향으로 해석한다: `DEGM = 90 − VAL(:,2)`(나침반 방위→수학각), `WINDE = 풍속·cos(DEGM)`, `WINDN = 풍속·sin(DEGM)`. 따라서:
+ 
+ - **`ISWDINT=2`로 성분(E/N)을 넣으면 v12.4는 조용히 오독한다** — E성분을 풍속으로, N성분을 방위각으로 읽음. 사용 금지.
+ - 실재 옵션은 0(toward)/1(from)뿐. 내부 표준은 "불어가는 방향" 나침반 방위 + 풍속.
+-- 참고: 풍속은 이후 `WINDH` 측정고도에서 2 m 로그 변환(`caltsxy.f90:253-255` 부근, z0=0.003 open grassland).
++- 참고: 풍속은 이후 `WINDH` 측정고도에서 2 m 로그 변환(`caltsxy.f90:252-254` 부근, z0=0.003 open grassland).
+ 
+ ## 6. 참조 구현 (레퍼런스)
+ 
+--- a/models/EFDC/source-analysis/efdc_baroclinic_eos.md
++++ b/models/EFDC/source-analysis/efdc_baroclinic_eos.md
+@@ -18,7 +18,7 @@
+ # EFDC+ 밀도 EOS + baroclinic 압력구배 — `calbuoy.f90` + `calebi.f90`
+ 
+ > 소스: [`calbuoy.f90`](../raw/source_code/EFDCPlus_Stable/EFDC/calbuoy.f90)(248, 밀도·부력) + [`calebi.f90`](../raw/source_code/EFDCPlus_Stable/EFDC/calebi.f90)(538, 외부모드 buoyancy 적분). 소비처 `calpuv9c.f90`(FPGXE/FPGYE)·`calexp.f90`(FBBX/FBBY).
+-> **정체**: 염분·수온 → 밀도(EOS) → 부력 → baroclinic 압력구배 → 밀도류. [[efdc_hydro_core]]:70-71 이 2줄 스케치(CALBUOY/CALEBI 이름+B=(ρ/ρ₀)-1)만 남긴 갭. EOS 다항식·ρ₀ baseline·SGZ face 적분·IINTPG 3형식·내부모드 shear 미문서.
++> **정체**: 염분·수온 → 밀도(EOS) → 부력 → baroclinic 압력구배 → 밀도류. [[efdc_hydro_core]]:70-71 이 2줄 스케치(CALBUOY/CALEBI 이름+B=(ρ/ρ₀)-1)만 남긴 갭. EOS 다항식·ρ₀ baseline·SGZ face 적분·buoyancy shear 분기(v12.5 `IGRIDV` 기준, `IINTPG`는 legacy 입력)·내부모드 shear 미문서.
+ 
+ ## 1. `calbuoy.f90` — 밀도 EOS (Mellor 1991 ≈ UNESCO)
+ 
+@@ -72,22 +72,22 @@
+ ```
+ 3-항 분해 = 수심구배 + 부력 shear + 저면경사(sigma) 보정. 결과 → 외부모멘텀 `FUHDYE/FVHDXE`(:256-257).
+ 
+-## 4. 내부모드 buoyancy shear FBBX/FBBY (calexp.f90:1162-1352)
++## 4. 내부모드 buoyancy shear FBBX/FBBY (calexp.f90:1162-1295)
+ 
+-`BSC>1.E-6 .and. KC>1` 게이트(:1167). **IINTPG 3 sigma-구배 형식** (steep bathymetry sigma 압력구배오차 억제):
++`BSC>1.E-6 .and. KC>1` 게이트(:1167). **EFDC+ Stable 12.5의 buoyancy shear 분기축은 IGRIDV**:
+ ```
+-IINTPG==0 : STANDARD      (:1207)
+-IINTPG==1 : JACOBIAN      (:1225)
+-IINTPG==2 : FINITE VOLUME (:1265)
++IGRIDV==1 : SIGMA-ZED      (:1169)
++IGRIDV>1  : SIGMA-ZED      (:1187)
++else      : STANDARD-SIGMA (:1206-1207)
+ ```
+-+ Sigma-Z 전용 분기 `IGRIDV==1`/`>1`(:1169,1187-1204).
++`IINTPG`는 입력으로 계속 읽히지만 (`input.f90:269`) buoyancy shear 분기에는 더 이상 쓰이지 않는다. `calexp2t.f90`(2TL)에서도 `IINTPG` 출현은 4→0으로 제거됐다 (`calexp2t.f90:1246-1305`). 유일한 동작 소비처는 `setbcs.f90:449`의 `if( IINTPG == 0 )` — 2-cell-wide 수로의 external density gradient cell-face flag 처리이며, `IINTPG /= 0`은 이 처리를 끈다.
+ 
+ ## 5. 주요 findings
+ - **surface EOS**: 압력 다항식 미포함(P=0) → 압축률 생략, "UNESCO EOS" 아니라 Mellor 절단근사.
+ - **IBSC==1 미문서 선형 진단**(B=0.00075·SAL, :50) — EOS 전체 우회.
+ - **ρ₀ 동결**: 참조온도 TEMO 단일 스칼라, N≤5 만 계산 → 전역 Boussinesq baseline.
+ - **유사-밀도 결합**: 부유사 loading 이 "water density" 에 이미 포함(:234-237).
+-- **IINTPG 0/1/2** 3형식 sigma-구배 — 매뉴얼은 통상 1문장 압축.
++- **EFDC+ Stable 12.5 기준**: `IINTPG` buoyancy shear 분기는 제거됐고 급경사 대응은 `IGRIDV>0`(SGZ)이다. `IINTPG /= 0`은 `setbcs.f90:449`의 2-cell-wide 수로 external density gradient cell-face flag 처리를 끈다.
+ - **인용 누락**: calbuoy/calebi 는 Hamrick 1992·Blumberg-Mellor 1987(POM)·Fofonoff-Millard 1983(UNESCO) 직접 미인용(sigma baroclinic split·이중 buoyancy 적분이 canonical Hamrick/BM 구성임에도) — change-log 는 Paul Craig/DSI 만.
+ 
+ ## 6. 관련
+--- a/models/EFDC/source-analysis/efdc_boundary_conditions.md
++++ b/models/EFDC/source-analysis/efdc_boundary_conditions.md
+@@ -16,9 +16,9 @@
+ 
+ ## Source basis
+ 
+-- `input.f90:264, 548, 732-754, 852-867, 870-1321, 1352-1378, 2721-2995, 3656-3705, 5650-5685, 5717-5755, 5858-6277` — input cards C5, C11, C14–C24, time series headers.
++- `input.f90:269, 570, 755-778, 884-901, 903-1395, 1445-1470, 2818-3092, 3753-3781, 5801-5836, 5868-5906, 6009-6428` — input cards C5, C11, C14–C24, time series headers.
+ - `calpser.f90:25-66` — runtime PSER interpolation.
+-- `setbcs.f90:203-490` — initialization of BC mappings + face/momentum mask setup.
++- `setbcs.f90:203-492` — initialization of BC mappings + face/momentum mask setup.
+ - `setopenbc.f90:231-620` — runtime pressure BC application (S/W/E/N), `LOPENBCDRY`.
+ - `Transport/calcser.f90`, `Transport/calqvs.f90`, `Transport/calfqc.f90` — concentration/flow series interpolation and injection.
+ - `subchan.f90`, `mod_chanbc.f90` — subgrid channel.
+@@ -33,7 +33,7 @@
+ | `0` | `(t, η)` | Single-side elevation series |
+ | `1` | `(t, η_primary, η_secondary)` + secondary adjustment | Cross-channel slope, two-side coupling |
+ 
+-Conversion to pressure-head: `G * η` units (`input.f90:5650-5685`). Datum shifts `PSERZDF/PSERZDS` also × G (`:5661-5665`).
++Conversion to pressure-head: `G * η` units (`input.f90:5801-5836`). Datum shifts `PSERZDF/PSERZDS` also × G (`:5661-5665`).
+ 
+ Runtime in `CALPSER`:
+ - Time scaling by `TMULT`, advance `MTSPLAST`.
+@@ -44,7 +44,7 @@
+ - `calpuv9c.f90:638-642` (3TL) or `calpuv2c.f90:591-599` (2TL).
+ - Applied as `PSERT + PSERZDF/2 + PSERST + PSERZDS/2` at S/W/E/N pressure cells (`setopenbc.f90:252-260, 357-365, 460-469, 566-574`).
+ 
+-`CALEXP` does not read PSER directly; it modifies momentum for open-boundary types `2` and `5` (`calexp.f90:629-669`; 2TL `calexp2t.f90:581-620`).
++`CALEXP` does not read PSER directly; it modifies momentum for open-boundary types `2` and `5` (`calexp.f90:629-669`; 2TL `calexp2t.f90:591-630`).
+ 
+ ## B. NCSER (concentration time series)
+ 
+@@ -63,13 +63,13 @@
+ Header: `ISTYP, MCSER, TCCSER, TOFFSET, multiplier, additive`, with either layer weights or per-layer values.
+ 
+ Examples:
+-- Salinity at `input.f90:5858-5904`.
++- Salinity at `input.f90:6009-6055`.
+ - Temperature `:5907-5951`.
+ - Dye `:5955-6015`.
+ - Sediment/toxic `:6066-6277`.
+ 
+ Open-concentration BC cards (per side, `NCSER*` indices + ramp `NTSCR*`):
+-- South `input.f90:2721-2737`.
++- South `input.f90:2818-2834`.
+ - West `:2807-2823`.
+ - East `:2893-2909`.
+ - North `:2979-2995`.
+@@ -82,10 +82,10 @@
+ 
+ ## C. NQSER (flow time series, river discharge)
+ 
+-Card C23 reads `NQSIJ` and `NQSER` counts (`input.f90:1352-1360`).
++Card C23 reads `NQSIJ` and `NQSER` counts (`input.f90:1445-1452`).
+ 
+ C24 reads each volumetric source cell:
+-`I, J, QSSE, NQSMUL, NQSMF, NQSERQ, NCSERQ(1:7), QWIDTH, QFACTOR, GRPID` (`input.f90:1365-1378`).
++`I, J, QSSE, NQSMUL, NQSMF, NQSERQ, NCSERQ(1:7), QWIDTH, QFACTOR, GRPID` (`input.f90:1457-1470`).
+ 
+ MPI mapping preserves `NQSERQ, NCSERQ, QFACTOR, QWIDTH, GRPID` (`MPI_Mapping/Map_Discharge_BCs.f90:50-69`).
+ 
+@@ -96,7 +96,7 @@
+ | `1` | Reads vertical weight vector `WKQ(K)`; scalar flow distributed by layer |
+ | else | Each record gives layer flows directly |
+ 
+-Sign clipping by `ICHGQS` (`input.f90:5717-5755`).
++Sign clipping by `ICHGQS` (`input.f90:5868-5906`).
+ 
+ Runtime:
+ - `CALQVS` interpolates → `QSERT(K, NS)` (`Transport/calqvs.f90:428-449`).
+@@ -107,7 +107,7 @@
+ 
+ ## D. NPBS / NPBE / NPBN / NPBW (pressure BC indices)
+ 
+-C16 reads counts: `NPBS, NPBW, NPBE, NPBN, NPFOR, NPFORT, NPSER, PDGINIT` (`input.f90:870-889`).
++C16 reads counts: `NPBS, NPBW, NPBE, NPBN, NPFOR, NPFORT, NPSER, PDGINIT` (`input.f90:903-919`).
+ 
+ Per-boundary pressure cells:
+ 
+@@ -134,7 +134,7 @@
+ 
+ ## F. SUBCHAN (subgrid channel)
+ 
+-`MODCHAN.INP` read when `ISCHAN > 0`. Supplies `MDCHH, QCHERR, channel type, host cell, U/V channel cells`, plus channel length/friction for `ISCHAN==2` (`input.f90:3656-3689`).
++`MODCHAN.INP` read when `ISCHAN > 0`. Supplies `MDCHH, QCHERR, channel type, host cell, U/V channel cells`, plus channel length/friction for `ISCHAN==2` (`input.f90:3753-3778`).
+ 
+ Host and channel I/J → `LMDCHH, LMDCHU, LMDCHV` (`:3692-3705`).
+ 
+@@ -149,12 +149,12 @@
+ 
+ There is **no `NWTSER` symbol**; equivalent is `MTIDE` plus periodic pressure forcing `NPFOR`.
+ 
+-- C14 reads `MTIDE` (`input.f90:732-754`).
++- C14 reads `MTIDE` (`input.f90:755-778`).
+ - C15 reads tidal symbols + periods `SYMBOL(M), TCP(M)` (`:852-867`).
+ - C17 reads harmonic amplitude/phase, converts phase to cos/sin coefficients (`:891-920`).
+ 
+ Boundary cards convert harmonics to `PCB*/PSB*` for each side (× G):
+-- South `input.f90:980-1005`.
++- South `input.f90:1021-1044`.
+ - West `:1070-1096`.
+ - East `:1159-1185`.
+ - North `:1249-1275`.
+@@ -195,7 +195,7 @@
+ - `RMULADJ` and `ADDADJ` apply to **all** records; check before scaling.
+ - BC ramp `NTSCR*` is in **timesteps**, not seconds — set proportional to spin-up duration.
+ - For multi-river runs, group `GRPID` lets you scale a subset uniformly via post-processing — useful for sensitivity tests.
+-- Harmonic block (C17) `PFPH` phase is **not degrees** — it is a time lag in the same unit as `TCP` (seconds): `RAD = 2π·PFPH/TCP` (`input.f90:913-915`, v12.4 재확인 2026-07). Degrees must be converted: `PFPH = [TCON·TBEGIN + TCP·(G−(V0+u))/360] mod TCP`. Amplitudes `PFAM` are in m (× G to pressure head at the boundary-card conversion). See [[efdc-tidal-forcing-conventions-v12]].
++- Harmonic block (C17) `PFPH` phase is **not degrees** — it is a time lag in the same unit as `TCP` (seconds): `RAD = 2π·PFPH/TCP` (`input.f90:944-946`, v12.4 재확인 2026-07). Degrees must be converted: `PFPH = [TCON·TBEGIN + TCP·(G−(V0+u))/360] mod TCP`. Amplitudes `PFAM` are in m (× G to pressure head at the boundary-card conversion). See [[efdc-tidal-forcing-conventions-v12]].
+ - `LOPENBCDRY` events are logged — grep stdout for "OPEN BC DRY" during validation.
+ - Subgrid channel needs both donor and receiver cells to be active wet for the channel itself to be active; design `MODCHAN.INP` accordingly.
+ 
+--- a/models/EFDC/source-analysis/efdc_dispersion.md
++++ b/models/EFDC/source-analysis/efdc_dispersion.md
+@@ -20,8 +20,8 @@
+ - `models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calhdmf3.f90` (340 lines) — 3-time-level (3TL) variant (AQEA legacy).
+ - `models/EFDC/raw/source_code/EFDC-GVC/calhdmf.for` (615 lines) — EFDC-FULL v1.0a Hamrick 2001-11 original.
+ - `models/EFDC/raw/source_code/EFDC-GVC/caldiff.for` (49 lines) — scalar horizontal diffusion via `AH(L,K)`.
+-- `models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:621, 3722-3795` — Card C12 read + spatially-variable mapping logic.
+-- `models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/mod_var_global.f90:991-992, 1098-1099` — `AHO/AHD` scalar + `AHOXY/AHDXY` array declarations.
++- `models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:643, 3877-3952` — Card C12 read + spatially-variable mapping logic.
++- `models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/mod_var_global.f90:992-993, 1099-1100` — `AHO/AHD` scalar + `AHOXY/AHDXY` array declarations.
+ - `models/EFDC/raw/manuals/confluence/spaces/ECIG/pages/Overview/EFDC_Cards/Card_Image_12.md` — C12 input card (AHO, AHD, AVO, ABO, AVMX, ABMX, VISMUD, AVCON, ZBRWALL).
+ - `models/EFDC/raw/manuals/confluence/spaces/EK/pages/EFDC_Explorer_12_Knowledge_Base/.../Turbulence.md` — EE12 GUI Turbulent Diffusion tab (ISHMD = ISHDMF 매핑).
+ - `models/EFDC/manual-notes/efdc-theory-v12-ch2-hydrodynamics.md:203-209` — Theory v12 §2.1.5 Eq 2.27 Smagorinsky 표현 + Cs 권장 범위.
+@@ -236,9 +236,9 @@
+ 
+ | 변수 | 의미 | 단위 | Default | 코드 위치 |
+ |---|---|---|---|---|
+-| `AHO` | Constant horizontal momentum/mass diffusivity (m²/s) | m²/s | 0 | `input.f90:621` read, `:3737, 3742` use |
+-| `AHD` | Dimensionless Smagorinsky coefficient $C_s$ (ISHDMF>0 필요) | — | 0.025 | `input.f90:621, 3791-3794` |
+-| `ZBRWALL` | 측벽 log-law 거칠기 (ISHDMF=2 wall effect) | m | 0.002 | `input.f90:621` |
++| `AHO` | Constant horizontal momentum/mass diffusivity (m²/s) | m²/s | 0 | `input.f90:643` read, `:3737, 3742` use |
++| `AHD` | Dimensionless Smagorinsky coefficient $C_s$ (ISHDMF>0 필요) | — | 0.025 | `input.f90:643, 3946-3951` |
++| `ZBRWALL` | 측벽 log-law 거칠기 (ISHDMF=2 wall effect) | m | 0.002 | `input.f90:643` |
+ | `ISHDMF` | HMD 옵션 (0/1/2 — EE GUI ISHMD 동일) | flag | — | `input.f90` Card C2 |
+ 
+ **Default 0.025 주의**: Theory §2.1.5 권장 범위 $C_s = 0.1\text{-}0.2$ (Smagorinsky 표준) 보다 훨씬 작음. EE GUI 기본값은 EFDC 전통 — 사용자가 격자 해상도 따라 조정 필요. Smagorinsky 1963 원논문 권장 0.16-0.17.
+@@ -253,7 +253,7 @@
+ 
+ ### 6.2 Spatially-variable AHO/AHD — `AHMAP.INP`
+ 
+-`input.f90:3722-3795`:
++`input.f90:3877-3952`:
+ 
+ ```fortran
+ ! AHO < 0 → cell area 의존
+--- a/models/EFDC/source-analysis/efdc_drifters.md
++++ b/models/EFDC/source-analysis/efdc_drifters.md
+@@ -19,9 +19,9 @@
+ - `Drifter/mod_drifter.f90:21-2754` — main module.
+ - `Drifter/mod_Variables_MPI_Drifter.f90:13-64` — MPI state.
+ - `MPI_Communication/mod_Communicate_Drifters.f90:12-35` — MPI exchange.
+-- `aaefdc.f90:1105-1106` — `DRIFTER_INP` call.
+-- `hdmt.f90:1378-1384`, `hdmt2t.f90:1058-1063` — `DRIFTER_CALC` call.
+-- `input.f90:3088` — old C68 deprecated.
++- `aaefdc.f90:1106-1107` — `DRIFTER_INP` call.
++- `hdmt.f90:1378-1384`, `hdmt2t.f90:1062-1067` — `DRIFTER_CALC` call.
++- `input.f90:3185` — old C68 deprecated.
+ 
+ ## A. Directory, entry points
+ 
+@@ -40,12 +40,12 @@
+ - Ghost-domain communication: `mod_Communicate_Drifters.f90:12-35`.
+ 
+ Setup/call sites:
+-- `aaefdc.f90:1105-1106`: `DRIFTER_INP` when `ISPD > 0`.
+-- `hdmt.f90:1378-1384`, `hdmt2t.f90:1058-1063`: `DRIFTER_CALC`.
++- `aaefdc.f90:1106-1107`: `DRIFTER_INP` when `ISPD > 0`.
++- `hdmt.f90:1378-1384`, `hdmt2t.f90:1062-1067`: `DRIFTER_CALC`.
+ 
+ ## B. Particle release
+ 
+-EFDC+ does **NOT** use old EFDC card C68 (`input.f90:3088` says "not used in EFDC+").
++EFDC+ does **NOT** use old EFDC card C68 (`input.f90:3185` says "not used in EFDC+").
+ 
+ Drifter input from **`drifter.inp`** (`Drifter/mod_drifter.f90:814`).
+ 
+@@ -182,7 +182,7 @@
+ 
+ ## H. Coupling with hydrodynamic state
+ 
+-Caller advances drifters after mean mass transport (`hdmt.f90:1370-1384`, `hdmt2t.f90:1053-1063`).
++Caller advances drifters after mean mass transport (`hdmt.f90:1370-1384`, `hdmt2t.f90:1057-1067`).
+ 
+ Time step: `DT` or `DTDYN` depending on dynamic time-step flag (`:123-128`).
+ 
+--- a/models/EFDC/source-analysis/efdc_hydraulic_structures.md
++++ b/models/EFDC/source-analysis/efdc_hydraulic_structures.md
+@@ -18,8 +18,8 @@
+ 
+ - `mod_hydstructure.f90:9-1296` — `HYDSTRUCMOD` module.
+ - `Transport/calqvs.f90:756-1217` — `CALQVS` dispatch.
+-- `input.f90:1352-6671` — input cards C23, C32, C32A, C32B.
+-- `input.f90:6344-6671` — `qctl.inp`, `qctlser.inp`, `qctrules.inp`.
++- `input.f90:1445-6822` — input cards C23, C32, C32A, C32B.
++- `input.f90:6495-6822` — `qctl.inp`, `qctlser.inp`, `qctrules.inp`.
+ - `hdmt.f90:587-589`, `hdmt2t.f90:527-529` — `CALQVS` calls.
+ - `calpuv9c.f90:609-784`, `caluvw.f90:697-736` — coupling.
+ - `setbcs.f90:303-362` — initial structure masks.
+@@ -95,12 +95,12 @@
+ 
+ **No separate `NQCTYP` for pumps** in `COMPUTE_HSFLOW`. Pumps via operation rules when rule `PARAM` has bit `16` set; then `PUMP_OPERATION_RULES` returns `QHS` directly (`:191-197`).
+ 
+-Pump rule data: target `FLOW`, `RATE` (`:41`, `input.f90:6580-6581`).
++Pump rule data: target `FLOW`, `RATE` (`:41`, `input.f90:6731-6732`).
+ 
+ Pump ramps flow up/down by `RATE * DELT / 60` until `LIM.FLOW` (`mod_hydstructure.f90:1084-1095`).
+ 
+ **Q-vs-head tables** are general `QCTL.INP` lookups, NOT pump-specific:
+-- 1D and 2D head/elevation tables (`input.f90:6344-6387`).
++- 1D and 2D head/elevation tables (`input.f90:6495-6538`).
+ - Rules can switch lookup table IDs via bit `32` (`:6671`, `mod_hydstructure.f90:1296`).
+ 
+ ## E. Culverts (NQCTYP=5)
+@@ -132,7 +132,7 @@
+ 
+ | File | Fields |
+ |---|---|
+-| `QCTLSER.INP` | time, height, width, sill, flow, table ID (`input.f90:6439, 6456, 6488, 6491`) |
++| `QCTLSER.INP` | time, height, width, sill, flow, table ID (`input.f90:6590, 6607, 6639, 6642`) |
+ | `QCTRULES.INP` | trigger level, on/off, ID, height, width, sill, flow, rate (`:6510, 6544, 6573, 6581`) |
+ 
+ ## G. Input format
+--- a/models/EFDC/source-analysis/efdc_hydro_core.md
++++ b/models/EFDC/source-analysis/efdc_hydro_core.md
+@@ -16,7 +16,7 @@
+ 
+ ## Source basis
+ 
+-- `aaefdc.f90:3187-3188` — top-level dispatch: `IS2TIM==0 → HDMT` (3TL), `IS2TIM>=1 → HDMT2T` (2TL).
++- `aaefdc.f90:3189-3190` — top-level dispatch: `IS2TIM==0 → HDMT` (3TL), `IS2TIM>=1 → HDMT2T` (2TL).
+ - `calexp.f90`, `calexp2t.f90` — external (depth-integrated) momentum.
+ - `calpuv9c.f90`, `calpuv2c.f90` — external continuity solver (preconditioned conjugate gradient).
+ - `caluvw.f90` — internal (3D) momentum, vertical velocity W, barotropic correction.
+@@ -26,9 +26,9 @@
+ 
+ ## A. External momentum (CALEXP / CALEXP2T)
+ 
+-- Advection fluxes `FUHU/FVHU/FUHV/FVHV` built per layer, upwind or central (`calexp.f90:218-227`); flux divergence assembled into `FX/FY` (`:685-686`). 2TL mirror in `calexp2t.f90:214-218`.
++- Advection fluxes `FUHU/FVHU/FUHV/FVHV` built per layer, upwind or central (`calexp.f90:218-227`); flux divergence assembled into `FX/FY` (`:685-686`). 2TL mirror in `calexp2t.f90:224-228`.
+ - Coriolis + curvature: `CAC = FCORC + metric + HP` (`calexp.f90:571`); `FCAX/FCAY` (`:620-621`).
+-- Vertical sums to depth-integrated `FCAXE/FCAYE`, `FXE/FYE` (`calexp.f90:1133-1136`; `calexp2t.f90:1053-1056`).
++- Vertical sums to depth-integrated `FCAXE/FCAYE`, `FXE/FYE` (`calexp.f90:1133-1136`; `calexp2t.f90:1062-1065`).
+ - Wind / bottom / pressure enter in **CALPUV**, not CALEXP: `FUHDYE/FVHDXE = old_flow − pressure_grad + DELT*(wind − bottom + Coriolis + buoyancy − advection)` at `calpuv9c.f90:256-257` (3TL), `calpuv2c.f90:224-226` (2TL).
+ - Horizontal momentum diffusion (`FMDUX/FMDUY/FMDVY/FMDVX`)은 `CALHDMF`(2TL) 또는 `CALHDMF3`(3TL) 에서 계산되어 CALEXP의 viscous flux divergence 항으로 합산 — 상세는 [[efdc_dispersion]] (Smagorinsky + AHO).
+ - Implicit bottom/vegetation drag coefficients `RCX/RCY` at `calpuv9c.f90:269-270`, applied at `:287-288`.
+@@ -96,7 +96,7 @@
+ |---|---|
+ | Standard tidal/coastal run | 3TL (`IS2TIM=0`); set `NTSTBC` so corrector fires every 24-48 steps |
+ | Sediment / water quality dominant | 2TL (`IS2TIM>=1`); allows dynamic timestep coupling |
+-| Density-stratified estuary | 3TL + `ISBAL=2` (S+T); set `IINTPG=1` or `2` for steep bathymetry |
++| Density-stratified estuary | 3TL + `ISBAL=2` (S+T); for EFDC+ Stable 12.5, the `IINTPG` buoyancy-shear branches were removed; use `IGRIDV>0` (SGZ) for steep bathymetry. `IINTPG /= 0` disables the 2-cell-wide channel external density-gradient cell-face flag treatment at `setbcs.f90:449`. |
+ | Wave-resolving short-wave runup | `ISPNHYDS>=1` + `KC>1` (non-hydrostatic) |
+ | External-mode CFL violation | Reduce `DT` first; PCG itself rarely the bottleneck |
+ | Mass drift | Verify CALUVW barotropic correction at `:601-624` runs, and `IS2TIM`/timestep are consistent across hot-start |
+--- a/models/EFDC/source-analysis/efdc_ice.md
++++ b/models/EFDC/source-analysis/efdc_ice.md
+@@ -16,31 +16,31 @@
+ 
+ ## Source basis
+ 
+-- `input.f90:2524-2530, 6888-6911, 7000-7099` — `ISICE`, ice series readers.
++- `input.f90:2621-2627, 7040-7063, 7152-7262` — `ISICE`, ice series readers.
+ - `mod_scaninp.f90:504-855` — input scanning.
+-- `Transport/mod_heat.f90:251-1490, 1095-1104, 641-753, 1322-1428, 1652-1674` — heat-balance + ice physics.
++- `Transport/mod_heat.f90:251-1488, 1093-1102, 639-751, 1320-1426, 1650-1672` — heat-balance + ice physics.
+ - `Transport/caltranice.f90:9-172` — frazil transport.
+-- `caltsxy.f90:612-864, 684-724` — ice cover application + momentum.
++- `caltsxy.f90:611-863, 683-723` — ice cover application + momentum.
+ - `calpuv2c.f90:220-226`, `calpuv9c.f90:565-573` — momentum coupling.
+-- `calexp.f90:1091-1385`, `calexp2t.f90:1014-1405` — internal mode + waves.
+-- `Transport/calconc.f90:296-471` — heat/frazil dispatch.
++- `calexp.f90:1091-1328`, `calexp2t.f90:1023-1405` — internal mode + waves.
++- `Transport/calconc.f90:308-483` — heat/frazil dispatch.
+ - `Transport/calqvs.f90:1513-1539` — ice volume → QSUM.
+-- `Waves/mod_windwave.f90:191-826` — wave routines (no ice).
+-- `varalloc.f90:1386-1400` — ice arrays.
++- `Waves/mod_windwave.f90:193-835` — wave routines (no ice).
++- `varalloc.f90:1386-1399` — ice arrays.
+ 
+ ## A. Activation
+ 
+ **No `NCICE` symbol; no `owi_ice` reader** in this source tree.
+ 
+-Ice controlled by `ISICE` (read from card `C46A` at `input.f90:2524-2530`):
++Ice controlled by `ISICE` (read from card `C46A` at `input.f90:2621-2627`):
+ - `ISICE, NISER, TEMPICE, CDICE, ICETHMX, RICETHK0`.
+ - Also scanned in `mod_scaninp.f90:504-514`.
+ 
+-Wind forcing separate: `NWSER` is wind series count from `WSER.INP` (`input.f90:6888-6911`), **not an ice flag**.
++Wind forcing separate: `NWSER` is wind series count from `WSER.INP` (`input.f90:7040-7063`), **not an ice flag**.
+ 
+ ## B. Ice cover dynamics modes
+ 
+-`Transport/mod_heat.f90:1095-1104` documents:
++`Transport/mod_heat.f90:1093-1102` documents:
+ 
+ | `ISICE` | Mode |
+ |---|---|
+@@ -51,7 +51,7 @@
+ 
+ `ISICE=1/2`:
+ - Reads external ice cover time series → `ICECOVER`.
+-- Thickness explicitly "not used" (`caltsxy.f90:612-704`).
++- Thickness explicitly "not used" (`caltsxy.f90:611-703`).
+ 
+ `ISICE=3/4`:
+ - Thermodynamic freeze/melt.
+@@ -61,7 +61,7 @@
+ 
+ ## C. Heat balance
+ 
+-Open-water surface heat balance: longwave + sensible + latent fluxes — but **skipped when `ICECELL(L)` is true** (`Transport/mod_heat.f90:641-669`).
++Open-water surface heat balance: longwave + sensible + latent fluxes — but **skipped when `ICECELL(L)` is true** (`Transport/mod_heat.f90:639-667`).
+ 
+ COARE heat exchange same skip pattern (`:699-753`).
+ 
+@@ -77,7 +77,7 @@
+ 
+ ## D. Ice momentum
+ 
+-In ice cells, surface shear replaced by ice-bottom drag (`caltsxy.f90:713-724`):
++In ice cells, surface shear replaced by ice-bottom drag (`caltsxy.f90:712-723`):
+ ```
+ TAUICE = -CDICE · sqrt(U² + V²)
+ ```
+@@ -85,11 +85,11 @@
+ 
+ `TSX/TSY` enters external momentum in `CALPUV` (`calpuv2c.f90:220-226`, `calpuv9c.f90:565-573`).
+ 
+-Also enters internal-mode top interface shear in `CALEXP` (`calexp.f90:1374-1385`, `calexp2t.f90:1400-1405`).
++Also enters internal-mode top interface shear in `CALEXP` (`calexp.f90:1317-1328`, `calexp2t.f90:1400-1405`).
+ 
+ ## E. Wind stress reduction under ice
+ 
+-Wind stress computed normally in `WINDSTRESS` (`caltsxy.f90:755-864`).
++Wind stress computed normally in `WINDSTRESS` (`caltsxy.f90:754-863`).
+ 
+ Then for `ICECELL(L)`, `TSX/TSY` **overwritten** by ice-bottom drag (`:713-724`).
+ 
+@@ -101,23 +101,23 @@
+ 
+ **No ice-specific wave damping or `ICECELL/ISICE` logic in wave routines**.
+ 
+-Wind-wave generation uses wind, fetch, depth, wave mask only (`Waves/mod_windwave.f90:191-220`).
++Wind-wave generation uses wind, fetch, depth, wave mask only (`Waves/mod_windwave.f90:193-222`).
+ 
+ Wave dissipation from wave height/period; active checks are wave mask, height threshold, depth — **not ice** (`:730-746, 784-826`).
+ 
+-Wave forcing added to momentum via `FXWAVE/FYWAVE` (`calexp.f90:1091-1097`, `calexp2t.f90:1014-1019`).
++Wave forcing added to momentum via `FXWAVE/FYWAVE` (`calexp.f90:1091-1097`, `calexp2t.f90:1023-1028`).
+ 
+ So wave physics is **ice-blind** in this version. For ice-affected wave damping, externally process or skip wave coupling under heavy ice.
+ 
+ ## G. Hydrodynamic coupling
+ 
+-Heat transport: `CALHEAT` called when temperature transport active (`Transport/calconc.f90:467-471`).
++Heat transport: `CALHEAT` called when temperature transport active (`Transport/calconc.f90:479-483`).
+ 
+ Frazil ice transport: called for `ISICE==4` (`:296-300`).
+ 
+ Ice freeze/melt volume changes → `ICERATE`, added to top-layer source/sink `QSUM(L,KC)` (`Transport/calqvs.f90:1513-1539`).
+ 
+-For 3-time-level mode, ice volume can directly update `HP, H1P`, layer depths (`Transport/mod_heat.f90:1480-1490`).
++For 3-time-level mode, ice volume can directly update `HP, H1P`, layer depths (`Transport/mod_heat.f90:1478-1488`).
+ 
+ Momentum coupling via `TSX/TSY` into `CALPUV` and `CALEXP` (cited above).
+ 
+@@ -125,12 +125,12 @@
+ 
+ | `ISICE` | File | Format |
+ |---|---|---|
+-| `1` | `iser.inp` | `VAL(M,1)` = ice on/off or cover; `VAL(M,2)` = thickness (legacy/display only) (`input.f90:7000-7031`) |
++| `1` | `iser.inp` | `VAL(M,1)` = ice on/off or cover; `VAL(M,2)` = thickness (legacy/display only) (`input.f90:7152-7182`) |
+ | `2` | `istat.inp` | One time series of fractional ice cover, capped at 1 (`:7038-7054`) |
+ | Multiple | `icemap.inp` | Weights by cell + time map (`:7068-7099`); allocated/scanned `mod_scaninp.f90:839-855` |
+ | `>2` | `ice.inp` | Initial thermodynamic ice thickness (`mod_heat.f90:251-263`) |
+ 
+-Allocated arrays: `ICECOVER, ICETHICK, ICETEMP, ICEVOL, ICERATE`, frazil arrays (`varalloc.f90:1386-1400`).
++Allocated arrays: `ICECOVER, ICETHICK, ICETEMP, ICEVOL, ICERATE`, frazil arrays (`varalloc.f90:1386-1399`).
+ 
+ ## Decision Guide
+ 
+--- a/models/EFDC/source-analysis/efdc_internal_shear_caluvw.md
++++ b/models/EFDC/source-analysis/efdc_internal_shear_caluvw.md
+@@ -30,7 +30,7 @@
+ DU(L,K) = CDZFU(L,K)*( H1U(L)*(U1(L,K+1)-U1(L,K))*DELTI
+         + DXYIU(L)*(FCAX(L,K+1)-FCAX(L,K) + FBBX(L,K) + SNLT*(FX(L,K)-FX(L,K+1))) )
+ ```
+-(calexp.f90:1366; DV 동형 :1367) — 직전 전단/Δt + **Coriolis(FCAX)·부력/경압(FBBX)·이류(FX)의 층간 차분**. 즉 explicit 물리는 전부 층차 형태로 RHS 에만.
++(calexp.f90:1309; DV 동형 :1367) — 직전 전단/Δt + **Coriolis(FCAX)·부력/경압(FBBX)·이류(FX)의 층간 차분**. 즉 explicit 물리는 전부 층차 형태로 RHS 에만.
+ 
+ - **바람응력**: 최상층 계면(KS) 행에 `DU(L,KS) -= CDZUU(L,KS)*TSX(L)` (:1383-1384). ★게이트 `(ISTL == 2 .and. NWSER > 0) .or. (ISTL == 2 .and. iGOTM_Test > 0)` (:1375) — §6 함정 참조.
+ - 마스크 SUB/SVB 적용 (:1397-1398).
+@@ -73,7 +73,7 @@
+ ## 7. ★Findings / 함정
+ 
+ - **θ knob 없음** — 연직확산 implicitness 는 사용자 조정 불가(항상 완전 implicit). fort.15 스타일 3-knob(ADCIRC Alp1/2/3)와 대비되는 설계.
+-- **★바람 전단 주입이 `ISTL==2` 에서만** (calexp.f90:1375) — 2TL(HDMT2T)은 ISTL 이 항상 2라 매 스텝 주입되지만, **3TL leapfrog full step(ISTL=3)에서는 내부전단 RHS 에 TSX/TSY 미주입** — 표면 강제가 corrector 주기(NTSTBC)로만 연직 구조에 들어가는 구조. 관찰 사실(코드 게이트)이며 의도/버그 여부는 문서 무언급.
++- **★바람 전단 주입이 `ISTL==2` 에서만** (calexp.f90:1318) — 2TL(HDMT2T)은 ISTL 이 항상 2라 매 스텝 주입되지만, **3TL leapfrog full step(ISTL=3)에서는 내부전단 RHS 에 TSX/TSY 미주입** — 표면 강제가 corrector 주기(NTSTBC)로만 연직 구조에 들어가는 구조. 관찰 사실(코드 게이트)이며 의도/버그 여부는 문서 무언급.
+ - **전단 정식화의 함의**: 내부모드가 깊이평균을 건드리지 않으므로 external↔internal 정합은 별도 barotropic 보정(hydro_core §C)이 담당 — 그 보정 없으면 mass drift.
+ - **Sherman-Morrison 보조해 UUU/VVV** — 디버깅 시 DU 배열이 소거 중간엔 미보정 상태임에 주의(:495 최종 변환 전후 단위·의미 다름: 소거계 무차원 → 물리 m²/s).
+ - **RCXX 의 시간분기** — 3TL full step 은 old 값(U1)만, corrector 는 old·new 기하평균: 같은 STBX 라도 스텝 종류별 유효 drag 상이.
+--- a/models/EFDC/source-analysis/efdc_linkages.md
++++ b/models/EFDC/source-analysis/efdc_linkages.md
+@@ -20,10 +20,10 @@
+ 
+ ## 1. WASP linkage (wasp4-8 + wasp7hydro/wasp8hydro)
+ 
+-- **WASP** (Water Quality Analysis Simulation Program, US EPA) box-model 로 EFDC 수리·분산을 전달. `ISWASP`(input C7, `input.f90:264`) = 버전/모드 선택. 버전별 파일: `wasp4.f90`(637)~`wasp8hydro.f90`(1549). M. Morton 1994.
++- **WASP** (Water Quality Analysis Simulation Program, US EPA) box-model 로 EFDC 수리·분산을 전달. `ISWASP`(input C7, `input.f90:269`) = 버전/모드 선택. 버전별 파일: `wasp4.f90`(637)~`wasp8hydro.f90`(1549). M. Morton 1994.
+ - 출력: hydrodynamic flow + **dispersion** 을 WASP 입력 그룹(B hydro / C / D dispersion: WASPB/C/D)으로 write.
+-- **residual transport**: `CALMMT`(mean mass transport averaging) 가 `ISWASP>0` 또는 `ISSSMMT>0` + `RESSTEP>0` 시 호출(`hdmt2t.f90:1055`) — 조석평균 잔차 flux/dispersion 을 WASP box exchange 로 집계. [[efdc_caldisp_postprocess]] 의 잔차 dispersion 텐서와 같은 계열(조석평균 transport).
+-- **`ISWASP==99 → ISICM=1`** (`input.f90:292`) — WASP 99 = CE-QUAL-ICM 모드 전환.
++- **residual transport**: `CALMMT`(mean mass transport averaging) 가 `ISWASP>0` 또는 `ISSSMMT>0` + `RESSTEP>0` 시 호출(`hdmt2t.f90:1059`) — 조석평균 잔차 flux/dispersion 을 WASP box exchange 로 집계. [[efdc_caldisp_postprocess]] 의 잔차 dispersion 텐서와 같은 계열(조석평균 transport).
++- **`ISWASP==99 → ISICM=1`** (`input.f90:297`) — WASP 99 = CE-QUAL-ICM 모드 전환.
+ 
+ ## 2. CE-QUAL-ICM (ceqicm.f90, 790)
+ 
+--- a/models/EFDC/source-analysis/efdc_mpi_decomposition.md
++++ b/models/EFDC/source-analysis/efdc_mpi_decomposition.md
+@@ -121,7 +121,7 @@
+ 
+ `Gather_Soln` uses `num_active_l_local` and `MPI_Gatherv` for values + global mapping (`Mod_Gather_Soln.f90:89-103`).
+ 
+-`Map_Write_EE_Binary` maps hydro/output arrays to global; `EE_LINKAGE` called only on `master_id` (`Mod_Map_Write_EE_Binary.f90:49-59`, `aaefdc.f90:3156-3159`).
++`Map_Write_EE_Binary` maps hydro/output arrays to global; `EE_LINKAGE` called only on `master_id` (`Mod_Map_Write_EE_Binary.f90:49-59`, `aaefdc.f90:3158-3161`).
+ 
+ Per-PE files are **logs/debug only**: `EFDC_out_proc_###.log, log_mpi_proc_###.log, map_mpi_proc_###.log` (`Setup_MPI_Debug_File.f90:67-92`).
+ 
+--- a/models/EFDC/source-analysis/efdc_sediment_diagenesis.md
++++ b/models/EFDC/source-analysis/efdc_sediment_diagenesis.md
+@@ -18,7 +18,7 @@
+ 
+ > 소스: [`Eutrophication/mod_diagen.f90`](../raw/source_code/EFDCPlus_Stable/EFDC/Eutrophication/mod_diagen.f90) (1394). EFDC+ Stable = 12.4.
+ > **정체**: Cerco-Cole 1994(CE-QUAL-ICM) / Di Toro 2001 **2-layer 퇴적물 flux** 서브모델. **pore-water pool `SM2NH4/NO3/PO4` + 벤딕 flux `WQBFNH4/NO3/PO4D/O2(SOD)/COD` 생산** — [[efdc_rpem_vegetation]]·수질 F1 이 이 pool 을 소비. [[efdc_water_quality]]:98-104 은 dispatch(`IWQBEN==1`·`SMMBE`)만, flux 알고리즘 미문서.
+-> ★**line range 정정**: water_quality:21 은 `mod_diagen.f90:9-1031` 이라 했으나 module `END`는 :1107, **flux kernel(SEDFLUXNEW/ZBRENT/SOLVSMBE)은 :1121-1393** — stale 인용은 solver 전체를 놓침.
++> ★**line range 정정**: water_quality:21 은 `mod_diagen.f90:9-1029` 이라 했으나 module `END`는 :1107, **flux kernel(SEDFLUXNEW/ZBRENT/SOLVSMBE)은 :1121-1393** — stale 인용은 solver 전체를 놓침.
+ 
+ ## 0. 구조
+ 
+--- a/models/EFDC/source-analysis/efdc_surface_forcing.md
++++ b/models/EFDC/source-analysis/efdc_surface_forcing.md
+@@ -63,7 +63,7 @@
+ 
+ ## 6. Momentum handoff (소비처)
+ - 외부모드: `calpuv2c.f90:224,226` `+DXYU*(TSX-RITB1*TBX)` (수면전단→수심적분 momentum, [[efdc_bottom_friction]] TBX 와 나란히).
+-- 내부모드: `calexp.f90:1383-1384` `DU -= CDZUU*TSX`.
++- 내부모드: `calexp.f90:1326-1327` `DU -= CDZUU*TSX`.
+ - **cyclone overlay**: `call CycloneFields(TIMEDAY)`(:487) → per-cell WINDSTRESS 재계산([[efdc_cyclone_wind]]).
+ 
+ ## 7. 주요 findings
+--- a/models/EFDC/source-analysis/efdc_transport_scheme.md
++++ b/models/EFDC/source-analysis/efdc_transport_scheme.md
+@@ -15,9 +15,9 @@
+   - models/EFDC/source-analysis/sediment/efdc_sediment.md
+ ---
+ 
+-# EFDC+ scalar transport 수치 스킴 — CALTRAN / CALTRAN_AD
++# EFDC+ scalar transport 수치 스킴 — CALTRAN / CALTRAN_AD / QUICKEST·ULTIMATE
+ 
+-> `Transport/caltran.f90`(373) + `caltran_ad.f90`(347) + `calconc.f90`(528) 직접 read. **모든 scalar(염분·수온·dye·SFL·toxic·SED·SND·WQ)의 advection 수치 알고리즘** = **1차 donor-cell upwind + Smolarkiewicz MPDATA anti-diffusive corrector**. 여러 노트가 CALTRAN 호출 맥락(dry mask·open-BC·vertical)을 다뤘으나, 본 노트는 **advection 스킴 자체**의 canonical. [[efdc_hydro_core]](운동량)·[[efdc_vertical]](연직 advection)·[[efdc_water_quality]]·[[efdc_sediment]]·[[efdc_toxics]] 가 공유.
++> `Transport/caltran.f90`(373) + `caltran_ad.f90`(347) + `calconc.f90`(528) 직접 read. **scalar(염분·수온·dye·SFL·toxic·SED·SND·WQ)의 advection 수치 알고리즘** = **1차 donor-cell upwind + Smolarkiewicz MPDATA anti-diffusive corrector**, v12.5 active WC dispatch에는 **`ISQUICK == 1` QUICKEST/ULTIMATE** 경로가 추가됐다 (`calconc.f90:198-203`). 여러 노트가 CALTRAN 호출 맥락(dry mask·open-BC·vertical)을 다뤘으나, 본 노트는 **advection 스킴 자체**의 canonical. [[efdc_hydro_core]](운동량)·[[efdc_vertical]](연직 advection)·[[efdc_water_quality]]·[[efdc_sediment]]·[[efdc_toxics]] 가 공유.
+ 
+ ## 1. CALCONC dispatch (calconc.f90)
+ 
+@@ -25,13 +25,13 @@
+ ```fortran
+ ISTRAN: 1 염분 / 2 수온 / 3 dye / 4 SFL(shellfish larvae) / 5 toxic / 6 SED(cohesive) / 7 SND(noncohesive) / 8 WQ
+ ```
+-1. **upwind cell 사전지정** (`calconc.f90:115-127`):
++1. **upwind cell 사전지정** (`calconc.f90:117-132`): `ISQUICK == 0 .or. ISTRAN(4) > 0 .or. (ISTRAN(2) > 0 .and. ISICE == 4)`일 때 수행.
+ ```fortran
+ LUPU(L,K) = UHDY2(L,K) >= 0 ? LWC(L) : L     ! x-flux donor cell (서/현)
+ LUPV(L,K) = VHDX2(L,K) >= 0 ? LSC(L) : L     ! y-flux donor cell (남/현)
+ ```
+-2. `CALTRAN`(IW) — donor-cell upwind 1차 update (모든 active WC).
+-3. `ISADAC>0` constituent → `CALTRAN_AD`(IW) — anti-diffusive 보정 (MPI: 그 사이 `Communicate_CON2` 로 FUHUD/FVHUD/FWUU 교환).
++2. `ISQUICK == 1`이면 `CALTRAN_QUICKEST`(IW) — QUICKEST/ULTIMATE, 그 외에는 `CALTRAN`(IW) — donor-cell upwind 1차 update (모든 active WC, `calconc.f90:198-203`). 신규 구현: `EFDC/Transport/caltran_quickest.f90:14-33`, `EFDC/Transport/mod_quickest.f90:80-101` (v12.5 좌표).
++3. `ISQUICK == 0`일 때만 `CALTRAN_AD`(IW) 호출 및 `ISADAC` anti-diffusive 보정 (`calconc.f90:228-230, 250`) (MPI: 그 사이 `Communicate_CON2` 로 FUHUD/FVHUD/FWUU 교환).
+ 4. 그 후 SED/SND(CALSND/bedload, ISTRAN6/7), dye(CALDYE), toxic 등 module-specific.
+ 
+ ## 2. CALTRAN — donor-cell upwind (caltran.f90)
+@@ -62,19 +62,20 @@
+ - **원리** (Smolarkiewicz 1984 MPDATA): donor-cell 의 implicit 확산을 "anti-diffusive velocity" `UHU = |u|(C_L−C_LW)/(C_L+C_LW)` 로 추정해 반대로 다시 upwind → 수치확산 차수 1→2 향상, **양정치 유지**.
+ - **cross-derivative 항**(line 109-143)이 다차원 MPDATA 의 핵심(1D 분리오차 보정).
+ 
+-## 4. ISADAC / ISFCT — constituent별 토글 (input.f90:306)
++## 4. ISQUICK / ISADAC / ISFCT — scalar 스킴 선택·constituent별 토글 (input.f90:311)
+ 
+-입력 카드(constituent별, C14 염분 ~ ):
++입력 카드 C6(constituent별; `ISQUICK`은 scalar):
+ ```fortran
+-read ISTRAN(NS), ISTOPT(NS), -, ISADAC(NS), ISFCT(NS), -, -, -, ISCI(NS), ISCO(NS)
++read ISTRAN(NS), ISTOPT(NS), ISQUICK, ISADAC(NS), ISFCT(NS), -, -, -, ISCI(NS), ISCO(NS)
+ ```
+ | flag | 의미 |
+ |---|---|
++| **ISQUICK** | scalar: 0 = donor-cell upwind / 1 = QUICKEST·ULTIMATE. Broadcast (`input.f90:316`), 0/1 외 값은 경고 후 0으로 리셋 (`input.f90:318-325`) |
+ | **ISADAC(NS)** | 0 = donor-cell upwind 만(수치확산 큼) / **1 = anti-diffusion(MPDATA) 적용** |
+ | **ISFCT(NS)** | flux corrector(FCT) — anti-diffusion 후 **monotonicity 보장**(local min/max clamp, caltran_ad CWMAX/CWMIN 등) |
+ | ISCI/ISCO | concentration input/output series 토글 |
+ 
+-→ **ISADAC=1 + ISFCT=1** = MPDATA + flux-corrected transport (실무 표준: 염분·수온 front 보존). ISADAC=0 = 순수 upwind(안정하나 smearing). `NANTIDIFF` = anti-diffusion 적용 constituent 수 카운트(calconc:93-99).
++→ **`ISQUICK == 0`일 때 ISADAC=1 + ISFCT=1** = MPDATA + flux-corrected transport (실무 표준: 염분·수온 front 보존). `ISQUICK == 0`에서 ISADAC=0 = 순수 upwind(안정하나 smearing). `NANTIDIFF` = anti-diffusion 적용 constituent 수 카운트(calconc:93-99). `CALTRAN_AD` 호출은 `ISQUICK == 0`일 때만 발생하고 (`calconc.f90:228-230`), `ISADAC` 반확산 적용도 동일 게이트를 사용한다 (`calconc.f90:250`).
+ 
+ ## 5. 비교·맥락
+ 
+--- a/models/EFDC/source-analysis/efdc_turbulence.md
++++ b/models/EFDC/source-analysis/efdc_turbulence.md
+@@ -18,9 +18,9 @@
+ 
+ - `calqq1.f90`, `calqq2t.f90` — `q²` (= QQ) and `q²L` (= QQL) equation assembly and tridiagonal solve.
+ - `calavb.f90` — vertical viscosity / diffusivity assembly with stability functions.
+-- `mod_var_global.f90:1003, 1091, 1103, 1105-1107` — array storage definitions.
+-- `input.f90:621-685` — input cards C12 (background mixing, max), C12A (`ISTOPT`), C12B (`ISGOTM`).
+-- `hdmt.f90:1274, 1283`; `hdmt2t.f90:533-579, 875-964, 989` — main-loop dispatch and BC setup.
++- `mod_var_global.f90:1004, 1092, 1104, 1106-1108` — array storage definitions.
++- `input.f90:643-708` — input cards C12 (background mixing, max), C12A (`ISTOPT`), C12B (`ISGOTM`).
++- `hdmt.f90:1274, 1283`; `hdmt2t.f90:533-579, 879-968, 993` — main-loop dispatch and BC setup.
+ - `GOTM_Turbulence/mod_gotm.f90`, `mod_turbulence.F90` — GOTM integration.
+ 
+ ## A. Entry points
+@@ -28,7 +28,7 @@
+ | Path | Driver | Calls |
+ |---|---|---|
+ | Original MY2.5 (3TL) | `HDMT` | `CALAVB` then `CALQQ1` (`hdmt.f90:1274, 1283`) |
+-| Original MY2.5 (2TL) | `HDMT2T` | `CALAVB` then `CALQQ2T` (`hdmt2t.f90:533, 577, 989`) |
++| Original MY2.5 (2TL) | `HDMT2T` | `CALAVB` then `CALQQ2T` (`hdmt2t.f90:533, 577, 993`) |
+ | GOTM (`ISGOTM > 0`) | `HDMT2T` | `Advance_GOTM(ISTL)` replaces both (`hdmt2t.f90:535-579`) |
+ 
+ `CALQQ1` and `CALQQ2T` solve for:
+@@ -64,7 +64,7 @@
+ - `AB = SFAB * DML * HP * sqrt(QQ) + AVBXY` (`:155`).
+ - `AV = SFAV * DML * HP * sqrt(QQ) + AVOXY` (`:156`).
+ 
+-Both depth-normalized afterward (`:157, 158`). Background `AVOXY/AVBXY` come from card C12 (`input.f90:621-633`: `AVO, ABO, AVMX, ABMX`).
++Both depth-normalized afterward (`:157, 158`). Background `AVOXY/AVBXY` come from card C12 (`input.f90:643-652`: `AVO, ABO, AVMX, ABMX`).
+ 
+ ## C. Production and dissipation
+ 
+@@ -79,7 +79,7 @@
+ - `q²`: `+ 2*DELT * QQSQR / (CTURBB1 * DML * HP)` (`calqq2t.f90:353`).
+ - `q²L`: `+ DELT * (QQSQR/(CTURBB1*DML*HP)) * (1 + CTE4*DML²*FPROX)` (`:355`).
+ 
+-`FPROX` = wall proximity function (`aaefdc.f90:1517-1528`).
++`FPROX` = wall proximity function (`aaefdc.f90:1519-1530`).
+ 
+ ## D. CALQQ1 (3TL) vs CALQQ2T (2TL) variant
+ 
+@@ -93,7 +93,7 @@
+ 
+ | Symbol | Meaning | Lines |
+ |---|---|---|
+-| `AB(LCM,KCM)` | Vertical diffusivity (depth-normalized, m/s — physical m²/s ÷ depth) | `mod_var_global.f90:1091` |
++| `AB(LCM,KCM)` | Vertical diffusivity (depth-normalized, m/s — physical m²/s ÷ depth) | `mod_var_global.f90:1092` |
+ | `AV(LCM,KCM)` | Vertical viscosity (depth-normalized) | `:1105` |
+ | `AQ(LCM,KCM)` | Diffusivity for `QQ/QQL` | `:1103` |
+ | `AVOXY` | Spatially varying background `AVO` | `:1106` |
+@@ -104,7 +104,7 @@
+ 
+ ## F. ISTOPT(0) dispatch
+ 
+-`ISTOPT(0)` is read from card C12A (`input.f90:641-661`). It does **not** select GOTM (that is `ISGOTM`). It selects original-EFDC coefficient behavior inside CALAVB:
++`ISTOPT(0)` is read from card C12A (`input.f90:664-681`). It does **not** select GOTM (that is `ISGOTM`). It selects original-EFDC coefficient behavior inside CALAVB:
+ 
+ - Default Galperin if `!= 2, 3`.
+ - `==2`: Kantha-Clayson 1994.
+@@ -112,7 +112,7 @@
+ 
+ ## G. GOTM integration (ISGOTM)
+ 
+-`ISGOTM` from card C12B (`input.f90:666-685`).
++`ISGOTM` from card C12B (`input.f90:689-708`).
+ 
+ When `ISGOTM > 0`:
+ - `Init_GOTM` sets up GOTM turbulence + tridiagonal init (`mod_gotm.f90:17-25`).
+@@ -132,7 +132,7 @@
+ 
+ Original EFDC sets `QQ(L,0)` (bottom) and `QQ(L,KC)` (surface) **before** solving CALQQ2T:
+ 
+-- Non-wave path: bottom from `TBX/TBY`, surface from `TSX/TSY` (`hdmt2t.f90:875-889`).
++- Non-wave path: bottom from `TBX/TBY`, surface from `TSX/TSY` (`hdmt2t.f90:879-893`).
+ - Corner-corrected path: modifies bottom stress weighting (`:892-931`).
+ - Wave path: includes current + wave bottom stress (`:939-964`).
+ 
+@@ -169,7 +169,7 @@
+ - ▢ Looking for `AVOMX` symbol — code uses `AVMX`.
+ - ▢ Setting `ISGOTM=1` but forgetting `gotm_input.nml` — `Init_GOTM` errors at startup.
+ - ▢ Expecting "AB ln" symbol from old docs — the actual variant is `CALQQ1` (3TL) vs `CALQQ2T` (2TL); the latter has additional vegetation/structure sink terms in the diagonal.
+-- ▢ Wall proximity `FPROX` formulation — different forms initialize at `aaefdc.f90:1517-1528`; choice depends on whether you want Mellor's parabolic or alternative form. Verify the active branch matches your case (free-surface vs bottom-bounded).
++- ▢ Wall proximity `FPROX` formulation — different forms initialize at `aaefdc.f90:1519-1530`; choice depends on whether you want Mellor's parabolic or alternative form. Verify the active branch matches your case (free-surface vs bottom-bounded).
+ 
+ ## Next expansion
+ 
+--- a/models/EFDC/source-analysis/efdc_vertical.md
++++ b/models/EFDC/source-analysis/efdc_vertical.md
+@@ -17,33 +17,33 @@
+ ## Source basis
+ 
+ - `mod_var_global.f90:221, 236` — `KC`, `IGRIDV` definitions.
+-- `input.f90:145, 264, 516, 531` — input reads for `KC`, `IGRIDV`, `IINTPG`, sigma fractions.
+-- `aaefdc.f90:1294, 1308, 1323, 1332, 1341, 1435, 1443, 1448, 1492, 1497, 2382, 2592, 2610, 2820, 2944` — layer setup, SGZ allocation, face metrics.
++- `input.f90:150, 269, 538, 553` — input reads for `KC`, `IGRIDV`, `IINTPG`, sigma fractions.
++- `aaefdc.f90:1295, 1310, 1325, 1334, 1343, 1437, 1445, 1450, 1494, 1499, 2384, 2594, 2612, 2822, 2946` — layer setup, SGZ allocation, face metrics.
+ - `varalloc.f90:1276, 1319` — SGZ array allocation, `DZC/DZG/DZIG` allocation.
+ - `caluvw.f90:16, 686-872, 1238` — vertical velocity W and `HPK`.
+-- `calexp.f90:243-406, 1152, 1169-1265` — vertical advection and PGF branches.
++- `calexp.f90:243-406, 1152, 1169-1222` — vertical advection and PGF branches.
+ - `Transport/caltran.f90:49, 152-228` — vertical tracer advection and SGZ skip.
+ - `calpuv9c.f90:1221, 1268, 1585` — face depths, SGZ face handling.
+ 
+ ## A. Sigma layers
+ 
+-- `KC` = water-column layer count (`mod_var_global.f90:221`); read from card C9A (`input.f90:516`).
+-- Global sigma fractions `DZCK(K)` from card C10 (`input.f90:531`); normalized to sum 1 (`aaefdc.f90:1294`).
++- `KC` = water-column layer count (`mod_var_global.f90:221`); read from card C9A (`input.f90:538`).
++- Global sigma fractions `DZCK(K)` from card C10 (`input.f90:553`); normalized to sum 1 (`aaefdc.f90:1295`).
+ - Cell layer fractions: `DZC(L,K)` allocated alongside `DZG/DZIG` (`varalloc.f90:1319`).
+-- Sigma stretch: inactive layers below `KSZ` zeroed; `DZC = DZCK / DZPC` (`aaefdc.f90:1435, 1443`).
+-- `DZIC/DZG/DZIG` set up in `aaefdc.f90:1492, 1497`.
++- Sigma stretch: inactive layers below `KSZ` zeroed; `DZC = DZCK / DZPC` (`aaefdc.f90:1437, 1445`).
++- `DZIC/DZG/DZIG` set up in `aaefdc.f90:1494, 1499`.
+ 
+ ## B. IGRIDV (Sigma-Zed / SGZ)
+ 
+-- `IGRIDV = 0` → standard sigma stretch (`mod_var_global.f90:236`, `aaefdc.f90:1323` sets `KSZ=1`).
++- `IGRIDV = 0` → standard sigma stretch (`mod_var_global.f90:236`, `aaefdc.f90:1325` sets `KSZ=1`).
+ - `IGRIDV > 0` → Sigma-Zed: variable bottom-active layer per cell.
+-- Read alongside `KMINV, SGZHPDELTA` at `input.f90:145`.
++- Read alongside `KMINV, SGZHPDELTA` at `input.f90:150`.
+ - SGZ arrays allocated when `IGRIDV > 0` (`varalloc.f90:1276`).
+-- Input: reads `sgzlayer.inp` (`aaefdc.f90:1332`):
++- Input: reads `sgzlayer.inp` (`aaefdc.f90:1334`):
+   - `IGRIDV == 1`: per-cell `KSZ` (bottom-active layer index only).
+   - `IGRIDV > 1`: per-cell `KSZ` and full `DZC(:)` array.
+-- Effect: layers `K < KSZ` are inactive (`DZC = 0`); face masks set by max neighbor `KSZ` (`aaefdc.f90:1448`).
+-- Face metrics `SGZU/SGZV` and inverses `FSGZU/FSGZV` at `aaefdc.f90:2382, 2592`.
++- Effect: layers `K < KSZ` are inactive (`DZC = 0`); face masks set by max neighbor `KSZ` (`aaefdc.f90:1450`).
++- Face metrics `SGZU/SGZV` and inverses `FSGZU/FSGZV` at `aaefdc.f90:2384, 2594`.
+ 
+ This lets you keep coarse layering in deep water while resolving thin near-bed layers in shallow areas — classic motivation for SGZ.
+ 
+@@ -67,27 +67,27 @@
+ 
+ Both use upwind (`KUPW = K − sign(W)/2`) for stability.
+ 
+-## E. Sigma-slope pressure-gradient (IINTPG)
++## E. Sigma-slope pressure-gradient (IGRIDV; IINTPG legacy input)
+ 
+-- `IINTPG` read at `input.f90:264`.
+-- SGZ branches override first (used when `IGRIDV>0`):
++- `IINTPG` is still read at `input.f90:269`, but EFDC+ Stable 12.5 no longer uses it to select buoyancy shear. Its only remaining behavioral consumer is `setbcs.f90:449`: `IINTPG /= 0` disables the external density-gradient cell-face flag treatment for 2-cell-wide channels. In `calexp2t.f90` (2TL), the four `IINTPG` occurrences were also removed (`calexp2t.f90:1246-1305`).
++- Buoyancy shear branches use `IGRIDV`; SGZ branches apply when `IGRIDV>0`:
+   - `IGRIDV == 1` → `calexp.f90:1169`.
+   - `IGRIDV > 1` → `calexp.f90:1187`.
+-- Sigma branches (used when `IGRIDV == 0`):
++- v12.5 branches:
+ 
+-| `IINTPG` | Branch | File:Line |
++| `IGRIDV` | Branch | File:Line |
+ |---|---|---|
+-| `0` | Standard density Jacobian | `calexp.f90:1207` |
+-| `1` | Improved sigma-slope correction | `calexp.f90:1225` |
+-| `2` | Finite-volume formulation | `calexp.f90:1265` |
++| `== 1` | Sigma-Zed buoyancy shears | `calexp.f90:1169` |
++| `> 1` | Sigma-Zed buoyancy shears | `calexp.f90:1187` |
++| else | STANDARD-SIGMA buoyancy shears | `calexp.f90:1206-1207` |
+ 
+-There is **no single named "sigma-slope error correction" symbol**; the alternative formulations are selected by `IINTPG`. For steep bathymetry, use `IINTPG=1` or `2`.
++There is **no single named "sigma-slope error correction" symbol**; for EFDC+ Stable 12.5, the `IINTPG` buoyancy-shear branches were removed; use `IGRIDV>0` (SGZ) for steep bathymetry. `IINTPG /= 0` disables the 2-cell-wide channel external density-gradient cell-face flag treatment at `setbcs.f90:449`.
+ 
+ ## F. Free-surface layer thickness
+ 
+ - Current layer thickness: `HPK = HP * DZC`; inverse `HPKI` (`caluvw.f90:1238`).
+-- Initial: `HPK = HP * DZC` (`aaefdc.f90:2610`).
+-- Prior `H1PK/H2PK` for time-history (`aaefdc.f90:2944`); wet/dry update at `calpuv9c.f90:1221`.
++- Initial: `HPK = HP * DZC` (`aaefdc.f90:2612`).
++- Prior `H1PK/H2PK` for time-history (`aaefdc.f90:2946`); wet/dry update at `calpuv9c.f90:1221`.
+ - Sigma face depths `HU/HV` from free-surface depths (`calpuv9c.f90:1268`).
+ - SGZ face depths handle unequal bottom layers via `HPK/DZC` (`calpuv9c.f90:1585`).
+ 
+@@ -97,15 +97,15 @@
+ 
+ - Inactive layers zeroed for tracers early (`Transport/caltran.f90:49`).
+ - Open-BC tracer logic skips inactive `LKSZ` (`Transport/caltran.f90:228`).
+-- Face masks `SUB3D/SVB3D` for SGZ (`aaefdc.f90:1448, 1458`).
+-- MPI subdomain boundary zeros face factors (`aaefdc.f90:2820`).
++- Face masks `SUB3D/SVB3D` for SGZ (`aaefdc.f90:1450, 1460`).
++- MPI subdomain boundary zeros face factors (`aaefdc.f90:2822`).
+ 
+ ## Decision Guide
+ 
+ | Domain type | `IGRIDV` | `IINTPG` | Notes |
+ |---|---|---|---|
+ | Flat / mild bathymetry | `0` (sigma) | `0` | Default behavior |
+-| Steep slope / canyon | `0` | `1` or `2` | Reduces sigma-coordinate PGF error |
++| Steep slope / canyon | `>0` (SGZ) | `0` | EFDC+ Stable 12.5 removed the `IINTPG` buoyancy-shear branches; `IINTPG /= 0` disables the 2-cell-wide channel external density-gradient cell-face flag treatment at `setbcs.f90:449` |
+ | Deep ocean + shallow shelf combined | `1` (per-cell `KSZ`) | `0` | Coarse deep, thin shallow |
+ | Highly variable bathymetry, per-cell layer control | `>1` (full `DZC` per cell) | `0` | Most flexible, requires `sgzlayer.inp` |
+ | Idealized box | `0` | `0` | Default |
+@@ -115,7 +115,7 @@
+ - For SGZ runs, ensure `KSZ` neighbors differ by no more than 1 — large jumps cause numerical noise at face transitions.
+ - `KMINV` (minimum active layer) prevents single-layer cells; default 1, raise to 2 for stability in very shallow cells.
+ - `SGZHPDELTA` controls the SGZ blending; typical values 0.1–0.3 of `HDRY`.
+-- If `KC >= 8` and bathymetry is steep, plot a vertical section of T/S — sigma-coordinate spurious diapycnal mixing shows as artificial stratification near slopes; cure with `IINTPG=2`.
++- If `KC >= 8` and bathymetry is steep, plot a vertical section of T/S — sigma-coordinate spurious diapycnal mixing shows as artificial stratification near slopes; for EFDC+ Stable 12.5, the `IINTPG` buoyancy-shear branches were removed; use `IGRIDV>0` (SGZ) for steep bathymetry. `IINTPG /= 0` disables the 2-cell-wide channel external density-gradient cell-face flag treatment at `setbcs.f90:449`.
+ - `HPK` should always be >= `DZC * HDRY` for active layers; if not, drying logic missed it.
+ - Vertical velocity W is diagnostic; large W spikes (>0.1 m/s in coastal) almost always mean horizontal flux imbalance, not a real physical signal.
+ 
+@@ -123,7 +123,7 @@
+ 
+ - ▢ Setting `IGRIDV>0` without providing `sgzlayer.inp` — model crashes on read.
+ - ▢ Mixing sigma and SGZ between cold-start and hot-start — `KSZ` inconsistency corrupts vertical structure.
+-- ▢ Using `IINTPG=2` (finite-volume) with very thin layers near surface — can introduce small mass-balance errors; check with shorter timestep first.
++- ▢ For EFDC+ Stable 12.5, the `IINTPG` buoyancy-shear branches were removed; use `IGRIDV>0` (SGZ) for steep bathymetry. `IINTPG /= 0` disables the 2-cell-wide channel external density-gradient cell-face flag treatment at `setbcs.f90:449`.
+ - ▢ Confusing `HPK` (layer thickness × depth) with `DZC` (sigma fraction) — many output diagnostics need one or the other.
+ - ▢ Relying on `HUVH` from older documentation — symbol does not exist in this code; use `HU/HV` and `DZC` instead.
+ 
+--- a/models/EFDC/source-analysis/efdc_water_quality.md
++++ b/models/EFDC/source-analysis/efdc_water_quality.md
+@@ -21,10 +21,10 @@
+ - `Eutrophication/mod_diagen.f90` (module :9-1107, flux kernel SEDFLUXNEW/ZBRENT/SOLVSMBE :1121-1393) — sediment diagenesis. 알고리즘: [[efdc_sediment_diagenesis]] (Cerco-Cole/Di Toro 2-layer flux, SOD Brent 폐합).
+ - `Eutrophication/mod_biota.f90:57-444` — biota.
+ - `Eutrophication/mod_zoopl.f90`, `mod_shellfish.f90`, `mod_rpem.f90` — additional modules.
+-- `aaefdc.f90:126, 3086` — `WQ3DINP` init.
++- `aaefdc.f90:126, 3088` — `WQ3DINP` init.
+ - `hdmt.f90:1021, hdmt2t.f90:734` — `WQ3D` runtime.
+ - `mod_scaninp.f90:1631-1697, 1875-1890` — input scanning.
+-- `Transport/calconc.f90:188, 213, 467-490`, `caltran.f90:13` — transport coupling.
++- `Transport/calconc.f90:191, 224, 479-507`, `caltran.f90:13` — transport coupling.
+ - `mod_netcdf.f90:291-1762` — NetCDF output.
+ - `SedTran-Original/ssedtox.f90:9-31` — sediment-toxic coupling.
+ 
+@@ -42,7 +42,7 @@
+ 
+ Core module: `WATERQUALITY` uses WQ vars + diagenesis + RPEM + shellfish + zooplankton + biota (`mod_wq.f90:9, 34`).
+ 
+-Init: `WQ3DINP` from startup when WQ active (`aaefdc.f90:126, 3086`).
++Init: `WQ3DINP` from startup when WQ active (`aaefdc.f90:126, 3088`).
+ 
+ Runtime: `WQ3D` called from both hydro drivers when `ISTRAN(8) >= 1` (`hdmt.f90:35, 1021`; `hdmt2t.f90:37, 734`).
+ 
+@@ -101,10 +101,10 @@
+ 
+ Initialized when `IWQBEN == 1`; reads `wq_3dsd.jnp` (`mod_wq.f90:585`, `mod_diagen.f90:160`).
+ 
+-Runtime coupling: `SMMBE` called from `WQ3D` (`mod_wq.f90:351`, `mod_diagen.f90:674`).
++Runtime coupling: `SMMBE` called from `WQ3D` (`mod_wq.f90:351`, `mod_diagen.f90:672`).
+ 
+-Inputs (`mod_diagen.f90:164-277`):
+-- Sediment zones, restart controls.
++Inputs (`mod_diagen.f90:164-276`):
++- Sediment zones.
+ - Diffusion, stoichiometry.
+ - Layer-1/2 NH4/H2S/PO4/silica parameters.
+ - Decay rates, burial, particle mixing.
+@@ -129,9 +129,9 @@
+ ## F. Coupling to hydrodynamics
+ 
+ WQ constituents transported through general concentration path:
+-- `CALCONC` calls `CALTRAN` for all water-column constituents (`Transport/calconc.f90:188`).
++- `CALCONC` calls `CALTRAN` for all water-column constituents (`Transport/calconc.f90:191`).
+ - `CALTRAN` is the advective transport routine (`Transport/caltran.f90:13`).
+-- Anti-diffusion: `CALTRAN_AD` (`Transport/calconc.f90:213`).
++- Anti-diffusion: `CALTRAN_AD` (`Transport/calconc.f90:224`).
+ 
+ Settling/bed exchange (sediments/toxics) coupled via `SSEDTOX` from `CALCONC` (`:490, 506`).
+ 
+--- a/models/EFDC/source-analysis/efdc_wetdry.md
++++ b/models/EFDC/source-analysis/efdc_wetdry.md
+@@ -16,8 +16,8 @@
+ 
+ ## Source basis
+ 
+-- `input.f90:264-293, 548-570` — `ISDRY`, `HDRY/HWET` reads, derived `HDRYICE/HDRYWAV`.
+-- `mod_var_global.f90:60, 841, 1048, 1053` — `LMASKDRY` definition, `ISDRY/HDRY/HWET` doc.
++- `input.f90:269-298, 570-592` — `ISDRY`, `HDRY/HWET` reads, derived `HDRYICE/HDRYWAV`.
++- `mod_var_global.f90:60, 841, 1049, 1054` — `LMASKDRY` definition, `ISDRY/HDRY/HWET` doc.
+ - `calpuv9c.f90` — primary wet/dry algorithm (`:130, 138, 146, 161, 177, 345, 353, 358, 400, 501, 521, 607-631, 641, 724, 752, 804-846, 861, 869, 892-1080, 1156, 1213-1379, 1454-1843`).
+ - `caluvw.f90:240-270, 939-1052` — velocity reset on dry cells.
+ - `calexp.f90:750, 1104` — wet-cell list refresh, newly wet damping.
+@@ -28,7 +28,7 @@
+ 
+ ## A. ISDRY flag
+ 
+-- Read from card C5 (`input.f90:264`) and broadcast (`:272`).
++- Read from card C5 (`input.f90:269`) and broadcast (`:272`).
+ - Negative `ISDRY` flips to positive and sets `IDRYTBP=1` (`:286`).
+ - Rigid lid forces `ISDRY = -1` (`:293`).
+ - Definition: `0` = off, `>0` = wetting/drying active (`mod_var_global.f90:841`).
+@@ -42,10 +42,10 @@
+ 
+ ## B. HDRY vs HWET
+ 
+-Read from card C11 (`input.f90:548-570`). Derived: `HDRYICE`, `HDRYWAV`.
++Read from card C11 (`input.f90:570-592`). Derived: `HDRYICE`, `HDRYWAV`.
+ 
+-- `HDRY` = wet/dry control depth (`mod_var_global.f90:1048`). Drying triggered when `HP < HDRY` or `HP <= HDRY` (`calpuv9c.f90:899, 935`).
+-- `HWET` = minimum operational depth for QSER withdrawals and structures, **not** the central rewetting threshold (`mod_var_global.f90:1053`).
++- `HDRY` = wet/dry control depth (`mod_var_global.f90:1049`). Drying triggered when `HP < HDRY` or `HP <= HDRY` (`calpuv9c.f90:899, 935`).
++- `HWET` = minimum operational depth for QSER withdrawals and structures, **not** the central rewetting threshold (`mod_var_global.f90:1054`).
+ 
+ Standard wet/dry mode (`ISDRY != 99`) closes all four cell faces when `HP < HDRY` and the cell isn't recovering fast enough (`calpuv9c.f90:905, 912`).
+ 
+--- a/models/EFDC/source-analysis/sediment/efdc_sediment.md
++++ b/models/EFDC/source-analysis/sediment/efdc_sediment.md
+@@ -18,11 +18,11 @@
+ 
+ - `mod_scaninp.f90:381, 407` — `ISTRAN` checks for SEDZLJ enable, noncohesive/bedload setup.
+ - `varalloc.f90:843-1156` — array allocation per branch.
+-- `SedTran-Original/ssedtox.f90:868-1287` — runtime dispatch.
++- `SedTran-Original/ssedtox.f90:863-1278` — runtime dispatch.
+ - `SedTran-Original/calsed.f90` — cohesive Krone-Partheniades.
+ - `SedTran-Original/calsnd.f90`, `bedload.f90`, `fsbdld.f90`, `csndzeq.f90`, `csndeqc.f90` — noncohesive.
+ - `SedTran-SEDZLJ/s_main.f90`, `s_sedic.f90`, `s_sedzlj.f90`, `s_shear.f90` — SEDZLJ.
+-- `Transport/calconc.f90:188-517` — coupling to water-column transport.
++- `Transport/calconc.f90:191-534` — coupling to water-column transport.
+ - `varinit.f90:319-340` — `SED/SND` constituent registration.
+ 
+ ## A. ISTRAN flag dispatch
+@@ -40,7 +40,7 @@
+ 
+ | Condition | Behavior | File:Line |
+ |---|---|---|
+-| `ISTRAN(6) >= 1 .and. LSEDZLJ` | Calls `SEDZLJ_MAIN`, bypasses Original bed/water logic | `SedTran-Original/ssedtox.f90:868-872` |
++| `ISTRAN(6) >= 1 .and. LSEDZLJ` | Calls `SEDZLJ_MAIN`, bypasses Original bed/water logic | `SedTran-Original/ssedtox.f90:863-867` |
+ | `ISTRAN(6) >= 1 .and. !LSEDZLJ` | Original cohesive `CALSED` | `:872-874` |
+ | `ISTRAN(7) >= 1 .and. !LSEDZLJ` | Original noncohesive `CALSND` | `:878-880` |
+ 
+@@ -163,11 +163,11 @@
+ ## E. Bed update per timestep
+ 
+ `CALCONC` calls `SSEDTOX` when sediment is active and sediment time has accumulated:
+-- 2TL: `Transport/calconc.f90:491-504`.
++- 2TL: `Transport/calconc.f90:508-521`.
+ - 3TL: `:506-517`.
+ 
+ Inside `SSEDTOX` (Original):
+-- `CALBLAY` (bed-layer accounting) after bed/water exchange if `KB > 1` (`SedTran-Original/ssedtox.f90:1117-1128`).
++- `CALBLAY` (bed-layer accounting) after bed/water exchange if `KB > 1` (`SedTran-Original/ssedtox.f90:1108-1119`).
+ - `CALBED` (physical bed properties) only when not SEDZLJ (`:1282-1287`).
+ 
+ SEDZLJ updates bed state inside `s_sedzlj.f90`; `SSEDTOX` bypasses Original `CALBED` (`:1282-1287`).
+@@ -189,7 +189,7 @@
+ 
+ ## G. Deposition boundary handling
+ 
+-- Water-column open-BC concentrations reset after CALTRAN (`Transport/calconc.f90:250-255`).
++- Water-column open-BC concentrations reset after CALTRAN (`Transport/calconc.f90:262-267`).
+ - Original cohesive hard-bottom cells skip bed exchange (`SedTran-Original/calsed.f90:320-323`).
+ - Original noncohesive skips hard-bottom in erosion/deposition loops (`SedTran-Original/calsnd.f90:361, 371`).
+ - Bedload boundary fluxes explicitly zeroed for outflow / recirculation BCs (`SedTran-Original/bedload.f90:35-45`).
+@@ -202,7 +202,7 @@
+ - Cohesive `SED` pointers added when `ISTRAN(6) > 0` (`varinit.f90:319-328`).
+ - Noncohesive `SND` pointers added when `ISTRAN(7) > 0` (`:331-340`).
+ 
+-CALTRAN transports every active constituent through `WCV` (`Transport/calconc.f90:188-193`); anti-diffusion at `:213-219`.
++With `ISQUICK == 1`, CALTRAN_QUICKEST transports every active constituent through `WCV`; otherwise CALTRAN does (`Transport/calconc.f90:198-203`); anti-diffusion is gated by `ISQUICK == 0` at `:228-230, 250`.
+ 
+ After CALTRAN + vertical diffusion, totals `SEDT/SNDT` recomputed (`:407-463`); sediment bed/water source-sink applied via `SSEDTOX` (`:490-517`).
+ 
