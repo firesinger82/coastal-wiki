@@ -309,6 +309,36 @@ ROMS 는 `ana_*.h` 41쌍을 `ROMS/Functionals/`(배포본)와 `User/Functionals/
 선언이 없거나 후보를 가르지 못하면 AMBIGUOUS 를 유지한다 — **임의로 한쪽을 고르지 않는다.**
 실측: ROMS AMBIGUOUS_SAME_MODEL 78 → 1.
 
+#### 변종 트리 — `source_scope` 선언 (2026-09-20, Celeris)
+
+`component:` 는 값이 **경로 형태일 때만** 후보를 가른다. 그렇지 않은 모델이 더 많다 —
+Celeris 노트 17개는 `component` 자체가 없고, CADMAS-SURF 는 자유서술(`src (CADMAS-SURF/3D2F …)`)이다.
+
+그래서 노트가 **분석한 저장소 상대 디렉터리 접두사**를 직접 선언한다.
+
+```yaml
+source_scope: Celeris-WebGPU/js, Celeris-WebGPU/shaders
+```
+
+해소 시 이 접두사로 후보를 거르고 `RESOLVED_BY_SCOPE` 로 기록한다.
+모델별 등록표가 필요 없고 변종 구조가 달라도 같은 방식이 쓰인다.
+
+**선언 전에 근거를 확인한다.** Celeris 실측: 노트의 `transect` 언급 0건,
+인용문 판별 대조에서 `transect만` 0 · `main만` 46, 인용 디렉터리가 11개 노트 모두 동일.
+변종 내용은 실제로 다르다(70쌍 중 60쌍). → 484건 전부 `RESOLVED_BY_SCOPE`.
+
+**휴리스틱으로 대체하지 않는다.** "얕은 경로(base tree) 우선" 규칙은 Celeris 만 풀고
+CADMAS-SURF(3D vs 3D2F)·FUNWAVE(TVD vs GPU)는 후보 깊이가 같아 듣지 않는다.
+
+| 모델 | 변종 | 내용 차이 | 잔여 |
+|---|---|---|---|
+| Celeris | `transect_version/` | 70쌍 중 60 | **0** (선언 완료) |
+| CADMAS-SURF | `CADMAS-SURF-3D` ↔ `-3D2F` | 212쌍 중 100 | 331 |
+| FUNWAVE | `FUNWAVE-TVD` ↔ `FUNWAVE-GPU` | 29쌍 중 27 | 120 |
+| LISFLOOD-FP · Delft3D · XBeach | 저장소 내부 중복 | 미조사 | 41 · 37 · 8 |
+
+남은 모델은 해당 migration 착수 시 같은 절차(근거 확인 → 선언)로 처리한다.
+
 #### 모양 기반 억제 금지 (2026-09-20, ROMS 파일럿에서 설계 변경)
 
 참고문헌 이니셜(`Shchepetkin, A.F.` → `A.F`)과 슬래시·플러스 축약(`exchange_2d/3d/4d.F`,

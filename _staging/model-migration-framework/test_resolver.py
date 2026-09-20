@@ -33,6 +33,11 @@ FIX = [
      "RESOLVED_BY_COMPONENT", "ROMS"),
     ("ana_grid.h", "models/ROMS/source-analysis/roms_analytical_functionals.md", 200,
      "RESOLVED_BY_COMPONENT", "ROMS"),
+    # 변종 트리: 노트 선언 source_scope 로 거른다 (Celeris main vs transect_version)
+    ("js/main.js", "models/Celeris/source-analysis/celeris-source-map.md", None,
+     "RESOLVED_BY_SCOPE", "Celeris"),
+    ("Pass1.wgsl", "models/Celeris/source-analysis/celeris-pipeline-graph.md", None,
+     "RESOLVED_BY_SCOPE", "Celeris"),
     # 부분 이름은 추측으로 해소하지 않는다
     ("Compdata.f90",  "models/SWAN/source-analysis/x.md", None, "UNRESOLVED", None),
     ("PDataSets.ftn90", "models/SWAN/source-analysis/x.md", None, "UNRESOLVED", None),
@@ -61,12 +66,16 @@ def main():
                    idx, max_line=53, wiki=W)
     if not (len(r["paths"]) == 1 and "/ROMS/Functionals/" in r["paths"][0]):
         fails.append(f"component 귀속 오류: {r['paths']}")
+    # source_scope 귀속은 main 트리를 고른다(transect_version 아님)
+    r = rv.resolve("main.js", "models/Celeris/source-analysis/celeris-source-map.md", idx, wiki=W)
+    if not (len(r["paths"]) == 1 and "transect_version" not in r["paths"][0]):
+        fails.append(f"source_scope 귀속 오류: {r['paths']}")
     # 모양 기반 억제 금지: 짧은 stem 이어도 실재하면 참조다 (io.F·bc.F 19건 선례)
     for probe in ("io.F", "bc.F"):
         if rv.resolve(probe, "models/ROMS/source-analysis/x.md", idx, wiki=W)["status"] == "UNRESOLVED":
             fails.append(f"짧은 stem 실재 파일이 미해소: {probe}")
 
-    print(f"fixtures {len(FIX)} + 규칙검사 4 | 실패 {len(fails)}")
+    print(f"fixtures {len(FIX)} + 규칙검사 5 | 실패 {len(fails)}")
     for f in fails:
         print("  FAIL:", f)
     if fails:

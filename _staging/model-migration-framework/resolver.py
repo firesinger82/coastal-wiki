@@ -92,8 +92,7 @@ def _narrow(cands, wiki, model, max_line):
     return cands, note
 
 
-def declared_component(note_path, wiki):
-    """노트 frontmatter 의 `component:` 선언. 이중 배치 소스의 귀속 근거."""
+def _frontmatter_field(note_path, wiki, field):
     try:
         lines = (Path(wiki)/note_path).read_text(errors="replace").splitlines()
     except OSError:
@@ -103,10 +102,27 @@ def declared_component(note_path, wiki):
     for l in lines[1:40]:
         if l.strip() == "---":
             break
-        m = re.match(r"\s*component\s*:\s*(.+?)\s*$", l)
+        m = re.match(rf"\s*{field}\s*:\s*(.+?)\s*$", l)
         if m:
             return m.group(1).strip().strip('"\'')
     return None
+
+
+def declared_component(note_path, wiki):
+    """노트 frontmatter 의 `component:` 선언. 이중 배치 소스의 귀속 근거."""
+    return _frontmatter_field(note_path, wiki, "component")
+
+
+def declared_scope(note_path, wiki):
+    """`source_scope:` — 노트가 분석한 저장소 상대 디렉터리 접두사 목록.
+
+    변종 트리(배포본 vs 파생본, 3D vs 3D2F, CPU vs GPU 포팅)를 가르는 일반 선언이다.
+    `component:` 가 경로 형태가 아닐 때도 쓸 수 있다.
+    """
+    v = _frontmatter_field(note_path, wiki, "source_scope")
+    if not v:
+        return []
+    return [s.strip().strip('"\'').strip("/") for s in v.strip("[]").split(",") if s.strip()]
 
 
 def resolve(ref, note_path, index, max_line=None, wiki=None):
@@ -128,6 +144,16 @@ def resolve(ref, note_path, index, max_line=None, wiki=None):
             c = _suffix_hit(c, ref)
             if len(c) > 1:
                 c, why = _narrow(c, wiki, own, max_line)
+                if len(c) > 1 and wiki:
+                    # 변종 트리: 노트가 선언한 source_scope 접두사로 거른다
+                    for sc in declared_scope(note_path, wiki):
+                        pref = [x for x in c
+                                if x[len(f"models/{own}/raw/source_code/"):].startswith(sc + "/")]
+                        if pref and len(pref) < len(c):
+                            c = pref
+                            if len(c) == 1:
+                                return pack("RESOLVED_BY_SCOPE", own, c,
+                                            f"노트 선언 source_scope={sc}")
                 if len(c) > 1 and wiki:
                     # 이중 배치(배포본 vs 사용자 템플릿 등): 노트가 선언한 component 를 근거로 쓴다
                     comp = declared_component(note_path, wiki)
