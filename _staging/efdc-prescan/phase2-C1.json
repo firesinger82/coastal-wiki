@@ -1,0 +1,132 @@
+[
+ {
+  "id": "C1-1",
+  "note": "models/EFDC/source-analysis/efdc_boundary_conditions.md",
+  "note_line": 21,
+  "wiki_claim": "- `setbcs.f90:203-490` — initialization of BC mappings + face/momentum mask setup.",
+  "file": "EFDC/setbcs.f90",
+  "old_range": "203-490",
+  "status": "modified",
+  "old_excerpt": "203:   ! *** New Mapping routines for MPI Domain Decomp\n204:   call Map_River\n205:   call Map_OpenBC_Pressure\n206:   call Map_OpenBC_Conc\n207:   call Map_Hydraulic_Structures\n208:   call Map_Withdrawal_Return\n209:   call Map_Jet_Plume\n210:   \n211:   ! *** SET WATER-WATER (P OR SURFACE ELEVATION) BOUNDARY SWITCHES\n212:   do LL = 1,NPBW\n213:     I = IPBW(LL)\n214:     J = JPBW(LL)\n215:     L = LIJ(I,J)\n216:     LPBW(LL) = L\n217:     LE = LEC(L)\n218:     SWB(L) = 0.               ! *** Used for On/Off of Vertical Velocities\n219:     SPB(L) = 0.               ! *** Used for On/Off of various BC forcings at open boundaries\n220:     \n221:     SUB(L) = 0.\n222:     SVB(L) = 0.               ! *** Bottom of cell\n223:     SVB(LNC(L)) = 0.          ! *** Top of cell"
+ },
+ {
+  "id": "C1-2",
+  "note": "models/EFDC/source-analysis/efdc_ice.md",
+  "note_line": 21,
+  "wiki_claim": "- `Transport/mod_heat.f90:251-1490, 1095-1104, 641-753, 1322-1428, 1652-1674` — heat-balance + ice physics.",
+  "file": "EFDC/Transport/mod_heat.f90",
+  "old_range": "251-1490",
+  "status": "modified",
+  "old_excerpt": "251:     ! *** READING ICEINIT.INP FILE FOR THE INITIAL ICE THICKNESS\n252:     if( ISICE > 2 )then\n253:       if( ISRESTI == 0 )then\n254:         if( process_id == master_id )then\n255:           write(*,'(A)')' CALHEAT: READ IN SPATIALLY VARYING ICE CONDITIONS: ICE.INP'\n256:           open(1001,FILE = 'ice.inp',STATUS = 'OLD')\n257:           call SKIPCOM(1001,'*')\n258:           do LL = 2,LA_Global\n259:             read(1001,*,IOSTAT = IOS) I, J, RICETHKL0\n260:             if( IOS > 0 ) STOP 'ICE.INP: READING ERROR'\n261:             LG = LIJ_Global(I,J)\n262:             ICETHICK_Global(LG) = RICETHKL0        ! INITIAL ICE THICKNESS IN M\n263:           enddo\n264:           close(1001)\n265:         endif\n266:         call Broadcast_Array(ICETHICK_Global, master_id)\n267: \n268:         ! *** Map to Local Domain\n269:         do LG = 2,LA_GLOBAL\n270:           L = Map2Local(LG).LL\n271:           if( L > 1 )then"
+ },
+ {
+  "id": "C1-3",
+  "note": "models/EFDC/source-analysis/efdc_ice.md",
+  "note_line": 25,
+  "wiki_claim": "- `calexp.f90:1091-1385`, `calexp2t.f90:1014-1405` — internal mode + waves.",
+  "file": "EFDC/calexp.f90",
+  "old_range": "1091-1385",
+  "status": "modified",
+  "old_excerpt": "1091:       do K = 1,KC  \n1092:         do LP = LF,LL\n1093:           L = LWVCELL(LP)\n1094:           if( LKSZ(L,K) ) CYCLE  \n1095:           FX(L,K) = FX(L,K) + SUB3D(L,K)*WVFACT*SAAX(L)*FXWAVE(L,K)\n1096:           FY(L,K) = FY(L,K) + SVB3D(L,K)*WVFACT*SAAY(L)*FYWAVE(L,K)\n1097:         enddo\n1098:       enddo\n1099:     enddo   ! *** END OF DOMAIN\n1100:     !$OMP END DO\n1101:   \n1102:   endif\n1103:   \n1104:   ! *** Filter cells which have been impacted by newly wet cells\n1105:   if( ISDRY > 0 )then\n1106:     !$OMP DO PRIVATE(ND,K,LP,L)\n1107:     do ND = 1,NDM   \n1108:       do K = 1,KC  \n1109:         do LP = 1,LLWET(K,ND)\n1110:           L = LKWET(LP,K,ND)\n1111:           if( NWET(L) > 2*NTSTBC ) CYCLE"
+ },
+ {
+  "id": "C1-4",
+  "note": "models/EFDC/source-analysis/efdc_ice.md",
+  "note_line": 25,
+  "wiki_claim": "- `calexp.f90:1091-1385`, `calexp2t.f90:1014-1405` — internal mode + waves.",
+  "file": "EFDC/calexp2t.f90",
+  "old_range": "1014-1405",
+  "status": "modified",
+  "old_excerpt": "1014:       do K = 1,KC\n1015:         do LP = LF,LL\n1016:           L = LWVCELL(LP)  \n1017:           if( LKSZ(L,K) ) CYCLE  \n1018:           FX(L,K) = FX(L,K)+SUB3D(L,K)*WVFACT*SAAX(L)*FXWAVE(L,K)\n1019:           FY(L,K) = FY(L,K)+SVB3D(L,K)*WVFACT*SAAY(L)*FYWAVE(L,K)\n1020:         enddo\n1021:       enddo\n1022:     enddo   ! *** END OF DOMAIN\n1023:     !$OMP END PARALLEL DO\n1024:   endif  \n1025:   \n1026:   \n1027:   ! *** Filter cells which have been impacted by newly wet cells\n1028:   !if( ISDRY > 0 )then\n1029:   !  !$OMP DO PRIVATE(ND,K,LP,L)\n1030:   !  do ND = 1,NDM   \n1031:   !    do K = 1,KC                delme - uncomment this block to match 3TL filtering\n1032:   !      do LP = 1,LLWET(K,ND)\n1033:   !        L = LKWET(LP,K,ND)\n1034:   !        if( NWET(L) > 10 ) CYCLE"
+ },
+ {
+  "id": "C1-5",
+  "note": "models/EFDC/source-analysis/efdc_ice.md",
+  "note_line": 28,
+  "wiki_claim": "- `Waves/mod_windwave.f90:191-826` — wave routines (no ice).",
+  "file": "EFDC/Waves/mod_windwave.f90",
+  "old_range": "191-826",
+  "status": "modified",
+  "old_excerpt": "191:       if( LWVMASK(L) )then\n192:       \n193:         ! *** 10 meter winds WNDVELE, WNDVELN already adjusted for wind sheltering\n194:         WINX = WNDVELE(L)    ! *** X IS TRUE EAST\n195:         WINY = WNDVELN(L)    ! *** Y IS TRUE NORTH\n196: \n197:         WINDVEL2 = WINX*WINX + WINY*WINY\n198:         WINDVEL = SQRT(WINDVEL2)                   ! *** 10m wind magnitude\n199: \n200:         if( WINDVEL > 1.D-3 )then\n201: \n202:           WV(L).TWX = WINX/WINDVEL\n203:           WV(L).TWY = WINY/WINDVEL\n204:           if( WINX  >= 0. )then\n205:             WINDDIR  = ACOS(WV(L).TWY)*180./PI      !DEG. (NORTH,WIND TO)\n206:           else\n207:             WINDDIR  = 360.-ACOS(WV(L).TWY)*180./PI\n208:           endif\n209:           ZONE = FETZONE(WINDDIR)\n210: \n211:           LG = Map2Global(L).LG"
+ },
+ {
+  "id": "C1-6",
+  "note": "models/EFDC/source-analysis/efdc_ice.md",
+  "note_line": 29,
+  "wiki_claim": "- `varalloc.f90:1386-1400` — ice arrays.",
+  "file": "EFDC/varalloc.f90",
+  "old_range": "1386-1400",
+  "status": "modified",
+  "old_excerpt": "1386:   ! *** ICE\n1387:   if( ISICE > 0 )then\n1388:     call AllocateDSI( MITLAST,     NISER,   0)           ! *** ISICE = 1  INPUT SERIES LAST INDEX FOR SERIES\n1389:     call AllocateDSI( FRAZILICE,   LCM,     KCM,   0.0)  ! *** ISICE = 4 FRAZIL ICE IN EACH CELL AND LAYER (M)\n1390:     call AllocateDSI( FRAZILICE1,  LCM,     KCM,   0.0)  ! *** ISICE = 4 FRAZIL ICE IN EACH CELL AND LAYER FOR PREVIOUS TIME STEP (M)\n1391:     call AllocateDSI( ICECOVER,    LCM,     0.0)         ! *** ISICE>0 FRACTION OF ICE COVER FOR EACH CELL (M)\n1392:     call AllocateDSI( ICERATE,     LCM,     0.0)         ! *** ISICE>2 WATER FLOW RATE TO/FROM WATER COLUMN (M3/S)\n1393:     call AllocateDSI( ICETHICK,    LCM,     0.0)         ! *** ISICE>0 ICE THICKNESS FOR EACH CELL (M)\n1394:     call AllocateDSI( ICETHICK1,   LCM,     0.0)         ! *** ISICE>0 ICE THICKNESS FOR EACH CELL FOR PREVIOUS TIME STEP (M)\n1395:     call AllocateDSI( ICETEMP,     LCM,     0.0)         ! *** ISICE>0 ICE TEMPERATURE OF EACH CELL (M)\n1396:     call AllocateDSI( ICEVOL,      LCM,     0.0)         ! *** ISICE>0 INCREMENTAL WATER VOLUMES FOR ICE FORMATION/MELT (M3)\n1397:     call AllocateDSI( RICECOVT,    NISER,   0.0)         ! *** ISICE = 1  INPUT ICE COVER AT CURRENT TIME\n1398:     call AllocateDSI( RICETHKT,    NISER,   0.0)         ! *** ISICE = 1  INPUT ICE THICKNESS AT CURRENT TIME\n1399:   endif\n1400:   call AllocateDSI( ICECELL,   LCM,  .false.)            ! *** ISICE>0  PERFORM ICE COMPUTATIONS"
+ },
+ {
+  "id": "C1-7",
+  "note": "models/EFDC/source-analysis/efdc_ice.md",
+  "note_line": 108,
+  "wiki_claim": "Wave forcing added to momentum via `FXWAVE/FYWAVE` (`calexp.f90:1091-1097`, `calexp2t.f90:1014-1019`).",
+  "file": "EFDC/calexp2t.f90",
+  "old_range": "1014-1019",
+  "status": "modified",
+  "old_excerpt": "1014:       do K = 1,KC\n1015:         do LP = LF,LL\n1016:           L = LWVCELL(LP)  \n1017:           if( LKSZ(L,K) ) CYCLE  \n1018:           FX(L,K) = FX(L,K)+SUB3D(L,K)*WVFACT*SAAX(L)*FXWAVE(L,K)\n1019:           FY(L,K) = FY(L,K)+SVB3D(L,K)*WVFACT*SAAY(L)*FYWAVE(L,K)"
+ },
+ {
+  "id": "C1-8",
+  "note": "models/EFDC/source-analysis/efdc_ice.md",
+  "note_line": 133,
+  "wiki_claim": "Allocated arrays: `ICECOVER, ICETHICK, ICETEMP, ICEVOL, ICERATE`, frazil arrays (`varalloc.f90:1386-1400`).",
+  "file": "EFDC/varalloc.f90",
+  "old_range": "1386-1400",
+  "status": "modified",
+  "old_excerpt": "1386:   ! *** ICE\n1387:   if( ISICE > 0 )then\n1388:     call AllocateDSI( MITLAST,     NISER,   0)           ! *** ISICE = 1  INPUT SERIES LAST INDEX FOR SERIES\n1389:     call AllocateDSI( FRAZILICE,   LCM,     KCM,   0.0)  ! *** ISICE = 4 FRAZIL ICE IN EACH CELL AND LAYER (M)\n1390:     call AllocateDSI( FRAZILICE1,  LCM,     KCM,   0.0)  ! *** ISICE = 4 FRAZIL ICE IN EACH CELL AND LAYER FOR PREVIOUS TIME STEP (M)\n1391:     call AllocateDSI( ICECOVER,    LCM,     0.0)         ! *** ISICE>0 FRACTION OF ICE COVER FOR EACH CELL (M)\n1392:     call AllocateDSI( ICERATE,     LCM,     0.0)         ! *** ISICE>2 WATER FLOW RATE TO/FROM WATER COLUMN (M3/S)\n1393:     call AllocateDSI( ICETHICK,    LCM,     0.0)         ! *** ISICE>0 ICE THICKNESS FOR EACH CELL (M)\n1394:     call AllocateDSI( ICETHICK1,   LCM,     0.0)         ! *** ISICE>0 ICE THICKNESS FOR EACH CELL FOR PREVIOUS TIME STEP (M)\n1395:     call AllocateDSI( ICETEMP,     LCM,     0.0)         ! *** ISICE>0 ICE TEMPERATURE OF EACH CELL (M)\n1396:     call AllocateDSI( ICEVOL,      LCM,     0.0)         ! *** ISICE>0 INCREMENTAL WATER VOLUMES FOR ICE FORMATION/MELT (M3)\n1397:     call AllocateDSI( RICECOVT,    NISER,   0.0)         ! *** ISICE = 1  INPUT ICE COVER AT CURRENT TIME\n1398:     call AllocateDSI( RICETHKT,    NISER,   0.0)         ! *** ISICE = 1  INPUT ICE THICKNESS AT CURRENT TIME\n1399:   endif\n1400:   call AllocateDSI( ICECELL,   LCM,  .false.)            ! *** ISICE>0  PERFORM ICE COMPUTATIONS"
+ },
+ {
+  "id": "C1-9",
+  "note": "models/EFDC/source-analysis/efdc_water_quality.md",
+  "note_line": 19,
+  "wiki_claim": "- `Eutrophication/mod_wq.f90:9-5083` — WATERQUALITY core.",
+  "file": "EFDC/Eutrophication/mod_wq.f90",
+  "old_range": "9-5083",
+  "status": "modified",
+  "old_excerpt": "9: MODULE WATERQUALITY\n10:     \n11:   ! *** WATER QUALITY MODEL KINETIC AND SEDIMENT PROCESSES\n12: \n13:   ! *** ------------------------------------------------------------------------------\n14:   ! *** CHANGE RECORD  \n15:   ! *** DATE MODIFIED     BY               DESCRIPTION\n16:   ! *** ------------------------------------------------------------------------------\n17:   ! *** 2019-12           D.K. TRAN          Derived data type for algae classes\n18:   ! *** 2019-11           D.K. TRAN          Converted to Module\n19:   ! *** 2018-04           Paul M. Craig      Rearranged entire water quality code\n20:   ! ***                                      to be better integrated with EFDC+\n21:   ! *** 2011-03           Paul M. Craig      Rewritten to F90 \n22:   ! *** 2008                                 Merged SNL and DSI\n23: \n24:   use GLOBAL    \n25:   use INFOMOD\n26:   use JULIANMOD\n27:   \n28:   use Variables_MPI\n29:   use Broadcast_Routines"
+ },
+ {
+  "id": "C1-10",
+  "note": "models/EFDC/source-analysis/efdc_water_quality.md",
+  "note_line": 22,
+  "wiki_claim": "- `Eutrophication/mod_biota.f90:57-444` — biota.",
+  "file": "EFDC/Eutrophication/mod_biota.f90",
+  "old_range": "57-444",
+  "status": "modified",
+  "old_excerpt": "57:   if( process_id == master_id  .and. NALGAE > 0 )then\n58:     json_data => fson_parse(\"wq_biota.jnp\")\n59:     \n60:     ! *** Get the phytoplankton group's parameters as an array\n61:     call fson_get(json_data, \"groups\", phytogroups)\n62:     \n63:     ! *** Loop through each array item\n64:     do NAL = 1, fson_value_count(phytogroups)\n65:       ! *** Get the array item \n66:       item => fson_value_get(phytogroups, NAL)\n67:       \n68:       ! *** Lookup the values from the array\n69:       call fson_get(item, \"index\",                                          ALGAES(NAL).IDN)            ! *** \n70:       call fson_get(item, \"mobility_flag\",                                  ISMOB)                      ! *** \n71:       call fson_get(item, \"salinity_toxicity_flag\",                         ALGAES(NAL).ISTOX)          ! *** \n72:       call fson_get(item, \"winter_bloom_flag\",                              ALGAES(NAL).ISBLOOM)        ! *** \n73:       call fson_get(item, \"silica_active_flag\",                             ALGAES(NAL).ISILICA)        ! *** \n74:       call fson_get(item, \"settling_velocity\",                              ALGAES(NAL).WQWS(1))        ! *** \n75:         \n76:       if( ISMOB == 0 )then\n77:         ALGAES(NAL).ISMOBILE = .FALSE.     "
+ },
+ {
+  "id": "C1-11",
+  "note": "models/EFDC/source-analysis/efdc_water_quality.md",
+  "note_line": 106,
+  "wiki_claim": "Inputs (`mod_diagen.f90:164-277`):",
+  "file": "EFDC/Eutrophication/mod_diagen.f90",
+  "old_range": "164-277",
+  "status": "modified",
+  "old_excerpt": "164:     call fson_get(json_data, \"title\", TITLE)\n165:     call fson_get(json_data, \"initial_condition_option\", ISMICI)\n166:     call fson_get(json_data, \"number_of_spatial_zones\", ISMZ)\n167:     call fson_get(json_data, \"write_restart_option\", ISMRST)\n168:     call fson_get(json_data, \"sediment_temperature_diffusion_coef\", SMDIFT)\n169:     call fson_get(json_data, \"stoichiometric_coef_for_carbon_diagenesis.nitrification\", SMO2NH4)\n170:     call fson_get(json_data, \"stoichiometric_coef_for_carbon_diagenesis.denitritrification\", SMO2NO3)\n171:     call fson_get(json_data, \"stoichiometric_coef_for_carbon_diagenesis.H2S_oxidation\", SMO2C)\n172:     \n173:     NSMZ = ISMZ\n174:     SMDIFT = SMDIFT*8.64E4   !< Convert to m^2/day\n175:     \n176:     call fson_get(json_data, \"fraction_from_algae.PON\", SMFNBA)\n177:     call fson_get(json_data, \"fraction_from_algae.POP\", SMFPBA)\n178:     call fson_get(json_data, \"fraction_from_algae.POC\", SMFCBA)\n179:     \n180:     Do NAL = 1,ALG_COUNT\n181:       SUMCBA(NAL) = SMFCBA(NAL,1) + SMFCBA(NAL,2) + SMFCBA(NAL,3)\n182:       SUMPBA(NAL) = SMFPBA(NAL,1) + SMFPBA(NAL,2) + SMFPBA(NAL,3)\n183:       SUMNBA(NAL) = SMFNBA(NAL,1) + SMFNBA(NAL,2) + SMFNBA(NAL,3)\n184:       if( SUMCBA(NAL) < 0.9999 .or. SUMCBA(NAL) > 1.0001) CALL STOPP('ERROR!! SMFCBA(1)+SMFCBA(2)+SMFCBA(3) SHOULD BE 1')"
+ },
+ {
+  "id": "C1-12",
+  "note": "models/EFDC/source-analysis/efdc_dispersion.md",
+  "note_line": 24,
+  "wiki_claim": "- `models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/mod_var_global.f90:991-992, 1098-1099` — `AHO/AHD` scalar + `AHOXY/AHDXY` array declarations.",
+  "file": "EFDC/mod_var_global.f90",
+  "old_range": "991-992",
+  "status": "modified",
+  "old_excerpt": "991:   real :: AHD      !< Background horizontal eddy viscosity (m2/s)\n992:   real :: AHO      !< Initial horizontal eddy viscosity (m2/s)"
+ },
+ {
+  "id": "C1-13",
+  "note": "models/EFDC/source-analysis/efdc_wetdry.md",
+  "note_line": 20,
+  "wiki_claim": "- `mod_var_global.f90:60, 841, 1048, 1053` — `LMASKDRY` definition, `ISDRY/HDRY/HWET` doc.",
+  "file": "EFDC/mod_var_global.f90",
+  "old_range": "1053-1053",
+  "status": "modified",
+  "old_excerpt": "1053:   real :: HWET           !< Minimum water depth to allow for QSER withdrawals"
+ }
+]

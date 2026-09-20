@@ -1,0 +1,911 @@
+id,note,note_line,wiki_claim,old_source_evidence,new_source_evidence,changed_hunk,semantic_meaning_changed,proposed_classification,confidence,exact_evidence
+1,models/EFDC/source-analysis/sediment/efdc_sediment.md,205,CALTRAN transports every active constituent through `WCV` (`Transport/calconc.f90:188-193`); anti-diffusion at `:213-219`.,"models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Transport/calconc.f90:188-193
+188:   ! *** 3D ADVECTI0N-DIFFUSION TRANSPORT FOR ALL WATER COLUMN CONSITUENTS (SEE VARINIT FOR WCV INITIALIZATION)
+189:   !$OMP PARALLEL DEFAULT(SHARED)
+190:   !$OMP DO PRIVATE(IW,IT,L) SCHEDULE(STATIC,1)
+191:   do IW = 1,NACTIVEWC
+192:     !$  IT = OMP_GET_THREAD_NUM() + 1
+193:     call CALTRAN( IACTIVEWC1(IW), IACTIVEWC2(IW), WCV(IW).VAL0, WCV(IW).VAL1, IW, IT, WCV(IW).WCLIMIT, ISKIP(IW) )
+
+models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Transport/calconc.f90:213-219
+213:   ! *** APPLY ANTI-DIFFUSION AND FLUX CORRECTOR
+214:   !$OMP DO PRIVATE(IW,IT) SCHEDULE(STATIC,1)
+215:   do IW = 1,NACTIVEWC
+216:     if( ISKIP(IW) == 0 )then
+217:       !$  IT = OMP_GET_THREAD_NUM() + 1
+218:       call CALTRAN_AD( IACTIVEWC1(IW), IACTIVEWC2(IW), WCV(IW).VAL0, WCV(IW).VAL1, IW, IT )
+219:     endif","_staging/efdc-prescan/new/EFDC__Transport__calconc.f90:191-204
+191:   ! *** 3D ADVECTI0N-DIFFUSION TRANSPORT FOR ALL WATER COLUMN CONSITUENTS (SEE VARINIT FOR WCV INITIALIZATION)
+192:   !$OMP PARALLEL DEFAULT(SHARED)
+193:   !$OMP DO PRIVATE(IW,IT,L) SCHEDULE(STATIC,1)
+194:   do IW = 1,NACTIVEWC
+195:     !$  IT = OMP_GET_THREAD_NUM() + 1
+196: 
+197:     ! *** Dispatch to appropriate transport scheme
+198:     if( ISQUICK == 1 )then
+199:       ! *** QUICKEST scheme with ULTIMATE limiter
+200:       call CALTRAN_QUICKEST( IACTIVEWC1(IW), IACTIVEWC2(IW), WCV(IW).VAL0, WCV(IW).VAL1, IW, IT, WCV(IW).WCLIMIT, ISKIP(IW) )
+201:     else
+202:       ! *** Original upwind scheme
+203:       call CALTRAN( IACTIVEWC1(IW), IACTIVEWC2(IW), WCV(IW).VAL0, WCV(IW).VAL1, IW, IT, WCV(IW).WCLIMIT, ISKIP(IW) )
+204:     endif
+
+_staging/efdc-prescan/new/EFDC__Transport__calconc.f90:224-231
+224:   ! *** APPLY ANTI-DIFFUSION AND FLUX CORRECTOR
+225:   ! *** Skip for QUICKEST scheme (limiter is built-in)
+226:   !$OMP DO PRIVATE(IW,IT) SCHEDULE(STATIC,1)
+227:   do IW = 1,NACTIVEWC
+228:     if( ISKIP(IW) == 0 .AND. ISQUICK == 0 )then
+229:       !$  IT = OMP_GET_THREAD_NUM() + 1
+230:       call CALTRAN_AD( IACTIVEWC1(IW), IACTIVEWC2(IW), WCV(IW).VAL0, WCV(IW).VAL1, IW, IT )
+231:     endif
+
+new EFDC/Transport/caltran_quickest.f90:14-18 (출처 _staging/efdc-prescan/patches/EFDC__Transport__caltran_quickest.f90.patch, @@ -0,0 +1,503 @@의 +행을 메모리에서 복원; new/ 실파일 없음)
+14:   SUBROUTINE CALTRAN_QUICKEST (MVAR, MO, CON, CON1, IW, IT, WCCUTOFF, ISKIP)
+15: 
+16:   ! *** Subroutine CALTRAN_QUICKEST calculates the advective transport of dissolved 
+17:   ! *** or suspended constituent M leading to a new value at time level (n+1) 
+18:   ! *** using the QUICKEST scheme
+
+new EFDC/Transport/caltran_quickest.f90:32-33 (출처 _staging/efdc-prescan/patches/EFDC__Transport__caltran_quickest.f90.patch, @@ -0,0 +1,503 @@의 +행을 메모리에서 복원; new/ 실파일 없음)
+32:   use GLOBAL
+33:   use MOD_QUICKEST
+
+new EFDC/Transport/caltran_quickest.f90:167-185 (출처 _staging/efdc-prescan/patches/EFDC__Transport__caltran_quickest.f90.patch, @@ -0,0 +1,503 @@의 +행을 메모리에서 복원; new/ 실파일 없음)
+167:       if( UHDY2(L,K) >= 0.0 )then
+168:         ! *** Positive U flow (eastward)
+169:         Lu = LWC(LWC(L))   ! 2 cells upstream (west)
+170: 
+171:         ! *** Check if we have enough wet cells for QUICKEST stencil
+172:         ! *** SUB(LWC(L)) is the face between the upstream (Lu) and center (LWC(L)) cells
+173:         if( SUB(LWC(L)) > 0.5 )then
+174:           ! *** Use QUICKEST scheme
+175:           CONC_U = CON1(Lu,K)        ! Upstream
+176:           CONC_C = CON1(LWC(L),K)    ! Center
+177:           CONC_D = CON1(L,K)         ! Downstream
+178: 
+179:           ! *** QUICKEST face concentration
+180:           face_conc = QUICKEST_FACE(CONC_U, CONC_C, CONC_D, CFL_U)
+181:           FUHUD(L,K,IW) = UHDY2(L,K) * face_conc
+182:         else
+183:           ! *** Near boundary or dry cell - use upwind
+184:           FUHUD(L,K,IW) = UHDY2(L,K) * CON1(LWC(L),K)
+185:         endif
+
+new EFDC/Transport/mod_quickest.f90:40-47 (출처 _staging/efdc-prescan/patches/EFDC__Transport__mod_quickest.f90.patch, @@ -0,0 +1,115 @@의 +행을 메모리에서 복원; new/ 실파일 없음)
+40:   REAL(RKD) FUNCTION QUICKEST_FACE(Cu, Cc, Cd, cfl)
+41:     IMPLICIT NONE
+42: 
+43:     ! Arguments
+44:     REAL(RKD), INTENT(IN) :: Cu    ! Upstream concentration
+45:     REAL(RKD), INTENT(IN) :: Cc    ! Center concentration
+46:     REAL(RKD), INTENT(IN) :: Cd    ! Downstream concentration
+47:     REAL(RKD), INTENT(IN) :: cfl   ! Courant number (positive)
+
+new EFDC/Transport/mod_quickest.f90:80-101 (출처 _staging/efdc-prescan/patches/EFDC__Transport__mod_quickest.f90.patch, @@ -0,0 +1,115 @@의 +행을 메모리에서 복원; new/ 실파일 없음)
+80:     ! *** Compute ULTIMATE QUICKEST limiter (P2_PDM from GOTM)
+81:     !     This is Leonard's (1991) ULTIMATE limiter applied to QUICKEST
+82: 
+83:     ! QUICKEST polynomial correction parameter
+84:     x = (1.0_RKD - 2.0_RKD*cfl_safe) / 6.0_RKD
+85: 
+86:     ! Third-order QUICKEST limiter
+87:     limiter = (0.5_RKD + x) + (0.5_RKD - x) * ratio
+88: 
+89:     ! Apply ULTIMATE monotonicity constraints
+90:     ! Limiter must satisfy all three conditions to ensure TVD property:
+91:     !   1. limiter <= 2*ratio/cfl        (prevents undershoot on upstream side)
+92:     !   2. limiter <= 2/(1-cfl)          (prevents overshoot on downstream side)
+93:     !   3. limiter as computed by QUICKEST formula
+94:     limiter = MIN(2.0_RKD * ratio / (cfl_safe + EPSILON), limiter)
+95:     limiter = MIN(limiter, 2.0_RKD / (1.0_RKD - cfl_safe))
+96: 
+97:     ! Ensure limiter is non-negative (positivity preserving)
+98:     limiter = MAX(limiter, 0.0_RKD)
+99: 
+100:     ! *** Compute face concentration using limited QUICKEST scheme
+101:     QUICKEST_FACE = Cc + 0.5_RKD * limiter * (1.0_RKD - cfl_safe) * deltaf","@@ -190,7 +193,15 @@ SUBROUTINE CALCONC",yes,UPDATE_REQUIRED,high,"old calconc:193의 무조건 CALTRAN 호출은 new :198-204에서 ISQUICK==1이면 CALTRAN_QUICKEST, 그 외 CALTRAN으로 분기하므로 “CALTRAN transports every active constituent”는 새 snapshot 전체에 성립하지 않는다."
+2,models/EFDC/manifest.md,17,"- **EFDCPlus_Stable = `EFDCPlus_12.4`** (릴리스 헤더 `EFDC/aaefdc.f90:22` ""RELEASE: EFDCPlus_12.4"", DATE 2025-12-29; 솔루션 파일명 `EFDCPlus_MPI_12.sln` 정합). clone HEAD sha **`3ed76b6eb1263921ba99bf23b66bb85c1a5feac1`** (2026-04-02 ""update readme""). 12.4 릴리스 피처(헤더 verbatim): MPI Domain Decomposition · Propeller Wash · 신 WQ kinetics(사용자 정의 algal groups+zooplankton) · 3TL 동적 timestep · GOTM · **SIGMA-Zed(SGZ)**. → **위키 EFDC source-analysis 전체 = EFDC+ 12.4 기준.**","models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/aaefdc.f90:22-30
+22: !  RELEASE:         EFDCPlus_12.4
+23: !                   Domain Decomposition with MPI
+24: !                   Propeller Wash 
+25: !                   New WQ kinetics with user defined algal groups and zooplankton
+26: !                   Dynamic time stepping adjustment for 3TL solution
+27: !                   General Ocean Turbulence Model (GOTM)
+28: !                   SIGMA-Zed (SGZ) Vertical Layering
+29: !
+30: !  DATE:            2025-12-29","_staging/efdc-prescan/new/EFDC__aaefdc.f90:22-30
+22: !  RELEASE:         EFDCPlus_12.5
+23: !                   Domain Decomposition with MPI
+24: !                   Propeller Wash 
+25: !                   New WQ kinetics with user defined algal groups and zooplankton
+26: !                   Dynamic time stepping adjustment for 3TL solution
+27: !                   General Ocean Turbulence Model (GOTM)
+28: !                   SIGMA-Zed (SGZ) Vertical Layering
+29: !
+30: !  DATE:            2026-05-26","@@ -19,15 +19,15 @@",yes,UPDATE_REQUIRED,high,"aaefdc:22 RELEASE가 EFDCPlus_12.4에서 EFDCPlus_12.5로, :30 DATE가 2025-12-29에서 2026-05-26으로 바뀌어 현행 snapshot을 12.4로 명시한 주장과 불일치한다."
+3,models/EFDC/manual-notes/efdc-implementation-guide.md,211,"> ⚠️ **v12.4 소스 드리프트 (검증 2026-07)**: v12.4의 C12A 첫 슬롯은 `ISSTAB`이 아니라 **`ISTOPT(0)`** (난류 폐쇄 옵션 배열의 0번 원소)로 읽힌다: `read ... ISTOPT(0), ISSQL, ISAVBMX, ISFAVB, ISINWV, ISLLIM, IFPROX, XYRATIO, BC_EDGEFACTOR` (`input.f90:646`). `ISSTAB` 식별자는 v12.4 소스에 없고, 마지막에 `BC_EDGEFACTOR` 슬롯이 추가되어 9개 값을 읽는다.","models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:643-650
+643:   ! *** ********************************************************
+644:   if( process_id == master_id )then
+645:     call SEEK('C12A',0)
+646:     read(1,*,IOSTAT = ISO) ISTOPT(0), ISSQL, ISAVBMX, ISFAVB, ISINWV, ISLLIM, IFPROX, XYRATIO, BC_EDGEFACTOR
+647: 
+648:     write(mpi_efdc_out_unit,1002) NCARD
+649:     write(mpi_efdc_out_unit,*) ISTOPT(0), ISSQL, ISAVBMX, ISFAVB, ISINWV, ISLLIM, IFPROX, XYRATIO, BC_EDGEFACTOR
+650:     if( ISO > 0 ) GOTO 100
+
+models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:660-665
+660:   call Broadcast_Scalar(XYRATIO      , master_id)
+661:   call Broadcast_Scalar(BC_EDGEFACTOR, master_id)
+662: 
+663:   if( BC_EDGEFACTOR < 0 ) BC_EDGEFACTOR = 0.0
+664:   if( BC_EDGEFACTOR > 1 ) BC_EDGEFACTOR = 1.0
+665: ","_staging/efdc-prescan/new/EFDC__input.f90:664-684
+664:   !C12A*  READ TURBULENCE CLOSURE OPTIONS
+665:   NCARD = '12A'
+666:   ! *** ********************************************************
+667:   if( process_id == master_id )then
+668:     call SEEK('C12A',0)
+669:     read(1,*,IOSTAT = ISO) ISTOPT(0), ISSQL, ISAVBMX, ISFAVB, ISINWV, ISLLIM, IFPROX, XYRATIO, BC_EDGEFACTOR
+670:     if( ISO > 0 ) GOTO 100
+671:   endif
+672: 
+673:   call Broadcast_Scalar(ISTOPT(0)    , master_id)
+674:   call Broadcast_Scalar(ISSQL        , master_id)
+675:   call Broadcast_Scalar(ISAVBMX      , master_id)
+676:   call Broadcast_Scalar(ISFAVB       , master_id)
+677:   call Broadcast_Scalar(ISINWV       , master_id)
+678:   call Broadcast_Scalar(ISLLIM       , master_id)
+679:   call Broadcast_Scalar(IFPROX       , master_id)
+680:   call Broadcast_Scalar(XYRATIO      , master_id)
+681:   call Broadcast_Scalar(BC_EDGEFACTOR, master_id)
+682: 
+683:   write(mpi_efdc_out_unit,1002) NCARD
+684:   write(mpi_efdc_out_unit,*) ISTOPT(0), ISSQL, ISAVBMX, ISFAVB, ISINWV, ISLLIM, IFPROX, XYRATIO, BC_EDGEFACTOR","@@ -644,9 +667,6 @@ SUBROUTINE INPUT()",no,NO_ACTION,high,"C12A read는 old input:646과 new :669에서 동일한 9개 슬롯(첫 ISTOPT(0), 마지막 BC_EDGEFACTOR); hunk는 echo write를 이동하며 슬롯 주장을 바꾸지 않는다."
+4,models/EFDC/source-analysis/efdc_boundary_conditions.md,198,"- Harmonic block (C17) `PFPH` phase is **not degrees** — it is a time lag in the same unit as `TCP` (seconds): `RAD = 2π·PFPH/TCP` (`input.f90:913-915`, v12.4 재확인 2026-07). Degrees must be converted: `PFPH = [TCON·TBEGIN + TCP·(G−(V0+u))/360] mod TCP`. Amplitudes `PFAM` are in m (× G to pressure head at the boundary-card conversion). See [[efdc-tidal-forcing-conventions-v12]].","models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:904-917
+904:       do NP = 1,NPFOR_Readin
+905:         do M = 1,MTIDE
+906:           if( NPFORT == 0 )then
+907:             read(1,*,IOSTAT = ISO)NDUM,CDUM,PFAM(NP,M),PFPH(NP,M)
+908:             write(mpi_efdc_out_unit,1002) NCARD
+909:             write(mpi_efdc_out_unit,*) NDUM, CDUM, PFAM(NP,M), PFPH(NP,M)
+910:             if( ISO > 0 ) GOTO 100
+911:           elseif( NPFORT >= 1 )then
+912:             read(1,*,IOSTAT = ISO) NDUM, CDUM, PFAM(NP,M), PFPH(NP,M)
+913:             RAD = PI2*PFPH(NP,M)/TCP(M)
+914:             CPFAM0(NP,M) = PFAM(NP,M)*COS(RAD)
+915:             SPFAM0(NP,M) = PFAM(NP,M)*SIN(RAD)
+916:             write(mpi_efdc_out_unit,1002) NCARD
+917:             write(mpi_efdc_out_unit,*) NDUM, CDUM, PFAM(NP,M), PFPH(NP,M), CPFAM0(NP,M), SPFAM0(NP,M)","_staging/efdc-prescan/new/EFDC__input.f90:937-947
+937:       do NP = 1,NPFOR_Readin
+938:         do M = 1,MTIDE
+939:           if( NPFORT == 0 )then
+940:             read(1,*,IOSTAT = ISO) IECHO(M), CECHO(M),PFAM(NP,M),PFPH(NP,M)
+941:             if( ISO > 0 ) GOTO 100
+942:           elseif( NPFORT >= 1 )then
+943:             read(1,*,IOSTAT = ISO) IECHO(M), CECHO(M), PFAM(NP,M), PFPH(NP,M)
+944:             RAD = PI2*PFPH(NP,M)/TCP(M)
+945:             CPFAM0(NP,M) = PFAM(NP,M)*COS(RAD)
+946:             SPFAM0(NP,M) = PFAM(NP,M)*SIN(RAD)
+947:             if( ISO > 0 ) GOTO 100","@@ -904,28 +937,22 @@ SUBROUTINE INPUT()",no,NO_ACTION,high,old input:913-915와 new :944-946의 RAD=PI2*PFPH/TCP 및 COS/SIN 변환은 동일; hunk의 dummy 식별자·echo 변경은 인용된 위상 단위 주장과 무관하다.
+5,models/EFDC/source-analysis/efdc_water_quality.md,134,- Anti-diffusion: `CALTRAN_AD` (`Transport/calconc.f90:213`).,"models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Transport/calconc.f90:213-220
+213:   ! *** APPLY ANTI-DIFFUSION AND FLUX CORRECTOR
+214:   !$OMP DO PRIVATE(IW,IT) SCHEDULE(STATIC,1)
+215:   do IW = 1,NACTIVEWC
+216:     if( ISKIP(IW) == 0 )then
+217:       !$  IT = OMP_GET_THREAD_NUM() + 1
+218:       call CALTRAN_AD( IACTIVEWC1(IW), IACTIVEWC2(IW), WCV(IW).VAL0, WCV(IW).VAL1, IW, IT )
+219:     endif
+220:   enddo","_staging/efdc-prescan/new/EFDC__Transport__calconc.f90:224-231
+224:   ! *** APPLY ANTI-DIFFUSION AND FLUX CORRECTOR
+225:   ! *** Skip for QUICKEST scheme (limiter is built-in)
+226:   !$OMP DO PRIVATE(IW,IT) SCHEDULE(STATIC,1)
+227:   do IW = 1,NACTIVEWC
+228:     if( ISKIP(IW) == 0 .AND. ISQUICK == 0 )then
+229:       !$  IT = OMP_GET_THREAD_NUM() + 1
+230:       call CALTRAN_AD( IACTIVEWC1(IW), IACTIVEWC2(IW), WCV(IW).VAL0, WCV(IW).VAL1, IW, IT )
+231:     endif","@@ -211,9 +222,10 @@ SUBROUTINE CALCONC",yes,REVIEW_ONLY,high,new calconc:228에 ISQUICK==0 조건이 추가되지만 :230의 anti-diffusion 호출명 CALTRAN_AD는 유지되므로 인용된 짧은 주장 자체의 불일치는 확정하지 않는다.
+6,models/EFDC/manual-notes/efdc-user-manual-r850.md,105,"> - **C8**: `TREF`/`CORIOLIS` → v12.4 이름 `TIDALP`/`CF`, 같은 슬롯 (`input.f90:387`).","models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:384-389
+384:   ! *** *******************************************************
+385:   if( process_id == master_id )then
+386:     call SEEK('C8',0)
+387:     read(1,*,IOSTAT = ISO) TCON, TBEGIN, TIDALP, CF, ISCORV, ISDCCA, ISCFL, ISCFLM, DTSSFAC, DTSSDHDT, DTMAX
+388:   endif
+389: 
+
+models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:402-405
+402: 
+403:   write(mpi_efdc_out_unit,1002) NCARD
+404:   write(mpi_efdc_out_unit,*) TCON, TBEGIN, TIDALP, CF, ISCORV, ISDCCA, ISCFL, ISCFLM, DTSSFAC, DTSSDHDT, DTMAX
+405:   if( ISO > 0 ) GOTO 100","_staging/efdc-prescan/new/EFDC__input.f90:399-406
+399:   !C8**  READ TIME-RELATED REAL parameterS
+400:   NCARD = '8'
+401:   ! *** *******************************************************
+402:   if( process_id == master_id )then
+403:     call SEEK('C8',0)
+404:     read(1,*,IOSTAT = ISO) TCON, TBEGIN, TIDALP, CF, ISCORV, ISDCCA, ISCFL, ISCFLM, DTSSFAC, DTSSDHDT, DTMAX
+405:     if( ISO > 0 ) GOTO 100
+406:   endif
+
+_staging/efdc-prescan/new/EFDC__input.f90:421-423
+421:   write(mpi_efdc_out_unit,1002) NCARD
+422:   write(mpi_efdc_out_unit,*) TCON, TBEGIN, TIDALP, CF, ISCORV, ISDCCA, ISCFL, ISCFLM, DTSSFAC, DTSSDHDT, DTMAX
+423: ","@@ -385,6 +402,7 @@ SUBROUTINE INPUT()",no,NO_ACTION,high,"old input:387와 new :404의 C8 read 목록은 동일(TIDALP 3번째, CF 4번째); ISO 오류 분기 위치 변경은 이름·슬롯 주장을 바꾸지 않는다."
+7,models/EFDC/manual-notes/efdc-user-manual-r850.md,106,> - **C12A**: 첫 슬롯 `ISSTAB` → v12.4 `ISTOPT(0)` + 9번째 `BC_EDGEFACTOR` 추가 (`input.f90:646`).,"models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:643-650
+643:   ! *** ********************************************************
+644:   if( process_id == master_id )then
+645:     call SEEK('C12A',0)
+646:     read(1,*,IOSTAT = ISO) ISTOPT(0), ISSQL, ISAVBMX, ISFAVB, ISINWV, ISLLIM, IFPROX, XYRATIO, BC_EDGEFACTOR
+647: 
+648:     write(mpi_efdc_out_unit,1002) NCARD
+649:     write(mpi_efdc_out_unit,*) ISTOPT(0), ISSQL, ISAVBMX, ISFAVB, ISINWV, ISLLIM, IFPROX, XYRATIO, BC_EDGEFACTOR
+650:     if( ISO > 0 ) GOTO 100
+
+models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:660-665
+660:   call Broadcast_Scalar(XYRATIO      , master_id)
+661:   call Broadcast_Scalar(BC_EDGEFACTOR, master_id)
+662: 
+663:   if( BC_EDGEFACTOR < 0 ) BC_EDGEFACTOR = 0.0
+664:   if( BC_EDGEFACTOR > 1 ) BC_EDGEFACTOR = 1.0
+665: ","_staging/efdc-prescan/new/EFDC__input.f90:664-684
+664:   !C12A*  READ TURBULENCE CLOSURE OPTIONS
+665:   NCARD = '12A'
+666:   ! *** ********************************************************
+667:   if( process_id == master_id )then
+668:     call SEEK('C12A',0)
+669:     read(1,*,IOSTAT = ISO) ISTOPT(0), ISSQL, ISAVBMX, ISFAVB, ISINWV, ISLLIM, IFPROX, XYRATIO, BC_EDGEFACTOR
+670:     if( ISO > 0 ) GOTO 100
+671:   endif
+672: 
+673:   call Broadcast_Scalar(ISTOPT(0)    , master_id)
+674:   call Broadcast_Scalar(ISSQL        , master_id)
+675:   call Broadcast_Scalar(ISAVBMX      , master_id)
+676:   call Broadcast_Scalar(ISFAVB       , master_id)
+677:   call Broadcast_Scalar(ISINWV       , master_id)
+678:   call Broadcast_Scalar(ISLLIM       , master_id)
+679:   call Broadcast_Scalar(IFPROX       , master_id)
+680:   call Broadcast_Scalar(XYRATIO      , master_id)
+681:   call Broadcast_Scalar(BC_EDGEFACTOR, master_id)
+682: 
+683:   write(mpi_efdc_out_unit,1002) NCARD
+684:   write(mpi_efdc_out_unit,*) ISTOPT(0), ISSQL, ISAVBMX, ISFAVB, ISINWV, ISLLIM, IFPROX, XYRATIO, BC_EDGEFACTOR","@@ -644,9 +667,6 @@ SUBROUTINE INPUT()",no,NO_ACTION,high,C12A의 ISTOPT(0) 첫 슬롯과 BC_EDGEFACTOR 9번째 슬롯은 old input:646 → new :669에 그대로 있고 echo 위치만 변경된다.
+8,models/EFDC/manual-notes/efdc-user-manual-r850.md,108,> - **C22B(Shellfish)**: v12.4는 SEEK하지 않음(미독) — JSON(`READ_SHELLFISH_JSON`)으로 대체 (`input.f90:3941-3943`).,"models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:3931-3944
+3931:       FBODYFX(LC,K) = 0.0
+3932:       FBODYFY(LC,K) = 0.0
+3933:     enddo
+3934: 
+3935:     if( process_id == master_id )then
+3936:       close(1)
+3937:     endif
+3938: 
+3939:   endif
+3940: 
+3941:   ! *** Read shellfish farm configuration
+3942:   if( ISFFARM > 0 .and. NSF > 0 )then
+3943:     call READ_SHELLFISH_JSON(LCM,KC)
+3944:   endif","_staging/efdc-prescan/new/EFDC__input.f90:4084-4093
+4084:       FBODYFX(LC,K) = 0.0
+4085:       FBODYFY(LC,K) = 0.0
+4086:     enddo
+4087:     deallocate(R2D_Global)
+4088:   endif
+4089: 
+4090:   ! *** Read shellfish farm configuration
+4091:   if( ISFFARM > 0 .and. NSF > 0 )then
+4092:     call READ_SHELLFISH_JSON(LCM,KC)
+4093:   endif","@@ -3931,11 +4084,7 @@ SUBROUTINE INPUT()",no,NO_ACTION,high,old input:3941-3944 → new :4090-4093의 shellfish 조건·READ_SHELLFISH_JSON 호출은 동일; C22B SEEK는 양쪽 input에 없고 교차 hunk는 앞선 body-force 정리 구문이다. (양쪽 input.f90 전체의 call SEEK(C22B) 검색 0건.)
+9,models/EFDC/manual-notes/efdc-implementation-guide.md,177,"> - **C22B (Shellfish) 미독**: v12.4 `input.f90`의 SEEK 카드 인벤토리에 C22B가 없다 — 이 카드는 읽히지 않는다. Shellfish 설정은 대신 `READ_SHELLFISH_JSON`(JSON 파일)으로 로드 (`input.f90:3941-3943`, `SHELLFISHMOD`).","models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:3931-3944
+3931:       FBODYFX(LC,K) = 0.0
+3932:       FBODYFY(LC,K) = 0.0
+3933:     enddo
+3934: 
+3935:     if( process_id == master_id )then
+3936:       close(1)
+3937:     endif
+3938: 
+3939:   endif
+3940: 
+3941:   ! *** Read shellfish farm configuration
+3942:   if( ISFFARM > 0 .and. NSF > 0 )then
+3943:     call READ_SHELLFISH_JSON(LCM,KC)
+3944:   endif","_staging/efdc-prescan/new/EFDC__input.f90:4084-4093
+4084:       FBODYFX(LC,K) = 0.0
+4085:       FBODYFY(LC,K) = 0.0
+4086:     enddo
+4087:     deallocate(R2D_Global)
+4088:   endif
+4089: 
+4090:   ! *** Read shellfish farm configuration
+4091:   if( ISFFARM > 0 .and. NSF > 0 )then
+4092:     call READ_SHELLFISH_JSON(LCM,KC)
+4093:   endif","@@ -3931,11 +4084,7 @@ SUBROUTINE INPUT()",no,NO_ACTION,high,old input:3942-3943와 new :4091-4092에서 ISFFARM>0 및 NSF>0의 JSON 호출이 동일하며 양쪽 input에 C22B SEEK가 없으므로 인용 주장은 유지된다. (양쪽 input.f90 전체의 call SEEK(C22B) 검색 0건.)
+10,models/EFDC/manual-notes/efdc-implementation-guide.md,179,"> - **C17 위상 규약**: 레거시 매뉴얼류의 ""phase relative to time origin of TBEGIN"" 서술과 달리, v12.4는 **절대 시간** `TIMESEC`로 합성한다: `hdmt.f90:89` `TIMESEC = TCON·TBEGIN` → `setopenbc.f90:232` `TN = TIMESEC` → η = PFAM·cos(2π(TIMESEC−PFPH)/TCP) (`input.f90:913-915` CPFAM0/SPFAM0 변환). 즉 PFPH는 **TCP와 같은 시간 단위(초)의 lag**이고 `PFPH = [TCON·TBEGIN + TCP·(G−(V0+u))/360] mod TCP`로 만들어야 한다. 도(°) 단위 위상을 그대로 넣으면 안 된다.","models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:904-917
+904:       do NP = 1,NPFOR_Readin
+905:         do M = 1,MTIDE
+906:           if( NPFORT == 0 )then
+907:             read(1,*,IOSTAT = ISO)NDUM,CDUM,PFAM(NP,M),PFPH(NP,M)
+908:             write(mpi_efdc_out_unit,1002) NCARD
+909:             write(mpi_efdc_out_unit,*) NDUM, CDUM, PFAM(NP,M), PFPH(NP,M)
+910:             if( ISO > 0 ) GOTO 100
+911:           elseif( NPFORT >= 1 )then
+912:             read(1,*,IOSTAT = ISO) NDUM, CDUM, PFAM(NP,M), PFPH(NP,M)
+913:             RAD = PI2*PFPH(NP,M)/TCP(M)
+914:             CPFAM0(NP,M) = PFAM(NP,M)*COS(RAD)
+915:             SPFAM0(NP,M) = PFAM(NP,M)*SIN(RAD)
+916:             write(mpi_efdc_out_unit,1002) NCARD
+917:             write(mpi_efdc_out_unit,*) NDUM, CDUM, PFAM(NP,M), PFPH(NP,M), CPFAM0(NP,M), SPFAM0(NP,M)","_staging/efdc-prescan/new/EFDC__input.f90:937-947
+937:       do NP = 1,NPFOR_Readin
+938:         do M = 1,MTIDE
+939:           if( NPFORT == 0 )then
+940:             read(1,*,IOSTAT = ISO) IECHO(M), CECHO(M),PFAM(NP,M),PFPH(NP,M)
+941:             if( ISO > 0 ) GOTO 100
+942:           elseif( NPFORT >= 1 )then
+943:             read(1,*,IOSTAT = ISO) IECHO(M), CECHO(M), PFAM(NP,M), PFPH(NP,M)
+944:             RAD = PI2*PFPH(NP,M)/TCP(M)
+945:             CPFAM0(NP,M) = PFAM(NP,M)*COS(RAD)
+946:             SPFAM0(NP,M) = PFAM(NP,M)*SIN(RAD)
+947:             if( ISO > 0 ) GOTO 100","@@ -904,28 +937,22 @@ SUBROUTINE INPUT()",no,NO_ACTION,high,교차 대상인 input의 CPFAM0/SPFAM0 위상 변환은 old :913-915와 new :944-946에서 동일; 이 hunk는 TIMESEC 합성 규약을 변경하는 근거가 아니다(다른 파일의 합성 경로 전체 재검증은 범위 밖).
+11,models/EFDC/manual-notes/efdc-implementation-guide.md,193,"> ⚠️ **v12.4 소스 드리프트 (검증 2026-07)**: v12.4의 C6 read는 `ISTRAN(NS), ISTOPT(NS), ldum, ISADAC(NS), ISFCT(NS), ldum, ldum, ldum, ISCI(NS), ISCO(NS)` (`input.f90:306`) — **3·6·7·8번째 슬롯은 더미(`ldum`)로 읽고 버린다**. 즉 매뉴얼이 3번째 슬롯에 문서화한 `ISCDCA` 등은 v12.4에서 **무시**된다 (자리는 유지해야 파싱이 맞음).","models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:300-312
+300:   NCARD = '6'
+301: 
+302:   ! *** ********************************************************
+303:   if( process_id == master_id )then
+304:     call SEEK('C6',0)
+305:     do NS = 0,8
+306:       read(1,*,IOSTAT = ISO) ISTRAN(NS), ISTOPT(NS), ldum, ISADAC(NS), ISFCT(NS), ldum, ldum, ldum, ISCI(NS), ISCO(NS)
+307:       write(mpi_efdc_out_unit,1002) NCARD
+308:       write(mpi_efdc_out_unit,*) ISTRAN(NS), ISTOPT(NS), ldum, ISADAC(NS), ISFCT(NS), ldum, ldum, ldum, ISCI(NS), ISCO(NS)
+309:       if( ISO > 0 ) GOTO 100
+310:     enddo
+311:   endif
+312: ","_staging/efdc-prescan/new/EFDC__input.f90:304-325
+304:   !C6**  DISSOLVED AND SUSPENDED CONSTITUENT TRANSPORT SWITCHES
+305:   NCARD = '6'
+306: 
+307:   ! *** ********************************************************
+308:   if( process_id == master_id )then
+309:     call SEEK('C6',0)
+310:     do NS = 0,8
+311:       read(1,*,IOSTAT = ISO) ISTRAN(NS), ISTOPT(NS), ISQUICK, ISADAC(NS), ISFCT(NS), ldum, ldum, ldum, ISCI(NS), ISCO(NS)
+312:       if( ISO > 0 ) GOTO 100
+313:     enddo
+314:   endif
+315:   
+316:   call Broadcast_Scalar(ISQUICK, master_id)   ! *** Using a scalar var for ISQUICK in EFDC+ 12.x - DKT
+317: 
+318:   ! *** Sanitize ISQUICK: this C6 column was unused prior to EFDC+ 12.x and legacy decks may contain other values
+319:   if( ISQUICK /= 0 .and. ISQUICK /= 1 )then
+320:     if( process_id == master_id )then
+321:       PRINT *,'*** WARNING: INVALID ISQUICK ON CARD C6.  RESETTING TO 0 (UPWIND SCHEME)'
+322:       write(mpi_efdc_out_unit,*) '*** WARNING: INVALID ISQUICK ON CARD C6.  RESETTING TO 0 (UPWIND SCHEME):', ISQUICK
+323:     endif
+324:     ISQUICK = 0
+325:   endif","@@ -303,12 +308,21 @@ SUBROUTINE INPUT()",yes,UPDATE_REQUIRED,high,old input:306의 C6 3번째 ldum이 new :311에서 scalar ISQUICK으로 읽히고 :316-325에서 broadcast·0/1 검사를 거치므로 “3번째 슬롯은 읽고 버린다”는 새 snapshot에 불일치한다.
+12,models/EFDC/manual-notes/efdc-implementation-guide.md,199,"> ⚠️ **v12.4 소스 드리프트 (검증 2026-07)**: v12.4의 C8 read는 `TCON, TBEGIN, TIDALP, CF, ISCORV, ISDCCA, ISCFL, ISCFLM, DTSSFAC, DTSSDHDT, DTMAX` (`input.f90:387`) — 매뉴얼의 `TREF`/`CORIOLIS`는 v12.4에서 **`TIDALP`/`CF`라는 이름**으로 같은 슬롯에 읽힌다 (의미 동일: reference 주기 / Coriolis 상수). 이름만 다르고 자리는 같으므로 파일 호환은 유지.","models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:384-389
+384:   ! *** *******************************************************
+385:   if( process_id == master_id )then
+386:     call SEEK('C8',0)
+387:     read(1,*,IOSTAT = ISO) TCON, TBEGIN, TIDALP, CF, ISCORV, ISDCCA, ISCFL, ISCFLM, DTSSFAC, DTSSDHDT, DTMAX
+388:   endif
+389: 
+
+models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:402-405
+402: 
+403:   write(mpi_efdc_out_unit,1002) NCARD
+404:   write(mpi_efdc_out_unit,*) TCON, TBEGIN, TIDALP, CF, ISCORV, ISDCCA, ISCFL, ISCFLM, DTSSFAC, DTSSDHDT, DTMAX
+405:   if( ISO > 0 ) GOTO 100","_staging/efdc-prescan/new/EFDC__input.f90:399-406
+399:   !C8**  READ TIME-RELATED REAL parameterS
+400:   NCARD = '8'
+401:   ! *** *******************************************************
+402:   if( process_id == master_id )then
+403:     call SEEK('C8',0)
+404:     read(1,*,IOSTAT = ISO) TCON, TBEGIN, TIDALP, CF, ISCORV, ISDCCA, ISCFL, ISCFLM, DTSSFAC, DTSSDHDT, DTMAX
+405:     if( ISO > 0 ) GOTO 100
+406:   endif
+
+_staging/efdc-prescan/new/EFDC__input.f90:421-423
+421:   write(mpi_efdc_out_unit,1002) NCARD
+422:   write(mpi_efdc_out_unit,*) TCON, TBEGIN, TIDALP, CF, ISCORV, ISDCCA, ISCFL, ISCFLM, DTSSFAC, DTSSDHDT, DTMAX
+423: ","@@ -385,6 +402,7 @@ SUBROUTINE INPUT()",no,NO_ACTION,high,C8 read는 old input:387 → new :404에서 그대로이며 TIDALP/CF의 슬롯 변경은 없다; ISO 오류 검사 이동은 해당 이름·파일 슬롯 호환 주장과 무관하다.
+13,models/EFDC/source-analysis/efdc_ice.md,26,- `Transport/calconc.f90:296-471` — heat/frazil dispatch.,"models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Transport/calconc.f90:289-307
+289:       eps3d1 (1:LCM,1:KCM) = EPS_TEMP1
+290:     endif
+291:     eps3d = max(eps_min,eps3d)
+292: 
+293:     !$OMP END SECTIONS
+294:   endif
+295:   
+296:   if( ISICE == 4 .and. (IS2TL > 0 .or. (IS2TL == 0 .and. NCTBC /= NTSTBC)) )then
+297:     if( LFRAZIL )then
+298:       ! *** FRAZIL ICE TRANSPORT
+299:       call CALTRANICE(FRAZILICE,FRAZILICE1,1)
+300:       NICE = NICE+1
+301: 
+302:     elseif( NICE > 0 )then
+303:       ! *** ADVANCE THE FRAZIL ICE VARIABLE
+304:       FRAZILICE1 = FRAZILICE
+305:       NICE = 0
+306:     endif
+307:   endif
+
+models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Transport/calconc.f90:467-473
+467:   ! *** SURFACE AND INTERNAL HEAT SOURCE-SINK CALCULATION
+468:   if( ISTRAN(2) >= 1 )then
+469:     TTDS1 = DSTIME(0)
+470:     call CALHEAT
+471: 
+472:     THEAT = THEAT + (DSTIME(0)-TTDS1)
+473:   endif","_staging/efdc-prescan/new/EFDC__Transport__calconc.f90:303-319
+303:     eps3d = max(eps_min,eps3d)
+304: 
+305:     !$OMP END PARALLEL SECTIONS
+306:   endif
+307:   
+308:   if( ISICE == 4 .and. (IS2TL > 0 .or. (IS2TL == 0 .and. NCTBC /= NTSTBC)) )then
+309:     if( LFRAZIL )then
+310:       ! *** FRAZIL ICE TRANSPORT
+311:       call CALTRANICE(FRAZILICE,FRAZILICE1,1)
+312:       NICE = NICE+1
+313: 
+314:     elseif( NICE > 0 )then
+315:       ! *** ADVANCE THE FRAZIL ICE VARIABLE
+316:       FRAZILICE1 = FRAZILICE
+317:       NICE = 0
+318:     endif
+319:   endif
+
+_staging/efdc-prescan/new/EFDC__Transport__calconc.f90:479-485
+479:   ! *** SURFACE AND INTERNAL HEAT SOURCE-SINK CALCULATION
+480:   if( ISTRAN(2) >= 1 )then
+481:     TTDS1 = DSTIME(0)
+482:     call CALHEAT
+483: 
+484:     THEAT = THEAT + (DSTIME(0)-TTDS1)
+485:   endif","@@ -263,34 +275,34 @@ SUBROUTINE CALCONC",no,NO_ACTION,high,"교차 hunk 변경은 앞선 GOTM 난류 수송부에 있고 frazil 조건·CALTRANICE(old :296-307 → new :308-319), heat 조건·CALHEAT(old :467-473 → new :479-485)는 동일하다."
+14,models/EFDC/source-analysis/efdc_water_quality.md,27,"- `Transport/calconc.f90:188, 213, 467-490`, `caltran.f90:13` — transport coupling.","models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Transport/calconc.f90:188-193
+188:   ! *** 3D ADVECTI0N-DIFFUSION TRANSPORT FOR ALL WATER COLUMN CONSITUENTS (SEE VARINIT FOR WCV INITIALIZATION)
+189:   !$OMP PARALLEL DEFAULT(SHARED)
+190:   !$OMP DO PRIVATE(IW,IT,L) SCHEDULE(STATIC,1)
+191:   do IW = 1,NACTIVEWC
+192:     !$  IT = OMP_GET_THREAD_NUM() + 1
+193:     call CALTRAN( IACTIVEWC1(IW), IACTIVEWC2(IW), WCV(IW).VAL0, WCV(IW).VAL1, IW, IT, WCV(IW).WCLIMIT, ISKIP(IW) )
+
+models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Transport/calconc.f90:213-220
+213:   ! *** APPLY ANTI-DIFFUSION AND FLUX CORRECTOR
+214:   !$OMP DO PRIVATE(IW,IT) SCHEDULE(STATIC,1)
+215:   do IW = 1,NACTIVEWC
+216:     if( ISKIP(IW) == 0 )then
+217:       !$  IT = OMP_GET_THREAD_NUM() + 1
+218:       call CALTRAN_AD( IACTIVEWC1(IW), IACTIVEWC2(IW), WCV(IW).VAL0, WCV(IW).VAL1, IW, IT )
+219:     endif
+220:   enddo","_staging/efdc-prescan/new/EFDC__Transport__calconc.f90:191-204
+191:   ! *** 3D ADVECTI0N-DIFFUSION TRANSPORT FOR ALL WATER COLUMN CONSITUENTS (SEE VARINIT FOR WCV INITIALIZATION)
+192:   !$OMP PARALLEL DEFAULT(SHARED)
+193:   !$OMP DO PRIVATE(IW,IT,L) SCHEDULE(STATIC,1)
+194:   do IW = 1,NACTIVEWC
+195:     !$  IT = OMP_GET_THREAD_NUM() + 1
+196: 
+197:     ! *** Dispatch to appropriate transport scheme
+198:     if( ISQUICK == 1 )then
+199:       ! *** QUICKEST scheme with ULTIMATE limiter
+200:       call CALTRAN_QUICKEST( IACTIVEWC1(IW), IACTIVEWC2(IW), WCV(IW).VAL0, WCV(IW).VAL1, IW, IT, WCV(IW).WCLIMIT, ISKIP(IW) )
+201:     else
+202:       ! *** Original upwind scheme
+203:       call CALTRAN( IACTIVEWC1(IW), IACTIVEWC2(IW), WCV(IW).VAL0, WCV(IW).VAL1, IW, IT, WCV(IW).WCLIMIT, ISKIP(IW) )
+204:     endif
+
+_staging/efdc-prescan/new/EFDC__Transport__calconc.f90:224-231
+224:   ! *** APPLY ANTI-DIFFUSION AND FLUX CORRECTOR
+225:   ! *** Skip for QUICKEST scheme (limiter is built-in)
+226:   !$OMP DO PRIVATE(IW,IT) SCHEDULE(STATIC,1)
+227:   do IW = 1,NACTIVEWC
+228:     if( ISKIP(IW) == 0 .AND. ISQUICK == 0 )then
+229:       !$  IT = OMP_GET_THREAD_NUM() + 1
+230:       call CALTRAN_AD( IACTIVEWC1(IW), IACTIVEWC2(IW), WCV(IW).VAL0, WCV(IW).VAL1, IW, IT )
+231:     endif","@@ -211,9 +222,10 @@ SUBROUTINE CALCONC",yes,REVIEW_ONLY,high,new calconc:198-204의 수송 분기 및 :228의 ISQUICK==0 제한은 변경됐지만 CALCONC의 transport coupling과 CALTRAN_AD 호출 자체(:230)는 유지되어 원문 목록 설명은 여전히 성립한다.
+15,models/EFDC/source-analysis/efdc_water_quality.md,27,"- `Transport/calconc.f90:188, 213, 467-490`, `caltran.f90:13` — transport coupling.","models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Transport/calconc.f90:467-490
+467:   ! *** SURFACE AND INTERNAL HEAT SOURCE-SINK CALCULATION
+468:   if( ISTRAN(2) >= 1 )then
+469:     TTDS1 = DSTIME(0)
+470:     call CALHEAT
+471: 
+472:     THEAT = THEAT + (DSTIME(0)-TTDS1)
+473:   endif
+474: 
+475:   ! *** APPLY DYE PROCESSES
+476:   if( ISTRAN(3) >= 1 ) CALL CALDYE
+477: 
+478:   ! **************************************************************************************************
+479:   ! *** BOTTOM AND INTERNAL SEDIMENT AND TOXIC CONTAMINATION SOURCE-SINK CALCULATION
+480: 
+481:   if( ISPROPWASH == 2 )then
+482:     ! *** If using propeller momentum, compute propeller velocities at every timestep, but skip if computing below
+483:     if( .not. ((SEDTIME+DELT) >= SEDSTEP .and. (ISTRAN(6) >= 1 .or. ISTRAN(7) >= 1 ) .and. TIMEDAY >= SEDSTART) )then
+484:       if( IS2TIM > 0 .or. NCTBC /= 1 )then
+485:         call Propwash_Calc_Sequence(1)
+486:       endif
+487:     endif
+488:   endif
+489: 
+490:   ! *** SEDIMENT AND TOXICS SETTLING,DEPOSITION,RESUSPENSION,ETC
+
+models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Transport/calconc.f90:499-507
+499:         if( propwash_on .and. IFIRST > 0 )then
+500:           call Propwash_Calc_Sequence(0)
+501:         endif
+502:         
+503:         call SSEDTOX
+504:         SEDTIME = 0.0
+505:       endif
+506:     else
+507:       ! *** FOR THREE TIME LEVEL SIMULATION","_staging/efdc-prescan/new/EFDC__Transport__calconc.f90:479-508
+479:   ! *** SURFACE AND INTERNAL HEAT SOURCE-SINK CALCULATION
+480:   if( ISTRAN(2) >= 1 )then
+481:     TTDS1 = DSTIME(0)
+482:     call CALHEAT
+483: 
+484:     THEAT = THEAT + (DSTIME(0)-TTDS1)
+485:   endif
+486: 
+487:   ! *** APPLY DYE PROCESSES
+488:   if( ISTRAN(3) >= 1 ) CALL CALDYE
+489: 
+490:   ! **************************************************************************************************
+491:   ! *** BOTTOM AND INTERNAL SEDIMENT AND TOXIC CONTAMINATION SOURCE-SINK CALCULATION
+492: 
+493:   if( ISPROPWASH == 2 )then
+494:     ! *** If using propeller momentum, compute propeller velocities at every timestep, but skip if computing below
+495:     if( ISTRAN(6) + ISTRAN(7) == 0 )then
+496:       ! *** SedTran is off
+497:       if( IS2TIM > 0 .or. NCTBC /= 1 )then
+498:         call Propwash_Calc_Sequence(1)
+499:       endif
+500:     elseif( (SEDTIME+DELT) < SEDSTEP .or. TIMEDAY < SEDSTART )then       ! *** SedTran is on.  Check timing
+501:       if( IS2TIM > 0 .or. NCTBC /= 1 )then
+502:         call Propwash_Calc_Sequence(1)
+503:       endif
+504:     endif
+505:   endif
+506: 
+507:   ! *** SEDIMENT AND TOXICS SETTLING,DEPOSITION,RESUSPENSION,ETC
+508:   if( ( ISTRAN(6) >= 1 .or. ISTRAN(7) >= 1 ) .and. TIMEDAY >= SEDSTART )then
+
+_staging/efdc-prescan/new/EFDC__Transport__calconc.f90:515-521
+515:         ! *** Call Propwash module if that option is selected
+516:         if( propwash_on .and. IFIRST > 0 )then
+517:           call Propwash_Calc_Sequence(0)
+518:         endif
+519:         
+520:         call SSEDTOX
+521:         SEDTIME = 0.0","@@ -480,7 +492,12 @@ SUBROUTINE CALCONC",no,REVIEW_ONLY,high,old calconc:483의 propwash 조건이 new :495-503에서 퇴적물 비활성/시간 조건으로 나뉘지만 CALHEAT·CALDYE 및 SSEDTOX 결합은 존속하므로 “transport coupling” 주장은 유지된다.
+16,models/EFDC/source-analysis/efdc_transport_scheme.md,28,1. **upwind cell 사전지정** (`calconc.f90:115-127`):,"models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Transport/calconc.f90:113-131
+113:   ! *** PRESPECIFY THE UPWIND CELLS FOR 3D ADVECTION
+114:   !$OMP PARALLEL DO PRIVATE(ND,K,LP,L,LE,LN)
+115:   do ND = 1,NDM
+116:     do K = 1,KC
+117:       do LP = 1,LLWET(K,ND)
+118:         L = LKWET(LP,K,ND)
+119:         if( UHDY2(L,K) >= 0.0 )then
+120:           LUPU(L,K) = LWC(L)
+121:         else
+122:           LUPU(L,K) = L
+123:         endif
+124:         if( VHDX2(L,K) >= 0.0 )then
+125:           LUPV(L,K) = LSC(L)
+126:         else
+127:           LUPV(L,K) = L
+128:         endif
+129:       enddo
+130:     enddo
+131: 
+
+models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Transport/calconc.f90:141-148
+141:         enddo
+142:       enddo
+143:     endif
+144:   enddo
+145:   !$OMP END PARALLEL DO
+146:   
+147:   ! *** EE7.2 - MUST ZERO ALL THREADS FOR EVERY INSTANCE DO TO POTENTIAL OF DIFFERENT THREADS MAY NOT BE ZEROED FOR CURRENT TIME
+148:   ! *** ZERO DRY CELL FLUXES","_staging/efdc-prescan/new/EFDC__Transport__calconc.f90:114-134
+114:   ! *** Prespecify the upwind cells for 3D advection
+115:   ! *** Upwind indices are also required by legacy CALTRAN calls that bypass the QUICKEST
+116:   ! *** dispatch: CALSFT (shellfish, ISTRAN(4)) and CALTRANICE (frazil ice, ISICE = 4)
+117:   if( ISQUICK == 0 .or. ISTRAN(4) > 0 .or. (ISTRAN(2) > 0 .and. ISICE == 4) )then  ! *** Upwind
+118:     !$OMP PARALLEL DO PRIVATE(ND,K,LP,L,LE,LN)
+119:     do ND = 1,NDM
+120:       do K = 1,KC
+121:         do LP = 1,LLWET(K,ND)
+122:           L = LKWET(LP,K,ND)
+123:           if( UHDY2(L,K) >= 0.0 )then
+124:             LUPU(L,K) = LWC(L)
+125:           else
+126:             LUPU(L,K) = L
+127:           endif
+128:           if( VHDX2(L,K) >= 0.0 )then
+129:             LUPV(L,K) = LSC(L)
+130:           else
+131:             LUPV(L,K) = L
+132:           endif
+133:         enddo
+134:       enddo
+
+_staging/efdc-prescan/new/EFDC__Transport__calconc.f90:144-152
+144:             endif
+145:           enddo
+146:         enddo
+147:       endif
+148:     enddo
+149:     !$OMP END PARALLEL DO
+150:   endif
+151:   
+152:   ! *** Must zero all threads for every instance do to potential of different threads may not be zeroed for current time","@@ -110,51 +111,53 @@ SUBROUTINE CALCONC",yes,REVIEW_ONLY,high,new calconc:117이 upwind 사전지정에 ISQUICK==0 또는 shellfish/frazil 조건을 추가하지만 :118-133의 LUPU/LUPV 계산은 유지되므로 인용된 항목 자체를 곧바로 거짓으로 보지 않는다.
+17,models/EFDC/source-analysis/sediment/efdc_sediment.md,25,- `Transport/calconc.f90:188-517` — coupling to water-column transport.,"models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Transport/calconc.f90:188-193
+188:   ! *** 3D ADVECTI0N-DIFFUSION TRANSPORT FOR ALL WATER COLUMN CONSITUENTS (SEE VARINIT FOR WCV INITIALIZATION)
+189:   !$OMP PARALLEL DEFAULT(SHARED)
+190:   !$OMP DO PRIVATE(IW,IT,L) SCHEDULE(STATIC,1)
+191:   do IW = 1,NACTIVEWC
+192:     !$  IT = OMP_GET_THREAD_NUM() + 1
+193:     call CALTRAN( IACTIVEWC1(IW), IACTIVEWC2(IW), WCV(IW).VAL0, WCV(IW).VAL1, IW, IT, WCV(IW).WCLIMIT, ISKIP(IW) )
+
+models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Transport/calconc.f90:213-220
+213:   ! *** APPLY ANTI-DIFFUSION AND FLUX CORRECTOR
+214:   !$OMP DO PRIVATE(IW,IT) SCHEDULE(STATIC,1)
+215:   do IW = 1,NACTIVEWC
+216:     if( ISKIP(IW) == 0 )then
+217:       !$  IT = OMP_GET_THREAD_NUM() + 1
+218:       call CALTRAN_AD( IACTIVEWC1(IW), IACTIVEWC2(IW), WCV(IW).VAL0, WCV(IW).VAL1, IW, IT )
+219:     endif
+220:   enddo
+
+models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Transport/calconc.f90:235-240
+235: 
+236:   !$OMP DO PRIVATE(IW,K,LP,L,CDTMP) SCHEDULE(STATIC,1)
+237:   do IW = 1,NACTIVEWC
+238:     if( ISADAC(IACTIVEWC1(IW)) == 1 )then 
+239:       ! *** APPLY THE ANTI-DIFFUSIVE ADVECTION CALCULATION TO STANDARD DONOR CELL SCHEME
+240:       if( ISKIP(IW) == 0 )then
+
+models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Transport/calconc.f90:290-299
+290:     endif
+291:     eps3d = max(eps_min,eps3d)
+292: 
+293:     !$OMP END SECTIONS
+294:   endif
+295:   
+296:   if( ISICE == 4 .and. (IS2TL > 0 .or. (IS2TL == 0 .and. NCTBC /= NTSTBC)) )then
+297:     if( LFRAZIL )then
+298:       ! *** FRAZIL ICE TRANSPORT
+299:       call CALTRANICE(FRAZILICE,FRAZILICE1,1)
+
+models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Transport/calconc.f90:480-488
+480: 
+481:   if( ISPROPWASH == 2 )then
+482:     ! *** If using propeller momentum, compute propeller velocities at every timestep, but skip if computing below
+483:     if( .not. ((SEDTIME+DELT) >= SEDSTEP .and. (ISTRAN(6) >= 1 .or. ISTRAN(7) >= 1 ) .and. TIMEDAY >= SEDSTART) )then
+484:       if( IS2TIM > 0 .or. NCTBC /= 1 )then
+485:         call Propwash_Calc_Sequence(1)
+486:       endif
+487:     endif
+488:   endif
+
+models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Transport/calconc.f90:499-507
+499:         if( propwash_on .and. IFIRST > 0 )then
+500:           call Propwash_Calc_Sequence(0)
+501:         endif
+502:         
+503:         call SSEDTOX
+504:         SEDTIME = 0.0
+505:       endif
+506:     else
+507:       ! *** FOR THREE TIME LEVEL SIMULATION","_staging/efdc-prescan/new/EFDC__Transport__calconc.f90:191-204
+191:   ! *** 3D ADVECTI0N-DIFFUSION TRANSPORT FOR ALL WATER COLUMN CONSITUENTS (SEE VARINIT FOR WCV INITIALIZATION)
+192:   !$OMP PARALLEL DEFAULT(SHARED)
+193:   !$OMP DO PRIVATE(IW,IT,L) SCHEDULE(STATIC,1)
+194:   do IW = 1,NACTIVEWC
+195:     !$  IT = OMP_GET_THREAD_NUM() + 1
+196: 
+197:     ! *** Dispatch to appropriate transport scheme
+198:     if( ISQUICK == 1 )then
+199:       ! *** QUICKEST scheme with ULTIMATE limiter
+200:       call CALTRAN_QUICKEST( IACTIVEWC1(IW), IACTIVEWC2(IW), WCV(IW).VAL0, WCV(IW).VAL1, IW, IT, WCV(IW).WCLIMIT, ISKIP(IW) )
+201:     else
+202:       ! *** Original upwind scheme
+203:       call CALTRAN( IACTIVEWC1(IW), IACTIVEWC2(IW), WCV(IW).VAL0, WCV(IW).VAL1, IW, IT, WCV(IW).WCLIMIT, ISKIP(IW) )
+204:     endif
+
+_staging/efdc-prescan/new/EFDC__Transport__calconc.f90:224-231
+224:   ! *** APPLY ANTI-DIFFUSION AND FLUX CORRECTOR
+225:   ! *** Skip for QUICKEST scheme (limiter is built-in)
+226:   !$OMP DO PRIVATE(IW,IT) SCHEDULE(STATIC,1)
+227:   do IW = 1,NACTIVEWC
+228:     if( ISKIP(IW) == 0 .AND. ISQUICK == 0 )then
+229:       !$  IT = OMP_GET_THREAD_NUM() + 1
+230:       call CALTRAN_AD( IACTIVEWC1(IW), IACTIVEWC2(IW), WCV(IW).VAL0, WCV(IW).VAL1, IW, IT )
+231:     endif
+
+_staging/efdc-prescan/new/EFDC__Transport__calconc.f90:248-252
+248:   !$OMP DO PRIVATE(IW,K,LP,L,CDTMP) SCHEDULE(STATIC,1)
+249:   do IW = 1,NACTIVEWC
+250:     if( ISADAC(IACTIVEWC1(IW)) == 1 .AND. ISQUICK == 0 )then 
+251:       ! *** APPLY THE ANTI-DIFFUSIVE ADVECTION CALCULATION TO STANDARD DONOR CELL SCHEME
+252:       if( ISKIP(IW) == 0 )then
+
+_staging/efdc-prescan/new/EFDC__Transport__calconc.f90:301-311
+301:       eps3d1 (1:LCM,1:KCM) = EPS_TEMP1
+302:     endif
+303:     eps3d = max(eps_min,eps3d)
+304: 
+305:     !$OMP END PARALLEL SECTIONS
+306:   endif
+307:   
+308:   if( ISICE == 4 .and. (IS2TL > 0 .or. (IS2TL == 0 .and. NCTBC /= NTSTBC)) )then
+309:     if( LFRAZIL )then
+310:       ! *** FRAZIL ICE TRANSPORT
+311:       call CALTRANICE(FRAZILICE,FRAZILICE1,1)
+
+_staging/efdc-prescan/new/EFDC__Transport__calconc.f90:493-505
+493:   if( ISPROPWASH == 2 )then
+494:     ! *** If using propeller momentum, compute propeller velocities at every timestep, but skip if computing below
+495:     if( ISTRAN(6) + ISTRAN(7) == 0 )then
+496:       ! *** SedTran is off
+497:       if( IS2TIM > 0 .or. NCTBC /= 1 )then
+498:         call Propwash_Calc_Sequence(1)
+499:       endif
+500:     elseif( (SEDTIME+DELT) < SEDSTEP .or. TIMEDAY < SEDSTART )then       ! *** SedTran is on.  Check timing
+501:       if( IS2TIM > 0 .or. NCTBC /= 1 )then
+502:         call Propwash_Calc_Sequence(1)
+503:       endif
+504:     endif
+505:   endif
+
+_staging/efdc-prescan/new/EFDC__Transport__calconc.f90:515-533
+515:         ! *** Call Propwash module if that option is selected
+516:         if( propwash_on .and. IFIRST > 0 )then
+517:           call Propwash_Calc_Sequence(0)
+518:         endif
+519:         
+520:         call SSEDTOX
+521:         SEDTIME = 0.0
+522:       endif
+523:     else
+524:       ! *** FOR THREE TIME LEVEL SIMULATION
+525:       if( NCTBC == 1 )then
+526:         DTSED = FLOAT(NTSTBC)*DT
+527:         
+528:         ! *** Call Propwash module if that option is selected
+529:         if( propwash_on .and. IFIRST > 0 )then
+530:           call Propwash_Calc_Sequence(0)
+531:         endif
+532:         
+533:         call SSEDTOX","@@ -190,7 +193,15 @@ SUBROUTINE CALCONC
+@@ -211,9 +222,10 @@ SUBROUTINE CALCONC
+@@ -235,7 +247,7 @@ SUBROUTINE CALCONC
+@@ -263,34 +275,34 @@ SUBROUTINE CALCONC
+@@ -480,7 +492,12 @@ SUBROUTINE CALCONC",yes,REVIEW_ONLY,high,new calconc:198-204의 scheme 분기와 :228/:250의 보정 제한이 추가됐어도 WCV 수송과 SSEDTOX(:520/:533) 결합은 유지되므로 포괄적 coupling 목록 주장은 성립한다.
+18,models/EFDC/source-analysis/efdc_boundary_conditions.md,19,"- `input.f90:264, 548, 732-754, 852-867, 870-1321, 1352-1378, 2721-2995, 3656-3705, 5650-5685, 5717-5755, 5858-6277` — input cards C5, C11, C14–C24, time series headers.","models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:543-550
+543:   !C11*  READ GRID, ROUGHNESS, MASKING AND DEPTH parameterS
+544:   NCARD = '11'
+545:   ! *** ********************************************************
+546:   if( process_id == master_id )then
+547:     call SEEK('C11',0)
+548:     read(1,*,IOSTAT = ISO) DX, DY, DXYCVT, IMDXDY, ZBRADJ, ZBRCVRT, HMIN, HADADJ, HCVRT, HDRY, HWET, BELADJ, BELCVRT, HDRYMOVE
+549:   endif
+550: 
+
+models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:565-569
+565: 
+566:   write(mpi_efdc_out_unit,1002) NCARD
+567:   write(mpi_efdc_out_unit,*) DX, DY, DXYCVT, IMDXDY, ZBRADJ, ZBRCVRT, HMIN, HADADJ, HCVRT, HDRY, HWET, BELADJ, BELCVRT, HDRYMOVE
+568:   if( ISO > 0 ) GOTO 100
+569: ","_staging/efdc-prescan/new/EFDC__input.f90:565-572
+565:   !C11*  READ GRID, ROUGHNESS, MASKING AND DEPTH parameterS
+566:   NCARD = '11'
+567:   ! *** ********************************************************
+568:   if( process_id == master_id )then
+569:     call SEEK('C11',0)
+570:     read(1,*,IOSTAT = ISO) DX, DY, DXYCVT, IMDXDY, ZBRADJ, ZBRCVRT, HMIN, HADADJ, HCVRT, HDRY, HWET, BELADJ, BELCVRT, HDRYMOVE
+571:     if( ISO > 0 ) GOTO 100
+572:   endif
+
+_staging/efdc-prescan/new/EFDC__input.f90:587-591
+587:   call Broadcast_Scalar(HDRYMOVE, master_id)
+588: 
+589:   write(mpi_efdc_out_unit,1002) NCARD
+590:   write(mpi_efdc_out_unit,*) DX, DY, DXYCVT, IMDXDY, ZBRADJ, ZBRCVRT, HMIN, HADADJ, HCVRT, HDRY, HWET, BELADJ, BELCVRT, HDRYMOVE
+591: ","@@ -538,14 +561,14 @@ SUBROUTINE INPUT()",no,NO_ACTION,high,old input:547-548와 new :569-570의 C11 SEEK·read는 동일; ISO 오류 검사 위치 변경은 입력 카드 목록 주장과 무관하다.
+19,models/EFDC/source-analysis/efdc_boundary_conditions.md,19,"- `input.f90:264, 548, 732-754, 852-867, 870-1321, 1352-1378, 2721-2995, 3656-3705, 5650-5685, 5717-5755, 5858-6277` — input cards C5, C11, C14–C24, time series headers.","models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:729-754
+729:   call Broadcast_Scalar(QQLMIN   , master_id)
+730:   call Broadcast_Scalar(DMLMIN   , master_id)
+731: 
+732:   !C14*  READ TIDAL & ATMOSPHERIC FORCING, GROUND WATER AND SUBGRID CHANNEL parameterS
+733:   NCARD = '14'
+734:   ! *** ********************************************************
+735:   if( process_id == master_id )then
+736:     call SEEK('C14',0)
+737:     read(1,*,IOSTAT = ISO) MTIDE, NWSER, NASER, ISGWIT, ISCHAN, ISWAVE, ITIDASM, ISPERC, ISBODYF, ISPNHYDS, ISPROPWASH
+738: 
+739:     write(mpi_efdc_out_unit,1002) NCARD
+740:     write(mpi_efdc_out_unit,*) MTIDE, NWSER, NASER, ISGWIT, ISCHAN, ISWAVE, ITIDASM, ISPERC, ISBODYF, ISPNHYDS, ISPROPWASH
+741:     if( ISO > 0 ) GOTO 100
+742:   endif
+743: 
+744:   call Broadcast_Scalar(MTIDE     , master_id)
+745:   call Broadcast_Scalar(NWSER     , master_id)
+746:   call Broadcast_Scalar(NASER     , master_id)
+747:   call Broadcast_Scalar(ISGWIT    , master_id)
+748:   call Broadcast_Scalar(ISCHAN    , master_id)
+749:   call Broadcast_Scalar(ISWAVE    , master_id)
+750:   call Broadcast_Scalar(ITIDASM   , master_id)
+751:   call Broadcast_Scalar(ISPERC    , master_id)
+752:   call Broadcast_Scalar(ISBODYF   , master_id)
+753:   call Broadcast_Scalar(ISPNHYDS  , master_id)
+754:   call Broadcast_Scalar(ISPROPWASH, master_id)","_staging/efdc-prescan/new/EFDC__input.f90:749-778
+749:   call Broadcast_Scalar(QQLMIN   , master_id)
+750:   call Broadcast_Scalar(DMLMIN   , master_id)
+751: 
+752:   write(mpi_efdc_out_unit,1002) NCARD
+753:   write(mpi_efdc_out_unit,*) VKC, CTURB, CTURB2B, CTE1, CTE2, CTE3, CTE4, CTE5, RIQMAX, QQMIN, QQLMIN, DMLMIN
+754: 
+755:   !C14*  READ TIDAL & ATMOSPHERIC FORCING, GROUND WATER AND SUBGRID CHANNEL parameterS
+756:   NCARD = '14'
+757:   ! *** ********************************************************
+758:   if( process_id == master_id )then
+759:     call SEEK('C14',0)
+760:     read(1,*,IOSTAT = ISO) MTIDE, NWSER, NASER, ISGWIT, ISCHAN, ISWAVE, ITIDASM, ISPERC, ISBODYF, ISPNHYDS, ISPROPWASH
+761:     if( ISO > 0 ) GOTO 100
+762:   endif
+763: 
+764:   call Broadcast_Scalar(MTIDE     , master_id)
+765:   call Broadcast_Scalar(NWSER     , master_id)
+766:   call Broadcast_Scalar(NASER     , master_id)
+767:   call Broadcast_Scalar(ISGWIT    , master_id)
+768:   call Broadcast_Scalar(ISCHAN    , master_id)
+769:   call Broadcast_Scalar(ISWAVE    , master_id)
+770:   call Broadcast_Scalar(ITIDASM   , master_id)
+771:   call Broadcast_Scalar(ISPERC    , master_id)
+772:   call Broadcast_Scalar(ISBODYF   , master_id)
+773:   call Broadcast_Scalar(ISPNHYDS  , master_id)
+774: 
+775:   write(mpi_efdc_out_unit,1002) NCARD
+776:   write(mpi_efdc_out_unit,*) MTIDE, NWSER, NASER, ISGWIT, ISCHAN, ISWAVE, ITIDASM, ISPERC, ISBODYF, ISPNHYDS, ISPROPWASH
+777: 
+778:   call Broadcast_Scalar(ISPROPWASH, master_id)","@@ -729,15 +749,15 @@ SUBROUTINE INPUT()
+@@ -751,6 +771,10 @@ SUBROUTINE INPUT()",no,NO_ACTION,high,C14 SEEK·11개 read 슬롯은 old input:736-737 → new :759-760에 동일; 교차 hunks는 echo 이동·추가여서 입력 카드 목록 주장을 바꾸지 않는다.
+20,models/EFDC/source-analysis/efdc_boundary_conditions.md,19,"- `input.f90:264, 548, 732-754, 852-867, 870-1321, 1352-1378, 2721-2995, 3656-3705, 5650-5685, 5717-5755, 5858-6277` — input cards C5, C11, C14–C24, time series headers.","models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:852-869
+852:   if( MTIDE > 0 )then
+853:     !C15*  READ PERIODIC FORCING (TIDAL) CONSTITUENT SYMBOLS AND PERIODS
+854:     NCARD = '15'
+855:     if( process_id == master_id )then
+856:       call SEEK('C15',0)
+857:       do M = 1,MTIDE
+858:         read(1,*,IOSTAT = ISO) SYMBOL(M),TCP(M)
+859: 
+860:         write(mpi_efdc_out_unit,1002) NCARD
+861:         write(mpi_efdc_out_unit,*) SYMBOL(M),TCP(M)
+862:         if( ISO > 0 ) GOTO 100
+863:       enddo
+864:     endif
+865:     call Broadcast_Array(SYMBOL, master_id)
+866:     call Broadcast_Array(TCP,    master_id)
+867: 
+868:   endif
+869: ","_staging/efdc-prescan/new/EFDC__input.f90:884-901
+884:   if( MTIDE > 0 )then
+885:     !C15*  READ PERIODIC FORCING (TIDAL) CONSTITUENT SYMBOLS AND PERIODS
+886:     NCARD = '15'
+887:     if( process_id == master_id )then
+888:       call SEEK('C15',0)
+889:       do M = 1,MTIDE
+890:         read(1,*,IOSTAT = ISO) SYMBOL(M),TCP(M)
+891:         if( ISO > 0 ) GOTO 100
+892:       enddo
+893:     endif
+894:     call Broadcast_Array(SYMBOL, master_id)
+895:     call Broadcast_Array(TCP,    master_id)
+896: 
+897:     do M = 1,MTIDE
+898:       write(mpi_efdc_out_unit,1002) NCARD
+899:       write(mpi_efdc_out_unit,*) SYMBOL(M),TCP(M)
+900:     enddo
+901:   endif","@@ -849,22 +878,26 @@ SUBROUTINE INPUT()",no,NO_ACTION,high,MTIDE>0의 C15 SEEK 및 SYMBOL/TCP read는 old input:852-866 → new :884-895에서 유지; write echo의 broadcast 뒤 이동은 카드 목록 주장과 무관하다.

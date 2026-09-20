@@ -1,0 +1,162 @@
+[
+ {
+  "id": "B2-1",
+  "note": "models/EFDC/source-analysis/efdc_dispersion.md",
+  "note_line": 241,
+  "wiki_claim": "| `ZBRWALL` | 측벽 log-law 거칠기 (ISHDMF=2 wall effect) | m | 0.002 | `input.f90:621` |",
+  "file": "EFDC/input.f90",
+  "old_range": "621-621",
+  "status": "modified",
+  "old_excerpt": "621:     read(1,*,IOSTAT = ISO) AHO, AHD, AVO, ABO, AVMX, ABMX, VISMUD, AVCON, ZBRWALL"
+ },
+ {
+  "id": "B2-2",
+  "note": "models/EFDC/source-analysis/efdc_dispersion.md",
+  "note_line": 256,
+  "wiki_claim": "`input.f90:3722-3795`:",
+  "file": "EFDC/input.f90",
+  "old_range": "3722-3795",
+  "status": "modified",
+  "old_excerpt": "3722:   ! *** ENABLE SPATIALLY VARIABLE BACKGROUND AHO\n3723:   if( AHO < 0. )then\n3724:     AHMAX = ABS(AHO)\n3725:     AHMIN = 1.0E32\n3726:     do L = 2,LA\n3727:       AHOXY(L) = ABS(AHO)*DXP(L)*DYP(L)\n3728:       AHMAX    = max(AHOXY(L),AHMAX)\n3729:       AHMIN    = min(AHOXY(L),AHMIN)\n3730:     enddo\n3731: \n3732:     if( process_id == master_id )then\n3733:       PRINT '(A,2E16.5)','VARIABLE AHO USED (MIN,MAX): ', AHMIN, AHMAX\n3734:     endif\n3735: \n3736:   else\n3737:     AHOXY = AHO\n3738:   endif\n3739: \n3740:   ! *** SMAGORINSKY AND BACKGROUND DIFFUSIVITY\n3741:   ! *** Constant and/or default values\n3742:   AHO = ABS(AHO)"
+ },
+ {
+  "id": "B2-3",
+  "note": "models/EFDC/source-analysis/efdc_hydraulic_structures.md",
+  "note_line": 21,
+  "wiki_claim": "- `input.f90:1352-6671` — input cards C23, C32, C32A, C32B.",
+  "file": "EFDC/input.f90",
+  "old_range": "1352-6671",
+  "status": "modified",
+  "old_excerpt": "1352:   !C23*  READ VELOCITY, VOL SOUR/SINK, FLOW CONTROL, & WITHDRAW/RETURN DATA\n1353:   NCARD = '23'\n1354:   ! *** ********************************************************\n1355:   if( process_id == master_id )then\n1356:     call SEEK('C23',0)\n1357:     read(1,*,IOSTAT = ISO) NQSIJ, NQJPIJ, NQSER, NQCTL, NQCTLT, NHYDST, NQWR, NQWRSR, ISDIQ, NQCTLSER, NQCTRULES\n1358: \n1359:     write(mpi_efdc_out_unit,1002) NCARD\n1360:     write(mpi_efdc_out_unit,*) NQSIJ, NQJPIJ, NQSER, NQCTL, NQCTLT, NHYDST, NQWR, NQWRSR, ISDIQ, NQCTLSER, NQCTRULES\n1361:     if( ISO > 0 ) GOTO 100\n1362:   endif\n1363:   ! *** Broadcast in Scan_EFDC\n1364: \n1365:   NGRPID = 0\n1366:   if( NQSIJ > 0 )then\n1367:     !C24*  READ VOLUME SOURCE/SINK LOCATIONS, MAGNITUDES, & VOL & CONC SERIES\n1368:     NCARD = '24'\n1369:     if( process_id == master_id )then\n1370:       call SEEK('C24',0)\n1371:       do NS = 1,NQSIJ\n1372:         read(1,*,IOSTAT = ISO) BCPS_GL(NS).I, BCPS_GL(NS).J, BCPS_GL(NS).QSSE, BCPS_GL(NS).NQSMUL, BCPS_GL(NS).NQSMF, BCPS_GL(NS).NQSERQ,   BCPS_GL(NS).NCSERQ(1), BCPS_GL(NS).NCSERQ(2), BCPS_GL(NS).NCSERQ(3), BCPS_GL(NS).NCSERQ(4), BCPS_GL(NS).NCSERQ(5),  &"
+ },
+ {
+  "id": "B2-4",
+  "note": "models/EFDC/source-analysis/efdc_wetdry.md",
+  "note_line": 19,
+  "wiki_claim": "- `input.f90:264-293, 548-570` — `ISDRY`, `HDRY/HWET` reads, derived `HDRYICE/HDRYWAV`.",
+  "file": "EFDC/input.f90",
+  "old_range": "548-570",
+  "status": "modified",
+  "old_excerpt": "548:     read(1,*,IOSTAT = ISO) DX, DY, DXYCVT, IMDXDY, ZBRADJ, ZBRCVRT, HMIN, HADADJ, HCVRT, HDRY, HWET, BELADJ, BELCVRT, HDRYMOVE\n549:   endif\n550: \n551:   call Broadcast_Scalar(DX     ,  master_id)\n552:   call Broadcast_Scalar(DY     ,  master_id)\n553:   call Broadcast_Scalar(DXYCVT ,  master_id)\n554:   call Broadcast_Scalar(IMDXDY ,  master_id)\n555:   call Broadcast_Scalar(ZBRADJ ,  master_id)\n556:   call Broadcast_Scalar(ZBRCVRT,  master_id)\n557:   call Broadcast_Scalar(HMIN   ,  master_id)\n558:   call Broadcast_Scalar(HADADJ ,  master_id)\n559:   call Broadcast_Scalar(HCVRT  ,  master_id)\n560:   call Broadcast_Scalar(HDRY   ,  master_id)\n561:   call Broadcast_Scalar(HWET   ,  master_id)\n562:   call Broadcast_Scalar(BELADJ ,  master_id)\n563:   call Broadcast_Scalar(BELCVRT,  master_id)\n564:   call Broadcast_Scalar(HDRYMOVE, master_id)\n565: \n566:   write(mpi_efdc_out_unit,1002) NCARD\n567:   write(mpi_efdc_out_unit,*) DX, DY, DXYCVT, IMDXDY, ZBRADJ, ZBRCVRT, HMIN, HADADJ, HCVRT, HDRY, HWET, BELADJ, BELCVRT, HDRYMOVE\n568:   if( ISO > 0 ) GOTO 100"
+ },
+ {
+  "id": "B2-5",
+  "note": "models/EFDC/source-analysis/efdc_wetdry.md",
+  "note_line": 45,
+  "wiki_claim": "Read from card C11 (`input.f90:548-570`). Derived: `HDRYICE`, `HDRYWAV`.",
+  "file": "EFDC/input.f90",
+  "old_range": "548-570",
+  "status": "modified",
+  "old_excerpt": "548:     read(1,*,IOSTAT = ISO) DX, DY, DXYCVT, IMDXDY, ZBRADJ, ZBRCVRT, HMIN, HADADJ, HCVRT, HDRY, HWET, BELADJ, BELCVRT, HDRYMOVE\n549:   endif\n550: \n551:   call Broadcast_Scalar(DX     ,  master_id)\n552:   call Broadcast_Scalar(DY     ,  master_id)\n553:   call Broadcast_Scalar(DXYCVT ,  master_id)\n554:   call Broadcast_Scalar(IMDXDY ,  master_id)\n555:   call Broadcast_Scalar(ZBRADJ ,  master_id)\n556:   call Broadcast_Scalar(ZBRCVRT,  master_id)\n557:   call Broadcast_Scalar(HMIN   ,  master_id)\n558:   call Broadcast_Scalar(HADADJ ,  master_id)\n559:   call Broadcast_Scalar(HCVRT  ,  master_id)\n560:   call Broadcast_Scalar(HDRY   ,  master_id)\n561:   call Broadcast_Scalar(HWET   ,  master_id)\n562:   call Broadcast_Scalar(BELADJ ,  master_id)\n563:   call Broadcast_Scalar(BELCVRT,  master_id)\n564:   call Broadcast_Scalar(HDRYMOVE, master_id)\n565: \n566:   write(mpi_efdc_out_unit,1002) NCARD\n567:   write(mpi_efdc_out_unit,*) DX, DY, DXYCVT, IMDXDY, ZBRADJ, ZBRCVRT, HMIN, HADADJ, HCVRT, HDRY, HWET, BELADJ, BELCVRT, HDRYMOVE\n568:   if( ISO > 0 ) GOTO 100"
+ },
+ {
+  "id": "B2-6",
+  "note": "models/EFDC/source-analysis/efdc_vertical.md",
+  "note_line": 20,
+  "wiki_claim": "- `input.f90:145, 264, 516, 531` — input reads for `KC`, `IGRIDV`, `IINTPG`, sigma fractions.",
+  "file": "EFDC/input.f90",
+  "old_range": "516-516",
+  "status": "modified",
+  "old_excerpt": "516:     read(1,*,IOSTAT = ISO) KC, ldum, ldum, tmp, tmp, ldum"
+ },
+ {
+  "id": "B2-7",
+  "note": "models/EFDC/source-analysis/efdc_vertical.md",
+  "note_line": 20,
+  "wiki_claim": "- `input.f90:145, 264, 516, 531` — input reads for `KC`, `IGRIDV`, `IINTPG`, sigma fractions.",
+  "file": "EFDC/input.f90",
+  "old_range": "531-531",
+  "status": "modified",
+  "old_excerpt": "531:     do K = 1,KC"
+ },
+ {
+  "id": "B2-8",
+  "note": "models/EFDC/source-analysis/efdc_vertical.md",
+  "note_line": 30,
+  "wiki_claim": "- `KC` = water-column layer count (`mod_var_global.f90:221`); read from card C9A (`input.f90:516`).",
+  "file": "EFDC/input.f90",
+  "old_range": "516-516",
+  "status": "modified",
+  "old_excerpt": "516:     read(1,*,IOSTAT = ISO) KC, ldum, ldum, tmp, tmp, ldum"
+ },
+ {
+  "id": "B2-9",
+  "note": "models/EFDC/source-analysis/efdc_vertical.md",
+  "note_line": 31,
+  "wiki_claim": "- Global sigma fractions `DZCK(K)` from card C10 (`input.f90:531`); normalized to sum 1 (`aaefdc.f90:1294`).",
+  "file": "EFDC/input.f90",
+  "old_range": "531-531",
+  "status": "modified",
+  "old_excerpt": "531:     do K = 1,KC"
+ },
+ {
+  "id": "B2-10",
+  "note": "models/EFDC/source-analysis/efdc_turbulence.md",
+  "note_line": 22,
+  "wiki_claim": "- `input.f90:621-685` — input cards C12 (background mixing, max), C12A (`ISTOPT`), C12B (`ISGOTM`).",
+  "file": "EFDC/input.f90",
+  "old_range": "621-685",
+  "status": "modified",
+  "old_excerpt": "621:     read(1,*,IOSTAT = ISO) AHO, AHD, AVO, ABO, AVMX, ABMX, VISMUD, AVCON, ZBRWALL\n622: \n623:     write(mpi_efdc_out_unit,1002) NCARD\n624:     write(mpi_efdc_out_unit,*) AHO, AHD, AVO, ABO, AVMX, ABMX, VISMUD, AVCON, ZBRWALL\n625:     if( ISO > 0 ) GOTO 100\n626:   endif\n627: \n628:   call Broadcast_Scalar(AHO    , master_id)\n629:   call Broadcast_Scalar(AHD    , master_id)\n630:   call Broadcast_Scalar(AVO    , master_id)\n631:   call Broadcast_Scalar(ABO    , master_id)\n632:   call Broadcast_Scalar(AVMX   , master_id)\n633:   call Broadcast_Scalar(ABMX   , master_id)\n634:   call Broadcast_Scalar(VISMUD , master_id)\n635:   call Broadcast_Scalar(AVCON  , master_id)\n636:   call Broadcast_Scalar(ZBRWALL, master_id)\n637: \n638:   ISAVCOMP = 1\n639:   if( AVCON == 0. ) ISAVCOMP = 0\n640: \n641:   !C12A*  READ TURBULENCE CLOSURE OPTIONS"
+ },
+ {
+  "id": "B2-11",
+  "note": "models/EFDC/source-analysis/efdc_turbulence.md",
+  "note_line": 67,
+  "wiki_claim": "Both depth-normalized afterward (`:157, 158`). Background `AVOXY/AVBXY` come from card C12 (`input.f90:621-633`: `AVO, ABO, AVMX, ABMX`).",
+  "file": "EFDC/input.f90",
+  "old_range": "621-633",
+  "status": "modified",
+  "old_excerpt": "621:     read(1,*,IOSTAT = ISO) AHO, AHD, AVO, ABO, AVMX, ABMX, VISMUD, AVCON, ZBRWALL\n622: \n623:     write(mpi_efdc_out_unit,1002) NCARD\n624:     write(mpi_efdc_out_unit,*) AHO, AHD, AVO, ABO, AVMX, ABMX, VISMUD, AVCON, ZBRWALL\n625:     if( ISO > 0 ) GOTO 100\n626:   endif\n627: \n628:   call Broadcast_Scalar(AHO    , master_id)\n629:   call Broadcast_Scalar(AHD    , master_id)\n630:   call Broadcast_Scalar(AVO    , master_id)\n631:   call Broadcast_Scalar(ABO    , master_id)\n632:   call Broadcast_Scalar(AVMX   , master_id)\n633:   call Broadcast_Scalar(ABMX   , master_id)"
+ },
+ {
+  "id": "B2-12",
+  "note": "models/EFDC/source-analysis/efdc_turbulence.md",
+  "note_line": 107,
+  "wiki_claim": "`ISTOPT(0)` is read from card C12A (`input.f90:641-661`). It does **not** select GOTM (that is `ISGOTM`). It selects original-EFDC coefficient behavior inside CALAVB:",
+  "file": "EFDC/input.f90",
+  "old_range": "641-661",
+  "status": "modified",
+  "old_excerpt": "641:   !C12A*  READ TURBULENCE CLOSURE OPTIONS\n642:   NCARD = '12A'\n643:   ! *** ********************************************************\n644:   if( process_id == master_id )then\n645:     call SEEK('C12A',0)\n646:     read(1,*,IOSTAT = ISO) ISTOPT(0), ISSQL, ISAVBMX, ISFAVB, ISINWV, ISLLIM, IFPROX, XYRATIO, BC_EDGEFACTOR\n647: \n648:     write(mpi_efdc_out_unit,1002) NCARD\n649:     write(mpi_efdc_out_unit,*) ISTOPT(0), ISSQL, ISAVBMX, ISFAVB, ISINWV, ISLLIM, IFPROX, XYRATIO, BC_EDGEFACTOR\n650:     if( ISO > 0 ) GOTO 100\n651:   endif\n652: \n653:   call Broadcast_Scalar(ISTOPT(0)    , master_id)\n654:   call Broadcast_Scalar(ISSQL        , master_id)\n655:   call Broadcast_Scalar(ISAVBMX      , master_id)\n656:   call Broadcast_Scalar(ISFAVB       , master_id)\n657:   call Broadcast_Scalar(ISINWV       , master_id)\n658:   call Broadcast_Scalar(ISLLIM       , master_id)\n659:   call Broadcast_Scalar(IFPROX       , master_id)\n660:   call Broadcast_Scalar(XYRATIO      , master_id)\n661:   call Broadcast_Scalar(BC_EDGEFACTOR, master_id)"
+ },
+ {
+  "id": "B2-13",
+  "note": "models/EFDC/source-analysis/efdc_turbulence.md",
+  "note_line": 115,
+  "wiki_claim": "`ISGOTM` from card C12B (`input.f90:666-685`).",
+  "file": "EFDC/input.f90",
+  "old_range": "666-685",
+  "status": "modified",
+  "old_excerpt": "666:   !C12B*  READ GOTM TURBULENCE OPTIONS\n667:   NCARD = '12B'\n668: \n669:   if( process_id == master_id )then\n670:     call SEEK('C12B',0)\n671:     read(1,*,IOSTAT = ISO) ISGOTM, IFRICTION, ICALNN, ICALSS, CHARNOCK\n672: \n673:     write(mpi_efdc_out_unit,1002) NCARD\n674:     write(mpi_efdc_out_unit,*)  ISGOTM, IFRICTION, ICALNN, ICALSS, CHARNOCK\n675:     if( ISO > 0 ) GOTO 100\n676:   endif\n677: \n678:   call Broadcast_Scalar(ISGOTM,        master_id)\n679:   call Broadcast_Scalar(IFRICTION,     master_id)\n680:   call Broadcast_Scalar(ICALNN,        master_id)\n681:   call Broadcast_Scalar(ICALSS,        master_id)\n682:   call Broadcast_Scalar(CHARNOCK,      master_id)\n683: \n684:   ! *** Initialize GOTM variables\n685:   if( ISGOTM > 0 ) CALL Init_GOTM"
+ },
+ {
+  "id": "B2-14",
+  "note": "models/EFDC/source-analysis/efdc-tidal-forcing-conventions-v12.md",
+  "note_line": 28,
+  "wiki_claim": "2. **cos/sin 변환**: `RAD = 2π·PFPH/TCP(M)` → `CPFAM0 = PFAM·cos(RAD)`, `SPFAM0 = PFAM·sin(RAD)` (`input.f90:913-915`, NPFORT≥1 분기; NPFORT=0은 S/W/E/N 경계 카드 처리에서 동일 변환 후 ×G로 `PCB*/PSB*` 생성, `input.f90:980-1005` 등 — [[efdc_boundary_conditions]] §G).",
+  "file": "EFDC/input.f90",
+  "old_range": "913-915",
+  "status": "modified",
+  "old_excerpt": "913:             RAD = PI2*PFPH(NP,M)/TCP(M)\n914:             CPFAM0(NP,M) = PFAM(NP,M)*COS(RAD)\n915:             SPFAM0(NP,M) = PFAM(NP,M)*SIN(RAD)"
+ },
+ {
+  "id": "B2-15",
+  "note": "models/EFDC/source-analysis/efdc-tidal-forcing-conventions-v12.md",
+  "note_line": 28,
+  "wiki_claim": "2. **cos/sin 변환**: `RAD = 2π·PFPH/TCP(M)` → `CPFAM0 = PFAM·cos(RAD)`, `SPFAM0 = PFAM·sin(RAD)` (`input.f90:913-915`, NPFORT≥1 분기; NPFORT=0은 S/W/E/N 경계 카드 처리에서 동일 변환 후 ×G로 `PCB*/PSB*` 생성, `input.f90:980-1005` 등 — [[efdc_boundary_conditions]] §G).",
+  "file": "EFDC/input.f90",
+  "old_range": "980-1005",
+  "status": "modified",
+  "old_excerpt": "980:           do M = 1,MTIDE\n981:             if( NPFORS == 0) exit\n982:             RAD = PI2*PFPH(NPFORS,M)/TCP(M)\n983:             AMP = G*PFAM(NPFORS,M)\n984:             PCBS_GL(L,M) = AMP*COS(RAD)\n985:             PSBS_GL(L,M) = AMP*SIN(RAD)\n986:           enddo\n987:         enddo\n988: \n989:       elseif( NPFORT == 1 )then\n990:         do L = 1,NPBS\n991:           read(1,*,IOSTAT = ISO) IPBS_GL(L), JPBS_GL(L), ISPBS_GL(L), ISPRS_GL(L), NPFORS, NPSERS_GL(L), NPSERS1_GL(L), TPCOORDS_GL(L)\n992: \n993:           write(mpi_efdc_out_unit,1002) NCARD\n994:           write(mpi_efdc_out_unit,*) IPBS_GL(L), JPBS_GL(L), ISPBS_GL(L), ISPRS_GL(L), NPFORS, NPSERS_GL(L), NPSERS1_GL(L), TPCOORDS_GL(L)\n995:           if( ISO > 0 ) GOTO 100\n996:           do M = 1,MTIDE\n997:             if( NPFORS == 0) exit\n998:             PCBS_GL(L,M) = CPFAM0(NPFORS,M)+TPCOORDS_GL(L)*CPFAM1(NPFORS,M) + TPCOORDS_GL(L)*TPCOORDS_GL(L)*CPFAM2(NPFORS,M)\n999:             PSBS_GL(L,M) = SPFAM0(NPFORS,M)+TPCOORDS_GL(L)*SPFAM1(NPFORS,M) + TPCOORDS_GL(L)*TPCOORDS_GL(L)*SPFAM2(NPFORS,M)\n1000:             TMPAMP = SQRT(PCBS(L,M)*PCBS(L,M)+PSBS_GL(L,M)*PSBS_GL(L,M))"
+ },
+ {
+  "id": "B2-16",
+  "note": "models/EFDC/source-analysis/efdc_transport_scheme.md",
+  "note_line": 65,
+  "wiki_claim": "## 4. ISADAC / ISFCT — constituent별 토글 (input.f90:306)",
+  "file": "EFDC/input.f90",
+  "old_range": "306-306",
+  "status": "modified",
+  "old_excerpt": "306:       read(1,*,IOSTAT = ISO) ISTRAN(NS), ISTOPT(NS), ldum, ISADAC(NS), ISFCT(NS), ldum, ldum, ldum, ISCI(NS), ISCO(NS)"
+ }
+]

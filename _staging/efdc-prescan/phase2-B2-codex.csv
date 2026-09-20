@@ -1,0 +1,867 @@
+id,note,note_line,wiki_claim,old_source_evidence,new_source_evidence,triggering_change,changed_file,changed_hunk,semantic_delta,proposed_classification,confidence,exact_evidence,reason
+B2-1,models/EFDC/source-analysis/efdc_dispersion.md,241,| `ZBRWALL` | 측벽 log-law 거칠기 (ISHDMF=2 wall effect) | m | 0.002 | `input.f90:621` |,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:618-625; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:635-636,_staging/efdc-prescan/new/EFDC__input.f90:638-655,C12 echo가 master read 블록에서 broadcast 뒤로 이동. 인용한 read 문은 동일(621→643).,EFDC/input.f90,"@@ -603,25 +625,22 @@ old citation∩hunk=621-621",ZBRWALL 필드의 위치·read·broadcast는 유지된다. 이 hunk가 표의 측벽 거칠기 의미나 0.002 예시를 바꾼다는 근거는 없다.,REVIEW_ONLY,HIGH,"old EFDC/input.f90:618:   ! *** ********************************************************
+old EFDC/input.f90:619:   if( process_id == master_id )then
+old EFDC/input.f90:620:     call SEEK('C12',0)
+old EFDC/input.f90:621:     read(1,*,IOSTAT = ISO) AHO, AHD, AVO, ABO, AVMX, ABMX, VISMUD, AVCON, ZBRWALL
+old EFDC/input.f90:622: 
+old EFDC/input.f90:623:     write(mpi_efdc_out_unit,1002) NCARD
+old EFDC/input.f90:624:     write(mpi_efdc_out_unit,*) AHO, AHD, AVO, ABO, AVMX, ABMX, VISMUD, AVCON, ZBRWALL
+old EFDC/input.f90:625:     if( ISO > 0 ) GOTO 100
+old EFDC/input.f90:635:   call Broadcast_Scalar(AVCON  , master_id)
+old EFDC/input.f90:636:   call Broadcast_Scalar(ZBRWALL, master_id)
+new EFDC/input.f90:638:   !C12*  READ TURBULENT DIFFUSION parameterS
+new EFDC/input.f90:639:   NCARD = '12'
+new EFDC/input.f90:640:   ! *** ********************************************************
+new EFDC/input.f90:641:   if( process_id == master_id )then
+new EFDC/input.f90:642:     call SEEK('C12',0)
+new EFDC/input.f90:643:     read(1,*,IOSTAT = ISO) AHO, AHD, AVO, ABO, AVMX, ABMX, VISMUD, AVCON, ZBRWALL
+new EFDC/input.f90:644:     if( ISO > 0 ) GOTO 100
+new EFDC/input.f90:645:   endif
+new EFDC/input.f90:646: 
+new EFDC/input.f90:647:   call Broadcast_Scalar(AHO    , master_id)
+new EFDC/input.f90:648:   call Broadcast_Scalar(AHD    , master_id)
+new EFDC/input.f90:649:   call Broadcast_Scalar(AVO    , master_id)
+new EFDC/input.f90:650:   call Broadcast_Scalar(ABO    , master_id)
+new EFDC/input.f90:651:   call Broadcast_Scalar(AVMX   , master_id)
+new EFDC/input.f90:652:   call Broadcast_Scalar(ABMX   , master_id)
+new EFDC/input.f90:653:   call Broadcast_Scalar(VISMUD , master_id)
+new EFDC/input.f90:654:   call Broadcast_Scalar(AVCON  , master_id)
+new EFDC/input.f90:655:   call Broadcast_Scalar(ZBRWALL, master_id)",인용 줄 이동과 인접 echo 변경을 검토한 결과 claim 불일치 미확인. input read만으로 GUI default 자체를 재검증한 것은 아니므로 REVIEW_ONLY.
+B2-2,models/EFDC/source-analysis/efdc_dispersion.md,256,`input.f90:3722-3795`:,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:3722-3729; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:3744-3746; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:3755-3781; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:3789-3795,_staging/efdc-prescan/new/EFDC__input.f90:3877-3884; _staging/efdc-prescan/new/EFDC__input.f90:3899-3901; _staging/efdc-prescan/new/EFDC__input.f90:3910-3936; _staging/efdc-prescan/new/EFDC__input.f90:3944-3952,old 3792의 AHO/AHD min/max PRINT에 master_id 조건 추가(new 3947-3949). 앞 hunk는 old 3722 주석에만 교차하며 channel 삽입은 그 앞이다.,EFDC/input.f90,"@@ -3717,6 +3793,85 @@ old citation∩hunk=3722-3722; @@ -3789,7 +3944,9 @@ old citation∩hunk=3789-3795","AHO<0 면적 배율, AHD<0 AHMAP 읽기·broadcast·local mapping, AHDXY 대입은 유지된다. 출력 rank 제한은 실제 내부 변경이나 노트의 확산계수 설정 알고리즘을 바꾸지 않는다.",REVIEW_ONLY,HIGH,"old EFDC/input.f90:3722:   ! *** ENABLE SPATIALLY VARIABLE BACKGROUND AHO
+old EFDC/input.f90:3723:   if( AHO < 0. )then
+old EFDC/input.f90:3724:     AHMAX = ABS(AHO)
+old EFDC/input.f90:3725:     AHMIN = 1.0E32
+old EFDC/input.f90:3726:     do L = 2,LA
+old EFDC/input.f90:3727:       AHOXY(L) = ABS(AHO)*DXP(L)*DYP(L)
+old EFDC/input.f90:3728:       AHMAX    = max(AHOXY(L),AHMAX)
+old EFDC/input.f90:3729:       AHMIN    = min(AHOXY(L),AHMIN)
+old EFDC/input.f90:3744:   ! *** ENABLE SPATIALLY VARIABLE SMAGORINSKY AND BACKGROUND DIFFUSIVITY
+old EFDC/input.f90:3745:   if( AHD < 0. )then
+old EFDC/input.f90:3746:     call AllocateDSI(R2D_Global, LCM_Global, 2, 0.0)
+old EFDC/input.f90:3755:     if( process_id == master_id )then
+old EFDC/input.f90:3756:       write(*,'(A)')'READING AHMAP.INP'
+old EFDC/input.f90:3757:       open(1,FILE = 'ahmap.inp')
+old EFDC/input.f90:3758: 
+old EFDC/input.f90:3759:       STR = READSTR(1)
+old EFDC/input.f90:3760: 
+old EFDC/input.f90:3761:       do LL = 2,LA_Global
+old EFDC/input.f90:3762:         read(1,*,END = 200) LG, ITMP, JTMP, T1, T2
+old EFDC/input.f90:3763: 
+old EFDC/input.f90:3764:         R2D_Global(LG,1) = T1
+old EFDC/input.f90:3765:         R2D_Global(LG,2) = T2
+old EFDC/input.f90:3766:       enddo
+old EFDC/input.f90:3767: 200   close(1)
+old EFDC/input.f90:3768:     endif
+old EFDC/input.f90:3769: 
+old EFDC/input.f90:3770:     call Broadcast_Array(R2D_Global, master_id)
+old EFDC/input.f90:3771: 
+old EFDC/input.f90:3772:     ! *** Map to Local Domain
+old EFDC/input.f90:3773:     do LG = 2,LA_GLOBAL
+old EFDC/input.f90:3774:       L = Map2Local(LG).LL
+old EFDC/input.f90:3775:       if( L > 1 )then
+old EFDC/input.f90:3776:         if( R2D_Global(LG,1) < 0. )then
+old EFDC/input.f90:3777:           AHOXY(L) = ABS(R2D_Global(LG,1))*DXP(L)*DYP(L)
+old EFDC/input.f90:3778:         else
+old EFDC/input.f90:3779:           AHOXY(L) = R2D_Global(LG,1)
+old EFDC/input.f90:3780:         endif
+old EFDC/input.f90:3781:         AHDXY(L) = R2D_Global(LG,2)
+old EFDC/input.f90:3789:     deallocate(R2D_Global)
+old EFDC/input.f90:3790: 
+old EFDC/input.f90:3791:     AHD = ABS(AHD)
+old EFDC/input.f90:3792:     PRINT '(A,4E12.4)','VARIABLE AHO & AHD USED (MIN,MAX): ',AHMIN,AHMAX,ADMIN,ADMAX
+old EFDC/input.f90:3793:   else
+old EFDC/input.f90:3794:     AHDXY = AHD       ! *** Constant value
+old EFDC/input.f90:3795:   endif
+new EFDC/input.f90:3877:   ! *** ENABLE SPATIALLY VARIABLE BACKGROUND AHO
+new EFDC/input.f90:3878:   if( AHO < 0. )then
+new EFDC/input.f90:3879:     AHMAX = ABS(AHO)
+new EFDC/input.f90:3880:     AHMIN = 1.0E32
+new EFDC/input.f90:3881:     do L = 2,LA
+new EFDC/input.f90:3882:       AHOXY(L) = ABS(AHO)*DXP(L)*DYP(L)
+new EFDC/input.f90:3883:       AHMAX    = max(AHOXY(L),AHMAX)
+new EFDC/input.f90:3884:       AHMIN    = min(AHOXY(L),AHMIN)
+new EFDC/input.f90:3899:   ! *** ENABLE SPATIALLY VARIABLE SMAGORINSKY AND BACKGROUND DIFFUSIVITY
+new EFDC/input.f90:3900:   if( AHD < 0. )then
+new EFDC/input.f90:3901:     call AllocateDSI(R2D_Global, LCM_Global, 2, 0.0)
+new EFDC/input.f90:3910:     if( process_id == master_id )then
+new EFDC/input.f90:3911:       write(*,'(A)')'READING AHMAP.INP'
+new EFDC/input.f90:3912:       open(1,FILE = 'ahmap.inp')
+new EFDC/input.f90:3913: 
+new EFDC/input.f90:3914:       STR = READSTR(1)
+new EFDC/input.f90:3915: 
+new EFDC/input.f90:3916:       do LL = 2,LA_Global
+new EFDC/input.f90:3917:         read(1,*,END = 200) LG, ITMP, JTMP, T1, T2
+new EFDC/input.f90:3918: 
+new EFDC/input.f90:3919:         R2D_Global(LG,1) = T1
+new EFDC/input.f90:3920:         R2D_Global(LG,2) = T2
+new EFDC/input.f90:3921:       enddo
+new EFDC/input.f90:3922: 200   close(1)
+new EFDC/input.f90:3923:     endif
+new EFDC/input.f90:3924: 
+new EFDC/input.f90:3925:     call Broadcast_Array(R2D_Global, master_id)
+new EFDC/input.f90:3926: 
+new EFDC/input.f90:3927:     ! *** Map to Local Domain
+new EFDC/input.f90:3928:     do LG = 2,LA_GLOBAL
+new EFDC/input.f90:3929:       L = Map2Local(LG).LL
+new EFDC/input.f90:3930:       if( L > 1 )then
+new EFDC/input.f90:3931:         if( R2D_Global(LG,1) < 0. )then
+new EFDC/input.f90:3932:           AHOXY(L) = ABS(R2D_Global(LG,1))*DXP(L)*DYP(L)
+new EFDC/input.f90:3933:         else
+new EFDC/input.f90:3934:           AHOXY(L) = R2D_Global(LG,1)
+new EFDC/input.f90:3935:         endif
+new EFDC/input.f90:3936:         AHDXY(L) = R2D_Global(LG,2)
+new EFDC/input.f90:3944:     deallocate(R2D_Global)
+new EFDC/input.f90:3945: 
+new EFDC/input.f90:3946:     AHD = ABS(AHD)
+new EFDC/input.f90:3947:     if( process_id == master_id )then
+new EFDC/input.f90:3948:       PRINT '(A,4E12.4)','VARIABLE AHO & AHD USED (MIN,MAX): ',AHMIN,AHMAX,ADMIN,ADMAX
+new EFDC/input.f90:3949:     endif
+new EFDC/input.f90:3950:   else
+new EFDC/input.f90:3951:     AHDXY = AHD       ! *** Constant value
+new EFDC/input.f90:3952:   endif",74줄 전체 대조. 내부 PRINT 변경이 있으므로 자동 line-only 불가. 설명된 AHO/AHD 의미에 영향이 없어 REVIEW_ONLY.
+B2-3,models/EFDC/source-analysis/efdc_hydraulic_structures.md,21,"- `input.f90:1352-6671` — input cards C23, C32, C32A, C32B.",models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:1352-1364; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:1607-1616; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:1661-1669; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:1702-1714; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:6344-6348; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:6667-6671,_staging/efdc-prescan/new/EFDC__input.f90:1445-1455; _staging/efdc-prescan/new/EFDC__input.f90:1704-1713; _staging/efdc-prescan/new/EFDC__input.f90:1758-1766; _staging/efdc-prescan/new/EFDC__input.f90:1799-1811; _staging/efdc-prescan/new/EFDC__input.f90:6495-6499; _staging/efdc-prescan/new/EFDC__input.f90:6818-6822,"인용 1352-6671에 29개 hunk 교차. C23 echo 이동 외 jet/sediment echo, subgrid-channel local mapping, body-force mapping, TOXPARB·DOCB·STPOCB·FPOCB·DYE 초기화, broadcast·오류처리 등이 내부에서 변경된다.",EFDC/input.f90,"@@ -1355,12 +1448,11 @@ old citation∩hunk=1355-1366; @@ -1438,15 +1530,17 @@ old citation∩hunk=1438-1452; @@ -1455,27 +1549,25 @@ old citation∩hunk=1455-1481; @@ -1487,6 +1579,11 @@ old citation∩hunk=1487-1492; @@ -1875,9 +1972,6 @@ old citation∩hunk=1875-1883; @@ -1891,6 +1985,9 @@ old citation∩hunk=1891-1896; @@ -1899,9 +1996,6 @@ old citation∩hunk=1899-1907; @@ -1912,15 +2006,15 @@ old citation∩hunk=1912-1926; @@ -1935,6 +2029,9 @@ old citation∩hunk=1935-1940; @@ -3668,10 +3765,6 @@ old citation∩hunk=3668-3677; @@ -3681,32 +3774,15 @@ old citation∩hunk=3681-3712; @@ -3717,6 +3793,85 @@ old citation∩hunk=3717-3722; @@ -3789,7 +3944,9 @@ old citation∩hunk=3789-3795; @@ -3869,6 +4026,7 @@ old citation∩hunk=3869-3874; @@ -3885,43 +4043,38 @@ old citation∩hunk=3885-3927; @@ -3931,11 +4084,7 @@ old citation∩hunk=3931-3941; @@ -4027,7 +4176,7 @@ old citation∩hunk=4027-4033; @@ -4148,7 +4297,7 @@ old citation∩hunk=4148-4154; @@ -4344,12 +4493,12 @@ old citation∩hunk=4344-4355; @@ -4377,7 +4526,8 @@ old citation∩hunk=4377-4383; @@ -4411,7 +4561,7 @@ old citation∩hunk=4411-4417; @@ -4573,7 +4723,7 @@ old citation∩hunk=4573-4579; @@ -4653,6 +4803,7 @@ old citation∩hunk=4653-4658; @@ -4725,12 +4876,6 @@ old citation∩hunk=4725-4736; @@ -4811,7 +4956,8 @@ old citation∩hunk=4811-4817; @@ -4847,8 +4993,8 @@ old citation∩hunk=4847-4854; @@ -4910,7 +5056,8 @@ old citation∩hunk=4910-4916; @@ -5015,7 +5162,9 @@ old citation∩hunk=5015-5021; @@ -5151,8 +5300,10 @@ old citation∩hunk=5151-5158","C23 입력 목록은 동일하고 C32/C32A/C32B 블록(old 1607-1830, new +97)은 내용 동일하다. qctl 관련 old 6344-6671도 +151로 동일. 넓은 범위의 다른 기능 변경을 이 입력 카드 source-basis 주장에 전파하지 않는다.",REVIEW_ONLY,HIGH,"old EFDC/input.f90:1352:   !C23*  READ VELOCITY, VOL SOUR/SINK, FLOW CONTROL, & WITHDRAW/RETURN DATA
+old EFDC/input.f90:1353:   NCARD = '23'
+old EFDC/input.f90:1354:   ! *** ********************************************************
+old EFDC/input.f90:1355:   if( process_id == master_id )then
+old EFDC/input.f90:1356:     call SEEK('C23',0)
+old EFDC/input.f90:1357:     read(1,*,IOSTAT = ISO) NQSIJ, NQJPIJ, NQSER, NQCTL, NQCTLT, NHYDST, NQWR, NQWRSR, ISDIQ, NQCTLSER, NQCTRULES
+old EFDC/input.f90:1358: 
+old EFDC/input.f90:1359:     write(mpi_efdc_out_unit,1002) NCARD
+old EFDC/input.f90:1360:     write(mpi_efdc_out_unit,*) NQSIJ, NQJPIJ, NQSER, NQCTL, NQCTLT, NHYDST, NQWR, NQWRSR, ISDIQ, NQCTLSER, NQCTRULES
+old EFDC/input.f90:1361:     if( ISO > 0 ) GOTO 100
+old EFDC/input.f90:1362:   endif
+old EFDC/input.f90:1363:   ! *** Broadcast in Scan_EFDC
+old EFDC/input.f90:1364: 
+old EFDC/input.f90:1607:   if( NQCTL > 0 )then
+old EFDC/input.f90:1608:     !C32*  READ SURF ELEV OR PRESS DEPENDENT FLOW CONTROL STRUCTURE INFO
+old EFDC/input.f90:1609:     NCARD = '32'
+old EFDC/input.f90:1610: 
+old EFDC/input.f90:1611:     if( process_id == master_id )then
+old EFDC/input.f90:1612:       call SEEK('C32',0)
+old EFDC/input.f90:1613:       do NC = 1,NQCTL
+old EFDC/input.f90:1614:         read(1,*,IOSTAT = ISO) HYD_STR_GL(NC).IQCTLU, HYD_STR_GL(NC).JQCTLU, HYD_STR_GL(NC).IQCTLD, HYD_STR_GL(NC).JQCTLD,  HYD_STR_GL(NC).NQCTYP, HYD_STR_GL(NC).NQCTLQ,  HYD_STR_GL(NC).NQCMUL,    &
+old EFDC/input.f90:1615:           HYD_STR_GL(NC).HQCTLU, HYD_STR_GL(NC).HQCTLD, HYD_STR_GL(NC).QCTLMU, HYD_STR_GL(NC).BQCLCE,  HYD_STR_GL(NC).NQCMINS, HYD_STR_GL(NC).HS_FACTOR, &
+old EFDC/input.f90:1616:           HYD_STR_GL(NC).MMASKS, HYD_STR_GL(NC).TRANSIT, HYD_STR_GL(NC).QCTLGRP
+old EFDC/input.f90:1661:     !C32A*  READ THE EQUATION parameterS FOR EACH OF THE HYDRAULIC STRUCTURE EQUATIONS
+old EFDC/input.f90:1662:     if( NHYDST > 0 )then
+old EFDC/input.f90:1663:       NCARD = '32A'
+old EFDC/input.f90:1664:       if( process_id == master_id )then
+old EFDC/input.f90:1665:         call SEEK('C32A',0)
+old EFDC/input.f90:1666:         do L = 1,NHYDST
+old EFDC/input.f90:1667:           ! *** COMPUTE FLOWS USING HYDRAULIC STRUCTURE EQUATIONS
+old EFDC/input.f90:1668:           read(1,*,IOSTAT = ISO) NS, NX, HS_REVERSE(L), HS_XSTYPE(L), HS_WIDTH(L), HS_HEIGHT(L), HS_LENGTH(L), HS_MANN(L), HS_ANGLE(L), HS_USELEV(L), HS_DSELEV(L),  &
+old EFDC/input.f90:1669:             HS_COEFF(L,1), HS_COEFF(L,2), HS_COEFF(L,3), HS_COEFF(L,4)
+old EFDC/input.f90:1702:     !C32B*  READ THE CONTROL INFO FOR ALL HYDRAULIC STRUCTURES
+old EFDC/input.f90:1703:     NCARD = '32B'
+old EFDC/input.f90:1704:     if( process_id == master_id )then
+old EFDC/input.f90:1705:       if( NQCTLSER > 0 .or. NQCTRULES > 0 )then
+old EFDC/input.f90:1706:         call SEEK('C32B',0)
+old EFDC/input.f90:1707:         do NC = 1,NQCTL
+old EFDC/input.f90:1708:           HSCTL_GL(NC).ITYPE = 0
+old EFDC/input.f90:1709:           HSCTL_GL(NC).ID = 0
+old EFDC/input.f90:1710:           HSCTL_GL(NC).SUBID = 0
+old EFDC/input.f90:1711: 
+old EFDC/input.f90:1712:           read(1,*,IOSTAT = ISO) HSCTL_GL(NC).ITYPE, HSCTL_GL(NC).ID, ITMPU, JTMPU, ITMPD, JTMPD, &
+old EFDC/input.f90:1713:             HSCTL_GL(NC).CUR.STATE, HSCTL_GL(NC).CUR.HEIGHT, HSCTL_GL(NC).CUR.WIDTH, &
+old EFDC/input.f90:1714:             HSCTL_GL(NC).CUR.SILL,  HYD_STR_GL(NC).NWRGRP
+old EFDC/input.f90:6344:   ! *** Read in free surface elevation or pressure controlled flow specification from the file QCTL.INP
+old EFDC/input.f90:6345:   if( NQCTLT >= 1 )then
+old EFDC/input.f90:6346:     if( process_id == master_id )then
+old EFDC/input.f90:6347:       write(*,'(A)')'READING QCTL.INP'
+old EFDC/input.f90:6348:       open(1,FILE = 'qctl.inp',STATUS = 'UNKNOWN')
+old EFDC/input.f90:6667:         ! *** STRUCTURE IS CONTROLLED BY OPERATION RULES
+old EFDC/input.f90:6668:         if( IVAL < 1 .or. IVAL > NQCTRULES )then
+old EFDC/input.f90:6669:           call STOPP('DATA ERROR: RULES INDEX FOR HYDRAULIC STRUCTURE CONTROL IS INVALID!')
+old EFDC/input.f90:6670:         endif
+old EFDC/input.f90:6671:         if( (QCTRULES(IVAL).PARAM .and. 32) == 32 )then
+new EFDC/input.f90:1445:   !C23*  READ VELOCITY, VOL SOUR/SINK, FLOW CONTROL, & WITHDRAW/RETURN DATA
+new EFDC/input.f90:1446:   NCARD = '23'
+new EFDC/input.f90:1447:   ! *** ********************************************************
+new EFDC/input.f90:1448:   if( process_id == master_id )then
+new EFDC/input.f90:1449:     call SEEK('C23',0)
+new EFDC/input.f90:1450:     read(1,*,IOSTAT = ISO) NQSIJ, NQJPIJ, NQSER, NQCTL, NQCTLT, NHYDST, NQWR, NQWRSR, ISDIQ, NQCTLSER, NQCTRULES
+new EFDC/input.f90:1451:     if( ISO > 0 ) GOTO 100
+new EFDC/input.f90:1452:   endif
+new EFDC/input.f90:1453: 
+new EFDC/input.f90:1454:   write(mpi_efdc_out_unit,1002) NCARD
+new EFDC/input.f90:1455:   write(mpi_efdc_out_unit,*) NQSIJ, NQJPIJ, NQSER, NQCTL, NQCTLT, NHYDST, NQWR, NQWRSR, ISDIQ, NQCTLSER, NQCTRULES
+new EFDC/input.f90:1704:   if( NQCTL > 0 )then
+new EFDC/input.f90:1705:     !C32*  READ SURF ELEV OR PRESS DEPENDENT FLOW CONTROL STRUCTURE INFO
+new EFDC/input.f90:1706:     NCARD = '32'
+new EFDC/input.f90:1707: 
+new EFDC/input.f90:1708:     if( process_id == master_id )then
+new EFDC/input.f90:1709:       call SEEK('C32',0)
+new EFDC/input.f90:1710:       do NC = 1,NQCTL
+new EFDC/input.f90:1711:         read(1,*,IOSTAT = ISO) HYD_STR_GL(NC).IQCTLU, HYD_STR_GL(NC).JQCTLU, HYD_STR_GL(NC).IQCTLD, HYD_STR_GL(NC).JQCTLD,  HYD_STR_GL(NC).NQCTYP, HYD_STR_GL(NC).NQCTLQ,  HYD_STR_GL(NC).NQCMUL,    &
+new EFDC/input.f90:1712:           HYD_STR_GL(NC).HQCTLU, HYD_STR_GL(NC).HQCTLD, HYD_STR_GL(NC).QCTLMU, HYD_STR_GL(NC).BQCLCE,  HYD_STR_GL(NC).NQCMINS, HYD_STR_GL(NC).HS_FACTOR, &
+new EFDC/input.f90:1713:           HYD_STR_GL(NC).MMASKS, HYD_STR_GL(NC).TRANSIT, HYD_STR_GL(NC).QCTLGRP
+new EFDC/input.f90:1758:     !C32A*  READ THE EQUATION parameterS FOR EACH OF THE HYDRAULIC STRUCTURE EQUATIONS
+new EFDC/input.f90:1759:     if( NHYDST > 0 )then
+new EFDC/input.f90:1760:       NCARD = '32A'
+new EFDC/input.f90:1761:       if( process_id == master_id )then
+new EFDC/input.f90:1762:         call SEEK('C32A',0)
+new EFDC/input.f90:1763:         do L = 1,NHYDST
+new EFDC/input.f90:1764:           ! *** COMPUTE FLOWS USING HYDRAULIC STRUCTURE EQUATIONS
+new EFDC/input.f90:1765:           read(1,*,IOSTAT = ISO) NS, NX, HS_REVERSE(L), HS_XSTYPE(L), HS_WIDTH(L), HS_HEIGHT(L), HS_LENGTH(L), HS_MANN(L), HS_ANGLE(L), HS_USELEV(L), HS_DSELEV(L),  &
+new EFDC/input.f90:1766:             HS_COEFF(L,1), HS_COEFF(L,2), HS_COEFF(L,3), HS_COEFF(L,4)
+new EFDC/input.f90:1799:     !C32B*  READ THE CONTROL INFO FOR ALL HYDRAULIC STRUCTURES
+new EFDC/input.f90:1800:     NCARD = '32B'
+new EFDC/input.f90:1801:     if( process_id == master_id )then
+new EFDC/input.f90:1802:       if( NQCTLSER > 0 .or. NQCTRULES > 0 )then
+new EFDC/input.f90:1803:         call SEEK('C32B',0)
+new EFDC/input.f90:1804:         do NC = 1,NQCTL
+new EFDC/input.f90:1805:           HSCTL_GL(NC).ITYPE = 0
+new EFDC/input.f90:1806:           HSCTL_GL(NC).ID = 0
+new EFDC/input.f90:1807:           HSCTL_GL(NC).SUBID = 0
+new EFDC/input.f90:1808: 
+new EFDC/input.f90:1809:           read(1,*,IOSTAT = ISO) HSCTL_GL(NC).ITYPE, HSCTL_GL(NC).ID, ITMPU, JTMPU, ITMPD, JTMPD, &
+new EFDC/input.f90:1810:             HSCTL_GL(NC).CUR.STATE, HSCTL_GL(NC).CUR.HEIGHT, HSCTL_GL(NC).CUR.WIDTH, &
+new EFDC/input.f90:1811:             HSCTL_GL(NC).CUR.SILL,  HYD_STR_GL(NC).NWRGRP
+new EFDC/input.f90:6495:   ! *** Read in free surface elevation or pressure controlled flow specification from the file QCTL.INP
+new EFDC/input.f90:6496:   if( NQCTLT >= 1 )then
+new EFDC/input.f90:6497:     if( process_id == master_id )then
+new EFDC/input.f90:6498:       write(*,'(A)')'READING QCTL.INP'
+new EFDC/input.f90:6499:       open(1,FILE = 'qctl.inp',STATUS = 'UNKNOWN')
+new EFDC/input.f90:6818:         ! *** STRUCTURE IS CONTROLLED BY OPERATION RULES
+new EFDC/input.f90:6819:         if( IVAL < 1 .or. IVAL > NQCTRULES )then
+new EFDC/input.f90:6820:           call STOPP('DATA ERROR: RULES INDEX FOR HYDRAULIC STRUCTURE CONTROL IS INVALID!')
+new EFDC/input.f90:6821:         endif
+new EFDC/input.f90:6822:         if( (QCTRULES(IVAL).PARAM .and. 32) == 32 )then",전체 인용에 실제 내부 변경이 있어 동일 범위/line-only로 처리하지 않는다. 주장한 카드들의 존재·입력 관계는 유지되는 broad citation이므로 REVIEW_ONLY.
+B2-4,models/EFDC/source-analysis/efdc_wetdry.md,19,"- `input.f90:264-293, 548-570` — `ISDRY`, `HDRY/HWET` reads, derived `HDRYICE/HDRYWAV`.",models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:543-571,_staging/efdc-prescan/new/EFDC__input.f90:565-593,C11 ISO 오류 분기를 echo 뒤(old 568)에서 master read 직후(new 571)로 이동.,EFDC/input.f90,"@@ -538,14 +561,14 @@ old citation∩hunk=548-551; @@ -565,7 +588,6 @@ old citation∩hunk=565-570","노트 source-basis의 HDRY/HWET read·broadcast 및 HDRYICE=0.91*HDRY, HDRYWAV=1.2*HWET은 그대로다. HDRYWAV 식은 기존 범위 끝 바로 다음 old 571/new 593에서 확인.",REVIEW_ONLY,HIGH,"old EFDC/input.f90:543:   !C11*  READ GRID, ROUGHNESS, MASKING AND DEPTH parameterS
+old EFDC/input.f90:544:   NCARD = '11'
+old EFDC/input.f90:545:   ! *** ********************************************************
+old EFDC/input.f90:546:   if( process_id == master_id )then
+old EFDC/input.f90:547:     call SEEK('C11',0)
+old EFDC/input.f90:548:     read(1,*,IOSTAT = ISO) DX, DY, DXYCVT, IMDXDY, ZBRADJ, ZBRCVRT, HMIN, HADADJ, HCVRT, HDRY, HWET, BELADJ, BELCVRT, HDRYMOVE
+old EFDC/input.f90:549:   endif
+old EFDC/input.f90:550: 
+old EFDC/input.f90:551:   call Broadcast_Scalar(DX     ,  master_id)
+old EFDC/input.f90:552:   call Broadcast_Scalar(DY     ,  master_id)
+old EFDC/input.f90:553:   call Broadcast_Scalar(DXYCVT ,  master_id)
+old EFDC/input.f90:554:   call Broadcast_Scalar(IMDXDY ,  master_id)
+old EFDC/input.f90:555:   call Broadcast_Scalar(ZBRADJ ,  master_id)
+old EFDC/input.f90:556:   call Broadcast_Scalar(ZBRCVRT,  master_id)
+old EFDC/input.f90:557:   call Broadcast_Scalar(HMIN   ,  master_id)
+old EFDC/input.f90:558:   call Broadcast_Scalar(HADADJ ,  master_id)
+old EFDC/input.f90:559:   call Broadcast_Scalar(HCVRT  ,  master_id)
+old EFDC/input.f90:560:   call Broadcast_Scalar(HDRY   ,  master_id)
+old EFDC/input.f90:561:   call Broadcast_Scalar(HWET   ,  master_id)
+old EFDC/input.f90:562:   call Broadcast_Scalar(BELADJ ,  master_id)
+old EFDC/input.f90:563:   call Broadcast_Scalar(BELCVRT,  master_id)
+old EFDC/input.f90:564:   call Broadcast_Scalar(HDRYMOVE, master_id)
+old EFDC/input.f90:565: 
+old EFDC/input.f90:566:   write(mpi_efdc_out_unit,1002) NCARD
+old EFDC/input.f90:567:   write(mpi_efdc_out_unit,*) DX, DY, DXYCVT, IMDXDY, ZBRADJ, ZBRCVRT, HMIN, HADADJ, HCVRT, HDRY, HWET, BELADJ, BELCVRT, HDRYMOVE
+old EFDC/input.f90:568:   if( ISO > 0 ) GOTO 100
+old EFDC/input.f90:569: 
+old EFDC/input.f90:570:   HDRYICE = 0.91*HDRY
+old EFDC/input.f90:571:   HDRYWAV = 1.2*HWET
+new EFDC/input.f90:565:   !C11*  READ GRID, ROUGHNESS, MASKING AND DEPTH parameterS
+new EFDC/input.f90:566:   NCARD = '11'
+new EFDC/input.f90:567:   ! *** ********************************************************
+new EFDC/input.f90:568:   if( process_id == master_id )then
+new EFDC/input.f90:569:     call SEEK('C11',0)
+new EFDC/input.f90:570:     read(1,*,IOSTAT = ISO) DX, DY, DXYCVT, IMDXDY, ZBRADJ, ZBRCVRT, HMIN, HADADJ, HCVRT, HDRY, HWET, BELADJ, BELCVRT, HDRYMOVE
+new EFDC/input.f90:571:     if( ISO > 0 ) GOTO 100
+new EFDC/input.f90:572:   endif
+new EFDC/input.f90:573: 
+new EFDC/input.f90:574:   call Broadcast_Scalar(DX     ,  master_id)
+new EFDC/input.f90:575:   call Broadcast_Scalar(DY     ,  master_id)
+new EFDC/input.f90:576:   call Broadcast_Scalar(DXYCVT ,  master_id)
+new EFDC/input.f90:577:   call Broadcast_Scalar(IMDXDY ,  master_id)
+new EFDC/input.f90:578:   call Broadcast_Scalar(ZBRADJ ,  master_id)
+new EFDC/input.f90:579:   call Broadcast_Scalar(ZBRCVRT,  master_id)
+new EFDC/input.f90:580:   call Broadcast_Scalar(HMIN   ,  master_id)
+new EFDC/input.f90:581:   call Broadcast_Scalar(HADADJ ,  master_id)
+new EFDC/input.f90:582:   call Broadcast_Scalar(HCVRT  ,  master_id)
+new EFDC/input.f90:583:   call Broadcast_Scalar(HDRY   ,  master_id)
+new EFDC/input.f90:584:   call Broadcast_Scalar(HWET   ,  master_id)
+new EFDC/input.f90:585:   call Broadcast_Scalar(BELADJ ,  master_id)
+new EFDC/input.f90:586:   call Broadcast_Scalar(BELCVRT,  master_id)
+new EFDC/input.f90:587:   call Broadcast_Scalar(HDRYMOVE, master_id)
+new EFDC/input.f90:588: 
+new EFDC/input.f90:589:   write(mpi_efdc_out_unit,1002) NCARD
+new EFDC/input.f90:590:   write(mpi_efdc_out_unit,*) DX, DY, DXYCVT, IMDXDY, ZBRADJ, ZBRCVRT, HMIN, HADADJ, HCVRT, HDRY, HWET, BELADJ, BELCVRT, HDRYMOVE
+new EFDC/input.f90:591: 
+new EFDC/input.f90:592:   HDRYICE = 0.91*HDRY
+new EFDC/input.f90:593:   HDRYWAV = 1.2*HWET",범위 내부 오류처리 변경을 확인했지만 wet/dry 입력·파생값 주장은 바뀌지 않아 REVIEW_ONLY. 같은 note_line의 264-293 후보를 새 작업으로 확대하지 않음.
+B2-5,models/EFDC/source-analysis/efdc_wetdry.md,45,"Read from card C11 (`input.f90:548-570`). Derived: `HDRYICE`, `HDRYWAV`.",models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:543-571,_staging/efdc-prescan/new/EFDC__input.f90:565-593,C11 오류 검사 위치 이동(old 568→new 571); 입력 필드와 파생식 유지.,EFDC/input.f90,"@@ -538,14 +561,14 @@ old citation∩hunk=548-551; @@ -565,7 +588,6 @@ old citation∩hunk=565-570","§B의 C11에서 HDRY/HWET을 읽고 HDRYICE/HDRYWAV를 파생한다는 문장을 개별 확인했다. read 548→570, 파생식 570-571→592-593.",REVIEW_ONLY,HIGH,"old EFDC/input.f90:543:   !C11*  READ GRID, ROUGHNESS, MASKING AND DEPTH parameterS
+old EFDC/input.f90:544:   NCARD = '11'
+old EFDC/input.f90:545:   ! *** ********************************************************
+old EFDC/input.f90:546:   if( process_id == master_id )then
+old EFDC/input.f90:547:     call SEEK('C11',0)
+old EFDC/input.f90:548:     read(1,*,IOSTAT = ISO) DX, DY, DXYCVT, IMDXDY, ZBRADJ, ZBRCVRT, HMIN, HADADJ, HCVRT, HDRY, HWET, BELADJ, BELCVRT, HDRYMOVE
+old EFDC/input.f90:549:   endif
+old EFDC/input.f90:550: 
+old EFDC/input.f90:551:   call Broadcast_Scalar(DX     ,  master_id)
+old EFDC/input.f90:552:   call Broadcast_Scalar(DY     ,  master_id)
+old EFDC/input.f90:553:   call Broadcast_Scalar(DXYCVT ,  master_id)
+old EFDC/input.f90:554:   call Broadcast_Scalar(IMDXDY ,  master_id)
+old EFDC/input.f90:555:   call Broadcast_Scalar(ZBRADJ ,  master_id)
+old EFDC/input.f90:556:   call Broadcast_Scalar(ZBRCVRT,  master_id)
+old EFDC/input.f90:557:   call Broadcast_Scalar(HMIN   ,  master_id)
+old EFDC/input.f90:558:   call Broadcast_Scalar(HADADJ ,  master_id)
+old EFDC/input.f90:559:   call Broadcast_Scalar(HCVRT  ,  master_id)
+old EFDC/input.f90:560:   call Broadcast_Scalar(HDRY   ,  master_id)
+old EFDC/input.f90:561:   call Broadcast_Scalar(HWET   ,  master_id)
+old EFDC/input.f90:562:   call Broadcast_Scalar(BELADJ ,  master_id)
+old EFDC/input.f90:563:   call Broadcast_Scalar(BELCVRT,  master_id)
+old EFDC/input.f90:564:   call Broadcast_Scalar(HDRYMOVE, master_id)
+old EFDC/input.f90:565: 
+old EFDC/input.f90:566:   write(mpi_efdc_out_unit,1002) NCARD
+old EFDC/input.f90:567:   write(mpi_efdc_out_unit,*) DX, DY, DXYCVT, IMDXDY, ZBRADJ, ZBRCVRT, HMIN, HADADJ, HCVRT, HDRY, HWET, BELADJ, BELCVRT, HDRYMOVE
+old EFDC/input.f90:568:   if( ISO > 0 ) GOTO 100
+old EFDC/input.f90:569: 
+old EFDC/input.f90:570:   HDRYICE = 0.91*HDRY
+old EFDC/input.f90:571:   HDRYWAV = 1.2*HWET
+new EFDC/input.f90:565:   !C11*  READ GRID, ROUGHNESS, MASKING AND DEPTH parameterS
+new EFDC/input.f90:566:   NCARD = '11'
+new EFDC/input.f90:567:   ! *** ********************************************************
+new EFDC/input.f90:568:   if( process_id == master_id )then
+new EFDC/input.f90:569:     call SEEK('C11',0)
+new EFDC/input.f90:570:     read(1,*,IOSTAT = ISO) DX, DY, DXYCVT, IMDXDY, ZBRADJ, ZBRCVRT, HMIN, HADADJ, HCVRT, HDRY, HWET, BELADJ, BELCVRT, HDRYMOVE
+new EFDC/input.f90:571:     if( ISO > 0 ) GOTO 100
+new EFDC/input.f90:572:   endif
+new EFDC/input.f90:573: 
+new EFDC/input.f90:574:   call Broadcast_Scalar(DX     ,  master_id)
+new EFDC/input.f90:575:   call Broadcast_Scalar(DY     ,  master_id)
+new EFDC/input.f90:576:   call Broadcast_Scalar(DXYCVT ,  master_id)
+new EFDC/input.f90:577:   call Broadcast_Scalar(IMDXDY ,  master_id)
+new EFDC/input.f90:578:   call Broadcast_Scalar(ZBRADJ ,  master_id)
+new EFDC/input.f90:579:   call Broadcast_Scalar(ZBRCVRT,  master_id)
+new EFDC/input.f90:580:   call Broadcast_Scalar(HMIN   ,  master_id)
+new EFDC/input.f90:581:   call Broadcast_Scalar(HADADJ ,  master_id)
+new EFDC/input.f90:582:   call Broadcast_Scalar(HCVRT  ,  master_id)
+new EFDC/input.f90:583:   call Broadcast_Scalar(HDRY   ,  master_id)
+new EFDC/input.f90:584:   call Broadcast_Scalar(HWET   ,  master_id)
+new EFDC/input.f90:585:   call Broadcast_Scalar(BELADJ ,  master_id)
+new EFDC/input.f90:586:   call Broadcast_Scalar(BELCVRT,  master_id)
+new EFDC/input.f90:587:   call Broadcast_Scalar(HDRYMOVE, master_id)
+new EFDC/input.f90:588: 
+new EFDC/input.f90:589:   write(mpi_efdc_out_unit,1002) NCARD
+new EFDC/input.f90:590:   write(mpi_efdc_out_unit,*) DX, DY, DXYCVT, IMDXDY, ZBRADJ, ZBRCVRT, HMIN, HADADJ, HCVRT, HDRY, HWET, BELADJ, BELCVRT, HDRYMOVE
+new EFDC/input.f90:591: 
+new EFDC/input.f90:592:   HDRYICE = 0.91*HDRY
+new EFDC/input.f90:593:   HDRYWAV = 1.2*HWET",입력 에러 경로는 변경되었지만 이 문장은 오류처리 순서를 주장하지 않는다. 내부 변경에 대한 semantic review 후 REVIEW_ONLY.
+B2-6,models/EFDC/source-analysis/efdc_vertical.md,20,"- `input.f90:145, 264, 516, 531` — input reads for `KC`, `IGRIDV`, `IINTPG`, sigma fractions.",models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:513-525,_staging/efdc-prescan/new/EFDC__input.f90:535-546,C9A read는 516→538로 이동하며 ISO 검사가 master read 직후로 이동.,EFDC/input.f90,"@@ -514,14 +536,14 @@ old citation∩hunk=516-516",source-basis 중 KC를 C9A에서 읽는 근거는 유지된다. KC read의 dummy 필드들도 동일하다.,REVIEW_ONLY,HIGH,"old EFDC/input.f90:513:   ! *** ********************************************************
+old EFDC/input.f90:514:   if( process_id == master_id )then
+old EFDC/input.f90:515:     call SEEK('C9A',0)
+old EFDC/input.f90:516:     read(1,*,IOSTAT = ISO) KC, ldum, ldum, tmp, tmp, ldum
+old EFDC/input.f90:517:   endif
+old EFDC/input.f90:518: 
+old EFDC/input.f90:519:   call Broadcast_Scalar(ISO    , master_id)
+old EFDC/input.f90:520:   call Broadcast_Scalar(KC     , master_id)
+old EFDC/input.f90:521: 
+old EFDC/input.f90:522:   write(mpi_efdc_out_unit,1002) NCARD
+old EFDC/input.f90:523:   write(mpi_efdc_out_unit,*) KC, ldum, ldum, tmp, tmp, ldum
+old EFDC/input.f90:524:   if( ISO > 0 ) GOTO 100
+old EFDC/input.f90:525: 
+new EFDC/input.f90:535:   ! *** ********************************************************
+new EFDC/input.f90:536:   if( process_id == master_id )then
+new EFDC/input.f90:537:     call SEEK('C9A',0)
+new EFDC/input.f90:538:     read(1,*,IOSTAT = ISO) KC, ldum, ldum, tmp, tmp, ldum
+new EFDC/input.f90:539:     if( ISO > 0 ) GOTO 100
+new EFDC/input.f90:540:   endif
+new EFDC/input.f90:541: 
+new EFDC/input.f90:542:   call Broadcast_Scalar(ISO    , master_id)
+new EFDC/input.f90:543:   call Broadcast_Scalar(KC     , master_id)
+new EFDC/input.f90:544: 
+new EFDC/input.f90:545:   write(mpi_efdc_out_unit,1002) NCARD
+new EFDC/input.f90:546:   write(mpi_efdc_out_unit,*) KC, ldum, ldum, tmp, tmp, ldum",인용한 KC read와 필드 의미는 유지되고 인접 오류처리 순서만 변한다. 줄 이동·범위 내 claim 영향 없음에 따라 REVIEW_ONLY.
+B2-7,models/EFDC/source-analysis/efdc_vertical.md,20,"- `input.f90:145, 264, 516, 531` — input reads for `KC`, `IGRIDV`, `IINTPG`, sigma fractions.",models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:527-540,_staging/efdc-prescan/new/EFDC__input.f90:548-563,"C10 do K=1,KC는 531→553. ISO 검사가 루프 밖에서 각 read 직후(new 555)로 이동.",EFDC/input.f90,"@@ -530,6 +552,7 @@ old citation∩hunk=531-531","source-basis의 sigma fraction 입력은 여전히 C10의 KDUM,DZCK(K) read이다.",REVIEW_ONLY,HIGH,"old EFDC/input.f90:527:   NCARD = '10'
+old EFDC/input.f90:528:   ! *** ********************************************************
+old EFDC/input.f90:529:   if( process_id == master_id )then
+old EFDC/input.f90:530:     call SEEK('C10',0)
+old EFDC/input.f90:531:     do K = 1,KC
+old EFDC/input.f90:532:       read(1,*,IOSTAT = ISO) KDUM, DZCK(K)
+old EFDC/input.f90:533:     enddo
+old EFDC/input.f90:534:   endif
+old EFDC/input.f90:535: 
+old EFDC/input.f90:536:   call Broadcast_Scalar(ISO , master_id)
+old EFDC/input.f90:537:   call Broadcast_Array(DZCK, master_id)
+old EFDC/input.f90:538: 
+old EFDC/input.f90:539:   write(mpi_efdc_out_unit,1002) NCARD
+old EFDC/input.f90:540:   write(mpi_efdc_out_unit,*) (DZCK(K),K = 1,KC)
+new EFDC/input.f90:548:   !C10*  READ LAYER THICKNESS IN VERTICAL
+new EFDC/input.f90:549:   NCARD = '10'
+new EFDC/input.f90:550:   ! *** ********************************************************
+new EFDC/input.f90:551:   if( process_id == master_id )then
+new EFDC/input.f90:552:     call SEEK('C10',0)
+new EFDC/input.f90:553:     do K = 1,KC
+new EFDC/input.f90:554:       read(1,*,IOSTAT = ISO) KDUM, DZCK(K)
+new EFDC/input.f90:555:       if( ISO > 0 ) GOTO 100
+new EFDC/input.f90:556:     enddo
+new EFDC/input.f90:557:   endif
+new EFDC/input.f90:558: 
+new EFDC/input.f90:559:   call Broadcast_Scalar(ISO , master_id)
+new EFDC/input.f90:560:   call Broadcast_Array(DZCK, master_id)
+new EFDC/input.f90:561: 
+new EFDC/input.f90:562:   write(mpi_efdc_out_unit,1002) NCARD
+new EFDC/input.f90:563:   write(mpi_efdc_out_unit,*) (DZCK(K),K = 1,KC)",루프 내부 오류 검사 추가를 확인했으며 sigma fraction의 입력 필드/의미 변경은 없다. REVIEW_ONLY.
+B2-8,models/EFDC/source-analysis/efdc_vertical.md,30,- `KC` = water-column layer count (`mod_var_global.f90:221`); read from card C9A (`input.f90:516`).,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:513-525,_staging/efdc-prescan/new/EFDC__input.f90:535-546,C9A 오류 검사 위치 이동. KC read와 broadcast는 동일.,EFDC/input.f90,"@@ -514,14 +536,14 @@ old citation∩hunk=516-516",§A의 KC를 C9A에서 읽는다는 명시적 주장을 확인: old 515-516→new 537-538.,REVIEW_ONLY,HIGH,"old EFDC/input.f90:513:   ! *** ********************************************************
+old EFDC/input.f90:514:   if( process_id == master_id )then
+old EFDC/input.f90:515:     call SEEK('C9A',0)
+old EFDC/input.f90:516:     read(1,*,IOSTAT = ISO) KC, ldum, ldum, tmp, tmp, ldum
+old EFDC/input.f90:517:   endif
+old EFDC/input.f90:518: 
+old EFDC/input.f90:519:   call Broadcast_Scalar(ISO    , master_id)
+old EFDC/input.f90:520:   call Broadcast_Scalar(KC     , master_id)
+old EFDC/input.f90:521: 
+old EFDC/input.f90:522:   write(mpi_efdc_out_unit,1002) NCARD
+old EFDC/input.f90:523:   write(mpi_efdc_out_unit,*) KC, ldum, ldum, tmp, tmp, ldum
+old EFDC/input.f90:524:   if( ISO > 0 ) GOTO 100
+old EFDC/input.f90:525: 
+new EFDC/input.f90:535:   ! *** ********************************************************
+new EFDC/input.f90:536:   if( process_id == master_id )then
+new EFDC/input.f90:537:     call SEEK('C9A',0)
+new EFDC/input.f90:538:     read(1,*,IOSTAT = ISO) KC, ldum, ldum, tmp, tmp, ldum
+new EFDC/input.f90:539:     if( ISO > 0 ) GOTO 100
+new EFDC/input.f90:540:   endif
+new EFDC/input.f90:541: 
+new EFDC/input.f90:542:   call Broadcast_Scalar(ISO    , master_id)
+new EFDC/input.f90:543:   call Broadcast_Scalar(KC     , master_id)
+new EFDC/input.f90:544: 
+new EFDC/input.f90:545:   write(mpi_efdc_out_unit,1002) NCARD
+new EFDC/input.f90:546:   write(mpi_efdc_out_unit,*) KC, ldum, ldum, tmp, tmp, ldum",KC의 카드·필드가 변경되지 않았다. 인접 오류 경로 변경과 줄 이동에 대한 REVIEW_ONLY.
+B2-9,models/EFDC/source-analysis/efdc_vertical.md,31,- Global sigma fractions `DZCK(K)` from card C10 (`input.f90:531`); normalized to sum 1 (`aaefdc.f90:1294`).,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:527-540,_staging/efdc-prescan/new/EFDC__input.f90:548-563,C10 각 read 직후 ISO 검사 추가 및 종전 루프 밖 검사 삭제.,EFDC/input.f90,"@@ -530,6 +552,7 @@ old citation∩hunk=531-531","§A의 DZCK(K) 입력은 그대로이며 인용 531은 read 자체가 아니라 do K=1,KC이다(old read 532→new 554).",REVIEW_ONLY,HIGH,"old EFDC/input.f90:527:   NCARD = '10'
+old EFDC/input.f90:528:   ! *** ********************************************************
+old EFDC/input.f90:529:   if( process_id == master_id )then
+old EFDC/input.f90:530:     call SEEK('C10',0)
+old EFDC/input.f90:531:     do K = 1,KC
+old EFDC/input.f90:532:       read(1,*,IOSTAT = ISO) KDUM, DZCK(K)
+old EFDC/input.f90:533:     enddo
+old EFDC/input.f90:534:   endif
+old EFDC/input.f90:535: 
+old EFDC/input.f90:536:   call Broadcast_Scalar(ISO , master_id)
+old EFDC/input.f90:537:   call Broadcast_Array(DZCK, master_id)
+old EFDC/input.f90:538: 
+old EFDC/input.f90:539:   write(mpi_efdc_out_unit,1002) NCARD
+old EFDC/input.f90:540:   write(mpi_efdc_out_unit,*) (DZCK(K),K = 1,KC)
+new EFDC/input.f90:548:   !C10*  READ LAYER THICKNESS IN VERTICAL
+new EFDC/input.f90:549:   NCARD = '10'
+new EFDC/input.f90:550:   ! *** ********************************************************
+new EFDC/input.f90:551:   if( process_id == master_id )then
+new EFDC/input.f90:552:     call SEEK('C10',0)
+new EFDC/input.f90:553:     do K = 1,KC
+new EFDC/input.f90:554:       read(1,*,IOSTAT = ISO) KDUM, DZCK(K)
+new EFDC/input.f90:555:       if( ISO > 0 ) GOTO 100
+new EFDC/input.f90:556:     enddo
+new EFDC/input.f90:557:   endif
+new EFDC/input.f90:558: 
+new EFDC/input.f90:559:   call Broadcast_Scalar(ISO , master_id)
+new EFDC/input.f90:560:   call Broadcast_Array(DZCK, master_id)
+new EFDC/input.f90:561: 
+new EFDC/input.f90:562:   write(mpi_efdc_out_unit,1002) NCARD
+new EFDC/input.f90:563:   write(mpi_efdc_out_unit,*) (DZCK(K),K = 1,KC)",C10 sigma fraction 입력에 대한 주장은 참이다. aaefdc 정규화는 이 input 후보의 변경 사항이 아니며 판정을 확장하지 않음. REVIEW_ONLY.
+B2-10,models/EFDC/source-analysis/efdc_turbulence.md,22,"- `input.f90:621-685` — input cards C12 (background mixing, max), C12A (`ISTOPT`), C12B (`ISGOTM`).",models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:617-685,_staging/efdc-prescan/new/EFDC__input.f90:638-708,C12/C12A/C12B echo를 각각 master read 내부에서 broadcast 뒤로 이동. 6개 hunk가 citation과 교차.,EFDC/input.f90,"@@ -603,25 +625,22 @@ old citation∩hunk=621-627; @@ -635,6 +654,10 @@ old citation∩hunk=635-640; @@ -644,9 +667,6 @@ old citation∩hunk=644-652; @@ -660,6 +680,9 @@ old citation∩hunk=660-665; @@ -669,9 +692,6 @@ old citation∩hunk=669-677; @@ -681,6 +701,9 @@ old citation∩hunk=681-685","AHO/AHD/AVO/ABO/AVMX/ABMX 등 C12 입력, C12A ISTOPT(0), C12B ISGOTM 및 Init_GOTM 조건부 호출 유지.",REVIEW_ONLY,HIGH,"old EFDC/input.f90:617:   NCARD = '12'
+old EFDC/input.f90:618:   ! *** ********************************************************
+old EFDC/input.f90:619:   if( process_id == master_id )then
+old EFDC/input.f90:620:     call SEEK('C12',0)
+old EFDC/input.f90:621:     read(1,*,IOSTAT = ISO) AHO, AHD, AVO, ABO, AVMX, ABMX, VISMUD, AVCON, ZBRWALL
+old EFDC/input.f90:622: 
+old EFDC/input.f90:623:     write(mpi_efdc_out_unit,1002) NCARD
+old EFDC/input.f90:624:     write(mpi_efdc_out_unit,*) AHO, AHD, AVO, ABO, AVMX, ABMX, VISMUD, AVCON, ZBRWALL
+old EFDC/input.f90:625:     if( ISO > 0 ) GOTO 100
+old EFDC/input.f90:626:   endif
+old EFDC/input.f90:627: 
+old EFDC/input.f90:628:   call Broadcast_Scalar(AHO    , master_id)
+old EFDC/input.f90:629:   call Broadcast_Scalar(AHD    , master_id)
+old EFDC/input.f90:630:   call Broadcast_Scalar(AVO    , master_id)
+old EFDC/input.f90:631:   call Broadcast_Scalar(ABO    , master_id)
+old EFDC/input.f90:632:   call Broadcast_Scalar(AVMX   , master_id)
+old EFDC/input.f90:633:   call Broadcast_Scalar(ABMX   , master_id)
+old EFDC/input.f90:634:   call Broadcast_Scalar(VISMUD , master_id)
+old EFDC/input.f90:635:   call Broadcast_Scalar(AVCON  , master_id)
+old EFDC/input.f90:636:   call Broadcast_Scalar(ZBRWALL, master_id)
+old EFDC/input.f90:637: 
+old EFDC/input.f90:638:   ISAVCOMP = 1
+old EFDC/input.f90:639:   if( AVCON == 0. ) ISAVCOMP = 0
+old EFDC/input.f90:640: 
+old EFDC/input.f90:641:   !C12A*  READ TURBULENCE CLOSURE OPTIONS
+old EFDC/input.f90:642:   NCARD = '12A'
+old EFDC/input.f90:643:   ! *** ********************************************************
+old EFDC/input.f90:644:   if( process_id == master_id )then
+old EFDC/input.f90:645:     call SEEK('C12A',0)
+old EFDC/input.f90:646:     read(1,*,IOSTAT = ISO) ISTOPT(0), ISSQL, ISAVBMX, ISFAVB, ISINWV, ISLLIM, IFPROX, XYRATIO, BC_EDGEFACTOR
+old EFDC/input.f90:647: 
+old EFDC/input.f90:648:     write(mpi_efdc_out_unit,1002) NCARD
+old EFDC/input.f90:649:     write(mpi_efdc_out_unit,*) ISTOPT(0), ISSQL, ISAVBMX, ISFAVB, ISINWV, ISLLIM, IFPROX, XYRATIO, BC_EDGEFACTOR
+old EFDC/input.f90:650:     if( ISO > 0 ) GOTO 100
+old EFDC/input.f90:651:   endif
+old EFDC/input.f90:652: 
+old EFDC/input.f90:653:   call Broadcast_Scalar(ISTOPT(0)    , master_id)
+old EFDC/input.f90:654:   call Broadcast_Scalar(ISSQL        , master_id)
+old EFDC/input.f90:655:   call Broadcast_Scalar(ISAVBMX      , master_id)
+old EFDC/input.f90:656:   call Broadcast_Scalar(ISFAVB       , master_id)
+old EFDC/input.f90:657:   call Broadcast_Scalar(ISINWV       , master_id)
+old EFDC/input.f90:658:   call Broadcast_Scalar(ISLLIM       , master_id)
+old EFDC/input.f90:659:   call Broadcast_Scalar(IFPROX       , master_id)
+old EFDC/input.f90:660:   call Broadcast_Scalar(XYRATIO      , master_id)
+old EFDC/input.f90:661:   call Broadcast_Scalar(BC_EDGEFACTOR, master_id)
+old EFDC/input.f90:662: 
+old EFDC/input.f90:663:   if( BC_EDGEFACTOR < 0 ) BC_EDGEFACTOR = 0.0
+old EFDC/input.f90:664:   if( BC_EDGEFACTOR > 1 ) BC_EDGEFACTOR = 1.0
+old EFDC/input.f90:665: 
+old EFDC/input.f90:666:   !C12B*  READ GOTM TURBULENCE OPTIONS
+old EFDC/input.f90:667:   NCARD = '12B'
+old EFDC/input.f90:668: 
+old EFDC/input.f90:669:   if( process_id == master_id )then
+old EFDC/input.f90:670:     call SEEK('C12B',0)
+old EFDC/input.f90:671:     read(1,*,IOSTAT = ISO) ISGOTM, IFRICTION, ICALNN, ICALSS, CHARNOCK
+old EFDC/input.f90:672: 
+old EFDC/input.f90:673:     write(mpi_efdc_out_unit,1002) NCARD
+old EFDC/input.f90:674:     write(mpi_efdc_out_unit,*)  ISGOTM, IFRICTION, ICALNN, ICALSS, CHARNOCK
+old EFDC/input.f90:675:     if( ISO > 0 ) GOTO 100
+old EFDC/input.f90:676:   endif
+old EFDC/input.f90:677: 
+old EFDC/input.f90:678:   call Broadcast_Scalar(ISGOTM,        master_id)
+old EFDC/input.f90:679:   call Broadcast_Scalar(IFRICTION,     master_id)
+old EFDC/input.f90:680:   call Broadcast_Scalar(ICALNN,        master_id)
+old EFDC/input.f90:681:   call Broadcast_Scalar(ICALSS,        master_id)
+old EFDC/input.f90:682:   call Broadcast_Scalar(CHARNOCK,      master_id)
+old EFDC/input.f90:683: 
+old EFDC/input.f90:684:   ! *** Initialize GOTM variables
+old EFDC/input.f90:685:   if( ISGOTM > 0 ) CALL Init_GOTM
+new EFDC/input.f90:638:   !C12*  READ TURBULENT DIFFUSION parameterS
+new EFDC/input.f90:639:   NCARD = '12'
+new EFDC/input.f90:640:   ! *** ********************************************************
+new EFDC/input.f90:641:   if( process_id == master_id )then
+new EFDC/input.f90:642:     call SEEK('C12',0)
+new EFDC/input.f90:643:     read(1,*,IOSTAT = ISO) AHO, AHD, AVO, ABO, AVMX, ABMX, VISMUD, AVCON, ZBRWALL
+new EFDC/input.f90:644:     if( ISO > 0 ) GOTO 100
+new EFDC/input.f90:645:   endif
+new EFDC/input.f90:646: 
+new EFDC/input.f90:647:   call Broadcast_Scalar(AHO    , master_id)
+new EFDC/input.f90:648:   call Broadcast_Scalar(AHD    , master_id)
+new EFDC/input.f90:649:   call Broadcast_Scalar(AVO    , master_id)
+new EFDC/input.f90:650:   call Broadcast_Scalar(ABO    , master_id)
+new EFDC/input.f90:651:   call Broadcast_Scalar(AVMX   , master_id)
+new EFDC/input.f90:652:   call Broadcast_Scalar(ABMX   , master_id)
+new EFDC/input.f90:653:   call Broadcast_Scalar(VISMUD , master_id)
+new EFDC/input.f90:654:   call Broadcast_Scalar(AVCON  , master_id)
+new EFDC/input.f90:655:   call Broadcast_Scalar(ZBRWALL, master_id)
+new EFDC/input.f90:656: 
+new EFDC/input.f90:657: 
+new EFDC/input.f90:658:   write(mpi_efdc_out_unit,1002) NCARD
+new EFDC/input.f90:659:   write(mpi_efdc_out_unit,*) AHO, AHD, AVO, ABO, AVMX, ABMX, VISMUD, AVCON, ZBRWALL
+new EFDC/input.f90:660: 
+new EFDC/input.f90:661:   ISAVCOMP = 1
+new EFDC/input.f90:662:   if( AVCON == 0. ) ISAVCOMP = 0
+new EFDC/input.f90:663: 
+new EFDC/input.f90:664:   !C12A*  READ TURBULENCE CLOSURE OPTIONS
+new EFDC/input.f90:665:   NCARD = '12A'
+new EFDC/input.f90:666:   ! *** ********************************************************
+new EFDC/input.f90:667:   if( process_id == master_id )then
+new EFDC/input.f90:668:     call SEEK('C12A',0)
+new EFDC/input.f90:669:     read(1,*,IOSTAT = ISO) ISTOPT(0), ISSQL, ISAVBMX, ISFAVB, ISINWV, ISLLIM, IFPROX, XYRATIO, BC_EDGEFACTOR
+new EFDC/input.f90:670:     if( ISO > 0 ) GOTO 100
+new EFDC/input.f90:671:   endif
+new EFDC/input.f90:672: 
+new EFDC/input.f90:673:   call Broadcast_Scalar(ISTOPT(0)    , master_id)
+new EFDC/input.f90:674:   call Broadcast_Scalar(ISSQL        , master_id)
+new EFDC/input.f90:675:   call Broadcast_Scalar(ISAVBMX      , master_id)
+new EFDC/input.f90:676:   call Broadcast_Scalar(ISFAVB       , master_id)
+new EFDC/input.f90:677:   call Broadcast_Scalar(ISINWV       , master_id)
+new EFDC/input.f90:678:   call Broadcast_Scalar(ISLLIM       , master_id)
+new EFDC/input.f90:679:   call Broadcast_Scalar(IFPROX       , master_id)
+new EFDC/input.f90:680:   call Broadcast_Scalar(XYRATIO      , master_id)
+new EFDC/input.f90:681:   call Broadcast_Scalar(BC_EDGEFACTOR, master_id)
+new EFDC/input.f90:682: 
+new EFDC/input.f90:683:   write(mpi_efdc_out_unit,1002) NCARD
+new EFDC/input.f90:684:   write(mpi_efdc_out_unit,*) ISTOPT(0), ISSQL, ISAVBMX, ISFAVB, ISINWV, ISLLIM, IFPROX, XYRATIO, BC_EDGEFACTOR
+new EFDC/input.f90:685: 
+new EFDC/input.f90:686:   if( BC_EDGEFACTOR < 0 ) BC_EDGEFACTOR = 0.0
+new EFDC/input.f90:687:   if( BC_EDGEFACTOR > 1 ) BC_EDGEFACTOR = 1.0
+new EFDC/input.f90:688: 
+new EFDC/input.f90:689:   !C12B*  READ GOTM TURBULENCE OPTIONS
+new EFDC/input.f90:690:   NCARD = '12B'
+new EFDC/input.f90:691: 
+new EFDC/input.f90:692:   if( process_id == master_id )then
+new EFDC/input.f90:693:     call SEEK('C12B',0)
+new EFDC/input.f90:694:     read(1,*,IOSTAT = ISO) ISGOTM, IFRICTION, ICALNN, ICALSS, CHARNOCK
+new EFDC/input.f90:695:     if( ISO > 0 ) GOTO 100
+new EFDC/input.f90:696:   endif
+new EFDC/input.f90:697: 
+new EFDC/input.f90:698:   call Broadcast_Scalar(ISGOTM,        master_id)
+new EFDC/input.f90:699:   call Broadcast_Scalar(IFRICTION,     master_id)
+new EFDC/input.f90:700:   call Broadcast_Scalar(ICALNN,        master_id)
+new EFDC/input.f90:701:   call Broadcast_Scalar(ICALSS,        master_id)
+new EFDC/input.f90:702:   call Broadcast_Scalar(CHARNOCK,      master_id)
+new EFDC/input.f90:703: 
+new EFDC/input.f90:704:   write(mpi_efdc_out_unit,1002) NCARD
+new EFDC/input.f90:705:   write(mpi_efdc_out_unit,*)  ISGOTM, IFRICTION, ICALNN, ICALSS, CHARNOCK
+new EFDC/input.f90:706:   
+new EFDC/input.f90:707:   ! *** Initialize GOTM variables
+new EFDC/input.f90:708:   if( ISGOTM > 0 ) CALL Init_GOTM",65줄 인용 내부 echo 변경을 검토했다. 입력 카드별 역할과 호출 관계는 유지되어 REVIEW_ONLY.
+B2-11,models/EFDC/source-analysis/efdc_turbulence.md,67,"Both depth-normalized afterward (`:157, 158`). Background `AVOXY/AVBXY` come from card C12 (`input.f90:621-633`: `AVO, ABO, AVMX, ABMX`).",models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:618-636,_staging/efdc-prescan/new/EFDC__input.f90:641-655,"C12 read 직후의 echo 삭제, new 658-659로 이동. AVO/ABO/AVMX/ABMX read·broadcast 동일.",EFDC/input.f90,"@@ -603,25 +625,22 @@ old citation∩hunk=621-627",이 후보가 인용하는 background mixing 입력의 C12 연결은 유지된다. calavb depth-normalization 문장을 이 input 변경과 혼동하지 않는다.,REVIEW_ONLY,HIGH,"old EFDC/input.f90:618:   ! *** ********************************************************
+old EFDC/input.f90:619:   if( process_id == master_id )then
+old EFDC/input.f90:620:     call SEEK('C12',0)
+old EFDC/input.f90:621:     read(1,*,IOSTAT = ISO) AHO, AHD, AVO, ABO, AVMX, ABMX, VISMUD, AVCON, ZBRWALL
+old EFDC/input.f90:622: 
+old EFDC/input.f90:623:     write(mpi_efdc_out_unit,1002) NCARD
+old EFDC/input.f90:624:     write(mpi_efdc_out_unit,*) AHO, AHD, AVO, ABO, AVMX, ABMX, VISMUD, AVCON, ZBRWALL
+old EFDC/input.f90:625:     if( ISO > 0 ) GOTO 100
+old EFDC/input.f90:626:   endif
+old EFDC/input.f90:627: 
+old EFDC/input.f90:628:   call Broadcast_Scalar(AHO    , master_id)
+old EFDC/input.f90:629:   call Broadcast_Scalar(AHD    , master_id)
+old EFDC/input.f90:630:   call Broadcast_Scalar(AVO    , master_id)
+old EFDC/input.f90:631:   call Broadcast_Scalar(ABO    , master_id)
+old EFDC/input.f90:632:   call Broadcast_Scalar(AVMX   , master_id)
+old EFDC/input.f90:633:   call Broadcast_Scalar(ABMX   , master_id)
+old EFDC/input.f90:634:   call Broadcast_Scalar(VISMUD , master_id)
+old EFDC/input.f90:635:   call Broadcast_Scalar(AVCON  , master_id)
+old EFDC/input.f90:636:   call Broadcast_Scalar(ZBRWALL, master_id)
+new EFDC/input.f90:641:   if( process_id == master_id )then
+new EFDC/input.f90:642:     call SEEK('C12',0)
+new EFDC/input.f90:643:     read(1,*,IOSTAT = ISO) AHO, AHD, AVO, ABO, AVMX, ABMX, VISMUD, AVCON, ZBRWALL
+new EFDC/input.f90:644:     if( ISO > 0 ) GOTO 100
+new EFDC/input.f90:645:   endif
+new EFDC/input.f90:646: 
+new EFDC/input.f90:647:   call Broadcast_Scalar(AHO    , master_id)
+new EFDC/input.f90:648:   call Broadcast_Scalar(AHD    , master_id)
+new EFDC/input.f90:649:   call Broadcast_Scalar(AVO    , master_id)
+new EFDC/input.f90:650:   call Broadcast_Scalar(ABO    , master_id)
+new EFDC/input.f90:651:   call Broadcast_Scalar(AVMX   , master_id)
+new EFDC/input.f90:652:   call Broadcast_Scalar(ABMX   , master_id)
+new EFDC/input.f90:653:   call Broadcast_Scalar(VISMUD , master_id)
+new EFDC/input.f90:654:   call Broadcast_Scalar(AVCON  , master_id)
+new EFDC/input.f90:655:   call Broadcast_Scalar(ZBRWALL, master_id)",범위 내부 echo 변경은 있으나 인용된 배경 계수의 입력 의미가 바뀌지 않아 REVIEW_ONLY.
+B2-12,models/EFDC/source-analysis/efdc_turbulence.md,107,`ISTOPT(0)` is read from card C12A (`input.f90:641-661`). It does **not** select GOTM (that is `ISGOTM`). It selects original-EFDC coefficient behavior inside CALAVB:,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:641-661,_staging/efdc-prescan/new/EFDC__input.f90:664-684,C12A echo old 648-649를 broadcast 뒤 new 683-684로 이동.,EFDC/input.f90,"@@ -644,9 +667,6 @@ old citation∩hunk=644-652; @@ -660,6 +680,9 @@ old citation∩hunk=660-661",ISTOPT(0) read·broadcast가 그대로며 ISGOTM 필드로 대체되거나 GOTM 선택자로 변경되지 않았다.,REVIEW_ONLY,HIGH,"old EFDC/input.f90:641:   !C12A*  READ TURBULENCE CLOSURE OPTIONS
+old EFDC/input.f90:642:   NCARD = '12A'
+old EFDC/input.f90:643:   ! *** ********************************************************
+old EFDC/input.f90:644:   if( process_id == master_id )then
+old EFDC/input.f90:645:     call SEEK('C12A',0)
+old EFDC/input.f90:646:     read(1,*,IOSTAT = ISO) ISTOPT(0), ISSQL, ISAVBMX, ISFAVB, ISINWV, ISLLIM, IFPROX, XYRATIO, BC_EDGEFACTOR
+old EFDC/input.f90:647: 
+old EFDC/input.f90:648:     write(mpi_efdc_out_unit,1002) NCARD
+old EFDC/input.f90:649:     write(mpi_efdc_out_unit,*) ISTOPT(0), ISSQL, ISAVBMX, ISFAVB, ISINWV, ISLLIM, IFPROX, XYRATIO, BC_EDGEFACTOR
+old EFDC/input.f90:650:     if( ISO > 0 ) GOTO 100
+old EFDC/input.f90:651:   endif
+old EFDC/input.f90:652: 
+old EFDC/input.f90:653:   call Broadcast_Scalar(ISTOPT(0)    , master_id)
+old EFDC/input.f90:654:   call Broadcast_Scalar(ISSQL        , master_id)
+old EFDC/input.f90:655:   call Broadcast_Scalar(ISAVBMX      , master_id)
+old EFDC/input.f90:656:   call Broadcast_Scalar(ISFAVB       , master_id)
+old EFDC/input.f90:657:   call Broadcast_Scalar(ISINWV       , master_id)
+old EFDC/input.f90:658:   call Broadcast_Scalar(ISLLIM       , master_id)
+old EFDC/input.f90:659:   call Broadcast_Scalar(IFPROX       , master_id)
+old EFDC/input.f90:660:   call Broadcast_Scalar(XYRATIO      , master_id)
+old EFDC/input.f90:661:   call Broadcast_Scalar(BC_EDGEFACTOR, master_id)
+new EFDC/input.f90:664:   !C12A*  READ TURBULENCE CLOSURE OPTIONS
+new EFDC/input.f90:665:   NCARD = '12A'
+new EFDC/input.f90:666:   ! *** ********************************************************
+new EFDC/input.f90:667:   if( process_id == master_id )then
+new EFDC/input.f90:668:     call SEEK('C12A',0)
+new EFDC/input.f90:669:     read(1,*,IOSTAT = ISO) ISTOPT(0), ISSQL, ISAVBMX, ISFAVB, ISINWV, ISLLIM, IFPROX, XYRATIO, BC_EDGEFACTOR
+new EFDC/input.f90:670:     if( ISO > 0 ) GOTO 100
+new EFDC/input.f90:671:   endif
+new EFDC/input.f90:672: 
+new EFDC/input.f90:673:   call Broadcast_Scalar(ISTOPT(0)    , master_id)
+new EFDC/input.f90:674:   call Broadcast_Scalar(ISSQL        , master_id)
+new EFDC/input.f90:675:   call Broadcast_Scalar(ISAVBMX      , master_id)
+new EFDC/input.f90:676:   call Broadcast_Scalar(ISFAVB       , master_id)
+new EFDC/input.f90:677:   call Broadcast_Scalar(ISINWV       , master_id)
+new EFDC/input.f90:678:   call Broadcast_Scalar(ISLLIM       , master_id)
+new EFDC/input.f90:679:   call Broadcast_Scalar(IFPROX       , master_id)
+new EFDC/input.f90:680:   call Broadcast_Scalar(XYRATIO      , master_id)
+new EFDC/input.f90:681:   call Broadcast_Scalar(BC_EDGEFACTOR, master_id)
+new EFDC/input.f90:682: 
+new EFDC/input.f90:683:   write(mpi_efdc_out_unit,1002) NCARD
+new EFDC/input.f90:684:   write(mpi_efdc_out_unit,*) ISTOPT(0), ISSQL, ISAVBMX, ISFAVB, ISINWV, ISLLIM, IFPROX, XYRATIO, BC_EDGEFACTOR",인용 범위 내부 echo 변경은 해당 ISTOPT 입력/선택 역할을 바꾸지 않는다. REVIEW_ONLY.
+B2-13,models/EFDC/source-analysis/efdc_turbulence.md,115,`ISGOTM` from card C12B (`input.f90:666-685`).,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:666-685,_staging/efdc-prescan/new/EFDC__input.f90:689-708,C12B echo old 673-674를 new 704-705로 이동.,EFDC/input.f90,"@@ -669,9 +692,6 @@ old citation∩hunk=669-677; @@ -681,6 +701,9 @@ old citation∩hunk=681-685",ISGOTM은 계속 C12B에서 읽으며 ISGOTM>0일 때 Init_GOTM 호출도 동일하다.,REVIEW_ONLY,HIGH,"old EFDC/input.f90:666:   !C12B*  READ GOTM TURBULENCE OPTIONS
+old EFDC/input.f90:667:   NCARD = '12B'
+old EFDC/input.f90:668: 
+old EFDC/input.f90:669:   if( process_id == master_id )then
+old EFDC/input.f90:670:     call SEEK('C12B',0)
+old EFDC/input.f90:671:     read(1,*,IOSTAT = ISO) ISGOTM, IFRICTION, ICALNN, ICALSS, CHARNOCK
+old EFDC/input.f90:672: 
+old EFDC/input.f90:673:     write(mpi_efdc_out_unit,1002) NCARD
+old EFDC/input.f90:674:     write(mpi_efdc_out_unit,*)  ISGOTM, IFRICTION, ICALNN, ICALSS, CHARNOCK
+old EFDC/input.f90:675:     if( ISO > 0 ) GOTO 100
+old EFDC/input.f90:676:   endif
+old EFDC/input.f90:677: 
+old EFDC/input.f90:678:   call Broadcast_Scalar(ISGOTM,        master_id)
+old EFDC/input.f90:679:   call Broadcast_Scalar(IFRICTION,     master_id)
+old EFDC/input.f90:680:   call Broadcast_Scalar(ICALNN,        master_id)
+old EFDC/input.f90:681:   call Broadcast_Scalar(ICALSS,        master_id)
+old EFDC/input.f90:682:   call Broadcast_Scalar(CHARNOCK,      master_id)
+old EFDC/input.f90:683: 
+old EFDC/input.f90:684:   ! *** Initialize GOTM variables
+old EFDC/input.f90:685:   if( ISGOTM > 0 ) CALL Init_GOTM
+new EFDC/input.f90:689:   !C12B*  READ GOTM TURBULENCE OPTIONS
+new EFDC/input.f90:690:   NCARD = '12B'
+new EFDC/input.f90:691: 
+new EFDC/input.f90:692:   if( process_id == master_id )then
+new EFDC/input.f90:693:     call SEEK('C12B',0)
+new EFDC/input.f90:694:     read(1,*,IOSTAT = ISO) ISGOTM, IFRICTION, ICALNN, ICALSS, CHARNOCK
+new EFDC/input.f90:695:     if( ISO > 0 ) GOTO 100
+new EFDC/input.f90:696:   endif
+new EFDC/input.f90:697: 
+new EFDC/input.f90:698:   call Broadcast_Scalar(ISGOTM,        master_id)
+new EFDC/input.f90:699:   call Broadcast_Scalar(IFRICTION,     master_id)
+new EFDC/input.f90:700:   call Broadcast_Scalar(ICALNN,        master_id)
+new EFDC/input.f90:701:   call Broadcast_Scalar(ICALSS,        master_id)
+new EFDC/input.f90:702:   call Broadcast_Scalar(CHARNOCK,      master_id)
+new EFDC/input.f90:703: 
+new EFDC/input.f90:704:   write(mpi_efdc_out_unit,1002) NCARD
+new EFDC/input.f90:705:   write(mpi_efdc_out_unit,*)  ISGOTM, IFRICTION, ICALNN, ICALSS, CHARNOCK
+new EFDC/input.f90:706:   
+new EFDC/input.f90:707:   ! *** Initialize GOTM variables
+new EFDC/input.f90:708:   if( ISGOTM > 0 ) CALL Init_GOTM",입력 카드·필드·조건부 호출 관계가 유지된다. 내부 echo 변경의 영향을 검토하여 REVIEW_ONLY.
+B2-14,models/EFDC/source-analysis/efdc-tidal-forcing-conventions-v12.md,28,"2. **cos/sin 변환**: `RAD = 2π·PFPH/TCP(M)` → `CPFAM0 = PFAM·cos(RAD)`, `SPFAM0 = PFAM·sin(RAD)` (`input.f90:913-915`, NPFORT≥1 분기; NPFORT=0은 S/W/E/N 경계 카드 처리에서 동일 변환 후 ×G로 `PCB*/PSB*` 생성, `input.f90:980-1005` 등 — [[efdc_boundary_conditions]] §G).",models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:906-918,_staging/efdc-prescan/new/EFDC__input.f90:939-948,C17 dummy echo 보관을 NDUM/CDUM에서 IECHO(M)/CECHO(M)로 변경하고 echo를 broadcast 뒤로 이동. 변환 3줄은 동일.,EFDC/input.f90,"@@ -904,28 +937,22 @@ old citation∩hunk=913-915","NPFORT>=1의 RAD=PI2*PFPH/TCP, CPFAM0=PFAM*COS(RAD), SPFAM0=PFAM*SIN(RAD)는 913-915→944-946로 그대로 대응한다. echo 식별자 저장 변경은 PFAM/PFPH의 물리 의미 변경이 아니다.",REVIEW_ONLY,HIGH,"old EFDC/input.f90:906:           if( NPFORT == 0 )then
+old EFDC/input.f90:907:             read(1,*,IOSTAT = ISO)NDUM,CDUM,PFAM(NP,M),PFPH(NP,M)
+old EFDC/input.f90:908:             write(mpi_efdc_out_unit,1002) NCARD
+old EFDC/input.f90:909:             write(mpi_efdc_out_unit,*) NDUM, CDUM, PFAM(NP,M), PFPH(NP,M)
+old EFDC/input.f90:910:             if( ISO > 0 ) GOTO 100
+old EFDC/input.f90:911:           elseif( NPFORT >= 1 )then
+old EFDC/input.f90:912:             read(1,*,IOSTAT = ISO) NDUM, CDUM, PFAM(NP,M), PFPH(NP,M)
+old EFDC/input.f90:913:             RAD = PI2*PFPH(NP,M)/TCP(M)
+old EFDC/input.f90:914:             CPFAM0(NP,M) = PFAM(NP,M)*COS(RAD)
+old EFDC/input.f90:915:             SPFAM0(NP,M) = PFAM(NP,M)*SIN(RAD)
+old EFDC/input.f90:916:             write(mpi_efdc_out_unit,1002) NCARD
+old EFDC/input.f90:917:             write(mpi_efdc_out_unit,*) NDUM, CDUM, PFAM(NP,M), PFPH(NP,M), CPFAM0(NP,M), SPFAM0(NP,M)
+old EFDC/input.f90:918:             if( ISO > 0 ) GOTO 100
+new EFDC/input.f90:939:           if( NPFORT == 0 )then
+new EFDC/input.f90:940:             read(1,*,IOSTAT = ISO) IECHO(M), CECHO(M),PFAM(NP,M),PFPH(NP,M)
+new EFDC/input.f90:941:             if( ISO > 0 ) GOTO 100
+new EFDC/input.f90:942:           elseif( NPFORT >= 1 )then
+new EFDC/input.f90:943:             read(1,*,IOSTAT = ISO) IECHO(M), CECHO(M), PFAM(NP,M), PFPH(NP,M)
+new EFDC/input.f90:944:             RAD = PI2*PFPH(NP,M)/TCP(M)
+new EFDC/input.f90:945:             CPFAM0(NP,M) = PFAM(NP,M)*COS(RAD)
+new EFDC/input.f90:946:             SPFAM0(NP,M) = PFAM(NP,M)*SIN(RAD)
+new EFDC/input.f90:947:             if( ISO > 0 ) GOTO 100
+new EFDC/input.f90:948:             read(1,*,IOSTAT = ISO) IECHO(M), CECHO(M), PFAM(NP,M), PFPH(NP,M)",변환 자체는 내용·의미 동일하지만 변경된 C17 hunk와 인용이 교차하고 좌표가 이동하여 REVIEW_ONLY 제안. 이 행 밖의 v12.4 문구를 별도 UPDATE 대상으로 확대하지 않음.
+B2-15,models/EFDC/source-analysis/efdc-tidal-forcing-conventions-v12.md,28,"2. **cos/sin 변환**: `RAD = 2π·PFPH/TCP(M)` → `CPFAM0 = PFAM·cos(RAD)`, `SPFAM0 = PFAM·sin(RAD)` (`input.f90:913-915`, NPFORT≥1 분기; NPFORT=0은 S/W/E/N 경계 카드 처리에서 동일 변환 후 ×G로 `PCB*/PSB*` 생성, `input.f90:980-1005` 등 — [[efdc_boundary_conditions]] §G).",models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:972-1005,_staging/efdc-prescan/new/EFDC__input.f90:1015-1044,C18 NPFORT=0 및 1 branch의 echo 이동; 인용 내부 old 992-994 삭제/재배치.,EFDC/input.f90,"@@ -973,8 +1016,6 @@ old citation∩hunk=980-980; @@ -989,10 +1030,8 @@ old citation∩hunk=989-998","NPFORT=0의 RAD와 AMP=G*PFAM, PCBS/PSBS cos/sin 식이 old 982-985→new 1023-1026으로 유지된다. NPFORT=1 다항 합성과 G 곱도 동일.",REVIEW_ONLY,HIGH,"old EFDC/input.f90:972:       if( NPFORT == 0 )then
+old EFDC/input.f90:973:         do L = 1,NPBS
+old EFDC/input.f90:974:           ! *** Added global arrays for MPI
+old EFDC/input.f90:975:           read(1,*,IOSTAT = ISO) IPBS_GL(L), JPBS_GL(L), ISPBS_GL(L), ISPRS_GL(L), NPFORS, NPSERS_GL(L)
+old EFDC/input.f90:976:           write(mpi_efdc_out_unit,1002) NCARD
+old EFDC/input.f90:977:           write(mpi_efdc_out_unit,*) IPBS_GL(L), JPBS_GL(L), ISPBS_GL(L), ISPRS_GL(L), NPFORS, NPSERS_GL(L)
+old EFDC/input.f90:978:           if( ISO > 0 ) GOTO 100
+old EFDC/input.f90:979: 
+old EFDC/input.f90:980:           do M = 1,MTIDE
+old EFDC/input.f90:981:             if( NPFORS == 0) exit
+old EFDC/input.f90:982:             RAD = PI2*PFPH(NPFORS,M)/TCP(M)
+old EFDC/input.f90:983:             AMP = G*PFAM(NPFORS,M)
+old EFDC/input.f90:984:             PCBS_GL(L,M) = AMP*COS(RAD)
+old EFDC/input.f90:985:             PSBS_GL(L,M) = AMP*SIN(RAD)
+old EFDC/input.f90:986:           enddo
+old EFDC/input.f90:987:         enddo
+old EFDC/input.f90:988: 
+old EFDC/input.f90:989:       elseif( NPFORT == 1 )then
+old EFDC/input.f90:990:         do L = 1,NPBS
+old EFDC/input.f90:991:           read(1,*,IOSTAT = ISO) IPBS_GL(L), JPBS_GL(L), ISPBS_GL(L), ISPRS_GL(L), NPFORS, NPSERS_GL(L), NPSERS1_GL(L), TPCOORDS_GL(L)
+old EFDC/input.f90:992: 
+old EFDC/input.f90:993:           write(mpi_efdc_out_unit,1002) NCARD
+old EFDC/input.f90:994:           write(mpi_efdc_out_unit,*) IPBS_GL(L), JPBS_GL(L), ISPBS_GL(L), ISPRS_GL(L), NPFORS, NPSERS_GL(L), NPSERS1_GL(L), TPCOORDS_GL(L)
+old EFDC/input.f90:995:           if( ISO > 0 ) GOTO 100
+old EFDC/input.f90:996:           do M = 1,MTIDE
+old EFDC/input.f90:997:             if( NPFORS == 0) exit
+old EFDC/input.f90:998:             PCBS_GL(L,M) = CPFAM0(NPFORS,M)+TPCOORDS_GL(L)*CPFAM1(NPFORS,M) + TPCOORDS_GL(L)*TPCOORDS_GL(L)*CPFAM2(NPFORS,M)
+old EFDC/input.f90:999:             PSBS_GL(L,M) = SPFAM0(NPFORS,M)+TPCOORDS_GL(L)*SPFAM1(NPFORS,M) + TPCOORDS_GL(L)*TPCOORDS_GL(L)*SPFAM2(NPFORS,M)
+old EFDC/input.f90:1000:             TMPAMP = SQRT(PCBS(L,M)*PCBS(L,M)+PSBS_GL(L,M)*PSBS_GL(L,M))
+old EFDC/input.f90:1001:             TMPPHS = ATAN2(PSBS_GL(L,M),PCBS_GL(L,M))
+old EFDC/input.f90:1002:             TMPPHS = TMPPHS*TCP(M)/PI2
+old EFDC/input.f90:1003:             if( TMPPHS<0.0)TMPPHS = TMPPHS+TCP(M)
+old EFDC/input.f90:1004:             PCBS_GL(L,M) = G*PCBS_GL(L,M)
+old EFDC/input.f90:1005:             PSBS_GL(L,M) = G*PSBS_GL(L,M)
+new EFDC/input.f90:1015:       if( NPFORT == 0 )then
+new EFDC/input.f90:1016:         do L = 1,NPBS
+new EFDC/input.f90:1017:           ! *** Added global arrays for MPI
+new EFDC/input.f90:1018:           read(1,*,IOSTAT = ISO) IPBS_GL(L), JPBS_GL(L), ISPBS_GL(L), ISPRS_GL(L), NPFORS, NPSERS_GL(L)
+new EFDC/input.f90:1019:           if( ISO > 0 ) GOTO 100
+new EFDC/input.f90:1020: 
+new EFDC/input.f90:1021:           do M = 1,MTIDE
+new EFDC/input.f90:1022:             if( NPFORS == 0) exit
+new EFDC/input.f90:1023:             RAD = PI2*PFPH(NPFORS,M)/TCP(M)
+new EFDC/input.f90:1024:             AMP = G*PFAM(NPFORS,M)
+new EFDC/input.f90:1025:             PCBS_GL(L,M) = AMP*COS(RAD)
+new EFDC/input.f90:1026:             PSBS_GL(L,M) = AMP*SIN(RAD)
+new EFDC/input.f90:1027:           enddo
+new EFDC/input.f90:1028:         enddo
+new EFDC/input.f90:1029: 
+new EFDC/input.f90:1030:       elseif( NPFORT == 1 )then
+new EFDC/input.f90:1031:         do L = 1,NPBS
+new EFDC/input.f90:1032:           read(1,*,IOSTAT = ISO) IPBS_GL(L), JPBS_GL(L), ISPBS_GL(L), ISPRS_GL(L), NPFORS, NPSERS_GL(L), NPSERS1_GL(L), TPCOORDS_GL(L)
+new EFDC/input.f90:1033:           if( ISO > 0 ) GOTO 100
+new EFDC/input.f90:1034:           
+new EFDC/input.f90:1035:           do M = 1,MTIDE
+new EFDC/input.f90:1036:             if( NPFORS == 0) exit
+new EFDC/input.f90:1037:             PCBS_GL(L,M) = CPFAM0(NPFORS,M)+TPCOORDS_GL(L)*CPFAM1(NPFORS,M) + TPCOORDS_GL(L)*TPCOORDS_GL(L)*CPFAM2(NPFORS,M)
+new EFDC/input.f90:1038:             PSBS_GL(L,M) = SPFAM0(NPFORS,M)+TPCOORDS_GL(L)*SPFAM1(NPFORS,M) + TPCOORDS_GL(L)*TPCOORDS_GL(L)*SPFAM2(NPFORS,M)
+new EFDC/input.f90:1039:             TMPAMP = SQRT(PCBS(L,M)*PCBS(L,M)+PSBS_GL(L,M)*PSBS_GL(L,M))
+new EFDC/input.f90:1040:             TMPPHS = ATAN2(PSBS_GL(L,M),PCBS_GL(L,M))
+new EFDC/input.f90:1041:             TMPPHS = TMPPHS*TCP(M)/PI2
+new EFDC/input.f90:1042:             if( TMPPHS<0.0)TMPPHS = TMPPHS+TCP(M)
+new EFDC/input.f90:1043:             PCBS_GL(L,M) = G*PCBS_GL(L,M)
+new EFDC/input.f90:1044:             PSBS_GL(L,M) = G*PSBS_GL(L,M)",조석 변환·중력 배율은 바뀌지 않는다. 980-1005 내부 echo 변경을 실제로 대조했으므로 자동 line-only 대신 REVIEW_ONLY.
+B2-16,models/EFDC/source-analysis/efdc_transport_scheme.md,65,## 4. ISADAC / ISFCT — constituent별 토글 (input.f90:306),models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:303-321,"_staging/efdc-prescan/new/EFDC__input.f90:307-337; _staging/efdc-prescan/new/EFDC__Transport__calconc.f90:197-204,225-231,248-251","C6 세 번째 필드 ldum→ISQUICK(new 311), scalar broadcast(new 316), 0/1 이외 입력은 0으로 sanitize(new 318-325).",EFDC/input.f90,"@@ -303,12 +308,21 @@ old citation∩hunk=306-306",노트 §4 입력 예시의 세 번째 -는 이제 실제 전역 transport 선택자다. NS별 ISADAC/ISFCT 필드는 남지만 ISQUICK=1이면 QUICKEST로 dispatch하고 기존 anti-diffusion 경로는 ISQUICK=0 조건을 갖는다.,UPDATE_REQUIRED,HIGH,"old EFDC/input.f90:303:   if( process_id == master_id )then
+old EFDC/input.f90:304:     call SEEK('C6',0)
+old EFDC/input.f90:305:     do NS = 0,8
+old EFDC/input.f90:306:       read(1,*,IOSTAT = ISO) ISTRAN(NS), ISTOPT(NS), ldum, ISADAC(NS), ISFCT(NS), ldum, ldum, ldum, ISCI(NS), ISCO(NS)
+old EFDC/input.f90:307:       write(mpi_efdc_out_unit,1002) NCARD
+old EFDC/input.f90:308:       write(mpi_efdc_out_unit,*) ISTRAN(NS), ISTOPT(NS), ldum, ISADAC(NS), ISFCT(NS), ldum, ldum, ldum, ISCI(NS), ISCO(NS)
+old EFDC/input.f90:309:       if( ISO > 0 ) GOTO 100
+old EFDC/input.f90:310:     enddo
+old EFDC/input.f90:311:   endif
+old EFDC/input.f90:312: 
+old EFDC/input.f90:313:   call Broadcast_Array(ISTRAN, master_id)
+old EFDC/input.f90:314:   call Broadcast_Array(ISTOPT, master_id)
+old EFDC/input.f90:315:   call Broadcast_Array(ISADAC, master_id)
+old EFDC/input.f90:316:   call Broadcast_Array(ISFCT , master_id)
+old EFDC/input.f90:317:   call Broadcast_Array(ISCI  , master_id)
+old EFDC/input.f90:318:   call Broadcast_Array(ISCO  , master_id)
+old EFDC/input.f90:319:   NFLTMT = 1
+old EFDC/input.f90:320: 
+old EFDC/input.f90:321:   if( ISTRAN(8) >= 1 .and. ISTRAN(2) == 0 )then
+new EFDC/input.f90:307:   ! *** ********************************************************
+new EFDC/input.f90:308:   if( process_id == master_id )then
+new EFDC/input.f90:309:     call SEEK('C6',0)
+new EFDC/input.f90:310:     do NS = 0,8
+new EFDC/input.f90:311:       read(1,*,IOSTAT = ISO) ISTRAN(NS), ISTOPT(NS), ISQUICK, ISADAC(NS), ISFCT(NS), ldum, ldum, ldum, ISCI(NS), ISCO(NS)
+new EFDC/input.f90:312:       if( ISO > 0 ) GOTO 100
+new EFDC/input.f90:313:     enddo
+new EFDC/input.f90:314:   endif
+new EFDC/input.f90:315:   
+new EFDC/input.f90:316:   call Broadcast_Scalar(ISQUICK, master_id)   ! *** Using a scalar var for ISQUICK in EFDC+ 12.x - DKT
+new EFDC/input.f90:317: 
+new EFDC/input.f90:318:   ! *** Sanitize ISQUICK: this C6 column was unused prior to EFDC+ 12.x and legacy decks may contain other values
+new EFDC/input.f90:319:   if( ISQUICK /= 0 .and. ISQUICK /= 1 )then
+new EFDC/input.f90:320:     if( process_id == master_id )then
+new EFDC/input.f90:321:       PRINT *,'*** WARNING: INVALID ISQUICK ON CARD C6.  RESETTING TO 0 (UPWIND SCHEME)'
+new EFDC/input.f90:322:       write(mpi_efdc_out_unit,*) '*** WARNING: INVALID ISQUICK ON CARD C6.  RESETTING TO 0 (UPWIND SCHEME):', ISQUICK
+new EFDC/input.f90:323:     endif
+new EFDC/input.f90:324:     ISQUICK = 0
+new EFDC/input.f90:325:   endif
+new EFDC/input.f90:326: 
+new EFDC/input.f90:327:   call Broadcast_Array(ISTRAN, master_id)
+new EFDC/input.f90:328:   call Broadcast_Array(ISTOPT, master_id)
+new EFDC/input.f90:329:   call Broadcast_Array(ISADAC, master_id)
+new EFDC/input.f90:330:   call Broadcast_Array(ISFCT , master_id)
+new EFDC/input.f90:331:   call Broadcast_Array(ISCI  , master_id)
+new EFDC/input.f90:332:   call Broadcast_Array(ISCO  , master_id)
+new EFDC/input.f90:333:   NFLTMT = 1
+new EFDC/input.f90:334: 
+new EFDC/input.f90:335:   do NS = 0,8
+new EFDC/input.f90:336:     write(mpi_efdc_out_unit,1002) NCARD
+new EFDC/input.f90:337:     write(mpi_efdc_out_unit,*) ISTRAN(NS), ISTOPT(NS), ISQUICK, ISADAC(NS), ISFCT(NS), ldum, ldum, ldum, ISCI(NS), ISCO(NS)
+new EFDC/Transport/calconc.f90:197:     ! *** Dispatch to appropriate transport scheme
+new EFDC/Transport/calconc.f90:198:     if( ISQUICK == 1 )then
+new EFDC/Transport/calconc.f90:199:       ! *** QUICKEST scheme with ULTIMATE limiter
+new EFDC/Transport/calconc.f90:200:       call CALTRAN_QUICKEST( IACTIVEWC1(IW), IACTIVEWC2(IW), WCV(IW).VAL0, WCV(IW).VAL1, IW, IT, WCV(IW).WCLIMIT, ISKIP(IW) )
+new EFDC/Transport/calconc.f90:201:     else
+new EFDC/Transport/calconc.f90:202:       ! *** Original upwind scheme
+new EFDC/Transport/calconc.f90:203:       call CALTRAN( IACTIVEWC1(IW), IACTIVEWC2(IW), WCV(IW).VAL0, WCV(IW).VAL1, IW, IT, WCV(IW).WCLIMIT, ISKIP(IW) )
+new EFDC/Transport/calconc.f90:204:     endif
+new EFDC/Transport/calconc.f90:225:   ! *** Skip for QUICKEST scheme (limiter is built-in)
+new EFDC/Transport/calconc.f90:226:   !$OMP DO PRIVATE(IW,IT) SCHEDULE(STATIC,1)
+new EFDC/Transport/calconc.f90:227:   do IW = 1,NACTIVEWC
+new EFDC/Transport/calconc.f90:228:     if( ISKIP(IW) == 0 .AND. ISQUICK == 0 )then
+new EFDC/Transport/calconc.f90:229:       !$  IT = OMP_GET_THREAD_NUM() + 1
+new EFDC/Transport/calconc.f90:230:       call CALTRAN_AD( IACTIVEWC1(IW), IACTIVEWC2(IW), WCV(IW).VAL0, WCV(IW).VAL1, IW, IT )
+new EFDC/Transport/calconc.f90:231:     endif
+new EFDC/Transport/calconc.f90:248:   !$OMP DO PRIVATE(IW,K,LP,L,CDTMP) SCHEDULE(STATIC,1)
+new EFDC/Transport/calconc.f90:249:   do IW = 1,NACTIVEWC
+new EFDC/Transport/calconc.f90:250:     if( ISADAC(IACTIVEWC1(IW)) == 1 .AND. ISQUICK == 0 )then 
+new EFDC/Transport/calconc.f90:251:       ! *** APPLY THE ANTI-DIFFUSIVE ADVECTION CALCULATION TO STANDARD DONOR CELL SCHEME",명시 기준 dummy·unused field가 실제 parameter가 됨 및 input field 의미 변경에 해당. §4의 dummy 표기와 ISADAC만으로 upwind/MPDATA를 설명하는 무조건 서술은 ISQUICK 조건을 반영해야 하므로 UPDATE_REQUIRED.

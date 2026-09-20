@@ -1,0 +1,504 @@
+id,note,note_line,wiki_claim,old_source_evidence,new_source_evidence,triggering_change,changed_file,changed_hunk,semantic_delta,proposed_classification,confidence,exact_evidence,reason
+C1-1,models/EFDC/source-analysis/efdc_boundary_conditions.md,21,- `setbcs.f90:203-490` — initialization of BC mappings + face/momentum mask setup.,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/setbcs.f90:203-209; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/setbcs.f90:449-476,_staging/efdc-prescan/new/EFDC__setbcs.f90:203-209; _staging/efdc-prescan/new/EFDC__setbcs.f90:449-478,2-cell channel의 SUBD/SVBD 차단을 IINTPG==0 조건으로 제한하고 EDG PRINT를 debug 조건으로 제한한다.,EFDC/setbcs.f90,"@@ -446,34 +446,36 @@ SUBROUTINE SETBCS | citation∩old-hunk=446-479",2-cell channel의 SUBD/SVBD 차단을 IINTPG==0 조건으로 제한하고 EDG PRINT를 debug 조건으로 제한한다.,REVIEW_ONLY,high,"old:203:   ! *** New Mapping routines for MPI Domain Decomp
+old:204:   call Map_River
+old:205:   call Map_OpenBC_Pressure
+old:206:   call Map_OpenBC_Conc
+old:207:   call Map_Hydraulic_Structures
+old:208:   call Map_Withdrawal_Return
+old:209:   call Map_Jet_Plume
+old:449:   IU = 0
+old:450:   JU = 0
+old:451:   do L = 2,LA
+old:452:     I = IL(L)
+old:453:     J = JL(L)
+old:454:     LE = LEC(L)
+old:455:     LW = LWC(L)
+old:456:     LN = LNC(L)
+old:457:     LS = LSC(L)
+old:458:     
+old:459:     ! *** Two cell flow channel - West face
+old:460:     if( SUB(L) > 0.5 .and. SUB(LW) < 0.5 )then
+old:461:       if( SUB(LE) < 0.5 )then
+old:462:         SUBD(L) = 0.0
+old:463:         IU = IU + 1
+old:464:       endif
+old:465:     endif
+old:466:     
+old:467:     ! *** Two cell flow channel - South face
+old:468:     if( SVB(L) > 0.5 .and. SVB(LS) < 0.5 )then
+old:469:       if( SVB(LN) < 0.5 )then
+old:470:         SVBD(L) = 0.0
+old:471:         JU = JU + 1
+old:472:       endif
+old:473:     endif
+old:474: 
+old:475:   enddo
+old:476:   PRINT ""(' EDG Test: Number of West Faces: ',I6,', Number of South Faces:',I6 )"", IU, JU
+new:203:   ! *** New Mapping routines for MPI Domain Decomp
+new:204:   call Map_River
+new:205:   call Map_OpenBC_Pressure
+new:206:   call Map_OpenBC_Conc
+new:207:   call Map_Hydraulic_Structures
+new:208:   call Map_Withdrawal_Return
+new:209:   call Map_Jet_Plume
+new:449:   if( IINTPG == 0 )then
+new:450:     IU = 0
+new:451:     JU = 0
+new:452:     do L = 2,LA
+new:453:       I = IL(L)
+new:454:       J = JL(L)
+new:455:       LE = LEC(L)
+new:456:       LW = LWC(L)
+new:457:       LN = LNC(L)
+new:458:       LS = LSC(L)
+new:459:       
+new:460:       ! *** Two cell flow channel - West face
+new:461:       if( SUB(L) > 0.5 .and. SUB(LW) < 0.5 )then
+new:462:         if( SUB(LE) < 0.5 )then
+new:463:           SUBD(L) = 0.0
+new:464:           IU = IU + 1
+new:465:         endif
+new:466:       endif
+new:467:       
+new:468:       ! *** Two cell flow channel - South face
+new:469:       if( SVB(L) > 0.5 .and. SVB(LS) < 0.5 )then
+new:470:         if( SVB(LN) < 0.5 )then
+new:471:           SVBD(L) = 0.0
+new:472:           JU = JU + 1
+new:473:         endif
+new:474:       endif
+new:475:     
+new:476:     enddo
+new:477:     if( debug ) PRINT ""(' EDG Test: Number of West Faces: ',I6,', Number of South Faces:',I6 )"", IU, JU
+new:478:   endif",BC mapping 초기화와 face/momentum mask setup이라는 문장은 계속 참이다. mapping 호출과 mask 설정은 존속하며 이 문장은 2-cell 차단이 모든 IINTPG에서 수행된다고 주장하지 않는다. 조건 추가를 기록하되 이 행의 문장 수정 필요는 확인되지 않았다.
+C1-2,models/EFDC/source-analysis/efdc_ice.md,21,"- `Transport/mod_heat.f90:251-1490, 1095-1104, 641-753, 1322-1428, 1652-1674` — heat-balance + ice physics.",models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Transport/mod_heat.f90:405-420,_staging/efdc-prescan/new/EFDC__Transport__mod_heat.f90:405-418,"야간 전환(ICOUNT(ND)>0)에서 RADTOP(L,0) 초기화의 ND==1 제한을 제거하여 각 ND의 wet-cell 구간을 초기화한다.",EFDC/Transport/mod_heat.f90,"@@ -410,13 +410,11 @@ SUBROUTINE CALHEAT | citation∩old-hunk=410-422","야간 전환(ICOUNT(ND)>0)에서 RADTOP(L,0) 초기화의 ND==1 제한을 제거하여 각 ND의 wet-cell 구간을 초기화한다.",REVIEW_ONLY,high,"old:405:         do LP = 1,LLWET(K,ND)
+old:406:           L = LKWET(LP,K,ND)
+old:407:           RADBOT(L,K) = 0.
+old:408:           RADTOP(L,K) = 0.
+old:409:           RADNET(L,K) = 0.
+old:410:         enddo
+old:411:       enddo
+old:412:       
+old:413:       ! *** ZERO SURFACE RADIATION (ONLY ONCE PER ITERATION)
+old:414:       if( ND == 1 )then
+old:415:         do LP = LF,LL
+old:416:           L = LWET(LP)
+old:417:           RADTOP(L,0) = 0.
+old:418:         enddo
+old:419:       endif
+old:420:     else
+new:405:         do LP = 1,LLWET(K,ND)
+new:406:           L = LKWET(LP,K,ND)
+new:407:           RADBOT(L,K) = 0.
+new:408:           RADTOP(L,K) = 0.
+new:409:           RADNET(L,K) = 0.
+new:410:         enddo
+new:411:       enddo
+new:412:       
+new:413:       ! *** ZERO BED SURFACE RADIATION
+new:414:       do LP = LF,LL
+new:415:         L = LWET(LP)
+new:416:         RADTOP(L,0) = 0.
+new:417:       enddo
+new:418:     else",heat-balance + ice physics라는 설명과 ice 열교환 설명을 거짓으로 만들지 않는다. 범위 내부 초기화 알고리즘은 실제 변경됐으므로 내용 동일로 처리하지 않으며 문장 영향 없음으로 검토에 남긴다.
+C1-3,models/EFDC/source-analysis/efdc_ice.md,25,"- `calexp.f90:1091-1385`, `calexp2t.f90:1014-1405` — internal mode + waves.",models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp.f90:1091-1097; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp.f90:1206-1208; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp.f90:1225-1227; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp.f90:1262-1264; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp.f90:1374-1385,_staging/efdc-prescan/new/EFDC__calexp.f90:1091-1097; _staging/efdc-prescan/new/EFDC__calexp.f90:1206-1223; _staging/efdc-prescan/new/EFDC__calexp.f90:1317-1328,표준 sigma 계산이 IINTPG==0 분기에서 else로 바뀌고 IINTPG==1 Jacobian 및 ==2 finite-volume 부력전단 구현이 삭제된다. 주석 처리 SUBD/SVBD 곱도 삭제된다.,EFDC/calexp.f90,"@@ -1203,9 +1203,8 @@ SUBROUTINE CALEXP | citation∩old-hunk=1203-1211; @@ -1215,67 +1214,11 @@ SUBROUTINE CALEXP | citation∩old-hunk=1215-1281",표준 sigma 계산이 IINTPG==0 분기에서 else로 바뀌고 IINTPG==1 Jacobian 및 ==2 finite-volume 부력전단 구현이 삭제된다. 주석 처리 SUBD/SVBD 곱도 삭제된다.,REVIEW_ONLY,high,"old:1091:       do K = 1,KC  
+old:1092:         do LP = LF,LL
+old:1093:           L = LWVCELL(LP)
+old:1094:           if( LKSZ(L,K) ) CYCLE  
+old:1095:           FX(L,K) = FX(L,K) + SUB3D(L,K)*WVFACT*SAAX(L)*FXWAVE(L,K)
+old:1096:           FY(L,K) = FY(L,K) + SVB3D(L,K)*WVFACT*SAAY(L)*FYWAVE(L,K)
+old:1097:         enddo
+old:1206: 
+old:1207:     elseif( IINTPG == 0 )then  
+old:1208:       ! *** IINTPG = 0  
+old:1225:     elseif( IINTPG == 1 )then
+old:1226:       ! *** JACOBIAN
+old:1227:       !$OMP SINGLE
+old:1262:       endif
+old:1263:       !$OMP END SINGLE
+old:1264:         
+old:1374:   ! *** ADD WIND SHEAR TO THE KC/KS INTERFACE
+old:1375:   if( (ISTL == 2 .and. NWSER > 0) .or. (ISTL == 2 .and. iGOTM_Test > 0 ) )then
+old:1376:     !$OMP DO PRIVATE(ND,LF,LL,LP,L)
+old:1377:     do ND = 1,NDM  
+old:1378:       LF = (ND-1)*LDMWET+1  
+old:1379:       LL = min(LF+LDMWET-1,LAWET)
+old:1380: 
+old:1381:       do LP = LF,LL
+old:1382:         L = LWET(LP)  
+old:1383:         DU(L,KS) = DU(L,KS) - CDZUU(L,KS)*TSX(L)
+old:1384:         DV(L,KS) = DV(L,KS) - CDZUV(L,KS)*TSY(L)
+old:1385:       enddo
+new:1091:       do K = 1,KC  
+new:1092:         do LP = LF,LL
+new:1093:           L = LWVCELL(LP)
+new:1094:           if( LKSZ(L,K) ) CYCLE  
+new:1095:           FX(L,K) = FX(L,K) + SUB3D(L,K)*WVFACT*SAAX(L)*FXWAVE(L,K)
+new:1096:           FY(L,K) = FY(L,K) + SVB3D(L,K)*WVFACT*SAAY(L)*FYWAVE(L,K)
+new:1097:         enddo
+new:1206:     else
+new:1207:       ! *** STANDARD-SIGMA BOUYANCY SHEARS
+new:1208:       !$OMP DO PRIVATE(ND,LF,LL,K,LP,L,LS,LW) 
+new:1209:       do ND = 1,NDM  
+new:1210:         do K = 1,KS  
+new:1211:         do LP = 1,LLWET(K,ND)
+new:1212:           L  = LKWET(LP,K,ND)  
+new:1213:             LS = LSC(L)
+new:1214:             LW = LWC(L)
+new:1215:             FBBX(L,K) = ROLD*FBBX(L,K) + RNEW*SBX(L)*GP*HU(L)*( HU(L)*( (B(L,K+1)-B(LW,K+1))*DZCK(K+1) + (B(L,K)-B(LW,K))*DZCK(K) ) - (B(L,K+1)-B(L,K)+B(LW,K+1)-B(LW,K))*(BELV(L)-BELV(LW)+Z(L,K)*(HP(L)-HP(LW))) )
+new:1216:             FBBY(L,K) = ROLD*FBBY(L,K) + RNEW*SBY(L)*GP*HV(L)*( HV(L)*( (B(L,K+1)-B(LS,K+1))*DZCK(K+1) + (B(L,K)-B(LS,K))*DZCK(K) ) - (B(L,K+1)-B(L,K)+B(LS,K+1)-B(LS,K))*(BELV(L)-BELV(LS)+Z(L,K)*(HP(L)-HP(LS))) )
+new:1217:           enddo
+new:1218:         enddo
+new:1219:       enddo
+new:1220:       !$OMP END DO  
+new:1221: 
+new:1222:     endif
+new:1223: 
+new:1317:   ! *** ADD WIND SHEAR TO THE KC/KS INTERFACE
+new:1318:   if( (ISTL == 2 .and. NWSER > 0) .or. (ISTL == 2 .and. iGOTM_Test > 0 ) )then
+new:1319:     !$OMP DO PRIVATE(ND,LF,LL,LP,L)
+new:1320:     do ND = 1,NDM  
+new:1321:       LF = (ND-1)*LDMWET+1  
+new:1322:       LL = min(LF+LDMWET-1,LAWET)
+new:1323: 
+new:1324:       do LP = LF,LL
+new:1325:         L = LWET(LP)  
+new:1326:         DU(L,KS) = DU(L,KS) - CDZUU(L,KS)*TSX(L)
+new:1327:         DV(L,KS) = DV(L,KS) - CDZUV(L,KS)*TSY(L)
+new:1328:       enddo",internal mode + waves라는 기능 설명은 계속 참이다. FXWAVE/FYWAVE 가산과 TSX/TSY 내부모드 전단 결합도 유지된다. 이 행은 삭제된 수치기법의 지원이나 IINTPG 선택지를 설명하지 않으므로 다른 알고리즘 주장으로 판정을 전파하지 않는다.
+C1-4,models/EFDC/source-analysis/efdc_ice.md,25,"- `calexp.f90:1091-1385`, `calexp2t.f90:1014-1405` — internal mode + waves.",models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp2t.f90:1011-1019; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp2t.f90:1131-1132; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp2t.f90:1144-1149; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp2t.f90:1162-1163; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp2t.f90:1175-1180; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp2t.f90:1204-1205; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp2t.f90:1216-1217; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp2t.f90:1277-1278; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp2t.f90:1295-1303; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp2t.f90:1400-1405,_staging/efdc-prescan/new/EFDC__calexp2t.f90:1021-1028; _staging/efdc-prescan/new/EFDC__calexp2t.f90:1140-1141; _staging/efdc-prescan/new/EFDC__calexp2t.f90:1153-1158; _staging/efdc-prescan/new/EFDC__calexp2t.f90:1171-1172; _staging/efdc-prescan/new/EFDC__calexp2t.f90:1184-1189; _staging/efdc-prescan/new/EFDC__calexp2t.f90:1213-1214; _staging/efdc-prescan/new/EFDC__calexp2t.f90:1225-1226; _staging/efdc-prescan/new/EFDC__calexp2t.f90:1286-1305; _staging/efdc-prescan/new/EFDC__calexp2t.f90:1400-1405,수로 momentum sink의 DZC 위치를 LCHNU/LCHNV/LHOST로 수정하고 host 누적·회전 인덱스를 수정한다. FY의 X source/sink를 Y 성분으로 수정한다. IINTPG==0을 else로 바꾸고 ==1/2 pause/stop 분기를 제거한다. 1198의 L 공백은 의미 동일. wave LF/LL 분할 변경은 인용 시작 전이며 첫 교집합 1014-1016은 context이다.,EFDC/calexp2t.f90,"@@ -1008,9 +1018,8 @@ SUBROUTINE CALEXP2T | citation∩old-hunk=1014-1016; @@ -1128,8 +1137,8 @@ SUBROUTINE CALEXP2T | citation∩old-hunk=1128-1135; @@ -1141,12 +1150,12 @@ SUBROUTINE CALEXP2T | citation∩old-hunk=1141-1152; @@ -1159,8 +1168,8 @@ SUBROUTINE CALEXP2T | citation∩old-hunk=1159-1166; @@ -1172,12 +1181,12 @@ SUBROUTINE CALEXP2T | citation∩old-hunk=1172-1183; @@ -1195,14 +1204,14 @@ SUBROUTINE CALEXP2T | citation∩old-hunk=1195-1208; @@ -1213,8 +1222,8 @@ SUBROUTINE CALEXP2T | citation∩old-hunk=1213-1220; @@ -1274,8 +1283,8 @@ SUBROUTINE CALEXP2T | citation∩old-hunk=1274-1281; @@ -1292,15 +1301,6 @@ SUBROUTINE CALEXP2T | citation∩old-hunk=1292-1306",수로 momentum sink의 DZC 위치를 LCHNU/LCHNV/LHOST로 수정하고 host 누적·회전 인덱스를 수정한다. FY의 X source/sink를 Y 성분으로 수정한다. IINTPG==0을 else로 바꾸고 ==1/2 pause/stop 분기를 제거한다. 1198의 L 공백은 의미 동일. wave LF/LL 분할 변경은 인용 시작 전이며 첫 교집합 1014-1016은 context이다.,REVIEW_ONLY,high,"old:1011:       LF = (ND-1)*NWVCELLS+1  
+old:1012:       LL = min(LF+NWVCELLS-1,NWVCELLS)
+old:1013:       
+old:1014:       do K = 1,KC
+old:1015:         do LP = LF,LL
+old:1016:           L = LWVCELL(LP)  
+old:1017:           if( LKSZ(L,K) ) CYCLE  
+old:1018:           FX(L,K) = FX(L,K)+SUB3D(L,K)*WVFACT*SAAX(L)*FXWAVE(L,K)
+old:1019:           FY(L,K) = FY(L,K)+SVB3D(L,K)*WVFACT*SAAY(L)*FYWAVE(L,K)
+old:1131:               QMCSINKX(LCHNU,K) = QMCSINKX(LCHNU,K)-0.5*DZC(L,K)*QCHANU(NMD)*(U(LCHNU,K)+U(LCHNU+1,K))  
+old:1132:               QMCSINKY(LCHNU,K) = QMCSINKY(LCHNU,K)-0.5*DZC(L,K)*QCHANU(NMD)*(V(LCHNU,K)+V(LNC(LCHNU),K))  
+old:1144:               QMCSINKX(LHOST,K) = QMCSINKX(LHOST,K)+0.5*DZC(L,K)*QCHANU(NMD)*(U(LHOST,K)+U(LHOST+1,K))  
+old:1145:               QMCSINKY(LHOST,K) = QMCSINKY(LCHNU,K)+0.5*DZC(L,K)*QCHANU(NMD)*(V(LHOST,K)+V(LNC(LHOST),K))  
+old:1146:             enddo  
+old:1147:             do K = 1,KC  
+old:1148:               TMPVEC1(K) = CUE(LHOST)*QMCSINKX(LHOST,K)+CVE(LHOST)*QMCSINKY(LHOST,K)  
+old:1149:               TMPVEC2(K) = CUN(LHOST)*QMCSINKX(LCHNU,K)+CVN(LHOST)*QMCSINKY(LHOST,K)  
+old:1162:               QMCSINKX(LCHNV,K) = QMCSINKX(LCHNV,K)-0.5*DZC(L,K)*QCHANV(NMD)*(U(LCHNV,K)+U(LCHNV+1,K))  
+old:1163:               QMCSINKY(LCHNV,K) = QMCSINKY(LCHNV,K)-0.5*DZC(L,K)*QCHANV(NMD)*(V(LCHNV,K)+V(LNC(LCHNV),K))  
+old:1175:               QMCSINKX(LHOST,K) = QMCSINKX(LHOST,K)+0.5*DZC(L,K)*QCHANV(NMD)*(U(LHOST,K)+U(LHOST+1,K))  
+old:1176:               QMCSINKY(LHOST,K) = QMCSINKY(LCHNV,K)+0.5*DZC(L,K)*QCHANV(NMD)*(V(LHOST,K)+V(LNC(LHOST),K))  
+old:1177:             enddo  
+old:1178:             do K = 1,KC  
+old:1179:               TMPVEC1(K) = CUE(LHOST)*QMCSINKX(LHOST,K)+CVE(LHOST)*QMCSINKY(LHOST,K)  
+old:1180:               TMPVEC2(K) = CUN(LHOST)*QMCSINKX(LCHNU,K)+CVN(LHOST)*QMCSINKY(LHOST,K)  
+old:1204:             FY(L,K)  = FY(L,K)  - SVB3D(L ,K)*QMCSOURX(L,K)/TMPVAL  
+old:1205:             FY(LN,K) = FY(LN,K) - SVB3D(LN,K)*QMCSOURX(L,K)/TMPVAL  
+old:1216:             FY(L,K)  = FY(L,K)  - SVB3D(L,K)*QMCSINKX(L,K)/TMPVAL  
+old:1217:             FY(LN,K) = FY(LN,K) - SVB3D(LN,K)*QMCSINKX(L,K)/TMPVAL  
+old:1277:     elseif( IINTPG == 0 )then  
+old:1278:       ! *** IINTPG = 0  
+old:1295: 
+old:1296:     elseif( IINTPG == 1. )then
+old:1297:       ! *** JACOBIAN
+old:1298:       pause    ! *** delme
+old:1299:       stop
+old:1300:     elseif( IINTPG == 2 )then  
+old:1301:       ! *** FINITE VOLUME  
+old:1302:       pause   ! delme
+old:1303:       stop
+old:1400:       ! *** ADD WIND SHEAR TO THE KC/KS INTERFACE
+old:1401:       if( NWSER > 0 )then
+old:1402:         do LP = 1,LLWET(KS,ND)
+old:1403:           L = LKWET(LP,KS,ND) 
+old:1404:           DU(L,KS) = DU(L,KS) - CDZUU(L,KS)*TSX(L)
+old:1405:           DV(L,KS) = DV(L,KS) - CDZUV(L,KS)*TSY(L)
+new:1021:       LF = 1 + (ND-1)*LDMW  
+new:1022:       LL = min(LF + LDMW-1,NWVCELLS)
+new:1023:       do K = 1,KC
+new:1024:         do LP = LF,LL
+new:1025:           L = LWVCELL(LP)  
+new:1026:           if( LKSZ(L,K) ) CYCLE  
+new:1027:           FX(L,K) = FX(L,K)+SUB3D(L,K)*WVFACT*SAAX(L)*FXWAVE(L,K)
+new:1028:           FY(L,K) = FY(L,K)+SVB3D(L,K)*WVFACT*SAAY(L)*FYWAVE(L,K)
+new:1140:               QMCSINKX(LCHNU,K) = QMCSINKX(LCHNU,K)-0.5*DZC(LCHNU,K)*QCHANU(NMD)*(U(LCHNU,K)+U(LCHNU+1,K))  
+new:1141:               QMCSINKY(LCHNU,K) = QMCSINKY(LCHNU,K)-0.5*DZC(LCHNU,K)*QCHANU(NMD)*(V(LCHNU,K)+V(LNC(LCHNU),K))  
+new:1153:               QMCSINKX(LHOST,K) = QMCSINKX(LHOST,K)+0.5*DZC(LHOST,K)*QCHANU(NMD)*(U(LHOST,K)+U(LHOST+1,K))  
+new:1154:               QMCSINKY(LHOST,K) = QMCSINKY(LHOST,K)+0.5*DZC(LHOST,K)*QCHANU(NMD)*(V(LHOST,K)+V(LNC(LHOST),K))  
+new:1155:             enddo  
+new:1156:             do K = 1,KC  
+new:1157:               TMPVEC1(K) = CUE(LHOST)*QMCSINKX(LHOST,K)+CVE(LHOST)*QMCSINKY(LHOST,K)  
+new:1158:               TMPVEC2(K) = CUN(LHOST)*QMCSINKX(LHOST,K)+CVN(LHOST)*QMCSINKY(LHOST,K)  
+new:1171:               QMCSINKX(LCHNV,K) = QMCSINKX(LCHNV,K)-0.5*DZC(LCHNV,K)*QCHANV(NMD)*(U(LCHNV,K)+U(LCHNV+1,K))  
+new:1172:               QMCSINKY(LCHNV,K) = QMCSINKY(LCHNV,K)-0.5*DZC(LCHNV,K)*QCHANV(NMD)*(V(LCHNV,K)+V(LNC(LCHNV),K))  
+new:1184:               QMCSINKX(LHOST,K) = QMCSINKX(LHOST,K)+0.5*DZC(LHOST,K)*QCHANV(NMD)*(U(LHOST,K)+U(LHOST+1,K))  
+new:1185:               QMCSINKY(LHOST,K) = QMCSINKY(LHOST,K)+0.5*DZC(LHOST,K)*QCHANV(NMD)*(V(LHOST,K)+V(LNC(LHOST),K))  
+new:1186:             enddo  
+new:1187:             do K = 1,KC  
+new:1188:               TMPVEC1(K) = CUE(LHOST)*QMCSINKX(LHOST,K)+CVE(LHOST)*QMCSINKY(LHOST,K)  
+new:1189:               TMPVEC2(K) = CUN(LHOST)*QMCSINKX(LHOST,K)+CVN(LHOST)*QMCSINKY(LHOST,K)  
+new:1213:             FY(L,K)  = FY(L,K)  - SVB3D(L ,K)*QMCSOURY(L,K)/TMPVAL  
+new:1214:             FY(LN,K) = FY(LN,K) - SVB3D(LN,K)*QMCSOURy(L,K)/TMPVAL  
+new:1225:             FY(L,K)  = FY(L,K)  - SVB3D(L, K)*QMCSINKY(L,K)/TMPVAL  
+new:1226:             FY(LN,K) = FY(LN,K) - SVB3D(LN,K)*QMCSINKY(L,K)/TMPVAL  
+new:1286:     else
+new:1287:       ! *** STANDARD-SIGMA BOUYANCY SHEARS
+new:1288:       !$OMP PARALLEL DO PRIVATE(ND,LF,LL,K,LP,L,LS,LW) 
+new:1289:       do ND = 1,NDM  
+new:1290:         LF = (ND-1)*LDMWET+1  
+new:1291:         LL = min(LF+LDMWET-1,LAWET)
+new:1292:       
+new:1293:         do K = 1,KS  
+new:1294:           do LP = LF,LL
+new:1295:             L = LWET(LP)  
+new:1296:             LS = LSC(L)  
+new:1297:             LW = LWC(L)
+new:1298:             FBBX(L,K) = SBX(L)*GP*HU(L)*(HU(L)*( (B(L,K+1)-B(LW,K+1))*DZCK(K+1) + (B(L,K)-B(LW,K))*DZCK(K) ) - (B(L,K+1)-B(L,K)+B(LW,K+1)-B(LW,K))*(BELV(L)-BELV(LW)+Z(L,K)*(HP(L)-HP(LW))) )  
+new:1299:             FBBY(L,K) = SBY(L)*GP*HV(L)*(HV(L)*( (B(L,K+1)-B(LS,K+1))*DZCK(K+1) + (B(L,K)-B(LS,K))*DZCK(K) ) - (B(L,K+1)-B(L,K)+B(LS,K+1)-B(LS,K))*(BELV(L)-BELV(LS)+Z(L,K)*(HP(L)-HP(LS))) )  
+new:1300:           enddo  
+new:1301:         enddo  
+new:1302:       enddo
+new:1303:       !$OMP END PARALLEL DO
+new:1304:       
+new:1305:     endif  
+new:1400:       ! *** ADD WIND SHEAR TO THE KC/KS INTERFACE
+new:1401:       if( NWSER > 0 )then
+new:1402:         do LP = 1,LLWET(KS,ND)
+new:1403:           L = LKWET(LP,KS,ND) 
+new:1404:           DU(L,KS) = DU(L,KS) - CDZUU(L,KS)*TSX(L)
+new:1405:           DV(L,KS) = DV(L,KS) - CDZUV(L,KS)*TSY(L)","internal mode + waves 설명, wave force 가산, TSX/TSY 결합이 유지된다. 인용 내부의 수로 수식 및 분기 변경은 사실이나 이 행은 해당 수식이나 IINTPG==1/2 동작을 단언하지 않는다. 넓은 범위라는 이유가 아니라 문장의 기능 설명이 유지되어 REVIEW_ONLY이다."
+C1-5,models/EFDC/source-analysis/efdc_ice.md,28,- `Waves/mod_windwave.f90:191-826` — wave routines (no ice).,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Waves/mod_windwave.f90:270-278; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Waves/mod_windwave.f90:688-699,_staging/efdc-prescan/new/EFDC__Waves__mod_windwave.f90:272-281; _staging/efdc-prescan/new/EFDC__Waves__mod_windwave.f90:691-708,무풍 분기에 KHP=0을 추가하고 ZEROWAVE에서 HEISIG/FREQ/LENGTH/UDEL/PERIOD/KHP 초기화를 추가한다. old 275|276 및 693|694 사이 삽입이다.,EFDC/Waves/mod_windwave.f90,"@@ -273,6 +275,7 @@ SUBROUTINE WINDWAVECAL | citation∩old-hunk=273-278; @@ -691,6 +694,12 @@ SUBROUTINE ZEROWAVE | citation∩old-hunk=691-696",무풍 분기에 KHP=0을 추가하고 ZEROWAVE에서 HEISIG/FREQ/LENGTH/UDEL/PERIOD/KHP 초기화를 추가한다. old 275|276 및 693|694 사이 삽입이다.,REVIEW_ONLY,high,"old:270:           WV(L).DIR    = 0.0
+old:271:           WV(L).FREQ   = 1.0
+old:272:           WV(L).LENGTH = 0.0
+old:273:           WV(L).UDEL   = 0.0
+old:274:           WV(L).PERIOD = 0.0
+old:275:           WV(L).K      = 0.01
+old:276:         endif
+old:277:       endif  ! *** END OF VALID WAVE CELL
+old:278: 
+old:688:     QQWV1(L) = 1.E-12  ! *** BED TURBULENT INTENSITY DUE TO WAVES ONLY
+old:689:     QQWV2(L) = 0.      ! *** WATER COLUMN TURBULENT INTENSITY DUE TO WAVES
+old:690:     QQWV3(L) = 1.E-12  ! *** WATER COLUMN TURBULENT INTENSITY DUE TO WAVES MODIFIED FOR NON-COHESIVE MOVING BED
+old:691:     WV(L).HEIGHT = 0.
+old:692:     WV(L).K = 0.
+old:693:     WV(L).DIR = 0.
+old:694:   enddo
+old:695:   do K = 1,KC
+old:696:     do L = 1,LC
+old:697:       WVHUU(L,K) = 0.
+old:698:       WVHVV(L,K) = 0.
+old:699:       WVHUV(L,K) = 0.
+new:272:           WV(L).DIR    = 0.0
+new:273:           WV(L).FREQ   = 1.0
+new:274:           WV(L).LENGTH = 0.0
+new:275:           WV(L).UDEL   = 0.0
+new:276:           WV(L).PERIOD = 0.0
+new:277:           WV(L).K      = 0.01
+new:278:           WV(L).KHP    = 0.0
+new:279:         endif
+new:280:       endif  ! *** END OF VALID WAVE CELL
+new:281: 
+new:691:     QQWV1(L) = 1.E-12  ! *** BED TURBULENT INTENSITY DUE TO WAVES ONLY
+new:692:     QQWV2(L) = 0.      ! *** WATER COLUMN TURBULENT INTENSITY DUE TO WAVES
+new:693:     QQWV3(L) = 1.E-12  ! *** WATER COLUMN TURBULENT INTENSITY DUE TO WAVES MODIFIED FOR NON-COHESIVE MOVING BED
+new:694:     WV(L).HEIGHT = 0.
+new:695:     WV(L).K = 0.
+new:696:     WV(L).DIR = 0.
+new:697:     WV(L).HEISIG = 0.0
+new:698:     WV(L).FREQ   = 0.0
+new:699:     WV(L).LENGTH = 0.0
+new:700:     WV(L).UDEL   = 0.0
+new:701:     WV(L).PERIOD = 0.0
+new:702:     WV(L).KHP    = 0.0
+new:703:   enddo
+new:704:   do K = 1,KC
+new:705:     do L = 1,LC
+new:706:       WVHUU(L,K) = 0.
+new:707:       WVHVV(L,K) = 0.
+new:708:       WVHUV(L,K) = 0.",wave routines (no ice)는 유지된다. 추가 코드는 wave 상태 초기화이며 ICECELL/ISICE 조건을 도입하지 않는다. 해당 파일의 실행 코드에 두 심볼이 없는 것도 확인했다. 범위 밖 WINDWAVETUR의 ISWAVE==4 처리 변경을 이 문장에 전파하지 않는다.
+C1-6,models/EFDC/source-analysis/efdc_ice.md,29,- `varalloc.f90:1386-1400` — ice arrays.,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/varalloc.f90:1386-1400,_staging/efdc-prescan/new/EFDC__varalloc.f90:1386-1399,ISICE>0 allocation 블록에서 RICETHKT(NISER)만 삭제한다.,EFDC/varalloc.f90,"@@ -1395,7 +1395,6 @@ SUBROUTINE VARALLOC | citation∩old-hunk=1395-1400",ISICE>0 allocation 블록에서 RICETHKT(NISER)만 삭제한다.,REVIEW_ONLY,high,"old:1386:   ! *** ICE
+old:1387:   if( ISICE > 0 )then
+old:1388:     call AllocateDSI( MITLAST,     NISER,   0)           ! *** ISICE = 1  INPUT SERIES LAST INDEX FOR SERIES
+old:1389:     call AllocateDSI( FRAZILICE,   LCM,     KCM,   0.0)  ! *** ISICE = 4 FRAZIL ICE IN EACH CELL AND LAYER (M)
+old:1390:     call AllocateDSI( FRAZILICE1,  LCM,     KCM,   0.0)  ! *** ISICE = 4 FRAZIL ICE IN EACH CELL AND LAYER FOR PREVIOUS TIME STEP (M)
+old:1391:     call AllocateDSI( ICECOVER,    LCM,     0.0)         ! *** ISICE>0 FRACTION OF ICE COVER FOR EACH CELL (M)
+old:1392:     call AllocateDSI( ICERATE,     LCM,     0.0)         ! *** ISICE>2 WATER FLOW RATE TO/FROM WATER COLUMN (M3/S)
+old:1393:     call AllocateDSI( ICETHICK,    LCM,     0.0)         ! *** ISICE>0 ICE THICKNESS FOR EACH CELL (M)
+old:1394:     call AllocateDSI( ICETHICK1,   LCM,     0.0)         ! *** ISICE>0 ICE THICKNESS FOR EACH CELL FOR PREVIOUS TIME STEP (M)
+old:1395:     call AllocateDSI( ICETEMP,     LCM,     0.0)         ! *** ISICE>0 ICE TEMPERATURE OF EACH CELL (M)
+old:1396:     call AllocateDSI( ICEVOL,      LCM,     0.0)         ! *** ISICE>0 INCREMENTAL WATER VOLUMES FOR ICE FORMATION/MELT (M3)
+old:1397:     call AllocateDSI( RICECOVT,    NISER,   0.0)         ! *** ISICE = 1  INPUT ICE COVER AT CURRENT TIME
+old:1398:     call AllocateDSI( RICETHKT,    NISER,   0.0)         ! *** ISICE = 1  INPUT ICE THICKNESS AT CURRENT TIME
+old:1399:   endif
+old:1400:   call AllocateDSI( ICECELL,   LCM,  .false.)            ! *** ISICE>0  PERFORM ICE COMPUTATIONS
+new:1386:   ! *** ICE
+new:1387:   if( ISICE > 0 )then
+new:1388:     call AllocateDSI( MITLAST,     NISER,   0)           ! *** ISICE = 1  INPUT SERIES LAST INDEX FOR SERIES
+new:1389:     call AllocateDSI( FRAZILICE,   LCM,     KCM,   0.0)  ! *** ISICE = 4 FRAZIL ICE IN EACH CELL AND LAYER (M)
+new:1390:     call AllocateDSI( FRAZILICE1,  LCM,     KCM,   0.0)  ! *** ISICE = 4 FRAZIL ICE IN EACH CELL AND LAYER FOR PREVIOUS TIME STEP (M)
+new:1391:     call AllocateDSI( ICECOVER,    LCM,     0.0)         ! *** ISICE>0 FRACTION OF ICE COVER FOR EACH CELL (M)
+new:1392:     call AllocateDSI( ICERATE,     LCM,     0.0)         ! *** ISICE>2 WATER FLOW RATE TO/FROM WATER COLUMN (M3/S)
+new:1393:     call AllocateDSI( ICETHICK,    LCM,     0.0)         ! *** ISICE>0 ICE THICKNESS FOR EACH CELL (M)
+new:1394:     call AllocateDSI( ICETHICK1,   LCM,     0.0)         ! *** ISICE>0 ICE THICKNESS FOR EACH CELL FOR PREVIOUS TIME STEP (M)
+new:1395:     call AllocateDSI( ICETEMP,     LCM,     0.0)         ! *** ISICE>0 ICE TEMPERATURE OF EACH CELL (M)
+new:1396:     call AllocateDSI( ICEVOL,      LCM,     0.0)         ! *** ISICE>0 INCREMENTAL WATER VOLUMES FOR ICE FORMATION/MELT (M3)
+new:1397:     call AllocateDSI( RICECOVT,    NISER,   0.0)         ! *** ISICE = 1  INPUT ICE COVER AT CURRENT TIME
+new:1398:   endif
+new:1399:   call AllocateDSI( ICECELL,   LCM,  .false.)            ! *** ISICE>0  PERFORM ICE COMPUTATIONS",ice arrays라는 설명은 여전히 참이며 이 행은 RICETHKT가 할당된다고 개별 단언하지 않는다. 배열 집합의 일부가 삭제되어 전체 범위 내용 동일은 아니지만 ice allocation 역할은 유지된다.
+C1-7,models/EFDC/source-analysis/efdc_ice.md,108,"Wave forcing added to momentum via `FXWAVE/FYWAVE` (`calexp.f90:1091-1097`, `calexp2t.f90:1014-1019`).",models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calexp2t.f90:1014-1019,_staging/efdc-prescan/new/EFDC__calexp2t.f90:1023-1028,인용 6줄은 old 1014-1019 → new 1023-1028로 완전 동일하다. hunk 교집합 1014-1016은 context이며 LF/LL 계산 변경은 old 1011-1013에 있다.,EFDC/calexp2t.f90,"@@ -1008,9 +1018,8 @@ SUBROUTINE CALEXP2T | citation∩old-hunk=1014-1016",인용 6줄은 old 1014-1019 → new 1023-1028로 완전 동일하다. hunk 교집합 1014-1016은 context이며 LF/LL 계산 변경은 old 1011-1013에 있다.,NO_ACTION,high,"old:1014:       do K = 1,KC
+old:1015:         do LP = LF,LL
+old:1016:           L = LWVCELL(LP)  
+old:1017:           if( LKSZ(L,K) ) CYCLE  
+old:1018:           FX(L,K) = FX(L,K)+SUB3D(L,K)*WVFACT*SAAX(L)*FXWAVE(L,K)
+old:1019:           FY(L,K) = FY(L,K)+SVB3D(L,K)*WVFACT*SAAY(L)*FYWAVE(L,K)
+new:1023:       do K = 1,KC
+new:1024:         do LP = LF,LL
+new:1025:           L = LWVCELL(LP)  
+new:1026:           if( LKSZ(L,K) ) CYCLE  
+new:1027:           FX(L,K) = FX(L,K)+SUB3D(L,K)*WVFACT*SAAX(L)*FXWAVE(L,K)
+new:1028:           FY(L,K) = FY(L,K)+SVB3D(L,K)*WVFACT*SAAY(L)*FYWAVE(L,K)",FX/FY에 FXWAVE/FYWAVE를 가산하는 식과 문장의 의미가 동일하다. LDMW 기반 병렬 분할 변경도 이 가산 관계를 바꾸지 않는다. 내용·의미 동일성을 확인했으므로 사용자 NO_ACTION 기준을 적용한다. 줄 번호 보정은 별도 migration 단계이다.
+C1-8,models/EFDC/source-analysis/efdc_ice.md,133,"Allocated arrays: `ICECOVER, ICETHICK, ICETEMP, ICEVOL, ICERATE`, frazil arrays (`varalloc.f90:1386-1400`).",models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/varalloc.f90:1386-1400,_staging/efdc-prescan/new/EFDC__varalloc.f90:1386-1399,RICETHKT allocation 삭제는 C1-6과 동일한 실제 변경이나 이 행의 배열 목록을 독립 대조했다.,EFDC/varalloc.f90,"@@ -1395,7 +1395,6 @@ SUBROUTINE VARALLOC | citation∩old-hunk=1395-1400",RICETHKT allocation 삭제는 C1-6과 동일한 실제 변경이나 이 행의 배열 목록을 독립 대조했다.,REVIEW_ONLY,high,"old:1386:   ! *** ICE
+old:1387:   if( ISICE > 0 )then
+old:1388:     call AllocateDSI( MITLAST,     NISER,   0)           ! *** ISICE = 1  INPUT SERIES LAST INDEX FOR SERIES
+old:1389:     call AllocateDSI( FRAZILICE,   LCM,     KCM,   0.0)  ! *** ISICE = 4 FRAZIL ICE IN EACH CELL AND LAYER (M)
+old:1390:     call AllocateDSI( FRAZILICE1,  LCM,     KCM,   0.0)  ! *** ISICE = 4 FRAZIL ICE IN EACH CELL AND LAYER FOR PREVIOUS TIME STEP (M)
+old:1391:     call AllocateDSI( ICECOVER,    LCM,     0.0)         ! *** ISICE>0 FRACTION OF ICE COVER FOR EACH CELL (M)
+old:1392:     call AllocateDSI( ICERATE,     LCM,     0.0)         ! *** ISICE>2 WATER FLOW RATE TO/FROM WATER COLUMN (M3/S)
+old:1393:     call AllocateDSI( ICETHICK,    LCM,     0.0)         ! *** ISICE>0 ICE THICKNESS FOR EACH CELL (M)
+old:1394:     call AllocateDSI( ICETHICK1,   LCM,     0.0)         ! *** ISICE>0 ICE THICKNESS FOR EACH CELL FOR PREVIOUS TIME STEP (M)
+old:1395:     call AllocateDSI( ICETEMP,     LCM,     0.0)         ! *** ISICE>0 ICE TEMPERATURE OF EACH CELL (M)
+old:1396:     call AllocateDSI( ICEVOL,      LCM,     0.0)         ! *** ISICE>0 INCREMENTAL WATER VOLUMES FOR ICE FORMATION/MELT (M3)
+old:1397:     call AllocateDSI( RICECOVT,    NISER,   0.0)         ! *** ISICE = 1  INPUT ICE COVER AT CURRENT TIME
+old:1398:     call AllocateDSI( RICETHKT,    NISER,   0.0)         ! *** ISICE = 1  INPUT ICE THICKNESS AT CURRENT TIME
+old:1399:   endif
+old:1400:   call AllocateDSI( ICECELL,   LCM,  .false.)            ! *** ISICE>0  PERFORM ICE COMPUTATIONS
+new:1386:   ! *** ICE
+new:1387:   if( ISICE > 0 )then
+new:1388:     call AllocateDSI( MITLAST,     NISER,   0)           ! *** ISICE = 1  INPUT SERIES LAST INDEX FOR SERIES
+new:1389:     call AllocateDSI( FRAZILICE,   LCM,     KCM,   0.0)  ! *** ISICE = 4 FRAZIL ICE IN EACH CELL AND LAYER (M)
+new:1390:     call AllocateDSI( FRAZILICE1,  LCM,     KCM,   0.0)  ! *** ISICE = 4 FRAZIL ICE IN EACH CELL AND LAYER FOR PREVIOUS TIME STEP (M)
+new:1391:     call AllocateDSI( ICECOVER,    LCM,     0.0)         ! *** ISICE>0 FRACTION OF ICE COVER FOR EACH CELL (M)
+new:1392:     call AllocateDSI( ICERATE,     LCM,     0.0)         ! *** ISICE>2 WATER FLOW RATE TO/FROM WATER COLUMN (M3/S)
+new:1393:     call AllocateDSI( ICETHICK,    LCM,     0.0)         ! *** ISICE>0 ICE THICKNESS FOR EACH CELL (M)
+new:1394:     call AllocateDSI( ICETHICK1,   LCM,     0.0)         ! *** ISICE>0 ICE THICKNESS FOR EACH CELL FOR PREVIOUS TIME STEP (M)
+new:1395:     call AllocateDSI( ICETEMP,     LCM,     0.0)         ! *** ISICE>0 ICE TEMPERATURE OF EACH CELL (M)
+new:1396:     call AllocateDSI( ICEVOL,      LCM,     0.0)         ! *** ISICE>0 INCREMENTAL WATER VOLUMES FOR ICE FORMATION/MELT (M3)
+new:1397:     call AllocateDSI( RICECOVT,    NISER,   0.0)         ! *** ISICE = 1  INPUT ICE COVER AT CURRENT TIME
+new:1398:   endif
+new:1399:   call AllocateDSI( ICECELL,   LCM,  .false.)            ! *** ISICE>0  PERFORM ICE COMPUTATIONS",명시한 ICECOVER/ICETHICK/ICETEMP/ICEVOL/ICERATE 및 FRAZILICE/FRAZILICE1은 모두 그대로 할당된다. 삭제된 RICETHKT는 이 문장의 목록에 없다. 인용 범위 내부 변경은 있으나 문장 영향은 없다.
+C1-9,models/EFDC/source-analysis/efdc_water_quality.md,19,- `Eutrophication/mod_wq.f90:9-5083` — WATERQUALITY core.,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Eutrophication/mod_wq.f90:9-11; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Eutrophication/mod_wq.f90:1884-1892; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Eutrophication/mod_wq.f90:2399-2405; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Eutrophication/mod_wq.f90:2424-2430,_staging/efdc-prescan/new/EFDC__Eutrophication__mod_wq.f90:9-11; _staging/efdc-prescan/new/EFDC__Eutrophication__mod_wq.f90:1884-1892; _staging/efdc-prescan/new/EFDC__Eutrophication__mod_wq.f90:2399-2405; _staging/efdc-prescan/new/EFDC__Eutrophication__mod_wq.f90:2424-2430,WQICI에서 LIJ/KSZ를 LIJ_Global/KSZ_Global로 바꾼다. WQBENTHIC의 사용되지 않는 local XBSFAD 선언을 제거하고 초기화 대상을 XBFSAD로 수정한다.,EFDC/Eutrophication/mod_wq.f90,"@@ -1884,9 +1884,9 @@ SUBROUTINE WQICI | citation∩old-hunk=1884-1892; @@ -2399,7 +2399,7 @@ SUBROUTINE WQBENTHIC(TIMTMP) | citation∩old-hunk=2399-2405; @@ -2424,7 +2424,7 @@ SUBROUTINE WQBENTHIC(TIMTMP) | citation∩old-hunk=2424-2430",WQICI에서 LIJ/KSZ를 LIJ_Global/KSZ_Global로 바꾼다. WQBENTHIC의 사용되지 않는 local XBSFAD 선언을 제거하고 초기화 대상을 XBFSAD로 수정한다.,REVIEW_ONLY,high,"old:9: MODULE WATERQUALITY
+old:10:     
+old:11:   ! *** WATER QUALITY MODEL KINETIC AND SEDIMENT PROCESSES
+old:1884:   ! *** Loop over cells and assign layers
+old:1885:   do LG = 2,LA_Global
+old:1886:     read(1,*) I, J, (WQVDA(NW),NW = 1,NWQV)
+old:1887:     L = LIJ(I,J)
+old:1888:     do NW = 1,NWQV
+old:1889:       do KG = KSZ(L),KC
+old:1890:         WQV_Global(L,KG,NW) = WQVDA(NW)
+old:1891:       enddo
+old:1892:     enddo
+old:2399:   
+old:2400:   real,intent(IN) :: TIMTMP
+old:2401:   integer :: M,MM,IBENZ,I,L,IZM,IZS
+old:2402:   real    :: XBSFAD,BDAY,XM
+old:2403:   
+old:2404:   character TITLE_(3)*79, CCMRM*1
+old:2405:   integer,save,allocatable,dimension(:) :: IZONE
+old:2424:     XBFNO3 = 0.0
+old:2425:     XBFO2 = 0.0
+old:2426:     XBFPO4D = 0.0
+old:2427:     XBSFAD = 0.0
+old:2428:   endif
+old:2429: 
+old:2430:   if( process_id == master_id )then
+new:9: MODULE WATERQUALITY
+new:10:     
+new:11:   ! *** WATER QUALITY MODEL KINETIC AND SEDIMENT PROCESSES
+new:1884:   ! *** Loop over cells and assign layers
+new:1885:   do LG = 2,LA_Global
+new:1886:     read(1,*) I, J, (WQVDA(NW),NW = 1,NWQV)
+new:1887:     L = LIJ_Global(I,J)
+new:1888:     do NW = 1,NWQV
+new:1889:       do KG = KSZ_Global(L),KC
+new:1890:         WQV_Global(L,KG,NW) = WQVDA(NW)
+new:1891:       enddo
+new:1892:     enddo
+new:2399:   
+new:2400:   real,intent(IN) :: TIMTMP
+new:2401:   integer :: M,MM,IBENZ,I,L,IZM,IZS
+new:2402:   real    :: BDAY,XM
+new:2403:   
+new:2404:   character TITLE_(3)*79, CCMRM*1
+new:2405:   integer,save,allocatable,dimension(:) :: IZONE
+new:2424:     XBFNO3 = 0.0
+new:2425:     XBFO2 = 0.0
+new:2426:     XBFPO4D = 0.0
+new:2427:     XBFSAD = 0.0
+new:2428:   endif
+new:2429: 
+new:2430:   if( process_id == master_id )then",WATERQUALITY core라는 모듈 역할은 그대로이다. 입력 초기조건의 global index 및 benthic 배열 초기화는 바뀌지만 이 문장은 그 구현을 단언하지 않는다. DO_SAT 염분 보정 변경(old/new 5729)은 9-5083 범위 밖이며 이 행 판정 근거에 섞지 않는다.
+C1-10,models/EFDC/source-analysis/efdc_water_quality.md,22,- `Eutrophication/mod_biota.f90:57-444` — biota.,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Eutrophication/mod_biota.f90:124; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Eutrophication/mod_biota.f90:144-150,_staging/efdc-prescan/new/EFDC__Eutrophication__mod_biota.f90:124; _staging/efdc-prescan/new/EFDC__Eutrophication__mod_biota.f90:144-150,predation.fraction_of_silica.SA의 수신 변수를 WQFSID에서 WQFSIP로 수정한다. metabolism SA는 WQFSID로 유지된다. 입력값의 실제 대입 효과가 변경되었다.,EFDC/Eutrophication/mod_biota.f90,"@@ -144,7 +144,7 @@ SUBROUTINE ALGAECONTROL | citation∩old-hunk=144-150",predation.fraction_of_silica.SA의 수신 변수를 WQFSID에서 WQFSIP로 수정한다. metabolism SA는 WQFSID로 유지된다. 입력값의 실제 대입 효과가 변경되었다.,REVIEW_ONLY,medium,"old:124:       call fson_get(item, ""metabolism.fraction_of_silica.SA"",               ALGAES(NAL).WQFSID)         ! *** 
+old:144:       call fson_get(item, ""predation.fraction_of_nitrogen.DON"",             ALGAES(NAL).WQFNDP)         ! *** 
+old:145:       call fson_get(item, ""predation.fraction_of_nitrogen.NH4"",             ALGAES(NAL).WQFNIP)         ! *** 
+old:146:       call fson_get(item, ""predation.fraction_of_silica.SU"",                ALGAES(NAL).WQFSPP)         ! *** 
+old:147:       call fson_get(item, ""predation.fraction_of_silica.SA"",                ALGAES(NAL).WQFSID)         ! *** 
+old:148:            
+old:149:       call fson_get(item, ""growth_velocity_limitation_option"",              ALGAES(NAL).IWQVLIM)      
+old:150: 			CALL fson_get(item, ""vel_lim.half_saturation_velocity"",               ALGAES(NAL).WQKMV(1))       ! *** 
+new:124:       call fson_get(item, ""metabolism.fraction_of_silica.SA"",               ALGAES(NAL).WQFSID)         ! *** 
+new:144:       call fson_get(item, ""predation.fraction_of_nitrogen.DON"",             ALGAES(NAL).WQFNDP)         ! *** 
+new:145:       call fson_get(item, ""predation.fraction_of_nitrogen.NH4"",             ALGAES(NAL).WQFNIP)         ! *** 
+new:146:       call fson_get(item, ""predation.fraction_of_silica.SU"",                ALGAES(NAL).WQFSPP)         ! *** 
+new:147:       call fson_get(item, ""predation.fraction_of_silica.SA"",                ALGAES(NAL).WQFSIP)         ! *** 
+new:148:            
+new:149:       call fson_get(item, ""growth_velocity_limitation_option"",              ALGAES(NAL).IWQVLIM)      
+new:150: 			CALL fson_get(item, ""vel_lim.half_saturation_velocity"",               ALGAES(NAL).WQKMV(1))       ! *** ",입력 필드의 실제 효과 변화는 확인했으나 이 행의 유일한 설명 biota는 여전히 참이다. 이 행에는 SA 필드 의미나 수신 변수에 관한 단언이 없어 입력 의미 설명의 불일치로 확대하지 않는다. Claude는 이 입력 변화와 문장 수준 판정의 구분을 최종 검토해야 한다.
+C1-11,models/EFDC/source-analysis/efdc_water_quality.md,106,Inputs (`mod_diagen.f90:164-277`):,models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Eutrophication/mod_diagen.f90:164-174; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Eutrophication/mod_diagen.f90:336-341,_staging/efdc-prescan/new/EFDC__Eutrophication__mod_diagen.f90:164-173; _staging/efdc-prescan/new/EFDC__Eutrophication__mod_diagen.f90:335-340,wq_3dsd.jnp의 write_restart_option → ISMRST 읽기(old 167)가 제거된다. 인용 밖 old 339의 ISMRST broadcast도 삭제되었다.,EFDC/Eutrophication/mod_diagen.f90,"@@ -164,7 +164,6 @@ SUBROUTINE SMRIN1_JNP | citation∩old-hunk=164-170",wq_3dsd.jnp의 write_restart_option → ISMRST 읽기(old 167)가 제거된다. 인용 밖 old 339의 ISMRST broadcast도 삭제되었다.,UPDATE_REQUIRED,medium,"old:164:     call fson_get(json_data, ""title"", TITLE)
+old:165:     call fson_get(json_data, ""initial_condition_option"", ISMICI)
+old:166:     call fson_get(json_data, ""number_of_spatial_zones"", ISMZ)
+old:167:     call fson_get(json_data, ""write_restart_option"", ISMRST)
+old:168:     call fson_get(json_data, ""sediment_temperature_diffusion_coef"", SMDIFT)
+old:169:     call fson_get(json_data, ""stoichiometric_coef_for_carbon_diagenesis.nitrification"", SMO2NH4)
+old:170:     call fson_get(json_data, ""stoichiometric_coef_for_carbon_diagenesis.denitritrification"", SMO2NO3)
+old:171:     call fson_get(json_data, ""stoichiometric_coef_for_carbon_diagenesis.H2S_oxidation"", SMO2C)
+old:172:     
+old:173:     NSMZ = ISMZ
+old:174:     SMDIFT = SMDIFT*8.64E4   !< Convert to m^2/day
+old:336:   call Broadcast_Scalar(ISMZ,     master_id)
+old:337:   call Broadcast_Scalar(NSMZ,     master_id)
+old:338:   call Broadcast_Scalar(ISMICI,   master_id)
+old:339:   call Broadcast_Scalar(ISMRST,   master_id)
+old:340:   call Broadcast_Scalar(ISMHYST,  master_id)
+old:341:   call Broadcast_Scalar(ISMZB,    master_id)
+new:164:     call fson_get(json_data, ""title"", TITLE)
+new:165:     call fson_get(json_data, ""initial_condition_option"", ISMICI)
+new:166:     call fson_get(json_data, ""number_of_spatial_zones"", ISMZ)
+new:167:     call fson_get(json_data, ""sediment_temperature_diffusion_coef"", SMDIFT)
+new:168:     call fson_get(json_data, ""stoichiometric_coef_for_carbon_diagenesis.nitrification"", SMO2NH4)
+new:169:     call fson_get(json_data, ""stoichiometric_coef_for_carbon_diagenesis.denitritrification"", SMO2NO3)
+new:170:     call fson_get(json_data, ""stoichiometric_coef_for_carbon_diagenesis.H2S_oxidation"", SMO2C)
+new:171:     
+new:172:     NSMZ = ISMZ
+new:173:     SMDIFT = SMDIFT*8.64E4   !< Convert to m^2/day
+new:335:   call Broadcast_Scalar(ISMZ,     master_id)
+new:336:   call Broadcast_Scalar(NSMZ,     master_id)
+new:337:   call Broadcast_Scalar(ISMICI,   master_id)
+new:338:   call Broadcast_Scalar(ISMHYST,  master_id)
+new:339:   call Broadcast_Scalar(ISMZB,    master_id)
+new:340: ","note:106의 Inputs는 바로 다음 note:107의 Sediment zones, restart controls를 수식한다. 인용 범위에서 restart 출력 제어를 읽던 근거가 삭제되어 입력 설명을 수정해야 한다. initial_condition_option → ISMICI는 유지되므로 모든 restart 기능 제거로 일반화하지 않고 write_restart_option 입력 제거에 한정한다."
+C1-12,models/EFDC/source-analysis/efdc_dispersion.md,24,"- `models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/mod_var_global.f90:991-992, 1098-1099` — `AHO/AHD` scalar + `AHOXY/AHDXY` array declarations.",models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/mod_var_global.f90:991-992; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/mod_var_global.f90:1098-1099,_staging/efdc-prescan/new/EFDC__mod_var_global.f90:992-993; _staging/efdc-prescan/new/EFDC__mod_var_global.f90:1099-1100,인용 old 991-992는 new 992-993과 동일하다. hunk 992-999와의 교집합 old 992는 context이며 실제 변경은 ABMAX/ABMIN 주석(old 995-996)이다.,EFDC/mod_var_global.f90,"@@ -992,8 +993,8 @@ MODULE GLOBAL | citation∩old-hunk=992",인용 old 991-992는 new 992-993과 동일하다. hunk 992-999와의 교집합 old 992는 context이며 실제 변경은 ABMAX/ABMIN 주석(old 995-996)이다.,NO_ACTION,high,"old:991:   real :: AHD      !< Background horizontal eddy viscosity (m2/s)
+old:992:   real :: AHO      !< Initial horizontal eddy viscosity (m2/s)
+old:1098:   real,allocatable,dimension(:)     :: AHDXY         !< Sptatially variable AHD
+old:1099:   real,allocatable,dimension(:)     :: AHOXY         !< Sptatially variable AHO
+new:992:   real :: AHD      !< Background horizontal eddy viscosity (m2/s)
+new:993:   real :: AHO      !< Initial horizontal eddy viscosity (m2/s)
+new:1099:   real,allocatable,dimension(:)     :: AHDXY         !< Sptatially variable AHD
+new:1100:   real,allocatable,dimension(:)     :: AHOXY         !< Sptatially variable AHO",AHO/AHD scalar 선언과 같은 문장에 함께 인용된 AHOXY/AHDXY 배열 선언 모두 동일하다. ABMAX/ABMIN의 horizontal→vertical 주석 수정은 다른 변수이다. 줄 이동 외에 이 주장 변경 없음.
+C1-13,models/EFDC/source-analysis/efdc_wetdry.md,20,"- `mod_var_global.f90:60, 841, 1048, 1053` — `LMASKDRY` definition, `ISDRY/HDRY/HWET` doc.",models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/mod_var_global.f90:60; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/mod_var_global.f90:841; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/mod_var_global.f90:1048; models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/mod_var_global.f90:1053,_staging/efdc-prescan/new/EFDC__mod_var_global.f90:60; _staging/efdc-prescan/new/EFDC__mod_var_global.f90:841; _staging/efdc-prescan/new/EFDC__mod_var_global.f90:1049; _staging/efdc-prescan/new/EFDC__mod_var_global.f90:1054,old HWET:1053 → new HWET:1054는 완전 동일하다. hunk 교집합 1053은 context이며 HMIN 기본값 추가는 old 1052이다.,EFDC/mod_var_global.f90,"@@ -1049,29 +1050,29 @@ MODULE GLOBAL | citation∩old-hunk=1053",old HWET:1053 → new HWET:1054는 완전 동일하다. hunk 교집합 1053은 context이며 HMIN 기본값 추가는 old 1052이다.,NO_ACTION,high,"old:60:   logical,allocatable,dimension(:) :: LMASKDRY          !< LMASKDRY = TRUE CELL IS WET.  CONTROLS ACTIVE CELL OPERATIONS
+old:841:   integer :: ISDRY        !< Wet/dry option: 0 - Off, >0 - Activate wetting/drying
+old:1048:   real :: HDRY           !< If ISDRY > 0, this is the depth to control wetting and drying (m)
+old:1053:   real :: HWET           !< Minimum water depth to allow for QSER withdrawals
+new:60:   logical,allocatable,dimension(:) :: LMASKDRY          !< LMASKDRY = TRUE CELL IS WET.  CONTROLS ACTIVE CELL OPERATIONS
+new:841:   integer :: ISDRY        !< Wet/dry option: 0 - Off, >0 - Activate wetting/drying
+new:1049:   real :: HDRY           !< If ISDRY > 0, this is the depth to control wetting and drying (m)
+new:1054:   real :: HWET           !< Minimum water depth to allow for QSER withdrawals",HWET의 QSER withdrawal 최소 수심 설명이 그대로이다. 같은 문장의 LMASKDRY/ISDRY/HDRY도 대조해 동일함을 확인했다. 인접 HMIN 변경은 HWET나 wet/dry 변수 정의를 바꾸지 않는다.
