@@ -1,13 +1,17 @@
 # MODEL SNAPSHOT MIGRATION FRAMEWORK — v2.0
 
-> 상태: **FINAL.** 파일럿 2건으로 검증됨 — ADCIRC(`6037225`→`e8b62a70`, 2026-09-20 종료),
-> EFDC/EFDCPlus_Stable(`3ed76b6`→`3b382fd`, 2026-09-20 종료).
+> 상태: **FINAL.** 파일럿 3건으로 검증됨 (전부 2026-09-20 종료) —
+> ADCIRC(`6037225`→`e8b62a70`), EFDC/EFDCPlus_Stable(`3ed76b6`→`3b382fd`), SWAN(`5544152`→`43e9bbb`).
 > v1(`DESIGN-v1-superseded.md`) + Codex 적대 검토(`DESIGN-REVIEW-codex.md`) + Claude 독립 검증 +
-> 두 파일럿 실측 반영. 변경 이력은 §CHANGELOG.
+> 세 파일럿 실측 반영. 변경 이력은 §CHANGELOG.
 >
-> EFDC 파일럿에서 **설계가 아니라 구현·운영이 어긋난 4건**이 드러났고 그 교정이 v2.0 에 들어갔다
-> (§UNCITED PROSE SWEEP, §EXCLUDED REFERENCE LEDGER, failure mode 22–25).
-> 구현 참조: `refparser.py` · `test_refparser.py`(게이트), `_staging/efdc-migration/build-inputs.py`(좌표 맵).
+> 파일럿이 드러낸 것은 **설계 결함이 아니라 구현·운영의 누락**이었고 그 교정이 v2.0 에 들어갔다 —
+> EFDC 에서 §UNCITED PROSE SWEEP·§EXCLUDED REFERENCE LEDGER(failure mode 22–25),
+> SWAN 에서 파서 문맥 오탐과 §CROSS-MODEL RESOLUTION(failure mode 26–28).
+>
+> 구현·게이트: `refparser.py` + `test_refparser.py`(문법), `resolver.py` + `test_resolver.py`(귀속),
+> 좌표 맵 예시 `_staging/efdc-migration/build-inputs.py` · `_staging/swan-prescan/build-phase2.py`.
+> **두 게이트를 모두 통과해야 migration 을 시작한다.**
 
 ## GOALS
 
@@ -198,6 +202,10 @@ EFDC 파일럿 추가(22–25). 넷 다 설계가 아니라 **구현·운영**�
     두 열을 **정규화 스키마로 고정**한다. 사람이 읽는 섹션 경로는 별도 열에 둔다.
     실측: 한 배치만 3번째 열이 `"… / claim L104"` 형태여서 17행의 줄번호가 통째로 잘못 들어갔고,
     "미분류 9건" 오탐으로 이어졌다. 조인 결과 건수를 **입력 건수와 대조**해야 잡힌다.
+26. **basename 단독 매칭으로 참조를 다른 모델에 귀속** → §CROSS-MODEL RESOLUTION.
+    실측: Delft3D 가 번들한 SWAN 사본으로 6건 오귀속 위험, ADCIRC `wind.F` 41건 동명 충돌.
+27. **생성 파일 인용을 미해결로 분류** → `switch.pl` 전처리 매핑. 실측 SWAN 8건 + 확장자불일치 1건.
+28. **롤백 자산(`.old-<sha>`)이 색인을 오염** → 색인 제외 규칙. 미적용 시 전 파일이 AMBIGUOUS.
 25. **잠금 검증을 root 로 실행해 무의미해짐** → `find <path> -writable` 은 root 에서 권한 비트와 무관하게
     참이다. 잠금 확인은 **소유자가 아닌 일반 사용자 권한으로** 실행하거나 `-perm` 비트로 검사한다.
     실측: sudo 스크립트 최종 단계가 `82713개 쓰기 가능`으로 오탐 실패, 실제 잠금은 정상이었다.
@@ -245,6 +253,37 @@ EFDC 파일럿 추가(22–25). 넷 다 설계가 아니라 **구현·운영**�
 위키가 인용한 source file 을 **현재 snapshot 에서 찾을 수 없는** 참조. 자동 `NO_ACTION` 금지 — 별도 unresolved ledger 에 남기고 다음 중 하나로 해소한다:
 ⑴ old snapshot 에만 존재 ⑵ 다른 repository/배포본 ⑶ stale reference ⑷ typo/path drift.
 EFDC 사전 스캔 실측: 89건(참조 2,317 중). 저장소별 이 수치를 ledger 에 기록한다.
+
+### CROSS-MODEL RESOLUTION (2026-09-20 신설, SWAN 파일럿 후속)
+
+**basename 단독 매칭은 참조를 엉뚱한 모델로 귀속시킨다.** Delft3D 가 SWAN 을 번들하고,
+ADCIRC 모델 아래 `adcirc` 와 `asgs` 두 저장소가 같은 `wind.F` 를 갖는다.
+해소 순서를 고정한다 (`resolver.py`, 게이트 `test_resolver.py`).
+
+1. 소유 모델 안에서 **경로 suffix 일치** (참조가 디렉터리 성분을 가질 때)
+2. 소유 모델 안에서 basename 일치
+3. 동명 후보가 남으면 좁힌다 — ⑴ **줄 번호 배제**: 인용된 최대 줄보다 짧은 파일은 그 인용의 대상일 수 없다
+   ⑵ **주 저장소 우선**: 저장소 디렉터리명이 모델명과 일치하는 쪽. 결과는 `RESOLVED_NARROWED` 로 구분 기록
+4. **생성 파일 매핑**: SWAN/SWASH 는 `switch.pl` 이 `.ftn90 → .f90`, `.ftn → .f` 로 전처리한다.
+   노트가 생성물 이름을 인용할 수 있다 (`RESOLVED_GENERATED`). 확장자 짝이 어긋나면
+   `RESOLVED_GENERATED_EXT_MISMATCH` 로 해소하되 표시한다
+5. cross-model: 소유자가 하나면 `RESOLVED_CROSS_MODEL` 로 귀속 기록, 여럿이면 `AMBIGUOUS_CROSS_MODEL`
+   (번들 사본 가능성 — 임의 귀속 금지)
+6. 실패 → `UNRESOLVED_SOURCE_REFERENCE`
+
+**부분 이름은 추측으로 해소하지 않는다** (`Compdata.f90` ← `SwanCompdata.ftn90`, `PDataSets.ftn90` ← `SwanVTKPDataSets.ftn90`).
+
+**migration 롤백 자산(`<tree>.old-<sha>`)은 색인에서 제외한다.** 포함하면 모든 파일이 동명 2중이 되어
+전부 AMBIGUOUS 로 오판정된다. 롤백 자산을 트리에 남겨 두는 동안 참조 해소가 오염되는 것은
+7일 보관 규칙의 부작용이며, 제외 규칙으로 막는다.
+
+도입 효과 (미해소 참조):
+
+| 모델 | 도입 전 | 도입 후 | 해소 경로 |
+|---|---|---|---|
+| SWAN | 29 | **5** + AMBIGUOUS 1 | cross-model 15, 생성물 8, 확장자불일치 1 |
+| EFDC | 89 | **9** | 대부분 경로·모델 귀속 문제였다 |
+| ADCIRC | 30 + 동명 48 | **30** + AMBIGUOUS 1 | 좁히기 47 (`wind.F` 41 포함) |
 
 ### UNCITED PROSE SWEEP (2026-09-20 신설, EFDC 파일럿)
 
@@ -294,6 +333,8 @@ v1 1–8 + 추가:
 12. `validate-all` 통과·broken reference 0 은 **필요조건일 뿐** 완료 근거가 아니다.
 13. `UNRESOLVED_SOURCE_REFERENCE` 전건이 ledger 에 분류되어 있고 자동 NO_ACTION 으로 처리되지 않음.
 14. **PARSER GATE 통과**(§PARSER SELF-TEST) — 실패 시 `PARSER_GATE_FAILED` 로 종료, migration 미착수.
+14b. **RESOLVER GATE 통과**(§CROSS-MODEL RESOLUTION) — 실패 시 `RESOLVER_GATE_FAILED` 로 종료.
+    참조가 어느 모델·파일에 귀속되는지 틀리면 impact filter 전체가 틀린다.
 15. UPDATE_REQUIRED 의 원인이 식별자 변경이면 **§UNCITED PROSE SWEEP 수행 기록**이 있고, 각 출현에 문장 단위 판정이 남아 있음.
 16. `excluded-refs.csv` 의 전 행에 disposition 이 있음(§EXCLUDED REFERENCE LEDGER).
 17. 분류·좌표 산출물의 조인 결과 건수가 입력 건수와 일치함(§FAILURE MODES 24).
