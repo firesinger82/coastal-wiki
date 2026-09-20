@@ -44,7 +44,7 @@ How ROMS advances 3D momentum (`step3d_uv`) and tracers (`step3d_t`), how the s-
 - Vertical advection dispatch likewise per-tracer: `SPLINES`, `CENTERED2`, `CENTERED4`, `AKIMA4`, `UPSTREAM3`, `SPLIT_U3` (`step3d_t.F:936, 985, 1027, 1048, 1069, 1144`).
 - Vertical mixing is applied implicitly via `Akt` tridiagonal solve (spline or standard form), updating `t(...,nnew,...)` (`step3d_t.F:1660-1789`).
 - Nudging/relaxation source: `Tnudgcof * (tclm - t)` when `LnudgeTCLM` is on (`step3d_t.F:1866-1874`).
-- Surface/bottom tracer fluxes injected as `FC(:,0)=dt*btflx`, `FC(:,N)=dt*stflx` (`pre_step3d.F:911-924`); `set_data` populates `stflux`/`btflux` (`set_data.F:415-557`).
+- Surface/bottom tracer fluxes injected as `FC(:,0)=dt*btflx`, `FC(:,N)=dt*stflx` (`pre_step3d.F:964-1000`); `set_data` populates `stflux`/`btflux` (`set_data.F:415-557`). **`BOTTOM_ALBEDO` 예외**: 온도 tracer(`itrc==itemp`)에서는 두 경계값에 단파 항 `dt*srflx*swdk`가 더해진다 (`pre_step3d.F:966-979`). 비온도 tracer와 옵션 비활성 빌드는 위 등식 그대로다 (`pre_step3d.F:981-992`).
 
 ## C. Vertical coordinate transform (s-coordinate)
 
@@ -84,7 +84,7 @@ How ROMS advances 3D momentum (`step3d_uv`) and tracers (`step3d_t`), how the s-
 - If `BULK_FLUXES` is enabled, `bulk_flux` computes air-sea fluxes before VBC setup (`main3d.F:441-449`).
 - Shortwave (`srflx`) and net surface heat tracer flux (`stflux(:,:,itemp)`) are set in `set_data.F:258-267, 415-424`.
 - Freshwater/salinity surface forcing via `stflux(:,:,isalt)` from `swflux`/`EminusP` pathways (`set_data.F:474-508`).
-- These fluxes are applied through the tracer-equation vertical flux BCs (`pre_step3d.F:901-916`).
+- These fluxes are applied through the tracer-equation vertical flux BCs (`pre_step3d.F:954-991`).
 
 ## Decision Guide
 

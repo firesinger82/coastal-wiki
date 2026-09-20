@@ -53,12 +53,12 @@ ROMS 4D-Var 는 **primal(model space)** 1종 + **dual(observation space)** 2종,
 
 `*.F` 모듈은 알고리즘을 "logical components routines" 로 쪼개 ESM 결합(coupling)·nesting 을 허용한다(`i4dvar.F:13-14`). 각 phase 는 `*_roms.h` driver 의 `ROMS_run` 에서 outer/inner 루프 순서로 호출된다.
 
-**I4D-Var phases** (`i4dvar.F:160-166`):
+**I4D-Var phases** (`i4dvar.F:171-177`):
 `background_initialize` → `background` → `increment` → `analysis` → `posterior_analysis_initialize` → `posterior_analysis` → `prior_error`.
 
 헤더 주석의 phase 역할(verbatim 요약):
 - `background`: "Timesteps the nonlinear model to compute the basic state Xb(t) ... interpolates the nonlinear model trajectory to the observations locations." (`i4dvar.F:24-29`)
-- `increment`: "Minimizes of the 4D-Var cost function over Ninner inner loops iterations to compute the data assimilation increment, dXa." (`i4dvar.F:33-35`) — 실제 inner-loop 최소화 본체(`i4dvar.F:781`).
+- `increment`: "Minimizes of the 4D-Var cost function over Ninner inner loops iterations to compute the data assimilation increment, dXa." (`i4dvar.F:33-35`) — 실제 inner-loop 최소화 본체(`i4dvar.F:792`).
 - `analysis`: 새 초기조건 $X_a = X_b(t{=}0) + dX_a$ 를 NLM INI 파일에 기록(`i4dvar.F:38-44`).
 - `posterior_analysis_*`: analysis $X_a$ 로 NLM 재적분해 posterior 상태 산출(`i4dvar.F:40-49`).
 - `prior_error`: 사전(prior) 배경오차 공분산 + 정규화 계수 처리(`i4dvar.F:51-54`).
@@ -67,10 +67,10 @@ ROMS 4D-Var 는 **primal(model space)** 1종 + **dual(observation space)** 2종,
 
 $$X_a = X_b(t{=}0) + dX_a, \qquad dX_a = \arg\min_{dX} J(dX)$$
 
-**RBL4D-Var phases** (`rbl4dvar.F:190-199`):
+**RBL4D-Var phases** (`rbl4dvar.F:201-210`):
 `background_initialize` → `background` → `increment` → `analysis_initialize` → `analysis` → `prior_error` → `posterior_error`. (I4D-Var 와 달리 `posterior_error` 보유 — weak-constraint 오차 추정.)
 
-**R4D-Var phases** (`r4dvar.F:138-145`):
+**R4D-Var phases** (`r4dvar.F:149-156`):
 `background` → `increment` → `analysis` → `prior_error` → `posterior_error`.
 
 ## 3. split (다중 실행파일) driver
@@ -179,5 +179,5 @@ $$dJ = \frac{\partial J}{\partial \zeta}d\zeta + \frac{\partial J}{\partial u}du
 
 ## 미확인 / source-needed
 
-- `rbl4dvar.F`/`r4dvar.F` 의 increment 루틴 내부 Lanczos/MINRES 수치 세부(반복 행렬연산 라인)는 본 노트에서 미추적 — 필요 시 `i4dvar.F:781` (increment 본체) 및 각 모듈 increment 라인 직접 분석 필요. **source-needed**.
+- `rbl4dvar.F`/`r4dvar.F` 의 increment 루틴 내부 Lanczos/MINRES 수치 세부(반복 행렬연산 라인)는 본 노트에서 미추적 — 필요 시 `i4dvar.F:792` (increment 본체) 및 각 모듈 increment 라인 직접 분석 필요. **source-needed**.
 - `propagator_*.h` 의 정규화(weight)·내적 정의 세부 라인은 헤더 주석 범위로만 인용, 본문 알고리즘 라인 미추적. **source-needed**.

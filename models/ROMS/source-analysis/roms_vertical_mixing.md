@@ -98,7 +98,7 @@ Stress-law branches in `set_vbc.F`:
 
 ## G. Output of mixing coefficients
 
-History-file variables (`def_his.F:1595-1649`, `wrt_his.F:1653-1713`):
+History-file variables (`def_his.F:1599-1653`, `wrt_his.F:1653-1713`):
 - `idVvis` ⇒ `MIXING(ng)%Akv` — vertical viscosity (m²/s).
 - `idTdif` ⇒ `MIXING(ng)%Akt(:,:,:,itemp)` — temperature diffusivity.
 - `idSdif` ⇒ `MIXING(ng)%Akt(:,:,:,isalt)` — salinity diffusivity.

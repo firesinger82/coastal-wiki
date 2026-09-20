@@ -37,23 +37,23 @@ ROMS는 컴파일 타임에 `#define` CPP 매크로로 기능을 토글하는 **
 
 ```c
 #if defined ROMS_HEADER
-# include ROMS_HEADER          // cppdefs.h:751-752
+# include ROMS_HEADER          // cppdefs.h:753-754
 #else
    CPPDEFS - Choose an appropriate ROMS application.   // 미정의 시 컴파일 에러 유발
 #endif
 ...
-#include "globaldefs.h"        // cppdefs.h:761
+#include "globaldefs.h"        // cppdefs.h:763
 ```
 
-(`cppdefs.h:751`, `cppdefs.h:752`, `cppdefs.h:755`, `cppdefs.h:761`). 헤더 카탈로그에 그 흐름이 명시돼 있다:
+(`cppdefs.h:753`, `cppdefs.h:754`, `cppdefs.h:757`, `cppdefs.h:763`). 헤더 카탈로그에 그 흐름이 명시돼 있다:
 
-> `**    ROMS_HEADER="upwelling.h"` — `cppdefs.h:742`
-> `**  in the makefile. ROMS will include the associated header file located` — `cppdefs.h:737`
+> `**    ROMS_HEADER="upwelling.h"` — `cppdefs.h:744`
+> `**  in the makefile. ROMS will include the associated header file located` — `cppdefs.h:739`
 
-따라서 **빌드 순서**는: makefile `ROMS_APPLICATION ?= UPWELLING` (`cppdefs.h:734`) → `ROMS_HEADER="upwelling.h"` → cppdefs.h 가 `upwelling.h` include(사용자 옵션 set) → 이어서 `globaldefs.h` include(내부 파생 + 검증).
+따라서 **빌드 순서**는: makefile `ROMS_APPLICATION ?= UPWELLING` (`cppdefs.h:736`) → `ROMS_HEADER="upwelling.h"` → cppdefs.h 가 `upwelling.h` include(사용자 옵션 set) → 이어서 `globaldefs.h` include(내부 파생 + 검증).
 
 ### 사전 정의 응용(pre-defined applications)
-cppdefs.h:680~713 이 동봉 예제 목록을 분류한다 — Idealized Test Problems(`cppdefs.h:680`)에 `BASIN`(`cppdefs.h:682`), `BENCHMARK`(`cppdefs.h:683`), `DOUBLE_GYRE`(`cppdefs.h:691`), `UPWELLING`(default, `cppdefs.h:711`), `WEDDELL`(`cppdefs.h:712`), `WINDBASIN`(`cppdefs.h:713`); Climatological 에 `DAMEE_4`; Realistic 에 `ADRIA02`, `NJ_BIGHT`, `WC13`(California Current, `wc13.h`). 각 `<app>.h`가 Include/ 에 있다(총 37개 헤더 파일).
+cppdefs.h:684~713 이 동봉 예제 목록을 분류한다 — Idealized Test Problems(`cppdefs.h:682`)에 `BASIN`(`cppdefs.h:682`), `BENCHMARK`(`cppdefs.h:685`), `DOUBLE_GYRE`(`cppdefs.h:693`), `UPWELLING`(default, `cppdefs.h:715`), `WEDDELL`(`cppdefs.h:714`), `WINDBASIN`(`cppdefs.h:713`); Climatological 에 `DAMEE_4`; Realistic 에 `ADRIA02`, `NJ_BIGHT`, `WC13`(California Current, `wc13.h`). 각 `<app>.h`가 Include/ 에 있다(총 37개 헤더 파일).
 
 ---
 
@@ -120,20 +120,20 @@ ROMS 4D-Var 동화의 거대한 OR 블록이 백미다. 수십 개 드라이버 
 **Split 4D-Var**: `SPLIT_I4DVAR` 등이 있으면 내부 `SPLIT_4DVAR` 정의(`globaldefs.h:310-315`), 그리고 unsplit 짝(`I4DVAR` 등)도 같이 켜 디렉티브 변경 최소화 (`globaldefs.h:322-336`).
 
 기타 물리 파생:
-- 생물(biology): `BIO_FENNEL`/`ECOSIM`/`NEMURO`/`NPZD_*`/`RED_TIDE` 중 하나 → 내부 `BIOLOGY` (`globaldefs.h:801-811`).
-- 해빙: `ICE_MODEL` → `SEAICE`, 그리고 `ICE_ADVECT→ICE_SMOLAR`, `ICE_MOMENTUM→ICE_EVP`, `ICE_THERMO→ICE_MK` (`globaldefs.h:783-794`).
-- 점성 3D 계수: `UV_SMAGORINSKY`/`TS_SMAGORINSKY`/`VEG_HMIXING` → `VISC_3DCOEF`/`DIFF_3DCOEF` (`globaldefs.h:1225-1237`).
-- 부유 생물 거동: `FLOATS && FLOAT_OYSTER → FLOAT_BIOLOGY` (`globaldefs.h:817-820`).
+- 생물(biology): `BIO_FENNEL`/`ECOSIM`/`NEMURO`/`NPZD_*`/`RED_TIDE` 중 하나 → 내부 `BIOLOGY` (`globaldefs.h:817-827`).
+- 해빙: `ICE_MODEL` → `SEAICE`, 그리고 `ICE_ADVECT→ICE_SMOLAR`, `ICE_MOMENTUM→ICE_EVP`, `ICE_THERMO→ICE_MK` (`globaldefs.h:799-810`).
+- 점성 3D 계수: `UV_SMAGORINSKY`/`TS_SMAGORINSKY`/`VEG_HMIXING` → `VISC_3DCOEF`/`DIFF_3DCOEF` (`globaldefs.h:1241-1253`).
+- 부유 생물 거동: `FLOATS && FLOAT_OYSTER → FLOAT_BIOLOGY` (`globaldefs.h:833-836`).
 
 ### (c) 모순 해소·일관성 강제 (`#undef`)
 사용자가 호환 안 되는 조합을 넣으면 globaldefs.h 가 조용히 끈다:
 - `SOLVE3D` 정의 시 `COSINE2`(2D 시간평균필터) `#undef` (`globaldefs.h:119-120`).
-- `UV_DRAG_GRID`(공간변동 바닥마찰)인데 BBL/SEDIMENT/`UV_*DRAG` 중 아무것도 없으면 `UV_DRAG_GRID` `#undef` (`globaldefs.h:765-772`); 이어 `ANA_DRAG`도 `UV_DRAG_GRID` 없으면 `#undef` (`globaldefs.h:774-777`).
-- `UV_U3ADV_SPLIT`(3차 풍상 분할이류) 시 `UV_C4ADVECTION`/`UV_VIS4` 강제 ON, `UV_VIS2`/`UV_SMAGORINSKY` 강제 OFF + `VISC_3DCOEF` (`globaldefs.h:1205-1219`) — cppdefs.h:20-28 의 설명과 짝.
-- `ANA_BIOLOGY` 인데 `BIOLOGY` 없으면 `#undef ANA_BIOLOGY` (`globaldefs.h:1054-1056`).
+- `UV_DRAG_GRID`(공간변동 바닥마찰)인데 BBL/SEDIMENT/`UV_*DRAG` 중 아무것도 없으면 `UV_DRAG_GRID` `#undef` (`globaldefs.h:781-788`); 이어 `ANA_DRAG`도 `UV_DRAG_GRID` 없으면 `#undef` (`globaldefs.h:790-793`).
+- `UV_U3ADV_SPLIT`(3차 풍상 분할이류) 시 `UV_C4ADVECTION`/`UV_VIS4` 강제 ON, `UV_VIS2`/`UV_SMAGORINSKY` 강제 OFF + `VISC_3DCOEF` (`globaldefs.h:1221-1235`) — cppdefs.h:20-28 의 설명과 짝.
+- `ANA_BIOLOGY` 인데 `BIOLOGY` 없으면 `#undef ANA_BIOLOGY` (`globaldefs.h:1070-1072`).
 
 ### 강제 강제력: 강제 파일 필요 여부 자동 판단 (`FRC_FILE`)
-`SOLVE3D` 하에서 표면/바닥 플럭스를 해석식(`ANA_*`)·결합(`*_COUPLING`)·bulk 로 다 못 채우면 내부 `FRC_FILE`(강제 NetCDF 필요)을 자동 정의하는 대형 OR 블록 (`globaldefs.h:994-1048`). 예: `BULK_FLUXES` 이면 `ANA_SMFLUX`/`ANA_STFLUX` 를 `#undef`(`globaldefs.h:995-1002`)하고, 필요한 대기 입력(`LONGWAVE`/`ANA_PAIR`/`ANA_TAIR`/`ANA_WINDS`…) 미충족 시 `FRC_FILE` (`globaldefs.h:1011-1042`).
+`SOLVE3D` 하에서 표면/바닥 플럭스를 해석식(`ANA_*`)·결합(`*_COUPLING`)·bulk 로 다 못 채우면 내부 `FRC_FILE`(강제 NetCDF 필요)을 자동 정의하는 대형 OR 블록 (`globaldefs.h:1010-1064`). 예: `BULK_FLUXES` 이면 `ANA_SMFLUX`/`ANA_STFLUX` 를 `#undef`(`globaldefs.h:1011-1018`)하고, 필요한 대기 입력(`LONGWAVE`/`ANA_PAIR`/`ANA_TAIR`/`ANA_WINDS`…) 미충족 시 `FRC_FILE` (`globaldefs.h:1027-1058`).
 
 ---
 
@@ -195,8 +195,8 @@ makefile: ROMS_APPLICATION ?= UPWELLING
         → -DROMS_HEADER="upwelling.h"
 cppdefs.h
    ├ (주석) 전 옵션 카탈로그 1~749
-   ├ #include ROMS_HEADER  → upwelling.h  (사용자 옵션 #define)   cppdefs.h:752
-   └ #include "globaldefs.h"                                       cppdefs.h:761
+   ├ #include ROMS_HEADER  → upwelling.h  (사용자 옵션 #define)   cppdefs.h:754
+   └ #include "globaldefs.h"                                       cppdefs.h:763
 globaldefs.h
    ├ 플랫폼/MPI 내부 스위치 (DISTRIBUTE 등)
    ├ 상위옵션 → 하위 내부스위치 파생 (TANGENT/ADJOINT/BIOLOGY/SEAICE/FRC_FILE…)

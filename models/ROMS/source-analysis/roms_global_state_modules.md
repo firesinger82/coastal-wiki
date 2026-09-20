@@ -24,12 +24,12 @@ related:
 Modules/ 에 38 개 `mod_*.F` 존재 (`ls Modules/*.F | wc -l` → 38). 핵심 상태 모듈의 공통 관용:
 
 1. `#include "cppdefs.h"` 로 시작, 모든 라이선스 헤더는 `!=== Hernan G. Arango ===` 블록 (예: `mod_param.F:5`, `mod_ocean.F:5`).
-2. 파생타입 `T_XXX` 를 정의하고, **nested grid 차원** allocatable 배열 `TYPE(T_XXX), allocatable :: XXX(:)` 를 모듈 전역에 선언 — 예: `OCEAN(:)` (`mod_ocean.F:363`), `GRID(:)` (`mod_grid.F:365`), `MIXING(:)` (`mod_mixing.F:399`), `FORCES(:)` (`mod_forces.F:563`), `BOUNDARY(:)` (`mod_boundary.F:763`).
+2. 파생타입 `T_XXX` 를 정의하고, **nested grid 차원** allocatable 배열 `TYPE(T_XXX), allocatable :: XXX(:)` 를 모듈 전역에 선언 — 예: `OCEAN(:)` (`mod_ocean.F:364`), `GRID(:)` (`mod_grid.F:365`), `MIXING(:)` (`mod_mixing.F:399`), `FORCES(:)` (`mod_forces.F:563`), `BOUNDARY(:)` (`mod_boundary.F:763`).
 3. 멤버는 거의 전부 `real(r8), pointer :: var(:,:,...)` — allocatable 이 아니라 **pointer** (nesting/contact point 에서 재지정·공유 필요).
 4. 3 루틴 PUBLIC: `allocate_*`/`deallocate_*`/`initialize_*` (예: `mod_ocean.F:76-78`).
-5. `initialize_*` 는 **first-touch 정책** 으로 0 초기화 — shared-memory 에서 thread 별 메모리 지역성(NUMA) 확보 (`mod_ocean.F:1566-1570` "using first touch distribution policy ... performs propagation of the shared arrays across the cluster").
+5. `initialize_*` 는 **first-touch 정책** 으로 0 초기화 — shared-memory 에서 thread 별 메모리 지역성(NUMA) 확보 (`mod_ocean.F:1567-1571` "using first touch distribution policy ... performs propagation of the shared arrays across the cluster").
 
-전체 할당은 `mod_arrays.F` 의 `ROMS_allocate_arrays` 가 grid 루프에서 각 모듈 `allocate_*` 를 순차 호출하는 방식으로 오케스트레이션된다 (`mod_arrays.F:123`, 호출 본문 `:180-224`).
+전체 할당은 `mod_arrays.F` 의 `ROMS_allocate_arrays` 가 grid 루프에서 각 모듈 `allocate_*` 를 순차 호출하는 방식으로 오케스트레이션된다 (`mod_arrays.F:127`, 호출 본문 `:180-224`).
 
 ## 1. mod_param — 차원·파티션·파생타입 부모
 
@@ -50,7 +50,7 @@ Modules/ 에 38 개 `mod_*.F` 존재 (`ls Modules/*.F | wc -l` → 38). 핵심 �
 
 ### 1.2 추적자(tracer) 차원
 
-`NAT`(능동, 보통 2=θ,S; `mod_param.F:499`, 정의 `:63-64`), `NT(:)`(총 추적자, `mod_param.F:489`), `MT`(최대 추적자, `mod_param.F:490`). 정의 주석 `mod_param.F:61-76` — `NST=NCS+NNS`(퇴적), `NPT`(passive), `NBT`(생물). 추적자 **이름 인덱스**(`itemp`,`isalt`)는 여기가 아니라 `mod_ncparam.F` 에 있다 (`idTvar(:)` 등 `mod_ncparam.F:586`).
+`NAT`(능동, 보통 2=θ,S; `mod_param.F:499`, 정의 `:63-64`), `NT(:)`(총 추적자, `mod_param.F:489`), `MT`(최대 추적자, `mod_param.F:490`). 정의 주석 `mod_param.F:61-76` — `NST=NCS+NNS`(퇴적), `NPT`(passive), `NBT`(생물). 추적자 **이름 인덱스**(`itemp`,`isalt`)는 여기가 아니라 `mod_ncparam.F` 에 있다 (`idTvar(:)` 등 `mod_ncparam.F:635`).
 
 ### 1.3 타일 경계 파생타입 — T_BOUNDS / T_IOBOUNDS / T_DOMAIN
 
@@ -62,11 +62,11 @@ Modules/ 에 38 개 `mod_*.F` 존재 (`ls Modules/*.F | wc -l` → 38). 핵심 �
 
 ### 1.4 메모리 추정
 
-`Dmem(:)`(동적 메모리 요구, 배열 원소 수; `mod_param.F:137`)와 `BmemMax(:)`(분산메모리 버퍼 최대, bytes; `:132`). 각 `allocate_*` 가 할당 시 `Dmem(ng)=Dmem(ng)+...` 로 누적 (예: `mod_ocean.F:459`).
+`Dmem(:)`(동적 메모리 요구, 배열 원소 수; `mod_param.F:137`)와 `BmemMax(:)`(분산메모리 버퍼 최대, bytes; `:132`). 각 `allocate_*` 가 할당 시 `Dmem(ng)=Dmem(ng)+...` 로 누적 (예: `mod_ocean.F:460`).
 
 ## 2. mod_ocean — 예후(prognostic) 상태변수 T_OCEAN
 
-ROMS 의 **핵심 상태벡터**. `T_OCEAN` 구조체 (`mod_ocean.F:84-361`), 전역 `OCEAN(:)` (`mod_ocean.F:363`).
+ROMS 의 **핵심 상태벡터**. `T_OCEAN` 구조체 (`mod_ocean.F:84-362`), 전역 `OCEAN(:)` (`mod_ocean.F:364`).
 
 ### 2.1 비선형(NLM) 상태변수
 
@@ -81,7 +81,7 @@ ROMS 의 **핵심 상태벡터**. `T_OCEAN` 구조체 (`mod_ocean.F:84-361`), �
 | `ru/rv(:,:,0:N,2)` | 3D 운동량 RHS | m⁴/s² | alloc `:452,455` |
 | `rubar/rvbar/rzeta(:,:,2)` | 2D RHS | — | 선언 `:88-90` |
 
-핵심 차원 규약: **2D 변수는 시간레벨 3개**(barotropic 예측자-수정자 + krhs/kstp/knew), **3D 운동량은 2개**(nstp/nnew), **추적자 t 는 3개**(`mod_ocean.F:458` 의 `,3,NT(ng)`). RHS 배열 ru/rv 는 `0:N(ng)` 로 연직 face 포함 (`:452`).
+핵심 차원 규약: **2D 변수는 시간레벨 3개**(barotropic 예측자-수정자 + krhs/kstp/knew), **3D 운동량은 2개**(nstp/nnew), **추적자 t 는 3개**(`mod_ocean.F:459` 의 `,3,NT(ng)`). RHS 배열 ru/rv 는 `0:N(ng)` 로 연직 face 포함 (`:452`).
 
 상태변수 정의 주석은 `mod_ocean.F:11-34` 에 단위까지 명시 — 예: `zeta` = "Free surface (m)" (`:18`), `W` = "S-coordinate (omega*Hz/mn) vertical velocity (m3/s)" (`:34`).
 
@@ -95,7 +95,7 @@ ROMS 의 **핵심 상태벡터**. `T_OCEAN` 구조체 (`mod_ocean.F:84-361`), �
 
 ### 2.4 초기화 (first-touch)
 
-`initialize_ocean(ng,tile,model)` (`mod_ocean.F:1562`): `IniVal=0.0_r8` (`:1588`) 로 타일 범위 전체를 0 대입 (`:1631-1639` ...). `#include "set_bounds.h"` 로 타일 인덱스 설정 (`:1590`), `#ifdef DISTRIBUTE` 분기로 분산메모리 시 전체 LBi:UBi 범위 사용 (`:1594-1596`).
+`initialize_ocean(ng,tile,model)` (`mod_ocean.F:1563`): `IniVal=0.0_r8` (`:1588`) 로 타일 범위 전체를 0 대입 (`:1631-1639` ...). `#include "set_bounds.h"` 로 타일 인덱스 설정 (`:1590`), `#ifdef DISTRIBUTE` 분기로 분산메모리 시 전체 LBi:UBi 범위 사용 (`:1594-1596`).
 
 ## 3. mod_grid — 격자 metric T_GRID
 
@@ -150,7 +150,7 @@ ROMS 의 **핵심 상태벡터**. `T_OCEAN` 구조체 (`mod_ocean.F:84-361`), �
 | `pi` | 3.14159265358979… (parameter) | `:834` |
 | `deg2rad` | pi/180 | `:835` |
 
-복합항 `gorho0=g/rho0` 는 런타임 계산 (`mod_scalars.F:4457`).
+복합항 `gorho0=g/rho0` 는 런타임 계산 (`mod_scalars.F:4560`).
 
 ### 5.3 종료 코드
 
@@ -174,17 +174,17 @@ ROMS 의 **핵심 상태벡터**. `T_OCEAN` 구조체 (`mod_ocean.F:84-361`), �
 
 ## 7. mod_iounits — I/O 파일 구조 T_IO
 
-`T_IO` (`mod_iounits.F:167-189`): 단일 출력 파일의 모든 메타를 압축 보관 — `IOtype`/`Nfiles`/`Fcount`(multi-file 카운터, `:168-170`), `Rindex`(NetCDF 레코드, `:172`), `ncid`(`:173`), 변수ID 포인터 `Vid/Tid`(`:175-176`), 시간범위 `time_min/time_max`(`:177-178`), 파일명 `base/name/files`(`:181-183`). `PIO_LIB` 시 PIO descriptor `pioFile/pioVar` (`:184-188`). HIS/AVG/RST 등 출력 종류마다 `TYPE(T_IO) :: HIS(Ngrids)` 형태로 인스턴스화 (`:160-165` 주석).
+`T_IO` (`mod_iounits.F:170-192`): 단일 출력 파일의 모든 메타를 압축 보관 — `IOtype`/`Nfiles`/`Fcount`(multi-file 카운터, `:168-170`), `Rindex`(NetCDF 레코드, `:172`), `ncid`(`:173`), 변수ID 포인터 `Vid/Tid`(`:175-176`), 시간범위 `time_min/time_max`(`:177-178`), 파일명 `base/name/files`(`:181-183`). `PIO_LIB` 시 PIO descriptor `pioFile/pioVar` (`:184-188`). HIS/AVG/RST 등 출력 종류마다 `TYPE(T_IO) :: HIS(Ngrids)` 형태로 인스턴스화 (`:160-165` 주석).
 
 ## 8. mod_arrays — 할당 오케스트레이터
 
-`ROMS_allocate_arrays(allocate_vars)` (`mod_arrays.F:123`): 모든 상태 모듈의 `allocate_*` 를 `ONLY` import (`:24-104`) 한 뒤, grid 루프 `DO ng=1,Ngrids` (`:168`) 안에서 타일 경계 `LBi..UBij` 를 `BOUNDS(ng)` 에서 추출(`:170-175`)하고 순차 호출 — `allocate_boundary`(`:182`)→`allocate_forces`(`:202`)→`allocate_grid`(`:203`)→`allocate_mixing`(`:208`)→`allocate_ocean`(`:209`) ... `$OMP MASTER`/`$OMP BARRIER` 로 마스터 스레드만 할당 (`:169,225-226`). 완료 시 `LallocatedMemory=.TRUE.` (`:252`). `NESTING` 시 contact point 구조는 `LBC_apply` 할당 후로 지연 (`:229-236`). 짝 루틴 `ROMS_deallocate_arrays`(`:273`)·`ROMS_initialize_arrays`(`mod_arrays.F:111` PUBLIC).
+`ROMS_allocate_arrays(allocate_vars)` (`mod_arrays.F:127`): 모든 상태 모듈의 `allocate_*` 를 `ONLY` import (`:24-104`) 한 뒤, grid 루프 `DO ng=1,Ngrids` (`:168`) 안에서 타일 경계 `LBi..UBij` 를 `BOUNDS(ng)` 에서 추출(`:170-175`)하고 순차 호출 — `allocate_boundary`(`:182`)→`allocate_forces`(`:202`)→`allocate_grid`(`:203`)→`allocate_mixing`(`:208`)→`allocate_ocean`(`:209`) ... `$OMP MASTER`/`$OMP BARRIER` 로 마스터 스레드만 할당 (`:169,225-226`). 완료 시 `LallocatedMemory=.TRUE.` (`:252`). `NESTING` 시 contact point 구조는 `LBC_apply` 할당 후로 지연 (`:229-236`). 짝 루틴 `ROMS_deallocate_arrays`(`:273`)·`ROMS_initialize_arrays`(`mod_arrays.F:115` PUBLIC).
 
 ## 9. 요약 — 상태 흐름
 
 ```
 mod_param (차원 Lm/Mm/N/NT, BOUNDS 타일 인덱스)
-   │ ROMS_allocate_arrays (mod_arrays.F:123)
+   │ ROMS_allocate_arrays (mod_arrays.F:127)
    ▼
 OCEAN(ng)%{zeta,ubar,u,v,t,rho,W}   ← 예후 상태 (mod_ocean)
 GRID(ng)%{h,f,pm,pn,Hz,z_r,*mask}   ← 격자 metric (mod_grid)

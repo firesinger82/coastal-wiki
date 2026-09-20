@@ -16,7 +16,7 @@ How ROMS sets up nested grids, what a contact region is, how parent→child (one
 
 ## Source basis
 
-- `ROMS/Include/cppdefs.h:557-562` — `NESTING`, `ONE_WAY`, `NESTING_DEBUG`, `TIME_INTERP_FLUX`.
+- `ROMS/Include/cppdefs.h:559-564` — `NESTING`, `ONE_WAY`, `NESTING_DEBUG`, `TIME_INTERP_FLUX`.
 - `ROMS/Utility/set_contact.F` — contact-region construction from contact NetCDF.
 - `ROMS/Nonlinear/nesting.F` — runtime exchange (`get_refine`, `do_twoway`, `fine2coarse`, `correct_tracer`, `check_massflux`).
 - `ROMS/Nonlinear/main3d.F:194-1122` — nested time-stepping orchestration.
@@ -24,7 +24,7 @@ How ROMS sets up nested grids, what a contact region is, how parent→child (one
 
 ## A. Nesting setup
 
-- `cppdefs.h:557-562`:
+- `cppdefs.h:559-564`:
   - `NESTING` — master switch.
   - `ONE_WAY` — disables fine-to-coarse feedback.
   - `NESTING_DEBUG` — extra diagnostics including mass-flux conservation checks.

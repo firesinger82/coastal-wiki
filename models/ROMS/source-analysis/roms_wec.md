@@ -16,7 +16,7 @@ The ROMS WEC (Wave Effects on Currents) module: vortex-force formulation (`WEC_V
 
 ## Source basis
 
-- `globaldefs.h:840-888, 861-879` — `WEC` derived flags.
+- `globaldefs.h:856-904,877-895` — `WEC` derived flags.
 - `Include/shoreface.h:21-25, test_head.h:17-20` — example CPP activations.
 - `rhs3d.F:60-1087` — WEC stresses in 3D momentum.
 - `WEC/wec_vf.F:1-905` — vortex force.
@@ -30,7 +30,7 @@ The ROMS WEC (Wave Effects on Currents) module: vortex-force formulation (`WEC_V
 
 ## A. WEC activation
 
-`WEC_VF` is user-facing; `globaldefs.h:861-867` automatically turns it into internal `WEC`.
+`WEC_VF` is user-facing; `globaldefs.h:877-883` automatically turns it into internal `WEC`.
 
 Stokes selection (`:873-879`):
 - If `SWAN_COUPLING` → `SPECTRUM_STOKES`.
@@ -139,7 +139,7 @@ Reniers is most general (full source-sink balance); Svendsen is simplest (geomet
 
 ## H. SWAN coupling fields
 
-MCT coupling shown is **ROMS-SWAN**. `SWAN_COUPLING` defines generic `WAV_COUPLING` (`globaldefs.h:840-844`).
+MCT coupling shown is **ROMS-SWAN**. `SWAN_COUPLING` defines generic `WAV_COUPLING` (`globaldefs.h:856-860`).
 
 `main3d.F:392-405` couples ocean to waves every `CoupleSteps(Iwaves)`.
 

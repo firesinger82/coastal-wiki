@@ -16,7 +16,7 @@ How `SPHERICAL` (compile-time) and `spherical` NetCDF flag (runtime) interact, w
 
 ## Source basis
 
-- `checkdefs.F:2832` — `SPHERICAL` compile flag.
+- `checkdefs.F:2867` — `SPHERICAL` compile flag.
 - `get_grid.F:2619-4272` — runtime grid file read.
 - `grid_coords.F:91-216` — lon/lat → fractional indices (`hindices`).
 - `mod_grid.F:36-263` — metric variables, `pm`, `pn`, `dmde/dndx`, `pmask`.
@@ -24,7 +24,7 @@ How `SPHERICAL` (compile-time) and `spherical` NetCDF flag (runtime) interact, w
 - `rhs3d.F:47-648` — metrics in momentum.
 - `Data/ROMS/CDL/grd_spherical.cdl` — canonical grid NetCDF template.
 - `mod_param.F:23` — `NtileI/J` definition.
-- `read_phypar.F:369-5081` — `NtileI/J` reading and check.
+- `read_phypar.F:369-5083` — `NtileI/J` reading and check.
 - `tile_indices.F:11-143`, `get_bounds.F:777-1036` — tile bound computation.
 - `tile.h:15-29` — tile-storage range definitions.
 - `mp_exchange.F:2-849` — MPI exchange routines.
@@ -32,7 +32,7 @@ How `SPHERICAL` (compile-time) and `spherical` NetCDF flag (runtime) interact, w
 
 ## A. SPHERICAL flag
 
-`SPHERICAL` is **compile-time** option (`checkdefs.F:2832`).
+`SPHERICAL` is **compile-time** option (`checkdefs.F:2867`).
 
 Runtime grid file also carries NetCDF `spherical` logical, required by `get_grid` (`:2619, 2758`).
 

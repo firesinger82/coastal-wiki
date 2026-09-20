@@ -30,12 +30,12 @@ User 사설 응용용 템플릿이 별도 존재:
 
 ### 호출/디스패치 구조 (3계층 tile 패턴)
 각 `ana_*.h` 는 ROMS 표준 2단 구조:
-1. **public 래퍼** `ana_xxx(ng,tile,model[,itrc])` — `tile.h` 인클루드 후 tile 범위(LBi..UBj) 계산, 모듈 변수(GRID/OCEAN/FORCES/BOUNDARY) 포인터를 인자로 넘겨 `_tile` 호출. 예 `ana_initial.h:32-53`, `ana_smflux.h:31-46`.
+1. **public 래퍼** `ana_xxx(ng,tile,model[,itrc])` — `tile.h` 인클루드 후 tile 범위(LBi..UBj) 계산, 모듈 변수(GRID/OCEAN/FORCES/BOUNDARY) 포인터를 인자로 넘겨 `_tile` 호출. 예 `ana_initial.h:38-59`, `ana_smflux.h:31-46`.
 2. **`ana_xxx_tile(...)`** — 실제 해석식 본문. `set_bounds.h` 로 인덱스 범위 결정 후 DO 루프.
 
 `ana_initial.h` 는 모델 종류(NLM/TLM/RPM/ADM)별로 별도 분기:
-- `ana_initial.h:31` `IF (model.eq.iNLM) THEN` → `ana_NLMinitial_tile`
-- `ana_initial.h:54` `ELSE IF ((model.eq.iTLM).or.(model.eq.iRPM))` (`#ifdef TANGENT`)
+- `ana_initial.h:33` `IF (model.eq.iNLM) THEN` → `ana_NLMinitial_tile`
+- `ana_initial.h:60` `ELSE IF ((model.eq.iTLM).or.(model.eq.iRPM))` (`#ifdef TANGENT`)
 
 ### ANANAME 추적 메커니즘
 각 `ana_*` 는 자신이 사용된 헤더 파일명을 전역 배열 `ANANAME(인덱스)=MyFile` 에 등록 (`__FILE__` 매크로). 표준출력 메타데이터로 "어떤 해석 함수가 컴파일에 들어갔는지" 보고. 인덱스 고정 매핑 (`*.h` grep):
@@ -55,7 +55,7 @@ User 사설 응용용 템플릿이 별도 존재:
 | 11 | sponge/ssh | 23 | scope | 37 | wwave |
 | 12 | — | 24 | smflux | 38 | wtype |
 
-(예: `ana_initial.h:66` `ANANAME(2)`, `ana_grid.h:94`/`:95` `ANANAME(7),(10)`, `ana_smflux.h` `ANANAME(24)`, `ana_tobc.h:48` `ANANAME(34)`, `ana_perturb.h:56` `ANANAME(48)=__FILE__`.) 등록 코드는 `#ifdef DISTRIBUTE` 하 master tile 만 기록 (`ana_btflux.h:39-43`).
+(예: `ana_initial.h:72` `ANANAME(2)`, `ana_grid.h:94`/`:95` `ANANAME(7),(10)`, `ana_smflux.h` `ANANAME(24)`, `ana_tobc.h:48` `ANANAME(34)`, `ana_perturb.h:56` `ANANAME(48)=__FILE__`.) 등록 코드는 `#ifdef DISTRIBUTE` 하 master tile 만 기록 (`ana_btflux.h:39-43`).
 
 ## 2. 기능별 카탈로그 (무엇을 해석적으로 지정하는가)
 

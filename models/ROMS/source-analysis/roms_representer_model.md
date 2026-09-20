@@ -116,7 +116,7 @@ BASIC STATE 와 adjoint 의 관계 — `rp_initial.F:162`:
 
 초기시각 처리(`rp_initial.F:164-172`): NLM IC 시각 `INItime(ng)` 가 알려져 있으면 그것을, 아니면 `dstart` 를 사용. → `ntstart`/`ntend` 산정(`rp_initial.F:174-175`).
 
-약제약 시 RPM 초기조건 파일 정의: `rp_initial.F:72-74` (`#ifdef WEAK_CONSTRAINT`) `USE rp_def_ini_mod, ONLY : rp_def_ini`. 모듈 `rp_def_ini.F:12` > "This module opens existing representer model initial conditions" — `iRPM` 으로 NetCDF/PIO 변수 정의(`rp_def_ini.F:141`, `:408`, `:931` 등).
+약제약 시 RPM 초기조건 파일 정의: `rp_initial.F:72-74` (`#ifdef WEAK_CONSTRAINT`) `USE rp_def_ini_mod, ONLY : rp_def_ini`. 모듈 `rp_def_ini.F:12` > "This module opens existing representer model initial conditions" — `iRPM` 으로 NetCDF/PIO 변수 정의(`rp_def_ini.F:139`, `:408`, `:931` 등).
 
 첫 step 후처리 `rp_post_initial.F:39` `SUBROUTINE rp_post_initial (ng, model)`, 헤더 `rp_post_initial.F:13-16`:
 > "On the first timestep, it computes the initial depths and level thicknesses from the initial free-surface field. Additionally, it initializes the representer state variables for all time levels and applies lateral boundary conditions."

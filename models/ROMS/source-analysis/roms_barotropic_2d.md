@@ -21,7 +21,7 @@ How ROMS splits the fast barotropic (depth-integrated 2D) mode from the slow bar
 - `ROMS/Utility/set_weights.F:12-182` — primary/secondary weight design, `nfast` derivation.
 - `ROMS/Utility/read_phypar.F:608` and `inp_par.F:640` — `NDTFAST → dtfast = dt/NDTFAST`.
 - `ROMS/Nonlinear/step3d_uv.F:1306-1526` — 3D→2D coupling and mass-flux correction.
-- `ROMS/Utility/checkdefs.F:3596` — 2D-only check (`!SOLVE3D ⇒ NDTFAST=1`).
+- `ROMS/Utility/checkdefs.F:3631` — 2D-only check (`!SOLVE3D ⇒ NDTFAST=1`).
 
 ## A. Mode-splitting structure
 
@@ -67,7 +67,7 @@ In nesting, the time-averaged `DU_avg1`, `DV_avg1`, `Zt_avg` are exchanged via `
   - Center-of-gravity at `NDTFAST` (so the average is centered on the slow time level, not biased forward).
   - Secondary weights for the staggered combinations `(-1/12, 8/12-1/12, 5/12)` used by LF-AM3 (`:785-836`).
 - This is the anti-aliasing bridge: too small `NDTFAST` ⇒ filter cannot kill aliased high-frequency 2D modes ⇒ noisy `zeta`.
-- Hard rule: 2D-only runs (`!SOLVE3D`) must use `NDTFAST=1` (`checkdefs.F:3596`). Split stepping is only valid with a 3D mode to filter into.
+- Hard rule: 2D-only runs (`!SOLVE3D`) must use `NDTFAST=1` (`checkdefs.F:3631`). Split stepping is only valid with a 3D mode to filter into.
 
 ## F. Open boundary in 2D
 

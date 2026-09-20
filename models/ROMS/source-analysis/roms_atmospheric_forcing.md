@@ -20,10 +20,10 @@ How `BULK_FLUXES` calls `bulk_flux` in the 3D nonlinear driver, the input fields
 - `Nonlinear/bulk_flux.F:20-1336, 74-79, 150-1558, 768-920, 1493-1558` — bulk flux algorithm.
 - `Nonlinear/get_data.F:222-544` — input loading.
 - `Nonlinear/set_data.F:216-628` — interpolation.
-- `Nonlinear/pre_step3d.F:324-892`, `lmd_swfrac.F:17-67` — shortwave penetration.
+- `Nonlinear/pre_step3d.F:324-945`, `lmd_swfrac.F:17-67` — shortwave penetration.
 - `External/varinfo.yaml:2034, 2067` — variable metadata.
-- `Modules/mod_ncparam.F:168` — `Hout` definitions.
-- `Utility/def_his.F:5109-5352`, `wrt_his.F:1834-2200` — history output.
+- `Modules/mod_ncparam.F:172` — `Hout` definitions.
+- `Utility/def_his.F:5117-5360`, `wrt_his.F:1834-2200` — history output.
 
 ## A. Dispatch
 
@@ -131,7 +131,7 @@ Jerlov types: I (clear ocean), IA, IB, II, III; coastal water typically II or II
 
 ## H. History output
 
-Switches `Hout(:,:)` (`mod_ncparam.F:168`).
+Switches `Hout(:,:)` (`mod_ncparam.F:172`).
 
 Bulk-related definitions in `def_his.F`:
 - `idTsur(itemp)` — surface tracer heat flux (`:5109`).

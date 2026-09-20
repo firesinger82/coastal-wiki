@@ -59,20 +59,20 @@ ROMS .F 파일은 모두 C-preprocessor 매크로(`#include "cppdefs.h"`)로 시
 | `netcdf_put_fvar` (부동소수 write) | 0d~4d (+dp) | `:82-94` |
 | `netcdf_put_ivar`/`put_lvar`/`put_svar` | 0d~2d/3d | `:96-113` |
 
-PUBLIC 진입점 (`mod_netcdf.F:115-126`): `netcdf_check_dim`, `netcdf_check_var`, `netcdf_close`, `netcdf_create`, `netcdf_enddef`, `netcdf_get_dim`, `netcdf_get_satt`, `netcdf_inq_var`, `netcdf_inq_varid`, `netcdf_open`, `netcdf_redef`, `netcdf_sync`.
+PUBLIC 진입점 (`mod_netcdf.F:117-128`): `netcdf_check_dim`, `netcdf_check_var`, `netcdf_close`, `netcdf_create`, `netcdf_enddef`, `netcdf_get_dim`, `netcdf_get_satt`, `netcdf_inq_var`, `netcdf_inq_varid`, `netcdf_open`, `netcdf_redef`, `netcdf_sync`.
 
 ### 2.2 외부 자료형 결정 (CPP 조건부)
 출력 부동소수 외부표현은 cppdefs 매크로로 결정:
-- `NF_FOUT` = `OUT_DOUBLE` 시 `nf90_double`, 아니면 `nf90_real` (`mod_netcdf.F:187-191`)
+- `NF_FOUT` = `OUT_DOUBLE` 시 `nf90_double`, 아니면 `nf90_real` (`mod_netcdf.F:189-193`)
 - `NF_FRST` (restart) = `RST_SINGLE` 시 `nf90_real`, 아니면 `nf90_double` (`:192-196`)
 - `NF_TOUT` (시간·깊이 변수) = 항상 `nf90_double` — 주석 `:203-205`: *"It is set to double precision for accuaracy in both single and douple precision numerical kernel"* (원문 오타 verbatim)
 
 ### 2.3 파일 생성 모드 (CMODE)
-`mod_netcdf.F:209-216` — 기본 생성 모드 플래그. `HDF5 || PARALLEL_IO || OUT_NETCDF4` 시 `CMODE = nf90_netcdf4` (NetCDF-4/HDF5), 아니면 classic. `netcdf_create` 에서 `IOR` 로 추가 플래그 합성:
+`mod_netcdf.F:211-218` — 기본 생성 모드 플래그. `HDF5 || PARALLEL_IO || OUT_NETCDF4` 시 `CMODE = nf90_netcdf4` (NetCDF-4/HDF5), 아니면 classic. `netcdf_create` 에서 `IOR` 로 추가 플래그 합성:
 - 병렬 경로 (`netcdf_create.F:9137-9140` 부근): `my_cmode=IOR(CMODE, nf90_mpiio)` → `IOR(my_cmode, nf90_clobber)` → `nf90_create(path=..., cmode=my_cmode, ...)`
 - 직렬 경로 (`:9163-9169`): `my_cmode=IOR(nf90_clobber, CMODE)`, `IOR(my_cmode, nf90_share)`, `nf90_create(TRIM(ncname), my_cmode, ncid)`
 
-(`netcdf_create` SUBROUTINE 본체: `mod_netcdf.F:9083-9216`)
+(`netcdf_create` SUBROUTINE 본체: `mod_netcdf.F:9642-9775`)
 
 ---
 
@@ -92,15 +92,15 @@ END INTERFACE def_dim
 `def_dim_nf90` 본체 (`def_dim.F:34-120`): `OutThread` 만 `nf90_def_dim(ncid, TRIM(DimName), DimSize, DimId)` 호출 (`:94-95`) → 오류 시 `FoundError` 로 `exit_flag=3` 설정 (`:96-100`). 비병렬 I/O + DISTRIBUTE 빌드에서는 `mp_bcasti` 로 `DimID/status/exit_flag` 를 전 thread 에 broadcast (`def_dim.F:103-113`). PIO 버전(`:125-190`)은 `PIO_def_dim` 사용 (`:178`), broadcast 불필요(병렬 I/O 자체가 분산).
 
 ### 3.2 def_var — 변수 + 메타데이터 정의
-`def_var.F:11` *"This routine defines the requested NetCDF variable"*. 입력 `Vinfo` 문자열 배열이 CF 규약 속성 25종을 운반 (`def_var.F:33-59`): `(1)`이름·`(2)`long_name·`(3)`units·`(4)`calendar·`(13)`cycle·`(14)`field·`(16)`time·`(17)`missing_value·`(21)`standard_name·`(22)`coordinates·`(23)`formula_terms·`(24)`_FillValue 등. `Aval` 실수배열은 add_offset/valid_min/valid_max/missing/C-grid-type/fill 값 운반 (`:26-32`).
+`def_var.F:11` *"This routine defines the requested NetCDF variable"*. 입력 `Vinfo` 문자열 배열이 CF 규약 속성 **26종**을 운반 (`def_var.F:33-60`). 인자 선언이 고정 크기 `Vinfo(25)`에서 `Vinfo(Natt)`로 바뀌고 `Natt=26`이 `mod_ncparam.F:114`에 새로 정의됐으며, 26번째 `range` 속성이 nf90·PIO 양쪽 경로에서 실제로 기록된다 (`def_var.F:59, 127, 997-1013, 2026-2042`): `(1)`이름·`(2)`long_name·`(3)`units·`(4)`calendar·`(13)`cycle·`(14)`field·`(16)`time·`(17)`missing_value·`(21)`standard_name·`(22)`coordinates·`(23)`formula_terms·`(24)`_FillValue 등. `Aval` 실수배열은 add_offset/valid_min/valid_max/missing/C-grid-type/fill 값 운반 (`:26-32`).
 
 핵심 호출:
-- 스칼라(`nVdim==1 && Vdim(1)==0`): `nf90_def_var(ncid, TRIM(Vinfo(1)), Vtype, varid=Vid)` (`def_var.F:159-161`)
+- 스칼라(`nVdim==1 && Vdim(1)==0`): `nf90_def_var(ncid, TRIM(Vinfo(1)), Vtype, varid=Vid)` (`def_var.F:160-162`)
 - 일반 다차원: `nf90_def_var(ncid, TRIM(Vinfo(1)), Vtype, Vdim(1:nVdim), Vid)` (`:162-164`)
-- 압축: `DEFLATE && OUT_NETCDF4` 시 `nf90_def_var_deflate(ncid, Vid, shuffle, deflate, deflate_level)` (다차원 변수 한정, `def_var.F:175-189`)
-- 속성: `nf90_put_att(...)` 반복으로 CF 메타·UGRID 위상(`cf_role`·`topology_dimension`·`node_dimensions`·`face_dimensions` 등, `def_var.F:199-346`) 기록.
+- 압축: `DEFLATE && OUT_NETCDF4` 시 `nf90_def_var_deflate(ncid, Vid, shuffle, deflate, deflate_level)` (다차원 변수 한정, `def_var.F:176-190`)
+- 속성: `nf90_put_att(...)` 반복으로 CF 메타·UGRID 위상(`cf_role`·`topology_dimension`·`node_dimensions`·`face_dimensions` 등, `def_var.F:200-347`) 기록.
 
-> 주석 `def_var.F:75-76`: *"Notice that arrays \"Aval\" and \"Vinfo\" is destroyed on output to facilitate the definition of the next variable."* — 호출자가 같은 버퍼를 재사용하도록 함.
+> 주석 `def_var.F:76-77`: *"Notice that arrays \"Aval\" and \"Vinfo\" is destroyed on output to facilitate the definition of the next variable."* — 호출자가 같은 버퍼를 재사용하도록 함.
 
 ---
 
@@ -108,10 +108,10 @@ END INTERFACE def_dim
 
 `def_his.F` (6575 라인) 가 `def_*` 의 전형. `def_his_nf90` 의 단계:
 
-1. **파일명 설정·보고** `def_his.F:174-186` (`ncname=HIS(ng)%name`).
+1. **파일명 설정·보고** `def_his.F:172-184` (`ncname=HIS(ng)%name`).
 2. **신규 파일 생성** — `DEFINE : IF (ldef)` 분기 (`:192`) → `CALL netcdf_create (ng, model, TRIM(ncname), HIS(ng)%ncid)` (`:193`).
-3. **차원 정의** `:199-` — `DimIDs=0` 초기화 후 C-grid 스태거 차원 일괄 정의: `xi_rho/xi_u/xi_v/xi_psi`, `eta_rho/eta_u/eta_v/eta_psi` (`def_his.F:205-235`), 경계조정 시 `IorJ`(`:237-241`), water-point 압축 시 `xy_rho/xy_u`(`WRITE_WATER && MASKING`, `:243-249`). 차원 크기는 `IOBOUNDS(ng)%xi_rho` 등 I/O 경계 구조에서 가져옴.
-4. **변수 정의** — `status=def_var(...)` 를 변수마다 반복. 시간변수부터(`HIS(ng)%Vid(idtime)`, `def_his.F:558`), 이어 wet/dry 마스크(`idPwet/idRwet/idUwet/idVwet`, `:596-647`), 깊이(`idpthR/U/V/W`), 자유표면(`idFsur`), 운동량·추적자 등. 각 변수 ID는 `HIS(ng)%Vid(...)` 에 저장돼 wrt_* 가 참조.
+3. **차원 정의** `:199-` — `DimIDs=0` 초기화 후 C-grid 스태거 차원 일괄 정의: `xi_rho/xi_u/xi_v/xi_psi`, `eta_rho/eta_u/eta_v/eta_psi` (`def_his.F:203-233`), 경계조정 시 `IorJ`(`:237-241`), water-point 압축 시 `xy_rho/xy_u`(`WRITE_WATER && MASKING`, `:243-249`). 차원 크기는 `IOBOUNDS(ng)%xi_rho` 등 I/O 경계 구조에서 가져옴.
+4. **변수 정의** — `status=def_var(...)` 를 변수마다 반복. 시간변수부터(`HIS(ng)%Vid(idtime)`, `def_his.F:562`), 이어 wet/dry 마스크(`idPwet/idRwet/idUwet/idVwet`, `:596-647`), 깊이(`idpthR/U/V/W`), 자유표면(`idFsur`), 운동량·추적자 등. 각 변수 ID는 `HIS(ng)%Vid(...)` 에 저장돼 wrt_* 가 참조.
 
 ---
 
@@ -187,17 +187,17 @@ read_*는 NetCDF 가 아닌 **텍스트 표준입력** 파서다(파일명·스�
 | 패턴 | 근거 |
 |---|---|
 | 모든 def/wrt/get/nf_ 모듈이 nf90 + PIO 듀얼 구현을 generic INTERFACE 로 추상화 | `def_dim.F:24-29`, `nf_fwrite2d.F:77-82` |
-| 오류 전파: `FoundError(status, nf90_noerr, __LINE__, MyFile)` → `exit_flag=3; ioerror=status` | `def_dim.F:96-100`, `def_var.F:166-171` |
+| 오류 전파: `FoundError(status, nf90_noerr, __LINE__, MyFile)` → `exit_flag=3; ioerror=status` | `def_dim.F:96-100`, `def_var.F:167-172` |
 | 비-PARALLEL_IO 분산: `OutThread`/`Master` 만 호출, 결과 `mp_bcast*` broadcast | `def_dim.F:94-113` |
 | write = (gather/pack) → `nf90_put_var`; read = `nf90_get_var` → (scatter) | `nf_fwrite2d.F:295,379,551`; `nf_fread2d.F:358,1035` |
-| def_*/wrt_* 출력 파일별 1:1 쌍, 변수 ID는 구조체 `<F>(ng)%Vid(idXxx)` 에 보존 | `def_his.F:558`, `wrt_his.F:270` |
+| def_*/wrt_* 출력 파일별 1:1 쌍, 변수 ID는 구조체 `<F>(ng)%Vid(idXxx)` 에 보존 | `def_his.F:562`, `wrt_his.F:270` |
 | 시간 레코드(unlimited)는 wrt_* 의 `%Rindex` 가 증분 관리 | `wrt_his.F:235,257` |
 
 ---
 
 ## 9. 미확인 / 후속 (source-needed)
 
-- `netcdf_open`/`netcdf_close`/`netcdf_enddef`/`netcdf_redef`/`netcdf_sync` 내부 구현 라인 — PUBLIC 선언만 확인(`mod_netcdf.F:117-126`), 본체 미정독. ⚠ 미확인.
+- `netcdf_open`/`netcdf_close`/`netcdf_enddef`/`netcdf_redef`/`netcdf_sync` 내부 구현 라인 — PUBLIC 선언만 확인(`mod_netcdf.F:119-128`), 본체 미정독. ⚠ 미확인.
 - set_2dfld/set_3dfld 의 실제 시간보간 계수(`fac1`/`fac2`) 적용 — 본 노트 범위 밖(numerics 계열, 별도 노트 담당).
 - 4D-Var 전용 def/wrt (def_hessian·def_lanczos·def_norm·def_std·wrt_state 등) 세부 — 헤더만 식별, 구조는 [[roms_4dvar]]/[[roms_adjoint_framework]] 와 교차. source-needed.
 - `def_var.F` UGRID 위상 속성(`face_dimensions` 등) 의 전체 조건부 분기 — 대표 라인만 인용.

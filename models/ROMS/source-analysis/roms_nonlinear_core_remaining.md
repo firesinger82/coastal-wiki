@@ -213,7 +213,7 @@ $$\text{Huon}=0.5(H_z^i+H_z^{i-1})\,u\,\text{on\_u},\quad \text{Hvom}=0.5(H_z^j+
 - **Crank-Nicholson** 암시 스킴의 시간 "n" 연직 점성·확산 기여 계산 — Hz 가 2D(barotropic) 엔진 끝에서 덮어쓰여지므로 미리 (`pre_step3d.F:21-24`).
 - 실제 시간적분은 step3d_uv·step3d_t 에서 (`pre_step3d.F:26-27`) — [[roms_baroclinic_3d]].
 
-본체 주요 블록 (`pre_step3d_tile`, `pre_step3d.F:126-1180`): 단파 침투분율 swdk (`326`), 중간 트레이서 n+1/2 (`348`), 수평·연직 이류에 의한 변화율 (`351, 627`), 인공 연속방정식(`811`), 연직 확산플럭스 FC (`858`), 새 트레이서 (`918`), U/V 점성 연직플럭스 + 새 운동량 (`939, 966, 1044, 1071`). (세부 알고리즘은 step3d 본체와 중복 — [[roms_baroclinic_3d]] · [[roms_vertical_mixing]] 참조.)
+본체 주요 블록 (`pre_step3d_tile`, `pre_step3d.F:126-1256`): 단파 침투분율 swdk (`326`), 중간 트레이서 n+1/2 (`348`), 수평·연직 이류에 의한 변화율 (`351, 627`), 인공 연속방정식(`811`), 연직 확산플럭스 FC (`858`), 새 트레이서 (`918`), U/V 점성 연직플럭스 + 새 운동량 (`939, 966, 1044, 1071`). (세부 알고리즘은 step3d 본체와 중복 — [[roms_baroclinic_3d]] · [[roms_vertical_mixing]] 참조.)
 
 ---
 

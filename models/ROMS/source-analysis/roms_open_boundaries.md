@@ -17,7 +17,7 @@ Per-edge OBC dispatch via `LBC(edge, var, ng)`, the actual implementations of fr
 ## Source basis
 
 - `mod_param.F:340-373, 1731-1798` — `LBC` shape, fields, allocation.
-- `inp_decode.F:1617-1658` — `Cha/Che/Cla/Clo/Fla/Rad/RadNud/Red/Shc` keyword parsing.
+- `inp_decode.F:1773-1814` — `Cha/Che/Cla/Clo/Fla/Rad/RadNud/Red/Shc` keyword parsing.
 - `zetabc.F:121-713` — free-surface BCs.
 - `u2dbc_im.F:145-783, v2dbc_im.F:150-774` — 2D momentum.
 - `u3dbc_im.F:99-676, v3dbc_im.F:99-676` — 3D momentum.
@@ -120,7 +120,7 @@ Fields (`:357-373`): `Chapman_explicit, Chapman_implicit, clamped, closed, Flath
 
 Allocated for NLM/TLM/ADJ (`:1731-1798`).
 
-Input keyword → flag mapping (`inp_decode.F:1617-1658`):
+Input keyword → flag mapping (`inp_decode.F:1773-1814`):
 
 | Keyword | Sets |
 |---|---|
