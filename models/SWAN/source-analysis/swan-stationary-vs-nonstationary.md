@@ -22,7 +22,7 @@ How SWAN dispatches between stationary (`MODE STAT`) and non-stationary (`MODE N
 - `swancom5.ftn:2148-2904, 2629-2700` — propagation scheme implementations.
 - `swmod1.ftn:2272-2403, 2869-2874` — defaults, `PROPSC` codes.
 - `swmod2.ftn:990-1028` — AC2 storage.
-- `SwanCompUnstruc.ftn90:780-1080`, `SwanVertlist.ftn90:45-181` — unstructured.
+- `SwanCompUnstruc.ftn90:777-1077`, `SwanVertlist.ftn90:48-217` — unstructured.
 
 ## A. Top-level dispatch
 
@@ -126,12 +126,12 @@ For unstructured (`OPTG=5`):
 - `SWMAIN` builds vertex list (`swanmain.ftn:493-495`).
 - Calls `SwanCompUnstruc` (`:623-627`).
 
-`SwanVertlist` creates vertex orderings aligned with sweep directions (`SwanVertlist.ftn90:45-181`):
+`SwanVertlist` creates vertex orderings aligned with sweep directions (`SwanVertlist.ftn90:48-217`):
 - First sweep direction follows user/wave/wind direction.
 - Allocates `vlist(nverts, nsweep)`.
 - Projects vertices onto each sweep direction; sorts by distance.
 
-`SwanCompUnstruc` iterates over sweeps + ordered vertices (`SwanCompUnstruc.ftn90:829-987`):
+`SwanCompUnstruc` iterates over sweeps + ordered vertices (`SwanCompUnstruc.ftn90:823-984`):
 - Identifies upwave vertices from cell topology.
 - Selects spectral sector for each sweep.
 

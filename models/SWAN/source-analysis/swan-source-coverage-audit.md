@@ -24,6 +24,12 @@ related:
 
 ## 1. 58 source file inventory (raw ls 직접)
 
+> **스냅샷 기준**: 본 인벤토리는 snapshot `43e9bbb` 기준이다. 직전 pinned `5544152` 대비
+> `SwanThreadBounds.ftn90`(unstructured OpenMP thread 경계 계산, 160줄)이 upstream 에서
+> 삭제되어 목록에서 제외했다 — 스케줄링 책임이 `SwanVertlist.ftn90` 의 front 구성과
+> `SwanCompUnstruc.ftn90` 의 front 루프로 옮겨갔다(`SwanCompUnstruc.ftn90:823-984`).
+> 나머지 나열 항목은 새 스냅샷에 모두 존재한다.
+
 ```
 58 source files in models/SWAN/raw/source_code/swan/src/
 ```
@@ -35,7 +41,7 @@ related:
 - **Grid readers**: SwanReadADCGrid / SwanReadEasymeshGrid / SwanReadGrid / SwanReadTriangleGrid
 - **Interpolation**: SwanInterpolateAc / SwanInterpolateOutput / SwanInterpolatePoint
 - **Boundary / obstacles**: SwanBndStruc / SwanBpntlist / SwanCrossObstacle / SwanFindObstacles
-- **Compute (unstructured)**: SwanCompUnstruc / SwanCompdata / SwanComputeForce / SwanConvAccur / SwanConvStopc / SwanPrepComp / SwanSweepSel / SwanThreadBounds
+- **Compute (unstructured)**: SwanCompUnstruc / SwanCompdata / SwanComputeForce / SwanConvAccur / SwanConvStopc / SwanPrepComp / SwanSweepSel
 - **Propagation velocity**: SwanGradDepthorK / SwanGradVel / SwanPropvelS / SwanPropvelX
 - **Transport**: SwanTranspAc / SwanTranspX
 - **Spectral**: SwanDispParm / SwanIntgratSpc / SwanSpectPart (.ftn legacy)

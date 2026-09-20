@@ -30,7 +30,7 @@ Codex deep scan 2026-05-06 of:
 - Runtime dispatch in `swanmain.ftn`:
   - Structured: `SWCOMP` when `OPTG ≠ 5` at `[file=src/swanmain.ftn line=618-623]`
   - Unstructured: `SwanCompUnstruc` when `OPTG == 5` at `[file=src/swanmain.ftn line=624-627]`
-- `SwanCompUnstruc` engine purpose (vertex-based, implicit geo+spectral) at `[file=src/SwanCompUnstruc.ftn90 line=66-83]`
+- `SwanCompUnstruc` engine purpose (vertex-based, implicit geo+spectral) at `[file=src/SwanCompUnstruc.ftn90 line=68-85]`
 
 ## B. SwanGriddata / SwanGridobjects modules
 
@@ -61,18 +61,18 @@ Connectivity:
   - `cax = cgo*cos(theta)`, `cay = cgo*sin(theta)` at `[file=src/SwanPropvelX.ftn90 line=87-89]`
   - Optional diffraction scaling at `[file=src/SwanPropvelX.ftn90 line=94-101]`
   - Ambient current advection at `[file=src/SwanPropvelX.ftn90 line=105-110]`
-- Called from unstructured main loop at `[file=src/SwanCompUnstruc.ftn90 line=918]`
+- Called from unstructured main loop at `[file=src/SwanCompUnstruc.ftn90 line=915]`
 
 ### Sweep replacement
 
-No 4-quadrant fixed sweep. Instead **ordered-vertex sweeps** over `nsweep` directions with per-cell intersection checks at `[file=src/SwanCompUnstruc.ftn90 line=829-979]`. Active spectral bins per sweep selected by `SwanSweepSel` at `[file=src/SwanCompUnstruc.ftn90 line=983-987]`. Spectral velocities per sweep from `SwanPropvelS` at `[file=src/SwanCompUnstruc.ftn90 line=994-1000]`.
+No 4-quadrant fixed sweep. Instead **ordered-vertex sweeps** over `nsweep` directions with per-cell intersection checks at `[file=src/SwanCompUnstruc.ftn90 line=823-976]`. Active spectral bins per sweep selected by `SwanSweepSel` at `[file=src/SwanCompUnstruc.ftn90 line=980-984]`. Spectral velocities per sweep from `SwanPropvelS` at `[file=src/SwanCompUnstruc.ftn90 line=991-997]`.
 
 ### Solver dispatch
 
-- Direct divide if no refraction/freq shift at `[file=src/SwanCompUnstruc.ftn90 line=1206-1228]`
-- `SOLMAT` (Thomas tridiag) at `[file=src/SwanCompUnstruc.ftn90 line=1237-1238]`
-- `SWSIP` (penta-diag SIP, implicit sigma) at `[file=src/SwanCompUnstruc.ftn90 line=1251-1255]`
-- `SOLMT1` (tridiag for explicit sigma) at `[file=src/SwanCompUnstruc.ftn90 line=1264-1266]`
+- Direct divide if no refraction/freq shift at `[file=src/SwanCompUnstruc.ftn90 line=1203-1225]`
+- `SOLMAT` (Thomas tridiag) at `[file=src/SwanCompUnstruc.ftn90 line=1234-1235]`
+- `SWSIP` (penta-diag SIP, implicit sigma) at `[file=src/SwanCompUnstruc.ftn90 line=1248-1252]`
+- `SOLMT1` (tridiag for explicit sigma) at `[file=src/SwanCompUnstruc.ftn90 line=1261-1263]`
 
 Same solver family as structured path — only the sweep loop differs.
 

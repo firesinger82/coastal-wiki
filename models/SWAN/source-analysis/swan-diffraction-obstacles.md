@@ -20,7 +20,7 @@ The phase-decoupled diffraction approximation (`DIFFRAC`) — eikonal-based form
 - `SwanDiffPar.ftn90:44-204` — eikonal diffraction.
 - `swancom5.ftn:1077-1608, 2148-2188, 5527-5717, 5881` — propagation velocity modification, smoothing.
 - `swanser.ftn:2420-3699` — structured obstacle marking, reflection.
-- `SwanPrepComp.ftn90:87`, `SwanFindObstacles.ftn90:103-127`, `SwanCompUnstruc.ftn90:780-1080`, `SwanPropvelX.ftn90:92`, `SwanPropvelS.ftn90:269` — unstructured.
+- `SwanPrepComp.ftn90:87`, `SwanFindObstacles.ftn90:103-127`, `SwanCompUnstruc.ftn90:777-1077`, `SwanPropvelX.ftn90:92`, `SwanPropvelS.ftn90:269` — unstructured.
 - `swanmain.ftn:6394-6455` — disable in GEN4/QC scattering.
 
 ## A. DIFFRAC activation / formulation
@@ -104,7 +104,7 @@ Unstructured handling is face-based:
 - Loops over obstacle segments + non-boundary faces (`SwanFindObstacles.ftn90:103-127`).
 - Marks `cross(iface) = j` when face and obstacle segment intersect.
 
-During unstructured computation, crossed faces mapped to two local stencil links and passed to `SWTRCF` (`SwanCompUnstruc.ftn90:1039-1080`).
+During unstructured computation, crossed faces mapped to two local stencil links and passed to `SWTRCF` (`SwanCompUnstruc.ftn90:1036-1077`).
 
 So unstructured obstacle handling is more flexible than structured (any face can be crossed; no orthogonality restriction).
 
@@ -120,7 +120,7 @@ Velocities enter transport matrix via `STRSXY` — `CAX/CAY` form `FXY1/FXY2` ad
 
 Unstructured:
 - Diffraction computed before transport.
-- `SwanTranspAc` uses modified velocities (`SwanCompUnstruc.ftn90:780-1080`).
+- `SwanTranspAc` uses modified velocities (`SwanCompUnstruc.ftn90:777-1077`).
 
 ## H. Limitations
 
