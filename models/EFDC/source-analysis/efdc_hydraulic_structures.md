@@ -18,8 +18,8 @@ The EFDC+ hydraulic structure module: structure types via `NQCTYP` (5=culvert, 6
 
 - `mod_hydstructure.f90:9-1296` — `HYDSTRUCMOD` module.
 - `Transport/calqvs.f90:756-1217` — `CALQVS` dispatch.
-- `input.f90:1352-6671` — input cards C23, C32, C32A, C32B.
-- `input.f90:6344-6671` — `qctl.inp`, `qctlser.inp`, `qctrules.inp`.
+- `input.f90:1445-6822` — input cards C23, C32, C32A, C32B.
+- `input.f90:6495-6822` — `qctl.inp`, `qctlser.inp`, `qctrules.inp`.
 - `hdmt.f90:587-589`, `hdmt2t.f90:527-529` — `CALQVS` calls.
 - `calpuv9c.f90:609-784`, `caluvw.f90:697-736` — coupling.
 - `setbcs.f90:303-362` — initial structure masks.
@@ -95,12 +95,12 @@ Selection by ratios `HDD/HUD` and `HUD/HB`.
 
 **No separate `NQCTYP` for pumps** in `COMPUTE_HSFLOW`. Pumps via operation rules when rule `PARAM` has bit `16` set; then `PUMP_OPERATION_RULES` returns `QHS` directly (`:191-197`).
 
-Pump rule data: target `FLOW`, `RATE` (`:41`, `input.f90:6580-6581`).
+Pump rule data: target `FLOW`, `RATE` (`:41`, `input.f90:6731-6732`).
 
 Pump ramps flow up/down by `RATE * DELT / 60` until `LIM.FLOW` (`mod_hydstructure.f90:1084-1095`).
 
 **Q-vs-head tables** are general `QCTL.INP` lookups, NOT pump-specific:
-- 1D and 2D head/elevation tables (`input.f90:6344-6387`).
+- 1D and 2D head/elevation tables (`input.f90:6495-6538`).
 - Rules can switch lookup table IDs via bit `32` (`:6671`, `mod_hydstructure.f90:1296`).
 
 ## E. Culverts (NQCTYP=5)
@@ -132,7 +132,7 @@ Input files:
 
 | File | Fields |
 |---|---|
-| `QCTLSER.INP` | time, height, width, sill, flow, table ID (`input.f90:6439, 6456, 6488, 6491`) |
+| `QCTLSER.INP` | time, height, width, sill, flow, table ID (`input.f90:6590, 6607, 6639, 6642`) |
 | `QCTRULES.INP` | trigger level, on/off, ID, height, width, sill, flow, rate (`:6510, 6544, 6573, 6581`) |
 
 ## G. Input format

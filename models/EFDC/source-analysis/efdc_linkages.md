@@ -20,10 +20,10 @@ related:
 
 ## 1. WASP linkage (wasp4-8 + wasp7hydro/wasp8hydro)
 
-- **WASP** (Water Quality Analysis Simulation Program, US EPA) box-model 로 EFDC 수리·분산을 전달. `ISWASP`(input C7, `input.f90:264`) = 버전/모드 선택. 버전별 파일: `wasp4.f90`(637)~`wasp8hydro.f90`(1549). M. Morton 1994.
+- **WASP** (Water Quality Analysis Simulation Program, US EPA) box-model 로 EFDC 수리·분산을 전달. `ISWASP`(input C7, `input.f90:269`) = 버전/모드 선택. 버전별 파일: `wasp4.f90`(637)~`wasp8hydro.f90`(1549). M. Morton 1994.
 - 출력: hydrodynamic flow + **dispersion** 을 WASP 입력 그룹(B hydro / C / D dispersion: WASPB/C/D)으로 write.
-- **residual transport**: `CALMMT`(mean mass transport averaging) 가 `ISWASP>0` 또는 `ISSSMMT>0` + `RESSTEP>0` 시 호출(`hdmt2t.f90:1055`) — 조석평균 잔차 flux/dispersion 을 WASP box exchange 로 집계. [[efdc_caldisp_postprocess]] 의 잔차 dispersion 텐서와 같은 계열(조석평균 transport).
-- **`ISWASP==99 → ISICM=1`** (`input.f90:292`) — WASP 99 = CE-QUAL-ICM 모드 전환.
+- **residual transport**: `CALMMT`(mean mass transport averaging) 가 `ISWASP>0` 또는 `ISSSMMT>0` + `RESSTEP>0` 시 호출(`hdmt2t.f90:1059`) — 조석평균 잔차 flux/dispersion 을 WASP box exchange 로 집계. [[efdc_caldisp_postprocess]] 의 잔차 dispersion 텐서와 같은 계열(조석평균 transport).
+- **`ISWASP==99 → ISICM=1`** (`input.f90:297`) — WASP 99 = CE-QUAL-ICM 모드 전환.
 
 ## 2. CE-QUAL-ICM (ceqicm.f90, 790)
 

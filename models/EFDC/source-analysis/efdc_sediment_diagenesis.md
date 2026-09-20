@@ -18,7 +18,7 @@ related:
 
 > 소스: [`Eutrophication/mod_diagen.f90`](../raw/source_code/EFDCPlus_Stable/EFDC/Eutrophication/mod_diagen.f90) (1394). EFDC+ Stable = 12.4.
 > **정체**: Cerco-Cole 1994(CE-QUAL-ICM) / Di Toro 2001 **2-layer 퇴적물 flux** 서브모델. **pore-water pool `SM2NH4/NO3/PO4` + 벤딕 flux `WQBFNH4/NO3/PO4D/O2(SOD)/COD` 생산** — [[efdc_rpem_vegetation]]·수질 F1 이 이 pool 을 소비. [[efdc_water_quality]]:98-104 은 dispatch(`IWQBEN==1`·`SMMBE`)만, flux 알고리즘 미문서.
-> ★**line range 정정**: water_quality:21 은 `mod_diagen.f90:9-1031` 이라 했으나 module `END`는 :1107, **flux kernel(SEDFLUXNEW/ZBRENT/SOLVSMBE)은 :1121-1393** — stale 인용은 solver 전체를 놓침.
+> ★**line range 정정**: water_quality:21 은 `mod_diagen.f90:9-1029` 이라 했으나 module `END`는 :1107, **flux kernel(SEDFLUXNEW/ZBRENT/SOLVSMBE)은 :1121-1393** — stale 인용은 solver 전체를 놓침.
 
 ## 0. 구조
 

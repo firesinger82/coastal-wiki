@@ -121,7 +121,7 @@ Model fields gathered to global arrays on master, **NOT independent per-PE scien
 
 `Gather_Soln` uses `num_active_l_local` and `MPI_Gatherv` for values + global mapping (`Mod_Gather_Soln.f90:89-103`).
 
-`Map_Write_EE_Binary` maps hydro/output arrays to global; `EE_LINKAGE` called only on `master_id` (`Mod_Map_Write_EE_Binary.f90:49-59`, `aaefdc.f90:3156-3159`).
+`Map_Write_EE_Binary` maps hydro/output arrays to global; `EE_LINKAGE` called only on `master_id` (`Mod_Map_Write_EE_Binary.f90:49-59`, `aaefdc.f90:3158-3161`).
 
 Per-PE files are **logs/debug only**: `EFDC_out_proc_###.log, log_mpi_proc_###.log, map_mpi_proc_###.log` (`Setup_MPI_Debug_File.f90:67-92`).
 

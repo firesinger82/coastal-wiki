@@ -24,8 +24,8 @@ related:
 
 읽기 → 변환 → 런타임 합성:
 
-1. **읽기**: `SEEK('C17')` 후 성분(MTIDE)×경계(NPFOR)별 `PFAM(NP,M), PFPH(NP,M)` (`input.f90:903` 부근, NPFORT 분기별).
-2. **cos/sin 변환**: `RAD = 2π·PFPH/TCP(M)` → `CPFAM0 = PFAM·cos(RAD)`, `SPFAM0 = PFAM·sin(RAD)` (`input.f90:913-915`, NPFORT≥1 분기; NPFORT=0은 S/W/E/N 경계 카드 처리에서 동일 변환 후 ×G로 `PCB*/PSB*` 생성, `input.f90:980-1005` 등 — [[efdc_boundary_conditions]] §G).
+1. **읽기**: `SEEK('C17')` 후 성분(MTIDE)×경계(NPFOR)별 `PFAM(NP,M), PFPH(NP,M)` (`input.f90:936` 부근, NPFORT 분기별).
+2. **cos/sin 변환**: `RAD = 2π·PFPH/TCP(M)` → `CPFAM0 = PFAM·cos(RAD)`, `SPFAM0 = PFAM·sin(RAD)` (`input.f90:944-946`, NPFORT≥1 분기; NPFORT=0은 S/W/E/N 경계 카드 처리에서 동일 변환 후 ×G로 `PCB*/PSB*` 생성, `input.f90:1021-1044` 등 — [[efdc_boundary_conditions]] §G).
 3. **런타임 합성**: `hdmt.f90:89` `TIMESEC = DBLE(TCON)·DBLE(TBEGIN)`(런 시작 시 **절대 시간**으로 초기화) → `setopenbc.f90:232` `TN = TIMESEC`, `:234-237` `CCCOS/SSSIN = cos/sin(2π·mod(TN,TCP)/TCP)` → `:255-260`(남측; 서/동/북 동형) `FP += PCB·cos + PSB·sin`.
 
 cos·cos + sin·sin 합성 항등식으로 정리하면:
@@ -76,19 +76,19 @@ utide 등 정밀 FUV 계산이 불가할 때 쓰는 Schureman 1차 근사 (N = �
 
 ## 5. wser 바람 규약 (ISWDINT)
 
-`wser.inp` 헤더의 `ISWDINT` (`input.f90:6903` read):
+`wser.inp` 헤더의 `ISWDINT` (`input.f90:7055` read):
 
 | ISWDINT | 문서상 의미 | v12.4 실제 동작 |
 |---|---|---|
-| 0 | 풍속+풍향(불어**가는** 방향) | read: 1열에 `WINDSCT` 배율 (`input.f90:6918-6922`). 런타임 그대로 소비 |
-| 1 | 풍속+풍향(불어**오는** 방향) | read 시 2열 180° 반전 (`input.f90:6923-6933`) → 이후 0과 동일 |
-| 2 | 동/북 **속도 성분** (DSI 블로그·wser 헤더 서술) | read는 두 열에 배율만 곱함 (`input.f90:6934-6939`) — **성분→풍속/풍향 변환 없음** |
+| 0 | 풍속+풍향(불어**가는** 방향) | read: 1열에 `WINDSCT` 배율 (`input.f90:7070-7074`). 런타임 그대로 소비 |
+| 1 | 풍속+풍향(불어**오는** 방향) | read 시 2열 180° 반전 (`input.f90:7075-7085`) → 이후 0과 동일 |
+| 2 | 동/북 **속도 성분** (DSI 블로그·wser 헤더 서술) | read는 두 열에 배율만 곱함 (`input.f90:7086-7091`) — **성분→풍속/풍향 변환 없음** |
 
-런타임 유일 소비처 `caltsxy.f90:244-251`(TSWND 사용처는 `caltsxy.f90` 외에 read/선언뿐)은 **무조건** 1열=풍속, 2열=풍향으로 해석한다: `DEGM = 90 − VAL(:,2)`(나침반 방위→수학각), `WINDE = 풍속·cos(DEGM)`, `WINDN = 풍속·sin(DEGM)`. 따라서:
+런타임 유일 소비처 `caltsxy.f90:243-250`(TSWND 사용처는 `caltsxy.f90` 외에 read/선언뿐)은 **무조건** 1열=풍속, 2열=풍향으로 해석한다: `DEGM = 90 − VAL(:,2)`(나침반 방위→수학각), `WINDE = 풍속·cos(DEGM)`, `WINDN = 풍속·sin(DEGM)`. 따라서:
 
 - **`ISWDINT=2`로 성분(E/N)을 넣으면 v12.4는 조용히 오독한다** — E성분을 풍속으로, N성분을 방위각으로 읽음. 사용 금지.
 - 실재 옵션은 0(toward)/1(from)뿐. 내부 표준은 "불어가는 방향" 나침반 방위 + 풍속.
-- 참고: 풍속은 이후 `WINDH` 측정고도에서 2 m 로그 변환(`caltsxy.f90:253-255` 부근, z0=0.003 open grassland).
+- 참고: 풍속은 이후 `WINDH` 측정고도에서 2 m 로그 변환(`caltsxy.f90:252-254` 부근, z0=0.003 open grassland).
 
 ## 6. 참조 구현 (레퍼런스)
 

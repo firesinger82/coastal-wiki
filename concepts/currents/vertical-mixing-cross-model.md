@@ -43,7 +43,7 @@ related:
 |---|---|---|---|
 | ROMS GLS | Dirichlet + **Charnok/Craig-Banner 옵션**(파랑 dissipation 주입) | log-wall | **있음** — 강풍 시 Charnok 미사용하면 표면 TKE 과소(노트 명시) |
 | Delft3D | 풍응력 기반 `tkewin`(tratur.f90:942-955) | log-wall `k=U²/(s²√c_μ)`(:978-991), 조도 선택 연동 | 없음(풍 경로만) |
-| EFDC | `q²=B₁^{2/3}·|τ_s|`(hdmt2t.f90:875-889) | `q²=B₁^{2/3}·|τ_b|` — 파랑은 wave-current 저면응력 경로(:939-964) | 표면 주입 없음(저면 응력 경유만) |
+| EFDC | `q²=B₁^{2/3}·|τ_s|`(hdmt2t.f90:879-893) | `q²=B₁^{2/3}·|τ_b|` — 파랑은 wave-current 저면응력 경로(:939-964) | 표면 주입 없음(저면 응력 경유만) |
 | SWASH | k Neumann + ε Dirichlet(:748-772) | Dirichlet `k=u*²/√c_μ` 또는 log-law 직접해(`irough=4`, :801-816) | k-ε 주입 없음 — ★breaking 소산은 **수평** HorzVisc(`ihvisc=4`) 경로(위상해상이라 애초 별도) |
 | ADCIRC | 미커버 | 3D BBL 응력(2D Manning 아님 — pitfall) | 없음 |
 

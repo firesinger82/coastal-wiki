@@ -16,9 +16,9 @@ How EFDC+ ingests boundary time series (`PSER` elevation, `NCSER` concentration,
 
 ## Source basis
 
-- `input.f90:264, 548, 732-754, 852-867, 870-1321, 1352-1378, 2721-2995, 3656-3705, 5650-5685, 5717-5755, 5858-6277` — input cards C5, C11, C14–C24, time series headers.
+- `input.f90:269, 570, 755-778, 884-901, 903-1395, 1445-1470, 2818-3092, 3753-3781, 5801-5836, 5868-5906, 6009-6428` — input cards C5, C11, C14–C24, time series headers.
 - `calpser.f90:25-66` — runtime PSER interpolation.
-- `setbcs.f90:203-490` — initialization of BC mappings + face/momentum mask setup.
+- `setbcs.f90:203-492` — initialization of BC mappings + face/momentum mask setup.
 - `setopenbc.f90:231-620` — runtime pressure BC application (S/W/E/N), `LOPENBCDRY`.
 - `Transport/calcser.f90`, `Transport/calqvs.f90`, `Transport/calfqc.f90` — concentration/flow series interpolation and injection.
 - `subchan.f90`, `mod_chanbc.f90` — subgrid channel.
@@ -33,7 +33,7 @@ Read when `NPSER >= 1`. Header: `ITYPE, NREC, TMULT, TOFFSET, RMULADJ, ADDADJ, P
 | `0` | `(t, η)` | Single-side elevation series |
 | `1` | `(t, η_primary, η_secondary)` + secondary adjustment | Cross-channel slope, two-side coupling |
 
-Conversion to pressure-head: `G * η` units (`input.f90:5650-5685`). Datum shifts `PSERZDF/PSERZDS` also × G (`:5661-5665`).
+Conversion to pressure-head: `G * η` units (`input.f90:5801-5836`). Datum shifts `PSERZDF/PSERZDS` also × G (`:5661-5665`).
 
 Runtime in `CALPSER`:
 - Time scaling by `TMULT`, advance `MTSPLAST`.
@@ -44,7 +44,7 @@ Application via `SETOPENBC` (called from both external solvers):
 - `calpuv9c.f90:638-642` (3TL) or `calpuv2c.f90:591-599` (2TL).
 - Applied as `PSERT + PSERZDF/2 + PSERST + PSERZDS/2` at S/W/E/N pressure cells (`setopenbc.f90:252-260, 357-365, 460-469, 566-574`).
 
-`CALEXP` does not read PSER directly; it modifies momentum for open-boundary types `2` and `5` (`calexp.f90:629-669`; 2TL `calexp2t.f90:581-620`).
+`CALEXP` does not read PSER directly; it modifies momentum for open-boundary types `2` and `5` (`calexp.f90:629-669`; 2TL `calexp2t.f90:591-630`).
 
 ## B. NCSER (concentration time series)
 
@@ -63,13 +63,13 @@ Application via `SETOPENBC` (called from both external solvers):
 Header: `ISTYP, MCSER, TCCSER, TOFFSET, multiplier, additive`, with either layer weights or per-layer values.
 
 Examples:
-- Salinity at `input.f90:5858-5904`.
+- Salinity at `input.f90:6009-6055`.
 - Temperature `:5907-5951`.
 - Dye `:5955-6015`.
 - Sediment/toxic `:6066-6277`.
 
 Open-concentration BC cards (per side, `NCSER*` indices + ramp `NTSCR*`):
-- South `input.f90:2721-2737`.
+- South `input.f90:2818-2834`.
 - West `:2807-2823`.
 - East `:2893-2909`.
 - North `:2979-2995`.
@@ -82,10 +82,10 @@ Injection (two paths):
 
 ## C. NQSER (flow time series, river discharge)
 
-Card C23 reads `NQSIJ` and `NQSER` counts (`input.f90:1352-1360`).
+Card C23 reads `NQSIJ` and `NQSER` counts (`input.f90:1445-1452`).
 
 C24 reads each volumetric source cell:
-`I, J, QSSE, NQSMUL, NQSMF, NQSERQ, NCSERQ(1:7), QWIDTH, QFACTOR, GRPID` (`input.f90:1365-1378`).
+`I, J, QSSE, NQSMUL, NQSMF, NQSERQ, NCSERQ(1:7), QWIDTH, QFACTOR, GRPID` (`input.f90:1457-1470`).
 
 MPI mapping preserves `NQSERQ, NCSERQ, QFACTOR, QWIDTH, GRPID` (`MPI_Mapping/Map_Discharge_BCs.f90:50-69`).
 
@@ -96,7 +96,7 @@ MPI mapping preserves `NQSERQ, NCSERQ, QFACTOR, QWIDTH, GRPID` (`MPI_Mapping/Map
 | `1` | Reads vertical weight vector `WKQ(K)`; scalar flow distributed by layer |
 | else | Each record gives layer flows directly |
 
-Sign clipping by `ICHGQS` (`input.f90:5717-5755`).
+Sign clipping by `ICHGQS` (`input.f90:5868-5906`).
 
 Runtime:
 - `CALQVS` interpolates → `QSERT(K, NS)` (`Transport/calqvs.f90:428-449`).
@@ -107,7 +107,7 @@ Runtime:
 
 ## D. NPBS / NPBE / NPBN / NPBW (pressure BC indices)
 
-C16 reads counts: `NPBS, NPBW, NPBE, NPBN, NPFOR, NPFORT, NPSER, PDGINIT` (`input.f90:870-889`).
+C16 reads counts: `NPBS, NPBW, NPBE, NPBN, NPFOR, NPFORT, NPSER, PDGINIT` (`input.f90:903-919`).
 
 Per-boundary pressure cells:
 
@@ -134,7 +134,7 @@ Per-boundary pressure cells:
 
 ## F. SUBCHAN (subgrid channel)
 
-`MODCHAN.INP` read when `ISCHAN > 0`. Supplies `MDCHH, QCHERR, channel type, host cell, U/V channel cells`, plus channel length/friction for `ISCHAN==2` (`input.f90:3656-3689`).
+`MODCHAN.INP` read when `ISCHAN > 0`. Supplies `MDCHH, QCHERR, channel type, host cell, U/V channel cells`, plus channel length/friction for `ISCHAN==2` (`input.f90:3753-3778`).
 
 Host and channel I/J → `LMDCHH, LMDCHU, LMDCHV` (`:3692-3705`).
 
@@ -149,12 +149,12 @@ Host and channel I/J → `LMDCHH, LMDCHU, LMDCHV` (`:3692-3705`).
 
 There is **no `NWTSER` symbol**; equivalent is `MTIDE` plus periodic pressure forcing `NPFOR`.
 
-- C14 reads `MTIDE` (`input.f90:732-754`).
+- C14 reads `MTIDE` (`input.f90:755-778`).
 - C15 reads tidal symbols + periods `SYMBOL(M), TCP(M)` (`:852-867`).
 - C17 reads harmonic amplitude/phase, converts phase to cos/sin coefficients (`:891-920`).
 
 Boundary cards convert harmonics to `PCB*/PSB*` for each side (× G):
-- South `input.f90:980-1005`.
+- South `input.f90:1021-1044`.
 - West `:1070-1096`.
 - East `:1159-1185`.
 - North `:1249-1275`.
@@ -195,7 +195,7 @@ Dry-cell transport masks **deliberately keep active boundary-flow cells alive**:
 - `RMULADJ` and `ADDADJ` apply to **all** records; check before scaling.
 - BC ramp `NTSCR*` is in **timesteps**, not seconds — set proportional to spin-up duration.
 - For multi-river runs, group `GRPID` lets you scale a subset uniformly via post-processing — useful for sensitivity tests.
-- Harmonic block (C17) `PFPH` phase is **not degrees** — it is a time lag in the same unit as `TCP` (seconds): `RAD = 2π·PFPH/TCP` (`input.f90:913-915`, v12.4 재확인 2026-07). Degrees must be converted: `PFPH = [TCON·TBEGIN + TCP·(G−(V0+u))/360] mod TCP`. Amplitudes `PFAM` are in m (× G to pressure head at the boundary-card conversion). See [[efdc-tidal-forcing-conventions-v12]].
+- Harmonic block (C17) `PFPH` phase is **not degrees** — it is a time lag in the same unit as `TCP` (seconds): `RAD = 2π·PFPH/TCP` (`input.f90:944-946`, v12.4 재확인 2026-07). Degrees must be converted: `PFPH = [TCON·TBEGIN + TCP·(G−(V0+u))/360] mod TCP`. Amplitudes `PFAM` are in m (× G to pressure head at the boundary-card conversion). See [[efdc-tidal-forcing-conventions-v12]].
 - `LOPENBCDRY` events are logged — grep stdout for "OPEN BC DRY" during validation.
 - Subgrid channel needs both donor and receiver cells to be active wet for the channel itself to be active; design `MODCHAN.INP` accordingly.
 

@@ -18,9 +18,9 @@ How EFDC+ runs the original Mellor-Yamada 2.5 closure (CALQQ1 / CALQQ2T + CALAVB
 
 - `calqq1.f90`, `calqq2t.f90` — `q²` (= QQ) and `q²L` (= QQL) equation assembly and tridiagonal solve.
 - `calavb.f90` — vertical viscosity / diffusivity assembly with stability functions.
-- `mod_var_global.f90:1003, 1091, 1103, 1105-1107` — array storage definitions.
-- `input.f90:621-685` — input cards C12 (background mixing, max), C12A (`ISTOPT`), C12B (`ISGOTM`).
-- `hdmt.f90:1274, 1283`; `hdmt2t.f90:533-579, 875-964, 989` — main-loop dispatch and BC setup.
+- `mod_var_global.f90:1004, 1092, 1104, 1106-1108` — array storage definitions.
+- `input.f90:643-708` — input cards C12 (background mixing, max), C12A (`ISTOPT`), C12B (`ISGOTM`).
+- `hdmt.f90:1274, 1283`; `hdmt2t.f90:533-579, 879-968, 993` — main-loop dispatch and BC setup.
 - `GOTM_Turbulence/mod_gotm.f90`, `mod_turbulence.F90` — GOTM integration.
 
 ## A. Entry points
@@ -28,7 +28,7 @@ How EFDC+ runs the original Mellor-Yamada 2.5 closure (CALQQ1 / CALQQ2T + CALAVB
 | Path | Driver | Calls |
 |---|---|---|
 | Original MY2.5 (3TL) | `HDMT` | `CALAVB` then `CALQQ1` (`hdmt.f90:1274, 1283`) |
-| Original MY2.5 (2TL) | `HDMT2T` | `CALAVB` then `CALQQ2T` (`hdmt2t.f90:533, 577, 989`) |
+| Original MY2.5 (2TL) | `HDMT2T` | `CALAVB` then `CALQQ2T` (`hdmt2t.f90:533, 577, 993`) |
 | GOTM (`ISGOTM > 0`) | `HDMT2T` | `Advance_GOTM(ISTL)` replaces both (`hdmt2t.f90:535-579`) |
 
 `CALQQ1` and `CALQQ2T` solve for:
@@ -64,7 +64,7 @@ Then:
 - `AB = SFAB * DML * HP * sqrt(QQ) + AVBXY` (`:155`).
 - `AV = SFAV * DML * HP * sqrt(QQ) + AVOXY` (`:156`).
 
-Both depth-normalized afterward (`:157, 158`). Background `AVOXY/AVBXY` come from card C12 (`input.f90:621-633`: `AVO, ABO, AVMX, ABMX`).
+Both depth-normalized afterward (`:157, 158`). Background `AVOXY/AVBXY` come from card C12 (`input.f90:643-652`: `AVO, ABO, AVMX, ABMX`).
 
 ## C. Production and dissipation
 
@@ -79,7 +79,7 @@ Both depth-normalized afterward (`:157, 158`). Background `AVOXY/AVBXY` come fro
 - `q²`: `+ 2*DELT * QQSQR / (CTURBB1 * DML * HP)` (`calqq2t.f90:353`).
 - `q²L`: `+ DELT * (QQSQR/(CTURBB1*DML*HP)) * (1 + CTE4*DML²*FPROX)` (`:355`).
 
-`FPROX` = wall proximity function (`aaefdc.f90:1517-1528`).
+`FPROX` = wall proximity function (`aaefdc.f90:1519-1530`).
 
 ## D. CALQQ1 (3TL) vs CALQQ2T (2TL) variant
 
@@ -93,7 +93,7 @@ There is **no literal `AB ln` symbol** in this source — that nomenclature appe
 
 | Symbol | Meaning | Lines |
 |---|---|---|
-| `AB(LCM,KCM)` | Vertical diffusivity (depth-normalized, m/s — physical m²/s ÷ depth) | `mod_var_global.f90:1091` |
+| `AB(LCM,KCM)` | Vertical diffusivity (depth-normalized, m/s — physical m²/s ÷ depth) | `mod_var_global.f90:1092` |
 | `AV(LCM,KCM)` | Vertical viscosity (depth-normalized) | `:1105` |
 | `AQ(LCM,KCM)` | Diffusivity for `QQ/QQL` | `:1103` |
 | `AVOXY` | Spatially varying background `AVO` | `:1106` |
@@ -104,7 +104,7 @@ Note: code uses `AVMX`, **not `AVOMX`** (older docs). Maximum limit applies via 
 
 ## F. ISTOPT(0) dispatch
 
-`ISTOPT(0)` is read from card C12A (`input.f90:641-661`). It does **not** select GOTM (that is `ISGOTM`). It selects original-EFDC coefficient behavior inside CALAVB:
+`ISTOPT(0)` is read from card C12A (`input.f90:664-681`). It does **not** select GOTM (that is `ISGOTM`). It selects original-EFDC coefficient behavior inside CALAVB:
 
 - Default Galperin if `!= 2, 3`.
 - `==2`: Kantha-Clayson 1994.
@@ -112,7 +112,7 @@ Note: code uses `AVMX`, **not `AVOMX`** (older docs). Maximum limit applies via 
 
 ## G. GOTM integration (ISGOTM)
 
-`ISGOTM` from card C12B (`input.f90:666-685`).
+`ISGOTM` from card C12B (`input.f90:689-708`).
 
 When `ISGOTM > 0`:
 - `Init_GOTM` sets up GOTM turbulence + tridiagonal init (`mod_gotm.f90:17-25`).
@@ -132,7 +132,7 @@ This gives access to GOTM's k-ε, k-ω, GLS-family closures while keeping EFDC's
 
 Original EFDC sets `QQ(L,0)` (bottom) and `QQ(L,KC)` (surface) **before** solving CALQQ2T:
 
-- Non-wave path: bottom from `TBX/TBY`, surface from `TSX/TSY` (`hdmt2t.f90:875-889`).
+- Non-wave path: bottom from `TBX/TBY`, surface from `TSX/TSY` (`hdmt2t.f90:879-893`).
 - Corner-corrected path: modifies bottom stress weighting (`:892-931`).
 - Wave path: includes current + wave bottom stress (`:939-964`).
 
@@ -169,7 +169,7 @@ For GOTM-MY:
 - ▢ Looking for `AVOMX` symbol — code uses `AVMX`.
 - ▢ Setting `ISGOTM=1` but forgetting `gotm_input.nml` — `Init_GOTM` errors at startup.
 - ▢ Expecting "AB ln" symbol from old docs — the actual variant is `CALQQ1` (3TL) vs `CALQQ2T` (2TL); the latter has additional vegetation/structure sink terms in the diagonal.
-- ▢ Wall proximity `FPROX` formulation — different forms initialize at `aaefdc.f90:1517-1528`; choice depends on whether you want Mellor's parabolic or alternative form. Verify the active branch matches your case (free-surface vs bottom-bounded).
+- ▢ Wall proximity `FPROX` formulation — different forms initialize at `aaefdc.f90:1519-1530`; choice depends on whether you want Mellor's parabolic or alternative form. Verify the active branch matches your case (free-surface vs bottom-bounded).
 
 ## Next expansion
 

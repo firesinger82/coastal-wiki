@@ -21,10 +21,10 @@ The EFDC+ Eutrophication module: directory structure (`Eutrophication/mod_wq.f90
 - `Eutrophication/mod_diagen.f90` (module :9-1107, flux kernel SEDFLUXNEW/ZBRENT/SOLVSMBE :1121-1393) — sediment diagenesis. 알고리즘: [[efdc_sediment_diagenesis]] (Cerco-Cole/Di Toro 2-layer flux, SOD Brent 폐합).
 - `Eutrophication/mod_biota.f90:57-444` — biota.
 - `Eutrophication/mod_zoopl.f90`, `mod_shellfish.f90`, `mod_rpem.f90` — additional modules.
-- `aaefdc.f90:126, 3086` — `WQ3DINP` init.
+- `aaefdc.f90:126, 3088` — `WQ3DINP` init.
 - `hdmt.f90:1021, hdmt2t.f90:734` — `WQ3D` runtime.
 - `mod_scaninp.f90:1631-1697, 1875-1890` — input scanning.
-- `Transport/calconc.f90:188, 213, 467-490`, `caltran.f90:13` — transport coupling.
+- `Transport/calconc.f90:191, 224, 479-507`, `caltran.f90:13` — transport coupling.
 - `mod_netcdf.f90:291-1762` — NetCDF output.
 - `SedTran-Original/ssedtox.f90:9-31` — sediment-toxic coupling.
 
@@ -42,7 +42,7 @@ Eutrophication code in `Eutrophication/`:
 
 Core module: `WATERQUALITY` uses WQ vars + diagenesis + RPEM + shellfish + zooplankton + biota (`mod_wq.f90:9, 34`).
 
-Init: `WQ3DINP` from startup when WQ active (`aaefdc.f90:126, 3086`).
+Init: `WQ3DINP` from startup when WQ active (`aaefdc.f90:126, 3088`).
 
 Runtime: `WQ3D` called from both hydro drivers when `ISTRAN(8) >= 1` (`hdmt.f90:35, 1021`; `hdmt2t.f90:37, 734`).
 
@@ -101,10 +101,10 @@ DO budget (`:3621, 4634, 4673`):
 
 Initialized when `IWQBEN == 1`; reads `wq_3dsd.jnp` (`mod_wq.f90:585`, `mod_diagen.f90:160`).
 
-Runtime coupling: `SMMBE` called from `WQ3D` (`mod_wq.f90:351`, `mod_diagen.f90:674`).
+Runtime coupling: `SMMBE` called from `WQ3D` (`mod_wq.f90:351`, `mod_diagen.f90:672`).
 
-Inputs (`mod_diagen.f90:164-277`):
-- Sediment zones, restart controls.
+Inputs (`mod_diagen.f90:164-276`):
+- Sediment zones.
 - Diffusion, stoichiometry.
 - Layer-1/2 NH4/H2S/PO4/silica parameters.
 - Decay rates, burial, particle mixing.
@@ -129,9 +129,9 @@ Layer light limitation feeds phytoplankton + macroalgae growth factors (`:3377, 
 ## F. Coupling to hydrodynamics
 
 WQ constituents transported through general concentration path:
-- `CALCONC` calls `CALTRAN` for all water-column constituents (`Transport/calconc.f90:188`).
+- `CALCONC` calls `CALTRAN` for all water-column constituents (`Transport/calconc.f90:191`).
 - `CALTRAN` is the advective transport routine (`Transport/caltran.f90:13`).
-- Anti-diffusion: `CALTRAN_AD` (`Transport/calconc.f90:213`).
+- Anti-diffusion: `CALTRAN_AD` (`Transport/calconc.f90:224`).
 
 Settling/bed exchange (sediments/toxics) coupled via `SSEDTOX` from `CALCONC` (`:490, 506`).
 

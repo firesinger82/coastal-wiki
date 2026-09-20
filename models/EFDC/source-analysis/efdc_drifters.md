@@ -19,9 +19,9 @@ EFDC+'s drifter module: directory and procedural Fortran structure (no classes),
 - `Drifter/mod_drifter.f90:21-2754` — main module.
 - `Drifter/mod_Variables_MPI_Drifter.f90:13-64` — MPI state.
 - `MPI_Communication/mod_Communicate_Drifters.f90:12-35` — MPI exchange.
-- `aaefdc.f90:1105-1106` — `DRIFTER_INP` call.
-- `hdmt.f90:1378-1384`, `hdmt2t.f90:1058-1063` — `DRIFTER_CALC` call.
-- `input.f90:3088` — old C68 deprecated.
+- `aaefdc.f90:1106-1107` — `DRIFTER_INP` call.
+- `hdmt.f90:1378-1384`, `hdmt2t.f90:1062-1067` — `DRIFTER_CALC` call.
+- `input.f90:3185` — old C68 deprecated.
 
 ## A. Directory, entry points
 
@@ -40,12 +40,12 @@ MPI support:
 - Ghost-domain communication: `mod_Communicate_Drifters.f90:12-35`.
 
 Setup/call sites:
-- `aaefdc.f90:1105-1106`: `DRIFTER_INP` when `ISPD > 0`.
-- `hdmt.f90:1378-1384`, `hdmt2t.f90:1058-1063`: `DRIFTER_CALC`.
+- `aaefdc.f90:1106-1107`: `DRIFTER_INP` when `ISPD > 0`.
+- `hdmt.f90:1378-1384`, `hdmt2t.f90:1062-1067`: `DRIFTER_CALC`.
 
 ## B. Particle release
 
-EFDC+ does **NOT** use old EFDC card C68 (`input.f90:3088` says "not used in EFDC+").
+EFDC+ does **NOT** use old EFDC card C68 (`input.f90:3185` says "not used in EFDC+").
 
 Drifter input from **`drifter.inp`** (`Drifter/mod_drifter.f90:814`).
 
@@ -182,7 +182,7 @@ NetCDF: `efdc_drifters.nc` (`:2628-2697`):
 
 ## H. Coupling with hydrodynamic state
 
-Caller advances drifters after mean mass transport (`hdmt.f90:1370-1384`, `hdmt2t.f90:1053-1063`).
+Caller advances drifters after mean mass transport (`hdmt.f90:1370-1384`, `hdmt2t.f90:1057-1067`).
 
 Time step: `DT` or `DTDYN` depending on dynamic time-step flag (`:123-128`).
 

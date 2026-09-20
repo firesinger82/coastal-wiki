@@ -20,8 +20,8 @@ EFDC의 horizontal momentum diffusion (HMD) sub-routine — Smagorinsky subgrid-
 - `models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/calhdmf3.f90` (340 lines) — 3-time-level (3TL) variant (AQEA legacy).
 - `models/EFDC/raw/source_code/EFDC-GVC/calhdmf.for` (615 lines) — EFDC-FULL v1.0a Hamrick 2001-11 original.
 - `models/EFDC/raw/source_code/EFDC-GVC/caldiff.for` (49 lines) — scalar horizontal diffusion via `AH(L,K)`.
-- `models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:621, 3722-3795` — Card C12 read + spatially-variable mapping logic.
-- `models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/mod_var_global.f90:991-992, 1098-1099` — `AHO/AHD` scalar + `AHOXY/AHDXY` array declarations.
+- `models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:643, 3877-3952` — Card C12 read + spatially-variable mapping logic.
+- `models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/mod_var_global.f90:992-993, 1099-1100` — `AHO/AHD` scalar + `AHOXY/AHDXY` array declarations.
 - `models/EFDC/raw/manuals/confluence/spaces/ECIG/pages/Overview/EFDC_Cards/Card_Image_12.md` — C12 input card (AHO, AHD, AVO, ABO, AVMX, ABMX, VISMUD, AVCON, ZBRWALL).
 - `models/EFDC/raw/manuals/confluence/spaces/EK/pages/EFDC_Explorer_12_Knowledge_Base/.../Turbulence.md` — EE12 GUI Turbulent Diffusion tab (ISHMD = ISHDMF 매핑).
 - `models/EFDC/manual-notes/efdc-theory-v12-ch2-hydrodynamics.md:203-209` — Theory v12 §2.1.5 Eq 2.27 Smagorinsky 표현 + Cs 권장 범위.
@@ -236,9 +236,9 @@ C12 | AHO | AHD | AVO | ABO | AVMX | ABMX | VISMUD | AVCON | ZBRWALL
 
 | 변수 | 의미 | 단위 | Default | 코드 위치 |
 |---|---|---|---|---|
-| `AHO` | Constant horizontal momentum/mass diffusivity (m²/s) | m²/s | 0 | `input.f90:621` read, `:3737, 3742` use |
-| `AHD` | Dimensionless Smagorinsky coefficient $C_s$ (ISHDMF>0 필요) | — | 0.025 | `input.f90:621, 3791-3794` |
-| `ZBRWALL` | 측벽 log-law 거칠기 (ISHDMF=2 wall effect) | m | 0.002 | `input.f90:621` |
+| `AHO` | Constant horizontal momentum/mass diffusivity (m²/s) | m²/s | 0 | `input.f90:643` read, `:3737, 3742` use |
+| `AHD` | Dimensionless Smagorinsky coefficient $C_s$ (ISHDMF>0 필요) | — | 0.025 | `input.f90:643, 3946-3951` |
+| `ZBRWALL` | 측벽 log-law 거칠기 (ISHDMF=2 wall effect) | m | 0.002 | `input.f90:643` |
 | `ISHDMF` | HMD 옵션 (0/1/2 — EE GUI ISHMD 동일) | flag | — | `input.f90` Card C2 |
 
 **Default 0.025 주의**: Theory §2.1.5 권장 범위 $C_s = 0.1\text{-}0.2$ (Smagorinsky 표준) 보다 훨씬 작음. EE GUI 기본값은 EFDC 전통 — 사용자가 격자 해상도 따라 조정 필요. Smagorinsky 1963 원논문 권장 0.16-0.17.
@@ -253,7 +253,7 @@ C12 | AHO | AHD | AVO | ABO | AVMX | ABMX | VISMUD | AVCON | ZBRWALL
 
 ### 6.2 Spatially-variable AHO/AHD — `AHMAP.INP`
 
-`input.f90:3722-3795`:
+`input.f90:3877-3952`:
 
 ```fortran
 ! AHO < 0 → cell area 의존

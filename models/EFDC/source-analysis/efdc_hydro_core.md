@@ -16,7 +16,7 @@ How EFDC+ assembles momentum and continuity, splits external (depth-integrated 2
 
 ## Source basis
 
-- `aaefdc.f90:3187-3188` — top-level dispatch: `IS2TIM==0 → HDMT` (3TL), `IS2TIM>=1 → HDMT2T` (2TL).
+- `aaefdc.f90:3189-3190` — top-level dispatch: `IS2TIM==0 → HDMT` (3TL), `IS2TIM>=1 → HDMT2T` (2TL).
 - `calexp.f90`, `calexp2t.f90` — external (depth-integrated) momentum.
 - `calpuv9c.f90`, `calpuv2c.f90` — external continuity solver (preconditioned conjugate gradient).
 - `caluvw.f90` — internal (3D) momentum, vertical velocity W, barotropic correction.
@@ -26,9 +26,9 @@ How EFDC+ assembles momentum and continuity, splits external (depth-integrated 2
 
 ## A. External momentum (CALEXP / CALEXP2T)
 
-- Advection fluxes `FUHU/FVHU/FUHV/FVHV` built per layer, upwind or central (`calexp.f90:218-227`); flux divergence assembled into `FX/FY` (`:685-686`). 2TL mirror in `calexp2t.f90:214-218`.
+- Advection fluxes `FUHU/FVHU/FUHV/FVHV` built per layer, upwind or central (`calexp.f90:218-227`); flux divergence assembled into `FX/FY` (`:685-686`). 2TL mirror in `calexp2t.f90:224-228`.
 - Coriolis + curvature: `CAC = FCORC + metric + HP` (`calexp.f90:571`); `FCAX/FCAY` (`:620-621`).
-- Vertical sums to depth-integrated `FCAXE/FCAYE`, `FXE/FYE` (`calexp.f90:1133-1136`; `calexp2t.f90:1053-1056`).
+- Vertical sums to depth-integrated `FCAXE/FCAYE`, `FXE/FYE` (`calexp.f90:1133-1136`; `calexp2t.f90:1062-1065`).
 - Wind / bottom / pressure enter in **CALPUV**, not CALEXP: `FUHDYE/FVHDXE = old_flow − pressure_grad + DELT*(wind − bottom + Coriolis + buoyancy − advection)` at `calpuv9c.f90:256-257` (3TL), `calpuv2c.f90:224-226` (2TL).
 - Horizontal momentum diffusion (`FMDUX/FMDUY/FMDVY/FMDVX`)은 `CALHDMF`(2TL) 또는 `CALHDMF3`(3TL) 에서 계산되어 CALEXP의 viscous flux divergence 항으로 합산 — 상세는 [[efdc_dispersion]] (Smagorinsky + AHO).
 - Implicit bottom/vegetation drag coefficients `RCX/RCY` at `calpuv9c.f90:269-270`, applied at `:287-288`.
@@ -96,7 +96,7 @@ This is a **quasi-non-hydrostatic** correction (pressure-projection style), not 
 |---|---|
 | Standard tidal/coastal run | 3TL (`IS2TIM=0`); set `NTSTBC` so corrector fires every 24-48 steps |
 | Sediment / water quality dominant | 2TL (`IS2TIM>=1`); allows dynamic timestep coupling |
-| Density-stratified estuary | 3TL + `ISBAL=2` (S+T); set `IINTPG=1` or `2` for steep bathymetry |
+| Density-stratified estuary | 3TL + `ISBAL=2` (S+T); for EFDC+ Stable 12.5, the `IINTPG` buoyancy-shear branches were removed; use `IGRIDV>0` (SGZ) for steep bathymetry. `IINTPG /= 0` disables the 2-cell-wide channel external density-gradient cell-face flag treatment at `setbcs.f90:449`. |
 | Wave-resolving short-wave runup | `ISPNHYDS>=1` + `KC>1` (non-hydrostatic) |
 | External-mode CFL violation | Reduce `DT` first; PCG itself rarely the bottleneck |
 | Mass drift | Verify CALUVW barotropic correction at `:601-624` runs, and `IS2TIM`/timestep are consistent across hot-start |

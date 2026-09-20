@@ -15,9 +15,9 @@ related:
   - models/EFDC/source-analysis/sediment/efdc_sediment.md
 ---
 
-# EFDC+ scalar transport 수치 스킴 — CALTRAN / CALTRAN_AD
+# EFDC+ scalar transport 수치 스킴 — CALTRAN / CALTRAN_AD / QUICKEST·ULTIMATE
 
-> `Transport/caltran.f90`(373) + `caltran_ad.f90`(347) + `calconc.f90`(528) 직접 read. **모든 scalar(염분·수온·dye·SFL·toxic·SED·SND·WQ)의 advection 수치 알고리즘** = **1차 donor-cell upwind + Smolarkiewicz MPDATA anti-diffusive corrector**. 여러 노트가 CALTRAN 호출 맥락(dry mask·open-BC·vertical)을 다뤘으나, 본 노트는 **advection 스킴 자체**의 canonical. [[efdc_hydro_core]](운동량)·[[efdc_vertical]](연직 advection)·[[efdc_water_quality]]·[[efdc_sediment]]·[[efdc_toxics]] 가 공유.
+> `Transport/caltran.f90`(373) + `caltran_ad.f90`(347) + `calconc.f90`(528) 직접 read. **scalar(염분·수온·dye·SFL·toxic·SED·SND·WQ)의 advection 수치 알고리즘** = **1차 donor-cell upwind + Smolarkiewicz MPDATA anti-diffusive corrector**, v12.5 active WC dispatch에는 **`ISQUICK == 1` QUICKEST/ULTIMATE** 경로가 추가됐다 (`calconc.f90:198-203`). 여러 노트가 CALTRAN 호출 맥락(dry mask·open-BC·vertical)을 다뤘으나, 본 노트는 **advection 스킴 자체**의 canonical. [[efdc_hydro_core]](운동량)·[[efdc_vertical]](연직 advection)·[[efdc_water_quality]]·[[efdc_sediment]]·[[efdc_toxics]] 가 공유.
 
 ## 1. CALCONC dispatch (calconc.f90)
 
@@ -25,13 +25,13 @@ scalar transport driver. `ISTRAN(NN)>0` constituent 마다 active water-column(I
 ```fortran
 ISTRAN: 1 염분 / 2 수온 / 3 dye / 4 SFL(shellfish larvae) / 5 toxic / 6 SED(cohesive) / 7 SND(noncohesive) / 8 WQ
 ```
-1. **upwind cell 사전지정** (`calconc.f90:115-127`):
+1. **upwind cell 사전지정** (`calconc.f90:117-132`): `ISQUICK == 0 .or. ISTRAN(4) > 0 .or. (ISTRAN(2) > 0 .and. ISICE == 4)`일 때 수행.
 ```fortran
 LUPU(L,K) = UHDY2(L,K) >= 0 ? LWC(L) : L     ! x-flux donor cell (서/현)
 LUPV(L,K) = VHDX2(L,K) >= 0 ? LSC(L) : L     ! y-flux donor cell (남/현)
 ```
-2. `CALTRAN`(IW) — donor-cell upwind 1차 update (모든 active WC).
-3. `ISADAC>0` constituent → `CALTRAN_AD`(IW) — anti-diffusive 보정 (MPI: 그 사이 `Communicate_CON2` 로 FUHUD/FVHUD/FWUU 교환).
+2. `ISQUICK == 1`이면 `CALTRAN_QUICKEST`(IW) — QUICKEST/ULTIMATE, 그 외에는 `CALTRAN`(IW) — donor-cell upwind 1차 update (모든 active WC, `calconc.f90:198-203`). 신규 구현: `EFDC/Transport/caltran_quickest.f90:14-33`, `EFDC/Transport/mod_quickest.f90:80-101` (v12.5 좌표).
+3. `ISQUICK == 0`일 때만 `CALTRAN_AD`(IW) 호출 및 `ISADAC` anti-diffusive 보정 (`calconc.f90:228-230, 250`) (MPI: 그 사이 `Communicate_CON2` 로 FUHUD/FVHUD/FWUU 교환).
 4. 그 후 SED/SND(CALSND/bedload, ISTRAN6/7), dye(CALDYE), toxic 등 module-specific.
 
 ## 2. CALTRAN — donor-cell upwind (caltran.f90)
@@ -62,19 +62,20 @@ FUHUD(L,K,IW) = max(UHU,0.)*POS(LW,K) + min(UHU,0.)*POS(L,K)  ! line 115 - pseud
 - **원리** (Smolarkiewicz 1984 MPDATA): donor-cell 의 implicit 확산을 "anti-diffusive velocity" `UHU = |u|(C_L−C_LW)/(C_L+C_LW)` 로 추정해 반대로 다시 upwind → 수치확산 차수 1→2 향상, **양정치 유지**.
 - **cross-derivative 항**(line 109-143)이 다차원 MPDATA 의 핵심(1D 분리오차 보정).
 
-## 4. ISADAC / ISFCT — constituent별 토글 (input.f90:306)
+## 4. ISQUICK / ISADAC / ISFCT — scalar 스킴 선택·constituent별 토글 (input.f90:311)
 
-입력 카드(constituent별, C14 염분 ~ ):
+입력 카드 C6(constituent별; `ISQUICK`은 scalar):
 ```fortran
-read ISTRAN(NS), ISTOPT(NS), -, ISADAC(NS), ISFCT(NS), -, -, -, ISCI(NS), ISCO(NS)
+read ISTRAN(NS), ISTOPT(NS), ISQUICK, ISADAC(NS), ISFCT(NS), -, -, -, ISCI(NS), ISCO(NS)
 ```
 | flag | 의미 |
 |---|---|
+| **ISQUICK** | scalar: 0 = donor-cell upwind / 1 = QUICKEST·ULTIMATE. Broadcast (`input.f90:316`), 0/1 외 값은 경고 후 0으로 리셋 (`input.f90:318-325`) |
 | **ISADAC(NS)** | 0 = donor-cell upwind 만(수치확산 큼) / **1 = anti-diffusion(MPDATA) 적용** |
 | **ISFCT(NS)** | flux corrector(FCT) — anti-diffusion 후 **monotonicity 보장**(local min/max clamp, caltran_ad CWMAX/CWMIN 등) |
 | ISCI/ISCO | concentration input/output series 토글 |
 
-→ **ISADAC=1 + ISFCT=1** = MPDATA + flux-corrected transport (실무 표준: 염분·수온 front 보존). ISADAC=0 = 순수 upwind(안정하나 smearing). `NANTIDIFF` = anti-diffusion 적용 constituent 수 카운트(calconc:93-99).
+→ **`ISQUICK == 0`일 때 ISADAC=1 + ISFCT=1** = MPDATA + flux-corrected transport (실무 표준: 염분·수온 front 보존). `ISQUICK == 0`에서 ISADAC=0 = 순수 upwind(안정하나 smearing). `NANTIDIFF` = anti-diffusion 적용 constituent 수 카운트(calconc:93-99). `CALTRAN_AD` 호출은 `ISQUICK == 0`일 때만 발생하고 (`calconc.f90:228-230`), `ISADAC` 반확산 적용도 동일 게이트를 사용한다 (`calconc.f90:250`).
 
 ## 5. 비교·맥락
 

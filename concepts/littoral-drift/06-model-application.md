@@ -47,7 +47,7 @@ $$
 |---|---|---|---|---|---|
 | **Delft3D-FLOW + WAVE** | SWAN-기반 WAVE 가 wave force `fxw/fyw` + surface stress `wsu/wsv` 를 COM 파일로 FLOW 에 전달; roller path 가 radiation stress 계산 (`radstr.f90:304`) | FLOW 의 3D 운동량식에 wave force 주입 (`uzd.f90:668`) → alongshore current | Van Rijn 1984/2007 (bed+susp), Partheniades-Krone (점착) — `erosed.f90` | **online morphology** (Exner bed update `bott3d.f90`), MorFac 가속 | breaker zone alongshore current + bed update 직접 — surf-zone 분해 시 roller 권장 |
 | **XBeach** | surfbeat 모드: short-wave action balance → roller → radiation-stress gradient 가 NLSWE flow 구동 (wave-group scale) | NLSWE shallow-water flow (surf-beat·infragravity 포함) | Soulsby-Van Rijn / Van Thiel-Van Rijn / Van Rijn 1993 (`sedtransform`) — skewness·asymmetry `ua` 포함 | bed update `dzg = morfac·dt/(1−por)·∇·flux` (`morphevolution.F90:737-748`) + **avalanching** (사면붕괴) | dune erosion·overwash·breaching 폭풍 사건 특화 (수일~수주); longshore 보다 cross-shore + 2DH storm impact 강점 |
-| **EFDC** | hydrodynamic core 가 흐름 계산; wave 는 외부(SWAN) wave-current bottom shear 로 결합 (Christoffersen-Jonsson, SEDZLJ) | EFDC 자체 3D 흐름 solver (조류·바람·밀도 구동) | **SedTran-Original** (`ISTRAN(6)` cohesive `CALSED` / `ISTRAN(7)` noncohesive `CALSND`) 또는 **SEDZLJ** unified multi-bed-layer (`ssedtox.f90:868-880`) | bed-water 결합 + multi-bed-layer 동역학 | 흐름(조류)·하구 표사 주력; 순수 wave-driven longshore current 는 외부 wave coupling 의존 |
+| **EFDC** | hydrodynamic core 가 흐름 계산; wave 는 외부(SWAN) wave-current bottom shear 로 결합 (Christoffersen-Jonsson, SEDZLJ) | EFDC 자체 3D 흐름 solver (조류·바람·밀도 구동) | **SedTran-Original** (`ISTRAN(6)` cohesive `CALSED` / `ISTRAN(7)` noncohesive `CALSND`) 또는 **SEDZLJ** unified multi-bed-layer (`ssedtox.f90:863-875`) | bed-water 결합 + multi-bed-layer 동역학 | 흐름(조류)·하구 표사 주력; 순수 wave-driven longshore current 는 외부 wave coupling 의존 |
 | **ROMS (+WEC, CSTMS)** | **WEC vortex-force** 정식 (`wec_vf.F`); SWAN coupling 시 spectral Stokes drift + wave dissipation (`mct_roms_swan.h`) | ROMS 3D primitive-equation 흐름 + WEC 가 surf-zone alongshore/rip current 구동 | CSTMS: bedload (Meyer-Peter-Müller·Soulsby-Damgaard·Van der A 2013) + suspended (tracer) — `roms_sediment.md` | active-layer bed model + Exner; COAWST(ROMS+SWAN) 통합 | regional shelf~surf zone 광역; vortex-force 로 longshore·rip current 물리 정밀 (Uchiyama et al. 2010) |
 
 (각 셀의 file:line·서브루틴은 아래 §3-§6 의 canonical 노트에서 검증)
@@ -77,7 +77,7 @@ $$
 > Canonical: [`efdc_sediment.md`](../../models/EFDC/source-analysis/sediment/efdc_sediment.md).
 
 **단계 4-5**: 두 분기 system ([`sediment-transport/06 §2`](../sediment-transport/06-model-application.md) 와 동일 canonical):
-- **SedTran-Original**: `ISTRAN(6)≥1` cohesive → `CALSED` (Krone-Partheniades), `ISTRAN(7)≥1` noncohesive → `CALSND` (Van Rijn 1984·Engelund-Hansen). 분기 `ssedtox.f90:868-880`.
+- **SedTran-Original**: `ISTRAN(6)≥1` cohesive → `CALSED` (Krone-Partheniades), `ISTRAN(7)≥1` noncohesive → `CALSND` (Van Rijn 1984·Engelund-Hansen). 분기 `ssedtox.f90:863-875`.
 - **SEDZLJ**: size-class unified cohesive+noncohesive, multi-bed-layer, **Christoffersen-Jonsson wave-current shear stress**.
 
 **단계 2 (파→흐름) 한계**: EFDC 의 hydrodynamic core 는 조류·바람·밀도 구동 흐름이 주력. 순수 wave-driven longshore current (radiation stress → surf-zone alongshore current) 는 **외부 SWAN wave coupling 의 wave-current bottom shear** 로만 들어온다 — Delft3D/ROMS 처럼 wave force 를 운동량식에 직접 주입하는 surf-zone radiation-stress driver 는 본 source-analysis 노트 범위에서 확인되지 않음 (source-needed). → 하구·조류 우세 표사에 강점, breaker-zone longshore drift 전용 도구로는 wave coupling 구성 필요.

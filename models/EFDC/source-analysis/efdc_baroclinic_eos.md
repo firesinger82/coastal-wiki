@@ -18,7 +18,7 @@ related:
 # EFDC+ 밀도 EOS + baroclinic 압력구배 — `calbuoy.f90` + `calebi.f90`
 
 > 소스: [`calbuoy.f90`](../raw/source_code/EFDCPlus_Stable/EFDC/calbuoy.f90)(248, 밀도·부력) + [`calebi.f90`](../raw/source_code/EFDCPlus_Stable/EFDC/calebi.f90)(538, 외부모드 buoyancy 적분). 소비처 `calpuv9c.f90`(FPGXE/FPGYE)·`calexp.f90`(FBBX/FBBY).
-> **정체**: 염분·수온 → 밀도(EOS) → 부력 → baroclinic 압력구배 → 밀도류. [[efdc_hydro_core]]:70-71 이 2줄 스케치(CALBUOY/CALEBI 이름+B=(ρ/ρ₀)-1)만 남긴 갭. EOS 다항식·ρ₀ baseline·SGZ face 적분·IINTPG 3형식·내부모드 shear 미문서.
+> **정체**: 염분·수온 → 밀도(EOS) → 부력 → baroclinic 압력구배 → 밀도류. [[efdc_hydro_core]]:70-71 이 2줄 스케치(CALBUOY/CALEBI 이름+B=(ρ/ρ₀)-1)만 남긴 갭. EOS 다항식·ρ₀ baseline·SGZ face 적분·buoyancy shear 분기(v12.5 `IGRIDV` 기준, `IINTPG`는 legacy 입력)·내부모드 shear 미문서.
 
 ## 1. `calbuoy.f90` — 밀도 EOS (Mellor 1991 ≈ UNESCO)
 
@@ -72,22 +72,22 @@ FPGXE = -SBX*SUBD*HU*GP*[ (BI2W(L)+BI2W(LW))*(HP(L)-HP(LW))          ! ① 수�
 ```
 3-항 분해 = 수심구배 + 부력 shear + 저면경사(sigma) 보정. 결과 → 외부모멘텀 `FUHDYE/FVHDXE`(:256-257).
 
-## 4. 내부모드 buoyancy shear FBBX/FBBY (calexp.f90:1162-1352)
+## 4. 내부모드 buoyancy shear FBBX/FBBY (calexp.f90:1162-1295)
 
-`BSC>1.E-6 .and. KC>1` 게이트(:1167). **IINTPG 3 sigma-구배 형식** (steep bathymetry sigma 압력구배오차 억제):
+`BSC>1.E-6 .and. KC>1` 게이트(:1167). **EFDC+ Stable 12.5의 buoyancy shear 분기축은 IGRIDV**:
 ```
-IINTPG==0 : STANDARD      (:1207)
-IINTPG==1 : JACOBIAN      (:1225)
-IINTPG==2 : FINITE VOLUME (:1265)
+IGRIDV==1 : SIGMA-ZED      (:1169)
+IGRIDV>1  : SIGMA-ZED      (:1187)
+else      : STANDARD-SIGMA (:1206-1207)
 ```
-+ Sigma-Z 전용 분기 `IGRIDV==1`/`>1`(:1169,1187-1204).
+`IINTPG`는 입력으로 계속 읽히지만 (`input.f90:269`) buoyancy shear 분기에는 더 이상 쓰이지 않는다. `calexp2t.f90`(2TL)에서도 `IINTPG` 출현은 4→0으로 제거됐다 (`calexp2t.f90:1246-1305`). 유일한 동작 소비처는 `setbcs.f90:449`의 `if( IINTPG == 0 )` — 2-cell-wide 수로의 external density gradient cell-face flag 처리이며, `IINTPG /= 0`은 이 처리를 끈다.
 
 ## 5. 주요 findings
 - **surface EOS**: 압력 다항식 미포함(P=0) → 압축률 생략, "UNESCO EOS" 아니라 Mellor 절단근사.
 - **IBSC==1 미문서 선형 진단**(B=0.00075·SAL, :50) — EOS 전체 우회.
 - **ρ₀ 동결**: 참조온도 TEMO 단일 스칼라, N≤5 만 계산 → 전역 Boussinesq baseline.
 - **유사-밀도 결합**: 부유사 loading 이 "water density" 에 이미 포함(:234-237).
-- **IINTPG 0/1/2** 3형식 sigma-구배 — 매뉴얼은 통상 1문장 압축.
+- **EFDC+ Stable 12.5 기준**: `IINTPG` buoyancy shear 분기는 제거됐고 급경사 대응은 `IGRIDV>0`(SGZ)이다. `IINTPG /= 0`은 `setbcs.f90:449`의 2-cell-wide 수로 external density gradient cell-face flag 처리를 끈다.
 - **인용 누락**: calbuoy/calebi 는 Hamrick 1992·Blumberg-Mellor 1987(POM)·Fofonoff-Millard 1983(UNESCO) 직접 미인용(sigma baroclinic split·이중 buoyancy 적분이 canonical Hamrick/BM 구성임에도) — change-log 는 Paul Craig/DSI 만.
 
 ## 6. 관련

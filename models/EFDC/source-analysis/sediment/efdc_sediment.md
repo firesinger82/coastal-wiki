@@ -18,11 +18,11 @@ How EFDC+ branches between the original sediment-transport module (`SedTran-Orig
 
 - `mod_scaninp.f90:381, 407` — `ISTRAN` checks for SEDZLJ enable, noncohesive/bedload setup.
 - `varalloc.f90:843-1156` — array allocation per branch.
-- `SedTran-Original/ssedtox.f90:868-1287` — runtime dispatch.
+- `SedTran-Original/ssedtox.f90:863-1278` — runtime dispatch.
 - `SedTran-Original/calsed.f90` — cohesive Krone-Partheniades.
 - `SedTran-Original/calsnd.f90`, `bedload.f90`, `fsbdld.f90`, `csndzeq.f90`, `csndeqc.f90` — noncohesive.
 - `SedTran-SEDZLJ/s_main.f90`, `s_sedic.f90`, `s_sedzlj.f90`, `s_shear.f90` — SEDZLJ.
-- `Transport/calconc.f90:188-517` — coupling to water-column transport.
+- `Transport/calconc.f90:191-534` — coupling to water-column transport.
 - `varinit.f90:319-340` — `SED/SND` constituent registration.
 
 ## A. ISTRAN flag dispatch
@@ -40,7 +40,7 @@ Runtime dispatch in `SSEDTOX`:
 
 | Condition | Behavior | File:Line |
 |---|---|---|
-| `ISTRAN(6) >= 1 .and. LSEDZLJ` | Calls `SEDZLJ_MAIN`, bypasses Original bed/water logic | `SedTran-Original/ssedtox.f90:868-872` |
+| `ISTRAN(6) >= 1 .and. LSEDZLJ` | Calls `SEDZLJ_MAIN`, bypasses Original bed/water logic | `SedTran-Original/ssedtox.f90:863-867` |
 | `ISTRAN(6) >= 1 .and. !LSEDZLJ` | Original cohesive `CALSED` | `:872-874` |
 | `ISTRAN(7) >= 1 .and. !LSEDZLJ` | Original noncohesive `CALSND` | `:878-880` |
 
@@ -163,11 +163,11 @@ SNDEQB  = CSNDEQC(ISNDEQ(NS), DIASED, SSG, WSETA, TAUR, TAUBSND, SEDDIA50, SIGP,
 ## E. Bed update per timestep
 
 `CALCONC` calls `SSEDTOX` when sediment is active and sediment time has accumulated:
-- 2TL: `Transport/calconc.f90:491-504`.
+- 2TL: `Transport/calconc.f90:508-521`.
 - 3TL: `:506-517`.
 
 Inside `SSEDTOX` (Original):
-- `CALBLAY` (bed-layer accounting) after bed/water exchange if `KB > 1` (`SedTran-Original/ssedtox.f90:1117-1128`).
+- `CALBLAY` (bed-layer accounting) after bed/water exchange if `KB > 1` (`SedTran-Original/ssedtox.f90:1108-1119`).
 - `CALBED` (physical bed properties) only when not SEDZLJ (`:1282-1287`).
 
 SEDZLJ updates bed state inside `s_sedzlj.f90`; `SSEDTOX` bypasses Original `CALBED` (`:1282-1287`).
@@ -189,7 +189,7 @@ The Christoffersen-Jonsson form properly accounts for nonlinear wave-current int
 
 ## G. Deposition boundary handling
 
-- Water-column open-BC concentrations reset after CALTRAN (`Transport/calconc.f90:250-255`).
+- Water-column open-BC concentrations reset after CALTRAN (`Transport/calconc.f90:262-267`).
 - Original cohesive hard-bottom cells skip bed exchange (`SedTran-Original/calsed.f90:320-323`).
 - Original noncohesive skips hard-bottom in erosion/deposition loops (`SedTran-Original/calsnd.f90:361, 371`).
 - Bedload boundary fluxes explicitly zeroed for outflow / recirculation BCs (`SedTran-Original/bedload.f90:35-45`).
@@ -202,7 +202,7 @@ Sediment classes registered as active water-column constituents:
 - Cohesive `SED` pointers added when `ISTRAN(6) > 0` (`varinit.f90:319-328`).
 - Noncohesive `SND` pointers added when `ISTRAN(7) > 0` (`:331-340`).
 
-CALTRAN transports every active constituent through `WCV` (`Transport/calconc.f90:188-193`); anti-diffusion at `:213-219`.
+With `ISQUICK == 1`, CALTRAN_QUICKEST transports every active constituent through `WCV`; otherwise CALTRAN does (`Transport/calconc.f90:198-203`); anti-diffusion is gated by `ISQUICK == 0` at `:228-230, 250`.
 
 After CALTRAN + vertical diffusion, totals `SEDT/SNDT` recomputed (`:407-463`); sediment bed/water source-sink applied via `SSEDTOX` (`:490-517`).
 

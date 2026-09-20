@@ -16,31 +16,31 @@ EFDC+ ice cover via `ISICE` flag (1=user-specified varying, 2=binary on/off, 3=f
 
 ## Source basis
 
-- `input.f90:2524-2530, 6888-6911, 7000-7099` — `ISICE`, ice series readers.
+- `input.f90:2621-2627, 7040-7063, 7152-7262` — `ISICE`, ice series readers.
 - `mod_scaninp.f90:504-855` — input scanning.
-- `Transport/mod_heat.f90:251-1490, 1095-1104, 641-753, 1322-1428, 1652-1674` — heat-balance + ice physics.
+- `Transport/mod_heat.f90:251-1488, 1093-1102, 639-751, 1320-1426, 1650-1672` — heat-balance + ice physics.
 - `Transport/caltranice.f90:9-172` — frazil transport.
-- `caltsxy.f90:612-864, 684-724` — ice cover application + momentum.
+- `caltsxy.f90:611-863, 683-723` — ice cover application + momentum.
 - `calpuv2c.f90:220-226`, `calpuv9c.f90:565-573` — momentum coupling.
-- `calexp.f90:1091-1385`, `calexp2t.f90:1014-1405` — internal mode + waves.
-- `Transport/calconc.f90:296-471` — heat/frazil dispatch.
+- `calexp.f90:1091-1328`, `calexp2t.f90:1023-1405` — internal mode + waves.
+- `Transport/calconc.f90:308-483` — heat/frazil dispatch.
 - `Transport/calqvs.f90:1513-1539` — ice volume → QSUM.
-- `Waves/mod_windwave.f90:191-826` — wave routines (no ice).
-- `varalloc.f90:1386-1400` — ice arrays.
+- `Waves/mod_windwave.f90:193-835` — wave routines (no ice).
+- `varalloc.f90:1386-1399` — ice arrays.
 
 ## A. Activation
 
 **No `NCICE` symbol; no `owi_ice` reader** in this source tree.
 
-Ice controlled by `ISICE` (read from card `C46A` at `input.f90:2524-2530`):
+Ice controlled by `ISICE` (read from card `C46A` at `input.f90:2621-2627`):
 - `ISICE, NISER, TEMPICE, CDICE, ICETHMX, RICETHK0`.
 - Also scanned in `mod_scaninp.f90:504-514`.
 
-Wind forcing separate: `NWSER` is wind series count from `WSER.INP` (`input.f90:6888-6911`), **not an ice flag**.
+Wind forcing separate: `NWSER` is wind series count from `WSER.INP` (`input.f90:7040-7063`), **not an ice flag**.
 
 ## B. Ice cover dynamics modes
 
-`Transport/mod_heat.f90:1095-1104` documents:
+`Transport/mod_heat.f90:1093-1102` documents:
 
 | `ISICE` | Mode |
 |---|---|
@@ -51,7 +51,7 @@ Wind forcing separate: `NWSER` is wind series count from `WSER.INP` (`input.f90:
 
 `ISICE=1/2`:
 - Reads external ice cover time series → `ICECOVER`.
-- Thickness explicitly "not used" (`caltsxy.f90:612-704`).
+- Thickness explicitly "not used" (`caltsxy.f90:611-703`).
 
 `ISICE=3/4`:
 - Thermodynamic freeze/melt.
@@ -61,7 +61,7 @@ Wind forcing separate: `NWSER` is wind series count from `WSER.INP` (`input.f90:
 
 ## C. Heat balance
 
-Open-water surface heat balance: longwave + sensible + latent fluxes — but **skipped when `ICECELL(L)` is true** (`Transport/mod_heat.f90:641-669`).
+Open-water surface heat balance: longwave + sensible + latent fluxes — but **skipped when `ICECELL(L)` is true** (`Transport/mod_heat.f90:639-667`).
 
 COARE heat exchange same skip pattern (`:699-753`).
 
@@ -77,7 +77,7 @@ sw_under_ice = sw_above · (1 - albedo_ice) · EXP(-GAMMAI · ICETHICK)
 
 ## D. Ice momentum
 
-In ice cells, surface shear replaced by ice-bottom drag (`caltsxy.f90:713-724`):
+In ice cells, surface shear replaced by ice-bottom drag (`caltsxy.f90:712-723`):
 ```
 TAUICE = -CDICE · sqrt(U² + V²)
 ```
@@ -85,11 +85,11 @@ Thickness-scaled and capped, then assigned to `TSX/TSY`.
 
 `TSX/TSY` enters external momentum in `CALPUV` (`calpuv2c.f90:220-226`, `calpuv9c.f90:565-573`).
 
-Also enters internal-mode top interface shear in `CALEXP` (`calexp.f90:1374-1385`, `calexp2t.f90:1400-1405`).
+Also enters internal-mode top interface shear in `CALEXP` (`calexp.f90:1317-1328`, `calexp2t.f90:1400-1405`).
 
 ## E. Wind stress reduction under ice
 
-Wind stress computed normally in `WINDSTRESS` (`caltsxy.f90:755-864`).
+Wind stress computed normally in `WINDSTRESS` (`caltsxy.f90:754-863`).
 
 Then for `ICECELL(L)`, `TSX/TSY` **overwritten** by ice-bottom drag (`:713-724`).
 
@@ -101,23 +101,23 @@ This is **not continuous partial-cover wind-stress scaling**. For `ISICE=1/2`, `
 
 **No ice-specific wave damping or `ICECELL/ISICE` logic in wave routines**.
 
-Wind-wave generation uses wind, fetch, depth, wave mask only (`Waves/mod_windwave.f90:191-220`).
+Wind-wave generation uses wind, fetch, depth, wave mask only (`Waves/mod_windwave.f90:193-222`).
 
 Wave dissipation from wave height/period; active checks are wave mask, height threshold, depth — **not ice** (`:730-746, 784-826`).
 
-Wave forcing added to momentum via `FXWAVE/FYWAVE` (`calexp.f90:1091-1097`, `calexp2t.f90:1014-1019`).
+Wave forcing added to momentum via `FXWAVE/FYWAVE` (`calexp.f90:1091-1097`, `calexp2t.f90:1023-1028`).
 
 So wave physics is **ice-blind** in this version. For ice-affected wave damping, externally process or skip wave coupling under heavy ice.
 
 ## G. Hydrodynamic coupling
 
-Heat transport: `CALHEAT` called when temperature transport active (`Transport/calconc.f90:467-471`).
+Heat transport: `CALHEAT` called when temperature transport active (`Transport/calconc.f90:479-483`).
 
 Frazil ice transport: called for `ISICE==4` (`:296-300`).
 
 Ice freeze/melt volume changes → `ICERATE`, added to top-layer source/sink `QSUM(L,KC)` (`Transport/calqvs.f90:1513-1539`).
 
-For 3-time-level mode, ice volume can directly update `HP, H1P`, layer depths (`Transport/mod_heat.f90:1480-1490`).
+For 3-time-level mode, ice volume can directly update `HP, H1P`, layer depths (`Transport/mod_heat.f90:1478-1488`).
 
 Momentum coupling via `TSX/TSY` into `CALPUV` and `CALEXP` (cited above).
 
@@ -125,12 +125,12 @@ Momentum coupling via `TSX/TSY` into `CALPUV` and `CALEXP` (cited above).
 
 | `ISICE` | File | Format |
 |---|---|---|
-| `1` | `iser.inp` | `VAL(M,1)` = ice on/off or cover; `VAL(M,2)` = thickness (legacy/display only) (`input.f90:7000-7031`) |
+| `1` | `iser.inp` | `VAL(M,1)` = ice on/off or cover; `VAL(M,2)` = thickness (legacy/display only) (`input.f90:7152-7182`) |
 | `2` | `istat.inp` | One time series of fractional ice cover, capped at 1 (`:7038-7054`) |
 | Multiple | `icemap.inp` | Weights by cell + time map (`:7068-7099`); allocated/scanned `mod_scaninp.f90:839-855` |
 | `>2` | `ice.inp` | Initial thermodynamic ice thickness (`mod_heat.f90:251-263`) |
 
-Allocated arrays: `ICECOVER, ICETHICK, ICETEMP, ICEVOL, ICERATE`, frazil arrays (`varalloc.f90:1386-1400`).
+Allocated arrays: `ICECOVER, ICETHICK, ICETEMP, ICEVOL, ICERATE`, frazil arrays (`varalloc.f90:1386-1399`).
 
 ## Decision Guide
 

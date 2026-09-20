@@ -71,8 +71,8 @@ EFDC에서 조석은 **개경계 수위(pressure BC)**로 진입한다. source-c
 
 검수완료 노트 [`efdc_boundary_conditions.md`](../../models/EFDC/source-analysis/efdc_boundary_conditions.md) §A·§G 가 확인하는 실제 구현:
 
-- **PSER (수위 시계열)**: `NPSER >= 1`일 때 `PSER.INP` 읽음. 헤더 `ITYPE,NREC,TMULT,...`. 수위 η를 pressure-head `G·η`로 변환해 S/W/E/N 압력셀에 적용 (`input.f90:5650-5685`, `calpser.f90:25-66`, `setopenbc.f90`). `ITYPE=1`은 cross-channel slope용 2-side. → §1.2 시계열 forcing 패턴에 해당.
-- **MTIDE 조화 합성**: `NWTSER` 심볼은 없고 `MTIDE` + periodic pressure forcing `NPFOR`로 분조 강제 (`input.f90:732-754`). C15가 `SYMBOL(M),TCP(M)`(분조명·주기)을, C17이 각 분조 진폭/위상→cos/sin 계수를 읽어 경계별 `PCB*/PSB*`(× G)로 변환. 런타임 `SETOPENBC`가 `TIMESEC`·`TCP`로 `cos/sin`을 계산해 각 경계 압력에 `PCB·cos + PSB·sin` 가산 (`setopenbc.f90:231-260`). → §1.1 분조 forcing 패턴에 해당.
+- **PSER (수위 시계열)**: `NPSER >= 1`일 때 `PSER.INP` 읽음. 헤더 `ITYPE,NREC,TMULT,...`. 수위 η를 pressure-head `G·η`로 변환해 S/W/E/N 압력셀에 적용 (`input.f90:5801-5836`, `calpser.f90:25-66`, `setopenbc.f90`). `ITYPE=1`은 cross-channel slope용 2-side. → §1.2 시계열 forcing 패턴에 해당.
+- **MTIDE 조화 합성**: `NWTSER` 심볼은 없고 `MTIDE` + periodic pressure forcing `NPFOR`로 분조 강제 (`input.f90:755-778`). C15가 `SYMBOL(M),TCP(M)`(분조명·주기)을, C17이 각 분조 진폭/위상→cos/sin 계수를 읽어 경계별 `PCB*/PSB*`(× G)로 변환. 런타임 `SETOPENBC`가 `TIMESEC`·`TCP`로 `cos/sin`을 계산해 각 경계 압력에 `PCB·cos + PSB·sin` 가산 (`setopenbc.f90:231-260`). → §1.1 분조 forcing 패턴에 해당.
 - **총 경계 수위 = PSER 시계열 + 조화 합성** (둘 중 하나만 또는 합산 — `efdc_boundary_conditions.md` §G 결론). 조석+기상 surge 결합 시 PSER(관측) + 조화 block(잔차 처리).
 - 위상은 **degrees**, 진폭 cm 입력 시 `RMULADJ=0.01` 필요 (노트 §G working rule).
 

@@ -173,10 +173,10 @@ CD "C:\Path\To\WorkingDirectory\"
 
 > ⚠️ **v12.4 소스 드리프트 (검증 2026-07)** — 위 카드 인덱스는 R8.5.0 매뉴얼(2020)을 정확히 기술하나, EFDC+ v12.4 소스(`EFDCPlus_Stable`, 로컬 clone 직접 확인 2026-07-04)는 다음이 다르다. 상세 규약은 [[efdc-tidal-forcing-conventions-v12]] 참조.
 >
-> - **C2A (매뉴얼 미기재)**: v12.4는 `ISRESTI==1 .and. ICONTINUE==1`(continuation restart)일 때 `SEEK('C2A')` 후 2줄 — `Restart_In_Ver`, `RESTARTF`(restart 파일명) — 를 읽는다 (`input.f90:198-200`). 본 매뉴얼 카드 인덱스에는 C2A가 없다.
-> - **C22B (Shellfish) 미독**: v12.4 `input.f90`의 SEEK 카드 인벤토리에 C22B가 없다 — 이 카드는 읽히지 않는다. Shellfish 설정은 대신 `READ_SHELLFISH_JSON`(JSON 파일)으로 로드 (`input.f90:3941-3943`, `SHELLFISHMOD`).
+> - **C2A (매뉴얼 미기재)**: v12.4는 `ISRESTI==1 .and. ICONTINUE==1`(continuation restart)일 때 `SEEK('C2A')` 후 2줄 — `Restart_In_Ver`, `RESTARTF`(restart 파일명) — 를 읽는다 (`input.f90:203-205`). 본 매뉴얼 카드 인덱스에는 C2A가 없다.
+> - **C22B (Shellfish) 미독**: v12.4 `input.f90`의 SEEK 카드 인벤토리에 C22B가 없다 — 이 카드는 읽히지 않는다. Shellfish 설정은 대신 `READ_SHELLFISH_JSON`(JSON 파일)으로 로드 (`input.f90:4090-4092`, `SHELLFISHMOD`).
 > - **C67~C91B 계열 대량 미독**: v12.4가 SEEK하지 않는 카드 = **C66A/C66B, C68–C70, C73–C83, C89–C90** (drifter 초기위치·경위도 상수·ASCII dump 계열 등). SEEK 인벤토리에 살아있는 것은 C66, C67, C71/C71A/C71B, C72, C84–C88, C91/C91A/C91B/C91C 뿐 (v12.4 `input.f90` 전수 grep, 2026-07-04).
-> - **C17 위상 규약**: 레거시 매뉴얼류의 "phase relative to time origin of TBEGIN" 서술과 달리, v12.4는 **절대 시간** `TIMESEC`로 합성한다: `hdmt.f90:89` `TIMESEC = TCON·TBEGIN` → `setopenbc.f90:232` `TN = TIMESEC` → η = PFAM·cos(2π(TIMESEC−PFPH)/TCP) (`input.f90:913-915` CPFAM0/SPFAM0 변환). 즉 PFPH는 **TCP와 같은 시간 단위(초)의 lag**이고 `PFPH = [TCON·TBEGIN + TCP·(G−(V0+u))/360] mod TCP`로 만들어야 한다. 도(°) 단위 위상을 그대로 넣으면 안 된다.
+> - **C17 위상 규약**: 레거시 매뉴얼류의 "phase relative to time origin of TBEGIN" 서술과 달리, v12.4는 **절대 시간** `TIMESEC`로 합성한다: `hdmt.f90:89` `TIMESEC = TCON·TBEGIN` → `setopenbc.f90:232` `TN = TIMESEC` → η = PFAM·cos(2π(TIMESEC−PFPH)/TCP) (`input.f90:944-946` CPFAM0/SPFAM0 변환). 즉 PFPH는 **TCP와 같은 시간 단위(초)의 lag**이고 `PFPH = [TCON·TBEGIN + TCP·(G−(V0+u))/360] mod TCP`로 만들어야 한다. 도(°) 단위 위상을 그대로 넣으면 안 된다.
 
 ### 6.3 핵심 카드 상세 (verbatim 옵션·기본값)
 
@@ -184,19 +184,19 @@ CD "C:\Path\To\WorkingDirectory\"
 
 **C3 External mode solver** (p.17): `RP`(over-relaxation), `RSQM`(목표 square residual), `ITERM`(최대 반복), `IRVEC`(0=conjugate gradient 무 scaling, 9=min diagonal scale, 99=normal form scale), `IWDRAG`(0=원 EFDC wind drag, 1=상대 수면속도 보정, 2=**Hersbach 2011 ECMWF**, 3=**simplified COARE 3.6** neutral+상대속도), `IDRYCK`(drying check당 반복, 2≤IDRYCK≤20), `FILT3TL`(3TL explicit filter 계수, `0.0625`).
 
-> ⚠️ **v12.4 소스 드리프트 (검증 2026-07)**: v12.4의 C3 read 목록은 `RP, RSQM, ITERM, IRVEC, IATMP, IWDRAG, ITERHPM, ldum, ISDSOLV, tmp` (`input.f90:225`) — 매뉴얼의 **`IDRYCK`·`FILT3TL` 식별자는 v12.4 소스 어디에도 존재하지 않는다** (전 `.f90` grep 0건, 2026-07-04). 해당 슬롯은 `ITERHPM`/`ldum`/`ISDSOLV`/`tmp`로 대체. 또한 `IRVEC`은 **0 또는 9만 허용** — 99를 넣으면 `STOPP('INVALID IRVEC')`로 즉시 정지한다 (`input.f90:237`).
+> ⚠️ **v12.4 소스 드리프트 (검증 2026-07)**: v12.4의 C3 read 목록은 `RP, RSQM, ITERM, IRVEC, IATMP, IWDRAG, ITERHPM, ldum, ISDSOLV, tmp` (`input.f90:230`) — 매뉴얼의 **`IDRYCK`·`FILT3TL` 식별자는 v12.4 소스 어디에도 존재하지 않는다** (전 `.f90` grep 0건, 2026-07-04). 해당 슬롯은 `ITERHPM`/`ldum`/`ISDSOLV`/`tmp`로 대체. 또한 `IRVEC`은 **0 또는 9만 허용** — 99를 넣으면 `STOPP('INVALID IRVEC')`로 즉시 정지한다 (`input.f90:242`).
 
-**C5 운동량 advection·misc** (p.18): `ISCDMA`(1=central diff momentum advection 3TL, 0=upwind), `ISHDMF`(1=수평 운동량 확산, 2=+water column), `ISDRY`(0=W&D 없음, 11=상수 drying depth HDRY+비선형반복, 99=가변 W&D depth cell-face masking), `ISRLID`(1=rigid lid 모드, 자유표면 없음), `ISVEG`(1=식생 저항, 2=+CBOT.LOG 진단), `IINTPG`(0=원 internal pressure gradient, 1=Jacobian, 2=finite volume).
+**C5 운동량 advection·misc** (p.18): `ISCDMA`(1=central diff momentum advection 3TL, 0=upwind), `ISHDMF`(1=수평 운동량 확산, 2=+water column), `ISDRY`(0=W&D 없음, 11=상수 drying depth HDRY+비선형반복, 99=가변 W&D depth cell-face masking), `ISRLID`(1=rigid lid 모드, 자유표면 없음), `ISVEG`(1=식생 저항, 2=+CBOT.LOG 진단), `IINTPG`(0=원 internal pressure gradient, 1=Jacobian, 2=finite volume). v12.5 C5 read에서는 `ISDISP` 슬롯을 `ldum`으로, `ISQQ` 슬롯을 `ICALTB`로 읽고, 13번째 필드 `ISHDMFILTER`를 읽는다. `IINTPG` 입력 필드는 유지된다 (`input.f90:269`).
 
 **C6 constituent transport** (p.18): index 매핑 — turb intensity=0, SAL=1, TEM=2, DYE=3, SFL=4, TOX=5, SED=6, SND=7, CWQ=8. `ISTRAN`(≥1 transport 활성), `ISCDCA`(0=donor cell upwind 3TL, 1=central diff 3TL), `ISADAC`(1=anti-numerical diffusion 보정), `ISFCT`(1=flux limiting 추가).
 
-> ⚠️ **v12.4 소스 드리프트 (검증 2026-07)**: v12.4의 C6 read는 `ISTRAN(NS), ISTOPT(NS), ldum, ISADAC(NS), ISFCT(NS), ldum, ldum, ldum, ISCI(NS), ISCO(NS)` (`input.f90:306`) — **3·6·7·8번째 슬롯은 더미(`ldum`)로 읽고 버린다**. 즉 매뉴얼이 3번째 슬롯에 문서화한 `ISCDCA` 등은 v12.4에서 **무시**된다 (자리는 유지해야 파싱이 맞음).
+> ⚠️ **v12.5 소스 드리프트**: v12.5의 C6 read는 `ISTRAN(NS), ISTOPT(NS), ISQUICK, ISADAC(NS), ISFCT(NS), ldum, ldum, ldum, ISCI(NS), ISCO(NS)` (`input.f90:311`) — **3번째 슬롯은 scalar `ISQUICK`**, **6·7·8번째 슬롯은 더미(`ldum`)로 읽고 버린다**. `ISQUICK`은 broadcast되며 (`input.f90:316`), 0/1 외 값은 경고 후 0으로 리셋된다 (`input.f90:318-325`).
 
 **C7 시간 정수** (p.19): `NTC`(reference time period 수), `NTSPTC`(reference period당 time step 수), `NTSTBC`(2TL trapezoidal 보정 step 간격, =mass balance print 간격), `NDRYSTP`(>0 시 isolated cell이 dry로 강제되기까지 step 수, 손실수는 QDWASTE 추적), `NRAMPUP`(dynamic time-stepping 시 step 고정 초기 loop 수).
 
 **C8 시간 실수** (p.19): `TCON`(TBEGIN→초 변환 배수), `TBEGIN`(run 시간 원점), `TREF`(reference 주기 sec, 예 44714.16s 또는 86400s), `CORIOLIS`(=2*7.29E-5*SIN(LAT)), `DTSSFAC`(>0이면 dynamic time-stepping), `DTMAX`(dynamic stepping 최대 step 초).
 
-> ⚠️ **v12.4 소스 드리프트 (검증 2026-07)**: v12.4의 C8 read는 `TCON, TBEGIN, TIDALP, CF, ISCORV, ISDCCA, ISCFL, ISCFLM, DTSSFAC, DTSSDHDT, DTMAX` (`input.f90:387`) — 매뉴얼의 `TREF`/`CORIOLIS`는 v12.4에서 **`TIDALP`/`CF`라는 이름**으로 같은 슬롯에 읽힌다 (의미 동일: reference 주기 / Coriolis 상수). 이름만 다르고 자리는 같으므로 파일 호환은 유지.
+> ⚠️ **v12.4 소스 드리프트 (검증 2026-07)**: v12.4의 C8 read는 `TCON, TBEGIN, TIDALP, CF, ISCORV, ISDCCA, ISCFL, ISCFLM, DTSSFAC, DTSSDHDT, DTMAX` (`input.f90:404`) — 매뉴얼의 `TREF`/`CORIOLIS`는 v12.4에서 **`TIDALP`/`CF`라는 이름**으로 같은 슬롯에 읽힌다 (의미 동일: reference 주기 / Coriolis 상수). 이름만 다르고 자리는 같으므로 파일 호환은 유지.
 
 **C9 공간** (p.20): `IC`(I방향 셀 수), `JC`(J방향 셀 수), `LC`(활성 수평셀 수+2), `LVC`(가변크기 수평셀 수), `ISCO`(1=곡선직교 그리드, LVC=LC-2), `NDM`(수평 domain decomposition 수, 단일 프로세서=1), `ISMASK`(1=mask.inp로 셀 land 마스킹/thin barrier), `ISCONNECT`(1=N-S, 2=E-W, 3=양방향 셀 연결).
 
@@ -208,7 +208,7 @@ CD "C:\Path\To\WorkingDirectory\"
 
 **C12A 난류폐쇄 옵션** (p.21–22): `ISSTAB`(0=Galperin et al. 안정함수 in CALAVBOLD …). 데이터라인 `C12A ISSTAB ISSQL ISAVBMX ISFAVB ISINWV ISLLIM IFPROX XYRATIO`.
 
-> ⚠️ **v12.4 소스 드리프트 (검증 2026-07)**: v12.4의 C12A 첫 슬롯은 `ISSTAB`이 아니라 **`ISTOPT(0)`** (난류 폐쇄 옵션 배열의 0번 원소)로 읽힌다: `read ... ISTOPT(0), ISSQL, ISAVBMX, ISFAVB, ISINWV, ISLLIM, IFPROX, XYRATIO, BC_EDGEFACTOR` (`input.f90:646`). `ISSTAB` 식별자는 v12.4 소스에 없고, 마지막에 `BC_EDGEFACTOR` 슬롯이 추가되어 9개 값을 읽는다.
+> ⚠️ **v12.4 소스 드리프트 (검증 2026-07)**: v12.4의 C12A 첫 슬롯은 `ISSTAB`이 아니라 **`ISTOPT(0)`** (난류 폐쇄 옵션 배열의 0번 원소)로 읽힌다: `read ... ISTOPT(0), ISSQL, ISAVBMX, ISFAVB, ISINWV, ISLLIM, IFPROX, XYRATIO, BC_EDGEFACTOR` (`input.f90:669`). `ISSTAB` 식별자는 v12.4 소스에 없고, 마지막에 `BC_EDGEFACTOR` 슬롯이 추가되어 9개 값을 읽는다.
 
 **C14 forcing·subgrid channel** (p.22): `MTIDE`, `NWSER`(wind series 수), `NASER`(대기 series 수), `ISGWIT`(지하수), `ISCHAN`(subgrid channel), `ISWAVE`(1=boundary layer 영향만 WAVEBL.INP, …).
 
@@ -254,7 +254,7 @@ IC×JC 매트릭스. IC/JC는 C9에서 지정. **매핑은 좌하단부터 시�
 | Temperature | `TEMP.INP`(IC), `TSER.INP`(BC), `ASER.INP`(대기), `ATMMAP.INP`(NASER>1), `PSHADE.INP`(shading), `SVHTFACT.INP`(ISVHEAT>0 표면열교환), `TEMB.INP`(bed temp) (p.73) |
 | Ice | `ISER.INP`(ISICE=1), `ICEMAP.INP`(NISER>1), `ISTAT.INP`(ISICE=2), `ICE.INP`(ISICE>2 heat-coupled) (p.73) |
 
-> ⚠️ **v12.4 소스 드리프트 (검증 2026-07)** — `WSER.INP`의 `ISWDINT`: DSI 블로그·wser 헤더는 `ISWDINT=2`를 "동/북 속도 성분 입력"으로 기술하나, v12.4 런타임(`caltsxy.f90:244-251`, TSWND의 유일한 런타임 소비처)은 **항상 1열=풍속, 2열=풍향(불어가는 쪽 나침반 방위, `DEGM=90−방향`으로 수학각 변환)** 으로 해석한다. `ISWDINT=2`의 read 처리는 두 열에 `WINDSCT` 배율만 곱할 뿐이어서 (`input.f90:6934-6939`) **성분 입력은 v12.4에서 조용히 오독된다**. 실재하는 옵션은 `ISWDINT=0`(불어가는 방향) / `=1`(불어오는 방향 — read 시 180° 반전, `input.f90:6923-6933`)뿐. 상세: [[efdc-tidal-forcing-conventions-v12]] §5.
+> ⚠️ **v12.4 소스 드리프트 (검증 2026-07)** — `WSER.INP`의 `ISWDINT`: DSI 블로그·wser 헤더는 `ISWDINT=2`를 "동/북 속도 성분 입력"으로 기술하나, v12.4 런타임(`caltsxy.f90:243-250`, TSWND의 유일한 런타임 소비처)은 **항상 1열=풍속, 2열=풍향(불어가는 쪽 나침반 방위, `DEGM=90−방향`으로 수학각 변환)** 으로 해석한다. `ISWDINT=2`의 read 처리는 두 열에 `WINDSCT` 배율만 곱할 뿐이어서 (`input.f90:7086-7091`) **성분 입력은 v12.4에서 조용히 오독된다**. 실재하는 옵션은 `ISWDINT=0`(불어가는 방향) / `=1`(불어오는 방향 — read 시 180° 반전, `input.f90:7075-7085`)뿐. 상세: [[efdc-tidal-forcing-conventions-v12]] §5.
 
 ## 9. 출력 파일 + GetEFDC (§1.4, p.73–76)
 

@@ -30,7 +30,7 @@ related:
 DU(L,K) = CDZFU(L,K)*( H1U(L)*(U1(L,K+1)-U1(L,K))*DELTI
         + DXYIU(L)*(FCAX(L,K+1)-FCAX(L,K) + FBBX(L,K) + SNLT*(FX(L,K)-FX(L,K+1))) )
 ```
-(calexp.f90:1366; DV 동형 :1367) — 직전 전단/Δt + **Coriolis(FCAX)·부력/경압(FBBX)·이류(FX)의 층간 차분**. 즉 explicit 물리는 전부 층차 형태로 RHS 에만.
+(calexp.f90:1309; DV 동형 :1367) — 직전 전단/Δt + **Coriolis(FCAX)·부력/경압(FBBX)·이류(FX)의 층간 차분**. 즉 explicit 물리는 전부 층차 형태로 RHS 에만.
 
 - **바람응력**: 최상층 계면(KS) 행에 `DU(L,KS) -= CDZUU(L,KS)*TSX(L)` (:1383-1384). ★게이트 `(ISTL == 2 .and. NWSER > 0) .or. (ISTL == 2 .and. iGOTM_Test > 0)` (:1375) — §6 함정 참조.
 - 마스크 SUB/SVB 적용 (:1397-1398).
@@ -73,7 +73,7 @@ DU(L,K) = SUB3D·DZGU·HU·AVUI·( DU(L,K) − AAU(L)·UUU(L,K) ) ! :495 — 물
 ## 7. ★Findings / 함정
 
 - **θ knob 없음** — 연직확산 implicitness 는 사용자 조정 불가(항상 완전 implicit). fort.15 스타일 3-knob(ADCIRC Alp1/2/3)와 대비되는 설계.
-- **★바람 전단 주입이 `ISTL==2` 에서만** (calexp.f90:1375) — 2TL(HDMT2T)은 ISTL 이 항상 2라 매 스텝 주입되지만, **3TL leapfrog full step(ISTL=3)에서는 내부전단 RHS 에 TSX/TSY 미주입** — 표면 강제가 corrector 주기(NTSTBC)로만 연직 구조에 들어가는 구조. 관찰 사실(코드 게이트)이며 의도/버그 여부는 문서 무언급.
+- **★바람 전단 주입이 `ISTL==2` 에서만** (calexp.f90:1318) — 2TL(HDMT2T)은 ISTL 이 항상 2라 매 스텝 주입되지만, **3TL leapfrog full step(ISTL=3)에서는 내부전단 RHS 에 TSX/TSY 미주입** — 표면 강제가 corrector 주기(NTSTBC)로만 연직 구조에 들어가는 구조. 관찰 사실(코드 게이트)이며 의도/버그 여부는 문서 무언급.
 - **전단 정식화의 함의**: 내부모드가 깊이평균을 건드리지 않으므로 external↔internal 정합은 별도 barotropic 보정(hydro_core §C)이 담당 — 그 보정 없으면 mass drift.
 - **Sherman-Morrison 보조해 UUU/VVV** — 디버깅 시 DU 배열이 소거 중간엔 미보정 상태임에 주의(:495 최종 변환 전후 단위·의미 다름: 소거계 무차원 → 물리 m²/s).
 - **RCXX 의 시간분기** — 3TL full step 은 old 값(U1)만, corrector 는 old·new 기하평균: 같은 STBX 라도 스텝 종류별 유효 drag 상이.

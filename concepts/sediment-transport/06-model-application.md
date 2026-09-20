@@ -45,13 +45,13 @@ EFDC+ Stable 의 sediment transport 는 **두 분기 system** ([`models/EFDC/sou
 - **ISTRAN(7) ≥ 1**: noncohesive 활성 → `CALSND` (Van Rijn 1984, Engelund-Hansen)
 - 별도 cohesive/noncohesive 처리, bed 모델 단순
 
-Source 분기: `SedTran-Original/ssedtox.f90:868-880`
+Source 분기: `SedTran-Original/ssedtox.f90:863-875`
 
 | Condition | Behavior | File:Line |
 |---|---|---|
-| `ISTRAN(6) >= 1 .and. LSEDZLJ` | SEDZLJ 사용 | `ssedtox.f90:868-872` |
-| `ISTRAN(6) >= 1 .and. !LSEDZLJ` | CALSED (cohesive only) | `ssedtox.f90:872-874` |
-| `ISTRAN(7) >= 1 .and. !LSEDZLJ` | CALSND (noncohesive only) | `ssedtox.f90:878-880` |
+| `ISTRAN(6) >= 1 .and. LSEDZLJ` | SEDZLJ 사용 | `ssedtox.f90:863-867` |
+| `ISTRAN(6) >= 1 .and. !LSEDZLJ` | CALSED (cohesive only) | `ssedtox.f90:867-869` |
+| `ISTRAN(7) >= 1 .and. !LSEDZLJ` | CALSND (noncohesive only) | `ssedtox.f90:873-875` |
 
 ### 2.2 SEDZLJ (modern, unified)
 

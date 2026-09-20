@@ -16,8 +16,8 @@ How EFDC+ identifies wet/dry cells, what the `HDRY`, `HWET` thresholds actually 
 
 ## Source basis
 
-- `input.f90:264-293, 548-570` — `ISDRY`, `HDRY/HWET` reads, derived `HDRYICE/HDRYWAV`.
-- `mod_var_global.f90:60, 841, 1048, 1053` — `LMASKDRY` definition, `ISDRY/HDRY/HWET` doc.
+- `input.f90:269-298, 570-592` — `ISDRY`, `HDRY/HWET` reads, derived `HDRYICE/HDRYWAV`.
+- `mod_var_global.f90:60, 841, 1049, 1054` — `LMASKDRY` definition, `ISDRY/HDRY/HWET` doc.
 - `calpuv9c.f90` — primary wet/dry algorithm (`:130, 138, 146, 161, 177, 345, 353, 358, 400, 501, 521, 607-631, 641, 724, 752, 804-846, 861, 869, 892-1080, 1156, 1213-1379, 1454-1843`).
 - `caluvw.f90:240-270, 939-1052` — velocity reset on dry cells.
 - `calexp.f90:750, 1104` — wet-cell list refresh, newly wet damping.
@@ -28,7 +28,7 @@ How EFDC+ identifies wet/dry cells, what the `HDRY`, `HWET` thresholds actually 
 
 ## A. ISDRY flag
 
-- Read from card C5 (`input.f90:264`) and broadcast (`:272`).
+- Read from card C5 (`input.f90:269`) and broadcast (`:272`).
 - Negative `ISDRY` flips to positive and sets `IDRYTBP=1` (`:286`).
 - Rigid lid forces `ISDRY = -1` (`:293`).
 - Definition: `0` = off, `>0` = wetting/drying active (`mod_var_global.f90:841`).
@@ -42,10 +42,10 @@ Major gates:
 
 ## B. HDRY vs HWET
 
-Read from card C11 (`input.f90:548-570`). Derived: `HDRYICE`, `HDRYWAV`.
+Read from card C11 (`input.f90:570-592`). Derived: `HDRYICE`, `HDRYWAV`.
 
-- `HDRY` = wet/dry control depth (`mod_var_global.f90:1048`). Drying triggered when `HP < HDRY` or `HP <= HDRY` (`calpuv9c.f90:899, 935`).
-- `HWET` = minimum operational depth for QSER withdrawals and structures, **not** the central rewetting threshold (`mod_var_global.f90:1053`).
+- `HDRY` = wet/dry control depth (`mod_var_global.f90:1049`). Drying triggered when `HP < HDRY` or `HP <= HDRY` (`calpuv9c.f90:899, 935`).
+- `HWET` = minimum operational depth for QSER withdrawals and structures, **not** the central rewetting threshold (`mod_var_global.f90:1054`).
 
 Standard wet/dry mode (`ISDRY != 99`) closes all four cell faces when `HP < HDRY` and the cell isn't recovering fast enough (`calpuv9c.f90:905, 912`).
 

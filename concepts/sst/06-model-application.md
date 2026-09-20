@@ -72,7 +72,7 @@ $$\rho C_p \frac{\partial T}{\partial t}\bigg|_{\text{surface}} = Q_{SW} - Q_{LW
 
 EFDC 의 heat budget 계산:
 - **표층 bulk flux 4개 항** (`calheat.f90`) — **source-needed** (본 위키 calheat.f90 source-analysis 미작성; EFDC v12 는 COARE 3.6 사용, [`models/EFDC/manual-notes/efdc-theory-doc-v12.md`](../../models/EFDC/manual-notes/efdc-theory-doc-v12.md) §4.2 Ch 5.1.2 참조 — manual-notes 확인 권장)
-- **연직 thermal transport / advection** — 수온은 EFDC 의 일반 tracer 로 연직 upwind advection (`caltran.f90:152-183`) 되며, sigma/Sigma-Zed(SGZ) 연직 격자(`KC`·`IGRIDV`)에 따라 layer thickness `HPK = HP·DZC` 로 분배됨. **verified**: [`models/EFDC/source-analysis/efdc_vertical.md`](../../models/EFDC/source-analysis/efdc_vertical.md) §A·§D (sigma layers·vertical advection). 가파른 지형에서 sigma 좌표 spurious diapycnal mixing 이 인공 성층(SST 연직 구조 왜곡)을 만들 수 있어 `IINTPG=1/2` 권장 (efdc_vertical.md §E·Working Rules).
+- **연직 thermal transport / advection** — 수온은 EFDC 의 일반 tracer 로 연직 upwind advection (`caltran.f90:152-183`) 되며, sigma/Sigma-Zed(SGZ) 연직 격자(`KC`·`IGRIDV`)에 따라 layer thickness `HPK = HP·DZC` 로 분배됨. **verified**: [`models/EFDC/source-analysis/efdc_vertical.md`](../../models/EFDC/source-analysis/efdc_vertical.md) §A·§D (sigma layers·vertical advection). 가파른 지형에서 sigma 좌표 spurious diapycnal mixing 이 인공 성층(SST 연직 구조 왜곡)을 만들 수 있다. **EFDC+ Stable 12.5 기준**으로는 `IINTPG` buoyancy shear 분기가 제거됐으며 급경사 대응은 `IGRIDV>0`(SGZ)을 사용한다. `IINTPG /= 0`은 `setbcs.f90:449`의 2-cell-wide 수로 external density gradient cell-face flag 처리를 끄는 부작용이 있다 (efdc_vertical.md §E·Working Rules).
 - horizontal advection
 
 > bulk 계수·albedo·방사율 등 EFDC 표층 heat budget 상수의 객관 인용은 `models/EFDC/manual-notes/heat-bulk-flux.md`(calheat.f90·aser.inp) 작성 시 보강 — 현재 source-needed.

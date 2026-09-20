@@ -63,7 +63,7 @@ if( IWDRAG==3 .and. ISTOPT(2)==2 ) TSX = 1.225E-3*CDCOARE(L)*U10*TSEAST   ! :812
 
 ## 6. Momentum handoff (소비처)
 - 외부모드: `calpuv2c.f90:224,226` `+DXYU*(TSX-RITB1*TBX)` (수면전단→수심적분 momentum, [[efdc_bottom_friction]] TBX 와 나란히).
-- 내부모드: `calexp.f90:1383-1384` `DU -= CDZUU*TSX`.
+- 내부모드: `calexp.f90:1326-1327` `DU -= CDZUU*TSX`.
 - **cyclone overlay**: `call CycloneFields(TIMEDAY)`(:487) → per-cell WINDSTRESS 재계산([[efdc_cyclone_wind]]).
 
 ## 7. 주요 findings
