@@ -8,8 +8,16 @@ DESIGN v2.0 파일럿 라운드(ADCIRC·EFDC·SWAN·ROMS·Celeris·asgs·hydromt
 
 | 항목 | 위치 | 성격 |
 |---|---|---|
-| **ShorelineS 공식 매뉴얼 v1.0 발췌** | `doc/ShorelineS_manual_v1.0.pdf`(66쪽, upstream `f3ec863` 2026-08-13 신규) | ShorelineS **최초** 공식 매뉴얼. 현재 `manual-notes/` 는 Frontiers 2020 + FAQ 2건뿐이고 매뉴얼 축이 비어 있었다. 66쪽 판독 → `manual-notes/` 신규 노트. AUDIT-LEDGER §14 '문서축 잔여 1' |
+| ~~**ShorelineS 공식 매뉴얼 v1.0 발췌**~~ | `doc/ShorelineS_manual_v1.0.pdf` 66쪽 | **✅완료 2026-09-22** — `manual-notes/shorelines-technical-manual-v1.md`(220행). 부수 성과: 매뉴얼 본문↔Appendix B 불일치 3건을 코드로 판정, **`rotfac` 키워드가 회절 루틴에서 무시됨**(`wave_diffraction.m:113`) 확정 |
 | XBeach 3 노트 'source revision unknown' 표기 | XBeach notes | 사용자 확정 2026-09-20, 아직 미반영 |
+
+## 코드↔문서 격차 (신규 2026-09-22)
+
+| 항목 | 위치 | 성격 |
+|---|---|---|
+| ShorelineS `RAY` 수송분기 미문서화 | `transport.m:194` | 매뉴얼 v1.0 §5.1 이 7공식을 문서화하면서 격차가 RAY 하나로 줄었다. upstream 보고 후보 |
+| ShorelineS `rotfac` 입력 무효 | `wave_diffraction.m:113` 이 `STRUC.rotfac` 을 무시하고 지역값 0.8 로 덮어씀 | 사용자가 키워드를 줘도 효과 없음. Appendix B 의 1.5 는 사문. upstream 보고 후보 |
+| ShorelineS 매뉴얼 `Kw`=1.2 (p49) | 실제 `initialize_defaultvalues.m:193` = 4.2 | 매뉴얼 본문 stale |
 
 ## 인용 좌표 (해결 보류)
 
