@@ -1,19 +1,21 @@
 # MODEL SNAPSHOT MIGRATION FRAMEWORK — v2.0
 
-> 상태: **FINAL.** 파일럿 4건으로 검증됨 (전부 2026-09-20 종료) —
+> 상태: **FINAL.** 파일럿 5건으로 검증됨 (2026-09-20~21) —
 > ADCIRC(`6037225`→`e8b62a70`), EFDC/EFDCPlus_Stable(`3ed76b6`→`3b382fd`), SWAN(`5544152`→`43e9bbb`),
-> ROMS/roms(`32c79b7`→`57aecf5`, Unit A/B 분리 적용).
+> ROMS/roms(`32c79b7`→`57aecf5`, Unit A/B 분리 적용), Celeris(`f6fd78b`→`ebca435`).
 > v1(`DESIGN-v1-superseded.md`) + Codex 적대 검토(`DESIGN-REVIEW-codex.md`) + Claude 독립 검증 +
-> 네 파일럿 실측 반영. 변경 이력은 §CHANGELOG.
+> 다섯 파일럿 실측 반영. 변경 이력은 §CHANGELOG.
 >
 > 파일럿이 드러낸 것은 **설계 결함이 아니라 구현·운영의 누락**이었고 그 교정이 v2.0 에 들어갔다 —
 > EFDC 에서 §UNCITED PROSE SWEEP·§EXCLUDED REFERENCE LEDGER(failure mode 22–25),
 > SWAN 에서 파서 문맥 오탐과 §CROSS-MODEL RESOLUTION(failure mode 26–28),
-> ROMS 에서 이중 배치 귀속·모양 기반 억제 금지·`AHEAD_OF_SNAPSHOT`(failure mode 29–31).
+> ROMS 에서 이중 배치 귀속·모양 기반 억제 금지·`AHEAD_OF_SNAPSHOT`(failure mode 29–31),
+> Celeris 에서 §REANCHOR 주석 함정(failure mode 32).
 >
 > 구현·게이트: `refparser.py` + `test_refparser.py`(문법), `resolver.py` + `test_resolver.py`(귀속),
+> `reanchor.py` + `test_reanchor.py`(재앵커·주석 함정),
 > 좌표 맵 예시 `_staging/efdc-migration/build-inputs.py` · `_staging/swan-prescan/build-phase2.py`.
-> **두 게이트를 모두 통과해야 migration 을 시작한다.**
+> **세 게이트를 모두 통과해야 migration 을 시작한다.**
 
 ## GOALS
 
@@ -231,6 +233,12 @@ ROMS 파일럿 추가(29–31).
     실측: "짧은 stem 억제" 규칙이 `io.F`·`bc.F` 등 실재 참조 19건을 함께 제거.
 31. **노트가 pinned 보다 앞선 서술을 stale 로 오분류** → `AHEAD_OF_SNAPSHOT` 로 구분,
     migration 후 내용 정정 단위로 분리. 실측: `roms_4dvar.md` 28건.
+
+Celeris 파일럿 추가(32).
+
+32. **재앵커가 주석화된 옛 코드에 정박** → §REANCHOR. upstream 이 교체 코드를 주석으로
+    남기면 옛 텍스트의 정확한 사본은 주석 쪽이다. 실측: Celeris 재앵커 4건 전부 해당,
+    각 지점 2줄 위에 옛 signature 주석.
 25. **잠금 검증을 root 로 실행해 무의미해짐** → `find <path> -writable` 은 root 에서 권한 비트와 무관하게
     참이다. 잠금 확인은 **소유자가 아닌 일반 사용자 권한으로** 실행하거나 `-perm` 비트로 검사한다.
     실측: sudo 스크립트 최종 단계가 `82713개 쓰기 가능`으로 오탐 실패, 실제 잠금은 정상이었다.
@@ -369,6 +377,36 @@ CADMAS-SURF(3D vs 3D2F)·FUNWAVE(TVD vs GPU)는 후보 깊이가 같아 듣지 �
 | EFDC | 89 | **9** | 대부분 경로·모델 귀속 문제였다 |
 | ADCIRC | 30 + 동명 48 | **30** + AMBIGUOUS 1 | 좁히기 47 (`wind.F` 41 포함) |
 
+### REANCHOR — 주석 함정 (2026-09-21 신설, Celeris 파일럿)
+
+기계 매핑이 실패한 인용은 옛 줄 내용으로 새 위치를 찾는다. 그런데 upstream 이
+**교체된 코드를 주석으로 남기면** 옛 텍스트와 정확히 같은 것은 주석 쪽이고,
+실행 줄은 인자·식이 바뀌어 있다. 내용만 대조하면 주석에 정박한다.
+
+Celeris 실측: 재앵커 4건 **전부** 이 형태였다. 각 지점 2줄 위에 옛 signature 가 주석으로 있다.
+
+| 파일 | 주석(옛) | 실행(정답) |
+|---|---|---|
+| `js/Handler_BoundaryPass.js` | 138 | **140** |
+| `js/main.js` | 2622 | **2624** |
+| `js/Time_Series.js` | 58 | **60** |
+
+규칙 (`reanchor.py`, 게이트 `test_reanchor.py`)
+
+1. **옛 줄이 주석이면** (Fortran 섹션 표제 `! loop over …` 등) 주석 일치가 정상이다 — 그대로 정박.
+   함정은 **옛 줄이 실행 코드**일 때만 성립한다.
+2. 옛 줄이 실행 코드일 때: 일치 중 **주석이 아닌 줄을 고른다**(`RESOLVED_SKIPPED_COMMENT`).
+3. 일치가 전부 주석이면 주변 ±8줄에서 **같은 signature 의 실행 줄**을 찾는다
+   (`RESOLVED_VIA_COMMENT_NEIGHBOR`). signature 는 `(` 앞(호출·선언) 또는 `=` 좌변(할당)이라
+   인자 추가·우변 확장에도 살아남는다.
+4. 그래도 없으면 `ALL_COMMENTED` — **자동 치환 금지**, 사람이 판단한다.
+
+**주석 판별은 줄 전체가 주석일 때만** 참이다. 코드 뒤 꼬리 주석은 실행 줄이다.
+Fortran 은 자유형식 `!` 와 고정형식 1열 `C`/`c`/`*` 를 모두 본다.
+
+회귀 fixture 는 파일럿 실측을 고정한다 — Celeris 3건(주석 회피),
+SWAN `SwanCompUnstruc.ftn90:829→823`·ROMS `pre_step3d.F:911→964`(주석 앵커가 정상인 경우).
+
 ### UNCITED PROSE SWEEP (2026-09-20 신설, EFDC 파일럿)
 
 **교집합 기반 후보 추출은 인용 없는 산문을 구조적으로 놓친다.** 노트는 근거 절에만 `file:line` 을 달고,
@@ -427,6 +465,9 @@ v1 1–8 + 추가:
 20. 동명 다중 후보가 남았으면 AMBIGUOUS 로 보고돼 있고 **조용히 RESOLVED 된 건이 없음**.
     귀속에 쓴 근거(줄 번호 배제 / 주 저장소 / 노트 component)가 건별로 기록돼 있음.
 21. `AHEAD_OF_SNAPSHOT` 참조를 가진 노트는 좌표 정비와 **별도 단위**로 분리돼 있음.
+22. **REANCHOR GATE 통과**(§REANCHOR) — 실패 시 `REANCHOR_GATE_FAILED`.
+    재앵커 건마다 정박 근거(`RESOLVED` / `SKIPPED_COMMENT` / `VIA_COMMENT_NEIGHBOR`)가 기록돼 있고,
+    `ALL_COMMENTED` 는 자동 치환되지 않았음.
 
 ## PILOT ROLLOUT ORDER
 
