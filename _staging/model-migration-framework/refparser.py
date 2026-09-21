@@ -12,9 +12,18 @@ r"""coastal-wiki source reference parser (DESIGN v2 §REFERENCE GRAMMAR).
 """
 import re
 
+# 확장자 목록은 **위키가 실제로 인용하는 것**을 기준으로 한다.
+# 소스 언어만 넣으면 스크립트·설정 기반 저장소(asgs 의 sh/pl, LISFLOOD 의 cu,
+# XBeach 의 def)의 인용이 통째로 누락된다 — asgs 파일럿에서 실측 247건 확인.
 EXTS = sorted(
-    ["ftn90", "ftn", "F90", "f90", "for", "cpp", "inc", "rst", "cff",
-     "wgsl", "F", "f", "c", "h", "py", "js", "m"],
+    # 컴파일 언어
+    ["ftn90", "ftn", "F90", "f90", "for", "cpp", "cuh", "cu", "inc",
+     "F", "f", "c", "h",
+     # 스크립트
+     "py", "js", "pl", "pm", "sh", "m",
+     # 설정·정의·문서
+     "wgsl", "rst", "cff", "def", "igs", "CMN", "yaml", "yml", "json",
+     "cmake", "in", "am", "vfproj", "txt"],
     key=lambda e: (-len(e), e),
 )
 _EXT_ALT = "|".join(re.escape(e) for e in EXTS)          # 길이 내림차순 고정

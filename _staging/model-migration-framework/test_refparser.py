@@ -30,6 +30,14 @@ FIX = [
     ("bare",         "적용 지점(`:2271`)",                    [("bare", None, [(2271, 2271)])]),
     ("bare 범위",    "(`:2936-2970`)",                        [("bare", None, [(2936, 2970)])]),
     ("bracket",      "`[file=aaefdc.f90 line=22]`",           [("file-line", "aaefdc.f90", [(22, 22)])]),
+    # 스크립트·설정 확장자 (asgs 파일럿 2026-09-21: 미인식으로 교집합 0 오판)
+    ("shell",        "`asgs_main.sh:2208`",                   [("file-line", "asgs_main.sh", [(2208, 2208)])]),
+    ("perl",         "`storm_track_gen.pl:46`",               [("file-line", "storm_track_gen.pl", [(46, 46)])]),
+    ("cuda",         "`cuda_flow.cu:41`",                     [("file-line", "cuda_flow.cu", [(41, 41)])]),
+    ("cuda header",  "`cuda/cuda_flow.cuh:9`",                [("file-line", "cuda/cuda_flow.cuh", [(9, 9)])]),
+    ("def",          "`params.def:147`",                      [("file-line", "params.def", [(147, 147)])]),
+    ("in",           "`s4dvar.in:461`",                       [("file-line", "s4dvar.in", [(461, 461)])]),
+    ("txt",          "`doc/util/aswip.1.txt:133`",            [("file-line", "doc/util/aswip.1.txt", [(133, 133)])]),
 ]
 
 SYMBOL_FIX = [("symbol-only", "`PADCSWAN_RUN` 호출", "PADCSWAN_RUN"),
@@ -74,6 +82,9 @@ def main():
     # 설계: 제외 영역도 탐지하되 excluded=True 로 표시(ledger 보존), 자동 수정 대상 아님
     if not (len(ex) == 2 and ex[0]["excluded"] and not ex[1]["excluded"]):
         fails.append(f"code block exclusion flag failed: {[(r['ranges'], r['excluded']) for r in ex]}")
+    # 위키 내부 링크(.md)를 소스 참조로 잡지 않는다 — 넣으면 2,052건 오탐
+    if [r for r in rp.parse_line("- [README](../README.md) 참조") if r["kind"] in ("file", "file-line")]:
+        fails.append(".md 를 소스 참조로 오인")
     # 부분 파싱 금지: 잘못된 범위는 None
     if rp.parse_ranges("12-") is not None:
         fails.append("malformed range accepted")
@@ -96,7 +107,7 @@ def main():
         fails.append(f"math fence failed: {[(r['path'], r['ranges']) for r in mb]}")
 
     n = len(FIX) + len(SYMBOL_FIX) + len(NEGATIVE_FIX) + len(ANOMALY_FIX)
-    print(f"fixtures {n} + 규칙검사 8 | 실패 {len(fails)}")
+    print(f"fixtures {n} + 규칙검사 9 | 실패 {len(fails)}")
     for f in fails:
         print("  FAIL:", f)
     if fails:
