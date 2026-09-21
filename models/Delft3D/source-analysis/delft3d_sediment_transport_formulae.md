@@ -4,7 +4,7 @@ model: Delft3D
 component: utils_gpl/morphology/morphology_kernel
 canonical_source: self
 citation_status: verified
-verification_method: "Delft3D morphology_kernel 소스 직접 read (models/Delft3D/raw/source_code/Delft3D/src/utils_gpl/morphology/packages/morphology_kernel/src/). erosilt.f90(269줄) 전체 + eqtran.f90(834줄) iform dispatch + compbsskin.f90(312줄) Function 직접 인용. 식·파라미터·iform 코드 verbatim. [`delft3d_sediment_morphology.md`](delft3d_sediment_morphology.md)(compute_sediment 커널)가 이 식들을 호출 — erosilt@erosed.f90:1074·eqtran@erosed.f90:1221·compbsskin@erosed.f90:880."
+verification_method: "Delft3D morphology_kernel 소스 직접 read (models/Delft3D/raw/source_code/Delft3D/src/utils_gpl/morphology/packages/morphology_kernel/src/). erosilt.f90(269줄) 전체 + eqtran.f90(834줄) iform dispatch + compbsskin.f90(312줄) Function 직접 인용. 식·파라미터·iform 코드 verbatim. [`delft3d_sediment_morphology.md`](delft3d_sediment_morphology.md)(compute_sediment 커널)가 이 식들을 호출 — erosilt@erosed.f90:1103·eqtran@erosed.f90:1256·compbsskin@erosed.f90:903."
 note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-15
 related:
@@ -21,11 +21,11 @@ source_scope: Delft3D/src/utils_gpl/morphology, Delft3D/src/engines_gpl/flow2d3d
 
 ## 1. erosilt.f90 — Partheniades-Krone (cohesive mud, 269줄)
 
-`erosed.f90:1074` 가 mud fraction 마다 호출. **iform** 으로 식 선택:
+`erosed.f90:1103` 가 mud fraction 마다 호출. **iform** 으로 식 선택:
 
 | iform | 식 |
 |---|---|
-| **−3** | Default **Partheniades-Krone** (`erosilt.f90:160`) |
+| **−3** | Default **Partheniades-Krone** (`erosilt.f90:193`) |
 | 21 | user-defined DLL (`perf_function_erosilt`, `:204-247`) |
 | flmd2l | 2-layer fluid mud (`:145`, entrainment `entr`=par(11)) |
 
@@ -80,7 +80,7 @@ sourf   = sour_fluff / thick0          (:266)
 
 ## 2. eqtran.f90 — transport formula gateway (non-cohesive sand, 834줄)
 
-`erosed.f90:1221`(3D) / `:1304`(2D) 호출. 헤더 자칭 **"Gateway for all sediment transport formulations"**(`eqtran.f90:2`). `iform` 으로 분기:
+`erosed.f90:1256`(3D) / `:1304`(2D) 호출. 헤더 자칭 **"Gateway for all sediment transport formulations"**(`eqtran.f90:2`). `iform` 으로 분기:
 
 | iform | routine | 식 (소스 주석 verbatim) |
 |---|---|---|
@@ -110,7 +110,7 @@ sourf   = sour_fluff / thick0          (:266)
 
 ## 3. compbsskin.f90 — muddy bed skin friction (312줄)
 
-`erosed.f90:880` 호출. **Soulsby (2004)** muddy/silt bed 의 skin-friction τ 계산(`compbsskin.f90:82-83`):
+`erosed.f90:903` 호출. **Soulsby (2004)** muddy/silt bed 의 skin-friction τ 계산(`compbsskin.f90:83-84`):
 
 - silt/sand 혼합 bed 의 skin shear stress `taumax` 산출(`:115`).
 - 상수: **ar = 0.26, as = 0.22** (Soulsby 원논문, `:90`).

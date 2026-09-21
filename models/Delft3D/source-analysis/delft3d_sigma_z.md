@@ -23,7 +23,7 @@ How Delft3D-FLOW switches between sigma and Z-layer vertical coordinates via the
 - `flow2d3d_kernel/src/inichk/inivol.f90:97-107`, `comvol.f90:95-99`, `layerdep.f90:75-96` — sigma volumes.
 - `flow2d3d_kernel/src/inichk/z_inizm.f90:168-328`, `z_kfmnmx.f90:73-117` — Z-layer init, layer bounds.
 - `flow2d3d_kernel/src/compute/z_drychk.f90:136-306` — Z runtime drying.
-- `flow2d3d_kernel/src/compute/dens.f90:180-187`, `cucnp.f90:412-508`, `dengra.f90:213-403` — sigma internal pressure.
+- `flow2d3d_kernel/src/compute/dens.f90:181-188`, `cucnp.f90:412-508`, `dengra.f90:214-404` — sigma internal pressure.
 - `flow2d3d_kernel/src/compute/z_dengra.f90:42-131`, `z_cucnp.f90:473-476` — Z internal pressure.
 - `flow2d3d_kernel/src/compute/sud.f90:932-937`, `difuvl.f90:353-411`, `difu.f90:578-604`, `z_sud.f90:329-954`, `z_difu.f90:362-558`, `z_updtvol.f90:94-96` — flux/diffusion forms.
 
@@ -72,13 +72,13 @@ So Z-layer effectively has **partial-thickness top and bottom layers**, whose nu
 
 ## D. Internal pressure gradient
 
-**Sigma** (`dens.f90:180-187`):
+**Sigma** (`dens.f90:181-188`):
 - Density-column integrals `sumrho` only computed when `.not. zmodel`.
 
 Sigma baroclinic forcing in momentum (`cucnp.f90:492-508`):
 - Uses `rho, sumrho, sig(k)`, left/right water depths.
 
-**Anti-creep** density-Jacobian style routine (`dengra.f90:213-403`):
+**Anti-creep** density-Jacobian style routine (`dengra.f90:214-404`):
 - Builds left/right sigma-interface elevations from `sig, thick, s0+dps` (`:213-225`).
 - Merges/interpolates columns before computing gradients and density derivatives (`:229-403`).
 

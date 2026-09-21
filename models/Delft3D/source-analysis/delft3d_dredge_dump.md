@@ -17,10 +17,10 @@ How Delft3D's Dredge-and-Dump (DAD) module is wired between FLOW and the shared 
 
 ## Source basis
 
-- `utils_gpl/morphology/packages/morphology_kernel/src/dredge.f90:30-37, 99-126, 176-1655` — core DAD module.
-- `flow2d3d/packages/flow2d3d_kernel/src/compute_sediment/dredge_d3d4.f90:1-137` — FLOW wrapper.
+- `utils_gpl/morphology/packages/morphology_kernel/src/dredge.f90:28-35,95-122,171-1648` — core DAD module.
+- `flow2d3d/packages/flow2d3d_kernel/src/compute_sediment/dredge_d3d4.f90:1-141` — FLOW wrapper.
 - `flow2d3d/packages/flow2d3d_io/src/input/rddredge_d3d4.f90:59-62` — input wrapper.
-- `flow2d3d/packages/flow2d3d_kernel/src/main/bott3d.f90:775-1285`, `z_bott3d.f90:1264-1267` — call sites.
+- `flow2d3d/packages/flow2d3d_kernel/src/main/bott3d.f90:784-1303`, `z_bott3d.f90:1333-1336` — call sites.
 - `utils_gpl/morphology/packages/morphology_io/src/rddredge.f90:258-1695` — input reader.
 - `utils_gpl/morphology/packages/morphology_data/src/dredge_data_module.f90:58-227` — data structures.
 - `utils_gpl/morphology/packages/morphology_kernel/src/dredge_comm.f90:13-18` — MPI / DD communicate.
@@ -37,8 +37,8 @@ DAD is implemented in the **shared morphology kernel**, wrapped by FLOW:
 | `flow2d3d/packages/flow2d3d_io/src/input/rddredge_d3d4.f90` | Reader wrapper, calls shared `rddredge` (`:59-62`) |
 
 Runtime call sites:
-- `bott3d.f90:1282-1285` — when `dredge` enabled.
-- `z_bott3d.f90:1264-1267` — Z-model equivalent.
+- `bott3d.f90:1300-1303` — when `dredge` enabled.
+- `z_bott3d.f90:1333-1336` — Z-model equivalent.
 
 Initialization path: `tricom_init.F90:1095-1099` reads DAD input; `:1247` initializes partition data.
 
@@ -50,7 +50,7 @@ Two scheduling mechanisms: **time-table `active`** + **depth-threshold `DredgeDe
 
 - `.dad` reader loads `General/TimeSeries` via `readtable` (`rddredge.f90:345-354`).
 - Default `active` table binding read + checked (`:416-433`); per-area active table at `:804-823`.
-- Runtime: `update_active_flags` chooses morphological time or hydrodynamic time using `TS_MorTimeScale` (`dredge.f90:176-180`), evaluates active table, sets `pdredge%active = values(1)>0` (`:188-200`).
+- Runtime: `update_active_flags` chooses morphological time or hydrodynamic time using `TS_MorTimeScale` (`dredge.f90:171-175`), evaluates active table, sets `pdredge%active = values(1)>0` (`:188-200`).
 
 ### Depth-threshold scheduling
 
@@ -59,35 +59,35 @@ Two scheduling mechanisms: **time-table `active`** + **depth-threshold `DredgeDe
 - If no `DredgeDepth` but rate given: sand-mining / fixed-rate dredging (`:841-847`).
 - Otherwise: dredging to specified depth (`:849-856`).
 
-Runtime threshold logic computes `z_dredge = reflevel − dredge_depth`, compares with `triggerlevel`, only triggers where sediment exists (`dredge.f90:514-551`).
+Runtime threshold logic computes `z_dredge = reflevel − dredge_depth`, compares with `triggerlevel`, only triggers where sediment exists (`dredge.f90:508-545`).
 
 ### Trigger modes
 
 Enums: point-by-point, all-by-one, all-by-average (`dredge_data_module.f90:58-63`).
 - Legacy `TriggerAll, DredgeTrigger` read at `rddredge.f90:440-448, 938-953`.
-- Runtime cases (`dredge.f90:514-645`): point/all-by-one (`:514-596`); average-trigger-all (`:597-645`).
+- Runtime cases (`dredge.f90:508-639`): point/all-by-one (`:514-596`); average-trigger-all (`:597-645`).
 
 ### Rate limiting
 
 - `MaxVolRate` converted from m³/year to m³/s (`rddredge.f90:859-860`).
-- Runtime: `maxvol = maxvolrate * dt * morfac` (`dredge.f90:375-379`).
+- Runtime: `maxvol = maxvolrate * dt * morfac` (`dredge.f90:369-373`).
 - Morph spinup or `morfac=0`: special handling (`:364-374`).
 
 ## C. Sediment sink (bed-only, not water column)
 
 Dredging removes sediment from **bed administration**, not the water column directly:
 
-- Dredge thickness stored in `dadpar%dzdred(nm)` (`dredge.f90:1154-1159`).
+- Dredge thickness stored in `dadpar%dzdred(nm)` (`dredge.f90:1148-1153`).
 - Bed-composition sink: `gettoplyr(morlyr, dadpar%dzdred, dbodsd, ...)`. Comment: `dbodsd` is "kg/m² sediment removed" (`:1162-1167`).
 - Volumes per fraction from `dbodsd / cdryb`; bed level `dps` updated (`:1175-1195`).
 
-General suspended-sediment exchange uses `sinkse/sourse` (`bott3d.f90:775-776`), but DAD runs **later** as a bed operation (`:1282-1285`). DAD does **not** add/remove from concentration arrays directly.
+General suspended-sediment exchange uses `sinkse/sourse` (`bott3d.f90:784-785`), but DAD runs **later** as a bed operation (`:1282-1285`). DAD does **not** add/remove from concentration arrays directly.
 
 ## D. Dumping
 
 Source material from `dadpar%voldred`, then assigned to dump areas as `dadpar%voldump`:
 
-- Per-step dredged volume per fraction accumulated (`dredge.f90:1184-1187`).
+- Per-step dredged volume per fraction accumulated (`dredge.f90:1178-1181`).
 - `distribute_sediments_over_dump_areas` (`:1202-1209`); cumulative totals (`:1231-1241`).
 
 Distribution modes:
@@ -113,7 +113,7 @@ Within modeled dredge/dump links, volume is carried fraction-wise (`dredge_data_
 - `voldump(ib, lsed)` — dump target.
 - `link_sum` — cumulative transported.
 
-- Percentage links: add `voltim*fracdumped` to both `link_sum` and `voldump` (`dredge.f90:1275-1279`).
+- Percentage links: add `voltim*fracdumped` to both `link_sum` and `voldump` (`dredge.f90:1268-1272`).
 - Sequential / proportional: allocate remaining `voldredged` into `voldump` (`:1300-1322, 1344-1363`).
 
 ### `REMOVED FROM MODEL` outlet
@@ -129,24 +129,24 @@ Conservation is explicit in DAD accounting, but material can intentionally leave
 
 DAD is coupled **after** the normal morphology bed update:
 
-1. `bott3d` computes normal `dbodsd`, calls `updmorlyr`, computes `depchg` (`bott3d.f90:1027-1088`).
+1. `bott3d` computes normal `dbodsd`, calls `updmorlyr`, computes `depchg` (`bott3d.f90:1043-1104`).
 2. Standard bed update (`:1112-1121`).
 3. **DAD updates `dps` directly via `dredge_d3d4`** (`:1282-1285`).
 
 For DAD dumping, FLOW updates bed composition again:
-- `updmorlyr(gdmorlyr, dbodsd, dz_dummy, ...)` (`dredge_d3d4.f90:121-137`).
+- `updmorlyr(gdmorlyr, dbodsd, dz_dummy, ...)` (`dredge_d3d4.f90:122-141`).
 - Comment: this is sediment administration for dumping only; no actual bed update through `dz_dummy` (`:121-126`).
 
 Cross-domain / MorMer-style merge uses `dredgecommunicate`:
 - MPI: `dfreduce(..., dfsum, ...)`.
 - Otherwise: `dd_dredgecommunicate` (`dredge_comm.f90:13-18`).
-- Core calls for dump capacity + dredged volumes (`dredge.f90:99-126`).
+- Core calls for dump capacity + dredged volumes (`dredge.f90:95-122`).
 
 ## G. Multi-fraction dredge / dump
 
 First-class support:
 
-- `lsedtot` passed through DAD core (`dredge.f90:37-40`).
+- `lsedtot` passed through DAD core (`dredge.f90:35-38`).
 - `voldred(source, lsedtot+1)` — extra column for **non-modeled subsoil sediment** (`dredge_data_module.f90:220-221`).
 - Links: `link_percentage(nalink, lsedtot)`, `link_sum(nalink, lsedtot)` (`:211-215`).
 
@@ -156,7 +156,7 @@ Reading:
 - Nourishment per-fraction `SedPercentage`, must sum to 100% (`:1176-1188, 1246-1264`).
 
 Runtime:
-- Dredging accumulates `voldred` over all fractions (`dredge.f90:1184-1187`).
+- Dredging accumulates `voldred` over all fractions (`dredge.f90:1178-1181`).
 - Dumping applies `dbodsd` over all fractions (`:1652-1655`).
 
 ## H. Output / logging

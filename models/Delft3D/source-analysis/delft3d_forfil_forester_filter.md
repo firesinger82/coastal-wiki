@@ -18,7 +18,7 @@ source_scope: Delft3D/src/engines_gpl/flow2d3d, Delft3D/src/engines_gpl/waq, Del
 # Delft3D-FLOW Forester anti-oscillation 필터 — `forfil.f90` + `z_forfil.f90`
 
 > 소스: [`.../compute/forfil.f90`](../raw/source_code/Delft3D/src/engines_gpl/flow2d3d/packages/flow2d3d_kernel/src/compute/forfil.f90)(411, sigma) + [`z_forfil.f90`](../raw/source_code/Delft3D/src/engines_gpl/flow2d3d/packages/flow2d3d_kernel/src/compute/z_forfil.f90)(357, Z-layer).
-> **정체**: transport([[delft3d_difu_transport]]/[[delft3d_z_difu_transport]]) 직후 **음수 농도 제거 + 수직 wiggle 평활**(Forester 1977). 호출 `trisol.f90:2104,3177`(sigma)·`z_trisol.f90:1774,2616`(Z). [[delft3d_z_difu_transport]]:70,83 이 sibling(범위 밖) 으로 명시한 갭. ※WAQ `vertical_forester_filter.f90`·dflowfm `doforester.f90` 는 별 엔진(무관).
+> **정체**: transport([[delft3d_difu_transport]]/[[delft3d_z_difu_transport]]) 직후 **음수 농도 제거 + 수직 wiggle 평활**(Forester 1977). 호출 `trisol.f90:2106,3179`(sigma)·`z_trisol.f90:1774,2616`(Z). [[delft3d_z_difu_transport]]:70,83 이 sibling(범위 밖) 으로 명시한 갭. ※WAQ `vertical_forester_filter.f90`·dflowfm `doforester.f90` 는 별 엔진(무관).
 
 ## 0. 2-pass 구조 (각 파일 단일 subroutine)
 

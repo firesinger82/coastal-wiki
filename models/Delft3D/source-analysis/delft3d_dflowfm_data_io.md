@@ -40,77 +40,77 @@ D-Flow FM 은 거대한 module 변수 집합으로 모델 상태를 보유한다
 module 선언부 주석 `module m_flow ! flow arrays-999` (`m_flow.f90:33`). 다수의 sub-data module 을 `use`: `fm_external_forcings_data`, `m_flowparameters`, `m_turbulence`, `m_vegetation`, `m_heatfluxes`, `m_physcoef` 등 (`m_flow.f90:34-45`).
 
 **노드 관련 배열 (dim = ndx, 수위점/셀중심):**
-- `s0(:)` / `s1(:)` — 타임스텝 시작/끝 수위 (m). `m_flow.f90:160-161`. 주석 `[m] waterlevel (m ) at start/end of timestep {"location": "face", "shape": ["ndx"]}`.
-- `hs(:)` — 셀 중심 수심 = s1 - bl. `m_flow.f90:171` (`[m] waterdepth at cell centre = s1 - bl (m)`).
-- `vol0(:)`/`vol1(:)` — 타임스텝 시작/끝 총부피 (m3). `m_flow.f90:166-167`.
-- `a0(:)`/`a1(:)` — 저류면적 (m2). `m_flow.f90:164-165`.
-- `ucx`/`ucy`/`ucz` — 셀 중심 속도 글로벌 x/y/z 성분 (m/s). `m_flow.f90:192-194`. `ucmag` 속도 크기 `m_flow.f90:199`.
+- `s0(:)` / `s1(:)` — 타임스텝 시작/끝 수위 (m). `m_flow.f90:165-166`. 주석 `[m] waterlevel (m ) at start/end of timestep {"location": "face", "shape": ["ndx"]}`.
+- `hs(:)` — 셀 중심 수심 = s1 - bl. `m_flow.f90:176` (`[m] waterdepth at cell centre = s1 - bl (m)`).
+- `vol0(:)`/`vol1(:)` — 타임스텝 시작/끝 총부피 (m3). `m_flow.f90:171-172`.
+- `a0(:)`/`a1(:)` — 저류면적 (m2). `m_flow.f90:169-170`.
+- `ucx`/`ucy`/`ucz` — 셀 중심 속도 글로벌 x/y/z 성분 (m/s). `m_flow.f90:197-199`. `ucmag` 속도 크기 `m_flow.f90:204`.
 
 **링크 관련 배열 (dim = lnkx, 속도점/엣지):**
-- `u0(:)`/`u1(:)` — 타임스텝 시작/끝 유속 (m/s). `m_flow.f90:295-296`.
-- `q1(:)` — 유량 (m3/s) at end of timestep n. 주석에 `used as q0 in timestep n+1, statement q0 = q1 is out of code, saves 1 array` (`m_flow.f90:298`) — 메모리 절약을 위해 q0 배열을 별도 유지하지 않는 설계.
-- `au(:)` — u 점에서의 흐름면적 (m2). `m_flow.f90:304`.
-- `qa(:)` — advection 용 유량 `qa=au(n)*u1(n+1)` `m_flow.f90:300`.
+- `u0(:)`/`u1(:)` — 타임스텝 시작/끝 유속 (m/s). `m_flow.f90:300-301`.
+- `q1(:)` — 유량 (m3/s) at end of timestep n. 주석에 `used as q0 in timestep n+1, statement q0 = q1 is out of code, saves 1 array` (`m_flow.f90:303`) — 메모리 절약을 위해 q0 배열을 별도 유지하지 않는 설계.
+- `au(:)` — u 점에서의 흐름면적 (m2). `m_flow.f90:309`.
+- `qa(:)` — advection 용 유량 `qa=au(n)*u1(n+1)` `m_flow.f90:305`.
 
 **스칼라 수송(노드, dim = ndkx):**
-- `sa0`/`sa1` 염분(ppt), `m_flow.f90:269-270` (단위 메타 `[1e-3]`).
-- `tem0`/`tem1` 수온(degC), `m_flow.f90:275-276`.
+- `sa0`/`sa1` 염분(ppt), `m_flow.f90:274-275` (단위 메타 `[1e-3]`).
+- `tem0`/`tem1` 수온(degC), `m_flow.f90:280-281`.
 
-**3D 층 자료구조 (`m_flow.f90:49-156`):**
+**3D 층 자료구조 (`m_flow.f90:49-161`):**
 - `kmx` — 3D 층 수, `kmx==0 → 2D code, kmx==1 → 3D code` (`m_flow.f90:50-51`).
 - `ndkx` — 3D flow 노드 차원(내부+경계), `m_flow.f90:54`. `lnkx` — 3D flow 링크 차원, `m_flow.f90:56`.
-- 층 압축 인덱스: `kbot(:)`/`ktop(:)` — 각 ndx 수평 셀의 바닥/상단 층 셀 번호 (`m_flow.f90:128-129`), `Lbot(:)`/`Ltop(:)` — 각 lnx 수평 링크의 바닥/상단 엣지 (`m_flow.f90:132-133`). 즉 3D 셀은 (수평셀 × 가변 수직층)을 1차원 압축 인덱싱.
-- `zws(:)` — 셀중심(s점)에서의 인터페이스(w점) z 레벨 (m), `m_flow.f90:106`. 주석에 ASCII 다이어그램으로 `zws(0)=interface(0)=bl`, `zws(ktop)=s1` 구조 도해 (`m_flow.f90:109-123`).
-- 층 타입 상수: `LAYTP_SIGMA=1`, `LAYTP_Z=2`, `LAYTP_POLYGON_MIXED=3`, `LAYTP_DENS_SIGMA=4` (`m_flow.f90:70-73`).
+- 층 압축 인덱스: `kbot(:)`/`ktop(:)` — 각 ndx 수평 셀의 바닥/상단 층 셀 번호 (`m_flow.f90:133-134`), `Lbot(:)`/`Ltop(:)` — 각 lnx 수평 링크의 바닥/상단 엣지 (`m_flow.f90:137-138`). 즉 3D 셀은 (수평셀 × 가변 수직층)을 1차원 압축 인덱싱.
+- `zws(:)` — 셀중심(s점)에서의 인터페이스(w점) z 레벨 (m), `m_flow.f90:111`. 주석에 ASCII 다이어그램으로 `zws(0)=interface(0)=bl`, `zws(ktop)=s1` 구조 도해 (`m_flow.f90:114-128`).
+- 층 타입 상수: `LAYTP_SIGMA=1`, `LAYTP_Z=2`, `LAYTP_POLYGON_MIXED=3`, `LAYTP_DENS_SIGMA=4` (`m_flow.f90:72-75`).
 
 ### 1.2 m_flowgeom — flow 격자 기하·번호체계
 
 D-Flow FM 의 핵심 **번호 규약(numbering convention)** 이 이 module 주석에 명시되어 있다.
 
-**Flow node 번호체계** (`m_flowgeom.f90:82-86`, verbatim):
+**Flow node 번호체계** (`m_flowgeom.f90:83-87`, verbatim):
 ```
 1:ndx2D, ndx2D+1:ndxi, ndxi+1:ndx1Db, ndx1Db+1:ndx
 ^ 2D int ^ 1D int      ^ 1D bnd       ^ 2D bnd ^ total
 ```
-즉 2D 내부 → 1D 내부 → 1D 경계 → 2D 경계 순으로 배열. 관련 차원: `ndxi`(내부 셀=2D+1D, `m_flowgeom.f90:101`), `ndx1db`(+1D 경계, `m_flowgeom.f90:102`). `ndx2d`/`ndx`는 gridgeom 의 `m_cell_geometry` 로 이동됨 (`m_flowgeom.f90:88-93`).
+즉 2D 내부 → 1D 내부 → 1D 경계 → 2D 경계 순으로 배열. 관련 차원: `ndxi`(내부 셀=2D+1D, `m_flowgeom.f90:103`), `ndx1db`(+1D 경계, `m_flowgeom.f90:102`). `ndx2d`/`ndx`는 gridgeom 의 `m_cell_geometry` 로 이동됨 (`m_flowgeom.f90:89-94`).
 
-**Flow link 번호체계** (`m_flowgeom.f90:124-126`, verbatim):
+**Flow link 번호체계** (`m_flowgeom.f90:125-127`, verbatim):
 ```
 1:lnx1d, lnx1d+1:lnxi, lnxi+1:lnx1Db, lnx1Db+1:lnx
 ^ 1D int ^ 2D int      ^ 1D bnd       ^ 2D bnd ^ total
 ```
-차원: `lnx1D`(1D 링크 수, `m_flowgeom.f90:127`), `lnxi`(내부 1D+2D, `m_flowgeom.f90:128`), `lnx`(전체, `m_flowgeom.f90:130`).
+차원: `lnx1D`(1D 링크 수, `m_flowgeom.f90:129`), `lnxi`(내부 1D+2D, `m_flowgeom.f90:128`), `lnx`(전체, `m_flowgeom.f90:131`).
 
 **핵심 연결·기하 배열:**
-- `nd(:)` — flow node administration, type `tnode` (`m_flowgeom.f90:103`). `tnode` 정의 `m_flowgeom.f90:47-56`: `ln`(연결 링크 번호, `>0` 들어오는·`<0` 나가는), `nod`(net node 매핑), `nwx`/`nw`(벽 연결).
-- `ln(2,*)` — 링크의 node 행정(좌/우 셀번호). `m_flowgeom.f90:131`.
-- `lncn(2,*)` — 2D 링크의 corner(net node) 행정. `m_flowgeom.f90:133`.
-- `kcu(:)` — 링크 코드: `1=1D link, 2=2D link, -1=bc 1D, -2=bc 2D, 3=lateral_1d2d_link, 4=longitudinal_1d2d_link, 5=street_inlet, 7=roof_gutter` (`m_flowgeom.f90:134`).
-- `bl(:)` — bottom level (m, 양수 위쪽). `m_flowgeom.f90:111`.
-- `dx(:)`/`wu(:)` — 링크 길이/폭 (m). `m_flowgeom.f90:140,142`. `dxi`=1/dx (`m_flowgeom.f90:141`).
-- `iadv(:)` — 링크별 advection 타입. `m_flowgeom.f90:137`.
-- `ln2lne`/`lne2ln` — flow link ↔ net link 번호 매핑 (`m_flowgeom.f90:193-194`).
-- 가중치 배열군: `wcx1/wcy1/wcx2/wcy2`(center 벡터 cartesian 성분 가중, `m_flowgeom.f90:163-166`), `acl`(left dx 분율 alfacl, `m_flowgeom.f90:154`), `csu`/`snu`(u0,u1 의 cos/sin 성분, `m_flowgeom.f90:159-160`).
+- `nd(:)` — flow node administration, type `tnode` (`m_flowgeom.f90:104`). `tnode` 정의 `m_flowgeom.f90:48-57`: `ln`(연결 링크 번호, `>0` 들어오는·`<0` 나가는), `nod`(net node 매핑), `nwx`/`nw`(벽 연결).
+- `ln(2,*)` — 링크의 node 행정(좌/우 셀번호). `m_flowgeom.f90:132`.
+- `lncn(2,*)` — 2D 링크의 corner(net node) 행정. `m_flowgeom.f90:134`.
+- `kcu(:)` — 링크 코드: `1=1D link, 2=2D link, -1=bc 1D, -2=bc 2D, 3=lateral_1d2d_link, 4=longitudinal_1d2d_link, 5=street_inlet, 7=roof_gutter` (`m_flowgeom.f90:136`).
+- `bl(:)` — bottom level (m, 양수 위쪽). `m_flowgeom.f90:112`.
+- `dx(:)`/`wu(:)` — 링크 길이/폭 (m). `m_flowgeom.f90:142,144`. `dxi`=1/dx (`m_flowgeom.f90:143`).
+- `iadv(:)` — 링크별 advection 타입. `m_flowgeom.f90:139`.
+- `ln2lne`/`lne2ln` — flow link ↔ net link 번호 매핑 (`m_flowgeom.f90:195-196`).
+- 가중치 배열군: `wcx1/wcy1/wcx2/wcy2`(center 벡터 cartesian 성분 가중, `m_flowgeom.f90:165-168`), `acl`(left dx 분율 alfacl, `m_flowgeom.f90:156`), `csu`/`snu`(u0,u1 의 cos/sin 성분, `m_flowgeom.f90:161-162`).
 
 ### 1.3 m_transport — 다중 스칼라 수송 자료구조
 
-module 헤더 주석(`m_transport.f90:33-43`)에 전송 module 의 자료 규약이 verbatim 으로 기술됨:
+module 헤더 주석(`m_transport.f90:30-40`)에 전송 module 의 자료 규약이 verbatim 으로 기술됨:
 - 모든 constituent 는 `constituents` 배열에 저장. 염분·온도는 `sa1`/`tem1` 에서 채우고 복사함.
 - tracer 는 constituents 배열의 **맨 뒤**에 위치, 번호 `ITRA1`~`ITRAN` (`m_transport.f90:40,55-56`).
 
-`m_transportdata` (`m_transport.f90:45`) 핵심:
-- `NUMCONST` 총 constituent 수 (`m_transport.f90:48`), `isalt`/`itemp` 인덱스 (`m_transport.f90:50-51`), `ised1`/`isedn` 첫/끝 sediment fraction (`m_transport.f90:52-53`).
+`m_transportdata` (`m_transport.f90:41`) 핵심:
+- `NUMCONST` 총 constituent 수 (`m_transport.f90:48`), `isalt`/`itemp` 인덱스 (`m_transport.f90:49-50`), `ised1`/`isedn` 첫/끝 sediment fraction (`m_transport.f90:52-53`).
 - `constituents(:,:)` — `dim(NUMCONST,Ndkx)` (`m_transport.f90:62`).
 - `itrac2const`/`ifrac2const` — tracer/sediment fraction → constituent 번호 매핑 (`m_transport.f90:60-61`).
 
-`m_transport` (`m_transport.f90:72`): `fluxhor`/`fluxver` 수평/수직 플럭스 (`m_transport.f90:77-78`), tridiag 계수 `a,b,c,d`·`sol`·`e` (`m_transport.f90:96-97`), local timestepping 용 `nsubsteps`/`ndeltasteps`/`jaupdate` (`m_transport.f90:101-103`). 자세한 수송 알고리즘은 [[delft3d_fm_compute_aux]] / 커널 노트 참조.
+`m_transport` (`m_transport.f90:73`): `fluxhor`/`fluxver` 수평/수직 플럭스 (`m_transport.f90:79-80`), tridiag 계수 `a,b,c,d`·`sol`·`e` (`m_transport.f90:98-99`), local timestepping 용 `nsubsteps`/`ndeltasteps`/`jaupdate` (`m_transport.f90:103-105`). 자세한 수송 알고리즘은 [[delft3d_fm_compute_aux]] / 커널 노트 참조.
 
 ### 1.4 m_flowparameters — 수치·물리 옵션 스위치
 
-- `itstep` — time step 방식: `0=no, 1=step_explicit, 2=step_reduce, 3=step_jacobi, 4: explicit` (`m_flowparameters.f90:39`).
-- `iadvec` — advection 타입: `0=no, 1=Wenneker vol, ... 3/4=Perot, 5~12=Piaczek 변형, 20=Energy conserving compact` (`m_flowparameters.f90:40-46`).
-- `Perot_type` — 셀중심 속도 ucx,ucy 의 Perot 가중 타입. 상수 `PEROT_WIDTH_BASED=0`, `PEROT_AREA_BASED=1`, `PEROT_VOLUME_BASED=2` (`m_flowparameters.f90:60-74`).
-- `icorio`/`newcorio` — Coriolis 가중 (`m_flowparameters.f90:82-84`).
+- `itstep` — time step 방식: `0=no, 1=step_explicit, 2=step_reduce, 3=step_jacobi, 4: explicit` (`m_flowparameters.f90:40`).
+- `iadvec` — advection 타입: `0=no, 1=Wenneker vol, ... 3/4=Perot, 5~12=Piaczek 변형, 20=Energy conserving compact` (`m_flowparameters.f90:41-47`).
+- `Perot_type` — 셀중심 속도 ucx,ucy 의 Perot 가중 타입. 상수 `PEROT_WIDTH_BASED=0`, `PEROT_AREA_BASED=1`, `PEROT_VOLUME_BASED=2` (`m_flowparameters.f90:61-75`).
+- `icorio`/`newcorio` — Coriolis 가중 (`m_flowparameters.f90:83-85`).
 
 ---
 
@@ -156,43 +156,43 @@ module 주석: `this module contains the real flow times, only to be managed by 
 
 ### 3.1 unstruc_netcdf — 중앙 NetCDF 모듈
 
-`module unstruc_netcdf` (`dflowfm_io/unstruc_netcdf.f90:44`). **18,974 라인**으로 dflowfm_io 의 핵심. UGRID(`io_ugrid`) + `netcdf` 라이브러리 사용 (`unstruc_netcdf.f90:48,51`).
+`module unstruc_netcdf` (`dflowfm_io/unstruc_netcdf.f90:44`). **16,909 라인**으로 dflowfm_io 의 핵심 (구 18,974 라인 — `0da71c3` 'flowgeom object v2' 가 데이터·타입을 `unstruc_netcdf_data.f90` 로 분리). UGRID(`io_ugrid`) + `netcdf` 라이브러리 사용 (`unstruc_netcdf.f90:48,51`).
 
 **Convention 상수:**
-- `UNC_CONV_CFOLD = 1` (구 CF 전용), `UNC_CONV_UGRID = 2` (신 CF+UGRID) (`unstruc_netcdf.f90:85-86`). map 출력 시 `iconv` 분기 (`unstruc_netcdf.f90:5285-5312`).
+- `UNC_CONV_CFOLD = 1` (구 CF 전용), `UNC_CONV_UGRID = 2` (신 CF+UGRID) (`unstruc_netcdf_data.f90:26`). map 출력 시 `iconv` 분기 (`unstruc_netcdf.f90:3727-3763`).
 
-**열린 파일 관리:** 모든 NetCDF 는 `unc_open`/`unc_create` 통해 열어 추적, `unc_closeall` 로 일괄 종료 (`unstruc_netcdf.f90:71-77`). 최대 `maxopenfiles = 50` (`unstruc_netcdf.f90:74`), 배열 `open_files_`/`open_datasets_`/`nopen_files_` (`unstruc_netcdf.f90:75-77`).
-- `unc_open` (`unstruc_netcdf.f90:2469`): `nf90_open` 래퍼 + 추적 리스트 등록.
-- `unc_create` (`unstruc_netcdf.f90:2490`): `nf90_create` 래퍼, `cmode_ = ior(cmode, unc_cmode)` 로 전역 cmode 합성 (`unstruc_netcdf.f90:2498`), 성공 시 `unc_addglobalatts` 호출 (`unstruc_netcdf.f90:2508`).
-- `unc_close` (`unstruc_netcdf.f90:2518`): 추적 리스트에서 데이터셋 탐색 후 제거.
+**열린 파일 관리:** 모든 NetCDF 는 `unc_open`/`unc_create` 통해 열어 추적, `unc_closeall` 로 일괄 종료 (`unstruc_netcdf_data.f90:18`). 최대 `maxopenfiles = 50` (`unstruc_netcdf_data.f90:21`), 배열 `open_files_`/`open_datasets_`/`nopen_files_` (`unstruc_netcdf_data.f90:22`).
+- `unc_open` (`unstruc_netcdf.f90:895`): `nf90_open` 래퍼 + 추적 리스트 등록.
+- `unc_create` (`unstruc_netcdf.f90:916`): `nf90_create` 래퍼. **선택 인자 `overwrite_cmode` 가 추가돼 전역 cmode 합성이 조건부가 됐다** — 인자가 없거나 `.false.` 면 기존대로 `cmode_ = ior(cmode, unc_cmode)`, `.true.` 면 `cmode_ = cmode` 로 전역 `unc_cmode` 를 합성하지 않는다 (`unstruc_netcdf.f90:924-934`), 성공 시 `unc_addglobalatts` 호출 (`unstruc_netcdf.f90:2508`).
+- `unc_close` (`unstruc_netcdf.f90:952`): 추적 리스트에서 데이터셋 탐색 후 제거.
 
-**메타데이터 무결성:** 사용자 metadata 파일로 덮어쓸 수 없는 forbidden 속성 19개 — `references`, `source`, `history`, `Conventions`, `uuid`, `date_created`, `geospatial_*`, `time_coverage_*` (`unstruc_netcdf.f90:104-125`). 환경변수로 설정 가능한 속성: `creator_name`/`creator_email`/`creator_url` (env `DFM_META_<NAME>`) (`unstruc_netcdf.f90:127-133`).
+**메타데이터 무결성:** 사용자 metadata 파일로 덮어쓸 수 없는 forbidden 속성 19개 — `references`, `source`, `history`, `Conventions`, `uuid`, `date_created`, `geospatial_*`, `time_coverage_*` (`unstruc_netcdf_data.f90:45`). 환경변수로 설정 가능한 속성: `creator_name`/`creator_email`/`creator_url` (env `DFM_META_<NAME>`) (`unstruc_netcdf_data.f90:68`).
 
 **id 관리 타입:**
-- `t_unc_timespace_id` (`unstruc_netcdf.f90:139-185`): 반복 쓰기용 시간·공간 행정. UGRID mesh id(`meshids1d/2d/3d`, `network1d`), 차원 id(`id_timedim`=유일한 `nf90_unlimited`, `id_laydim`, `id_wdim`), `idx_curtime`(최신 snapshot 인덱스, `unstruc_netcdf.f90:181`).
-- `t_unc_mapids` (`unstruc_netcdf.f90:190`): map 파일별 NetCDF id 전체 집합 — `ncid` 파일포인터 + `id_tsp`(timespace) + 변수 id 군(`id_s1`, `id_hs`, `id_vol1`, `id_au`, `id_taus`...). `MAX_ID_VAR=4` (1D/2D/3D/1D2D 격자부) (`unstruc_netcdf.f90:97,232-243`).
+- `t_unc_timespace_id` (`unstruc_netcdf_data.f90:80`): 반복 쓰기용 시간·공간 행정. UGRID mesh id(`meshids1d/2d/3d`, `network1d`), 차원 id(`id_timedim`=유일한 `nf90_unlimited`, `id_laydim`, `id_wdim`), `idx_curtime`(최신 snapshot 인덱스, `unstruc_netcdf_data.f90:122`).
+- `t_unc_mapids` (`unstruc_netcdf_data.f90:131`): map 파일별 NetCDF id 전체 집합 — `ncid` 파일포인터 + `id_tsp`(timespace) + 변수 id 군(`id_s1`, `id_hs`, `id_vol1`, `id_au`, `id_taus`...). `MAX_ID_VAR=4` (1D/2D/3D/1D2D 격자부) (`unstruc_netcdf_data.f90:38`).
 
 **핵심 쓰기 subroutine:**
-- `unc_write_map` (`unstruc_netcdf.f90:5273`) → conv 분기 → `unc_write_map_filepointer_ugrid` (`unstruc_netcdf.f90:5312`) 또는 `unc_write_map_filepointer` (`unstruc_netcdf.f90:8282`, CF-old).
-- `unc_write_rst`/`unc_write_rst_filepointer` (`unstruc_netcdf.f90:2931,2950`) — restart 파일.
-- `unc_write_net`/`unc_write_net_ugrid2` (`unstruc_netcdf.f90:11197,11903`) — net(grid) 파일.
-- `unc_write_flowgeom` (`unstruc_netcdf.f90:15405`) / `..._ugrid` (`unstruc_netcdf.f90:15665`) — flow geometry 파일.
-- 3D geom: `unc_append_3dflowgeom_def`/`_put` (`unstruc_netcdf.f90:2750,2826`).
+- `unc_write_map` (`unstruc_netcdf.f90:3714`) → conv 분기 → `unc_write_map_filepointer_ugrid` (`unstruc_netcdf.f90:3763`) 또는 `unc_write_map_filepointer` (`unstruc_netcdf.f90:6663`, CF-old).
+- `unc_write_rst`/`unc_write_rst_filepointer` (`unstruc_netcdf.f90:1365,1384`) — restart 파일.
+- `unc_write_net`/`unc_write_net_ugrid2` (`unstruc_netcdf.f90:9557,10264`) — net(grid) 파일.
+- `unc_write_flowgeom` (`unstruc_netcdf.f90:13801`) / `..._ugrid` (`unstruc_netcdf.f90:13915`) — flow geometry 파일.
+- 3D geom: `unc_append_3dflowgeom_def`/`_put` (`unstruc_netcdf.f90:1184,1260`).
 
-**변수 정의/put helper:** `unc_def_var_map` (`unstruc_netcdf.f90:843`, location code 로 1D/2D/3D 일반화), `unc_put_var_map_real`/`_dble`/`_int`/`_byte` (`unstruc_netcdf.f90:1380,1411,1349,1711` — iloc 위치코드별 데이터 put).
+**변수 정의/put helper:** `unc_def_var_map` (`unstruc_netcdf.f90:337`, location code 로 1D/2D/3D 일반화), `unc_put_var_map_real`/`_dble`/`_int`/`_byte` (`generate_unc_put_var_map.py:32` — iloc 위치코드별 데이터 put).
 
 **읽기(restart/net):**
-- `unc_read_net`/`unc_read_net_ugrid` (`unstruc_netcdf.f90:12975,12433`).
-- `unc_read_map_or_rst` (`unstruc_netcdf.f90:13445`) — map/restart 파일에서 상태 복원.
-- `unc_read_merged_map` (`unstruc_netcdf.f90:14818`) — 병합 map(병렬 partition 통합)에서 읽기. `get_var_and_shift`/`assign_restart_data_to_local_array` (`unstruc_netcdf.f90:13270,13215`) 로 partition shift 처리.
+- `unc_read_net`/`unc_read_net_ugrid` (`unstruc_netcdf.f90:11336,10794`).
+- `unc_read_map_or_rst` (`unstruc_netcdf.f90:11838`) — map/restart 파일에서 상태 복원.
+- `unc_read_merged_map` (`unstruc_netcdf.f90:13214`) — 병합 map(병렬 partition 통합)에서 읽기. `get_var_and_shift`/`assign_restart_data_to_local_array` (`unstruc_netcdf.f90:11663,11608`) 로 partition shift 처리.
 
 ### 3.2 unc_write_his — history(관측점) 출력
 
-별도 파일 `dflowfm_io/unc_write_his.F90` (1741 라인). public 진입점 `unc_write_his(tim)` 주석 `Write history data in NetCDF format` (`unc_write_his.F90:84`, 별칭 `wrihis`). 모듈 변수로 station/구조물별 dim·var id 를 대량 보유: 관측점 `id_statdim`/`id_statx`/`id_staty`/`id_statname` (`unc_write_his.F90:45,44`), 횡단면 `id_crsdim`/`id_crs_id` (`unc_write_his.F90:44,50`), 구조물별 id(weir/gate/pump/culvert/dambreak/source...) (`unc_write_his.F90:49-64`). 즉 his 파일은 0차원(점) 시계열 + 구조물 시계열 전용.
+별도 파일 `dflowfm_io/unc_write_his.F90` (1741 라인). public 진입점 `unc_write_his(tim)` 주석 `Write history data in NetCDF format` (`unc_write_his.F90:87`, 별칭 `wrihis`). 모듈 변수로 station/구조물별 dim·var id 를 대량 보유: 관측점 `id_statdim`/`id_statx`/`id_staty`/`id_statname` (`unc_write_his.F90:45,44`), 횡단면 `id_crsdim`/`id_crs_id` (`unc_write_his.F90:44,50`), 구조물별 id(weir/gate/pump/culvert/dambreak/source...) (`unc_write_his.F90:49`). 즉 his 파일은 0차원(점) 시계열 + 구조물 시계열 전용.
 
 ### 3.3 wrimap 래퍼 + map class(incremental)
 
-- `wrimap(tim)` (`dflowfm_io/wrimap.f90:34`): map 파일 ncid 가 없으면 `unc_create` 로 생성 (`wrimap.f90:79-92`), conv 에 따라 `unc_write_map_filepointer_ugrid` (`wrimap.f90:106`) 또는 `unc_write_map_filepointer` (`wrimap.f90:112`) 호출, 후 `nf90_sync` (`wrimap.f90:116-120`). 타이머 세분화(`handle_extra(80~83)`)로 inq/create/write/sync 계측.
+- `wrimap(tim)` (`dflowfm_io/wrimap.f90:34`): map 파일 ncid 가 없으면 `unc_create` 로 생성 (`wrimap.f90:89-102`), conv 에 따라 `unc_write_map_filepointer_ugrid` (`wrimap.f90:116`) 또는 `unc_write_map_filepointer` (`wrimap.f90:122`) 호출, 후 `nf90_sync` (`wrimap.f90:126-130`). 타이머 세분화(`handle_extra(80~83)`)로 inq/create/write/sync 계측.
 - `unstruc_netcdf_map_class.f90` (module `unstruc_netcdf_map_class`, `unstruc_netcdf_incremental.f90:32`): class map(분류된 수위/수심/속도 클래스) UGRID 출력. `write_map_classes_ugrid` (`unstruc_netcdf_incremental.f90:97`), `put_in_classes`/`classes_to_classbounds` helper (`unstruc_netcdf_incremental.f90:512,631`). 정수 클래스로 양자화하여 저장 → 용량 절감.
 
 ### 3.4 caching — 격자 기반 정보 캐시
@@ -225,19 +225,19 @@ subroutine 주석(verbatim): `Write solution data to output files (map/his/resta
 ## 5. unstruc_model — 모델 정의·MDU 버전
 
 `unstruc_model.f90` (4385 라인) 은 MDU 파일 파싱·모델 식별·파일명 관리를 담당. 자세한 MDU 키워드는 [[delft3d_dflowfm_mdu_input]] 참조. 본 노트는 자료구조 측면만:
-- MDU 포맷 버전: `MDUFormatMajorVersion=1`, `MDUFormatMinorVersion=9` (`unstruc_model.f90:60-61`). 버전 history 주석 `unstruc_model.f90:63-73` (e.g. `1.08: Default density Eckart→UNESCO`).
-- ext 파일 버전: `ExtfileNewMajorVersion=2`, minor=2 (`unstruc_model.f90:76-77`).
-- `md_ptr` — MDU 를 tree_data 로 파싱한 포인터 (`unstruc_model.f90:101`). `md_ident` 모델 식별자(runid) (`unstruc_model.f90:103`).
-- 파일명 변수군: `md_netfile`(net), `md_flowgeomfile`(flowgeom 출력), `md_fixedweirfile` 등 (`unstruc_model.f90:113-122`).
+- MDU 포맷 버전: `MDUFormatMajorVersion=1`, `MDUFormatMinorVersion=9` (`m_unstruc_model_data.f90:24`). 버전 history 주석 `m_unstruc_model_data.f90:27` (e.g. `1.08: Default density Eckart→UNESCO`).
+- ext 파일 버전: `ExtfileNewMajorVersion=3`, minor=0 (**2.02 → 3.00 으로 상향**; 새 파일의 `2.02` 문자열은 history 주석이다) (`unstruc_model.f90:76-77`).
+- `md_ptr` — MDU 를 tree_data 로 파싱한 포인터 (`m_unstruc_model_data.f90:65`). `md_ident` 모델 식별자(runid) (`m_unstruc_model_data.f90:67`).
+- 파일명 변수군: `md_netfile`(net), `md_flowgeomfile`(flowgeom 출력), `md_fixedweirfile` 등 (`m_unstruc_model_data.f90:77`).
 
 ---
 
 ## 6. 정리 — 자료/IO 아키텍처 요약
 
-- **상태 보유**: module-global allocatable 배열(`m_flow`/`m_flowgeom`/`m_transport`). 노드(ndx/ndkx)·링크(lnx/lnkx) 두 축, 3D 는 (수평셀×가변층) 압축 인덱스(`kbot/ktop`, `Lbot/Ltop`). (`m_flow.f90:128-133`)
-- **번호 규약**: 2D내부→1D내부→1D경계→2D경계 (node), 1D내부→2D내부→1D경계→2D경계 (link). (`m_flowgeom.f90:82-86,124-126`)
+- **상태 보유**: module-global allocatable 배열(`m_flow`/`m_flowgeom`/`m_transport`). 노드(ndx/ndkx)·링크(lnx/lnkx) 두 축, 3D 는 (수평셀×가변층) 압축 인덱스(`kbot/ktop`, `Lbot/Ltop`). (`m_flow.f90:133-138`)
+- **번호 규약**: 2D내부→1D내부→1D경계→2D경계 (node), 1D내부→2D내부→1D경계→2D경계 (link). (`m_flowgeom.f90:83-87,125-127`)
 - **time 관리**: 사용자 시각(`tstart/tstop/dt_user`) vs 내부 계산 시각(`time0/time1/dts`) 분리, CFL 자동 timestep(`autotimestep`). (`m_flowtimes.f90:47-85`)
-- **I/O**: 중앙 `unstruc_netcdf`(18974줄)가 map/rst/net/flowgeom 을 CF-old + UGRID 양 convention 으로 쓰고, his 는 별도 `unc_write_his`, class map 은 `unstruc_netcdf_map_class`. 모든 파일은 추적 리스트(`unc_open/create/closeall`)로 관리. (`unstruc_netcdf.f90:44,2469-2558`)
+- **I/O**: 중앙 `unstruc_netcdf`(16,909줄)가 map/rst/net/flowgeom 을 CF-old + UGRID 양 convention 으로 쓰고, his 는 별도 `unc_write_his`, class map 은 `unstruc_netcdf_map_class`. 모든 파일은 추적 리스트(`unc_open/create/closeall`)로 관리. (`unstruc_netcdf.f90:44,2469-2558`)
 - **출력 trigger**: `flow_externaloutput` 가 형식별 독립 interval 검사로 dispatch. (`flow_externaloutput.F90:48-152`)
 
 ### ⚠ 본 노트 범위 밖 (source-needed / 타 노트)

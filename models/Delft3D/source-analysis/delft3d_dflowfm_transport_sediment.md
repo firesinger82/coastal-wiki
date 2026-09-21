@@ -64,7 +64,7 @@ limiter type 는 `limtyp = max(limtypsa, limtyptm, limtypsed)` — 염분·수�
 ### 2.1 Advection (upwind + slope reconstruction)
 flowlink L 의 좌/우 cell `k1=ln(1,L)`, `k2=ln(2,L)` (`:203-204`). Courant 수:
 $$cf = \Delta t\,|u_1(L)|\,/\,\Delta x_L \quad(\texttt{dxi})$$
-(`comp_fluxhor3d.f90:208`). discharge 를 부호 분리: `QL = max(q1(L),0)`, `QR = min(q1(L),0)` (`:249-250`).
+(`comp_fluxhor3d.f90:209`). discharge 를 부호 분리: `QL = max(q1(L),0)`, `QR = min(q1(L),0)` (`:249-250`).
 
 기본 스킴 (limtyp 1~4): 좌측 면값 재구성
 ```
@@ -72,7 +72,7 @@ sedL = sed(j,k1) + acl(LL)*max(0, 1-cf)*dlimiter(ds1L,ds2L,limtyp)*ds2L   (q1(L)
 sedR = sed(j,k2) + (1-acl(LL))*max(0, 1-cf)*dlimiter(ds1R,ds2R,limtyp)*ds2R (q1(L)<0)
 flux(j,L) = QL*sedL + QR*sedR
 ```
-(`comp_fluxhor3d.f90:288-302`). `ds2L=sed(k2)-sed(k1)`(다운스트림 기울기), `ds1L=(sed(k1)-sedkuL)*sl3L`(업스트림 기울기, `sedkuL` 은 stencil 보간) (`:289-291`). `max(0,1-cf)` 는 Courant 가 클수록 high-order 비중을 줄이는 안정화 항.
+(`comp_fluxhor3d.f90:289-303`). `ds2L=sed(k2)-sed(k1)`(다운스트림 기울기), `ds1L=(sed(k1)-sedkuL)*sl3L`(업스트림 기울기, `sedkuL` 은 stencil 보간) (`:289-291`). `max(0,1-cf)` 는 Courant 가 클수록 high-order 비중을 줄이는 안정화 항.
 
 upstream stencil 은 `klnup`/`slnup` (cell-link upwind admin) 으로 좌/우 각 2-cell 보간 (`:167-182`). 3D 에서는 layer 정렬 `laydif=L-Lb` + `kmxn`/`kmxL` 로 동일 레이어를 추적 (`:216-235`).
 
@@ -82,7 +82,7 @@ upstream stencil 은 `klnup`/`slnup` (cell-link upwind admin) 으로 좌/우 각
 - **limtyp 9**: 비등간격 격자용 MC — `dlimiter_nonequi` (`:268-285`).
 
 ### 2.3 Diffusion
-`dicouv>=0 .and. jalimitdiff/=3` 일 때 두 번째 link 루프 (`comp_fluxhor3d.f90:314-410`). 확산계수:
+`dicouv>=0 .and. jalimitdiff/=3` 일 때 두 번째 link 루프 (`comp_fluxhor3d.f90:315-413`). 확산계수:
 $$\text{difcoeff} = \text{sigdifi}(j)\cdot\nu_{viu}(L) + \text{difsed}(j) + f_{bg}\cdot\text{diuspL}$$
 (`:366`) — Smagorinsky 수평점성(`viu`)·분자확산(`difsed`)·사용자 배경확산(`diusp`/`dicouv`). `sigdifi` 는 1/Prandtl(열)·1/Schmidt(질량) (`:80`). flux:
 $$\text{flux}(j,L) \mathrel{-}= \text{difcoeff}\cdot \text{dxiAu}(L)\cdot(\text{sed}(j,k2)-\text{sed}(j,k1))$$
@@ -146,7 +146,7 @@ $$\text{rhs}(j,k) = \Big[\big(\tfrac{\text{sumhorflux}}{\text{ndeltasteps}} - (1
 2D (`kmx==0`): `dtmax(k) = cflmx*vol1(k)/squ(k)` (outward flux 기준) (`:118-120`). 확산 포함 옵션이면 분모에 `sqi+sumdifflim` (`:123`).
 3D: layer별 `vol1(k)/max(squ(k),sqi(k))` 의 최소에 `cflmx` 곱 (`:159-182`). stm sediment + explicit fall velocity 면 settling flux `maxval(mtd%ws)*ba` 까지 분모에 포함 (`:150-156, :166-173`).
 
-`jalimitdtdiff==1`(=`jatransportautotimestepdiff==1`) 이면 확산이 timestep 을 제약, `sumdifflim` 사전계산 (`:80-111`). MPI 면 `reduce_double_min` 으로 전역 최소 (`:203-214`). `jatransportautotimestepdiff` 분기는 `ini_transport.f90:111-131`.
+`jalimitdtdiff==1`(=`jatransportautotimestepdiff==1`) 이면 확산이 timestep 을 제약, `sumdifflim` 사전계산 (`:80-111`). MPI 면 `reduce_double_min` 으로 전역 최소 (`:203-214`). `jatransportautotimestepdiff` 분기는 `ini_transport.f90:107-127`.
 
 ---
 
@@ -165,19 +165,19 @@ source/sink 채움은 `fill_constituents.f90` — heat source(`:188-194`), salt/
 
 ## 7. Sediment source/sink ↔ transport 결선
 
-stm sediment 의 entrainment/deposition 은 `fm_erosed` 가 `sedtra%sourse`/`sinkse` 에 채우고, `fill_constituents.f90:251-252` 에서 transport 의 `const_sour`/`const_sink` 로 합산:
+stm sediment 의 entrainment/deposition 은 `fm_erosed` 가 `sedtra%sourse`/`sinkse` 에 채우고, `fill_constituents.f90:256-257` 에서 transport 의 `const_sour`/`const_sink` 로 합산:
 ```
 const_sour(iconst, kkk) += sedtra%sourse(kk, jsed)
 const_sink(iconst, kkk) += sedtra%sinkse(kk, jsed)
 ```
-(`fill_constituents.f90:246-256`). fluff layer 면 `sourf`/`sinkf` 도 추가 (`:255-256`). 즉 sediment 부유사는 다른 scalar 와 **동일한 transport solver** 를 타고, bed exchange 만 source/sink 로 들어간다.
+(`fill_constituents.f90:251-261`). fluff layer 면 `sourf`/`sinkf` 도 추가 (`:255-256`). 즉 sediment 부유사는 다른 scalar 와 **동일한 transport solver** 를 타고, bed exchange 만 source/sink 로 들어간다.
 
 `fm_erosed` 헤더(verbatim):
 > `!!    Function: Computes sediment fluxes at the bed using`
 > `!!              the Partheniades-Krone formulations.`
 > `!!              Arrays SOURSE and SINKSE are filled and added to arrays SOUR and SINK`
 > `!!              Computes bed load transport for sand sediment`
-> (`fm_erosed.f90:53-58`)
+> (`fm_erosed.f90:61-66`)
 공식 자체(Van Rijn reference height `:830`, Soulsby skin friction `:777`, Rouse profile)는 [[delft3d_sediment_transport_formulae]] 참조.
 
 ---
@@ -192,7 +192,7 @@ sutot1>0 .and. sutot2>0:  e_sn(Lf,l) = csu*sx(k1) + snu*sy(k1)   (k1 upwind)
 sutot1<0 .and. sutot2<0:  e_sn(Lf,l) = csu*sx(k2) + snu*sy(k2)   (k2 upwind)
 else:                      acl-weighted central
 ```
-(`fm_upwbed.f90:133-146`). central(`upwindbedload=.false.`)이면 항상 acl 가중평균 (`:142-145`). `pure1d_mor` 1D link 는 x-성분 전체벡터 사용 (`:101-127`). 마른 link·비활성 sediment cell 은 0 (`:95-98, :149-153`). 경계처리 `jabndtreatment` 분기 (`:75-79, :157-`).
+(`fm_upwbed.f90:134-147`). central(`upwindbedload=.false.`)이면 항상 acl 가중평균 (`:142-145`). `pure1d_mor` 1D link 는 x-성분 전체벡터 사용 (`:101-127`). 마른 link·비활성 sediment cell 은 0 (`:95-98, :149-153`). 경계처리 `jabndtreatment` 분기 (`:75-79, :157-`).
 
 ---
 
@@ -215,7 +215,7 @@ node nm·fraction l 별로 link 합산하여 발산 계산 (`:1014-1170`):
 - avalanche flux `avalflux` 별도 (`:1135-1144`).
 - 최종 변화량:
 $$\Delta s_{nm} = (\text{trndiv} + \text{sedflx} - \text{eroflx})\cdot\Delta t_{mor}$$
-(`m_fm_bott3d.f90:1146`), `dbodsd(l,nm) += dsdnm` (`:1169`). `link 방향부호`는 helper `fm_sumflux(LL,sumflux,flux)` 가 처리 (`:2017`).
+(`m_fm_bott3d.f90:1177`), `dbodsd(l,nm) += dsdnm` (`:1169`). `link 방향부호`는 helper `fm_sumflux(LL,sumflux,flux)` 가 처리 (`:2017`).
 
 bed change 가 수심의 `dhmax=0.05`(5%) 초과 시 경고(변화 자체는 미제한) (`:1151-1165`).
 
@@ -275,8 +275,8 @@ $$u_{rouse}(z) = \ln(z/z_0)\cdot\Big(\frac{a}{h-a}\cdot\frac{h-z}{z}\Big)^{rs}$$
 
 ## 핵심 요약
 
-1. **단일 통합 배열** `constituents(NUMCONST,Ndkx)` 로 salt·temp·sediment·tracer·secondary-flow 를 한 번에 수송 — 동일 advection/diffusion/solve 코드 재사용 (`update_constituents.f90:63-70`, `ini_transport.f90:79-109`).
+1. **단일 통합 배열** `constituents(NUMCONST,Ndkx)` 로 salt·temp·sediment·tracer·secondary-flow 를 한 번에 수송 — 동일 advection/diffusion/solve 코드 재사용 (`update_constituents.f90:63-70`, `ini_transport.f90:75-105`).
 2. **수평 = explicit FV + MUSCL limiter** (`comp_fluxhor3D` `:288-302`, MC limiter `dlimiter.f90:63`), Courant 억제 `max(0,1-cf)`.
 3. **수직 = implicit tridiagonal** (`solve_vertical.f90`, Thomas `:244`), advection 은 `thetavert` 로 explicit↔central-implicit 전환.
 4. **Transport 전용 CFL** `cflmx*vol/squ` + sediment settling flux 포함, local substepping 으로 안정화 (`get_dtmax.f90`).
-5. **Sediment bed exchange 는 source/sink 로만 transport 에 결합** (`fill_constituents.f90:251-252`); bed level 은 별도 transport-divergence (`fm_change_in_sediment_thickness` `:1146`) + bedload upwind (`fm_upwbed.f90`) 으로 갱신, `morfac` 가속.
+5. **Sediment bed exchange 는 source/sink 로만 transport 에 결합** (`fill_constituents.f90:256-257`); bed level 은 별도 transport-divergence (`fm_change_in_sediment_thickness` `:1146`) + bedload upwind (`fm_upwbed.f90`) 으로 갱신, `morfac` 가속.

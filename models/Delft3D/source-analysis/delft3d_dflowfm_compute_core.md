@@ -40,14 +40,14 @@ source_scope: Delft3D/src/engines_gpl/dflowfm
 | 5 | `call solve_matrix(s1, ndx, itsol)` | `:140` | `s1` 에 대한 선형계 해 (Gauss+CG) |
 | 6 | `call poshcheck(key)` | `:167` | 음수 수심 검사 → 필요시 setback |
 
-`dti = 1/dts` 로 역시간간격 설정(`step_reduce_hydro.f90:96`), `time1 = time0 + dts` 도달 시도(`:95`).
+`dti = 1/dts` 로 역시간간격 설정(`step_reduce_hydro.f90:97`), `time1 = time0 + dts` 도달 시도(`:95`).
 
 세 겹 루프 구조:
 - `setback:` (`:93`) — 음수수심·비수렴 시 `dts`를 절반으로 줄여 재시도. `dts = 0.5_dp*dts` 후 `cycle setback` (`:243`, `:253`).
 - `wetdry:` (`:115`) — 건습 행렬 갱신(hu=0 처리) 재진입점.
 - `nonlincont:` (`:129`) — 비선형 연속식 반복 진입점.
 
-`itstep == 4` 면 명시적 timestep으로 분기하여 `s1 = s0` 만 두고 행렬 풀이 생략(`step_reduce_hydro.f90:113`, `:313-314`).
+`itstep == 4` 면 명시적 timestep으로 분기하여 `s1 = s0` 만 두고 행렬 풀이 생략(`step_reduce_hydro.f90:114`, `:313-314`).
 
 ---
 
@@ -59,17 +59,17 @@ $$u^{n+1}_L = ru(L) - fu(L)\,\big(s_1(k_2) - s_1(k_1)\big)$$
 
 (이 관계가 실제로 `u1q1.f90:80` 에서 사용됨 — §4 참조.)
 
-### 2.1 2D(`kmx==0`) 코어 루프 (`furu.f90:89-214`)
+### 2.1 2D(`kmx==0`) 코어 루프 (`furu.f90:90-214`)
 
-link `L`에 대해 `hu(L)>0` (습윤)일 때만 계산(`furu.f90:97`):
+link `L`에 대해 `hu(L)>0` (습윤)일 때만 계산(`furu.f90:98`):
 
-- 중력·경사 항: `gdxi = agp * dxi(L)` (`furu.f90:144`), 여기서 `agp`는 위도보정 중력(Helmert, `furu.f90:140-143`), `dxi(L)=1/dx`.
-- θ-implicit 계수: `cu = gdxi * teta(L)` (`furu.f90:149`) — θ-method의 암시 압력경사 기여.
-- 명시 RHS: `du = dti*u0(L) - adve(L) + gdxi*slopec` (`furu.f90:150`) — 시간미분 `dti*u0`, 이류 `adve` (외부에서 set), drop-loss 경사 보정 `slopec`.
-- θ≠1 이면 명시 압력경사 추가: `du = du - (1-teta)*gdxi*ds`, `ds = s0(k2)-s0(k1)` (`furu.f90:151-154`).
-- 밀도가 운동량에 들어가면(`jarhoxu>=2`) `gdxi`에 `rhomean/rhou(L)` 곱(`furu.f90:145-147`).
+- 중력·경사 항: `gdxi = agp * dxi(L)` (`furu.f90:145`), 여기서 `agp`는 위도보정 중력(Helmert, `furu.f90:141-144`), `dxi(L)=1/dx`.
+- θ-implicit 계수: `cu = gdxi * teta(L)` (`furu.f90:150`) — θ-method의 암시 압력경사 기여.
+- 명시 RHS: `du = dti*u0(L) - adve(L) + gdxi*slopec` (`furu.f90:151`) — 시간미분 `dti*u0`, 이류 `adve` (외부에서 set), drop-loss 경사 보정 `slopec`.
+- θ≠1 이면 명시 압력경사 추가: `du = du - (1-teta)*gdxi*ds`, `ds = s0(k2)-s0(k1)` (`furu.f90:152-155`).
+- 밀도가 운동량에 들어가면(`jarhoxu>=2`) `gdxi`에 `rhomean/rhou(L)` 곱(`furu.f90:146-148`).
 
-**마찰 inner loop** `do itu1 = 1, 4 ! furu_loop` (`furu.f90:169`): 바닥마찰 항 `frL`을 속도의 함수로 갱신하며 최대 4회 반복.
+**마찰 inner loop** `do itu1 = 1, 4 ! furu_loop` (`furu.f90:170`): 바닥마찰 항 `frL`을 속도의 함수로 갱신하며 최대 4회 반복.
 - 표준: `frL = cfuhi(L) * sqrt(u1L*u1L + v2)` — 주석 `g / (H.C.C) = (g.K.K) / (A.A) travels in cfu` (`furu.f90:197`). 즉 `cfuhi`에 $g/(H C^2)$ 가 담겨 있고 여기에 속도 크기를 곱해 선형화된 마찰계수를 얻는다.
 - 핵심 계수 산출(`furu.f90:200-204`):
   ```
@@ -81,14 +81,14 @@ link `L`에 대해 `hu(L)>0` (습윤)일 때만 계산(`furu.f90:97`):
   즉 $fu = \dfrac{g\,\theta/\Delta x}{1/\Delta t + advi + fr}$, $ru = \dfrac{u^0/\Delta t - adve + \dots}{1/\Delta t + advi + fr}$ — 분모는 암시 시간·이류·마찰의 합.
 - 수렴 조기탈출: 수심 <1 m 이거나 속도변화 <1e-2 면 `exit furu_loop` (`furu.f90:206-208`).
 
-파동 연동 시 Stokes-drift 보정: `frL` 을 Eulerian 속도 `u1L - ustokes(L)` 기준으로 계산하고 `du = du0 + frL*ustokes(L)` 보정(`furu.f90:170-181`). 식생 항력은 `alfav(L)` 추가(`furu.f90:184-186`, `:194-195`).
+파동 연동 시 Stokes-drift 보정: `frL` 을 Eulerian 속도 `u1L - ustokes(L)` 기준으로 계산하고 `du = du0 + frL*ustokes(L)` 보정 — **보정 시점이 식생 `frL` 가산 이전에서 이후로 이동했다**. `jaBaptist>=2` 또는 `trachy_resistance` 일 때 새 `du` 에는 식생 항력이 포함된 `frL` 이 반영된다(`furu.f90:170-181`). 식생 항력은 `alfav(L)` 추가(`furu.f90:184-186`, `:194-195`).
 
 ### 2.2 펌프·구조물·3D
 
 - 펌프 link: `fu/ru` 0으로 두고 `ru(L) = ±qp/ap` 로 규정 토출(`furu.f90:216-267`).
-- 구조물: `call furu_structures()` (`furu.f90:269`), `call furusobekstructures()` (`furu.f90:369`).
-- 3D(`kmx>0`)는 본 루프 대신 `call update_verticalprofiles()` 로 위임(`furu.f90:273-281`), 필터 predictor 옵션(`:275-277`).
-- u-점 경계: `nbndu` 루프에서 `fu(L)=0`, `ru(L)=zbndun` 으로 규정속도/Riemann/critical-outflow 등 처리(`furu.f90:283-367`); 3D는 log-profile 적분으로 layer별 `ru` 분배(`furu.f90:340-362`).
+- 구조물: `call furu_structures()` (`furu.f90:368`), `call furusobekstructures()` (`furu.f90:369`).
+- 3D(`kmx>0`)는 본 루프 대신 `call update_verticalprofiles()` 로 위임(`furu.f90:272-280`), 필터 predictor 옵션(`:275-277`).
+- u-점 경계: `nbndu` 루프에서 `fu(L)=0`, `ru(L)=zbndun` 으로 규정속도/Riemann/critical-outflow 등 처리(`furu.f90:282-366`); 3D는 log-profile 적분으로 layer별 `ru` 분배(`furu.f90:339-361`).
 
 ### 2.3 구조물 운동량 (`iterfurufm`, SOBEK 계열)
 
@@ -108,9 +108,9 @@ fu(m) = cu/bu ; ru(m) = du/bu ; u1(m) = ru(m) + fu(m)*(su-sd)
 
 `subroutine s1ini() !> links in continuity eq.` (`compute/s1ini.f90:47-48`). 먼저 행렬 초기화 `bb=0; ccr=0; dd=0` (`s1ini.f90:70-72`).
 
-전반부(`s1ini.f90:84-326`)는 소스/싱크(강우 `rain`, 증발 `evap`, 외부유량 `qext`, lateral `qqlat`, 지하수 `setgrwflowexpl`, source/sink `setsorsin`)를 `qin`/`dd`에 누적 — 질량보존 영역(`mba`) 추적 포함.
+전반부(`s1ini.f90:84-330`)는 소스/싱크(강우 `rain`, 증발 `evap`, 외부유량 `qext`, lateral `qqlat`, 지하수 `setgrwflowexpl`, source/sink `setsorsin`)를 `qin`/`dd`에 누적 — 질량보존 영역(`mba`) 추적 포함.
 
-**핵심 행렬 조립** (2D, `s1ini.f90:328-344`): 습윤 link `L`마다
+**핵심 행렬 조립** (2D, `s1ini.f90:332-348`): 습윤 link `L`마다
 ```
 tetau = teta(L)*au(L)
 aufu  = tetau*fu(L)
@@ -121,9 +121,9 @@ dd(k1) -= auru ; dd(k2) += auru       ! RHS (유출/유입 부호)
 ```
 여기서 `au(L)`=습윤 단면적, `Lv2(L)`=link `L`의 packed off-diagonal 인덱스. 즉 cell 연속식
 $$A_n\frac{s_1^{n+1}-s_1^n}{\Delta t} + \sum_{L \in n} \pm q_1(L) = Q_{in}$$
-에서 `q1(L) = au(L)[θ u^{n+1} + (1-θ)u^0]` 를 `u^{n+1}=ru-fu·Δs` 로 치환해, `s1`의 대각·비대각·RHS 항으로 전개한 것이다. 3D는 동일 로직을 layer `Lbot..Ltop`에 대해 누적(`s1ini.f90:346-372`).
+에서 `q1(L) = au(L)[θ u^{n+1} + (1-θ)u^0]` 를 `u^{n+1}=ru-fu·Δs` 로 치환해, `s1`의 대각·비대각·RHS 항으로 전개한 것이다. 3D는 동일 로직을 layer `Lbot..Ltop`에 대해 누적(`s1ini.f90:350-376`).
 
-비선형이면 `ccrsav = ccr` 저장(`s1ini.f90:374-376`) — outer 반복에서 solve가 `ccr`를 덮어쓰므로 복원용(`step_reduce_hydro`의 `ccr = ccrsav` `:274`).
+비선형이면 `ccrsav = ccr` 저장(`s1ini.f90:378-380`) — outer 반복에서 solve가 `ccr`를 덮어쓰므로 복원용(`step_reduce_hydro`의 `ccr = ccrsav` `:274`).
 
 ### 3.2 cell 대각·RHS 완성 + 경계 — `s1nod`
 
@@ -223,10 +223,10 @@ cell별 유입·유출 flux 합산 `squ`(유출), `sqi`(유입) 누적(`u1q1.f90
 
 `step_reduce_hydro`의 `nonlincont` 루프가 비선형 연속식을 반복:
 
-- 매 반복 후 `call volsur()` 로 체적·표면적 재계산(`step_reduce_hydro.f90:213`), 수위변화 최대값 `difmaxlev` 산출(`:217-228`).
-- 수렴판정: `difmaxlev > epsmaxlev` 면 `ccr = ccrsav` 복원 후 `cycle nonlincont` (`step_reduce_hydro.f90:273-275`).
-- **Nested Newton** (`nonlin>=2`, pressurised/1D 정수압): 내부 수렴 후 `s1m`(보조 수위) 대 `s1` 차이 `difmaxlevm > epsmaxlevm` 검사 → outer 반복(`step_reduce_hydro.f90:286-303`). 시작 시 `s1m = bl` (bed level, `:118`).
-- 비수렴(반복수 > `maxNonlinearIterations`): `dts = 0.5*dts`, `s1 = s0`, `dsetb++`, `cycle setback` (`step_reduce_hydro.f90:232-255`). `dts < dtmin` 이면 포기(`:246-251`).
+- 매 반복 후 `call volsur()` 로 체적·표면적 재계산(`step_reduce_hydro.f90:214`), 수위변화 최대값 `difmaxlev` 산출(`:217-228`).
+- 수렴판정: `difmaxlev > epsmaxlev` 면 `ccr = ccrsav` 복원 후 `cycle nonlincont` (`step_reduce_hydro.f90:274-276`).
+- **Nested Newton** (`nonlin>=2`, pressurised/1D 정수압): 내부 수렴 후 `s1m`(보조 수위) 대 `s1` 차이 `difmaxlevm > epsmaxlevm` 검사 → outer 반복(`step_reduce_hydro.f90:287-304`). 시작 시 `s1m = bl` (bed level, `:118`).
+- 비수렴(반복수 > `maxNonlinearIterations`): `dts = 0.5*dts`, `s1 = s0`, `dsetb++`, `cycle setback` (`step_reduce_hydro.f90:233-256`). `dts < dtmin` 이면 포기(`:246-251`).
 - `poshcheck`가 음수수심 검출(`key==2`)하면 Nested Newton 재시작(`firstnniteration=.false.`, `cycle wetdry` `:177-180`) 또는 hu=0 재조립(`cycle wetdry` `:194`) 또는 timestep 감축(`cycle setback` `:200`).
 
 ---
@@ -240,7 +240,7 @@ sethu ──hu──┤
 furu: u-momentum → fu(L), ru(L)         [compute/furu.f90:200-204]
             │
             ▼
-s1ini: link → bb(diag)/ccr(offdiag)/dd  [compute/s1ini.f90:328-344]
+s1ini: link → bb(diag)/ccr(offdiag)/dd  [compute/s1ini.f90:332-348]
             │  (+ pack_matrix CRS)
             ▼
 s1nod: + dti*a1 대각, RHS ddr, 경계      [compute/s1nod.f90:108-167,181-277]
@@ -252,7 +252,7 @@ solve_matrix: Gauss elim → CG → subst   [dflowfm_utils/solve_guus.F90:577-66
 u1q1: u1=ru-fu·Δs, q1=au·(θu1+(1-θ)u0)  [compute/u1q1.f90:80-82]
             │
             ▼
-poshcheck / volsur → 수렴·setback 판정   [compute/step_reduce_hydro.f90:167,213,273]
+poshcheck / volsur → 수렴·setback 판정   [compute/step_reduce_hydro.f90:168,214,274]
 ```
 
 θ-method 변수: `teta(L)` (link별 implicitness), `dti=1/dts`. 대칭 양정부호 행렬 → CG. 비선형 체적(테이블 기반 `vol12d`)과 Nested Newton이 비선형 연속식·압력화(pressurised 1D)를 처리.
@@ -262,5 +262,5 @@ poshcheck / volsur → 수렴·setback 판정   [compute/step_reduce_hydro.f90:1
 ## 9. 미확인 / source-needed
 
 - `gauss_elimination`/`conjugategradient_omp` **본체** 수치 디테일(전처리 ILUD 구성, 수렴 tolerance 값)은 본 검수에서 헤더·분기까지만 확인. 세부는 `dflowfm_utils/solve_guus.F90` (해당 subroutine 본체) 및 `solve_petsc.F90`/`solve_parms.F90` 추가 read 필요 — **source-needed**.
-- `adve(L)`/`advi(L)` (이류 항·암시 이류계수)의 **계산 위치**는 본 노트 범위(compute/ solver 코어) 밖. `furu`는 이미 set된 값을 소비만 함(`furu.f90:150,200`). 이류 이산화 본체(예: `advec.f90`, `setumod.f90`)는 별도 검수 대상 — 본 노트에서 미확인.
+- `adve(L)`/`advi(L)` (이류 항·암시 이류계수)의 **계산 위치**는 본 노트 범위(compute/ solver 코어) 밖. `furu`는 이미 set된 값을 소비만 함(`furu.f90:151,200`). 이류 이산화 본체(예: `advec.f90`, `setumod.f90`)는 별도 검수 대상 — 본 노트에서 미확인.
 - `vol12d`/`a1`/`a1m` 비선형 체적테이블의 구성은 [[delft3d_drying_flooding]]·[[delft3d_fm_compute_aux]] 영역으로, 여기선 소비 관계만 인용.

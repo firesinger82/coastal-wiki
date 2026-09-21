@@ -88,7 +88,7 @@ source_scope: Delft3D/src/engines_gpl/flow2d3d
 
 ## 4. inchkr 호출 순서 (시변 강제력·초기 상태)
 
-`grep -n call inchkr.f90` 기준 (`inchkr.f90:747~1307`):
+`grep -n call inchkr.f90` 기준 (`inchkr.f90:745~1307`):
 
 | 단계 | call (라인) | 내용 |
 |---|---|---|

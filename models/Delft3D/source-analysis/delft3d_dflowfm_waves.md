@@ -38,7 +38,7 @@ source_scope: Delft3D/src/engines_gpl/dflowfm
 | `WAVE_NC_OFFLINE` | 7 | SWAN NetCDF offline | `m_waveconst.f90:11` |
 
 파력(wave force) 모드 `WAVEFORCING_*`: 0=없음, 1=radiation stress, 2=dissipation total, 3=dissipation 3D (`m_waveconst.f90:18-21`).
-Stokes drift 모드 `STOKES_DRIFT_*`: 0=off, 1=depth-uniform, 2=2nd-order, 3=+viscous, 4=+viscous+advection (`m_waveconst.f90:24-28`).
+Stokes drift 모드 `STOKES_DRIFT_*`: 0=off, 1=depth-uniform, 2=2nd-order, 3=+viscous, 4=+viscous+advection (`m_waveconst.f90:36-40`).
 
 ## 2. 시간스텝 dispatcher — compute_wave_forcing_rhs
 
@@ -46,8 +46,8 @@ Stokes drift 모드 `STOKES_DRIFT_*`: 0=off, 1=depth-uniform, 2=2nd-order, 3=+vi
 
 - **fetch 모드** (`jawave < WAVE_SWAN_ONLINE`): 2D면 `tauwave()` 호출 (`compute_wave_forcing_rhs.f90:68-72`).
 - **SWAN online/offline** (`jawave == WAVE_SWAN_ONLINE .or. == WAVE_NC_OFFLINE`): `tauwave()` → `setwavfu()`(wave force) → `setwavmubnd()`(경계 mass flux) (`compute_wave_forcing_rhs.f90:75-81`).
-- **SURFBEAT**: `jajre==1 .and. nwbnd>0` 이고 `swave==1` 일 때 XBeach 체인 `xbeach_wave_bc()` → `xbeach_apply_wave_bc()` → `xbeach_waves()` → `xbeach_wave_compute_flowforcing2D()`, 3D면 추가로 `xbeach_wave_compute_flowforcing3D()` (`compute_wave_forcing_rhs.f90:84-107`).
-- **UNIFORM**: 2D면 `tauwave()` (`compute_wave_forcing_rhs.f90:110-114`).
+- **SURFBEAT**: `jajre==1 .and. nwbnd>0` 이고 `swave==1` 일 때 XBeach 체인 `xbeach_wave_bc()` → `xbeach_apply_wave_bc()` → `xbeach_waves()` → `xbeach_wave_compute_flowforcing2D()`, 3D면 추가로 `xbeach_wave_compute_flowforcing3D()` (`compute_wave_forcing_rhs.f90:84-108`).
+- **UNIFORM**: 2D면 `tauwave()` (`compute_wave_forcing_rhs.f90:111-115`).
 
 파라미터(uorb·rlabda·Stokes) 계산은 별도로 `compute_wave_parameters.f90` 의 `compute_wave_parameters` 가 담당 (`compute_wave_parameters.f90:48`).
 
@@ -61,17 +61,17 @@ Stokes drift 모드 `STOKES_DRIFT_*`: 0=off, 1=depth-uniform, 2=2nd-order, 3=+vi
 $$u_{orb} = \frac{1}{2} H_{rms}\,\frac{\omega}{\sinh(k\,h)}$$
 (`wave_uorbrlabda.f90:82`). `jauorb==0`(구 D3D 관례)이면 `uorb *= √π/2` 보정 (`wave_uorbrlabda.f90:83-85`). SWAN에서 직접 읽은 uorb 사용 옵션은 `jauorbfromswan==1` (`wave_uorbrlabda.f90:79-80`).
 
-`compute_wave_parameters` 에서 `hwav` 는 항상 breaking 한계 `gammax`로 clip: `hwav = min(hwav, gammax*hs)` (`compute_wave_parameters.f90:105`, `:66`, `:149`). NetCDF offline 입력은 `Hsig → Hrms` 변환 `hwav = hwavcom / √2` (`compute_wave_parameters.f90:101`).
+`compute_wave_parameters` 에서 `hwav` 는 breaking 한계 `gammax` 로 clip — **다만 offline 처리가 입력 요구량별 helper 분기로 바뀌어 '항상' 은 성립하지 않는다**: `hwav = min(hwav, gammax*hs)` (`compute_wave_parameters.f90:105`, `:66`, `:149`). NetCDF offline 입력은 `Hsig → Hrms` 변환 `hwav = hwavcom / √2` (`compute_wave_parameters.f90:101`).
 
 ## 4. Wave force (radiation stress 구배) — setwavfu
 
 `setwavfu.f90` 의 `setwavfu` 가 셀중심 파 강제력 `sxwav/sywav`(표면력, surface)와 `sbxwav/sbywav`(체적력, body)를 link 법선 방향으로 투영해 `wavfu/wavfv` 생성.
 
 핵심 메커닉:
-- **force 한계(limiter)**: `facmax = 0.25·g·ρ·gammaloc²` (`setwavfu.f90:83`), `fmax = facmax·hu^1.5 / max(0.1, twav)` (`setwavfu.f90:108`, 3D는 `:150`).
-- **2D** (`kmx==0`): link 양 셀의 force를 `acl` 가중 평균 후 법선·접선 분해, 벡터 norm으로 한계 적용(성분별이 아님 — `:116` 주석 "Should be done on the vector norm, nt separate comps"), 표면력+체적력 합산 (`setwavfu.f90:99-127`). 최종 가속도화: `wavfu *= min(huvli, 1/hminlw)/rhomean`, 단위 [m/s²] (`setwavfu.f90:130-131`).
-- **3D** (`kmx>0`): 표면력은 **최상위 층(Lt)에만** 부여 — "as in D3D" (`setwavfu.f90:159`), 체적력은 연직 균일 분배 (`setwavfu.f90:196-199`).
-- limiting depth `hminlw`/`gammaloc` 는 SWAN 계열이면 `m_waves` 값, SURFBEAT면 `m_xbeach_data` 의 `hminlw`/`gammaxxb` (`setwavfu.f90:71-81`).
+- **force 한계(limiter)**: `facmax = 0.25·g·ρ·gammaloc²` (`setwavfu.f90:83`), `fmax = facmax·hu^1.5 / max(0.1, twav)` — **`get_maximum_wave_force` 로 분리되며 조건부가 됐다**(offline radiation-stress 입력이고 period 가 불필요하면 limiter 경로가 달라진다) (`setwavfu.f90:108`, 3D는 `:150`).
+- **2D** (`kmx==0`): link 양 셀의 force를 `acl` 가중 평균 후 법선·접선 분해, 벡터 norm으로 한계 적용(성분별이 아님). **적용 순서가 바뀌었다** — 구판은 표면력·체적력의 norm 을 각각 제한한 뒤 더했고, 신판은 먼저 합산한 벡터를 투영해 그 합성 norm 을 한 번 제한한다 (성분별이 아니라는 원리는 유지 — `:116` 주석 "Should be done on the vector norm, nt separate comps"), 표면력+체적력 합산 (`setwavfu.f90:99-127`). 최종 가속도화: `wavfu *= min(huvli, 1/hminlw)/rhomean`, 단위 [m/s²] (`setwavfu.f90:130-131`).
+- **3D** (`kmx>0`): 표면력은 **최상위 층(Lt)에만** 부여 — "as in D3D" (`setwavfu.f90:195`), 체적력은 연직 균일 분배 (`setwavfu.f90:199-204`).
+- limiting depth `hminlw`/`gammaloc` 는 SWAN 계열이면 `m_waves` 값, SURFBEAT면 `m_xbeach_data` 의 `hminlw`/`gammaxxb` (`setwavfu.f90:75-85`).
 
 ## 5. Stokes drift 와 wave mass flux
 
@@ -82,12 +82,12 @@ $$u_{orb} = \frac{1}{2} H_{rms}\,\frac{\omega}{\sinh(k\,h)}$$
 - link Stokes 속도: `ustokes(L) = Mu/hstokes` (= mass flux ÷ effective depth) (`wave_comp_stokes_velocities.f90:117-118`). 경계는 Neumann (`:125-154`). MPI ghost 갱신 `update_ghosts(ITYPE_U,…)` (`:156-161`).
 
 ### 5.2 fetch/uniform 의 Stokes (shear velocity 기반)
-2D fetch·uniform 모드에선 `compute_wave_shear_velocity(hw,tw,hh,…,ustt)` 로 ustt 산출 후 풍향(fetch) 또는 phiwav(uniform)으로 투영 (`compute_wave_parameters.f90:86-88`, `:164-166`).
+2D fetch·uniform 모드에선 `compute_wave_shear_velocity(hw,tw,hh,…,ustt)` 로 ustt 산출 후 풍향(fetch) 또는 phiwav(uniform)으로 투영 (`compute_wave_parameters.f90:88-90`, `:164-166`).
 
 ### 5.3 경계 wave mass flux — setwavmubnd
 `setwavmubnd.f90` 의 `setwavmubnd`: 전 mesh 에 정의되나 **open boundary 에서만 비영(非零)** (`setwavmubnd.f90:61-62`). u-bnd(`nbndu`), Riemann z-bnd(`BOUNDARY_VELOCITY_RIEMANN`), normal-velocity bnd(`nbndn`) 각각에 대해 셀중심 `mxwav/mywav` 를 link 법선으로 투영하고 `min(huvli, 1/hminlw)` 로 가중 (`setwavmubnd.f90:76-79`, `:104-116`, `:133-144`). 접선 bnd 는 불필요 (`:148`). 2D/3D(연직 균일, "like D3D" `:81`) 분기.
 
-전역 토글 `jawavestokes==0` 이면 `compute_wave_parameters` 끝에서 ustokes/vstokes 강제 0 (`compute_wave_parameters.f90:176-179`).
+전역 토글 `jawavestokes==0` 이면 `compute_wave_parameters` 끝에서 ustokes/vstokes 강제 0 (`compute_wave_parameters.f90:149-152`).
 
 ## 6. 파-흐름 결합 bottom shear stress — tauwave
 
@@ -128,7 +128,7 @@ $$u_{orb} = \frac{1}{2} H_{rms}\,\frac{\omega}{\sinh(k\,h)}$$
 `surfbeat/` 는 XBeach surfbeat 모드를 D-Flow FM 비구조 격자에 이식한 것. 핵심은 `xbeachwaves.f90` (6176라인, module `m_xbeachwaves`, `xbeachwaves.f90:33`). 공개 진입점: `xbeach_waves`, `xbeach_wave_compute_flowforcing2D/3D`, `xbeach_wave_bc`, `xbeach_flow_bc`, `xbeach_wave_init` 등 (`xbeachwaves.f90:41-42`).
 
 ### 8.1 메인 흐름 — xbeach_waves
-`xbeach_waves(ierr)` (`xbeachwaves.f90:3217`):
+`xbeach_waves(ierr)` (`xbeachwaves.f90:3218`):
 1. 파 계산용 수심 `hhw` 설정 (deltaH 옵션 시 `hs + deltaH·H`) (`:3237-3241`), `hstokes` 천해 보정 (`:3243-3254`).
 2. `instat` 에 따라 분기: `'stat'/'stat_table'` 이면 `xbeach_wave_dispersion(0)` + `xbeach_wave_stationary(0)` (`:3259-3264`); 그 외 instationary 면 `xbeach_wave_dispersion` + `xbeach_wave_instationary()` (`:3285`, `:3295`). `single_dir>0` 분기로 refraction 만 stationary 풀이 (`:3266-3285`). wave-current interaction `wci>0` 면 dispersion type 2 (`:3280-3282`).
 3. `xbeach_compute_stokesdrift()` 매 스텝 (2D) (`:3300-3302`).
@@ -145,7 +145,7 @@ $$u_{orb} = \frac{1}{2} H_{rms}\,\frac{\omega}{\sinh(k\,h)}$$
 - roller off 시 대체: `R = 0.9·ρ·g·sin(β)·H²` (Martins 2018) (`:1217`).
 
 ### 8.3 breaker dissipation 식 — xbeach_wave_breaker_dissipation
-`xbeach_wave_breaker_dissipation` (`xbeachwaves.f90:2222`):
+`xbeach_wave_breaker_dissipation` (`xbeachwaves.f90:2223`):
 - **Roelvink (1993)** `break=='roelvink1'`: $Q_b = 1 - e^{-(H/(\gamma h))^n}$ (`:2282`, `:2285`), $D = Q_b\cdot 2\alpha\rho g H^2/8 / T_{rep}$ (`:2286`, `:2291`). wci 시 $\gamma\tanh(kh)/k$ 형 (`:2280`).
 - **Baldock et al. (1998)** `break=='baldock'` (stationary 전용): `gam = γ` 또는 wci 시 `0.76·kh+0.29` (`:2308-2311`).
 - 모드 제약: Roelvink/Roelvink-Daly 는 instationary 만, Baldock/Janssen 은 stationary 만 (`:361-381`).
@@ -158,7 +158,7 @@ $$S_{xx} = \big[n\,\textstyle\sum(1+\cos^2\theta)\,E_\theta - \tfrac12\sum E_\th
 - wave force = radiation stress 구배: `Fx_cc = -∂Sxx/∂x - ∂Sxy/∂y`, `Fy_cc = -∂Sxy/∂x - ∂Syy/∂y` (`:1364-1367`). 구배는 link 가중 `wcx1/wcy1·dxi` 합산 (`:1351-1361`). 경계 Neumann (`:1370-1389`), MPI ghost (`:1391-1400`).
 - 2D wavfu: `wavfu = (Fx·csu + Fy·snu)/(ρ·max(hu,hminlw))` (`:1412-1413`), dry link 0 (`:1416-1419`).
 
-`xbeach_wave_compute_flowforcing3D` (`xbeachwaves.f90:6040`): dissipation 을 표면력으로 분배 `sxwav = cos(dir)·D·T/L`, body force = `Fx_cc - sxwav` (`:6066-6073`), roller on 시 `DR` 사용 (`:6058-6061`), 이후 `setwavfu()` 호출해 3D wavfu 구성 (`:6094`) — 즉 §4 의 표면/체적력 split 메커닉을 재사용.
+`xbeach_wave_compute_flowforcing3D` (`xbeachwaves.f90:6042`): dissipation 을 표면력으로 분배 `sxwav = cos(dir)·D·T/L`, body force = `Fx_cc - sxwav` (`:6066-6073`), roller on 시 `DR` 사용 (`:6058-6061`), 이후 `setwavfu()` 호출해 3D wavfu 구성 (`:6094`) — 즉 §4 의 표면/체적력 split 메커닉을 재사용.
 
 ### 8.5 경계조건
 `xbeach_wave_bc`(`:1670`)·`xbeach_apply_wave_bc`(`:2177`): 파 에너지 경계 스펙트럼; `xbeach_flow_bc`(`:2683`): absorbing-generating(Riemann) 흐름 경계. wave energy boundary 의 edge node 인덱싱 (`:5418-5465`).
@@ -173,12 +173,12 @@ $$S_{xx} = \big[n\,\textstyle\sum(1+\cos^2\theta)\,E_\theta - \tfrac12\sum E_\th
 - `getwavenr.f90` — 분산관계 반복해 파수 (`getwavenr` `:43`경, `wave_uorbrlabda.f90:71` 호출).
 - `reconstruct_cc_stokesdrift.f90` — link Stokes → 셀중심 재구성 (`reconstruct_cc_stokesdrift.f90:43`).
 - `wave_fillsurdis.f90`·`wave_statbreakerdis.f90` — surface/breaker dissipation 채우기.
-- `wave_shear_velocity.f90` — 파 shear velocity (`compute_wave_parameters.f90:86` 호출).
-- `wave_makeplotvars.f90` — GUI 시각화 변수 (`compute_wave_forcing_rhs.f90:117-123`).
+- `wave_shear_velocity.f90` — 파 shear velocity (`compute_wave_parameters.f90:88` 호출).
+- `wave_makeplotvars.f90` — GUI 시각화 변수 (`compute_wave_forcing_rhs.f90:118-124`).
 
 ## 10. flow2d3d 와의 차이 (요지)
 
 - **격자**: flow2d3d = 구조격자(M,N); D-Flow FM = 비구조 link/셀 (`ln`, `acl`, `csu`, `snu` 기반 투영).
-- **공통 D3D 관례 유지**: 3D 표면력 최상위 층 부여(`setwavfu.f90:159`), 경계 mass flux 연직 균일(`setwavmubnd.f90:81`), `jauorb==0` 의 `√π/2` 보정(`wave_uorbrlabda.f90:84`) — 모두 "as in D3D" 명시.
+- **공통 D3D 관례 유지**: 3D 표면력 최상위 층 부여(`setwavfu.f90:195`), 경계 mass flux 연직 균일(`setwavmubnd.f90:81`), `jauorb==0` 의 `√π/2` 보정(`wave_uorbrlabda.f90:84`) — 모두 "as in D3D" 명시.
 - **surfbeat**: flow2d3d 에는 없는 XBeach 기반 infragravity 위상해상 모듈이 D-Flow FM 측에만 존재.
 - SWAN 결합 자체(파↔흐름 양방향)의 일반 메커닉은 [[wave/delft3d_flow_wave_coupling]] 참조; 본 노트는 FM kernel 내부 force 적용·Stokes·tauwave·surfbeat 에 집중.

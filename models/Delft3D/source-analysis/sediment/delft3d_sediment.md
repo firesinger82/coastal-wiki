@@ -24,7 +24,7 @@ Delft3D's sediment-transport architecture in `compute_sediment/`: `erosed` compu
 - `compute_sediment/soursin_3d.f90`, `soursin_2d.f90` — source/sink conversion.
 - `compute_sediment/red_soursin.f90` — limiter.
 - `compute_sediment/compthick.f90` — transport-layer thickness.
-- `main/trisol.f90:1968-3279` — call sites.
+- `main/trisol.f90:1970-3281` — call sites.
 
 ## A. Directory and entry
 
@@ -35,12 +35,12 @@ Runtime from `trisol.f90`:
 - `bott3d` later computes bed composition + level effects (`:2204, 2205`).
 - Second sequence later (`:3041, 3047, 3278, 3279`).
 
-`erosed` fills `SOURSE/SINKSE`, bedload `SBUU/SBVV`, `SEDDIF` (`erosed.f90:46-53`).
-`bott3d` updates `BODSED`, mixing-layer thickness, depths (`bott3d.f90:43-52`).
+`erosed` fills `SOURSE/SINKSE`, bedload `SBUU/SBVV`, `SEDDIF` (`erosed.f90:50-57`).
+`bott3d` updates `BODSED`, mixing-layer thickness, depths (`bott3d.f90:45-54`).
 
 ## B. Cohesive mud (Krone-Partheniades)
 
-Mud/cohesive routed through `erosilt` (`erosed.f90:1045-1081`).
+Mud/cohesive routed through `erosilt` (`erosed.f90:1070-1110`).
 
 `erosilt` documents Partheniades-Krone for cohesive sediment + fluff layers (`:40-43`).
 
@@ -65,39 +65,39 @@ Bed slope can reduce cohesive erosion critical shear when slope > `WetSlope` (`:
 
 ## C. Noncohesive sand (Van Rijn paths)
 
-Sand fractions with bedload/advection-diffusion through `eqtran` (`erosed.f90:1125-1234`).
+Sand fractions with bedload/advection-diffusion through `eqtran` (`erosed.f90:1160-1269`).
 
-Van Rijn paths (`eqtran.f90:304-420`):
+Van Rijn paths (`eqtran.f90:326`):
 
 | `iform` | Formula | Routine |
 |---|---|---|
-| `-1` | Van Rijn 1993 | `tram1` (`tram1.f90:41-42`) |
+| `-1` | Van Rijn 1993 | `tram1` (`tram1.f90:47-48`) |
 | `-2` | Van Rijn 2004 (code says "Van Rijn 2007") | `tram2` (`:58`) |
 | `-4` | SANTOSS | `tram2` |
-| `7` | Modified Van Rijn 1984 | `tranb7` (`tranb7.f90:31-35`) |
+| `7` | Modified Van Rijn 1984 | `tranb7` (`tranb7.f90:37-41`) |
 
 Critical Shields/tau recomputed for spatially varying `D50`:
 ```
 dstar, piecewise tetacr
 taucr = factcr · (rho_s - rho_w) · g · d50 · tetacr
 ```
-(`erosed.f90:1135-1162`).
+(`erosed.f90:1170-1197`).
 
 Van Rijn reference height `aks` from roughness/reference, limited to 20% depth (`:923-942`).
 
 ## D. Bed/water exchange (suspended-bed)
 
-**Cohesive**: `erosilt` returns `sourse, sinktot`; `erosed` stores in `sourse(nm,l), sinkse(nm,l)` (`erosed.f90:1074-1102`).
+**Cohesive**: `erosilt` returns `sourse, sinktot`; `erosed` stores in `sourse(nm,l), sinkse(nm,l)` (`erosed.f90:1103-1137`).
 
 **Noncohesive**: `eqtran` computes reference concentration/profile; `erosed` calls `soursin_3d` or `soursin_2d` for explicit + implicit source + sink (`:1218-1335`).
 
-In 3D: if reference concentration > bottom-cell concentration, upward diffusion creates explicit/implicit source + settling sink (`soursin_3d.f90:84-155`); else only settling sink (`:156-165`).
+In 3D: if reference concentration > bottom-cell concentration, upward diffusion creates explicit/implicit source + settling sink (`soursin_3d.f90:86-157`); else only settling sink (`:156-165`).
 
 `red_soursin` limiter reduces large sand source/sink — **not applied to mud or pure bedload** (`red_soursin.f90:130-135`).
 
 ## E. Bed model (thickness, fractions per layer)
 
-`erosed` gets bed fractions from bed-composition module: top-layer fractions + mud fraction via `getfrac` (`erosed.f90:629-635`).
+`erosed` gets bed fractions from bed-composition module: top-layer fractions + mud fraction via `getfrac` (`erosed.f90:652-649`).
 
 Multi-fraction non-mud: mean diameters, percentiles, hiding/exposure, optionally active layer + coarse layer (`:697-739`).
 
@@ -105,7 +105,7 @@ Multi-fraction non-mud: mean diameters, percentiles, hiding/exposure, optionally
 - Proportional to depth: `thtrlyr = max(ttlalpha · depth, ttlmin)`.
 - Or proportional to dune height (`compthick.f90:89-105`).
 
-`bott3d` calls `compthick` when composition or dredging needs current thickness (`bott3d.f90:604-612`).
+`bott3d` calls `compthick` when composition or dredging needs current thickness (`bott3d.f90:613-621`).
 
 Bed composition updated through `updmorlyr`, then layer diffusion + boundary composition (`:1079-1094`).
 
@@ -120,31 +120,31 @@ Bed update: `dps(nm) = dps(nm) - depchg(nm)` (`dps` positive downward) (`:1226-1
 
 ## G. Multi-fraction (lsedtot)
 
-Code consistently loops `lsedtot` (`erosed.f90:580-619, 1028-1043`):
+Code consistently loops `lsedtot` (`erosed.f90:603-642,1053-1068`):
 - Source/sink reset over all fractions.
 - Bedload reset over all fractions.
 - Transport loop `l = 1, lsedtot`.
-- Bed changes per fraction (`bott3d.f90:724-840`).
+- Bed changes per fraction (`bott3d.f90:733-851`).
 
-First `lsed` fractions = suspended/advection-diffusion; comments rely on this mapping with `kmxsed` (`erosed.f90:1117-1119, bott3d.f90:763-769`).
+First `lsed` fractions = suspended/advection-diffusion; comments rely on this mapping with `kmxsed` (`erosed.f90:1152-1154, bott3d.f90:772-778`).
 
-Composition updates can exclude fractions via `cmpupdfrac` (`bott3d.f90:1027-1037`).
+Composition updates can exclude fractions via `cmpupdfrac` (`bott3d.f90:1043-1053`).
 
 ## H. Validation pitfalls
 
 Calibrate together:
-- Mud: `tcrero, tcrdep, eropar, powern` (`erosilt.f90:160-203`).
-- Sand: `factcr, taucr, tetacr, D50` (`erosed.f90:1135-1162`).
+- Mud: `tcrero, tcrdep, eropar, powern` (`erosilt.f90:193-252`).
+- Sand: `factcr, taucr, tetacr, D50` (`erosed.f90:1170-1197`).
 
 Settling velocity `ws`:
-- Mud deposition (`erosilt.f90:262`).
-- Sand source/sink (`soursin_3d.f90:146-165`, `soursin_2d.f90:80-114`).
+- Mud deposition (`erosilt.f90:281`).
+- Sand source/sink (`soursin_3d.f90:148-167`, `soursin_2d.f90:80-114`).
 
 Bed roughness affects:
-- Shear/velocity construction (`erosed.f90:854-890`).
+- Shear/velocity construction (`erosed.f90:877-913`).
 - Van Rijn reference height (`:923-942`).
 
-Calibration multipliers `bed, bedw, susw, sus` scale transport/concentration after formula evaluation (`eqtran.f90:722-743`).
+Calibration multipliers `bed, bedw, susw, sus` scale transport/concentration after formula evaluation (`eqtran.f90:749`).
 
 Large morphology changes warned but not capped in `bott3d` (`:815-840`) — validate timestep, `morfac, cdryb`, layer availability.
 

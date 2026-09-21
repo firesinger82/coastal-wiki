@@ -73,7 +73,7 @@ FLOW honors by jumping back to solve label when `nxtstp` returns same solve step
 
 FLOW calls `nxtstp` at DD interruption points.
 
-Timestep start: `D3dFlow_InitTimeStep`; comment "set up virtual points for next time step" (`trisol.f90:1104-1107`).
+Timestep start: `D3dFlow_InitTimeStep`; comment "set up virtual points for next time step" (`trisol.f90:1106-1109`).
 
 During solve: mapper build/check for U/V + dry checks (`uzd.f90:1079-1366, sud.f90:600-884`).
 

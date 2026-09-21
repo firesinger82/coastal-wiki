@@ -40,11 +40,11 @@ source_scope: Delft3D/src/engines_gpl/flow2d3d
 | `shearx.f90` | 105 | bed shear 저장 |
 | `updwaqflxsed.f90` / `upbdps.f90` / `inised.f90` | 88 / 75 / — | WAQ flux 갱신 · bed datum · 초기화 |
 
-핵심 use 모듈: `bedcomposition_module`(bed 층 조성) · `morphology_data_module` · `sediment_basics_module` · `compbsskin_module`(skin friction) · `m_sand_mud`(sand-mud 상호작용) — `erosed.f90:70-71`.
+핵심 use 모듈: `bedcomposition_module`(bed 층 조성) · `morphology_data_module` · `sediment_basics_module` · `compbsskin_module`(skin friction) · `m_sand_mud`(sand-mud 상호작용) — `erosed.f90:74-75`.
 
 ## 2. erosed.f90 — source/sink 계산 (Partheniades-Krone + bedload)
 
-Function 주석 (`erosed.f90:46-58`): bed 에서의 sediment flux 를 **Partheniades-Krone formulation** 으로 계산, `SOURSE`/`SINKSE` 채워 `SOUR`/`SINK` 에 가산. sand 의 **bed load transport**(`SBUU`/`SBVV`) + 연직 **sediment diffusion**(`SEDDIF`) + sand bed-load 의 **wave asymmetry** + U/V 점 **bed slope** 효과 포함.
+Function 주석 (`erosed.f90:50-62`): bed 에서의 sediment flux 를 **Partheniades-Krone formulation** 으로 계산, `SOURSE`/`SINKSE` 채워 `SOUR`/`SINK` 에 가산. sand 의 **bed load transport**(`SBUU`/`SBVV`) + 연직 **sediment diffusion**(`SEDDIF`) + sand bed-load 의 **wave asymmetry** + U/V 점 **bed slope** 효과 포함.
 
 ### 2.1 전처리 흐름 (시간스텝 시작부)
 
@@ -91,7 +91,7 @@ Function 주석 (`bott3d.f90` Function): (a) sand 부유사 transport **보정 �
 ## 5. Z-model 대응 + sand-mud
 
 - σ-model(`erosed`/`bott3d`) ↔ **Z-model**(`z_erosed`/`z_bott3d`/`z_dwnvel`/`z_red_soursin`) 쌍 — 연직격자 방식별 ([`delft3d_sigma_z.md`](delft3d_sigma_z.md)).
-- **sand-mud 상호작용**(`m_sand_mud` 모듈, `erosed.f90:71`) + **flocculation**(`d3d4_flocculate.f90`) — 혼합 sediment 거동.
+- **sand-mud 상호작용**(`m_sand_mud` 모듈, `erosed.f90:75`) + **flocculation**(`d3d4_flocculate.f90`) — 혼합 sediment 거동.
 
 ## 6. 본 위키 접점
 

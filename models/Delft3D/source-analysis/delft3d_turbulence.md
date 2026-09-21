@@ -20,7 +20,7 @@ How Delft3D-FLOW selects between constant, algebraic, k-l, and k-ε vertical tur
 - `flow2d3d_io/src/input/dimrd.f90:439-464`, `rdhyvd.f90:278-296` — `Tkemod` parsing.
 - `flow2d3d_kernel/src/compute/turclo.f90` — closure dispatch + algebraic/k-l/k-ε vicww assembly (`:39-45, 190-537`).
 - `flow2d3d_kernel/src/compute/tratur.f90` — k and ε transport equation (`:47-1055`).
-- `flow2d3d_kernel/src/main/trisol.f90:1522-1535, 1555-1565, 2031-2071` — call sites.
+- `flow2d3d_kernel/src/main/trisol.f90:1524-1537,1557-1567,2033-2073` — call sites.
 - `flow2d3d_kernel/src/compute/uzd.f90:51-1229` — momentum vertical diffusion.
 - `flow2d3d_kernel/src/inichk/initur.f90:248-318`, `tkecof.f90:178-197` — initial fields.
 - `flow2d3d_data/include/physco.igs:43-47` — `vicoww/dicoww` declarations.
@@ -41,7 +41,7 @@ Note: this is the sigma-FLOW path. Z-model has parallel `z_turclo.f90` / `z_trat
 
 Constant sets uniform vertical `vicww=dicoww` from `Vicoww/Dicoww` (`turclo.f90:190-199`).
 
-`tkedis` is **not** the option dispatch — it's an **internal-wave TKE dissipation source/sink array** passed into turbulence transport (`trisol.f90:1555-1565`); used in TKE/ε equations at `tratur.f90:665-666, 813-814`.
+`tkedis` is **not** the option dispatch — it's an **internal-wave TKE dissipation source/sink array** passed into turbulence transport (`trisol.f90:1557-1567`); used in TKE/ε equations at `tratur.f90:665-666, 813-814`.
 
 ## B. K-ε equations
 
@@ -130,7 +130,7 @@ Initial minima:
 ## G. Coupling to momentum
 
 `trisol` order:
-1. `turclo` (compute `vicww`) before momentum (`trisol.f90:1522-1535`).
+1. `turclo` (compute `vicww`) before momentum (`trisol.f90:1524-1537`).
 2. Momentum solve `uzd`.
 3. `tratur` (transport k/ε) when `ltur > 0` (`:2031-2071`).
 

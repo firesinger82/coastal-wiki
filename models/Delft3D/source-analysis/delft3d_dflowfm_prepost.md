@@ -134,7 +134,7 @@ corner 관련 stuff `cn(numk)`, `ucnx/ucny`, `ban(net node area)` 재할당·초
 
 ### 6.2 find1dcells
 
-`find1dcells.f90:51`. 헤더(`:48-50`): `find one-dimensional net cells / it is assumed that kc has been allocated / it is assumed that findcells has already been called (for 2d cells)`. `nump1d2d = nump` 에서 시작(`:102`, 2D cell 다음부터). `construct_lne_array` 를 두 번 호출 — preserve_branch_order true/false (`:103-105`, "second one in case branch order cannot be preserved"). 각 1D net node(`kc(k)<0`)에 cell 번호를 부여하고 `netcell(cell)%nod` 채움 (`:120-142`), cell 중심을 net node 좌표로 설정 (`:144-152`). 1D cell 생성 시 `netstat = NETSTAT_CELLS_DIRTY` (`:156`).
+`find1dcells.f90:52`. 헤더(`:48-50`): `find one-dimensional net cells / it is assumed that kc has been allocated / it is assumed that findcells has already been called (for 2d cells)`. `nump1d2d = nump` 에서 시작(`:102`, 2D cell 다음부터). `construct_lne_array` 를 두 번 호출 — preserve_branch_order true/false (`:103-105`, "second one in case branch order cannot be preserved"). 각 1D net node(`kc(k)<0`)에 cell 번호를 부여하고 `netcell(cell)%nod` 채움 (`:120-142`), cell 중심을 net node 좌표로 설정 (`:144-152`). 1D cell 생성 시 `netstat = NETSTAT_CELLS_DIRTY` (`:156`).
 
 ## 7. bed level on links — setbobs
 

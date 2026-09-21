@@ -72,40 +72,40 @@ SWAN 정상종료 확인은 **`norm_end` 파일 존재**로 판정 — 없으면
 
 ## 3. SWAN command-file(`INPUT`) 생성 — `write_swan_inp`
 
-WAVE wrapper 의 가장 핵심 부분. `write_swan_input` (swan_input.f90:2407) 은 템플릿모드(`update_swan_inp`, swan_input.f90:2453)가 아니면 `write_swan_inp` (swan_input.f90:2542) 를 호출해 SWAN 텍스트 명령파일을 한 줄씩 작성한다. 주요 명령:
+WAVE wrapper 의 가장 핵심 부분. `write_swan_input` (swan_input.f90:2613) 은 템플릿모드(`update_swan_inp`, swan_input.f90:2659)가 아니면 `write_swan_inp` (swan_input.f90:2760) 를 호출해 SWAN 텍스트 명령파일을 한 줄씩 작성한다. 주요 명령:
 
 | SWAN 명령 | 의미 | file:line |
 |---|---|---|
-| `PROJECT` | 프로젝트 헤더 | swan_input.f90:2768 |
-| `CGRID` | 계산격자 정의 | swan_input.f90:2871 |
-| `INPGRID BOTTOM … / READINP BOTTOM` | 수심 입력격자·파일 | swan_input.f90:2918, 2945 |
-| `INPGRID CURREN / READ CUR` | 유속 입력격자 (qextnd(q_cur)>0 또는 swuvi) | swan_input.f90:2967-2977 |
-| `INPGRID … / READINP AICE` | 해빙 fraction | swan_input.f90:2999, 3008 |
-| `READINP MUDL` | mud level (flow_mud_online) | swan_input.f90:3027 |
-| `READINP NPLANTS` | 식생 stem 밀도 | swan_input.f90:3048, 3068 |
-| `BOUN NEST / BOUN WWIII / BOUN SHAPE` | 경계조건 (nest·WW3·파라메트릭) | swan_input.f90:3223, 3233, 3248 |
-| `INITIAL HOTSTART … NETCDF` | hotfile restart | swan_input.f90:3407-3409, 4281 |
-| `GEN1/GEN2/GEN3 KOMEN|WESTH DRAG WU` | 파 생성 물리 | swan_input.f90:3418-3428 |
-| `POINTS NGRID### / SPEC … SPEC2D ABS` | **자식 nest 출력** | swan_input.f90:3640-3673 |
-| `COMPUTE [STAT|NONSTAT]` | 계산 트리거 | swan_input.f90:4059, 4062, 4091 |
-| `STOP` | 종료 | swan_input.f90:4102 |
+| `PROJECT` | 프로젝트 헤더 | swan_input.f90:3000 |
+| `CGRID` | 계산격자 정의 | swan_input.f90:3103 |
+| `INPGRID BOTTOM … / READINP BOTTOM` | 수심 입력격자·파일 | swan_input.f90:3150,3177 |
+| `INPGRID CURREN / READ CUR` | 유속 입력격자 (qextnd(q_cur)>0 또는 swuvi) | swan_input.f90:3199-3209 |
+| `INPGRID … / READINP AICE` | 해빙 fraction | swan_input.f90:3231,3240 |
+| `READINP MUDL` | mud level (flow_mud_online) | swan_input.f90:3259 |
+| `READINP NPLANTS` | 식생 stem 밀도 | swan_input.f90:3280,3300 |
+| `BOUN NEST / BOUN WW3 / BOUN SHAPE` | 경계조건 (nest·WW3·파라메트릭). **`bndtyp==5` 출력 문자열이 `BOUN WWIII ` → `BOUN WW3 ` 로 바뀌었다** | swan_input.f90:3223, 3233, 3248 |
+| `INITIAL HOTSTART … NETCDF` | hotfile restart | swan_input.f90:3634-3636,4508 |
+| `GEN1/GEN2/GEN3 KOMEN|WESTH DRAG WU` | 파 생성 물리 | swan_input.f90:3645-3655 |
+| `POINTS NGRID### / SPEC … SPEC2D ABS` | **자식 nest 출력** | swan_input.f90:3867-3900 |
+| `COMPUTE [STAT|NONSTAT]` | 계산 트리거 | swan_input.f90:4286,4289,4318 |
+| `STOP` | 종료 | swan_input.f90:4329 |
 
 ### 3.1 Grid nesting (부모↔자식 SWAN 격자)
 
 nesting 은 **두 방향**으로 작동:
 
-- **자식이 부모로부터 경계 받기**: 자식 도메인은 `dom%nestnr` (부모 도메인 번호, swan_input.f90:1697 에서 MDW `NestedInDomain` 으로 read)를 갖고, `dom%nesfil(1:4) = 'NEST'` 로 경계파일명을 정한다 (swan_input.f90:1703). 자식 INPUT 에는 `BOUN NEST 'NEST###' CLOSED` 가 기록된다 (swan_input.f90:3394-3400, `inest` 가 `NEST` 접미 3자리).
-- **부모가 자식 경계 출력하기**: 부모 격자(`inest`)의 INPUT 에 자식들(`sr%dom(kst)%nestnr == inest`, swan_input.f90:3639)에 대해 `POINTS 'NGRID###' FILE 'SWANIN_NGRID###'` + `SPEC 'NGRID###' SPEC2D ABS 'NEST###'` 를 기록 — 즉 부모 SWAN 이 자식 격자 모서리 점에서 2D 스펙트럼(`SPEC2D ABS`)을 `NEST###` 파일로 출력하고, 그것이 다음 자식 SWAN 의 `BOUN NEST` 입력이 된다 (swan_input.f90:3636-3674).
+- **자식이 부모로부터 경계 받기**: 자식 도메인은 `dom%nestnr` (부모 도메인 번호, swan_input.f90:1898 에서 MDW `NestedInDomain` 으로 read)를 갖고, `dom%nesfil(1:4) = 'NEST'` 로 경계파일명을 정한다 (swan_input.f90:1904). 자식 INPUT 에는 `BOUN NEST 'NEST###' CLOSED` 가 기록된다 (swan_input.f90:3621-3627, `inest` 가 `NEST` 접미 3자리).
+- **부모가 자식 경계 출력하기**: 부모 격자(`inest`)의 INPUT 에 자식들(`sr%dom(kst)%nestnr == inest`, swan_input.f90:3866)에 대해 `POINTS 'NGRID###' FILE 'SWANIN_NGRID###'` + `SPEC 'NGRID###' SPEC2D ABS 'NEST###'` 를 기록 — 즉 부모 SWAN 이 자식 격자 모서리 점에서 2D 스펙트럼(`SPEC2D ABS`)을 `NEST###` 파일로 출력하고, 그것이 다음 자식 SWAN 의 `BOUN NEST` 입력이 된다 (swan_input.f90:3863-3901).
 
 이 구조 때문에 `swan_tot` 의 안쪽 nest 루프(`i_swan = 1, n_swan_grids`)는 **부모 먼저 자식 나중** 순으로 도메인이 정렬되어 있어, 부모가 만든 `NEST###` 파일을 자식이 곧바로 읽을 수 있다.
 
 ### 3.2 정상/비정상 계산 — `modsim`
 
-`swan_run%modsim` (swan_input.f90:202): `0/<=1` 정상, `2` quasi-stationary(`COMPUTE STAT <tendc>`, swan_input.f90:4062), `3` non-stationary(`COMPUTE NONSTAT <tbegc> <deltc> MIN <tendc>`, swan_input.f90:4091-4095). 시각 문자열은 `datetime_to_string(refdate, timsec)` (swan_input.f90:4061, 4069). `modsim=3` + hotfile 사용 시 `usehottime > tbegc` 이면 에러 중단 (swan_input.f90:4080-4085).
+`swan_run%modsim` (swan_input.f90:202): `0/<=1` 정상, `2` quasi-stationary(`COMPUTE STAT <tendc>`, swan_input.f90:4289), `3` non-stationary(`COMPUTE NONSTAT <tbegc> <deltc> MIN <tendc>`, swan_input.f90:4318-4322). 시각 문자열은 `datetime_to_string(refdate, timsec)` (swan_input.f90:4288,4296). `modsim=3` + hotfile 사용 시 `usehottime > tbegc` 이면 에러 중단 (swan_input.f90:4307-4312).
 
 ### 3.3 Hotfile (restart)
 
-`create_hotstart_line` (swan_input.f90:4256): hotfile 명을 `hot_<inest>_<yyyymmdd>_<hhmmss>.nc` 형식으로 구성(swan_input.f90:4275), 존재하면 `INITIAL HOTSTART '<file>' NETCDF` 줄 생성 (swan_input.f90:4281). 분할(MPI partitioned, `-001` 접미) hotfile 도 처리 (swan_input.f90:4284-4288). 없으면 `usehottime='00000000.000000'` 로 리셋하고 줄을 주석 `$` 처리 (swan_input.f90:4292-4293). `swan_tot` 종료부에서 `swan_run%usehottime = swan_run%writehottime` 으로 다음 step 이 직전 hotfile 을 쓰도록 갱신 (swan_tot.f90:495).
+`create_hotstart_line` (swan_input.f90:4483): hotfile 명을 `hot_<inest>_<yyyymmdd>_<hhmmss>.nc` 형식으로 구성(swan_input.f90:4502), 존재하면 `INITIAL HOTSTART '<file>' NETCDF` 줄 생성 (swan_input.f90:4508). 분할(MPI partitioned, `-001` 접미) hotfile 도 처리 (swan_input.f90:4511-4515). 없으면 `usehottime='00000000.000000'` 로 리셋하고 줄을 주석 `$` 처리 (swan_input.f90:4519-4520). `swan_tot` 종료부에서 `swan_run%usehottime = swan_run%writehottime` 으로 다음 step 이 직전 hotfile 을 쓰도록 갱신 (swan_tot.f90:495).
 
 ---
 

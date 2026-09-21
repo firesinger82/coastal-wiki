@@ -22,7 +22,7 @@ How Delft3D-FLOW and Delft3D-WAVE (SWAN-based) communicate via the COM file, wha
 - `flow2d3d_io/src/output/setwav.f90:210, 365-517` — COM file fields written/read.
 - `wave/packages/io/src/put_wave_fields.f90:332` — WAVE writes NEFIS fields.
 - `wave/packages/kernel/src/wave2com.f90:44` — SWAN → FLOW field transformation.
-- `wave/packages/manager/src/wave_main.f90:430` — WAVE-side online loop.
+- `wave/packages/manager/src/wave_main.f90:431` — WAVE-side online loop.
 - `flow2d3d_manager/src/tricom_step.F90:645, 699, 771-880` — FLOW-side dispatch + restart.
 - `flow2d3d_kernel/src/compute/uzd.f90:668`, `cucnp.f90:631` — wave forces in momentum.
 - `flow2d3d_kernel/src/compute_roller/radstr.f90:304`, `massfl.f90:113` — roller.
@@ -31,7 +31,7 @@ How Delft3D-FLOW and Delft3D-WAVE (SWAN-based) communicate via the COM file, wha
 - `flow2d3d_io/src/input/rdtimo.f90:337` — `Flpp` reading.
 - `flow2d3d_io/src/output/postpr.f90:794` — `itcomc` advance.
 - `flow2d3d_io/src/input/restart_trim_roller.f90:97-163` — roller restart.
-- `wave/packages/data/src/swan_input.f90:4211, 4256` — SWAN hotstart.
+- `wave/packages/data/src/swan_input.f90:4438,4483` — SWAN hotstart.
 
 ## A. Mode dispatch (WaveOL)
 
@@ -47,7 +47,7 @@ Meaning (`procs.igs:78`):
 
 Online FLOW triggers WAVE at `nst == itwav` via `flow_to_wave_command(...perform_step...)` (`tricom_step.F90:699`).
 
-WAVE-side: waits for FLOW command, sets WAVE time from FLOW `timtscale`, runs `swan_tot`, reports OK (`wave_main.f90:430`).
+WAVE-side: waits for FLOW command, sets WAVE time from FLOW `timtscale`, runs `swan_tot`, reports OK (`wave_main.f90:431`).
 
 ## B. COM-file fields
 
@@ -124,7 +124,7 @@ f2 += w * f1
 
 Wave vectors transformed to FLOW curvilinear u/v points — component conversion, not conservation enforcement (`wave2flow.f90:48`).
 
-FLOW hydrodynamic open boundaries with short-wave effects use Riemann / weakly reflective conditions when `wavcmp` is active (`trisol.f90:1304`, `cucbp.f90:317`).
+FLOW hydrodynamic open boundaries with short-wave effects use Riemann / weakly reflective conditions when `wavcmp` is active (`trisol.f90:1306`, `cucbp.f90:317`).
 
 This means: **mass/momentum conservation across the FLOW-WAVE grid boundary is approximate**. For tightly coupled cases, ensure FLOW and WAVE grids match closely or accept small drift.
 
@@ -138,8 +138,8 @@ Roller restart reads from `map-rol-series` (`restart_trim_roller.f90:97-163`):
 - `HS, EWAVE1, EROLL1, QXKR, QYKR, QXKW, QYKW, FXW, FYW, WSU, WSV`.
 
 WAVE hotstart uses SWAN hotfiles:
-- Writes `HOTFILE` at end (`swan_input.f90:4211`).
-- Reads `INITIAL HOTSTART ... NETCDF` when `UseHotFile` / `usehottime` are active (`swan_input.f90:4256`).
+- Writes `HOTFILE` at end (`swan_input.f90:4438`).
+- Reads `INITIAL HOTSTART ... NETCDF` when `UseHotFile` / `usehottime` are active (`swan_input.f90:4483`).
 
 ## Decision Guide
 

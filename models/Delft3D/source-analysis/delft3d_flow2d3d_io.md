@@ -159,22 +159,22 @@ counter 의미 (`output/postpr.f90:355-360`): `itdroc`(drogue), `ithisc`(history
 
 ### 3.2 NEFIS/NetCDF 이중 백엔드 + 2-pass define/write
 
-`wrh_main` ("Main routine for writing the FLOW HIS file", `output/wrh_main.f90:33`)는 출력 포맷을 런타임에 선택한다 (`output/wrh_main.f90:329-330`):
+`wrh_main` ("Main routine for writing the FLOW HIS file", `output/wrh_main.f90:33`)는 출력 포맷을 런타임에 선택한다 (`output/wrh_main.f90:327-328`):
 ```fortran
 filetype = getfiletype(gdp, FILOUT_HIS)
 if (filetype == FTYPE_NETCDF) filename = trim(filename)//'.nc'
 ```
-**2-pass 패턴**: define 후 write (`output/wrh_main.f90:365-368`):
+**2-pass 패턴**: define 후 write (`output/wrh_main.f90:363-366`):
 ```fortran
 do irequest = REQUESTTYPE_DEFINE, REQUESTTYPE_WRITE
    ! request REQUESTTYPE_DEFINE: define all groups, dimensions, and elements
    !         REQUESTTYPE_WRITE : write the data
 ```
-- DEFINE pass 는 첫 호출(`first`)·master node 에서만 수행, 기존 파일 삭제(`delnef`, `output/wrh_main.f90:371-373`).
-- NEFIS: `open_datdef` 로 `.dat`/`.def` 쌍 생성(`output/wrh_main.f90:382-387`).
-- NetCDF: `nf90_create` + CF-1.6 global attribute(`Conventions`/`institution`/`source`/`history`) 부여(`output/wrh_main.f90:392-405`).
+- DEFINE pass 는 첫 호출(`first`)·master node 에서만 수행, 기존 파일 삭제(`delnef`, `output/wrh_main.f90:369-371`).
+- NEFIS: `open_datdef` 로 `.dat`/`.def` 쌍 생성(`output/wrh_main.f90:380-385`).
+- NetCDF: `nf90_create` + CF-1.6 global attribute(`Conventions`/`institution`/`source`/`history`) 부여(`output/wrh_main.f90:390-403`).
 
-`wrh_main` 이 호출하는 그룹별 writer (`output/wrh_main.f90`): 시간독립 `wrihis`(415)·`wrihisbal`(433)·`wrihisdad`(437), 시간종속 `wrthis`(447)·`wrthisbal`(471)·`wrsedh`(475, 퇴적)·`wrthisdad`(488). NetCDF 차원 정의는 `defnewgrp`(507). `wridoc` 는 version 그룹을 쓰며 **defnewgrp 이후**에 호출돼야 함(주석 `output/wrh_main.f90:527-529`, 호출 534). MAP 측은 `wrm_main`(`output/postpr.f90:1040`)이 대칭 구조.
+`wrh_main` 이 호출하는 그룹별 writer (`output/wrh_main.f90`): 시간독립 `wrihis`(415)·`wrihisbal`(433)·`wrihisdad`(437), 시간종속 `wrthis`(447)·`wrthisbal`(471)·`wrsedh`(475, 퇴적)·`wrthisdad`(488). NetCDF 차원 정의는 `defnewgrp`(507). `wridoc` 는 version 그룹을 쓰며 **defnewgrp 이후**에 호출돼야 함(주석 `output/wrh_main.f90:525-527`, 호출 534). MAP 측은 `wrm_main`(`output/postpr.f90:1040`)이 대칭 구조.
 
 `wridoc` ("Writes the initial group 4 ('"ftype"-version')", `output/wridoc.f90:32`)는 그룹명을 `grnam4 = ftype(1:3) // '-version'` 로 구성(`output/wridoc.f90:110`) — 예 `his-version`, 버전 문자열은 `getfullversionstring_flow2d3d`(`output/wridoc.f90:117`).
 
@@ -204,7 +204,7 @@ case (FTYPE_NETCDF)
 1. **입력**: `readmd` 가 그룹별 rd* 디스패치. 키워드 파싱은 legacy `search`/`readnc`(record-pointer) 와 modern `prop_get`(property tree) 가 공존, 신규 코드는 후자로 이행(`input/rdmeteo.f90` vs `input/rdrund.f90`).
 2. **전처리**: `tdatom` 가 시변 데이터를 unformatted 중간파일로 변환해 kernel 읽기 비용 절감(`preprocessor/tdatom.f90:32-39`).
 3. **출력 트리거**: `postpr` 가 매 step counter(`ithisc`/`itmapc`/`itdroc`/`itrstc`) 일치 검사로 writer 활성화·counter 전진(`output/postpr.f90:996-1206`).
-4. **출력 포맷**: 런타임 `getfiletype` 으로 NEFIS(`.dat`/`.def`) 또는 NetCDF(CF-1.6 `.nc`) 선택, 모든 writer 가 REQUESTTYPE_DEFINE→WRITE 2-pass + `wrtarray` generic 추상화로 두 백엔드 동시 지원(`output/wrh_main.f90:329-534`, `output/wrtarray.f90:132-152`).
+4. **출력 포맷**: 런타임 `getfiletype` 으로 NEFIS(`.dat`/`.def`) 또는 NetCDF(CF-1.6 `.nc`) 선택, 모든 writer 가 REQUESTTYPE_DEFINE→WRITE 2-pass + `wrtarray` generic 추상화로 두 백엔드 동시 지원(`output/wrh_main.f90:327-532`, `output/wrtarray.f90:132-152`).
 5. **restart**: 입력측 precision 자동감지(`input/rstfil.f90:215`), 출력측 single-precision `wrirst`(`output/wrirst.f90:35`).
 
 ⚠ 미확인/source-needed: `search`/`readnc` 구현 위치(공유 util), 3.4 의 헤더 미인용 writer 들의 정확한 그룹명·element. 본 노트는 인용한 file:line 범위에 한해 verified.
