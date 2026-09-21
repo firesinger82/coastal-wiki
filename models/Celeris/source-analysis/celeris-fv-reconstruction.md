@@ -40,7 +40,7 @@ face-state 텍스처 `txH/txU/txV/txC`의 4채널은 **셀의 4개 face**를 담
 
 ## 2. Pass1 — cell-center → face state 재구성
 
-입력 `txState`(보존량) → 출력 face별 `H,U,V,C`(원시 변수). 표준 `Pass1.wgsl`과 `Pass1_HighOrder.wgsl` 두 종, `Accuracy_mode`로 선택 (`js/main.js:1322-1327`: `==1`이면 HighOrder).
+입력 `txState`(보존량) → 출력 face별 `H,U,V,C`(원시 변수). 표준 `Pass1.wgsl`과 `Pass1_HighOrder.wgsl` 두 종, `Accuracy_mode`로 선택 (`js/main.js:1539-1544`: `==1`이면 HighOrder).
 
 ### 2.1 MinMod slope limiter (표준, 2nd-order)
 
@@ -93,7 +93,7 @@ FUNWAVE의 4차 MUSCL과 직접 대응(아래 §5).
 
 ## 3. Pass2 — Riemann flux (txXFlux/txYFlux 형성)
 
-입력: Pass1의 face state `txH/txU/txV/txC` + `txHnear`. 출력: x-face flux `txXFlux`, y-face flux `txYFlux` (각 vec4 = [mass, x-mom, y-mom, scalar]). `Accuracy_mode`로 표준 `Pass2.wgsl`(2nd) vs `Pass2_HighOrder_HLLC.wgsl`(4th) 선택 (`js/main.js:1329-1334`).
+입력: Pass1의 face state `txH/txU/txV/txC` + `txHnear`. 출력: x-face flux `txXFlux`, y-face flux `txYFlux` (각 vec4 = [mass, x-mom, y-mom, scalar]). `Accuracy_mode`로 표준 `Pass2.wgsl`(2nd) vs `Pass2_HighOrder_HLLC.wgsl`(4th) 선택 (`js/main.js:1546-1551`).
 
 ### 3.0 공통 — face 좌우 상태와 파속 추정
 
@@ -159,17 +159,17 @@ Fm_x = state_minus_x * u_here.y                   // F_L
 
 HLLC와의 실질 차이: HLLC는 Toro star 상태 `U*`를 명시 구성 후 blend, HLLEM은 중앙평균 Roe flux `Froe`를 직접 blend. 둘 다 같은 `psi` 한계함수 사용.
 
-**활성 여부** (`ARCHITECTURE.md:69-72`): `Accuracy_mode==1`(고차)에서 `main.js`는 `Pass2_HighOrder_HLLC.wgsl`만 fetch (`js/main.js:1330-1331`). **HLLEM은 소스에 존재하나 현재 main.js 경로에서 선택되지 않음**(present-but-not-default).
+**활성 여부** (`ARCHITECTURE.md:69-72`): `Accuracy_mode==1`(고차)에서 `main.js`는 `Pass2_HighOrder_HLLC.wgsl`만 fetch (`js/main.js:1547-1548`). **HLLEM은 소스에 존재하나 현재 main.js 경로에서 선택되지 않음**(present-but-not-default).
 
 ### 3.4 어느 것이 언제 (Accuracy_mode)
 
 | Accuracy_mode | Pass1 | Pass2 |
 |---|---|---|
-| `0` (2nd-order, 기본 default `constants_load_calc.js:35`) | `Pass1.wgsl` (MinMod θ-limiter) | `Pass2.wgsl` (성분별 HLL) |
+| `0` (2nd-order, 기본 default `constants_load_calc.js:39`) | `Pass1.wgsl` (MinMod θ-limiter) | `Pass2.wgsl` (성분별 HLL) |
 | `1` (4th-order) | `Pass1_HighOrder.wgsl` (MUSCL4) | `Pass2_HighOrder_HLLC.wgsl` (HLLC) |
 | — | — | `Pass2_HighOrder_HLLEM.wgsl` (미연결) |
 
-(선택 로직 `js/main.js:1322-1334`. cross-ref [celeris-pipeline-graph.md](celeris-pipeline-graph.md).)
+(선택 로직 `js/main.js:1539-1551`. cross-ref [celeris-pipeline-graph.md](celeris-pipeline-graph.md).)
 
 ### 3.5 sediment flux (옵션)
 

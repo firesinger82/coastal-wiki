@@ -16,15 +16,15 @@ source_scope: Celeris-WebGPU/js, Celeris-WebGPU/shaders
 
 ## 1. 지배방정식·수치기법 요약
 
-Celeris는 동일 FV(유한체적) 골격 위에서 **3개 방정식 계열**을 config로 전환한다 (`NLSW_or_Bous`). 셰이더 fetch 분기는 `js/main.js:1320-1368`, 패스 시퀀스 설명은 `docs/architecture/SIMULATION_PIPELINE.md`.
+Celeris는 동일 FV(유한체적) 골격 위에서 **3개 방정식 계열**을 config로 전환한다 (`NLSW_or_Bous`). 셰이더 fetch 분기는 `js/main.js:1537-1593` — 계열 선택은 `NLSW_or_Bous` 지만 NLSW 안에서 `grid_type == 2` 이면 구면 변형이 선택되고, 이때 `constants_load_calc.js:454-469` 가 `NLSW_or_Bous=0`·`Accuracy_mode=0`·`useSedTransModel=0`·`useBreakingModel=0` 을 강제한다, 패스 시퀀스 설명은 `docs/architecture/SIMULATION_PIPELINE.md`.
 
 | 계열 | 활성 Pass3 셰이더 | 분산항(dispersive) | 암시적 PCR solve |
 |---|---|---|---|
-| **NLSW** (비선형 천수) | `Pass3_NLSW.wgsl` (285) | 없음 | skip — 중간상태를 `txNewState`로 copy (`Run_Tridiag_Solver.js:37-39`) |
+| **NLSW** (비선형 천수) | `Pass3_NLSW.wgsl` (285) — `grid_type == 2`(구면 격자)이면 `Pass3_NLSW_Spherical.wgsl` (267) 선택 (`js/main.js:1558-1563`) | 없음 | skip — 중간상태를 `txNewState`로 copy (`Run_Tridiag_Solver.js:37-39`) |
 | **Boussinesq** | `Pass3_Bous.wgsl` (430) | `Bcoef`·3차 미분항 (`Pass3_Bous.wgsl:282-286`) | x·y 양방향 PCR |
 | **COULWAVE** | `Pass3A/B_COULWAVE.wgsl` + `Pass3_COULWAVE.wgsl` | 다층 z-α 그룹핑 텍스처 | x·y 양방향 PCR (COULWAVE 변형) |
 
-수치 골격 (각 timestep, `SIMULATION_PIPELINE.md` §Timestep + `main.js:1893-2174`):
+수치 골격 (각 timestep, `SIMULATION_PIPELINE.md` §Timestep + `main.js:2638-2924`):
 
 ```
 Pass0   neighbor 수심 (dry/wet helper, txHnear)        Pass0.wgsl
@@ -38,7 +38,7 @@ Bndry   경계조건·wet/dry cleanup (1차)                  BoundaryPass.wgsl
 Bndry   경계조건 재적용 (2차)                           BoundaryPass.wgsl
 ```
 
-- **Riemann 수치플럭스**: `Pass2.wgsl:34-40` `NumericalFlux()` = HLL 형태 `(a⁺F⁻−a⁻F⁺+a⁺a⁻ΔU)/(a⁺−a⁻)`. High-order 경로는 HLLC를 선택(`main.js:1331`).
+- **Riemann 수치플럭스**: `Pass2.wgsl:34-40` `NumericalFlux()` = HLL 형태 `(a⁺F⁻−a⁻F⁺+a⁺a⁻ΔU)/(a⁺−a⁻)`. High-order 경로는 HLLC를 선택(`main.js:1548`).
 - **시간적분 (3rd-order Adams-Bashforth predictor-corrector)** — `Pass3_Bous.wgsl:400-409`:
   - `timeScheme==0`: 단일 explicit `U + dt·d_by_dt` (l.400)
   - predictor (`pred_or_corrector==1`): `U + dt/12·(23·dⁿ − 16·dⁿ⁻¹ + 5·dⁿ⁻²)` (l.404) — AB3
@@ -54,7 +54,7 @@ Bndry   경계조건 재적용 (2차)                           BoundaryPass.wgs
 |---|---:|---|
 | `main.js` | 4368 | **오케스트레이션**: init, 셰이더 fetch/컴파일, 파이프라인·바인드그룹 생성, `frame()` 루프, UI/이벤트, 패스 dispatch 시퀀스 |
 | `site.js` | 4 | 엔트리 모듈 로더 |
-| `constants_load_calc.js` | 556 | 파이프라인 설정·기본 config·파생 상수 계산 (Courant·dt·Bcoef 등). ★**dt 정적 확정(2026-07-12)**: `dt=Courant_num·min(dx,dy)/√(g·base_depth)`(:404, Courant_num 기본 0.15 :27) — 재계산은 main.js:1614 의 `html_update>0` 블록(UI 변경 시)뿐, frame 루프 per-step CFL 재산정 없음 |
+| `constants_load_calc.js` | 556 | 파이프라인 설정·기본 config·파생 상수 계산 (Courant·dt·Bcoef 등). ★**dt 정적 확정(2026-07-12)**: `dt=Courant_num·min(dx,dy)/√(g·base_depth)` — **단, `grid_type == 2`(구면)에서는 dx/dy 를 도→rad 로 변환해 `R·|Δlat|` 과 셀 위도별 `R·cos(φ)·|Δlon|` 중 최소 물리 간격을 쓴다** (`js/main.js:2294-2333`; 구면 대입 `:2328`, Cartesian 대입 `:2331`, 초기화 `constants_load_calc.js:454-487`)(:404, Courant_num 기본 0.15 :27) — 재계산은 main.js:1614 의 `html_update>0` 블록(UI 변경 시)뿐, frame 루프 per-step CFL 재산정 없음 |
 | `Config_Pipelines.js` | 283 | **파이프라인 팩토리**: `createComputePipeline`/`createRenderPipeline`/skybox/model (l.6,22,111,150) — 셰이더 코드 인자로 받는 범용 함수 |
 | `Create_Textures.js` | 100 | **텍스처 할당** 팩토리: 2D rgba32f / 3D rgba16f / bgra8 / 1D (l.3,16,29,55,69) |
 | `Copy_Data_to_Textures.js` | 527 | CPU→GPU 데이터 전송 (bathy·waves·이미지) |
@@ -142,7 +142,7 @@ Bndry   경계조건 재적용 (2차)                           BoundaryPass.wgs
 
 ## 4. JS 핸들러 ↔ WGSL 셰이더 ↔ dispatch 대응
 
-핸들러는 바인드그룹 레이아웃을 정의하고, `main.js`가 동명 셰이더 코드와 짝지어 파이프라인을 만든 뒤(`main.js:1392-1422`) frame 루프에서 dispatch(`main.js:1893-2174`)한다. config 분기로 셰이더 파일이 바뀌어도 핸들러(레이아웃)는 동일.
+핸들러는 바인드그룹 레이아웃을 정의하고, `main.js`가 동명 셰이더 코드와 짝지어 파이프라인을 만든 뒤(`main.js:1619-1651`) frame 루프에서 dispatch(`main.js:2638-2924`)한다. config 분기로 셰이더 파일이 바뀌어도 핸들러(레이아웃)는 동일.
 
 | 핸들러 (`js/`) | 파이프라인 생성 (main.js) | WGSL 셰이더 | dispatch (frame loop) |
 |---|---|---|---|
@@ -176,21 +176,21 @@ Bndry   경계조건 재적용 (2차)                           BoundaryPass.wgs
 
 ## 5. 텍스처 상태 규약 요약 (브리프)
 
-심화 계약은 인프라 노트 + `docs/architecture/DATA_AND_TEXTURES.md`. 텍스처 생성·라벨은 `js/main.js:341-426`에서 검증.
+심화 계약은 인프라 노트 + `docs/architecture/DATA_AND_TEXTURES.md`. 텍스처 생성·라벨은 `js/main.js:449-536`에서 검증.
 
 | 텍스처 | 채널 (r,g,b,a) | 출처 |
 |---|---|---|
-| `txState` / `txNewState` | η, P(=hu), Q(=hv), scalar c | `main.js:343-344`; `DATA_AND_TEXTURES.md` §State |
-| `txstateUVstar` / `current_stateUVstar` | bous-grouped 중간상태 (η,U,V,c); PCR RHS/해 | `main.js:347-348` |
-| `txBottom` | bed N면, bed E면, bed 셀중심, near-dry 플래그 | `main.js:341`; `DATA_AND_TEXTURES.md` §Bathy |
-| `txBottomInitial` / `txHardBottom` | 초기 bed / 비침식 하한 bed | `main.js:342`, `361` |
-| `txH` / `txU` / `txV` / `txC` | 면(N,E,S,W = x,y,z,w) 수심 / u / v / scalar | `main.js:349-353`; `DATA_AND_TEXTURES.md` §Face (x=N면, y=E면 주의) |
-| `txHnear` | dry/wet helper (Pass0 산출) | `main.js:352`; `Pass0.wgsl:18` |
-| `txXFlux` / `txYFlux` | mass, x-mom, y-mom, scalar 플럭스 | `main.js:365-366`; `DATA_AND_TEXTURES.md` §Flux |
-| `txBreaking` | breaking age, eddy-visc, intensity, subgrid | `main.js:369`; `DATA_AND_TEXTURES.md` §Breaking |
-| `coefMatx` / `coefMaty` | 삼중대각: a(sub), b(diag), c(super), 0/rhs | `main.js:393-394`; `Update_TriDiag_coef.wgsl:72,108` `vec4(a,b,c,0)` |
-| `newcoef_x/y`, `txtemp_PCR*`, `txtemp2_PCR*` | PCR ping-pong 계수 / 최종 해 | `main.js:395-396`; `DATA_AND_TEXTURES.md` §Tridiag |
-| `txCW_groupings` | COULWAVE 6-layer rgba32f 3D (u/v/du/dv, z-α, S/T, grad, E, …) | `main.js:405`; `Handler_Pass3.js:222` (3d view); `DATA_AND_TEXTURES.md` §COULWAVE |
+| `txState` / `txNewState` | η, P(=hu), Q(=hv), scalar c | `main.js:451-452`; `DATA_AND_TEXTURES.md` §State |
+| `txstateUVstar` / `current_stateUVstar` | bous-grouped 중간상태 (η,U,V,c); PCR RHS/해 | `main.js:455-456` |
+| `txBottom` | bed N면, bed E면, bed 셀중심, near-dry 플래그 | `main.js:449`; `DATA_AND_TEXTURES.md` §Bathy |
+| `txBottomInitial` / `txHardBottom` | 초기 bed / 비침식 하한 bed | `main.js:450`, `361` |
+| `txH` / `txU` / `txV` / `txC` | 면(N,E,S,W = x,y,z,w) 수심 / u / v / scalar | `main.js:457-461`; `DATA_AND_TEXTURES.md` §Face (x=N면, y=E면 주의) |
+| `txHnear` | dry/wet helper (Pass0 산출) | `main.js:460`; `Pass0.wgsl:18` |
+| `txXFlux` / `txYFlux` | mass, x-mom, y-mom, scalar 플럭스 | `main.js:473-474`; `DATA_AND_TEXTURES.md` §Flux |
+| `txBreaking` | breaking age, eddy-visc, intensity, subgrid | `main.js:477`; `DATA_AND_TEXTURES.md` §Breaking |
+| `coefMatx` / `coefMaty` | 삼중대각: a(sub), b(diag), c(super), 0/rhs | `main.js:501-502`; `Update_TriDiag_coef.wgsl:72,108` `vec4(a,b,c,0)` |
+| `newcoef_x/y`, `txtemp_PCR*`, `txtemp2_PCR*` | PCR ping-pong 계수 / 최종 해 | `main.js:503-504`; `DATA_AND_TEXTURES.md` §Tridiag |
+| `txCW_groupings` | COULWAVE 6-layer rgba32f 3D (u/v/du/dv, z-α, S/T, grad, E, …) | `main.js:515`; `Handler_Pass3.js:222` (3d view); `DATA_AND_TEXTURES.md` §COULWAVE |
 
 ---
 

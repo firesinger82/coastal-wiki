@@ -46,7 +46,7 @@ let source_term = vec4<f32>(
 ```
 4성분 = [질량(dhdt/침투), x운동량, y운동량, scalar transport]. x운동량 항만 보면:
 - `-g·h·detadx` : eta 경사 압력 구동 (`detadx`는 분산 켜질 때 4차 차분, `:241`)
-- `-Hu·friction_` : 바닥 마찰 (`FrictionCalc`, `:67-93`) — **식 전개(2026-07-12 보강)**: `isManning==1`이면 `f=g·n²/h^{1/3}`(`:82-83`), 아니면 `f=friction`(무차원 Moody); **f≤0.5 클램프**(`:87` 'non-physical above 0.5'); 마찰항 = `f·√(hu²+hv²)·divide_by_h2`, 여기서 `divide_by_h2=2h²/(h⁴+max(h⁴,1e-6))/base_depth²`(`:74-77`) — ★h⁴ 단정밀도 스케일링 탓에 **수심 <~5% base_depth 에서 마찰 과소**(소스 주석 `:69-73` disclosed). 기본값 `friction=0.000`·`isManning=0`(constants_load_calc.js:42-43) — **기본 마찰 off**.
+- `-Hu·friction_` : 바닥 마찰 (`FrictionCalc`, `:67-93`) — **식 전개(2026-07-12 보강)**: `isManning==1`이면 `f=g·n²/h^{1/3}`(`:82-83`), 아니면 `f=friction`(무차원 Moody); **f≤0.5 클램프**(`:87` 'non-physical above 0.5'); 마찰항 = `f·√(hu²+hv²)·divide_by_h2`, 여기서 `divide_by_h2=2h²/(h⁴+max(h⁴,1e-6))/base_depth²`(`:74-77`) — ★h⁴ 단정밀도 스케일링 탓에 **수심 <~5% base_depth 에서 마찰 과소**(소스 주석 `:69-73` disclosed). 기본값 `friction=0.000`·`isManning=0`(constants_load_calc.js:46-47) — **기본 마찰 off**.
 - `breaking_x` : 파괴 와점성 유발 운동량 확산 (`:361`, `useBreakingModel`일 때 `txDissipationFlux` 차분)
 - `(Psi1x + Psi2x)` : **Boussinesq 분산 source** (§2)
 - `press_x` : 외부 압력 경사 `-0.5·h·(g/dx)·(P_right-P_left)` (`:314`)
@@ -124,7 +124,7 @@ c = -d_here*d_dx/(6.0*dx) - (Bcoef + 1.0/3.0)*d_here*d_here/(dx*dx);
 
 Thomas 알고리즘은 forward sweep → back substitution이 **본질적으로 순차적**(셀 i가 i-1에 의존). GPU에서 한 행에 수천 셀이 있어도 직렬화돼 병렬성을 못 살린다. **Parallel Cyclic Reduction(PCR)**은 매 패스마다 모든 미지수를 stride `s`만큼 떨어진 이웃 2개와 결합해 동시에 줄인다. `log2(N)` 패스로 시스템을 항등(대각만 남김)으로 환원 → 각 셀이 독립적으로 해를 읽는다. WGSL compute(셀=스레드) 모델에 자연스럽다.
 
-JS가 패스 수를 `Px = ceil(log2(WIDTH))`, `Py = ceil(log2(HEIGHT))`로 계산(`js/constants_load_calc.js:427-428`). 우라일 `Px`는 PCR uniform `P`로 byte offset 16에 기록(`main.js:1034`).
+JS가 패스 수를 `Px = ceil(log2(WIDTH))`, `Py = ceil(log2(HEIGHT))`로 계산(`js/constants_load_calc.js:511-512`). 우라일 `Px`는 PCR uniform `P`로 byte offset 16에 기록(`main.js:1233`).
 
 ### 3.3 PCR 한 패스 (`TriDiag_PCRx.wgsl`)
 

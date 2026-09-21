@@ -9,7 +9,7 @@ source_scope: Celeris-WebGPU/js, Celeris-WebGPU/shaders
 ---
 
 > 상위: [../README.md](../README.md) · 표준 분산 모드: [celeris-boussinesq-solver.md](celeris-boussinesq-solver.md) · 파이프라인 분기: [celeris-pipeline-graph.md](celeris-pipeline-graph.md)
-> COULWAVE 방정식 계보·항 매핑은 [`../web-refs/celeris-coulwave-theory.md`](../web-refs/celeris-coulwave-theory.md). **요점**: 모드2 "COULWAVE equations"는 **단일층 완전비선형(fully-nonlinear) 확장 Boussinesq**(Nwogu z_α + Wei-Kirby 1995, `constants_load_calc.js:32` 주석)이며 **2층/다층 아님**(소스에 단일 za). 모드1 "Bous"는 Madsen & Sørensen 약비선형(B=1/15). 이 노트는 WGSL 코드에서 검증 가능한 사실만 단언한다.
+> COULWAVE 방정식 계보·항 매핑은 [`../web-refs/celeris-coulwave-theory.md`](../web-refs/celeris-coulwave-theory.md). **요점**: 모드2 "COULWAVE equations"는 **단일층 완전비선형(fully-nonlinear) 확장 Boussinesq**(Nwogu z_α + Wei-Kirby 1995, `constants_load_calc.js:36` 주석)이며 **2층/다층 아님**(소스에 단일 za). 모드1 "Bous"는 Madsen & Sørensen 약비선형(B=1/15). 이 노트는 WGSL 코드에서 검증 가능한 사실만 단언한다.
 
 # COULWAVE 고차 모드 (NLSW_or_Bous == 2)
 
@@ -140,13 +140,13 @@ if (p == Px - 1) {                          // PCRx_COULWAVE:102-108
 
 코드/문서에서 검증되는 계층 (ARCHITECTURE.md:63-67):
 
-| 모드 | NLSW_or_Bous | 방정식 (`constants_load_calc.js:32`) | 분산 | 비선형 | implicit solve |
+| 모드 | NLSW_or_Bous | 방정식 (`constants_load_calc.js:36`) | 분산 | 비선형 | implicit solve |
 |---|---|---|---|---|---|
 | NLSW | 0 | 비선형 천수 | 없음 | 완전 | bypass (텍스처 복사) |
 | Bous | 1 | **Madsen** Boussinesq (B=1/15) | B-enhanced | **약비선형** | PCR |
 | COULWAVE | 2 | **Fully Non-linear** Boussinesq (COULWAVE eq.) | Nwogu z_α | **완전비선형** | PCR (velocity↔flux 환산 추가) |
 
-**모드 1→2 격상의 본질은 "비선형 차수"(약→완전)이지 "단층→다층"이 아니다** — 둘 다 단일층·O(μ²) 분산. 코드 주석이 모드1을 "Madsen", 모드2를 "Fully Non-linear Boussinesq (COULWAVE equations)"로 명시(`constants_load_calc.js:32`). za(Nwogu reference)는 **모드2만** 사용, 모드1 `Pass3_Bous`는 정수심 d 기반(za 미참조). 항별 식대응·계보는 [`../web-refs/celeris-coulwave-theory.md`](../web-refs/celeris-coulwave-theory.md) §3.
+**모드 1→2 격상의 본질은 "비선형 차수"(약→완전)이지 "단층→다층"이 아니다** — 둘 다 단일층·O(μ²) 분산. 코드 주석이 모드1을 "Madsen", 모드2를 "Fully Non-linear Boussinesq (COULWAVE equations)"로 명시(`constants_load_calc.js:36`). za(Nwogu reference)는 **모드2만** 사용, 모드1 `Pass3_Bous`는 정수심 d 기반(za 미참조). 항별 식대응·계보는 [`../web-refs/celeris-coulwave-theory.md`](../web-refs/celeris-coulwave-theory.md) §3.
 
 COULWAVE는 매 step 보조패스 2회 + 3D 텍스처 packing + 4차 η차분으로 추가 비용. 정확도↑↔비용↑.
 

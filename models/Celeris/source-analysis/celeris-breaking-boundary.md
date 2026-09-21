@@ -34,7 +34,7 @@ let dzdt_I = globals.dzdt_I_coef * c_here;                    // 개시(initiati
 let dzdt_F = globals.dzdt_F_coef * c_here;                    // 종료(final) 임계
 ```
 
-**계수 기본값(2026-07-12 확인)**: `dzdt_I_coef=0.50`('start breaking parameter')·`dzdt_F_coef=0.15`('end')·`T_star_coef=5.0`('length of time until breaking becomes fully developed')·`delta_breaking=2.0`('eddy viscosity coefficient') — constants_load_calc.js:51-54.
+**계수 기본값(2026-07-12 확인)**: `dzdt_I_coef=0.50`('start breaking parameter')·`dzdt_F_coef=0.15`('end')·`T_star_coef=5.0`('length of time until breaking becomes fully developed')·`delta_breaking=2.0`('eddy viscosity coefficient') — constants_load_calc.js:57-60.
 
 쇄파 나이에 따라 임계 `dzdt_star`를 시간 보간(`:104-112`):
 
@@ -78,15 +78,16 @@ Boussinesq/COULWAVE `Pass3` 변형이 `txDissipationFlux`를 다시 미분해 �
 
 ## 2. BoundaryPass — 경계 유형 열거 (가장 두꺼운 섹션)
 
-`main()`은 한 셀에서 **periodic → sponge → solid → incident wave → river stage/discharge → island/negative-depth cleanup** 순으로 `BCState`를 덮어쓴다(`shaders/BoundaryPass.wgsl:184-595`). 네 변(`west/east/south/north`) 각각 `*_boundary_type` 정수로 분기. 타입 코드:
+`main()`은 한 셀에서 **periodic → sponge → solid → incident wave → boundary time-series(type 5) → river stage/discharge → island/negative-depth cleanup** 순으로 `BCState`를 덮어쓴다(`shaders/BoundaryPass.wgsl:280-725`). 네 변(`west/east/south/north`) 각각 `*_boundary_type` 정수로 분기. 타입 코드:
 
 | 코드 | 의미 | 분기 |
 |---|---|---|
-| ≤1 (0,1) | solid wall (0) / 그 외 (1) | `:307,318,329,340` |
-| 1 | sponge layer | `:264,273,282,291` |
-| 2 | incident wave injection | `:352,369,386,403` |
-| 3 | periodic | `:203,217,231,245` |
-| 4 | river stage/discharge | `:448,463,475` |
+| ≤1 (0,1) | solid wall (0) / 그 외 (1) | `:403,414,425,436` |
+| 1 | sponge layer | `:360,369,378,387` |
+| 2 | incident wave injection | `:448,465,482,499` |
+| 3 | periodic | `:299,313,327,341` |
+| 4 | river stage/discharge | `:578,593,605` |
+| 5 | boundary time-series forcing (nested grid 입력) | `:517,525,533,541` |
 
 > 주의: solid 분기는 `*_boundary_type <= 1`이라 type 1은 sponge 블록과 solid 블록 양쪽에 걸린다(sponge가 먼저 적용된 뒤 가장자리 1~2셀이 solid로 덮임).
 
@@ -181,19 +182,19 @@ stage_speed = Q_c / stage_c / (channel_bottom_width·cos(angle) + stage_c/channe
 
 ### 2.9 출력 → JS 복사
 
-`main` 끝에서 임시 텍스처에 기록(`:592-594`): `txNewState ← BCState`, `txNewState_Sed ← BCState_Sed`, `txtemp_Breaking ← BCState_Breaking`. canonical state로의 복사는 JS(`Handler_BoundaryPass.js`는 바인딩만 정의, binding 5/6/8이 write-only storage)가 담당. 입력 state는 binding 1 `current_stateUVstar`(`Handler_BoundaryPass.js:100-147`). ping-pong 세부는 인프라 노트 참조.
+`main` 끝에서 임시 텍스처에 기록(`:592-594`): `txNewState ← BCState`, `txNewState_Sed ← BCState_Sed`, `txtemp_Breaking ← BCState_Breaking`. canonical state로의 복사는 JS(`Handler_BoundaryPass.js`는 바인딩만 정의, binding 5/6/8이 write-only storage)가 담당. 입력 state는 binding 1 `current_stateUVstar`(`Handler_BoundaryPass.js:140-206`). ping-pong 세부는 인프라 노트 참조.
 
 ---
 
 ## 3. Wave generation — waves.txt → txWaves
 
-`Wave_Generator.js`(Codex 추가, `:1-2`)가 incident wave 성분 배열을 만들어 `txWaves`에 올린다. 각 성분 행 = `[amplitude, period, direction(rad), phase]` (BoundaryPass `sineWave`의 인자 순서 `wave.r/g/b/a`와 일치, `BoundaryPass.wgsl:177-178`).
+`Wave_Generator.js`(Codex 추가, `:1-2`)가 incident wave 성분 배열을 만들어 `txWaves`에 올린다. 각 성분 행 = `[amplitude, period, direction(rad), phase]` (BoundaryPass `sineWave`의 인자 순서 `wave.r/g/b/a`와 일치, `BoundaryPass.wgsl:198-199`).
 
-- **단일 sine**(`buildSineWaveData`, `Wave_Generator.js:44-50`): `[0.5·H, T, dir(rad), 0]` — 진폭은 파고의 절반. `incident_wave_H/T/direction`(config)에서.
+- **단일 sine**(`buildSineWaveData`, `Wave_Generator.js:44-60`): `[0.5·H, T, dir(rad), 0]` — 진폭은 파고의 절반. `incident_wave_H/T/direction`(config)에서. **단, dir 은 config 값의 단순 단위변환이 아니다** — 횡방향 양쪽 경계가 주기경계(type 3)이면 `fitDirectionToPeriodicBoundary` 로 보정한 각도를 rad 로 반환한다 (`Wave_Generator.js:47-59`, 경계 확인 `:297-332`).
 - **TMA/JONSWAP 스펙트럼**(`buildTmaWaveData`, `:52-131`): JONSWAP 에너지(`calculateJonswapEnergy`, `:179-190`, γ=3.3)에 cos-power 방향 분포(`:192-213`)를 곱해 다방향 성분 생성. 주파수 100개(`fp/3 ~ 3·fp`, `:133-147`), 방향 ±20°/5°(`:149-160`). 입력 파고로 재정규화(`scaleDirectionalSpectraToInputHeight`, Hs=4.004·√E0, `:215-231`), 에너지 1% 미만 절단(`:233-241`). 위상은 random(`:125`).
 - **주기경계 보정**(`fitDirectionToPeriodicBoundary`, `:243-275`): 각 성분의 along-boundary 파장이 경계 길이에 정수배로 맞도록 방향을 미세 조정 → periodic 경계에서 위상 불연속 방지. 경계 기하(길이·각도·수심)는 `getIncidentBoundaryGeometry`(`:277-301`)가 활성 type==2 변에서 도출.
 
-BoundaryPass는 매 스텝 `txWaves`의 `numberOfWaves` 행을 합산(`BoundaryPass.wgsl:176-179`)하므로, JS는 파라미터 변경 시에만 텍스처를 재생성(TMA 결과 캐시, `:22-23,59-72`). transient(type 2)는 JS가 아닌 셰이더 `sineWave`의 4파 taper(`:156-161`)로 처리.
+BoundaryPass는 매 스텝 `txWaves`의 `numberOfWaves` 행을 합산(`BoundaryPass.wgsl:197-200`)하므로, JS는 파라미터 변경 시에만 텍스처를 재생성(TMA 결과 캐시, `:22-23,59-72`). transient(type 2)는 JS가 아닌 셰이더 `sineWave`의 4파 taper(`:156-161`)로 처리.
 
 ---
 

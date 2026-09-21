@@ -14,7 +14,7 @@ source_scope: Celeris-WebGPU/js, Celeris-WebGPU/shaders
 
 ## 0. 개요
 
-표사 모듈은 단일 부유사 클래스(Class 1)에 대한 **농도 이류·확산 + 픽업/침강 closure**와, 소류사 MP&M 항, 그리고 이를 받아 바닥고를 갱신하는 **Exner형 질량보존**으로 구성. config `useSedTransModel == 1`일 때만 dispatch (default `0`, `constants_load_calc.js:85`). 활성화 시 매 시간스텝 하이드로 패스 사이에 3개 GPU 패스가 삽입된다:
+표사 모듈은 단일 부유사 클래스(Class 1)에 대한 **농도 이류·확산 + 픽업/침강 closure**와, 소류사 MP&M 항, 그리고 이를 받아 바닥고를 갱신하는 **Exner형 질량보존**으로 구성. config `useSedTransModel == 1`일 때만 dispatch (default `0`, `constants_load_calc.js:106`). 활성화 시 매 시간스텝 하이드로 패스 사이에 3개 GPU 패스가 삽입된다:
 
 | 패스 | 셰이더(활성) | 삽입 위치 | 산출 |
 |---|---|---|---|
@@ -26,9 +26,9 @@ source_scope: Celeris-WebGPU/js, Celeris-WebGPU/shaders
 
 `main.js`의 메인 루프(predictor + corrector). 모든 호출이 `if(calc_constants.useSedTransModel == 1)`로 게이트됨.
 
-- **Pass1 → SedTrans_Pass1**: `js/main.js:1898-1901` (predictor), `js/main.js:2032-2035` (corrector). Pass1(플럭스/셀면 재구성) 직후 Pass2 전에 농도를 셀면 재구성. Pass2는 `useSedTransModel`을 uniform offset 28로 받아(`js/main.js:847,1627`) 표사 플럭스 `txXFlux_Sed/txYFlux_Sed`를 계산.
-- **Pass3 → SedTrans_Pass3**: `js/main.js:1943-1946`. Pass3(하이드로 적분) 직후, `dU_by_dt_Sed → predictedGradients_Sed` 복사 동반. BoundaryPass에서 `txNewState_Sed`도 경계처리(`js/main.js:1953-1955`).
-- **UpdateBottom**: `js/main.js:2133-2143`. corrector step 완료 후, gradient/state shift 직전. 바닥 변화 → near-dry → (Bous일 때) tridiag 순서로 갱신.
+- **Pass1 → SedTrans_Pass1**: `js/main.js:2643-2646` (predictor), `js/main.js:2777-2780` (corrector). Pass1(플럭스/셀면 재구성) 직후 Pass2 전에 농도를 셀면 재구성. Pass2는 `useSedTransModel`을 uniform offset 28로 받아(`js/main.js:1025,2346`) 표사 플럭스 `txXFlux_Sed/txYFlux_Sed`를 계산.
+- **Pass3 → SedTrans_Pass3**: `js/main.js:2688-2691`. Pass3(하이드로 적분) 직후, `dU_by_dt_Sed → predictedGradients_Sed` 복사 동반. BoundaryPass에서 `txNewState_Sed`도 경계처리(`js/main.js:2698-2700`).
+- **UpdateBottom**: `js/main.js:2878-2888`. corrector step 완료 후, gradient/state shift 직전. 바닥 변화 → near-dry → (Bous일 때) tridiag 순서로 갱신.
 
 각 패스는 `runComputeShader_EncStack`로 command encoder에 스택됨. 즉 하이드로 패스와 같은 encoder 안에서 순차 dispatch (별도 frequency 게이트 없음 — 매 스텝).
 
@@ -59,7 +59,7 @@ shear_velocity = sqrt(f)·local_speed                               // :139
 shields        = shear_velocity²·sedC1_shields                     // :140
 ```
 
-`sedC1_shields = 1/((s-1)·g·d50)` (무차원화 계수, `constants_load_calc.js:510`; `s = sedC1_denrat = 2.65`, `d50` mm→m). 즉 `shields`는 `τ/((ρs-ρ)g d50)` 형태의 Shields 수에 해당.
+`sedC1_shields = 1/((s-1)·g·d50)` (무차원화 계수, `constants_load_calc.js:618`; `s = sedC1_denrat = 2.65`, `d50` mm→m). 즉 `shields`는 `τ/((ρs-ρ)g d50)` 형태의 Shields 수에 해당.
 
 **부유사 침식(entrainment):** 임계 Shields 초과 시
 
@@ -67,7 +67,7 @@ shields        = shear_velocity²·sedC1_shields                     // :140
 erosion = sedC1_erosion · (shields - sedC1_criticalshields) · local_speed   // :143-145 (음수면 0)
 ```
 
-`sedC1_erosion = sedC1_psi · (d50)^(-0.2)` (`constants_load_calc.js:508`, ψ=5e-5 기본). hard-bottom 잔여깊이 `B - hardbottom < delta`면 침식 0 (`:147-151`) — 비침식층 보호.
+`sedC1_erosion = sedC1_psi · (d50)^(-0.2)` (`constants_load_calc.js:616`, ψ=5e-5 기본). hard-bottom 잔여깊이 `B - hardbottom < delta`면 침식 0 (`:147-151`) — 비침식층 보호.
 
 **소류사 (Meyer-Peter–Müller):** 4 이웃셀에서 각 방향 소류사 플럭스를 계산하고 발산을 취함:
 
@@ -78,7 +78,7 @@ bedload_erosion = ½·(bedload_right_X - bedload_left_X)/dx
                 + ½·(bedload_up_Y   - bedload_down_Y)/dy          // :209
 ```
 
-`sedC1_bedloadMPM = 8·sqrt(g·(s-1)·d50³)` (`constants_load_calc.js:512`) — 고전적 MPM `q_b = 8(θ-θ_cr)^1.5` 계수와 일치. 소류사는 **부유사 소스항에는 더하지 않고**(`:215` 주석 명시), bed-update용으로만 `erosion_Sed`에 합산(`:239`).
+`sedC1_bedloadMPM = 8·sqrt(g·(s-1)·d50³)` (`constants_load_calc.js:620`) — 고전적 MPM `q_b = 8(θ-θ_cr)^1.5` 계수와 일치. 소류사는 **부유사 소스항에는 더하지 않고**(`:215` 주석 명시), bed-update용으로만 `erosion_Sed`에 합산(`:239`).
 
 **침강(deposition):** fall velocity × 농도, 가용량 상한:
 
@@ -86,7 +86,7 @@ bedload_erosion = ½·(bedload_right_X - bedload_left_X)/dx
 deposition = min(2·C_here, h·(1-n))·sedC1_fallvel               // :212-213
 ```
 
-`sedC1_fallvel`은 자연입자 항력식(A=25,B=1.25)으로 d50에서 도출(`constants_load_calc.js:514-522`).
+`sedC1_fallvel`은 자연입자 항력식(A=25,B=1.25)으로 d50에서 도출(`constants_load_calc.js:622-630`).
 
 **적분(소스 + 플럭스 발산):**
 
@@ -101,7 +101,7 @@ d_by_dt = (xflux_west-xflux_here)/dx + (yflux_south-yflux_here)/dy + source_term
 
 ### 2.3 확산항 (현재 비활성)
 
-수평 난류확산(`sedTurbDispersion` 배경 + `sedBreakingDispersionCoef`×breaking eddy viscosity) 코드는 `SedTrans_Pass3.wgsl:102-119`에 **전부 주석처리**되어 있음. 즉 현재 활성 빌드는 **이류 + 픽업/침강만**, 명시적 확산 없음. config 키(`sedTurbDispersion=0.01`, `sedBreakingDispersionCoef=0.1`, `constants_load_calc.js:91-92`)는 uniform으로 전달되나 셰이더에서 미사용.
+수평 난류확산(`sedTurbDispersion` 배경 + `sedBreakingDispersionCoef`×breaking eddy viscosity) 코드는 `SedTrans_Pass3.wgsl:102-119`에 **전부 주석처리**되어 있음. 즉 현재 활성 빌드는 **이류 + 픽업/침강만**, 명시적 확산 없음. config 키(`sedTurbDispersion=0.01`, `sedBreakingDispersionCoef=0.1`, `constants_load_calc.js:112-113`)는 uniform으로 전달되나 셰이더에서 미사용.
 
 ## 3. 지형변화 (morphology) — UpdateBottom
 
@@ -115,14 +115,14 @@ dB_cumulative = B_new - txBottomInitial             // :117 (누적 변화 추�
 
 `e_here`는 부유사 픽업 + 소류사 발산(`erosion_Sed`), `d_here`는 침강. 면값은 인접 평균(`:78-86`)으로 j+½, i+½ 성분 구성(`dB` vec4). `1-n` (n=porosity 0.40)으로 나누는 것이 Exner의 퇴적층 부피↔질량 변환. 경계 근처는 선형 ramp로 표사 억제(`:90-105`, boundary_type==2일 때 가장자리 10셀). hard-bottom 하한도 vec4 구성(`:107-114`).
 
-산출: `txtemp_SedTrans_Botttom`(새 B), `txtemp_SedTrans_Change`(누적). main.js에서 `txBottom`/`txBotChange_Sed`로 복사(`js/main.js:2135-2136`).
+산출: `txtemp_SedTrans_Botttom`(새 B), `txtemp_SedTrans_Change`(누적). main.js에서 `txBottom`/`txBotChange_Sed`로 복사(`js/main.js:2880-2881`).
 
 ### 3.1 바닥 변경 후 near-dry + tridiag 재계산 이유
 
 `txBottom`(수심/바닥고)은 하이드로 코어의 **near-dry 셀 판정**과 **Boussinesq 암시항의 tridiagonal 계수**에 직접 들어간다. 바닥고가 바뀌면:
 
-1. **Updateneardry** 재실행 (`js/main.js:2137-2138`) — 건습 경계·국소 수심 한계가 변했으므로 near-dry mask/계수 재산정.
-2. **UpdateTrid** 재실행 (`js/main.js:2139-2142`) — **단, `NLSW_or_Bous == 1`(Celeris Boussinesq)일 때만**. tridiag 계수는 수심 함수이므로 분산항 암시해를 위해 갱신 필요. NLSW는 암시항이 없어 skip (코드 주석 명시).
+1. **Updateneardry** 재실행 (`js/main.js:2882-2883`) — 건습 경계·국소 수심 한계가 변했으므로 near-dry mask/계수 재산정.
+2. **UpdateTrid** 재실행 (`js/main.js:2884-2887`) — **단, `NLSW_or_Bous == 1`(Celeris Boussinesq)일 때만**. tridiag 계수는 수심 함수이므로 분산항 암시해를 위해 갱신 필요. NLSW는 암시항이 없어 skip (코드 주석 명시).
 
 이 갱신을 빠뜨리면 다음 스텝의 tridiag 솔버가 옛 수심 계수를 쓰게 되어 분산해가 일관성을 잃는다.
 
@@ -130,9 +130,9 @@ dB_cumulative = B_new - txBottomInitial             // :117 (누적 변화 추�
 
 `main.js`가 fetch하는 셰이더 파일로 활성본 확정:
 
-- `SedTrans_Pass1.wgsl` — `js/main.js:1348` ✅ 활성
-- `SedTrans_Pass3.wgsl` — `js/main.js:1349` ✅ 활성
-- `SedTrans_UpdateBottom.wgsl` — `js/main.js:1361` ✅ 활성
+- `SedTrans_Pass1.wgsl` — `js/main.js:1573` ✅ 활성
+- `SedTrans_Pass3.wgsl` — `js/main.js:1574` ✅ 활성
+- `SedTrans_UpdateBottom.wgsl` — `js/main.js:1586` ✅ 활성
 
 **비활성(레거시):**
 
@@ -161,6 +161,6 @@ Celeris 표사는 실시간 브라우저 시뮬레이터의 **경량·스크리�
 - 셀면 재구성: `shaders/SedTrans_Pass1.wgsl:98-132`
 - Shields/픽업/MPM/침강/적분: `shaders/SedTrans_Pass3.wgsl:122-240`
 - Exner bed update: `shaders/SedTrans_UpdateBottom.wgsl:84-120`
-- closure 파라미터 유도: `js/constants_load_calc.js:85-92,508-522`
-- 파이프라인 삽입: `js/main.js:1898-1901,1943-1946,2133-2143`
-- 활성 셰이더 fetch: `js/main.js:1348-1361`
+- closure 파라미터 유도: `js/constants_load_calc.js:106-113,616-630`
+- 파이프라인 삽입: `js/main.js:2643-2646,2688-2691,2878-2888`
+- 활성 셰이더 fetch: `js/main.js:1573-1586`

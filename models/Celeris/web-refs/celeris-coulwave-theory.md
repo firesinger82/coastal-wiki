@@ -2,7 +2,7 @@
 title: "Celeris 분산 방정식 계보 — Madsen(모드1) vs COULWAVE 완전비선형(모드2) + S/T/E 항 매핑"
 model: Celeris
 citation_status: verified
-source: "모드 정의·계수·S/T/E/F/G 항은 소스 직접 read(constants_load_calc.js:32-34, Pass3A/3B/Pass3_COULWAVE.wgsl, Pass3_Bous.wgsl, 2026-06-15). 원논문 서지(권·호·페이지·DOI)는 WebSearch landing-page 확인. 단, 코드↔논문 식 동등성은 '표준형 일치' 수준의 구조 식별이며 각 논문 유도 본문 정독은 아님(명시)."
+source: "모드 정의·계수·S/T/E/F/G 항은 소스 직접 read(constants_load_calc.js:36-38, Pass3A/3B/Pass3_COULWAVE.wgsl, Pass3_Bous.wgsl, 2026-06-15). 원논문 서지(권·호·페이지·DOI)는 WebSearch landing-page 확인. 단, 코드↔논문 식 동등성은 '표준형 일치' 수준의 구조 식별이며 각 논문 유도 본문 정독은 아님(명시)."
 note_date: 2026-06-15
 source_scope: Celeris-WebGPU/js, Celeris-WebGPU/shaders
 ---
@@ -17,7 +17,7 @@ source_scope: Celeris-WebGPU/js, Celeris-WebGPU/shaders
 
 ## 0. 핵심 정정 — 모드는 "단·다층"이 아니라 "비선형 차수"로 갈린다
 
-`js/constants_load_calc.js:32` 주석이 모드를 직접 규정한다 (verbatim):
+`js/constants_load_calc.js:36` 주석이 모드를 직접 규정한다 (verbatim):
 
 ```
 NLSW_or_Bous: 0,  // Choose 0 for Non-linear Shallow Water (NLSW),
@@ -44,7 +44,7 @@ NLSW_or_Bous: 0,  // Choose 0 for Non-linear Shallow Water (NLSW),
 ### 1.1 모드 1 (Bous) — Madsen & Sørensen 1992
 - **Madsen, P.A., Sørensen, O.R. (1992)** "A new form of the Boussinesq equations with improved linear dispersion characteristics. Part 2. A slowly-varying bathymetry." *Coastal Engineering* **18**(3-4):183-204. DOI: [10.1016/0378-3839(92)90019-Q](https://doi.org/10.1016/0378-3839(92)90019-Q).
 - (Part 1: Madsen, Murray, Sørensen (1991) *Coastal Engineering* **15**:371-388 — 평탄지형 유도.)
-- B 계수로 선형분산을 Padé[2,2]에 맞춰 향상. **코드 `Bcoef = 1/15`** (`constants_load_calc.js:33`, "optimum value for this set of equations")가 이 B. dispersive 항이 정수심 d의 d²·d³로 스케일(`Pass3_Bous.wgsl:272-286`).
+- B 계수로 선형분산을 Padé[2,2]에 맞춰 향상. **코드 `Bcoef = 1/15`** (`constants_load_calc.js:37`, "optimum value for this set of equations")가 이 B. dispersive 항이 정수심 d의 d²·d³로 스케일(`Pass3_Bous.wgsl:272-286`).
 
 ### 1.2 모드 2 (COULWAVE) — 완전비선형 확장 Boussinesq 계보
 

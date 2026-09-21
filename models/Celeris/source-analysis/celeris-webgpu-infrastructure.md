@@ -28,13 +28,13 @@ Celeris-WebGPU는 **빌드 단계 없는** ES6 모듈 + WGSL 컴퓨트 셰이더
 | `createUniformBuffer` | 기본 256 B | 패스별 uniform (라인 81) |
 | `create_Depth_Texture` | depth24plus | 3D 렌더 깊이 (라인 88) |
 
-생성된 모든 텍스처는 `allTextures` Set에 추적 등록 → 재시작 시 일괄 `destroy()` (`js/main.js:191-195`).
+생성된 모든 텍스처는 `allTextures` Set에 추적 등록 → 재시작 시 일괄 `destroy()` (`js/main.js:225-229`).
 
 ---
 
 ## 1. 텍스처 상태 규약 (centerpiece)
 
-채널 의미는 `docs/architecture/DATA_AND_TEXTURES.md`와 대조했고, 진단 셰이더(CalcMeans/CalcWaveHeight/ExtractTimeSeries) 실제 `.x/.y/.z/.w` 접근으로 교차 검증했다. 할당은 모두 `js/main.js:341-456`.
+채널 의미는 `docs/architecture/DATA_AND_TEXTURES.md`와 대조했고, 진단 셰이더(CalcMeans/CalcWaveHeight/ExtractTimeSeries) 실제 `.x/.y/.z/.w` 접근으로 교차 검증했다. 할당은 모두 `js/main.js:449-576`.
 
 ### 1a. 주 상태 (primary state)
 
@@ -92,7 +92,7 @@ Celeris-WebGPU는 **빌드 단계 없는** ES6 모듈 + WGSL 컴퓨트 셰이더
 | `predictedF_G_star` / `F_G_star_oldGradients` / `F_G_star_oldOldGradients` | Bous 전용 F*,G* (현/이전/두스텝전) | 377-379 |
 | `*_Sed` 변종 | 퇴적물 적분용 | 374-376 |
 
-스텝 끝 시프트: `oldGradients→oldOldGradients`, `predictedGradients→oldGradients` (`js/main.js:2146-2147`).
+스텝 끝 시프트: `oldGradients→oldOldGradients`, `predictedGradients→oldGradients` (`js/main.js:2896-2897`).
 
 ### 1f. PCR 삼중대각 솔버 (Bous/COULWAVE)
 
@@ -151,7 +151,7 @@ Celeris-WebGPU는 **빌드 단계 없는** ES6 모듈 + WGSL 컴퓨트 셰이더
 - WGSL: `@binding(8) var txtemp_Means: texture_storage_2d<rgba32float, write>` (`shaders/CalcMeans.wgsl:20`)
 - Layout: binding 8을 `storageTexture{access:'write-only', format:'rgba32float', viewDimension:'2d'}`로 선언 (`js/Handler_CalcMeans.js:74-83`)
 - BindGroup: binding 8 → `txtemp_Means.createView()` (`js/Handler_CalcMeans.js:175-177`)
-- main.js: `create_CalcMeans_BindGroup(device, CalcMeans_uniformBuffer, txMeans, txMeans_Speed, ..., txtemp_Means, ...)` 인자 순서 (`js/main.js:1098`)
+- main.js: `create_CalcMeans_BindGroup(device, CalcMeans_uniformBuffer, txMeans, txMeans_Speed, ..., txtemp_Means, ...)` 인자 순서 (`js/main.js:1297`)
 
 binding 14개 모두 셰이더의 `@binding(0..13)`와 일치해야 하며, 하나라도 어긋나면 검증 오류. **공유 레이아웃** 주의: `Handler_Pass2.js`는 standard/HLLC/HLLEM 변종, `Handler_Pass3.js`는 NLSW/Bous/COULWAVE를 한 레이아웃으로 공유 — 미사용 바인딩도 호환 계약의 일부로 취급해야 한다 (WEBGPU_BINDING_PATTERN.md:36-46). handler 주석에 "fragment shader"라 적힌 컴퓨트 바인딩이 많으니 주석 말고 `@binding` 선언을 신뢰 (라인 48-50).
 
@@ -223,21 +223,21 @@ binding 14개 모두 셰이더의 `@binding(0..13)`와 일치해야 하며, 하�
 - running mean: `means_new = means·(1−1/n) + state·(1/n)`, `n = n_time_steps_means` (라인 75-78).
 - max 트래킹: u/v/speed/eta_max, hu²/hv²/momflux_max (n>1일 때, 라인 88-97).
 - 출력: `txtemp_Means`(means), `txtemp_Means_Speed`(maxes), `txtemp_Means_Momflux`(mom maxes + |vort| 평균), `txModelVelocities=(u,v,eta,h)` (라인 99-102). 건셀은 `eta=−10·base_depth` placeholder (라인 55-57).
-- 디스패치 후 `txtemp_Means*`→`txMeans*` 복사, `n_time_steps_means`는 매 corrector 스텝 +1 (`js/main.js:2123-2124, 2165-2170`).
+- 디스패치 후 `txtemp_Means*`→`txMeans*` 복사, `n_time_steps_means`는 매 corrector 스텝 +1 (`js/main.js:2868-2869,2915-2920`).
 
 ### 5b. CalcWaveHeight (`shaders/CalcWaveHeight.wgsl`, `Handler_CalcWaveHeight.js`)
 입력 `txState`(η_old), `txNewState`(η_new), `txMeans`(η_mean), `txWaveHeight`(이전). η' = η_new − η_mean, `sum_eta2 += η'²` 누적 (n≤1이면 리셋) → `variance = Ση'²/n`, `σ=√variance` (라인 31-37).
 - **H_mean = 2.829·σ** (RMS 파고), **H_sig = 4.000·σ** (유의파고) — Rayleigh 가정 (라인 39-41).
 - 출력 `txtemp_WaveHeight = (Ση'², (H_sig−old)/old 상대변화, H_sig, H_mean)` (라인 42, 75). zero-crossing 분기는 주석처리됨.
-- main.js는 `txstateUVstar`를 binding1(txState)로 넘김 (`js/main.js:1111`), 디스패치 후 `txtemp_WaveHeight`→`txWaveHeight`, `n_time_steps_waveheight` +1 (라인 2126-2127, 2174-2175).
+- main.js는 `txstateUVstar`를 binding1(txState)로 넘김 (`js/main.js:1310`), 디스패치 후 `txtemp_WaveHeight`→`txWaveHeight`, `n_time_steps_waveheight` +1 (라인 2126-2127, 2174-2175).
 
 ### 5c. ExtractTimeSeries (`shaders/ExtractTimeSeries.wgsl`, `Handler_ExtractTimeSeries.js`)
-**workgroup_size(1,1)**, 디스패치 폭 = `NumberOfTimeSeries + 1` (`js/main.js:2652`). 1D 텍스처 `txTimeSeries_Data`에 기록:
+**workgroup_size(1,1)**, 디스패치 폭 = `NumberOfTimeSeries + 1` (`js/main.js:3515`). 1D 텍스처 `txTimeSeries_Data`에 기록:
 - idx 0 = **tooltip**: 마우스 위치의 `(bottom, η, Hs, friction)`. river_sim이면 `(bottom, η, speed, friction)`, disturbanceType>1이면 Hs 대신 `txMeans_Speed.w`(max η) (라인 31-54).
 - idx ≥1 = **시계열 프로브**: `txTimeSeries_Locations`에서 격자좌표 읽어 `(time, η, P, Q)` 기록 (라인 55-61).
-- readback: `readToolTipTextureData`가 1D 텍스처를 256B/행 버퍼로 `copyTextureToBuffer` → `mapAsync(READ)` → `timeSeriesData[i].{time,eta,P,Q}`에 push (`js/Time_Series.js:58-115`). `downloadTimeSeriesData`가 위치·시계열을 텍스트로 내보냄 (라인 128-171). 차트는 1초 간격 갱신 (`js/main.js:4367`).
+- readback: `readToolTipTextureData`가 1D 텍스처를 256B/행 버퍼로 `copyTextureToBuffer` → `mapAsync(READ)` → `timeSeriesData[i].{time,eta,P,Q}`에 push (`js/Time_Series.js:60-128`). `downloadTimeSeriesData`가 위치·시계열을 텍스트로 내보냄 (라인 128-171). 차트는 1초 간격 갱신 (`js/main.js:5488`).
 
 ---
 
 ## 부록: 렌더 캐시 패킹
-`shaders/Copytxf32_txf16.wgsl`가 매 프레임 f32 시뮬 텍스처 → `txRenderVarsf16`(3 layer, f16)로 패킹해 렌더 시 full rgba32float 샘플링 압력을 줄인다 (`js/main.js:2184`). 레이어 채널 의미·시각화는 `celeris-render` 참조.
+`shaders/Copytxf32_txf16.wgsl`가 매 프레임 f32 시뮬 텍스처 → `txRenderVarsf16`(3 layer, f16)로 패킹해 렌더 시 full rgba32float 샘플링 압력을 줄인다 (`js/main.js:2980`). 레이어 채널 의미·시각화는 `celeris-render` 참조.
