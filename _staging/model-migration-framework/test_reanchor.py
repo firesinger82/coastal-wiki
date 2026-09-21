@@ -60,6 +60,19 @@ def main():
     else:
         skipped = len(CELERIS)
 
+    # Fortran 선언 문법 변경: 심볼명이 앵커 (Delft3D 실측)
+    old_decl = "   real(kind=dp), allocatable, target :: s1max(:) !< [m] maximum waterlevel"
+    new_file = ["   real(kind=dp), allocatable, target, dimension(:) :: s0 !< [m] waterlevel",
+                "   real(kind=dp), allocatable, target, dimension(:) :: s1max !< [m] maximum waterlevel"]
+    r = ra.find_anchor(old_decl, new_file, "m_flow.f90", hint=1)
+    if r["line"] != 2 or r["status"] != "RESOLVED_BY_SIGNATURE":
+        fails.append(f"선언 문법 변경 재앵커 실패: {r}")
+    # 선언 signature 는 :: 뒤 심볼이다 (타입 표기의 괄호·등호에 속지 않는다)
+    if ra._signature("real(kind=dp), allocatable :: foo") != "::foo":
+        fails.append(f"선언 signature 오류: {ra._signature('real(kind=dp), allocatable :: foo')}")
+    # 심볼이 그 파일에서 사라졌으면 찾지 않는다
+    if ra.find_anchor("   integer :: md_ptr", ["   integer :: other"], "x.f90")["status"] != "NOT_FOUND":
+        fails.append("사라진 심볼을 잘못 정박")
     # 옛 줄 자체가 주석이면(Fortran 섹션 표제 등) 주석 일치가 정상이다
     fort = ["      subroutine X", "! loop over sweeps", "      do i=1,n"]
     r = ra.find_anchor("! loop over sweeps", fort, "x.ftn90", hint=2)
@@ -75,7 +88,7 @@ def main():
 
     n = len(UNIT) + len(CELERIS)
     print(f"fixtures {n} (Celeris 실측 {len(CELERIS)}{', 건너뜀' if skipped else ''})"
-          f" + 규칙검사 3 | 실패 {len(fails)}")
+          f" + 규칙검사 6 | 실패 {len(fails)}")
     for f in fails:
         print("  FAIL:", f)
     if fails:

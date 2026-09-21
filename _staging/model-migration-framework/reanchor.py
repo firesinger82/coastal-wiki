@@ -61,15 +61,24 @@ def _strip_comment(line, path=""):
 
 
 _ASSIGN = re.compile(r"(?<![=!<>+\-*/])=(?!=)")
+# Fortran 선언: `real(kind=dp), allocatable, target :: s1max(:) !< …` 의 `s1max`
+_DECL = re.compile(r"::\s*([A-Za-z_][A-Za-z0-9_]*)")
 
 
 def _signature(s):
     """식이 바뀌어도 남는 식별 부분.
 
-    호출·선언은 `(` 앞, 할당문은 `=` 왼쪽(대상 이름), 그 외는 앞 40자.
-    인자 추가(`foo(a,b)` → `foo(a,b,c)`)나 우변 확장
-    (`t = a*b` → `t = a*b + c`)에도 같은 signature 가 나온다.
+    ⑴ **선언은 `::` 뒤의 심볼명**. Fortran 은 선언 문법이 통째로 바뀌기도 한다 —
+       Delft3D 실측: `..., target :: s1max(:)` → `..., target, dimension(:) :: s1max`.
+       타입·속성·차원 표기가 다 달라져도 심볼명은 남는다.
+    ⑵ 호출·정의는 `(` 앞, ⑶ 할당문은 `=` 왼쪽, ⑷ 그 외는 앞 40자.
+
+    선언을 먼저 보는 이유: 선언문에도 `(`(예: `real(kind=dp)`)와 `=`(예: `kind=dp`)가
+    있어서 ⑵⑶ 을 먼저 적용하면 타입 표기를 signature 로 잡는다.
     """
+    m = _DECL.search(s)
+    if m:
+        return "::" + m.group(1)
     if "(" in s:
         head = s.split("(")[0].strip()
         if len(head) >= 8:
@@ -101,6 +110,15 @@ def find_anchor(old_line, new_lines, path="", hint=None):
     hits = [i + 1 for i, l in enumerate(new_lines)
             if _norm(l) == key or _norm(_strip_comment(l, path)) == key]
     if not hits:
+        # 줄 전체가 바뀐 경우(선언 문법 변경 등) signature 로 되돌아간다
+        sig = _signature(key)
+        live = [i + 1 for i, l in enumerate(new_lines)
+                if l.strip() and not is_commented(l, path) and _signature(_norm(l)) == sig]
+        if live:
+            pick = min(live, key=lambda h: abs(h - hint)) if hint else live[0]
+            if len(live) > 1 and hint is None:
+                return dict(line=pick, status="AMBIGUOUS", candidates=live)
+            return dict(line=pick, status="RESOLVED_BY_SIGNATURE", candidates=live)
         return dict(line=None, status="NOT_FOUND", candidates=[])
 
     # 옛 줄 자체가 주석이면(섹션 표제 등) 주석 일치가 정상이다.
