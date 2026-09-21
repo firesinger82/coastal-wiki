@@ -32,3 +32,4 @@ DESIGN v2.0 파일럿 라운드(ADCIRC·EFDC·SWAN·ROMS·Celeris·asgs·hydromt
 ## 정리 대상
 
 - `~/.cache/coastal-snapshots/` staging clone — 의도적으로 보존 중(게이트 fixture 가 Celeris clone 을 참조한다: `test_reanchor.py:13`). 삭제 시 게이트 fixture 3건이 건너뛰기로 바뀐다.
+- ~~Delft3D 롤백 트리 1.4G + `/opt/coastal-snapshots` tar 562M~~ **✅정리 2026-09-21** — `_staging/delft3d-prescan/rollback-cleanup-delft3d.sh`. 표본 200 `--filters` 대조 불일치 0 확인 후 삭제, 약 2.0G 회수. `models/` 의 `.old-*` 자산은 이제 **0건**이다.

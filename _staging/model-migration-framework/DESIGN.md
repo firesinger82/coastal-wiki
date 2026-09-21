@@ -243,6 +243,15 @@ Celeris 파일럿 추가(32).
     참이다. 잠금 확인은 **소유자가 아닌 일반 사용자 권한으로** 실행하거나 `-perm` 비트로 검사한다.
     실측: sudo 스크립트 최종 단계가 `82713개 쓰기 가능`으로 오탐 실패, 실제 잠금은 정상이었다.
 
+33. **롤백 자산 폐기 전 복원 검증에 EOL 필터를 적용하지 않음** → 저장된 blob 과 체크아웃 결과는
+    같은 바이트가 아니다. `.gitattributes` 가 CRLF 를 지정한 저장소에서 `git show <sha>:<path>` 는
+    **LF 원본**을 주고 디스크 파일은 **CRLF** 다. 복원은 체크아웃으로 하므로 대조도
+    `git cat-file --filters <sha>:<path>` 로 해야 한다. 실측(Delft3D, 2026-09-21): raw blob 대조는
+    표본 200 중 **5건 불일치**(전부 `.vcproj` 등 Windows 파일), `--filters` 대조는 **0건**.
+    raw blob 방식은 안전 방향의 오탐이라 데이터를 잃지는 않지만 정리를 부당하게 막는다.
+    부수 규칙: 트리 목록은 공백 포함 경로 때문에 `ls-tree -r -z --name-only` + NUL 분리로 읽는다
+    (`.split()` 은 경로를 쪼갠다 — SFINCS 비교에서 같은 버그가 있었다).
+
 ## PARSER SELF-TEST / GRAMMAR REGRESSION GATE
 
 **framework 실행 전 통과 필수.** 2026-09-20 ADCIRC 후속 정정에서 parser 결함(확장자 우선순위)이 migration 누락으로 이어진 사실이 확인됐다. parser 정확성은 impact filter 신뢰의 **선행 조건**이다.

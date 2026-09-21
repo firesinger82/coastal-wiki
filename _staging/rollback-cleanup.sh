@@ -34,13 +34,17 @@ for m,r,sha,suf in CASES:
     old  = W/f"models/{m}/raw/source_code/{r}.old-{suf or sha}"
     if git(inst,"cat-file","-t",sha).stdout.decode().strip() != "commit":
         print(f"  FAIL {m}: 설치 트리에 pinned 커밋 객체 없음"); bad+=1; continue
-    files = git(inst,"ls-tree","-r","--name-only",sha).stdout.decode("utf-8","replace").split()
+    # -z + NUL 분리: 공백 포함 경로가 .split() 에 쪼개지는 것을 막는다 (failure mode 33)
+    raw = git(inst,"ls-tree","-r","-z","--name-only",sha).stdout
+    files = [f.decode("utf-8","replace") for f in raw.split(b"\0") if f]
     files = [f for f in files if (old/f).is_file()]
     if not files:
         print(f"  WARN {m}: .old 디렉터리 비교 대상 없음(이미 정리됨?)"); continue
     smp = random.sample(files, min(12,len(files))); mism=0
     for f in smp:
-        blob = git(inst,"show",f"{sha}:{f}").stdout
+        # --filters: 체크아웃이 실제로 만드는 바이트(EOL 변환 적용). raw blob 대조는
+        # CRLF 저장소에서 가짜 불일치를 낸다 — failure mode 33 (Delft3D 실측 200중 5).
+        blob = git(inst,"cat-file","--filters",f"{sha}:{f}").stdout
         if hashlib.sha256(blob).hexdigest() != hashlib.sha256((old/f).read_bytes()).hexdigest():
             mism+=1
     print(f"  {'OK  ' if mism==0 else 'FAIL'} {m:9} 표본 {len(smp)} 대조 불일치 {mism}")
