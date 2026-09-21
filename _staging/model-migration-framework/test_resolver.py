@@ -75,7 +75,29 @@ def main():
         if rv.resolve(probe, "models/ROMS/source-analysis/x.md", idx, wiki=W)["status"] == "UNRESOLVED":
             fails.append(f"짧은 stem 실재 파일이 미해소: {probe}")
 
-    print(f"fixtures {len(FIX)} + 규칙검사 5 | 실패 {len(fails)}")
+    # note_path 계약: 절대경로는 **거부**한다 (failure mode 34).
+    # 허용하면 owning_model 이 조용히 None 을 돌려 전 참조가 cross-model 로 떨어지고,
+    # 실패가 아니라 다른 저장소로의 잘못된 귀속이 나온다 — 게이트로는 잡히지 않는다.
+    # 실측 2026-09-21: roms_test 인용이 0건이 아니라 45/36 으로 집계됐다.
+    abs_note = str(W/"models/ROMS/source-analysis/roms_4dvar.md")
+    for bad, why in ((abs_note, "절대경로"), ("../outside/x.md", "위키 밖 경로")):
+        try:
+            rv.owning_model(bad)
+            fails.append(f"note_path 계약 미강제: {why} 를 받아들임 ({bad})")
+        except ValueError:
+            pass
+    # 정상 상대경로는 그대로 통과해야 한다(과잉 거부 금지)
+    for good, want in (("models/ROMS/source-analysis/roms_4dvar.md", "ROMS"),
+                       ("concepts/waves/01-theory.md", None),
+                       ("textbook/notes/theory-x.md", None)):
+        try:
+            got = rv.owning_model(good)
+            if got != want:
+                fails.append(f"owning_model({good}) = {got} != {want}")
+        except ValueError as e:
+            fails.append(f"정상 경로를 거부함: {good} ({e})")
+
+    print(f"fixtures {len(FIX)} + 규칙검사 6 | 실패 {len(fails)}")
     for f in fails:
         print("  FAIL:", f)
     if fails:

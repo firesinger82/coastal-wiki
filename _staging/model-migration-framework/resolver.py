@@ -47,9 +47,39 @@ def build_index(wiki):
     return idx
 
 
+WIKI_ROOTS = {"models", "concepts", "textbook", "experience", "examples",
+               "references", "research", "standards", "data", "tools",
+               "_staging", "_archive"}
+
+
+def check_note_path(note_path):
+    """`note_path` 는 **위키 루트 기준 상대경로**여야 한다 (예: `models/ROMS/x.md`).
+
+    이 계약을 강제하는 이유 — 어기면 예외가 아니라 **그럴듯한 오답**이 나오기 때문이다.
+    절대경로를 넘기면 `parts[0]` 이 `"/"` 라서 `owning_model` 이 조용히 None 을 돌리고,
+    모든 참조가 소유 모델 단계를 건너뛰어 cross-model 탐색으로 떨어진다. 결과는
+    실패가 아니라 **다른 저장소로의 잘못된 귀속**이다.
+
+    실측(2026-09-21): 남은 BEHIND 저장소 집계에서 절대경로를 넘긴 탓에
+    `roms_test` 가 인용 0건이 아니라 **file-line 45 · file-only 36** 으로 나왔다.
+    RESOLVED 9,120→0 · RESOLVED_CROSS_MODEL 46→9,044 · AMBIGUOUS 458→1,332.
+    게이트는 통과한다 — 함수가 틀린 게 아니라 잘못 불린 것이라서. failure mode 34.
+    """
+    p = Path(note_path)
+    if p.is_absolute():
+        raise ValueError(
+            f"note_path 는 위키 상대경로여야 한다(절대경로를 받음): {note_path}\n"
+            f"  → wiki 루트 기준으로 바꿔 넘겨라: Path(p).relative_to(WIKI)")
+    if p.parts and p.parts[0] not in WIKI_ROOTS:
+        raise ValueError(
+            f"note_path 의 첫 경로요소가 위키 최상위 디렉터리가 아니다: {note_path}\n"
+            f"  → 허용: {sorted(WIKI_ROOTS)}")
+    return p
+
+
 def owning_model(note_path):
     """노트 경로에서 소유 모델을 얻는다. concepts/textbook 은 None."""
-    parts = Path(note_path).parts
+    parts = check_note_path(note_path).parts
     return parts[1] if len(parts) > 2 and parts[0] == "models" else None
 
 

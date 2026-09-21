@@ -252,6 +252,19 @@ Celeris 파일럿 추가(32).
     부수 규칙: 트리 목록은 공백 포함 경로 때문에 `ls-tree -r -z --name-only` + NUL 분리로 읽는다
     (`.split()` 은 경로를 쪼갠다 — SFINCS 비교에서 같은 버그가 있었다).
 
+34. **호출 규약 위반이 예외가 아니라 그럴듯한 오답을 낸다** → `resolver.resolve()` 의 `note_path` 는
+    **위키 상대경로**다. 절대경로를 넘기면 `owning_model` 이 조용히 None 을 돌려 소유 모델 단계를
+    건너뛰고 전 참조가 cross-model 탐색으로 떨어진다. 실패가 아니라 **다른 저장소로의 잘못된 귀속**이다.
+    실측(2026-09-21, 남은 BEHIND 저장소 집계): `roms_test` 인용이 0건이 아니라 file-line 45·file-only 36
+    으로 나왔다(RESOLVED 9,120→0 · CROSS_MODEL 46→9,044 · AMBIGUOUS 458→1,332). 없는 파일럿을
+    만들어 낼 뻔했다.
+    **세 게이트는 이런 결함을 잡지 못한다** — 함수가 틀린 게 아니라 잘못 불린 것이고, 게이트는
+    함수를 올바르게 부르기 때문이다. 그래서 규약은 문서가 아니라 **코드로 강제**한다:
+    `check_note_path()` 가 절대경로와 위키 밖 경로를 `ValueError` 로 거부하고, 게이트에
+    "거부한다 / 정상 경로는 과잉 거부하지 않는다" fixture 를 둔다.
+    일반화: **조용히 틀릴 수 있는 인터페이스는 계약을 런타임에 강제한다.** 산출물 검증만으로는
+    부족하다 — 검증자도 같은 잘못된 호출을 쓰기 때문이다.
+
 ## PARSER SELF-TEST / GRAMMAR REGRESSION GATE
 
 **framework 실행 전 통과 필수.** 2026-09-20 ADCIRC 후속 정정에서 parser 결함(확장자 우선순위)이 migration 누락으로 이어진 사실이 확인됐다. parser 정확성은 impact filter 신뢰의 **선행 조건**이다.
