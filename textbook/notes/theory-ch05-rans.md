@@ -30,7 +30,7 @@ related:
 ## 1. 난류의 기원과 Reynolds 수
 
 - **난류는 운동량 방정식의 비선형 항($u\,\partial u/\partial x$ 등)에서 발생** — 그 중요도는 **Reynolds 수 = 비선형/점성 항의 비**(상세 정의는 [[theory-ch04-navier-stokes]] §5 canonical)로 판정 (stewart-physical-ocean, p.129, §8.2). 분자 점성은 수 mm 거리에서만 중요, 경계 영향이 내부로 전달되는 통로가 곧 난류.
-- **환경 유동은 거의 항상 난류**: 대양은 $U\sim0.1$ m/s·$L\sim1$ Mm 로 $\mathrm{Re}\sim10^{11}$ — 비선형 항이 $\mathrm{Re}>10\text{–}1000$ 에서 중요하므로 "the ocean is turbulent" (stewart-physical-ocean, p.130).
+- **대양의 대표 규모 유동은 난류**: 대양은 $U\sim0.1$ m/s·$L\sim1$ Mm 로 $\mathrm{Re}\sim10^{11}$ — 비선형 항이 $\mathrm{Re}>10\text{–}1000$ 에서 중요하므로 "the ocean is turbulent" (stewart-physical-ocean, p.130; `textbook/md/stewart_textbook.md:7222-7224`).
 - **같은 기하·같은 Re → 같은 유동 패턴**(1 mm vs 1 m 원기둥 동일) (stewart-physical-ocean, p.130-131, Fig. 8.3). ※원문 교재의 난류 5특성 정식 목록(비가역성 등)은 stewart 서술로 응축.
 
 ## 2. Reynolds 분해와 평균
