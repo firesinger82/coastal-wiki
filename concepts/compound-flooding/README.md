@@ -13,9 +13,11 @@
 | 파일 | 상태 | 비고 |
 |---|---|---|
 | `README.md` | self (governance) | 이 파일 |
-| `01-concept.md` | (작성 예정) | 복합침수 정의·인자(coastal/pluvial/fluvial)·복합 메커니즘·위험 |
-| `06-model-application.md` | (작성 예정) | 침수 모델 스펙트럼 link-hub (full→reduced→ML) |
-| `02~05` | (미생성) | 이론·분석법·예제·(05 한국 연안도시 침수) — 후속 |
+| `01-concept.md` | ✅ **verified** | 복합침수 정의·인자(coastal/pluvial/fluvial)·복합 메커니즘·위험 |
+| `03-analysis-methods.md` | ✅ **verified** (2026-09-22) | 확률 해석 — 재현기간·조우확률, 연최대치+GEV vs 조석⊗해일 결합확률(convolution 8:5), 독립 가정의 붕괴, USACE LACPR 4단계 체인(JPM-OS·월류 Monte Carlo·내수 box model). ★강우에는 빈도가 붙지 않는다 — stage frequency 의 N년은 외수 빈도다 |
+| `06-model-application.md` | ✅ **verified** | 침수 모델 스펙트럼 link-hub (full→reduced→ML) |
+| `wetting-drying-cross-model.md` | ✅ **verified** | 침수-노출 판정 8모델 대조 |
+| `02`·`04`·`05` | (미생성) | 이론·도구·예제(05 한국 연안도시 침수) — 후속 |
 
 ## 출처 원칙
 

@@ -44,7 +44,7 @@
 | 파일 | 비고 |
 |---|---|
 | `stewart_textbook.pdf` | Stewart — 물리해양학 |
-| `801443089-Hydraulics-and-Hydrology.pdf` | 수리·수문학 |
+| `801443089-Hydraulics-and-Hydrology.pdf` | **USACE LACPR 수리·수문 부록** (교재 아님 — JPM-OS·제방월류·내수침수) |
 | `preview-9780080570549_A23597767.pdf` | 미분류 (제목 확인 필요) |
 | `885214645-Pando-e-2004.pdf` | 미분류 |
 
