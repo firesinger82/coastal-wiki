@@ -17,8 +17,8 @@
 | `04-code-and-tools.md` | ✅ **verified** (2026-06-18) | swash 수치모델 점검 — 모델 swash-handling(SWASH·XBeach·FUNWAVE)을 검수된 source-analysis 로 연결(wetting-drying·breaking·runup·비정수압). NLSW 해·VOF/SPH·한국검증은 source-needed 잔존 |
 | `02-theory.md` | ✅ **verified** (2026-06-18) | NLSW swash 해(Shen-Meyer 1963·Antuono 2010, 문헌 cross-ref)·Iribarren/surf similarity scaling·runup 매개변수화(R_u2%·front velocity Eq2-4)·uprush/backwash 비대칭. **교과서 page 인용 verified**: surf similarity ζ=tanβ/√(H0/L0) coastal-processes p.26 §3.3.1 / run-up 속도·계수 coastal-structures p.20-23 §2.3. Hunt1959·Stockdon2006·breaker-type 임계값은 source-needed(교과서 본문 미보유) |
 | `03-analysis-methods.md` | ✅ **verified** (2026-09-22) | R2% 분해(setup+swash, inc/IG)·매개변수화 3종 실식(Stockdon·Larson·Ghonim, ShorelineS 구현 기준)·★runupform fallback 함정·파라미터화 vs shoreline 해상 두 경로. 잔여: 원논문 미판독·scalogram/shoreline tracking 미작성 |
+| `06-model-application.md` | ✅ **verified** (2026-09-22) | 처오름을 모델에서 **꺼내는** 일 — 출력 설계 3종 대조. SWASH `SwashRunupHeight`(보간 O, **1D·동향 전제**) vs XBeach runup gauge(보간 X, **게이지=행**). ★`rugdepth≤eps` 는 조용히 `eps` 로 승격 → 기본 설정에서 처오름 임계 = 침수-건조 임계. FUNWAVE·Celeris 출력 경로는 **미조사**(부재 아님) |
 | `05-examples.md` | (미생성) | 한국 해빈 swash·runup 관측 사례 |
-| `06-model-application.md` | (미생성) | XBeach/SWASH 적용 워크플로 — `models/` 작성 후 |
 
 ## 출처 원칙
 
