@@ -241,4 +241,16 @@ def resolve(ref, note_path, index, max_line=None, wiki=None):
                     [p for c in owners.values() for p in c],
                     f"복수 모델 보유: {', '.join(sorted(owners))} — 번들 사본 가능성")
 
+    # 5. 슬래시 축약 — `TriDiag_PCRx/y.wgsl` = `…x.wgsl` + `…y.wgsl` 두 파일의 압축 표기다.
+    #    파일 참조가 아니므로 UNRESOLVED 로 세면 안 된다. 파서의 NUMERIC_STEM
+    #    (`swancom1/5.ftn`)과 같은 현상인데 stem 이 알파벳이라 모양만으로는 갈리지 않는다.
+    #    **모양이 아니라 트리를 보고 판정한다** — `/` 앞 마지막 성분이 그 모델의 실제
+    #    디렉터리가 아니면 경로일 수 없다. 실디렉터리면(예: `src/main.c`) 건드리지 않는다.
+    if "/" in ref and own and wiki:
+        parent = ref.rsplit("/", 1)[0].rsplit("/", 1)[-1]
+        src = Path(wiki)/f"models/{own}/raw/source_code"
+        if src.is_dir() and not any(d.name == parent for d in src.rglob("*") if d.is_dir()):
+            return pack("UNRESOLVED_SLASH_ABBREV", None, [],
+                        f"`{parent}` 가 {own} 트리의 디렉터리가 아니다 — 슬래시 축약 표기")
+
     return pack("UNRESOLVED", None, [], "어느 모델 트리에도 없음")

@@ -38,6 +38,10 @@ FIX = [
      "RESOLVED_BY_SCOPE", "Celeris"),
     ("Pass1.wgsl", "models/Celeris/source-analysis/celeris-pipeline-graph.md", None,
      "RESOLVED_BY_SCOPE", "Celeris"),
+    # 슬래시 축약 — `TriDiag_PCRx/y.wgsl` 은 두 파일의 압축 표기이지 경로가 아니다.
+    # 트리를 보고 판정한다: `/` 앞 성분이 실디렉터리가 아니면 축약. (2026-09-22)
+    ("TriDiag_PCRx/y.wgsl", "models/Celeris/source-analysis/celeris-pipeline-graph.md", None,
+     "UNRESOLVED_SLASH_ABBREV", None),
     # 부분 이름은 추측으로 해소하지 않는다
     ("Compdata.f90",  "models/SWAN/source-analysis/x.md", None, "UNRESOLVED", None),
     ("PDataSets.ftn90", "models/SWAN/source-analysis/x.md", None, "UNRESOLVED", None),
@@ -84,6 +88,12 @@ def main():
     # `dir` (별표 없음)은 하위까지 포함한다 — 두 형태가 구분되는지 확인
     if rv.declared_scope.__doc__ is None or "dir/*" not in rv.declared_scope.__doc__:
         fails.append("declared_scope 문서에 dir/* 규칙 누락")
+    # 실디렉터리를 낀 경로는 축약으로 오판하지 않는다(src/ 는 SWAN 실디렉터리)
+    r = rv.resolve("src/SwanCompUnstruc.ftn90", "models/SWAN/source-analysis/x.md",
+                   idx, max_line=900, wiki=W)
+    if r["status"] != "RESOLVED":
+        fails.append(f"실디렉터리 경로를 슬래시 축약으로 오판: {r['status']}")
+
     # 모양 기반 억제 금지: 짧은 stem 이어도 실재하면 참조다 (io.F·bc.F 19건 선례)
     for probe in ("io.F", "bc.F"):
         if rv.resolve(probe, "models/ROMS/source-analysis/x.md", idx, wiki=W)["status"] == "UNRESOLVED":
@@ -111,7 +121,7 @@ def main():
         except ValueError as e:
             fails.append(f"정상 경로를 거부함: {good} ({e})")
 
-    print(f"fixtures {len(FIX)} + 규칙검사 9 | 실패 {len(fails)}")
+    print(f"fixtures {len(FIX)} + 규칙검사 10 | 실패 {len(fails)}")
     for f in fails:
         print("  FAIL:", f)
     if fails:
