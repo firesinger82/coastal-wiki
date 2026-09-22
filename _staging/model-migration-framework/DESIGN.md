@@ -350,8 +350,31 @@ Celeris 노트 17개는 `component` 자체가 없고, CADMAS-SURF 는 자유서�
 source_scope: Celeris-WebGPU/js, Celeris-WebGPU/shaders
 ```
 
-해소 시 이 접두사로 후보를 거르고 `RESOLVED_BY_SCOPE` 로 기록한다.
+해소 시 이 선언으로 후보를 거르고 `RESOLVED_BY_SCOPE` 로 기록한다.
 모델별 등록표가 필요 없고 변종 구조가 달라도 같은 방식이 쓰인다.
+
+**두 형태를 구분한다 (2026-09-22, LISFLOOD-FP).**
+
+| 형태 | 의미 |
+|---|---|
+| `dir` | 그 디렉터리 **아래 전부**(하위 디렉터리 포함) |
+| `dir/*` | 그 디렉터리 **직속 파일만**(하위 제외) |
+
+`dir/*` 가 필요한 이유는 변종이 **별개 트리가 아니라 한 트리 안의 계층**일 때가 있기 때문이다.
+LISFLOOD-FP 는 `output.cpp` 와 `swe/output.cpp`, `swe/fields.cpp` 와 `swe/dg2/fields.cpp`
+가 공존한다. 접두사 매칭만 있으면 `LISFLOOD-FP` 가 `LISFLOOD-FP/swe/…` 까지 잡아
+"루트만" 을 표현할 수 없다 — 기존 문법만으로는 43건 중 5건만 풀렸다.
+
+```yaml
+source_scope: LISFLOOD-FP/*        # 루트 직속 (classic 솔버)
+source_scope: LISFLOOD-FP/swe/*    # swe 직속 (dg2 하위 제외)
+source_scope: LISFLOOD-FP/cuda     # cuda 아래 전부
+```
+
+실측: LISFLOOD-FP AMBIGUOUS **43 → 8**, 위키 전체 **104 → 69**.
+
+이는 규칙 **완화가 아니라 선언 표현력의 추가**다. 추측으로 고르는 경로는 여전히 없고,
+노트가 더 정확히 말할 수 있게 한 것뿐이다.
 
 **선언 전에 근거를 확인한다.** Celeris 실측: 노트의 `transect` 언급 0건,
 인용문 판별 대조에서 `transect만` 0 · `main만` 46, 인용 디렉터리가 11개 노트 모두 동일.

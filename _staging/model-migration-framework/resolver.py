@@ -144,15 +144,24 @@ def declared_component(note_path, wiki):
 
 
 def declared_scope(note_path, wiki):
-    """`source_scope:` — 노트가 분석한 저장소 상대 디렉터리 접두사 목록.
+    """`source_scope:` — 노트가 분석한 저장소 상대 디렉터리 선언 목록.
 
     변종 트리(배포본 vs 파생본, 3D vs 3D2F, CPU vs GPU 포팅)를 가르는 일반 선언이다.
-    `component:` 가 경로 형태가 아닐 때도 쓸 수 있다.
+
+    두 형태:
+      `dir`   — 그 디렉터리 **아래 전부**(하위 디렉터리 포함)
+      `dir/*` — 그 디렉터리 **직속 파일만**(하위 제외)
+
+    `dir/*` 가 필요한 이유: 한 저장소 안에서 루트와 하위가 같은 파일명을 쓰면
+    접두사로 갈리지 않는다. LISFLOOD-FP 는 `output.cpp` 와 `swe/output.cpp`,
+    `swe/fields.cpp` 와 `swe/dg2/fields.cpp` 가 공존한다.
     """
     v = _frontmatter_field(note_path, wiki, "source_scope")
     if not v:
         return []
-    return [s.strip().strip('"\'').strip("/") for s in v.strip("[]").split(",") if s.strip()]
+    return [s.strip().strip('"\'').rstrip("/") if s.strip().endswith("/*")
+            else s.strip().strip('"\'').strip("/")
+            for s in v.strip("[]").split(",") if s.strip()]
 
 
 def resolve(ref, note_path, index, max_line=None, wiki=None):
@@ -175,10 +184,20 @@ def resolve(ref, note_path, index, max_line=None, wiki=None):
             if len(c) > 1:
                 c, why = _narrow(c, wiki, own, max_line)
                 if len(c) > 1 and wiki:
-                    # 변종 트리: 노트가 선언한 source_scope 접두사로 거른다
+                    # 변종 트리: 노트가 선언한 source_scope 로 거른다.
+                    #   `dir`   — 그 디렉터리 **아래 전부**(하위 포함)
+                    #   `dir/*` — 그 디렉터리 **직속만**(하위 제외)
+                    # 후자가 필요한 이유: 한 저장소 안에서 루트와 하위가 같은 파일명을
+                    # 쓰는 경우(LISFLOOD-FP 의 `output.cpp` vs `swe/output.cpp`,
+                    # `swe/fields.cpp` vs `swe/dg2/fields.cpp`)는 접두사로 갈리지 않는다.
+                    root = f"models/{own}/raw/source_code/"
                     for sc in declared_scope(note_path, wiki):
-                        pref = [x for x in c
-                                if x[len(f"models/{own}/raw/source_code/"):].startswith(sc + "/")]
+                        if sc.endswith("/*"):
+                            scope_dir = sc[:-2]          # ← ref basename 인 `base` 를 가리지 않는다
+                            pref = [x for x in c
+                                    if x[len(root):].rsplit("/", 1)[0] == scope_dir]
+                        else:
+                            pref = [x for x in c if x[len(root):].startswith(sc + "/")]
                         if pref and len(pref) < len(c):
                             c = pref
                             if len(c) == 1:

@@ -70,6 +70,20 @@ def main():
     r = rv.resolve("main.js", "models/Celeris/source-analysis/celeris-source-map.md", idx, wiki=W)
     if not (len(r["paths"]) == 1 and "transect_version" not in r["paths"][0]):
         fails.append(f"source_scope 귀속 오류: {r['paths']}")
+    # source_scope `dir/*` = 그 디렉터리 **직속만**. 한 저장소 안에서 루트와 하위가
+    # 같은 파일명을 쓰면 접두사로는 갈리지 않는다(LISFLOOD-FP 2026-09-22).
+    #   output.cpp : 루트 vs swe/  |  fields.cpp : swe/ vs swe/dg2/
+    r = rv.resolve("output.cpp", "models/LISFLOOD-FP/source-analysis/lisflood-fp-io-boundary.md",
+                   idx, wiki=W)
+    if not (len(r["paths"]) == 1 and r["paths"][0].endswith("LISFLOOD-FP/output.cpp")):
+        fails.append(f"source_scope dir/* (루트 직속) 오류: {r['paths']}")
+    r = rv.resolve("fields.cpp", "models/LISFLOOD-FP/source-analysis/lisflood-fp-swe-fv1-dg2.md",
+                   idx, wiki=W)
+    if not (len(r["paths"]) == 1 and r["paths"][0].endswith("swe/fields.cpp")):
+        fails.append(f"source_scope dir/* (하위 제외) 오류: {r['paths']}")
+    # `dir` (별표 없음)은 하위까지 포함한다 — 두 형태가 구분되는지 확인
+    if rv.declared_scope.__doc__ is None or "dir/*" not in rv.declared_scope.__doc__:
+        fails.append("declared_scope 문서에 dir/* 규칙 누락")
     # 모양 기반 억제 금지: 짧은 stem 이어도 실재하면 참조다 (io.F·bc.F 19건 선례)
     for probe in ("io.F", "bc.F"):
         if rv.resolve(probe, "models/ROMS/source-analysis/x.md", idx, wiki=W)["status"] == "UNRESOLVED":
@@ -97,7 +111,7 @@ def main():
         except ValueError as e:
             fails.append(f"정상 경로를 거부함: {good} ({e})")
 
-    print(f"fixtures {len(FIX)} + 규칙검사 6 | 실패 {len(fails)}")
+    print(f"fixtures {len(FIX)} + 규칙검사 9 | 실패 {len(fails)}")
     for f in fails:
         print("  FAIL:", f)
     if fails:
