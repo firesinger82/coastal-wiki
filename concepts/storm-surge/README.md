@@ -10,7 +10,7 @@
 | `03-analysis-methods.md` | **verified** | tide-surge separation (Pugh §6:1) + interaction 진단 (§7:8) + Mann-Kendall trend (sst/03 canonical) + return period annual maxima (§8:3:2) + joint probability convolution (§8:3:3) + **§9.1 관측-시뮬 융합 EVA(White et al. 2026) full PDF 격상 2026-09-22** — LMC 2단계, 공위치 불요, ★정직 재구성(LOO-CV 35% vs block CV 18%, log-scale 은 악화) |
 | `04-code-and-tools.md` | **verified** | ADCIRC NWS modes·OWI/GRIB·KHOA observation·SWAN coupling·운영 workflow |
 | `05-examples.md` | **source-needed** | Maemi 2003 + Hinnamnor 2022 case cross-ref (본 위키 내부 verified · 외부 실측 surge 수치 KHOA Annual Report fetch 필요) — 2026-05-24 |
-| `06-model-application.md` | **verified** | 모델 적용 link-hub — ADCIRC(primary, GWCE+surge 구성요소) · Delft3D-FLOW/FM · ROMS(+COAWST) · EFDC. `models/<model>/source-analysis/` verified 링크 중심(중복 금지). SCHISM 미커버 (2026-06-12) |
+| `06-model-application.md` | **verified** | 모델 적용 link-hub — ADCIRC(primary, GWCE+surge 구성요소) · Delft3D-FLOW/FM · ROMS(+COAWST) · EFDC. `models/<model>/source-analysis/` verified 링크 중심(중복 금지). SCHISM 미커버 (2026-06-12) + **§10.1 연구문헌 2건 full PDF 격상 (2026-09-22)** — Meteo-HySEA vs AdriSC-ADCIRC(같은 강제·다른 답·★저자 미판정, 주기 과대의 원인이 wet-dry 기법) / Atlantic Canada 기후투영(★침수가 bathtub·해일이 풍속 경험식·무조석) |
 | `08-applied-observed-surge-resolution.md` | ✅ **verified** ④응용 (2026-09-22) | 관측 surge 의 **자료 층위**(백서 월별 / OpenAPI 1년 / ZIP+조화분해 사건별)와 ★**절대 peak 순위 ≠ 이례성 순위**(baseline σ 동해<서해). 05-examples 의 `source-needed` 가 층위 문제임을 규정 |
 | `07-ml-emulators.md` | **verified** | ML/surrogate storm-surge — PACT (Liu et al. 2026, arxiv:2605.09036) entry. abstract 직접 fetch (2026-05-26), full PDF read 후 §2 보강 가능 |
 
