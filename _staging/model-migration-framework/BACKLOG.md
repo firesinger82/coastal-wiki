@@ -46,5 +46,5 @@ DESIGN v2.0 파일럿 라운드(ADCIRC·EFDC·SWAN·ROMS·Celeris·asgs·hydromt
 
 | 항목 | 위치 | 성격 |
 |---|---|---|
-| `adcirc-testsuite` 크기 표기 166M vs 실측 8,140M | `models/ADCIRC/manifest.md` | Git LFS 저장소. LFS 실체가 내려받아져 있어 커밋된 포인터와 작업트리가 달라 `git status` 가 **776 파일을 modified** 로 본다(손상 아님). 두 가지가 필요하다 — 크기 측정 기준 통일, **LFS 저장소의 clean-tree 판정 규칙**(현 apply 스크립트의 사전조건은 LFS 저장소에서 통과하지 못한다) |
+| `adcirc-testsuite` 크기 표기 166M vs 실측 8,140M | `models/ADCIRC/manifest.md` | Git LFS 저장소. 크기 표기 갱신은 미착수. ~~clean-tree 판정 규칙~~ **✅완료 2026-09-22** — `tree_state.py`(failure mode 35). 실측 776 = LFS 555 + EOL 221 + 사람수정 **0** 으로 판명돼, 이 저장소는 실제로 migration 가능하다 |
 | ADCIRC manifest 나머지 행 미검증 | 같음 | StormEvents 만 실측 갱신, 나머지는 caveat 으로 표시 |

@@ -13,7 +13,7 @@
 > Celeris 에서 §REANCHOR 주석 함정(failure mode 32).
 >
 > 구현·게이트: `refparser.py` + `test_refparser.py`(문법), `resolver.py` + `test_resolver.py`(귀속),
-> `reanchor.py` + `test_reanchor.py`(재앵커·주석 함정),
+> `reanchor.py` + `test_reanchor.py`(재앵커·주석 함정), `tree_state.py` + `test_tree_state.py`(dirty 원인 판별),
 > 좌표 맵 예시 `_staging/efdc-migration/build-inputs.py` · `_staging/swan-prescan/build-phase2.py`.
 > **세 게이트를 모두 통과해야 migration 을 시작한다.**
 
@@ -251,6 +251,20 @@ Celeris 파일럿 추가(32).
     raw blob 방식은 안전 방향의 오탐이라 데이터를 잃지는 않지만 정리를 부당하게 막는다.
     부수 규칙: 트리 목록은 공백 포함 경로 때문에 `ls-tree -r -z --name-only` + NUL 분리로 읽는다
     (`.split()` 은 경로를 쪼갠다 — SFINCS 비교에서 같은 버그가 있었다).
+
+35. **체크아웃 필터 때문에 dirty 로 보이는 트리를 오염으로 오판** → apply 스크립트의
+    사전조건 `git status --porcelain` 이 비어 있기 요구는 **필터가 적용된 정상 트리**를
+    막는다. 실측(`adcirc-testsuite`, 2026-09-22): 776 파일이 modified 인데 내역은
+    **LFS smudge 555 + EOL 정규화 221, 사람 수정 0** 이다.
+    - LFS: HEAD blob 이 `version https://git-lfs…` 포인터인데 작업파일은 실체
+      (`hrrr.222.nc` 포인터 131 B ↔ 실체 408 KB)
+    - EOL: CRLF↔LF 만 다르다(`README.md` HEAD LF ↔ 작업트리 CRLF)
+    `git status` 가 비어 있기만 요구하면 LFS 저장소는 영영 migration 할 수 없고, 반대로
+    dirty 를 무시하면 사람의 수정을 덮어쓴다. **원인별로 가른다** — `tree_state.py` 가
+    LFS_SMUDGED / EOL_NORMALIZED / REAL_MODIFICATION 로 분류하고, 실제 수정이 하나라도
+    있으면 막는다. 게이트 `test_tree_state.py`(합성 3분류 + 실측).
+    failure mode 33(롤백 검증의 EOL 필터)과 같은 뿌리다 — **저장된 blob 과 체크아웃 결과는
+    같은 바이트가 아니다.**
 
 34. **호출 규약 위반이 예외가 아니라 그럴듯한 오답을 낸다** → `resolver.resolve()` 의 `note_path` 는
     **위키 상대경로**다. 절대경로를 넘기면 `owning_model` 이 조용히 None 을 돌려 소유 모델 단계를
