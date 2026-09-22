@@ -12,6 +12,7 @@ VALIDATORS=(
     validate-link-integrity.sh
     validate-layer-deps.sh
     validate-claims.sh
+    validate-counts.sh
 )
 
 for v in "${VALIDATORS[@]}"; do

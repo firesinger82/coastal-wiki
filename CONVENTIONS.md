@@ -122,6 +122,28 @@ verification_date: YYYY-MM-DD
 - 소스코드: `<repo>/path/file.f90:LN-LN`
 - 외부 URL: `[제목](URL) (acc. YYYY-MM-DD)`
 
+### 계수 단언 (G10, 2026-09-22)
+
+파일 수·배열 크기처럼 **세면 확정되는 수**를 단언할 때는 **무엇을 셌는지 glob 으로 고정**한다.
+노트 안에 지시자를 두면 `tools/validate-counts.sh` 가 매 커밋 다시 세어 대조한다.
+
+```
+<!-- count: models/SWAN/raw/source_code/swan/src/*.ftn90 = 57 -->
+<!-- count: models/SWAN/raw/source_code/swan/src/*.ftn = 18 -->
+총: **75 source files**
+```
+
+특히 아래 두 형태가 있는 노트는 지시자가 **필수**다 — 무엇을 셌는지 문장에서 불분명해 총계로 오독된다.
+
+| 형태 | 예 | 실제 결함 |
+|---|---|---|
+| 숫자 + 확장자 2종 나열 | "54개 `.F`/`.h`" | ROMS `Tangent/` — 54 는 `.F` 만, `.h` 18 을 합하면 72 |
+| 숫자 + source files/소스 파일 | "58 source files" | SWAN `src/` — 58 은 `.ftn90` 수(구 스냅샷), `.ftn` 18 누락, 총 75 |
+
+**근거**: 같은 결함이 세 번 반복됐다(SWAN·ROMS·LISFLOOD `H` 배열 크기). 셋 다
+**세어 보면 즉시 드러나는** 오류였고, 스냅샷 교체로 조용히 낡는 성질도 공통이었다.
+계수는 단언이 아니라 **재현 가능한 측정**으로 다룬다.
+
 ### source_id 사용 + 경로 표기 (G8b)
 
 - 인용은 `textbook/sources.yml`에 등록된 안정적 ID 사용 (예: `holthuijsen2007`)
@@ -177,7 +199,8 @@ verification_date: YYYY-MM-DD
 - `tools/validate-canonical-hygiene.sh` — **G8** 강제: canonical(concepts/·models/·textbook/) 에 작성자 로컬 절대경로(G8b) 또는 개인사례 유도 placeholder(G8d) 가 있는지 검증 + concepts/·models/ 의 작성자 작업환경 흔적(G8e: `local path:`·"this workspace"·"current local …"·"locally confirmed"·"local note"·"위키 머신" 류 — `--staged` 는 추가된 줄만 차단, working-tree 는 기존 잔존분 WARN). vendor 경로·repo-상대 file:line·textbook/md 미러·거버넌스(POLICY/INDEX) 면제. exit bit OR 1(G8b)/2(G8d)/4(G8e). 회귀: `tools/test_validate_canonical_hygiene.py` (33 case).
 - `tools/validate-link-integrity.sh` — 내부 링크 무결성: 상대 `.md` 링크 + `[[wikilink]]` 타겟이 실존 노트로 resolve 되는지. 코드·glob·textbook/md 미러 스킵, `(예정)`·`미생성` 마커는 forward-ref 로 통과. exit 0/1/2/3. 회귀: `tools/test_validate_link_integrity.py` (16 case).
 - `tools/validate-layer-deps.sh` — **§8.1** 강제: 4-레이어 근거 의존성 방향(④→③→②→①)·동일 layer 순환 금지·레이어 전용 경로(theory-*·NN-applied-*)의 layer/depends_on 필수·대상 실존성·scope guard(HEAD 기준 verified 오염 차단). 회귀: `tools/test_validate_layer_deps.py`.
-- **`tools/validate-all.sh` — 위 4종의 단일 진입점(SSOT, F-8)**. pre-commit 훅은 이것만 호출 — validator 추가·변경 시 이 목록만 갱신.
+- `tools/validate-counts.sh` — **§4 G10** 강제: `<!-- count: <glob> = <N> -->` 지시자를 glob 으로 다시 세어 대조(C1) + '숫자+확장자 2종'·'숫자+source files' 형태의 계수 단언이 있는 노트에 지시자 1개 이상 요구(C2). 반복 결함(SWAN 58 / ROMS 54 / LISFLOOD `H`) 차단용. exit 0/1/2.
+- **`tools/validate-all.sh` — 위 5종의 단일 진입점(SSOT, F-8)**. pre-commit 훅은 이것만 호출 — validator 추가·변경 시 이 목록만 갱신.
 - `tools/count-notes.sh` — 노트 개수 실측·원장 대조(F-1): `--check` 는 AUDIT-LEDGER 대시보드의 "✅ N 노트" 를 실측과 대조해 불일치 시 실패. 문서에 개수 하드코딩 시 이 도구로 검증.
 - `tools/install-hooks.sh` — `.git/hooks/pre-commit` 이 `validate-all.sh --staged` 를 호출하도록 등록 (marker v6). 한 번 실행하면 commit마다 자동 검증.
 - ※ L4 자가 감사(coastal-audit, cron)는 **의미 검증** 축 — 위 결정적(구조) 검증과 구현 분리 유지(F-8).
