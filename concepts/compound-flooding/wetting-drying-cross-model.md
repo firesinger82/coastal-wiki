@@ -46,7 +46,7 @@ related:
 ## 3. 마스크 위상 3계열
 
 1. **노드 기반(유한요소)**: ADCIRC `NODECODE`(1/0) — 요소 활성은 wet 노드 수(NCTOT)로. 별도 velocity-point 없음.
-2. **셀+face 기반(유한차분/체적)**: Delft3D(KFS/KFU)·SWASH(wets/wetu)·SFINCS(kfuv)·LISFLOOD(MaskTest)·ROMS(rmask_wet/umask_wet) — **face(velocity-point)가 1차 판정 주체, cell 은 face 의 OR**. 보수적 wetting(둘러싼 face 전부 dry 여야 cell dry). ★ROMS 만 edge mask 가 부호 있는 `{0,±1,2}`로 flux 방향 인코딩(다른 모델 0/1) — [[roms_wetting_drying]] §2.
+2. **셀+face 기반(유한차분/체적)**: Delft3D(KFS/KFU)·SWASH(wets/wetu)·SFINCS(kfuv)·LISFLOOD(MaskTest)·ROMS(rmask_wet/umask_wet) — **SWASH의 해당 분기는 cell 을 둘러싼 face 의 OR로 판정**한다(`SwashDryWet.ftn90:203-211`; 둘러싼 face 전부 dry 여야 cell dry). ROMS는 먼저 cell의 수위+수심으로 판정한다(`wetdry.F:191-214`). Delft3D·SFINCS·LISFLOOD의 동일 규칙 적용 여부는 이 근거로 확인되지 않았다. ★ROMS의 해당 edge mask 는 부호 있는 `{0,±1,2}`로 인접 cell의 wet/dry 배치를 인코딩한다(`wetdry.F:628-648`); 다른 모델 전체의 0/1 사용은 이 근거로 확인되지 않았다 — [[roms_wetting_drying]] §2.
 3. **셀+분산게이트**: FUNWAVE MASK(wet/dry) + **MASK9**(9점곱) — MASK9 는 셀과 8이웃 모두 wet 일 때만 1 → **완전 습윤 내부에서만 Boussinesq 분산항 활성, 물가는 자동 NSWE 강등**. 위상해상 모델 특유(SWASH breaking 도 유사: breaking 점을 dry 처리해 비정수압 제외).
 
 ## 4. 질량보존·음수수심 방지 대조

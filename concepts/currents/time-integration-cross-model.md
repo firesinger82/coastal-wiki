@@ -60,7 +60,7 @@ related:
 
 ## 2. 계보 — 네 흐름
 
-1. **split-explicit 해양모델(ROMS 단독)**: 빠른 barotropic 을 **작은 dtfast explicit substep + 시간필터**로 처리. NDTFAST 가 핵심 knob — 나머지 전부 implicit/semi-implicit 로 격리하는 다른 모델과 정반대 설계. leapfrog computational mode 는 LF-AM3 weight 자체가 억제(Asselin 필터 불사용).
+1. **split-explicit 해양모델(ROMS 단독)**: 빠른 barotropic 을 **작은 dtfast explicit substep + 시간필터**로 처리. NDTFAST 가 핵심 knob — implicit/semi-implicit 경로와 구분되는 설계이며, 비교 대상에는 SFINCS·XBeach 등의 explicit 경로도 있다(`time-integration-cross-model.md:48-57`); ROMS 외 모델이 전부 implicit/semi-implicit인 것은 아니다. leapfrog computational mode 는 LF-AM3 weight 자체가 억제(Asselin 필터 불사용).
 2. **semi-implicit 중력파 격리(EFDC·ADCIRC·Delft3D-FLOW·FM·SWASH-Imp)**: 자유표면/연속을 행렬로 풀어 표면중력파 CFL 제거. 행렬 형태가 갈림 — EFDC CALPUV PCG / ADCIRC GWCE JCG(consistent) 또는 lumped / Delft3D ADI double-sweep(방향분리로 tridiagonal 화) / FM Guus SPD+Nested Newton / SWASH SIP·BiCGSTAB. leapfrog mode 제어도 갈림: EFDC=주기적 trapezoidal corrector(NTSTBC), ADCIRC=GWCE wave-continuity 정식화 자체.
 3. **explicit CFL-adaptive 천수(SFINCS·LISFLOOD·XBeach)**: 행렬 없음 — 매 스텝 CFL 로 dt 재산정(§3), 마찰만 semi-implicit(Bates 분모, [[bottom-friction-cross-model]] §3). 유일한 무조건 안정 성분이 마찰이라는 점이 특징.
 4. **고차 multistep/multistage 위상해상(FUNWAVE·Celeris·LISFLOOD DG2)**: 파형 위상 전파의 시간 정확도가 목적 — FUNWAVE SSP-RK3(3단×flux 재계산, TVD 안정성 보존), Celeris AB3-AM4(1회 flux + history 재활용 = GPU 효율 지향), LISFLOOD DG2 SSP-RK2(공간 2차와 짝). multistep(Celeris)은 시작 3스텝 부트스트랩·불연속 취약, multistage(FUNWAVE)는 스텝당 3배 비용이 트레이드오프.
