@@ -1,0 +1,193 @@
+{
+ "date": "2026-09-23",
+ "findings": [
+  {
+   "path": "concepts/currents/vertical-mixing-cross-model.md",
+   "blob_sha": "7fede1ad30164b572482f65586503c91064bb16a",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 28,
+   "opinion": 3,
+   "has_source_needed": true,
+   "unsourced": [],
+   "proposals": [],
+   "value_checks": [
+    {
+     "claim_id": "c1cc16a546b26d25",
+     "claim": "Delft3D algebraic Ri 감쇠 — Ri≥0 분기 fl=exp(−2.3·min(Ri,30))·fs=(1+3.33Ri)^1.5/(1+10Ri)^0.5, Ri<0 은 fl=(1−14Ri)^0.25·fs=1 (이번 변경 셀)",
+     "source_ref": "models/Delft3D/raw/.../turclo.f90:350-360",
+     "mismatch": false,
+     "note": "원문 완전 일치 — if(rich>=0): fl=exp(-2.3*min(rich,30.0)), aa=(1+3.33Ri)^1.5/bb=(1+10Ri)^0.5; else fl=(1-14Ri)**0.25, fs=1"
+    }
+   ],
+   "value_mismatches": 0,
+   "source_unavailable": 0,
+   "audit_notes": "changed(1줄) — Delft3D 셀에 Ri≥0/Ri<0 분기 정밀화만 추가. 전 행 file:line+wikilink 소급, §5 disclosed gaps 유지. §2 계보 서술은 (저자 연도)+wikilink 커버, 평가 문장은 opinion. 값검증: 변경 셀 우선 검사 PASS. 이전 run(09-22) SFAV0·turclo 구식 검사 PASS 이력은 ledger 유지."
+  },
+  {
+   "path": "concepts/rip-currents/06-model-application.md",
+   "blob_sha": "bc32510a144a08b539d54da126c41627f8266c18",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 22,
+   "opinion": 4,
+   "has_source_needed": true,
+   "unsourced": [],
+   "proposals": [],
+   "value_checks": [],
+   "value_mismatches": 0,
+   "source_unavailable": 0,
+   "audit_notes": "changed(1줄) — §5 말미에 `source-needed` 토큰 명시화만(이미 disclosed 였던 갭의 토큰 정형화). 모델별 행 전부 source-analysis 노트+file:line 소급. 'B/C = 같은 물리의 다른 분해'는 [[roms_wec]] 인접 링크 커버로 refute 성공, 'VLF 맥동 여지'는 hedged 추론(opinion). 미출처 0."
+  },
+  {
+   "path": "concepts/sediment-transport/06-model-application.md",
+   "blob_sha": "1777f80203340d8ebede2da2f63b6d6319754276",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 18,
+   "opinion": 5,
+   "has_source_needed": true,
+   "unsourced": [
+    {
+     "line": 137,
+     "text": "| Bed elevation RMSE | √mean((Δz_model − Δz_obs)²) | < 0.1 m (반년-1년) | / | Suspended C RMSE | mg/L | < 50 mg/L (점착) | (§6.1 메트릭 표의 수치 기준값)",
+     "reason": "정량 임계값(< 0.1 m, < 50 mg/L)이 어떤 출처(문헌·기관 지침·모델 매뉴얼)로도 소급되지 않음. §6 전체에 인용·source-needed 토큰 부재 — undisclosed. frontmatter verification_method 도 모델 source-analysis 만 커버.",
+     "adversary": "refute 시도: (a) §9 외부 인용(Lesser·Roelvink 등)은 모델 기술 논문이지 검증 기준 아님 (b) §6.2 는 데이터 소스 나열일 뿐 (c) 파일 내 blanket 출처 없음 (d) §2.4 등의 source-needed 토큰은 다른 갭 커버 → refute 실패, confirmed. 사견: 작업 가정 성격이면 절대규칙 #8상 experience/runs 채널 소관."
+    }
+   ],
+   "proposals": [
+    {
+     "old_string": "### 6.1 메트릭\n\n| 항목 | 정의 | 기준 |",
+     "new_string": "### 6.1 메트릭\n\n> 아래 표의 수치 기준(RMSE < 0.1 m 등)은 출처 미확보 작업 가정 — `source-needed`. 객관 출처(문헌·기관 지침) 확보 시 인용 보강, 개인 운영 기준이면 experience/ 채널로 이관.\n\n| 항목 | 정의 | 기준 |",
+     "rationale": "G9b disclosed-gap 콜아웃 추가로 INTEGRITY-VIOLATION → verified-confirmed(+has_source_needed) 정상화. 값 자체는 손대지 않음."
+    }
+   ],
+   "value_checks": [
+    {
+     "claim_id": "7dd71cb9f678c7f9",
+     "claim": "SedTran 분기 ssedtox.f90:863-875 — SEDZLJ 863-867 / CALSED 867-869 / CALSND 873-875 (이번 변경분·라인 정정)",
+     "source_ref": "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/SedTran-Original/ssedtox.f90:863-875",
+     "mismatch": false,
+     "note": "원문 일치 — 863 if(ISTRAN(6)>=1), 864-866 LSEDZLJ→SEDZLJ_MAIN+GOTO 1000, 867-869 else CALSED, 875 if(ISTRAN(7)>=1) CALL CALSND. GOTO 바이패스가 표의 !LSEDZLJ 유효조건과 정합"
+    }
+   ],
+   "value_mismatches": 0,
+   "source_unavailable": 0,
+   "audit_notes": "changed — ssedtox 라인번호 정정(868-880→863-875, 값검증 PASS). §6.1 수치 기준 undisclosed 미출처 1건 confirmed → 제안 패치(disclosed 콜아웃) 첨부. §1.1 forcing 나열·§8 노트 집계는 운영 요약/메타로 opinion 처리(precision 우선)."
+  },
+  {
+   "path": "concepts/sst/06-model-application.md",
+   "blob_sha": "9eeaf02af8ad5e23c10a22c581db2c217f10e771",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 26,
+   "opinion": 4,
+   "has_source_needed": true,
+   "unsourced": [],
+   "proposals": [],
+   "value_checks": [],
+   "value_mismatches": 0,
+   "source_unavailable": 0,
+   "audit_notes": "changed(1줄) — §3.2 IINTPG 서술을 EFDC+ 12.5 기준으로 교체(efdc_vertical.md §E 인용 유지, setbcs.f90:449 부작용 명시). 입력 파일 형식·한국 paper·SWAN 보정은 파일 상단 blanket + §11 로 disclosed(G9b). §7 'XBeach SST 무관'은 blanket 커버 경계 — 약한 후보라 폐기(precision), §1 표의 'XBeach boundary condition 입력' 행과의 내부 긴장은 비감사 관찰로만 기록."
+  },
+  {
+   "path": "concepts/storm-surge/03-analysis-methods.md",
+   "blob_sha": "ddfd83f234aca41230cca17460b5fca95fdd5172",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 34,
+   "opinion": 3,
+   "has_source_needed": true,
+   "unsourced": [],
+   "proposals": [],
+   "value_checks": [
+    {
+     "claim_id": "d071c093ee9981b7",
+     "claim": "annual maxima ranking P=(2r−1)/(2M) — Pugh §8:3:2",
+     "source_ref": "textbook/md/sea-level.md:9416",
+     "mismatch": false,
+     "note": "원문 'P = mean value of (2r — l)/2JV' — OCR 훼손(l=1, JV=N)이나 식 구조 (2r−1)/2N 일치, M≡N=연최대치 수 표기 차이만"
+    },
+    {
+     "claim_id": "67daa1602062426d",
+     "claim": "'at least 25 values are needed for a satisfactory analysis' + trend 사전보정·계측기 파손 결측 경고",
+     "source_ref": "textbook/md/sea-level.md:9508-9510",
+     "mismatch": false,
+     "note": "verbatim 일치 — 'at least 25 values are needed', 'trendadjusted to some common year', 'a very severe extreme level damaged the recording instrument' 모두 확인"
+    }
+   ],
+   "value_mismatches": 0,
+   "source_unavailable": 1,
+   "audit_notes": "changed(+93줄) — §9.1 White et al. 2026 full-PDF 격상분. 각주 [^wh-*] 6개에 verbatim 인용 결박, 잔존 갭은 §9.1.4 source-needed 토큰으로 disclosed. §3.2 n≥30/25 '권장'은 Pugh 25-값 최소치(§4.2 인용) 기반 실무 권고로 opinion 처리. source_unavailable 1 = arXiv:2603.03247 전문(repo 미보관, 네트워크 fetch 필요) — 표본 한도 미소비, 접근 가능 Pugh 2건으로 대체."
+  },
+  {
+   "path": "concepts/storm-surge/05-examples.md",
+   "blob_sha": "7eac3909e6a1002f791e7cb3f07aa54d45baa240",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 30,
+   "opinion": 5,
+   "has_source_needed": true,
+   "unsourced": [],
+   "proposals": [],
+   "value_checks": [
+    {
+     "claim_id": "7eab192cc6df682e",
+     "claim": "포항 2022-09 고극조위 137.0 cm(19년 최대)·누년 101.0·편차 +36 cm — KHOA 2022 표 3-258·3-259",
+     "source_ref": "E:/KHOA_연간백서/markdowns/Annual_Report(2022).md:10546-10597",
+     "mismatch": false,
+     "note": "원문 표 일치 — 2022행 137.0, 9월행 137.0/101.0/36.0"
+    }
+   ],
+   "value_mismatches": 0,
+   "source_unavailable": 1,
+   "audit_notes": "changed(+4줄) — 07-20 INTEGRITY-VIOLATION(사유: case 표 무출처 추정치)이 층위 경고 콜아웃('Lingling ~1.0 m 는 출처 없는 추정이며 실측과 어긋난다')+08 탐색 링크로 disclosed 처리됨 → G9b 기준 위반 해소, verified-confirmed 복귀. 표의 추정 셀 전부 (source-needed) 토큰 보유. source_unavailable 1 = Wikipedia/eSurge/Shim et al. 외부 수치(비 repo)."
+  },
+  {
+   "path": "concepts/storm-surge/06-model-application.md",
+   "blob_sha": "ef6991b84c08f15e89c2b08e6f8045c7882dd181",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 25,
+   "opinion": 3,
+   "has_source_needed": true,
+   "unsourced": [],
+   "proposals": [],
+   "value_checks": [],
+   "value_mismatches": 0,
+   "source_unavailable": 1,
+   "audit_notes": "changed(+89줄) — §10.1 두 편 full-PDF 격상. 각주 [^mh-*]/[^ac-*] verbatim 인용 결박, 위키 자체 판단(스펙트럼 위치·wet-dry↔공진 연결)은 원문 인용과 구분 표기 확인. 메테오쓰나미→태풍 전이 미확인은 본문 source-needed 토큰 disclosed. link-hub 모델 행은 §3-6 소급. source_unavailable 1 = arXiv 2601.03856/2510.20074 전문(repo 미보관)."
+  },
+  {
+   "path": "concepts/swash-zone/02-theory.md",
+   "blob_sha": "a275b51a9ef2079b3548384181bbb232a2695626",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 20,
+   "opinion": 3,
+   "has_source_needed": true,
+   "unsourced": [],
+   "proposals": [],
+   "value_checks": [
+    {
+     "claim_id": "3a712bc244a0494b",
+     "claim": "c_h2%=0.20(1:3·1:4)/0.30(1:6)/보간 0.25(1:5), EurOtop c_h2%=0.055cotα 대비 권장, c_u2%=1.4–1.5",
+     "source_ref": "textbook/md/366445416-design-of-coastal-structures-and-sea-defenses.md:453,461",
+     "mismatch": false,
+     "note": "verbatim 일치 — 'ch2% = 0.20 for slopes of 1:3 and 1:4 and ch2% = 0.30 for a slope of 1:6 ... 1:5 would then by interpolation give ch2% = 0.25 ... better than ... ch2% = 0.055 cotα, as given in EurOtop [2007] ... cu2% = 1.4-1.5'"
+    }
+   ],
+   "value_mismatches": 0,
+   "source_unavailable": 0,
+   "audit_notes": "changed(+4줄) — §3.4 에 ShorelineS 구현 기반 '일부 해소' 주석 추가(출처 한정 명시, 모범적 disclosed). Shen-Meyer·Hunt·Stockdon 계수 비단언·§2.2 임계값 source-needed 등 갭 전부 disclosed 유지. §4 시간규모는 §2.2/§3.3/[[01-concept]] 소급 정리로 sourced/opinion 처리."
+  }
+ ]
+}
