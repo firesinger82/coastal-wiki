@@ -76,6 +76,21 @@ def main():
     # V1 default = 라운드로빈(변경분 우선 + 정적 파일 오래된순 순환). --changed-only
     # = V0 동작(변경분만). 정적 verified(대다수)가 1회 감사 후 영영 안 도는 맹점 해소.
     changed_only = "--changed-only" in sys.argv
+    # SKILL.md 입력 사양 "명시 파일 path list: 그 파일만 감사" 구현(2026-09-22).
+    # 플래그·플래그값이 아닌 argv = 명시 경로. 있으면 라운드로빈을 건너뛰고 그 파일만
+    # 슬라이스로 낸다(ledger 등재 여부 무관). 라운드로빈 기본 동작은 그대로.
+    explicit = []
+    skip_next = False
+    for a in sys.argv[1:]:
+        if skip_next:
+            skip_next = False
+            continue
+        if a == "--n":
+            skip_next = True
+            continue
+        if a.startswith("-"):
+            continue
+        explicit.append(a)
 
     ledger = json.loads(LEDGER.read_text()) if LEDGER.exists() else {}
     blobs = head_blobs()
@@ -122,20 +137,34 @@ def main():
     changed.sort(key=lambda c: (PRIORITY.get(c["citation_status"], 3), c["path"]))
     rotation.sort(key=lambda c: (c["audited_at"], c["path"]))
 
-    pool = changed if changed_only else changed + rotation
-    slice_ = pool[:n]
+    if explicit:
+        by_path = {c["path"]: c for c in changed + rotation}
+        slice_, missing = [], []
+        for pth in explicit:
+            if pth in by_path:
+                slice_.append(by_path[pth])
+            else:
+                missing.append(pth)
+    else:
+        missing = []
+        pool = changed if changed_only else changed + rotation
+        slice_ = pool[:n]
 
     stats = {
         "total_content": total_content,
         "changed": len(changed),
         "rotation_pool": len(rotation),
         "never_audited": sum(1 for c in changed if c["reason"] == "new"),
-        "mode": "changed-only" if changed_only else "round-robin",
+        "mode": "explicit" if explicit else
+                ("changed-only" if changed_only else "round-robin"),
         "slice": len(slice_),
         "slice_reasons": {r: sum(1 for c in slice_ if c["reason"] == r)
                           for r in ("new", "changed", "rotation")},
         "dirty_in_slice": [c["path"] for c in slice_ if c["dirty"]],
     }
+    if explicit:
+        # 커밋 안 됐거나 is_content() 밖이라 풀에 없는 경로 — 조용히 삭제하지 않고 알린다.
+        stats["explicit_missing"] = missing
     print(json.dumps({"slice": slice_, "stats": stats}, ensure_ascii=False, indent=2))
 
 
