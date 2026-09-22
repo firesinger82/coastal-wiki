@@ -2,7 +2,11 @@
 
 ## 현재 작업
 
-[ADCIRC 공개 quarter-annular 예제 근거](_staging/adcirc-quarterannular-20260916/README.md)를 기존 조석 노트와 기능 지도에 반영했다. Claude Opus가 원문·코드 사실을 수집하고 Codex가 선형 해석해의 조건·특수형, 비선형 회귀 입력, control 판본과 여섯 출력의 비교 범위를 판정·검토했다. 실제 ADCIRC 실행·수렴/보존 검사·관측 검증은 미수행이다. 다음 실제 검증에는 선형 해석해와 동일한 입력·실행 환경·판정 기준을 별도로 고정해야 하며, 해역 관측·허용오차를 임의로 채우거나 과거 전체 감사를 자동 재개하지 않는다.
+**2026-09-22 — 스냅샷 마이그레이션 프로그램 종료.** 핸드오프: [세션 기록 2026-09-21~22](_staging/SESSION-2026-09-22.md).
+git 저장소 29/29 upstream 최신 · 프레임워크 게이트 4종(+`tree_state`) · 계수 게이트 G10 신설 · AMBIGUOUS 460→69 · UNRESOLVED 234→153 · 전칭 단언 61건 정정.
+다음 후보는 **concepts 보강**(1차 축인데 2차 축의 1/6) — 상세·잔여·사용자 결정 대기 항목은 세션 기록 §5.
+
+직전 작업: [ADCIRC 공개 quarter-annular 예제 근거](_staging/adcirc-quarterannular-20260916/README.md)를 기존 조석 노트와 기능 지도에 반영했다. Claude Opus가 원문·코드 사실을 수집하고 Codex가 선형 해석해의 조건·특수형, 비선형 회귀 입력, control 판본과 여섯 출력의 비교 범위를 판정·검토했다. 실제 ADCIRC 실행·수렴/보존 검사·관측 검증은 미수행이다. 다음 실제 검증에는 선형 해석해와 동일한 입력·실행 환경·판정 기준을 별도로 고정해야 하며, 해역 관측·허용오차를 임의로 채우거나 과거 전체 감사를 자동 재개하지 않는다.
 
 ## 2026-09-12 사용자 범위 정정 (과거 계획보다 우선)
 
@@ -1741,6 +1745,12 @@ XB-SC-001~012의 초기화·hotstart·BMI·오류 종료·MPI 소유 계약을 �
 동결 57개 Fortran·2개 Python의 호출 후보를 생성/외부/C export/콜백 인터페이스와 구분했다. 원문 48구간에 아홉 연결 계약을 결속하고 선박/nonh 압력 귀속, 잔차 부호·실제 2차 보정, 식생·강우·조도 시점, 출력 공급자/rank 설명을 기존 7개 문서에 정정했다. [독립 검토·P2 조건 수정·후속 확인](_staging/total-read/model-audit/XBeach/connectivity/runtime-20260912/review-response.json) 후 [설치 검사](_staging/total-read/model-audit/XBeach/connectivity/runtime-20260912/validation.json)를 통과했다. 기존 승인 292개와 파일 소유자·권한을 보존했다.
 
 R1 전체는 미완이며 후보 수를 도달성 검증이나 진행률로 올리지 않는다. 다음은 [동결 R1-G1/G2/G3](_staging/total-read/model-audit/XBeach/connectivity/runtime-20260912/remaining-gaps.json)의 호출 조건·generic·미분류 정의·동적 wrapper 대조다. R2/R3 전체/R4는 기존 범위와 미완 상태를 유지한다. [실행 메모](_staging/total-read/model-audit/XBeach/connectivity/runtime-20260912/EXECUTION-NOTES.md)에 sandbox 시작 실패와 승인 실행 경로를 남겼다.
+
+### 2026-09-12 R1-G2/G3 인터페이스·도움 루틴 판정
+
+기준은 `760413c`와 runtime-20260912의 동결 후보 인덱스다. 미분류 26개 정의는 기존 57개 Fortran·2개 Python과 동일한 27개 생성 출력 안의 이름 참조·공개 인터페이스·실제 호출을 대조하여 도움 루틴/비활성/인터페이스/누락 연결로 처분한다. 이름 검색 부재만으로 전역 사장 코드를 확정하지 않는다. Python의 동적 getter/setter는 타입·rank·shape 조건과 C export/인수/복사·pointer 계약을 결속한다. 생성 include는 재사용 해시 아래에서 정의·generic·호스트 소비자를 확장한다. 외부 라이브러리 구현과 새 입력은 제외한다.
+
+R1-G2/G3의 종료는 해당 고정 목록의 설명 없는 항목이 없어지고 명시된 소스 제약과 근거가 있는 경우에만 한다. R1-G1 전체의 generic 타입·가시성·공동 실행 조건 대조와 R2는 이 작업만으로 닫지 않는다. 필요한 최소 재현은 원문 wrapper 메서드와 표식 native 인터페이스로 범위를 고정하며 전체 솔버 실행으로 표현하지 않는다. 이미 확인된 lifecycle 결론은 재사용한다. 결과를 기존 lifecycle/build 노트에 출처와 함께 보강하고 독립 검토·manifest 설치·불변 292개 검사·커밋·푸시를 마친다.
 
 
 ### 2026-09-12~13 COASTAL-WIKI 실제 구조 파악·개편 계획 검토
