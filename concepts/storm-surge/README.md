@@ -11,6 +11,7 @@
 | `04-code-and-tools.md` | **verified** | ADCIRC NWS modes·OWI/GRIB·KHOA observation·SWAN coupling·운영 workflow |
 | `05-examples.md` | **source-needed** | Maemi 2003 + Hinnamnor 2022 case cross-ref (본 위키 내부 verified · 외부 실측 surge 수치 KHOA Annual Report fetch 필요) — 2026-05-24 |
 | `06-model-application.md` | **verified** | 모델 적용 link-hub — ADCIRC(primary, GWCE+surge 구성요소) · Delft3D-FLOW/FM · ROMS(+COAWST) · EFDC. `models/<model>/source-analysis/` verified 링크 중심(중복 금지). SCHISM 미커버 (2026-06-12) |
+| `08-applied-observed-surge-resolution.md` | ✅ **verified** ④응용 (2026-09-22) | 관측 surge 의 **자료 층위**(백서 월별 / OpenAPI 1년 / ZIP+조화분해 사건별)와 ★**절대 peak 순위 ≠ 이례성 순위**(baseline σ 동해<서해). 05-examples 의 `source-needed` 가 층위 문제임을 규정 |
 | `07-ml-emulators.md` | **verified** | ML/surrogate storm-surge — PACT (Liu et al. 2026, arxiv:2605.09036) entry. abstract 직접 fetch (2026-05-26), full PDF read 후 §2 보강 가능 |
 
 ## 사용된 source_id
