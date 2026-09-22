@@ -212,6 +212,8 @@ NOAA verified (실측)와의 잔차는 기상·storm surge 등 비-천문조 변
 
 ## 3. 한국 KHOA 정점 — 인천 (DT_0001) 실측 데이터 적용
 
+> **관련(탐색)**: 자료 길이·분석 창이 결과를 얼마나 바꾸는지는 [`07-applied-record-length.md`](07-applied-record-length.md) (④응용) 참조.
+
 > **상태**: 인천 4대분조·천해 분조 진폭은 KHOA 공식 조화상수 (`khoa-tide-model` source, [tides-khoa-nonharmonic-research.md](../../textbook/notes/tides-khoa-nonharmonic-research.md) §7 인용). UTide·pytides 실제 실행은 KHOA 시계열 다운로드 후 — `experience/`에서 추가 검증 권장.
 
 ### 3.1 데이터 출처

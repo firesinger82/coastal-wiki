@@ -11,6 +11,7 @@
 | `04-code-and-tools.md` | **verified** | t_tide / UTide / pytides / pyTMD — DOI·repo·논문 인용 |
 | `05-examples.md` | **verified** | UTide/pytides 공식 예제 + 한국 KHOA template |
 | `06-model-application.md` | `source-needed` | EFDC/ADCIRC/XBeach/Delft3D — `models/<model>/` 채워지면 verified |
+| `07-applied-record-length.md` | ✅ **verified** ④응용 (2026-09-22) | **위키 최초 layer-4 노트.** 자료 길이·분석 창이 조화상수·추세를 얼마나 바꾸는가 — nodal 이론은 위상만 맞힌다 / 추세는 창 종속 / 자료 product 차이. 결론 = **인용 계약**(값 + 기간 + nodal 처리 + 취득 경로) |
 
 ## 사용된 source_id
 
