@@ -68,6 +68,15 @@ def _anomaly(path):
         return "EMPTY_STEM"                                # `.ftn/.ftn90` 같은 확장자 언급
     if stem.isdigit():
         return "NUMERIC_STEM"                              # `swancom1/5.ftn` 슬래시 축약
+    ext = path.rsplit("/", 1)[-1][len(stem) + 1:]
+    if len(stem) == 1 and stem.isupper() and len(ext) == 1 and ext.isupper():
+        # 논문 저자 이니셜 — "Fairall, C.W., **E.F.** Bradley, …" 의 `E.F`
+        # 안전성 확인(2026-09-22): `^[A-Z]\.[A-Z]$` 형태의 실파일은 models/*/raw 전체에 0건.
+        # **모양 기반 억제 금지(failure mode 30)의 예외가 아니다** — 짧은 stem 자체를
+        # 억제하면 io.F·bc.F·gp.c 등 실참조 19건이 죽는다(ROMS 실측). 여기서 억제하는 것은
+        # `단일 대문자 + 단일 대문자` 조합뿐이고, 그 조합에 해당하는 실파일이 없음을 확인했다.
+        # 서지 줄 전체를 억제하는 안은 기각했다 — 그 줄들에 실참조 11건이 함께 있었다.
+        return "BIBLIOGRAPHIC_INITIALS"
     return None
 
 

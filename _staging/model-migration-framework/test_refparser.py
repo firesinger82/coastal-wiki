@@ -50,7 +50,11 @@ NEGATIVE_FIX = [
     ("확장자 언급",   "어떤 `.ftn`/`.ftn90` 이 무슨 역할인지"),
 ]
 ANOMALY_FIX = [("슬래시 축약1", "`swancom1/5.ftn`", "NUMERIC_STEM"),
-               ("슬래시 축약2", "`swanpre1/2.ftn`", "NUMERIC_STEM")]
+               ("슬래시 축약2", "`swanpre1/2.ftn`", "NUMERIC_STEM"),
+               # 논문 저자 이니셜 (2026-09-22). `^[A-Z]\.[A-Z]$` 형태 실파일은 0건 확인.
+               # 짧은 stem 일반 억제는 금지 — io.F·bc.F 등 실참조가 죽는다(failure mode 30).
+               ("저자 이니셜1", "Fairall, C.W., E.F. Bradley, D.P. Rogers (1996)", "BIBLIOGRAPHIC_INITIALS"),
+               ("저자 이니셜2", "Grachev, A.A., A.F. Edson (2003)", "BIBLIOGRAPHIC_INITIALS")]
 
 def norm(refs):
     return [(r["kind"], r["path"], r["ranges"]) for r in refs if r["kind"] != "symbol"]
@@ -100,6 +104,13 @@ def main():
         got = [r for r in rp.parse_line(line) if r["kind"] in ("file", "file-line")]
         if not (len(got) == 1 and got[0].get("anomaly") == want):
             fails.append(f"{name}: anomaly {[(r['path'], r.get('anomaly')) for r in got]} != {want}")
+    # 짧은 stem 실참조는 살아 있어야 한다 — 이니셜 규칙이 이들을 잡으면 안 된다
+    # (파서 인식 확장자만 — .mat/.inp 는 EXTS 에 없어 애초에 참조로 잡지 않는다)
+    for probe in ("io.F", "bc.F", "gp.c", "df.c", "oc.c"):
+        got = [r for r in rp.parse_line(f"`{probe}` 참조") if r["kind"] in ("file", "file-line")]
+        if not got or got[0].get("anomaly"):
+            fails.append(f"짧은 stem 실참조가 억제됨: {probe} → {got}")
+
     # 여러 줄 수식 블록 펜스
     mb = [r for r in rp.parse_note("$$\n\\mathrm{c.c.}\n$$\n`calexp.f90:20`\n")
           if r["kind"] == "file-line"]
@@ -107,7 +118,7 @@ def main():
         fails.append(f"math fence failed: {[(r['path'], r['ranges']) for r in mb]}")
 
     n = len(FIX) + len(SYMBOL_FIX) + len(NEGATIVE_FIX) + len(ANOMALY_FIX)
-    print(f"fixtures {n} + 규칙검사 9 | 실패 {len(fails)}")
+    print(f"fixtures {n} + 규칙검사 10 | 실패 {len(fails)}")
     for f in fails:
         print("  FAIL:", f)
     if fails:
