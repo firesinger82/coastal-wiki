@@ -12,6 +12,7 @@ action: archive
 collected: 2026-06-06T00:00:46.194278+00:00
 promoted_to: concepts/storm-surge/03-analysis-methods.md#9.1
 promoted_date: 2026-06-15
+promotion_upgraded: 2026-09-22  # abstract-level source-needed → full PDF 전문 판독 verified (§9.1.1-9.1.4)
 ---
 
 ## Abstract

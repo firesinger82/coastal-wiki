@@ -7,7 +7,7 @@
 | `README.md` | self (governance) | 이 파일 |
 | `01-concept.md` | **verified** | 정의·인자 (기압·바람·tide-surge interaction·wave setup)·한국 적용 (Pugh 1987 Ch 6 + ADCIRC + KHOA) |
 | `02-theory.md` | **verified** | shallow-water + wind-driven setup 방정식, inverse-barometer 정량 |
-| `03-analysis-methods.md` | **verified** | tide-surge separation (Pugh §6:1) + interaction 진단 (§7:8) + Mann-Kendall trend (sst/03 canonical) + return period annual maxima (§8:3:2) + joint probability convolution (§8:3:3) |
+| `03-analysis-methods.md` | **verified** | tide-surge separation (Pugh §6:1) + interaction 진단 (§7:8) + Mann-Kendall trend (sst/03 canonical) + return period annual maxima (§8:3:2) + joint probability convolution (§8:3:3) + **§9.1 관측-시뮬 융합 EVA(White et al. 2026) full PDF 격상 2026-09-22** — LMC 2단계, 공위치 불요, ★정직 재구성(LOO-CV 35% vs block CV 18%, log-scale 은 악화) |
 | `04-code-and-tools.md` | **verified** | ADCIRC NWS modes·OWI/GRIB·KHOA observation·SWAN coupling·운영 workflow |
 | `05-examples.md` | **source-needed** | Maemi 2003 + Hinnamnor 2022 case cross-ref (본 위키 내부 verified · 외부 실측 surge 수치 KHOA Annual Report fetch 필요) — 2026-05-24 |
 | `06-model-application.md` | **verified** | 모델 적용 link-hub — ADCIRC(primary, GWCE+surge 구성요소) · Delft3D-FLOW/FM · ROMS(+COAWST) · EFDC. `models/<model>/source-analysis/` verified 링크 중심(중복 금지). SCHISM 미커버 (2026-06-12) |
