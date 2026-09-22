@@ -7,7 +7,9 @@ authors: Andrei Dumitriu, Aakash Ralhan, Florin Miron, Florin Tatui, Radu Tudor 
 published: 2026-04-18
 
 link: https://arxiv.org/abs/2604.17070v2
-promoted_to: concepts/rip-currents/01-concept.md
+promoted_to:
+  - concepts/rip-currents/01-concept.md      # 2026-06-18 벤치마크 목록·계보
+  - concepts/rip-currents/03-analysis-methods.md  # 2026-09-22 방법론 층(주석 프로토콜·지표 3세대)
 promoted_date: 2026-06-18
 citation_status: draft-unsourced
 action: archive

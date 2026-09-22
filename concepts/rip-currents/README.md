@@ -14,6 +14,7 @@
 |---|---|---|
 | `README.md` | self (governance) | 이 파일 |
 | `01-concept.md` | **source-needed** (탐지 §4 full-PDF verified) | 정의·위험·유형·시각signature + ML 탐지 벤치마크(RipVIS·RipSeg·RipDetSeg·YOLOv8). |
+| `03-analysis-methods.md` | ✅ **verified** (2026-09-22) | 관측 수단(drifter=flash rip 부적합)·주석 프로토콜(κ=0.82, 150편 중 28편 재작업)·**지표 3세대**(F2 → 합성 → IoU 확장). ★지표가 안전 목적에서 연역되고, 다시 역이용을 막도록 재설계된다. ★병목은 존재가 아니라 경계(IoU 0.50 70대 vs [40:95] 40대). ★벤치마크가 재지 않는 것 = flash/traveling rip 제외 + **동아시아 자료 0** |
 | `02-theory.md` | ✅ **verified** (2026-06-18) | 형성 mechanism(쇄파 alongshore 변동→superelevation∝H→보상 seaward flow)·유형·간격·edge wave — textbook 인용(mechanics-of-sediment-transport p.764-766·stewart p.309-310·coastal-eng-guidelines p.91). flash rip·shear instability 정량은 source-needed |
 | `06-model-application.md` | ✅ **verified** (2026-09-22) | 모델 표현 cross-model 대조 9모델 — 위상해상 창발 / radiation stress 파력 / vortex force 세 갈래. 전 행이 모델 source-analysis 노트로 소급 |
 
