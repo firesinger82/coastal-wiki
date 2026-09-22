@@ -249,6 +249,10 @@ ADCIRC 가 한국 storm-surge 의 primary unstructured 모델이라면, **EFDC+ 
 
 [01-concept.md §3.2](01-concept.md#32-한국-주요-태풍-storm-surge-case-khoa-annual-report-인용) 의 표:
 
+> **관련(탐색)**: 아래 `source-needed` 칸의 추정치는 **연간백서 층위로는 채울 수 없다** — 백서는 월별 통계만 준다.
+> 층위별로 무엇이 가능한지와 시간별 잔차 실측의 소재는 [`08-applied-observed-surge-resolution.md`](08-applied-observed-surge-resolution.md) (④응용) §1–2 참조.
+> 특히 **Lingling 행의 `~1.0 m` 는 출처 없는 추정이며 실측과 어긋난다.**
+
 | 태풍 | 연 | 한국 경로 | 관측 surge | 본 case 와 관계 |
 |---|---|---|---|---|
 | **Maemi (매미)** | 2003 | 마산만 직격 | ~2.4 m 마산 (source-needed) | **본 노트 §1** |
