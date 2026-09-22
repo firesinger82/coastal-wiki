@@ -241,7 +241,22 @@ def resolve(ref, note_path, index, max_line=None, wiki=None):
                     [p for c in owners.values() for p in c],
                     f"복수 모델 보유: {', '.join(sorted(owners))} — 번들 사본 가능성")
 
-    # 5. 슬래시 축약 — `TriDiag_PCRx/y.wgsl` = `…x.wgsl` + `…y.wgsl` 두 파일의 압축 표기다.
+    # 5. 위키 내부 파일 — 소스 참조가 아니다.
+    #    `_staging/…/evidence.json`·`textbook/sources.yml`·`tools/count-notes.sh` 처럼
+    #    위키 자신의 산출물을 가리키는 인용이 있다. **모양이 아니라 실재로 판정한다** —
+    #    노트 기준 또는 위키 루트 기준으로 실제 파일이면 소스 트리에서 찾을 이유가 없다.
+    if wiki and not ref.startswith("/"):
+        wroot = Path(wiki).resolve()
+        for cand in (Path(wiki)/Path(note_path).parent/ref, Path(wiki)/ref):
+            try:
+                rp_ = cand.resolve()
+            except OSError:
+                continue
+            if rp_.is_file() and str(rp_).startswith(str(wroot)):
+                return pack("NOT_A_SOURCE_REF", None, [str(rp_.relative_to(wroot))],
+                            "위키 내부 파일 — 소스 트리 대상이 아니다")
+
+    # 6. 슬래시 축약 — `TriDiag_PCRx/y.wgsl` = `…x.wgsl` + `…y.wgsl` 두 파일의 압축 표기다.
     #    파일 참조가 아니므로 UNRESOLVED 로 세면 안 된다. 파서의 NUMERIC_STEM
     #    (`swancom1/5.ftn`)과 같은 현상인데 stem 이 알파벳이라 모양만으로는 갈리지 않는다.
     #    **모양이 아니라 트리를 보고 판정한다** — `/` 앞 마지막 성분이 그 모델의 실제

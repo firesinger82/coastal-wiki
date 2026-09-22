@@ -80,6 +80,25 @@ def _anomaly(path):
     return None
 
 
+def _is_glob(line, start, end):
+    """바로 앞의 `*` 가 와일드카드인가, 마크다운 강조인가.
+
+    `**swancom1.ftn**` 의 앞 문자도 `*` 다 — 이것을 글롭으로 보면 **실참조가 통째로 죽는다**
+    (실측 2026-09-22: 구분 없이 적용했더니 65건이 anomaly 로 잡혔고 대부분 정상 참조였다).
+
+    구분:
+      글롭   `(CUDA 8 *_gpu.F`   — `*` 앞이 공백·괄호, 참조 뒤에 닫는 `*` 없음
+      강조   `**swancom1.ftn**`  — `*` 앞이 또 `*`, 참조 뒤에 `*` 가 이어짐
+    """
+    if start == 0 or line[start - 1] != "*":
+        return False
+    if start >= 2 and line[start - 2] == "*":
+        return False                                       # `**…` 강조 여는 표시
+    if end < len(line) and line[end] == "*":
+        return False                                       # 참조 뒤에 닫는 `*`
+    return True
+
+
 def parse_line(line, in_code=False, in_frontmatter=False, in_math=False):
     """한 줄에서 참조 후보를 뽑는다. 반환: list of dict"""
     refs = []
@@ -96,6 +115,11 @@ def parse_line(line, in_code=False, in_frontmatter=False, in_math=False):
         if any(s0 <= m.start() < e0 for s0, e0 in spans):
             continue                                       # bracket 문법 내부 중복 방지
         an = _anomaly(m.group("path"))
+        # 글롭 패턴 — 바로 앞이 `*` 면 파일명이 아니라 와일드카드다("CUDA 8 *_gpu.F").
+        # **모양이 아니라 문맥으로 판정한다**: `_` 로 시작하는 실파일이 존재하므로
+        # (`__init__.py`·`_config.yml`) 선행 `_` 만으로 억제하면 실참조가 죽는다.
+        if an is None and _is_glob(line, m.start(), m.end()):
+            an = "GLOB_PATTERN"
         if an == "EMPTY_STEM":
             continue                                       # 참조가 아니다
         rngs = parse_ranges(m.group("lines")) if m.group("lines") else None
