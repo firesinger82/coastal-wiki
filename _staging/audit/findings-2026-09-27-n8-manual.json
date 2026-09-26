@@ -1,0 +1,235 @@
+{
+ "findings": [
+  {
+   "path": "models/ADCIRC/source-analysis/adcirc-3d-mode.md",
+   "blob_sha": "db6a7251ebd20dbff588155421e835ad16ce67eb",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 46,
+   "opinion": 12,
+   "has_source_needed": true,
+   "unsourced": []
+  },
+  {
+   "path": "models/ADCIRC/source-analysis/adcirc-3d-vssol-vertical-scheme.md",
+   "blob_sha": "bdb27cf21234aa49bc820ec456cb717775500852",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 41,
+   "opinion": 4,
+   "has_source_needed": false,
+   "unsourced": [
+    {
+     "line": 30,
+     "text": "fort.15 3D 블록에서 `READ(15,*) Alp1,Alp2,Alp3` (read_input.F:5141-5141), 계수 조립 :5132-5137:",
+     "reason": "VALUE-MISMATCH: 계수 조립(IDTAlp1 등 6줄)의 실제 위치는 read_input.F:5146-5151. :5132-5137 은 구 스냅샷 라인(구 blob da7dd1a 의 READ :5127 기준) — e8b62a70 재번호화(1a8e232·701ae09)가 READ 는 :5141 로 갱신하며 인접 조립 범위를 누락. 식 자체는 verbatim 일치.",
+     "adversary": "인접 인용 :5087(DelT=>DTDP)·:5116(READ ISlip,KP)·:5141(READ Alp1..) 모두 현 스냅샷과 정확 일치 → 스냅샷 버전 차이로 refute 불가. 구 blob 대조로 갱신 누락 확인 → confirmed"
+    },
+    {
+     "line": 60,
+     "text": "TRIDIAG(:2097-2130): 위→아래 소거(`DO J=nfen-1,1,-1`) + 대각 0 검사 시 즉시 terminate",
+     "reason": "VALUE-MISMATCH: SUBROUTINE TRIDIAG 실제 범위는 vsmy.F:2099-2132 (grep 확인). :2097-2130 은 구 스냅샷 라인 — 같은 재번호화 누락(같은 파일 InmINT 는 :2299-2319→:2301-2321 로 +2 갱신됐으나 TRIDIAG 범위는 미갱신).",
+     "adversary": "CALL TRIDIAG :1125·CCL :993·wind stress :1043-1046·WZkp1 :1377 모두 정확 → 파일 대부분 갱신됐고 이 범위만 누락. confirmed"
+    }
+   ],
+   "value_checks": [
+    {
+     "claim_id": "72c8787158a5af8b",
+     "claim": "Alp1/2/3 계수 조립 IDTAlp1=iy*DelT*Alp1 등 (read_input.F:5132-5137)",
+     "source_ref": "read_input.F:5132-5137",
+     "mismatch": true,
+     "note": "식은 :5146-5151 에 verbatim 존재 — 인용 라인만 stale. 표본 메타: seed=L4-2026-09-27-manual-n8, 열거 모집단 12(수치·계수·라인인용, 접근가능), 표본 3(ledger 미검사 우선), source_unavailable 0"
+    },
+    {
+     "claim_id": "c751da61dc11d03d",
+     "claim": "TRIDIAG 서브루틴 범위 vsmy.F:2097-2130",
+     "source_ref": "vsmy.F:2097-2130",
+     "mismatch": true,
+     "note": "VC3 adversary 패스 파생 확인 — 실제 2099-2132 (표본 3건 외 추가 확인분)"
+    }
+   ],
+   "value_mismatches": 2,
+   "source_unavailable": 0,
+   "proposals": [
+    {
+     "old_string": "계수 조립 :5132-5137:",
+     "new_string": "계수 조립 :5146-5151:",
+     "rationale": "e8b62a70 스냅샷 실제 라인으로 정정 (IDTAlp1..DT1MAlp2 6줄 = :5146-5151, grep 확인)"
+    },
+    {
+     "old_string": "- TRIDIAG(:2097-2130): 위→아래 소거",
+     "new_string": "- TRIDIAG(:2099-2132): 위→아래 소거",
+     "rationale": "SUBROUTINE TRIDIAG = vsmy.F:2099, END = :2132 (grep 확인). frontmatter verification_method 의 구 범위는 판독 당시 기록이라 보존"
+    }
+   ]
+  },
+  {
+   "path": "models/ADCIRC/source-analysis/adcirc-baseline-anatomy.md",
+   "blob_sha": "19c552f8a2518114bb145f07fd451cf76a09b73b",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 14,
+   "opinion": 10,
+   "has_source_needed": false,
+   "unsourced": [],
+   "proposals": [
+    {
+     "old_string": "citation_status: verified\nverification_method:",
+     "new_string": "citation_status: verified\nhas_source_needed: false\nverification_method:",
+     "rationale": "G9e: verified-confirmed + disclosed 갭 0 → has_source_needed: false 권고값을 frontmatter 에 명시 (현재 필드 부재)"
+    }
+   ]
+  },
+  {
+   "path": "models/ADCIRC/source-analysis/adcirc-fort15-checklist-v1.md",
+   "blob_sha": "b93533b8fe8c1b9e68ffffc6a4c5a043c811bd0e",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 18,
+   "opinion": 25,
+   "has_source_needed": true,
+   "unsourced": []
+  },
+  {
+   "path": "models/ADCIRC/source-analysis/adcirc-gwce-implementation.md",
+   "blob_sha": "6437965ea0335a8f45165e3108de44268ca1e1cd",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 38,
+   "opinion": 8,
+   "has_source_needed": false,
+   "unsourced": [
+    {
+     "line": 89,
+     "text": "**`ILump=1` (lumped) skips JCG entirely** — much faster but less accurate. Default for ADCIRC v55+ is `ILump=0`.",
+     "reason": "'v55+ 기본값 ILump=0' — 버전·기본값 단언에 인용 0. §A 는 ILump 스위치 지점만 인용, 기본값 출처 아님.",
+     "adversary": "코드 확인: IM=0 등 표준 IM 분기가 ILump=0 대입(read_input.F:1174 등) — 사실 자체는 코드로 지지 가능하나 노트에 인용 부재. 인접·frontmatter 포괄 출처로 커버 안 됨 → confirmed (보강 패치 첨부)"
+    },
+    {
+     "line": 96,
+     "text": "**TAU0=-5 with no `Tau0FullDomainMin/Max` line** — defaults take over; result depends on sandbox state.",
+     "reason": "인용 0 + 기술된 메커니즘이 코드와 불일치: read_input.F:2505-2507 은 -6<TAU0≤-5 이면 무조건 READ(15,*) 로 다음 줄을 소비 — 줄 부재 시 'defaults take over' 가 아니라 후속 fort.15 파싱 어긋남.",
+     "adversary": "refute 시도: 인접 문장·frontmatter 에 근거 없음. 코드 직접 확인으로 반대 방향 확인 → confirmed"
+    }
+   ],
+   "proposals": [
+    {
+     "old_string": "much faster but less accurate. Default for ADCIRC v55+ is `ILump=0`.",
+     "new_string": "much faster but less accurate. 표준 `IM` 분기는 `ILump=0`(consistent) 을 대입한다 (`read_input.F:1174` IM=0 등 분기별 대입).",
+     "rationale": "무인용 버전 기본값 단언 → 확인된 코드 근거로 교체 (read_input.F:1172-1176 IF(IM.EQ.0) 블록 grep 확인)"
+    },
+    {
+     "old_string": "- **TAU0=-5 with no `Tau0FullDomainMin/Max` line** — defaults take over; result depends on sandbox state.",
+     "new_string": "- **TAU0=-5 with no `Tau0FullDomainMin/Max` line** — `-6 < TAU0 ≤ -5` 이면 다음 줄을 `READ(15,*) Tau0FullDomainMin, Tau0FullDomainMax` 로 소비한다 (`read_input.F:2505-2507`); 줄이 없으면 후속 fort.15 파싱이 어긋난다.",
+     "rationale": "무인용 + 오류 서술('defaults take over') → 코드 확인 결과로 정정. 조건부 READ 는 read_input.F:2505-2507 grep/sed 확인"
+    }
+   ]
+  },
+  {
+   "path": "models/ADCIRC/source-analysis/adcirc-hotstart.md",
+   "blob_sha": "e30426d1178d6fe11b925aae3bc104f42593c848",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 44,
+   "opinion": 10,
+   "has_source_needed": false,
+   "unsourced": [
+    {
+     "line": 174,
+     "text": "Verify hot-start success: log says \"HOTSTART SUCCESSFUL\" and prints `IT, TimeLoc`. Mismatch = abort.",
+     "reason": "인용 0. 'HOTSTART SUCCESSFUL' 문자열이 현 스냅샷 src 전체 grep 0건 (hstart.F·adcirc.F 포함) — 로그 문자열 단언이 소스로 뒷받침 안 됨.",
+     "adversary": "refute 시도: src/*.F,*.F90 대소문자 무시 'successful' grep — GRIB2 읽기 메시지 등만 존재, hot-start 성공 배너 없음. 커버 출처 없음 → confirmed"
+    }
+   ],
+   "value_checks": [
+    {
+     "claim_id": "ea941e332d6c2119",
+     "claim": "fort.67/68 헤더 순서 = FileFmtVersion, IM, TimeLoc, IT, NPX, NEX, NPX, NEX (write_output.F:5011-5020)",
+     "source_ref": "write_output.F:5011-5020",
+     "mismatch": false,
+     "note": "WRITE(hss%lun,REC=..) 연쇄 :5012-5020 과 verbatim 일치 — NPX·NEX 2회 기록 포함 정확. 표본 메타: seed=L4-2026-09-27-manual-n8, 열거 모집단 12(수치·계수·라인인용, 접근가능), 표본 3(ledger 미검사 우선), source_unavailable 0"
+    }
+   ],
+   "value_mismatches": 0,
+   "source_unavailable": 0,
+   "proposals": [
+    {
+     "old_string": "- Verify hot-start success: log says \"HOTSTART SUCCESSFUL\" and prints `IT, TimeLoc`. Mismatch = abort.",
+     "new_string": "- Verify hot-start success: log says \"HOTSTART SUCCESSFUL\" and prints `IT, TimeLoc`. Mismatch = abort. <!-- source-needed: 'HOTSTART SUCCESSFUL' 문자열이 e8b62a70 src 전체 grep 0건 — 로그 문자열·검증 절차의 실제 출처(구버전 메시지? 매뉴얼?) 필요 -->",
+     "rationale": "정정 문안을 자신 있게 쓸 수 없어(실제 로그 배너 미확인) disclosed 갭으로 전환 제안 — 사람이 실행 로그/매뉴얼로 확정"
+    }
+   ]
+  },
+  {
+   "path": "models/ADCIRC/source-analysis/adcirc-met-forcing-implementation.md",
+   "blob_sha": "999fc5669fa2574978d49177cfc42e1a1e444305",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 42,
+   "opinion": 8,
+   "has_source_needed": false,
+   "unsourced": [
+    {
+     "line": 139,
+     "text": "**NWS sign matters**: positive vs negative changes whether `WSX/WSY` are stress (positive) or wind speed (negative — multiplied by Cd internally).",
+     "reason": "인용 0 + 코드와 모순: NWS=-2 블록(wind.F:2203-2217)도 fort.22 값을 그대로 WSX2/WSY2 에 대입(응력 직접, drag law 미적용). 부호는 시각 기준(양수=cold-start 상대 fast-forward :2170-2192, 음수=hot-start 상대 WTIME1=TimeLoc) — 본 노트 §B·hotstart 노트 §H 와도 상충.",
+     "adversary": "refute 시도: §B·§F 인용 확인 — §F drag law 는 NWS=14 등 velocity 계열 reader 에 적용되는 것이고 부호와 무관. 코드 직접 확인으로 단언 반대 확인 → confirmed"
+    },
+    {
+     "line": 149,
+     "text": "**NOIVB** with hurricane storm-surge — disabling IB underestimates surge by 1-3 cm per mb pressure drop.",
+     "reason": "'mb당 1-3 cm' 수치 단언에 인용 0. 표준 inverse-barometer 근사 ~1 cm/hPa 대비 상한 3 cm 의 근거 불명.",
+     "adversary": "refute 시도: §G(IB 구현) 인용은 코드 경로만 — 정량 응답 크기의 출처 아님. 문헌 인용 부재 → confirmed"
+    }
+   ],
+   "value_checks": [
+    {
+     "claim_id": "8038470118189255",
+     "claim": "Garratt Cd=0.001(0.75+0.067U) (wind.F:514-521)·cap MIN(Garratt,WindDragLimit) (:531-539)·기본 WindDragLimit=0.0035 (:122)",
+     "source_ref": "wind.F:122, 514-521, 531-539",
+     "mismatch": false,
+     "note": "Drag=0.001d0*(0.75d0+0.067d0*WindSpeed) :521, CappedGarrattWindDrag MIN(...) :537, WindDragLimit=0.0035d0 :122 — 3건 모두 verbatim 일치. 표본 메타: seed=L4-2026-09-27-manual-n8, 열거 모집단 12(수치·계수·라인인용, 접근가능), 표본 3(ledger 미검사 우선), source_unavailable 0"
+    }
+   ],
+   "value_mismatches": 0,
+   "source_unavailable": 0,
+   "proposals": [
+    {
+     "old_string": "2. **NWS sign matters**: positive vs negative changes whether `WSX/WSY` are stress (positive) or wind speed (negative — multiplied by Cd internally).",
+     "new_string": "2. **NWS sign matters**: 부호는 met 자료의 시각 기준을 바꾼다 — 양수 = cold-start 상대(기록 fast-forward, `wind.F:2170-2192`), 음수 = hot-start 상대(`WTIME1=TimeLoc`, `wind.F:2203-2217`). NWS=±2 는 부호와 무관하게 stress 를 직접 읽는다(drag law 미적용).",
+     "rationale": "무인용 + 코드 모순(NWS=-2 도 응력 직접 대입) → 확인된 코드 근거로 교체. §B·adcirc-hotstart §H 와 정합"
+    },
+    {
+     "old_string": "- **NOIVB** with hurricane storm-surge — disabling IB underestimates surge by 1-3 cm per mb pressure drop.",
+     "new_string": "- **NOIVB** with hurricane storm-surge — disabling IB underestimates surge by 1-3 cm per mb pressure drop. <!-- source-needed: 'mb당 1-3 cm' 수치 출처 필요 — 정역학 inverse-barometer 근사는 ~1 cm/hPa, 상한 3 cm(동적 증폭?) 근거 문헌 요망 -->",
+     "rationale": "수치를 임의 정정하지 않고 disclosed 갭 전환 제안 — 사람이 문헌(예: Pugh)으로 확정 또는 ~1 cm/hPa 로 수정"
+    }
+   ]
+  },
+  {
+   "path": "models/ADCIRC/source-analysis/adcirc-momentum-implementation.md",
+   "blob_sha": "fd4014a5c27cb63368f2eb181bb56ec2b22606fc",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 26,
+   "opinion": 5,
+   "has_source_needed": false,
+   "unsourced": [],
+   "proposals": [
+    {
+     "old_string": "citation_status: verified\nverification_method:",
+     "new_string": "citation_status: verified\nhas_source_needed: false\nverification_method:",
+     "rationale": "G9e: verified-confirmed + disclosed 갭 0 → has_source_needed: false 명시 (현재 필드 부재). 표본 확인: VCOEF :751-772·gwce.F TK :2477-2482·:385 barotropic·momentum.F 2686줄 모두 현 스냅샷 일치"
+    }
+   ]
+  }
+ ]
+}
