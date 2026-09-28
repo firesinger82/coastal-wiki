@@ -4,7 +4,7 @@ topic: tides
 canonical_source: self
 citation_status: verified
 has_source_needed: true
-verification_method: "AI cross-reference: 코드는 (a) sam-cox/pytides 공식 wiki Example-Pytides-Usage.md, (b) wesleybowman/UTide README.md + utide/_solve.py 공식 docstring에서 직접 인용. URL·코드 fetch via ctx_execute(JS fetch) acc. 2026-05-21. 한국 적용 §3은 코드 틀만, 실제 데이터 검증은 보강 대기 (source-needed)."
+verification_method: "AI cross-reference: 코드는 (a) sam-cox/pytides 공식 wiki Example-Pytides-Usage.md, (b) wesleybowman/UTide README.md + utide/_solve.py 공식 docstring에서 직접 인용. URL·코드 fetch via ctx_execute(JS fetch) acc. 2026-05-21. 한국 적용 §3은 코드 틀만 — 실제 데이터 검증은 experience 두 노트(@990b382·@454a69b)로 cross-link (2026-09-28)."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-21
 verification_by: "Claude Opus 4.7 (1M context) — cross-ref"
@@ -214,7 +214,7 @@ NOAA verified (실측)와의 잔차는 기상·storm surge 등 비-천문조 변
 
 > **관련(탐색)**: 자료 길이·분석 창이 결과를 얼마나 바꾸는지는 [`07-applied-record-length.md`](07-applied-record-length.md) (④응용) 참조.
 
-> **상태**: 인천 4대분조·천해 분조 진폭은 KHOA 공식 조화상수 (`khoa-tide-model` source, [tides-khoa-nonharmonic-research.md](../../textbook/notes/tides-khoa-nonharmonic-research.md) §7 인용). UTide·pytides 실제 실행은 KHOA 시계열 다운로드 후 — `experience/`에서 추가 검증 권장.
+> **상태**: 인천 4대분조·천해 분조 진폭은 KHOA 공식 조화상수 (`khoa-tide-model` source, [tides-khoa-nonharmonic-research.md](../../textbook/notes/tides-khoa-nonharmonic-research.md) §7 인용). UTide 실제 실행 검증은 experience 에 있다(본문 수치는 옮기지 않음): [`experience/khoa-multi-station-tide-validation-2026.md`](../../experience/khoa-multi-station-tide-validation-2026.md) @ `990b382` (15정점 1년, OpenAPI), [`experience/khoa-49-station-16yr-utide-2026.md`](../../experience/khoa-49-station-16yr-utide-2026.md) @ `454a69b` (49정점 16년).
 
 ### 3.1 데이터 출처
 

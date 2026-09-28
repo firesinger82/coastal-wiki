@@ -10,7 +10,7 @@
 | `03-analysis-methods.md` | **verified** | 조화분해·response method (Stewart §17.5 + Foreman 1977 appendix + KHOA) |
 | `04-code-and-tools.md` | **verified** | t_tide / UTide / pytides / pyTMD — DOI·repo·논문 인용 |
 | `05-examples.md` | **verified** | UTide/pytides 공식 예제 + 한국 KHOA template |
-| `06-model-application.md` | `source-needed` | EFDC/ADCIRC/XBeach/Delft3D — `models/<model>/` 채워지면 verified |
+| `06-model-application.md` | `verified` | EFDC/ADCIRC/ROMS/XBeach/Delft3D 조석 진입 경로 — models/ 검수 노트 cross-link. 잔존: D-Flow FM `.bc` |
 | `07-applied-record-length.md` | ✅ **verified** ④응용 (2026-09-22) | **위키 최초 layer-4 노트.** 자료 길이·분석 창이 조화상수·추세를 얼마나 바꾸는가 — nodal 이론은 위상만 맞힌다 / 추세는 창 종속 / 자료 product 차이. 결론 = **인용 계약**(값 + 기간 + nodal 처리 + 취득 경로) |
 
 ## 사용된 source_id
@@ -33,10 +33,10 @@
 3. ~~`03-analysis-methods.md` 작성 (Stewart §17.5 + Foreman appendix + KHOA)~~ (완료, 2026-05-21)
 4. ~~`04-code-and-tools.md` 작성 (t_tide/UTide/pytides/pyTMD + TPXO/FES/NAO/GOT)~~ (완료, 2026-05-21)
 5. ~~`05-examples.md` 작성 (UTide/pytides 공식 예제 + 한국 template)~~ (완료, 2026-05-21)
-6. ~~`06-model-application.md` 골격~~ (완료 source-needed, `models/<model>/` 채워지면 verified)
+6. ~~`06-model-application.md` 골격~~ (완료, verified — 2026-09-28 README 갱신)
 
 보강 대기:
-- `models/EFDC/manual-notes/` 작성 → 06-model-application source-needed → verified
+- ~~`models/EFDC/manual-notes/` 작성~~ — 작성 완료(efdc-user-manual-r850·efdc-implementation-guide 등), 06 verified
 - `models/ADCIRC/manual-notes/` + tidal database web-refs
 - `models/XBeach/manual-notes/`, `models/Delft3D/manual-notes/`
 - 한국 KHOA 인천 정점 데이터로 §3 template 실행 → verified 승격
