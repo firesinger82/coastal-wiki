@@ -3,7 +3,7 @@ title: "KHOA 수치조류도 조화상수 CSV — `지각` = g(135°E), `진폭�
 topic: currents
 canonical_source: self
 citation_status: verified
-verification_method: "AI programmatic validation: (1) data.go.kr 파일데이터 15145955 '해양수산부 국립해양조사원_수치조류도 기반 조화상수_20250814.csv'(cp949, 813,703행, 14분조 진폭·지각 + 좌표) — CSV 헤더와 포털 컬럼 설명('조화상수의 지각정보') 모두 위상 기준 미기재를 2026-09-28 직접 확인. (2) 조위 G 위상 = [[khoa-49-station-16yr-utide-2026]] 의 49정점 16년 UTide(UTC 입력) 결과, KHOA 공표 pha_kst−9a 와 0.2–0.5° 이내 일치. (3) 정점별 최근접 격자점(≤5 km, 44정점) 에서 8분조(M2 S2 N2 K2 K1 O1 P1 Q1) 조류 위상 − 조위 G 위상을 비교 — 교차 대역 6쌍 + 시간대 오프셋 H 스캔(0–24 h, 0.25 h 간격) + 부트스트랩 10,000회. 스크립트·입력표·출력: tools/khoa-validation/current_phase_reference_test.py, results/current_phase_reference_rows.csv, results/current_phase_reference_test.txt. (4) 성분 판별(2026-09-28 추가): data.go.kr 파일데이터 15130143 해양수산부_수치조류도(예측 유속·유향 연도별 CSV, 지점당 하루 1표본) 과 동일 격자 대조 — ½ΣA²(S2 제외 13분조) 대 예측 u·v·장축·전체 분산 비(2021-2024, 연 2,005-2,020점) + UTide FUV 로 CSV 분조 합성 후 표본시각 스캔 상관(2024, 142점). 스크립트 tools/khoa-validation/current_component_test.py, 출력 results/current_component_test.txt."
+verification_method: "AI programmatic validation: (1) data.go.kr 파일데이터 15145955 '해양수산부 국립해양조사원_수치조류도 기반 조화상수_20250814.csv'(cp949, 813,703행, 14분조 진폭·지각 + 좌표) — CSV 헤더와 포털 컬럼 설명('조화상수의 지각정보') 모두 위상 기준 미기재를 2026-09-28 직접 확인. (2) 조위 G 위상 = [[khoa-49-station-16yr-utide-2026]] 의 49정점 16년 UTide(UTC 입력) 결과, KHOA 공표 pha_kst−9a 와 0.2–0.5° 이내 일치. (3) 정점별 최근접 격자점(≤5 km, 44정점) 에서 8분조(M2 S2 N2 K2 K1 O1 P1 Q1) 조류 위상 − 조위 G 위상을 비교 — 교차 대역 6쌍 + 시간대 오프셋 H 스캔(0–24 h, 0.25 h 간격) + 부트스트랩 10,000회. 스크립트·입력표·출력: tools/khoa-validation/current_phase_reference_test.py, results/current_phase_reference_rows.csv, results/current_phase_reference_test.txt. (4) 성분 판별(2026-09-28 추가): data.go.kr 파일데이터 15130143 해양수산부_수치조류도(예측 유속·유향 연도별 CSV, 지점당 하루 1표본) 과 동일 격자 대조 — ½ΣA²(S2 제외 13분조) 대 예측 u·v·장축·전체 분산 비(2021-2024, 연 2,005-2,020점) + UTide FUV 로 CSV 분조 합성 후 표본시각 스캔 상관(2024, 142점). 스크립트 tools/khoa-validation/current_component_test.py, 출력 results/current_component_test.txt. (5) API 시각 지정 대조(2026-09-28 추가): KHOA 바다누리 OpenAPI tidalCurrentArea 를 2024-04-21~22 매시 48회(126.0–126.3E·36.0–36.3N, 209점) 호출 — CSV 13분조 UTide 합성 v 와 API 벡터 비교, API 시각 KST/UTC 두 가정. 스냅샷 results/current_api_snapshots_20240421-22.csv, 스크립트 current_component_test.py api."
 note_author: "Claude Opus 5.5 + 사용자 합의"
 note_date: 2026-09-28
 verification_by: "Claude Opus 5.5 — 3검정(교차쌍·오프셋 스캔·부트스트랩) + 포털 메타데이터 직접 확인"
@@ -90,6 +90,21 @@ $\Delta_c$ 에 $9a_c$ 가 섞여 반일주조–일주조 사이에 약 125–14
   위상 기준 근거는 §3(조위 대조)이다. 최적 시각 21 UTC 는 g 가정일 때의 값이다.
 - 유향 규약(진북 기준 시계방향, 흐르는 방향)을 가정했다. 이 규약이 다르면 "v" 가 가리키는 물리 축도 달라진다.
 
+## 3c. 시각을 지정한 API 대조 — API 는 KST, 유향은 흐르는 방향
+
+KHOA 바다누리 OpenAPI `tidalCurrentArea` 로 같은 격자를 **시각을 지정해** 받았다(2024-04-21~22 매시 48회, 126.0–126.3°E·36.0–36.3°N, 209점).
+CSV 13분조를 UTide `FUV` 로 합성($G = g - 9a$)해 API 벡터와 비교:
+
+| API 시각 가정 | corr(합성, API v) | corr(합성, API u) | RMSE (v) |
+|---|---|---|---|
+| **KST** | **1.000** (최소 0.999) | 0.555 | **0.80 cm/s** |
+| UTC | −0.099 | −0.872 | 48.15 cm/s |
+
+- **API 의 `Date`·`Hour` 는 KST** 이고, CSV 를 g 로 읽을 때 API 예측을 반올림 수준(0.8 cm/s — API 유속은 정수)으로 재현한다.
+  API 와 CSV 는 같은 조화상수에서 나온 산출물로 보인다. API 는 u·v 벡터를 주고, 공개 CSV 는 그중 v 만 담는다.
+- **유향은 흐르는 방향(진북 기준 시계방향)** — 반대 규약이면 상관이 −1 이 된다. 백서 2025 도 *"유향은 진북을 기준으로"* 라 쓴다.
+- 이 검정만으로는 "CSV=g·API=KST" 와 "CSV=G·API=UTC" 를 가를 수 없다(둘 다 같은 9 h 이동). §3 조위 대조가 CSV=g 를 정하므로 API=KST 가 따라 나온다.
+
 ## 4. 한계
 
 - **정점 해상도는 약 ±1 h 수준** — 스캔 곡선이 8.5–9.5 h 에서 평평하다(0.821–0.830). 9 h 대 0 h 판별은 확실하지만,
@@ -108,7 +123,8 @@ CSV 의 경도 범위(117.59–129.97°E)가 동해안을 포함하는데도 격
 
 ```bash
 cd tools/khoa-validation
-# 성분 판별 (utide 필요, 원본 두 파일 필요)
+# 성분 판별 (utide 필요, 원본 두 파일 필요). api 모드는 저장소 스냅샷만 있으면 된다(--fetch 시 KHOA_OCEANDATA_KEY 필요)
+python3 current_component_test.py api --harm <조화상수.csv>
 python3 current_component_test.py variance --harm <조화상수.csv> --pred <수치조류도.zip>
 python3 current_component_test.py recon --harm <조화상수.csv> --pred <수치조류도.zip> --year 2024
 # (1) 입력표 생성 — CSV 는 data.go.kr 15145955 에서 받는다(296 MB, 저장소 미포함)

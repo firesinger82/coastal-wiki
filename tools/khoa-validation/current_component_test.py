@@ -9,6 +9,10 @@
              예측 u·v·장축·전체 분산의 비
   recon    : UTide FUV(nodal·천문인수) 로 CSV 분조를 합성, 표본 시각 h 를 0–24h 훑어
              관측 v·u 와 상관 (표본 지점 150개 무작위)
+  api      : KHOA 바다누리 OpenAPI tidalCurrentArea 스냅샷(시각 지정) 과 CSV 합성 비교 —
+             API 시각을 KST/UTC 로 가정해 각각 v·u 상관. 스냅샷은 --snap CSV
+             (results/current_api_snapshots_20240421-22.csv, 2024-04-21~22 매시 48회, 126.0–126.3E·36.0–36.3N)
+             를 쓰거나 --fetch 로 새로 받는다(인증키: 환경변수 KHOA_OCEANDATA_KEY — 저장소에 두지 않음)
 
 주의: g(135°E) ↔ G 변환은 9h 시간 이동과 같으므로 recon 은 위상 기준을 따로 판별하지 않는다
 (위상 기준은 current_phase_reference_test.py).
@@ -16,6 +20,7 @@
 실행 (utide 필요):
   python3 current_component_test.py variance --harm <조화상수.csv> --pred <수치조류도.zip>
   python3 current_component_test.py recon    --harm <조화상수.csv> --pred <수치조류도.zip> --year 2024
+  python3 current_component_test.py api      --harm <조화상수.csv> --snap results/current_api_snapshots_20240421-22.csv
 """
 import argparse, datetime as dt, zipfile
 import numpy as np
@@ -102,11 +107,64 @@ def recon(a):
           f'corr_u median {mu[i]:.3f}, RMSE_v median {np.nanmedian(arr[:, i, 2]):.2f} cm/s')
 
 
+def fetch_snap(out, dates=('20240421', '20240422'), box=(126.0, 126.3, 36.0, 36.3)):
+    import json, os, urllib.parse, urllib.request
+    key = os.environ['KHOA_OCEANDATA_KEY']
+    rows = []
+    for d in dates:
+        for h in range(24):
+            q = urllib.parse.urlencode({'ServiceKey': key, 'Date': d, 'Hour': f'{h:02d}', 'Minute': '00',
+                                        'MinX': box[0], 'MaxX': box[1], 'MinY': box[2], 'MaxY': box[3],
+                                        'ResultType': 'json'})
+            r = json.load(urllib.request.urlopen('https://www.khoa.go.kr/oceandata/api/tidalCurrentArea/search.do?' + q, timeout=60))
+            t = r['result']['meta']['sch_time']
+            rows += [(t, x['pre_lon'], x['pre_lat'], x['current_speed'], x['current_dir']) for x in r['result']['data']]
+    pd.DataFrame(rows, columns=['sch_time_api', 'pre_lon', 'pre_lat', 'current_speed_cm_s', 'current_dir_deg']).to_csv(out, index=False)
+
+
+def api(a):
+    from utide import harmonics
+    from utide._ut_constants import ut_constants as k
+    if a.fetch:
+        fetch_snap(a.snap)
+    A = pd.read_csv(a.snap)
+    A['t'] = pd.to_datetime(A.sch_time_api)
+    th = np.radians(A.current_dir_deg)
+    A['u'], A['v'] = A.current_speed_cm_s * np.sin(th), A.current_speed_cm_s * np.cos(th)
+    H = pd.read_csv(a.harm, encoding='cp949')
+    xy = H['좌표'].str.split(expand=True).astype(float)
+    hl, ha = xy[0].values, xy[1].values
+    names = list(k.const.name)
+    lind = np.array([names.index(c) for c in RECON])
+    frq = np.array(k.const.freq)[lind]
+    times = np.array(sorted(A.t.unique()))
+    for label, shift in (('API=KST', 9), ('API=UTC', 0)):
+        tu = [pd.Timestamp(x) - pd.Timedelta(hours=shift) for x in times]
+        jd = np.array([x.toordinal() + (x.hour * 3600 + x.minute * 60) / 86400 for x in tu])
+        F, U, V = harmonics.FUV(jd, jd[0], lind, 36.0, np.array([0, 0, 0, 0]))
+        cv, cu, rm = [], [], []
+        for (lo, la), g in A.groupby(['pre_lon', 'pre_lat']):
+            dd = np.hypot((hl - lo) * 111.32 * np.cos(np.radians(la)), (ha - la) * 110.57)
+            i = int(np.argmin(dd))
+            if dd[i] > 0.5:
+                continue
+            Am = np.array([H[c.lower() + '_진폭'].values[i] for c in RECON])
+            G = np.radians(np.array([H[c.lower() + '_지각'].values[i] for c in RECON]) - 9 * 360 * frq)
+            pred = (F * Am * np.cos(2 * np.pi * (V + U) - G)).sum(axis=1)
+            g = g.set_index('t').reindex(times)
+            cv.append(np.corrcoef(pred, g.v)[0, 1]); cu.append(np.corrcoef(pred, g.u)[0, 1])
+            rm.append(np.sqrt(np.mean((pred - g.v) ** 2)))
+        print(f'{label}: pts {len(cv)}, times {len(times)}, corr(pred,v) median {np.median(cv):.3f} '
+              f'[min {np.min(cv):.3f}], corr(pred,u) median {np.median(cu):.3f}, RMSE_v median {np.median(rm):.2f} cm/s')
+
+
 if __name__ == '__main__':
     ap = argparse.ArgumentParser()
-    ap.add_argument('mode', choices=['variance', 'recon'])
+    ap.add_argument('mode', choices=['variance', 'recon', 'api'])
     ap.add_argument('--harm', required=True)
-    ap.add_argument('--pred', required=True)
+    ap.add_argument('--pred')
+    ap.add_argument('--snap', default='results/current_api_snapshots_20240421-22.csv')
+    ap.add_argument('--fetch', action='store_true')
     ap.add_argument('--year', default='2024')
     a = ap.parse_args()
-    variance(a) if a.mode == 'variance' else recon(a)
+    {'variance': variance, 'recon': recon, 'api': api}[a.mode](a)
