@@ -4,7 +4,7 @@ topic: waves
 canonical_source: self
 citation_status: verified
 has_source_needed: true
-verification_method: "AI cross-reference: textbook/md/Waves-Holthuijsen2007.md Ch.9 (SWAN canonical) + WebSearch acc. 2026-05-21 (WW3 NOAA, XBeach Deltares). §3.4 추가 (2026-05-28): NOAA-EMC/WW3 Issue #1600 (UK Met Office ukmo-rwdavies, OPEN 2026-05-20) GitHub Issues API 직접 fetch — bug body verbatim 인용 (SMC nested grid boundary point mismatch → coastline spurious wave energy), 재현 절차. Fix PR 제출 예정 (status tracking). **§5.1 full PDF 격상 (2026-09-28)**: arXiv:2511.21856v1 (Ferdaus et al., 2025-11-26) 전문을 curl+pdftotext 로 받아 §3.8.1 Decision Framework·§3.8.2 Application-Specific Recommendations·§3.9+Table 5 Computational Performance·§3.11.2 Statistical Validation Metrics·§3.11.3 Intercomparison 을 직접 인용. 확인 사항: 공간규모(<10 / 10-1,000 / 10^4-10^6 / >10^7 km^2)·수심(<10 / 10-200 / >200 m / 극지)·출력별 권장 모델, SWAN 의 회절이 'limited' 이고 항만 정온도는 위상해상 필요, Table 5 대표 소요(항만 1 km^2 1시간 = FUNWAVE-TVD 10-100 cores 2-10시간 > 전지구 7일 예보 0.5-2시간), GPU 10-50x(WW3·WAM·FUNWAVE-TVD). ★실측 판정: 리뷰는 검증 **지표 정의만** 주고 **수치 합격 임계는 제시하지 않는다** — 06-model-application 의 미출처 임계표는 이 리뷰로 닫히지 않으며, 대신 표준 소재(WISE Group·JCOMM Wave Forecast Verification Project·WMO 검증표준)를 §5.1.3 에 기록했다. ★한계: 리뷰가 다루는 9모델 중 본 위키 수록은 SWAN·WW3·FUNWAVE·SWASH 4종뿐이라 나머지(MIKE 21 SW·TOMAWAC·WAM·COULWAVE·NHWAVE) 서술은 소스 대조 없이 리뷰 인용에 머문다. Table 5 는 representative 추정이지 벤치마크 실측이 아니다(리뷰 자체 단서)."
+verification_method: "AI cross-reference: textbook/md/Waves-Holthuijsen2007.md Ch.9 (SWAN canonical) + WebSearch acc. 2026-05-21 (WW3 NOAA, XBeach Deltares). §3.4 추가 (2026-05-28): NOAA-EMC/WW3 Issue #1600 (UK Met Office ukmo-rwdavies, OPEN 2026-05-20) GitHub Issues API 직접 fetch — bug body verbatim 인용 (SMC nested grid boundary point mismatch → coastline spurious wave energy), 재현 절차. Fix PR 제출 예정 (status tracking). **§5.1 full PDF 격상 (2026-09-28)**: arXiv:2511.21856v1 (Ferdaus et al., 2025-11-26) 전문을 curl+pdftotext 로 받아 §3.8.1 Decision Framework·§3.8.2 Application-Specific Recommendations·§3.9+Table 5 Computational Performance·§3.11.2 Statistical Validation Metrics·§3.11.3 Intercomparison 을 직접 인용. 확인 사항: 공간규모(<10 / 10-1,000 / 10^4-10^6 / >10^7 km^2)·수심(<10 / 10-200 / >200 m / 극지)·출력별 권장 모델, SWAN 의 회절이 'limited' 이고 항만 정온도는 위상해상 필요, Table 5 대표 소요(항만 1 km^2 1시간 = FUNWAVE-TVD 10-100 cores 2-10시간 > 전지구 7일 예보 0.5-2시간), GPU 10-50x(WW3·WAM·FUNWAVE-TVD). ★실측 판정: 리뷰는 검증 **지표 정의만** 주고 **수치 합격 임계는 제시하지 않는다** — 06-model-application 의 미출처 임계표는 이 리뷰로 닫히지 않으며, 대신 표준 소재(WISE Group·JCOMM Wave Forecast Verification Project·WMO 검증표준)를 §5.1.3 에 기록했다. ★한계: 리뷰가 다루는 9모델 중 본 위키 수록은 SWAN·WW3·FUNWAVE·SWASH 4종뿐이라 나머지(MIKE 21 SW·TOMAWAC·WAM·COULWAVE·NHWAVE) 서술은 소스 대조 없이 리뷰 인용에 머문다. Table 5 는 representative 추정이지 벤치마크 실측이 아니다(리뷰 자체 단서). **§7.1 full PDF 격상 (2026-09-28)**: arXiv:2401.08684v1 (Saviz Naeini·Snaiki, 28p) · arXiv:2401.09687v1 (Amini·Marsooli·Neshat, 26p) 전문을 curl+pdftotext 로 받아 방법·설정·Table 2 를 직접 인용. ★실측 판정: (1) PIML runup 의 scalogram MSE 18–22배 개선이 시계열 MSE 에서는 1.3–2.0배로 줄고, 시나리오 1·2 는 cGAN 시계열 MSE 가 XBNH σ² 를 넘는다(위상 skill 없음, 분포 일치만 확인) — 본 노트 재계산. (2) 식생 Cd 최적화 이득은 수동 대비 ≤0.19%p, T&N 계수는 저자 재회귀, 식생 치수(9.5 vs 3.2 mm, λ 19.1 cm vs 3182/m²) 본문 내 모순으로 φ 재현 불가. (3) XBeach 소스 직독: vegetation.F90:327-329 Cdveg<0 자동값은 첫 호출에 s%Cdveg 로 덮어써져 고정 — 저자의 'Cd 시간 불변' 진술과 부합; NH 에서 bulkdragcoeff 입력(H·sigm·k, :731·:742·:745) 내용은 미추적(params.F90:1560-1563 swave 강제 0)."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-21
 verification_by: "Claude Opus 4.7 (1M context) — cross-ref + WebSearch + WW3 Issue #1600 GitHub API 직접 fetch (2026-05-28)"
@@ -267,11 +267,88 @@ bulk 파라미터를 넘어서면 스펙트럼 거리(Earth Mover's/Wasserstein)
 - XBeach 천해 검증 한국 사례
 - 상용 도구 (MIKE 21 SW) 비교 — 한국 항만 설계에서 사용 빈도
 
-### 7.1 연구 문헌 (research/inbox promote, source-needed)
+### 7.1 XBeach 연구 문헌 2편 ✅ verified (full PDF 판독 2026-09-28)
 
-- **PIML wave runup — XBeach (Saviz Naeini·Snaiki 2024)** — arxiv:[2401.08684](https://arxiv.org/abs/2401.08684). 시간의존 wave runup 을 physics-informed ML 로 예측 — XBeach **Surfbeat(XBSB) 효율 + Nonhydrostatic(XBNH) 정확도** 결합. cGAN 으로 XBSB→XBNH scalogram image-to-image 매핑, 역 wavelet 변환으로 시계열 복원. runup risk 평가. cf. [`05-examples.md`](05-examples.md) · swash-zone runup.
-- **식생 drag 계수 보정 — XBeach NH (Amini·Marsooli·Neshat 2024)** — arxiv:[2401.09687](https://arxiv.org/abs/2401.09687). 식생 wave height 감쇠 예측의 핵심 = drag 계수 추정. 수동보정 vs **메타휴리스틱 최적화**(최초적용) vs Tanino-Nepf(2008) 경험식의 XBeach NH 통합 — 3 방법 비교. nature-based flood mitigation 설계.
-- citation_status: 위 2건 source-needed (abstract 기반)
+#### 7.1.1 PIML wave runup — Saviz Naeini·Snaiki (2024), arXiv:[2401.08684](https://arxiv.org/abs/2401.08684)v1
+
+XBeach **Surfbeat(XBSB)** runup 시계열을 Morlet 웨이블릿 scalogram → RGB 이미지로 바꾸고,
+pix2pix 계열 cGAN(U-Net 생성기 + PatchGAN 판별기, λ_L1=100)으로 **Nonhydrostatic(XBNH)** scalogram 을
+예측한 뒤 역변환으로 시계열을 복원한다.[^px-method] 원 cGAN 은 [`storm-surge/07-ml-emulators`](../storm-surge/07-ml-emulators.md) 계열과 같은
+"저충실도 → 고충실도" 매핑이되, 입력이 **물리모델(XBSB) 출력**이라는 점이 "physics-informed" 의 실체다
+(손실함수에 물리 제약은 없다 — 식 11–13 은 표준 cGAN+L1).
+
+| 항목 | 논문 값 |
+|---|---|
+| 영역 | **1D 실험수조 단면** ~30 m, 수심 −0.5→+0.4 m, SWL 0.05 m (Demirbilek et al. 2007 fringing reef 수조 재현) |
+| 격자 | XBNH 2.5 cm 균일 / XBSB 5→2.5 cm, Manning 0.01 |
+| 강제 | JONSWAP, Hm0 0.05–0.085 m · fp 0.55–1 Hz · γ 1–3.3 변화, mainang 270° · dsc 1000 · fnyq 1 Hz 고정 |
+| 데이터 | 모드별 100 run × 1800 s (spin-up 150 s 제외), 무작위 90/10 분할 → **본문 보고 시나리오 3건** |
+| 비용 | XBNH ≈ 5 분 / XBSB < 2.5 분 → cGAN 파이프라인 ≈ XBSB 시간 = **약 2배 단축** |
+
+★ **scalogram 공간의 개선이 시간영역에서 크게 줄어든다** (Table 2·§4.3 수치로 재계산).[^px-t2]
+
+| 시나리오 | scalogram MSE 비 (XBSB/cGAN) | 시계열 MSE 비 (XBSB/cGAN) | cGAN 시계열 MSE ÷ XBNH σ² |
+|---|---|---|---|
+| 1 | 18.0 | 1.29 | **1.87** (σ 반올림 범위 1.6–2.2) |
+| 2 | 20.2 | 1.40 | **1.75** (1.55–2.0) |
+| 3 | 22.0 | 1.97 | 0.97 (0.90–1.05) |
+
+- 마지막 열이 1 을 넘으면 **"XBNH 평균값 하나를 예측"하는 것보다 시계열 MSE 가 크다** — 즉 1·2 시나리오에서
+  위상 일치 기술(skill)은 없고, 논문이 확인한 것은 **평균·σ 의 분포 일치**(Table 2)다.
+  "good agreement" 는 Fig. 9 육안 판정이다. XBSB 역시 시계열 MSE 가 σ² 의 1.9–2.5배라, 두 모드 모두 XBNH 와
+  개별 파 위상을 맞추지 못한다는 점은 XBSB 가 입사대역을 풀지 않는다는 구조(§4.2)와 부합한다.
+- 시나리오 1 cGAN **MAE 0.0001 m** 는 같은 행 RMSE(√9.16e-5 ≈ 0.0096 m)와 두 자릿수 차이이고
+  다른 행(MAE ≈ 0.8×RMSE)과 어긋난다 — **표기 오류 의심**(원문 그대로 둔다).
+- **runup 추출 정의가 본문에 없다** — gauge 위치·`rugdepth` 미기재. XBeach 기본 설정에서는 처오름 임계가
+  침수-건조 임계 `eps` 로 승격되므로([`xbeach_output.md §C.2`](../../models/XBeach/source-analysis/xbeach_output.md)),
+  이 논문의 "runup 시계열"은 설정 의존량이다.
+- 적용 한계(저자 명시): **단일 단면에서만 유효, 새 지형은 재학습**, 계산시간 하한이 XBSB 실행시간에 묶인다.[^px-lim]
+- 부수: 식 (3) 의 $D_w$ 를 "dispersion due to wave breaking" 이라 부르나 문맥상 **쇄파 소산(dissipation)** 이다.
+
+#### 7.1.2 식생 drag 계수 보정 — Amini·Marsooli·Neshat (2024), arXiv:[2401.09687](https://arxiv.org/abs/2401.09687)v1
+
+XBNH 로 Wu et al. (2011) 1:21 경사 식생 수조(강체 원기둥, JONSWAP Hs 3.7–7.9 cm · Tp 1.2–1.8 s, 4 case)를
+재현하며 $C_D$ 결정법 셋을 비교: **수동 보정**($C_D$ 1.8–2.8 탐색) · **메타휴리스틱**(GWO·MFO, 에이전트 10 × 400 반복,
+탐색 범위 1.8–10) · **Tanino-Nepf(2008) 벌크식을 XBNH 에 이식**($C_D = 2(\alpha_0/R_p + \alpha_1)$).[^am-method]
+XBNH 설정 `maxbrsteep`=0.65 · `breakviscfac`=1.5 (Amini & Marsooli 2023 선행 보정값).
+
+| Case | 수동 | T&N 식 | GWO | MFO |
+|---|---|---|---|---|
+| I | 3.49 % | **5.91 %** | 3.56 % | 3.47 % |
+| II | 2.81 % | 2.86 % | 2.69 % | 2.66 % |
+| III | 4.87 % | 5.45 % | 4.68 % | 4.81 % |
+| IV | 4.17 % | 4.16 % | 4.08 % | 4.09 % |
+
+(파고 정규화 RMSE, Table 2)[^am-t2]
+
+- ★ **최적화의 이득은 수동 대비 최대 0.19 %p**(Case III) — 결론부의 *"major advance"* 는 정확도가 아니라
+  **자동화**에 대한 주장으로 읽어야 한다. 비용은 case 당 XBNH 최대 ~4000 회 평가(10 × 400).
+  최적 $C_D$ 값 자체는 표로 주지 않는다(Fig. 8·9 그림만).
+- ★ **"T&N 식"은 원식 계수가 아니다** — $\alpha_1 = 0.56 + 4.08\varphi$ ($R^2$ 0.94), $\alpha_0 = 5.26 + 318.1\varphi$ ($R^2$ 0.83)
+  를 저자들이 문헌 자료로 **재회귀**했다. 또 T&N 은 **emergent** 원기둥 배열 · $R_p$ 40–685 에서 유도됐는데,
+  여기서는 submerged 식생($h_v$ 20 cm)에 Stone & Shen (2002) 식생층 평균유속 보정을 얹어 쓴다. T&N 오차가
+  소파고 Case I 에서 가장 크고 Case IV 에서 사라지는 것을 저자는 $R_p$ 유효범위 이탈로 설명한다(검증은 안 함).
+- ★ **재현 불가 지점 — 식생 치수가 본문 안에서 모순된다.** 줄기 지름이 "9.5 mm birch dowels" 와 $b_v$ = 3.2 mm 로
+  두 번 나오고, 간격 λ = 19.1 cm 는 $N_v$ = 3182 stems/m² 와 맞지 않는다(엇갈림 배열 $2/(\sqrt3\lambda^2)$ 로
+  λ = 1.91 cm → 3165/m², 19.1 cm → 32/m²).[^am-dim] 두 지름 비(2.97)와 밀도 비 3182/350 = 9.09 ≈ 3² 는
+  **1:3 모형/원형 척도 혼용**을 시사하나 어느 쪽이 수조값인지는 이 논문만으로 판정 불가(`source-needed`: Wu et al. 2011 원전).
+  영향이 크다 — $\varphi = N_v\pi b_v^2/4$ 가 0.026(3.2 mm) 대 0.226(9.5 mm)이 되어 $\alpha_0$ 가 13.4 대 77.0 으로 갈린다.
+  논문은 사용한 $\varphi$ 를 밝히지 않는다.
+- **XBeach 소스 대조** — 저자의 *"the drag coefficient in the model is a predefined temporally constant value"* 는
+  기본 제공 자동 옵션까지 포함해도 성립한다. `Cdveg < 0` 이면 `bulkdragcoeff`(Mendez & Losada 2004 eq. 40,
+  소스 주석 *"Only applicable for Laminaria Hyperborea (kelp)???"*)가 호출되지만 결과를 **`s%Cdveg` 에 덮어써**
+  다음 호출부터 조건이 거짓이 된다 — 첫 `vegatt` 호출에서 한 번 계산되고 고정된다
+  (`vegetation.F90:327-329`, `:763`). 또 그 식은 단파 작용량 필드 `s%H`·`s%sigm`·`s%k` 로 KC 를 만드는데
+  (`:731`, `:742`, `:745`) NH 모드는 `swave` 를 강제로 0 으로 둔다(`params.F90:1560-1563`).
+  NH 에서 그 필드가 무엇을 담는지는 여기서 추적하지 않았다 → 모델 메커닉은
+  [`xbeach_vegetation.md`](../../models/XBeach/source-analysis/xbeach_vegetation.md) 후속 대상.
+
+[^px-method]: Saviz Naeini & Snaiki (2024) arXiv:2401.08684v1 §3.1–3.2, §4.2 — *"a Conditional Generative Adversarial Network (cGAN) is employed to establish a mapping between the image representations of the XBSB-based scalograms and the XBNH-based scalograms"*; 생성기 C64-C128-C128-C256-C256-C512×5 / CD512×4-CD256×2-CD128×2-CD64, 4×4 stride 2; *"The weighting parameter λ of Eq. (13) was set to a large value of 100"*; *"The implementation of the entire framework is based on pix2pixGAN project (Isola et al., 2017)"*. 설정 §4.1 — *"The domain size extends approximately 30 m in the cross-shore direction. The depth of the 1D profile ranges from -0.5 m offshore to 0.4 m nearshore. The still water level (SWL) is set at 0.05 m"*; *"A uniform grid size of 2.5 cm is utilized for XBNH, whereas for XBSB, the grid spacing varies from 5 cm offshore to 2.5 cm closer to the shoreline"*; *"a total of 100 experiments were conducted for each mode … 0.05 ≤ Hm0 (m) ≤ 0.085, 0.55 ≤ fp (Hz) ≤ 1, and 1 ≤ γ ≤ 3.3"*; *"On average, each simulation using the XBNH mode lasted approximately 5 minutes, whereas the simulations using the XBSB mode required less than 2 minutes and a half"*.
+[^px-t2]: 同 §4.3 — scalogram MSE *"between the cGAN-based and the XBNH-based scalograms are 1.06e-06, 1.26e-06, and 2.37e-06 … between the XBSB-based and the XBNH-based scalograms are 1.91e-05, 2.54e-05, and 5.21e-05"*. Table 2 (XBNH mean/σ; cGAN mean/σ/MSE/MAE; XBSB mean/σ/MSE/MAE, m·m²): 1st 0.055/0.007; 0.056/0.007/9.16e-5/0.0001; 0.053/0.008/1.18e-4/0.008 · 2nd 0.055/0.008; 0.053/0.008/1.12e-4/0.008; 0.056/0.010/1.57e-4/0.010 · 3rd 0.061/0.013; 0.058/0.012/1.64e-4/0.010; 0.059/0.014/3.23e-4/0.015. 비율·σ² 비교는 본 노트 계산이며 σ 가 1 mm 단위로 반올림돼 있어 범위로 적었다.
+[^px-lim]: 同 §5 — *"its applicability is restricted to a single coastal profile (Fig. 3). With a new basin configuration, it's necessary to retrain the model"*; *"the cGAN model necessitates the use of low-fidelity simulations from XBSB mode as input … leading to a total simulation time comparable to XBSB"*; *"the proposed model reduces the time required for high-fidelity simulation by almost half"*.
+[^am-method]: Amini, Marsooli & Neshat (2024) arXiv:2401.09687v1 §2.1–2.3 — T&N *"C_D = 2(α0/Rp + α1)"*, *"we applied a linear relationship between α1 and φ, expressed as α1 = 0.56 + 4.08 φ with the R² value of 0.94 … α0 = 5.26 + 318.1 φ, displaying an R² value of 0.83"*; *"maxbrsteep was set to 0.65 and breakviscfac was set to 1.5"*; *"The values of Cd range from 1.8 to 10 … the constraint for the decision variable is considered as 1.8 ≤ Cd ≤ 10"*; Appendix Algorithm 1·2 *"N=10, Max_iter=400"*. §1 *"This represents an improvement to the XBNH model, given that the drag coefficient in the model is a predefined temporally constant value."* §3 *"T&N formula being developed and validated for a limited range of plant Reynolds numbers between 40-685"*.
+[^am-t2]: 同 Table 2 *"Root-mean-square-error (RMSE) of the different approaches across four cases"*; 수동 탐색 §3 *"For each case, we manually tested different drag coefficient (Cd) values between 1.8 and 2.8 … Cd values above 2.8 are not simulated as the errors increased for all cases"*. 결론 §4 *"This represents a major advance by harnessing optimization techniques to improve the accuracy, efficiency, and consistency of Cd calibration."*
+[^am-dim]: 同 §2.2 — *"The rigid model vegetation consisted of uniform cylindrical birch dowels with a diameter of 9.5 mm"* 와 *"scaled rigid vegetation with a density of Nv=3182 stems/m2, stem diameter of bv=3.2 mm, and height of hv=20 cm were installed along the sloping beach profile with the spacing of λ=19.1 cm to represent a full-scale density of 350 stems/m2"*. 밀도·φ·α 역산은 본 노트 계산.
 
 ## 7.2 §5.1 출처
 
