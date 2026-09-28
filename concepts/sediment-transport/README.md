@@ -12,7 +12,7 @@
 | `03-analysis-methods.md` | **verified** | 입도 분석·관측·empirical formula |
 | `04-code-and-tools.md` | **verified** | EFDC SED·Delft3D-SED·CSTMS·Soulsby |
 | `05-examples.md` | TBD | 한국 적용 사례는 바이블 검증(객관 데이터) 후 experience/ 에 카테고리화 — 본 canonical 미수록 |
-| `06-model-application.md` | source-needed | EFDC 표사 모듈 — `models/EFDC/` |
+| `06-model-application.md` | verified | EFDC SED 2분기 — `models/EFDC/source-analysis/sediment/` cross-link. 잔존 source-needed: 한국 적용 사례(`experience/` 정책) |
 
 ## 사용된 source_id
 
