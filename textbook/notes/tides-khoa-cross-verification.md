@@ -69,8 +69,9 @@ g_expected = G + 9·a_M2  (mod 360)
 
 - **A (DASHBOARD 조위관측소_조화상수.csv) = 정확** — 변환 공식과 정합
 - **C (tide_model 통합 DB) `m2_pha_g` 컬럼 = 일부 정점에서 변환 오류 가능성**
+  - ★2026-09-28 정정: 오류는 일부가 아니라 **전 행**이고 소스별로 반대 열이 틀렸다 — TIDE_OBS·TIDEBED 는 g 열, **TBM 은 G 열**(원본 추출의 `pha_kst` 가 실제로는 κ). 원본 파일은 수정됨(`textbook/sources.yml` `khoa-tide-model` 항목 참조).
 
-skill.md의 KHOA API 가이드(§ "G 재계산 코드")에서도 `tl_*_k` 값 재계산 필요성 명시 — 통합 DB 생성 과정에서 일부 정점 변환 미적용·미스매치 가능.
+skill.md의 KHOA API 가이드(§ "G 재계산 코드")에서도 `tl_*_k` 값 재계산 필요성 명시 — 통합 DB 생성 과정에서 일부 정점 변환 미적용·미스매치 가능. (2026-09-28: 그 가이드의 "`tl_*_k` = 실제 g" 가 틀렸고, 이것이 TBM G 열 오류의 원인이었다 — `tl_*_k` 는 κ, 실제 g 는 `tl_*_g`.)
 
 ### 3.4 후속 조치
 
@@ -177,8 +178,8 @@ skill.md의 KHOA API 가이드(§ "G 재계산 코드")에서도 `tl_*_k` 값 �
 |---|---|
 | DASHBOARD `조위관측소_조화상수.csv` | **정확** (변환 공식과 정합) |
 | DASHBOARD `기준검조소_조화 및 비조화 상수.csv` | 검증 필요한 추가 케이스 있음 |
-| tide_model `khoa_harmonic_db.csv` (G 컬럼) | **정확** |
-| tide_model `khoa_harmonic_db.csv` (g 컬럼) | **일부 정점 변환 오차** — 재계산 권장 |
+| tide_model `khoa_harmonic_db.csv` (G 컬럼) | TIDE_OBS·TIDEBED **정확** / **TBM 518행 오류**(κ−9a) — 2026-09-28 원본 수정 |
+| tide_model `khoa_harmonic_db.csv` (g 컬럼) | TIDE_OBS·TIDEBED **전 행 오류** / TBM 정확 — 2026-09-28 원본 수정 |
 | 4대분조 각속도 (9자리, skill.md) | **정확** |
 | 부산 검증 (연구 doc 40 cm) | 자체 일관, source 명시 필요 |
 | 수치조류도 CSV | 단위 = **cm/s (조류 속도)**, elevation 아님 |
