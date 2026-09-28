@@ -251,15 +251,15 @@ ADCIRC 가 한국 storm-surge 의 primary unstructured 모델이라면, **EFDC+ 
 
 > **관련(탐색)**: 아래 `source-needed` 칸의 추정치는 **연간백서 층위로는 채울 수 없다** — 백서는 월별 통계만 준다.
 > 층위별로 무엇이 가능한지와 시간별 잔차 실측의 소재는 [`08-applied-observed-surge-resolution.md`](08-applied-observed-surge-resolution.md) (④응용) §1–2 참조.
-> 특히 **Lingling 행의 `~1.0 m` 는 출처 없는 추정이며 실측과 어긋난다.**
+> 산바·볼라벤·링링 행에 있던 `~1.5 m`·`~1.2 m`·`~1.0 m` 는 출처 없는 추정이라 지웠다(2026-09-28). 두 건은 시간별 잔차 실측과 크게 어긋났다 — 값은 08 에만 둔다(이 노트는 layer 3 이라 experience 근거 불가).
 
 | 태풍 | 연 | 한국 경로 | 관측 surge | 본 case 와 관계 |
 |---|---|---|---|---|
 | **Maemi (매미)** | 2003 | 마산만 직격 | ~2.4 m 마산 (source-needed) | **본 노트 §1** |
-| Sanba (산바) | 2012 | 남해 동부 | ~1.5 m 부산 (source-needed) | Hinnamnor 와 유사 magnitude |
-| **Bolaven (볼라벤)** | **2012-08-29** | 서해 종단 | ~1.2 m 인천 (source-needed) + **군산 외해 ADCP 잔차류 verified** | **§4.1 보강 (verified case)** |
+| Sanba (산바) | 2012 | 남해 동부 | 시간별 잔차 층위 값은 [08 §6.1](08-applied-observed-surge-resolution.md) 참조 (무출처 추정 삭제) | — |
+| **Bolaven (볼라벤)** | **2012-08-29** | 서해 종단 | 조위 잔차: [08 §6.1](08-applied-observed-surge-resolution.md) 참조 + **군산 외해 ADCP 잔차류 verified** | **§4.1 보강 (verified case)** |
 | **Danas (다나스)** | 2013-10 | **대한해협 북상** | **가덕도 71·부산 53·고흥 56 cm verified ✓** (KHOA 2013 §3, 해일고) | **백서 전용 챕터** ([[khoa-annual-2013-danas-surge]]) |
-| Lingling (링링) | 2019 | 서해 북상 | ~1.0 m 인천 (source-needed) | 서해 storm-surge baseline |
+| Lingling (링링) | 2019 | 서해 북상 | 시간별 잔차 층위 값은 [08 §2](08-applied-observed-surge-resolution.md) 참조 (무출처 추정 삭제) | 서해 storm-surge baseline |
 | **Hinnamnor (힌남노)** | 2022 | **남동해안 직격** | **포항 137 cm verified ✓** (KHOA 2022) | **본 노트 §2** ([[khoa-annual-2022-hinnamnor-surge]]) |
 
 ### 4.1 Bolaven 2012 verified — 군산 외해 ADCP 잔차 조류
