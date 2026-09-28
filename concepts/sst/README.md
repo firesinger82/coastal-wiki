@@ -10,7 +10,7 @@
 | `03-analysis-methods.md` | **verified** | 시계열 회귀·Mann-Kendall·Sen's slope·climatology·anomaly·MHW (Hobday 2016)·spectral |
 | `04-code-and-tools.md` | **verified** | KHOA OpenAPI + NOAA OISST + UKMO HadISST + JMA COBE-SST2 + NIFS KODC 운영 정리 |
 | `05-examples.md` | **verified** | trend 재현 + monthly MHW 식별 (Hobday 2016 variant) — 13정점 ~180 events, 2024-08~11 광역 사건 정량 |
-| `06-model-application.md` | verified | EFDC/Delft3D/ROMS heat module — models/ source-analysis cross-link. 잔존 source-needed: Delft3D 일부 입력 형식·한국 적용 paper·forcing endpoint |
+| `06-model-application.md` | verified | EFDC/Delft3D/ROMS heat module — models/ source-analysis cross-link. 잔존 source-needed: 한국 적용 paper(`experience/` 정책)·SST forcing endpoint |
 
 ## 사용된 source_id
 

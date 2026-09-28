@@ -4,7 +4,7 @@ topic: sst
 canonical_source: self
 citation_status: verified
 has_source_needed: true
-verification_method: "모델별 표층 열수지 구현 claim 을 검수완료 source-analysis 노트로 cross-link verified: (1) ROMS COARE bulk flux 4-항 + cool-skin → models/ROMS/source-analysis/roms_bulk_flux_coare.md (bulk_flux.F 1623줄 직접 read, COARE 1996/2003/Edson2013 8 paper) + roms_atmospheric_forcing.md (COARE 3.0 3-iter loop, longwave 3 옵션, shortwave penetration SOLAR_SOURCE, file:line 인용). (2) Delft3D heat KTEMP 5 dispatch + ocean/Proctor COARE-style bulk + Murakami 4-항 → models/Delft3D/source-analysis/delft3d_heat.md (heatu.f90:162-1276 직접 분석). (3) EFDC 연직 수온 transport/layering(sigma·SGZ)·vertical advection → models/EFDC/source-analysis/efdc_vertical.md (caltran.f90·caluvw.f90 file:line). \n**2026-09-28 토큰 재분류·정정**: (4) EFDC 표층 heat budget → models/EFDC/source-analysis/efdc_heat_temperature.md (EFDC+ mod_heat.f90 CALHEAT :52-1093, ISTOPT(2) 5 분기, Full Heat Balance 3 flux 하드코딩 :648-651, COARE 3.6 :691-773) + efdc_surface_forcing.md §4 (ASER :332-470) 로 이미 verified 였음 — 'calheat source-analysis 미작성' 은 stale. (5) ★§8 SWAN 정정: 구 서술 'S_in 에 Tolman(1991) stability correction, SET LEVel=auto' 는 틀림. SET [level] 은 수위 증분(swanuse.pdf PDF p.35, swanpre1.ftn:2170 INREAL('LEVEL',WLEV)). ASTD(기온-수온차)는 INPGRID ASTD(swanpre1.ftn:1388-1391)·WIND ASTD(:2780, CASTD) 로 읽혀 보간·저장·출력(swanmain.ftn:4972-4974, swanout1.ftn:2714)만 되고 swancom1-5.ftn·SdsBabanin.ftn90 의 ASTD 참조 0건, CASTD 는 초기화·읽기·0 대입 외 사용 0건 — 본 스냅샷 SWAN 풍입력 항은 안정도 보정을 하지 않는다. 여전히 source-needed: Delft3D §4.1 .bcc·Sub1 형식(.bct 는 delft3d-flow-boundary-forcing §6), 각 모델 한국 적용 paper(NIFS/KMOU — experience/ 정책), SST forcing 데이터셋 endpoint(외부)."
+verification_method: "모델별 표층 열수지 구현 claim 을 검수완료 source-analysis 노트로 cross-link verified: (1) ROMS COARE bulk flux 4-항 + cool-skin → models/ROMS/source-analysis/roms_bulk_flux_coare.md (bulk_flux.F 1623줄 직접 read, COARE 1996/2003/Edson2013 8 paper) + roms_atmospheric_forcing.md (COARE 3.0 3-iter loop, longwave 3 옵션, shortwave penetration SOLAR_SOURCE, file:line 인용). (2) Delft3D heat KTEMP 5 dispatch + ocean/Proctor COARE-style bulk + Murakami 4-항 → models/Delft3D/source-analysis/delft3d_heat.md (heatu.f90:162-1276 직접 분석). (3) EFDC 연직 수온 transport/layering(sigma·SGZ)·vertical advection → models/EFDC/source-analysis/efdc_vertical.md (caltran.f90·caluvw.f90 file:line). \n**2026-09-28 토큰 재분류·정정**: (4) EFDC 표층 heat budget → models/EFDC/source-analysis/efdc_heat_temperature.md (EFDC+ mod_heat.f90 CALHEAT :52-1093, ISTOPT(2) 5 분기, Full Heat Balance 3 flux 하드코딩 :648-651, COARE 3.6 :691-773) + efdc_surface_forcing.md §4 (ASER :332-470) 로 이미 verified 였음 — 'calheat source-analysis 미작성' 은 stale. (5) ★§8 SWAN 정정: 구 서술 'S_in 에 Tolman(1991) stability correction, SET LEVel=auto' 는 틀림. SET [level] 은 수위 증분(swanuse.pdf PDF p.35, swanpre1.ftn:2170 INREAL('LEVEL',WLEV)). ASTD(기온-수온차)는 INPGRID ASTD(swanpre1.ftn:1388-1391)·WIND ASTD(:2780, CASTD) 로 읽혀 보간·저장·출력(swanmain.ftn:4972-4974, swanout1.ftn:2714)만 되고 swancom1-5.ftn·SdsBabanin.ftn90 의 ASTD 참조 0건, CASTD 는 초기화·읽기·0 대입 외 사용 0건 — 본 스냅샷 SWAN 풍입력 항은 안정도 보정을 하지 않는다. 여전히 source-needed: 각 모델 한국 적용 paper(NIFS/KMOU — experience/ 정책), SST forcing 데이터셋 endpoint(외부). §4.1 (2026-09-28): Delft3D-FLOW User Manual (models/Delft3D/raw/manuals/pdfs, pdftotext) App A.2.17 <name.bcc> p.467·A.2.18 <name.tem> p.472·MDF 예시 Sub1/Ktemp PDF p.451 + dimpro.f90:146-169 Sub1 파싱 직독 — .bct·.ext·Sub1=temp 서술 정정."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-23
 verification_by: "Claude Opus 4.8 (1M context) — 모델 source-analysis 노트 cross-link verify 2026-06-18"
@@ -20,7 +20,7 @@ related:
 
 > 본 §는 SST(또는 수온 일반) 가 연안 수치모델에 어떻게 들어가는지·어떻게 나오는지 정리. EFDC·Delft3D·ROMS·ADCIRC·XBeach·SWAN 모델별 차이.
 
-> **citation_status: verified** (모델 source-analysis cross-link 기반) — ROMS COARE bulk flux·Delft3D heat KTEMP·EFDC 연직 수온 transport 의 구현은 검수완료 source-analysis 노트(아래 링크)로 뒷받침. EFDC 표층 heat budget 커널도 검수완료 노트로 뒷받침(§3.2). **여전히 source-needed**: Delft3D §4.1 일부 입력 형식, 한국 적용 paper(`experience/` 정책), SST forcing endpoint(외부).
+> **citation_status: verified** (모델 source-analysis cross-link 기반) — ROMS COARE bulk flux·Delft3D heat KTEMP·EFDC 연직 수온 transport 의 구현은 검수완료 source-analysis 노트(아래 링크)로 뒷받침. EFDC 표층 heat budget 커널도 검수완료 노트로 뒷받침(§3.2). **여전히 source-needed**: 한국 적용 paper(`experience/` 정책), SST forcing endpoint(외부).
 
 ## 1. SST 의 역할 — 입력 vs 출력
 
@@ -87,12 +87,16 @@ EFDC 의 SST 출력:
 
 ### 4.1 입력 (Delft3D-FLOW 4.x)
 
-| 파일 | 변수 |
-|---|---|
-| `*.bct` | open boundary forcing — temperature time series 옵션 |
-| `*.bcc` | 3D boundary condition (수온 vertical profile) |
-| `*.ext` | external forcing — meteo block (heat flux 옵션) |
-| `*.mdf` | master file — heat model 활성화 (Sub1 = 'temp') |
+| 파일 | 역할 | 근거 |
+|---|---|---|
+| `*.mdf` `Sub1` | 앞 4글자 중 **어느 자리든 `T`(대소문자 무관)** 가 있으면 수온 활성 (`S` 염분·`I` 이차류·`W` 바람도 같은 방식, 예 `Sub1 = #ST W#`) | `dimpro.f90:146-169` (`models/Delft3D/raw/source_code/Delft3D/src/engines_gpl/flow2d3d/packages/flow2d3d_io/src/input/`) · FLOW User Manual MDF 예시 PDF p.451 |
+| `*.mdf` `Ktemp` | heat flux 모델 선택 (0 = 없음) | 같은 MDF 예시 · 분기 구현은 §4.2 [`delft3d_heat.md`](../../models/Delft3D/source-analysis/delft3d_heat.md) |
+| `*.bcc` | **수송 경계(염분·수온) 시계열** — 경계 구간별 header + data 블록, 연직 분포 `Uniform`·`Linear`·`Step`·`3d-profile` | FLOW User Manual App A.2.17 p.467 |
+| `*.tem` | heat flux 모델 시간 입력(기온·상대습도·운량·일사 등, 모델 번호별 레코드) | 같은 매뉴얼 App A.2.18 p.472 |
+| `*.bct` | 수리(수위·유량) 경계 시계열 — **수온 입력 아님** | [`delft3d-flow-boundary-forcing.md`](../../models/Delft3D/manual-notes/delft3d-flow-boundary-forcing.md) §6 |
+
+> ★정정 (2026-09-28): 구판은 `.bct` 를 "수온 시계열 옵션", `.ext` 를 D3D-4 FLOW 의 meteo 입력, 활성화를 `Sub1 = 'temp'` 로 적었다.
+> 수온 경계는 `.bcc`, heat 강제는 `.tem` 이다. `.ext` 는 D-Flow FM 의 외부 강제 파일이다. `'temp'` 는 `t` 를 포함해 우연히 동작할 뿐 문서 규약이 아니다.
 
 ### 4.2 Heat module
 
