@@ -51,7 +51,7 @@ def nearest_point(lat_t, lon_t):
 ### 1.3 관찰
 
 **서해·명량 (강함)**:
-- M₂ 진폭 ≈ 40-42 cm/s — 한국 서해 일반 통설 (1-3 m/s 왕복성) 대비 **낮은 격자값**
+- M₂ 진폭 ≈ 40-42 cm/s — 한국 서해 일반 통설 (1-3 m/s 왕복성) 대비 **낮은 격자값**. 이 진폭은 유속 크기가 아니라 **남북(v) 성분**이다(§4) — 동서로 흐르는 조류는 이 값에 거의 나타나지 않는다
 - 격자는 해역 평균값. 명량해협 통과 부근 sub-grid 가속 (5+ m/s)은 미해상
 
 **부산 (약함)**:
@@ -113,9 +113,9 @@ sub = df[(df.lon.between(126,127)) & (df.lat.between(37,38))]
 
 ## 4. 한계 명시
 
-- **단일 (진폭, 위상) 페어**만 제공 — (Lsmaj, Lsmin, θ, g) 4 parameter 중 일부만. **회전 방향 정보 없음**
-- **단위 추정**: 파일명 + range로 cm/s 추정. KHOA 원본 문서 확인 권장
-- **위상 기준**: GMT (G) or KST (g) — 명시 없음 (KHOA 공시 자료라 g 추정, 확인 필요)
+- **단일 (진폭, 위상) 페어** = **남북(v) 유속 성분**(동서 성분 없음). 예측 아카이브 대조로 확인 — [`experience/khoa-tidal-current-phase-reference-2026.md`](../../experience/khoa-tidal-current-phase-reference-2026.md) @ `5de93ff` §3b. **회전 방향·장축 정보 없음**
+- **단위**: cm/s — 예측 유속(cm/s) 의 v 성분 분산과 ½ΣA² 의 비가 0.99–1.01 로 맞는다(같은 experience 노트 §3b). 포털 메타데이터에는 단위 미기재
+- **위상 기준**: CSV·포털 모두 명시 없음 — KHOA 표준에 따라 g(135°E) 로 해석(상단 출처 줄 참조)
 - **동해 미커버**: 별도 source 필요
 - **격자 평균**: sub-grid (명량 협수로 등) 가속 미해상
 
@@ -155,12 +155,12 @@ pred = reconstruct(t_pred, coef)
 # 5) 수치조류도 격자값과 정합 비교
 nearest = nearest_point(target_lat=35.0, target_lon=129.0)  # §1.1 함수
 print(f"수치조류도 M2 = {nearest['m2_진폭']:.2f} cm/s @ {nearest['m2_지각']:.2f}°")
-# UTide 결과 M2 = coef[name=='M2'] / Lsmaj 와 비교
+# 격자 진폭은 v 성분 — UTide 를 v 성분 단독(스칼라)으로 분해한 M2 진폭과 비교
 ```
 
 검증 기준:
-- UTide M₂ Lsmaj ↔ 수치조류도 격자 M₂ 진폭: 같은 정점에서 ±20% 이내 (격자 해상도 한계)
-- 위상 차이: 격자 기준이 명시되면 (G/g 변환) 동일 정밀도로 비교
+- UTide 로 **v 성분만** 따로 분해한 M₂ 진폭 ↔ 수치조류도 격자 M₂ 진폭 (Lsmaj 와 비교하면 안 된다 — 격자 진폭은 남북 성분, §4)
+- 위상: 격자 지각은 g(135°E) — UTC 입력 UTide 결과(G)와 비교할 때 G = g − 9a 로 변환
 
 ## 5.5 KHOA 2025 관측 기반 유속 대표값 (해역별)
 
@@ -174,8 +174,8 @@ print(f"수치조류도 M2 = {nearest['m2_진폭']:.2f} cm/s @ {nearest['m2_지�
 
 ## 6. 보강
 
-- ~~**수치조류도 위상 기준** (G/g) 확인~~ — **해소**: KHOA 표준 지각 g=동경135°(KST) ([03-analysis-methods.md](03-analysis-methods.md) §1.3, 백서 L2491). CSV 컬럼 라벨 명시만 잔존.
-- **수치조류도 "진폭"** 정확한 정의 (단일 성분 / |U| / Lsmaj 중 어느 것)
+- ~~**수치조류도 위상 기준** (G/g) 확인~~ — **해소**: KHOA 표준 지각 g=동경135°(KST) ([03-analysis-methods.md](03-analysis-methods.md) §1.3, 백서 L2491). CSV·포털 메타데이터 모두 미기재 확인(2026-09-28).
+- ~~**수치조류도 "진폭"** 정확한 정의~~ — **해소**: 남북(v) 성분 ([`experience/khoa-tidal-current-phase-reference-2026.md`](../../experience/khoa-tidal-current-phase-reference-2026.md) @ `5de93ff` §3b)
 - 동해 조류 별도 자료 — NAO.99Jb regional, KHOA OpenAPI 직접
 - ADCP 실측 데이터 사용 시 격자값과 검증 사례 추가 (`experience/`로)
 - 명량·진도 실제 관측 사례 (강한 비선형)

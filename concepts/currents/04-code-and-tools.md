@@ -95,9 +95,11 @@ q1_진폭, q1_지각, s2_진폭, s2_지각, 좌표
 
 ### 2.3 한계
 
-- **단일 성분만**: 4 parameter (Lsmaj, Lsmin, θ, g) 중 (진폭, 위상) 2개만 — 회전·장축 방향 정보 없음
-  - 추측: u 또는 v 한 방향, 또는 max speed magnitude만
-  - 정확한 의미 → KHOA 원본 문서 별도 확인 필요 (source-needed)
+- **단일 성분만**: 4 parameter (Lsmaj, Lsmin, θ, g) 중 (진폭, 위상) 2개만 — 회전·장축 방향 정보 없음.
+  CSV 헤더와 data.go.kr 컬럼 설명(*"조화상수의 진폭정보"*)은 어느 성분인지 밝히지 않는다(2026-09-28 확인).
+  같은 격자의 KHOA 예측 유속·유향 아카이브(data.go.kr 15130143)와 대조하면 **남북(v) 성분**과 일치하고 동서 성분은 담기지 않는다 —
+  [`experience/khoa-tidal-current-phase-reference-2026.md`](../../experience/khoa-tidal-current-phase-reference-2026.md) @ `5de93ff` §3b.
+  따라서 이 CSV 만으로는 조류 벡터·타원을 재구성할 수 없다.
 - **위상 기준**: CSV 헤더·data.go.kr 컬럼 설명 모두 명시 없음(2026-09-28 확인). KHOA 공식 표준(지각 g 는 동경 135° 기준, [03-analysis-methods.md](03-analysis-methods.md) §1.3)에 따라 **g(135°E KST)** 로 해석한다. 데이터 기반 교차 확인: [`experience/khoa-tidal-current-phase-reference-2026.md`](../../experience/khoa-tidal-current-phase-reference-2026.md) @ `636c1e6`
 - **격자 해상도**: 약 0.001° (≈ 100 m) → 좁은 수로·만 미해상 가능
 
