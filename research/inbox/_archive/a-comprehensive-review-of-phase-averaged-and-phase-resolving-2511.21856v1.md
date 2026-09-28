@@ -12,6 +12,7 @@ action: archive
 collected: 2026-06-07T00:00:30.413735+00:00
 promoted_to: concepts/waves/04-code-and-tools.md#51
 promoted_date: 2026-06-15
+promotion_upgraded: 2026-09-28  # abstract-level source-needed → full PDF 전문 판독 verified (§5.1.1-5.1.4)
 ---
 
 ## Abstract

@@ -118,6 +118,11 @@ Layer 3: SWAN detail (~50-100 m, 항만·연안)
 ### 7.2 검증 메트릭
 
 > ⚠ 아래 '일반 기준' 수치(RMSE·bias·상관계수·방향오차 임계)는 인용 근거 미확보 — 출처(검증 practice 문헌·기관 기준) 확보 전까지 참고값. (source-needed)
+>
+> **확보 대상 확인 (2026-09-28)**: Ferdaus et al. (2025) 종합 리뷰를 전문 판독했으나 **지표 정의만 있고 수치 합격선은 없다**
+> ([`04-code-and-tools.md §5.1.3`](04-code-and-tools.md)). 리뷰가 표준의 소재로 지목한 곳은 셋 —
+> **WISE Group** 비교 연구 · **JCOMM Wave Forecast Verification Project** · **WMO 파랑모델 검증 표준**.
+> 다음 확보는 이 셋을 대상으로 한다.
 
 | 메트릭 | 정의 | 일반 기준 |
 |---|---|---|
