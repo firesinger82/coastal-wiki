@@ -2,6 +2,11 @@
 
 ## 현재 작업
 
+**2026-09-28 — concepts 보강 + ④ 응용 레이어 신설.** 핸드오프: [세션 기록 2026-09-22~28](_staging/SESSION-2026-09-28.md).
+신규 6노트(layer 4 = 2, **위키 최초**) · 격상 4절(전부 abstract → full PDF verified) · L4 감사 11파일 + cron 6회 ·
+**models/ 무결성 위반 1건 적발→SCOPED EDIT 정정**(adcirc-swan-coupling 인용 3건) · XBeach 발견 2건 models 이관.
+다음 후보·잔여·본질적 공백 구분은 세션 기록 §6, 반복 확인된 규칙은 §7.
+
 **2026-09-22 — 스냅샷 마이그레이션 프로그램 종료.** 핸드오프: [세션 기록 2026-09-21~22](_staging/SESSION-2026-09-22.md).
 git 저장소 29/29 upstream 최신 · 프레임워크 게이트 4종(+`tree_state`) · 계수 게이트 G10 신설 · AMBIGUOUS 460→69 · UNRESOLVED 234→153 · 전칭 단언 61건 정정.
 다음 후보는 **concepts 보강**(1차 축인데 2차 축의 1/6) — 상세·잔여·사용자 결정 대기 항목은 세션 기록 §5.

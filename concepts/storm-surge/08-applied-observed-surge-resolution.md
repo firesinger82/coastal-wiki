@@ -9,7 +9,7 @@ depends_on:
 canonical_source: self
 citation_status: verified
 has_source_needed: true
-verification_method: "④ 응용 노트(CONVENTIONS §8.1). [[05-examples]] 가 한국 태풍 case 의 관측 surge peak 를 `source-needed` 로 남겼는데, 그 공백이 **자료 층위 문제**라는 것이 본 노트의 출발점이다 — [[khoa-annual-2019-lingling-mitag-surge]] §3.2·§5 가 백서로는 시간별 surge 시계열을 줄 수 없다고 직접 적고 있고, 그 시계열은 experience 자산에만 있다. 근거 의존: ③[[03-analysis-methods]](tide-surge 분리 절차)·[[khoa-annual-2019-lingling-mitag-surge]](백서가 주는 것의 한계, verified)·experience 커밋고정. **개인 결과 수치는 본문에 표로 복제하지 않고** 논증에 필요한 최소 쌍만 인용하며 전체는 고정 링크를 따른다(§8.1 '본문 복제 금지'). 인용 고정점 = `experience/khoa-49-station-16yr-utide-2026.md` @ `454a69b`. **한계**: (1) 근거가 한국 연안 KHOA 단일 자산이고 10개 태풍 표본이다. (2) baseline σ 의 해역별 값은 인용 노트 §4.5 의 범위 서술(7–14 cm)을 따른 것이고 정점별 σ 목록은 본 노트가 재현하지 않았다. (3) §3 의 경보 임계 논의는 **설계 함의**이지 현행 경보 기준에 대한 평가가 아니다 — 국내 경보 기준 문서는 확보하지 않았다."
+verification_method: "④ 응용 노트(CONVENTIONS §8.1). [[05-examples]] 가 한국 태풍 case 의 관측 surge peak 를 `source-needed` 로 남겼는데, 그 공백이 **자료 층위 문제**라는 것이 본 노트의 출발점이다 — [[khoa-annual-2019-lingling-mitag-surge]] §3.2·§5 가 백서로는 시간별 surge 시계열을 줄 수 없다고 직접 적고 있고, 그 시계열은 experience 자산에만 있다. 근거 의존: ③[[03-analysis-methods]](tide-surge 분리 절차)·[[khoa-annual-2019-lingling-mitag-surge]](백서가 주는 것의 한계, verified)·experience 커밋고정. **개인 결과 수치는 본문에 표로 복제하지 않고** 논증에 필요한 최소 쌍만 인용하며 전체는 고정 링크를 따른다(§8.1 '본문 복제 금지'). 인용 고정점 = `experience/khoa-49-station-16yr-utide-2026.md` @ `454a69b`. ★정정(2026-09-28): §6 첫 항목이 2003년 마산 사례를 '마이삭' 으로 잘못 적었다 — 2003 마산은 **매미(Maemi)**, 마이삭(Maysak)은 2020 부산으로 §3 표에 별도 등장한다. 두 태풍을 혼동한 표기 오류로 정정했다(§3 표·각주의 마이삭 2020 수치는 영향 없음). **한계**: (1) 근거가 한국 연안 KHOA 단일 자산이고 10개 태풍 표본이다. (2) baseline σ 의 해역별 값은 인용 노트 §4.5 의 범위 서술(7–14 cm)을 따른 것이고 정점별 σ 목록은 본 노트가 재현하지 않았다. (3) §3 의 경보 임계 논의는 **설계 함의**이지 현행 경보 기준에 대한 평가가 아니다 — 국내 경보 기준 문서는 확보하지 않았다."
 note_author: "Claude Opus 5 (1M context)"
 note_date: 2026-09-22
 related:
@@ -111,8 +111,8 @@ minor-event reproducibility 를 못 본다.**
 
 ## 6. 남은 것
 
-- **[[05-examples]] 의 잔여 칸은 그대로다** — 마이삭 2003 마산, 산바 2012 부산, 볼라벤 2012 인천.
-  마이삭(매미) 2003 은 백서 자체가 2012년부터라 **본질적 공백**이고([[05-examples]] §1 명시),
+- **[[05-examples]] 의 잔여 칸은 그대로다** — **매미(Maemi) 2003** 마산, 산바 2012 부산, 볼라벤 2012 인천.
+  매미 2003 은 백서 자체가 2012년부터라 **본질적 공백**이고([[05-examples]] §1 명시),
   나머지는 층위를 내리면 닿을 수 있으나 본 노트는 인용 자산에 있는 10개 태풍만 다뤘다. `source-needed`
 - **정점별 baseline σ 목록 미수록** — §3 은 범위(7–14 cm)와 해역 경향만 쓴다.
   정점별 값은 인용 노트를 따르며 본 노트가 복제하지 않았다. 경보 임계를 실제로 설계하려면 필요. `source-needed`
