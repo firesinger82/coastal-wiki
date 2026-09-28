@@ -151,7 +151,7 @@ print(f"O1: {nearest['o1_진폭']:.2f} cm/s @ {nearest['o1_지각']:.2f}°")
 
 - 실측 판별: 존재하는 이름은 키 없이 호출하면 `{"result":{"error":"ServiceKey is null"}}`, 없는 이름은 "요청하신 페이지" 오류 HTML 을 준다.
   이 방식으로 위 5개는 존재, 구판에 적었던 `tideObsReal`·`tideObsPre` 는 현행 경로에 **없다**(2026-09-28).
-- 유향 규약은 공식 명세에도 "deg" 로만 적혀 있다.
+- 명세는 유향을 "deg" 로만 적는다. 시각 지정 호출 대조로 **`Date`·`Hour` 는 KST**, **유향은 흐르는 방향(진북 기준 시계방향)** 임을 확인했다 — [`experience/khoa-tidal-current-phase-reference-2026.md`](../../experience/khoa-tidal-current-phase-reference-2026.md) @ `68ae7d7` §3c.
 - `tidalCurrentArea` 는 §2 조화상수 CSV 와 같은 수치조류도의 예측값이며, 예측은 **회전성 조류 벡터**다 — CSV(남북 성분만)로는 재현되지 않는다.
 
 ## 4. 도구 vs 모델 분리 (참고)
