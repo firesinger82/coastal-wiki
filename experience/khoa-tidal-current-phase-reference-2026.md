@@ -1,9 +1,9 @@
 ---
-title: "KHOA 수치조류도 조화상수 CSV — `지각` 위상 기준 판별 (g = 135°E, 44정점 데이터 검정)"
+title: "KHOA 수치조류도 조화상수 CSV — `지각` = g(135°E), `진폭·지각` = 남북(v) 성분 (데이터 검정)"
 topic: currents
 canonical_source: self
 citation_status: verified
-verification_method: "AI programmatic validation: (1) data.go.kr 파일데이터 15145955 '해양수산부 국립해양조사원_수치조류도 기반 조화상수_20250814.csv'(cp949, 813,703행, 14분조 진폭·지각 + 좌표) — CSV 헤더와 포털 컬럼 설명('조화상수의 지각정보') 모두 위상 기준 미기재를 2026-09-28 직접 확인. (2) 조위 G 위상 = [[khoa-49-station-16yr-utide-2026]] 의 49정점 16년 UTide(UTC 입력) 결과, KHOA 공표 pha_kst−9a 와 0.2–0.5° 이내 일치. (3) 정점별 최근접 격자점(≤5 km, 44정점) 에서 8분조(M2 S2 N2 K2 K1 O1 P1 Q1) 조류 위상 − 조위 G 위상을 비교 — 교차 대역 6쌍 + 시간대 오프셋 H 스캔(0–24 h, 0.25 h 간격) + 부트스트랩 10,000회. 스크립트·입력표·출력: tools/khoa-validation/current_phase_reference_test.py, results/current_phase_reference_rows.csv, results/current_phase_reference_test.txt."
+verification_method: "AI programmatic validation: (1) data.go.kr 파일데이터 15145955 '해양수산부 국립해양조사원_수치조류도 기반 조화상수_20250814.csv'(cp949, 813,703행, 14분조 진폭·지각 + 좌표) — CSV 헤더와 포털 컬럼 설명('조화상수의 지각정보') 모두 위상 기준 미기재를 2026-09-28 직접 확인. (2) 조위 G 위상 = [[khoa-49-station-16yr-utide-2026]] 의 49정점 16년 UTide(UTC 입력) 결과, KHOA 공표 pha_kst−9a 와 0.2–0.5° 이내 일치. (3) 정점별 최근접 격자점(≤5 km, 44정점) 에서 8분조(M2 S2 N2 K2 K1 O1 P1 Q1) 조류 위상 − 조위 G 위상을 비교 — 교차 대역 6쌍 + 시간대 오프셋 H 스캔(0–24 h, 0.25 h 간격) + 부트스트랩 10,000회. 스크립트·입력표·출력: tools/khoa-validation/current_phase_reference_test.py, results/current_phase_reference_rows.csv, results/current_phase_reference_test.txt. (4) 성분 판별(2026-09-28 추가): data.go.kr 파일데이터 15130143 해양수산부_수치조류도(예측 유속·유향 연도별 CSV, 지점당 하루 1표본) 과 동일 격자 대조 — ½ΣA²(S2 제외 13분조) 대 예측 u·v·장축·전체 분산 비(2021-2024, 연 2,005-2,020점) + UTide FUV 로 CSV 분조 합성 후 표본시각 스캔 상관(2024, 142점). 스크립트 tools/khoa-validation/current_component_test.py, 출력 results/current_component_test.txt."
 note_author: "Claude Opus 5.5 + 사용자 합의"
 note_date: 2026-09-28
 verification_by: "Claude Opus 5.5 — 3검정(교차쌍·오프셋 스캔·부트스트랩) + 포털 메타데이터 직접 확인"
@@ -65,11 +65,35 @@ $\Delta_c$ 에 $9a_c$ 가 섞여 반일주조–일주조 사이에 약 125–14
 
 → **CSV 의 `지각` 은 g(135°E, KST) 기준이다.** KHOA 공식 조석 위상 표준(동경 135° 기준 g)과 일치한다.
 
+## 3b. `진폭`·`지각` 은 남북(v) 유속 성분이다
+
+같은 격자의 KHOA 예측 유속·유향 아카이브(data.go.kr 15130143, 지점당 하루 1표본)와 대조했다.
+유향은 진북 기준 시계방향(흐르는 방향)으로 보고 $u=s\sin\theta$, $v=s\cos\theta$.
+
+**분산 대조** — CSV 의 $\tfrac12\sum A_c^2$ (S2 제외 13분조: 하루 1회 표본에서 S2 위상은 매일 같아 분산에 기여하지 않는다) 을
+예측 성분 분산으로 나눈 비의 중앙값 [사분위]:
+
+| 연도 | 지점 | v | u | 장축 | 전체 | log 상관 (v) |
+|---|---|---|---|---|---|---|
+| 2021 | 2,020 | **1.013** [0.979, 1.028] | 1.215 [0.78, 2.73] | 0.770 | 0.552 | 0.997 |
+| 2022 | 2,020 | **0.990** [0.970, 1.011] | 1.240 | 0.770 | 0.546 | 0.996 |
+| 2023 | 2,005 | **1.008** [0.969, 1.034] | 1.233 | 0.780 | 0.551 | 0.996 |
+| 2024 | 2,012 | **1.014** [0.980, 1.041] | 1.249 | 0.788 | 0.556 | 0.996 |
+
+**시계열 재구성** — UTide `FUV`(nodal·천문인수)로 CSV 13분조를 합성해 표본 시각을 0–24 h 훑었다(2024, 무작위 142점):
+최적 시각에서 관측 **v 와 상관 중앙 0.990** [0.989, 0.991], RMSE 4.9 cm/s, **u 와는 −0.28**.
+
+→ **CSV 는 남북 성분 하나만 담는다.** 예측 조류 자체는 회전성이다(연간 표본의 단축/장축 표준편차 비 중앙 0.45) —
+동서 성분 없이는 이 CSV 로 조류 벡터·타원을 재구성할 수 없다. 모델 조류 검증에 쓸 때는 모델의 v 성분과만 비교해야 한다.
+
+- 재구성 검정은 위상 기준을 따로 판별하지 않는다 — g↔G 변환은 표본 시각 9 h 이동과 수학적으로 같아 스캔이 흡수한다.
+  위상 기준 근거는 §3(조위 대조)이다. 최적 시각 21 UTC 는 g 가정일 때의 값이다.
+- 유향 규약(진북 기준 시계방향, 흐르는 방향)을 가정했다. 이 규약이 다르면 "v" 가 가리키는 물리 축도 달라진다.
+
 ## 4. 한계
 
 - **정점 해상도는 약 ±1 h 수준** — 스캔 곡선이 8.5–9.5 h 에서 평평하다(0.821–0.830). 9 h 대 0 h 판별은 확실하지만,
   9 h 가 8.5 h 보다 낫다는 것은 이 검정만으로는 약하다. 135°E 라는 값 자체는 기관 표준에 기댄다.
-- **`진폭` 이 어느 성분인지(장축 유속? u/v?)는 풀리지 않는다** — 이 검정은 위상만 쓴다.
 - 분조 간 $\Delta_c$ 가 같다는 전제는 근사다(개별 쌍 R 0.60–0.67). 결론은 44정점 평균의 방향에 기댄다.
 - 조위 G 는 16년 UTide 결과다(공표값과 대조 완료). KHOA 통합 DB(`khoa_harmonic_db.csv`)는 `g − G` 가 이론값 $9a$ 와
   **576행 전부** 어긋난다(M2 중앙 +7.5°, S2 +16.5°, K1 +8.2°, O1 −1.6°). 조위관측소 49정점에서 DB 의 G 열은 UTide G 와
@@ -84,6 +108,9 @@ CSV 의 경도 범위(117.59–129.97°E)가 동해안을 포함하는데도 격
 
 ```bash
 cd tools/khoa-validation
+# 성분 판별 (utide 필요, 원본 두 파일 필요)
+python3 current_component_test.py variance --harm <조화상수.csv> --pred <수치조류도.zip>
+python3 current_component_test.py recon --harm <조화상수.csv> --pred <수치조류도.zip> --year 2024
 # (1) 입력표 생성 — CSV 는 data.go.kr 15145955 에서 받는다(296 MB, 저장소 미포함)
 python3 current_phase_reference_test.py build --csv <수치조류도_조화상수.csv> --utide <49정점 UTide JSON 디렉터리>
 # (2) 검정 — 저장소의 입력표만으로 실행 가능

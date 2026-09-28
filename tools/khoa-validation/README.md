@@ -13,6 +13,7 @@
 | `logs/` | fetch 실행 로그 (정점별 시간·결측 정보) |
 | `results/` | 정점별 분석 결과 JSON + `ALL_RESULTS.json` 통합 |
 | `current_phase_reference_test.py` | 수치조류도 조화상수 CSV `지각` 위상 기준(G/g) 판별 검정 — `experience/khoa-tidal-current-phase-reference-2026.md` 재현용 (`build` → `results/current_phase_reference_rows.csv`, `test` → `results/current_phase_reference_test.txt`) |
+| `current_component_test.py` | 같은 CSV 의 `진폭·지각` 이 어느 유속 성분인지 판별 (예측 유속·유향 아카이브 대조, 결과 v 성분) → `results/current_component_test.txt` |
 
 ## 재현 절차
 
