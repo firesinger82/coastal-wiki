@@ -4,7 +4,7 @@ topic: swash-zone
 canonical_source: self
 citation_status: verified
 has_source_needed: true
-verification_method: "**교과서 page 직접 확인 인용분 = verified**: (1) surf similarity(Battjes 1974) ζ=tanβ/√(H0/L0)·Dean number D=Hb/(wT)·Froude F=w/√(gHb) → coastal-processes-with-eng-apps p.26 §3.3.1 Eq(3.1)-(3.3) 본문 read 확인. (2) wave run-up R_u2% 설계파라미터·run-up 속도 Eq(2) u2%=c_u2%√(g(R_u2%−zA))·flow thickness Eq(3)·front velocity Eq(4)·계수 c_h2%=0.20(1:3,1:4)/0.30(1:6)·c_u2%=1.4-1.5·front-velocity 분포(15%/30-40%/75%) → coastal-structures-design p.20-23 §2.3 본문 read 확인. **NLSW swash 해(Shen-Meyer 1963·Antuono 2010 JFM)·Hunt 1959·Stockdon 2006 runup 식·breaker-type ξ 임계값은 본 위키 md 교과서에 본문 부재 → 문헌 cross-ref(01 §4.2·04)로만 표기, 임의 page/식 인용 안 함**. Wijetunge book pp.49-59 run-up 본문은 추출 md 에 미수록(index entry 만 존재) → 인용 안 함."
+verification_method: "**교과서 page 직접 확인 인용분 = verified**: (1) surf similarity(Battjes 1974) ζ=tanβ/√(H0/L0)·Dean number D=Hb/(wT)·Froude F=w/√(gHb) → coastal-processes-with-eng-apps p.26 §3.3.1 Eq(3.1)-(3.3) 본문 read 확인. (2) wave run-up R_u2% 설계파라미터·run-up 속도 Eq(2) u2%=c_u2%√(g(R_u2%−zA))·flow thickness Eq(3)·front velocity Eq(4)·계수 c_h2%=0.20(1:3,1:4)/0.30(1:6)·c_u2%=1.4-1.5·front-velocity 분포(15%/30-40%/75%) → coastal-structures-design p.20-23 §2.3 본문 read 확인. **NLSW swash 해(Shen-Meyer 1963·Antuono 2010 JFM)·Hunt 1959·Stockdon 2006 runup 식·breaker-type ξ 임계값은 본 위키 md 교과서에 본문 부재 → 문헌 cross-ref(01 §4.2·04)로만 표기, 임의 page/식 인용 안 함**. Wijetunge book pp.49-59 run-up 본문은 추출 md 에 미수록(index entry 만 존재) → 인용 안 함. §2.2 쇄파형 임계값(2026-09-28): textbook/md/Waves-Holthuijsen2007.md §7.6 (PDF p.260, page_offset 0) Battjes 1974b 임계 verbatim — 구판 '교과서 부재' 서술 정정."
 note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-18
 related:
@@ -70,7 +70,18 @@ $$
 
 $\zeta$ 가 클수록(가파른 경사·긴 주기·작은 파형경사) 사면이 **반사성(reflective)** — 입사파가 사면에서 강하게 반사, plunging/surging breaker, swash 진폭 큼. 작을수록 **소산성(dissipative)** — spilling breaker, 넓은 surf zone, swash 가 infragravity(IG) 변조에 지배. 이 체계 의존성은 [[01-concept]] §4.1 bore-bore capture 가 "steeper/more reflective 일수록 극단 shoreline 최대치 구동 확률 ↑" (Stringari & Power 2019) 와 직접 부합.
 
-> 주의: surf similarity 의 spilling/plunging/surging **임계값**(예: Battjes 의 $\zeta<0.5$ spilling 등)은 본 위키 md 교과서 본문에 수치가 부재 → 본 노트에서 임계값을 단언하지 않음(source-needed). 정성 경향만 기술.
+**쇄파형 임계값 (Battjes 1974b, 평탄 해빈)** — Holthuijsen 이 심해 파형경사 기준 $\xi_\infty$ 와 쇄파점 기준 $\xi_{br}$ 로 제시한다 (holthuijsen2007, p.260 §7.6):
+
+| 쇄파형 | $\xi_\infty$ | $\xi_{br}$ |
+|---|---|---|
+| spilling | < 0.5 | < 0.4 |
+| plunging | 0.5 – 3.3 | 0.4 – 2.0 |
+| collapsing / surging | > 3.3 | > 2.0 |
+
+원문: *"spilling: if ξ∞ < 0.5 or ξbr < 0.4 plunging: if 0.5 < ξ∞ < 3.3 or 0.4 < ξbr < 2.0 collapsing or surging: if ξ∞ > 3.3 or ξbr > 2.0"*, 그리고 *"the value of ξ characterises not only the type of breaking, but also the reflection of waves off the beach, the run-up of waves up a beach"*.
+위 §2.1 의 경사 정의 문제는 그대로다 — 어느 $\tan\beta$ 를 쓰느냐에 따라 같은 해빈이 다른 구간에 들어간다.
+
+> ★정정 (2026-09-28): 구판은 "임계값이 본 위키 md 교과서 본문에 부재" 라 적었으나 Holthuijsen §7.6 에 있었다.
 
 ---
 

@@ -118,15 +118,17 @@ LISFLOOD-FP 는 경계 유입/유출(`Qin`/`Qout`), 하천·점소스(`Qpoint_po
 checkpoint 에도 저장한다.[^lf-mass] 복합침수에서 이것은 진단 자산이다 —
 **침수 체적을 인자별로 분해해 "이번 사건에서 pluvial 이 몇 %였나" 를 사후에 물을 수 있다.**
 
-> [!source-needed]
-> SFINCS 의 대응 회계(외력별 누적 체적 출력)는 [[sfincs_boundaries_forcing]] 범위에서 확인되지 않았다.
-> [[sfincs_io_data]] 확인 후 보강한다.
+**SFINCS 는 외력별 체적 회계를 하지 않는다** (2026-09-28, `sfincs_ncoutput.F90` 의 NetCDF 변수 정의 전수 확인).
+가진 것은 **셀별 누적 깊이**다 — `storecumprcp = 1` 이면 `cumprcp`(누적 강수 깊이, m)·`cuminf`(누적 침투 깊이)를 map 파일에 쓴다
+(`sfincs_input.f90:280`·`:511-514`, `sfincs_ncoutput.F90:408-413`·`:500-504`; 누적 갱신은 [[sfincs_infiltration]]).
+체적 쪽은 `storage_volume`·`subgrid_volume`(셀 저장량), 경계·단면 유량은 his 파일의 `crosssection_discharge` 시계열이다.
+→ LISFLOOD-FP 처럼 "사건 중 pluvial 이 몇 %" 를 바로 묻는 적산값은 없고, 강수 깊이 × 면적과 단면 유량 적분으로 **사후 조립**해야 한다.
 
 ## 6. 남은 것
 
 - **Delft3D·EFDC 미대조** — full-physics 두 모델의 외력 인터페이스는 본 표에 없다.
   [[06-model-application]] §2 가 솔버 수준에서만 다룬다. `source-needed`
-- **SFINCS 질량수지 회계** — §5 콜아웃. `source-needed`
+- ~~SFINCS 질량수지 회계~~ — §5: 외력별 적산 없음, 셀별 `cumprcp`·`cuminf` + 단면 유량으로 사후 조립 (2026-09-28)
 - **ADCIRC 강우·하천** — 본 대조는 ADCIRC 의 조석·기상만 다뤘다. ADCIRC 가 pluvial/fluvial 을
   어떻게 받는지(또는 받지 않는지)는 미조사. `source-needed`
 - **오프라인 커플링 실무** — SFINCS·LISFLOOD-FP 를 ADCIRC/Delft3D 출력으로 강제하는

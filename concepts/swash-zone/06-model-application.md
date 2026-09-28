@@ -109,8 +109,12 @@ enddo
   을 만들고 방향별 dry 플래그를 집계한다.[^ce-shore] 이것은 **안정화**이지 처오름 출력이 아니다.
 - **FUNWAVE**: 검수된 12개 source-analysis 노트에 runup·shoreline 출력 언급이 없다.
 
-이것은 **부재가 아니라 미조사**다. [[compound-flooding/04-code-and-tools]] 에서 LISFLOOD-FP 의 조석 부재를
-전수 grep 으로 확인했던 것과 달리, 여기서는 세어 보지 않았다. §6 에 남긴다.
+**2026-09-28 전수 grep 으로 확인 — 처오름 전용 출력은 두 모델 모두 없다.**
+- FUNWAVE-TVD `src/` 전체에서 `runup`·`run_up` **0 건**. 출력 스위치(`OUT_*`) 목록에도 처오름 항목이 없고,
+  가까운 것은 `OUT_MASK`(건습 마스크)·`OUT_Hmax`(최대 수위)다 — 처오름은 이 둘에서 **후처리로** 뽑아야 한다.
+- Celeris-WebGPU 본체(`js/`·`shaders/`)에서 `runup` 은 최소수심 주석(`constants_load_calc.js:51` *"too large and runup accuracy is poor"*)과
+  렌더링 주석(`shaders/fragment.wgsl:366·377`)뿐이다 — 출력 경로가 아니다.
+- 대조: 같은 방식으로 세면 SFINCS 는 `runup_gauge_zs` 출력 변수를 갖는다(`sfincs_ncoutput.F90` 변수 정의).
 
 ## 5. 물가선이 흔들리는 곳에서 물가선을 재는 일
 
@@ -143,10 +147,8 @@ enddo
 
 **남은 것**:
 
-- **XBeach 발견 2건의 `models/` 반영 미완** — "게이지=행" 과 "rugdepth≥eps 승격" 은 모델 메커닉이므로
-  절대규칙 #6 상 [[xbeach_output]] 에 있어야 한다. `models/` 가 잠금 상태라 **SCOPED EDIT 승인 대기**.
-  현재는 본 노트가 유일한 기록이다.
-- **FUNWAVE·Celeris 처오름 출력 경로 미조사** — §4. 부재로 단정하지 않았다. `source-needed`
+- ~~XBeach 발견 2건의 `models/` 반영~~ — **완료**: [[xbeach_output]] §C.1·C.2 (SCOPED EDIT, 커밋 `663da84`).
+- ~~FUNWAVE·Celeris 처오름 출력 경로~~ — §4: 전수 grep 으로 전용 출력 없음 확인(2026-09-28). 마스크·최대수위 후처리 필요.
 - **$R_{2\%}$ 까지 가는 후처리 미작성** — 위 방법들이 주는 것은 물가선 **시계열**이다.
   거기서 setup·swash 를 분리하고 초과확률 2% 를 뽑는 단계는 [[03-analysis-methods]] §4 가
   `source-needed` 로 남긴 scalogram·스펙트럼 분리와 같은 자리다.
