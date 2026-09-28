@@ -4,7 +4,7 @@ topic: littoral-drift
 canonical_source: self
 citation_status: verified
 has_source_needed: true
-verification_method: "Soulsby 'Dynamics of Marine Sands' (marine-sands-manual) §10.5 Longshore transport — CERC 공식 Eq(138) 본문·계수 0.023 (p.198) + 계수 calibration/적용 한계 (p.199) + Damgaard-Soulsby Eq(139a-e) (p.199-200) + Example 10.3 longshore transport 수치 (p.201-203, shingle Q_LS=36,700 m3/yr vs CERC 819,410 m3/yr) + beach planshape(one-line)·coastal profile 모델 분류·sediment budget 셀 (p.207-208) 직접 인용. Dean-Dalrymple 'Water Wave Mechanics' (water-wave-mechanics) §10.5 Example 10.2 longshore wave thrust Eq(10.37) F_y=-dS_xy/dx (p.309) 인용. 모든 page 는 textbook/md ---PAGE-NN--- 구분자로 직접 확인."
+verification_method: "Soulsby 'Dynamics of Marine Sands' (marine-sands-manual) §10.5 Longshore transport — CERC 공식 Eq(138) 본문·계수 0.023 (p.198) + 계수 calibration/적용 한계 (p.199) + Damgaard-Soulsby Eq(139a-e) (p.199-200) + Example 10.3 longshore transport 수치 (p.201-203, shingle Q_LS=36,700 m3/yr vs CERC 819,410 m3/yr) + beach planshape(one-line)·coastal profile 모델 분류·sediment budget 셀 (p.207-208) 직접 인용. Dean-Dalrymple 'Water Wave Mechanics' (water-wave-mechanics) §10.5 Example 10.2 longshore wave thrust Eq(10.37) F_y=-dS_xy/dx (p.309) 인용. 모든 page 는 textbook/md ---PAGE-NN--- 구분자로 직접 확인. CERC 독립 대조(2026-09-28): textbook/md Van-Rijn-1993 §9.5 식 9.5.3–9.5.5 (K=0.77, 0.025 형태, 적용범위·오차 민감도) 직독."
 note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-18
 related:
@@ -45,7 +45,18 @@ $$Q_{LS} = 0.023\, g^{1/2}\, H_{sb}^{5/2}\, \sin(2\alpha_b)$$
 - $\alpha_b$ = breaker line 에서 wave crest 와 shoreline 사이 각
 - $s$ = sediment relative density (입력 인자로 명시되나, 위 단순형은 $s$ 가 흡수된 형태로 leading 계수 0.023 에 포함됨; 원 full 식과의 관계는 `marine-sands-manual` p.198)
 
-(*주의*: 위 식은 OCR 본문에서 수식 본체가 깨져 있어, Soulsby 가 명시한 입력 변수 $g, H_{sb}, \alpha_b, s$ + leading 계수 0.023 + shallow-water linear theory 가정으로부터 재구성한 표준형이다. 본문은 "coefficient 0.023" 과 입력 변수 목록을 직접 진술 (`marine-sands-manual`, p.198). 정확한 지수·계수 대조가 필요하면 SPM 1984 원문 또는 Fredsøe & Deigaard 1992 와 재대조 권장 — 이 부분만 `source-needed` 강등 가능.)
+(*주의*: 위 식은 OCR 본문에서 수식 본체가 깨져 있어, Soulsby 가 명시한 입력 변수 $g, H_{sb}, \alpha_b, s$ + leading 계수 0.023 + shallow-water linear theory 가정으로부터 재구성한 표준형이다. 본문은 "coefficient 0.023" 과 입력 변수 목록을 직접 진술 (`marine-sands-manual`, p.198). 정확한 지수·계수 대조가 필요하면 SPM 1984 원문 또는 Fredsøe & Deigaard 1992 와 재대조 권장.)
+
+**독립 교재 대조 — Van Rijn (1993) §9.5** (van-rijn-1993, 인쇄 p.9.29–9.30, 식 9.5.3–9.5.5; 2026-09-28 추가). OCR 이 온전한 두 번째 출처다:
+
+- 원형: $I = K\,E\,c_{g,br}\sin\theta_{br}\cos\theta_{br}$ (9.5.3), $I$ = 수중중량 기준 수송률, $E = \tfrac18\rho g H_{rms,br}^2$, **$K = 0.77$** (SPM 1977·1984 권장, $H_{rms}$ 기준).
+  초기 보정은 현장 9점 + 실험 150점으로 $K = 0.42$ 였고, 이후 연구의 $K$ 는 0.2–1.6 범위다(Bodge & Kraus 1991 인용).
+- 유의파고·체적 형태: $Q_s = 0.025\,H_{s,br}^2\,n_{br}\,c_{br}\sin(2\theta_{br})$ (9.5.4a) — $Q_s$ 는 **공극 포함** 체적 수송률(m³/s, 공극률 0.4).
+- $n_{br}\approx1$, $c_{br}=(g h_{br})^{0.5}$, $\gamma_{br}=H_{s,br}/h_{br}$ 를 넣으면 $Q_s = 0.025\,g^{0.5}\gamma_{br}^{-0.5}H_{s,br}^{2.5}\sin(2\theta_{br})$ (9.5.5).
+- 한계(원문): *"An error of 10% in the wave height and in the wave angle at the breaker line yields a 30% error in the transport rate"*,
+  입경 200–600 µm·경사 $\tan\beta$ 0.015–0.15 에서 타당(Kamphuis et al. 1986 인용), *"The CERC-formula cannot be applied when tidal current velocities are significant."*
+
+두 교재의 선행 계수(Soulsby 0.023 / Van Rijn 0.025)는 공극 포함 여부와 $\gamma_{br}$ 처리가 달라 그대로 비교되지 않는다 — 인용할 때는 **어느 형태인지와 공극 규약을 함께** 적을 것.
 
 핵심 특성 (`marine-sands-manual`, p.198 §10.5):
 
