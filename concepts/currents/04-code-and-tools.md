@@ -156,16 +156,9 @@ print(f"O1: {nearest['o1_진폭']:.2f} cm/s @ {nearest['o1_지각']:.2f}°")
 
 ## 4. 도구 vs 모델 분리 (참고)
 
-`concepts/tides/04-code-and-tools.md` §6 글로벌 조석 모델은 **조류도 동시 제공** — 사용 시:
-
-| 모델 | 조류 제공 |
-|---|---|
-| **TPXO** | u, v 분조 ✓ |
-| **FES2022** | u, v 분조 ✓ (`global_tide_fes`/eastward·northward) |
-| **NAO.99Jb** | 일본 주변 조류 ✓ |
-| GOT5 | elevation only (deep ocean, 조류 별도) |
-
-→ pyTMD는 elevation·current 양쪽 지원. 외해 조류 forcing은 글로벌 모델, 연안은 KHOA 수치조류도 우선.
+글로벌 조석 모델의 조류 제공 여부는 모델마다 다르다 — 가용성 표와 근거는 [06-model-application §6](06-model-application.md) (2026-09-28 확인).
+요약: TPXO10·FES2014 는 u, v 분조 제공, **FES2022 조류는 공개 배포 안 함**, **NAO.99 는 조류 미배포**, GOT 는 조위만.
+KHOA 수치조류도 조화상수 CSV 는 v 성분만이라 연안 조류 forcing 자료로 쓸 수 없다(§2.3).
 
 ## 5. 도구·자료 선택 가이드
 

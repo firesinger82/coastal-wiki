@@ -12,7 +12,7 @@
 | `03-analysis-methods.md` | **verified** | UTide 2D·ADCP·KHOA 조류관측 protocol |
 | `04-code-and-tools.md` | **verified** | UTide 2D 출력·수치조류도 격자 데이터·KHOA OpenAPI |
 | `05-examples.md` | **verified** | KHOA 수치조류도에서 임의 정점 분조 추출 예제 |
-| `06-model-application.md` | `verified` | 흐름 코어·경계 분조 포맷 models/ cross-link. 잔존 source-needed: 글로벌 datum·한국 권장·검증 임계·ADCIRC tidal DB |
+| `06-model-application.md` | `verified` | 흐름 코어·경계 분조 포맷 models/ cross-link. 조류 자료 가용성 §6 공식 배포처 확인(2026-09-28). 검증 수치 임계는 출처 없음(공백) |
 
 ## 사용된 source_id
 

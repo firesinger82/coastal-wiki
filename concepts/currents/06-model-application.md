@@ -4,7 +4,7 @@ topic: currents
 canonical_source: self
 citation_status: verified
 has_source_needed: true
-verification_method: "조류의 운동량·연속 방정식 흐름 해상(currents solver core) claim 은 검수완료 모델 source-analysis 노트로 verified — ROMS [[roms_baroclinic_3d]]·[[roms_barotropic_2d]] (3D 경압 step3d_uv / 2D 순압 step2d 모드분할, file:line), Delft3D [[delft3d_flow2d3d_dispatcher]] (구조격자 TRISULA ADI kernel) + [[delft3d_dflowfm_compute_core]] (비구조 FM furu/s1ini/u1q1 semi-implicit θ-method), EFDC [[efdc_hydro_core]] (external 2D / internal 3D 모드분할 + PCG 연속식). 여전히 source-needed: §1.1~1.3·§6~8 의 조류 forcing 입력 포맷·글로벌 datum(TPXO/FES/NAO.99Jb/KHOA)·한국 해역 권장·검증 임계치는 모델 manual / 외부 datum 문서 미수록분으로 잔존. ADCIRC·XBeach §3·§5 도 검수 노트 미연결로 잔존. **2026-09-28 토큰 재분류**: §2 PSER 포맷(efdc_boundary_conditions §A)·§4 .bca 포맷(delft3d-flow-boundary-forcing §3)·§3 ADCIRC 경계 분조(NBFR/NFFR)·§5 XBeach 흐름 경계(xbeach_flow_boundary_conditions·xbeach_tide_forcing)는 이미 검수완료 models/ 노트가 있어 연결로 해소. §3 의 구 서술 'ADCIRC tidal database 가 조위+u,v 분조를 함께 보간' 은 근거 없음 — 소스 노트상 경계 강제는 수위 분조(NBFR)와 법선 flux 분조(NFFR)이고 u,v 분조 입력 카드는 확인되지 않아 정정. 잔존: 글로벌 datum·한국 해역 권장·검증 임계치, ADCIRC tidal database 내용(코퍼스 밖)."
+verification_method: "조류의 운동량·연속 방정식 흐름 해상(currents solver core) claim 은 검수완료 모델 source-analysis 노트로 verified — ROMS [[roms_baroclinic_3d]]·[[roms_barotropic_2d]] (3D 경압 step3d_uv / 2D 순압 step2d 모드분할, file:line), Delft3D [[delft3d_flow2d3d_dispatcher]] (구조격자 TRISULA ADI kernel) + [[delft3d_dflowfm_compute_core]] (비구조 FM furu/s1ini/u1q1 semi-implicit θ-method), EFDC [[efdc_hydro_core]] (external 2D / internal 3D 모드분할 + PCG 연속식). 여전히 source-needed: §1.1~1.3·§6~8 의 조류 forcing 입력 포맷·글로벌 datum(TPXO/FES/NAO.99Jb/KHOA)·한국 해역 권장·검증 임계치는 모델 manual / 외부 datum 문서 미수록분으로 잔존. ADCIRC·XBeach §3·§5 도 검수 노트 미연결로 잔존. **2026-09-28 토큰 재분류**: §2 PSER 포맷(efdc_boundary_conditions §A)·§4 .bca 포맷(delft3d-flow-boundary-forcing §3)·§3 ADCIRC 경계 분조(NBFR/NFFR)·§5 XBeach 흐름 경계(xbeach_flow_boundary_conditions·xbeach_tide_forcing)는 이미 검수완료 models/ 노트가 있어 연결로 해소. §3 의 구 서술 'ADCIRC tidal database 가 조위+u,v 분조를 함께 보간' 은 근거 없음 — 소스 노트상 경계 강제는 수위 분조(NBFR)와 법선 flux 분조(NFFR)이고 u,v 분조 입력 카드는 확인되지 않아 정정. 잔존: 글로벌 datum·한국 해역 권장·검증 임계치, ADCIRC tidal database 내용(코퍼스 밖). **2026-09-28 추가**: §6 조류 가용성 표를 pyTMD 모델 DB·AVISO FES2022 release·NAO 공식 페이지·adcirc.org 로 재작성 — FES2022 조류 비공개, NAO.99 조류 미배포, KHOA CSV v 성분만(experience/khoa-tidal-current-phase-reference-2026.md @ 5de93ff), 따라서 §7 구 권장표(서해 KHOA CSV·동해 NAO.99Jb) 폐기; §8 무출처 임계(±20%·±10°) 삭제."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-21
 verification_by: "Claude Opus 4.8 (1M context) — 모델 solver-core 노트 cross-link"
@@ -61,7 +61,7 @@ EFDC도 **external(깊이적분 2D)** 과 **internal(3D shear)** 모드를 분�
 
 시간적분 스킴(LF-AM3·3TL/2TL·GWCE 3레벨·ADI·θ semi-implicit·SSP-RK·AB-AM·SMAC projection)·mode splitting·adaptive dt·implicit 성분은 **[[time-integration-cross-model]]** 이 canonical (ROMS·EFDC·ADCIRC·Delft3D-FLOW·FM·SWASH·FUNWAVE·Celeris·XBeach·SFINCS·LISFLOOD-FP·CADMAS). 요지: split-explicit(ROMS 단독) vs semi-implicit 중력파 격리(해양모델 다수) vs explicit CFL-adaptive(천수) vs 고차 RK/multistep(위상해상) 4계보 — dt 고정/적응 여부와 무조건 안정 성분이 모델 선택·런타임 예측의 1차 분기. 부수 적발: [[adcirc-timestep-orchestration]] §5 의 EFDC 파라미터 혼용 정정(2026-07-10).
 
-> 위 §0 의 흐름 해상 claim 은 모두 검수완료 source-analysis 노트로 verified. 아래 §1 이하의 **조류 forcing 입력 포맷·글로벌 datum·한국 해역 권장·검증 임계치**는 모델 manual / 외부 datum 문서(미수록분)로 여전히 source-needed.
+> 위 §0 의 흐름 해상 claim 은 모두 검수완료 source-analysis 노트로 verified. §1·§6·§7 의 조류 자료 가용성은 2026-09-28 공식 배포처로 확인했다(§6 출처). **조류 검증의 수치 합격 임계**는 출처가 없어 제시하지 않는다(§8).
 
 ## 1. 모델별 조류 입출력
 
@@ -69,7 +69,7 @@ EFDC도 **external(깊이적분 2D)** 과 **internal(3D shear)** 모드를 분�
 
 외해 개경계에서 조류 분조 forcing:
 - 각 경계 셀에 분조별 (u_Lsmaj, u_Lsmin, u_θ, u_g) 4 parameter 또는 (u_진폭, u_위상, v_진폭, v_위상) 입력
-- 데이터 출처: **TPXO·FES** (u, v 분조 모두 제공), **KHOA 수치조류도** (한국 해역 한정), 자체 ADCP 관측 조화분해
+- 데이터 출처: **TPXO10**·**FES2014** (u, v 분조 제공), 자체 ADCP 관측 조화분해. **KHOA 수치조류도 조화상수 CSV 는 남북(v) 성분만** 담아 u, v 분조 입력으로 쓸 수 없다([04 §2.3](04-code-and-tools.md)). FES2022 조류·NAO.99 조류는 공개 배포되지 않는다(§6)
 
 ### 1.2 시계열 forcing (Time-series Current Boundary)
 
@@ -111,7 +111,9 @@ EFDC도 **external(깊이적분 2D)** 과 **internal(3D shear)** 모드를 분�
 - 출력 조류 조화분해: global velocity HA → `fort.54` — [[adcirc-tidal-forcing]]
 - ★정정 (2026-09-28): 구판의 "ADCIRC tidal database 가 조위 + u, v 분조를 함께 보간" 은 근거가 없다. 위 소스 노트상
   경계 강제 입력은 수위 분조와 법선 flux 분조이며 u, v 분조 입력 카드는 확인되지 않는다.
-  tidal database(EC2001 등) 자체의 수록 변수는 코퍼스 밖 — source-needed.
+  ADCIRC tidal database 는 판본마다 다르다 — ec_95d·ec2001_v2e·wc_2003 는 *"elevations and depth-averaged velocities"*, ec2001_v2d 는 조위만,
+  ec2015·ENPAC15 는 두 판본(조위+유속 / 조위만). 영역은 서북대서양·동태평양 연안뿐이라 **한국 해역을 덮는 판본은 없다**
+  ([adcirc.org/products/adcirc-tidal-databases](https://adcirc.org/products/adcirc-tidal-databases/), 2026-09-28 확인).
 
 ## 4. Delft3D
 
@@ -130,43 +132,46 @@ XBeach는 단기 폭풍 모델. 조류는 보통 수위 시계열 forcing의 부
 
 흐름 해상은 [[xbeach_flow_solver]], 조위 경계 입력·보간은 [[xbeach_tide_forcing]] (`compute_tide_zs0.F90`), 흐름 경계의 tide 처리(instant/velocity/hybrid)·offshore front 는 [[xbeach_flow_boundary_conditions]].
 
-## 6. 글로벌 모델에서 조류 데이터 추출
+## 6. 조류 (u, v) 자료 가용성 — 2026-09-28 확인
 
-[`concepts/tides/04-code-and-tools.md` §6](../tides/04-code-and-tools.md) 글로벌 모델별 조류 제공 여부:
-
-| 모델 | 조류 (u, v) | 주 사용처 |
+| 모델·자료 | 조류 (u, v) | 근거 |
 |---|---|---|
-| **TPXO** | ✓ | 외해 분조 forcing 표준 |
-| **FES2022** | ✓ (eastward·northward) | 유럽·CNES 미션 + 외해 forcing |
-| **NAO.99Jb** | ✓ | 일본·한국 동해 권장 |
-| **GOT5** | × (elevation only) | 위성 altimetry 보정 |
-| **KHOA 수치조류도** | ✓ (단일 성분) | **한국 황해·남해 권장** (동해 미커버) |
+| **TPXO10-atlas** | ✓ (z·u·v) | pyTMD 모델 DB `TPXO10-atlas-v2` 항목에 `z`·`u`·`v` |
+| **FES2014** | ✓ (z·u·v) | pyTMD 모델 DB `FES2014` 항목에 `z`·`u`·`v` |
+| **FES2022** | **✗ 공개 배포 안 함** | AVISO: *"The FES2022 currents are not disseminated yet, they will be delivered to scientific teams and for scientific studies on demand."* |
+| **NAO.99b / NAO.99Jb** | **✗ 배포 목록에 없음** | NAO 공식 페이지 배포물 = 단주기·장주기 해양조석 + loading(radial displacement·potential) 뿐 |
+| **GOT4.10 / GOT5.x** | ✗ (z 만) | pyTMD 모델 DB 에 `z` 만 |
+| **KHOA 수치조류도 조화상수 CSV** | **v 성분만** | [04 §2.3](04-code-and-tools.md) — 벡터 재구성 불가 |
+| **KHOA OpenAPI `tidalCurrentArea`** | ✓ 예측 유속·유향 (벡터) | [04 §3](04-code-and-tools.md) — 날짜·시각·영역 지정, 1–10 km 간격. 분조가 아닌 **시계열** 자료 |
+| **ADCIRC tidal database** | 판본별(조위만 / 조위+유속) | §3 — 한국 해역 판본 없음 |
 
-→ pyTMD (`concepts/tides/04-code-and-tools.md` §5)는 조류 (u, v) 추출 지원.
+pyTMD 모델 DB: `pyTMD/data/database.json` (github.com/tsutterley/pyTMD, main, 2026-09-28). FES2022: [AVISO FES2022 release](https://www.aviso.altimetry.fr/en/data/products/auxiliary-products/global-tide-fes/release-fes22.html). NAO: [miz.nao.ac.jp/rise/s/nao99](https://www.miz.nao.ac.jp/rise/s/nao99/index_En.html).
+조위(z) 쪽 모델 비교는 [`concepts/tides/04-code-and-tools.md` §6](../tides/04-code-and-tools.md).
 
-## 7. 한국 해역 조류 forcing 권장
+## 7. 한국 해역 조류 경계 자료 — 선택지
 
-| 영역 | 외해 경계 forcing | 검증 |
-|---|---|---|
-| 서해 (황해) | **KHOA 수치조류도** (1°×1° 영역 3500+ 격자) | KHOA OpenAPI ADCP 관측 |
-| 남해 | KHOA 수치조류도 + TPXO10 (보조) | KHOA 관측 |
-| 동해 | **NAO.99Jb** (KHOA 수치조류도 미커버) | KHOA 관측 |
-| 동중국해 | TPXO10 또는 KHOA 수치조류도 | — |
+★정정 (2026-09-28): 구판 권장표는 "서해 경계 = KHOA 수치조류도 분조", "동해 경계 = NAO.99Jb 조류" 였다. 둘 다 성립하지 않는다 —
+수치조류도 CSV 는 v 성분만 있고, NAO.99 는 조류를 배포하지 않는다(§6).
 
-> 한국 EFDC·ADCIRC 시뮬에서 **혼합 forcing 권장**:
-> - 황해 connectivity: KHOA 수치조류도
-> - 외해 (동해·동중국해 경계): NAO.99Jb 또는 TPXO10
-> - 두 datum + 위상 기준 일치 확인 필수
+| 필요 | 쓸 수 있는 자료 |
+|---|---|
+| 개경계 u, v **분조** (§1.1) | TPXO10-atlas · FES2014 (한국 해역 전역, 공개) |
+| 개경계 u, v **시계열** (§1.2) | KHOA OpenAPI `tidalCurrentArea` 예측 벡터 (황해·남해 중심 — 동해 연안 격자 없음, [04 §2.3](04-code-and-tools.md)) |
+| 조위 경계 (§1.1 대신 흔한 선택) | [`concepts/tides/06`](../tides/06-model-application.md) |
+
+어느 자료가 한국 해역에서 더 정확한지는 이 위키에 비교 근거가 없다 — 권장 순위는 두지 않는다.
 
 ## 8. 모델 검증 — 조류 specific
 
 | 항목 | 방법 |
 |---|---|
-| 분조별 진폭 정합 | UTide(모델 출력) vs KHOA 수치조류도 격자값 ±20% |
-| 분조별 위상 정합 | 위상 기준 (G/g) 일치 후 ±10° 이내 |
+| 분조별 진폭 정합 | 모델 출력의 **v 성분**을 UTide 로 분해해 KHOA 수치조류도 격자값(v 성분)과 비교 — 장축(Lsmaj)과 비교하면 안 된다 |
+| 분조별 위상 정합 | 격자 지각은 g(135°E) — UTC 입력 UTide(G) 와 비교 시 G = g − 9a |
 | 잔류 흐름 | 모델·관측 시계열 평균 비교 |
 | 창·낙조류 비대칭 | 비선형 분조 (M₄·MS₄) 진폭 비교 |
 | Hodograph (vector trace) | 시각적 패턴 정합 (왕복성/회전성) |
+
+> 수치 합격 임계(구판의 ±20%·±10°)는 출처가 없어 뺐다 — 파랑 `waves/06` 의 검증 임계표와 같은 성격의 공백이다.
 
 ## 9. 보강 — `verified` 승격 체크리스트
 
@@ -174,9 +179,9 @@ XBeach는 단기 폭풍 모델. 조류는 보통 수위 시계열 forcing의 부
 - [x] ROMS 흐름 코어 [[roms_baroclinic_3d]]·[[roms_barotropic_2d]] (경압3D step3d_uv / 순압2D split-explicit) **verified**
 - [x] Delft3D 흐름 커널 [[delft3d_flow2d3d_dispatcher]] (구조격자 ADI) + [[delft3d_dflowfm_compute_core]] (비구조 FM θ-method) **verified**
 - [x] EFDC `PSER.INP`·C17 조화 경계 포맷 — [[efdc_boundary_conditions]] §A · [[efdc-tidal-forcing-conventions-v12]] (2026-09-28 연결)
-- [x] ADCIRC 경계 분조 NBFR/NFFR — §3 연결·정정 (2026-09-28). 잔존: tidal database 수록 변수 (source-needed, 코퍼스 밖)
+- [x] ADCIRC 경계 분조 NBFR/NFFR — §3 연결·정정 + tidal database 판본별 수록 변수(adcirc.org) (2026-09-28)
 - [x] Delft3D `.bca` 조류 분조 포맷 — [[delft3d-flow-boundary-forcing]] §3 (2026-09-28 연결)
-- [ ] 한국 적용 사례 1건 verified (서해 EFDC 또는 동해 NAO.99Jb forcing)
+- [ ] 한국 적용 사례 1건 verified (`experience/` 경유 — 동해 조류 경계에 NAO.99Jb 는 쓸 수 없음, §6)
 
 ## 10. 연결
 

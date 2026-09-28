@@ -62,7 +62,7 @@ def nearest_point(lat_t, lon_t):
 **동해 (커버리지 없음)**:
 - 수치조류도 CSV는 **황해 + 동중국해 + 일부 남해**만 커버
 - 동해 (128-131°E, 37-40°N) **0 grid points**
-- 동해 조류 분석은 별도 자료 (NAO.99Jb regional 1/12°, 또는 KHOA OpenAPI 조류 관측 직접)
+- 동해 조류 분석은 별도 자료 — NAO.99 는 조류를 배포하지 않는다([06 §6](06-model-application.md)). TPXO10·FES2014 조류, 또는 KHOA 부이 관측(동해 중부는 조류조화 미산출, [02 §6](02-theory.md))
 
 ## 2. 수치조류도 데이터 범위 검증
 
@@ -176,7 +176,7 @@ print(f"수치조류도 M2 = {nearest['m2_진폭']:.2f} cm/s @ {nearest['m2_지�
 
 - ~~**수치조류도 위상 기준** (G/g) 확인~~ — **해소**: KHOA 표준 지각 g=동경135°(KST) ([03-analysis-methods.md](03-analysis-methods.md) §1.3, 백서 L2491). CSV·포털 메타데이터 모두 미기재 확인(2026-09-28).
 - ~~**수치조류도 "진폭"** 정확한 정의~~ — **해소**: 남북(v) 성분 ([`experience/khoa-tidal-current-phase-reference-2026.md`](../../experience/khoa-tidal-current-phase-reference-2026.md) @ `5de93ff` §3b)
-- 동해 조류 별도 자료 — NAO.99Jb regional, KHOA OpenAPI 직접
+- 동해 조류 별도 자료 — TPXO10·FES2014 조류 (NAO.99 는 조류 미배포, [06 §6](06-model-application.md))
 - ADCP 실측 데이터 사용 시 격자값과 검증 사례 추가 (`experience/`로)
 - 명량·진도 실제 관측 사례 (강한 비선형)
 
