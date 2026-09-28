@@ -3,7 +3,7 @@ title: "xbeach vegetation"
 topic: general
 canonical_source: self
 citation_status: verified
-verification_method: "XBeach source code 직접 분석 (models/XBeach/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/xbeach_vegetation.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
+verification_method: "XBeach source code 직접 분석 (models/XBeach/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/xbeach_vegetation.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시. **2026-09-28 SCOPED EDIT**: §D bulk drag 보강 — vegetation.F90:327-329 (Cdveg<0 → bulkdragcoeff 결과를 s%Cdveg 에 덮어써 이후 호출에서 조건 거짓 = 첫 vegatt 호출값 고정), :731·:742·:745 (Tp=2π/sigm, um∝H, KC=um·Tp/bv), :766-770 (Q<7 하한 Cdterm=exp(-0.0138·7)/7^0.3≈0.506); NH 경로: params.F90:1560-1563 (swave 강제 0) + libxbeach.F90:302 (wave 호출은 swave==1 때만) + initialize.F90:556 (s%H=0) → s%H 대입은 wave_* 루틴에만 있어(grep 전수) NH 에서 H≡0 → KC=0 → Cd≈0.506. 발견 경위: concepts/waves/04 §7.1.2 (Amini et al. 2024 판독)."
 note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
 note_date: 2026-04~05 (original) / 2026-05-23 (promote)
 verification_by: "사용자 + codex source-code analysis"
@@ -132,7 +132,11 @@ The missing term commented in legacy `wave_directions.F90:290` is not a limitati
 
 **Bulk drag coefficient** (Mendez-Losada 2004) when `Cdveg < 0`:
 - `vegatt` calls `bulkdragcoeff` (`:327-329`).
-- Hard-wires `myflag = 2` (`:728`) with comment "Mendez and Losada (2004), eq. 40" (`:760-763`).
+- Hard-wires `myflag = 2` (`:728`) with comment "Mendez and Losada (2004), eq. 40" (`:760-763`); the same block also comments *"Only applicable for Laminaria Hyperborea (kelp)???"* (`:763`).
+- ★ **Computed once, then frozen.** The result is written back into `s%Cdveg` (`:329`), so `Cdveg < 0` is false on every later call — the bulk value is fixed at the **first** `vegatt` call and never adapts to later wave conditions (`:327-329`).
+- ★ **Inputs come from the short-wave (wave-action) fields**: `Tp = 2π/sigm` (`:731`), `um ∝ s%H` (`:742`), `KC = um·Tp/bv` (`:745`), `Q = KC/alfav^0.76`; for `Q < 7` the code returns the floor `exp(−0.0138·7)/7^0.3 ≈ 0.506` (`:766-770`).
+- ★ **Non-hydrostatic mode → Cd ≈ 0.506 everywhere.** `wavemodel=nonh` forces `swave=0` (`params.F90:1560-1563`); `call wave` runs only if `swave==1` (`libxbeach.F90:302`); `s%H` is set to 0 at init (`initialize.F90:556`) and is assigned only inside `wave_*` routines. So under NH `H ≡ 0 → KC = 0 → Q < 7 →` the floor value. `Cdveg < 0` is therefore **not** an adaptive calibration in NH.
+- Surfbeat/stationary: `call wave` precedes `vegatt` in the same step (`libxbeach.F90:302-303`), so the frozen value uses the step-1 wave field; cells the incident waves have not yet reached then get the same floor. (Inferred from call order; confirm with a run before relying on it.)
 
 ## E. Multi-layer vegetation
 
@@ -177,7 +181,7 @@ Documented as "vegetation type index" (`variables.def:271`).
 | Mangrove forest | Multi-section: roots, trunk, canopy with different `bv, Cd, N` |
 | Seagrass meadow (flexible) | `vegnonlin=1` for nonlinear reduction (Van Rooijen 2016) |
 | Reef / coral | `Cdveg=1.5–2.0`, `bv ≈ 0.1 m`, low `N` |
-| Auto-calibrate `Cd` | Set `Cdveg < 0` → activates Mendez-Losada bulk drag |
+| One-time bulk `Cd` estimate | `Cdveg < 0` → Mendez-Losada (kelp) bulk drag, **frozen at first call**; under NH it is the floor ≈ 0.506 (§D) |
 | Porous canopy (dense vegetation) | `porcanflow=1`, `nsec=1` only |
 | Flow-only friction (no wave dissipation) | Use `bedfricfile` instead, not vegetation |
 | Wave-only dissipation | Set vegetation but only short waves matter — long-wave/flow effects are coupled |
@@ -187,7 +191,7 @@ Documented as "vegetation type index" (`variables.def:271`).
 - `vegtype=0` cells are fully transparent — useful for vegetation-free patches in a vegetated domain.
 - `nsec` 2-3 sections is enough for most marsh/seagrass cases. More than 5 rarely improves accuracy.
 - Stem density `N` is in stems per horizontal m² (not per stem volume). Stem density of 200/m² is typical for spartina.
-- `Cd=1.0` is a reasonable default for slender stems (per Mendez-Losada empirical fit). Use `Cdveg=−1` to auto-calibrate from wave conditions.
+- `Cd=1.0` is a reasonable default for slender stems (per Mendez-Losada empirical fit). `Cdveg=−1` is **not** a wave-adaptive calibration: it is evaluated once at the first call, and under NH returns the floor ≈ 0.506 (§D).
 - Vegetation drag **decelerates** flow — verify by output `Fvegu, Fvegv` near vegetated patches.
 - For storm hindcasts, vegetation persists through inundation; the model handles submergence automatically via `h_layer = min(aht, watr)`.
 - Active stationary and surfbeat single-direction calculations include `Dveg`; their invocation and update timing follow §D.
@@ -197,7 +201,8 @@ Documented as "vegetation type index" (`variables.def:271`).
 - ▢ Using `NDmax` parameter name from old docs — actual key in species file is `N`.
 - ▢ `vegtype` map size — must be `(nx+1, ny+1)`, NODE-based.
 - ▢ Setting `nsec=2` with `isCanopy=1` — rejected, use `nsec=1` for canopy.
-- ▢ `Cdveg=0` (zero) — completely disables drag silently. Use `Cdveg<0` for auto-calibrate.
+- ▢ `Cdveg=0` (zero) — completely disables drag silently. `Cdveg<0` gives a one-time bulk value, not an auto-calibration (§D).
+- ▢ Expecting `Cdveg<0` to track storm conditions — it is frozen at the first `vegatt` call (`vegetation.F90:327-329`); with `wavemodel=nonh` it is the constant floor ≈ 0.506.
 - ▢ Forgetting `Trep` — vegetation dissipation formula needs representative period.
 - ▢ Treating the build-excluded `wave_directions` comment as the behavior of active `wave_stationary_directions`; see §D.
 - ▢ Single-species runs with multi-species `veggiemapfile` — non-existent vegtype indices silently zero.

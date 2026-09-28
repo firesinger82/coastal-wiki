@@ -4,7 +4,7 @@ topic: swan
 canonical_source: external
 external_source: "swanuse.pdf (User Manual, SWAN Cycle III version 41.51) §4.5.4 Physics (p.57-83) + node28.md. 각 command 구문·파라미터·default·키워드. swantech 물리(이론)의 user-command 대응."
 citation_status: verified
-verification_method: "swanuse website_markdown node28.md (Physics, 1577줄) 직접 read: GEN1/2/3(ST6 RBW12 calibration lines)·SSWELL·NEGATINP·WCAPPING·QUADRUPL·BREAKING·FRICTION·TRIAD·VEGETATION 구문+default verbatim. swanuse.pdf §4.5.4 TOC 대조. 나머지(MUD/SICE/TURBULENCE/BRAGG/LIMITER/OBSTACLE/SETUP/DIFFRACTION/SURFBEAT/SCAT/OFF)는 요약."
+verification_method: "swanuse website_markdown node28.md (Physics, 1577줄) 직접 read: GEN1/2/3(ST6 RBW12 calibration lines)·SSWELL·NEGATINP·WCAPPING·QUADRUPL·BREAKING·FRICTION·TRIAD·VEGETATION 구문+default verbatim. swanuse.pdf §4.5.4 TOC 대조. 나머지(MUD/SICE/TURBULENCE/BRAGG/LIMITER/OBSTACLE/SETUP/DIFFRACTION/SURFBEAT/SCAT/OFF)는 요약. **2026-09-28 SCOPED EDIT**: §11 ASTD 미사용 — swanpre1.ftn:1388-1391·:2780, swanmain.ftn:4972-4974, swanout1.ftn:2714, swancom1-5·SdsBabanin ASTD grep 0건."
 note_author: "Claude Opus 4.8 (1M context) raw markdown direct read"
 note_date: 2026-06-02
 verification_by: "Claude Opus 4.8 (1M context) — command 구문·default 값 verbatim"
@@ -138,6 +138,8 @@ VEGEtation [iveg] < [height] [diamtr] [nstems] [drag] >
 > ★ default 값이 swantech 식의 계수와 일치 (예 KOMEN cds2=2.36e-5 = [[swan-tech-ch2-dissipation-detailed]] Eq 2.44 C_ds WAM Cycle 3; gamma=0.73 = Eq 2.68 Battjes-Stive).
 
 ## 11. 한계
+
+- ★ **대기 안정도 보정 없음 (소스 직독 2026-09-28).** 기온-수온차 `ASTD` 는 `INPGRID ASTD`(`swanpre1.ftn:1388-1391`)·`WIND ... ASTD`(`:2780`, `CASTD`) 로 읽혀 보간·저장·출력(`swanmain.ftn:4972-4974`, `swanout1.ftn:2714`)만 되고, `swancom1-5.ftn`·`SdsBabanin.ftn90` 에 `ASTD` 참조 0건, `CASTD` 는 초기화·읽기·0 대입 외 사용 없음 → GEN3 풍입력 어디에도 안정도 보정이 들어가지 않는다. swanuse 매뉴얼도 `ASTD` 를 기술하지 않는다. `SET [level]` 은 수위 증분이지 안정도 설정이 아니다([[swan-command-setup-grid-reference]]). 발견 경위: `concepts/sst/06 §8` 오기 정정.
 
 - node28(1577줄) 중 MUD/TURBULENCE/LIMITER/OBSTACLE/SETUP/DIFFRACTION/SURFBEAT/SCAT 의 정밀 파라미터·default 는 §9 요약만 — 개별 deep 후속.
 - swanuse §4.4 Start-up(PROJECT/SET/MODE/COORDINATES) + §4.5.1-3 grid/input/BC + §4.5.5 NUMERIC + §4.6 output command 미커버 (별도 노트).
