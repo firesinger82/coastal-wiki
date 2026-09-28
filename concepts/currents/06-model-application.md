@@ -4,7 +4,7 @@ topic: currents
 canonical_source: self
 citation_status: verified
 has_source_needed: true
-verification_method: "조류의 운동량·연속 방정식 흐름 해상(currents solver core) claim 은 검수완료 모델 source-analysis 노트로 verified — ROMS [[roms_baroclinic_3d]]·[[roms_barotropic_2d]] (3D 경압 step3d_uv / 2D 순압 step2d 모드분할, file:line), Delft3D [[delft3d_flow2d3d_dispatcher]] (구조격자 TRISULA ADI kernel) + [[delft3d_dflowfm_compute_core]] (비구조 FM furu/s1ini/u1q1 semi-implicit θ-method), EFDC [[efdc_hydro_core]] (external 2D / internal 3D 모드분할 + PCG 연속식). 여전히 source-needed: §1.1~1.3·§6~8 의 조류 forcing 입력 포맷·글로벌 datum(TPXO/FES/NAO.99Jb/KHOA)·한국 해역 권장·검증 임계치는 모델 manual / 외부 datum 문서 미수록분으로 잔존. ADCIRC·XBeach §3·§5 도 검수 노트 미연결로 잔존."
+verification_method: "조류의 운동량·연속 방정식 흐름 해상(currents solver core) claim 은 검수완료 모델 source-analysis 노트로 verified — ROMS [[roms_baroclinic_3d]]·[[roms_barotropic_2d]] (3D 경압 step3d_uv / 2D 순압 step2d 모드분할, file:line), Delft3D [[delft3d_flow2d3d_dispatcher]] (구조격자 TRISULA ADI kernel) + [[delft3d_dflowfm_compute_core]] (비구조 FM furu/s1ini/u1q1 semi-implicit θ-method), EFDC [[efdc_hydro_core]] (external 2D / internal 3D 모드분할 + PCG 연속식). 여전히 source-needed: §1.1~1.3·§6~8 의 조류 forcing 입력 포맷·글로벌 datum(TPXO/FES/NAO.99Jb/KHOA)·한국 해역 권장·검증 임계치는 모델 manual / 외부 datum 문서 미수록분으로 잔존. ADCIRC·XBeach §3·§5 도 검수 노트 미연결로 잔존. **2026-09-28 토큰 재분류**: §2 PSER 포맷(efdc_boundary_conditions §A)·§4 .bca 포맷(delft3d-flow-boundary-forcing §3)·§3 ADCIRC 경계 분조(NBFR/NFFR)·§5 XBeach 흐름 경계(xbeach_flow_boundary_conditions·xbeach_tide_forcing)는 이미 검수완료 models/ 노트가 있어 연결로 해소. §3 의 구 서술 'ADCIRC tidal database 가 조위+u,v 분조를 함께 보간' 은 근거 없음 — 소스 노트상 경계 강제는 수위 분조(NBFR)와 법선 flux 분조(NFFR)이고 u,v 분조 입력 카드는 확인되지 않아 정정. 잔존: 글로벌 datum·한국 해역 권장·검증 임계치, ADCIRC tidal database 내용(코퍼스 밖)."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-21
 verification_by: "Claude Opus 4.8 (1M context) — 모델 solver-core 노트 cross-link"
@@ -100,15 +100,18 @@ EFDC도 **external(깊이적분 2D)** 과 **internal(3D shear)** 모드를 분�
 - 분석: snapshot 매 시간 / 시계열 추출 후 UTide 2D
 - 검증: KHOA 수치조류도 격자 또는 ADCP 관측
 
-→ EFDC 흐름 솔버(external 연속식 PCG, internal barotropic correction)가 (u, v, w) 출력을 생성하는 메커닉은 [[efdc_hydro_core]] §B·§C (`calpuv9c.f90:693-707`, `caluvw.f90:601-624`). 개경계 조류 forcing 의 솔버 진입 경로는 [[efdc_hydro_core]] §G (`calpser.f90`, `setopenbc.f90`). 정확한 `efdc.inp`/`pser.inp` 카드 포맷은 manual 미수록 — source-needed 잔존.
+→ EFDC 흐름 솔버(external 연속식 PCG, internal barotropic correction)가 (u, v, w) 출력을 생성하는 메커닉은 [[efdc_hydro_core]] §B·§C (`calpuv9c.f90:693-707`, `caluvw.f90:601-624`). 개경계 조류 forcing 의 솔버 진입 경로는 [[efdc_hydro_core]] §G (`calpser.f90`, `setopenbc.f90`). `PSER.INP` 포맷(헤더 `ITYPE, NREC, TMULT, TOFFSET, RMULADJ, ADDADJ, PSERZDF, INTPSER`, ITYPE 0/1 레코드, 압력수두 변환 `input.f90:5801-5836`)은 [[efdc_boundary_conditions]] §A, 조화 경계(C17 `PFAM`/`PFPH` — nodal factor·V0+u 를 사용자가 fold)는 [[efdc-tidal-forcing-conventions-v12]].
 
 ## 3. ADCIRC
 
 > Canonical: [`models/ADCIRC/`](../../models/ADCIRC/) (source-analysis 38, verified)
 
-- `fort.15` 경계 분조 카드 (NBFR + amplitude·equilibrium argument)
-- ADCIRC tidal database가 임의 mesh 경계점에 분조 보간 (조위 + u, v 분조 함께)
-- → [`models/ADCIRC/web-refs/adcirc-tidal-database.md`](../../models/ADCIRC/web-refs/) (미작성) 보강
+- `fort.15` 수위 경계 분조 카드 `NBFR` (분조별 진폭·equilibrium argument) — [[adcirc-fort15-checklist-v1]], 개경계 조화 합성 `ETA2(NBDI) += EMO*FF*RampElev*cos(AMIG*timeh + FACE - EFA)` (`gwce.F:1638-1650`) 은 [[adcirc-gwce-implementation]]
+- 주기 **법선 flux** 경계 분조 `NFFR` (flux 경계 IBTYPE 2/12/22/32/52 가 있을 때만) — [[adcirc-nffr-periodic-flux-boundary]] §1
+- 출력 조류 조화분해: global velocity HA → `fort.54` — [[adcirc-tidal-forcing]]
+- ★정정 (2026-09-28): 구판의 "ADCIRC tidal database 가 조위 + u, v 분조를 함께 보간" 은 근거가 없다. 위 소스 노트상
+  경계 강제 입력은 수위 분조와 법선 flux 분조이며 u, v 분조 입력 카드는 확인되지 않는다.
+  tidal database(EC2001 등) 자체의 수록 변수는 코퍼스 밖 — source-needed.
 
 ## 4. Delft3D
 
@@ -117,13 +120,15 @@ EFDC도 **external(깊이적분 2D)** 과 **internal(3D shear)** 모드를 분�
 - D3D-4 FLOW: `.bnd`, `.bca` (boundary, harmonic constituents) — 조위·조류 분조 직접 입력. 내부 흐름 해상은 `flow2d3d_kernel` 의 Stelling-Leendertse ADI (§0.2 / [[delft3d_flow2d3d_dispatcher]] §3).
 - Delft3D FM: unstructured mesh, 동일 분조 지원. 흐름 솔버는 `furu`→`s1ini`→`s1nod`→Gauss+CG→`u1q1` semi-implicit θ-method 루프 (§0.2 / [[delft3d_dflowfm_compute_core]] §1·§8). 수위 경계(Dirichlet)·Riemann·velocity 경계의 행렬 처리는 [[delft3d_dflowfm_compute_core]] §3.2 (`s1nod.f90:181-277`).
 
-> `.bca`/`.bnd` 조류 분조 카드 정확한 포맷은 Delft3D-FLOW manual 미수록분 — source-needed 잔존.
+> `.bnd`/`.bca` 조류 분조 카드 포맷은 [[delft3d-flow-boundary-forcing]] §3 (FLOW User Manual §4.5.6.1 p.50-53 + App A.2.11 p.455-456).
 
 ## 5. XBeach
 
 > Canonical: [`models/XBeach/`](../../models/XBeach/) (source-analysis 32, verified)
 
 XBeach는 단기 폭풍 모델. 조류는 보통 수위 시계열 forcing의 부산물 또는 별도 background 흐름.
+
+흐름 해상은 [[xbeach_flow_solver]], 조위 경계 입력·보간은 [[xbeach_tide_forcing]] (`compute_tide_zs0.F90`), 흐름 경계의 tide 처리(instant/velocity/hybrid)·offshore front 는 [[xbeach_flow_boundary_conditions]].
 
 ## 6. 글로벌 모델에서 조류 데이터 추출
 
@@ -168,9 +173,9 @@ XBeach는 단기 폭풍 모델. 조류는 보통 수위 시계열 forcing의 부
 - [x] `models/EFDC/source-analysis/` — 흐름 코어 [[efdc_hydro_core]] (external/internal 모드분할·PCG·barotropic correction·개경계 forcing 진입) **verified**
 - [x] ROMS 흐름 코어 [[roms_baroclinic_3d]]·[[roms_barotropic_2d]] (경압3D step3d_uv / 순압2D split-explicit) **verified**
 - [x] Delft3D 흐름 커널 [[delft3d_flow2d3d_dispatcher]] (구조격자 ADI) + [[delft3d_dflowfm_compute_core]] (비구조 FM θ-method) **verified**
-- [ ] `models/EFDC/manual-notes/` 작성 — §2 정확한 `efdc.inp`/`pser.inp` 카드명·포맷 (source-needed)
-- [ ] `models/ADCIRC/web-refs/adcirc-tidal-database.md` — u, v 분조 활용 (source-needed)
-- [ ] `models/Delft3D/manual-notes/` — `.bca` 조류 분조 포맷 (source-needed)
+- [x] EFDC `PSER.INP`·C17 조화 경계 포맷 — [[efdc_boundary_conditions]] §A · [[efdc-tidal-forcing-conventions-v12]] (2026-09-28 연결)
+- [x] ADCIRC 경계 분조 NBFR/NFFR — §3 연결·정정 (2026-09-28). 잔존: tidal database 수록 변수 (source-needed, 코퍼스 밖)
+- [x] Delft3D `.bca` 조류 분조 포맷 — [[delft3d-flow-boundary-forcing]] §3 (2026-09-28 연결)
 - [ ] 한국 적용 사례 1건 verified (서해 EFDC 또는 동해 NAO.99Jb forcing)
 
 ## 10. 연결
@@ -178,5 +183,5 @@ XBeach는 단기 폭풍 모델. 조류는 보통 수위 시계열 forcing의 부
 - `01`~`05` — 조류 도메인 지식
 - [`concepts/tides/06-model-application.md`](../tides/06-model-application.md) — 조위 모델 적용 (동일 모델군)
 - 흐름 솔버 코어 (검수완료): [[roms_baroclinic_3d]] · [[roms_barotropic_2d]] · [[delft3d_flow2d3d_dispatcher]] · [[delft3d_dflowfm_compute_core]] · [[efdc_hydro_core]]
-- `models/ADCIRC/`, `models/XBeach/` — canonical source (조류 흐름 코어 노트 미연결, source-needed)
+- ADCIRC 흐름 코어: [[adcirc-momentum-implementation]] · [[adcirc-gwce-implementation]] / XBeach: [[xbeach_flow_solver]] · [[xbeach_flow_boundary_conditions]]
 - `concepts/tides/04-code-and-tools.md` §6 — 글로벌 조석/조류 모델
