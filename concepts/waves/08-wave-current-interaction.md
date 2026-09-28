@@ -5,7 +5,7 @@ canonical_source: external
 external_source: "arXiv:2511.12711v1 (Violante-Carvalho et al. 2025, Current effects on wind generated waves near an Ocean Eddy Dipole) + arXiv:2606.03231v1 (Onuki & Fujiwara 2026, A reduced model for surface wave–current interactions without spatial scale separation) — 양편 full PDF 직접 read"
 citation_status: verified
 has_source_needed: true
-verification_method: "arXiv 2511.12711·2606.03231 full PDF (curl https://arxiv.org/pdf/...) pdftotext 직접 read. abstract·introduction·방법(§3 WW3 / §2 reduced model)·결과(Hs 상대차·% 증폭·dispersion·conservation) 인용분만 verified. 일부 일반 이론(radiation stress feedback·blocking 정의)은 본 두 논문에 명시 없어 source-needed."
+verification_method: "arXiv 2511.12711·2606.03231 full PDF (curl https://arxiv.org/pdf/...) pdftotext 직접 read. abstract·introduction·방법(§3 WW3 / §2 reduced model)·결과(Hs 상대차·% 증폭·dispersion·conservation) 인용분만 verified. 일부 일반 이론(radiation stress feedback·blocking 정의)은 본 두 논문에 명시 없어 source-needed 로 두었다가 **2026-09-28 §5 정정**: (a) radiation stress 정의·유도는 외부 출처가 아니라 본 위키 concepts/littoral-drift/02-theory.md 에 Holthuijsen §7.4.2-7.4.3 인용으로 이미 있었다 — 재서술 대신 canonical 지시로 해소. (b) wave blocking 은 [holthuijsen2007] PAGE-282 직접 확인으로 비 형태 조건(U_current/c_g -> 1 에서 고주파 blocking·반사, 쇄파 동반)까지 해소, 단 원래 적혀 있던 U_c=-c_g/4 수치 임계는 보유 교과서에서 확인되지 않아 disclosed 유지. ★교훈: '본 논문에 없다' 가 '위키에 없다' 를 뜻하지 않는다 — 외부 출처를 찾기 전에 내부를 먼저 세야 한다."
 note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-18
 related:
@@ -117,8 +117,40 @@ WKB-type ray/action 기술(Vanneste & Young 2026 등)이 scale 분리에 의존�
 
 ---
 
-## 5. 미정리 (source-needed)
+## 5. 일반 이론의 소재 — 두 항목 정정 (2026-09-28)
 
-- **radiation stress feedback**(파→평균류 운동량 전달, Longuet-Higgins & Stewart)의 정식 정의·식: 본 두 논문에 명시 없음 → 별도 교과서 출처 필요.
-- **wave blocking** 정량 한계(군속도=역류 조건, $U_c = -c_g/4$ 등): 2511이 개념 언급만, 식 미제시.
-- radiation stress·set-up과 surf zone current 결합은 [[../currents/01-concept]] / [[07-wave-transmission]] 와 교차 — 후속 연계 필요.
+본 절은 "본 두 논문에 없으니 별도 교과서 출처가 필요하다" 로 남아 있었다.
+실제로 찾아보니 **하나는 본 위키에 이미 있었고, 하나는 부분적으로 있었다.**
+
+### 5.1 radiation stress feedback — ✅ 위키 내부에 있다
+
+별도 외부 출처가 필요하지 않다. [[../littoral-drift/02-theory]] 가
+Holthuijsen §7.4.2–7.4.3 을 직접 인용해 **wave momentum 에서 radiation stress 까지 식 단위로 유도**하고
+(eq 7.4.1 이하), set-down·set-up(eq 7.4.21 이하)과 longshore current 까지 잇는다.
+원 논문 귀속(Longuet-Higgins & Stewart 1962·1963·1964)도 그 노트가 기록한다.
+
+따라서 본 노트는 정의를 재서술하지 않고 그 노트를 canonical 로 가리킨다
+(CONVENTIONS §3 — 도메인 개념의 canonical 은 한 곳). [[02-theory]] 도 radiation stress 를
+Longuet-Higgins & Stewart 귀속으로 다룬다.
+
+### 5.2 wave blocking — 부분 해소
+
+**조건의 형태는 보유 교과서에 있다.** Holthuijsen 은 역류에서 지배 파라미터가
+**흐름속도/군속도 비**이고, 그 비가 1 에 접근하면 고주파 성분의 **blocking 과 반사**가
+일어난다고 적는다 — 그리고 그때는 파가 이미 충분히 가팔라져 쇄파가 동반된다.[^ho-block]
+
+하구에서 파가 증가하는 하천류를 거슬러 전파해 **유출류 바깥 가장자리에 쇄파대를 만드는** 사례,
+조석 와류·좁은 해협·Agulhas·Gulf Stream 가장자리가 같은 기제의 예로 제시된다.[^ho-block]
+
+> [!source-needed]
+> 다만 §5 가 원래 적었던 **$U_c = -c_g/4$ 형태의 수치 임계는 확인되지 않았다.**
+> Holthuijsen 이 주는 것은 $U_{current}/c_g \to 1$ 이라는 **비(比) 형태**이고,
+> 심해 단색파의 구체적 차단 유속 계수는 본 위키 보유 교과서에서 찾지 못했다.
+> 그 수치를 인용하려면 별도 원전이 필요하다. `source-needed`
+
+### 5.3 남은 연계
+
+radiation stress·set-up 과 surf zone current 의 결합은
+[[../currents/01-concept]] · [[07-wave-transmission]] 과 교차한다 — 후속 연계 과제로 유지.
+
+[^ho-block]: [holthuijsen2007] PAGE-282 — *"in the case of an ambient current, the ratio of current speed over group velocity U_current/c_g is the controlling parameter. For frequencies propagating in an opposing current, this ratio may approach unity (U_current/c_g -> 1), resulting in blocking and reflection of the energy at the high frequencies. In addition, the waves have usually steepened enough that wave breaking occurs."* 이어서 하구 사례(*"The waves, propagating against the increasing river current in the estuary, may enhance their wave height to a point at which they will break, thus creating a zone of breaking waves at the seaward edge of the outgoing flow."*)와 조석 와류·좁은 해협·Agulhas·Gulf Stream 가장자리를 같은 기제의 예로 든다. 색인 항목 "blocking, current-induced 264" 도 같은 문헌.
