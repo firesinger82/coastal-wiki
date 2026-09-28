@@ -4,7 +4,7 @@ topic: currents
 canonical_source: self
 citation_status: verified
 has_source_needed: true
-verification_method: "AI cross-reference: KHOA glossary 조류타원 정의 + UTide 2D output (utide/_solve.py 'Lsmaj','Lsmin','theta','g','umean','vmean','uslope','vslope' 변수명 직접 인용) + Stewart §17 tidal currents intro (p.313-314). **§4 Pugh 격상 (2026-09-28)**: textbook/md/sea-level.md (source_id: sea-level) §4:4:2 p.128·§4:4:3 p.131·§5:4:3 p.176-179 직독. ★정정: 구 §4 '북반구 CCW 회전' 은 반대 — Pugh 는 외해 반일주조 타원이 북반구 시계방향(직접 조석력+Coriolis), 대륙붕은 지형·연안반사가 결정, 'no simple rules'."
+verification_method: "AI cross-reference: KHOA glossary 조류타원 정의 + UTide 2D output (utide/_solve.py 'Lsmaj','Lsmin','theta','g','umean','vmean','uslope','vslope' 변수명 직접 인용) + Stewart §17 tidal currents intro (p.313-314). **§4 Pugh 격상 (2026-09-28)**: textbook/md/sea-level.md (source_id: sea-level) §4:4:2 p.128·§4:4:3 p.131·§5:4:3 p.176-179 직독. ★정정: 구 §4 '북반구 CCW 회전' 은 반대 — Pugh 는 외해 반일주조 타원이 북반구 시계방향(직접 조석력+Coriolis), 대륙붕은 지형·연안반사가 결정, 'no simple rules'. §6 KHOA 실측 주석 (2026-09-28): Annual Report 2025 부이 조류타원요소 표(그림 3-112·3-127·3-160·3-166·3-172·3-175) 와 동해중부 7부이 미산출 주기(원문 md L8801·L8862·L9301 등) 직독."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-21
 verification_by: "Claude Opus 4.7 (1M context) — cross-ref"
@@ -124,6 +124,13 @@ Stewart §9 (Geostrophic Currents)·§11 (Vorticity)는 Coriolis 일반론이며
 | 명량해협 (전남) | 강한 왕복성 | 5+ m/s | 반일주조 |
 | 진도해협 | 강한 왕복성 | 3-5 m/s | 반일주조 |
 
+> **KHOA 실측 대조 (Annual Report 2025, `khoa-annual-reports`, 2026-09-28)** — 부이 M₂ 조류타원(반단축 부호: − 시계, + 반시계):
+> - **동해 중부 부이 7곳**(울릉도북서·울릉도북동·고래불·망상·경포대·낙산·속초)은 *"동해중부 해역 특성상, 조류조화상수 및 조류타원요소 미산출"* —
+>   위 표의 "동해: 약함, 회전성" 은 KHOA 가 조류 타원 자체를 내지 않는 해역에 대한 서술이라 **실측 근거가 없다**(표 행은 일반론으로만 남긴다).
+> - 회전성 실례: **제주남부**(남해 외해) M₂ 반장축 16.0 / 반단축 −6.4 cm/s → 비 0.40, **시계방향**(그림 3-112) — §4 Pugh 의 "외해 북반구 시계방향" 과 부합.
+>   서해 **상왕등도** 38.2 / +14.2 → 0.37 반시계(그림 3-172), **대천해수욕장** 43.1 / +12.3 → 0.29 반시계(그림 3-127) — 대륙붕에서는 방향이 지형에 따라 갈린다.
+> - 왕복성 실례: **우이도** 87.2 / −2.2 → 0.03(그림 3-175), **인천항** 44.5 / −1.5 → 0.03(그림 3-160), **태안항** 66.8 / −4.1 → 0.06(그림 3-166).
+
 → 정량 검증은 [`05-examples.md`](05-examples.md)에서 수치조류도 CSV 격자에서 직접 추출.
 
 ## 7. 분조 set (조류 적용)
@@ -146,7 +153,7 @@ j1, k1, k2, l2, m1, m2, mu2, n2, nu2, o1, oo1, p1, q1, s2
 
 - Coriolis ↔ 조류타원 회전 방향 정량 (§4)
 - Pugh (1987) tidal current chapter 인용 추가
-- 한국 동해 회전성 조류 사례·자료
+- ~~한국 동해 회전성 조류 사례·자료~~ — 동해 중부는 KHOA 조류조화 미산출(§6 주석). 회전성 실례는 제주남부·상왕등도로 대체
 - 명량·진도해협 조류 극값 정량 source
 
 ## 9. 연결
