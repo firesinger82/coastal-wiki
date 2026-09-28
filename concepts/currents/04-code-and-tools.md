@@ -4,7 +4,7 @@ topic: currents
 canonical_source: self
 citation_status: verified
 has_source_needed: true
-verification_method: "AI cross-reference: UTide README + _solve.py docstring + KHOA OpenAPI 가이드 (khoa-tide-model skill.md) + 수치조류도 CSV 단위·구조 검증 (tides-khoa-cross-verification §5)."
+verification_method: "AI cross-reference: UTide README + _solve.py docstring + KHOA OpenAPI 가이드 (khoa-tide-model skill.md) + 수치조류도 CSV 단위·구조 검증 (tides-khoa-cross-verification §5). §6.1 full PDF 격상 (2026-09-28): arXiv 2511.12711v1·2606.03231v1·1307.0584v1 전문 판독(서브에이전트 + 핵심 인용·Table 2 원문 대조). ★ 에디 논문 hindcast 에서 HYCOM 입력이 무해류보다 RMSE·bias 나쁨, 축소모델은 수치실험 0건, Bayesian 논문은 사실상 MLE·‘surface forcing’=경계 파진폭으로 요약 정정."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-21
 verification_by: "Claude Opus 4.7 (1M context) — cross-ref"
@@ -177,12 +177,64 @@ print(f"O1: {nearest['o1_진폭']:.2f} cm/s @ {nearest['o1_지각']:.2f}°")
 - TPXO·FES의 조류 데이터 사용법 — pyTMD `currents` mode 인용 보강
 - 라이선스 (UTide MIT 확인, KHOA 자료 사용 정책 확인)
 
-### 6.1 연구 문헌 (research/inbox promote, source-needed)
+### 6.1 연구 문헌 3편 ✅ verified (full PDF 판독 2026-09-28)
 
-- **Eddy dipole wave-current (Violante-Carvalho et al. 2025)** — arxiv:[2511.12711](https://arxiv.org/abs/2511.12711). WW3 로 ocean eddy dipole 근방 wave field 에 대한 표층류 영향 평가 — dipole = surface wave **수렴렌즈**(중앙 jet 으로 refraction 채널링), H_s 공간변동. 남서대서양 강 dipole 2개월 hindcast(HYCOM/GlobCurrent/SSalto-Duacs 3 표층류 비교, 위성고도계 H_s 검증). 와류 wave-current 상호작용.
-- **Wave-current 축소모델 — Craik-Leibovich 확장 (Onuki·Fujiwara 2026)** — arxiv:[2606.03231](https://arxiv.org/abs/2606.03231). 약비선형 표면중력파 ↔ 천천히 진화하는 current 양방향 상호작용 reduced asymptotic 모델. Craik-Leibovich wave-averaged momentum 기반이나 Stokes drift 를 외부규정 않고 동반 진폭식으로 결정. **공간 scale separation 미가정** → current-induced advection·refraction·scattering 표현. wave action 보존.
-- **Nearshore 모델 Bayesian 보정 (Balci·Restrepo·Venkataramani 2013)** — arxiv:[1307.0584](https://arxiv.org/abs/1307.0584). **longshore current** nearshore 모델 파라미터(bottom drag·surface forcing)를 field data 로 tuning 하는 Bayesian MLE(다항근사 효율화, covariance 부재 문제 대응). 모델 보정 방법론.
-- citation_status: 위 3건 source-needed (abstract 기반)
+#### 6.1.1 에디 dipole 근방 파랑–해류 — Violante-Carvalho et al., arXiv:[2511.12711](https://arxiv.org/abs/2511.12711)v1 (2025-11-16)
+
+WAVEWATCH III **v7.14 ST4**, 0.04° 격자, 남서대서양(São Paulo 대지 부근) 에디 dipole. 실험이 **둘로 나뉜다**:[^vc]
+
+| 실험 | 강제 | 결과 |
+|---|---|---|
+| 이상화 | **바람 없음**, HYCOM 해류 한 장(2010-09-08) 고정, 남쪽 경계 swell Hs 1 m · 방향분산 15° · Tp 7 s / 15 s | 중앙 jet 에서 Hs 증가 **7 s 50% 초과 / 15 s 최대 33%** — 선형이론 단일 파(1 m/s 역류) 예측 25% / 10% 보다 크다 |
+| hindcast | ERA5 바람·경계 스펙트럼, 2010-08~09, 해류 3종(SSalto/Duacs 1/4° 일별 · HYCOM 1/12° · GlobCurrent 1/4°) + 무해류, 24/72 방향 | 위성고도계(CCI L3) Hs 14 궤도 구간 대조 |
+
+- **"수렴렌즈" 는 이상화 실험의 결론이다** — 바람 없음·정지 해류·좁은 방향분산(저자 스스로 *"expected to cause a pronounced increase in energy"*).
+  hindcast 에서 해류가 만든 Hs 변화량은 따로 정량화되지 않는다. 기구는 굴절 채널링 단독이 아니라 **굴절 + 이류(Doppler)** 결합.
+- ★ **hindcast 검증표(Table 2)를 다시 읽으면** (dipole 영역 971점 / 중앙 jet 476점):
+
+  | 해류 입력 | CORR | RMSE (m) | bias (m) |
+  |---|---|---|---|
+  | SSalto (24 방향) | 0.68 / 0.65 | 0.23 / 0.22 | 0.040 / 0.022 |
+  | GlobCurrent (24) | 0.67 / 0.61 | 0.24 / 0.23 | 0.041 / 0.023 |
+  | HYCOM (24) | 0.64 / 0.57 | 0.26 / 0.26 | 0.062 / 0.043 |
+  | **무해류** | 0.53 / **0.30** | 0.25 / 0.23 | 0.040 / **−0.008** |
+
+  해류 효과는 **상관계수에서만 뚜렷하고 RMSE 개선은 0.01–0.02 m** 다. **HYCOM 입력은 RMSE·SI·bias 모두 무해류보다 나쁘다** —
+  jet 위치를 20–30 km 어긋나게 놓았기 때문이다(저자 명시). 가장 거친 SSalto 가 가장 좋다. 24→72 방향은 *"marginal impact"*.
+  저자 스스로 *"the differences in RMSE are not statistically significant"* 라 쓰며, 검정 방법은 기술하지 않는다.
+- 결론부 "HYCOM 이 에너지 역학을 더 포괄적으로 표현" 은 **저자 주장**이며 자신들의 Table 2 순위와 반대다.
+- 본문 불일치: 파형경사를 $\varepsilon=(H_s/2)k_p$ 로 정의하나 보고값 0.0822(7 s)·0.0179(15 s)는 $H_s k_p$ 값이다
+  ($k_p=\omega^2/g$ 심해: 7 s → 0.0821, 15 s → 0.0179 m⁻¹, 본 노트 계산).
+- 연안 모델러 교훈: **해류장 선택(위치 정확도)이 방향 해상도보다 중요**하고, 위치가 어긋난 재해석 해류는 해류를 안 넣은 것보다 나쁠 수 있다.
+  SWAN/WW3 해류 입력의 Doppler·굴절 항 메커닉은 [`08-wave-current-interaction`](../waves/08-wave-current-interaction.md).
+
+#### 6.1.2 공간 규모 분리 없는 파랑–해류 축소모델 — Onuki·Fujiwara, arXiv:[2606.03231](https://arxiv.org/abs/2606.03231)v1 (2026-06-02, 12p)
+
+Craik-Leibovich(Suzuki & Fox-Kemper 2016 형) 평균류 + 복소 진폭 $A$ 의 Helmholtz 형 파동식을 결합하고, Stokes drift 를 외부에서 주지 않고 $A$ 로부터 계산한다.
+주기 영역에서 파작용·에너지(교환분)·운동량($f=0$ 일 때) 보존을 해석적으로 보인다.[^of]
+- ★ **수치 실험이 하나도 없다** — 그림·시뮬레이션·기준해 비교 없음. 수치 구현은 향후 과제(§7).
+- ★ **"규모 분리 없음" 은 수평 공간에 한정** — 시간 규모 분리($\epsilon^{-2}$), 좁은 주파수대($|k|=\kappa$), 약한 해류($U\sim\epsilon^2 c$)는 그대로 가정.
+  저자 요약: *"weak nonlinearity, constant depth and a narrow frequency band, but does not impose a spatial-scale separation"*.
+- 보존 구조의 일부는 현상론적 치환(§5: $\nabla\cdot\mathbf U^L=0$ 강제, Stokes 보정항 도입)으로 만든 것이며, 후자는 심해에서만 타당하다고 저자가 적는다.
+  평탄 지형·강체 뚜껑·쇄파 없음 — 대상은 외해 Langmuir 순환이다. 연안 적용성은 현재 낮다.
+- 위치 짓기: 저자는 vortex-force 계열(McWilliams et al. 2004, Uchiyama et al. 2010)과 WKB/ray 계열을 "규모 분리형" 으로 묶고 대비한다.
+  SWAN/WW3 작용평형이 바로 그 WKB 계열이라는 연결은 본 노트의 해석이다.
+
+#### 6.1.3 연안류 모델의 자료 기반 모수 추정 — Balci·Restrepo·Venkataramani, arXiv:[1307.0584](https://arxiv.org/abs/1307.0584)v1 (2013, *Ocean Modeling* 투고)
+
+vortex-force 수심평균 파랑–해류 모델(Duck 단면, 연안방향 균일)의 두 모수 — **외해 경계 파진폭 $a$** 와 **선형 저면마찰 계수 $d$**($\tau=du$) — 를
+DUCK94 현장 연안류(바 부근 유속계 3개, 1994-09~11)로 추정한다.[^br]
+- 결과: *"a = 0.8−1.1 m"*, *"d = 0.007 − 0.020"*. 최소 **3–5 시간** 자료가 필요하고, 3 시간 창에서는 $a$ 는 변하나 $d$ 는 안정적이다.
+- ★ **이름은 Bayesian 이지만 실제는 격자 위 최대우도(MLE)** — 사전분포는 균일 상자, 저자 *"only interested in computing the maximal likelihood estimates"*.
+  불확실성 구간·합성자료(twin) 검증은 없다. 우도는 크기 상대오차 $|1-|O|/|M||$ 이며 **해류 방향은 벌점에 들어가지 않는다**.
+- "다항근사" = 모델 출력의 Legendre 대리모델(17 × 33 = 561 run) → 256² 격자 평가. *"117 times faster"* 는 run 수 비 65536/561 = 116.8 이다(본 노트 계산).
+- 기존 요약의 "surface forcing" 은 **바람이 아니라 외해 경계 파진폭**이다(풍응력 항은 0).
+- 실무 교훈(저자 Fig. 6 의 능선 + 본 노트 해석): 마찰과 경계 파고는 서로 보상하는 능선을 이룬다 — **마찰을 경계 파고와 따로 보정하면 편향된다**.
+  $d$ 는 선형계수라 2차 $C_f$·Manning 으로 바로 옮길 수 없다.
+
+[^vc]: Violante-Carvalho et al., arXiv:2511.12711v1 — WW3 *"7.14"*, *"ST4"*; §4.1 *"A maximum increase in Hs for the 7 s waves of over 50% is observed in the central jet"*, *"maximum of 33%"*, 선형이론 *"predicts an increase of approximately 25%"*; §4.1 *"the narrow σ = 15◦ employed in the simulations is expected to cause a pronounced increase in energy"*; §4.2 HYCOM *"misplaced the position of the maximum value by ∼20-30 km"*, *"ten points greater than HYCOM"*, *"twice as large"*, *"the differences in RMSE are not statistically significant"*, *"has a marginal impact on Hs"*; Table 2 (6 run × dipole 971점 / jet 476점) CORR·BIAS·RMSE·SI·VAR — 위 표는 그 중 24 방향 4행 발췌.
+[^of]: Onuki & Fujiwara, arXiv:2606.03231v1 [physics.flu-dyn] — §7 *"The formulation assumes weak nonlinearity, constant depth and a narrow frequency band, but does not impose a spatial-scale separation between the waves and the current"*; §7 *"A complementary next step is to implement the reduced equations in a numerical model"*. 본문에 Figure 0 건(추출본 계수).
+[^br]: Balci, Restrepo & Venkataramani, arXiv:1307.0584v1 — *"linear bottom drag formulation: τ = du"*; 사전 상자 *"[0.4, 1.2]"*·*"[0.002, 0.026]"*; §3.1 *"only interested in computing the maximal likelihood estimates for a and d"*; §3.3 *"117 times faster"*; §5 *"a = 0.8−1.1 m. The most likely bottom drag coefficient was in the range d = 0.007 − 0.020"*, *"3-5 hours"*; *"Submitted to Ocean Modeling"*.
 
 ## 7. 연결
 
