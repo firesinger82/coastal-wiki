@@ -3,6 +3,7 @@ title: "ADCIRC 3D 스칼라 transport solver source-analysis — transport.F/TRA
 topic: adcirc-transport-solver
 canonical_source: self
 citation_status: verified
+has_source_needed: false
 verification_method: "ADCIRC raw source 직접 read: src/transport.F(1497, v45.12) — Alp4 semi-implicit DTAlp4/DT1MAlp4(:31-32)·ADC_TRIDAG2 tridiag 호출(:1182) file:line 직접 검증. dispatch vsmy.F:1550-1555. 소스 banner Luettich-Westerink. ★adcirc-3d-mode:59 가 transport 를 vsmy.F:1545-1545 로 오귀속(정정)."
 note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-07-07

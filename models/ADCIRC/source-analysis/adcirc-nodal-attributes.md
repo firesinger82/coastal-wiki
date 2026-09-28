@@ -3,6 +3,7 @@ title: "ADCIRC nodal attributes (fort.13) — 공간변화 파라미터 시스�
 topic: adcirc
 canonical_source: self
 citation_status: verified
+has_source_needed: false
 verification_method: "models/ADCIRC/raw/source_code/adcirc/src/nodalattr.F (3193) 직접 read — attribute CASE 카탈로그(636-686) + Apply2DBottomFriction(2271, Manning→Cd FRIC=g·n²/H^(1/3)) + CalculateTimeVaryingTau0(2117) + Apply2DInternalWaveDrag(2516) + ApplyDirectionalWindReduction(2804) + ApplyCanopyCoefficient(2922) file:line 인용. Luettich-Westerink ADCIRC."
 note_author: "Claude Opus 4.8 (1M context) source-code direct read"
 note_date: 2026-06-03
