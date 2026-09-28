@@ -133,20 +133,26 @@ print(f"K1: {nearest['k1_진폭']:.2f} cm/s @ {nearest['k1_지각']:.2f}°")
 print(f"O1: {nearest['o1_진폭']:.2f} cm/s @ {nearest['o1_지각']:.2f}°")
 ```
 
-## 3. KHOA OpenAPI (조류 관측)
+## 3. KHOA OpenAPI (조류·조위)
 
-> KHOA 바다누리 API 가이드는 [`khoa-tide-model` skill.md](../../textbook/notes/tides-khoa-cross-verification.md) 인용. **조류 관련 endpoint** 별도 조사 필요 (현재 noted endpoints는 조위 위주).
+> ✅ verified (2026-09-28): KHOA 바다누리 OpenAPI 공식 목록(`https://www.khoa.go.kr/oceandata/openapi/openApiList.do`, 목록 데이터
+> `POST /oceandata/openapi/search.do`) + 키 없이 호출한 응답 실측. 기존 가이드(`khoa-tide-model` skill.md)의 `http://www.khoa.go.kr/api/oceangrid/<이름>/search.do`
+> 경로는 **폐기됐다** — 모든 이름에 오류 페이지를 돌려준다.
 
-조위 endpoint (참고):
-- `tideObsHar` — 조화상수 (조위)
-- `tideObsReal` — 실시간 관측 조위
-- `tideObsPre` — 예측 조위
+현행 경로 형식: `https://khoa.go.kr/oceandata/api/<이름>/search.do` (공통 `ServiceKey`, `ResultType=json|xml`).
 
-조류 endpoint (추정):
-- `tideObsTideCurrent` 또는 유사 — 조류 관측 데이터
-- 정확한 endpoint 명은 KHOA OpenAPI 문서 직접 확인 (source-needed)
+| 이름 | 공식 명칭 | 주요 요청 파라미터 | 응답 |
+|---|---|---|---|
+| `tidalCurrentArea` | 수치조류도 예측 유향 유속 | `Date`(YYYYMMDD)·`Hour`·`Minute`·`MaxX`·`MinX`·`MaxY`·`MinY` | `pre_lon`·`pre_lat`·`current_speed`(**cm/s**)·`current_dir`(deg) — 영역 폭에 따라 1–10 km 간격 자동 조절 |
+| `tidalCurrentAreaGeoJson` | 면(지역)단위 수치조류도 예측 유향 유속 | 위와 같음 | GeoJSON |
+| `tidalCurrentPoint` | 수치조류도 지점별 최강창낙조 | `SDate`·`SHour`·`SMinute`·`EDate`·`EHour`·`EMinute`·`lon`·`lat` | 최근접 지점(최대 1 km)의 `obs_date`·`type`(창조·낙조·전류)·`current_speed`(cm/s)·`current_dir`(deg) |
+| `tideObsHar` | 조위관측소 조화상수 | 관측소 코드 | 진폭·지각 |
+| `tbm` | 기본수준점 | — | 조화상수·메타정보 |
 
-→ 조류 관측 데이터 자동 다운로드 코드는 KHOA OpenAPI 키 + 정확한 endpoint 확인 후 보강.
+- 실측 판별: 존재하는 이름은 키 없이 호출하면 `{"result":{"error":"ServiceKey is null"}}`, 없는 이름은 "요청하신 페이지" 오류 HTML 을 준다.
+  이 방식으로 위 5개는 존재, 구판에 적었던 `tideObsReal`·`tideObsPre` 는 현행 경로에 **없다**(2026-09-28).
+- 유향 규약은 공식 명세에도 "deg" 로만 적혀 있다.
+- `tidalCurrentArea` 는 §2 조화상수 CSV 와 같은 수치조류도의 예측값이며, 예측은 **회전성 조류 벡터**다 — CSV(남북 성분만)로는 재현되지 않는다.
 
 ## 4. 도구 vs 모델 분리 (참고)
 
