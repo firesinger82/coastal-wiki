@@ -1,0 +1,63 @@
+--- a/models/XBeach/source-analysis/xbeach_output.md
++++ b/models/XBeach/source-analysis/xbeach_output.md
+@@ -3,7 +3,7 @@
+ topic: general
+ canonical_source: self
+ citation_status: verified
+-verification_method: "XBeach source code 직접 분석 (models/XBeach/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/xbeach_output.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
++verification_method: "XBeach source code 직접 분석 (models/XBeach/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/xbeach_output.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시. **§C.1-C.2 추가 (2026-09-28, SCOPED EDIT)**: runup gauge 추출 경로 직독 — ncoutput.F90:113(rugrowindex 선언 주석)·:915·:925-930·:932-938(rugx is not used)·:957-964(교차 탐색 루프)·:987-989(교차 셀 xz/yz/zs 출력)·:1720(rugrowindex=ypoints), varoutput.F90:182-191, params.F90:1256-1261(nrugauge 0-50·nrugdepth 1-10·rugdepth 기본 0.0)·1398(eps 기본 0.005)·1796-1807(rugdepth<=eps 승격 + 경고). 두 발견은 concepts/swash-zone/06-model-application.md 집필 중 드러났고 절대규칙 #6 에 따라 모델 메커닉을 본 노트로 옮긴 것이다."
+ note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
+ note_date: 2026-04~05 (original) / 2026-05-23 (promote)
+ verification_by: "사용자 + codex source-code analysis"
+@@ -81,6 +81,51 @@
+ 
+ Coordinates **snapped to nearest grid indices** in output init (`ncoutput.F90:1697-1731`).
+ 
++### C.1 ★ runup gauge 는 점이 아니라 **행**이다
++
++`nrugauge` 게이지는 `x y stationid` 로 좌표를 받지만 **추출 루틴은 y 성분만 쓴다.**
++게이지는 `rugrowindex` 라는 격자 **행 인덱스** 하나로 환원된다 — 변수 선언 주석이
++*"Array with row index where runup gauge can be found"* (`ncoutput.F90:113`), 할당은
++`rugrowindex = ypoints(par%npoints+1:)` (`:1720`). Fortran 출력 경로도 동일
++(`varoutput.F90:182-191`, 주석 *"Make rugrowindex with row number (per subprocess) with runup gauge"*).
++
++추출 루프는 전역 x 인덱스 **1** 과 `rugrowindex` 를 지역좌표로 변환한 뒤
++*"rugy now contains the local y-coordinate / rugx is not used"* 라고 주석으로 못박고(`:937-938`),
++그 행의 **전 cross-shore 구간**(`xmin+1 .. xmax`)을 훑어 수심이 임계를 가로지르는 첫 지점을 찾는다
++(`:957-964`):
++
++```fortran
++do j=xmin+1,xmax
++   if ((sl%hh(j,  rugy)<=par%rugdepth(ird)) .and. &
++   &   (sl%hh(j-1,rugy)> par%rugdepth(ird)) ) then
++      idumhl=j-1
++      exit
++   endif
++enddo
++```
++
++- **같은 행에 게이지를 둘 놓으면 같은 결과가 나온다** — 게이지가 고르는 것은 cross-shore 측선이지 지점이 아니다.
++- 출력은 교차 **셀**의 `xz`·`yz`·`zs` 를 그대로 낸다(`:987-989`) — **보간 없음**.
++  따라서 처오름 해상도가 cross-shore 격자 간격에 직접 묶인다.
++- 미검출은 `huge(0.d0)`(`:930`)이고 MPI 에서는 **최솟값 reduce** 로 합쳐진다
++  (주석 *"The runup values are collected in xomaster, using xmpi_reduce, taking the minimum values"*, `:925-926`).
++- 범위: `nrugauge` 0–50(`params.F90:1257`), 게이지당 출력 벡터 길이 `1 + nrugdepth*3`(`ncoutput.F90:915`).
++
++### C.2 ★ `rugdepth` 는 `eps` 아래로 내려가지 않는다
++
++`nrugdepth`(기본 1, 범위 1–10)개의 처오름 임계를 한 게이지에서 동시에 받을 수 있고
++`rugdepth` 기본값은 **0.0**, 범위 0.0–0.1 이다(`params.F90:1260-1261`).
++
++그런데 초기화 단계에서 `nrugauge>0` 이면 `rugdepth <= par%eps` 인 항목이 전부
++`(1.0d0 + epsilon(0.d0))*par%eps` 로 **승격**되고 경고 한 줄만 남는다 —
++주석 *"fix minimum runup depth"*, 경고 *"Warning: Setting rugdepth to minimum value greater than eps ("*
++(`params.F90:1796-1807`). `eps` 는 침수-건조 임계이며 기본 **0.005 m**(범위 0.001–0.1, `params.F90:1398`).
++
++- **기본 설정에서 처오름 임계 = 침수-건조 임계다.** `rugdepth` 를 지정하지 않으면 0.0 이 아니라 `eps` 가 쓰인다.
++- **안정성 때문에 `eps` 를 키우면 처오름 정의가 함께 움직인다** — 수치 설정이 물리량 정의를 바꾸는 결합이고,
++  로그의 경고 한 줄 말고는 드러나지 않는다.
++- 도메인 층 논의는 [concepts/swash-zone/06-model-application.md](../../../concepts/swash-zone/06-model-application.md) §3.
++
+ NetCDF point metadata: `pointx, pointy, station_id, xpointindex, ypointindex, pointtypes`. Point data variables: `point_<mnem>` (`:446-528`).
+ 
+ Fortran point output: each station writes `<stationid>.dat` + `pointvars.idx` (`:1786-1804`).
