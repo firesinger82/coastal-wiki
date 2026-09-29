@@ -66,11 +66,14 @@ $$\boxed{\eta_{IB} = -\frac{\Delta P_A}{\rho g}}$$
 
 ### 2.2 한국 적용 — 태풍 IB surge
 
-| 태풍 (한국) | 중심기압 (mb) | IB 정적 surge (m) | 분류 |
-|---|---:|---:|---|
-| Maemi 2003 | 950 | +0.63 | extratropical 보다 큼 |
-| Hinnamnor 2022 | 920 | +0.93 | extreme tropical |
-| typical 가을 태풍 | 970-980 | +0.33~+0.43 | average |
+| 태풍 (한국) | 기압 (hPa) | 기압의 종류 | IB 정적 surge (m) | 출처 |
+|---|---:|---|---:|---|
+| Maemi 2003 | 950 | **제주 관측소 최저기압** (국내 기록) — 중심기압 아님 | +0.63 | Wikipedia "Typhoon Maemi" |
+| Maemi 2003 | 910 | JMA 최저 중심기압 (09-10, 한반도 도달 전) | +1.02 | 같음 |
+| Hinnamnor 2022 | 920 | JMA 최저 중심기압 (08-30, 오키나와 접근 시) — 한반도 영향 시 아님 | +0.93 | Wikipedia "Typhoon Hinnamnor" |
+| (계산 예시) | 970–980 | 가정값 | +0.33~+0.43 | — |
+
+IB 값은 $\Delta\eta = (1013 - P)/(\rho g)$, $\rho = 1025$ kg/m³ 로 계산한 **정적 상한**이다. 기압 종류가 다른 값끼리 태풍 강도를 비교하지 않는다. 한반도 영향 시점의 중심기압은 KMA·JMA Best Track 필요 (source-needed). Wikipedia 값 확인 2026-09-29.
 
 배경기압 1013 mb 기준. ADCIRC 의 `PRBCKGRND = 1013.0 mb` constant (`models/ADCIRC/raw/source_code/adcirc/src/constants.F90:54`).
 

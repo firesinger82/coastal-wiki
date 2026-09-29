@@ -35,7 +35,7 @@ related:
 |---|---|---|
 | 시기 | 2003-09-12 ~ 13 | KMA·JMA RSMC Best Track — fetch 필요 |
 | 한국 경로 | 남해 직격, 마산만 통과 | KMA Best Track 트랙 — fetch 필요 |
-| 중심기압 (최저) | 950 mb (한반도 영향 시) | 본 위키 [02-theory.md §2.2 표](02-theory.md#22-한국-적용--태풍-ib-surge) 인용 (KMA·JMA RSMC 원본 fetch 필요) |
+| 제주 관측소 최저기압 (중심기압 아님) | 950 hPa | Wikipedia ✓ (§1.1.1) — 한반도 영향 시 중심기압은 KMA·JMA Best Track 필요 |
 | 최대 surge | ~2.4 m 마산 | 본 위키 [01-concept.md §3.2 표](01-concept.md#32-한국-주요-태풍-storm-surge-case) 인용 (KHOA Annual Report 2003 §3.x fetch 필요) |
 | 침수 피해 | 마산항 주변 광범위 침수 | 언론·공식 보고 — fetch 필요 |
 | 분류 | benchmark TC | 한국 storm-surge 연구의 historical reference case |
@@ -50,7 +50,7 @@ WebSearch + Wikipedia + Shim et al. JCR 직접 fetch:
 | 한국 상륙 | **2003-09-12 부산 서쪽** | Wikipedia + WebSearch ✓ |
 | 중심기압 trajectory peak (JMA 10-min) | **910 hPa** | Wikipedia (JMA Best Track) ✓ |
 | 중심기압 (JTWC 1-min) | **885 hPa** | Wikipedia (JTWC 15W report) ✓ |
-| **중심기압 한반도 영향 시 (Jeju)** | **950 hPa** (national record) | Wikipedia ✓ |
+| **제주 관측소 최저기압** (중심기압 아님) | **950 hPa** (국내 기록) | Wikipedia ✓ |
 | 최대 풍속 peak (10-min, JMA) | 195 km/h (120 mph) | Wikipedia ✓ |
 | 최대 풍속 peak (1-min, JTWC) | 280 km/h (175 mph), Cat 5 | Wikipedia ✓ |
 | 풍속 한반도 상륙 시 | 140 km/h (JMA) / 165 km/h (JTWC) | Wikipedia ✓ |
@@ -65,9 +65,9 @@ WebSearch + Wikipedia + Shim et al. JCR 직접 fetch:
 - 차이 가능성: (a) 1.40 m = 잔차 (residual) vs 2.4 m = 절대 해수면 above MSL (천문조 + surge 합산), (b) 측정 정점 차이 (마산 조위관측소 vs 마산만 head), (c) 자료원 차이 (KHOA 직접 측정 vs 사후 hindcast 표시). KHOA Annual Report 2003 부재로 직접 비교 불가 — **§5 보강 우선순위 2 유지**.
 
 **Maemi vs Hinnamnor 한반도 영향 시 비교**:
-- Maemi: **910 hPa peak → 950 hPa (Jeju, 한반도 영향 시)** (Wikipedia ✓)
-- Hinnamnor 2022 ([[khoa-annual-2022-hinnamnor-surge]]): trajectory peak 920 hPa → 영향 시 더 약화. 마산 9월 고극조위는 누년 대비 −38 cm (KHOA 2022 §3) — 이것은 월 최고수위 층위이며 해일 부재의 근거가 아니다(시간별 잔차 층위는 [08 §6.1](08-applied-observed-surge-resolution.md) 참조)
-- **Maemi 가 한반도 직격·강도 모두 더 강함**. 02-theory.md §2.2 표의 Hinnamnor "920 mb" 는 trajectory peak 기준임을 명시 필요 (한반도 접근 시는 더 약화).
+- Maemi: JMA 최저 중심기압 **910 hPa** / 제주 관측소 최저기압 **950 hPa** — 서로 다른 종류의 기압 (Wikipedia ✓)
+- Hinnamnor 2022 ([[khoa-annual-2022-hinnamnor-surge]]): JMA 최저 중심기압 920 hPa (2022-08-30, 오키나와 접근 시, Wikipedia ✓). 한반도 영향 시 중심기압은 source-needed. 마산 9월 고극조위는 누년 대비 −38 cm (KHOA 2022 §3) — 이것은 월 최고수위 층위이며 해일 부재의 근거가 아니다(시간별 잔차 층위는 [08 §6.1](08-applied-observed-surge-resolution.md) 참조)
+- 두 태풍의 한반도 영향 시 강도 비교는 같은 종류의 기압(Best Track 영향 시 중심기압)이 필요하다 — source-needed. 02-theory.md §2.2 표는 기압 종류를 구분해 표기(2026-09-29).
 
 ### 1.2 본 위키 도구로 풀어보기 — Maemi hindcast workflow (verified)
 
@@ -75,7 +75,7 @@ WebSearch + Wikipedia + Shim et al. JCR 직접 fetch:
 
 #### Step 1: IB 정적 surge 추정 (verified — Pugh §6:3)
 
-[02-theory.md §2.2 Eq](02-theory.md#22-한국-적용--태풍-ib-surge) — 중심기압 950 mb 가정 시:
+[02-theory.md §2.2 Eq](02-theory.md#22-한국-적용--태풍-ib-surge) — 제주 관측소 최저기압 950 hPa 기준 (중심기압 아님):
 
 $$\eta_{IB} = -\frac{\Delta P_A}{\rho g} = -\frac{(950 - 1013) \text{ mb}}{1025 \times 9.81 / 100} \approx +0.63 \text{ m}$$
 
@@ -132,7 +132,7 @@ IM = 0              ! 2DDI barotropic (im.rst); Garratt drag 는 IM 과 별개 (
 |---|---|---|
 | 시기 | 2022년 9월 상순 (정확한 일자 원문 미기재) | KHOA 2022 line 3350, 4486 ✓ |
 | 한국 경로 | 남동해안 근접 또는 한반도 상륙 (line 3350, 난마돌과 함께 서술) | KHOA 2022 line 3350 ✓ |
-| 중심기압 (최저, 전체) | 920 mb (한반도 접근 시 약화) | 본 위키 [02-theory.md §2.2 표](02-theory.md#22-한국-적용--태풍-ib-surge) (JMA RSMC 원본 fetch 필요) — partial |
+| JMA 최저 중심기압 | 920 hPa (2022-08-30, 오키나와 접근 시 — 한반도 영향 시 아님) | Wikipedia "Typhoon Hinnamnor" ✓ ([02-theory.md §2.2](02-theory.md#22-한국-적용--태풍-ib-surge)) — 영향 시 중심기압 source-needed |
 | **포항 9월 고극조위** | **137.0 cm** (2022-09, 2004 이후 19년 최대) — 조석+해일 합, **해일 peak 아님** | KHOA 2022 표 3-258·3-259 ✓ |
 | 포항 9월 고극조위 편차 (누년대비) | **+36 cm** | KHOA 2022 표 3-259 ✓ |
 | 울산 최대 (9월) | 124.0 cm (+5 cm 편차) | KHOA 2022 표 3-253·3-254 ✓ |
@@ -215,8 +215,8 @@ KHOA OpenAPI `surveyTideLevel` 은 archive **~1년 rolling** ([04-code-and-tools
 | 항목 | Maemi 2003 | Hinnamnor 2022 | 본 위키 식·도구 |
 |---|---|---|---|
 | **경로** | 남해 직격 (마산) | 남동해안 근접·상륙 | Maemi: KMA Best Track (fetch 필요) / Hinnamnor: KHOA 2022 line 3350 ✓ |
-| **중심기압 (trajectory 최저)** | 950 mb | 920 mb | [02-theory.md §2.2](02-theory.md) — partial |
-| **IB 정적 (계산)** | +0.63 m | +0.93 m | Pugh §6:3 verified 계산 |
+| **기압** ([02-theory.md §2.2](02-theory.md)) | 910 hPa (JMA 최저 중심) / 950 hPa (제주 관측 최저) | 920 hPa (JMA 최저 중심, 오키나와 접근 시) | Wikipedia ✓ — 영향 시 중심기압은 source-needed |
+| **IB 정적 (계산, 상한)** | +1.02 m (910) / +0.63 m (950) | +0.93 m (920) | Pugh §6:3 식 — 기압 종류가 달라 강도 비교 불가 |
 | **관측 surge peak** | ~2.4 m 마산 (source-needed) | 월 고극조위 층위만 있음(포항 137 cm, 누년 +36 cm) — 해일 peak 는 [08 §6.1](08-applied-observed-surge-resolution.md) | KHOA 2022 표 3-258 |
 | **반대 해역** | (자료 미)  | 마산 -38 cm, 통영 -55 cm 고극조위 누년편차 — 해일 부재 근거 아님 | KHOA 2022 표 3-223·3-213 |
 | **IB / 관측 비** | 0.26 (관측값 source-needed) | ~~0.68~~ — 삭제: 분모 1.37 m 가 고극조위라 비가 성립하지 않음 | — |
