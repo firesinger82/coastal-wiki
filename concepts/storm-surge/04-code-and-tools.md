@@ -63,12 +63,12 @@ ADCIRC 의 모든 parameter. 핵심 storm-surge 관련 필드:
 |---|---|
 | `NWS` | meteorological forcing source (위 §1.1) |
 | `NOIVB` | inverse-barometer 억제 — ★compile-time flag(`-DNOIVB`)이며 fort.15 필드 아님 ([`adcirc-storm-surge.md`](../../models/ADCIRC/source-analysis/storm-surge/adcirc-storm-surge.md) §G, wind.F:1415,3018) |
-| `RampMete` | vortex spin-up ramp (sec) — typical 1-2 days `[source-needed]` |
+| `DRAMPMete` | 기상 강제(meteorological forcing) ramp 기간 — 단위 **일(days)**, 쌍곡탄젠트 형 ramp. `NRAMP` 로 켜고, `NRAMP=8` 이면 기준이 cold start + `FluxSettlingTime` + `DUnRampMete` (ADCIRC docs `user_guide/model_configuration/model_parameters/ramping.rst:31-56`). 권장 기간은 문서에 없음 `[source-needed]`. ★정정(2026-09-29): 구판은 이름 `RampMete`·단위 "sec" 로 적었다 |
 | `WTIMINC` | met forcing time increment |
 | `BLAdj` | boundary-layer adjustment (NWS=20) |
 | `GEOFACTOR` | geostrophic vs cyclostrophic balance |
 | `IM` | 모델 정식화 선택 (2DDI/3D; `IM=1/11/21/31`→3D — [`adcirc-3d-mode.md`](../../models/ADCIRC/source-analysis/adcirc-3d-mode.md)). wind drag 는 별개: Garratt 식 + `/metControl/ WindDragLimit` ([`adcirc-met-forcing-implementation.md`](../../models/ADCIRC/source-analysis/adcirc-met-forcing-implementation.md), wind.F:514-539) |
-| `TAU0` | numerical weighting (typical 0.01 `[source-needed]`) |
+| `TAU0` | GWCE 의 primitive/wave 가중(수치 확산 조절). 음수는 공간·시간 가변 계산 방식을 고르는 **flag**, 양수는 $\tau_0$ 값 자체 — *"Typical values for TAU0 are in the range of 0.005 – 0.1"* (ADCIRC docs `model_parameters/tau0.rst:28-31`·`:301-302`) |
 
 ### 2.2 `fort.14` (mesh)
 
