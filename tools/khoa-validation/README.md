@@ -15,6 +15,7 @@
 | `current_phase_reference_test.py` | 수치조류도 조화상수 CSV `지각` 위상 기준(G/g) 판별 검정 — `experience/khoa-tidal-current-phase-reference-2026.md` 재현용 (`build` → `results/current_phase_reference_rows.csv`, `test` → `results/current_phase_reference_test.txt`) |
 | `current_component_test.py` | 같은 CSV 의 `진폭·지각` 이 어느 유속 성분인지 판별 (예측 유속·유향 아카이브 대조, 결과 v 성분) → `results/current_component_test.txt` |
 | `typhoon_surge_peaks.py` | 태풍별 관측 해일 peak (연단위 UTide 편차, ±2일 창 최대) — `experience/khoa-typhoon-surge-peaks-2026.md` 재현용. 결과 `results/typhoon_surge_peaks.json`(타사 벤치마크 필드 제거) |
+| `crnt_fcst_direction_test.py` | 조류예보(시계열) 16방위 유향 → 도 변환·흐르는 방향 규약 검증 (키: 환경변수 `DATAGOKR_KEY`·`KHOA_OCEANDATA_KEY`) → `results/crnt_fcst_direction_test.txt` |
 
 ## 재현 절차
 
