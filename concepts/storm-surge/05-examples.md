@@ -97,11 +97,11 @@ $$\eta_{IB} = -\frac{\Delta P_A}{\rho g} = -\frac{(950 - 1013) \text{ mb}}{1025 
 
 ```
 NWS = 20            ! GAHM
-NOIVB = 0           ! IB 자동 포함 (PRBCKGRND = 1013.0 mb)
-RampMete = 86400    ! 1 day vortex spin-up
+! IB: 기본 포함 (PRBCKGRND = 1013.0 mb). NOIVB 는 compile-time 매크로 — 정의 시 IB 억제 (wind.F:1415)
+DRAMPMete = 1.0     ! 기상 ramp 1 day (단위 days; RampMete 는 계산 계수, timestep.F:306)
 WTIMINC = 3600      ! 1 h met increment
 BLAdj = 0.9         ! standard BL adjustment
-IM = 0              ! Garratt drag (Table 2.2 [[efdc-theory-v12-ch2-hydrodynamics]] §2.4 의 Garratt 1977 과 동일)
+IM = 0              ! 2DDI barotropic (im.rst); Garratt drag 는 IM 과 별개 (wind.F)
 ```
 
 #### Step 4: KHOA 정점 검증 (verified — 04-code-and-tools.md §4)
@@ -172,8 +172,8 @@ NWS=13 표준 셋팅 ([adcirc-met-forcing-implementation.md §D](../../models/AD
 
 ```
 NWS = 13
-NOIVB = 0
-RampMete = 86400
+! IB: 기본 포함 (NOIVB 는 compile-time 매크로, wind.F:1415)
+DRAMPMete = 1.0    ! 기상 ramp 1 day (단위 days)
 WTIMINC = 3600     ! JMA-MSM 의 1 h
 ```
 
@@ -229,9 +229,7 @@ KHOA OpenAPI `surveyTideLevel` 은 archive **~1년 rolling** ([04-code-and-tools
 
 본 위키 [01-concept.md §3.3 SLR + SST 강화 + storm surge cascade](01-concept.md#33-slr--sst-강화--storm-surge-의-climate-cascade):
 
-- Maemi (2003) 시점의 한국 MSL 대비 Hinnamnor (2022) 는 약 **+7.5 cm** 누적 (3.94 mm/yr × 19년, [[khoa-annual-climate-trend]])
-- 동시 SST 가속 (동해 +0.30°C/decade 등, [[khoa-sst-warming-trend]]) → 태풍 강도화 가능성
-- → 같은 surge magnitude 라도 **effective inundation level 은 매년 증가** — 100년 누적 시 +40 cm baseline 상승
+- MSL 이 오르면 같은 surge magnitude 라도 effective inundation level 이 높아진다 (정성 관계; 한국 실측 추세 수치는 layer-4 응용 노트 소관)
 
 → 본 위키의 SLR + SST experience 노트는 storm-surge case 분석의 climate boundary condition.
 
