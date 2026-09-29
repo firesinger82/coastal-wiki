@@ -1,0 +1,55 @@
+---
+title: "Delft3D D-Flow FM 경계 강제 — .ext [boundary] 블록 + .bc 파일 형식 (EC module ec_bcreader·ec_astro)"
+model: Delft3D
+component: dflowfm/external-forcing + utils_lgpl/ec_module
+canonical_source: self
+citation_status: verified
+has_source_needed: true
+verification_method: "Delft3D 소스 직접 read (models/Delft3D/raw/source_code/Delft3D/src): engines_gpl/dflowfm/.../timespace/fm_external_forcings.f90 (:947 quantity, :954 nodeId, :958 locationFile, :970 forcingFile, :979 returnTime) + utils_lgpl/ec_module/packages/ec_module/src/ec_bcreader.f90 (:214-217 블록 헤더, :318-352 name·function·quantity 매칭, :504-525 FUNCTION, :527-532 OFFSET·FACTOR, :547 TIMEINTERPOLATION, :568 PERIODIC, :878-889 astronomic 레코드) + ec_astro.f90 (:74-123 asc — f·V0+u 적용) + ec_filereader.F90 (:266-282 astronomic 초기화 호출). FM 사용자 매뉴얼은 코퍼스에 없음 — 형식은 reader 코드 기준. 2026-09-29 SCOPED EDIT 신설 (concepts/tides/06 §5.2 잔존 source-needed 해소용)."
+note_author: "Claude Opus 5.5"
+note_date: 2026-09-29
+verification_by: "Claude Opus 5.5 — reader 소스 직독"
+verification_date: 2026-09-29
+related:
+  - models/Delft3D/manual-notes/delft3d-flow-boundary-forcing.md
+  - models/Delft3D/source-analysis/delft3d_dflowfm_mdu_input.md
+  - models/Delft3D/source-analysis/delft3d_dflowfm_compute_core.md
+---
+
+# D-Flow FM 경계 강제 — `.ext` `[boundary]` + `.bc`
+
+> 짝 노트: D3D-4 FLOW 의 `.bnd`/`.bca` 는 [[delft3d-flow-boundary-forcing]] (FLOW User Manual 기반). 이 노트는 **FM** 의 새 형식 외부강제 파일과 `.bc` 를 **reader 소스**로 정리한다. FM 매뉴얼은 코퍼스에 없다.
+
+## 1. `.ext` 의 `[boundary]` 블록 (`fm_external_forcings.f90`)
+
+| 키 | 필수 | 역할 | 소스 |
+|---|---|---|---|
+| `quantity` | ✓ | 강제할 물리량 이름(예: 수위 경계) — `.bc` 쪽 `Quantity` 와 매칭 | `:947`, 없으면 "Expected property" 오류 |
+| `nodeId` 또는 `locationFile` | 둘 중 하나 ✓ | `nodeId` 가 있으면 NODE_ID 형식, 없으면 `locationFile`(polyline, POLY_TIM 형식) | `:954-958` |
+| `forcingFile` | ✓ | 강제값 파일(`.bc`) 경로 | `:970` |
+| `returnTime` | – | 수송 경계 return time (구 키 `return_time` 도 읽음) | `:979-980` |
+
+## 2. `.bc` 파일 구조 (`ec_bcreader.f90`)
+
+- 블록 헤더는 대소문자 무관 `[general]`(파일 정보) 과 `[forcing]` — **`[boundary]` 도 같은 forcing 블록으로 인정**한다 (`:214-217`).
+- 한 forcing 블록 헤더의 키: `Name`(위치 이름), `Function`, `Quantity`/`Unit`(열마다 반복), `Vector`, `Offset`, `Factor`, `Time-interpolation`, `Periodic`, 연직 위치 키 등 (`:428-600`).
+- **`Function` 값** (`:504-525`): `timeseries` · `constant` · `harmonic` · `astronomic` · `harmonic-correction` · `astronomic-correction` · `t3d` · `c3d` · `qhtable`.
+- `Offset`·`Factor` 는 값에 선형 보정 (`:527-532`). `Time-interpolation` 은 `linear` · `linear-extrapolate` · `block-to` · `block-from` 등 (`:547-561`).
+
+### 2.1 조석(`astronomic`) 블록
+
+- 블록 선택 조건: `Name` 이 경계 위치와 같고, `Function = astronomic`(또는 `-correction`), 그리고 **`Quantity` 가 `<물리량> amplitude` 와 `<물리량> phase` 두 열** (`:328-334`). `harmonic` 도 같은 두 열 규칙 (`:335-340`).
+- 자료 한 줄 = **분조 이름 · 진폭 · 위상**. `Factor` 는 **진폭 열에만** 곱한다 (`:878-889`, 주석 *"Apply the factor to the amplitude column only"*).
+- 분조 이름은 EC 의 분조표(KompBes) 번호로 바뀌고, 초기화 때 `asc` 가 nodal 인수 $f$ 와 천문인수 $V_0+u$ 를 적용한다: `ampl = ampl * fr(1)`, `phas = phas - v0u(1)` (`ec_astro.f90:121-122`; 호출 `ec_filereader.F90:266-282`).
+  → `.bc` 의 위상은 **$V_0+u$ 를 빼기 전의 지각**으로 읽힌다 — 모델이 nodal·천문 보정을 직접 한다. `harmonic` 은 이 보정 없이 주기·위상 그대로 쓴다(분조표 조회 없음).
+
+### 2.2 확인하지 않은 것
+
+- **위상 기준 시간대** — `asc` 는 EC 시간축의 날짜·시각(`ecTimeFrameRealHpTimestepsToDateTime`, `ec_support.f90:104-118`)으로 $V_0+u$ 를 계산한다. 그 시간축이 모델 `Tzone` 을 GMT 로 되돌린 값인지는 이 경로만으로 확정하지 않았다(`ecProviderInitializeTimeFrame` 은 kernel timezone 을 time frame 에 보관, `ec_provider.F90:3489-3507`). 따라서 `.bc` 위상을 **G(그리니치)로 줄지 모델 시간대 기준으로 줄지는 `source-needed`** — KHOA g(135°E) 를 넣기 전에 반드시 확인할 것.
+- `.bc` 의 `[general]` 필수 키(파일 버전 등)의 허용값 전체.
+
+## 3. 쓸 때의 함정
+
+- 조석 블록은 `Quantity` 이름을 **`<물리량> amplitude` / `<물리량> phase`** 로 정확히 써야 매칭된다 — 이름이 어긋나면 블록을 못 찾는다(`:330-331`).
+- `Factor` 가 위상 열에는 적용되지 않으므로, 단위 변환(cm→m)은 `Factor` 로 해도 위상은 안전하다(`:880`).
+- `astronomic` 과 `harmonic` 은 다르다 — 전자는 모델이 nodal·$V_0+u$ 를 적용하고, 후자는 주어진 값을 그대로 쓴다.
