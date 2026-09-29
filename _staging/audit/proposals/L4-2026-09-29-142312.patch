@@ -1,0 +1,52 @@
+diff --git a/concepts/sst/05-examples.md b/concepts/sst/05-examples.md
+--- a/concepts/sst/05-examples.md
++++ b/concepts/sst/05-examples.md
+@@ -3,6 +3,7 @@
+ topic: sst
+ canonical_source: self
+ citation_status: verified
++has_source_needed: false
+ verification_method: "Hobday et al. 2016 MHW 알고리즘 (Progress in Oceanography 141:227-238)  monthly variant(OISST v2.1 monthly, 1991-2020 climatology, month-of-year p90, 연속 2+ months) 와 daily 표준(5-day) 의 구현·실행 방법 — tools/sst-cross-check/identify_mhw_{monthly,daily_2024}.py. 실행 결과 수치는 본문 §4 에서 링크 (CONVENTIONS §8.1)."
+ note_author: "Claude Opus 4.7 (1M context)"
+ note_date: 2026-05-23
+@@ -141,7 +142,7 @@
+ | Min duration | 2 months | 5 days |
+ | Category | 미분류 | Hobday 2018 I-IV |
+ 
+-→ Daily 가 Hobday 2016 spec, monthly variant 는 supplemental. 두 방식의 결과 비교는 [`experience/khoa-2024-mhw-extreme.md`](../../experience/khoa-2024-mhw-extreme.md) §2b.4.
++→ Daily 구현은 최소 5일 기준을 사용하지만, monthly climatology 보간을 쓰는 변형이다(§4.8). Monthly 구현도 별도 변형이다. 두 방식의 결과 비교는 [`experience/khoa-2024-mhw-extreme.md`](../../experience/khoa-2024-mhw-extreme.md) §2b.4.
+ 
+ ### 4.8 한계
+ 
+diff --git a/concepts/storm-surge/02-theory.md b/concepts/storm-surge/02-theory.md
+--- a/concepts/storm-surge/02-theory.md
++++ b/concepts/storm-surge/02-theory.md
+@@ -3,6 +3,7 @@
+ topic: storm-surge
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "Pugh 'Tides, Surges and Mean Sea-Level' Ch 6 (textbook/md/sea-level.md p.184-230) 직접 인용 — §6:1 Weather effects, §6:3 Atmospheric pressure (eq. 6:5), §6:4 Wind stress, §6:5 Numerical modelling, §7:8 Tide-surge interaction. ADCIRC Theory (Luettich & Westerink 2004) GWCE form. textbook/md/sea-level.md line 7370 ('one millibar will produce a decrease in sea-level of one centimetre') + line 7374 (Proudman shelf model amplification) 직접 인용. §3.4 추가 (2026-05-26): arXiv:2605.03933v1 (Sathia & Giometto 2026, 제출일 2026-05-05, 카테고리 physics.flu-dyn) abstract 직접 fetch (WebFetch 2026-05-26) — 새 PBL height scaling 두 식 u_*/β (neutral) + u_*/√(βN) (stable) + 평균 2.5% relative error verbatim 인용. ADCIRC GAHM BL Vmax 환산 cross-ref 와 한국 태풍 적용 검토는 자체 분석. **§3.4.4~3.4.8 추가 (2026-05-28)**: arXiv:2605.03933v1 **full PDF 34p 직접 fetch** (curl + Read tool) — derivation eq 5-32 (Pollard 1973 P73 응용 + slab model + Ri_b closure) + LES setup Appendix A (256×256×512 grid, Bou-Zeid Smagorinsky, CFL=0.075) + Table A1 216 stratified sims + Appendix B 16 neutral/mild (Set A C_R=0.58, avg 6% error / R²=0.99 / RMSE=6.92m) + parity plot stable C_S=1.2 (R²=0.99 / bias=1.04m / RMSE=23.5m) + characteristic heights (v_max 65-85% / inflow peak 6-20% of h) + eq 41-43 R-scaling h~R^((1-n)/2) + eq 44 K_m~R^(-2n) + combined formula B1 p=4 (vs ABL p=2). Wind engineering / coastal resilience 응용 명시. 비교 expressions 구체화 (Meng 1995 / Kepert 2001 / Pollard 1973 / Sous 2013 / Zilitinkevich 2007 외 closure model papers)."
+ note_author: "Claude Opus 4.7 (1M context)"
+ note_date: 2026-05-26
+@@ -394,7 +395,7 @@
+ 본 분석에서 storm surge 는 **maximum surge envelope** $\max_t \eta_{surge}(x, y, t)$ 가 주된 관심사 (특정 시점 elevation 보다는 storm 전체 영향의 spatial pattern).
+ 
+ ADCIRC outputs:
+-- `fort.63` = elevation time series (한 정점)
++- `fort.63` = 전체 격자점 elevation time series; 지정 정점 출력은 `fort.61` ([ADCIRC 출력 파일 표](../../models/ADCIRC/source-analysis/adcirc-fort-files-reference.md)).
+ - `fort.74` = wind velocity
+ - `maxele.63` = **maximum elevation envelope** — surge map 생성에 핵심
+ - `maxvel.63` = max velocity envelope
+diff --git a/concepts/storm-surge/05-examples.md b/concepts/storm-surge/05-examples.md
+--- a/concepts/storm-surge/05-examples.md
++++ b/concepts/storm-surge/05-examples.md
+@@ -4,7 +4,7 @@
+ canonical_source: self
+ citation_status: verified
+ has_source_needed: true
+-verification_method: "본 위키 내 cross-reference 만 verified — 02-theory.md (Pugh §6:3 IB 식, Maemi 950 mb / Hinnamnor 920 mb 중심기압 인용) + 04-code-and-tools.md (NWS 모드·KHOA OpenAPI + archive 한계 verified) + models/ADCIRC/source-analysis/storm-surge/ 7개 노트 (NWS=13 JMA-MSM + GAHM Best Track + fort.15 운영 규칙). **§2 Hinnamnor 2022 는 KHOA Annual Report 2022 §3 직접 인용으로 verified** (별도 노트 [[khoa-annual-2022-hinnamnor-surge]] 분리, 2026-05-28). **§1 Maemi 2003 §1.1.1 disclosed-gap (2026-06-01) — 핵심 수치는 Wikipedia + Shim et al. JCR SI65 doi:10.2112/SI65-067.1 + eSurge + WebSearch 직접 인용으로 verified: peak 910 hPa (JMA) / 885 hPa (JTWC) / Jeju national record 950 hPa / 마산 1.40 m 1403 mm / 사망 120명 / ₩5.52 trillion 손실 확보**. 잔존 source-needed = KHOA 관측 surge peak (Annual Report 2003 부재 — 백서 변환 2012 시작, 본질적 출처 공백). **§4.1 Bolaven 2012 는 KHOA Annual Report 2012 vol.1 §7.3 직접 인용으로 verified** (별도 노트 [[khoa-annual-2012-bolaven-surge]] 분리)."
++verification_method: "본 위키 내 cross-reference 만 verified — 02-theory.md (Pugh §6:3 IB 식, Maemi 제주 관측 최저기압 950 hPa / Hinnamnor JMA 최저 중심기압 920 hPa 인용) + 04-code-and-tools.md (NWS 모드·KHOA OpenAPI + archive 한계 verified) + models/ADCIRC/source-analysis/storm-surge/ 7개 노트 (NWS=13 JMA-MSM + GAHM Best Track + fort.15 운영 규칙). **§2 Hinnamnor 2022 는 KHOA Annual Report 2022 §3 직접 인용으로 verified** (별도 노트 [[khoa-annual-2022-hinnamnor-surge]] 분리, 2026-05-28). **§1 Maemi 2003 §1.1.1 disclosed-gap (2026-06-01) — 핵심 수치는 Wikipedia + Shim et al. JCR SI65 doi:10.2112/SI65-067.1 + eSurge + WebSearch 직접 인용으로 verified: peak 910 hPa (JMA) / 885 hPa (JTWC) / Jeju national record 950 hPa / 마산 1.40 m 1403 mm / 사망 120명 / ₩5.52 trillion 손실 확보**. 잔존 source-needed = KHOA 관측 surge peak (Annual Report 2003 부재 — 백서 변환 2012 시작, 본질적 출처 공백). **§4.1 Bolaven 2012 는 KHOA Annual Report 2012 vol.1 §7.3 직접 인용으로 verified** (별도 노트 [[khoa-annual-2012-bolaven-surge]] 분리)."
+ note_author: "Claude Opus 4.7 (1M context)"
+ note_date: 2026-05-24
+ verification_by: "Claude Opus 4.7 (1M context) — 위키 내부 cross-ref만 verified, 외부 실측 수치는 source-needed 분리"
