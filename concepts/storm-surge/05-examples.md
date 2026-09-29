@@ -130,8 +130,8 @@ IM = 0              ! Garratt drag (Table 2.2 [[efdc-theory-v12-ch2-hydrodynamic
 
 | 항목 | 값 | 출처·검증 |
 |---|---|---|
-| 시기 | 2022-09-06 ~ 07 (한반도 상륙) | KHOA 2022 line 3350, 4486 ✓ |
-| 한국 경로 | **남동해안 직격** — 포항·울산이 주 영향 | KHOA 2022 line 3350 ✓ |
+| 시기 | 2022년 9월 상순 (정확한 일자 원문 미기재) | KHOA 2022 line 3350, 4486 ✓ |
+| 한국 경로 | 남동해안 근접 또는 한반도 상륙 (line 3350, 난마돌과 함께 서술) | KHOA 2022 line 3350 ✓ |
 | 중심기압 (최저, 전체) | 920 mb (한반도 접근 시 약화) | 본 위키 [02-theory.md §2.2 표](02-theory.md#22-한국-적용--태풍-ib-surge) (JMA RSMC 원본 fetch 필요) — partial |
 | **포항 9월 고극조위** | **137.0 cm** (2022-09, 2004 이후 19년 최대) — 조석+해일 합, **해일 peak 아님** | KHOA 2022 표 3-258·3-259 ✓ |
 | 포항 9월 고극조위 편차 (누년대비) | **+36 cm** | KHOA 2022 표 3-259 ✓ |
@@ -141,9 +141,9 @@ IM = 0              ! Garratt drag (Table 2.2 [[efdc-theory-v12-ch2-hydrodynamic
 | 생일도 부이 최대 유의파고 | **5.81 m** | KHOA 2022 line 4486 ✓ |
 | 9월 **월별 최대풍속의 평균** (주요 관측소) | **18.6 m/s** (월 중 최고) | KHOA 2022 line 4212 ✓ — 원문 *"월별 최대풍속 평균은 9월에 18.6 m/s"* |
 | 침수 피해 | 포항 일대 침수 (제철소 등) | 언론·KMA 사후 보고 — fetch 필요 |
-| 분류 | recent extreme TC, 동해 직격 | 한국 동해안 storm-surge 의 최근 reference case |
+| 분류 | recent extreme TC, 남동해안 근접·상륙 | 한국 동해안 storm-surge 의 최근 reference case |
 
-월 고극조위 층위의 관찰: 포항만 누년 9월보다 +36 cm 높고 마산·통영은 38–55 cm 낮다. **주의 (2026-09-29 L4 감사 정정)**: 월 고극조위는 조석+해일을 합친 그 달 최고 수위라, 누년 대비 편차가 곧 해일 크기는 아니다(대조기·소조기 위상에 좌우). 이 층위로 "남해안 영향 없음" 을 말할 수 없다 — 시간별 잔차 층위는 [08 §6.1](08-applied-observed-surge-resolution.md). 상세 정점별 데이터 + 해역 평균 표 + Bolaven 2012 대비는 [[khoa-annual-2022-hinnamnor-surge]] §2-3.
+월 고극조위 층위의 관찰: 포항(+36 cm)·울산(+5 cm)은 누년 9월보다 높고 마산·통영은 38–55 cm 낮다. **주의 (2026-09-29 L4 감사 정정)**: 월 고극조위는 조석+해일을 합친 그 달 최고 수위라, 누년 대비 편차가 곧 해일 크기는 아니다(대조기·소조기 위상에 좌우). 이 층위로 "남해안 영향 없음" 을 말할 수 없다 — 시간별 잔차 층위는 [08 §6.1](08-applied-observed-surge-resolution.md). 상세 정점별 데이터 + 해역 평균 표 + Bolaven 2012 대비는 [[khoa-annual-2022-hinnamnor-surge]] §2-3.
 
 ### 2.2 본 위키 도구로 풀어보기 — Hinnamnor hindcast workflow (verified)
 
@@ -157,11 +157,11 @@ $$\eta_{IB} = -\frac{(920 - 1013)}{1025 \times 0.0981} \approx +0.93 \text{ m}$$
 
 **주의**: 920 mb 는 Hinnamnor 의 전체 trajectory 최저값. 한반도 접근 시 약화되었을 가능성 — 정확한 한반도 접근 시 중심기압은 KMA·JMA Best Track 직접 fetch 필요 (partial verified, [[khoa-annual-2022-hinnamnor-surge]] §6).
 
-**Maemi 대비 동해 (수심 ↑) 라 wind set-up 작은 것이 일관** (Pugh §6:4 의 $\tau_w / \rho g H$ 식 — $H$ 클수록 set-up 작음, [02-theory.md §3](02-theory.md)) — 단 포항 +36 cm·마산 −38 cm 는 월 고극조위 편차라 wind set-up 크기의 근거로 쓸 수 없다.
+**Maemi 대비 동해 (수심 ↑) 라 이론상 wind set-up 이 작을 것으로 기대 (관측 검증 없음)** (Pugh §6:4 의 $\tau_w / \rho g H$ 식 — $H$ 클수록 set-up 작음, [02-theory.md §3](02-theory.md)) — 단 포항 +36 cm·마산 −38 cm 는 월 고극조위 편차라 wind set-up 크기의 근거로 쓸 수 없다.
 
 #### Step 2: ADCIRC NWS 모드 선택 (verified)
 
-Hinnamnor 는 **NWS=13 JMA-MSM OWI NetCDF** 워크플로 적용 가능 (2022 는 JMA-MSM archive 충분). 상세:
+Hinnamnor 는 **NWS=13 JMA-MSM OWI NetCDF** 워크플로 적용 가능. 상세:
 
 - [04-code-and-tools.md §1.2](04-code-and-tools.md#12-한국-운영-워크플로--nws13-jma-msm) — JMA-MSM 5 km × 5 km
 - [`adcirc-met-forcing-implementation.md §D`](../../models/ADCIRC/source-analysis/adcirc-met-forcing-implementation.md) — NWS=13 OWI NetCDF reader (OWIWIND_NETCDF, wind.F)
@@ -191,7 +191,7 @@ KHOA OpenAPI `surveyTideLevel` 은 archive **~1년 rolling** ([04-code-and-tools
 | 서해안 평균 | 747.2 cm | -25.2 cm | KHOA 2022 표 3-5 |
 | 남해안 평균 | 312.8 cm | -25.5 cm | KHOA 2022 표 3-5 |
 
-→ **동해안만 누년 수준 유지 (편차 -0.6 cm)**. 다른 해역은 -25 cm. Hinnamnor 동해 직격 정량 입증.
+→ **동해안만 누년 수준 유지 (편차 -0.6 cm)**. 다른 해역은 -25 cm.
 
 상세는 [[khoa-annual-2022-hinnamnor-surge]] §2.
 
@@ -214,7 +214,7 @@ KHOA OpenAPI `surveyTideLevel` 은 archive **~1년 rolling** ([04-code-and-tools
 
 | 항목 | Maemi 2003 | Hinnamnor 2022 | 본 위키 식·도구 |
 |---|---|---|---|
-| **경로** | 남해 직격 (마산) | **남동해안 직격** (포항·울산) | KMA Best Track / KHOA 2022 line 3350 ✓ |
+| **경로** | 남해 직격 (마산) | 남동해안 근접·상륙 | Maemi: KMA Best Track (fetch 필요) / Hinnamnor: KHOA 2022 line 3350 ✓ |
 | **중심기압 (trajectory 최저)** | 950 mb | 920 mb | [02-theory.md §2.2](02-theory.md) — partial |
 | **IB 정적 (계산)** | +0.63 m | +0.93 m | Pugh §6:3 verified 계산 |
 | **관측 surge peak** | ~2.4 m 마산 (source-needed) | 월 고극조위 층위만 있음(포항 137 cm, 누년 +36 cm) — 해일 peak 는 [08 §6.1](08-applied-observed-surge-resolution.md) | KHOA 2022 표 3-258 |
@@ -260,7 +260,7 @@ ADCIRC 가 한국 storm-surge 의 primary unstructured 모델이라면, **EFDC+ 
 | **Bolaven (볼라벤)** | **2012-08-29** | 서해 종단 | 조위 잔차: [08 §6.1](08-applied-observed-surge-resolution.md) 참조 + **군산 외해 ADCP 잔차류 verified** | **§4.1 보강 (verified case)** |
 | **Danas (다나스)** | 2013-10 | **대한해협 북상** | **가덕도 71·부산 53·고흥 56 cm verified ✓** (KHOA 2013 §3, 해일고) | **백서 전용 챕터** ([[khoa-annual-2013-danas-surge]]) |
 | Lingling (링링) | 2019 | 서해 북상 | 시간별 잔차 층위 값은 [08 §2](08-applied-observed-surge-resolution.md) 참조 (무출처 추정 삭제) | 서해 storm-surge baseline |
-| **Hinnamnor (힌남노)** | 2022 | **남동해안 직격** | 포항 9월 고극조위 137 cm ✓ (KHOA 2022, 해일 peak 아님) | **본 노트 §2** ([[khoa-annual-2022-hinnamnor-surge]]) |
+| **Hinnamnor (힌남노)** | 2022 | 남동해안 근접·상륙 (KHOA 2022 line 3350) | 포항 9월 고극조위 137 cm ✓ (KHOA 2022, 해일 peak 아님) | **본 노트 §2** ([[khoa-annual-2022-hinnamnor-surge]]) |
 
 ### 4.1 Bolaven 2012 verified — 군산 외해 ADCP 잔차 조류
 
