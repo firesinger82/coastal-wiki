@@ -3,7 +3,7 @@ title: "SST 분석 실습 — Marine Heatwave 식별 + 한국 연안 trend 재�
 topic: sst
 canonical_source: self
 citation_status: verified
-verification_method: "Hobday et al. 2016 MHW 알고리즘 (Progress in Oceanography 141:227-238)  monthly variant(OISST v2.1 monthly, 1991-2020 climatology, month-of-year p90, 연속 2+ months) 와 daily 표준(5-day) 의 구현·실행 방법 — tools/sst-cross-check/identify_mhw_{monthly,daily_2024}.py. 실행 결과 수치는 experience/khoa-2024-mhw-extreme.md §2·§2b (2026-09-29 이관, CONVENTIONS §8.1)."
+verification_method: "Hobday et al. 2016 MHW 알고리즘 (Progress in Oceanography 141:227-238)  monthly variant(OISST v2.1 monthly, 1991-2020 climatology, month-of-year p90, 연속 2+ months) 와 daily 표준(5-day) 의 구현·실행 방법 — tools/sst-cross-check/identify_mhw_{monthly,daily_2024}.py. 실행 결과 수치는 본문 §4 에서 링크 (CONVENTIONS §8.1)."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-23
 verification_by: "Claude Opus 4.7 (1M context) — monthly MHW 직접 실행 + OISST 검증"

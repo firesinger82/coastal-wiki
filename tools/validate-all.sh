@@ -13,6 +13,7 @@ VALIDATORS=(
     validate-layer-deps.sh
     validate-claims.sh
     validate-counts.sh
+    validate-experience-numbers.sh
 )
 
 for v in "${VALIDATORS[@]}"; do
