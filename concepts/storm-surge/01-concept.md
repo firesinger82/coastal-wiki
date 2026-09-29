@@ -4,7 +4,7 @@ topic: storm-surge
 canonical_source: self
 citation_status: verified
 has_source_needed: true
-verification_method: "Pugh 'Tides, Surges and Mean Sea-Level' Ch 6 Storm Surges (textbook/md/sea-level.md, p.184-230) 직접 인용 + ADCIRC theory report (Luettich & Westerink 2004) + _staging/from-modeling-wiki/knowledge/methods/adcirc-storm-surge-foundation.md (at commit a9618df^) (이미 source-code 기반 분석). 한국 적용은 KHOA Annual Report 2012-2025 의 이상조위 분석 + 본 위키 experience/khoa-annual-climate-trend.md SLR cross-reference."
+verification_method: "Pugh 'Tides, Surges and Mean Sea-Level' Ch 6 Storm Surges (textbook/md/sea-level.md, p.184-230) 직접 인용 + ADCIRC theory report (Luettich & Westerink 2004) + _staging/from-modeling-wiki/knowledge/methods/adcirc-storm-surge-foundation.md (at commit a9618df^) (이미 source-code 기반 분석). 한국 적용은 KHOA Annual Report 2012-2025 의 이상조위 분석."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-23
 verification_by: "Claude Opus 4.7 (1M context) — Pugh Ch 6 + ADCIRC + KHOA cross-ref"
@@ -13,7 +13,7 @@ related:
   - concepts/tides/02-theory.md
   - concepts/waves/
   - concepts/sst/02-theory.md
-  - experience/khoa-annual-climate-trend.md
+  - concepts/tides/07-applied-record-length.md
   - models/ADCIRC/
 ---
 
@@ -38,7 +38,7 @@ $$\eta_{\text{total}}(t) = \eta_{\text{tide}}(t) + \eta_{\text{surge}}(t) + \eta
 | **tide** | 12h/24h/14d/지속 | ±5 m 인천, ±0.3 m 동해 ([`concepts/tides/`](../tides/)) |
 | **storm surge** | 수시간~수일 | +0.5 ~ +3 m (한국 태풍 시) |
 | **wave setup** | 수분~수시간 | +0.2 ~ +1 m (대형 storm 시) |
-| **MSL trend** | 다년·secular | +3.94 mm/yr 한국 (SLR) |
+| **MSL trend** | 다년·secular | mm/yr 규모 (값은 분석 창 종속 — [tides/07 §2](../tides/07-applied-record-length.md#2-추세--같은-자료-창만-바꿔도-값이-바뀐다)) |
 
 > 호우·태풍 동시 발생 시 4 성분 합 → **flooding 위험** (한국 인천·아산만·새만금 등 천해 + tide 큰 곳 특히 위험).
 
@@ -136,13 +136,13 @@ $$\frac{\partial u}{\partial t} - fv = \cdots, \quad f = 2\Omega \sin\phi$$
 
 ### 3.3 SLR + SST 강화 + storm surge 의 climate cascade
 
-[`experience/khoa-annual-climate-trend.md`](../../experience/khoa-annual-climate-trend.md) (SLR 3.94 mm/yr 한국) + [`experience/khoa-sst-warming-trend.md`](../../experience/khoa-sst-warming-trend.md) (SST 가속) 의 결합 효과:
+정성 관계 (수치 없음):
 
-1. **MSL 상승** → 같은 surge 의 절대 수위 매년 +4 mm 증가 → 100년 = +40 cm
-2. **SST 가속** (특히 Kuroshio + 동중국해 +2.4 °C/decade) → 태풍 강도화·서진 경로 변화·발생 빈도 증가
-3. **tide × surge interaction** 은 한국 서해 천해에서 비선형 → MSL 가 약간 상승해도 effective surge 위험 더 크게 증가
+1. **MSL 상승** → 같은 surge 라도 절대 수위(effective inundation level)가 높아진다.
+2. **SST 상승** → 태풍 강도화 가능성과 연결되어 논의된다 (정량 근거 source-needed).
+3. **tide × surge interaction** 은 천해에서 비선형이라 MSL 변화가 surge 위험에 선형으로만 더해지지 않는다 ([02-theory.md](02-theory.md)).
 
-→ storm surge 위험 평가는 SLR + SST trend 와 함께 종합 분석 필요. 본 위키의 SST·SLR experience 와 직접 연결.
+한국 연안 해수면 추세의 실측 값은 분석 창에 강하게 종속되므로 이 layer-3 노트에 옮기지 않는다 — 인용 규칙과 값은 ④ 응용 노트 [`tides/07-applied-record-length.md` §2](../tides/07-applied-record-length.md#2-추세--같은-자료-창만-바꿔도-값이-바뀐다) 소관.
 
 ## 4. 모델링 접근
 
@@ -176,8 +176,7 @@ ADCIRC + SWAN coupled (한국 적용): wave setup + surge 동시 계산 → ADCI
 
 | 노트 | 사용처 |
 |---|---|
-| SLR + storm surge 위험 누적 | `experience/khoa-annual-climate-trend.md` (해수면 상승 → surge baseline 상승) |
-| SST 가속 → 태풍 강도 | `experience/khoa-sst-warming-trend.md` §7 marine heatwave |
+| 해수면 추세 인용 규칙 (④) | `concepts/tides/07-applied-record-length.md` §2 |
 | ADCIRC NWS 모드 (source-code level) | `models/ADCIRC/source-analysis/storm-surge/` (7개, promote 완료) |
 | KHOA 정점 surge 관측 | `concepts/tides/04-code-and-tools.md` §3 KHOA OpenAPI |
 
