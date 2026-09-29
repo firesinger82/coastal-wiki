@@ -149,6 +149,15 @@ print(f"O1: {nearest['o1_진폭']:.2f} cm/s @ {nearest['o1_지각']:.2f}°")
 | `tideObsHar` | 조위관측소 조화상수 | 관측소 코드 | 진폭·지각 |
 | `tbm` | 기본수준점 | — | 조화상수·메타정보 |
 
+**공공데이터포털 게이트웨이 (data.go.kr 인증키 — 바다누리 키와 별개, 서비스별 활용신청 필요)**:
+
+| 서비스 (data.go.kr 번호) | 호출 | 주요 요청 | 응답 |
+|---|---|---|---|
+| 국립해양조사원_조류예보(시계열) (15156024) | `https://apis.data.go.kr/1192136/crntFcstTime/GetCrntFcstTimeApiService` | `obsCode`(예보지점, 예 16LTC10)·`reqDate`·`min`(간격, 최대 60) | `obsvtrNm`·`lat`·`lot`·`predcDt`·`crdir`(**16방위 문자**)·`crsp`(cm/s) |
+| 국립해양조사원_조류예보 최강창낙조 및 전류 (15156025) | 같은 게이트웨이 | `obsCode` | 최강 창·낙조 유향(deg)·유속, 전류 시각 |
+
+2026-09-28–29 확인: 15156024 는 활용신청 전 `SERVICE_KEY_IS_NOT_REGISTERED_ERROR`, 신청 후 `NORMAL_SERVICE` — 비진도남측 2026-09-29 1시간 간격 24건(예 00:00 동북동 44.40 cm/s). 이것은 수치조류도 격자가 아니라 **관측 기반 조류예보 지점**의 예측이다(명세: *"우리나라 관할해역 조류 예보지점의 시계열 조류 정보(유향, 유속, 시각)"*).
+
 - 실측 판별: 존재하는 이름은 키 없이 호출하면 `{"result":{"error":"ServiceKey is null"}}`, 없는 이름은 "요청하신 페이지" 오류 HTML 을 준다.
   이 방식으로 위 5개는 존재, 구판에 적었던 `tideObsReal`·`tideObsPre` 는 현행 경로에 **없다**(2026-09-28).
 - 명세는 유향을 "deg" 로만 적는다. 시각 지정 호출 대조로 **`Date`·`Hour` 는 KST**, **유향은 흐르는 방향(진북 기준 시계방향)** 임을 확인했다 — [`experience/khoa-tidal-current-phase-reference-2026.md`](../../experience/khoa-tidal-current-phase-reference-2026.md) @ `68ae7d7` §3c.
