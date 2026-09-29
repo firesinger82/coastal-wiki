@@ -1,0 +1,82 @@
+diff --git a/concepts/sst/01-concept.md b/concepts/sst/01-concept.md
+--- a/concepts/sst/01-concept.md
++++ b/concepts/sst/01-concept.md
+@@ -3,6 +3,7 @@
+ topic: sst
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "AI cross-reference: Stewart 'Introduction to Physical Oceanography' §5 Oceanic Heat Budget + §6 Temperature/Salinity/Density 직접 인용 (textbook/md/stewart_textbook.md). KHOA 정점 인프라는 Annual Report 2012-2025 (textbook/notes/khoa-annual-reports-overview.md) 직접 인용. bulk vs skin SST 정의는 NOAA/GHRSST 표준 정의 (외부 reference)."
+ note_author: "Claude Opus 4.7 (1M context)"
+ note_date: 2026-05-23
+@@ -55,7 +56,7 @@
+ | 월 | 계절 cycle, 중위도 10~15 °C 진폭 |
+ | 년 (interannual) | ENSO (1~3 °C, 적도 태평양), PDO (~1 °C, 북태평양), 한국 영향 |
+ | 십년 (decadal) | PDO 위상 전환 (~20-30년 cycle), AMV |
+-| 백년+ (secular) | climate warming trend (글로벌 0.13~0.18 °C/decade, 1971-2024) |
++| 백년+ (secular) | climate warming trend (글로벌 0.13~0.18 °C/decade, 1971-2024 — 인용 미확보 `[source-needed]`, IPCC AR6 류 공식 출처 확보 필요) |
+ 
+ ### 3.2 공간 스케일
+ 
+diff --git a/concepts/sst/03-analysis-methods.md b/concepts/sst/03-analysis-methods.md
+--- a/concepts/sst/03-analysis-methods.md
++++ b/concepts/sst/03-analysis-methods.md
+@@ -89,7 +89,7 @@
+ **한국 적용**:
+ - KHOA 2024 9월 SST anomaly = +3.40 °C (KHOA 2024 §3.1 인용, 본 위키)
+ - KHOA 2025 9월 인천 anomaly = +1.89 °C
+-- 글로벌 ERSST anomaly map — 한국 인근 +1~+3 °C 지역적 hotspot
++- 글로벌 anomaly map 의 한국 인근 hotspot 정량값은 [`khoa-sst-global-crosscheck.md`](../../experience/khoa-sst-global-crosscheck.md) 를 탐색용으로 참조한다 (canonical 수치 인용은 공식 출처 확보 후)
+ 
+ ## 4. Marine Heatwave (MHW) 정의 — Hobday 2016
+ 
+diff --git a/concepts/storm-surge/01-concept.md b/concepts/storm-surge/01-concept.md
+--- a/concepts/storm-surge/01-concept.md
++++ b/concepts/storm-surge/01-concept.md
+@@ -36,8 +36,8 @@
+ | 성분 | 시간 스케일 | 진폭 (한국 typical) |
+ |---|---|---:|
+ | **tide** | 12h/24h/14d/지속 | ±5 m 인천, ±0.3 m 동해 ([`concepts/tides/`](../tides/)) |
+-| **storm surge** | 수시간~수일 | +0.5 ~ +3 m (한국 태풍 시) |
+-| **wave setup** | 수분~수시간 | +0.2 ~ +1 m (대형 storm 시) |
++| **storm surge** | 수시간~수일 | +0.5 ~ +3 m (한국 태풍 시) `[source-needed]` |
++| **wave setup** | 수분~수시간 | +0.2 ~ +1 m (대형 storm 시) `[source-needed]` |
+ | **MSL trend** | 다년·secular | mm/yr 규모 (값은 분석 창 종속 — [tides/07 §2](../tides/07-applied-record-length.md#2-추세--같은-자료-창만-바꿔도-값이-바뀐다)) |
+ 
+ > 호우·태풍 동시 발생 시 4 성분 합 → **flooding 위험** (한국 인천·아산만·새만금 등 천해 + tide 큰 곳 특히 위험).
+@@ -57,8 +57,7 @@
+ 예: 태풍 중심기압 950 mb (배경 1013 mb 대비 -63 mb) → 약 **+63 cm** 정적 IB surge.
+ 
+ ADCIRC 의 IB 처리:
+-- `NOIVB = 0` (기본): IB 자동 포함
+-- `NOIVB = 1`: IB 억제 (이미 GAHM 등이 IB 계산 시 중복 방지)
++- IB 는 기본 포함. `NOIVB` 는 fort.15 파라미터가 아니라 **compile-time flag**(`-DNOIVB` — `wind.F:1415,3018` `#ifdef NOIVB`)로, 빌드에서 정의된 경우에만 IB 항이 제외된다 ([`04-code-and-tools.md`](04-code-and-tools.md) §2.1 정정과 동일)
+ - 배경기압 `PRBCKGRND = 1013.0 mb` (`models/ADCIRC/raw/source_code/adcirc/src/constants.F90:55` 참조)
+ 
+ ### 2.2 Wind stress (풍응력)
+@@ -118,6 +117,8 @@
+ | **온대저기압** (extratropical) | 11-3월 | 서해 (북서풍 강) | 중 (+0.5~+1.5 m) |
+ | **국지 thunderstorm** | 여름 | 만 안쪽 | 약 (+0.3~+0.5 m) |
+ | **seiche** (장주기 진동) | 연중 | 만·항만 | 약~중 (resonance 시 크게) |
++
++> 위 유형별 강도 범위는 인용 미확보 일반 지침값 `[source-needed]` — 실측 층위 값은 [08](08-applied-observed-surge-resolution.md)·[`05-examples.md`](05-examples.md) 참조.
+ 
+ ### 3.2 한국 주요 태풍 storm surge case
+ 
+diff --git a/concepts/storm-surge/04-code-and-tools.md b/concepts/storm-surge/04-code-and-tools.md
+--- a/concepts/storm-surge/04-code-and-tools.md
++++ b/concepts/storm-surge/04-code-and-tools.md
+@@ -196,11 +196,11 @@
+ 전형적 한국 태풍 hindcast (예: Hinnamnor 2022) 단계:
+ 
+ 1. **태풍 best track** — JMA RSMC 또는 KMA → ATCF format 변환
+-2. **JMA-MSM NetCDF** download — 태풍 기간 + 3일 spin-up (RampMete)
++2. **JMA-MSM NetCDF** download — 태풍 기간 + 3일 spin-up (DRAMPMete)
+ 3. **ADCIRC mesh** — 한국 ECS-Korea mesh (학계 표준 형태) 또는 사용자 정의
+ 4. **`fort.15`** 편집:
+    - `NWS = 13`
+-   - `RampMete = 86400` (1 day spin-up)
++   - `DRAMPMete = 1` (1일 spin-up — 단위는 일(days), §2.1 정정·ramping.rst:31-56 참조)
+    - IB(inverse barometer)는 기본 포함 — `NOIVB` 는 compile-time flag(`-DNOIVB`)로 fort.15 편집 대상 아님 (§2.1, wind.F:1415,3018)
+ 5. **ADCIRC 실행** — MPI parallel, 보통 64-256 cores `[source-needed]`
+ 6. **검증** — KHOA 정점 surge (관측 vs 모델 hindcast)
