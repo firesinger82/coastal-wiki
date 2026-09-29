@@ -119,7 +119,8 @@ WW3 SMC (Spherical Multi-Cell) nested grid 운영 시 boundary point mismatch �
 **Status (2026-07-19 갱신 — GitHub Issues API 재조회)**:
 
 - ✅ **Issue CLOSED — `closed_at` 2026-06-15T17:00:21Z** (등록 2026-05-20, mingchen-NOAA collaborator 확인 후 UK Met Office 대응)
-- ⚠ 종료 사유·merge 된 PR 번호·수정 반영 release 는 **미확인** `[source-needed]` — 실사용 전 해당 커밋과 사용 중 WW3 버전 포함 여부 대조 필요
+- ✅ **종료 사유·수정 PR 확인 (2026-09-29, GitHub API 재조회)**: `state_reason: completed`. 수정은 **PR #1602** *"Bugfix for spurious wave energy along coastlines of nested SMC grid models"* (작성 `ukmo-rwdavies`, base `develop`, merged 2026-06-15T17:00:20Z — 이슈 종료 1초 전), merge commit `a48d81d0`.
+- ⚠ **태그 릴리스에는 없다** — 수정 커밋은 기본 브랜치 `develop` 에만 포함되고(`compare` 상태 ahead), `main` 은 이 커밋을 포함하지 않으며(diverged), 저장소 태그는 2019년 `6.07`·`6.07.1` 뿐이다. SMC nesting 을 쓴다면 **`develop` 이후 빌드인지** 확인해야 한다.
 - ★신선도 교훈: 2026-05-28 판이 "OPEN·fix PR 예정"으로 5주간 잔존했다. **외부 이슈 트래커 상태는 시점 종속** — 인용 시 조회일자 병기 + 사용 직전 재확인(프로젝트 freshness 규약)
 
 ## 4. XBeach
