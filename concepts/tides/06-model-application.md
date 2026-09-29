@@ -4,7 +4,7 @@ topic: tides
 canonical_source: self
 citation_status: verified
 has_source_needed: true
-verification_method: "본 문서는 **요약 + 링크 중심** (canonical source 분리 규칙 [CONVENTIONS.md §3]). 각 모델의 조석 구현은 다음 검수완료(verified) 모델 노트로 cross-link·검증됨: ADCIRC tidal forcing(NTIP/fort.15 NBFR/fort.24 SAL — source-code file:line) = `models/ADCIRC/source-analysis/tide/adcirc-tide-forcing-implementation.md` + harmonic prep = `.../adcirc-tide-harmonic-prep.md`; ROMS 경계 조석(SSH_TIDES/UV_TIDES, set_tides.F) = `models/ROMS/source-analysis/roms_tidal_forcing.md`; EFDC 경계 조석(PSER + MTIDE harmonic synthesis, C14-C21 cards) = `models/EFDC/source-analysis/efdc_boundary_conditions.md` §A,§G,§H; Delft3D-TIDE 조화분석/예측(Ch 8 + App A/B) = `models/Delft3D/manual-notes/delft3d-tide-user-manual.md`; XBeach 조석(`tideloc`/`zs0file`) = `models/XBeach/manual-notes/xbeach-master-manual.md` §3.2.3; EFDC 카드(C14 MTIDE/C15) = `models/EFDC/manual-notes/efdc-implementation-guide.md`. **여전히 source-needed**(2026-09-28 갱신): D-Flow FM `.bc`/`.ext` 조석 경계만. D3D-4 FLOW `.bnd`/`.bca` 는 delft3d-flow-boundary-forcing §3, XBeach 는 xbeach_tide_forcing 으로 연결, 글로벌 DB 사양은 04 §6, §6 표의 무출처 '한국 서해 적합도' 행 삭제."
+verification_method: "본 문서는 **요약 + 링크 중심** (canonical source 분리 규칙 [CONVENTIONS.md §3]). 각 모델의 조석 구현은 다음 검수완료(verified) 모델 노트로 cross-link·검증됨: ADCIRC tidal forcing(NTIP/fort.15 NBFR/fort.24 SAL — source-code file:line) = `models/ADCIRC/source-analysis/tide/adcirc-tide-forcing-implementation.md` + harmonic prep = `.../adcirc-tide-harmonic-prep.md`; ROMS 경계 조석(SSH_TIDES/UV_TIDES, set_tides.F) = `models/ROMS/source-analysis/roms_tidal_forcing.md`; EFDC 경계 조석(PSER + MTIDE harmonic synthesis, C14-C21 cards) = `models/EFDC/source-analysis/efdc_boundary_conditions.md` §A,§G,§H; Delft3D-TIDE 조화분석/예측(Ch 8 + App A/B) = `models/Delft3D/manual-notes/delft3d-tide-user-manual.md`; XBeach 조석(`tideloc`/`zs0file`) = `models/XBeach/manual-notes/xbeach-master-manual.md` §3.2.3; EFDC 카드(C14 MTIDE/C15) = `models/EFDC/manual-notes/efdc-implementation-guide.md`. **여전히 source-needed**(2026-09-29 갱신): D-Flow FM `.bc` 위상 기준 시간대만(형식은 delft3d_fm_bc_forcing). D3D-4 FLOW `.bnd`/`.bca` 는 delft3d-flow-boundary-forcing §3, XBeach 는 xbeach_tide_forcing 으로 연결, 글로벌 DB 사양은 04 §6, §6 표의 무출처 '한국 서해 적합도' 행 삭제."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-21
 verification_by: "Claude Opus 4.8 (1M context) — 모델 노트 cross-reference"
@@ -149,7 +149,7 @@ XBeach는 **단기 폭풍 시뮬레이션** 위주 (수일~수주). 조석 forci
 - D3D-4 FLOW: `.bnd`(경계 정의) + `.bca`(분조 진폭·위상) — §5.1 Delft3D-TIDE 산출 분조를 각 경계점별로 입력.
 - D-Flow FM: unstructured mesh(ADCIRC 유사), `.bnd`/`.ext`/`.bc`로 더 유연한 boundary.
 
-→ D3D-4 FLOW 의 `.bnd`/`.bca` 파일 포맷과 astronomic 경계 forcing 은 [[delft3d-flow-boundary-forcing]] §3 (FLOW User Manual §4.5.6.1 p.50-53 + App A.2.11 p.455-456) — 2026-09-28 연결. D-Flow FM `.bc`/`.ext` 는 이 노트 범위 밖.
+→ D3D-4 FLOW 의 `.bnd`/`.bca` 파일 포맷과 astronomic 경계 forcing 은 [[delft3d-flow-boundary-forcing]] §3 (FLOW User Manual §4.5.6.1 p.50-53 + App A.2.11 p.455-456) — 2026-09-28 연결. D-Flow FM 의 `.ext` `[boundary]` 블록과 `.bc`(`Function = astronomic`·`harmonic`, `<물리량> amplitude`/`phase` 열) 는 [[delft3d_fm_bc_forcing]] (reader 소스 직독, 2026-09-29) — 단 `.bc` 위상의 기준 시간대는 그 노트에서도 미확정(`source-needed`).
 
 ## 6. 모델 간 비교 — 조석 적용 관점
 
@@ -189,7 +189,7 @@ XBeach는 **단기 폭풍 시뮬레이션** 위주 (수일~수주). 조석 forci
 - [x] D3D-4 FLOW `.bnd`/`.bca` 경계 forcing — [[delft3d-flow-boundary-forcing]] §3
 - [x] 글로벌 DB(TPXO/FES/NAO/GOT) 사양 — [`04-code-and-tools.md` §6](04-code-and-tools.md) (공식 사이트·논문 인용), 조류 제공 여부는 [`currents/06` §6](../currents/06-model-application.md)
 - [x] §6 비교표 무출처 행(한국 서해 적합도) 삭제
-- [ ] D-Flow FM `.bc`/`.ext` 조석 경계 — 코퍼스 FM 매뉴얼 발췌 필요
+- [x] D-Flow FM `.bc`/`.ext` 조석 경계 — [[delft3d_fm_bc_forcing]] (2026-09-29). 잔존: `.bc` 위상 기준 시간대
 
 ## 9. 연결
 

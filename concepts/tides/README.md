@@ -10,7 +10,7 @@
 | `03-analysis-methods.md` | **verified** | 조화분해·response method (Stewart §17.5 + Foreman 1977 appendix + KHOA) |
 | `04-code-and-tools.md` | **verified** | t_tide / UTide / pytides / pyTMD — DOI·repo·논문 인용 |
 | `05-examples.md` | **verified** | UTide/pytides 공식 예제 + 한국 KHOA template |
-| `06-model-application.md` | `verified` | EFDC/ADCIRC/ROMS/XBeach/Delft3D 조석 진입 경로 — models/ 검수 노트 cross-link. 잔존: D-Flow FM `.bc` |
+| `06-model-application.md` | `verified` | EFDC/ADCIRC/ROMS/XBeach/Delft3D 조석 진입 경로 — models/ 검수 노트 cross-link. 잔존: D-Flow FM `.bc` 위상 기준 시간대 |
 | `07-applied-record-length.md` | ✅ **verified** ④응용 (2026-09-22) | **위키 최초 layer-4 노트.** 자료 길이·분석 창이 조화상수·추세를 얼마나 바꾸는가 — nodal 이론은 위상만 맞힌다 / 추세는 창 종속 / 자료 product 차이. 결론 = **인용 계약**(값 + 기간 + nodal 처리 + 취득 경로) |
 
 ## 사용된 source_id
