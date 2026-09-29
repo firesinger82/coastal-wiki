@@ -405,20 +405,9 @@ F = (H_K1 + H_O1) / (H_M2 + H_S2)
 
 ### 8.6 평균해면 장기 추세 — 한국 연안 SLR
 
-MSL은 단기적으로 안정한 비조화상수이지만 **장기 추세**(decade scale)에서는 해수면 상승(Sea Level Rise) 신호. KHOA Annual Report 2007-2025 19년 데이터 13정점 선형회귀:
+MSL의 장기 변화에는 해수면 상승 신호가 포함된다. 추세를 비교하거나 설계에 적용할 때는 분석 기간과 정점 구성을 함께 확인해야 한다.
 
-| 정점 그룹 | 평균 SLR (mm/yr) | 비고 |
-|---|---:|---|
-| 한국 전체 (13정점) | **3.94** | 글로벌 평균(3.4) 초과 |
-| 남해 | 4.10 | Kuroshio 영향 |
-| 서해 | 3.90 | |
-| 동해 | 3.72 | |
-| **서귀포** | **5.42** | 한국 최대 (동중국해/Kuroshio) |
-| **울산** | **2.59** | 최소 (큰 단기 변동성) |
-
-전체 분석: [`experience/khoa-annual-climate-trend.md`](../../experience/khoa-annual-climate-trend.md).
-
-→ 설계 수명 30~50년 구조물은 MSL을 **고정값 아닌 trend 적용** 권장. 가속화(acceleration) 시그널 — 본 19년 평균 3.94 mm/yr는 KHOA 1989-2017 분석(2.97 mm/yr)보다 33% 높음.
+한국 연안 사례 분석은 [`experience/khoa-annual-climate-trend.md`](../../experience/khoa-annual-climate-trend.md)를 탐색용으로 참조한다. 분석 창에 따른 추세 해석과 인용 조건은 [`07-applied-record-length.md`](07-applied-record-length.md) §2(④ 응용)에서 다룬다.
 
 ## 9. 보강 필요·미해결
 

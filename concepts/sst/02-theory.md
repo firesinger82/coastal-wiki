@@ -121,7 +121,7 @@ $$Q_L = \rho_a L_v C_L U (q_a - q_s)$$
 
 해류 운송 — Kuroshio·황해 난류·동한 난류 등의 효과. 한국 연안에서 특히 중요한 항:
 
-- **서귀포·제주** (Kuroshio 분지): $Q_V$ 큰 양의 값 → 동중국해 난류 유입 → SST 최대 trend (본 분석 결과 일관)
+- **서귀포·제주** (Kuroshio 분지): 동중국해 난류 유입에 따른 열 수송과 SST 변화의 관계를 검토할 지역.
 - **인천·서해** (Yellow Sea cold pool): $Q_V$ 비교적 작음
 - **동해** (East Korea Warm Current): 부분 영향, 시기별 변동
 
@@ -137,13 +137,7 @@ effective depth $H$ 의 표층이 $\Delta T$ 가열되면 해수면 상승:
 
 $$\Delta L = \alpha \cdot H \cdot \Delta T$$
 
-**한국 연안 적용** (`experience/khoa-sst-global-crosscheck.md` §5 참조):
-- HadISST 1968-2022 한국 SST trend = 0.027 °C/yr
-- $H = 200$ m, $\alpha = 1.5\times10^{-4}$ → $\Delta L / \Delta t = 1.5e-4 \times 200 \times 0.027 = 0.81$ mm/yr
-- 한국 평균 SLR 3.94 mm/yr 의 **약 20%** 가 thermal expansion (단순 추정)
-- 나머지 80% = ice melt + halosteric (염분) + sterodynamic (해양 dynamics)
-
-IPCC 글로벌 평균 (30-50% 열팽창) 보다 낮은 이유: 한국은 Kuroshio 강화·동아시아 해류 변동 (sterodynamic) 영향이 상대적으로 큼.
+**한국 연안 적용 시 고려사항**: 열팽창 기여를 평가하려면 수온 추세의 분석 기간, 유효 수심, 해수면 변화의 다른 성분을 구분해야 한다. 사례 계산은 [`experience/khoa-sst-global-crosscheck.md`](../../experience/khoa-sst-global-crosscheck.md) §5를 탐색용으로 참조한다.
 
 ## 5. SST anomaly 와 climate variability
 
@@ -174,7 +168,7 @@ El Niño year 한국 영향:
 - $Q_{net} > 0$ 시 stratification 강화 → MLD 감소
 - $Q_{net} < 0$ 시 convection → MLD 증가
 
-→ 열팽창 계산의 effective $H$ 결정 시 시기·해역별 MLD 차이 필요. 본 분석 $H = 200$ m 는 한국 연안 겨울 평균 정도의 보수적 추정.
+→ 열팽창 계산의 effective $H$ 결정 시 시기·해역별 MLD 차이를 고려해야 한다.
 
 ## 7. 인용 정형
 
@@ -189,8 +183,8 @@ El Niño year 한국 영향:
 ## 8. 연결
 
 - [`01-concept.md`](01-concept.md) — SST 정의·측정 정형화
-- [`experience/khoa-sst-warming-trend.md`](../../experience/khoa-sst-warming-trend.md) §4 — 열팽창 ~10% 계산 (9년 trend 기반)
-- [`experience/khoa-sst-global-crosscheck.md`](../../experience/khoa-sst-global-crosscheck.md) §5 — 열팽창 ~20% 갱신 (HadISST 1968-2022 기반)
+- [`experience/khoa-sst-warming-trend.md`](../../experience/khoa-sst-warming-trend.md) §4 — 열팽창 사례 계산(탐색용)
+- [`experience/khoa-sst-global-crosscheck.md`](../../experience/khoa-sst-global-crosscheck.md) §5 — 자료별 열팽창 계산 비교(탐색용)
 - [`concepts/tides/02-theory.md`](../tides/02-theory.md) §8.6 — 평균해면 trend (SLR-SST 인과 연결)
 - 외부:
   - Stewart, R.H., 'Introduction to Physical Oceanography' (textbook/md/stewart_textbook.md) — Ch 5 + 6

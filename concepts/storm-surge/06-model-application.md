@@ -61,7 +61,7 @@ ADCIRC barotropic + 태풍 parametric/재분석 바람 + (선택) SWAN 결합 wa
 
 [`05-examples.md`](05-examples.md)의 관측 검증 case와 대응:
 - **Maemi 2003**(마산 최악, source-needed) · **Hinnamnor 2022**(포항 9월 고극조위 누년 +36 cm, verified — 해일 peak 아님) · **Bolaven 2012**(군산외해 ADCP 잔차, verified)
-- 독립 설계모델 검증: 서승원·이화영(2012) pADCIRC+unSWAN 목포 100년 191cm — [[khoa-design-surge-eva-2026]] §4 3중일치.
+- 설계모델 사례: 서승원·이화영(2012)의 목포 가상태풍 범람모의. 관측·설계값과의 비교 사례는 [[khoa-design-surge-eva-2026]]를 탐색용으로 참조한다.
 
 ## 8. 다른 토픽과의 교차
 

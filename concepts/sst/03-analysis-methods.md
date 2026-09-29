@@ -3,7 +3,7 @@ title: "SST 분석 기법 — 회귀·climatology·anomaly·MHW·spectral"
 topic: sst
 canonical_source: self
 citation_status: verified
-verification_method: "Hobday et al. 2016 MHW 정의 (Progress in Oceanography 141, 227-238), IPCC AR6 WG1 Annex II 통계 부록, Mann-Kendall test 표준 정의 (Mann 1945, Kendall 1948), Sen's slope (Sen 1968). 본 위키 적용: experience/khoa-sst-warming-trend.md + khoa-sst-global-crosscheck.md 분석 절차 재정리. tools/sst-cross-check/ 스크립트 1:1 대응."
+verification_method: "Hobday et al. 2016 MHW 정의 (Progress in Oceanography 141, 227-238), IPCC AR6 WG1 Annex II 통계 부록, Mann-Kendall test 표준 정의 (Mann 1945, Kendall 1948), Sen's slope (Sen 1968). 경험 분석은 related의 탐색용 링크이며 본 문서의 검증 근거에 포함하지 않는다."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-23
 verification_by: "Claude Opus 4.7 (1M context) — 표준 정의 인용 + 본 위키 실제 적용 cross-ref"
@@ -161,7 +161,7 @@ $$\text{RMSE} = \sqrt{\frac{1}{n} \sum (T_{\text{insitu}} - T_{\text{sat}})^2}$$
 
 본 위키의 5-source cross-check ([`khoa-sst-global-crosscheck.md`](../../experience/khoa-sst-global-crosscheck.md) §2):
 - 같은 시간 윈도우에서 dataset 간 slope 차이를 비교
-- 2017-2025: KHOA 1.39, OISST 1.11, HadISST 1.10, COBE2 1.47, NIFS raw 1.17 — **range 0.37 °C/decade**
+- 자료별 회귀값과 차이의 정량 결과는 위 경험 노트를 탐색용으로 참조한다.
 
 ## 7. Heat content (수온 적분)
 

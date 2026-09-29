@@ -24,7 +24,7 @@ related:
 스크립트: 본 위키 외부 (KHOA 백서 markdown → JSON 추출 + 회귀).
 결과: [`experience/khoa-sst-warming-trend.md`](../../experience/khoa-sst-warming-trend.md) §2.
 
-핵심: 9년 시계열 13정점 평균 1.39 °C/decade, R² 강한 정점 (서귀포 0.758, 제주 0.746).
+검토 항목: 정점별 추세와 회귀 적합도를 함께 확인한다. 정량 결과는 위 경험 노트를 탐색용으로 참조한다.
 
 ## 2. 예제 2 — 글로벌 reanalysis cross-check (완료)
 

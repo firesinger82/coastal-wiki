@@ -120,9 +120,9 @@ $C_p \approx 4.0 \times 10^3$ J·kg⁻¹·°C⁻¹ (해수 비열, Stewart eq. 5
 
 | 노트 | 사용처 |
 |---|---|
-| 한국 9년 trend (1.39 °C/decade) | [`experience/khoa-sst-warming-trend.md`](../../experience/khoa-sst-warming-trend.md) |
+| 한국 연안 SST 추세 분석(탐색용) | [`experience/khoa-sst-warming-trend.md`](../../experience/khoa-sst-warming-trend.md) |
 | KHOA 장기 1968-2012 (0.123 °C/decade) | 같음, §3.2 |
-| SLR과 정합성 (열팽창 기여 ~10%) | 같음, §4 |
+| SLR과 열팽창의 관계 검토(탐색용) | 같음, §4 |
 | Marine heatwave 2023-2025 | 같음, §7 |
 | EFDC/Delft3D boundary 입력 갱신 | 같음, §8.1 + `06-model-application.md` (예정) |
 

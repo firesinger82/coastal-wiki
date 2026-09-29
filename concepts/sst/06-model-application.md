@@ -191,15 +191,9 @@ SWAN: spectral wave 모델 — **SST 직접 사용 안 함.** 기온-수온차�
 
 ## 10. 한국 SST 가속이 모델에 미치는 영향
 
-[`experience/khoa-sst-warming-trend.md`](../../experience/khoa-sst-warming-trend.md) §8.1 에서 지적:
+SST 경계 입력에서는 climatology의 기준기간과 적용 시점의 차이를 검토해야 한다. 수온 변화는 thermal stratification·산소 용해도·생물지화학 반응 속도에 영향을 준다.
 
-- 한국 평균 SST 가 1968-2012 보다 ~10× 가속 (최근 9년)
-- 모델 boundary 입력값을 ~2010 climatology 로 사용 시 **+0.7~1.4 °C 보정 필요** (2025 기준)
-- thermal stratification·산소 용해도·생물지화학 반응 속도 모두 영향
-
-권장:
-- **2025+ 모델 적용 시 climatology 를 1991-2020 또는 더 최근으로 갱신** (NIFS·KHOA·OISST)
-- climatology + 최근 anomaly forecast (e.g., KMA 기후 예측) 조합
+입력자료의 갱신 여부와 anomaly 반영 방법은 적용 해역·기간에 맞춰 검토한다. 관련 사례는 [`experience/khoa-sst-warming-trend.md`](../../experience/khoa-sst-warming-trend.md) §8.1을 탐색용으로 참조한다.
 
 ## 11. TODO (잔존 source-needed — verified 부분은 §3-5 cross-link 참조)
 

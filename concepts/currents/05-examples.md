@@ -114,7 +114,7 @@ sub = df[(df.lon.between(126,127)) & (df.lat.between(37,38))]
 ## 4. 한계 명시
 
 - **단일 (진폭, 위상) 페어** = **남북(v) 유속 성분**(동서 성분 없음). 예측 아카이브 대조로 확인 — [`experience/khoa-tidal-current-phase-reference-2026.md`](../../experience/khoa-tidal-current-phase-reference-2026.md) @ `5de93ff` §3b. **회전 방향·장축 정보 없음**
-- **단위**: cm/s — 예측 유속(cm/s) 의 v 성분 분산과 ½ΣA² 의 비가 0.99–1.01 로 맞는다(같은 experience 노트 §3b). 포털 메타데이터에는 단위 미기재
+- **단위 해석**: 포털 메타데이터에는 단위가 명시되어 있지 않다. 예측 유속과의 단위 교차검증은 위 경험 노트 §3b를 탐색용으로 참조한다.
 - **위상 기준**: CSV·포털 모두 명시 없음 — KHOA 표준에 따라 g(135°E) 로 해석(상단 출처 줄 참조)
 - **동해 미커버**: 별도 source 필요
 - **격자 평균**: sub-grid (명량 협수로 등) 가속 미해상
