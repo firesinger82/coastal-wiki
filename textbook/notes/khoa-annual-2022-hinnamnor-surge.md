@@ -1,5 +1,5 @@
 ---
-title: "KHOA Annual Report 2022 §3 — 태풍 힌남노 (Hinnamnor, 제11호) 2022-09-06 동해 동남부 surge"
+title: "KHOA Annual Report 2022 §3 — 태풍 힌남노 (Hinnamnor, 제11호) 2022년 9월 상순 남동해안 surge"
 source_id: khoa-annual-reports
 chapter: "§3 자료 분석 결과 — 표 3-5 (해역별 월별 고극조위) + 표 3-253/254 (울산) + 표 3-258/259 (포항) + 표 3-223/224 (마산) + 표 3-213/214 (통영)"
 pages: "—"
@@ -22,7 +22,7 @@ related:
   - textbook/notes/khoa-annual-2012-bolaven-surge.md
 ---
 
-# KHOA Annual Report 2022 §3 — 태풍 힌남노 2022-09-06 동해 동남부 surge
+# KHOA Annual Report 2022 §3 — 태풍 힌남노 2022년 9월 상순 남동해안 surge
 
 > 출처: `Annual_Report(2022).md`, source_id `khoa-annual-reports` (국립해양조사원 국가해양관측망 연간백서 2012-2025).
 
@@ -61,7 +61,7 @@ related:
 
 2022년 월별 (표 3-259):
 
-| 월 | 2022 고극조위 (cm) | 누년 평균 (cm) | 편차 (cm) |
+| 월 | 2022 고극조위 (cm) | 누년 (cm, 2012–2021 월 통계, line 2967) | 편차 (cm) |
 |---|---|---|---|
 | 8월 | 61.0 | 94.0 | -33 |
 | **9월** | **137.0** | **101.0** | **+36 (양의 최대)** |
@@ -84,7 +84,7 @@ related:
 
 ### 2.3 마산 조위관측소 (표 3-223 + 표 3-224, line 9626-9677)
 
-2022 9월: 227.0 cm vs 누년 9월 평균 **265.0** = **-38 cm 편차** (누년보다 낮음)
+2022 9월: 227.0 cm vs 누년 9월 **265.0** = **-38 cm 편차** (누년보다 낮음)
 
 ★정정 (2026-09-29): 구판은 이 음의 편차로 "Hinnamnor 2022는 마산 영향 미미" 라 결론했으나, 월 고극조위가 낮았다는 것은 해일이 없었다는 뜻이 아니다(조석 위상에 좌우). 이 백서 층위로는 마산 해일 크기를 판단할 수 없다.
 
@@ -120,10 +120,10 @@ related:
 
 본 노트와 [[khoa-annual-2012-bolaven-surge]] 의 대비:
 
-| 항목 | Bolaven 2012-08-29 | Hinnamnor 2022-09-06 |
+| 항목 | Bolaven 2012-08-29 | Hinnamnor 2022-09 상순 |
 |---|---|---|
-| 경로 | 서해 종단 → 북서풍 → 군산 외해 | **동해 동남부 직격** |
-| 주 영향 해역 | 서해안 (군산 외해 잔차류 +) | **동해안** (포항 +36 cm) |
+| 경로 | 서해 종단 → 북서풍 → 군산 외해 | 남동해안 근접 또는 한반도 상륙 (line 3350, 난마돌과 함께 서술) |
+| 인용 관측자료의 해역·정점 | 서해안 군산 외해 (잔차류) | 동해안 포항 (월 고극조위 누년 편차 +36 cm) |
 | KHOA 자료 형식 | ADCP 잔차류 시계열 (그림 7-64·7-81) | 조위 고극조위 단일값 (표 3-5 + 정점별 3-259 등) |
 | 관측량 (해일고 아님) | 군산 외해 잔차류 시계열 (수치값 그림에만) | **포항 137 cm = 19년 최대**, 누년대비 +36 cm |
 
@@ -143,8 +143,8 @@ related:
 
 | 항목 | 값 | 출처 verified |
 |---|---|---|
-| 통과 시기 | 2022-09-06 (9월 상순) | KHOA 2022 line 3350, 4486 |
-| 영향 해역 | 남동해안 (동해 직격) | KHOA 2022 line 3350 |
+| 통과 시기 | 9월 상순 (정확한 일자 원문 미기재) | KHOA 2022 line 3350, 4486 |
+| 영향 해역 | 남동해안 | KHOA 2022 line 3350 |
 | **포항 9월 고극조위** | **137.0 cm** — 해일 peak 아님 | KHOA 2022 표 3-258·3-259 |
 | 포항 9월 고극조위 편차 (누년대비) | +36 cm — 해일 크기 아님 | KHOA 2022 표 3-259 |
 | 울산 9월 고극조위 | 124.0 cm | KHOA 2022 표 3-253·3-254 |
@@ -157,9 +157,9 @@ related:
 
 [`concepts/storm-surge/04-code-and-tools.md §1`](../../concepts/storm-surge/04-code-and-tools.md#11-nws-모드-일람):
 
-- Hinnamnor 2022-09-06 hindcast → **NWS=20 GAHM + KMA Best Track** 또는 **NWS=13 JMA-MSM** (2022 자료 보유 시)
+- Hinnamnor 2022-09 상순 hindcast → **NWS=20 GAHM + KMA Best Track** 또는 **NWS=13 JMA-MSM** (2022 자료 보유 시)
 - 검증 정점: 포항 (137 cm + 시계열), 울산 (124 cm), 생일도 부이 (파고 5.81 m)
-- KHOA OpenAPI archive 한계: 2022 자료는 archive 기간 안에 들어가지만 1년 rolling 정책 ([`04-code-and-tools.md §4.1`](../../concepts/storm-surge/04-code-and-tools.md#41-실시간-조위-관측)) — 현재 (2026-05) 시점에선 OpenAPI fetch 불가. **KHOA Annual Report 2022 가 verified source**.
+- KHOA OpenAPI archive 한계: 2022 자료는 약 1년 rolling 조회 기간 밖이며 ([`04-code-and-tools.md §4.1`](../../concepts/storm-surge/04-code-and-tools.md#41-실시간-조위-관측)) — 현재 (2026-05) 시점에선 OpenAPI fetch 불가. **KHOA Annual Report 2022 가 verified source**.
 
 ## 5. 인용 정형
 
@@ -178,8 +178,8 @@ source_id 매니페스트: [`textbook/sources.yml`](../sources.yml) — `khoa-an
 본 노트는 **포항·울산·마산·통영 4정점 고극조위 단일값** verified. 추가 가능:
 
 1. **Hinnamnor 중심기압 추적** (KMA Best Track 또는 JMA RSMC) — IB 정적 surge 계산 (Pugh §6:3)
-2. **포항 시계열 (9월 5-7일 hourly)** — KHOA Annual Report 부록 또는 KHOA 별도 출판물 / 학술 논문
-3. **포항 침수 피해 보고** — 포스코 침수 (2022-09-06) 등 언론·정부 공식 보고
+2. **포항 시계열 (9월 상순 hourly)** — KHOA Annual Report 부록 또는 KHOA 별도 출판물 / 학술 논문
+3. **포항 침수 피해 보고** — 포스코 침수 (2022-09) 등 언론·정부 공식 보고
 4. **Hinnamnor hindcast 학술 논문** — 한국 학계 ADCIRC/Delft3D-FLOW 적용 결과
 5. **수온·풍향 시계열** (line 10629-10635 포항 표 3-261 확장) — 현재 연도별 단일값만 read, 9월 시간별 detail 추가 가능
 
