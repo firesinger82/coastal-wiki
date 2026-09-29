@@ -3,6 +3,7 @@ title: "xbeach vegetation"
 topic: general
 canonical_source: self
 citation_status: verified
+has_source_needed: true
 verification_method: "XBeach source code 직접 분석 (models/XBeach/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/xbeach_vegetation.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시. **2026-09-28 SCOPED EDIT**: §D bulk drag 보강 — vegetation.F90:327-329 (Cdveg<0 → bulkdragcoeff 결과를 s%Cdveg 에 덮어써 이후 호출에서 조건 거짓 = 첫 vegatt 호출값 고정), :731·:742·:745 (Tp=2π/sigm, um∝H, KC=um·Tp/bv), :766-770 (Q<7 하한 Cdterm=exp(-0.0138·7)/7^0.3≈0.506); NH 경로: params.F90:1560-1563 (swave 강제 0) + libxbeach.F90:302 (wave 호출은 swave==1 때만) + initialize.F90:556 (s%H=0) → s%H 대입은 wave_* 루틴에만 있어(grep 전수) NH 에서 H≡0 → KC=0 → Cd≈0.506. 발견 경위: concepts/waves/04 §7.1.2 (Amini et al. 2024 판독). **2026-09-29 SCOPED EDIT (L4 감사 L4-2026-09-29-092708 미출처 4건)**: Decision Guide·Working Rules 의 무출처 권장값(염습지 Cd≈1.0·N 100–1000·bv 5e-3, 산호초 Cd 1.5–2.0·bv 0.1, nsec 2–3 충분, Spartina 200/m²)을 코드 입력 기본값·범위(vegetation.F90:168,180-185; readkey.F90:430-437 범위 밖=경고 후 유지)와 source-needed 로 대체. Cd 기본값 0 명시(구판 'Cd=1.0 기본' 정정)."
 note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
 note_date: 2026-04~05 (original) / 2026-05-23 (promote)
