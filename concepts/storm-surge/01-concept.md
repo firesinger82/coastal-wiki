@@ -52,14 +52,14 @@ Storm surge 의 주된 원인 5개.
 
 수식 (Pugh §6:3):
 
-$$\eta_{IB} = -\frac{\Delta P_a}{\rho g} \approx -\frac{1 \text{ mb}}{1 \text{ cm}} \cdot \Delta P_a \text{ [mb]}$$
+$$\eta_{IB} = -\frac{\Delta P_a}{\rho g} \approx -\frac{1 \text{ cm}}{1 \text{ mb}} \cdot \Delta P_a \text{ [mb]}$$
 
 예: 태풍 중심기압 950 mb (배경 1013 mb 대비 -63 mb) → 약 **+63 cm** 정적 IB surge.
 
 ADCIRC 의 IB 처리:
 - `NOIVB = 0` (기본): IB 자동 포함
 - `NOIVB = 1`: IB 억제 (이미 GAHM 등이 IB 계산 시 중복 방지)
-- 배경기압 `PRBCKGRND = 1013.0 mb` (`models/ADCIRC/raw/source_code/adcirc/src/constants.F90:54` 참조)
+- 배경기압 `PRBCKGRND = 1013.0 mb` (`models/ADCIRC/raw/source_code/adcirc/src/constants.F90:55` 참조)
 
 ### 2.2 Wind stress (풍응력)
 

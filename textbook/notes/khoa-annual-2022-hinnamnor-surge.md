@@ -7,7 +7,7 @@ page_offset_applied: false
 topic: storm-surge
 canonical_source: self
 citation_status: verified
-verification_method: "Annual_Report(2022).md 직접 인용 — line 3155-3166 (표 3-5 해역별 월별 고극조위), line 3350 (제11호 힌남노 + 제14호 난마돌 정성), line 4212 (월별 평균풍속 9월 18.6 m/s), line 4486 (생일도 부이 유의파고 5.81 m), line 10546-10597 (포항 표 3-258/259 — 2022 9월 137 cm), line 10413-10464 (울산 표 3-253/254 — 2022 9월 124 cm), line 9626-9677 (마산 표 3-223/224 — 2022 9월 227 cm, 누년대비 -38 cm), line 9358-9409 (통영 표 3-213/214 — 2022 9월 302 cm, 누년대비 -55 cm)."
+verification_method: "Annual_Report(2022).md 직접 인용 — line 3155-3166 (표 3-5 해역별 월별 고극조위), line 3350 (제11호 힌남노 + 제14호 난마돌 정성), line 4212 (주요 관측소 월별 최대풍속 평균 9월 18.6 m/s), line 4486 (생일도 부이 유의파고 5.81 m), line 10546-10597 (포항 표 3-258/259 — 2022 9월 137 cm), line 10413-10464 (울산 표 3-253/254 — 2022 9월 124 cm), line 9626-9677 (마산 표 3-223/224 — 2022 9월 227 cm, 누년대비 -38 cm), line 9358-9409 (통영 표 3-213/214 — 2022 9월 302 cm, 누년대비 -55 cm)."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-28
 verification_by: "Claude Opus 4.7 (1M context) — markdown 직접 인용"
@@ -34,7 +34,7 @@ related:
 | 통과 시기 | 2022년 9월 상순 (한반도 상륙) | line 3350, 4486 |
 | 주 영향 해역 | **남동해안** (포항·울산 등) — 최저기압 누년대비 음의 편차 | line 3350 |
 | 관측 기관 | 국립해양조사원 (KHOA) | §3 자료 분석 결과 |
-| 2022 연간 평균 9월 풍속 | **9월 18.6 m/s 최대** (월별 평균 중) | line 4212 |
+| 2022 주요 관측소 월별 최대풍속 평균 | **9월 18.6 m/s** (12개월 중 최고; 월평균 풍속 아님) | line 4212 |
 | 생일도 부이 최대 유의파고 | **5.81 m** (한반도 상륙 영향) | line 4486 |
 
 > KHOA 본문 정성 인용 (line 3350):
@@ -133,7 +133,7 @@ related:
 | Pugh §6 인자 | Hinnamnor 2022 case 매핑 |
 |---|---|
 | §2.1 IB (대기압 surge) | 남동해안 최저기압 누년대비 음의 편차 (line 3350) → IB 정적 surge 양의 기여 |
-| §2.2 Wind stress | 9월 월평균 풍속 **18.6 m/s** (line 4212) — 동해 직격 동풍 → 포항만 wind set-up |
+| §2.2 Wind stress | 9월 주요 관측소 월별 최대풍속 평균 **18.6 m/s** (line 4212; 월평균 풍속 아님) — 동해 직격 동풍 → 포항만 wind set-up |
 | §2.3 Tide-surge interaction | 포항 (수심 ~50 m 외해 + 만 내) — 천해 비선형 효과 |
 | §2.4 Wave setup | 생일도 부이 유의파고 **5.81 m** (line 4486) — 동남부 해안 wave setup 가능성 |
 | §2.5 Coriolis | 동해 동풍 + Coriolis → 해안 north-eastward Ekman 변형 |
@@ -144,13 +144,13 @@ related:
 |---|---|---|
 | 통과 시기 | 2022-09-06 (9월 상순) | KHOA 2022 line 3350, 4486 |
 | 영향 해역 | 남동해안 (동해 직격) | KHOA 2022 line 3350 |
-| **포항 최대 surge peak** | **137.0 cm** | KHOA 2022 표 3-258·3-259 |
-| 포항 9월 surge 편차 (누년대비) | +36 cm | KHOA 2022 표 3-259 |
-| 울산 최대 | 124.0 cm | KHOA 2022 표 3-253·3-254 |
-| 마산 최대 (영향 없음 확인) | 227 cm (누년대비 -38 cm) | KHOA 2022 표 3-223·3-224 |
-| 통영 최대 (영향 없음 확인) | 302 cm (누년대비 -55 cm) | KHOA 2022 표 3-213·3-214 |
+| **포항 9월 고극조위** | **137.0 cm** — 해일 peak 아님 | KHOA 2022 표 3-258·3-259 |
+| 포항 9월 고극조위 편차 (누년대비) | +36 cm — 해일 크기 아님 | KHOA 2022 표 3-259 |
+| 울산 9월 고극조위 | 124.0 cm | KHOA 2022 표 3-253·3-254 |
+| 마산 9월 고극조위 | 227 cm (누년대비 -38 cm) — 해일 부재 근거 아님 | KHOA 2022 표 3-223·3-224 |
+| 통영 9월 고극조위 | 302 cm (누년대비 -55 cm) — 해일 부재 근거 아님 | KHOA 2022 표 3-213·3-214 |
 | 생일도 부이 최대 유의파고 | 5.81 m | KHOA 2022 line 4486 |
-| 9월 월평균 풍속 (전국) | 18.6 m/s | KHOA 2022 line 4212 |
+| 9월 주요 관측소 월별 최대풍속 평균 | 18.6 m/s | KHOA 2022 line 4212 |
 
 ### 4.3 ADCIRC NWS workflow 적용
 
@@ -168,7 +168,7 @@ related:
 - `(KHOA Annual Report 2022 표 3-258·3-259)` — 포항 137 cm, 9월 +36 cm 편차
 - `(KHOA Annual Report 2022 표 3-253·3-254)` — 울산 124 cm
 - `(KHOA Annual Report 2022 line 4486)` — 생일도 부이 5.81 m
-- `(KHOA Annual Report 2022 line 4212)` — 9월 월평균 풍속 18.6 m/s
+- `(KHOA Annual Report 2022 line 4212)` — 9월 주요 관측소 월별 최대풍속 평균 18.6 m/s
 
 source_id 매니페스트: [`textbook/sources.yml`](../sources.yml) — `khoa-annual-reports`.
 
