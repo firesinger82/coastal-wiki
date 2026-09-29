@@ -189,6 +189,7 @@ verification_date: YYYY-MM-DD
 - **④ 응용 노트**: `concepts/<topic>/NN-applied-<slug>.md` — **NN = 해당 토픽의 다음 빈 번호**(고정 07 아님). 토픽 횡단 연구는 주 연구질문 기준 한 곳만 canonical + INDEX 응용 표 연결. 문헌 기반이면 experience 선행 불요, 개인 결과 주장 시 experience 커밋고정 링크 필수(본문 복제 금지).
 - **근거 의존성의 단방향**: 단언의 검증이 기대는 의존은 ④→③→②→① 방향만. 탐색용 cross-link 는 claim 복제 없는 범위에서 양방향 허용. 신규 파일은 frontmatter `layer:` + `depends_on:`(근거 의존 대상 경로 목록) 기록 — `tools/validate-layer-deps.sh` 가 방향 검사. **기존 verified 파일은 소급 적용·검사 대상에서 제외.**
 - **동일 layer 근거 의존(2026-07-12, Codex F-3)**: **허용** — 특히 ①→① 유도 의존(예: ch09 비선형이 ch08 선형해에 기댐)은 정당. 조건: ⑴ claim 복제 금지(선행 노트의 식·결과를 재서술하지 않고 링크) ⑵ 명시적 `depends_on` 기록 ⑶ **순환 금지**(lint 가 cycle 검사). "단순 관련성"은 탐색 링크로 — 선행 식·정의 없이는 후속 단언이 성립하지 않는 경우만 근거 의존.
+- **experience 수치 인용 금지(2026-09-29 사용자 결정)**: layer ①–③ 과 `layer:` 없는 기존 canonical(concepts·models·textbook) 은 experience 를 탐색용 참고 링크로 걸 수 있으나, experience 에서 나온 **수치·정량 결론을 본문에 옮기지 않는다**(값·인용 계약은 ④ 응용 노트 소관). 위 "기존 verified 파일 소급 제외" 는 이 항목에 적용하지 않는다.
 - **③ canonical 허용 기준**: 출처 기반·일반화 가능 절차만 concepts/examples. case-specific 설정·보정값·결과 수치는 G8 대로 coastal-runs → experience 경유.
 
 ## 9. 위키 무결성 검증 도구
