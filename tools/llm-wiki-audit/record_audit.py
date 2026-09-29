@@ -76,13 +76,27 @@ SEVERITY = {V_VIOLATION: 0, V_NEEDS_WORK: 1, V_NONSTD: 2,
             V_PROMOTE: 3, V_CONFIRMED: 4, V_SCAFFOLD: 5}
 
 
-def verdict_for(cs, n_unsourced, has_claims):
+def is_value_mismatch(vc):
+    """값검증 항목의 불일치 여부 — SKILL.md 스키마(result=VALUE-MISMATCH)와 구 키(mismatch=True) 둘 다 인정."""
+    return bool(vc.get("mismatch")) or str(vc.get("result", "")).upper() == "VALUE-MISMATCH"
+
+
+def count_mismatches(f):
+    """confirmed VALUE-MISMATCH 수 — value_mismatches 목록 우선, 없으면 value_checks 에서 셈."""
+    if f.get("value_mismatches"):
+        return len(f["value_mismatches"])
+    return sum(1 for vc in f.get("value_checks", []) if is_value_mismatch(vc))
+
+
+def verdict_for(cs, n_unsourced, has_claims, n_mismatch=0):
+    # SKILL.md V1.1: confirmed VALUE-MISMATCH 가 있는 verified 파일 = INTEGRITY-VIOLATION, 그 밖은 needs-work.
+    # (2026-09-29 수정: 이전에는 미출처 수만 보아 값 불일치 verified 파일이 verified-confirmed 로 기록됨)
     if not has_claims:
         return V_SCAFFOLD
     if cs == "verified":
-        return V_VIOLATION if n_unsourced > 0 else V_CONFIRMED
+        return V_VIOLATION if (n_unsourced > 0 or n_mismatch > 0) else V_CONFIRMED
     if cs in ("source-needed", ""):
-        return V_PROMOTE if n_unsourced == 0 else V_NEEDS_WORK
+        return V_PROMOTE if (n_unsourced == 0 and n_mismatch == 0) else V_NEEDS_WORK
     return V_NONSTD       # 표준 외 상태값 — 별도 정규화 필요
 
 
@@ -108,7 +122,8 @@ def main():
     for f in findings:
         cs = f.get("citation_status", "")
         unsourced = f.get("unsourced", [])
-        v = verdict_for(cs, len(unsourced), f.get("has_real_claims", True))
+        n_mm = count_mismatches(f)
+        v = verdict_for(cs, len(unsourced), f.get("has_real_claims", True), n_mm)
         # V1: actionable finding 의 제안 패치 렌더(미적용). proposals 없으면 [].
         patch_text, notes = build_patch(f["path"], f.get("proposals", [])) \
             if f.get("proposals") else ("", [])
@@ -127,6 +142,7 @@ def main():
             # 매 run 을 단조 구분 → 방금 감사한 파일은 뒤로 밀려 순환이 진행됨.
             "audited_at": now.isoformat(),
             "n_unsourced": len(unsourced),
+            "n_value_mismatches": n_mm,
         }
         # V1.1 값-검증 필드 (있을 때만 — SKILL.md 값-검증 표본 절)
         for k in ("value_checks", "value_mismatches", "source_unavailable"):
@@ -153,7 +169,7 @@ def main():
         hsn_str = f" · has_source_needed→`{str(hsn).lower()}`(권고)" if hsn is not None else ""
         out.append(f"- citation_status: `{r.get('citation_status','') or '(빈)'}` · "
                    f"sourced {r.get('sourced','?')} · opinion {r.get('opinion','?')} · "
-                   f"미출처 {len(r.get('unsourced', []))}{hsn_str}"
+                   f"미출처 {len(r.get('unsourced', []))} · 값불일치 {count_mismatches(r)}{hsn_str}"
                    + ("  · ⚠ dirty(미커밋)" if r.get("dirty") else ""))
         for u in r.get("unsourced", []):
             out.append(f"  - L{u.get('line','?')}: {u.get('text','').strip()}")
@@ -165,13 +181,23 @@ def main():
             out.append(f"  - {tag}: {pn.get('rationale','')}"
                        + (f" — {pn['why']}" if pn.get("why") else ""))
         # V1.1 값-검증 표본 결과 (있을 때만)
+        for vm in r.get("value_mismatches", []):
+            out.append(f"  - ❌ VALUE-MISMATCH L{vm.get('line','?')}: {vm.get('text', vm.get('claim',''))} ← {vm.get('source_ref','')}")
+            if vm.get("source_says"):
+                out.append(f"    - 원문: {vm['source_says']}")
+            if vm.get("reason"):
+                out.append(f"    - 사유: {vm['reason']}")
+            if vm.get("claude_verification"):
+                out.append(f"    - 재확인: {vm['claude_verification']}")
         if r.get("value_checks"):
             for vc in r["value_checks"]:
-                mark = "❌ VALUE-MISMATCH" if vc.get("mismatch") else "✓"
-                out.append(f"  - 값검증 {mark} [{vc.get('claim_id','?')}] {vc.get('claim','')} ← {vc.get('source_ref','')}"
-                           + (f" — {vc['note']}" if vc.get("note") else ""))
-        if r.get("source_unavailable"):
-            out.append(f"  - 값검증 접근불가(source_unavailable): {r['source_unavailable']}건")
+                mark = "❌ VALUE-MISMATCH" if is_value_mismatch(vc) else "✓"
+                note = vc.get("note") or vc.get("source_says")
+                out.append(f"  - 값검증 {mark} [L{vc.get('line', vc.get('claim_id','?'))}] {vc.get('claim', vc.get('text',''))} ← {vc.get('source_ref','')}"
+                           + (f" — {note}" if note else ""))
+        su = r.get("source_unavailable")
+        if su:
+            out.append(f"  - 값검증 접근불가(source_unavailable): {len(su) if isinstance(su, list) else su}건")
         out.append("")
 
     # ── 제안 패치 파일(미적용) ──
