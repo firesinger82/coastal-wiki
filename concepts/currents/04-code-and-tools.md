@@ -172,7 +172,7 @@ deg = {n: i * 22.5 for i, n in enumerate(DIR16)}   # crdir → 도
 ```
 
 - **정밀도는 ±11.25°** 다 — 모델 유향과 비교할 때 이보다 작은 차이는 판별할 수 없다. 유속과 함께 벡터로 바꾸면 방향 오차가 성분에 그대로 들어간다(최대 약 20% 성분 오차: sin 11.25° ≈ 0.195).
-- "흐르는 방향" 규약은 같은 기관의 `tidalCurrentArea` 에서 시각 지정 대조로 확인했다([`experience/khoa-tidal-current-phase-reference-2026.md`](../../experience/khoa-tidal-current-phase-reference-2026.md) @ `68ae7d7` §3c). 이 조류예보 API 는 따로 대조하지 않았다.
+- 변환표와 "흐르는 방향" 규약은 데이터로 검증했다 — 숫자 유향을 주는 최강창낙조 API 와 같은 시각 비교, 규약이 확인된 수치조류도 API 와 비교: [`experience/khoa-tidal-current-phase-reference-2026.md`](../../experience/khoa-tidal-current-phase-reference-2026.md) @ `20bc544` §3d.
 
 2026-09-28–29 확인: 15156024 는 활용신청 전 `SERVICE_KEY_IS_NOT_REGISTERED_ERROR`, 신청 후 `NORMAL_SERVICE` — 비진도남측 2026-09-29 1시간 간격 24건(예 00:00 동북동 44.40 cm/s). 이것은 수치조류도 격자가 아니라 **관측 기반 조류예보 지점**의 예측이다(명세: *"우리나라 관할해역 조류 예보지점의 시계열 조류 정보(유향, 유속, 시각)"*).
 
