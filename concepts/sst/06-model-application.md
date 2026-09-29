@@ -189,9 +189,9 @@ SWAN: spectral wave 모델 — **SST 직접 사용 안 함.** 기온-수온차�
 
 본 위키 [`04-code-and-tools.md`](04-code-and-tools.md) §3-6 에 각 데이터셋 endpoint·접근법.
 
-## 10. 한국 SST 가속이 모델에 미치는 영향
+## 10. SST 경계 입력의 기준기간 검토
 
-SST 경계 입력에서는 climatology의 기준기간과 적용 시점의 차이를 검토해야 한다. 수온 변화는 thermal stratification·산소 용해도·생물지화학 반응 속도에 영향을 준다.
+검토 항목: SST 경계 입력에 사용한 climatology의 기준기간과 모델 적용 기간을 기록하고 비교한다.
 
 입력자료의 갱신 여부와 anomaly 반영 방법은 적용 해역·기간에 맞춰 검토한다. 관련 사례는 [`experience/khoa-sst-warming-trend.md`](../../experience/khoa-sst-warming-trend.md) §8.1을 탐색용으로 참조한다.
 

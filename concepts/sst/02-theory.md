@@ -121,7 +121,7 @@ $$Q_L = \rho_a L_v C_L U (q_a - q_s)$$
 
 해류 운송 — Kuroshio·황해 난류·동한 난류 등의 효과. 한국 연안에서 특히 중요한 항:
 
-- **서귀포·제주** (Kuroshio 분지): 동중국해 난류 유입에 따른 열 수송과 SST 변화의 관계를 검토할 지역.
+- **서귀포·제주**: 해류 열 수송과 SST 변화의 관계를 검토할 후보 지역. 지역별 해류 설명은 독립 문헌 인용 보강 필요(`source-needed`).
 - **인천·서해** (Yellow Sea cold pool): $Q_V$ 비교적 작음
 - **동해** (East Korea Warm Current): 부분 영향, 시기별 변동
 
@@ -147,7 +147,7 @@ $$\Delta L = \alpha \cdot H \cdot \Delta T$$
 - PDO+ phase: 적도 동태평양 warm → Kuroshio 강화 가능 → 한국 연안 SST 상승
 - PDO− phase: 반대
 
-본 분석 2017-2025 의 강한 한국 SST 가속은 **PDO+ phase 와 일치** — 단순 자연 변동 일부 + global warming 누적의 조합.
+한국 연안 SST의 장단기 추세 비교와 PDO/ENSO 관련 해석 사례는 [`experience/khoa-sst-warming-trend.md`](../../experience/khoa-sst-warming-trend.md) §3.2를 탐색용으로 참조한다.
 
 ### 5.2 ENSO
 
@@ -158,7 +158,7 @@ El Niño year 한국 영향:
 ### 5.3 Marine Heatwave (MHW)
 
 해양 폭염 정의 (Hobday 2016): 일 SST 가 climatology 90 percentile 5일 연속 초과.
-- 한국 2023-2025 MHW 빈도·강도 모두 증가
+- 한국 최근 고온 사례는 [`experience/khoa-sst-warming-trend.md`](../../experience/khoa-sst-warming-trend.md) §7을 탐색용으로 참조한다.
 - 양식·어업·생태계 직접 피해
 
 ## 6. 해양 mixed layer

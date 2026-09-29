@@ -188,7 +188,7 @@ def categorize(max_anom, threshold_diff_sigma):
 | **속초** | 2024-07-24 ~ 2024-11-29 | 129 | +4.53 | — | III-severe |
 
 → **2024년 한국 연안 12/13 정점이 IV-extreme MHW 경험**. 
-→ **인천 262일 (8.6개월) 연속 IV-extreme** — 한국 SST 가속의 가장 강한 단일 증거.
+→ 사건과 장기 추세의 관계에 관한 해석 사례는 [`experience/khoa-2024-mhw-extreme.md`](../../experience/khoa-2024-mhw-extreme.md) §6을 탐색용으로 참조한다.
 → Monthly 분해능 (§4.4) 의 max anomaly +3.4~+4.7°C 대비 **daily 에서 +4.4~+6.2°C** — daily 가 더 강한 anomaly 포착.
 
 ### 4.7 종합 — Monthly vs Daily MHW 비교
