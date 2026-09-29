@@ -112,11 +112,11 @@ $$f(\alpha_b) = (0.95 - 0.19\cos 2\alpha_b)\,\sin 2\alpha_b$$
 
 Soulsby Example 10.3 (shingle beach, `marine-sands-manual`, p.201-203):
 
-- 입력: $D_{50}=0.5$ mm 부근, 수온 15 °C, breaker angle $\alpha_b=20°$($\beta=2.86°$), $T_p=6$ s, $\tan\beta=1/10$
+- 입력: $D_{50}=10$ mm, 수온 15 °C, breaker angle $\alpha_b=20°$($\beta=2.86°$), $T_p=6$ s, $\tan\beta=1/10$
 - 중간값: $H_b=H_{rms}=0.707$ m, mean Shields $\theta_m=0.153$, wave Shields $\theta_w=0.169$, $f(\alpha_b)=0.264$
 - Damgaard-Soulsby 결과: $Q_{LS2}=6.98\times10^{-4}$ m³/s → pore space 포함 부피로 환산 (porosity 0.40):
 
-$$\frac{0.00698 \times 3600\times24\times365}{1-0.40} \approx 36{,}700\ \text{m}^3/\text{yr}$$
+$$\frac{0.000698 \times 3600\times24\times365}{1-0.40} \approx 36{,}700\ \text{m}^3/\text{yr}$$
 
 - **동일 입력에 CERC** Eq (138) 적용 시: $Q_{LS}=0.0156$ m³/s ≈ **819,410 m³/yr**
 

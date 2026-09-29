@@ -19,10 +19,10 @@ verification_date: 2026-05-21
 |---|---|---|---|---|
 | **EFDC SED** | hydrodynamic + sediment (3D) | open source (DSI, USEPA 등) | 자체 모듈 | USEPA 수질·침퇴적 |
 | **Delft3D-SED** | hydrodynamic + sediment | GPL-3.0 | D3D-4 또는 FM | 표준 (Deltares) |
-| **MIKE 21/3 ST** | 상용 | 상용 (DHI) | ST = Sediment Transport | 항만 설계 |
+| **MIKE 21/3 ST · MT** | 상용 | 상용 (DHI) | ST = Sand Transport(비점착성), MT = Mud Transport(점착성) — **별개 모듈** (§6) | — |
 | **XBeach sedtrans** | 폭풍 침식 | GPL-3.0 | non-cohesive · 비점착성 | 폭풍 시뮬 |
 | **CSTMS / COAWST** | combined ocean·atm·wave·sed | open source | ROMS + SWAN + CSTMS | 학술 |
-| **TELEMAC-SISYPHE** | unstructured | open source (EDF) | SISYPHE = sediment | 유럽 표준 |
+| **TELEMAC-MASCARET (SISYPHE → GAIA)** | unstructured | open source | GAIA 가 SISYPHE 를 대체하는 표사·지형 모듈 (§6.1) | — |
 
 ## 2. EFDC SED
 
@@ -98,12 +98,17 @@ verification_date: 2026-05-21
 - Beach-dune system: erosion·breaching
 - 한국 적용 사례 (서해 폭풍 침식): 별도 보강
 
-## 6. MIKE 21 ST (상용)
+## 6. MIKE 21/3 ST·MT (상용, DHI)
 
-- DHI MIKE Powered 의 sediment 모듈
-- 비점착성 + 점착성 통합
-- 한국 항만 설계 (성남구·해양수산부) 사용 빈도 높음 — 상용 라이선스
-- 별도 보강
+- **ST (Sand Transport) 는 비점착성(모래) 전용** — DHI 모듈 설명서: *"The MIKE 21 & MIKE 3 Flow Model FM, Sand Transport Module (ST) is the module for the calculation of sediment transport capacity and related initial rates of bed level changes for noncohesive sediment (sand) due to currents or combined waves-currents."* ([DHI, Sand Transport Module short description](https://www.dhigroup.com/upload/dhisoftwarearchive/shortdescriptions/marine/SandTransportModuleST.pdf), 2026-09-28 확인)
+- **점착성(펄)은 별도 MT (Mud Transport) 모듈** — *"a specialised software module designed for simulating the transport of fine-grained sediments, particularly mud, in coastal and marine environments"* ([DHI, MIKE 21/3 Mud Transport](https://www.dhigroup.com/technologies/mikepoweredbydhi/mike-21-3-mud-transport)).
+- ★정정 (2026-09-29 L4 감사): 구판의 "비점착성 + 점착성 통합", "한국 항만 설계 사용 빈도 높음" 은 출처가 없어 뺐다 — 앞의 것은 모듈 구분과도 맞지 않는다.
+
+### 6.1 TELEMAC-MASCARET GAIA
+
+GAIA 는 TELEMAC-MASCARET 의 표사·하상변동 모듈로, 기존 SISYPHE 를 바탕으로 만들어 이를 대체한다 — 여러 입경 분급의 비점착성·점착성 표사를 함께 다룬다
+("GAIA – a unified framework for sediment transport and bed evolution in rivers, coastal seas and transitional waters in the TELEMAC-MASCARET modelling system", *Environmental Modelling & Software*, doi:10.1016/j.envsoft.2022.105544 — 초록 기준, 전문 미판독 `source-needed`).
+구판 표의 "유럽 표준" 은 출처가 없어 뺐다.
 
 ## 7. Python 도구
 
@@ -112,7 +117,6 @@ verification_date: 2026-05-21
 | **pyDGS** | 이미지 기반 입도 분포 추정 (Digital Grain Size) | [github.com/DigitalGrainSize/pyDGS](https://github.com/DigitalGrainSize/pyDGS) |
 | **GrainSizeTools** | 입도 분포 통계·정상상태 입도 해석 | [github.com/marcoalopez/GrainSizeTools](https://github.com/marcoalopez/GrainSizeTools) |
 | Soulsby formulae (NumPy) | `02-theory.md`·`03-analysis-methods.md` 식 직접 구현 | 자체 |
-| scikit-image (수직 단면 분석) | side-scan image 처리 | open |
 
 ## 8. 도구 선택 가이드
 

@@ -55,8 +55,8 @@ verification_date: 2026-05-21
 
 | 부호 of L_smin | 회전 | 의미 |
 |---|---|---|
-| L_smin > 0 | **반시계 (counter-clockwise, CCW)** | 북반구 외해에서 흔함 (Coriolis right-deflection 결과의 자연 회전) |
-| L_smin < 0 | **시계 (clockwise, CW)** | 남반구 외해 또는 북반구 일부 만 |
+| L_smin > 0 | **반시계 (counter-clockwise, CCW)** | 남반구 외해 반일주조의 기본 방향. 북반구에서는 대륙붕·반사 경계·만 등 지형 조건에서 나타난다 (§4) |
+| L_smin < 0 | **시계 (clockwise, CW)** | **북반구 외해 반일주조의 기본 방향** — 직접 조석력과 Coriolis 가속이 함께 CW 로 돌린다 (§4, Pugh §5:4:3 p.179) |
 | L_smin ≈ 0 | **왕복성 (reversing)** | 좁은 수로·연안에서 — 한국 서해 다수 |
 
 ### 3.4 최강 창조류 / 낙조류 추출
@@ -78,7 +78,7 @@ verification_date: 2026-05-21
 ## 4. Coriolis 효과 — 조류 타원의 회전 방향 (Pugh §4:4:2·§4:4:3·§5:4:3)
 
 > ✅ verified (Pugh 'Tides, Surges and Mean Sea-Level', `source_id: sea-level`, 2026-09-28).
-> ★정정: 구판은 "북반구: 흐름이 오른쪽으로 편향 → 시간에 따라 자연스러운 **CCW** 회전(대규모 해역)" 이라 적었다.
+> ★정정: 구판은 "북반구: 흐름이 오른쪽으로 편향 → 시간에 따라 자연스러운 **CCW** 회전(대규모 해역)" 이라 적었다(§3 부호 표도 같은 오기 — 2026-09-29 L4 감사로 적발·정정).
 > Pugh 는 외해 반일주조 타원이 북반구에서 **시계방향(CW)** 으로 돈다고 쓴다 — 방향이 반대였다.[^pugh-rot]
 
 - **외해 (연안 영향에서 먼 곳)**: 직접 조석력과 Coriolis 가속이 **둘 다** 반일주조 타원을

@@ -119,15 +119,18 @@ $$\frac{\partial u}{\partial t} - fv = \cdots, \quad f = 2\Omega \sin\phi$$
 | **국지 thunderstorm** | 여름 | 만 안쪽 | 약 (+0.3~+0.5 m) |
 | **seiche** (장주기 진동) | 연중 | 만·항만 | 약~중 (resonance 시 크게) |
 
-### 3.2 한국 주요 태풍 storm surge case (KHOA Annual Report 인용)
+### 3.2 한국 주요 태풍 storm surge case
 
-| 태풍 | 연 | 한국 경로 | 관측 최대 surge (한국 정점) |
-|---|---|---|---:|
-| Maemi (매미) | 2003 | 마산만 직격 | ~2.4 m 마산 |
-| Sanba (산바) | 2012 | 남해 동부 | ~1.5 m 부산 |
-| Bolaven (볼라벤) | 2012 | 서해 종단 | ~1.2 m 인천 |
-| Lingling (링링) | 2019 | 서해 북상 | ~1.0 m 인천 |
-| Hinnamnor (힌남노) | 2022 | 동해 남부 | ~1.5 m 포항·울산 |
+| 태풍 | 연 | 한국 경로 | 관측 해일 |
+|---|---|---|---|
+| Maemi (매미) | 2003 | 마산만 직격 | source-needed — 문헌값 논의는 [`05-examples.md`](05-examples.md) §1 |
+| Sanba (산바) | 2012 | 남해 동부 | 시간별 잔차 층위 값: [08 §6.1](08-applied-observed-surge-resolution.md) |
+| Bolaven (볼라벤) | 2012 | 서해 종단 | 시간별 잔차 층위 값: [08 §6.1](08-applied-observed-surge-resolution.md) |
+| Lingling (링링) | 2019 | 서해 북상 | 시간별 잔차 층위 값: [08 §2](08-applied-observed-surge-resolution.md) |
+| Hinnamnor (힌남노) | 2022 | 동해 남부 | 월 고극조위 층위만 인용됨(포항 9월 137 cm, 누년 +36 cm — [`05-examples.md`](05-examples.md) §2). 해일 peak 아님 |
+
+> ★정정 (2026-09-29 L4 감사): 구판 표 제목은 "KHOA Annual Report 인용" 이었으나 값(~2.4·~1.5·~1.2·~1.0·~1.5 m)은 인용 없는 추정이었다.
+> 산바 부산·링링 인천은 시간별 잔차 실측과 크게 어긋나 삭제했다. 값은 층위가 맞는 ④ 응용 노트 08 에 둔다.
 
 (정확 값은 KHOA Annual Report 해당 연도 §3.x 인용 필요 — TODO. Maemi 2003 + Hinnamnor 2022 의 case-별 cross-ref + IB 계산 + workflow 매핑은 [`05-examples.md`](05-examples.md) 참조)
 

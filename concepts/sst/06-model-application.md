@@ -161,7 +161,7 @@ ADCIRC 기본 모드: 2DDI (depth-integrated) → 수온 무관. 그러나:
 
 XBeach: 단기 (storm) 사건 surf zone 모델 — **SST 무관**.
 
-XBeach 에 수온은 입력하지 않음. 다만 wave dissipation 의 viscosity 계산에 수온 영향 가능 (보통 무시).
+XBeach 에는 수온 변수가 없다 — `src/xbeachlibrary/*.F90` 전체에서 `temperature` 0 건(2026-09-29 grep). 밀도는 사용자 상수 `rho`(기본 1025, `params.F90:295`), 수평점성도 사용자 상수 `nuh`(기본 0.1, `:744`)라 수온이 들어갈 경로가 없다. ★정정: 구판의 "viscosity 계산에 수온 영향 가능" 은 근거가 없어 뺐다.
 
 ## 8. SWAN 의 SST 처리
 
