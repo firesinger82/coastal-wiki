@@ -9,7 +9,7 @@
 | `02-theory.md` | **verified** | 해양 열수지·열팽창·해류 forcing — Stewart §5 eq. 5.1-5.6 정형 인용 |
 | `03-analysis-methods.md` | **verified** | 시계열 회귀·Mann-Kendall·Sen's slope·climatology·anomaly·MHW (Hobday 2016)·spectral |
 | `04-code-and-tools.md` | **verified** | KHOA OpenAPI + NOAA OISST + UKMO HadISST + JMA COBE-SST2 + NIFS KODC 운영 정리 |
-| `05-examples.md` | **verified** | trend 재현 + monthly MHW 식별 (Hobday 2016 variant) — 13정점 ~180 events, 2024-08~11 광역 사건 정량 |
+| `05-examples.md` | **verified** | trend 재현 + MHW 식별 (Hobday 2016 monthly variant·daily) 알고리즘·실행 방법 — 결과 수치는 `experience/khoa-2024-mhw-extreme.md` |
 | `06-model-application.md` | verified | EFDC/Delft3D/ROMS heat module — models/ source-analysis cross-link. 잔존 source-needed: 한국 적용 paper(`experience/` 정책)·SST forcing endpoint |
 
 ## 사용된 source_id

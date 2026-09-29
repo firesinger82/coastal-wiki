@@ -3,10 +3,10 @@ title: "한국 연안 2024년 광역 marine heatwave — 13정점 OISST daily MH
 topic: khoa-2024-mhw-extreme
 canonical_source: self
 citation_status: verified
-verification_method: "data/sst-global/mhw/daily_2024_*.csv 13정점 daily SST (OISST v2.1 NOAA PSL) + daily_2024_events.csv (63 events) + daily_2024_summary.json (정점별 통계) 직접 추출·집계 — 위키 내 raw 자료. 알고리즘 Hobday et al. 2016 daily variant 5-day continuous p90 cross + Hobday et al. 2018 category I-IV 분류 — tools/sst-cross-check/identify_mhw_daily_2024.py 실행 결과. KHOA Annual Report 2024 §3.1 한국 평균 anomaly +3.40 °C cross-check 는 [`concepts/sst/05-examples.md §4.4`](../concepts/sst/05-examples.md) 에 monthly variant 와 일치 확인 완료 (source_id: khoa-annual-reports). 본 노트는 daily 분석의 operational 함의 합성."
+verification_method: "data/sst-global/mhw/daily_2024_*.csv 13정점 daily SST (OISST v2.1 NOAA PSL) + daily_2024_events.csv (63 events) + daily_2024_summary.json (정점별 통계) 직접 추출·집계 — 위키 내 raw 자료. 알고리즘 Hobday et al. 2016 daily variant 5-day continuous p90 cross + Hobday et al. 2018 category I-IV 분류 — tools/sst-cross-check/identify_mhw_daily_2024.py 실행 결과. KHOA Annual Report 2024 §3.1 한국 평균 anomaly +3.40 °C cross-check 는 본 노트 §2b.2 의 monthly variant 와 일치 확인 완료 (source_id: khoa-annual-reports). 본 노트는 daily 분석의 operational 함의 합성."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-24
-verification_by: "Claude Opus 4.7 (1M context) — wiki-internal data 재집계 + sst/05 §4.4-4.6 cross-ref + warming-trend (1.39 °C/decade) 정합성 확인"
+verification_by: "Claude Opus 4.7 (1M context) — wiki-internal data 재집계 + sst/05 monthly 결과(현 §2b) cross-ref + warming-trend (1.39 °C/decade) 정합성 확인"
 verification_date: 2026-05-24
 related_experience:
   - khoa-sst-warming-trend (1.39 °C/decade 가속 trend — 2024 사건이 trend 곡선에 위치)
@@ -16,14 +16,14 @@ data_sources:
   - data/sst-global/mhw/daily_2024_*.csv (13정점, 각 367 일)
   - data/sst-global/mhw/daily_2024_events.csv (63 events, 4 categories)
   - data/sst-global/mhw/daily_2024_summary.json (정점별 통계)
-  - khoa-annual-reports (Annual Report 2024 §3.1 — concepts/sst/05 §4.4 인용)
+  - khoa-annual-reports (Annual Report 2024 §3.1 — 본 노트 §2b.2·§5 인용)
 analysis_files:
   - tools/sst-cross-check/identify_mhw_daily_2024.py (OISST daily fetch + p90 threshold + 5-day continuous detection)
 caveats:
   - "OISST v2.1 grid 0.25° → 한국 13정점 nearest-grid 보간. 정점 정확 위치는 lat_grid/lon_grid 컬럼."
   - "Climatology baseline 1991-2020 (30년 표준) — 짧은 baseline 대비 더 보수적 anomaly. 1971-2000 등 다른 baseline 시 anomaly 더 클 수 있음."
-  - "Hobday 2016 daily 와 monthly variant 결과 비교는 [`concepts/sst/05-examples.md §4.7`](../concepts/sst/05-examples.md) — daily 가 +1°C 이상 강한 anomaly 포착."
-  - "2024 단일 연도 = '반복 관찰' 의 부분 — 다정점 + 다범주 + multi-month 지속 + 직전 연도 (2023) 와의 연속성 (sst/05 §4.5) 으로 '12개월 단순 anomaly' 가 아닌 '광역·장기 사건' 으로 분류."
+  - "Hobday 2016 daily 와 monthly variant 결과 비교는 본 노트 §2b.4 — daily 가 +1°C 이상 강한 anomaly 포착."
+  - "2024 단일 연도 = '반복 관찰' 의 부분 — 다정점 + 다범주 + multi-month 지속 + 직전 연도 (2023) 와의 연속성 (§2b.3) 으로 '12개월 단순 anomaly' 가 아닌 '광역·장기 사건' 으로 분류."
 ---
 
 # 한국 연안 2024년 광역 marine heatwave — 13정점 daily MHW 분석
@@ -55,6 +55,67 @@ caveats:
 **총 63 events** (I-moderate 22 + II-strong 24 + III-severe 3 + IV-extreme 14, `daily_2024_events.csv` 집계).
 
 > **속초만 IV-extreme 미경험 (III-severe 2건)** — 단 longest 129일은 12 IV-extreme 정점들과 동급. 동해 북부 한류 영향 일부 잔존 가능성.
+
+## 2b. Monthly variant 결과 (1981.09–2026.04) — `concepts/sst/05` 에서 이관 (2026-09-29)
+
+> CONVENTIONS §8.1 (2026-09-29): 실행 결과 수치는 canonical 에서 빼고 experience 에 둔다. 아래는 `tools/sst-cross-check/identify_mhw_monthly.py` 실행 결과(산출 `data/sst-global/mhw/monthly_*.csv·json`)로, 2026-05-23 `concepts/sst/05-examples.md` §4.3–4.5·§4.7 에 있던 내용을 그대로 옮겼다. 알고리즘·실행 방법은 그 노트에 남는다.
+
+### 2b.1 13정점 monthly MHW events
+
+**13정점 총 ~180 events (1981.09 ~ 2026.04)**:
+
+| 정점 | 해역 | 총 events | 최대 anomaly (°C) | 가장 긴 event (months) |
+|---|---|---:|---:|---:|
+| 포항 | 동해 | 19 | +3.75 | 7 |
+| 제주 | 남해 | 18 | +4.15 | 10 |
+| 거문도 | 남해 | 16 | +3.83 | 5 |
+| 목포·여수·거제도·서귀포 | 서해·남해 | 15 | +4.69 (목포) | 10 |
+| 묵호·속초 | 동해 | 14-15 | +3.69 | 8 |
+| 부산 | 남해 | 14 | +3.38 | 5 |
+| 울산 | 동해 | 13 | +3.38 | 6 |
+| 인천 | 서해 | ~10 | — | — |
+| 진도 | 서해 | 9 | +3.81 | 3 |
+
+### 2b.2 2024년 가을 광역 사건 (monthly)
+
+**2024-08 ~ 2024-11** 거의 모든 한국 정점에서 동시 발생한 광역 marine heatwave:
+
+| 정점 | 기간 | 기간 (months) | 최대 anomaly (°C) | 최대 SST (°C) |
+|---|---|---:|---:|---:|
+| 목포 | 2024-03~2024-11 | **9** | +4.69 | 28.61 |
+| 진도 | 2024-09~2024-11 | 3 | +3.81 | 26.96 |
+| 부산 | 2024-08~2024-11 | 4 | +3.38 | 28.58 |
+| 여수 | 2024-08~2024-10 | 3 | +4.24 | 28.51 |
+| 거제도 | 2024-08~2024-11 | 4 | +3.53 | 28.64 |
+| 거문도 | 2024-08~2024-10 | 3 | +3.83 | 28.25 |
+| **제주** | 2024-08~2024-11 | 4 | **+4.15** | **29.86** |
+| **서귀포** | 2024-08~2024-11 | 4 | +3.58 | **30.56** |
+| 울산 | 2024-08~2024-11 | 4 | +3.38 | 28.40 |
+| 포항 | 2024-08~2024-11 | 4 | +3.75 | 27.39 |
+| 묵호 | 2024-04~2024-11 | **8** | +3.69 | 27.28 |
+| 속초 | 2024-04~2024-11 | **8** | +3.13 | 27.35 |
+
+→ **서귀포·제주 최대 SST 30°C 초과** (역대 최고 수준). 한국 평균 anomaly +3.40°C (KHOA 2024 §3.1 보고) 와 본 분석 일치.
+
+### 2b.3 2025–2026 장기 지속 (monthly)
+
+- **제주**: 2025-07~2026-04 (10개월 연속) max anomaly +3.91°C
+- **서귀포**: 2025-07~2026-04 (10개월) max anomaly +4.03°C
+- 한국 남해 marine heatwave 가 **년 단위로 정상화** 되는 상황 — 2024 광역 사건 후 reset 없이 지속
+
+### 2b.4 Monthly vs Daily 비교
+
+| 항목 | Monthly variant (§2b.2–2b.3) | Daily Hobday 2016 (§2) |
+|---|---|---|
+| 데이터 | OISST monthly 1981-2026 | OISST daily 2024 (NetCDF 449MB) |
+| Threshold | monthly p90 (1991-2020) | daily p90 (monthly→doy interp) |
+| Min duration | 2 months | 5 days |
+| 2024 events 수 | ~12 events (per 정점) | 1-8 events (per 정점), longer durations |
+| Top event 강도 | +3.40~+4.69°C | +4.36~+6.18°C |
+| Category | 미분류 | Hobday 2018 I-IV |
+| 한국 평균 (KHOA) | +3.40°C anomaly (2024) | 본 분석과 정합 |
+
+→ Daily 가 정확한 Hobday 2016 spec, monthly variant 는 supplemental.
 
 ## 3. 가장 충격적인 단일 사건 — 인천 262일
 
@@ -92,9 +153,9 @@ start,end,duration_days,max_anomaly_c,mean_anomaly_c,max_sst_c,category,station
 
 ## 5. KHOA Annual Report 2024 cross-check
 
-KHOA Annual Report 2024 §3.1 (source_id: khoa-annual-reports) — 한국 평균 SST anomaly **+3.40 °C** (KHOA 공식 monthly 분석). [`concepts/sst/05-examples.md §4.4`](../concepts/sst/05-examples.md) 의 monthly MHW 분석 (max anomaly +3.4~+4.7 °C) 과 일치.
+KHOA Annual Report 2024 §3.1 (source_id: khoa-annual-reports) — 한국 평균 SST anomaly **+3.40 °C** (KHOA 공식 monthly 분석). §2b.2 의 monthly MHW 분석 (max anomaly +3.4~+4.7 °C) 과 일치.
 
-본 daily 분석 (max anomaly **+4.4~+6.2 °C**) 은 monthly 평균에 의해 smoothing 되는 short-term peak 를 포착 — daily resolution 에서 +1~+2 °C 더 강한 anomaly 가 보임 ([`concepts/sst/05-examples.md §4.7`](../concepts/sst/05-examples.md) 비교표).
+본 daily 분석 (max anomaly **+4.4~+6.2 °C**) 은 monthly 평균에 의해 smoothing 되는 short-term peak 를 포착 — daily resolution 에서 +1~+2 °C 더 강한 anomaly 가 보임 (본 노트 §2b.4 비교표).
 
 → **KHOA 공식 + 본 위키 daily + 본 위키 monthly = 3-way 정합** ([[khoa-sst-global-crosscheck]] 의 5-source cross-check 정신과 동일).
 
@@ -165,7 +226,7 @@ awk -F, 'NR>1 {print $7}' data/sst-global/mhw/daily_2024_events.csv | sort | uni
 
 ### 본 위키
 - [`concepts/sst/03-analysis-methods.md`](../concepts/sst/03-analysis-methods.md) §3 — Hobday MHW 정의 (Mann-Kendall canonical 포함)
-- [`concepts/sst/05-examples.md`](../concepts/sst/05-examples.md) §4.4-4.7 — monthly variant + daily variant 통합 데모
+- [`concepts/sst/05-examples.md`](../concepts/sst/05-examples.md) §4 — MHW 알고리즘·실행 방법 (결과는 본 노트 §2·§2b)
 - [`concepts/sst/06-model-application.md`](../concepts/sst/06-model-application.md) — ROMS·NEMO·HYCOM SST module
 - [[khoa-sst-warming-trend]] — 9년 trend (한국 1.39 / 남해 1.74 °C/decade)
 - [[khoa-sst-global-crosscheck]] — OISST v2.1 + HadISST + COBE2 + NIFS 5-source cross-check
@@ -180,6 +241,6 @@ awk -F, 'NR>1 {print $7}' data/sst-global/mhw/daily_2024_events.csv | sort | uni
 
 ## 10. 후속 작업 후보 (별도 노트로)
 
-- 2025 연속 관찰 — 2025 동일 분석 (제주·서귀포 10개월 연속 지속, [`concepts/sst/05`](../concepts/sst/05-examples.md) §4.5)
+- 2025 연속 관찰 — 2025 동일 분석 (제주·서귀포 10개월 연속 지속, §2b.3)
 - 2024 태풍 hindcast — ADCIRC + 2024 SST forcing → surge skill 변화 (storm-surge/05 보강)
 - 한국 남해 어종 분포 변화 (해양수산부 자료 + 본 SST 관측 cross-check)
