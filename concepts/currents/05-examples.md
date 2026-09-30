@@ -15,7 +15,7 @@ verification_date: 2026-05-21
 
 ## 1. 한국 4정점 — 수치조류도 격자 추출
 
-> 출처: `khoa-tide-model` / `해양수산부 국립해양조사원_수치조류도 기반 조화상수_20250814.csv` (cp949, 813,703 rows). 단위: **cm/s** (조류 속도). 위상 기준: KHOA 공식 표준은 지각 g 를 한국표준시 기준자오선(동경 135°)으로 산출한다 ([03-analysis-methods.md](03-analysis-methods.md) §1.3, `khoa-annual-reports` Annual Report 2025 L2491). CSV 컬럼은 G/g/κ 라벨이 미명시이나 동일 KHOA 기관 표준상 g(135°E)로 해석 (CSV 헤더·data.go.kr 컬럼 설명(파일데이터 15145955) 모두 기준 미기재 — 2026-09-28 확인. 데이터 기반 교차 확인: [`experience/khoa-tidal-current-phase-reference-2026.md`](../../experience/khoa-tidal-current-phase-reference-2026.md) @ `636c1e6`).
+> 출처: `khoa-tide-model` / `해양수산부 국립해양조사원_수치조류도 기반 조화상수_20250814.csv` (cp949, 813,703 rows). 단위: 포털 미기재 — cm/s 로 정합([07 응용](07-applied-khoa-api-conventions.md) §1). 위상 기준: KHOA 공식 표준은 지각 g 를 한국표준시 기준자오선(동경 135°)으로 산출한다 ([03-analysis-methods.md](03-analysis-methods.md) §1.3, `khoa-annual-reports` Annual Report 2025 L2491). CSV 컬럼은 G/g/κ 라벨이 미명시이나 동일 KHOA 기관 표준상 g(135°E)로 해석 (CSV 헤더·data.go.kr 컬럼 설명(파일데이터 15145955) 모두 기준 미기재 — 2026-09-28 확인. 데이터 기반 교차 확인: [`experience/khoa-tidal-current-phase-reference-2026.md`](../../experience/khoa-tidal-current-phase-reference-2026.md) @ `636c1e6`).
 
 ### 1.1 추출 코드
 
@@ -113,8 +113,8 @@ sub = df[(df.lon.between(126,127)) & (df.lat.between(37,38))]
 
 ## 4. 한계 명시
 
-- **단일 (진폭, 위상) 페어** = **남북(v) 유속 성분**(동서 성분 없음). 예측 아카이브 대조로 확인 — [`experience/khoa-tidal-current-phase-reference-2026.md`](../../experience/khoa-tidal-current-phase-reference-2026.md) @ `5de93ff` §3b. **회전 방향·장축 정보 없음**
-- **단위 해석**: 포털 메타데이터에는 단위가 명시되어 있지 않다. 예측 유속과의 단위 교차검증은 위 경험 노트 §3b를 탐색용으로 참조한다.
+- **단일 (진폭, 위상) 페어** — 명세는 성분을 밝히지 않는다. 실측 대조로 정한 사용 계약(남북 v 성분)은 [07 응용](07-applied-khoa-api-conventions.md) §1. **회전 방향·장축 정보 없음**
+- **단위 해석**: 포털 메타데이터에는 단위가 명시되어 있지 않다 — [07 응용](07-applied-khoa-api-conventions.md) §1.
 - **위상 기준**: CSV·포털 모두 명시 없음 — KHOA 표준에 따라 g(135°E) 로 해석(상단 출처 줄 참조)
 - **동해 미커버**: 별도 source 필요
 - **격자 평균**: sub-grid (명량 협수로 등) 가속 미해상
@@ -175,7 +175,7 @@ print(f"수치조류도 M2 = {nearest['m2_진폭']:.2f} cm/s @ {nearest['m2_지�
 ## 6. 보강
 
 - ~~**수치조류도 위상 기준** (G/g) 확인~~ — **해소**: KHOA 표준 지각 g=동경135°(KST) ([03-analysis-methods.md](03-analysis-methods.md) §1.3, 백서 L2491). CSV·포털 메타데이터 모두 미기재 확인(2026-09-28).
-- ~~**수치조류도 "진폭"** 정확한 정의~~ — **해소**: 남북(v) 성분 ([`experience/khoa-tidal-current-phase-reference-2026.md`](../../experience/khoa-tidal-current-phase-reference-2026.md) @ `5de93ff` §3b)
+- **수치조류도 "진폭"** 정확한 정의 — 공식 명세 없음(source-needed). 실측 대조 계약: [07 응용](07-applied-khoa-api-conventions.md) §1
 - 동해 조류 별도 자료 — TPXO10·FES2014 조류 (NAO.99 는 조류 미배포, [06 §6](06-model-application.md))
 - ADCP 실측 데이터 사용 시 격자값과 검증 사례 추가 (`experience/`로)
 - 명량·진도 실제 관측 사례 (강한 비선형)

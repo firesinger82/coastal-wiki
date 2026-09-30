@@ -97,10 +97,8 @@ q1_진폭, q1_지각, s2_진폭, s2_지각, 좌표
 
 - **단일 성분만**: 4 parameter (Lsmaj, Lsmin, θ, g) 중 (진폭, 위상) 2개만 — 회전·장축 방향 정보 없음.
   CSV 헤더와 data.go.kr 컬럼 설명(*"조화상수의 진폭정보"*)은 어느 성분인지 밝히지 않는다(2026-09-28 확인).
-  같은 격자의 KHOA 예측 유속·유향 아카이브(data.go.kr 15130143)와 대조하면 **남북(v) 성분**과 일치하고 동서 성분은 담기지 않는다 —
-  [`experience/khoa-tidal-current-phase-reference-2026.md`](../../experience/khoa-tidal-current-phase-reference-2026.md) @ `5de93ff` §3b.
-  따라서 이 CSV 만으로는 조류 벡터·타원을 재구성할 수 없다.
-- **위상 기준**: CSV 헤더·data.go.kr 컬럼 설명 모두 명시 없음(2026-09-28 확인). KHOA 공식 표준(지각 g 는 동경 135° 기준, [03-analysis-methods.md](03-analysis-methods.md) §1.3)에 따라 **g(135°E KST)** 로 해석한다. 데이터 기반 교차 확인: [`experience/khoa-tidal-current-phase-reference-2026.md`](../../experience/khoa-tidal-current-phase-reference-2026.md) @ `636c1e6`
+  단일 (진폭, 위상) 쌍이라 이 CSV 만으로는 조류 벡터·타원을 재구성할 수 없다. 어느 성분인지는 실측 대조로 정한 사용 계약 [07 응용](07-applied-khoa-api-conventions.md) §1.
+- **위상 기준**: CSV 헤더·data.go.kr 컬럼 설명 모두 명시 없음(2026-09-28 확인). KHOA 공식 표준(지각 g 는 동경 135° 기준, [03-analysis-methods.md](03-analysis-methods.md) §1.3)에 따라 **g(135°E KST)** 로 해석한다. 데이터 기반 교차 확인: [07 응용](07-applied-khoa-api-conventions.md) §2
 - **격자 해상도**: 약 0.001° (≈ 100 m) → 좁은 수로·만 미해상 가능
 
 ### 2.4 격자에서 임의 정점 분조 추출 (template)
@@ -156,7 +154,7 @@ print(f"O1: {nearest['o1_진폭']:.2f} cm/s @ {nearest['o1_지각']:.2f}°")
 | 국립해양조사원_조류예보(시계열) (15156024) | `https://apis.data.go.kr/1192136/crntFcstTime/GetCrntFcstTimeApiService` | `obsCode`(예보지점, 예 16LTC10)·`reqDate`·`min`(간격, 최대 60) | `obsvtrNm`·`lat`·`lot`·`predcDt`·`crdir`(**16방위 문자**)·`crsp`(cm/s) |
 | 국립해양조사원_조류예보 최강창낙조 및 전류 (15156025) | 같은 게이트웨이 | `obsCode` | 최강 창·낙조 유향(deg)·유속, 전류 시각 |
 
-`crdir` 16방위 → 도(진북 기준 시계방향, 22.5° 간격). API 가 돌려주는 이름 16개를 2개 지점 144건에서 모두 확인했다(동·서가 앞에 오는 한국식: `동북동`·`동남동`·`서남서`·`서북서`):
+`crdir` 16방위 → 도(진북 기준 시계방향, 22.5° 간격). 명세는 변환 규칙과 이름 체계를 적지 않는다 — 이름 체계(동·서가 앞에 오는 한국식)와 반올림·유향 규약은 [07 응용](07-applied-khoa-api-conventions.md) §3:
 
 | 방위 | 도 | 방위 | 도 | 방위 | 도 | 방위 | 도 |
 |---|---|---|---|---|---|---|---|
@@ -171,14 +169,13 @@ DIR16 = ['북','북북동','북동','동북동','동','동남동','남동','남�
 deg = {n: i * 22.5 for i, n in enumerate(DIR16)}   # crdir → 도
 ```
 
-- 문자 방위의 양자화는 모델 유향 비교와 벡터 성분 변환에 영향을 준다. API별 정량 검증 결과는 아래 경험 노트를 탐색용으로 참조한다.
-- 변환표와 "흐르는 방향" 규약은 데이터로 검증했다 — 숫자 유향을 주는 최강창낙조 API 와 같은 시각 비교, 규약이 확인된 수치조류도 API 와 비교: [`experience/khoa-tidal-current-phase-reference-2026.md`](../../experience/khoa-tidal-current-phase-reference-2026.md) @ `20bc544` §3d.
+- 문자 방위의 양자화는 모델 유향 비교와 벡터 성분 변환에 영향을 준다 — 규약과 영향은 [07 응용](07-applied-khoa-api-conventions.md) §3.
 
-2026-09-28–29 확인: 15156024 는 활용신청 전 `SERVICE_KEY_IS_NOT_REGISTERED_ERROR`, 신청 후 `NORMAL_SERVICE` — 비진도남측 2026-09-29 1시간 간격 24건(예 00:00 동북동 44.40 cm/s). 이것은 수치조류도 격자가 아니라 **관측 기반 조류예보 지점**의 예측이다(명세: *"우리나라 관할해역 조류 예보지점의 시계열 조류 정보(유향, 유속, 시각)"*).
+15156024 는 활용신청 전 `SERVICE_KEY_IS_NOT_REGISTERED_ERROR` 를 준다. 이것은 수치조류도 격자가 아니라 **관측 기반 조류예보 지점**의 예측이다(명세: *"우리나라 관할해역 조류 예보지점의 시계열 조류 정보(유향, 유속, 시각)"*).
 
 - 실측 판별: 존재하는 이름은 키 없이 호출하면 `{"result":{"error":"ServiceKey is null"}}`, 없는 이름은 "요청하신 페이지" 오류 HTML 을 준다.
   이 방식으로 위 5개는 존재, 구판에 적었던 `tideObsReal`·`tideObsPre` 는 현행 경로에 **없다**(2026-09-28).
-- 명세는 유향을 "deg" 로만 적는다. 시각 지정 호출 대조로 **`Date`·`Hour` 는 KST**, **유향은 흐르는 방향(진북 기준 시계방향)** 임을 확인했다 — [`experience/khoa-tidal-current-phase-reference-2026.md`](../../experience/khoa-tidal-current-phase-reference-2026.md) @ `68ae7d7` §3c.
+- 명세는 유향을 "deg" 로만 적는다. 시각대(`Date`·`Hour`)와 유향 규약(흐르는 방향 여부)은 실측 대조로 정한 사용 계약 [07 응용](07-applied-khoa-api-conventions.md) §2.
 - `tidalCurrentArea` 는 §2 조화상수 CSV 와 같은 수치조류도의 예측값이며, 예측은 **회전성 조류 벡터**다 — CSV(남북 성분만)로는 재현되지 않는다.
 
 ## 4. 도구 vs 모델 분리 (참고)
