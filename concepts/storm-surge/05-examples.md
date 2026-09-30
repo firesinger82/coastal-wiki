@@ -4,7 +4,7 @@ topic: storm-surge
 canonical_source: self
 citation_status: verified
 has_source_needed: true
-verification_method: "본 위키 내 cross-reference 만 verified — 02-theory.md (Pugh §6:3 IB 식, Maemi 950 mb / Hinnamnor 920 mb 중심기압 인용) + 04-code-and-tools.md (NWS 모드·KHOA OpenAPI + archive 한계 verified) + models/ADCIRC/source-analysis/storm-surge/ 7개 노트 (NWS=13 JMA-MSM + GAHM Best Track + fort.15 운영 규칙). **§2 Hinnamnor 2022 는 KHOA Annual Report 2022 §3 직접 인용으로 verified** (별도 노트 [[khoa-annual-2022-hinnamnor-surge]] 분리, 2026-05-28). **§1 Maemi 2003 §1.1.1 disclosed-gap (2026-06-01) — 핵심 수치는 Wikipedia + Shim et al. JCR SI65 doi:10.2112/SI65-067.1 + eSurge + WebSearch 직접 인용으로 verified: peak 910 hPa (JMA) / 885 hPa (JTWC) / Jeju national record 950 hPa / 마산 1.40 m 1403 mm / 사망 120명 / ₩5.52 trillion 손실 확보**. 잔존 source-needed = KHOA 관측 surge peak (Annual Report 2003 부재 — 백서 변환 2012 시작, 본질적 출처 공백). **§4.1 Bolaven 2012 는 KHOA Annual Report 2012 vol.1 §7.3 직접 인용으로 verified** (별도 노트 [[khoa-annual-2012-bolaven-surge]] 분리)."
+verification_method: "본 위키 내 cross-reference 만 verified — 02-theory.md (Pugh §6:3 IB 식, Maemi 910 hPa JMA 최저 중심·950 hPa 제주 관측 최저 / Hinnamnor 920 hPa JMA 최저 중심 — 기압 종류 구분) + 04-code-and-tools.md (NWS 모드·KHOA OpenAPI + archive 한계 verified) + models/ADCIRC/source-analysis/storm-surge/ 7개 노트 (NWS=13 JMA-MSM + GAHM Best Track + fort.15 운영 규칙). **§2 Hinnamnor 2022 는 KHOA Annual Report 2022 §3 직접 인용으로 verified** (별도 노트 [[khoa-annual-2022-hinnamnor-surge]] 분리, 2026-05-28). **§1 Maemi 2003 §1.1.1 disclosed-gap (2026-06-01) — 핵심 수치는 Wikipedia + Shim et al. JCR SI65 doi:10.2112/SI65-067.1 + eSurge + WebSearch 직접 인용으로 verified: peak 910 hPa (JMA) / 885 hPa (JTWC) / Jeju national record 950 hPa / 마산 1.40 m 1403 mm / 사망 120명 / ₩5.52 trillion 손실 확보**. 잔존 source-needed = KHOA 관측 surge peak (Annual Report 2003 부재 — 백서 변환 2012 시작, 본질적 출처 공백). **§4.1 Bolaven 2012 는 KHOA Annual Report 2012 vol.1 §7.3 직접 인용으로 verified** (별도 노트 [[khoa-annual-2012-bolaven-surge]] 분리)."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-24
 verification_by: "Claude Opus 4.7 (1M context) — 위키 내부 cross-ref만 verified, 외부 실측 수치는 source-needed 분리"
@@ -79,7 +79,7 @@ WebSearch + Wikipedia + Shim et al. JCR 직접 fetch:
 
 $$\eta_{IB} = -\frac{\Delta P_A}{\rho g} = -\frac{(950 - 1013) \text{ mb}}{1025 \times 9.81 / 100} \approx +0.63 \text{ m}$$
 
-→ 정적 IB 만 +63 cm. 관측 ~2.4 m 와 비교 → 나머지 ~1.8 m 는 **wind set-up + tide-surge interaction + wave setup** 기여 (Pugh §6:4, §7:8, [02-theory.md §3-4](02-theory.md)).
+→ 제주 관측 기압 기준 정적 IB 는 +63 cm. 마산 관측값(source-needed)과는 위치·시점이 달라 차감으로 비-IB 성분(wind set-up·tide-surge interaction·wave setup, Pugh §6:4·§7:8)을 분리할 수 없다.
 
 #### Step 2: ADCIRC NWS 모드 선택 (verified — ADCIRC source-analysis)
 
@@ -276,7 +276,7 @@ ADCIRC 가 한국 storm-surge 의 primary unstructured 모델이라면, **EFDC+ 
 
 → **sea-level surge 직접 표는 본 보고서 vol.1·vol.2 검색에서 미발견** — KHOA Annual Report 2012 의 §3 조위 분석 챕터 또는 다른 출판물에서 보강 가능 (보강 우선순위 §5.2).
 
-→ 본 위키 [`02-theory.md §2.2 wind stress`](02-theory.md#22-한국-적용--태풍-ib-surge) 의 wind set-up 메커니즘이 잔차 조류 형태로 verified 됨. ADCIRC NWS=20 GAHM hindcast 의 검증 대상으로 활용 가능.
+→ 본 위키 [`02-theory.md §2.2 wind stress`](02-theory.md#22-한국-적용--태풍-ib-surge) 의 wind set-up 메커니즘과 부합하는 관측이다(메커니즘 검증은 아님). ADCIRC NWS=20 GAHM hindcast 의 검증 대상으로 활용 가능.
 
 ### 4.2 추가 sub-노트 후보
 

@@ -28,13 +28,15 @@ $$Q = Q_{SW} + Q_{LW} + Q_S + Q_L + Q_V$$
 
 (Stewart eq. 5.1, p.52)
 
-| 항 | 의미 | 부호 관례 | typical 한국 연안 (W/m²) |
-|---|---|---|---:|
-| $Q_{SW}$ | 입사 단파복사 (insolation) | + (해양으로) | +180 ~ +280 (여름) / +60 ~ +120 (겨울) |
-| $Q_{LW}$ | 순 장파복사 (net infrared) | − (대기로) | −30 ~ −70 |
-| $Q_S$ | sensible heat flux (전도) | − (보통) | −10 ~ −30 |
-| $Q_L$ | latent heat flux (증발) | − (보통) | −50 ~ −150 |
-| $Q_V$ | advection (해류 운송) | ± | Kuroshio 영향권 +100 이상 |
+| 항 | 의미 | 부호 관례 |
+|---|---|---|
+| $Q_{SW}$ | 입사 단파복사 (insolation) | + (해양으로) |
+| $Q_{LW}$ | 순 장파복사 (net infrared) | − (대기로) |
+| $Q_S$ | sensible heat flux (전도) | − (보통) |
+| $Q_L$ | latent heat flux (증발) | − (보통) |
+| $Q_V$ | advection (해류 운송) | ± |
+
+한국 연안의 항별 계절 크기(W/m²)는 지역·기간이 명시된 관측·재분석 출처가 필요하다 (source-needed).
 
 총합 $Q$ 의 부호:
 - 여름·열대: Q > 0 → 표층 가열
@@ -79,7 +81,7 @@ $$\frac{\Delta E_{\text{ocean}}}{\Delta E_{\text{land}}} = \frac{C_p^w \cdot m_w
 **한국 연안 적용**:
 - 인천 (37.5°N): 하지 정오 $\phi \approx 76°$ → $\csc\phi \approx 1.03$ (거의 직사)
 - 동지 정오 $\phi \approx 29°$ → $\csc\phi \approx 2.06$ (감쇠 2배)
-- 결과: 한국 연안 $Q_{SW}$ 가 여름:겨울 = 약 3:1 비율
+- 정오 광로만 비교한 것이며, 계절 일평균 $Q_{SW}$ 비율은 일조 시간·운량까지 필요하다 (source-needed).
 
 ### 3.2 장파복사 $Q_{LW}$
 
@@ -99,7 +101,7 @@ $$Q_{LW,\ \text{net}} = \varepsilon \sigma (T_s^4 - T_a^4)$$
 
 $$Q_S = \rho_a c_{p,a} C_S U (T_a - T_s)$$
 
-- $\rho_a$ = 공기 밀도 (1.2 kg/m³), $c_{p,a}$ = 1005 J·kg⁻¹·°C⁻¹
+- $\rho_a$ = 공기 밀도 (1.3 kg/m³), $c_{p,a}$ = 1030 J·kg⁻¹·K⁻¹ (Stewart Table 5.1)
 - $C_S$ = bulk transfer coefficient (~ 1.0×10⁻³ for 중립 대기)
 - $U$ = 풍속 (m/s, 10m 기준), $T_a - T_s$ = 공기 - 해수 온도 차이
 
@@ -153,7 +155,7 @@ $$\Delta L = \alpha \cdot H \cdot \Delta T$$
 
 El Niño year 한국 영향:
 - 1997-98, 2015-16, 2023-24 강한 El Niño 시기 한국 SST 양의 anomaly
-- 본 분석 2024 SST 한국 평균 +3.40 °C anomaly (KHOA 2024 §3.1 인용) — 2023-24 El Niño 누적
+- KHOA Annual Report 2024: **2024년 9월** 한국 평균 수온 편차 +3.40 °C (월별 편차 표). 원인 귀속(El Niño 등)은 원문에 없다.
 
 ### 5.3 Marine Heatwave (MHW)
 
@@ -164,7 +166,7 @@ El Niño year 한국 영향:
 ## 6. 해양 mixed layer
 
 표층 열수지가 영향을 미치는 깊이 = mixed layer depth (MLD):
-- 한국 연안 MLD: 여름 10-30 m, 겨울 100-200 m
+- 한국 연안 계절별 MLD 범위는 지역 관측 출처 필요 (source-needed). 일반적으로 여름에 얕고 겨울에 깊다.
 - $Q_{net} > 0$ 시 stratification 강화 → MLD 감소
 - $Q_{net} < 0$ 시 convection → MLD 증가
 
@@ -176,7 +178,7 @@ El Niño year 한국 영향:
 - $Q = Q_{SW} + Q_{LW} + Q_S + Q_L + Q_V$ — (Stewart eq. 5.1, p.52)
 - $\Delta E = C_p \cdot m \cdot \Delta T$ — (eq. 5.2)
 - $C_p \approx 4.0 \times 10^3$ J/(kg·°C) — (eq. 5.3)
-- 해양 100× 육지 열 저장 비율 — (eq. 5.5-5.6, p.53-54)
+- 해양 100× 육지 열 저장 비율 — (Stewart p.53-54 본문 계산, 식 번호 없음)
 
 다음 절 (`03-analysis-methods.md`, `04-code-and-tools.md`) 에서 위 이론을 실제 시계열·격자 데이터에 적용.
 

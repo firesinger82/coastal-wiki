@@ -93,7 +93,7 @@ $$A = \frac{1}{1 - C_A^2/(gD)}$$
 
 > "The amplification factor for a disturbance moving at 20 km per hour over water of 50 m depth is 1.07, but if the depth falls to 25 m the factor increases to 1.14. The resonant condition for a disturbance travelling at a speed of 20 km per hour requires a very shallow depth of 3.0 m." (Pugh §6:3)
 
-→ 한국 서해 (수심 20-50m) 가 동해 (1000m+) 보다 동적 amplification 가능성 큼. 단, 한국 태풍은 보통 25-40 km/h 이동.
+→ 식으로 보면 수심이 얕을수록 amplification 이 커진다. 한국 해역 적용에는 태풍 이동속도 통계가 필요하다 (source-needed).
 
 ## 3. Wind Stress (Pugh §6:4)
 
@@ -146,7 +146,7 @@ $$\boxed{\Delta \eta_{wind} \approx \frac{\rho_a C_D U^2 \cdot L}{\rho g H}}$$
 
 $$\Delta\eta_{wind} = \frac{540{,}000}{10{,}056{,}717} \approx 0.054 \text{ m} = 5.4 \text{ cm}$$
 
-→ 동해는 wind set-up 30 배 작음. 동해 storm surge 는 주로 IB + Coriolis 효과.
+→ 같은 조건의 이상화 계산에서 깊은 수심의 wind set-up 은 약 30 배 작다. 동해 해일의 성분 구성은 이 계산만으로 판정하지 않는다.
 
 ### 3.3 ADCIRC 의 wind input
 
@@ -367,7 +367,7 @@ $$\bar{u} \frac{\partial \bar{u}}{\partial x}$$ 의 비선형 결합
 ### 4.2 한국 서해 특수성
 
 - 큰 tide range (인천 +5 m spring tide range) + 천해 (20-50m) → tide-surge interaction 강함
-- Lingling 2019, Bolaven 2012 등 서해 태풍 시 관측 surge 가 단순 IB+wind+tide 합산보다 작거나 큰 phase-dependent 변동
+- 서해 태풍 사례별 tide-surge interaction 정량은 사건별 출처 필요 (source-needed)
 
 ADCIRC 의 처리: shallow water 비선형 항 모두 포함, tide forcing + storm vortex 같은 grid 에서 결합 계산 — separation 없는 통합.
 
@@ -394,7 +394,7 @@ ADCIRC 의 unstructured triangular grid → 한국 연안 같은 복잡 지형 �
 본 분석에서 storm surge 는 **maximum surge envelope** $\max_t \eta_{surge}(x, y, t)$ 가 주된 관심사 (특정 시점 elevation 보다는 storm 전체 영향의 spatial pattern).
 
 ADCIRC outputs:
-- `fort.63` = elevation time series (한 정점)
+- `fort.61` = 관측 정점 수위 시계열, `fort.63` = 전체 격자 수위 (models/ADCIRC/source-analysis/adcirc-fort-files-reference.md)
 - `fort.74` = wind velocity
 - `maxele.63` = **maximum elevation envelope** — surge map 생성에 핵심
 - `maxvel.63` = max velocity envelope

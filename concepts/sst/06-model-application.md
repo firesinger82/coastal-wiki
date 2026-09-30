@@ -40,7 +40,9 @@ EFDC·Delft3D-FLOW·ROMS 는 **prognostic 3D** 그룹 — SST 를 boundary/forci
 
 수치모델 내부 표층 열수지 ([`02-theory.md`](02-theory.md) §1 eq. 5.1):
 
-$$\rho C_p \frac{\partial T}{\partial t}\bigg|_{\text{surface}} = Q_{SW} - Q_{LW} - Q_S - Q_L$$
+$$\rho C_p h \frac{\partial T}{\partial t}\bigg|_{\text{surface layer}} = Q_{SW} - Q_{LW} + Q_S + Q_L$$
+
+($h$ = 표층 두께. 아래 bulk 식에서 $Q_S$·$Q_L$ 은 공기−해수 차이로 부호를 포함하고 $Q_{LW}$ 는 해양 손실을 양으로 둔다.)
 
 (advection $Q_V$ 는 별도 수송 방정식에서 처리)
 

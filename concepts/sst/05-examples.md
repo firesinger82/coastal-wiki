@@ -59,7 +59,7 @@ https://coastwatch.pfeg.noaa.gov/erddap/griddap/ncdcOisst21Agg_LonPM180.json?sst
 
 ```python
 # Step 1. Daily SST 시계열 D (length N days)
-# Step 2. day-of-year 별 climatology + 90% threshold (11일 윈도우 평활화)
+# Step 2. day-of-year 별 climatology + 90% threshold (간이 구현 — 아래 주석 참조)
 import numpy as np
 import pandas as pd
 
@@ -72,7 +72,8 @@ def compute_climatology(daily_sst: pd.Series, baseline_start='1991-01-01',
     # 윤년 2-29 → doy=60 으로 매핑 (단순화)
     clim_mean = base.groupby(doy).mean()
     clim_p90 = base.groupby(doy).quantile(0.9)
-    # 11일 윈도우 평활화 (Hobday 2016 권장)
+    # 간이 구현: doy 별 통계 후 이동평균. Hobday 2016 원 알고리즘은 각 doy 중심 11일 창의
+    # 표본을 모아 평균·p90 을 구한 뒤 31일 이동평균으로 평활화한다 (ecjoliver/marineHeatWaves).
     clim_mean_s = clim_mean.rolling(smooth_window, center=True, min_periods=1).mean()
     clim_p90_s = clim_p90.rolling(smooth_window, center=True, min_periods=1).mean()
     return clim_mean_s, clim_p90_s
