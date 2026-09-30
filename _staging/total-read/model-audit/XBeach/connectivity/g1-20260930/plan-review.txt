@@ -1,0 +1,56 @@
+**실행 전 수정이 필요합니다.** [PLAN.md](/home/firesinger/coastal-wiki/_staging/total-read/model-audit/XBeach/connectivity/g1-20260930/PLAN.md)의 분류와 완료 조건으로는 잘못된 결속도 통과할 수 있습니다.
+
+실제 후보 30건을 대조했습니다: CALL 21건·함수/generic 참조 9건, 직접 정의 후보 있음 11건·없음 19건, CPP 포함 12건, generic 후보 포함 9건. 샤드의 3,228개 ID·51파일 분할에는 누락·중복이 없었습니다. 파일 수정이나 계획 실행은 하지 않았습니다. 아래 ID는 `src/xbeachlibrary/` 접두사를 생략했습니다.
+
+1. **[blocker] 결속과 도달 조건이 겹쳐 ‘정확히 한 범주’가 불가능합니다.**  
+   `boundaryconditions.F90:9:wave_bc@145:5:xmpi_bcast`는 `generic_edge`이면서 `guard_conditional`입니다. `xmpi.F90:1568:xmpi_send_sleep@1583:5:myusleep`는 컴파일러에 따라 서로 다른 네 정의로 결속됩니다. 조건 범주를 선택하면 대상 결속 검사가 사라집니다.  
+   **변경:** `resolution`과 `applicability`를 분리하고, 한 후보에 조건별 `bindings[]`를 허용하십시오. 단일 `target`이나 분류 우선순위만으로 해결되지 않습니다.
+
+2. **[blocker] 생성 generic의 대상·근거를 검증할 스키마가 없습니다.**  
+   `boundaryconditions.F90:9:wave_bc@120:5:writelog`는 생성된 `writelog_a`로 연결되는 사례입니다. 전체에 `writelog` 후보가 **524건** 있지만 `interfaces.json`에는 이 generic이 없고 `procedures.jsonl`에도 생성 specific이 없습니다. 현재 `generic_edge`는 대상 존재 검사조차 요구하지 않습니다.  
+   **변경:** 기존 `generated-links.json`·G3 결과를 이용하는 생성 대상 레지스트리를 명시하십시오. 대상과 인용은 **출력 SHA + 생성 행 + 템플릿 SHA + 소비자 include 위치**로 식별해야 합니다. 생성물 행을 원본 `logging.F90` 행처럼 인용하면 안 됩니다.
+
+3. **[major] 포인터 호출과 내부 절차의 정상적인 결속 경로가 빠졌습니다.**  
+   `logging.F90:63:logmsg@72:5:logging_callback`는 `procedure(ilogger), pointer` 호출입니다. `ilogger`는 실행 대상이 아니라 인터페이스 선언입니다. `libxbeach_dynamic.F90:49:writetolog@59:5:distributelog`는 association 검사 없이 호출됩니다. 반면 `math_tools.F90:348:fftradix@394:5:factorize`는 `CONTAINS` 내부 절차라 USE 근거가 필요하지 않습니다.  
+   **변경:** `indirect_interface`를 추가하고 선언·등록 경로·association 전제를 기록하십시오. 직접 결속의 가시성 근거에는 내부/host scope도 허용하고, 인터페이스 선언을 실행 정의로 인정하지 마십시오.
+
+4. **[major] 빌드 계열·파일 포함·CPP 가능성을 혼동할 수 있습니다.**  
+   `sleeper.F90:23:myusleep@25:5:usleep`의 `__GFORTRAN__`는 Autotools의 MPI/netCDF 조합만으로 판정할 수 없습니다. `xmpi.F90:1211:xmpi_shift_ee_r2@1217:4:mpi_wtime`의 `SHIFT_TIMER`도 목록에 없다는 이유만으로 “어떤 빌드에서도 불가능”하지 않습니다. `libxbeach_dynamic.F90`는 Windows dynamic 프로젝트에만 들어갑니다.  
+   **변경:** 대상 프로젝트·구성·파일별 제외 설정·컴파일러 매크로를 별도 기록하고, 알려지지 않은 정의는 `unknown`으로 유지하십시오. 제외 판정은 명시한 빌드 집합 안에서만 주장해야 합니다.
+
+5. **[major] 실행 조건과 generic 판별에 필요한 증거가 부족합니다.**  
+   `libxbeach.F90:246:executestep@302:61:wave`의 `swave==1`은 단일행 IF라 enclosing-control 목록만 읽으면 빠집니다. `ncoutput.F90:169:ncoutput_init@251:5:nf90_create`에는 앞선 `if (.not. xomaster) return`도 적용됩니다. `initialize.F90:1781:lowlevel_read_hotstart_2d@1793:5:check_file_length`는 타입·rank뿐 아니라 **인자 수**로 specific을 구분합니다.  
+   **변경:** 전체 조건식에 단일행 IF·ELSE 부정·조기 종료를 포함하고, generic 근거에는 가시성, type/**kind**/rank, 인자 수·keyword·optional 대응, specific 시그니처를 요구하십시오. 기존 `contracts.json`의 여섯 모드가 모든 실행 조건을 증명한다고 간주하지 마십시오.
+
+6. **[major] 결정적 검사는 증거의 관련성을 보장하지 않습니다.**  
+   `iso_c_utils.f90:40:strcpy@46:8:strlen`은 실제 모델 함수입니다. “Fortran/C 내장—이름만” 규칙으로 이름 기반 분류하면 틀립니다. 마찬가지로 `params.F90:25:all_input@147:12:readkey_dbl`에 다른 **실재하는** procedure ID와 무관한 정확 인용을 붙여도 현재 검사 항목은 통과할 수 있습니다.  
+   **변경:** 호출 위치·가시성 경로·선언·시그니처·조건에 역할을 붙인 구조화된 evidence와 입력 SHA manifest를 요구하십시오. `generic_edge`도 대상 참조 무결성을 검사해야 합니다. 인용 일치는 기계 검사, 결속 타당성은 의미 검토로 구분하십시오. 배열/함수 구별 역시 이름 목록이 아니라 해당 scope 선언으로 판정해야 합니다.
+
+7. **[major] 10% 표본과 5% 기준이 오류를 남긴 채 종료하도록 허용합니다.**  
+   예컨대 `params.F90:25:all_input@147:12:readkey_dbl`의 잘못된 결속이 발견되어도, 838건 샤드에서 84건을 검사해 4건 REFUTED이면 **4.76%**라 재판정 기준을 넘지 않습니다. 분모가 전체 샤드인지 검토 건수인지도 불명확합니다. `NARROWED` 처리와 수정 후 재검증 의무도 없습니다.  
+   **변경:** 발견된 REFUTED·NARROWED는 비율과 무관하게 모두 처리·재검증하십시오. 5%는 추가 조사 확대 기준으로만 사용하고, 분모·반올림·seed·표본 ID를 고정하십시오. 조건부 결속, 생성 대상, 포인터, 내부 절차, 외부/내장, `not_a_call`을 위험 층으로 포함하고 오류 발견 시 같은 규칙을 적용한 후보까지 확대하십시오.
+
+8. **[major] 샤드 크기가 실행·검토 예산과 연결되지 않습니다.**  
+   `G1-00`은 838건이며 후보 JSON만 약 **676KB**, `params.F90` 원문은 약 **133KB**입니다. `params.F90:25:all_input@58:28:readkey_int`를 포함한 반복 후보에도 개별 근거가 필요합니다. 반대로 336건인 `G1-04`도 후보 JSON이 약 405KB라 건수만으로 작업량을 비교하기 어렵습니다.  
+   **변경:** 파일 소유권은 유지하되 ID 구간별 하위 배치와 공유 근거 레지스트리를 두십시오. 작은 파일럿으로 실제 입력·출력 토큰과 검토량을 측정한 뒤 배치를 정하고, 중단·재개 시 ID 합집합 검사를 요구하십시오. 현재 자료만으로 특정 모델의 용량 초과를 단정할 수는 없습니다.
+
+9. **[blocker] ‘판정 기록 완료’와 ‘R1 공백 해소’가 구분되지 않습니다.**  
+   `unresolved`는 사유만 있으면 허용되므로 위 후보들이 미해결로 남아도 형식상 완료 조건을 만족할 수 있습니다. 또한 G2의 `wave_boundary_update.f90:1308 → linear_interp_2d`와 `test/testgenmodule.F90:306 → xmpi_getrow`는 **동결 후보 ID 자체가 없습니다**. 3,228건 완료로 전체 호출 그래프 완전성을 주장하면 이 누락 패턴을 재현합니다.  
+   **변경:** 미해결 목록·영향·수용 결정 없이는 G1 해소를 선언하지 마십시오. G2 정정은 `source edge / build reachability unknown / test-only`를 보존해 교차 참조하고 3,228건 분모에 몰래 추가하지 마십시오. G2/G3의 기존 검토·정정을 명시적으로 완료 조건에 대응시키십시오. 빌드·동적 대상 탐색은 모델 인터페이스에서 멈추며 외부 구현이나 전체 그래프 재탐색으로 확대하지 않는다고 명문화하십시오.
+
+수정 분류표는 다음처럼 **결속 범주와 적용 조건을 분리**하는 편이 안전합니다.
+
+| `resolution` — 후보당 하나 | 필수 근거 |
+|---|---|
+| `direct_edge` | 조건별 실행 정의 ID, USE/동일 scope/host 가시성, 호출 호환성 |
+| `generic_edge` | generic 가시성·interface, specific ID, 전체 실인자–형식인자 대응 |
+| `indirect_interface` | 포인터/type-bound 선언, 인터페이스, 등록·association 또는 dispatch 조건; 모르는 실제 대상은 명시 |
+| `intrinsic` | 표준/컴파일러 구분, 이름 가림 여부와 실제 호출 형태 확인 |
+| `external_interface` | 외부 심볼·선언/모듈·빌드/링크 근거; 구현 내부는 조사 종료 |
+| `not_a_call` | 해당 scope의 배열·변수·문자열 등 선언과 표현식 해석 |
+| `unresolved` | 결속 실패 원인, 부족한 증거, 종료 판단에 미치는 영향 |
+
+모든 행에 별도로 `bindings[]`, **프로젝트별 파일 포함 상태**, **CPP 조건**, **실행 조건**, **확인/제외/미확정 상태**를 둡니다. 생성 여부는 대상·증거의 출처 속성으로 기록합니다. 기존 `guard_excluded`·`guard_conditional`은 이 별도 축으로 옮기고, 제외되어 결속을 조사하지 않은 경우도 명시하여 해결된 호출로 집계하지 않아야 합니다.
+
+Codex session ID: 01a0efca-147f-73f1-817f-7940bcdb2d0a
+Resume in Codex: codex resume 01a0efca-147f-73f1-817f-7940bcdb2d0a
