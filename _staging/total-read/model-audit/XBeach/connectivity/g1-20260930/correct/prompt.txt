@@ -1,0 +1,13 @@
+OBJECTIVE: Produce a corrected XBeach R1-G1 judgment set. Read first: _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/PLAN.md (binding schema) and CLAUDE.md "모델 분석 범위 통제".
+INPUTS: g1-20260930/G1-all.jsonl (3,228 judged records), g1-20260930/verify/all-verdicts.json (adversarial verdicts on 2,042 of them: 3 REFUTED, 130 NARROWED, each with field/problem/evidence/fix). Sources: models/XBeach/raw/source_code/trunk/** and g1-20260930/generated/*.inc; build facts: build-mode-20260912/build-map.json.
+TASKS:
+ A. For every REFUTED and NARROWED verdict, fix the record per the verdict after confirming it against the source (if you disagree with a verdict, keep the record and explain in the change log with file:line evidence).
+ B. Pattern sweep over ALL 3,228 records for the recurring defect types found by verification, applying the same rule wherever it applies (not only to verified records):
+   B1 build applicability: bindings[].applicability.build must list every project family from build-map.json whose inclusion of the caller file is known (autotools, each vfproj incl. non-compiling production vfproj families, test) with state included|excluded|unknown — do not leave exclusions only in note.
+   B2 prior exits: runtime.expr must account for earlier STOP/EXIT/RETURN/CYCLE that can prevent reaching the call, including those in earlier loop iterations and in the host caller path when the verdicts showed that pattern.
+   B3 character kind: do not mark status confirmed when compatibility relies on c_char == default CHARACTER kind (or similar unestablished kind equality); use undetermined and say why.
+   Also fix any record repeating the writelog specific-selection error (character actual matched to a REAL dummy).
+WRITE ONLY: g1-20260930/G1-corrected.jsonl (all 3,228 records, same order as G1-all.jsonl) and g1-20260930/correct/changes.jsonl (one line per changed record: {"id","source": "verdict"|"sweep-B1"|"sweep-B2"|"sweep-B3"|"sweep-writelog","fields_changed":[...],"summary","evidence": "file:line + quote"}). Modify nothing else; no commits.
+SELF-CHECK: run `python3 _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/check_g1.py <G1-corrected.jsonl> --expect-ids <g1-20260930/all-ids.txt>` until errors=0.
+STOP CONDITION: both files written and checker passes.
+DELIVERABLE: final message: checker output line; counts of changed records by source; list of verdicts you disagreed with (with evidence); any further systematic pattern you noticed but did not fix.

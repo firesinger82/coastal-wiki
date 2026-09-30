@@ -1,0 +1,467 @@
+Reading additional input from stdin...
+OpenAI Codex v0.159.2
+--------
+workdir: /home/firesinger/coastal-wiki
+model: gpt-6.1-sol
+provider: openai
+approval: never
+sandbox: workspace-write [workdir, /tmp, $TMPDIR]
+reasoning effort: max
+reasoning summaries: none
+session id: 01a0f2c4-56e1-7fe0-9a18-c18bac6e6133
+--------
+user
+OBJECTIVE: Produce a corrected XBeach R1-G1 judgment set. Read first: _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/PLAN.md (binding schema) and CLAUDE.md "모델 분석 범위 통제".
+INPUTS: g1-20260930/G1-all.jsonl (3,228 judged records), g1-20260930/verify/all-verdicts.json (adversarial verdicts on 2,042 of them: 3 REFUTED, 130 NARROWED, each with field/problem/evidence/fix). Sources: models/XBeach/raw/source_code/trunk/** and g1-20260930/generated/*.inc; build facts: build-mode-20260912/build-map.json.
+TASKS:
+ A. For every REFUTED and NARROWED verdict, fix the record per the verdict after confirming it against the source (if you disagree with a verdict, keep the record and explain in the change log with file:line evidence).
+ B. Pattern sweep over ALL 3,228 records for the recurring defect types found by verification, applying the same rule wherever it applies (not only to verified records):
+   B1 build applicability: bindings[].applicability.build must list every project family from build-map.json whose inclusion of the caller file is known (autotools, each vfproj incl. non-compiling production vfproj families, test) with state included|excluded|unknown — do not leave exclusions only in note.
+   B2 prior exits: runtime.expr must account for earlier STOP/EXIT/RETURN/CYCLE that can prevent reaching the call, including those in earlier loop iterations and in the host caller path when the verdicts showed that pattern.
+   B3 character kind: do not mark status confirmed when compatibility relies on c_char == default CHARACTER kind (or similar unestablished kind equality); use undetermined and say why.
+   Also fix any record repeating the writelog specific-selection error (character actual matched to a REAL dummy).
+WRITE ONLY: g1-20260930/G1-corrected.jsonl (all 3,228 records, same order as G1-all.jsonl) and g1-20260930/correct/changes.jsonl (one line per changed record: {"id","source": "verdict"|"sweep-B1"|"sweep-B2"|"sweep-B3"|"sweep-writelog","fields_changed":[...],"summary","evidence": "file:line + quote"}). Modify nothing else; no commits.
+SELF-CHECK: run `python3 _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/check_g1.py <G1-corrected.jsonl> --expect-ids <g1-20260930/all-ids.txt>` until errors=0.
+STOP CONDITION: both files written and checker passes.
+DELIVERABLE: final message: checker output line; counts of changed records by source; list of verdicts you disagreed with (with evidence); any further systematic pattern you noticed but did not fix.
+2026-09-30T14:42:30.096864Z ERROR codex_rmcp_client::oauth::refresh_transaction: error=failed to refresh OAuth tokens for server exa: OAuth refresh token was rejected: Server returned error response: invalid_grant: Refresh token has been revoked
+hook: SessionStart
+hook: SessionStart
+hook: SessionStart Completed
+hook: SessionStart Completed
+hook: UserPromptSubmit
+hook: UserPromptSubmit
+hook: UserPromptSubmit Completed
+hook: UserPromptSubmit Completed
+codex
+먼저 PLAN의 스키마와 모델 분석 범위 제한을 읽겠습니다. 각 verdict를 소스로 확인한 뒤 전체 3,228건을 같은 기준으로 점검하고, 지정한 두 파일만 작성해 검사하겠습니다.
+hook: PreToolUse
+hook: PreToolUse
+hook: PreToolUse
+hook: PreToolUse
+hook: PreToolUse
+hook: PreToolUse
+hook: PreToolUse Completed
+hook: PreToolUse Completed
+hook: PreToolUse Completed
+hook: PreToolUse Completed
+hook: PreToolUse Completed
+hook: PreToolUse Completed
+exec
+/bin/bash -lc 'cat _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/PLAN.md' in /home/firesinger/coastal-wiki
+exec
+/bin/bash -lc "rg -n -A 95 -B 8 '모델 분석 범위 통제' CLAUDE.md" in /home/firesinger/coastal-wiki
+ succeeded in 0ms:
+# XBeach R1-G1 — 호출 후보 판정 계획 v2 (2026-09-30)
+
+사용자 지시(2026-09-30): 모델 분석 복귀, XBeach 연결 분석 잔여(R1-G1~G3)부터. 토큰 대량 작업은 Codex `gpt-6.1-sol`.
+범위: [remaining-gaps.json](../runtime-20260912/remaining-gaps.json) R1-G1 — **동결 입력 3,228 후보**(`call-candidates.jsonl`, 호출문 2,242 + 함수/generic 참조 986, 호출자 51파일). 새 입력·부속 도구 내부·솔버 패치 없음 ([CLAUDE.md 범위 통제](../../../../../../CLAUDE.md#모델-분석-범위-통제)).
+빌드·동적 대상 탐색은 **모델 인터페이스에서 멈춘다** — 외부 라이브러리 구현이나 전체 호출 그래프 재탐색으로 확대하지 않는다.
+
+v1 → v2: Codex 적대 검토([plan-review.txt](plan-review.txt), blocker 3·major 6) 전건 반영.
+
+## 1. 레코드 스키마 — 결속(resolution)과 적용 조건(applicability) 분리
+
+후보 1건 = 레코드 1개. `resolution` 은 하나, 조건별 결속은 `bindings[]` 로 여러 개.
+
+| `resolution` | 필수 근거 (`evidence[]` 의 role) |
+|---|---|
+| `direct_edge` | `call_site`, `visibility`(USE / 동일 scope / host(CONTAINS) 중 하나), `definition`(실행 정의 — 인터페이스 선언 불인정), `compatibility`(인자 수·타입) |
+| `generic_edge` | `call_site`, `visibility`, `generic_interface`, `specific_signature`, `compatibility`(인자 수·keyword·optional·type·**kind**·rank 대응) |
+| `indirect_interface` | `call_site`, `pointer_or_binding_decl`(procedure pointer·type-bound), `abstract_interface`, `registration`(등록·association 경로) — 실제 대상을 모르면 명시 |
+| `intrinsic` | `call_site`, `shadowing_check`(같은 scope 에 동명 모델 정의·가림 없음) — 이름만으로 분류 금지 (예: `iso_c_utils.f90` 의 모델 함수 `strlen`) |
+| `external_interface` | `call_site`, `external_decl`(모듈 USE·interface·bind(C)), `link_evidence`(빌드 설정) — 구현 내부 조사 없음 |
+| `not_a_call` | `call_site`, `scope_declaration`(해당 scope 의 배열·변수 선언) |
+| `unresolved` | `call_site` + `reason`, `missing_evidence`, `impact`(R1 종료 판단에 미치는 영향) |
+
+**`bindings[]`** (결속 대상이 조건별로 다르면 여러 개): `target`(아래 ID 규칙), `applicability`:
+- `build`: 프로젝트/구성별 파일 포함 상태 — [build-map.json](../build-mode-20260912/build-map.json) 의 autotools·projects·per-file 제외. 값 `included|excluded|unknown` + 근거.
+- `cpp`: 호출 위치에 걸리는 전처리 조건식 전체와, 명시한 빌드 집합에서의 참/거짓/미정. 목록에 없는 매크로(`SHIFT_TIMER`, 컴파일러 매크로 `__GFORTRAN__` 등)는 **미정**이지 불가능이 아니다.
+- `runtime`: 실행 조건식 전체 — 단일행 IF, ELSE 부정, 앞선 조기 종료(`return`/`exit`/`stop`)를 포함. 기존 `contracts.json` 의 여섯 모드가 모든 실행 조건을 증명한다고 간주하지 않는다.
+- `status`: `confirmed|excluded|undetermined`. 빌드에서 제외돼 결속을 조사하지 않은 경우도 명시하고 **해결된 호출로 집계하지 않는다**.
+
+**대상 ID 규칙**
+- 원본 정의: `procedures.jsonl` 의 `id` (예 `src/xbeachlibrary/interp.F90:8:linear_interp_2d`).
+- 생성 대상: `gen:<출력명>@<출력 sha256 앞 12>:<생성 행>:<이름>` + `template_sha256` + 소비자 include 위치 (근거 [generated-links.json](../runtime-20260912/generated-links.json)·G3 [review-response-20260930](../interfaces-20260912/review-response-20260930.json)). **생성물 행을 원본 `.F90` 행처럼 인용하지 않는다** (예: `writelog` 후보 524건 → 생성 `writelog_a` 등).
+- 외부/내장: `ext:<심볼>` / `intrinsic:<이름>`.
+
+**evidence 항목**: `{role, path, line_start, line_end, quote, sha256}` — quote 는 해당 행 원문 부분 문자열. 입력 SHA manifest(`inputs.json`)에 없는 파일 인용 금지.
+
+## 2. 실행
+
+- 샤드 8개([shards.json](shards.json), 호출자 파일 소유 유지). 큰 샤드는 **ID 구간 하위 배치**로 나눈다. 반복 패턴(예 `params.F90` 의 `readkey_*`)은 공유 근거 레지스트리(`shared-evidence.json`)로 가시성·generic 근거를 한 번 기록하고 레코드가 참조하되, **호출 위치·인자 대응은 레코드마다 개별 기록**.
+- **파일럿 먼저**: 위험 층을 섞은 60건으로 `gpt-6.1-sol` 1회 → 실제 입력·출력 토큰, 스키마 준수, 검사 통과율을 측정하고 배치 크기를 정한다.
+- 샤드·배치 순차(병렬 금지). 산출 `G1-NN[-bK].jsonl`. 중단·재개 시 ID 합집합 검사.
+
+## 3. 검증
+
+1. **결정적 검사** (`check_g1.py`): ① 3,228 id 전부 정확히 1회 ② 스키마·범주 유효, resolution 별 필수 role 존재 ③ evidence 의 path·행 실재, quote 원문 일치, sha256 = inputs.json ④ `target` 참조 무결성 — 원본 id 는 procedures.jsonl, `gen:` 는 generated-links 레지스트리 ⑤ `call_site` 행 = 후보의 line_start. **통과는 인용 일치일 뿐 결속 타당성이 아니다.**
+2. **적대 검증** (Codex `gpt-6-astra`, seed·표본 ID 고정 파일로 기록):
+   - 전건: `unresolved`, `generic_edge`, `indirect_interface`, `not_a_call`, `bindings` 가 2개 이상인 것, `status≠confirmed` 인 것, 생성 대상, `intrinsic`.
+   - 층화 무작위: 나머지 `direct_edge`·`external_interface` 의 10% (샤드별, 분모 = 해당 층 레코드 수, 올림).
+   - **REFUTED·NARROWED 는 비율과 무관하게 전건 정정·재검증.** 한 층의 표본 REFUTED 비율이 5% 를 넘으면 그 층 전체로 검증을 확대하고, 같은 규칙으로 판정된 후보까지 재검토.
+3. **Claude 검증**: REFUTED·NARROWED 원문 대조 후 판정.
+
+## 4. 완료 조건과 한계
+
+- **G1 판정 기록 완료** = 위 1–3 통과 + REFUTED/NARROWED 처리 완료.
+- **R1-G1 공백 해소 선언**은 별도: `unresolved`·`undetermined` 목록, 각 영향, **사용자 수용 결정**이 있어야 한다. 기록 완료만으로 해소를 선언하지 않는다.
+- 3,228건은 **동결 후보 집합**이지 전체 호출 그래프가 아니다. G2 에서 찾은 동결 밖 호출(`wave_boundary_update.f90:1308 → linear_interp_2d` = source edge·빌드 도달 미확정, `test/testgenmodule.F90:306 → xmpi_getrow` = test-only)은 분모에 몰래 추가하지 않고 교차 참조로 남긴다. 3,228건 완료로 호출 그래프 완전성을 주장하지 않는다.
+- G2/G3 는 [review-response-20260930](../interfaces-20260912/review-response-20260930.json) 으로 대응: 58건 중 55 유지, 3 정정.
+- R1 종료는 G1(해소 선언 포함)·G2·G3 가 모두 충족될 때만. R2·R3 전체·R4 는 자동 착수 안 함. 사람 승인 발급 없음.
+- 결과 요약의 `models/` 반영은 R1 단위로 한 번, SCOPED EDIT(사용자 sudo).
+
+카운트 정책: 범주별 개수는 인벤토리이며 결함 수·진행률이 아니다.
+
+ succeeded in 0ms:
+23-
+24-1. **현재 요청의 범위와 완료 조건을 따른다.** 조사 요청은 조사 결과까지, 변경 요청은 필요한 구현·수정·검증까지 마친다. 조사·질문만 요청된 경우 분석 대상 원문을 임의로 수정하지 않는다. 이미 허가된 범위의 되돌릴 수 있는 작업은 중간 확인 없이 계속한다. 인접 개선점은 별도로 보고하고 범위를 임의로 넓히거나 좁히지 않는다. 결과를 좌우하는 정보가 없거나 적용되는 별도 승인 조건이 충족되지 않은 경우에만 묻는다. 기존 모델 감사의 범위·사람 게이트는 유지한다. (근거: 2026-07-24 total-read 사고와 현재 사용자 지시 우선 원칙)
+25-2. **응답과 산출물 길이는 과제에 비례.** 노트·리포트에 요약 반복·보일러플레이트 절을 덧붙이지 않는다. 실질이 끝나면 멈춘다. 짧게 쓰려고 문장을 파편·화살표·약어로 압축하지 말고, 넣을 내용을 고르는 쪽으로 줄인다.
+26-3. **위임은 아래 [역할 분담](#역할-분담-claude--codex)의 Codex 계약으로.** 그 밖의 subagent·workflow는 요청 시에만 쓴다. 직접 몇 번의 tool call로 끝나는 일은 위임하지 않는다. 검증 *실행*(테스트·검사·evidence 수집)은 Codex에 맡길 수 있으나 완료 *판정*은 위임하지 않는다 — 판정은 4항 소관.
+27-4. **완료 판정은 자기신고가 아니다.** [`coastal-audit`](.claude/skills/coastal-audit/SKILL.md)의 Adversary·human gate와 [`tools/resume-gate/`](tools/resume-gate/README.md)의 `decision.json`은 모델 자기검증을 대체하는 장치가 아니라, 자기신고에 완료 권한을 주지 않기 위한 **외부 게이트**다. 모델의 자기검증 능력 향상을 이유로 제거·완화하지 않는다.
+28-5. **자기수정은 짧게.** 사용자의 판단·코드·결론을 바꾸는 오류만 정정하고 계속 진행한다. 경위 서술·자책·오류 집계는 하지 않는다. 후속 질문이 곧 지적은 아니다 — 물은 것에 답한다.
+29-6. **장기 작업은 첫 턴에 전체 사양을.** 자율·다단계 작업(전수 감사, 마이그레이션, 파일럿)은 목표·제약·완료조건을 처음에 모두 주는 편이 여러 턴에 걸쳐 점증적으로 지시하는 것보다 결과가 낫다. 사용자·AI 양쪽에 해당.
+30-
+31:## 모델 분석 범위 통제
+32-
+33-2026-09-12 사용자 정정: XBeach 분석에서 부속 MPI/Jumpshot 뷰어 내부 판독으로 이탈한 작업을 중단한다. 모든 모델 분석과 재개 작업에 다음을 적용한다.
+34-
+35-- **“전수”, “완벽 마무리”, “GOAL”, “계속 진행”은 범위 확장 허가가 아니다.** 대상은 요청한 모델의 물리·수치해법·입출력·실행 흐름·모델 문서와 그 연결 검증이다. 파일이 동봉되어 있거나 인벤토리에 unread로 남았다는 이유로 분석 대상을 늘리지 않는다.
+36-- MPI/Jumpshot 뷰어, 범용 라이브러리, 설치 도구의 내부 구현·클래스·바이트코드를 재귀적으로 판독하지 않는다. 의존성은 모델에 필요한 버전·빌드·링크·실행·호출 인터페이스까지만 확인한다. 모델 자체의 MPI 호출과 병렬 수치 동작은 모델 분석 범위에 포함된다.
+37-- 예외는 사용자가 해당 부속 구성요소 분석을 명시적으로 요청했거나, 구체적으로 재현된 모델 문제 해결에 필요한 경우뿐이다. 후자는 조사 전에 모델 문제, 필요한 구성요소, 조사 종료 조건을 기록하고 필요한 부분만 확인한다.
+38-- 다음 자료를 열기 전에 **어떤 모델 질문이나 산출물을 해결하는지** 판단한다. 직접 관련성을 설명할 수 없으면 그 분기를 중단하고 모델의 남은 작업으로 돌아간다. 이미 쓴 시간·토큰이나 남은 파일 수는 계속할 근거가 아니다.
+39-- 부속 도구의 클래스 수·파일 수·검사 PASS 수를 모델 진행률로 보고하거나 모델 완료의 필수 조건으로 삼지 않는다. 진행 보고는 모델 산출물과 실제 미해결 사항을 기준으로 한다.
+40-- 이 사용자 정정은 과거 plan·RESUME·GOAL 기록의 부속 도구 전수 판독 지시보다 우선한다. 과거 판독 영수증과 원본은 보존하되 현재 할 일로 재사용하지 않는다. 범위 제외를 판독 완료·검증 통과·사람 승인으로 바꾸지 않으며, 모델 자체의 검토·승인 조건은 유지한다.
+41-
+42-## 지식 보강과 전체 감사의 작업 단위
+43-
+44-개별 지식 보강과 모델 전체 감사는 별도 작업 단위다. 개별 보강은 그 주장에 필요한 원문·식·조건·코드 대조를 수행하고 적용되는 독립 검토와 사람 결정을 거치면, 해당 모델의 전체 감사 완료를 기다리지 않고 반영할 수 있다. 이는 XBeach R3에서 이미 허용한 개별 정정과 전체 감사의 분리를 공통 원칙으로 명시한 것이며, 기존 전체 감사 상태는 독립적으로 유지한다. 개별 보강 반영을 미완인 전체 감사의 완료로 간주하지 않는다. 전체 감사를 기다릴 필요가 없다는 것이 개별 보강의 대조·검토·게이트를 면제한다는 뜻은 아니다.
+45-
+46-- “전수”·“진행”은 분석 범위의 자동 확장 허가도, 자동 축소 허가도 아니다. 기존에 승인된 고정 집합과 종료 조건을 바꾸려면 사용자의 별도 명시 결정, 원래 snapshot 보존, 개정 기록이 필요하다. 구조 개편이나 일반적인 진행 지시를 그 결정으로 대체하지 않는다.
+47-- 읽지 않은 driver·이론을 이름만 보고 비핵심으로 분류하지 않는다. 기존 note_worthy 판정의 근거 기록 의무는 그대로 유지한다.
+48-- 기존 판독 기록·승인·게이트는 유지한다. 개별 보강은 이를 우회하는 경로가 아니다.
+49-- 현재 작업은 [plan.md의 현재 작업](plan.md#현재-작업)을 따르고, 현재 사용자 지시가 우선한다. 과거 RESUME·GOAL 기록의 재개 목록은 자동 실행하지 않는다.
+50-
+51-## 디렉토리 책임
+52-
+53-| 경로 | 무엇이 들어가는가 | 무엇이 안 들어가는가 |
+54-|---|---|---|
+55-| `concepts/<topic>/` | 개념·이론·분석법·코드·예제·모델적용 + 응용 연구노트(`NN-applied-*`, [CONVENTIONS.md](CONVENTIONS.md) §8.1) | 특정 사례의 개인 결론 |
+56-| `textbook/notes/theory-*` | 4-레이어 ① 이론 canonical — 교재 인용보강 이식분 (§8.1, [textbook/THEORY-LEDGER.md](textbook/THEORY-LEDGER.md) 추적) | 무인용 AI 합성 잔존 단언 |
+57-| `models/<model>/source-analysis/` | 모델 소스코드 분석 (서브루틴별·모듈별) | 모델 사용 후기 |
+58-| `models/<model>/manual-notes/` | 공식 메뉴얼 발췌·정리 (페이지 인용 필수) | 메뉴얼 없는 추정 |
+59-| `models/<model>/web-refs/` | 공식 위키·논문·블로그 인용 정리 | 비인용 추측 |
+60-| `textbook/notes/` | 교과서 챕터별 발췌·요약 (출처: `source_id` + 페이지, [textbook/sources.yml](textbook/sources.yml)) | 교과서 본문 그대로 복붙 |
+61-| `examples/` | 개념을 가로지르는 실습 (재현 가능 코드/데이터) | 특정 프로젝트 산출물 |
+62-| `experience/` | 위 3조건 통과한 검증 경험 | 미검증 직관 |
+63-
+64-## 새 토픽·새 모델 생성 워크플로
+65-
+66-- 새 토픽: [CONVENTIONS.md](CONVENTIONS.md) §8 (최소 시작 2파일 — 6파일 강제 없음, 템플릿은 `concepts/_template/`에서 작업내용에 맞게 복사)
+67-- 새 모델: `models/_template/` 복사 → `models/<model>/` (구조·필수 항목은 템플릿 자체 참조)
+68-
+69-## 작업별 문서 안내
+70-
+71-매 작업마다 아래 문서를 모두 읽지 않는다. 필요한 문서의 관련 절을 찾고, 이미 읽은 지침은 변경되었거나 새 판단에 필요한 경우에만 다시 읽는다.
+72-
+73-- 구조를 파악할 때: [README.md](README.md)와 해당 디렉터리 README. 항목을 찾을 때는 [INDEX.md](INDEX.md)의 관련 부분.
+74-- 모델 기능 근거를 보강·비교·결합할 때: [BUILD-PLAN.md](BUILD-PLAN.md)의 해당 단계와 완료 조건.
+75-- 노트·인용·frontmatter를 바꿀 때: [CONVENTIONS.md](CONVENTIONS.md)의 해당 규칙.
+76-- 다른 위키와 책임 경계를 바꿀 때: [BOUNDARY.md](BOUNDARY.md).
+77-- 교과서를 편입·인용할 때: [textbook/POLICY.md](textbook/POLICY.md)와 [textbook/sources.yml](textbook/sources.yml)의 해당 source_id.
+78-- 중단 작업을 재개할 때: [plan.md의 현재 작업](plan.md#현재-작업)과 연결된 실행 기록. 과거 결정이 필요한 경우에만 해당 절을 검색한다. 현재 사용자 지시가 우선한다.
+79-
+80-## 검색
+81-
+82-- **`coastal-wiki` MCP** (`.mcp.json`) — `wiki_search`(BM25 + `citation_status`/`path_class` 필터, canonical만: concepts/models/textbook/experience, research·_archive·raw 제외) / `wiki_read`(section·grep·full, read-only sandbox) / `wiki_manifest`(git sha·dirty·doc count). 구현 `tools/llm-wiki-poc/`(FTS5, 순수 stdlib), 인덱스는 기동 시 자동 빌드(~0.5s, gitignore). 설계 [plan.md "LLM-Wiki 서빙 레이어"](plan.md), [plan.md G6](plan.md). (~~`mcp__qmd__query`~~ = 미설치 stale, 2026-06-21 FTS5로 대체)
+83-- 빠른 키워드: `rg "키워드" ~/coastal-wiki -g "*.md" -g "*.yml"` — 전체 트리 스코프 (concepts/models/textbook/examples/experience/governance 문서 포함)
+84-- 토픽·상태 필터: frontmatter 검색 — `rg "citation_status: verified" -l ~/coastal-wiki`
+85-- 큰 출력은 `ctx_execute(language: "shell", code: "rg ...")` 경유
+86-
+87-## 역할 분담 (Claude ↔ Codex)
+88-
+89-2026-09-19 사용자 지시. 기본 역할이며 기계적으로 적용하지 않는다.
+90-
+91-- **Claude = Lead / Planner / Reviewer** — objective·scope 관리, 요구사항 해석, 작업 분해, engineering/content decision, acceptance criteria·stop condition 설정, Codex 결과 검증, 최종 판단.
+92-- **Codex = Executor / Investigator** — 저장소 조사, 코드·문서 수정, 반복 작업, 테스트·검증 실행, evidence 수집, bounded task 결과 반환.
+93-
+94-Codex 위임 우선: 대량 파일 조사, 여러 파일에 걸친 수정, 반복적 refactor, 테스트·검증, 코드 구현, 로그·데이터 분석. Claude가 직접 하는 편이 더 싸고 단순한 소규모 작업은 위임하지 않아도 된다.
+95-
+96-Codex 호출은 항상 다음 계약으로 한다.
+97-
+98-```
+99-OBJECTIVE:      달성할 결과
+100-SCOPE:          대상 경로·파일, 허용 동작(읽기/쓰기), 금지 사항
+101-STOP CONDITION: 종료 조건. 범위 밖 판단이 필요하면 확대하지 않고 Claude에게 반환
+102-DELIVERABLE:    반환 형식(diff·표·로그 요약)과 근거(파일:줄·명령 출력)
+103-```
+104-
+105-Codex 결과는 그대로 채택하지 않는다. Claude가 evidence와 [PROJECT_REQUIREMENTS.md](PROJECT_REQUIREMENTS.md)·이 문서·[CONVENTIONS.md](CONVENTIONS.md)에 대조해 검증한 뒤 판단한다.
+106-
+107-**`models/` 잠금**: `models/`는 root 소유 읽기 전용이며 현재 운영 제약으로 유지한다. Claude·Codex 모두 우회하지 않는다. 변경 방식은 둘 중 하나를 **작업 시작 전에 명시**한다 — **A. INSTALL-STYLE**(snapshot 교체·root 소유 파일 배치): 변경안(diff/script) → 사용자 승인 → 사용자 sudo 적용 → `validate-all` → 검증 → 재잠금. **B. SCOPED EDIT**(승인된 제한 범위의 노트·파일 수정): 대상 경로만 최소 unlock → 승인된 수정 → diff·hash·validation 검증 → 즉시 relock → 쓰기 가능 파일 0 확인. 전체 `models/` unlock·범위 밖 수정·relock 생략·장기 해제는 금지 ([PROJECT_REQUIREMENTS.md](PROJECT_REQUIREMENTS.md#models-잠금-절차)).
+108-
+109-**Claude 모델 지정** (역할 규칙과 별개 설정): 현재 기본 모델은 **Fable 5.1 (`claude-fable-5-1`)**. 자동 fallback 금지 — 다른 모델로 대체하지 않고 실제 응답의 모델 정보를 확인한다. 모델명은 사용자 지시로 변경하며, 사용자가 특정 작업에 한해 승인한 예외는 그 작업에만 적용된다.
+110-
+111-큰 산출물 작성·구조 변경 시:
+112-1. `plan.md`에 현재 계획 포인터, 상세 계획·acceptance criteria는 해당 작업 문서에 작성 (Claude)
+113-2. `/codex:adversarial-review`로 계획 비판 검토, Claude가 반영 여부 판단
+114-3. 구현을 Codex에 bounded task로 위임 (`models/`는 diff/script까지)
+115-4. Claude가 결과 검증 — diff·검사 출력·요구사항 대조
+116-5. 사람 게이트(해당 시 sudo 적용·승인) 후 커밋
+117-
+118-미세 노트 추가나 출처 인용 보강은 위 사이클 skip 가능. 검사는 변경한 주장·코드·링크에 맞춰 수행하며, 통과 뒤에는 새 변경·실패·미해결 우려가 있을 때만 확대하거나 반복한다. 적용되는 독립 검토·사람 게이트·필수 훅은 유지한다.
+119-
+120-## 동기화
+121-
+122-- writer = 이 PC (WSL2 ext4, `~/coastal-wiki`) — **coastal-wiki 유일 writer**. 이 PC가 계산도 겸할 수 있으나 그 결과는 위키가 아닌 `coastal-runs`로(아래).
+123-  - Windows 측 접근: `\\wsl$\Ubuntu\home\firesinger\coastal-wiki` (Obsidian 등 Windows 앱)
+124-- reader = 다른 PC (git clone 후 git pull) — 위키에 대해 **pull 전용**. 리더 머신은 `git config pull.ff only` 권장(로컬 커밋 시 조용한 merge 대신 즉시 에러 → divergence 방지).
+125-- **계산결과 → experience 채널**: 개인 run 결과는 위키에 직접 넣지 않고([RUNS-CHANNEL.md](RUNS-CHANNEL.md)) 별도 `coastal-runs` repo에 축적 → 3조건 게이트 통과분만 이 PC(writer)가 `experience/`로 promote. run 생산자는 여러 머신 가능(머신별 `runs/<host>/` 서브트리, 절대규칙 #8).
+126-- 작업 후 항상 `git commit && git push` (push 전 `git pull` 로 origin 동기화 — 리더가 올린 변경 합류)
+
+hook: PostToolUse
+hook: PostToolUse
+hook: PostToolUse Completed
+hook: PostToolUse Completed
+exec
+/bin/bash -lc "git status --short; rg --files -g AGENTS.md -g '*verdict*' -g 'build-map.json' -g 'check_g1.py' -g 'G1-all.jsonl' -g 'all-ids.txt' _staging/total-read/model-audit/XBeach/connectivity" in /home/firesinger/coastal-wiki
+ succeeded in 0ms:
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/G1-all.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/all-ids.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-00-b0.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-00-b0.jsonl
+M  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-00-b0.result.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-00-b1.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-00-b1.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-00-b1.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-00-b1.result.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-00-b2.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-00-b2.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-00-b2.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-00-b2.result.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-00-b3.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-00-b3.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-00-b3.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-00-b3.result.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-00-b4.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-00-b4.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-00-b4.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-00-b4.result.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-00-b5.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-00-b5.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-00-b5.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-00-b5.result.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-00-b6.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-00-b6.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-00-b6.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-00-b6.result.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-01-b0.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-01-b0.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-01-b0.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-01-b0.result.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-01-b1.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-01-b1.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-01-b1.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-01-b1.result.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-01-b2.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-01-b2.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-01-b2.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-01-b2.result.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-02-b0.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-02-b0.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-02-b0.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-02-b0.result.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-02-b1.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-02-b1.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-02-b1.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-02-b1.result.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-02-b2.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-02-b2.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-02-b2.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-02-b2.result.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-03-b0.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-03-b0.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-03-b0.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-03-b0.result.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-03-b1.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-03-b1.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-03-b1.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-03-b1.result.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-03-b2.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-03-b2.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-03-b2.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-03-b2.result.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-04-b0.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-04-b0.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-04-b0.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-04-b0.result.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-04-b1.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-04-b1.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-04-b1.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-04-b1.result.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-04-b2.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-04-b2.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-04-b2.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-04-b2.result.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-05-b0.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-05-b0.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-05-b0.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-05-b0.result.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-05-b1.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-05-b1.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-05-b1.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-05-b1.result.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-05-b2.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-05-b2.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-05-b2.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-05-b2.result.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-06-b0.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-06-b0.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-06-b0.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-06-b0.result.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-06-b1.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-06-b1.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-06-b1.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-06-b1.result.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-06-b2.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-06-b2.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-06-b2.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-06-b2.result.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-07-b0.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-07-b0.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-07-b0.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-07-b0.result.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-07-b1.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-07-b1.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-07-b1.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-07-b1.result.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-07-b2.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-07-b2.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-07-b2.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/G1-07-b2.result.txt
+M  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/batches/progress.log
+AM _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/correct/exec.log
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/correct/prompt.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify-selection.json
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-00.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-00.exec.log
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-00.ids
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-00.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-00.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-00.verify.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-01.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-01.exec.log
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-01.ids
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-01.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-01.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-01.verify.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-02.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-02.exec.log
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-02.ids
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-02.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-02.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-02.verify.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-03.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-03.exec.log
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-03.ids
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-03.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-03.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-03.verify.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-04.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-04.exec.log
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-04.ids
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-04.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-04.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-04.verify.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-05.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-05.exec.log
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-05.ids
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-05.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-05.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-05.verify.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-06.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-06.exec.log
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-06.ids
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-06.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-06.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-06.verify.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-07.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-07.exec.log
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-07.ids
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-07.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-07.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-07.verify.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-08.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-08.exec.log
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-08.ids
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-08.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-08.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-08.verify.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-09.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-09.exec.log
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-09.ids
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-09.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-09.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-09.verify.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-10.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-10.exec.log
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-10.ids
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-10.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-10.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-10.verify.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-11.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-11.exec.log
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-11.ids
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-11.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-11.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-11.verify.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-12.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-12.exec.log
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-12.ids
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-12.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-12.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-12.verify.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-13.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-13.exec.log
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-13.ids
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-13.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-13.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-13.verify.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-14.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-14.exec.log
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-14.ids
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-14.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-14.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-14.verify.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-15.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-15.exec.log
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-15.ids
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-15.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-15.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-15.verify.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-16.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-16.exec.log
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-16.ids
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-16.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-16.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-16.verify.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-17.check.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-17.exec.log
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-17.ids
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-17.jsonl
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-17.prompt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/V-17.verify.txt
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/all-verdicts.json
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/check_verify.py
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/plan.json
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/progress.log
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/run_verify.sh
+A  _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/runner.out
+_staging/total-read/model-audit/XBeach/connectivity/build-mode-20260912/build-map.json
+_staging/total-read/model-audit/XBeach/connectivity/g1-20260930/G1-all.jsonl
+_staging/total-read/model-audit/XBeach/connectivity/g1-20260930/all-ids.txt
+_staging/total-read/model-audit/XBeach/connectivity/g1-20260930/check_g1.py
+_staging/total-read/model-audit/XBeach/connectivity/g1-20260930/verify/all-verdicts.json
+
+hook: PostToolUse
+hook: PostToolUse Completed
