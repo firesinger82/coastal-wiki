@@ -219,7 +219,7 @@ KHOA OpenAPI `surveyTideLevel` 은 archive **~1년 rolling** ([04-code-and-tools
 | **IB 정적 (계산, 상한)** | +1.02 m (910) / +0.63 m (950) | +0.93 m (920) | Pugh §6:3 식 — 기압 종류가 달라 강도 비교 불가 |
 | **관측 surge peak** | ~2.4 m 마산 (source-needed) | 월 고극조위 층위만 있음(포항 137 cm, 누년 +36 cm) — 해일 peak 는 [08 §6.1](08-applied-observed-surge-resolution.md) | KHOA 2022 표 3-258 |
 | **반대 해역** | (자료 미)  | 마산 -38 cm, 통영 -55 cm 고극조위 누년편차 — 해일 부재 근거 아님 | KHOA 2022 표 3-223·3-213 |
-| **IB / 관측 비** | 0.26 (관측값 source-needed) | ~~0.68~~ — 삭제: 분모 1.37 m 가 고극조위라 비가 성립하지 않음 | — |
+| **IB / 관측 비** | — 삭제: 제주 관측 기압 IB 와 마산 관측값은 위치가 달라 비가 성립하지 않음 | ~~0.68~~ — 삭제: 분모 1.37 m 가 고극조위라 비가 성립하지 않음 | — |
 | **주된 비-IB 기여** | wind set-up + tide-surge interaction (마산만 천해·tide ↑) | wind set-up (동해 깊은 수심에서 작음, 만 안쪽 일부) | Pugh §6:4, §7:8 |
 | **표준 NWS 모드 (학술)** | NWS=20 GAHM + KMA Best Track | NWS=13 JMA-MSM (5 km) + GAHM 비교 | [04-code-and-tools.md §1](04-code-and-tools.md) |
 | **KHOA archive** | 2003 — 부재 (백서 2012부터) | 2022 — OpenAPI 1년 한계 → **KHOA Annual 2022 PDF verified** ✓ | [04-code-and-tools.md §4](04-code-and-tools.md), [[khoa-annual-2022-hinnamnor-surge]] |
@@ -276,7 +276,7 @@ ADCIRC 가 한국 storm-surge 의 primary unstructured 모델이라면, **EFDC+ 
 
 → **sea-level surge 직접 표는 본 보고서 vol.1·vol.2 검색에서 미발견** — KHOA Annual Report 2012 의 §3 조위 분석 챕터 또는 다른 출판물에서 보강 가능 (보강 우선순위 §5.2).
 
-→ 본 위키 [`02-theory.md §2.2 wind stress`](02-theory.md#22-한국-적용--태풍-ib-surge) 의 wind set-up 메커니즘과 부합하는 관측이다(메커니즘 검증은 아님). ADCIRC NWS=20 GAHM hindcast 의 검증 대상으로 활용 가능.
+→ 본 위키 [`02-theory.md §3.2 wind set-up`](02-theory.md#32-wind-set-up--shallow-water) 의 wind set-up 메커니즘과 부합하는 관측이다(메커니즘 검증은 아님). ADCIRC NWS=20 GAHM hindcast 의 검증 대상으로 활용 가능.
 
 ### 4.2 추가 sub-노트 후보
 

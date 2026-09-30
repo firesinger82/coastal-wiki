@@ -3,7 +3,7 @@ title: "SST 분석 실습 — Marine Heatwave 식별 + 한국 연안 trend 재�
 topic: sst
 canonical_source: self
 citation_status: verified
-verification_method: "Hobday et al. 2016 MHW 알고리즘 (Progress in Oceanography 141:227-238)  monthly variant(OISST v2.1 monthly, 1991-2020 climatology, month-of-year p90, 연속 2+ months) 와 daily 표준(5-day) 의 구현·실행 방법 — tools/sst-cross-check/identify_mhw_{monthly,daily_2024}.py. 실행 결과 수치는 본문 §4 에서 링크 (CONVENTIONS §8.1)."
+verification_method: "Hobday et al. 2016 MHW 알고리즘 (Progress in Oceanography 141:227-238)  monthly variant(OISST v2.1 monthly, 1991-2020 climatology, month-of-year p90, 연속 2+ months) 와 daily(5-day 최소 지속, threshold 간이 구현) 의 구현·실행 방법 — tools/sst-cross-check/identify_mhw_{monthly,daily_2024}.py. 실행 결과 수치는 본문 §4 에서 링크 (CONVENTIONS §8.1)."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-23
 verification_by: "Claude Opus 4.7 (1M context) — monthly MHW 직접 실행 + OISST 검증"
@@ -125,7 +125,7 @@ def categorize(max_anom, threshold_diff_sigma):
 
 결과 수치는 [`experience/khoa-2024-mhw-extreme.md`](../../experience/khoa-2024-mhw-extreme.md) §2b.1 (CONVENTIONS §8.1 — 실행 결과는 experience).
 
-### 4.6 Daily MHW (Hobday 2016 standard) — 2024 한국 13정점
+### 4.6 Daily MHW (Hobday 2016 5일 기준, threshold 간이 구현) — 2024 한국 13정점
 
 > **2026-05-23 추가 실행**: NOAA PSL `sst.day.mean.2024.nc` 직접 다운로드 (449MB) + monthly p90 climatology 를 day-of-year linear interp + daily 연속 ≥5일 threshold cross. Category I-IV (Hobday 2018) 자동 분류.
 
@@ -142,7 +142,7 @@ def categorize(max_anom, threshold_diff_sigma):
 | Min duration | 2 months | 5 days |
 | Category | 미분류 | Hobday 2018 I-IV |
 
-→ Daily 가 Hobday 2016 spec, monthly variant 는 supplemental. 두 방식의 결과 비교는 [`experience/khoa-2024-mhw-extreme.md`](../../experience/khoa-2024-mhw-extreme.md) §2b.4.
+→ Daily 방식은 Hobday 2016 의 최소 지속(5일)을 따르지만 threshold 는 간이 구현(§4.8)이라 원 알고리즘과 같지 않다. monthly variant 는 보조. 두 방식의 결과 비교는 [`experience/khoa-2024-mhw-extreme.md`](../../experience/khoa-2024-mhw-extreme.md) §2b.4.
 
 ### 4.8 한계
 

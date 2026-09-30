@@ -1,0 +1,85 @@
+diff --git a/concepts/currents/05-examples.md b/concepts/currents/05-examples.md
+--- a/concepts/currents/05-examples.md
++++ b/concepts/currents/05-examples.md
+@@ -15,7 +15,7 @@
+ 
+ ## 1. 한국 4정점 — 수치조류도 격자 추출
+ 
+-> 출처: `khoa-tide-model` / `해양수산부 국립해양조사원_수치조류도 기반 조화상수_20250814.csv` (cp949, 813,703 rows). 단위: 포털 미기재 — cm/s 로 정합([07 응용](07-applied-khoa-api-conventions.md) §1). 위상 기준: KHOA 공식 표준은 지각 g 를 한국표준시 기준자오선(동경 135°)으로 산출한다 ([03-analysis-methods.md](03-analysis-methods.md) §1.3, `khoa-annual-reports` Annual Report 2025 L2491). CSV 컬럼은 G/g/κ 라벨이 미명시이나 동일 KHOA 기관 표준상 g(135°E)로 해석 (CSV 헤더·data.go.kr 컬럼 설명(파일데이터 15145955) 모두 기준 미기재 — 2026-09-28 확인. 데이터 기반 교차 확인: [`experience/khoa-tidal-current-phase-reference-2026.md`](../../experience/khoa-tidal-current-phase-reference-2026.md) @ `636c1e6`).
++> 출처: `khoa-tide-model` / `해양수산부 국립해양조사원_수치조류도 기반 조화상수_20250814.csv` (cp949, 813,703 rows). 단위: 포털 미기재 — cm/s 로 정합([07 응용](07-applied-khoa-api-conventions.md) §1). 위상 기준: KHOA 공식 표준은 지각 g 를 한국표준시 기준자오선(동경 135°)으로 산출한다 ([03-analysis-methods.md](03-analysis-methods.md) §1.3, `khoa-annual-reports` Annual Report 2025 L2491). CSV 컬럼은 G/g/κ 라벨이 미명시이나 동일 KHOA 기관 표준상 g(135°E)로 해석 (CSV 헤더·data.go.kr 컬럼 설명(파일데이터 15145955) 모두 기준 미기재 — 2026-09-28 확인. 관련 적용 사례(탐색용): [07 응용](07-applied-khoa-api-conventions.md) §2).
+ 
+ ### 1.1 추출 코드
+ 
+diff --git a/concepts/sst/02-theory.md b/concepts/sst/02-theory.md
+--- a/concepts/sst/02-theory.md
++++ b/concepts/sst/02-theory.md
+@@ -93,7 +93,7 @@
+ - $\sigma$ = 5.67×10⁻⁸ W·m⁻²·K⁻⁴
+ - $T_s$ = 표면 온도, $T_a$ = effective 대기 온도 (cloud-corrected)
+ 
+-**한국 연안**: 표층 0~25°C → $T_s$ 273~298 K. 청명한 밤 effective $T_a$ ~250 K → $Q_{LW}$ 약 −60 W/m² (해양→우주).
++Stewart 식 5.6의 −60~−30 W/m²는 연평균 순 장파복사 범위다. 위 식은 외향을 양으로 쓰므로 §1의 해양 유입 양의 부호 관례와 변환이 필요하다. 한국 연안의 특정 조건별 값은 별도 출처가 필요하다 (source-needed).
+ 
+ ### 3.3 Sensible heat flux $Q_S$
+ 
+@@ -155,7 +155,7 @@
+ 
+ El Niño year 한국 영향:
+ - 1997-98, 2015-16, 2023-24 강한 El Niño 시기 한국 SST 양의 anomaly
+-- KHOA Annual Report 2024: **2024년 9월** 한국 평균 수온 편차 +3.40 °C (월별 편차 표). 원인 귀속(El Niño 등)은 원문에 없다.
++- KHOA Annual Report 2024: **2024년 9월** 한국 평균 수온 편차 +3.40 °C (월별 편차 표). 원문은 북태평양·티베트 고기압의 동시 발달에 따른 고온다습한 공기 유입을 설명하며, El Niño 누적으로 귀속하지 않는다.
+ 
+ ### 5.3 Marine Heatwave (MHW)
+ 
+diff --git a/concepts/sst/05-examples.md b/concepts/sst/05-examples.md
+--- a/concepts/sst/05-examples.md
++++ b/concepts/sst/05-examples.md
+@@ -3,6 +3,7 @@
+ topic: sst
+ canonical_source: self
+ citation_status: verified
++has_source_needed: false
+ verification_method: "Hobday et al. 2016 MHW 알고리즘 (Progress in Oceanography 141:227-238)  monthly variant(OISST v2.1 monthly, 1991-2020 climatology, month-of-year p90, 연속 2+ months) 와 daily 표준(5-day) 의 구현·실행 방법 — tools/sst-cross-check/identify_mhw_{monthly,daily_2024}.py. 실행 결과 수치는 본문 §4 에서 링크 (CONVENTIONS §8.1)."
+ note_author: "Claude Opus 4.7 (1M context)"
+ note_date: 2026-05-23
+@@ -142,7 +143,7 @@
+ | Min duration | 2 months | 5 days |
+ | Category | 미분류 | Hobday 2018 I-IV |
+ 
+-→ Daily 가 Hobday 2016 spec, monthly variant 는 supplemental. 두 방식의 결과 비교는 [`experience/khoa-2024-mhw-extreme.md`](../../experience/khoa-2024-mhw-extreme.md) §2b.4.
++→ Daily 구현은 최소 5일 기준을 사용하지만 monthly p90을 일별로 보간하는 변형이다(§4.8). Monthly 구현도 별도 변형이다. 두 방식의 결과 비교는 [`experience/khoa-2024-mhw-extreme.md`](../../experience/khoa-2024-mhw-extreme.md) §2b.4.
+ 
+ ### 4.8 한계
+ 
+diff --git a/concepts/storm-surge/02-theory.md b/concepts/storm-surge/02-theory.md
+--- a/concepts/storm-surge/02-theory.md
++++ b/concepts/storm-surge/02-theory.md
+@@ -3,6 +3,7 @@
+ topic: storm-surge
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "Pugh 'Tides, Surges and Mean Sea-Level' Ch 6 (textbook/md/sea-level.md p.184-230) 직접 인용 — §6:1 Weather effects, §6:3 Atmospheric pressure (eq. 6:5), §6:4 Wind stress, §6:5 Numerical modelling, §7:8 Tide-surge interaction. ADCIRC Theory (Luettich & Westerink 2004) GWCE form. textbook/md/sea-level.md line 7370 ('one millibar will produce a decrease in sea-level of one centimetre') + line 7374 (Proudman shelf model amplification) 직접 인용. §3.4 추가 (2026-05-26): arXiv:2605.03933v1 (Sathia & Giometto 2026, 제출일 2026-05-05, 카테고리 physics.flu-dyn) abstract 직접 fetch (WebFetch 2026-05-26) — 새 PBL height scaling 두 식 u_*/β (neutral) + u_*/√(βN) (stable) + 평균 2.5% relative error verbatim 인용. ADCIRC GAHM BL Vmax 환산 cross-ref 와 한국 태풍 적용 검토는 자체 분석. **§3.4.4~3.4.8 추가 (2026-05-28)**: arXiv:2605.03933v1 **full PDF 34p 직접 fetch** (curl + Read tool) — derivation eq 5-32 (Pollard 1973 P73 응용 + slab model + Ri_b closure) + LES setup Appendix A (256×256×512 grid, Bou-Zeid Smagorinsky, CFL=0.075) + Table A1 216 stratified sims + Appendix B 16 neutral/mild (Set A C_R=0.58, avg 6% error / R²=0.99 / RMSE=6.92m) + parity plot stable C_S=1.2 (R²=0.99 / bias=1.04m / RMSE=23.5m) + characteristic heights (v_max 65-85% / inflow peak 6-20% of h) + eq 41-43 R-scaling h~R^((1-n)/2) + eq 44 K_m~R^(-2n) + combined formula B1 p=4 (vs ABL p=2). Wind engineering / coastal resilience 응용 명시. 비교 expressions 구체화 (Meng 1995 / Kepert 2001 / Pollard 1973 / Sous 2013 / Zilitinkevich 2007 외 closure model papers)."
+ note_author: "Claude Opus 4.7 (1M context)"
+ note_date: 2026-05-26
+diff --git a/concepts/storm-surge/05-examples.md b/concepts/storm-surge/05-examples.md
+--- a/concepts/storm-surge/05-examples.md
++++ b/concepts/storm-surge/05-examples.md
+@@ -219,7 +219,7 @@
+ | **IB 정적 (계산, 상한)** | +1.02 m (910) / +0.63 m (950) | +0.93 m (920) | Pugh §6:3 식 — 기압 종류가 달라 강도 비교 불가 |
+ | **관측 surge peak** | ~2.4 m 마산 (source-needed) | 월 고극조위 층위만 있음(포항 137 cm, 누년 +36 cm) — 해일 peak 는 [08 §6.1](08-applied-observed-surge-resolution.md) | KHOA 2022 표 3-258 |
+ | **반대 해역** | (자료 미)  | 마산 -38 cm, 통영 -55 cm 고극조위 누년편차 — 해일 부재 근거 아님 | KHOA 2022 표 3-223·3-213 |
+-| **IB / 관측 비** | 0.26 (관측값 source-needed) | ~~0.68~~ — 삭제: 분모 1.37 m 가 고극조위라 비가 성립하지 않음 | — |
++| **IB / 관측 비** | 산정하지 않음 — 제주 기압과 마산 수위는 위치·시점이 다름 | 산정하지 않음 — 포항 1.37 m는 월 고극조위 | — |
+ | **주된 비-IB 기여** | wind set-up + tide-surge interaction (마산만 천해·tide ↑) | wind set-up (동해 깊은 수심에서 작음, 만 안쪽 일부) | Pugh §6:4, §7:8 |
+ | **표준 NWS 모드 (학술)** | NWS=20 GAHM + KMA Best Track | NWS=13 JMA-MSM (5 km) + GAHM 비교 | [04-code-and-tools.md §1](04-code-and-tools.md) |
+ | **KHOA archive** | 2003 — 부재 (백서 2012부터) | 2022 — OpenAPI 1년 한계 → **KHOA Annual 2022 PDF verified** ✓ | [04-code-and-tools.md §4](04-code-and-tools.md), [[khoa-annual-2022-hinnamnor-surge]] |
+@@ -276,7 +276,7 @@
+ 
+ → **sea-level surge 직접 표는 본 보고서 vol.1·vol.2 검색에서 미발견** — KHOA Annual Report 2012 의 §3 조위 분석 챕터 또는 다른 출판물에서 보강 가능 (보강 우선순위 §5.2).
+ 
+-→ 본 위키 [`02-theory.md §2.2 wind stress`](02-theory.md#22-한국-적용--태풍-ib-surge) 의 wind set-up 메커니즘과 부합하는 관측이다(메커니즘 검증은 아님). ADCIRC NWS=20 GAHM hindcast 의 검증 대상으로 활용 가능.
++→ 본 위키 [`02-theory.md §3.2 wind set-up`](02-theory.md#32-wind-set-up--shallow-water) 의 wind set-up 메커니즘과 부합하는 관측이다(메커니즘 검증은 아님). ADCIRC NWS=20 GAHM hindcast 의 검증 대상으로 활용 가능.
+ 
+ ### 4.2 추가 sub-노트 후보
+ 

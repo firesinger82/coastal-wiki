@@ -93,7 +93,7 @@ $$Q_{LW,\ \text{net}} = \varepsilon \sigma (T_s^4 - T_a^4)$$
 - $\sigma$ = 5.67×10⁻⁸ W·m⁻²·K⁻⁴
 - $T_s$ = 표면 온도, $T_a$ = effective 대기 온도 (cloud-corrected)
 
-**한국 연안**: 표층 0~25°C → $T_s$ 273~298 K. 청명한 밤 effective $T_a$ ~250 K → $Q_{LW}$ 약 −60 W/m² (해양→우주).
+위 식은 해양의 순 장파 손실을 양으로 둔다(표 §1 의 부호 관례에서는 음). 한국 연안의 계절별 크기는 관측·재분석 출처 필요 (source-needed).
 
 ### 3.3 Sensible heat flux $Q_S$
 

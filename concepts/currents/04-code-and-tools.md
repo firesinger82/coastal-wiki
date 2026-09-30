@@ -154,7 +154,7 @@ print(f"O1: {nearest['o1_진폭']:.2f} cm/s @ {nearest['o1_지각']:.2f}°")
 | 국립해양조사원_조류예보(시계열) (15156024) | `https://apis.data.go.kr/1192136/crntFcstTime/GetCrntFcstTimeApiService` | `obsCode`(예보지점, 예 16LTC10)·`reqDate`·`min`(간격, 최대 60) | `obsvtrNm`·`lat`·`lot`·`predcDt`·`crdir`(**16방위 문자**)·`crsp`(cm/s) |
 | 국립해양조사원_조류예보 최강창낙조 및 전류 (15156025) | 같은 게이트웨이 | `obsCode` | 최강 창·낙조 유향(deg)·유속, 전류 시각 |
 
-`crdir` 16방위 → 도(진북 기준 시계방향, 22.5° 간격). 명세는 변환 규칙과 이름 체계를 적지 않는다 — 이름 체계(동·서가 앞에 오는 한국식)와 반올림·유향 규약은 [07 응용](07-applied-khoa-api-conventions.md) §3:
+아래는 일반 16방위 나침반 환산표(진북 기준 시계방향, 22.5° 간격)다. 명세는 `crdir` 의 도 변환 규칙·이름 체계·유향 규약을 적지 않는다 — API 가 이 체계를 따르는지와 반올림·유향 규약은 실측 대조로 정한 사용 계약 [07 응용](07-applied-khoa-api-conventions.md) §3:
 
 | 방위 | 도 | 방위 | 도 | 방위 | 도 | 방위 | 도 |
 |---|---|---|---|---|---|---|---|
@@ -173,8 +173,7 @@ deg = {n: i * 22.5 for i, n in enumerate(DIR16)}   # crdir → 도
 
 15156024 는 활용신청 전 `SERVICE_KEY_IS_NOT_REGISTERED_ERROR` 를 준다. 이것은 수치조류도 격자가 아니라 **관측 기반 조류예보 지점**의 예측이다(명세: *"우리나라 관할해역 조류 예보지점의 시계열 조류 정보(유향, 유속, 시각)"*).
 
-- 실측 판별: 존재하는 이름은 키 없이 호출하면 `{"result":{"error":"ServiceKey is null"}}`, 없는 이름은 "요청하신 페이지" 오류 HTML 을 준다.
-  이 방식으로 위 5개는 존재, 구판에 적었던 `tideObsReal`·`tideObsPre` 는 현행 경로에 **없다**(2026-09-28).
+- 위 5개는 공식 OpenAPI 목록에 있고, 구판에 적었던 `tideObsReal`·`tideObsPre` 는 목록에 없다(2026-09-28 목록 기준).
 - 명세는 유향을 "deg" 로만 적는다. 시각대(`Date`·`Hour`)와 유향 규약(흐르는 방향 여부)은 실측 대조로 정한 사용 계약 [07 응용](07-applied-khoa-api-conventions.md) §2.
 - `tidalCurrentArea` 는 §2 조화상수 CSV 와 같은 수치조류도의 예측값이며, 예측은 **회전성 조류 벡터**다 — CSV(남북 성분만)로는 재현되지 않는다.
 

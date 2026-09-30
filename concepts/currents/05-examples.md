@@ -15,7 +15,7 @@ verification_date: 2026-05-21
 
 ## 1. 한국 4정점 — 수치조류도 격자 추출
 
-> 출처: `khoa-tide-model` / `해양수산부 국립해양조사원_수치조류도 기반 조화상수_20250814.csv` (cp949, 813,703 rows). 단위: 포털 미기재 — cm/s 로 정합([07 응용](07-applied-khoa-api-conventions.md) §1). 위상 기준: KHOA 공식 표준은 지각 g 를 한국표준시 기준자오선(동경 135°)으로 산출한다 ([03-analysis-methods.md](03-analysis-methods.md) §1.3, `khoa-annual-reports` Annual Report 2025 L2491). CSV 컬럼은 G/g/κ 라벨이 미명시이나 동일 KHOA 기관 표준상 g(135°E)로 해석 (CSV 헤더·data.go.kr 컬럼 설명(파일데이터 15145955) 모두 기준 미기재 — 2026-09-28 확인. 데이터 기반 교차 확인: [`experience/khoa-tidal-current-phase-reference-2026.md`](../../experience/khoa-tidal-current-phase-reference-2026.md) @ `636c1e6`).
+> 출처: `khoa-tide-model` / `해양수산부 국립해양조사원_수치조류도 기반 조화상수_20250814.csv` (cp949, 813,703 rows). 단위: 포털 미기재 — cm/s 로 정합([07 응용](07-applied-khoa-api-conventions.md) §1). 위상 기준: KHOA 공식 표준은 지각 g 를 한국표준시 기준자오선(동경 135°)으로 산출한다 ([03-analysis-methods.md](03-analysis-methods.md) §1.3, `khoa-annual-reports` Annual Report 2025 L2491). CSV 컬럼은 G/g/κ 라벨이 미명시이나 동일 KHOA 기관 표준상 g(135°E)로 해석 (CSV 헤더·data.go.kr 컬럼 설명(파일데이터 15145955) 모두 기준 미기재 — 2026-09-28 확인. 실측 대조로 정한 사용 계약: [07 응용](07-applied-khoa-api-conventions.md) §2).
 
 ### 1.1 추출 코드
 
@@ -107,9 +107,7 @@ sub = df[(df.lon.between(126,127)) & (df.lat.between(37,38))]
 조류 진폭 절대값은 조위 진폭과 직접 비교 불가 (다른 물리량). 그러나 **위상**은 비교 가능:
 - 인천 조위 M₂ G = 228.79° ([`tides-khoa-cross-verification.md` §3](../../textbook/notes/tides-khoa-cross-verification.md))
 - 인천 인근 수치조류도 M₂ 지각 = 57.72°
-- 차이 (228.79 - 57.72) = 171.07° ≈ **반대 위상 (180°)**
-
-해석: 조위 만조 시점에서 조류는 turning (게류) → 합리적. 조위와 조류의 90° phase offset이 일반적 (왕복성 천해 조류) — 더 정밀 검증은 격자 위상 기준 (G/g) 확인 후.
+- 두 값은 **위상 기준이 다르다** — 조위 228.79° 는 G(그리니치), 조류 지각은 g(동경 135°, [07 응용](07-applied-khoa-api-conventions.md) §2). 게다가 조류 값은 v 성분 하나다(§4). 따라서 단순 차감으로 조위–조류 위상 관계(동위상·반대 위상·게류)를 판정할 수 없다. 비교하려면 같은 기준으로 변환하고 흐름 방향 성분을 맞춰야 한다.
 
 ## 4. 한계 명시
 
