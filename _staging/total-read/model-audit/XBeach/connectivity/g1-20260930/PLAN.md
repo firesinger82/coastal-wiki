@@ -58,3 +58,9 @@ v1 → v2: Codex 적대 검토([plan-review.txt](plan-review.txt), blocker 3·ma
 - 결과 요약의 `models/` 반영은 R1 단위로 한 번, SCOPED EDIT(사용자 sudo).
 
 카운트 정책: 범주별 개수는 인벤토리이며 결함 수·진행률이 아니다.
+
+## 5. 공통 전제와 멈춤 규칙 (2026-10-01 사용자 승인)
+
+**A-K1 (kind 동일성 전제)**: 모든 빌드 구성(Autotools `configure.ac`·`Makefile.am`, vfproj 8개)에 kind 를 바꾸는 옵션(`-r8`·`-i8`·`-fdefault-real-8`·`-fdefault-integer-8`·`/real-size`·`/integer-size`·`/double-size`·`RealKIND`·`IntegerKIND`·autodouble)이 없다(2026-10-01 원본 grep). 이 모델의 컴파일러(ifort/ifx/gfortran) 기본값에서 `DOUBLE PRECISION`=`REAL(8)`=`REAL*8`, 기본 `INTEGER`=`INTEGER*4`, D 지수 리터럴=`REAL(8)`, `c_char`=기본 CHARACTER kind 이다. 이 동일성에만 기대는 결속은 `status=confirmed` + `note` 에 "A-K1" 표기. **한계**: 컴파일러 기본값은 코퍼스 밖 문서(공급사 매뉴얼)이며, kind 변경 옵션을 추가한 빌드에는 적용되지 않는다.
+
+**멈춤 규칙**: verify2 의 NARROWED 208건만 2차 정정(새 스윕 없음) → check_g1 → kind 외 변경분만 재검증(verify3) → 그 뒤 남는 NARROWED 는 목록으로 기록하고 판정 확정. 결속 대상 REFUTED 가 새로 나오면 그 건만 정정.

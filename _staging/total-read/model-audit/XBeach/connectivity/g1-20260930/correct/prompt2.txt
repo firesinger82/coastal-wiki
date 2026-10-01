@@ -1,0 +1,10 @@
+OBJECTIVE: Second (final) correction pass for XBeach R1-G1. Read g1-20260930/PLAN.md incl. new §5 (assumption A-K1 and stop rule) first.
+INPUTS: g1-20260930/G1-corrected.jsonl (current 3,228 records), g1-20260930/verify2/all-verdicts.json (re-verification of 982 corrected records: 208 NARROWED, 0 REFUTED, each with field/problem/evidence/fix). Sources: models/XBeach/raw/source_code/trunk/** and g1-20260930/generated/*.inc.
+TASK: Fix ONLY the 208 NARROWED records, per their verdicts, after confirming against source:
+ - kind-equality findings (DOUBLE PRECISION vs REAL*8, default INTEGER vs INTEGER*4, D-exponent literals, c_char vs default CHARACTER): apply A-K1 — status confirmed, note "A-K1"; but keep undetermined if something other than A-K1 is still unestablished.
+ - note/status inconsistencies left by the earlier B3 sweep: make note consistent with status.
+ - prior-exit over-reach: remove exits that cannot precede the call (sibling CASE, mutually exclusive ELSEIF, THEN-branch RETURN bypassed by ELSE, etc.); add genuinely missing ones the verdict lists.
+ No new sweeps; do not touch records without a NARROWED verdict. If you disagree with a verdict, keep the record and log why with file:line.
+WRITE ONLY: g1-20260930/G1-final.jsonl (all 3,228 records, same order) and g1-20260930/correct/changes2.jsonl ({"id","category":"A-K1"|"note-status"|"prior-exit"|"other","fields_changed","summary","evidence"}). No other writes, no commits.
+SELF-CHECK: python3 _staging/total-read/model-audit/XBeach/connectivity/g1-20260930/check_g1.py <G1-final.jsonl> --expect-ids <g1-20260930/all-ids.txt> until errors=0.
+DELIVERABLE: final message: checker line, counts by category, disagreements with evidence.
