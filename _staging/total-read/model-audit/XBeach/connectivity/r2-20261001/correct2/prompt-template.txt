@@ -1,0 +1,13 @@
+OBJECTIVE: Correct XBeach R2 dispositions after independent adversarial verification. Read r2-20261001/PLAN.md and judge-prompt-template.txt (binding rules) first.
+INPUT: the records for ids in __IDS_FILE__, taken from r2-20261001/R2-norm.jsonl; verdicts in r2-20261001/verify/all-verdicts.json (REFUTED/NARROWED with problem/evidence/fix; ids not present there were not verified). Sources: packets, render page images (open with your image viewer), models/XBeach/raw/source_code/trunk/src/**.
+FIX (for every input record):
+ 1. Apply each REFUTED/NARROWED verdict after confirming it against the image/source (if you disagree, keep and explain with evidence in note).
+ 2. Sweeps (apply even where no verdict exists):
+   S1 symbols: definition_locator only for text that actually defines the symbol (nomenclature/list of symbols/"X is ..."/an equation that defines it e.g. C.36 defining ERO/DEPO). Derivation/introductory prose is not a definition. Re-check every symbol marked undefined_in_document by searching the document for its definition.
+   S2 transcription fidelity: re-open the image and transcribe exactly as printed — keep every index (half-grid vs integer), time level (n, n*, *, n+1, n+1½ as printed — do not substitute abbreviations like α or a), overbars/double bars/vector arrows, repeated or odd subscripts (e.g. rep,srep,s), lower/upper case. Do not regularize. Record printed oddities as document observations, not as code differences.
+   S3 groundwater conductivity: in groundwater.F90 the pressure solver receives Kxupd/Kyupd/Kzupd (gw_solver, :382) while gw_calculate_velocities resets Kxupd=Kx (:30 of that routine, intent(out)) and computes velocity from Kin=Kx; the comment at groundwater.F90:387-397 claims velocities use the Poisson estimate — record this comment/code mismatch; never claim velocity uses the solver conductivity.
+   S4 nonh pressure bottom-slope term: printed -(∂x(H p̄)+p∂x d)/H vs source (nonh.F90:1193-1195,1234-1238 with p̄=p/2, zb=-d) giving -(∂x(H p̄)-p∂x d)/H — record as a sign difference; resolution of which is intended depends on the report's definition of d (check it; if not settled, closure unresolved).
+ 3. Keep closure_status honest (PLAN §1 and the closure rule in judge-prompt-template.txt).
+WRITE ONLY __OUT_FILE__ (corrected records for the input ids, same order) and __LOG_FILE__ ({"id","source":"verdict"|"S1"|"S2"|"S3"|"S4","fields_changed","summary","evidence"} per change). No other writes, no commits.
+SELF-CHECK: python3 _staging/total-read/model-audit/XBeach/connectivity/r2-20261001/check_r2.py __OUT_FILE__ --expect-ids __IDS_FILE__ until errors=0.
+DELIVERABLE: final message: checker line, counts by source, disagreements with evidence.

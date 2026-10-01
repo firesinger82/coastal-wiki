@@ -1,0 +1,278 @@
+```json
+[
+  {
+    "id": "kingsday:xml:93270",
+    "verdict": "STANDS",
+    "field": null,
+    "problem": null,
+    "evidence": "Viewed page-125.png, B.1. wave_instationary.F90:189-220,287-339 supports action transport and split energy dissipation; cgx/cgy versus cx/cy and notation limits are retained.",
+    "fix": null
+  },
+  {
+    "id": "kingsday:xml:93485",
+    "verdict": "STANDS",
+    "field": null,
+    "problem": null,
+    "evidence": "Viewed page-126.png, B.2. wave_functions.F90:175-242 reproduces both interior reconstructions and face flux; fallback, boundary and scheme differences are stated.",
+    "fix": null
+  },
+  {
+    "id": "kingsday:xml:93588",
+    "verdict": "STANDS",
+    "field": null,
+    "problem": null,
+    "evidence": "Viewed page-126.png, B.3. wave_functions.F90:223-242 and wave_instationary.F90:189-220,287-339 support the discrete divergence and update, with energy/action splitting explicitly distinguished.",
+    "fix": null
+  },
+  {
+    "id": "kingsday:xml:93856",
+    "verdict": "STANDS",
+    "field": null,
+    "problem": null,
+    "evidence": "Viewed page-127.png, B.4. The rendered positive outward-flux difference is transcribed faithfully; its opposite sign in flow_timestep.F90:738-751 is explicitly reported.",
+    "fix": null
+  },
+  {
+    "id": "kingsday:xml:93954",
+    "verdict": "STANDS",
+    "field": null,
+    "problem": null,
+    "evidence": "Viewed page-127.png, B.5. Flux geometry matches flow_timestep.F90:714-751; the sign discrepancy and unproved half-step correspondence remain unresolved.",
+    "fix": null
+  },
+  {
+    "id": "kingsday:xml:94708",
+    "verdict": "STANDS",
+    "field": null,
+    "problem": null,
+    "evidence": "Viewed page-127.png, B.8. flow_timestep.F90:185-208,535-578 supports momentum advection and force signs; hu versus hum, additional forces and clipping are distinguished.",
+    "fix": null
+  },
+  {
+    "id": "kingsday:xml:95066",
+    "verdict": "STANDS",
+    "field": null,
+    "problem": null,
+    "evidence": "Viewed page-128.png, B.9. flow_timestep.F90:186-207 confirms the signed inflows, left rotation-sign discrepancy and right angle reversal. Unresolved closure is appropriate.",
+    "fix": null
+  },
+  {
+    "id": "kingsday:xml:95171",
+    "verdict": "NARROWED",
+    "field": "symbols[h_v]; note",
+    "problem": "The assertion that no explicit h_v definition was located is false. The document's output table defines hv, and record 93954 already uses that definition.",
+    "evidence": [
+      "models/XBeach/raw/source_code/trunk/doc/manual/XBeach_manual_kingsday.docx!word/document.xml:2, paragraph XML ordinal 68568; enclosing table row: 'hv | Water depth in v-points | m'.",
+      "_staging/total-read/model-audit/XBeach/connectivity/r2-20261001/verify/V-04.jsonl:5 and :8."
+    ],
+    "fix": "Link h_v to paragraph 68568 and remove its claimed definition gap. Retain unresolved closure for the rotation discrepancy."
+  },
+  {
+    "id": "kingsday:xml:95313",
+    "verdict": "STANDS",
+    "field": null,
+    "problem": null,
+    "evidence": "Viewed page-129.png, B.11. flow_timestep.F90:185-240 and spaceparams.F90:1349-1350 support all four momentum-branch coefficients and inverse area; energy-head and rotation differences are retained.",
+    "fix": null
+  },
+  {
+    "id": "kingsday:xml:95639",
+    "verdict": "STANDS",
+    "field": null,
+    "problem": null,
+    "evidence": "Viewed page-129.png, B.12. groundwater.F90:267-271,309-340 supports connected, with strict groundwater comparison, wetness and recalculation differences explicitly identified.",
+    "fix": null
+  },
+  {
+    "id": "kingsday:xml:95860",
+    "verdict": "STANDS",
+    "field": null,
+    "problem": null,
+    "evidence": "Viewed page-130.png, B.13: no operator is visible before terminal 1. groundwater.F90:619-634,1559-1573,1631-1643 and the reused contract support only the stated conditional comparison; missing-operator and filtering issues remain open.",
+    "fix": null
+  },
+  {
+    "id": "kingsday:xml:96040",
+    "verdict": "STANDS",
+    "field": null,
+    "problem": null,
+    "evidence": "Viewed page-130.png, B.14. Rendered reciprocal factors differ from groundwater.F90:1568-1629. The reused algebra receipt is correctly restricted to the implemented plus-one root, and implementation_relation remains unresolved.",
+    "fix": null
+  },
+  {
+    "id": "kingsday:xml:96136",
+    "verdict": "REFUTED",
+    "field": "implementation_relation supporting explanation; differences; closure_status",
+    "problem": "The infiltration Reynolds-law comparison is supported, but the claim that velocity calls retain Kin from the pressure solve is wrong. The pressure solver receives updated conductivity arrays; velocity calculations receive separate arrays reset to parameter values. The retention switch also depends on the surface-wave model, not gwnonh.",
+    "evidence": [
+      "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/groundwater.F90:382 passes Kxupd/Kyupd/Kzupd to gw_solver.",
+      "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/groundwater.F90:397 passes Kx/Ky/Kz to gw_calculate_velocities; :409-417 preserves updated arrays and resets Kx/Ky/Kz to par%kx/par%ky/par%kz.",
+      "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/groundwater.F90:1311-1321 supplies isnonh from par%wavemodel==WAVEMODEL_NONH; :1429-1433 selects Kin versus Kupd."
+    ],
+    "fix": "Retain the infiltration-law comparison, replace the pressure-solver conductivity claim with the actual argument/reset chain, and state the wavemodel condition explicitly. Reassess resolved closure after correcting this implementation explanation."
+  },
+  {
+    "id": "kingsday:xml:96318",
+    "verdict": "STANDS",
+    "field": null,
+    "problem": null,
+    "evidence": "Viewed page-130.png, B.16. The image puts porosity in the denominator; groundwater.F90:1632-1643 produces a multiplying porosity cap. The coefficient disagreement and possible trailing mark remain open.",
+    "fix": null
+  },
+  {
+    "id": "kingsday:xml:96466",
+    "verdict": "STANDS",
+    "field": null,
+    "problem": null,
+    "evidence": "Viewed page-131.png, B.17. groundwater.F90:1632-1643 uses the implicit-root velocity and further surface-water limitation. The record does not falsely equate that denominator with the displayed instantaneous expression.",
+    "fix": null
+  },
+  {
+    "id": "kingsday:xml:96562",
+    "verdict": "STANDS",
+    "field": null,
+    "problem": null,
+    "evidence": "Viewed page-131.png, B.18. groundwater.F90:318-334 confirms the negative exchange, porosity coefficient and gwnonh guard, including the absence of an active not-connected test at this subtraction.",
+    "fix": null
+  },
+  {
+    "id": "kingsday:xml:96665",
+    "verdict": "STANDS",
+    "field": null,
+    "problem": null,
+    "evidence": "Viewed page-131.png, B.19. groundwater.F90:528-530,1134-1265 supports the four branches; Kx use at v interfaces, separate area scaling, wetness and volume limits are correctly distinguished.",
+    "fix": null
+  },
+  {
+    "id": "kingsday:xml:96759",
+    "verdict": "STANDS",
+    "field": null,
+    "problem": null,
+    "evidence": "Viewed page-131.png, B.20. groundwater.F90:333-334,533-539 and flow_timestep.F90:738-745 support opposite exchange signs and porosity scaling, while separate horizontal contributions and half-step correspondence remain unclosed.",
+    "fix": null
+  },
+  {
+    "id": "kingsday:xml:96890",
+    "verdict": "NARROWED",
+    "field": "symbols[Δz_H]; evidence_origin.gaps_left; note",
+    "problem": "Δz_H is explicitly named and defined immediately before B.21; classifying it as undefined_in_document is incorrect.",
+    "evidence": [
+      "_staging/total-read/model-audit/XBeach/connectivity/manuals-docx-read/full-visual-read/kingsday/page-132.png, paragraph immediately above B.21.",
+      "models/XBeach/raw/source_code/trunk/doc/manual/XBeach_manual_kingsday.docx!word/document.xml:2, paragraph XML ordinal 96825: 'The cell height at the center of the groundwater cells (ΔzH,i,j)...'."
+    ],
+    "fix": "Bind Δz_H to paragraph 96825 and narrow the definition-gap statements. Keep the y-neighbor discrepancy and unresolved closure."
+  },
+  {
+    "id": "kingsday:xml:97055",
+    "verdict": "STANDS",
+    "field": null,
+    "problem": null,
+    "evidence": "Viewed page-132.png, B.22. groundwater.F90:349-360,734-758 supports the conditional total-pressure substitution, cosine smoothing and wet mask. These differences are explicit.",
+    "fix": null
+  },
+  {
+    "id": "kingsday:xml:97243",
+    "verdict": "NARROWED",
+    "field": "differences; implementation comparison conditions",
+    "problem": "The Darcy-gradient correspondence stands, but 'nonhydrostatic retention of Kin' leaves the controlling mode ambiguous. In this groundwater comparison, gwnonh and the surface-wave nonhydrostatic mode must be distinguished.",
+    "evidence": [
+      "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/groundwater.F90:373-382 selects hydrostatic versus groundwater pressure-solver head using gwnonh.",
+      "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/groundwater.F90:1311-1321 instead supplies the velocity routine's isnonh from wavemodel; :1429-1433 selects Kin versus Kupd."
+    ],
+    "fix": "State both switches explicitly and qualify the conductivity used in each velocity branch. Retain unresolved closure and the rendered y-index discrepancy."
+  },
+  {
+    "id": "kingsday:xml:97449",
+    "verdict": "REFUTED",
+    "field": "implementation_relation supporting explanation; differences; symbols[Δz_H]",
+    "problem": "The parabolic head expansion is supported, but the assertion that flux calculations use the pressure-solver conductivity estimate is false in general. The velocity and pressure calls receive different conductivity arrays, and Kin retention is controlled by wavemodel. Δz_H also has an overlooked explicit definition.",
+    "evidence": [
+      "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/groundwater.F90:382 versus :397 passes updated arrays to the pressure solver and separate Kx/Ky/Kz arrays to velocities; :409-417 preserves updates then resets the latter arrays.",
+      "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/groundwater.F90:1311-1321 and :1429-1433 establish the wavemodel-dependent conductivity selection.",
+      "models/XBeach/raw/source_code/trunk/doc/manual/XBeach_manual_kingsday.docx!word/document.xml:2, paragraph XML ordinal 96825 defines Δz_H; visible above B.21 in full-visual-read/kingsday/page-132.png."
+    ],
+    "fix": "Correct the conductivity supply and mode conditions, bind Δz_H to paragraph 96825, and preserve unresolved closure for the remaining document discrepancies."
+  },
+  {
+    "id": "kingsday:xml:97636",
+    "verdict": "STANDS",
+    "field": null,
+    "problem": null,
+    "evidence": "Viewed page-133.png, B.25. groundwater.F90:422-466 supports horizontal discharge times face length and inverse area, with upward-positive gww. The record explicitly avoids dimensional equality without those factors.",
+    "fix": null
+  },
+  {
+    "id": "kingsday:xml:97924",
+    "verdict": "STANDS",
+    "field": null,
+    "problem": null,
+    "evidence": "Viewed page-133.png, B.26. groundwater.F90:861-866,907-912,1069-1092 and solver.F90:289-303,474-478 support x=gwcurv and b=-rhs. The reused XH091 judgment is restricted to document-level solver roles.",
+    "fix": null
+  },
+  {
+    "id": "kingsday:xml:98197",
+    "verdict": "STANDS",
+    "field": null,
+    "problem": null,
+    "evidence": "Viewed page-134.png, B.27, separately associated with oleObject147 rather than B.20's oleObject140. The repeated expression is faithfully transcribed; groundwater.F90:484-539 does not establish the claimed post-solver labels, so unresolved is honest.",
+    "fix": null
+  },
+  {
+    "id": "kingsday:xml:98332",
+    "verdict": "NARROWED",
+    "field": "symbols[q^z]; note",
+    "problem": "The statement that q^z lacks an explicit definition overlooks the paragraph following B.25, which names q^z as vertical groundwater discharge. This definition does not resolve the Δx_H divisor or establish equality with gww.",
+    "evidence": [
+      "_staging/total-read/model-audit/XBeach/connectivity/manuals-docx-read/full-visual-read/kingsday/page-133.png, paragraph immediately below B.25.",
+      "models/XBeach/raw/source_code/trunk/doc/manual/XBeach_manual_kingsday.docx!word/document.xml:2, paragraph XML ordinal 97694: 'the variable qz refers to the vertical groundwater discharge'."
+    ],
+    "fix": "Link q^z to paragraph 97694 while keeping its implementation units, Δx_H and the overall mapping unresolved."
+  },
+  {
+    "id": "kingsday:xml:98437",
+    "verdict": "NARROWED",
+    "field": "evidence",
+    "problem": "The stated conversion from depth-integrated cc back to concentration is correct, but the cited update span ends at line 529 and omits the division that establishes it.",
+    "evidence": [
+      "_staging/total-read/model-audit/XBeach/connectivity/r2-20261001/verify/V-04.jsonl:27 cites morphevolution.F90:498-529.",
+      "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/morphevolution.F90:531 divides cc by s%hh."
+    ],
+    "fix": "Extend the source evidence through line 531 so the concentration interpretation is directly supported."
+  },
+  {
+    "id": "kingsday:xml:98587",
+    "verdict": "NARROWED",
+    "field": "evidence",
+    "problem": "The old/new-depth concentration mapping depends on cc/=hh, but the cited update span stops one line before that operation.",
+    "evidence": [
+      "_staging/total-read/model-audit/XBeach/connectivity/r2-20261001/verify/V-04.jsonl:28 cites morphevolution.F90:498-530.",
+      "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/morphevolution.F90:531 supplies the final division by new depth."
+    ],
+    "fix": "Include line 531 in the source evidence; retain the literal h_h transcription and stated implementation differences."
+  },
+  {
+    "id": "kingsday:xml:98685",
+    "verdict": "NARROWED",
+    "field": "evidence",
+    "problem": "The displayed 1/h_new prefactor is supported by the code, but its essential source line is outside the cited span.",
+    "evidence": [
+      "_staging/total-read/model-audit/XBeach/connectivity/r2-20261001/verify/V-04.jsonl:29 cites morphevolution.F90:498-530.",
+      "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/morphevolution.F90:501-504 gives the depth-integrated prefactor; :531 supplies division by h_new."
+    ],
+    "fix": "Extend the source evidence through line 531 to support the complete concentration prefactor."
+  }
+]
+```
+
+Counts: **29 records — 20 STANDS, 7 NARROWED, 2 REFUTED.**
+
+Systematic patterns:
+
+- Conductivity provenance and mode switches were conflated in groundwater implementation explanations.
+- Existing symbol definitions were overlooked.
+- Three sediment citations omit the essential final concentration conversion.
+- All 29 original caption/object associations and image hashes passed. Ten render pages were opened directly; no transcription refutation was established. Reused receipts remained appropriately bounded.
+
+`STANDS` preserves any recorded unresolved status; it does not establish equation correctness.
+
+Reviewed JSONL SHA-256: `494b396d1a28fba5539de48b6e210b9fafce9813d2dd2ec89c9816f5c133f384`. No files changed.
