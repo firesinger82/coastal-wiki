@@ -1,0 +1,256 @@
+Verified all 29 records read-only, including direct image inspection.
+
+Evidence aliases:
+- `R` = `_staging/total-read/model-audit/XBeach/connectivity/r2-20261001/verify2/W-05.jsonl`
+- `IMG` = `_staging/total-read/model-audit/XBeach/connectivity/manuals-docx-read/full-visual-read/kingsday`
+- `SRC` = `models/XBeach/raw/source_code/trunk/src/xbeachlibrary`
+- `DOC` = `models/XBeach/raw/source_code/trunk/doc/manual/XBeach_manual_kingsday.docx!word/document.xml`; `@` denotes paragraph XML ordinal.
+
+```json
+[
+  {
+    "id": "kingsday:xml:96562",
+    "verdict": "STANDS",
+    "field": null,
+    "problem": null,
+    "evidence": ["IMG/page-131.png, B.18; SRC/groundwater.F90:318-334 confirms the sign, porosity factor and disclosed differences in activation conditions."],
+    "fix": null
+  },
+  {
+    "id": "kingsday:xml:96665",
+    "verdict": "NARROWED",
+    "field": "symbols[eps]; evidence_origin.gaps_left; search_scope; note",
+    "problem": "The claim that no explicit eps definition was located is incorrect. The manual defines this exact parameter as the wet-cell depth threshold. This does not resolve the separate discrepancy between printed eta>eps and code wetness.",
+    "evidence": ["R:2", "IMG/page-113.png, A.4; IMG/page-114.png, Table 5.4 eps row", "DOC @85631, @85800 and @85809 explicitly name and define eps.", "SRC/groundwater.F90:1137 and :1207 use wetz."],
+    "fix": "Bind eps to its defining paragraph/table row and remove the missing-definition claim. Preserve the printed eta test, its difference from wetz, and unresolved closure."
+  },
+  {
+    "id": "kingsday:xml:96759",
+    "verdict": "STANDS",
+    "field": null,
+    "problem": null,
+    "evidence": ["IMG/page-131.png, B.20; SRC/groundwater.F90:333-334,533-539; SRC/flow_timestep.F90:738-744. Opposite exchange signs and porosity scaling correspond; aggregate horizontal exchange and time-level gaps remain explicit."],
+    "fix": null
+  },
+  {
+    "id": "kingsday:xml:96890",
+    "verdict": "NARROWED",
+    "field": "symbols[q_gw^x,q_gw^y].definition_quote",
+    "problem": "B.21 itself is faithfully transcribed, and the recovered thickness definitions are valid. However, the reused B.23 defining equations silently add j to the printed interface-thickness subscripts.",
+    "evidence": ["R:4", "IMG/page-132.png, B.23: all four thickness factors print Delta z_{u,i} or Delta z_{v,i}, without j.", "DOC @97215 is the cited B.23 equation paragraph."],
+    "fix": "Correct both reused definition quotes to preserve the omitted j. Distinguish this B.23 notation from the fully indexed B.21 definitions; retain unresolved closure."
+  },
+  {
+    "id": "kingsday:xml:97055",
+    "verdict": "STANDS",
+    "field": null,
+    "problem": null,
+    "evidence": ["IMG/page-132.png, B.22; SRC/groundwater.F90:299-302,349-360,734-758. Conditional total-pressure substitution, cosine smoothing, wetness masking and pressure averaging are disclosed."],
+    "fix": null
+  },
+  {
+    "id": "kingsday:xml:97243",
+    "verdict": "REFUTED",
+    "field": "equation_content.transcription; symbols[q_gw^x,q_gw^y].definition_quote; reviewer_note",
+    "problem": "The transcription adds a j index to every interface-thickness factor. B.23 prints Delta z_{u,i} twice and Delta z_{v,i} twice. Its K and spacing factors retain i,j, making the omission distinguishable. The corrected conductivity argument-flow explanation is supported.",
+    "evidence": ["R:6", "IMG/page-132.png, B.23, directly inspected and enlarged", "SRC/groundwater.F90:382,397,1285-1287,1303-1321,1429-1433 supports the revised Kx/Kxupd and wavemodel explanation."],
+    "fix": "Remove the four invented j indices from the transcription and both defining-equation quotes. Record the printed omission separately from the already preserved y-neighbor discrepancy. Keep unresolved closure."
+  },
+  {
+    "id": "kingsday:xml:97449",
+    "verdict": "REFUTED",
+    "field": "equation_content.transcription; symbols[q_gw^x,q_gw^y].definition_quote; reviewer_note",
+    "problem": "B.24 likewise prints Delta z_{u,i} and Delta z_{v,i}, each twice, without j. The transcription supplies j in all four places. Its reused B.23 definition quotes repeat the same error. The parabolic-head and conductivity corrections otherwise withstand comparison.",
+    "evidence": ["R:7", "IMG/page-133.png, B.24, directly inspected and enlarged", "IMG/page-132.png, B.23", "SRC/groundwater.F90:907-915,1285-1287,1303-1321,1429-1433"],
+    "fix": "Preserve the omitted j in B.24 and the reused B.23 quotes. Retain the printed i+1,j y-gradient, the corrected conductivity conditions, and unresolved closure."
+  },
+  {
+    "id": "kingsday:xml:97636",
+    "verdict": "NARROWED",
+    "field": "symbols[q_gw^x,q_gw^y].definition_quote",
+    "problem": "The B.25 continuity transcription and geometric qualification stand, but its reused B.23 definition quotes add the unprinted j to interface thicknesses.",
+    "evidence": ["R:8", "IMG/page-132.png, B.23; DOC @97215", "IMG/page-133.png, B.25; SRC/groundwater.F90:422-466 supports the qualified finite-volume balance."],
+    "fix": "Correct the reused B.23 quotes to Delta z_{u,i} and Delta z_{v,i}. Preserve the face-length/area qualification and distinguish it from the separate conductivity-coupling limitation."
+  },
+  {
+    "id": "kingsday:xml:97924",
+    "verdict": "STANDS",
+    "field": null,
+    "problem": null,
+    "evidence": ["IMG/page-133.png, B.26; DOC @97981; SRC/groundwater.F90:861-866,907-912,1069-1092; SRC/solver.F90:289-303,474-478. x=gwcurv and b=-rhs hold. XH091 reuse is limited to documentary solver roles; resolved closure explicitly excludes downstream coupling."],
+    "fix": null
+  },
+  {
+    "id": "kingsday:xml:98197",
+    "verdict": "STANDS",
+    "field": null,
+    "problem": null,
+    "evidence": ["IMG/page-134.png, B.27; its oleObject147 association is distinct from B.20's oleObject140. SRC/groundwater.F90:484-539 supports retaining the unresolved post-solver interpretation."],
+    "fix": null
+  },
+  {
+    "id": "kingsday:xml:98332",
+    "verdict": "STANDS",
+    "field": null,
+    "problem": null,
+    "evidence": ["IMG/page-134.png, B.28 preserves repeated n+1 and the Delta x_H divisor. IMG/page-129.png, B.12 defines kappa; DOC @97694 defines vertical discharge. SRC/groundwater.F90:497-504,533-539 does not resolve the remaining normalization/sign bridge."],
+    "fix": null
+  },
+  {
+    "id": "kingsday:xml:98437",
+    "verdict": "STANDS",
+    "field": null,
+    "problem": null,
+    "evidence": ["IMG/page-134.png, B.29; IMG/page-135.png, B.36; SRC/morphevolution.F90:498-531,1508-1513. Corrected evidence now includes the final depth division; erosion supply and clipping differences remain stated."],
+    "fix": null
+  },
+  {
+    "id": "kingsday:xml:98587",
+    "verdict": "STANDS",
+    "field": null,
+    "problem": null,
+    "evidence": ["IMG/page-134.png, B.30; SRC/morphevolution.F90:498-531. Printed h_h and individual time levels are retained; the added line 531 supports the old/new-depth concentration comparison."],
+    "fix": null
+  },
+  {
+    "id": "kingsday:xml:98685",
+    "verdict": "STANDS",
+    "field": null,
+    "problem": null,
+    "evidence": ["IMG/page-134.png, B.31, including enlarged inspection; SRC/morphevolution.F90:501-531; SRC/flow_timestep.F90:938-940. The complete concentration prefactor and literal subscripts are supported."],
+    "fix": null
+  },
+  {
+    "id": "kingsday:xml:98779",
+    "verdict": "STANDS",
+    "field": null,
+    "problem": null,
+    "evidence": ["IMG/page-134.png, B.32; DOC @92870; SRC/morphevolution.F90:501-504,519-521; SRC/spaceparams.F90:1387-1398. Face indices, signs and geometric factors correspond."],
+    "fix": null
+  },
+  {
+    "id": "kingsday:xml:98889",
+    "verdict": "STANDS",
+    "field": null,
+    "problem": null,
+    "evidence": ["IMG/page-135.png, B.33; DOC @98943; SRC/morphevolution.F90:237-242,277,383-407. Three terms, negative slope contribution, masks and slope-option restrictions are correctly qualified."],
+    "fix": null
+  },
+  {
+    "id": "kingsday:xml:99052",
+    "verdict": "STANDS",
+    "field": null,
+    "problem": null,
+    "evidence": ["IMG/page-135.png, B.34, enlarged inspection confirms repeated rep,srep,s, C_c, uppercase Z_b and unmatched parenthesis. SRC/morphevolution.F90:247-277,393-407 supports the bounded comparison; notation gaps remain unresolved."],
+    "fix": null
+  },
+  {
+    "id": "kingsday:xml:99182",
+    "verdict": "STANDS",
+    "field": null,
+    "problem": null,
+    "evidence": ["IMG/page-135.png, B.35 and preceding theta definition; SRC/morphevolution.F90:247-262. Positive/negative weighting, zero-velocity addition and boundary substitutions are accurately distinguished."],
+    "fix": null
+  },
+  {
+    "id": "kingsday:xml:99276",
+    "verdict": "STANDS",
+    "field": null,
+    "problem": null,
+    "evidence": ["IMG/page-135.png, B.36; SRC/morphevolution.F90:498-531,1508-1513. ERO/DEPO definitions, printed time levels, current-depth erosion and clipped implicit deposition are correctly recorded."],
+    "fix": null
+  },
+  {
+    "id": "kingsday:xml:99457",
+    "verdict": "STANDS",
+    "field": null,
+    "problem": null,
+    "evidence": ["IMG/page-135.png, B.37; DOC @99513; SRC/morphevolution.F90:640,736-788. XB-EQ-BED receipt was checked: its scope supports the branches and erosion sign without resolving terminal a."],
+    "fix": null
+  },
+  {
+    "id": "kingsday:xml:99617",
+    "verdict": "STANDS",
+    "field": null,
+    "problem": null,
+    "evidence": ["IMG/page-136.png, B.38; SRC/morphevolution.F90:736-768,781-796. The positive printed increment versus upward bed-elevation sign remains honestly unresolved."],
+    "fix": null
+  },
+  {
+    "id": "kingsday:xml:99865",
+    "verdict": "STANDS",
+    "field": null,
+    "problem": null,
+    "evidence": ["IMG/page-136.png, B.39; DOC @99746,@99919; SRC/morphevolution.F90:1248,1291-1296,1323. Definition role, density spelling variation and code volume-equivalent normalization are explicitly distinguished."],
+    "fix": null
+  },
+  {
+    "id": "kingsday:xml:100080",
+    "verdict": "STANDS",
+    "field": null,
+    "problem": null,
+    "evidence": ["IMG/page-137.png, B.40; DOC @99989,@100134; SRC/morphevolution.F90:1232-1285. Missing continuation operators and incompatible A normalization are preserved rather than silently repaired."],
+    "fix": null
+  },
+  {
+    "id": "kingsday:xml:100267",
+    "verdict": "STANDS",
+    "field": null,
+    "problem": null,
+    "evidence": ["IMG/page-137.png, B.41 confirms lowercase p_bot/p_ceil; DOC @99746,@100134 supplies their definitions. SRC/morphevolution.F90:1255-1285 leaves the stated sign and normalization questions unresolved."],
+    "fix": null
+  },
+  {
+    "id": "kingsday:xml:100371",
+    "verdict": "STANDS",
+    "field": null,
+    "problem": null,
+    "evidence": ["IMG/page-137.png, B.42; SRC/morphevolution.F90:1264-1324. Missing area factor and unresolved A sign/normalization are accurately retained."],
+    "fix": null
+  },
+  {
+    "id": "kingsday:xml:100627",
+    "verdict": "NARROWED",
+    "field": "symbols[j]; document conditions; evidence",
+    "problem": "The symbol linkage gives only the generic sediment-class definition. It omits the explicit local instruction that the transport and erosion rates in this bound use the smallest fraction, j=1. This condition explains the second line's class argument 1.",
+    "evidence": ["R:26", "IMG/page-138.png, paragraph immediately below B.43", "DOC @100685 explicitly states 'the smallest fraction: j=1'. The record's defining-text evidence omits this paragraph."],
+    "fix": "Link the local j=1 condition to paragraph 100685 and distinguish class 1 from top-layer index 1 in M(1,j). Keep the literal dy denominator and unresolved implementation relation."
+  },
+  {
+    "id": "kingsday:xml:100903",
+    "verdict": "STANDS",
+    "field": null,
+    "problem": null,
+    "evidence": ["IMG/page-139.png, B.44 prints x under both flux derivatives; SRC/flow_timestep.F90:738-744 uses distinct directional flux differences. Unresolved disposition is justified."],
+    "fix": null
+  },
+  {
+    "id": "kingsday:xml:101078",
+    "verdict": "STANDS",
+    "field": null,
+    "problem": null,
+    "evidence": ["IMG/page-139.png, B.45 and inline discharge definitions; DOC @101135; SRC/flow_timestep.F90:654-758. Signs and face fluxes correspond; time-level, source-term and geometry qualifications remain explicit."],
+    "fix": null
+  },
+  {
+    "id": "kingsday:xml:101213",
+    "verdict": "NARROWED",
+    "field": "symbols[ζ,d].context_basis.prior_context",
+    "problem": "The correction properly withdraws the unsupported report bridge in note and claims_resolved and restores unresolved closure. Both symbol context objects nevertheless retain the affirmative claim that report (2.3)-(2.5) supports the occurrence-specific bridge. This is the same unsupported claim the correction says it removed.",
+    "evidence": ["R:29, symbols[ζ,d].context_basis.prior_context versus note and evidence_origin.claims_resolved", "IMG/page-139.png, B.46; SRC/flow_timestep.F90:664-677 establishes the code branches but supplies no report locator or Kingsday notation identity.", "_staging/total-read/model-audit/XBeach/connectivity/r2-20261001/correct2/R2-04.changes.jsonl records withdrawal of that unsupported bridge."],
+    "fix": "Remove the affirmative report-bridge claim from both context objects, or explicitly identify it as a rejected historical assertion. Retain unresolved closure and the faithful ζ and d_i transcription."
+  }
+]
+```
+
+Counts: **22 STANDS, 5 NARROWED, 2 REFUTED**.
+
+Systematic patterns:
+
+- Printed omissions were normalized: B.23/B.24 gained eight unprinted `j` indices; faulty B.23 quotes propagated into four records.
+- Definition searches missed explicit text (`eps`, smallest-fraction `j=1`).
+- Corrections were not fully propagated across fields: B.46 retains its withdrawn bridge.
+- Associations, object/preview/image hashes and quoted source spans matched. Kx/Kxupd corrections and the bounded reused receipts withstand scrutiny.
+- W-05 contains no nonhydrostatic bottom-slope equation; that separate sign correction receives no verdict here.
+
+Verified JSONL SHA-256: `0f911fe83c8611fc9f98c7b85fc7345d2a64a602ad35fe6b0539b7cbafb71bf4`.
