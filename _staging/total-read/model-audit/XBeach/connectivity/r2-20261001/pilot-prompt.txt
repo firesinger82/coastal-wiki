@@ -1,0 +1,15 @@
+OBJECTIVE: Disposition XBeach R2 equation-caption locations. Read FIRST: _staging/total-read/model-audit/XBeach/connectivity/r2-20261001/PLAN.md (schema §1 binding; scope limits) and CLAUDE.md "모델 분석 범위 통제". No MathType/Native decoding, no font/render investigation, no guessing author intent — if existing images/receipts cannot explain it, use unresolved.
+INPUT IDS: _staging/total-read/model-audit/XBeach/connectivity/r2-20261001/pilot-ids.txt. For each id, start from its packet r2-20261001/packets/<id with ':' -> '_'>.json (find by caption.id) — it gives the associated objects, render page images, context text and candidate existing judgments.
+VISUAL READING: open the packet's render page image(s) (association.render.page_images[].path) with your image viewing tool and read the equation at this caption. Record exactly which image(s) you used (path + sha256 — compute with sha256sum) and your transcription; list uncertain symbols. Do not claim a reading from an image you did not open.
+CODE: for implementation_relation, search the model source models/XBeach/raw/source_code/trunk/src/** (read-only) and cite file:line with verbatim quote (role "source_code"). Reuse existing judgments only for what they actually resolve (claims_resolved / gaps_left). Existing contract files: build-mode-20260912/contracts.json, models/XBeach/manual-notes/*.md, nonhydro-read/*/receipt.json, ../closure/document-inventory/document-canonical-mapping.json.
+OUTPUT one JSON object per line:
+{"id", "association": {"status", "objects":[{"member"}], "page"}, "body_status", "equation_content": {"images_used":[{"path","region","sha256"}], "transcription", "uncertain_symbols":[], "reviewer_note"} | null,
+ "document_role", "implementation_relation", "search_scope" (required if document_only: what was searched),
+ "evidence_origin":[{"origin": existing_contract|existing_judgment|new_comparison, "ref", "claims_resolved", "gaps_left"}],
+ "document_differences":[{"other_locator","difference"}], "symbols":[{"symbol","definition_locator","definition_quote","meaning"}],
+ "evidence":[{"role": source_code|document_text|receipt|contract, "path", "line_start", "line_end", "quote", "sha256"}],
+ "closure_status", "note"}
+Values per PLAN §1. association.status must equal the packet's unless you justify a change in note. readable requires images_used + transcription. absent_at_caption → equation_content null.
+WRITE ONLY _staging/total-read/model-audit/XBeach/connectivity/r2-20261001/pilot.jsonl (JSONL, one object per id, same order). No other writes, no commits.
+SELF-CHECK: python3 _staging/total-read/model-audit/XBeach/connectivity/r2-20261001/check_r2.py _staging/total-read/model-audit/XBeach/connectivity/r2-20261001/pilot.jsonl --expect-ids _staging/total-read/model-audit/XBeach/connectivity/r2-20261001/pilot-ids.txt until errors=0.
+DELIVERABLE: final message: checker line; counts by body_status, implementation_relation, closure_status; whether you could actually view the images (state the tool you used); systematic difficulties.
