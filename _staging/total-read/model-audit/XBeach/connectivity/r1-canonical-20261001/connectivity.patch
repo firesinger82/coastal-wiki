@@ -1,0 +1,20 @@
+--- a/models/XBeach/source-analysis/xbeach-build-mode-connectivity.md
++++ b/models/XBeach/source-analysis/xbeach-build-mode-connectivity.md
+@@ -55,3 +55,17 @@
+ stationary 또는 `single_dir`의 MPI 입력에서는 `swave==1`, 전역 `par%ny>0`일 때 자동 분할이 `MPIBOUNDARY_X`로 설정되며, 작은 `ny`는 종료된다. `MPIBOUNDARY_MAN`은 이 자동 분기의 명시적 예외다. NONH의 2DV/3D dispatcher는 별도로 **로컬 `s%ny`**를 검사한다. (`params.F90:1884-1910`; `nonh.F90:209-230`)
+ 
+ 이 문서는 저장된 빌드 선언·전체 `src` 파일 역할과 위 여섯 dispatcher 경로를 연결한다. 경계 종류·표사 공식·선택 기능까지 포함한 모든 루틴의 실행 도달성이나 전체 모델 검증 완료를 뜻하지 않는다.
++
++## 호출 연결 판정 — R1 (2026-10-01)
++
++동결된 호출 후보 3,228건(호출문 2,242 + 함수·generic 참조 986, 호출자 51파일)을 결속 대상과 적용 조건(빌드 계열·CPP·실행 조건)으로 나눠 판정했다. 결과는 직접 결속 1,802 · generic 결속 1,054 · 외부 인터페이스 279 · 미해결 56 · 내장 33 · 포인터 호출 2 · 호출 아님 2다. 판정 기준과 근거는 [R1-G1 결과](../../../_staging/total-read/model-audit/XBeach/connectivity/g1-20260930/RESULT.md)에 있다. 개수는 인벤토리이며 결함 수가 아니다. 이 집합은 동결 후보이고 전체 호출 그래프의 완전성을 뜻하지 않는다.
++
++- **생성 generic `writelog`**: 호출 524건은 생성 `writelog.inc`의 specific(`writelog_a`, `writelog_aaa` 등)으로 결속된다. 실인자 타입으로 고른다 — 예를 들어 `waveparams.F90:246,459,802`의 4번째 실인자 `fname`은 `character(len=*)`이므로 `writelog_aaa`이며 실수 인자를 받는 `writelog_afa`가 아니다.
++- **kind 전제(A-K1)**: 모든 빌드 구성(Autotools, vfproj 8개)에 kind 변경 옵션이 없다. `DOUBLE PRECISION`=`REAL*8`, 기본 `INTEGER`=`INTEGER*4`, `c_char`=기본 문자 kind 는 이 모델의 컴파일러(ifort/ifx/gfortran) 기본값에 기댄 전제이며, kind 변경 옵션을 추가한 빌드에는 적용되지 않는다.
++- **MPI 호출의 적용 조건**: MPI 는 빌드 옵션(`USEMPI`)이라 빌드 집합 전체로는 미정이다. IFX 실행 파일은 MPI 구성에서 `impi.lib`를 링크한다. (`src/xbeach/xbeach_IFX.vfproj:32,43,76,87`)
++- **표준 위반 후보**: `wave_stationary_directions.F90:668,671`의 `writelog` 인자 `min(Herr,0.99)`는 `REAL*8` 식과 기본 실수 리터럴을 섞는다. 표준 `MIN`은 같은 kind 인자를 요구하므로 컴파일러 확장에 기댄다.
++- **죽은 코드**: `debugging.F90`(`:2` `#if 0`)과 `varoutput.F90`(`:6` `#if 0`) 안의 호출 `indextos`·`printsum`·`makeaveragenames`는 결속되지 않으며 어느 빌드에도 들어가지 않는다.
++- **동결 후보 밖 호출**: `linear_interp_2d`는 빌드 목록에 없는 `wave_boundary_update.f90:1308`의 `interpolate_spectrum`에서 호출된다(소스상 연결, 빌드 도달 미확정). `xmpi_getrow`(`xmpi.F90:1619`)는 테스트 `test/testgenmodule.F90:306`에서만 호출된다.
++- **배열 getter 계약**: `introspection.F90`의 양의 rank getter는 모델 메모리 주소가 아니라 `save` 속성 복사 버퍼의 주소를 돌려준다. 같은 getter를 다시 호출하면 버퍼를 재할당하므로 이전 주소는 무효가 된다. (`introspection.F90:574-600` `get1ddoublearray_c`: `allocate(r1(...))`, `r1(:) = array%r1(:)`, `x = c_loc(r1)`)
++
++미해결 56건은 컴파일러 확장(`flush` 17, 슬립·시스템 함수 6), 외부 상수 kind 미확인(MPI reduce 계열 14), MPE 로깅 라이브러리(14), 위의 죽은 코드 3과 표준 위반 후보 2다. 모델 내부에서 결속이 빠진 연결은 확인되지 않았다. 판정은 AI(Codex gpt-6.1-sol)가 하고 같은 모델이 적대 검증했으며, 결속 대상 반증 3건은 원문 대조로 정정했다. 사람 승인은 발급되지 않았다.
