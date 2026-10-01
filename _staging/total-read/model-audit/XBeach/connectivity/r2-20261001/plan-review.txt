@@ -1,0 +1,39 @@
+**현 계획은 실행 전 수정이 필요합니다.** 20개 캡션을 구조적으로 대조했고 주요 페이지 이미지도 확인했습니다. 파일 수정·R2 실행은 하지 않았습니다.
+
+표본 ID는 다음과 같습니다. 각 행의 숫자에 해당 접두사를 붙이면 전체 ID입니다.
+
+| 접두사 | 확인한 locator |
+|---|---|
+| `kingsday:xml:` | 11291, 12167, 17124, 18997, 19400, 19490, 99457 |
+| `master:xml:` | 10302, 11195, 18476, 19087, 33272, 33803, 33982, 93855 |
+| `nonhydro:word:` | 36614, 50607, 80632, 137756, 180603 |
+
+1. **Blocker — “직전 수식 객체”는 실제로 오결속한다.** `kingsday:xml:17124`(2.27)는 수식 객체가 없는 문단인데, 직전 객체를 고르면 다른 문단의 `oleObject30.bin`이 붙는다. `19400`(2.41)·`19490`(2.42)도 동일하게 `oleObject43.bin`으로 잘못 연결된다. **변경:** [§2.1](/home/firesinger/coastal-wiki/_staging/total-read/model-audit/XBeach/connectivity/r2-20261001/PLAN.md:23)을 문단·표 셀 구조에 기반한 **0..N 객체 연결**로 바꾸고, 부재·복수 후보·불확실 상태를 허용한다. 빈 문단을 만나 이전 객체로 후퇴하면 안 된다.
+
+2. **Blocker — 전체 연결을 “결정적”이라고 부르기 위한 매핑 규칙이 없다.** Master의 세 `(2.110)`은 각각 `33272→oleObject124→p.44`, `33803→125→p.45`, `33982→126→p.46`이다. 번호 검색은 세 페이지를 모두 반환한다. 비정수압 `80632`·`137756`의 `(2.9)`는 **필드 SHA까지 같지만**, 각각 `oleObject174/p.23`과 `oleObject332/p.41`이다. 기존 파일로 연결할 수는 있으나, JSON 영수증만으로 자동 연결되지는 않는다. **변경:** 원본 XML ordinal→문단→relationship, DOC byte offset→166개 outer-field 순서→변환 문단, 문맥→물리 페이지의 어댑터와 검증 조건을 명시한다. 실제 대조에서 outer-field 166개와 변환본 command 순서는 일치했다. 페이지 연결이 모호하면 후보로 남기고 검증 전 확정하지 않는다.
+
+3. **Major — “같은 페이지 inline 기호”는 필요한 문맥을 놓친다.** `master:xml:33272`의 식은 p.44에 있지만 공극률·`morfac`·수송량 설명은 p.45에 있다. 같은 페이지의 모든 객체를 모으면 관련 없는 앞선 식의 기호도 들어간다. **변경:** 페이지가 아니라 해당 식의 정의·참조 문단을 연결하고, 페이지를 넘는 관계를 허용한다. 기호별 원본 locator, 정의 인용, 연결 대상 식을 검사한다.
+
+4. **Major — 현재 범주는 중첩되며 재사용이 의미 설명을 대체할 수 있다.** `kingsday:xml:12167`은 기존 계약 재사용이면서 코드 대응과 구현 차이도 있다. 반대로 `nonhydro:word:36614`의 [기호 영수증](/home/firesinger/coastal-wiki/_staging/total-read/model-audit/XBeach/connectivity/nonhydro-read/stress-tensor-symbol/receipt.json)은 𝕋의 의미만 확인하며 식 전체의 구현 관계를 해결하지 않는다. `137756`은 전개 매개변수의 정의·가정이라 “소스에 없음”을 입증할 대상도 아니다. **변경:** 재사용 방식과 의미 판정을 별도 필드로 분리하고, 재사용 근거가 해결하는 주장과 남기는 공백을 기록한다. 문서–코드 차이에 “두 판본 위치”를 요구하는 조건도 수정한다.
+
+5. **Major — 이미지 존재·해시는 판독 근거의 충분성을 검사하지 못한다.** `master:xml:18476`(2.40)은 본문 렌더가 비어 있지만 별도 preview에서는 식이 보인다. `kingsday:xml:18997`(2.38)은 객체가 존재하지만 별도 preview도 비어 있다. 이 둘은 원본 본체 부재와 다르다. [기존 영수증](/home/firesinger/coastal-wiki/_staging/total-read/model-audit/XBeach/connectivity/manuals-docx-read/full-visual-read/receipt.json)도 그 차이를 보존한다. **변경:** 판독에 실제 제공한 이미지·영역·해시, 전사/관측, 불확실 기호, 검토 결과를 결속한다. 시각적 관측은 원문 `quote`와 분리하고, 본체 부재에는 `equation_content=null`을 허용한다. 전체 페이지 판독 이력만으로 개별 식 판독을 통과시키지 않는다.
+
+6. **Major — 층화 20%는 현재 정의로는 부적절하다.** 층·반올림·표본 목록·합격 기준이 없고, 판정자가 `reuse_*`로 분류하면 검토 강도가 낮아진다. 특히 `kingsday:xml:17124`의 잘못된 객체 연결이나 `nonhydro:word:137756`의 기호 판정을 전체 식 판정으로 확대하는 오류가 빠질 수 있다. **변경:** locator 연결과 재사용 근거의 주장 범위는 전건 확인한다. 원본 부재, 반복 번호, 빈 렌더, 제한적 기호 영수증은 전건 의미 검토하고, 나머지 저위험 재사용만 고정된 층별 20%로 제한한다. 오류 발견 시 확대할 모집단과 재검증 종료 기준도 고정한다.
+
+7. **Major — 미판독 객체가 범위 확장을 유발할 탈출구가 남아 있다.** `kingsday:xml:18997`은 “모든 레코드에 판독 내용”을 요구하면 Native 해독이나 렌더·폰트 조사로 이어지기 쉽다. **변경:** 기존 이미지·영수증으로 의미를 설명할 수 없으면 `unresolved`로 종료한다는 규칙을 추가한다. 새 Native decoder·폰트 조사·전체 재렌더를 파일럿 실패의 해결책으로 삼지 않는다. 또한 [§4의 `models/` 반영](/home/firesinger/coastal-wiki/_staging/total-read/model-audit/XBeach/connectivity/r2-20261001/PLAN.md:37)은 Codex의 diff/script 제출과 Claude의 적용 단계로 분리해야 root 잠금 계약과 일치한다.
+
+8. **Major — 기록 완료와 R2 종결의 기준이 충돌한다.** `kingsday:xml:18997`이 미해결로 남아도 검사 통과·사용자 수용으로 “종결”할 수 있다는 문장과, 설명하지 못한 관계가 있으면 미완이라는 동결 조건이 함께 있다. **변경:** [§4](/home/firesinger/coastal-wiki/_staging/total-read/model-audit/XBeach/connectivity/r2-20261001/PLAN.md:34)에 `기록 완료`, `의미·구현 공백`, `사용자 결정`을 별도 상태로 둔다. 수용만으로 기존 완료 조건을 충족했다고 기록하지 않는다. R1 §5는 정확한 파일·버전을 연결하고 R2 적용 중단 조건을 명시하며, 최종 검토를 최종 JSONL 해시에 결속한다.
+
+수정 범주는 단일 `disposition` 대신 다음 독립 축이 적합합니다.
+
+| 축 | 값 | 판정 규칙 |
+|---|---|---|
+| `evidence_origin[]` | `existing_contract`, `existing_judgment`, `new_comparison` | 복수 허용. 근거 조달 방식이며 완료 판정이 아님 |
+| `body_status` | `readable`, `absent_at_caption`, `present_unreadable`, `association_unresolved` | 위치별 하나. 빈 렌더를 원본 부재로 처리하지 않음 |
+| `document_role` | `model_relation`, `definition_or_assumption`, `derivation_or_validation`, `unknown` | 본체가 있을 때 적용. 정의식에 불필요한 코드 부재 증명을 요구하지 않음 |
+| `implementation_relation` | `mapped`, `mapped_with_differences`, `document_only`, `not_applicable`, `unresolved` | 하나 선택. `document_only`는 근거 있는 범위 판단, 검색 실패는 `unresolved` |
+| `document_differences[]` | 다른 판본·표현과의 차이 및 양쪽 locator | 선택적 복수 관계. 구현 대응과 공존 가능 |
+| `closure_status` | `resolved`, `documented_limit`, `unresolved` | 설명되지 않은 모델 의미·구현 관계가 있으면 반드시 `unresolved` |
+
+Codex session ID: 01a0f513-6693-7153-8639-0f7b00fb7f3f
+Resume in Codex: codex resume 01a0f513-6693-7153-8639-0f7b00fb7f3f
