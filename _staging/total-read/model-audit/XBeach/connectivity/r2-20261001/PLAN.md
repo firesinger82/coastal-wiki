@@ -30,7 +30,7 @@ v1 → v2: Codex 적대 검토([plan-review.txt](plan-review.txt), blocker 2·ma
    - 산출 `packets/<id>.json` + `association-check.json`.
 2. **파일럿 30곳** (세 문서·계약 유무·반복 번호·빈 렌더·본체 부재·기호 영수증 사례 포함, seed 고정) — Codex 가 이미지를 실제로 열어 판독했는지(롤아웃 근거)·품질·토큰 측정.
 3. **본 판정**: Codex `gpt-6.1-sol` 배치 순차, 매 배치 `check_r2.py`.
-4. **적대 검증** (`gpt-6.1-sol` max):
+4. **적대 검증** (`gpt-6-astra` — 판정 모델과 다른 계열. 2026-10-01 하네스 검토: R1-G1 은 판정·검증이 같은 모델이라 맹점 공유를 배제 못 함):
    - **전건**: `association`(locator 연결) · 재사용 근거의 `claims_resolved` 범위 · `body_status≠readable` · 반복 번호 · `implementation_relation∈{mapped_with_differences, document_only, unresolved}` · `document_differences` 있음 · 기호 영수증을 쓴 레코드.
    - **층별 20%**(층 = 문서 × implementation_relation, 올림, seed·표본 ID 파일 고정): 나머지 `mapped`·`not_applicable`.
    - REFUTED·NARROWED 전건 정정·재검증. 한 층 표본 REFUTED > 5% 면 그 층 전건 확대. 같은 규칙 오류는 전체 스윕. 멈춤 규칙은 [R1 PLAN §5](../g1-20260930/PLAN.md#5-공통-전제와-멈춤-규칙-2026-10-01-사용자-승인) 와 같다. 최종 검증 결과는 최종 JSONL sha256 에 결속.
