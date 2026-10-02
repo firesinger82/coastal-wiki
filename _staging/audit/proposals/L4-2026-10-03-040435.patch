@@ -1,0 +1,46 @@
+diff --git a/models/ADCIRC/source-analysis/adcirc-swan-coupling.md b/models/ADCIRC/source-analysis/adcirc-swan-coupling.md
+--- a/models/ADCIRC/source-analysis/adcirc-swan-coupling.md
++++ b/models/ADCIRC/source-analysis/adcirc-swan-coupling.md
+@@ -3,7 +3,7 @@
+ topic: general
+ canonical_source: self
+ citation_status: verified
+-has_source_needed: false
++has_source_needed: true
+ verification_method: "ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-swan-coupling.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시. **SWAN Temporal Controls (PR #498) 절 추가 (2026-05-28)**: GitHub API `gh pr view 498 -R adcirc/adcirc` + `gh pr diff 498` 직접 fetch — PR body verbatim 인용 (SWANTimeControl namelist + RunStartDateTime + fort.26 COMPUTE 카드) + presizes.F / prep.F / couple2swan.F diff hunk 직접 인용 (SwanTimeStep offset 계산 + [1, SWAN_MTC] range gate + sentinel/radiation-stress fallback)."
+ note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23 + SWAN Temporal Controls 절 2026-05-28"
+ note_date: 2026-04~05 (original) / 2026-05-23 (promote) / 2026-05-28 (PR #498 절)
+@@ -157,11 +157,11 @@
+ ## Working Rules
+ 
+ - Use `padcswan` binary; verify with `padcswan --help` or check link map for `swan` symbols.
+-- `SWAN_DT` typically 60-1800 s; ADCIRC `DT` 0.5-5 s. Ratio 100-300 is normal.
++- `SWAN_DT` typically 60-1800 s; ADCIRC `DT` 0.5-5 s. Ratio 100-300 is normal. ⚠ source-needed(관행 수치 — 공식 문서·논문 미인용).
+ - Set ADCIRC `OutputControl` and SWAN `BLOCK` outputs at compatible intervals for diagnostic plots.
+ - In log, look for "WAVES WILL BE COUPLED TO SWAN" confirming `NRS=3` parsed.
+ - `COUPWIND` flag in `couple2swan.F`: if true, ADCIRC met goes to SWAN; if false, SWAN reads its own wind file (rarely used).
+-- For ADCIRC v55+, NetCDF hot-start is preferred; for older versions, fort.67/68 binary is more stable.
++- For ADCIRC v55+, NetCDF hot-start is preferred; for older versions, fort.67/68 binary is more stable. ⚠ source-needed(버전별 안정성 주장 — 출처 미인용).
+ - SWAN spectral hot-start (`HOTSTART` in SWAN input) is separate from ADCIRC hot-start; both must align on time.
+ 
+ ## Common Pitfalls
+diff --git a/models/ADCIRC/source-analysis/storm-surge/adcirc-storm-surge.md b/models/ADCIRC/source-analysis/storm-surge/adcirc-storm-surge.md
+--- a/models/ADCIRC/source-analysis/storm-surge/adcirc-storm-surge.md
++++ b/models/ADCIRC/source-analysis/storm-surge/adcirc-storm-surge.md
+@@ -199,14 +199,14 @@
+ - For NWS=30 hybrid: ensure OWI domain extends well outside vortex radius; otherwise blend produces wind-shadow artifacts.
+ - Output `fort.73, fort.74` (global pressure/wind) at validation stations to verify forcing.
+ - `RampMete` ramp ~1-2 days for met spin-up; without it, initial winds shock the cold-start.
+-- For Korean typhoons, KMA Best Track in JAS basin (no `AL` prefix) — convert to ATCF format with `WP` basin code for ASWIP.
++- For Korean typhoons, KMA Best Track in JAS basin (no `AL` prefix) — convert to ATCF format with `WP` basin code for ASWIP. ⚠ source-needed(KMA 포맷·basin 코드 관행 — KMA/ATCF 문서 미인용).
+ 
+ ## Common Pitfalls
+ 
+ - ▢ Using raw ATCF with NWS=20 (no ASWIP preprocessing) — quadrant `Rmax`/`B` missing; vortex degenerate.
+ - ▢ NWS=30 with OWI domain too small — wind shadow at OWI boundary.
+ - ▢ Mixing forward-speed-corrected and uncorrected ATCF — duplicate motion subtraction.
+-- ▢ Setting `BLAdj=1.0` thinking it's no adjustment — actually 100% reduction (typical 0.85-0.9 for boundary-layer wind to 10-m wind).
++- ▢ Setting `BLAdj=1.0` thinking it's no adjustment — actually 100% reduction (typical 0.85-0.9 for boundary-layer wind to 10-m wind). ⚠ source-needed(BLAdj 의미·전형값 — 코드/문서 미인용, '1.0=100% reduction' 서술은 통상 이해와 상충 — 내용 재검증 필요).
+ - ▢ Cold-start with strong storm and `DRAMP=0` — initial-condition shock.
+ - ▢ NWS=29/30 with NWS=13 expecting NetCDF blend — only NWS=12 OWI ASCII supported.
+ - ▢ Inverse barometer with gauge data already IB-corrected — double-count; use `NOIVB`.

@@ -1,0 +1,208 @@
+{
+ "date": "2026-10-03",
+ "audit_run_id": "L4-2026-10-03-n8",
+ "value_check_sampling": {
+  "seed": "L4-2026-10-03-n8",
+  "population_note": "접근 가능(로컬 raw 소스 존재) 수치·라인 sourced 단언 중 3건 — transport-solver(복합 4값)·nodal-attributes(Manning 식)·storm-surge(PRBCKGRND). source_unavailable 0건.",
+  "n": 3
+ },
+ "findings": [
+  {
+   "path": "models/ADCIRC/source-analysis/adcirc-nodal-attributes.md",
+   "blob_sha": "1a9bd2f386c704741c6de37e7dd6cee11e63fb24",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 28,
+   "opinion": 2,
+   "has_source_needed": false,
+   "unsourced": [],
+   "value_checks": [
+    {
+     "claim_id": "388b5bb071fc5e86",
+     "line": 56,
+     "text": "Manning→Cd 변환식 g·n²/H^(1/3) + BFCdLLimit 하한 (nodalattr.F:2316-2365)",
+     "result": "PASS",
+     "note": "식 내용 일치: 현재 raw nodalattr.F:2387 'FRIC(I) = g*ManningsN(I)**2.d0', :2390-2391 BFCdLLimit 하한. 단 ★라인 드리프트: raw 소스(gitignored 로컬 사본)가 노트 분석 시점(3193행) 이후 갱신됨(현재 3269행, subgrid 추가) — 노트의 서브루틴 라인 인용 전반이 +60~76 어긋남(Apply2DBottomFriction 2271→2331, CalculateTimeVaryingTau0 2117→2177, Apply2DInternalWaveDrag 2516→2590, ApplyDirectionalWindReduction 2804→2878, ApplyCanopyCoefficient 2922→2996). Adversary: 버전 변경이 원인, 전사 오류 아님 → VALUE-MISMATCH 아님. 노트에 소스 버전 pin 부재가 근본 원인."
+    }
+   ],
+   "value_mismatches": [],
+   "source_unavailable": [],
+   "proposals": []
+  },
+  {
+   "path": "models/ADCIRC/source-analysis/adcirc-swan-coupling.md",
+   "blob_sha": "e5740b29c93b7415dc7f42da5c0ee103f2c0fc69",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 60,
+   "opinion": 8,
+   "has_source_needed": true,
+   "unsourced": [
+    {
+     "line": 160,
+     "text": "`SWAN_DT` typically 60-1800 s; ADCIRC `DT` 0.5-5 s. Ratio 100-300 is normal.",
+     "reason": "관행 수치 단언 — Source basis(코드 file:line)로 커버 불가, 공식 문서·논문 인용 0, disclosed 토큰 없음. 동일 성격 단언을 adcirc-storm-surge.md 는 ⚠ source-needed 로 공시함(위키 자체 규약과 불일치).",
+     "adversary": "섹션·인접·frontmatter 출처 탐색 — Working Rules 절은 무인용, 코드 인용은 integer-ratio 메커닉만 지지하고 '전형 범위 60-1800s/0.5-5s'는 지지 안 함. refute 실패 → confirmed"
+    },
+    {
+     "line": 164,
+     "text": "For ADCIRC v55+, NetCDF hot-start is preferred; for older versions, fort.67/68 binary is more stable.",
+     "reason": "버전별 안정성·선호 단언 — hot-start 메커닉 인용(hstart.F·netcdfio.F90)은 구현만 지지, 'v55+ 선호/구버전 더 안정' 주장의 출처 0, disclosed 아님.",
+     "adversary": "References(Dietrich 2011·Booij 1999)·§H 인용 모두 이 주장 미지지. refute 실패 → confirmed"
+    }
+   ],
+   "value_checks": [],
+   "value_mismatches": [],
+   "source_unavailable": [],
+   "proposals": [
+    {
+     "old_string": "- `SWAN_DT` typically 60-1800 s; ADCIRC `DT` 0.5-5 s. Ratio 100-300 is normal.",
+     "new_string": "- `SWAN_DT` typically 60-1800 s; ADCIRC `DT` 0.5-5 s. Ratio 100-300 is normal. ⚠ source-needed(관행 수치 — 공식 문서·논문 미인용).",
+     "rationale": "undisclosed 관행 수치를 G9b disclosed 갭으로 전환(최소 수정; 강등 대신 공시)"
+    },
+    {
+     "old_string": "- For ADCIRC v55+, NetCDF hot-start is preferred; for older versions, fort.67/68 binary is more stable.",
+     "new_string": "- For ADCIRC v55+, NetCDF hot-start is preferred; for older versions, fort.67/68 binary is more stable. ⚠ source-needed(버전별 안정성 주장 — 출처 미인용).",
+     "rationale": "undisclosed 버전별 안정성 주장을 disclosed 갭으로 전환"
+    },
+    {
+     "old_string": "has_source_needed: false",
+     "new_string": "has_source_needed: true",
+     "rationale": "disclosed 갭 2건 보유 파일 → G9e 권고값 true 로 정규화(위 2건 공시 적용 전제)"
+    }
+   ]
+  },
+  {
+   "path": "models/ADCIRC/source-analysis/adcirc-transport-solver.md",
+   "blob_sha": "f641e9a16aba2d84b7c5d67f83745c5b84a291a9",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 25,
+   "opinion": 1,
+   "has_source_needed": false,
+   "unsourced": [],
+   "value_checks": [
+    {
+     "claim_id": "aa76072d73cfd847",
+     "line": 35,
+     "text": "DTAlp4/DT1MAlp4 (:31-32)·ADC_TRIDAG2 호출(:1182)·cpwater=4000(:134)·파일 1497행",
+     "result": "PASS",
+     "note": "4개 하위값 전부 현재 raw transport.F 와 정확 일치(라인·내용·행수)."
+    }
+   ],
+   "value_mismatches": [],
+   "source_unavailable": [],
+   "proposals": []
+  },
+  {
+   "path": "models/ADCIRC/source-analysis/adcirc_asgs_operational_system.md",
+   "blob_sha": "e3fa5ee8821a2c8f700c32763b0939cc87801e7f",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 55,
+   "opinion": 6,
+   "has_source_needed": true,
+   "unsourced": [],
+   "value_checks": [],
+   "value_mismatches": [],
+   "source_unavailable": [],
+   "proposals": []
+  },
+  {
+   "path": "models/ADCIRC/source-analysis/storm-surge/adcirc-storm-surge-foundation.md",
+   "blob_sha": "66554369c30379192449b2af069bae465db606e9",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 18,
+   "opinion": 14,
+   "has_source_needed": true,
+   "unsourced": [],
+   "value_checks": [],
+   "value_mismatches": [],
+   "source_unavailable": [],
+   "proposals": []
+  },
+  {
+   "path": "models/ADCIRC/source-analysis/storm-surge/adcirc-storm-surge-nws-families.md",
+   "blob_sha": "a84f4e4e85f1f9b571730a252737b39c6eddc834",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 20,
+   "opinion": 6,
+   "has_source_needed": false,
+   "unsourced": [],
+   "value_checks": [],
+   "value_mismatches": [],
+   "source_unavailable": [],
+   "proposals": []
+  },
+  {
+   "path": "models/ADCIRC/source-analysis/storm-surge/adcirc-storm-surge.md",
+   "blob_sha": "07d0e7f18c447eecf909ee8c682adcdcdd82b6fa",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 45,
+   "opinion": 10,
+   "has_source_needed": true,
+   "unsourced": [
+    {
+     "line": 202,
+     "text": "For Korean typhoons, KMA Best Track in JAS basin (no `AL` prefix) — convert to ATCF format with `WP` basin code for ASWIP.",
+     "reason": "KMA Best Track 포맷·basin 코드 관행 단언 — Source basis(ADCIRC 코드)로 커버 불가, KMA/ATCF 문서 인용 0, disclosed 토큰 없음. 같은 파일 L180 의 유사 단언은 ⚠ 공시됨 — 이 문장만 누락.",
+     "adversary": "aswip 인용(aswip.F:1024,1034 'AL' prefix)은 ASWIP 출력측만 지지, KMA 포맷·'JAS basin' 주장 미지지. refute 실패 → confirmed"
+    },
+    {
+     "line": 209,
+     "text": "Setting `BLAdj=1.0` thinking it's no adjustment — actually 100% reduction (typical 0.85-0.9 for boundary-layer wind to 10-m wind).",
+     "reason": "BLAdj 의미론 단언('1.0=100% reduction') — §A 인용(read_input.F:2720)은 파라미터 존재만 지지, 의미·전형값 0.85-0.9 의 출처 0. 통상 이해(1.0=무보정, 0.9=10% 감축)와 상충해 보여 내용 자체도 재검증 필요.",
+     "adversary": "wind.F·vortex.F 인용 범위에서 BLAdj 적용식 미인용 — 본문 어디에도 지지 없음. refute 실패 → confirmed"
+    }
+   ],
+   "value_checks": [
+    {
+     "claim_id": "2b55c1ad11a481a3",
+     "line": 133,
+     "text": "PRBCKGRND = 1013.0 mb (constants.F90:54)",
+     "result": "PASS",
+     "note": "값 1013.0d0 일치. 현재 raw 에서는 :55(인용 :54 와 1행 차 — raw 소스 버전 드리프트, 전사 오류 아님)."
+    }
+   ],
+   "value_mismatches": [],
+   "source_unavailable": [],
+   "proposals": [
+    {
+     "old_string": "- For Korean typhoons, KMA Best Track in JAS basin (no `AL` prefix) — convert to ATCF format with `WP` basin code for ASWIP.",
+     "new_string": "- For Korean typhoons, KMA Best Track in JAS basin (no `AL` prefix) — convert to ATCF format with `WP` basin code for ASWIP. ⚠ source-needed(KMA 포맷·basin 코드 관행 — KMA/ATCF 문서 미인용).",
+     "rationale": "undisclosed 관행 단언을 disclosed 갭으로 전환(같은 파일 L180 공시 스타일과 일치)"
+    },
+    {
+     "old_string": "- ▢ Setting `BLAdj=1.0` thinking it's no adjustment — actually 100% reduction (typical 0.85-0.9 for boundary-layer wind to 10-m wind).",
+     "new_string": "- ▢ Setting `BLAdj=1.0` thinking it's no adjustment — actually 100% reduction (typical 0.85-0.9 for boundary-layer wind to 10-m wind). ⚠ source-needed(BLAdj 의미·전형값 — 코드/문서 미인용, '1.0=100% reduction' 서술은 통상 이해와 상충 — 내용 재검증 필요).",
+     "rationale": "undisclosed·내용 의심 단언을 disclosed 갭 + 재검증 표지로 전환"
+    }
+   ]
+  },
+  {
+   "path": "models/ADCIRC/source-analysis/tide/adcirc-tide-forcing-implementation.md",
+   "blob_sha": "91770a0fe09ff77120646a16ea6ae988ec17daa7",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 40,
+   "opinion": 8,
+   "has_source_needed": true,
+   "unsourced": [],
+   "value_checks": [],
+   "value_mismatches": [],
+   "source_unavailable": [],
+   "proposals": []
+  }
+ ]
+}
