@@ -1,0 +1,31 @@
+---
+file: models/XBeach/raw/source_code/trunk/src/xbeachlibrary/libxbeach.F90
+lines: 352
+sha256: 1656cceb95c9d87a51b70225a725fc6e544ed56b424c97a9e2806c86f15b6696
+reader: codex gpt-6.1-sol
+read_date: 2026-10-02
+---
+
+# libxbeach.F90 — 판독 구간 기록
+
+구간은 1행부터 352행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–44 | `libxbeach_module`의 모듈 사용·private/public·save 선언. 파라미터 `par`, 시간 `tpar`, 공간 포인터 `s`, 전역 target `sglobal`, 배 `sh`, 카운터·오류·시작 CPU 시간(19–26). `USEMPI`에서만 `slocal`·벽시계·종료 플래그·`toall = .true.` (28–34). |
+| 45–94 | `init` 사용 모듈 및 지역 선언, `error`·`n` 0 초기화(75–76). `USEMPI`에서 `s=>slocal`, `xmpi_initialize`, `xmpi_barrier(toall)`, `t0 = MPI_Wtime()` (80–83). 전처리 블록 밖에서 `start_logfiles(error)` (87), `cpu_time(tbegin)` (90), `writelog_startup` (93) 호출. 원문 조건·식(행 순서): `error   = 0` (75); `n = 0` (76); `t0 = MPI_Wtime()` (83). |
+| 95–155 | `it=0`, `params_inio=.false.` 후 `all_input(par)` (100–104); `space_alloc_scalars(sglobal)`, `s=>sglobal`, `grid_bathy` (107–111). `USEMPI`에서 `xmpi_determine_processor_grid` (115)와 `writelog_mpi` (153). 116–152행은 `#if 0`로 비활성인 이웃 정보 로그: 경계 플래그에 따라 info(9..12)=1; MPI_PROC_NULL→-99, `do rank = 0,xmpi_osize-1`(142) 안에서 `if (rank .ne. xmpi_omaster) then`(143)이면 `call xmpi_send(rank,xmpi_imaster,info)`(144), `if (xmaster) then`(145) 안에서는 `write(line,…) info`(146)만 하고 `call writelog("ls"," ",trim(line))`(148)은 xmaster 밖·143 조건 안. 132행 `do i=5,8` 루프가 133–135를 감쌈. [10-02 검증 정정] 원문 조건·식(행 순서): `it      = 0` (100); `params_inio = .false.` (103); `info                      = 0` (118); `info(1)                   = xmpi_orank` (119); `info(2)                   = xmpi_rank` (120); `info(3)                   = xmpi_prow` (121); `info(4)                   = xmpi_pcol` (122); `info(5)                   = xmpi_left` (123); `info(6)                   = xmpi_right` (124); `info(7)                   = xmpi_top` (125); `info(8)                   = xmpi_bot` (126); `if(xmpi_isleft)  info(9)  = 1` (127); `if(xmpi_isright) info(10) = 1` (128); `if(xmpi_istop)   info(11) = 1` (129); `if(xmpi_isbot)   info(12) = 1` (130); `if(info(i) .eq. MPI_PROC_NULL) then` (133); `info(i) = -99` (134); `endif` (135); `if (rank .ne. xmpi_omaster) then` (143); `if (xmaster) then` (145); `endif` (147); `endif` (149). |
+| 156–190 | `timestep_init` (157). 첫 xmaster 블록은 초기화 로그(159–162); 다음 xmaster 안에서 hotstart==1일 때만 `hotstart_init_1` (163–167). 밖에서 `setbathy_init`, `readtide`, `readwind`, `flow_init`, `discharge_init`, `drifter_init`, `wave_init`, `gw_init`, `rainfall_init`, `sed_init`, `ship_init`, `veggie_init`를 순서대로 호출(168–184). 마지막 xmaster 안의 hotstart==1일 때만 `hotstart_init_2` (186–190). 원문 조건·식(행 순서): `if (xmaster) then` (159); `endif` (162); `if (xmaster) then` (163); `if(par%hotstart==1) then` (164); `endif` (166); `endif` (167); `if (xmaster) then` (186); `if(par%hotstart==1) then` (187); `endif` (189); `endif` (190). |
+| 191–227 | `USEMPI`에서 `distribute_par`와 `s=>slocal` (192–193); xmaster도 xomaster도 아닌 프로세스에서만 `space_alloc_arrays_dummies` (198–206), 그 조건 밖에서 `space_distribute_space` (207). 전처리 밖에서 `ranges_init` (210), NONH 조건에만 `nonh_init` (213), 무조건 `means_init`, `output_init`, `output` (216–224); init=0 반환(225). 원문 조건·식(행 순서): `if (.not. xmaster .and. .not. xomaster) then` (198); `endif` (206); `if (par%wavemodel==WAVEMODEL_NONH) call nonh_init(s,par)` (213); `init = 0` (225). |
+| 228–245 | `outputext`: 먼저 무조건 `output(sglobal,s,par,tpar,.false.)` (231). error==0이면 0; error==1이면 `output_error` 호출 후 1(232–237). 시뮬레이션 시작 구분 주석 포함. 원문 조건·식(행 순서): `if(error==0) then` (232); `outputext = 0` (233); `elseif(error==1) then` (234); `outputext = 1` (236); `endif` (237). |
+| 246–292 | `executestep(dt)` 선언; `dt`는 optional real*8(267). `USEMPI`이고 execute_counter==1일 때 barrier와 `t01 = MPI_Wtime()` (270–274). 그 블록 밖에서 `execute_counter = execute_counter + 1` (276), 반환값 -1(278). xcompute 안에서 `compute_wetcells`, `timestep(...,dt=dt,ierr=error)`, `outputtimes_update`, `log_progress` (281–291). 다음 구간도 이 xcompute 안이다. 원문 조건·식(행 순서): `if (execute_counter .eq. 1) then` (270); `t01 = MPI_Wtime()` (273); `endif` (274); `execute_counter = execute_counter + 1` (276); `executestep = -1` (278); `if(xcompute) then` (281). |
+| 293–320 | 바깥 xcompute(281)가 참이고 안쪽 error==0(293)일 때만 물리 처리: `wave_bc` (296) 후 옵션별 `gw_bc`, `flow_bc`, `shipwave`, `wave`, `vegatt`, `gwflow`, `flow`, `drifter`, `transus`, `bed_update`, `setbathy_update` (297–311). 호출문의 조건은 아래 그대로. error 블록은 312, xcompute 블록은 313에서 끝난다. 둘 다 밖에서 `n = n + 1` (315)와 executestep=0(316). 원문 조건·식(행 순서): `if (error==0) then` (293); `if (par%gwflow==1)                                      call gw_bc          (s,par)` (297); `if ((par%flow==1).or.(par%wavemodel==WAVEMODEL_NONH))   call flow_bc        (s,par)` (298); `if (par%ships==1)                                       call shipwave       (s,par,sh)` (301); `if (par%swave==1)                                       call wave           (s,par)` (302); `if (par%vegetation==1)                                  call vegatt         (s,par)` (303); `if (par%gwflow==1)                                      call gwflow         (s,par)` (304); `if ((par%flow==1).or.(par%wavemodel==WAVEMODEL_NONH))   call flow           (s,par)` (305); `if (par%ndrifter>0)                                     call drifter        (s,par)` (306); `if (par%sedtrans==1)                                    call transus        (s,par)` (307); `if ((par%morphology==1).and.(.not. par%setbathy==1)) call bed_update(s,par)` (310); `if (par%setbathy==1)     call setbathy_update(s, par)` (311); `endif` (312); `endif` (313); `n = n + 1` (315); `executestep = 0` (316). |
+| 321–342 | `final`: USEMPI에서 end_program=true, `xmpi_send_sleep`, `xmpi_bcast`, barrier, MPI 시작 시간 인수를 포함한 `writelog_finalize` 및 `xmpi_finalize` (331–336). 비MPI는 짧은 `writelog_finalize` 호출(338). 전처리 밖에서 final=0(340). 원문 조건·식(행 순서): `end_program = .true.` (331); `final = 0` (340). |
+| 343–352 | `getversion`: `version.def`·`version.dat` 포함(346–347), `version = trim(Build_Revision)` (349) 반환. 모듈 끝. 원문 조건·식(행 순서): `version = trim(Build_Revision)` (349). |
+
+## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
+
+- 232–237: `outputext`는 error가 0 또는 1인 분기에서만 결과값을 설정한다.
+- 293–316: `executestep`은 error==0에서만 물리 루틴을 호출하지만, 그 블록 밖에서 n을 증가시키고 결과를 0으로 설정한다.
+- 25·100·276: `it`는 init에서 0으로 되돌린다. `execute_counter`는 이 파일의 init·final에서 되돌리는 문장이 없다.
+- 116–152: MPI 이웃 정보 출력 코드는 `#if 0` 안에 있다.
