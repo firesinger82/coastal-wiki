@@ -2,6 +2,10 @@
 
 ## 현재 작업
 
+**2026-10-02 — 사고 수습 + XBeach 자체 코드·매뉴얼 1행/1쪽 단위 재판독.** 인계: [_staging/recovery/README.md](_staging/recovery/README.md) "다음에 이어서 할 일".
+경위: 모델별 "전수" 기록이 과장이었음을 확인·정정([HISTORY](_staging/recovery/HISTORY.md), 원장 상단 정정). 기존 판독 기록을 믿지 않고 XBeach부터 다시 읽음 — 기록마다 1행~끝(코드)·1쪽~끝(PDF) 구간 표, 원문 인용 기계 대조, 판독자 출력 로그 대조, 다른 모델 표본 검증.
+완료: 자체 코드 83파일 / readthedocs·tex·Office 텍스트 / PDF 389쪽 1차 판독. 진행: PDF fable 재판독(비정수압 69쪽 완료, kingsday 일부). 다른 12개 모델은 미착수.
+
 **2026-10-02 — 하네스 철거.** 사용자 지시("다 걷어내고")에 따라 task 하네스·resume-gate·hook·`models/` root 잠금·Codex 계약 의무를 걷어냈다. 코드는 `_archive/harness-20261002/`에 보존. 남은 장치 = 출처 인용 규칙·git·pre-commit validator·커밋 전 diff 확인([CLAUDE.md 작업 방식](CLAUDE.md#작업-방식)). `_staging/harness-redesign-20261001/DESIGN-v1.md`는 폐기.
 
 **2026-09-28 — concepts 보강 + ④ 응용 레이어 신설.** 핸드오프: [세션 기록 2026-09-22~28](_staging/SESSION-2026-09-28.md).
