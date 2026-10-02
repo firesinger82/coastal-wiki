@@ -83,3 +83,30 @@ ACTIVE                  repo 루트 아닌 tools/task/state/ACTIVE — 현재 �
 4. 전환: 옛 resume-gate 설치분(`/etc/claude-code/managed-mcp.json`, `managed-settings.d/*.bak`, `/etc/claude-code/.claude/agents/`, `/opt/coastal-resume`) 한 묶음 제거 — sudo 스크립트. `tools/resume-gate/` 는 `_archive/` 로 이동(결정적 검사 코드는 v1 lib 로 흡수한 뒤).
 5. 문서: CLAUDE.md·PROJECT_REQUIREMENTS 에 검증 정책·작업 진입 절차 반영, 메모리 규칙은 포인터로 축소, plan.md 현재 작업 = 활성 task 포인터.
 6. 첫 파일럿 실행 → 실패를 회귀 fixture 로 축적 → 다음 작업 종류로 확대.
+
+---
+
+# v1.1 — 적대 검토 반영 (2026-10-02, 사용자 결정: 위협 모델 A)
+
+[적대 검토](design-review.md): blocker 5·major 9. 확인한 사실: 이 세션에서 `sudo -n true` 성공(인증 캐시 또는 NOPASSWD), `wsl.exe` 접근 가능 → root 경계는 Claude 를 막는 경계가 아니다.
+
+**위협 모델 A (사용자 확정)**: 막을 대상은 *표류와 자기신고*(헤맴, 목적 무관 전수 작업, 근거 없는 완료 선언, 지시 무시)다. 의도적 우회(로그 전체 재생성·판정 위조·wsl.exe root)는 범위 밖 — 그건 **탐지·기록**만 한다. 원칙: 올바른 경로를 기본 경로로, 이탈은 보이게.
+
+## 반영 (검토 번호)
+
+- **#1 승인 스크립트 보호**: `approve` 와 그 의존은 root 소유 `/usr/local/lib/coastal-task/` 설치본만 실행(`tools/task/install/install.sh` 를 사용자가 sudo 로 1회). 설치본은 계약을 임시 스냅샷으로 복사해 그 스냅샷을 보여주고 그 해시를 승인. task_id 검증·심볼릭 링크/경로 이탈 거부·effective UID 0 확인.
+- **#2 환경 조임(사용자 실행)**: `install/harden-sudo.sh` — `/etc/sudoers.d/coastal-timestamp` 에 `Defaults timestamp_timeout=0` (visudo -c 검증). NOPASSWD 여부는 `sudo -l` 로 사용자 확인. wsl.exe 경로는 A 범위 밖으로 기록.
+- **#3 승인 사용성**: `! sudo …` 와 실제 터미널 두 경로를 시험 항목으로. 승인 화면에 revision·이전 revision 대비 변경·스냅샷 해시 표시.
+- **#4 완료 권한**: 권위 있는 상태는 `tasks/<id>/STATUS.json` 하나 — `receipt` 만 생성. pre-commit 은 피드백(우회 가능함을 문서에 명시). RESULT.md 같은 산문 "완료"는 막지 않는다 — 대신 goal-pin 과 receipt 가 STATUS 를 보여준다.
+- **#5 해시 사슬**: 변조 *탐지*용으로 유지(A 범위). 재생성 공격은 범위 밖으로 명시.
+- **#6 결속**: verdict 는 task·revision·계약 sha·입력 스냅샷·검사기 버전·**후보 산출물 해시**에 결속. receipt 는 현재 산출물 해시와 다른 verdict(오래된 PASS)를 거부. review 질문 전부 커버돼야 함.
+- **#7 검증자**: 검증 프롬프트는 codex-run 이 계약에서 생성(호출자 제공 불가). 계열 표 고정(`gpt-*`/`codex-*`=openai, `claude-*`/`opus`/`fable`/`sonnet`=anthropic, `grok-*`=xai). 실제 모델은 Codex 세션 메타에서 기록, 불일치·미지정이면 거부. 검토자 2명 요건은 서로 다른 run·다른 계열 또는 다른 모델.
+- **#8 예산**: flock 으로 실행 슬롯 원자 예약, 실패·중단도 집계. 단위 = `codex_runs`, `wall_hours`(첫 run 시작부터), 선택 `max_records`(산출물 레코드 수, receipt 에서 검사). 검증용 1회는 항상 예약. **멈춤 규칙**: 같은 review 항목이 새 산출물 변화 없이 2회 FAIL → `paused`, 사용자에게 반환.
+- **#9 목적 관련성**: 첫 worker run 전에 verifier 의 *목적 검토* 1회(“이 계획이 function_question 에 답하는가, 과한가”)를 필수 단계로 — 비싼 배치 전에. 의미 판단은 리뷰 몫(스키마로 증명 안 함).
+- **#10 hook 의미**: PreToolUse 는 JSON `hookSpecificOutput.permissionDecision: "deny"` + 사유. matcher 정확히(Bash, Write|Edit|MultiEdit|NotebookEdit). 실패 시 동작 시험. 서브에이전트 호출에도 발화하는지 시험.
+- **#11 ACTIVE**: `tools/task/state/ACTIVE` = `{task_id, revision, contract_sha256}`. 상태 손상/불일치는 "작업 없음"과 구분해 경고. goal-pin: SessionStart(시작·재개·압축) 와 SubagentStart 에 3–6줄 요약, UserPromptSubmit 엔 1줄.
+- **#12 상태 전이**: `draft → approved → running → paused | incomplete | complete`, `superseded`. 초안·이력 커밋은 항상 허용. 게이트는 (a) codex-run 실행 (b) STATUS=complete 생성 (c) `models/` 반영 패치 생성에만. 일반 위키 읽기·편집·검색·검사는 막지 않는다. Codex 직접 호출 차단은 *활성 작업이 있을 때만*? → 아니다: 항상 차단하되 `codex-run --task none --purpose <짧은 사유>` 의 비작업 모드(예산 없음, 기록만)를 둔다.
+- **#13 시험 확장**: 부정 fixture 에 추가 — 산출물 교체 후 오래된 PASS, 동시 launch 2개, kill 후 재시작, 승인 후 계약 수정, 위조 approvals 경로, hook 실패, staged/worktree 불일치, 그리고 **일반 위키 작업 흐름(노트 편집·validate·커밋)이 막히지 않음**.
+- **#14 이행**: ① 보존 스냅샷 ② v1.1 구현·시험(옛 잔재 그대로) ③ 사용자 sudo 1회: 설치본 + harden-sudo + 옛 resume-gate 잔재 제거를 **한 스크립트**로, 실행 전 dry-run 출력 ④ 세션 재시작 후 정상 작업 smoke test ⑤ 롤백 = 프로젝트 settings 의 hook 항목 제거 + 설치본 제거(옛 전역 잠금은 복원하지 않음) ⑥ L4 cron 의 작업 트리 되돌리기 동작은 별도 작업으로 기록(이번 범위 밖).
+
+검토 결과 A 범위 밖으로 남긴 것: wsl.exe root 경로, 로그 전체 재생성·판정 위조, 별도 계정/서비스로의 권한 분리(= 위협 모델 B).
