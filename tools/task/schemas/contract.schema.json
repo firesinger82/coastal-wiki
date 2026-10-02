@@ -1,0 +1,316 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Coastal task v1.1 contract",
+  "type": "object",
+  "properties": {
+    "task_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9_][a-z0-9_-]{0,63}$"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "model": {
+      "type": "string",
+      "minLength": 1
+    },
+    "function": {
+      "type": "string",
+      "minLength": 1
+    },
+    "function_question": {
+      "type": "string",
+      "minLength": 1
+    },
+    "build_plan_levels": {
+      "type": "object",
+      "properties": {
+        "target": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "enum": [
+              "문서 지원",
+              "코드 구현",
+              "실행 확인",
+              "수치 검증",
+              "물리 검증"
+            ]
+          },
+          "minItems": 1
+        },
+        "not_performed": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "enum": [
+              "문서 지원",
+              "코드 구현",
+              "실행 확인",
+              "수치 검증",
+              "물리 검증"
+            ]
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "target",
+        "not_performed"
+      ],
+      "additionalProperties": false
+    },
+    "inputs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "required": [
+          "path",
+          "sha256"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0
+    },
+    "allowed_outputs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1
+    },
+    "constraints": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 0
+    },
+    "done_when": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9_][a-z0-9_-]{0,63}$"
+              },
+              "kind": {
+                "const": "review"
+              },
+              "spec": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "id",
+              "kind",
+              "spec"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z0-9_][a-z0-9_-]{0,63}$"
+              },
+              "kind": {
+                "const": "check"
+              },
+              "spec": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "const": "exists"
+                      },
+                      "path": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "path"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "const": "sha256"
+                      },
+                      "path": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "sha256": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{64}$"
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "path",
+                      "sha256"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "const": "command"
+                      },
+                      "path": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "args": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        },
+                        "minItems": 0
+                      },
+                      "timeout_seconds": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 300
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "path",
+                      "args",
+                      "timeout_seconds"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "kind",
+              "spec"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      },
+      "minItems": 2,
+      "prefixItems": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "const": "purpose"
+            },
+            "kind": {
+              "const": "review"
+            },
+            "spec": {
+              "const": "이 산출물이 function_question 에 답하는가? done_when 이 그 질문에 비해 과하거나(전수·소진형) 모자라지 않은가?"
+            }
+          },
+          "required": [
+            "id",
+            "kind",
+            "spec"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "budget": {
+      "type": "object",
+      "properties": {
+        "codex_runs": {
+          "type": "integer",
+          "minimum": 3
+        },
+        "max_records": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "wall_hours": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      },
+      "required": [
+        "codex_runs",
+        "wall_hours"
+      ],
+      "additionalProperties": false
+    },
+    "verifier": {
+      "type": "object",
+      "properties": {
+        "family": {
+          "type": "string",
+          "enum": [
+            "openai",
+            "anthropic",
+            "xai"
+          ]
+        },
+        "second_for_models": {
+          "const": true
+        }
+      },
+      "required": [
+        "family",
+        "second_for_models"
+      ],
+      "additionalProperties": false
+    },
+    "out_of_scope": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 0
+    }
+  },
+  "required": [
+    "task_id",
+    "revision",
+    "model",
+    "function",
+    "function_question",
+    "build_plan_levels",
+    "inputs",
+    "allowed_outputs",
+    "constraints",
+    "done_when",
+    "budget",
+    "verifier",
+    "out_of_scope"
+  ],
+  "additionalProperties": false
+}
