@@ -25,7 +25,7 @@
 | ShorelineS | 485 | 154 | 154 | 0 | 26 | 18 | 14 |
 | XBeach | 543 | 167 | 167 | 0 | 84 | 78 | 60 |
 
-- "코드"에는 외부 라이브러리·테스트·예제가 섞여 있다(예: ROMS `WRF/` 수천 파일, Delft3D `third_party_open/`). 모델 자체 코드만의 수는 각 모델 표의 **폴더별** 절에서 사용자가 구분을 확정해야 나온다.
+- "코드"에는 외부 라이브러리·테스트·예제가 섞여 있다(예: ROMS `WRF/` 수천 파일, Delft3D `third_party_open/`). 모델 자체 코드만의 수는 아래 "분류 후" 절.
 - "문서 판독"에는 웹 문서 사본(md·txt 미러)의 grok 판독이 포함된다. ADCIRC·ROMS 문서 판독 대부분이 이것이다. PDF 매뉴얼 판독 여부는 모델 표 파일 목록에서 확인.
 - ADCIRC·ROMS·Delft3D는 코드 파일별 판독 기록이 **0**이다. 08-29 Codex 결함 감사가 코어 파일 32·41·33개를 다뤘을 뿐이다.
 
@@ -80,4 +80,4 @@ Delft3D 487(기계 sweep 실패 471 + 웹 16, 09-22 스냅샷 교체 전 경로)
 ## 파일
 
 - `<모델>.md` — 종류별·폴더별 집계
-- `<모델>-files.tsv` — 파일별 목록 (`path`, `group`, `type`, `read`, `reader`, `note_mentions_name`)
+- `<모델>-files.tsv` — 파일별 목록 (`path`, `group`, `type`, `read`, `reader`, `note_mentions_name`, `category`)
