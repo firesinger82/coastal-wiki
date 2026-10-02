@@ -9,7 +9,7 @@
 3. AI 요약은 원본·요약 명확히 구분.
 4. "내가 해보니" 화법은 객관 레이어 금지.
 5. 단일 writer (이 PC).
-6. **모델 분석 범위 이탈 금지.** “전수·완벽·GOAL·계속”은 동봉된 의존성 전체 역어셈블리 지시가 아니다. MPI/Jumpshot 뷰어 등 부속 도구 내부를 모델 완료 조건으로 삼지 않는다. 재개 시에도 [CLAUDE.md의 범위 통제](CLAUDE.md#모델-분석-범위-통제)를 먼저 적용한다.
+6. **모델 분석 범위 이탈 금지.** “전수·완벽·GOAL·계속”은 동봉된 의존성 전체 역어셈블리 지시가 아니다. MPI/Jumpshot 뷰어 등 부속 도구 내부를 모델 완료 조건으로 삼지 않는다. 재개 시에도 [CLAUDE.md 작업 방식](CLAUDE.md#작업-방식)를 먼저 적용한다.
 
 ## 작업 진입 시
 
@@ -20,8 +20,4 @@
 
 모델 기능 근거의 구축·비교·결합은 [BUILD-PLAN.md](BUILD-PLAN.md)의 해당 단계·완료 조건을 따른다.
 
-**역할** ([CLAUDE.md 역할 분담](CLAUDE.md#역할-분담-claude--codex)): Claude = Lead / Planner / Reviewer, Codex = Executor / Investigator. Codex는 OBJECTIVE / SCOPE / STOP CONDITION / DELIVERABLE 계약 범위에서 조사·수정·검사를 수행하고 evidence와 함께 반환한다. 범위 밖 판단이 필요하면 작업을 확대하지 않고 Claude에게 반환한다. `models/`는 root 잠금 — 우회하지 않고 diff/script까지만 만든다. Claude 모델 지정은 CLAUDE.md를 따른다.
-
-## 큰 변경 시 워크플로
-
-Claude 계획(`plan.md` 포인터 + 작업 문서) → `/codex:adversarial-review`(계획 비판) → Claude 반영 판단 → Codex 구현(bounded task, `models/`는 diff/script까지) → Claude 검증 → 사람 게이트 → 커밋
+**작업 방식**: [CLAUDE.md 작업 방식](CLAUDE.md#작업-방식). 요청받은 범위만 하고, 확인한 것과 하지 않은 것을 구분해 반환한다.

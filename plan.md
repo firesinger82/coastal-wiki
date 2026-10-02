@@ -2,6 +2,8 @@
 
 ## 현재 작업
 
+**2026-10-02 — 하네스 철거.** 사용자 지시("다 걷어내고")에 따라 task 하네스·resume-gate·hook·`models/` root 잠금·Codex 계약 의무를 걷어냈다. 코드는 `_archive/harness-20261002/`에 보존. 남은 장치 = 출처 인용 규칙·git·pre-commit validator·커밋 전 diff 확인([CLAUDE.md 작업 방식](CLAUDE.md#작업-방식)). `_staging/harness-redesign-20261001/DESIGN-v1.md`는 폐기.
+
 **2026-09-28 — concepts 보강 + ④ 응용 레이어 신설.** 핸드오프: [세션 기록 2026-09-22~28](_staging/SESSION-2026-09-28.md).
 신규 6노트(layer 4 = 2, **위키 최초**) · 격상 4절(전부 abstract → full PDF verified) · L4 감사 11파일 + cron 6회 ·
 **models/ 무결성 위반 1건 적발→SCOPED EDIT 정정**(adcirc-swan-coupling 인용 3건) · XBeach 발견 2건 models 이관.
@@ -15,7 +17,7 @@ git 저장소 29/29 upstream 최신 · 프레임워크 게이트 4종(+`tree_sta
 
 ## 2026-09-12 사용자 범위 정정 (과거 계획보다 우선)
 
-XBeach 분석 중 부속 MPI/Jumpshot 뷰어 내부 판독으로 이탈한 작업을 중단한다. 모델 전수 분석·완벽 마무리·GOAL은 동봉 의존성 전체 역어셈블리를 뜻하지 않는다. 이 문서의 과거 컨테이너·부속 도구 전수 판독 요구는 [CLAUDE.md의 범위 통제](CLAUDE.md#모델-분석-범위-통제)에 따라 제한한다. 부속 도구 미판독 수는 모델 완료의 필수 조건이 아니며, 과거 증거와 모델 자체의 검토·승인 조건은 보존한다.
+XBeach 분석 중 부속 MPI/Jumpshot 뷰어 내부 판독으로 이탈한 작업을 중단한다. 모델 전수 분석·완벽 마무리·GOAL은 동봉 의존성 전체 역어셈블리를 뜻하지 않는다. 이 문서의 과거 컨테이너·부속 도구 전수 판독 요구는 [CLAUDE.md 작업 방식](CLAUDE.md#작업-방식)에 따라 제한한다. 부속 도구 미판독 수는 모델 완료의 필수 조건이 아니며, 과거 증거와 모델 자체의 검토·승인 조건은 보존한다.
 
 
 작성: 2026-05-21

@@ -65,7 +65,7 @@
 
 | 경로 | 역할 |
 |---|---|
-| `tools/` | 검색(`llm-wiki-poc/`)·자가감사(`llm-wiki-audit/`)·게이트(`resume-gate/`)·검사 스크립트(`validate-*`)·재현 도구 |
+| `tools/` | 검색(`llm-wiki-poc/`)·자가감사(`llm-wiki-audit/`)·검사 스크립트(`validate-*`)·재현 도구 |
 | `_staging/` | 진행 중 작업 및 반영된 작업의 검토·판독 증거 보존 |
 | `_archive/` | 과거 통합본·검토 이력 보존 |
 
