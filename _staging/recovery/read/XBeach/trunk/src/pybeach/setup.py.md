@@ -12,12 +12,12 @@ read_date: 2026-10-02
 
 | 구간 | 내용 |
 |---|---|
-| 1–5 | `setuptools.setup/find_packages`와 `sys/os`를 가져오고 패키지 버전을 `0.1`로 둔다(1–4). |
-| 6–22 | `setup` 메타데이터: 이름 `XBeach`, 4행의 버전, 파랑·흐름·퇴적물·지형변화 모델 설명(6–10), 과학/물리·연구자·Beta·GPLv3 분류(11–17), 키워드·저자·전자우편·웹 주소·`license='GPLv3'`(18–22). 긴 설명에는 public-domain이라는 문구가 있다(10). |
-| 23–36 | `find_packages(exclude=['ez_setup', 'examples', 'tests'])`, `include_package_data=True`, `zip_safe=False`(23–25). 설치 의존성은 `numpy`, `matplotlib`, `nose`, CI용 `teamcity-nose`이며 버전 제한이 없다(26–32). `entry_points` 문자열에는 주석만 있고 `setup` 호출이 끝난다(33–36). |
+| 1–5 | setuptools의 setup·find_packages 및 sys·os 가져오기(1–2), 버전 기본값 `version = '0.1'` (4), 빈 줄. |
+| 6–25 | setup 호출의 이름 XBeach·version·짧은/긴 설명(6–10). classifiers는 과학/공학·물리·연구자·Beta·GPLv3(11–17); 키워드·작성자·메일·URL·license='GPLv3'(18–22). `packages=find_packages(exclude=['ez_setup', 'examples', 'tests'])` (23), `include_package_data=True` (24), `zip_safe=False` (25). 조건 분기 없음. |
+| 26–36 | install_requires는 numpy·matplotlib·nose·teamcity-nose이며 마지막 항목은 Deltares CI용이라는 주석(26–32). entry_points는 실제 엔트리 없이 자리표시자 주석 문자열(33–35); setup 호출 종료(36). |
 
 ## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
 
-- 10·16·22: 긴 설명의 public-domain 문구와 GPLv3 분류·license 설정이 함께 존재한다.
-- 2: 가져온 `sys`, `os`는 이 파일의 이후 코드에서 사용하지 않는다.
-- 23: 제외 목록은 `tests`(복수)이며, 지정 판독 대상의 테스트 패키지 경로는 `xbeach/test`(단수)이다.
+- 2: sys·os를 가져오지만 이후 이 파일에서 사용하지 않는다.
+- 10·16·22: 긴 설명은 public-domain model이라고 쓰고, 패키지 classifier와 license는 GPLv3로 적는다.
+- 23: 제외 이름은 'tests'이며 지정된 소스 트리의 테스트 패키지 이름은 xbeach/test이다. 제외 목록에 'test'는 없다.

@@ -12,7 +12,7 @@ read_date: 2026-10-02
 
 | 구간 | 내용 |
 |---|---|
-| 1–21 | `mnemiso_module`: ISO C binding과 mnemmodule 사용, implicit none·save. bind(c)인 `b_arraytype` (8): type·btype·rank, name(maxnamelen), units(20), description(1024), `character(kind=c_char), dimension(maxrank) :: dimensions(20)`(16, 엔티티의 `(20)`과 `dimension(maxrank)` 속성이 함께 있음) [10-02 검증 정정: 원문 인용], c_ptr array(10–18). |
+| 1–21 | `mnemiso_module`: ISO C binding과 mnemmodule 사용, implicit none·save. bind(c)인 `b_arraytype` (8): type·btype·rank, name(maxnamelen), units(20), description(1024), `character(kind=c_char), dimension(maxrank) :: dimensions(20)`(16). 엔티티 쪽 배열 지정 (20)과 속성 dimension(maxrank)가 함께 있음. [10-02 검증 정정: 원문 인용], c_ptr array(10–18). |
 | 22–31 | bind(c)인 `carraytype`: rank 주석 0..4, type i/r, btype b/d/2, c_ptr array(24–27). contains 포함. |
 | 32–49 | `arrayf2c`: 지역 target `a(3)` (34)에 `a = (/ 1.0d0,  2.0d0, 3.0d0 /)` (35); 입력의 type·btype·rank 복사(36–38). 39–43행은 주석 처리된 조건·c_f_pointer·NULL 지정안이며 실행되지 않음. 현재 실행문은 `arrayf2c%array = c_loc(a)` (44). 원문 조건·식(행 순서): `a = (/ 1.0d0,  2.0d0, 3.0d0 /)` (35); `arrayf2c%type = farray%type` (36); `arrayf2c%btype = farray%btype` (37); `arrayf2c%rank = farray%rank` (38); `arrayf2c%array = c_loc(a)` (44). |
 | 50–62 | `stringlength`: assumed-shape 문자 배열. 결과 0으로 시작(53), 전체 루프(54)에서 NULL이면 결과=i(55–57)지만 exit 없음. 루프 밖에서 `stringlength = size(char_array)` (59)로 무조건 덮어쓴다. 원문 조건·식(행 순서): `stringlength = 0` (53); `if (char_array(i) .eq. C_NULL_CHAR) then` (55); `stringlength = i` (56); `end if` (57); `stringlength = size(char_array)` (59). |

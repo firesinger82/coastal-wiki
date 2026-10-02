@@ -12,12 +12,10 @@ read_date: 2026-10-02
 
 | 구간 | 내용 |
 |---|---|
-| 1–14 | echo를 끄고 `%1..%3`을 `SolutionDir`, `ConfigurationName`, `Platform`에 넣으며 큰따옴표를 제거하고 echo를 다시 켠다(1–13). |
-| 15–22 | 상대경로 `build\7za.exe`를 배포 디렉터리에 복사하고 그 디렉터리로 이동한다(15–18). `7za.exe a "xbeach_%ConfigurationName%_%Platform%.zip" *`로 압축한 뒤 `7za.exe d … 7za.exe`로 압축 안의 도구를 제거한다(20–21). |
-| 23–26 | `%SolutionDir%\src\xbeach\`로 이동한 뒤 배포 디렉터리에 복사했던 `7za.exe`를 삭제한다(23–26). |
+| 1–14 | echo off/on(1·13). %1..%3에서 SolutionDir·ConfigurationName·Platform을 받음(4–6), 각 변수의 큰따옴표 제거(9–11). 인수/따옴표 처리 원문: `set SolutionDir=%1` (4), `set ConfigurationName=%2` (5), `set Platform=%3` (6), `set SolutionDir=%SolutionDir:"=%` (9), `set ConfigurationName=%ConfigurationName:"=%` (10), `set Platform=%Platform:"=%` (11). |
+| 15–26 | build\7za.exe를 dist로 copy(16)하고 그 디렉터리로 이동(18). `7za.exe a "xbeach_%ConfigurationName%_%Platform%.zip" *` (20), `7za.exe d "xbeach_%ConfigurationName%_%Platform%.zip" 7za.exe` (21). src\xbeach로 이동(23) 후 dist의 7za.exe 삭제(26). 조건 분기 없음; 주석·빈 줄 포함. |
 
 ## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
 
-- 16: 압축 도구 원본 경로 `build\7za.exe`는 현재 디렉터리 기준 상대경로다.
-- 18·23: 디렉터리 이동에 `cd`를 사용하고 `/d` 옵션은 없다.
-- 4–26: 인자 개수나 각 명령의 errorlevel 검사 없이 복사·이동·압축·삭제를 이어 실행한다.
+- 16·18·20: 7za.exe를 상대 경로 build에서 복사하며 압축 입력은 작업 디렉터리의 *이다.
+- 26: 마지막 삭제 줄은 개행이 없으며 nl 기준 마지막 번호는 26이다.

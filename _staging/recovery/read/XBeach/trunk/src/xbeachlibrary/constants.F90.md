@@ -12,11 +12,10 @@ read_date: 2026-10-02
 
 | 구간 | 내용 |
 |---|---|
-| 1–22 | 공통 kind·pi·허수단위 모듈의 문서 머리말, 저작권(2004 WL Delft)·작성자. 19–21은 never used 및 pi/twopi 저장 위치 제안 주석. |
-| 23–28 | `constants` 모듈, implicit none·save·private. spkind/dpkind/pi/compi/iFill/sFill/dFill 공개(27). |
-| 29–33 | `spkind=kind(1.0)`, `dpkind=kind(1.0d0)`(29–30), `pi=4*atan(1.0_dpkind)`(31), 복소 허수단위 `compi=(0.0_dpkind,1.0_dpkind)`(32), 모두 parameter. |
-| 34–40 | 채움값 `iFill=-huge(0)`, `sFill=-huge(0.0)`, `dFill=-dble(huge(0.0))`(35–37). dFill을 sFill보다 작게 만들지 않기 위한 방식이라는 주석(37), 모듈 끝·문서 종료 표시. |
+| 1–22 | 공통 상수 모듈의 목적·저작권·작성자 주석. precision kind·pi·허수 단위 소개(13–15)와 never used 주석(19–21).  |
+| 23–40 | implicit none·save·private 모듈(23–26), 공개 상수 목록(27). single/double kind와 pi·compi 정의(29–32), integer/real/real*8 fill 값 정의(35–37). 모듈 종료·닫는 주석까지 포함(39–40). 원문(조건·반복 블록 밖): `integer,              parameter :: spkind = kind(1.0)` (29). `integer,              parameter :: dpkind = kind(1.0d0)` (30). `real(kind=dpkind),    parameter :: pi     = 4*atan(1.0_dpkind)` (31). `complex(kind=dpkind), parameter :: compi  = (0.0_dpkind,1.0_dpkind)` (32). `integer,parameter                     :: iFill = -huge(0)` (35). `real,parameter                        :: sFill = -huge(0.0)` (36). `real*8,parameter                      :: dFill = -dble(huge(0.0))  ! Robert: easier this way than to catch dFill<sFill later on` (37). |
 
 ## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
 
-- 37: real*8 dFill은 배정밀도 huge를 직접 취하지 않고 기본 real의 huge를 dble로 변환한 값이다.
+- 35–37: dFill은 double precision huge를 직접 쓰지 않고 single precision `huge(0.0)`를 dble로 변환한 음수이며, 37행 주석은 sFill과의 비교를 이유로 적는다.
+- 19·27: never used라는 주석과 공개 상수 선언이 함께 있다. 이 파일 밖 사용 여부는 확인하지 않았다.

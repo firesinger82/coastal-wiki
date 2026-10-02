@@ -12,28 +12,27 @@ read_date: 2026-10-02
 
 | 구간 | 내용 |
 |---|---|
-| 1–25 | 표준 모듈·숫자형·ctypes·NumPy·subprocess를 가져온다(1–10). 모듈 로거를 DEBUG로 두고 스트림 핸들러와 포맷을 추가한다(12–18). 공유 라이브러리 접미사의 기본은 `.so`, darwin은 `.dylib`, win32/win64는 `.dll`(21–24). |
-| 26–48 | `dlclose(handle)`는 플랫폼 접미사의 `libdl`을 `CDLL`로 열고 `dlerror.restype=c_char_p`, `dlclose.argtypes=[c_void_p]`를 설정한다(26–30). `dlclose` 반환값이 0이 아니면 오류를 로그에 남기고 특정 invalid-handle 문자열과 같을 때만 `ValueError`를 낸다(32–40). `isloaded(lib)`는 절대경로와 PID를 `lsof -p %d &#124; grep %s > /dev/null` 셸 명령에 넣어 종료값 0 여부를 반환한다(43–47). |
-| 49–72 | `XBeach` 생성자는 현재 디렉터리를 `olddir`에 저장하고, `workingdir=None`이면 현재 경로를 쓰며 `os.chdir` 뒤 `libpath`를 절대경로화해 `CDLL`을 연다(51–60). `shouldinitialize=True`인 경우에만 `init()`을 호출한 뒤 False로 둔다(61–66). `executestep()`과 `output()`은 각각 라이브러리의 `executestep`, `outputext`를 호출한다(67–72). |
-| 73–92 | 매개변수 개수는 `getnparameter(byref(c_int))`로 얻는다(73–76). 인덱스별 이름은 1024바이트 버퍼, `index=c_int(i+1)` 및 길이 변수를 `getparametername`에 전달해 `name.value`를 반환한다(77–86). `get_parameternames`는 `range(get_nparameter())`를 순회해 목록을 만든다(87–92). |
-| 93–119 | `get_parameter`는 `get_parametertype` 결과에 따라 문자 `c`이면 `c_char`와 `getcharparameter` 및 `string_at(addressof(value), valuelength)`(98–102), 실수 `r`이면 `c_double/getdoubleparameter`(103–106), 정수 `i`이면 `c_int/getintparameter`(107–110)를 사용한다. 다른 형은 `ValueError`(111–113). 형 조회는 이름 버퍼·`c_char`·이름 길이를 `getparametertype`에 참조 전달한다(114–119). |
-| 120–144 | `get_parameters`는 `(name, self.get_parameter(name))` 쌍을 중괄호 컴프리헨션으로 모아 반환한다(120–126). `set_parameter`는 실수형만 `setdoubleparameter`에 넘기며 반환 코드가 0이 아니면 `ValueError`(127–136); 정수 설정 코드는 주석이고 그 외 형은 예외다(137–144). 136행 `result`는 반환하지 않는다. |
-| 145–165 | 배열 개수는 `getnarray`로 얻는다(145–148). 이름은 1024바이트 버퍼와 1부터 시작하는 `i+1` 인덱스로 `getarrayname`을 호출한다(149–158). `get_arraynames`는 배열 이름 목록을 만든다(159–164). |
-| 166–191 | `get_arraytype`, `get_arrayrank`는 이름·길이·출력 참조를 `getarraytype/getarrayrank`에 전달한다(166–177). `get_arraydimsize`는 Python 차원 번호를 `dim+1`로 바꿔 `getarraydimsize`를 호출한다(178–184). `get_arrayshape`는 rank만큼 차원 길이를 조회한 튜플을 반환한다(185–189); 끝에 빈 줄이 있다(190–191). |
-| 192–227 | `get_array`는 rank 0의 shape를 `()`로, 양수 rank의 shape를 조회값으로 정한다(192–205). 문자 배열은 거부(206–207); 정수는 rank≤2에서 `get{rank}dintarray`, rank 0이면 `POINTER(c_int)`, 그 외 `int32`·Fortran 연속 `ndpointer`(208–216). 실수는 rank≤4에서 `get{rank}ddoublearray`, rank 0이면 `POINTER(c_double)`, 그 외 `float64`·Fortran 연속 포인터를 쓴다(217–225). 나머지 형은 예외다(226–227). |
-| 228–242 | 조회 함수의 인자형을 이름 포인터·배열 포인터의 포인터·`c_int`로 설정하고 `fun(c_name, byref(arrayp), namelength)`를 호출한다(228–230). rank 0은 `arrayp.contents.value`, 그 외는 `array(arrayp)`를 반환한다(231–236). `get_arrays`는 모든 이름에 대해 값을 읽어 사전을 만든다(237–241). |
-| 243–269 | `set_array`는 shape가 `array(value).shape`와 같은지 assert한다(243–252). 문자형과 rank>4는 거부(254–257). 실수는 양수 rank에 `float64`, rank 0에 `c_double`; 정수는 양수 rank에 `int32`, rank 0에도 `c_double`을 둔다(258–263). `set{rank}d{typename}array`를 찾고 스칼라/Fortran 연속 배열 포인터 및 함수 인자형을 설정한다(264–269). |
-| 270–290 | 설정값이 `Number`이면 `pointer(dtype(value))`, `ndarray`이면 `value.ctypes.data_as(arraytype)`, 그 외는 예외다(270–275); `fun`을 참조 인자로 호출한다(276). `finalize`는 핸들을 보관하고 `_lib`를 삭제한 뒤 `isloaded`가 참인 동안 같은 핸들에 `dlclose`를 호출한다(278–285). 열린 파일 로그 코드는 주석이고 `shouldinitialize=True`로 되돌린다(286–290). |
+| 1–25 | os/sys·collections·Number·ctypes·NumPy·subprocess·logging 가져오기(1–12). DEBUG logger와 StreamHandler/formatter 구성(14–18); 비활성 basicConfig 주석(13). DLL 접미사 기본 .so, darwin .dylib, win32/win64 .dll(21–24). 접미사 원문: `dllsuffix = collections.defaultdict(lambda:'.so')` (21), `dllsuffix['darwin'] = '.dylib'` (22), `dllsuffix['win32'] = '.dll'` (23), `dllsuffix['win64'] = '.dll'` (24). |
+| 26–48 | dlclose에서 `name = 'libdl' + dllsuffix[sys.platform]` (27), CDLL 로드(28), dlerror.restype=c_char_p·dlclose.argtypes=[c_void_p](29–30), dlclose(handle)(32). `if rc!=0:` (33) 안 dlerror 호출(35); 중첩 `if error == 'invalid handle passed to dlclose()':` (37)일 때만 ValueError(38). 33의 else는 성공 로그(39–40). isloaded는 abspath(45), `ret = os.system("lsof -p %d \| grep %s > /dev/null" % (os.getpid(), libp))` (46), `return (ret == 0)` (47). |
+| 49–76 | XBeach 클래스·생성자(49–51)는 olddir 저장(52). `if workingdir is None:` (53)이면 현재 폴더, `else:` (55)는 전달값(56). 이 분기 밖 os.chdir(57), abspath·CDLL 로드(58–59), shouldinitialize=True(60). init의 `if self.shouldinitialize:` (64) 안 `_lib.init()`(65); False 재설정(66)은 if 밖. executestep→_lib.executestep(69), output→_lib.outputext(72), get_nparameter→getnparameter(byref(n)) 및 n.value(74–76). 생성자 기본 인수 원문: `def __init__(self, libpath, workingdir=None):` (51). |
+| 77–92 | 파라미터 이름 1024바이트 버퍼(80); Python 인덱스를 `index = c_int(i+1)` (81)로 바꿔 getparametername에 index/name/length 전달(83), name.value 반환(85–86). get_parameternames는 range(get_nparameter())를 순회하여 위 메서드 결과를 list에 append(89–92). |
+| 93–126 | get_parameter는 get_parametertype(94)·이름 버퍼·`namelength = c_int(len(name))` (96). `if typecode == 'c':` (98) 안 getcharparameter(100) 후 `result = string_at(addressof(value), valuelength)` (102); 앞 조건 거짓인 `elif typecode == 'r':` (103)는 getdoubleparameter(105), 앞 두 조건 거짓인 `elif typecode == 'i':` (107)는 getintparameter(109); `else:` (111)는 ValueError(112). 성공 분기 뒤 result 반환(113). get_parametertype는 `length = c_int(len(name))` (117), getparametertype(118)·typecode.value 반환(119). get_parameters는 `(name, self.get_parameter(name))` (122)를 get_parameternames(124)에서 모은 집합 comprehension(121–125) 반환(126). |
+| 127–148 | set_parameter는 type 조회·이름 버퍼·`namelength = c_int(len(name))` (130). `if typecode == 'r':` (131) 안 c_double 변환(132), setdoubleparameter(133); 중첩 `if (code != 0):` (134)일 때 ValueError(135), 그 검사 밖 같은 r 분기에서 result=value.value(136). 주석 처리된 정수 setter: `# if typecode == 'i':` (137), setintparameter 호출 주석(139), `#     if (code != 0):` (140), 예외·result 주석(141–142). 활성 131의 `else:` (143)는 ValueError(144). get_narray는 getnarray(byref(n))·n.value(145–148). |
+| 149–191 | get_arraynamebyindex는 이름 버퍼 1024(152), `index = c_int(i+1)` (153), getarrayname(155), name.value 반환(157–158). get_arraynames는 range(get_narray()) 이름 list(161–164). get_arraytype·get_arrayrank 각각 이름 길이 `namelength = c_int(len(name))` (169·175)와 getarraytype/getarrayrank 호출(170·176), scalar value 반환(171·177). get_arraydimsize는 `dim = c_int(dim+1)` (180), `namelength = c_int(len(name))` (182), getarraydimsize(183)·dimsize.value(184). get_arrayshape는 rank 개수의 각 dimsize를 tuple로 반환(185–189); 빈 줄 포함. |
+| 192–227 | get_array에서 type·rank 조회(193–194), `namelength = c_int(len(name))` (196), 작업 변수 None(197–199). `if rank == 0:` (200) → shape=(); `elif rank >= 1:` (202) → get_arrayshape(203); `else:` (204) → ValueError(205). 이 rank 분기 밖 `if typecode == 'c':` (206)는 예외(207); `elif typecode == 'i':` (208) 안 `if rank > 2:` (209) 예외, 그 검사 뒤 get{rank}dintarray(212), `if rank == 0:` (213) → POINTER(c_int), `else:` (215) → F_CONTIGUOUS int32 ndpointer(216). 같은 type 선택의 병렬 `elif typecode == 'r':` (217) 안 `if rank > 4:` (218) 예외, get{rank}ddoublearray(221), `if rank == 0:` (222) → POINTER(c_double), `else:` (224) → F_CONTIGUOUS float64 ndpointer(225). 마지막 type `else:` (226)는 예외(227). |
+| 228–242 | 앞 type·rank 선택 모두 끝난 뒤 fun.argtypes 설정(228), arraytype 객체·fun 호출(229–230). 별도 `if rank == 0:` (231)이면 contents.value(233), `else:` (234)는 NumPy array 복사(235); 분기 밖 result 반환(236). get_arrays는 모든 이름에 get_array를 호출해 dict로 반환(237–241), 빈 줄(242). |
+| 243–277 | set_array는 type·rank·shape 조회(244–251), `namelength = c_int(len(name))` (247); `assert shape == array(value).shape, "Shapes not equal {} versus {} for variable {}".format(shape, value.shape, name)` (252). 독립 `if typecode == 'c':` (254), `if rank > 4:` (256)는 각각 예외. 별도 `if typecode == 'r':` (258)에서 `dtype = float64 if rank > 0 else c_double` (259), typename='double'; 병렬 `elif typecode == 'i':` (261)에서 `dtype = int32 if rank > 0 else c_double` (262), typename='int'. 선택 뒤 set{rank}d{typename}array 조회(264). `if rank == 0:` (265) → POINTER(dtype), `else:` (267) → F_CONTIGUOUS ndpointer(268). 그 분기 뒤 fun.argtypes(269). `if isinstance(value, Number):` (270) → pointer(dtype(value))(271); `elif isinstance(value, ndarray):` (272) → data_as(arraytype)(273); `else:` (274) → ValueError(275). 성공 선택 뒤 fun 호출(276). |
+| 278–290 | finalize는 handle 저장(280), self._lib 삭제(281), isloaded 로그(282). `while isloaded(self.libpath):` (283) 안 dlclose(handle)·상태 로그(284–285). 루프 뒤 subprocess 기반 파일조회는 주석(286–287), shouldinitialize=True(289). 마지막 공백 줄(290). |
 
 ## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
 
-- 120–126: `get_parameters`의 중괄호 컴프리헨션에는 콜론이 없으며 `(이름, 값)` 튜플의 집합을 만든다.
-- 261–266: 정수 rank 0 설정 경로의 dtype도 `c_double`이다. 정수 rank 0 조회 경로는 `c_int`를 쓴다(213–214).
-- 51–59·278–290: 생성자에서 `olddir`를 저장하고 작업 디렉터리를 변경하지만, 이 파일에는 `olddir`로 돌아가는 코드가 없다.
-- 278–289: `finalize`는 `_lib`를 삭제하고 초기화 플래그만 True로 되돌린다. 이 메서드에는 라이브러리 `final` 호출이나 `_lib` 재생성이 없다.
-- 256–264: 설정은 정수도 rank≤4를 허용하는 검사인데, 정수 조회는 rank>2를 거부한다(208–210).
-- 254–264: 설정의 문자·실수·정수 외 typecode에는 명시적 예외 분기가 없고 `typename`은 실수·정수 분기에서만 정해진다.
-- 46: `isloaded`는 라이브러리 경로를 따옴표 없이 셸 명령에 삽입하며 `lsof`·`grep`에 의존한다.
-- 252: shape 비교에는 `array(value).shape`를 쓰지만 assert 메시지에는 원래 `value.shape`를 사용한다.
-- 4–10·136: 가져온 `as_array`, `zeros`, `subprocess`와 설정 후의 지역 `result`는 이후 실행 코드에서 사용하지 않는다.
-- 200–205: rank 0 또는 양수를 처리하지만 음수 rank용 예외 문자열에는 허용 rank가 `(0, 2)`로 적혀 있다.
+- 52·57·278–290: 생성자는 프로세스 작업 디렉터리를 바꾸고 olddir를 저장하지만 이 파일에서 olddir로 복구하는 문장은 없다.
+- 121–125: get_parameters의 comprehension은 키:값 구분자가 없는 (name,value) 튜플 집합이다.
+- 98–102: 문자열 getter의 value 저장소는 c_char 하나이며 string_at의 길이에 c_int 객체 valuelength를 그대로 전달한다.
+- 200–205: rank>=1을 허용하는 분기와 오류 문자열의 'not in (0, 2)' 표기가 다르다.
+- 213–214·261–263: 정수 scalar getter는 POINTER(c_int)를 쓰지만 정수 scalar setter의 dtype은 c_double이다.
+- 258–264: setter의 타입 선택에는 r/i만 있고 마지막 else는 없다. typename을 이 선택 이전에 초기화하는 문장도 없다.
+- 252: assert의 메시지를 만들 때 전달값의 value.shape를 참조한다. Number 입력 처리 분기는 그 뒤 270행에 있다.
+- 278–289: finalize는 _lib.final()을 호출하지 않고 라이브러리 객체 삭제·dlclose 반복을 수행한다.
+- 283–285: 라이브러리가 로드된 동안 반복하며 반복 횟수 상한은 없다.
+- 8·9·10·286: as_array·zeros는 이후 활성 코드에서 쓰이지 않는다. subprocess 사용 예시는 286행 주석뿐이다.

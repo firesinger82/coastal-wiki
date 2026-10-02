@@ -12,11 +12,11 @@ read_date: 2026-10-02
 
 | 구간 | 내용 |
 |---|---|
-| 1–16 | echo를 끄고 명령행 인자 `%1..%4`를 각각 `SolutionDir`, `ConfigurationName`, `TargetDir`, `Platform`에 넣는다(1–7). 각 값의 큰따옴표를 제거한 뒤 echo를 켠다(9–15); 빈 줄도 포함한다. |
-| 17–23 | `dist\%Platform%\%ConfigurationName%`가 있으면 `rmdir /q /s`로 제거하고 다시 만든다(17–19). `src\xbeachlibrary\bin\static\%Platform%\%ConfigurationName%\*.dll`을 TargetDir로 복사한다(21–22). |
-| 24–32 | TargetDir의 모든 exe·dll을 배포 디렉터리로 복사한다(24–26). 고정 경로 `doc\manual\xbeach_manual.pdf`와 루트 `LICENSE`도 같은 곳에 복사한다(28–32). |
+| 1–16 | 명령 표시 off/on(1·15). %1..%4에서 SolutionDir·ConfigurationName·TargetDir·Platform을 받음(4–7), 각 변수의 큰따옴표 제거(10–13); 주석·빈 줄 포함. 인수/따옴표 처리 원문: `set SolutionDir=%1` (4), `set ConfigurationName=%2` (5), `set TargetDir=%3` (6), `set Platform=%4` (7), `set SolutionDir=%SolutionDir:"=%` (10), `set ConfigurationName=%ConfigurationName:"=%` (11), `set TargetDir=%TargetDir:"=%` (12), `set Platform=%Platform:"=%` (13). |
+| 17–23 | 출력 디렉터리 존재 조건 `if exist "%SolutionDir%\dist\%Platform%\%ConfigurationName%\" rmdir "%SolutionDir%\dist\%Platform%\%ConfigurationName%\" /q /s` (18). 조건 밖 mkdir(19). static의 해당 Platform/ConfigurationName DLL을 TargetDir로 copy(22). |
+| 24–32 | 분기 없이 TargetDir의 *.exe·*.dll을 dist 디렉터리로 복사(25–26), manual PDF(29)와 LICENSE(32) 복사; 주석·빈 줄 포함. |
 
 ## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
 
-- 18: 기존 배포 디렉터리를 `/q /s` 옵션으로 제거한 뒤 다시 생성한다.
-- 4–32: 인자 개수 검사나 복사·디렉터리 작업 뒤의 errorlevel 검사·실패 분기가 없다.
+- 18–19: 기존 dist 출력 폴더가 있으면 /q /s로 제거한 뒤 같은 폴더를 만든다.
+- 32: 마지막 LICENSE 복사 줄은 개행이 없으며 nl 기준 마지막 번호는 32이다.

@@ -12,15 +12,14 @@ read_date: 2026-10-02
 
 | 구간 | 내용 |
 |---|---|
-| 1–19 | mnemonic 사용 시범 `program demo`. spacepars·slen·mnemmodule 사용(5–7). `nnames=4`, 이름 배열은 xz/x/cx/nx(12–13). mnemonic 상수로 컴파일러 오타 검사를 받는 대안은 주석(16–18). |
-| 20–35 | `space_alloc_scalars(s)` 호출(21), xz(100)·x(120,10)·cx(10,10,10) 할당(25–28). 전체 배열용 space_alloc_arrays와 사전 s/par 값 필요 설명은 주석(30–32). |
-| 36–50 | i=1..4에서 `setvar(s,names(i),dble(i))`(38–40), nx 및 xz/x/cx 첫 요소를 출력(44–47). program 종료(49). |
-| 51–79 | `setvar(s,name,value)`는 real*8 value를 받음(54–60). `chartoindex(name)` → `indextos(s,index,t)` → 정보 로그·`printvar(t)`(65–69). 포인터 type/rank별 처리가 필요하다는 설명(72–77). |
-| 80–93 | type='r'의 rank 0..4별 `t%r0/r1/r2/r3/r4=value`(84–92). 배열 분기는 부분 첨자가 없는 전체 배열 대입이다. |
-| 94–109 | type='i'도 rank 0..4별 `t%i0/i1/i2/i3/i4=value`(97–105), real*8 value를 integer 변수로 대입. select와 루틴 종료(106–108), 마지막 빈 줄(109). |
+| 1–19 | mnemonic 사용 예제 program과 모듈·변수 선언(4–14). nnames=4, names 배열은 xz·x·cx·nx(12–13); compiler가 오자를 잡는 대안 mnemonic 선언은 주석(16–18). 원문(조건·반복 블록 밖): `integer, parameter :: nnames = 4` (12). `character(slen), dimension(nnames),parameter :: names=(/'xz','x','cx','nx'/)` (13). |
+| 20–50 | `space_alloc_scalars` 호출(21), xz(100), x(120,10), cx(10,10,10) 할당(25–28). i=1..nnames에서 `setvar`에 dble(i)를 전달(38–40), 지정 필드의 첫 원소·nx를 출력(44–47), program 종료(49). 원문(조건·반복 블록 밖): `call space_alloc_scalars(s)` (21). `allocate(s%xz(100))` (25). `allocate(s%x(120,10))` (27). `allocate(s%cx(10,10,10))` (28). `do i=1,nnames` (38). 원문(38행 반복 안): `call setvar(s,names(i),dble(i))` (39). `enddo` (40). |
+| 51–79 | `setvar`의 목적 주석·입력과 arraytype 선언(51–63). `chartoindex`로 이름을 index로 바꾸고 `indextos`로 정보·포인터를 얻으며 `printvar` 호출(65–69). 이후 엄격한 pointer type/rank 선택 필요성 주석(71–77). 원문(조건·반복 블록 밖): `character(len=*) :: name` (59). `index = chartoindex(name)   !determine index from name` (65). `call indextos(s,index,t)    !get info and pointer` (66). `call printvar(t)` (69). |
+| 80–93 | 조건 블록 밖에서 type select를 시작(80). r case(81) 안의 rank select는 0..4별 r0..r4에 value를 대입하고 종료(82–93). 원문(조건·반복 블록 밖): `select case (t%type)` (80). 원문(조건·반복 블록 밖 → 80행 select): `case ('r')      ! type is integer` (81). 원문(80행 select → 81행 case ('r')): `select case (t%rank)` (82). 원문(80행 select → 81행 case ('r') → 82행 select): `case(0)              ! scalar` (83). 원문(80행 select → 81행 case ('r') → 82행 select → 83행 case(0)): `t%r0 = value` (84). 원문(80행 select → 81행 case ('r') → 82행 select): `case(1)              ! (:)` (85). 원문(80행 select → 81행 case ('r') → 82행 select → 85행 case(1)): `t%r1 = value` (86). 원문(80행 select → 81행 case ('r') → 82행 select): `case(2)              ! (:,:)` (87). 원문(80행 select → 81행 case ('r') → 82행 select → 87행 case(2)): `t%r2 = value` (88). 원문(80행 select → 81행 case ('r') → 82행 select): `case(3)              ! (:,:,:)` (89). 원문(80행 select → 81행 case ('r') → 82행 select → 89행 case(3)): `t%r3 = value` (90). 원문(80행 select → 81행 case ('r') → 82행 select): `case(4)              ! (:,:,:,:)` (91). 원문(80행 select → 81행 case ('r') → 82행 select → 91행 case(4)): `t%r4 = value` (92). `end select` (93). |
+| 94–109 | 첫 행은 80행 select의 병렬 i case이며 앞 r case 내부가 아니다. i case 안의 rank 0..4별 i0..i4 대입(95–106), type select·subroutine 종료 및 마지막 빈 줄(107–109). 첫 행의 바깥 범위: 조건·반복 블록 밖 → 80행 select. 원문(조건·반복 블록 밖 → 80행 select): `case ('i')     ! type is real*8` (94). 원문(80행 select → 94행 case ('i')): `select case (t%rank)` (95). 원문(80행 select → 94행 case ('i') → 95행 select): `case(0)              ! scalar` (96). 원문(80행 select → 94행 case ('i') → 95행 select → 96행 case(0)): `t%i0 = value` (97). 원문(80행 select → 94행 case ('i') → 95행 select): `case(1)              ! (:)` (98). 원문(80행 select → 94행 case ('i') → 95행 select → 98행 case(1)): `t%i1 = value` (99). 원문(80행 select → 94행 case ('i') → 95행 select): `case(2)              ! (:,:)` (100). 원문(80행 select → 94행 case ('i') → 95행 select → 100행 case(2)): `t%i2 = value` (101). 원문(80행 select → 94행 case ('i') → 95행 select): `case(3)              ! (:,:,:)` (102). 원문(80행 select → 94행 case ('i') → 95행 select → 102행 case(3)): `t%i3 = value` (103). 원문(80행 select → 94행 case ('i') → 95행 select): `case(4)              ! (:,:,:,:)` (104). 원문(80행 select → 94행 case ('i') → 95행 select → 104행 case(4)): `t%i4 = value` (105). `end select` (106). 원문(80행 select → 94행 case ('i')): `end select` (107). |
 
 ## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
 
-- 51–53·84–105: 머리 주석은 이름으로 찾은 변수의 첫 요소를 0으로 설정한다고 적지만, 실제 대입은 전달받은 value이며 배열 전체에 적용된다.
-- 81·94: case('r') 주석은 integer, case('i') 주석은 real*8이라고 적혀 있어 사용한 r/i 포인터 멤버와 반대이다.
-- 60·97–105: value는 real*8로 선언되지만 integer 멤버 대입에 명시적 int/nint 변환 호출은 없다.
+- 51–53·84–92·97–105: 주석은 첫 원소를 zero로 설정한다고 쓰지만 실제 대입은 전달받은 value를 scalar 또는 배열 포인터 전체에 넣는다.
+- 81·94: r case 주석은 integer, i case 주석은 real*8이라고 쓰며 실제 대상 필드는 각각 r0..r4·i0..i4다.
+- 80–107: type/rank select에 case default가 없다.

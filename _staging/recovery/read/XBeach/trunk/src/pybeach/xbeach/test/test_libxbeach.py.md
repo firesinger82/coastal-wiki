@@ -12,18 +12,16 @@ read_date: 2026-10-02
 
 | 구간 | 내용 |
 |---|---|
-| 1–37 | `unittest2`를 우선 가져오고 실패하면 `unittest`로 대체한다(5–8). nose·래퍼·NumPy와 DEBUG 로거를 준비하고 Matplotlib 대화형 모드를 켠다(9–24). 라이브러리 접미사는 기본 `.so`, darwin `.dylib`, Windows `.dll`(26–29); 라이브러리와 사례 경로는 `__file__` 기준 `../../../xbeachlibrary/.libs/libxbeach.0…`, `../../../../../branches/rewind/data/example1`로 고정한다(30–37). |
-| 38–76 | `TestXBeach.setUp`에서 지정 경로로 래퍼를 만들고 `init`, `tearDown`에서 `finalize`를 호출한다(38–50). 매개변수 수≥224, 인덱스 0=`depfile`, 20=`disch_timeseries_file`, 이름 `disch_loc_file` 포함을 검사한다(51–59). 형은 eps=`r`, morfacopt=`i`, depfile=`c`; 값은 0.005·1·`z.grd`를 기대한다(60–73). 전체 매개변수는 길이≥224만 검사한다(74–76). |
-| 77–90 | 매개변수 설정 검사: `g=9.81`과 `nx=707`을 읽고 변경 시 `ValueError` 및 원래 값 유지를 기대한다(79–85). `t≥0` 확인 후 `t=1.0` 설정의 반환값 None과 조회값 1.0을 검사하고 `t=0.0`으로 되돌린다(87–90). |
-| 91–117 | 배열 이름·전체 배열 수≥30, `zb` 실수형·`wetz` 정수형을 검사한다(91–95·106–108). 초기값 `zb[0,0]=-19.96`, `wetz[0,0]=1`, `dy=dx=0.0`, zb 차원 길이 708·1 및 shape `(708,1)`을 기대한다(96–105). 읽은 모든 배열을 `set_array`로 다시 넣는다(109–112). 한 timestep 뒤 `t>0`을 검사한다(113–115); 끝에 빈 줄이 있다(116–117). |
-| 118–139 | `IntegrationTest`도 생성·초기화/정리 루틴을 동일하게 호출한다(118–130). `test_rewind`에서 첫 timestep을 실행한 후 `get_arrays`를 deepcopy하여 `t0_arrays`에 저장하고 시간 `told`를 보관한다(131–138). 배열이 XBeach 메모리를 직접 가리킨다는 주석이 있다(132). |
-| 140–175 | `tnext=10`으로 설정하고 `t<tnext` 동안 `executestep`, `output`, `tnext` 재설정을 반복한다(141–146). 첫 결과 `t1a`·배열을 저장한 뒤 `t=told`와 저장 배열을 복구한다(147–154). 같은 루프를 재실행해 `t1b`·배열을 저장한다(156–165). 키 집합 일치를 assert하며(167), 비어 있지 않은 ndarray는 절대차의 max, 그 외는 절대차를 구한다(168–172). 차가 `0.00001`보다 크면 이름과 차를 `print`한다(173–174). |
+| 1–37 | os/sys·copy·collections 가져오기(1–4); unittest2 시도(5–6), ImportError면 unittest(7–8), nose with_setup·libxbeach·NumPy·logging(9–12). DEBUG logger(14–18), matplotlib interactive(True)(22–23), time(24). 접미사 기본 .so·darwin .dylib·win32/win64 .dll(26–29). XBEACHLIB는 ../../../xbeachlibrary/.libs/libxbeach.0+접미사(30–33), WD는 ../../../../../branches/rewind/data/example1(34–37). 접미사 원문: `dllsuffix = collections.defaultdict(lambda:'.so')` (26), `dllsuffix['darwin'] = '.dylib'` (27), `dllsuffix['win32'] = '.dll'` (28), `dllsuffix['win64'] = '.dll'` (29). 경로 계산 원문: `XBEACHLIB = os.path.join(` (30); `os.path.dirname(__file__),` (31); `'../../../xbeachlibrary/.libs/libxbeach.0' + dllsuffix[sys.platform]` (32); `)` (33). `WD = os.path.join(` (34); `os.path.dirname(__file__),` (35); `'../../../../../branches/rewind/data/example1'` (36); `)` (37). |
+| 38–76 | TestXBeach setUp은 XBeach(libpath,workingdir)·init(39–47), tearDown은 finalize(48–50). nparameter·이름 수>=224(52·58), 0번 depfile·20번 disch_timeseries_file(54–55), disch_loc_file 포함(59). eps/morfacopt/depfile 타입 r/i/c(60–66); 값 0.005/1/'z.grd'(67–73), get_parameters 크기>=224(74–76). 테스트 기대값이며 모델 전체 기본값으로 일반화하지 않는다. |
+| 77–115 | set_parameter 테스트는 g=9.81·nx=707 설정 예외와 값 유지(79–85), t>=0 후 1.0 설정/확인·0.0 재설정, setter 반환 None(87–90). 배열 이름 수>=30(92), zb/wetz 타입 r/i(94–95), 첫 값 -19.96/1 및 dy/dx=0(97–100), zb 차원 708·1/shape(708,1)(102–105), 전체 배열 수>=30(108). 모든 배열을 같은 값으로 set_array(110–112). executestep 후 t>0(114–115). |
+| 116–150 | 빈 줄(116–117), IntegrationTest의 setUp XBeach·init(119–127), tearDown finalize(128–130). rewind에서 첫 timestep(135), 전체 배열 deepcopy·told 저장(136–137). `tnext = 10` (141), tnext 설정(142). `while self.xb.get_parameter('t') < tnext:` (143) 안 executestep·output·tnext 재설정(144–146); 루프 뒤 t1a·배열 deepcopy(147–149), 빈 줄(150). |
+| 151–175 | t=told 복구(151), t0_arrays의 모든 배열 set_array(152–153). tnext 설정(156), `while self.xb.get_parameter('t') < tnext:` (157) 안 executestep·output·tnext 재설정(158–160); 루프 뒤 t1b·배열 deepcopy(161–165). 배열 키 집합 동일 assert(167). 이름 루프(168)의 `if isinstance(t1a_arrays[name], np.ndarray) and t1a_arrays[name].size > 0:` (169) 참 분기 `maxdiff = np.abs(t1a_arrays[name]- t1b_arrays[name]).max()` (170); `else:` (171)에서 `maxdiff = np.abs(t1a_arrays[name]- t1b_arrays[name])` (172). 앞 if 종료 뒤 같은 루프 안 독립 `if maxdiff > 0.00001:` (173)일 때 print name,maxdiff(174); 마지막 공백 줄(175). |
 
 ## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
 
-- 30–37·51–105: 라이브러리·사례 경로와 개수·인덱스·격자 크기·초기값 기대치가 코드에 고정되어 있다.
-- 147·161: `t1a`, `t1b`는 저장되지만 이후 비교나 assert에 사용하지 않는다.
-- 167–174: rewind 결과의 키 집합은 assert하지만 수치 차가 `0.00001`을 넘는 경우에는 출력만 하고 수치 일치 assert를 호출하지 않는다.
-- 169–172: 크기 0 ndarray는 else에서 배열 절대차를 만들고, 다음 행에서는 `if maxdiff > 0.00001` 조건에 사용한다.
-- 9·24: 가져온 `with_setup`, `time`은 이후 코드에서 사용하지 않는다.
-- 174: 출력 구문은 `print name, maxdiff` 형식이다.
+- 30–37: 라이브러리와 fixture 경로는 상대 경로의 .libs/libxbeach.0 및 branches/rewind/data/example1로 고정되어 있다.
+- 132·136·149·165·libxbeach.py 235: 테스트 주석은 배열이 XBeach 메모리를 직접 가리킨다고 적고, getter의 반환은 array(arrayp)이다.
+- 147·161: t1a·t1b를 저장하지만 두 값에 대한 assert는 없다.
+- 167–174: 키 집합은 assert하지만 값 차이는 0.00001 초과 시 출력하며 assert하지 않는다.
+- 9·24: with_setup·time을 가져오지만 이후 이 파일에서 쓰지 않는다.
