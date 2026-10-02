@@ -64,7 +64,7 @@ try:
         else:
             shutil.copyfile(origin, staging / name)
     for x in [staging, *staging.rglob('*')]:
-        x.chown(0, 0)
+        os.lchown(x, 0, 0)
         x.chmod(0o755 if x.is_dir() or x.parent.name in ('bin','hooks','install') and
                 x.suffix in ('','.py','.sh') else 0o644)
     if destination.exists():
@@ -73,7 +73,7 @@ try:
     approvals = Path('/var/lib/coastal-task/approvals')
     approvals.mkdir(parents=True, exist_ok=True)
     for x in (approvals.parent, approvals):
-        x.chown(0,0)
+        os.chown(x, 0, 0)
         x.chmod(0o755)
     # Protected installed scripts, in one authenticated process; dry-run precedes this command.
     subprocess.run([str(destination/'install/harden-sudo.sh'), '--apply'], check=True)
