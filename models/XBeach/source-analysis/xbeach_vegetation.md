@@ -63,7 +63,8 @@ flowchart TD
 
 그림에서 짚을 점(판독 기록의 코드 사실):
 - v 방향 항력은 v점 속도 `vev`·`vv`에 u점 속력 `vmageu`·`vmagu`를 곱한다(vegetation.F90:516·520). v점 속력 `vmagev`는 flow_timestep.F90:934에 따로 있다. `porcanflow` 경로는 u·v점 평균을 한다(871·877).
-- 파봉 위 단면에서 canopy 힘 `FvgCau/FvgCav`는 0으로 초기화되지 않는다(vegetation.F90:502–511).
+- 매뉴얼 식 (2.58)은 층별 항력을 Lagrangian 속도 $u^L$로 쓴다(XBeach_manual_master 인쇄 25쪽·PDF 29쪽). 기본값 `veguntow=1`(params.F90:1338) 경로는 Eulerian 속도 `ueu`·`vev`와 Eulerian 속력 `vmageu`를 쓴다(vegetation.F90:515–516; flow_timestep.F90:858·864·926). `veguntow=0` 경로만 `uu`·`vv`(GLM 속도, `ueu = uu - usu`, flow_timestep.F90:858)를 쓴다(vegetation.F90:519–520). 매뉴얼은 격자 위치(u점·v점 속력)를 지정하지 않는다.
+- `FvgCau`·`FvgCav`는 스칼라다(vegetation.F90:418). `momeqveg`는 호출마다 두 변수를 0으로 만든다(vegetation.F90:452–453). 따라서 이전 시간 단계 값은 남지 않는다. 그러나 파봉 위 층의 분기(`ahtold > wacr`)는 두 변수를 다시 대입하지 않는다(vegetation.F90:502–511). `vegcanflo=1`이면 이 층은 같은 격자점의 앞선 층 값을 항력 합에 다시 더한다(vegetation.F90:539–540·554–556). 셀마다 `ahtold = 0`에서 시작하므로(vegetation.F90:477) 첫 층은 항상 새 값을 쓴다. 이 재사용의 실제 크기는 모델 실행으로 확인하지 않았다.
 - `Dveg`는 이번 단계의 `vegatt` 전에 실행된 `wave`가 쓰므로, 파랑은 직전 단계의 `Dveg`를 쓴다(libxbeach.F90:302–303).
 
 ## A. Entry / call sequence

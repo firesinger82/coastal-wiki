@@ -44,6 +44,16 @@ source_correction_human_approval: not-issued
 
 이 값은 nonh 루틴 내부의 수평·연직 속도 보정에 쓰인다. 기존 설명의 `dp → ph → g∂(zs+ph)` 연결은 잘못된 귀속이었다. `flow`의 `zs+ph` 경사는 선박 외력 경로이며 비정수압 보정과 별도로 읽어야 한다. (`nonh.F90:1234-1262`; `flow_timestep.F90:131-149`; [[xbeach_flow_solver]])
 
+### 3.1 보고서 압력항 식과 코드의 부호 대조
+
+비정수압 보고서(non-hydrostatic_report_draft)는 바닥을 $z=-d$로 정의한다(인쇄 3쪽·PDF 13쪽 Figure 2-2). 따라서 코드의 `zb`는 보고서의 $-d$에 해당한다.
+
+- 보고서 식 (2.15)의 첫 표현 $\frac{H_{i+1,j}\bar p_{i+1,j}-H_{i,j}\bar p_{i,j}}{\Delta x}-p_{i+\frac12,j}\frac{d_{i+\frac12,j}-d_{i-\frac12,j}}{\Delta x}$에 $H=\eta+d$, $\bar p=\frac12p$, $p_{i+\frac12,j}=\frac12(p_{i+1,j}+p_{i,j})$를 넣으면 $\frac{(\eta_{i+1,j}+d_{i,j})p_{i+1,j}-(\eta_{i,j}+d_{i+1,j})p_{i,j}}{2\Delta x}$가 된다(Claude 전개).
+- 보고서는 같은 식의 마지막 표현을 $(\eta^{n+1}_{i,j}-d^{n+1}_{i+1,j})$로 인쇄한다(인쇄 15쪽·PDF 25쪽, 쪽 이미지로 확인). 식 (2.18)과 (2.19)도 같은 자리에 $-d$를 인쇄한다(인쇄 16쪽·PDF 26쪽).
+- 코드는 `au(1,i,j) = - (s%zs(i+1,j) - s%zb(i  ,j))*vol`, `au(0,i,j) = + (s%zs(i  ,j) - s%zb(i+1,j))*vol`이다(`nonh.F90:1194-1195`). v 방향도 같은 형태다(`nonh.F90:1217-1218`). `zb=-d`를 넣으면 두 괄호는 모두 $\eta+d$ 형태다. 따라서 코드는 첫 표현을 전개한 식과 같다. 보고서 마지막 표현의 $-d$는 첫 표현과 맞지 않는 인쇄 부호다.
+- 보고서 식 (1.13)은 y 이류항 앞에 $-$를, 식 (1.17)은 $+$를 인쇄한다(인쇄 6쪽·PDF 16쪽). 코드의 u 운동량 잔차는 x 이류항과 y 이류항을 같은 부호로 더한다: `dudt = (s%ududx(i,j)+s%vdudy(i,j)-s%viscu(i,j) &`(`flow_timestep.F90:564`). 따라서 코드는 식 (1.17)의 부호와 같다.
+- 확인하지 않은 것: 이 부호 차이가 계산 결과에 주는 영향은 모델 실행으로 확인하지 않았다. 코드는 보고서의 인쇄 오기와 무관하게 첫 표현의 전개와 일치한다.
+
 ## 4. MPI 빌드와 실제 guard
 
 `nonh.F90:42-43`의 MPI 제외 문장은 오래된 주석이다. 현재 조사한 MPI 프로젝트에 이 소스가 포함되고, 구현 안에는 `#ifdef USEMPI`로 감싼 `xmpi_shift_ee` 호출이 있다. 이를 `#ifdef CMPI`에 의해 모듈 전체가 제외된다고 설명할 근거는 없다. (`nonh.F90:1446-1449, 1872-1883, 2237-2241, 2927-2935`; [[xbeach-build-mode-connectivity]])
