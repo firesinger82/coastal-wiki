@@ -93,22 +93,21 @@ Delft3D 487(기계 sweep 실패 471 + 웹 16, 09-22 스냅샷 교체 전 경로)
 - 한계: "모든 행이 판독자에게 출력됨"과 "인용이 원문과 일치"는 기계로 확인했지만, 요약 문장의 이해 정확도는 표본 검증만 했다. 파일 간 연결(예: 변수의 실제 격자 위치)은 파일별 판독으로 잡히지 않는다 — vegetation 516·520의 u점 속력 사용은 교차 파일 사실로 따로 적었다.
 - 남은 것: XBeach 매뉴얼·보고서(수식·그림 미판독 9경로), 파일 간 연결 분석.
 
-## XBeach 매뉴얼·문서 판독 (2026-10-02, 진행 중)
+## XBeach 매뉴얼·문서 판독 (2026-10-02~03 완료)
 
 기록: `read/XBeach/manuals/`, `read/XBeach/source_code/trunk/doc/`, `read/XBeach/office-converted/`, `read/XBeach/office-compare/word-vs-pdf.md`. 추출본: `extract/XBeach/{pdf,pdf-md,office,marker}/`.
 
 - 텍스트 문서(readthedocs rst 13·md 2·libxbeach.tex·Office 변환 3): Codex gpt-6.1-sol 행 단위 판독, 기계 확인 통과, sonnet 표본 검증(정정 3).
 - Word 판 3종: PDF와 기계 대조 — Word에만 있는 실질 내용 없음.
-- PDF 4종+슬라이드+adapted_front_0(389쪽): sonnet 1차 쪽 판독 → fable 표본 검증(표본 30쪽 중 8쪽 오류, 정정 27) → **fable 전 쪽 재판독**(쪽 이미지 + 300dpi 확대 + Marker LaTeX 초안 대조, 원문 오기는 인쇄 그대로).
+- PDF 4종+슬라이드+adapted_front_0(389쪽): sonnet 1차 쪽 판독 → fable 표본 검증(표본 30쪽 중 8쪽 오류, 정정 27) → **전 쪽 재판독 완료(10-03)**. 쪽 이미지(300dpi) + Marker LaTeX 초안 대조, 원문 오기는 인쇄 그대로.
+  - 재판독자: fable = 비정수압 69쪽, kingsday 19–36·109–141쪽. Codex `gpt-6.1-sol` = kingsday 나머지, master 145쪽, Parallellization_report, curvilinear, adapted_front_0.
+  - 결과(대시보드 집계, 10-03): 389쪽 중 재판독에서 정정 193쪽, 일치 196쪽.
+  - Codex 구간마다 기계 확인(`pdfcheck.py`, 23개 작업 모두 통과)과 sonnet 3~4쪽 이미지 대조. 표본에서 나온 정정: kingsday 2, master p.14·p.40 누락 보완·p.64 용어, curvilinear p.6 도식 설명(Claude가 이미지로 확인). adapted_front_0 1쪽은 Claude가 이미지로 대조.
+  - 남은 판독 불가: master p.17 식 (2.1)의 사각형 3곳·p.15 잘린 축 라벨, p.25 (2.40)·p.26 (2.43) 깨진 글리프(PDF 자체 결함).
 - 도구: 본문 텍스트 = opendataloader-pdf `-f markdown --use-struct-tree` (`-f text`는 목록을 빠뜨림). 수식 = Marker 1.10 (`~/.venvs/pdfocr`, GPU). Marker는 첨자는 잘 읽지만 괄호 구조·p/ρ 혼동이 있어 판정은 이미지로.
 
 ## 다음에 이어서 할 일
 
-1. PDF 재판독 남은 것 — **Codex `gpt-6.1-sol`로 한다**(10-02 시험: 300dpi PNG를 직접 보고 kingsday B.13·B.14·B.16을 fable 확정값과 똑같이 판독. fable은 18쪽당 13만~21만 토큰이라 대량에 부적합). `fableprompt.py`의 지시를 Codex용으로 바꿔 쓰고(쪽 이미지는 `pdftoppm -r 300`으로 미리 렌더해 경로를 줌), Claude는 기계 확인·소량 표본만 — 지시문 생성 `python3 _staging/recovery/scripts/fableprompt.py N` (N = `scripts/pdfjobs.json` 작업 번호), 기계 확인 `python3 _staging/recovery/scripts/pdfcheck.py N` (저장소 루트에서 실행; 확대 이미지 임시 경로는 지시문 안에서 바꿀 것):
-   - kingsday: p001-018, p037-054, p055-072, p073-090, p091-108 (p019-036·p109-126·p127-141은 10-02 진행분 — 기록 frontmatter `reread_by` 유무로 확인)
-   - master: 8개 기록 전부 (Marker 초안 `extract/XBeach/marker/XBeach_manual_master/` 생성 여부 확인)
-   - Parallellization_report, curvilinear grid properties, adapted_front_0
-   - 인용 없는 쪽 보완: 비정수압 p.1·5·45, kingsday p.17
-2. 매뉴얼에서 나온 사실과 코드 판독 기록을 대조해 `models/XBeach/` 노트에 반영 — 우선: 식생 v방향 u점 속력(vegetation.F90:516·520), FvgCau 미초기화(502–511), 비정수압 보고서 −d 부호·(1.13)/(1.17) 부호와 nonh.F90 대조.
-3. XBeach 파일 간 계산 흐름 분석(미완).
-4. 다른 12개 모델: 같은 방식(고정 목록 → 1행/1쪽 판독 → 기계 확인 → 다른 모델 검증).
+1. 매뉴얼에서 나온 사실과 코드 판독 기록을 대조해 `models/XBeach/` 노트에 반영 — 우선: 식생 v방향 u점 속력(vegetation.F90:516·520), FvgCau 미초기화(502–511), 비정수압 보고서 −d 부호·(1.13)/(1.17) 부호와 nonh.F90 대조.
+2. XBeach 파일 간 계산 흐름 분석(미완).
+3. 다른 12개 모델: 같은 방식(고정 목록 → 1행/1쪽 판독 → 기계 확인 → 다른 모델 검증).

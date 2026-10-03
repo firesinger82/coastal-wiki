@@ -63,9 +63,9 @@ def pdf_pages():
         d = docs.setdefault(name, {'name': name, 'total': total, 'pages': {}})
         for m in re.finditer(r'^\|\s*p\.(\d+)[^|]*\|(.*)$', t, re.M):
             p, body = int(m.group(1)), m.group(2)
-            if 'fable 재판독: 일치' in body:
+            if re.search(r'(fable|codex) 재판독: 일치', body) and '검증 정정' not in body:
                 s = 'reread_ok'
-            elif 'fable 재판독' in body:
+            elif re.search(r'(fable|codex) 재판독', body):
                 s = 'reread_fixed'
             elif re.search(r'fable 검증|검증 정정|Claude 정정', body):
                 s = 'checked_fixed'
