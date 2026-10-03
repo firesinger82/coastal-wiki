@@ -1,0 +1,34 @@
+diff --git a/models/ADCIRC/source-analysis/tide/adcirc-tide-harmonic-prep.md b/models/ADCIRC/source-analysis/tide/adcirc-tide-harmonic-prep.md
+--- a/models/ADCIRC/source-analysis/tide/adcirc-tide-harmonic-prep.md
++++ b/models/ADCIRC/source-analysis/tide/adcirc-tide-harmonic-prep.md
+@@ -380,8 +380,8 @@
+ (See "H. Validation pitfalls" above — most issues come from epoch and phase convention.)
+ 
+ Additional:
+-- ▢ Hot-start across `NTIP` change — harmonic accumulators / SAL arrays inconsistent.
+-- ▢ Modifying NBFR block but not regenerating SAL constituent set — names mismatch silently.
++- ▢ Hot-start across `NTIP` change — harmonic accumulators / SAL arrays inconsistent (`source-needed`: hot-start 경로의 해당 배열 처리 코드 미인용 — 확인 전 단정하지 않는다).
++- ▢ Modifying NBFR block but not regenerating SAL constituent set — names mismatch silently (`source-needed`: 미스매치 시 동작·NBFR↔SAL 연동의 코드 근거 미인용; §C 기준 SAL 매칭은 TIPOTAG 로 BOUNTAG 와 별개 — 재확인 필요).
+ - ▢ Nesting (boundary forcing from coarse-grid output) — coarse `EMO/EFA` may not be exact at fine boundary nodes; interpolate carefully.
+ 
+ ## Next expansion
+diff --git a/models/CADMAS-SURF/source-analysis/cadmas-2f-stier-and-hidem-dem-coupling.md b/models/CADMAS-SURF/source-analysis/cadmas-2f-stier-and-hidem-dem-coupling.md
+--- a/models/CADMAS-SURF/source-analysis/cadmas-2f-stier-and-hidem-dem-coupling.md
++++ b/models/CADMAS-SURF/source-analysis/cadmas-2f-stier-and-hidem-dem-coupling.md
+@@ -5,6 +5,7 @@
+ canonical_source: self
+ verification_method: "CADMAS-SURF/3D2F 소스 전수 카탈로그 (raw/.../CADMAS-SURF-3D2F/Source code/, 388 파일 C티어 2노트 외 잔여). vf_* 대부분 SURF/3D 공유 확인(SMAC·VOF·k-ε·MPI·nesting·IO·입력) + sf_* 지원(sf_mpi/c_mpi/stm_mpi 27·메모리 sf_alloc/dealloc 8·restart/ENS 9). HiDEM firming read: vf_jphdm1.f:1-7(HiDEM 인터페이스 連成領域 확인, use mod_comm comm_2fc_dem)·vf_jpcoef.f:1-8(HiDEM 전용 포텐셜 Poisson)·mod_dem.f90:1-15(ihidem 플래그·comm_2fc_dem). 2상물리=EOS집합 전수 확인(RHOG/ISTATE grep clean, 표면장력·상변화 無). file:line 직접 인용."
+ citation_status: verified
++has_source_needed: true
+ note_author: "Claude Opus 4.8 (1M context)"
+ note_date: 2026-06-24
+ related:
+@@ -27,7 +28,7 @@
+ 
+ ## B. ★ HiDEM(DEM) 결합 — 4번째 결합파트너
+ 
+-CADMAS-2F 는 **구조물 파괴 해석 DEM 프로그램 HiDEM**(High-performance Discrete Element Method)과 연성 — 쓰나미 표류물/블록 파괴·표류 모사. STOC·STR3D(FEM)·AGENT 에 더한 4번째 MPMD 파트너:
++CADMAS-2F 는 **구조물 파괴 해석 DEM 프로그램 HiDEM**(⚠ 약어 전개 "High-performance Discrete Element Method" 는 1차 출처 미확인 — `source-needed`; 구조물파괴 해석 프로그램·連成은 `mod_dem.f90:5` 주석)과 연성 — 쓰나미 표류물/블록 파괴·표류 모사. STOC·STR3D(FEM)·AGENT 에 더한 4번째 MPMD 파트너:
+ - `mod_dem.f90`(`:1-15`): `ihidem`(연성 플래그 0=무/≠0=연성)·`nsize_dem`(DEM PE수)·`comm_2fc_dem`(통신자 프로세스수/rank)·`ihidm`(HiDEM 대표 rank)
+ - `vf_jphdm1.f:1-7`(`HiDEMとのインターフェイス(1):連成解析計算領域の確認`, `use mod_comm,only:comm_2fc_dem; use mod_dem`)·`vf_jphdm2.f`(인터페이스 2)
+ - `vf_jpcoef.f:1-8`(`HiDEM用のポテンシャル関数の連立1次方程式を作成` — HiDEM 인터페이스 전용 포텐셜 Poisson, 대각 양수화 -1.0 승, [SMAC vpcoef](cadmas-surf3d-smac-velocity-pressure-solver.md#4-압력-poisson--포텐셜-함수-pt-vf_vpcoeff)와 동형)·`vf_vpsol.f`(HiDEM Poisson solve)
