@@ -32,6 +32,40 @@ How XBeach models vegetation: per-species multi-section vertical structure, drag
 - `wave_instationary.F90:294-295`, `wave_stationary_directions.F90:442-444` — current `Dveg` consumers; see [[xbeach-build-mode-connectivity]] for the excluded legacy files.
 - `variables.def:271, 277-280` — `vegtype, Nveg, Fvegu/v` definitions.
 
+## 계산 흐름 그림
+
+상자 안 위치는 모두 `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/` 기준 file:line이다(2026-10-02 원문 재확인; 판독 기록 `_staging/recovery/read/XBeach/trunk/src/xbeachlibrary/vegetation.F90.md`).
+
+```mermaid
+flowchart TD
+  P["params.txt<br/>vegetation=1 (params.F90:127)<br/>veguntow·vegnonlin·vegcanflo·porcanflow (params.F90:1336–1339)"]
+  I["veggie_init (vegetation.F90:75–303)<br/>호출 libxbeach.F90:184<br/>veggiefile·veggiemapfile → 셀 중심 배열<br/>Cdveg·bveg·Nveg·ahveg (vegetation.F90:208–257)"]
+  L["매 시간 단계 (libxbeach.F90:302–305)<br/>wave → vegatt → flow 순서"]
+  V{"vegatt (vegetation.F90:305–345)<br/>porcanflow==1 ? (319)"}
+  C["porcanflow (vegetation.F90:775–884)<br/>셀 중심 canopy 힘 → u점·v점 평균<br/>(871 · 877)"]
+  B["Cdveg&lt;0 이면 bulkdragcoeff<br/>(vegetation.F90:327–329, 701–773)<br/>Mendez–Losada 고정 (728)"]
+  S["swvegatt (vegetation.F90:347–403)<br/>단파 소산 Dveg (400)"]
+  W["파랑 작용량 소산에 더해짐<br/>wave_instationary.F90:295<br/>wave_stationary.F90:236<br/>wave_stationary_directions.F90:444"]
+  M["momeqveg (vegetation.F90:404–566)"]
+  U["u 방향: ueu × vmageu (u점 속력)<br/>(vegetation.F90:515)"]
+  VV["v 방향: vev × vmageu<br/>⚠ v점 속도 × u점 속력 (516)<br/>veguntow=0이면 vv × vmagu (520)"]
+  F["Fvegu·Fvegv = 합 × ρ (563–564)"]
+  FL["흐름 운동량식 항<br/>Fvegu/(ρ·hu) flow_timestep.F90:567<br/>Fvegv/(ρ·hv) flow_timestep.F90:603"]
+
+  P --> I --> L --> V
+  V -- "예" --> C --> FL
+  V -- "아니오" --> B --> S --> W
+  B --> M
+  M --> U --> F
+  M --> VV --> F
+  F --> FL
+```
+
+그림에서 짚을 점(판독 기록의 코드 사실):
+- v 방향 항력은 v점 속도 `vev`·`vv`에 u점 속력 `vmageu`·`vmagu`를 곱한다(vegetation.F90:516·520). v점 속력 `vmagev`는 flow_timestep.F90:934에 따로 있다. `porcanflow` 경로는 u·v점 평균을 한다(871·877).
+- 파봉 위 단면에서 canopy 힘 `FvgCau/FvgCav`는 0으로 초기화되지 않는다(vegetation.F90:502–511).
+- `Dveg`는 이번 단계의 `vegatt` 전에 실행된 `wave`가 쓰므로, 파랑은 직전 단계의 `Dveg`를 쓴다(libxbeach.F90:302–303).
+
 ## A. Entry / call sequence
 
 `vegetation.F90` exposes `veggie_init` and `vegatt` (`:69-70`).
