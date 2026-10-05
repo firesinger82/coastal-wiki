@@ -1,0 +1,134 @@
+diff --git a/models/Celeris/source-analysis/celeris-boussinesq-solver.md b/models/Celeris/source-analysis/celeris-boussinesq-solver.md
+--- a/models/Celeris/source-analysis/celeris-boussinesq-solver.md
++++ b/models/Celeris/source-analysis/celeris-boussinesq-solver.md
+@@ -2,6 +2,7 @@
+ title: "Celeris-WebGPU Boussinesq 분산 solver — Pass3_Bous + PCR tridiagonal 음해"
+ model: Celeris
+ citation_status: verified
++has_source_needed: true
+ verification_method: "models/Celeris/raw/source_code/Celeris-WebGPU/shaders/{Pass3_Bous,Pass3_NLSW,Update_TriDiag_coef,TriDiag_PCRx,TriDiag_PCRy}.wgsl + js/Run_Tridiag_Solver.js 직접 read. 라인·수식 인용 소스 기준. 2026-06-15."
+ note_author: "Claude Opus 4.8 (1M context)"
+ note_date: 2026-06-15
+diff --git a/models/Celeris/source-analysis/celeris-coulwave.md b/models/Celeris/source-analysis/celeris-coulwave.md
+--- a/models/Celeris/source-analysis/celeris-coulwave.md
++++ b/models/Celeris/source-analysis/celeris-coulwave.md
+@@ -2,6 +2,7 @@
+ title: "Celeris-WebGPU COULWAVE 고차 모드 — Pass3A/3B 보조패스·COULWAVE PCR"
+ model: Celeris
+ citation_status: verified
++has_source_needed: true
+ verification_method: "models/Celeris/raw/source_code/Celeris-WebGPU/shaders/{Pass3A_COULWAVE,Pass3B_COULWAVE,Pass3_COULWAVE,Update_TriDiag_coef_COULWAVE,TriDiag_PCRx_COULWAVE,TriDiag_PCRy_COULWAVE}.wgsl 직접 read + ARCHITECTURE.md Model Modes. 라인 인용 소스 기준. 2026-06-15."
+ note_author: "Claude Opus 4.8 (1M context)"
+ note_date: 2026-06-15
+diff --git a/models/Celeris/source-analysis/celeris-pipeline-graph.md b/models/Celeris/source-analysis/celeris-pipeline-graph.md
+--- a/models/Celeris/source-analysis/celeris-pipeline-graph.md
++++ b/models/Celeris/source-analysis/celeris-pipeline-graph.md
+@@ -11,7 +11,7 @@
+ > Canonical: [`../README.md`](../README.md) (모델 정체) · 소스 맵 [`celeris-source-map.md`](celeris-source-map.md).
+ > 본 노트 = **per-timestep 파이프라인 + 제어흐름 그래프**. 인용 경로는 `Celeris-WebGPU/` 루트 상대 (`js/main.js:NNN`).
+ 
+-Celeris-WebGPU는 단일 모놀리식 오케스트레이터 `js/main.js`(~6800 lines)가 WebGPU compute 패스를 고정 순서로 디스패치한다. JS는 스케줄링·텍스처 복사만, 수치 커널은 WGSL. 이 노트는 그 디스패치 시퀀스를 소스 라인 기준으로 재구성한다.
++Celeris-WebGPU는 단일 모놀리식 오케스트레이터 `js/main.js`(5489 lines)가 WebGPU compute 패스를 고정 순서로 디스패치한다. JS는 스케줄링·텍스처 복사만, 수치 커널은 WGSL. 이 노트는 그 디스패치 시퀀스를 소스 라인 기준으로 재구성한다.
+ 
+ ---
+ 
+diff --git a/models/Celeris/source-analysis/celeris-sediment.md b/models/Celeris/source-analysis/celeris-sediment.md
+--- a/models/Celeris/source-analysis/celeris-sediment.md
++++ b/models/Celeris/source-analysis/celeris-sediment.md
+@@ -2,6 +2,7 @@
+ title: "Celeris-WebGPU 표사·지형변화 — SedTrans Pass1/Pass3 + UpdateBottom"
+ model: Celeris
+ citation_status: verified
++has_source_needed: true
+ verification_method: "models/Celeris/raw/source_code/Celeris-WebGPU/shaders/SedTrans_*.wgsl + js/Handler_SedTrans_*.js 직접 read. 활성 variant는 Handler/main.js dispatch로 확인. 라인 인용 소스 기준. 2026-06-15."
+ note_author: "Claude Opus 4.8 (1M context)"
+ note_date: 2026-06-15
+diff --git a/models/Celeris/source-analysis/celeris-source-map.md b/models/Celeris/source-analysis/celeris-source-map.md
+--- a/models/Celeris/source-analysis/celeris-source-map.md
++++ b/models/Celeris/source-analysis/celeris-source-map.md
+@@ -48,16 +48,16 @@
+ 
+ ---
+ 
+-## 2. JS 모듈 맵 (35 파일, `js/`)
++## 2. JS 모듈 맵 (37 파일, `js/`)
+ 
+ | 파일 | 줄 | 역할군 |
+ |---|---:|---|
+-| `main.js` | 4368 | **오케스트레이션**: init, 셰이더 fetch/컴파일, 파이프라인·바인드그룹 생성, `frame()` 루프, UI/이벤트, 패스 dispatch 시퀀스 |
++| `main.js` | 5489 | **오케스트레이션**: init, 셰이더 fetch/컴파일, 파이프라인·바인드그룹 생성, `frame()` 루프, UI/이벤트, 패스 dispatch 시퀀스 |
+ | `site.js` | 4 | 엔트리 모듈 로더 |
+-| `constants_load_calc.js` | 556 | 파이프라인 설정·기본 config·파생 상수 계산 (Courant·dt·Bcoef 등). ★**dt 정적 확정(2026-07-12)**: `dt=Courant_num·min(dx,dy)/√(g·base_depth)` — **단, `grid_type == 2`(구면)에서는 dx/dy 를 도→rad 로 변환해 `R·|Δlat|` 과 셀 위도별 `R·cos(φ)·|Δlon|` 중 최소 물리 간격을 쓴다** (`js/main.js:2294-2333`; 구면 대입 `:2328`, Cartesian 대입 `:2331`, 초기화 `constants_load_calc.js:454-487`)(:404, Courant_num 기본 0.15 :27) — 재계산은 main.js:1614 의 `html_update>0` 블록(UI 변경 시)뿐, frame 루프 per-step CFL 재산정 없음 |
++| `constants_load_calc.js` | 664 | 파이프라인 설정·기본 config·파생 상수 계산 (Courant·dt·Bcoef 등). ★**dt 정적 확정(2026-07-12)**: `dt=Courant_num·min(dx,dy)/√(g·base_depth)` — **단, `grid_type == 2`(구면)에서는 dx/dy 를 도→rad 로 변환해 `R·|Δlat|` 과 셀 위도별 `R·cos(φ)·|Δlon|` 중 최소 물리 간격을 쓴다** (`js/main.js:2294-2333`; 구면 대입 `:2328`, Cartesian 대입 `:2331`, 초기화 `constants_load_calc.js:454-487`)(대입: 구면 `:484`·Cartesian `:486`, Courant_num 기본 0.15 `:31`) — 재계산은 main.js:1614 의 `html_update>0` 블록(UI 변경 시)뿐, frame 루프 per-step CFL 재산정 없음 |
+ | `Config_Pipelines.js` | 283 | **파이프라인 팩토리**: `createComputePipeline`/`createRenderPipeline`/skybox/model (l.6,22,111,150) — 셰이더 코드 인자로 받는 범용 함수 |
+ | `Create_Textures.js` | 100 | **텍스처 할당** 팩토리: 2D rgba32f / 3D rgba16f / bgra8 / 1D (l.3,16,29,55,69) |
+-| `Copy_Data_to_Textures.js` | 527 | CPU→GPU 데이터 전송 (bathy·waves·이미지) |
++| `Copy_Data_to_Textures.js` | 642 | CPU→GPU 데이터 전송 (bathy·waves·이미지) |
+ | `Run_Compute_Shader.js` | 89 | 컴퓨트 dispatch 헬퍼 (`runComputeShader`) |
+ | `Run_Tridiag_Solver.js` | 93 | **PCR 솔버 드라이버** (§1 참조) |
+ | `Handler_Pass0.js` | 68 | per-pass 핸들러 (바인드그룹 레이아웃·바인드그룹) |
+@@ -65,7 +65,7 @@
+ | `Handler_Pass2.js` | 227 | Pass2 핸들러 |
+ | `Handler_Pass3.js` | 572 | Pass3 + Pass3A/B_COULWAVE 핸들러 (3개 레이아웃) |
+ | `Handler_PassBreaking.js` | 134 | breaking 패스 핸들러 |
+-| `Handler_BoundaryPass.js` | 147 | 경계 패스 핸들러 (NewState 변형 포함) |
++| `Handler_BoundaryPass.js` | 206 | 경계 패스 핸들러 (NewState 변형 포함) |
+ | `Handler_Tridiag.js` | 108 | PCR x/y 바인드그룹 (ping-pong 변형) |
+ | `Handler_UpdateTrid.js` | 80 | 삼중대각 계수 갱신 핸들러 |
+ | `Handler_Updateneardry.js` | 53 | near-dry 플래그 갱신 핸들러 |
+@@ -75,24 +75,26 @@
+ | `Handler_CalcMeans.js` | 199 | 진단: 시간평균 통계 |
+ | `Handler_CalcWaveHeight.js` | 92 | 진단: 파고(wave height) |
+ | `Handler_ExtractTimeSeries.js` | 132 | 진단: 시계열/툴팁 추출 |
+-| `Time_Series.js` | 171 | 시계열 좌표·CPU측 관리 |
++| `Handler_ExtractNestedBoundaryTimeSeries.js` | 109 | nested-grid 경계 시계열 추출 핸들러 (Codex 추가 주석 `:1-3`; 디스패치 `main.js:2893`→`:2181-2208`) |
++| `Time_Series.js` | 184 | 시계열 좌표·CPU측 관리 |
+ | `Handler_AddDisturbance.js` | 120 | 교란(disturbance) 주입 |
+ | `Handler_MouseClickChange.js` | 119 | 마우스 편집 (bathy/state) |
+-| `Wave_Generator.js` | 334 | 경계 파랑 생성 (forcing) |
++| `Wave_Generator.js` | 374 | 경계 파랑 생성 (forcing) |
+ | `Handler_Copytxf32_txf16.js` | 133 | f32→f16 렌더 데이터 패킹 |
+ | `Handler_Model.js` | 57 | 3D 모델(glTF) 렌더 핸들러 |
+ | `Handler_Skybox.js` | 56 | 스카이박스 렌더 핸들러 |
+ | `Handler_Render.js` | 391 | **2D/3D 렌더** 바인드그룹·파이프라인 (vertex/fragment, l.3~) |
+ | `Model_Loaders.js` | 235 | 3D 모델 로딩 |
+-| `display_parameters.js` | 232 | UI 패널 로직 |
+-| `File_Loader.js` | 608 | 입력 파싱 (JSON·bathy·waves·이미지) |
+-| `File_Writer.js` | 641 | 출력 (JPEG·GIF·binary·JSON) |
++| `display_parameters.js` | 251 | UI 패널 로직 |
++| `File_Loader.js` | 819 | 입력 파싱 (JSON·bathy·waves·이미지) |
++| `File_Writer.js` | 848 | 출력 (JPEG·GIF·binary·JSON) |
++| `agent_controls.js` | 949 | CelerisAgent 플롯/제어 UI — PLOT_QUANTITIES 매핑·시계열 연동 (`js/agent_controls.js:1-13`) |
+ 
+ > 핸들러 규약: `Handler_*.js`는 **바인드그룹 레이아웃·바인드그룹만** 정의한다 (`grep`상 셰이더 코드·`createShaderModule` 미포함). 셰이더 fetch·컴파일·파이프라인 생성은 모두 `main.js`에서 수행 (`fetchShader` l.1320~, `createComputePipeline` l.1392~).
+ 
+ ---
+ 
+-## 3. WGSL 셰이더 맵 (42 파일, `shaders/`)
++## 3. WGSL 셰이더 맵 (44 파일, `shaders/`)
+ 
+ | 파일 | 줄 | 그룹 |
+ |---|---:|---|
+@@ -103,12 +105,13 @@
+ | `Pass2_HighOrder_HLLC.wgsl` | 291 | Pass2 고차 HLLC (활성 고차 경로) |
+ | `Pass2_HighOrder_HLLEM.wgsl` | 274 | Pass2 고차 HLLEM |
+ | `Pass3_NLSW.wgsl` | 285 | Pass3 NLSW (분산 없음) |
++| `Pass3_NLSW_Spherical.wgsl` | 267 | Pass3 NLSW 구면 변형 (`grid_type==2`, `js/main.js:1558-1563`) |
+ | `Pass3_Bous.wgsl` | 430 | Pass3 Boussinesq |
+ | `Pass3_COULWAVE.wgsl` | 524 | Pass3 COULWAVE |
+ | `Pass3A_COULWAVE.wgsl` | 85 | COULWAVE 보조항 A (u,v,du,dv·z-α) |
+ | `Pass3B_COULWAVE.wgsl` | 206 | COULWAVE 보조항 B (S,T·E terms·F,G) |
+ | `Pass_Breaking.wgsl` | 144 | 파괴 age/eddy-viscosity |
+-| `BoundaryPass.wgsl` | 595 | 경계조건·wet/dry cleanup |
++| `BoundaryPass.wgsl` | 725 | 경계조건·wet/dry cleanup |
+ | `Update_TriDiag_coef.wgsl` | 111 | PCR 계수 초기화 (Bous) |
+ | `Update_TriDiag_coef_COULWAVE.wgsl` | 117 | PCR 계수 초기화 (COULWAVE) |
+ | `TriDiag_PCRx.wgsl` | 107 | PCR x-solve (Bous) |
+@@ -125,6 +128,7 @@
+ | `CalcMeans.wgsl` | 104 | 진단: 시간평균 |
+ | `CalcWaveHeight.wgsl` | 77 | 진단: 파고 |
+ | `ExtractTimeSeries.wgsl` | 65 | 진단: 시계열/툴팁 (1D 출력) |
++| `ExtractNestedBoundaryTimeSeries.wgsl` | 53 | nested-grid 경계 시계열 추출 (`main.js:2893`) |
+ | `AddDisturbance.wgsl` | 241 | 교란 주입 |
+ | `MouseClickChange.wgsl` | 246 | 마우스 편집 |
+ | `Copytxf32_txf16.wgsl` | 50 | f32→f16 렌더 패킹 |
