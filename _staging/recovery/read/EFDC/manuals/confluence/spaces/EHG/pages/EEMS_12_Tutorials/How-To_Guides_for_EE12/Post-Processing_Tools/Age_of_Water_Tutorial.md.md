@@ -1,0 +1,30 @@
+---
+file: models/EFDC/raw/manuals/confluence/spaces/EHG/pages/EEMS_12_Tutorials/How-To_Guides_for_EE12/Post-Processing_Tools/Age_of_Water_Tutorial.md
+lines: 125
+sha256: 1a5a871c54370063717d0103b1322f34844ccf9b1dd7710d77a45f8cddc16200
+reader: codex gpt-6.1-sol
+read_date: 2026-10-07
+---
+
+# Age_of_Water_Tutorial.md — 판독 구간 기록
+
+구간은 1행부터 125행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–11 | 문서 정보·개요 — 페이지 정보와 염료(dye) 하위 모델로 체류 시간(residence time) 또는 물의 나이(age of water)를 계산하는 기능을 소개한다(1–10). |
+| 12–31 | Age of Water Approach — DYE를 일 단위 age로 취급하고 이류(advection)·확산(diffusion) 단계 뒤 모든 활성 셀에 시간 간격을 더한다(14–30). 그림의 수송 방정식을 그대로 옮긴다(16). 원문 수식·매개변수: `The age of water approach uses the DYE constituent, referred to as "age" in days.  The transport equation for the AGE constituent having an "age" (equivalent to a "mass") per unit volume C, is:` (14); `C represents the AGE;` (20); `Qc represents the source term for age, at all active cells for each time step` (22); `Qc = delta T, in days` (24); `Ct+1 = Ct + delta T` (28). 그림의 원문 매개변수·입력 예시: `\partial_t(m_xm_yHC)+\partial_x(m_yHuC)+\partial_y(m_xHvC)+\partial_z(m_xm_ywC)-\partial_z(m_xm_yw_{sc}C)=\partial_x\left(\frac{m_y}{m_x}HK_H\partial_xC\right)+\partial_y\left(\frac{m_x}{m_y}HK_H\partial_yv\right)+\partial_z\left(m_xm_y\frac{K_v}{H}\partial_zC\right)+Q_c` (16행 그림). 그림 판독: AGE 수송 방정식 그림이다. 시간·x·y·z 수송항과 침강(settling) 항, 수평·수직 확산항, Qc를 포함한다 (16). |
+| 32–49 | Step 1–2 — DYE 모듈을 켜고 Type 열에서 Age of Water를 선택한다(34–44). 각 시간 단계의 수송 뒤 delta-T를 더하는 절차를 설명한다(44). 원문 수식·매개변수: `From Model control form, RMC on DYE under Modules tab, select setting to open DYE module form. From DYE module form, click on dropdown menu under type column and select Age of Water to effectively treat the dye constituent as an age counter. Every timestep the dye constituent is transported in a method similar to all other water column constituents. At the end of the dye transport the water is "aged" by adding the delta-T in days, to the dye constituent. The result is the dye constituent represents the age of water in days.` (44). 그림의 원문 매개변수·입력 예시: `ID DYE_1` (46행 그림); `Units mg/L` (46행 그림); `0th-order Rate (1/day) 0.0000` (46행 그림); `1st-order Rate (1/day) 0.0000` (46행 그림); `Temp. Adj. Coeff. 0.00` (46행 그림); `Ref. Temp. (°C) 0.00` (46행 그림); `Settling Velocity (m/day) 0.000E0` (46행 그림); `Initial Conc. 0.000` (46행 그림). 그림 판독: Figure 1은 Dye 활성화 체크와 Modules 메뉴에서 모듈 창으로 향하는 화살표이다 (38); Figure 2는 Dye Type 메뉴에서 Age of Water를 선택하는 화면이다 (46). |
+| 50–59 | Step 3 — 들어오는 물을 0일로 가정하는 표준 접근을 적고 경계 염료 농도·시계열을 0으로 설정한다(50–56). 유량 경계 예시와 압력 경계·취수/회귀(withdrawal/return)에도 같은 접근을 쓰는 조건을 포함한다(51). 원문 수식·매개변수: `The standard approach is to assume that all incoming water to the model domain has an age of zero days, i.e. "new" water. To do this the user should set all boundary condition dye concentrations and/or series to 0. The following is an example of the flow boundary type. The same approach would be used for pressure or withdrawal/return.  ` (51). 그림 판독: Figure 3은 Time Varying Concentration의 Dye 시계열을 None으로 표시한다 (52); Figure 4는 Constant Concentration의 Dye(mg/L) 값을 0으로 표시한다 (56). |
+| 60–70 | Step 4–6 — 프로젝트 저장·실행 후 Water Column의 Dye와 Age(day) 종류를 선택해 표시층을 추가한다(60–67). 애니메이션·종단 및 수직 프로파일 생성도 가능하다고 적는다(65). 원문 수식·매개변수: `Go to *2DH View* window and select *Add New Layer* buttonwill bring up *2DH View Option* form. From *2DH View Option* form, select *Water Column* in *Primary Group* frame, *Dye* for *Parameter*, in *Class Settings* frame, select *Age (day)*class to add A*ge of water* layer in *2DH View* . The user can generate animations, longitudinal profiles, vertical profiles, etc. as with any water column constituent.` (65). 그림 판독: Figure 5는 Add Layer에서 2DH 옵션 창으로 향하는 화살표이다. `Age (Depth Avg.) (day)` 색 범위는 0.000–5.155이고 저면고는 -7.518–0.550 m이다 (67). |
+| 71–93 | Step 7 / 전체 영역 시계열 — Volume Statistics로 전체 또는 선택 영역의 평균 age를 추출한다(71–78). 기본 추출 기간은 전체 모의 기간이고 관심 기간을 선택할 수 있다(78). age에는 질량 부하(mass loading) 통계를 쓰지 않는다고 적는다(80). 왼쪽 age·오른쪽 체적(volume) 축과 ASCII 추출·필터를 안내한다(86–92). 원문 수식·매개변수: `EE will pop-up *General Statistic Volume Start/Stop* form which allows user define the extract time period. The initial default is the entire model simulation period. However, the user can select only the period of interest. Moreover, user can select show mass loading or not by select checking or unchecking on *Show Mass* checkbox.` (78); `**Note:** Mass loading statistic is not used for *Age of Water.*` (80). 그림의 원문 매개변수·입력 예시: `Start Extraction (day): 2922.000` (82행 그림); `Stop Extraction (day): 2932.000` (82행 그림). 그림 판독: Figure 6은 Volume Statistics 메뉴와 체적 가중 평균 도구 도움말이다. 초기 age 평면도는 0.000–0.000 day이다 (74); Figure 7은 통계 추출 기간 표와 Show Mass 체크 상자이다 (82); 첫 Figure 8은 전체 영역 age와 체적 그래프이다. 가로축 Time(days) 2922–2932, 왼쪽 Water Age(days) 0–2.25, 오른쪽 Volume(10⁶m³) 1100–1550이다. 빨간 Age of Water, 파란 Volume이다 (88). |
+| 94–118 | Step 7 / 다각형 영역 — Caloosahatchee 하구 다각형 내부 셀을 선택한 뒤 같은 통계 도구로 평균 age와 체적을 추출한다(94–113). 전체 영역과 다각형 결과 비교 그림을 포함한다(115–117). 그림 판독: 둘째 Figure 8은 Caloosahatchee 영역 격자와 빨간 점선 `age plot.p2d` 다각형이다. `Age of Water (Depth Avg.) (days)` 범위는 0.000–8.502이다 (96); Figure 9는 다각형 파일 내부 셀 선택 메뉴이다 (102); Figure 10은 age plot.p2d 파일 열기 창이다 (108); Figure 11은 전체·다각형 영역 시계열 비교이다. 가로축 Time(days) 2922–2932, 왼쪽 Water Age(days) 0–8, 오른쪽 Volume(10⁶m³) 0–1600이다. 빨간 전체 age, 녹색 다각형 age, 파란 전체 체적, 자홍색 다각형 체적이다 (115). |
+| 119–125 | 연간 변화·수직 단면 — age가 유입·유출에 의존하여 해마다 달라진다고 적는다(119). 중심선 수직 단면과 애니메이션으로 밀도 성층(density stratification)과 밀도류(density current) 효과를 보는 방법을 적는다(121–125). 그림 판독: Figure 12는 day 2923.9584의 수직 단면이다. 가로축 Distance(m) 0–50000, 세로축 Elevation(m) -7–1, Age of Water(days) 색 범위 0.425–1.934이다. 중간 구간은 빨간색이고 양 끝은 파란색 계열이다 (123). |
+
+## 판독 중 확인된 사실 (판단 아님, 후속 검토 대상)
+
+- 16: 방정식 그림의 y방향 확산항은 `\partial_y v`로 적혀 있다. 같은 그림의 x·z방향 확산항은 `\partial_x C`·`\partial_z C`이다.
+- 16·18–24: 방정식 그림에 나오는 `m_x`, `m_y`, `H`, `u`, `v`, `w`, `w_{sc}`, `K_H`, `K_v`는 이 파일 본문에서 정의하지 않는다. 본문은 C와 Qc만 설명한다.
+- 71·74행 그림: 소절 제목은 `Mass Weighted Age`이다. 통계 도구의 도움말은 `Plot Time Series of Volume Weighted Average`이다.
+- 90·98: 두 다른 그림의 캡션을 모두 Figure 8로 적는다.
+

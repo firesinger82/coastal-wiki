@@ -1,0 +1,23 @@
+---
+file: models/EFDC/raw/manuals/confluence/spaces/EHG/pages/EEMS_12_Tutorials/How-To_Guides_for_EE12/Sediment_Transport_Modeling/Steps_To_Set_up_a_Sediment_Bed_Model.md
+lines: 27
+sha256: ef108713628324c84d7e5029bf5c3dbd081e31b940c81349200197e31e896651
+reader: codex gpt-6.1-sol
+read_date: 2026-10-07
+---
+
+# Steps_To_Set_up_a_Sediment_Bed_Model.md — 판독 구간 기록
+
+구간은 1행부터 27행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–11 | 문서 정보·개요 — 페이지 정보와 Original EFDC 또는 SEDZLJ 퇴적물 하위 모델의 저면 설정 절차를 소개한다(1–10). |
+| 12–18 | 모듈·주 설정·수송 옵션 — 퇴적물 모듈을 선택하고 Settings를 연다(12–13). 자료 손실을 피하려면 저면층·등급 수를 먼저 정의하도록 적는다(14). General·Cohesives·Non-Cohesive Suspended·Bed의 계산 옵션을 설정한다(15–18). 원문 수식·매개변수: `1. Click the *Modules* item in the menu in the *Model Control* form and check on one of the boxes *(Original) Cohesive Sediments, (Original) Non-Cohesive Sediments,* or *SEDZLJ Sediments* then click the *OK* button. ([Figure 1](#Figure1)).` (12); `3. Define the number of sediment bed layers, cohesive and non-cohesive sediments as shown in *Major Settings* of EFDC Sediment Model (it is important to do this first to avoid losing data).` (14); `4. Set the options in the *General* tab for the *Primary Computational Options* and the *Bed Shear Calculation Options*.` (15); `5. In the *Cohesives* tab the user should enter the appropriate values for the relative parameters as well as defining the minimum and maximum values of *Cohesive Fluids Concentration* as shown in [Figure 2](#Figure2).` (16); `6. In the *Non-Cohesive Suspended* tab the user should define the *Equilibrium Concentration Option* and enter the appropriate values for the relative parameters and non-cohesive layers.` (17); `7. In the *Non-cohesive Bed* tab the user should click on *Initialize Constants* button and enter the number for the approach desired e.g. enter "1" for the Van Rijn approach.` (18). |
+| 19–27 | 형태 변화·초기화 — 체크 해제 시 저면 변화가 없고 체크 시 변화를 허용한다(19). 최대 층 두께와 상수 공극률은 입력 파일과 같게 설정한다(19). 초기화 방식·최대 입경을 정의하고 필요한 정보를 입력하면 보이는 Apply로 초기화한다(20–25). 세 설정 그림으로 끝난다(27). 원문 수식·매개변수: `8. In the *Morphology & Consolidation* tab the user should select the *Bed Morphology Options*: check-box, off is no bed change, on is allow bed changes. The user should also set the *Max Layer Thickness* and *Constant Porosity* to be the same values as those in the input sediment file (refer to [Appendix B - Data Formats](https://eemodelingsystem.atlassian.net/wiki/spaces/EK/pages/1528397825/Appendix+B+-+Data+Formats+EE10.3) for the DSM format of the file).` (19); `9. In the *Initial Conditions* tab: select the *Sediment Initial Condition Options*. Then click *Assign Bed IC* button*,* there are 2 options to initialize bed layers: uniform bed and use initial data file.` (20); `11. Check *Use sediment cores with grain size*` (22); `12. Define the maximum grain size for each size class relatively to cohesive and non-cohesive layers as displayed in the red frame in [Figure 3](#Figure3).` (23); `If the required information has been entered then the *Apply* button is visible. After clicking on *Apply*, the sediment bed will be initialized.` (25). 그림의 원문 매개변수·입력 예시: `# Sediment Bed Layers: 5` (27행 그림); `# Cohesives: 1` (27행 그림); `# Non-Cohesives: 1` (27행 그림); `Cohesive Settling Flag: 0` (27행 그림); `Min: 10 (mg/L)` (27행 그림); `Max: 5000 (mg/L)` (27행 그림); `IC WC Concentration (mg/L) 10` (27행 그림); `IC Bed Mass (g/m² per layer) 25000` (27행 그림); `Specific Volume (m³/g) 3.7740e-7` (27행 그림); `Specific Gravity 2.65` (27행 그림); `Settling Velocity (m/s) 0.00001` (27행 그림); `Tau Critical-Deposition (m²/s²) 1E-08` (27행 그림); `Tau Critical-Erosion (m²/s²) 10` (27행 그림); `Ref. Surf Erosion Rate (g/m... 0.0005` (27행 그림); `Erosion Exponent 1` (27행 그림); `Surface Erosion Opt. [IWRS... 0` (27행 그림); `Reference Void Ratio (IWR... 0` (27행 그림); `Cohesive Hiding Factor Exp... 0` (27행 그림); `Correct Bottom Layer Conc. ... 30` (27행 그림); `Probability of Deposition (0-3) 0` (27행 그림); `No Max (µm): 1 35; 2 250; 3 1500; 4 10000` (27행 그림); `Number of Initial Layers: 1` (27행 그림); `Constant Porosity: 0.4` (27행 그림); `Minimum Surface Sediment Layer Thickness (m): 0.05` (27행 그림); `Minimum Subsurface Layer Thickness (m): 0.05` (27행 그림). 그림 판독: 첫 그림은 Original Cohesive·Non-Cohesive Sediments를 선택한 모듈 창이다. 둘째 그림은 저면층 5·점착성 1·비점착성 1과 Coh1 설정 표이다. 셋째 그림은 코어 방식 초기화·등급별 최대 입경·표면층 및 내부층 최소 두께 설정이다 (27). |
+
+## 판독 중 확인된 사실 (판단 아님, 후속 검토 대상)
+
+- 20·27행 셋째 그림: 본문은 균일 저면·초기 자료 파일의 두 초기화 옵션을 적는다. 그림에는 Use Polygon DSM, Use Sediment Cores with Grainsize, Create Uniform Bed의 세 선택지가 보인다.
+- 27행 둘째 그림: 표의 일부 매개변수 이름·단위가 잘려 전체 내용을 판독할 수 없다. 마지막 Probability of Deposition 행은 아래 경계에 걸쳐 있다.
+
