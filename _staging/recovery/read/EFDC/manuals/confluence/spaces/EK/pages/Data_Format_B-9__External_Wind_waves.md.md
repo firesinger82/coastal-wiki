@@ -1,0 +1,26 @@
+---
+file: models/EFDC/raw/manuals/confluence/spaces/EK/pages/Data_Format_B-9__External_Wind_waves.md
+lines: 14
+sha256: b2770de237456363530174eb354805add788c8f9d17617ba39e97002ad086c95
+reader: codex gpt-6.1-sol
+read_date: 2026-10-07
+---
+
+# Data_Format_B-9__External_Wind_waves.md — 판독 구간 기록
+
+구간은 1행부터 14행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–9 | 메타데이터 — 페이지 제목은 `"Data Format B-9  External Wind waves"` (3)이다. `id: 1585709210` (2), `space: EK` (4), `version: 1` (6), `updated: 2021-11-10T04:10:25.508Z` (7)를 기록한다. 원문 URL (5)과 문서 경로 (8)가 있다. 1·9행은 frontmatter 구분선이다. |
+| 10–11 | External Wind waves — 본문은 `wser.inp`를 바람 데이터 파일(wind data file)이라고 적는다 (10). 이어 Noorinastaliq 글꼴로 저장한 우르두어(Urdu) Nastaliq 문자를 포함하고 INP 파일이 표준 페이지 배치 서식을 지원한다고 적는다 (10). 이 설명의 원문: `wser.inp is the wind data file. It contains text saved in the Noorinastaliq font, which displays Urdu in Nastaliq script. INP files also support standard page layout formatting.` (10). 11행의 빈 줄을 포함한다. |
+| 12–14 | Example — 예시 표제 (12), 빈 줄 (13), 그림 참조 (14)를 포함한다. 로컬 `attachments/1585709210/B-11.png`를 열었다 (14). Notepad++의 `wser.inp` 화면은 `WSER.INP - TIME SERIES FOR WIND FORCINGS - Version: 10.3`의 주석, 계열별 머리말, 시각·풍속·방향 자료를 보여 준다 (14). `MWSER(NW)`는 시간 데이터 점 개수, `TCWSER(NW)`는 시간 단위의 초 변환, `TAWSER(NW)`는 입력 시각과 같은 단위의 가산 조정, `WINDSCT(NW)`는 풍속의 M/SEC 변환, `ISWDINT(NW)`는 방향 규약(direction convention), `WINDH(NW)`는 풍속계(anemometer) 측정 높이를 설명한다 (14, 그림 예시 4–12행). 방향 규약의 0·1·2 조건, 기본값 표기, 단위와 입력 예시 줄을 아래에 그대로 옮긴다. 탭과 공백의 구분은 이미지에서 확정하지 못했다. `*  WSER.INP - TIME SERIES FOR WIND FORCINGS - Version: 10.3` (14, 그림 예시 1행); `*  Project: EFDC+ Demonstration` (14, 그림 예시 2행); `*` (14, 그림 예시 3행); `*  MWSER(NW)     = NUMBER OF TIME DATA POINTS` (14, 그림 예시 4행); `*  TCWSER(NW)    = DATA TIME UNIT CONVERSION TO SECONDS` (14, 그림 예시 5행); `*  TAWSER(NW)    = ADDITIVE ADJUSTMENT OF TIME VALUES SAME UNITS AS INPUT TIMES` (14, 그림 예시 6행); `*  WINDSCT(NW)   = WIND SPEED CONVERSION TO M/SEC` (14, 그림 예시 7행); `*  ISWDINT(NW)   = DIRECTION CONVENTION` (14, 그림 예시 8행); `*                  0 SPEED (M/S) AND DIRECTION (DEG) TOWARDS (EE DEFAULT)` (14, 그림 예시 9행); `*                  1 SPEED (M/S) AND DIRECTION (DEG) FROM` (14, 그림 예시 10행); `*                  2 EAST VELOCITY, NORTH VELOCITY (M/S)` (14, 그림 예시 11행); `*  WINDH(NW)     = MEASUREMENT HEIGHT OF ANEMOMETER (M)` (14, 그림 예시 12행); `*` (14, 그림 예시 13행); `*` (14, 그림 예시 14행); `* REPEAT FOR EACH SERIES` (14, 그림 예시 15행); `*        MWSER    TCWSER    TAWSER   WINDSCT   ISWDINT     WINDH` (14, 그림 예시 16행); `*        TWSER     SPEED DIRECTION` (14, 그림 예시 17행); `*` (14, 그림 예시 18행); `*Format:    F3  F3  F1` (14, 그림 예시 19행); `         20138 86400.000         0         1         0     10.00 ! WIND` (14, 그림 예시 20행); `      -154.000     1.811     250.0` (14, 그림 예시 21행); `      -153.960     1.542     260.0` (14, 그림 예시 22행); `      -153.920     1.811     260.0` (14, 그림 예시 23행); `      -153.870     1.542     250.0` (14, 그림 예시 24행); `      -153.830     1.542     260.0` (14, 그림 예시 25행); `      -153.790     1.811     250.0` (14, 그림 예시 26행); `      -153.750     1.297     240.0` (14, 그림 예시 27행); `      -153.710     2.056     280.0` (14, 그림 예시 28행); `      -153.670     2.302     280.0` (14, 그림 예시 29행); `      -153.620     2.302     220.0` (14, 그림 예시 30행); `      -153.580     2.548     110.0` (14, 그림 예시 31행); `      -153.540     2.548     120.0` (14, 그림 예시 32행); `      -153.500     3.353     240.0` (14, 그림 예시 33행); `      -153.460     3.107      30.0` (14, 그림 예시 34행); `      -153.420     1.297      40.0` (14, 그림 예시 35행); `      -153.370     2.548     120.0` (14, 그림 예시 36행); `      -153.330     2.861      40.0` (14, 그림 예시 37행); `      -153.290     2.548      60.0` (14, 그림 예시 38행); `      -153.250     2.548      50.0` (14, 그림 예시 39행); `      -153.210     1.811     180.0` (14, 그림 예시 40행); `      -153.170     2.056     180.0` (14, 그림 예시 41행); `      -153.120     2.056     180.0` (14, 그림 예시 42행); `      -153.080     2.302     320.0` (14, 그림 예시 43행); `      -153.040     2.302     200.0` (14, 그림 예시 44행); `      -153.000     1.811     230.0` (14, 그림 예시 45행); `      -152.960     0.760     250.0` (14, 그림 예시 46행); `      -152.920     1.051     250.0` (14, 그림 예시 47행); `      -152.870     1.051     280.0` (14, 그림 예시 48행); `      -152.830     0.000     260.0` (14, 그림 예시 49행); `      -152.790     0.760     270.0` (14, 그림 예시 50행); `      -152.750     1.297     290.0` (14, 그림 예시 51행); `      -152.710     1.051     250.0` (14, 그림 예시 52행); `      -152.670     1.051     250.0` (14, 그림 예시 53행); `      -152.620     1.297     260.0` (14, 그림 예시 54행); `      -152.580     1.297     330.0` (14, 그림 예시 55행); `      -152.540     1.051     200.0` (14, 그림 예시 56행); `      -152.500     1.297     360.0` (14, 그림 예시 57행). 그림 예시 20행의 값은 이 파일의 예시 값이다. 57행 이후의 데이터는 그림에 보이지 않으므로 전사하지 않았다. |
+
+수식 전사: 0개. 매개변수·입력 필드 이름 전사: 9개 (`MWSER(NW)`, `TCWSER(NW)`, `TAWSER(NW)`, `WINDSCT(NW)`, `ISWDINT(NW)`, `WINDH(NW)`, `TWSER`, `SPEED`, `DIRECTION`).
+이 집계는 전사한 이름의 종류 수이다. 예시 값은 기본값으로 간주하지 않았다.
+참조 그림 1개를 로컬 파일로 직접 열어 확인했다.
+
+## 판독 중 확인된 사실 (판단 아님, 후속 검토 대상)
+
+- 10·14: 본문은 Noorinastaliq 글꼴의 우르두어 Nastaliq 문자와 페이지 배치 서식을 설명한다. 그림은 영어 바람 강제력(wind forcing) 주석과 숫자 입력 자료를 보여 준다.
+- 14 (그림 예시 4–12행): 매개변수의 인수 `NW`가 반복되지만, 이 문서와 가시 그림에는 `NW`의 정의가 없다.

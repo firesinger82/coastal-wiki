@@ -1,0 +1,25 @@
+---
+file: models/EFDC/raw/manuals/confluence/spaces/EK/pages/EFDC_Explorer_12_Knowledge_Base/EFDC_Explorer_12_User_Guide/Model_Control_Form/External_Forcing_Data/Water_Level.md
+lines: 67
+sha256: 9e34f39508f7c4a82d539787ea7b2c07d2cc86446b23ee376a702e825e6388ab
+reader: codex gpt-6.1-sol
+read_date: 2026-10-07
+---
+
+# Water_Level.md — 판독 구간 기록
+
+구간은 1행부터 67행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–9 | Water Level — 문서 식별자, 제목, space, URL, 판본, 갱신 시각과 문서 계층의 frontmatter(1–9). |
+| 10–15 | 수위(water level) 시계열 정의 — CSS 선언, 빈 줄과 세 가지 방법의 번호 목록을 포함한다(10–15). 방법은 ASCII 파일의 붙여넣기·가져오기(12), `Generate from Harmonics`로 천문조석(astronomical tides)을 계산한 시계열 생성(13), `Download Online Data`로 온라인 자료 다운로드(14)이다. |
+| 16–43 | Option 2 - Generate from Harmonics — 절 제목, 빈 줄과 수식 그림을 포함한다(16–43). `EE10_160.png`을 열었다(18). `Tides` 시계열의 `Generate from Harmonics` 버튼과 `Time (days)`, `WSEL (m)` 표를 보여 준다. 완전히 보이는 표 행은 `0.000000, -0.178`; `0.041670, 0.111`; `0.083330, 0.284`; `0.125000, 0.331`; `0.166670, 0.259`; `0.208330, 0.098`; `0.250000, -0.068`; `0.291670, -0.190`; `0.333330, -0.202`; `0.375000, -0.082`; `0.416670, 0.145`; `0.458330, 0.436`이며 `# of Points: 721`이다. 수식 로컬 이미지 `harmonics.png`을 열었다(22). 이미지 수식을 LaTeX로 옮기면 `\eta = z_0 + \sum_{i=0}^{N} f_i H_i \cos\{\omega_i t + (V_0 + u)_i - g_i\}`이다(22의 그림). 기호 정의 원문: `*η* = tide level (m)` (26); `*z*0 = mean sea level above the datum (m)` (28); `fi = nodal coefficient to adjust amplitude for the ith component` (30); `Hi = amplitude of the ith component (m)` (32); `ωi = speed or angular velocity of water for the  ith component (radians per second)` (34); `t = time (s)` (36); `(V0 + u)i = astronomical arguments of the ith component` (38); `gi = phase lag of the ith component from Greenwich longitude` (40). EE에서 사용하는 단위는 편의를 위해 변경할 수 있다고 적는다(42). |
+| 44–50 | Astronomical Tides 양식 — 먼저 새 관측점(station)을 정의한 뒤 분조(tidal constituents)를 추가하고 이름·진폭(amplitude)·위상(phase)을 입력하거나 파일에서 가져온다(44). 의무·매개변수 원문: `The user must first define a *New*station.` (44) `input the constituent parameters (name, amplitude, phase) or import them from a data file if available.` (44) `The user can change units for amplitude and phase, apply a datum shift (zo) in meters or time shift in hours to the series.` (46) `EE10_135.png`을 열었다(48). 그림은 조석 관측점, 분조 선택, 진폭·위상 입력과 시간 설정을 보여 준다. 열은 `Name`, `Speed (deg/hr)`, `Amplitude (m)`, `Phase (deg)`이며 선택된 분조 행은 `SSA, 0.082137, 0.000, 0.00`; `MSO, 1.015896, 0.000, 0.00`; `SN, 1.560270, 0.000, 0.00`이다. 좌측 사용 가능한 분조 목록의 `Name, Speed` 표시 행은 `Z0, 0.000000`; `SA, 0.041069`; `SSA, 0.082137`; `MSM, 0.471521`; `MM, 0.544375`; `MSF, 1.015896`; `MSO, 1.015896`; `MF, 1.098033`; `KOO, 1.098033`; `MKO, 1.098033`; `SNU, 1.487417`; `SN, 1.560270`; `MSTM, 1.569554`; `MFM, 1.642408`; `2SM, 2.031797`; `MSQM, 2.113929`이다. `Units for Amplitude: Meters`, `Units for Phase: Degrees (Arc)`, `Datum Shift: 0.00`, `Time Shift (hr): 0.00`, `Start Julian Date: 0.000`, `Duration (days): 1.000`, `Time Step (min.): 60`이 보인다. 빈 줄과 Figure 2 캡션을 포함한다(45,47,49–50). |
+| 51–58 | Download Online Tidal Harmonics for a Specific Location — Download로 온라인 분조 자료를 가져오는 방법이다(51–55). 관측점 이름과 정밀한 경도·위도를 먼저 입력하고 Add로 목록에 추가한다(55). 여러 관측점을 추가할 수 있으며 Remove·Update·Load·Save를 사용할 수 있다(55). 위상의 기준과 시간 보정 조건 원문: `The phase lag of the harmonic constants is referenced to zero UTC, so the user may need to change the time shift to adjust for the local time of the model.` (55) Get Data는 목록의 모든 관측점 자료를 받고 생성한 수위 시계열을 External Forcing Data의 Water Level에 채운다(55). `EE10_170.png`을 열었다(57). 화면은 `Data Set: HAMTIDE`, `Name: test`, `Longitude: 115`, `Latitude: 12`, `Time Shift (hours): 0`을 보여 준다. 표 열은 `ID`, `Name`, `Speed`, `Amplitude (m)`, `Phase (deg.)`이다. 이름 뒤 줄임표는 그림 그대로이며 행은 `108, S2, 30.000000, 0.064, 101.62`; `24, Q1 ..., 13.398661, 0.050, 139.63`; `40, P1, 14.958931, 0.104, 184.23`; `28, O1 ..., 13.943036, 0.280, 151.67`; `80, N2 ..., 28.439730, 0.032, 61.59`; `92, M2 ..., 28.984104, 0.175, 74.00`; `111, K2, 30.082137, 0.018, 102.97`; `43, K1, 15.041069, 0.320, 192.45`이다. |
+| 59–67 | Option 3 - Download Online Data — 절 제목과 메뉴 경로를 설명한다(59–61). `2019-09-19_3-51-28_PM.png`을 열었다(63). 그림은 Tools에서 Download Online Data의 Model Open Boundary Conditions를 선택한 메뉴이다. Boundary와 Data Type을 고르고 Get Times로 자료의 시간 범위를 받아 모델 시각을 갱신한다(65). 기간 조건 원문: `However, it is recommended to extend *Time Begin* and *Time End* to cover the model time and remain within the data set time range.` (65) Time Zone 설정 후 Get Data와 OK로 시계열을 자동 생성·배정한다(65). `2019-09-19_4-34-43_PM.png`을 열었다(67). 화면은 `Boundary: Ocean`, `Data Type: Water Surface Elevation`, `Data Set: HYCOM Global Surface Data (1/12°)`, `Begin: 2013-03-05 00:00:00`, `End: 2019-09-24 00:00:00`, `Base Date: 2013-03-05`, `Interval (hours): 3`, `#: 16426`, `Time Begin: 2018-01-01 00:00:00`, `Time End: 2018-01-11 00:00:00`, `# Portions: 1`, `Time Zone: -5`를 보여 준다. `Merge with Existing Series`가 선택되어 있고 `Replace Existing Series`는 선택되지 않았다. |
+
+## 판독 중 확인된 사실 (판단 아님, 후속 검토 대상)
+
+- 22·26–40: 조석 수식 그림의 합 상한은 `N`이다. 이 파일의 기호 설명에는 `N` 정의가 없다.
+- 44: 수위 시계열 생성 절에서 생성 대상은 `pressure time series`로 적혀 있다.

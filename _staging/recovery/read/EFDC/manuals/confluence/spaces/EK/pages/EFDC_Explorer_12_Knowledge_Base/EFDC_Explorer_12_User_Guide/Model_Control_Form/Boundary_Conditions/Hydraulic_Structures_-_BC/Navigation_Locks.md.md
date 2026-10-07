@@ -1,0 +1,26 @@
+---
+file: models/EFDC/raw/manuals/confluence/spaces/EK/pages/EFDC_Explorer_12_Knowledge_Base/EFDC_Explorer_12_User_Guide/Model_Control_Form/Boundary_Conditions/Hydraulic_Structures_-_BC/Navigation_Locks.md
+lines: 40
+sha256: 6607a43f18dfa5d2f7402306588014e013ea9ed38bcf78a5a5f9b94f5f31f843
+reader: codex gpt-6.1-sol
+read_date: 2026-10-07
+---
+
+# Navigation_Locks.md — 판독 구간 기록
+
+구간은 1행부터 40행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–9 | Navigation Locks / 문서 메타데이터 — 페이지 ID, 제목, space, 원문 URL, 버전, 갱신 시각과 문서 계층을 담은 frontmatter 및 구분선이다(1–9). |
+| 10–19 | Navigation Locks / 정의와 그룹 생성 — 항행 갑문(navigation lock)은 수위가 다른 두 수역(water pools) 사이의 안전한 통항을 만드는 구조물이라고 적는다(10). Model Control의 Boundary Conditions에서 Hydraulic Structure를 오른쪽 클릭하여 New Boundary Group을 선택한다(12). Add BC Group에서 ``*Boundary Group Name*`` (12)을 지정한다. 설정 창의 요구 항목으로 Boundary Group Conditions, Current Boundary Cell, Time-Variable Hydraulic Structure Control, Navigation Lock Filling/Draining Options를 나열한다(18). 14행 `Figure_1._New_Boundary_Group_.png`의 로컬 사본을 열었다. 그림은 메뉴의 New Boundary Group에서 Add BC Group 창을 여는 과정을 빨간 화살표로 표시한다(14). Figure 1 캡션과 빈 줄을 포함한다(16–19). |
+| 20–25 | Boundary Group Conditions — Group Name을 바꾸고 Flow Control Type에서 Navigation Lock을 선택한다(22). 기본 마스크(default masks)를 사용하는 기능을 기본으로 활성화하도록 적는다(22). 원문: ``In the *Boundary Group Conditions* menu, the user can change the *Group Name.* In the *Flow Control Type*menu, select the *Navigation Lock* option. The *Use Default Masks to Control U/D Flow* function should be enabled as the default (Figure 2).`` (22). 24행 `Figure_2._Navigation_Lock_setting_form_.png`의 로컬 사본을 열었다. 그림은 Navigation Lock 유형을 선택하고 Use Default Masks to Control U/D Flow를 체크한 창이다(24). 충수·배수(filling/draining) 옵션의 화면 예시는 `Time to Fill/Drain the Lock (s): 1`, `Withdrawal/Return Group Number to Use for Filling/Emptying Lock: 1`이다(24행 그림). |
+| 26–33 | Current Boundary Cell — Number of Cells는 갑문의 한 수문에 지정한 전체 셀 수이며 실제 수문 폭에 달려 있다고 적는다(28). 셀을 추가하거나 제거할 수 있다(28). 상·하류 셀의 좌표와 고도, 초기 수위를 입력한다(30). Depth는 초기 WSEL에서 저면 고도를 뺀 값으로 자동 계산한다(30). 원문: ``In the *Current Boundary Cell,* the user can see in the *Number of Cells* text box. This represents the total number of cells they have set for one gate of the navigation lock. This number depends on the actual navigation lock gate width. The user can add or remove cells as required.`` (28); ``In the *Upstream (outflow) Cell* and *Downstream Cell*, input the necessary information for L, I, J, Bottom, Depth, Initial WSEL, and Vertical Offset. An example configuration is shown in Figure 3. L, I, and J can be extracted from the *2DH View* function. The cell bottom elevation can also be obtained from the *2DH View* after you have set the bottom elevation for the model. The user should also set the initial WSEL correctly. The *Depth* will be automatically calculated, which is equal to the initial WSEL minus the bottom elevation.`` (30). 32행 그림은 변환 규칙의 파일명을 찾지 못해 폴더를 `ls`로 확인한 뒤 `Figure_3._The_Upstream_outflow_Cell_and_Downstream_Cell_.png`를 열었다. 그림은 Current Boundary Cell의 상·하류 셀 입력 프레임을 강조한다(32). 그림의 상류 예시는 `L: 2389`, `I: 27`, `J: 166`이며 하류 예시는 `L: 2396`, `I: 27`, `J: 167`이다. 양쪽 셀의 예시는 `Bottom: -8.085`, `Depth: 7.842`, `Initial WSEL: -0.243`, `Vert. Offset (m): 0`이다(32행 그림). 이 그림은 Use Default Masks to Control U/D Flow의 체크가 해제되어 있다(32). |
+| 34–40 | Time-Variable Hydraulic Structure Control — Edit에서 Boundary Data Series를 열고 Add New로 시간, 열림 높이·폭과 바닥턱 높이 변화(sill level change)를 입력한다(36). 시간은 시뮬레이션 기간이고 높이·폭은 개구의 수직·수평 치수이며 일반적으로 관측값이라고 적는다(36). 원문: ``In the *Time-Variable Hydraulic Structure Control* section, click *Edit.* The *Boundary Data Series* will be displayed. Click *Add New* and input the necessary information, including Time (days), Opening Height (m), Opening Width (m), and Sill level change (m) as shown in Figure 4. Time (days) is the period for simulation. Opening Height and Width refer to the vertical and horizontal dimensions of the opening, respectively. Typically, these are observed values.`` (36). 38행 `Figure_4._Boundary_Data_Series_.png`의 로컬 사본을 열었다. 그림은 Edit에서 시계열 창으로 향하는 빨간 화살표와 Add New를 보여 준다(38). 자료 표 머리글은 `Time (days)`, `Opening Height (m)`, `Opening Width (m)`, `Sill Level Change (m)`이다. 보이는 자료 행을 `행 번호: Time, Opening Height, Opening Width, Sill Level Change` 순서로 옮긴다: ``1: 4748.385417, 0.000, 24.400, 0.000``; ``2: 4748.386806, 0.000, 24.400, 0.000``; ``3: 4748.387185, 0.000, 24.400, 0.000``; ``4: 4748.390974, 0.000, 24.400, 0.000``; ``5: 4748.391353, 0.000, 24.400, 0.000``; ``6: 4748.392742, 0.000, 24.400, 0.000``; ``7: 4748.501932, 0.000, 24.400, 0.000``; ``8: 4748.503321, 0.000, 0.000, 0.000``; ``9: 4748.503774, 0.000, 0.000, 0.000``; ``10: 4748.508305, 0.000, 0.000, 0.000`` (38행 그림). 전체 점 수는 `# of Points: 56689`라고 표시한다. 이 화면에 보이지 않는 다음 자료 행은 옮기지 않았다(38행 그림). Figure 4 캡션과 마지막 행을 포함한다(40). |
+
+## 판독 중 확인된 사실 (판단 아님, 후속 검토 대상)
+
+- 18·20–40: 요구 항목 목록은 Navigation Lock Filling/Draining Options도 아래에서 설명한다고 적는다. 뒤 본문에는 그 항목의 별도 설명 소절이 없고 해당 입력칸은 24·32·38행 그림에만 보인다.
+- 22·24·32·38행 그림: 본문은 Use Default Masks to Control U/D Flow를 기본으로 활성화해야 한다고 적는다. 24행 그림은 체크되어 있으나 32·38행 그림은 체크되어 있지 않다.
+- 32: URL에는 `(outflow)`가 있다. 지정한 변환 규칙으로 얻은 괄호 포함 파일명은 로컬 폴더에 없다. `ls`로 확인한 폴더에는 괄호 없는 `Figure_3._The_Upstream_outflow_Cell_and_Downstream_Cell_.png`가 있어 그 사본을 열었다.
+- 38행 그림: 화면은 전체 56689개 점을 표시하지만 자료 표에는 처음 10개 행만 보인다. 보이지 않는 자료 행은 기록하지 않았다.

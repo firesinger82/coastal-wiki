@@ -1,0 +1,22 @@
+---
+file: models/EFDC/raw/manuals/confluence/spaces/EK/pages/EFDC_Explorer_12_Knowledge_Base/EFDC_Explorer_12_User_Guide/Appendices/Appendix_B_-_Data_Formats/Data_Format_B-9__Digital_Sediment_Model_Format_for_Sediment_Cores_with_Grain_Siz.md
+lines: 33
+sha256: d17d9eb2a3f365be07118dfc17a11b91e75e8996eee33055b9b8d3f70ecd6a71
+reader: codex gpt-6.1-sol
+read_date: 2026-10-07
+---
+
+# Data_Format_B-9__Digital_Sediment_Model_Format_for_Sediment_Cores_with_Grain_Siz.md — 판독 구간 기록
+
+구간은 1행부터 33행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–9 | 문서 메타데이터 — 페이지 식별자, 제목, space, URL, 버전, 갱신 시각과 문서 계층을 기록한다(2–8). |
+| 10–13 | Sediment Cores with Grain Sizes / 정의 — 제목 앞에 CSS 스타일 문자열이 있다(10). 파일에 임의 개수의 퇴적물 코어(sediment core)를 담고 각 코어는 상단 아래 깊이에 임의 개수의 시료(sample)를 둘 수 있다(12). 각 코어의 수평 XY 위치를 지정해야 하며 Z는 코어 상단, 곧 해당 위치의 하상 표면 고도(bed surface elevation)이다(12). 조건과 Z 정의를 원문 그대로 옮긴다. 원문: `[data-colorid=az5ezh61ej]{color:#091e42} html[data-color-mode=dark] [data-colorid=az5ezh61ej]{color:#bdd2f6}[data-colorid=z88eetm7jj]{color:#091e42} html[data-color-mode=dark] [data-colorid=z88eetm7jj]{color:#bdd2f6}**Data Format B-9**  **Digital Sediment Model Format for** **Sediment Cores with Grain Sizes**` (10); `The "Sediment Cores with Grainsize" Digital Sediment Model (DSM) format is a file that contains any number of cores. Each core can have any number of samples at depths below the top of the core. For each core, the user must locate the core in horizontal (XY) space. The "Z" requested is the top of the core elevation (i.e., the bed surface elevation at the core location).` (12). |
+| 14–17 | Figure 1 / 참조 그림 — 로컬 `models/EFDC/raw/manuals/confluence/spaces/EK/attachments/2094956689/7-20-2018_9-59-53_AM.jpg`를 직접 열었다(14). 입력 파일 예시에서 빨간 주석은 코어 그룹 이름·개수, X·Y·Z·층 수, 층 두께·공극률·비중(specific gravity)·입도 등급 수, `Class or Sieve Size`와 `% passing`을 표시한다(14). 파란 수평선은 Group 1 Core 1과 Group 1 Core 2를 구분한다(14). Z 주석은 `Z is top elevation of bed`이다(14). 예시 줄은 다음과 같다. 그림에 보이는 줄: `VietNam Estuary-Trakhuc Sediment Model` (14행 그림 내부 1행); `Discrete` (14행 그림 내부 2행); `Bedcores 72` (14행 그림 내부 3행); `265814.313 1673167.375 5.90 4 Core1` (14행 그림 내부 4행); `0.250 0.560 2.66000 9` (14행 그림 내부 5행); `30 75 175 375 1250 3500 7500 15000 20000` (14행 그림 내부 6행); `2.2 10 16.5 36 79 84.1 89.5 94.4 100` (14행 그림 내부 7행); `0.650 0.560 2.66000 6` (14행 그림 내부 8행); `8 30 75 175 375 1250` (14행 그림 내부 9행); `9 17.8 33 70.2 90.8 100` (14행 그림 내부 10행); `5.000 0.560 2.65000 7` (14행 그림 내부 11행); `30 75 175 375 1250 3500 7500` (14행 그림 내부 12행); `0.9 4.1 11.3 24.7 84.8 96.8 100` (14행 그림 내부 13행); `8.200 0.560 2.66000 7` (14행 그림 내부 14행); `30 75 175 375 1250 3500 7500` (14행 그림 내부 15행); `0.9 5.2 13.9 29.3 87.6 97.6 100` (14행 그림 내부 16행); `265808.094 1673613.875 -0.38 4 Core2` (14행 그림 내부 17행); `0.250 0.560 2.66000 9` (14행 그림 내부 18행); `30 75 175 375 1250 3500 7500 15000 20000` (14행 그림 내부 19행); `2.2 10 16.5 36 79 84.1 89.5 94.4 100` (14행 그림 내부 20행); `0.850 0.560 2.65000 7` (14행 그림 내부 21행); `30 75 175 375 1250 3500 7500` (14행 그림 내부 22행); `0.9 4.6 17.1 27.7 83.1 96.5 100` (14행 그림 내부 23행); `4.000 0.560 2.65000 7` (14행 그림 내부 24행); `30 75 175 375 1250 3500 15000` (14행 그림 내부 25행); `1 3.6 16.3 26.1 87.3 96.7 100` (14행 그림 내부 26행); `4.000 0.560 2.65000 7` (14행 그림 내부 27행); `30 75 175 375 1250 3500 7500` (14행 그림 내부 28행); `0.5 3.7 12.1 26.8 86.1 97.5 100` (14행 그림 내부 29행). 원문: `![](https://eemodelingsystem.atlassian.net/wiki/download/attachments/2094956689/7-20-2018%209-59-53%20AM.jpg?version=1&modificationDate=1679542204265&cacheVersion=1&api=v2)` (14); `**Figure 1.****EFDC+ sediment core data file format.**` (16). |
+| 18–33 | Detail description / 입력 줄 정의 — 파일 제목·형식 결정 줄·코어 수, Core 1 위치 필드, 첫 층 물성 필드, 입도 분포, 대응 누적 백분율과 후속 층 반복을 설명한다(20–33). 필드 이름과 반복 범위를 그대로 옮긴다. 원문: `Detail description` (18); `- Line 1: Data file title` (20); `- Line 2: Used to determine the data file format` (21); `- Line 3: Number of sediment cores` (22); `- Line 4: Core 1 location` (23); `(X coordinate    Y coordinate     Elevation          Number of layers          Core1 ID)` (25); `- Line 5: Bed properties of layer 1/core 1` (27); `(Layer thickness            Bed porosity     Specified Gravity          Number of grain size distribution)` (29); `- Line 6: Grain size distribution of layer 1/core 1` (31); `- Line 7: Accumulate percent corresponding to each grain size of layer 1/core1` (32); `- Line 8-16: Repeat bed properties of layers 2, 3 &4/core 1` (33). |
+
+## 판독 중 확인된 사실 (판단 아님, 후속 검토 대상)
+
+- 29·14(그림): 본문 물성 필드는 `Specified Gravity`이고 그림 주석은 `Specific gravity`이다.

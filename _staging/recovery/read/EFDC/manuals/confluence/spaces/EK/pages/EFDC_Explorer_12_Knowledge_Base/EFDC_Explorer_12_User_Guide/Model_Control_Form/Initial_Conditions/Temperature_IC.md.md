@@ -1,0 +1,22 @@
+---
+file: models/EFDC/raw/manuals/confluence/spaces/EK/pages/EFDC_Explorer_12_Knowledge_Base/EFDC_Explorer_12_User_Guide/Model_Control_Form/Initial_Conditions/Temperature_IC.md
+lines: 28
+sha256: 1dc08ef3cad212e142c9c6530d8d1970907653dc413fe170f5a0c59314c6b673
+reader: codex gpt-6.1-sol
+read_date: 2026-10-07
+---
+
+# Temperature_IC.md — 판독 구간 기록
+
+구간은 1행부터 28행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–9 | Temperature IC — 문서 식별자, 제목, space, URL, 판본, 갱신 시각과 문서 계층의 frontmatter(1–9). |
+| 10–19 | Water Column Temperature Initial Conditions — CSS 선언·소개 뒤 수층 수온(temperature)의 상수 또는 공간변화 초기조건을 설명한다(10–18). 상수와 적용 층 선택을 설명한다(14). 원문: `The initial temperature can be set to a constant value or assigned to vary spatially. To set either of these options select the *Assign* button. To set a constant value simply enter a value in the *Constant* field under the *Values to Set* frame.  The user can set this constant to certain layers in the *Layer Options* frame and then select *Assign.*` (14) 다각형, XYZ 또는 수직분포(vertical profile) 자료로 층별 값을 지정할 수 있다(16–18). 보간(interpolation) 설정은 기존 자료 교체, 최댓값·최솟값과 역거리 가중(inverse distance weighting, IDW) 차수·이웃점 수·사분면 수를 포함한다(18). 입력·옵션 원문: `If the values to be set vary spatially varying temperature based on XYZ or from vertical profile data, they should select one of these two options in the *Values to Set* frame. The user should then browse with the *Add file* button in the *Data files* frame to add these data sets. Various interpolation options are provided in the Interpolation Options frame, including replacement of existing data,  and using the maximum or minimum values. Selecting the *More* button provides further interpolation options including order of inverse distance weighting (IDW) interpolation, number of neighboring points, and number of quadrants. ` (18) 제목·빈 줄을 포함한다(11–13,15,17,19). 공간변화 선택 조건의 원문: `If users want to use spatially varying initial temperature determined by a polygon, they should check the box and press The *Apply Cell Properties via Polygons* form is displayed in [Figure 1](#TemperatureIC-Figure1).The options and format of data files to upload to are described in [Apply Cell Properties via Polygon](https://eemodelingsystem.atlassian.net/wiki/spaces/EK/pages/240419005/Bathymetry). Again, users are able to select to apply cell properties for a specific layer or all layers in the model. ` (16). |
+| 20–28 | Bed Temperature Initial Conditions — 저질(bed) 초기온도의 상수·공간변화 입력과 층 선택을 설명한다(20–22). 파일·체크박스 적용 조건 원문: `A constant initial bed temperature can be used or alternatively the TEMPB.INP file can be assigned as a spatially varying initial temperature, by layer. Check the *Use Spatially Variable Bed Temp and Thickness* checkbox in the *Initial Conditions for Bed Temperatures* frame for this option and press *Bed Temp* and *Thermal* buttons to set these values. The options and format of data files to upload to are described in [Apply Cell Properties via Polygon](https://eemodelingsystem.atlassian.net/wiki/spaces/EK/pages/240419005/Bathymetry). Users are able to select to apply cell properties for a specific layer or all layers in the model. ` (22) 결측 온도자료를 온라인으로 받아 전체 영역 또는 특정 결측 영역에 적용할 수 있다(24). 조건 원문: `The data for *Temperature**IC* if missing may be downloaded from online open sources are described in [Download Online Data](https://eemodelingsystem.atlassian.net/wiki/spaces/EK/pages/240386174/Water+Depth+Elevation#WaterDepth/Elevation-DownloadOnlineData). Users are able to select to apply the downloaded data for the whole model domain or just a specific missing data area.` (24) 빈 줄·그림 마크업·캡션을 포함한다(21,23,25–28). `Temp.jpg`을 열었다(26). 메뉴에서 온도 양식으로 향하는 화살표와 Assign 강조를 보여 준다. 그림은 `Use Spatially Varying Initial Conditions` 미체크, `Const./Avg. Value: 20.000`, `Allow spatially varying Bed Temperatures` 체크, `Spatially Variable Bed Temp and Thickness` 체크, `Uniform Bed Temperature: 0 (°C)`, `Uniform Thermal Thickness: 0 (m)`, Ice Thickness의 `Average: 0`을 표시한다. 배정 양식은 `Only grid cells inside polygons`, `For All Layers`, `From Scatter (XYZ) Data`, `Replacement`를 선택하고 `All grid cells`, `For A Specific Layer: 1`, `Constant: 0`, `From Profile Data`, `Maximum value`, `Minimum value`를 보여 준다. 파일 목록은 비어 있다. |
+
+## 판독 중 확인된 사실 (판단 아님, 후속 검토 대상)
+
+- 16: 문장은 `they should check the box and press The`로 이어진다. `press` 뒤의 버튼 이름이 없다. 같은 행의 `#TemperatureIC-Figure1` anchor 정의도 이 파일에 없다.
+- 22·26의 그림: 본문의 체크박스 명칭은 `Use Spatially Variable Bed Temp and Thickness`이다. 그림은 `Spatially Variable Bed Temp and Thickness`로 표시한다.
