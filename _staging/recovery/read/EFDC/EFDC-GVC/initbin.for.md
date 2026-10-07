@@ -1,0 +1,36 @@
+---
+file: models/EFDC/raw/source_code/EFDC-GVC/initbin.for
+lines: 433
+sha256: 091a9a3d226ba04423f27abcd5d703338ebead16b88ecda4bde5b7028f946426
+reader: codex gpt-6.1-sol
+read_date: 2026-10-07
+---
+
+# initbin.for — 판독 구간 기록
+
+구간은 1행부터 433행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–60 | 구분 주석과 `SUBROUTINE INITBIN` 입구(1–9). 작성자·수정일·EFDC-FULL 1.0a 및 변경 기록 주석(10–27). 평균·최솟값·최댓값 수질 이진 파일(binary file)의 후처리기(post-processor) 제어 정보를 헤더(header)에 넣는다는 목적 주석(28–33). `INCLUDE 'EFDC.PAR'` (34), `INCLUDE 'EFDC.CMN'` (35). 포함 파일 내부는 이 판독 대상에 없다. `PARAMETER(MXPARM=30)` (37), 실수 TEND, LCM 크기의 XLON/YLAT, 정수 NPARM/NCELLS, 논리 FEXIST를 선언한다(38–41). WQNAME/WQUNITS/WQCODE는 각각 길이 20/10/3의 문자열이며 배열 크기는 MXPARM이다(42–44). 입력 매개변수 KC·IWQTSDT·DT·LA·TBEGAN의 의미를 주석으로 설명한다(46–53). NPARM은 WWQTSBIN 출력과 맞추고 NREC은 전체 자료 출력 횟수로 사용한다는 주석이다(54–60). |
+| 61–79 | 시작 시 6행 INITBIN 루틴 안. 원문 `IF(IDNOTRVA.EQ.0)THEN` (61)의 참 분기는 `NPARM = 23` (62), `ELSE` (63)는 `NPARM = 24` (64). 조건 종료(65). `NCELLS = LA-1` (66), `NREC = 0` (67), TEND에 TBEGIN 복사(68), `MAXRECL = 32` (69). 원문 `IF(NPARM .GE. 8)THEN` (70)이면 `MAXRECL = NPARM*4` (71); 조건 종료(72). 수질 이름·단위·코드는 WWQTSBIN 출력과 일치시키고 고정 문자열 길이를 지켜야 한다는 주석(73–79). |
+| 80–155 | 시작 시 6행 INITBIN 루틴 안. 20자 이름 길이 안내(80–82). WQNAME(1–24)에 염분(salinity), 엽록소 a(chlorophyll-a), 용존산소(dissolved oxygen), 총·용존·입자 유기탄소, 총질소, 용존 유기질소, 암모니아성 질소, 질산성 질소, 입자 유기질소, 총인, 용존·입자 유기인, 용존 정인산염, 용존 가용 규소, 분변성 대장균, 화학적 산소요구량, 규조류, 녹조류, 총부유고형물, 총광소멸, 수온, 대형조류 이름을 순서대로 대입한다(83–106). 대체 이름 대입은 주석이다(108–116). 10자 단위 길이 안내(118–120). WQUNITS는 1번 G/L, 2·19·20·24번 UG/L, 3–16·18·21번 MG/L, 17번 MPN/100ML, 22번 PER_METER, 23번 DEGC이다(121–144). 다른 단위 대입은 주석으로 남아 있다(146–154). 빈 줄·주석을 포함한다(107·117·145·155). |
+| 156–195 | 시작 시 6행 INITBIN 루틴 안. 3자 코드 길이 안내(156–158). WQCODE(1–24)에 SAL·CHL·DOO·TOC·DOC·POC·TNN·DON·NH4·NO3·PON·TPP·DOP·POP·P4D·SAD·FCB·COD·DIA·GRN·TSS·KET·TEM·MAC를 순서대로 대입한다(159–182). 대체 코드 대입은 주석으로 남아 있다(184–192). 빈 줄과 구분 주석(183·193–195). |
+| 196–218 | 시작 시 6행 INITBIN 루틴 안. 기존 평균 파일 추가 기록(append) 주석(196–197). 원문 `IF(ISWQAVG .EQ. 2)THEN` (198) 안에서 WQWCAVG.BIN 존재 여부를 조회한다(199). 내부 `IF(FEXIST)THEN` (200)이면 장치 2에 직접 접근(direct access)·비서식(unformatted)·STATUS='UNKNOWN'·RECL=MAXRECL로 연다(201–202). 발견 로그 출력(203). `READ(2, REC=1) NREC, TBEGAN, TEND, DT, IWQTSDT, NPARM,` (204); `+      NCELLS, KC` (205)로 기존 헤더를 읽는다. 다음 기록 위치는 `NR1 = 1 + NPARM*3 + NCELLS*4 + (NCELLS*KC+1)*NREC + 1` (206). 파일을 닫는다(207). `ELSE` (208)는 `ISWQAVG=1` (209)로 새 파일 생성 모드로 바꾼다. 두 조건 종료(210–211). 헤더 작성 안내와 구분 주석(212–218). |
+| 219–246 | 시작 시 6행 INITBIN 루틴 안. 기존 평균 파일 삭제 안내(219–220). 원문 `IF(ISWQAVG .EQ. 1)THEN` (221)이면 TBEGAN에 TBEGIN을 복사하고 파일 존재 여부를 조회한다(222–223). 내부 `IF(FEXIST)THEN` (224)은 기존 파일을 열고 STATUS='DELETE'로 닫으며 삭제 로그를 출력한다(225–227); 내부 조건 종료(228). 빈 줄(229). 장치 2에 WQWCAVG.BIN을 직접 접근·비서식·STATUS='UNKNOWN'·RECL=MAXRECL로 연다(230–231). 헤더 작성 주석(232–235). 제어 정보 NREC·TBEGAN·TEND·DT·IWQTSDT·NPARM·NCELLS·KC를 쓴다(236). `DO I=1,NPARM` (237·240·243)의 세 루프는 각각 WQNAME·WQUNITS·WQCODE를 쓴다(238·241·244). 루프 종료와 주석(239·242·245–246). 평균 파일 생성 조건은 이어진다. |
+| 247–273 | 시작 시 6행 INITBIN 루틴·221행 ISWQAVG=1 참 분기 안. 셀(cell) 인덱스 대응 주석(247–248). `DO L=2,LA` (249·252)의 두 루프는 IL(L)·JL(L)를 각각 쓴다(250·253); 루프 종료(251·254). 셀 중심 좌표 입력 안내(255–258). 장치 1에 LXLY.INP를 STATUS='UNKNOWN'으로 연다(259). `DO NS=1,4` (261)에서 `READ(1,1111)` (262)로 앞 네 기록을 건너뛴다. 루프 종료(263), `1111   FORMAT(80X)` (264). `DO LL=1,LVC` (266)에서 I·J·XUTME·YUTMN을 읽는다(267). 대응 인덱스는 `L=LIJ(I,J)` (268). XLON(L)·YLAT(L)에 읽은 좌표를 복사한다(269–270). 루프 종료(271), 장치 1 닫기(272), 주석(260·265·273). |
+| 274–287 | 시작 시 6행 INITBIN 루틴·221행 ISWQAVG=1 참 분기 안. 셀 중심 좌표 출력 안내(274–276). `DO L=2,LA` (277·280)의 두 루프에서 XLON(L)·YLAT(L)를 쓴다(278·281); 루프 종료(279·282). 빈 줄(283). NEXTREC를 NR1으로 조회하고 장치 2를 닫는다(284–285). 221행 조건 종료(286), 주석(287). |
+| 288–308 | 시작 시 6행 INITBIN 루틴 안. 기존 최솟값 파일 추가 기록 안내(288–291). 원문 `IF(ISWQMIN .EQ. 2)THEN` (292) 안에서 WQWCMIN.BIN 존재 여부를 조회한다(293). 내부 `IF(FEXIST)THEN` (294)이면 장치 2에 직접 접근·비서식·STATUS='UNKNOWN'·RECL=MAXRECL로 연다(295–296). 발견 로그 출력(297). `READ(2, REC=1) NREC, TBEGAN, TEND, DT, IWQTSDT, NPARM,` (298); `+      NCELLS, KC` (299)로 기존 헤더를 읽는다. 다음 기록 위치는 `NR2 = 1 + NPARM*3 + NCELLS*4 + (NCELLS*KC+1)*NREC + 1` (300). 파일을 닫는다(301). `ELSE` (302)는 `ISWQMIN=1` (303). 두 조건 종료(304–305), 구분 주석(306–308). |
+| 309–336 | 시작 시 6행 INITBIN 루틴 안. 기존 최솟값 파일 삭제 안내(309–310). 원문 `IF(ISWQMIN .EQ. 1)THEN` (311)이면 TBEGAN에 TBEGIN을 복사하고 파일 존재 여부를 조회한다(312–313). 내부 `IF(FEXIST)THEN` (314)은 기존 파일을 열고 STATUS='DELETE'로 닫으며 삭제 로그를 출력한다(315–317); 내부 조건 종료(318). 빈 줄(319). 장치 2에 WQWCMIN.BIN을 직접 접근·비서식·STATUS='UNKNOWN'·RECL=MAXRECL로 연다(320–321). 헤더 안내(322–325). 제어 정보 NREC·TBEGAN·TEND·DT·IWQTSDT·NPARM·NCELLS·KC를 쓴다(326). `DO I=1,NPARM` (327·330·333)의 세 루프는 각각 WQNAME·WQUNITS·WQCODE를 쓴다(328·331·334). 루프 종료와 주석(329·332·335–336). 최솟값 파일 생성 조건은 이어진다. |
+| 337–359 | 시작 시 6행 INITBIN 루틴·311행 ISWQMIN=1 참 분기 안. 셀 인덱스 대응 주석(337–338). `DO L=2,LA` (339·342)의 두 루프는 IL(L)·JL(L)를 쓴다(340·343); 루프 종료(341·344). 좌표 출력 안내(345–348). `DO L=2,LA` (349·352)의 두 루프는 XLON(L)·YLAT(L)를 쓴다(350·353); 루프 종료(351·354). 빈 줄(355). NEXTREC를 NR2로 조회하고 장치 2를 닫는다(356–357). 311행 조건 종료(358), 주석(359). |
+| 360–380 | 시작 시 6행 INITBIN 루틴 안. 기존 최댓값 파일 추가 기록 안내(360–363). 원문 `IF(ISWQMAX .EQ. 2)THEN` (364) 안에서 WQWCMAX.BIN 존재 여부를 조회한다(365). 내부 `IF(FEXIST)THEN` (366)이면 장치 2에 직접 접근·비서식·STATUS='UNKNOWN'·RECL=MAXRECL로 연다(367–368). 발견 로그 출력(369). `READ(2, REC=1) NREC, TBEGAN, TEND, DT, IWQTSDT, NPARM,` (370); `+      NCELLS, KC` (371)로 기존 헤더를 읽는다. 다음 기록 위치는 `NR3 = 1 + NPARM*3 + NCELLS*4 + (NCELLS*KC+1)*NREC + 1` (372). 파일을 닫는다(373). `ELSE` (374)는 `ISWQMAX=1` (375). 두 조건 종료(376–377), 구분 주석(378–380). |
+| 381–408 | 시작 시 6행 INITBIN 루틴 안. 기존 최댓값 파일 삭제 안내(381–382). 원문 `IF(ISWQMAX .EQ. 1)THEN` (383)이면 TBEGAN에 TBEGIN을 복사하고 파일 존재 여부를 조회한다(384–385). 내부 `IF(FEXIST)THEN` (386)은 기존 파일을 열고 STATUS='DELETE'로 닫으며 삭제 로그를 출력한다(387–389); 내부 조건 종료(390). 빈 줄(391). 장치 2에 WQWCMAX.BIN을 직접 접근·비서식·STATUS='UNKNOWN'·RECL=MAXRECL로 연다(392–393). 헤더 안내(394–397). 제어 정보 NREC·TBEGAN·TEND·DT·IWQTSDT·NPARM·NCELLS·KC를 쓴다(398). `DO I=1,NPARM` (399·402·405)의 세 루프는 각각 WQNAME·WQUNITS·WQCODE를 쓴다(400·403·406). 루프 종료와 주석(401·404·407–408). 최댓값 파일 생성 조건은 이어진다. |
+| 409–433 | 시작 시 6행 INITBIN 루틴·383행 ISWQMAX=1 참 분기 안. 셀 인덱스 대응 주석(409–410). `DO L=2,LA` (411·414)의 두 루프는 IL(L)·JL(L)를 쓴다(412·415); 루프 종료(413·416). 좌표 출력 안내(417–420). `DO L=2,LA` (421·424)의 두 루프는 XLON(L)·YLAT(L)를 쓴다(422·425); 루프 종료(423·426). 빈 줄(427). NEXTREC를 NR3으로 조회하고 장치 2를 닫는다(428–429). 383행 조건 종료(430), 빈 줄(431), `RETURN` (432), `END` (433). 이 파일에는 CALL문이 없다. |
+
+## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
+
+- 61–72·204–205·298–299·370–371: MAXRECL은 초기 NPARM=23 또는 24를 이용해 계산한다. 기존 파일 헤더 판독은 NPARM을 다시 읽는다. 그 뒤 MAXRECL을 다시 계산하는 문장은 이 파일에 없다.
+- 201–202·230–231·295–296·320–321·367–368·392–393 및 236–281·326–353·398–425: 출력 파일은 ACCESS='DIRECT'로 열린다. 새 파일 헤더·이름·단위·코드·인덱스·좌표의 WRITE문에는 REC 지정이 없다. 기존 헤더 READ에는 REC=1이 있다(204·298·370).
+- 39·221–286·311–358·383–430: XLON/YLAT 값 대입은 ISWQAVG=1 분기의 LXLY.INP 판독 루프에만 있다(266–271). ISWQMIN=1 및 ISWQMAX=1 분기는 해당 배열을 출력한다(349–354·421–426). 이 파일에는 평균 파일 생성 분기 밖의 XLON/YLAT 초기화가 없다.
+- 67–68·204–205·298–299·370–371 및 222·312·384: NREC/TEND의 초기 대입은 세 파일 처리 앞에 한 번 있다. 기존 파일 헤더 판독은 같은 NREC/TEND에 값을 읽는다. 새 파일 생성 분기들은 TBEGAN을 복사하지만 NREC/TEND를 다시 초기화하지 않는다.
+- 37·42–44·83–182·204–205·298–299·370–371: 문자열 배열 크기는 30이다. 이 파일의 활성 이름·단위·코드 대입 범위는 1–24이다. 기존 헤더에서 읽은 NPARM에 대해 배열 크기 또는 대입 범위를 검사하는 조건은 이 파일에 없다.
