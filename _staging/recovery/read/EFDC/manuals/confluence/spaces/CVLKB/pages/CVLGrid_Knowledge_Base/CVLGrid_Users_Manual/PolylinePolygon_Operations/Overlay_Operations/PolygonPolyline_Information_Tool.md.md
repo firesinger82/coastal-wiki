@@ -1,0 +1,29 @@
+---
+file: models/EFDC/raw/manuals/confluence/spaces/CVLKB/pages/CVLGrid_Knowledge_Base/CVLGrid_Users_Manual/PolylinePolygon_Operations/Overlay_Operations/PolygonPolyline_Information_Tool.md
+lines: 43
+sha256: 3678a7f8bb93cea8a9be0edc3a65402c284d2f9b27dde49e173114e7c1b6908e
+reader: codex gpt-6.1-sol
+read_date: 2026-10-07
+---
+
+# PolygonPolyline_Information_Tool.md — 판독 구간 기록
+
+구간은 1행부터 43행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–9 | Polygon/Polyline Information Tool / 문서 메타데이터 — 페이지 ID `2818104`, 제목, space, 원문 URL, 버전 `3`, 갱신 시각, 문서 계층을 포함한다(1–9). |
+| 10–14 | Polygon/Polyline Information / 속성 창 개요 — 폴리라인(polyline)별 정보를 편집하는 도구를 그림 1로 소개한다(10). 직접 연 그림 1의 선택 번호는 `Polygon/Polyline: 1`, `ID:`는 빈 칸, `Layer:`는 `Overlay`, `Defined:`는 `1`, `Description:`은 빈 칸, `Closed`는 미선택이다(12–13행 참조 그림). `Stats` 표시값은 `# Pts: 4`, `Length: 7.1`, `Area: NA`다(12행 참조 그림). 그림에는 통계 단위가 보이지 않는다(12행 참조 그림). |
+| 15–20 | Polygon/Polyline / 선택·ID·레이어·닫기 — 화살표 버튼으로 현재 다각형(polygon)·폴리라인을 순회하고 오른쪽에 번호·ID를 표시한다(15). 텍스트 칸에 새 ID를 입력할 수 있다(15). 입력 항목 원문: `In the *Polygon/Polyline* sub frame the user can cycle through the current polygons and polylines using the arrow buttons. As the user cycles, the polygon number and ID are displayed on the right. The user can change a polyline ID by clicking in the text box and typing the desired ID.` (15). `Layer`는 현재 레이어(layer), `Defined`는 사용 가능한 레이어 수, `Description`은 설명 입력 항목이다(17). 항목 정의 원문: `The *Layer* drop down menu shows what layer the current polygon is on. *Defined* simply shows how many available layers are in the *Layer Control*. *Description* allows the user to describe the polygon/polyline.` (17). `Options`에서 선을 닫으면 다각형이 되고 `Area`를 표시한다고 적는다(19). 면적 표시 조건·단위 원문: `The *Options* frame allows the user to close the polylines, thus creating polygons. When this box is checked the "*Area*" display box will show the area in meters within the current polygon.` (19). 이 문장은 면적 단위를 `meters`로 적는다(19). |
+| 21–23 | Stats / 거리 라벨 설정 — 현재 선의 점 수·길이·면적을 표시하지만 면적은 다각형일 때만 표시한다(21). 조건 원문: `The *Stats* window displays the polygon/polyline statistics. For the currently selected line it shows the number of points, the length, and the area. However, the area is only shown when the line is a polygon.  ` (21). `Edit RK/RM Options Window`에서 `Symbol`, `Font` 버튼을 원문의 `LMC`로 눌러 기호(symbol)와 글꼴(font)을 바꾼다(22). 라벨 시작값·간격·단위 입력 항목 원문: ` In the *Edit RK/RM Options Window* the user can LMC on *Symbol* and *Font* buttons to change the symbol and font as shown in [Figure 2](#Polygon/PolylineInformationTool-Figure2) and [Figure 3](#Polygon/PolylineInformationTool-Figure3) respectively. In addition, the user can modify the starting RK and Delta (m) and unit for display on the polyline. [Figure 4](#Polygon/PolylineInformationTool-Figure4) shows RK labels displayed on the polyline.` (22). 항목 이름은 `starting RK`, `Delta (m)`, `unit`이다(22). 이 본문에는 기본값·범위가 없다. |
+| 24–26 | Symbol Properties / 기호 설정 화면 — 직접 연 그림 2의 `Symbol:` 선택값은 `Triangle (Filled)`, `Size (inches):` 값은 `0.08`이다(24–25행 참조 그림). `Outline Format`의 `Thickness` 값은 `0`이고 옆 단위 표기는 `Inches`다(24행 참조 그림). `Outline Format`에는 `Color` 버튼과 색상 팔레트가 있고 `Fill Color`에는 `Transparent`, `Color` 버튼과 팔레트가 있다(24행 참조 그림). 미리보기는 빨간 채움 삼각형이며 외곽 색상 표시 칸은 검은색이다(24행 참조 그림). 화면값이 기본값이라는 본문 설명은 없다. |
+| 27–29 | Text Display & Formatting Options / 글꼴 설정 화면 — 직접 연 그림 3은 미리보기 `1.0`, `Font` 옆 `8 pt`, `Arial`, `ForeColor` 버튼, `Angle: 0`을 보여 준다(27–28행 참조 그림). `Angle`의 단위는 화면에 표시하지 않는다(27행 참조 그림). `Text Background Options`의 `Use Background`는 미선택이고 `Color` 버튼이 있다(27행 참조 그림). `Label Precision`은 `General`이 선택되며 `Significant Digits`, `Fixed`는 미선택이다(27행 참조 그림). `Fixed` 옆 입력값은 `.999`다(27행 참조 그림; 해당 영역을 확대해 소수점 표기를 확인했다). `Text/Label Alignment` 선택지는 `Top Left`, `Top Center`, `Top Right`, `Center Left`, `Center Center`, `Center Right`, `Bottom Left`, `Bottom Center`, `Bottom Right`이며 `Center Center`가 선택되어 있다(27행 참조 그림). 배경·전경의 색상 코드나 기본값·허용 수치 범위는 이 본문과 화면에 없다. |
+| 30–32 | RK labels / 폴리라인의 거리 표기 — 직접 연 그림 4는 검은 선을 따라 빨간 채움 삼각형과 파란 숫자 `0`, `1`, `2`, `3`, `4`, `5`, `6`, `7`을 표시한다(30–31). 숫자는 왼쪽 아래에서 시작해 오른쪽 끝으로 증가한다(30행 참조 그림). 삼각형은 위쪽을 향하며 이동 방향을 나타내는 화살표는 없다(30행 참조 그림). 범례는 `Overlay`, 축척 막대는 `1 Meters`다(30행 참조 그림). |
+| 33–42 | Copy to Another Layer / 적용 조건과 목적지 — 본문은 스플라인(spline)을 Overlay로, 반대로도 옮길 수 있다고 적는다(33). `Layer Control`에 `Overlay`와 `Spline` 두 레이어 유형이 있으면 복사 기능이 켜진다고 적는다(35). 목적지 레이어(destination layer)를 정하며 Overlay는 다른 Overlay 또는 Spline으로 복사될 수 있다(35). 복사 결과는 목적지 레이어 속성을 갖는다(35). 적용 조건·목적지 원문: `When there are from two layers types (both *Overlay* and *Spline*) in the *Layer Control*, the *Copy to Another Layer* function is enabled as shown in [Figure 5](#Polygon/PolylineInformationTool-Figure5). The user may then define a destination layer for copying the polygon/polyline to as shown in [Figure 6](#Polygon/PolylineInformationTool-Figure6). For an *Overlay* type, it can be copied to another *Overlay* or a *Spline* layer. Then it will have properties of the layer it is copied to.` (35). 직접 연 그림 5는 `Spline`, `Overlay2`, 활성 `Overlay` 레이어와 빨간 테두리로 강조한 `Copy to Another Layer` 메뉴를 보여 준다(37–38). 그림 6의 `Select Layer` 목록은 `Spline`, `Overlay2`이며 `OK`, `Cancel` 버튼이 있다(40–41). |
+| 43–43 | Delete Nodes inside Selected Polylines / 활성화 조건 — `Layer Control`에 `Grid` 레이어가 있으면 기능이 활성화된다(43). 선택 폴리라인 내부의 모든 격자 절점(grid nodes)을 삭제할 수 있다(43). 적용 조건·수량 원문: `The *Delete Nodes inside Selected Polylines* function is enabled when there is a *Grid* layer in *Layer Control*. It allows the user to delete all the grid nodes inside the polyline.` (43). |
+
+## 판독 중 확인된 사실 (판단 아님, 후속 검토 대상)
+
+- 10·22·35행: `#Polygon/PolylineInformationTool-Figure1`부터 `#Polygon/PolylineInformationTool-Figure6`까지의 내부 참조가 있다. 이 파일에는 해당 ID를 정의하는 명시 앵커가 없다.
+- 19행: 면적 표시 단위를 `meters`라고 적는다. 이 파일에는 면적의 제곱 단위 표기가 없다.
+- 22행: `LMC`, `RK/RM`을 사용하지만 이 파일에는 해당 약어의 풀이가 없다.
