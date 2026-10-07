@@ -49,7 +49,7 @@ input:focus-visible, button:focus-visible { outline: 2px solid var(--accent); ou
 .legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: .82rem; color: var(--muted) }
 .legend span { display: inline-flex; align-items: center; gap: 6px }
 .sw { width: 11px; height: 11px; border-radius: 2px; display: inline-block }
-.s-reread_ok { background: var(--ok) } .s-reread_fixed { background: var(--fix) } .s-checked_fixed { background: var(--chk) }
+.s-reread_ok, .s-codex_read { background: var(--ok) } .s-codex_read_fixed { background: var(--chk) } .s-reread_fixed { background: var(--fix) } .s-checked_fixed { background: var(--chk) }
 .s-first_pass { background: var(--raw) } .s-missing { background: var(--miss) }
 .doc { display: grid; gap: 6px; padding-block: 10px; border-bottom: 1px solid var(--rule) }
 .doc:last-child { border-bottom: 0 }
@@ -78,11 +78,12 @@ footer { font-size: .8rem; color: var(--muted) }
   </section>
 
   <section>
-    <h2>XBeach 매뉴얼·보고서 PDF — 쪽별 상태</h2>
+    <h2>매뉴얼·보고서 PDF — 쪽별 상태</h2>
     <div class="legend">
       <span><i class="sw s-reread_ok"></i>재판독(fable 또는 Codex), 원문과 일치</span>
       <span><i class="sw s-reread_fixed"></i>재판독(fable 또는 Codex), 정정함</span>
       <span><i class="sw s-checked_fixed"></i>표본 검증에서 정정</span>
+      <span><i class="sw s-codex_read"></i>Codex 판독(쪽 이미지), 기계 확인</span>
       <span><i class="sw s-first_pass"></i>1차 판독만(오류율 약 27%)</span>
       <span>칸 아래 짙은 띠 = 수식이 있는 쪽</span>
     </div>
@@ -118,14 +119,14 @@ const code = D.code, pdfs = D.pdfs;
 const codeOk = code.filter(c => c.covered && c.sha).length;
 const codeLines = code.reduce((a, c) => a + c.lines, 0);
 const pages = pdfs.flatMap(p => p.pages);
-const reread = pages.filter(p => p.s.startsWith('reread')).length;
+const reread = pages.filter(p => p.s.startsWith('reread') || p.s.startsWith('codex_read')).length;
 const fixesCode = code.reduce((a, c) => a + c.fixes, 0);
 const fixedPages = pages.filter(p => p.s === 'reread_fixed' || p.s === 'checked_fixed').length;
 const rereadModels = [...new Set(code.map(c => c.model))];
 const otherModels = D.models.filter(m => !rereadModels.includes(m.model)).length;
 $('#strip').innerHTML = [
   ['자체 코드 재판독', `${codeOk}/${code.length}`, `파일 · ${fmt(codeLines)}행 · ${rereadModels.join('·')} · 1행~끝 구간과 해시 일치`],
-  ['XBeach PDF 재판독', `${reread}/${pages.length}`, (reread === pages.length ? `쪽 · 전 쪽 재판독` : `쪽 · 나머지는 1차 판독만`)],
+  ['PDF 판독', `${reread}/${pages.length}`, (reread === pages.length ? `쪽 · 전 쪽 재판독` : `쪽 · 나머지는 1차 판독만`)],
   ['정정한 곳', `${fixesCode + fixedPages}`, `코드 기록 ${fixesCode}건 · PDF ${fixedPages}쪽`],
   ['재판독 전 모델', `${otherModels}`, `옛 기록만 있음`],
 ].map(([k, v, n]) => `<div class="tile"><span class="k">${k}</span><span class="v">${v}</span><span class="n">${n}</span></div>`).join('');
@@ -140,7 +141,8 @@ $('#models').innerHTML = `<thead><tr><th>모델</th><th class="r">원자료 파�
       const mc = code.filter(c => c.model === m.model), mok = mc.filter(c => c.covered && c.sha).length;
       const md = D.textdocs.filter(t => t.model === m.model).length;
       ownS = `<span class="pill p-ok">재판독 ${mok}/${mc.length}</span>`;
-      manS = m.model === 'XBeach' ? `<span class="pill p-fix">PDF 재판독 ${reread}/${pages.length}쪽 · 문서 ${md}</span>` : `<span class="pill p-ok">문서 재판독 ${md}</span>`;
+      const mp = pdfs.filter(d => d.name.startsWith(m.model + ' ·')).reduce((a, d) => a + d.total, 0);
+      manS = `<span class="pill p-ok">문서 ${fmt(md)}${mp ? ' · PDF ' + fmt(mp) + '쪽' : ''}</span>`;
     } else {
       const rec = (own['LLM판독'] || 0) + (own['부분판독'] || 0);
       ownS = rec ? `<span class="pill p-old">옛 기록 ${fmt(rec)}/${fmt(ownN)}</span>` : `<span class="pill p-miss">기록 없음</span>`;
@@ -150,10 +152,10 @@ $('#models').innerHTML = `<thead><tr><th>모델</th><th class="r">원자료 파�
     return `<tr><td>${esc(m.model)}</td><td class="r num">${fmt(m.raw)}</td><td class="r num">${fmt(ownN)}</td><td>${ownS}</td><td class="r num">${fmt(manN)}</td><td>${manS}</td></tr>`;
   }).join('') + '</tbody>';
 
-const label = {reread_ok:'재판독 일치', reread_fixed:'재판독 정정', checked_fixed:'표본 검증 정정', first_pass:'1차 판독만', missing:'기록 없음'};
+const label = {codex_read:'Codex 판독', codex_read_fixed:'Codex 판독·표본 정정', reread_ok:'재판독 일치', reread_fixed:'재판독 정정', checked_fixed:'표본 검증 정정', first_pass:'1차 판독만', missing:'기록 없음'};
 $('#pdfs').innerHTML = pdfs.map(d => {
   const c = {}; d.pages.forEach(p => c[p.s] = (c[p.s] || 0) + 1);
-  const rr = (c.reread_ok || 0) + (c.reread_fixed || 0);
+  const rr = (c.reread_ok || 0) + (c.reread_fixed || 0) + (c.codex_read || 0) + (c.codex_read_fixed || 0);
   return `<div class="doc"><div class="doc-h"><b>${esc(d.name.replace(/_/g, ' '))}</b><span class="meta num">${d.total}쪽 · 재판독 ${rr} · 정정 ${(c.reread_fixed || 0) + (c.checked_fixed || 0)}</span></div>
   <div class="grid" role="img" aria-label="${esc(d.name)} 쪽별 상태">${d.pages.map((p, i) => `<i class="s-${p.s}${p.eq ? ' eq' : ''}" title="${i + 1}쪽 · ${label[p.s]}${p.eq ? ' · 수식 ' + p.eq : ''}"></i>`).join('')}</div></div>`;
 }).join('');

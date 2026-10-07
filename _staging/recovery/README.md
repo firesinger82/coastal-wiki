@@ -116,8 +116,20 @@ Delft3D 487(기계 sweep 실패 471 + 웹 16, 09-22 스냅샷 교체 전 경로)
 - 문서·코드 대조(`compare/SFINCS-docs-vs-code.md`, 불일치 39)와 시간 단계 흐름 분석(`flow/SFINCS-callflow.md`)을 마치고 노트 14개에 반영했다(`667408d`). 보고서·노트 인용은 `scripts/citecheck.py`로 기계 대조, 전부 일치.
 - 확인하지 않은 것: 모델 실행. 불일치·지연이 결과에 주는 영향.
 
+## EFDC 판독 (2026-10-07~08 완료)
+
+기록: `read/EFDC/EFDCPlus_Stable/`(EFDC+ 코드), `read/EFDC/EFDC-GVC/`(옛 판 코드), `read/EFDC/manuals/confluence/`(Confluence), `read/EFDC/manuals/pdfs/`(PDF). 대상 목록은 `EFDC-files.tsv`의 자체코드·매뉴얼·문서 분류.
+
+- 자체 코드 510파일 307,120행: EFDC+ 207파일 131,630행(34묶음), EFDC-GVC 303파일 175,490행(46묶음). Codex `gpt-6.1-sol`, `codex exec` 5개 동시. 기계 확인 전부 통과(1행~끝 구간·sha·전 행 열람·원문 인용). sonnet 표본 약 110구간 대조, 틀림 0, 인용·표현 보완 5.
+- Confluence 721쪽(25묶음, 그림 2,682개 참조 중 로컬 2,574개 열람): 기계 확인 통과. 그림 로컬 사본 규칙(공백→_, 콜론·괄호 삭제)을 처음에 빠뜨려 한 번 재실행했다. 용량 오류로 끊긴 2묶음은 빠진 파일만 재실행. sonnet 표본 약 30구간·그림 10여 장 대조, 정정 2(그림 속 `WKQ` 오기, 오역).
+- PDF 5종 634쪽(37작업): Codex가 300 dpi 쪽 이미지를 직접 판독(텍스트 추출본·Theory는 Marker 초안 참고). 기계 확인 전부 통과. sonnet 표본 36쪽·식 약 80개 대조, 정정: 식 (8.60) 곱 점 1, 서술·해석 정정 4.
+- 범위 밖: `third_party_open`·`lib`·`redist`·`include` 외부 라이브러리, 빌드·설정, 바이너리, `manuals/refs/*.md`(이전 AI가 만든 요약·목록이라 원자료가 아님).
+- 검사 도구 수정: `quotes.py` 짝짓기 결함(인용 0개 쪽을 골라 불일치를 숨김) 수정, 그림 줄 인용은 따로 셈. `pdfcheck.py --jobs`로 모델별 작업 목록.
+- 확인하지 않은 것: 문서·코드 대조, 계산 흐름 분석, 노트(`models/EFDC/`) 반영.
+
 ## 다음에 이어서 할 일
 
 1. ~~매뉴얼과 코드 판독 기록 대조~~ — 10-03 완료(`compare/XBeach-manual-vs-code.md`, 노트 반영 `1da8d89`).
 2. ~~XBeach 파일 간 계산 흐름 분석~~ — 10-07 완료(`flow/XBeach-callflow.md`, 노트 반영 `d89cd8b`). 판독 기록 검색은 `wiki_search` `path_class="records"`(`ce7b3ae`).
-3. 다른 11개 모델: 같은 방식(고정 목록 → 1행/1쪽 판독 → 기계 확인 → 다른 모델 검증).
+3. EFDC: 문서·코드 대조, 계산 흐름 분석, 노트 반영.
+4. 다른 10개 모델: 같은 방식(고정 목록 → 1행/1쪽 판독 → 기계 확인 → 다른 모델 검증).

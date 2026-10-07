@@ -22,7 +22,7 @@ def lines_of(path):
     d = open(path, 'rb').read()
     return d.count(b'\n') + (1 if d and not d.endswith(b'\n') else 0)
 
-CODE_DIR = re.compile(r'/(src|source)/')
+CODE_DIR = re.compile(r'/(src|source)/|/source_code/(?!.*/docs?/)')
 
 def all_records():
     for r in sorted(glob.glob(f'{ROOT}/read/*/**/*.md', recursive=True)):
@@ -63,9 +63,9 @@ def text_doc_records():
 
 def pdf_pages():
     docs = collections.OrderedDict()
-    for r in sorted(glob.glob(f'{ROOT}/read/XBeach/**/p[0-9][0-9][0-9]-[0-9][0-9][0-9].md', recursive=True)):
+    for r in sorted(glob.glob(f'{ROOT}/read/*/**/p[0-9][0-9][0-9]-[0-9][0-9][0-9].md', recursive=True)):
         t = open(r).read()
-        name = os.path.basename(os.path.dirname(r))[:-4]
+        name = r.split('/read/')[1].split('/')[0] + ' · ' + os.path.basename(os.path.dirname(r))[:-4]
         total = int(re.search(r'^pages_total: (\d+)', t, re.M).group(1))
         d = docs.setdefault(name, {'name': name, 'total': total, 'pages': {}})
         for m in re.finditer(r'^\|\s*p\.(\d+)[^|]*\|(.*)$', t, re.M):
@@ -74,8 +74,11 @@ def pdf_pages():
                 s = 'reread_ok'
             elif re.search(r'(fable|codex) 재판독', body):
                 s = 'reread_fixed'
-            elif re.search(r'fable 검증|검증 정정|Claude 정정', body):
+            elif re.search(r'fable 검증|Claude 정정', body) or (re.search(r'검증 정정', body) and 'reader: codex' not in t):
                 s = 'checked_fixed'
+            elif re.search(r'^reader: codex gpt-6.1-sol', t, re.M):
+                # first-pass read by Codex from 300 dpi page images (2026-10-08~), machine-checked
+                s = 'codex_read_fixed' if re.search(r'검증 (정정|보완)', body) else 'codex_read'
             else:
                 s = 'first_pass'
             d['pages'][p] = {'s': s, 'eq': len(re.findall(r'\(식 [^)]+\)|\([A-C]\.\d+\)|\(\d\.\d+\)', body))}
