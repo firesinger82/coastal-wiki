@@ -1,0 +1,22 @@
+---
+file: models/EFDC/raw/manuals/confluence/spaces/EK/pages/OMP_Runs_OLD.md
+lines: 38
+sha256: 44f43a5dca755416f31863a0d29a1a7160d503c4c94b38f7a2f61d6fb1785e51
+reader: codex gpt-6.1-sol
+read_date: 2026-10-07
+---
+
+# OMP_Runs_OLD.md — 판독 구간 기록
+
+구간은 1행부터 38행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–9 | 문서 메타데이터 — 페이지 ID, `_OLD` 제목, space, 원문 URL, 판본, 갱신 시각과 경로를 담은 frontmatter를 읽었다(1–9). |
+| 10–18 | OMP / 실행 코어 설정 — EFDC+의 다중 스레드(multi-threading) 지원과 스레드 친화도(thread affinity)의 성능 영향을 설명한다(10). 문서는 2TL와 3TL 해법 모두 OMP를 허용하며 EEMS10.2에서도 이전 버전과 본질적으로 같은 옵션이라고 적는다(10). 코어 수 상한에 관한 권고와 성능 조건 원문: `In the *General* frame of *EFDC+ Run Options*, set *#OMP Cores Used* and *KMP Offset* as shown in Figure 1. It is recommended not to set *# OMP Cores Used* greater than or equal to the *Available CPU Cores*. Setting the number of cores to the maximum number of cores will result in diminished performance.` (12). `KMP Offset` 설명으로 연결하는 링크를 포함한다(14). Figure 1의 `attachments/609779718/2020-05-19_10-24-40_AM.png`를 열었다(16). 화면에는 `Available CPU Cores: 6`, `# OMP Cores Used: 1`, `KMP Offset: 0`, `Display parameter: Salinity`, `L: 29`, `I: 3`, `J: 31`, `Print Interval: 500`, `Output Interval (min.): 60`을 표시한다(16 그림). `MPI Domain Decomposition`은 해제되어 있고 `Run MPI Cluster`는 비활성이다(16 그림). 캡션을 포함한다(18). 16행 그림의 `Write EE_Arrays.out Linkage file (optional)`, `Auto-generate Calibration Plots & Statistics`, `Do not pause when the run completes` 체크박스는 모두 해제되어 있다(16 그림). |
+| 19–30 | Run Time Status / EFDC_Explorer Post Processing and Linkage — 실행 창에 표시할 매개변수와 셀 지수를 선택한다(24). 출력 갱신 간격의 시간 단계(time step) 수 정의 원문: `This contains the settings for feedback to EFDC's runtime window during the model run. The user selects a parameter to display for a grid cell which is defined by the L, I, J indices. The number in the *Print Interval:* specifies the number of time steps after which the output written in the Model runtime Window is refreshed.` (24). EE 출력 주기 원문: `*Output interval*: Set time for EE to the write output frequency` (28). 선택적 연결 파일(linkage file)의 변수 이름과 추가 출력 조건 원문: `*Write EE\_Arrays.out Linkage file (optional):*These arrays can be output if the user is interested in analyzing outputs that are beyond the standard outputs for model verification or research purposes. These outputs include Horizontal Eddy Viscosity (AH), Vertical Viscosity (AV), Turbulence (QQ), and Layer Thickness (HPK). If horizontal diffusivity is turned on for Turbulence, then additional outputs are generated. These include horizontal diffusion in XX (FMDUX), XY (FMDUY), YY (FMDVX), and YX (FMDVY). For more details about linkage files, please refer to the EFDC+ documentation. The users that can compile EFDC+ source code can specify the outputs that can be written in these linkage files.` (30). `AH`, `AV`, `QQ`, `HPK`, `FMDUX`, `FMDUY`, `FMDVX`, `FMDVY`는 이 행에 열거된 출력 변수이며 이 구간은 수치·단위를 제시하지 않는다(30). |
+| 31–38 | 자동 보정 그림 / 종료·덮어쓰기·실행 파일 — `0run` 표시 파일(flag)과 자동 보정(calibration) 그림·통계 생성 조건, 동일 EE 인스턴스(instance)에서 다른 모델을 열면 기능을 중단하는 조건 원문: `*Auto-generate Calibration Plots & Statistics*: EE has an option of automatically generating calibration plots and statistics. In order to accomplish this, a file named "0run" is created as a flag that tells EE that the model is still running or has crashed. When this is not the case, EE automatically generates the plots and statistics. If the user opens a new EFDC+ model with the same instance of EE while the EFDC+ model is running, the automatic plot/statistics generation function is aborted. A new EE window should be opened if the user needs to open another EFDC model.` (32). 종료 대기 해제 조건 원문: `When EFDC+ finishes execution, the model waits for the user to press a key to continue/exit. If the user does not want the pause function, they may check the box *Do not pause when the run completes* on the *EFDC+ Run Options* form.` (34). 기존 출력이 있을 때 실행을 허용하는 체크와 이전 출력을 보존할 때 필요한 저장 동작 원문: `In case the user opens the model that already has output from an older run, *Overwrite the existing model outputs?* box appears. The model can run only if the user checks on this box to overwrite results. If the user wants to preserve the output from a previous run, then they must save the existing model as a new model.` (36). 실행 파일 선택과 설치 경로 예 원문: `*Executable*: The user should browse to the correct EFDC executable to run the model. The default executable is generally located in the installation folder (e.g. C:\Program Files\DSI\EEMS10.X).` (38). |
+
+## 판독 중 확인된 사실 (판단 아님, 후속 검토 대상)
+
+없음
