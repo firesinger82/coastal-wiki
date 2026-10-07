@@ -13,6 +13,38 @@ verification_method: "동결 로컬 소스 직접 추적 및 최소 Fortran 대�
 
 `executestep`은 wet mask → 시간 선택 → 경계 → 파랑 → 식생 → 지하수 → 유동 → 표사 → 지형 순서로 실행한다. 각 옵션은 별도 guard를 가지며, `bed_update` 호출은 `morphology=1`이면서 `setbathy!=1`일 때다. 내부 지형 갱신은 `morstart <= t < morstop`과 `morfac > 0.999`를 추가로 요구한다. 따라서 아래 결과는 해당 분기가 실행되는 경우에 한정한다. (`libxbeach.F90:280-312`; `morphevolution.F90:632-640`)
 
+위 순서에는 선박과 표류자가 빠져 있다. 선박(`ships==1`)은 경계 다음, 파랑 전에 실행한다(`libxbeach.F90:301`). 표류자(`ndrifter>0`)는 유동 다음, 표사 전에 실행한다(`libxbeach.F90:306`). `setbathy==1`이면 `bed_update` 대신 `setbathy_update`를 실행한다(`libxbeach.F90:310-311`).
+
+```mermaid
+flowchart TD
+  W["compute_wetcells<br/>libxbeach.F90:284"] --> T["timestep<br/>:287"]
+  T --> BC["wave_bc :296<br/>gw_bc :297 (gwflow==1)<br/>flow_bc :298 (flow==1 또는 nonh)"]
+  BC --> SH["shipwave :301<br/>(ships==1)"]
+  SH --> WV["wave :302<br/>(swave==1)"]
+  WV --> VG["vegatt :303<br/>(vegetation==1)"]
+  VG --> GW["gwflow :304<br/>(gwflow==1)"]
+  GW --> FL["flow :305<br/>(flow==1 또는 nonh)"]
+  FL --> DR["drifter :306<br/>(ndrifter>0)"]
+  DR --> TR["transus :307<br/>(sedtrans==1)"]
+  TR -->|"morphology==1, setbathy/=1"| BU["bed_update :310"]
+  TR -->|"setbathy==1"| SB["setbathy_update :311"]
+```
+
+### 직전 단계 값을 읽는 지점(지연)
+
+아래 항목은 소비 루틴이 같은 단계의 생산 루틴보다 먼저 실행된다. 따라서 소비 루틴은 직전 단계의 값을 읽는다. 첫 단계에서는 초기화 값을 읽는다. 순서 근거는 위 그림의 `libxbeach.F90` 행이다. 이 목록은 코드 순서에서 확인한 것이며, 결과에 주는 영향은 모델 실행으로 확인하지 않았다.
+
+| 변수 | 소비(먼저 실행) | 생산(나중 실행) |
+|---|---|---|
+| `hh` | `compute_wetcells`: `if(s%hh(i,j)>par%eps+numeps) then`(`wetcells.F90:108`); `wave`: `s%hhw = max(s%hh+par%delta*s%H,par%eps)`(`wave_timestep.F90:59`) | `flow`: `s%hh  = max(s%zs-s%zb,par%eps)`(`flow_timestep.F90:940`) |
+| `H` | `wave` 진입 시 `hhw` 계산(`wave_timestep.F90:59`) | 같은 `wave` 안의 `s%H  = sqrt(s%E/par%rhog8)`(`wave_instationary.F90:433`) |
+| `Dveg` | `wave`의 소산 항(`wave_instationary.F90:295`) | `vegatt`(`vegetation.F90:400`) |
+| `ueu`, `vev`, `vmageu` | `vegatt`의 항력(`vegetation.F90:515-516`) | `flow`(`flow_timestep.F90:858,864,926`) |
+| `ue`, `ve` | `porcanflow`: `U = s%ue(i,j)`, `V = s%ve(i,j)`(`vegetation.F90:832-833`) | `flow`(`flow_timestep.F90:867,872`) |
+| `nuh` | `timestep`의 점성 CFL(`timestep.F90:523`) | `flow`: `s%nuh = par%nuh` 이후 갱신(`flow_timestep.F90:376`) |
+
+`flow` 안에도 순서 비대칭이 있다. 셀 중심 `ue`는 이번 단계의 `ueu`로 만든다(`flow_timestep.F90:858,867`). 셀 중심 `ve`는 `vev`를 새로 대입하기 전에 만든다(`flow_timestep.F90:872`, 새 대입은 `:926`). 따라서 `ve`는 직전 단계의 `vev`로 만들어지고, 같은 단계에서 `ve`를 읽는 `transus`(`vmag2     = s%ue**2+s%ve**2`, `morphevolution.F90:141`)도 그 값을 읽는다. `flow_timestep.F90:103`의 `s%vev=0.d0`은 첫 호출의 할당 블록 안에만 있다. 원본 소스 전체에서 `vev`를 대입하는 곳은 이 둘과 초기화(`initialize.F90:894,1049,1159`)뿐이다.
+
 ## 다분급 입경: 셀별 초기화 뒤 로컬 배열 전체 덮어쓰기
 
 초기화에서는 `D50top(i,j)`·`D90top(i,j)`를 해당 셀 최상층 분급비의 가중합으로 만든다. 그러나 `bed_update`의 `ngd>1` 분기는 대입 왼쪽에 `(i,j)`가 없다. 오른쪽 `sum(...)`은 스칼라이므로 매 반복마다 로컬 배열 전체가 같은 값으로 바뀐다. 반복이 비어 있지 않으면 마지막 로컬 셀 `(nx,max(ny,1))`의 값이 로컬 halo를 포함한 배열 전체에 남는다. MPI rank 사이의 값이 동일하다는 뜻은 아니다. (`initialize.F90:1277-1283,1389-1398`; `morphevolution.F90:632-640,1170-1182`)

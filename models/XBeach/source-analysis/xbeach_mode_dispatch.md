@@ -120,7 +120,7 @@ Nonh is dispatched **inside `flow_timestep.F90:635-657`**, not through `wave_tim
 | Source | File:Line | Behavior |
 |---|---|---|
 | Base hydrodynamic CFL | `timestep.F90:461-591` | Grid/depth, velocity, viscosity limits |
-| Surfbeat directional refraction CFL | `:632-646` | Adds when `swave=1`, except stationary |
+| Surfbeat directional refraction CFL | `:632-646` | Adds when `swave=1`. 비 MPI 빌드는 stationary를 제외한다(`:641-646`). MPI 빌드는 `ntheta>1`이면 stationary에도 적용한다(`:633-637`). |
 | Stationary internal pseudo-time `dtw` | `wave_stationary_directions.F90:256-277` | From `cgx/cgy/ctheta`, optionally capped by hydro `dt` for WCI |
 | Stationary update interval | `timestep.F90:161-179` | At `wavint`; `wavint/maxiter/maxerror` only read for stationary or `single_dir` |
 | Nonh: `swave=0` default → no short-wave CFL | `params.F90:98-101` | Practical step is hydro/wave-resolving CFL |
@@ -137,14 +137,14 @@ Nonh is dispatched **inside `flow_timestep.F90:635-657`**, not through `wave_tim
 - Forces from radiation stresses + roller (`wave_functions.F90:1238-1275`).
 
 **Flow → waves (WCI)**:
-- Surfbeat/stationary use smoothed flow/depth means (`wave_functions.F90:24-48`); selected in `wave_timestep.F90:84-102`.
+- Surfbeat는 `single_dir=1`일 때 평활 유속·수심(`wave_functions.F90:24-48`)을 쓴다(`wave_timestep.F90:84-102`). Stationary는 평활값을 쓰지 않고 순간 수심 `hhw`를 쓴다: `call wave_dispersion(s,par,0)  ! use instantaneous water depth (and velocity)`(`wave_timestep.F90:77-79`).
 - **Nonh coupling is monolithic in flow**: pressure predictor/projection modifies velocities directly (`flow_timestep.F90:635-657`, `nonh.F90:1980-2005`); no surfbeat radiation-stress wave solve in nonh.
 
 ## Decision Guide
 
 | Use case | `wavemodel` | Notes |
 |---|---|---|
-| IG-band runup, dune erosion, beach response | `surfbeat` | The default; pair with `instat=jons` or `swan` |
+| IG-band runup, dune erosion, beach response | `surfbeat` | 기본값이 아니다. `wavemodel`(또는 구 `instat`·`nonh`)을 지정하지 않으면 실행이 멈춘다: `Error: XBeach cannot run without a hydrodynamic type`(`params.F90:89-93`; 초기값 −123 `params.def:28`). pair with `instat=jons` or `swan` |
 | Short-wave-resolving harbor / structure | `nonh` | Higher cost; expects fine grid (Δx ~ Lp/30) |
 | Wave climate / equilibrium beach state | `stationary` | Iterates to converge per `wavint` step; cheap |
 | Wave overtopping with wave-by-wave detail | `nonh` | `swave=0` automatic |
