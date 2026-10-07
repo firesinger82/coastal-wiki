@@ -1,7 +1,8 @@
 # one-off: check each non-blank source line appeared, as `nl -ba` formatted text, in the Codex session's tool outputs
 import json,re,glob,os,sys
 log=open(sys.argv[1]).read()
-tid=re.search(r'Thread ready \(([0-9a-f-]+)\)',log).group(1)
+m=re.search(r'Thread ready \(([0-9a-f-]+)\)',log) or re.search(r'"thread_id":"([0-9a-f-]+)"',log)  # companion log or `codex exec --json`
+tid=m.group(1)
 sess=[p for p in glob.glob(os.path.expanduser('~/.codex/sessions/2026/*/*/*.jsonl')) if tid in p][0]
 os.chdir('/home/firesinger/coastal-wiki')
 texts=[]; trunc=0
