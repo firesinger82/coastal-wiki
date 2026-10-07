@@ -113,11 +113,11 @@ Delft3D 487(기계 sweep 실패 471 + 웹 16, 09-22 스냅샷 교체 전 경로)
 - 자체 코드 51파일 40,175행: Codex `gpt-6.1-sol` 11묶음(`scripts/sfincs-batches.json`, `codex exec` 병렬). 기계 확인 전부 통과(1행~끝 구간·sha·전 행 열람·원문 인용 8,083개 일치). sonnet 표본 34구간 대조, 정정 2·표현 보완 1. directional spreading을 '분산'으로 옮긴 곳을 '방향 퍼짐'으로 통일.
 - 문서 15파일 4,187행(rst·txt, 그림 27개 열람 포함): 5묶음 병렬. 기계 확인 전부 통과(원문 인용 2,339개 일치). sonnet 표본 8구간과 그림 2장 대조, 틀림 0.
 - 지시문 생성: 코드 `python3 scripts/mkprompt.py N MODEL BATCHFILE`, 문서 `python3 scripts/mkdocprompt_model.py MODEL BATCHFILE N`. 용어 규칙(spreading=방향 퍼짐, dispersion=분산)과 조건문·식 원문 인용 규칙 포함.
-- 확인하지 않은 것: 매뉴얼과 코드 대조, 파일 간 계산 흐름 분석, 노트(`models/SFINCS/`) 반영은 아직 하지 않았다.
+- 문서·코드 대조(`compare/SFINCS-docs-vs-code.md`, 불일치 39)와 시간 단계 흐름 분석(`flow/SFINCS-callflow.md`)을 마치고 노트 14개에 반영했다(`667408d`). 보고서·노트 인용은 `scripts/citecheck.py`로 기계 대조, 전부 일치.
+- 확인하지 않은 것: 모델 실행. 불일치·지연이 결과에 주는 영향.
 
 ## 다음에 이어서 할 일
 
 1. ~~매뉴얼과 코드 판독 기록 대조~~ — 10-03 완료(`compare/XBeach-manual-vs-code.md`, 노트 반영 `1da8d89`).
 2. ~~XBeach 파일 간 계산 흐름 분석~~ — 10-07 완료(`flow/XBeach-callflow.md`, 노트 반영 `d89cd8b`). 판독 기록 검색은 `wiki_search` `path_class="records"`(`ce7b3ae`).
-3. SFINCS: 문서와 코드 대조, 계산 흐름 분석, 노트 반영.
-4. 다른 11개 모델: 같은 방식(고정 목록 → 1행/1쪽 판독 → 기계 확인 → 다른 모델 검증).
+3. 다른 11개 모델: 같은 방식(고정 목록 → 1행/1쪽 판독 → 기계 확인 → 다른 모델 검증).
