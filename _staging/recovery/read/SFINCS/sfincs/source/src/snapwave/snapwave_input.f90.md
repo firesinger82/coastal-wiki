@@ -1,0 +1,30 @@
+---
+file: models/SFINCS/raw/source_code/sfincs/source/src/snapwave/snapwave_input.f90
+lines: 201
+sha256: 95019d015c0b4ee1feda41fef34f1c88c944545339f7e2499a35f66f6bdd2191
+reader: codex gpt-6.1-sol
+read_date: 2026-10-07
+---
+
+# snapwave_input.f90 — 판독 구간 기록
+
+구간은 1행부터 201행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–22 | snapwave_input 모듈과 contains가 시작한다(1–3). `read_snapwave_input()`은 snapwave_data와 snapwave_date를 사용하고 implicit none, dtsec/irestart를 선언한다(5–15). 입력 판독 로그를 쓰고 unit 500으로 `snapwave.inp`를 연다(17–19). 입력 절 주석과 빈 줄을 포함한다(20–22). |
+| 23–43 | 시작 시 5행 read_snapwave_input 루틴 안. 기본값을 포함한 호출 원문은 `call read_int_input(500,'nmax',nmax,0)` (23), `call read_int_input(500,'mmax',mmax,0)` (24), `call read_real_input(500,'dx',dx,0.0)` (25), `call read_real_input(500,'dy',dy,0.0)` (26), `call read_real_input(500,'x0',x0,0.0)` (27), `call read_real_input(500,'y0',y0,0.0)` (28), `call read_real_input(500,'rotation',rotation,0.0)` (29)이다. 시각 기본값은 `call read_char_input(500,'tref',trefstr,'20000101 000000')` (30), `call read_char_input(500,'tstart',tstartstr,'20000101 000000')` (31), `call read_char_input(500,'tstop',tstopstr,'20000101 000000')` (32)이다. 나머지는 `call read_real_input(500,'timestep',timestep,3600.0)` (33), `call read_real_input(500,'gamma',gamma,0.7)` (34), `call read_real_input(500,'alpha',snapwave_alpha,1.0)` (35), `call read_real_input(500,'hmin',hmin,0.1)` (36), `call read_char_input(500,'gridfile',gridfile,'.txt')` (37), `call read_int_input(500,'sferic',sferic,0)` (38), `call read_real_input(500,'fw',fw0,0.01)` (39), `call read_real_input(500,'fwig',fw0_ig,0.015)` (40), `call read_real_input(500,'dt',dt,36000.0)` (41), `call read_real_input(500,'tol',tol,10.0)` (42), `call read_real_input(500,'dtheta',dtheta,10.0)` (43)이다. 이 호출에는 상한·하한 인수가 없다. |
+| 44–71 | 시작 시 5행 read_snapwave_input 루틴 안. ntheta/nHrel·테이블 이름·waterlevelfile 판독은 주석 처리되어 있다(44–52). 실행 호출은 `call read_char_input(500,'jonswapfile',jonswapfile,'')` (53), `call read_char_input(500,'bndfile',bndfile,'')` (54), `call read_char_input(500,'encfile',encfile,'')` (55), `call read_char_input(500,'bhsfile',bhsfile,'')` (56), `call read_char_input(500,'btpfile',btpfile,'')` (57), `call read_char_input(500,'bwdfile',bwdfile,'')` (58), `call read_char_input(500,'bdsfile',bdsfile,'')` (59), `call read_char_input(500,'bzsfile',bzsfile,'')` (60), `call read_char_input(500,'upwfile',upwfile,'')` (61), `call read_char_input(500,'mskfile',mskfile,'')` (62), `call read_char_input(500,'indfile',indfile,'')` (63), `call read_char_input(500,'depfile',depfile,'')` (64), `call read_char_input(500,'obsfile',obsfile,'')` (65), `call read_char_input(500,'outputformat',outputformat,'bin')` (66), `call read_char_input(500,'map_file',map_filename,'')` (67), `call read_char_input(500,'his_file',his_filename,'')` (68), `call read_int_input(500,'restart',irestart,1)` (69)이다. unit 500을 닫는다(71). |
+| 72–87 | 시작 시 5행 read_snapwave_input 루틴 안. `call time_difference(trefstr, tstartstr, dtsec)  ! time difference in seconds between tstart and tref` (73), `tstart = dtsec*1.0 ! time difference in seconds between tstop and tstart` (74), `call time_difference(trefstr, tstopstr, dtsec)` (75), `tstop = dtsec*1.0 ! time difference in seconds between tstop and tstart` (76)로 기준 시각에 대한 초를 설정한다. `mmax = mmax + 2  ! Original mmax and nmax are for number of cells in bathy grid. Add two dummy rows.` (78), `nmax = nmax + 2` (79)로 dummy 행을 더한다. restart를 true로 설정하고 `if (irestart==0) restart = .false.` (82)를 적용한다. 주석·루틴 종료·빈 줄(83–87). |
+| 88–114 | `read_real_input(fileid,keyword,value,default)`는 길이 256 keystr/valstr/line, 단정밀도 value/default, j/stat를 선언한다(88–97). value에 default를 복사하고 rewind한다(99–100). `do while(.true.)` (101)에서 문자열을 iostat=stat로 읽고 `if (stat<0) exit` (103)한다. `j=index(line,'=')` (104), `keystr = trim(line(1:j-1))` (105)로 키를 얻는다. `if (trim(keystr)==trim(keyword)) then` (106)이면 `valstr = trim(line(j+1:256))` (107), 내부 read로 value를 읽고 exit한다(108–109). 조건·루프·루틴 종료와 빈 줄(110–114). |
+| 115–145 | `read_real_array_input(fileid,keyword,value,default,nr)`는 단정밀도 allocatable 출력 배열과 nr, 길이 256 작업 문자열, j/stat/m을 선언한다(115–125). value(nr)를 할당하고 default를 복사한 뒤 rewind한다(127–130). `do while(.true.)` (131), `if (stat<0) exit` (133), `j=index(line,'=')` (134), `keystr = trim(line(1:j-1))` (135), `if (trim(keystr)==trim(keyword)) then` (136), `valstr = trim(line(j+1:256))` (137)를 사용한다. 일치하면 `read(valstr,*)(value(m), m = 1, nr)` (138)로 배열을 읽고 exit한다(139). 조건·루프·루틴 종료·빈 줄(140–145). |
+| 146–173 | `read_int_input(fileid,keyword,value,default)`는 정수 출력·기본값과 길이 256 작업 문자열을 선언한다(146–155). 기본값 복사·rewind(157–158) 뒤 `do while(.true.)` (159), `if (stat<0) exit` (161), `j=index(line,'=')` (162), `keystr = trim(line(1:j-1))` (163), `if (trim(keystr)==trim(keyword)) then` (164), `valstr = trim(line(j+1:256))` (165)를 적용한다. 키가 일치하면 내부 read로 정수를 읽고 exit한다(166–167). 조건·루프·루틴 종료·빈 줄(168–173). |
+| 174–201 | `read_char_input(fileid,keyword,value,default)`는 가변 길이 문자열 입력·출력과 길이 256 작업 문자열을 선언한다(174–183). 기본값 복사·rewind(185–186) 뒤 `do while(.true.)` (187), `if (stat<0) exit` (189), `j=index(line,'=')` (190), `keystr = trim(line(1:j-1))` (191), `if (trim(keystr)==trim(keyword)) then` (192)를 적용한다. `valstr = adjustl(trim(line(j+1:256)))` (193)로 앞 공백을 제거하고 value에 복사한 뒤 exit한다(194–195). 조건·루프·루틴 및 모듈 종료·빈 줄(196–201). |
+
+## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
+
+- 103–105·133–135·161–163·189–191: 키 판독 루틴은 index로 얻은 j를 곧바로 부분 문자열 범위에 사용한다. j=0을 검사하는 분기는 없다.
+- 102–108·132–138·160–166·188–194: 외부 read의 stat 검사는 음수인 경우만 처리한다. 실수·배열·정수의 내부 read에는 iostat 인수가 없다.
+- 23–26·78–79: 격자 크기와 dx/dy의 입력 기본값은 0이다. 크기에는 2를 더하지만 이 루틴에는 dx/dy가 양수인지 검사하는 조건이 없다.
+- 73–76: tstart와 tstop 계산 호출의 첫 인수는 모두 trefstr이다. 두 대입문의 주석은 모두 tstop과 tstart의 차이라고 적는다.
+- 9–15·35·53–60: 루틴은 implicit none을 사용하지만 snapwave_alpha와 접두사 없는 jonswapfile/bndfile/encfile/bhsfile/btpfile/bwdfile/bdsfile/bzsfile을 지역 선언하지 않는다. 직접 읽은 snapwave_data에는 alpha와 snapwave_jonswapfile/snapwave_bndfile/snapwave_encfile/snapwave_bhsfile/snapwave_btpfile/snapwave_bwdfile/snapwave_bdsfile 선언이 있다(snapwave_data.f90:89–98·174). 그 모듈에는 bzsfile 선언이 없다.
