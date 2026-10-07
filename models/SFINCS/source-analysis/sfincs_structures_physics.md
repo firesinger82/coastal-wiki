@@ -9,6 +9,7 @@ note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-18
 related:
   - "[[sfincs-architecture-source-map]]"
+last_source_check: 2026-10-07 (recovery 재판독 대조)
 ---
 
 # SFINCS 물리·구조 모듈
@@ -181,6 +182,11 @@ stream-unformatted, 레코드마다 dummy로 감쌈. `rsttype` 1-6, 범위 밖�
 ```
 
 `inizs4`는 항상 읽음 (`:221-222`). type 1/2/4/5/6은 `iniq`·`uvmean`도 읽음 (`:227-235`). type 4/5/6은 각각 침투 상태변수 `scs_Se`/`GA_sigma`+`GA_F`/`rain_T1` 추가 (`:237-259`). 끝에 real*4→real*8 remap (`:264`).
+
+type 2의 문서·코드 헤더는 uvmean을 적지 않는다. `sfincs_initial_conditions.F90:196` `! 2: zs, q`; `sfincs_initial_conditions.F90:227` `if (rsttype==1 .or. rsttype==2 .or. rsttype==4 .or. rsttype==5 .or. rsttype==6) then`; `sfincs_initial_conditions.F90:233` `read(500)uvmean`
+type 2 파일의 실제 호환성은 이 코드 대조만으로 확정할 수 없다. `sfincs_initial_conditions.F90:196` `! 2: zs, q`; `sfincs_initial_conditions.F90:227` `if (rsttype==1 .or. rsttype==2 .or. rsttype==4 .or. rsttype==5 .or. rsttype==6) then`; `sfincs_initial_conditions.F90:229` `read(500)iniq`; `sfincs_initial_conditions.F90:233` `read(500)uvmean`
+코드의 실제 읽기 동작과 주석의 형식 설명을 구분한다. `sfincs_initial_conditions.F90:195` `! 1: zs, q, uvmean`; `sfincs_initial_conditions.F90:196` `! 2: zs, q`; `sfincs_initial_conditions.F90:227` `if (rsttype==1 .or. rsttype==2 .or. rsttype==4 .or. rsttype==5 .or. rsttype==6) then`; `sfincs_initial_conditions.F90:229` `read(500)iniq`; `sfincs_initial_conditions.F90:233` `read(500)uvmean`
+
 
 ### 5.4 zsini 호환성
 

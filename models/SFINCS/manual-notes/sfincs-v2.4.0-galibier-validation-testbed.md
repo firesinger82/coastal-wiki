@@ -12,6 +12,7 @@ related:
   - models/SFINCS/source-analysis/sfincs-architecture-source-map.md
   - models/SFINCS/source-analysis/sfincs_subgrid_quadtree.md
   - models/SFINCS/source-analysis/sfincs_snapwave.md
+last_source_check: 2026-10-07 (recovery 재판독 대조)
 ---
 
 # SFINCS v2.4.0 Galibier 테스트베드 검증 카탈로그

@@ -12,6 +12,7 @@ related:
   - models/SFINCS/source-analysis/sfincs_boundaries_forcing.md
   - models/SFINCS/source-analysis/sfincs_flow_solver.md
   - models/SFINCS/source-analysis/sfincs_subgrid_quadtree.md
+last_source_check: 2026-10-07 (recovery 재판독 대조)
 ---
 
 # SFINCS 침투(강우손실) — `sfincs_infiltration.f90`
@@ -23,7 +24,7 @@ related:
 | 서브루틴 | 라인 | 역할 |
 |---|---|---|
 | `initialize_infiltration` | 8-604 | type auto-select(:92-135) + 법별 read/할당/단위변환/recovery 상수 |
-| `update_infiltration_map(dt)` | 607-1037 | 매스텝 침투율(inftype 분기, OpenMP/ACC) + 공통 `netprcp-=qinfmap`·`cuminf+=qinfmap·dt` |
+| `update_infiltration_map(dt)` | 607-1037 | 침투율과 `netprcp`를 갱신한다. `sfincs_infiltration.f90:707` `netprcp(nm) = netprcp(nm) - qinfmap(nm)`<br>`cuminf` 갱신은 `store_cumulative_precipitation`이 참일 때만 수행한다. `sfincs_infiltration.f90:709` `if (store_cumulative_precipitation) then`; `sfincs_infiltration.f90:713` `cuminf(nm) = cuminf(nm) + qinfmap(nm) * dt` |
 
 분기: con/c2d :630·cna :676·cnb :722·gai :828·hor :912. type 자동선택 = 파일존재(qinf→con·qinffile→c2d·scsfile→cna·sefffile→cnb·psifile→gai·f0file→hor, :92-135).
 
@@ -57,8 +58,16 @@ I = exp(kd·rain_T1/3600) ; f = (fc + (f0-fc)·I)/3600/1000   ! :967,979 지수�
 ## 4. 공통 결합
 `netprcp(nm) -= qinfmap(nm)`(전분기 :661/707/813/897/1017) + `cuminf += qinfmap·dt`(store 시). **"물 없으면 침투 없음"** guard(subgrid z_volume≤0 or zs≤zb → qinfmap=0, :645-657·946). NetCDF 입력=quadtree 전용·ASCII=정규격자 전용(:170-189).
 
+현재 코드의 CN A 식은 cumprcp와 cuminf를 사용한다. `sfincs_infiltration.f90:689` `if (cumprcp(nm) > sfacinf * qinffield(nm)) then ! qinffield is S`; `sfincs_infiltration.f90:693` `Qq  = (cumprcp(nm) - sfacinf * qinffield(nm))**2 / (cumprcp(nm) + (1.0 - sfacinf) * qinffield(nm))  ! cumulative runoff in m`; `sfincs_infiltration.f90:695` `qinfmap(nm) = (I - cuminf(nm)) / dt           ! infiltration in m/s`
+현재 코드는 store_cumulative_precipitation이 true일 때만 두 누적량을 갱신한다. `sfincs_meteo.f90:1321` `if (store_cumulative_precipitation) then`; `sfincs_meteo.f90:1323` `cumprcp(nm) = cumprcp(nm) + prcp(nm) * dt`; `sfincs_meteo.f90:1534` `if (store_cumulative_precipitation) then`; `sfincs_meteo.f90:1535` `cumprcp(nm) = cumprcp(nm) + ptmp * dt`; `sfincs_infiltration.f90:709` `if (store_cumulative_precipitation) then`; `sfincs_infiltration.f90:713` `cuminf(nm) = cuminf(nm) + qinfmap(nm) * dt`
+현재 코드에서 출력 플래그 의존성의 제거를 확인하지 못했다. `sfincs_input.f90:280` `call read_int_input(500,'storecumprcp',storecumprcp,0)`; `sfincs_input.f90:511` `store_cumulative_precipitation = .false.`; `sfincs_input.f90:512` `if (storecumprcp==1) then`; `sfincs_input.f90:513` `store_cumulative_precipitation = .true.`; `sfincs_meteo.f90:1321` `if (store_cumulative_precipitation) then`; `sfincs_meteo.f90:1534` `if (store_cumulative_precipitation) then`; `sfincs_infiltration.f90:709` `if (store_cumulative_precipitation) then`
+
+
 ## 5. 주요 findings
-- **★Green-Ampt 인덱싱 버그**(:856 `np` vs 루프 `nm`) — 확인됨, 공간균일 오류. 기존 노트 미표기.
+- 이 분기의 셀은 마지막 셀의 흡입수두와 수분 부족량을 참조한다. `sfincs_infiltration.f90:838` `do nm = 1, np`; `sfincs_infiltration.f90:856` `qinfmap(nm) = (ksfield(nm) * (1.0 + (GA_head(np) * GA_sigma(np)) / GA_F(nm)))`
+  포화 수리전도도와 누적 침투 상태는 각 셀의 값을 사용한다. `sfincs_infiltration.f90:856` `qinfmap(nm) = (ksfield(nm) * (1.0 + (GA_head(np) * GA_sigma(np)) / GA_F(nm)))`; `sfincs_infiltration.f90:863` `GA_sigma(nm) = max(GA_sigma(nm) - (qinfmap(nm) * dt / GA_Lu(nm)), 0.0)`; `sfincs_infiltration.f90:867` `GA_F(nm)    = GA_F(nm) + qinfmap(nm) * dt   ! internal cumulative rainfall from Green-Ampt`
+  전체 침투율이 공간적으로 균일해진다고 단정할 수 없다. `sfincs_infiltration.f90:856` `qinfmap(nm) = (ksfield(nm) * (1.0 + (GA_head(np) * GA_sigma(np)) / GA_F(nm)))`; `sfincs_infiltration.f90:863` `GA_sigma(nm) = max(GA_sigma(nm) - (qinfmap(nm) * dt / GA_Lu(nm)), 0.0)`; `sfincs_infiltration.f90:867` `GA_F(nm)    = GA_F(nm) + qinfmap(nm) * dt   ! internal cumulative rainfall from Green-Ampt`
+  np를 nm로 바꾸는 작성 의도는 확인하지 않았다. `sfincs_infiltration.f90:838` `do nm = 1, np`; `sfincs_infiltration.f90:856` `qinfmap(nm) = (ksfield(nm) * (1.0 + (GA_head(np) * GA_sigma(np)) / GA_F(nm)))`
 - **cnb dual-S 부기**(:775 주석 "scs_Se 는 계산 미사용"이나 매 강우스텝 감소, 실제 runoff 는 onset 시 frozen `scs_S1` 이 구동 :749) — survey bullet 누락 subtlety.
 - **Horton Qq refactor 미결**(:987 주석 `Qq=prcp·dt+(zs-zb)` vs active `+hh_local`, "MvO: using hh_local?").
 - **개발자 doubt marker**(:896 주석처리 `qinffield(nm)=qinfmap(nm) ! Really? Why?`).

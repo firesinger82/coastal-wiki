@@ -9,6 +9,7 @@ note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-18
 related:
   - "[[sfincs-architecture-source-map]]"
+last_source_check: 2026-10-07 (recovery 재판독 대조)
 ---
 
 # SFINCS SnapWave 연안 파솔버
@@ -25,11 +26,24 @@ SnapWave는 Deltares가 SFINCS와 한 바이너리로 통합한 **정상상태(s
 순서: `read_snapwave_input`(inp 읽기) → `initialize_snapwave_domain`(메쉬·upwind) → `read_boundary_data` → 배열 할당 → `find_matching_cells`. spherical/cartesian 은 SFINCS `crsgeo` 로 `sferic` 결정 (`:97-101`).
 
 ### 격자 매핑 `find_matching_cells` (`:173`)
-quadtree 인덱스를 매개로 SnapWave↔SFINCS 노드를 연결한다 (`index_sfincs_in_snapwave`, `index_snapwave_in_sfincs`). SFINCS 가 비활성인 SnapWave 노드는, `snapwave_use_nearest` 시 1000km 이내 최근접 SFINCS 점을 OpenMP 거리탐색으로 찾고(`:231-252`), 아니면 수위 0 처리.
+`find_matching_cells`는 대응 셀이 없고 `snapwave_use_nearest`가 참이면 좌표 차이의 최소 거리를 찾는다. `sfincs_snapwave.f90:220` `if (snapwave_use_nearest) then`; `sfincs_snapwave.f90:225` `dstmin = 1.0e6`; `sfincs_snapwave.f90:233` `dst = sqrt((z_xz(ip) - xsw)**2 + (z_yz(ip) - ysw)**2)`; `sfincs_snapwave.f90:244` `if (min_distance < dstmin) then`
+거리 상한은 `dstmin=1.0e6`이다. `sfincs_snapwave.f90:220` `if (snapwave_use_nearest) then`; `sfincs_snapwave.f90:225` `dstmin = 1.0e6`; `sfincs_snapwave.f90:233` `dst = sqrt((z_xz(ip) - xsw)**2 + (z_yz(ip) - ysw)**2)`; `sfincs_snapwave.f90:244` `if (min_distance < dstmin) then`
+이 비교는 좌표 차이를 미터로 바꾸지 않는다. `sfincs_snapwave.f90:220` `if (snapwave_use_nearest) then`; `sfincs_snapwave.f90:225` `dstmin = 1.0e6`; `sfincs_snapwave.f90:233` `dst = sqrt((z_xz(ip) - xsw)**2 + (z_yz(ip) - ysw)**2)`; `sfincs_snapwave.f90:244` `if (min_distance < dstmin) then`
 
-### 매 타임스텝 갱신 `update_wave_field(t, tloop)` (`:289`)
+### `update_wave_field(t, tloop)`
+
+`update_wave_field`는 SnapWave 갱신 시각에 도달한 시간 단계에서만 실행한다. `sfincs_lib.f90:552` `if (snapwave .and. update_waves) then`; `sfincs_lib.f90:509` `if (t >= twaveupd) then`; `sfincs_input.f90:68` `call read_real_input(500,'dtwave',dtwave,3600.0)`
+`dtwave`의 기본값은 3600초다. `sfincs_lib.f90:552` `if (snapwave .and. update_waves) then`; `sfincs_lib.f90:509` `if (t >= twaveupd) then`; `sfincs_input.f90:68` `call read_real_input(500,'dtwave',dtwave,3600.0)`
 1. SnapWave 수심을 SFINCS 수위에서 산정: `snapwave_depth = max(zs(ip) - snapwave_z, 1e-5)` (wavemaker 면 `zsm`) (`:354-368`).
-2. 바람 입력 시 SFINCS `windu/windv` → 크기·방향 변환, **nautical-coming-from(deg) → cartesian-going-to(rad)** (`:390-398`).
+
+   SnapWave는 현재 단계의 연속식보다 먼저 내부 수위를 읽는다. `sfincs_lib.f90:546` `call update_boundaries(t, dt, tloopbnd)`; `sfincs_lib.f90:556` `call update_wave_field(t, tloopsnapwave)`; `sfincs_lib.f90:618` `call compute_water_levels(t, dt, tloopcont)`; `sfincs_snapwave.f90:356` `snapwave_depth(nm) = max(zsm(ip) - snapwave_z(nm), 0.00001)`; `sfincs_snapwave.f90:360` `snapwave_depth(nm) = max(zs(ip) - snapwave_z(nm), 0.00001)`
+   wavemaker가 참이면 직전 필터 수위 `zsm`을 읽는다. `sfincs_lib.f90:546` `call update_boundaries(t, dt, tloopbnd)`; `sfincs_lib.f90:556` `call update_wave_field(t, tloopsnapwave)`; `sfincs_lib.f90:618` `call compute_water_levels(t, dt, tloopcont)`; `sfincs_snapwave.f90:356` `snapwave_depth(nm) = max(zsm(ip) - snapwave_z(nm), 0.00001)`; `sfincs_snapwave.f90:360` `snapwave_depth(nm) = max(zs(ip) - snapwave_z(nm), 0.00001)`
+   그 외는 `zs`를 읽는다. `sfincs_lib.f90:546` `call update_boundaries(t, dt, tloopbnd)`; `sfincs_lib.f90:556` `call update_wave_field(t, tloopsnapwave)`; `sfincs_lib.f90:618` `call compute_water_levels(t, dt, tloopcont)`; `sfincs_snapwave.f90:356` `snapwave_depth(nm) = max(zsm(ip) - snapwave_z(nm), 0.00001)`; `sfincs_snapwave.f90:360` `snapwave_depth(nm) = max(zs(ip) - snapwave_z(nm), 0.00001)`
+   경계 갱신은 이 읽기보다 먼저 실행한다. `sfincs_lib.f90:546` `call update_boundaries(t, dt, tloopbnd)`; `sfincs_lib.f90:556` `call update_wave_field(t, tloopsnapwave)`; `sfincs_lib.f90:618` `call compute_water_levels(t, dt, tloopcont)`; `sfincs_snapwave.f90:356` `snapwave_depth(nm) = max(zsm(ip) - snapwave_z(nm), 0.00001)`; `sfincs_snapwave.f90:360` `snapwave_depth(nm) = max(zs(ip) - snapwave_z(nm), 0.00001)`
+
+2. `update_wave_field`는 `windu/windv`로 풍속 크기를 계산한다. `sfincs_snapwave.f90:390` `u10 = sqrt(windu(ip)**2 + windv(ip)**2)`; `sfincs_snapwave.f90:392` `u10dir = atan2(windv(ip), windu(ip))*180/pi`; `sfincs_snapwave.f90:398` `snapwave_u10dir(nm) = u10dir / 180.0 * pi ! from nautical coming from in degrees to cartesian going to in radians`
+   이 루틴은 `atan2(windv,windu)`의 방향을 도 단위로 만든다. `sfincs_snapwave.f90:390` `u10 = sqrt(windu(ip)**2 + windv(ip)**2)`; `sfincs_snapwave.f90:392` `u10dir = atan2(windv(ip), windu(ip))*180/pi`; `sfincs_snapwave.f90:398` `snapwave_u10dir(nm) = u10dir / 180.0 * pi ! from nautical coming from in degrees to cartesian going to in radians`
+   이 루틴은 그 방향을 라디안으로 저장한다. `sfincs_snapwave.f90:390` `u10 = sqrt(windu(ip)**2 + windv(ip)**2)`; `sfincs_snapwave.f90:392` `u10dir = atan2(windv(ip), windu(ip))*180/pi`; `sfincs_snapwave.f90:398` `snapwave_u10dir(nm) = u10dir / 180.0 * pi ! from nautical coming from in degrees to cartesian going to in radians`
 3. `compute_snapwave(t)` 호출 (실제 솔버).
 4. 결과를 SFINCS 배열로 역매핑 (`:417-485`): `hm0`, `hm0_ig`, `sw_tp`, force 등.
 5. **Hrms→Hm0 변환**: `hm0 = hm0 * sqrt(2.0)` (`:487-488`).
@@ -112,7 +126,8 @@ Leijnse 2024 피팅상수(beta1=0.016993 … beta7=0.34037). beta≤0 면 alphai
 
 ## 4. 도메인 & upwind (`snapwave_domain.f90`)
 
-`initialize_snapwave_domain` (`:7`): 상수 설정(`rho=1025`, `np=22`) → quadtree/ASCII/SFINCS 메쉬 읽기(기본 quadtree) → 방향격자 `ntheta360=360/dtheta`, `ntheta=sector/dtheta` (`:100-101`) → 대규모 배열 할당(`:105-170`). 바닥마찰은 공간균일이되 `zb > rghlevland` 육지면 `fw*fwratio` 적용 (`:177-182`).
+현재 `initialize_snapwave_domain`은 `ext='qt'`를 설정한다. `snapwave/snapwave_domain.f90:45` `ext = 'qt'`; `snapwave/snapwave_domain.f90:52`; `sfincs_snapwave.f90:734` `coupled_to_sfincs = .true.`
+현재 결합 경로는 이미 보유한 quadtree 자료를 사용하는 `read_snapwave_quadtree_mesh(.false.)`를 선택한다. `snapwave/snapwave_domain.f90:45` `ext = 'qt'`; `snapwave/snapwave_domain.f90:52`; `sfincs_snapwave.f90:734` `coupled_to_sfincs = .true.`
 
 **upwind 이웃**: `snapwave.upw` 캐시가 있으면 읽고(prev360/w360/ds360/dhdx/dhdy), 없으면 `fm_surrounding_points`(주변점·bed slope 최소제곱) + `find_upwind_neighbours` 로 생성 후 저장 (`:223-279`).
 - `find_upwind_neighbours` (`:356`): 각 노드·방향마다 주변 edge 와 광선(θ+π)의 교차점을 `intersect_angle` 로 찾아 2개 upwind 점·weight·거리 ds 산정. 교차 실패 시 prev=1, w=0 (`:405-410`).
@@ -124,7 +139,11 @@ Leijnse 2024 피팅상수(beta1=0.016993 … beta7=0.34037). beta≤0 면 alphai
 
 ## 5. 경계 데이터 & 스펙트럼 (`snapwave_boundaries.f90`)
 
-`read_boundary_data` (`:8`): jonswap(단일점)/netcdf/timeseries 분기 → `find_boundary_indices`. 입력 방향은 cartesian going-to rad 로 변환 `wd_bwv=(270-wd_bwv)*pi/180`, 분산은 deg→rad (`:85-88`).
+`read_boundary_data` (`:8`): jonswap(단일점)/netcdf/timeseries 분기 → `find_boundary_indices`.
+
+read_boundary_data는 입력 파향을 Cartesian 진행 방향 라디안으로 바꾼다. `snapwave/snapwave_boundaries.f90:85` `wd_bwv = (270.0 - wd_bwv)*pi/180`
+같은 루틴은 방향 퍼짐을 도에서 라디안으로 바꾼다. `snapwave/snapwave_boundaries.f90:87` `! Convert directional spreading input to radians - independent of input type`; `snapwave/snapwave_boundaries.f90:88` `ds_bwv = ds_bwv * pi / 180`
+방향 퍼짐과 파수·주파수의 분산 관계를 구분한다. `snapwave/snapwave_boundaries.f90:87` `! Convert directional spreading input to radians - independent of input type`; `snapwave/snapwave_boundaries.f90:88` `ds_bwv = ds_bwv * pi / 180`; `snapwave/snapwave_solver.f90:74` `expon   = - (sig * sqrt(depth / g))**2.5`; `snapwave/snapwave_solver.f90:75` `kwav    = sig**2 / g * (1.0 - exp(expon))**-0.4`; `snapwave/snapwave_solver.f90:76` `C       = sig / kwav`; `snapwave/snapwave_solver.f90:77` `nwav    = 0.5 + kwav * depth / sinh(min(2 * kwav * depth, 50.0))`; `snapwave/snapwave_solver.f90:78` `Cg      = nwav * C`
 
 `update_boundary_conditions(t)` (`:471`): 경계점 갱신 → 바람장 → theta grid 를 평균 파/바람 방향 중심으로 회전 → `update_boundaries`.
 
@@ -156,13 +175,22 @@ $$ D_{vg} = \frac{1}{2\sqrt\pi}\rho\,C_d\,b\,N\,\Big(\tfrac12 k\,g/\sigma\Big)^3
 
 ## 8. 결합 데이터 흐름 요약
 
+별도 host·device 메모리를 사용하는 빌드는 결합 입력의 최신성 확인이 필요하다. `sfincs_snapwave.f90:289` `subroutine update_wave_field(t, tloop)`; `sfincs_snapwave.f90:514` `!$acc update device(fwuv)`; `sfincs_output.f90:113` `if (write_map .or. write_his .or. write_rst) then`; `sfincs_output.f90:115` `!$acc update host(zs)`
+`update_wave_field`는 입력 수위·바람을 host로 가져오는 지시문을 포함하지 않는다. `sfincs_snapwave.f90:289` `subroutine update_wave_field(t, tloop)`; `sfincs_snapwave.f90:514` `!$acc update device(fwuv)`; `sfincs_output.f90:113` `if (write_map .or. write_his .or. write_rst) then`; `sfincs_output.f90:115` `!$acc update host(zs)`
+이 분석은 해당 빌드의 실행을 확인하지 않았다. `sfincs_snapwave.f90:289` `subroutine update_wave_field(t, tloop)`; `sfincs_snapwave.f90:514` `!$acc update device(fwuv)`; `sfincs_output.f90:113` `if (write_map .or. write_his .or. write_rst) then`; `sfincs_output.f90:115` `!$acc update host(zs)`
+
+
 | 단계 | 함수 | 결과 |
 |---|---|---|
 | 초기화 | `couple_snapwave` → `initialize_snapwave_domain` | 메쉬·upwind·경계 |
-| 매스텝 입력 | `update_wave_field` | depth(=SFINCS zs-zb), u10 |
+| 갱신 시각의 입력 | `update_wave_field` | 갱신 시각의 입력은 SFINCS 수위와 선택한 바람 속도다. `sfincs_lib.f90:552` `if (snapwave .and. update_waves) then`; `sfincs_snapwave.f90:356` `snapwave_depth(nm) = max(zsm(ip) - snapwave_z(nm), 0.00001)`; `sfincs_snapwave.f90:360` `snapwave_depth(nm) = max(zs(ip) - snapwave_z(nm), 0.00001)`; `sfincs_snapwave.f90:390` `u10 = sqrt(windu(ip)**2 + windv(ip)**2)`<br>비갱신 단계는 마지막 파랑 결과를 유지한다. `sfincs_lib.f90:552` `if (snapwave .and. update_waves) then`; `sfincs_snapwave.f90:356` `snapwave_depth(nm) = max(zsm(ip) - snapwave_z(nm), 0.00001)`; `sfincs_snapwave.f90:360` `snapwave_depth(nm) = max(zs(ip) - snapwave_z(nm), 0.00001)`; `sfincs_snapwave.f90:390` `u10 = sqrt(windu(ip)**2 + windv(ip)**2)` |
 | 경계 | `update_boundary_conditions` | ee/ee_ig 경계 스펙트럼, theta grid |
 | 솔버 | `compute_wave_field` → `solve_energy_balance2Dstat` | H, H_ig, Tp, Dw, F, thetam |
 | IG | `determine_infragravity_source_sink_term` + Herbers bc | srcig, alphaig, H_ig |
 | 출력 매핑 | `update_wave_field` 후반 | hm0(×√2), hm0_ig, fwuv(force/rhow) |
 
 SnapWave→SFINCS 의 물리적 되먹임은 **UV 점 파 force `fwuv`** (radiation stress divergence/ρ → 운동량 가속도, `sfincs_snapwave.f90:502-508`)로, 이것이 SFINCS 흐름에 wave setup·wave-driven current 를 만든다.
+
+SnapWave 갱신 단계는 새 `fwuv`를 같은 단계의 운동량에 사용한다. `sfincs_lib.f90:556` `call update_wave_field(t, tloopsnapwave)`; `sfincs_lib.f90:584` `call compute_fluxes(dt, tloopflux)`; `sfincs_snapwave.f90:502` `fwuv(ip) = waveforces_ratio * (0.5 * (cosrot * fwx0(nm) + sinrot * fwy0(nm)) + 0.5 * ( cosrot * fwx0(nmu) + sinrot * fwy0(nmu))) / rhow`; `sfincs_momentum.f90:606` `frc = frc + phi * sign(min(abs(fwuv(ip)), fwmax), fwuv(ip))`
+비갱신 단계는 마지막 `fwuv`를 사용한다. `sfincs_lib.f90:556` `call update_wave_field(t, tloopsnapwave)`; `sfincs_lib.f90:584` `call compute_fluxes(dt, tloopflux)`; `sfincs_snapwave.f90:502` `fwuv(ip) = waveforces_ratio * (0.5 * (cosrot * fwx0(nm) + sinrot * fwy0(nm)) + 0.5 * ( cosrot * fwx0(nmu) + sinrot * fwy0(nmu))) / rhow`; `sfincs_momentum.f90:606` `frc = frc + phi * sign(min(abs(fwuv(ip)), fwmax), fwuv(ip))`
+

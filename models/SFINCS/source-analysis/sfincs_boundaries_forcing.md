@@ -13,6 +13,7 @@ note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-18
 related:
   - "[[sfincs-architecture-source-map]]"
+last_source_check: 2026-10-07 (recovery 재판독 대조)
 ---
 
 # SFINCS 외력 (Boundaries & Forcing)
@@ -56,6 +57,9 @@ dzs_bdr(ibdr) = - slope_bdr * sqrt( (x_bdr_in - x_bdr(ibdr))**2 + (y_bdr_in - y_
 ### 1.3 천문조 (`bca` 파일, astro)
 `bcafile` + `use_bcafile` 시 조석 성분 읽기 (`:293`). `[forcing]` 블록 단위(=bnd 점당), 성분당 `(name, amplitude, phase)`. 2-pass 파싱: 1차로 set/성분 수 카운트(`:311-358`), `A0` 없으면 1개 추가(`:370-376`), 2차로 `tidal_component_data(2, ic, nbnd)` 채움(`:396-439`). set 수 ≠ nbnd 면 ERROR 출력(`:362-366`). `update_nodal_factors` 로 nodal factor·주파수 산정 후 `rad/s` 변환(`:446-448`).
 
+천문조 입력은 `bcafile`이 있고 `use_bcafile`가 참이며 `nbnd>0`일 때 실행한다. `sfincs_boundaries.f90:293` `if (bcafile(1:4) /= 'none' .and. nbnd > 0 .and. use_bcafile) then`
+
+
 ### 1.4 시간보간 + 조석 합성 (`update_boundary_points`, `:682`)
 `itbndlast` 캐시로 시간 구간 탐색(`:714-722`), 선형보간 계수 `tbfac`(`:726`). 천문조 합성식(`:736-744`):
 
@@ -89,7 +93,8 @@ kcs=2: 거리가중 수위 `zst`(`:810`) + **기압보정**(`patmos .and. pavbnd
 
 $$z_s \mathrel{+}= (p_{av,bnd} - p_{atm,b})/(\rho_w \cdot 9.81)$$
 
-spin-up 구간(`t<tspinup`)에는 `zini`와 가중평균 smoothing(`:851-862`). still water `zsb0` 와 total `zsb`(IG 포함) 분리(`:865-866`). subgrid 면 `subgrid_z_zmin`, 아니면 `zb` 하한(`:870-876`). kcs=5 는 내부수위+`dzs_bdr`(`:886`), kcs=6 Neumann 은 내부점 수위 복사(`:913`).
+경계 수위의 spin-up은 `t<tspinup-1.0e-3`에서 실행한다. `sfincs_boundaries.f90:851` `if (t < (tspinup - 1.0e-3)) then`; `sfincs_boundaries.f90:856,860`
+이 분기는 초기 수위와 현재 경계 수위를 가중평균한다. `sfincs_boundaries.f90:851` `if (t < (tspinup - 1.0e-3)) then`; `sfincs_boundaries.f90:856,860`
 
 ### 1.7 경계 flux (`update_boundary_fluxes`, `:924`) — **weakly reflective**
 `bndtype==1`(기본, `:968`). subgrid lookup 으로 경계 uv 점 수심 `hnmb`(`:976-997`). 약반사 Riemann 류 유속(`:1019-1022`):
@@ -104,7 +109,9 @@ q(ip) = ub * hnmb + uvmean(ib)
 
 inflow/outflow 부호 제한(빈 셀/얕은 경계, `:1034-1073`), 유속 ±4 m/s clamp(`:1077`). `uvmean` 은 `btfilter`/`btrelax` 로 relaxation — "persistent jets" 억제, 기본 `btrelax=3600s`(`:1081-1093`). 코드 주석에 미사용 대안 Riemann 식도 기록(`:1024-1032`).
 
-드라이버 `update_boundaries`(`:1126`)는 `boundaries_in_mask` 시 points→conditions→fluxes 순; `bathtub` 모드면 grid 갱신 skip(`:1158`).
+`update_boundaries`는 `boundaries_in_mask`가 참이면 경계 작업을 선택한다. `sfincs_boundaries.f90:1145` `if (boundaries_in_mask) then`; `sfincs_boundaries.f90:1147` `if (nbnd > 0) then`; `sfincs_boundaries.f90:1151` `call update_boundary_points(t)`; `sfincs_boundaries.f90:1158` `if (.not. bathtub) then`; `sfincs_boundaries.f90:1162` `call update_boundary_conditions(t, dt)`; `sfincs_boundaries.f90:1166` `call update_boundary_fluxes(dt, t)`
+경계점 갱신은 `nbnd>0`을 추가로 요구한다. `sfincs_boundaries.f90:1145` `if (boundaries_in_mask) then`; `sfincs_boundaries.f90:1147` `if (nbnd > 0) then`; `sfincs_boundaries.f90:1151` `call update_boundary_points(t)`; `sfincs_boundaries.f90:1158` `if (.not. bathtub) then`; `sfincs_boundaries.f90:1162` `call update_boundary_conditions(t, dt)`; `sfincs_boundaries.f90:1166` `call update_boundary_fluxes(dt, t)`
+격자 수위·유량 갱신은 `bathtub=false`에서 순서대로 실행한다. `sfincs_boundaries.f90:1145` `if (boundaries_in_mask) then`; `sfincs_boundaries.f90:1147` `if (nbnd > 0) then`; `sfincs_boundaries.f90:1151` `call update_boundary_points(t)`; `sfincs_boundaries.f90:1158` `if (.not. bathtub) then`; `sfincs_boundaries.f90:1162` `call update_boundary_conditions(t, dt)`; `sfincs_boundaries.f90:1166` `call update_boundary_fluxes(dt, t)`
 
 ---
 
@@ -146,6 +153,10 @@ qq = qq * wdt * frac
 
 공통 후처리: `structure_relax`(기본 10s) relaxation(`:625`), 셀 가용 volume 으로 유량 제한(subgrid: `z_volume`, regular: `(zs-zb)*cell_area`)(`:629-645`), `qtsrc(jin)=-qq`, `qtsrc(jout)=qq`(`:647-648`).
 
+배수 구조물은 현재 연속식 이전의 수위·부피로 유량을 정한다. `sfincs_discharges.f90:398` `qq  = drainage_params(idrn, 1) * sqrt(zs(nmin) - zs(nmout))`; `sfincs_discharges.f90:632` `qq = min(qq, max(z_volume(nmin), 0.0) / dt)`; `sfincs_discharges.f90:647` `qtsrc(jin)  = -qq`; `sfincs_continuity.f90:100` `zs(nmindsrc(isrc)) = max(zs(nm) + qtsrc(isrc) * dt / cell_area(z_flags_iref(nm)), zb(nm))`; `sfincs_continuity.f90:319` `z_volume(nm) = z_volume(nm) + qtsrc(isrc) * dt`
+연속식은 같은 단계에서 새 `qtsrc`를 적용한다. `sfincs_discharges.f90:398` `qq  = drainage_params(idrn, 1) * sqrt(zs(nmin) - zs(nmout))`; `sfincs_discharges.f90:632` `qq = min(qq, max(z_volume(nmin), 0.0) / dt)`; `sfincs_discharges.f90:647` `qtsrc(jin)  = -qq`; `sfincs_continuity.f90:100` `zs(nmindsrc(isrc)) = max(zs(nm) + qtsrc(isrc) * dt / cell_area(z_flags_iref(nm)), zb(nm))`; `sfincs_continuity.f90:319` `z_volume(nm) = z_volume(nm) + qtsrc(isrc) * dt`
+
+
 ---
 
 ## 3. 기상 강제 (`sfincs_meteo.f90`)
@@ -185,7 +196,17 @@ bin u/v 분해(`:77-78`): `spw_wu = vmag*cos(pi*(270-vdir)/180)`.
 ### 3.5 매 timestep 적용 (`update_meteo_forcing`, `:1233`)
 `meteo3d` 시 t0/t1 시간보간(`:1259`). wind→`tauwu/tauwv`, patm, precip→`prcp`(m/s) 보간(`:1273-1327`). 음수 prcp(effective rainfall) 는 물 없는 셀에서 0 처리(`:1303-1315`). meteo spin-up(`spinup_meteo`, `:1336-1385`): 바람·patm·netprcp 를 `(t-t0)/(tspinup-t0)` 로 ramp, patm 은 gapres 로 보간. 경계점 기압 `patmb`(`:1387-1404`). 시계열 wind/precip 은 별도 호출(`:1410-1424`).
 
+격자 기상은 먼저 현재 시각으로 보간한다. `sfincs_meteo.f90:1257` `if (meteo3d) then`; `sfincs_meteo.f90:1336` `if (t < (tspinup - 1.0e-3) .and. spinup_meteo) then`; `sfincs_meteo.f90:1414` `call update_wind_forcing_from_timeseries(t)`; `sfincs_meteo.f90:1422` `call update_precipitation_from_timeseries(t, dt)`; `sfincs_meteo.f90:1474` `tauwu(nm) = twu`; `sfincs_meteo.f90:1532` `netprcp(nm) = ptmp`
+격자 spin-up은 이 격자장 분기 안에서 실행한다. `sfincs_meteo.f90:1257` `if (meteo3d) then`; `sfincs_meteo.f90:1336` `if (t < (tspinup - 1.0e-3) .and. spinup_meteo) then`; `sfincs_meteo.f90:1414` `call update_wind_forcing_from_timeseries(t)`; `sfincs_meteo.f90:1422` `call update_precipitation_from_timeseries(t, dt)`; `sfincs_meteo.f90:1474` `tauwu(nm) = twu`; `sfincs_meteo.f90:1532` `netprcp(nm) = ptmp`
+시계열 바람·강수는 이후 해당 최종 강제를 덮어쓴다. `sfincs_meteo.f90:1257` `if (meteo3d) then`; `sfincs_meteo.f90:1336` `if (t < (tspinup - 1.0e-3) .and. spinup_meteo) then`; `sfincs_meteo.f90:1414` `call update_wind_forcing_from_timeseries(t)`; `sfincs_meteo.f90:1422` `call update_precipitation_from_timeseries(t, dt)`; `sfincs_meteo.f90:1474` `tauwu(nm) = twu`; `sfincs_meteo.f90:1532` `netprcp(nm) = ptmp`
+
+
 `update_meteo_fields`(`:1548`)는 t0/t1 격자 필드를 재계산하고 device 로 갱신(`:1568-1606`).
+
+`update_meteo_fields`는 `meteo3d`이고 예정 갱신 시각에 도달했을 때 실행한다. `sfincs_lib.f90:519` `if (meteo3d .and. update_meteo)  then`; `sfincs_lib.f90:524` `call update_meteo_fields(t, tloopwnd1)`; `sfincs_input.f90:69` `call read_real_input(500,'dtwnd',dtwindupd,1800.0)`; `sfincs_lib.f90:517` `if (wind .or. patmos .or. precip) then`; `sfincs_lib.f90:530` `call update_meteo_forcing(t, dt, tloopwnd2)`
+`dtwnd`의 기본값은 1800초다. `sfincs_lib.f90:519` `if (meteo3d .and. update_meteo)  then`; `sfincs_lib.f90:524` `call update_meteo_fields(t, tloopwnd1)`; `sfincs_input.f90:69` `call read_real_input(500,'dtwnd',dtwindupd,1800.0)`; `sfincs_lib.f90:517` `if (wind .or. patmos .or. precip) then`; `sfincs_lib.f90:530` `call update_meteo_forcing(t, dt, tloopwnd2)`
+`update_meteo_forcing`는 기상 과정이 하나라도 켜져 있으면 각 시간 단계에서 실행한다. `sfincs_lib.f90:519` `if (meteo3d .and. update_meteo)  then`; `sfincs_lib.f90:524` `call update_meteo_fields(t, tloopwnd1)`; `sfincs_input.f90:69` `call read_real_input(500,'dtwnd',dtwindupd,1800.0)`; `sfincs_lib.f90:517` `if (wind .or. patmos .or. precip) then`; `sfincs_lib.f90:530` `call update_meteo_forcing(t, dt, tloopwnd2)`
+
 
 ---
 
@@ -225,6 +246,11 @@ bin u/v 분해(`:77-78`): `spw_wu = vmag*cos(pi*(270-vdir)/180)`.
 
 NetCDF 입력은 quadtree mesh 전용, ASCII binary 입력은 regular mesh 전용(`:170-189`). `cumprcp/cuminf/qinfmap` 할당(`:139-152`).
 
+균일 상수 `con`은 격자 형식 제한에서 제외한다. `sfincs_infiltration.f90:170` `if (infiltration .and. inftype /= 'con') then !constant uniform works for both options`; `sfincs_infiltration.f90:174` `if (use_quadtree .eqv. .false.) then`; `sfincs_infiltration.f90:176` `call stop_sfincs('Error ! Netcdf infiltration input format can only be specified for quadtree mesh model !', 1)`; `sfincs_infiltration.f90:182` `if (use_quadtree .eqv. .true.) then`; `sfincs_infiltration.f90:184` `call stop_sfincs('Error ! Infiltration input for quadtree mesh model can only be specified using the infiltrationfile Netcdf format! !', 1)`
+나머지 netCDF 침투 자료는 quadtree를 요구한다. `sfincs_infiltration.f90:170` `if (infiltration .and. inftype /= 'con') then !constant uniform works for both options`; `sfincs_infiltration.f90:174` `if (use_quadtree .eqv. .false.) then`; `sfincs_infiltration.f90:176` `call stop_sfincs('Error ! Netcdf infiltration input format can only be specified for quadtree mesh model !', 1)`; `sfincs_infiltration.f90:182` `if (use_quadtree .eqv. .true.) then`; `sfincs_infiltration.f90:184` `call stop_sfincs('Error ! Infiltration input for quadtree mesh model can only be specified using the infiltrationfile Netcdf format! !', 1)`
+나머지 기존 침투 자료는 quadtree를 허용하지 않는다. `sfincs_infiltration.f90:170` `if (infiltration .and. inftype /= 'con') then !constant uniform works for both options`; `sfincs_infiltration.f90:174` `if (use_quadtree .eqv. .false.) then`; `sfincs_infiltration.f90:176` `call stop_sfincs('Error ! Netcdf infiltration input format can only be specified for quadtree mesh model !', 1)`; `sfincs_infiltration.f90:182` `if (use_quadtree .eqv. .true.) then`; `sfincs_infiltration.f90:184` `call stop_sfincs('Error ! Infiltration input for quadtree mesh model can only be specified using the infiltrationfile Netcdf format! !', 1)`
+
+
 회복률(`cnb`,`gai`) **SWMM Eq 4-36**(`:374-375`): `inf_kr = sqrt(ksfield/25.4)/75` (ks mm/hr→inch/hr, /75=days). Green-Ampt 상부회복깊이 **Eq 4-33**(`:488`): `GA_Lu = 4*sqrt(25.4)*sqrt(ksfield)`. GA 단위 m/m·s 변환(`:492-494`).
 
 ### 5.2 매 timestep 갱신 (`update_infiltration_map`, `:607`)
@@ -243,6 +269,15 @@ NetCDF 입력은 quadtree mesh 전용, ASCII binary 입력은 regular mesh 전�
   ```fortran
   qinfmap(nm) = (ksfield(nm) * (1.0 + (GA_head(np) * GA_sigma(np)) / GA_F(nm)))
   ```
+
+  현재 코드의 고강수 분기 식은 ksfield(nm)·(1+GA_head(np)·GA_sigma(np)/GA_F(nm))이다. `sfincs_infiltration.f90:838` `do nm = 1, np`; `sfincs_infiltration.f90:842` `if (prcp(nm) > 0.0) then`; `sfincs_infiltration.f90:846` `if (prcp(nm) < ksfield(nm)) then`; `sfincs_infiltration.f90:850` `qinfmap(nm) = prcp(nm)                       ! infiltration is same as rainfall`; `sfincs_infiltration.f90:856` `qinfmap(nm) = (ksfield(nm) * (1.0 + (GA_head(np) * GA_sigma(np)) / GA_F(nm)))`; `sfincs_infiltration.f90:857` `qinfmap(nm) = max(min(qinfmap(nm), prcp(nm)), 0.0)     ! never more than rainfall and and never negative`
+  이 식은 명시적인 h0 항을 포함하지 않는다. `sfincs_infiltration.f90:856` `qinfmap(nm) = (ksfield(nm) * (1.0 + (GA_head(np) * GA_sigma(np)) / GA_F(nm)))`
+  이 분기의 셀은 마지막 셀의 흡입수두와 수분 부족량을 참조한다. `sfincs_infiltration.f90:838` `do nm = 1, np`; `sfincs_infiltration.f90:856` `qinfmap(nm) = (ksfield(nm) * (1.0 + (GA_head(np) * GA_sigma(np)) / GA_F(nm)))`
+  포화 수리전도도와 누적 침투 상태는 각 셀의 값을 사용한다. `sfincs_infiltration.f90:856` `qinfmap(nm) = (ksfield(nm) * (1.0 + (GA_head(np) * GA_sigma(np)) / GA_F(nm)))`; `sfincs_infiltration.f90:863` `GA_sigma(nm) = max(GA_sigma(nm) - (qinfmap(nm) * dt / GA_Lu(nm)), 0.0)`; `sfincs_infiltration.f90:867` `GA_F(nm)    = GA_F(nm) + qinfmap(nm) * dt   ! internal cumulative rainfall from Green-Ampt`
+  전체 침투율이 공간적으로 균일해진다고 단정할 수 없다. `sfincs_infiltration.f90:856` `qinfmap(nm) = (ksfield(nm) * (1.0 + (GA_head(np) * GA_sigma(np)) / GA_F(nm)))`; `sfincs_infiltration.f90:863` `GA_sigma(nm) = max(GA_sigma(nm) - (qinfmap(nm) * dt / GA_Lu(nm)), 0.0)`; `sfincs_infiltration.f90:867` `GA_F(nm)    = GA_F(nm) + qinfmap(nm) * dt   ! internal cumulative rainfall from Green-Ampt`
+  np를 nm로 바꾸는 작성 의도는 확인하지 않았다. `sfincs_infiltration.f90:838` `do nm = 1, np`; `sfincs_infiltration.f90:856` `qinfmap(nm) = (ksfield(nm) * (1.0 + (GA_head(np) * GA_sigma(np)) / GA_F(nm)))`
+  원문 식과 결함 해석을 구분한다. `docs/input.rst:496` `**f(t) = K(1+ delta_theta (sigma + h0) / F(t) )**`; `sfincs_infiltration.f90:838` `do nm = 1, np`; `sfincs_infiltration.f90:856` `qinfmap(nm) = (ksfield(nm) * (1.0 + (GA_head(np) * GA_sigma(np)) / GA_F(nm)))`
+
   σ·F 갱신(`:863-867`), 비강우 회복 **Eq 4-35**(`:884`).
 - **hor** modified Horton(`:912`): 침투능 지수감쇠(`:967`,`:979`):
 
@@ -262,7 +297,9 @@ SFINCS compound flooding 의 동인이 본 5모듈에서 합쳐진다:
 
 1. **해양측**: tide(`bca` 천문조) + surge(`bzs`) + IG wave(`bzi`) + 기압역조(`patmos` 보정) → kcs=2 약반사 경계 flux.
 2. **태풍 강제**: spiderweb(`spw`) 바람→wind stress(land reduction 포함) + 기압강하 + (옵션)강우. 격자 meteo(`am*`)와 background 병합 가능.
-3. **육상측**: 격자/시계열 강우 → `prcp` → `netprcp` 에서 침투(`qinfmap`) 차감 → runoff.
+3. 기상 강제는 `prcp`와 `netprcp`를 만든다. `sfincs_meteo.f90:1319` `netprcp(nm) = prcp(nm)`; `sfincs_infiltration.f90:661` `netprcp(nm) = netprcp(nm) - qinfmap(nm)`; `sfincs_continuity.f90:118` `zs(nm) = zs(nm) + netprcp(nm) * dt`; `sfincs_continuity.f90:481` `dzsdt = dzsdt + netprcp(nm)`
+   침투는 같은 단계의 `netprcp`에서 `qinfmap`을 뺀다. `sfincs_meteo.f90:1319` `netprcp(nm) = prcp(nm)`; `sfincs_infiltration.f90:661` `netprcp(nm) = netprcp(nm) - qinfmap(nm)`; `sfincs_continuity.f90:118` `zs(nm) = zs(nm) + netprcp(nm) * dt`; `sfincs_continuity.f90:481` `dzsdt = dzsdt + netprcp(nm)`
+   연속식은 같은 단계의 차감 결과를 읽는다. `sfincs_meteo.f90:1319` `netprcp(nm) = prcp(nm)`; `sfincs_infiltration.f90:661` `netprcp(nm) = netprcp(nm) - qinfmap(nm)`; `sfincs_continuity.f90:118` `zs(nm) = zs(nm) + netprcp(nm) * dt`; `sfincs_continuity.f90:481` `dzsdt = dzsdt + netprcp(nm)`
 4. **하천측**: 점소스 방류(`src/dis`) + 하류 하천 경계(`bdr`, kcs=5) + 배수구조물(pump/culvert/gate).
 
 외력의 연속식 net source·모멘텀 forcing 연결은 계산 모드별로 구분한다; `bathtub` 모드는 경계조건에 따라 수위만 갱신한다(`sfincs_lib.f90:572-584`; 상세 솔버는 [[sfincs-architecture-source-map]]). 모든 외력의 동일 경로 처리는 이 근거로 확인되지 않았다.

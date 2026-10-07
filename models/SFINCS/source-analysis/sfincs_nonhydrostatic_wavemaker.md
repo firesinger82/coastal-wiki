@@ -12,6 +12,7 @@ note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-18
 related:
   - "[[sfincs-architecture-source-map]]"
+last_source_check: 2026-10-07 (recovery 재판독 대조)
 ---
 
 # SFINCS 비정수압·wavemaker·파-증강 조도

@@ -20,6 +20,7 @@ related:
   - "[[sfincs-numerical-implementation]]"
   - models/SFINCS/manual-notes/sfincs-v2.4.0-galibier-changelog-known-issues.md
   - "[[../source-analysis/sfincs_io_data]]"
+last_source_check: 2026-10-07 (recovery 재판독 대조)
 ---
 
 # SFINCS 모델 구축·실행 환경 (공식 문서)

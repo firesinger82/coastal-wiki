@@ -18,6 +18,7 @@ related:
   - "[[../source-analysis/sfincs_flow_solver]]"
   - "[[../source-analysis/sfincs_subgrid_quadtree]]"
   - "[[../source-analysis/sfincs-architecture-source-map]]"
+last_source_check: 2026-10-07 (recovery 재판독 대조)
 ---
 
 # SFINCS 모델 개요 + 수치 구현 (공식 문서)
@@ -131,7 +132,7 @@ related:
 
 | 질문 (RST sub-section) | 핵심 (요약) |
 |---|---|
-| `§What are subgrid features?` | flux 계산은 **거친 격자**, water level 갱신은 **훨씬 고해상도**. 고해상도 지형정보를 유지하며 가속 |
+| `§What are subgrid features?` | subgrid kernel은 활성 계산 셀의 부피를 갱신한다. `sfincs_continuity.f90:337` `do nm = 1, np`; `sfincs_continuity.f90:535` `z_volume(nm) = z_volume(nm) + dvol`<br>kernel은 같은 계산 셀의 부피·수위 표에서 수위를 산정한다. `sfincs_continuity.f90:565` `dzvol    = subgrid_z_volmax(nm) / (subgrid_nlevels - 1)`; `sfincs_continuity.f90:566` `iuv      = int(z_volume(nm) / dzvol) + 1`; `sfincs_continuity.f90:568` `zs(nm)   = subgrid_z_dep(iuv, nm) + (subgrid_z_dep(iuv + 1, nm) - subgrid_z_dep(iuv, nm)) * facint`; `docs/developments.rst:336` `In the SFINCS model itself, these subgrid tables are used to determine an accurate estimation of the water level after calculating fluxes on a coarser grid resolution.`<br>고해상도 지형 정보는 전처리한 표에 들어 있다. `docs/developments.rst:334` `The subgrid method implemented so that subgrid tables are derived in pre-processing that contain relations between the water level and volume for every grid cell.`; `docs/developments.rst:335` `These tables are derived using high resolution topography and bathymetry data.`<br>kernel이 지형 픽셀마다 별도 수위를 시간 적분한다는 설명은 현재 코드와 맞지 않는다. `sfincs_continuity.f90:337` `do nm = 1, np`; `sfincs_continuity.f90:535` `z_volume(nm) = z_volume(nm) + dvol`; `sfincs_continuity.f90:568` `zs(nm)   = subgrid_z_dep(iuv, nm) + (subgrid_z_dep(iuv + 1, nm) - subgrid_z_dep(iuv, nm)) * facint` |
 | `§Why subgrid features?` | grid 를 2배 정세화하면 CFL 시간스텝 제약 때문에 runtime 이 $2^3$ 배. subgrid 로 continuity 갱신을 우회 |
 | `§How does it work?` | 전처리에서 셀별 **water level↔volume 관계 table** 을 고해상도 지형으로 도출 → 런타임에 거친 격자 flux 후 정확한 수위 추정; flux 용으로는 대표 수심(representative water depth) 결정 |
 | `§Increase in computational efficiency?` | 100 m → 200 m 격자로 flux 계산 시 약 **factor 8** 가속 (CFL 제약상) |
@@ -141,7 +142,14 @@ $$\text{runtime} \propto \left(\frac{1}{\Delta x}\right)^{3} \quad\Rightarrow\qu
 
 출처: `developments.rst §What are subgrid features?`, `§Why subgrid features?`, `§How does it work?`, `§Increase in computational efficiency?`.
 
-> **코드 대응**: subgrid look-up table 도출·소비(volume↔level, depth↔level 1D 보간)는 [[../source-analysis/sfincs_subgrid_quadtree]] (sfincs_subgrid.F90, 소비측 sfincs_continuity.f90 / sfincs_momentum.f90). subgrid 방법론은 v2.0.0 Alpe d'Huez(2022-11-16)에서 추가 (`developments.rst §v2.0.0 Alpe d'Huez release`), v2.2.0 col d'Eze 에서 van Ormondt et al. (2025) 논문과 일관되게 정비 (`developments.rst §col d'Eze release`), v2.1.1 Dollerup 에서 wet fraction 포함 신 방법론 도입 (`developments.rst §v2.1.1 Dollerup release`).
+sfincs_subgrid.F90는 전처리한 subgrid 표를 읽는다. `sfincs_subgrid.F90:94` `NF90(nf90_open(trim(sbgfile), NF90_CLOBBER, net_file_sbg%ncid))`; `sfincs_subgrid.F90:352` `NF90(nf90_get_var(net_file_sbg%ncid, net_file_sbg%uv_pwet_varid, rtmpuv2(:,:) ))`; `sfincs_subgrid.F90:356` `subgrid_uv_pwet(ilevel, ip) = rtmpuv2(ilevel, uv_index(ip))`
+sfincs_continuity.f90는 부피·수위 관계를 소비한다. `sfincs_continuity.f90:568` `zs(nm)   = subgrid_z_dep(iuv, nm) + (subgrid_z_dep(iuv + 1, nm) - subgrid_z_dep(iuv, nm)) * facint`
+sfincs_momentum.f90는 대표 수심·조도·젖은 비율을 소비한다. `sfincs_momentum.f90:376` `hu     = subgrid_uv_havg(iuv, ip) + (subgrid_uv_havg(iuv + 1, ip) - subgrid_uv_havg(iuv, ip)) * facint   ! grid-average depth`; `sfincs_momentum.f90:377` `gnavg2 = subgrid_uv_nrep(iuv, ip) + (subgrid_uv_nrep(iuv + 1, ip) - subgrid_uv_nrep(iuv, ip)) * facint   ! representative g*n^2`; `sfincs_momentum.f90:378` `phi    = subgrid_uv_pwet(iuv, ip) + (subgrid_uv_pwet(iuv + 1, ip) - subgrid_uv_pwet(iuv, ip)) * facint   ! wet fraction`
+지형 픽셀에서 표를 생성하는 전처리 알고리즘은 이 source/src 대조의 범위 밖이다. `sfincs_subgrid.F90:94` `NF90(nf90_open(trim(sbgfile), NF90_CLOBBER, net_file_sbg%ncid))`; `docs/developments.rst:334` `The subgrid method implemented so that subgrid tables are derived in pre-processing that contain relations between the water level and volume for every grid cell.`
+
+[표를 읽고 소비하는 코드 노트](../source-analysis/sfincs_subgrid_quadtree.md)를 참조한다.
+
+변경 기록의 이력: subgrid 방법론은 v2.0.0 Alpe d'Huez(2022-11-16)에서 추가 (`developments.rst §v2.0.0 Alpe d'Huez release`), v2.2.0 col d'Eze 에서 van Ormondt et al. (2025) 논문과 일관되게 정비 (`developments.rst §col d'Eze release`), v2.1.1 Dollerup 에서 wet fraction 포함 신 방법론 도입 (`developments.rst §v2.1.1 Dollerup release`).
 
 ### 3.3 안정조건 (stability) — changelog 가 명시한 키워드·기본값
 
@@ -155,7 +163,7 @@ $$\text{runtime} \propto \left(\frac{1}{\Delta x}\right)^{3} \quad\Rightarrow\qu
 | `uvlim` | `10` m/s | flux 유속 limiter |
 | `slopelim` | `9999.9` (= off) | `dzdx` slope limiter (기본 꺼짐) |
 | `advlim` | `1.0` (on) | advection limiter, 신 기본값에서 기본 켜짐 |
-| `coriolis` | projected 계는 `latitude≠0` 일 때만 on (`latitude=0.0` 기본=off); spherical 대규모는 기본 on | 운동량 방정식 coriolis 항 사용 여부 |
+| `coriolis` | 투영좌표에서 -0.01 < latitude < 0.01이면 코드는 Coriolis를 끈다. `sfincs_input.f90:399` `if (igeo == 0) then`; `sfincs_input.f90:406` `if (latitude < 0.01 .and. latitude > -0.01) then`; `sfincs_input.f90:410` `coriolis = .false.`<br>위도 조건을 통과해도 coriolis=false 입력은 Coriolis를 끈다. `sfincs_input.f90:105` `call read_logical_input(500, 'coriolis', coriolis, .true.)`; `sfincs_domain.f90:1469` `if (coriolis) then`<br>구면좌표에서 코드는 셀 위도로 Coriolis 계수를 계산한다. `sfincs_input.f90:419` `crsgeo = .true.`; `sfincs_domain.f90:1469` `if (coriolis) then`; `sfincs_domain.f90:1471` `fcorio2d(nm) = 2 * 7.2921e-05 * sin(z_yz(nm) * pi / 180)` | 운동량 방정식 coriolis 항 사용 여부 |
 
 출처: `developments.rst §col d'Eze release` (Detailed overview additions/changes: stopdepth/uvmax/hmin_cfl/uvlim/slopelim/advlim/coriolis).
 
@@ -164,8 +172,20 @@ $$\text{runtime} \propto \left(\frac{1}{\Delta x}\right)^{3} \quad\Rightarrow\qu
 - `friction2d = true` → 마찰항 2D 성분 포함, **신 기본값**.
 - 신 권장 조합: **`alpha=0.50, theta=1.0, advection=1`(항상 2D), `viscosity=1`**.
 
+현재 viscosity 읽기 기본값은 false이다. `sfincs_input.f90:111` `call read_logical_input(500,'viscosity',iviscosity,.false.)`
+권고 조합 viscosity=1은 사용자가 명시해서 켠다. `sfincs_input.f90:111` `call read_logical_input(500,'viscosity',iviscosity,.false.)`
+
+
 `viscosity` 관련 (`developments.rst §v2.0.2 Blockhaus release`):
-- `viscosity = 1` 로 `theta=1.0` 운용 가능; `nuvisc` 는 격자 해상도 기반 자동결정(로그 출력), `nuvisc=value` 직접지정 또는 `nuviscdim=2` 로 배수 가능.
+developments.rst:286은 v2.0.2 Blockhaus의 점성 설정 이력이다. `docs/developments.rst:286` `* Option to include viscosity, enabling running on theta=1.0,  with viscosity = 1. The values 'nuvisc' will be automatically determined based on your grid resolution, and written to the log screen. Value can still be overruled by specifying 'nuvisc = value' directly, or increased with e.g. a factor 2 using 'nuviscdim = 2'.`
+현재 입력 nuvisc의 기본값은 0.01이다. `sfincs_input.f90:110` `call read_real_input(500,'nuvisc',nuviscdim,0.01)`
+현재 코드는 이 값을 셀 길이에 곱한다. `sfincs_domain.f90:1565` `nuvisc(iref) = max(nuviscdim * dxyr(iref), 0.0) ! take min of dx and dy, don't allow to be negative`
+현재 리더는 nuviscdim이라는 입력 키워드를 읽지 않는다. `sfincs_input.f90:110` `call read_real_input(500,'nuvisc',nuviscdim,0.01)`
+nuviscdim은 현재 코드의 내부 변수 이름이다. `sfincs_input.f90:110` `call read_real_input(500,'nuvisc',nuviscdim,0.01)`; `sfincs_domain.f90:1565` `nuvisc(iref) = max(nuviscdim * dxyr(iref), 0.0) ! take min of dx and dy, don't allow to be negative`
+현재 viscosity 읽기 기본값은 false이다. `sfincs_input.f90:111` `call read_logical_input(500,'viscosity',iviscosity,.false.)`
+권고 조합 viscosity=1은 사용자가 명시해서 켠다. `sfincs_input.f90:111` `call read_logical_input(500,'viscosity',iviscosity,.false.)`
+해석: 현재 입력 nuvisc의 차원은 m/s이다. `sfincs_input.f90:110` `call read_real_input(500,'nuvisc',nuviscdim,0.01)`; `sfincs_domain.f90:1565` `nuvisc(iref) = max(nuviscdim * dxyr(iref), 0.0) ! take min of dx and dy, don't allow to be negative`; `sfincs_momentum.f90:519` `frc = frc + nuvisc(iref) * hu * ( (uu_nmu - 2*uu_nm + uu_nmd ) * dxuv2inv + (uu_num - 2*uu_nm + uu_ndm ) * dyuv2inv )`; `sfincs_momentum.f90:677` `q(ip) = (qsm + frc * dt) / (1.0 + gnavg2 * dt * qfr / hu73)`; `docs/parameters.rst:116` `:units:		-`
+해석: 셀 길이를 곱한 내부 nuvisc의 차원은 m^2/s이다. `sfincs_domain.f90:1565` `nuvisc(iref) = max(nuviscdim * dxyr(iref), 0.0) ! take min of dx and dy, don't allow to be negative`; `sfincs_momentum.f90:519` `frc = frc + nuvisc(iref) * hu * ( (uu_nmu - 2*uu_nm + uu_nmd ) * dxuv2inv + (uu_num - 2*uu_nm + uu_ndm ) * dyuv2inv )`; `sfincs_momentum.f90:677` `q(ip) = (qsm + frc * dt) / (1.0 + gnavg2 * dt * qfr / hu73)`
 
 `timestep_analysis` (`developments.rst §v2.4.0 Galibier release`):
 - `timestep_analysis = 1` → `average_required_timestep`·`percentage_limiting_timestep` 를 `sfincs_map.nc`/화면에 기록해 **global timestep 을 제약하는 셀** 분석.
@@ -202,7 +222,7 @@ staggered grid, momentum→continuity 순서의 1 step 알고리즘 레벨 상�
 
 | 릴리스 | 코드/날짜 | 수치 관련 핵심 |
 |---|---|---|
-| v2.4.0 Galibier | 2026.01 | timestep_analysis, huvmin, snapwave wave force factor |
+| v2.4.0 Galibier | 2026.01 | timestep_analysis, huvmin.<br>파력 배율의 활성 입력 이름은 snapwave_waveforces_ratio이다. `sfincs_input.f90:308` `call read_real_input(500,'snapwave_waveforces_ratio',waveforces_ratio,1.0)`<br>공식 변경 기록은 같은 기능의 이름을 snapwave_waveforces_factor로 적는다. `docs/developments.rst:54` `* Added input variable 'snapwave_waveforces_factor' which you can set to 0 to turn off wave forces and thus incident wave setup.` |
 | v2.3.0 mt. Faber | 2025.02 | 파일 존재 체크, volfile, Neumann/하류 riverine BC(alpha) |
 | v2.2.0 col d'Eze | 2025.01 | **안정성 대개편**(uvmax/hmin_cfl/uvlim/slopelim/advlim, stopdepth 제거), subgrid 정비(van Ormondt 2025), nonh(alpha) |
 | v2.1.1 Dollerup | 2024.01 | `advection_scheme=upw1` 기본, `friction2d=true` 기본, wet-fraction subgrid |
@@ -212,7 +232,10 @@ staggered grid, momentum→continuity 순서의 1 step 알고리즘 레벨 상�
 출처: `developments.rst §Releases Changelog` 하위 각 release section.
 
 ### 5.1 알려진 이슈 (수치 관련, `developments.rst §Known issues`)
-- v2.3.0 mt Faber: Curve Number infiltration + `storecumprcp=0`(기본) → 침투 비정상 처리 가능 → 임시해법 `storecumprcp=1`. **v2.4.0 Galibier 에서 수정**.
+- 공식 v2.4.0 변경 기록은 storecumprcp=0의 Curve Number 문제를 수정했다고 기록한다. `docs/developments.rst:27` `* Issue in SFINCS v2.3.0 mt Faber Release regarding Curve Number infiltration if storecumprcp = 0 (default), then infiltration is not processed correctly and can result to unrealistic results! Simple solution for now: put storecumprcp = 1 when using this infiltration option. This issue is fixed in the 2026.01 Galibier Release!`; `docs/developments.rst:63` `* Fixed bug with Curve Number infiltration if storecumprcp = 0 (default).`
+  현재 코드에서 출력 플래그 의존성의 제거를 확인하지 못했다. `sfincs_input.f90:280` `call read_int_input(500,'storecumprcp',storecumprcp,0)`; `sfincs_input.f90:511` `store_cumulative_precipitation = .false.`; `sfincs_input.f90:512` `if (storecumprcp==1) then`; `sfincs_input.f90:513` `store_cumulative_precipitation = .true.`; `sfincs_meteo.f90:1321` `if (store_cumulative_precipitation) then`; `sfincs_meteo.f90:1534` `if (store_cumulative_precipitation) then`; `sfincs_infiltration.f90:709` `if (store_cumulative_precipitation) then`
+  판정: 정적 판독으로 확인, 실행으로는 확인하지 않음. `sfincs_meteo.f90:1321` `if (store_cumulative_precipitation) then`; `sfincs_meteo.f90:1534` `if (store_cumulative_precipitation) then`; `sfincs_infiltration.f90:689` `if (cumprcp(nm) > sfacinf * qinffield(nm)) then ! qinffield is S`; `sfincs_infiltration.f90:693` `Qq  = (cumprcp(nm) - sfacinf * qinffield(nm))**2 / (cumprcp(nm) + (1.0 - sfacinf) * qinffield(nm))  ! cumulative runoff in m`; `sfincs_infiltration.f90:695` `qinfmap(nm) = (I - cuminf(nm)) / dt           ! infiltration in m/s`; `sfincs_infiltration.f90:709` `if (store_cumulative_precipitation) then`
+  실제 영향과 수정 반영 판은 별도 증거가 필요하다. `docs/developments.rst:27` `* Issue in SFINCS v2.3.0 mt Faber Release regarding Curve Number infiltration if storecumprcp = 0 (default), then infiltration is not processed correctly and can result to unrealistic results! Simple solution for now: put storecumprcp = 1 when using this infiltration option. This issue is fixed in the 2026.01 Galibier Release!`; `docs/developments.rst:63` `* Fixed bug with Curve Number infiltration if storecumprcp = 0 (default).`; `sfincs_meteo.f90:1321` `if (store_cumulative_precipitation) then`; `sfincs_meteo.f90:1534` `if (store_cumulative_precipitation) then`; `sfincs_infiltration.f90:709` `if (store_cumulative_precipitation) then`
 - 2023 Cauberg 이전 restartfile 은 재생성 권장 (flux 읽기 mismatch).
 
 출처: `developments.rst §Known issues`, `§col d'Eze release` bugfixes, `§mt. Faber release` bugfixes.

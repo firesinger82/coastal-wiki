@@ -9,6 +9,7 @@ note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-18
 related:
   - "[[sfincs-architecture-source-map]]"
+last_source_check: 2026-10-07 (recovery 재판독 대조)
 ---
 
 # SFINCS 고속화 핵심: subgrid + quadtree + domain
