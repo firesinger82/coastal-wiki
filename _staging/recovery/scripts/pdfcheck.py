@@ -1,8 +1,12 @@
 # one-off: PDF page records — every page row present once; `quote` (p.N) found in extracted text of page N
 import re,sys,glob,os,hashlib,json
 os.chdir('/home/firesinger/coastal-wiki')
-jobs=json.load(open('_staging/recovery/scripts/pdfjobs.json'))
-sel=[jobs[int(x)-1] for x in sys.argv[1:]] or jobs
+# usage: pdfcheck.py [--jobs FILE] [N ...]   (default jobs = XBeach pdfjobs.json)
+args=sys.argv[1:]
+JF='_staging/recovery/scripts/pdfjobs.json'
+if args[:1]==['--jobs']: JF=args[1]; args=args[2:]
+jobs=json.load(open(JF))
+sel=[jobs[int(x)-1] for x in args] or jobs
 vok=set(tuple(l.rstrip('\n').split('\t')) for l in open('_staging/recovery/scripts/visual-ok.txt') if l.strip())
 norm=lambda s: re.sub(r'[^a-z0-9]','',s.lower().replace('ﬁ','fi').replace('ﬂ','fl'))
 for j in sel:
@@ -16,8 +20,8 @@ for j in sel:
     if sorted(rows)!=want: errs.append(f'rows {len(rows)} != pages {len(want)}; missing {sorted(set(want)-set(rows))[:8]} dup {[x for x in set(rows) if rows.count(x)>1][:5]}')
     q=tot=0; bad=[]
     if j['ext']:
-        ext=open(f"_staging/recovery/extract/XBeach/pdf/{j['ext']}.txt",errors='replace').read()
-        ext2=open(f"_staging/recovery/extract/XBeach/pdf-md/{j['ext']}.md",errors='replace').read()
+        ext=open(f"_staging/recovery/extract/{j.get('model','XBeach')}/pdf/{j['ext']}.txt",errors='replace').read()
+        ext2=open(f"_staging/recovery/extract/{j.get('model','XBeach')}/pdf-md/{j['ext']}.md",errors='replace').read()
         pages={int(m.group(1)):'' for m in re.finditer(r'<<<PAGE (\d+)>>>',ext)}
         parts=re.split(r'<<<PAGE (\d+)>>>',ext)
         for k in range(1,len(parts),2): pages[int(parts[k])]=norm(parts[k+1])
