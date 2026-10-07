@@ -27,12 +27,15 @@ def log(*a):
 
 # ---- read-only path sandbox (F5) ------------------------------------------
 def safe_path(p: str) -> Path:
+    p = p.split("#", 1)[0]  # 판독 기록 결과의 '#L1–200'·'#p.5' 꼬리표 제거
     if p.startswith("/") or ".." in Path(p).parts:
         raise ValueError("absolute paths and '..' are not allowed")
     target = (WIKI / p).resolve()
     if not (target == WIKI or str(target).startswith(str(WIKI) + os.sep)):
         raise ValueError("path escapes the wiki root")
     rel = target.relative_to(WIKI)
+    if fx.is_record(rel) and target.is_file():
+        return target  # 판독 기록은 _staging 안이지만 읽기 허용
     if any(part in DENY for part in rel.parts):
         raise ValueError(f"denied corpus zone: {rel.parts[0] if rel.parts else p}")
     if not rel.parts or rel.parts[0] not in ALLOW:
@@ -119,16 +122,16 @@ def t_manifest(_args):
 TOOLS = {
     "wiki_search": {
         "fn": t_search,
-        "description": "BM25 full-text search over canonical coastal-wiki (concepts/models/textbook/experience). Filter by citation_status (verified/source-needed) and path_class. research/_archive/raw are excluded from the index.",
+        "description": "BM25 full-text search over canonical coastal-wiki (concepts/models/textbook/experience). Filter by citation_status (verified/source-needed) and path_class. research/_archive/raw are excluded from the index. path_class='records' searches the source reading records (_staging/recovery/read) instead: one hit per table row (code line range '#L1–200' or PDF page '#p.5'); these are reading records, not canonical notes.",
         "schema": {"type": "object", "properties": {
             "query": {"type": "string"},
             "status": {"type": "string", "enum": ["verified", "source-needed", "draft-unsourced"]},
-            "path_class": {"type": "string", "enum": ["concepts", "models", "textbook", "experience"]},
+            "path_class": {"type": "string", "enum": ["concepts", "models", "textbook", "experience", "records"]},
             "k": {"type": "integer", "default": 8}}, "required": ["query"]},
     },
     "wiki_read": {
         "fn": t_read,
-        "description": "Read a canonical wiki file (read-only, sandboxed to repo). mode=section (heading via pattern), grep (regex lines), full.",
+        "description": "Read a canonical wiki file or a reading record under _staging/recovery/read (read-only, sandboxed to repo; a '#...' suffix from search results is ignored). mode=section (heading via pattern), grep (regex lines), full.",
         "schema": {"type": "object", "properties": {
             "path": {"type": "string"},
             "mode": {"type": "string", "enum": ["section", "grep", "full"], "default": "section"},

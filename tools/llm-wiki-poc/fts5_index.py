@@ -64,8 +64,48 @@ def frontmatter(text):
             fm[k.strip()] = v.strip().strip('"').strip("'")
     return fm, text[m.end():]
 
+# 판독 기록(_staging/recovery/read): canonical 이 아닌 원문 판독 기록.
+# 표의 행 하나(코드 `| A–B |` 행 구간, PDF `| p.N |` 쪽)를 문서 하나로 색인한다.
+# path_class='records' 로만 검색된다(기본 검색은 canonical 만, 2026-10-07).
+RECORDS_PARTS = ("_staging", "recovery", "read")
+RECORD_ROW = re.compile(r"^\|\s*(\d+\s*[–-]\s*\d+|p\.\d+)[^|]*\|(.*)$")
+
+def is_record(rel: Path):
+    return tuple(rel.parts[:3]) == RECORDS_PARTS
+
 def path_class(rel: Path):
+    if is_record(rel):
+        return "records"
     return rel.parts[0] if rel.parts else ""
+
+def index_records(con):
+    n = 0
+    root = WIKI.joinpath(*RECORDS_PARTS)
+    for md in sorted(root.rglob("*.md")):
+        rel = md.relative_to(WIKI)
+        try:
+            text = md.read_text(encoding="utf-8", errors="ignore")
+        except Exception:
+            continue
+        fm, body = frontmatter(text)
+        src = fm.get("file", str(rel))
+        for line in body.splitlines():
+            m = RECORD_ROW.match(line)
+            if not m:
+                continue
+            key = re.sub(r"\s+", "", m.group(1))
+            key = key if key.startswith("p.") else "L" + key
+            con.execute("INSERT INTO idx VALUES (?,?,?,?,?,?,?)",
+                        (f"{rel}#{key}", "records", "reading-record",
+                         f"{src} {key}", line, 0.0, ""))
+            n += 1
+        if "## 판독 중" in body:
+            facts = body.split("## 판독 중", 1)[1]
+            con.execute("INSERT INTO idx VALUES (?,?,?,?,?,?,?)",
+                        (f"{rel}#facts", "records", "reading-record",
+                         f"{src} 판독 중 확인된 사실", facts, 0.0, ""))
+            n += 1
+    return n
 
 def included(rel: Path):
     if any(p in DENY_PARTS for p in rel.parts):
@@ -102,6 +142,7 @@ def build():
         con.execute("INSERT INTO idx VALUES (?,?,?,?,?,?,?)",
                     (str(rel), path_class(rel), cs, title, body, tier, hsn))
         n += 1
+    nrec = index_records(con)
     # freshness metadata (Codex 22회차): HEAD sha at build time → ensure_index()
     # rebuilds when HEAD moves without a reindex hook firing (e.g. hook-less
     # clone, long-lived MCP server across a git pull). Plain table, not fts5.
@@ -114,7 +155,7 @@ def build():
     hist = dict(con.execute(
         "SELECT citation_status, count(*) FROM idx GROUP BY citation_status").fetchall())
     con.close()
-    print(f"indexed {n} docs in {dt:.2f}s  | db {size:.0f} KB")
+    print(f"indexed {n} docs + {nrec} record rows in {dt:.2f}s  | db {size:.0f} KB")
     print("citation_status histogram:", hist)
 
 def _schema_current():
@@ -157,6 +198,8 @@ def query(q, status=None, path_class=None, k=8):
         where.append("citation_status = ?"); args.append(status)
     if path_class:
         where.append("path_class = ?"); args.append(path_class)
+    else:
+        where.append("path_class != 'records'")  # 기본 검색은 canonical 만
     # tier demotes raw textbook dumps below curated notes (see RAW_DEMOTE);
     # bm25(idx) is negative (lower = better), so adding tier sorts dumps last.
     sql = (f"SELECT path, path_class, citation_status, title, "
