@@ -1,0 +1,34 @@
+---
+file: models/EFDC/raw/source_code/EFDC-GVC/adtoxdp.for
+lines: 337
+sha256: a89d9c99112699e3779c243eac706d6caf12a071a0fcf8660345c7876a5d1464
+reader: codex gpt-6.1-sol
+read_date: 2026-10-07
+---
+
+# adtoxdp.for — 판독 구간 기록
+
+구간은 1행부터 337행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–78 | 구분 주석(1–5), `SUBROUTINE ADTOXDP(NT,DELTI,PARTDIF)` 입구(6). 주석은 EFDC-FULL VERSION 1.0a·2001년 11월 1일 수정(8·10), 독성물질(toxicant)의 공극수(pore water) 이류(advection)·확산(diffusion)을 배정밀도(double precision)로 푼다고 적는다(20–21). `INCLUDE 'EFDC.PAR'` (25), `INCLUDE 'EFDC.CMN'` (26)을 포함한다. 30–75행은 인수·공통 변수·작업 배열의 단정밀도(single precision) 원형과 배정밀도 복사 필요성을 설명하는 주석이다. 포함 파일 내부는 이 판독 범위에 없다. |
+| 79–122 | 시작 시 6행 ADTOXDP 루틴 안. DELTI·PARTDIF는 REAL*4이며 PARTDIF 크기는 (LCM,KBM)이다(81–84). REAL*8 지역 스칼라는 DELTI_DP·BETTMP·DIFBWFAC(88). DZC_DP는 KCM(90–91), DIFTOX_DP·DIFTOXS_DP는 NTXM(93–94), DIFTOXBW·질량 합계·HP_DP는 LCM(96–98)이다. PARTDIF_DP·HBED_DP·PORBED_DP는 (LCM,KBM)(100–101), QWTRBED_DP는 (LCM,0:KBM)(103–104)이다. 삼중대각(tridiagonal) 계수·우변·해 배열은 (LCM,KBM+1)(106–109)이다. TADFLUX_DP·CONGW_DP·수중 TOX_DP/TOXPFTW_DP·저층 TOXB_DP/TOXPFTB_DP의 크기를 각각 선언한다(111–121). 선언 사이의 주석도 포함한다. |
+| 123–153 | 시작 시 6행 ADTOXDP 루틴 안. DBLE로 DELTI·DZC(1)·현재 NT의 확산 계수를 복사한다(127–130). `DO L=2,LA` (132)에서 HP·QWTRBED(L,0)·수층 1의 TOX/TOXPFTW·CONGW(L,NT+4)를 배정밀도로 복사한다(133–138). TADFLUX의 기존값 복사는 주석 처리되어 있다(137). `DO K=1,KB` (141)·`DO L=2,LA` (142)에서 HBED·QWTRBED·PORBED·PARTDIF·TOXB·TOXPFTB를 배정밀도로 복사한다(143–148). 주석·루프 종료를 포함한다. |
+| 154–171 | 시작 시 6행 ADTOXDP 루틴 안. L=2..LA에서 DIFTOXBW를 0으로 초기화한다(154–156). 별도 루프에서 `IF(LMASKDRY(L)) DIFTOXBW(L)=DIFTOXS_DP(NT)` (159)를 실행한다. `DO L=2,LA` (162)에서 `DIFBWFAC=2./HBED_DP(L,KBT(L))` (164)을 계산한다. `IF(ISDIFBW(NT).EQ.1)DIFBWFAC=1.0` (165)은 계수를 1로 바꾼다. TOXBBALO·ALOW(L,1)·CUPP(L,KBTP1)를 0으로 초기화한다(166·169–170). `KBTP1=KBT(L)+1` (167), `KBTM1=KBT(L)-1` (168)로 결합 수층과 저층 번호를 정한다. |
+| 172–188 | 시작 시 6행 ADTOXDP 루틴·162행 L 루프 안. `DO K=1,KBTM1` (172)에서 상부 대각 계수를 계산한다. 174–180행 주석은 입자 혼합(particle mixing)을 길이²/시간 계수에서 길이/시간 속도로 바꾼 2005년 9월 28일 수정과 이전 식을 적는다. 활성 식은 `CUPP(L,K)=MIN(QWTRBED_DP(L,K),0.)` (181); `&          -((DIFTOX_DP(NT)/(HBED_DP(L,K)+HBED_DP(L,K+1)))+` (182); `&          PARTDIF_DP(L,K))*(PORBED_DP(L,K)+PORBED_DP(L,K+1))` (183)이다. K 루프 종료(185) 후 저층 최상부는 `CUPP(L,KBT(L))=MIN(QWTRBED_DP(L,KBT(L)),0.)` (186); `&          -DIFBWFAC*DIFTOXBW(L)*PORBED_DP(L,KBT(L))` (187)이다. |
+| 189–212 | 시작 시 6행 ADTOXDP 루틴·162행 L 루프 안. `DO K=2,KBT(L)` (189)에서 하부 대각 계수를 계산한다. 입자 혼합 수정과 이전 식은 주석이다(190–197). 활성 식은 `ALOW(L,K)=-MAX(QWTRBED_DP(L,K-1),0.)` (198); `&          -((DIFTOX_DP(NT)/(HBED_DP(L,K-1)+HBED_DP(L,K)))+` (199); `&          PARTDIF_DP(L,K-1))*(PORBED_DP(L,K-1)+PORBED_DP(L,K))` (200)이다. 수층 쪽 하부 계수는 `ALOW(L,KBTP1)=-MAX(QWTRBED_DP(L,KBT(L)),0.)` (203); `&                 -DIFBWFAC*DIFTOXBW(L)*PORBED_DP(L,KBT(L))` (204)이다. `DO K=1,KBT(L)` (206)에서 `BMNN(L,K)=DELTI_DP*HBED_DP(L,K)*PORBED_DP(L,K)/` (207); `&                  (1.-TOXPFTB_DP(L,K,NT))` (208)을 계산한다. 수층 기본 대각은 `BMNN(L,KBTP1)=DELTI_DP*DZC_DP(1)*HP_DP(L)/` (210); `&                  (1.-TOXPFTW_DP(L,1,NT))` (211)이다. |
+| 213–245 | 시작 시 6행 ADTOXDP 루틴·162행 L 루프 안. 입자 혼합 수정·이전 첫 층 식은 주석이다(213–220). 활성 첫 층 식은 `BMNN(L,1)=BMNN(L,1)+MAX(QWTRBED_DP(L,1),0.)` (221); `&        +((DIFTOX_DP(NT)/(HBED_DP(L,2)+HBED_DP(L,1)))+` (222); `&        PARTDIF_DP(L,1))*(PORBED_DP(L,2)+PORBED_DP(L,1))` (223)이다. `DO K=2,KBTM1` (225)에서 중간 층을 보정한다. 226–237행은 수정 설명·이전 식이다. 활성 식은 `BMNN(L,K)=BMNN(L,K)+MAX(QWTRBED_DP(L,K),0.)` (238); `&         +((DIFTOX_DP(NT)/(HBED_DP(L,K+1)+HBED_DP(L,K)))+` (239); `&         PARTDIF_DP(L,K))*(PORBED_DP(L,K+1)+PORBED_DP(L,K))` (240); `&                         -MIN(QWTRBED_DP(L,K-1),0.)` (241); `&         +((DIFTOX_DP(NT)/(HBED_DP(L,K-1)+HBED_DP(L,K)))+` (242); `&         PARTDIF_DP(L,K-1))*(PORBED_DP(L,K-1)+PORBED_DP(L,K))` (243)이다. K 루프 종료(245). |
+| 246–276 | 시작 시 6행 ADTOXDP 루틴·162행 L 루프 안. K=KBT(L)(246), 수정 주석·이전 식(247–255). 최상부 저층 식은 `BMNN(L,K)=BMNN(L,K)+MAX(QWTRBED_DP(L,K),0.)` (256); `&           +DIFBWFAC*DIFTOXBW(L)*PORBED_DP(L,KBT(L))` (257); `&                         -MIN(QWTRBED_DP(L,K-1),0.)` (258); `&           +((DIFTOX_DP(NT)/(HBED_DP(L,K-1)+HBED_DP(L,K)))` (259); `&           +PARTDIF_DP(L,K-1))*(PORBED_DP(L,K-1)+PORBED_DP(L,K))` (260)이다. K=KBTP1(262)에서 `BMNN(L,K)=BMNN(L,K)-MIN(QWTRBED_DP(L,K-1),0.)` (263); `&          +DIFBWFAC*DIFTOXBW(L)*PORBED_DP(L,KBT(L))` (264)을 계산한다. K=1..KBT(L)에서 `RRHS(L,K)=DELTI_DP*TOXB_DP(L,K,NT)` (267), `TOXBBALO(L)=TOXBBALO(L)+TOXB_DP(L,K,NT)` (268)을 계산한다. 지하수(groundwater) 항은 `RRHS(L,1)=RRHS(L,1)+MAX(QWTRBED_DP(L,0),0.)` (270); `&                  *CONGW_DP(L,NT+4)` (271)이다. 수층 우변은 `RRHS(L,KBTP1)=DELTI_DP*DZC_DP(1)*HP_DP(L)*TOX_DP(L,1,NT)` (272), 초기 수층 질량은 `TOXWBALO(L)=DZC_DP(1)*HP_DP(L)*TOX_DP(L,1,NT)` (273)이다. L 루프 종료(275)·주석(276). |
+| 277–293 | 시작 시 6행 ADTOXDP 루틴 안. 삼중대각 해법 주석(277). `DO L=2,LA` (279)에서 `KBTP1=KBT(L)+1` (280), BETTMP=BMNN(L,1) 복사(281), `TOXTMP(L,1)=RRHS(L,1)/BETTMP` (282)을 계산한다. `DO KK=2,KBTP1` (283)의 전진 계산은 `GAMTMP(L,KK)=CUPP(L,KK-1)/BETTMP` (284), `BETTMP=BMNN(L,KK)-ALOW(L,KK)*GAMTMP(L,KK)` (285), `TOXTMP(L,KK)=(RRHS(L,KK)-ALOW(L,KK)*TOXTMP(L,KK-1))/` (286); `&                     BETTMP` (287)이다. `DO KK=KBT(L),1,-1` (289)의 후진 대입은 `TOXTMP(L,KK)=TOXTMP(L,KK)-GAMTMP(L,KK+1)*TOXTMP(L,KK+1)` (290)이다. 모든 루프 종료·주석(291–293). 별도 해법 루틴을 호출하지 않는다. |
+| 294–309 | 시작 시 6행 ADTOXDP 루틴 안. 해의 척도를 환산하고 최종 질량을 계산한다는 주석(294). L=2..LA에서 TOXBBALN=0(297), `KBTP1=KBT(L)+1` (298), K=1..KBT(L)에서 `TOXB_DP(L,K,NT)=HBED_DP(L,K)*PORBED_DP(L,K)*TOXTMP(L,K)/` (301); `&                     (1.-TOXPFTB_DP(L,K,NT))` (302), `TOXBBALN(L)=TOXBBALN(L)+TOXB_DP(L,K,NT)` (303)을 계산한다. TOXBSMB·TOXSMB 저장은 주석 처리되어 있다(300·305). `TOX_DP(L,1,NT)=TOXTMP(L,KBTP1)/(1.-TOXPFTW_DP(L,1,NT))` (306), `TOXWBALN(L)=DZC_DP(1)*HP_DP(L)*TOX_DP(L,1,NT)` (307)로 수층 농도·질량을 계산한다. 루프 종료·주석(308–309). |
+| 310–322 | 시작 시 6행 ADTOXDP 루틴 안. 질량 수지(mass balance)용 이류·확산 플럭스(flux) 주석(310). L=2..LA에서 `TADFLUX_DP(L,NT)=DELTI_DP*(DZC_DP(1)*HP_DP(L)` (313); `&                       *TOX_DP(L,1,NT)-TOXWBALO(L))` (314)을 계산한다. 갱신값을 단정밀도로 공통 영역(COMMON)에 돌려준다는 주석과 구분 주석을 포함한다(317–322). |
+| 323–337 | 시작 시 6행 ADTOXDP 루틴 안. L=2..LA에서 SNGL로 TOX(L,1,NT)·TADFLUX(L,NT)를 돌려준다(323–326). K=1..KB·L=2..LA에서 SNGL로 TOXB(L,K,NT)를 돌려준다(328–332). 구분 주석·RETURN·END(333–337). |
+
+## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
+
+- 128·135–136·210–211·272–273·306–307·324: 수중 자료의 복사·계산·반환은 수층 번호 1만 사용한다. 이 루틴에는 KC에 따른 다른 수층 처리나 KC 조건 검사가 없다.
+- 154–165: DIFTOXBW는 0으로 시작한다. DIFTOXS_DP를 넣는 조건은 LMASKDRY(L) 자체이다. ISDIFBW(NT)=1은 DIFBWFAC만 1로 바꾼다. LMASKDRY의 외부 정의는 확인하지 않았다.
+- 221–223·246–260: 첫 저층 대각식은 HBED_DP(L,2)·PORBED_DP(L,2)를 사용한다. 최상부 저층 대각식은 K-1을 사용한다. HBED_DP·PORBED_DP의 수직 선언 범위는 1..KBM이며, 이 식들 앞에는 KBT(L)>=2 검사 분기가 없다.
+- 164·181–211·221–264·281–290·301–306: 계수·해 계산은 저층 두께, 1-TOXPFTB_DP, 1-TOXPFTW_DP, BETTMP를 분모로 사용한다. 이 루틴에는 이 분모들의 0 검사 조건이 없다.
+- 96–98·166·268·297·303·307: TOXBBALO·TOXBBALN은 초기화·누적 후 다른 계산이나 반환에 사용되지 않는다. TOXWBALN은 계산 후 사용되지 않는다. TADFLUX_DP 식은 TOXWBALO를 사용한다(313–314).

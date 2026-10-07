@@ -1,0 +1,34 @@
+---
+file: models/EFDC/raw/source_code/EFDC-GVC/calavb2.for
+lines: 291
+sha256: be59a6bf5b759b66f87cde351b404333e4c5fccb75efda5670158b75a18eadb2
+reader: codex gpt-6.1-sol
+read_date: 2026-10-07
+---
+
+# calavb2.for — 판독 구간 기록
+
+구간은 1행부터 291행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–45 | 구분 주석·`SUBROUTINE CALAVB2 (ISTL)` (6) 입구. 수직 점성계수(vertical viscosity)·확산계수(diffusivity)의 Mellor–Yamada/Galperin 계산 및 H 정규화 주석이다(8–11). 버전·수정일·빈 변경 이력을 포함한다(13–22). `INCLUDE 'EFDC.PAR'` (26); `INCLUDE 'EFDC.CMN'` (27)로 공통 선언을 포함한다. 상수 초기값은 `DATA ATURB1,ATURB2,TURBC1/0.92,0.74,0.08/` (30). 28행 QQI 선언·34–44행 계수표는 주석이다. |
+| 46–80 | 시작 시 6행 CALAVB2 루틴 안. 극값·배경 계수 초기값은 `AVMAX=AVO` (46); `ABMAX=ABO` (47); `AVMIN=10.` (48); `ABMIN=10.` (49); `RAVBTMP=1.` (52). `IF(ISAVBMN.GE.1) RAVBTMP=0.` (53)으로 배경 가산을 끈다. K=1..KS·L=2..LA(58–59)에서 CTURBB1=CTURB·CTURBB2=CTURB2B를 복사한다(60–61). 다음 K/L 루프(65–66)의 성층 지표는 `DELBTMP=(B(L,K+1)-B(L,K))*DZIG(K)` (67); `RITMP=-GP*HP(L)*DELBTMP/QQ(L,K)` (68). `IF(RITMP.GT.0.)THEN` (69)이면 `RIQ=DML(L,K)*DML(L,K)*RITMP` (70); `BFUN=EXP(-3.11*RIQ)` (71); `CTURBB1(L,K)=CTURB/(BFUN+1.E-16)` (72). 그 안의 `IF(BBT(L,K).GT.0.)THEN` (73)이면 `TMPVAL=DELBTMP*DELBTMP/(RITMP*BBT(L,K))` (74); `CTURBB2(L,K)=CTURB2B/(1.+0.61*(1.-BFUN)*TMPVAL)` (75). 두 검사와 루프를 닫는다(76–79). 50–51행 RIQMIN 설정은 주석이다. |
+| 81–119 | 시작 시 6행 CALAVB2 루틴 안. 구분 주석 뒤 `IF(ISFAVB.EQ.0)THEN` (84)에서 ND=1..NDM(86), 블록 범위 `LF=2+(ND-1)*LDM` (87); `LL=LF+LDM-1` (88)를 정한다. K=1..KS·L=LF..LL(89–90)의 `QQI(L)=1./QQ(L,K)` (91)로 QQ 역수를 구한다. 다음 L 루프(93)의 RIQ·안정도 함수(stability function)는 `RIQ=-GP*HP(L)*DML(L,K)*DML(L,K)*DZIG(K)` (94); `&    *(B(L,K+1)-B(L,K))*QQI(L)` (95); `RIQ=MAX(RIQ,RIQMIN)` (96); `TMPVAL1=1.-( 6.*ATURB1/CTURBB1(L,K) )` (97); `SBTOP=ATURB2*TMPVAL1` (98); `SBBOT=3.*ATURB2*( 6.*ATURB1+CTURBB2(L,K) )` (99); `SVTOP=ATURB1*( TMPVAL1-3.*TURBC1)` (100); `TMPVAL2=TMPVAL1*( CTURBB2(L,K)-3.*ATURB2 )` (101); `TMPVAL3=-3.*TURBC1*( CTURBB2(L,K)+6.*ATURB1)` (102); `SVTOP2=3.*ATURB2*(TMPVAL2+TMPVAL3)/SVTOP` (103); `SVBOT=9.*ATURB1*ATURB2` (104); `SFAV=SVTOP*(1.+SVTOP2*RIQ)/((1.+SVBOT*RIQ)*(1.+SBBOT*RIQ))` (105); `SFAB=SBTOP/(1.+SBBOT*RIQ)` (106). AB·AV 및 극값·HPI·SCB 계산은 `AB(L,K)=AVCON*SFAB*DML(L,K)*HP(L)*SQRT(QQ(L,K))+RAVBTMP*ABO` (107); `AV(L,K)=AVCON*SFAV*DML(L,K)*HP(L)*SQRT(QQ(L,K))+RAVBTMP*AVO` (108); `AVMAX=MAX(AVMAX,AV(L,K))` (109); `ABMAX=MAX(ABMAX,AB(L,K))` (110); `AVMIN=MIN(AVMIN,AV(L,K))` (111); `ABMIN=MIN(ABMIN,AB(L,K))` (112); `AV(L,K)=AV(L,K)*HPI(L)` (113); `AB(L,K)=SCB(L)*AB(L,K)*HPI(L)` (114). 세 루프와 분기를 닫는다(115–119). 83행 ISTL 조건은 주석이다. |
+| 120–155 | 시작 시 6행 CALAVB2 루틴 안. `IF(ISFAVB.EQ.1)THEN` (120)에서 ND=1..NDM(122), `LF=2+(ND-1)*LDM` (123); `LL=LF+LDM-1` (124)로 범위를 정한다. K=1..KS·L=LF..LL(125–126)의 `QQI(L)=1./QQ(L,K)` (127)로 QQ 역수를 구한다. 다음 L 루프(129)의 RIQ·안정도 함수는 `RIQ=-GP*HP(L)*DML(L,K)*DML(L,K)*DZIG(K)` (130); `&    *(B(L,K+1)-B(L,K))*QQI(L)` (131); `RIQ=MAX(RIQ,RIQMIN)` (132); `TMPVAL1=1.-( 6.*ATURB1/CTURBB1(L,K) )` (133); `SBTOP=ATURB2*TMPVAL1` (134); `SBBOT=3.*ATURB2*( 6.*ATURB1+CTURBB2(L,K) )` (135); `SVTOP=ATURB1*( TMPVAL1-3.*TURBC1)` (136); `TMPVAL2=TMPVAL1*( CTURBB2(L,K)-3.*ATURB2 )` (137); `TMPVAL3=-3.*TURBC1*( CTURBB2(L,K)+6.*ATURB1)` (138); `SVTOP2=3.*ATURB2*(TMPVAL2+TMPVAL3)/SVTOP` (139); `SVBOT=9.*ATURB1*ATURB2` (140); `SFAV=SVTOP*(1.+SVTOP2*RIQ)/((1.+SVBOT*RIQ)*(1.+SBBOT*RIQ))` (141); `SFAB=SBTOP/(1.+SBBOT*RIQ)` (142). 임시 AB·AV 및 극값은 `ABTMP=AVCON*SFAB*DML(L,K)*HP(L)*SQRT(QQ(L,K))+RAVBTMP*ABO` (143); `AVTMP=AVCON*SFAV*DML(L,K)*HP(L)*SQRT(QQ(L,K))+RAVBTMP*AVO` (144); `AVMAX=MAX(AVMAX,AVTMP)` (145); `ABMAX=MAX(ABMAX,ABTMP)` (146); `AVMIN=MIN(AVMIN,AVTMP)` (147); `ABMIN=MIN(ABMIN,ABTMP)` (148). 이전 값과 산술평균(arithmetic average)은 `AV(L,K)=0.5*(AV(L,K)+AVTMP*HPI(L))` (149); `AB(L,K)=SCB(L)*0.5*(AB(L,K)+ABTMP*HPI(L))` (150). 세 루프와 분기를 닫는다(151–155). |
+| 156–191 | 시작 시 6행 CALAVB2 루틴 안. `IF(ISFAVB.EQ.2)THEN` (156)에서 ND=1..NDM(158), `LF=2+(ND-1)*LDM` (159); `LL=LF+LDM-1` (160)로 범위를 정한다. K=1..KS·L=LF..LL(161–162)의 `QQI(L)=1./QQ(L,K)` (163)로 QQ 역수를 구한다. 다음 L 루프(165)의 RIQ·안정도 함수는 `RIQ=-GP*HP(L)*DML(L,K)*DML(L,K)*DZIG(K)` (166); `&    *(B(L,K+1)-B(L,K))*QQI(L)` (167); `RIQ=MAX(RIQ,RIQMIN)` (168); `TMPVAL1=1.-( 6.*ATURB1/CTURBB1(L,K) )` (169); `SBTOP=ATURB2*TMPVAL1` (170); `SBBOT=3.*ATURB2*( 6.*ATURB1+CTURBB2(L,K) )` (171); `SVTOP=ATURB1*( TMPVAL1-3.*TURBC1)` (172); `TMPVAL2=TMPVAL1*( CTURBB2(L,K)-3.*ATURB2 )` (173); `TMPVAL3=-3.*TURBC1*( CTURBB2(L,K)+6.*ATURB1)` (174); `SVTOP2=3.*ATURB2*(TMPVAL2+TMPVAL3)/SVTOP` (175); `SVBOT=9.*ATURB1*ATURB2` (176); `SFAV=SVTOP*(1.+SVTOP2*RIQ)/((1.+SVBOT*RIQ)*(1.+SBBOT*RIQ))` (177); `SFAB=SBTOP/(1.+SBBOT*RIQ)` (178). 임시 AB·AV 및 극값은 `ABTMP=AVCON*SFAB*DML(L,K)*HP(L)*SQRT(QQ(L,K))+RAVBTMP*ABO` (179); `AVTMP=AVCON*SFAV*DML(L,K)*HP(L)*SQRT(QQ(L,K))+RAVBTMP*AVO` (180); `AVMAX=MAX(AVMAX,AVTMP)` (181); `ABMAX=MAX(ABMAX,ABTMP)` (182); `AVMIN=MIN(AVMIN,AVTMP)` (183); `ABMIN=MIN(ABMIN,ABTMP)` (184). 이전 값과 기하평균(geometric average)은 `AV(L,K)=SQRT(AV(L,K)*AVTMP*HPI(L))` (185); `AB(L,K)=SCB(L)*SQRT(AB(L,K)*ABTMP*HPI(L))` (186). 세 루프와 분기를 닫는다(187–191). |
+| 192–224 | 시작 시 6행 CALAVB2 루틴 안. 192행 ENDIF 및 194–221행 ISTL=2·ND/K/L 루프·대체 안정도 함수·기하평균 계산 전체는 주석 처리되어 실행되지 않는다. 구분 주석을 포함한다(223–224). |
+| 225–247 | 시작 시 6행 CALAVB2 루틴 안. `IF(ISAVBMN.GE.1)THEN` (225)에서 K=1..KS·L=2..LA(226–227)의 최소값 적용은 `AVTMP=AVMN*HPI(L)` (228); `ABTMP=ABMN*HPI(L)` (229); `AV(L,K)=MAX(AV(L,K),AVTMP)` (230); `AB(L,K)=MAX(AB(L,K),ABTMP)` (231). 분기 밖 K=1..KS·L=2..LA(238–239), LS=LSC(L)(240)로 남쪽 이웃을 얻는다. 면 점성 역수는 `AVUI(L,K)=2./(AV(L,K)+AV(L-1,K))` (241); `AVVI(L,K)=2./(AV(L,K)+AV(LS,K))` (242). 두 루프를 닫고 구분 주석을 둔다(243–247). |
+| 248–263 | 시작 시 6행 CALAVB2 루틴 안. `IF(ISTL.EQ.3)THEN` (248)이면 K=2..KS·L=2..LA(250–251)의 난류 확산계수(turbulence diffusivity)는 `AQ(L,K)=0.205*(AV(L,K-1)+AV(L,K))` (253). L=2..LA(257)의 경계식은 `AQ(L,1)=0.205*AV(L,1)` (260); `AQ(L,KC)=0.205*AV(L,KS)` (261). 252·258–259행 0.255 계수식은 주석이다. |
+| 264–291 | 시작 시 6행 CALAVB2 루틴·248행 ISTL 참 분기 안. `ELSE` (264)에서 K=2..KS·L=2..LA(266–267)의 임시 확산계수는 `AQTMP=0.205*(AV(L,K-1)+AV(L,K))` (269). AQ=AQTMP를 복사한다(271). L=2..LA(275)의 경계 임시값은 `AQTMP=0.205*AV(L,1)` (277); `AQTMP=0.205*AV(L,KS)` (281). AQ(L,1)·AQ(L,KC)에 AQTMP를 각각 복사한다(279·283). 268·270·276·278·280·282행의 대체 계수 및 기하평균은 주석이다. 분기를 닫고 RETURN·END로 종료한다(286–291). 실행 CALL 문은 없다. |
+
+## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
+
+- 50–51·96·132·168: 이 파일에는 실행 RIQMIN 대입이 없다. 실행식은 RIQ를 RIQMIN으로 제한한다. 공통 포함 파일에서의 설정은 이 판독에 포함하지 않았다.
+- 65–79·86–191·225–244: 실행 계산 루프에는 LMASKDRY·IMASKDRY 검사가 없다.
+- 68·91·127·163: QQ(L,K)는 분모에 직접 사용된다. 이 파일에는 QQI에 QQMIN 기반 상한을 적용하는 실행문이 없다.
+- 11·84·120·156: 기하평균 설명 주석은 ISGA를 적지만 실행 평균 선택은 ISFAVB를 사용한다. N=1에 대한 별도 조건은 이 파일의 세 평균 선택 조건에 없다.
+- 72·75·103·139·175: CTURBB1 분모에는 BFUN+1.E-16이 사용된다. SVTOP을 분모로 사용하는 계산에는 같은 가산항이 없다.
+- 149–150·185–186: AB의 평균 결과에는 SCB(L)를 곱한다. AV의 평균 결과에는 SCB(L)를 곱하지 않는다.
+- 248–286: ISTL=3 경로는 AQ에 0.205 식을 직접 대입한다. ELSE 경로도 같은 식의 AQTMP를 복사한다. AQ 기하평균은 주석 처리되어 있다.
+- 30·48–49: ATURB1·ATURB2·TURBC1은 DATA에서 0.92·0.74·0.08로 고정한다. AVMIN·ABMIN 초기값은 10.이다.
