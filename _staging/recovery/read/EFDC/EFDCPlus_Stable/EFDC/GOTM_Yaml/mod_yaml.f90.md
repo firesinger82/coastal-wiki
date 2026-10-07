@@ -1,0 +1,30 @@
+---
+file: models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/GOTM_Yaml/mod_yaml.f90
+lines: 322
+sha256: 93be2d11dc0af2f46d865d50b76212dcfb9d9782d0e8ea4e7a40f142488f25df
+reader: codex gpt-6.1-sol
+read_date: 2026-10-07
+---
+
+# mod_yaml.f90 — 판독 구간 기록
+
+구간은 1행부터 322행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–45 | Fortran-YAML 파서(parser) 소개·저장소·저작권·GNU GPL·무보증 주석(1–15). yaml 모듈은 yaml_types를 사용하고 implicit none·기본 private·공개 parse/error_length를 지정한다(17–24). 원문 상수는 `integer,parameter :: line_length  = 2048` (26), `integer,parameter :: error_length = 2048` (27)이다. type_file의 기본값은 `integer                 :: unit   = -1` (30), line='', indent=0, eof=.false., iline=0, error_message='', has_error=.false.이다(31–36). `#ifdef USE_YAML` (37) 아래 형식 결합 루틴(type-bound procedure) next_line·set_error를 선언한다(38–41). 형식·contains·빈 줄까지 포함한다(42–45). |
+| 46–88 | parse(path,unit,error)는 다형 노드(polymorphic node) 포인터 root와 type_file을 선언하고 root를 null, error를 빈 문자열로 설정한다(46–55). `#ifdef USE_YAML` (56) 안에서 inquire 후 `if( .not.already_open) open(unit = unit,file = path,status = 'old',action = 'read',err = 90)` (58), file%next_line 호출(61), `if( .not.file%has_error) root => read_value(file)` (62), `if( .not.already_open) close(file%unit)` (63)을 실행한다. `if( file%has_error )then` (64)이면 경로·행·오류문을 쓴다(65). `elseif( .not.file%eof )then` (66) 아래 `if( associated(root) )then` (67)·`select type (root)` (68)는 dictionary/scalar/default에 따라 예상하지 않은 들여쓰기 감소 또는 파일 끝 오류를 쓴다(69–76). 그 associated 조건의 `else` (77)도 파일 끝 오류를 쓴다(78). `if( associated(root)) call root%set_path('')` (82), 전처리 종료·return(83–84). 파일 열기 실패의 90 레이블은 error 문자열을 설정한다(86). 함수 종료·빈 줄(87–88). |
+| 89–137 | `#ifdef USE_YAML` (89) 아래 next_line(file)을 시작한다(90). done=.false. 뒤 `do while (.not.done)` (96)에서 고정 길이 line을 읽는다(98). `file%iline = file%iline + 1` (99), `file%indent = len(file%line)` (102), 문자 루프(103)의 `if( file%line(i:i)==achar(9) )then` (104)이면 들여쓰기 탭 오류를 set_error로 기록하고 반환한다(106–107). 병렬 `elseif( file%line(i:i)/=' ' )then` (108)이면 `file%indent = i-1` (110)과 exit이다(111). `file%line = file%line(file%indent+1:)` (114), `if( file%line(1:1)=='#') cycle` (117)로 앞 공백·전체 주석을 제거한다. 문자 루프(120)의 `if( is_whitespace(file%line(i:i)).and.file%line(i+1:i+1)=='#' )then` (121)이면 `file%line = file%line(:i-1)` (122)로 공백 뒤 주석을 제거한다. 역순 문자 루프(128)의 `if( .not.is_whitespace(file%line(i:i)) )then` (129)이면 `file%line = file%line(:i)` (131), done=.true.·exit으로 유효 행을 확정한다(132–133). 바깥 루프 종료·빈 줄(136–137). |
+| 138–155 | 시작 시 90행 next_line 안이며 done 루프 밖. 문자 루프(139)의 `if( file%line(i:i)=='['.or.file%line(i:i)==']'.or.file%line(i:i)=='{'.or.file%line(i:i)=='}' )then` (140)이면 흐름형 매핑/시퀀스(flow mapping/sequence) 미지원 오류를 set_error로 기록하고 반환한다(141–142). 별도 `if( file%line(i:i)=='"'.or.file%line(i:i)=='''' )then` (144)이면 작은/큰따옴표 문자열 미지원 오류와 반환이다(145–146). 정상 return(150), 파일 끝의 91 레이블에서 indent=0·eof=.true.를 설정하고 루틴을 끝낸다(152–154). 빈 줄(155)도 포함한다. |
+| 156–190 | recursive read_value(file)는 노드 포인터·콜론 위치·최초 들여쓰기·키/값 쌍·목록 항목을 선언한다(156–162). node를 null로 하고 `if( file%eof) return` (165)한다. `if( file%line(1:2)=='- ' )then` (167)이면 type_list를 할당하고 최초 들여쓰기를 보존한다(168–169). 무조건 do(170)에서 `file%line = file%line(3:)` (171), `file%indent = file%indent + 2` (172), 재귀 read_value 호출(173), `if( file%has_error) return` (174)이다. select type의 type_list에서 append를 호출한다(175–178). `if( file%indent>firstindent )then` (181)이면 들여쓰기 증가 오류·반환(182–183)이다. `elseif( file%eof .or. file%indent<firstindent .or. file%line(1:2)/='- ' )then` (184)이면 목록 종료로 반환한다(186). 루프·목록 조건·빈 줄까지 포함한다(188–190). |
+| 191–232 | 시작 시 156행 read_value 안이며 목록 조건 밖. find_mapping_character를 호출한다(192). `if( icolon==-1 )then` (194)이면 scalar를 할당하고 select type 안의 `node%string = trim(file%line)` (199), next_line 호출(201)이다. `else` (202)는 dictionary 할당·최초 들여쓰기 보존·do(204–206)로 들어간다. read_key_value_pair 호출(207), `if( file%has_error) return` (208), select type에서 node%set 호출(211)이다. `if( file%indent>firstindent )then` (215)이면 키/값 뒤 들여쓰기 증가 오류·반환(216–217), `elseif( file%eof .or. file%indent<firstindent )then` (218)이면 exit이다(220). 같은 do 안의 find_mapping_character 재호출(224) 뒤 `if( icolon==-1 )then` (225)이면 키 지시자 부재 오류·반환이다(226–227). 루프·콜론 분기·함수를 끝낸다(229–231). |
+| 233–264 | recursive read_key_value_pair(file,icolon,icolon_stop)는 키/값 쌍과 기준 들여쓰기를 선언한다(233–238). `istop = len_trim(file%line)` (240), `pair%key = file%line(:icolon-1)` (242)이다. `if( icolon_stop==istop )then` (243)이면 기준 들여쓰기를 보존하고 next_line 호출(245–246), `if( file%has_error) return` (247)한다. `if( file%eof .or. file%indent<baseindent .or. (file%indent==baseindent .and. file%line(1:2)/='- ') )then` (248)이면 type_null을 할당한다(252). 이 조건의 `else` (253)는 재귀 read_value로 다음 행 값을 읽는다(255). 바깥 `else` (257)는 `file%line = file%line(icolon_stop+1:)` (259), `file%indent = file%indent + icolon_stop` (260) 후 같은 행 값을 재귀 판독한다(261). 분기·함수 종료·빈 줄(262–264). |
+| 265–307 | find_mapping_character는 string과 시작/끝 위치를 받고 위치를 -1로 초기화한다(265–272). `length = len_trim(string)` (275), `do i = 1,length-1` (276)·`if( string(i:i+1)==': ' )then` (277)이면 istart=i·exit이다(279–280). 조건 원문은 `if( istart==-1 .and. string(length:length)==':') istart = length` (285), `if( istart==-1) return` (288)이다. istop=istart 뒤 `do i = istart+1,length` (292)·`if( .not.is_whitespace(string(i:i)) )then` (293)이면 `istop = i-1` (294)과 exit으로 뒤 공백을 제외한다. `do i = istart-1,1,-1` (300)·`if( .not.is_whitespace(string(i:i)) )then` (301)이면 `istart = i+1` (302)과 exit으로 앞 공백을 제외한다. 루틴 종료·빈 줄(306–307). |
+| 308–322 | is_whitespace(string)는 공백을 판정한다(308–312). 원문 식은 `is_whitespace = (string(1:1)==' '.or.string(1:1)==achar(9))` (311)이다. set_error는 오류 문자열을 복사하고 has_error=.true.를 설정한다(314–319). `#endif` (320)·빈 줄·yaml 모듈 종료(322)까지 포함한다. |
+
+## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
+
+- 26–27·98: 입력 행과 오류 문자열 길이는 각각 2048로 고정되어 있다. next_line의 read에는 입력 행 길이 초과를 확인하는 별도 분기가 없다.
+- 54–56·83–87: USE_YAML 전처리 조건이 빠지면 parse는 root를 null로 하고 error를 빈 문자열로 설정한 뒤 반환한다. 해당 경로에는 미지원 안내 문자열 설정이 없다.
+- 64–82: parse의 오류 문자열 설정 뒤에도 root가 연결되어 있으면 set_path를 호출한다. 오류 경로에서 root를 해제하거나 null로 돌리는 문장은 없다.
+- 104–108·121·140–146: 들여쓰기 탭은 오류로 처리한다. 주석 제거는 공백/탭 뒤 #을 기준으로 한다. 대괄호·중괄호·작은따옴표·큰따옴표가 남은 행은 미지원 오류로 처리한다.
