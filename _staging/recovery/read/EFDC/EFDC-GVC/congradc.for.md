@@ -1,0 +1,33 @@
+---
+file: models/EFDC/raw/source_code/EFDC-GVC/congradc.for
+lines: 281
+sha256: d74bf933070743cc3565ff1aa4704e8f5e306ad89f1dab0a3036e3905533a564
+reader: codex gpt-6.1-sol
+read_date: 2026-10-07
+---
+
+# congradc.for — 판독 구간 기록
+
+구간은 1행부터 281행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–33 | 구분 주석과 `SUBROUTINE CONGRADC (ISTL)` 입구(6). 외부 모드(external mode)를 공액기울기법(conjugate gradient scheme)으로 푼다는 설명은 CONGRAD라는 이름을 쓴다(19–20). 버전·수정일·변경 기록, `EFDC.PAR`·`EFDC.CMN` 포함(8–25). PNORTH·PSOUTH·TMPCG는 LCM 크기(27). CG 계수·작업 배열 선언은 주석 처리(29–30). |
+| 34–79 | 시작 시 6행 CONGRADC 루틴 안. ISTL=2의 CCC 계열 및 ELSE의 CC 계열에서 역대각 CIT와 CGS·CGW·CGE·CGN을 만드는 첫 블록은 주석 처리(34–50). 두 번째 ISTL 조건은 계수를 직접 복사하는 비활성 블록이다(53–69). PAM으로 FPTMP를 만드는 71–76행도 주석 처리이다. 주석 처리된 조건·계산식을 원문으로 인용한다. 원문: `C     IF(ISTL.EQ.2)THEN` (34); `C      DO L=2,LA` (35); `C      CIT=1./CCC(L)` (36); `C      CGS(L)=CIT*CCS(L)` (37); `C      CGW(L)=CIT*CCW(L)` (38); `C      CGE(L)=CIT*CCE(L)` (39); `C      CGN(L)=CIT*CCN(L)` (40); `C      DO L=2,LA` (43); `C      CIT=1./CC(L)` (44); `C      CGS(L)=CIT*CS(L)` (45); `C      CGW(L)=CIT*CW(L)` (46); `C      CGE(L)=CIT*CE(L)` (47); `C      CGN(L)=CIT*CN(L)` (48); `C     IF(ISTL.EQ.2)THEN` (53); `C      DO L=2,LA` (54); `C      DO L=2,LA` (62); `C     DO L=2,LA` (71); `C     FPTMP(L)=FP(L)-CG(L)*PAM(L)-CGS(L)*PAM(LS)-CGW(L)*PAM(L-1)` (74); `C    &        -CGE(L)*PAM(L+1)-CGN(L)*PAM(LN)` (75). |
+| 80–101 | 시작 시 6행 CONGRADC 루틴 안. ISCRAY=0이면 SECNDS, ELSE(82)는 SECOND 및 `CALL TIMEF(WT1TMP)`로 시작 시각을 구한다(80–85). L=2..LA의 P 북·남 이웃을 PNORTH·PSOUTH에 복사한다(87–90). 초기 잔차(residual) RCG는 FPTMP에서 계수 CCC·CCN·CCS·CCW·CCE와 P의 곱을 뺀 값이다(98–100). 같은 계산의 RSD·RCG 대체문은 주석 처리(93–97). 원문: `IF(ISCRAY.EQ.0)THEN` (80); `DO L=2,LA` (87); `PNORTH(L)=P(LNC(L))` (88); `PSOUTH(L)=P(LSC(L))` (89); `DO L=2,LA` (92); `C       RSD=CCC(L)*P(L)+CCS(L)*PSOUTH(L)+CCW(L)*P(L-1)+CCE(L)*P(L+1)` (95); `C    &        +CCN(L)*PNORTH(L)-FPTMP(L)` (96); `C       RCG(L)=-RSD` (97); `RCG(L)=FPTMP(L)-CCC(L)*P(L)-CCN(L)*PNORTH(L)-CCS(L)*PSOUTH(L)` (98); `&        -CCW(L)*P(L-1)-CCE(L)*P(L+1)` (99). |
+| 102–132 | 시작 시 6행 CONGRADC 루틴 안. MDCHH>=1이면 NMD=1..MDCHH의 호스트 LHOST 및 채널(channel) LCHNU·LCHNV를 받는다(102–106). MDCHTYP=1은 U와 호스트의 RCG에 CCCCHH×상대 P를 더하고, MDCHTYP=2는 V와 호스트에 더한다(108–116). L=2..LA에서 대각 전처리(diagonal preconditioning) PCG=RCG×CCCI를 만들고 RPCG=ΣRCG×PCG를 계산한다(120–127). ITER=0(129). 원문: `IF(MDCHH.GE.1)THEN` (102); `DO NMD=1,MDCHH` (103); `IF(MDCHTYP(NMD).EQ.1)THEN` (108); `RCG(LCHNU)=RCG(LCHNU)+CCCCHH(NMD)*P(LHOST)` (109); `RCG(LHOST)=RCG(LHOST)+CCCCHH(NMD)*P(LCHNU)` (110); `IF(MDCHTYP(NMD).EQ.2)THEN` (113); `RCG(LCHNV)=RCG(LCHNV)+CCCCHH(NMD)*P(LHOST)` (114); `RCG(LHOST)=RCG(LHOST)+CCCCHH(NMD)*P(LCHNV)` (115); `DO L=2,LA` (120); `PCG(L)=RCG(L)*CCCI(L)` (121); `DO L=2,LA` (125); `RPCG=RPCG+RCG(L)*PCG(L)` (126). |
+| 133–164 | 시작 시 6행 CONGRADC 루틴 안. 100번 표지에서 ITER를 증가시키고 PCG 북·남 이웃을 복사한다(133–140). 계수 행렬(matrix)과 PCG의 곱 APCG를 계산한다(142–145). MDCHH>=1에서 MDCHTYP=1의 U·호스트 또는 MDCHTYP=2의 V·호스트 APCG에 CCCCHH×상대 PCG를 더한다(147–163). 원문: `ITER=ITER+1` (135); `DO L=2,LA` (137); `PNORTH(L)=PCG(LNC(L))` (138); `PSOUTH(L)=PCG(LSC(L))` (139); `DO L=2,LA` (142); `APCG(L)=CCC(L)*PCG(L)+CCS(L)*PSOUTH(L)+CCN(L)*PNORTH(L)` (143); `&       +CCW(L)*PCG(L-1)+CCE(L)*PCG(L+1)` (144); `IF(MDCHH.GE.1)THEN` (147); `DO NMD=1,MDCHH` (148); `IF(MDCHTYP(NMD).EQ.1)THEN` (153); `APCG(LCHNU)=APCG(LCHNU)+CCCCHH(NMD)*PCG(LHOST)` (154); `APCG(LHOST)=APCG(LHOST)+CCCCHH(NMD)*PCG(LCHNU)` (155); `IF(MDCHTYP(NMD).EQ.2)THEN` (158); `APCG(LCHNV)=APCG(LCHNV)+CCCCHH(NMD)*PCG(LHOST)` (159); `APCG(LHOST)=APCG(LHOST)+CCCCHH(NMD)*PCG(LCHNV)` (160). |
+| 165–180 | 시작 시 6행 CONGRADC 루틴 안. PAPCG=0에서 L=2..LA의 APCG×PCG를 누적한다(165–171). 같은 위치의 RPCG 초기화·재계산은 COLD 주석이다(166·170). ALPHA=RPCG/PAPCG 뒤 P+=ALPHA×PCG로 갱신한다(173–177). 원문: `DO L=2,LA` (168); `PAPCG=PAPCG+APCG(L)*PCG(L)` (169); `COLD     RPCG=RPCG+RCG(L)*PCG(L)` (170); `ALPHA=RPCG/PAPCG` (173); `DO L=2,LA` (175); `P(L)=P(L)+ALPHA*PCG(L)` (176). |
+| 181–205 | 시작 시 6행 CONGRADC 루틴 안. RCG-=ALPHA×APCG와 TMPCG=CCCI×RCG를 계산한다(181–187). RPCGN=ΣRCG×TMPCG·RSQ=ΣRCG²(189–194). RSQ<=RSQM이면 200번 표지로 이동한다(196). 수렴하지 않고 ITER>=ITERM이면 오류를 출력하고 L=2..LA의 IL·JL·계수 다섯 개·FPTMP를 WRITE(8,800)으로 기록한 뒤 STOP한다(198–205). 원문: `DO L=2,LA` (181); `RCG(L)=RCG(L)-ALPHA*APCG(L)` (182); `DO L=2,LA` (185); `TMPCG(L)=CCCI(L)*RCG(L)` (186); `DO L=2,LA` (191); `RPCGN=RPCGN+RCG(L)*TMPCG(L)` (192); `RSQ=RSQ+RCG(L)*RCG(L)` (193); `IF(RSQ .LE. RSQM) GOTO 200` (196); `IF(ITER .GE. ITERM)THEN` (198); `DO L=2,LA` (200). |
+| 206–227 | 시작 시 6행 CONGRADC 루틴 안. 과거 BETA=-ΣRCG×APCG/PAPCG 방식은 COLD 주석 처리(207–213). 실행 경로는 BETA=RPCGN/RPCG, RPCG=RPCGN이다(214–215). 과거 PCG=RCG+BETA×PCG는 COLD 주석(218). 현재 PCG=TMPCG+BETA×PCG를 L=2..LA에서 갱신하고 GOTO 100으로 반복한다(217–222). 오류 FORMAT(224). 원문: `COLD     BETA=0.` (207); `COLD     DO L=2,LA` (209); `COLD     BETA=BETA+RCG(L)*APCG(L)` (210); `COLD     BETA=-BETA/PAPCG` (213); `BETA=RPCGN/RPCG` (214); `DO L=2,LA` (217); `COLD     PCG(L)=RCG(L)+BETA*PCG(L)` (218); `PCG(L)=TMPCG(L)+BETA*PCG(L)` (219). |
+| 228–261 | 시작 시 6행 CONGRADC 루틴 안. 200번 표지에서 최종 P 북·남 이웃을 복사한다(230–235). RSQ=0으로 시작하여 계수 행렬×P-FPTMP를 RCG에 계산한다(237–242). MDCHH>=1의 채널 보정은 MDCHTYP=1에서 U·호스트, MDCHTYP=2에서 V·호스트 RCG에 CCCCHH×상대 P를 뺀다(244–260). 원문: `DO L=2,LA` (232); `PNORTH(L)=P(LNC(L))` (233); `PSOUTH(L)=P(LSC(L))` (234); `DO L=2,LA` (239); `RCG(L)=CCC(L)*P(L)+CCS(L)*PSOUTH(L)+CCN(L)*PNORTH(L)` (240); `&        +CCW(L)*P(L-1)+CCE(L)*P(L+1)-FPTMP(L)` (241); `IF(MDCHH.GE.1)THEN` (244); `DO NMD=1,MDCHH` (245); `IF(MDCHTYP(NMD).EQ.1)THEN` (250); `RCG(LCHNU)=RCG(LCHNU)-CCCCHH(NMD)*P(LHOST)` (251); `RCG(LHOST)=RCG(LHOST)-CCCCHH(NMD)*P(LCHNU)` (252); `IF(MDCHTYP(NMD).EQ.2)THEN` (255); `RCG(LCHNV)=RCG(LCHNV)-CCCCHH(NMD)*P(LHOST)` (256); `RCG(LHOST)=RCG(LHOST)-CCCCHH(NMD)*P(LCHNV)` (257). |
+| 262–281 | 시작 시 6행 CONGRADC 루틴 안. L=2..LA에서 RCG에 CCCI를 곱하고 그 제곱합을 RSQ에 누적한다(262–267). ISCRAY=0이면 SECNDS 경과 시간을 TCONG에 더한다(269–270). ELSE(271)는 SECOND 및 `CALL TIMEF(WT2TMP)`로 TCONG·WTCONG를 갱신한다(272–275). FORMAT 800·RETURN·END(278–281). 원문: `DO L=2,LA` (262); `RCG(L)=RCG(L)*CCCI(L)` (263); `DO L=2,LA` (265); `RSQ=RSQ+RCG(L)*RCG(L)` (266); `IF(ISCRAY.EQ.0)THEN` (269); `TCONG=TCONG+SECNDS(TTMP)` (270); `TCONG=TCONG+T2TMP-T1TMP` (274); `WTCONG=WTCONG+(WT2TMP-WT1TMP)*0.001` (275). |
+
+## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
+
+- 6·19: 루틴 선언 이름은 CONGRADC이다. 목적 설명 주석의 이름은 CONGRAD이다.
+- 34·53·6: ISTL을 검사하는 두 조건은 주석 처리이다. ISTL은 실행문에서 참조하지 않는다.
+- 109–115·154–160·251–257: 초기 RCG의 채널 항은 더하기이다. APCG의 채널 항도 더하기이다. 최종 RCG 재계산의 채널 항은 빼기이다.
+- 108·113·153·158·250·255: 실행 채널 조건은 MDCHTYP=1과 2만 있다. MDCHTYP=3에 대한 조건이나 ELSE는 없다.
+- 129–135·173·196·214: 첫 반복 전 초기 잔차 수렴 검사는 없다. ALPHA·BETA의 분모 PAPCG·RPCG에 대한 0 여부 검사는 없다.
+- 193–196·240–266: 반복 종료 판단의 RSQ는 전처리하지 않은 RCG² 합이다. 종료 뒤 RSQ는 채널 항을 뺀 재계산 RCG에 CCCI를 곱한 값의 제곱합이다.
