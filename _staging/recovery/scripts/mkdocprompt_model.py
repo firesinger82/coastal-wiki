@@ -3,7 +3,7 @@ import json,sys,datetime,os
 M,BF,N=sys.argv[1],sys.argv[2],int(sys.argv[3])
 D=datetime.date.today().isoformat()
 b=json.load(open(BF))[N-1]
-out=lambda p:'_staging/recovery/read/'+M+'/'+p.split('/raw/')[1]+'.md'
+out=lambda p:'_staging/recovery/read/'+M+'/'+p.split('/raw/')[1].removeprefix('source_code/')+'.md'  # code records also drop source_code/
 files='\n'.join(f'- {p}' for p in b); outs='\n'.join(f'- {out(p)}' for p in b)
 print(f"""OBJECTIVE
 아래 {M} 문서 파일을 각각 1행부터 마지막 행까지 직접 읽고, 파일마다 판독 구간 기록 1개를 작성한다.

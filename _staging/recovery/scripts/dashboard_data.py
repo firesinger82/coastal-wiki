@@ -22,17 +22,29 @@ def lines_of(path):
     d = open(path, 'rb').read()
     return d.count(b'\n') + (1 if d and not d.endswith(b'\n') else 0)
 
+CODE_DIR = re.compile(r'/(src|source)/')
+
+def all_records():
+    for r in sorted(glob.glob(f'{ROOT}/read/*/**/*.md', recursive=True)):
+        if '.pdf/' in r or 'office-compare' in r:
+            continue
+        t = open(r).read()
+        m = re.search(r'^file: (.+)$', t, re.M)
+        if not m:
+            continue
+        yield r.split('/read/')[1].split('/')[0], m.group(1).strip(), t
+
 def code_records():
     recs = []
-    for r in sorted(glob.glob(f'{ROOT}/read/XBeach/trunk/src/**/*.md', recursive=True)):
-        t = open(r).read()
-        src = re.search(r'^file: (.+)$', t, re.M).group(1).strip()
+    for model, src, t in all_records():
+        if not CODE_DIR.search(src):
+            continue
         n = lines_of(src)
         rngs = [(int(a), int(b)) for a, b in re.findall(r'^\|\s*(\d+)\s*[–-]\s*(\d+)\s*\|', t, re.M)]
         cont = n == 0 or (rngs and rngs[0][0] == 1 and rngs[-1][1] == n and
                           all(rngs[i + 1][0] == rngs[i][1] + 1 for i in range(len(rngs) - 1)))
         sha = hashlib.sha256(open(src, 'rb').read()).hexdigest() in t
-        recs.append({'file': src.split('source_code/')[-1], 'lines': n, 'ranges': len(rngs),
+        recs.append({'model': model, 'file': src.split('source_code/')[-1], 'lines': n, 'ranges': len(rngs),
                      'covered': bool(cont), 'sha': sha,
                      'quotes': len(re.findall(r'`[^`\n]{6,}`\s*\(\d+', t)) + len(re.findall(r'\(\d+\)\s*`[^`\n]{6,}`', t)),
                      'fixes': len(re.findall(r'검증 (정정|보완)', t)),
@@ -41,15 +53,10 @@ def code_records():
 
 def text_doc_records():
     recs = []
-    for r in sorted(glob.glob(f'{ROOT}/read/XBeach/**/*.md', recursive=True)):
-        if '/trunk/src/' in r or '.pdf/' in r or 'office-compare' in r:
+    for model, src, t in all_records():
+        if CODE_DIR.search(src):
             continue
-        t = open(r).read()
-        m = re.search(r'^file: (.+)$', t, re.M)
-        if not m:
-            continue
-        src = m.group(1).strip()
-        recs.append({'file': src.split('/raw/')[-1].split('/XBeach/')[-1], 'lines': lines_of(src),
+        recs.append({'model': model, 'file': src.split('/raw/')[-1].split('/' + model + '/')[-1], 'lines': lines_of(src),
                      'ranges': len(re.findall(r'^\|\s*\d+\s*[–-]\s*\d+\s*\|', t, re.M)),
                      'fixes': len(re.findall(r'검증 (정정|보완)', t))})
     return recs

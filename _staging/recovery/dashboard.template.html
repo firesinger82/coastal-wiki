@@ -90,7 +90,7 @@ footer { font-size: .8rem; color: var(--muted) }
   </section>
 
   <section>
-    <h2>XBeach 자체 코드 — 파일별 판독 기록</h2>
+    <h2>자체 코드 — 파일별 판독 기록</h2>
     <div class="controls">
       <input type="search" id="q" placeholder="파일 이름으로 찾기 (예: vegetation)" aria-label="파일 이름으로 찾기">
       <span class="note" id="qcount"></span>
@@ -99,7 +99,7 @@ footer { font-size: .8rem; color: var(--muted) }
   </section>
 
   <section>
-    <h2>XBeach 텍스트 문서</h2>
+    <h2>텍스트 문서</h2>
     <div class="panel scroll"><table id="docs"></table></div>
   </section>
 
@@ -121,12 +121,13 @@ const pages = pdfs.flatMap(p => p.pages);
 const reread = pages.filter(p => p.s.startsWith('reread')).length;
 const fixesCode = code.reduce((a, c) => a + c.fixes, 0);
 const fixedPages = pages.filter(p => p.s === 'reread_fixed' || p.s === 'checked_fixed').length;
-const otherModels = D.models.filter(m => m.model !== 'XBeach').length;
+const rereadModels = [...new Set(code.map(c => c.model))];
+const otherModels = D.models.filter(m => !rereadModels.includes(m.model)).length;
 $('#strip').innerHTML = [
-  ['XBeach 자체 코드', `${codeOk}/${code.length}`, `파일 · ${fmt(codeLines)}행 · 1행~끝 구간과 해시 일치`],
-  ['XBeach PDF 재판독', `${reread}/${pages.length}`, `쪽 · 나머지는 1차 판독만`],
+  ['자체 코드 재판독', `${codeOk}/${code.length}`, `파일 · ${fmt(codeLines)}행 · ${rereadModels.join('·')} · 1행~끝 구간과 해시 일치`],
+  ['XBeach PDF 재판독', `${reread}/${pages.length}`, (reread === pages.length ? `쪽 · 전 쪽 재판독` : `쪽 · 나머지는 1차 판독만`)],
   ['정정한 곳', `${fixesCode + fixedPages}`, `코드 기록 ${fixesCode}건 · PDF ${fixedPages}쪽`],
-  ['다른 모델', `0/${otherModels}`, `재판독 시작 전 · 옛 기록만 있음`],
+  ['재판독 전 모델', `${otherModels}`, `옛 기록만 있음`],
 ].map(([k, v, n]) => `<div class="tile"><span class="k">${k}</span><span class="v">${v}</span><span class="n">${n}</span></div>`).join('');
 
 const sum = o => Object.values(o || {}).reduce((a, b) => a + b, 0);
@@ -135,9 +136,11 @@ $('#models').innerHTML = `<thead><tr><th>모델</th><th class="r">원자료 파�
     const own = m.cats['자체코드'] || {}, man = m.cats['매뉴얼·문서'] || {};
     const ownN = sum(own), manN = sum(man);
     let ownS, manS;
-    if (m.model === 'XBeach') {
-      ownS = `<span class="pill p-ok">재판독 ${codeOk}/${code.length}</span>`;
-      manS = `<span class="pill p-fix">PDF 재판독 ${reread}/${pages.length}쪽</span>`;
+    if (rereadModels.includes(m.model)) {
+      const mc = code.filter(c => c.model === m.model), mok = mc.filter(c => c.covered && c.sha).length;
+      const md = D.textdocs.filter(t => t.model === m.model).length;
+      ownS = `<span class="pill p-ok">재판독 ${mok}/${mc.length}</span>`;
+      manS = m.model === 'XBeach' ? `<span class="pill p-fix">PDF 재판독 ${reread}/${pages.length}쪽 · 문서 ${md}</span>` : `<span class="pill p-ok">문서 재판독 ${md}</span>`;
     } else {
       const rec = (own['LLM판독'] || 0) + (own['부분판독'] || 0);
       ownS = rec ? `<span class="pill p-old">옛 기록 ${fmt(rec)}/${fmt(ownN)}</span>` : `<span class="pill p-miss">기록 없음</span>`;
@@ -157,14 +160,14 @@ $('#pdfs').innerHTML = pdfs.map(d => {
 
 const maxL = Math.max(...code.map(c => c.lines));
 function drawCode(q) {
-  const rows = code.filter(c => !q || c.file.toLowerCase().includes(q));
+  const rows = code.filter(c => !q || (c.model + ' ' + c.file).toLowerCase().includes(q));
   $('#qcount').textContent = `${rows.length}개 파일`;
   $('#code').innerHTML = `<thead><tr><th>파일</th><th class="r">행</th><th></th><th class="r">구간</th><th class="r">원문 인용</th><th>1행~끝</th><th class="r">정정</th><th class="r">확인된 코드 사실</th></tr></thead><tbody>` +
-    rows.map(c => `<tr><td class="num">${esc(c.file.replace('trunk/src/', ''))}</td><td class="r num">${fmt(c.lines)}</td><td><div class="bar"><i style="width:${(100 * c.lines / maxL).toFixed(1)}%"></i></div></td><td class="r num">${c.ranges}</td><td class="r num">${fmt(c.quotes)}</td><td>${c.covered && c.sha ? '<span class="pill p-ok">확인</span>' : '<span class="pill p-miss">불일치</span>'}</td><td class="r num">${c.fixes || ''}</td><td class="r num">${c.facts || ''}</td></tr>`).join('') + '</tbody>';
+    rows.map(c => `<tr><td class="num">${esc(c.model)} · ${esc(c.file.replace('trunk/src/', '').replace('sfincs/source/', ''))}</td><td class="r num">${fmt(c.lines)}</td><td><div class="bar"><i style="width:${(100 * c.lines / maxL).toFixed(1)}%"></i></div></td><td class="r num">${c.ranges}</td><td class="r num">${fmt(c.quotes)}</td><td>${c.covered && c.sha ? '<span class="pill p-ok">확인</span>' : '<span class="pill p-miss">불일치</span>'}</td><td class="r num">${c.fixes || ''}</td><td class="r num">${c.facts || ''}</td></tr>`).join('') + '</tbody>';
 }
 drawCode('');
 $('#q').addEventListener('input', e => drawCode(e.target.value.trim().toLowerCase()));
 
 $('#docs').innerHTML = `<thead><tr><th>문서</th><th class="r">행</th><th class="r">구간</th><th class="r">정정</th></tr></thead><tbody>` +
-  D.textdocs.map(t => `<tr><td class="num">${esc(t.file)}</td><td class="r num">${fmt(t.lines)}</td><td class="r num">${t.ranges}</td><td class="r num">${t.fixes || ''}</td></tr>`).join('') + '</tbody>';
+  D.textdocs.map(t => `<tr><td class="num">${esc(t.model)} · ${esc(t.file)}</td><td class="r num">${fmt(t.lines)}</td><td class="r num">${t.ranges}</td><td class="r num">${t.fixes || ''}</td></tr>`).join('') + '</tbody>';
 </script>
