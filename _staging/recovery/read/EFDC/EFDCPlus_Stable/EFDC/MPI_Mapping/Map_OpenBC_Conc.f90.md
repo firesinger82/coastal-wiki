@@ -1,0 +1,42 @@
+---
+file: models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/MPI_Mapping/Map_OpenBC_Conc.f90
+lines: 516
+sha256: 8f4472d376099709cc53d10fd6a5fae6d20a5ef53f08ba7a9bf294b90a353155
+reader: codex gpt-6.1-sol
+read_date: 2026-10-07
+---
+
+# Map_OpenBC_Conc.f90 — 판독 구간 기록
+
+구간은 1행부터 516행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–30 | EFDC+ 출처·2021–2024 저작권·GPLv2 머리말(1–8). 개방경계(open boundary) 농도를 전역(global) 값에서 지역(local) 값으로 재매핑한다는 설명과 저자·날짜 주석(9–15). `Map_OpenBC_Conc` 시작(17). GLOBAL 및 MPI 변수·매핑·출력 모듈 사용(19–22). implicit none과 지역 정수·allocatable LLSave 선언(24–30). |
+| 31–42 | 시작 시 17행 Map_OpenBC_Conc 루틴 안. `NOPEN = NCBW+NCBE+NCBS+NCBN` (32)로 네 방향 경계 수를 합산한다. LLSave(NOPEN)를 할당하고 0으로 초기화한다(33–34). `WriteBreak(mpi_mapping_unit)` 호출과 전역 방향별 경계 수 로그(36–41). 빈 줄도 포함한다. |
+| 43–83 | 시작 시 17행 Map_OpenBC_Conc 루틴 안. 남쪽 전역 수를 NCBS_GL에 보존하고 NCBS·II를 0으로 초기화한다(43–45). `do LL = 1,NCBS_GL` (46)에서 IG2IL·JG2JL로 좌표를 얻는다(47–48). `if( III > 0 .and. III <= IC )then` (49), 그 안 `if( JJJ > 0 .and. JJJ <= JC )then` (50). 참이면 `II = II + 1` (51), LLSave에 원래 LL 저장(52), `NCBS = NCBS + 1` (54), 지역 좌표·NTSCRS·NCSERS의 1–7열 복사(55–65). `MMAX = 3 + NDYM + NTOX  ! New format (multiple dye classes)` (67), `do MS = 1,MMAX` (68)에서 CBS의 1·2층 값을 복사한다(69–70). `MMIN = MMAX + 1` (73), `MMAX = MMAX + NSED + NSND` (74), `do MS = MMIN,MMAX` (75)에서 나머지 CBS 값을 복사한다(76–77). 조건·루프 종료(78–82). |
+| 84–93 | 시작 시 17행 Map_OpenBC_Conc 루틴 안. SOUTH 로그 표 머리말(84–87). `do II = 1,NCBS` (88)에서 LLSave로 전역 LL을 되찾고 전역·지역 좌표, 압력 시계열 번호, 농도 2번 성분의 하부·상부 값과 농도 시계열 번호를 출력한다(89–91). 루프 종료와 빈 줄(92–93). |
+| 94–134 | 시작 시 17행 Map_OpenBC_Conc 루틴 안. 서쪽 수를 보존하고 NCBW·II를 0으로 초기화한다(94–96). `do LL  = 1,NCBW_GL` (97), 좌표 조회(98–99), `if( III .GT. 0 .and. III <= IC )then` (100), `if( JJJ .GT. 0 .and. JJJ <= JC )then` (101). 참이면 `II = II +1` (102), LLSave 저장(103), `NCBW = NCBW + 1` (105), 지역 좌표·NTSCRW·NCSERW의 1–7열 복사(106–116). `MMAX = 3 + NDYM + NTOX  ! New format (multiple dye classes)` (118), `do MS = 1,MMAX` (119)에서 CBW의 1·2층 복사(120–121). `MMIN = MMAX + 1` (124), `MMAX = MMAX+NSED+NSND` (125), `do MS = MMIN,MMAX` (126)에서 추가 성분 복사(127–128). 조건·루프 종료(129–133). |
+| 135–144 | 시작 시 17행 Map_OpenBC_Conc 루틴 안. WEST 로그 표 머리말(135–138). `do II = 1,NCBW` (139)에서 LLSave의 LL로 전역·지역 좌표, 압력 시계열 번호, 농도 2번 성분의 두 층 값과 시계열 번호를 출력한다(140–142). 루프 종료와 빈 줄(143–144). |
+| 145–186 | 시작 시 17행 Map_OpenBC_Conc 루틴 안. 동쪽 전역 수를 보존하고 NCBE·II를 0으로 초기화한다(145–148). `do LL  = 1,NCBE_GL` (149), 좌표 조회(150–151), `if( III .GT. 0 .and. III <= IC )then` (152), `if( JJJ .GT. 0 .and. JJJ <= JC )then` (153). 참이면 `II = II + 1` (154), LLSave 저장(155), `NCBE = NCBE + 1` (157), 지역 좌표·NTSCRE·NCSERE의 1–7열 복사(158–168). `MMAX = 3 + NDYM + NTOX  ! New format (multiple dye classes)` (170), `do MS = 1,MMAX` (171)에서 CBE의 두 층 복사(172–173). `MMIN = MMAX + 1` (176), `MMAX = MMAX+NSED+NSND` (177), `do MS = MMIN,MMAX` (178)에서 추가 성분 복사(179–180). 조건·루프 종료(181–185). |
+| 187–196 | 시작 시 17행 Map_OpenBC_Conc 루틴 안. EAST 로그 표 머리말(187–190). `do II = 1,NCBE` (191)에서 LLSave의 LL을 사용하여 전역·지역 좌표, 압력 시계열 번호, 농도 2번 성분의 두 층 값과 시계열 번호를 출력한다(192–194). 루프 종료와 빈 줄(195–196). |
+| 197–238 | 시작 시 17행 Map_OpenBC_Conc 루틴 안. 북쪽 전역 수를 보존하고 NCBN·II를 0으로 초기화한다(197–200). `do LL  = 1,NCBN_GL` (201), 좌표 조회(202–203), `if( III .GT. 0 .and. III <= IC )then` (204), `if( JJJ .GT. 0 .and. JJJ <= JC )then` (205). 참이면 `II = II +1` (206), LLSave 저장(207), `NCBN = NCBN + 1` (209), 지역 좌표·NTSCRN·NCSERN의 1–7열 복사(210–220). `MMAX = 3 + NDYM + NTOX  ! New format (multiple dye classes)` (222), `do MS = 1,MMAX` (223)에서 CBN의 두 층 복사(224–225). `MMIN = MMAX + 1` (228), `MMAX = MMAX+NSED+NSND` (229), `do MS = MMIN,MMAX` (230)에서 추가 성분 복사(231–232). 조건·루프 종료(233–237). |
+| 239–260 | 시작 시 17행 Map_OpenBC_Conc 루틴 안. NORTH 표 머리말(239–242). `do II = 1,NCBN` (243)에서 LLSave의 LL을 사용하여 같은 전역·지역 필드를 출력한다(244–246). `WriteBreak(mpi_mapping_unit)` 호출(249). 네 방향 지역 경계 수를 출력한다(251–255). return·루틴 종료·빈 줄(257–260). |
+| 261–287 | 수질(water quality) 경계의 지역 재매핑 설명과 날짜 주석(261–266). `Map_OpenBC_Eutrophication` 시작(268). GLOBAL·Variables_WQ·MPI 변수·매핑·출력 모듈 사용(270–275). implicit none·정수·LLSave 및 좌표 임시 배열 ITMP·JTMP 선언(277–286). 빈 줄 포함. |
+| 288–308 | 시작 시 268행 Map_OpenBC_Eutrophication 루틴 안. `NOPEN = NWQOBW + NWQOBE + NWQOBS + NWQOBN` (288). LLSave(NOPEN) 할당·0 초기화(289–290). `WriteBreak` 호출과 네 방향 전역 수질 경계 수 로그(292–297). 남쪽 수를 NCBS_GL에 저장하고 원래 좌표를 ITMP·JTMP에 복사한다(300–303). NWQOBS·IWQCBS·JWQCBS·II를 0으로 초기화한다(305–308). |
+| 309–339 | 시작 시 268행 Map_OpenBC_Eutrophication 루틴 안. `do LL = 1,NCBS_GL` (309)에서 임시 좌표를 IG2IL·JG2JL로 변환(310–311). `if( III > 0 .and. III <= IC )then` (312), `if( JJJ > 0 .and. JJJ <= JC )then` (313). 참이면 `II = II + 1` (314), LLSave 저장(315), `NWQOBS = NWQOBS + 1` (317), 지역 좌표 복사(318–319). `if( IWQCBS(II) == IG2IL(ICBS_GL(LL)) .and. JWQCBS(II) == JG2JL(JCBS_GL(LL)) )then` (322)이면 IWQOBS(LL,IDOX)를 NCSERS(II,8)에 복사한다(323). `else` (324)는 `STOPP('WQ: SOUTH OBC: MISS MATCH BETWEEN NCBS & NWQOBS')` 호출(325). 이 일치 검사 밖에서 `do NW = 1,NWQV` (328), `if( ISTRWQ(NW) > 0 )then` (329)이면 NT=MSVWQV(NW)와 CBS 두 층 값 복사(330–332). 모든 조건·루프 종료(333–338). |
+| 340–360 | 시작 시 268행 Map_OpenBC_Eutrophication 루틴 안. EUTRO SOUTH 로그 머리말(340–343). `do II = 1,NWQOBS` (344)에서 LLSave의 전역 LL로 전역·지역 좌표, 수질 시계열 및 용존산소(dissolved oxygen) 하부·상부 값을 출력한다(345–347). ITMP·JTMP 해제(349). 서쪽 수를 보존하고 임시 배열을 할당하여 원래 좌표를 저장한다(351–355). NWQOBW·IWQCBW·JWQCBW·II를 0으로 초기화한다(357–360). |
+| 361–391 | 시작 시 268행 Map_OpenBC_Eutrophication 루틴 안. `do LL  = 1,NCBW_GL` (361), 좌표 변환(362–363), `if( III .GT. 0 .and. III <= IC )then` (364), `if( JJJ .GT. 0 .and. JJJ <= JC )then` (365). 참이면 `II = II +1` (366), LLSave 저장(367), `NWQOBW = NWQOBW + 1` (369), 지역 좌표 복사(370–371). `if( IWQCBW(II) == IG2IL(ICBW_GL(LL)) .and. JWQCBW(II) == JG2JL(JCBW_GL(LL)) )then` (374)이면 IWQOBW(LL,IDOX)를 NCSERW(II,8)에 복사한다(375). `else` (376)는 `STOPP('WQ: WEST OBC: MISS MATCH BETWEEN NCBW & NWQOBW')` 호출(377). `do NW = 1,NWQV` (380), `if( ISTRWQ(NW) > 0 )then` (381)이면 NT 매핑과 CBW 두 층 복사(382–384). 모든 조건·루프 종료(385–390). |
+| 392–412 | 시작 시 268행 Map_OpenBC_Eutrophication 루틴 안. EUTRO WEST 로그 머리말(392–395). `do II = 1,NWQOBW` (396)에서 전역·지역 좌표, 수질 시계열·용존산소 두 층 값을 출력한다(397–399). ITMP·JTMP 해제(401). 동쪽 수를 보존하고 임시 배열을 할당하여 좌표를 저장한다(403–407). NWQOBE·IWQCBE·JWQCBE·II를 0으로 초기화한다(409–412). |
+| 413–443 | 시작 시 268행 Map_OpenBC_Eutrophication 루틴 안. `do LL  = 1,NCBE_GL` (413), 좌표 변환(414–415), `if( III .GT. 0 .and. III <= IC )then` (416), `if( JJJ .GT. 0 .and. JJJ <= JC )then` (417). 참이면 `II = II + 1` (418), LLSave 저장(419), `NWQOBE = NWQOBE + 1` (421), 지역 좌표 복사(422–423). `if( IWQCBE(II) == IG2IL(ICBE_GL(LL)) .and. JWQCBE(II) == JG2JL(JCBE_GL(LL)) )then` (426)이면 IWQOBE(LL,IDOX)를 NCSERE(II,8)에 복사한다(427). `else` (428)는 `STOPP('WQ: EAST OBC: MISS MATCH BETWEEN NCBE & NWQOBE')` 호출(429). `do NW = 1,NWQV` (432), `if( ISTRWQ(NW) > 0 )then` (433)이면 NT 매핑과 CBE 두 층 복사(434–436). 모든 조건·루프 종료(437–442). |
+| 444–464 | 시작 시 268행 Map_OpenBC_Eutrophication 루틴 안. EUTRO EAST 로그 머리말(444–447). `do II = 1,NWQOBE` (448)에서 전역·지역 좌표, 수질 시계열·용존산소 두 층 값을 출력한다(449–451). ITMP·JTMP 해제(453). 북쪽 수를 보존하고 임시 배열을 할당하여 좌표를 저장한다(455–459). NWQOBN·IWQCBN·JWQCBN·II를 0으로 초기화한다(461–464). |
+| 465–495 | 시작 시 268행 Map_OpenBC_Eutrophication 루틴 안. `do LL  = 1,NCBN_GL` (465), 좌표 변환(466–467), `if( III .GT. 0 .and. III <= IC )then` (468), `if( JJJ .GT. 0 .and. JJJ <= JC )then` (469). 참이면 `II = II +1` (470), LLSave 저장(471), `NWQOBN = NWQOBN + 1` (473), 지역 좌표 복사(474–475). `if( IWQCBN(II) == IG2IL(ICBN_GL(LL)) .and. JWQCBN(II) == JG2JL(JCBN_GL(LL)) )then` (478)이면 IWQOBN(LL,IDOX)를 NCSERN(II,8)에 복사한다(479). `else` (480)는 `STOPP('WQ: NORTH OBC: MISS MATCH BETWEEN NCBN & NWQOBN')` 호출(481). `do NW = 1,NWQV` (484), `if( ISTRWQ(NW) > 0 )then` (485)이면 NT 매핑과 CBN 두 층 복사(486–488). 모든 조건·루프 종료(489–494). |
+| 496–516 | 시작 시 268행 Map_OpenBC_Eutrophication 루틴 안. EUTRO NORTH 로그 머리말(496–499). `do II = 1,NWQOBN` (500)에서 LLSave의 LL로 전역·지역 좌표, 수질 시계열·용존산소 두 층 값을 출력한다(501–503). `WriteBreak(mpi_mapping_unit)` 호출(506). 네 방향 지역 수질 경계 수 로그(508–512). return·루틴 종료와 빈 줄(514–516). |
+
+## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
+
+- 27·280–281: Map_OpenBC_Conc의 K·M과 Map_OpenBC_Eutrophication의 MS·K·M·MMAX·MMIN은 선언 뒤 이 파일의 해당 루틴에서 사용되지 않는다.
+- 59–65·110–116·162–168·214–220 및 323·375·427·479: 첫 루틴은 농도 시계열 1–7열을 각각 복사한다. 수질 루틴은 시계열 8열에 IDOX 성분의 시계열을 대입한다.
+- 322·374·426·478: 수질 좌표와 일반 농도 좌표의 일치 검사는 양쪽 전역 배열의 같은 LL 인덱스를 비교한다. 별도로 좌표를 검색하는 루프는 이 검사에 없다.
+- 330–332·346–347·382–384·398–399·434–436·450–451·486–488·502–503: 수질 농도 복사의 대상 성분 인덱스는 NT=MSVWQV(NW)이다. 지역 용존산소 로그는 CBS·CBW·CBE·CBN의 IDOX 인덱스를 직접 읽는다.
+- 90–91·141–142·193–194·245–246: 첫 루틴의 로그는 NPSERS·NPSERW·NPSERE·NPSERN을 출력한다. 이 루틴에는 해당 배열을 대입하는 문장이 없다.
