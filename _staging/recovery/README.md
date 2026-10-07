@@ -108,6 +108,6 @@ Delft3D 487(기계 sweep 실패 471 + 웹 16, 09-22 스냅샷 교체 전 경로)
 
 ## 다음에 이어서 할 일
 
-1. 매뉴얼에서 나온 사실과 코드 판독 기록을 대조해 `models/XBeach/` 노트에 반영 — 우선: 식생 v방향 u점 속력(vegetation.F90:516·520), FvgCau 미초기화(502–511), 비정수압 보고서 −d 부호·(1.13)/(1.17) 부호와 nonh.F90 대조.
-2. XBeach 파일 간 계산 흐름 분석(미완).
+1. ~~매뉴얼과 코드 판독 기록 대조~~ — 10-03 완료(`compare/XBeach-manual-vs-code.md`, 노트 반영 `1da8d89`).
+2. ~~XBeach 파일 간 계산 흐름 분석~~ — 10-07 완료(`flow/XBeach-callflow.md`, 노트 반영 `d89cd8b`). 판독 기록 검색은 `wiki_search` `path_class="records"`(`ce7b3ae`).
 3. 다른 12개 모델: 같은 방식(고정 목록 → 1행/1쪽 판독 → 기계 확인 → 다른 모델 검증).
