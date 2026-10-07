@@ -2,7 +2,7 @@
 import re,sys,glob,os
 os.chdir('/home/firesinger/coastal-wiki')
 recs=sys.argv[1:] or sorted(glob.glob('_staging/recovery/read/XBeach/**/*.md',recursive=True))
-T=B=0
+T=B=0; IMG=[0]
 for r in recs:
     t=open(r).read()
     src=re.search(r'^file: (.+)$',t,re.M).group(1).strip()
@@ -27,8 +27,10 @@ for r in recs:
         cands=[(a,b) for a,b in cands if 1<=a<=len(L)]
         if not cands: continue
         parts=[p for p in re.split(r'…|\.\.\.',q) if p]
+        if all('![' in ''.join(L[a-1:b]) for a,b in cands):
+            IMG[0]+=1; continue  # cited line is an image: value read from the picture, not checkable against text
         allq[(s,raw)]=any(all(p in ''.join(nl[a-1:min(len(L),max(b,a)+3)]) for p in parts) for a,b in cands)
     tot=len(allq); badl=[(k[1][:60]) for k,ok in allq.items() if not ok]; bad=len(badl); ex=badl
     T+=tot; B+=bad
     if bad: print('QUOTE-MISMATCH',src.split('source_code/')[-1],f'{bad}/{tot}',ex[:3])
-print('records',len(recs),'quotes',T,'mismatch',B)
+print('records',len(recs),'quotes',T,'mismatch',B,'image-derived(skipped)',IMG[0])
