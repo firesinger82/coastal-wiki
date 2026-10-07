@@ -9,19 +9,26 @@ for r in recs:
     L=open(src,'rb').read().decode('utf-8','replace').replace('\r','').split('\n')
     norm=lambda s: re.sub(r'\s+|&','',s.replace('\\|','|')).lower()
     nl=[norm(x) for x in L]
-    def run(pat,qi,ni,mi):
-        tot=bad=0; ex=[]
-        for m in re.finditer(pat,t):
-            q=norm(m.group(qi)); a=int(m.group(ni)); b=int(m.group(mi) or a)
-            if not q or a<1 or a>len(L): continue
-            tot+=1
-            win=''.join(nl[a-1:min(len(L),max(b,a)+3)])
-            parts=[p for p in re.split(r'…|\.\.\.',q) if p]
-            if not all(p in win for p in parts): bad+=1; ex.append((a,m.group(qi)[:60]))
-        return tot,bad,ex
-    r1=run(r'`([^`\n]{6,})`\s*\((\d+)(?:[–-](\d+))?\)',1,2,3)
-    r2=run(r'\((\d+)(?:[–-](\d+))?\)\s*`([^`\n]{6,})`',3,1,2)
-    tot,bad,ex=min([r1,r2],key=lambda x:(x[1]/max(x[0],1)))
+    # 2026-10-08: union of both pairings (a quote is OK if either pairing matches);
+    # reader-written paths (attachments/..., models/...) are not source text and are skipped.
+    skip=lambda s: s.startswith(('attachments/','models/','_staging/','/home/'))
+    # pair backticks left-to-right over ALL spans (any length) so short spans cannot shift pairing
+    spans=[(m.start(),m.end(),m.group(1)) for m in re.finditer(r'`([^`\n]*)`',t)]
+    allq={}
+    for s,e,raw in spans:
+        if len(raw)<6 or skip(raw.strip()): continue
+        q=norm(raw)
+        if not q: continue
+        cands=[]
+        m=re.match(r'\s*\((\d+)(?:[–-](\d+))?\)',t[e:e+20])
+        if m: cands.append((int(m.group(1)),int(m.group(2) or m.group(1))))
+        m=re.search(r'\((\d+)(?:[–-](\d+))?\)\s*$',t[max(0,s-20):s])
+        if m: cands.append((int(m.group(1)),int(m.group(2) or m.group(1))))
+        cands=[(a,b) for a,b in cands if 1<=a<=len(L)]
+        if not cands: continue
+        parts=[p for p in re.split(r'…|\.\.\.',q) if p]
+        allq[(s,raw)]=any(all(p in ''.join(nl[a-1:min(len(L),max(b,a)+3)]) for p in parts) for a,b in cands)
+    tot=len(allq); badl=[(k[1][:60]) for k,ok in allq.items() if not ok]; bad=len(badl); ex=badl
     T+=tot; B+=bad
     if bad: print('QUOTE-MISMATCH',src.split('source_code/')[-1],f'{bad}/{tot}',ex[:3])
 print('records',len(recs),'quotes',T,'mismatch',B)
