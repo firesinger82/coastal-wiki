@@ -1,0 +1,313 @@
+{
+ "date": "2026-10-09",
+ "findings": [
+  {
+   "path": "models/Delft3D/source-analysis/delft3d_difu_transport.md",
+   "blob_sha": "ea97b0bfe305b7d3d8fbfa76342e66d5b8329de0",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 45,
+   "opinion": 2,
+   "has_source_needed": false,
+   "unsourced": [],
+   "value_checks": [
+    {
+     "claim_id": "bf1313967423",
+     "line": 70,
+     "claim": "difiwe=0.2·sqrt(bruvai)·xlo² (:587)·horizontal diffusion 0.7 Prandtl/Schmidt σ (:469-475)·stencil qxu=qxk/6 (:379)·j1=6iad1+3iad2+iad3 (:385)·red-black parity mod(mfg+nfg,2) (:843-849)",
+     "source_ref": "flow2d3d_kernel/src/compute/difu.f90",
+     "result": "OK",
+     "note": "원본 직접 read — 0.7(:469)·qxu/6(:379)·j1(:385)·red-black(:843-849) 전부 verbatim 일치. difiwe 식만 실제 :589(인용 :587, 2행 이른 shift)이나 값·식 정확 — 08-03 선례(1-2행 shift·값 정확=실질 유효)에 따라 mismatch 아님. 안정한계 주석 DT<=(DX**2)/(2*DICUV) 실제 :447-448 일치"
+    }
+   ]
+  },
+  {
+   "path": "models/Delft3D/source-analysis/delft3d_dimr_coupling.md",
+   "blob_sha": "375cccba89e84c75b220c729bc88b5ed4ea94bb3",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 6,
+   "opinion": 8,
+   "has_source_needed": true,
+   "unsourced": [
+    {
+     "line": 44,
+     "text": "D3D-4 시절: flow2d3d ↔ wave (SWAN) coupling 만 가능 (comm file 통신). DIMR 도입 후: 임의 N 엔진 결합 가능",
+     "reason": "결합 이력·능력 단언 — verification_method 는 '디렉토리 ls 직접' 뿐, 문서·코드 인용 0. 08-02 적발(L43) 후 미수정 잔존.",
+     "adversary": "refute 시도: 08-02 이후 변경은 source_scope 프론트매터 1줄뿐(blob diff 직접 확인) — disclosure·인용 추가 없음. §10 외부링크는 페이지·절 미지정 관련자료 나열. refute 실패 → confirmed(재확인)"
+    },
+    {
+     "line": 61,
+     "text": "각 엔진은 BMI standard 의 메소드 구현: initialize/update/get_variable/set_variable/finalize … DIMR 가 orchestrator 로 각 엔진에 BMI 호출 → 시간 동기화 + 변수 교환",
+     "reason": "'각 엔진이 구현' 전칭 단언 + orchestration 동작 단언 — dimr_lib 코드·문서 인용 0. 08-02 적발(L60) 후 미수정 잔존.",
+     "adversary": "refute 시도: CSDMS 링크는 표준 명세만 커버. FBC 의 BMI 구현은 [[delft3d_fbc_flow_boundary]](bmi.h:41-74)가 입증하나 본 파일엔 그 인용 없음·전칭 미입증. refute 실패 → confirmed(재확인)"
+    },
+    {
+     "line": 79,
+     "text": "dimr_config.xml 예시 — <control><parallel><startGroup> 등 element 구조 (L81-116 예시 블록)",
+     "reason": "구체 XML element 구조 제시 — schemas/ 존재만 확인, XSD 내용 대조 인용 0. 08-02 적발(L81) 후 미수정 잔존.",
+     "adversary": "refute 시도: '`schemas/` 의 XSD 정의' 문구는 존재 언급이지 element-level 출처 아님. refute 실패 → confirmed(재확인)"
+    },
+    {
+     "line": 137,
+     "text": "동기화 빈도: comm file 은 매 communication step (분 단위) vs BMI 는 time-step 단위; 통신 비용 디스크 IO vs 메모리 (빠름)",
+     "reason": "정량·성능 비교 단언 — 인용 0. 08-02 적발(L136) 후 미수정 잔존.",
+     "adversary": "refute 시도: 본문·관련자료 어디에도 동기화 주기·성능 근거 없음. refute 실패 → confirmed(재확인)"
+    }
+   ],
+   "proposals": [
+    {
+     "old_string": "D3D-4 시절: flow2d3d ↔ wave (SWAN) coupling 만 가능 (comm file 통신).\nDIMR 도입 후: **임의 N 엔진** 결합 가능 — 예시:",
+     "new_string": "⚠ source-needed — 이 절의 결합 이력·능력 서술은 공식 문서·코드 인용 미확보 (verification_method 는 디렉토리 ls 뿐).\n\nD3D-4 시절: flow2d3d ↔ wave (SWAN) coupling 만 가능 (comm file 통신).\nDIMR 도입 후: **임의 N 엔진** 결합 가능 — 예시:",
+     "rationale": "§3 undisclosed 미출처 → disclosed 갭 전환(G9b)"
+    },
+    {
+     "old_string": "DIMR 의 핵심 설계: **BMI (CSDMS Basic Model Interface)** 준수.\n\n각 엔진은 BMI standard 의 메소드 구현:",
+     "new_string": "DIMR 의 핵심 설계: **BMI (CSDMS Basic Model Interface)** 준수.\n\n⚠ source-needed — dimr_lib 코드·문서 file:line 인용 미확보 (BMI 표준 자체는 §10 CSDMS 링크, FBC 측 구현 입증은 [[delft3d_fbc_flow_boundary]] bmi.h:41-74).\n\n각 엔진은 BMI standard 의 메소드 구현:",
+     "rationale": "§4 전칭 단언 disclosure + 기존 canonical 근거 wikilink 연결"
+    },
+    {
+     "old_string": "DIMR 의 runtime 설정 파일 (`schemas/` 의 XSD 정의):",
+     "new_string": "DIMR 의 runtime 설정 파일 (`schemas/` 의 XSD 정의) — ⚠ source-needed: 아래 예시 element 구조는 XSD 대조 미실시:",
+     "rationale": "§5 XML 구조 disclosure"
+    },
+    {
+     "old_string": "## 7. flow2d3d 와의 비교\n",
+     "new_string": "## 7. flow2d3d 와의 비교\n\n⚠ source-needed — 아래 비교표의 동기화 빈도·통신 비용 항목은 정량 근거 인용 미확보.\n",
+     "rationale": "§7 정량 비교 disclosure"
+    },
+    {
+     "old_string": "citation_status: verified",
+     "new_string": "citation_status: verified\nhas_source_needed: true",
+     "rationale": "G9e — disclosed 갭 보유 verified 파일의 has_source_needed: true 프론트매터 명시(권고값 기입)"
+    }
+   ]
+  },
+  {
+   "path": "models/Delft3D/source-analysis/delft3d_dredge_dump.md",
+   "blob_sha": "0fc96fb3c70be0ab984c712b33e2977efe2f45e0",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 55,
+   "opinion": 12,
+   "has_source_needed": true,
+   "unsourced": [
+    {
+     "line": 196,
+     "text": "For navigation depth maintenance, triggerlevel ≈ DredgeDepth + 0.5 m is a good buffer to avoid constant dredging at threshold.",
+     "reason": "운영 권고 수치(0.5 m) — Source basis·본문 file:line 어디에도 근거 없음. 08-02 적발(L195) 후 미수정 잔존.",
+     "adversary": "refute 시도: 08-02 이후 변경은 source_scope·인용좌표 refresh 뿐(blob diff 확인) — 권고 수치 출처 추가 없음. dredge.f90 triggerlevel 인용은 비교 메커닉만 커버. refute 실패 → confirmed(재확인)"
+    },
+    {
+     "line": 207,
+     "text": "Restart with DAD: bed administration recovers but LINK_SUM resets to zero each run unless cumLink_continue is set (check version-specific support).",
+     "reason": "restart 동작 단언 + 파라미터명 cumLink_continue — 현 스냅샷(upstream 231bbf2)에서도 utils_gpl/morphology+flow2d3d 전체 grep -i cumlink 0건(이번 run 직접 재실행). 소스에 존재 근거 없는 식별자.",
+     "adversary": "refute 시도: 스냅샷 교체(ca5f39b9)로 식별자가 새로 생겼을 가능성 → 새 트리에서 재grep 0건으로 배제. '(check version-specific support)' 헤지는 G9b 표준 disclosure 아님. refute 실패 → confirmed(재확인)"
+    }
+   ],
+   "proposals": [
+    {
+     "old_string": "- For navigation depth maintenance, `triggerlevel` ≈ `DredgeDepth + 0.5 m` is a good buffer to avoid constant dredging at threshold.",
+     "new_string": "- For navigation depth maintenance, `triggerlevel` ≈ `DredgeDepth + 0.5 m` is a good buffer to avoid constant dredging at threshold. ⚠ source-needed — 권고 수치(0.5 m)의 매뉴얼·문헌 근거 미확보.",
+     "rationale": "미출처 운영 권고 수치 → disclosed 갭 전환(또는 사람이 삭제 결정)"
+    },
+    {
+     "old_string": "- ▢ Restart with DAD: bed administration recovers but `LINK_SUM` resets to zero each run unless `cumLink_continue` is set (check version-specific support).",
+     "new_string": "- ▢ Restart with DAD: bed administration recovers but `LINK_SUM` resets to zero each run. ⚠ source-needed — restart 동작의 소스 근거 미확보. (구판 본문의 `cumLink_continue` 는 스냅샷 231bbf2 전체 grep 0건 — 소스에 존재하지 않는 식별자라 제거.)",
+     "rationale": "소스에 존재하지 않는 파라미터명 제거 + 미출처 restart 단언 disclosure"
+    },
+    {
+     "old_string": "citation_status: verified",
+     "new_string": "citation_status: verified\nhas_source_needed: true",
+     "rationale": "G9e — disclosed 갭 보유 verified 파일의 has_source_needed: true 프론트매터 명시(권고값 기입)"
+    }
+   ]
+  },
+  {
+   "path": "models/Delft3D/source-analysis/delft3d_drying_flooding.md",
+   "blob_sha": "f45167580e18f45160b992400232c36739f4abce",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 40,
+   "opinion": 10,
+   "has_source_needed": true,
+   "unsourced": [
+    {
+     "line": 143,
+     "text": "Tidal flats: Dpsopt=MEAN, Dryflc=0.05–0.1 m, Dco=0.1–0.5 m (Decision Guide 표 권고 수치 전반)",
+     "reason": "파라미터 권고 범위 수치 — 매뉴얼 페이지·문헌 인용 0. 08-02 적발(L142) 후 미수정 잔존.",
+     "adversary": "refute 시도: 08-02 이후 변경은 source_scope 1줄뿐(blob diff 확인). References 의 Theory Manual 은 페이지 무지정 일반 참조. refute 실패 → confirmed(재확인)"
+    },
+    {
+     "line": 156,
+     "text": "Dco too small (~0.01) causes oscillations; too large (~1 m) over-smears.",
+     "reason": "정량 동작 단언(진동·과평활 임계) — 출처 0. 08-02 적발(L155) 후 미수정 잔존.",
+     "adversary": "refute 시도: upwhu.f90:126-163 인용은 DCO 사용 조건만, 값별 거동 미기술. refute 실패 → confirmed(재확인)"
+    },
+    {
+     "line": 157,
+     "text": "Number of repeats reported in log; >5 means timestep too large.",
+     "reason": "진단 임계값(>5) 단언 — 출처 0. 08-02 적발(L156) 후 미수정 잔존.",
+     "adversary": "refute 시도: adi.f90:422-428 은 반복 메커닉만. refute 실패 → confirmed(재확인)"
+    },
+    {
+     "line": 168,
+     "text": "Not checking ADI repeat count — silent pathology when >10 repeats per step; usually CFL violation.",
+     "reason": "진단 임계값(>10)·원인 귀속(CFL) 단언 — 출처 0. 08-02 적발(L167) 후 미수정 잔존.",
+     "adversary": "refute 시도: 인용된 어느 소스 절도 반복수 임계 미포함. refute 실패 → confirmed(재확인)"
+    }
+   ],
+   "value_checks": [
+    {
+     "claim_id": "825a94c638a1",
+     "line": 107,
+     "claim": "Minimum z-layer thickness tied to 0.1·Dryflc (z_inizm.f90:168-169)",
+     "source_ref": "flow2d3d_kernel/src/inichk/z_inizm.f90:169",
+     "result": "OK",
+     "note": "원본 직접 read — dzmin = 0.1_fp*dryflc 실제 :169 일치(인용 :168-169 범위 내). 단 파일 위치는 compute/ 아닌 inichk/z_inizm.f90 — Source basis 의 디렉토리 표기 부정확(값·식은 정확, 경로만 보정 대상)"
+    }
+   ],
+   "proposals": [
+    {
+     "old_string": "## Decision Guide\n",
+     "new_string": "## Decision Guide\n\n⚠ source-needed — 아래 표의 권고 수치(Dryflc·Dco 범위 등)는 매뉴얼·문헌 인용 미확보.\n",
+     "rationale": "Decision Guide 수치 권고 전반 → disclosed 갭 전환"
+    },
+    {
+     "old_string": "- `Dco` at ~0.1 m smooths the velocity reconstruction near drying — too small (~0.01) causes oscillations; too large (~1 m) over-smears.",
+     "new_string": "- `Dco` at ~0.1 m smooths the velocity reconstruction near drying — too small (~0.01) causes oscillations; too large (~1 m) over-smears. ⚠ source-needed.",
+     "rationale": "정량 동작 단언 disclosure"
+    },
+    {
+     "old_string": "- For sigma model, drying repeats `sud`. Number of repeats reported in log; >5 means timestep too large.",
+     "new_string": "- For sigma model, drying repeats `sud`. Number of repeats reported in log; >5 means timestep too large. ⚠ source-needed(임계값 >5).",
+     "rationale": "진단 임계값 disclosure"
+    },
+    {
+     "old_string": "- ▢ Not checking ADI repeat count — silent pathology when `>10` repeats per step; usually CFL violation.",
+     "new_string": "- ▢ Not checking ADI repeat count — silent pathology when `>10` repeats per step; usually CFL violation. ⚠ source-needed(임계값 >10·CFL 귀속).",
+     "rationale": "진단 임계값·원인 귀속 disclosure"
+    },
+    {
+     "old_string": "citation_status: verified",
+     "new_string": "citation_status: verified\nhas_source_needed: true",
+     "rationale": "G9e — disclosed 갭 보유 verified 파일의 has_source_needed: true 프론트매터 명시(권고값 기입)"
+    }
+   ]
+  },
+  {
+   "path": "models/Delft3D/source-analysis/delft3d_fbc_flow_boundary.md",
+   "blob_sha": "deb142d30fbb13aaaf0f34e67303383353321656",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 70,
+   "opinion": 3,
+   "has_source_needed": true,
+   "unsourced": [],
+   "value_checks": [
+    {
+     "claim_id": "ff742855f06a",
+     "line": 78,
+     "claim": "PID positional: sum_integrator += dt·e_n, u_n = kp·e_n + ki·Σ + kd·(e_n−e_nd)/dt, rate limit |Δu|≤settingMaxSpeed·dt, level limit settingMin≤u≤settingMax, 초기 NaN→(min+max)/2 (pidControllerPositional.cpp:91-147)",
+     "source_ref": "engines_gpl/fbc/packages/FBCTools/src/schematization/rules/pidControllerPositional.cpp:91-147",
+     "result": "OK",
+     "note": "원본 직접 read — 적분 누적(:117)·출력식(:118)·rate limit du_max=settingMaxSpeed*dt 클립(:121-130)·level limit(:133-142)·NaN 초기값 (settingMin+settingMax)/2 (:97-100) 전부 verbatim 일치"
+    }
+   ],
+   "proposals": [
+    {
+     "old_string": "citation_status: verified",
+     "new_string": "citation_status: verified\nhas_source_needed: true",
+     "rationale": "G9e — disclosed 갭 보유 verified 파일의 has_source_needed: true 프론트매터 명시(권고값 기입)"
+    }
+   ]
+  },
+  {
+   "path": "models/Delft3D/source-analysis/delft3d_flow2d3d_inichk_general.md",
+   "blob_sha": "7713b39ebda9eeb29ca4bb55380d41c8291640da",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 52,
+   "opinion": 3,
+   "has_source_needed": true,
+   "unsourced": [],
+   "value_mismatches": [
+    {
+     "line": 18,
+     "text": "두 드라이버 inchki(553L)·inchkr(1315L) — inchki 실제 555행(wc -l, 이번 run 재측정)",
+     "source_ref": "flow2d3d_kernel/src/inichk/inchki.f90 (wc -l = 555)",
+     "source_says": "inchki.f90 = 555행 (유일본, find 로 중복 없음 확인)",
+     "reason": "08-03 적발된 전사 오류(553, 같은 문서 §1 표는 555 로 정확 — 내부 모순) 미수정 잔존. 제안 패치 미적용 상태.",
+     "claude_verification": "이번 run 에서 wc -l 재실행 — 555 재확인. L18 의 inchkr 1315 도 아래 mm2 와 동일하게 1313 으로 보정 필요"
+    },
+    {
+     "line": 31,
+     "text": "§1 표 inchkr 라인수 1315 — 현 스냅샷(231bbf2) 실제 1313행(wc -l)",
+     "source_ref": "flow2d3d_kernel/src/inichk/inchkr.f90 (wc -l = 1313)",
+     "source_says": "inchkr.f90 = 1313행 (유일본, find 로 중복 없음 확인)",
+     "reason": "08-03 당시 구 스냅샷 기준 1315 는 정확했으나, 스냅샷 교체(ca5f39b9, upstream 231bbf2)로 2행 감소 — 라인수 단언이 버전 drift 로 불일치. 인용좌표 refresh 때 라인수 집계는 갱신 누락.",
+     "claude_verification": "Adversary: 다른 inchkr.f90 존재 가능성 → find 전체 트리 1건뿐. 단위·정의 차이(코드라인만 집계 등)로 1315 도출 불가(08-03 동일 논증). confirmed VALUE-MISMATCH"
+    }
+   ],
+   "proposals": [
+    {
+     "old_string": "두 드라이버 `inchki`(553L)·`inchkr`(1315L)가 순서대로 호출한다",
+     "new_string": "두 드라이버 `inchki`(555L)·`inchkr`(1313L)가 순서대로 호출한다",
+     "rationale": "VALUE-MISMATCH 정정 — 현 스냅샷(231bbf2) wc -l: inchki 555·inchkr 1313"
+    },
+    {
+     "old_string": "| `inchkr` | 1315 |",
+     "new_string": "| `inchkr` | 1313 |",
+     "rationale": "VALUE-MISMATCH 정정 — §1 표 inchkr 라인수를 현 스냅샷 1313 으로"
+    },
+    {
+     "old_string": "citation_status: verified",
+     "new_string": "citation_status: verified\nhas_source_needed: true",
+     "rationale": "G9e — disclosed 갭 보유 verified 파일의 has_source_needed: true 프론트매터 명시(권고값 기입)"
+    }
+   ]
+  },
+  {
+   "path": "models/Delft3D/source-analysis/delft3d_flow2d3d_io.md",
+   "blob_sha": "3d0a5f61be691da199f02b5e63d6267f63076dd1",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 50,
+   "opinion": 4,
+   "has_source_needed": true,
+   "unsourced": [],
+   "proposals": [
+    {
+     "old_string": "citation_status: verified",
+     "new_string": "citation_status: verified\nhas_source_needed: true",
+     "rationale": "G9e — disclosed 갭 보유 verified 파일의 has_source_needed: true 프론트매터 명시(권고값 기입)"
+    }
+   ]
+  },
+  {
+   "path": "models/Delft3D/source-analysis/delft3d_flow2d3d_special_physics.md",
+   "blob_sha": "9da436d1c7de2b4466c487138f31a8cc4af33b50",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 60,
+   "opinion": 3,
+   "has_source_needed": true,
+   "unsourced": [],
+   "proposals": [
+    {
+     "old_string": "citation_status: verified",
+     "new_string": "citation_status: verified\nhas_source_needed: true",
+     "rationale": "G9e — disclosed 갭 보유 verified 파일의 has_source_needed: true 프론트매터 명시(권고값 기입)"
+    }
+   ]
+  }
+ ]
+}

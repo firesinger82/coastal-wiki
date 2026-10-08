@@ -1,0 +1,178 @@
+diff --git a/models/Delft3D/source-analysis/delft3d_dimr_coupling.md b/models/Delft3D/source-analysis/delft3d_dimr_coupling.md
+--- a/models/Delft3D/source-analysis/delft3d_dimr_coupling.md
++++ b/models/Delft3D/source-analysis/delft3d_dimr_coupling.md
+@@ -3,6 +3,7 @@
+ topic: delft3d-dimr-coupling
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "models/Delft3D/raw/source_code/Delft3D/src/engines_gpl/dimr/ + packages/ 직접 ls — 4 packages (dimr, dimr_lib, dimr_lib_tests, dimr_testcomponent) + 보조 (doc, docs, schemas, scripts) 직접 인용."
+ note_author: "Claude Opus 4.7 (1M context)"
+ note_date: 2026-05-24
+@@ -41,6 +42,8 @@
+ 
+ ## 3. DIMR 의 역할 — Why multi-engine coupling
+ 
++⚠ source-needed — 이 절의 결합 이력·능력 서술은 공식 문서·코드 인용 미확보 (verification_method 는 디렉토리 ls 뿐).
++
+ D3D-4 시절: flow2d3d ↔ wave (SWAN) coupling 만 가능 (comm file 통신).
+ DIMR 도입 후: **임의 N 엔진** 결합 가능 — 예시:
+ 
+@@ -57,6 +60,8 @@
+ ## 4. BMI (Basic Model Interface) 표준
+ 
+ DIMR 의 핵심 설계: **BMI (CSDMS Basic Model Interface)** 준수.
++
++⚠ source-needed — dimr_lib 코드·문서 file:line 인용 미확보 (BMI 표준 자체는 §10 CSDMS 링크, FBC 측 구현 입증은 [[delft3d_fbc_flow_boundary]] bmi.h:41-74).
+ 
+ 각 엔진은 BMI standard 의 메소드 구현:
+ - `initialize(config_file)` — 엔진 초기화
+@@ -76,7 +81,7 @@
+ 
+ ## 5. dimr_config.xml — 운영 설정
+ 
+-DIMR 의 runtime 설정 파일 (`schemas/` 의 XSD 정의):
++DIMR 의 runtime 설정 파일 (`schemas/` 의 XSD 정의) — ⚠ source-needed: 아래 예시 element 구조는 XSD 대조 미실시:
+ 
+ ```xml
+ <dimrConfig>
+@@ -131,6 +136,8 @@
+ 
+ ## 7. flow2d3d 와의 비교
+ 
++⚠ source-needed — 아래 비교표의 동기화 빈도·통신 비용 항목은 정량 근거 인용 미확보.
++
+ | 항목 | flow2d3d (legacy comm file) | dimr (BMI) |
+ |---|---|---|
+ | Coupling 메커니즘 | 파일 IO (comm.dat) | BMI in-memory |
+diff --git a/models/Delft3D/source-analysis/delft3d_dredge_dump.md b/models/Delft3D/source-analysis/delft3d_dredge_dump.md
+--- a/models/Delft3D/source-analysis/delft3d_dredge_dump.md
++++ b/models/Delft3D/source-analysis/delft3d_dredge_dump.md
+@@ -3,6 +3,7 @@
+ topic: general
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "Delft3D source code 직접 분석 (models/Delft3D/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/delft3d_dredge_dump.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
+ note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
+ note_date: 2026-04~05 (original) / 2026-05-23 (promote)
+@@ -193,7 +194,7 @@
+ - Per-area `active` table is in **hydrodynamic time** unless `TS_MorTimeScale=true` — make sure the units match.
+ - Dredge mass is removed bed-side; if you need water-column suspended sediment from dredge plume, use a separate source term — DAD does not generate it.
+ - Multi-fraction nourishment percentages **must sum to 100%** per area; reader checks and stops if not.
+-- For navigation depth maintenance, `triggerlevel` ≈ `DredgeDepth + 0.5 m` is a good buffer to avoid constant dredging at threshold.
++- For navigation depth maintenance, `triggerlevel` ≈ `DredgeDepth + 0.5 m` is a good buffer to avoid constant dredging at threshold. ⚠ source-needed — 권고 수치(0.5 m)의 매뉴얼·문헌 근거 미확보.
+ 
+ ## Common Pitfalls
+ 
+@@ -204,7 +205,7 @@
+ - ▢ Confusing `active` table with `triggerlevel` — both gate dredging; `active=0` overrides depth trigger.
+ - ▢ Looking for water-column sink from dredge plume — not implemented; DAD is bed-only.
+ - ▢ Comparing `LINK_SUM` across `morfac` settings expecting same value — `morfac=10` gives 10× volumes for same `dt`.
+-- ▢ Restart with DAD: bed administration recovers but `LINK_SUM` resets to zero each run unless `cumLink_continue` is set (check version-specific support).
++- ▢ Restart with DAD: bed administration recovers but `LINK_SUM` resets to zero each run. ⚠ source-needed — restart 동작의 소스 근거 미확보. (구판 본문의 `cumLink_continue` 는 스냅샷 231bbf2 전체 grep 0건 — 소스에 존재하지 않는 식별자라 제거.)
+ 
+ ## Next expansion
+ 
+diff --git a/models/Delft3D/source-analysis/delft3d_drying_flooding.md b/models/Delft3D/source-analysis/delft3d_drying_flooding.md
+--- a/models/Delft3D/source-analysis/delft3d_drying_flooding.md
++++ b/models/Delft3D/source-analysis/delft3d_drying_flooding.md
+@@ -3,6 +3,7 @@
+ topic: general
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "Delft3D source code 직접 분석 (models/Delft3D/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/delft3d_drying_flooding.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
+ note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
+ note_date: 2026-04~05 (original) / 2026-05-23 (promote)
+@@ -138,6 +139,8 @@
+ 
+ ## Decision Guide
+ 
++⚠ source-needed — 아래 표의 권고 수치(Dryflc·Dco 범위 등)는 매뉴얼·문헌 인용 미확보.
++
+ | Domain feature | Setting |
+ |---|---|
+ | Tidal flats with regular wet/dry | `Dpsopt=MEAN`, `Dryflc=0.05–0.1 m`, `Dco=0.1–0.5 m` |
+@@ -153,8 +156,8 @@
+ 
+ - **Avoid `Dryflp` keyword** — use `Dpsopt` directly. Legacy `Dryflp=NO` is no longer accepted.
+ - `Drycrt` is auto half of `Dryflc` — explicitly set if you want different hysteresis.
+-- `Dco` at ~0.1 m smooths the velocity reconstruction near drying — too small (~0.01) causes oscillations; too large (~1 m) over-smears.
+-- For sigma model, drying repeats `sud`. Number of repeats reported in log; >5 means timestep too large.
++- `Dco` at ~0.1 m smooths the velocity reconstruction near drying — too small (~0.01) causes oscillations; too large (~1 m) over-smears. ⚠ source-needed.
++- For sigma model, drying repeats `sud`. Number of repeats reported in log; >5 means timestep too large. ⚠ source-needed(임계값 >5).
+ - Z-model partial-column drying needs `Ztop` set above maximum expected water level — undersized → top layer stuck dry.
+ - Watch `KFS=0` at unexpected cells — usually missing connectivity in `KCU/KCV` (thin dam, obstacle).
+ - `dpsopt=MAX` is conservative for flood mapping (less water gets in); `MIN` is conservative for outlet design (more water flows out).
+@@ -165,7 +168,7 @@
+ - ▢ `Dryflc=0.01` (very small) — flickering wet/dry; expensive ADI repeats; mass not actually lost but performance suffers.
+ - ▢ Z-model with `Ztop` ~ MSL — first surge event hits top of grid; partial column saturates.
+ - ▢ Hot-start with different `Dpsopt` than cold run — `nfltyp` mismatch; `dps` field inconsistent.
+-- ▢ Not checking ADI repeat count — silent pathology when `>10` repeats per step; usually CFL violation.
++- ▢ Not checking ADI repeat count — silent pathology when `>10` repeats per step; usually CFL violation. ⚠ source-needed(임계값 >10·CFL 귀속).
+ - ▢ Cut-cells expected to fix wet/dry oscillations — they don't; they fix momentum at angled boundaries only.
+ - ▢ Monitoring `KCU/KCV` for drying — those are static; use `KFU/KFV/KFS`.
+ 
+diff --git a/models/Delft3D/source-analysis/delft3d_fbc_flow_boundary.md b/models/Delft3D/source-analysis/delft3d_fbc_flow_boundary.md
+--- a/models/Delft3D/source-analysis/delft3d_fbc_flow_boundary.md
++++ b/models/Delft3D/source-analysis/delft3d_fbc_flow_boundary.md
+@@ -4,6 +4,7 @@
+ component: fbc/FBCTools
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "Delft3D 소스 직접 read (src/engines_gpl/fbc/packages/FBCTools/src/...). element/rule/trigger 기반 클래스(schematization/element.h, rules/rule.h, triggers/trigger.h), 시뮬레이터 실행순서(rtcToolsSimulator.cpp), PID positional 알고리즘(rules/pidControllerPositional.cpp), 조건 평가(triggers/condition.cpp + utilities/utils.h relationalOperator), lookup table 보간(utilities/lookupTableConverter.cpp), timeseries 자료구조(timeseries/timeSeriesBasics.h), BMI 인터페이스(bmi.h), dataBinding XSD 출처(dataBinding/rtcToolsConfig.hxx) 를 file:line 인용. xerces는 외부 라이브러리로 존재만 확인(timeseries/piTimeSeriesSAX2Handler.h)."
+ note_author: "Claude Opus 4.8 (1M context)"
+ note_date: 2026-06-16
+diff --git a/models/Delft3D/source-analysis/delft3d_flow2d3d_inichk_general.md b/models/Delft3D/source-analysis/delft3d_flow2d3d_inichk_general.md
+--- a/models/Delft3D/source-analysis/delft3d_flow2d3d_inichk_general.md
++++ b/models/Delft3D/source-analysis/delft3d_flow2d3d_inichk_general.md
+@@ -4,6 +4,7 @@
+ component: flow2d3d/flow2d3d_kernel(inichk·general)
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "Delft3D 소스 직접 read (src/engines_gpl/flow2d3d/packages/flow2d3d_kernel/src/inichk·general). inchki/inchkr 의 call 시퀀스(grep -n call), chkgeo/chknum 실행부, nm_to_n_and_m/n_and_m_to_nm 변환식, 각 chk*/ini* subroutine 헤더 Function 주석을 file:line 인용"
+ note_author: "Claude Opus 4.8 (1M context)"
+ note_date: 2026-06-16
+@@ -15,7 +16,7 @@
+ 
+ # Delft3D flow2d3d 초기화·검사·general 유틸
+ 
+-> flow2d3d 구조격자 커널의 시뮬레이션 시작 단계 — 격자/입력 정합성 검사(`chk*`)와 초기조건 채우기(`ini*`)를 두 드라이버 `inchki`(553L)·`inchkr`(1315L)가 순서대로 호출한다. `general/`은 인덱스 변환·에러출력·시간·기하 공용 함수. (경로: src/engines_gpl/flow2d3d/packages/flow2d3d_kernel/src/{inichk,general}/)
++> flow2d3d 구조격자 커널의 시뮬레이션 시작 단계 — 격자/입력 정합성 검사(`chk*`)와 초기조건 채우기(`ini*`)를 두 드라이버 `inchki`(555L)·`inchkr`(1313L)가 순서대로 호출한다. `general/`은 인덱스 변환·에러출력·시간·기하 공용 함수. (경로: src/engines_gpl/flow2d3d/packages/flow2d3d_kernel/src/{inichk,general}/)
+ 
+ 상위 디스패처/시간루프 흐름은 [[delft3d_flow2d3d_dispatcher]] 참조. 건습(drying/flooding) 알고리즘 본체는 [[delft3d_drying_flooding]], σ/z 수직격자는 [[delft3d_sigma_z]], 난류 초기화 본체는 [[delft3d_turbulence]] 참조 — 본 노트는 **초기화 오케스트레이션과 검사 항목** 자체에 집중한다.
+ 
+@@ -28,7 +29,7 @@
+ | 드라이버 | 라인수 | Function 주석 | 역할 |
+ |---|---|---|---|
+ | `inchki` | 555 | "Initialises and checks various params. and arrays / defines initial arrays" (`inchki.f90:37`) | **격자·기하·물리·수치 검사** + 초기 배열 정의 |
+-| `inchkr` | 1315 | "...were arrays can be initialized in INCHKI or come from restart data" (`inchkr.f90:36`) | **시변 강제력·초기 상태**(경계/방류/기상/증발/sed/난류/마찰) 초기화 (restart 데이터 가능) |
++| `inchkr` | 1313 | "...were arrays can be initialized in INCHKI or come from restart data" (`inchkr.f90:36`) | **시변 강제력·초기 상태**(경계/방류/기상/증발/sed/난류/마찰) 초기화 (restart 데이터 가능) |
+ 
+ 즉 `inchki`는 **정적 정합성 검사**, `inchkr`는 **시간의존 초기 상태 채우기** 단계로 책임이 갈린다.
+ 
+diff --git a/models/Delft3D/source-analysis/delft3d_flow2d3d_io.md b/models/Delft3D/source-analysis/delft3d_flow2d3d_io.md
+--- a/models/Delft3D/source-analysis/delft3d_flow2d3d_io.md
++++ b/models/Delft3D/source-analysis/delft3d_flow2d3d_io.md
+@@ -4,6 +4,7 @@
+ component: flow2d3d/flow2d3d_io
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "Delft3D 소스 직접 read (src/engines_gpl/flow2d3d/packages/flow2d3d_io/src/). input/readmd.f90 마스터 디스패처 call 시퀀스(573-909), input/rdrund.f90 legacy search/readnc 키워드 메커니즘(98-131), input/rdmeteo.f90 modern prop_get(199-485), output/postpr.f90 his/map/rst 트리거 로직(930-1206), output/wrh_main.f90 NEFIS/NetCDF 이중 백엔드 + REQUESTTYPE_DEFINE/WRITE 2-pass(329-534), output/wrtarray.f90 typed-rank putelt/nf90_put_var dispatch(101-296), input/rstfil.f90 restart precision 자동감지(166-232), preprocessor/tdatom.f90 시변 데이터 중간파일 생성(598-718) file:line 인용"
+ note_author: "Claude Opus 4.8 (1M context)"
+ note_date: 2026-06-16
+diff --git a/models/Delft3D/source-analysis/delft3d_flow2d3d_special_physics.md b/models/Delft3D/source-analysis/delft3d_flow2d3d_special_physics.md
+--- a/models/Delft3D/source-analysis/delft3d_flow2d3d_special_physics.md
++++ b/models/Delft3D/source-analysis/delft3d_flow2d3d_special_physics.md
+@@ -4,6 +4,7 @@
+ component: flow2d3d/kernel(compute_nearfar·compute_roller·non_hydro)
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "Delft3D 소스 직접 read (src/engines_gpl/flow2d3d/packages/flow2d3d_kernel/src/). near_field.f90 dispatch(L392-655)·desa.f90 entrainment/sink/source(L361-654)·radstr.f90 radiation stress tensor(L212-373)·rollu.f90 roller energy(L85-116)·massfl.f90 mass flux(L96-117)·z_hydpres.f90 Poisson 행렬(L208-291,L474-485)·z_momcor.f90 velocity correction(L179-321) file:line 인용. 일부 솔버 내부(BiCGSTAB/ILU 세부)는 description 헤더만 인용."
+ note_author: "Claude Opus 4.8 (1M context)"
+ note_date: 2026-06-16
