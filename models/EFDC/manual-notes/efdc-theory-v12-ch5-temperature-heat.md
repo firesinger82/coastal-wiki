@@ -13,6 +13,7 @@ related:
   - models/EFDC/manual-notes/efdc-theory-doc-v12.md
   - models/EFDC/source-analysis/
   - concepts/sst/04-code-and-tools.md
+last_source_check: 2026-10-08 (recovery 재판독 대조)
 ---
 
 # EFDC+ Theory v12 Ch 5 TEMPERATURE AND HEAT TRANSFER — 식 level deep 노트
@@ -92,11 +93,11 @@ $$T_e = \frac{I_{sw}}{23 + f(W)(\beta+0.255)} + T_d \quad (5.10)$$
 $$K = 23 + (\beta_w+0.225)\,17 W_2 \quad (5.11)$$
 $$\beta_w = 0.255 - 0.0085 T_w - 0.000204 T_w^2 \quad (5.12)$$
 
-$\beta = 0.255-0.0085T^*+0.000204T^{*2}$, $T^*=0.5(T_s+T_d)$, $T_d$ = dew point (°F), $W_2$ = 2 m 풍속 (mph). **소스 교차검증** (mod_heat.f90 `SUBROUTINE EQUILIBRIUM_TEMPERATURE`:1551) — `BETA=0.255-8.5E-3*TSTAR+2.04E-4*TSTAR**2`:1583, `TSTAR=(ET+TDEW_F)*0.5`:1582, `CSHE=15.7+(0.26+BETA)*FW`:1585, ETP 반복해 (`do J` 루프 :1587-1594) → 매뉴얼 "iterative/approximate technique (Brady et al. 1969)" 실장 확인. 코드 계수(15.7·0.26)는 매뉴얼 제시형(23·0.255)의 대체 Edinger/Brady 표현이며 English↔SI 변환 상수(`W_M2_TO_BTU_FT2_DAY=7.60796` 등 :33-37) 동반. equilibrium module 도 ice 모듈과 완전 연동.
+반복 구현은 확인했다. (`Transport/mod_heat.f90:1589` — `BETA  = 0.255-(8.5E-3*TSTAR)+(2.04E-4*TSTAR*TSTAR)`; `Transport/mod_heat.f90:1591` — `ETP   = (SRO_BR+RA-1801.0)/CSHE+(CSHE-15.7)*(0.26*TAIR_F+BETA*TDEW_F)/(CSHE*(0.26+BETA))`; `Transport/mod_heat.f90:1592` — `J     = J+1`; EFDC_Theory_Document_Ver_12.pdf, PDF 75쪽·인쇄 62쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 76쪽·인쇄 63쪽) 문서 식 5.10·5.11의 23·0.255·0.225와 코드의 15.7·0.26은 다르다. (`Transport/mod_heat.f90:1582` — `CSHE  = 15.7+(0.26+BETA)*FW`; `Transport/mod_heat.f90:1584` — `ETP   = (SRO_BR+RA-1801.0)/CSHE+(CSHE-15.7)*(0.26*TAIR_F+BETA*TDEW_F)/(CSHE*(0.26+BETA))`; EFDC_Theory_Document_Ver_12.pdf, PDF 75쪽·인쇄 62쪽, 식 5.10; EFDC_Theory_Document_Ver_12.pdf, PDF 75쪽·인쇄 62쪽, 식 5.11) 코드는 기온 장파항 RA와 1801을 포함한다. (`Transport/mod_heat.f90:1583` — `RA    = 3.1872E-08*(TAIR_F+459.67)**4`; `Transport/mod_heat.f90:1584` — `ETP   = (SRO_BR+RA-1801.0)/CSHE+(CSHE-15.7)*(0.26*TAIR_F+BETA*TDEW_F)/(CSHE*(0.26+BETA))`; EFDC_Theory_Document_Ver_12.pdf, PDF 75쪽·인쇄 62쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 76쪽·인쇄 63쪽) 식 5.12의 이차항은 음수이고 코드는 양수이다. (`Transport/mod_heat.f90:1589` — `BETA  = 0.255-(8.5E-3*TSTAR)+(2.04E-4*TSTAR*TSTAR)`; EFDC_Theory_Document_Ver_12.pdf, PDF 76쪽·인쇄 63쪽, 식 5.12) 코드는 평형온도와 이슬점의 평균을 쓴다. (`Transport/mod_heat.f90:1588` — `TSTAR = (ET+TDEW_F)*0.5`; EFDC_Theory_Document_Ver_12.pdf, PDF 75쪽·인쇄 62쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 76쪽·인쇄 63쪽) 해석: 단위 변환 상수만으로 두 식의 동등성을 확인할 수 없다(정적 판독, 실행 미확인). (`Transport/mod_heat.f90:1582` — `CSHE  = 15.7+(0.26+BETA)*FW`; `Transport/mod_heat.f90:1584` — `ETP   = (SRO_BR+RA-1801.0)/CSHE+(CSHE-15.7)*(0.26*TAIR_F+BETA*TDEW_F)/(CSHE*(0.26+BETA))`; `Transport/mod_heat.f90:1589` — `BETA  = 0.255-(8.5E-3*TSTAR)+(2.04E-4*TSTAR*TSTAR)`; EFDC_Theory_Document_Ver_12.pdf, PDF 75쪽·인쇄 62쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 76쪽·인쇄 63쪽)
 
 ## 2. §5.2 Short Wave Radiation (pp.63-65)
 
-수면 도달 단파복사 (Eq 5.13) — 수관 shading + ice + emergent shoot 감쇠:
+식 5.13의 별도 수관 줄기 지수 감쇠를 찾지 못했다. (`Transport/mod_heat.f90:391` — `SOLSWRT(L) = SOLSWRT(L)*PSHADE(L)`; EFDC_Theory_Document_Ver_12.pdf, PDF 76쪽·인쇄 63쪽, 식 5.13) PSHADE의 동일 수관 인자 자동 계산은 확인하지 않음. (`Transport/mod_heat.f90:391` — `SOLSWRT(L) = SOLSWRT(L)*PSHADE(L)`; EFDC_Theory_Document_Ver_12.pdf, PDF 76쪽·인쇄 63쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 77쪽·인쇄 64쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 78쪽·인쇄 65쪽)
 
 $$I_{sw} = I_0 S_f \min\{\exp[-K_{e,me}(H_{rps}-H)],1\}\min\{\exp[-K_{e,ice}H_{ice}],1\} \quad (5.13)$$
 
@@ -112,7 +113,13 @@ $\zeta$ = light extinction coefficient (1/m), $z$ = 수심.
 
 fast/slow 2 감쇠계수 (상부 5 m 적색광 급감 + 10 m 이하 청록광 완감):
 
+
+문서 원문 (EFDC_Theory_Document_Ver_12.pdf, PDF 76쪽·인쇄 63쪽, 식 5.13; EFDC_Theory_Document_Ver_12.pdf, PDF 77쪽·인쇄 64쪽, 식 5.15; EFDC_Theory_Document_Ver_12.pdf, PDF 78쪽·인쇄 65쪽, 식 5.16; EFDC_Theory_Document_Ver_12.pdf, PDF 78쪽·인쇄 65쪽, 식 5.17)
+
 $$I(z) = I_{sw}[R\exp(z\zeta_f)+(1-R)\exp(z\zeta_s)] \quad (5.15)$$
+
+식 5.15의 양의 지수는 문서 원문이다. (EFDC_Theory_Document_Ver_12.pdf, PDF 77쪽·인쇄 64쪽, 식 5.15) 코드는 수면 아래 거리의 음의 지수를 사용한다. (`Transport/mod_heat.f90:515` — `TFAST  = SWRATNF*(Z(L,KC)  -1.)`; `Transport/mod_heat.f90:520` — `RSN = RADTOP(L,KC)*( FSWRATF*EXP(TFAST*HP(L))  + (1.-FSWRATF)*EXP(TSLOW*HP(L))        &`; EFDC_Theory_Document_Ver_12.pdf, PDF 76쪽·인쇄 63쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 77쪽·인쇄 64쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 78쪽·인쇄 65쪽)
+
 
 **Table 5.1** (Paulson-Simpson 1977 adapted) — 관측 fit 계수:
 
@@ -130,9 +137,15 @@ $$I(z) = I_{sw}[R\exp(z\zeta_f)+(1-R)\exp(z\zeta_s)] \quad (5.15)$$
 
 ### 2.3 §5.2.3 Water Quality Linked (pp.64-65)
 
-Full Heat / Equilibrium Temperature 옵션용 — 상층의 고정비율 β 흡수는 Equilibrium Temperature 설명에서 명시한다(Eq 5.16, `EFDC_Theory_Document_Ver_12.pdf:PDF pp.77-78`); Full Heat에도 항상 적용되는지는 이 근거로 확인되지 않았다:
+식 5.16의 고정 (1−β)와 코드의 최소 층 흡수율 FSOLRADMIN을 구분한다. (`Transport/mod_heat.f90:574` — `if( FSOLRADMIN > 0.0 )then`; `Transport/mod_heat.f90:576` — `BOT = max(BOT, FSOLRADMIN)`; EFDC_Theory_Document_Ver_12.pdf, PDF 78쪽·인쇄 65쪽, 식 5.16) 식 5.17의 CHL 선형 합은 코드의 WQKECHLE=1일 때만 같은 형태이다. (`Transport/mod_heat.f90:1638` — `CHLKE = WQKECHL*WQCHL(L,K)**WQKECHLE`; EFDC_Theory_Document_Ver_12.pdf, PDF 78쪽·인쇄 65쪽, 식 5.17) 음의 WQKECHL은 별도 경험식을 선택한다. (`Transport/mod_heat.f90:1634` — `if( WQKECHL < 0.0 )then                                          ! *** CHLOROPHYLL`; `Transport/mod_heat.f90:1636` — `CHLKE = 0.054*WQCHL(L,K)**0.6667 + 0.0088*WQCHL(L,K)`; EFDC_Theory_Document_Ver_12.pdf, PDF 76쪽·인쇄 63쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 77쪽·인쇄 64쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 78쪽·인쇄 65쪽)
+
+
+문서 원문 (EFDC_Theory_Document_Ver_12.pdf, PDF 76쪽·인쇄 63쪽, 식 5.13; EFDC_Theory_Document_Ver_12.pdf, PDF 77쪽·인쇄 64쪽, 식 5.15; EFDC_Theory_Document_Ver_12.pdf, PDF 78쪽·인쇄 65쪽, 식 5.16; EFDC_Theory_Document_Ver_12.pdf, PDF 78쪽·인쇄 65쪽, 식 5.17)
 
 $$I(z) = (1-\beta)I_{sw}\exp(-K_e z) \quad (5.16)$$
+
+식 5.16의 고정 (1−β)와 코드의 최소 층 흡수율 FSOLRADMIN을 구분한다. (`Transport/mod_heat.f90:574` — `if( FSOLRADMIN > 0.0 )then`; `Transport/mod_heat.f90:576` — `BOT = max(BOT, FSOLRADMIN)`; EFDC_Theory_Document_Ver_12.pdf, PDF 78쪽·인쇄 65쪽, 식 5.16) 식 5.17의 CHL 선형 합은 코드의 WQKECHLE=1일 때만 같은 형태이다. (`Transport/mod_heat.f90:1638` — `CHLKE = WQKECHL*WQCHL(L,K)**WQKECHLE`; EFDC_Theory_Document_Ver_12.pdf, PDF 78쪽·인쇄 65쪽, 식 5.17) 음의 WQKECHL은 별도 경험식을 선택한다. (`Transport/mod_heat.f90:1634` — `if( WQKECHL < 0.0 )then                                          ! *** CHLOROPHYLL`; `Transport/mod_heat.f90:1636` — `CHLKE = 0.054*WQCHL(L,K)**0.6667 + 0.0088*WQCHL(L,K)`; EFDC_Theory_Document_Ver_12.pdf, PDF 76쪽·인쇄 63쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 77쪽·인쇄 64쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 78쪽·인쇄 65쪽)
+
 
 **총 소광계수** — rooted plant 포함 (Eq 5.17):
 
@@ -178,7 +191,7 @@ $K_i$ = 얼음 열전도도 (W/m/°C), $T_f$ = 결빙점, $q_i$ = 얼음통과 h
 
 $$T_f = \begin{cases} -0.0545\,TDS, & TDS<35\ ppt \\ -0.3146-0.0417\,TDS-0.000166\,TDS^2, & TDS>35\ ppt \end{cases} \quad (5.26)$$
 
-**소스 정합 확인** (mod_heat.f90:1178-1182): `SAL<35 → TF=-0.0545*SAL`, `else TF=-0.31462-0.04177*SAL-0.000166*SAL*SAL`. (매뉴얼 반올림형 -0.3146/-0.0417 vs 소스 -0.31462/-0.04177 — 동일식.) `ISTRAN(1)==0` (염분 미모의) 시 `TF=0`.
+문서의 입력은 TDS이다. (EFDC_Theory_Document_Ver_12.pdf, PDF 81쪽·인쇄 68쪽) 코드의 입력은 SAL이다. (`Transport/mod_heat.f90:1178` — `if( SAL(L,KC) < 35. )then`; `Transport/mod_heat.f90:1181` — `TF = -0.31462-0.04177*SAL(L,KC)-0.000166*SAL(L,KC)*SAL(L,KC)`; EFDC_Theory_Document_Ver_12.pdf, PDF 81쪽·인쇄 68쪽) TDS와 SAL을 같은 값으로 놓아야 식을 비교할 수 있다. (`Transport/mod_heat.f90:1178` — `if( SAL(L,KC) < 35. )then`; `Transport/mod_heat.f90:1181` — `TF = -0.31462-0.04177*SAL(L,KC)-0.000166*SAL(L,KC)*SAL(L,KC)`; EFDC_Theory_Document_Ver_12.pdf, PDF 81쪽·인쇄 68쪽) 고염분 계수 −0.0417과 −0.04177은 숫자가 다르다. (`Transport/mod_heat.f90:1181` — `TF = -0.31462-0.04177*SAL(L,KC)-0.000166*SAL(L,KC)*SAL(L,KC)`; EFDC_Theory_Document_Ver_12.pdf, PDF 81쪽·인쇄 68쪽) −0.3146과 −0.31462도 숫자가 다르다. (`Transport/mod_heat.f90:1181` — `TF = -0.31462-0.04177*SAL(L,KC)-0.000166*SAL(L,KC)*SAL(L,KC)`; EFDC_Theory_Document_Ver_12.pdf, PDF 81쪽·인쇄 68쪽) SAL=35는 코드의 둘째 분기이다. (`Transport/mod_heat.f90:1178` — `if( SAL(L,KC) < 35. )then`; `Transport/mod_heat.f90:1180` — `else`; `Transport/mod_heat.f90:1181` — `TF = -0.31462-0.04177*SAL(L,KC)-0.000166*SAL(L,KC)*SAL(L,KC)`; EFDC_Theory_Document_Ver_12.pdf, PDF 81쪽·인쇄 68쪽) 문서는 등호 조건을 비워 두었다. (EFDC_Theory_Document_Ver_12.pdf, PDF 81쪽·인쇄 68쪽)
 
 ### 4.4 §5.4.4–5.4.6 Ice Melt / Growth (p.69)
 
@@ -189,9 +202,15 @@ $$\Delta\theta_{iw}^n = \frac{1}{\rho_i L_f}\left[K_i\frac{T_f-T_s^n}{\theta^{n-
 
 얼음 저면 태양복사 (Eq 5.30) — albedo·surface absorption·감쇠:
 
+
+문서 원문 (EFDC_Theory_Document_Ver_12.pdf, PDF 82쪽·인쇄 69쪽, 식 5.30)
+
 $$H_{ps} = H_s(1-\alpha_i)(1-\beta_i)\exp[-\gamma_i\theta(t)] \quad (5.30)$$
 
-$\alpha_i$ = ice albedo, $\beta_i$ = 얼음표면 흡수분율, $\gamma_i$ = ice extinction coeff.
+문서 식 5.30은 (1−βi)를 포함한다. (EFDC_Theory_Document_Ver_12.pdf, PDF 82쪽·인쇄 69쪽, 식 5.30) 코드의 투과율은 (1−ALBEDOI)·exp(−GAMMAI·두께)이다. (`Transport/mod_heat.f90:1666` — `SOLBOT = EXP(-GAMMAI*ICETHICK(L))`; `Transport/mod_heat.f90:1668` — `REFICE  = (1. - ALBEDOI)/(1.-REFL)*SOLBOT`; EFDC_Theory_Document_Ver_12.pdf, PDF 82쪽·인쇄 69쪽) BETAI는 1−exp(−GAMMAI·두께)로 다시 설정한다. (`Transport/mod_heat.f90:1667` — `BETAI = 1.0 - SOLBOT`; EFDC_Theory_Document_Ver_12.pdf, PDF 82쪽·인쇄 69쪽) 문서의 추가 (1−βi)는 코드 투과율에 없다. (`Transport/mod_heat.f90:1666` — `SOLBOT = EXP(-GAMMAI*ICETHICK(L))`; `Transport/mod_heat.f90:1668` — `REFICE  = (1. - ALBEDOI)/(1.-REFL)*SOLBOT`; EFDC_Theory_Document_Ver_12.pdf, PDF 82쪽·인쇄 69쪽)
+
+
+문서 식 5.30은 (1−βi)를 포함한다. (EFDC_Theory_Document_Ver_12.pdf, PDF 82쪽·인쇄 69쪽, 식 5.30) 코드의 투과율은 (1−ALBEDOI)·exp(−GAMMAI·두께)이다. (`Transport/mod_heat.f90:1666` — `SOLBOT = EXP(-GAMMAI*ICETHICK(L))`; `Transport/mod_heat.f90:1668` — `REFICE  = (1. - ALBEDOI)/(1.-REFL)*SOLBOT`; EFDC_Theory_Document_Ver_12.pdf, PDF 82쪽·인쇄 69쪽) BETAI는 1−exp(−GAMMAI·두께)로 다시 설정한다. (`Transport/mod_heat.f90:1667` — `BETAI = 1.0 - SOLBOT`; EFDC_Theory_Document_Ver_12.pdf, PDF 82쪽·인쇄 69쪽) 문서의 추가 (1−βi)는 코드 투과율에 없다. (`Transport/mod_heat.f90:1666` — `SOLBOT = EXP(-GAMMAI*ICETHICK(L))`; `Transport/mod_heat.f90:1668` — `REFICE  = (1. - ALBEDOI)/(1.-REFL)*SOLBOT`; EFDC_Theory_Document_Ver_12.pdf, PDF 82쪽·인쇄 69쪽)
 
 ## 5. §5.5 Water Volume Evaporative Losses (pp.70-71)
 
@@ -211,14 +230,14 @@ $$f(W) = a + bW + cW^2 \quad (5.33)$$
 | 0 | Do Not Include Evaporation | — | | | |
 | 1 | Use Evaporation from ASER | Measured/Externally Est. | | | |
 | 2 | EFDC Original | | | | |
-| 3 | Ward 1980 | Cooling Lake | 0.0 | 3.534 | 0.0 |
+| 3 | — | — | — | — | Table 5.2의 a·b·c는 문서의 제안값이다. (EFDC_Theory_Document_Ver_12.pdf, PDF 83쪽·인쇄 70쪽) 코드는 WINDFA·WINDFB·WINDFC를 C46C에서 읽는다. (`input.f90:2693` — `read(1,*,IOSTAT = ISO) DS_LONG, DS_LAT, COMPUTESOLRAD, USESHADE, IEVAP, WINDFA, WINDFB, WINDFC, PBLZ, TEM_HRZ, COARE_NITS`; EFDC_Theory_Document_Ver_12.pdf, PDF 83쪽·인쇄 70쪽) IEVAP 번호만으로 표의 계수를 자동 대입하는 경로를 확인하지 못했다. (`input.f90:2693` — `read(1,*,IOSTAT = ISO) DS_LONG, DS_LAT, COMPUTESOLRAD, USESHADE, IEVAP, WINDFA, WINDFB, WINDFC, PBLZ, TEM_HRZ, COARE_NITS`; EFDC_Theory_Document_Ver_12.pdf, PDF 83쪽·인쇄 70쪽) EEMS12 Confluence에는 IEVAP=11·12에 대응하는 추가 방법도 있다. (`models/EFDC/raw/manuals/confluence/spaces/EK/pages/EFDC_Explorer_12_Knowledge_Base/EFDC_Explorer_12_User_Guide/Model_Control_Form/Modules/Temperature_EEMS12/Evaporation_EEMS12.md:23` — `- Compute: Lakes/Streams (Ryan-Harleman, 1974)`; `Transport/calqvs.f90:1651` — `elseif( IEVAP == 11 )then`; `Transport/calqvs.f90:1674` — `elseif( IEVAP == 12 )then`; EFDC_Theory_Document_Ver_12.pdf, PDF 83쪽·인쇄 70쪽) |
 | 4 | Harbeck Jr 1964 | Cooling Lake | 0.0 | 3.818 | 0.0 |
 | 5 | Brady et al. 1969 | Cooling Pond | 6.442 | 0.0 | 0.322 |
 | 6 | Anderson et al. 1954 | Large Lake | 0.0 | 2.403 | 0.0 |
 | 7 | Webster-Sherman 1995 | Lakes | 2.717 | 2.743 | 0.0 |
 | 8 | Fulford-Sturm 1984 | Rivers | 8.359 | 2.090 | 0.0 |
 | 9 | Gulliver-Stefan 1984 | Streams | 7.732 | 1.672 | 0.0 |
-| 10 | Edinger et al. 1974 | Lakes/Rivers | 6.9 | 0.0 | 0.345 |
+| 10 | — | — | — | — | Table 5.2의 a·b·c는 문서의 제안값이다. (EFDC_Theory_Document_Ver_12.pdf, PDF 83쪽·인쇄 70쪽) 코드는 WINDFA·WINDFB·WINDFC를 C46C에서 읽는다. (`input.f90:2693` — `read(1,*,IOSTAT = ISO) DS_LONG, DS_LAT, COMPUTESOLRAD, USESHADE, IEVAP, WINDFA, WINDFB, WINDFC, PBLZ, TEM_HRZ, COARE_NITS`; EFDC_Theory_Document_Ver_12.pdf, PDF 83쪽·인쇄 70쪽) IEVAP 번호만으로 표의 계수를 자동 대입하는 경로를 확인하지 못했다. (`input.f90:2693` — `read(1,*,IOSTAT = ISO) DS_LONG, DS_LAT, COMPUTESOLRAD, USESHADE, IEVAP, WINDFA, WINDFB, WINDFC, PBLZ, TEM_HRZ, COARE_NITS`; EFDC_Theory_Document_Ver_12.pdf, PDF 83쪽·인쇄 70쪽) EEMS12 Confluence에는 IEVAP=11·12에 대응하는 추가 방법도 있다. (`models/EFDC/raw/manuals/confluence/spaces/EK/pages/EFDC_Explorer_12_Knowledge_Base/EFDC_Explorer_12_User_Guide/Model_Control_Form/Modules/Temperature_EEMS12/Evaporation_EEMS12.md:23` — `- Compute: Lakes/Streams (Ryan-Harleman, 1974)`; `Transport/calqvs.f90:1651` — `elseif( IEVAP == 11 )then`; `Transport/calqvs.f90:1674` — `elseif( IEVAP == 12 )then`; EFDC_Theory_Document_Ver_12.pdf, PDF 83쪽·인쇄 70쪽) |
 
 ## 6. 소스 매핑 요약
 
@@ -228,7 +247,7 @@ $$f(W) = a + bW + cW^2 \quad (5.33)$$
 | §5.1.2 COARE 3.6 | `ISTOPT(2)==2` :691, 입력변환 :704-737 |
 | §5.1.3 Equilibrium Temp | `SUBROUTINE EQUILIBRIUM_TEMPERATURE` :1551-1603 (BETA:1583·CSHE:1585·반복해 J-loop:1587) |
 | §5.3 Bed Heat | `4.43E-14 = 1/rhob/cpb·5.67e-8` 주석 :968,992 |
-| §5.4.3 Freezing Temp | `TF=-0.0545*SAL` :1181 (매뉴얼 Eq 5.26 정합) |
+| §5.4.3 Freezing Temp | 문서의 입력은 TDS이다. (EFDC_Theory_Document_Ver_12.pdf, PDF 81쪽·인쇄 68쪽) 코드의 입력은 SAL이다. (`Transport/mod_heat.f90:1178` — `if( SAL(L,KC) < 35. )then`; `Transport/mod_heat.f90:1181` — `TF = -0.31462-0.04177*SAL(L,KC)-0.000166*SAL(L,KC)*SAL(L,KC)`; EFDC_Theory_Document_Ver_12.pdf, PDF 81쪽·인쇄 68쪽) TDS와 SAL을 같은 값으로 놓아야 식을 비교할 수 있다. (`Transport/mod_heat.f90:1178` — `if( SAL(L,KC) < 35. )then`; `Transport/mod_heat.f90:1181` — `TF = -0.31462-0.04177*SAL(L,KC)-0.000166*SAL(L,KC)*SAL(L,KC)`; EFDC_Theory_Document_Ver_12.pdf, PDF 81쪽·인쇄 68쪽) 고염분 계수 −0.0417과 −0.04177은 숫자가 다르다. (`Transport/mod_heat.f90:1181` — `TF = -0.31462-0.04177*SAL(L,KC)-0.000166*SAL(L,KC)*SAL(L,KC)`; EFDC_Theory_Document_Ver_12.pdf, PDF 81쪽·인쇄 68쪽) −0.3146과 −0.31462도 숫자가 다르다. (`Transport/mod_heat.f90:1181` — `TF = -0.31462-0.04177*SAL(L,KC)-0.000166*SAL(L,KC)*SAL(L,KC)`; EFDC_Theory_Document_Ver_12.pdf, PDF 81쪽·인쇄 68쪽) SAL=35는 코드의 둘째 분기이다. (`Transport/mod_heat.f90:1178` — `if( SAL(L,KC) < 35. )then`; `Transport/mod_heat.f90:1180` — `else`; `Transport/mod_heat.f90:1181` — `TF = -0.31462-0.04177*SAL(L,KC)-0.000166*SAL(L,KC)*SAL(L,KC)`; EFDC_Theory_Document_Ver_12.pdf, PDF 81쪽·인쇄 68쪽) 문서는 등호 조건을 비워 두었다. (EFDC_Theory_Document_Ver_12.pdf, PDF 81쪽·인쇄 68쪽) 두 식은 TDS와 SAL을 같게 놓을 때 조건부로 근사 대응한다. (`Transport/mod_heat.f90:1178` — `if( SAL(L,KC) < 35. )then`; `Transport/mod_heat.f90:1181` — `TF = -0.31462-0.04177*SAL(L,KC)-0.000166*SAL(L,KC)*SAL(L,KC)`; EFDC_Theory_Document_Ver_12.pdf, PDF 81쪽·인쇄 68쪽) |
 | §5.4.1 Ice (frazil) | `ISICE==4` frazil transport :1190, `FRAZILICE` :1197 |
 | 단위변환 (W2 English) | `MPS_TO_MPH`·`W_M2_TO_BTU_FT2_DAY` 등 :33-37 |
 

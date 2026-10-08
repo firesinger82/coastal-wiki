@@ -8,6 +8,7 @@ note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) �
 note_date: 2026-04~05 (original) / 2026-05-23 (promote)
 verification_by: "사용자 + codex source-code analysis"
 verification_date: 2026-04
+last_source_check: 2026-10-08 (recovery 재판독 대조)
 ---
 
 ## Scope
@@ -75,7 +76,7 @@ Time scheduling per particle:
 
 ## C. Advection / interpolation
 
-RK4 trajectory update in `DRIFTER_CALC` passes 1-4 (`:405-471`).
+LA_DIFOP가 0이 아니거나 ISHDMF가 0이면 코드 위치 갱신은 Euler 경로를 사용한다. (`Drifter/mod_drifter.f90:389` — `if( LA_DIFOP /= 0 .or. ISHDMF == 0 )then`; `Drifter/mod_drifter.f90:410` — `KDX1 = DELTD*(U2NP + DAHX1)`) 그 밖의 경우 코드 위치 갱신은 RK4 경로를 사용한다. (`Drifter/mod_drifter.f90:467` — `XLA(NP) = XLA1 + (KDX1 + 2.0*KDX2 + 2.0*KDX3 + KDX4)/KWEIGHT`) RK4의 공간 보간 단계는 같은 U2·V2·W2 유속 배열을 사용한다. (`Drifter/mod_drifter.f90:467` — `XLA(NP) = XLA1 + (KDX1 + 2.0*KDX2 + 2.0*KDX3 + KDX4)/KWEIGHT`) Theory의 단계별 시간 인자와 이 코드 시간 수준을 구별한다. (`Drifter/mod_drifter.f90:389` — `if( LA_DIFOP /= 0 .or. ISHDMF == 0 )then`; `Drifter/mod_drifter.f90:410` — `KDX1 = DELTD*(U2NP + DAHX1)`; `Drifter/mod_drifter.f90:467` — `XLA(NP) = XLA1 + (KDX1 + 2.0*KDX2 + 2.0*KDX3 + KDX4)/KWEIGHT`)
 
 Particle velocity: `DRF_VELOCITY` (`:1858`).
 
@@ -91,7 +92,7 @@ Vertical velocity `W2` linearly interpolated between layer interfaces (`:1942-19
 
 Horizontal **inverse-distance weighting over 3×3 neighbor stencil** accumulates (`:2017-2023`); returns `U2NI, V2NI, W2NI` (`:2027-2029`).
 
-This is more diffusive than trilinear but smoother near complex bathymetry.
+코드는 인접 위치의 유속을 공간 가중치로 보간한다. (`Drifter/mod_drifter.f90:1917` — `UKB  = 0.5*STCUV(L)*( RSSBCE(L)*U2(LE,K1) + RSSBCW(L)*U2(L,K1) )`; `Drifter/mod_drifter.f90:1926` — `UKT  = 0.5*STCUV(L)*( RSSBCE(L)*U2(LE,K3) + RSSBCW(L)*U2(L,K3) )`) 정적 원문 대조는 보간 방식의 존재를 확인한다. (`Drifter/mod_drifter.f90:1917` — `UKB  = 0.5*STCUV(L)*( RSSBCE(L)*U2(LE,K1) + RSSBCW(L)*U2(L,K1) )`; `Drifter/mod_drifter.f90:1926` — `UKT  = 0.5*STCUV(L)*( RSSBCE(L)*U2(LE,K3) + RSSBCW(L)*U2(L,K3) )`) 다른 보간 방식과의 수치 분산 크기 비교는 확인하지 않음. (`Drifter/mod_drifter.f90:1917` — `UKB  = 0.5*STCUV(L)*( RSSBCE(L)*U2(LE,K1) + RSSBCW(L)*U2(L,K1) )`; `Drifter/mod_drifter.f90:1926` — `UKT  = 0.5*STCUV(L)*( RSSBCE(L)*U2(LE,K3) + RSSBCW(L)*U2(L,K3) )`)
 
 ## D. Random walk diffusion
 
@@ -134,7 +135,7 @@ If `LA_ZCAL == 0`, vertical position **fixed** at initial depth: `ZLA = HPLA + B
 
 **Oil buoyancy special case**: if oil density < 1000 AND `GRPWS == 0`, particle forced near surface at `DLA = 0.005` (`:1212-1217`).
 
-Oil volume loss from evaporation/biodegradation can deactivate particle when `DVOL <= 1D-9` (`:321-333`).
+코드 소멸 기준은 DVOL≤10⁻⁹ m³이다. (`Drifter/mod_drifter.f90:324` — `if( DVOL(NP) <= 1D-9 )then`; EFDC_Theory_Document_Ver_12.pdf, PDF 246쪽·인쇄 233쪽) 이 부피는 1 mm³이다. (`Drifter/mod_drifter.f90:324` — `if( DVOL(NP) <= 1D-9 )then`; EFDC_Theory_Document_Ver_12.pdf, PDF 246쪽·인쇄 233쪽) Confluence도 1 mm³를 사용한다. (`models/EFDC/raw/manuals/confluence/spaces/EK/pages/EFDC_Explorer_12_Knowledge_Base/EFDC_Explorer_12_User_Guide/Model_Control_Form/Modules/Lagrangian_Particle_Tracking/Oil_Spill_Modeling_with_LPT.md:23` — `It should be noted that EFDC will cause the drifter to disappear when the oil per drifter is less than 1.0 mm3. The user may manually choose to hide concentrations of oil higher than this by using the crop below in *2DH View*. For post-processing of the oil simulation, *2DH View* provides several options for displaying the oil. Oil thickness, mass, and volume may also be displayed.`; EFDC_Theory_Document_Ver_12.pdf, PDF 246쪽·인쇄 233쪽) Theory PDF 246쪽은 질량 10⁻⁹ kg로 설명한다. (EFDC_Theory_Document_Ver_12.pdf, PDF 246쪽·인쇄 233쪽)
 
 ## F. Particle status
 

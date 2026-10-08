@@ -8,6 +8,7 @@ note_author: "Claude Opus 4.7 (1M context) source-code 직접 read"
 note_date: 2026-05-28
 verification_by: "사용자 + Claude source-code direct read"
 verification_date: 2026-05-28
+last_source_check: 2026-10-08 (recovery 재판독 대조)
 ---
 
 ## Scope
@@ -223,7 +224,7 @@ ENDDO
 ENDDO
 ```
 
-momentum HMD에서 계산된 `AH(L,K)` 를 그대로 scalar transport (salinity, temperature, contaminant) 확산 flux에 적용 — 즉 Schmidt/Prandtl 수 1로 가정 (momentum과 동일 diffusivity). EFDC+에서는 `ISHDMF == 2` 옵션에서만 scalar diffusion 활성 (EE12 Turbulence 문서: "When `Smagorinsky` is selected (ISHMD=1) ... contaminant diffusion is off and not accounted for. ... When `Smagorinsky with Wall Drag and WC Diffusion` is selected (ISHMD=2), then the full HMD is used as well as wall effects. This option also applies diffusivities to all constituent transport, which includes salinity and temperatures").
+2시각 CALHDMF의 ISHDMF=1·2는 벽 효과를 제외한다. (`calhdmf.f90:121` — `if( ISHDMF == 1 .or. ISHDMF == 2 )then`; `calhdmf.f90:122` — `! *** HMD WITHOUT WALL EFFECTS`; `calhdmf.f90:143` — `! *** HMD WITH WALL EFFECTS`) 다른 활성 분기는 벽 효과를 사용한다. (`calhdmf.f90:121` — `if( ISHDMF == 1 .or. ISHDMF == 2 )then`; `calhdmf.f90:122` — `! *** HMD WITHOUT WALL EFFECTS`; `calhdmf.f90:143` — `! *** HMD WITH WALL EFFECTS`) CALTRAN의 수평 물질 확산은 ISHDMF=2·4에서 작동한다. (`Transport/caltran.f90:162` — `if( (ISHDMF == 2 .or. ISHDMF == 4) .and. IW <= NACTIVEWC ) CALL CALDIFF (CON1,IW)`)
 
 ## 6. 입력 파라미터 — Card C12
 
@@ -238,7 +239,7 @@ C12 | AHO | AHD | AVO | ABO | AVMX | ABMX | VISMUD | AVCON | ZBRWALL
 |---|---|---|---|---|
 | `AHO` | Constant horizontal momentum/mass diffusivity (m²/s) | m²/s | 0 | `input.f90:643` read, `:3737, 3742` use |
 | `AHD` | Dimensionless Smagorinsky coefficient $C_s$ (ISHDMF>0 필요) | — | 0.025 | `input.f90:643, 3946-3951` |
-| `ZBRWALL` | 측벽 log-law 거칠기 (ISHDMF=2 wall effect) | m | 0.002 | `input.f90:643` |
+| `ZBRWALL` | — | — | — | 2시각 CALHDMF의 ISHDMF=1·2는 벽 효과를 제외한다. (`calhdmf.f90:121` — `if( ISHDMF == 1 .or. ISHDMF == 2 )then`; `calhdmf.f90:122` — `! *** HMD WITHOUT WALL EFFECTS`; `calhdmf.f90:143` — `! *** HMD WITH WALL EFFECTS`) 다른 활성 분기는 벽 효과를 사용한다. (`calhdmf.f90:121` — `if( ISHDMF == 1 .or. ISHDMF == 2 )then`; `calhdmf.f90:122` — `! *** HMD WITHOUT WALL EFFECTS`; `calhdmf.f90:143` — `! *** HMD WITH WALL EFFECTS`) CALTRAN의 수평 물질 확산은 ISHDMF=2·4에서 작동한다. (`Transport/caltran.f90:162` — `if( (ISHDMF == 2 .or. ISHDMF == 4) .and. IW <= NACTIVEWC ) CALL CALDIFF (CON1,IW)`) |
 | `ISHDMF` | HMD 옵션 (0/1/2 — EE GUI ISHMD 동일) | flag | — | `input.f90` Card C2 |
 
 **Default 0.025 주의**: Theory §2.1.5 권장 범위 $C_s = 0.1\text{-}0.2$ (Smagorinsky 표준) 보다 훨씬 작음. EE GUI 기본값은 EFDC 전통 — 사용자가 격자 해상도 따라 조정 필요. Smagorinsky 1963 원논문 권장 0.16-0.17.
@@ -249,7 +250,7 @@ C12 | AHO | AHD | AVO | ABO | AVMX | ABMX | VISMUD | AVCON | ZBRWALL
 |---|---|
 | 0 | HMD off — `AH = AHO` (`AHOXY`) 상수만 |
 | 1 | Smagorinsky on, **벽 효과 없음**, **scalar 확산 미적용** |
-| 2 | Smagorinsky + 벽 log-law slip + **scalar (salinity, temperature) 확산 적용** |
+| 2 | 2시각 CALHDMF의 ISHDMF=1·2는 벽 효과를 제외한다. (`calhdmf.f90:121` — `if( ISHDMF == 1 .or. ISHDMF == 2 )then`; `calhdmf.f90:122` — `! *** HMD WITHOUT WALL EFFECTS`; `calhdmf.f90:143` — `! *** HMD WITH WALL EFFECTS`) 다른 활성 분기는 벽 효과를 사용한다. (`calhdmf.f90:121` — `if( ISHDMF == 1 .or. ISHDMF == 2 )then`; `calhdmf.f90:122` — `! *** HMD WITHOUT WALL EFFECTS`; `calhdmf.f90:143` — `! *** HMD WITH WALL EFFECTS`) CALTRAN의 수평 물질 확산은 ISHDMF=2·4에서 작동한다. (`Transport/caltran.f90:162` — `if( (ISHDMF == 2 .or. ISHDMF == 4) .and. IW <= NACTIVEWC ) CALL CALDIFF (CON1,IW)`) Confluence Turbulence의 ISHMD=2 설명도 같은 번호 오류를 가진다. (`calhdmf.f90:121` — `if( ISHDMF == 1 .or. ISHDMF == 2 )then`; `calhdmf.f90:122` — `! *** HMD WITHOUT WALL EFFECTS`; `models/EFDC/raw/manuals/confluence/spaces/EK/pages/EFDC_Explorer_12_Knowledge_Base/EFDC_Explorer_12_User_Guide/Model_Control_Form/Modules/Hydrodynamics_Module/Turbulence.md:34` — `When Activate HMD with *Smagorinsky with Wall Drag and WC Diffusion* is selected (ISHMD=2), then the full HMD is used as well as wall effects. This option also applies diffusivities to all constituent transport, which includes salinity and temperatures. This option should be used when simulating a very uniform flow system, the constituent transport is needed. The resulting horizontal diffusivity from these options can be viewed from within *ViewPlan*provided velocities are also available. The vertical eddy viscosities and diffusivities (AVO & ABO arrays in EFDC, respectively) can also be viewed if the user configures the Internal Array Viewer (See [Appendix A](/wiki/spaces/CVLKB/pages/2818055/Appendix+A+-+Grid+Formats)) to include these arrays.`) |
 
 ### 6.2 Spatially-variable AHO/AHD — `AHMAP.INP`
 

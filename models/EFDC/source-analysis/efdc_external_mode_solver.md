@@ -11,15 +11,16 @@ verification_date: 2026-06-04
 related:
   - models/EFDC/source-analysis/efdc_hydro_core.md
   - models/EFDC/source-analysis/efdc_dispersion.md
+last_source_check: 2026-10-08 (recovery 재판독 대조)
 ---
 
 # EFDC 외부모드 solver (congrad / congradc)
 
-> `congrad.f90`(225) + `congradc.f90`(231) 직접 read. EFDC 의 **external mode(2D depth-integrated 수위) 방정식**을 **Conjugate Gradient(CG)** 로 해. [[efdc_hydro_core]] 의 external-internal mode split 에서 external mode(자유표면 중력파)를 implicit 하게 푸는 핵심 solver. ADCIRC GWCE JCG([[adcirc-itpack-solver]])·XBeach SIP 와 같은 역할.
+> 외부 모드의 해법 호출은 프로세스 수와 MDCHH에 따라 CONGRAD·CONGRADC·Congrad_MPI로 나뉜다. (`calpuv2c.f90:660` — `if( MDCHH == 0 ) Call Congrad_MPI   ! *** MSCHH> = 1 not parallelized yet @todo`; `calpuv2c.f90:662` — `if( MDCHH == 0 ) CALL CONGRAD`; `calpuv2c.f90:663` — `if( MDCHH >= 1 ) CALL CONGRADC`)
 
 ## 1. 외부모드 5-point 방정식 (congrad.f90:70)
 
-수위 `P`(=자유표면 압력/elevation)의 이산 방정식 — 곡선격자 cell L 의 5-point stencil:
+외부 압력 상태 P는 G*(HP+BELV)이다. (`calpuv2c.f90:975` — `P(L) = G*(HP(L) + BELV(L))`)
 ```fortran
 CCC(L)·P(L) + CCN·P(LN) + CCS·P(LS) + CCW·P(LW) + CCE·P(LE) = FPTMP(L)
 ```
@@ -37,13 +38,13 @@ RPCG = Σ RCG·PCG                                                     ! r·z
         RSQ < tol 까지
 ```
 - **Jacobi(대각) 전처리** `CCCI = 1/CCC` — 간단·빠름(EFDC 격자 대각우세). CG 표준 recurrence(ALPHA step + BETA conjugate direction).
-- **OMP 병렬**: matvec(APCG)·내적이 OpenMP `$OMP` 분할(NOPTIMAL/LDMOPT 도메인). 수렴 `RSQ/RSQ0 < RSQM`.
-- `congradc.f90` = 변형(complex/특수 경계 또는 다른 전처리 버전).
+- CONGRAD는 RSQ<=RSQM이면 종료한다. (`congrad.f90:143` — `RSQ   = RSQ   + RCG(L)*RCG(L)`; `congrad.f90:171` — `if( RSQ <= RSQM )then`)
+- 단일 프로세스는 MDCHH>=1에서 CONGRADC를 호출한다. (`calpuv2c.f90:663` — `if( MDCHH >= 1 ) CALL CONGRADC`; `calpuv9c.f90:706` — `if( MDCHH >= 1 ) CALL CONGRADC`; `congradc.f90:69` — `if( MDCHH >= 1 )then`) CONGRADC는 하부격자 수로 결합 경로이다. (`calpuv2c.f90:663` — `if( MDCHH >= 1 ) CALL CONGRADC`; `calpuv9c.f90:706` — `if( MDCHH >= 1 ) CALL CONGRADC`)
 
 ## 3. external-internal mode split 내 위치
 
-- EFDC 는 **mode splitting**([[efdc_hydro_core]]): external(2D 빠른 중력파, 작은 dt 또는 implicit) + internal(3D shear, 큰 dt). CONGRAD 가 external mode 수위를 **semi-implicit** 하게 → 중력파 CFL 제약 완화(큰 dt 가능).
-- 매 time step external mode 호출. 수렴 반복수가 hydro 비용의 큰 부분(대규모 격자).
+- 외부 모드와 내부 모드는 같은 물리 단계에서 순차 호출한다. (`hdmt2t.f90:627` — `call CALPUV2C`; `hdmt2t.f90:650` — `call CALUVW`; `hdmt.f90:690` — `call CALPUV9C`; `hdmt.f90:772` — `call CALUVW`)
+- 3TL 보정은 같은 시각에서 계산 구간을 다시 수행한다. (`hdmt.f90:1342` — `GOTO 500`; `calpuv2c.f90:1002` — `GOTO 1000`) 습윤건조 상태 변경은 외부 해법을 다시 수행할 수 있다. (`hdmt.f90:1342` — `GOTO 500`; `calpuv2c.f90:1002` — `GOTO 1000`) 해법 비용 비중은 확인하지 않음. (`hdmt.f90:1342` — `GOTO 500`; `calpuv2c.f90:1002` — `GOTO 1000`)
 
 ## 4. 비교
 

@@ -11,6 +11,7 @@ verification_date: 2026-06-04
 related:
   - models/EFDC/source-analysis/efdc_hydro_core.md
   - models/EFDC/source-analysis/efdc_wetdry.md
+last_source_check: 2026-10-08 (recovery 재판독 대조)
 ---
 
 # EFDC 보조 모듈 맵
@@ -29,8 +30,8 @@ related:
 
 ## 3. 외력·물리 옵션
 
-- **calvegser.f90**(69): **식생(vegetation) 시계열** 입력(시변 식생밀도/높이). vegetation drag 외력의 time series.
-- **mhkpwr.f90**(324): **MHK(Marine Hydrokinetic) 터빈 전력** — 조류/해류 터빈의 운동량 흡수(drag) + 전력 산출. tidal/current energy 응용.
+- calvegser.f90는 줄기 밀도·줄기 지름·식생 높이를 시간 보간한다. (`calvegser.f90:58` — `RDLPSQ(M) = VEGSERRT(NSTMP)`; `calvegser.f90:59` — `BPVEG(M) = VEGSERBT(NSTMP)`; `calvegser.f90:60` — `HPVEG(M) = VEGSERHT(NSTMP)`) 이 루틴은 PVEGZ도 다시 계산한다. (`calvegser.f90:62` — `PVEGZ(M) = 1.-ALPVEG(M)*BDLTMP`) 이 재계산에는 입력 단계의 PVEGZ 하한을 적용하지 않는다. (`calvegser.f90:62` — `PVEGZ(M) = 1.-ALPVEG(M)*BDLTMP`)
+- 코드는 CTMHK에 장치 밀도 DENMHK를 곱한다. (`input.f90:7430` — `CTMHK(M) = CTMHK(M)*DENMHK(M)`; EFDC_Theory_Document_Ver_12.pdf, PDF 247쪽·인쇄 234쪽) 코드는 CTMHK를 비선형 추력계수로 변환한다. (`mhkpwr.f90:203` — `THRSTCOEF = 4.0*(1.0-SQRT(1.0-CTMHK(M)))/(1.0+SQRT(1.0-CTMHK(M))) !From Roc paper`; EFDC_Theory_Document_Ver_12.pdf, PDF 247쪽·인쇄 234쪽) 추력은 평가 속도의 제곱에 비례한다. (`mhkpwr.f90:212` — `FMHK = (B(L,K)+1.0)/DXMHK*0.5*THRSTCOEF*VELUP*VELUP*HP(L)*DZC(L,K)*WIDTHMHK(M)*LAYFRACM(K)*DENMHK(M)  ! area is ASSUMED square`; EFDC_Theory_Document_Ver_12.pdf, PDF 247쪽·인쇄 234쪽) 출력은 그 추력에 국소 속도를 곱한다. (`mhkpwr.f90:214` — `PMHK(L,K) = FMHK*FLOWSPEED(K) !ThrustCoef*|u|u^2*area [m^5/s^3] (will yield different power outputs depending on UPSTREAM)`; EFDC_Theory_Document_Ver_12.pdf, PDF 247쪽·인쇄 234쪽) 코드 출력에는 밀도 보정의 추가 곱셈이 있다. (`mhkpwr.f90:223` — `PMHK(L,K) = PMHK(L,K)*(B(L,K)+1.0)*1000.0`; EFDC_Theory_Document_Ver_12.pdf, PDF 247쪽·인쇄 234쪽) Theory 식 10.1–10.2와 Confluence의 단순 속도 세제곱 설명은 이 코드식과 다르다. (`mhkpwr.f90:212` — `FMHK = (B(L,K)+1.0)/DXMHK*0.5*THRSTCOEF*VELUP*VELUP*HP(L)*DZC(L,K)*WIDTHMHK(M)*LAYFRACM(K)*DENMHK(M)  ! area is ASSUMED square`; EFDC_Theory_Document_Ver_12.pdf, PDF 247쪽·인쇄 234쪽, 식 10.1; EFDC_Theory_Document_Ver_12.pdf, PDF 247쪽·인쇄 234쪽, 식 10.2)
 
 ## 4. 제어·로그·유틸
 

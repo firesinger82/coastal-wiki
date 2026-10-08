@@ -13,6 +13,7 @@ related:
   - models/EFDC/source-analysis/efdc_turbulence.md
   - models/EFDC/manual-notes/efdc-theory-v12-ch2-hydrodynamics.md
   - models/SWAN/source-analysis/swan-foundation.md
+last_source_check: 2026-10-08 (recovery 재판독 대조)
 ---
 
 # EFDC+ Waves 모듈 — wind-wave / SWAN 결합 / radiation stress
@@ -63,13 +64,13 @@ FWL = (RLS/TP - U*COS(PHI)) - SQRT(G*RLS/2π * TANH(2π*HD/RLS))    ! DISRELATIO
 ## 5. Radiation stress + wave 강제 (wavesxy.f90) ★
 
 외부/내부 wave data → 운동량·난류 강제:
-- **wave energy**: `ENE = 0.5·g·|a|²` (m³/s²), `WVDISP` = dissipation (m³/s³, SWAN INRHOG W/m²).
+- 코드의 유의파고 에너지는 ρgHs²/16이다. (`Waves/wavesxy.f90:232` — `WE = 9.81*1000.*WV(L).HEIGHT**2 /16.           ! *** TOTAL WAVE ENERGY : KG/S2`; `Waves/mod_windwave.f90:741` — `WVENEP(L)= G*WV(L).HEIGHT**2./16.                         ! *** ENERGY/RHO (M3/S2) FOR RANDOM WAVE`; EFDC_Theory_Document_Ver_12.pdf, PDF 34쪽·인쇄 21쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 35쪽·인쇄 22쪽) 문서 식 2.49는 ρgHs²/8이다. (EFDC_Theory_Document_Ver_12.pdf, PDF 35쪽·인쇄 22쪽, 식 2.49) 기존 ENE=0.5g|a|² 표현의 파고·진폭 정의와 저장 단위는 확인하지 않음. (`Waves/wavesxy.f90:232` — `WE = 9.81*1000.*WV(L).HEIGHT**2 /16.           ! *** TOTAL WAVE ENERGY : KG/S2`; `Waves/wavesxy.f90:233` — `WVENEP(L) = WE/1000.                           ! *** WAVE ENERGY/RHO: M3/S2`; EFDC_Theory_Document_Ver_12.pdf, PDF 34쪽·인쇄 21쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 35쪽·인쇄 22쪽)
 - **radiation stress** `SXX/SYY/SXY` (kg/s²) → **wave-induced force** `FXWAVE/FYWAVE` + `WVHUU/WVHVV/WVHUV`(운동량 항). 
   - `ISWRSR` = 회전(rotational) 성분 / `ISWRSI` = 비회전(irrotational) 성분 포함 토글.
 - **wave dissipation → 난류 source**: `WVDISV` = TKE(q²) closure source 분율 → `WVDTKEP/WVDTKEM`(층별 0.5·WVDISV 분배, line 109-120). `WVDISH`(Smagorinsky 수평) = **NOT USED**.
 - `ISWCBL=1` wave-current BL 활성, `NTSWV` = wave forcing 점진 도입 step 수.
 
-→ radiation stress 이론은 [[efdc-theory-v12-ch2-hydrodynamics]] (Longuet-Higgins-Stewart 1964) 대응. wave→current setup·longshore 구동.
+코드의 유의파고 에너지는 ρgHs²/16이다. (`Waves/wavesxy.f90:232` — `WE = 9.81*1000.*WV(L).HEIGHT**2 /16.           ! *** TOTAL WAVE ENERGY : KG/S2`; `Waves/mod_windwave.f90:741` — `WVENEP(L)= G*WV(L).HEIGHT**2./16.                         ! *** ENERGY/RHO (M3/S2) FOR RANDOM WAVE`; EFDC_Theory_Document_Ver_12.pdf, PDF 34쪽·인쇄 21쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 35쪽·인쇄 22쪽) 문서 식 2.49는 ρgHs²/8이다. (EFDC_Theory_Document_Ver_12.pdf, PDF 35쪽·인쇄 22쪽, 식 2.49) wavesxy는 방사 응력 괄호 전체에 E를 곱한다. (`Waves/wavesxy.f90:236` — `SXXTMP = WE*(WG/2+WN*COS(WV(L).DIR)**2)        ! *** RADIATION SHEAR STRESS [Kg/S2]`; `Waves/wavesxy.f90:238` — `SYYTMP = WE*(WG/2+WN*SIN(WV(L).DIR)**2)        ! *** RADIATION SHEAR STRESS [Kg/S2]`; EFDC_Theory_Document_Ver_12.pdf, PDF 34쪽·인쇄 21쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 35쪽·인쇄 22쪽) 문서 식 2.46·2.48은 마지막 항에만 E를 인쇄한다. (EFDC_Theory_Document_Ver_12.pdf, PDF 34쪽·인쇄 21쪽, 식 2.46; EFDC_Theory_Document_Ver_12.pdf, PDF 34쪽·인쇄 21쪽, 식 2.48)
 
 ## 6. SWAN 결합 (mod_getswan.f90)
 

@@ -14,6 +14,7 @@ related:
   - models/EFDC/source-analysis/efdc_cyclone_wind.md
   - models/EFDC/manual-notes/efdc-implementation-guide.md
   - models/EFDC/manual-notes/efdc-user-manual-r850.md
+last_source_check: 2026-10-08 (recovery 재판독 대조)
 ---
 
 # EFDC+ v12.4 조석·바람 강제력 규약
@@ -26,7 +27,7 @@ related:
 
 1. **읽기**: `SEEK('C17')` 후 성분(MTIDE)×경계(NPFOR)별 `PFAM(NP,M), PFPH(NP,M)` (`input.f90:936` 부근, NPFORT 분기별).
 2. **cos/sin 변환**: `RAD = 2π·PFPH/TCP(M)` → `CPFAM0 = PFAM·cos(RAD)`, `SPFAM0 = PFAM·sin(RAD)` (`input.f90:944-946`, NPFORT≥1 분기; NPFORT=0은 S/W/E/N 경계 카드 처리에서 동일 변환 후 ×G로 `PCB*/PSB*` 생성, `input.f90:1021-1044` 등 — [[efdc_boundary_conditions]] §G).
-3. **런타임 합성**: `hdmt.f90:89` `TIMESEC = DBLE(TCON)·DBLE(TBEGIN)`(런 시작 시 **절대 시간**으로 초기화) → `setopenbc.f90:232` `TN = TIMESEC`, `:234-237` `CCCOS/SSSIN = cos/sin(2π·mod(TN,TCP)/TCP)` → `:255-260`(남측; 서/동/북 동형) `FP += PCB·cos + PSB·sin`.
+3. **런타임 합성**: `hdmt.f90:89` `TIMESEC = DBLE(TCON)*DBLE(TBEGIN)`(런 시작 시 **절대 시간**으로 초기화) → `setopenbc.f90:232` `TN = TIMESEC`, `:234-237` `CCCOS/SSSIN = cos/sin(2π·mod(TN,TCP)/TCP)` → `:255-260`(남측; 서/동/북 동형) `FP += PCB·cos + PSB·sin`.
 
 cos·cos + sin·sin 합성 항등식으로 정리하면:
 
@@ -36,7 +37,7 @@ cos·cos + sin·sin 합성 항등식으로 정리하면:
 
 **핵심 규약 2가지**:
 
-- `PFPH`는 도(°)가 아니라 **TCP와 같은 시간 단위(초)의 위상 lag**다 (`RAD = 2π·PFPH/TCP`가 성립하려면 PFPH∈[0,TCP)).
+- PFPH의 단위는 TCP와 같은 초다. (`input.f90:940` — `read(1,*,IOSTAT = ISO) IECHO(M), CECHO(M),PFAM(NP,M),PFPH(NP,M)`; `input.f90:944` — `RAD = PI2*PFPH(NP,M)/TCP(M)`; `input.f90:943` — `read(1,*,IOSTAT = ISO) IECHO(M), CECHO(M), PFAM(NP,M), PFPH(NP,M)`; EFDC_Manual.pdf, PDF 30쪽·인쇄 26쪽) 코드는 RAD=2*PI*PFPH/TCP를 계산한다. (`input.f90:940` — `read(1,*,IOSTAT = ISO) IECHO(M), CECHO(M),PFAM(NP,M),PFPH(NP,M)`; `input.f90:944` — `RAD = PI2*PFPH(NP,M)/TCP(M)`; `input.f90:943` — `read(1,*,IOSTAT = ISO) IECHO(M), CECHO(M), PFAM(NP,M), PFPH(NP,M)`; EFDC_Manual.pdf, PDF 30쪽·인쇄 26쪽) 확인한 C17 입력 경로에는 PFPH를 [0,TCP)로 제한하는 검사가 없다. (`input.f90:940` — `read(1,*,IOSTAT = ISO) IECHO(M), CECHO(M),PFAM(NP,M),PFPH(NP,M)`; `input.f90:944` — `RAD = PI2*PFPH(NP,M)/TCP(M)`; `input.f90:943` — `read(1,*,IOSTAT = ISO) IECHO(M), CECHO(M), PFAM(NP,M), PFPH(NP,M)`; EFDC_Manual.pdf, PDF 30쪽·인쇄 26쪽) [0,TCP) 정규화는 입력 준비 규약으로 구분한다. (`input.f90:944` — `RAD = PI2*PFPH(NP,M)/TCP(M)`; EFDC_Manual.pdf, PDF 30쪽·인쇄 26쪽)
 - 합성 시각은 run 상대시간이 아니라 **절대 `TIMESEC`(= TCON·TBEGIN 부터 진행)**. 따라서 레거시 매뉴얼의 "phase relative to time origin of TBEGIN" 서술을 "run 시작 = 위상 0"으로 읽으면 안 되고, `TBEGIN`을 바꾸면 `PFPH`를 재계산해야 한다:
 
 ```

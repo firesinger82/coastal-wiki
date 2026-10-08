@@ -13,6 +13,7 @@ related:
   - models/EFDC/source-analysis/efdc_external_mode_solver.md
   - models/EFDC/source-analysis/efdc_bottom_friction.md
   - concepts/sst/04-code-and-tools.md
+last_source_check: 2026-10-08 (recovery 재판독 대조)
 ---
 
 # EFDC+ 밀도 EOS + baroclinic 압력구배 — `calbuoy.f90` + `calebi.f90`
@@ -48,7 +49,7 @@ B(L,K)    = (RHO1/RHOO) - 1.        ! :137 부력 [무차원]
 ```
 온도전용(:148-151)·S+T full(:166-176) 분기. 유사 밀도보정(:234-237): `B = B*(1-TVAR1S) + TVAR1W`, `RHOW *= (1-TVAR1S+TVAR1W)` (부피변위 + 초과침수중량, ISTRAN(6/7) 시).
 
-> ⚠ **surface EOS (압력 탈락)**: 다항식은 `P=0`에서 평가(:57), S/T 항에 압력/수심항 없음. GSW `PSW=(1-ZZ)*HP`(:94)는 **in-situ→잠재온도 변환에만** 사용, 밀도다항식엔 미투입. → EFDC+ 밀도 = Mellor **절단·압력무관** 근사(UNESCO 압축률/secant-bulk-modulus 분기 생략). 매뉴얼 "UNESCO EOS" 는 과대표현.
+> 일반 상태방정식 2.8과 압력 인자가 없는 다항식 2.12를 구분한다. (EFDC_Theory_Document_Ver_12.pdf, PDF 24쪽·인쇄 11쪽, 식 2.8; EFDC_Theory_Document_Ver_12.pdf, PDF 26쪽·인쇄 13쪽, 식 2.12) CALBUOY의 기본 S·T 다항식은 식 2.12와 대응한다. (`calbuoy.f90:166` — `RHTMP = 999.842594 + 6.793952D-2*TTMP - 9.095290D-3*TTMP*TTMP  &`; `calbuoy.f90:171` — `RHO1 = RHTMP + SSTMP*(0.824493 - 4.0899D-3*TTMP + 7.6438D-5*TTMP*TTMP   &`; `calbuoy.f90:174` — `+ SQRT(SSTMP)*SSTMP*(-5.72466D-3 + 1.0227D-4*TTMP   &`; `calbuoy.f90:176` — `+ 4.8314D-4*SSTMP*SSTMP`; EFDC_Theory_Document_Ver_12.pdf, PDF 26쪽·인쇄 13쪽, 식 2.12) ISGOTM>0 또는 IBSC=2는 수심에 따른 온위 변환을 먼저 적용한다. (`calbuoy.f90:94` — `PSW = (1. - ZZ(L,K))*HP(L)        ! *** Pressue at the mid point of the layer [m]`; `calbuoy.f90:97` — `PTEM(L,K) = gsw_pt_from_t (sa, tm, PSW, p_ref)`; EFDC_Theory_Document_Ver_12.pdf, PDF 24쪽·인쇄 11쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 26쪽·인쇄 13쪽) 밀도 다항식 자체에는 압축률을 넣지 않는다. (`calbuoy.f90:166` — `RHTMP = 999.842594 + 6.793952D-2*TTMP - 9.095290D-3*TTMP*TTMP  &`; `calbuoy.f90:171` — `RHO1 = RHTMP + SSTMP*(0.824493 - 4.0899D-3*TTMP + 7.6438D-5*TTMP*TTMP   &`; `calbuoy.f90:174` — `+ SQRT(SSTMP)*SSTMP*(-5.72466D-3 + 1.0227D-4*TTMP   &`; `calbuoy.f90:176` — `+ 4.8314D-4*SSTMP*SSTMP`; EFDC_Theory_Document_Ver_12.pdf, PDF 24쪽·인쇄 11쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 26쪽·인쇄 13쪽) 이 확인만으로 문서의 식 2.12를 UNESCO가 아닌 다른 상태방정식으로 재명명하지 않는다. (`calbuoy.f90:166` — `RHTMP = 999.842594 + 6.793952D-2*TTMP - 9.095290D-3*TTMP*TTMP  &`; `calbuoy.f90:171` — `RHO1 = RHTMP + SSTMP*(0.824493 - 4.0899D-3*TTMP + 7.6438D-5*TTMP*TTMP   &`; `calbuoy.f90:174` — `+ SQRT(SSTMP)*SSTMP*(-5.72466D-3 + 1.0227D-4*TTMP   &`; `calbuoy.f90:176` — `+ 4.8314D-4*SSTMP*SSTMP`; EFDC_Theory_Document_Ver_12.pdf, PDF 26쪽·인쇄 13쪽, 식 2.12)
 
 ## 2. `calebi.f90` — 외부모드 buoyancy 적분 (:9-453)
 
@@ -83,7 +84,7 @@ else      : STANDARD-SIGMA (:1206-1207)
 `IINTPG`는 입력으로 계속 읽히지만 (`input.f90:269`) buoyancy shear 분기에는 더 이상 쓰이지 않는다. `calexp2t.f90`(2TL)에서도 `IINTPG` 출현은 4→0으로 제거됐다 (`calexp2t.f90:1246-1305`). 유일한 동작 소비처는 `setbcs.f90:449`의 `if( IINTPG == 0 )` — 2-cell-wide 수로의 external density gradient cell-face flag 처리이며, `IINTPG /= 0`은 이 처리를 끈다.
 
 ## 5. 주요 findings
-- **surface EOS**: 압력 다항식 미포함(P=0) → 압축률 생략, "UNESCO EOS" 아니라 Mellor 절단근사.
+- 일반 상태방정식 2.8과 압력 인자가 없는 다항식 2.12를 구분한다. (EFDC_Theory_Document_Ver_12.pdf, PDF 24쪽·인쇄 11쪽, 식 2.8; EFDC_Theory_Document_Ver_12.pdf, PDF 26쪽·인쇄 13쪽, 식 2.12) CALBUOY의 기본 S·T 다항식은 식 2.12와 대응한다. (`calbuoy.f90:166` — `RHTMP = 999.842594 + 6.793952D-2*TTMP - 9.095290D-3*TTMP*TTMP  &`; `calbuoy.f90:171` — `RHO1 = RHTMP + SSTMP*(0.824493 - 4.0899D-3*TTMP + 7.6438D-5*TTMP*TTMP   &`; `calbuoy.f90:174` — `+ SQRT(SSTMP)*SSTMP*(-5.72466D-3 + 1.0227D-4*TTMP   &`; `calbuoy.f90:176` — `+ 4.8314D-4*SSTMP*SSTMP`; EFDC_Theory_Document_Ver_12.pdf, PDF 26쪽·인쇄 13쪽, 식 2.12) 밀도 다항식 자체에는 압축률을 넣지 않는다. (`calbuoy.f90:166` — `RHTMP = 999.842594 + 6.793952D-2*TTMP - 9.095290D-3*TTMP*TTMP  &`; `calbuoy.f90:171` — `RHO1 = RHTMP + SSTMP*(0.824493 - 4.0899D-3*TTMP + 7.6438D-5*TTMP*TTMP   &`; `calbuoy.f90:174` — `+ SQRT(SSTMP)*SSTMP*(-5.72466D-3 + 1.0227D-4*TTMP   &`; `calbuoy.f90:176` — `+ 4.8314D-4*SSTMP*SSTMP`; EFDC_Theory_Document_Ver_12.pdf, PDF 24쪽·인쇄 11쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 26쪽·인쇄 13쪽) 이 확인만으로 문서의 식 2.12를 UNESCO가 아닌 다른 상태방정식으로 재명명하지 않는다. (`calbuoy.f90:166` — `RHTMP = 999.842594 + 6.793952D-2*TTMP - 9.095290D-3*TTMP*TTMP  &`; `calbuoy.f90:171` — `RHO1 = RHTMP + SSTMP*(0.824493 - 4.0899D-3*TTMP + 7.6438D-5*TTMP*TTMP   &`; `calbuoy.f90:174` — `+ SQRT(SSTMP)*SSTMP*(-5.72466D-3 + 1.0227D-4*TTMP   &`; `calbuoy.f90:176` — `+ 4.8314D-4*SSTMP*SSTMP`; EFDC_Theory_Document_Ver_12.pdf, PDF 26쪽·인쇄 13쪽, 식 2.12)
 - **IBSC==1 미문서 선형 진단**(B=0.00075·SAL, :50) — EOS 전체 우회.
 - **ρ₀ 동결**: 참조온도 TEMO 단일 스칼라, N≤5 만 계산 → 전역 Boussinesq baseline.
 - **유사-밀도 결합**: 부유사 loading 이 "water density" 에 이미 포함(:234-237).

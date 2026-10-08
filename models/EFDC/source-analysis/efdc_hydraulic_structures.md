@@ -8,6 +8,7 @@ note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) �
 note_date: 2026-04~05 (original) / 2026-05-23 (promote)
 verification_by: "사용자 + codex source-code analysis"
 verification_date: 2026-04
+last_source_check: 2026-10-08 (recovery 재판독 대조)
 ---
 
 ## Scope
@@ -116,7 +117,7 @@ KCON = area / Manning_n · hydraulic_radius^0.6667
 | Condition | Regime | Formula |
 |---|---|---|
 | `HDD > DIA` or `HUD > 1.5·DIA` | Full pipe | `Q = KCON·√S` |
-| `S >= SCR` | Supercritical inlet control | `Q = QCR` |
+| `S >= SCR` | 코드·문서 대조 | 문서의 수리 수심 D=A/수면 폭과 코드 HRAD=A/젖은 둘레를 구분한다. (`mod_hydstructure.f90:956` — `HRAD = FAREA/WETPER                          ! *** HYDRAULIC RADIUS`; EFDC_Theory_Document_Ver_12.pdf, PDF 40쪽·인쇄 27쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 43쪽·인쇄 30쪽) 코드는 HCR=HUD−HRAD/2를 관경 이하로 제한한다. (`mod_hydstructure.f90:273` — `HCR =  HUD - 0.5*HRAD               ! *** Critical depth`; `mod_hydstructure.f90:274` — `HCR = min(HCR,DIA)`; EFDC_Theory_Document_Ver_12.pdf, PDF 40쪽·인쇄 27쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 43쪽·인쇄 30쪽) VCR은 sqrt(9.81HRAD)이다. (`mod_hydstructure.f90:275` — `VCR = SQRT(9.81*HRAD)`; EFDC_Theory_Document_Ver_12.pdf, PDF 40쪽·인쇄 27쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 43쪽·인쇄 30쪽) HCR 제한 뒤에는 문서의 에너지 식을 그대로 보존하지 않는다. (`mod_hydstructure.f90:273` — `HCR =  HUD - 0.5*HRAD               ! *** Critical depth`; `mod_hydstructure.f90:274` — `HCR = min(HCR,DIA)`; EFDC_Theory_Document_Ver_12.pdf, PDF 40쪽·인쇄 27쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 43쪽·인쇄 30쪽) 코드의 오리피스 수두에는 별도 기준 표고와 부분 잠김 보정이 있다. (`mod_hydstructure.f90:494` — `HUD = ZHU - USINV + 0.5*HB  ! *** HUD based on centerline`; `mod_hydstructure.f90:498` — `if( ZHD > USINV )then`; `mod_hydstructure.f90:499` — `QHS = QHS*(1.-HDD/HUD)**0.385`; EFDC_Theory_Document_Ver_12.pdf, PDF 40쪽·인쇄 27쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 43쪽·인쇄 30쪽) |
 | `S < SCR` and `HDD >= HCR` | Subcritical tailwater control | Manning velocity at tailwater depth |
 | `HDD < HCR` and `S < SCR` | Subcritical outlet control | Normal-depth Manning velocity |
 

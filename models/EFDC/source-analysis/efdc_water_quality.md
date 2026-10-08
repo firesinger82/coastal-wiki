@@ -8,6 +8,7 @@ note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) �
 note_date: 2026-04~05 (original) / 2026-05-23 (promote)
 verification_by: "사용자 + codex source-code analysis"
 verification_date: 2026-04
+last_source_check: 2026-10-08 (recovery 재판독 대조)
 ---
 
 ## Scope
@@ -46,7 +47,7 @@ Init: `WQ3DINP` from startup when WQ active (`aaefdc.f90:126, 3088`).
 
 Runtime: `WQ3D` called from both hydro drivers when `ISTRAN(8) >= 1` (`hdmt.f90:35, 1021`; `hdmt2t.f90:37, 734`).
 
-`WQ3D` dispatches kinetic scheme via `WQSKE0/1/2/3/4`, then optional zooplankton, sediment diagenesis, RPEM (`mod_wq.f90:333-358`).
+EFDC+는 ISWQLVL=1에서 WQSKE1을 호출한다. (`Eutrophication/mod_wq.f90:335` — `if( ISWQLVL == 1 ) CALL WQSKE1 ! *** Extension of CEQUAL-ICM for unlimited algae + zooplankton`) WQSKE0은 STOPP로 중단한다. (`Eutrophication/mod_wq.f90:2622` — `call STOPP('BAD KINETICS OPTION: ISWQLVL = 0 Does not work!  Contact DSI')   ! delme`) 이 문서의 수질 식 대조는 WQSKE1을 대상으로 한다. (`Eutrophication/mod_wq.f90:335` — `if( ISWQLVL == 1 ) CALL WQSKE1 ! *** Extension of CEQUAL-ICM for unlimited algae + zooplankton`)
 
 ## B. State variables
 
@@ -86,12 +87,12 @@ Algae kinetics:
 
 Organic matter / nutrients (`:3804-4385`):
 - Hydrolysis, mineralization.
-- Nitrification, denitrification.
+- 코드는 WQNIT에 NH4/(KH+NH4)를 포함한다. (`Eutrophication/mod_wq.f90:3593` — `WQNIT(L) = WQTDNIT(IWQT(L)) * O2WQ(L) / (WQKHNDO + O2WQ(L) + 1.E-18) * RNH4WQ(L) / (WQKHNN + RNH4WQ(L) + 1.E-18)`; EFDC_Theory_Document_Ver_12.pdf, PDF 185쪽·인쇄 172쪽) 코드는 NH4 손실에 WQNIT·NH4를 사용한다. (`Eutrophication/mod_wq.f90:4357` — `WQF14 = - DTWQO2*WQNIT(L)`; `Eutrophication/mod_wq.f90:4375` — `WQRR(L) = WQV(L,K,INHX) + DTWQ*WQRR(L) + WQF14*WQVO(L,K,INHX) + DTWQO2*(WQA14 + WQKDON(L)*WQO(L,K,IDON))`; EFDC_Theory_Document_Ver_12.pdf, PDF 185쪽·인쇄 172쪽) DO의 질산화 손실도 NH4를 다시 곱한다. (`Eutrophication/mod_wq.f90:4719` — `WQNH3 = WQAONT*WQNIT(L)*WQO(L,K,INHX)      ! *** Ammonia`; EFDC_Theory_Document_Ver_12.pdf, PDF 185쪽·인쇄 172쪽) 이 총속도는 Theory 식 8.81과 8.83의 NH4 차수와 다르다. (`Eutrophication/mod_wq.f90:3593` — `WQNIT(L) = WQTDNIT(IWQT(L)) * O2WQ(L) / (WQKHNDO + O2WQ(L) + 1.E-18) * RNH4WQ(L) / (WQKHNN + RNH4WQ(L) + 1.E-18)`; `Eutrophication/mod_wq.f90:4719` — `WQNH3 = WQAONT*WQNIT(L)*WQO(L,K,INHX)      ! *** Ammonia`; `Eutrophication/mod_wq.f90:4375` — `WQRR(L) = WQV(L,K,INHX) + DTWQ*WQRR(L) + WQF14*WQVO(L,K,INHX) + DTWQO2*(WQA14 + WQKDON(L)*WQO(L,K,IDON))`; EFDC_Theory_Document_Ver_12.pdf, PDF 185쪽·인쇄 172쪽, 식 8.81; EFDC_Theory_Document_Ver_12.pdf, PDF 185쪽·인쇄 172쪽, 식 8.83)
 - Uptake, benthic fluxes.
 - Settling/sorption.
 
 DO budget (`:3621, 4634, 4673`):
-- Saturation/reaeration.
+- 코드는 Chapra 온도식과 Garcia–Gordon 온도식을 제공한다. (`Eutrophication/mod_wq.f90:5728` — `RLNSAT1 = ((((-8.621949e11 * TVAL + 1.2438e10)*TVAL -6.642308e7)*TVAL + 1.575701e5)*TVAL -139.34411)`; `Eutrophication/mod_wq.f90:5734` — `RLNSAT1 = (((((1.41575*TVAL + 1.01567)*TVAL + 4.93845)*TVAL + 4.11890)*TVAL + 3.20684)*TVAL + 5.80818)`; EFDC_Theory_Document_Ver_12.pdf, PDF 190쪽·인쇄 177쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 191쪽·인쇄 178쪽) Chapra 염분식의 온도 역수는 Theory 식 8.98과 다르다. (`Eutrophication/mod_wq.f90:5729` — `RLNSAT2 = -SWQ(L)*(( 2140.7 * TVAL - 10.754)*TVAL + 1.7674e-2)   ! *** Salinity correction: -S*(1.7674e-2 - 10.754/Ta + 2140.7/Ta^2)`; EFDC_Theory_Document_Ver_12.pdf, PDF 190쪽·인쇄 177쪽, 식 8.98) Garcia–Gordon 염분 다항식의 마지막 코드 항은 S²이다. (`Eutrophication/mod_wq.f90:5735` — `RLNSAT2 = -SWQ(L)*( 1.32412e-7*SWQ(L) + (((5.54491e-3*TVAL + 7.93334E-3)*TVAL + 7.25958e-3)*TVAL +7.01211e-3) )`; EFDC_Theory_Document_Ver_12.pdf, PDF 190쪽·인쇄 177쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 191쪽·인쇄 178쪽) Theory 식 8.100은 S³를 인쇄한다. (EFDC_Theory_Document_Ver_12.pdf, PDF 191쪽·인쇄 178쪽, 식 8.100)
 - Photosynthesis, respiration.
 - DOC oxidation, nitrification, COD demand.
 
@@ -196,7 +197,7 @@ Global/map output mainly NetCDF and EE binary:
 ## Working Rules
 
 - WQ timestep can be different from hydro timestep; set in `wq_3dwc.jnp`.
-- Sediment diagenesis (`IWQBEN=1`) is essential for SOD-driven anoxia; without it, DO budget incomplete.
+- 전체 diagenesis를 선택하면 코드는 퇴적층 반응과 수주 플럭스를 계산한다. (`Eutrophication/mod_wq.f90:352` — `if( IWQBEN == 1 .and. ITNWQ > 0 )then`; `Eutrophication/mod_wq.f90:354` — `call SMMBE`) Confluence는 상수 플럭스와 시계열 플럭스도 제공한다. (`models/EFDC/raw/manuals/confluence/spaces/EK/pages/EFDC_Explorer_12_Knowledge_Base/EFDC_Explorer_12_User_Guide/Model_Control_Form/Modules/Water_Quality_EEMS12/Sediment_Fluxes_EEMS12.md:10` — `Benthic flux settings are made in the *Sediment Fluxes* form. After a LMC on the *Sediment Fluxes**sub-menu items in* the *Water Quality* module, the user can access the*Sediment Diagenesis Options and Parameters* as shown in [Figure 1](#SedimentFluxes(EEMS12)-Figure1)*.* The top frame, *Benthic Nutrient Flux Method* is the option that controls EFDC's benthic flux approach. If the nutrient mass fluxes are to be specified either as constants or variables in time and space, then the diagenesis tabs are not used and are consequently disabled. If the *Full Diagenesis Model (DiToro & Fitzpatrick, 1993)* option is selected, then the three diagenesis tabs are visible to allow the user to specify the diagenesis parameters.`) 해석: DO 수지의 적절성은 선택한 저층 플럭스와 적용 목적에 따라 판단해야 한다(정적 판독, 실행 미확인). (`models/EFDC/raw/manuals/confluence/spaces/EK/pages/EFDC_Explorer_12_Knowledge_Base/EFDC_Explorer_12_User_Guide/Model_Control_Form/Modules/Water_Quality_EEMS12/Sediment_Fluxes_EEMS12.md:10` — `Benthic flux settings are made in the *Sediment Fluxes* form. After a LMC on the *Sediment Fluxes**sub-menu items in* the *Water Quality* module, the user can access the*Sediment Diagenesis Options and Parameters* as shown in [Figure 1](#SedimentFluxes(EEMS12)-Figure1)*.* The top frame, *Benthic Nutrient Flux Method* is the option that controls EFDC's benthic flux approach. If the nutrient mass fluxes are to be specified either as constants or variables in time and space, then the diagenesis tabs are not used and are consequently disabled. If the *Full Diagenesis Model (DiToro & Fitzpatrick, 1993)* option is selected, then the three diagenesis tabs are visible to allow the user to specify the diagenesis parameters.`)
 - `PARADJ=0.43` is the standard PAR fraction; rarely changed.
 - `WQKESS` (light extinction) typically 0.5-2.0 m⁻¹; calibrate from Secchi depth observations.
 - Algae growth limitation: typically nutrient + light + temperature multiplicative.

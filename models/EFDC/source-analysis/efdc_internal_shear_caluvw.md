@@ -13,6 +13,7 @@ related:
   - models/EFDC/source-analysis/efdc_turbulence.md
   - models/EFDC/source-analysis/efdc_bottom_friction.md
   - concepts/currents/time-integration-cross-model.md
+last_source_check: 2026-10-08 (recovery 재판독 대조)
 ---
 
 # EFDC CALUVW — 내부모드 전단 연직 implicit 솔버
@@ -30,16 +31,16 @@ related:
 DU(L,K) = CDZFU(L,K)*( H1U(L)*(U1(L,K+1)-U1(L,K))*DELTI
         + DXYIU(L)*(FCAX(L,K+1)-FCAX(L,K) + FBBX(L,K) + SNLT*(FX(L,K)-FX(L,K+1))) )
 ```
-(calexp.f90:1309; DV 동형 :1367) — 직전 전단/Δt + **Coriolis(FCAX)·부력/경압(FBBX)·이류(FX)의 층간 차분**. 즉 explicit 물리는 전부 층차 형태로 RHS 에만.
+3TL 전단 우변은 이전 속도 U1과 H1U를 사용한다. (`calexp.f90:1309` — `DU(L,K) = CDZFU(L,K)*( H1U(L)*(U1(L,K+1)-U1(L,K))*DELTI + DXYIU(L)*(FCAX(L,K+1)-FCAX(L,K)   + FBBX(L,K) + SNLT*(FX(L,K)-FX(L,K+1))) )`) 2TL 전단 우변은 현재 저장 상태 U와 HU를 사용한다. (`calexp2t.f90:1395` — `DU(L,K) = CDZFU(L,K)*( HU(L)*( U(L,K+1)-U(L,K) )*DELTI + DXYIU(L)*( FCAX(L,K+1)-FCAX(L,K)   + FBBX(L,K) + SNLT*(FX(L,K)-FX(L,K+1)) ) )   ! *** M2/S2`)
 
-- **바람응력**: 최상층 계면(KS) 행에 `DU(L,KS) -= CDZUU(L,KS)*TSX(L)` (:1383-1384). ★게이트 `(ISTL == 2 .and. NWSER > 0) .or. (ISTL == 2 .and. iGOTM_Test > 0)` (:1375) — §6 함정 참조.
+- CALEXP의 바람 주입은 ISTL=2를 검사한다. (`calexp.f90:1318` — `if( (ISTL == 2 .and. NWSER > 0) .or. (ISTL == 2 .and. iGOTM_Test > 0 ) )then`) HDMT는 ISTL=3에서 CALTSXY(0)를 호출한다. (`calexp.f90:1318` — `if( (ISTL == 2 .and. NWSER > 0) .or. (ISTL == 2 .and. iGOTM_Test > 0 ) )then`; `hdmt.f90:749` — `call CALTSXY(0)`) 그 뒤 HDMT는 DU/DV에 TSX/TSY를 주입한다. (`calexp.f90:1326` — `DU(L,KS) = DU(L,KS) - CDZUU(L,KS)*TSX(L)`; `hdmt.f90:757` — `DU(L,KS) = DU(L,KS) - CDZUU(L,KS)*TSX(L)`; `hdmt.f90:758` — `DV(L,KS) = DV(L,KS) - CDZUV(L,KS)*TSY(L)`)
 - 마스크 SUB/SVB 적용 (:1397-1398).
 
 ## 3. 연직 확산 — 완전 implicit tridiagonal (θ knob 없음)
 
 CALUVW 의 전단 solve (caluvw.f90:392-462, SGZ-aware — 셀별 최하활성층 `KSZU/KSZV`):
 
-- **대각**: `CMU = 1 + CDZMU(L,K)·DELTI·HU(L)·AVUI(L,K)` (:406) — `AVUI = 1/AV`(연직 eddy viscosity 역수) 로 정규화된 계이므로 **확산이 항상 완전 implicit**. ADCIRC 의 `Alp3` 같은 사용자 θ 없음.
+- CALAVB의 해당 분기에서 AVUI=2/(AV(L,K)+AV(LWC(L),K))이다. (`calavb.f90:291` — `AVUI(L,K) = 2.0/( AV(L,K) + AV(LWC(L),K) )`; `caluvw.f90:406` — `CMU = 1.+RCDZM*HU(L)*AVUI(L,K)`) CALUVW는 이 면 계수를 전단 계의 대각에 사용한다. (`calavb.f90:291` — `AVUI(L,K) = 2.0/( AV(L,K) + AV(LWC(L),K) )`; `caluvw.f90:406` — `CMU = 1.+RCDZM*HU(L)*AVUI(L,K)`)
 - **전진소거(Thomas, in-place)**: `EU = 1/(CMU − RCDZL·CU1(L,K-1))`, `CU1 = RCDZU·EU`, `DU = (DU − RCDZL·DU(k-1))·EU` (:407-409). 보조해 `UUU` 도 동시 소거 (:410, §4 용).
 - **바닥 행(K=KSZU)**: RHS 에 저면항력 `− RCDZL·RCXX(L)·UHE(L)·HUI(L)` (:419), `UUU(KSZU)=EU` 시드 (:420).
 - **후진대입**: `DU(K) -= CU1(K)·DU(K+1)` (:455-462, DU·DV·UUU·VVV 4계 동시).
@@ -63,20 +64,26 @@ DU(L,K) = SUB3D·DZGU·HU·AVUI·( DU(L,K) − AAU(L)·UUU(L,K) ) ! :495 — 물
 1. 깊이평균 갱신: `UHE(L) += CDZDU(L,K)·DU(L,K)` (:517).
 2. **top-down marching**: `UHDYF(L,KC) = UHE·SUB` (:525) → `UHDYF(L,K) = SUB3D·(UHDYF(L,K+1) − DU(L,K))` (:531) → `×DYU` 로 m³/s (:536-542).
 3. blocked layer face 옵션(NBLOCKED, 수문·취수구 층 차단) 별도 재구성 (:551-).
-4. 이후: **barotropic 보정 3단계**(:601-624 — [[efdc_hydro_core]] §C canonical) → **W 연속식**(:686-872 — [[efdc_vertical]] §) → 비정수압 `CALPNHS`(:1319 — [[efdc_hydro_core]] §F) → Courant 진단 축적(ISINWV=1, :1302-1312 — 진단 전용, dt 제어 아님).
+4. CALUVW는 barotropic 보정과 W 연속식 계산을 수행한다. (`caluvw.f90:1302` — `if( ISINWV == 1 )then`; `caluvw.f90:1319` — `if( KC > 1 .and. ISPNHYDS >= 1 ) CALL CALPNHS`; `caluvw.f90:613` — `TVARE(L) = TVARE(L) - UHDYE(L)`; `caluvw.f90:733` — `W(L,K) = W(L,K-1) - 0.5*DXYIP(L)  &`) CALUVW는 Courant 진단 뒤 CALPNHS를 호출한다. (`caluvw.f90:1319` — `if( KC > 1 .and. ISPNHYDS >= 1 ) CALL CALPNHS`) CALPNHS 조건은 KC>1과 ISPNHYDS>=1이다. (`caluvw.f90:1319` — `if( KC > 1 .and. ISPNHYDS >= 1 ) CALL CALPNHS`)
 
 ## 6. GOTM 결합 (ISGOTM)
 
 - `ISGOTM > 0` 시 `Advance_GOTM(ISTL)` 호출 (hdmt.f90:598 / hdmt2t.f90:537) — `GOTM_Turbulence/mod_gotm.f90`(364줄) 이 인터페이스: 수평 셀별 1D 컬럼으로 `do_turbulence` 호출, `tke/eps/Lgs`·표저면 응력 `GTAUS/GTAUB`·`z0s/z0b`·성층 `NN`·전단 `SS` 교환 (:286-295), 결과 eddy viscosity 가 `AVUI` 경유로 본 노트의 계에 유입.
+
+Advance_GOTM은 앞쪽 계수 계산 분기에 있다. (`hdmt2t.f90:537` — `call Advance_GOTM(ISTL)`; `hdmt.f90:598` — `call Advance_GOTM(ISTL)`; `GOTM_Turbulence/mod_gotm.f90:292` — `call do_turbulence(IT, NLAYER, DELT, DEPTH, GTAUS, GTAUB, z0s_gotm, z0b_gotm, HPK1d, NN1d, SS1d)`) DO_TURBULENCE 내부는 확인하지 않음. (`GOTM_Turbulence/mod_gotm.f90:292` — `call do_turbulence(IT, NLAYER, DELT, DEPTH, GTAUS, GTAUB, z0s_gotm, z0b_gotm, HPK1d, NN1d, SS1d)`)
+
 - **판정(2026-07-11)**: `GOTM_Turbulence/` 나머지 32파일 = **vendored 3rd-party GOTM 라이브러리**(gotm.net; cmue_*, tke 계열) — CADMAS 의 MUMPS·SWAN OCP 와 동급의 T티어 외부코드로 **위키 검수 범위 밖**. EFDC 자체 MY2.5 계열은 [[efdc_turbulence]] canonical.
 
 ## 7. ★Findings / 함정
 
 - **θ knob 없음** — 연직확산 implicitness 는 사용자 조정 불가(항상 완전 implicit). fort.15 스타일 3-knob(ADCIRC Alp1/2/3)와 대비되는 설계.
-- **★바람 전단 주입이 `ISTL==2` 에서만** (calexp.f90:1318) — 2TL(HDMT2T)은 ISTL 이 항상 2라 매 스텝 주입되지만, **3TL leapfrog full step(ISTL=3)에서는 내부전단 RHS 에 TSX/TSY 미주입** — 표면 강제가 corrector 주기(NTSTBC)로만 연직 구조에 들어가는 구조. 관찰 사실(코드 게이트)이며 의도/버그 여부는 문서 무언급.
+- 3TL 일반 단계에도 HDMT가 새 바람을 내부 모드 DU/DV에 주입한다. (`hdmt.f90:757` — `DU(L,KS) = DU(L,KS) - CDZUU(L,KS)*TSX(L)`; `hdmt.f90:758` — `DV(L,KS) = DV(L,KS) - CDZUV(L,KS)*TSY(L)`) CALEXP2T 주입은 NWSER>0을 검사한다. (`calexp2t.f90:1401` — `if( NWSER > 0 )then`)
 - **전단 정식화의 함의**: 내부모드가 깊이평균을 건드리지 않으므로 external↔internal 정합은 별도 barotropic 보정(hydro_core §C)이 담당 — 그 보정 없으면 mass drift.
 - **Sherman-Morrison 보조해 UUU/VVV** — 디버깅 시 DU 배열이 소거 중간엔 미보정 상태임에 주의(:495 최종 변환 전후 단위·의미 다름: 소거계 무차원 → 물리 m²/s).
 - **RCXX 의 시간분기** — 3TL full step 은 old 값(U1)만, corrector 는 old·new 기하평균: 같은 STBX 라도 스텝 종류별 유효 drag 상이.
+
+CALUVW가 읽는 STBX/STBY는 앞 계산의 값이다. (`caluvw.f90:327` — `RCXX(L) = STBX(L)*SQRT(Q1*Q2)`)
+
 - CFL 축적(:1302-)은 **진단 전용**(ISINWV=1) — EFDC 의 안정성은 external semi-implicit + internal 완전 implicit 이 담당, 이류 explicit 성분만 dt 제약.
 
 ## 연결

@@ -8,6 +8,7 @@ note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) �
 note_date: 2026-04~05 (original) / 2026-05-23 (promote)
 verification_by: "사용자 + codex source-code analysis"
 verification_date: 2026-04
+last_source_check: 2026-10-08 (recovery 재판독 대조)
 ---
 
 ## Scope
@@ -147,7 +148,7 @@ Allocated arrays: `ICECOVER, ICETHICK, ICETEMP, ICEVOL, ICERATE`, frazil arrays 
 
 ## Working Rules
 
-- `CDICE` (ice-water drag coefficient): typical 0.001-0.005.
+- 문서는 CDICE의 DEFAULT를 0.001로 적는다. (EFDC_Manual.pdf, PDF 51쪽·인쇄 47쪽) 현재 C46A는 CDICE를 읽는다. (`input.f90:2626` — `read(1,*,IOSTAT = ISO) ISICE, NISER, TEMPICE, CDICE, ICETHMX, RICETHK0`; `caltsxy.f90:714` — `! *** SHEAR ON TOP WATER LAYER DUE TO DRAG ON BOTTOM OF ICE (CDICE = 0.001)`; EFDC_Manual.pdf, PDF 51쪽·인쇄 47쪽) 확인한 .f90에서 CDICE=0.001 기본 대입을 찾지 못했다. (`input.f90:2626` — `read(1,*,IOSTAT = ISO) ISICE, NISER, TEMPICE, CDICE, ICETHMX, RICETHK0`; `caltsxy.f90:714` — `! *** SHEAR ON TOP WATER LAYER DUE TO DRAG ON BOTTOM OF ICE (CDICE = 0.001)`; EFDC_Manual.pdf, PDF 51쪽·인쇄 47쪽) caltsxy의 0.001은 주석이다. (`input.f90:2626` — `read(1,*,IOSTAT = ISO) ISICE, NISER, TEMPICE, CDICE, ICETHMX, RICETHK0`; `caltsxy.f90:714` — `! *** SHEAR ON TOP WATER LAYER DUE TO DRAG ON BOTTOM OF ICE (CDICE = 0.001)`; EFDC_Manual.pdf, PDF 51쪽·인쇄 47쪽) 0.005의 근거는 확인하지 않음. (`input.f90:2626` — `read(1,*,IOSTAT = ISO) ISICE, NISER, TEMPICE, CDICE, ICETHMX, RICETHK0`; `caltsxy.f90:714` — `! *** SHEAR ON TOP WATER LAYER DUE TO DRAG ON BOTTOM OF ICE (CDICE = 0.001)`; EFDC_Manual.pdf, PDF 51쪽·인쇄 47쪽)
 - `GAMMAI` (under-ice solar attenuation): 1-3 m⁻¹ for clear ice; higher for snow-covered.
 - `RICETHK0` (initial ice thickness for `ISICE>=3`): set realistic value to avoid spin-up.
 - `ICETHMX` (max thickness cap): prevents unphysical accumulation.

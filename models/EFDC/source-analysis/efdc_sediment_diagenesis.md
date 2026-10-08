@@ -12,6 +12,7 @@ related:
   - models/EFDC/source-analysis/efdc_water_quality.md
   - models/EFDC/source-analysis/efdc_rpem_vegetation.md
   - models/EFDC/source-analysis/sediment/efdc_sedzlj.md
+last_source_check: 2026-10-08 (recovery 재판독 대조)
 ---
 
 # EFDC+ 퇴적물 diagenesis — `mod_diagen.f90` (`WQ_DIAGENESIS`)
@@ -39,7 +40,7 @@ SMTDCD(IT,M) = SMKPOC(M)*SMTHKC(M)**TT20                          ! :484 3 G-cla
 SMPOC(L,M) = (SMPOC + SMDFC*SMDTOH)/(SMW2DTOH + SMTDCD*DTWQ)      ! :816 POM 물질수지(burial+decay, 2-layer)
 SMDGFN(L)  = SMHSED*(SMTDND(,1)*SMPON(,1) + SMTDND(,2)*SMPON(,2)) ! :824 G1+G2 → diagenesis flux(N/P/C, pore-water 공급)
 ```
-particle mixing `SMW12=SMDP·SMTDDP·SMPOC(,1)·O2/(SMKMDP+O2)`(:887) + 확산 `SMKL12=SMDD·SMTDDD+SMRBIBT·SMW12`(:888) — layer1↔2.
+코드는 저층 DO를 최소 3.0으로 제한한다. (`Eutrophication/mod_diagen.f90:828` — `XSMO20(L) = max( WQV(L,KSZ(L),IDOX), 3.0 )`) SMW12는 산소 Monod 항과 G1 POC 항에 저서 스트레스 계수 (1−SMKBST·SMBST)를 곱한다. (`Eutrophication/mod_diagen.f90:885` — `SMW12(L)  = SMDP(IZ)*SMTDDP(ISMT(L)) * SMPOC(L,1) * XSMO20(L) * (1.0-SMKBST*SMBST(L)) / (SMKMDP+XSMO20(L)+ 1.E-18) + SMDPMIN(IZ)`) SMW12는 SMDPMIN을 더한다. (`Eutrophication/mod_diagen.f90:885` — `SMW12(L)  = SMDP(IZ)*SMTDDP(ISMT(L)) * SMPOC(L,1) * XSMO20(L) * (1.0-SMKBST*SMBST(L)) / (SMKMDP+XSMO20(L)+ 1.E-18) + SMDPMIN(IZ)`) SMKL12는 온도 보정 확산과 SMRBIBT·SMW12의 합이다. (`Eutrophication/mod_diagen.f90:885` — `SMW12(L)  = SMDP(IZ)*SMTDDP(ISMT(L)) * SMPOC(L,1) * XSMO20(L) * (1.0-SMKBST*SMBST(L)) / (SMKMDP+XSMO20(L)+ 1.E-18) + SMDPMIN(IZ)`)
 
 ## 2. Ammonia/nitrification 2-layer + ★SOD Brent 폐합
 
@@ -50,22 +51,28 @@ SMSOD = ZBRENT(L, ..., SK1NH4SM,A1NH4SM,..., SM2NH4(L),...)      ! :969 ★SOD =
 RSMSS = SMSOD1/(XSMO20(L)+1.E-18)                                ! :1177 ★s=SOD/O2(0) Di Toro 폐합
 RNSODSM = SMO2NH4*RJNITSM ; SMSOD = CSODSM + RNSODSM             ! :1232 SOD = 탄소성(H2S/CH4) + 질소성(nitrification)
 WQBFO2(L) = -SMSOD*SODMULT(IZ)                                    ! :989 SOD 벤딕 flux
-WQBFNH4(L) = SMSS(L)*(SMFD1NH4*SM1NH4(L) - WQV(L,KSZ(L),INHX))    ! :998 암모늄 flux(g NH4/m2/day)
+WQBFNH4(L) = SMSS(L)*(SMFD1NH4*SM1NH4(L) - WQV(L,KSZ(L),INHX))    ! :998 암모늄 flux(g N/m²/day)
 WQBFNO3(L) = SMSS(L)*(SM1NO3(L) - WQV(L,KSZ(L),INOX))            ! :999
 WQBFCOD(L) = SMJAQH2S(L) - SMSS(L)*WQV(L,KSZ(L),ICOD)            ! :1000
 ```
+
+전체 diagenesis의 SOD는 Brent 근 찾기의 해이다. (`Eutrophication/mod_diagen.f90:967` — `SMSOD = ZBRENT(L, ISMERR, SMCH4S, SMK1CH4, SMO2JC,                                &`; EFDC_Theory_Document_Ver_12.pdf, PDF 234쪽·인쇄 221쪽) 코드 전달계수는 RSMSS=SMSOD1/(XSMO20+1E-18)이다. (`Eutrophication/mod_diagen.f90:1175` — `RSMSS = SMSOD1 / (XSMO20(L)+ 1.E-18)`; EFDC_Theory_Document_Ver_12.pdf, PDF 234쪽·인쇄 221쪽) XSMO20에는 저층 DO의 3.0 하한을 적용한다. (`Eutrophication/mod_diagen.f90:828` — `XSMO20(L) = max( WQV(L,KSZ(L),IDOX), 3.0 )`; EFDC_Theory_Document_Ver_12.pdf, PDF 234쪽·인쇄 221쪽) Theory PDF 234쪽도 SOD를 추정한 뒤 NH4·NO3·S2−/CH4를 풀고 Brent 방법으로 반복하도록 설명한다. (`Eutrophication/mod_diagen.f90:967` — `SMSOD = ZBRENT(L, ISMERR, SMCH4S, SMK1CH4, SMO2JC,                                &`; EFDC_Theory_Document_Ver_12.pdf, PDF 234쪽·인쇄 221쪽)
+
+
+WQBFNH4는 암모늄태 질소의 플럭스이다. (`Eutrophication/mod_diagen.f90:996` — `WQBFNH4(L)  = SMSS(L) * (SMFD1NH4*SM1NH4(L) - WQV(L,KSZ(L),INHX))   ! *** Ammonium flux  (g NH4/m2/day)`) 이 플럭스의 단위는 g N/m²/day이다. (`Eutrophication/mod_diagen.f90:996` — `WQBFNH4(L)  = SMSS(L) * (SMFD1NH4*SM1NH4(L) - WQV(L,KSZ(L),INHX))   ! *** Ammonium flux  (g NH4/m2/day)`) NH4 화합물 전체 질량 g NH4로 해석하지 않는다. (`Eutrophication/mod_diagen.f90:996` — `WQBFNH4(L)  = SMSS(L) * (SMFD1NH4*SM1NH4(L) - WQV(L,KSZ(L),INHX))   ! *** Ammonium flux  (g NH4/m2/day)`)
+
 kernel 순차해(SEDFLUXNEW): NH4→NO3(layer1 source = nitrification 산물 `RJNITSM`:1192, 양층 denitrif)→H2S/CH4(:1179-1231), 2×2 판별식 solver(:1131).
 
 ## 3. 병렬 flux (요약)
-- **염분 switch H2S vs CH4**(:954 `SAL>SMCSHSCH` 황화물 else 메탄): 메탄 `CSODMSM=min(√(SMCH4S·SMJ2H2S),SMJ2H2S)` + sech gas-escape(:1219-1229).
+- sech 항은 수체 방향 용존 메탄 플럭스에 들어간다. (`Eutrophication/mod_diagen.f90:1221` — `SMSECH = 2.0 / (SMTT3 + 1.0/SMTT3)`; `Eutrophication/mod_diagen.f90:1225` — `AQJCH4SM = CSODMSM*SMSECH`) 메탄 산화에 의한 탄소성 SOD는 CSODMSM에서 용존 메탄 플럭스를 뺀 값이다. (`Eutrophication/mod_diagen.f90:1226` — `CSODSM = CSODMSM - AQJCH4SM`) 기체 메탄 플럭스는 공급 플럭스에서 CSODMSM을 뺀 값이다. (`Eutrophication/mod_diagen.f90:1227` — `GJCH4SM = SMJ2H2S - CSODMSM`) 염분 선택지는 황화물 경로와 메탄 경로를 구분한다. (`Eutrophication/mod_diagen.f90:1221` — `SMSECH = 2.0 / (SMTT3 + 1.0/SMTT3)`; `Eutrophication/mod_diagen.f90:1225` — `AQJCH4SM = CSODMSM*SMSECH`; `Eutrophication/mod_diagen.f90:1226` — `CSODSM = CSODMSM - AQJCH4SM`; `Eutrophication/mod_diagen.f90:1227` — `GJCH4SM = SMJ2H2S - CSODMSM`)
 - **인산 DO의존 sorption power-law**(:1009 `SMP1PO4=SMP2PO4·SMDP1PO4**(O2/SMCO2PO4)`, O2<임계 시 호기층 P trapping) + 2-layer 해 → `WQBFPO4D`(:1025). silica 동형(:1042).
 
 ## 4. 주요 findings
-- **★SOD 은 입력 아니라 implicit 해**(Brent root :969, bound RMIN 1e-4/RMAX 100 g O2/m²/d, `s=SOD/O2` 순환폐합 :1177) — 매뉴얼은 흔히 SOD 를 입력 파라미터로 제시. 미수렴 시 `ZBRENT.LOG` 기록(:1090).
-- **solve order 강제** NH4→NO3→H2S(SEDFLUXNEW) — CE-QUAL-ICM 은 결합식이나 코드는 순차.
+- 전체 diagenesis의 SOD는 Brent 근 찾기의 해이다. (`Eutrophication/mod_diagen.f90:967` — `SMSOD = ZBRENT(L, ISMERR, SMCH4S, SMK1CH4, SMO2JC,                                &`; EFDC_Theory_Document_Ver_12.pdf, PDF 234쪽·인쇄 221쪽) 코드 전달계수는 RSMSS=SMSOD1/(XSMO20+1E-18)이다. (`Eutrophication/mod_diagen.f90:1175` — `RSMSS = SMSOD1 / (XSMO20(L)+ 1.E-18)`; EFDC_Theory_Document_Ver_12.pdf, PDF 234쪽·인쇄 221쪽) XSMO20에는 저층 DO의 3.0 하한을 적용한다. (`Eutrophication/mod_diagen.f90:828` — `XSMO20(L) = max( WQV(L,KSZ(L),IDOX), 3.0 )`; EFDC_Theory_Document_Ver_12.pdf, PDF 234쪽·인쇄 221쪽) Theory PDF 234쪽도 SOD를 추정한 뒤 NH4·NO3·S2−/CH4를 풀고 Brent 방법으로 반복하도록 설명한다. (`Eutrophication/mod_diagen.f90:967` — `SMSOD = ZBRENT(L, ISMERR, SMCH4S, SMK1CH4, SMO2JC,                                &`; EFDC_Theory_Document_Ver_12.pdf, PDF 234쪽·인쇄 221쪽)
+- 코드 SEDFLUXNEW는 NH4, NO3, H2S/CH4의 순서로 계산한다. (`Eutrophication/mod_diagen.f90:1183` — `call SOLVSMBE(RSM1NH4,RSM2NH4,A11NH4,A22NH4SM,A1NH4SM,A2NH4SM,B11NH4,B22NH4)`; `Eutrophication/mod_diagen.f90:1193` — `call SOLVSMBE(RSM1NO3,RSM2NO3,A11NO3,A22NO3SM,A1NO3SM,A2NO3SM,B11NO3,B22NO3)`; `Eutrophication/mod_diagen.f90:1210` — `call SOLVSMBE(RSM1H2S,RSM2H2S,A11H2S,A22H2SSM,A1H2SSM,A2H2SSM,B11H2S,B22H2S)`; EFDC_Theory_Document_Ver_12.pdf, PDF 234쪽·인쇄 221쪽) Theory PDF 234쪽의 SOD 반복 절차도 해당 물질을 계산한 뒤 SOD를 갱신한다. (EFDC_Theory_Document_Ver_12.pdf, PDF 234쪽·인쇄 221쪽) 원래 CE-QUAL-ICM의 소스 해법은 확인하지 않음. (`Eutrophication/mod_diagen.f90:1183` — `call SOLVSMBE(RSM1NH4,RSM2NH4,A11NH4,A22NH4SM,A1NH4SM,A2NH4SM,B11NH4,B22NH4)`; `Eutrophication/mod_diagen.f90:1193` — `call SOLVSMBE(RSM1NO3,RSM2NO3,A11NO3,A22NO3SM,A1NO3SM,A2NO3SM,B11NO3,B22NO3)`; `Eutrophication/mod_diagen.f90:1210` — `call SOLVSMBE(RSM1H2S,RSM2H2S,A11H2S,A22H2SSM,A1H2SSM,A2H2SSM,B11H2S,B22H2S)`; EFDC_Theory_Document_Ver_12.pdf, PDF 234쪽·인쇄 221쪽)
 - **P sorption power-law**(step 아님, 연속 지수 ramp) — 단순설명의 binary on/off 와 대조.
 - **퇴적물 온도 = 확산/relaxation 상태**(:744 `SMT=(SMT+SM1DIFT·TEM)·SM2DIFT`, 저수온 lag), 범위밖 시 `ERROR.LOG`+clamp(정지 아님).
-- **메탄 sech gas-escape 를 단일 염분비교(SMCSHSCH)로 switch** — 기수/하구 보정 주의점.
+- sech 항은 수체 방향 용존 메탄 플럭스에 들어간다. (`Eutrophication/mod_diagen.f90:1221` — `SMSECH = 2.0 / (SMTT3 + 1.0/SMTT3)`; `Eutrophication/mod_diagen.f90:1225` — `AQJCH4SM = CSODMSM*SMSECH`) 염분 선택지는 황화물 경로와 메탄 경로를 구분한다. (`Eutrophication/mod_diagen.f90:1221` — `SMSECH = 2.0 / (SMTT3 + 1.0/SMTT3)`; `Eutrophication/mod_diagen.f90:1225` — `AQJCH4SM = CSODMSM*SMSECH`; `Eutrophication/mod_diagen.f90:1226` — `CSODSM = CSODMSM - AQJCH4SM`; `Eutrophication/mod_diagen.f90:1227` — `GJCH4SM = SMJ2H2S - CSODMSM`)
 - **line range stale**(water_quality:21 `9-1031` → kernel :1121-1393 누락).
 
 ## 5. Primary sources

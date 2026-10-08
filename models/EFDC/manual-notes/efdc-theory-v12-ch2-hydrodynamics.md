@@ -3,7 +3,7 @@ title: "EFDC+ Theory v12 Ch 2 HYDRODYNAMICS — Governing Equations + Numerical 
 topic: efdc-theory-v12-ch2-hydrodynamics
 canonical_source: self
 citation_status: verified
-verification_method: "models/EFDC/raw/manuals/pdfs/EFDC_Theory_Document_Ver_12.pdf 본문 pp.8-47 (Ch 2 전체) 직접 추출 — 식 번호 (2.1)~(2.150) 인용, Table 2.1·2.2 + Fig 2.1~2.9 캡션 인용, primary sources (Hamrick 1992, Ji 2008, Mellor-Yamada 1982, Galperin 1988, Smagorinsky 1963, Longuet-Higgins-Stewart 1964, Craig et al. 2014, Fairall et al. 2003, Mellor et al. 1994) 인용 형식 PDF 직접."
+verification_method: "기존 판독: EFDC_Theory_Document_Ver_12.pdf 본문 인쇄 pp.8–47, 식 2.1–2.150. recovery 대조: 근거리 방류 식 2.155·2.157·2.167·2.169·2.170·2.177과 코드의 대응. 근거리 방류 실행 결과는 확인하지 않음."
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-24
 verification_by: "Claude Opus 4.7 (1M context) — PDF Read pages 8-47 직접"
@@ -14,6 +14,7 @@ related:
   - models/EFDC/source-analysis/
   - concepts/sst/04-code-and-tools.md
   - concepts/storm-surge/02-theory.md
+last_source_check: 2026-10-08 (recovery 재판독 대조)
 ---
 
 # EFDC+ Theory v12 Ch 2 HYDRODYNAMICS — 식 level deep 노트
@@ -124,7 +125,13 @@ $$\partial_t(mHT) + \partial_x(m_y HuT) + \partial_y(m_x HvT) + \partial_z(mwT) 
 
 SIG 좌표 vertical velocity $w$ 와 물리 vertical velocity $w^*$:
 
+
+문서 원문 (EFDC_Theory_Document_Ver_12.pdf, PDF 25쪽·인쇄 12쪽, 식 2.11)
+
 $$w = w^* - z\left(\frac{\partial \zeta}{\partial t} + \frac{u}{m_x}\frac{\partial \zeta}{\partial x} + \frac{v}{m_y}\frac{\partial \zeta}{\partial y}\right) + (1-z)\left(\frac{u}{m_x}\frac{\partial h}{\partial x} + \frac{v}{m_y}\frac{\partial h}{\partial y}\right)$$
+
+문서 식 2.11은 아래 문서 원문이다. (EFDC_Theory_Document_Ver_12.pdf, PDF 25쪽·인쇄 12쪽, 식 2.11) CALPNHS의 역변환은 인터페이스 W와 층 중심 ZZ를 함께 쓴다. (`calpnhs.f90:69` — `WZ(L,K) = W(L,K)+GI*ZZ(L,K)*( DELTI*(P(L)-P1(L)) &`; EFDC_Theory_Document_Ver_12.pdf, PDF 25쪽·인쇄 12쪽) 코드의 역변환에는 저면 시간 변화 항이 있다. (`calpnhs.f90:72` — `+ (1.-ZZ(L,K))*( DELTI*(BELV(L)-BELV1(L)) &`; EFDC_Theory_Document_Ver_12.pdf, PDF 25쪽·인쇄 12쪽) 고정 저면·같은 수직 평가 위치에서만 문서 좌표 관계를 동일한 식으로 비교한다. (`calpnhs.f90:69` — `WZ(L,K) = W(L,K)+GI*ZZ(L,K)*( DELTI*(P(L)-P1(L)) &`; `calpnhs.f90:72` — `+ (1.-ZZ(L,K))*( DELTI*(BELV(L)-BELV1(L)) &`; EFDC_Theory_Document_Ver_12.pdf, PDF 25쪽·인쇄 12쪽)
+
 
 ---
 
@@ -141,7 +148,13 @@ $$+ (-5.72466 \times 10^{-3} + 1.0227 \times 10^{-4} T - 1.6546 \times 10^{-6} T
 
 **TSS 보정** (Eq 2.13, Tetra Tech 2007a):
 
+
+문서 원문 (EFDC_Theory_Document_Ver_12.pdf, PDF 26쪽·인쇄 13쪽, 식 2.13)
+
 $$C_{TSS} = 1 - \sum_j^N \rho_{s,j} C_j + \sum_j^N (s_j - 1) \rho_{s,j} C_j$$
+
+문서 원문은 ρs,j를 곱한다. (EFDC_Theory_Document_Ver_12.pdf, PDF 26쪽·인쇄 13쪽) 문서는 이 기호를 kg/m³의 퇴적물 밀도로 정의한다. (EFDC_Theory_Document_Ver_12.pdf, PDF 26쪽·인쇄 13쪽) 코드는 SDEN·C를 고체 체적분율로 사용한다. (`calbuoy.f90:201` — `TVAR1S(L,K) = TVAR1S(L,K) + SDEN(NS)*SED(L,K,NS)`; `calbuoy.f90:202` — `TVAR1W(L,K) = TVAR1W(L,K) + (SSG(NS)-1.)*SDEN(NS)*SED(L,K,NS)`; `calbuoy.f90:234` — `B(L,K) = B(L,K)*(1. - TVAR1S(L,K)) + TVAR1W(L,K)`; EFDC_Theory_Document_Ver_12.pdf, PDF 26쪽·인쇄 13쪽) 코드에 대응하는 SDEN은 g/m³ 농도에 대한 역밀도이다. (`calbuoy.f90:201` — `TVAR1S(L,K) = TVAR1S(L,K) + SDEN(NS)*SED(L,K,NS)`; `Transport/mod_diffuser.f90:1643` — `SDEN = 1./2500000.`; `input.f90:2097` — `read(1,*,IOSTAT = ISO)SEDO(NS),SEDBO(NS),SDEN(NS),SSG(NS),WSEDO(NS),SEDN(NS),SEXP(NS),TAUD(NS),ISEDSCOR(NS),ISPROBDEP(NS)`; EFDC_Theory_Document_Ver_12.pdf, PDF 26쪽·인쇄 13쪽) 문서 식의 단위와 기호 정의는 코드와 함께 일치하지 않는다. (`calbuoy.f90:201` — `TVAR1S(L,K) = TVAR1S(L,K) + SDEN(NS)*SED(L,K,NS)`; `Transport/mod_diffuser.f90:1643` — `SDEN = 1./2500000.`; `input.f90:2097` — `read(1,*,IOSTAT = ISO)SEDO(NS),SEDBO(NS),SDEN(NS),SSG(NS),WSEDO(NS),SEDN(NS),SEXP(NS),TAUD(NS),ISEDSCOR(NS),ISPROBDEP(NS)`; EFDC_Theory_Document_Ver_12.pdf, PDF 26쪽·인쇄 13쪽) 문서의 ρs,j와 코드의 역밀도 SDEN을 구별한다. (`calbuoy.f90:201` — `TVAR1S(L,K) = TVAR1S(L,K) + SDEN(NS)*SED(L,K,NS)`; `Transport/mod_diffuser.f90:1643` — `SDEN = 1./2500000.`; `input.f90:2097` — `read(1,*,IOSTAT = ISO)SEDO(NS),SEDBO(NS),SDEN(NS),SSG(NS),WSEDO(NS),SEDN(NS),SEXP(NS),TAUD(NS),ISEDSCOR(NS),ISPROBDEP(NS)`; EFDC_Theory_Document_Ver_12.pdf, PDF 26쪽·인쇄 13쪽)
+
 
 — sediment 농도 $C_j$ 있을 시 density·buoyancy 보정.
 
@@ -182,10 +195,22 @@ $$R_q = \frac{gH}{q^2} \cdot \frac{l^2}{H^2} \cdot \frac{\partial b}{\partial z}
 #### (d) $q^2$ + $q^2 l$ prognostic equations (Eq 2.24·2.25):
 
 $$\partial_t(mHq^2) + \partial_x(Pq^2) + \partial_y(Qq^2) + \partial_z(mwq^2)$$
+
+해석 수정식 (EFDC_Theory_Document_Ver_12.pdf, PDF 28쪽·인쇄 15쪽, 식 2.24; EFDC_Theory_Document_Ver_12.pdf, PDF 28쪽·인쇄 15쪽, 식 2.25; EFDC_Theory_Document_Ver_12.pdf, PDF 28쪽·인쇄 15쪽, 식 2.26)
+
 $$= \partial_z\left(\frac{mA_q}{H}\partial_z q^2\right) + 2m\frac{A_v}{H}\left[(\partial_z u)^2 + (\partial_z v)^2\right] + 2mgA_b \partial_z b - 2m\frac{Hq^3}{B_1 l} + S_b$$
 
+노트의 아래 식은 PDF 식 2.24에 없는 더하기 부호를 보충한 해석 수정식이다. (EFDC_Theory_Document_Ver_12.pdf, PDF 28쪽·인쇄 15쪽, 식 2.24)
+
+
 $$\partial_t(mHq^2 l) + \partial_x(Pq^2 l) + \partial_y(Qq^2 l) + \partial_z(mwq^2 l)$$
+
+문서 원문 (EFDC_Theory_Document_Ver_12.pdf, PDF 28쪽·인쇄 15쪽, 식 2.24; EFDC_Theory_Document_Ver_12.pdf, PDF 28쪽·인쇄 15쪽, 식 2.25; EFDC_Theory_Document_Ver_12.pdf, PDF 28쪽·인쇄 15쪽, 식 2.26)
+
 $$= \partial_z\left[\frac{mA_{ql}}{H}\partial_z(q^2 l)\right] + mlE_1\left\{\frac{A_v}{H}\left[(\partial_z u)^2 + (\partial_z v)^2\right] + E_3 g A_b \partial_z b\right\}$$
+
+코드의 q²l 생성은 CTE1·전단+CTE3TMP·부력이다. (`calqq2t.f90:280` — `PQQL = DELT*HP(L)*(CTE3TMP*PQQB + CTE1*(PQQU+PQQV) + CE4VEG*PQQVEGE(L,K) + CE4MHK*PQQMHKE(L,K) + CE4SUP*PQQSUPE(L,K))`; EFDC_Theory_Document_Ver_12.pdf, PDF 28쪽·인쇄 15쪽) 문서처럼 E1을 부력항의 E3에도 다시 곱하지 않는다. (`calqq2t.f90:280` — `PQQL = DELT*HP(L)*(CTE3TMP*PQQB + CTE1*(PQQU+PQQV) + CE4VEG*PQQVEGE(L,K) + CE4MHK*PQQMHKE(L,K) + CE4SUP*PQQSUPE(L,K))`; EFDC_Theory_Document_Ver_12.pdf, PDF 28쪽·인쇄 15쪽) CTE3TMP는 성층 조건에 따라 달라진다. (`calqq2t.f90:267` — `DELB = B(L,K) - B(L,K+1)`; `calqq2t.f90:268` — `CTE3TMP = CTE3`; `calqq2t.f90:269` — `if( DELB < 0.0 ) CTE3TMP = CTE1`; EFDC_Theory_Document_Ver_12.pdf, PDF 28쪽·인쇄 15쪽) CTE2는 입력 코드가 미사용으로 명시한다. (`input.f90:734` — `! *** PMC - CTE2 NOT USED`; EFDC_Theory_Document_Ver_12.pdf, PDF 28쪽·인쇄 15쪽)
+
 $$- mE_2 \frac{Hq^3}{B_1}\left[1 + E_4\left(\frac{l}{\kappa H z}\right)^2 + E_5\left(\frac{l}{\kappa H (1-z)}\right)^2\right] + S_l$$
 
 상수: $E_1 = 1.8, E_2 = 1.0, E_3 = 1.8, E_4 = 1.33, E_5 = 0.25$.
@@ -199,6 +224,9 @@ $$\frac{1}{L} = \frac{1}{H}\left(\frac{1}{z} + \frac{1}{1-z}\right)$$
 Galperin et al. 1988 권장: $\sqrt{R_q} < 0.53$ (stable stratification 시).
 
 $A_q = 0.2 q l$ (Mellor-Yamada 1982 추천값).
+
+Aq=0.2ql은 문서의 추천식이다. (EFDC_Theory_Document_Ver_12.pdf, PDF 28쪽·인쇄 15쪽) CALAVB는 0.205·점성 합 또는 0.314·ql 합을 계산한다. (`calavb.f90:320` — `AQ(L,K) = 0.205*(AV(L,K-1)+AV(L,K))`; `calavb.f90:352` — `AQ(L,K) = 0.314*( DML(L,K-1)*QQSQR(L,K-1)+DML(L,K)*QQSQR(L,K) ) + AVOXYHPI(L)`; EFDC_Theory_Document_Ver_12.pdf, PDF 28쪽·인쇄 15쪽) Kantha의 q²l 확산 비는 0.377/0.628이다. (`calqq2t.f90:100` — `if( ISTOPT(0) == 3 )SQLDSQ = 0.377/0.628`; EFDC_Theory_Document_Ver_12.pdf, PDF 28쪽·인쇄 15쪽) CALAVB의 한 하부 경계 줄은 DML**QQSQR를 사용한다. (`calavb.f90:358` — `AQ(L,KSZ(L)) = 0.314*DML(L,KSZ(L))**QQSQR(L,KSZ(L)) + AVOXYHPI(L)`; EFDC_Theory_Document_Ver_12.pdf, PDF 28쪽·인쇄 15쪽) 이 거듭제곱은 원문 확인 사실이다. (`calavb.f90:358` — `AQ(L,KSZ(L)) = 0.314*DML(L,KSZ(L))**QQSQR(L,KSZ(L)) + AVOXYHPI(L)`; EFDC_Theory_Document_Ver_12.pdf, PDF 28쪽·인쇄 15쪽) 해석: 곱셈 오기의 가능성을 제기할 수 있다(정적 판독, 실행 미확인). (`calavb.f90:358` — `AQ(L,KSZ(L)) = 0.314*DML(L,KSZ(L))**QQSQR(L,KSZ(L)) + AVOXYHPI(L)`; EFDC_Theory_Document_Ver_12.pdf, PDF 28쪽·인쇄 15쪽)
+
 
 ---
 
@@ -236,21 +264,33 @@ $$\frac{1}{\rho_w}\begin{bmatrix}\tau_{bx} \\ \tau_{by}\end{bmatrix} = C_b \sqrt
 
 $$C_b = \left[\frac{\kappa}{\ln(\Delta_1 / 2z_0) + (\Pi - 1)}\right]^2$$
 
-— $\kappa$ = von Karman 상수, $\Delta_1$ = bottom layer 무차원 두께, $z_0$ = roughness height, $\Pi$ = wake strength (low Re ~ 0, fully turbulent ~ 0.2, EFDC+ assumes **0.0**).
+PDF는 Pi=0을 설명한다. (EFDC_Theory_Document_Ver_12.pdf, PDF 30쪽·인쇄 17쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 58쪽·인쇄 45쪽) 해당 Nezu 단층 코드의 −0.8은 Pi=0.2에 대응한다. (`caltbxy.f90:541` — `! *** NEZU & NAKAGAWA (1993) WHERE THE WAKE parameter IS 0.2  FOR TURBULENT CONDITIONS.  -0.8 = WAKE - 1.`; `caltbxy.f90:542` — `STBX(L) = (VKC/(LOG( HUDZBR ) - 0.8))**2`; `caltbxy.f90:543` — `STBY(L) = (VKC/(LOG( HVDZBR ) - 0.8))**2`; EFDC_Theory_Document_Ver_12.pdf, PDF 30쪽·인쇄 17쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 58쪽·인쇄 45쪽) 다른 단층 코드는 로그에서 1을 뺀다. (`caltbxy.f90:598` — `STBX(L) = STBXO(L)*0.16/( (LOG( HUDZBR ) -1.)**2)`; `caltbxy.f90:599` — `STBY(L) = STBYO(L)*0.16/( (LOG( HVDZBR ) -1.)**2)`; EFDC_Theory_Document_Ver_12.pdf, PDF 30쪽·인쇄 17쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 58쪽·인쇄 45쪽)
 
 ### 2.3 §2.2.2 Vegetation (pp.17-18) — Vegetation Drag
 
-Momentum eq 의 $-m_x m_y c_p D_p u \sqrt{u^2+v^2}$ 항 (Eq 2.2) + 추가 turbulence canopy 항 Eq 2.32-2.33.
+식 2.32·2.33의 생성 효율과 벽 항 기호는 코드 CE4VEG·FPROX와 구분한다. (`calqq2t.f90:280` — `PQQL = DELT*HP(L)*(CTE3TMP*PQQB + CTE1*(PQQU+PQQV) + CE4VEG*PQQVEGE(L,K) + CE4MHK*PQQMHKE(L,K) + CE4SUP*PQQSUPE(L,K))`; `aaefdc.f90:1525` — `if( IFPROX == 2 ) FPROX(L,K) = (1./(VKC*Z(L,K))**2) + CTE5*(1./(VKC*(1.-Z(L,K)))**2)/(CTE4+0.00001)`; EFDC_Theory_Document_Ver_12.pdf, PDF 30쪽·인쇄 17쪽, 식 2.32; EFDC_Theory_Document_Ver_12.pdf, PDF 30쪽·인쇄 17쪽, 식 2.33) 코드는 SCVEG·BPVEG와 층별 식생 높이를 사용한다. (`caltbxy.f90:752` — `if( ISVEGL == 1 ) CPVEGU = CPVEGU + 10.E-6/((BPVEG(MW) + BPVEG(M))*UMAGTMP )`; `caltbxy.f90:757` — `CPVEGU = SCVEG(M)*CPVEGU`; EFDC_Theory_Document_Ver_12.pdf, PDF 30쪽·인쇄 17쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 31쪽·인쇄 18쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 32쪽·인쇄 19쪽)
 
 Bulk drag coefficient (수족산업·갈대 canopy, Plew 2011 + Scott-O'Donncha 2019 fitting, Eq 2.34):
 
+
+문서 원문 (EFDC_Theory_Document_Ver_12.pdf, PDF 30쪽·인쇄 17쪽, 식 2.32; EFDC_Theory_Document_Ver_12.pdf, PDF 30쪽·인쇄 17쪽, 식 2.33; EFDC_Theory_Document_Ver_12.pdf, PDF 31쪽·인쇄 18쪽, 식 2.34; EFDC_Theory_Document_Ver_12.pdf, PDF 32쪽·인쇄 19쪽, 식 2.35)
+
 $$\bar{C}_D = 2.0 - 67 a_d$$
+
+식 2.34의 2−67ad와 식 2.35의 수직 다항식은 대조한 f90에서 찾지 못했다. (EFDC_Theory_Document_Ver_12.pdf, PDF 31쪽·인쇄 18쪽, 식 2.34; EFDC_Theory_Document_Ver_12.pdf, PDF 32쪽·인쇄 19쪽, 식 2.35) 이 빌드의 두 식 자동 계산은 확인하지 않음. (`calqq2t.f90:278` — `PQQ  = DELT*( PQQB+PQQU+PQQV+PQQVEGE(L,K)+PQQMHKE(L,K)+PQQSUPE(L,K) )`; `calqq2t.f90:279` — `UUU(L,K) = UUU(L,K) + 2.*PQQ`; `calqq2t.f90:280` — `PQQL = DELT*HP(L)*(CTE3TMP*PQQB + CTE1*(PQQU+PQQV) + CE4VEG*PQQVEGE(L,K) + CE4MHK*PQQMHKE(L,K) + CE4SUP*PQQSUPE(L,K))`; `calqq2t.f90:281` — `VVV(L,K) = VVV(L,K) + DML(L,K)*PQQL`; `calqq2t.f90:355` — `CMQLTMP = 1. - CLQLTMP-CUQLTMP+DELT*(QQSQR(L,1)/(CTURBB1(L,1)*DML(L,1)*HP(L)))*(1.+CTE4*DML(L,1)*DML(L,1)*FPROX(L,1)) &`; `calqq2t.f90:356` — `+ DELT*HPI(L)*(CE4VEG*PQQVEGI(L,1)+CE4MHK*PQQMHKI(L,1)+CE4SUP*PQQSUPI(L,1))`; `aaefdc.f90:1525` — `if( IFPROX == 2 ) FPROX(L,K) = (1./(VKC*Z(L,K))**2) + CTE5*(1./(VKC*(1.-Z(L,K)))**2)/(CTE4+0.00001)`; `caltbxy.f90:750` — `! *** DRAG COEFFICIENT: U COMPONENT`; `caltbxy.f90:751` — `CPVEGU = 1.0`; `caltbxy.f90:752` — `if( ISVEGL == 1 ) CPVEGU = CPVEGU + 10.E-6/((BPVEG(MW) + BPVEG(M))*UMAGTMP )`; `caltbxy.f90:753` — `if( CPVEGU > 1.0 )then`; `caltbxy.f90:754` — `! *** CALCULATE R FOR LAMINAR FLOW`; `caltbxy.f90:755` — `CPVEGU = CPVEGU-0.5`; `caltbxy.f90:757` — `CPVEGU = SCVEG(M)*CPVEGU`; EFDC_Theory_Document_Ver_12.pdf, PDF 30쪽·인쇄 17쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 31쪽·인쇄 18쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 32쪽·인쇄 19쪽)
+
 
 — $a_d$ = 무차원 canopy density.
 
 Depth-varying drag (Eq 2.35):
 
+
+문서 원문 (EFDC_Theory_Document_Ver_12.pdf, PDF 30쪽·인쇄 17쪽, 식 2.32; EFDC_Theory_Document_Ver_12.pdf, PDF 30쪽·인쇄 17쪽, 식 2.33; EFDC_Theory_Document_Ver_12.pdf, PDF 31쪽·인쇄 18쪽, 식 2.34; EFDC_Theory_Document_Ver_12.pdf, PDF 32쪽·인쇄 19쪽, 식 2.35)
+
 $$C_D(\zeta) = \bar{C}_D(1.2 + 0.8\zeta - 0.5\zeta^2)$$
+
+식 2.34의 2−67ad와 식 2.35의 수직 다항식은 대조한 f90에서 찾지 못했다. (EFDC_Theory_Document_Ver_12.pdf, PDF 31쪽·인쇄 18쪽, 식 2.34; EFDC_Theory_Document_Ver_12.pdf, PDF 32쪽·인쇄 19쪽, 식 2.35) 이 빌드의 두 식 자동 계산은 확인하지 않음. (`calqq2t.f90:278` — `PQQ  = DELT*( PQQB+PQQU+PQQV+PQQVEGE(L,K)+PQQMHKE(L,K)+PQQSUPE(L,K) )`; `calqq2t.f90:279` — `UUU(L,K) = UUU(L,K) + 2.*PQQ`; `calqq2t.f90:280` — `PQQL = DELT*HP(L)*(CTE3TMP*PQQB + CTE1*(PQQU+PQQV) + CE4VEG*PQQVEGE(L,K) + CE4MHK*PQQMHKE(L,K) + CE4SUP*PQQSUPE(L,K))`; `calqq2t.f90:281` — `VVV(L,K) = VVV(L,K) + DML(L,K)*PQQL`; `calqq2t.f90:355` — `CMQLTMP = 1. - CLQLTMP-CUQLTMP+DELT*(QQSQR(L,1)/(CTURBB1(L,1)*DML(L,1)*HP(L)))*(1.+CTE4*DML(L,1)*DML(L,1)*FPROX(L,1)) &`; `calqq2t.f90:356` — `+ DELT*HPI(L)*(CE4VEG*PQQVEGI(L,1)+CE4MHK*PQQMHKI(L,1)+CE4SUP*PQQSUPI(L,1))`; `aaefdc.f90:1525` — `if( IFPROX == 2 ) FPROX(L,K) = (1./(VKC*Z(L,K))**2) + CTE5*(1./(VKC*(1.-Z(L,K)))**2)/(CTE4+0.00001)`; `caltbxy.f90:750` — `! *** DRAG COEFFICIENT: U COMPONENT`; `caltbxy.f90:751` — `CPVEGU = 1.0`; `caltbxy.f90:752` — `if( ISVEGL == 1 ) CPVEGU = CPVEGU + 10.E-6/((BPVEG(MW) + BPVEG(M))*UMAGTMP )`; `caltbxy.f90:753` — `if( CPVEGU > 1.0 )then`; `caltbxy.f90:754` — `! *** CALCULATE R FOR LAMINAR FLOW`; `caltbxy.f90:755` — `CPVEGU = CPVEGU-0.5`; `caltbxy.f90:757` — `CPVEGU = SCVEG(M)*CPVEGU`; EFDC_Theory_Document_Ver_12.pdf, PDF 30쪽·인쇄 17쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 31쪽·인쇄 18쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 32쪽·인쇄 19쪽)
+
 
 ### 2.4 §2.2.3 Wind Forcings (pp.19-21) — **4 + 1 = 5 wind drag 옵션**
 
@@ -266,6 +306,9 @@ $$C_D = \begin{cases}
 -3.99677 \times 10^{-7} W_s^2 + 7.32937 \times 10^{-5} W_s + 0.000726716, & W_s \ge 7
 \end{cases}$$
 
+7 m/s는 코드의 둘째 구간에 들어간다. (`caltsxy.f90:778` — `elseif( U10 >= 5.0 .and. U10 <= 7. )then`; `caltsxy.f90:779` — `CD10 = -5.37642E-006*(U10**3) + 0.000112556*(U10**2) - 0.000721203*U10 + 0.00259657`; EFDC_Theory_Document_Ver_12.pdf, PDF 32쪽·인쇄 19쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 33쪽·인쇄 20쪽)
+
+
 #### Option 2: Original + relative-to-water velocity (Eq 2.39-2.40)
 
 #### Option 3: ECMWF wave-age-dependent (Hersbach 2011, Eq 2.41)
@@ -278,9 +321,27 @@ $$C_D = \frac{c_1 + c_2 W_s^{p_1}}{W_s^{p_2}}$$
 
 (Eq 2.42-2.44):
 
+
+문서 원문 (EFDC_Theory_Document_Ver_12.pdf, PDF 32쪽·인쇄 19쪽, 식 2.38; EFDC_Theory_Document_Ver_12.pdf, PDF 33쪽·인쇄 20쪽, 식 2.42; EFDC_Theory_Document_Ver_12.pdf, PDF 33쪽·인쇄 20쪽, 식 2.43; EFDC_Theory_Document_Ver_12.pdf, PDF 33쪽·인쇄 20쪽, 식 2.44)
+
 $$\tau = \rho_a C_D U_r^2$$
+
+응력은 U10·상대 풍속 벡터의 곱이다. (`caltsxy.f90:809` — `TSX(L) = 1.225E-3*CD10*U10*TSEAST             ! *** TSX IS THE WIND SHEAR IN THE U DIRECTION (M2/S2)`; `caltsxy.f90:810` — `TSY(L) = 1.225E-3*CD10*U10*TSNORT             ! *** TSY IS THE WIND SHEAR IN THE V DIRECTION (M2/S2)`; EFDC_Theory_Document_Ver_12.pdf, PDF 32쪽·인쇄 19쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 33쪽·인쇄 20쪽) 상대 풍속 크기의 제곱과 일반적으로 다르다. (`caltsxy.f90:809` — `TSX(L) = 1.225E-3*CD10*U10*TSEAST             ! *** TSX IS THE WIND SHEAR IN THE U DIRECTION (M2/S2)`; `caltsxy.f90:810` — `TSY(L) = 1.225E-3*CD10*U10*TSNORT             ! *** TSY IS THE WIND SHEAR IN THE V DIRECTION (M2/S2)`; EFDC_Theory_Document_Ver_12.pdf, PDF 32쪽·인쇄 19쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 33쪽·인쇄 20쪽)
+
+
+문서 원문 (EFDC_Theory_Document_Ver_12.pdf, PDF 32쪽·인쇄 19쪽, 식 2.38; EFDC_Theory_Document_Ver_12.pdf, PDF 33쪽·인쇄 20쪽, 식 2.42; EFDC_Theory_Document_Ver_12.pdf, PDF 33쪽·인쇄 20쪽, 식 2.43; EFDC_Theory_Document_Ver_12.pdf, PDF 33쪽·인쇄 20쪽, 식 2.44)
+
 $$C_D = \left[\frac{\kappa}{\ln(z/z_0)}\right]^2$$
+
+바람 전용 IWDRAG=3은 중립 COARE 근사 다항식을 쓴다. (`caltsxy.f90:786` — `elseif( IWDRAG == 3 )then`; `caltsxy.f90:789` — `CD10 = 8.394E-05*U10 + 8.285E-04`; `caltsxy.f90:791` — `CD10 = 1.376E-08*U10**4 - 9.841E-07*U10**3 + 2.324E-05*U10**2 - 1.012E-04*U10 + 8.971E-04`; EFDC_Theory_Document_Ver_12.pdf, PDF 32쪽·인쇄 19쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 33쪽·인쇄 20쪽) ISTOPT(2)=2를 함께 켜면 열교환 COARE의 항력계수를 사용한다. (`caltsxy.f90:811` — `if( IWDRAG == 3 .and. ISTOPT(2) == 2 )then`; `caltsxy.f90:812` — `TSX(L) = 1.225E-3*CDCOARE(L)*U10*TSEAST`; `caltsxy.f90:813` — `TSY(L) = 1.225E-3*CDCOARE(L)*U10*TSNORT`; EFDC_Theory_Document_Ver_12.pdf, PDF 32쪽·인쇄 19쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 33쪽·인쇄 20쪽) 로그 조도 유도식의 모든 바람 전용 분기 직접 구현은 확인하지 않음. (`caltsxy.f90:786` — `elseif( IWDRAG == 3 )then`; `caltsxy.f90:789` — `CD10 = 8.394E-05*U10 + 8.285E-04`; `caltsxy.f90:791` — `CD10 = 1.376E-08*U10**4 - 9.841E-07*U10**3 + 2.324E-05*U10**2 - 1.012E-04*U10 + 8.971E-04`; EFDC_Theory_Document_Ver_12.pdf, PDF 32쪽·인쇄 19쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 33쪽·인쇄 20쪽)
+
+
+문서 원문 (EFDC_Theory_Document_Ver_12.pdf, PDF 32쪽·인쇄 19쪽, 식 2.38; EFDC_Theory_Document_Ver_12.pdf, PDF 33쪽·인쇄 20쪽, 식 2.42; EFDC_Theory_Document_Ver_12.pdf, PDF 33쪽·인쇄 20쪽, 식 2.43; EFDC_Theory_Document_Ver_12.pdf, PDF 33쪽·인쇄 20쪽, 식 2.44)
+
 $$z_0 = z_0^{\text{smooth}} + z_0^{\text{rough}} = \gamma \frac{\nu}{u_*} + \alpha \frac{u_*^2}{g}$$
+
+바람 전용 IWDRAG=3은 중립 COARE 근사 다항식을 쓴다. (`caltsxy.f90:786` — `elseif( IWDRAG == 3 )then`; `caltsxy.f90:789` — `CD10 = 8.394E-05*U10 + 8.285E-04`; `caltsxy.f90:791` — `CD10 = 1.376E-08*U10**4 - 9.841E-07*U10**3 + 2.324E-05*U10**2 - 1.012E-04*U10 + 8.971E-04`; EFDC_Theory_Document_Ver_12.pdf, PDF 32쪽·인쇄 19쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 33쪽·인쇄 20쪽) ISTOPT(2)=2를 함께 켜면 열교환 COARE의 항력계수를 사용한다. (`caltsxy.f90:811` — `if( IWDRAG == 3 .and. ISTOPT(2) == 2 )then`; `caltsxy.f90:812` — `TSX(L) = 1.225E-3*CDCOARE(L)*U10*TSEAST`; `caltsxy.f90:813` — `TSY(L) = 1.225E-3*CDCOARE(L)*U10*TSNORT`; EFDC_Theory_Document_Ver_12.pdf, PDF 32쪽·인쇄 19쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 33쪽·인쇄 20쪽) 로그 조도 유도식의 모든 바람 전용 분기 직접 구현은 확인하지 않음. (`caltsxy.f90:786` — `elseif( IWDRAG == 3 )then`; `caltsxy.f90:789` — `CD10 = 8.394E-05*U10 + 8.285E-04`; `caltsxy.f90:791` — `CD10 = 1.376E-08*U10**4 - 9.841E-07*U10**3 + 2.324E-05*U10**2 - 1.012E-04*U10 + 8.971E-04`; EFDC_Theory_Document_Ver_12.pdf, PDF 32쪽·인쇄 19쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 33쪽·인쇄 20쪽)
+
 
 — Charnock coefficient $\alpha$, roughness Reynolds 계수 $\gamma = 0.11$ (smooth flow laboratory experiments).
 
@@ -319,11 +380,23 @@ C_2, & W_s \ge W_2
 
 #### (a) Radiation stress (Longuet-Higgins & Stewart 1964, Eq 2.46-2.48):
 
+
+문서 원문 (EFDC_Theory_Document_Ver_12.pdf, PDF 34쪽·인쇄 21쪽, 식 2.46; EFDC_Theory_Document_Ver_12.pdf, PDF 34쪽·인쇄 21쪽, 식 2.48; EFDC_Theory_Document_Ver_12.pdf, PDF 35쪽·인쇄 22쪽, 식 2.49)
+
 $$S_{xx} = n\cos^2\theta + n - \frac{1}{2}E$$
+
+wavesxy는 방사 응력 괄호 전체에 E를 곱한다. (`Waves/wavesxy.f90:236` — `SXXTMP = WE*(WG/2+WN*COS(WV(L).DIR)**2)        ! *** RADIATION SHEAR STRESS [Kg/S2]`; `Waves/wavesxy.f90:238` — `SYYTMP = WE*(WG/2+WN*SIN(WV(L).DIR)**2)        ! *** RADIATION SHEAR STRESS [Kg/S2]`; EFDC_Theory_Document_Ver_12.pdf, PDF 34쪽·인쇄 21쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 35쪽·인쇄 22쪽) 문서 식 2.46·2.48은 마지막 항에만 E를 인쇄한다. (EFDC_Theory_Document_Ver_12.pdf, PDF 34쪽·인쇄 21쪽, 식 2.46; EFDC_Theory_Document_Ver_12.pdf, PDF 34쪽·인쇄 21쪽, 식 2.48)
+
 $$S_{xy} = S_{yx} = (n\cos\theta\sin\theta) E$$
+
+문서 원문 (EFDC_Theory_Document_Ver_12.pdf, PDF 34쪽·인쇄 21쪽, 식 2.46; EFDC_Theory_Document_Ver_12.pdf, PDF 34쪽·인쇄 21쪽, 식 2.48; EFDC_Theory_Document_Ver_12.pdf, PDF 35쪽·인쇄 22쪽, 식 2.49)
+
 $$S_{yy} = n\sin^2\theta + n - \frac{1}{2}E$$
 
-Wave energy (Eq 2.49): $E = \frac{1}{8}\rho g H_s^2$
+wavesxy는 방사 응력 괄호 전체에 E를 곱한다. (`Waves/wavesxy.f90:236` — `SXXTMP = WE*(WG/2+WN*COS(WV(L).DIR)**2)        ! *** RADIATION SHEAR STRESS [Kg/S2]`; `Waves/wavesxy.f90:238` — `SYYTMP = WE*(WG/2+WN*SIN(WV(L).DIR)**2)        ! *** RADIATION SHEAR STRESS [Kg/S2]`; EFDC_Theory_Document_Ver_12.pdf, PDF 34쪽·인쇄 21쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 35쪽·인쇄 22쪽) 문서 식 2.46·2.48은 마지막 항에만 E를 인쇄한다. (EFDC_Theory_Document_Ver_12.pdf, PDF 34쪽·인쇄 21쪽, 식 2.46; EFDC_Theory_Document_Ver_12.pdf, PDF 34쪽·인쇄 21쪽, 식 2.48)
+
+
+코드의 유의파고 에너지는 ρgHs²/16이다. (`Waves/wavesxy.f90:232` — `WE = 9.81*1000.*WV(L).HEIGHT**2 /16.           ! *** TOTAL WAVE ENERGY : KG/S2`; `Waves/mod_windwave.f90:741` — `WVENEP(L)= G*WV(L).HEIGHT**2./16.                         ! *** ENERGY/RHO (M3/S2) FOR RANDOM WAVE`; EFDC_Theory_Document_Ver_12.pdf, PDF 34쪽·인쇄 21쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 35쪽·인쇄 22쪽) 문서 식 2.49는 ρgHs²/8이다. (EFDC_Theory_Document_Ver_12.pdf, PDF 35쪽·인쇄 22쪽, 식 2.49)
 
 #### (b) Dispersion + 근사 (Hunt 1979, Eq 2.50-2.55):
 
@@ -337,10 +410,19 @@ $$d = \gamma + \frac{1}{1 + 0.6522\gamma + 0.4622\gamma^2 + 0.0864\gamma^4 + 0.0
 
 $$R_w = \frac{U_b A}{\nu}, \quad r = \frac{A}{k_s}$$
 $$A = \frac{H_s}{2\sinh(kh)}, \quad U_b = A\omega = \frac{\omega H_s}{2\sinh(kh)}$$
+
+문서 원문 (EFDC_Theory_Document_Ver_12.pdf, PDF 36쪽·인쇄 23쪽, 식 2.60)
+
 $$f_w = \begin{cases}
 e^{(5.21 r^{-0.19} - 6.0)}, & r > 1.57 \\
-0.3 r, & r \le 1.57
+0.3 r, & r = 1.57
 \end{cases}$$
+
+코드의 Swart 지수식은 r≤1.57·Re>5E5에 적용한다. (`Waves/wavebl.f90:208` — `elseif( REYWAVE>5D5 .and. RA <= 1.57 )then`; `Waves/wavebl.f90:210` — `FCW = EXP(5.2*RA**(-0.19)-6)    ! *** Baird's paper`; EFDC_Theory_Document_Ver_12.pdf, PDF 36쪽·인쇄 23쪽) 코드의 Swart 지수식 계수는 5.2이다. (`Waves/wavebl.f90:210` — `FCW = EXP(5.2*RA**(-0.19)-6)    ! *** Baird's paper`; EFDC_Theory_Document_Ver_12.pdf, PDF 36쪽·인쇄 23쪽) 코드는 0.3 상한을 적용한다. (`Waves/wavebl.f90:211` — `FCW = min(FCW,0.3)`; EFDC_Theory_Document_Ver_12.pdf, PDF 36쪽·인쇄 23쪽)
+
+
+PDF 원문의 둘째 조건은 r=1.57이다. (EFDC_Theory_Document_Ver_12.pdf, PDF 36쪽·인쇄 23쪽) 코드는 Reynolds 수 5E5를 경계로 세 분기를 쓴다. (`Waves/wavebl.f90:200` — `if( REYWAVE <= 5D5 )then`; `Waves/wavebl.f90:204` — `elseif( REYWAVE>5D5 .and. RA>1.57 )then`; `Waves/wavebl.f90:208` — `elseif( REYWAVE>5D5 .and. RA <= 1.57 )then`; EFDC_Theory_Document_Ver_12.pdf, PDF 36쪽·인쇄 23쪽) 문서식과 코드의 분기 조건은 다르다. (`Waves/wavebl.f90:200` — `if( REYWAVE <= 5D5 )then`; `Waves/wavebl.f90:204` — `elseif( REYWAVE>5D5 .and. RA>1.57 )then`; `Waves/wavebl.f90:208` — `elseif( REYWAVE>5D5 .and. RA <= 1.57 )then`; EFDC_Theory_Document_Ver_12.pdf, PDF 36쪽·인쇄 23쪽)
+
 
 — Nikuradse 등가 sand grain roughness $k_s$.
 
@@ -349,14 +431,32 @@ e^{(5.21 r^{-0.19} - 6.0)}, & r > 1.57 \\
 **SMB** (Sverdrup-Munk-Bretschneider, Ji 2008) — 등가 fetch + wind 조건 기반 empirical wave height·period:
 
 Wave height (Eq 2.61):
+
+문서 원문 (EFDC_Theory_Document_Ver_12.pdf, PDF 37쪽·인쇄 24쪽, 식 2.61; EFDC_Theory_Document_Ver_12.pdf, PDF 37쪽·인쇄 24쪽, 식 2.63; EFDC_Theory_Document_Ver_12.pdf, PDF 37쪽·인쇄 24쪽, 식 2.64)
+
 $$H_s = 0.283 \alpha \frac{W_s^2}{g} \tanh\left[0.0125\left(\frac{gF}{\alpha W_s^2}\right)^{0.42}\right]$$
+
+α·β의 수심은 코드 Fetch_Depth의 취송 구간 평균 수심이다. (`Waves/mod_windwave.f90:214` — `AVEDEP = Fetch_Depth(LG,ZONE)              ! *** Get the average depth along the fetch (m)`; `Waves/mod_windwave.f90:218` — `FC0 = (G*AVEDEP/WINDVEL2)**0.75`; `Waves/mod_windwave.f90:237` — `FC0 = TANH(0.833*(G*AVEDEP/WINDVEL2)**0.375)`; EFDC_Theory_Document_Ver_12.pdf, PDF 37쪽·인쇄 24쪽) 파고 상한에는 국소 HP를 사용한다. (`Waves/mod_windwave.f90:222` — `WV(L).HEIGHT = min(0.75*HP(L), FC2*FC3)                                      ! *** Wave height (m)`; EFDC_Theory_Document_Ver_12.pdf, PDF 37쪽·인쇄 24쪽) 문서의 H와 평균 수심을 같은 값으로 고정하지 않는다. (`Waves/mod_windwave.f90:214` — `AVEDEP = Fetch_Depth(LG,ZONE)              ! *** Get the average depth along the fetch (m)`; `Waves/mod_windwave.f90:218` — `FC0 = (G*AVEDEP/WINDVEL2)**0.75`; `Waves/mod_windwave.f90:237` — `FC0 = TANH(0.833*(G*AVEDEP/WINDVEL2)**0.375)`; EFDC_Theory_Document_Ver_12.pdf, PDF 37쪽·인쇄 24쪽) 코드는 파고에 0.75HP 상한을 적용한다. (`Waves/mod_windwave.f90:222` — `WV(L).HEIGHT = min(0.75*HP(L), FC2*FC3)                                      ! *** Wave height (m)`; EFDC_Theory_Document_Ver_12.pdf, PDF 37쪽·인쇄 24쪽) 코드는 주기 하한도 적용한다. (`Waves/mod_windwave.f90:240` — `WV(L).PERIOD = max(1.D-3, FC1*FC2)`; EFDC_Theory_Document_Ver_12.pdf, PDF 37쪽·인쇄 24쪽)
+
 
 Peak period (Eq 2.62):
 $$T_p = 7.54 \beta \frac{W_s}{g} \tanh\left[0.077\left(\frac{gF}{\beta W_s^2}\right)^{0.25}\right]$$
 
 (Eq 2.63-2.64):
+
+문서 원문 (EFDC_Theory_Document_Ver_12.pdf, PDF 37쪽·인쇄 24쪽, 식 2.61; EFDC_Theory_Document_Ver_12.pdf, PDF 37쪽·인쇄 24쪽, 식 2.63; EFDC_Theory_Document_Ver_12.pdf, PDF 37쪽·인쇄 24쪽, 식 2.64)
+
 $$\alpha = \tanh\left[0.53\left(\frac{gH}{W_s^2}\right)^{0.75}\right]$$
+
+α·β의 수심은 코드 Fetch_Depth의 취송 구간 평균 수심이다. (`Waves/mod_windwave.f90:214` — `AVEDEP = Fetch_Depth(LG,ZONE)              ! *** Get the average depth along the fetch (m)`; `Waves/mod_windwave.f90:218` — `FC0 = (G*AVEDEP/WINDVEL2)**0.75`; `Waves/mod_windwave.f90:237` — `FC0 = TANH(0.833*(G*AVEDEP/WINDVEL2)**0.375)`; EFDC_Theory_Document_Ver_12.pdf, PDF 37쪽·인쇄 24쪽) 파고 상한에는 국소 HP를 사용한다. (`Waves/mod_windwave.f90:222` — `WV(L).HEIGHT = min(0.75*HP(L), FC2*FC3)                                      ! *** Wave height (m)`; EFDC_Theory_Document_Ver_12.pdf, PDF 37쪽·인쇄 24쪽) 문서의 H와 평균 수심을 같은 값으로 고정하지 않는다. (`Waves/mod_windwave.f90:214` — `AVEDEP = Fetch_Depth(LG,ZONE)              ! *** Get the average depth along the fetch (m)`; `Waves/mod_windwave.f90:218` — `FC0 = (G*AVEDEP/WINDVEL2)**0.75`; `Waves/mod_windwave.f90:237` — `FC0 = TANH(0.833*(G*AVEDEP/WINDVEL2)**0.375)`; EFDC_Theory_Document_Ver_12.pdf, PDF 37쪽·인쇄 24쪽)
+
+
+문서 원문 (EFDC_Theory_Document_Ver_12.pdf, PDF 37쪽·인쇄 24쪽, 식 2.61; EFDC_Theory_Document_Ver_12.pdf, PDF 37쪽·인쇄 24쪽, 식 2.63; EFDC_Theory_Document_Ver_12.pdf, PDF 37쪽·인쇄 24쪽, 식 2.64)
+
 $$\beta = \tanh\left[0.833\left(\frac{gH}{W_s^2}\right)^{0.375}\right]$$
+
+α·β의 수심은 코드 Fetch_Depth의 취송 구간 평균 수심이다. (`Waves/mod_windwave.f90:214` — `AVEDEP = Fetch_Depth(LG,ZONE)              ! *** Get the average depth along the fetch (m)`; `Waves/mod_windwave.f90:218` — `FC0 = (G*AVEDEP/WINDVEL2)**0.75`; `Waves/mod_windwave.f90:237` — `FC0 = TANH(0.833*(G*AVEDEP/WINDVEL2)**0.375)`; EFDC_Theory_Document_Ver_12.pdf, PDF 37쪽·인쇄 24쪽) 파고 상한에는 국소 HP를 사용한다. (`Waves/mod_windwave.f90:222` — `WV(L).HEIGHT = min(0.75*HP(L), FC2*FC3)                                      ! *** Wave height (m)`; EFDC_Theory_Document_Ver_12.pdf, PDF 37쪽·인쇄 24쪽) 문서의 H와 평균 수심을 같은 값으로 고정하지 않는다. (`Waves/mod_windwave.f90:214` — `AVEDEP = Fetch_Depth(LG,ZONE)              ! *** Get the average depth along the fetch (m)`; `Waves/mod_windwave.f90:218` — `FC0 = (G*AVEDEP/WINDVEL2)**0.75`; `Waves/mod_windwave.f90:237` — `FC0 = TANH(0.833*(G*AVEDEP/WINDVEL2)**0.375)`; EFDC_Theory_Document_Ver_12.pdf, PDF 37쪽·인쇄 24쪽)
+
 
 — $F$ = fetch length, 16 방향 cell-by-cell 계산.
 
@@ -368,7 +468,13 @@ $$\zeta(t) = \zeta_0(t) + a_0 + \sum_{k=1}^N [a_k \cos(\omega_k t) + b_k \sin(\o
 
 amplitude + phase form (Eq 2.67-2.69):
 $$\zeta(t) = \zeta_0(t) + a_0 + \sum_k A_k \cos(\omega_k t - \phi_k)$$
+
+문서 원문 (EFDC_Theory_Document_Ver_12.pdf, PDF 38쪽·인쇄 25쪽, 식 2.68; EFDC_Theory_Document_Ver_12.pdf, PDF 38쪽·인쇄 25쪽, 식 2.69)
+
 $$A_k = \sqrt{a_k^2 + b_k^2}, \quad f_k = \arctan(b_k / a_k)$$
+
+진폭과 위상의 식은 문서의 역변환 관계이다. (EFDC_Theory_Document_Ver_12.pdf, PDF 38쪽·인쇄 25쪽) 코드 입력은 진폭과 시간 지연에서 사인·코사인 계수를 만든다. (`input.f90:1227` — `AMP = G*PFAM(NPFORE,M)`; `input.f90:1228` — `PCBE_GL(L,M) = AMP*COS(RAD)`; `input.f90:1229` — `PSBE_GL(L,M) = AMP*SIN(RAD)`; `input.f90:1226` — `RAD = PI2*PFPH(NPFORE,M)/TCP(M)`; EFDC_Theory_Document_Ver_12.pdf, PDF 38쪽·인쇄 25쪽) f_k 표기는 원문에 있고 φ_k와 구분해야 한다. (EFDC_Theory_Document_Ver_12.pdf, PDF 38쪽·인쇄 25쪽) 해석: arctan(b/a)는 사분면 정보를 잃는다(정적 판독, 실행 미확인). (EFDC_Theory_Document_Ver_12.pdf, PDF 38쪽·인쇄 25쪽) 확인한 코드에서 이 역변환 계산은 찾지 못했다. (`input.f90:1227` — `AMP = G*PFAM(NPFORE,M)`; `input.f90:1228` — `PCBE_GL(L,M) = AMP*COS(RAD)`; `input.f90:1229` — `PSBE_GL(L,M) = AMP*SIN(RAD)`; `input.f90:1226` — `RAD = PI2*PFPH(NPFORE,M)/TCP(M)`; EFDC_Theory_Document_Ver_12.pdf, PDF 38쪽·인쇄 25쪽)
+
 
 — estuary/coastal storm-surge + 조석 superposition.
 
@@ -380,7 +486,7 @@ EFDC+ 의 hydraulic structure: **rating curve** (lookup table) 또는 **physical
 
 Manning eq: $Q = AV = AC\sqrt{RS} = K\sqrt{S}$ (Eq 2.70), $C = \frac{1}{n}R^{1/6}$ (Eq 2.71).
 
-Critical depth (Eq 2.75): $y_c = H_{HW} - \frac{D}{2}$.
+문서의 수리 수심 D=A/수면 폭과 코드 HRAD=A/젖은 둘레를 구분한다. (`mod_hydstructure.f90:956` — `HRAD = FAREA/WETPER                          ! *** HYDRAULIC RADIUS`; EFDC_Theory_Document_Ver_12.pdf, PDF 40쪽·인쇄 27쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 43쪽·인쇄 30쪽) 코드는 HCR=HUD−HRAD/2를 관경 이하로 제한한다. (`mod_hydstructure.f90:273` — `HCR =  HUD - 0.5*HRAD               ! *** Critical depth`; `mod_hydstructure.f90:274` — `HCR = min(HCR,DIA)`; EFDC_Theory_Document_Ver_12.pdf, PDF 40쪽·인쇄 27쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 43쪽·인쇄 30쪽) VCR은 sqrt(9.81HRAD)이다. (`mod_hydstructure.f90:275` — `VCR = SQRT(9.81*HRAD)`; EFDC_Theory_Document_Ver_12.pdf, PDF 40쪽·인쇄 27쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 43쪽·인쇄 30쪽) HCR 제한 뒤에는 문서의 에너지 식을 그대로 보존하지 않는다. (`mod_hydstructure.f90:273` — `HCR =  HUD - 0.5*HRAD               ! *** Critical depth`; `mod_hydstructure.f90:274` — `HCR = min(HCR,DIA)`; EFDC_Theory_Document_Ver_12.pdf, PDF 40쪽·인쇄 27쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 43쪽·인쇄 30쪽) 코드의 오리피스 수두에는 별도 기준 표고와 부분 잠김 보정이 있다. (`mod_hydstructure.f90:494` — `HUD = ZHU - USINV + 0.5*HB  ! *** HUD based on centerline`; `mod_hydstructure.f90:498` — `if( ZHD > USINV )then`; `mod_hydstructure.f90:499` — `QHS = QHS*(1.-HDD/HUD)**0.385`; EFDC_Theory_Document_Ver_12.pdf, PDF 40쪽·인쇄 27쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 43쪽·인쇄 30쪽)
 
 #### Weirs (Eq 2.80, free flow):
 $$Q = C_d W \sqrt{2g H_{HW}^3}$$
@@ -444,7 +550,13 @@ External mode eq (Eq 2.101): K cells 적분.
 
 핵심 — **Helmholtz elliptic equation** for free surface displacement (Eq 2.132):
 
+
+해석 수정식 (EFDC_Theory_Document_Ver_12.pdf, PDF 47쪽·인쇄 34쪽, 식 2.96; EFDC_Theory_Document_Ver_12.pdf, PDF 47쪽·인쇄 34쪽, 식 2.100; EFDC_Theory_Document_Ver_12.pdf, PDF 48쪽·인쇄 35쪽, 식 2.102; EFDC_Theory_Document_Ver_12.pdf, PDF 50쪽·인쇄 37쪽, 식 2.113; EFDC_Theory_Document_Ver_12.pdf, PDF 50쪽·인쇄 37쪽, 식 2.116; EFDC_Theory_Document_Ver_12.pdf, PDF 51쪽·인쇄 38쪽, 식 2.117; EFDC_Theory_Document_Ver_12.pdf, PDF 52쪽·인쇄 39쪽, 식 2.118; EFDC_Theory_Document_Ver_12.pdf, PDF 52쪽·인쇄 39쪽, 식 2.119; EFDC_Theory_Document_Ver_12.pdf, PDF 54쪽·인쇄 41쪽, 식 2.132; EFDC_Theory_Document_Ver_12.pdf, PDF 56쪽·인쇄 43쪽, 식 2.134; EFDC_Theory_Document_Ver_12.pdf, PDF 58쪽·인쇄 45쪽, 식 2.144)
+
 $$\zeta^{n+1} - g\Delta t^2 \left(\frac{1}{m}\right)^\zeta \left[\delta_x^\zeta\left(\frac{Hm_y}{m_x}\right)^u \delta_x^u \zeta^{n+1} + \delta_y^\zeta\left(\frac{Hm_x}{m_y}\right)^v \delta_y^v \zeta^{n+1}\right] - \phi = 0$$
+
+노트의 아래 Helmholtz 식은 PDF의 둘째 바깥 δx를 δy로 바꾼 해석 수정식이다. (EFDC_Theory_Document_Ver_12.pdf, PDF 47쪽·인쇄 34쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 48쪽·인쇄 35쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 50쪽·인쇄 37쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 51쪽·인쇄 38쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 52쪽·인쇄 39쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 54쪽·인쇄 41쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 56쪽·인쇄 43쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 58쪽·인쇄 45쪽)
+
 
 — **Conjugate Gradient (CG)** with multicolor/red-black ordering (Hageman-Young 1981) 으로 풀이. CG iteration 은 squared residual sum < threshold 까지.
 
@@ -466,7 +578,7 @@ $$\frac{(P_{k+1} - P_k)^{n+1}}{m_y^u \Delta_{k+1,k}} = \frac{(P_{k+1} - P_k)^{**
 
 $$(\tau_{xz})_0^{n+1} = C_b \sqrt{(u_1)^2 + (v_1)^2}^n \frac{P_1^{n+1}}{m_y^u H^u}$$
 
-Log-profile assumption → $C_b = \kappa^2 / [\ln(\Delta_1 H / 2z_o^*)]^2$ (Eq 2.148).
+다층 로그는 1+반층 두께/조도이다. (`caltbxy.f90:601` — `DZHUDZBR = 1. + SGZUU(L,KSZU(L))*HURTMP/ZBRATU(L)`; `caltbxy.f90:602` — `DZHVDZBR = 1. + SGZVV(L,KSZV(L))*HVRTMP/ZBRATV(L)`; EFDC_Theory_Document_Ver_12.pdf, PDF 30쪽·인쇄 17쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 58쪽·인쇄 45쪽) 저면 계수의 SGZ 조건과 안정성 상한은 별도 분기이다. (`caltbxy.f90:545` — `STBX(L) = min(CDMAXU, STBX(L) )`; `caltbxy.f90:546` — `STBY(L) = min(CDMAXV, STBY(L) )`; `caltbxy.f90:601` — `DZHUDZBR = 1. + SGZUU(L,KSZU(L))*HURTMP/ZBRATU(L)`; `caltbxy.f90:602` — `DZHVDZBR = 1. + SGZVV(L,KSZV(L))*HVRTMP/ZBRATV(L)`; EFDC_Theory_Document_Ver_12.pdf, PDF 30쪽·인쇄 17쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 58쪽·인쇄 45쪽)
 
 #### Vertical velocity (Eq 2.150):
 
@@ -609,3 +721,7 @@ primary sources of Ch 2 (각 식 옆 인용):
   - Mellor-Yamada 1982 — *Rev. Geophys.* 20:851-875
   - Craig et al. 2014 — DSI internal doc
   - Fairall et al. 2003 — *J. Climate* 16:571-591
+
+## 근거리 방류(식 2.151–2.181)
+
+문서 2장의 번호 식은 2.1–2.181이다. (EFDC_Theory_Document_Ver_12.pdf, PDF 62쪽·인쇄 49쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 63쪽·인쇄 50쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 64쪽·인쇄 51쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 65쪽·인쇄 52쪽) ISENT=0의 연행은 두 항의 최댓값이다. (`Transport/mod_diffuser.f90:1008` — `if( JET_PLM(NJP).ISENT == 0 )then`; `Transport/mod_diffuser.f90:1010` — `DRMAJ = max(DRMAJSA,DRMAJFA)`; EFDC_Theory_Document_Ver_12.pdf, PDF 62쪽·인쇄 49쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 63쪽·인쇄 50쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 64쪽·인쇄 51쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 65쪽·인쇄 52쪽) 연행 계수의 부호와 초기 밀도 차 참조는 식 2.157과 다르다. (`Transport/mod_diffuser.f90:979` — `FRD2I = FTOP/(ALPH2*DVEL*DVEL)`; `Transport/mod_diffuser.f90:980` — `EBOT = 1. + 5.*RDQA(1)/DVEL`; `Transport/mod_diffuser.f90:981` — `ETOP = 0.057 + 0.554*SINPHJ*FRD2I`; `Transport/mod_diffuser.f90:982` — `ENTS = 1.414*ETOP/EBOT`; EFDC_Theory_Document_Ver_12.pdf, PDF 63쪽·인쇄 50쪽, 식 2.157) 제트 밀도는 TSS를 포함한다. (`Transport/mod_diffuser.f90:1101` — `RHOJ(N2) = FUNDEN(SALJ(N2),SEDJETT,TEMJ(N2))`; `Transport/mod_diffuser.f90:1659` — `RHO = RHO*( (1. - SDEN*SEDIN) + (SSG - 1.)*SDEN*SEDIN )`; EFDC_Theory_Document_Ver_12.pdf, PDF 62쪽·인쇄 49쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 63쪽·인쇄 50쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 64쪽·인쇄 51쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 65쪽·인쇄 52쪽) 주변 y·z 운동량을 혼합한다. (`Transport/mod_diffuser.f90:1105` — `VJG(N2) = RMAJI*( RMAJP(N1)*VJG(N1) + DRMAJ*VAG )                   ! ***`; `Transport/mod_diffuser.f90:1107` — `WJG(N2) = RMAJI*( RMAJP(N1)*WJG(N1) + DRMAJ*WAG ) + G*DRHO*DTJP     ! ***`; EFDC_Theory_Document_Ver_12.pdf, PDF 62쪽·인쇄 49쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 63쪽·인쇄 50쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 64쪽·인쇄 51쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 65쪽·인쇄 52쪽) 수직 부력 갱신은 문서의 연행 질량 가중과 다르다. (`Transport/mod_diffuser.f90:1102` — `DRHO = (RHOA(N2) - RHOJ(N2))/RHOA(N2)`; `Transport/mod_diffuser.f90:1107` — `WJG(N2) = RMAJI*( RMAJP(N1)*WJG(N1) + DRMAJ*WAG ) + G*DRHO*DTJP     ! ***`; EFDC_Theory_Document_Ver_12.pdf, PDF 62쪽·인쇄 49쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 63쪽·인쇄 50쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 64쪽·인쇄 51쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 65쪽·인쇄 52쪽) 수평 방향각은 ATAN2를 사용한다. (`Transport/mod_diffuser.f90:1162` — `THJG(N2) = 57.2958*ATAN2(VJG(N2),UJG(N2))                             ! *** Horizontal angle of the jet`; EFDC_Theory_Document_Ver_12.pdf, PDF 62쪽·인쇄 49쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 63쪽·인쇄 50쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 64쪽·인쇄 51쪽; EFDC_Theory_Document_Ver_12.pdf, PDF 65쪽·인쇄 52쪽)
