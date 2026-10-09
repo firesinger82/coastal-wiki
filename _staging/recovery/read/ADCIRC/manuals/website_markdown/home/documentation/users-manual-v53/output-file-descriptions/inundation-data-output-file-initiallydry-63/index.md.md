@@ -1,0 +1,34 @@
+---
+file: models/ADCIRC/raw/manuals/website_markdown/home/documentation/users-manual-v53/output-file-descriptions/inundation-data-output-file-initiallydry-63/index.md
+lines: 446
+sha256: 31a3ba341abf30d387561359a6dc22596bd349232c16ef7ea16b4cedb7f2d8da
+reader: codex gpt-6.1-sol
+read_date: 2026-10-09
+---
+
+# index.md — 판독 구간 기록
+
+구간은 1행부터 446행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+| --- | --- |
+| 1–12 | 문서 앞 웹 계측 스크립트 — New Relic 초기 설정과 압축된 브라우저 계측(instrumentation) JavaScript가 들어 있다(1–2). 뒤에는 빈 줄이 이어진다(3–12). |
+| 13–70 | 사이트 스타일시트(Cascading Style Sheets, CSS) / 검색창·제목·기본 배치 — 검색창과 검색 버튼, 링크와 페이지 제목, 본문 글꼴·색상, 전체 컨테이너(container)와 헤더(header)의 배치를 정한다(13–65). 태그 표시 영역의 스타일도 포함한다(66–70). |
+| 71–135 | 사이트 CSS / 본문·링크·경로 표시 — 본문 영역의 배치와 문단·링크 스타일을 정한다(71–114). 경로 표시(breadcrumbs), 활성 탐색 링크, 인용문과 소제목 스타일을 정한다(115–135). |
+| 136–200 | 사이트 CSS / 열 배치·탐색 메뉴 — 본문 열과 탐색 영역의 배치를 정한다(136–150). 메뉴 목록과 하위 메뉴의 위치·색상·크기를 정한다(151–200). |
+| 201–231 | 사이트 CSS / 메뉴 상태·이미지 크기 — 마우스를 올린 메뉴와 현재 페이지 메뉴의 표시 규칙이 들어 있다(201–225). 콘텐츠 표시 영역, 메뉴 글꼴, 태그 숨김과 이미지의 내재 크기(intrinsic size) 설정을 포함한다(226–231). |
+| 232–241 | 페이지 메타데이터 — 페이지 제목이 들어 있다(232). JSON-LD에 이 페이지의 URL·제목·게시 시각과 상위 페이지 경로, 사이트 검색 정보를 담는다(237). 나머지는 빈 줄이다(233–236·238–241). |
+| 242–270 | WordPress 스크립트·CSS — 이모지(emoji) 지원 설정과 브라우저 지원 검사 스크립트가 들어 있다(242–246). 이모지 표시, 블록(block) 버튼, 색상·글꼴·간격·배치의 공통 CSS를 포함한다(249–269). 빈 줄도 포함한다. |
+| 271–303 | 사이트 설정 / 관리자 표시·방문 계측·배경 — 관리자 지원 표시 스타일이 들어 있다(286–288). 방문 계측 설정이 들어 있다(292–298). 사이트 배경 이미지의 반복 표시 CSS가 들어 있다(300). 주변 빈 줄도 포함한다. |
+| 304–358 | 사이트 탐색 / Community·Documentation — 빈 제목 마크업과 ADCIRC 사이트 제목, 탐색 건너뛰기 링크가 들어 있다(304–310). 커뮤니티·개발 기관과 사용자 안내가 들어 있다(312–322). 매뉴얼 판본, 컴파일·실행 옵션, FAQ, 예제, 개발·이론 보고서와 출판물 링크를 나열한다(323–358). |
+| 359–401 | 사이트 탐색 / Related software·News·Products·ASGS — 유틸리티와 격자 생성 도구를 연결한다(359–361). 사용자 모임·워크숍·사진·발표자료·폭풍해일 예보 링크를 나열한다(362–393). 조석 데이터베이스·출판물·격자·예보 제품과 ASGS 링크를 나열한다(394–400). 끝의 빈 줄도 포함한다(401). |
+| 402–407 | Inundation data output file (initiallydry.63) / 목적 — 상위 경로와 본문 제목이 들어 있다(402–404). 초기 실행(cold start) 시 ADCIRC가 습윤(wet)·건조(dry)로 판단하는 영역을 지정하여 침수(inundation) 출력 자료의 기반으로 삼는다고 적는다(406). 처음 건조한 영역이 습윤 상태가 되면 침수 영역으로 간주할 수 있다고 적는다(406). |
+| 408–411 | initiallydry.63 / 생성 조건·표지 값·초기 상태 — 선택 네임리스트(namelist)의 매개변수를 참으로 설정하면 초기 실행과 재시작(hot start) 모두 시뮬레이션 시작에 파일을 쓴다고 적는다(408). 노드가 초기 실행 때 건조하면 표지 값은 1이고 습윤이면 0이다(408). 재시작 실행에서 만든 파일도 초기 실행 기준의 건조 영역을 나타낸다고 적는다(408). 습윤·건조 상태는 fort.13의 노드 속성(nodal attributes), fort.14의 수심(bathymetric depth), 건조 노드에 완전히 둘러싸인 습윤 노드를 건조하게 하는 알고리즘(landlocking)을 반영한다(410). 조석·기상·하천 및 기타 외력(forcing)의 효과는 포함하지 않는다고 적는다(410). 조건·이름·값·포함 및 제외 범위 원문: `When the inundationOutput parameter is set to .true. in the optional inundationOutputContol namelist at the bottom of the [fort.15 file](https://adcirc.org/home/documentation/users-manual-v53/input-file-descriptions/model-parameter-and-periodic-boundary-condition-file-fort-15/), the initiallydry.63 file will be written at the beginning of the simulation whether the run is a cold start or hot start. The nodal values in the initiallydry.63 file are 1 if a node is dry at cold start, and 0 if the node is wet at coldstart. The data in the initiallydry.63 file represent areas that are dry at cold start, even if the run that produced the initiallydry.63 file was hotstarted.` (408); `The wet/dry state in the initiallydry.63 file takes into account the initial\_river\_elevation nodal attribute, the surface\_submergence\_state nodal attribute, and the sea\_surface\_height\_above\_geoid nodal attribute from the [nodal attributes (fort.13) file](https://adcirc.org/home/documentation/users-manual-v53/input-file-descriptions/nodal-attributes-file-fort-13/), as well as the bathymetric depth from the [mesh (fort.14) file](https://adcirc.org/home/documentation/users-manual-v52/input-file-descriptions/adcirc-grid-and-boundary-information-file-fort-14/). It also includes the results of the landlocking algorithm, which dries any wet nodes that are completely surrounded by dry nodes. It does not include the effect of any tidal, meteorological, river, or other forcing.` (410). |
+| 412–419 | initiallydry.63 / 파일 구조·형식·헤더 — 굵은 변수 이름의 각 줄이 출력 한 줄을 나타낸다고 설명한다(412). 빈 줄은 가독성을 위한 것이며 반복은 여러 출력 줄을 나타낸다고 설명한다(412). 변수 정의는 링크로 제공한다고 적는다(412). fort.15 설정에 따라 ASCII 또는 netCDF 형식으로 출력할 수 있다고 적는다(414). 실행·격자 식별자, 첫 값이 1인 헤더, 출력 간격의 곱셈식과 변수 순서를 제시한다(416–418). 조건·형식 원문: `Output may be in ascii or netCDF format depending on how [NOUTGE](https://adcirc.org/home/documentation/users-manual-v53/parameter-definitions#NOUTGE) is set in the [Model Parameter and Periodic Boundary Condition (fort.15) File](https://adcirc.org/home/documentation/users-manual-v52/input-file-descriptions/model-parameter-and-periodic-boundary-condition-file-fort-15/).` (414). 헤더·곱셈식 원문: `[**RUNDES**](https://adcirc.org/home/documentation/users-manual-v53/parameter-definitions#RUNDES), [**RUNID**](https://adcirc.org/home/documentation/users-manual-v53/parameter-definitions#RUNID), [**AGRID**](https://adcirc.org/home/documentation/users-manual-v53/parameter-definitions#AGRID)` (416); `1, [**NP**](https://adcirc.org/home/documentation/users-manual-v53/parameter-definitions#NP), [**DTDP**](https://adcirc.org/home/documentation/users-manual-v53/parameter-definitions#DTDP)\*[**NSPOOLGE**](https://adcirc.org/home/documentation/users-manual-v53/parameter-definitions#NSPOOLGE), [**NSPOOLGE**](https://adcirc.org/home/documentation/users-manual-v53/parameter-definitions#NSPOOLGE), [**IRTYPE**](https://adcirc.org/home/documentation/users-manual-v53/parameter-definitions#IRTYPE)` (418). |
+| 420–427 | initiallydry.63 / 시각·노드별 표지 — 시각과 시간 단계(time step) 변수 뒤 모든 노드에 대한 반복문을 제시한다(420–426). 노드 첨자와 초기 건조 표지의 출력 순서를 제시한다(424). 원문: `[**TIME**](https://adcirc.org/home/documentation/users-manual-v53/parameter-definitions#TIME), [**IT**](https://adcirc.org/home/documentation/users-manual-v53/parameter-definitions#IT)` (420); `for k=1,[NP](https://adcirc.org/home/documentation/users-manual-v53/parameter-definitions#NP)` (422); `**k,** [**initiallydry(k)**](https://adcirc.org/home/documentation/users-manual-v53/parameter-definitions#initiallydry)` (424); `end k loop` (426). 빈 줄도 포함한다. |
+| 428–431 | Note / 출력 시점 — 시뮬레이션 실행의 맨 처음에 시간 단계 진행(timestepping)을 시작하기 전에 파일을 쓴다고 적는다(428–430). 출력 시점 원문: `The initiallydry.63 is written at the very beginning of a simulation run, before timestepping begins.` (430). 빈 줄도 포함한다. |
+| 432–446 | 페이지 말미 웹 설정 — 빈 줄과 유틸리티 표시 호출이 들어 있다(432–434). 링크 사전 가져오기(prefetch) 규칙이 들어 있다(436). 쿠키 안내문 설정이 들어 있다(439–441). jQuery 표시 클래스 변경과 New Relic 계측 메타데이터가 들어 있다(445–446). |
+
+## 판독 중 확인된 사실 (판단 아님, 후속 검토 대상)
+
+- 410·414: 본문 경로는 v53 매뉴얼이다(402). fort.14 격자 파일 링크(410)와 출력 형식을 설명하는 fort.15 파일 링크(414)는 `users-manual-v52/input-file-descriptions`를 가리킨다. 같은 본문의 fort.13 링크(410)와 `NOUTGE` 정의 링크(414)는 v53을 가리킨다. 링크 대상 본문은 이번 판독에서 읽지 않았다.
