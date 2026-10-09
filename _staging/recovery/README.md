@@ -128,8 +128,26 @@ Delft3D 487(기계 sweep 실패 471 + 웹 16, 09-22 스냅샷 교체 전 경로)
 - 문서·코드 대조 3종(`compare/EFDC-*.md`: 입력 카드 불일치 133, 이론 식 803개 중 불일치 284)과 흐름 분석 2종(`flow/EFDC-callflow.md`, `flow/EFDC-GVC-vs-plus.md`)을 마치고 노트 30개에 반영했다(`f3c6397a`). 보고서·노트 인용은 `citecheck.py`로 기계 대조.
 - 확인하지 않은 것: 모델 실행. 문서와 코드 차이 중 어느 쪽이 맞는지(단위·정의에 따라 갈리는 항목은 해석으로 표시).
 
+## ADCIRC 판독 (2026-10-09 시작, 진행 중)
+
+대상 목록: `scripts/adcirc-batches.json`(코드 36묶음, 95파일 147,568행), `scripts/adcirc-docbatches.json`(문서 66묶음: 웹사이트 md 471쪽(중복 884 중 고유), 위키 161쪽, rst 150파일), `scripts/adcirc-website-canon.json`(웹사이트 중복 정리). PDF 42종과 pptx 3종은 1,933쪽이다(추출 `extract/ADCIRC/`). 범위 밖: asgs, adcircpy, StormEvents, `refs/subroutines.md`, `notes/adcirc-fort-files-reference.md`, 웹사이트 html(md와 중복), 웹사이트 PDF(manuals/pdfs와 중복), zip.
+
+2026-10-09 22:51 기준 상태:
+- 코드 묶음 1–7은 판독이 끝났고, 기계 확인(`runner/bcheck.sh`)을 통과했다. 인용 수는 726, 677, 707, 133, 1,185, 434, 1,059이고, 불일치는 0이다. sonnet 표본 대조는 하지 않았다. 커밋하지 않았다.
+- 코드 묶음 8–36은 Codex가 분리 실행(`setsid nohup`, 5개 동시)으로 판독 중이다.
+- 문서 66묶음은 코드가 끝나면(`ALLDONE-ac`) 자동으로 시작하도록 대기 중이다.
+- Marker(`runner/admarker.sh`)가 PDF 초안을 만들고 있다. 끝나면 progress.txt에 `MARKER-ADCIRC-DONE`을 쓴다.
+- `scripts/adcirc-pdfjobs.json`(18쪽 작업)은 아직 만들지 않았다.
+
+이어받는 방법:
+1. 실행 상태를 본다: `pgrep -fa "codex exec|codexone|ALLDONE"`. 진행 기록은 이전 세션 scratchpad `/tmp/claude-1000/-home-firesinger-coastal-wiki/338e5a20-3378-4629-86f1-592f9d629b53/scratchpad/progress.txt`에 있다. 분리 실행 프로세스는 이 경로에 로그(`ac-N.log`, `ad-N.log`)를 쓴다. 쪽 이미지는 같은 곳의 `apages/`(1,933장)에 있다.
+2. 프롬프트·스크립트·진행 기록 사본은 `~/.cache/coastal-recovery/adcirc-20261009/`에 있다. 옛 scratchpad가 지워졌으면 이 사본으로 남은 묶음을 다시 돌리고, 쪽 이미지는 `runner/adprep.sh`로 다시 만든다.
+3. 끝난 코드 묶음마다 `bash runner/bcheck.sh ADCIRC _staging/recovery/scripts/adcirc-batches.json N ac-N`, 문서 묶음마다 `python3 scripts/dcheck.py ADCIRC scripts/adcirc-docbatches.json N <scratch>/ad-N.log`. 5묶음마다 sonnet 표본 대조 후 커밋.
+4. PDF: `adcirc-pdfjobs.json`을 만든다(`manuals/pdfs/*.pdf`와 `extract/ADCIRC/office/*.pdf`, 18쪽 단위, `model: 'ADCIRC'`, Marker 초안 경로). `codexpdfread.py`로 프롬프트를 만들고 문서가 끝난 뒤(`ALLDONE-ad`) 돌린다. `pdfcheck.py --jobs`와 식 쪽 이미지 표본 대조.
+5. 그 뒤: 문서·이론과 코드 대조, 흐름 분석, 노트 반영, 이 절 갱신, 대시보드 재생성(`dashboard_data.py`)과 재게시.
+
 ## 다음에 이어서 할 일
 
 1. ~~매뉴얼과 코드 판독 기록 대조~~ — 10-03 완료(`compare/XBeach-manual-vs-code.md`, 노트 반영 `1da8d89`).
 2. ~~XBeach 파일 간 계산 흐름 분석~~ — 10-07 완료(`flow/XBeach-callflow.md`, 노트 반영 `d89cd8b`). 판독 기록 검색은 `wiki_search` `path_class="records"`(`ce7b3ae`).
-3. 다른 10개 모델: 같은 방식(고정 목록 → 1행/1쪽 판독 → 기계 확인 → 다른 모델 검증).
+3. 다른 10개 모델(SFINCS·EFDC 완료, ADCIRC 진행 중, 나머지 9개 미착수): 같은 방식(고정 목록 → 1행/1쪽 판독 → 기계 확인 → 다른 모델 검증).
