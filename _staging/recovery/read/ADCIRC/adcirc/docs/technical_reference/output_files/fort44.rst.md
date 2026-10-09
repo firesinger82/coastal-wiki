@@ -1,0 +1,24 @@
+---
+file: models/ADCIRC/raw/source_code/adcirc/docs/technical_reference/output_files/fort44.rst
+lines: 69
+sha256: 9fc5276c1936fa2414b6af26074fdc5a34fcc95c12106c44150441df99c9b0ac
+reader: codex gpt-6.1-sol
+read_date: 2026-10-09
+---
+
+# fort44.rst — 판독 구간 기록
+
+구간은 1행부터 69행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–9 | Fort.44: 3D Density, Temperature and/or Salinity at All Nodes in the Model Grid — fort.15에 따른 전체 격자 절점의 밀도(density)·수온(temperature)·염분(salinity) 시계열(time series) 출력이다(3–6). ASCII 형식이며 구조는 IDEN 값에 따른다(8). 원문: ``This file contains density, temperature and salinity time series output at all nodes in the model grid as specified in the :doc:`Model Parameter and Periodic Boundary Condition File <../input_files/fort15>`.`` (6); ``The file is generated in ASCII format and its structure depends on the value of :ref:`IDEN <iden>`.`` (8). |
+| 10–14 | File Structure — 형식의 각 줄이 출력 변수 기록을 나타내며 반복은 여러 출력 줄을 뜻한다고 설명한다(13). 원문: `The basic file structure is shown below. Each line of output is represented by a line containing the output variable name(s). Loops indicate multiple lines of output.` (13). |
+| 15–28 | If IDEN = 1 or -1 — 실행 식별 정보 다음 머리말(header)의 마지막 변수는 IDEN이다(20–21). 각 자료 집합(data set)에서 TIME·IT·SIGMA 좌표 다음에 NP 절점의 SIGT(M)를 수직 층별로 기록한다(22–27). 원문: ``If :ref:`IDEN <iden>` = 1 or -1`` (15); `~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~` (16); `.. parsed-literal::` (18); ``    :ref:`RUNDES <rundes>`, :ref:`RUNID <runid>`, :ref:`AGRID <agrid>` `` (20); ``    :ref:`NDSET3DGD <ndset3dgd>`, :ref:`NP <np>`, :ref:`DTDP <dtdp>` * :ref:`NSPO3DGD <nspo3dgd>`, :ref:`NSPO3DGD <nspo3dgd>`, :ref:`NFEN <nfen>`, :ref:`IDEN <iden>` `` (21); ``    for k = 1 to :ref:`NDSET3DGD <ndset3dgd>` `` (22); ``      :ref:`TIME <time>`, :ref:`IT <it>`, (:ref:`SIGMA <sigma>` (N), N=1,:ref:`NFEN <nfen>`-1)`` (23); ``       for j = 1 to :ref:`NP <np>` `` (24); ``         J, (:ref:`SIGT <sigt>` (M), M=1, :ref:`NFEN <nfen>`)`` (25); `      end j loop` (26); `   end k loop` (27). |
+| 29–42 | If IDEN = 2 or -2 — 이 분기의 머리말(header) 마지막 변수는 IRTYPE이다(35). SIGMA 좌표 다음에 NP 절점의 SIGT(M), SAL(M)를 수직 층별로 기록한다(36–41). 원문: ``If :ref:`IDEN <iden>` = 2 or -2`` (29); `~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~` (30); `.. parsed-literal::` (32); ``    :ref:`RUNDES <rundes>`, :ref:`RUNID <runid>`, :ref:`AGRID <agrid>` `` (34); ``    :ref:`NDSET3DGD <ndset3dgd>`, :ref:`NP <np>`, :ref:`DTDP <dtdp>` * :ref:`NSPO3DGD <nspo3dgd>`, :ref:`NSPO3DGD <nspo3dgd>`, :ref:`NFEN <nfen>`, :ref:`IRTYPE <irtype>` `` (35); ``    for k = 1 to :ref:`NDSET3DGD <ndset3dgd>` `` (36); ``      :ref:`TIME <time>`, :ref:`IT <it>`, (:ref:`SIGMA <sigma>` (N), N=1,:ref:`NFEN <nfen>`-1), :ref:`SIGMA <sigma>` (:ref:`NFEN <nfen>`)`` (37); ``       for j = 1 to :ref:`NP <np>` `` (38); ``         J, (:ref:`SIGT <sigt>` (M), :ref:`SAL <sal>` (M), M=1, :ref:`NFEN <nfen>`)`` (39); `      end j loop` (40); `   end k loop` (41). |
+| 43–56 | If IDEN = 3 or -3 — 이 분기의 머리말(header) 마지막 변수는 IRTYPE이다(49). SIGMA 좌표 다음에 NP 절점의 SIGT(M), TEMP(M)를 수직 층별로 기록한다(50–55). 원문: ``If :ref:`IDEN <iden>` = 3 or -3`` (43); `~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~` (44); `.. parsed-literal::` (46); ``    :ref:`RUNDES <rundes>`, :ref:`RUNID <runid>`, :ref:`AGRID <agrid>` `` (48); ``    :ref:`NDSET3DGD <ndset3dgd>`, :ref:`NP <np>`, :ref:`DTDP <dtdp>` * :ref:`NSPO3DGD <nspo3dgd>`, :ref:`NSPO3DGD <nspo3dgd>`, :ref:`NFEN <nfen>`, :ref:`IRTYPE <irtype>` `` (49); ``    for k = 1 to :ref:`NDSET3DGD <ndset3dgd>` `` (50); ``      :ref:`TIME <time>`, :ref:`IT <it>`, (:ref:`SIGMA <sigma>` (N), N=1,:ref:`NFEN <nfen>`-1), :ref:`SIGMA <sigma>` (:ref:`NFEN <nfen>`)`` (51); ``       for j = 1 to :ref:`NP <np>` `` (52); ``         J, (:ref:`SIGT <sigt>` (M), :ref:`TEMP <temp>` (M), M=1, :ref:`NFEN <nfen>`)`` (53); `      end j loop` (54); `   end k loop` (55). |
+| 57–69 | If IDEN = 4 or -4 — 이 분기의 머리말(header) 마지막 변수는 IRTYPE이다(63). SIGMA(NFEN)을 두 번 적은 시각 기록을 제시한다(65). NP 절점의 SIGT(M), TEMP(M), SAL(M)를 수직 층별로 기록한다(66–69). 원문: ``If :ref:`IDEN <iden>` = 4 or -4`` (57); `~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~` (58); `.. parsed-literal::` (60); ``    :ref:`RUNDES <rundes>`, :ref:`RUNID <runid>`, :ref:`AGRID <agrid>` `` (62); ``    :ref:`NDSET3DGD <ndset3dgd>`, :ref:`NP <np>`, :ref:`DTDP <dtdp>` * :ref:`NSPO3DGD <nspo3dgd>`, :ref:`NSPO3DGD <nspo3dgd>`, :ref:`NFEN <nfen>`, :ref:`IRTYPE <irtype>` `` (63); ``    for k = 1 to :ref:`NDSET3DGD <ndset3dgd>` `` (64); ``      :ref:`TIME <time>`, :ref:`IT <it>`, (:ref:`SIGMA <sigma>` (N), N=1,:ref:`NFEN <nfen>`-1), :ref:`SIGMA <sigma>` (:ref:`NFEN <nfen>`), :ref:`SIGMA <sigma>` (:ref:`NFEN <nfen>`)`` (65); ``       for j = 1 to :ref:`NP <np>` `` (66); ``         J, (:ref:`SIGT <sigt>` (M), :ref:`TEMP <temp>` (M), :ref:`SAL <sal>` (M), M=1, :ref:`NFEN <nfen>`)`` (67); `      end j loop` (68); `   end k loop ` (69). |
+
+## 판독 중 확인된 사실 (판단 아님, 후속 검토 대상)
+
+- 21·35·49·63행: IDEN이 1 또는 -1인 분기의 머리말 마지막 변수는 `IDEN`이다. 나머지 세 분기의 같은 위치는 `IRTYPE`이다.

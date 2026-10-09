@@ -1,0 +1,21 @@
+---
+file: models/ADCIRC/raw/manuals/wiki/markdown/Global_Storm_Tide_-_Hurricane_Katrina.md
+lines: 35
+sha256: ec4dcbbf7b895c2d2f1d8bd4e207ca4393ca4d5e3e364cd0b4fce59a5614c8fe
+reader: codex gpt-6.1-sol
+read_date: 2026-10-09
+---
+
+# Global_Storm_Tide_-_Hurricane_Katrina.md — 판독 구간 기록
+
+구간은 1행부터 35행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–6 | Global Storm Tide - Hurricane Katrina — 제목과 판본 표기 `_revid=1103_`(1–3)을 포함한다. ADCIRC 55 이후 판본에서 Katrina가 멕시코만을 강타한 2005년 8월의 천문·대기 강제력(astronomical and atmospheric forcing)에 따른 구면 지구(spherical Earth)의 폭풍 조위(storm tide)를 시험한다고 적는다(5). 전역 수위·유속·기상장을 관심 결과로 제시한다(5). 한 달 모의를 직렬(serial) ADCIRC에서 약 5분에 마친다는 문서 설명과 시험 저장소 링크가 있다(5). 시험 조건과 시간 원문: `This example tests ADCIRC version 55 (and beyond). It tests the simulation of the storm tides on the spherical Earth under astronomical and atmospheric forcing during August 2005 when Hurricane Katrina impacted the Gulf of Mexico. The results of interest are the global elevations, velocities and meteorology. The test finishes in about 5 minutes in serial ADCIRC for a full month of simulation. Find the test at the [GitHub test suite](https://github.com/adcirc/adcirc-cg-testsuite/tree/v55/adcirc/adcirc_global-tide%2Bsurge-2d).` (5). |
+| 7–10 | Mesh — 최소 해상도가 약 50 km인 구면 지구의 성긴 격자(mesh)를 설명한다(9). 꼭짓점(vertices) 27,330개와 삼각형 요소(triangular elements) 50,859개라고 적는다(9). 수치 원문: `The mesh is a coarse representation of the spherical Earth with minimum resolution of approximately 50 km, comprised of 27,330 vertices and 50,859 triangular elements.  ` (9). |
+| 11–35 | Options/Features Tested — 좌표 회전(coordinate rotation)이 있는 Mercator 투영(projection), 중력파 항의 완전 암시적 해법(fully implicit scheme), 10개 분조(tidal constituents)의 평형·자기 인력 및 하중 조석(self-attraction and loading tide) 강제력을 시험한다(13–17). GRIB2 전역 대기 자료와 OWI ASCII 상륙 지역 자료를 함께 읽는 옵션 및 각 자료의 초 단위 시간 간격을 제시한다(19–21). 가중 계수·Smagorinsky 난류 폐합(turbulence closure), NetCDF4 전역 출력, fort.13의 내부 조석 에너지 변환(internal tide energy conversion)·이차 저면 마찰(quadratic bottom friction) 속성을 제시한다(23–35). 각 옵션의 값·조건·단위·파일 원문: ``- `[ICS](/ICS)` = -22: Uses the Mercator projection with a coordinate rotation to remove the pole singularity (need to provide a [fort.rotm](/Fort.rotm)).`` (13); ``- `[IM](/IM)` = 513113: Uses the fully implicit scheme for the gravity wave term (computational time step is 12 minutes).`` (15); ``- `[NTIP](/NTIP)` = 2: Equilibrium tide + self-attraction and loading tide (read from a [fort.24 file](/Fort.24_file)) forcing for 10 tidal constituents.`` (17); ``- `[NWS](/NWS)` = -14: Reads from GRIB2 files that specify the global atmospheric forcing (6-hourly CFS reanalysis data) in addition to OWI ASCII files that specify the 3-hourly atmospheric forcing in the Hurricane Katrina landfall region.`` (19); ``- `[WTIMINC](/WTIMINC)` = 21600, 10800: First value gives the temporal interval of the GRIB2 met data (6 hours), second value gives the temporal interval of the OWI met data (3 hours) in seconds.`` (21); ``- `[A00, B00, C00](/A00,_B00,_C00)` = 0.5, 0.5, 0: Ensures that the fully implicit scheme is stable with a large time step.`` (23); ``- `[ESLM](/ESLM)` = -0.2: Enables the Smagorinsky turbulence closure with a coefficient of 0.2.`` (25); ``- `[NOUTGE](/index.php?title=NOUTGE&action=edit&redlink=1)` = 5: Outputs the global elevations into a netCDF4 [fort.63 file](/Fort.63_file).`` (27); ``- `[NOUTGV](/index.php?title=NOUTGV&action=edit&redlink=1)` = 5: Outputs the global velocities into a netCDF4 [fort.64 file](/Fort.64_file).`` (29); ``- `[NOUTGM](/index.php?title=NOUTGM&action=edit&redlink=1)` = 5: Outputs the global meteorology into a netCDF4 [fort.73 file](/Fort.73_file) (pressure) and a netCDF4 [fort.74 file](/Fort.74_file) (velocity).`` (31); `- [internal_tide_friction](/Fort.13_file#Internal_Tide_Energy_Conversion): Spatially varying linear wave drag [fort.13 file](/Fort.13_file) attribute accounting for energy conversion due to internal tide generation in the deep ocean.` (33); `- [quadratic_friction_coefficient](/Fort.13_file#Quadratic_Friction_coefficient): Spatially varying quadratic bottom friction [fort.13 file](/Fort.13_file) attribute.` (35). |
+
+## 판독 중 확인된 사실 (판단 아님, 후속 검토 대상)
+
+- 27–31행: NOUTGE·NOUTGV·NOUTGM 참조 URL에 `action=edit&redlink=1`이 들어 있다.
