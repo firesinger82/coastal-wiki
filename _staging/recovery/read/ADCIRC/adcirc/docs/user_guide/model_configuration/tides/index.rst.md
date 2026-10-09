@@ -1,0 +1,22 @@
+---
+file: models/ADCIRC/raw/source_code/adcirc/docs/user_guide/model_configuration/tides/index.rst
+lines: 72
+sha256: 0d7affc9b087bcb2dc42c761a99d0e981c87ec572060bd0de2db0723d583944c
+reader: codex gpt-6.1-sol
+read_date: 2026-10-09
+---
+
+# index.rst — 판독 구간 기록
+
+구간은 1행부터 72행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–20 | Astronomical Tides / Tidal Potential Terms — 메타데이터·앵커·제목을 포함한다(1–8). 조석 퍼텐셜(tidal potential)과 개방 경계(open boundary)를 단독 또는 함께 사용할 수 있다고 적는다(10). fort.15의 NTIP·TIPOTAG·TPK·AMIGT·ETRF·FFT·FACET 이름과 문서의 정의를 원문대로 옮긴다(15–19). 원문: ` ADCIRC supports two primary methods for implementing tidal forcings in your model: tidal potential terms and open boundary conditions. These can be used independently or in combination to achieve accurate tidal simulations. ` (10); ` Tidal Potential Terms ` (12); ` --------------------- ` (13); `` Tidal potential terms represent the direct gravitational effects of celestial bodies (primarily the moon and sun) on the water surface. In ADCIRC, these are specified in the :ref:`fort.15 <fort15>` file through: `` (15); ``` * ``NTIP``: Number of tidal potential constituents to be included ``` (17); ``` * ``TIPOTAG``: Name/tag for each tidal potential constituent ``` (18); ``` * ``TPK``, ``AMIGT``, ``ETRF``, ``FFT``, ``FACET``: Parameters defining amplitude, frequency, earth tide reduction factor, and nodal factor for each constituent ``` (19). |
+| 21–38 | Open Boundary Conditions — 주기 조화 조건(periodic harmonic condition)의 NBFR·BOUNTAG·AMIG·FF·FACE·EMO·EFA와 fort.15, 비주기(non-periodic) 시계열의 fort.19, 경계 위치의 fort.14 절점 문자열(node string)을 옮긴다(24–37). 원문: ` Open boundary conditions allow you to specify water surface elevations at the model domain boundaries. These can be implemented in two ways: ` (24); ` 1. **Periodic (Harmonic) Conditions**: ` (26); ``    Specified in the :ref:`fort.15 <fort15>` file using: `` (27); ```    * ``NBFR``: Number of forcing frequencies on open boundaries ``` (29); ```    * ``BOUNTAG``: Name/tag for each boundary forcing constituent ``` (30); ```    * ``AMIG``, ``FF``, ``FACE``: Parameters for amplitude, nodal factor, and equilibrium argument ``` (31); ```    * ``EMO``, ``EFA``: Elevation amplitude and phase for each constituent at boundary nodes ``` (32); ` 2. **Non-periodic Conditions**: ` (34); ``    Time series of water surface elevations are defined in the :ref:`fort.19 <fort19>` file. `` (35); `` The locations of open boundaries are defined in the :ref:`fort.14 <fort14>` file through the open boundary node strings. `` (37). |
+| 39–56 | Internal Tide Energy Conversion / 숨김 목차 — 순압(barotropic)에서 경압(baroclinic)으로의 에너지 변환을 설명한다(42). internal_tide_friction 이름, 적용 수심과 전역 순압 조석 소산(tidal dissipation)의 약 30%라는 문서 수치를 옮긴다(44–46). 관련 ref와 hidden toctree 지시문을 포함한다(48–55). 원문: ` For large-scale ocean models, internal tide energy conversion should be considered. This represents the conversion of barotropic to baroclinic energy as surface tides flow over deep ocean topography. It can be implemented through: ` (42); ``` * A spatially varying nodal attribute called ``internal_tide_friction`` in the fort.13 file ``` (44); ` * Typically applied only in deep ocean regions (>100-500m depth) ` (45); ` * Accounts for approximately 30% of global barotropic tidal dissipation ` (46); `` See :ref:`internal_tide_energy_conversion` for more details. `` (48); ` .. toctree:: ` (50); `    :maxdepth: 1 ` (51); `    :caption: Contents: ` (52); `    :hidden: ` (53); `    internal_tide_energy_conversion ` (55). |
+| 57–72 | Best Practices / See also — 연안·광역 영역의 권고, NRAMP 램핑(ramping), 분조(tidal constituent) 또는 관측과의 검증 권고를 옮긴다(60–65). 추가 목차의 ali_dispersion_conrtol을 원문 파일명대로 포함하고 마지막 행까지 읽었다(67–72). 원문: ` 1. For coastal models, focus on accurate open boundary conditions ` (60); ` 2. For large-scale ocean models, include both tidal potential terms and internal tide energy conversion ` (61); ``` 3. Ensure boundary conditions are properly ramped up using the ``NRAMP`` parameter in fort.15 ``` (62); ` 4. Validate your tidal implementation against known tidal constituents or observations ` (63); `` For detailed implementation guidance, refer to the :ref:`fort.14 <fort14>` and :ref:`fort.15 <fort15>` documentation. `` (65); ` See also: ` (67); ` .. toctree:: ` (69); `    :maxdepth: 1 ` (70); `    ali_dispersion_conrtol ` (72). |
+
+## 판독 중 확인된 사실 (판단 아님, 후속 검토 대상)
+
+- 17 및 대상 원문 model_configuration/model_parameters/ntif.rst 10–12·ntip.rst 10–11: 이 파일은 NTIP를 조석 퍼텐셜 분조의 개수로 적는다. 다른 대상 문서는 분조 개수를 NTIF, 천문 입력 형식 선택을 NTIP로 정의한다.
