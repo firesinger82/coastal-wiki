@@ -7,7 +7,7 @@ for r in recs:
     t=open(r).read()
     src=re.search(r'^file: (.+)$',t,re.M).group(1).strip()
     L=open(src,'rb').read().decode('utf-8','replace').replace('\r','').split('\n')
-    norm=lambda s: re.sub(r'\s+|&','',s.replace('\\|','|')).lower()
+    norm=lambda s: re.sub(r'\s+|&','',re.sub(r'\\([_*|#\[\]()<>`.!-])',r'\1',s)).lower()  # 10-10: Markdown escapes (\_ etc.) ignored
     nl=[norm(x) for x in L]
     # 2026-10-08: union of both pairings (a quote is OK if either pairing matches);
     # reader-written paths (attachments/..., models/...) are not source text and are skipped.
