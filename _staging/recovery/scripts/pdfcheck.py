@@ -22,6 +22,7 @@ for j in sel:
     if j['ext']:
         ext=open(f"_staging/recovery/extract/{j.get('model','XBeach')}/pdf/{j['ext']}.txt",errors='replace').read()
         ext2=open(f"_staging/recovery/extract/{j.get('model','XBeach')}/pdf-md/{j['ext']}.md",errors='replace').read()
+        ext2=re.sub(r'!\[[^\]]*\]\([^)]*\)','',ext2)  # 10-10: image links are not page text (scanned PDFs)
         pages={int(m.group(1)):'' for m in re.finditer(r'<<<PAGE (\d+)>>>',ext)}
         parts=re.split(r'<<<PAGE (\d+)>>>',ext)
         for k in range(1,len(parts),2): pages[int(parts[k])]=norm(parts[k+1])
@@ -34,7 +35,7 @@ for j in sel:
             if not qs and len(pages.get(p,''))>200: nopq.append(p)
             thin=[x for x in want if len(pages.get(x,''))<120]
             for s,pn in qs:
-                if len(pages.get(int(pn),''))<120: continue  # extraction empty: quote unverifiable
+                if len(pages.get(int(pn),'').strip())<120: continue  # extraction empty: quote unverifiable
                 tot+=1
                 if (j['ext'],pn,s[:50]) in vok: continue
                 if norm(s) not in pages.get(int(pn),'') and norm(s) not in pages.get(int(pn)+1,'')+pages.get(int(pn)-1,''): bad.append((pn,s[:50]))
