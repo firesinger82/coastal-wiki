@@ -73,16 +73,18 @@ fi
 # 4. 하드 가드 — _staging/audit/ 외 변경 제거
 echo "--- report-only 가드 ---"
 # (a) tracked 수정 복원 (_staging/audit 제외). step0 에서 clean 이었으니 이건 claude 의 수정.
-git checkout -- . ':(exclude)_staging/audit' 2>/dev/null || echo "WARN: 일부 tracked 복원 실패"
+# 2026-10-10: _staging/recovery/ 는 판독 Codex 작업이 cron 시각에도 쓰므로 복원·제거 대상에서 뺀다
+#   (10-10 04:00 run 이 판독 기록 12개를 지운 사고 — cron-logs/2026-10-10_04-00-01.log).
+git checkout -- . ':(exclude)_staging/audit' ':(exclude)_staging/recovery' 2>/dev/null || echo "WARN: 일부 tracked 복원 실패"
 # (b) *이번 run 이 새로 만든* untracked 만 제거 (스냅샷에 없던 것). 기존 워크벤치 보존.
 NOW_UNTRACKED="$(git status --porcelain --untracked-files=all | grep '^??' | cut -c4- | sort || true)"
 comm -13 <(printf '%s\n' "$SNAP_UNTRACKED") <(printf '%s\n' "$NOW_UNTRACKED") | while read -r f; do
   [ -z "$f" ] && continue
-  case "$f" in _staging/audit/*) continue ;; esac
+  case "$f" in _staging/audit/*|_staging/recovery/*) continue ;; esac
   echo "WARN: cron 생성 untracked 제거: $f"; rm -rf -- "$f"
 done
 # (c) 최종 점검(tracked): _staging/audit 외 tracked 변경 잔존이면 커밋 중단(가시화)
-LEFTOVER="$(git status --porcelain --untracked-files=no | grep -v '^.. _staging/audit/' || true)"
+LEFTOVER="$(git status --porcelain --untracked-files=no | grep -v -e '^.. _staging/audit/' -e '^.. _staging/recovery/' || true)"
 if [ -n "$LEFTOVER" ]; then
   echo "ALERT(step4c): 가드 후 _staging/audit 외 tracked 변경 잔존 — 커밋 중단:"
   echo "$LEFTOVER" | head; exit 3
