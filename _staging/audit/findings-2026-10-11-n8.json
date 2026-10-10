@@ -1,0 +1,216 @@
+{
+ "date": "2026-10-11",
+ "audit_run_id": "L4-2026-10-11-manual-n8",
+ "findings": [
+  {
+   "path": "models/Delft3D/source-analysis/delft3d_sediment_transport_formulae.md",
+   "blob_sha": "47ec552edbe552db32b9cf36fc893a1252d213de",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 40,
+   "opinion": 2,
+   "has_source_needed": true,
+   "unsourced": [],
+   "value_checks": [
+    {
+     "claim_id": "b3a253f8611c",
+     "line": 36,
+     "claim": "Partheniades 침식식 taum(:183)·sour(:184) + iform=-3 분기(:193) + 호출 erosed.f90:1103",
+     "source_ref": "morphology_kernel/src/erosilt.f90 · flow2d3d .../compute_sediment/erosed.f90",
+     "result": "VALUE-MISMATCH",
+     "note": "원본 직접 read(스냅샷 231bbf2). :193(iform==-3)·erosed.f90:1103(call erosilt)·:1256(call eqtran 3D)·:903(call compbsskin)은 정확 — ca5f39b9 이식이 갱신한 인용은 전부 일치. 그러나 이식이 안 건드린 인용은 대폭 stale: 식 본체는 실제 :194 `taum = max(0,taub/tcrero-1)**powern` · :198 `sour = eropar*taum` (주장 :183-184 는 현재 bed-slope 주석 줄, 10행 이상 shift — 08-03 '1-2행 shift 허용' 선례 초과). 식 형태도 변경됨(powern 이 taum 에 적용, iform=-5 분기 신설 — 수학적으론 iform=-3 에서 등가). ad-hoc 확장 확인: §1.3 bed-slope 실제 :182-191(주장 :172-181)·taucrmin/betaslope 실제 :187-188(주장 :177-178)·tcrero 실제 :189-190(주장 :179-180)·§1.4 fluff 실제 :203-204(주장 :189-190)·§1.2 Krone sink 실제 :211(주장 :197)·§2 eqtran 2D 호출 실제 :1345(주장 :1304)·§2 iform 표 행별 인용 :292/:353/:362/:371/:389 전부 다른 내용(수 십행 shift)·§4 L124 'erosilt@1074·eqtran@1221·compbsskin@880'은 이식 전 구좌표(frontmatter·본문과 자기모순). compbsskin ar/as 는 실제 :91(주장 :90, 1행 shift — 선례상 유효). 확인한 것: 위 라인들의 소스 원문. 확인하지 않은 것: §1.5(:253-268)·eqtran 표의 신좌표 전수 재앵커."
+    }
+   ],
+   "proposals": [
+    {
+     "old_string": "- [`delft3d_sediment_morphology.md`](delft3d_sediment_morphology.md) — 이 식들의 **호출자**(compute_sediment 커널): erosilt@1074·eqtran@1221·compbsskin@880.",
+     "new_string": "- [`delft3d_sediment_morphology.md`](delft3d_sediment_morphology.md) — 이 식들의 **호출자**(compute_sediment 커널): erosilt@1103·eqtran@1256·compbsskin@903.",
+     "rationale": "§4 의 erosed.f90 호출 라인이 ca5f39b9 이식 전 구좌표로 잔존 — 현 스냅샷(231bbf2) 실측 1103/1256/903 으로 정정(frontmatter·§1~3 과 일치화)"
+    },
+    {
+     "old_string": "`erosed.f90:1256`(3D) / `:1304`(2D) 호출.",
+     "new_string": "`erosed.f90:1256`(3D) / `:1345`(2D) 호출.",
+     "rationale": "eqtran 2D 호출(sig2d/thck2d) 실측 erosed.f90:1345 — :1304 는 구좌표"
+    },
+    {
+     "old_string": "taum = max(0, taub/tcrero − 1)        ! 무차원 초과전단 (:183)\nsour = eropar · taum**powern          ! 침식 entrainment flux [kg/m²/s] (:184)",
+     "new_string": "taum = max(0, taub/tcrero − 1)**powern   ! 무차원 초과전단 (iform=−3, :194)\nsour = eropar · taum                     ! 침식 entrainment flux [kg/m²/s] (:198)",
+     "rationale": "현 스냅샷에서 powern 이 taum 산출식 안으로 이동(:194)·sour 는 단순곱(:198), iform=−3 기준 수학적 등가 — 라인·식 형태를 실측대로 정정"
+    }
+   ]
+  },
+  {
+   "path": "models/Delft3D/source-analysis/delft3d_sigma_z.md",
+   "blob_sha": "4578da9fa2e125323adb6904a14690a8dc6c2d84",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 38,
+   "opinion": 5,
+   "has_source_needed": true,
+   "unsourced": [
+    {
+     "line": 154,
+     "text": "| Mild bathymetry, depth ratio < 5 | Sigma |",
+     "reason": "수치 임계값(depth ratio < 5)으로 좌표계를 가르는 판정 기준 — 소스코드에 없는 실무 임계값, §References 4건 중 귀속 표기 없음. 2026-08-04 적발(당시 L153) 후 미수정 잔존(이후 변경은 ca5f39b9 좌표 이식뿐).",
+     "adversary": "refute 시도 — (a) Decision Guide 표·인접 절 전체 무인용. (b) sigma slope error 문헌 표준 지표는 rx0/Haney 계열, 'depth ratio 5' 미확인. (c) 코드 유도 불가(Zmodel 은 이진 플래그). refute 실패 → confirmed(재확인)"
+    },
+    {
+     "line": 168,
+     "text": "- Z-model layer count: `kmax = 20–50` typical for coastal applications; more layers cost ~linearly.",
+     "reason": "수치 권장범위+비용 스케일링 주장 — §H 는 kmax 파싱·할당만 커버(dimrd.f90:328-345), 실무 범위는 그 밖. 08-04 적발(당시 L167) 후 미수정 잔존.",
+     "adversary": "refute 시도 — 인접 문장·frontmatter·References 에 근거 없음. refute 실패 → confirmed(재확인)"
+    },
+    {
+     "line": 171,
+     "text": "- Cold-start with sigma → restart as Z-model: not supported. Pick early.",
+     "reason": "모델 기능 한계 사실 단언인데 file:line·매뉴얼 인용 0 — §A~H 동종 단언은 전부 인용 보유, 이 절만 예외. 08-04 적발(당시 L170) 후 미수정 잔존.",
+     "adversary": "refute 시도 — restart 경로(trirst 등) 인용이 Source basis 에 없고, §E 의 'Zmodel 이진' 인용은 restart 호환성과 별개 단언. refute 실패 → confirmed(재확인)"
+    }
+   ],
+   "proposals": [
+    {
+     "old_string": "| Mild bathymetry, depth ratio < 5 | Sigma |",
+     "new_string": "| Mild bathymetry, depth ratio < 5 (source-needed) | Sigma |",
+     "rationale": "undisclosed 수치 임계값 → disclosed 갭 전환(G9b). 주장 자체는 유지, 출처 날조 없음"
+    },
+    {
+     "old_string": "- Z-model layer count: `kmax = 20–50` typical for coastal applications; more layers cost ~linearly.",
+     "new_string": "- Z-model layer count: `kmax = 20–50` typical for coastal applications; more layers cost ~linearly. (source-needed)",
+     "rationale": "동일 — disclosed 갭 전환"
+    },
+    {
+     "old_string": "- Cold-start with sigma → restart as Z-model: not supported. Pick early.",
+     "new_string": "- Cold-start with sigma → restart as Z-model: not supported. Pick early. (source-needed)",
+     "rationale": "동일 — disclosed 갭 전환(restart 소스 경로 인용 확보 시 해제)"
+    }
+   ]
+  },
+  {
+   "path": "models/Delft3D/source-analysis/delft3d_turbulence.md",
+   "blob_sha": "13f0d9d4578d18e439d374b55dab4801528dbed2",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 41,
+   "opinion": 6,
+   "has_source_needed": true,
+   "unsourced": [
+    {
+     "line": 167,
+     "text": "- For shallow tidal flats, `algebraic` is sufficient and 30% cheaper than `k-ε`.",
+     "reason": "정량 성능 주장(30%) — 소스 read 로 유도 불가(런타임 벤치마크), References 3건 귀속 없음, disclosed 아님. 08-04 적발(당시 L166) 후 미수정 잔존.",
+     "adversary": "refute 시도 — 인접·frontmatter·References 모두 벤치마크 수치 미커버. refute 실패 → confirmed(재확인)"
+    },
+    {
+     "line": 179,
+     "text": "- ▢ Comparing `vicww` output across closures expecting same magnitude — k-ε can produce 10× algebraic in active mixing regions.",
+     "reason": "정량 크기비교(10×) — 실행 결과 비교치, 인용 0, disclosed 아님. 08-04 적발(당시 L178) 후 미수정 잔존.",
+     "adversary": "refute 시도 — 파일 포괄 출처는 file:line 코드 인용만 보증, 시뮬레이션 비교치 미커버. refute 실패 → confirmed(재확인)"
+    }
+   ],
+   "value_checks": [
+    {
+     "claim_id": "331c5fe960d7",
+     "line": 69,
+     "claim": "algebraic 안정함수 — stable fl=exp(−2.3·Ri)·fs=(1+3.33Ri)^1.5/(1+10Ri)^0.5(:347-356), unstable fl=(1−14Ri)^0.25·fs=1(:357-360)",
+     "source_ref": "flow2d3d_kernel/src/compute/turclo.f90:347-360",
+     "result": "OK",
+     "note": "원본 직접 read — fl=exp(−2.3·min(rich,30))(:351)·aa=(1+3.33Ri), aa·sqrt(aa)=^1.5(:352-353)·bb=sqrt(1+10Ri)=^0.5(:354-355)·fs=aa/bb(:356)·unstable fl=(1−14Ri)^0.25, fs=1(:358-359) 전부 라인 구간 내 일치. 본문 표기는 min(Ri,30) cap 을 생략하나 같은 파일 L29(z_turclo 동형 확인)가 cap 포함 명시 — 값·식 유효"
+    }
+   ],
+   "proposals": [
+    {
+     "old_string": "- For shallow tidal flats, `algebraic` is sufficient and 30% cheaper than `k-ε`.",
+     "new_string": "- For shallow tidal flats, `algebraic` is sufficient and 30% cheaper than `k-ε`. (source-needed)",
+     "rationale": "undisclosed 정량 성능 주장 → disclosed 갭 전환(G9b)"
+    },
+    {
+     "old_string": "- ▢ Comparing `vicww` output across closures expecting same magnitude — k-ε can produce 10× algebraic in active mixing regions.",
+     "new_string": "- ▢ Comparing `vicww` output across closures expecting same magnitude — k-ε can produce 10× algebraic in active mixing regions. (source-needed)",
+     "rationale": "동일 — disclosed 갭 전환"
+    }
+   ]
+  },
+  {
+   "path": "models/Delft3D/source-analysis/delft3d_utils_libraries.md",
+   "blob_sha": "5becb27321fb914cc4d3fde3724904cb7c140257",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 55,
+   "opinion": 4,
+   "has_source_needed": true,
+   "unsourced": []
+  },
+  {
+   "path": "models/Delft3D/source-analysis/delft3d_waq_algae_models.md",
+   "blob_sha": "47340bdc3f5cc7e8f74c3286a4ed43dd94479a0e",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 60,
+   "opinion": 3,
+   "has_source_needed": true,
+   "unsourced": [],
+   "value_checks": [
+    {
+     "claim_id": "1baaa646f0e7",
+     "line": 52,
+     "claim": "BLOOM 차원 — mt=30 최대 type·ms=15 최대 species·mn=8 최대 영양염(:44-46), ia=mn+2+1+2·ms(:48)",
+     "source_ref": "waq_process/bloom/bloom_data.f90:44-48",
+     "result": "OK",
+     "note": "원본 직접 read — :44 mt=30·:45 ms=15·:46 mn=8·:48 ia=mn+2+1+2*ms, 값·라인·주석(energy constraints 2+exclusion 1+2·ms) verbatim 일치"
+    }
+   ]
+  },
+  {
+   "path": "models/Delft3D/source-analysis/delft3d_waq_io_preprocess.md",
+   "blob_sha": "c833df1a92bc651ebef1499b4fc8245c9c523fda",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 70,
+   "opinion": 3,
+   "has_source_needed": true,
+   "unsourced": []
+  },
+  {
+   "path": "models/Delft3D/source-analysis/delft3d_waq_kernel_integration.md",
+   "blob_sha": "fe1d8ed5756203e420caecf83010228c7279a12d",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 71,
+   "opinion": 5,
+   "has_source_needed": true,
+   "unsourced": [
+    {
+     "line": 127,
+     "text": "T-H 는 유입/유출 전환 시 경계농도의 시간이력 완화(return time)를 적용하는 표준 estuarine BC.",
+     "reason": "T-H BC 동작 정의 단언인데 출처 0 — §3.2 인용은 호출 지점뿐, T-H 루틴·원논문 인용 없음. §8 disclosed 갭 목록에도 미포함. 08-05 적발(당시 L126) 후 미수정 잔존.",
+     "adversary": "refute 시도 — frontmatter verification_method 열거 read 대상에 thatcher_harleman_bc.f90 없음, §8 미열거 → undisclosed. (검증: 실제 waq_kernel/kernel/calculation/thatcher_harleman_bc.f90:35-41 헤더 주석에 outflow 저장·inflow time-lag 동작 서술 — 내용은 옳고 결함은 인용 부재.) refute 실패 → confirmed(재확인)"
+    }
+   ],
+   "proposals": [
+    {
+     "old_string": "T-H 는 유입/유출 전환 시 경계농도의 시간이력 완화(return time)를 적용하는 표준 estuarine BC.",
+     "new_string": "T-H 는 outflow 시 마지막 유출 농도를 저장했다가, inflow 전환 후 time-lag 이내에는 그 저장값으로 경계농도를 완화 적용하는 경계조건이다(`waq_kernel/kernel/calculation/thatcher_harleman_bc.f90:35-41` 헤더 주석).",
+     "rationale": "무인용 도메인 단언 → 실재 확인한 헤더 주석 file:line 인용으로 대체(서술도 코드 주석 표현에 정합)"
+    }
+   ]
+  },
+  {
+   "path": "models/Delft3D/source-analysis/delft3d_waq_opal_silica_dissolution.md",
+   "blob_sha": "415308e640b826ff1ec07e876bb15a876629d5d1",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 20,
+   "opinion": 3,
+   "has_source_needed": false,
+   "unsourced": []
+  }
+ ]
+}

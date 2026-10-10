@@ -2869,50 +2869,51 @@
     "n_value_mismatches": 0
   },
   "models/Delft3D/source-analysis/delft3d_turbulence.md": {
-    "blob_sha": "56b96a115f794ba9e2f12a5c12f19faaa4878492",
+    "blob_sha": "13f0d9d4578d18e439d374b55dab4801528dbed2",
     "verdict": "INTEGRITY-VIOLATION",
     "has_source_needed": true,
-    "audited_date": "2026-08-04",
-    "audited_at": "2026-08-04T04:05:25.229133",
+    "audited_date": "2026-10-11",
+    "audited_at": "2026-10-11T04:08:32.842113",
     "n_unsourced": 2,
-    "value_mismatches": 0,
-    "source_unavailable": 0
-  },
-  "models/Delft3D/source-analysis/delft3d_sigma_z.md": {
-    "blob_sha": "c56466c5360f98fb5280214e294faee0309acf3e",
-    "verdict": "INTEGRITY-VIOLATION",
-    "has_source_needed": true,
-    "audited_date": "2026-08-04",
-    "audited_at": "2026-08-04T04:05:25.229133",
-    "n_unsourced": 3,
-    "value_mismatches": 0,
-    "source_unavailable": 0
-  },
-  "models/Delft3D/source-analysis/delft3d_sediment_transport_formulae.md": {
-    "blob_sha": "e4009aae9b33cee17d324f9a24f5c680d4b970f3",
-    "verdict": "verified-confirmed",
-    "has_source_needed": true,
-    "audited_date": "2026-08-04",
-    "audited_at": "2026-08-04T04:05:25.229133",
-    "n_unsourced": 0,
+    "n_value_mismatches": 0,
     "value_checks": [
       {
-        "claim_id": "1afc52b2f7a3",
-        "claim": "sour = eropar · taum**powern (침식 entrainment flux)",
-        "source_ref": "morphology_kernel/src/erosilt.f90:184",
-        "mismatch": false,
-        "note": "원본 L183 `taum = max(0.0_fp, taub/tcrero - 1.0_fp)` · L184 `sour = eropar * taum**powern` — 식·라인 정확 일치"
-      },
-      {
-        "claim_id": "a7a8e78a0b12",
-        "claim": "taucrmin = 0.1 ; betaslope = 2.0 (bed-slope 효과)",
-        "source_ref": "morphology_kernel/src/erosilt.f90:177-178",
-        "mismatch": false,
-        "note": "원본 L177 `taucrmin  = 0.1_fp` · L178 `betaslope = 2.0_fp` — 값·라인 정확 일치. 인접 인용 :179-180(경사 보간 후 max) 도 일치"
+        "claim_id": "331c5fe960d7",
+        "line": 69,
+        "claim": "algebraic 안정함수 — stable fl=exp(−2.3·Ri)·fs=(1+3.33Ri)^1.5/(1+10Ri)^0.5(:347-356), unstable fl=(1−14Ri)^0.25·fs=1(:357-360)",
+        "source_ref": "flow2d3d_kernel/src/compute/turclo.f90:347-360",
+        "result": "OK",
+        "note": "원본 직접 read — fl=exp(−2.3·min(rich,30))(:351)·aa=(1+3.33Ri), aa·sqrt(aa)=^1.5(:352-353)·bb=sqrt(1+10Ri)=^0.5(:354-355)·fs=aa/bb(:356)·unstable fl=(1−14Ri)^0.25, fs=1(:358-359) 전부 라인 구간 내 일치. 본문 표기는 min(Ri,30) cap 을 생략하나 같은 파일 L29(z_turclo 동형 확인)가 cap 포함 명시 — 값·식 유효"
       }
-    ],
-    "value_mismatches": 0,
-    "source_unavailable": 0
+    ]
+  },
+  "models/Delft3D/source-analysis/delft3d_sigma_z.md": {
+    "blob_sha": "4578da9fa2e125323adb6904a14690a8dc6c2d84",
+    "verdict": "INTEGRITY-VIOLATION",
+    "has_source_needed": true,
+    "audited_date": "2026-10-11",
+    "audited_at": "2026-10-11T04:08:32.842113",
+    "n_unsourced": 3,
+    "n_value_mismatches": 0
+  },
+  "models/Delft3D/source-analysis/delft3d_sediment_transport_formulae.md": {
+    "blob_sha": "47ec552edbe552db32b9cf36fc893a1252d213de",
+    "verdict": "INTEGRITY-VIOLATION",
+    "has_source_needed": true,
+    "audited_date": "2026-10-11",
+    "audited_at": "2026-10-11T04:08:32.842113",
+    "n_unsourced": 0,
+    "n_value_mismatches": 1,
+    "value_checks": [
+      {
+        "claim_id": "b3a253f8611c",
+        "line": 36,
+        "claim": "Partheniades 침식식 taum(:183)·sour(:184) + iform=-3 분기(:193) + 호출 erosed.f90:1103",
+        "source_ref": "morphology_kernel/src/erosilt.f90 · flow2d3d .../compute_sediment/erosed.f90",
+        "result": "VALUE-MISMATCH",
+        "note": "원본 직접 read(스냅샷 231bbf2). :193(iform==-3)·erosed.f90:1103(call erosilt)·:1256(call eqtran 3D)·:903(call compbsskin)은 정확 — ca5f39b9 이식이 갱신한 인용은 전부 일치. 그러나 이식이 안 건드린 인용은 대폭 stale: 식 본체는 실제 :194 `taum = max(0,taub/tcrero-1)**powern` · :198 `sour = eropar*taum` (주장 :183-184 는 현재 bed-slope 주석 줄, 10행 이상 shift — 08-03 '1-2행 shift 허용' 선례 초과). 식 형태도 변경됨(powern 이 taum 에 적용, iform=-5 분기 신설 — 수학적으론 iform=-3 에서 등가). ad-hoc 확장 확인: §1.3 bed-slope 실제 :182-191(주장 :172-181)·taucrmin/betaslope 실제 :187-188(주장 :177-178)·tcrero 실제 :189-190(주장 :179-180)·§1.4 fluff 실제 :203-204(주장 :189-190)·§1.2 Krone sink 실제 :211(주장 :197)·§2 eqtran 2D 호출 실제 :1345(주장 :1304)·§2 iform 표 행별 인용 :292/:353/:362/:371/:389 전부 다른 내용(수 십행 shift)·§4 L124 'erosilt@1074·eqtran@1221·compbsskin@880'은 이식 전 구좌표(frontmatter·본문과 자기모순). compbsskin ar/as 는 실제 :91(주장 :90, 1행 shift — 선례상 유효). 확인한 것: 위 라인들의 소스 원문. 확인하지 않은 것: §1.5(:253-268)·eqtran 표의 신좌표 전수 재앵커."
+      }
+    ]
   },
   "models/Delft3D/source-analysis/delft3d_sediment_morphology.md": {
     "blob_sha": "6d5fbb9b4307d3b714674c8c2bcfbedb994d2ba9",
@@ -2954,75 +2955,59 @@
     "source_unavailable": []
   },
   "models/Delft3D/source-analysis/delft3d_utils_libraries.md": {
-    "blob_sha": "85c93019d4836f0376e66d36719976367db8b6d0",
+    "blob_sha": "5becb27321fb914cc4d3fde3724904cb7c140257",
     "verdict": "verified-confirmed",
     "has_source_needed": true,
-    "audited_date": "2026-08-04",
-    "audited_at": "2026-08-04T04:05:25.229133",
+    "audited_date": "2026-10-11",
+    "audited_at": "2026-10-11T04:08:32.842113",
     "n_unsourced": 0,
-    "value_mismatches": 0,
-    "source_unavailable": 0
+    "n_value_mismatches": 0
   },
   "models/Delft3D/source-analysis/delft3d_waq_algae_models.md": {
-    "blob_sha": "a2c999076039dae96546c3a7528a649fb79488a5",
+    "blob_sha": "47340bdc3f5cc7e8f74c3286a4ed43dd94479a0e",
     "verdict": "verified-confirmed",
     "has_source_needed": true,
-    "audited_date": "2026-08-04",
-    "audited_at": "2026-08-04T04:05:25.229133",
+    "audited_date": "2026-10-11",
+    "audited_at": "2026-10-11T04:08:32.842113",
     "n_unsourced": 0,
-    "value_mismatches": 0,
-    "source_unavailable": 0
+    "n_value_mismatches": 0,
+    "value_checks": [
+      {
+        "claim_id": "1baaa646f0e7",
+        "line": 52,
+        "claim": "BLOOM 차원 — mt=30 최대 type·ms=15 최대 species·mn=8 최대 영양염(:44-46), ia=mn+2+1+2·ms(:48)",
+        "source_ref": "waq_process/bloom/bloom_data.f90:44-48",
+        "result": "OK",
+        "note": "원본 직접 read — :44 mt=30·:45 ms=15·:46 mn=8·:48 ia=mn+2+1+2*ms, 값·라인·주석(energy constraints 2+exclusion 1+2·ms) verbatim 일치"
+      }
+    ]
   },
   "models/Delft3D/source-analysis/delft3d_waq_io_preprocess.md": {
-    "blob_sha": "937510c4d5f3822d385c1e5b40f41652c9e09950",
+    "blob_sha": "c833df1a92bc651ebef1499b4fc8245c9c523fda",
     "verdict": "verified-confirmed",
     "has_source_needed": true,
-    "audited_date": "2026-08-05",
-    "audited_at": "2026-08-05T04:10:50.524198",
+    "audited_date": "2026-10-11",
+    "audited_at": "2026-10-11T04:08:32.842113",
     "n_unsourced": 0,
-    "value_checks": [
-      {
-        "claim_id": "703878350ea2",
-        "claim": "versip = 5.07 · nbprm = 1750(최대 프로세스) · novarm = 15000(최대 변수)",
-        "source_ref": "waq_preprocessor/dlwqp1.f90:105-108",
-        "mismatch": false,
-        "note": "[표본 선정, seed=2026-08-05-L4] 원본 L105 versip=5.07 · L107 novarm=15000 · L108 nbprm=1750 — 3값 전부 정확, 인용 범위 :105-108 안에 모두 포함"
-      }
-    ]
+    "n_value_mismatches": 0
   },
   "models/Delft3D/source-analysis/delft3d_waq_kernel_integration.md": {
-    "blob_sha": "fd4119d6533445b2c912b7a338750656408dab15",
+    "blob_sha": "fe1d8ed5756203e420caecf83010228c7279a12d",
     "verdict": "INTEGRITY-VIOLATION",
-    "has_source_needed": null,
-    "audited_date": "2026-08-05",
-    "audited_at": "2026-08-05T04:10:50.524198",
+    "has_source_needed": true,
+    "audited_date": "2026-10-11",
+    "audited_at": "2026-10-11T04:08:32.842113",
     "n_unsourced": 1,
-    "value_checks": [
-      {
-        "claim_id": "bf5e04cf122b",
-        "claim": "amass = amass + idt*deriv ; deriv = 0.0 (Euler 적분)",
-        "source_ref": "calculation/update_concentration.f90:72-73",
-        "mismatch": false,
-        "note": "[표본 외 ad-hoc] 원본 L72 `amass = amass + idt * deriv` · L73 `deriv = 0.0` — 식·라인 정확 일치"
-      }
-    ]
+    "n_value_mismatches": 0
   },
   "models/Delft3D/source-analysis/delft3d_waq_opal_silica_dissolution.md": {
-    "blob_sha": "7d9f3c1678ba38c06dd4d0c49f291359bf2be1c5",
+    "blob_sha": "415308e640b826ff1ec07e876bb15a876629d5d1",
     "verdict": "verified-confirmed",
     "has_source_needed": false,
-    "audited_date": "2026-08-05",
-    "audited_at": "2026-08-05T04:10:50.524198",
+    "audited_date": "2026-10-11",
+    "audited_at": "2026-10-11T04:08:32.842113",
     "n_unsourced": 0,
-    "value_checks": [
-      {
-        "claim_id": "851f744ebda2",
-        "claim": "SWDISSI=0 → FSOL = KSOL*TEMPC*OPAL*(CSIDE − CSID/POROS) / SWDISSI=1 → FSOL = KSOL*TEMPC*OPAL",
-        "source_ref": "waq_process/dissi.f90:109-112",
-        "mismatch": false,
-        "note": "[표본 외 ad-hoc] 원본 L109 IF(NINT(SWDISSi)==0) · L110 2차식 · L112 1차식 — 식·분기·라인 정확 일치. 파일 길이 153줄도 일치"
-      }
-    ]
+    "n_value_mismatches": 0
   },
   "models/Delft3D/source-analysis/delft3d_waq_ph_carbonate.md": {
     "blob_sha": "cb0aa008626818159eef627f3d5ca33062c02c1b",

@@ -1,0 +1,90 @@
+diff --git a/models/Delft3D/source-analysis/delft3d_sediment_transport_formulae.md b/models/Delft3D/source-analysis/delft3d_sediment_transport_formulae.md
+--- a/models/Delft3D/source-analysis/delft3d_sediment_transport_formulae.md
++++ b/models/Delft3D/source-analysis/delft3d_sediment_transport_formulae.md
+@@ -32,8 +32,8 @@
+ ### 1.1 침식 flux (Partheniades, `:183-184`)
+ 
+ ```
+-taum = max(0, taub/tcrero − 1)        ! 무차원 초과전단 (:183)
+-sour = eropar · taum**powern          ! 침식 entrainment flux [kg/m²/s] (:184)
++taum = max(0, taub/tcrero − 1)**powern   ! 무차원 초과전단 (iform=−3, :194)
++sour = eropar · taum                     ! 침식 entrainment flux [kg/m²/s] (:198)
+ ```
+ 
+ - `taub` = (파 enhanced) bed shear stress [N/m²], `realpar(RP_TAUB)` (`:130`)
+@@ -80,7 +80,7 @@
+ 
+ ## 2. eqtran.f90 — transport formula gateway (non-cohesive sand, 834줄)
+ 
+-`erosed.f90:1256`(3D) / `:1304`(2D) 호출. 헤더 자칭 **"Gateway for all sediment transport formulations"**(`eqtran.f90:2`). `iform` 으로 분기:
++`erosed.f90:1256`(3D) / `:1345`(2D) 호출. 헤더 자칭 **"Gateway for all sediment transport formulations"**(`eqtran.f90:2`). `iform` 으로 분기:
+ 
+ | iform | routine | 식 (소스 주석 verbatim) |
+ |---|---|---|
+@@ -121,7 +121,7 @@
+ 
+ ## 4. 본 위키 접점
+ 
+-- [`delft3d_sediment_morphology.md`](delft3d_sediment_morphology.md) — 이 식들의 **호출자**(compute_sediment 커널): erosilt@1074·eqtran@1221·compbsskin@880.
++- [`delft3d_sediment_morphology.md`](delft3d_sediment_morphology.md) — 이 식들의 **호출자**(compute_sediment 커널): erosilt@1103·eqtran@1256·compbsskin@903.
+ - [`web-refs/delft3d-official-resources.md §3.1`](../web-refs/delft3d-official-resources.md) — Lesser 2004 canonical.
+ - [`concepts/sediment-transport/04-code-and-tools.md`](../../../concepts/sediment-transport/04-code-and-tools.md) §3 Delft3D-SED.
+ - [[../../EFDC/source-analysis/sediment/efdc_sedzlj]] — EFDC cohesive(Sedflume) vs Delft3D(Partheniades-Krone) 대비. 둘 다 van Rijn 비점착 식 공유.
+diff --git a/models/Delft3D/source-analysis/delft3d_sigma_z.md b/models/Delft3D/source-analysis/delft3d_sigma_z.md
+--- a/models/Delft3D/source-analysis/delft3d_sigma_z.md
++++ b/models/Delft3D/source-analysis/delft3d_sigma_z.md
+@@ -151,7 +151,7 @@
+ 
+ | Domain feature | Coordinate |
+ |---|---|
+-| Mild bathymetry, depth ratio < 5 | Sigma |
++| Mild bathymetry, depth ratio < 5 (source-needed) | Sigma |
+ | Steep slope, canyon, abrupt shelf | Z-model (avoids sigma PGF error) |
+ | Surge over dunes (top of grid wets/dries) | Z-model with sufficient `Ztop` |
+ | Stratified estuary, mild bathymetry | Sigma + anti-creep automatic |
+@@ -165,10 +165,10 @@
+ 
+ - For sigma, `THICK` should be denser near surface and bottom (geometric or stretched) — uniform `thick=0.1` (10 layers) gives poor surface/bottom resolution.
+ - Z-model: `Ztop` should be ≥ max expected `s1` (e.g., MSL + storm surge + tide); `Zbot` ≤ min bathymetry.
+-- Z-model layer count: `kmax = 20–50` typical for coastal applications; more layers cost ~linearly.
++- Z-model layer count: `kmax = 20–50` typical for coastal applications; more layers cost ~linearly. (source-needed)
+ - For Z-model with steep bathymetry, use `ZTBML` for smoother bottom roughness representation.
+ - Anti-creep is automatic for sigma; **don't** disable unless you're testing the difference (sigma slope error is strong in stratified canyons).
+-- Cold-start with sigma → restart as Z-model: not supported. Pick early.
++- Cold-start with sigma → restart as Z-model: not supported. Pick early. (source-needed)
+ - Hybrid coordinates not supported in this version — use Z-model if you need fixed levels in part of the domain (entire domain becomes Z).
+ 
+ ## Common Pitfalls
+diff --git a/models/Delft3D/source-analysis/delft3d_turbulence.md b/models/Delft3D/source-analysis/delft3d_turbulence.md
+--- a/models/Delft3D/source-analysis/delft3d_turbulence.md
++++ b/models/Delft3D/source-analysis/delft3d_turbulence.md
+@@ -164,7 +164,7 @@
+ - For `k-ε` runs, output `RTUR1` (k) and `RTUR2` (ε) to TRIM-MAP for diagnostics. Surface k spike at strong winds is normal.
+ - `vicoww` (background) typical 1e-6 to 1e-5 m²/s; never zero.
+ - Internal-wave dissipation `tkedis` is small in coastal seas; significant in deep stratified fjords.
+-- For shallow tidal flats, `algebraic` is sufficient and 30% cheaper than `k-ε`.
++- For shallow tidal flats, `algebraic` is sufficient and 30% cheaper than `k-ε`. (source-needed)
+ - HLES (Horizontal Large Eddy Simulation) sets `vicuv` background — orthogonal to vertical closure choice.
+ - Surface BC: `tkewin` requires wind stress; if wind is weak, surface k floors at 1e-7.
+ - Bottom BC: depends on `Chezy/Manning/White-Colebrook` choice; ensure roughness map is consistent.
+@@ -176,7 +176,7 @@
+ - ▢ K-ε with cold-start `k=ε=0` — singular dissipation; always init to `1e-7` minimum.
+ - ▢ Confusing `vicww` (vertical viscosity) with `vicuv` (horizontal viscosity at layer centers).
+ - ▢ Setting `Vicoww=0` — model accepts but `vicww` can become spuriously small in stratified zones.
+-- ▢ Comparing `vicww` output across closures expecting same magnitude — k-ε can produce 10× algebraic in active mixing regions.
++- ▢ Comparing `vicww` output across closures expecting same magnitude — k-ε can produce 10× algebraic in active mixing regions. (source-needed)
+ - ▢ Forgetting that Z-model uses `z_turclo.f90` / `z_tratur.f90` — same closure structure but different layer mechanics.
+ 
+ ## Next expansion
+diff --git a/models/Delft3D/source-analysis/delft3d_waq_kernel_integration.md b/models/Delft3D/source-analysis/delft3d_waq_kernel_integration.md
+--- a/models/Delft3D/source-analysis/delft3d_waq_kernel_integration.md
++++ b/models/Delft3D/source-analysis/delft3d_waq_kernel_integration.md
+@@ -124,7 +124,7 @@
+ 
+ ### 3.2 boundary: Thatcher-Harleman
+ 
+-`scheme_1` 은 신규 경계농도 산정 시 OpenDA 버퍼 우선 적용 후 `thatcher_harleman_bc(a(ibset),a(ibsav),...)` 호출 (`integration_scheme_1.f90:222-231`). T-H 는 유입/유출 전환 시 경계농도의 시간이력 완화(return time)를 적용하는 표준 estuarine BC.
++`scheme_1` 은 신규 경계농도 산정 시 OpenDA 버퍼 우선 적용 후 `thatcher_harleman_bc(a(ibset),a(ibsav),...)` 호출 (`integration_scheme_1.f90:222-231`). T-H 는 outflow 시 마지막 유출 농도를 저장했다가, inflow 전환 후 time-lag 이내에는 그 저장값으로 경계농도를 완화 적용하는 경계조건이다(`waq_kernel/kernel/calculation/thatcher_harleman_bc.f90:35-41` 헤더 주석).
+ 
+ ### 3.3 explicit Euler 적분 (`update_concentration.f90`)
+ 
