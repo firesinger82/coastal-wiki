@@ -136,12 +136,15 @@ Delft3D 487(기계 sweep 실패 471 + 웹 16, 09-22 스냅샷 교체 전 경로)
 - 문서 66묶음: 웹사이트 471쪽, 위키 161쪽, rst 150파일. 전 행 열람·인용 대조 통과. sonnet 표본 대조는 한국어 요약의 뜻(동사·조건·부정·수량·의무)까지 봤다. 뜻이 바뀐 요약 4건(removed→수정, some→모든, error will result→종료, 치명적 오류)과 결과절이 빠진 요약 여러 건을 고쳤다. 표본 밖 요약에도 같은 종류의 오류가 남아 있을 수 있다.
 - PDF 42종과 pptx 3종 1,933쪽(130작업). Codex가 300 dpi 쪽 이미지로 판독(Marker 초안 참고). 1990년대 보고서 대부분은 스캔본이라 인용의 기계 대조가 불가능하고, 검증은 쪽 이미지 표본 대조뿐이다. 이미지 표본 약 75쪽 대조, 틀림 1(xdmf2 p.5 'Internal'을 'Intertidal'로 읽음) 수정. 텍스트 층이 깨졌거나 그림 안 문구라 기계 대조에서 걸린 인용 약 35건은 이미지로 확인해 `visual-ok.txt`에 등록했다.
 - 범위 밖: asgs, adcircpy, StormEvents, `refs/subroutines.md`, `notes/adcirc-fort-files-reference.md`(이전 AI 요약), 웹사이트 html(md와 중복), 웹사이트 PDF(manuals/pdfs와 중복), zip, `website_markdown/wp-json/index.md`(WordPress API 응답 JSON 한 줄, 기록은 있으나 전 행 열람·인용 대조 미통과).
-- 사고: 10-10 04:00 L4 감사 cron 가드(`tools/llm-wiki-audit/run-audit-cron.sh` 82행)가 실행 중 새로 생긴 untracked 판독 기록 12개를 지웠다. 문서 묶음 42를 다시 판독했다. 가드 처리 방법은 사용자 결정 대기.
+- 사고: 10-10 04:00 L4 감사 cron 가드(`tools/llm-wiki-audit/run-audit-cron.sh` 82행)가 실행 중 새로 생긴 untracked 판독 기록 12개를 지웠다. 문서 묶음 42를 다시 판독했다. 가드가 `_staging/recovery/`를 복원·삭제하지 않게 고쳤다(`ba88e244`, 사용자 결정 10-10, 복제본에서 가짜 claude로 시험).
 - 검사 도구 수정: `quotes.py` Markdown 이스케이프 무시, `pdfcheck.py` Marker 이미지 링크를 쪽 글자로 세지 않음, 공백만 있는 쪽 텍스트 무시.
-- 아직 하지 않은 것: 문서·이론과 코드 대조, 흐름 분석, 노트 반영. 모델 실행.
+- 문서·코드 대조 5종(10-10, Codex `gpt-6.1-sol` 5개 동시): `compare/ADCIRC-fort15-vs-code.md`(주 표 358행 중 불일치 131, NWS 보충 줄 126행 중 21), `ADCIRC-inputfiles-vs-code.md`(516행 중 불일치 90), `ADCIRC-outputs-vs-code.md`(불일치 60유형 145행), `ADCIRC-theory-vs-code.md`(번호 식 456개 등, 2004 이론 매뉴얼 136행 중 불일치 39), `ADCIRC-features-vs-code.md`(351행 중 불일치 80). 문서는 rst(현행)·위키·웹 v53·PDF(v44.XX와 1990년대 보고서) 순으로 보고, 코드는 v56.2.1이다. 판 차이는 판정 이유에 적었다.
+  - 기계 확인: `scripts/citecheck_path.py`(경로 인용·`.F`·`.md`·링크형·역순 `이름 — 경로:줄` 지원)로 인용 25,477개 대조, 일치 25,475, 불일치 2(노트 문장 안의 인용을 잡은 검사 오판).
+  - sonnet 표본 50행(보고서마다 10행) 대조: 맞음 43, 부분 5, 틀림 2. 틀림 2는 sponge 층 '코드에서 찾지 못함'(실제 `read_input.F:5637–5718`에 구현)과 fort.15 NWS=6 계열 '불일치'였다. NWS=6은 이웃 행 이유를 복사한 오류로 같은 표 8행에 퍼져 있었고, 표 전체를 스크립트로 대조해 8행만 해당함을 확인했다. 모두 원문 확인 후 정정(`[10-10 검증 정정]`·`[10-10 검증 보완]`), 요약 표 수 갱신. 표본 오판율로 보아 표본 밖 행에도 틀린 판정이 남아 있을 수 있다.
+- 아직 하지 않은 것: 흐름 분석, 노트 반영. 모델 실행.
 
 ## 다음에 이어서 할 일
 
 1. ~~매뉴얼과 코드 판독 기록 대조~~ — 10-03 완료(`compare/XBeach-manual-vs-code.md`, 노트 반영 `1da8d89`).
 2. ~~XBeach 파일 간 계산 흐름 분석~~ — 10-07 완료(`flow/XBeach-callflow.md`, 노트 반영 `d89cd8b`). 판독 기록 검색은 `wiki_search` `path_class="records"`(`ce7b3ae`).
-3. 다른 10개 모델(SFINCS·EFDC 완료, ADCIRC 판독 완료·대조와 흐름 분석 남음, 나머지 9개 미착수): 같은 방식(고정 목록 → 1행/1쪽 판독 → 기계 확인 → 다른 모델 검증).
+3. 다른 10개 모델(SFINCS·EFDC 완료, ADCIRC 판독·대조 완료, 흐름 분석과 노트 반영 남음, 나머지 9개 미착수): 같은 방식(고정 목록 → 1행/1쪽 판독 → 기계 확인 → 다른 모델 검증).
