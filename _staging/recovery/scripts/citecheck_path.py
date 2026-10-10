@@ -27,6 +27,7 @@ for m in re.finditer(pat,t):
     seg=norm(''.join(L[a-1:max(a,b)+3]))
     parts=[x for x in re.split(r'…|\.\.\.',norm(code)) if x]
     if parts and all(x in seg for x in parts): ok+=1
+    elif (pm:=re.search(r'`([^`\n]+)`\s*(?:→\s*)?$',t[max(0,m.start()-200):m.start()])) and norm(pm.group(1)) and norm(pm.group(1)) in seg: ok+=1  # form `NAME` `path:N` (definition location)
     else: bad+=1; out.append(f'{path}:{a} `{code[:80]}`')
 # reverse form: `name` — path:N
 for m in re.finditer(r'`([^`\n]+)`\s*—\s*((?:src|prep|wind|util|docs)/[^`\s:]+?\.[A-Za-z0-9]+):(\d+)',t):
