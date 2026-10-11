@@ -3,6 +3,7 @@ title: "ADCIRC 3D internal mode — VSSOL 연직 시간적분 스킴 (vsmy.F: θ
 topic: general
 canonical_source: self
 citation_status: verified
+last_source_check: 2026-10-11 (recovery 재판독 대조)
 has_source_needed: false
 verification_method: "vsmy.F(5281줄) VSSOL(:142-1703)·TRIDIAG(:2097-2130)·InmINT(:2299-2319)·EDDYVIS(:1785-2062) + read_input.F 3D 블록(:5073,5102,5127-5137) + global_3dvs.F(:98,193-195) + timestep.F(:1121-1125) + docs parameter_definitions/index.rst:1309-1316(ALP1/2/3)·fort15.rst:129 직접 read (2026-07-10~11). 모든 식·계수 verbatim 인용."
 note_author: "Claude Fable 5 (source-code direct read)"
@@ -62,7 +63,7 @@ DT1MAlp2  = DelT*(1.-Alp2)    ! 저면응력 RHS
 
 ## 5. 경계조건
 
-- **바닥**: `ISlip=0` no-slip → Dirichlet 행 `Fr(1)=0, Mk(1)=(1,−1)` (:997-1001; 주석 "-I*IV=V") / `ISlip≥1` slip → 저면응력을 `TK(NH)` 로 LHS(Alp2)·RHS(1−Alp2) 분배 (:1010,:1015). `ISlip=1` 선형 slip 계수, `=2` 최소 2차, `=3` 2차 (헤더 :946-948; `READ(15,*) ISlip,KP` read_input.F:5116-5116). ※2016 개정으로 `KSlip` 대신 2D 마찰 `TK` 재사용 (":1009-1010 주석 arash May 31 2016 based on Rosemary's work" — 구식 KSlip 코드 주석잔존).
+- `ISlip=0`은 첫 연직 절점의 no-slip 조건이다 (`src/vsmy.F:997` `IF(ISlip.EQ.0) THEN    !no slip bottom boundary condition`; `src/vsmy.F:998` `Fr(1)   = (0.d0,0.d0)`; `src/vsmy.F:1000` `Mk(1)   = (1.d0,-1.d0) !note: -I*IV=V`). 현재 `Apply3DBottomFriction`은 비영 `ISlip`의 값 1·2·3을 인수로 받지 않는다 (`src/timestep.F:599` `CALL Apply3DBottomFriction(Q, SIGMA, DP, ETA2, G, IFNLFA, NP,`; `src/timestep.F:600` `&                              TK, NFEN, Z0B, KP)`). 이 루틴은 로그식 `FRIC(NH)`와 `ABS(Q(NH,1))`로 `TK(NH)`를 계산한다 (`src/nodalattr.F:2555` `FRIC(NH)= (1.D0 / ( (1.D0/0.41D0) *`; `src/nodalattr.F:2556` `&   LOG((ABS( ( ( SIGMA(2)-SIGMA(1) )/2.d0 ) *(H1) ) + Z0B1 )/Z0B1)`; `src/nodalattr.F:2559` `TK(NH)= FRIC(NH) * ABS(Q(NH,1))`). 이 루틴은 `TK(NH)`의 `abs(Q(NH,1))` 상한을 먼저 적용한다 (`src/nodalattr.F:2571` `If ( TK(NH) > abs( Q(NH,1) ) ) TK(NH) = abs( Q(NH,1) )`). 이 루틴은 `KP*abs(Q(NH,1))` 하한을 이어 적용한다 (`src/nodalattr.F:2572` `If ( TK(NH) < KP * abs( Q(NH,1) ) ) TK(NH) = KP * abs( Q(NH,1) )`). VSSOL은 `TK(NH)`를 바닥 응력의 우변 `DT1MAlp2` 항과 좌변 `DTAlp2` 항에 사용한다 (`src/vsmy.F:1010` `&           - q(NH,1)*DT1MAlp2*TK(NH)/HsOAMB`; `src/vsmy.F:1015` `&           + DTAlp2*TK(NH)/Hsp1OAMB`). 현행 문서는 `ISLIP=1`을 선형, 2를 최소 이차, 3을 지정 이차 slip으로 설명한다 (`docs/technical_reference/parameter_definitions/index.rst:1287` `If ISLIP = 1 the bottom friction is a linear function of bottom velocity and KP is the corresponding linear friction coefficient (units of velocity)`; `docs/technical_reference/parameter_definitions/index.rst:1289` `If ISLIP = 2 bottom friction is is computed using the log layer formula and KP is the minimum quadratic bottom friction coefficient (dimensionless)`; `docs/technical_reference/parameter_definitions/index.rst:1291` `If ISLIP = 3 bottom friction is a quadratic function of bottom velocity and KP is the corresponding quadratic friction coefficient (dimensionless)`).
 - **표면**: 바람응력을 natural BC 로 `Fr(NFEN)` 에 — `+ ΔT·½·(WS^{s+1}/H^{s+1} + WS^s/H^s)` (:1043-1046) = **고정 trapezoidal(½·½)**, Alp 가중과 무관. `NWS≠0` 게이트 (:1042, Casey 220120).
 - **측면 flux 경계**: 법선/접선 회전 후 행 수정 — `LBcodeI 0~9` essential normal flux + free tangential slip, `10~19` zero tangential slip, `20~29` natural (:1053-1090).
 
@@ -81,7 +82,7 @@ DT1MAlp2  = DelT*(1.-Alp2)    ! 저면응력 RHS
 - **consistent mass** — 연직 FE 가 lumped 아님: RHS 에 이웃층 기여(Inm off-diagonal). 층별 후처리 시 `q` 를 point value 로 취급해도 되지만 모멘텀 수지 분석은 Inm 가중 고려.
 - **바람응력 시간가중은 Alp 와 무관한 고정 ½** (:1043-1046) — Alp3=1(완전 implicit) 로 놓아도 표면 강제는 centered.
 - **복소 정식화 함정**: `u=REAL(q)`, `v=AIMAG(q)` — 디버깅·후처리에서 실수부/허수부 혼동 주의. Coriolis 부호는 `CCL=1+i·f·ΔT·Alp1` 회전에 내장.
-- **2016 슬립계수 이관**: 저면 slip 이 자체 `KSlip=KP·|q(1)|` 계산(주석처리 :985-988, :1009, :1014)에서 2D 마찰계수 `TK(NH)` 재사용으로 변경 — fort.15 `KP` 는 `ISlip` 분기 선택에만 잔존 의미. 구문서와 코드가 다를 수 있는 지점.
+- VSSOL은 주석 처리한 `KSlip` 대신 `TK(NH)`를 사용한다 (`src/vsmy.F:1009` `!     &           - q(NH,1)*DT1MAlp2*KSlip/HsOAMB`; `src/vsmy.F:1010` `&           - q(NH,1)*DT1MAlp2*TK(NH)/HsOAMB`; `src/vsmy.F:1014` `!     &           + DTAlp2*KSlip/Hsp1OAMB`; `src/vsmy.F:1015` `&           + DTAlp2*TK(NH)/Hsp1OAMB`). TIMESTEP은 `C3D`일 때 `KP`를 `Apply3DBottomFriction`에 전달한다 (`src/timestep.F:594` `if (C3D) then`; `src/timestep.F:599` `CALL Apply3DBottomFriction(Q, SIGMA, DP, ETA2, G, IFNLFA, NP,`; `src/timestep.F:600` `&                              TK, NFEN, Z0B, KP)`). `KP`는 이 루틴의 이차 마찰 계수 하한 계산에 남아 있다 (`src/nodalattr.F:2572` `If ( TK(NH) < KP * abs( Q(NH,1) ) ) TK(NH) = KP * abs( Q(NH,1) )`). wetdry.F의 `ISLIP=1` 경로는 `KSLIP=KP`를 사용한다 (`src/wetdry.F:482` `IF(ISLIP.NE.0)THEN`; `src/wetdry.F:483` `IF(ISLIP.EQ.1)THEN`; `src/wetdry.F:484` `KSLIP=KP`).
 - **w 는 사후진단적** — qkp1 확정 후 연속식으로 유도(모멘텀에 재결합 없음), 보정은 표면 BC 정확 일치 지향(`Wf=0`).
 
 ## 연결

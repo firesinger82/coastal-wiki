@@ -3,6 +3,7 @@ title: "adcirc parallel implementation"
 topic: general
 canonical_source: self
 citation_status: verified
+last_source_check: 2026-10-11 (recovery 재판독 대조)
 has_source_needed: true
 verification_method: "ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-parallel-implementation.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
 note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
@@ -69,6 +70,40 @@ How `adcprep --partmesh` partitions the global mesh, how `--prepall` generates p
 **NOT in fort.80**. Instead in per-PE `fort.18` (receive/send lists):
 - `IRECV_TOT/ISEND_TOT`, neighbor PE IDs at `[file=prep/prep.F line=2850-2905]`
 
+fort.18의 reader 레코드 순서는 다음과 같다.
+
+| 순서 | 값 | 코드 원문 |
+| --- | --- | --- |
+| 1 | FileFmt 이름·판 | `[file=src/messenger.F90 line=339]` `read (18, 3020) BlkName, inputFileFmtVn` |
+| 2 | NE_G | `[file=src/messenger.F90 line=348]` `read (18, '(8X,3I12)') NE_G` |
+| 3 | IMAP_EL_LG | `[file=src/messenger.F90 line=351]` `read (18, *) IMAP_EL_LG(I)` |
+| 4 | NP_G | `[file=src/messenger.F90 line=355]` `read (18, 3015) NP_G` |
+| 5 | NODES_LG | `[file=src/messenger.F90 line=358]` `read (18, *) NODES_LG(I)` |
+| 6 | nfluxf | `[file=src/messenger.F90 line=363]` `read (18, '(8X,I12)') jdumy ! nfluxf for subdomain` |
+| 7 | neta 전역·최대·지역 | `[file=src/messenger.F90 line=364]` `read (18, '(8X,3I12)') jdumy_g, jdumy_max, jdumy_loc ! neta for subdomain` |
+| 8 | obnode_lg | `[file=src/messenger.F90 line=366]` `read (18, '(I12)') jdumy ! obnode_lg table` |
+| 9 | NSTAE_G 및 지역 수 | `[file=src/messenger.F90 line=370]` `read (18, 3015) NSTAE_G, jdumy_max, jdumy_loc !tcm v51.20.05` |
+| 10 | IMAP_STAE_LG | `[file=src/messenger.F90 line=379]` `read (18, '(I12)') IMAP_STAE_LG(I)` |
+| 11 | NSTAV_G 및 지역 수 | `[file=src/messenger.F90 line=384]` `read (18, 3015) NSTAV_G, jdumy_max, jdumy_loc !tcm v51.20.05` |
+| 12 | IMAP_STAV_LG | `[file=src/messenger.F90 line=393]` `read (18, '(I12)') IMAP_STAV_LG(I)` |
+| 13 | NSTAM_G 및 지역 수 | `[file=src/messenger.F90 line=398]` `read (18, 3015) NSTAM_G, jdumy_max, jdumy_loc !tcm v51.20.05` |
+| 14 | IMAP_STAM_LG | `[file=src/messenger.F90 line=407]` `read (18, '(I12)') IMAP_STAM_LG(I)` |
+| 15 | NSTAC_G 및 지역 수 | `[file=src/messenger.F90 line=412]` `read (18, 3015) NSTAC_G, jdumy_max, jdumy_loc !tcm v51.20.05` |
+| 16 | IMAP_STAC_LG | `[file=src/messenger.F90 line=421]` `read (18, '(I12)') IMAP_STAC_LG(I)` |
+| 17 | IDPROC,NLOCAL | `[file=src/messenger.F90 line=429]` `read (18, 3010) IDPROC, NLOCAL` |
+| 18 | NNODELOC | `[file=src/messenger.F90 line=431]` `read (18, 1130) (NNODELOC(I), I=1, NLOCAL)` |
+| 19 | NEIGHPROC | `[file=src/messenger.F90 line=448]` `read (18, 3015) NEIGHPROC` |
+| 20 | IPROC,NNODRECV | `[file=src/messenger.F90 line=456]` `read (18, 3010) IPROC(J), NNODRECV(J)` |
+| 21 | IRECVLOC | `[file=src/messenger.F90 line=457]` `read (18, 1130) (IRECVLOC(I, J), I=1, NNODRECV(J))` |
+| 22 | IPROC,NNODSEND | `[file=src/messenger.F90 line=464]` `read (18, 3010) IPROC(J), NNODSEND(J)` |
+| 23 | ISENDLOC | `[file=src/messenger.F90 line=465]` `read (18, 1130) (ISENDLOC(I, J), I=1, NNODSEND(J))` |
+| 24 | NSTA3DD_G_OUT | `[file=src/messenger.F90 line=471]` `read (18, 3015) NSTA3DD_G_OUT` |
+| 25 | IMAP_STA3DD_LG_OUT | `[file=src/messenger.F90 line=475]` `read (18, '(I12)') IMAP_STA3DD_LG_OUT(I)` |
+| 26 | NSTA3DV_G_OUT | `[file=src/messenger.F90 line=479]` `read (18, 3015) NSTA3DV_G_OUT` |
+| 27 | IMAP_STA3DV_LG_OUT | `[file=src/messenger.F90 line=483]` `read (18, '(I12)') IMAP_STA3DV_LG_OUT(I)` |
+| 28 | NSTA3DT_G_OUT | `[file=src/messenger.F90 line=487]` `read (18, 3015) NSTA3DT_G_OUT` |
+| 29 | IMAP_STA3DT_LG_OUT | `[file=src/messenger.F90 line=491]` `read (18, '(I12)') IMAP_STA3DT_LG_OUT(I)` |
+
 ## D. padcirc startup
 
 - MPI startup in `MSG_INIT`:
@@ -93,7 +128,7 @@ Core routines:
 
 ### Call sites
 
-- GWCE solve update at `[file=src/gwce.F line=1874-1879]`
+- `gwce.F:1874·1876·1879`는 풀이 전 GWCE 우변과 대각 계수의 통신 호출이다 (`[file=src/gwce.F line=1874]` `CALL UPDATER_W_PERBC(GWCE_LV,COEF(:,1),DUMY1,2)`; `[file=src/gwce.F line=1876]` `CALL UPDATER(GWCE_LV,COEF(:,1),DUMY1,2)`; `[file=src/gwce.F line=1879]` `CALL UPDATER(GWCE_LV,COEFD,DUMY1,2)`). `gwce.F:2031`은 새 `ETA2`의 통신 호출이다 (`[file=src/gwce.F line=2031]` `CALL UPDATER(ETA2,DUMY1,DUMY2,1)`). solveGWCE wrapper의 slope limiter 뒤 `ETA2` 통신은 `LoadEleSlopeLim`과 `CMPI` 조건 안에 있다 (`[file=src/gwce.F line=185]` `IF (LoadEleSlopeLim) THEN`; `[file=src/gwce.F line=188]` `#ifdef CMPI`; `[file=src/gwce.F line=189]` `CALL UPDATER(ETA2,DUMY1,DUMY2,1)`; `[file=src/gwce.F line=200]` `IF (LoadEleSlopeLim) THEN`; `[file=src/gwce.F line=204]` `CALL UPDATER(ETA2,DUMY1,DUMY2,1)`; `[file=src/gwce.F line=216]` `IF (LoadEleSlopeLim) THEN`; `[file=src/gwce.F line=220]` `CALL UPDATER(ETA2,DUMY1,DUMY2,1)`).
 - Momentum update at `[file=src/momentum.F line=137-138]`
 - ITPACK iterations at `[file=src/itpackv.F line=537-540]`
 
@@ -151,6 +186,39 @@ GWCE iterative residual/dot products globally reduced via `psdot/ps2dots/ps3dots
 |------|---------|--------|
 | 1 | `adcprep --np 18 --partmesh` | METIS partitions, writes `partmesh.txt` |
 | 2 | `adcprep --np 18 --prepall` | Creates `PE0000`–`PE0017`, writes per-PE files + `fort.80` |
+
+- ADCIRC parser는 mesh 유형 옵션으로 `-MFT·-mft`를 비교한다 (`[file=src/sizes.F line=234]` `case("-MFT","-mft") ! mesh file type`). mesh 이름 옵션은 `-MFN·-mfn`을 비교한다 (`[file=src/sizes.F line=249]` `case("-MFN","-mfn") ! mesh file name`). 노드 속성 유형 옵션은 `-NFT·-nft`를 비교한다 (`[file=src/sizes.F line=271]` `case("-NFT","-nft") ! nodal attributes file type`). 노드 속성 이름 옵션은 `-NFN·-nfn`을 비교한다 (`[file=src/sizes.F line=287]` `case("-NFN","-nfn") ! nodal attributes file name`).
+- 현행 명령줄 rst는 이 이름들을 혼합 대소문자로 적는다 (`[file=docs/user_guide/running_adcirc/command_line_options.rst line=41]` ``` ``-Mft MESH_FILE_TYPE`` ```; `[file=docs/user_guide/running_adcirc/command_line_options.rst line=44]` ``` ``-Mfn MESH_FILE_NAME`` ```; `[file=docs/user_guide/running_adcirc/command_line_options.rst line=47]` ``` ``-Nft NODAL_ATTRIBUTES_FILE_TYPE`` ```; `[file=docs/user_guide/running_adcirc/command_line_options.rst line=50]` ``` ``-Nfn NODAL_ATTRIBUTES_FILE_NAME`` ```). 확인하지 않음: 수정 전 노트에서 `-Mft·-Mfn·-Nft·-Nfn` 별칭을 설명한 문장.
+- adcprep의 유형·이름 별칭은 ADCIRC parser와 별도로 비교한다 (`[file=prep/adcprep.F line=217]` `case("-MFT","-mft","--MFT","--mft") ! mesh file type`; `[file=prep/adcprep.F line=231]` `case("-MFN","-mfn","--MFN","--mfn") ! mesh file name`; `[file=prep/adcprep.F line=235]` `case("-NFT","-nft","--NFT","--nft") ! nodal attributes file type`; `[file=prep/adcprep.F line=250]` `case("-NFN","--nfn") ! nodal attributes file name`).
+- `--prep88`의 코드 CASE는 주석이다 (`[file=prep/adcprep.F line=209]` `!            CASE("--prep88")`; `[file=prep/adcprep.F line=210]` `!               PREP_88 = .TRUE.`). 현행 문서는 `--prep88`을 적는다 (`[file=docs/user_guide/running_adcirc/command_line_options.rst line=99]` ``` ``--prep88`` ```).
+- adcprep은 `--partmesh_npart_from_epart`로 분할 접근법 2를 선택한다 (`[file=prep/adcprep.F line=198]` `CASE("--partmesh_npart_from_epart")`; `[file=prep/adcprep.F line=199]` `PARTITION = .TRUE.`; `[file=prep/adcprep.F line=200]` `PARTITION_APPROACH = 2`). `--strict-boundaries`는 엄격한 경계 플래그를 켠다 (`[file=prep/adcprep.F line=211]` `CASE("--strict-boundaries")`; `[file=prep/adcprep.F line=212]` `strictBoundaries = .true.`).
+- ADCIRC의 `-h·--help`는 도움말을 출력한다 (`[file=src/adcirc.F line=185]` `case("-h","--help")`; `[file=src/adcirc.F line=186]` `call PRINT_HELP()`). `-V·-v·--version`은 판을 출력한다 (`[file=src/adcirc.F line=188]` `case("-V","-v","--version")`; `[file=src/adcirc.F line=192]` `write(*,'(a)') trim(adc_version)`). `--hash`는 hash를 출력한다 (`[file=src/adcirc.F line=194]` `case("--hash")`; `[file=src/adcirc.F line=195]` `write(*,'(a)') trim(adc_hash)`). `-U·-u`는 지역 출력만 설정한다 (`[file=src/sizes.F line=211]` `case("-U","-u")`; `[file=src/sizes.F line=212]` `WRITE_LOCAL_FILES = .TRUE.`).
+
+보고서가 추가한 aswip 옵션은 다음과 같다.
+
+| 옵션 용도 | 코드 CASE 원문 |
+| --- | --- |
+| 도움말 | `[file=wind/aswip.F line=2860]` `CASE("-h") ! display help and exit` |
+| Rmw·방위각 출력 | `[file=wind/aswip.F line=2863]` `CASE("-A","-a") ! Rmw and Azimuth vals req. (360 deg/1deg incr.)` |
+| 방사 방향 V·P 출력 | `[file=wind/aswip.F line=2865]` `CASE("-V","-v") ! radial V and P values requested` |
+| 비정형 격자 V·P 출력 | `[file=wind/aswip.F line=2867]` `CASE("-S","-s") ! spatial V and P unstructured mesh vals requested` |
+| 지정 노드 uvp 출력 | `[file=wind/aswip.F line=2869]` `CASE("-B","-b") ! uvp at given node location xy` |
+| 비정형 격자 xy·uvp 출력 | `[file=wind/aswip.F line=2871]` `CASE("-C","-c") ! spatial xy&uvp,unstructured mesh vals requested` |
+| NWS19 fort.22 쓰기 제외 | `[file=wind/aswip.F line=2873]` `CASE("-D","-d") ! don't write NWS19 fort.22` |
+| 요소 파일 이름 | `[file=wind/aswip.F line=2875]` `CASE("-E","-e")  ! providing an element table for spatial output` |
+| frame 선택 | `[file=wind/aswip.F line=2880]` `CASE("-F","-f")  ! selecting a particular frame to render` |
+| geostrophic 선택값 | `[file=wind/aswip.F line=2884]` `CASE("-G","-g")  ! selecting geostrophic or cyclostrophic` |
+| fort.14 파일 이름 | `[file=wind/aswip.F line=2892]` `CASE("-I","-i")  ! input fort.14 file containing mesh locations` |
+| 관측점 위치 파일 이름 | `[file=wind/aswip.F line=2897]` `CASE("-L","-l")  ! input text file containing station locations` |
+| 출력 시간 간격(초) | `[file=wind/aswip.F line=2910]` `CASE("-O","-o")  ! time increment for writing output (seconds)` |
+| rmax 비율 | `[file=wind/aswip.F line=2919]` `CASE("-P","-p")  ! percent change of rmax relative to calculated val` |
+| vmax 비율 | `[file=wind/aswip.F line=2926]` `CASE("-X","-x")  ! percent change of vmax relative to given val` |
+| 시간 offset | `[file=wind/aswip.F line=2930]` `CASE("-T","-t")  ! time offset (like hotstart time)` |
+| 일정한 forecastRmax | `[file=wind/aswip.F line=2935]` `CASE("-R","-r")  ! constant forecastRmax` |
+| 트랙 파일 이름 | `[file=wind/aswip.F line=2945]` `CASE("-W","-w") ! the name of the track file to read` |
+
+| Step | Command | Effect |
+| --- | --- | --- |
 | 3 | `mpiexec -np 18 padcirc.exe` | Each rank reads its `PE####/fort.{14,15,13}` + `fort.18` halo data |
 | Post | `adcpost` or built-in `POST61` etc. | Merges per-PE `PE####/fort.6X` into global `fort.6X` (or NetCDF gather path) |
 
@@ -159,7 +227,7 @@ GWCE iterative residual/dot products globally reduced via `psdot/ps2dots/ps3dots
 1. **`partmesh.txt` is per-node** — METIS output with one PE id per global node.
 2. **fort.80 has node/element maps + counts** — but boundary halo metadata is in per-PE fort.18, not fort.80.
 3. **Halo updates are point-to-point** (IRECV/ISEND), not collective. Number of neighbors per PE is small (typically <= 4). <!-- source-needed: neighbor 수 통계 — METIS partition 특성 문헌 또는 실측 인용 필요 -->
-4. **Reductions are infrequent** — only inside JCG iterations for residual checks. Halo exchange dominates communication cost. <!-- source-needed: 성능 단언 — 프로파일/문헌 인용 필요 -->
+4. MPI 조건의 호출에는 `JCG` 밖의 `WetDrySum·WarnElevSum·EarlyTermSum`도 있다 (`[file=src/wetdry.F line=1452]` `#ifdef CMPI`; `[file=src/wetdry.F line=1459]` `call WetDrySum(NCCHANGE)`; `[file=src/timestep.F line=1311]` `call WarnElevSum(WarnElevExceeded)`; `[file=src/timestep.F line=1473]` `call EarlyTermSum( earlyterminate )`). `WetDrySum`은 침수·노출의 `ILump.eq.0` 조건에서 호출한다 (`[file=src/wetdry.F line=1458]` `IF ( ILump.eq.0 ) THEN`; `[file=src/wetdry.F line=1459]` `call WetDrySum(NCCHANGE)`). `WarnElevSum`은 `NSCREEN` 분기의 수위 검사에서 호출한다 (`[file=src/timestep.F line=1246]` `IF(NSCREEN.NE.0) THEN`; `[file=src/timestep.F line=1311]` `call WarnElevSum(WarnElevExceeded)`; `[file=src/timestep.F line=1333]` `call WarnElevSum(ErrorElevExceeded)  ! Clint's Zombie Slayer 2010.08.07`). `EarlyTermSum`은 `VELCHECK` 경로에서 호출한다 (`[file=src/timestep.F line=1417]` `#ifdef VELCHECK`; `[file=src/timestep.F line=1473]` `call EarlyTermSum( earlyterminate )`). 확인하지 않음: halo와 reduction의 통신 비용 비교. <!-- source-needed: 성능 단언 — 프로파일/문헌 인용 필요 -->
 5. **Re-running adcprep --partmesh** overwrites partmesh.txt; run --prepall after to refresh PE####/. Don't mix old partmesh + new prepall.
 
 ## Common Pitfalls

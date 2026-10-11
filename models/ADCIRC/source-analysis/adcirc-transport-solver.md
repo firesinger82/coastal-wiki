@@ -3,6 +3,7 @@ title: "ADCIRC 3D 스칼라 transport solver source-analysis — transport.F/TRA
 topic: adcirc-transport-solver
 canonical_source: self
 citation_status: verified
+last_source_check: 2026-10-11 (recovery 재판독 대조)
 has_source_needed: false
 verification_method: "ADCIRC raw source 직접 read: src/transport.F(1497, v45.12) — Alp4 semi-implicit DTAlp4/DT1MAlp4(:31-32)·ADC_TRIDAG2 tridiag 호출(:1182) file:line 직접 검증. dispatch vsmy.F:1550-1555. 소스 banner Luettich-Westerink. ★adcirc-3d-mode:59 가 transport 를 vsmy.F:1545-1545 로 오귀속(정정)."
 note_author: "Claude Opus 4.8 (1M context)"
@@ -28,7 +29,7 @@ related:
 | `TRANS_3D(inarray,diffhoriz,diffvert,outarray,field,TimeLoc)` | 44-1229 | 한 스칼라장 advection-diffusion 메인 |
 | `ADC_TRIDAG2(A,B,C,R,U,N)` | 1231-1272 | Thomas 연직 tridiagonal solver |
 | `CROSSPRODUCT` | 1274-1316 | 벡터 외적(geometry/normal) |
-| `cubic_vertical_interpolation` | 1318-1497 | 이웃노드 sigma 준위로 cubic 보간(수심다른 노드간 수평구배용) |
+| `cubic_vertical_interpolation` | 1318-1497 | TRANS_3D는 `verticalInterpolationSchemeID==VERTICAL_INTERPOLATION_LINEAR`에서 `linear_vertical_interpolation_real`을 호출한다 (`src/transport.F:252` `IF( verticalInterpolationSchemeID==VERTICAL_INTERPOLATION_LINEAR )THEN`; `src/transport.F:253` `CALL linear_vertical_interpolation_real (`; `src/transport.F:266` `IF( verticalInterpolationSchemeID==VERTICAL_INTERPOLATION_LINEAR )THEN`; `src/transport.F:267` `CALL linear_vertical_interpolation_real (`). 그 `ELSE` 경로는 `cubic_vertical_interpolation`을 호출한다 (`src/transport.F:256` `ELSE ! Default`; `src/transport.F:257` `CALL cubic_vertical_interpolation( inarray_vertical,`; `src/transport.F:270` `ELSE ! Default`; `src/transport.F:271` `CALL cubic_vertical_interpolation( inarray_vertical,`). 두 루틴의 내부는 이 호출 흐름 판독의 3단계 경계다. |
 
 ## 1. Alp4 semi-implicit 연직 시간가중 (:31-32) ★GWCE 와 다른 스킴
 ```fortran

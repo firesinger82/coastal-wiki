@@ -144,10 +144,13 @@ Delft3D 487(기계 sweep 실패 471 + 웹 16, 09-22 스냅샷 교체 전 경로)
 - 흐름 분석(10-11, Codex `gpt-6.1-sol`): `flow/ADCIRC-callflow.md`. driver.F → ADCIRC_Init → ADCIRC_Run → TIMESTEP의 직접 호출 64행과 2단계 호출, 변수 생산·소비 37행, 문서(code_architecture.rst·DevGuide·SDD)와 노트 대조, 노트 수정안. mermaid 2개(초기화·시간 반복, TIMESTEP 내부)를 렌더해 확인했고, 상자의 `src/파일:줄` 100개를 원문과 대조했다.
   - 기계 확인: 인용 6,553개 일치. `citecheck_path.py`에 '`이름` `경로:줄`'(정의 위치) 형식을 추가했다. 이 형식은 앞 이름이 그 줄에 있으면 통과하므로 뒤 인용의 오기를 놓칠 수 있다.
   - sonnet 표본 18행: 맞음 16, 부분 2, 틀림 0. 맞음 중 1행(F:1430)은 호출 사슬 일부를 끝까지 따라가지 않았다. 부분 2(핫스타트 분기를 둘로 적음, 마찰 노트 대조의 이유 부족)를 원문 확인 후 정정·보완(`[10-11 검증 정정]`·`[10-11 검증 보완]`).
-- 아직 하지 않은 것: 노트 반영. 모델 실행.
+- 노트 반영(10-11, Codex `gpt-6.1-sol` 3개 동시, 노트 묶음을 겹치지 않게 나눔): 노트 35개를 고쳤다. 반영 기록은 `flow/ADCIRC-notes-apply-{A,B,C}.md`다. 대조 보고서 5종과 흐름 보고서의 수정안 행 ID를 모두 처리했다. 처리하지 않은 행은 보고서가 "판정하지 못한 세부 주장"·"판정을 제한한 항목"·"수정 불필요"로 둔 행뿐이다(스크립트로 대조). 새 절: `adcirc-timestep-orchestration.md` 시간 단계 호출 흐름(mermaid 2개, 렌더 확인), `adcirc-fort-files-reference.md` 문서와 코드 입력 차이, `adcirc-output-writers-implementation.md` 문서와 코드 출력 차이, `04-theory-pdf-v44xx.md` 이론 식 차이.
+  - 기계 확인: 노트의 `[file=경로 line=N]` 형식을 `경로:N`으로 바꾼 임시 사본에서 `citecheck_path.py`로 인용 약 7,000개를 대조했다. 불일치는 이번에 고치지 않은 기존 줄 1건(검사 짝짓기 오판)이다. `tools/validate-all.sh` 통과.
+  - sonnet 표본 24줄(추가된 1,144줄에서 무작위): 맞음 20, 부분 4(핫스타트 레코드 순서 표현, XDMF tau의 `NOLIBF=0` 조건, RaysIce·IceCube의 max·음수 분기 누락). 4건 모두 원문을 열어 확인하고 고쳤다. 표본 밖에도 조건 누락이 남아 있을 수 있다.
+- 아직 하지 않은 것: 모델 실행. 문서와 코드 차이 중 어느 쪽이 맞는지 판정.
 
 ## 다음에 이어서 할 일
 
 1. ~~매뉴얼과 코드 판독 기록 대조~~ — 10-03 완료(`compare/XBeach-manual-vs-code.md`, 노트 반영 `1da8d89`).
 2. ~~XBeach 파일 간 계산 흐름 분석~~ — 10-07 완료(`flow/XBeach-callflow.md`, 노트 반영 `d89cd8b`). 판독 기록 검색은 `wiki_search` `path_class="records"`(`ce7b3ae`).
-3. 다른 10개 모델(SFINCS·EFDC 완료, ADCIRC 판독·대조·흐름 분석 완료, 노트 반영 남음, 나머지 9개 미착수): 같은 방식(고정 목록 → 1행/1쪽 판독 → 기계 확인 → 다른 모델 검증).
+3. 다른 10개 모델(SFINCS·EFDC 완료, ADCIRC 완료, 나머지 9개 미착수): 같은 방식(고정 목록 → 1행/1쪽 판독 → 기계 확인 → 다른 모델 검증).

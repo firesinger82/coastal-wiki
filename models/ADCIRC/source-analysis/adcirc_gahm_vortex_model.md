@@ -12,6 +12,7 @@ related:
   - models/ADCIRC/README.md
   - models/ADCIRC/source-analysis/adcirc-met-forcing-implementation.md
   - models/ADCIRC/source-analysis/storm-surge/adcirc-storm-surge-nws-families.md
+last_source_check: 2026-10-11 (recovery 재판독 대조)
 ---
 
 # GAHM 비대칭 Holland 바람 모델 (gahm 라이브러리)
@@ -19,6 +20,13 @@ related:
 > 요약(`models/ADCIRC/raw/source_code/gahm/src/`). GAHM = **Generalized Asymmetric Holland Model**. ATCF best-track 4분면 isotach를 입력받아 폭풍별 **분면-개별 GAHM Holland B·radius-to-max-wind**를 Newton-Raphson으로 풀고(`gahm/`+`preprocessor/`), 임의 점군에서 경도풍 합성·기압장을 만드는(`vortex/`) C++ 라이브러리. Fortran 바인딩(`fortran/gahm.F90`)으로 ADCIRC와 결합되며 OWI 격자바람(NWS12/13)도 출력 가능(`output/OwiOutput`). Author: Zach Cobell (The Water Institute), GPLv3, ADCIRC Development Group (예: `gahm/GahmSolver.cpp:1-19`).
 
 ADCIRC NWS 외력 패밀리 전반은 [[adcirc-storm-surge-nws-families]], met-forcing 적용 맥락은 [[adcirc-met-forcing-implementation]] 참조. 본 노트는 gahm 라이브러리의 **방정식·솔버·합성 알고리즘** 자체를 다룬다.
+본 노트의 방정식·수렴 허용오차·전처리 설명은 외부 gahm C++ 라이브러리에 한정한다. 외부 C++ 내부는 이번 recovery 대조에서 확인하지 않음.
+
+ADCIRC v56.2.1의 NWS=20 Fortran 경로는 `NWS20GET`을 호출한다. (`src/wind.F:1502` `IF(NWS.EQ.20) THEN`; `src/wind.F:1503` `CALL NWS20GET(wvnx2, wvny2, prn2, timeloc)`)
+
+이 Fortran 경로의 수치 조건은 `src/wind.F`, `wind/vortex.F`, `wind/aswip.F`로 별도 인용한다. (`wind/vortex.F:401` `if (abs(B_new-B_new1).le.0.01d0) then`; `wind/vortex.F:412` `if (abs(B-B_new).le.0.01d0) then`; `wind/aswip.F:561` `stormMotion = 1.5d0 * h_speed(ient)**0.63d0`)
+
+두 구현의 수치 조건을 서로 옮겨 적지 않는다.
 
 ---
 
@@ -96,6 +104,10 @@ $$p(r) = p_c + (p_{bk} - p_c)\, e^{-\phi (r_m/r)^{b_g}}$$
 - Rmax 초기추정 `estimateRmax` (아래 3.3).
 - B 초기값 = 전통 Holland B (`calcHollandB`, `GahmSolver.cpp:58`).
 - $\phi$ 초기 1.0, B 수렴 tol `1e-9`, 최대 반복 200 (`GahmSolver.cpp:59-61`).
+- ADCIRC Fortran 반복의 B 변화 허용오차는 0.01이다. (`wind/vortex.F:401` `if (abs(B_new-B_new1).le.0.01d0) then`; `wind/vortex.F:412` `if (abs(B-B_new).le.0.01d0) then`)
+- GAHM 문서는 B와 Phi가 모두 수렴할 때까지 반복한다고 적는다. (`docs/user_guide/model_configuration/meteorological_forcing/generalized_asymmetric_holland_model.rst:487` ``:math:`\varphi` can be solved iteratively from (9) and (11) until both converge,``)
+- Fortran의 이 비교는 Phi 변화량을 따로 검사하지 않는다. (`wind/vortex.F:401` `if (abs(B_new-B_new1).le.0.01d0) then`; `wind/vortex.F:412` `if (abs(B-B_new).le.0.01d0) then`)
+- 위 C++의 `1e-9` 설명은 외부 gahm 구현 범위에 남긴다. 외부 C++ 원문은 이번 recovery 대조에서 확인하지 않음.
 
 `solve()` 루프(`gahm/GahmSolver.cpp:68-92`):
 1. `GahmRadiusSolver::solve(1.0, isotach_radius, guess)` → 새 rmax (Newton-Raphson, 하한 1, 상한 isotach 반경).
@@ -174,6 +186,11 @@ isotach 파싱(`AtcfSnap.cpp:361-385`): `tokens[11]` isotach 풍속(kt→m/s). *
 snap 쌍 위치차를 `Earth::sphericalDx`(haversine 분해, `Earth.h:174-182`)로 u·v 거리 산출, $dt$로 나눠 속도. 방향 `atan2(u, v)` (북기준, `Preprocessor.cpp:249`). 합성 이동속도에 **경험식 변환** 적용(`Preprocessor.cpp:254`):
 
 $$U_{trans} = 1.5\, U_{raw}^{0.63}$$
+현재 Fortran도 원 이동속도를 경험식 보정 이동속도로 바꾼다. (`wind/aswip.F:561` `stormMotion = 1.5d0 * h_speed(ient)**0.63d0`; `src/wind.F:6193` `stormMotion = 1.5d0*(SQRT(uTransNow**2.d0+vTransNow**2.d0))**0.63d0`)
+
+GAHM 문서의 VT는 연속 중심 위치에서 계산한 이동속도다. (`docs/user_guide/model_configuration/meteorological_forcing/generalized_asymmetric_holland_model.rst:390` ``:math:`\overrightarrow{V_T}` is the storm translational speed calculated from``; `docs/user_guide/model_configuration/meteorological_forcing/generalized_asymmetric_holland_model.rst:391` ``successive storm center locations, :math:`W_{rf} = 0.9` is the wind reduction``)
+
+해석: 원 이동속도와 경험식 보정 이동속도를 구분하면 문서 식 (14)·(17)의 입력 차이가 드러난다(정적 판독, 실행 미확인). (`docs/user_guide/model_configuration/meteorological_forcing/generalized_asymmetric_holland_model.rst:382` `V_{max} = \vert \frac{\overrightarrow{V_M} - \gamma\overrightarrow{V_T}}{W_{rf}} \vert = \frac{V_M - \gamma V_T}{W_{rf}} \quad (14)`; `docs/user_guide/model_configuration/meteorological_forcing/generalized_asymmetric_holland_model.rst:443` `& = \frac{\vert\overrightarrow{V_{isot}} - \gamma\overrightarrow{V_T}  \vert}{W_{rf}}`; `wind/aswip.F:561` `stormMotion = 1.5d0 * h_speed(ient)**0.63d0`)
 
 첫 snap은 다음 snap으로, 그 외는 이전 snap과의 차로 forward/backward 차분(`Preprocessor.cpp:206-222`).
 
@@ -182,6 +199,15 @@ $$U_{trans} = 1.5\, U_{raw}^{0.63}$$
 - snap vmax: 10m → 경계층 = `× tenMeterToTopOfBoundaryLayer()` = `1/0.9 ≈ 1.111` (`Preprocessor.cpp:319-320`, `Constants.h:74-82`), 이후 이동속도 제거.
 - isotach 분면 풍속: `removeTranslationVelocity`로 이동성분 차감(scaling = `min(1, ws/vmax)`, `Preprocessor.cpp:307-312`) 후 경계층 변환(`Preprocessor.cpp:325-335`).
 - **참고**: 분면별 회전 기반 제거(`removeTranslationVelocity(.., quadrant, ..)`)는 현재 본문이 주석처리되고 `wind_speed`를 그대로 반환 — `// TODO`/실험 상태(`Preprocessor.cpp:271-297`).
+ASWIP 기본 approach=2 경로는 회전각을 만든다. (`wind/aswip.F:2828` `approach=2           ! set both Vr and quadrantVr tangential to azimuth`; `wind/aswip.F:677` `quadrantvecangles(i) = quadrantAngles(i)+`; `wind/aswip.F:678` `&             (90.0d0+quadrotateAngle(i))*deg2rad`)
+
+이 경로는 이동 벡터를 제거한 크기를 계산한다. (`wind/aswip.F:706` `quadrantVr(i) = sqrt(`; `wind/aswip.F:707` `&                   (U_Vr - gamma(i)*stormMotionU)**2.0d0`; `wind/aswip.F:708` `&                  +(V_Vr - gamma(i)*stormMotionV)**2.0d0`; `wind/aswip.F:709` `&                  )/windReduction`)
+
+Fortran 유입각의 r<Rmax 구간은 `10.0d0 * r/rmx`다. (`wind/vortex.F:1148` `fang = 10.0d0 * r/rmx`)
+
+rst 식 (16)은 이 구간의 유입각을 상수 10°로 적는다. (`docs/user_guide/model_configuration/meteorological_forcing/generalized_asymmetric_holland_model.rst:424` `10^{\circ}, & r<R_{max} \\`)
+
+위 외부 C++의 비활성 블록 설명은 이 ASWIP 경로에 적용하지 않는다.
 
 ### 5.5 분면별 솔버 구동 (`Preprocessor.cpp:68-102`)
 
@@ -215,6 +241,15 @@ $$U_{trans} = 1.5\, U_{raw}^{0.63}$$
 `getInterpolatedPack`(`Vortex.cpp:158-177`): 두 시각 각각에서 점위치 파라미터팩을 만들고 시간 선형보간.
 
 `getBaseQuadrant`(`Vortex.cpp:315-340`): 방위각을 45°/135°/225°/315° 경계로 분면 0~3 + delta_angle 산출. `getBaseIsotach`(`Vortex.cpp:349-370`): 거리에 대해 해당 분면 isotach 반경 배열에서 lower_bound로 isotach 인덱스+가중. 거리가 최외곽 isotach 밖이면 최외곽, 안쪽이면 0.
+Fortran 각도 보간은 절대 azimuth가 아니라 사분면의 delta_angle을 쓴다. (`wind/vortex.F:973` `spInterp = ( temp1/delta_angle**2.d0`; `wind/vortex.F:974` `&             + temp2/(90.0-delta_angle)**2.d0 )`)
+
+Fortran 반경 보간에서 `(r-R64)/(R50-R64)`는 P50의 가중치다. (`wind/vortex.F:1008` `fac = (r-QuadIr4(quad,2))/`; `wind/vortex.F:1009` `&               (QuadIr4(quad,1)-QuadIr4(quad,2))`; `wind/vortex.F:1010` `interpR = val(quad,1)* fac+`; `wind/vortex.F:1011` `&         val(quad,2)* (1-fac)`)
+
+Fortran 반경 보간에서 `(r-R50)/(R34-R50)`는 P34의 가중치다. (`wind/vortex.F:1013` `fac = (r-QuadIr4(quad,3))/`; `wind/vortex.F:1014` `&               (QuadIr4(quad,2)-QuadIr4(quad,3))`; `wind/vortex.F:1015` `interpR = val(quad,2)* fac+`; `wind/vortex.F:1016` `&         val(quad,3)* (1-fac)`)
+
+Fortran의 바깥 유지 조건은 r>R34다. (`wind/vortex.F:1005` `if (r > QuadIr4(quad,1)) then`; `wind/vortex.F:1006` `interpR = val(quad,1)`)
+
+이 Fortran 보간은 rst 식 (20)·(22)의 가중치·괄호·IV 부등호와 구분한다. (`docs/user_guide/model_configuration/meteorological_forcing/generalized_asymmetric_holland_model.rst:545` `P(\theta,d)=\frac{P(quad(i),d)(90-\theta)^2+P(quad(i+1),d)\theta^2}{(90-\theta)^2+\theta^2} \quad (20)`; `docs/user_guide/model_configuration/meteorological_forcing/generalized_asymmetric_holland_model.rst:577` `\mathrm{II}. & R_{64}\le r<R_{50} &  f_{64}=(r-R_{64})/(R_{50}-R_{64}),f_{50}=(R_{50}-r)/(R_{50}-R_{64}), f_{34}=0 \\`; `docs/user_guide/model_configuration/meteorological_forcing/generalized_asymmetric_holland_model.rst:578` `\mathrm{III}. & R_{50}\le r<R_{34} &  f_{64}=0,f_{50}=(r-R_{50}/(R_{34}-R_{50})),f_{34}=(R_{34}-r/(R_{34}-R_{50})) \\`; `docs/user_guide/model_configuration/meteorological_forcing/generalized_asymmetric_holland_model.rst:579` `\mathrm{IV}. & r \le R_{34} & f_{64}=0,f_{50}=0,f_{34}=1`; `wind/vortex.F:973` `spInterp = ( temp1/delta_angle**2.d0`; `wind/vortex.F:1008` `fac = (r-QuadIr4(quad,2))/`; `wind/vortex.F:1013` `fac = (r-QuadIr4(quad,3))/`; `wind/vortex.F:1005` `if (r > QuadIr4(quad,1)) then`)
 
 분면 방향 보간 `interpolateParameterPackRadial`(`Vortex.cpp:490-513`) — **역제곱 거리 가중**:
 
@@ -247,7 +282,13 @@ C API(`extern "C"`, `gahm_fortran.cpp:71-83`):
 
 Fortran 측(`fortran/gahm.F90`): `gahm_t`(핸들 래퍼)·`date_t` 파생형, `iso_c_binding` interface로 위 C 함수 바인딩(`gahm.F90:21-89`). `gahm_initialize`가 파일·점군으로 인스턴스 생성, `gahm_get`이 (u,v,p) 조회(`gahm.F90:141-165`). 출력 단위: u,v는 m/s(10분 풍), p는 mb(§6.2의 /100).
 
-ADCIRC fort.15 NWS 외력 패밀리에서 GAHM 호출(NWS13 등) 맥락은 [[adcirc-storm-surge-nws-families]] 참조.
+NWS=20은 `NWS20GET`을 호출한다. (`src/wind.F:1502` `IF(NWS.EQ.20) THEN`; `src/wind.F:1503` `CALL NWS20GET(wvnx2, wvny2, prn2, timeloc)`)
+
+결합 NWS=30도 `NWS20GET`을 호출한다. (`src/wind.F:1553` `case(30)`; `src/wind.F:1554` `CALL NWS20GET(vortexWVNX2,vortexWVNY2,vortexPRN2,timeloc)`)
+
+NWS=13은 OWI NetCDF reader를 사용한다. (`src/wind.F:2045` `CALL NWS13INIT(0.D0,W)`; `src/wind.F:2046` `CALL NWS13GET(WTIME1,WVNX1,WVNY1,PRN1,`; `docs/user_guide/model_configuration/meteorological_forcing/nws13.rst:208` `*&owiWindNetcdf* fort.15 namelist with all inputs quoted as strings`; `docs/user_guide/model_configuration/meteorological_forcing/nws13.rst:214` `-  *NWS13File*: optional file name for netCDF file ( *fort.22.nc* default )`)
+
+ADCIRC NWS 외력 패밀리는 [[adcirc-storm-surge-nws-families]]를 참조한다.
 
 ---
 

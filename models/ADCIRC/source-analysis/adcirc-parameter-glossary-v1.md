@@ -12,6 +12,7 @@ verification_date: 2026-07-10
 related:
   - models/ADCIRC/source-analysis/adcirc-fort-files-reference.md
   - models/ADCIRC/source-analysis/adcirc-parallel-implementation.md
+last_source_check: 2026-10-11 (recovery 재판독 대조)
 ---
 
 # ADCIRC Parameter Glossary V1
@@ -55,7 +56,11 @@ It is intentionally narrow. The goal is to stabilize vocabulary before the first
 
 - `tau0`
   - weighting applied to the primitive continuity equation within the generalized wave continuity formulation (`tau0.rst:12-19` — "the weighting factor that determines the relative contribution of the primitive and wave portions of the GWCE")
-  - 수심이 얕을수록 높은 값 사용이 공식 값표에 내장 (`tau0.rst:204-214`: `TAU0=-1` → depth≥10 에서 0.005, depth<10 에서 0.020; `TAU0=-2` → depth≥200 에서 0.005, 1<depth<200 에서 1/depth, depth<1 에서 1) — 이전 판의 익명 'FAQ guidance' 인용을 공식 문서로 대체
+  - 현행 RST는 TAU0=-1의 `depth >= 10`에 0.005를 적는다. (`docs/user_guide/model_configuration/model_parameters/tau0.rst:204` ``` -  ``If depth >= 10; then``\ :math:`\tau_0`\ ``= 0.005`` ```)
+  - v56.2.1 코드는 `IF(Depth.LE.10.) Tau0NodalValue=0.020d0`과 `IF(Depth.GT.10.) Tau0NodalValue=0.005d0`을 사용한다. (`src/nodalattr.F:2158` ` IF(Depth.LE.10.) Tau0NodalValue=0.020d0 `; `src/nodalattr.F:2159` ` IF(Depth.GT.10.) Tau0NodalValue=0.005d0 `)
+  - TAU0=-2의 코드 조건은 `(Depth.LT.200.).AND.(Depth.GE.1.)`이다. (`src/nodalattr.F:2152` ` IF((Depth.LT.200.).AND.(Depth.GE.1.)) THEN `; `src/nodalattr.F:2153` ` Tau0NodalValue=1./Depth `)
+  - 현행 RST의 `1 < depth < 200` 설명은 수심 1을 빠뜨린다. (`docs/user_guide/model_configuration/model_parameters/tau0.rst:213` ``` -  ``If 1 < depth < 200; then``\ :math:`\tau_0`\ ``= 1/depth`` ```; `src/nodalattr.F:2152` ` IF((Depth.LT.200.).AND.(Depth.GE.1.)) THEN `)
+  - TAU0=-2.1이 -2와 같은 수심 계수식을 쓰는지는 확인하지 않음. (`src/nodalattr.F:2149` ` IF (Scheme.eq.-2.d0) THEN `)
   - should become one of the first logged parameters in stability experiments
 - `WarnElev`
   - warning threshold for large free-surface elevation (`global.F:86` verbatim: "elevation at which a warning is issued"; fort.69 dump 제어 `global.F:87-90`)

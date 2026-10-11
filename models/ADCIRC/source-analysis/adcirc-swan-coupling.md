@@ -9,6 +9,7 @@ note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) �
 note_date: 2026-04~05 (original) / 2026-05-23 (promote) / 2026-05-28 (PR #498 절)
 verification_by: "사용자 + codex source-code analysis + Claude Opus 4.7 (1M context) — PR #498 GitHub API 직접 fetch"
 verification_date: 2026-04 (base) / 2026-05-28 (PR #498)
+last_source_check: 2026-10-11 (recovery 재판독 대조)
 ---
 
 ## Scope
@@ -52,6 +53,7 @@ SWAN-side hooks activated by `switch.pl -adcirc` — only present in coupled bin
 - ADCIRC runs every `DT`; SWAN `DT` imported as `SWAN_DT` (`couple2swan.F:950, 965`).
 - **Coupling interval = integer ratio** `SWAN_DT / DT` (`:1103-1105`).
 - ADCIRC calls SWAN only on that interval (`adcirc.F:475-483`).
+- 이번 단계의 `PADCSWAN_RUN`은 TIMESTEP 뒤에 있다. (`src/adcirc.F:476` `CALL TIMESTEP(ITIME,TimeLoc)`; `src/adcirc.F:481` `IF(MOD(ITIME,CouplingInterval).EQ.0)THEN`; `src/adcirc.F:482` `CALL PADCSWAN_RUN(ITIME)`)
 - During SWAN run, interpolation midpoint used for time-centering (`couple2swan.F:1241-1243`); `SWMAIN` 호출은 temporal control gate 안(`:1245-1247`).
 
 **Note**: there is **no `CWTIM_INC` symbol** in this tree; coupling interval comes from SWAN `TIMECOMM:DT` block divided by ADCIRC `DT`.
@@ -59,9 +61,17 @@ SWAN-side hooks activated by `switch.pl -adcirc` — only present in coupled bin
 ## C. SWAN → ADCIRC (radiation stress)
 
 1. SWAN spectra integrated into `ADCIRC_SXX/SXY/SYY` (`couple2swan.F:112-119, 177-196`).
-2. Gradients converted to nodal wave forces in `SWAN_RSNX2/SWAN_RSNY2` (`:360-364, 399-404, 421-427`).
+2. SWAN 파력은 방사 응력의 음의 발산이다. (`src/couple2swan.F:399` `SWAN_RSNX2(IP) = SWAN_RSNX2(IP) + 0.5d0*AREAS(NEITABELE(IP,IE))`; `src/couple2swan.F:400` `&                     * ( - DSXXDX(NEITABELE(IP,IE))`; `src/couple2swan.F:401` `&                         - DSXYDY(NEITABELE(IP,IE)) )`; `src/couple2swan.F:402` `SWAN_RSNY2(IP) = SWAN_RSNY2(IP) + 0.5d0*AREAS(NEITABELE(IP,IE))`; `src/couple2swan.F:403` `&                     * ( - DSXYDX(NEITABELE(IP,IE))`; `src/couple2swan.F:404` `&                         - DSYYDY(NEITABELE(IP,IE)) )`)
+   - SWANOutputControl은 현재 일곱 출력의 on/off를 제어한다. (`src/read_input.F:456` `namelistSpecifier = 'SWANOutputControl'`; `src/read_input.F:457` `read(unit=15,nml=SWANOutputControl,iostat=ios,iomsg=ios_nml_error_msg)`; `src/couple2swan.F:746` `SWAN_OutputAgg(1) = SWAN_OutputHS`; `src/couple2swan.F:747` `SWAN_OutputAgg(2) = SWAN_OutputDIR`; `src/couple2swan.F:748` `SWAN_OutputAgg(3) = SWAN_OutputTM01`; `src/couple2swan.F:749` `SWAN_OutputAgg(4) = SWAN_OutputTPS`; `src/couple2swan.F:750` `SWAN_OutputAgg(5) = SWAN_OutputWIND`; `src/couple2swan.F:751` `SWAN_OutputAgg(6) = SWAN_OutputTM02`; `src/couple2swan.F:752` `SWAN_OutputAgg(7) = SWAN_OutputTMM10`; `src/couple2swan.F:770` `IF(.NOT.SWAN_OutputAgg(IW))CYCLE`)
+   - 현재 등록한 출력은 HS·DIR·TM01·TPS·WIND·TM02·TMM10이다. (`src/couple2swan.F:727` `Names(1) = "HS"`; `src/couple2swan.F:728` `Names(2) = "DIR"`; `src/couple2swan.F:729` `Names(3) = "TM01"`; `src/couple2swan.F:730` `Names(4) = "TPS"`; `src/couple2swan.F:731` `Names(5) = "WIND"`; `src/couple2swan.F:732` `Names(6) = "TM02"`; `src/couple2swan.F:733` `Names(7) = "TMM10"`)
+   - 새 출력의 추가는 couple2swan.F 등록과 GLOBAL 집계 플래그 및 입력 제어와 출력 descriptor를 함께 확인한다. (`src/global.F:318` `LOGICAL                      :: SWAN_OutputAgg(7)`; `src/couple2swan.F:725` `IF(.NOT.ALLOCATED(IGSW))  ALLOCATE(IGSW(1:NumSwanOutput))`; `src/couple2swan.F:727` `Names(1) = "HS"`; `src/read_input.F:457` `read(unit=15,nml=SWANOutputControl,iostat=ios,iomsg=ios_nml_error_msg)`)
+   - 문서의 only four 제한은 현재 일곱 항목 등록과 다르다. (`docs/user_guide/tips_and_tricks/coupled_adcirc_swan.rst:163` `existing SWAN output that you'd like to modify. Keep in mind that you only have`; `docs/user_guide/tips_and_tricks/coupled_adcirc_swan.rst:164` `four existing files to work with here, so that is ultimately your limit on`; `docs/user_guide/tips_and_tricks/coupled_adcirc_swan.rst:165` `output parameters as well. You may want to consider renaming your output files`; `src/couple2swan.F:727` `Names(1) = "HS"`; `src/couple2swan.F:733` `Names(7) = "TMM10"`)
+   - 출력 파일명은 write_output.F와 couple2swan.F 두 위치에 있다. (`src/write_output.F:5884` `SwanHSDescript % file_basename        = "swan_HS"`; `src/couple2swan.F:735` `FileName(1) = "swan_"//TRIM(Names(1))//".63"//"       "`)
 3. ADCIRC extrapolates/interpolates into `RSNX2/RSNY2` for `NRS=3` (`timestep.F:699-707`).
-4. Added to wind stress in momentum (`timestep.F:725-729`).
+4. ADCIRC는 SWAN 파력을 풍응력 항에 더한다. (`src/timestep.F:728` `WSX2(I) = WSX2(I) + RSX`; `src/timestep.F:729` `WSY2(I) = WSY2(I) + RSY`)
+1999_Luettich02.pdf는 Rx·Ry를 양의 발산으로 정의하고 운동량 우변에 더한다. (`raw/manuals/pdfs/1999_Luettich02.pdf, PDF 쪽 3 / 인쇄 쪽 2`)
+
+1999년 문서와 v56.2.1 코드의 부호 차이를 기록한다. 어느 쪽이 맞는지는 이 대조에서 단정하지 않는다.
 
 ## D. ADCIRC → SWAN (water level, currents, wind)
 

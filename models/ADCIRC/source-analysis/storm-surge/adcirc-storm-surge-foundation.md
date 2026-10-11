@@ -13,6 +13,7 @@ related:
   - concepts/storm-surge/01-concept.md
   - concepts/storm-surge/02-theory.md
   - models/ADCIRC/raw/source_code/adcirc/src/
+last_source_check: 2026-10-11 (recovery 재판독 대조)
 ---
 
 # ADCIRC Storm Surge Foundation
@@ -92,8 +93,15 @@ Relevant official options for surge-related work include (`docs/user_guide/model
 - `NWS = 12`
   - OWI gridded wind and pressure (rst:298)
 - `NWS = 13`
-  - OWI NetCDF gridded wind/pressure — **코드 정본**: `read_input.F:1796-1796`(owiWindNetcdf namelist 필수)·`read_input.F:4749`("OWI Netcdf (NWS13) format wind/pres used"), reader = [[adcirc-met-forcing-implementation]] §D
-  - ★**code≠docs divergence (2026-07-10 판정)**: 원문 "ramped meteorological forcing" 은 오기가 아니라 `nws_parameters.rst:308-310`("Similar to NWS=5... ramping... WRAMP") 의 충실한 전사였음 — 그러나 **그 rst 서술 자체가 코드와 divergent(stale)**. 소스가 물리·기능 정본.
+  - NWS=13 상세 문서는 OWI NetCDF 입력을 정의한다. (`docs/user_guide/model_configuration/meteorological_forcing/nws13.rst:65` `**NetCDF4 File** contents:`; `docs/user_guide/model_configuration/meteorological_forcing/nws13.rst:67` `-  Group(s) – 1 group per grid or overlay`; `docs/user_guide/model_configuration/meteorological_forcing/nws13.rst:68` `-  Variables – U10/V10, PSFC`)
+  - fort.15 namelist 이름은 `owiWindNetcdf`이다. (`docs/user_guide/model_configuration/meteorological_forcing/nws13.rst:208` `*&owiWindNetcdf* fort.15 namelist with all inputs quoted as strings`; `src/read_input.F:534` `read(unit=15,nml=owiWindNetcdf,iostat=ios,iomsg=ios_nml_error_msg)`)
+  - NWS13ColdStartString sentinel 검사는 `IF(NWS.EQ.13)THEN`에서만 실행한다. (`src/read_input.F:1796` `IF(NWS.EQ.13)THEN`; `src/read_input.F:1797` `IF(INDEX(NWS13ColdStartString,"99999999.999999").GT.0)THEN`; `src/read_input.F:1799` `&                  message="NWS13ColdStartString must be set in the owiWindNetcdf namelist in the fort.15 file.")`)
+  - 이 시점에는 NCICE만 분리했다. (`src/read_input.F:1775` `NCICE = INT(ABS(NWS)/1000)`; `src/read_input.F:1776` `NWS = INT(ABS(NWS)-NCICE*1000)*INT(NWS/ABS(NWS))  !RESETTING NWS/NRS`; `src/read_input.F:1796` `IF(NWS.EQ.13)THEN`)
+  - 코드는 이 검사 뒤에 NRS를 분리한다. (`src/read_input.F:1829` `NRS=ABS(NWS/100)`; `src/read_input.F:1830` `NWS=(ABS(NWS)-NRS*100)*(NWS/ABS(NWS))`)
+  - nws_parameters.rst의 NWS=13 개요는 NWS=5 계열의 ramp와 WRAMP를 설명한다. (`docs/user_guide/model_configuration/meteorological_forcing/nws_parameters.rst:308` `**NWS = 13, -13**`; `docs/user_guide/model_configuration/meteorological_forcing/nws_parameters.rst:309` `Similar to NWS = 5/-5, but applies a ramping function to the meteorological inputs. Wind velocity and atmospheric pressure are read in at all grid nodes from the Single File Meteorological Forcing Input File. The positive/negative convention for time reference is the same as with NWS = 5/-5. The meteorological forcing is ramped up over a user-specified time period using the WRAMP parameter.`)
+  - 이 개요는 v56.2.1의 OWI NetCDF reader와 다르다. (`src/wind.F:2045` `CALL NWS13INIT(0.D0,W)`; `src/wind.F:2046` `CALL NWS13GET(WTIME1,WVNX1,WVNY1,PRN1,`)
+  - 같은 현행 문서의 nws13.rst는 OWI NetCDF와 owiWindNetcdf를 정의한다. (`docs/user_guide/model_configuration/meteorological_forcing/nws13.rst:65` `**NetCDF4 File** contents:`; `docs/user_guide/model_configuration/meteorological_forcing/nws13.rst:208` `*&owiWindNetcdf* fort.15 namelist with all inputs quoted as strings`)
+  - 이 상세 정의는 코드의 reader와 일치한다. (`src/read_input.F:534` `read(unit=15,nml=owiWindNetcdf,iostat=ios,iomsg=ios_nml_error_msg)`; `src/owiwind_netcdf.F:262` `call check_err(NF90_OPEN(TRIM(ADJUSTL(NWS13File)),NF90_NOWRITE,NC_ID))`)
 - `NWS = 14`
   - GRIB2/NetCDF gridded forcing (rst:311-312)
 - `NWS = 20`

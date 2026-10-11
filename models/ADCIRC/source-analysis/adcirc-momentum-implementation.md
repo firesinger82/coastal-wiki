@@ -3,6 +3,7 @@ title: "ADCIRC momentum.F — 2D 운동량 방정식 solver: barotropic+tidal+ba
 topic: adcirc
 canonical_source: self
 citation_status: verified
+last_source_check: 2026-10-11 (recovery 재판독 대조)
 verification_method: "models/ADCIRC/raw/source_code/adcirc/src/momentum.F (2686) 직접 read — Mom_Eqs_New_NC/New_Conserv/Non_Conserv_pc subroutine + 항 구성(barotropic pressure :385, atm :394, tidal potential :441, baroclinic :473, advection :581-658, wind stress :705-733, VCOEFXX/YY/XY/YX 2×2 implicit :751-772 Coriolis CorifA) + bottom friction TK 식(gwce.F:2479 hybrid) + NOLIBF(timestep.F:129) file:line 인용."
 note_author: "Claude Opus 4.8 (1M context) source-code direct read"
 note_date: 2026-06-03
@@ -52,10 +53,10 @@ depth-integrated 2D 운동량(비보존형) RHS 구성:
 VCOEFXX = DTO2*(TKM(1,I) + SPNGCOEF_X)        ! x-x: friction + sponge
 VCOEFYY = DTO2*(TKM(2,I) + SPNGCOEF_Y)        ! y-y
 CorifA  = CORIF(I) + IFNLCT*TANPHI(I)*UU1(I)  ! Coriolis + 구면 metric(tan φ) 비선형
-VCOEFXY = DTO2*(TKM(3,I) - CorifA)            ! x-y: lateral - Coriolis
-VCOEFYX = DTO2*(TKM(3,I) + CorifA)            ! y-x: lateral + Coriolis
+VCOEFXY = DTO2*(TKM(3,I) - CorifA)            ! x-y: 항력 교차 성분과 코리올리
+VCOEFYX = DTO2*(TKM(3,I) + CorifA)            ! y-x: 항력 교차 성분과 코리올리
 ```
-- `TKM(1/2/3)` = friction+lateral tensor 성분, `CORIF` = f = 2Ωsinφ, `TANPHI` = 구면좌표 metric(고위도 보정).
+- `TKM`은 저면 마찰과 내부파 항력의 행렬 성분이다 (`src/nodalattr.F:2762` `TKM(1,I) = TK(I) + IT_Fric(I,1)`; `src/nodalattr.F:2763` `TKM(2,I) = TK(I) + IT_Fric(I,2)`; `src/nodalattr.F:2764` `TKM(3,I) = IT_Fric(I,3)`). 내부파 항력이 없는 경로는 대각 성분에 `TK`를 대입하고 교차 성분을 0으로 둔다 (`src/nodalattr.F:2777` `TKM(1,:) = TK`; `src/nodalattr.F:2778` `TKM(2,:) = TK`; `src/nodalattr.F:2779` `TKM(3,:) = 0.0d0`). 운동량 분산 보정 루틴은 `IF (NOLIBF.NE.3.OR.HBREAK.LE.0d0) RETURN`에서 반환한다 (`src/nodalattr.F:2818` `IF (NOLIBF.NE.3.OR.HBREAK.LE.0d0) RETURN`). 보정 실행 경로는 `TKM` 대각 성분에 분산 보정을 더한다 (`src/nodalattr.F:2838` `TKM(1,I) = TKM(1,I) + Cd*adju*UVBar/H1`; `src/nodalattr.F:2839` `TKM(2,I) = TKM(2,I) + Cd*adjv*UVBar/H1`). 코리올리는 `VCOEFXY·VCOEFYX`에서 `TKM(3,I)`와 결합한다 (`src/momentum.F:770` `VCOEFXY = DTO2*(TKM(3,I) - CorifA)`; `src/momentum.F:771` `VCOEFYX = DTO2*(TKM(3,I) + CorifA)`).
 - 2×2 [VCOEFXX VCOEFXY; VCOEFYX VCOEFYY] 를 풀어 `(UU2,VV2)` — Coriolis·friction 을 implicit 처리해 안정.
 
 ## 4. Bottom friction TK — hybrid (gwce.F:2479, NOLIBF)
@@ -63,16 +64,16 @@ VCOEFYX = DTO2*(TKM(3,I) + CorifA)            ! y-x: lateral + Coriolis
 ```fortran
 TK = FRIC·( IFLINBF + (|U|/H)·( IFNLBF + IFHYBF·(1+(HBREAK/H)^FTHETA)^(FGAMMA/FTHETA) ) )
 ```
-- `NOLIBF`(timestep.F:129) → `IFLINBF`(0 선형)/`IFNLBF`(1 quadratic)/`IFHYBF`(2 hybrid) 토글.
-- **선형**(NOLIBF=0): `TK=FRIC` (Cf 상수). **quadratic**(1): `TK=FRIC·|U|/H` (= C_d|U|/H). **hybrid**(2): 깊은 물 H≫HBREAK → quadratic, 얕은 물 H<HBREAK → `(HBREAK/H)^FGAMMA` 증가(Manning-like). `FTHETA`/`FGAMMA` 형상, `HBREAK` break depth.
+- `NOLIBF=0·1·2`는 각각 선형 감쇠·이차·혼합 바닥 마찰 분기를 선택한다 (`src/nodalattr.F:2025` `IFLINBF=1`; `src/nodalattr.F:2030` `IFLINBF=0`; `src/nodalattr.F:2035` `IFLINBF=0`). 현재 코드는 `NOLIBF=3`도 허용한다 (`src/read_input.F:1485` `IF((NOLIBF.LT.0).OR.(NOLIBF.GT.3)) THEN`; `src/nodalattr.F:2440` `NOLIBFRIC: IF (NOLIBF.eq.3) THEN`). `NOLIBF=3`의 심해 운동량 분산 보정은 `MLD`와 시간평균 유속을 사용한다 (`src/nodalattr.F:2818` `IF (NOLIBF.NE.3.OR.HBREAK.LE.0d0) RETURN`; `src/nodalattr.F:2825` `UVBar = SQRT(UBar(I)*UBar(I)+VBar(I)*VBar(I))`; `src/nodalattr.F:2828` `Cd = HBREAK*(max(4d-3,MLD(I))**FTHETA - 1d0)`).
+- 기본 바닥 마찰 `TK` 계산은 `MIN`으로 `2.0/DTDP` 상한을 적용한다 (`src/nodalattr.F:2468` `TK(I) = MIN(FRIC(I)*`; `src/nodalattr.F:2469` `&                     (IFLINBF +                                          ! linear`; `src/nodalattr.F:2470` `&                     (UV1/H1) * (IFNLBF +                               ! nonlinear`; `src/nodalattr.F:2471` `&                     IFHYBF*(1+(HBREAK/H1)**FTHETA)**(FGAMMA/FTHETA)) ), ! hybrid`; `src/nodalattr.F:2472` `&                  2.0/DTDP)`). 혼합 바닥 마찰의 인자는 `(1+(HBREAK/H1)**FTHETA)**(FGAMMA/FTHETA)`다 (`src/nodalattr.F:2471` `&                     IFHYBF*(1+(HBREAK/H1)**FTHETA)**(FGAMMA/FTHETA)) ), ! hybrid`). 해석: `(HBREAK/H)^FGAMMA`는 `H`가 `HBREAK`보다 훨씬 작을 때의 근사다 (`src/nodalattr.F:2471` `&                     IFHYBF*(1+(HBREAK/H1)**FTHETA)**(FGAMMA/FTHETA)) ), ! hybrid`).
 - `FRIC` = bottom friction 계수 (`nodalattr.F` Manning's n 또는 fort.13 공간변화). 3 time level: TK0/TK/TK2 (gwce.F:2477-2482).
 - BEDSTR = `H·|U|·TK·ρ` (bed shear N/m², timestep.F:1638-1638).
 
 ## 5. GWCE ↔ momentum 결합
 
-- **semi-implicit 순서**: GWCE([[adcirc-gwce-implementation]]) 가 ζ^{n+1} (TK friction 도 GWCE 행렬에 들어감, gwce.F:442) → momentum 이 ζ gradient 로 U,V^{n+1}.
+- 기본 순서는 GWCE 수위 해 뒤 운동량 해다 (`src/timestep.F:1073` `call solveGWCE(it, ITIME_BGN, timeloc, timeh)`; `src/timestep.F:1107` `call solveMomentumEq()`). 시간 가변 `Tau0` 경로는 2DDI 마찰 텐서의 최대 절대 행합으로 `TK`를 만든다 (`src/gwce.F:437` `IF(C2DDI.AND.`; `src/gwce.F:442` `TK(I) = max(abs(TKM(1,I))+abs(TKM(3,I)),`; `src/gwce.F:443` `&                     abs(TKM(2,I))+abs(TKM(3,I)))`). 이 값은 시간 가변 `Tau0` 계산에 사용한다 (`src/gwce.F:445` `CALL CalculateTimeVaryingTau0(TK, NNeigh, NeiTab, NP)`). 기본 GWCE 좌변은 `TK`를 독립 마찰 강성항으로 직접 넣지 않는다 (`src/gwce.F:516` `GA00DPAvgOAreaIE4 = ALPHAL(IE)*A00*G*DPAvg*Cfac/AreaIE4`; `src/gwce.F:538` `MsFacLOnDiag =OnDiag*AreaIE*(1.d0/DT+Tau0Avg_S/2.d0)/DT/12.d0`). 해석: `TK`가 적응 `Tau0`를 통해 좌변에 간접 영향을 줄 수 있다 (`src/gwce.F:445` `CALL CalculateTimeVaryingTau0(TK, NNeigh, NeiTab, NP)`; `src/gwce.F:538` `MsFacLOnDiag =OnDiag*AreaIE*(1.d0/DT+Tau0Avg_S/2.d0)/DT/12.d0`). 운동량 좌변의 마찰 계수는 `TKM`이다 (`src/momentum.F:751` `VCOEFXX = DTO2*(TKM(1,I) + SPNGCOEF_X)`).
 - wetting-drying([[adcirc-wetting-drying-implementation]]): dry node 유속 0, MJU/노드 mask.
-- 3D([[adcirc-3d-mode]]): C3D 시 vsmy.F velocity/stress form 으로 연직 분해(여기는 2D depth-integrated).
+- TIMESTEP은 `C3D` 조건에서 `Apply3DBottomFriction`을 호출한다 (`src/timestep.F:594` `if (C3D) then`; `src/timestep.F:599` `CALL Apply3DBottomFriction(Q, SIGMA, DP, ETA2, G, IFNLFA, NP,`). TIMESTEP은 `C3DVS` 조건에서 `VSSOL`을 호출한다 (`src/timestep.F:1127` `IF (C3DVS) THEN`; `src/timestep.F:1143` `CALL VSSOL(IT,TimeLoc)`). `solveMomentumEq`의 2D 풀이 선택은 `C2DDI` 조건 안에 있다 (`src/momentum.F:125` `IF (C2DDI) THEN`).
 
 ## 6. 연결
 

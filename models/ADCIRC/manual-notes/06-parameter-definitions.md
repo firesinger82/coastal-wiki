@@ -6,6 +6,7 @@ promote_phase: 2a
 classification: manual-notes-catalog
 source_id: models/ADCIRC
 notes: "P2 catalog audit 2026-05-24 — external URL catalog (adcirc.github.io/adcirc.org/github.com) verified via WebFetch sampling (03 theory + 06 parameter_definitions confirm docs structure live)"
+last_source_check: 2026-10-11 (recovery 재판독 대조)
 ---
 # ADCIRC Parameter Definitions
 
@@ -25,6 +26,13 @@ This is the main source for interpreting fort.14 and fort.15 fields without gues
 ## Core Claims
 
 - the page gives explicit meanings for many fort.14 and fort.15 fields
+
+- THETA1은 v56.2.1에서 연직 확산을 가중한다. (`[file=src/vsmy.F line=2875]` ` coef2 = delt*theta1/HOamb2 `)
+- THETA2는 v56.2.1에서 소산을 가중한다. (`[file=src/vsmy.F line=2883]` ` coef1 = 1.d0 + delt*theta2*tdiss `; `[file=src/vsmy.F line=2885]` ` Mqa(n) = Inm(n,1)*coef1+KQnm(n,1)*coef2 `)
+- 현행 RST의 두 역할 설명은 코드의 배정과 반대이다. (`[file=docs/technical_reference/parameter_definitions/index.rst line=1449]` ` THETA1 weights the dissipation term `; `[file=docs/technical_reference/parameter_definitions/index.rst line=1451]` ` THETA2 weights the vertical diffusion term `)
+- 코드는 `(IEVC.EQ.50).or.(IEVC.EQ.51)` 조건에서 THETA1·THETA2를 읽는다. (`[file=src/read_input.F line=5274]` ` IF((IEVC.EQ.50).or.(IEVC.EQ.51)) THEN `; `[file=src/read_input.F line=5275]` ` READ(15,*,err=99999,end=99998,iostat=ios) Theta1,Theta2 `)
+- 현행 문서는 IEVC=50일 때만 이 입력 줄을 포함하라고 적는다. (`[file=docs/technical_reference/parameter_definitions/index.rst line=1445]` ` Time weighting coefficients for the MY2.5 turbulence soln. (include this line only if IEVC = 50) `)
+
 - boundary types, bathymetry sign conventions, and barrier semantics are stated directly
 - some parameter constraints are strict enough that violating them terminates a run
 

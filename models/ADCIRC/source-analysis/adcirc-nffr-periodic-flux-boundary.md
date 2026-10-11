@@ -3,6 +3,7 @@ title: "ADCIRC fort.15 NFFR 주기 flux 경계 — 레코드 구조·QN 합성·
 topic: general
 canonical_source: self
 citation_status: verified
+last_source_check: 2026-10-11 (recovery 재판독 대조)
 has_source_needed: false
 verification_method: "read_input.F NFFR 블록(:3504-3589)·timestep.F QN/EN 합성(:860-880)·gwce.F flux BC 블록(:1725-1810, Note 2 주석 :1727-1733, JCG :2003)·normal_flow_boundary.F90 rotate_normal_flux(:59-104) + 공식 docs fort15.rst:79-90·parameter_definitions/index.rst:806-840 직접 read (2026-07-12). 모든 식·주석 verbatim 인용."
 note_author: "Claude Fable 5 (source-code direct read)"
@@ -23,6 +24,14 @@ NFFR 라인은 mesh(fort.14)에 flux 경계(IBTYPE 2/12/22/32/52)가 있어 `NFL
 
 ```
 NFFR                              ← 정수. 0/-1 = 비주기(fort.20에서 읽음; 0=coldstart 기점, -1=hotstart 기점, :3509-3516·paramdef:811)
+```
+
+- prep는 fort.19 값을 `A40` 문자열로 복사한다 (`prep/prep.F:3032` `READ(19,40) ETIMINC`; `prep/prep.F:3041` `READ(19,40,iostat=eof)  ESBIN(I)`; `prep/prep.F:3068` `40  FORMAT(A40)`). prep는 fort.20 유량 레코드를 `A80` 문자열로 복사한다 (`prep/prep.F:3152` `READ(proc_no,'(A80)',END=40) FLUX_MSG ! flo val for this node`; `prep/prep.F:3175` `WRITE(SDU(IPROC2),'(A)') TRIM(FLUX_MSG)`).
+- 코드는 개방 경계가 있을 때 fort.19 존재 여부로 `NPEBC`를 설정한다 (`src/read_input.F:3427` `IF (MNOPE.GT.0) THEN`; `src/read_input.F:3429` `INQUIRE(FILE=TRIM(INPUTDIR)//'/'//'fort.19',exist=NPEBC)`). 이 검사에는 `NBFR=0` 조건이 없다 (`src/read_input.F:3427` `IF (MNOPE.GT.0) THEN`; `src/read_input.F:3429` `INQUIRE(FILE=TRIM(INPUTDIR)//'/'//'fort.19',exist=NPEBC)`).
+- `ETIMINC`는 fort.19 처음에서 한 번만 읽는다 (`src/cstart.F:208` `READ(19,*) ETIMINC`; `src/cstart.F:210` `READ(19,*) ESBIN1(J)`; `src/cstart.F:213` `READ(19,*) ESBIN2(J)`). `FTIMINC`도 fort.20 처음에서 한 번만 읽는다 (`src/cstart.F:233` `READ(20,*) FTIMINC`; `src/cstart.F:239` `READ(20,*) QNIN_TMP`; `src/cstart.F:248` `READ(20,*) QNIN_TMP`). 반복 데이터에 시간 간격 레코드를 다시 넣지 않는다 (`src/cstart.F:213` `READ(19,*) ESBIN2(J)`; `src/cstart.F:248` `READ(20,*) QNIN_TMP`).
+- fort.20 reader는 `IF(NFLUXF.EQ.1.AND.NFFR.LE.0)THEN`에서 사용한다 (`src/cstart.F:226` `IF(NFLUXF.EQ.1.AND.NFFR.LE.0)THEN`). `IBTYPE=32`이면 추가 `ENIN` 값을 읽는다 (`src/cstart.F:241` `ELSEIF (LBCODEI(J).EQ.32) THEN`; `src/cstart.F:242` `READ(20,*) QNIN_TMP,ENIN1(J)`).
+
+```
 k = 1..NFFR:                      ← 분조 정의 블록
   FBOUNTAG(k)                     ← 분조명 한 줄 (READ '(A5)', :3549)
   FAMIGT(k)  FFF(k)  FFACE(k)     ← 주파수(rad/s)·nodal factor·평형인수(★도 단위, :3550; 코드가 DEG2RAD 변환 :3553)
