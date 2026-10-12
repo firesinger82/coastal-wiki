@@ -9,7 +9,7 @@ note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-18
 related:
   - "[[sfincs-architecture-source-map]]"
-last_source_check: 2026-10-07 (recovery 재판독 대조)
+last_source_check: 2026-10-12 (recovery 차이 결론 반영)
 ---
 
 # SFINCS IO·전역 데이터 (S-tier)
@@ -92,16 +92,30 @@ SFINCS 는 압축 1D 인덱싱(z-점=셀 중심, uv-점=면)을 사용. 핵심:
 
 ### 2.2 keyword 예시 (default 포함)
 
-| keyword | 변수 | default | line |
+| keyword | 변수 | default | line | 결론 |
+|---|---|---|--- | --- |
+| `alpha` | `alfa` | 0.50 | `:70` | — |
+| `theta` | `theta` | 1.0 | `:71` | — |
+| `huthresh` | `huthresh` | 0.05 | `:80` | C 문서 누락. 이 판은 NetCDF subgrid 입력을 사용할 때 huthresh의 읽기 기본값 0.05 m를 0으로 덮어쓴다. [대조 보고서 §5 A013·C001](../../../_staging/recovery/compare/SFINCS-docs-vs-code.md:943)<br>근거: `docs/parameters.rst:84` `:default:		0.05`<br>`sfincs_input.f90:80` `call read_real_input(500,'huthresh',huthresh,0.05)`<br>`sfincs_subgrid.F90:34` `if (net_file_sbg%ncid > 0) then`<br>`sfincs_subgrid.F90:40` `huthresh = 0.0`<br>`sfincs_momentum.f90:177` `if (zsu>zmin + huthresh) then ! In the 'new' subgrid formulations, zmin is lowest pixel + huthresh. Huthresh was already applied when building the subgrid tables. In sfincs_domain, huthresh is set to 0.0 to acount for this.`<br>확인: 코드 주석은 표 생성 때 이미 huthresh를 적용했다고 설명한다.<br>해석: 기본값 표는 NetCDF subgrid의 덮어쓰기 조건을 누락했다. |
+| `manning` | `manning` | 0.04 | `:73` | — |
+| `dtmax` | `dtmax` | 60.0 | `:79` | — |
+| `inputformat` | `inputtype` | `bin` | `:84` | — |
+| `outputformat` | `outputtype` | `net` | `:85` | — |
+| `nc_deflate_level` | `nc_deflate_level` | 2 | `:88` | — |
+
+#### 문서에 빠진 주 입력
+
+| 보고서 행 ID | 항목 | 근거 | 결론 |
 |---|---|---|---|
-| `alpha` | `alfa` | 0.50 | `:70` |
-| `theta` | `theta` | 1.0 | `:71` |
-| `huthresh` | `huthresh` | 0.05 | `:80` |
-| `manning` | `manning` | 0.04 | `:73` |
-| `dtmax` | `dtmax` | 60.0 | `:79` |
-| `inputformat` | `inputtype` | `bin` | `:84` |
-| `outputformat` | `outputtype` | `net` | `:85` |
-| `nc_deflate_level` | `nc_deflate_level` | 2 | `:88` |
+| K056·K057·K058 | 출력 시각과 파랑 갱신 간격 | K056: `sfincs_input.f90:61` `call read_real_input(500,'t0out',t0out,-999.0)`<br>K057: `sfincs_input.f90:62` `call read_real_input(500,'t1out',t1out,-999.0)`<br>K058: `sfincs_input.f90:68` `call read_real_input(500,'dtwave',dtwave,3600.0)`<br>검색: docs/*.rst·docs/*.txt에서 위 호출의 정확한 입력 이름을 검색했다.<br>확인: 해당 문서는 이 이름들을 입력 필드로 설명하지 않는다.<br>해석: 코드에 존재하는 입력 읽기의 문서 누락이다. | C 문서 누락. 이 판은 t0out·t1out·dtwave의 읽기 기본값으로 각각 -999·-999·3600을 사용한다. [대조 보고서 §5 K056·K057·K058](../../../_staging/recovery/compare/SFINCS-docs-vs-code.md:987) |
+| K061·K062·K063·K064·K065 | 기압·필터·복사응력·좌표 입력 | K061: `sfincs_input.f90:92` `call read_real_input(500,'pavbnd',pavbnd,0.0)`<br>K062: `sfincs_input.f90:93` `call read_real_input(500,'gapres',gapres,101200.0)`<br>K063: `sfincs_input.f90:101` `call read_real_input(500,'btfilter',btfilter,60.0)`<br>K064: `sfincs_input.f90:103` `call read_int_input(500,'radstr',iradstr,0)`<br>K065: `sfincs_input.f90:104` `call read_int_input(500,'crsgeo',igeo,0)`<br>검색: docs/*.rst·docs/*.txt에서 위 호출의 정확한 입력 이름을 검색했다.<br>확인: 해당 문서는 이 이름들을 입력 필드로 설명하지 않는다.<br>해석: 코드에 존재하는 입력 읽기의 문서 누락이다. | C 문서 누락. 이 판은 pavbnd·gapres·btfilter·radstr·crsgeo 입력을 읽는다. [대조 보고서 §5 K061·K062·K063·K064·K065](../../../_staging/recovery/compare/SFINCS-docs-vs-code.md:988) |
+| K068·K069·K070·K071 | 전역·파령·SnapWave·고정 출력 간격 입력 | K068: `sfincs_input.f90:109` `call read_int_input(500,'global',iglobal,0)`<br>K069: `sfincs_input.f90:113` `call read_real_input(500,'waveage',waveage,-999.0)`<br>K070: `sfincs_input.f90:114` `call read_int_input(500,'snapwave', isnapwave, 0)`<br>K071: `sfincs_input.f90:115` `call read_int_input(500,'dtoutfixed', ioutfixed, 1)`<br>검색: docs/*.rst·docs/*.txt에서 위 호출의 정확한 입력 이름을 검색했다.<br>확인: 해당 문서는 이 이름들을 입력 필드로 설명하지 않는다.<br>확인: global·vegetation·timestep·restart의 일반 명사 용례는 동명 입력 필드의 설명이 아니다.<br>해석: 코드에 존재하는 입력 읽기의 문서 누락이다. | C 문서 누락. 이 판은 global·waveage·snapwave·dtoutfixed 입력을 읽는다. [대조 보고서 §5 K068·K069·K070·K071](../../../_staging/recovery/compare/SFINCS-docs-vs-code.md:989) |
+| K109·K110·K111·K112·K113·K114·K115·K116·K117·K118·K119·K120 | 유동·조도·조석·기상 계수 입력 | K109: `sfincs_input.f90:179` `call read_real_input(500,'btrelax',btrelax,3600.0)`<br>K110: `sfincs_input.f90:182` `call read_real_input(500,'wiggle_factor',wiggle_factor,0.1)`<br>K111: `sfincs_input.f90:183` `call read_real_input(500,'wiggle_threshold',wiggle_threshold,0.1)`<br>K112: `sfincs_input.f90:187` `call read_logical_input(500,'advection_mask',advection_mask,.true.)`<br>K113: `sfincs_input.f90:190` `call read_real_input(500, 'nuviscfac', nuviscfac, 100.0)`<br>K114: `sfincs_input.f90:197` `call read_real_input(500, 'rugdepth', runup_gauge_depth, 0.05)`<br>K115: `sfincs_input.f90:198` `call read_logical_input(500, 'wave_enhanced_roughness', wave_enhanced_roughness, .false.)`<br>K116: `sfincs_input.f90:199` `call read_logical_input(500, 'use_bcafile', use_bcafile, .true.)`<br>K117: `sfincs_input.f90:200` `call read_real_input(500, 'factor_wind', factor_wind, 1.0)`<br>K118: `sfincs_input.f90:201` `call read_real_input(500, 'factor_pres', factor_pres, 1.0)`<br>K119: `sfincs_input.f90:202` `call read_real_input(500, 'factor_prcp', factor_prcp, 1.0)`<br>K120: `sfincs_input.f90:203` `call read_real_input(500, 'factor_spw_size', factor_spw_size, 1.0)`<br>검색: docs/*.rst·docs/*.txt에서 위 호출의 정확한 입력 이름을 검색했다.<br>확인: 해당 문서는 이 이름들을 입력 필드로 설명하지 않는다.<br>해석: 코드에 존재하는 입력 읽기의 문서 누락이다. | C 문서 누락. 이 판은 열거한 유동·조도·조석·기상 계수 입력을 읽는다. [대조 보고서 §5 K109·K110·K111·K112·K113·K114·K115·K116·K117·K118·K119·K120](../../../_staging/recovery/compare/SFINCS-docs-vs-code.md:993) |
+| K121·K122·K123·K124·K125·K126·K127·K128·K129·K130·K131·K132 | bathtub·식생·격자·침투 파일 입력 | K121: `sfincs_input.f90:205` `call read_real_input(500, 'bathtub_fachs', bathtub_fac_hs, 0.2)`<br>K122: `sfincs_input.f90:206` `call read_real_input(500, 'bathtub_dt', bathtub_dt, -999.0)`<br>K123: `sfincs_input.f90:207` `call read_logical_input(500,'vegetation',vegetation,.false.)`<br>K124: `sfincs_input.f90:211` `call read_char_input(500,'qtrfile',qtrfile,'none')`<br>K125: `sfincs_input.f90:224` `call read_char_input(500,'vegetationfile',veggiefile,'none')`<br>K126: `sfincs_input.f90:225` `call read_char_input(500,'vegetationtype_toml',veggietype_toml,'none')   ! companion TOML lookup table; if set, veggiefile holds only vegetation_type integers`<br>K127: `sfincs_input.f90:233` `call read_char_input(500, 'bdrfile', bdrfile, 'none')`<br>K128: `sfincs_input.f90:238` `call read_char_input(500,'prcfile',prcpfile,'none')`<br>K129: `sfincs_input.f90:247` `call read_char_input(500,'z0lfile',z0lfile,'none')`<br>K130: `sfincs_input.f90:270` `call read_char_input(500,'infiltration_file',infiltrationfile,'none')`<br>K131: `sfincs_input.f90:271` `call read_char_input(500,'infiltration_type',inftype,'none')`<br>K132: `sfincs_input.f90:276` `call read_char_input(500, 'rugfile', rugfile, 'none')`<br>검색: docs/*.rst·docs/*.txt에서 위 호출의 정확한 입력 이름을 검색했다.<br>확인: 해당 문서는 이 이름들을 입력 필드로 설명하지 않는다.<br>확인: global·vegetation·timestep·restart의 일반 명사 용례는 동명 입력 필드의 설명이 아니다.<br>해석: 코드에 존재하는 입력 읽기의 문서 누락이다. | C 문서 누락. 이 판은 열거한 bathtub·식생·격자·침투 관련 입력을 읽는다. [대조 보고서 §5 K121·K122·K123·K124·K125·K126·K127·K128·K129·K130·K131·K132](../../../_staging/recovery/compare/SFINCS-docs-vs-code.md:994) |
+| K133·K134·K135·K136·K137·K138·K139 | 쓰나미·파력·파향·하상·보간 출력 입력 | K133: `sfincs_input.f90:286` `call read_int_input(500,'store_tsunami_arrival_time',itsunamitime,0)`<br>K134: `sfincs_input.f90:287` `call read_real_input(500,'tsunami_arrival_threshold',tsunami_arrival_threshold,0.01)`<br>K135: `sfincs_input.f90:292` `call read_int_input(500,'writeruntime',wrttimeoutput,0)`<br>K136: `sfincs_input.f90:296` `call read_int_input(500,'storefw', istorefw, 0)`<br>K137: `sfincs_input.f90:297` `call read_int_input(500,'storewavdir', istorewavdir, 0)`<br>K138: `sfincs_input.f90:299` `call read_logical_input(500, 'store_dynamic_bed_level', store_dynamic_bed_level, .false.)`<br>K139: `sfincs_input.f90:300` `call read_logical_input(500,'snapwave_use_nearest',snapwave_use_nearest,.true.)`<br>검색: docs/*.rst·docs/*.txt에서 위 호출의 정확한 입력 이름을 검색했다.<br>확인: 해당 문서는 이 이름들을 입력 필드로 설명하지 않는다.<br>해석: 코드에 존재하는 입력 읽기의 문서 누락이다. | C 문서 누락. 이 판은 열거한 진단·출력 플래그와 snapwave_use_nearest 입력을 읽는다. [대조 보고서 §5 K133·K134·K135·K136·K137·K138·K139](../../../_staging/recovery/compare/SFINCS-docs-vs-code.md:995) |
+| K141 | dtmapout 입력 | K141: `sfincs_input.f90:342` `call read_real_input(500,'dtmapout',dtmapout,0.0)`<br>검색: docs/*.rst·docs/*.txt에서 위 호출의 정확한 입력 이름을 검색했다.<br>확인: 해당 문서는 이 이름들을 입력 필드로 설명하지 않는다.<br>해석: 코드에 존재하는 입력 읽기의 문서 누락이다.<br>`sfincs_input.f90:63`이 dtout을 먼저 dtmapout에 읽는다. `:341`의 `if (dtmapout==0.0) then`을 통과해야 `:342`가 dtmapout 이름을 읽는다. | C 문서 누락. dtout을 읽은 값이 0.0일 때만 dtmapout 입력을 읽는다. dtmapout 리더의 기본값은 0.0이다. [대조 보고서 §5 K141](../../../_staging/recovery/compare/SFINCS-docs-vs-code.md:996) [10-12 결론 검증 보완] |
+
+
 
 ### 2.3 backward-compat 키워드
 
@@ -113,7 +127,7 @@ SFINCS 는 압축 1D 인덱싱(z-점=셀 중심, uv-점=면)을 사용. 핵심:
 - 상수: `g=9.81`, `pi=3.14159`, `gn2=9.81*0.02*0.02` (subgrid 전용, `:372-374`)
 - 단위변환: `qinf = qinf/(3600*1000)` (mm/hr → m/s, `:376`); `rotation = rotation*pi/180`, `cosrot/sinrot` (`:378-380`)
 - CRS: `crsgeo` 결정 (`igeo==0` → projected, else geographic, `:399-421`)
-- Coriolis: `fcorio = 2*7.2921e-05*sin(latitude*pi/180)` (`:404`); latitude≈0 이면 off (`:406-412`)
+- Coriolis: `fcorio = 2*7.2921e-05*sin(latitude*pi/180)` (`:404`); latitude≈0 이면 off (`:406-412`) 근거: `docs/developments.rst:179` `* coriolis - clarification of use in model and logfile: for projected coordinate systems only turned on if a latitude is provided other than 0 (default, latitude = 0.0, means no coriolis terms used in momentum equation). For large scale applications on spherical grid, the coriolis term is turned on by default.`<br>`sfincs_input.f90:399` `if (igeo == 0) then`<br>`sfincs_input.f90:404` `fcorio = 2 * 7.2921e-05 * sin(latitude * pi / 180)`<br>`sfincs_input.f90:406` `if (latitude < 0.01 .and. latitude > -0.01) then`<br>`sfincs_input.f90:410` `coriolis = .false.` [대조 보고서 §5 E003·B082·C017](../../../_staging/recovery/compare/SFINCS-docs-vs-code.md:964) 결론: 문서 누락. 이 판은 투영격자의 위도가 -0.01도보다 크고 0.01도보다 작으면 Coriolis 항을 끈다.
 - `store_*` 논리 플래그를 `storevel`/`storemeteo` 등 integer 입력에서 도출 (`:449`~`:650`). 예: `subgrid` 는 `sbgfile/='none'` 일 때 true (`:547`)
 - bathtub 모드는 다수 프로세스 강제 off (`:707-743`)
 
@@ -188,6 +202,12 @@ SFINCS 는 압축 1D 인덱싱(z-점=셀 중심, uv-점=면)을 사용. 핵심:
 
 ---
 
+### 문서와 코드 차이 (외부 원문 판정)
+
+| 보고서 행 ID | 항목 | 근거 | 결론 |
+|---|---|---|---|
+| <a id="cv-s-b042"></a>B042 | quadtree NetCDF를 QGIS에서 표시 | MDAL, [UGRID driver 문서](https://raw.githubusercontent.com/lutraconsulting/MDAL/master/docs/source/drivers/ugrid.rst). MDAL, [`mdal_ugrid.cpp`](https://raw.githubusercontent.com/lutraconsulting/MDAL/master/mdal/frmts/mdal_ugrid.cpp):41, 137, 148, 203, 350, 354–356, 400, 496, 644. MDAL, [`mdal_cf.cpp`](https://raw.githubusercontent.com/lutraconsulting/MDAL/master/mdal/frmts/mdal_cf.cpp):512–515. MDAL 판은 2026-10-12에 받은 master이다. Deltares/SFINCS, [v2.4.0 릴리스 노트](https://api.github.com/repos/Deltares/SFINCS/releases/tags/v2.4.0_Galibier_release). Deltares/SFINCS, [PR #335](https://github.com/Deltares/SFINCS/pull/335) 설명.<br>`sfincs_ncoutput.F90:979–987, 998, 1007, 1033–1038, 1044, 1085`의 속성을 MDAL 리더와 정적으로 대조했다.<br>MDAL은 `EPSG_code`가 비어 있으면 정수 `epsg`로 대체한다. `long_name`의 `direction` 때문에 메시를 거부한다는 설명은 PR #335의 주장이다. 이 설명은 직접 재현하지 않았다. | H 코드 대조 대상 아님. 이 주장은 도구 호환성 주장이다. 코드가 쓰는 UGRID 속성(`cf_role`, `topology_dimension`, `node_coordinates`, `face_coordinates`, `face_node_connectivity`, `start_index`, `grid_mapping`, `epsg`)은 MDAL 소스가 읽는 속성과 겹친다. QGIS 표시는 실행해 확인하지 않았다. [대조 보고서 §5 B042](../../../_staging/recovery/compare/SFINCS-docs-vs-code.md:1024) [10-12 외부 원문 판정] [10-12 결론 검증 보완] |
+
 ## 6. `sfincs_output.f90` — 출력 디스패처 + ASCII/binary 출력 + 재시작
 
 `module sfincs_output` (`use sfincs_ncoutput`, `:3`). netCDF/binary 분기 + restart 작성.
@@ -208,7 +228,7 @@ SFINCS 는 압축 1D 인덱싱(z-점=셀 중심, uv-점=면)을 사용. 핵심:
 - `zs`(real*8)→`zs4`(real*4) 다운캐스트 (`:683-686`)
 - 파일명: `sfincs.<tstring>.rst`, `form='unformatted'` (`:690-692`)
 - 6 flavour (주석 `:694-700`): 1=zs,q,uvmean / 2=zs,q / 3=zs / 4-6=+침투상태(cnb→scs_Se, gai→GA_sigma+GA_F, hor→rain_T1)
-- 침투 type 별 분기 (`:704-740`). default(type 1): `write(911)1; zs4; q; uvmean` (`:735-738`)
+<a id="cv-s-a100"></a>**A100·C014 — E 코드 결함 후보(정본).** `sfincs_initial_conditions.F90:196`의 헤더는 type 2를 `! 2: zs, q`로 적는다. `docs/parameters.rst:555`도 type 2에 평균 유량을 열거하지 않는다. 그러나 `sfincs_initial_conditions.F90:227`의 `if (rsttype==1 .or. rsttype==2 .or. rsttype==4 .or. rsttype==5 .or. rsttype==6) then`은 type 2도 포함한다. 이 분기는 `:229`에서 iniq를 읽은 뒤 `:233`에서 `read(500)uvmean`을 실행한다.<br>반대 경로인 `sfincs_output.f90:704–738`을 확인했다. CN B·Green-Ampt·Horton 쓰기는 각각 type 4·5·6이다. 나머지 쓰기는 `:735–738`에서 type 1과 zs4·q·uvmean을 기록한다. 이 쓰기 경로는 type 2를 만들지 않는다. 따라서 후보는 평균 유량이 없는 외부 type 2 파일을 읽는 경우에 한정한다. type 1의 현재 배열 이름은 통합 q와 uvmean이다. 실제 읽기 오류는 실행하지 않았다. [대조 보고서 §5 A100·C014](../../../_staging/recovery/compare/SFINCS-docs-vs-code.md:961) [10-12 결론 검증 보완]
 - 중요 주석 verbatim (`:737`): `! Note: q is actually larger than npuv! It has size npuv + ncuv + 1`
 
 ---
@@ -265,3 +285,7 @@ SFINCS 는 압축 1D 인덱싱(z-점=셀 중심, uv-점=면)을 사용. 핵심:
 4. **결합**: BMI (§7) 가 동일 전역 배열을 C 포인터로 노출 — 외부 coupler 가 zero-copy 로 `zs`/`qext`/`zb` 등을 읽고 씀.
 
 전체 컴포넌트 맵은 [[sfincs-architecture-source-map]] 참조.
+
+## 문서 참고 링크 오류
+
+v2.0.2 릴리스 링크의 정정은 [변경 이력 노트의 정본](../manual-notes/sfincs-v2.4.0-galibier-changelog-known-issues.md#문서-참고-링크-오류)을 따른다. [10-12 결론 검증 보완]

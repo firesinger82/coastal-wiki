@@ -348,7 +348,7 @@ F_{v,i}(t)=\frac{1}{2}\rho\widetilde{C}_{D,i}b_{v,i}N_{v,i}h_{v,i}u^L(t)\left\|u
 작성자는 master 쪽 이미지를 직접 확인했다.
 작성자는 Kingsday 쪽 이미지와 readthedocs 화면을 직접 확인하지 않았다.
 
-**확인:** 지정한 매뉴얼·보고서·readthedocs 판독 기록에서 `FvgCau` 또는 `vegcanflo`를 검색한 결과는 없다.
+**확인:** 지정한 매뉴얼·보고서·readthedocs 판독 기록에서 `FvgCau` 또는 `vegcanflo`를 검색한 결과는 없다. [10-12 결론 정정] `_staging/recovery/read/XBeach/manuals/readthedocs_markdown/en/latest/input_parameters.md.md:23`은 `vegcanflo`와 설명 `Include incanopy flow [1] or not [0]`를 기록한다. 이 입력 설명은 `FvgCau`의 초기화 규칙을 제공하지 않는다.
 **미확인:** 지정한 판독 기록은 `FvgCau`의 호출별 초기화 규칙을 제공하지 않는다.
 **미확인:** 지정한 판독 기록은 파봉 위 층에서 `FvgCau`를 어떻게 처리할지 제공하지 않는다.
 **해석:** 층별 항력 합 식만으로 `FvgCau`의 초기화 위치를 정할 수 없다.
@@ -521,7 +521,7 @@ grep -n -i -- 'FvgCau' models/XBeach/raw/source_code/trunk/src/xbeachlibrary/*.F
 **확인:** 555행의 추가는 `vegcanflo==1`일 때만 실행한다.
 근거는 `vegetation.F90:502–511, 535–555`이다.
 
-**판정: 자료로 판정 불가.**
+**판정: 자료로 판정 불가.** [10-12 결론 정정] 매뉴얼의 초기화 규칙은 여전히 확인하지 못했다. 코드의 파봉 위 층 주석과 다른 층 처리식은 같은 호출의 힘 재사용을 결함 후보(E)로 분류할 근거를 제공한다. 5.3에 두 종류의 정적 근거를 적는다.
 이 판정의 대조 대상은 매뉴얼이 요구하는 `FvgCau` 초기화 규칙이다.
 지정한 판독 기록에 그 규칙이 없다.
 **미확인:** 작성자는 값 재사용의 실제 항력 크기를 모델 실행으로 확인하지 않았다.
@@ -1148,3 +1148,243 @@ w(x,y,-d,t)=\frac{\partial d}{\partial t}-u\frac{\partial d}{\partial x}-v\frac{
 현재 노트는 대조한 바닥 경사 항의 부호를 주장하지 않는다.
 
 렌더한 이미지 목록: `/tmp/claude-1000/-home-firesinger-coastal-wiki/338e5a20-3378-4629-86f1-592f9d629b53/scratchpad/pages/`의 `cmp-master-p29-029.png`, `cmp-nonh-p13-13.png`, `cmp-nonh-p15-15.png`, `cmp-nonh-p16-16.png`, `cmp-nonh-p25-25.png`, `cmp-nonh-p26-26.png`. 작성자는 이 이미지들을 모두 열었다. 열지 못한 파일: 없음.
+
+## 5 차이 결론
+
+분류별 개수는 기존 결론표의 9행을 센 값이다: A 판 차이 0행, B 문서 오기 5행, C 문서 누락 2행, D 문서만 있음 0행, E 코드 결함 후보 2행, F 표기 차이 0행, G 판단 근거 부족 0행. 이번 검증에서 추가한 CV-S-XB-01의 E 1행은 기존 9행 집계와 구분한다. [10-12 결론 검증 보완]
+
+대상은 본문 판정문 5행과 세부 대조표 4행이다.
+보고서 줄 번호는 이 절을 추가하기 전의 295·308·510·524·1068·1075·1077·1079·1080행이다.
+1068행은 C절의 총괄 판정이다.
+이 집계는 총괄행과 세부행을 함께 센 원문 판정행 수다.
+기존 행에 붙인 정정은 같은 물리적 줄에 추가했다.
+기존 행의 줄 번호는 바뀌지 않았다.
+이 절의 원문 인용은 이번 작업에서 `nl -ba`로 확인했다.
+PDF 근거는 아래에 적은 판독 기록의 쪽 번호를 사용한다.
+식 변형과 정적 판독의 결론은 `해석:`으로 구분한다.
+
+| 행 ID 또는 보고서 줄 | 항목 | 결론(A–G) | 근거 | 노트에 쓸 결론 문장(한 문장, 한국어) |
+|---|---|---|---|---|
+| 295 (A절) | Lagrangian 속도 식과 `veguntow`의 Eulerian 속도 선택 | C 문서 누락 | 확인: `_staging/recovery/read/XBeach/manuals/pdfs/XBeach_manual_master.pdf/p019-036.md:26`의 PDF 29쪽 식 (2.58)은 `u^L(t)\left\vert u^L(t)\right\vert`를 쓴다. `_staging/recovery/read/XBeach/manuals/pdfs/XBeach_manual_kingsday.pdf/p019-036.md:26`의 PDF 29쪽 식 (2.53)도 Lagrangian 속도를 쓴다. `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vegetation.F90:513`의 `if (par%veguntow == 1) then` 아래의 `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vegetation.F90:515`의 `Fvgtu = max((min(aht,watr)-ahtold),0d0)*0.5d0*s%Cdveg(i,j,m)*s%bveg(i,j,m)*s%Nveg(i,j,m)*(s%ueu(i,j)*s%vmageu(i,j))`는 Eulerian 성분을 쓴다. `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/flow_timestep.F90:858`의 `s%ueu = s%uu - usu`가 그 성분을 정의한다. 확인: `models/XBeach/raw/manuals/readthedocs/en/latest/input_parameters.html:2713`의 `<td><p><p>Include undertow in phase-averaged vegetati</p>`와 같은 파일 2715행의 `<td><p><p>1</p>`는 `veguntow`의 설명과 기본값이다. 해석: 식생 이론절은 이 스위치의 Eulerian 분기를 생략한다. 문서의 Lagrangian 표기는 `veguntow=0`의 속도 종류에 대응한다. 판 이력과 분기 근거는 5.1에 적는다. | 표준 식생 경로는 기본값인 `veguntow=1`에서 Eulerian 속도로 평균류·장파 항력을 계산한다. |
+| 308 (A절) | v점 성분에 u점 속력을 곱하는 선택의 정당성 | E 코드 결함 후보 | 확인: `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vegetation.F90:516,520`은 v점 성분에 같은 첨자의 u점 속력을 곱한다.<br>확인: `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/flow_timestep.F90:807–808`은 주변 v 속도의 네 점 평균으로 u점의 횡속도 `s%vu`를 만든다.<br>확인: 같은 파일 861행의 원문은 `s%vmagu=sqrt(s%uu**2+s%vu**2)`이다.<br>확인: 같은 파일 931행의 원문은 `s%vmagv=sqrt(s%uv**2+s%vv**2)`이다.<br>해석: 5.2의 원문 대입에서는 v점 속력이 양수여도 u점 속력이 0이 되어 520행의 v 방향 항력이 사라진다.<br>해석: 같은 속도 배치를 x 방향으로 바꾸면 519행의 u 방향 항력은 남는다.<br>확인: `flow_timestep.F90:535,550`의 바닥마찰은 방향마다 해당 격자점의 속력을 쓴다.<br>확인: `vegetation.F90:871,877`의 porous 경로는 각 방향의 셀 경계로 힘을 보간한다.<br>해석: 축 교환의 비대칭과 다른 항력 경로의 격자 처리 차이는 E 후보의 근거이다.<br>해석: `models/XBeach/raw/manuals/readthedocs/en/latest/_sources/xbeach_manual.rst.txt:1236`의 양의 계수와 0이 아닌 속도에 대한 항력식도 5.2에서 대조했다.<br>확인: 추가 검색 파일·검색어·식 전개는 5.2에 적는다. | 표준 식생 경로가 v 방향 항력에 u점 속력을 사용하는 동작은 축 교환 시 항력이 비대칭이 되는 코드 결함 후보다. [10-12 G 재판정] |
+| 510 (B절) | 호출 시작 초기화와 이전 시간 단계 값의 누적 가설 | C 문서 누락 | 확인: `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vegetation.F90:452`의 `FvgCav = 0.d0`와 `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vegetation.F90:453`의 `FvgCau = 0.d0`는 `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vegetation.F90:475`의 `do j=1,s%ny+1`보다 앞에 있다. `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/libxbeach.F90:303`의 `if (par%vegetation==1)                                  call vegatt         (s,par)`의 표준 경로는 `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vegetation.F90:342`의 `call momeqveg(s,par)`를 호출한다. 해석: 호출 시작의 대입은 이전 시간 단계의 값을 지운다. 이 행의 기존 불일치 판정은 누적 가설을 기각한다. C는 문서에 호출별 초기화 설명이 없는 점을 분류한다. 확인: `_staging/recovery/read/XBeach/manuals/pdfs/XBeach_manual_master.pdf/p019-036.md:26`의 PDF 29쪽 식 (2.58)은 시각 `t`의 층별 합을 적는다. 이 식과 readthedocs 입력 표는 지역 변수의 초기화 위치를 지정하지 않는다. 검색 범위와 351행의 검색 결과 정정은 5.3에 적는다. | `momeqveg`는 호출마다 `FvgCau`와 `FvgCav`를 0으로 초기화한다. |
+| 524 (B절) | 초기화 규칙의 공백과 같은 호출의 canopy 힘 재사용 | E 코드 결함 후보 | 확인: `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vegetation.F90:502`의 `if (ahtold > wacr) then ! if plant section is entirely above wave crest, then do nothing`의 분기는 `FvgCau`와 `FvgCav`에 대입하지 않는다. `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vegetation.F90:554`의 `if (par%vegcanflo == 1) then ! add in canopy flow (Luhar et al., 2010)` 아래에서 `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vegetation.F90:555`의 `Fvgu(i,j) = Fvgu(i,j) + FvgCau`와 `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vegetation.F90:556`의 `Fvgv(i,j) = Fvgv(i,j) + FvgCav`를 실행한다. 확인: 다른 층 처리 경로의 `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vegetation.F90:536`의 `FvgCan = max((min(aht,watr)-ahtold),0d0)/s%hh(i,j)*0.5d0*s%Cdveg(i,j,m)*s%bveg(i,j,m)*s%Nveg(i,j,m)*ucan**2`는 해당 층의 잠긴 높이를 힘에 곱한다. 해석: 파봉 위 층의 값 재사용은 502행의 `then do nothing` 주석과 모순된다. 해석: 같은 층의 힘을 잠긴 높이로 제한하는 536행의 다른 코드 경로와도 모순된다. 두 종류의 근거를 충족하므로 정적 판독의 결함 후보로 분류한다. 문서의 초기화 규칙은 여전히 확인하지 못했다. `[10-12 결론 정정]`의 상세 근거는 5.3에 적는다. | `vegcanflo==1`인 파봉 위 층이 같은 호출의 앞선 층에서 계산한 0이 아닌 canopy 힘을 다시 더하는 동작은 결함 후보다. |
+| 1068 (C절 총괄) | 단일층 코드와 비정수압 보고서의 인쇄 부호 차이 | B 문서 오기 | 확인: `_staging/recovery/read/XBeach/manuals/reports/non-hydrostatic_report_draft.pdf/p001-018.md:29`의 PDF 16쪽 식 (1.13)과 식 (1.17)은 y 이류항의 부호가 다르다. `_staging/recovery/read/XBeach/manuals/reports/non-hydrostatic_report_draft.pdf/p019-036.md:22`의 PDF 25쪽 식 (2.15)은 첫 표현과 마지막 표현이 일정한 수심·압력에서도 같지 않다. 코드의 압력 계수는 `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/nonh.F90:1195`의 `au(0,i,j) = + (s%zs(i  ,j) - s%zb(i+1,j))*vol`를 쓴다. 해석: 같은 문서 내부의 모순으로 B를 판정한다. 아래 1075·1077·1079·1080행과 5.4가 각 항의 근거다. 이 총괄행도 대상 행 수에 포함한다. | 단일층 코드와 대조한 비정수압 보고서의 y 이류항과 동압 압력항에는 문서 내부 모순으로 확인한 오기가 있다. |
+| 1075 (C절 표) | 식 (1.13)과 식 (1.17)의 y 이류항 | B 문서 오기 | 확인: `_staging/recovery/read/XBeach/manuals/reports/non-hydrostatic_report_draft.pdf/p001-018.md:29`의 PDF 16쪽 식 (1.13)은 `-\frac{\partial}{\partial y}\left(HUV-\int_{-d}^{\eta}(v-V)(u-U)dz\right)`를 인쇄한다. 같은 쪽 식 (1.17)은 `+\frac{\partial}{\partial y}\left(HUV-\frac{1}{\rho}H\bar\tau_{yx}\right)`를 인쇄한다. 해석: 연직으로 균일한 속도와 평탄한 경계에서 식 (1.13)의 원래 적분은 `+\partial_y(HUV)`가 된다. 5.4의 반례가 음수 부호를 배제한다. | 비정수압 보고서 식 (1.13)의 y 이류항 앞 음수 부호는 문서 오기다. |
+| 1077 (C절 표) | 코드의 y 이류항과 식 (1.13)의 음수 부호 | B 문서 오기 | 확인: `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/flow_timestep.F90:564`의 `dudt = (s%ududx(i,j)+s%vdudy(i,j)-s%viscu(i,j) & !Ap,Robert,Jaap`는 잔차에 `+s%vdudy(i,j)`를 넣는다. `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/flow_timestep.F90:576`의 `s%uu(i,j)=s%uu(i,j)-par%dt*dudt`는 그 잔차를 뺀다. 확인: `_staging/recovery/read/XBeach/manuals/reports/non-hydrostatic_report_draft.pdf/p001-018.md:29`의 PDF 16쪽 식 (1.17)은 좌변에 `+\frac{\partial}{\partial y}\left(HUV-\frac{1}{\rho}H\bar\tau_{yx}\right)`를 둔다. 해석: 시간 갱신에서 잔차를 빼는 동작은 좌변 이류항의 부호를 바꾸지 않는다. 식 (1.13)의 문서 오기가 차이의 원인이다. | 코드는 운동량 잔차에 y 이류항을 양의 부호로 더한다. |
+| 1079 (C절 표) | 식 (1.17) 우변의 동압 바닥 경사 부호 | B 문서 오기 | 확인: `_staging/recovery/read/XBeach/manuals/reports/non-hydrostatic_report_draft.pdf/p001-018.md:29`의 PDF 16쪽 식 (1.14)은 `\frac{\partial H\bar p}{\partial x}-\left[p\frac{\partial z}{\partial x}\right]_{z=-d}^{z=\eta}`를 인쇄한다. 같은 쪽 식 (1.17)은 우변에 `-p\frac{\partial d}{\partial x}`를 인쇄한다. `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/nonh.F90:1194`의 `au(1,i,j) = - (s%zs(i+1,j) - s%zb(i  ,j))*vol`와 `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/nonh.F90:1195`의 `au(0,i,j) = + (s%zs(i  ,j) - s%zb(i+1,j))*vol`가 코드의 두 압력 계수다. 해석: `z=-d`와 수면 동압 0을 대입하면 식 (1.14)의 압력 적분은 `\partial_x(H\bar p)-p_b\partial_x d`다. 우변 힘으로 옮긴 바닥 경사 항은 `+p_b\partial_x d`다. 식 (1.17)의 우변 음수 부호가 같은 문서의 압력 적분과 모순된다. 5.4에서 코드 갱신과 대조한다. | 비정수압 보고서 식 (1.17) 우변의 동압 바닥 경사 항은 양의 부호로 써야 한다. |
+| 1080 (C절 표) | 식 (2.15) 마지막 표현과 식 (2.18)·(2.19)의 압력 계수 | B 문서 오기 | 확인: `_staging/recovery/read/XBeach/manuals/reports/non-hydrostatic_report_draft.pdf/p019-036.md:22`의 PDF 25쪽 식 (2.15)은 둘째 괄호에 `\left(\eta^{n+1}_{i,j} - d^{n+1}_{i+1,j}\right)`를 인쇄한다. `_staging/recovery/read/XBeach/manuals/reports/non-hydrostatic_report_draft.pdf/p019-036.md:23`의 PDF 26쪽 식 (2.18)과 식 (2.19)도 그 음수 부호를 쓴다. 확인: `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/nonh.F90:1195`의 `au(0,i,j) = + (s%zs(i  ,j) - s%zb(i+1,j))*vol`와 `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/nonh.F90:1218`의 `av(0,i,j)  = +(s%zs(i  ,j  ) - s%zb(i  ,j+1))*vol`의 괄호는 `zb=-d`를 대입하면 모두 `+d`다. 해석: `\eta=0`, `d=D`, `p=P`가 일정하면 식 (2.15)의 첫 표현은 0이다. 마지막 표현은 `DP/\Delta x`다. 0이 아닌 `D`와 `P`에서 두 표현이 모순된다. 같은 오기가 압력 보정식에 반복된다. 식 (2.19)의 V 압력항에 남은 `\Delta x`도 5.4에서 대조한다. | 단일층 코드는 u·v 방향 압력 계수의 두 깊이 괄호에 모두 `zs-zb`를 사용한다. |
+| <a id="cv-s-xb-01"></a>CV-S-XB-01 | canopy 힘 합산의 차원 | E 코드 결함 후보 | [식생 정본](../../../models/XBeach/source-analysis/xbeach_vegetation.md#cv-s-xb-01). `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vegetation.F90:515–564`의 항력과 canopy 힘을 대조했다. `variables.def:82,121,274–280`과 `params.def:103,502`의 차원을 확인했다. 소비식은 `flow_timestep.F90:567,603`이다. | 표준 식생의 vegcanflo==1 경로는 m/s²인 canopy 항과 m²/s²인 장파·평균류 항을 합산한다. 수심을 곱하는 보정 경로는 찾지 못했다. [10-12 결론 검증 보완] |
+
+### 5.1 속도 선택의 문서 누락과 판 이력
+
+확인: `_staging/recovery/read/XBeach/manuals/pdfs/XBeach_manual_master.pdf/p001-018.md:24`의 PDF 9쪽은 적용 판을 `XBeach version 1.22 (revision 4567)`로 적는다.
+확인: `_staging/recovery/read/XBeach/manuals/pdfs/XBeach_manual_kingsday.pdf/p001-018.md:23`의 PDF 8쪽도 같은 적용 판을 적는다.
+확인: `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vegetation.F90:36`의 `! Version 2.0:`와 `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vegetation.F90:38`의 `! Arnold van Rooijen, okt 2015,`는 식생 모듈의 판과 날짜를 적는다.
+확인: `models/XBeach/raw/source_code/trunk/ChangeLog:1`의 `Please see the subversion log for the latest changes, using the command:`와 같은 파일 2행의 `svn log`는 변경 내역을 외부 이력으로 안내한다.
+확인: `models/XBeach/raw/source_code/trunk/NEWS:1`의 `Please visit the XBeach website for the latest news:`는 뉴스 웹사이트를 안내한다.
+해석: 이 두 파일은 `veguntow` 분기를 도입한 변경 기록을 제공하지 않는다.
+해석: 식생 모듈의 판 표기만으로 Lagrangian 식에서 Eulerian 분기로 바뀐 시점을 확정할 수 없다.
+
+확인: `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.F90:1338`의 `par%veguntow      = readkey_int   ('params.txt', 'veguntow', 1,0,1,silent=.true.)`는 입력 표의 기본값 1과 일치한다.
+확인: `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vegetation.F90:519`의 `Fvgtu = max((min(aht,watr)-ahtold),0d0)*0.5d0*s%Cdveg(i,j,m)*s%bveg(i,j,m)*s%Nveg(i,j,m)*(s%uu(i,j)*s%vmagu(i,j))`는 `veguntow`를 끈 분기에서 GLM 속도를 사용한다.
+확인: `models/XBeach/raw/manuals/readthedocs/en/latest/_sources/xbeach_manual.rst.txt:1028`의 `u^{L} =u^{E} +u^{S} \quad and\quad v^{L} =v^{E} +v^{S}`는 Lagrangian 속도와 Eulerian 속도의 관계다.
+확인: `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/flow_timestep.F90:926`의 `s%vev = s%vv - vsv`도 Stokes 성분을 뺀다.
+확인: `models/XBeach/raw/manuals/readthedocs/en/latest/_sources/xbeach_manual.rst.txt:1228`의 `account the velocity due to mean flow and infragravity waves, we use`와 `models/XBeach/raw/manuals/readthedocs/en/latest/_sources/xbeach_manual.rst.txt:1229`의 ``the Lagrangian velocity (:math:`{u}^{L}`) here. The vegetation-induced``는 저장한 readthedocs 이론절의 서술이다.
+해석: 이론절은 `veguntow`에 따른 속도 선택을 설명하지 않는다.
+해석: 코드의 Eulerian 분기는 이름만 바꾼 계산이 아니다.
+해석: Stokes 속도가 0이 아니면 두 속도 종류는 달라진다.
+해석: 따라서 295행은 분기 설명의 문서 누락으로 분류한다.
+해석: 이 결론은 v점에서 쓰는 속력 배열의 정당성까지 판정하지 않는다.
+
+### 5.2 v 방향 식생 항력의 격자 위치와 축 교환 [10-12 G 재판정]
+
+확인: 이번 검색 범위는 `models/XBeach/raw/` 전체와 `_staging/recovery/read/XBeach/` 전체이다.
+확인: `rg --hidden --no-ignore`로 코드 주석·문서·판독 기록을 검색했다.
+확인: PDF와 DOCX 문서의 텍스트도 같은 검색어로 검색했다.
+확인: `rg --files --hidden --no-ignore`로 다른 코드 판과 시험·예제 파일의 존재를 확인했다.
+추가 검색어: `Fvgtv`·`Fvgtu`·`vmageu`·`vmagev`·`vmagu`·`vmagv`·`vegetation`·`veguntow`·`vegcanflo`·`porcanflow`·`stagger`·`drag`.
+추가 검색 파일: `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vegetation.F90`·`flow_timestep.F90`·`variables.def`·`models/XBeach/raw/source_code/trunk/ChangeLog`·`NEWS`·`models/XBeach/raw/source_code/trunk/test/`·`models/XBeach/raw/manuals/examples/Wong2016/`·`models/XBeach/raw/manuals/`·`models/XBeach/raw/source_code/trunk/doc/manual/`.
+확인: `models/XBeach/raw/source_code/trunk/ChangeLog:1–2`는 외부 SVN 이력 조회만 안내한다.
+확인: `models/XBeach/raw/source_code/trunk/test/xbeachlibrary_test/run_xbeach_tests.f90:13`은 `call runtests( allInterpTests )`를 호출한다.
+확인: 검색 범위에는 `Fvgtv`의 속력 선택을 설명하는 변경 기록이나 식생 항력의 격자 시험이 없다.
+
+확인: `models/XBeach/raw/manuals/readthedocs/en/latest/_sources/xbeach_manual.rst.txt:1236`의 원문은 다음과 같다.
+
+~~~text
+   \begin{array}{l} {F_{v} (t)=\sum _{i=1}^{n_{v} }F_{v,i}  (t)} \\ {F_{v,i} (t)=\frac{1}{2} \rho \widetilde{C}_{D,i} b_{v,i} N_{v,i} h_{v,i} u^{L} (t)\left|u^{L} (t)\right|} \end{array}
+~~~
+
+확인: 이번에 연 RST 원문은 한 겹의 절댓값 기호를 쓴다.
+해석: 이 식에서 항력계수·줄기 지름·밀도·잠긴 높이가 양수이면 0이 아닌 속도에 대응하는 항력도 0이 아니다.
+확인: `models/XBeach/raw/manuals/readthedocs/en/latest/_sources/numerical_implementation.rst.txt:7–11`은 속도를 u·v 셀 경계에 정의한다.
+해석: 한 방향만 흐르는 경우에는 위 식의 절댓값을 스칼라 속도의 절댓값으로 대조할 수 있다.
+
+확인: `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vegetation.F90:319–342`는 porous 경로와 표준 `momeqveg` 경로를 구분한다.
+해석: 다음 대입 검토는 표준 경로의 잠긴 식생 한 층에 적용한다.
+해석: 파랑과 Stokes drift는 0으로 둔다.
+해석: `par%vegnonlin`·`par%vegcanflo`·`par%sedtrans`는 0으로 둔다.
+해석: 식생 계수와 잠긴 높이는 공간적으로 같은 양수로 둔다.
+해석: 경계 밖의 젖은 내부 격자에서 `s%wetu`와 `s%wetv`는 1로 둔다.
+해석: 이 설정은 추가 힘을 더하는 `vegetation.F90:550–557`의 분기를 제외한다.
+확인: `flow_timestep.F90:855–864,925–934`에서 Stokes drift가 0이면 Eulerian 속도와 Lagrangian 속도가 같다.
+
+확인: `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/flow_timestep.F90:805–808`의 원문은 다음과 같다.
+
+~~~fortran
+      ! V-velocities at u-points
+      if (s%ny>0) then
+         s%vu(1:s%nx,2:s%ny)= 0.25d0*(s%vv(1:s%nx,1:s%ny-1)+s%vv(1:s%nx,2:s%ny)+ &
+         s%vv(2:s%nx+1,1:s%ny-1)+s%vv(2:s%nx+1,2:s%ny))
+~~~
+
+해석: 같은 x 방향의 두 열에서 j번째 v 속도를 같은 양수로 둔다.
+해석: 두 열의 j-1번째 v 속도는 그 값의 음수로 둔다.
+해석: 위 네 점 평균에 이 값을 대입하면 해당 u점의 `s%vu`는 0이다.
+확인: `flow_timestep.F90:861`의 원문은 `s%vmagu=sqrt(s%uu**2+s%vu**2)`이다.
+해석: 모든 `s%uu`를 0으로 두면 해당 u점의 `s%vmagu`도 0이다.
+확인: `flow_timestep.F90:879–880`은 `s%uu`의 네 점 평균으로 `s%uv`를 계산한다.
+확인: `flow_timestep.F90:931`의 원문은 `s%vmagv=sqrt(s%uv**2+s%vv**2)`이다.
+해석: 이 대입에서는 해당 v점의 `s%vmagv`가 양수이다.
+
+확인: `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vegetation.F90:519–520`의 원문은 다음과 같다.
+
+~~~fortran
+                        Fvgtu = max((min(aht,watr)-ahtold),0d0)*0.5d0*s%Cdveg(i,j,m)*s%bveg(i,j,m)*s%Nveg(i,j,m)*(s%uu(i,j)*s%vmagu(i,j))
+                        Fvgtv = max((min(aht,watr)-ahtold),0d0)*0.5d0*s%Cdveg(i,j,m)*s%bveg(i,j,m)*s%Nveg(i,j,m)*(s%vv(i,j)*s%vmagu(i,j))
+~~~
+
+해석: 위 대입에서 520행은 0이 아닌 v점 속도에 0인 u점 속력을 곱한다.
+해석: 따라서 이 층의 v 방향 항력은 0이 된다.
+확인: `vegetation.F90:548`은 `Fvgv(i,j) = Fvgv(i,j) + Fvgtv`로 이 값을 합산한다.
+확인: 같은 파일 564행은 `s%Fvegv = Fvgv*par%rho ! make sure units of drag force are consistent (N/m2)`로 힘을 전달한다.
+확인: `flow_timestep.F90:603`은 v 방향 운동량 잔차에 `+ s%Fvegv(i,j)/(par%rho*s%hv(i,j)) &`를 넣는다.
+해석: 이 전달 경로에는 v점 속력을 복구하는 보간이 없다.
+
+해석: 같은 격자와 식생을 유지하면서 위 속도 배치를 x 방향으로 바꾸어 본다.
+해석: 모든 v 속도는 0으로 둔다.
+해석: 해당 u 속도는 양수로 둔다.
+해석: i-1번째 u 속도는 그 값의 음수로 둔다.
+확인: `flow_timestep.F90:861`의 원문은 `s%vmagu=sqrt(s%uu**2+s%vu**2)`이다.
+해석: 이 경우 `s%vmagu`는 해당 u 속도의 절댓값이다.
+해석: `vegetation.F90:519`에 같은 양의 식생 계수를 대입하면 u 방향 항력은 양수이다.
+해석: 이 두 대입은 축을 바꿀 때 항력의 소실 여부가 바뀌는 비대칭을 보인다.
+해석: 이 비대칭은 현재 코드 식을 대입해 얻은 결과이다.
+해석: 이 결과는 균일 유속에서 두 격자점 속력이 같은 경우에는 나타나지 않는다.
+
+확인: `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/flow_timestep.F90:535`의 원문은 `s%taubx=s%cfu*par%rho*s%ueu*sqrt((1.16d0*s%urms)**2+s%vmageu**2) !Ruessink et al, 2001`이다.
+확인: 같은 파일 550행의 원문은 `s%tauby=s%cfv*par%rho*s%vev*sqrt((1.16d0*s%urms)**2+s%vmagev**2) !Ruessink et al, 2001`이다.
+해석: 바닥마찰 경로는 각 방향의 성분과 같은 격자점의 속력을 사용한다.
+확인: `vegetation.F90:812–814`는 porous 경로에서 중심의 힘을 셀 경계로 보간한다고 적는다.
+확인: 같은 파일 871행의 원문은 `s%Fvegu(i,j) = (Fcanu(i,j)+Fcanu(i+1,j))/2`이다.
+확인: 같은 파일 877행의 원문은 `s%Fvegv(i,j) = (Fcanv(i,j)+Fcanv(i,j+1))/2`이다.
+해석: 이 두 경로는 힘이나 속력의 격자 위치를 각 방향에 맞추는 비교 근거이다.
+
+해석: 308행은 축 교환의 비대칭과 다른 항력 경로의 격자 처리 차이에 근거하여 E 코드 결함 후보로 바꾼다.
+해석: 한 방향 항력의 소실은 문서의 양의 계수와 0이 아닌 속도에 대한 항력식과도 맞지 않는다.
+해석: `vegetation.F90:513–516`의 Eulerian 분기에도 같은 u점 속력 선택이 있으므로 Stokes drift가 0인 위 대입이 적용된다.
+미확인: raw의 변경 기록에는 이 대입의 작성 의도가 없다.
+해석: 작성 의도의 부재는 위 코드 식의 비대칭을 E 후보로 기록하는 것을 막지 않는다.
+확인: 이 재판정은 모델 실행이나 컴파일을 사용하지 않았다.
+
+### 5.3 호출 초기화와 파봉 위 층의 힘 재사용
+
+확인: `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vegetation.F90:319`의 `if (par%porcanflow == 1) then`는 `porcanflow` 경로를 구분한다.
+확인: 510행과 524행의 결론은 그 밖의 표준 경로가 호출하는 `momeqveg`에 적용한다.
+확인: `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/params.F90:1337`의 `par%vegcanflo     = readkey_int   ('params.txt', 'vegcanflo',0,0,1,silent=.true.)`는 `vegcanflo` 기본값을 0으로 읽는다.
+해석: 524행의 결함 후보는 `vegcanflo==1` 조건에서 발생 가능한 값 재사용이다.
+
+확인: `_staging/recovery/read/XBeach/manuals/` 전체에서 `FvgCau`, `FvgCav`, `vegcanflo`를 검색했다.
+확인: `_staging/recovery/read/XBeach/manuals/readthedocs_markdown/en/latest/input_parameters.md.md:23`은 `vegcanflo`를 기록한다.
+확인: 이 판독 기록의 설명 원문은 `Include incanopy flow [1] or not [0]`다.
+확인: HTML 원문의 `models/XBeach/raw/manuals/readthedocs/en/latest/input_parameters.html:2665`의 `<tr class="row-odd"><td><p><p>vegcanflo</p>`와 `models/XBeach/raw/manuals/readthedocs/en/latest/input_parameters.html:2667`의 `<td><p><p>Include incanopy flow [1] or not [0]</p>`도 이 입력을 확인한다.
+확인: `FvgCau`와 `FvgCav`의 초기화 규칙은 지정한 판독 기록에서 찾지 못했다.
+[10-12 결론 정정] 보고서 351행의 `vegcanflo` 검색 결과 없음은 잘못된 서술이다.
+해석: 입력 설명의 존재는 호출별 초기화 규칙의 존재를 뜻하지 않는다.
+해석: 510행의 누적 가설은 호출 시작의 0 대입으로 기각한다.
+
+확인: `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vegetation.F90:487`의 `do m=1,s%nsecveg(i,j)`는 식생 층을 순서대로 처리한다.
+확인: `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vegetation.F90:544`의 `ahtold = aht`는 처리한 층의 높이를 다음 층의 `ahtold`로 넘긴다.
+확인: `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vegetation.F90:498`의 `watr = s%hh(i,j)`와 `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vegetation.F90:499`의 `wacr = s%hh(i,j)`는 비선형 파형을 쓰지 않는 분기의 골·봉우리 높이다.
+해석: 이 분기에서 `ahtold>wacr`이면 `min(aht,watr)-ahtold<0`이다.
+해석: 따라서 536행의 잠긴 높이 인자 `max((min(aht,watr)-ahtold),0d0)`는 0이다.
+확인: `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vegetation.F90:539`의 `FvgCau = FvgCan*costhm(i,j)`와 `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/vegetation.F90:540`의 `FvgCav = FvgCan*sinthm(i,j)`는 잠긴 층 분기의 힘 성분을 새로 대입한다.
+확인: 파봉 위 층의 분기는 이 두 대입을 건너뛴다.
+해석: 앞선 층의 힘이 0이 아니면 다음 파봉 위 층의 합산은 그 값을 재사용한다.
+해석: 이 값 재사용은 `then do nothing` 주석과 모순된다.
+해석: 이 값 재사용은 다른 분기에서 잠긴 높이를 곱해 해당 층의 힘을 제한하는 처리와도 모순된다.
+[10-12 결론 정정] 524행은 이 두 종류의 정적 근거로 E 코드 결함 후보까지 판정할 수 있다.
+확인: 검색한 매뉴얼 판독 기록은 초기화를 어느 반복 위치에 두어야 하는지 지정하지 않는다.
+미확인: 작성자는 이 값 재사용의 실제 수치 영향을 확인하지 않았다.
+
+### 5.4 비정수압 보고서의 문서 내부 모순
+
+확인: `_staging/recovery/read/XBeach/manuals/reports/non-hydrostatic_report_draft.pdf/p001-018.md:26`의 PDF 13쪽은 바닥을 `z=-d(\mathbf{x},t)`로 정의한다.
+확인: `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/initialize.F90:1012`의 `s%hh=max(s%zs-s%zb,par%eps)`는 코드의 전체 수심 정의다.
+해석: 같은 기준면의 젖은 점에서 `zs=\eta`, `zb=-d`, `H=\eta+d`로 대응한다.
+확인: 코드 대조는 `nonh.F90:233–243`의 단일층 분기에 한정한다.
+확인: `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/nonh.F90:1192`의 `if (nonhU(i,j)==1) then`는 u 압력 계수의 활성 조건이다.
+확인: `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/nonh.F90:1212`의 `if (s%ny>2) then`와 `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/nonh.F90:1215`의 `if (nonhV(i,j)==1)then`는 아래 v 압력 계수의 조건이다.
+
+**y 이류항: 1075·1077행.**
+
+해석: 평탄한 수면과 바닥 사이에서 `u=U(y)`, `v=V_0`, `w=0`인 연직 균일 속도를 대입한다.
+해석: 이 조건에서 보고서 PDF 16쪽 식 (1.13)의 적분 좌변은 `H V_0\partial_y U`다.
+해석: 인쇄된 우변은 `-H V_0\partial_y U`다.
+해석: `V_0\partial_y U`가 0이 아니면 두 변은 같지 않다.
+해석: 이 반례는 식 (1.13)의 y 이류항 앞 음수 부호를 배제한다.
+해석: 식 (1.17)의 양수 부호는 같은 조건의 적분과 일치한다.
+확인: 코드의 y 이류 계산은 `flow_timestep.F90:212–241`에 있다.
+확인: 코드의 잔차 조립과 갱신은 같은 파일 564–576행에 있다.
+해석: 잔차의 `+vdudy`와 시간 갱신의 잔차 차감은 식 (1.17)의 좌변 양수 부호에 대응한다.
+
+**동압 바닥 경사: 1079행.**
+
+확인: `_staging/recovery/read/XBeach/manuals/reports/non-hydrostatic_report_draft.pdf/p001-018.md:29`의 PDF 16쪽 식 (1.14)은 수면 동압을 0으로 둔다.
+해석: 아래 식은 식 (1.14)의 압력 부분에 바닥 정의를 대입한 결과다.
+
+\[
+I_p=\partial_x(H\bar p)-[p\,\partial_x z]_{-d}^{\eta}
+=\partial_x(H\bar p)-p_b\partial_x d.
+\]
+
+해석: 운동량식 우변의 압력 힘은 `-I_p`다.
+해석: 그 힘의 바닥 경사 항은 `+p_b\partial_x d`다.
+해석: 따라서 식 (1.17) 우변의 음수 부호는 같은 문서의 식 (1.14)와 모순된다.
+해석: 같은 쪽 식 (1.18)의 y 방향 음수 부호에도 같은 대입 결과가 적용된다.
+
+확인: `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/nonh.F90:1193`의 `vol       = 0.5_rKind*par%dt/(s%hum(i,j)*dxu(i))`는 u 방향 계수의 배율이다.
+확인: `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/nonh.F90:1235`의 `if (par%secorder == 1) then` 아래에서 `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/nonh.F90:1238`의 `s%uu(i,j) = s%uu(i,j) + au(1,i,j) * s%pres(i+1,j) + au(0,i,j) * s%pres(i  ,j)`를 실행한다.
+해석: 이 갱신의 압력 부분은 다음과 같다.
+
+\[
+\delta U_p=-\frac{\Delta t}{2\,\mathrm{hum}_{i,j}\,\mathrm{dxu}_i}
+\left[(\eta_{i+1,j}+d_{i,j})p_{i+1,j}-(\eta_{i,j}+d_{i+1,j})p_{i,j}\right].
+\]
+
+해석: 이 식의 압력 부호는 `-I_p/H`의 바닥 경사 기여와 일치한다.
+해석: 이 대조는 압력 부호에 한정한다.
+
+**깊이 괄호와 V 압력항: 1080행.**
+
+확인: `_staging/recovery/read/XBeach/manuals/reports/non-hydrostatic_report_draft.pdf/p019-036.md:22`의 PDF 25쪽 본문은 `\bar p^{n+\frac12}_{i+1,j} = \frac12 p^{n+\frac12}_{i+1,j}`를 적는다.
+해석: `\eta=0`, `d=D>0`, `p=P\ne0`를 모든 점에 일정하게 대입한다.
+해석: 이때 `H=D`이고 `\bar p=P/2`다.
+해석: 식 (2.15)의 첫 표현은 수심평균 압력차와 바닥 경사가 모두 0이므로 0이다.
+해석: 같은 식의 마지막 표현은 `(DP-(-D)P)/(2\Delta x)=DP/\Delta x`다.
+해석: 코드의 두 `+d` 괄호는 `(DP-DP)/(2\Delta x)=0`을 준다.
+해석: 따라서 둘째 괄호의 `-d`는 표기만 다른 동등한 계산이 아니다.
+해석: 식 (2.18)과 식 (2.19)의 동일한 괄호도 일정한 `\Delta p`를 넣으면 같은 모순을 보인다.
+
+확인: `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/nonh.F90:1216`의 `vol       = 0.5_rKind*par%dt/(s%hvm(i,j)*dyv(j))`는 v 방향 거리로 `dyv(j)`를 쓴다.
+확인: `_staging/recovery/read/XBeach/manuals/reports/non-hydrostatic_report_draft.pdf/p019-036.md:23`의 PDF 26쪽 식 (2.19)은 V 압력항의 분모를 `2\bar H^{n+1}_{i,j+\frac12}\Delta x`로 인쇄한다.
+해석: 같은 식의 U 압력항에서 `x`와 `y`, `i`와 `j`를 교환하면 V 압력항의 분모는 `\Delta y`를 가져야 한다.
+해석: V식에 남은 `\Delta x`도 코드와 다른 문서 오기다.
+확인: `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/nonh.F90:697`의 `s%uu(i,j) = aur(i,j) + au(1,i,j)*dp(i+1,j)+au(0,i,j)*dp(i,j)`와 `models/XBeach/raw/source_code/trunk/src/xbeachlibrary/nonh.F90:709`의 `s%vv(i,j) = avr(i,j) + av(1,i,j)*dp(i,j+1)+av(0,i,j)*dp(i,j)`는 압력 보정에도 같은 계수를 사용한다.
+해석: 이 판정은 비정수압 보고서 자체의 모순에 근거한다.
+미확인: 작성자는 인쇄 오류의 편집 원인이나 저자의 수정 의도를 확인하지 않았다.
+확인: 작성자는 모델을 실행하거나 컴파일하지 않았다.
+
+대상 9행, A 0, B 5, C 2, D 0, E 2, F 0, G 0
+
+G 재판정: 대상 1행 중 A–F로 바꾼 1행, G 유지 0행

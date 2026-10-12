@@ -13,7 +13,7 @@ note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-18
 related:
   - "[[sfincs-architecture-source-map]]"
-last_source_check: 2026-10-07 (recovery 재판독 대조)
+last_source_check: 2026-10-12 (recovery 차이 결론 반영)
 ---
 
 # SFINCS flow solver
@@ -55,8 +55,8 @@ SFINCS 의 시간 적분 코어. **staggered grid + explicit** 으로 reduced-co
 - 비-subgrid: `hu = max(zsu - zbuvmx(ip), huthresh)`, `gnavg2 = gn2uv(ip)` (`sfincs_momentum.f90:384-385`).
 
 huthresh의 읽기 기본값은 0.05 m이다. `sfincs_input.f90:80` `call read_real_input(500,'huthresh',huthresh,0.05)`
-NetCDF subgrid 입력 분기는 huthresh를 0.0으로 재설정한다. `sfincs_subgrid.F90:34` `if (net_file_sbg%ncid > 0) then`; `sfincs_subgrid.F90:40` `huthresh = 0.0`; `sfincs_subgrid.F90:42` `call read_subgrid_file_netcdf()`
-이 분기의 젖음 조건은 subgrid 표에 들어 있는 지형·수심 관계도 사용한다. `sfincs_subgrid.F90:34` `if (net_file_sbg%ncid > 0) then`; `sfincs_subgrid.F90:40` `huthresh = 0.0`; `sfincs_subgrid.F90:42` `call read_subgrid_file_netcdf()`
+NetCDF subgrid 입력 분기는 huthresh를 0.0으로 재설정한다. `sfincs_subgrid.F90:34` `if (net_file_sbg%ncid > 0) then`; `sfincs_subgrid.F90:40` `huthresh = 0.0`; `sfincs_subgrid.F90:42` `call read_subgrid_file_netcdf()` 근거: `docs/parameters.rst:84` `:default:		0.05`<br>`sfincs_input.f90:80` `call read_real_input(500,'huthresh',huthresh,0.05)`<br>`sfincs_subgrid.F90:34` `if (net_file_sbg%ncid > 0) then`<br>`sfincs_subgrid.F90:40` `huthresh = 0.0`<br>`sfincs_momentum.f90:177` `if (zsu>zmin + huthresh) then ! In the 'new' subgrid formulations, zmin is lowest pixel + huthresh. Huthresh was already applied when building the subgrid tables. In sfincs_domain, huthresh is set to 0.0 to acount for this.` [대조 보고서 §5 A013·C001](../../../_staging/recovery/compare/SFINCS-docs-vs-code.md:943) 결론: 문서 누락. 이 판은 NetCDF subgrid 입력을 사용할 때 huthresh의 읽기 기본값 0.05 m를 0으로 덮어쓴다.
+이 분기의 젖음 조건은 subgrid 표에 들어 있는 지형·수심 관계도 사용한다. `sfincs_subgrid.F90:34` `if (net_file_sbg%ncid > 0) then`; `sfincs_subgrid.F90:40` `huthresh = 0.0`; `sfincs_subgrid.F90:42` `call read_subgrid_file_netcdf()` 실제 subgrid 젖음 판정은 `sfincs_momentum.f90:170` `zsu = max(zs(nm), zs(nmu)) ! water level at u point`, `sfincs_momentum.f90:174` `zmin = subgrid_uv_zmin(ip)` 뒤의 `sfincs_momentum.f90:177` `if (zsu>zmin + huthresh) then ! In the 'new' subgrid formulations, zmin is lowest pixel + huthresh. Huthresh was already applied when building the subgrid tables. In sfincs_domain, huthresh is set to 0.0 to acount for this.`이다. [10-12 전수 검증 보완]
 
 ### 2.2 강제항 `frc`
 
@@ -85,6 +85,13 @@ $$\text{frc} = -\,g\,h_u\,\frac{\partial z_s}{\partial x}$$
 
 코리올리·점성에 쓰는 V-속도는 인접 4점 평균 `vu=(...)/4` (`:335`).
 
+#### 문서와 코드 차이 (외부 원문 판정)
+
+| 보고서 행 ID | 항목 | 근거 | 결론 |
+|---|---|---|---|
+| B067 | quadtree `dyrinvc` 정의·사용 버그 | [검증 정본](sfincs_subgrid_quadtree.md#cv-s-b067) | 근거와 판정은 정본을 따른다. [10-12 결론 검증 보완] |
+| <a id="cv-s-b103"></a>B103 | 개선된 2차원 이류 항 | Deltares/SFINCS, `v2.0.0`, [`source/src/sfincs_momentum.f90`](https://raw.githubusercontent.com/Deltares/SFINCS/v2.0.0/source/src/sfincs_momentum.f90), `sfincs_momentum.f90:401, 403, 405, 407` (2022-11-11, `336abcd`)<br>Deltares/SFINCS, `v2.0.2_Blockhaus_release`, [`source/src/sfincs_momentum.f90`](https://raw.githubusercontent.com/Deltares/SFINCS/v2.0.2_Blockhaus_release/source/src/sfincs_momentum.f90), `sfincs_momentum.f90:376, 378, 380, 384` (2023-06-09, `640289f`)<br>[Deltares/SFINCS 커밋 `105da46`](https://github.com/Deltares/SFINCS/commit/105da46) 및 [Deltares/SFINCS 커밋 `5a33695`](https://github.com/Deltares/SFINCS/commit/5a33695)<br>`docs/developments.rst:283`의 수정 이력을 이전·이후 횡방향 이류 식에 대조했다. 로컬 `sfincs_momentum.f90:440`은 v2.0.2의 형태를 이어 쓴다.<br>현재 `upw1` 분기는 v2.0.2의 수정 전후를 대신하지 않는다. 정확도 개선은 소스 차이만으로 판정하지 않았다. | A 판 차이. v2.0.2는 2차원 횡방향 이류 항을 v2.0.0의 `v` 속도와 `qx` 유량 차분의 곱에서 `qy` 유량 합과 `uu` 속도 차분의 곱으로 바꾸었다. 부호 판정은 유량 합 `qvt`를 사용하도록 바뀌었다. [대조 보고서 §5 B103](../../../_staging/recovery/compare/SFINCS-docs-vs-code.md:1039) [10-12 외부 원문 판정] [10-12 결론 검증 보완] |
+
 ### 2.3 마찰 + Bates 갱신
 
 마찰에 쓰는 flux `qfr`:
@@ -105,11 +112,17 @@ $$q^{n+1} = \frac{q_{sm} + \text{frc}\cdot dt}{1 + \dfrac{g\,n^2\,dt\,|q_{fr}|}{
 
 dry 점은 `q=uv=0`, `kfuv=0` (`:745-747`).
 
+#### 문서와 코드 차이 (외부 원문 판정)
+
+| 보고서 행 ID | 항목 | 근거 | 결론 |
+|---|---|---|---|
+| <a id="cv-s-b024"></a>B024 | Leijnse (2018)에 기초 | Leijnse, T. (2018). [*Computationally Efficient Modelling of Compound Flooding due to Tropical Cyclones with the Explicit Inclusion of Wave-Driven Processes*](https://repository.tudelft.nl/file/File_da13d247-495e-4556-9211-abb18ee7232d). TU Delft 석사학위논문, 2018-06-29. [서지](https://repository.tudelft.nl/record/uuid:53037d4d-d7a9-4f71-9b22-8c329f2b384c). §3.2.3, PDF 33쪽(인쇄 17쪽). 식 (3.5)·(3.6), PDF 34쪽(인쇄 18쪽). 식 (3.12), PDF 35쪽(인쇄 19쪽).<br>`sfincs_momentum.f90:677`의 마찰 분모와 `sfincs_continuity.f90:151`의 연속식을 대조했다. `sfincs_input.f90:71, 186, 616–618`은 θ 기본값·기본 2차원 마찰·평활 활성 조건의 근거이다. `sfincs_momentum.f90:624, 644–648`은 마찰 유량과 조건부 평활의 근거이다.<br>식 (3.5)의 인용은 외부 판정이 pdftotext 출력에서 재구성한 식이다. | A 판 차이. Leijnse (2018) 식 (3.5)의 마찰 분모는 현재 코드와 같은 구조이다. 식 (3.12)의 연속식은 현재 코드와 같은 구조이다. 논문의 θ 기본값은 0.9이다. 현재 코드의 θ 기본값은 1.0이다. 논문은 평활을 항상 사용한다. 현재 코드는 평활을 조건부로 사용한다. 논문은 1차원 마찰 유량을 사용한다. 현재 코드는 기본 2차원 마찰을 사용한다. 이류 식은 논문 식 (3.8)–(3.10)과 다르다. [대조 보고서 §5 B024](../../../_staging/recovery/compare/SFINCS-docs-vs-code.md:1007) [10-12 외부 원문 판정] [10-12 결론 검증 보완] |
+
 ### 2.4 combined uv 점
 
 quadtree 미세-조대 경계의 결합점 `ncuv` 개는 두 하위 uv 점 평균: `q(cuv)=(q1+q2)/2`, `uv` 동일 (`sfincs_momentum.f90:771-772`). 이 값이 연속방정식·출력에 쓰인다 (주석 `:759-761`).
 
-운동량은 후속 유량 보정 전에 결합점 평균을 만든다. `sfincs_momentum.f90:771` `q(cuv_index_uv(icuv))  = (q(cuv_index_uv1(icuv)) + q(cuv_index_uv2(icuv))) / 2`; `sfincs_momentum.f90:772` `uv(cuv_index_uv(icuv)) = (uv(cuv_index_uv1(icuv)) + uv(cuv_index_uv2(icuv))) / 2`; `sfincs_lib.f90:594` `call update_wavemaker_fluxes(t, dt, tloopwavemaker)`; `sfincs_lib.f90:600` `call compute_fluxes_over_structures(tloopstruc)`; `sfincs_lib.f90:610` `call compute_nonhydrostatic(dt, tloopnonh)`
+운동량은 후속 유량 보정 전에 결합점 평균을 만든다. `sfincs_momentum.f90:771` `q(cuv_index_uv(icuv))  = (q(cuv_index_uv1(icuv)) + q(cuv_index_uv2(icuv))) / 2`; `sfincs_momentum.f90:772` `uv(cuv_index_uv(icuv)) = (uv(cuv_index_uv1(icuv)) + uv(cuv_index_uv2(icuv))) / 2`; `sfincs_lib.f90:594` `call update_wavemaker_fluxes(t, dt, tloopwavemaker)`; `sfincs_lib.f90:600` `call compute_fluxes_over_structures(tloopstruc)`; `sfincs_lib.f90:610` `call compute_nonhydrostatic(dt, tloopnonh)` 결합점 평균 루프의 바깥 조건은 `if (ncuv > 0) then`이다(`sfincs_momentum.f90:757` `if (ncuv > 0) then`). [10-12 전수 검증 보완]
 wavemaker·구조물·비정수압 루틴은 이 평균을 다시 만드는 대입을 포함하지 않는다. `sfincs_momentum.f90:771` `q(cuv_index_uv(icuv))  = (q(cuv_index_uv1(icuv)) + q(cuv_index_uv2(icuv))) / 2`; `sfincs_momentum.f90:772` `uv(cuv_index_uv(icuv)) = (uv(cuv_index_uv1(icuv)) + uv(cuv_index_uv2(icuv))) / 2`; `sfincs_lib.f90:594` `call update_wavemaker_fluxes(t, dt, tloopwavemaker)`; `sfincs_lib.f90:600` `call compute_fluxes_over_structures(tloopstruc)`; `sfincs_lib.f90:610` `call compute_nonhydrostatic(dt, tloopnonh)`
 
 
@@ -130,9 +143,9 @@ $$z_s^{n+1} = z_s^n + \big[(q_{nmd}-q_{nmu})\,dx^{-1} + (q_{ndm}-q_{num})\,dy^{-
 flux 발산으로 **부피 변화** `dvol` 누적 (`:355` geo / `:376` quadtree / `:380` regular), 강수·qext 를 `dvol += dzsdt*a*dt` 로 가산 (`:495`), storage volume 처리(`:499-531`) 후 `z_volume(nm) += dvol` (`:535`). 수위는 subgrid 테이블에서 역산:
 
 저장용량 옵션은 subgrid에서 사용한다. `sfincs_input.f90:655` `if (volfile(1:4) /= 'none') then`; `sfincs_input.f90:656` `if (subgrid) then`; `sfincs_input.f90:657` `use_storage_volume = .true.`
-순강수·면 유량의 양의 유입은 남은 저장용량을 먼저 채운다. `sfincs_continuity.f90:503` `if (storage_volume(nm) > 1.0e-6 .and. dvol > 0.0) then`; `sfincs_continuity.f90:513` `storage_volume(nm) = max(dv, 0.0)`; `sfincs_continuity.f90:525` `dvol = 0.0`; `sfincs_continuity.f90:535` `z_volume(nm) = z_volume(nm) + dvol`
-점 유량은 계산 셀의 z_volume에 직접 들어간다. `sfincs_continuity.f90:319` `z_volume(nm) = z_volume(nm) + qtsrc(isrc) * dt`
-점 유량은 저장용량의 우선 저장 분기를 우회한다. `sfincs_continuity.f90:319` `z_volume(nm) = z_volume(nm) + qtsrc(isrc) * dt`; `sfincs_continuity.f90:501` `! If water enters the cell through a point discharge, it will NOT end up in storage volume !`; `sfincs_continuity.f90:503` `if (storage_volume(nm) > 1.0e-6 .and. dvol > 0.0) then`
+subgrid의 `if (kcs(nm) == 1 .or. kcs(nm) == 4) then` 안에서 면 유량과 활성 순강수·외부 소스의 순 체적 변화량을 `dvol`에 합산한다(`sfincs_continuity.f90:459` `if (kcs(nm) == 1 .or. kcs(nm) == 4) then`; `sfincs_continuity.f90:473` `if (precip .or. use_qext) then`; `sfincs_continuity.f90:481` `dzsdt = dzsdt + netprcp(nm)`; `sfincs_continuity.f90:489` `dzsdt = dzsdt + qext(nm)`; `sfincs_continuity.f90:495` `dvol = dvol + dzsdt * a * dt`). [10-12 전수 검증 보완] 저장용량 사용 시 `if (storage_volume(nm) > 1.0e-6 .and. dvol > 0.0) then`은 `dv = storage_volume(nm) - dvol`과 `storage_volume(nm) = max(dv, 0.0)`을 대입한다(`sfincs_continuity.f90:499` `if (use_storage_volume) then`; `sfincs_continuity.f90:503` `if (storage_volume(nm) > 1.0e-6 .and. dvol > 0.0) then`; `sfincs_continuity.f90:509` `dv = storage_volume(nm) - dvol`; `sfincs_continuity.f90:513` `storage_volume(nm) = max(dv, 0.0)`). [10-12 전수 검증 보완] `if (dv < 0.0) then`은 `dvol = - dv`를 남긴다(`sfincs_continuity.f90:515` `if (dv < 0.0) then`; `sfincs_continuity.f90:519` `dvol = - dv`). [10-12 전수 검증 보완] ELSE는 `dvol = 0.0`을 남긴다(`sfincs_continuity.f90:521` `else`; `sfincs_continuity.f90:525` `dvol = 0.0`). [10-12 전수 검증 보완]
+subgrid 점 유량 대입은 `if (nsrcdrn > 0) then` 안에서 `if ((z_volume(nm) >= 0) .or. ((qtsrc(isrc)<0.0) .and. (z_volume(nm) >= 0))) then`을 통과할 때 수행한다(`sfincs_continuity.f90:311` `if (nsrcdrn > 0) then`; `sfincs_continuity.f90:318` `if ((z_volume(nm) >= 0) .or. ((qtsrc(isrc)<0.0) .and. (z_volume(nm) >= 0))) then`; `sfincs_continuity.f90:319` `z_volume(nm) = z_volume(nm) + qtsrc(isrc) * dt`). [10-12 전수 검증 보완]
+점 유량은 저장용량의 우선 저장 분기를 우회한다. `sfincs_continuity.f90:319` `z_volume(nm) = z_volume(nm) + qtsrc(isrc) * dt`; `sfincs_continuity.f90:501` `! If water enters the cell through a point discharge, it will NOT end up in storage volume !`; `sfincs_continuity.f90:503` `if (storage_volume(nm) > 1.0e-6 .and. dvol > 0.0) then` 근거: `docs/input.rst:540` `Water will be stored in this storage volume before it will contribute to surface runoff.`<br>`docs/input.rst:542` `**NOTE - Only useable in subgrid mode (on either regular or quadtree grid)**`<br>`sfincs_continuity.f90:319` `z_volume(nm) = z_volume(nm) + qtsrc(isrc) * dt`<br>`sfincs_continuity.f90:501` `! If water enters the cell through a point discharge, it will NOT end up in storage volume !`<br>`sfincs_continuity.f90:503` `if (storage_volume(nm) > 1.0e-6 .and. dvol > 0.0) then`<br>`sfincs_continuity.f90:535` `z_volume(nm) = z_volume(nm) + dvol` [대조 보고서 §5 B124·C027](../../../_staging/recovery/compare/SFINCS-docs-vs-code.md:1050) 결론: 문서 누락. 이 판의 subgrid 연속식은 점 유량을 저장용량에 보내지 않고 셀의 물 부피에 직접 더한다.
 
 - 완전 wet (`z_volume >= subgrid_z_volmax*0.999`): `zs=max(z_zmax,-20)+(vol-volmax)/a` (`:553`).
 - 거의 dry (`<=1e-6`): `zs=max(z_zmin,-20)` (`:559`).
@@ -140,10 +153,16 @@ flux 발산으로 **부피 변화** `dvol` 누적 (`:355` geo / `:376` quadtree 
 
 `wiggle_suppression` 용 2차 도함수 `zsderv(nm)=zs - 2*zs11 + zs00` 저장 (`:575`) — 이를 §2.3 의 flux 감쇠가 사용.
 
-subgrid 연속식은 단계 끝에서 `zsderv`를 쓴다. `sfincs_continuity.f90:575` `zsderv(nm) = zs(nm) - 2 * zs11 + zs00`; `sfincs_momentum.f90:683` `mdrv = abs(zsderv(nm) - zsderv(nmu)) - wiggle_threshold`
-다음 단계의 운동량은 이 값을 읽는다. `sfincs_continuity.f90:575` `zsderv(nm) = zs(nm) - 2 * zs11 + zs00`; `sfincs_momentum.f90:683` `mdrv = abs(zsderv(nm) - zsderv(nmu)) - wiggle_threshold`
+subgrid 연속식은 단계 끝에서 `zsderv`를 쓴다. `sfincs_continuity.f90:575` `zsderv(nm) = zs(nm) - 2 * zs11 + zs00`; `sfincs_momentum.f90:683` `mdrv = abs(zsderv(nm) - zsderv(nmu)) - wiggle_threshold` 이 대입은 계산 셀의 `if (kcs(nm) == 1 .or. kcs(nm) == 4) then` 안에서 `if (wiggle_suppression) then`일 때 수행한다(`sfincs_continuity.f90:459` `if (kcs(nm) == 1 .or. kcs(nm) == 4) then`; `sfincs_continuity.f90:573` `if (wiggle_suppression) then`; `sfincs_continuity.f90:575` `zsderv(nm) = zs(nm) - 2 * zs11 + zs00`). [10-12 전수 검증 보완]
+다음 단계의 운동량은 이 값을 읽는다. `sfincs_continuity.f90:575` `zsderv(nm) = zs(nm) - 2 * zs11 + zs00`; `sfincs_momentum.f90:683` `mdrv = abs(zsderv(nm) - zsderv(nmu)) - wiggle_threshold` 소비 조건은 `if (subgrid .and. wiggle_suppression) then`이다(`sfincs_momentum.f90:679` `if (subgrid .and. wiggle_suppression) then`). [10-12 전수 검증 보완]
 현재 운동량은 직전 단계의 `zsderv`를 사용한다. `sfincs_continuity.f90:575` `zsderv(nm) = zs(nm) - 2 * zs11 + zs00`; `sfincs_momentum.f90:683` `mdrv = abs(zsderv(nm) - zsderv(nmu)) - wiggle_threshold`
 
+
+#### 문서와 코드 차이 (외부 원문 판정)
+
+| 보고서 행 ID | 항목 | 근거 | 결론 |
+|---|---|---|---|
+| B080 | subgrid 모드와 van Ormondt et al. (2025) 일관성 | [검증 정본](sfincs_subgrid_quadtree.md#cv-s-b080) | G 판단 근거 부족. 거칠기 식 일치 결론은 철회했다. [10-12 결론 검증 정정] |
 
 ### 3.3 부가 저장
 
@@ -187,7 +206,9 @@ dtchk = alfa * min_dt
 ### 5.2 step 순서와 불안정 정지
 
 일반 계산 경로는 운동량 다음에 단계 진단·wavemaker·구조물·비정수압·연속식을 조건에 따라 실행한다. `sfincs_lib.f90:584` `call compute_fluxes(dt, tloopflux)`; `sfincs_lib.f90:588` `call timestep_analysis_update(min_dt)`; `sfincs_lib.f90:594` `call update_wavemaker_fluxes(t, dt, tloopwavemaker)`; `sfincs_lib.f90:600` `call compute_fluxes_over_structures(tloopstruc)`; `sfincs_lib.f90:610` `call compute_nonhydrostatic(dt, tloopnonh)`; `sfincs_lib.f90:618` `call compute_water_levels(t, dt, tloopcont)`; `sfincs_lib.f90:392` `dtchk = alfa * min_dt`; `sfincs_lib.f90:634` `if (dtchk < dtmin .and. nt > 1) then`
-단계 시작의 `dtchk`가 `dtmin`보다 작고 `nt>1`이면 최종 출력을 기록한다. `sfincs_lib.f90:584` `call compute_fluxes(dt, tloopflux)`; `sfincs_lib.f90:588` `call timestep_analysis_update(min_dt)`; `sfincs_lib.f90:594` `call update_wavemaker_fluxes(t, dt, tloopwavemaker)`; `sfincs_lib.f90:600` `call compute_fluxes_over_structures(tloopstruc)`; `sfincs_lib.f90:610` `call compute_nonhydrostatic(dt, tloopnonh)`; `sfincs_lib.f90:618` `call compute_water_levels(t, dt, tloopcont)`; `sfincs_lib.f90:392` `dtchk = alfa * min_dt`; `sfincs_lib.f90:634` `if (dtchk < dtmin .and. nt > 1) then`
+단계 시작의 `dtchk`가 `dtmin`보다 작고 `nt>1`이면 최종 출력을 기록한다. `sfincs_lib.f90:584` `call compute_fluxes(dt, tloopflux)`; `sfincs_lib.f90:588` `call timestep_analysis_update(min_dt)`; `sfincs_lib.f90:594` `call update_wavemaker_fluxes(t, dt, tloopwavemaker)`; `sfincs_lib.f90:600` `call compute_fluxes_over_structures(tloopstruc)`; `sfincs_lib.f90:610` `call compute_nonhydrostatic(dt, tloopnonh)`; `sfincs_lib.f90:618` `call compute_water_levels(t, dt, tloopcont)`; `sfincs_lib.f90:392` `dtchk = alfa * min_dt`; `sfincs_lib.f90:634` `if (dtchk < dtmin .and. nt > 1) then` 근거: `docs/developments.rst:142` `Official open source version 2025.01: v2.2.0 col d'Eze release`<br>`docs/developments.rst:173` `* stopdepth - REMOVED in SFINCS v2.2.0, replaced by 'uvmax' to determine possible instabilities based on flow velocities rather than maximum water depth!`<br>`docs/parameters.rst:202` `stopdepth - removed from SFINCS v2.1.1 Dollerup onwards, replaced by 'uvmax'`<br>`sfincs_domain.f90:1528` `! No longer use long wave celerity, OLD implementation with 'stopdepth'`<br>`sfincs_domain.f90:1530` `! dtmin = alfa * dxymin / (sqrt(9.81 * stopdepth))`<br>`sfincs_domain.f90:1539` `dtmin = alfa * dxymin / (1.25 * abs(uvmax))`<br>`sfincs_lib.f90:634` `if (dtchk < dtmin .and. nt > 1) then`<br>`sfincs_lib.f90:638` `write(error_message,'(a,f0.4,a,f0.1,a)')'Error! Minimum time step of ', dtmin, ' s reached ! Current velocity exceeded uvmax ', uvmax, ' m/s. Simulation stopped.'` [대조 보고서 §5 A033·B081·C029](../../../_staging/recovery/compare/SFINCS-docs-vs-code.md:948) 결론: 판 차이. 중단 조건은 `if (dtchk < dtmin .and. nt > 1) then`이다. 인용한 dtmin 계산식은 투영좌표 분기에만 있다. [10-12 결론 검증 정정]
+
+<a id="cv-s-sf-02"></a>**CV-S-SF-02 — E 코드 결함 후보.** 구면좌표 초기화에서 dtmin을 대입하지 않은 채 중단 검사에 사용하는 후보이다. `sfincs_domain.f90:1403`의 `if (crsgeo) then`은 `:1475`에서 ELSE로 끝난다. `:1539`의 dtmin 대입은 이 ELSE 안에만 있다. `sfincs_data.f90:56`의 `real*4 dtmin`에는 초기값이 없다. `sfincs_lib.f90:634`는 좌표계 구분 없이 `if (dtchk < dtmin .and. nt > 1) then`을 검사한다. 투영좌표의 명시적 계산 경로와 구면좌표의 사용 전 대입 부재가 근거이다. raw 전체의 dtmin 검색에서 다른 초기화·입력·변환 경로를 찾지 못했다. 컴파일러가 정적 저장소를 0으로 채우더라도 uvmax 기반 임계값을 계산한 근거가 되지 않는다. 구면좌표에서의 실제 값과 실행 영향은 미확인이다. [대조 보고서 §5 CV-S-SF-02](../../../_staging/recovery/compare/SFINCS-docs-vs-code.md#cv-s-sf-02) [10-12 결론 검증 정정]
 현재 운동량이 새로 만든 `min_dt`는 다음 단계의 간격에 쓰인다. `sfincs_lib.f90:584` `call compute_fluxes(dt, tloopflux)`; `sfincs_lib.f90:588` `call timestep_analysis_update(min_dt)`; `sfincs_lib.f90:594` `call update_wavemaker_fluxes(t, dt, tloopwavemaker)`; `sfincs_lib.f90:600` `call compute_fluxes_over_structures(tloopstruc)`; `sfincs_lib.f90:610` `call compute_nonhydrostatic(dt, tloopnonh)`; `sfincs_lib.f90:618` `call compute_water_levels(t, dt, tloopcont)`; `sfincs_lib.f90:392` `dtchk = alfa * min_dt`; `sfincs_lib.f90:634` `if (dtchk < dtmin .and. nt > 1) then`
 
 현재 중단 메시지는 최소 시간 간격과 uvmax 초과를 적는다. `sfincs_lib.f90:638` `write(error_message,'(a,f0.4,a,f0.1,a)')'Error! Minimum time step of ', dtmin, ' s reached ! Current velocity exceeded uvmax ', uvmax, ' m/s. Simulation stopped.'`
@@ -201,10 +222,10 @@ dtchk = alfa * min_dt
 - `timestep_analysis_update(min_dt)` (`sfincs_lib.f90:588`): wet 점(`kfuv==1`)의 required dt 누적 평균, `times_wet++` (`sfincs_timestep_analysis.f90:51-55`), 전역 `min_dt` 와 거의 같으면(`<= min_dt+1e-6`) `times_limiting++` (`:59-61`).
 - `timestep_analysis_finalize(nt)` (`sfincs_lib.f90:698`): 셀의 8개 이웃 U/V 점 평균 required dt 의 최소에 `alfa` 곱해 셀별 dt 맵, 유효 이웃 없으면 −1 (`sfincs_timestep_analysis.f90:178-188`), 제한 비율 `100*tmsl/nt` (`:192`).
 
-  코드는 이 값을 dtmax 이하로 제한한다. `sfincs_timestep_analysis.f90:182` `timestep_analysis_average_required_timestep_per_cell(nm) = min(dtm * alfa, dtmax)`
-  해석: 유효한 건조 면의 0/max(0,1) 경로는 값 0을 만들 수 있다. `sfincs_timestep_analysis.f90:124` `dtm = min(dtm, timestep_analysis_average_required_timestep(nmd1) / max(timestep_analysis_times_wet(nmd1), 1))`
-  -1은 유효 주변 면이 없어 큰 초기 dtm이 남는 경우에 기록한다. `sfincs_timestep_analysis.f90:188` `timestep_analysis_average_required_timestep_per_cell(nm) = -1.0`
-  percentage_limiting_timestep은 주변 면별 제한 횟수의 최댓값에 100/nt를 곱한다. `sfincs_timestep_analysis.f90:59` `if (timestep_analysis_required_timestep(ip) <= min_dt + 1.0e-6) then`; `sfincs_timestep_analysis.f90:125` `tmsl = max(tmsl, timestep_analysis_times_limiting(nmd1))`; `sfincs_timestep_analysis.f90:192` `timestep_analysis_percentage_limiting_per_cell(nm) = 100.0 * tmsl / nt`
+  코드는 이 값을 dtmax 이하로 제한한다. `sfincs_timestep_analysis.f90:182` `timestep_analysis_average_required_timestep_per_cell(nm) = min(dtm * alfa, dtmax)` 이 대입은 `if (dtm < 1.0e5) then`에서만 수행한다(`sfincs_timestep_analysis.f90:178` `if (dtm < 1.0e5) then`). [10-12 전수 검증 보완]
+<a id="cv-s-b125"></a>  해석: 유효한 건조 면의 0/max(0,1) 경로는 값 0을 만들 수 있다. `sfincs_timestep_analysis.f90:124` `dtm = min(dtm, timestep_analysis_average_required_timestep(nmd1) / max(timestep_analysis_times_wet(nmd1), 1))` 근거: `docs/input.rst:758` ```:description:		The time-averaged CFL-limited timestep at each cell (scaled by the Courant factor ``alpha``), taking the minimum across surrounding U/V flux points. Cells that were never wet during the simulation are assigned a value of -1.```<br>`sfincs_timestep_analysis.f90:17` `timestep_analysis_average_required_timestep = 0.0`<br>`sfincs_timestep_analysis.f90:19` `timestep_analysis_times_wet = 0`<br>`sfincs_timestep_analysis.f90:51` `timestep_analysis_average_required_timestep(ip) = timestep_analysis_average_required_timestep(ip) + timestep_analysis_required_timestep(ip)`<br>`sfincs_timestep_analysis.f90:55` `timestep_analysis_times_wet(ip) = timestep_analysis_times_wet(ip) + 1`<br>`sfincs_timestep_analysis.f90:123` `if (kcuv(nmd1) == 1 .or. kcuv(nmd1) == 6) then`<br>`sfincs_timestep_analysis.f90:124` `dtm = min(dtm, timestep_analysis_average_required_timestep(nmd1) / max(timestep_analysis_times_wet(nmd1), 1))`<br>`sfincs_timestep_analysis.f90:178` `if (dtm < 1.0e5) then`<br>`sfincs_timestep_analysis.f90:182` `timestep_analysis_average_required_timestep_per_cell(nm) = min(dtm * alfa, dtmax)`<br>`sfincs_timestep_analysis.f90:186` `! No normal wet neighboring U/V points, likely a dry cell or near boundary, set to -1 to indicate not wet or not valid`<br>`sfincs_timestep_analysis.f90:188` `timestep_analysis_average_required_timestep_per_cell(nm) = -1.0` [대조 보고서 §5 B125·C028](../../../_staging/recovery/compare/SFINCS-docs-vs-code.md:1051) 결론: 코드 결함 후보. 이 판의 average_required_timestep에는 한 번도 젖지 않은 유효 면 때문에 -1 대신 0을 기록할 수 있는 결함 후보가 있다. 반대 경로 확인: `sfincs_timestep_analysis.f90:17,19`는 누적값과 젖은 횟수를 0으로 초기화한다. `:43–55`의 갱신은 `kfuv(ip) == 1`을 요구한다. 집계의 `:123–124`는 유효 면의 마스크만 검사한다. `:178–188`의 출력 제한은 0을 -1로 바꾸지 않는다. 주변의 다른 젖은 면이 있어도 최솟값에 건조 면의 0이 들어갈 수 있다. [10-12 결론 검증 보완]
+  `if (dtm < 1.0e5) then`의 ELSE가 -1을 기록한다(`sfincs_timestep_analysis.f90:178` `if (dtm < 1.0e5) then`; `sfincs_timestep_analysis.f90:188` `timestep_analysis_average_required_timestep_per_cell(nm) = -1.0`). [10-12 전수 검증 정정] 해석: 유효 주변 면의 평균값이 모두 1.0e5 이상인 경우도 이 ELSE에 들어갈 수 있다(`sfincs_timestep_analysis.f90:124` `dtm = min(dtm, timestep_analysis_average_required_timestep(nmd1) / max(timestep_analysis_times_wet(nmd1), 1))`; `sfincs_timestep_analysis.f90:178` `if (dtm < 1.0e5) then`). [10-12 전수 검증 보완]
+  percentage_limiting_timestep은 주변 면별 제한 횟수의 최댓값에 100/nt를 곱한다. `sfincs_timestep_analysis.f90:59` `if (timestep_analysis_required_timestep(ip) <= min_dt + 1.0e-6) then`; `sfincs_timestep_analysis.f90:125` `tmsl = max(tmsl, timestep_analysis_times_limiting(nmd1))`; `sfincs_timestep_analysis.f90:192` `timestep_analysis_percentage_limiting_per_cell(nm) = 100.0 * tmsl / nt` 근거: `docs/input.rst:762` `:description:		The percentage of total simulation timesteps during which a cell's required timestep was the global minimum (i.e., it was the bottleneck). High values indicate cells that frequently limit the overall model performance.`<br>`sfincs_timestep_analysis.f90:59` `if (timestep_analysis_required_timestep(ip) <= min_dt + 1.0e-6) then`<br>`sfincs_timestep_analysis.f90:61` `timestep_analysis_times_limiting(ip) = timestep_analysis_times_limiting(ip) + 1`<br>`sfincs_timestep_analysis.f90:125` `tmsl = max(tmsl, timestep_analysis_times_limiting(nmd1))`<br>`sfincs_timestep_analysis.f90:139` `tmsl = max(tmsl, timestep_analysis_times_limiting(nmu1))`<br>`sfincs_timestep_analysis.f90:192` `timestep_analysis_percentage_limiting_per_cell(nm) = 100.0 * tmsl / nt` [대조 보고서 §5 B126](../../../_staging/recovery/compare/SFINCS-docs-vs-code.md:1052) 결론: 문서 오기. 이 판의 percentage_limiting_timestep은 주변 면별 제한 횟수의 최댓값을 전체 단계 수로 나눈 백분율이다.
   해석: 이 비율은 주변 면의 제한 단계 집합을 합친 비율과 일반적으로 같지 않다. `sfincs_timestep_analysis.f90:125` `tmsl = max(tmsl, timestep_analysis_times_limiting(nmd1))`; `sfincs_timestep_analysis.f90:192` `timestep_analysis_percentage_limiting_per_cell(nm) = 100.0 * tmsl / nt`
 
 - `timestep_analysis_write_log` (`sfincs_lib.f90:781`): 가장 자주 제한한 uv 점의 인덱스·좌표·제한 비율 로그 (`sfincs_timestep_analysis.f90:206-241`).
@@ -215,3 +236,7 @@ dtchk = alfa * min_dt
 - 운동량: 수면경사 압력항 + 옵션(이류 upw1 기본·점성·코리올리·바람·기압·파랑) → Bates(2010) semi-implicit Manning friction 갱신 (`sfincs_momentum.f90:677`).
 - 연속: regular 는 수위 직접 갱신, subgrid 는 부피→테이블 역산 (`sfincs_continuity.f90:151` vs `:535,:553-568`).
 - dt: 셀별 $1/(\max(\sqrt{gh},|u|)\,dx^{-1})$ 의 전역 최소 × `alfa`(0.5), 상한 `dtmax`(60 s); `dtmin` 미만 시 중단 (`sfincs_lib.f90:391,634`).
+
+## 문서 참고 링크 오류
+
+v2.0.2 릴리스 링크의 정정은 [변경 이력 노트의 정본](../manual-notes/sfincs-v2.4.0-galibier-changelog-known-issues.md#문서-참고-링크-오류)을 따른다. [10-12 결론 검증 보완]

@@ -3,6 +3,7 @@ title: "XBeach nonh — pres/dp 압력 예측·보정, 1층·reduced 2층 및 MP
 topic: xbeach
 canonical_source: self
 citation_status: verified
+last_source_check: "2026-10-12 (recovery 차이 결론 반영)"
 verification_method: "models/XBeach/raw/source_code/trunk/src/xbeachlibrary/nonh.F90 (3471) 직접 read — nonh_cor(146 entry, 2회/step), nonhq3d 분기(1-layer nonh_1lay_pred/cor vs reduced 2-layer nonh_2lay_pred/cor_2dV/3d, 174-249), 5-diagonal pressure matrix mat+rhs+dp, solver_solvemat(686/1412/2164) file:line 인용. Pieter Bart Smit 2009/2014."
 note_author: "Claude Opus 4.8 (1M context) source-code direct read"
 note_date: 2026-06-03
@@ -46,13 +47,25 @@ source_correction_human_approval: not-issued
 
 ### 3.1 보고서 압력항 식과 코드의 부호 대조
 
-비정수압 보고서(non-hydrostatic_report_draft)는 바닥을 $z=-d$로 정의한다(인쇄 3쪽·PDF 13쪽 Figure 2-2). 따라서 코드의 `zb`는 보고서의 $-d$에 해당한다.
+비정수압 보고서(non-hydrostatic_report_draft)는 바닥을 $z=-d$로 정의한다(인쇄 3쪽·PDF 13쪽 Figure 2-2). 해석: 코드의 `zb`는 보고서의 $-d$에 해당한다(`flow_timestep.F90:940` `s%hh  = max(s%zs-s%zb,par%eps)`). [10-12 전수 검증 보완]
 
-- 보고서 식 (2.15)의 첫 표현 $\frac{H_{i+1,j}\bar p_{i+1,j}-H_{i,j}\bar p_{i,j}}{\Delta x}-p_{i+\frac12,j}\frac{d_{i+\frac12,j}-d_{i-\frac12,j}}{\Delta x}$에 $H=\eta+d$, $\bar p=\frac12p$, $p_{i+\frac12,j}=\frac12(p_{i+1,j}+p_{i,j})$를 넣으면 $\frac{(\eta_{i+1,j}+d_{i,j})p_{i+1,j}-(\eta_{i,j}+d_{i+1,j})p_{i,j}}{2\Delta x}$가 된다(Claude 전개).
+이 대조는 단일층 분기에 한정한다(`nonh.F90:239` `call nonh_1lay_pred(s,par)`); (`nonh.F90:243` `call nonh_1lay_cor(s,par)`). 원문 근거: (`_staging/recovery/read/XBeach/manuals/reports/non-hydrostatic_report_draft.pdf/p001-018.md:29` `-\frac{\partial}{\partial y}\left(HUV-\int_{-d}^{\eta}(v-V)(u-U)dz\right)`); (`_staging/recovery/read/XBeach/manuals/reports/non-hydrostatic_report_draft.pdf/p019-036.md:22` `\left(\eta^{n+1}_{i,j} - d^{n+1}_{i+1,j}\right)`); (`nonh.F90:1195` `au(0,i,j) = + (s%zs(i  ,j) - s%zb(i+1,j))*vol`). [대조 보고서 §5, 1068행](../../../_staging/recovery/compare/XBeach-manual-vs-code.md#5-차이-결론) 결론: 문서 오기. 단일층 코드와 대조한 비정수압 보고서의 y 이류항과 동압 압력항에는 문서 내부 모순으로 확인한 오기가 있다.
+
+- 보고서 식 (1.14)의 압력 적분은 `\frac{\partial H\bar p}{\partial x}-\left[p\frac{\partial z}{\partial x}\right]_{z=-d}^{z=\eta}`다(`_staging/recovery/read/XBeach/manuals/reports/non-hydrostatic_report_draft.pdf/p001-018.md:29` `\frac{\partial H\bar p}{\partial x}-\left[p\frac{\partial z}{\partial x}\right]_{z=-d}^{z=\eta}`). 같은 쪽 식 (1.17)은 우변에 `-p\frac{\partial d}{\partial x}`를 인쇄한다(`_staging/recovery/read/XBeach/manuals/reports/non-hydrostatic_report_draft.pdf/p001-018.md:29` `-p\frac{\partial d}{\partial x}`). 해석: `z=-d`와 수면 동압 0을 대입하면 압력 적분은 `\partial_x(H\bar p)-p_b\partial_x d`다. 해석: 우변 압력 힘의 바닥 경사 항은 `+p_b\partial_x d`다. 코드 근거: (`nonh.F90:1194` `au(1,i,j) = - (s%zs(i+1,j) - s%zb(i  ,j))*vol`); (`nonh.F90:1195` `au(0,i,j) = + (s%zs(i  ,j) - s%zb(i+1,j))*vol`). [대조 보고서 §5, 1079행](../../../_staging/recovery/compare/XBeach-manual-vs-code.md#5-차이-결론) 결론: 문서 오기. 비정수압 보고서 식 (1.17) 우변의 동압 바닥 경사 항은 양의 부호로 써야 한다.
+
+- 보고서 식 (2.15)의 첫 표현은 $\frac{H^{n+1}_{i+1,j}\bar p^{n+\frac12}_{i+1,j}-H^{n+1}_{i,j}\bar p^{n+\frac12}_{i,j}}{\Delta x}-p^{n+\frac12}_{i+\frac12,j}\frac{d_{i+\frac12,j}-d_{i-\frac12,j}}{\Delta x}$이다(`_staging/recovery/read/XBeach/manuals/reports/non-hydrostatic_report_draft.pdf/p019-036.md:22`, 인쇄 15쪽·PDF 25쪽). [10-12 전수 검증 정정]
+  해석: $H=\eta+d$, $\bar p=\frac12p$, $p_{i+\frac12,j}=\frac12(p_{i+1,j}+p_{i,j})$만 대입하면 바닥 차분의 반격자 첨자가 남는다(같은 판독 기록:22, 원문 `d_{i+\frac12,j} - d_{i-\frac12,j}`). [10-12 전수 검증 정정]
+  해석: $d_{i+\frac12,j}-d_{i-\frac12,j}=d_{i+1,j}-d_{i,j}$를 추가로 가정하고 시간 첨자를 생략해야 $\frac{(\eta_{i+1,j}+d_{i,j})p_{i+1,j}-(\eta_{i,j}+d_{i+1,j})p_{i,j}}{2\Delta x}$를 얻는다(같은 판독 기록:22의 식 (2.15) 대수 전개). [10-12 전수 검증 정정]
 - 보고서는 같은 식의 마지막 표현을 $(\eta^{n+1}_{i,j}-d^{n+1}_{i+1,j})$로 인쇄한다(인쇄 15쪽·PDF 25쪽, 쪽 이미지로 확인). 식 (2.18)과 (2.19)도 같은 자리에 $-d$를 인쇄한다(인쇄 16쪽·PDF 26쪽).
-- 코드는 `au(1,i,j) = - (s%zs(i+1,j) - s%zb(i  ,j))*vol`, `au(0,i,j) = + (s%zs(i  ,j) - s%zb(i+1,j))*vol`이다(`nonh.F90:1194-1195`). v 방향도 같은 형태다(`nonh.F90:1217-1218`). `zb=-d`를 넣으면 두 괄호는 모두 $\eta+d$ 형태다. 따라서 코드는 첫 표현을 전개한 식과 같다. 보고서 마지막 표현의 $-d$는 첫 표현과 맞지 않는 인쇄 부호다.
-- 보고서 식 (1.13)은 y 이류항 앞에 $-$를, 식 (1.17)은 $+$를 인쇄한다(인쇄 6쪽·PDF 16쪽). 코드의 u 운동량 잔차는 x 이류항과 y 이류항을 같은 부호로 더한다: `dudt = (s%ududx(i,j)+s%vdudy(i,j)-s%viscu(i,j) &`(`flow_timestep.F90:564`). 따라서 코드는 식 (1.17)의 부호와 같다.
-- 확인하지 않은 것: 이 부호 차이가 계산 결과에 주는 영향은 모델 실행으로 확인하지 않았다. 코드는 보고서의 인쇄 오기와 무관하게 첫 표현의 전개와 일치한다.
+- `nonh_1lay_pred`는 `if (nonhU(i,j)==1) then`에서 `au(1,i,j) = - (s%zs(i+1,j) - s%zb(i  ,j))*vol`과 `au(0,i,j) = + (s%zs(i  ,j) - s%zb(i+1,j))*vol`을 대입한다(`nonh.F90:1192-1195`). [10-12 전수 검증 보완]
+  ELSE 분기는 두 계수를 0으로 대입한다(`nonh.F90:1196-1198` `au(1,i,j) =  0.0_rKind`, `au(0,i,j) =  0.0_rKind`). [10-12 전수 검증 보완]
+  v 방향은 `if (s%ny>2) then`과 `if (nonhV(i,j)==1)then` 안에서 같은 부호 구조를 쓴다(`nonh.F90:1212-1218` `av(1,i,j)  = -(s%zs(i  ,j+1) - s%zb(i  ,j  ))*vol`, `av(0,i,j)  = +(s%zs(i  ,j  ) - s%zb(i  ,j+1))*vol`). [10-12 전수 검증 보완]
+  v 방향의 내부 ELSE 분기는 두 계수를 0으로 대입한다(`nonh.F90:1220-1222` `av(1,i,j) =  0.0_rKind`, `av(0,i,j) =  0.0_rKind`). [10-12 전수 검증 보완]
+  해석: `zb=-d`로 대응시키면 코드의 두 괄호는 모두 $\eta+d$ 형태다(`nonh.F90:1194-1195,1217-1218`). [10-12 전수 검증 정정]
+  해석: 이 부호 구조는 위의 추가 차분 가정으로 전개한 식과 대응하며, 보고서 마지막 표현의 둘째 괄호에 인쇄한 $-d$와 다르다(인쇄 15–16쪽·PDF 25–26쪽; 판독 기록 `p019-036.md:22-23`). [10-12 전수 검증 정정] 원문 근거: (`_staging/recovery/read/XBeach/manuals/reports/non-hydrostatic_report_draft.pdf/p019-036.md:22` `\left(\eta^{n+1}_{i,j} - d^{n+1}_{i+1,j}\right)`); (`nonh.F90:1195` `au(0,i,j) = + (s%zs(i  ,j) - s%zb(i+1,j))*vol`); (`nonh.F90:1218` `av(0,i,j)  = +(s%zs(i  ,j  ) - s%zb(i  ,j+1))*vol`). 해석: `\eta=0`과 일정한 `d=D>0` 및 `p=P\ne0`를 대입하면 식 (2.15)의 첫 표현은 0이다. 같은 대입에서 마지막 표현은 `DP/\Delta x`다. 식 (2.19)의 V 압력항은 분모에 `\Delta x`를 인쇄한다(`_staging/recovery/read/XBeach/manuals/reports/non-hydrostatic_report_draft.pdf/p019-036.md:23` `2\bar H^{n+1}_{i,j+\frac12}\Delta x`). 코드는 v 방향 거리에 `dyv(j)`를 쓴다(`nonh.F90:1216` `vol       = 0.5_rKind*par%dt/(s%hvm(i,j)*dyv(j))`). [대조 보고서 §5, 1080행](../../../_staging/recovery/compare/XBeach-manual-vs-code.md#5-차이-결론) 결론: 문서 오기. 단일층 코드는 u·v 방향 압력 계수의 두 깊이 괄호에 모두 `zs-zb`를 사용한다.
+- 보고서 식 (1.13)은 y 이류항 앞에 $-$를, 식 (1.17)은 $+$를 인쇄한다(인쇄 6쪽·PDF 16쪽). 원문 근거: (`_staging/recovery/read/XBeach/manuals/reports/non-hydrostatic_report_draft.pdf/p001-018.md:29` `-\frac{\partial}{\partial y}\left(HUV-\int_{-d}^{\eta}(v-V)(u-U)dz\right)`); (`_staging/recovery/read/XBeach/manuals/reports/non-hydrostatic_report_draft.pdf/p001-018.md:29` `+\frac{\partial}{\partial y}\left(HUV-\frac{1}{\rho}H\bar\tau_{yx}\right)`). [대조 보고서 §5, 1075행](../../../_staging/recovery/compare/XBeach-manual-vs-code.md#5-차이-결론) 결론: 문서 오기. 비정수압 보고서 식 (1.13)의 y 이류항 앞 음수 부호는 문서 오기다.
+- 코드의 u 운동량 잔차는 젖은 u점의 `if(s%wetu(i,j)==1) then`(`flow_timestep.F90:563`) 안에서 x 이류항과 y 이류항을 같은 부호로 더한다: `dudt = (s%ududx(i,j)+s%vdudy(i,j)-s%viscu(i,j) &`(`flow_timestep.F90:564`). [10-12 전수 검증 보완] 해석: 이 두 이류항의 상대 부호는 식 (1.17)과 같다. [10-12 전수 검증 보완] 코드는 시간 갱신에서 잔차를 뺀다(`flow_timestep.F90:576` `s%uu(i,j)=s%uu(i,j)-par%dt*dudt`). [대조 보고서 §5, 1077행](../../../_staging/recovery/compare/XBeach-manual-vs-code.md#5-차이-결론) 결론: 문서 오기. 코드는 운동량 잔차에 y 이류항을 양의 부호로 더한다.
+- 확인하지 않은 것: 이 부호 차이가 계산 결과에 주는 영향은 모델 실행으로 확인하지 않았다. 해석: 코드와 보고서의 대응은 위에서 밝힌 바닥 차분 가정과 계수 대입 조건에 한정한다(`nonh.F90:1192-1222`; 판독 기록 `p019-036.md:22-23`, 원문 `d_{i+\frac12,j} - d_{i-\frac12,j}`). [10-12 전수 검증 정정]
 
 ## 4. MPI 빌드와 실제 guard
 

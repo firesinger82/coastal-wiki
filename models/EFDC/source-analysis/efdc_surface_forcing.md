@@ -13,6 +13,7 @@ related:
   - models/EFDC/source-analysis/efdc_cyclone_wind.md
   - models/EFDC/source-analysis/efdc_bottom_friction.md
   - models/EFDC/source-analysis/efdc_ice.md
+last_source_check: 2026-10-12 (recovery 차이 결론 반영)
 ---
 
 # EFDC+ 수면 풍응력 + 대기강제 — `caltsxy.f90`
@@ -43,6 +44,9 @@ IWDRAG==3: COARE 3.6 (Edson 2013) neutral 간소화 (U10>20 선형 / else quarti
 IWDRAG==4: USER 선형(WDRAG1/2·CDRAG1/2 보간)                             ! :796-801
 ```
 
+결론: 문서 누락. EFDC+는 바람 항력 계산의 U10에 0.25 m/s 하한을 둔다. (근거: 문서: `_staging/recovery/read/EFDC/manuals/pdfs/EFDC_Theory_Document_Ver_12.pdf/p019-036.md:29`<br>`models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/caltsxy.f90:770` — `WSPD = SQRT( WNDVELE(L)*WNDVELE(L) + WNDVELN(L)*WNDVELN(L) )    ! *** Compute magnitude of 10m wind components`<br>`models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/caltsxy.f90:771` — `U10 = max(WSPD,0.25)`; [EFDC-theory-hydro-vs-code §5 행 B10](../../../_staging/recovery/compare/EFDC-theory-hydro-vs-code.md:749)) [10-12 결론 검증 보완]
+
+
 ## 3. 풍응력식 (:807-820)
 ```fortran
 ! IWDRAG>0: 물 상대 풍속 (current-relative)
@@ -63,7 +67,7 @@ if( IWDRAG==3 .and. ISTOPT(2)==2 ) TSX = 1.225E-3*CDCOARE(L)*U10*TSEAST   ! :812
 
 ## 6. Momentum handoff (소비처)
 - 외부모드: `calpuv2c.f90:224,226` `+DXYU*(TSX-RITB1*TBX)` (수면전단→수심적분 momentum, [[efdc_bottom_friction]] TBX 와 나란히).
-- 내부모드: `calexp.f90:1326-1327` `DU -= CDZUU*TSX`.
+- 내부모드: `calexp.f90:1326` `DU(L,KS) = DU(L,KS) - CDZUU(L,KS)*TSX(L)`.
 - **cyclone overlay**: `call CycloneFields(TIMEDAY)`(:487) → per-cell WINDSTRESS 재계산([[efdc_cyclone_wind]]).
 
 ## 7. 주요 findings

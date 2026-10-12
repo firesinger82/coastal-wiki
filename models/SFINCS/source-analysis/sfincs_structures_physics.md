@@ -9,7 +9,7 @@ note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-18
 related:
   - "[[sfincs-architecture-source-map]]"
-last_source_check: 2026-10-07 (recovery 재판독 대조)
+last_source_check: 2026-10-12 (recovery 차이 결론 반영)
 ---
 
 # SFINCS 물리·구조 모듈
@@ -67,9 +67,18 @@ OpenACC GPU 병렬(`!$acc parallel ... loop independent gang vector`, `:625-626`
 
 > 주석 verbatim: `q(ip)  = qstruc*idir ! Add relaxation here !!!` (`:689`) — 완화(relaxation) 미적용 상태.
 
+#### 문서와 코드 차이 (외부 원문 판정)
+
+| 보고서 행 ID | 항목 | 근거 | 결론 |
+|---|---|---|---|
+| <a id="cv-s-b110"></a>B110 | weir 공식 수정 | Deltares/SFINCS, `v2.0.0`, [`source/src/sfincs_structures.f90`](https://raw.githubusercontent.com/Deltares/SFINCS/v2.0.0/source/src/sfincs_structures.f90), `sfincs_structures.f90:523–524, 541, 545`<br>Deltares/SFINCS, `v2.0.2_Blockhaus_release`, [`source/src/sfincs_structures.f90`](https://raw.githubusercontent.com/Deltares/SFINCS/v2.0.2_Blockhaus_release/source/src/sfincs_structures.f90), `sfincs_structures.f90:589, 593`<br>[Deltares/SFINCS 커밋 `def301e`](https://github.com/Deltares/SFINCS/commit/def301e) (2023-04-06), PR #19 병합.<br>`docs/developments.rst:290`의 수정 이력을 이전·이후 잠김 조건과 유량식에 대조했다. 로컬 `sfincs_structures.f90:651–652, 669, 673, 679`는 v2.0.2와 같다. | A 판 차이. v2.0.2는 broad-crested weir의 잠김 판정을 `if (h1>0.0 .and. h2>0.0) then`에서 `if (h2 > 2.0 / 3.0 * h1) then`으로 바꾸었다. 잠긴 흐름식은 `qstruc = Cd*h2*sqrt(2.0 * 9.81 * (h1 - h2)/(1.0 - m))`으로 바뀌었다. 두 판의 자유 유출식은 `qstruc = Cd*cweir*h1**1.5`로 같다. [대조 보고서 §5 B110](../../../_staging/recovery/compare/SFINCS-docs-vs-code.md:1041) [10-12 외부 원문 판정] [10-12 결론 검증 보완] |
+
 ### 1.5 Thin dams (`read_thin_dams`, :385-495)
 
 `thdfile`의 polyline이 교차하는 uv 점에 대해 `kcuv(indx)=0` 설정 → 완전 차단(흐름 0) (`:459-461`). thin dam은 파라미터 없음(좌표만 읽음, `:450`). `nrthindams`에 점 개수 저장 (`:474`).
+
+thin dam의 5000점 상한: 근거: `docs/input_structures.rst:30` `One can provide multiple polylines within one file, a maximum of 5000 supplied points is supported.`<br>`sfincs_structures.f90:445` `read(500,*,iostat = stat)nrows,ncols`<br>`sfincs_structures.f90:447` `allocate(xthd(nrows))`<br>`sfincs_structures.f90:448` `allocate(ythd(nrows))`<br>`sfincs_structures.f90:449` `do irow = 1, nrows`<br>`sfincs_structures.f90:453` `call find_uv_points_intersected_by_polyline(uv_indices, vertices, nr_points, xthd, ythd, nrows)`<br>`sfincs_quadtree.F90:853` `subroutine find_uv_points_intersected_by_polyline(uv_indices,vertices,nint,xpol,ypol,npol)`<br>`sfincs_quadtree.F90:863` `real*4, dimension(npol),              intent(in)  :: xpol,ypol`<br>`sfincs_quadtree.F90:877` `allocate(ind(npuv))`<br>`sfincs_quadtree.F90:884` `do ipol = 1, npol - 1`<br>`sfincs_quadtree.F90:996` `allocate(uv_indices(nint))` [대조 보고서 §5 B130](../../../_staging/recovery/compare/SFINCS-docs-vs-code.md:1053) 결론: 문서 오기. 이 판의 thin dam 읽기와 교차점 계산 경로는 입력점 수 5000의 고정 상한을 적용하지 않는다.
+
 
 ### 1.6 출력 보조
 
@@ -155,7 +164,7 @@ $$ z_{bt} = w_1 \, zst\_bnd(i_1) + w_2 \, zst\_bnd(i_2), \quad w_2 = 1 - w_1 $$
 
 ### 5.1 진입점 (`set_initial_conditions`, :14-179)
 
-기본값: `inizs=zini`(수위), `iniq=0`(플럭스) (`:38-40`). **`q` 배열 크기 주의** — 주석 verbatim: `iniq(npuv+ncuv+1)) ! Note: q is actually larger than npuv! It has size npuv + ncuv + 1` (`:36`).
+기본값: `inizs=zini`(수위), `iniq=0`(플럭스) (`:38-40`). **`q` 배열 크기 주의** — 주석 verbatim: `iniq(npuv+ncuv+1)) ! Note: q is actually larger than npuv! It has size npuv + ncuv + 1` (`:36`). 근거: `docs/developments.rst:88` `Official open source version 2025.02: v2.3.0 mt. Faber release`<br>`docs/developments.rst:121` `* Fixed bug with restartfile where fluxes were not read in fully correctly due to mismatch length of variable (dummy +1). NOTE - if you are still using restartfiles from SFINCS 2023 Cauberg release or older, you should remake your restartfiles to overcome potential issues!`<br>`sfincs_initial_conditions.F90:36` `allocate(iniq(npuv+ncuv+1)) ! Note: q is actually larger than npuv! It has size npuv + ncuv + 1`<br>`sfincs_domain.f90:2197` `! q, q0, uv, and uv0 also contain the combined values at quadtree transition cells. Plus 1 for dummy values set to 0.0.`<br>`sfincs_domain.f90:2199` `allocate(q(npuv + ncuv + 1))`<br>`sfincs_initial_conditions.F90:229` `read(500)iniq`<br>`sfincs_output.f90:710` `write(911)q` [대조 보고서 §5 B066](../../../_staging/recovery/compare/SFINCS-docs-vs-code.md:1031) 결론: 판 차이. 이 판은 재시작 유량 배열을 dummy 원소를 포함한 npuv+ncuv+1 길이로 읽고 쓴다.
 
 초기조건 소스 우선순위 (`:44-94`):
 1. `rstfile` ≠ none → 바이너리 restart (`:44-54`)
@@ -183,7 +192,7 @@ stream-unformatted, 레코드마다 dummy로 감쌈. `rsttype` 1-6, 범위 밖�
 
 `inizs4`는 항상 읽음 (`:221-222`). type 1/2/4/5/6은 `iniq`·`uvmean`도 읽음 (`:227-235`). type 4/5/6은 각각 침투 상태변수 `scs_Se`/`GA_sigma`+`GA_F`/`rain_T1` 추가 (`:237-259`). 끝에 real*4→real*8 remap (`:264`).
 
-type 2의 문서·코드 헤더는 uvmean을 적지 않는다. `sfincs_initial_conditions.F90:196` `! 2: zs, q`; `sfincs_initial_conditions.F90:227` `if (rsttype==1 .or. rsttype==2 .or. rsttype==4 .or. rsttype==5 .or. rsttype==6) then`; `sfincs_initial_conditions.F90:233` `read(500)uvmean`
+재시작 type 2의 uvmean 읽기 후보와 자체 쓰기 형식은 [검증 정본](sfincs_io_data.md#cv-s-a100)을 따른다. E는 평균 유량이 없는 외부 type 2 파일에 한정한다. [10-12 결론 검증 보완]
 type 2 파일의 실제 호환성은 이 코드 대조만으로 확정할 수 없다. `sfincs_initial_conditions.F90:196` `! 2: zs, q`; `sfincs_initial_conditions.F90:227` `if (rsttype==1 .or. rsttype==2 .or. rsttype==4 .or. rsttype==5 .or. rsttype==6) then`; `sfincs_initial_conditions.F90:229` `read(500)iniq`; `sfincs_initial_conditions.F90:233` `read(500)uvmean`
 코드의 실제 읽기 동작과 주석의 형식 설명을 구분한다. `sfincs_initial_conditions.F90:195` `! 1: zs, q, uvmean`; `sfincs_initial_conditions.F90:196` `! 2: zs, q`; `sfincs_initial_conditions.F90:227` `if (rsttype==1 .or. rsttype==2 .or. rsttype==4 .or. rsttype==5 .or. rsttype==6) then`; `sfincs_initial_conditions.F90:229` `read(500)iniq`; `sfincs_initial_conditions.F90:233` `read(500)uvmean`
 
@@ -235,3 +244,7 @@ type 2 파일의 실제 호환성은 이 코드 대조만으로 확정할 수 �
 | `find_uv_points_intersected_by_polyline` | structures `:159`, thd `:453`, crs `:86` | polyline-격자 교차 uv 점 추출 (geometry 모듈) |
 | quadtree cell 검색 | runup `:117`, obs `:104` | `find_quadtree_cell`+`index_sfincs_in_quadtree` |
 | GPU/병렬 지시 | structures `!$acc :625`, bathtub `!$omp :135` / `!$acc :169` | structures는 ACC, bathtub은 OMP+ACC 동기화 |
+
+## 문서 참고 링크 오류
+
+v2.0.2 릴리스 링크의 정정은 [변경 이력 노트의 정본](../manual-notes/sfincs-v2.4.0-galibier-changelog-known-issues.md#문서-참고-링크-오류)을 따른다. [10-12 결론 검증 보완]

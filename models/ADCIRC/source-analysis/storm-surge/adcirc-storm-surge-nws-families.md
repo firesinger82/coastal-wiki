@@ -14,7 +14,7 @@ related:
   - concepts/storm-surge/02-theory.md
   - models/ADCIRC/source-analysis/adcirc-met-forcing-implementation.md
   - models/ADCIRC/raw/source_code/adcirc/src/
-last_source_check: 2026-10-11 (recovery 재판독 대조)
+last_source_check: 2026-10-12 (recovery 차이 결론 반영)
 ---
 
 # ADCIRC Storm Surge NWS Families
@@ -55,7 +55,7 @@ It does not choose final project parameter values.
 
 - NWS=13 상세 문서는 OWI NetCDF 입력을 정의한다. (`docs/user_guide/model_configuration/meteorological_forcing/nws13.rst:65` `**NetCDF4 File** contents:`; `docs/user_guide/model_configuration/meteorological_forcing/nws13.rst:67` `-  Group(s) – 1 group per grid or overlay`; `docs/user_guide/model_configuration/meteorological_forcing/nws13.rst:68` `-  Variables – U10/V10, PSFC`)
 - fort.15 namelist 이름은 `owiWindNetcdf`이다. (`docs/user_guide/model_configuration/meteorological_forcing/nws13.rst:208` `*&owiWindNetcdf* fort.15 namelist with all inputs quoted as strings`; `src/read_input.F:534` `read(unit=15,nml=owiWindNetcdf,iostat=ios,iomsg=ios_nml_error_msg)`)
-- NWS13ColdStartString sentinel 검사는 `IF(NWS.EQ.13)THEN`에서만 실행한다. (`src/read_input.F:1796` `IF(NWS.EQ.13)THEN`; `src/read_input.F:1797` `IF(INDEX(NWS13ColdStartString,"99999999.999999").GT.0)THEN`; `src/read_input.F:1799` `&                  message="NWS13ColdStartString must be set in the owiWindNetcdf namelist in the fort.15 file.")`)
+- NWS13ColdStartString의 빌드 조건과 sentinel 검사식은 [기상 forcing 정본](../adcirc-met-forcing-implementation.md#nws13-precheck)을 따른다. [10-12 결론 검증 보완]
 - 이 시점에는 NCICE만 분리했다. (`src/read_input.F:1775` `NCICE = INT(ABS(NWS)/1000)`; `src/read_input.F:1776` `NWS = INT(ABS(NWS)-NCICE*1000)*INT(NWS/ABS(NWS))  !RESETTING NWS/NRS`; `src/read_input.F:1796` `IF(NWS.EQ.13)THEN`)
 - 코드는 이 검사 뒤에 NRS를 분리한다. (`src/read_input.F:1829` `NRS=ABS(NWS/100)`; `src/read_input.F:1830` `NWS=(ABS(NWS)-NRS*100)*(NWS/ABS(NWS))`)
 - useful for: high-quality gridded forcing with overlays, curvilinear grids, and irregular timesteps
@@ -75,11 +75,11 @@ It does not choose final project parameter values.
 ### `NWS=20`
 
 - type: Generalized Asymmetric Holland Model
-- 이 판의 NWS=8 해당 호출은 `HollandGet`이다. (`src/nws08.F90:531` `call HollandGet(WVNX, WVNY, PRESS, TIMELOC, FoundEye, EyeLon, EyeLat)`)
+- NWS=8의 Holland·CLE15 선택 조건과 호출은 [기상 forcing 정본](../adcirc-met-forcing-implementation.md#nws8-vortex-choice)을 따른다. [10-12 결론 검증 보완]
 - fort22.rst의 NWS=8 Generalized asymmetric Holland 설명은 NWS=20 GAHM 경로와 구분한다. (`docs/technical_reference/input_files/fort22.rst:333` `In this format, a single tropical cyclone model using the Generalized asymmetric Holland formulation with a moving reference frame and a background wind field is used.`; `src/wind.F:1502` `IF(NWS.EQ.20) THEN`; `src/wind.F:1503` `CALL NWS20GET(wvnx2, wvny2, prn2, timeloc)`)
 - NWS=±29는 OWI 제어 파일과 GBLINPUTDIR의 `NWS_19_fort.22`를 함께 읽는다. (`src/wind.F:1928` `IF ((ABS(NWS).EQ.12).OR.(ABS(NWS).EQ.29).OR.(ABS(NWS).EQ.30)) THEN`; `src/wind.F:1929` `CALL NWS12INIT(WVNX1,WVNY1,PRN1,NP,PRBCKGRND)`; `src/wind.F:1948` `if (abs(nws).eq.29) then`; `src/wind.F:1949` `OPEN(22,FILE=TRIM(GBLINPUTDIR)//'/'//'NWS_19_fort.22',`; `src/wind.F:1951` `CALL NWS19GET(vortexWVNX2,vortexWVNY2,vortexPRN2,STATIM*86400.D0)`)
 - NWS=19는 고정 폭 레코드를 읽는다. (`docs/technical_reference/input_files/fort22.rst:624` `* The format of the file is fixed and users will want to use the aswip program to be sure that the input fort.22 file is properly formatted.`; `src/wind.F:5216` `26       FORMAT(3x, i3, 2x, i4, 3i2, 6x, a4, 2(2x,i3),a1, 2x, i4,a1, 2x,`; `src/wind.F:5217` `&         i3,2x, i4, 6x, i3, 7x, 4(i4,2x), i4, 8x, i3,`; `src/wind.F:5218` `&          27x, 2(i3,2x), a10, 2x, i4, 2x, i4,`; `src/wind.F:5219` `&         2x, 4(i1,2x),2x, 4(f6.1,2x), 2x, f8.4) !,2(2x,f10.4))`)
-- NWS=19 reader는 날짜·TECH·TAU·좌표·풍속·기압·등풍속선·네 반경·배경 기압·RMW·이동 방향·이동 속도·이름·cycle 번호·등풍속선 수·네 선택 값·네 Rmax·Holland B 순서로 읽는다. (`src/wind.F:5223` `READ(22,26) advr1(ient), iyear1(ient),imth1(ient),iday1(ient),`; `src/wind.F:5224` `&    ihr1(ient), type1(ient),iFcstInc1(ient), ilat1(ient),ns,`; `src/wind.F:5225` `&    ilon1(ient),ew, ispd1(ient), icpress1(ient), ivr1(ient),`; `src/wind.F:5226` `&    (ir1(ient,i),i=1,4), ipn1(ient), atcfRMW1(ient),`; `src/wind.F:5227` `&    dir1(ient),speed1(ient), name1(ient),`; `src/wind.F:5228` `&    cycle_num1(ient),isotachs_per_cycle1(ient),`; `src/wind.F:5229` `&    (quadflag1(ient,i),i=1,4),(rmaxw1(ient,i),i=1,4),HollB1(ient)`)
+- NWS=19 reader는 `advr1(ient)`·날짜·TECH·TAU·좌표·풍속·기압·등풍속선·네 반경·배경 기압·RMW·이동 방향·이동 속도·이름·cycle 번호·등풍속선 수·네 선택 값·네 Rmax·Holland B 순서로 읽는다. (`src/wind.F:5223` `READ(22,26) advr1(ient), iyear1(ient),imth1(ient),iday1(ient),`; `src/wind.F:5224` `&    ihr1(ient), type1(ient),iFcstInc1(ient), ilat1(ient),ns,`; `src/wind.F:5225` `&    ilon1(ient),ew, ispd1(ient), icpress1(ient), ivr1(ient),`; `src/wind.F:5226` `&    (ir1(ient,i),i=1,4), ipn1(ient), atcfRMW1(ient),`; `src/wind.F:5227` `&    dir1(ient),speed1(ient), name1(ient),`; `src/wind.F:5228` `&    cycle_num1(ient),isotachs_per_cycle1(ient),`; `src/wind.F:5229` `&    (quadflag1(ient,i),i=1,4),(rmaxw1(ient,i),i=1,4),HollB1(ient)`) [10-12 전수 검증 정정]
 - NWS=20 reader는 NWS=19 필드 뒤에서 사분면 Holland B 네 값과 경계층 Vmax 네 값을 추가로 읽는다. (`docs/technical_reference/input_files/fort22.rst:638` `The file format is similar to the NWS = 19 format with 8 additional columns of data, see notes below for more information.`; `docs/technical_reference/input_files/fort22.rst:660` `* Columns 40-43: Quadrant-varying Holland B parameter`; `docs/technical_reference/input_files/fort22.rst:661` `* Columns 44-47: Quadrant-varying Vmax calculated at the top of the planetary boundary (a wind reduction factor is applied to reduce the wind speed at the boundary to the 10-m surface)`; `src/wind.F:5811` `&    (quadflag1(ient,i),i=1,4),(rmaxw1(ient,i),i=1,4),HollB1(ient),`; `src/wind.F:5812` `&    (HollBs1(ient,i),i=1,4),(VmaxesBL1(ient,i),i=1,4)`)
 - 코드는 TAU의 시간 단위 값을 초로 바꾼다. (`src/wind.F:5258` `CycleTime(icyc) =  iFcstInc1(ient) * 3600.d0 + timeOffset`)
 - 코드는 위도·경도의 0.1도 정수와 N/S·E/W 필드에서 좌표 부호를 반영한다. (`src/wind.F:5262` `IF(ew.EQ.'E')THEN`; `src/wind.F:5263` `ilon(icyc)=(-1)*ilon(icyc)`; `src/wind.F:5265` `IF(ns.EQ.'S')THEN`; `src/wind.F:5266` `ilat(icyc)=(-1)*ilat(icyc)`; `src/wind.F:5268` `lon(icyc) = (-1.0d0) * ilon(icyc) * 0.1d0`; `src/wind.F:5269` `lat(icyc)=ilat(icyc) * 0.1d0`)
@@ -92,14 +92,14 @@ It does not choose final project parameter values.
 - NWS=20은 선택한 사분면의 Holland B와 경계층 Vmax를 저장한다. (`src/wind.F:5936` `if (quadflag1(ient,i)==1) then`; `src/wind.F:5940` `HollBs(icyc,i,isot) = HollBs1(ient,i)`; `src/wind.F:5941` `VmaxesBL(icyc,i,isot) = VmaxesBL1(ient,i)`)
 - NWS=20은 풍속에 kt2ms를 적용한다. (`src/wind.F:6120` `&                       (cHollBs(i)*((cVmwBL(i)*kt2ms)**2+`)
 - NWS=20은 반경에 nm2m을 적용한다. (`src/wind.F:6119` `&                       cVmwBL(i)*kt2ms*crmaxw(i)*nm2m*corio/`)
-- NWS=20은 계산한 Pa 기압을 RhoWatG로 나눈다. (`src/wind.F:6216` `press(i) = press(i) / RhoWatG`)
+- NWS=20의 Pa 기압 제한과 RhoWatG 나눗셈은 [GAHM 출력 제한 정본](../adcirc_gahm_vortex_model.md#gahm-output-limits)을 따른다. [10-12 결론 검증 보완]
 - useful for: parametric tropical cyclone forcing — 공식 문서가 NWS=19 를 명시적으로 비권장: `nws_parameters.rst:32` verbatim "Use of the Dynamic Asymmetric Holland Model (NWS=19) is discouraged. The Generalized Asymmetric Holland Model (NWS=20) provides improved functionality."
 - strength: compact forcing representation for hurricane workflows
 - 상세: [[adcirc_gahm_vortex_model]]
 
 ### `NWS=-14` / `NWS=14`
 
-- v56.2.1의 NWS=14는 GRIB2 또는 netCDF 입력을 읽는다. (`src/wind.F:8021` `Pfile = 'fort.221.grb2'`; `src/wind.F:8030` `Pfile = 'fort.221.nc'`)
+- NWS=14의 빌드 조건과 GRIB2·netCDF 선택은 [기상 forcing 정본](../adcirc-met-forcing-implementation.md#nws14-format)을 따른다. NWS=-14의 netCDF 거부는 [NWS=-14 정본](../adcirc-met-forcing-implementation.md#nws-minus14)을 따른다. [10-12 결론 검증 보완]
 - NWS=-14는 NWS14 배경에 OWI 입력을 추가한다. (`src/wind.F:2014` `if (NWS.eq.-14) then`; `src/wind.F:2015` `CALL NWS12INIT(WVNX1,WVNY1,PRN1,NP,PRBCKGRND)`; `src/wind.F:2016` `CALL NWS12GET(WVNX1,WVNY1,PRN1,NP,PRBCKGRND,HasData)`)
 - 코드는 NWS=-14의 netCDF 입력에서 종료한다. (`src/wind.F:8235` `IF (NWS.EQ.-14) THEN`; `src/wind.F:8238` `CALL terminate(exit_code=ADCIRC_EXIT_FAILURE,`; `src/wind.F:8239` `&      message="NWS = -14 has not yet been set up to use netcdf "//`; `src/wind.F:8240` `&              "files. Try again with grib2 background wind files.")`)
 - 현행 nws_parameters.rst의 -14 hot-start 시간 기준 설명은 이 OWI 추가 경로를 설명하지 않는다. (`docs/user_guide/model_configuration/meteorological_forcing/nws_parameters.rst:312` `Wind velocity and atmospheric pressure are read in from NetCDF or GRIB2 format files. This option allows ADCIRC to directly read standardized meteorological formats. If NWS = 14, ADCIRC assumes data from the cold start time; if NWS = -14, ADCIRC assumes data from the hot start time. The files must include wind velocity components and sea level pressure on a regular grid with proper metadata.`; `src/wind.F:2014` `if (NWS.eq.-14) then`; `src/wind.F:2015` `CALL NWS12INIT(WVNX1,WVNY1,PRN1,NP,PRBCKGRND)`)
@@ -111,6 +111,10 @@ It does not choose final project parameter values.
 - useful for: more generic gridded forcing workflows
 - strength: broad compatibility with gridded products
 - limitation: different configuration path from the OWI-NWS13 convention
+
+
+([fort15 보고서 §5 L77, L345, C19 (L857)](../../../../_staging/recovery/compare/ADCIRC-fort15-vs-code.md#5-차이-결론); 항목: NWS13 개요의 forcing 종류) 결론: B 문서 오기. 근거는 [storm-surge foundation의 NWS13 입력 종류 정본](adcirc-storm-surge-foundation.md#nws13-kind)에 모았다. [10-12 결론 검증 보완]
+([fort15 보고서 §5 L542, C17 (L855), C18 (L856)](../../../../_staging/recovery/compare/ADCIRC-fort15-vs-code.md#5-차이-결론); 항목: NWS13ColdStartString 필수값 검사) 결론: E 코드 결함 후보. 검사 조건과 반대 근거는 [storm-surge foundation의 NWS13 날짜 검사 정본](adcirc-storm-surge-foundation.md#nws13-sentinel)에 모았다. [10-12 결론 검증 보완]
 
 ## `NWS=13` Facts (docs 귀속 — 인용 소급)
 

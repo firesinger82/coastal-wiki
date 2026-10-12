@@ -8,6 +8,7 @@ note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) �
 note_date: 2026-04~05 (original) / 2026-05-23 (promote)
 verification_by: "사용자 + codex source-code analysis"
 verification_date: 2026-04
+last_source_check: 2026-10-12 (recovery 차이 결론 반영)
 ---
 
 ## Scope
@@ -32,6 +33,9 @@ How EFDC+ sets up vertical layers (sigma stretch vs Sigma-Zed/SGZ), where layer 
 - Cell layer fractions: `DZC(L,K)` allocated alongside `DZG/DZIG` (`varalloc.f90:1319`).
 - Sigma stretch: inactive layers below `KSZ` zeroed; `DZC = DZCK / DZPC` (`aaefdc.f90:1437, 1445`).
 - `DZIC/DZG/DZIG` set up in `aaefdc.f90:1494, 1499`.
+
+결론: 문서 누락. EFDC+는 입력 시그마 층 두께를 실제 합으로 다시 나누어 정규화한다. (근거: 문서: `_staging/recovery/read/EFDC/manuals/pdfs/EFDC_Theory_Document_Ver_12.pdf/p055-072.md:19`<br>`models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/aaefdc.f90:1295` — `! *** ENSURE SUM OF DZC = 1.0000 TO MACHINE PRECISION`<br>`models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/aaefdc.f90:1298` — `DZPC = DZPC + DZCK(K)`<br>`models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/aaefdc.f90:1301` — `DZCK(K) = DZCK(K)/DZPC`; [EFDC-theory-hydro-vs-code §5 행 B02](../../../_staging/recovery/compare/EFDC-theory-hydro-vs-code.md:741)) [10-12 결론 검증 보완]
+
 
 ## B. IGRIDV (Sigma-Zed / SGZ)
 
@@ -69,7 +73,7 @@ Both use upwind (`KUPW = K − sign(W)/2`) for stability.
 
 ## E. Sigma-slope pressure-gradient (IGRIDV; IINTPG legacy input)
 
-- `IINTPG` is still read at `input.f90:269`, but EFDC+ Stable 12.5 no longer uses it to select buoyancy shear. Its only remaining behavioral consumer is `setbcs.f90:449`: `IINTPG /= 0` disables the external density-gradient cell-face flag treatment for 2-cell-wide channels. In `calexp2t.f90` (2TL), the four `IINTPG` occurrences were also removed (`calexp2t.f90:1246-1305`).
+- `IINTPG` is still read at `input.f90:269`, but EFDC+ Stable 12.5 no longer uses it to select buoyancy shear. Its only remaining behavioral consumer is `setbcs.f90:449` `if( IINTPG == 0 )then`; so IINTPG ≠ 0 disables the external density-gradient cell-face flag treatment for 2-cell-wide channels. In `calexp2t.f90` (2TL), the four `IINTPG` occurrences were also removed (`calexp2t.f90:1246-1305`).
 - Buoyancy shear branches use `IGRIDV`; SGZ branches apply when `IGRIDV>0`:
   - `IGRIDV == 1` → `calexp.f90:1169`.
   - `IGRIDV > 1` → `calexp.f90:1187`.

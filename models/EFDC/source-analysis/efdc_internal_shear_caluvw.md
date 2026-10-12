@@ -33,14 +33,14 @@ DU(L,K) = CDZFU(L,K)*( H1U(L)*(U1(L,K+1)-U1(L,K))*DELTI
 ```
 3TL 전단 우변은 이전 속도 U1과 H1U를 사용한다. (`calexp.f90:1309` — `DU(L,K) = CDZFU(L,K)*( H1U(L)*(U1(L,K+1)-U1(L,K))*DELTI + DXYIU(L)*(FCAX(L,K+1)-FCAX(L,K)   + FBBX(L,K) + SNLT*(FX(L,K)-FX(L,K+1))) )`) 2TL 전단 우변은 현재 저장 상태 U와 HU를 사용한다. (`calexp2t.f90:1395` — `DU(L,K) = CDZFU(L,K)*( HU(L)*( U(L,K+1)-U(L,K) )*DELTI + DXYIU(L)*( FCAX(L,K+1)-FCAX(L,K)   + FBBX(L,K) + SNLT*(FX(L,K)-FX(L,K+1)) ) )   ! *** M2/S2`)
 
-- CALEXP의 바람 주입은 ISTL=2를 검사한다. (`calexp.f90:1318` — `if( (ISTL == 2 .and. NWSER > 0) .or. (ISTL == 2 .and. iGOTM_Test > 0 ) )then`) HDMT는 ISTL=3에서 CALTSXY(0)를 호출한다. (`calexp.f90:1318` — `if( (ISTL == 2 .and. NWSER > 0) .or. (ISTL == 2 .and. iGOTM_Test > 0 ) )then`; `hdmt.f90:749` — `call CALTSXY(0)`) 그 뒤 HDMT는 DU/DV에 TSX/TSY를 주입한다. (`calexp.f90:1326` — `DU(L,KS) = DU(L,KS) - CDZUU(L,KS)*TSX(L)`; `hdmt.f90:757` — `DU(L,KS) = DU(L,KS) - CDZUU(L,KS)*TSX(L)`; `hdmt.f90:758` — `DV(L,KS) = DV(L,KS) - CDZUV(L,KS)*TSY(L)`)
+- CALEXP의 바람 주입은 `if( (ISTL == 2 .and. NWSER > 0) .or. (ISTL == 2 .and. iGOTM_Test > 0 ) )then`을 검사한다. (`calexp.f90:1318` — `if( (ISTL == 2 .and. NWSER > 0) .or. (ISTL == 2 .and. iGOTM_Test > 0 ) )then`) (`calexp.f90:1318` — `if( (ISTL == 2 .and. NWSER > 0) .or. (ISTL == 2 .and. iGOTM_Test > 0 ) )then`) [10-12 전수 검증 보완] HDMT는 ISTL=3에서 CALTSXY(0)를 호출한다. (`calexp.f90:1318` — `if( (ISTL == 2 .and. NWSER > 0) .or. (ISTL == 2 .and. iGOTM_Test > 0 ) )then`; `hdmt.f90:749` — `call CALTSXY(0)`) 그 뒤 HDMT는 DU/DV에 TSX/TSY를 주입한다. (`calexp.f90:1326` — `DU(L,KS) = DU(L,KS) - CDZUU(L,KS)*TSX(L)`; `hdmt.f90:757` — `DU(L,KS) = DU(L,KS) - CDZUU(L,KS)*TSX(L)`; `hdmt.f90:758` — `DV(L,KS) = DV(L,KS) - CDZUV(L,KS)*TSY(L)`)
 - 마스크 SUB/SVB 적용 (:1397-1398).
 
 ## 3. 연직 확산 — 완전 implicit tridiagonal (θ knob 없음)
 
 CALUVW 의 전단 solve (caluvw.f90:392-462, SGZ-aware — 셀별 최하활성층 `KSZU/KSZV`):
 
-- CALAVB의 해당 분기에서 AVUI=2/(AV(L,K)+AV(LWC(L),K))이다. (`calavb.f90:291` — `AVUI(L,K) = 2.0/( AV(L,K) + AV(LWC(L),K) )`; `caluvw.f90:406` — `CMU = 1.+RCDZM*HU(L)*AVUI(L,K)`) CALUVW는 이 면 계수를 전단 계의 대각에 사용한다. (`calavb.f90:291` — `AVUI(L,K) = 2.0/( AV(L,K) + AV(LWC(L),K) )`; `caluvw.f90:406` — `CMU = 1.+RCDZM*HU(L)*AVUI(L,K)`)
+- CALAVB는 `if( IGRIDV == 0 )then`에서 `AVUI(L,K) = 2.0/( AV(L,K) + AV(LWC(L),K) )`를 계산한다. (`calavb.f90:291` — `AVUI(L,K) = 2.0/( AV(L,K) + AV(LWC(L),K) )`; `caluvw.f90:406` — `CMU = 1.+RCDZM*HU(L)*AVUI(L,K)`) (`calavb.f90:285` — `if( IGRIDV == 0 )then`) [10-12 전수 검증 보완] CALUVW는 이 면 계수를 전단 계의 대각에 사용한다. (`calavb.f90:291` — `AVUI(L,K) = 2.0/( AV(L,K) + AV(LWC(L),K) )`; `caluvw.f90:406` — `CMU = 1.+RCDZM*HU(L)*AVUI(L,K)`) 그 ELSE는 수심과 면 스위치로 가중한 식을 사용한다. (`calavb.f90:303` — `AVUI(L,K) = SUB(L)*(1. + SUB3D(L,K))/( AV(L,K)*HP(L) + SUB3D(L,K)*AV(LWC(L),K)*HP(LWC(L) ) )*HU(L)`) [10-12 전수 검증 보완]
 - **전진소거(Thomas, in-place)**: `EU = 1/(CMU − RCDZL·CU1(L,K-1))`, `CU1 = RCDZU·EU`, `DU = (DU − RCDZL·DU(k-1))·EU` (:407-409). 보조해 `UUU` 도 동시 소거 (:410, §4 용).
 - **바닥 행(K=KSZU)**: RHS 에 저면항력 `− RCDZL·RCXX(L)·UHE(L)·HUI(L)` (:419), `UUU(KSZU)=EU` 시드 (:420).
 - **후진대입**: `DU(K) -= CU1(K)·DU(K+1)` (:455-462, DU·DV·UUU·VVV 4계 동시).
@@ -64,7 +64,7 @@ DU(L,K) = SUB3D·DZGU·HU·AVUI·( DU(L,K) − AAU(L)·UUU(L,K) ) ! :495 — 물
 1. 깊이평균 갱신: `UHE(L) += CDZDU(L,K)·DU(L,K)` (:517).
 2. **top-down marching**: `UHDYF(L,KC) = UHE·SUB` (:525) → `UHDYF(L,K) = SUB3D·(UHDYF(L,K+1) − DU(L,K))` (:531) → `×DYU` 로 m³/s (:536-542).
 3. blocked layer face 옵션(NBLOCKED, 수문·취수구 층 차단) 별도 재구성 (:551-).
-4. CALUVW는 barotropic 보정과 W 연속식 계산을 수행한다. (`caluvw.f90:1302` — `if( ISINWV == 1 )then`; `caluvw.f90:1319` — `if( KC > 1 .and. ISPNHYDS >= 1 ) CALL CALPNHS`; `caluvw.f90:613` — `TVARE(L) = TVARE(L) - UHDYE(L)`; `caluvw.f90:733` — `W(L,K) = W(L,K-1) - 0.5*DXYIP(L)  &`) CALUVW는 Courant 진단 뒤 CALPNHS를 호출한다. (`caluvw.f90:1319` — `if( KC > 1 .and. ISPNHYDS >= 1 ) CALL CALPNHS`) CALPNHS 조건은 KC>1과 ISPNHYDS>=1이다. (`caluvw.f90:1319` — `if( KC > 1 .and. ISPNHYDS >= 1 ) CALL CALPNHS`)
+4. CALUVW는 barotropic 보정과 W 연속식 계산을 수행한다. (`caluvw.f90:1302` — `if( ISINWV == 1 )then`; `caluvw.f90:1319` — `if( KC > 1 .and. ISPNHYDS >= 1 ) CALL CALPNHS`; `caluvw.f90:613` — `TVARE(L) = TVARE(L) - UHDYE(L)`; `caluvw.f90:733` — `W(L,K) = W(L,K-1) - 0.5*DXYIP(L)  &`) CALUVW는 `if( ISINWV == 1 )then`의 Courant 진단 블록 뒤에서 CALPNHS 호출 조건을 검사한다. (`caluvw.f90:1319` — `if( KC > 1 .and. ISPNHYDS >= 1 ) CALL CALPNHS`) (`caluvw.f90:1302` — `if( ISINWV == 1 )then`) [10-12 전수 검증 보완] CALPNHS 조건은 KC>1과 ISPNHYDS>=1이다. (`caluvw.f90:1319` — `if( KC > 1 .and. ISPNHYDS >= 1 ) CALL CALPNHS`)
 
 ## 6. GOTM 결합 (ISGOTM)
 

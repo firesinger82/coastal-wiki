@@ -70,7 +70,7 @@ VENDOR_PREFIX_RE = re.compile(r"(?i)^(?:program files(?: \(x86\))?|windows|path[
 LOCAL_PATH_PATTERNS = [
     ("win-drive", re.compile(r"(?<![A-Za-z0-9])([A-Za-z]):\\\\?")),  # D:\  D:\\  E:\
     ("wsl-mount", re.compile(r"/mnt/[a-z]/")),                       # /mnt/d/ /mnt/e/
-    ("home", re.compile(r"(?<![\w.])~/")),                            # ~/rag ~/.venv
+    ("home", re.compile(r"(?<![\w.=])~/")),                            # ~/rag ~/.venv
     ("wsl-unc", re.compile(r"\\\\wsl")),                             # \\wsl$ \\wsl.localhost
 ]
 

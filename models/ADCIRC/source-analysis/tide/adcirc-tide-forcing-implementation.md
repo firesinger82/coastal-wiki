@@ -18,6 +18,7 @@ note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) �
 note_date: 2026-04~05 (original) / 2026-05-23 (promote)
 verification_by: "사용자 + codex source-code analysis"
 verification_date: 2026-04
+last_source_check: 2026-10-12 (recovery 차이 결론 반영)
 ---
 
 # ADCIRC tide forcing — NTIP, fort.15 NBFR, fort.24 SAL
@@ -104,6 +105,9 @@ SAL adds to effective tide potential:
 TIP2 += SALTMUL * SALTAMP * cos(ARGT - SALTPHA)
 ```
 at `[file=src/hstart.F line=1529-1532]`, `[file=src/timestep.F line=1547-1555]`.
+
+
+([inputfiles 보고서 §5 F24-06](../../../../_staging/recovery/compare/ADCIRC-inputfiles-vs-code.md#5-차이-결론); 항목: fort.24.nc 우선 입력) 근거: `models/ADCIRC/raw/source_code/adcirc/src/read_input.F:6368` `filename_netcdf = TRIM(GBLINPUTDIR)//'/'//"fort.24.nc"`<br>`models/ADCIRC/raw/source_code/adcirc/src/read_input.F:6377` `INQUIRE(FILE=TRIM(filename_netcdf), EXIST=netcdf_file_found)`<br>`models/ADCIRC/raw/source_code/adcirc/src/read_input.F:6381` `IF(netcdf_file_found)THEN`<br>`models/ADCIRC/raw/source_code/adcirc/src/read_input.F:6391` `CALL check_err(nf90_inq_dimid(ncid, "node", dimid_node))`<br>`models/ADCIRC/raw/source_code/adcirc/src/read_input.F:6392` `CALL check_err(nf90_inq_dimid(ncid, "num_constituents",`<br>`models/ADCIRC/raw/source_code/adcirc/src/read_input.F:6393` `&                   dimid_nconst))`<br>`models/ADCIRC/raw/source_code/adcirc/src/read_input.F:6394` `CALL check_err(nf90_inq_dimid(ncid, "char_len", dimid_charlen))`<br>`models/ADCIRC/raw/source_code/adcirc/src/read_input.F:6400` `CALL check_err(nf90_inq_varid(ncid, "constituents", varid_const))`<br>`models/ADCIRC/raw/source_code/adcirc/src/read_input.F:6401` `CALL check_err(nf90_inq_varid(ncid, "frequency", varid_freq))`<br>`models/ADCIRC/raw/source_code/adcirc/src/read_input.F:6402` `CALL check_err(nf90_inq_varid(ncid, "sal_amplitude", varid_amp))`<br>`models/ADCIRC/raw/source_code/adcirc/src/read_input.F:6403` `CALL check_err(nf90_inq_varid(ncid, "sal_phase", varid_pha))`<br>`models/ADCIRC/raw/source_code/adcirc/src/read_input.F:6405` `IF(n_const_sal.NE.ntif)THEN`<br>fort24 문서는 ASCII 구조만 제시한다. `src/read_input.F:6367`의 `IF(NTIP.EQ.2) THEN`과 `src/read_input.F:6376–6382`의 ADCNETCDF 조건을 통과하면 fort.24.nc를 우선 열고 이름·주파수·진폭·위상을 읽는다. 해석: netCDF 형식의 문서 누락이다. 결론: 문서 누락. v56.2.1은 NTIP=2이고 ADCNETCDF가 활성화된 경우 fort.24.nc가 있으면 ASCII SAL 입력보다 먼저 읽는다. [10-12 결론 검증 보완]
 
 ## E. Tidal potential (NTIP=1)
 

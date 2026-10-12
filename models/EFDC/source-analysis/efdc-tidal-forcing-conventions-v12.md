@@ -14,7 +14,7 @@ related:
   - models/EFDC/source-analysis/efdc_cyclone_wind.md
   - models/EFDC/manual-notes/efdc-implementation-guide.md
   - models/EFDC/manual-notes/efdc-user-manual-r850.md
-last_source_check: 2026-10-08 (recovery 재판독 대조)
+last_source_check: 2026-10-12 (recovery 차이 결론 반영)
 ---
 
 # EFDC+ v12.4 조석·바람 강제력 규약
@@ -37,7 +37,7 @@ cos·cos + sin·sin 합성 항등식으로 정리하면:
 
 **핵심 규약 2가지**:
 
-- PFPH의 단위는 TCP와 같은 초다. (`input.f90:940` — `read(1,*,IOSTAT = ISO) IECHO(M), CECHO(M),PFAM(NP,M),PFPH(NP,M)`; `input.f90:944` — `RAD = PI2*PFPH(NP,M)/TCP(M)`; `input.f90:943` — `read(1,*,IOSTAT = ISO) IECHO(M), CECHO(M), PFAM(NP,M), PFPH(NP,M)`; EFDC_Manual.pdf, PDF 30쪽·인쇄 26쪽) 코드는 RAD=2*PI*PFPH/TCP를 계산한다. (`input.f90:940` — `read(1,*,IOSTAT = ISO) IECHO(M), CECHO(M),PFAM(NP,M),PFPH(NP,M)`; `input.f90:944` — `RAD = PI2*PFPH(NP,M)/TCP(M)`; `input.f90:943` — `read(1,*,IOSTAT = ISO) IECHO(M), CECHO(M), PFAM(NP,M), PFPH(NP,M)`; EFDC_Manual.pdf, PDF 30쪽·인쇄 26쪽) 확인한 C17 입력 경로에는 PFPH를 [0,TCP)로 제한하는 검사가 없다. (`input.f90:940` — `read(1,*,IOSTAT = ISO) IECHO(M), CECHO(M),PFAM(NP,M),PFPH(NP,M)`; `input.f90:944` — `RAD = PI2*PFPH(NP,M)/TCP(M)`; `input.f90:943` — `read(1,*,IOSTAT = ISO) IECHO(M), CECHO(M), PFAM(NP,M), PFPH(NP,M)`; EFDC_Manual.pdf, PDF 30쪽·인쇄 26쪽) [0,TCP) 정규화는 입력 준비 규약으로 구분한다. (`input.f90:944` — `RAD = PI2*PFPH(NP,M)/TCP(M)`; EFDC_Manual.pdf, PDF 30쪽·인쇄 26쪽)
+- PFPH의 단위는 TCP와 같은 초다. (`input.f90:940` — `read(1,*,IOSTAT = ISO) IECHO(M), CECHO(M),PFAM(NP,M),PFPH(NP,M)`; `input.f90:944` — `RAD = PI2*PFPH(NP,M)/TCP(M)`; `input.f90:943` — `read(1,*,IOSTAT = ISO) IECHO(M), CECHO(M), PFAM(NP,M), PFPH(NP,M)`; EFDC_Manual.pdf, PDF 30쪽·인쇄 26쪽) 코드는 RAD=2*PI*PFPH/TCP를 계산한다. (`input.f90:940` — `read(1,*,IOSTAT = ISO) IECHO(M), CECHO(M),PFAM(NP,M),PFPH(NP,M)`; `input.f90:944` — `RAD = PI2*PFPH(NP,M)/TCP(M)`; `input.f90:943` — `read(1,*,IOSTAT = ISO) IECHO(M), CECHO(M), PFAM(NP,M), PFPH(NP,M)`; EFDC_Manual.pdf, PDF 30쪽·인쇄 26쪽) 확인한 C17 입력 경로에는 PFPH를 [0,TCP)로 제한하는 검사가 없다. (`input.f90:940` — `read(1,*,IOSTAT = ISO) IECHO(M), CECHO(M),PFAM(NP,M),PFPH(NP,M)`; `input.f90:944` — `RAD = PI2*PFPH(NP,M)/TCP(M)`; `input.f90:943` — `read(1,*,IOSTAT = ISO) IECHO(M), CECHO(M), PFAM(NP,M), PFPH(NP,M)`; EFDC_Manual.pdf, PDF 30쪽·인쇄 26쪽) [0,TCP) 정규화는 입력 준비 규약으로 구분한다. (`input.f90:944` — `RAD = PI2*PFPH(NP,M)/TCP(M)`; EFDC_Manual.pdf, PDF 30쪽·인쇄 26쪽) 판정·근거: [정본 §5 행 512](../manual-notes/efdc-user-manual-r850.md#cv-e-input-2557). 판정·근거: [정본 §5 행 513](../manual-notes/efdc-user-manual-r850.md#cv-e-input-2558). 결론: 문서 오기. C17의 PFPH에 대한 [0,TCP) 정규화는 동등한 주기 위상의 대표값을 고르는 규약이다. (근거: `models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:940` — `read(1,*,IOSTAT = ISO) IECHO(M), CECHO(M),PFAM(NP,M),PFPH(NP,M)`<br>`models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:944` — `RAD = PI2*PFPH(NP,M)/TCP(M)`<br>`models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:945` — `CPFAM0(NP,M) = PFAM(NP,M)*COS(RAD)`<br>`models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:946` — `SPFAM0(NP,M) = PFAM(NP,M)*SIN(RAD)`; [EFDC-input-cards-vs-code §5 행 2442](../../../_staging/recovery/compare/EFDC-input-cards-vs-code.md:2654)) [10-12 결론 검증 보완]
 - 합성 시각은 run 상대시간이 아니라 **절대 `TIMESEC`(= TCON·TBEGIN 부터 진행)**. 따라서 레거시 매뉴얼의 "phase relative to time origin of TBEGIN" 서술을 "run 시작 = 위상 0"으로 읽으면 안 되고, `TBEGIN`을 바꾸면 `PFPH`를 재계산해야 한다:
 
 ```

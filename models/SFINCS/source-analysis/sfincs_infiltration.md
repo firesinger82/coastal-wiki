@@ -12,7 +12,7 @@ related:
   - models/SFINCS/source-analysis/sfincs_boundaries_forcing.md
   - models/SFINCS/source-analysis/sfincs_flow_solver.md
   - models/SFINCS/source-analysis/sfincs_subgrid_quadtree.md
-last_source_check: 2026-10-07 (recovery 재판독 대조)
+last_source_check: 2026-10-12 (recovery 차이 결론 반영)
 ---
 
 # SFINCS 침투(강우손실) — `sfincs_infiltration.f90`
@@ -36,7 +36,10 @@ inf_kr = √(ks/25.4)/75                       ! :375 recovery 상수 SWMM Eq4-3
 if( rain_T1 > 0.06/inf_kr ) scs_Se += inf_kr·Smax·dt/3600 (cap Smax)   ! :800-805 SWMM Eq4-37 회복
 ```
 
-## 2. Green-Ampt (gai) — SWMM Eq4-27 + ★인덱싱 버그
+CN A 유출식의 초기 손실 생략: 근거: `docs/input.rst:422` `**Q = (P^2/(P+Smax))**`<br>`docs/input.rst:455` `The user can also specify the sfacinf which controls the initial abstraction or the amount of water before runoff, such as infiltration, or rainfall interception by vegetation; historically, it has generally been assumed that sfacinf = 0.2 (default, however, for urbanized watersheds lower values can be expected (e.g. 0.05).`<br>`sfincs_infiltration.f90:689` `if (cumprcp(nm) > sfacinf * qinffield(nm)) then ! qinffield is S`<br>`sfincs_infiltration.f90:693` `Qq  = (cumprcp(nm) - sfacinf * qinffield(nm))**2 / (cumprcp(nm) + (1.0 - sfacinf) * qinffield(nm))  ! cumulative runoff in m`<br>`sfincs_infiltration.f90:701` `qinfmap(nm) = prcp(nm)` [대조 보고서 §5 B122·C025](../../../_staging/recovery/compare/SFINCS-docs-vs-code.md:1048) 결론: 문서 오기. 이 판의 CN A는 누적 강수가 sfacinf·S보다 클 때 초기 손실을 뺀 누적 유출식을 사용한다.
+
+
+## 2. Green-Ampt (gai) — SWMM Eq4-27 + 인덱싱 결함 후보
 ```fortran
 do nm = 1, np                                             ! :838 셀 루프
   if( prcp<ks ) qinfmap(nm)=prcp(nm)                      ! :846-850 소량=강우와 동일
@@ -45,7 +48,7 @@ do nm = 1, np                                             ! :838 셀 루프
   GA_F(nm) += qinfmap·dt                                  ! :867 누적침투
 ! GA_Lu = 4·√25.4·√ks (Eq4-33 :488), recovery GA_sigma += inf_kr·sigma_max·dt/3600 (Eq4-35 :884)
 ```
-> ⚠ **Green-Ampt 인덱싱 버그(:856, 직접 확인)**: 루프 `do nm=1,np`(:838)인데 흡입수두·수분부족을 **`GA_head(np)`·`GA_sigma(np)`**(=`np`=마지막 셀/총셀수)로 인덱싱, 나머지(`ksfield(nm)`·`GA_F(nm)`·`qinfmap(nm)`)는 `nm`. → **`prcp(nm)>0`이고 `prcp(nm)>=ksfield(nm)`인 분기에 들어온 셀이 마지막 셀의 ψ·σ 를 참조**한다(`sfincs_infiltration.f90:838-857`); `ksfield(nm)`·`GA_F(nm)`도 사용하므로 침투량 전체가 공간균일해진다는 뜻은 아니다(`np`→`nm`가 작성 의도인지는 확인되지 않았다). [[sfincs_boundaries_forcing]]:244 는 이 줄을 verbatim 인용하나 결함 미표기.
+<a id="cv-s-b123"></a>**B123·C026 — E 코드 결함 후보(정본).** `sfincs_infiltration.f90:838`의 `do nm = 1, np` 안에서 `:842`의 `if (prcp(nm) > 0.0) then`을 통과하고 `:846`의 `if (prcp(nm) < ksfield(nm)) then`의 ELSE로 들어간 경우에 한정한다. `:856`은 `qinfmap(nm) = (ksfield(nm) * (1.0 + (GA_head(np) * GA_sigma(np)) / GA_F(nm)))`이다. 흡입수두와 수분 부족량만 마지막 셀 np를 참조한다.<br>`docs/input.rst:496,501–505`는 Green-Ampt의 셀별 매개변수를 설명한다. `sfincs_infiltration.f90:399,423,483`은 셀별 배열을 만든다. `:863,867,884,889`의 상태 갱신은 현재 셀 nm를 사용한다. 이 두 근거가 인덱스 비대칭을 뒷받침한다.<br>반대 경로도 확인했다. `:492–494`의 단위 변환은 셀 인덱스를 바꾸지 않는다. `:857`의 `qinfmap(nm) = max(min(qinfmap(nm), prcp(nm)), 0.0)`은 결과를 제한한다. 따라서 잘못 참조한 두 배열의 값이 같거나 제한값에 걸리면 침투율 차이가 드러나지 않을 수 있다. 이 제한은 np 참조를 nm 참조로 보정하지 않는다. 전체 침투율이 공간적으로 균일하다는 결론은 내리지 않는다. [대조 보고서 §5 B123·C026](../../../_staging/recovery/compare/SFINCS-docs-vs-code.md:1049) [10-12 결론 검증 보완]
 
 ## 3. Modified Horton (hor)
 ```fortran
@@ -59,12 +62,13 @@ I = exp(kd·rain_T1/3600) ; f = (fc + (f0-fc)·I)/3600/1000   ! :967,979 지수�
 `netprcp(nm) -= qinfmap(nm)`(전분기 :661/707/813/897/1017) + `cuminf += qinfmap·dt`(store 시). **"물 없으면 침투 없음"** guard(subgrid z_volume≤0 or zs≤zb → qinfmap=0, :645-657·946). NetCDF 입력=quadtree 전용·ASCII=정규격자 전용(:170-189).
 
 현재 코드의 CN A 식은 cumprcp와 cuminf를 사용한다. `sfincs_infiltration.f90:689` `if (cumprcp(nm) > sfacinf * qinffield(nm)) then ! qinffield is S`; `sfincs_infiltration.f90:693` `Qq  = (cumprcp(nm) - sfacinf * qinffield(nm))**2 / (cumprcp(nm) + (1.0 - sfacinf) * qinffield(nm))  ! cumulative runoff in m`; `sfincs_infiltration.f90:695` `qinfmap(nm) = (I - cuminf(nm)) / dt           ! infiltration in m/s`
-현재 코드는 store_cumulative_precipitation이 true일 때만 두 누적량을 갱신한다. `sfincs_meteo.f90:1321` `if (store_cumulative_precipitation) then`; `sfincs_meteo.f90:1323` `cumprcp(nm) = cumprcp(nm) + prcp(nm) * dt`; `sfincs_meteo.f90:1534` `if (store_cumulative_precipitation) then`; `sfincs_meteo.f90:1535` `cumprcp(nm) = cumprcp(nm) + ptmp * dt`; `sfincs_infiltration.f90:709` `if (store_cumulative_precipitation) then`; `sfincs_infiltration.f90:713` `cuminf(nm) = cuminf(nm) + qinfmap(nm) * dt`
+<a id="cv-s-b047"></a>**B047·C021 — E 코드 결함 후보(정본).** 강수가 활성화된 CN A에서 `storecumprcp=0`이면 계산용 누적 강수와 누적 침투의 갱신이 빠진다. `sfincs_input.f90:280,511–513`은 읽기 기본값 0에서 `store_cumulative_precipitation = .false.`를 유지한다. `sfincs_meteo.f90:1321–1323,1534–1535`는 이 플래그가 참일 때만 `cumprcp`를 증가시킨다. `sfincs_infiltration.f90:709–715`도 같은 플래그 아래에서 `cuminf(nm) = cuminf(nm) + qinfmap(nm) * dt`를 실행한다. 그러나 CN A는 `:689`의 `if (cumprcp(nm) > sfacinf * qinffield(nm)) then`과 `:695`의 `qinfmap(nm) = (I - cuminf(nm)) / dt`에 두 누적량을 사용한다.<br>반대 근거를 확인했다. `sfincs_infiltration.f90:41–44`의 주석은 CN A가 두 누적량을 요구한다고 적는다. CN B의 주석은 `but not necessarily cuminf and cumprcp`라고 적는다. `:52–55`는 출력 여부 외에도 `inftype == 'cna' or inftype == 'cnb'`일 때 메모리에 두 누적량이 필요하다고 적는다. `:139–143`의 할당·초기화는 이후의 갱신 누락을 보정하지 않는다. `:50`의 출력 플래그 기본값 true 주석은 실제 입력 리더와 다르므로 기본값 근거에서 제외했다. CN B의 `:756,765,770,777`은 별도 `scs_P1`, `scs_F1`, `scs_Se`를 갱신한다. 따라서 CN B까지 같은 계산 결함으로 일반화하지 않는다.<br>`docs/developments.rst:27,63`의 수정 완료 설명과 CN A의 사용식·갱신 조건이 모순된다. raw 전체에서 출력 플래그가 거짓일 때 CN A의 계산용 누적량을 갱신하는 경로를 찾지 못했다. `sfincs_infiltration.f90:600`은 반대로 플래그를 끈다. 실행 결과는 확인하지 않았다. [대조 보고서 §5 B047·C021](../../../_staging/recovery/compare/SFINCS-docs-vs-code.md:1025) [10-12 결론 검증 보완]
 현재 코드에서 출력 플래그 의존성의 제거를 확인하지 못했다. `sfincs_input.f90:280` `call read_int_input(500,'storecumprcp',storecumprcp,0)`; `sfincs_input.f90:511` `store_cumulative_precipitation = .false.`; `sfincs_input.f90:512` `if (storecumprcp==1) then`; `sfincs_input.f90:513` `store_cumulative_precipitation = .true.`; `sfincs_meteo.f90:1321` `if (store_cumulative_precipitation) then`; `sfincs_meteo.f90:1534` `if (store_cumulative_precipitation) then`; `sfincs_infiltration.f90:709` `if (store_cumulative_precipitation) then`
 
 
 ## 5. 주요 findings
-- 이 분기의 셀은 마지막 셀의 흡입수두와 수분 부족량을 참조한다. `sfincs_infiltration.f90:838` `do nm = 1, np`; `sfincs_infiltration.f90:856` `qinfmap(nm) = (ksfield(nm) * (1.0 + (GA_head(np) * GA_sigma(np)) / GA_F(nm)))`
+B123·C026의 Green-Ampt 인덱스 후보는 [검증 정본](sfincs_infiltration.md#cv-s-b123)을 따른다. 고강수 분기와 결과 제한의 조건도 정본에 적었다. [10-12 결론 검증 보완]
+B123·C026의 Green-Ampt 인덱스 후보는 [검증 정본](sfincs_infiltration.md#cv-s-b123)을 따른다. 고강수 분기와 결과 제한의 조건도 정본에 적었다. [10-12 결론 검증 보완]
   포화 수리전도도와 누적 침투 상태는 각 셀의 값을 사용한다. `sfincs_infiltration.f90:856` `qinfmap(nm) = (ksfield(nm) * (1.0 + (GA_head(np) * GA_sigma(np)) / GA_F(nm)))`; `sfincs_infiltration.f90:863` `GA_sigma(nm) = max(GA_sigma(nm) - (qinfmap(nm) * dt / GA_Lu(nm)), 0.0)`; `sfincs_infiltration.f90:867` `GA_F(nm)    = GA_F(nm) + qinfmap(nm) * dt   ! internal cumulative rainfall from Green-Ampt`
   전체 침투율이 공간적으로 균일해진다고 단정할 수 없다. `sfincs_infiltration.f90:856` `qinfmap(nm) = (ksfield(nm) * (1.0 + (GA_head(np) * GA_sigma(np)) / GA_F(nm)))`; `sfincs_infiltration.f90:863` `GA_sigma(nm) = max(GA_sigma(nm) - (qinfmap(nm) * dt / GA_Lu(nm)), 0.0)`; `sfincs_infiltration.f90:867` `GA_F(nm)    = GA_F(nm) + qinfmap(nm) * dt   ! internal cumulative rainfall from Green-Ampt`
   np를 nm로 바꾸는 작성 의도는 확인하지 않았다. `sfincs_infiltration.f90:838` `do nm = 1, np`; `sfincs_infiltration.f90:856` `qinfmap(nm) = (ksfield(nm) * (1.0 + (GA_head(np) * GA_sigma(np)) / GA_F(nm)))`
@@ -82,3 +86,7 @@ I = exp(kd·rain_T1/3600) ; f = (fc + (f0-fc)·I)/3600/1000   ! :967,979 지수�
 - [[sfincs_boundaries_forcing]] — §5 침투 survey(본 노트가 알고리즘 심화 + GA 버그 표기)
 - [[sfincs_flow_solver]] — netprcp 가 연속식으로(Bates 마찰 reduced-SWE)
 - [[sfincs_subgrid_quadtree]] — subgrid z_volume(hh_local 산정)·quadtree(NetCDF 입력)
+
+## 문서 참고 링크 오류
+
+v2.0.2 릴리스 링크의 정정은 [변경 이력 노트의 정본](../manual-notes/sfincs-v2.4.0-galibier-changelog-known-issues.md#문서-참고-링크-오류)을 따른다. [10-12 결론 검증 보완]

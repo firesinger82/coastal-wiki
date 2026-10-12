@@ -9,7 +9,7 @@ note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-18
 related:
   - "[[sfincs-architecture-source-map]]"
-last_source_check: 2026-10-07 (recovery 재판독 대조)
+last_source_check: 2026-10-12 (recovery 차이 결론 반영)
 ---
 
 # SFINCS 고속화 핵심: subgrid + quadtree + domain
@@ -106,7 +106,13 @@ SFINCS의 reduced-complexity 모델이 "거친 계산격자 + 정밀 지형 정�
 
 ### 2.2 두 입력 포맷
 
-`read_subgrid_file()`은 파일을 netcdf로 열어보고 성공 시 새 netcdf 포맷(`havg`/`nrep`), 실패(-51 = not-a-netcdf)면 "old" binary 포맷(`hrep`/`navg`)으로 분기 (`sfincs_subgrid.F90:32-52`, 경고 :48). netcdf 경로에선 `huthresh=0.0` 강제(`:40`).
+`read_subgrid_file()`은 파일을 netcdf로 열어보고 성공 시 새 netcdf 포맷(`havg`/`nrep`), 실패(-51 = not-a-netcdf)면 "old" binary 포맷(`hrep`/`navg`)으로 분기 (`sfincs_subgrid.F90:32-52`, 경고 :48). netcdf 경로에선 `huthresh=0.0` 강제(`:40`). 근거: `docs/parameters.rst:84` `:default:		0.05`<br>`sfincs_input.f90:80` `call read_real_input(500,'huthresh',huthresh,0.05)`<br>`sfincs_subgrid.F90:34` `if (net_file_sbg%ncid > 0) then`<br>`sfincs_subgrid.F90:40` `huthresh = 0.0`<br>`sfincs_momentum.f90:177` `if (zsu>zmin + huthresh) then ! In the 'new' subgrid formulations, zmin is lowest pixel + huthresh. Huthresh was already applied when building the subgrid tables. In sfincs_domain, huthresh is set to 0.0 to acount for this.` [대조 보고서 §5 A013·C001](../../../_staging/recovery/compare/SFINCS-docs-vs-code.md:943) 결론: 문서 누락. 이 판은 NetCDF subgrid 입력을 사용할 때 huthresh의 읽기 기본값 0.05 m를 0으로 덮어쓴다.
+
+#### 문서와 코드 차이 (외부 원문 판정)
+
+| 보고서 행 ID | 항목 | 근거 | 결론 |
+|---|---|---|---|
+| <a id="cv-s-b049"></a>B049 | 정규격자 binary sbgfile 버그 | Deltares/SFINCS, `v2.3.0_mt_Faber_release`, [`source/src/sfincs_subgrid.F90`](https://raw.githubusercontent.com/Deltares/SFINCS/v2.3.0_mt_Faber_release/source/src/sfincs_subgrid.F90), `sfincs_subgrid.F90:789–790, 862–863, 866–867`<br>Deltares/SFINCS, `v2.4.0_Galibier_release`, [`source/src/sfincs_subgrid.F90`](https://raw.githubusercontent.com/Deltares/SFINCS/v2.4.0_Galibier_release/source/src/sfincs_subgrid.F90), `sfincs_subgrid.F90:789–790, 862–863, 866–867`<br>[Deltares/SFINCS 커밋 `96b5014`](https://github.com/Deltares/SFINCS/commit/96b5014) (2026-04-15)<br>`docs/developments.rst:65`의 수정 이력을 `do nm = 1, np`와 `do ip = 1, npuv`의 차이에 대조했다.<br>`np`와 `npuv`의 대소 차이 때문에 생긴 증상은 확인하지 않았다. | A 판 차이. v2.4.0은 정규격자 구형 binary subgrid 파일 리더의 `subgrid_uv_nrep(1, :)` 채움 반복을 셀 수 `np`에서 uv 점 수 `npuv`로 바꾸었다. 현재 로컬 코드는 이 수정판이다. [대조 보고서 §5 B049](../../../_staging/recovery/compare/SFINCS-docs-vs-code.md:1027) [10-12 외부 원문 판정] [10-12 결론 검증 보완] |
 
 ### 2.3 quadtree → SFINCS 인덱스 re-map (핵심)
 
@@ -128,11 +134,17 @@ subgrid 파일은 **quadtree 전체 점**(kcs==0 포함)에 대한 값을 담고
 - 셀이 완전 침수면 `z_volume = z_volmax + A\cdot(zs - zmax)` (`:929-931`).
 - 아니면 레벨 검색 후 1D 보간(`:938-948`):
   $$\text{facint}=\frac{zs - z_{dep}(ivol)}{z_{dep}(ivol{+}1)-z_{dep}(ivol)},\quad z_{vol}=(ivol{-}1)dz_{vol}+\text{facint}\cdot dz_{vol}$$
-- 역방향(continuity, `sfincs_continuity.f90:565-568`): `iuv=int(z_volume/dzvol)+1`로 부피→수위.
+- 역방향(continuity, `sfincs_continuity.f90:565-568`): `iuv=int(z_volume/dzvol)+1`로 부피→수위. 근거: `docs/developments.rst:334` `The subgrid method implemented so that subgrid tables are derived in pre-processing that contain relations between the water level and volume for every grid cell.`<br>`docs/developments.rst:335` `These tables are derived using high resolution topography and bathymetry data.`<br>`sfincs_subgrid.F90:94` `NF90(nf90_open(trim(sbgfile), NF90_CLOBBER, net_file_sbg%ncid))`<br>`sfincs_continuity.f90:568` `zs(nm)   = subgrid_z_dep(iuv, nm) + (subgrid_z_dep(iuv + 1, nm) - subgrid_z_dep(iuv, nm)) * facint` [대조 보고서 §5 C023](../../../_staging/recovery/compare/SFINCS-docs-vs-code.md:1059) 결론: 문서 누락. 이 판의 실행 커널은 전처리에서 만든 subgrid 표를 읽어 수위를 계산한다.
 
 **uv-점 momentum** (`sfincs_momentum.f90:373-378`): 수위 `zsu`로 레벨 인덱스/보간계수 계산 후 `havg`(흐름수심)·`nrep`($gn^2$)·`pwet`(wet fraction)을 1D 보간. `zsu>zmax`면 `fnfit` 기반 외삽(`sfincs_momentum.f90:351-364`). 이것이 거친 셀에서도 sub-grid 지형 효과를 보존하는 메커니즘.
 
 ---
+
+### 문서와 코드 차이 (외부 원문 판정)
+
+| 보고서 행 ID | 항목 | 근거 | 결론 |
+|---|---|---|---|
+| <a id="cv-s-b080"></a>B080 | subgrid 논문과 실행 중 표 사용 식 | [van Ormondt et al. (2025)](https://gmd.copernicus.org/articles/18/843/2025/gmd-18-843-2025.html), 식 (19)는 Manning 계수 n을 보간한다.<br>`sfincs_subgrid.F90:329,347`은 입력 조도를 `g*max(n,0.0001)**2`로 변환한다. `:323`은 `subgrid_uv_fnfit(ip) = rtmpuv(uv_index(ip))`이다. `:445`는 마지막 표의 변환된 조도를 보존한다. `sfincs_momentum.f90:364`는 `gnavg2 = subgrid_uv_navg_w(ip) - (subgrid_uv_navg_w(ip) - subgrid_uv_nrep_zmax(ip)) / (subgrid_uv_fnfit(ip) * (zsu - zmax) + 1.0)`이다.<br>해석: 두 끝값을 a·b, 분모를 d라 놓으면 코드의 값은 `g*(a**2-(a**2-b**2)/d)`이다. 식 (19)를 제곱한 값 `g*(a-(a-b)/d)**2`와 일반적으로 다르다. 차이는 `g*(a-b)**2*(d-1)/d**2`이다.<br>`sfincs_continuity.f90:549`는 0.999 경계를 사용한다. `:553`의 `max(subgrid_z_zmax(nm), -20.0)`도 논문 식 (25)에 없는 제한이다. `sfincs_momentum.f90:347`의 `zsu > zmax`도 논문 본문의 완전 젖음 경계와 다르다. | G 판단 근거 부족. 거칠기 식 (19)까지 일치한다는 결론을 철회한다. 조도 변환과 보간의 순서는 같은 연산이 아니다. 압력항·마찰 분모의 기본 구조와 완전 젖음 깊이 식 (22)의 대응은 유지한다. 논문은 SFINCS 2.1.1을 대상으로 한다. 로컬 코드는 2.4.0이다. 전처리 피팅 계수의 의도와 두 판 사이의 변경 근거는 확인하지 못했다. 따라서 차이의 원인을 A·B·E 중 하나로 확정하지 않는다. [대조 보고서 §5 B080](../../../_staging/recovery/compare/SFINCS-docs-vs-code.md:1036) [10-12 결론 검증 정정] |
 
 ## 3. domain 셋업 (`sfincs_domain.f90`)
 
@@ -172,6 +184,12 @@ subgrid 파일은 **quadtree 전체 점**(kcs==0 포함)에 대한 값을 담고
 - **projected**(`:1475-1518`): 레벨별 상수 `cell_area(iref)=dxrm\cdot dyrm` (`:1504`). coarse 이웃용 `dxrinvc=1/(1.5\,dxrm)` (`:1508`).
 둘 다 `dxymin`(최소격자, dtmax CFL 결정용)을 추적(`:1434,1515`).
 
+#### 문서와 코드 차이 (외부 원문 판정)
+
+| 보고서 행 ID | 항목 | 근거 | 결론 |
+|---|---|---|---|
+| <a id="cv-s-b067"></a>B067 | quadtree `dyrinvc` 정의·사용 버그 | Deltares/SFINCS, `v2.2.0_col_dEze_release`, [`source/src/sfincs_domain.f90`](https://raw.githubusercontent.com/Deltares/SFINCS/v2.2.0_col_dEze_release/source/src/sfincs_domain.f90), `sfincs_domain.f90:1417, 1480`<br>Deltares/SFINCS, `v2.3.0_mt_Faber_release`, [`source/src/sfincs_domain.f90`](https://raw.githubusercontent.com/Deltares/SFINCS/v2.3.0_mt_Faber_release/source/src/sfincs_domain.f90), `sfincs_domain.f90:1431, 1494`<br>Deltares/SFINCS, `v2.4.0_Galibier_release`, [`source/src/sfincs_domain.f90`](https://raw.githubusercontent.com/Deltares/SFINCS/v2.4.0_Galibier_release/source/src/sfincs_domain.f90), `sfincs_domain.f90:1446, 1509`<br>Deltares/SFINCS, `v2.2.0_col_dEze_release`, [`source/src/sfincs_momentum.f90`](https://raw.githubusercontent.com/Deltares/SFINCS/v2.2.0_col_dEze_release/source/src/sfincs_momentum.f90), `sfincs_momentum.f90:280`<br>Deltares/SFINCS, `v2.3.0_mt_Faber_release`, [`source/src/sfincs_momentum.f90`](https://raw.githubusercontent.com/Deltares/SFINCS/v2.3.0_mt_Faber_release/source/src/sfincs_momentum.f90), `sfincs_momentum.f90:280`<br>[Deltares/SFINCS 커밋 `e5f94e0`](https://github.com/Deltares/SFINCS/commit/e5f94e0) 및 [Deltares/SFINCS 커밋 `44a38cc`](https://github.com/Deltares/SFINCS/commit/44a38cc)<br>`docs/developments.rst:122`의 수정은 v2.3.0에서 투영 분기와 V 점 사용에 한정된다. 로컬 `sfincs_domain.f90:1446, 1509`와 `sfincs_momentum.f90:302`는 v2.4.0과 같다. | A 판 차이. v2.2.0의 `dyrinvc` 정의는 역수가 아닌 `1.0*(3*dyrm/2)`였다. v2.2.0의 V 점은 `dyrinvc`를 사용하지 않았다. v2.3.0은 투영 좌표 분기의 정의를 고쳤다. v2.3.0은 V 점의 사용을 고쳤다. 지리 좌표 분기의 정의는 v2.4.0에서 고쳤다. [대조 보고서 §5 B067](../../../_staging/recovery/compare/SFINCS-docs-vs-code.md:1032) [10-12 외부 원문 판정] [10-12 결론 검증 보완] |
+
 ### 3.5 bathymetry
 
 `initialize_bathymetry()` (`:1588-1744`):
@@ -196,3 +214,7 @@ subgrid 파일은 **quadtree 전체 점**(kcs==0 포함)에 대한 값을 담고
 | combined uv 점 | refinement 경계 흐름 보존 | `sfincs_domain.f90:537-596` |
 
 연결: 시간루프 전체는 [[sfincs-architecture-source-map]] 참조 (momentum→continuity).
+
+## 문서 참고 링크 오류
+
+v2.0.2 릴리스 링크의 정정은 [변경 이력 노트의 정본](../manual-notes/sfincs-v2.4.0-galibier-changelog-known-issues.md#문서-참고-링크-오류)을 따른다. [10-12 결론 검증 보완]

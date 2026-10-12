@@ -12,7 +12,7 @@ verification_date: 2026-07-10
 related:
   - models/ADCIRC/source-analysis/adcirc-fort-files-reference.md
   - models/ADCIRC/source-analysis/adcirc-parallel-implementation.md
-last_source_check: 2026-10-11 (recovery 재판독 대조)
+last_source_check: 2026-10-12 (recovery 차이 결론 반영)
 ---
 
 # ADCIRC Parameter Glossary V1
@@ -67,6 +67,10 @@ It is intentionally narrow. The goal is to stabilize vocabulary before the first
   - warning output can be an early signal of growing instability
 - `ErrorElev`
   - hard-stop threshold for clearly erroneous water-surface elevations (`global.F:91` verbatim: "ADCIRC terminates if this elev is exceeded")
+
+
+([fort15 보고서 §5 L712, L713, C01 (L839)](../../../_staging/recovery/compare/ADCIRC-fort15-vs-code.md#5-차이-결론); 항목: TAU0 수심 경계) 근거: 확인한 원문: `docs/user_guide/model_configuration/model_parameters/tau0.rst:204` ``` -  ``If depth >= 10; then``\ :math:`\tau_0`\ ``= 0.005`` ```<br>`docs/user_guide/model_configuration/model_parameters/tau0.rst:205` ``` -  ``If depth < 10; then``\ :math:`\tau_0`\ ``= 0.020`` ```<br>`docs/user_guide/model_configuration/model_parameters/tau0.rst:212` ``` -  ``If depth >= 200; then``\ :math:`\tau_0`\ ``= 0.005`` ```<br>`docs/user_guide/model_configuration/model_parameters/tau0.rst:213` ``` -  ``If 1 < depth < 200; then``\ :math:`\tau_0`\ ``= 1/depth`` ```<br>`docs/user_guide/model_configuration/model_parameters/tau0.rst:214` ``` -  ``If depth < 1; then``\ :math:`\tau_0 = 1` ```<br>`src/nodalattr.F:2149` ` IF (Scheme.eq.-2.d0) THEN `<br>`src/nodalattr.F:2151` ` IF(Depth.GE.200.) Tau0NodalValue=0.005 `<br>`src/nodalattr.F:2152` ` IF((Depth.LT.200.).AND.(Depth.GE.1.)) THEN `<br>`src/nodalattr.F:2153` ` Tau0NodalValue=1./Depth `<br>`src/nodalattr.F:2155` ` IF(Depth.LT.1.) Tau0NodalValue=1.0 `<br>`src/nodalattr.F:2158` ` IF(Depth.LE.10.) Tau0NodalValue=0.020d0 `<br>`src/nodalattr.F:2159` ` IF(Depth.GT.10.) Tau0NodalValue=0.005d0 `<br>해석: 같은 판 RST는 -1의 depth=10에 0.005를 적지만 코드는 <=10에 0.020을 대입한다. -2의 문서 구간은 depth=1을 빠뜨렸고 코드는 >=1 분기로 1을 만든다. exact Scheme=-2가 아니면 두 구간 초기화를 사용하므로 -2.1을 -2와 같은 초기값 선택으로 일반화하지 않는다. 결론: 문서 오기. v56.2.1의 기본 두 구간 TAU0 초기화는 수심 10 이하에서 0.020을 사용한다.
+([theory 보고서 §5 1027행 (`C04`)](../../../_staging/recovery/compare/ADCIRC-theory-vs-code.md#5-차이-결론); 항목: C04 τ₀ 문서 값과 실제 분기) 근거: `models/ADCIRC/raw/source_code/adcirc/src/nodalattr.F:2149` `IF (Scheme.eq.-2.d0) THEN`<br>`models/ADCIRC/raw/source_code/adcirc/src/nodalattr.F:2151` `IF(Depth.GE.200.) Tau0NodalValue=0.005`<br>`models/ADCIRC/raw/source_code/adcirc/src/nodalattr.F:2152` `IF((Depth.LT.200.).AND.(Depth.GE.1.)) THEN`<br>`models/ADCIRC/raw/source_code/adcirc/src/nodalattr.F:2153` `Tau0NodalValue=1./Depth`<br>`models/ADCIRC/raw/source_code/adcirc/src/nodalattr.F:2155` `IF(Depth.LT.1.) Tau0NodalValue=1.0`<br>`models/ADCIRC/raw/source_code/adcirc/src/nodalattr.F:2158` `IF(Depth.LE.10.) Tau0NodalValue=0.020d0`<br>`models/ADCIRC/raw/source_code/adcirc/src/nodalattr.F:2159` `IF(Depth.GT.10.) Tau0NodalValue=0.005d0`<br>보고서 C04의 노트는 현행 문서의 D=10·D=1 조건을 그대로 현재 코드 값표로 옮긴다. 해석: 문서의 경계값 오기를 노트가 이어받았다. −2.1의 별도 코드 결함 후보는 TAU-FRACTION 결론을 참조한다. 결론: 문서 오기. 현재 τ₀ 값표는 −1의 D≤10 조건과 −2의 1≤D<200 조건을 코드대로 기록해야 한다.
 
 ## Execution Terms
 

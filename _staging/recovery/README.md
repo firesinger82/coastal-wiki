@@ -114,7 +114,6 @@ Delft3D 487(기계 sweep 실패 471 + 웹 16, 09-22 스냅샷 교체 전 경로)
 - 문서 15파일 4,187행(rst·txt, 그림 27개 열람 포함): 5묶음 병렬. 기계 확인 전부 통과(원문 인용 2,339개 일치). sonnet 표본 8구간과 그림 2장 대조, 틀림 0.
 - 지시문 생성: 코드 `python3 scripts/mkprompt.py N MODEL BATCHFILE`, 문서 `python3 scripts/mkdocprompt_model.py MODEL BATCHFILE N`. 용어 규칙(spreading=방향 퍼짐, dispersion=분산)과 조건문·식 원문 인용 규칙 포함.
 - 문서·코드 대조(`compare/SFINCS-docs-vs-code.md`, 불일치 39)와 시간 단계 흐름 분석(`flow/SFINCS-callflow.md`)을 마치고 노트 14개에 반영했다(`667408d`). 보고서·노트 인용은 `scripts/citecheck.py`로 기계 대조, 전부 일치.
-- 확인하지 않은 것: 모델 실행. 불일치·지연이 결과에 주는 영향.
 
 ## EFDC 판독 (2026-10-07~08 완료)
 
@@ -126,7 +125,7 @@ Delft3D 487(기계 sweep 실패 471 + 웹 16, 09-22 스냅샷 교체 전 경로)
 - 범위 밖: `third_party_open`·`lib`·`redist`·`include` 외부 라이브러리, 빌드·설정, 바이너리, `manuals/refs/*.md`(이전 AI가 만든 요약·목록이라 원자료가 아님).
 - 검사 도구 수정: `quotes.py` 짝짓기 결함(인용 0개 쪽을 골라 불일치를 숨김) 수정, 그림 줄 인용은 따로 셈. `pdfcheck.py --jobs`로 모델별 작업 목록.
 - 문서·코드 대조 3종(`compare/EFDC-*.md`: 입력 카드 불일치 133, 이론 식 803개 중 불일치 284)과 흐름 분석 2종(`flow/EFDC-callflow.md`, `flow/EFDC-GVC-vs-plus.md`)을 마치고 노트 30개에 반영했다(`f3c6397a`). 보고서·노트 인용은 `citecheck.py`로 기계 대조.
-- 확인하지 않은 것: 모델 실행. 문서와 코드 차이 중 어느 쪽이 맞는지(단위·정의에 따라 갈리는 항목은 해석으로 표시).
+- 문서와 코드 차이의 결론은 아래 "노트 반영분 전수 대조와 차이 결론(10-12)" 절.
 
 ## ADCIRC 판독 (2026-10-09~10 판독 완료)
 
@@ -147,7 +146,17 @@ Delft3D 487(기계 sweep 실패 471 + 웹 16, 09-22 스냅샷 교체 전 경로)
 - 노트 반영(10-11, Codex `gpt-6.1-sol` 3개 동시, 노트 묶음을 겹치지 않게 나눔): 노트 35개를 고쳤다. 반영 기록은 `flow/ADCIRC-notes-apply-{A,B,C}.md`다. 대조 보고서 5종과 흐름 보고서의 수정안 행 ID를 모두 처리했다. 처리하지 않은 행은 보고서가 "판정하지 못한 세부 주장"·"판정을 제한한 항목"·"수정 불필요"로 둔 행뿐이다(스크립트로 대조). 새 절: `adcirc-timestep-orchestration.md` 시간 단계 호출 흐름(mermaid 2개, 렌더 확인), `adcirc-fort-files-reference.md` 문서와 코드 입력 차이, `adcirc-output-writers-implementation.md` 문서와 코드 출력 차이, `04-theory-pdf-v44xx.md` 이론 식 차이.
   - 기계 확인: 노트의 `[file=경로 line=N]` 형식을 `경로:N`으로 바꾼 임시 사본에서 `citecheck_path.py`로 인용 약 7,000개를 대조했다. 불일치는 이번에 고치지 않은 기존 줄 1건(검사 짝짓기 오판)이다. `tools/validate-all.sh` 통과.
   - sonnet 표본 24줄(추가된 1,144줄에서 무작위): 맞음 20, 부분 4(핫스타트 레코드 순서 표현, XDMF tau의 `NOLIBF=0` 조건, RaysIce·IceCube의 max·음수 분기 누락). 4건 모두 원문을 열어 확인하고 고쳤다. 표본 밖에도 조건 누락이 남아 있을 수 있다.
-- 아직 하지 않은 것: 모델 실행. 문서와 코드 차이 중 어느 쪽이 맞는지 판정.
+- 문서와 코드 차이의 결론은 아래 "노트 반영분 전수 대조와 차이 결론(10-12)" 절.
+
+## 노트 반영분 전수 대조와 차이 결론 (2026-10-12)
+
+사용자 지시(10-12): 확인하지 않은 것을 한계로 남기지 말고 해결한 뒤 다음 모델로 간다. 모델 실행은 위키 범위가 아니므로 한계로 적지 않는다.
+
+- 노트 반영분 전수 대조(Codex `gpt-6-astra`): 노트 반영 커밋이 넣은 줄을 모두 원문과 대조했다. ADCIRC(`8a943078`) 정정 40·보완 264·이상 없음 1,423, XBeach·SFINCS(`1da8d89`·`d89cd8b`·`c41c3037`·`667408d`) 정정 30·보완 83·이상 없음 437, EFDC(`f3c6397a`) 정정 19·보완 60·이상 없음 568. 기록: `flow/*-notes-verify*.md`. sonnet 표본 48줄(ADCIRC 24, 나머지 24) 모두 맞음, 표본에서 나온 경미한 조건 누락 2건은 원문 확인 후 보완.
+- 차이 결론(Codex `gpt-6-astra`): 대조 보고서 10개의 §5 "차이 결론"에 차이 행마다 A 판 차이·B 문서 오기·C 문서 누락·D 문서에만·E 코드 결함 후보·F 표기 차이·H 코드 대조 대상 아님(적용 사례·성능 주장)을 근거와 함께 달았다. 처음 G(근거 부족) 171행은 재판정 → 기준 정리(H 신설, 지원 범위 질문은 코드 동작으로 판정) → 외부 원문(sonnet 웹 판독, `compare/external-results-*.md`: GitHub 태그 소스, Fofonoff 1985 Table 3, Garcia & Gordon 1992, van Rijn 1984 Part I, Hamill & Kee 2016 저자 원고, SnapWave 프리프린트, GMD 2025 등)으로 0행이 됐다. 2차 문헌으로 판정한 행(Lee & Cheung 1990, Chapra 1997)은 노트에 "2차 문헌 기준"으로 표시했다.
+- 코드 결함 후보 표본(sonnet 24행): 23행 E 유지, 1행(ADCIRC ISLIP 3D 마찰)은 `vsmy.F:942` 의도 변경 주석으로 C로 바꿈. 강한 후보 예: ADCIRC EOS-80 계수 부호(`vsmy.F:3964` `c24=0.00000082467d0`, Fofonoff 1985 Table 3은 −8.2467E-7; Claude 원문 확인).
+- 노트 반영: 각 모델 노트의 문서·코드 차이 표에 결론을 붙이고 대표 노트에 "코드 결함 후보 (정적 판독)" 절을 만들었다(`flow/*-conclusions-apply.md`, `flow/*-external-apply.md`).
+- 기계 확인: 바뀐 노트 82개의 인용을 `citecheck_path.py`·`citecheck.py`로 대조. 원문을 줄여 옮긴 기존 인용 6곳을 원문 그대로 고쳤다. 남은 경고는 검사기 오판(표 안 `\|`, 탭 표기, 원문과 글자 단위로 같은 문헌 인용)이다. `tools/validate-canonical-hygiene.py`의 홈 경로 규칙이 Perl `=~/`를 경로로 잡아 `=` 뒤를 제외했다(시험 33개 통과).
 
 ## 다음에 이어서 할 일
 

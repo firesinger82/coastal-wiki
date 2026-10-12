@@ -2,6 +2,7 @@
 title: "XBeach 지형·지하수·Q3D 연결 계약과 적용 한계"
 canonical_source: self
 citation_status: draft-unsourced
+last_source_check: "2026-10-12 (recovery 차이 결론 반영)"
 note_author: "Codex"
 note_date: 2026-09-12
 verification_method: "동결 로컬 소스 직접 추적 및 최소 Fortran 대입 재현; 새 연결 주장 사람 검토 대기"
@@ -13,37 +14,46 @@ verification_method: "동결 로컬 소스 직접 추적 및 최소 Fortran 대�
 
 `executestep`은 wet mask → 시간 선택 → 경계 → 파랑 → 식생 → 지하수 → 유동 → 표사 → 지형 순서로 실행한다. 각 옵션은 별도 guard를 가지며, `bed_update` 호출은 `morphology=1`이면서 `setbathy!=1`일 때다. 내부 지형 갱신은 `morstart <= t < morstop`과 `morfac > 0.999`를 추가로 요구한다. 따라서 아래 결과는 해당 분기가 실행되는 경우에 한정한다. (`libxbeach.F90:280-312`; `morphevolution.F90:632-640`)
 
-위 순서에는 선박과 표류자가 빠져 있다. 선박(`ships==1`)은 경계 다음, 파랑 전에 실행한다(`libxbeach.F90:301`). 표류자(`ndrifter>0`)는 유동 다음, 표사 전에 실행한다(`libxbeach.F90:306`). `setbathy==1`이면 `bed_update` 대신 `setbathy_update`를 실행한다(`libxbeach.F90:310-311`).
+위 순서에는 선박과 표류자가 빠져 있다. 선박(`ships==1`)은 경계 다음, 파랑 전에 실행한다(`libxbeach.F90:301`). 표류자(`ndrifter>0`)는 유동 다음, 표사 전에 실행한다(`libxbeach.F90:306`). `setbathy==1`이면 `bed_update` 대신 `setbathy_update`를 실행한다(`libxbeach.F90:310-311`). 이 호출 순서는 `if(xcompute) then`과 `if (error==0) then` 안에서 각 기능의 조건을 만족할 때 적용한다(`libxbeach.F90:281,293`). [10-12 전수 검증 보완] 그림의 화살표는 조건을 만족한 호출의 상대 순서를 나타낸다(`libxbeach.F90:296-311` `if (par%swave==1)`, `if (par%vegetation==1)`). [10-12 전수 검증 보완]
 
 ```mermaid
 flowchart TD
-  W["compute_wetcells<br/>libxbeach.F90:284"] --> T["timestep<br/>:287"]
-  T --> BC["wave_bc :296<br/>gw_bc :297 (gwflow==1)<br/>flow_bc :298 (flow==1 또는 nonh)"]
-  BC --> SH["shipwave :301<br/>(ships==1)"]
-  SH --> WV["wave :302<br/>(swave==1)"]
-  WV --> VG["vegatt :303<br/>(vegetation==1)"]
-  VG --> GW["gwflow :304<br/>(gwflow==1)"]
-  GW --> FL["flow :305<br/>(flow==1 또는 nonh)"]
-  FL --> DR["drifter :306<br/>(ndrifter>0)"]
-  DR --> TR["transus :307<br/>(sedtrans==1)"]
-  TR -->|"morphology==1, setbathy/=1"| BU["bed_update :310"]
-  TR -->|"setbathy==1"| SB["setbathy_update :311"]
+  X{"if(xcompute) then<br/>libxbeach.F90:281<br/>[10-12 전수 검증 보완]"} --> W["compute_wetcells<br/>libxbeach.F90:284"] --> T["timestep<br/>libxbeach.F90:287"]
+  T --> OK{"if (error==0) then<br/>libxbeach.F90:293<br/>[10-12 전수 검증 보완]"} --> BC["wave_bc libxbeach.F90:296<br/>gw_bc libxbeach.F90:297 (gwflow==1)<br/>flow_bc libxbeach.F90:298 (flow==1 또는 nonh)"]
+  BC --> SH["shipwave libxbeach.F90:301<br/>(ships==1)"]
+  %% 파일 위치를 명시했다. [10-12 전수 검증 보완]
+  SH --> WV["wave libxbeach.F90:302<br/>(swave==1)"]
+  %% 파일 위치를 명시했다. [10-12 전수 검증 보완]
+  WV --> VG["vegatt libxbeach.F90:303<br/>(vegetation==1)"]
+  %% 파일 위치를 명시했다. [10-12 전수 검증 보완]
+  VG --> GW["gwflow libxbeach.F90:304<br/>(gwflow==1)"]
+  %% 파일 위치를 명시했다. [10-12 전수 검증 보완]
+  GW --> FL["flow libxbeach.F90:305<br/>(flow==1 또는 nonh)"]
+  %% 파일 위치를 명시했다. [10-12 전수 검증 보완]
+  FL --> DR["drifter libxbeach.F90:306<br/>(ndrifter>0)"]
+  %% 파일 위치를 명시했다. [10-12 전수 검증 보완]
+  DR --> TR["transus libxbeach.F90:307<br/>(sedtrans==1)"]
+  %% 파일 위치를 명시했다. [10-12 전수 검증 보완]
+  TR -->|"morphology==1, setbathy/=1"| BU["bed_update libxbeach.F90:310"]
+  %% 파일 위치를 명시했다. [10-12 전수 검증 보완]
+  TR -->|"setbathy==1"| SB["setbathy_update libxbeach.F90:311"]
+  %% 파일 위치를 명시했다. [10-12 전수 검증 보완]
 ```
 
 ### 직전 단계 값을 읽는 지점(지연)
 
-아래 항목은 소비 루틴이 같은 단계의 생산 루틴보다 먼저 실행된다. 따라서 소비 루틴은 직전 단계의 값을 읽는다. 첫 단계에서는 초기화 값을 읽는다. 순서 근거는 위 그림의 `libxbeach.F90` 행이다. 이 목록은 코드 순서에서 확인한 것이며, 결과에 주는 영향은 모델 실행으로 확인하지 않았다.
+아래 소비 루틴은 같은 단계의 생산 루틴보다 먼저 실행한다(`libxbeach.F90:284,287,302-305`). 해석: 소비 루틴은 활성 생산 경로가 마지막으로 갱신한 값 또는 초기값을 읽는다(`libxbeach.F90:302-305` `if (par%swave==1)`, `if (par%vegetation==1)`; `wave_timestep.F90:78` `if ((abs(mod(par%t,par%wavint))<0.001d0*par%dt) .or. s%newstatbc==1) then`). [10-12 전수 검증 정정] 이 목록은 코드 순서에서 확인한 것이며, 결과에 주는 영향은 모델 실행으로 확인하지 않았다.
 
 | 변수 | 소비(먼저 실행) | 생산(나중 실행) |
 |---|---|---|
-| `hh` | `compute_wetcells`: `if(s%hh(i,j)>par%eps+numeps) then`(`wetcells.F90:108`); `wave`: `s%hhw = max(s%hh+par%delta*s%H,par%eps)`(`wave_timestep.F90:59`) | `flow`: `s%hh  = max(s%zs-s%zb,par%eps)`(`flow_timestep.F90:940`) |
-| `H` | `wave` 진입 시 `hhw` 계산(`wave_timestep.F90:59`) | 같은 `wave` 안의 `s%H  = sqrt(s%E/par%rhog8)`(`wave_instationary.F90:433`) |
-| `Dveg` | `wave`의 소산 항(`wave_instationary.F90:295`) | `vegatt`(`vegetation.F90:400`) |
-| `ueu`, `vev`, `vmageu` | `vegatt`의 항력(`vegetation.F90:515-516`) | `flow`(`flow_timestep.F90:858,864,926`) |
-| `ue`, `ve` | `porcanflow`: `U = s%ue(i,j)`, `V = s%ve(i,j)`(`vegetation.F90:832-833`) | `flow`(`flow_timestep.F90:867,872`) |
-| `nuh` | `timestep`의 점성 CFL(`timestep.F90:523`) | `flow`: `s%nuh = par%nuh` 이후 갱신(`flow_timestep.F90:376`) |
+| `hh` | `compute_wetcells`: `if(s%hh(i,j)>par%eps+numeps) then`(`wetcells.F90:108`); `wave`는 `if (par%delta>0.d0) then`에서 `s%hhw = max(s%hh+par%delta*s%H,par%eps)`를 쓴다(`wave_timestep.F90:58-59`). [10-12 전수 검증 보완] ELSE에서는 `s%hhw = max(s%hh,par%eps)`를 쓴다(`:60-61`). [10-12 전수 검증 보완] | `flow`: `s%hh  = max(s%zs-s%zb,par%eps)`(`flow_timestep.F90:940`); `setbathy==1`이면 이후 `setbathy_update`도 `s%hh=max(s%zs-s%zb,par%eps)`를 대입한다(`libxbeach.F90:311`; `morphevolution.F90:3200`). [10-12 전수 검증 보완] |
+| `H` | `wave`는 `if (par%delta>0.d0) then`에서 `hhw`에 이전 `H`를 사용한다(`wave_timestep.F90:58-59` `s%hhw = max(s%hh+par%delta*s%H,par%eps)`). [10-12 전수 검증 보완] | Surfbeat의 같은 `wave` 호출 안에서 `s%H  = sqrt(s%E/par%rhog8)`를 대입한다(`wave_timestep.F90:83,103,113` `call wave_instationary(s,par)`; `wave_instationary.F90:433`). [10-12 전수 검증 보완] |
+| `Dveg` | 실행한 파랑 경로의 소산 항(`wave_instationary.F90:295`; `wave_stationary_directions.F90:444`) | `vegatt`의 `if (par%porcanflow == 1) then`에 대한 ELSE에서 `call swvegatt(s,par)`를 실행한다(`vegetation.F90:319-339`). [10-12 전수 검증 보완] 이 루틴이 `s%Dveg = Dvg`를 대입한다(`:400`). [10-12 전수 검증 보완] |
+| `ueu`, `vev`, `vmageu` | 표준 `vegatt`의 `momeqveg` 호출 안에서 `if (s%nsecveg(i,j)>0) then`, `if (ahtold > wacr) then`의 ELSE, `if (par%veguntow == 1) then`을 통과한 항력 계산이 읽는다(`vegetation.F90:319-342,478,502,513-516`). [10-12 전수 검증 보완] | `flow`(`flow_timestep.F90:858,864,926`) |
+| `ue`, `ve` | `if (par%porcanflow == 1) then`으로 호출한 `porcanflow`는 `if (s%isCanopy(i,j)==1 .and. s%wetz(i,j)==1) then` 안에서 `U = s%ue(i,j)`, `V = s%ve(i,j)`를 읽는다(`vegetation.F90:319-321,821-833`). [10-12 전수 검증 보완] | `flow`(`flow_timestep.F90:867,872`) |
+| `nuh` | 초기 단계 분기 뒤의 일반 시간 간격 계산에서 점성 CFL을 적용한다(`timestep.F90:481` `else`; `:519` `if(s%wetz(i,j)==1) then`; `:523,574`). [10-12 전수 검증 보완] | `flow`는 `if (par%viscosity==0) then`에서 `s%nuh = 0.d0`을 대입한다(`flow_timestep.F90:366-367`). [10-12 전수 검증 보완] ELSE에서는 `if (par%smag == 1) then`에 따라 `call visc_smagorinsky(s,par)` 또는 `s%nuh = par%nuh`를 선택한다(`:372-376`). [10-12 전수 검증 정정] 이후 `swave`·`smag`·`wavemodel`·`nhbreaker` 조건에 따라 쇄파 점성을 반영한다(`:380-414` `if (par%swave == 1) then`, `if (par%smag==0) then`, `elseif (par%swave==0 .and. par%wavemodel==WAVEMODEL_NONH) then`, `select case (par%nhbreaker)`). [10-12 전수 검증 보완] |
 
-`flow` 안에도 순서 비대칭이 있다. 셀 중심 `ue`는 이번 단계의 `ueu`로 만든다(`flow_timestep.F90:858,867`). 셀 중심 `ve`는 `vev`를 새로 대입하기 전에 만든다(`flow_timestep.F90:872`, 새 대입은 `:926`). 따라서 `ve`는 직전 단계의 `vev`로 만들어지고, 같은 단계에서 `ve`를 읽는 `transus`(`vmag2     = s%ue**2+s%ve**2`, `morphevolution.F90:141`)도 그 값을 읽는다. `flow_timestep.F90:103`의 `s%vev=0.d0`은 첫 호출의 할당 블록 안에만 있다. 원본 소스 전체에서 `vev`를 대입하는 곳은 이 둘과 초기화(`initialize.F90:894,1049,1159`)뿐이다.
+`flow` 안에도 순서 비대칭이 있다. 셀 중심 `ue`는 이번 단계의 `ueu`로 만든다(`flow_timestep.F90:858,867`). 셀 중심 `ve`는 `vev`를 새로 대입하기 전에 만든다(`flow_timestep.F90:872`, 새 대입은 `:926`). 해석: 첫 `flow` 호출에서는 `s%vev=0.d0`(`flow_timestep.F90:103`)을 읽는다. [10-12 전수 검증 보완] 해석: 후속 호출에서 `ve`는 직전 `flow` 호출의 `vev`로 만든다(`flow_timestep.F90:872,926`). [10-12 전수 검증 보완] 같은 단계의 `transus`도 그 `ve`를 읽는다(`morphevolution.F90:141` `vmag2     = s%ue**2+s%ve**2`). [10-12 전수 검증 보완] `flow_timestep.F90:103`의 `s%vev=0.d0`은 첫 호출의 할당 블록 안에만 있다. 원본 소스 전체에서 `vev`를 대입하는 곳은 이 둘과 초기화(`initialize.F90:894,1049,1159`)뿐이다.
 
 ## 다분급 입경: 셀별 초기화 뒤 로컬 배열 전체 덮어쓰기
 
@@ -92,3 +102,12 @@ flowchart TD
 | `D90top` → `cfu/cfv` | 이전 지형 갱신의 입경 상태; White-Colebrook 입경 옵션과 `ngd>1`에서 조도 계산 | `flow`의 `bedroughness_update`가 운동량 계산 전에 사용. 뒤의 `bed_update` 결과는 이후 유동 호출에 전달 |
 
 선박은 첫 처리에서 `zs -= ph`도 수행한다 (`ship.F90:403-410`). 표의 시점은 해당 옵션이 실행되는 경우의 호출 순서이며 스텝 사이 모든 상태가 재초기화된다는 뜻이 아니다. 입경 배열 덮어쓰기의 기존 판정·한계는 위 절을 그대로 따른다. (`libxbeach.F90:293-312`; `ship.F90:287-337,365-373`; `vegetation.F90:318-345,400,563-564`; `wave_instationary.F90:294-295`; `wave_stationary_directions.F90:442-444`; `rainfall.F90:22-70,86-100`; `flow_timestep.F90:120,131-149,176-177,563-612,724-751`; `bedroughness.F90:220-249`)
+
+## 코드 결함 후보 (정적 판독)
+
+이 목록은 원문 정적 판독에서 코드가 자기 주석·문서·다른 경로·단위와 어긋나는 곳이다. 결함 확정은 개발자 확인이 필요하다.
+
+| 위치(경로:줄 + 원문) | 무엇이 어긋나는가 | 근거 둘 이상(자기 주석, 같은 판 문서, 다른 코드 경로, 단위) | 영향 범위(어떤 입력·분기에서만 나타나는가) | 근거 강도(강함/중간/약함, 그 이유) | 출처 보고서 행 ID |
+|---|---|---|---|---|---|
+| [검증 정본](xbeach_vegetation.md#cv-s-xb-308) | 표준 v 항력의 u점 속력 참조 | 조건·반례·다른 경로의 대조는 정본을 따른다. | 정본의 활성 조건에 한정한다. | E 코드 결함 후보. 정적 판독이다. | [대조 보고서 §5, 308행](../../../_staging/recovery/compare/XBeach-manual-vs-code.md#5-차이-결론) (A절, E 코드 결함 후보, [10-12 G 재판정]) [10-12 결론 검증 보완] |
+| [검증 정본](xbeach_vegetation.md#cv-s-xb-524) | 파봉 위 층의 canopy 힘 재사용 | 조건·반례·다른 경로의 대조는 정본을 따른다. | 정본의 활성 조건에 한정한다. | E 코드 결함 후보. 정적 판독이다. | [대조 보고서 §5, 524행](../../../_staging/recovery/compare/XBeach-manual-vs-code.md#5-차이-결론) (B절, E 코드 결함 후보, [10-12 결론 정정])<br>별도의 단위 후보는 [CV-S-XB-01 정본](xbeach_vegetation.md#cv-s-xb-01)을 따른다. [10-12 결론 검증 보완] |
