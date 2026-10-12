@@ -156,6 +156,16 @@ Delft3D 487(기계 sweep 실패 471 + 웹 16, 09-22 스냅샷 교체 전 경로)
 - PDF 111쪽(7작업): Codex가 300 dpi 쪽 이미지로 판독(Marker 초안 참고). 용량 오류로 끊긴 2작업은 재실행. 기계 확인 7작업 전부 통과. sonnet 쪽 이미지 표본 12쪽 모두 맞음, 빠진 구절 2곳 보완(FAQ p.5는 Claude가 이미지로 확인).
 - 검사 도구 수정: `quotes.py`가 UTF-8로 읽지 못하는 원문(ISO-8859)을 latin-1로 다시 읽는다.
 
+## ShorelineS 대조·흐름·노트 반영 (2026-10-12 완료)
+
+- 대조 보고서 3종(Codex `gpt-6.1-sol`): `compare/ShorelineS-theory-vs-code.md`(매뉴얼 v1.0 식 (1)~(78)·FAQ·2018/2020 논문 식 대 코드), `compare/ShorelineS-inputs-vs-code.md`(S 필드·입력 파일 형식), `flow/ShorelineS-callflow.md`(초기화·시간 단계 호출 순서, mermaid 2개 — 렌더 확인).
+- 외부 원문(sonnet 웹 조회, 5묶음): Seabrook & Hall 1998 식 (4)·Hallin 학위논문 식 3.23·3.49·Vitousek & Barnard 2015는 원문을 직접 읽음. SPM 1984·Stockdon 2006은 2차 문헌 기준. 결과: 매뉴얼 식 (73) Stockdon `/2` 위치 B, 식 (58) 지수 부호 B, 코드 `wave_transmission.m:94` 선형 두 항 부호 E(강함), `dune_growth.m:75` 입경비 역수 E(강함), CERC3 `gamma.^-0.52` E(중간).
+- git 이력 판정(Codex `gpt-6-astra`): 원본 저장소(`raw/.../shorelines`, HEAD `f3ec8638`, 47커밋, 2018-05-24~2026-08-13, 작업 트리 변경 없음, `7bf4481` 이후 변경은 매뉴얼 PDF 추가 하나)의 문서 날짜 직전 커밋과 대조. 이론·흐름의 A 10행은 문서 시점 코드도 현재와 같아 A 0(B 4·C 6으로 변경). D 39행 중 18행은 과거 코드에 있다가 지워진 기능이라 A로 변경(대부분 `f5f12430` 2024-06-14 "Midsummer 2024 beta release"). E 32행은 도입 커밋과 반대 증거를 찾아 모두 유지(외부 원문 판정으로 이론 E 4행 추가). 기록: `compare/ShorelineS-git-verify*.md`.
+- 결론 전수 재검증(Codex `gpt-6-astra`, sonnet 표본 22행 중 부분 4를 보고 전수로): 398행. 최종 분류 — 이론 189행 A0·B16·C104·D4·E11·F33·H21, 입력 166행 A18·B27·C76·D18·E19·F4·H4, 흐름 43행 A1·B11·C20·D1·E6·F3·H1. G·X 0.
+- 노트 반영(Codex `gpt-6.1-sol`, 스트림 끊김 1회 이어서 재실행): 노트 9개, 각 노트 "문서와 코드 차이 (10-12 대조)" 표, 대표 노트 `shorelines-architecture-map.md`에 흐름도 2개와 "코드 결함 후보 (정적 판독)" 28행(E 36행을 원인별로 묶음). 기록: `flow/ShorelineS-notes-apply-{1,2}.md`.
+- 추가 줄 전수 대조(Codex `gpt-6-astra`): 1,002줄, 정정 74·보완 29(`flow/ShorelineS-notes-verify-{1,2}.md`). sonnet 표본 24줄: 맞음 22, 부분 2(각도 제한 줄 인용 누락, `dsdn` 설명) → 고침. 같은 표본에서 보고서의 `Kw=4.2` 목록 쪽(PDF 50 → 51) 정정.
+- 기계 확인: 현재 코드 인용(보고서 6,874·노트 2,809)과 과거 커밋 인용(`HASH:path:N`, 보고서 398·노트 317, `git show`로 대조) 불일치 0. 남은 경고는 같은 이름 README 2개로 인한 검사기 오판.
+
 ## 노트 반영분 전수 대조와 차이 결론 (2026-10-12)
 
 사용자 지시(10-12): 확인하지 않은 것을 한계로 남기지 말고 해결한 뒤 다음 모델로 간다. 모델 실행은 위키 범위가 아니므로 한계로 적지 않는다.
@@ -170,4 +180,4 @@ Delft3D 487(기계 sweep 실패 471 + 웹 16, 09-22 스냅샷 교체 전 경로)
 
 1. ~~매뉴얼과 코드 판독 기록 대조~~ — 10-03 완료(`compare/XBeach-manual-vs-code.md`, 노트 반영 `1da8d89`).
 2. ~~XBeach 파일 간 계산 흐름 분석~~ — 10-07 완료(`flow/XBeach-callflow.md`, 노트 반영 `d89cd8b`). 판독 기록 검색은 `wiki_search` `path_class="records"`(`ce7b3ae`).
-3. 다른 10개 모델(SFINCS·EFDC·ADCIRC 완료, ShorelineS 판독 완료·대조 이후 진행 중, 나머지 8개 미착수): 같은 방식(고정 목록 → 1행/1쪽 판독 → 기계 확인 → 다른 모델 검증).
+3. 다른 10개 모델(SFINCS·EFDC·ADCIRC 완료, ShorelineS 10-12 완료, 나머지 8개 미착수 — CADMAS-SURF·Celeris·Delft3D·FUNWAVE·LISFLOOD-FP·ROMS·SWAN·SWASH): 같은 방식(고정 목록 → 1행/1쪽 판독 → 기계 확인 → 다른 모델 검증).
