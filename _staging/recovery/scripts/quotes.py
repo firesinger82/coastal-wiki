@@ -6,7 +6,10 @@ T=B=0; IMG=[0]
 for r in recs:
     t=open(r).read()
     src=re.search(r'^file: (.+)$',t,re.M).group(1).strip()
-    L=open(src,'rb').read().decode('utf-8','replace').replace('\r','').split('\n')
+    _raw=open(src,'rb').read()
+    try: _txt=_raw.decode('utf-8')
+    except UnicodeDecodeError: _txt=_raw.decode('latin-1')  # 10-12: ISO-8859 sources (ShorelineS)
+    L=_txt.replace('\r','').split('\n')
     norm=lambda s: re.sub(r'\s+|&','',re.sub(r'\\([_*|#\[\]()<>`.!-])',r'\1',s)).lower()  # 10-10: Markdown escapes (\_ etc.) ignored
     nl=[norm(x) for x in L]
     # 2026-10-08: union of both pairings (a quote is OK if either pairing matches);

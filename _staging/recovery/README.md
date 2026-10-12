@@ -148,6 +148,14 @@ Delft3D 487(기계 sweep 실패 471 + 웹 16, 09-22 스냅샷 교체 전 경로)
   - sonnet 표본 24줄(추가된 1,144줄에서 무작위): 맞음 20, 부분 4(핫스타트 레코드 순서 표현, XDMF tau의 `NOLIBF=0` 조건, RaysIce·IceCube의 max·음수 분기 누락). 4건 모두 원문을 열어 확인하고 고쳤다. 표본 밖에도 조건 누락이 남아 있을 수 있다.
 - 문서와 코드 차이의 결론은 아래 "노트 반영분 전수 대조와 차이 결론(10-12)" 절.
 
+## ShorelineS 판독 (2026-10-12)
+
+기록: `read/ShorelineS/shorelines/`(코드·문서), `read/ShorelineS/shorelines/doc/*.pdf/`(PDF). 대상 목록: `scripts/shorelines-batches.json`(자체 코드 `functions/` MATLAB 136파일 + `compiled/launchShorelineS.sh`, 137파일 19,941행), `scripts/shorelines-docbatches.json`(README 2·출판 목록·`compiled/input.txt`·`ShorelineS.ipynb`), `scripts/shorelines-pdfjobs.json`(매뉴얼 v1.0 66쪽, FAQ 15쪽, FMarS2020 20쪽, ICEC2018 10쪽 = 111쪽). 테스트·예제(`script/` 333파일, 대부분 그림)는 다른 모델과 같은 기준으로 제외.
+
+- 코드·문서: Codex `gpt-6.1-sol` 6묶음. 기계 확인 142기록 전부 통과(1행~끝 구간·sha·행 수). sonnet 표본 30구간: 맞음 26, 부분 4(변수 용도 단정, 루프 순서 해석, 삭제 대상 반대, 점 개수) → 고침. 표본 오류율을 보고 전 기록을 `gpt-6-astra`로 의미까지 전수 대조: 정정 93, 보완 80(`read/ShorelineS/verify-*.md`). 원문 인용 6,938개 중 불일치 1(원문 한 줄에 UTF-8과 ISO-8859가 섞인 검사 오판).
+- PDF 111쪽(7작업): Codex가 300 dpi 쪽 이미지로 판독(Marker 초안 참고). 용량 오류로 끊긴 2작업은 재실행. 기계 확인 7작업 전부 통과. sonnet 쪽 이미지 표본 12쪽 모두 맞음, 빠진 구절 2곳 보완(FAQ p.5는 Claude가 이미지로 확인).
+- 검사 도구 수정: `quotes.py`가 UTF-8로 읽지 못하는 원문(ISO-8859)을 latin-1로 다시 읽는다.
+
 ## 노트 반영분 전수 대조와 차이 결론 (2026-10-12)
 
 사용자 지시(10-12): 확인하지 않은 것을 한계로 남기지 말고 해결한 뒤 다음 모델로 간다. 모델 실행은 위키 범위가 아니므로 한계로 적지 않는다.
@@ -162,4 +170,4 @@ Delft3D 487(기계 sweep 실패 471 + 웹 16, 09-22 스냅샷 교체 전 경로)
 
 1. ~~매뉴얼과 코드 판독 기록 대조~~ — 10-03 완료(`compare/XBeach-manual-vs-code.md`, 노트 반영 `1da8d89`).
 2. ~~XBeach 파일 간 계산 흐름 분석~~ — 10-07 완료(`flow/XBeach-callflow.md`, 노트 반영 `d89cd8b`). 판독 기록 검색은 `wiki_search` `path_class="records"`(`ce7b3ae`).
-3. 다른 10개 모델(SFINCS·EFDC 완료, ADCIRC 완료, 나머지 9개 미착수): 같은 방식(고정 목록 → 1행/1쪽 판독 → 기계 확인 → 다른 모델 검증).
+3. 다른 10개 모델(SFINCS·EFDC·ADCIRC 완료, ShorelineS 판독 완료·대조 이후 진행 중, 나머지 8개 미착수): 같은 방식(고정 목록 → 1행/1쪽 판독 → 기계 확인 → 다른 모델 검증).

@@ -1,0 +1,30 @@
+---
+file: models/ShorelineS/raw/source_code/shorelines/functions/get_nourishments.m
+lines: 180
+sha256: c3c3b80be871d753224a58cef1e23578e409ae6e038c1247eb68c18d73b10aca
+reader: codex gpt-6.1-sol
+read_date: 2026-10-12
+---
+
+# get_nourishments.m — 판독 구간 기록
+
+구간은 1행부터 180행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–52 | 함수 시그니처는 `function [NOUR]=get_nourishments(TIME,COAST,NOUR)` (1). 양빈(nourishment) 시작·종료 날짜, 좌표, 횟수, 연간 체적률(volume rate), 길이당 체적률 출력을 설명한다(2–24). 주석은 nourish=0·1·2, growth의 범위 0–1·기본 1을 적는다(12–13). 저작권·연락처·LGPL 2.1 이상·무보증 주석과 빈 줄을 포함한다(25–52). |
+| 53–66 | 시작 시 1행 get_nourishments 함수 안. NOUR.rate_density를 해안점 수의 0 배열로 만든다(53). `if NOUR.nourish==1` (54)의 양빈 방식에서 반복은 `for i_n=1:NOUR.nnour` (55). `if TIME.tnow>=NOUR.tstart(i_n) && TIME.tnow<=NOUR.tend(i_n)` (56)이면 `[ x_n,y_n,~,~,~ ] = get_one_polygon( NOUR.xnour,NOUR.ynour,i_n );` (57)로 get_one_polygon을 호출한다. 내부점(in-polygon) 검사식은 `in=inpolygon(COAST.x,COAST.y,x_n,y_n);` (58). `if sum(in)>0` (59)이면 내부 좌표의 선분(segment) 길이·유효값 검색·길이 합 식 `cl=(hypot(diff(COAST.x(in)),diff(COAST.y(in))));` (60); `idnotnan=find(~isnan(cl));` (61); `clsum=sum(cl(idnotnan));` (62). 체적률 밀도 누적식은 `NOUR.rate_density=NOUR.rate_density+in*NOUR.rate(i_n)/clsum;` (63). 분기·반복을 닫는다(64–66). |
+| 67–104 | 시작 시 1행 get_nourishments 함수 안. 시작 시 54행 양빈 방식 선택 if 블록 안. 대체 방식은 `elseif NOUR.nourish==2` (67). 반복은 `for i_n=1:NOUR.nnour` (68). `if TIME.tnow>=NOUR.tstart(i_n) && TIME.tnow<=NOUR.tend(i_n)` (69)이면 방법 선택 `if ~isempty(findstr(lower(NOUR.method),'default'))` (70). 기본 방법은 dxnour·iddist·idx를 비운다(75–77). 해안 요소(coastal element) 반복은 `for i_mc=1:COAST.n_mc` (78). get_one_polygon 호출은 `[ xc,yc,~,~,~ ] = get_one_polygon( COAST.x_mc,COAST.y_mc,i_mc );` (79). 양끝점·평균 위치 거리식은 `dist1=((xc-NOUR.xnour(i_n,1)).^2+(yc-NOUR.ynour(i_n,1)).^2).^0.5;` (80); `dist2=((xc-NOUR.xnour(i_n,2)).^2+(yc-NOUR.ynour(i_n,2)).^2).^0.5;` (81); `dist3=((xc-mean(NOUR.xnour(i_n,:))).^2+(yc-mean(NOUR.ynour(i_n,:))).^2).^0.5;` (82). 최근접 인덱스(index)·영향 구간·최단거리 식은 `idx1=find(dist1==min(dist1),1);` (83); `idx2=find(dist2==min(dist2),1);` (84); `idx3=find(dist3==min(dist3),1);` (85); `idx{i_mc}=[min([idx1,idx2,idx3]):max([idx1,idx2,idx3])]; % find the coastline id's that are affected` (86); `iddist(i_mc,:)=[min(dist1),min(dist2),min(dist3)]; % store the minimum distance to this coastal section` (87). 누적 거리·점 간격 식은 `s=[0,cumsum((diff(xc).^2+diff(yc).^2).^0.5)];` (90); `ds0=diff(s);` (91); `ds=[ds0(1),(ds0(1:end-1)+ds0(2:end))/2,ds0(end)];` (92). get_cyclic 호출은 `cyclic=get_cyclic(xc,yc,COAST.ds0);` (94). `if cyclic` (95)이면 양 끝 간격식 `ds(1)=(ds0(1)+ds0(end))/2;` (96); `ds(end)=(ds0(1)+ds0(end))/2;` (97). 양빈 길이 합은 `dxnour(i_mc)=sum(ds(idx{i_mc}));` (100). `if isnan(dxnour(i_mc))` (101)이면 해당 길이를 0으로 만든다(102). 분기·해안 요소 반복을 닫는다(103–104). |
+| 105–123 | 시작 시 1행 get_nourishments 함수 안. 시작 시 67행 nourish==2·68행 i_n 반복·69행 시간 분기·70행 default 방법 분기 안. 제외 기준 주석 뒤 반복은 `for i_mc=1:COAST.n_mc` (108). `if length(idx{i_mc})>=1 && iddist(i_mc,1)>min(iddist(:,1)) && iddist(i_mc,2)>min(iddist(:,2)) && iddist(i_mc,3)>min(iddist(:,3))` (109)이면 해당 idx를 비우고 dxnour=0으로 설정한다(110–111). `else` (114)는 대체 방법이다. 주석은 양빈선을 20점으로 나눈다고 적는다(116–118). 실제 거리·표본점 식은 `dist0=[0,(diff(NOUR.xnour(i_n,:)).^2+diff(NOUR.ynour(i_n,:)).^2).^0.5];` (119), `disti=[0:dist0(end)/50:dist0(end)];` (120). interp1 호출식은 `xn=interp1(dist0,NOUR.xnour(i_n,:),disti);` (121), `yn=interp1(dist0,NOUR.ynour(i_n,:),disti);` (122). 빈 줄을 포함한다(115·123). |
+| 124–151 | 시작 시 1행 get_nourishments 함수 안. 시작 시 67행 nourish==2·68행 i_n 반복·69행 시간 분기·114행 대체 방법 else 안. idxm·distmin·dxnour0·dsmc를 비운다(124–127). 해안 요소 반복은 `for i_mc=1:COAST.n_mc` (128). get_one_polygon 호출은 `[ xc,yc,~,~,~ ] = get_one_polygon( COAST.x_mc,COAST.y_mc,i_mc );` (129). idxn·distn을 비우고(130–131), `for kk=1:length(xn)` (132)에서 거리·최단거리·최근접점 식 `distm=((xc-xn(i_n,kk)).^2+(yc-yn(i_n,kk)).^2).^0.5;` (133); `distn(kk)=min(distm);` (134); `idxn(kk)=find(distm==min(distm),1);` (135). idxm·distmin에 결과를 복사한다(137–138). 누적 거리·점 간격 식은 `s=[0,cumsum((diff(xc).^2+diff(yc).^2).^0.5)];` (141); `ds0=diff(s);` (142); `ds=[ds0(1),(ds0(1:end-1)+ds0(2:end))/2,ds0(end)];` (143). get_cyclic 호출은 `cyclic=get_cyclic(xc,yc,COAST.ds0);` (145). `if cyclic` (146)이면 양끝 간격식 `ds(1)=(ds0(1)+ds0(end))/2;` (147); `ds(end)=(ds0(1)+ds0(end))/2;` (148). dsmc에 간격을 복사하고 요소 반복을 닫는다(150–151). |
+| 152–168 | 시작 시 1행 get_nourishments 함수 안. 시작 시 67행 nourish==2·68행 i_n 반복·69행 시간 분기·114행 대체 방법 else 안. 가장 가까운 요소 선택·요소 전환점·구간 끝점·구간 재배열 식은 `[dmin,idmin]=min(distmin,[],1);` (152); `ids0=find(diff(idmin)~=0);` (153); `ids1=[1,sort([ids0,ids0+1]),length(idmin)]; % find the start and end points` (154); `idn20=reshape(ids1,[2,length(ids1)/2])';` (155); `idele=idmin(ids1(1:2:end))';` (156). idn·idx·dxnour를 초기화한다(157–159). `for nn=1:length(idele)` (160)에서 요소별 표본 구간과 해안 인덱스 누적식 `idn{idele(nn)}=[idn{idele(nn)},[idn20(nn,1):idn20(nn,2)]];` (161), `idx{idele(nn)}=[idx{idele(nn)},[min(idxm(idele(nn),[idn20(nn,1):idn20(nn,2)])):max(idxm(idele(nn),[idn20(nn,1):idn20(nn,2)]))]];` (162). `for i_mc=1:length(idx)` (165)에서 양빈 길이 누적식 `dxnour(i_mc)=dxnour(i_mc)+sum(dsmc{i_mc}(idx{i_mc}));` (166). 반복·방법 분기를 닫는다(163·167–168). |
+| 169–180 | 시작 시 1행 get_nourishments 함수 안. 시작 시 67행 nourish==2·68행 i_n 반복·69행 시간 분기 안이며 방법 선택 분기 밖. 양빈량 배분 주석과 빈 줄을 포함한다(169–172). 길이 비율 식은 `fraction = dxnour./max(sum(dxnour),1e-5);` (173). `if ~isempty(idx{COAST.i_mc}) \|\| sum(dxnour)==0` (174)이면 현재 해안 요소의 밀도 누적식 `NOUR.rate_density(idx{COAST.i_mc})=NOUR.rate_density(idx{COAST.i_mc})+NOUR.rate(i_n)./dxnour(COAST.i_mc).*fraction(COAST.i_mc);` (175). 조건·시간 분기·양빈 반복·방식 분기·함수를 닫는다(176–180). |
+
+## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
+
+- 13·53–175: NOUR.growth의 범위와 기본값은 입력 주석에 있다. 실행문은 NOUR.growth를 참조하지 않는다.
+- 59–63: 내부점 존재 조건은 sum(in)>0이다. clsum으로 나누기 전에 clsum>0을 검사하는 문장은 없다.
+- 116·119–122: 대체 방법 주석은 20점을 적는다. 실제 disti는 dist0(end)/50 간격을 사용한다. dist0는 좌표차 길이 앞에 0을 붙이며 누적합을 호출하지 않는다.
+- 121–122·133: xn·yn은 현재 양빈 행의 interp1 결과이다. 거리 식은 xn(i_n,kk)·yn(i_n,kk)를 참조한다.
+- 126·152: dxnour0는 빈 배열 대입 이후 사용하지 않는다. min 호출의 dmin 출력은 이후 사용하지 않는다.
+- 173–175: fraction의 분모는 max(sum(dxnour),1e-5)로 제한한다. 밀도 누적식의 분모 dxnour(COAST.i_mc)에는 같은 제한식이 없다. 진입 조건에는 sum(dxnour)==0도 포함한다.
