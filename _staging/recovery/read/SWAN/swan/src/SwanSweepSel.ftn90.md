@@ -1,0 +1,32 @@
+---
+file: models/SWAN/raw/source_code/swan/src/SwanSweepSel.ftn90
+lines: 375
+sha256: da0b12adfa3ab3a01a567e74f0ef3f9f2a258547392e0110199cd76a55d80572
+reader: codex gpt-6.1-sol
+read_date: 2026-10-12
+---
+
+# SwanSweepSel.ftn90 — 판독 구간 기록
+
+구간은 1행부터 375행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–74 | SwanSweepSel 인수 목록(1–4), 기관·GPL 3 이상·무보증 머리말(6–30), 저자·2007년 이력(33–39). 주파수별 방향 구간과 현재 훑기(sweep)의 활성 빈(bin)을 계산한다는 목적(41–44). CFL 제한 없이 계산하기 위한 의존 영역(domain of dependence)을 두 파상류 면(upwave face)으로 둘러싼다는 방법 주석(48–64). 주석의 기준식은 `!   Cx * rdx(1) + Cy * rdy(1) >= 0 and` (58), `!   Cx * rdx(2) + Cy * rdy(2) >= 0` (60). 흐름(current)이 높은 주파수의 전달 방향에 더 영향을 준다는 주석과 anybin의 의미(66–73). |
+| 75–128 | 시작 시 1행 SwanSweepSel 루틴 안. ocpcomm4·swcomm3·SwanGriddata 사용(77–79), implicit none(81). 출력 전체 방향·주파수 범위와 수, 주파수별 idcmin/idcmax, 방향별 iscmin/iscmax 선언(85–95). 입력 cax/cay(MDC,MSC,ICMAX), 반변 기저 벡터(contravariant base vector) rdx/rdy(2), 상대 주파수(relative frequency) spcsig(MSC), 출력 anybin(MDC,MSC) 선언(97–103). 지역 인덱스·변환 속도·경계 플래그, `integer, save :: ient = 0 ! number of entries in this subroutine` (112) 선언(107–121). 구조·소스 문서 주석·빈 줄. 기저 성분 주석은 `rdx(b) = a^(b)_1` (99)과 `rdy(b) = a^(b)_2` (100)이다. [10-13 전수 검증 보완] |
+| 129–149 | 시작 시 1행 루틴 안. `if (ltrace) call strace (ient,'SwanSweepSel')` (129). 범위 미설정 표식은 iddlow·isslow=9999, iddtop·isstop=-9999(133–138). idtot·istot=1(135·139), idcmin/idcmax=0·anybin=FALSE(141–143), iscmin/iscmax=1(145–146). 주파수 루프 안내 주석(148). 초기 대입 원문은 `iddlow =  9999` (133), `iddtop = -9999` (134), `idtot  =     1` (135), `isslow =  9999` (137), `isstop = -9999` (138), `istot  =     1` (139), `idcmin = 0` (141), `idcmax = 0` (142), `anybin = .false.` (143), `iscmin = 1` (145), `iscmax = 1` (146)이다. [10-13 전수 검증 보완] |
+| 150–193 | 시작 시 1행 루틴 안. is=1..MSC 루프(150)마다 `idsum = 0` (154). `if ( is == 1 .or. ICUR /= 0 ) then` (156)이면 id 루프(158)에서 `caxloc = cax(id,is,1)*rdx(1) + cay(id,is,1)*rdy(1)` (160); `cayloc = cax(id,is,1)*rdx(2) + cay(id,is,1)*rdy(2)` (161)로 속도를 기저 벡터에 투영한다. `if ( caxloc >= 0. .and. cayloc >= 0. ) then` (163)이면 `anybin(id,is) = .true.` (165), `idsum         = idsum + 1` (166); `isslow        = min(is,isslow)` (167); `isstop        = max(is,isstop)` (168)로 수와 주파수 범위를 갱신한다. `else` (174)에서는 `anybin(id,is) = anybin(id,1)` (181)로 첫 주파수의 anybin을 복사. id 루프(176)의 `if ( anybin(id,1) ) then` (183)일 때 `idsum  = idsum + 1` (184); `isstop = max(is,isstop)` (185). 흐름이 없으면 첫 주파수의 방향 선택을 다른 주파수에 적용한다는 주석(178–179). 156행 IF는 190행에서 닫힌다. 150행 주파수 루프는 262행에서 닫힌다. [10-13 전수 검증 보완] |
+| 194–238 | 시작 시 1행 루틴·150행 is 루프 안. `idclow = 0` (194)과 `idchgh = 0` (195), id 루프(197)에서 `lowbin = .false.` (199)와 `hghbin = .false.` (200). `if ( anybin(id,is) ) then` (202)일 때 하한 처리: `if ( id == 1 ) then` (204)의 `if ( FULCIR ) then` (206)이면 `if ( .not.anybin(MDC,is) ) lowbin = .true.` (207), `else` (208)는 `lowbin = .true.` (209), `else` (212)는 `if ( .not.anybin(id-1,is) ) lowbin = .true.` (214). 상한 처리: `if ( id == MDC ) then` (218)의 `if ( FULCIR ) then` (220)이면 `if ( .not.anybin(1,is) ) hghbin = .true.` (221), `else` (222)는 `hghbin = .true.` (223), `else` (226)는 `if ( .not.anybin(id+1,is) ) hghbin = .true.` (228). 활성 빈 조건 밖에서 `if ( lowbin ) idclow = id` (234); `if ( hghbin ) idchgh = id` (235)로 경계 인덱스를 저장한다. [10-13 전수 검증 보완] |
+| 239–263 | 시작 시 1행 루틴·150행 is 루프 안. 방향 범위 기본은 1..MDC(241–242). `if ( idsum == 0 ) then` (244)이면 빈 범위 표식 9..-9(246–247). `elseif ( idsum /= MDC ) then` (249)이면 `if ( idclow > idchgh ) idclow = idclow - MDC` (251)로 주기 경계를 음수 인덱스까지 연장하고 idcmin/idcmax에 경계를 복사(252–253). `if ( idsum /= 0 ) then` (257)이면 `iddlow = min ( iddlow , idcmin(is) )` (258); `iddtop = max ( iddtop , idcmax(is) )` (259)로 전체 방향 범위 갱신. is 루프 종료(262). 기본 범위는 `idcmin(is) = 1` (241)과 `idcmax(is) = MDC` (242)이다. 빈 범위는 `idcmin(is) =  9` (246)와 `idcmax(is) = -9` (247)이다. 일부 빈이 활성인 분기는 `idcmin(is) = idclow` (252)와 `idcmax(is) = idchgh` (253)를 대입한다. 244–255행 IF 사슬에는 ELSE가 없다. idsum=MDC이면 기본 범위 1..MDC를 유지한다. [10-13 전수 검증 보완] |
+| 264–300 | 시작 시 1행 루틴 안이며 is 루프 밖. `if ( iddlow /= 9999 ) then` (266)의 `if ( iddtop == -9999 ) then` (268)이면 msgerr(4)·반환(269–270), 그렇지 않으면 `idtot = iddtop - iddlow + 1` (273). `if ( ICUR > 0 ) then` (275)의 `if ( idtot < 3 ) then` (277)이면 `iddtop = iddtop + 1` (278), `if ( idtot == 1 ) iddlow = iddlow - 1` (279), `idtot = 3` (280). `else` (284)의 `if ( iddtop /= -9999 ) then` (286)이면 msgerr(4)·반환(287–288), 검사 뒤 `idtot = 0` (291). `if ( idtot > MDC ) then` (295)이면 `iddlow = 1` (296), `iddtop = MDC` (297), `idtot  = MDC` (298)로 전체 범위를 제한. 269행 메시지는 최대 방향 빈 누락을 보고한다. 287행 메시지는 최소 방향 빈 누락을 보고한다. 284행 ELSE는 266행 IF에 속한다. 이 IF는 293행에서 닫힌다. [10-13 전수 검증 보완] |
+| 301–336 | 시작 시 1행 루틴 안. `if ( isslow /= 9999 ) then` (303)의 `if ( isstop == -9999 ) then` (305)이면 msgerr(4)·반환(306–307). `!if ( isslow /= 1 ) then` (310)의 오류 검사·메시지·반환은 모두 주석 처리되어 있다(310–313). `isslow = 1` (315), `if ( ICUR > 0 ) isstop = max(min(4,MSC),isstop)` (317)로 흐름이 있으면 상한을 적어도 min(4,MSC)까지 늘리고 `istot = isstop - isslow + 1` (319)로 수 계산. `else` (321)의 `if ( isstop /= -9999 ) then` (323)이면 msgerr(4)·반환(324–325), `istot = 0` (328). 같은 else의 `if ( idtot /= 0 ) then` (330)이면 방향·주파수 범위 불일치 msgerr(4)·반환(331–332). 306행 메시지는 최대 주파수 빈 누락을 보고한다. 324행 메시지는 최소 주파수 빈 누락을 보고한다. 303행 IF는 335행에서 닫힌다. [10-13 전수 검증 보완] |
+| 337–375 | 시작 시 1행 루틴 안. iddum=iddlow..iddtop 루프(339), `id = mod ( iddum - 1 + MDC , MDC ) + 1` (340)로 방향 번호를 1..MDC에 대응시킨다. `lowbin = .false.` (342). is 루프(344)의 `if ( anybin(id,is) ) then` (345)에서 `if ( .not.lowbin ) then` (346)이면 `isclow = is` (347)로 첫 활성 주파수를 저장한다. `lowbin = .true.` (348)로 첫 활성 빈 발견을 표시한다. `ischgh = is` (350)로 마지막 활성 주파수를 저장한다. 주파수 루프 종료 뒤 `if ( lowbin ) then` (356)의 `if ( isclow < isslow .or. ischgh > isstop ) then` (358)이면 msgerr(4)·반환(359–360), 검사 뒤 `iscmin(id) = isclow` (363)와 `iscmax(id) = ischgh` (364)를 대입한다. `else                     ! no frequency bins fall within considered sweep` (366)에서는 `iscmin(id) = 0` (368)과 `iscmax(id) = 0` (369)을 대입한다. 방향 루프·루틴 종료(373·375). 359행 메시지는 최소·최대 주파수 인덱스가 올바르지 않음을 보고한다. [10-13 전수 검증 보완] |
+
+## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
+
+- 4·101: spcsig는 입력 인수로 선언되지만 실행문에서 사용되지 않는다.
+- 133–146·246–247: 전체 범위 미설정 표식은 9999·-9999이다. 빈 주파수별 방향 범위는 9·-9로 표시한다.
+- 156·275·317: 활성 방향 재계산은 ICUR/=0을 조건으로 사용한다. 전체 방향·주파수 범위 확장은 ICUR>0을 조건으로 사용한다.
+- 194–235: 활성 영역 경계 탐색은 lowbin/hghbin이 참일 때 idclow/idchgh를 덮어쓴다. 여러 분리된 활성 구간이 있는지 검사하는 별도 조건은 이 블록에 없다.
+- 310–319: isslow/=1 오류 검사는 주석 처리되어 있다. 활성 주파수가 있으면 isslow를 1로 대입한다.
+- 145–146·339–373: iscmin/iscmax는 처음 전체를 1로 설정한다. 이후 iddlow..iddtop 루프가 방문한 방향에서만 활성 범위 또는 0으로 바꾼다.

@@ -166,6 +166,16 @@ Delft3D 487(기계 sweep 실패 471 + 웹 16, 09-22 스냅샷 교체 전 경로)
 - 추가 줄 전수 대조(Codex `gpt-6-astra`): 1,002줄, 정정 74·보완 29(`flow/ShorelineS-notes-verify-{1,2}.md`). sonnet 표본 24줄: 맞음 22, 부분 2(각도 제한 줄 인용 누락, `dsdn` 설명) → 고침. 같은 표본에서 보고서의 `Kw=4.2` 목록 쪽(PDF 50 → 51) 정정.
 - 기계 확인: 현재 코드 인용(보고서 6,874·노트 2,809)과 과거 커밋 인용(`HASH:path:N`, 보고서 398·노트 317, `git show`로 대조) 불일치 0. 남은 경고는 같은 이름 README 2개로 인한 검사기 오판.
 
+## SWAN 판독 (2026-10-12~13)
+
+기록: `read/SWAN/swan/`(코드·스크립트), `read/SWAN/manuals/website/`(웹 문서), `read/SWAN/manuals/pdfs/*.pdf/`(PDF), 전수 검증 결과 `read/SWAN/verify/`. 대상 목록: `scripts/swan-batches.json`(자체 코드 `src/*.ftn*`·`bin/swanrun`·`switch.pl`·`src/CMakeLists.txt`, 75파일 122,313행; `fftpack51.ftn90`·`agioncmd.ftn90`·`nctablemd.ftn90`은 범용 라이브러리라 제외), `scripts/swan-docbatches.json`(README·`modifications.htm`·`patches/41.51.A`·`problems_and_fixes.htm`·`swan.edt`·`swanrun.bat`·웹 문서·설정 예제 24파일), `scripts/swan-pdfjobs.json`(Cycle III 41.51 매뉴얼 swanuse 154쪽, swantech 176쪽, swanimp 35쪽, swanpgr 51쪽 = 416쪽). 웹 `online_doc`·`website_markdown`(같은 41.51 매뉴얼의 HTML 사본), 이전 AI 요약, 바이너리·압축본, `doc/*.pdf` 중복본, `tools/`는 제외. 코드 판 = `VERNUM = 41.51`(`swanmain.ftn:965`).
+
+- 코드·문서: Codex `gpt-6.1-sol` 20작업. 스트림 끊김 4작업(큰 파일 swancom4·swanmain·swanout1·swanser)은 400행마다 기록을 덧붙이게 해서 재실행. 기계 확인 99기록 전부 통과(1행~끝 구간·sha·행 수, 읽은 범위 로그 확인). 행 첫머리 `!JAC`·`!WFR`·`!MPI` 등 전처리 표시는 `switch.pl` 82–105행 규칙에 따라 어느 스위치에서 사는 행인지 함께 적었다.
+- PDF 416쪽(24작업): Codex가 300 dpi 쪽 이미지로 판독(Marker·opendataloader 추출 참고). 끊긴 작업 2개는 재실행·이어 쓰기. 기계 확인 24작업 전부 통과.
+- sonnet 표본 21건(코드·문서 14구간, PDF 7쪽): 맞음 17, 부분 4(인덱스 계산을 코드에 없는 말로 씀, 주석 속 차분식 누락, 바깥 IF 범위 오기, 쪽 원문의 한정 표현 누락) → 표본 오류율을 보고 전 기록을 `gpt-6-astra` 53작업으로 의미까지 전수 대조: 정정 701, 보완 1,668, 이상 없음 1,491(작업별 요약 줄 합계).
+- 정정분 sonnet 표본 20건: 맞음 19, 부분 1(swanpre1 1832–1908 첫 문장의 바깥 블록 표기) → Claude가 고침. 앞 표본의 부분 4건은 모두 고쳐진 것을 확인.
+- 최종 기계 확인: 원문 인용 34,739개 중 불일치 2. 둘 다 swancom2 679·719행이다. 원문은 `\|`이고 기록은 표 칸 안 이스케이프로 `\\|`라고 썼다. 렌더 결과는 원문과 같으므로 검사 오판이다.
+
 ## 노트 반영분 전수 대조와 차이 결론 (2026-10-12)
 
 사용자 지시(10-12): 확인하지 않은 것을 한계로 남기지 말고 해결한 뒤 다음 모델로 간다. 모델 실행은 위키 범위가 아니므로 한계로 적지 않는다.
@@ -180,4 +190,4 @@ Delft3D 487(기계 sweep 실패 471 + 웹 16, 09-22 스냅샷 교체 전 경로)
 
 1. ~~매뉴얼과 코드 판독 기록 대조~~ — 10-03 완료(`compare/XBeach-manual-vs-code.md`, 노트 반영 `1da8d89`).
 2. ~~XBeach 파일 간 계산 흐름 분석~~ — 10-07 완료(`flow/XBeach-callflow.md`, 노트 반영 `d89cd8b`). 판독 기록 검색은 `wiki_search` `path_class="records"`(`ce7b3ae`).
-3. 다른 10개 모델(SFINCS·EFDC·ADCIRC 완료, ShorelineS 10-12 완료, 나머지 8개 미착수 — CADMAS-SURF·Celeris·Delft3D·FUNWAVE·LISFLOOD-FP·ROMS·SWAN·SWASH): 같은 방식(고정 목록 → 1행/1쪽 판독 → 기계 확인 → 다른 모델 검증).
+3. 다른 10개 모델(SFINCS·EFDC·ADCIRC 완료, ShorelineS 10-12 완료, SWAN 판독 10-13 완료(대조·흐름·노트 반영 진행 중), 나머지 7개 미착수 — 순서 ROMS·SWASH·FUNWAVE·LISFLOOD-FP·Delft3D·Celeris·CADMAS-SURF): 같은 방식(고정 목록 → 1행/1쪽 판독 → 기계 확인 → 다른 모델 검증).

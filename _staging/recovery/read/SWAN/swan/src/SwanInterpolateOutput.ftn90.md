@@ -1,0 +1,28 @@
+---
+file: models/SWAN/raw/source_code/swan/src/SwanInterpolateOutput.ftn90
+lines: 317
+sha256: b5ca0827332e07977522648d2cd71775aa4bb8d7dfda95110745d49c64ba9eb2
+reader: codex gpt-6.1-sol
+read_date: 2026-10-12
+---
+
+# SwanInterpolateOutput.ftn90 — 판독 구간 기록
+
+구간은 1행부터 317행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–64 | `SwanInterpolateOutput` 입구(1). 기관·GPL 3 이상·무보증·작성자·장애물 근처 보간 개선과 최적화 이력(3–40). 주어진 출력량(output quantity)을 여러 점에 보간하는 목적(42–44). 최근접 꼭짓점과 삼각형을 찾고 장애물 교차 꼭짓점 가중치를 0으로 하여 보간한다는 방법 주석(46–51). 통신·장애물·출력 데이터·격자 모듈과 `implicit none`(55–63). |
+| 65–126 | 시작 시 1행 루틴 안. 점 수 `mip`, 점별 꼭짓점 번호 `kvert`, 예외값·입력 출력량·출력 보간량·점 좌표 선언(67–74). 셀·점·순환 꼭짓점·장애물 모서리·좌표차·방향각·가중치·메시지·교차 및 셀 플래그·`EQREAL`·`TCROSS`·장애물과 격자 객체 포인터 선언(78–119). 초기값 선언은 `integer, save                         :: ient = 0  ! number of entries in this subroutine`(79)이다. `xonobst`는 사용되지 않는다는 선언 주석(114). 구조·소스 안내 주석(121–126). [10-13 전수 검증 보완] |
+| 127–174 | 시작 시 1행 루틴 안. 추적 조건은 `if (ltrace) call strace (ient,'SwanInterpolateOutput')` (127)이다. 계산 격자 출력 직접 복사 조건은 `if ( LCOMPGRD .and. mip == nvertsg ) then` (129)이며 참이면 `foutp = finp`(130) 뒤에 `return`(131)한다. 이 조건은 132행에서 끝난다. 객체 연결은 `vert => gridobject%vert_grid`(136)와 `cell => gridobject%cell_grid`(137)이다. 출력 전체 대입은 `foutp = excval`(141)이다. `pointloop: do ip = 1, mip`(145)에서 `ivert = kvert(ip)`로 꼭짓점 번호를 읽는다(149). 점 미발견·최근접 꼭짓점 비활성 조건은 `if ( ivert < 0 ) cycle pointloop` (153), `if ( .not.vert(ivert)%active ) cycle pointloop` (157)이다. 좌표차 식은 `dxp = xcugrd(ivert) - x(ip)` (161); `dyp = ycugrd(ivert) - y(ip)` (162)이다. 같은 위치 조건은 `if ( EQREAL(dxp,0.) .and. EQREAL(dyp,0.) ) then` (166)이며 `foutp(ip) = finp(ivert)`(167)로 복사한다. 이어 `cycle pointloop`(168)로 다음 점에 진입한다. 이 조건은 169행에서 끝난다. 방향각은 `th = atan2(dyp,dxp)` (171)이다. 셀 발견 플래그 초기값은 `cellfound = .false.`(173)이다. [10-13 전수 검증 보완] |
+| 175–225 | 시작 시 1행 루틴·145행 출력점 루프 안. `celloop: do jc = 1, vert(ivert)%noc`(177)에서 셀 번호 대입은 `icell = vert(ivert)%cell(jc)%atti(CELLID)`(181)이다. 꼭짓점 대입은 `v(1) = cell(icell)%atti(CELLV1)`(183), `v(2) = cell(icell)%atti(CELLV2)`(184), `v(3) = cell(icell)%atti(CELLV3)`(185)이다. `do k = 1, 3`(189)의 일치 조건은 `if ( v(k) == ivert ) then` (190)이며 방향 대입은 `th1 = cell(icell)%geom(k)%th1`(191)과 `th2 = cell(icell)%geom(k)%th2`(192)이다. `exit`(193)는 189행 내부 루프를 벗어난다. 방향차는 `thdiff = th - th2` (197)이다. 무조건 `do`(198)의 종료 조건은 `if ( abs(thdiff) <= PI ) exit` (199)이며 보정식은 `th = th - sign (2., thdiff) * PI` (200); `thdiff = th - th2` (201)이다. 경계 조건은 `if ( vert(ivert)%atti(VMARKER) == 1 ) then   ! boundary vertex` (206)이며 여유각은 `eps = PI/360.` (207)이다. `else` (208) 분기의 대입은 `eps = 0.`(209)이다. 셀 방향 범위 조건은 `if ( th > th1-eps .and. th <= th2+eps ) then` (212)이며 참 분기에서 `cellfound = .true.`(213)를 대입한다. 이어 `exit celloop`(214)로 셀 루프를 벗어난다. 셀 루프의 종료문은 `enddo celloop`(217)이다. 미발견 조건은 `if ( .not.cellfound ) then` (221)이며 메시지 작성은 `write (msgstr, '(a,f12.4,a,f12.4,a)') ' No triangle containing point (',x(ip)+XOFFS,',',y(ip)+YOFFS,') is found'`(222)이다. `call msgerr( 1, trim(msgstr) )`(223) 뒤에 `cycle pointloop`(224)로 다음 출력점에 진입한다. 미발견 조건은 225행에서 끝난다. [10-13 전수 검증 보완] |
+| 226–249 | 시작 시 1행 루틴·145행 출력점 루프 안. 세 꼭짓점 활성 조건은 `if ( vert(v(1))%active .and. vert(v(2))%active .and. vert(v(3))%active ) then` (229)이다. 참 분기의 `do k = 1, 3`(233)에서 좌표 대입은 `xv(k) = xcugrd(v(k))`(234)와 `yv(k) = ycugrd(v(k))`(235)이다. 교차 플래그 대입은 `cross(k) = .false.`(236)이다. 다음 `do k = 1, 3`(241)의 순환 꼭짓점과 반대 변 좌표차 식은 `ivc(2) = mod(k  ,3)+1` (242); `ivc(3) = mod(k+1,3)+1` (243); `dxv(k) = xv(ivc(3)) - xv(ivc(2))` (244); `dyv(k) = yv(ivc(3)) - yv(ivc(2))` (245)이다. 장애물 검사 안내 주석(248–249). [10-13 전수 검증 보완] |
+| 250–286 | 시작 시 1행 루틴·145행 출력점 루프·229행 세 꼭짓점 활성 참 분기 안. 장애물 조건은 `if ( NUMOBS > 0 ) then` (250)이다. 첫 장애물 포인터 연결은 `COBST => FOBSTAC`(252)이다. `do jc = 1, NUMOBS`(254)에서 모서리 수 대입은 `numcor = COBST%NCRPTS`(256)이다. 시작점 대입은 `xb = COBST%XCRP(1)`(259)과 `yb = COBST%YCRP(1)`(260)이다. 진단 출력 조건은 `if ( ITEST >= 120 ) write (PRINTF,10) jc, numcor` (257), `if ( ITEST >= 120 ) write (PRINTF,20) 1, xb+XOFFS, yb+YOFFS` (261)이다. `do l = 2, numcor`(263)에서 끝점 대입은 `xe = COBST%XCRP(l)`(265)과 `ye = COBST%YCRP(l)`(266)이다. 진단 조건은 `if ( ITEST >= 120 ) write (PRINTF,20) l, xe+XOFFS, ye+YOFFS` (267)이다. `do k = 1, 3`(271)의 교차 검사·`TCROSS` 호출은 `if ( TCROSS(x(ip), xv(k), xb, xe, y(ip), yv(k), yb, ye, xonobst) ) cross(k) = .true.` (272)이다. 다음 선분 시작점 대입은 `xb = xe`(275)와 `yb = ye`(276)이다. 다음 장애물 존재 검사·종료 조건은 `if (.not.associated(COBST%NEXTOBST)) exit` (280)이다. 다음 포인터 연결은 `COBST => COBST%NEXTOBST`(281)이다. 장애물 루프는 283행에서 끝난다. 250행 장애물 조건은 ELSE 없이 285행에서 끝난다. [10-13 전수 검증 보완] |
+| 287–317 | 시작 시 1행 루틴·145행 출력점 루프·229행 세 꼭짓점 활성 참 분기 안. 장애물 셀 플래그 초기값은 `obstcell = .false.`(289)이다. `do k = 1, 3`(290)의 교차 조건은 `if (cross(k)) then` (291)이다. 참 분기 대입은 `ww(k) = 0.`(292)과 `obstcell = .true.`(293)이다. `else` (294) 분기의 첫 순환 번호 대입은 `ivc(1) = k`(295)이다. 나머지 순환 번호·가중치 식은 `ivc(2) = mod(k  ,3)+1` (296); `ivc(3) = mod(k+1,3)+1` (297); `ww(k) = ((x(ip) - xv(ivc(3))) * dyv(ivc(1)) - (y(ip) - yv(ivc(3))) * dxv(ivc(1))) / ( dxv(ivc(2)) * dyv(ivc(1)) - dyv(ivc(2)) * dxv(ivc(1)) )` (298)이다. 가중치 합 조건·식은 `if (obstcell) sumww = sum(ww)` (301)이다. `do k = 1, 3`(305)의 정규화 조건·식은 `if (obstcell) ww(k) = ww(k) / sumww` (306)이다. 출력 보간식은 `foutp(ip) = sum (ww(:) * finp(v(:)))` (308)이다. 229행 활성 조건은 ELSE 없이 310행에서 끝난다. 145행 출력점 루프는 `enddo pointloop`(312)에서 끝난다. 장애물 진단 출력 형식 10·20과 루틴 종료가 이어진다(314–317). [10-13 전수 검증 보완] |
+
+## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
+
+- 129–132·153–157·250–285: 직접 복사 분기가 참이면 출력점 번호·활성 상태·장애물 검사를 수행하기 전에 반환한다.
+- 70·229–308: 일반 보간 조건은 세 꼭짓점의 활성 상태이다. 세 입력값이 `excval`과 같은지 검사하는 조건은 이 보간 블록에 없다.
+- 291–306: 교차 꼭짓점 가중치를 0으로 둔 뒤 장애물 셀 가중치를 `sumww`로 나눈다. `sumww`가 0인지 검사하는 조건은 없다.
+- 298: 가중치 계산은 좌표차 교차곱의 차로 나눈다. 이 대입 앞에는 해당 분모의 0 검사가 없다.

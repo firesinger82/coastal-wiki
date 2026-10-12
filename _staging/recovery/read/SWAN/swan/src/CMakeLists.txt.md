@@ -1,0 +1,32 @@
+---
+file: models/SWAN/raw/source_code/swan/src/CMakeLists.txt
+lines: 133
+sha256: 111998634dd3b0a5efd442bfba0af0156d95e50db9e780c49b9bfb7405f8095a
+reader: codex gpt-6.1-sol
+read_date: 2026-10-12
+---
+
+# CMakeLists.txt — 판독 구간 기록
+
+구간은 1행부터 133행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–7 | 스위치 설정 주석(1). `if( WIN32 )` (2)이면 `set( SWITCHES -dos -cvis )` (3). `elseif( UNIX )` (4)이면 `set( SWITCHES -unix )` (5). 운영체제 분기 종료·빈 줄(6–7). 이 IF/ELSEIF 사슬에는 `else()`가 없다. 두 조건이 모두 거짓이면 SWITCHES를 설정하지 않는다(2–6). [10-13 전수 검증 보완] |
+| 8–20 | 사용자 스위치 주석(8). `if( MPI OR JAC )` (9) 안의 `if( CMAKE_Fortran_COMPILER_ID MATCHES "GNU" )` (10)이면 `list( APPEND SWITCHES -mpi )` (11). 내부 `else()` (12)는 `list( APPEND SWITCHES -impi -mpi )` (13). 내부·외부 조건 종료(14–15), 주석(16). 별도 `if( JAC )` (17)는 `set( MPI ON )` (18), `list( APPEND SWITCHES -jac )` (19). JAC 선택은 MPI를 켠다. 조건 종료(20). |
+| 21–33 | 구분 주석과 조건별 스위치 추가. `if( METIS )` (22)는 `list( APPEND SWITCHES -metis )` (23). `if( FFRO )` (26)는 `list( APPEND SWITCHES -fixfront )` (27). `if( NETCDF )` (30)는 `list( APPEND SWITCHES -netcdf )` (31). 각 조건 종료·빈 줄 포함(24–25·28–29·32–33). |
+| 34–40 | 전처리 실행 주석(34). `if( PERL_FOUND )` (35)는 `execute_process( COMMAND ${PERL_EXECUTABLE} ${CMAKE_SOURCE_DIR}/switch.pl ${SWITCHES} ${SRC}/*.ftn ${SRC}/*.ftn90 )` (36)로 switch.pl을 호출한다. `else()` (37)는 `message( FATAL_ERROR "-- Cannot build ${CMAKE_PROJECT_NAME} without Perl" )` (38)로 구성을 중단한다. 조건 종료·빈 줄(39–40). |
+| 41–50 | 컴파일러 옵션 주석(41). `if( CMAKE_Fortran_COMPILER_ID MATCHES "GNU" )` (42)는 `set( CMAKE_Fortran_FLAGS "-O -w -fno-second-underscore -ffree-line-length-none" CACHE STRING "" FORCE )` (44)로 GNU 기본 옵션을 설정한다. 이 분기 안 `if( ${CMAKE_Fortran_COMPILER_VERSION} VERSION_GREATER_EQUAL 10 )` (45)는 `set( CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fallow-argument-mismatch" )` (46). 별도 `if( WIN32 AND ${CMAKE_Fortran_COMPILER_VERSION} VERSION_GREATER_EQUAL 7 )` (48)는 `set( CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fdec" )` (49). 내부 조건 종료(47·50). |
+| 51–69 | 시작 시 42행 컴파일러 선택 분기 안. `elseif( CMAKE_Fortran_COMPILER_ID MATCHES "Intel" )` (51) 안 `if( UNIX )` (53)는 `set( CMAKE_Fortran_FLAGS "-O2 -W0 -assume byterecl -traceback -diag-disable 8290 -diag-disable 8291 -diag-disable 8293" CACHE STRING "" FORCE )` (54). 내부 `elseif( WIN32 )` (55)는 `set( CMAKE_Fortran_FLAGS "/O2 /assume:byterecl /traceback /nowarn /nologo /Qdiag-disable:8290 /Qdiag-disable:8291 /Qdiag-disable:8293" CACHE STRING "" FORCE )` (56). 내부 종료(57). 컴파일러 선택의 `elseif( CMAKE_Fortran_COMPILER_ID MATCHES "PGI" )` (58)는 `set( CMAKE_Fortran_FLAGS "-fast" CACHE STRING "" FORCE )` (60). `elseif( CMAKE_Fortran_COMPILER_ID MATCHES "Fujitsu" )` (61)는 `set( CMAKE_Fortran_FLAGS "-O1 -staticlink -nwo" CACHE STRING "" FORCE )` (63). `elseif( CMAKE_Fortran_COMPILER_ID MATCHES "XL" )` (64)는 `set( CMAKE_Fortran_FLAGS "-O3 -qstrict -qarch=auto -qtune=auto -qcache=auto -qalign=4k -w" CACHE STRING "" FORCE )` (66). `else()` (67)는 `message( FATAL_ERROR "-- Current Fortran compiler ${CMAKE_Fortran_COMPILER} not supported" )` (68). 선택 종료(69). Intel 분기 안의 UNIX/WIN32 사슬에는 `else()`가 없다(53–57). 두 운영체제 조건이 모두 거짓이면 이 사슬에서 컴파일러 옵션을 설정하지 않는다. [10-13 전수 검증 보완] |
+| 70–84 | 빈 줄·병렬화 선택 주석(70–71). `if( OPENMP AND MPI )` (72)는 `message( FATAL_ERROR "-- Cannot use both OpenMP and MPI" )` (73). `elseif( OPENMP )` (74)는 `find_package( OpenMP REQUIRED COMPONENTS Fortran )` (75). 이 분기 안 `if( OpenMP_Fortran_FOUND )` (76)는 `set( CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} ${OpenMP_Fortran_FLAGS}" )` (77). 내부 `else()` (78)는 `message( FATAL_ERROR "-- Fortran compiler does not support OpenMP" )` (79). 내부 조건 종료(80). 같은 OpenMP 분기에서 `unset( MPI_Fortran_FOUND CACHE )` (82), `unset( MPI_Fortran_COMPILER CACHE )` (83), `unset( MPI_Fortran_LIBRARIES CACHE )` (84)로 MPI 캐시 항목을 해제한다. |
+| 85–96 | 시작 시 72행 병렬화 선택 분기 안. `elseif( MPI )` (85)는 `find_package( MPI REQUIRED COMPONENTS Fortran )` (86), `unset( OpenMP_Fortran_FLAGS CACHE )` (88). `else()` (89)는 `unset( OpenMP_Fortran_FLAGS CACHE )` (91), `unset( MPI_Fortran_FOUND CACHE )` (92), `unset( MPI_Fortran_COMPILER CACHE )` (93), `unset( MPI_Fortran_LIBRARIES CACHE )` (94). 주석·조건 종료·빈 줄 포함(87·90·95–96). |
+| 97–114 | 라이브러리 빌드 주석(97). `if( NOT TARGET swan${VERSION} )` (98) 안의 `if( NOT NETCDF )` (99)는 `include( ${SRC}/srclist.cmake )` (100), `add_library( swan${VERSION} STATIC ${swan_src} )` (101), `set_target_properties( swan${VERSION} PROPERTIES LINKER_LANGUAGE Fortran )` (102). 내부 `else()` (103)는 `include( ${SRC}/srclistnc.cmake )` (104), `add_library( swan${VERSION} STATIC ${swan_nc_src} )` (105), `set_target_properties( swan${VERSION} PROPERTIES LINKER_LANGUAGE Fortran )` (106), `target_include_directories( swan${VERSION} PUBLIC ${NetCDF_INCLUDE_DIRS} )` (107), `target_link_libraries( swan${VERSION} PUBLIC NetCDF::NetCDF_Fortran )` (108). 내부 조건 종료(109) 후에도 98행 참 분기 안에서 `if( METIS_FOUND )` (110)는 `target_include_directories( swan${VERSION} PUBLIC ${Metis_INCLUDE_DIR} )` (111), `target_link_libraries( swan${VERSION} PUBLIC ${Metis_LIBRARIES} )` (112). 두 조건 종료(113–114). 포함하는 소스 목록 파일의 내부는 이 판독 대상이 아니다. |
+| 115–122 | 빈 줄·실행 파일 빌드 주석(115–116). `if( NOT TARGET ${EXE} )` (117)는 `set( swanmain ${SRC}/swanmain.${EXTF} )` (118), `add_executable( ${EXE} ${swanmain} )` (119), `target_link_libraries( ${EXE} swan${VERSION} ${MPI_Fortran_LIBRARIES} )` (120). 조건 종료·빈 줄(121–122). |
+| 123–133 | 설치 주석(123). `install( TARGETS ${EXE} swan${VERSION} RUNTIME DESTINATION bin LIBRARY DESTINATION lib ARCHIVE DESTINATION lib )` (124), `install( DIRECTORY ${CMAKE_BINARY_DIR}/mod/ DESTINATION mod )` (125), `install( DIRECTORY ${CMAKE_SOURCE_DIR}/doc/ DESTINATION doc )` (126), `install( DIRECTORY ${CMAKE_SOURCE_DIR}/misc/ DESTINATION misc )` (127), `install( DIRECTORY ${CMAKE_SOURCE_DIR}/tools/ DESTINATION tools )` (128). `if( WIN32 )` (129)는 `install( PROGRAMS ${CMAKE_SOURCE_DIR}/bin/swanrun.bat DESTINATION bin )` (130). `elseif( UNIX )` (131)는 `install( PROGRAMS ${CMAKE_SOURCE_DIR}/bin/swanrun DESTINATION bin )` (132). 조건 종료(133). 실행 스크립트를 선택하는 129–133행 IF/ELSEIF 사슬에는 `else()`가 없다. WIN32와 UNIX가 모두 거짓이면 이 사슬의 스크립트 설치 명령은 선택되지 않는다. [10-13 전수 검증 보완] |
+
+## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
+
+- 36: execute_process에는 RESULT_VARIABLE이나 실행 결과를 검사하는 후속 조건이 없다.
+- 44·54·56·60·63·66: 컴파일러별 기본 옵션 설정은 CACHE STRING과 FORCE를 사용한다. GNU 추가 옵션은 별도 set에서 붙인다(46·49).
+- 35–39·72–73: switch.pl 실행은 OpenMP와 MPI의 동시 선택 오류 검사보다 앞에 있다.
+- 61–63: 컴파일러 조건은 Fujitsu 문자열을 검사한다. 해당 분기 주석은 Lahey Fortran으로 적는다.
