@@ -1,0 +1,27 @@
+---
+file: models/ROMS/raw/source_code/roms/Master/esmf_driver.h
+lines: 245
+sha256: c63be87a46ed29501a9731646ad3aceda403a5df6e9a8eac720724d72730d346
+reader: codex gpt-6.1-sol
+read_date: 2026-10-13
+---
+
+# esmf_driver.h — 판독 구간 기록
+
+구간은 1행부터 245행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–35 | 열린 전처리 조건은 없다. PROGRAM esmf_driver 입구(1), 저작권·라이선스·작성자와 ROMS를 다른 지구시스템모델(Earth System Model, ESM)에 ESMF(Earth System Modeling Framework)·NUOPC(National Unified Operational Prediction Capability)로 결합한다는 주석(2–17). ESMF·mod_esmf_esm·ESM_SetServices를 사용하고 implicit none을 설정한다(18–24). rc/urc·MyFile=__FILE__·driver·LogKindFlag를 선언한다(26–35). |
+| 36–76 | 열린 전처리 조건은 없다. 시작 시 1행 esmf_driver 프로그램 안. 로그 파일 설명은 SINGLE의 플랫폼 제약과 MULTI의 파일 수 부담을 적는다(36–45). `LogKindFlag=ESMF_LOGKIND_SINGLE` (47)이 실행 설정이며 MULTI 대입은 주석이다(48). ESMF_Initialize는 ESMnameLog·logappendflag=.FALSE.·LogKindFlag·VMdriver를 받는다(52–56). `driver=ESMF_GridCompCreate(name="roms_esm",                       &` (68), `&                           rc=rc)` (69)로 드라이버 컴포넌트(component)를 만든다. 두 오류 조건은 `IF (ESMF_LogFoundError(rcToCheck=rc,                              &` (57·70), `&                       msg=ESMF_LOGERR_PASSTHRU,                  &` (58·71), `&                       line=__LINE__,                             &` (59·72), `&                       file=MyFile)) THEN` (60·73)이며 ESMF_Finalize(endflag=ESMF_END_ABORT)를 호출한다(61·74). |
+| 77–128 | 열린 전처리 조건은 없다. 시작 시 1행 esmf_driver 프로그램 안. 주석은 표준 입력 설정과 ROMS/External/coupling_esmf.in을 가리킨다(77–83). read_ESMconfig(VMdriver,rc)를 호출한다(84). `IF (TraceLevel.ge.2) THEN` (94)은 ESMF_LogSet에 flush=.TRUE.·ESMF_LOGMSG_ALL·trace=.TRUE.를 전달하고 ELSE(105)는 ESMF_LOGMSG_NOTRACE·trace=.FALSE.를 전달한다(95–109). 두 내부 오류 조건은 `IF (ESMF_LogFoundError(rcToCheck=rc,                            &` (99·110), `&                         msg=ESMF_LOGERR_PASSTHRU,                &` (100·111), `&                         line=__LINE__,                           &` (101·112), `&                         file=MyFile)) THEN` (102·113)이며 ESMF_END_ABORT로 종료한다. set_metadata(VMdriver,rc)는 가져오기·내보내기 필드 메타데이터(metadata)와 NUOPC 사전을 설정한다는 주석 뒤 호출한다(118–121). 설정 판독과 메타데이터 오류 조건은 `IF (ESMF_LogFoundError(rcToCheck=rc,                              &` (85·122), `&                       msg=ESMF_LOGERR_PASSTHRU,                  &` (86·123), `&                       line=__LINE__,                             &` (87·124), `&                       file=MyFile)) THEN` (88·125)이며 ESMF_END_ABORT로 종료한다. |
+| 129–149 | 열린 전처리 조건은 없다. 시작 시 1행 esmf_driver 프로그램 안. ESMF_GridCompSetServices(driver,ESM_SetServices,userRc=urc,rc=rc)를 호출한다(133–136). 오류 조건은 `IF (ESMF_LogFoundError(rcToCheck=rc,                              &` (137)와 `IF (ESMF_LogFoundError(rcToCheck=urc,                             &` (143), 공통 계속행 `&                       msg=ESMF_LOGERR_PASSTHRU,                  &` (138·144), `&                       line=__LINE__,                             &` (139·145), `&                       file=MyFile)) THEN` (140·146)이다. 각각 라이브러리 rc와 사용자 urc를 검사하여 ESMF_Finalize(endflag=ESMF_END_ABORT)를 호출한다(141·147). |
+| 150–179 | 열린 전처리 조건은 없다. 시작 시 1행 esmf_driver 프로그램 안. ESMF_GridCompInitialize(driver,userRc=urc,rc=rc)를 호출하고 ESMF_VMBarrier(VMdriver,rc=rc)로 초기화 완료를 동기화한다(154–156·172). 오류 조건은 `IF (ESMF_LogFoundError(rcToCheck=rc,                              &` (157·173), `IF (ESMF_LogFoundError(rcToCheck=urc,                             &` (163), 공통 계속행 `&                       msg=ESMF_LOGERR_PASSTHRU,                  &` (158·164·174), `&                       line=__LINE__,                             &` (159·165·175), `&                       file=MyFile)) THEN` (160·166·176)이다. 각 오류는 ESMF_END_ABORT로 종료한다(161·167·177). |
+| 180–199 | 열린 전처리 조건은 없다. 시작 시 1행 esmf_driver 프로그램 안. ESMF_GridCompRun(driver,userRc=urc,rc=rc)을 호출한다(184–186). 오류 조건은 `IF (ESMF_LogFoundError(rcToCheck=rc,                              &` (187), `IF (ESMF_LogFoundError(rcToCheck=urc,                             &` (193), 공통 계속행 `&                       msg=ESMF_LOGERR_PASSTHRU,                  &` (188·194), `&                       line=__LINE__,                             &` (189·195), `&                       file=MyFile)) THEN` (190·196)이다. 각각 ESMF_END_ABORT로 종료한다(191·197). |
+| 200–218 | 열린 전처리 조건은 없다. 시작 시 1행 esmf_driver 프로그램 안. ESMF_GridCompFinalize(driver,userRc=urc,rc=rc)를 호출한다(204–206). 오류 조건은 `IF (ESMF_LogFoundError(rcToCheck=rc,                              &` (207), `IF (ESMF_LogFoundError(rcToCheck=urc,                             &` (213), 공통 계속행 `&                       msg=ESMF_LOGERR_PASSTHRU,                  &` (208·214), `&                       line=__LINE__,                             &` (209·215), `&                       file=MyFile)) THEN` (210·216)이다. 각각 ESMF_END_ABORT로 종료한다(211·217). |
+| 219–245 | 열린 전처리 조건은 없다. 시작 시 1행 esmf_driver 프로그램 안. ESMF_GridCompDestroy(driver,rc=rc)를 호출한다(224–225). `IF (ESMF_LogFoundError(rcToCheck=rc,                              &` (226), `&                       msg=ESMF_LOGERR_PASSTHRU,                  &` (227), `&                       line=__LINE__,                             &` (228), `&                       file=MyFile)) THEN` (229)이면 ESMF_END_ABORT로 종료한다(230). 정상 ESMF_Finalize(rc=rc), cplout FLUSH·CLOSE, STOP·프로그램 종료(237–245). 빈 줄과 구분/종료 주석도 포함한다. |
+
+## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
+
+- 47–48·68–69: 실행 로그 종류는 ESMF_LOGKIND_SINGLE로 고정되어 있다. ESMF_LOGKIND_MULTI 대입은 주석이다. 생성 컴포넌트 이름은 roms_esm이다.
+- 237–245: 정상 ESMF_Finalize는 rc를 받는다. 이후 종료까지 rc에 대한 ESMF_LogFoundError 검사는 없다.

@@ -1,0 +1,27 @@
+---
+file: models/ROMS/raw/source_code/roms/ROMS/Utility/shapiro.F
+lines: 231
+sha256: 4442ca18ad57591e42a25992c7c0c2538b7fd11317d6398803a3e1e25a2931c9
+reader: codex gpt-6.1-sol
+read_date: 2026-10-13
+---
+
+# shapiro.F — 판독 구간 기록
+
+구간은 1행부터 231행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–24 | 시작 시 열린 전처리 조건 없음. `cppdefs.h`를 끼워 넣고 `shapiro_mod` 모듈을 연다(1–2). 저작권과 2차 Shapiro 필터(Shapiro filter), 경계·마스크(mask) 가장자리에서 차수를 줄인다는 주석을 포함한다(4–19). 2차원·3차원 루틴 이름을 소개하고 implicit none·CONTAINS를 둔다(21–23). 원문 조건·대입·전처리: `#include "cppdefs.h"` (1). |
+| 25–63 | 시작 시 열린 전처리 조건 없음. `shapiro2d_tile`을 열고 ng·tile·model·배열 경계와 A 인수를 선언한다(26–41). MASKING은 Amask 인수를 추가한다(29–31). A는 intent(inout), Amask는 intent(in)이며 ASSUMED_SHAPE 또는 명시 경계 형태를 선택한다(43–53). i/j와 IminS:ImaxS·JminS:JmaxS의 2차원 Awrk1/Awrk2를 선언하고 `set_bounds.h`를 끼워 넣는다(57–62). 원문 조건·대입·전처리: `#ifdef MASKING` (29); `#endif` (31); `#ifdef ASSUMED_SHAPE` (43); `# ifdef MASKING` (44); `# endif` (46); `#else` (48); `# ifdef MASKING` (49); `# endif` (51); `#endif` (53); `#include "set_bounds.h"` (62). |
+| 64–97 | 시작 시 열린 전처리 조건 없음. 시작 시 26행 `shapiro2d_tile` 안. Shapiro 1970 정의 차수와 현재 차수의 관계, 경계·마스크 차수 축소 주석을 포함한다(68–71). Y 방향은 j=Jstr:Jend·i=Istr-1:Iend+1에서 0.25 계수의 이차 차분(second difference)을 Awrk1에 계산한다(75–88). MASKING은 각 A에 대응 마스크를 곱하고 전체에 이웃·중심 마스크의 곱을 추가로 적용한다(77–86). 같은 범위에서 Awrk2=A+Awrk1로 중간값을 만든다(92–96). 원문 조건·대입·전처리: `#ifdef MASKING` (77); `Awrk1(i,j)=0.25_r8*                                           &` (78); `&               (A(i,j-1)*Amask(i,j-1)+                            &` (79); `&                A(i,j+1)*Amask(i,j+1)-                            &` (80); `&                2.0_r8*A(i,j)*Amask(i,j))*                        &` (81); `&               Amask(i,j-1)*Amask(i,j+1)*Amask(i,j)` (82); `#else` (83); `Awrk1(i,j)=0.25_r8*                                           &` (84); `&               (A(i,j-1)+A(i,j+1)-2.0_r8*A(i,j))` (85); `#endif` (86); `Awrk2(i,j)=A(i,j)+Awrk1(i,j)` (94). |
+| 98–125 | 시작 시 열린 전처리 조건 없음. 시작 시 26행 `shapiro2d_tile` 안. X 방향은 j=Jstr:Jend·i=Istr:Iend에서 Awrk2의 이차 차분을 0.25로 계산한다(100–113). MASKING 분기는 이웃·중심 마스크를 각 항과 전체 곱에 적용한다(102–111). 같은 내부 범위에서 A=Awrk2+Awrk1로 갱신하고 반환·루틴 종료한다(117–124). 원문 조건·대입·전처리: `#ifdef MASKING` (102); `Awrk1(i,j)=0.25_r8*                                           &` (103); `&               (Awrk2(i-1,j)*Amask(i-1,j)+                        &` (104); `&                Awrk2(i+1,j)*Amask(i+1,j)-                        &` (105); `&                2.0_r8*Awrk2(i,j)*Amask(i,j))*                    &` (106); `&               Amask(i-1,j)*Amask(i+1,j)*Amask(i,j)` (107); `#else` (108); `Awrk1(i,j)=0.25_r8*                                           &` (109); `&               (Awrk2(i-1,j)+Awrk2(i+1,j)-2.0_r8*Awrk2(i,j))` (110); `#endif` (111); `A(i,j)=Awrk2(i,j)+Awrk1(i,j)` (119). |
+| 126–166 | 시작 시 열린 전처리 조건 없음. SOLVE3D 전처리 조건에서 `shapiro3d_tile`을 연다(126–135). MASKING은 2차원 Amask 인수를 추가한다(132–134). ng·tile·model, 수평·수직 경계와 작업 범위를 선언한다(138–144). A는 수직 하한 LBk를 포함한 intent(inout) 3차원 배열이고, ASSUMED_SHAPE 또는 명시 경계를 선택한다(146–156). i/j/k와 2차원 작업 배열을 선언하고 `set_bounds.h`를 끼워 넣는다(160–165). 원문 조건·대입·전처리: `#ifdef SOLVE3D` (126); `# ifdef MASKING` (132); `# endif` (134); `# ifdef ASSUMED_SHAPE` (146); `#  ifdef MASKING` (147); `#  endif` (149); `# else` (151); `#  ifdef MASKING` (152); `#  endif` (154); `# endif` (156); `# include "set_bounds.h"` (165). |
+| 167–200 | 시작 시 전처리 조건 `#ifdef SOLVE3D` (126) 안. 시작 시 129행 `shapiro3d_tile` 안. 필터 차수·경계 설명 뒤 k=LBk:UBk 루프를 연다(171–178). 각 층의 Y 방향 이차 차분은 j=Jstr:Jend·i=Istr-1:Iend+1이며 0.25 계수를 사용한다(179–192). MASKING이면 2차원 Amask를 이웃·중심 항과 전체 곱에 적용한다(181–190). 같은 수평 범위에서 Awrk2=A(:,:,k)+Awrk1을 계산한다(196–200). 원문 조건·대입·전처리: `# ifdef MASKING` (181); `Awrk1(i,j)=0.25_r8*                                         &` (182); `&                 (A(i,j-1,k)*Amask(i,j-1)+                        &` (183); `&                  A(i,j+1,k)*Amask(i,j+1)-                        &` (184); `&                  2.0_r8*A(i,j,k)*Amask(i,j))*                    &` (185); `&                 Amask(i,j-1)*Amask(i,j+1)*Amask(i,j)` (186); `# else` (187); `Awrk1(i,j)=0.25_r8*                                         &` (188); `&                 (A(i,j-1,k)+A(i,j+1,k)-2.0_r8*A(i,j,k))` (189); `# endif` (190); `Awrk2(i,j)=A(i,j,k)+Awrk1(i,j)` (198). |
+| 201–231 | 시작 시 전처리 조건 `#ifdef SOLVE3D` (126) 안. 시작 시 129행 루틴·178행 k 루프 안. 각 층의 X 방향 차분은 j=Jstr:Jend·i=Istr:Iend에서 Awrk2와 0.25 계수로 계산하며 MASKING은 이웃·중심 마스크를 적용한다(204–217). 내부 범위에서 A(i,j,k)=Awrk2+Awrk1로 갱신한다(221–225). k 루프·루틴·SOLVE3D·모듈 종료까지 포함한다(226–231). 원문 조건·대입·전처리: `# ifdef MASKING` (206); `Awrk1(i,j)=0.25_r8*                                         &` (207); `&                 (Awrk2(i-1,j)*Amask(i-1,j)+                      &` (208); `&                  Awrk2(i+1,j)*Amask(i+1,j)-                      &` (209); `&                  2.0_r8*Awrk2(i,j)*Amask(i,j))*                  &` (210); `&                 Amask(i-1,j)*Amask(i+1,j)*Amask(i,j)` (211); `# else` (212); `Awrk1(i,j)=0.25_r8*                                         &` (213); `&                 (Awrk2(i-1,j)+Awrk2(i+1,j)-2.0_r8*Awrk2(i,j))` (214); `# endif` (215); `A(i,j,k)=Awrk2(i,j)+Awrk1(i,j)` (223); `#endif` (230). |
+
+## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
+
+- 39·142: model 인수는 두 루틴에서 선언 이후 실행문에 참조하지 않는다.
+- 75–121·178–226: 필터 계수 0.25_r8을 두 수평 방향 식에 직접 적는다. 계수 입력 인수는 없다.
+- 26–124·129–229: 두 루틴에는 경계 교환이나 경계 조건 루틴 호출이 없다. 3차원 루틴은 k 층마다 수평 필터를 적용하며 k 이웃을 참조하는 수직 차분식은 없다.

@@ -1,0 +1,28 @@
+---
+file: models/ROMS/raw/source_code/roms/ROMS/Adjoint/ad_force_dual.F
+lines: 210
+sha256: aeb757214f1a4c009d615a324d3d3e85449b0d982496930f8e402983ab0033e2
+reader: codex gpt-6.1-sol
+read_date: 2026-10-13
+---
+
+# ad_force_dual.F — 판독 구간 기록
+
+구간은 1행부터 210행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–24 | `#include "cppdefs.h"` (1)은 cppdefs.h를 끼워 넣는다. 모듈 선언·빈 줄(2–3), `#if defined ADJOINT && defined WEAK_CONSTRAINT` (4), 저작권·라이선스·수반(adjoint) 상태 방정식 강제 목적 주석(5–16). implicit none·PRIVATE·ad_force_dual 공개·CONTAINS·구분 주석(17–24). 원문: `#include "cppdefs.h"` (1); `#if defined ADJOINT && defined WEAK_CONSTRAINT` (4). |
+| 25–65 | 시작 시 4행 `#if defined ADJOINT && defined WEAK_CONSTRAINT` 안. `ad_force_dual(ng,tile,Kfrc,Nfrc)` 선언(25), mod_param·mod_ocean 사용(28–29), 인수 선언·지역 선언 제목(31–36). `# include "tile.h"` (37)은 tile.h를 끼워 넣는다. `ad_force_dual_tile`을 호출한다(39–60). 격자·작업 경계·Kfrc/Nfrc와 OCEAN 배열을 전달한다. SOLVE3D에서는 f_t/f_u/f_v와 ad_t/ad_u/ad_v, 전처리 ELSE에서는 f_ubar/f_vbar와 ad_ubar/ad_vbar를 전달한다(43–50·52–59). f_zeta·ad_zeta는 두 경로에 공통이다(51·60). RETURN·래퍼(wrapper) 종료·구분 주석(61–65). 원문: `# include "tile.h"` (37); `CALL ad_force_dual_tile (ng, tile,                                &` (39); `&                      LBi, UBi, LBj, UBj,                         &` (40); `&                      IminS, ImaxS, JminS, JmaxS,                 &` (41); `&                      Kfrc, Nfrc,                                 &` (42); `# ifdef SOLVE3D` (43); `# else` (47); `# endif` (50); `# ifdef SOLVE3D` (52); `# else` (56); `# endif` (59). |
+| 66–93 | 시작 시 4행 `#if defined ADJOINT && defined WEAK_CONSTRAINT` 안. `ad_force_dual_tile` 인수 목록(66–81)은 SOLVE3D에서 3차원 강제장·수반장을 선택하고 ELSE에서 2차원 운동량(momentum) 강제장·수반장을 선택한다(70–74·76–80). f_zeta·ad_zeta는 공통 인수이다(75·81). mod_param 사용과 격자·작업 배열 경계·Kfrc/Nfrc 정수 인수 선언·빈 주석(84–93). 원문: `# ifdef SOLVE3D` (70); `# else` (72); `# endif` (74); `# ifdef SOLVE3D` (76); `# else` (78); `# endif` (80). |
+| 94–112 | 시작 시 4행 `#if defined ADJOINT && defined WEAK_CONSTRAINT`·66행 ad_force_dual_tile 안. ASSUMED_SHAPE에서 가정 형상(assumed-shape) intent(inout) 배열을 선언한다(94–112). SOLVE3D의 f_t는 4차원, f_u/f_v는 3차원, ad_t는 5차원, ad_u/ad_v는 4차원이다(95–98·104–107). 각 전처리 ELSE에서는 f_ubar/f_vbar는 2차원, ad_ubar/ad_vbar는 3차원이다(99–102·108–111). f_zeta는 2차원, ad_zeta는 3차원이다(103·112). 원문: `# ifdef ASSUMED_SHAPE` (94); `#  ifdef SOLVE3D` (95); `#  else` (99); `#  endif` (102); `#  ifdef SOLVE3D` (104); `#  else` (108); `#  endif` (111). |
+| 113–141 | 시작 시 4행 `#if defined ADJOINT && defined WEAK_CONSTRAINT`·66행 루틴·94행 `# ifdef ASSUMED_SHAPE` 참 경로 안. 113행 ELSE부터 ASSUMED_SHAPE 미정의 경로를 선언한다. SOLVE3D에서는 수직 N(ng)·추적자(tracer) NT(ng)를 명시한다(114–117·123–126). ad_t의 시간 차원은 3, ad_u/ad_v의 시간 차원은 2이다(124–126). 두 SOLVE3D ELSE의 강제장·수반장과 공통 f_zeta/ad_zeta 선언을 포함한다(118–122·127–131). ASSUMED_SHAPE 종료(132), 지역 i/j와 SOLVE3D의 itrc/k 선언(134–139), 빈 줄(140). `# include "set_bounds.h"` (141)은 set_bounds.h를 끼워 넣는다. 원문: `# else` (113); `#  ifdef SOLVE3D` (114); `#  else` (118); `#  endif` (121); `#  ifdef SOLVE3D` (123); `#  else` (127); `#  endif` (130); `# endif` (132); `# ifdef SOLVE3D` (137); `# endif` (139); `# include "set_bounds.h"` (141). |
+| 142–155 | 시작 시 4행 `#if defined ADJOINT && defined WEAK_CONSTRAINT`·66행 루틴 안. 강제장 누적·자유수면(free surface) 제목 주석(142–148). j=JstrR:JendR·i=IstrR:IendR 루프(149–150)에서 ad_zeta의 Kfrc 슬롯에 f_zeta를 더한다(151). 사용한 f_zeta는 0.0_r8로 지운다(152). 두 루프 종료·빈 줄(153–155). 원문: `DO j=JstrR,JendR` (149); `DO i=IstrR,IendR` (150); `ad_zeta(i,j,Kfrc)=ad_zeta(i,j,Kfrc)+f_zeta(i,j)` (151). |
+| 156–172 | 시작 시 4행 `#if defined ADJOINT && defined WEAK_CONSTRAINT`·66행 루틴 안. SOLVE3D 미정의 경로(156)는 2차원 운동량 강제장을 누적한다. ubar는 j=JstrR:JendR·i=Istr:IendR(160–161), vbar는 j=Jstr:JendR·i=IstrR:IendR(167–168)이다. 각각 Kfrc 슬롯에 f_ubar/f_vbar를 더한 뒤 강제장 값을 0으로 지운다(162–163·169–170). 루프 종료(164–165·171–172). 원문: `# ifndef SOLVE3D` (156); `DO j=JstrR,JendR` (160); `DO i=Istr,IendR` (161); `ad_ubar(i,j,Kfrc)=ad_ubar(i,j,Kfrc)+f_ubar(i,j)` (162); `DO j=Jstr,JendR` (167); `DO i=IstrR,IendR` (168); `ad_vbar(i,j,Kfrc)=ad_vbar(i,j,Kfrc)+f_vbar(i,j)` (169). |
+| 173–190 | 시작 시 4행 `#if defined ADJOINT && defined WEAK_CONSTRAINT`·66행 루틴·156행 `# ifndef SOLVE3D` 참 경로 안. 173행 ELSE부터 SOLVE3D 정의 경로이다. k=1:N(ng) 루프(177)에서 u는 j=JstrR:JendR·i=Istr:IendR(178–179), v는 j=Jstr:JendR·i=IstrR:IendR(184–185)이다. ad_u/ad_v의 Nfrc 슬롯에 f_u/f_v를 더하고 사용 강제장을 0으로 지운다(180–181·186–187). 수평·수직 루프 종료(182–183·188–190). 원문: `# else` (173); `DO k=1,N(ng)` (177); `DO j=JstrR,JendR` (178); `DO i=Istr,IendR` (179); `ad_u(i,j,k,Nfrc)=ad_u(i,j,k,Nfrc)+f_u(i,j,k)` (180); `DO j=Jstr,JendR` (184); `DO i=IstrR,IendR` (185); `ad_v(i,j,k,Nfrc)=ad_v(i,j,k,Nfrc)+f_v(i,j,k)` (186). |
+| 191–210 | 시작 시 4행 `#if defined ADJOINT && defined WEAK_CONSTRAINT`·66행 루틴·156행 `# ifndef SOLVE3D`의 173행 `# else` 경로 안. 추적자 제목 주석(191–193), itrc=1:NT(ng)·k=1:N(ng)·j=JstrR:JendR·i=IstrR:IendR 루프(194–197)에서 ad_t의 Nfrc 슬롯에 f_t를 누적한다(198–199). 사용한 f_t를 0으로 지운다(200). 네 루프 종료(201–204), SOLVE3D 분기 종료(205), 빈 줄·RETURN·루틴 종료(206–208), 바깥 전처리 조건 종료(209), 모듈 종료(210). 원문: `DO itrc=1,NT(ng)` (194); `DO k=1,N(ng)` (195); `DO j=JstrR,JendR` (196); `DO i=IstrR,IendR` (197); `ad_t(i,j,k,Nfrc,itrc)=ad_t(i,j,k,Nfrc,itrc)+              &` (198); `&                              f_t(i,j,k,itrc)` (199); `# endif` (205); `#endif` (209). |
+
+
+## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
+
+- 113–132: ASSUMED_SHAPE 미정의 선언 경로에도 `real(r8), intent(inout) :: ad_ubar(LBi:UBi,LBj:UBj,:)` (128), `real(r8), intent(inout) :: ad_vbar(LBi:UBi,LBj:UBj,:)` (129), `real(r8), intent(inout) :: ad_zeta(LBi:UBi,LBj:UBj,:)` (131)가 있다. 이 세 선언은 앞 두 차원의 명시 경계와 마지막 차원의 콜론을 함께 사용한다. 같은 경로의 SOLVE3D 운동량·추적자 수반장 시간 차원은 2 또는 3으로 명시한다(124–126).

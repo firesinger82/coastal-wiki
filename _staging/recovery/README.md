@@ -176,6 +176,14 @@ Delft3D 487(기계 sweep 실패 471 + 웹 16, 09-22 스냅샷 교체 전 경로)
 - 정정분 sonnet 표본 20건: 맞음 19, 부분 1(swanpre1 1832–1908 첫 문장의 바깥 블록 표기) → Claude가 고침. 앞 표본의 부분 4건은 모두 고쳐진 것을 확인.
 - 최종 기계 확인: 원문 인용 34,739개 중 불일치 2. 둘 다 swancom2 679·719행이다. 원문은 `\|`이고 기록은 표 칸 안 이스케이프로 `\\|`라고 썼다. 렌더 결과는 원문과 같으므로 검사 오판이다.
 
+## ROMS 판독 (2026-10-13~14)
+
+기록: `read/ROMS/roms/`(코드·입력 예제), `read/ROMS/manuals/wiki/wikitext/`(ROMS 위키 321쪽), `read/ROMS/`의 나머지(Data/ROMS/CDL 등). 대상 목록: `scripts/roms-batches.json`(ROMS/{Adjoint,Tangent,Representer,Nonlinear,Utility,Modules,Drivers,Functionals,Include,Programs}·Master의 .F/.h, makefile, CMakeLists.txt, `ROMS/Bin/build_roms.sh` — 881파일 971,495행, 192작업; 사용자 지시로 자료동화 코드 Adjoint·Tangent·Representer 포함; Utility 범용 라이브러리 11파일 lapack_mod·nrutil·erf·ran_state·gasdev·ran1·round·ludcmp·lubksb·sqlq·yaml_parser와 Obsolete·External 코드 제외), `scripts/roms-docbatches.json`(위키 wikitext 321쪽, User/External의 roms_* 아닌 .in, ROMS/External의 varinfo.yaml·ice.in·vegetation.in·coupling_mct.dat, docs/README.md, ROMS_ChangeLog.md, License_ROMS.md, Data/ROMS/CDL 24 — 368파일 64,986행, 19작업). WRF, roms_test, roms_matlab, roms-jedi, website(forum·blog), website_markdown, AI 요약 refs/subroutines.md, 응용 .in, Compilers, ESM은 제외. 원본 저장소 `raw/source_code/roms` HEAD `57aecf58`.
+
+- Codex `gpt-6.1-sol` 211작업, 6개 동시. cpp 지시문(`#if`·`#ifdef`·`#ifndef`·`#elif`·`#else`·`#endif`·`#define`·`#undef`·`#include`)은 원문 그대로 인용하고, 구간 첫머리에 감싸는 전처리 조건을 적게 했다. 400행마다 덧붙여 저장하고 끊기면 이어 읽는다. 용량 오류("Selected model is at capacity")로 끊긴 11작업(rr-61·63·69·70·72·76·80·96·111·162·172)은 이어 쓰기로 재실행해 모두 끝났다.
+- 기계 확인 1,249기록 전부 통과: 1행~끝 구간·sha·행 수, 전 행 열람(재실행 작업은 두 세션 로그를 합쳐 확인). 위키 2쪽(I4DVAR_ANA_SENSITIVITY, I4DVAR_Observation_Impact_Tutorial_2010)은 열람 로그로 확인되지 않아 Codex가 `nl -ba`로 다시 읽고 기록을 고쳤다(참고문헌·목차 보완, 축약 식·그림 부재 단언 정정). 원문 인용 454,411개 중 불일치 41개는 모두 검사기 오판이다: 위키 `\<br />` 이음 행(coupling.in 17·coupling_esmf.in 21), 표 칸 안 `\|` 이스케이프(I4DVAR 1), 굵은 글씨 표기 생략(NUOPC_Cap 1), 다른 파일 행 번호 인용(fennel_var.h 기록의 `fennel_mod.h:101`, 1).
+- sonnet 표본 24구간(코드 18·문서 6, 무작위): 맞음 24. 사소한 행 범위 표기 1건(get_ngfld.F 361–364의 END IF 행)을 원문 확인 후 고쳤다(`[10-14 표본 정정]`). 표본 오류가 없어 전수 의미 대조는 하지 않았다.
+
 ## SWAN 대조·흐름·노트 반영 (2026-10-13 완료)
 
 - 대조 보고서 7종(Codex `gpt-6.1-sol`): `compare/swan-theory-{numerics,sources,obstacles-setup-qc-bc}-vs-code.md`(swantech 식 대 코드), `compare/swan-inputs-{setup,physics-numerics}-vs-code.md`(swanuse 명령 대 `swanpre1`·`swanmain`), `compare/swan-outputs-vs-code.md`(출력 변수·형식), `compare/swan-implementation-history-vs-code.md`(swanimp·swanpgr·웹 수정 이력·패치·설정 예제). 흐름 분석 `flow/SWAN-callflow.md`(mermaid 3개 — 렌더 확인).
@@ -200,4 +208,4 @@ Delft3D 487(기계 sweep 실패 471 + 웹 16, 09-22 스냅샷 교체 전 경로)
 
 1. ~~매뉴얼과 코드 판독 기록 대조~~ — 10-03 완료(`compare/XBeach-manual-vs-code.md`, 노트 반영 `1da8d89`).
 2. ~~XBeach 파일 간 계산 흐름 분석~~ — 10-07 완료(`flow/XBeach-callflow.md`, 노트 반영 `d89cd8b`). 판독 기록 검색은 `wiki_search` `path_class="records"`(`ce7b3ae`).
-3. 다른 10개 모델(SFINCS·EFDC·ADCIRC 완료, ShorelineS 10-12 완료, SWAN 10-13 완료, 나머지 7개 미착수 — 순서 ROMS·SWASH·FUNWAVE·LISFLOOD-FP·Delft3D·Celeris·CADMAS-SURF): 같은 방식(고정 목록 → 1행/1쪽 판독 → 기계 확인 → 다른 모델 검증).
+3. 다른 10개 모델(SFINCS·EFDC·ADCIRC 완료, ShorelineS 10-12 완료, SWAN 10-13 완료, ROMS 판독 10-14 완료·대조 진행, 나머지 6개 미착수 — 순서 ROMS·SWASH·FUNWAVE·LISFLOOD-FP·Delft3D·Celeris·CADMAS-SURF): 같은 방식(고정 목록 → 1행/1쪽 판독 → 기계 확인 → 다른 모델 검증).

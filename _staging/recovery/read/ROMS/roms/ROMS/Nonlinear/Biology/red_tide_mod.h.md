@@ -1,0 +1,27 @@
+---
+file: models/ROMS/raw/source_code/roms/ROMS/Nonlinear/Biology/red_tide_mod.h
+lines: 256
+sha256: 95987eb4a53275d3d71e382a28a7673469551e0f970be4a15b8bbf59af9e0519
+reader: codex gpt-6.1-sol
+read_date: 2026-10-13
+---
+
+# red_tide_mod.h — 판독 구간 기록
+
+구간은 1행부터 256행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–44 | 전처리 조건 밖. `mod_biology`를 시작한다(1). 저작권·라이선스와 생물 계수의 의미·단위에 관한 주석이다(3–43). 주석은 광 감쇠(attenuation), 용존 무기 영양염(dissolved inorganic nutrient), 포낭(cyst) 발아(germination), 성장·사망·와편모조류(dinoflagellate) 이동 계수를 설명한다. 이 머리말은 Powell et al. (2006)·철 제한(iron limitation)이라고 적는다(10–11). |
+| 45–99 | 시작 시 1행 `mod_biology` 안. 전처리 조건 밖. mod_param을 사용하고 생물 추적자(tracer) ID와 Ngrids용 매개변수 allocatable 배열을 선언한다(45–78). 1월 1일 자정=0인 월 중간 날짜와 월별 발아 잠재력(germination potential) GP를 12개 값으로 선언 초기화한다(80–92). 정규화(normalization) 배열 GPN 선언 뒤 CONTAINS가 시작한다(94–98). 원문: `real(dp), dimension(12) :: Month_MidDay =                         &` (82); `&          (/ 15.5_dp,  45.0_dp,  74.5_dp, 105.0_dp,               &` (83); `&            135.5_dp, 166.0_dp, 196.5_dp, 227.5_dp,               &` (84); `&            258.0_dp, 288.5_dp, 319.0_dp, 349.5_dp /)` (85); `real(r8), dimension(12) :: GP =                                   &` (89); `&          (/ 21.90_r8, 11.25_r8, 78.0_r8, 85.0_r8,                &` (90); `&             96.8_r8,  93.0_r8,  60.0_r8, 50.0_r8,                &` (91); `&             10.0_r8,  11.5_r8,  17.0_r8, 34.5_r8 /)` (92). |
+| 100–124 | 시작 시 1행 모듈 안. 전처리 조건 밖. `initialize_biology`는 필요한 생물 변수·추적자 ID를 할당한다는 주석과 지역 i·ic·GPmax 선언을 가진다(100–113). `NBT=1` (119)로 생물 추적자 수를 정한다. 다음 할당 블록의 안내 주석까지 포함한다(121–124). 원문: `NBT=1` (119). |
+| 125–178 | 시작 시 1행 모듈·100행 `initialize_biology` 안. 전처리 조건 밖. BioIter·AttS·AttW·DIN_Cdepth·Dg·E_dark·E_light·Gmax·G_eff·G_r·Kn이 미할당이면 각각 Ngrids 크기로 할당한다. 각 할당 분기는 Dmem(1)에 REAL(Ngrids,r8)를 더한다(125–178). 배열 원소에 물리 기본값을 대입하는 문장은 이 구간에 없다. 원문: `IF (.not.allocated(BioIter)) THEN` (125); `allocate ( BioIter(Ngrids) )` (126); `Dmem(1)=Dmem(1)+REAL(Ngrids,r8)` (127); `IF (.not.allocated(AttS)) THEN` (130); `allocate ( AttS(Ngrids) )` (131); `Dmem(1)=Dmem(1)+REAL(Ngrids,r8)` (132); `IF (.not.allocated(AttW)) THEN` (135); `allocate ( AttW(Ngrids) )` (136); `Dmem(1)=Dmem(1)+REAL(Ngrids,r8)` (137); `IF (.not.allocated(DIN_Cdepth)) THEN` (140); `allocate ( DIN_Cdepth(Ngrids) )` (141); `Dmem(1)=Dmem(1)+REAL(Ngrids,r8)` (142); `IF (.not.allocated(Dg)) THEN` (145); `allocate ( Dg(Ngrids) )` (146); `Dmem(1)=Dmem(1)+REAL(Ngrids,r8)` (147); `IF (.not.allocated(E_dark)) THEN` (150); `allocate ( E_dark(Ngrids) )` (151); `Dmem(1)=Dmem(1)+REAL(Ngrids,r8)` (152); `IF (.not.allocated(E_light)) THEN` (155); `allocate ( E_light(Ngrids) )` (156); `Dmem(1)=Dmem(1)+REAL(Ngrids,r8)` (157); `IF (.not.allocated(Gmax)) THEN` (160); `allocate ( Gmax(Ngrids) )` (161); `Dmem(1)=Dmem(1)+REAL(Ngrids,r8)` (162); `IF (.not.allocated(G_eff)) THEN` (165); `allocate ( G_eff(Ngrids) )` (166); `Dmem(1)=Dmem(1)+REAL(Ngrids,r8)` (167); `IF (.not.allocated(G_r)) THEN` (170); `allocate ( G_r(Ngrids) )` (171); `Dmem(1)=Dmem(1)+REAL(Ngrids,r8)` (172); `IF (.not.allocated(Kn)) THEN` (175); `allocate ( Kn(Ngrids) )` (176); `Dmem(1)=Dmem(1)+REAL(Ngrids,r8)` (177). |
+| 179–234 | 시작 시 1행 모듈·100행 루틴 안. 전처리 조건 밖에서 시작한다. Tmin_growth·srad_Cdepth·wDino·Mor_a·Mor_b·Mor_Q10·Mor_T0도 미할당이면 Ngrids 크기로 할당하고 Dmem을 갱신한다(180–213). TANGENT는 tl_wDino, ADJOINT는 ad_wDino 할당을 선택한다(215–227). idbio는 NBT 크기로 할당한다(231–234). 원문: `IF (.not.allocated(Tmin_growth)) THEN` (180); `allocate ( Tmin_growth(Ngrids) )` (181); `Dmem(1)=Dmem(1)+REAL(Ngrids,r8)` (182); `IF (.not.allocated(srad_Cdepth)) THEN` (185); `allocate ( srad_Cdepth(Ngrids) )` (186); `Dmem(1)=Dmem(1)+REAL(Ngrids,r8)` (187); `IF (.not.allocated(wDino)) THEN` (190); `allocate ( wDino(Ngrids) )` (191); `Dmem(1)=Dmem(1)+REAL(Ngrids,r8)` (192); `IF (.not.allocated(Mor_a)) THEN` (195); `allocate ( Mor_a(Ngrids) )` (196); `Dmem(1)=Dmem(1)+REAL(Ngrids,r8)` (197); `IF (.not.allocated(Mor_b)) THEN` (200); `allocate ( Mor_b(Ngrids) )` (201); `Dmem(1)=Dmem(1)+REAL(Ngrids,r8)` (202); `IF (.not.allocated(Mor_Q10)) THEN` (205); `allocate ( Mor_Q10(Ngrids) )` (206); `Dmem(1)=Dmem(1)+REAL(Ngrids,r8)` (207); `IF (.not.allocated(Mor_T0)) THEN` (210); `allocate ( Mor_T0(Ngrids) )` (211); `Dmem(1)=Dmem(1)+REAL(Ngrids,r8)` (212); `#ifdef TANGENT` (215); `IF (.not.allocated(tl_wDino)) THEN` (216); `allocate ( tl_wDino(Ngrids) )` (217); `Dmem(1)=Dmem(1)+REAL(Ngrids,r8)` (218); `#endif` (220); `#ifdef ADJOINT` (222); `IF (.not.allocated(ad_wDino)) THEN` (223); `allocate ( ad_wDino(Ngrids) )` (224); `Dmem(1)=Dmem(1)+REAL(Ngrids,r8)` (225); `#endif` (227); `IF (.not.allocated(idbio)) THEN` (231); `allocate ( idbio(NBT) )` (232); `Dmem(1)=Dmem(1)+REAL(Ngrids,r8)` (233). |
+| 235–256 | 시작 시 1행 모듈·100행 루틴 안. 전처리 조건 밖. 기존 추적자 수 NAT+NPT+NCS+NNS를 ic로 합산하고 idbio와 iDino를 뒤에 배치한다(240–244). GP 최댓값으로 월별 값을 나누어 GPN을 계산한다(248–251). RETURN·루틴 종료·모듈 종료와 빈 줄을 포함한다(253–256). 원문: `ic=NAT+NPT+NCS+NNS` (240); `DO i=1,NBT` (241); `idbio(i)=ic+i` (242); `iDino=ic+1` (244); `GPmax=MAXVAL(GP)` (248); `DO i=1,12` (249); `GPN(i)=GP(i)/GPmax` (250). |
+
+## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
+
+- 10–11: 파일 머리말은 Powell et al. (2006)의 철 제한 생태계 모델이라고 적는다. 같은 파일의 19–24·40–41행은 포낭 발아와 Alexandrium Fundyense 이동을 설명한다.
+- 125–213: 생물 매개변수 배열은 할당 후 Dmem만 갱신한다. 해당 배열 원소의 기본값 대입은 이 초기화 루틴에 없다.
+- 231–233: idbio 할당 크기는 NBT이다. Dmem 증가량은 REAL(Ngrids,r8)이다.
+- 215–227: 조건부 tl_wDino·ad_wDino 할당문이 있다. 이 파일의 선언부 45–96행에는 두 이름의 선언이 없고 mod_param을 USE한다.

@@ -1,0 +1,23 @@
+---
+file: models/ROMS/raw/source_code/roms/Data/ROMS/CDL/frc_respiration.cdl
+lines: 78
+sha256: 388adbf8d73d5ae387bdb26748e44b215c9359ee16232d7892347914af35d568
+reader: codex gpt-6.1-sol
+read_date: 2026-10-13
+---
+
+# frc_respiration.cdl — 판독 구간 기록
+
+구간은 1행부터 78행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–13 | frc_respiration / 차원 — RHO·U·V 수평 차원, RHO·W 수직 차원 및 무제한 호흡 시간 차원(unlimited respiration time dimension)을 선언한다(1–12). 각 이름·값·현재 레코드 수 주석을 인용한다. 원문: `netcdf frc_respiration {` (1); `dimensions:` (3); `	xi_rho = 100 ;` (4); `	xi_u = 99 ;` (5); `	xi_v = 100 ;` (6); `	eta_rho = 150 ;` (7); `	eta_u = 150 ;` (8); `	eta_v = 149 ;` (9); `	s_rho = 20 ;` (10); `	s_w = 21 ;` (11); `	respiration_time = UNLIMITED ; // (0 currently)` (12). |
+| 14–54 | variables / 격자·수직 좌표 — 구면 여부(spherical), 지형 추종 수직 좌표(terrain-following vertical coordinate)의 변환·늘림 함수(stretching function), 제어값·층 폭·임계 수심(critical depth), S좌표·늘림 곡선을 선언한다(15–54). 단위·범위·양의 방향·표준 이름·수식 항 참조(formula_terms)를 인용한다. 원문: `variables:` (14); `        int spherical ;` (15); `                spherical:long_name = "grid type logical switch" ;` (16); `                spherical:flag_values = "0, 1" ;` (17); `                spherical:flag_meanings = "Cartesian spherical" ;` (18); `        int Vtransform ;` (19); `                Vtransform:long_name = "vertical terrain-following transformation equation" ;` (20); `        int Vstretching ;` (21); `                Vstretching:long_name = "vertical terrain-following stretching function" ;` (22); `	double theta_s ;` (23); `		theta_s:long_name = "S-coordinate surface control parameter" ;` (24); `	double theta_b ;` (25); `		theta_b:long_name = "S-coordinate bottom control parameter" ;` (26); `	double Tcline ;` (27); `		Tcline:long_name = "S-coordinate surface/bottom layer width" ;` (28); `		Tcline:units = "meter" ;` (29); `	double hc ;` (30); `		hc:long_name = "S-coordinate parameter, critical depth" ;` (31); `		hc:units = "meter" ;` (32); `	double s_rho(s_rho) ;` (33); `		s_rho:long_name = "S-coordinate at RHO-points" ;` (34); `		s_rho:valid_min = -1. ;` (35); `		s_rho:valid_max = 0. ;` (36); `                s_rho:positive = "up" ;` (37); `                s_rho:standard_name = "ocean_s_coordinate_g1" ;` (38); `                s_rho:formula_terms = "s: s_rho C: Cs_r eta: zeta depth: h depth_c: hc" ;` (39); `	double s_w(s_w) ;` (40); `		s_w:long_name = "S-coordinate at W-points" ;` (41); `		s_w:valid_min = -1. ;` (42); `		s_w:valid_max = 0. ;` (43); `                s_w:positive = "up" ;` (44); `                s_w:standard_name = "ocean_s_coordinate_g1" ;` (45); `                s_w:formula_terms = "s: s_w C: Cs_w eta: zeta depth: h depth_c: hc" ;` (46); `	double Cs_r(s_rho) ;` (47); `		Cs_r:long_name = "S-coordinate stretching curves at RHO-points" ;` (48); `		Cs_r:valid_min = -1. ;` (49); `		Cs_r:valid_max = 0. ;` (50); `	double Cs_w(s_w) ;` (51); `		Cs_w:long_name = "S-coordinate stretching curves at W-points" ;` (52); `		Cs_w:valid_min = -1. ;` (53); `		Cs_w:valid_max = 0. ;` (54). |
+| 55–66 | variables / 수심·지리 좌표 — RHO점 수심(bathymetry), 경도(longitude)·위도(latitude)의 차원·단위·표준 이름·좌표 참조를 제시한다(55–66). 원문: `        double h(eta_rho, xi_rho) ;` (55); `                h:long_name = "bathymetry at RHO-points" ;` (56); `                h:units = "meter" ;` (57); `                h:coordinates = "lon_rho lat_rho" ;` (58); `	double lon_rho(eta_rho, xi_rho) ;` (59); `		lon_rho:long_name = "longitude of RHO-points" ;` (60); `		lon_rho:units = "degree_east" ;` (61); `                lon_rho:standard_name = "longitude" ;` (62); `	double lat_rho(eta_rho, xi_rho) ;` (63); `		lat_rho:long_name = "latitude of RHO-points" ;` (64); `		lat_rho:units = "degree_north" ;` (65); `                lat_rho:standard_name = "latitude" ;` (66). |
+| 67–74 | variables / 호흡 시간·호흡률 — 호흡(respiration) 시간의 기준 날짜·단위와 시간·수직·수평 차원을 갖는 호흡률 배열의 단위·시간 참조를 제시한다(67–73). 원문: `	double respiration_time(respiration_time) ;` (67); `		respiration_time:long_name = "respiration date time" ;` (68); `		respiration_time:units = "days since 2001-01-01 00:00:00" ;` (69); `	double respiration(respiration_time, s_rho, eta_rho, xi_rho) ;` (70); `		respiration:long_name = "respiration rate" ;` (71); `		respiration:units = "millimole_oxygen meter-3 day-1" ;` (72); `		respiration:time = "respiration_time" ;` (73). |
+| 75–78 | global attributes / 전역 속성 — 외력(forcing) 파일 유형과 저산소(hypoxia) 관련 총 호흡률 제목을 제시한다(75–77). 닫는 중괄호까지 포함한다(78). 자료값을 지정하는 data 절은 없다. 원문: `// global attributes:` (75); `		:type = "ROMS FORCING file" ;` (76); `		:title = "Total Respiration Rate for Hypoxia" ;` (77); `}` (78). |
+
+## 판독 중 확인된 사실 (판단 아님, 후속 검토 대상)
+
+- 39·46: 두 수직 좌표의 `formula_terms`는 `eta: zeta`를 참조한다. 이 파일에는 `zeta` 선언이 없다.
