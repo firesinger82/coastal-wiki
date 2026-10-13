@@ -1,0 +1,65 @@
+diff --git a/models/ADCIRC/source-analysis/adcirc-3d-vssol-vertical-scheme.md b/models/ADCIRC/source-analysis/adcirc-3d-vssol-vertical-scheme.md
+--- a/models/ADCIRC/source-analysis/adcirc-3d-vssol-vertical-scheme.md
++++ b/models/ADCIRC/source-analysis/adcirc-3d-vssol-vertical-scheme.md
+@@ -21,14 +21,14 @@
+ 
+ ## 1. 정체 — 무엇을 언제 푸는가
+ 
+-- `VSSOL(IT,TimeLoc)` = 3D internal mode **수평속도의 연직구조** 솔버 (vsmy.F:142-1705). `C3DVS` 시 매 timestep 호출 (timestep.F:1125-1127; 직전에 barotropic 압력 `MOM_LV_X`→`BTP` 를 **time level s·s+1 평균**으로 적재, timestep.F 주석 "averaged between time levels s and s+1").
++- `VSSOL(IT,TimeLoc)` = 3D internal mode **수평속도의 연직구조** 솔버 (vsmy.F:142-1705). `C3DVS` 시 매 timestep 호출 (timestep.F:1131-1143; 직전에 barotropic 압력 `MOM_LV_X`→`BTP` 를 **time level s·s+1 평균**으로 적재, timestep.F 주석 "averaged between time levels s and s+1").
+ - **복소 속도 정식화**: `q = u + i·v` (`COMPLEX(8)`, 헤더 :124 "3D Complex Velocity field (GAMMA)") — Coriolis 가 복소 회전(스칼라 곱)이 되어 2×2 행렬 불필요.
+ - 시간간격: `DelT => DTDP` (read_input.F:5087-5087, POINTER alias — global_3dvs.F:98) — **2D 와 동일 dt, 별도 subcycling 없음**. 2-time-level(s → s+1) 스킴.
+ - 좌표: 무차원 sigma `[b,a] = [-1,+1]` 고정 (global_3dvs.F:193-195, `AMB=A-B=2`).
+ 
+ ## 2. θ³-가중 시간적분 — 항별 3개의 독립 implicitness
+ 
+-fort.15 3D 블록에서 `READ(15,*) Alp1,Alp2,Alp3` (read_input.F:5141-5141), 계수 조립 :5132-5137:
++fort.15 3D 블록에서 `READ(15,*) Alp1,Alp2,Alp3` (read_input.F:5141-5141), 계수 조립 :5146-5151:
+ 
+ ```fortran
+ IDTAlp1   = iy*DelT*Alp1      ! Coriolis LHS      (iy = 복소 i)
+@@ -58,7 +58,7 @@
+ ## 4. 해법 — 복소 Thomas (TRIDIAG)
+ 
+ - `CALL TRIDIAG(Mkm1,Mk,Mkp1,Fr,Gamma,NFEN)` (:1125) → `qkp1(NH,k)=Gamma(k)` (:1133). node 별 독립 — 수평 결합은 explicit 항에만 있으므로 **NFEN 크기 복소 tridiagonal 을 NP 번** 푸는 구조.
+-- TRIDIAG(:2097-2130): 위→아래 소거(`DO J=nfen-1,1,-1`) + 대각 0 검사 시 즉시 terminate ("Diagonal term in the VS matrix is zero").
++- TRIDIAG(:2099-2132): 위→아래 소거(`DO J=nfen-1,1,-1`) + 대각 0 검사 시 즉시 terminate ("Diagonal term in the VS matrix is zero").
+ - 시간레벨 shift: `q(NH,k)=qkp1(NH,k)` (:1678) — `qkp1` 을 별도 보존하는 이유는 transport 계산 공급 (:1127-1130 주석).
+ 
+ ## 5. 경계조건
+diff --git a/models/ADCIRC/source-analysis/adcirc-fort-files-reference.md b/models/ADCIRC/source-analysis/adcirc-fort-files-reference.md
+--- a/models/ADCIRC/source-analysis/adcirc-fort-files-reference.md
++++ b/models/ADCIRC/source-analysis/adcirc-fort-files-reference.md
+@@ -182,7 +182,7 @@
+ ## Working Rules
+ 
+ 1. Treat `fort.14` + `fort.15` as the canonical pair — never touch the mesh without keeping the matching `fort.15` (or you get mismatched `NSTAE`/`NSTAV` arrays).
+-2. Always inspect `fort.80` after a parallel run before opening `fort.61/62/...` — those files are split per PE before merge.
++2. Always inspect `fort.80` after a parallel run before opening `fort.61/62/...` — adcprep 가 ADCPOST 용으로 `fort.80` 을 쓰고(`[file=prep/prep.F line=7472]` ` OPEN(UNIT=80,FILE='fort.80')              ! output for ADCPOST `), ADCPOST 가 이를 읽어 per-PE 로 분할된 출력을 병합한다(`[file=prep/post.F line=52]` ` "fort.80", which was written by the ADCIRC pre-processor ADCPREP. `; `[file=prep/post.F line=67]` ` OPEN(UNIT=80,FILE='fort.80') `).
+ 3. 2차원 ASCII 시계열의 첫 줄은 RUNDES,RUNID,AGRID이다. (`[file=src/globalio.F line=971]` ` write(lun, 1000) rundes, runid, agrid `) 조화분석 ASCII는 NFREQ로 시작한다. (`[file=docs/technical_reference/output_files/fort51.rst line=13]` `` :ref:`NFREQ <NFREQ>` ``; `[file=src/write_output.F line=2765]` ` write(lun,*) nfreq+nf `) binary 핫스타트는 FileFmtVersion으로 시작한다. (`[file=src/write_output.F line=5012]` ` WRITE(hss % lun,REC=IHOTSTP) FileFmtVersion `) netCDF는 해당 포맷과 변수 스키마로 판독한다. (`[file=src/netcdfio.F90 line=3945]` ` case (3, 367, 368) `; `[file=src/netcdfio.F90 line=3946]` ` myFile%ncformat = NF90_CLOBBER `)
+ 4. POST51은 첫 지역 파일의 NFREQ로 다른 지역 파일을 읽는다. (`[file=prep/post.F line=1315]` ` READ(NFREQMSG,*) NFREQ `; `[file=prep/post.F line=1326]` ` DO I=1, NFREQ `; `[file=prep/post.F line=1327]` ` READ(LOC2(IPROC),'(A80)') INLINE `) 다른 지역 파일의 주파수 수는 IDUM으로 읽는다. (`[file=prep/post.F line=1325]` ` READ(INLINE,*) IDUM `) 이 구간은 주파수 수의 동일성을 검사하지 않는다. (`[file=prep/post.F line=1325]` ` READ(INLINE,*) IDUM `; `[file=prep/post.F line=1326]` ` DO I=1, NFREQ `; `[file=prep/post.F line=1327]` ` READ(LOC2(IPROC),'(A80)') INLINE `) 조용히 주파수를 버리는 결과는 확인하지 않음. <!-- source-needed: 실행 결과 근거 없음 -->
+ 
+diff --git a/models/ADCIRC/source-analysis/adcirc-gwce-implementation.md b/models/ADCIRC/source-analysis/adcirc-gwce-implementation.md
+--- a/models/ADCIRC/source-analysis/adcirc-gwce-implementation.md
++++ b/models/ADCIRC/source-analysis/adcirc-gwce-implementation.md
+@@ -104,7 +104,7 @@
+ 
+ - `IF ( (Tau0.le.-5.d0).and.(Tau0.gt.-6.d0) ) THEN`이면 다음 위치 입력 줄의 `Tau0FullDomainMin, Tau0FullDomainMax`를 읽는다 (`[file=src/read_input.F line=2505]` `IF ( (Tau0.le.-5.d0).and.(Tau0.gt.-6.d0) ) THEN`; `[file=src/read_input.F line=2506]` `READ(15,*) Tau0FullDomainMin, Tau0FullDomainMax`). 이 `READ`에는 생략을 허용하는 `IOSTAT` 처리가 없다 (`[file=src/read_input.F line=2506]` `READ(15,*) Tau0FullDomainMin, Tau0FullDomainMax`). 해석: 입력 줄을 생략하면 reader가 다음 위치 입력을 이 두 값으로 소비한다 (`[file=src/read_input.F line=2506]` `READ(15,*) Tau0FullDomainMin, Tau0FullDomainMax`). `Tau0Dig1.eq.-5`이고 `LoadTau0MinMax`가 거짓이면 후속 경로는 두 위치 입력값을 절점 최소·최대 값에 복사한다 (`[file=src/nodalattr.F line=1979]` `IF ( .not.LoadTau0MinMax ) THEN`; `[file=src/nodalattr.F line=1981]` `Tau0MinMax(I,1) = Tau0FullDomainMin`; `[file=src/nodalattr.F line=1982]` `Tau0MinMax(I,2) = Tau0FullDomainMax`; `src/nodalattr.F:1977` `IF ( Tau0Dig1.eq.-5 ) THEN`). [10-12 전수 검증 보완]
+ - **Boundary ELEVALPHA wrong** — phases shifted across NBFR block; check `read_input.F:3445-3470` parse order.
+-- **Hot-restart with different `ILump`** — matrix shape differs; restart fails or silently runs lumped.
++- **Hot-restart with different `ILump`** — consistent/lumped 는 행렬 할당 구조가 다르다 (`[file=src/gwce.F line=141-154]` `alloc_main11` vs `alloc_main11_lumped`). hotstart 파일은 행렬이 아니라 상태만 저장하고([[adcirc-hotstart]] §F), `ILump` 는 새 실행의 fort.15 `IM` 분기에서 다시 정해져 행렬이 재조립된다 (`[file=src/read_input.F line=1174]` ` ILump=0 ` 등 IM 분기별 대입). 확인하지 않음: `ILump` 를 바꾼 hot-restart 실행의 결과.
+ - **NTIP=2 without fort.24** — runtime error or zero SAL contribution.
+ 
+ ## References
+diff --git a/models/ADCIRC/source-analysis/adcirc-hotstart.md b/models/ADCIRC/source-analysis/adcirc-hotstart.md
+--- a/models/ADCIRC/source-analysis/adcirc-hotstart.md
++++ b/models/ADCIRC/source-analysis/adcirc-hotstart.md
+@@ -342,7 +342,7 @@
+ - NHSTAR=-1은 IT가 붙은 fort.68 파일을 쓴다. (`src/write_output.F:5640` ` hss % filename = 'fort.68_' `; `src/write_output.F:5642` ` WRITE(itstr,'(I9.9)') IT+NHSINC  !setting the name for the next hot start file `; `src/write_output.F:5659` ` hss % filename = 'fort.68_' `; `src/write_output.F:5661` ` WRITE(itstr,'(I9.9)') IT+NHSINC  !setting the name for the next hot start file `)
+ - 특정 67/68 계열 시험 모드는 작성 후 종료한다. (`src/write_output.F:5665` ` IF (TEST_HOTSTART.eqv..true.) THEN `; `src/write_output.F:5666` ` call terminate(exit_code=ADCIRC_EXIT_FAILURE, `; `src/write_output.F:5667` ` &     message='Test hotstart completed') `)
+ - NHSTAR<-1은 절댓값 형식으로 한 번 쓰는 설정이다. (`src/read_input.F:4530` ` IF (NHSTAR.lt.-1) then `; `src/read_input.F:4531` ` NHOUTONCE = .true. `; `src/read_input.F:4532` ` NHSTAR = -NHSTAR `)
+-- Verify hot-start success: log says "HOTSTART SUCCESSFUL" and prints `IT, TimeLoc`. Mismatch = abort.
++- Verify hot-start success: log says "HOTSTART SUCCESSFUL" and prints `IT, TimeLoc`. Mismatch = abort. <!-- source-needed: 'HOTSTART SUCCESSFUL' 문자열이 현 raw 트리 src 전체 grep 0건 (2026-09-27·10-14 재확인) — 로그 문자열·검증 절차의 실제 출처(구버전 메시지? 매뉴얼?) 필요 -->
+ - For coupled runs (NRS=3), confirm SWAN spectral hot-file written at compatible time.
+ - fort.51–54는 최종화의 solveHarmonicAnalysis와 writeHarmonicAnalysisOutput이 생성한다. (`src/adcirc.F:540` ` CALL solveHarmonicAnalysis(ITIME) `; `src/adcirc.F:541` ` CALL writeHarmonicAnalysisOutput(ITIME) `)
+ - 조화분석 창은 THAS·THAF·NHAINC로 설명한다. (`docs/technical_reference/parameter_definitions/index.rst:1173` ` THAS = The number of days after which data starts to be harmonically analysed (THAS is relative to STATIM) `; `docs/technical_reference/parameter_definitions/index.rst:1175` ` THAF = The number of days after which data ceases to be harmonically analysed (THAF is relative to STATIM) `; `docs/technical_reference/parameter_definitions/index.rst:1177` ` NHAINC = The number of time steps at which information is harmonically analysed (information every NHAINC time steps after THAS is used in harmonic analysis) `)
