@@ -4,7 +4,8 @@ topic: swan
 canonical_source: external
 external_source: "swantech.pdf (SWAN Cycle III version 41.51) Ch 7 Parallel implementation aspects §7.1 Load balancing + §7.2 Parallelization of implicit propagation schemes, doc p.129-134 (무방정식 서술). References: Fox 1988, Chrisochoides et al. 1994, Tolman 2002, Meurant 1988, Van der Vorst 1989, Bastian-Horton 1991, Templates 1994, Campbell et al. 2002, Zijlema 2005."
 citation_status: verified
-verification_method: "swantech.pdf (v41.51) Ch 7 직접 read via pdftotext + website_markdown node81-83.md. Ch 7은 무방정식(서술 only) — 알고리즘·라이브러리·버전 history verbatim 정리."
+verification_method: "swantech PDF 137–141쪽의 제7장을 대조했다. 제7장은 번호가 붙은 방정식 없이 병렬 알고리즘을 서술한다. 본문은 원문 인용과 AI 한국어 요약을 함께 포함한다. 2026-10-13 recovery 대조 보고서 R1–R8 반영분의 추가·수정 27줄을 현재 코드·과거 커밋·PDF·웹 HTML·최종 보고서와 대조했다." # [10-13 전수 검증 정정]
+last_source_check: "2026-10-13 (recovery 대조 반영)"
 note_author: "Claude Opus 4.8 (1M context) raw PDF direct read"
 note_date: 2026-06-02
 verification_by: "Claude Opus 4.8 (1M context) — SPMD/halo/RCB/wavefront/Jacobi + 41.10 history verbatim"
@@ -17,15 +18,14 @@ related:
 
 # swantech Ch 7 Parallel implementation aspects — verified verbatim
 
-> swantech.pdf (v41.51) Ch 7 직접 read (**무방정식, 서술 only**). SWAN 의 **분산메모리 병렬화** — domain decomposition + load balancing + implicit four-sweep 병렬화(block wavefront vs Jacobi). §3.3 four-sweep([[swan-tech-ch3-solution-iteration-limiter]])의 병렬 처리.
+> swantech.pdf (v41.51) Ch 7 직접 read (**무방정식, 서술 only**). SWAN 의 **분산메모리 병렬화** — domain decomposition + load balancing + implicit four-sweep 병렬화(block wavefront vs Jacobi). §3.3 four-sweep([swan-tech-ch3-solution-iteration-limiter](swan-tech-ch3-solution-iteration-limiter.md))의 병렬 처리.
 
 ## 1. §7 Domain decomposition (SPMD)
 
 CFD 의 대형 sparse 계(FD/FV) 분산메모리 해법. $\vec{x}$-space 를 **contiguous·non-overlapping subdomain** 으로 분할 → 각 processor 에 할당. 동일 알고리즘이 각 processor 의 자체 데이터에 수행 (**SPMD** 모델).
 
 - 각 subdomain 은 4 변마다 다중 neighbor 가능 → 관계 정보 저장 data structure
-- **Halo layer**: subdomain 을 **1~3 grid point auxiliary layer** 로 둘러쌈 (neighbor 의 halo data 저장). 층 수 = geographic propagation scheme 의존:
-  - **BSBT → 1 점**, **SORDUP → 2 점**, **Stelling-Leendertse → 3 점** ([[swan-tech-ch3-discretization]] §3.2 stencil 폭과 일치)
+halo 폭은 `-jac`에서 1이고 기본 WFR에서 3이다. 공간 기법을 보고 폭을 바꾸는 대입은 없다. (`src/swmod2.ftn:1148–1149` `!JAC     &           IHALOX = 1, IHALOY = 1`; `!WFR     &          ,IHALOX = 3, IHALOY = 3`; R1:TN-176)
 - subdomain 경계 데이터 교환 필요 + **stopping criterion(Eq 3.37) 평가엔 global communication**
 - **MPI** 표준 (popular: **MPICH** free software) — point-to-point + collective 만 사용
 
@@ -43,7 +43,9 @@ Subdomain→processor 매핑: 계산부하 균등 + 통신비용 최소. 직관�
 
 ### 2.2 SWAN 구현
 
-**wet 점만 자동 분할** (subdomain 크기 = 총 wet 점 / subdomain 수). Stripwise 절차: 빈 strip 생성 → 크기 도달까지 점별 할당 → 잔여 wet 점 있으면 동일 part 에 추가, 없으면 다음 strip. → **모든 strip 직선 interface + 근사 동수 wet 점**.
+정렬 영역 분할은 활성 격자 번호와 프로세서 가중치를 사용한다. 같은 가중치에서는 균등 크기에 대응한다. (`src/swanparll.ftn:2277` `IF ( KGRPGL(IX,IY).NE.1 ) THEN`; `src/swanparll.ftn:2291–2292` `IWORK(2,I) = (NACTP*ICNT)/SUM(IWEIG) - NPCUM`; `NPCUM      = (NACTP*ICNT)/SUM(IWEIG)`; R1:TN-178)
+
+비정렬 METIS 분할과 ghost 교환은 별도 경로이다. 균등 분할 가중치는 `tpwgts = 1./real(np)`이다. 통신은 `MPI_IRECV`·`MPI_ISEND`·`MPI_WAITALL` 교환을 사용한다. (`src/SwanParallel.ftn90:483`; `src/SwanParallel.ftn90:1261,1274,1285`; R1:TN-185)
 > SWAN 경험상 wet 점당 계산량이 시뮬 중 거의 일정 → **dynamic load balancing 불필요**.
 
 ### 2.3 Tolman (2002) 대안 거부
@@ -75,7 +77,8 @@ Beowulf cluster 실 응용 실험:
 | Tech (PDF §7) | User cmd / 빌드 | 비고 |
 |---|---|---|
 | domain decomposition | MPI 빌드 (`swanrun -mpi n`) | SPMD, MPICH |
-| §7.1 partitioning | (internal, 자동 wet-only) | stripwise/RCB |
+| §7.1 정렬 분할 | internal | 활성 계산점 표지와 IWEIG를 적용한다. (R1:TN-178) |
+| 비정렬 분할·교환 | `-metis`, `-mpi` | METIS 분할과 ghost 교환은 별도 경로이다. (R1:TN-185) |
 | §7.2 wavefront | (default 운영판) | 수렴 보존 |
 | §7.2 block Jacobi | (since 41.10, Impl Manual) | curvature stopping 권장 |
 
@@ -87,6 +90,21 @@ Beowulf cluster 실 응용 실험:
 
 ## 6. 연결
 
-- [[swan-tech-ch3-discretization]] — §3.2 propagation scheme (halo 1/2/3 점 = BSBT/SORDUP/S&L stencil)
-- [[swan-tech-ch3-solution-iteration-limiter]] — §3.3 four-sweep(병렬화 대상) + §3.4 curvature stopping(Jacobi scalability)
-- [[swan-tech-ch8-unstructured-grid-scheme]] — Ch 8 unstructured 병렬(다음)
+- [swan-tech-ch3-discretization](swan-tech-ch3-discretization.md) — §3.2 propagation scheme; halo 폭은 빌드 선택별 JAC=1·WFR=3이다. (R1:TN-176)
+- [swan-tech-ch3-solution-iteration-limiter](swan-tech-ch3-solution-iteration-limiter.md) — §3.3 four-sweep(병렬화 대상) + §3.4 curvature stopping(Jacobi scalability)
+- [swan-tech-ch8-unstructured-grid-scheme](swan-tech-ch8-unstructured-grid-scheme.md) — Ch 8 unstructured 병렬(다음)
+
+## 문서와 코드 차이 (10-13 대조)
+
+문서 판: SWAN Cycle III 41.51 매뉴얼; 웹 수정 이력·패치. 코드 판: VERNUM 41.51, 원본 저장소 HEAD 43e9bbb 2026-07-13 patch B.
+
+확정 결론과 원문 인용: [R1](../../../_staging/recovery/compare/swan-theory-numerics-vs-code.md#5-차이-결론), [R7](../../../_staging/recovery/compare/swan-implementation-history-vs-code.md#5-차이-결론).
+
+| 행 ID | 항목 | 문서 원문 | 코드 원문 | 결론 | 결론 문장 |
+|---|---|---|---|---|---|
+| R1:TN-176 | halo 폭 | swantech PDF 137쪽 / 인쇄 129쪽: 연속된 비중첩 소영역을 각 프로세서에 배정한다. halo 폭은 BSBT·SORDUP·S&L에서 각각 1·2·3이다. | `src/swanparll.ftn:2525–2528` `MXF = MAX(1  ,MXF-IHALOX)`; `MYF = MAX(1  ,MYF-IHALOY)`; `MXL = MIN(MXC,MXL+IHALOX)`; `MYL = MIN(MYC,MYL+IHALOY)`<br>`src/swmod2.ftn:1148–1149` `!JAC     &           IHALOX = 1, IHALOY = 1`; `!WFR     &          ,IHALOX = 3, IHALOY = 3` | B 문서 오기 | 해석: 실제 halo 폭은 공간 기법별 1·2·3이 아니라 빌드 선택별 JAC=1·WFR=3이다. 공간 기법을 보고 폭을 바꾸는 대입은 없다. 소유권 비중첩과 halo 배열 중첩은 양립한다. |
+| R1:TN-178 | 영역 분할 가중치 | swantech PDF 138쪽 / 인쇄 130쪽: 소영역 크기 $=$ 총 wet점 수 / 소영역 수.<br>swanuse PDF 21–22·46의 예외값 격자와 MPI 부하 분산 설명. | `src/swanparll.ftn:2277,2291–2292` `IF ( KGRPGL(IX,IY).NE.1 ) THEN`; `IWORK(2,I) = (NACTP*ICNT)/SUM(IWEIG) - NPCUM`; `NPCUM      = (NACTP*ICNT)/SUM(IWEIG)` | C 문서 누락 | 분할 기준은 활성 계산점 표지이며 프로세서별 `IWEIG`를 적용한다. swanuse가 말하는 예외값 제외 격자는 이 활성점 개념과 대응한다. C는 swantech 제7장의 균등 wet점 설명에 가중치와 동적 수심 검사의 구분이 없는 점이다. 같은 가중치에서는 균등 크기에 대응한다. |
+| R1:TN-183 | 병렬 성능·권고 | PDF 138,140–141/인쇄 130,132–133: 동적 부하 재분배가 불필요하다는 경험; speedup·scalability; Jacobi 반복 증가; 곡률 기준 권고. | — | H 코드 대조 대상 아님 | 특정 실험의 병렬 성능 주장과 권고이다. 성능의 관측값과 구현 알고리즘을 구분하는 H 판정이다. |
+| R1:TN-185 | METIS 비정렬 병렬 경로 | 제7장 swantech PDF 137–141쪽 / 인쇄 129–133쪽에는 METIS 비정렬 통신식이 없다.<br>swanimp PDF 19·22·25 및 웹 [METIS 지원](../raw/manuals/website/online_doc/swanimp/node13.html):48–53, [CMake 옵션](../raw/manuals/website/online_doc/swanimp/node17.html):79–81. `src/SwanCompUnstruc.ftn90:1350–1355`; `switch.pl:89,101`. | `src/SwanParallel.ftn90:483,504` `tpwgts = 1./real(np)`; `ierr = METIS_PartGraphKway (nv, ncon, xadj, adjncy, vwgt, vsize, adjw, np, tpwgts, ubvec, options, edgecut, ipown)` | C 문서 누락 | swanimp §3.2.5는 METIS를 통한 비정렬 격자 분할과 분산 메모리 실행을 이미 설명한다. `-metis`의 분할 활성화도 swanimp에 있다. C는 swantech 제7장에 가중치 균등 분할 `tpwgts = 1./real(np)`·`MPI_IRECV`/`MPI_ISEND`/`MPI_WAITALL` 교환·`if ( ACUPDA .and. PARLL ) then` 조건이 없는 점이다. 호출의 `!METIS`와 통신의 `!MPI`는 해당 빌드 선택에서 활성화된다. CMake의 METIS 기본값은 OFF이다. |
+| R7:H-139 | ADCIRC 기반 비구조 병렬화 | `website/modifications/modifications.htm:139` `Inclusion of parallel, unstructured mesh implementation utilizing the parallel infrastructure from ADCIRC.` | `src/SwanParallel.ftn90:504` `ierr = METIS_PartGraphKway (nv, ncon, xadj, adjncy, vwgt, vsize, adjw, np, tpwgts, ubvec, options, edgecut, ipown)`<br>`24a7d67:src/SwanParallel.ftn90:504` `    ierr = METIS_PartGraphKway (nv, ncon, xadj, adjncy, vwgt, vsize, adjw, np, tpwgts, ubvec, options, edgecut, ipown)` | A 판 차이 | 40.85의 ADCIRC 병렬 기반 도입 이후에 Git 코드는 독립 METIS 분할 경로를 추가했다(24a7d67, 2023-10-16). 현재 비정렬 MPI 절차는 내부 METIS 경로를 포함한다. METIS 경로는 METIS 빌드 옵션을 선택한 경우에 사용한다. |
+| R7:H-949p | Jacobi 비정상 효율 | `website/modifications/modifications.htm:949` `An option at compile level is available to switch from the wavefront to the block Jacobi approach for parallel MPI runs. The latter is very efficient for nonstationary computations. See Implementation Manual for more details.` | `src/CMakeLists.txt:17` `if( JAC )` | H 코드 대조 대상 아님 | 계산 효율 주장이다. 빌드 분기의 존재와 성능을 구분한다. |

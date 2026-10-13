@@ -4,11 +4,12 @@ topic: swan
 canonical_source: external
 external_source: "swantech.pdf Ch 2 §2.3.1 General concepts (p.13-19) + §2.3.2 Input by wind (p.19-21). Primary references: Phillips 1957·1960, Miles 1957, Hasselmann 1960·1962·1963·1973·1974·1985, Cavaleri-Malanotte-Rizzoli 1981, Snyder 1981, Komen 1984·1994, Janssen 1989·1991, Battjes-Janssen 1978, Eldeberky-Battjes 1995, WAMDI 1988, Wu 1982, Zijlema 2012, Van Vledder-Bottema 2003."
 citation_status: verified
-verification_method: "raw PDF p.13-21 (PDF page 21-29) 직접 read. Eq 2.27-2.37 LaTeX verbatim + 30+ references."
+verification_method: "raw PDF p.13-21 (PDF page 21-29) 직접 read. Eq 2.27-2.37 LaTeX verbatim + 30+ references. 2026-10-13 recovery 대조 보고서 R1–R8 반영"
 note_author: "Claude Opus 4.7 (1M context) raw PDF direct read"
 note_date: 2026-06-01
 verification_by: "Claude Opus 4.7 (1M context) — Eq 2.27-2.37 + references verbatim"
 verification_date: 2026-06-01
+last_source_check: 2026-10-13 (recovery 대조 반영)
 related:
   - models/SWAN/manual-notes/swan-tech-ch2-governing-equations.md
   - models/SWAN/manual-notes/swan-documentation-stack.md
@@ -19,7 +20,7 @@ related:
 
 # swantech Ch 2.3 §2.3.1-2.3.2 verified verbatim
 
-> swantech.pdf p.13-21 직접 read. SWAN의 모든 6 source/sink term의 **표준 식 + 30+ reference**. 본 위키 [[swan-tech-ch2-governing-equations]] §2.2.2 의 RHS S_tot 정의.
+> swantech PDF 21–29쪽 / 인쇄 13–21쪽의 원천항 개요와 바람 입력을 정리한다. 식 (2.27)은 천해의 기본 과정 6개를 분해한다. 식생·해빙·불규칙 해저 산란은 같은 문서의 별도 절에서 설명한다. [swan-tech-ch2-governing-equations](swan-tech-ch2-governing-equations.md)은 작용 평형식의 우변을 정리한다. [10-13 전수 검증 정정]
 
 ## 1. §2.3.1 General concepts — 6 processes (p.14-19)
 
@@ -114,12 +115,12 @@ $$S_{\text{ds,br}}(\sigma, \theta) = \frac{D_{\text{tot}}}{E_{\text{tot}}} E(\si
 **Exact Boltzmann integral**:
 - Algorithm: **WRT (Webb-Tracy-Resio)** developed by Resio 2001
 - Reprogrammed: **XNL** by Van Vledder (Van Vledder-Bottema 2003)
-- 본 위키 [[swan-xnl4-exact-quadruplet]] (mod_xnl4v5.ftn90)
+- 본 위키 [swan-xnl4-exact-quadruplet](../source-analysis/swan-xnl4-exact-quadruplet.md) (mod_xnl4v5.ftn90)
 
 **DIA (Discrete Interaction Approximation)** — Hasselmann 1985:
 - SWAN 표준
 - Quite successful for developing wave spectrum (Komen 1994)
-- 한계: uni-directional waves (DIA coefficient ≈ 0) + finite-depth (Hasselmann-Hasselmann 1981 JONSWAP scaling)
+- 단일 방향 파랑에서 거의 0이라는 설명은 실제 4파 상호작용 계수에 관한 것이다. 이를 DIA의 고정 계수 $C_{nl4}$가 0이라는 뜻으로 옮기지 않는다. (swantech PDF 26쪽 / 인쇄 18쪽)
 - **Multiple DIA**: Hashimoto 2002 (up to 6 wave number configurations 으로 정확도 ↑)
 
 #### Triad (shallow water)
@@ -148,7 +149,7 @@ $$U_*^2 = C_D U_{10}^2 \quad \text{(2.33)}$$
 
 $$C_D(U_{10}) = \begin{cases} 1.2875 \times 10^{-3}, & U_{10} < 7.5 \text{ m/s} \\ (0.8 + 0.065 U_{10}) \times 10^{-3}, & U_{10} \ge 7.5 \text{ m/s} \end{cases} \quad \text{(2.34)}$$
 
-**Zijlema 2012 (Eq 2.35)** — **since SWAN 41.01** (default 현행):
+**Zijlema 2012 (Eq 2.35)** — FIT 선택 경로. 이 코드의 기본 항력은 Wu이다. (`src/swanmain.ftn:1109` `IDRAG  = 1`; swanuse PDF 66쪽 / 인쇄 58쪽, PDF 69쪽 / 인쇄 61쪽)
 
 $$C_D(U_{10}) = (0.55 + 2.97 \tilde{U} - 1.49 \tilde{U}^2) \times 10^{-3}, \quad \tilde{U} = U_{10}/U_{\text{ref}}, \quad U_{\text{ref}} = 31.5 \text{ m/s} \quad \text{(2.35)}$$
 
@@ -162,13 +163,19 @@ with PM filter:
 
 $$H = \exp\left\{-\left(\frac{\sigma}{\sigma_{\text{PM}}^*}\right)^{-4}\right\}, \quad \sigma_{\text{PM}}^* = \frac{0.13 g}{28 U_*} \cdot 2\pi$$
 
+인쇄식은 그대로 인용한다. AGROW 미선택 시 계수는 0이다. (`src/swanmain.ftn:1484` `PWIND(31) = 0.`)
+구현 필터는 $g/(28U_*)$를 사용한다. (`src/swancom3.ftn:1749` `FPM =  GRAV / ( 28.0 * UFRIC )`)
+(2.36)의 필터 외에 하한과 고주파 감소를 적용한다. (`src/swancom3.ftn:1762` `ARGU = MIN (2., FPM / SIGMA)`; `src/swancom3.ftn:1776–1778`의 `FREQ1 .GT. 1.`·`FREQ1**(-3)`)
+
 - $\theta_w$ = wind direction
 - $\sigma_{\text{PM}}^*$ = fully developed Pierson-Moskowitz 1964 peak frequency (friction velocity 기준)
 - **Tolman 1992a 의 10^{-5}** → **10^{-3} 오타** (Tolman personal comm 1995 footnote)
 
 ### 2.5 Exponential growth B — 2 옵션
 
-#### Option 1: Komen 1984 (WAM Cycle 3, default)
+#### Option 1: Komen 1984 (WAM Cycle 3)
+
+기본 GEN3 바람·백파 조합은 WESTH이다. Komen과 FIT는 선택 가능한 경로이다. (`src/swanpre1.ftn:453` `INTEGER, SAVE :: LWINDM = 5`; `src/swanmain.ftn:1112` `IWCAP  = 7`; swanuse PDF 69쪽 / 인쇄 61쪽)
 
 $$B = \max\left[0, 0.25 \frac{\rho_a}{\rho_w} \left(28 \frac{U_*}{c_{\text{ph}}} \cos(\theta - \theta_w) - 1\right)\right] \sigma \quad \text{(2.37)}$$
 
@@ -183,21 +190,24 @@ quasi-linear wind-wave theory + BL + roughness length. Iterative Mastenbroek 199
 
 | Tech 식 | User cmd | 본 위키 |
 |---|---|---|
-| Eq 2.28-2.37 S_in | `WIND` + `GEN1/GEN2/GEN3` | [[swan-wind-formulations-implementation]] |
-| Eq 2.29 whitecapping | `WCAPPING` (Komen / Janssen / Van der Westhuysen) | [[swan-whitecapping]] |
+| Eq 2.28·2.32–2.37 S_in | `WIND` + `GEN1/GEN2/GEN3` | [swan-wind-formulations-implementation](../source-analysis/swan-wind-formulations-implementation.md) (swantech PDF 22·27–28쪽 / 인쇄 14·19–20쪽) [10-13 전수 검증 정정]
+| Eq 2.29 whitecapping | `WCAPPING KOMEN` / `WCAPPING AB`; Janssen 조합은 `GEN3 JANSSEN` | [swan-whitecapping](../source-analysis/swan-whitecapping.md) (swanuse PDF 66·71쪽 / 인쇄 58·63쪽) [10-13 전수 검증 정정]
 | Eq 2.30 bottom friction | `FRICTION` (JONSWAP / Collins / Madsen) | (없음) |
-| Eq 2.31 breaking | `BREAKING CON 0.73` (default γ Battjes-Stive) | (없음) |
-| S_nl4 exact (Eq 별도) | `QUADRUPL XNL` | [[swan-xnl4-exact-quadruplet]] |
-| S_nl4 DIA | `QUADRUPL` (default Hasselmann 1985) | [[swan-source-terms-implementation]] |
+| Eq 2.31 breaking | `BREAKING CONSTANT 1.0 0.73` | (없음) |
+| S_nl4 exact (Eq 별도) | `QUADRUPL 51` / `QUADRUPL 52` / `QUADRUPL 53` | [swan-xnl4-exact-quadruplet](../source-analysis/swan-xnl4-exact-quadruplet.md) |
+| S_nl4 DIA | `QUADRUPL` (default Hasselmann 1985) | [swan-source-terms-implementation](../source-analysis/wave/swan-source-terms-implementation.md) |
 | S_nl3 triad | `TRIAD LTA/SPB/FTIM/DCTA` | (없음) |
-| Multiple DIA | `QUADRUPL MDIA 6` | (없음, Hashimoto 2002) |
+| Multiple DIA | `QUADRUPL 4`와 별도 `MDIA` 명령 | (없음, Hashimoto 2002) |
+
+상수 쇄파 기본값의 명시 예는 `BREAKING CONSTANT 1.0 0.73`이다. 첫 수치는 $\alpha_{BJ}$이다. 둘째 수치는 $\gamma$이다. (`src/swanpre1.ftn:2380` `CALL INREAL ('ALPHA', PSURF(1), 'STA', 1.0)`; `src/swanpre1.ftn:2381` `CALL INREAL ('GAMMA', PSURF(2), 'STA', 0.73)`)
+XNL은 `QUADRUPL 51`·`52`·`53`으로 지정한다. Multiple DIA는 `QUADRUPL 4`와 별도 `MDIA` 명령으로 지정한다. (`src/swanpre1.ftn:3294`의 정수 `IQUAD`; `src/swanpre1.ftn:3152` `IF (KEYWIS('MDIA')) THEN`)
 
 ## 4. SWAN 41.x 기본값 변경 history
 
-- **41.01** (2014?): C_D Zijlema 2012 (Eq 2.35) **default 채택**
-- **41.80** (2021-09): Bragg scattering 추가 ([[swan-bragg-scattering]])
-- **41.85** (2019-01): IEM surfbeat ([[swan-surfbeat-iem]])
-- **41.90** (2021-06): QCM ([[swan-quasi-coherent]])
+- 41.01의 FIT 항력 기본값은 41.45 공개 커밋 `2980d1a`(2023-02-27)에서 Wu로 바뀌었다. (`2980d1a:src/swanmain.ftn:1096` `IDRAG  = 1`; `src/swanmain.ftn:1109` `IDRAG  = 1`; `website/modifications/modifications.htm:538`)
+- 배포판 41.51과 파일 내부 변경 번호 41.80을 구별한다. (`src/swanmain.ftn:965` `VERNUM = 41.51`; [swan-bragg-scattering](../source-analysis/swan-bragg-scattering.md))
+- **41.85** (2019-01): IEM surfbeat ([swan-surfbeat-iem](../source-analysis/swan-surfbeat-iem.md))
+- **41.90** (2021-06): QCM ([swan-quasi-coherent](../source-analysis/swan-quasi-coherent.md))
 
 ## 5. 핵심 references (Ch 2.3 인용 30+)
 
@@ -207,7 +217,7 @@ quasi-linear wind-wave theory + BL + roughness length. Iterative Mastenbroek 199
 - Janssen 1989, 1991a (WAM Cycle 4)
 - Cavaleri-Malanotte-Rizzoli 1981 (linear A)
 - Tolman 1992a (PM filter)
-- Wu 1982 (C_D), Zijlema 2012 (Eq 2.35 default since 41.01)
+- Wu 1982 ($C_D$), Zijlema 2012 (Eq 2.35 FIT 선택)
 - Pierson-Moskowitz 1964 (PM peak)
 - Mastenbroek 1993 (iterative U_*)
 - Yan 1987 (alternative wind input)
@@ -255,22 +265,40 @@ quasi-linear wind-wave theory + BL + roughness length. Iterative Mastenbroek 199
 - Booij 2009 (DCTA)
 - Komen et al. 1994 (book reference)
 
-## 6. 한계
+## 6. 원천항 상세 연결
 
-- §2.3 의 §2.3.3 Dissipation (deep treatment, Eq 2.38+) + §2.3.4 Nonlinear (DIA Eq 정확 식) 미커버 — 다음 chapter notes 예정
-- §2.3.5 Vegetation + §2.3.6 Sea ice + §2.3.7 Bragg + §2.3.8 1st/2nd-gen — 다음
-- Janssen 1991a quasi-linear theory 의 정확 식 미인용 (Eq 2.32 의 B option 2 = Janssen Cycle 4 식 별도)
-- Van der Westhuysen 2007 alternative whitecapping 식 미인용
-- 30+ reference 의 DOI/페이지 별도 cross-check 필요
+- [swan-tech-ch2-dissipation-detailed](swan-tech-ch2-dissipation-detailed.md) — §2.3.3 소산
+- [swan-tech-ch2-nonlinear-detailed](swan-tech-ch2-nonlinear-detailed.md) — §2.3.4 4파·3파
+- [swan-tech-ch2-vegetation-ice-bragg-gen12](swan-tech-ch2-vegetation-ice-bragg-gen12.md) — §2.3.5–2.3.8 식생·얼음·Bragg·GEN1/2
 
 ## 7. 연결
 
-- [[swan-tech-ch2-governing-equations]] — §2.1-2.2 (Eq 2.16 의 RHS S_tot 의 정의)
-- [[swan-documentation-stack]] — 4 PDFs TOC
-- [[swan-wind-formulations-implementation]] — Eq 2.32-2.37 implementation
-- [[swan-whitecapping]] — Eq 2.29 implementation
-- [[swan-xnl4-exact-quadruplet]] — exact S_nl4 via Van Vledder XNL
-- [[swan-source-terms-implementation]] — DIA implementation
-- [[swan-st6-babanin-implementation]] — ST6 (Yan 1987 + Van der Westhuysen 2007) physics package
-- [[swan-bragg-scattering]] — Bragg (§2.3.7)
-- [[swan-quasi-coherent]] — QCM (§2.7, scattering 별도)
+- [swan-tech-ch2-governing-equations](swan-tech-ch2-governing-equations.md) — §2.1-2.2 (Eq 2.16 의 RHS S_tot 의 정의)
+- [swan-documentation-stack](swan-documentation-stack.md) — 4 PDFs TOC
+- [swan-wind-formulations-implementation](../source-analysis/swan-wind-formulations-implementation.md) — Eq 2.32-2.37 implementation
+- [swan-whitecapping](../source-analysis/swan-whitecapping.md) — Eq 2.29 implementation
+- [swan-xnl4-exact-quadruplet](../source-analysis/swan-xnl4-exact-quadruplet.md) — exact S_nl4 via Van Vledder XNL
+- [swan-source-terms-implementation](../source-analysis/wave/swan-source-terms-implementation.md) — DIA implementation
+- [swan-st6-babanin-implementation](../source-analysis/swan-st6-babanin-implementation.md) — ST6 바람 입력은 `SWIND_DBYB`이다. ST6 백파는 `CALC_SDS`이다. Yan 입력과 Van der Westhuysen 백파의 조합은 WESTH이다. (swantech PDF 33쪽 / 인쇄 25쪽; swanuse PDF 69쪽 / 인쇄 61쪽) `src/swancom1.ftn:7489`는 `CALL SWIND_DBYB`이다. `src/swancom2.ftn:2859`는 `CALL CALC_SDS`이다. [10-13 전수 검증 보완]
+- [swan-bragg-scattering](../source-analysis/swan-bragg-scattering.md) — Bragg (§2.3.7)
+- [swan-quasi-coherent](../source-analysis/swan-quasi-coherent.md) — QCM (§2.7, scattering 별도)
+
+
+## 문서와 코드 차이 (10-13 대조)
+
+문서 판: SWAN Cycle III 41.51 매뉴얼; 웹 수정 이력·패치. 코드 판: VERNUM 41.51, 원본 저장소 HEAD 43e9bbb 2026-07-13 patch B.
+
+대조 보고서: [R2](../../../_staging/recovery/compare/swan-theory-sources-vs-code.md) · [R7](../../../_staging/recovery/compare/swan-implementation-history-vs-code.md).
+
+| 행 ID | 항목 | 문서 원문 | 코드 원문 | 결론 | 결론 문장 |
+|---|---|---|---|---|---|
+| R2:SS-036 | 전체 원천항과 바람 입력 · swantech PDF 28쪽 / 인쇄 20쪽, (2.36) | swantech PDF 28쪽 / 인쇄 20쪽, (2.36) $A={1.5\times10^{-3}\over2\pi g^2}(U_*\max[0,\cos(\theta-\theta_w)])^4H$, $H=\exp\{-(\sigma/\sigma_{PM}^*)^{-4}\}$, $\sigma_{PM}^*={0.13g\over28U_*}2\pi$. | `src/swancom3.ftn:1749` `FPM =  GRAV / ( 28.0 * UFRIC )`; `src/swancom3.ftn:1750` `TEMP1 = PWIND(31) / ( GRAV**2 * 2. * PI )`; `src/swancom3.ftn:1763` `FILTER = EXP ( - ARGU**4 )`; `src/swancom3.ftn:1772` `TEMP3  = ( UFRIC *  MAX( 0. , COSDIF))**4`; `src/swancom3.ftn:1773` `SWINEA = MAX( 0. , TEMP2 * TEMP3 * FILTER )` | C | $A$의 계수·방향 의존성은 `AGROW` 설정 시 같다. 구현의 필터 주파수는 문서 값의 $1/(0.13\,2\pi)$배이다. `src/swancom3.ftn:1611`–1613 주석도 (g/(28U_*))를 명시한다. 해석: 코드가 채택한 필터 주파수의 변경을 문서가 적지 않았다. 추가 절단은 SS-502이다. |
+| R2:SS-038 | 전체 원천항과 바람 입력 · swantech PDF 29쪽 / 인쇄 21쪽, (2.38) | swantech PDF 29쪽 / 인쇄 21쪽, (2.38) $B=\beta(\rho_a/\rho_w)(U_*/c_{ph})^2\max[0,\cos(\theta-\theta_w)]^2\sigma$. | `src/swancom3.ftn:2326` `ZALP   = 0.011`; `src/swancom3.ftn:2609` `XFAC2  = ( UFRIC / CW1 + ZALP )**2`; `src/swancom3.ftn:2619` `SWINEB = RHOAW * BETA * XFAC2 * COS2 * SIGMA` | C | 코드가 ((U_*/c_{ph}+0.011)^2)를 사용한다. 같은 보정은 파랑 응력 계산의 2388–2389행에도 있다. |
+| R2:SS-039 | 전체 원천항과 바람 입력 · swantech PDF 29쪽 / 인쇄 21쪽, (2.39) | swantech PDF 29쪽 / 인쇄 21쪽, (2.39) $\beta=(1.2/\kappa^2)\lambda\ln^4\lambda$, $\lambda\le1$; $\lambda=gz_e e^r/c_{ph}^2$, $r=\kappa c/\lvert U_*\cos(\theta-\theta_w)\rvert$. 본문은 $\lambda>1$이면 $\beta=0$, $\kappa=0.41$로 정한다. | `src/swancom3.ftn:2324` `BETAMX = 1.2`; `src/swancom3.ftn:2325` `F1     = BETAMX / XKAPPA**2`; `src/swancom3.ftn:2611` `IF ( COS1 .GT. 0.01 ) THEN`; `src/swancom3.ftn:2612` `ZARG = XKAPPA / ( (UFRIC / CW1 + ZALP ) * COS1 )`; `src/swancom3.ftn:2614` `IF ( ZLOG .LT. 0. ) BETA = F1 * EXP (ZLOG) * ZLOG**4`; `src/swanmain.ftn:1476` `PWIND(15) = 0.41` | C | 로그 공간의 Miles 함수는 같다. $r$의 분모에는 `ZALP` 보정이 있다. 코드는 `COS1>0.01`에서만 성장률을 계산한다. $\lambda=1$에서 두 표현은 모두 0이다. |
+| R2:SS-201 | 전체 원천항과 바람 입력 · swantech PDF 28쪽 / 인쇄 20쪽, 본문 `Since version 41.01, the SWAN model employs the drag formulation as given by Eq. (2.35).` | swantech PDF 28쪽 / 인쇄 20쪽, 본문 `Since version 41.01, the SWAN model employs the drag formulation as given by Eq. (2.35).` | `src/swanmain.ftn:1109` `IDRAG  = 1`; `src/swanpre1.ftn:3048` `CALL INKEYW ('STA','WU')`; `src/swanpre1.ftn:3052` `IDRAG = 2`는 `FIT` 선택 안에 있다 | C | swantech PDF 28쪽 / 인쇄 20쪽은 FIT 식을 사용한다고 적지만 그 문장에는 기본값이라는 한정이 없다. 현재 기본값 Wu는 swanuse PDF 66쪽 / 인쇄 58쪽·swanuse PDF 69쪽 / 인쇄 61쪽과 코드가 일치한다. FIT도 선택 가능한 구현으로 남는다. 따라서 C의 범위는 swantech PDF 28쪽 / 인쇄 20쪽에 현재 선택·기본값 설명이 빠진 점이다. `2980d1a`(2023-02-27)는 `IDRAG`를 2에서 1로 바꿨다. 공개 41.51 `7ee8981`도 1이다. 이 이력만으로 현재 매뉴얼의 해당 문장을 기본값 오기로 단정하지 않는다. [10-13 결론 검증 정정] [10-13 결론 검증 보완] |
+| R2:SS-701 | 노트 · manual-notes/swan-tech-ch2-sources-sinks.md:151 | `manual-notes/swan-tech-ch2-sources-sinks.md:151` `(default 현행)`; 171 `Komen 1984 (WAM Cycle 3, default)`. | `src/swanmain.ftn:1109` `IDRAG  = 1`; `src/swanpre1.ftn:453` `INTEGER, SAVE :: LWINDM = 5`; `src/swanmain.ftn:1112` `IWCAP  = 7` | B | 이 코드의 기본 항력은 Wu이다. 기본 GEN3 바람·백파 조합은 WESTH이다. Komen과 FIT는 선택 가능한 경로이다. [10-13 결론 검증 보완] |
+| R2:SS-702 | 노트 · manual-notes/swan-tech-ch2-sources-sinks.md:159 | `manual-notes/swan-tech-ch2-sources-sinks.md:159`의 $1.5\,10^{-3}$; 163의 $\sigma_{PM}^*=.13g\,2\pi/(28U_*)$. | `src/swanmain.ftn:1484` `PWIND(31) = 0.`; `src/swancom3.ftn:1749` `FPM = GRAV / ( 28.0 * UFRIC )` | C | 인쇄식은 그대로 인용한다. 구현 설명에는 AGROW 미선택 시 계수 0을 적는다. 구현 필터는 $g/(28U_*)$를 사용한다고 적는다. 고주파 절단도 별도로 적는다. |
+| R2:SS-703 | 노트 · manual-notes/swan-tech-ch2-sources-sinks.md:274 | `manual-notes/swan-tech-ch2-sources-sinks.md:274` `ST6 (Yan 1987 + Van der Westhuysen 2007) physics package`; `manual-notes/swan-tech-ch2-dissipation-detailed.md:208`의 같은 ST6 연결 설명. | `src/swanpre1.ftn:2985`–2986 `based on work of` / `Donelan, Babanin, Tsagareli and others`; `src/swancom1.ftn:7489` `CALL SWIND_DBYB`; `src/swancom2.ftn:2859` `CALL CALC_SDS` | B | Yan 입력과 Van der Westhuysen 백파의 조합은 WESTH이다. ST6 바람 입력은 `SWIND_DBYB`이다. ST6 백파는 `CALC_SDS`이다. [10-13 결론 검증 보완] [10-13 전수 검증 보완]
+| R2:SS-704 | 노트 · manual-notes/swan-tech-ch2-sources-sinks.md:122 | `manual-notes/swan-tech-ch2-sources-sinks.md:122` `uni-directional waves (DIA coefficient ≈ 0)`. | — | B | 단일 방향 파랑에서 거의 0이라는 설명은 실제 4파 상호작용 계수에 관한 것이다. 이를 DIA의 고정 계수 $C_{nl4}$가 0이라는 뜻으로 옮기지 않는다. |
+| R2:SS-705 | 노트 · manual-notes/swan-tech-ch2-sources-sinks.md:189 | `manual-notes/swan-tech-ch2-sources-sinks.md:189` `BREAKING CON 0.73`. | `src/swanpre1.ftn:2380` `CALL INREAL ('ALPHA', PSURF(1), 'STA', 1.0)`; `src/swanpre1.ftn:2381` `CALL INREAL ('GAMMA', PSURF(2), 'STA', 0.73)` | B | 상수 쇄파 기본값의 명시 예는 `BREAKING CONSTANT 1.0 0.73`이다. 첫 수치는 $\alpha_{BJ}$이다. 둘째 수치는 $\gamma$이다. [10-13 결론 검증 보완] |
+| R7:H-538 | FIT·JONSWAP 기본값 | `website/modifications/modifications.htm:538` `For computing wind drag the second order polynomial fit as described in this article is the default instead of the well-known Wu (1982) parameterization. At the same time the value of the Jonswap bottom friction is set to 0.038 m²/s³. This is default irrespective of swell and wind-sea conditions.` | `src/swanmain.ftn:1109` `IDRAG  = 1                                                          42.00 41.49 41.33`; 이력: `122b595:src/swanmain.ftn:1096` `IDRAG  = 1                                                          42.00 41.49 41.33`; `122b595:src/swanmain.ftn:1383` `PBOT(3)   = 0.038                                                   41.49`; `2980d1a:src/swanmain.ftn:1096` `IDRAG  = 1                                                          42.00 41.49 41.33`; 변경·대조 커밋: `2980d1a 2023-02-27 initial release (v 41.45)`; `git show 2980d1a -- src/swanmain.ftn`의 변경은 `IDRAG  = 2`에서 `IDRAG  = 1`이다. `src/swanmain.ftn:1396` `PBOT(3)   = 0.038` | A 판 차이 | 41.01의 FIT 항력 기본값은 41.45 공개 커밋 `2980d1a`(2023-02-27)에서 Wu로 바뀌었다. JONSWAP 바닥 마찰 기본값 0.038은 현재도 유지된다. [10-13 결론 검증 보완] [10-13 git 이력 판정] |

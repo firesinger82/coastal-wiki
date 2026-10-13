@@ -7,7 +7,8 @@ page_offset_applied: false
 topic: waves
 canonical_source: self
 citation_status: verified
-verification_method: "AI cross-reference: textbook/md/Waves-Holthuijsen2007.md Ch.8 §8.4 + Ch.9 §9.3 직접 인용. Holthuijsen이 SWAN 공동 개발이라 본 책이 algorithmic canonical."
+verification_method: "2026-10-13 추가·수정 줄을 swantech.pdf PDF 25·59–60쪽, swanuse.pdf PDF 65–66·69·74쪽, 현재 SWAN 코드 및 R2:SS-741–743의 최종 결론과 대조했다." # [10-13 전수 검증 정정]
+last_source_check: "2026-10-13 (recovery 대조 반영)"
 note_author: "Claude Opus 4.7 (1M context)"
 note_date: 2026-05-21
 verification_by: "Claude Opus 4.7 (1M context) — cross-ref"
@@ -58,9 +59,8 @@ S_in(σ, θ) = A + B · E(σ, θ)
 핵심 파라미터: **U_*/c** (마찰 속도 / 위상 속도). 천해에서 c 감소 → U/c 증가 → S_in 증가 (Ch.8 §8.4.3).
 
 **SWAN 옵션**:
-- `GEN1`: Komen et al. (1984)
-- `GEN2`: 동상 (개선)
-- `GEN3`: Janssen (1991) — 표준
+
+GEN1/2는 포화 스펙트럼 완화 모형이다. GEN3는 여러 바람·백파 선택을 제공한다. 현재 기본 조합은 WESTH이다. (swantech PDF 59–60쪽 / 인쇄 51–52쪽의 포화 스펙트럼·완화식; swanuse PDF 65–66쪽 / 인쇄 57–58쪽 및 PDF 69쪽 / 인쇄 61쪽; `src/swanpre1.ftn:2907` `CALL INKEYW ('STA', 'WESTH')`; R2:SS-741) [10-13 전수 검증 보완]
 
 ### 2.2 S_nl4 — Quadruplet Wave–Wave Interactions (§9.3.3 p.292, Ch.8 §8.4.4 p.287-288)
 
@@ -109,7 +109,7 @@ S_wc(σ, θ) = -Γ · σ̃ · (k/k̃) · E(σ, θ)
 
 Γ = steepness 의존 계수 (Komen 1984 또는 van der Westhuysen 2007). 진폭이 크면 무너짐 — Stokes 한계 (H/L ≈ 0.14) 근처에서 폭증.
 
-SWAN 입력: `WCAP KOMEN` (기본) 또는 `WCAP WESTH`.
+현재 기본 조합은 WESTH이다. (swanuse PDF 69쪽 / 인쇄 61쪽; `src/swanpre1.ftn:2907` `CALL INKEYW ('STA', 'WESTH')`; R2:SS-741)
 
 #### 2.4.2 Bottom Friction (천해)
 
@@ -118,20 +118,21 @@ S_bf(σ, θ) = -C_bf · (σ²/(g²·sinh²(kh))) · E(σ, θ)
 ```
 
 C_bf 계수 (JONSWAP/Madsen/Collins):
-- JONSWAP: C_bf = 0.067 (sandy bottom, 표준)
+- 현재 JONSWAP 마찰 기본 계수는 $.038\,m^2s^{-3}$이다. (swanuse PDF 74쪽 / 인쇄 66쪽; `src/swanmain.ftn:1396` `PBOT(3) = 0.038`; R2:SS-742)
 - Madsen: roughness 기반
 - Collins: drag coefficient 기반
 
-SWAN 입력: `FRICTION JONSWAP 0.067` 등.
+`FRICTION JONSWAP 0.067`은 .067을 사용할 수 있는 입력 예이다. 현재 기본값은 .038이다. (swanuse PDF 74쪽 / 인쇄 66쪽; `src/swanmain.ftn:1396` `PBOT(3) = 0.038`; `src/swanpre1.ftn:2556–2558` `CALL IGNORE ('CON')`; `CALL INREAL('CFJON',PBOT(3),'UNC',0.)`; R2:SS-742) [10-13 전수 검증 보완]
 
 #### 2.4.3 Depth-Induced Surf-Breaking (천해 한계)
 
 Battjes & Janssen (1978) **statistical breaker model**:
 ```
-S_brk(σ, θ) = -D_tot / E_tot · E(σ, θ)
+S_brk(σ, θ) = D_tot / E_tot · E(σ, θ)
 ```
 
-- D_tot = 평균 dissipation rate
+- 매뉴얼 기호는 $D_{tot}<0$이다. (swantech PDF 25쪽 / 인쇄 17쪽 원문 `Dtot < 0`; R2:SS-743)
+- 소산 크기를 양수 $D_{loss}=-D_{tot}>0$로 정의하면 $S_{br}=-D_{loss}E/E_{tot}$이다. (swantech PDF 25쪽 / 인쇄 17쪽, 식 (2.31); R2:SS-743) [10-13 전수 검증 보완]
 - 쇄파 부분 Q_b: H_rms이 H_max로 truncated 가정 (Rayleigh)
 - H_max = γ · D (D = set-up 포함 총수심; **SWAN 기본 γ = 0.73** — holthuijsen2007 §9.3.4. ※0.78 은 천해 개별파 한계비(H_b/h_b, Weggel 문맥)로 별개 — 혼동 주의)
 
@@ -233,4 +234,16 @@ STOP
 - 외부:
   - Holthuijsen (2007) Ch.9
   - Booij, Ris, Holthuijsen (1999) seminal paper
-  - SWAN: [https://swanmodel.sourceforge.io/](https://swanmodel.sourceforge.io/)
+  - [SWAN 공식 자료](../web-refs/swan-official-resources.md)
+
+## 문서와 코드 차이 (10-13 대조)
+
+문서 판: SWAN Cycle III 41.51 매뉴얼; 웹 수정 이력·패치. 코드 판: VERNUM 41.51, 원본 저장소 HEAD 43e9bbb 2026-07-13 patch B.
+
+확정 결론과 원문 인용: [R2](../../../_staging/recovery/compare/swan-theory-sources-vs-code.md#5-차이-결론). 아래 결론 문장은 R2의 AI 해석이다. 기존 노트 줄 번호는 반영 전 HEAD 기준이다. [10-13 전수 검증 보완]
+
+| 행 ID | 항목 | 문서 원문 | 코드 원문 | 결론 | 결론 문장 |
+|---|---|---|---|---|---|
+| R2:SS-741 | 노트 · manual-notes/swan-action-balance.md:61 | 기존 노트 `GEN1`: Komen et al. (1984); `GEN3`: Janssen (1991) — 표준; `WCAP KOMEN` (기본). swanuse PDF 65–66쪽 / 인쇄 57–58쪽 및 PDF 69쪽 / 인쇄 61쪽. | `src/swanpre1.ftn:2907` `CALL INKEYW ('STA', 'WESTH')` | B | 해석: GEN1/2는 포화 스펙트럼 완화 모형이다. GEN3는 여러 바람·백파 선택을 제공한다. 현재 기본 조합은 WESTH이다. |
+| R2:SS-742 | 노트 · manual-notes/swan-action-balance.md:121 | 기존 노트 `C_bf = 0.067 (sandy bottom, 표준)`. swanuse PDF 74쪽 / 인쇄 66쪽은 JONSWAP 기본값 .038을 명시한다. | `src/swanmain.ftn:1396` `PBOT(3) = 0.038` | B | 해석: 현재 JONSWAP 마찰 기본 계수는 $.038\,m^2s^{-3}$이다. .067을 사용할 수 있는 입력 예와 현재 기본값을 구별한다. |
+| R2:SS-743 | 노트 · manual-notes/swan-action-balance.md:131 | 기존 노트 `S_brk(σ, θ) = -D_tot / E_tot · E(σ, θ)`. swantech PDF 25쪽 / 인쇄 17쪽 원문 `Dtot < 0`. | `src/swancom2.ftn:2114` `DBLE(QB) * DBLE(FMEAN) / BB`<br>`src/swancom2.ftn:2120` `SURFA0 = SbrD`<br>`src/swancom2.ftn:2121` `SURFA1 = WS + SbrD`<br>`src/swancom2.ftn:2188` `IMATDA(ID,IS) = IMATDA(ID,IS) + REAL(SURFA1)`<br>`src/swancom2.ftn:2190` `IMATRA(ID,IS) = IMATRA(ID,IS) + REAL(DIS0)` | F | 해석: 소산 크기를 양수 $D_{loss}=-D_{tot}>0$로 정의하면 $S_{br}=-D_{loss}E/E_{tot}$이다. 매뉴얼 기호 $D_{tot}<0$를 유지하면 앞의 음수를 제거한다. |

@@ -3,7 +3,8 @@ title: "SWAN Garden-Sprinkler Effect correction — SwanGSECorr.ftn90 verified"
 topic: swan
 canonical_source: self
 citation_status: verified
-verification_method: "raw `models/SWAN/raw/source_code/swan/src/SwanGSECorr.ftn90` 직접 read (280 lines, line 1-100 subroutine header + argument 변수 정의). Tech §3.8 refraction approximation + §8.6 diffusion-like terms (p.146) + Booij-Holthuijsen 1987 GSE 이론."
+last_source_check: "2026-10-13 (recovery 대조 반영)"
+verification_method: "SwanGSECorr.ftn90의 전체 280줄과 인용 호출·정렬 GSE·회절 비교 실행문을 대조했다. swantech §3.2.1–3.2.2의 PDF 81–83쪽과 §8.6의 PDF 154쪽을 대조했다. R1 최종 결론과 R8:V12를 대조했다." # [10-13 전수 검증 정정]
 note_author: "Claude Opus 4.7 (1M context) raw source direct read"
 note_date: 2026-06-01
 verification_by: "Claude Opus 4.7 (1M context) — full header verbatim + 변수 정의 발췌"
@@ -83,15 +84,19 @@ SWAN 의 spectral propagation 은 **discrete directional bins** (MDC, 보통 36 
 
 해결: **wave-age 의존 spatial diffusion** 항을 추가 → 인접 directional bin 의 action density 가 smooth하게 spread.
 
-$$D_{ss} = f_s(\text{wave age}, \Delta\theta, c_g), \quad D_{nn} = f_n(\text{wave age}, \Delta\theta, c_g)$$
+$$D_{ss}=(\Delta c_g)^2\,\mathrm{WAVAGE}/12$$
 
-여기서 wave-age = $c_p / U_{10}$ (peak phase speed / wind speed). 어린 wave (low age) 는 directional spread 큼 → 작은 diffusion. 늙은 wave (high age) 는 좁은 spread → 큰 diffusion 필요.
+$$D_{nn}=(c_g\Delta\theta)^2\,\mathrm{WAVAGE}/12$$
 
-### 4.3 큰 격자 GSE 의 심각성
+근거: swantech PDF 81–82쪽 / 인쇄 73–74쪽; `src/swancom5.ftn:2930` `DSS = DCG**2*WAVAGE/12.`; `src/swancom5.ftn:2931` `DNN = (CGO(IS,IC)*DDIR)**2 * WAVAGE/12.`.
 
-Tech §3.8.5 (p.101) "**The problem with refraction on coarse grids**": 격자 ≥ $L_{wave}/4$ 일 때 GSE 심함. 본 노트의 GSE correction이 coarse grid에서도 안정적 결과 보장.
+`WAVAGE`는 GSE의 전파 시간이다. 근거: swantech PDF 81쪽 / 인쇄 73쪽의 $D_{ss}=\Delta c_g^2T/12$; `src/swancom5.ftn:2930` `DSS = DCG**2*WAVAGE/12.`.
 
-## 5. Algorithm overview (추정 line 110-280)
+### 4.3 기법 선택 권고
+
+적용 규모별 예시와 기법 선택 권고이다. GSE 보정은 기본으로 켜지지 않는다. 근거: swantech PDF 83쪽 / 인쇄 75쪽; `src/swanmain.ftn:1184`: `WAVAGE = 0.`; `src/SwanTranspAc.ftn90:135`의 `WAVAGE > 0.` 호출 조건. [10-13 전수 검증 보완]
+
+## 5. Algorithm overview
 
 1. **Loop over vertices** (`ivert`) — unstructured grid
 2. Cell 별 (`icell/jcell`) action density gradient (`dac2dx/dac2dy`) 계산
@@ -101,19 +106,34 @@ Tech §3.8.5 (p.101) "**The problem with refraction on coarse grids**": 격자 �
 
 `carea` (double precision 2×centroid dual area) 사용 → centroid dual control volume 방식 (Tech §8.3.1 discretization procedure).
 
+비정렬 GSE는 현재 갱신 중인 `ac2`를 사용한다. 정렬 S&L의 이전 시간 `AC1` 보정과 다르다. 경계 절점에는 보정을 적용하지 않는다. 근거: `src/SwanGSECorr.ftn90:127,181,271`: `if ( vert(ivert)%atti(VMARKER) == 1 ) return`; `dac2dx = 0.5*( ac2(id,is,v(1))*(ycugrd(v(2))-ycugrd(v(3))) + &`; `rhs  (id,is  ) = rhs  (id,is  ) + dgxdx + dgydy`. `src/SwanGSECorr.ftn90:62`는 `ac2`를 현재 시간 수준으로 정의한다. 정렬 S&L의 근거는 `src/swancom5.ftn:3000–3010`의 `AC1` 차분이다. [10-13 전수 검증 보완]
+
+GSE는 현재 절점의 확산 텐서를 둘러싼 모든 셀에 공통 적용한다. 회절처럼 셀 중심에서 계수를 다시 평균하지 않는다. 문서는 이 경로 차이를 적지 않는다. 근거: `src/SwanGSECorr.ftn90:140,143–144,200,238`: `dcg = 0.5 * abs(cgo(is+1,1)-cgo(is-1,1))`; `dss = dcg**2*WAVAGE/12.`; `dnn = (cgo(is,1)*DDIR)**2 * WAVAGE/12.`; `dgx0 = dxx*dac2dx + dxy*dac2dy`; `dgx1 = dxx*dac2dx + dxy*dac2dy`. 회절 비교의 근거는 `src/SwanDiffPar.ftn90:252–253,295–296`의 셀별 군속도·파수 평균과 276·319행의 확산 기울기다. [10-13 전수 검증 보완]
+
 ## 6. Cross-references
 
-- [[swan-documentation-stack]] §3.8 + §8.6 diffusion-like terms
-- [[swan-propagation-implementation]] — propagation 표준 (GSE 미적용 path)
-- [[swan-action-balance]] — action density 정의
-- [[swan-source-coverage-audit]] §3.1 신규 발견
-- [[swan-bragg-scattering]] / [[swan-quasi-coherent]] / [[swan-surfbeat-iem]] — 다른 신규 module 과 함께 SWAN 41.x 추가
+- [swan-documentation-stack](../manual-notes/swan-documentation-stack.md) — GSE의 근거는 swantech §3.2.1–3.2.2와 §8.6이다. 해당 본문은 PDF 81–83·154쪽이다. [10-13 전수 검증 정정]
+- [swan-propagation-implementation](swan-propagation-implementation.md) — 지리 공간·스펙트럼 공간의 전파 구현. [10-13 전수 검증 정정]
+- [swan-action-balance](../manual-notes/swan-action-balance.md) — action density 정의
+- [swan-source-coverage-audit](swan-source-coverage-audit.md) §3.1 신규 발견
+- [swan-bragg-scattering](swan-bragg-scattering.md) / [swan-quasi-coherent](swan-quasi-coherent.md) / [swan-surfbeat-iem](swan-surfbeat-iem.md) — Bragg·준결맞음·surfbeat 구현 노트. [10-13 전수 검증 정정]
 - Author: Marcel Zijlema (41.00, 2009-02) — TU Delft SWAN team lead
 - 원논문 추정: **Booij·Holthuijsen 1987** "Propagation of ocean waves in discrete spectral wave models" *J. Comput. Phys.* 68, 307-326
 
 ## 7. 한계
 
-- 본 노트는 line 1-110 (header + arguments + local var 정의) 만 verified. 실제 GSE diffusion 식 (line 110-280) deep 미실시.
-- User cmd 명시 없음 → SWAN 활성 조건 별도 확인 (always active? specific OPTION? config file?)
-- Wave-age 정의의 정확 식 (`dnn(c_p, U_10, Δθ)`) 별도 deep 필요
+- 비정렬 GSE는 현재 갱신 중인 `ac2`를 사용한다. 정렬 S&L의 이전 시간 `AC1` 보정과 다르다. 경계 절점에는 보정을 적용하지 않는다. 근거: `src/SwanGSECorr.ftn90:127` `if ( vert(ivert)%atti(VMARKER) == 1 ) return`; `src/SwanGSECorr.ftn90:181` `dac2dx = 0.5*( ac2(id,is,v(1))*(ycugrd(v(2))-ycugrd(v(3))) + &`. `src/SwanGSECorr.ftn90:62`는 `ac2`를 현재 시간 수준으로 정의한다. 정렬 S&L의 근거는 `src/swancom5.ftn:3000–3010`의 `AC1` 차분이다. [10-13 전수 검증 보완]
+- `src/SwanTranspAc.ftn90:135` `if ( WAVAGE > 0. ) call SwanGSECorr ( rhs, ac2, cgo, spcdir, idcmin, idcmax, isslow, isstop, trac0 )`. 근거: [SWAN 호출 흐름](../../../_staging/recovery/flow/SWAN-callflow.md), V12.
+- `WAVAGE`는 GSE의 전파 시간이다. 근거: swantech PDF 81쪽 / 인쇄 73쪽; `src/swancom5.ftn:2930` `DSS = DCG**2*WAVAGE/12.`.
 - Booij-Holthuijsen 1987 원논문 DOI 검증 필요
+
+## 문서와 코드 차이 (10-13 대조)
+
+문서 판: SWAN Cycle III 41.51 매뉴얼; 웹 수정 이력·패치. 코드 판: VERNUM 41.51, 원본 저장소 HEAD 43e9bbb 2026-07-13 patch B.
+
+| 행 ID | 항목 | 문서 원문 | 코드 원문 | 결론 | 결론 문장 |
+|---|---|---|---|---|---|
+| R1:TC-008 | 비정렬 GSE의 시간 수준과 경계점 | — (문서 누락) | `src/SwanGSECorr.ftn90:127,181,271`: `if ( vert(ivert)%atti(VMARKER) == 1 ) return`; `dac2dx = 0.5*( ac2(id,is,v(1))*(ycugrd(v(2))-ycugrd(v(3))) + &`; `rhs  (id,is  ) = rhs  (id,is  ) + dgxdx + dgydy`. `src/SwanGSECorr.ftn90:62`는 `ac2`를 현재 시간 수준으로 정의한다. 정렬 S&L의 근거는 `src/swancom5.ftn:3000–3010`의 `AC1` 차분이다. | C 문서 누락 | 비정렬 GSE는 현재 갱신 중인 `ac2`를 사용한다. 정렬 S&L의 이전 시간 `AC1` 보정과 다르다. 경계 절점에는 보정을 적용하지 않는다. [10-13 전수 검증 보완] |
+| R1:TN-055 | GSE 교차차분 | swantech PDF 82쪽 / 인쇄 74쪽, 번호 없음: $D_{xy}(N_{i,j}-N_{i-1,j}-N_{i,j-1}+N_{i-1,j-1})^{n-1}/(\Delta x\Delta y)$. | `src/swancom5.ftn:3003–3008`: `!           old method`; 기존 식은 주석이다. `!           new method`; `D12AC = 0.25*(AC1(ID,IS,IND12) - AC1(ID,IS,IND11)`; `&                   -AC1(ID,IS,IND13) + AC1(ID,IS,IND10))`. | B 문서 오기 | 해석: 활성 식은 네 대각 이웃의 중심 교차차분이다. 문서는 주석으로 남은 구식을 적는다. 구식도 해당 절점에서 2차 중심차분이 아니다. 의도 변경 주석이 있으므로 코드 결함으로 판정하지 않는다. |
+| R1:TN-057 | GSE 안정성·규모별 권고 | swantech PDF 83쪽 / 인쇄 75쪽, §3.2.2 및 번호 없는 권고: $\mu\approx1/2,\ Q\le1/4,\ \Delta\theta\sim10^\circ,\ \bar L/\Delta x\sim200$; 지역 $\mu=\mathcal O(1)$; 국소 $\mathcal O(10-100)$. | `src/swanmain.ftn:1184`: `WAVAGE = 0.`. | H 코드 대조 대상 아님 | 적용 규모별 예시와 기법 선택 권고이다. GSE 보정은 기본으로 켜지지 않는다. |
+| R1:TN-218 | 문서 식 (8.39) | swantech PDF 154쪽 / 인쇄 146쪽, (8.39)의 GSE 적용도 “$\kappa$ as given in the centroid”. | `src/SwanGSECorr.ftn90:140,143–144,200,238`: `dcg = 0.5 * abs(cgo(is+1,1)-cgo(is-1,1))`; `dss = dcg**2*WAVAGE/12.`; `dnn = (cgo(is,1)*DDIR)**2 * WAVAGE/12.`; `dgx0 = dxx*dac2dx + dxy*dac2dy`; `dgx1 = dxx*dac2dx + dxy*dac2dy`. 회절 비교의 근거는 `src/SwanDiffPar.ftn90:252–253,295–296`의 셀별 군속도·파수 평균과 276·319행의 확산 기울기다. | C 문서 누락 | GSE는 현재 절점의 확산 텐서를 둘러싼 모든 셀에 공통 적용한다. 회절처럼 셀 중심에서 계수를 다시 평균하지 않는다. 문서는 이 경로 차이를 적지 않는다. [10-13 전수 검증 보완] |

@@ -176,6 +176,16 @@ Delft3D 487(기계 sweep 실패 471 + 웹 16, 09-22 스냅샷 교체 전 경로)
 - 정정분 sonnet 표본 20건: 맞음 19, 부분 1(swanpre1 1832–1908 첫 문장의 바깥 블록 표기) → Claude가 고침. 앞 표본의 부분 4건은 모두 고쳐진 것을 확인.
 - 최종 기계 확인: 원문 인용 34,739개 중 불일치 2. 둘 다 swancom2 679·719행이다. 원문은 `\|`이고 기록은 표 칸 안 이스케이프로 `\\|`라고 썼다. 렌더 결과는 원문과 같으므로 검사 오판이다.
 
+## SWAN 대조·흐름·노트 반영 (2026-10-13 완료)
+
+- 대조 보고서 7종(Codex `gpt-6.1-sol`): `compare/swan-theory-{numerics,sources,obstacles-setup-qc-bc}-vs-code.md`(swantech 식 대 코드), `compare/swan-inputs-{setup,physics-numerics}-vs-code.md`(swanuse 명령 대 `swanpre1`·`swanmain`), `compare/swan-outputs-vs-code.md`(출력 변수·형식), `compare/swan-implementation-history-vs-code.md`(swanimp·swanpgr·웹 수정 이력·패치·설정 예제). 흐름 분석 `flow/SWAN-callflow.md`(mermaid 3개 — 렌더 확인).
+- 외부 원문(sonnet 웹 조회) 3행: TN-089(Hersbach & Janssen 1999 제한기, 논문 본문은 접근 차단으로 WW3·ECWAM 코드와 ECMWF IFS Cy48r1 문서로 판정) H, QC-020(Akrish et al. 2020 식 (2.2)) F, SS-537(Zieger 너울 소산 계수 B1Z) F. 기록: `compare/SWAN-external-sources.md`.
+- git 이력 판정(Codex `gpt-6-astra`): 원본 저장소(`raw/source_code/swan`, 98커밋, 2022-07-30~2026-07-13, HEAD `43e9bbb`, 실제 patch B 변경 `0dabfa4`)에서 문서 시점(41.51 공개 `7ee8981` 2024-09-02)과 41.45 공개(`2980d1a`~`122b595`, 2023-02-27~28)를 대조. A 후보 105행 중 A 26·B 5·C 44·D 22·H 8. D 45행 중 D 43·F 2(QC-050·QC-058). E 39행은 도입 커밋(대부분 `b2ae30e` 최초 반입)·수정 기록·반대 증거를 찾아 모두 유지(강함 31·중간 7·약함 1). 기록: `compare/SWAN-git-verify-{A,D,E}.md`.
+- 결론 전수 재검증(Codex `gpt-6-astra` 10작업, sonnet 표본 26행에서 OK 17·부분 8·틀림 1을 보고 전수로): 보고서 8종 1,134행. 최종 분류 일치 19·A 26·B 246·C 405·D 34·E 39·F 93·H 272. G·X 0. QC 이론 정의(Weyl·Moyal 등) D 31행은 구현 지시가 아니라 H로, 2행은 F로 바꾸고 이유를 적었다. 기록: 각 보고서 "## 최종 집계"와 `compare/SWAN-conclusion-sample.md`.
+- 노트 반영(Codex `gpt-6.1-sol` 7작업 + 누락 보완 1작업): 노트 60개에 "문서와 코드 차이 (10-13 대조)" 표. 대표 노트 `source-analysis/swan-foundation.md`에 흐름도 3개와 "코드 결함 후보 (정적 판독)" E 39행. 작업 사이에 넘긴 15행이 어느 노트에도 안 들어간 것을 행 ID 대조로 찾아 지정 노트에 넣었다(`flow/SWAN-notes-apply-8.md`). 결론 행 1,115행(일치 19행 제외)이 모두 노트에 있다.
+- 추가 줄 전수 대조(Codex `gpt-6-astra` 12작업): 정정 233줄·보완 95줄(`flow/SWAN-notes-verify-{1..12}.md`, 노트 태그 수). sonnet 표본 25줄(정정 줄 10 포함): 맞음 23, 부분 2(1D 갱신식 인용 줄, 수정 전 노트 줄을 현재 줄처럼 인용) → 고침. 같은 표본에서 보고서 R3 SU-042의 줄 번호 11864 → 11863 정정. 표본 검증자가 확인하지 못한 3항목(비구조 COMPGRID 정점값, (8.44)–(8.45)의 반변 기저 차원, (5.24) 화살표)은 Claude가 쪽 이미지·코드로 확인했다(`flow/SWAN-notes-sample.md`).
+- 기계 확인: 바뀐 노트의 과거 커밋 인용(`HASH:path:N`) 820개 불일치 0. 현재 코드·문서 인용 불일치 표시는 검사기 오판(여러 줄 HTML 문장, Fortran 연속 줄과 줄 끝 판 번호, 노트 자기 경로, 같은 이름 README, 인용 짝짓기)이며, 87건 후보는 전수 대조 작업이 하나씩 판정했다. `tools/validate-all.sh` 통과.
+
 ## 노트 반영분 전수 대조와 차이 결론 (2026-10-12)
 
 사용자 지시(10-12): 확인하지 않은 것을 한계로 남기지 말고 해결한 뒤 다음 모델로 간다. 모델 실행은 위키 범위가 아니므로 한계로 적지 않는다.
@@ -190,4 +200,4 @@ Delft3D 487(기계 sweep 실패 471 + 웹 16, 09-22 스냅샷 교체 전 경로)
 
 1. ~~매뉴얼과 코드 판독 기록 대조~~ — 10-03 완료(`compare/XBeach-manual-vs-code.md`, 노트 반영 `1da8d89`).
 2. ~~XBeach 파일 간 계산 흐름 분석~~ — 10-07 완료(`flow/XBeach-callflow.md`, 노트 반영 `d89cd8b`). 판독 기록 검색은 `wiki_search` `path_class="records"`(`ce7b3ae`).
-3. 다른 10개 모델(SFINCS·EFDC·ADCIRC 완료, ShorelineS 10-12 완료, SWAN 판독 10-13 완료(대조·흐름·노트 반영 진행 중), 나머지 7개 미착수 — 순서 ROMS·SWASH·FUNWAVE·LISFLOOD-FP·Delft3D·Celeris·CADMAS-SURF): 같은 방식(고정 목록 → 1행/1쪽 판독 → 기계 확인 → 다른 모델 검증).
+3. 다른 10개 모델(SFINCS·EFDC·ADCIRC 완료, ShorelineS 10-12 완료, SWAN 10-13 완료, 나머지 7개 미착수 — 순서 ROMS·SWASH·FUNWAVE·LISFLOOD-FP·Delft3D·Celeris·CADMAS-SURF): 같은 방식(고정 목록 → 1행/1쪽 판독 → 기계 확인 → 다른 모델 검증).

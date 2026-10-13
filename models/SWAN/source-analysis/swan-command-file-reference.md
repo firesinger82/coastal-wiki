@@ -3,7 +3,8 @@ title: "swan command file reference"
 topic: general
 canonical_source: self
 citation_status: verified
-verification_method: "SWAN source code 직접 분석 (models/SWAN/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/swan-command-file-reference.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
+verification_method: "SWAN source code 직접 분석 (models/SWAN/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/swan-command-file-reference.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시. 2026-10-13 recovery 대조 보고서 R1–R8 반영."
+last_source_check: 2026-10-13 (recovery 대조 반영)
 note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
 note_date: 2026-04~05 (original) / 2026-05-23 (promote)
 verification_by: "사용자 + codex source-code analysis"
@@ -32,7 +33,10 @@ Companion to `swan-foundation.md`. Where the foundation note covers *why*, this 
 ## Command-file structure (typical order)
 
 ```
-PROJECT 'name' 'nr' 'title1' 'title2' 'title3'
+PROJECT 'name' 'nr'
+'title1'
+'title2'
+'title3'
 SET LEVEL 0.0 NAUT
 MODE NONSTATIONARY TWODIMENSIONAL
 COORDINATES SPHERICAL CCM
@@ -51,7 +55,7 @@ GEN3 WESTHUYSEN
 WCAP KOMEN
 QUADRUPL ...
 BREAKING CONSTANT 1.0 0.73
-FRICTION JONSWAP CONSTANT 0.067
+FRICTION JONSWAP CONSTANT 0.038
 TRIAD
 
 NUMERICAL ACCUR 0.02 0.02 ... STAT 50
@@ -66,7 +70,7 @@ COMPUTE NONSTATIONARY 20070101.000000 30 MIN 20070103.000000
 STOP
 ```
 
-Reading order in the parser is **fixed**: `PROJECT` and `SET` first, then `MODE/COORD/CGRID/INPGRID/READINP/BOUND` setup, then physics/numerics, then output (`POINTS/FRAME/.../BLOCK/TABLE`), then `COMPUTE`. `STOP` ends parsing.
+권고 순서와 선행 자료 의존성을 구분한다. BOUND SHAPE를 생략하면 기본 모양을 사용한다. 뒤에 BOUND SHAPE가 나왔다고 명령 파서 자체가 실패하지는 않는다. `src/swanmain.ftn:1039` `FSHAPE = 2`; `src/swanpre2.ftn:3654` `BSTMP%FSHAPE = FSHAPE`.
 
 ## Commands by group
 
@@ -158,7 +162,7 @@ These reference a name from Group 6 (or use `'COMPGRID'` for the full computatio
               CGRID  ─── defines computational grid + spectral grid
                 │
                 ▼
-       INPGRID + READINP  ─── for each input field (BOT, WIND, CUR, ICE, ...)
+       INPGRID + READINP  ─── for each input field (BOT, WIND, CUR, AICE, HICE, ...)
                 │
                 ▼
          BOUND / INITIAL  ─── boundary spectra + initial state
@@ -194,16 +198,16 @@ Critical orderings:
 |----------|-------------------|----------------------|
 | Stationary 2D wave hindcast | PROJECT, MODE STAT, CGRID, INPGRID/READINP BOT, INPGRID/READINP WIND, BOUND, GEN3, NUMERICAL ACCUR, COMPUTE STAT, STOP | WCAP, BREAKING, FRICTION, BLOCK, TABLE |
 | Nonstationary storm passage | + MODE NONSTAT, INPGRID WIND NONSTAT, COMPUTE NONSTAT | + INITIAL HOTS for restart, NESTOUT for downstream nesting |
-| Nesting from coarse run | (in coarse run) NGRID + NESTOUT | (in fine run) BOUND NEST 'sname' 'fname' |
-| Surf-zone with shoaling | + TRIAD ON, BREAKING with appropriate alpha/gamma | + finer spectral resolution (`MSC=36+`, `MDC=36+`) |
+| Nesting from coarse run | (in coarse run) NGRID + NESTOUT | 받는 실행은 `BOUNDNEST1 NEST 'fname'`을 쓴다. `src/swanpre2.ftn:2971` `CALL INCSTR ('FNAME',FILENM,'REQ', ' ')`. |
+| 천수 변형이 있는 쇄파대 | 삼파는 TRIAD DCTA·LTA·FTIM·SPB 중 하나로 지정한다. 쇄파 명령은 BREAKING이다. 근거: swanuse PDF 73·75쪽 / 인쇄 65·67쪽. | — | [10-13 전수 검증 정정]
 
 ## Working Rules
 
 1. **`SET PWTAIL` matters for stationary convergence** — too steep tail underestimates whitecapping, may prevent convergence.
 2. **`NUMERICAL STOPC ...` is the convergence gate for stationary** — default tolerances are loose; tighten for high-quality validation.
 3. **`COMPGRID` is a built-in name** for the computational grid — you don't need to define it via `FRAME`/`POINTS`.
-4. **`NESTOUT` writes 2D spectra** — the receiving fine-grid `BOUND NEST` reads them, both grids must share `SET FREQ` and `SET DIR` parameters.
-5. **`COMPUTE NONSTAT` time format**: `YYYYMMDD.HHMMSS` (default), or with `SET TIMEFORMAT` set differently — be explicit when sharing scripts.
+4. 주파수와 방향의 스펙트럼 격자는 CGRID에서 지정한다. SET FREQ·SET DIR·SET TIMEFORMAT은 지원하는 명령문이 아니다. `src/swanpre1.ftn:1730` `CALL ININTG('MDC',MDC,'RQI',0)`; `src/swanpre1.ftn:1739` `CALL INREAL('FLOW',FRLOW,'STA',-999.)`; `src/swanpre1.ftn:1740` `CALL INREAL('FHIGH',FRHIG,'STA',-999.)`.
+5. ST6는 GEN3 ST6로 지정한다. XNL은 QUADRUPL 51·52·53으로 지정한다. Multiple DIA는 QUADRUPL 4와 별도 MDIA 명령으로 지정한다. `2980d1a:src/swanpre1.ftn:2936` `ELSE IF (KEYWIS('ST6')) THEN`; `43e9bbb:src/swanpre1.ftn:2983` `ELSE IF (KEYWIS('ST6')) THEN`.
 6. **Multiple `INPGRID WIND` blocks override each other** — keep one canonical wind input per run.
 
 ## Common Pitfalls
@@ -211,9 +215,10 @@ Critical orderings:
 - **`CGRID` after `INPGRID`** → SWAN doesn't know the domain when reading inputs. Always order `CGRID` first.
 - **`READINP` without preceding `INPGRID`** → "input grid not yet defined" error. Pair them.
 - **Mixing structured and unstructured** in the same `INPGRID/READINP` block → fails. Each input field must match the type declared in its `INPGRID`.
-- **Forgetting `MODE STAT` ↔ `COMPUTE STAT`** mismatch → SWAN ignores the inconsistency and assumes nonstationary; debug from the log header.
+- NSTATM≤0이면 COMPUTE의 정상 분기로 간다. 비정상 모드에서는 COMPUTE STAT으로 특정 시각의 정상 계산을 요청할 수 있다. MODE의 모순된 재지정에는 오류가 있다. `src/swanpre1.ftn:879` `IF (NSTATM.LE.0 .OR. KEYWIS('STAT')) THEN`; `src/swanpre1.ftn:881` `IF (NSTATM.GT.0) CALL INCTIM (ITMOPT,'TIME',TINIC,'REQ',0D0)`. MODE 재지정 검사는 `src/swanpre1.ftn:741–751`에 있다. [10-13 전수 검증 보완]
+- HOTSTART 시각보다 이전인 시작 시각에는 오류를 내고 현재 시각으로 되돌린다. `src/swanpre1.ftn:899` `IF (TINIC .LT. TIMCO) THEN`. 오류 메시지와 `TINIC = TIMCO` 대입은 `src/swanpre1.ftn:900–901`에 있다. [10-13 전수 검증 보완]
 - **`SET LEVEL` left at 0** when modeling a tide-influenced domain — wave-current interaction wrong.
-- **`FRICTION JONSWAP CONSTANT 0.067`** = default; valid for storms but too dissipative for swell — switch to `FRICTION COLL` or measured Madsen for swell-dominated cases.
+- 현재 JONSWAP CONSTANT 기본값은 0.038 m²/s³다. JONSWAP VARIABLE은 방향 퍼짐에 따라 계수를 정한다. 공간 입력장은 별도 INPGRID FRICTION·READINP FRICTION 경로다. `src/swanmain.ftn:1396` `PBOT(3)   = 0.038`.
 - **Output before `COMPUTE`** → the `BLOCK/TABLE/SPECOUT/NESTOUT` records the run state; if placed before `COMPUTE`, you get an empty file. Put output commands BEFORE `COMPUTE` (they're declarative; they fire during/after `COMPUTE`).
 
 ## Next expansion
@@ -255,5 +260,31 @@ Critical orderings:
 | Source-scan tool | `codex exec --model gpt-5.3-codex` over `models/swan/source_code/swan/src/` |
 | RAG retrieval | rag_proxy on `manuals` filtered `model=swan` (902 chunks across pdf+website doc_types) |
 | Coverage | 33 top-level commands; sub-keywords at summary level (full BNF deferred to per-command notes) |
-| Review status | `review_required: true` — modeler should validate file:line citations against current SWAN trunk (this scan was post-2024 release-line) |
+| Review status | 2026-10-13 recovery 대조 보고서 R4·R5의 명령 수정안을 반영했다. |
 | Companion notes | `swan-foundation.md`, `swan/manuals/refs/subroutines.md` |
+
+## 문서와 코드 차이 (10-13 대조)
+
+문서 판: SWAN Cycle III 41.51 매뉴얼; 웹 수정 이력·패치. 코드 판: VERNUM 41.51, 원본 저장소 HEAD 43e9bbb 2026-07-13 patch B.
+
+빈 인용 칸은 `—`로 표시한다. 표의 절 번호는 각 행이 링크한 대조 보고서의 절 번호다.
+
+| 행 ID | 항목 | 문서 원문 | 코드 원문 | 결론 | 결론 문장 |
+|---|---|---|---|---|---|
+| R4:T1-037 | 파일 이름 길이 | swanuse PDF 29쪽 / 인쇄 21쪽: “SWAN does not permit file names longer than 36 characters.” swanuse PDF 34쪽 / 인쇄 26쪽: “The maximum length of the file names is 36 characters.” | `src/swmod1.ftn:232` `PARAMETER (LENFNM=140)`; `src/swmod1.ftn:259` `CHARACTER (LEN=LENFNM) :: FILEA , FILEB , FILENM`; `src/ocpcre.ftn:967` `IF (LENCST.GT.LENW) THEN` | B 문서 오기 | 일반 파일 이름 버퍼는 140자이다. 개별 읽기의 더 짧은 제한은 따로 적는다. [R4](../../../_staging/recovery/compare/swan-inputs-setup-vs-code.md#5-차이-결론) |
+| R4:T1-038 | unit 상한 | swanuse PDF 34쪽 / 인쇄 26쪽: “The maximum number of file names is 99.” “edit the file swaninit to change highest unit number of 99 to a higher number”. swanimp PDF 27 / 인쇄 21 및 웹 `swanimp/node19.html:67`의 swaninit 예시는 `99999`를 highest file ref. number로 제시한다. | `src/ocpids.ftn:190` `IUNMAX = 99999` | B 문서 오기 | 기본 Unix의 unit 상한은 99999이다. 사용자 매뉴얼의 99 표기는 구현 매뉴얼의 예시와도 다르다. 파일 개수 99라는 제한으로 해석하지 않는다. [R4](../../../_staging/recovery/compare/swan-inputs-setup-vs-code.md#5-차이-결론) |
+| R4:T1-220 | INCLUDE 명령 | — | `src/swanpre1.ftn:543` `IF (KEYWIS ('INCL')) THEN`; `src/swanpre1.ftn:545` `CALL INCSTR ('FILE' , FILENM , 'REQ', ' ')`; `src/swanpre1.ftn:547` `IF (INCLEV.GT.MXINCL) THEN`; `src/swanpre1.ftn:548` `CALL MSGERR (4, 'too many INCLUDE levels')`; `src/swanpre1.ftn:553` `INPUTF = INCNUM(INCLEV)`; `src/swanpre1.ftn:476` `INPUTF = INCNUM(INCLEV)` | C 문서 누락 | INCLUDE는 다른 명령 파일을 읽고 EOF에서 이전 파일로 복귀한다. [R4](../../../_staging/recovery/compare/swan-inputs-setup-vs-code.md#5-차이-결론) |
+| R4:T1-221 | POOL 호환 처리 | — | `src/swanpre1.ftn:563` `IF (KEYWIS ('POOL')) THEN`; `src/swanpre1.ftn:564` `CALL MSGERR(1,'Keyword POOL is not relevant anymore!')`; `src/swanpre1.ftn:565` `GOTO 100` | C 문서 누락 | POOL은 경고 후 무시한다. 메모리 크기 설정으로 사용하지 않는다. [R4](../../../_staging/recovery/compare/swan-inputs-setup-vs-code.md#5-차이-결론) |
+| R4:T1-222 | INTEST | — | `src/swanpre1.ftn:629` `CALL ININTG ('INTES' , INTES , 'STA', 30)`; `src/swanmain.ftn:1615` `INTES  = 0`; `src/swanpre1.ftn:4077` `IF (ITEST .GE. 50 .OR. INTES .GE. 5) THEN` | C 문서 누락 | INTEST 명령의 값 생략 기본값은 30이다. 실행 초기값은 0이다. [R4](../../../_staging/recovery/compare/swan-inputs-setup-vs-code.md#5-차이-결론) |
+| R4:T1-223 | COTEST | — | `src/swanpre1.ftn:641` `CALL ININTG ('COTES' , ICOTES , 'STA', 30)`; `src/swanmain.ftn:1616` `ICOTES = 0`; `src/swanmain.ftn:613` `IF (ICOTES .GT. ITEST) ITEST = ICOTES` | C 문서 누락 | COTEST는 계산 단계의 진단 수준을 설정한다. [R4](../../../_staging/recovery/compare/swan-inputs-setup-vs-code.md#5-차이-결론) |
+| R4:T1-224 | OUTEST | — | `src/swanpre1.ftn:656` `CALL ININTG ('ITEST' , IOUTES , 'STA', 30)`; `src/swanmain.ftn:1617` `IOUTES = 0`; `src/swanmain.ftn:668` `IF (IOUTES .GT. ITEST) ITEST = IOUTES` | C 문서 누락 | OUTEST가 읽는 변수 이름은 ITEST이다. 출력 단계의 진단 수준을 설정한다. [R4](../../../_staging/recovery/compare/swan-inputs-setup-vs-code.md#5-차이-결론) |
+| R4:T1-227 | GRID 별칭 | — | `src/swanpre1.ftn:1608` `IF (KEYWIS('CGRID') .OR. KEYWIS('GRID')) THEN` | C 문서 누락 | GRID는 CGRID와 같은 최상위 명령 경로로 간다. [R4](../../../_staging/recovery/compare/swan-inputs-setup-vs-code.md#5-차이-결론) |
+| R4:T1-228 | INP GRID·입력장 생략 | — | `src/swanpre1.ftn:1354` `IF (KEYWIS ('INP')) THEN`; `src/swanpre1.ftn:1355` `CALL IGNORE ('GRID')`; `src/swanpre1.ftn:1425` `IGRD = 1`; `src/swanpre1.ftn:1426` `PSNAME = 'BOTTGRID'` | C 문서 누락 | 분리된 INP GRID를 허용한다. 입력장 선택을 생략하면 BOTTOM으로 간다. [R4](../../../_staging/recovery/compare/swan-inputs-setup-vs-code.md#5-차이-결론) |
+| R4:T1-232 | BOUND 호환 토큰 | — | `src/swanpre2.ftn:3054` `IF (KEYWIS ('STAT')) THEN`; `src/swanpre2.ftn:3055` `CALL MSGERR (1, 'keyword STAT ignored')`; `src/swanpre2.ftn:3066` `IF (KEYWIS('XY') .OR. KEYWIS ('LOC')) THEN`; `src/swanpre2.ftn:3068` `ELSE IF (KEYWIS('IJ') .OR. KEYWIS ('GRI')) THEN`; `src/swanpre2.ftn:3618` `IF (KEYWIS('UNIF') .OR. KEYWIS('CON') .OR. KEYWIS('PAR')) THEN`; `src/swanpre2.ftn:3666` `ELSE IF (KEYWIS('FILE') .OR. KEYWIS('SPEC')) THEN` | C 문서 누락 | STAT는 무시한다. LOC·GRI·SPEC 별칭과 CONSTANT를 생략한 PAR를 수용한다. [R4](../../../_staging/recovery/compare/swan-inputs-setup-vs-code.md#5-차이-결론) |
+| R4:T1-233 | INITIAL 호환 토큰 | — | `src/swanpre1.ftn:6166` `CALL IGNORE ('COND')`; `src/swanpre1.ftn:6260` `ELSE IF (KEYWIS('HOTS') .OR. KEYWIS('REST')) THEN`; `src/swanpre1.ftn:6295` `IF (KEYWIS ('UNF') .OR. KEYWIS('BIN')) THEN` | C 문서 누락 | INITIAL 안에서는 COND를 무시한다. REST·BIN은 각각 HOTSTART·UNFORMATTED의 별칭이다. [R4](../../../_staging/recovery/compare/swan-inputs-setup-vs-code.md#5-차이-결론) |
+| R4:T1-234 | 명령 숫자 반복·문자열 이스케이프 | — | `src/ocpcre.ftn:1784` `IF (ELTYPE.EQ.'INT' .AND. ELINT.GT.0) THEN`; `src/ocpcre.ftn:1785` `NREP = ELINT`; `src/ocpcre.ftn:1818` `IF (KAR.NE.QUOTE) GOTO 88`; `src/ocpcre.ftn:1819` `!         double quote is read as a single quote; continue` | C 문서 누락 | 명령 숫자에 양의 정수 반복 계수를 쓸 수 있다. 문자열 안의 연속 작은따옴표는 작은따옴표 하나로 읽는다. C 판정은 명령 파일의 문법 설명에 한정한다. [R4](../../../_staging/recovery/compare/swan-inputs-setup-vs-code.md#5-차이-결론) |
+| R4:T1-300 | 노트의 SET FREQ·DIR·TIMEFORMAT | `source-analysis/swan-command-file-reference.md:205–206`의 SET FREQ·DIR·TIMEFORMAT 안내. | `2980d1a:src/swanpre1.ftn:2123–2166`과 `src/swanpre1.ftn:2169–2213`의 SET 분기에는 FREQ·DIR·TIMEFORMAT 선택이 없다. `src/swanpre1.ftn:1730` `CALL ININTG('MDC',MDC,'RQI',0)`; `src/swanpre1.ftn:1739` `CALL INREAL('FLOW',FRLOW,'STA',-999.)`; `src/swanpre1.ftn:1740` `CALL INREAL('FHIGH',FRHIG,'STA',-999.)` | D 문서에만 있음 | SET FREQ·SET DIR·SET TIMEFORMAT은 지원하는 명령문이 아니다. 주파수와 방향의 스펙트럼 격자는 CGRID에서 지정한다. [R4](../../../_staging/recovery/compare/swan-inputs-setup-vs-code.md#5-차이-결론) | [10-13 전수 검증 정정]
+| R4:T1-302 | 명령 순서의 일괄 고정 | `source-analysis/swan-boundary-implementation.md:211`의 `Reverse breaks the parser.` | `src/swanmain.ftn:1039` `FSHAPE = 2` | B 문서 오기 | 권고 순서와 선행 자료 의존성을 구분한다. BOUND SHAPE 생략 자체가 파서 실패 조건은 아니다. [R4](../../../_staging/recovery/compare/swan-inputs-setup-vs-code.md#5-차이-결론) |
+| R4:T1-304 | BOUNDNEST의 문자열 수 | `source-analysis/swan-command-file-reference.md:197`의 `BOUND NEST 'sname' 'fname'` | `src/swanpre2.ftn:2971` `CALL INCSTR ('FNAME',FILENM,'REQ', ' ')` | B 문서 오기 | 받는 실행의 BOUNDNEST1 NEST는 fname 하나를 읽는다. [R4](../../../_staging/recovery/compare/swan-inputs-setup-vs-code.md#5-차이-결론) |
+| R5:PN-154 | 별칭 | — | `src/swanpre1.ftn:793` `IF (KEYWIS ('BSBT') .OR. KEYWIS ('BTBS')) THEN`; `src/swanpre1.ftn:1000` `IF (KEYWIS ('TRANS1') .OR. KEYWIS ('TRFREQ')) THEN`; `src/swanpre1.ftn:1121` `IF (KEYWIS ('FIG') .OR. KEYWIS ('IG')) THEN`; `src/swanpre1.ftn:1325–1326` `IF (KEYWIS('REST') .OR. KEYWIS ('BACK') .OR. KEYWIS('HOTF')`; `src/swanpre1.ftn:2023` `IF (KEYWIS('SIGIM') .OR. KEYWIS ('IMP')) THEN`; `src/swanpre1.ftn:2032` `ELSE IF (KEYWIS('SIGEX') .OR. KEYWIS('EXP')) THEN`; `src/swanpre1.ftn:2382` `ELSE IF (KEYWIS('VAR') .OR. KEYWIS('NEL')) THEN`; `src/swanpre1.ftn:3337` `IF ( KEYWIS ('TRI') .OR. KEYWIS ('NL3') ) THEN`; `src/swanpre1.ftn:3462` `IF (KEYWIS('TRA') .OR. KEYWIS('IC')) THEN`; `src/swanpre1.ftn:3589` `IF ( KEYWIS('SCAT') .OR. KEYWIS('QC') ) THEN`; `src/swanpre1.ftn:3594` `IF ( KEYWIS('K') .OR. KEYWIS('WNUM') ) THEN`; `src/swanpre1.ftn:6744` `IF (KEYWIS ('UNF') .OR. KEYWIS('BIN')) THEN` | C 문서 누락 | 입력기는 §3.2에 열거한 별칭을 같은 처리 분기로 보낸다. 네 매뉴얼과 웹 문서의 검색에서 지원 문법 설명이 없는 별칭은 권장 문법과 구분한다. [R5](../../../_staging/recovery/compare/swan-inputs-physics-numerics-vs-code.md#5-차이-결론) |
+| R5:PN-176 | 지원하지 않는 노트 문법 | `source-analysis/swan-st6-babanin-implementation.md:117`의 `pair with`와 `WCAP ST6`; 124행의 `without`와 `WCAP ST6`. `source-analysis/swan-whitecapping.md:190`의 `GEN3 ST6 BABANIN`, 204행의 `WAVE_BREAKING`. `source-analysis/swan-command-file-reference.md:198`의 `TRIAD ON`, 206행의 `SET TIMEFORMAT`. `source-analysis/swan-time-stepping-implementation.md:138`의 `SET TIMINC`. `manual-notes/swan-tech-ch2-sources-sinks.md:190`의 `QUADRUPL XNL`, 193행의 `QUADRUPL MDIA 6`. | `2980d1a:src/swanpre1.ftn:2936` `ELSE IF (KEYWIS('ST6')) THEN`; `43e9bbb:src/swanpre1.ftn:2983` `ELSE IF (KEYWIS('ST6')) THEN` | D 문서에만 있음 | WCAP ST6·WAVE_BREAKING·TRIAD ON·SET TIMEFORMAT·SET TIMINC·GEN3 ST6 BABANIN·QUADRUPL XNL·QUADRUPL MDIA는 지원 명령문으로 쓰지 않는다. ST6는 GEN3 ST6, 쇄파는 BREAKING, 삼파는 TRIAD DCTA·LTA·FTIM·SPB로 지정한다. XNL은 QUADRUPL 51·52·53, Multiple DIA는 QUADRUPL 4와 별도 MDIA를 사용한다. `2980d1a`(41.45)부터 `43e9bbb`까지 해당 문자열의 이력 검색은 0커밋이며 두 판의 ST6 입력 분기도 GEN3 아래에 있다. [R5](../../../_staging/recovery/compare/swan-inputs-physics-numerics-vs-code.md#5-차이-결론) |

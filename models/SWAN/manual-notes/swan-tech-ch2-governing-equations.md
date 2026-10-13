@@ -4,7 +4,8 @@ topic: swan
 canonical_source: external
 external_source: "swantech.pdf (SWAN Scientific/Technical Documentation, Cycle III 41.51, Delft 1993-2026) Ch 2 Governing equations, §2.1 Spectral description (p.7-10) + §2.2 Propagation of wave energy (p.10-12). Primary refs: Whitham 1974, Mei 1983, Komen et al. 1994, Holthuijsen 2007, Zijlema 2021."
 citation_status: verified
-verification_method: "raw PDF `models/SWAN/raw/manuals/pdfs/swantech.pdf` 직접 read (p.7-12 = PDF page 15-19). Eq 2.1-2.17 LaTeX verbatim 인용. Figure 2.1 Holthuijsen 2007 reproduction 명시."
+verification_method: "raw PDF models/SWAN/raw/manuals/pdfs/swantech.pdf의 인쇄 7–13쪽(PDF 15–21쪽)을 직접 대조했다. 식 (2.1)–(2.26)의 원문과 인용한 코드 실행문을 대조했다. Figure 2.1의 Holthuijsen 2007 전재 표기를 확인했다. 2026-10-13 recovery 대조 보고서 R1–R8 반영" # [10-13 전수 검증 정정]
+last_source_check: "2026-10-13 (recovery 대조 반영)"
 note_author: "Claude Opus 4.7 (1M context) raw PDF direct read"
 note_date: 2026-06-01
 verification_by: "Claude Opus 4.7 (1M context) — Eq 2.1-2.17 verbatim + Whitham/Mei/Komen/Holthuijsen citations"
@@ -19,7 +20,7 @@ related:
 
 # SWAN swantech Ch 2 Governing equations — §2.1-2.2 verified verbatim
 
-> **swantech.pdf p.7-12** (Ch 2 Governing equations §2.1 Spectral description of wind waves + §2.2 Propagation of wave energy) verbatim 직접 인용. SWAN 의 모든 verified 식의 **1차 출처**. 본 위키 기존 [[swan-action-balance]] 와 보완.
+> swantech PDF 15–21쪽 / 인쇄 7–13쪽의 §2.1 스펙트럼 정의와 §2.2 전파식을 정리한다. 본문은 [swan-action-balance](swan-action-balance.md)의 구현 설명과 연결된다. [10-13 전수 검증 정정]
 
 ## 1. §2.1 Spectral description of wind waves (p.7-10)
 
@@ -76,7 +77,7 @@ $$\langle \eta^2 \rangle = C(0) = \int_0^{+\infty} E(f) df \quad \text{(2.7)}$$
 
 $$E_{\text{tot}} = \frac{1}{2} \rho_w g \langle \eta^2 \rangle \quad \text{(2.8)}$$
 
-→ 표면적당 wave 전체 energy. "variance" 와 "energy density" 용어를 본 문서에서 **혼용** (단, **Zijlema 2021** 참조 — 정확 구분).
+문서 식 (2.8)은 $1/2$를 적는다. 이는 전체 에너지의 오기이다. 코드와 응력 식은 $E_{\rm tot}=\rho_wg\langle\eta^2\rangle$에 대응한다. (swantech PDF 16쪽 / 인쇄 8쪽, 식 (2.8); `src/SwanComputeForce.ftn90:306` `fx(ivert) = -RHO * GRAV * ( dsxxdx  + dsxydy )`; R1:TN-008)
 
 ### 1.5 2D directional spectrum (Eq 2.9)
 
@@ -104,7 +105,9 @@ $$T_{m01} = \frac{m_0}{m_1}, \quad T_{m02} = \sqrt{\frac{m_0}{m_2}}, \quad T_{m-
 
 > "In SWAN, the energy density spectrum $E(\sigma, \theta)$ is generally used. On a larger scale the spectral energy density function $E(\sigma, \theta)$ becomes a function of space and time, that is, $E(\vec{x}, t; \sigma, \theta)$ and wave dynamics should be considered to determine the evolution of the spectrum in space and time."
 
-→ SWAN 의 dependent variable = **$E(\vec{x}, t; \sigma, \theta)$**.
+진화 미지수는 작용밀도 $N=E/\sigma$이다. $E$는 분산밀도이다. (swantech PDF 19쪽 / 인쇄 11쪽, 식 (2.16); R1 §4의 TN-018–023 수정안)
+
+구면 밀도 $\widetilde N=N R^2\cos\varphi$를 쓰면 원천항에도 같은 Jacobian이 필요하다. 코드는 $N$의 남북 플럭스에 $\cos\varphi_{\rm up}/\cos\varphi_P$를 곱한다. (swantech PDF 20–21쪽 / 인쇄 12–13쪽, 식 (2.19) 및 Jacobian 정의; `src/swancom5.ftn:2167` `&              AC2(ID,IS,KCGRD(IC)) * COSLAT(IC) / COSLAT(1)`; R1:TN-023·TN-031)
 
 ## 2. §2.2 Propagation of wave energy (p.10-12)
 
@@ -171,7 +174,7 @@ Ambient current(tidal·ocean·wind-generated·river·wave-generated)은 wave gro
 - wave steepness·height **급증**, **wave blocking** (current 가 군속도 접근) + current-induced **whitecapping·reflection**
 - **blocking frequency**서 action 이 nonlinear wave-wave interaction 으로 고/저주파로 부분 전이 (Ris 1997)
 
-이론적 기반: **Longuet-Higgins-Stewart (1960, 1961, 1962)**. **핵심**: current 존재 시 **action density 보존, energy density 비보존** (Eq 2.16의 $N=E/\sigma$ 이유) → SWAN 이 energy balance 아닌 **action balance** 채택. (Eq 2.16 §2.2 + [[swan-tech-ch3-refraction-limiter]] §3.8 current refraction.)
+이론적 기반은 Longuet-Higgins와 Stewart(1960, 1961, 1962)의 파랑·흐름 상호작용 연구이다. 문서는 흐름 위에서 전파할 때 에너지밀도 대신 작용밀도를 보존한다고 설명한다. SWAN은 이 설명을 근거로 작용량 수지식을 채택한다. 근거: swantech PDF 60쪽 / 인쇄 52쪽 §2.4 및 PDF 19쪽 / 인쇄 11쪽 식 (2.16). 흐름 굴절은 [swan-tech-ch3-refraction-limiter](swan-tech-ch3-refraction-limiter.md)를 참조한다. [10-13 전수 검증 보완]
 
 ## 3. 핵심 references (Ch 2 인용)
 
@@ -180,13 +183,13 @@ Ambient current(tidal·ocean·wind-generated·river·wave-generated)은 wave gro
 - **Komen et al. 1994** — Dynamics and Modelling of Ocean Waves (Cambridge UP) — WAM 표준 reference, source term framework
 - **Holthuijsen 2007** — Waves in Oceanic and Coastal Waters (Cambridge UP) — Eq 2.1 random-phase + Fig 2.1 (수업용 표준 교재)
 - **Zijlema 2021** — variance vs energy density 정확 구분 (별도 paper)
-- 1차 SWAN paper: [[swan-booij-1999-jgr-foundational]] (Booij·Ris·Holthuijsen 1999 JGR)
+- 1차 SWAN paper: [swan-booij-1999-jgr-foundational](swan-booij-1999-jgr-foundational.md) (Booij·Ris·Holthuijsen 1999 JGR)
 
 ## 4. 본 위키 cross-references
 
-### 4.1 [[swan-action-balance]] 와 보완
+### 4.1 [swan-action-balance](swan-action-balance.md) 와 보완
 
-본 위키 기존 [[swan-action-balance]] = source-analysis level (구현). 본 노트 = theory level (Eq 2.16 verbatim). 두 노트는 상호 보완.
+본 위키 기존 [swan-action-balance](swan-action-balance.md) = source-analysis level (구현). 본 노트 = theory level (Eq 2.16 verbatim). 두 노트는 상호 보완.
 
 ### 4.2 §2.1 의 implementation
 
@@ -196,16 +199,16 @@ Ambient current(tidal·ocean·wind-generated·river·wave-generated)은 wave gro
 
 ### 4.3 §2.2 의 implementation
 
-- Eq 2.13 propagation velocities → `SwanPropvelX/SwanPropvelS` ([[swan-source-coverage-audit]])
-- Eq 2.16 action balance → `SwanCompUnstruc` ([[swan-unstructured-time-step]]) + swancom1.ftn
-- $c_\theta$ = depth/current refraction → [[swan-propagation-implementation]] + [[swan-gse-correction]] (GSE artifact 억제)
-- $c_\sigma$ = σ-shifting → [[swan-propagation-implementation]] §σ space
+- Eq 2.13 propagation velocities → `SwanPropvelX/SwanPropvelS` ([swan-source-coverage-audit](../source-analysis/swan-source-coverage-audit.md))
+- Eq 2.16 action balance → `SwanCompUnstruc` ([swan-unstructured-time-step](../source-analysis/swan-unstructured-time-step.md)) + swancom1.ftn
+- $c_\theta$는 수심·흐름 굴절의 방향 전파속도이다. 근거: swantech PDF 18쪽 / 인쇄 10쪽 (2.13); [swan-propagation-implementation](../source-analysis/swan-propagation-implementation.md). GSE 억제는 별도의 공간 확산 보정이다. 근거: `src/SwanGSECorr.ftn90:40`; [swan-gse-correction](../source-analysis/swan-gse-correction.md). [10-13 전수 검증 정정]
+- $c_\sigma$ = σ-shifting → [swan-propagation-implementation](../source-analysis/swan-propagation-implementation.md) §σ space
 
 ### 4.4 §2.5.4 diffraction (별도) + §2.7 QCM (Wigner)
 
 Eq 2.13 의 $c_\theta$ 는 diffraction 미포함. 회절 처리:
-- 표준 mild-slope diffraction → [[swan-diffraction-obstacles]] (Holthuijsen 2003 후속)
-- Wigner-based **quasi-coherent** → [[swan-quasi-coherent]] (Akrish-Smit-Zijlema 41.90)
+- 표준 mild-slope diffraction → [swan-diffraction-obstacles](../source-analysis/swan-diffraction-obstacles.md) (Holthuijsen 2003 후속)
+- Wigner-based **quasi-coherent** → [swan-quasi-coherent](../source-analysis/swan-quasi-coherent.md) (Akrish-Smit-Zijlema 41.90)
 
 ## 5. 한계
 
@@ -217,11 +220,35 @@ Eq 2.13 의 $c_\theta$ 는 diffraction 미포함. 회절 처리:
 
 ## 6. 연결
 
-- [[swan-action-balance]] — source-level action balance
-- [[swan-documentation-stack]] — 4 PDFs TOC + §2.2.2 매핑
-- [[swan-booij-1999-jgr-foundational]] — Booij 1999 JGR 원논문 (§1.4 reference)
-- [[swan-propagation-implementation]] — Eq 2.13 implementation
-- [[swan-unstructured-time-step]] — Eq 2.16 unstructured implementation
-- [[swan-quasi-coherent]] — §2.7 Wigner 확장 (별도 chapter 노트)
-- [[swan-diffraction-obstacles]] — §2.5.4 diffraction
-- [[swan-gse-correction]] — Eq 2.13 $c_\theta$ refraction 의 GSE artifact 보정
+- [swan-action-balance](swan-action-balance.md) — source-level action balance
+- [swan-documentation-stack](swan-documentation-stack.md) — 4 PDFs TOC + §2.2.2 매핑
+- [swan-booij-1999-jgr-foundational](swan-booij-1999-jgr-foundational.md) — Booij 1999 JGR 원논문 (§1.4 reference)
+- [swan-propagation-implementation](../source-analysis/swan-propagation-implementation.md) — Eq 2.13 implementation
+- [swan-unstructured-time-step](../source-analysis/swan-unstructured-time-step.md) — Eq 2.16 unstructured implementation
+- [swan-quasi-coherent](../source-analysis/swan-quasi-coherent.md) — §2.7 Wigner 확장 (별도 chapter 노트)
+- [swan-diffraction-obstacles](../source-analysis/swan-diffraction-obstacles.md) — §2.5.4 diffraction
+- [swan-gse-correction](../source-analysis/swan-gse-correction.md)은 GSE를 억제하는 파령 의존 공간 확산을 설명한다. 근거: `src/SwanGSECorr.ftn90:40`의 `diffusion terms in x-y space`. [10-13 전수 검증 정정]
+
+## 문서와 코드 차이 (10-13 대조)
+
+문서 판: SWAN Cycle III 41.51 매뉴얼; 웹 수정 이력·패치. 코드 판: VERNUM 41.51, 원본 저장소 HEAD 43e9bbb 2026-07-13 patch B.
+
+확정 결론과 원문 인용: [R1](../../../_staging/recovery/compare/swan-theory-numerics-vs-code.md#5-차이-결론).
+
+| 행 ID | 항목 | 문서 원문 | 코드 원문 | 결론 | 결론 문장 |
+|---|---|---|---|---|---|
+| R1:TN-001 | 문서 식 (2.1) | swantech PDF 15쪽 / 인쇄 7쪽, (2.1): $\eta(t)=\sum_i a_i\cos(\sigma_i t+\alpha_i)$. | `src/swancom1.ftn:9802` `ACS2  = SPCSIG(IS)**2 * AC2(ID,IS,INDX)` | H 코드 대조 대상 아님 | 수면 시계열의 통계적 표현이다. 위상별 수면 재구성을 작용 평형 해법의 완료 조건으로 삼지 않는다. |
+| R1:TN-003 | 문서 식 (2.3) | swantech PDF 16쪽 / 인쇄 8쪽, (2.3): $\sigma=\sqrt{g\lvert\vec k\rvert\tanh(\lvert\vec k\rvert d)}$.<br>웹 [수정 이력](../raw/manuals/website/modifications/modifications.htm):596–598은 `Pade approximation for the wave celerity`를 명시한다. | `src/swanser.ftn:713–715` `C     = SQRT(GRAV*D/(SND2+1./(1.+0.666*SND2+0.445*SND2**2`; `&                                  -0.105*SND2**3+0.272*SND2**4)))`; `K(IS) = SIG(IS)/C` | C 문서 누락 | KSCIP1은 분산 관계를 구간별 근사로 계산한다. Padé 근사의 존재는 웹 수정 이력에도 있다. C는 swantech 식 (2.3)에 `IF (SND.GE.2.5) THEN`, `ELSE IF (SND.LT.1.E-6) THEN`과 유한 수심 유리식이 없는 점으로 한정한다. |
+| R1:TN-004 | 문서 식 (2.4) | swantech PDF 16쪽 / 인쇄 8쪽, (2.4): $E'(f)=\int_{-\infty}^{+\infty}C(\tau)e^{-2\pi if\tau}d\tau$. | — | H 코드 대조 대상 아님 | 공분산과 스펙트럼의 정의다. |
+| R1:TN-005 | 문서 식 (2.5) | swantech PDF 16쪽 / 인쇄 8쪽, (2.5): $C(\tau)=\langle\eta(t)\eta(t+\tau)\rangle$. | — | H 코드 대조 대상 아님 | 앙상블 공분산의 정의다. |
+| R1:TN-006 | 문서 식 (2.6) | swantech PDF 16쪽 / 인쇄 8쪽, (2.6): $E(f)=2E'(f)$ for $f\ge0$ and $E(f)=0$ for $f<0$. | `src/swanpre1.ftn:4689` `SPCSIG(1) = SLOW` | H 코드 대조 대상 아님 | 양측 스펙트럼과 단측 스펙트럼의 정의다. 음의 주파수 배열 변환을 요구하는 식이 아니다. |
+| R1:TN-008 | 문서 식 (2.8) | swantech PDF 16쪽 / 인쇄 8쪽, (2.8): $E_{\rm tot}=\frac12\rho_wg\langle\eta^2\rangle$. | `src/SwanComputeForce.ftn90:179,187,195,306` `sxxsumd = sxxsumd + ( n(1)*(spcdir(id,4) + 1.) -0.5 ) * ac2(id,is,ivert)`; `sxxsums = sxxsums + sxxsumd * spcsig(is)**2`; `sxx(ivert) = sxxsums * DDIR * FRINTF`; `fx(ivert) = -RHO * GRAV * ( dsxxdx  + dsxydy )` | B 문서 오기 | 해석: 문서는 분산에 $\rho g/2$를 곱한다. 같은 문서 (3.59)와 (8.30), 코드의 힘 계산은 분산에 $\rho g$를 곱한다. 진폭 제곱의 $1/2$와 분산을 혼동한 계수다. |
+| R1:TN-017 | 문서 식 (2.15) | swantech PDF 19쪽 / 인쇄 11쪽, (2.15): $d/dt=\partial_t+(\vec c_g+\vec u)\cdot\nabla_{\vec x}$. | `src/swancom5.ftn:2183–2184` `IMATRA(ID,IS) = IMATRA(ID,IS) + FXY2 + ACOLD*RDTIM`; `IMATDA(ID,IS) = IMATDA(ID,IS) + FXY1 + RDTIM` | H 코드 대조 대상 아님 | 공간 경로를 따라 정의한 미분 연산자다. 코드가 직접 이 연산자를 별도 계산하는 것은 아니다. 스펙트럼 특성곡선의 전체 미분은 (3.33)에 추가 항을 포함한다. |
+| R1:TN-021 | 에너지 플럭스 곱미분 | swantech PDF 20쪽 / 인쇄 12쪽, 번호 없음: $\partial_tE+\vec c_g\cdot\nabla E+E\nabla\cdot\vec c_g=S_{\rm tot}$. | `src/swancom5.ftn:2153` `FXY2 =  RDX(1) * CAX(ID,IS,2)* TCF1 * AC2(ID,IS,IND2)` | F 표기 차이 | 해석: $\nabla\cdot(\vec c_gE)=\vec c_g\cdot\nabla E+E\nabla\cdot\vec c_g$이다. 코드가 이웃점의 속도와 밀도를 함께 곱하므로 천수화 항을 빠뜨리지 않는다. |
+| R1:TN-023 | 문서 식 (2.19) | swantech PDF 20쪽 / 인쇄 12쪽, (2.19): $\partial_t\widetilde N+\partial_\lambda(c_\lambda\widetilde N)+\partial_\varphi(c_\varphi\widetilde N)+\partial_\sigma(c_\sigma\widetilde N)+\partial_\theta(\widetilde c_\theta\widetilde N)=S_{\rm tot}/\sigma$. | `src/swancom5.ftn:2167` `&              AC2(ID,IS,KCGRD(IC)) * COSLAT(IC) / COSLAT(1)` | B 문서 오기 | 해석: 문서가 뒤에서 정의한 $\widetilde N=NR^2\cos\varphi$를 적용하면 이 식의 우변에도 $R^2\cos\varphi$가 필요하다. 원천항 기호를 재정의하지 않고 (2.26)을 얻을 수 없다. 코드의 (2.26) 경로에는 이 누락이 없다. |
+| R1:TN-026 | 문서 식 (2.22) | swantech PDF 21쪽 / 인쇄 13쪽, (2.22): $R\cos\varphi\cos\theta=\mathrm{constant}$. | `src/swancom5.ftn:1918–1921` `CTTMP = ECOS(ID) * TANLAT / REARTH`; `CAD(ID,IS,1) = CAD(ID,IS,1) -`; `&           (CAX(ID,IS,1)*ECOS(ID) + CAY(ID,IS,1)*ESIN(ID)) * CTTMP` | H 코드 대조 대상 아님 | 심해·무흐름에서 대권 굴절 항을 유도하는 Clairaut 관계다. |
+| R1:TN-027 | 문서 식 (2.23) | swantech PDF 21쪽 / 인쇄 13쪽, (2.23): $-R\sin\varphi\cos\theta\,d\varphi/ds-R\cos\varphi\sin\theta\,d\theta/ds=0$. | — | H 코드 대조 대상 아님 | (2.22)의 미분식이다. |
+| R1:TN-028 | 구면 경로의 거리·위도 관계 | swantech PDF 21쪽 / 인쇄 13쪽, 번호 없음: $dy=ds\sin\theta,\ d\varphi/ds=\sin\theta/R,\ ds=(c_x\cos\theta+c_y\sin\theta)dt$. | — | H 코드 대조 대상 아님 | 대권 항 유도의 중간식이다. 흐름이 파향과 평행하지 않으면 공간 에너지 경로와 파수 방향을 구분해야 한다. |
+| R1:TN-031 | 구면 작용밀도 Jacobian | swantech PDF 21쪽 / 인쇄 13쪽, 번호 없음: $\widetilde N\,d\sigma d\theta d\varphi d\lambda=N\,d\sigma d\theta dxdy$, $\widetilde N=NR^2\cos\varphi$. | `src/swancom5.ftn:2167` `&              AC2(ID,IS,KCGRD(IC)) * COSLAT(IC) / COSLAT(1)` | F 표기 차이 | 해석: 코드는 $\widetilde N$ 배열을 만들지 않는다. $N$의 남북 플럭스에 $\cos\varphi_{\rm up}/\cos\varphi_P$를 곱한다. |
+| R1:TN-034 | 흐름 차단의 관측 현상 | swantech PDF 60쪽 / 인쇄 52쪽, §2.4: “often accompanied with current-induced whitecapping and wave reflections.” | `src/swancom1.ftn:3702–3715` `ELSE IF (INT(PNUMS(8)).EQ.2 .OR. INT(PNUMS(8)).EQ.3) THEN` | H 코드 대조 대상 아님 | 이 문장은 관측 현상의 서술이다. 흐름 차단에 의한 반사를 SWAN이 구현한다는 기능 선언으로 옮기면 안 된다. |
+| R1:TC-001 | 분산 관계의 심해·천해 분기와 유한 수심 근사 | 웹 [수정 이력](../raw/manuals/website/modifications/modifications.htm):596–598은 위상속도의 Padé 근사를 설명한다. | `src/swanser.ftn:699–719` `IF (SND.GE.2.5) THEN`; `ELSE IF (SND.LT.1.E-6) THEN` | C 문서 누락 | 분산 관계 근사의 존재는 웹 수정 이력에도 있다. C는 swantech 식 (2.3)에 KSCIP1의 심해·극천해 분기 문턱과 유한 수심 근사 계수가 없는 점으로 한정한다. |

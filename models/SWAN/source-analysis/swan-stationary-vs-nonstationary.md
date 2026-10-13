@@ -3,7 +3,8 @@ title: "swan stationary vs nonstationary"
 topic: general
 canonical_source: self
 citation_status: verified
-verification_method: "SWAN source code 직접 분석 (models/SWAN/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/swan-stationary-vs-nonstationary.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
+verification_method: "SWAN source code 직접 분석 (models/SWAN/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/swan-stationary-vs-nonstationary.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시. 2026-10-13 recovery 대조 보고서 R1–R8 반영"
+last_source_check: "2026-10-13 (recovery 대조 반영)"
 note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
 note_date: 2026-04~05 (original) / 2026-05-23 (promote)
 verification_by: "사용자 + codex source-code analysis"
@@ -62,7 +63,7 @@ Structured stationary: `DO 450 ITER = 1, ITERMX` (`swancom1.ftn:1487`):
 
 Termination: `ACCUR >= PNUMS(4)`, with guard preventing `STOPC` from stopping on iteration 1 (`:2349-2356`).
 
-`SWSTPC` checks Hs/Tm changes + curvature (`:9618-9886`); converts converged wet points to percent accuracy (`:9912-9928`).
+구조 격자의 TMREL은 TMABS/SACC2로 계산된다. SACC2는 평균 각주파수다. 같은 출력의 주기 정규화와 단위가 다르므로 코드 결함 후보로 기록한다. 기본 DTABS=1000은 이 차이를 가릴 수 있다. `src/swancom1.ftn:9855`의 원문은 `TMREL = TMABS / SACC2(INDX)`이다. `src/swancom1.ftn:9873`의 `IF ( IQCM.EQ.0 ) THEN`에 속한 주기 판정이 TMREL을 사용한다. QC 분기는 이 값을 합격 조건에 쓰지 않는다. `b2ae30e`(2022-08-10, 저장소 최초 반입)부터 같은 식이 남는다. [R5:PN-085 수정안](../../../_staging/recovery/compare/swan-inputs-physics-numerics-vs-code.md#4-노트-대조와-수정안), [코드 결함 후보 표](swan-foundation.md#코드-결함-후보-정적-판독).
 
 ## C. Stationary sweeping (4-quadrant Gauss-Seidel)
 
@@ -143,15 +144,9 @@ This is the unstructured analogue of the structured-grid dependence chain.
 
 `AC1` = local previous-time action density in `SWMAIN` (`swanmain.ftn:266, 296`).
 
-`AC1` allocated **only**:
-- Non-stationary runs with multiple iterations.
-- S&L propagation.
+AC1의 전체 크기 할당은 NSTATM·MXITNS·PROPSC 조건을 따른다. `src/swanmain.ftn:500`의 원문은 `IF ( NSTATM.EQ.1 .AND. MXITNS.GT.1 .OR. PROPSC.EQ.3 ) THEN`이다. 나머지 경로의 최초 할당은 0 크기이다. `src/swanmain.ftn:518`의 원문은 `IF(.NOT.ALLOCATED(AC1)) ALLOCATE(AC1(0,0,0))`이다. 이미 할당된 AC1은 이 ELSE에서 해제하지 않는다.
 
-Otherwise zero-size placeholder (`swanmain.ftn:497-519`).
-
-`SNEXTI` copies `AC2 → AC1` only for non-stationary multi-iteration or S&L (`:6889-6904`).
-
-So **stationary BSBT/SORDUP** generally stores only `AC2`; **non-stationary multi-iter** and **S&L** need `AC1+AC2` (~2× memory).
+SNEXTI의 시간 복사는 별도의 NSTATC·ITERMX·PROPSC 조건을 따른다. `src/swanmain.ftn:6892`의 `IF (NSTATC.EQ.1) THEN` 안에서 `src/swanmain.ftn:6893–6895`의 `IF (ITERMX.GT.1`<br>`&       .OR. PROPSC.EQ.3`<br>`&                                 ) THEN`을 만족할 때 복사한다. `src/swanmain.ftn:6899`의 원문은 `AC1(IDD,ISS,IXY) = AC2(IDD,ISS,IXY)`이다. [R8:N1-001](../../../_staging/recovery/flow/SWAN-callflow.md#8-차이-결론).
 
 ## H. Recommended choice
 
@@ -173,7 +168,7 @@ SWAN enforces non-stationary input fields require `MODE NONSTAT` (`swanpre1.ftn:
 
 | Domain / Situation | Mode + Settings |
 |---|---|
-| Steady design wave (single sea state) | `MODE STAT`, `MXITST=50` (default), `BSBT` |
+| 정상 기본 전파법 | SORDUP이다. `src/swanmain.ftn:1179` `PROPSS = 2` |
 | Tidal bay with wave-current interaction | `MODE NONSTAT`, `DELTC=15-30 min`, `BSBT`, `MXITNS=1` |
 | Storm hindcast (wide domain) | `MODE NONSTAT`, `DELTC=30-60 min`, `BSBT` |
 | Surf-zone resolved (very fine grid) | `MODE NONSTAT`, `DELTC` matching wave period × 5-10 |
@@ -184,9 +179,9 @@ SWAN enforces non-stationary input fields require `MODE NONSTAT` (`swanpre1.ftn:
 
 ## Working Rules
 
-- Stationary `MXITST=50` is generous; reduce to 30 for speed if convergence robust.
+- 반복 횟수 축소는 적용 권고다. 이를 코드가 강제하는 규칙으로 쓰지 않는다. [R5:PN-186](../../../_staging/recovery/compare/swan-inputs-physics-numerics-vs-code.md#5-차이-결론).
 - For non-stationary, `MXITNS=1` is the production default; only raise for special cases.
-- BSBT is the default and works for nearly all cases. SORDUP and S&L for academic comparison only.
+- 일반 구조 격자의 기본 전파법은 정상 SORDUP과 비정상 S&L이다. PROP BSBT를 쓰면 두 모드를 BSBT로 지정한다. DIFFRACTION은 두 선택을 BSBT로 덮어쓴다. `src/swanmain.ftn:1179–1180`의 원문은 `PROPSS = 2`와 `PROPSN = 3`이다. `src/swanpre1.ftn:794–795`의 원문은 `PROPSN = 1`과 `PROPSS = 1`이다. 회절의 조건은 `src/swanmain.ftn:4090`의 `IF ( IDIFFR.EQ.1 ) THEN`이다. [R5 §4](../../../_staging/recovery/compare/swan-inputs-physics-numerics-vs-code.md#4-노트-대조와-수정안).
 - Convergence criterion: `STOPC` more rigorous than `ACCUR`; recommend `STOPC` for production.
 - For unstructured grids, sweep ordering matters — first sweep along dominant wave direction speeds convergence.
 - Output `BLOCK 'sname' ITERMAX HSIGN ...` to monitor iteration count and Hs convergence per stationary call.
@@ -216,4 +211,15 @@ SWAN enforces non-stationary input fields require `MODE NONSTAT` (`swanpre1.ftn:
 
 ## Provenance
 
-Generated 2026-05-03 from Codex `gpt-5.3-codex` analysis of `models/swan/source_code/swan/src`. Auto-draft = false; review_required = true.
+Generated 2026-05-03 from Codex `gpt-5.3-codex` analysis of `models/swan/source_code/swan/src`. Auto-draft = false; 2026-10-13 recovery 대조 보고서 R1–R8 반영.
+
+## 문서와 코드 차이 (10-13 대조)
+
+문서 판: SWAN Cycle III 41.51 매뉴얼; 웹 수정 이력·패치. 코드 판: VERNUM 41.51, 원본 저장소 HEAD 43e9bbb 2026-07-13 patch B.
+
+| 행 ID | 항목 | 문서 원문 | 코드 원문 | 결론 | 결론 문장 |
+|---|---|---|---|---|---|
+| R4:T1-303 | MODE 모순 무시 | `source-analysis/swan-command-file-reference.md:214`의 `ignores the inconsistency and assumes nonstationary` | `src/swanpre1.ftn:879` `IF (NSTATM.LE.0 .OR. KEYWIS('STAT')) THEN`. | B 문서 오기 | NSTATM≤0이면 COMPUTE의 정상 분기로 간다. 비정상 모드에서는 COMPUTE STAT도 허용한다. [R4](../../../_staging/recovery/compare/swan-inputs-setup-vs-code.md#5-차이-결론) |
+| R5:PN-087 | NONSTAT MXITNS | swanuse PDF 94쪽 / 인쇄 86쪽 `Default: [mxitns] = 1.` | `src/swanpre1.ftn:1959` `CALL ININTG ('MXITNS' , MXITNS   , 'REQ', 0 )`. | B | NUMERIC STOPC NONSTAT을 적으면 최대 반복 횟수를 명시해야 한다. [R5](../../../_staging/recovery/compare/swan-inputs-physics-numerics-vs-code.md#5-차이-결론) |
+| R5:PN-155 | ITERMX | — | `src/swanpre1.ftn:1956` `MXITNS = MXITST`, 1957 `'[itermx] is replaced; see user manual'`. | C | ITERMX는 경고를 내지만 두 모드의 반복 상한에 값을 대입한다. [R5](../../../_staging/recovery/compare/swan-inputs-physics-numerics-vs-code.md#5-차이-결론) |
+| R5:PN-180 | BSBT 기본값 주장 | `source-analysis/swan-stationary-vs-nonstationary.md:189` `BSBT is the default` | `src/swanmain.ftn:1179` `PROPSS = 2`, 1180 `PROPSN = 3`. | B | 일반 구조 격자의 기본값은 정상 SORDUP·비정상 S&L이다. 회절의 BSBT 덮어쓰기는 별도 조건이다. [R5](../../../_staging/recovery/compare/swan-inputs-physics-numerics-vs-code.md#5-차이-결론) |

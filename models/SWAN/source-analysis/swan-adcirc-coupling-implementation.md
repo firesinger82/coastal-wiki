@@ -3,7 +3,8 @@ title: "swan adcirc coupling implementation"
 topic: general
 canonical_source: self
 citation_status: verified
-verification_method: "SWAN source code 직접 분석 (models/SWAN/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/swan-adcirc-coupling-implementation.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
+verification_method: "SWAN source code 직접 분석 (models/SWAN/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/swan-adcirc-coupling-implementation.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시. 2026-10-13 recovery 대조 보고서 R1–R8 반영."
+last_source_check: 2026-10-13 (recovery 대조 반영)
 note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
 note_date: 2026-04~05 (original) / 2026-05-23 (promote)
 verification_by: "사용자 + codex source-code analysis"
@@ -96,6 +97,8 @@ So SWAN reads ADCIRC's `fort.14` directly when in unstructured mode — no trans
 
 - Coupled-run entry points: `PADCSWAN_INIT` and `PADCSWAN_RUN` pass timestep into `SWMAIN` at `[file=src/swanmain.ftn line=101-104]`
 - The actual `couple2swan.F` wrapper that ADCIRC uses to call SWAN is **not in this source tree** (it lives in the ADCIRC repo).
+
+couple2adcirc.ftn90과 swan2coh.ftn90은 조사한 Git 배포에 없다. 전처리 스위치의 존재는 두 coupler 파일의 배포 근거가 아니다. swanimp PDF 10쪽 / 인쇄 4쪽: `couple2adcirc.ftn90`; `swan2coh.ftn90`. `switch.pl:97` `if ($adc=~/TRUE/) {$newline=~s/^!ADC//;}`; `switch.pl:99` `if ($coh=~/TRUE/) {$newline=~s/^!COH//;}`. 두 파일의 부재 근거는 [git D 판정의 I-058](../../../_staging/recovery/compare/SWAN-git-verify-D.md)이다. [10-13 전수 검증 보완]
 - For `READ UNSTRUC ADC`: SWAN reads its own copy of `fort.14` — no in-memory mesh sharing in this snapshot.
 - Force feedback to ADCIRC: `SwanComputeForce` at `[file=src/SwanComputeForce.ftn90 line=38]`
 
@@ -121,7 +124,7 @@ Explicit code-level unsupported features:
 | Scenario | Path | Note |
 |----------|------|------|
 | Standalone SWAN, regional structured grid | structured `SWCOMP` | default |
-| Coupled ADCIRC-SWAN, unstructured ADCIRC mesh | unstructured `SwanCompUnstruc` | `READ UNSTRUC ADC 'fort.14'` |
+| ADCIRC fort.14 격자를 읽는 SWAN 실행 | 비정렬 `SwanCompUnstruc` (`src/swanmain.ftn:618–627`) | `READ UNSTRUC ADC`는 `src/swanpre1.ftn:1478–1492`에서 격자 판독기로 연결된다. `src/SwanReadGrid.ftn90:73–77`은 `SwanReadADCGrid`를 호출한다. `src/SwanReadADCGrid.ftn90:95`의 원문은 `grdfil = 'fort.14'`이다. | [10-13 전수 검증 정정]
 | Want WW3/WAM nesting | structured | unstructured doesn't support these BCs |
 | Want wave setup | structured | unstructured disabled |
 | Need GSE anti-spoke | either | both paths support, separate routines |
@@ -166,3 +169,13 @@ Explicit code-level unsupported features:
 | Coverage | dispatch, mesh data, propagation, fort.14 reader, coupling hooks, limitations |
 | Out of scope | couple2swan.F (lives in ADCIRC), full force-feedback algorithm |
 | Review status | `review_required: true` |
+
+## 문서와 코드 차이 (10-13 대조)
+
+문서 판: SWAN Cycle III 41.51 매뉴얼; 웹 수정 이력·패치. 코드 판: VERNUM 41.51, 원본 저장소 HEAD 43e9bbb 2026-07-13 patch B.
+
+빈 인용 칸은 `—`로 표시한다. 표의 절 번호는 각 행이 링크한 대조 보고서의 절 번호다.
+
+| 행 ID | 항목 | 문서 원문 | 코드 원문 | 결론 | 결론 문장 |
+|---|---|---|---|---|---|
+| R7:I-058 | 배포 목록의 두 coupler 파일 | swanimp PDF 10쪽, 인쇄 4쪽: `couple2adcirc.ftn90`; `swan2coh.ftn90` | `switch.pl:97` `if ($adc=~/TRUE/) {$newline=~s/^!ADC//;}`; `switch.pl:99` `if ($coh=~/TRUE/) {$newline=~s/^!COH//;}` | D 현재 해당 구현 없음 | couple2adcirc.ftn90과 swan2coh.ftn90은 조사한 Git 배포에 없다. 전처리 스위치의 존재는 두 coupler 파일의 배포 근거가 아니다. swanimp PDF 8–10쪽의 목록은 tarball 목록이므로 이 판정을 tarball 자체의 파일 부재로 확대하지 않는다. [R7](../../../_staging/recovery/compare/swan-implementation-history-vs-code.md#5-차이-결론) | [10-13 전수 검증 정정]

@@ -3,7 +3,8 @@ title: "swan adcirc coupling"
 topic: general
 canonical_source: self
 citation_status: verified
-verification_method: "SWAN source code 직접 분석 (models/SWAN/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/swan-adcirc-coupling.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
+verification_method: "2026-10-13 HEAD 대비 추가·수정 19줄을 R5·R7 최종 보고서, git 판정 A, 현재·과거 코드와 웹 HTML에 대조했다." # [10-13 전수 검증 정정]
+last_source_check: 2026-10-13 (recovery 대조 반영)
 note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
 note_date: 2026-04~05 (original) / 2026-05-23 (promote)
 verification_by: "사용자 + codex source-code analysis"
@@ -19,7 +20,7 @@ SWAN-side mechanism for sharing the ADCIRC unstructured mesh (`fort.14`), how `R
 - `swanpre1.ftn:1462-1492, 1344-1350, 944-1286, 791-3074` — `READ UNSTRUC`, input grid types, propagation flags.
 - `SwanReadADCGrid.ftn90:42-176`, `SwanGriddata.ftn90:54-72`, `SwanReadGrid.ftn90:73-78` — ADCIRC mesh reader.
 - `swanmain.ftn:101-104, 128, 266-695, 1105-1109, 1110-1112, 4037-6960, 5053-5161, 8798-8823` — main loop, coupling flags.
-- `swanparll.ftn:140-319` — MPI bypass in coupled mode.
+- `src/swanparll.ftn:140` `!MPI!NCOH      CALL MPI_INIT ( IERR )` — MPI_INIT의 COH 전처리 표식.
 - `swanpre2.ftn:2702-3151` — boundary list / segment validation.
 - `SwanComputeForce.ftn90:35-307` — wave-driven force computation.
 - `switch.pl:33,97-100` — `-adcirc` switch.
@@ -29,7 +30,7 @@ SWAN-side mechanism for sharing the ADCIRC unstructured mesh (`fort.14`), how `R
 
 `READ UNSTRUC` parser at `swanpre1.ftn:1462-1492`:
 - Default keyword: `ADC` → `grid_generator = meth_adcirc`, depth source `IGTYPE(1)=3`, calls `SwanReadGrid`.
-- Triton (`TRI`), GMSH alternatives also supported.
+- fname은 Triangle·Easymesh의 확장자 없는 이름이다. `src/swanpre1.ftn:1485` `ELSEIF (KEYWIS('TRIA')) THEN`; `src/swanpre1.ftn:1488` `ELSEIF (KEYWIS('EASY')) THEN`. 확장자 결합은 `src/SwanReadTriangleGrid.ftn90:87,136`의 `.node`·`.ele`와 `src/SwanReadEasymeshGrid.ftn90:80,114`의 `.n`·`.e`에 있다. [10-13 전수 검증 보완]
 
 `SwanReadADCGrid.ftn90:42-176`:
 - Hard-codes `grdfil = 'fort.14'` and opens it (`:91-97`).
@@ -47,7 +48,7 @@ There is **no `couple2adcirc.F` in the SWAN tree** — coupling logic lives in A
 
 ADCIRC-specific preprocessing switch: `-adcirc` (`switch.pl:33,97-98`); applied by uncommenting `!ADC` lines.
 
-ADCIRC-coupled default drag note at `swanmain.ftn:1105-1109` — switch documented inline.
+41.01 patch A의 항목은 ADCIRC 결합 시의 기본값을 말한다. 현재 Git 소스에는 그 결합 초기 대입이 없다. 현재 독립 초기값 IDRAG=1을 ADCIRC 결합 기본값의 변경 증거로 쓰지 않는다. `43e9bbb:src/swanmain.ftn:1109` `      IDRAG  = 1                                                          42.00 41.49 41.33`; `43e9bbb:src/swanmain.ftn:1108` `!     when coupled with ADCIRC, the default is to use ADCIRC drag formulation`.
 
 ## C. Time stepping / MPI
 
@@ -61,7 +62,7 @@ SWAN normal loop (`swanmain.ftn:569-694`):
 
 **Coupled mode**: ADCIRC passes timestep to SWAN per source comment; **no return-timestep API** in this SWAN tree (`swanmain.ftn:101-104`). ADCIRC controls when SWAN runs.
 
-**MPI**: init/finalize omitted in coupled (`!NCOH`) builds; **host owns MPI** (`swanparll.ftn:140-319`, `switch.pl:99-100`). Serial vs parallel: `PARLL = .TRUE.` if `NPROC > 1` (`:189-196`).
+MPI_INIT 행 자체의 표식은 !MPI!NCOH이다. 이 행을 -adcirc가 직접 제거한다고 쓰지 않는다. `src/swanparll.ftn:140` `!MPI!NCOH      CALL MPI_INIT ( IERR )`. ADCIRC 결합에서 주 프로그램을 우회한다는 설명은 별도의 호출 구조이다. `src/swanmain.ftn:101` `!     In case of coupling with ADCIRC, this program will not be executed`; `src/swanmain.ftn:102` `!     Instead, SWAN initialization and run will be done by PADCSWAN_INIT`.
 
 ## D. Boundary / nesting on unstructured
 
@@ -131,7 +132,7 @@ NetCDF source list includes same (`srclistnc.cmake:31-66`).
 | ADCIRC unstructured mesh sharing | `READ UNSTRUC ADC` (default keyword); needs `fort.14` |
 | Coupled hot-start | SWAN `HOTSTART` synchronized via ADCIRC `SwanHotStartUnit` |
 | Nesting child of coupled parent | `BOUND NEST 'parent.spec'` (coarser SWAN parent) |
-| Disable SWAN-side MPI init in coupled | Use `-adcirc` switch in `switch.pl` |
+| ADCIRC와 COH 전처리 구분 | -adcirc는 !ADC를 제거하고 !NADC를 남긴다. MPI_INIT 행 자체의 표식은 !MPI!NCOH이다. `switch.pl:97` `if ($adc=~/TRUE/) {$newline=~s/^!ADC//;}`; `src/swanparll.ftn:140` `!MPI!NCOH      CALL MPI_INIT ( IERR )`. |
 | Disable wind-input from ADCIRC met | Set SWAN's own `INPGRID WIND` instead of `COUPWIND` in ADCIRC |
 | Output radiation stresses for diagnostic | Use `BLOCK ... 'fname' ...FX FY...` (or compute from `HSIGN`, `DIR`) |
 
@@ -168,3 +169,15 @@ NetCDF source list includes same (`srclistnc.cmake:31-66`).
 ## Provenance
 
 Generated 2026-05-03 from Codex `gpt-5.3-codex` analysis of `models/swan/source_code/swan/src`. Auto-draft = false; review_required = true.
+
+## 문서와 코드 차이 (10-13 대조)
+
+문서 판: SWAN Cycle III 41.51 매뉴얼; 웹 수정 이력·패치. 코드 판: VERNUM 41.51, 원본 저장소 HEAD 43e9bbb 2026-07-13 patch B.
+
+빈 인용 칸은 `—`로 표시한다. 표의 절 번호는 각 행이 링크한 대조 보고서의 절 번호다.
+
+| 행 ID | 항목 | 문서 원문 | 코드 원문 | 결론 | 결론 문장 |
+|---|---|---|---|---|---|
+| R5:PN-144 | CICE ADCICE | — | `src/swanpre1.ftn:2342` `IF (KEYWIS('CICE')) THEN`; `src/swanpre1.ftn:2346` `IICE=2`; `src/swanpre1.ftn:2347` `CALL INREAL('WBICETH',WBICETH,'STA',70.0)`; `src/swmod1.ftn:2674` `! WBICETH[  70.0] Minimum ice concentration (percentage out of 100.0)` | C 문서 누락 | CICE ADCICE 입력은 존재한다. WBICETH=70%의 읽기와 독립 실행 소산 구현은 구분한다. [R5](../../../_staging/recovery/compare/swan-inputs-physics-numerics-vs-code.md#5-차이-결론) |
+| R7:H-1204 | ADCIRC 항력 기본 | `website/modifications/modifications.htm:1204` `when coupled with ADCIRC, the default is to use ADCIRC drag formulation` | `src/swanmain.ftn:1109` `IDRAG  = 1                                                          42.00 41.49 41.33`; `122b595:src/swanmain.ftn:1096` `      IDRAG  = 1                                                          42.00 41.49 41.33`; `43e9bbb:src/swanmain.ftn:1109` `      IDRAG  = 1                                                          42.00 41.49 41.33`; `43e9bbb:src/swanmain.ftn:101` `!     In case of coupling with ADCIRC, this program will not be executed  41.20`; `43e9bbb:src/swanmain.ftn:102` `!     Instead, SWAN initialization and run will be done by PADCSWAN_INIT  41.20`; `43e9bbb:src/swanmain.ftn:1108` `!     when coupled with ADCIRC, the default is to use ADCIRC drag formulation` | D 현재 해당 구현 없음 | 41.01 patch A의 항목은 ADCIRC 결합 시의 기본값을 말한다. 현재 Git 소스에는 그 결합 초기 대입이 없다. 현재 독립 초기값 IDRAG=1을 ADCIRC 결합 기본값의 변경 증거로 쓰지 않는다. [R7](../../../_staging/recovery/compare/swan-implementation-history-vs-code.md#5-차이-결론) [10-13 전수 검증 정정] |
+| R7:N-030 | ADCIRC와 COH 전처리 구분 | `swan-adcirc-coupling.md:134` ``\| Disable SWAN-side MPI init in coupled \| Use `-adcirc` switch in `switch.pl` \|`` | `src/swanparll.ftn:140` `!MPI!NCOH      CALL MPI_INIT ( IERR )` | B 문서 오기 | -adcirc는 !ADC를 제거하고 !NADC를 남긴다. MPI_INIT 행 자체의 표식은 !MPI!NCOH이다. 이 행을 -adcirc가 직접 제거한다고 쓰지 않는다. ADCIRC 결합에서 주 프로그램을 우회한다는 설명은 별도의 호출 구조이다. 노트 64행의 coupled 표기도 COH와 ADCIRC를 구분하도록 고친다. [R7](../../../_staging/recovery/compare/swan-implementation-history-vs-code.md#5-차이-결론) |
