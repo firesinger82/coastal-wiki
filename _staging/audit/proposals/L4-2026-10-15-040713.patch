@@ -1,0 +1,78 @@
+diff --git a/models/ADCIRC/source-analysis/adcirc-met-forcing-implementation.md b/models/ADCIRC/source-analysis/adcirc-met-forcing-implementation.md
+--- a/models/ADCIRC/source-analysis/adcirc-met-forcing-implementation.md
++++ b/models/ADCIRC/source-analysis/adcirc-met-forcing-implementation.md
+@@ -3,6 +3,7 @@
+ topic: general
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-met-forcing-implementation.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
+ note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
+ note_date: 2026-04~05 (original) / 2026-05-23 (promote)
+@@ -208,7 +209,8 @@
+ | Step | Tool | Result |
+ |------|------|--------|
+ | Download JMA-MSM | external (already in WORK_LOG) | NetCDF files per day |
+-| Convert to OWI NetCDF | `tools/scripts/jma_to_fort22.py` | NWS=13 compatible NetCDF |
++| Convert to OWI NetCDF | OWI NetCDF 변환 도구(경로 미확정) | NWS=13 compatible NetCDF |
++<!-- source-needed: 변환 도구 실경로 — tools/scripts/jma_to_fort22.py 는 repo에 없음(stale 개인 참조) -->
+ | Set NWS=13 in fort.15 | text edit | format declaration |
+ | Set NWS13 namelist | `NWS13File`, `NWS13ColdStartString` | reader configuration |
+ | Run | adcprep + padcirc | hourly wind/pressure forcing |
+@@ -225,18 +227,18 @@
+    - 일부 NWS의 부호는 자료 시간 기준을 바꾼다. (`[file=src/wind.F line=2172]` `WTIME1 = STATIM*86400.D0`; `[file=src/wind.F line=2205]` `WTIME1 = TimeLoc`)
+    - NWS=2와 NWS=-2는 모두 입력 응력을 WSX2·WSY2에 직접 대입한다. (`[file=src/wind.F line=2193]` `WSX2(I) = RampMete2*WINDX`; `[file=src/wind.F line=2194]` `WSY2(I) = RampMete2*WINDY`; `[file=src/wind.F line=2210]` `WSX2(I) = RampMete2*WVNX1(I)`; `[file=src/wind.F line=2211]` `WSY2(I) = RampMete2*WVNY1(I)`)
+    - NWS=-2의 부호 자체가 풍속을 Cd로 곱하게 만들지 않는다. (`[file=src/wind.F line=2203]` `IF(NWS.EQ.-2) THEN`; `[file=src/wind.F line=2210]` `WSX2(I) = RampMete2*WVNX1(I)`; `[file=src/wind.F line=2211]` `WSY2(I) = RampMete2*WVNY1(I)`)
+-3. **CDCAP** is renamed to `WindDragLimit` in v55+; legacy fort.15 `CDCAP` lines may be ignored.
++3. **CDCAP** is renamed to `WindDragLimit` in v55+; legacy fort.15 `CDCAP` lines may be ignored. <!-- source-needed: v55 rename 판 근거·CDCAP 라인 무시 동작 — 릴리스 노트/코드 인용 필요 -->
+ 4. **NOIVB=1** to disable inverse barometer when only wind matters; default behavior includes IB pressure effect on water level.
+ 5. NWS=2의 fort.22에는 WTIMINC 헤더를 넣지 않는다. (`[file=src/wind.F line=1817]` `READ(22,*) (NHG,WVNX1(I),WVNY1(I),PRN1(I),I=1,NP)`; `[file=src/wind.F line=1818]` `READ(22,*) (NHG,WVNX2(I),WVNY2(I),PRN2(I),I=1,NP)`)
+ 
+ ## Common Pitfalls
+ 
+-- **NWS=13 with wrong NetCDF variable names** — fails silently or wrong forcing; use the canonical OWI converter tool.
++- **NWS=13 with wrong NetCDF variable names** — fails silently or wrong forcing; use the canonical OWI converter tool. <!-- source-needed: '조용한 실패' 동작 — owiwind_netcdf.F check_err(:683-721) 경로와 상충 가능, 실제 동작 인용 필요 -->
+ - <a id="nws14-format"></a>NWS=14 초기화 호출은 `#ifdef DATETIME`과 `#if defined(GRIB2API) || defined(ADCNETCDF)` 안에 있다. (`src/wind.F:1996` `#ifdef DATETIME`; `src/wind.F:1997` `#if defined(GRIB2API) || defined(ADCNETCDF)`; `src/wind.F:1998` `IF (ABS(NWS).eq.14) THEN`) [10-12 전수 검증 보완] 파일 종류 선택은 GRIB2API 빌드에서 fort.221.grb2가 있으면 GRIB2를 우선 선택한다. (`src/wind.F:8021` `Pfile = 'fort.221.grb2'`; `src/wind.F:8022` `INQUIRE(file=Pfile,exist=Fexists)`; `src/wind.F:8023` `#ifdef GRIB2API`; `src/wind.F:8024` `IF (Fexists) THEN`; `src/wind.F:8026` `grb2flag = .TRUE.`; `src/wind.F:8027` `RETURN`) [10-12 전수 검증 보완] 그 경로에서 반환하지 않으면 fort.221.nc의 존재를 검사한다. (`src/wind.F:8030` `Pfile = 'fort.221.nc'`; `src/wind.F:8031` `INQUIRE(file=Pfile,exist=Fexists)`; `src/wind.F:8032` `IF (Fexists) THEN`; `src/wind.F:8033` `grb2flag = .FALSE.`) [10-12 전수 검증 보완] 이 파일도 없으면 오류로 종료한다. (`src/wind.F:8035` `ELSE`; `src/wind.F:8036` `call terminate(exit_code=ADCIRC_EXIT_FAILURE,`; `src/wind.F:8037` `&       message='Neither .grb2 nor .nc wind files exist. Or, if .grb2 '//`; `src/wind.F:8038` `&       'files exist, did you compile with GRIB2 compiler flags?')`) [10-12 전수 검증 보완] [10-12 결론 검증 보완]
+ - NWS=-14의 GRIB2·OWI 결합과 netCDF 거부 조건은 [NWS=-14 정본](#nws-minus14)을 따른다. [10-12 결론 검증 보완]
+ - NWS=-14의 fort.15 보충 줄에는 WTIMINC_12가 추가된다. (`[file=src/read_input.F line=2674]` `IF (NWS.eq.-14) THEN`; `[file=src/read_input.F line=2675]` `IF((NCICE.EQ.0).AND.(NRS.EQ.0)) READ(15,*) WTIMINC,`; `[file=src/read_input.F line=2676]` `&                                                 WTIMINC_12`; `[file=docs/user_guide/model_configuration/meteorological_forcing/wtiminc.rst line=19]` `````NWS=-14``, a second parameter, WTIMINC_12```; `[file=docs/user_guide/model_configuration/meteorological_forcing/wtiminc.rst line=20]` `defines the time increment for meteorological data for the OWI-formatted files.`)
+ - **Wind multiplier scaling** — `NWS13WindMultiplier` for unit conversion. Default 1.0; check if your NetCDF is in m/s or knots.
+-- **NOIVB** with hurricane storm-surge — disabling IB underestimates surge by 1-3 cm per mb pressure drop.
++- **NOIVB** with hurricane storm-surge — disabling IB underestimates surge by 1-3 cm per mb pressure drop. <!-- source-needed: 1-3 cm/mb 수치 — 역기압 문헌 인용 필요(정역학 이론값 ≈1 cm/hPa) -->
+ 
+ ## References
+ 
+diff --git a/models/ADCIRC/source-analysis/adcirc-output-writers-implementation.md b/models/ADCIRC/source-analysis/adcirc-output-writers-implementation.md
+--- a/models/ADCIRC/source-analysis/adcirc-output-writers-implementation.md
++++ b/models/ADCIRC/source-analysis/adcirc-output-writers-implementation.md
+@@ -3,6 +3,7 @@
+ topic: general
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-output-writers-implementation.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
+ note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
+ note_date: 2026-04~05 (original) / 2026-05-23 (promote)
+@@ -416,6 +417,8 @@
+ | Climatology | NSPOOLE = 86400 (1 day) | daily averaging needed externally |
+ | Disk-saving runs | NSPOOLE = 1800 (1 hour) | rough validation only |
+ 
++<!-- source-needed: 위 stride 권고값 4행 — 근거 문헌/관행 인용 필요. 환산 재계산 필요: DT=2s 기준 360 steps=12min(≠15 min), 86400 steps=2일(≠1 day) -->
++
+ 예시 산정 (RNDAY=30, DT=2s, NSPOOLGE=900, 475K 노드):
+ - 30 days × 24 h × 2 (per hour) = ~1440 records on global elevation field
+ - Each record = 475K × 8 bytes = 3.8 MB → total ~5.5 GB fort.63.nc
+@@ -433,10 +436,10 @@
+ 
+ ## Common Pitfalls
+ 
+-- **fort.63 + fort.63.nc both exist** — old format vs new NetCDF; `read_global` may pick the older. Delete one or set NOUT specifier consistently.
+-- **Hot restart with different `NSPOOLE`** — old file format matched first stride; new stride creates inconsistent records.
+-- **`NFREQ` mismatch between fort.15 NBFR and fort.15 harmonic block** — silent corruption.
+-- **Adcprep `--prepall` re-runs every time** — overrides per-PE PE####/fort.6X files. Check before re-running mid-output collection.
++- **fort.63 + fort.63.nc both exist** — old format vs new NetCDF; `read_global` may pick the older. Delete one or set NOUT specifier consistently. <!-- source-needed: read_global의 파일 선택 규칙 — prep/read_global.F 인용 필요 -->
++- **Hot restart with different `NSPOOLE`** — old file format matched first stride; new stride creates inconsistent records. <!-- source-needed: stride 불일치 시 기록 동작 — netcdfio.F90/globalio 인용 필요 -->
++- **`NFREQ` mismatch between fort.15 NBFR and fort.15 harmonic block** — silent corruption. <!-- source-needed: 근거 불명 + NBFR(경계 강제)·NFREQ(조화분석)는 별개 주파수 블록 — 근거 인용 또는 삭제 검토 -->
++- **Adcprep `--prepall` re-runs every time** — overrides per-PE PE####/fort.6X files. Check before re-running mid-output collection. <!-- source-needed: adcprep의 PE 출력 덮어쓰기 동작 — prep 코드 인용 필요 -->
+ - v56.2.1의 일반 실수 대체값은 -99999.0이다. (`[file=src/netcdfio.F90 line=81]` ` real(8), parameter ::  doubleval = -99999.d0 `) 정수 기본 대체값은 -99999이다. (`[file=src/netcdfio.F90 line=82]` ` integer, parameter :: intFillValue = -99999 `) 핫스타트 방사 응력의 _FillValue는 0.0d0이다. (`[file=src/netcdfio.F90 line=5605]` ` iret = nf90_put_att(hs%ncid, hs%rs1%u_nodal_data_id, & `; `[file=src/netcdfio.F90 line=5606]` ` '_FillValue', 0.0d0) `) 변수별 예외는 아래 출력 차이 표와 netCDF 변수 목록에서 구분한다.
+ 
+ fort.77.nc의 weir_dz도 _FillValue에 0.0d0을 기록한다. (`[file=src/netcdfio.F90 line=2677]` ` dat%varnames(1) = 'weir_dz' `; `[file=src/netcdfio.F90 line=2697]` ` iret = nf90_put_att(dat%ncid, dat%nodal_data_id, & `; `[file=src/netcdfio.F90 line=2698]` ` '_FillValue', 0.0d0) `)
