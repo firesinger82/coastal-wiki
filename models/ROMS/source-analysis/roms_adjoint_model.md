@@ -4,7 +4,8 @@ model: ROMS
 component: ROMS/Adjoint
 canonical_source: self
 citation_status: verified
-verification_method: "ROMS 소스 직접 read (roms/ROMS/Adjoint/). ad_main3d.F 역방향 driver 루프, ad_rhs3d.F 의 adjoint RHS 연산 구조(Coriolis 블록 verbatim), ad_step3d_t.F corrector/spline adjoint, ad_pre_step3d.F·ad_prsgrd.F·ad_omega.F·ad_t3dmix.F·ad_uv3dmix.F dispatch 를 file:line 인용"
+verification_method: "ROMS 소스 직접 read (roms/ROMS/Adjoint/). ad_main3d.F 역방향 driver 루프, ad_rhs3d.F 의 adjoint RHS 연산 구조(Coriolis 블록 verbatim), ad_step3d_t.F corrector/spline adjoint, ad_pre_step3d.F·ad_prsgrd.F·ad_omega.F·ad_t3dmix.F·ad_uv3dmix.F dispatch 를 file:line 인용; 2026-10-14 ROMS recovery 대조 보고서 반영"
+last_source_check: "2026-10-14 (recovery 대조 반영)"
 note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-16
 related:
@@ -18,7 +19,7 @@ related:
 
 > 개별 ad_ 물리 커널이 NLM 의 forward 연산을 시간 역방향으로 전치(transpose)·역전파하는 구조. (경로: roms/ROMS/Adjoint/)
 
-프레임워크(4D-Var 드라이버·I/O·precondition)는 [[roms_adjoint_framework]] 참조. 본 노트는 **개별 ad_ 커널의 adjoint 연산 패턴**과 **driver 의 역방향 호출 순서**에 집중한다.
+프레임워크(4D-Var 드라이버·I/O·precondition)는 [roms_adjoint_framework](roms_adjoint_framework.md) 참조. 본 노트는 **개별 ad_ 커널의 adjoint 연산 패턴**과 **driver 의 역방향 호출 순서**에 집중한다.
 
 ---
 
@@ -39,6 +40,12 @@ step 루프 자체가 역방향이다 — `ad_main3d.F:266`:
 ```
 STEP_LOOP : DO istep=Nsteps,1,-1
 ```
+
+수반 모델은 시간 단계 역순으로 적분한다 (`ROMS/Adjoint/ad_main3d.F:266`).
+감도 함수의 수반 forcing은 이 역적분에 입력한다 ([4D-Var 대조 보고서의 DA1-812](../../../_staging/recovery/compare/roms-da-4dvar-vs-code.md#4-노트-대조와-수정안)).
+
+`ad_main3d`는 `obs_read` 다음에 `WEAK_CONSTRAINT`이면 `ad_htobs`를 호출한다.
+`WEAK_CONSTRAINT`가 없으면 `ad_misfit`을 호출한다 (`ROMS/Adjoint/ad_main3d.F:697,709-714`; [DA 계산 흐름 대조 보고서](../../../_staging/recovery/flow/ROMS-callflow-da.md#6-기존-노트-대조와-수정안)). [10-14 전수 검증 보완]
 
 JEDI 빌드에서는 시간 클럭도 후진한다 (`ad_main3d.F:273-274`): `jic(ng)=jic(ng)-1`, `time4jedi(ng)=time4jedi(ng)-dt(ng)`.
 
@@ -161,7 +168,7 @@ NLM 처럼 adjoint 도 컴파일 옵션별 `.h` include 로 알고리즘을 선�
 
 | cppdef | include | 알고리즘 |
 |---|---|---|
-| `PJ_GRADP` | `ad_prsgrd40.h` (`:21`) | Jacobian density (4th-order 계열) |
+| `PJ_GRADP` | `ad_prsgrd40.h` (`:21`) | Lin (1997)의 finite-volume pressure Jacobian (`ROMS/Adjoint/ad_prsgrd40.h:10-12`) |
 | `DJ_GRADPS` | `ad_prsgrd32.h` (`:23`) | spline density Jacobian |
 | (default) | `ad_prsgrd31.h` (`:25`) | standard density Jacobian |
 
@@ -187,8 +194,23 @@ NLM 처럼 adjoint 도 컴파일 옵션별 `.h` include 로 알고리즘을 선�
 
 ---
 
-## 6. 미확인 / 후속
+## 6. 검증 절차와 순압 dispatch
 
-- **adjoint 정확성 검증**(dot-product / gradient test) 루틴 위치 — source-needed (본 노트는 커널 연산 구조에 한정; 검증 드라이버는 `Drivers/` 또는 [[roms_adjoint_framework]] 영역으로 추정).
-- `ad_step2d_FB.h` / `ad_step2d_LF_AM3.h` 등 순압 2D adjoint 알고리즘 상세는 미독(파일 크기 173KB~213KB). dispatch 는 `ad_step2d.F` 경유 (`ad_main3d.F:595` 호출 확인).
-- WEC(`WEC_NOT_YET`)·BBL·bulk_flux adjoint 는 driver 에서 다수 `_NOT_YET` 가드로 비활성(`ad_main3d.F:50-58,118` 등) — adjoint 미완 영역.
+`SANITY_CHECK`는 접선형 모형과 수반 모형의 지정점 검사를 선택한다 (`Master/roms_kernel.F:142-143`).
+표준 입력 `User` 배열로 검사할 변수와 격자점을 지정한다 (`ROMS/Drivers/pert_roms.h:31-39`; [빌드·옵션 대조 보고서의 RBH-1335](../../../_staging/recovery/compare/roms-build-options-history-vs-code.md#5-차이-결론)).
+
+순압 2D 수반 알고리즘은 `ad_step2d.F`의 `# include "ad_step2d_LF_AM3.h"`로 선택한다 (`ROMS/Adjoint/ad_step2d.F:20`). [10-14 전수 검증 보완]
+`ad_main3d`는 `ad_step2d`를 호출한다 (`ROMS/Adjoint/ad_main3d.F:595`).
+
+수반 드라이버의 인용한 `_NOT_YET` 전처리 분기에서 `USE` 문은 `!!`로 주석 처리되어 있다 (`ROMS/Adjoint/ad_main3d.F:50-58,118-120`). [10-14 전수 검증 정정]
+
+## 문서와 코드 차이 (10-14 대조)
+
+출처는 [생지화학 대조 보고서](../../../_staging/recovery/compare/roms-biology-vs-code.md#5-차이-결론)의 최종 결론이다.
+
+문서 판은 ROMS 위키 wikitext이다 (2026-05-03 받음; 쪽별 revid는 [manifest.json](../raw/manuals/wiki/manifest.json)). 코드 판은 원본 저장소 HEAD `57aecf58`이다 (2026-09-18; roms-4.2 이후 4.3 개발).
+
+| 행 ID | 항목 | 문서 원문 | 코드 원문 | 결론 | 결론 문장 |
+|---|---|---|---|---|---|
+| biology:ES-096 | ad_AKT_BAK | `ecosim.in.wiki:306` <code>*Vertical mixing coefficients for biological tracers: [1:&#91;&#91;Variables#NBT\|NBT&#93;&#93;,&#91;&#91;Variables#Ngrids\|Ngrids&#93;&#93;] values expected.</code><br>`ecosim.in.wiki:307` <code>:&lt;div class="box"&gt;       &#91;&#91;Variables#AKT_BAK\|AKT_BAK&#93;&#93; == 61*1.0d-6         ! m&lt;sup&gt;2&lt;/sup&gt;/s&lt;br /&gt;&lt;br /&gt;    &#91;&#91;Variables#ad_AKT_fac\|ad_AKT_fac&#93;&#93; == 61*1.0d0          ! nondimensional&lt;/div&gt;</code><br>`User/External/ecosim.in:552` `    ad_AKT_BAK == 61*1.0d0                       ! nondimensional` | `ROMS/Nonlinear/Biology/ecosim_inp.h:296` `            CASE ('ad_AKT_fac')`<br>`ROMS/Nonlinear/Biology/ecosim_inp.h:297` `              Npts=load_r(Nval, Rval, NBT, Ngrids, Rbio)`<br>`ROMS/Nonlinear/Biology/ecosim_inp.h:298` `              DO ng=1,Ngrids`<br>`ROMS/Nonlinear/Biology/ecosim_inp.h:299` `                DO itrc=1,NBT`<br>`ROMS/Nonlinear/Biology/ecosim_inp.h:300` `                  i=idbio(itrc)`<br>`ROMS/Nonlinear/Biology/ecosim_inp.h:301` `                  ad_Akt_fac(i,ng)=Rbio(itrc,ng)`<br>`ROMS/Nonlinear/Biology/ecosim_inp.h:302` `                  tl_Akt_fac(i,ng)=Rbio(itrc,ng)`<br>`ROMS/Nonlinear/Biology/ecosim_inp.h:303` `                END DO` | B 문서 오기 | EcoSim 생물 입력에서 ad_AKT_BAK를 ad_AKT_fac로 고친다. [10-14 전수 검증 보완] |
+| biology:CM-097 | 생물 ad_AKT_fac의 FORWARD_MIXING 효과 | `User/External/ecosim.in:1196` `!  ad_AKT_fac     Adjoint-based algorithms vertical mixing, basic state,`<br>`User/External/ecosim.in:1197` `!                   scale factor (nondimensional) for biological tracer`<br>`User/External/ecosim.in:1198` `!                   variables; [1:NBT,1:Ngrids] values are expected. In`<br>`User/External/ecosim.in:1199` `!                   some applications, a smaller/larger values of vertical`<br>`User/External/ecosim.in:1200` `!                   mixing are necessary for stability. It is only used`<br>`User/External/ecosim.in:1201` `!                   when FORWARD_MIXING is activated.` | `ROMS/Nonlinear/Biology/ecosim_inp.h:296` `            CASE ('ad_AKT_fac')`<br>`ROMS/Nonlinear/Biology/ecosim_inp.h:297` `              Npts=load_r(Nval, Rval, NBT, Ngrids, Rbio)`<br>`ROMS/Nonlinear/Biology/ecosim_inp.h:298` `              DO ng=1,Ngrids`<br>`ROMS/Nonlinear/Biology/ecosim_inp.h:299` `                DO itrc=1,NBT`<br>`ROMS/Nonlinear/Biology/ecosim_inp.h:300` `                  i=idbio(itrc)`<br>`ROMS/Nonlinear/Biology/ecosim_inp.h:301` `                  ad_Akt_fac(i,ng)=Rbio(itrc,ng)`<br>`ROMS/Nonlinear/Biology/ecosim_inp.h:302` `                  tl_Akt_fac(i,ng)=Rbio(itrc,ng)`<br>`ROMS/Nonlinear/Biology/ecosim_inp.h:303` `                END DO`<br>`ROMS/Adjoint/ad_get_data.F:1480` `#   ifdef FORWARD_MIXING`<br>`ROMS/Adjoint/ad_get_data.F:1481` `!`<br>`ROMS/Adjoint/ad_get_data.F:1482` `!  Read in vertical mixing variables.`<br>`ROMS/Adjoint/ad_get_data.F:1483` `!`<br>`ROMS/Adjoint/ad_get_data.F:1484` `      DO i=1,NAT`<br>`ROMS/Adjoint/ad_get_data.F:1485` `        scale=Fscale(idDiff(i),ng)                    ! save and rescale`<br>`ROMS/Adjoint/ad_get_data.F:1486` `        Fscale(idDiff(i),ng)=ad_Akt_fac(i,ng)`<br>`ROMS/Tangent/tl_get_data.F:1479` `#   ifdef FORWARD_MIXING`<br>`ROMS/Tangent/tl_get_data.F:1480` `!`<br>`ROMS/Tangent/tl_get_data.F:1481` `!  Read in vertical mixing variables.`<br>`ROMS/Tangent/tl_get_data.F:1482` `!`<br>`ROMS/Tangent/tl_get_data.F:1483` `      DO i=1,NAT`<br>`ROMS/Tangent/tl_get_data.F:1484` `        scale=Fscale(idDiff(i),ng)                    ! save and rescale`<br>`ROMS/Tangent/tl_get_data.F:1485` `        Fscale(idDiff(i),ng)=tl_Akt_fac(i,ng)`<br>`ROMS/Representer/rp_get_data.F:1478` `#   ifdef FORWARD_MIXING`<br>`ROMS/Representer/rp_get_data.F:1479` `!`<br>`ROMS/Representer/rp_get_data.F:1480` `!  Read in vertical mixing variables.`<br>`ROMS/Representer/rp_get_data.F:1481` `!`<br>`ROMS/Representer/rp_get_data.F:1482` `      DO i=1,NAT`<br>`ROMS/Representer/rp_get_data.F:1483` `        scale=Fscale(idDiff(i),ng)                    ! save and rescale`<br>`ROMS/Representer/rp_get_data.F:1484` `        Fscale(idDiff(i),ng)=tl_Akt_fac(i,ng)`<br>`316e5450:ROMS/Adjoint/ad_get_data.F:1241` `        Fscale(idDiff(i),ng)=ad_Akt_fac(i,ng)`<br>`316e5450:User/External/ecosim.in:1028` `!  ad_AKT_fac     Adjoint-based algorithms vertical mixing, basic state,`<br>`316e5450:User/External/ecosim.in:1029` `!                   scale factor (nondimensional) for biological tracer`<br>`316e5450:User/External/ecosim.in:1030` `!                   variables; [1:NBT,1:Ngrids] values are expected. In`<br>`316e5450:User/External/ecosim.in:1031` `!                   some applications, a smaller/larger values of vertical`<br>`316e5450:User/External/ecosim.in:1032` `!                   mixing are necessary for stability. It is only used`<br>`316e5450:User/External/ecosim.in:1033` `!                   when FORWARD_MIXING is activated.`<br>`ROMS/Adjoint/ad_step3d_t.F:558` `        DO itrc=1,NT(ng)`<br>`ROMS/Adjoint/ad_step3d_t.F:559` `          ltrc=MIN(NAT,itrc)`<br>`ROMS/Nonlinear/Biology/npzd_Franks_inp.h:156` `            CASE ('ad_AKT_fac')`<br>`ROMS/Nonlinear/Biology/npzd_Franks_inp.h:157` `              Npts=load_r(Nval, Rval, NBT, Ngrids, Rbio)`<br>`ROMS/Nonlinear/Biology/npzd_Franks_inp.h:158` `              DO ng=1,Ngrids`<br>`ROMS/Nonlinear/Biology/npzd_Franks_inp.h:159` `                DO itrc=1,NBT`<br>`ROMS/Nonlinear/Biology/npzd_Franks_inp.h:160` `                  i=idbio(itrc)`<br>`ROMS/Nonlinear/Biology/npzd_Franks_inp.h:161` `                  ad_Akt_fac(i,ng)=Rbio(itrc,ng)`<br>`ROMS/Nonlinear/Biology/npzd_Franks_inp.h:162` `                  tl_Akt_fac(i,ng)=Rbio(itrc,ng)`<br>`ROMS/Adjoint/Biology/ad_biology.F:2` `#if defined ADJOINT && defined BIOLOGY`<br>`ROMS/Adjoint/Biology/ad_biology.F:18` `# elif defined NPZD_FRANKS`<br>`ROMS/Adjoint/Biology/ad_biology.F:19` `#  include <ad_npzd_Franks.h>`<br>`ROMS/Adjoint/ad_get_data.F:1246` `# ifdef FORWARD_READ`<br>`ROMS/Adjoint/ad_get_data.F:1333` `#  ifdef SOLVE3D` | E 코드 결함 후보 (중간) | FORWARD_READ, SOLVE3D, FORWARD_MIXING 경로에서 생물 ad_AKT_fac 입력은 저장되지만 생물 tracer별 배율로 소비되지 않는 결함 후보이다. 근거 강도는 중간이다. |

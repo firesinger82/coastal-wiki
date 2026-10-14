@@ -4,7 +4,8 @@ model: ROMS
 component: ROMS/Utility
 canonical_source: self
 citation_status: verified
-verification_method: "ROMS 소스 직접 read (roms/ROMS/Utility, roms/ROMS/Modules). mod_netcdf.F (INTERFACE 오버로딩·netcdf_create cmode), def_dim.F·def_var.F (nf90/PIO 듀얼 인터페이스·nf90_def_var·deflate), def_his.F (파일 생성·차원·변수 정의), wrt_his.F (Rindex 시간레코드 write·nf_fwrite), nf_fwrite2d.F·nf_fread2d.F (gather/scatter·water-point packing), get_2dfld.F·get_grid.F·get_state.F·read_phypar.F 헤더·핵심 로직 file:line 인용"
+verification_method: "ROMS 소스 직접 read (roms/ROMS/Utility, roms/ROMS/Modules). mod_netcdf.F (INTERFACE 오버로딩·netcdf_create cmode), def_dim.F·def_var.F (nf90/PIO 듀얼 인터페이스·nf90_def_var·deflate), def_his.F (파일 생성·차원·변수 정의), wrt_his.F (Rindex 시간레코드 write·nf_fwrite), nf_fwrite2d.F·nf_fread2d.F (gather/scatter·water-point packing), get_2dfld.F·get_grid.F·get_state.F·read_phypar.F 헤더·핵심 로직 file:line 인용. 2026-10-14 ROMS recovery 대조 보고서 반영"
+last_source_check: "2026-10-14 (recovery 대조 반영)"
 note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-16
 related:
@@ -17,7 +18,11 @@ related:
 
 > ROMS의 디스크 입출력 전체를 담당하는 Utility/ 의 NetCDF I/O 계층 분석. 파일/차원/변수 **정의**(`def_*`, 23개) → **출력**(`wrt_*`, 20개) → **입력**(`get_*` 18개, `read_*` 10개) → **저수준 병렬 read/write 래퍼**(`nf_f(re|w)rite*`, 12개) 의 4단 구조. (경로: roms/ROMS/Utility/, mod_netcdf 는 roms/ROMS/Modules/)
 
-ROMS .F 파일은 모두 C-preprocessor 매크로(`#include "cppdefs.h"`)로 시작하며, NetCDF 표준 라이브러리와 NCAR **PIO(Parallel-IO)** 라이브러리를 동일 이름의 generic interface로 추상화한다.
+ROMS의 많은 수치 커널과 I/O 파일은 `cppdefs.h`를 포함한다([build-options-history:RBH-3504](../../../_staging/recovery/compare/roms-build-options-history-vs-code.md#4-노트-대조와-수정안)).
+독립 유틸리티에는 예외가 있다(`ROMS/Utility/yaml_parser.F:1`, `ROMS/Utility/get_env.F:1`).
+상위 I/O 계층의 `def_info`는 같은 generic 이름 아래 `def_info_nf90`를 제공한다(`ROMS/Utility/def_info.F:75–80`).
+`PIO_LIB`와 `DISTRIBUTE`가 정의되면 `def_info_pio`도 제공한다(`ROMS/Utility/def_info.F:77–79`).
+하위 `netcdf_*`와 `pio_netcdf_*` 호출 이름은 서로 다르다(`ROMS/Modules/mod_netcdf.F:38–45`, `ROMS/Modules/mod_pio_netcdf.F:42–49`).
 
 ---
 
@@ -29,15 +34,19 @@ ROMS .F 파일은 모두 C-preprocessor 매크로(`#include "cppdefs.h"`)로 시
 | 파일·차원·변수 정의 | `def_*` | 23 | NetCDF 파일 생성, 차원/변수/속성 정의 (define mode) |
 | 격자장 출력 | `wrt_*` | 20 | 시간 레코드별 모델 필드를 출력 파일에 write |
 | 격자장 입력 | `get_*` (18), `read_*` (10) | 28 | 초기/경계/강제·격자 read, 표준입력 파라미터 read |
-| 분산 2D/3D/4D read/write | `nf_fread*` / `nf_fwrite*` | 12 | MPI 타일 ↔ 전역 배열 gather/scatter + nf90_get/put_var |
+| 분산 2D/3D/4D read/write | `nf_fread*` / `nf_fwrite*` | 12개 .F 파일 | NetCDF·PIO 분기는 §6을 따른다. |
 
-`def_*`/`wrt_*` 이 **출력 파일별로 1:1 쌍**을 이룬다: his(history)/avg(time-average)/rst(restart)/ini(initial)/dai(daily-avg)/diags/floats/station/quick/tides 등. 예) `def_his.F` ↔ `wrt_his.F`, `def_rst.F` ↔ `wrt_rst.F`.
+같은 접미사의 `def_*`·`wrt_*` 파일이 있는 출력 종류에는 his(history), avg(time-average), rst(restart), ini(initial), dai(자료동화 분석 초기조건 또는 EnKF 재시작), diags, floats, station, quick, tides가 있다. 예는 `def_his.F`·`wrt_his.F`와 `def_rst.F`·`wrt_rst.F`이다. (`ROMS/Utility/`의 해당 파일명) [10-14 전수 검증 정정]
+
+위 표의 12개는 Utility의 `nf_fread*.F` 7개와 `nf_fwrite*.F` 5개를 센 값이다([outputs-metadata:OMD-N016](../../../_staging/recovery/compare/roms-outputs-metadata-vs-code.md#4-노트-대조와-수정안)).
 
 출력 파일 종류 (헤더 주석):
 - `def_his.F:11` — `This module creates output HISTORY file ...`
 - `def_rst.F:11` — `This module creates ouput restart file ...` (원문 오타 verbatim)
 - `def_ini.F:11` — `This module open existing nonlinear model initial conditions file ...`
-- `def_avg`(time-average)·`def_dai`(daily)·`def_diags`(diagnostics)·`def_quick`(quick-save)·`def_tides`·`def_floats`·`def_station`·`def_extract`. 4D-Var 전용: `def_hessian`·`def_lanczos`·`def_norm`·`def_std`·`def_state`·`def_impulse`·`def_error`. GST(고유값): `def_gst`.
+- `def_avg`(time-average)·`def_dai`(자료동화 분석 초기조건 또는 EnKF 재시작)·`def_diags`(diagnostics)·`def_quick`(quick-save)·`def_tides`·`def_floats`·`def_station`·`def_extract`. 4D-Var 전용: `def_hessian`·`def_lanczos`·`def_norm`·`def_std`·`def_state`·`def_impulse`·`def_error`. GST(고유값): `def_gst`.
+
+`def_dai`는 `FOUR_DVAR` 또는 `ENKF_RESTART` 조건에서 자료동화 분석 초기조건 또는 EnKF 재시작 파일을 정의한다(`ROMS/Utility/def_dai.F:3`, `ROMS/Utility/def_dai.F:12–15`).
 
 ---
 
@@ -68,9 +77,10 @@ PUBLIC 진입점 (`mod_netcdf.F:117-128`): `netcdf_check_dim`, `netcdf_check_var
 - `NF_TOUT` (시간·깊이 변수) = 항상 `nf90_double` — 주석 `:203-205`: *"It is set to double precision for accuaracy in both single and douple precision numerical kernel"* (원문 오타 verbatim)
 
 ### 2.3 파일 생성 모드 (CMODE)
-`mod_netcdf.F:211-218` — 기본 생성 모드 플래그. `HDF5 || PARALLEL_IO || OUT_NETCDF4` 시 `CMODE = nf90_netcdf4` (NetCDF-4/HDF5), 아니면 classic. `netcdf_create` 에서 `IOR` 로 추가 플래그 합성:
-- 병렬 경로 (`netcdf_create.F:9137-9140` 부근): `my_cmode=IOR(CMODE, nf90_mpiio)` → `IOR(my_cmode, nf90_clobber)` → `nf90_create(path=..., cmode=my_cmode, ...)`
-- 직렬 경로 (`:9163-9169`): `my_cmode=IOR(nf90_clobber, CMODE)`, `IOR(my_cmode, nf90_share)`, `nf90_create(TRIM(ncname), my_cmode, ncid)`
+`#if defined HDF5 || defined PARALLEL_IO` 분기는 `CMODE = nf90_netcdf4`를 선택한다(`ROMS/Modules/mod_netcdf.F:215–216`).
+`#elif defined OUT_NETCDF4` 분기도 `CMODE = nf90_netcdf4`를 선택한다(`ROMS/Modules/mod_netcdf.F:217–218`).
+일반 기본은 `nf90_64bit_offset`이다(`ROMS/Modules/mod_netcdf.F:220`).
+`PARALLEL_IO` 생성은 `my_cmode=IOR(CMODE, nf90_mpiio)`로 `nf90_mpiio`를 추가한다(`ROMS/Modules/mod_netcdf.F:9696`).
 
 (`netcdf_create` SUBROUTINE 본체: `mod_netcdf.F:9642-9775`)
 
@@ -92,7 +102,12 @@ END INTERFACE def_dim
 `def_dim_nf90` 본체 (`def_dim.F:34-120`): `OutThread` 만 `nf90_def_dim(ncid, TRIM(DimName), DimSize, DimId)` 호출 (`:94-95`) → 오류 시 `FoundError` 로 `exit_flag=3` 설정 (`:96-100`). 비병렬 I/O + DISTRIBUTE 빌드에서는 `mp_bcasti` 로 `DimID/status/exit_flag` 를 전 thread 에 broadcast (`def_dim.F:103-113`). PIO 버전(`:125-190`)은 `PIO_def_dim` 사용 (`:178`), broadcast 불필요(병렬 I/O 자체가 분산).
 
 ### 3.2 def_var — 변수 + 메타데이터 정의
-`def_var.F:11` *"This routine defines the requested NetCDF variable"*. 입력 `Vinfo` 문자열 배열이 CF 규약 속성 **26종**을 운반 (`def_var.F:33-60`). 인자 선언이 고정 크기 `Vinfo(25)`에서 `Vinfo(Natt)`로 바뀌고 `Natt=26`이 `mod_ncparam.F:114`에 새로 정의됐으며, 26번째 `range` 속성이 nf90·PIO 양쪽 경로에서 실제로 기록된다 (`def_var.F:59, 127, 997-1013, 2026-2042`): `(1)`이름·`(2)`long_name·`(3)`units·`(4)`calendar·`(13)`cycle·`(14)`field·`(16)`time·`(17)`missing_value·`(21)`standard_name·`(22)`coordinates·`(23)`formula_terms·`(24)`_FillValue 등. `Aval` 실수배열은 add_offset/valid_min/valid_max/missing/C-grid-type/fill 값 운반 (`:26-32`).
+`def_var.F:11` *"This routine defines the requested NetCDF variable"*.
+`Vinfo`는 변수 정의 정보를 담는 `Natt=26`개의 문자열 슬롯이다(`ROMS/Modules/mod_ncparam.F:114`, `ROMS/Utility/def_var.F:127`).
+첫 슬롯은 변수 이름이다(`ROMS/Utility/def_var.F:34`).
+`Vinfo`는 이름·조건·자료형 정보를 함께 운반한다([outputs-metadata:OMD-N018](../../../_staging/recovery/compare/roms-outputs-metadata-vs-code.md#4-노트-대조와-수정안)).
+26번째 `range`는 NetCDF와 PIO 출력부에서 별도 속성으로 처리한다(`ROMS/Utility/def_var.F:59`, `ROMS/Utility/def_var.F:1000–1004`, `ROMS/Utility/def_var.F:2029–2033`).
+`Aval` 실수배열은 add_offset/valid_min/valid_max/missing/C-grid-type/fill 값을 운반한다(`def_var.F:26-32`).
 
 핵심 호출:
 - 스칼라(`nVdim==1 && Vdim(1)==0`): `nf90_def_var(ncid, TRIM(Vinfo(1)), Vtype, varid=Vid)` (`def_var.F:160-162`)
@@ -135,6 +150,7 @@ END INTERFACE def_dim
 
 ### 6.1 인터페이스 분기
 `nf_fwrite2d.F:77-82`: generic `nf_fwrite2d` = `nf90_fwrite2d` (+ PIO 시 `pio_fwrite2d`).
+`pio_fwrite2d`는 `#if defined PIO_LIB && defined DISTRIBUTE` 조건에서 제공된다(`ROMS/Utility/nf_fwrite2d.F:79–80`).
 
 ### 6.2 입력 인자 의미 (헤더 `:17-50`)
 - `gtype` — 격자 타입. **음수면 water point 만 기록** (`:34`).
@@ -144,18 +160,29 @@ END INTERFACE def_dim
 - `SetFillVal` — 육지에 fill value 설정 (`:45-46`).
 
 ### 6.3 직렬-vs-병렬 분기
-- `PARALLEL_IO && DISTRIBUTE` 빌드(`nf_fwrite2d.F:86-`): 각 프로세스가 PIO 로 자기 타일을 직접 write. `pack_field2d` 로 타일 데이터 패킹 (`:519-520`) 후 `nf90_put_var(ncid, ncvarid, Awrk, start, total)` (`:551`).
-- 비-PARALLEL_IO 분산 빌드(`nf90_fwrite2d`, `:89-`): `mp_collect` 로 전 타일을 마스터에 모은 뒤 단일 write.
-  - 일반 격자(`gtype>0`): `nf90_put_var(ncid, ncvarid, Awrk, start, total)` (`:295`).
-  - water-point 압축(`gtype<0`): `CALL mp_collect (ng, model, Npts, IniVal, Awrk)` (`:356`) → `nf90_put_var(ncid, ncvarid, Awrk(Istr:), start, total)` (`:379`).
+`#if defined PARALLEL_IO && defined DISTRIBUTE`의 표준 NetCDF 경로는 각 노드가 자기 타일을 직접 쓴다(`ROMS/Utility/nf_fwrite2d.F:86`, `ROMS/Utility/nf_fwrite2d.F:286–295`).
+이 경로의 쓰기 호출은 `nf90_put_var(ncid, ncvarid, Awrk, start, total)`이다(`ROMS/Utility/nf_fwrite2d.F:295`).
+
+그 외 표준 NetCDF 쓰기 경로는 `pack_field2d`를 호출한다(`ROMS/Utility/nf_fwrite2d.F:394`, `ROMS/Utility/nf_fwrite2d.F:519–527`).
+분산 실행의 gather 호출은 `#ifdef DISTRIBUTE` 안의 `IF (Extract_Flag.ge.0) THEN`에 있다(`ROMS/Utility/pack_field.F:697`, `ROMS/Utility/pack_field.F:712–718`).
+실제 쓰기는 `IF (OutThread) THEN` 아래의 `nf90_put_var(ncid, ncvarid, Awrk, start, total)`이다(`ROMS/Utility/nf_fwrite2d.F:550–551`).
+
 - 통계: `CALL stats_2dfld (...)` 로 min/max 산출 (`:560`).
 
 > `POSITIVE_ZERO` 매크로 주석 `nf_fwrite2d.F:58-64`: F95 부호있는 0(-0/+0) 때문에 직렬·병렬 출력이 달라질 수 있어, 병렬 분할 버그 추적 위해 "positive zero" 강제.
 
 ### 6.4 입력 대칭 (nf_fread2d)
-`nf_fread2d.F` — read 후 **scatter**: `nf90_get_var(ncid, ncvarid, wrk, start, total)` (`nf_fread2d.F:358`, `:482`, `:997`) 로 전역장 읽은 뒤 `mp_scatter2d` 로 각 타일에 분배 (`:1035`). 사용 분산 루틴 `mp_bcastf/mp_bcasti/mp_scatter2d` (`:727`).
+`#if defined PARALLEL_IO && defined DISTRIBUTE`의 표준 NetCDF 경로는 각 노드가 자기 타일을 직접 읽는다(`ROMS/Utility/nf_fread2d.F:78`, `ROMS/Utility/nf_fread2d.F:339–358`).
+그 외 경로에서는 `InpThread`가 읽는다(`ROMS/Utility/nf_fread2d.F:996–997`).
+이 경로의 `IF (.not.interpolate) THEN` 안에서 `DISTRIBUTE`가 정의되면 `mp_scatter2d`를 호출한다(`ROMS/Utility/nf_fread2d.F:1030–1040`).
+이 표준 NetCDF 경로에서 보간이 필요하고 `DISTRIBUTE`가 정의되면 `mp_bcastf`를 호출한다. 보간이 필요한 경우는 `regrid_nf90` 경로를 따른다([outputs-metadata:OMD-N021](../../../_staging/recovery/compare/roms-outputs-metadata-vs-code.md#4-노트-대조와-수정안), `ROMS/Utility/nf_fread2d.F:1070–1085`). [10-14 전수 검증 정정]
+`IF (.not.interpolate) THEN` 안에서 `DISTRIBUTE`가 없으면 배열을 직접 푼다(`ROMS/Utility/nf_fread2d.F:1030–1045`). [10-14 전수 검증 정정]
 
-3D/4D·경계(bry)·추출(xtr) 변형: `nf_fread3d`/`nf_fread4d`/`nf_fread2d_bry`/`nf_fread3d_bry`/`nf_fread2d_xtr`/`nf_fread3d_xtr`, write 측도 동형 (`nf_fwrite3d`/`nf_fwrite4d`/`*_bry`).
+일반 격자의 3D·4D reader는 `nf_fread3d`·`nf_fread4d`이다([outputs-metadata:OMD-N022](../../../_staging/recovery/compare/roms-outputs-metadata-vs-code.md#4-노트-대조와-수정안)).
+경계(bry) reader는 `nf_fread2d_bry`·`nf_fread3d_bry`이다([outputs-metadata:OMD-N022](../../../_staging/recovery/compare/roms-outputs-metadata-vs-code.md#4-노트-대조와-수정안)).
+추출(xtr) reader는 `nf_fread2d_xtr`·`nf_fread3d_xtr`이다([outputs-metadata:OMD-N022](../../../_staging/recovery/compare/roms-outputs-metadata-vs-code.md#4-노트-대조와-수정안)).
+경계·추출 차원은 일반 2D·3D 격자 차원과 구분한다([outputs-metadata:OMD-N022](../../../_staging/recovery/compare/roms-outputs-metadata-vs-code.md#4-노트-대조와-수정안)).
+대응 writer에는 `nf_fwrite3d`·`nf_fwrite4d`·`*_bry`가 있다([outputs-metadata:OMD-N022](../../../_staging/recovery/compare/roms-outputs-metadata-vs-code.md#4-노트-대조와-수정안)).
 
 ---
 
@@ -175,10 +202,16 @@ END INTERFACE def_dim
 - `get_cycle.F` — 강제장 순환 주기 내 적절한 레코드 위치 계산 헬퍼.
 
 ### 7.3 표준입력 파라미터 read (read_*)
-`read_phypar.F:11` *"This routine reads and reports physical model input parameters."* — `roms.in` 형식 키워드 입력을 파싱(8237 라인). 하위 분야별:
+`read_phypar.F:11` *"This routine reads and reports physical model input parameters."* — `roms.in` 형식 키워드 입력을 파싱한다.
+입력 처리의 코드 판은 HEAD `57aecf58`이다. `Ngrids` 입력은 `CASE ('Ngrids')`에서 읽는다(`ROMS/Utility/read_phypar.F:171–173`; [inputs:RI1-1044](../../../_staging/recovery/compare/roms-inputs-vs-code.md#5-차이-결론)). [10-14 전수 검증 정정]
+하위 분야별:
 - `read_biopar`(생물)·`read_sedpar`(퇴적)·`read_icepar`(해빙)·`read_vegpar`(식생)·`read_stapar`(station)·`read_fltpar`/`read_fltbiopar`(floats)·`read_asspar`(데이터동화)·`read_couplepar`(모델 결합).
 
 read_*는 NetCDF 가 아닌 **텍스트 표준입력** 파서다(파일명·스위치를 받아 이후 get_*/def_* 가 사용). NetCDF I/O 자체는 아니나 I/O 설정 진입점.
+
+MCT는 `read_couplepar`를 사용한다(`ROMS/Utility/read_couplepar.F:2`, `ROMS/Utility/read_couplepar.F:102`).
+native ESMF는 `mod_esmf_esm`의 입력 판독을 사용한다(`Master/mod_esmf_esm.F:1598`).
+CMEPS는 YAML 설정을 읽는다(`Master/cmeps_roms.h:726`).
 
 ---
 
@@ -189,15 +222,36 @@ read_*는 NetCDF 가 아닌 **텍스트 표준입력** 파서다(파일명·스�
 | `def_dim`·`nf_fwrite2d`는 nf90 + 조건부 PIO 구현을 generic INTERFACE 로 추상화; `def_his`는 PUBLIC wrapper/PRIVATE backend 구성 | `def_dim.F:24-29`, `nf_fwrite2d.F:77-82`, `def_his.F:71-79` |
 | 오류 전파: `FoundError(status, nf90_noerr, __LINE__, MyFile)` → `exit_flag=3; ioerror=status` | `def_dim.F:96-100`, `def_var.F:167-172` |
 | 비-PARALLEL_IO 분산: `OutThread`/`Master` 만 호출, 결과 `mp_bcast*` broadcast | `def_dim.F:94-113` |
-| write = (gather/pack) → `nf90_put_var`; read = `nf90_get_var` → (scatter) | `nf_fwrite2d.F:295,379,551`; `nf_fread2d.F:358,1035` |
+| `#if defined PARALLEL_IO && defined DISTRIBUTE`의 NetCDF 경로는 타일을 직접 읽고 쓴다. | `ROMS/Utility/nf_fread2d.F:78,339–358`, `ROMS/Utility/nf_fwrite2d.F:86,286–295` |
+| 그 외 쓰기 경로는 `pack_field2d`를 호출한다. | `ROMS/Utility/nf_fwrite2d.F:519–527` |
+| 분산 쓰기의 gather는 `IF (Extract_Flag.ge.0) THEN` 안에 있다. | `ROMS/Utility/pack_field.F:697,712–718` |
+| 그 외 읽기 경로의 scatter 조건은 `DISTRIBUTE`와 `IF (.not.interpolate) THEN`이다. | `ROMS/Utility/nf_fread2d.F:1030–1040` |
+| 이 표준 NetCDF 보간 경로는 `DISTRIBUTE`가 정의되면 broadcast를 사용한다. [10-14 전수 검증 정정] | `ROMS/Utility/nf_fread2d.F:1070–1074` |
+| 비분산 읽기 경로는 `IF (.not.interpolate) THEN` 안에서 배열을 직접 푼다. [10-14 전수 검증 정정] | `ROMS/Utility/nf_fread2d.F:1030–1045` |
 | def_*/wrt_* 출력 파일별 1:1 쌍, 변수 ID는 구조체 `<F>(ng)%Vid(idXxx)` 에 보존 | `def_his.F:562`, `wrt_his.F:270` |
 | 시간 레코드(unlimited)는 wrt_* 의 `%Rindex` 가 증분 관리 | `wrt_his.F:235,257` |
 
 ---
 
-## 9. 미확인 / 후속 (source-needed)
+## 9. 관련 구현 위치
 
-- `netcdf_open`/`netcdf_close`/`netcdf_enddef`/`netcdf_redef`/`netcdf_sync` 내부 구현 라인 — PUBLIC 선언만 확인(`mod_netcdf.F:119-128`), 본체 미정독. ⚠ 미확인.
-- set_2dfld/set_3dfld 의 실제 시간보간 계수(`fac1`/`fac2`) 적용 — 본 노트 범위 밖(numerics 계열, 별도 노트 담당).
-- 4D-Var 전용 def/wrt (def_hessian·def_lanczos·def_norm·def_std·wrt_state 등) 세부 — 헤더만 식별, 구조는 [[roms_4dvar]]/[[roms_adjoint_framework]] 와 교차. source-needed.
-- `def_var.F` UGRID 위상 속성(`face_dimensions` 등) 의 전체 조건부 분기 — 대표 라인만 인용.
+- `netcdf_open`/`netcdf_close`/`netcdf_enddef`/`netcdf_redef`/`netcdf_sync`의 PUBLIC 선언: `mod_netcdf.F:119-128`.
+- 시간보간 계수(`fac1`/`fac2`) 적용: `set_2dfld`/`set_3dfld`. (`ROMS/Utility/set_2dfld.F:116–124`, `ROMS/Utility/set_3dfld.F:126–135`) [10-14 전수 검증 보완]
+- 자료동화 파일의 관련 설명: [roms_4dvar](roms_4dvar.md)·[roms_adjoint_framework](roms_adjoint_framework.md). [10-14 전수 검증 정정]
+- SGRID 위상 속성(`face_dimensions` 등)의 대표 기록부: `ROMS/Utility/def_var.F:196–203,230–233`. [10-14 전수 검증 정정]
+
+### 9.1 정규화 파일의 생성·조회와 LCZ 레코드
+
+`def_norm`은 `SELECT CASE (NRM(ifile,ng)%IOtype)`으로 표준 NetCDF와 PIO를 구분한다(`ROMS/Utility/def_norm.F:68–74`).
+PIO 경로의 조건은 `# if defined PIO_LIB && defined DISTRIBUTE`이다(`ROMS/Utility/def_norm.F:72–74`).
+`DEFINE : IF (LdefNRM(ifile,ng)) THEN`은 파일 생성 분기이다(`ROMS/Utility/def_norm.F:151`).
+`QUERY : IF (.not.LdefNRM(ifile,ng)) THEN`은 기존 파일의 변수·차원을 조회한다(`ROMS/Utility/def_norm.F:1094–1114`). [10-14 전수 검증 보완]
+`LdefNRM=F, LwrtNRM=T` 조합은 기존 파일에 새 정규화 값을 계산하여 쓴다([da-4dvar:DA1-659](../../../_staging/recovery/compare/roms-da-4dvar-vs-code.md#5-차이-결론), `ROMS/Utility/normalization_mono.h:3590`).
+LCZ에는 추가 다음 벡터를 포함한 `Ninner+1` 레코드가 있다(`ROMS/Utility/ini_lanczos.F:24–26`).
+감도에 사용하는 Q의 열 수는 `Ninner`이다([da-4dvar:DA1-305](../../../_staging/recovery/compare/roms-da-4dvar-vs-code.md#5-차이-결론)).
+감도 초기화는 LCZ의 추가 마지막 레코드를 제외한다(`ROMS/Utility/ini_lanczos.F:26`).
+
+## 문서와 코드 차이 (10-14 대조)
+
+차이 표: [roms_io_netcdf-differences.md](roms_io_netcdf-differences.md).
+결론별 개수: A 37행, B 85행, C 67행, D 27행, E 5행, F 16행, 합계 237행([배정표](../../../_staging/recovery/assign/)의 `ROMS-assign-*.tsv`에서 3열이 `source-analysis/roms_io_netcdf.md`인 행을 집계).

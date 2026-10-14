@@ -4,7 +4,8 @@ model: ROMS
 component: ROMS/Tangent
 canonical_source: self
 citation_status: verified
-verification_method: "ROMS 소스 직접 read (roms/ROMS/Tangent/). tl_main3d.F·tl_main2d.F·tl_step3d_t.F·tl_pre_step3d.F·tl_step2d.F·tl_omega.F·tl_rho_eos.F·tl_initial.F·tl_get_data.F·tl_prsgrd.F 의 헤더 주석·CALL 시퀀스·선형화 라인을 file:line 인용"
+verification_method: "ROMS 소스 직접 read (roms/ROMS/Tangent/). tl_main3d.F·tl_main2d.F·tl_step3d_t.F·tl_pre_step3d.F·tl_step2d.F·tl_omega.F·tl_rho_eos.F·tl_initial.F·tl_get_data.F·tl_prsgrd.F 의 헤더 주석·CALL 시퀀스·선형화 라인을 file:line 인용; 2026-10-14 ROMS recovery 대조 보고서 반영"
+last_source_check: "2026-10-14 (recovery 대조 반영)"
 note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-16
 related:
@@ -27,7 +28,7 @@ $$\delta\mathbf{x}_{n+1} = \mathbf{M}\,\delta\mathbf{x}_n, \qquad \mathbf{M} = \
 
 <!-- count: models/ROMS/raw/source_code/roms/ROMS/Tangent/*.F = 54 -->
 <!-- count: models/ROMS/raw/source_code/roms/ROMS/Tangent/*.h = 18 -->
-`Tangent/` 의 `tl_*` 루틴은 NLM 코드([[roms_baroclinic_3d]]의 `main3d.F` 등)에 대응하는 **접선선형 구현**이다. `tl_main3d`는 3D 접선선형 모델을 전진시키는 주 드라이버이다(`tl_main3d.F:1-15`). `Tangent/` 최상위에는 `.F` 54 + `.h` 18 = **72개** 파일이 있으며, NLM 의 거의 모든 커널과의 1:1 대응·동일 CALL 시퀀스·각 비선형 연산의 줄단위 치환은 이 근거로 확인되지 않았다.
+`Tangent/`의 `tl_*` 루틴은 NLM 코드([roms_baroclinic_3d](roms_baroclinic_3d.md)의 `main3d.F` 등)에 대응하는 **접선선형 구현**이다. `tl_main3d`는 3D 접선선형 모델을 전진시키는 주 드라이버이다 (`ROMS/Tangent/tl_main3d.F:1–15`). `ROMS/Tangent/` 최상위의 `.F` 파일 54개와 `.h` 파일 18개를 합하면 **72개**이다. [10-14 전수 검증 정정]
 
 ROMS 모델 ID `iTLM` 으로 식별된다 (`tl_main3d.F` 전반에서 `iTLM` 인자 사용, 예 `tl_main3d.F:179` `CALL ntimesteps (iTLM, ...)`).
 
@@ -44,13 +45,13 @@ ROMS 모델 ID `iTLM` 으로 식별된다 (`tl_main3d.F` 전반에서 `iTLM` 인
 - `tl_main3d.F:12-15`: `"This routine is the main driver for tangent linear ROMS when configurated as a full 3D baroclinic ocean model. It advances forward the tangent linear model equations for all nested grids ... by the specified time interval (seconds), RunInterval."`
 - `tl_main2d.F:12-15`: `"... configurated as shallow water (barotropic) ocean model only."`
 
-진입점은 [[roms_main_driver_dispatch]] 의 드라이버가 `tl_main3d`/`tl_main2d` 를 dispatch.
+[진입 드라이버](roms_main_driver_dispatch.md)의 `tl_roms.h`는 `SOLVE3D`가 정의되면 `tl_main3d`를 호출한다 (`ROMS/Drivers/tl_roms.h:277–278`). 그렇지 않으면 `tl_main2d`를 호출한다 (`ROMS/Drivers/tl_roms.h:279–281`). [10-14 전수 검증 보완]
 
 ## 3. 3D TLM 시간적분 루프 (`tl_main3d.F`)
 
 구조가 NLM `main3d.F` 와 동일: `KERNEL_LOOP → NEST_LAYER → STEP_LOOP` 3중 루프 (`tl_main3d.F:158`, `:170`, `:185`). 각 그리드·타일에 대해 `tl_*` 커널을 호출한다.
 
-### 3.1 시간 인덱스 (NLM 과 동일 leapfrog)
+### 3.1 시간 슬롯 회전
 
 `tl_main3d.F:191-193`:
 ```
@@ -58,6 +59,10 @@ nstp(ng)=1+MOD(iic(ng)-ntstart(ng),2)
 nnew(ng)=3-nstp(ng)
 nrhs(ng)=nstp(ng)
 ```
+
+시간 슬롯의 회전과 적분식을 구분한다.
+2D 기본 경로는 LF-AM3이다 (`ROMS/Tangent/tl_step2d.F:20`).
+3D 운동량은 AB3의 n·n-1·n-2 기여를 조립한다 (`ROMS/Tangent/tl_pre_step3d.F:16–19, 1559–1581`; `ROMS/Tangent/tl_step3d_uv.F:393–423`). [10-14 전수 검증 보완]
 
 ### 3.2 STEP_LOOP 내 CALL 시퀀스 (대표)
 
@@ -84,7 +89,7 @@ nrhs(ng)=nstp(ng)
 | 수직혼합/source-sink | `tl_omega`, `tl_biology` | `tl_main3d.F:776, :783` | corrector |
 | tracer step | `tl_step3d_t` | `tl_main3d.F:801` | `#ifndef TS_FIXED` (`:792`) |
 
-이 순서가 [[roms_baroclinic_3d]] 의 NLM `main3d.F` CALL 시퀀스와 일치 — TLM 은 NLM 의 줄단위 거울.
+대표 호출 순서는 `tl_rhs3d` 뒤에 `tl_step2d`의 예측·보정 호출이 오고, 그 뒤에 `tl_step3d_uv`가 오는 순서이다 (`ROMS/Tangent/tl_main3d.F:554, 612, 659, 749`). [10-14 전수 검증 정정]
 
 ### 3.3 barotropic split-explicit LOOP_2D
 
@@ -159,8 +164,8 @@ NLM 과 동일하게 CPP 로 스킴 선택 (`tl_prsgrd.F:16-25`):
 | CPP | include | 비고 |
 |---|---|---|
 | `PJ_GRADP` | `tl_prsgrd40.h` | `:20-21` |
-| `DJ_GRADPS` | `tl_prsgrd32.h` | `:22-23` (기본 spline) |
-| (else) | `tl_prsgrd31.h` | `:24-25` |
+| `DJ_GRADPS` | `tl_prsgrd32.h` | `:22-23` (선택 spline) |
+| (else) | `tl_prsgrd31.h` | `:24-25` (기본 include) |
 
 헤더 주석 `tl_prsgrd.F:11-12`: `"This routine computes the tangent linear baroclinic hydrostatic pressure gradient term."` (`tl_rhs3d.F` 에서 호출, `tl_rhs3d.F:84` `"Compute baroclinic pressure gradient."`).
 
@@ -179,7 +184,13 @@ NLM 과 동일하게 CPP 로 스킴 선택 (`tl_prsgrd.F:16-25`):
 
 ### 8.3 `tl_pre_step3d.F`
 
-헤더 `tl_pre_step3d.F:13-14`: `"initialize computations for new time step of the tangent linear 3D primitive variables."` Adams/Bashforth n-1·n-2 기여를 `nnew` 의 u,v 에 미리 합산 (`:16-19`), Crank-Nicholson 음해 수직점성을 미리 계산 (`:21-24`).
+헤더 `ROMS/Tangent/tl_pre_step3d.F:13–14`는 `"initialize computations for new time step of the tangent linear 3D primitive variables."`라고 설명한다.
+`tl_pre_step3d`는 Adams/Bashforth n-1·n-2 기여를 `nnew`의 u,v에 미리 합산한다 (`ROMS/Tangent/tl_pre_step3d.F:16–19`).
+헤더는 Crank–Nicolson의 현재 단계 기여를 설명한다 (`ROMS/Tangent/tl_pre_step3d.F:21–24`).
+현행 공통 `lambda`는 `1.0_r8`이다 (`ROMS/Modules/mod_scalars.F:760–765`).
+현재 단계 확산 기여 `dt*(1-lambda)`는 0이다 (`ROMS/Nonlinear/pre_step3d.F:917–925`; `ROMS/Tangent/tl_pre_step3d.F:1292–1318`). [10-14 전수 검증 보완]
+미래 단계는 backward implicit으로 계산한다 (`ROMS/Nonlinear/step3d_t.F:1730`; `ROMS/Tangent/tl_step3d_t.F:1355–1373`). [10-14 전수 검증 보완]
+`lambda=0.5`일 때만 Crank–Nicolson이다 (`ROMS/Modules/mod_scalars.F:756–758`).
 
 ## 9. 초기화 (`tl_initial.F`)
 
@@ -197,9 +208,9 @@ NLM 과 동일하게 CPP 로 스킴 선택 (`tl_prsgrd.F:16-25`):
 TLM 은 incremental 4D-Var 의 forward perturbation 엔진:
 - weak-constraint 강제 임펄스 주입 `tl_forcing` (`tl_main3d.F:275, :285`, `#if WEAK_CONSTRAINT || FORCING_SV`).
 - 제어변수 조정: 경계 `tl_obc_adjust` (`ADJUST_BOUNDARY`), 표면강제 `tl_frc_adjust` (`ADJUST_STFLUX`/`ADJUST_WSTRESS`) (`tl_main3d.F:411-447`).
-- minimization 루틴 `tl_rpcg_lanczos.F`, `tl_congrad.F`, convolution `tl_convolution.F`/`tl_conv_*.F` 가 디렉토리에 동거 (배경오차 공분산 적용·켤레경사 — 상세는 [[roms_4dvar]]).
+- `ROMS/Tangent/`에는 켤레경사 최소화 루틴 `tl_rpcg_lanczos.F`와 `tl_congrad.F`가 있다 (`ROMS/Tangent/tl_rpcg_lanczos.F:17–18`; `ROMS/Tangent/tl_congrad.F:18–19`). 같은 디렉터리의 `tl_convolution.F`와 `tl_conv_*.F`는 배경오차 공분산의 합성곱 계산에 사용된다 (`ROMS/Tangent/tl_convolution.F:11–26`). 상세는 [roms_4dvar](roms_4dvar.md)를 참조한다. [10-14 전수 검증 보완]
 
-수반(adjoint) 역방향 전파 $\mathbf{M}^T$ 는 [[roms_adjoint_framework]] (`Adjoint/ad_*`), representer 모델은 RPM 으로 별도. TLM 은 그 forward 짝.
+수반의 역방향 전파 $\mathbf{M}^T$는 [수반 모델](roms_adjoint_framework.md)의 `Adjoint/ad_*` 루틴이 담당한다 (`ROMS/Adjoint/ad_main3d.F:12–15`). TLM은 이에 대응하는 전진 적분 모델이다 (`ROMS/Drivers/symmetry.h:12–16`). Representer 모델 RPM은 별도의 `Representer/rp_*` 루틴으로 구현된다 (`ROMS/Representer/rp_main3d.F:12–15`; `Regional_Ocean_Modeling_System__ROMS_.wiki:11`). [10-14 전수 검증 보완]
 
 ## 11. 요약
 
@@ -214,4 +225,15 @@ TLM 은 incremental 4D-Var 의 forward perturbation 엔진:
 | 4D-Var | forward perturbation 엔진, 제어변수 조정 | `tl_main3d.F:275,422,442` |
 | 검증 | TLM_CHECK + tl_dotproduct | `tl_main3d.F:331`, `tl_initial.F:542-552` |
 
-> ⚠ 본 노트는 driver/대표 커널 중심. 개별 `.h` 의 advection/mixing 줄단위 선형화 전수와 `tl_convolution`/`tl_rpcg_lanczos` 의 4D-Var 수학 세부는 source-needed (추후 [[roms_4dvar]] 와 연계 확장).
+4D-Var의 최소화와 배경오차 공분산은 [4D-Var 노트](roms_4dvar.md)에서 다룬다. [10-14 전수 검증 정정]
+
+
+## 문서와 코드 차이 (10-14 대조)
+
+대조 보고서: [이론·수치해법](../../../_staging/recovery/compare/roms-theory-numerics-vs-code.md#5-차이-결론).
+
+문서 판: ROMS 위키 wikitext, 2026-05-03 받음, 쪽별 revid는 [manifest.json](../raw/manuals/wiki/manifest.json). 코드 판: 원본 저장소 HEAD `57aecf58`, 2026-09-18, roms-4.2 이후 4.3 개발.
+
+| 행 ID | 항목 | 문서 원문 | 코드 원문 | 결론 | 결론 문장 |
+|---|---|---|---|---|---|
+| theory-numerics:RTN-381 | TLM 노트의 기본 spline 표현 | `models/ROMS/source-analysis/roms_tangent_linear_model.md:162` ``\| `DJ_GRADPS` \| `tl_prsgrd32.h` \| `:22-23` (기본 spline) \|`` | `ROMS/Tangent/tl_prsgrd.F:20` `# elif defined PJ_GRADP`<br>`ROMS/Tangent/tl_prsgrd.F:21` `#  include "tl_prsgrd40.h"`<br>`ROMS/Tangent/tl_prsgrd.F:22` `# elif defined DJ_GRADPS`<br>`ROMS/Tangent/tl_prsgrd.F:23` `#  include "tl_prsgrd32.h"`<br>`ROMS/Tangent/tl_prsgrd.F:24` `# else`<br>`ROMS/Tangent/tl_prsgrd.F:25` `#  include "tl_prsgrd31.h"` | B 문서 오기 | TLM의 공통 기본 압력 kernel은 tl_prsgrd31.h이다. |

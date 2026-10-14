@@ -184,6 +184,18 @@ Delft3D 487(기계 sweep 실패 471 + 웹 16, 09-22 스냅샷 교체 전 경로)
 - 기계 확인 1,249기록 전부 통과: 1행~끝 구간·sha·행 수, 전 행 열람(재실행 작업은 두 세션 로그를 합쳐 확인). 위키 2쪽(I4DVAR_ANA_SENSITIVITY, I4DVAR_Observation_Impact_Tutorial_2010)은 열람 로그로 확인되지 않아 Codex가 `nl -ba`로 다시 읽고 기록을 고쳤다(참고문헌·목차 보완, 축약 식·그림 부재 단언 정정). 원문 인용 454,411개 중 불일치 41개는 모두 검사기 오판이다: 위키 `\<br />` 이음 행(coupling.in 17·coupling_esmf.in 21), 표 칸 안 `\|` 이스케이프(I4DVAR 1), 굵은 글씨 표기 생략(NUOPC_Cap 1), 다른 파일 행 번호 인용(fennel_var.h 기록의 `fennel_mod.h:101`, 1).
 - sonnet 표본 24구간(코드 18·문서 6, 무작위): 맞음 24. 사소한 행 범위 표기 1건(get_ngfld.F 361–364의 END IF 행)을 원문 확인 후 고쳤다(`[10-14 표본 정정]`). 표본 오류가 없어 전수 의미 대조는 하지 않았다.
 
+## ROMS 대조·흐름·노트 반영 (2026-10-14 완료)
+
+- 대조 보고서 12종(Codex `gpt-6.1-sol`): `compare/roms-{theory-numerics,mixing-bc-forcing,biology,sediment-ice-vegetation,da-4dvar,da-representer,inputs,outputs-metadata,coupling-nesting-parallel,build-options-history,testcases,tools-guides}-vs-code.md`. 흐름 분석 2종: `flow/ROMS-callflow-nonlinear.md`(비선형 시작·계산 순서), `flow/ROMS-callflow-da.md`(4D-Var·representer). 각 mermaid 3개, 렌더 확인.
+- 외부 원문: 7행. RMF1-239 B, RMF1-816 B, RMF1-688 E 중간(`ROMS/Utility/equilibrium_tide.F:276`의 `/36524.25_r8`, 위키는 `/ 36525`), RMF1-837 F, RMF1-837a C(새 행, `sed_bedload.F:504–509` `IF (ABS(phi_x2).gt.phi_x1)`, 원식 MAX는 주석, `5e82991c` 2008-08-19), XR-001 D, XR-002 F. 기록: `compare/ROMS-external-sources.md`.
+- git 이력 판정(Codex `gpt-6-astra` 11작업): 원본 저장소(`raw/source_code/roms`, 1,005커밋, 태그 roms-2.0~4.2, HEAD `57aecf58` 2026-09-18)에서 1,241행. A 후보 954행 → A 848·B 52·C 20·D 6·F 7·H 2. D 133행 → A 36·D 71·B 14·F 12. E 154행 → E 144·B 8·C 1·A 1. 기록: `compare/ROMS-git-verify-{A1..A8,D1,E1,E2}.md`.
+- 결론 표본(sonnet 30행): OK 23·부분 4·틀림 3. 틀림 유형은 git 판정 미반영(RBH-0821·RBH-1588), 코드에 없는 동작 단언(RBH-1535), 근거 줄 오기다. 이 유형을 넣어 결론 전수 재검증을 했다(Codex `gpt-6-astra` 28작업, 보고서별 "## 전수 검증 기록 (10-14)"). 전수 검증이 git 판정 B를 A로 바꾼 3행(RT1-538·547·548)은 Claude가 `roms-3.0`의 `ana_fsobc.h`·`ana_m2obc.h` WEDDELL 블록에서 문서 식과 반복문을 확인했다. 기록: `compare/ROMS-conclusion-sample.md`.
+- 최종 결론(차이 결론 절 9,269행, 결론 열에서 셈): 일치 327·A 935·B 861·C 1,597·D 85·E 157·F 303·H 5,004. G·X 0.
+- 노트 반영(Codex `gpt-6.1-sol`): 먼저 보고서별 14작업으로 노트에 넣을 3,938행(H·일치 제외)마다 담당 파일 하나를 정했다(`assign/ROMS-assign-*.tsv`). 이어 20작업이 반영했다(`assign/note-job-*.tsv`, `flow/ROMS-notes-apply-{1..20}.md`). 기존 노트 42개를 고쳤다. 차이 행이 150개를 넘는 노트 5개(cppdefs 2·io_netcdf·biology·analytical_functionals)는 표를 차이 파일 12개로 나눴고, 새 노트 3개(version-history·test-cases·tools differences)를 만들었다. 대표 노트: `roms_main_driver_dispatch.md`(비선형 흐름도), `roms_4dvar.md`(자료동화 흐름도), `models/ROMS/README.md`(코드 결함 후보 E 157행 표). 행 ID 대조로 3,938행이 모두 배정 파일에 한 번씩 있고 분류가 보고서와 같음을 확인했다.
+- 추가 줄 전수 대조(Codex `gpt-6-astra` 20작업): 정정 274줄·보완 89줄(`flow/ROMS-notes-verify-{1..20}.md`, 노트 태그 수). 예: `roms_analytical_functionals.md`의 `ana_initial.h:72` `ANANAME(2)` 인용을 101행 `ANANAME(10)=MyFile`로 정정.
+- 기계 확인: 바뀐 노트 57개의 `경로:줄` 인용 31,835개 중 불일치 표시 28개는 위키 마크업(링크 대괄호·작은따옴표 세 개 굵게 표시·`&nbsp;`·`<math>`) 생략과 "수정 전 노트 인용"이다. 하나씩 원문을 열어 확인했다. 위키 튜토리얼 원문의 홈 디렉터리 경로 2곳은 인용에서 `~`를 `…`로 줄이고 그 사실을 적었다(G8b). `tools/validate-all.sh` 통과.
+- sonnet 표본 38건(표 행 30·본문 수정 8): OK 37·부분 1(CD-010 근거 인용 누락) → `hypoxia_srm.h:342·359·361·364` 인용을 노트와 보고서에 보탰다(`[10-14 표본 보완]`). 선택 지적 1건(`roms_open_boundaries.md`의 `obc_volcons.F:207·227` 인용)도 넣었다. 기록: `compare/ROMS-notes-sample.md`.
+
 ## SWAN 대조·흐름·노트 반영 (2026-10-13 완료)
 
 - 대조 보고서 7종(Codex `gpt-6.1-sol`): `compare/swan-theory-{numerics,sources,obstacles-setup-qc-bc}-vs-code.md`(swantech 식 대 코드), `compare/swan-inputs-{setup,physics-numerics}-vs-code.md`(swanuse 명령 대 `swanpre1`·`swanmain`), `compare/swan-outputs-vs-code.md`(출력 변수·형식), `compare/swan-implementation-history-vs-code.md`(swanimp·swanpgr·웹 수정 이력·패치·설정 예제). 흐름 분석 `flow/SWAN-callflow.md`(mermaid 3개 — 렌더 확인).
@@ -208,4 +220,4 @@ Delft3D 487(기계 sweep 실패 471 + 웹 16, 09-22 스냅샷 교체 전 경로)
 
 1. ~~매뉴얼과 코드 판독 기록 대조~~ — 10-03 완료(`compare/XBeach-manual-vs-code.md`, 노트 반영 `1da8d89`).
 2. ~~XBeach 파일 간 계산 흐름 분석~~ — 10-07 완료(`flow/XBeach-callflow.md`, 노트 반영 `d89cd8b`). 판독 기록 검색은 `wiki_search` `path_class="records"`(`ce7b3ae`).
-3. 다른 10개 모델(SFINCS·EFDC·ADCIRC 완료, ShorelineS 10-12 완료, SWAN 10-13 완료, ROMS 판독 10-14 완료·대조 진행, 나머지 6개 미착수 — 순서 ROMS·SWASH·FUNWAVE·LISFLOOD-FP·Delft3D·Celeris·CADMAS-SURF): 같은 방식(고정 목록 → 1행/1쪽 판독 → 기계 확인 → 다른 모델 검증).
+3. 다른 10개 모델(SFINCS·EFDC·ADCIRC 완료, ShorelineS 10-12 완료, SWAN 10-13 완료, ROMS 10-14 완료, 나머지 6개 미착수 — 순서 SWASH·FUNWAVE·LISFLOOD-FP·Delft3D·Celeris·CADMAS-SURF): 같은 방식(고정 목록 → 1행/1쪽 판독 → 기계 확인 → 다른 모델 검증).
