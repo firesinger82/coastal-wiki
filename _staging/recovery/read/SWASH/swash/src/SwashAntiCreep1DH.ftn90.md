@@ -1,0 +1,30 @@
+---
+file: models/SWASH/raw/source_code/swash/src/SwashAntiCreep1DH.ftn90
+lines: 303
+sha256: 18360e72c96642b565e408771f05df5df1bca23fba9a868f265624418c2a1251
+reader: codex gpt-6.1-sol
+read_date: 2026-10-15
+---
+
+# SwashAntiCreep1DH.ftn90 — 판독 구간 기록
+
+구간은 1행부터 303행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–78 | SwashAntiCreep1DH 입구(1), 기관·SWASH 팀·GPL 3 이상·무보증 머리말(2–29), Koen Hilgersom와 2015년 신설 이력(30–36). 1DH 수송 방정식(transport equation)에 인공 수직 혼합 억제항(anti-creep term)을 추가한다는 목적(38–40). 급한 바닥 경사·강한 안정 성층(stable stratification)에서 수평 확산(horizontal diffusion) 변환으로 곡률 항(curvature term)이 생긴다는 방법 주석(42–47). WAQUA/TRIWAQ 기술문서·SIMONA 99-01의 유도 31–33쪽·이산화(discretization) 90쪽을 지시한다(49–55). 사용 모듈 여섯 개(59–64), implicit none(66). kgrpnt(mxc)는 입력 주소표이며 1=비활성·>1=활성 주석(70–72). amatc(mcgrd,kmax,3)·rhsc(mcgrd,kmax)는 intent(inout), psm·rpo(mcgrd,kmax)는 입력이다(74–77). 방법 주석은 이 곡률 항을 생략하면 성분의 인공적인 수직 혼합이 발생할 수 있다고 설명한다(46–47). [10-15 전수 검증 보완] |
+| 79–123 | 시작 시 1행 SwashAntiCreep1DH 루틴 안. `integer, save  :: ient = 0`(81)·층(layer) 및 격자 인덱스·주소(81–94), ctrm1..4·유효 확산계수(diffusivity coefficient)·격자 간격 역수·안정성(stability) 상한·STPNOW(96–104), 구조·실행부 표제(106–111). `if (ltrace) call strace (ient,'SwashAntiCreep1DH')` (112), `nmf = kgrpnt(mf)`(114), `nml = kgrpnt(ml)`(115). `rdx = 1./dx` (117), `stabmx = 0.5 * dx * dx / dt` (119), `flux(nmf,:,1) = 0.`(121), `flux(nml,:,1) = 0.`(122). [10-15 전수 검증 보완] |
+| 124–164 | 시작 시 1행 SwashAntiCreep1DH 루틴 안. 124행 주석은 내부 셀 면(cell face)의 식 4.83을 `d( D h(k) dz(k)/dx d c(k-1/2)/dz ) / dx`로 쓴다(124–125). `if ( LMXF ) then` (127)은 `msta = mf + 1   ! first internal cell-face` (128), `else` (129)는 `msta = mf`(130). `mend = ml - 1      ! last  internal cell-face` (132). `do m = msta, mend` (134)에서 mu=m+1·주소 복사(136–139). `if ( hdiff > 0. ) then` (143)은 `dif2d = hdiff`(145), `else` (147)의 `if ( ihvisc == 2 .or. ihvisc == 3 ) then` (149)은 `dif2d = 0.5 * ( vnu2d(nm) + vnu2d(nmu) ) / psm` (151), `else` (153)는 `dif2d = 0.`(155)이다. `if ( .not. dif2d < stabmx ) dif2d = stabmx` (163)으로 상한을 적용한다. 인덱스·카운터 계산 원문: `mu = m + 1` (136). 주소 대입은 `nm  = kgrpnt(m )`(138), `nmu = kgrpnt(mu)`(139)이다. [10-15 전수 검증 보완] |
+| 165–187 | 시작 시 1행 SwashAntiCreep1DH 루틴·134행 `do m = msta, mend` 루프 안. `do k = 1, kmax` (165), `kd = max(   1,k-1)` (167), `ku = min(kmax,k+1)` (168). 연속 식 전체는 `flux(nm,k,1) = 0.5 * ( hkso(nm,k) + hkso(nmu,k) ) * dif2d * rdx *                    &` (170), `0.5 * ( zkso(nmu,k-1) - zkso(nm,k-1) + zkso(nmu,k) - zkso(nm,k) ) *   &` (174), `( rpo(nmu,kd) + rpo(nm,kd) - rpo(nmu,ku) - rpo(nm,ku) ) * 2. /        &` (178), `( (ku-k) * (zkso(nmu,k -1) - zkso(nmu,ku)) +                          &` (179), `(k-kd) * (zkso(nmu,kd-1) - zkso(nmu,k )) +                          &` (180), `(ku-k) * (zkso(nm ,k -1) - zkso(nm ,ku)) +                          &` (181), `(k-kd) * (zkso(nm ,kd-1) - zkso(nm ,k )) )` (182)이다. 171·173·175·177행은 빈 줄이며 172행 주석의 식은 `d z(k) / dx`이다. 176행 주석의 식은 `d c(k-1/2) / dz`이다. k·m 루프 종료(184–186). [10-15 전수 검증 보완] |
+| 188–213 | 시작 시 1행 SwashAntiCreep1DH 루틴 안. 플럭스(flux) 부분을 우변(right-hand side)에 반영한다는 주석(188–190). `mend = ml - 1` (192), `if ( LMXL ) mend = ml` (193). `do k = 1, kmax` (195), `do m = mfu, mend` (197), md=m-1과 주소 복사(199–202). `if ( hs(nm) > epsdry ) then` (204)의 `rhsc(nm,k) = rhsc(nm,k) - rdx * ( flux(nm,k,1) - flux(nmd,k,1) )` (206)으로 젖은 점(wet point)의 우변을 갱신한다. 분기·루프 종료(208–212). 인덱스·카운터 계산 원문: `md = m - 1` (199). 190행 주석은 부분영역 경계의 끝점 `ml`을 이웃 부분영역이 소유하므로 그 점을 계산하지 않는다고 설명한다. 주소 대입은 `nm  = kgrpnt(m )`(201), `nmd = kgrpnt(md)`(202)이다. [10-15 전수 검증 보완] |
+| 214–229 | 시작 시 1행 SwashAntiCreep1DH 루틴 안. 층 경계 성분(constituent) 계산과 식 4.87 설명(214–215). `do m = mf, mlu` (217), `nm = kgrpnt(m)`(219), `do k = 1, kmax-1` (221)의 `wrk(nm,k) = ( hkso(nm,k) * rpo(nm,k+1) + hkso(nm,k+1) * rpo(nm,k) ) / ( hkso(nm,k) + hkso(nm,k+1) )` (222)이다. 루프 종료(223–225), 나머지 B·C 항과 식 4.82 설명(227–229). [10-15 전수 검증 보완] |
+| 230–262 | 시작 시 1행 SwashAntiCreep1DH 루틴 안. `do m = mfu, mend` (230)에서 md=m-1·mu=m+1·주소 복사(232–237). `if ( hdiff > 0. ) then` (241)은 `dif2d = hdiff`(243), `else` (245)의 `if ( ihvisc == 2 .or. ihvisc == 3 ) then` (247)은 `dif2d = vnu2d(nm) / psm` (249), `else` (251)는 `dif2d = 0.`(253)이다. `if ( .not. dif2d < stabmx ) dif2d = stabmx` (261)로 수위점(water level point) 계수 상한을 적용한다. 인덱스·카운터 계산 원문: `md = m - 1` (232), `mu = m + 1` (233). 주소 대입은 `nm   = kgrpnt(m )`(235), `nmd  = kgrpnt(md)`(236), `nmu  = kgrpnt(mu)`(237)이다. [10-15 전수 검증 보완] |
+| 263–282 | 시작 시 1행 SwashAntiCreep1DH 루틴·230행 `do m = mfu, mend` 루프 안. `do k = 1, kmax-1` (263). 층 경계 경사 `ctrm1 = 0.5 * rdx * ( zkso(nmu,k) - zkso(nmd,k) )` (267), 성분 기울기 `ctrm2 = 0.5 * rdx * ( wrk(nmu,k) - wrk(nmd,k) )` (271), 식 4.85의 두 번째 항 `ctrm3 = dif2d * ctrm1 * ctrm2` (276), 식 4.88의 세 번째 항 `ctrm4 = 2. * dif2d * ctrm1*ctrm1 / ( hkso(nm,k) + hkso(nm,k+1) )` (281)을 계산한다. 설명 주석·빈 줄도 포함한다(265–282). 265행 주석의 미분식은 `d z(k) / dx`이다. 269행 주석의 미분식은 `dc / dx`이다. 두 주석은 층 `k`와 `k+1`의 경계를 지정한다. 263행 루프는 299행 `enddo`에서 닫힌다. 230행 루프는 301행 `enddo`에서 닫힌다. [10-15 전수 검증 보완] |
+| 283–303 | 시작 시 1행 SwashAntiCreep1DH 루틴·230행 `do m = mfu, mend` 루프·263행 `do k = 1, kmax-1` 루프 안. `if ( hs(nm) > epsdry ) then` (283)은 두 번째 항을 명시적(explicit)으로 반영한다는 주석(285), `rhsc(nm,k  ) = rhsc(nm,k  ) + ctrm3            ! at interface between layers k and k+1` (287), `rhsc(nm,k+1) = rhsc(nm,k+1) - ctrm3            ! at interface between layers k-1 and k` (288)이다. 세 번째 항의 암시적(implicit) 반영 주석(290), `amatc(nm,k  ,1) = amatc(nm,k  ,1) + ctrm4      ! at interface between layers k and k+1` (292), `amatc(nm,k  ,3) = amatc(nm,k  ,3) - ctrm4` (293), `amatc(nm,k+1,1) = amatc(nm,k+1,1) + ctrm4      ! at interface between layers k-1 and k` (294), `amatc(nm,k+1,2) = amatc(nm,k+1,2) - ctrm4` (295)이다. 283행 조건은 297행 `endif`에서 닫힌다. 263행 루프는 299행 `enddo`에서 닫힌다. 230행 루프는 301행 `enddo`에서 닫힌다. 루틴은 303행에서 끝난다. [10-15 전수 검증 보완] |
+
+## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
+
+- 104: STPNOW는 선언 이후 호출하거나 참조하지 않는다.
+- 117·119·151·249: dx·dt·psm을 분모로 사용한다. 이 루틴에는 이 값들이 0인지 검사하는 조건이 없다.
+- 165–182: kd·ku를 1..kmax로 제한한 뒤 층간 거리식을 분모로 사용한다. 이 블록에는 kmax>1 검사 또는 분모 0 검사 조건이 없다.
+- 134–186·217–225·263–281: flux·wrk·ctrm1..4 계산에는 hs>epsdry 조건이 없다. 젖은 점 조건은 우변·행렬 갱신에만 있다(204·283).

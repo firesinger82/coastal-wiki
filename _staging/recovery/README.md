@@ -206,6 +206,16 @@ Delft3D 487(기계 sweep 실패 471 + 웹 16, 09-22 스냅샷 교체 전 경로)
 - 추가 줄 전수 대조(Codex `gpt-6-astra` 12작업): 정정 233줄·보완 95줄(`flow/SWAN-notes-verify-{1..12}.md`, 노트 태그 수). sonnet 표본 25줄(정정 줄 10 포함): 맞음 23, 부분 2(1D 갱신식 인용 줄, 수정 전 노트 줄을 현재 줄처럼 인용) → 고침. 같은 표본에서 보고서 R3 SU-042의 줄 번호 11864 → 11863 정정. 표본 검증자가 확인하지 못한 3항목(비구조 COMPGRID 정점값, (8.44)–(8.45)의 반변 기저 차원, (5.24) 화살표)은 Claude가 쪽 이미지·코드로 확인했다(`flow/SWAN-notes-sample.md`).
 - 기계 확인: 바뀐 노트의 과거 커밋 인용(`HASH:path:N`) 820개 불일치 0. 현재 코드·문서 인용 불일치 표시는 검사기 오판(여러 줄 HTML 문장, Fortran 연속 줄과 줄 끝 판 번호, 노트 자기 경로, 같은 이름 README, 인용 짝짓기)이며, 87건 후보는 전수 대조 작업이 하나씩 판정했다. `tools/validate-all.sh` 통과.
 
+## SWASH 판독 (2026-10-14~15)
+
+기록: `read/SWASH/swash/`(코드·빌드·문서), `read/SWASH/swash/doc/*.pdf/`(PDF), 전수 검증 결과 `read/SWASH/verify/`. 대상 목록: `scripts/swash-batches.json`(자체 코드 `src/*` 162파일과 `switch.pl`·`bin/swashrun`, 164파일 180,232행, 40작업), `scripts/swash-docbatches.json`(README.md·Makefile·CMakeLists.txt·clobber.cmake·`bin/swashrun.bat`·`misc/swash.edt`·`misc/machinefile` 7파일), `scripts/swash-pdfjobs.json`(swashuse 167쪽, swashtech 128쪽 = 295쪽, 16작업). `tools/*.m`(SWAN과 같은 기준)과 LICENSE는 제외. 코드 판 = `VERNUM = 12.01`(`src/SwashInit.ftn90:79`), 매뉴얼 표지 = "SWASH version 12.01".
+
+- 코드·문서: Codex `gpt-6.1-sol` 41작업. 행 첫머리 `!TIMG`·`!MPI`·`!F95` 등 전처리 표시는 `switch.pl` 57–66행 규칙에 따라 어느 스위치에서 사는 행인지 함께 적었다. `!DIFF`·`!MUD`·`!TEST`·`!VEGE`는 규칙에 없어 주석으로 남는다고 적었다. 기계 확인 171기록 전부 통과(1행~끝 구간·sha·행 수, 전 행 열람).
+- PDF 295쪽: Codex가 300 dpi 쪽 이미지로 판독(Marker·opendataloader 추출 참고). 세션 로그로 295쪽 이미지를 모두 연 것을 확인했다. 기계 확인 16작업 전부 통과.
+- sonnet 표본: 코드 20구간 중 맞음 18, 부분 2(SwashImpLayP2DHflow 1346행 `k-1`을 "아래층"으로 씀 — SWASH는 k=1이 맨 위층; SwashImpLayP1DHflow 1366행 분기를 조건식 `if ( propsc /= 1 ) then` 없이 씀). PDF 16쪽 중 맞음 12, 부분 4(쪽에 없는 말 추가, τ_cd를 τ_ce로 씀, 괄호 설명을 적용 조건으로 읽음, 앞 쪽 내용 끌어옴). 표본 오류를 보고 전 기록을 `gpt-6-astra`로 의미까지 전수 대조했다. 코드 58작업: 정정 410, 보완 3,502, 이상 없음 1,342. PDF 8작업: 정정 164, 보완 59(작업별 요약 줄 합계). swashtech p.54 그림 2.8의 첨자 하나는 1과 l을 구별할 수 없어 `[원문 인쇄 판독 불가]`로 남겼다.
+- 정정분 sonnet 표본 24행: 맞음 24. 앞 표본의 부분 6건은 모두 고쳐진 것을 확인했다.
+- 최종 기계 확인: 원문 인용 64,615개 중 불일치 0.
+
 ## 노트 반영분 전수 대조와 차이 결론 (2026-10-12)
 
 사용자 지시(10-12): 확인하지 않은 것을 한계로 남기지 말고 해결한 뒤 다음 모델로 간다. 모델 실행은 위키 범위가 아니므로 한계로 적지 않는다.

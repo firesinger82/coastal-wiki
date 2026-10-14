@@ -1,0 +1,50 @@
+SWASH swashtech.pdf 55–90쪽 전수 대조 기록
+
+검증일은 2026-10-15이다. 쪽 번호는 PDF 파일의 쪽 번호다. 인쇄 쪽 번호는 47–82이다.
+
+원문은 [swashtech.pdf](../../../../../models/SWASH/raw/source_code/swash/doc/swashtech.pdf)이다. 지정된 300dpi 이미지 36개를 각각 열어 해당 쪽 행의 수식과 의미를 대조했다. 이미지 경로는 `/tmp/claude-1000/-home-firesinger-coastal-wiki/338e5a20-3378-4629-86f1-592f9d629b53/scratchpad/swhpages/swashtech-NNN.png`이다. `NNN`은 055부터 090까지다. 추출 텍스트와 Marker 출력은 판정 근거로 사용하지 않았다.
+
+| 기록 | 대조한 쪽 | 대조한 쪽 수 | 정정 | 보완 | 정정·보완 동시 | 이상 없음 |
+|---|---|---:|---:|---:|---:|---:|
+| [p055-072.md](../swash/doc/swashtech.pdf/p055-072.md) | 55–72 | 18 | 1 | 8 | 0 | 9 |
+| [p073-090.md](../swash/doc/swashtech.pdf/p073-090.md) | 73–90 | 18 | 11 | 10 | 4 | 1 |
+| 합계 | 55–90 | 36 | 12 | 18 | 4 | 10 |
+
+집계 단위는 쪽 행이다. 정정 수는 `[10-15 전수 검증 정정]`을 붙인 쪽 행에서 셌다. 보완 수는 `[10-15 전수 검증 보완]`을 붙인 쪽 행에서 셌다. 73·74·76·80쪽은 정정과 보완에 각각 포함된다. 수정한 쪽 행은 두 기록에서 모두 26개다.
+
+아래 표의 인쇄 원문은 해당 쪽 이미지에서 읽은 문구와 수식이다. 앞 쪽의 정의를 인용한 항목은 그 출처 쪽을 별도로 표시했다.
+
+| 기록:쪽 | 이전 요지 | 새 요지 | 인쇄 원문 |
+|---|---|---|---|
+| [p055-072.md:55](../swash/doc/swashtech.pdf/p055-072.md) | 연속방정식과 흐름방정식의 인쇄 식 참조가 없다. 플럭스 표현의 계량 독립성과 흐름장 표현의 좌표계 독립성 및 우변의 물리적 의미가 없다. | 보완. 식 (2.1)과 (2.2)의 참조를 넣었다. 두 독립성 및 수심 적분 압력 경사의 구동력 의미를 넣었다. | “continuity equation (2.1)”; “flow equation (2.2)”; “a metric-free representation of the flux field”; “independent of the coordinate system”; “the depth-integrated pressure gradient”; “a driving force along the flow direction” |
+| [p055-072.md:56](../swash/doc/swashtech.pdf/p055-072.md) | 이류항의 이산화 조건에 관한 §2.3 참조만 있다. | 보완. 이류항이 식 (2.2) 좌변의 두 번째 항이라는 인쇄 참조를 넣었다. | “the second term on the left-hand side of Eq. (2.2)”; $A\mathbf u=\nabla\cdot(\mathbf q\otimes\mathbf u)$ |
+| [p055-072.md:57](../swash/doc/swashtech.pdf/p055-072.md) | 계량 의존성과 다섯 형식만 설명한다. 이류항의 형식 조건과 식 (2.22)·(2.23)의 정확성에 붙은 예외가 없다. | 보완. 이류항은 쌍대 변의 내향 1-형식이어야 함을 넣었다. 이류항을 제외한 계량 독립성 및 미지수 과잉을 넣었다. | “for consistency must be an inner 1–form living on dual edges (see also Section 2.4.5)”; “a principal source of discretization error”; “Eqs. (2.22) and (2.23), with the exception of the second term …, are exact in the sense that they are independent of the metric”; “more unknowns than equations” |
+| [p055-072.md:59](../swash/doc/swashtech.pdf/p055-072.md) | 반이산화 방정식과 원래 방정식의 대응 참조가 없다. 이류항의 식 (2.27) 내 표기가 없다. | 보완. 식 (2.26)–(2.27)이 식 (2.1)–(2.2)의 이산화임을 넣었다. 이류항의 이산 표기를 넣었다. | “the discretizations of Eqs. (2.1)–(2.2)”; “$\mathbb A\tilde\upsilon^{(1)}$ in Eq. (2.27)” |
+| [p055-072.md:60](../swash/doc/swashtech.pdf/p055-072.md) | 이류항 전개에 쓰인 식 (2.13) 참조가 없다. 평균 단계의 비관련성을 설명하는 연결이 없다. | 보완. 식 (2.13)의 참조를 넣었다. 식 (2.28)에 따른 평균 단계의 비관련성과 2.3절 참조를 넣었다. | “Based on Eq. (2.13)”; “follows directly from Eq. (2.28) which explains the irrelevance of the averaging step associated with the tilde (see also Section 2.3)” |
+| [p055-072.md:63](../swash/doc/swashtech.pdf/p055-072.md) | 기울기 연산자의 성분 괄호 뒤에 전치 기호 $\mathrm T$를 붙였다. | 정정. 인쇄되지 않은 전치 기호를 삭제했다. | $\nabla=(\partial/\partial x,\partial/\partial y)$ |
+| [p055-072.md:67](../swash/doc/swashtech.pdf/p055-072.md) | 정확 이산화의 설명에서 예로 든 식 번호가 없다. | 보완. 무한 자유도 시스템의 예인 식 (3.1)과 (3.2)를 넣었다. | “a system with an infinite number of degrees of freedom, such as Eqs. (3.1) and (3.2)” |
+| [p055-072.md:68](../swash/doc/swashtech.pdf/p055-072.md) | 5.4절의 대상 격자 조건이 없다. 외심 쌍대 선택의 2.5.8절 참조가 없다. | 보완. 직교 삼각 격자 조건을 넣었다. 외심 쌍대 선택의 동기를 설명하는 2.5.8절 참조를 넣었다. | “the inviscid shallow water equations on orthogonal triangular meshes”; “The motivation for this choice is also discussed in Section 2.5.8.” |
+| [p055-072.md:69](../swash/doc/swashtech.pdf/p055-072.md) | 단위 접선 관계식의 직교성 전제가 없다. 쌍대 대응의 2.5.6절 참조가 없다. | 보완. 직교성이 접선 관계식의 근거임을 넣었다. 2.5.6절 참조를 넣었다. | “See Section 2.5.6 for further details.”; “Owing to the orthogonality, we have”; $\mathbf r_{fl}/l_{fl}=-\mathbf r_{fr}/l_{fr}=\mathbf t_{\tilde e}$ |
+| [p073-090.md:73](../swash/doc/swashtech.pdf/p073-090.md) | $S_f$와 $l_{\tilde e}$의 정의를 이 쪽의 설명처럼 적었다. 예측 변수 설명에서 식 (2.1)·(2.2) 참조가 없다. | 정정·보완. 두 기호의 정의는 앞 p.69에서 가져왔음을 밝혔다. 예측 변수 설명에 식 (2.1)·(2.2)를 넣었다. | p.73: $\upsilon_f^{(n-1)}=(S_f/l_{\tilde e})\tilde\upsilon_{\tilde e}^{(1)}$; “the shallow water equations (2.1) and (2.2)”. 정의 출처 p.69: “$S_f$ the length of face $f$ (or the face area in 3D)”; “the length of edge $\tilde e$ … $l_{\tilde e}=l_{fl}+l_{fr}$” |
+| [p073-090.md:74](../swash/doc/swashtech.pdf/p073-090.md) | 접선·법선·셀 면적의 정의를 이 쪽의 설명처럼 적었다. 선적분·수심·셀 적분의 식 참조와 셀별 상수 가정의 정확도 진술이 없다. | 정정·보완. 기호 정의의 출처를 p.69·70으로 밝혔다. 식 (5.5), (5.10)·(5.11), (5.4), (5.1) 참조를 넣었다. 셀별 상수 가정이 1차 근사임을 넣었다. | p.74: “as given by Eq. (5.5)”; “From Eqs. (5.10) and (5.11)”; “This inner 0–form is given by Eq. (5.4)”; “This is a first order approximation.”; “the integral of the water depth over the primal cell, that is, Eq. (5.1)”. 기호 정의는 p.69·70에 인쇄되어 있다. p.69: “$\mathbf t_{\tilde e}$ is the unit tangent”; “$A_c$ the area of cell $c$”. p.70: “the unit normal to face $f$, denoted $\mathbf n_f$”. |
+| [p073-090.md:75](../swash/doc/swashtech.pdf/p073-090.md) | $\Delta s_f$의 정의를 이 쪽의 설명처럼 적었다. | 정정. 두 외심 사이 거리의 정의는 앞 p.69에 있음을 밝혔다. | p.75: 식 (5.19)에 $\Delta s_f$가 쓰인다. p.69: “the distance between the two neighboring cell circumcenters”; “we denote by $\Delta s_f$ this distance” |
+| [p073-090.md:76](../swash/doc/swashtech.pdf/p073-090.md) | 본문에 없는 $\partial c$와 $\mathbf n_{c,f}$의 정의 문장을 덧붙였다. 평균 높이를 쓰는 이유와 식 (5.7) 참조가 없다. | 정정·보완. 이 쪽에 인쇄되지 않은 정의 문장을 삭제했다. 면 양쪽 높이가 다를 수 있다는 설명을 넣었다. 식 (5.8)의 흐름방정식 (5.7) 기여를 넣었다. | “Since the heights on each side of the face may not be equal”; “the line integral (5.8) that contributes to the flow equation (5.7)”. $\partial c$와 $\mathbf n_{c,f}$는 적분식에 쓰이지만 이 쪽 본문에는 별도 정의가 없다. |
+| [p073-090.md:77](../swash/doc/swashtech.pdf/p073-090.md) | 식 (5.2)·(5.17) 참조가 없다. 면 도심에서 벡터를 직접 계산할 경우의 조건을 ‘주의’로만 적었다. | 보완. 두 식 참조를 넣었다. 면 도심 자체에서 계산한다면 접선 성분만 구하면 된다는 조건을 넣었다. 접선 속도의 불연속 가능성을 유지했다. | “with (see Eq. (5.2))”; “the volume-weighted average formula (5.17)”; “If we were to calculate this vector at the face centroid itself, we would only need to find its tangential component at the same point.”; “the tangent velocity can display a discontinuity at the face” |
+| [p073-090.md:78](../swash/doc/swashtech.pdf/p073-090.md) | 휘트니 형식의 호지 행렬 구성 적용 가능성을 실제 사용으로 단정했다. 이 쪽에 아직 인쇄되지 않은 ‘외심’을 마지막 문장에 넣었다. | 정정. 호지 행렬 구성에도 적용할 수 있다는 가능 표현을 복원했다. 마지막 문장이 ‘무게중심 … or’에서 끝난다고 고쳤다. | “can also be applied to construct Hodge star matrices on simplicial meshes”; “The position $\mathbf x_c$ might be the center of gravity or” |
+| [p073-090.md:79](../swash/doc/swashtech.pdf/p073-090.md) | 본문에 없는 $\mathbf I$의 명시적 정의를 덧붙였다. | 정정. 이 쪽에 인쇄되지 않은 항등행렬 정의 문장을 삭제했다. 수식과 원문에 있는 전치 설명은 유지했다. | $A_c\mathbf I=\sum_{f\in\partial c}S_f\mathbf r_{fc}\otimes\mathbf n_{c,f}$; “We can also take the transpose of this identity”. $\mathbf I$의 별도 정의 문장은 없다. |
+| [p073-090.md:80](../swash/doc/swashtech.pdf/p073-090.md) | 첫 전개식 마지막 항에서 합을 적분 앞에 놓았다. 연속식·질량 플럭스·흐름식의 유도에 인쇄된 참조가 빠졌다. | 정정·보완. 마지막 항을 인쇄대로 적분 다음 합 순서로 고쳤다. 식 (2.1), (5.3), (5.13), (5.12), (5.14), (5.16), (2.2), (5.7)의 연결을 보완했다. | $\mathbf u\cdot\int_f\sum_{f\in\partial c}\mathbf n_{c,f}\,dS$; “continuity equation (2.1). From Eqs. (5.3) and (5.13)”; “Using Eqs. (5.12), (5.14) and (5.16)”; “flow equation (2.2)”; “Substituting Eqs. (5.16), (5.18) and (5.22) into Eq. (5.7)” |
+| [p073-090.md:81](../swash/doc/swashtech.pdf/p073-090.md) | 세 이산식의 원래 방정식 참조가 없다. | 보완. 식 (5.28), (5.29), (5.32)가 무점성 천수방정식 (2.1)·(2.2)의 이산화임을 넣었다. | “Eqs. (5.28), (5.29), and (5.32) are the discretizations of the inviscid shallow water equations (2.1) and (2.2)” |
+| [p073-090.md:82](../swash/doc/swashtech.pdf/p073-090.md) | ‘고려해야 한다’를 ‘유지해야 한다’로 강화했다. 국소 절단오차를 보통 최소화하지 않는다는 부정을 목표 간 비교로 바꿨다. 필터 사용 최소화의 원인을 결합 전체로 적었다. | 정정. 고려 의무와 부정 표현을 복원했다. 필터 사용 최소화의 원인을 앨리어싱 오차 최소화로 고쳤다. | “Other properties such as preserving symmetries and conservation of the PDEs in a discrete sense need to be considered.”; “Mimetic discretizations typically do not minimize the local truncation error on nonuniform grids”; “while minimizing aliasing errors. The latter also ensures that the use of dissipative filters or artificial viscosity is kept to a minimum.” |
+| [p073-090.md:83](../swash/doc/swashtech.pdf/p073-090.md) | 경계 질량 플럭스 유도의 식 참조가 없다. | 보완. 경계 질량 플럭스가 식 (5.20)에 따른다는 참조를 넣었다. | “By virtue of Eq. (5.20), the outward pointing mass flux at boundary face $f\in\partial\Omega$ is given by” |
+| [p073-090.md:84](../swash/doc/swashtech.pdf/p073-090.md) | 이산 운동량 정의의 출발식 참조가 없다. | 보완. 식 (5.17)을 다시 사용한다는 참조를 넣었다. | “We start with the definition of discrete momentum by recalling Eq. (5.17).” |
+| [p073-090.md:85](../swash/doc/swashtech.pdf/p073-090.md) | 운동량의 양보다 변화율이 중요하다는 상대적 비교로 적었다. | 정정. 운동량의 양 자체는 중요하지 않으며 변화율만 중요하다는 부정과 한정을 복원했다. | “the amount of momentum itself is immaterial, only its rate of change is important” |
+| [p073-090.md:86](../swash/doc/swashtech.pdf/p073-090.md) | 이류항의 플럭스 형식을 필요조건으로만 적어 ‘only’를 빠뜨렸다. | 정정. 운동량 보존에는 이류항을 플럭스 형식으로 쓰는 것만 필요하다는 한정을 복원했다. | “conservation of momentum only requires the advection term to be written in flux form, that is, Eq. (5.23)” |
+| [p073-090.md:87](../swash/doc/swashtech.pdf/p073-090.md) | 다음 쪽의 ‘energy head’를 이 쪽의 물리량 이름처럼 적었다. | 정정. 이 쪽에는 정의식까지 있으며 이름은 다음 쪽으로 이어짐을 명시했다. | p.87의 마지막 인쇄는 “where”와 $h_e=\zeta+(\mathbf u\cdot\mathbf u)/(2g)$다. |
+| [p073-090.md:88](../swash/doc/swashtech.pdf/p073-090.md) | 첫 줄의 물리량 이름이 이 쪽 행에 없다. | 보완. 앞 p.87의 $h_e$를 에너지 수두라고 부르는 문장을 실제 인쇄 쪽에 넣었다. | p.88 첫 줄: “is the energy head.” |
+| [p073-090.md:89](../swash/doc/swashtech.pdf/p073-090.md) | 위치에너지 유도에서 식 (5.37)의 첫 항에 대입한다는 연결이 없다. 마지막 두 관계의 식 (2.7)·(2.8) 참조가 없다. | 보완. 두 시간 미분항에 대한 대입을 구분했다. 이산 곱 규칙의 연속 항등식은 식 (2.7)을 참조함을 넣었다. 반대칭 관계의 식 (2.8) 참조를 넣었다. | “the first term of Eq. (5.37) while substituting the second term of the right-hand side of Eq. (5.39)”; “(see also Eq. (2.7))”; “$\mathtt{div}=-\mathtt{grad}^{\mathsf T}$ (see also Eq. (2.8))” |
+
+이상 없음으로 분류한 쪽은 `p055-072.md`의 58·61·62·64·65·66·70·71·72쪽과 `p073-090.md`의 90쪽이다. 이 10개 쪽 행은 수정하지 않았다.
+
+각 정정은 해당 쪽 행에 한 번씩 적용했다. 두 대상 기록의 frontmatter는 수정 전 내용과 같다. 쪽 행의 수와 순서는 수정 전 내용과 같다. 쪽 행 밖의 내용은 수정 전 내용과 같다. 원문과 노트 및 git은 변경하지 않았다. 모델은 실행하지 않았다.
+
+정정 12, 보완 18, 이상 없음 10
