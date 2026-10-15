@@ -1,0 +1,32 @@
+diff --git a/models/ADCIRC/source-analysis/adcirc-swan-coupling.md b/models/ADCIRC/source-analysis/adcirc-swan-coupling.md
+--- a/models/ADCIRC/source-analysis/adcirc-swan-coupling.md
++++ b/models/ADCIRC/source-analysis/adcirc-swan-coupling.md
+@@ -3,7 +3,7 @@
+ topic: general
+ canonical_source: self
+ citation_status: verified
+-has_source_needed: false
++has_source_needed: true
+ verification_method: "ADCIRC source code 직접 분석 (models/ADCIRC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/adcirc-swan-coupling.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시. **SWAN Temporal Controls (PR #498) 절 추가 (2026-05-28)**: GitHub API `gh pr view 498 -R adcirc/adcirc` + `gh pr diff 498` 직접 fetch — PR body verbatim 인용 (SWANTimeControl namelist + RunStartDateTime + fort.26 COMPUTE 카드) + presizes.F / prep.F / couple2swan.F diff hunk 직접 인용 (SwanTimeStep offset 계산 + [1, SWAN_MTC] range gate + sentinel/radiation-stress fallback)."
+ note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23 + SWAN Temporal Controls 절 2026-05-28"
+ note_date: 2026-04~05 (original) / 2026-05-23 (promote) / 2026-05-28 (PR #498 절)
+@@ -184,7 +184,7 @@
+ - Set ADCIRC `OutputControl` and SWAN `BLOCK` outputs at compatible intervals for diagnostic plots.
+ - In log, look for "WAVES WILL BE COUPLED TO SWAN" confirming `NRS=3` parsed.
+ - `COUPWIND` flag in `couple2swan.F`: if true, ADCIRC met goes to SWAN; if false, SWAN reads its own wind file (rarely used).
+-- For ADCIRC v55+, NetCDF hot-start is preferred; for older versions, fort.67/68 binary is more stable.
++- For ADCIRC v55+, NetCDF hot-start is preferred; for older versions, fort.67/68 binary is more stable. `[source-needed]`
+ - SWAN spectral hot-start (`HOTSTART` in SWAN input) is separate from ADCIRC hot-start; both must align on time.
+ 
+ ## Common Pitfalls
+diff --git a/models/ADCIRC/source-analysis/adcirc-weir-boundary.md b/models/ADCIRC/source-analysis/adcirc-weir-boundary.md
+--- a/models/ADCIRC/source-analysis/adcirc-weir-boundary.md
++++ b/models/ADCIRC/source-analysis/adcirc-weir-boundary.md
+@@ -3,6 +3,7 @@
+ topic: adcirc
+ canonical_source: self
+ citation_status: verified
++has_source_needed: false
+ last_source_check: 2026-10-12 (recovery 차이 결론 반영)
+ verification_method: "models/ADCIRC/raw/source_code/adcirc/src/weir_boundary.F90 (2715, module WEIR) 직접 read — BARINHT/BARLANHT(internal/external barrier 고도 47-50), BARMIN 0.04m 임계(51), vertical element wall BARMIN64=1.2·H0(259), TVW(time-varying weir) namelist file:line 인용."
+ note_author: "Claude Opus 4.8 (1M context) source-code direct read"
