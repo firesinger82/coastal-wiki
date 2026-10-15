@@ -4,7 +4,8 @@ model: SWASH
 component: src (scalar transport / constituents)
 canonical_source: self
 citation_status: verified
-verification_method: "SWASH v12.01 소스 직접 read (raw/source_code/swash/src/). SwashComputTrans.ftn90 / SwashCompUTrans.ftn90 dispatch, SwashExpDep1DHtrans.ftn90 전문(:1-535), SwashExpDep2DHtrans/DepUtrans/Lay1DHtrans/Lay2DHtrans/LayUtrans Purpose·Method 블록 및 핵심 스킴부, SwashInitBCtrans.ftn90·SwashInitBCUtrans.ftn90 전문, SwashServices.ftn90 fluxlim(:307-452) file:line 인용"
+verification_method: "SWASH v12.01 소스 직접 read (raw/source_code/swash/src/). SwashComputTrans.ftn90 / SwashCompUTrans.ftn90 dispatch, SwashExpDep1DHtrans.ftn90 전문(:1-534), SwashExpDep2DHtrans/DepUtrans/Lay1DHtrans/Lay2DHtrans/LayUtrans Purpose·Method 블록 및 핵심 스킴부, SwashInitBCtrans.ftn90·SwashInitBCUtrans.ftn90 전문, SwashServices.ftn90 fluxlim(:307-452) file:line 인용. 2026-10-15 SWASH recovery 대조 보고서 반영" # [10-15 전수 검증 정정]
+last_source_check: "2026-10-15 (recovery 대조 반영)"
 note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-16
 related:
@@ -53,7 +54,7 @@ related:
 
 ### 2.1 Prandtl-Schmidt 수 (확산계수 스케일링)
 
-constituent별 난류 Prandtl/Schmidt 수 `psm`: 염분·온도 = 0.7, 부유사 = 1.0 (`SwashExpDep1DHtrans.ftn90:157-161`). 수평 eddy 확산계수는 이 `psm`으로 나눠 적용.
+수심평균 1DH에서 염분·수온의 `psm`은 0.7이다. 같은 경로에서 부유사의 `psm`은 1.0이다. (`src/SwashExpDep1DHtrans.ftn90:157–161`) 다층 1DH의 부유사는 입력값 `snum`인 `psed(3)`을 사용한다. (`src/SwashExpLay1DHtrans.ftn90:159–162`; `src/SwashReadInput.ftn90:1442`) 두 경로의 수평 와점성계수 평균은 각각의 `psm`으로 나눠 확산계수에 적용한다. (`src/SwashExpDep1DHtrans.ftn90:303–305`; `src/SwashExpLay1DHtrans.ftn90:362–364`) [10-15 전수 검증 정정]
 
 ### 2.2 finite-volume 이류 flux — predictor (1차 upwind)
 
@@ -174,14 +175,17 @@ enddo
 
 ### 5.3 anti-creep 보정
 
-sigma 좌표 인공 확산(creep) 억제: `if ( icreep == 1 ) call SwashAntiCreep1DH(amatc,rhsc,rpo,kgrpnt,psm)` (`SwashExpLay1DHtrans.ftn90:677`). 2D 대응 `SwashAntiCreep2DH` (`SwashExpLay2DHtrans.ftn90:951`). ⚠ AntiCreep 서브루틴 본체는 본 배정 외 파일이라 미확인.
+sigma 좌표 인공 확산(creep) 억제: `if ( icreep == 1 ) call SwashAntiCreep1DH(amatc,rhsc,rpo,kgrpnt,psm)` (`src/SwashExpLay1DHtrans.ftn90:677`). 2D 대응은 `SwashAntiCreep2DH`다. (`src/SwashExpLay2DHtrans.ftn90:951`) [10-15 대조 정정]
+STANDARD는 층 경사와 연직 농도 구배의 곱을 더한다. SVK 확산의 보간은 MUSCL이다. (`src/SwashAntiCreep1DH.ftn90:170–182`; `src/SwashHDiffZplane1DH.ftn90:285–294`; `src/SwashHDiffZplane2DH.ftn90:315`) [10-15 대조 정정]
+원문 식은 아래 차이 표의 `inputs-physics-numerics:SI2-283`과 `inputs-physics-numerics:SI2-284`에 있다. [10-15 대조 정정]
 
 ### 5.4 sediment 침식/퇴적 (bed 경계 mass exchange)
 
-부유사(`l==lsed`)일 때 bed 셀(k=kmax)에 erosion/deposition flux 추가 (`SwashExpLay1DHtrans.ftn90:421-484`). 파라미터는 `psed()` 배열(의미는 SwashCommdata3 모듈, 주석 `:428`):
+부유사(`l==lsed`)일 때 bed 셀(`k=kmax`)에 erosion/deposition flux를 추가한다. (`src/SwashExpLay1DHtrans.ftn90:421–484`) `src/SwashModule1.ftn90:539–552`가 psed의 정의를 제공한다. [10-15 대조 정정]
 
 - **noncohesive sand**(`psed(9)>0`): bed 마찰속도 `fac = (0.3+psed(7))*rtur(nm,kmax,1)`(난류운동에너지 기반, 파괴 난류 포함 가능). erosion = pickup function `rhsc += psed(9)*((fac-psed(5))/psed(5))**1.5` (임계 `psed(5)` 초과 시), deposition = fall velocity `amatc(nm,kmax,1) += psed(1)` (`:439-447`).
-- **cohesive mud**(`psed(10)>0`): bed 전단응력 `fac = 0.3*rhow*rtur(nm,kmax,1)`. erosion `rhsc += psed(12)*(fac/psed(10)-1.)` (`fac>psed(10)`), deposition `amatc += psed(1)*(1.-fac/psed(11))` (`fac<psed(11)`) (`:468-476`).
+- **cohesive mud**(`psed(10)>0`): bed 전단응력은 `fac = 0.3*rhow*rtur(nm,kmax,1)`이다. 침식은 `if( fac > psed(10) ) rhsc(nm,kmax) = rhsc(nm,kmax) + psed(12) * ( fac/psed(10) - 1. )`이다. (`src/SwashExpLay1DHtrans.ftn90:468–472`) 퇴적 항은 `psed(1)*(1.-fac/psed(11))`이다. 조건은 `fac<psed(11)`이다. (`src/SwashExpLay1DHtrans.ftn90:476`) [10-15 대조 정정]
+- erate는 문서에서 질량 flux 단위이다. 수송 상태는 체적 농도이다. 활성 침식 대입에는 rhos 환산이 없다. 이 차이는 E 강함의 코드 결함 후보이다. (swashuse PDF p.87: “entrainment rate for erosion (in kg/m2/s).”; swashuse PDF p.85: “cb is the (volumetric) sediment concentration”; `src/SwashDensity.ftn90:66`; `src/SwashInitBCtrans.ftn90:398`; `src/SwashExpLay1DHtrans.ftn90:472`) [10-15 대조 정정]
 
 `psed(1)`이 fall(settling) velocity 계수임이 deposition 양쪽에 공통 등장으로 확인됨 (`:447,476`).
 
@@ -218,10 +222,33 @@ sigma 좌표 인공 확산(creep) 억제: `if ( icreep == 1 ) call SwashAntiCree
 | `psm` | Prandtl-Schmidt 수 | `:121,157-161` |
 | `cbndl/r/b/t`, `cbndu` | Dirichlet 경계 농도(x좌/우, y하/상, 비정형 face) | `SwashInitBCtrans.ftn90:116,176,210,217`; `SwashInitBCUtrans.ftn90:107` |
 | `coutl/r`,`icretl/r`,`tcret` | Thatcher-Harleman 유출농도·잔여 return time·return time | `SwashExpDep1DHtrans.ftn90:186,202-203` |
-| `psed()` | sediment 파라미터(settling/임계전단/pickup) | `SwashExpLay1DHtrans.ftn90:425-476` |
+| `psed()` | sediment의 수송·바닥교환 매개변수 | `src/SwashModule1.ftn90:539–552` [10-15 대조 정정] |
 
-## 8. 출처 미확인 / 후속
+## 8. 수송 매개변수와 층 순서 [10-15 대조 정정]
 
-- `SwashAntiCreep1DH/2DH` 본체: 호출만 확인(`SwashExpLay1DHtrans.ftn90:677`, `SwashExpLay2DHtrans.ftn90:951`), 알고리즘 내부는 배정 외 파일 — source-needed.
-- `psed()` 각 인덱스의 정확한 물리적 의미: 주석이 SwashCommdata3 모듈 참조(`SwashExpLay1DHtrans.ftn90:428`)로 위임 — 본 노트는 코드 사용 맥락에서 `psed(1)`=settling, `psed(5)`/`psed(10)`/`psed(11)`=임계전단, `psed(9)`/`psed(12)`=pickup 계수로 **추정**(⚠ 모듈 정의 직접 미확인).
-- `SwashExpLay2DHtrans`(1256줄)·`SwashExpLayUtrans`(1138줄) 전문은 1DH/U 구현의 차원 확장이며 Purpose·Method·AntiCreep 호출만 확인, 라인별 전사 생략(proportional).
+- STANDARD는 층 경사와 연직 농도 구배의 곱을 더한다. SVK 확산의 보간은 MUSCL이다. (`src/SwashAntiCreep1DH.ftn90:170–182`; `src/SwashHDiffZplane1DH.ftn90:285–294`; `src/SwashHDiffZplane2DH.ftn90:315`) [10-15 대조 정정]
+- `src/SwashModule1.ftn90:539–552`가 psed의 정의를 제공한다. psed(5)는 입력 때 무차원 임계 Shields 수이다. `src/SwashCheckPrep.ftn90:926`이 이를 임계 마찰속도 제곱으로 변환한다. psed(10)·psed(11)는 N/m² 응력이다. psed(12)는 침식률이다. ALFA와 AK는 각각 psed(4)와 psed(13)이다. [10-15 대조 정정] (단위: swashuse PDF p.87. 입력 이름: `src/SwashReadInput.ftn90:1444,1458`.) [10-15 전수 검증 보완]
+- k−1은 위층이다. k는 그 아래층이다. 수층 침강은 위층의 손실과 아래층의 유입으로 연결된다. 바닥 퇴적은 최하층 kmax에서 처리한다. (`src/SwashExpLay1DHtrans.ftn90:447,594–595`) [10-15 대조 정정]
+
+## 문서와 코드 차이 (10-15 대조)
+
+행 ID의 약칭은 [inputs-physics-numerics](../../../_staging/recovery/compare/swash-inputs-physics-numerics-vs-code.md)와 [guide-syntax-build](../../../_staging/recovery/compare/swash-guide-syntax-build-vs-code.md)를 가리킨다.
+문서 인용은 PDF 쪽 번호를 쓴다.
+swashuse의 인쇄 쪽 번호는 PDF 쪽 번호에서 8을 뺀다.
+
+문서 판: SWASH 12.01 매뉴얼 swashuse·swashtech, 공개 저장소 `7949227` 2026-05-06 "release v12.01"에서 마지막 변경. 코드 판: VERNUM 12.01, 공개 저장소 main `a486d5f` 2026-05-26, 12.01 뒤 `608ffd7`·`9554c98` 포함.
+
+| 행 ID | 항목 | 문서 원문 | 코드 원문 | 결론 | 결론 문장 |
+|---|---|---|---|---|---|
+| guide-syntax-build:SG1-887 | 침전물 입력 단위와 거칠기 | swashuse PDF p.87은 FALL의 mm/s와 SIZE의 µm를 명시한다. p.86은 입경에 따른 거칠기 5.5d50을 설명한다. | `src/SwashCheckPrep.ftn90:824–838` `if ( lsed > 0 ) then` / `if ( psed(1) < 0. ) then` / `call msgerr (1, 'incorrect sediment settling velocity')` / `psed(1) = 0.` / `else` / `! fall velocity is given by user in millimeter per second` / `psed(1) = psed(1) * 1.e-3` / `endif` / `if ( psed(2) < 0. ) then` / `call msgerr (1, 'incorrect median sediment diameter')` / `psed(2) = 0.` / `else` / `! grain size is given by user in micrometer` / `psed(2) = psed(2) * 1.e-6` / `endif`; `src/SwashCheckPrep.ftn90:843–856` `if ( lsed > 0 .and. (psed(2) /= 0. .or. psed(10) /= 0. .or. lsal > 0 .or. ltemp > 0) .and. kmax > 1 .and. lmixt ) then` / `if ( iturb /= 1 ) then` / `call msgerr (3, 'vertical mixing (k-epsilon model) must be employed in case of sediment transport')` / `endif` / `if ( irough /= 4 ) then` / `call msgerr (3, 'logarithmic wall-law must be applied in case of sediment transport')` / `endif` / `if ( instead ) then` / `call msgerr (1, 'no steady flow condition in case of sediment transport')` / `instead = .false.` / `endif` / `! calculate the Nikuradse roughness height in case of sand transport, if appropriate` / `if ( .not.varfr .and. .not. pbot(2) /= 0. .and. psed(2) /= 0. ) then` / `pbot(2) = psed(4) * psed(2)` `src/SwashInit.ftn90:378` `psed(4) = 5.5`; swashuse PDF p.86–87. | C 문서 누락 | FALL·SIZE의 SI 단위 변환과 입경에 비례하는 거칠기 식은 문서에 대응한다. C는 음수 입력의 0 보정과 거칠기 자동 대입의 정확한 조건에 한정한다. 거칠기는 843행의 침전물·다층·혼합밀도 조건 안에서 `if ( .not.varfr .and. .not. pbot(2) /= 0. .and. psed(2) /= 0. ) then`일 때만 `pbot(2) = psed(4) * psed(2)`로 대입한다. [10-15 결론 검증 정정] [10-15 결론 검증 보완] |
+| inputs-physics-numerics:SI2-141 | erate 단위 | swashuse PDF p.87: “entrainment rate for erosion (in kg/m2/s).”;<br>swashuse PDF p.85: “cb is the (volumetric) sediment concentration” / | `src/SwashReadInput.ftn90:1424`: `call INREAL( 'ERATE', psed(12), 'REQ', 0.)`;<br>`src/SwashExpLay1DHtrans.ftn90:472`: `if( fac > psed(10) ) rhsc(nm,kmax) = rhsc(nm,kmax) + psed(12) * ( fac/psed(10) - 1. )`;<br>`src/SwashInitBCtrans.ftn90:398`: `rp(nm,:,lsed) = 0.5 * ( sedf(nm,:) + sedf(nmd,:) ) / rhos`;<br>`src/SwashDensity.ftn90:66`: `real*8        :: c        ! local sediment volume concentration`;<br>`src/SwashExpLay1DHtrans.ftn90:423`: `if ( l == lsed ) then`; 455행: `if ( psed(10) > 0. ) then`; 464행: `if ( hs(nm) > epsdry ) then`; 700행: `rp(nm,kmax,l) = rhsc(nm,kmax)`.<br>`src/SwashCheckPrep.ftn90:804–818`은 단일층·DENSITY NO에서 침식을 끈다. 843–848행은 활성 다층 혼합에 연직 k–epsilon과 LOGLAW를 요구한다. | E 코드 결함 후보 | 해석: erate는 문서에서 질량 flux 단위이다. 수송 상태는 체적 농도이다. 활성 침식 대입에는 rhos 환산이 없다. 이 차이는 E 강함의 코드 결함 후보이다. 구조 침식식은 `8756667:src/SwashExpLay1DHtrans.ftn90:472`부터, 비구조 식은 `9b8a012:src/SwashExpLayUtrans.ftn90:662`부터 같다. `9554c98`은 수송 초기화 위치만 옮겼으며 침식률의 단위를 변환하지 않는다. 활성 다층 경로에서 kg/m²/s의 erate를 체적 농도식에 직접 더하므로 E 강함을 유지한다. [10-15 결론 검증 보완] [10-15 git 이력 판정] |
+| inputs-physics-numerics:SI2-146 | TRANSPORT 본문의 ALFA·CRSN·CP·EK 설명 누락 | swashuse PDF p.83–87 본문에는 ALFA·CRSN·CP·EK 입력 설명이 없다. p.159 부록은 `[alfa] [crsn] [cp] [ek]`를 표시한다. | `src/SwashReadInput.ftn90:1400–1402`: `!           [alfa] [crsn] [cp] [ek]   (not documented)                          &` / `!` / `!           ANTICreep  STAndard \| SVK \| None`; `src/SwashReadInput.ftn90:1458–1461`: `call INREAL( 'ALFA', psed(4), 'STA', 5.5    )` / `call INREAL( 'CRSN', psed(5), 'STA', 0.05   )` / `call INREAL( 'CP'  , psed(6), 'STA', 0.00033)` / `call INREAL( 'EK'  , psed(7), 'UNC', 0.     )`;<br>`misc/swash.edt:194`의 `[alfa] [crsn] [cp] [ek]`. | C 문서 누락 | 네 값은 거칠기 배율·임계 Shields 수·pickup 계수·쇄파 난류 추가 계수이다. ALFA와 AK는 서로 다른 대상이다. C는 p.83–87 본문의 입력 의미·기본값 설명 누락으로 한정한다. 부록에는 네 매개변수 이름이 있다. [10-15 결론 검증 정정] [10-15 전수 검증 정정] |
+| inputs-physics-numerics:SI2-147 | 별칭·추가 입력 검사 | — | `src/SwashReadInput.ftn90:1406`: `if ( KEYWIS ('TRANSP') .or. KEYWIS('CONST') ) then`; `src/SwashReadInput.ftn90:1447`: `if ( KEYWIS ('DENS') .or. KEYWIS('MIXT') ) then`; `src/SwashReadInput.ftn90:1468`: `else if ( KEYWIS ('STA') .or. KEYWIS ('Y') ) then`;<br>`src/SwashCheckPrep.ftn90:789–791`: `if ( tcret < 0. ) then` / `call msgerr (1, 'incorrect return time for salt intrusion')` / `tcret = 0.`;<br>`src/SwashCheckPrep.ftn90:825–834`는 음수 침강속도와 음수 입경을 각각 0으로 복구한다. | C 문서 누락 | 음수 복귀시간은 0으로 복구한다. 음수 침강속도와 입경도 0으로 복구한다. [10-15 결론 검증 보완] |
+| inputs-physics-numerics:SI2-148 | 수평 확산의 실제 계수·안정성 | — | `src/SwashExpLay1DHtrans.ftn90:159–162`: `if ( l == lsal .or. l == ltemp ) then` / `psm = 0.7` / `else if ( l == lsed ) then` / `psm = psed(3)`; `src/SwashExpLay1DHtrans.ftn90:364`: `dif2d = 0.5 * ( vnu2d(nm) + vnu2d(nmu) ) / psm`; `src/SwashExpLay1DHtrans.ftn90:376–377`: `if ( .not. dif2d < stabmx ) then` / `dif2d  = stabmx` | C 문서 누락 | 염분·수온의 비율은 고정 0.7이다. 부유사는 snum을 사용한다. 코드가 실제 확산계수를 안정성 상한으로 자른다. |
+| inputs-physics-numerics:SI2-149 | ANTICREEP 추가 조건 | — | `src/SwashCheckPrep.ftn90:797`: `if ( itrans == 0 .or. kmax == 1 ) icreep = 0`; `src/SwashCheckPrep.ftn90:799`: `if ( icreep == 2 .and. ( lreptx .or. lrepty ) ) call msgerr (3,'repeating grid not allowed in case of Stelling and Van Kester method')` | C 문서 누락 | 수송이 없거나 단일층이면 anti-creep를 해제한다. SVK는 반복 격자를 허용하지 않는다. |
+| inputs-physics-numerics:SI2-150 | 바닥교환 해제와 매개변수 초기화 | swashuse PDF p.23: “In the depth-averaged mode, there is no mass exchange of suspended sediment between the bed and the flow.”; p.86: “Also, there is no sedimentation and erosion near the bed.” | `src/SwashCheckPrep.ftn90:804–810`: `if ( kmax == 1 ) then` / `call msgerr (1, 'no mass exchange of sediment in depth-averaged mode')` / `psed( 1) = 0.` / `psed( 2) = 0.` / `psed(10) = 0.` / `psed(11) = 0.` / `psed(12) = 0.`; `src/SwashCheckPrep.ftn90:812–818`: `if ( .not.lmixt ) then` / `call msgerr (1, 'no mass exchange of sediment for tracer')` / `psed( 1) = 0.` / `psed( 2) = 0.` / `psed(10) = 0.` / `psed(11) = 0.` / `psed(12) = 0.`; | C 문서 누락 | 단일층과 DENSITY NO의 바닥교환 해제는 각각 swashuse PDF p.23과 p.86의 설명과 일치한다. C는 이때 침강속도·입경·임계응력·침식률을 모두 0으로 덮어쓰는 매개변수 처리의 설명 누락으로 한정한다. [10-15 결론 검증 정정] |
+| inputs-physics-numerics:SI2-151 | Eckart 상태방정식·밀도 기준 | — | `src/SwashDensity.ftn90:105–108`: `p0        =  5890d0  + (  38d0  - 375d-3*t)*t +              3d0*s` / `lambda    = 17795d-1 + (1125d-2 - 745d-4*t)*t - (38d-1 + 1d-2*t)*s` / `!` / `rho(n,k) = p0/(lambda+0.698*p0)`; `src/SwashDensity.ftn90:163`: `if ( lsal > 0 .or. ltemp > 0 ) rho = 1000.*rho - rhow` | C 문서 누락 | 코드는 Eckart 밀도를 계산한 뒤 기준 밀도를 뺀 편차를 저장한다. `rho`를 절대 밀도로 설명하면 다르다. |
+| inputs-physics-numerics:SI2-152 | 침강 방향·최하층 | — | `src/SwashExpLay1DHtrans.ftn90:590`: `! include fall velocity in case of sediment transport`; `src/SwashExpLay1DHtrans.ftn90:594–595`: `amatc(nm,k-1,1) = amatc(nm,k-1,1) +     psed(1)` / `amatc(nm,k  ,2) = amatc(nm,k  ,2) - kwu*psed(1)`; `src/SwashExpLay1DHtrans.ftn90:445`: `! include downward sediment flux (deposition) by means of fall velocity`; `src/SwashExpLay1DHtrans.ftn90:447`: `amatc(nm,kmax,1) = amatc(nm,kmax,1) + psed(1)` | C 문서 누락 | k−1은 위층이다. k는 그 아래층이다. 수층 침강은 위층의 손실과 아래층의 유입으로 연결된다. 바닥 퇴적은 최하층 kmax에서 처리한다. |
+| inputs-physics-numerics:SI2-243 | limiter 실제 식·보호값 | — | `src/SwashServices.ftn90:387`: `if ( abs(b) > 1.e-10 ) then`; `src/SwashServices.ftn90:389`: `r = a / b`; `src/SwashServices.ftn90:393`: `r = 0.`; `src/SwashServices.ftn90:421`: `fluxlim = 2.*r * ( -r*r + (3.+kappa)*r - kappa )/((1.+r)**2)`; `src/SwashServices.ftn90:425`: `fluxlim = ( (2.+kappa)*r - kappa )/( 1.+r )`; `src/SwashServices.ftn90:443`: `fluxlim = max( 0., min( mbound*r, fac ) ) * b` | C 문서 누락 | 구배 b의 크기가 1e−10 이하이면 `r=0`이다. R-kappa의 kappa<0 분기는 `r≤1`과 `r>1`의 식이 다르다. Sweby·PL-kappa의 식은 SI2-228/230에 적었다. |
+| inputs-physics-numerics:SI2-283 | STANDARD anti-creep 실제 곱 | — | `src/SwashAntiCreep1DH.ftn90:170–182`: `flux(nm,k,1) = 0.5 * ( hkso(nm,k) + hkso(nmu,k) ) * dif2d * rdx *                    &` / `!         --- compute d z(k) / dx` / `0.5 * ( zkso(nmu,k-1) - zkso(nm,k-1) + zkso(nmu,k) - zkso(nm,k) ) *   &` / `!         --- compute d c(k-1/2) / dz` / `( rpo(nmu,kd) + rpo(nm,kd) - rpo(nmu,ku) - rpo(nm,ku) ) * 2. /        &` / `( (ku-k) * (zkso(nmu,k -1) - zkso(nmu,ku)) +                          &` / `(k-kd) * (zkso(nmu,kd-1) - zkso(nmu,k )) +                          &` / `(ku-k) * (zkso(nm ,k -1) - zkso(nm ,ku)) +                          &` / `(k-kd) * (zkso(nm ,kd-1) - zkso(nm ,k )) )` | C 문서 누락 | 코드는 수평 확산 flux에 수평 층 경사와 연직 농도 구배의 곱을 더한다. k−1은 위층이다. 변수명 kd/ku만 보고 층 순서를 바꾸지 않는다. |
+| inputs-physics-numerics:SI2-284 | SVK z-plane 실제 limiter·flux | — | `src/SwashHDiffZplane1DH.ftn90:285–290`: `! MUSCL limiter` / `if ( grmax < 0. .or. grmin > 0. ) then` / `grad = min( grmin, 0.25 * grsum )` / `if (grad1 < 0.) grad = max( grmax, 0.25 * grsum )` / `endif` / `grad = 2. * grad`; `src/SwashHDiffZplane1DH.ftn90:294`: `flux = dif2d * rdx * rdx * ( point(kf-1) - point(kf) ) * grad`;<br>`src/SwashHDiffZplane2DH.ftn90:315`: `flux = dif2d * ( point(kf-1) - point(kf) ) * grad * guu(nm) / gvu(nm)` | C 문서 누락 | z-plane 확산은 MUSCL 보간을 사용한다. DISCRETIZATION TRANSPORT의 이류 limiter 선택과 다른 내부 선택이다. Van Leer 대안 줄은 일반 주석으로 남아 있다. |

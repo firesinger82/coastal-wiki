@@ -216,6 +216,18 @@ Delft3D 487(기계 sweep 실패 471 + 웹 16, 09-22 스냅샷 교체 전 경로)
 - 정정분 sonnet 표본 24행: 맞음 24. 앞 표본의 부분 6건은 모두 고쳐진 것을 확인했다.
 - 최종 기계 확인: 원문 인용 64,615개 중 불일치 0.
 
+## SWASH 대조·흐름·노트 반영 (2026-10-15 완료)
+
+- 대조 보고서 6종(Codex `gpt-6.1-sol`): `compare/swash-{theory-framework,theory-unstructured,inputs-setup,inputs-physics-numerics,outputs,guide-syntax-build}-vs-code.md`. 흐름 분석 `flow/SWASH-callflow.md`(시작·입력 읽기 순서, 계산 순서, 변수 생산·소비, 문서 대조). mermaid 3개(전체, 구조 격자 한 단계, 비구조 격자 한 단계)는 렌더해 확인했다.
+- 외부 원문: 위키 원자료는 커밋 1개짜리 얕은 사본이다. 공개 저장소(gitlab.tudelft.nl/citg/wavemodels/swash)를 `extract/SWASH/external/gl`에 받았다. main은 91커밋(2022-07-30 `744735e` ~ 2026-05-26 `a486d5f`)이고 HEAD의 src는 원자료와 같다. 매뉴얼 PDF의 마지막 변경은 `7949227` 2026-05-06 "release v12.01"이다. 그 뒤 코드 커밋은 `608ffd7`·`9554c98` 둘(5파일, 41줄)이다. 웹 `swash-12.01.tar.gz`의 src 162파일은 원자료와 바이트 단위로 같다. 웹 PDF 텍스트도 원자료와 같다. `swash-11.01.tar.gz`·`modifications.htm`·`problems_and_fixes.htm`도 받았다(extract는 커밋하지 않는다).
+- git 이력 판정(Codex `gpt-6-astra` 3작업): E 39행 → E 37·C 2. A 후보(12.01 뒤 변경 덩어리를 인용한 283행, 문서 지연 후보 B 123행) → A 2(SI1-259 LAYERS 파일 교체 문장은 `9d03fff` 이전 동작, SO1-293 출력 키워드 94개는 9.01 `5d279d7`의 수, 10.01 `9b8a012`부터 96개 — Claude가 두 판에서 직접 셈). D 3행은 모두 D 유지. 기록: `compare/SWASH-git-verify-{E1,E2,AD}.md`.
+- 결론 표본(sonnet 30행): OK 26·부분 3·틀림 1. 유형은 기본값만 보고 H로 둠(SI1-017, `stricthead`는 UMOM HEAD로 켜짐), 다른 매뉴얼에 있는 내용을 C로 둠(ST1-287), 코드 대조한 행을 H로 둠(SI1-143), 같은 사실을 두 행이 다르게 분류함(SO1-295·SO1-100). Claude가 세 위치를 원문에서 확인했다. 이 유형을 넣어 결론 전수 재검증(Codex `gpt-6-astra` 10작업): 1,438행, 정정 344·보완 441·분류 변경 79(작업 요약 줄 합계). 기록: `compare/SWASH-conclusion-sample.md`, 보고서별 "## 전수 검증 기록 (10-15, …)".
+- 최종 결론(차이 결론 절 1,438행, 결론 열에서 Claude가 셈): 일치 30·A 2·B 150·C 428·D 3·E 41·F 109·H 675. G·X 0. 보고서의 분류별 개수 줄을 이 값으로 바꿨다.
+- 노트 반영(Codex `gpt-6.1-sol`): 보고서별 7작업이 A–F 733행마다 담당 노트 하나를 정했다(`assign/SWASH-assign-*.tsv`). 8작업이 반영했다(`assign/SWASH-note-job-*.tsv`, `flow/SWASH-notes-apply-{1..8}.md`). 기존 노트 26개를 고쳤고 새 노트 `manual-notes/swash-build-run-differences.md`를 만들었다. 흐름도 3개는 `swash-timestepping-update-driver.md`에 옮겼다(보고서 블록과 글자 단위로 같음). `models/SWASH/README.md`에 코드 결함 후보 E 41행 표를 넣었다. 이 표는 작업 8이 지시문의 경로 누락으로 저장소 루트 README에 넣은 것을 Claude가 옮긴 것이다. 행 ID 대조로 733행이 모두 배정 파일에 한 번씩 있고 분류가 보고서와 같음을 확인했다.
+- 추가 줄 전수 대조(Codex `gpt-6-astra` 8작업): 2,039줄, 정정 131·보완 46(`flow/SWASH-notes-verify-{1..8}.md`, 노트 태그 수와 같음).
+- 기계 확인: 바뀐 노트 27개의 `경로:줄` 인용 2,174개 중 불일치 표시 147개다. 과거 커밋 인용(`8756667:src/...`, Claude가 7개를 직접 열어 확인), 두 백틱 사이 문장, 노트 자기 인용, 수정 전 줄 인용이 섞인 검사 오판이다. 전수 대조 작업이 후보를 하나씩 판정했다. `tools/validate-all.sh` 통과.
+- sonnet 표본 30줄(표 22·본문 8): OK 29·부분 1(README.md:80 manual-notes 파일 수 3 → 반영 뒤 4) → 고쳤다(`[10-15 표본 정정]`). 표본이 찾은 보고서 쪽 번호 오기(SG1-875 p.37 → p.38)도 보고서에서 고쳤다. 기록: `compare/SWASH-notes-sample.md`.
+
 ## 노트 반영분 전수 대조와 차이 결론 (2026-10-12)
 
 사용자 지시(10-12): 확인하지 않은 것을 한계로 남기지 말고 해결한 뒤 다음 모델로 간다. 모델 실행은 위키 범위가 아니므로 한계로 적지 않는다.
@@ -230,4 +242,4 @@ Delft3D 487(기계 sweep 실패 471 + 웹 16, 09-22 스냅샷 교체 전 경로)
 
 1. ~~매뉴얼과 코드 판독 기록 대조~~ — 10-03 완료(`compare/XBeach-manual-vs-code.md`, 노트 반영 `1da8d89`).
 2. ~~XBeach 파일 간 계산 흐름 분석~~ — 10-07 완료(`flow/XBeach-callflow.md`, 노트 반영 `d89cd8b`). 판독 기록 검색은 `wiki_search` `path_class="records"`(`ce7b3ae`).
-3. 다른 10개 모델(SFINCS·EFDC·ADCIRC 완료, ShorelineS 10-12 완료, SWAN 10-13 완료, ROMS 10-14 완료, 나머지 6개 미착수 — 순서 SWASH·FUNWAVE·LISFLOOD-FP·Delft3D·Celeris·CADMAS-SURF): 같은 방식(고정 목록 → 1행/1쪽 판독 → 기계 확인 → 다른 모델 검증).
+3. 다른 10개 모델(SFINCS·EFDC·ADCIRC 완료, ShorelineS 10-12 완료, SWAN 10-13 완료, ROMS 10-14 완료, SWASH 10-15 완료, 나머지 5개 미착수 — 순서 FUNWAVE·LISFLOOD-FP·Delft3D·Celeris·CADMAS-SURF): 같은 방식(고정 목록 → 1행/1쪽 판독 → 기계 확인 → 다른 모델 검증).

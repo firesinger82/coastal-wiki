@@ -4,7 +4,8 @@ model: SWASH
 component: src (boundary / spectral synthesis)
 canonical_source: self
 citation_status: verified
-verification_method: "SWASH v12.01 소스 직접 read (raw/source_code/swash/src/). SwashBCspecfile.ftn90 전문(1-932) read — SPEC1D/SWAN 파일 파서, 방향분포 합성, Fourier 성분 저장, nesting 좌표 매칭. SwashBCtransferfnc.ftn90 핵심부(1-668) + 40개 contained function 구조(grep) read — 2차 sub/super-harmonic transfer function 합성 메인 루프 + 대표 함수(etasub1·velsb11) 식 인용. 호출처 SwashUpdateUData/Data·SwashBounCond grep 확인."
+verification_method: "SWASH v12.01 소스 직접 read (raw/source_code/swash/src/). SwashBCspecfile.ftn90 전문(1-932) read — SPEC1D/SWAN 파일 파서, 방향분포 합성, Fourier 성분 저장, nesting 좌표 매칭. SwashBCtransferfnc.ftn90 핵심부(1-668) + 28개 contained function 구조(grep) read — 2차 sub/super-harmonic transfer function 합성 메인 루프 + 대표 함수(etasub1·velsb11) 식 인용. 호출처 SwashUpdateUData/Data·SwashBounCond grep 확인. 2026-10-15 SWASH recovery 대조 보고서 반영" # [10-15 전수 검증 정정]
+last_source_check: "2026-10-15 (recovery 대조 반영)"
 note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-16
 related:
@@ -97,7 +98,10 @@ SWAN ASCII 스펙트럼 포맷을 단계별로 파싱:
 `lnest`(SPECSWAN)일 때, 연속한 두 SWAN 위치 (x1,y1)→(x2,y2) 선분 위에 놓인 계산격자 경계점을 찾아 보간 가중치를 부여:
 
 - 선분에 대한 상대 수직거리 `rdist = abs(rx*(yp-y1) - ry*(xp-x1))`, `rdist<0.1`이면 선분 위로 간주(`:833-836`)
-- 선분 방향 투영비 `fac = rx*(xp-x1)+ry*(yp-y1)`, `[−0.001,1.001]` 범위면 채택(`:838-841`)
+- 선분 방향 투영비는 `fac = rx*(xp-x1)+ry*(yp-y1)`이다. (`src/SwashBCspecfile.ftn90:838-841`). [10-15 대조 정정]
+  fac는 −0.001 초과·1.001 미만이어야 한다. (`src/SwashBCspecfile.ftn90:841` `if ( fac > -0.001 .and. fac < 1.001 ) then`). [10-15 대조 정정]
+  `fac<0.01`이면 0으로 만든다. (`src/SwashBCspecfile.ftn90:845` `if ( fac < 0.01 ) fac = 0.`). [10-15 대조 정정]
+  `fac>0.99`이면 1로 만든다. (`src/SwashBCspecfile.ftn90:846` `if ( fac > 0.99 ) fac = 1.`). [10-15 대조 정정]
 - 경계점 데이터 `bgptmp%bgp(1..9)` 저장: 격자주소, btype, `nint(1000*fac)`/`nint(1000*(1-fac))` 두 인접 위치 가중치, nbv2/nbv1 두 variance set index, smoothing `nint(100000*tsmo)`, blayk, ibound (`:848-861`)
 
 → 한 계산 경계점이 인접한 두 SWAN 스펙트럼 위치를 선형보간하도록 설정.
@@ -154,7 +158,7 @@ omega3 = omega1 + omega2                                   (:354)
 | 3 | etasub3/etasup3 | velsb13,velsb23,velsb33 / velsp.. |
 | 4 | etasub4/etasup4 | velsb14..velsb44 (4개) / velsp.. |
 
-전체 40개 contained function: `eta{sub,sup}{1-4}` 8개 + `vel{sb,sp}{layer-pair}{kmax}` 32개 (`:429-4707` grep 확인). `velsbIJ`의 두 번째 자리(J=kmax)·세번째(I=레이어) 인덱싱으로 kmax 레이어 시스템의 각 레이어 속도 transfer를 표현.
+내부 함수는 총 28개다 (`src/SwashBCtransferfnc.ftn90:429–4707`의 `real function` 선언). 수면 전달함수 `eta{sub,sup}{1-4}`는 8개다. 속도 전달함수 `vel{sb,sp}{I}{J}`는 20개다. `I`는 층 번호다. `J`는 전체 층 수 `kmax`다 (`src/SwashBCtransferfnc.ftn90:313–330,380–397`의 호출 대입). 층 번호 1은 맨 위층이다 (`src/SwashExpLayUflow.ftn90:1060–1068`). [10-15 전수 검증 정정]
 
 각 함수는 `kd1,kd2,omega1,omega2,swd,grav`만으로 구성된 **순수 대수식**(분산관계 기반 닫힌 형식). 대표 예 etasub1 (`:499-504`):
 $$\eta_{\text{sub}}^{(1)} = \frac{(kd_1-kd_2)^2\big[4g\,kd_1kd_2 + (\ldots)h\big]}{2\,kd_1kd_2\,h\big[-4g(kd_1-kd_2)^2 + (4+(kd_1-kd_2)^2)(\omega_1-\omega_2)^2 h\big]}$$
@@ -189,9 +193,31 @@ SwashBCspecfile                          SwashBCtransferfnc
 
 ---
 
-## 5. 미확인 / source-needed
+## 5. 배열 선언과 원문 연결 [10-15 전수 검증 정정]
 
-- `subzc/subuc/supzc` 등 누적 배열의 **선언 모듈과 차원** — grep으로 `SwashCommdata3`/`m_bndspec`에서 직접 확인 못함(검색 무결과). 사용 패턴상 `(nbgrpt, nfreq?, kmax)` 추정이나 ⚠ 미확인 (source-needed).
-- `etaXXX`/`velXXX` 대수식의 물리적 유도 — 코드는 닫힌 형식만 제공, 유도는 Vasarmidis et al. (2024) 논문 참조(`:47-51`). 식 자체는 etasub1/velsb11만 본문 인용, 나머지 38개는 동형 구조로 미전사(분량 비례 생략).
-- `CHGBAS`·`disprel`·`GAMMAF`·`REFIXY` 구현 본체는 별도 파일 — 본 노트 범위 외(호출 인터페이스만 인용).
-- `seedf`/`seedt` 정의 위치 — `SwashCommdata3`/`SwashCommdata4` 추정이나 직접 미확인 (source-needed).
+- `subuc`·`supuc`는 경계점×주파수×층 배열이다. (`src/SwashModule2.ftn90:384–385`; `src/SwashCheckPrep.ftn90:1689–1690` `if ( .not.allocated(subuc) ) allocate(subuc(nbgrpt,nfreq,kmax))`·`if ( .not.allocated(supuc) ) allocate(supuc(nbgrpt,nfreq,kmax))`). [10-15 대조 정정]
+- `subzc`·`supzc`는 경계점×주파수 배열이다. (`src/SwashModule2.ftn90:392–393`; `src/SwashCheckPrep.ftn90:1699–1700` `if ( .not.allocated(subzc) ) allocate(subzc(nbgrpt,nfreq))`·`if ( .not.allocated(supzc) ) allocate(supzc(nbgrpt,nfreq))`). [10-15 대조 정정]
+- 이 배열의 선언 모듈은 `SwashModule2.ftn90`의 `m_bndspec`이다. ([inputs-setup:SI1-713](../../../_staging/recovery/compare/swash-inputs-setup-vs-code.md#4-노트-대조와-수정안)). [10-15 대조 정정]
+- 상호작용 계수의 계산 방법은 코드의 Method 주석이 Vasarmidis et al. (2024) 논문으로 안내한다 (`src/SwashBCtransferfnc.ftn90:47–51`). 이 노트의 대표 식은 `etasub1`과 `velsb11`이다 (`src/SwashBCtransferfnc.ftn90:499–504,657–663`). [10-15 전수 검증 정정]
+- `CHGBAS`는 `src/swanser.ftn:3331`에 정의되어 있다. `disprel`은 `src/SwashServices.ftn90:13`에 정의되어 있다. `GAMMAF`는 `src/swanser.ftn:3892`에 정의되어 있다. `REFIXY`는 `src/swanser.ftn:174`에 정의되어 있다. [10-15 전수 검증 정정]
+- `seedf`·`seedt`는 `SwashModule2.ftn90`의 `m_bndspec` 모듈에 선언한다. (`src/SwashModule2.ftn90:368–369`). [10-15 대조 정정]
+- `seedf`는 위상 난수용이다. (`src/SwashModule2.ftn90:368` `integer   , dimension(:)    , save, allocatable :: seedf  ! seed used to generate pseudorandom phases`). [10-15 대조 정정]
+- `seedt`는 파향 난수용이다. (`src/SwashModule2.ftn90:369` `integer   , dimension(:)    , save, allocatable :: seedt  ! seed used to generate pseudorandom spectral directions`). [10-15 대조 정정]
+
+## 문서와 코드 차이 (10-15 대조)
+
+결론과 원문 인용은 [inputs-setup](../../../_staging/recovery/compare/swash-inputs-setup-vs-code.md#5-차이-결론)의 최종본에서 옮겼다.
+swashuse의 인쇄 쪽은 PDF 쪽에서 8을 뺀 값이다.
+
+문서 판: SWASH 12.01 매뉴얼 swashuse·swashtech(공개 저장소 `7949227`, 2026-05-06, "release v12.01"에서 마지막 변경). 코드 판: VERNUM 12.01(공개 저장소 main `a486d5f`, 2026-05-26, 12.01 뒤 `608ffd7`·`9554c98` 포함).
+
+| 행 ID | 항목 | 문서 원문 | 코드 원문 | 결론 | 결론 문장 |
+|---|---|---|---|---|---|
+| inputs-setup:SI1-319 | SPECFILE cycle의 SPEC1D 예외 | `swashuse PDF p.63` “[cycle] the cyclic period ...”; `swashuse PDF p.57`의 `SPECFile ’fname’ [cycle]` | `src/SwashBCspecfile.ftn90:222–224` `if ( tcycl < 9.e9 ) then`<br>`write (msgstr,'(a,f9.2,a)') 'user-defined cyclic period is ignored. Instead, a cyclic period of ',1./df,' sec will be used.'`<br>`call msgerr (1, trim(msgstr) )` | C 문서 누락 | SPEC1D에서는 사용자가 준 cycle을 무시한다. 실제 주기는 `1/df`이다. SWAN 파일의 cycle 처리와 구분해야 한다. [10-15 전수 검증 보완] |
+| inputs-setup:SI1-324 | SPECSWAN 1D-MODE 금지 | `swashuse PDF p.64` “CANNOT BE USED IN 1D-MODE.” | `src/SwashBCspecfile.ftn90:398` `if ( oned .and. mdc /= 0 ) call msgerr (3, 'directional wave spectrum not allowed in 1D mode')`; `src/SwashBCspecfile.ftn90:719–722` `if ( .not.oned ) then`<br>`bfstmp%spparm(3) = thp`<br>`else`<br>`bfstmp%spparm(3) = -999.` | B 문서 오기 | 코드의 1D 거부 조건은 방향 스펙트럼 `mdc≠0`이다. 비방향 SWAN 스펙트럼의 1D 처리 경로가 있다. SPECSWAN·lnest 전체를 1D에서 차단하는 검사는 없다. git 이력: `8756667:src/SwashBCspecfile.ftn90:381` `if ( oned .and. mdc /= 0 ) call msgerr (3, 'directional wave spectrum not allowed in 1D mode')`. 최초 공개판도 1D의 방향 스펙트럼만 거부한다. 비방향 스펙트럼의 1D 경로가 뒤에 새로 추가된 이력은 없다. SPECSWAN의 1D 거부 조건은 방향 성분 mdc가 0이 아닌 경우다. ([AD 판정표](../../../_staging/recovery/compare/SWASH-git-verify-AD.md)) [10-15 결론 검증 정정] [10-15 git 이력 판정] |
+| inputs-setup:SI1-507 | 난수 seedf·seedt의 일회 초기화 | `swashuse PDF p.34` seed는 공통 정수값만 적는다. | `src/SwashBounCond.ftn90:235` `if ( lseed ) then`; `src/SwashBounCond.ftn90:236` `if ( myseed < 1000 ) myseed = 1000*myseed`; `src/SwashBounCond.ftn90:241–244` `seedf(i) = abs(myseed) +    i - 1`<br>`seedt(i) = abs(myseed) + 2*(i - 1)`<br>`enddo`<br>`lseed = .false.`; `src/SwashReadInput.ftn90:2625–2634`는 SOURCE 입력에서도 같은 초기화 조건·정수열·표지 해제를 사용한다. | C 문서 누락 | 처음 경계·소스가 seed를 초기화한다. 위상 난수와 파향 난수에 다른 정수열을 넣는다. 그 뒤 SET SEED를 바꾸는 것만으로 이미 만든 seedf·seedt를 다시 만들지 않는다. git 이력: `7949227:src/SwashBounCond.ftn90:237` `if ( lseed ) then`. H1·H2·H6·H7은 시드 초기화 표지를 공용 모듈로 옮긴다. H8은 SOURCE가 먼저 나오는 경우도 초기화한다. 문서는 초기화 순서를 설명하지 않는다. 이전 동작을 적은 문장과의 충돌이 아니므로 C를 유지한다. HEAD는 BOUND 또는 SOURCE 중 먼저 읽은 경로에서 시드 배열을 한 번 초기화한다. 문서는 이 호출 순서와 두 정수열을 설명하지 않는다. ([AD 판정표](../../../_staging/recovery/compare/SWASH-git-verify-AD.md)) [10-15 결론 검증 보완] [10-15 git 이력 판정] [10-15 전수 검증 보완] |
+| inputs-setup:SI1-547 | SPEC1D Δf·음수 밀도·random phase | `swashuse PDF p.62–63`은 두 열과 예제만 적는다. | `src/SwashBCspecfile.ftn90:204–208` `if ( spec < 0. ) then`<br>`call msgerr (3, 'error in reading 1D spectrum file: density is negative')`<br>`exit`<br>`endif`<br>`if ( nfreq < 2 ) df = f - df`; `src/SwashBCspecfile.ftn90:262–263` `bfstmp%phase(j) = 2.*pi*tarr(j)`<br>`bfstmp%theta(j) = 0.            ! no directional spreading` | C 문서 누락 | Δf는 처음 두 주파수의 차이이다. 모든 후속 간격의 균일성을 검사하지 않는다. 음수 밀도는 오류이다. 위상은 난수이고 방향 분산은 0이다. |
+| inputs-setup:SI1-548 | nesting 허용 거리·투영·가중치 반올림 | `swashuse PDF p.63`은 좌표 보간을 설명한다. 임계값을 적지 않는다. | `src/SwashBCspecfile.ftn90:833` `rdist = abs( rx*(yp-y1) - ry*(xp-x1) )`; `src/SwashBCspecfile.ftn90:836` `if ( rdist < 0.1 ) then`; `src/SwashBCspecfile.ftn90:841` `if ( fac > -0.001 .and. fac < 1.001 ) then`; `src/SwashBCspecfile.ftn90:845–846` `if ( fac < 0.01 ) fac = 0.`<br>`if ( fac > 0.99 ) fac = 1.`; `src/SwashBCspecfile.ftn90:855` `bgptmp%bgp(3) = nint(1000.*fac)` | C 문서 누락 | 위치 선분 길이 대비 거리 10% 미만을 허용한다. 투영 길이는 −0.001 초과·1.001 미만이다. 양 끝 1% 구간은 끝점으로 붙인다. 나머지 가중치는 0.001 단위이다. SEGMENT XY의 1% 검색과 다르다. |
+| inputs-setup:SI1-714 | nesting 투영 끝점 | `models/SWASH/source-analysis/swash-boundary-spectral-transfer.md:100` “`[−0.001,1.001]` 범위면 채택” | `8756667:src/SwashBCspecfile.ftn90:792` `if ( fac > -0.001 .and. fac < 1.001 ) then` | B 문서 오기 | fac는 −0.001 초과·1.001 미만이어야 한다. `fac<0.01`이면 0으로 만든다. `fac>0.99`이면 1로 만든다. `rdist<0.1`의 10% 거리 조건을 유지한다. git 이력: `8756667:src/SwashBCspecfile.ftn90:792` `if ( fac > -0.001 .and. fac < 1.001 ) then`. fac의 열린 부등식은 최초 공개판부터 같다. 양 끝점을 포함한 이전 판은 없다. fac는 −0.001 초과·1.001 미만이어야 한다. `fac<0.01`이면 0으로 만든다. `fac>0.99`이면 1로 만든다. `rdist<0.1`의 10% 거리 조건을 유지한다. ([AD 판정표](../../../_staging/recovery/compare/SWASH-git-verify-AD.md)) [10-15 결론 검증 보완] [10-15 git 이력 판정] |
+| inputs-setup:SI1-712 | 난수 seed 선언 확인 | `models/SWASH/source-analysis/swash-boundary-spectral-transfer.md:197` “SwashCommdata3/SwashCommdata4 추정이나 직접 미확인” | 코드에만(C). `src/SwashModule2.ftn90:368` `integer   , dimension(:)    , save, allocatable :: seedf  ! seed used to generate pseudorandom phases`; `src/SwashModule2.ftn90:369` `integer   , dimension(:)    , save, allocatable :: seedt  ! seed used to generate pseudorandom spectral directions`. | C 문서 누락 | seedf·seedt는 SwashModule2.ftn90의 m_bndspec 모듈에 선언한다. 두 배열은 위상·파향 난수용이다. git 이력: `7949227:src/SwashModule2.ftn90:366` `integer   , dimension(:)    , save, allocatable :: seedf  ! seed used to generate pseudorandom phases`. 두 배열 선언은 H7의 문맥 행이다. 이번 커밋은 배열의 선언 모듈을 바꾸지 않았다. seedf와 seedt는 7949227과 HEAD 모두 m_bndspec에 선언되어 있다. ([AD 판정표](../../../_staging/recovery/compare/SWASH-git-verify-AD.md)) [10-15 결론 검증 보완] [10-15 git 이력 판정] [10-15 전수 검증 정정] |
+| inputs-setup:SI1-713 | 전달함수 배열 차원 확인 | `models/SWASH/source-analysis/swash-boundary-spectral-transfer.md:194` “선언 모듈과 차원”의 “미확인 (source-needed)” | 코드에만(C). `src/SwashCheckPrep.ftn90:1689` `if ( .not.allocated(subuc) ) allocate(subuc(nbgrpt,nfreq,kmax))`; `src/SwashCheckPrep.ftn90:1699` `if ( .not.allocated(subzc) ) allocate(subzc(nbgrpt,nfreq))`.<br>`src/SwashModule2.ftn90:384–385`는 subuc·supuc를 dimension(:,:,:)로 선언한다. `src/SwashModule2.ftn90:392–393`은 subzc·supzc를 dimension(:,:)로 선언한다. `src/SwashCheckPrep.ftn90:1690` `if ( .not.allocated(supuc) ) allocate(supuc(nbgrpt,nfreq,kmax))`; `src/SwashCheckPrep.ftn90:1700` `if ( .not.allocated(supzc) ) allocate(supzc(nbgrpt,nfreq))`. | C 문서 누락 | subuc·supuc는 경계점×주파수×층 배열이다. subzc·supzc는 경계점×주파수 배열이다. Module2의 m_bndspec 선언과 준비 단계의 allocate에서 배열 차원이 일치한다. [10-15 결론 검증 보완] [10-15 전수 검증 정정] |

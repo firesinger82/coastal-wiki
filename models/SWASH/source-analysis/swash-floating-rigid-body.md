@@ -4,7 +4,8 @@ model: SWASH
 component: src (floating rigid body)
 canonical_source: self
 citation_status: verified
-verification_method: "SWASH v12.01 소스 직접 read (raw/source_code/swash/src/). SwashRigBoddata.ftn90(모듈 변수·ribdat type), SwashMotionRigidBod.ftn90(generalized-alpha 적분), SwashForcesRigidBod.ftn90(mooring·fender·복원력·rotatep), SwashHydroLoads.ftn90(Froude-Krylov 압력적분), SwashFloatObjects.ftn90(draft·label·면적/부피/관성모멘트·pretension), SwashUpdKBCrigb.ftn90(운동학 BC), SwashFlobjOutp.ftn90(출력)을 각 file:line 인용"
+verification_method: "SWASH v12.01 소스 직접 read (raw/source_code/swash/src/). SwashRigBoddata.ftn90(모듈 변수·ribdat type), SwashMotionRigidBod.ftn90(generalized-alpha 적분), SwashForcesRigidBod.ftn90(mooring·fender·복원력·rotatep), SwashHydroLoads.ftn90(Froude-Krylov 압력적분), SwashFloatObjects.ftn90(draft·label·면적/부피/관성모멘트·pretension), SwashUpdKBCrigb.ftn90(운동학 BC), SwashFlobjOutp.ftn90(출력)을 각 file:line 인용; 2026-10-15 SWASH recovery 대조 보고서 반영"
+last_source_check: "2026-10-15 (recovery 대조 반영)"
 note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-16
 related:
@@ -14,14 +15,16 @@ related:
 
 # SWASH 부유체·강체 6DOF — floating object / moving rigid body
 
-> SWASH의 부유체 기능은 두 모드로 나뉜다: `ifloat==1`(고정체, 압력장만 부과·하중은 출력용) vs `ifloat==2`(운동하는 강체, 6DOF 운동방정식 풀이). 강체 운동은 generalized-alpha 시간적분으로 풀고, 유체력은 선체 wet surface 위 전압력(정수압+비정수압) 적분(Froude-Krylov)으로 얻으며, 계류삭(mooring)·fender·부력복원력이 추가된다. (경로: raw/source_code/swash/src/)
+> SWASH의 부유체 기능은 두 모드로 나뉜다: `ifloat==1`(고정체, 압력장만 부과·하중은 출력용) vs `ifloat==2`(운동하는 강체). 강체 운동은 generalized-alpha 시간적분으로 풀고, 유체력은 선체 wet surface 위 전압력(정수압+비정수압) 적분(Froude-Krylov)으로 얻으며, 계류삭(mooring)·fender·부력복원력이 추가된다. (경로: raw/source_code/swash/src/) [10-15 대조 정정]
 
 ## 1. 두 가지 부유체 모드 (`ifloat`)
 
 | 값 | 의미 | 근거 |
 |---|---|---|
 | `ifloat == 1` | 고정 부유체(fixed body). 압력장만 부과, 하중은 출력 목적으로만 계산 | `SwashFloatObjects.ftn90:314-317` (`lfbs = 1` "superfluous, but used to compute hydrodynamic loads as output"), `SwashFlobjOutp.ftn90:103-114` |
-| `ifloat == 2` | 운동하는 강체(moving rigid body). 6DOF 운동방정식 풀이 | `SwashFloatObjects.ftn90:318-322`, `SwashMotionRigidBod.ftn90:84` (`if ( ifloat /= 2 ) return`) |
+| `ifloat == 2` | 운동하는 강체(moving rigid body). 2D 평면 격자의 강체는 여섯 자유도를 선택할 수 있다. | `SwashFloatObjects.ftn90:318-322`, `SwashMotionRigidBod.ftn90:84` (`if ( ifloat /= 2 ) return`); `src/SwashReadInput.ftn90:1071–1088`의 여섯 자유도 선택; inputs-setup:SI1-563. [10-15 대조 정정] [10-15 전수 검증 보완] |
+
+1D에서는 SWAY·ROLL·YAW를 비활성화한다. SURGE·HEAVE·PITCH의 입력 선택은 유지한다 (`src/SwashCheckPrep.ftn90:1872–1874,1900–1906`; inputs-setup:SI1-563). [10-15 대조 정정] [10-15 전수 검증 정정]
 
 운동 루틴들(`SwashMotionRigidBod`, `SwashForcesRigidBod`, `SwashUpdKBCrigb`)은 모두 `ifloat /= 2`일 때 즉시 return — `SwashMotionRigidBod.ftn90:84`, `SwashForcesRigidBod.ftn90:93`, `SwashUpdKBCrigb.ftn90:88`.
 
@@ -68,6 +71,17 @@ related:
 
 ### 3.1 파라미터
 `SwashMotionRigidBod.ftn90:86-88`: `alfa = pship(10)` (under-relaxation factor), `beta = pship(3)`, `gamma = pship(4)` (generalized-alpha implicitness factors). `alfam`, `alfaf`는 모듈 변수로부터.
+
+FLOAT의 ALPHA 판독은 `call INREAL ( 'ALPHA', pship(1), 'STA', 0. )`이다 (`src/SwashReadInput.ftn90:1226`; inputs-setup:SI1-569 수정안; guide-syntax-build:SG1-612). [10-15 대조 정정]
+가속도 완화의 RELAX 판독은 `call INREAL('RELAX'  , pship(10), 'STA', 0.3)`이다 (`src/SwashReadInput.ftn90:1021`; inputs-setup:SI1-569 수정안). [10-15 대조 정정]
+NEWMARK의 BETA 판독은 `call INREAL ('BETA' , pship(3), 'STA', 0.25)`이다 (`src/SwashReadInput.ftn90:1003`; inputs-setup:SI1-569 수정안). [10-15 대조 정정]
+범위 밖 BETA는 경고 후 0.25로 바꾼다 (`src/SwashCheckPrep.ftn90:1379–1381`; inputs-setup:SI1-569 수정안). [10-15 대조 정정]
+NEWMARK의 GAMMA 판독은 `call INREAL ('GAMMA', pship(4), 'STA', 0.50)`이다 (`src/SwashReadInput.ftn90:1004`; inputs-setup:SI1-569 수정안). [10-15 대조 정정]
+범위 밖 GAMMA는 경고 후 0.5로 바꾼다 (`src/SwashCheckPrep.ftn90:1383–1385`; inputs-setup:SI1-569 수정안). [10-15 대조 정정]
+CH·HHT·WBZ의 읽기 기본은 모두 1이다 (`src/SwashReadInput.ftn90:1007,1010,1014` `call INREAL ('RHO', pship(5), 'STA', 1.0)`; inputs-setup:SI1-569 수정안). [10-15 대조 정정] [10-15 전수 검증 보완]
+범위 밖 값은 실제 계수 계산에 사용하는 rhoinf를 1로 고친다 (`src/SwashCheckPrep.ftn90:1388–1391`; inputs-setup:SI1-569 수정안). [10-15 대조 정정]
+CH·HHT·WBZ가 각각 alfam·alfaf를 계산한다 (`src/SwashCheckPrep.ftn90:1406–1421`; inputs-setup:SI1-566). [10-15 대조 정정]
+이어서 beta·gamma를 rho에서 다시 정한다 (`src/SwashCheckPrep.ftn90:1427–1429`; inputs-setup:SI1-566). [10-15 대조 정정]
 
 ### 3.2 병진 운동 (translation, `:92-123`)
 각 body `m`, 방향 `n`에 대해 `bdof(m,n,1)`가 true일 때만 (`:96`):
@@ -193,6 +207,8 @@ heave·roll·pitch에만 존재 (verbatim `:259`).
 
 `ifloat==1`은 출력 직전 `bdof`를 `oqproc(100+l)`로 세팅 후 `SwashHydroLoads` 직접 호출(`:107-114`), `ifloat==2`는 이미 계산된 `fhyd1/thyd1`을 그대로 복사(`:120-126`). 변위·회전·PTO 출력은 `ifloat==2`에서만(`:166-200`).
 
+출력 단위: [outputs §2.4 출력 변수 이름·단위·정의](../../../_staging/recovery/compare/swash-outputs-vs-code.md#24-p109118-출력-변수-이름단위정의) (outputs:SO1-305 수정안).
+
 ## 9. 전체 흐름 (요약)
 
 1. 초기화: `SwashFloatObjects` — draft·label·body 물성·프리텐션 (`SwashFloatObjects.ftn90:107~`).
@@ -201,4 +217,34 @@ heave·roll·pitch에만 존재 (verbatim `:259`).
 4. `SwashUpdKBCrigb` — 갱신된 body 속도로 hull 표면 KBC(`skc`) 재계산 → 압력 결합 (`SwashUpdKBCrigb.ftn90:92~`).
 5. 출력 요청 시 `SwashFlobjOutp`.
 
-⚠ 미확인: 3~4의 반복(FSI iteration) 루프 자체와 `xfoti/xfori`(중간 변위) 갱신·수렴판정은 본 7파일 밖(상위 시간적분 드라이버)에서 호출될 것으로 보임 — source-needed (배정 파일 내에 호출자 부재). `pship` 배열의 전체 인덱스 의미도 본 파일 밖 정의 — source-needed.
+FSI 반복 조건은 `if ( ( resm(1) > epslin(1) .or. resm(2) > epslin(2) ) .and. j < maxit ) then`이다 (`src/SwashComputStruc.ftn90:107`; inputs-setup:SI1-569 수정안). [10-15 대조 정정]
+병진·회전 변위의 반복 간 최대 차이를 비교한다 (`src/SwashComputStruc.ftn90:153,160`; inputs-setup:SI1-569 수정안). [10-15 대조 정정]
+이전 시간 병진·회전 변위가 기준을 확대할 수 있다 (`src/SwashComputStruc.ftn90:92–96`; inputs-setup:SI1-567). [10-15 대조 정정]
+실제 기준은 각각 `max(tol,tol×max(abs(이전 변위)))`이다 (`src/SwashComputStruc.ftn90:92–96`; inputs-setup:SI1-567). [10-15 대조 정정] [10-15 전수 검증 정정]
+회전은 라디안 기준이다 (`src/SwashComputStruc.ftn90:160,175–177`; inputs-setup:SI1-567). [10-15 대조 정정] [10-15 전수 검증 보완]
+이동 강체에서 relax 밖값을 0.3으로 고친다 (`src/SwashCheckPrep.ftn90:1436–1438`; inputs-setup:SI1-568). [10-15 대조 정정]
+이동 강체가 아니면 `tol=0`·`maxiter=1`로 바꾼다 (`src/SwashCheckPrep.ftn90:1440–1443`; inputs-setup:SI1-568). [10-15 대조 정정]
+
+
+## 문서와 코드 차이 (10-15 대조)
+
+출처: [inputs-setup](../../../_staging/recovery/compare/swash-inputs-setup-vs-code.md), [outputs](../../../_staging/recovery/compare/swash-outputs-vs-code.md), [guide-syntax-build](../../../_staging/recovery/compare/swash-guide-syntax-build-vs-code.md)의 최종 결론과 원문 인용.
+
+문서 판: SWASH 12.01 매뉴얼 swashuse·swashtech, 공개 저장소 `7949227 2026-05-06 "release v12.01"`에서 마지막 변경; 코드 판: `VERNUM 12.01`, 공개 저장소 main `a486d5f 2026-05-26`, 12.01 뒤 `608ffd7`·`9554c98` 포함.
+
+| 행 ID | 항목 | 문서 원문 | 코드 원문 | 결론 | 결론 문장 |
+|---|---|---|---|---|---|
+| guide-syntax-build:SG1-612 | swashuse PDF p.157 (edt 106–106): FLOAT [alpha] [theta] | swashuse PDF p.157 (edt 106–106): `FLOAT [alpha] [theta]` | `src/SwashReadInput.ftn90:981–983`의 FLOAT 공통 진입부가 `call INKEYW ('REQ',' ')`를 먼저 호출한다. `src/ocpcre.ftn:342–348`은 INT·REAL에서 `CALL MSGERR (2, 'Data field skipped:'//ELTEXT)` 후 `GOTO 510`으로 다음 필드를 읽는다. `src/SwashReadInput.ftn90:1226–1227` `call INREAL ( 'ALPHA', pship(1), 'STA', 0. )` / `call INREAL ( 'THETA', pship(2), 'STA', 1. )`. 이름 입력은 `src/ocpcre.ftn:606–609`의 KEY·NAAM 비교 경로를 탄다. `switch.pl:57–66`의 비활성 접두어 규칙은 이 일반 소스 행들을 주석으로 만들지 않는다. | E 코드 결함 후보 · 강함 | FLOAT의 위치 수치 입력은 선행 INKEYW(REQ)에서 건너뛴다. 예를 들어 `FLOAT 0.2 0.7`은 수치마다 수준 2 오류를 기록하며 ALPHA·THETA의 STA 판독에는 기본값 0·1이 남는다. ALPHA와 THETA에 이름을 붙인 입력은 별도 경로로 읽는다. 결함 도입은 재등록 blame인 f7ebbca가 아니라 5d279d7(2022-12-27 v9.01)이다. 12.01 문서와 소스의 PFLOW 수치 구문이 함께 남아 있고 후속 608ffd7·9554c98도 이 경로를 바꾸지 않았다. 같은 판의 입력 구문 모순이므로 A가 아닌 E 강함이다. 준비 단계의 범위 보정은 버린 수치를 복구하지 않는다. [10-15 결론 검증 정정] [10-15 결론 검증 보완] [10-15 git 이력 판정] |
+| guide-syntax-build:SG1-892 | 부체 theta·시간적분 조건 | swashuse PDF p.69–70·100은 부체의 가압 흐름과 IMPLICIT 요구를 설명한다. `THETA=0.5`의 0.51 보정과 움직이는 부체의 ALPHA 강제 대입은 명시하지 않는다. | `src/SwashCheckPrep.ftn90:1115–1143` `horwinc = .false.` / `!` / `if ( mtimei /= 2 ) call msgerr (3, 'semi-implicit time integration is required in case of floating object or pressurized flow')` / `!` / `if ( pship(1) < 0. .or. pship(1) > 1. ) then` / `call msgerr (1, 'incorrect compressibility factor for flow beneath fixed floating object')` / `pship(1) = 0.` / `endif` / `!` / `if ( pship(2) < 0.5 .or. pship(2) > 1. ) then` / `call msgerr (1, 'incorrect theta value for time integration beneath floating object')` / `pship(2) = 1.` / `endif` / `!` / `if ( .not. pship(2) /= 0.5 ) pship(2) = 0.51` / `!` / `! check motion rigid bodies` / `!` / `if ( ifloat /= 2 .and. mbod > 1 ) then` / `call msgerr (3, 'specification of labels for rigid bodies as input grid is required')` / `else if ( mbod == 1 ) then` / `ifloat = 2` / `else if ( mbod == 0 ) then` / `ifloat = min( 1, ifloat )` / `endif` / `!` / `! in case of moving object, set compressibility factor to zero` / `!` / `if ( ifldyn(18) /= 0 .or. ifloat == 2 ) pship(1) = 0.` | C 문서 누락 | 부체 분기는 IMPL을 요구하고 ALPHA의 [0,1]·THETA의 [0.5,1] 범위를 검사한다. 정확히 0.5인 THETA는 0.51로 바꾼다. `if ( ifldyn(18) /= 0 .or. ifloat == 2 ) pship(1) = 0.`이다. C는 문서에 있는 IMPL 요구를 제외한 보정·강제 대입 조건에 한정한다. [10-15 결론 검증 정정] [10-15 결론 검증 보완] |
+| guide-syntax-build:SG1-897 | 부체 적분 계수·coupling 보정 | swashuse PDF p.71–72는 CH·HHT·WBZ 선택과 rho 범위를 설명한다. 범위 밖 값의 대체와 고정 부체의 coupling 보정은 명시하지 않는다. | `src/SwashCheckPrep.ftn90:1378–1392` `if ( mfoti == 1 ) then` / `if ( pship(3) < 0. .or. pship(3) > 0.5 ) then` / `call msgerr (1, 'incorrect beta for the Newmark scheme')` / `pship(3) = 0.25` / `endif` / `if ( pship(4) < 0. .or. pship(4) > 1. ) then` / `call msgerr (1, 'incorrect gamma for the Newmark scheme')` / `pship(4) = 0.5` / `endif` / `else if ( mfoti > 1 ) then` / `rhoinf = pship(5)` / `if ( rhoinf < 0. .or. rhoinf > 1. ) then` / `call msgerr (1, 'incorrect spectral radius for the generalized-alpha method')` / `rhoinf = 1.` / `endif`; `src/SwashCheckPrep.ftn90:1406–1429` `alfam = (2.*rhoinf-1.) / (1.+rhoinf)` / `alfaf = rhoinf / (1.+rhoinf)` / `!` / `else if ( mfoti == 3 ) then` / `!` / `! Hilber-Hughes-Taylor scheme` / `!` / `alfam = 0.` / `alfaf = (1.-rhoinf) / (1.+rhoinf)` / `!` / `else if ( mfoti == 4 ) then` / `!` / `! Wood-Bossak-Zienkiewicz scheme` / `!` / `alfam = (rhoinf-1.) / (1.+rhoinf)` / `alfaf = 0.` / `!` / `endif` / `!` / `if ( mfoti > 1 ) then` / `!` / `fac      = 1. - alfam + alfaf` / `pship(3) = 0.25 * fac * fac` / `pship(4) = fac - 0.5`; `src/SwashCheckPrep.ftn90:1435–1451` `if ( ifloat == 2 ) then` / `if ( pship(10) < 0. .or. pship(10) > 1. ) then` / `call msgerr (1, 'incorrect under-relaxation value for FSI coupling')` / `pship(10) = 0.3` / `endif` / `else` / `! no iteration process required!` / `pship(8) = 0.` / `pship(9) = 1.` / `endif` / `!` / `! check implicitness factor for kinematic boundary conditions` / `!` / `if ( ifloat == 2 ) then` / `if ( pship(11) < 0. .or. pship(11) > 1. ) then` / `call msgerr (1, 'incorrect theta value for update kinematic boundary conditions')` / `pship(11) = 0.5` | C 문서 누락 | rho는 [0,1]에서 검사한다. CH·HHT·WBZ의 alfam·alfaf와 beta·gamma 대입은 해당 적분법의 내부 표현이다. C는 수학적 변환 자체가 아니라 범위 밖 입력의 대체 및 `ifloat == 2`가 아닌 분기에서 `pship(8) = 0.`과 `pship(9) = 1.`로 coupling을 보정하는 처리에 한정한다. [10-15 결론 검증 정정] [10-15 결론 검증 보완] |
+| inputs-setup:SI1-361 | FLOAT `theta=0.5`·Crank–Nicolson | swashuse PDF p.69 “[theta] = 0.5 corresponds to the Crank−Nicolson scheme” | `src/SwashCheckPrep.ftn90:1129` `if ( .not. pship(2) /= 0.5 ) pship(2) = 0.51` | C | 코드는 정확히 0.5인 값을 조용히 0.51로 바꾼다. 사용자 입력 0.5가 실제 계산에서도 유지된다고 쓰면 안 된다. 의도적인 보정 줄이 있으므로 결함 후보 대신 문서 누락으로 판정한다. |
+| inputs-setup:SI1-532 | 수위·흘수·LABEL의 공간 바깥 값 | swashuse PDF p.22의 외부장 목록은 DRAFT·LABEL의 규칙을 적지 않는다. | `src/SwashCheckPrep.ftn90:2480` `draft = SVALQI (xp, yp, 18, flobj, NEAREST)`; `src/SwashCheckPrep.ftn90:2492` `labl = SVALQI (xp, yp, 19, lbod, 0.)`; `src/SwashFloatObjects.ftn90:320` `lfbs = int(lbodf)` | C | DRAFT는 최근접 값을 쓴다. LABEL은 격자 밖 0을 쓴다. LABEL을 공간 보간한 실수에서 int로 절단해 강체 번호로 만든다. 반올림과 다르다. |
+| inputs-setup:SI1-561 | FLOAT·BODY 별칭·DOF ALL | swashuse PDF p.69–72 문법에 없다. | `src/SwashReadInput.ftn90:981` `if ( KEYWIS ('SHIP') .or. KEYWIS ('VESS') .or. KEYWIS ('WEC') .or. KEYWIS ('FLOAT') .or. KEYWIS ('BODY') .or. KEYWIS ('PONT') .or. KEYWIS ('PFLOW') ) then`; `src/SwashReadInput.ftn90:984` `if ( KEYWIS('METH') .or. KEYWIS('SOLV') ) then`; `src/SwashReadInput.ftn90:1088` `if ( KEYWIS ('ALL') ) bodtmp%dof(1:6) = .true.` | C | 동일 부유체 명령 분기로 일곱 이름을 받는다. METH도 SOLVER를 선택한다. DOF ALL은 여섯 자유도를 모두 켠다. |
+| inputs-setup:SI1-562 | 부유체 반음해·움직이는 흘수·보간 방식 | swashuse PDF p.69–70은 입력 파일 필요 조건을 적는다. | `src/SwashCheckPrep.ftn90:1117` `if ( mtimei /= 2 ) call msgerr (3, 'semi-implicit time integration is required in case of floating object or pressurized flow')`; `src/SwashCheckPrep.ftn90:1143` `if ( ifldyn(18) /= 0 .or. ifloat == 2 ) pship(1) = 0.`; `src/SwashCheckPrep.ftn90:1147` `if ( ifloat /= 0 ) dpsopt = 4`<br>swashuse PDF p.100은 부유체의 가압 흐름에 반음해 적분이 필요하다고 명시한다. | C | 부유체·가압 흐름의 반음해 적분 조건은 swashuse PDF p.100에 있다. C는 동적 DRAFT·이동 강체에서 alpha를 0으로 바꾸는 조건과 부유체의 수심 보간을 `dpsopt=4`로 바꾸는 세부 처리에 한정한다. [10-15 결론 검증 정정] [10-15 전수 검증 정정] |
+| inputs-setup:SI1-563 | 강체 수·단일 LABEL 생략·1D 자유도 | swashuse PDF p.70은 LABEL의 다중 강체 조건을 적는다. 1D 자유도 보정을 적지 않는다. | `src/SwashCheckPrep.ftn90:1135–1138` `else if ( mbod == 1 ) then`<br>`ifloat = 2`<br>`else if ( mbod == 0 ) then`<br>`ifloat = min( 1, ifloat )`; `src/SwashCheckPrep.ftn90:1904–1906` `bdof(:,2,1) = .false.`<br>`bdof(:,1,2) = .false.`<br>`bdof(:,3,2) = .false.` | C | 강체 자료가 없으면 이동 모드를 고정 모드 이하로 낮춘다. 1D에서는 SWAY·ROLL·YAW를 끈다. SURGE·HEAVE·PITCH만 남는다. |
+| inputs-setup:SI1-564 | BODY 번호·질량·관성모멘트 유효성의 입력 검사 부재 | swashuse PDF p.70은 LABEL 정합성을 요구한다. 양수 검사와 자동 번호 재배열을 설명하지 않는다. | `src/SwashReadInput.ftn90:1054–1056` `call ININTG ('L'   , labl, 'REQ', 0 )`<br>`call INREAL ('MASS', mass, 'REQ', 0.)`<br>`call INREAL ('IX'  , moix, 'REQ', 0.)`; `src/SwashCheckPrep.ftn90:1867–1871` `m = currib%label`<br>`bmass(m) = currib%parm(1)`<br>`do j = 1, ndim`<br>`bmoi(m,j) = currib%parm(j+1)`<br>`bcog(m,j) = currib%parm(j+4)`; `src/SwashMotionRigidBod.ftn90:135` `f0 = ( thyd0(m,n) + tbod0(m,n) ) / bmoi(m,n)` | C | l을 배열 첨자로 직접 쓴다. DIMENSION은 입력값을 읽지만 1..mbod 검사·중복 번호 검사·질량과 관성모멘트 양수 검사를 하지 않는다. 사용자가 번호·질량·활성 회전 관성을 유효하게 준비해야 한다. |
+| inputs-setup:SI1-565 | MLINE·FENDER 계수 읽기와 PRET의 수평 예외 | swashuse PDF p.70–71은 계수 단위·PRET 여부만 적는다. | `src/SwashReadInput.ftn90:1106–1108` `112         call INREAL ('K', bk, 'REP', -1.)`<br>`if ( bk /= -1. ) then`<br>`call INREAL ('B'   , bb, 'REQ', 0.)`; `src/SwashFloatObjects.ftn90:472–476` `if ( gamma /= 0. ) then`<br>`bmli(m,n,10) = fac / sin(gamma)`<br>`else`<br>`! horizintal line? no pretension`<br>`bmli(m,n,10) = 0.` | C | `K=−1`은 반복 종료 sentinel이다. 수치 읽기 자체는 그 밖의 음수 K·B를 양수로 고치지 않는다. 수평 계류선은 PRET가 있어도 예장력을 0으로 둔다. |
+| inputs-setup:SI1-566 | generalized-alpha 계수 대입 | swashuse PDF p.71–72은 방법 이름·rho 범위·성질을 적는다. 계수식을 인쇄하지 않는다. | `src/SwashCheckPrep.ftn90:1406–1407` `alfam = (2.*rhoinf-1.) / (1.+rhoinf)`<br>`alfaf = rhoinf / (1.+rhoinf)`; `src/SwashCheckPrep.ftn90:1413–1414` `alfam = 0.`<br>`alfaf = (1.-rhoinf) / (1.+rhoinf)`; `src/SwashCheckPrep.ftn90:1420–1421` `alfam = (rhoinf-1.) / (1.+rhoinf)`<br>`alfaf = 0.`; `src/SwashCheckPrep.ftn90:1427–1429` `fac      = 1. - alfam + alfaf`<br>`pship(3) = 0.25 * fac * fac`<br>`pship(4) = fac - 0.5` | C | CH·HHT·WBZ가 각각 alfam·alfaf를 계산한다. 이어서 beta·gamma를 rho에서 다시 정한다. NEWMARK 사용자값 유지와 구분한다. 이 C 판정은 설명서의 계수식 누락과 코드의 대입식을 구분한 것이다. [10-15 결론 검증 정정] |
+| inputs-setup:SI1-569 | 가속도 완화·Newmark 갱신 | swashuse PDF p.72는 under-relaxation만 적는다. 갱신식을 인쇄하지 않는다. | `src/SwashMotionRigidBod.ftn90:109` `afot1(m,n) = ( -alfam * afot0(m,n) + alfaf * f0 + (1.-alfaf) * f1 ) / (1.-alfam)`; `src/SwashMotionRigidBod.ftn90:113` `afot1(m,n) = alfa * afot1(m,n) + (1.-alfa) * accu`; `src/SwashMotionRigidBod.ftn90:117` `vfot1(m,n) = vfot0(m,n) + dt * ( gamma * afot1(m,n) + (1.-gamma) * afot0(m,n) )`; `src/SwashMotionRigidBod.ftn90:119` `xfot1(m,n) = xfot0(m,n) + dt * ( vfot0(m,n) + dt * ( beta * afot1(m,n) + (0.5-beta) * afot0(m,n) ) )` | C | 각 자유도의 가속도를 완화한다. 완화한 가속도로 속도·변위를 갱신한다. 회전도 같은 형식으로 토크/관성모멘트에서 갱신한다. |
+| inputs-setup:SI1-570 | KBC 기본값·범위 보정의 문서 범위 경계 | swashuse PDF p.71 문법에는 KBC가 있다. 상세 설명은 swashuse PDF p.73으로 이어진다. | `src/SwashInit.ftn90:355` `pship(11) = 0.5`; `src/SwashCheckPrep.ftn90:1449–1451` `if ( pship(11) < 0. .or. pship(11) > 1. ) then`<br>`call msgerr (1, 'incorrect theta value for update kinematic boundary conditions')`<br>`pship(11) = 0.5`; `src/SwashUpdKBCrigb.ftn90:116` `vrb = theta * vfot1(l,1) + (1.-theta) * vfot0(l,1)`<br>swashuse PDF p.73은 KBC theta의 `0 ≤ [theta] ≤ 1`과 기본값 0.5 및 이전·현재 속도의 가중 의미를 설명한다. | C | KBC의 기본값·범위·가중 의미는 swashuse PDF p.73과 코드가 일치한다. C는 이동 강체에서 범위 밖 theta를 경고 후 0.5로 되돌리는 처리에 한정한다. [10-15 결론 검증 정정] [10-15 전수 검증 정정] |
+| outputs:SO1-287 | 여러 부유체의 열 수 | swashuse PDF p.117–118의 부유체 출력 변수 정의는 부유체별 열 수를 적지 않는다. | `src/SwashDecOutQ.ftn90:205–206` `nvoqp = nvoqp + mbod` / `ovsvty(ivtype) = ovsvty(ivtype) + mbod`; `src/SwashFlobjOutp.ftn90:88` `nflob = mbod` | C 문서 누락 | 이동 부유체가 여러 개이면 하중·변위·PTO를 부유체 수만큼의 열로 쓴다. [10-15 전수 검증 정정] |

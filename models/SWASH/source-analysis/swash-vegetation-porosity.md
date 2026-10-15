@@ -4,7 +4,8 @@ model: SWASH
 component: src (vegetation / porous structure friction)
 canonical_source: self
 citation_status: verified
-verification_method: "SWASH v12.01 소스 직접 read (raw/source_code/swash/src/). SwashVeget.ftn90 (Morison 항력·관성 항 적분 cvegu/cvegv 산출, porosity 보정 식생 식 645·684), SwashPorousStruc.ftn90 (Van Gent 마찰계수 aporu/bporu/cporu 식 338-340·354-356), SwashPorFricDep.ftn90 (수심평균 잠수 보정 100-102 + KC 보정 169-170), SwashPorFricLay.ftn90 (다층 layer-resolved 보정 137-143 + w-point bpoks) 의 file:line 직접 인용."
+verification_method: "SWASH v12.01 소스 직접 read (raw/source_code/swash/src/). SwashVeget.ftn90 (Morison 항력·관성 항 적분 cvegu/cvegv 산출, porosity 보정 식 645–646·694–695), SwashPorousStruc.ftn90 (Van Gent 마찰계수 apors/bpors/cpors 식 338–340, aporu/bporu/cporu 식 354–356), SwashPorFricDep.ftn90 (수심평균 잠수 보정 100–102 + KC 보정 169–170), SwashPorFricLay.ftn90 (다층 layer-resolved 보정 137–143 + w-point bpoks) 의 file:line 직접 인용. 2026-10-15 SWASH recovery 대조 보고서 반영" # [10-15 전수 검증 정정]
+last_source_check: "2026-10-15 (recovery 대조 반영)"
 note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-16
 related:
@@ -108,7 +109,9 @@ cvegu(nm,k,2) = 0.25*pi  * cvm * tinerf / hkum(nm,k)
 - `dsiz = ppor(1)` — grain size $d_{50}$
 - `alpha0 = ppor(3)` — 층류(laminar) 마찰 무차원 상수 $\alpha$
 - `beta0 = ppor(4)` — 난류(turbulent) 마찰 무차원 상수 $\beta$
-- 추가: `ppor(2)` = default 구조물 높이 (`:300-302`), `ppor(5)` = wave period (PorFricDep/Lay 에서 사용, `:80`/`:83`).
+- `ppor(2)`는 구조물 높이이다. (`src/SwashModule1.ftn90:535` `! =2; structure height`) [10-15 대조 정정]
+- HEIGHT 기본값은 99999 m이다. (`src/SwashReadInput.ftn90:968` `call INREAL( 'HEIGHT', ppor(2), 'STA', 99999.)`; `swashuse PDF p.81`) [10-15 대조 정정] [10-15 전수 검증 보완]
+- `ppor(5)`는 대표 파주기이며 단위는 s이다. (`src/SwashModule1.ftn90:538`; `src/SwashPorFricDep.ftn90:80`; `src/SwashPorFricLay.ftn90:83`; `swashuse PDF p.81`) [10-15 대조 정정] [10-15 전수 검증 보완]
 - added mass 경험계수 `gamma = 0.34` (parameter, `:69`).
 
 ### 2.3 Van Gent 마찰·added mass 식
@@ -125,7 +128,7 @@ LaTeX (n = porosity, $\nu$ = `kinvis` 동점성, d = grain size):
 - **난류(Forchheimer)**: $b = \beta \dfrac{(1-n)}{n^2 d}$
 - **added mass**: $c = \gamma \dfrac{(1-n)}{n}$, $\gamma = 0.34$
 
-이는 Van Gent(1995)의 표준 Darcy-Forchheimer 다공질 마찰식. `kinvis` = 동점성계수(외부 모듈 변수, ⚠ 정의는 SwashCommdata 측 — 본 파일엔 사용만 등장 `:338`).
+코드 헤더는 이 식의 출처로 Van Gent(1995)를 명시한다 (`src/SwashPorousStruc.ftn90:44–55`). `kinvis`는 `SwashCommdata3`에 선언된 동점성 변수다 (`src/SwashModule1.ftn90:250,421`). [10-15 전수 검증 정정]
 
 배열 분포:
 - `apors/bpors/cpors` = water-level(s) 점, `aporu/bporu/cporu` = u-점, `aporv/bporv/cporv` = v-점.
@@ -232,4 +235,26 @@ $$n_{pok} = \frac{n(z_{kh} - z_k) + (z_{k-1} - z_{kh})}{z_{k-1} - z_k}$$
 | KC 보정 | 없음 | $b(1+7.5/KC)$ (Dep `:170` / Lay `:286`) |
 | 연결점 | `iveg==1 & iporos/=0` 시 porosity로 $1/n^3$(drag)·$1/n^2$(inertia) 보정 (`SwashVeget:645-646`) | — |
 
-⚠ 미확인: `ppor(2)` 가 default 구조높이임은 `:300-302` 의 사용처에서 추정. `kinvis`·`cvm`·`iporos`·`ihydro` 등 외부 모듈 변수의 정의 본체는 본 4개 파일에 없음(SwashCommdata*/m_genarr 측) — 본 노트는 사용처 의미만 기술. 정확한 선언/단위는 해당 모듈 분석 노트 필요 (source-needed: SwashCommdata2/3 의 ppor·kinvis·cvm 선언).
+구조물 높이의 정의와 기본값은 선언부와 입력부에 명시되어 있다. (`src/SwashModule1.ftn90:533–535`; `src/SwashReadInput.ftn90:968`; [inputs-physics-numerics:SI2-087·SI2-106 수정안](../../../_staging/recovery/compare/swash-inputs-physics-numerics-vs-code.md#4-노트-대조와-수정안)) [10-15 대조 정정] [10-15 전수 검증 보완]
+
+- `kinvis`는 `SwashCommdata3`의 real 동점성 변수다 (`src/SwashModule1.ftn90:250,421`). 준비 단계에서 `kinvis = dynvis / rhow`로 설정한다 (`src/SwashCheckPrep.ftn90:918`). swashuse PDF p.34의 점성·밀도 입력 단위로 환산한 단위는 m²/s이다. [10-15 전수 검증 정정]
+- `cvm`은 `SwashCommdata3`의 real 식생 부가질량 계수다 (`src/SwashModule1.ftn90:250,593`; `swashuse PDF p.82`). 코드에서 체적비에 곱한 뒤 1과 더하는 관성 계수이므로 무차원이다 (`src/SwashVeget.ftn90:185–188`; `src/SwashExpDep1DHflow.ftn90:721`). [10-15 전수 검증 정정]
+- `iporos`는 단위가 없는 integer 공극률 선택자다. 0은 비활성이다. 1은 활성이다. (`src/SwashModule1.ftn90:250,476–478`) [10-15 전수 검증 정정]
+- `ihydro`는 단위가 없는 integer 압력 이산화 선택자다. 0은 정수압이다. 1은 비정수압 box 방식이다. 2는 비정수압 표준 수직 이산화이다. 3은 여러 속도층을 포함한 압력층의 box 방식이다. (`src/SwashModule1.ftn90:250,614–618`) [10-15 전수 검증 정정]
+
+## 문서와 코드 차이 (10-15 대조)
+
+문서 판: SWASH 12.01 매뉴얼 swashuse·swashtech, 공개 저장소 `7949227` 2026-05-06 `"release v12.01"`에서 마지막 변경. 코드 판: `VERNUM 12.01`, 공개 저장소 main `a486d5f` 2026-05-26, 12.01 뒤 `608ffd7`·`9554c98` 포함.
+
+매뉴얼 인용은 PDF 쪽 번호를 사용한다. 인쇄 쪽은 PDF 쪽에서 8을 뺀 값이다.
+출처는 [theory-framework §5](../../../_staging/recovery/compare/swash-theory-framework-vs-code.md#5-차이-결론), [inputs-setup §5](../../../_staging/recovery/compare/swash-inputs-setup-vs-code.md#5-차이-결론), [inputs-physics-numerics §5](../../../_staging/recovery/compare/swash-inputs-physics-numerics-vs-code.md#5-차이-결론), [guide-syntax-build §5](../../../_staging/recovery/compare/swash-guide-syntax-build-vs-code.md#5-차이-결론)의 최종 결론이다.
+결론의 절 번호는 해당 보고서의 절 번호이다.
+
+| 행 ID | 항목 | 문서 원문 | 코드 원문 | 결론 | 결론 문장 |
+|---|---|---|---|---|---|
+| guide-syntax-build:SG1-886 | 식생·수송 검사 | `swashuse PDF p.81–82`; `swashuse PDF p.86–87` | `src/SwashCheckPrep.ftn90:769` `if ( iveg /= 0 .and. lmax == 0 ) call msgerr (3,'input for vegetation is required')`<br>`src/SwashCheckPrep.ftn90:771–780` `if ( iveg /= 0 ) then` / `if ( cvm < 0. ) then` / `call msgerr (1, 'incorrect added mass coefficient')` / `cvm = 0.` / `endif` / `if ( iveg == 2 .and. iporos /= 0 ) then` / `call msgerr (1, 'porous model should not be applied in case of vegetation porosity')` / `iporos = 0` / `endif` / `endif`<br>`src/SwashCheckPrep.ftn90:784` `if ( itrans /= 0 .and. ltrans == 0 ) call msgerr (3, 'at least one input grid for constituent must be given in case of transport')`<br>`src/SwashCheckPrep.ftn90:803` `if ( lsed > 0 ) then`; `src/SwashCheckPrep.ftn90:812–819` `if ( .not.lmixt ) then` / `call msgerr (1, 'no mass exchange of sediment for tracer')` / `psed( 1) = 0.` / `psed( 2) = 0.` / `psed(10) = 0.` / `psed(11) = 0.` / `psed(12) = 0.` / `endif`<br>`src/SwashReadInput.ftn90:1305,1347–1352`의 식생 입력은 활성 코드다. `switch.pl:57–66`에는 `!VEGE` 접두어 제거 규칙이 없다. | C 문서 누락 | 식생 활성 상태에서 `lmax == 0`이면 오류를 낸다. 식생이 활성인 상태에서 `cvm < 0.`이면 0으로 보정한다. `iveg == 2 .and. iporos /= 0`이면 iporos를 0으로 만든다. 침전물의 `.not.lmixt` 분기는 침강·입경·침식·퇴적 매개변수를 0으로 만든다. tracer의 질량교환 생략은 문서와 일치한다. C는 입력 이상과 공극 모델 충돌 보정에 한정한다. 기존의 ‘종밀도 검사’는 이 인용 범위의 근거가 아니므로 삭제한다. [10-15 전수 검증 정정] |
+| inputs-physics-numerics:SI2-106 | 코드의 물리량 정의 | `swashuse PDF p.81–82` | `src/SwashPorousStruc.ftn90:49–51` `!   Note: the intrinsic volume-averaged variables are employed` / `!         (not the Darcy's averaged variables!)` / `!         the frictional forces are then multiplied by the volumetric porosity` | C 문서 누락 | 코드의 변수는 intrinsic volume 평균이다. Darcy 평균 변수가 아니다. 저항력에는 체적 공극률을 곱한다. |
+| inputs-setup:SI1-189 | 공극률 정의·범위·0.45 권고·잠김 높이 | `swashuse PDF p.42–43` `volumetric porosity` / `in between 0 and 1` / `0.45 is typically used` / `submerged and emerged breakwaters` | `src/SwashCheckPrep.ftn90:2351` `nporf(indx) = max( n, 0.1 )`<br>`src/SwashInputField.ftn90:294` `call SWCOPR( tarr, hpor, mxg(igr1)*myg(igr1) )` | C 문서 누락 | 문서의 체적 공극률 정의는 0–1이고 0.45는 권고값이다. 코드는 입력 공극률에 0.1 하한을 적용한다. 상한 1의 검사와 이 하한 보정은 다르다. 문서가 적지 않은 입력 보정 범위를 C로 기록한다. 같은 하한은 SI1-521, 불투수 설명과의 차이는 SI1-222에서 대조한다. |
+| inputs-setup:SI1-222 | READINP POROSITY의 물·불투수 설명 | `swashuse PDF p.48` `A value of 1 represents water points.` / `Regions with small porosity values (< 0.1) will be treated as impermeable regions, i.e. land points.` | `src/SwashCheckPrep.ftn90:2351` `nporf(indx) = max( n, 0.1 )`<br>`src/SwashPorousStruc.ftn90:338–340` `apors(nm) = alpha0 * kinvis * ( 1. - npors(nm) )**2. / ( npors(nm) * npors(nm) * dsiz * dsiz )` / `bpors(nm) = beta0 * ( 1. - npors(nm) ) / ( npors(nm) * npors(nm) * dsiz )` / `cpors(nm) = gamma * ( 1. - npors(nm) ) / npors(nm)`<br>`src/SwashExpDep1DHflow.ftn90:725` `u1(nm) = ( (1.+cvegu(nm,1,2) +cpomu(nm,1)) * u0(nm) - dt * contrib ) / denom` | B 문서 오기 | 1은 공극 구조물이 없는 물을 나타낸다. 0.1 미만은 활성점 제거값이 아니라 0.1로 올린 공극률이다. 유효 입도에서 저항 계수는 유한값이다. 해석: 이 경로는 큰 저항을 줄 수 있지만 법선 속도를 항상 0으로 만드는 impermeable 경계와 같지 않다. 바닥 exception의 영구 비활성 주소와 구분한다. git 이력: `8756667:src/SwashCheckPrep.ftn90:1877` `nporf(indx) = max( n, 0.1 )`. 공극률을 0.1 이상으로 올리는 대입은 최초 공개판부터 같다. 작은 공극률을 비활성점으로 바꾸던 코드의 삭제는 없다. 0.1 미만 공극률은 0.1로 올린다. 이 처리는 점을 불투수 경계로 제거하는 처리가 아니다. ([AD 판정표](../../../_staging/recovery/compare/SWASH-git-verify-AD.md)) [10-15 결론 검증 보완] [10-15 git 이력 판정] [10-15 전수 검증 보완] |
+| inputs-setup:SI1-521 | 공극률 하한·상한 검사 부재 | `swashuse PDF p.42–43` | `src/SwashCheckPrep.ftn90:2351` `nporf(indx) = max( n, 0.1 )`<br>`src/SwashCheckPrep.ftn90:2673` `nporf(indx) = max( n, 0.1 )` | C 문서 누락 | 정형·비정형 모두 공극률을 최소 0.1로 만든다. 이 줄들은 1 초과 값을 잘라내지 않는다. 0–1 범위를 그대로 강제한다고 쓰지 않는다. |
+| theory-framework:ST1-299 | 다공성·식생 관성 및 저항 | `swashtech PDF p.63` 식 (3.2); `swashuse PDF p.81–82` | `src/SwashExpDep2DHflow.ftn90:1346` `cporfr = apomu(nm,1) + bpomu(nm,1) * utot`<br>`src/SwashExpDep2DHflow.ftn90:1350` `cveg = cvegu(nm,1,1) * utot`<br>`src/SwashExpDep2DHflow.ftn90:1356` `denom = 1. + cvegu(nm,1,2) + cpomu(nm,1) + dt * ( cbot(nm) + cporfr + cveg + wndimp(nm) )`<br>`src/SwashExpDep2DHflow.ftn90:1360` `u1(nm) = ( (1.+cvegu(nm,1,2)+cpomu(nm,1)) * u0(nm) - dt * contrib ) / denom`<br>`src/SwashReadInput.ftn90:965–966,1305–1306` `PORO` / `VEGE` / `iporos = 1` / `iveg  = 1`<br>`src/SwashCheckPrep.ftn90:3106` `cvegu  = 0.`<br>`src/SwashCheckPrep.ftn90:3143` `if ( optg /= 5 .and. iporos == 1 ) call SwashPorousStruc`<br>`src/SwashUpdateData.ftn90:2590` `if ( iveg /= 0 ) call SwashVeget` | C 문서 누락 | C는 `swashtech PDF p.63` 식 (3.2)의 항 구성에 한정한다. 다공성·식생 기능은 사용자 설명서에 있다. 인용된 입력·계수 계산·유속 갱신에는 `!VEGE`가 없다. `switch.pl:57–66`은 `!VEGE`를 제거하지 않지만 이 활성 코드에는 그 제한이 적용되지 않는다. 비활성 계수가 0이면 해당 추가 항은 사라진다. |

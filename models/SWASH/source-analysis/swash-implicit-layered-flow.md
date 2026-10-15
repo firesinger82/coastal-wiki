@@ -4,7 +4,8 @@ model: SWASH
 component: src (implicit layered flow / non-hydrostatic projection)
 canonical_source: self
 citation_status: verified
-verification_method: "SWASH v12.01 소스 직접 read (raw/source_code/swash/src/). SwashImpLay1DHflow.ftn90(Purpose/Method :44-79, 반복루프 :1458·:2829, 수위 tridiag :1467-1597, divergence/Poisson 빌드 :2570-2702, qlay 축소 :2706-2722, Poisson 풀이 :2742-2780, 압력·속도 보정 :2833-2908), SwashImpLayM1DHflow.ftn90(skew-symmetric 주석 :42-84, qm/중심차분 advection :301-321), SwashImpLayP1DHflow.ftn90(subgrid Purpose :84-87, npu/kup use :94, u1p 적분 :1693-1713, dq0 tridiag :2738, coarse→fine 보간 :2752-2816), SwashImpLayUflow.ftn90(triangular Purpose :41-75, perot :295-299·1954·2881, pcgu/newtonU :1683·1784, bicgstab3 :2785), SwashComputFlow.ftn90 dispatch :106-188, SwashCheckPrep.ftn90 iproj/qmax 기본값 :585-655, SwashReadInput.ftn90 PROJ ITER :1566-1574 직접 인용."
+verification_method: "SWASH v12.01 소스 직접 read (raw/source_code/swash/src/). SwashImpLay1DHflow.ftn90(Purpose/Method :44-79, 반복루프 :1458·:2829, 수위 tridiag :1467-1597, divergence/Poisson 빌드 :2570-2702, qlay 축소 :2706-2722, Poisson 풀이 :2742-2780, 압력·속도 보정 :2833-2908), SwashImpLayM1DHflow.ftn90(skew-symmetric 주석 :42-84, qm/중심차분 advection :301-321), SwashImpLayP1DHflow.ftn90(subgrid Purpose :84-87, npu/kup use :94, u1p 적분 :1693-1713, dq0 tridiag :2738, coarse→fine 보간 :2752-2816), SwashImpLayUflow.ftn90(triangular Purpose :41-75, perot :295-299·1954·2881, pcgu/newtonU :1683·1784, bicgstab3 :2785), SwashComputFlow.ftn90 dispatch :106-188, SwashCheckPrep.ftn90 iproj 기본값·qmax 계산 :585-655, SwashReadInput.ftn90 PROJ ITER :1566-1574 직접 인용. 2026-10-15 SWASH recovery 대조 보고서 반영" # [10-15 전수 검증 정정]
+last_source_check: "2026-10-15 (recovery 대조 반영)"
 note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-16
 related:
@@ -117,7 +118,11 @@ outer loop 안에서 수위 correction `ds`를 푼다. theta-scheme 연속방정
 projection의 심장부 (`SwashImpLay1DHflow.ftn90:2566-2908`).
 
 ### (a) divergence matrix `dmat`
-각 (m,k)에서 face 두께·$\Delta\sigma$로 6-stencil divergence 연산자 구성 (`:2570-2609`). 표면(k==kmax)·표면압력층(presp==1)에서 경계조정 `fac2=0`/`fac1=0` (`:2591-2592`). 표층(k==1)에서 stencil 절곡 보정 (`:2611-2622`).
+각 (m,k)에서 층 두께 `hku`·`hks`, 층 경계면 높이 `zku`, 역격자 간격 `rdx`로 여섯 성분의 발산 연산자를 구성한다 (`src/SwashImpLay1DHflow.ftn90:2588–2599`). [10-15 전수 검증 정정]
+`k==kmax`는 최하층이다. [10-15 대조 정정]
+최하층에서 아래쪽 계수 `fac2`를 0으로 둔다 (`src/SwashImpLay1DHflow.ftn90:2591`). [10-15 대조 정정]
+`k==1 .and. presp(nm)==1`일 때만 위쪽 계수 `fac1`을 0으로 둔다 (`src/SwashImpLay1DHflow.ftn90:2592`). [10-15 대조 정정]
+표층은 `k==1`이다 (`src/SwashImpLay1DHflow.ftn90:2611–2622`). [10-15 대조 정정]
 
 ### (b) Poisson 방정식 빌드
 $A_p = D\,G$ (divergence∘gradient). amatp의 각 대각밴드를 `dmat`와 `gmatu`의 곱으로 명시 조립 (`:2644-2661`). w-momentum의 `gmatw` 기여를 `ihydro==1`(Keller-box, full band) vs else 두 갈래로 추가 (`:2663-2689`). RHS는 예측 속도장의 발산:
@@ -150,7 +155,10 @@ endif
 ## 8. 변종별 차이점
 
 ### 8.1 M1D — mimetic / skew-symmetric (energy-conservative)
-헤더가 보존성을 명시 — verbatim: "strictly mass and momentum conservative at the discrete level, and strictly energy conservative in discrete space ... The discrete advective operator is skew-symmetric" (`SwashImpLayM1DHflow.ftn90:42-46`). theta는 0.5만: "Only a value of theta = 0.5 is taken." (`:53`). 수평 advection을 Crank-Nicolson + 중심차분으로:
+다층 M1D의 공간 에너지 보존과 시간 근사 보존을 구별한다 (`src/SwashImpLayM1DHflow.ftn90:42–47`). [10-15 대조 정정]
+헤더 원문은 `!         but nearly energy conservative for discrete time. The discrete advective operator is skew-symmetric`이다 (`src/SwashImpLayM1DHflow.ftn90:44`). [10-15 대조 정정]
+시간 분할 때문에 시간 에너지는 엄밀 보존이 아니라 근사 보존이다 (`src/SwashImpLayM1DHflow.ftn90:46–47`). [10-15 대조 정정]
+theta는 0.5만: "Only a value of theta = 0.5 is taken." (`:53`). 수평 advection을 Crank-Nicolson + 중심차분으로:
 
 ```
 qm(nm,k) = 0.5 * ( qx(nm,k) + qx(nmd,k) )          ! face→center 질량플럭스 평균
@@ -174,7 +182,11 @@ fac2 = 0.5 * rdx * qm(nm ,k) / hkumn(nm,k)
 헤더 verbatim: "Performs the time integration for the non-hydrostatic, layer-averaged shallow water equations on triangular mesh" (`SwashImpLayUflow.ftn90:43`). advection은 Euler explicit + cell→vertex/face의 r-ratio 고차 limiter: "The time integration with respect to the advective term is based on Euler explicit" (`:50`), "The r-ratio formulation based on most upwave vertex is employed." (`:57`).
 
 - **Perot 재구성**: face normal 속도 → cell 중심 벡터. `call perot ( u0, 1, kmax )` (`:299`), `call perot ( u1, 1, kmax )` (`:1954`, `:2881`). 적분속도도 Perot's formula로 (`:1349`).
-- **수위 보정 solver**: 비대칭 그래프라 tridiag 불가 → `call pcgu( amat, rhs, ds )` (PCG, `:1683`); Newton-type면 `call newtonU ( amatn, rhsn, ds )` (`:1784`). sum(rhs)>0 사전 검사 (`:1759`).
+- **수위 보정 solver**: 삼각 격자의 일반 셀 접속은 일렬 삼중대각 구조가 아니다 (`src/SwashImpDepUflow.ftn90:1092–1093`). [10-15 대조 정정]
+  이 사실은 행렬의 비대칭성을 뜻하지 않는다 (swashuse PDF p.99, 인쇄 91). [10-15 대조 정정]
+  비구조 수위 경로는 PCG 또는 Newton을 사용한다 (`src/SwashImpLayUflow.ftn90:1683,1784`). [10-15 대조 정정]
+  비정수압 압력 경로의 BiCGSTAB와 구분한다 (`src/SwashImpLayUflow.ftn90:2785`). [10-15 대조 정정]
+  Newton 경로는 `if ( .not. sum(rhsn) > 0d0 ) then`일 때 오류를 출력한다 (`src/SwashImpLayUflow.ftn90:1761–1764`). [10-15 전수 검증 정정]
 - **Poisson solver**: `call bicgstab3 ( amatp(1:ncells,1:qmax,0:nconct), rhsp, dq )` (`:2785`) — 셀 단위(`ncells`) 가변 stencil(`0:nconct`) BiCGSTAB.
 - `epswom = 0.005` (다른 파일은 0.001, `:91` vs `SwashImpLay1DHflow.ftn90:105`).
 
@@ -193,8 +205,22 @@ projection 완료 후 모든 변종이 layer interface 기준 상대 연직속�
 7. 압력 갱신(`q=q+dq` 또는 `q=dq`) + u·w projection 보정
 8. (lpproj) `dqgrd` 갱신 후 `goto 10`; 수렴 시 wom·CFL 후처리
 
-## 11. 미확인 / source-needed
+## 11. 보조 루틴과 행렬 연결 [10-15 전수 검증 정정]
 
-- `tridiag`, `bicgstab`, `bicgstab3`, `pcgu`, `iluds/iludr/ilu`, `perot`, `newton1D/newtonU`, `sigmacoor`의 내부 구현은 본 5파일 밖(별도 솔버 모듈)이라 본 노트 범위 밖 — **source-needed** (호출 시그니처만 인용).
-- `gmatu`/`gmatw`/`dmat` band 인덱스(1~6, ishif 등)의 기하학적 의미 상세는 gradient-matrix 빌드부(`:546-862`) 추가 정독 필요 — 본 노트는 호출·조립 구조만 확인.
-- 2D 파일의 v-방향 모멘텀 세부(7003줄)는 1D 대칭 추론에 의존; v-specific file:line 미인용 부분은 **source-needed**.
+- `tridiag`·`bicgstab`·`ilu`·`iludr`·`iluds`·`newton1D`는 `SwashSolvers.ftn90`에 정의되어 있다 (`src/SwashSolvers.ftn90:4297,3312,2258,2694,3050,5283`). `pcgu`·`bicgstab3`·`newtonU`·`perot`는 `SwashUServ.ftn90`에 정의되어 있다 (`src/SwashUServ.ftn90:299,1707,2324,17`). `sigmacoor`는 `SwashServices.ftn90`에 정의되어 있다 (`src/SwashServices.ftn90:454`). [10-15 전수 검증 정정]
+- `gmatu`의 성분 1–6은 `(nm,kd)`, `(nm,k)`, `(nmu,kd)`, `(nmu,k)`, `(nm,ku)`, `(nmu,ku)` 위치의 압력 보정에 각각 곱해진다 (`src/SwashImpLay1DHflow.ftn90:2853–2866`). `dmat`의 성분 1–6은 `(nm,kd)`, `(nm,k)`, `(nmd,kd)`, `(nmd,k)`, `(nm,ku)`, `(nmd,ku)` 위치의 u1에 각각 곱해진다 (`src/SwashImpLay1DHflow.ftn90:2691–2694`). `ihydro == 1 .and. presp(nm) == 0` 분기의 `gmatw`는 k+j와 k+j+1을 유효 층 범위로 제한한 위치의 압력 보정에 곱해진다 (`src/SwashImpLay1DHflow.ftn90:2884–2892`). 추가 연직 밴드 위치 `ishif`는 격자 종류와 ihydro에 따라 설정한다 (`src/SwashCheckPrep.ftn90:5462–5482`). [10-15 전수 검증 정정]
+- 2D의 v 방향 운동량 조립은 `src/SwashImpLay2DHflow.ftn90:2170`에서 시작한다. 같은 파일의 3673–3698행은 연직 삼중대각계를 풀어 v1을 갱신한다. 압력 보정은 `vwetp(nm) == 1`일 때 gmatv의 여섯 성분을 사용한다 (`src/SwashImpLay2DHflow.ftn90:6074–6077`). [10-15 전수 검증 정정]
+
+## 문서와 코드 차이 (10-15 대조)
+
+출처: [theory-framework](../../../_staging/recovery/compare/swash-theory-framework-vs-code.md), [theory-unstructured](../../../_staging/recovery/compare/swash-theory-unstructured-vs-code.md). 표의 노트 인용 120·153·177행은 수정 전 노트의 위치다. 해당 인용은 두 보고서의 수정 근거 원문이다. [10-15 전수 검증 보완]
+
+쪽 규약: `PDF 쪽 = 인쇄 쪽 + 8`.
+
+문서 판: SWASH 12.01 매뉴얼 swashuse·swashtech는 공개 저장소 `7949227` 2026-05-06 "release v12.01"에서 마지막 변경. 코드 판: `VERNUM 12.01`, 공개 저장소 main `a486d5f` 2026-05-26, 12.01 뒤 `608ffd7`·`9554c98` 포함.
+
+| 행 ID | 항목 | 문서 원문 | 코드 원문 | 결론 | 결론 문장 |
+|---|---|---|---|---|---|
+| theory-framework:ST1-335 | 최하층 발산 경계의 방향 | `source-analysis/swash-implicit-layered-flow.md:120` `표면(k==kmax)·표면압력층(presp==1)에서 경계조정` | `src/SwashImpLay1DHflow.ftn90:2591–2592` `if ( k == kmax ) fac2 = 0.`<br>`if ( k == 1 .and. presp(nm) == 1 ) fac1 = 0.`; `src/SwashImpLay1DHflow.ftn90:1107` `! compute bottom friction (bottom layer only), if appropriate`; 같은 파일 최상층 바람 주석은 ST1-301에 인용했다. | B 문서 오기 (현재 노트) | `k==kmax`는 최하층이다. 최하층에서 아래쪽 계수 `fac2`를 0으로 둔다. `k==1 .and. presp(nm)==1`일 때만 위쪽 계수 `fac1`을 0으로 둔다. `8756667:src/SwashImpLay1DHflow.ftn90:2507–2511`의 `fac1`은 `k-1`, `fac2`는 `k` 경계에 연결된다. 현재 2588–2592행과 같은 조건이다. [git 판정 AD §3](../../../_staging/recovery/compare/SWASH-git-verify-AD.md)대로 표면 인덱스의 판 변경이 아닌 현재 노트의 B이다. 층 정의는 ST1-328과 같다. |
+| theory-framework:ST1-336 | 다층 M 경로의 시간 한계 생략 | `source-analysis/swash-implicit-layered-flow.md:153` `strictly energy conservative in discrete space ... The discrete advective operator is skew-symmetric` | `src/SwashImpLayM1DHflow.ftn90:44` `!         but nearly energy conservative for discrete time. The discrete advective operator is skew-symmetric`; `src/SwashImpLayM1DHflow.ftn90:47` `!         terms of the momentum equation, the energy is not strictly conservative in time. Nevertheless, the` | C 문서 누락 (현재 노트) | 생략한 시간 한계를 복원한다. 다층 M1D의 공간 에너지 보존과 시간 근사 보존을 구별한다. |
+| theory-unstructured:ST2-431 | 비구조 수위 행렬의 비대칭 단정 | models/SWASH/source-analysis/swash-implicit-layered-flow.md:177 `- **수위 보정 solver**: 비대칭 그래프라 tridiag 불가` | `src/SwashImpDepUflow.ftn90:1092–1093` `ctrs           = -fac * lf * hu(iface) * rdx * hf / hum(iface)`, `amat(icell,jf) = ctrs`; `src/SwashImpDepUflow.ftn90:1140` `call pcgu( amat, rhs, ds )`; 다층 호출 `src/SwashImpLayUflow.ftn90:1683` `call pcgu( amat, rhs, ds )` | B 문서 오기(현재 노트) | 삼각 격자의 일반 셀 접속은 일렬 삼중대각 구조가 아니다. 이 사실은 행렬의 비대칭성을 뜻하지 않는다. 비구조 수위 경로는 PCG 또는 Newton을 사용한다. 비정수압 압력 경로의 BiCGSTAB와 구분한다. swashuse PDF p.99도 반음해 수위 선형계를 대칭 양의 정부호라고 설명한다. ST2-398의 행렬식과 같은 대조다. |
