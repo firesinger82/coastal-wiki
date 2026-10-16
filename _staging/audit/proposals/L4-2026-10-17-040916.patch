@@ -1,0 +1,70 @@
+diff --git a/models/Delft3D/source-analysis/delft3d_waq_ph_carbonate.md b/models/Delft3D/source-analysis/delft3d_waq_ph_carbonate.md
+--- a/models/Delft3D/source-analysis/delft3d_waq_ph_carbonate.md
++++ b/models/Delft3D/source-analysis/delft3d_waq_ph_carbonate.md
+@@ -4,6 +4,7 @@
+ component: waq-process
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "Delft3D raw 직접 read: src/engines_gpl/waq/waq_process/phcarb.f90(456) — 해리상수(Roy1993/Dickson1990/Weiss1974/Mucci1983)·solvesaphe H+ 3단 fallback·화학종 분배·Ω 포화도 file:line 전수(2026-07-07). solvesaphe 모듈(Munhoven2013 SOLVE_ACBW_*)은 phcarb.f90 에 use 문 없이 호출 — 이 raw 트리서 정의파일 미검출(빌드 링크), 함수 시그니처만 확인."
+ note_author: "Claude Fable 5"
+ note_date: 2026-07-07
+diff --git a/models/Delft3D/source-analysis/delft3d_waq_process_library.md b/models/Delft3D/source-analysis/delft3d_waq_process_library.md
+--- a/models/Delft3D/source-analysis/delft3d_waq_process_library.md
++++ b/models/Delft3D/source-analysis/delft3d_waq_process_library.md
+@@ -193,4 +193,4 @@
+ - ✅ 퇴적물 산소요구·매몰(SOD, sediment flux): `sedox.f90`(SODCH4 sech 반복해법+메탄)/`botmin.f90`(S1/S2 무기화)/`sedsod.f90` — [[delft3d_waq_sediment_oxygen_demand]] 로 해소(2026-07-07, verified)
+ - CO₂/CH₄ 포화: `satco2.f90`/`satch4.f90` — 파일 존재만 확인, source-needed
+ 
+-> 전체 프로세스 파일 184개(`waq_process/` 최상위 ls 기준). 본 노트는 산소·N순환·BOD·1차생산제한·무기화의 **대표 루틴**만 식 단위로 인용했다.
++> 전체 프로세스 루틴 `*.f90` 179개(`waq_process/` 최상위 ls 기준 총 186항목 = *.f90 179 + 기타 파일 2 + 하위 디렉터리 5; 2026-10-17 재계수). 본 노트는 산소·N순환·BOD·1차생산제한·무기화의 **대표 루틴**만 식 단위로 인용했다.
+diff --git a/models/Delft3D/source-analysis/delft3d_waq_sediment_denitrification.md b/models/Delft3D/source-analysis/delft3d_waq_sediment_denitrification.md
+--- a/models/Delft3D/source-analysis/delft3d_waq_sediment_denitrification.md
++++ b/models/Delft3D/source-analysis/delft3d_waq_sediment_denitrification.md
+@@ -17,7 +17,7 @@
+ # Delft3D WAQ 저니 탈질 — `densed.f90` (SUBROUTINE DENSED)
+ 
+ > 소스: `.../src/engines_gpl/waq/waq_process/densed.f90` (158줄, `module m_densed`).
+-> **정체**: 저니(sediment)에서의 **탈질(denitrification) — NO3⁻ → N2 제거 flux**. 하구·연안 부영양화 완화의 최대 질소 sink. 위키가 커버한 **수주 탈질 `denwat`([[delft3d_waq_process_library]])의 저니 대응짝** → 질소순환 sink 완결. SOD 노트(탄소·산소 diagenesis)와 인접하되 N 화학은 미겹침(상보).
++> **정체**: 저니(sediment)에서의 **탈질(denitrification) — NO3⁻ → N2 제거 flux**. 하구·연안 부영양화 완화의 주요 질소 sink(⚠ source-needed: '최대' 정량 순위의 문헌 인용 미확보 — 확보 시 인용 교체). 위키가 커버한 **수주 탈질 `denwat`([[delft3d_waq_process_library]])의 저니 대응짝** → 질소순환 sink 완결. SOD 노트(탄소·산소 diagenesis)와 인접하되 N 화학은 미겹침(상보).
+ 
+ ## 0. flux process — 상태변수 구동
+ `phcarb`(진단, flux 0)과 달리 **flux를 실제 갱신**: `FL(1+IFLUX)`에 탈질률 기입(:138) → NO3 상태변수를 감소시킴. active + **bottom 층만** 처리.
+diff --git a/models/Delft3D/source-analysis/delft3d_waq_sediment_oxygen_demand.md b/models/Delft3D/source-analysis/delft3d_waq_sediment_oxygen_demand.md
+--- a/models/Delft3D/source-analysis/delft3d_waq_sediment_oxygen_demand.md
++++ b/models/Delft3D/source-analysis/delft3d_waq_sediment_oxygen_demand.md
+@@ -68,9 +68,9 @@
+ ## 4. 주요 findings (code≠manual, 개발자 주석)
+ - **★메탄 double-count guard**: 수렴 시 `DOXSOD` 를 CH4-보정값으로 덮되 `DMINER` 를 빼냄 — 주석 "anders dubbeltelling met BotMin!!!!"(:313-317). sedox↔botmin 결합 제약(단일 process 매뉴얼로는 안 보임).
+ - **★개발자 미결(Dutch "Te doen")**: 가스버블 블록에 "mag ik dsod gebruiken voor diagen?"·"temperatuurcorrectie niet dubbelop???"·"groot risico dubbeltellingen"(:265-281) — 온도보정·DetC 수요 이중적용 가능성을 코드가 자인. 매뉴얼 부재.
+-- **수치 guard(식에 없음)**: DOXSOD floor 1e-15(:252)·dowc floor 1e-3(:454)·**half-step damping(:481, 수렴증명·반복상한 없음, 매뉴얼의 direct solve 암시와 다름)**.
++- **수치 guard(식에 없음)**: DOXSOD floor 1e-15(:252)·dowc floor 1e-3(:454)·**half-step damping(:481, 수렴증명·반복상한 없음, 매뉴얼의 direct solve 암시와 다름 — ⚠ source-needed(매뉴얼 페이지 미인용, 확인 시 (source_id, p.NN) 교체))**.
+ - **온도 base 2종 공존**: sedox/botmin `theta^(T-20)`(증가) vs SODCH4 메탄포화 `0.9759^(T-20)`(감소) — 한 process 내 반대 온도민감도.
+-- **swoxy 런타임 층 라우팅**: flux 가 도달하는 저니층(S1/S2)이 수관 산소의 계산된 함수(정적 config 아님) — 매뉴얼은 고정층으로 제시.
++- **swoxy 런타임 층 라우팅**: flux 가 도달하는 저니층(S1/S2)이 수관 산소의 계산된 함수(정적 config 아님) — 매뉴얼은 고정층으로 제시(⚠ source-needed: 매뉴얼 페이지 미인용, 확인 시 (source_id, p.NN) 교체).
+ 
+ ## 5. Primary sources
+ - **Deltares D-Water Quality Technical Reference(Processes Library Description)** — SOD·SwitchOxyDem·S1/S2 무기화(process명 SEDOX·BMS1/2·SEDOD·SWOXY).
+diff --git a/models/Delft3D/source-analysis/delft3d_waq_sulphide_speciation.md b/models/Delft3D/source-analysis/delft3d_waq_sulphide_speciation.md
+--- a/models/Delft3D/source-analysis/delft3d_waq_sulphide_speciation.md
++++ b/models/Delft3D/source-analysis/delft3d_waq_sulphide_speciation.md
+@@ -4,6 +4,7 @@
+ component: waq-process
+ canonical_source: self
+ citation_status: verified
++has_source_needed: false
+ verification_method: "Delft3D raw 직접 read: src/engines_gpl/waq/waq_process/sulfid.f90(150) 전수 — 2단 산해리 speciation·간극수 보정·frsdis 음수가드 file:line 직접 검증(2026-07-07). ★active-cell 게이트 부재·ks1/ks2 주석오류(H2CO3) 확인."
+ note_author: "Claude Fable 5"
+ note_date: 2026-07-07
+diff --git a/models/Delft3D/source-analysis/delft3d_wave_swan_module.md b/models/Delft3D/source-analysis/delft3d_wave_swan_module.md
+--- a/models/Delft3D/source-analysis/delft3d_wave_swan_module.md
++++ b/models/Delft3D/source-analysis/delft3d_wave_swan_module.md
+@@ -83,7 +83,7 @@
+ | `INPGRID … / READINP AICE` | 해빙 fraction | swan_input.f90:3231,3240 |
+ | `READINP MUDL` | mud level (flow_mud_online) | swan_input.f90:3259 |
+ | `READINP NPLANTS` | 식생 stem 밀도 | swan_input.f90:3280,3300 |
+-| `BOUN NEST / BOUN WW3 / BOUN SHAPE` | 경계조건 (nest·WW3·파라메트릭). **`bndtyp==5` 출력 문자열이 `BOUN WWIII ` → `BOUN WW3 ` 로 바뀌었다** | swan_input.f90:3223, 3233, 3248 |
++| `BOUN NEST / BOUN WW3 / BOUN SHAPE` | 경계조건 (nest·WW3·파라메트릭). **`bndtyp==5` 출력 문자열이 `BOUN WWIII ` → `BOUN WW3 ` 로 바뀌었다** | swan_input.f90:3460, 3466, 3477 |
+ | `INITIAL HOTSTART … NETCDF` | hotfile restart | swan_input.f90:3634-3636,4508 |
+ | `GEN1/GEN2/GEN3 KOMEN|WESTH DRAG WU` | 파 생성 물리 | swan_input.f90:3645-3655 |
+ | `POINTS NGRID### / SPEC … SPEC2D ABS` | **자식 nest 출력** | swan_input.f90:3867-3900 |
