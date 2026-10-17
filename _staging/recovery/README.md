@@ -228,6 +228,16 @@ Delft3D 487(기계 sweep 실패 471 + 웹 16, 09-22 스냅샷 교체 전 경로)
 - 기계 확인: 바뀐 노트 27개의 `경로:줄` 인용 2,174개 중 불일치 표시 147개다. 과거 커밋 인용(`8756667:src/...`, Claude가 7개를 직접 열어 확인), 두 백틱 사이 문장, 노트 자기 인용, 수정 전 줄 인용이 섞인 검사 오판이다. 전수 대조 작업이 후보를 하나씩 판정했다. `tools/validate-all.sh` 통과.
 - sonnet 표본 30줄(표 22·본문 8): OK 29·부분 1(README.md:80 manual-notes 파일 수 3 → 반영 뒤 4) → 고쳤다(`[10-15 표본 정정]`). 표본이 찾은 보고서 쪽 번호 오기(SG1-875 p.37 → p.38)도 보고서에서 고쳤다. 기록: `compare/SWASH-notes-sample.md`.
 
+## FUNWAVE 판독 (2026-10-17)
+
+기록: `read/FUNWAVE/FUNWAVE-{TVD,GPU}/`(코드·빌드·tex), `read/FUNWAVE/FUNWAVE-TVD/doc/*.pdf/`(PDF), 전수 검증 결과 `read/FUNWAVE/verify/`. 대상 목록: `scripts/funwave-batches.json`(자체 코드 FUNWAVE-TVD `src/*.F` 38파일과 FUNWAVE-GPU `src/*.F` 41파일, 79파일 67,922행, 14작업), `scripts/funwave-docbatches.json`(README.md, 빌드 파일 41개, `doc/funwave_tvd_3.0.tex` 2,829행, 3작업), `scripts/funwave-pdfjobs.json`(funwave_tvd_3.0 89쪽, funwave_tvd_2.1_manual 77쪽, Intro-to-FUNWAVE-CHL-TN 24쪽, funwave_code_analysis 15쪽 = 205쪽, 12작업). 제외: 테스트·예제(`simple_cases/`·`benchmarks/`, 다른 모델과 같은 기준), `tools/*.m`(부속 도구), `funwave-work/build/pre/*.f90`(빌드가 만든 전처리 사본), `.o`·`.mod`, LICENSE, `manuals/funwave_tvd_3.0.md`(같은 3.0 PDF의 텍스트 변환본). 코드 판 = `FUNWAVE-TVD/src/main.F:47` `!    VERSION 3.0`, README "This version is a beta version.". 위키 원자료 두 저장소는 커밋 1개짜리 얕은 사본이다(TVD `b4c322e` 2025-01-24, GPU `7f892ba` 2019-11-26). GPU 작업 트리는 `src/etauv_solver_gpu.F`·`src/mod_cuda.F`·`src/Makefile_cuda`가 커밋과 다르다(커밋하지 않은 로컬 수정, 21줄 추가·7줄 삭제).
+
+- 코드·문서: Codex `gpt-6.1-sol` 17작업. C 전처리 조건(`# if defined (CARTESIAN)` 등)은 원문 그대로 인용하고 어느 플래그 조합에서 컴파일되는지 적었다. 기계 확인 121기록 전부 통과(1행~끝 구간·sha·행 수, 세션 로그로 전 행 열람 확인).
+- PDF 205쪽: Codex가 300 dpi 쪽 이미지로 판독(Marker·opendataloader 추출, 3.0은 tex 원고 참고). 기계 확인 12작업 통과. 인용 없는 쪽 3.0 p.87–89는 식만 있는 쪽이다(추출 텍스트에도 6단어 이상 문장 없음). Intro-TN p.12 인용 1개는 표 칸 텍스트 층이 깨진 것이라 Claude가 쪽 이미지로 확인해 `visual-ok.txt`에 넣었다.
+- sonnet 표본: 코드 20구간 맞음 20(보완 후보 1: `fluxes_21v.F` 892–906이 `# if defined (CARTESIAN)` (884) 안이라는 점이 모호 → Claude가 고침). PDF 16쪽 맞음 15·부분 1(3.0 p.73 캡션 "Solid line: model, stars: data."와 그림 범례(실선=data, 파선=model)의 모순을 적지 않음). 앞 모델과 같이 전 기록을 `gpt-6-astra`로 의미까지 전수 대조했다. 코드 22작업: 정정 213, 보완 1,513, 이상 없음 895. PDF 6작업: 정정 141, 보완 95, 이상 없음 36(작업별 요약 줄 합계).
+- 정정분 sonnet 표본 28행(코드 14, PDF 14): 맞음 27, 새 오류 1(2.1 p.14 본문과 식 (7)의 $\overline{\mathbf{u}}_2$ 상선이 다르다고 씀 — Claude가 쪽 이미지로 두 곳 모두 상선이 있음을 확인하고 고침). 과잉 정정 0.
+- 최종 기계 확인: 원문 인용 32,018개 중 불일치 표시 5개. tex 원본에 이미 있는 U+FFFD 문자 4개(기록과 바이트가 같음)와 행 번호가 인용 바로 뒤에 오지 않은 문장 1개로, 검사기 오판이다.
+
 ## 노트 반영분 전수 대조와 차이 결론 (2026-10-12)
 
 사용자 지시(10-12): 확인하지 않은 것을 한계로 남기지 말고 해결한 뒤 다음 모델로 간다. 모델 실행은 위키 범위가 아니므로 한계로 적지 않는다.
