@@ -238,6 +238,20 @@ Delft3D 487(기계 sweep 실패 471 + 웹 16, 09-22 스냅샷 교체 전 경로)
 - 정정분 sonnet 표본 28행(코드 14, PDF 14): 맞음 27, 새 오류 1(2.1 p.14 본문과 식 (7)의 $\overline{\mathbf{u}}_2$ 상선이 다르다고 씀 — Claude가 쪽 이미지로 두 곳 모두 상선이 있음을 확인하고 고침). 과잉 정정 0.
 - 최종 기계 확인: 원문 인용 32,018개 중 불일치 표시 5개. tex 원본에 이미 있는 U+FFFD 문자 4개(기록과 바이트가 같음)와 행 번호가 인용 바로 뒤에 오지 않은 문장 1개로, 검사기 오판이다.
 
+## FUNWAVE 대조·흐름·노트 반영 (2026-10-17~18)
+
+- 외부 원문: 위키 원자료 두 저장소는 커밋 1개짜리 얕은 사본이다. 공개 저장소 github.com/fengyanshi/FUNWAVE-TVD(554커밋, 2016-03-02 `cab9425` ~ 2025-01-24 `b4c322e`, 태그 v3.0 `b569dfe` 2017-04-18 ~ Version_3.6 `e8c9474` 2021-05-19)와 github.com/dryuanye/FUNWAVE-GPU(3커밋, 2019-11-26 `7f892ba`)를 `extract/FUNWAVE/external/{tvd,gpu}`에 받았다(extract는 커밋하지 않는다). TVD HEAD의 src는 원자료와 같다. GPU 원자료는 3파일에 커밋하지 않은 로컬 수정이 있다. 문서 커밋: 3.0 PDF 마지막 변경 `fef45a7` 2018-02-24, tex `24a88c3` 2016-11-18, 2.1 매뉴얼·code_analysis `b9c035d` 2016-11-03, Intro-TN `80ac086` 2016-11-10.
+- 대조 보고서 7종(Codex `gpt-6.1-sol`, 처음부터 git 이력을 근거로 줌): `compare/funwave-{theory-numerics,inputs,examples,v21-manual,v21-examples,aux-docs-build}-vs-code.md`, `compare/funwave-gpu-vs-tvd.md`(GPU 판 대 TVD 판 코드 대조, 문서 없음). 흐름 분석 `flow/FUNWAVE-callflow.md`(TVD·GPU 시작·입력 읽기, 계산 순서, 변수 생산·소비, 문서 대조). mermaid 3개(TVD 전체, TVD 한 시간 단계, GPU 한 시간 단계)는 렌더해 확인했다. 렌더 확인에서 RK 반복 끝 상자 2개의 코드에 없는 조건 `(ISTAGE<3)`을 원문 `DO ISTAGE=1,3`의 `ENDDO`로 고쳤다.
+- git 이력 판정(Codex `gpt-6-astra` 6작업): E 116행 모두 유지. A 101행 확정, B→A 6행, 보조 문서·빌드 보고서에서 그 밖 재분류 37행. 기록: `compare/FUNWAVE-git-verify-{E1,E2,E3,AD1,AD2,AD3}.md`.
+- 외부 원문(sonnet 웹 조회): E 행 중 비선형 분산 항의 `Beta_2` 배수(`init.F:664` `Beta_2=(1.0_SP/5.0_SP)**2/1.0_SP`, 주석 `! kennedy equation`, 최초 커밋 `cab9425:init.F:497`부터 있음)에서 나온 행들은 원인이 하나다. Kennedy et al. ICCE 2000 학회판과 2.1 매뉴얼에 이 배수가 없고, GitHub 이슈 #46(2021-04-01)이 같은 질문을 했으며 조회 시점에 답이 없다. E(강함) 유지. Wave Motion 2001·Ocean Modelling 2012 본문은 유료라 학회판과 매뉴얼로 판정했다. 기록: `compare/FUNWAVE-external-sources.md`.
+- 결론 표본(sonnet 30행): OK 28·부분 1·틀림 1(FN1-644 보고서에 git 판정 미반영, FN1-768 근거 없는 부연). 결론 전수 재검증(Codex `gpt-6-astra` 12작업): 1,741행, 정정 668·보완 1,298·분류 변경 259(작업 요약 줄 합계). 기록: `compare/FUNWAVE-conclusion-sample.md`, 보고서별 "## 전수 검증 기록 (10-18, …)".
+- 최종 결론(차이 결론 절 1,741행, 결론 열에서 Claude가 셈, 보고서 끝 "## 최종 집계"): 일치 66·A 186·B 316·C 467·D 44·E 122·F 289·H 251. G·X 0.
+- 노트 반영(Codex `gpt-6.1-sol`): 보고서별 8작업이 A–F 1,424행마다 담당 노트 하나를 정했다(`assign/FUNWAVE-assign-*.tsv`). 9작업이 반영했다(`assign/FUNWAVE-note-job-*.tsv`, `flow/FUNWAVE-notes-apply-{1..9}.md`). 기존 노트 16개를 고쳤고 새 노트 3개(`source-analysis/funwave-gpu-vs-tvd-differences.md`, `manual-notes/funwave-aux-docs-build-differences.md`, `manual-notes/funwave-v21-manual-differences.md`)를 만들었다. 흐름도 3개는 `source-analysis/funwave-source-map.md`에, 코드 결함 후보 E 122행 표는 `models/FUNWAVE/README.md`에 넣었다. 행 ID 대조로 1,424행이 모두 배정 노트의 표에 한 번 이상 있고 분류가 배정표와 같음을 확인했다. 저장소 루트 README는 바뀌지 않았다.
+- 추가 줄 전수 대조(Codex `gpt-6-astra` 10작업): 2,420줄(기존 노트 + 줄 2,254, 새 노트 166), 정정 181·보완 59(노트 태그 수).
+- 기계 확인: 바뀐 노트 19개의 `경로:줄` 인용 5,031개 중 불일치 표시 217개다. 과거 커밋 인용(`334bb51:src/main.F:151`, `7b93138:src/init.F:488`, `cab9425:init.F:497` 등은 Claude가 해당 커밋을 열어 원문과 같음을 확인), 인용 사이 문장 조각, TVD·GPU 같은 이름 파일이 섞인 검사 오판이다. 전수 대조 작업이 후보를 하나씩 판정했다. `tools/validate-all.sh` 통과(경고 1건은 기존 ROMS 노트).
+- sonnet 표본 30줄(표 22·본문 8): OK 28·부분 2. FroudeCap=10 중첩 예제 서술은 Claude가 2.1 p.71–72에서 확인(노트 맞음). 노트가 반영 전 노트 줄을 현재 줄처럼 인용한 유형(`funwave-user-manual-full.md:232`)은 Claude가 전수 기계 대조로 66곳(64줄)을 찾아 `HASH:models/FUNWAVE/<노트>:줄`(반영 전 노트 줄)로 고쳤다(`[10-18 표본 정정]`). 기록: `compare/FUNWAVE-notes-sample.md`. 고친 뒤 `tools/validate-all.sh` 통과.
+- Claude 정정: 외부 원문 기록에 `Beta_2` 줄이 `b9c035d`부터 있다고 쓴 것을 최초 커밋 `cab9425`로 고쳤다(`b9c035d`는 파일을 `src/`로 옮긴 커밋). 노트와 보고서는 이미 `cab9425`로 적혀 있었다.
+
 ## 노트 반영분 전수 대조와 차이 결론 (2026-10-12)
 
 사용자 지시(10-12): 확인하지 않은 것을 한계로 남기지 말고 해결한 뒤 다음 모델로 간다. 모델 실행은 위키 범위가 아니므로 한계로 적지 않는다.
@@ -252,4 +266,4 @@ Delft3D 487(기계 sweep 실패 471 + 웹 16, 09-22 스냅샷 교체 전 경로)
 
 1. ~~매뉴얼과 코드 판독 기록 대조~~ — 10-03 완료(`compare/XBeach-manual-vs-code.md`, 노트 반영 `1da8d89`).
 2. ~~XBeach 파일 간 계산 흐름 분석~~ — 10-07 완료(`flow/XBeach-callflow.md`, 노트 반영 `d89cd8b`). 판독 기록 검색은 `wiki_search` `path_class="records"`(`ce7b3ae`).
-3. 다른 10개 모델(SFINCS·EFDC·ADCIRC 완료, ShorelineS 10-12 완료, SWAN 10-13 완료, ROMS 10-14 완료, SWASH 10-15 완료, 나머지 5개 미착수 — 순서 FUNWAVE·LISFLOOD-FP·Delft3D·Celeris·CADMAS-SURF): 같은 방식(고정 목록 → 1행/1쪽 판독 → 기계 확인 → 다른 모델 검증).
+3. 다른 10개 모델(SFINCS·EFDC·ADCIRC 완료, ShorelineS 10-12 완료, SWAN 10-13 완료, ROMS 10-14 완료, SWASH 10-15 완료, FUNWAVE 10-18 완료, 나머지 4개 미착수 — 순서 LISFLOOD-FP·Delft3D·Celeris·CADMAS-SURF): 같은 방식(고정 목록 → 1행/1쪽 판독 → 기계 확인 → 다른 모델 검증).
