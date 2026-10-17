@@ -1,0 +1,76 @@
+diff --git a/models/Delft3D/source-analysis/sediment/delft3d_sediment.md b/models/Delft3D/source-analysis/sediment/delft3d_sediment.md
+--- a/models/Delft3D/source-analysis/sediment/delft3d_sediment.md
++++ b/models/Delft3D/source-analysis/sediment/delft3d_sediment.md
+@@ -83,7 +83,7 @@
+ ```
+ (`erosed.f90:1170-1197`).
+ 
+-Van Rijn reference height `aks` from roughness/reference, limited to 20% depth (`:923-942`).
++Van Rijn reference height `aks` from roughness/reference, limited to 20% depth (`:946-965`).
+ 
+ ## D. Bed/water exchange (suspended-bed)
+ 
+@@ -142,7 +142,7 @@
+ 
+ Bed roughness affects:
+ - Shear/velocity construction (`erosed.f90:877-913`).
+-- Van Rijn reference height (`:923-942`).
++- Van Rijn reference height (`:946-965`).
+ 
+ Calibration multipliers `bed, bedw, susw, sus` scale transport/concentration after formula evaluation (`eqtran.f90:749`).
+ 
+@@ -163,8 +163,8 @@
+ 
+ ## Working Rules
+ 
+-- For Korean coastal mud (Yeongsan, Han mouth): mud `iform=-3`, `tcrero=0.1-0.3 Pa`, `eropar=1e-5 to 5e-4 kg/m²/s`.
+-- Sand `D50` 0.1-0.5 mm typical; `factcr=1.5-2.0` for hiding effect in mixtures.
++- For Korean coastal mud (Yeongsan, Han mouth): mud `iform=-3`, `tcrero=0.1-0.3 Pa`, `eropar=1e-5 to 5e-4 kg/m²/s`. (source-needed — 한국 연안 보정범위 근거 문헌 미기재)
++- Sand `D50` 0.1-0.5 mm typical; `factcr=1.5-2.0` for hiding effect in mixtures. (source-needed — 전형값 근거 미기재)
+ - Output `dps, sbuu, sbvv, sourse, sinkse` for diagnostics.
+ - Multi-fraction needs `cdryb` per fraction; check sum consistency.
+ - `morfac > 1` requires monitoring `bott3d` warnings.
+diff --git a/models/Delft3D/source-analysis/wave/delft3d_flow_wave_coupling.md b/models/Delft3D/source-analysis/wave/delft3d_flow_wave_coupling.md
+--- a/models/Delft3D/source-analysis/wave/delft3d_flow_wave_coupling.md
++++ b/models/Delft3D/source-analysis/wave/delft3d_flow_wave_coupling.md
+@@ -159,7 +159,7 @@
+ - `Flpp` should be ~ wave field response time (≈ tide period / 4 for tides; ≈ wind change time scale for surge). Too short = expensive; too long = lagged feedback.
+ - Always check FLOW and WAVE grid alignment before running coupled — use Delft3D-MOR or Delft3D-Quickplot to verify overlap.
+ - For storm hindcast: use `WaveOL=true`, `Flpp ~ 60 min`. Acceptable for semi-stationary winds.
+-- Roller adds CPU cost (~30% on FLOW side); enable only when surf-zone matters.
++- Roller adds CPU cost (~30% on FLOW side; source-needed — 측정 근거 미기재); enable only when surf-zone matters.
+ - SWAN hotfile path: `UseHotFile` triggers read; `WriteHotFile` triggers write at end. Both needed for restart chain.
+ - COM file is binary NEFIS — use `getdata.pl` or NetCDF conversion for inspection.
+ - Diagnostic: time series of `WSU` at a station should track wave-orbital × FX magnitude.
+@@ -169,7 +169,7 @@
+ - ▢ Setting `WaveOL=true` but not running Delft3D-WAVE simultaneously — FLOW waits forever at `itwav`.
+ - ▢ Setting `Flpp` to mismatch WAVE expected interval — first time mismatch crashes WAVE.
+ - ▢ Using offline COM (`WaveOL=0`) but writing COM with online setup — fields stale immediately.
+-- ▢ Hot-start without `WriteHotFile` enabled in prior run — SWAN cold-starts; surface gravity waves take 30+ min spin-up.
++- ▢ Hot-start without `WriteHotFile` enabled in prior run — SWAN cold-starts; surface gravity waves take 30+ min spin-up (source-needed — spin-up 수치 근거 미기재).
+ - ▢ Restart without prior `map-rol-series` file — roller restarts cold; surf-zone solution discontinuous.
+ - ▢ Looking for `TWAVE` keyword — doesn't exist; use `Flpp`/`itcomi`.
+ - ▢ Looking for `TAUWX` — actual code uses `wsu/wsv` and `fxw/fyw`.
+diff --git a/models/Delft3D/web-refs/delft3d-official-resources.md b/models/Delft3D/web-refs/delft3d-official-resources.md
+--- a/models/Delft3D/web-refs/delft3d-official-resources.md
++++ b/models/Delft3D/web-refs/delft3d-official-resources.md
+@@ -3,6 +3,7 @@
+ topic: delft3d-web-refs
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "Deltares 공식 도메인 (oss.deltares.nl) + GitHub 공개 repo (Deltares/delft3d). 핵심 논문 인용은 publicly-known canonical works (Lesser et al. 2004, Stelling & Duinmeijer 2003). §8 추가 (2026-05-26): GitHub API `gh release view DIMRset_2026.02 -R Deltares/Delft3D` + `gh api repos/Deltares/Delft3D/compare/DIMRset_2026.01...DIMRset_2026.02` (1067 commits / 300 files / 6개월) + `gh pr view 900 -R Deltares/Delft3D` 직접 fetch (2026-05-26). PR body verbatim + 변경 파일 4개 직접 확인 + release commit log 주요 UNST-\*/DELWAQ-\* 카테고리 추출. release notes body 자체는 비어있어 GitHub commit log 가 first-party authoritative source."
+ note_author: "Claude Opus 4.7 (1M context)"
+ note_date: 2026-05-26
+diff --git a/models/EFDC/manual-notes/efdc-theory-v12-ch2-hydrodynamics.md b/models/EFDC/manual-notes/efdc-theory-v12-ch2-hydrodynamics.md
+--- a/models/EFDC/manual-notes/efdc-theory-v12-ch2-hydrodynamics.md
++++ b/models/EFDC/manual-notes/efdc-theory-v12-ch2-hydrodynamics.md
+@@ -702,7 +702,7 @@
+ | 항목 | 권장 | 근거 (Theory v12) |
+ |---|---|---|
+ | Wind drag | Option 1 piecewise OR Option 4 COARE 3.6 | Eq 2.38·2.42-2.44, Garratt/Large-Pond 표준 (Table 2.2) |
+-| Bottom roughness $z_0$ | 0.005-0.02 m (한국 서해·남해 mud), 0.02-0.05 m (남해 sand) | Eq 2.31 |
++| Bottom roughness $z_0$ | 0.005-0.02 m (한국 서해·남해 mud), 0.02-0.05 m (남해 sand) (source-needed — 지역값 근거 미기재) | Eq 2.31 (공식만) |
+ | Vertical closure | Mellor-Yamada 1982 or Galperin 1988 | Table 2.1, 가장 검증된 |
+ | Wave coupling | SWAN external (NWS=13 + ADCIRC 와 일관) | §2.2.4 External SWAN |
+ | Vertical layering | SIG 10 layers (천해 항만) / SGZ (수심 변화 큰 외해) | §2.6 결정표 |
