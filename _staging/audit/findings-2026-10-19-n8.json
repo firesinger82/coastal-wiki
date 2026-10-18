@@ -1,0 +1,257 @@
+{
+ "date": "2026-10-19",
+ "audit_run_id": "L4-2026-10-19-n8",
+ "findings": [
+  {
+   "path": "models/EFDC/manual-notes/efdc-theory-v12-ch5-temperature-heat.md",
+   "blob_sha": "eff5d9f33ed6b6cfe459e4addaaff0262f9a2221",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 60,
+   "opinion": 3,
+   "has_source_needed": false,
+   "unsourced": [],
+   "value_checks": [
+    {
+     "claim_id": "a3c0ch5-twoband",
+     "line": 124,
+     "claim": "two-band 일사 감쇠: 코드는 TFAST=SWRATNF*(Z(L,KC)-1.) (:515), RSN=RADTOP*(FSWRATF*EXP(TFAST*HP)+(1-FSWRATF)*EXP(TSLOW*HP)-...) (:520-521)",
+     "source_ref": "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/Transport/mod_heat.f90:515,520-521 직접 대조 (겸 coare36.f90:271 visa·:393 zo 정합 확인)",
+     "mismatch": false
+    }
+   ],
+   "value_mismatches": [],
+   "source_unavailable": []
+  },
+  {
+   "path": "models/EFDC/manual-notes/efdc-theory-v12-ch6-sediment.md",
+   "blob_sha": "4bc208b24dab09d4ae0ca84c543f80036d0e25e8",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 55,
+   "opinion": 2,
+   "has_source_needed": false,
+   "unsourced": [],
+   "value_checks": [
+    {
+     "claim_id": "b7d1ch6-setstvel",
+     "line": 80,
+     "claim": "van Rijn 침강 구간 경계의 코드 측 등호 소속: setstvel.f90 if(D<1.0E-4) / if(D>=1.0E-4 .and. D<1.E-3) / if(D>=1.E-3)",
+     "source_ref": "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/SedTran-Original/setstvel.f90:28,31,35 직접 대조",
+     "mismatch": false
+    }
+   ],
+   "value_mismatches": [],
+   "source_unavailable": []
+  },
+  {
+   "path": "models/EFDC/manual-notes/efdc-user-manual-r850.md",
+   "blob_sha": "ddc69fea4d9d7afe3f07229684237884ddf09fc5",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 90,
+   "opinion": 8,
+   "has_source_needed": false,
+   "unsourced": [],
+   "value_checks": [
+    {
+     "claim_id": "c9e2r850-isquick",
+     "line": 112,
+     "claim": "C6: do NS=0,8 행 읽기에서 3번째 열이 scalar ISQUICK, 0·1 외 값은 ISQUICK=0으로 보정 (input.f90:310,311,319,324)",
+     "source_ref": "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:310-311,319,324 직접 대조",
+     "mismatch": false
+    }
+   ],
+   "value_mismatches": [],
+   "source_unavailable": []
+  },
+  {
+   "path": "models/EFDC/source-analysis/efdc-grid-system-foundation.md",
+   "blob_sha": "3c5db487357c1e84f95983c47d3c42bb17ecc97d",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 24,
+   "opinion": 10,
+   "has_source_needed": true,
+   "unsourced": [],
+   "value_mismatches": [
+    {
+     "line": 64,
+     "claim": "sigma z=(z*+h)/(ζ+h), 범위를 −1 ≤ z ≤ 0 으로 기술",
+     "source_ref": "EFDC_Theory_Document_Ver_12.pdf Ch2 §2.1.1 Eq 2.1 + Fig 2.2",
+     "source_says": "Fig 2.2 표기: 수면 z=1, 하상 z=0 (판독 기록 _staging/recovery/read/EFDC/manuals/pdfs/EFDC_Theory_Document_Ver_12.pdf/p019-036.md:20). 식 z=(z*+h)/H 자체도 z*=−h에서 0, z*=ζ에서 1",
+     "reason": "2026-08-08 감사에서 적발된 값 불일치가 미수정 상태로 잔존. 올바른 범위는 0 ≤ z ≤ 1",
+     "claude_verification": "2026-10-19 판독 기록 p019-036.md:20 Fig 2.2 재대조 — mismatch 재확정"
+    }
+   ],
+   "value_checks": [],
+   "source_unavailable": [],
+   "proposals": [
+    {
+     "old_string": "- `z` is the sigma coordinate (dimensionless, −1 ≤ z ≤ 0)",
+     "new_string": "- `z` is the sigma coordinate (dimensionless, 0 ≤ z ≤ 1)",
+     "rationale": "Theory v12 Eq 2.1·Fig 2.2(수면 z=1, 하상 z=0)에 맞게 sigma 범위 전사 오류 수정 (2026-08-08 감사 적발분)"
+    }
+   ]
+  },
+  {
+   "path": "models/EFDC/source-analysis/efdc-boundary-condition-foundation.md",
+   "blob_sha": "c80605074495a158d391e0351f806e8be39d0261",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 0,
+   "opinion": 18,
+   "has_source_needed": null,
+   "unsourced": [
+    {
+     "line": 30,
+     "text": "EFDC+ open-boundary conditions support a combination of: time-series forcing / harmonic forcing",
+     "reason": "\"retrieved EFDC+ manual passages\"라고만 쓰고 메뉴얼 이름·페이지·file:line 인용 0. frontmatter 는 '본문 내 file:line 명시'를 주장하나 본문에 file:line 없음",
+     "adversary": "섹션·인접 문장·frontmatter 어디에도 구체 출처 없음(통째 소스트리 경로는 인용이 아님) → refute 실패, confirmed"
+    },
+    {
+     "line": 39,
+     "text": "The theory-side retrieval also confirms that harmonic forcing can be represented through sinusoidal constituent-style expressions.",
+     "reason": "이론 문서 페이지·식 번호 인용 없음",
+     "adversary": "동일 — confirmed. (실제 근거는 [[efdc-tidal-forcing-conventions-v12]]·efdc-user-manual-r850 C17 절에 존재하므로 wikilink 보강으로 해소 가능)"
+    },
+    {
+     "line": 43,
+     "text": "The EFDC+ Explorer / KB guidance ... emphasizes grouping cells into physically meaningful sets",
+     "reason": "KB 페이지 식별자·경로 인용 없음",
+     "adversary": "refute 실패 — confirmed"
+    },
+    {
+     "line": 55,
+     "text": "The retrieved guidance explicitly supports preparing river-discharge time series for inflow conditions",
+     "reason": "출처 인용 없음",
+     "adversary": "refute 실패 — confirmed"
+    },
+    {
+     "line": 63,
+     "text": "within EFDC+ boundary grouping, some properties can vary cell by cell while others must remain consistent across the group, especially in the water-quality context",
+     "reason": "KB 출처 인용 없음",
+     "adversary": "refute 실패 — confirmed"
+    }
+   ],
+   "value_checks": [],
+   "value_mismatches": [],
+   "proposals": [
+    {
+     "old_string": "citation_status: verified",
+     "new_string": "citation_status: source-needed",
+     "rationale": "본문 무인용 상태로 verified 유지 불가(2026-08-07 위반 판정 후 미보강) — 출처 보강 전까지 source-needed 강등 제안"
+    }
+   ]
+  },
+  {
+   "path": "models/EFDC/source-analysis/efdc-calibration-foundation.md",
+   "blob_sha": "c767a0387b0a692e0e9c0079c66ad93455079f40",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 0,
+   "opinion": 25,
+   "has_source_needed": null,
+   "unsourced": [
+    {
+     "line": 39,
+     "text": "EFDC+ should be built in stages, with hydrodynamics established before more complex coupled behavior is trusted",
+     "reason": "'Manual-Backed Foundation' 절이나 메뉴얼 이름·페이지 인용 없음",
+     "adversary": "섹션 포괄 출처 없음 → refute 실패, confirmed"
+    },
+    {
+     "line": 40,
+     "text": "hydrodynamic behavior depends on vertical layering, density effects, and forcing structure",
+     "reason": "출처 인용 없음",
+     "adversary": "refute 실패 — confirmed"
+    },
+    {
+     "line": 41,
+     "text": "harmonic forcing is part of the hydrodynamic setup foundation",
+     "reason": "출처 인용 없음",
+     "adversary": "refute 실패 — confirmed"
+    },
+    {
+     "line": 42,
+     "text": "external forcing choices matter to the resulting flow field",
+     "reason": "출처 인용 없음",
+     "adversary": "refute 실패 — confirmed"
+    }
+   ],
+   "value_checks": [],
+   "value_mismatches": [],
+   "proposals": [
+    {
+     "old_string": "citation_status: verified",
+     "new_string": "citation_status: source-needed",
+     "rationale": "'Manual-Backed' 단언 4건 전부 무인용 — 출처 보강 전까지 source-needed 강등 제안"
+    }
+   ]
+  },
+  {
+   "path": "models/EFDC/source-analysis/efdc-current-mismatch-diagnosis.md",
+   "blob_sha": "c151e80cafd50470dae345429fd44b3e9828b619",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 0,
+   "opinion": 20,
+   "has_source_needed": null,
+   "unsourced": [
+    {
+     "line": 17,
+     "text": "Water level or tidal phase can look acceptable in EFDC while current magnitude, direction, or timing remains poor.",
+     "reason": "모델 거동에 대한 사실 단언이나 메뉴얼·소스·사례 인용 0 (파일 전체에 인용 없음)",
+     "adversary": "frontmatter 는 file:line 명시를 주장하나 본문에 없음 → refute 실패, confirmed"
+    },
+    {
+     "line": 44,
+     "text": "Stage can be comparatively robust while current is highly sensitive to local conveyance.",
+     "reason": "출처 인용 없음",
+     "adversary": "refute 실패 — confirmed"
+    },
+    {
+     "line": 53,
+     "text": "A visually good tide boundary does not guarantee correct current forcing.",
+     "reason": "출처 인용 없음",
+     "adversary": "refute 실패 — confirmed"
+    }
+   ],
+   "value_checks": [],
+   "value_mismatches": [],
+   "proposals": [
+    {
+     "old_string": "citation_status: verified",
+     "new_string": "citation_status: source-needed",
+     "rationale": "전면 무인용 진단 노트 — 출처 보강(또는 heuristics/playbooks 재배치 검토) 전까지 source-needed 강등 제안"
+    }
+   ]
+  },
+  {
+   "path": "models/EFDC/source-analysis/efdc-parameter-glossary-v1.md",
+   "blob_sha": "31b64d319c4c1eb9ef2d8fb20a29ec4dba9c260b",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 5,
+   "opinion": 30,
+   "has_source_needed": true,
+   "unsourced": [],
+   "value_checks": [],
+   "value_mismatches": [],
+   "proposals": [
+    {
+     "old_string": "citation_status: verified",
+     "new_string": "citation_status: verified\nhas_source_needed: true",
+     "rationale": "G9e: 본문이 'Not yet exact-name confirmed' 갭을 명시적으로 공개 — frontmatter 에 has_source_needed: true 반영 제안 (2026-08-08 감사 권고값과 동일)"
+    }
+   ]
+  }
+ ]
+}
