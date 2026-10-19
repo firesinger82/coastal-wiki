@@ -1,0 +1,58 @@
+diff --git a/models/EFDC/source-analysis/efdc-wetting-drying-foundation.md b/models/EFDC/source-analysis/efdc-wetting-drying-foundation.md
+--- a/models/EFDC/source-analysis/efdc-wetting-drying-foundation.md
++++ b/models/EFDC/source-analysis/efdc-wetting-drying-foundation.md
+@@ -23,6 +23,8 @@
+ ## Manual-Backed Controls
+ 
+ Retrieved EFDC+ manual passages explicitly list the following wetting/drying controls.
++
++> **출처(섹션 단위, §1–4 + cell skipping):** `models/EFDC/raw/manuals/confluence/spaces/EK/pages/EFDC_Explorer_12_Knowledge_Base/EFDC_Explorer_12_User_Guide/Model_Control_Form/Modules/Hydrodynamics_Module/Shallow_Water.md` (Confluence id 243630129, v24, 2025-03-24) — ISDRY 0/11/99 의미·Dry Depth·Minimum Height<Dry Depth·dry-step 배수와 mass-balance 추적·cell skipping 서술이 이 페이지 L12–L22와 일치함을 L4 감사(2026-08-08·2026-10-20)에서 대조 확인.
+ 
+ ### 1. ISDRY Options
+ 
+diff --git a/models/EFDC/source-analysis/efdc_boundary_conditions.md b/models/EFDC/source-analysis/efdc_boundary_conditions.md
+--- a/models/EFDC/source-analysis/efdc_boundary_conditions.md
++++ b/models/EFDC/source-analysis/efdc_boundary_conditions.md
+@@ -191,12 +191,12 @@
+ 
+ ## Working Rules
+ 
+-- Always set `INTPSER=1` (Catmull-Rom) for tidal-data PSER — linear interp introduces sub-tidal noise.
++- Always set `INTPSER=1` (Catmull-Rom) for tidal-data PSER — linear interp introduces sub-tidal noise. <!-- source-needed: 보간 방식별 sub-tidal 노이즈 특성 단언 — 소스·매뉴얼·논문 근거 필요 (G9b, L4 2026-08-09·2026-10-20) -->
+ - `RMULADJ` and `ADDADJ` apply to **all** records; check before scaling.
+ - BC ramp `NTSCR*` is in **timesteps**, not seconds — set proportional to spin-up duration.
+ - For multi-river runs, group `GRPID` lets you scale a subset uniformly via post-processing — useful for sensitivity tests.
+ - Harmonic block (C17) `PFPH` phase is **not degrees** — it is a time lag in the same unit as `TCP` (seconds): `RAD = 2π·PFPH/TCP` (`input.f90:944-946`, v12.4 재확인 2026-07). Degrees must be converted: `PFPH = [TCON·TBEGIN + TCP·(G−(V0+u))/360] mod TCP`. Amplitudes `PFAM` are in m (× G to pressure head at the boundary-card conversion). See [[efdc-tidal-forcing-conventions-v12]].
+-- `LOPENBCDRY` events are logged — grep stdout for "OPEN BC DRY" during validation.
++- `LOPENBCDRY` 이벤트 로그: v12.5 소스에 `OPEN BC DRY` 문자열은 없다(모든 소스 트리 grep 0건, 2026-10-20). 실제 경고는 `' WARNING!  NEG DEPTH AT OPEN BC: L,HP,H1P,H2P,TIMEDAY'` — stdout과 mpi 로그 파일에 기록된다 (`calpuv9c.f90:815-817`).
+ - Subgrid channel needs both donor and receiver cells to be active wet for the channel itself to be active; design `MODCHAN.INP` accordingly.
+ 
+ ## Common Pitfalls
+@@ -207,7 +207,7 @@
+ - ▢ Using harmonic block without rebuilding `PFPH` after changing `TBEGIN` — synthesis uses absolute `TIMESEC = TCON·TBEGIN` (`hdmt.f90:89`; `setopenbc.f90:232`), so the phase lag must be recomputed for the new time origin (`TCP` periods themselves do not change). See [[efdc-tidal-forcing-conventions-v12]].
+ - ▢ Volumetric source `QSS` injection at a dry cell — will queue but not enter the system; check `LOPENBCDRY` log.
+ - ▢ `ISTYP=1` QSER without proper `WKQ(K)` (must sum to 1) — silent under-injection.
+-- ▢ Hot-start with different `NPSER` count than cold run — index pointers misalign.
++- ▢ Hot-start with different `NPSER` count than cold run — index pointers misalign. <!-- source-needed: restart 루틴 미인용 단언 (G9b, L4 2026-08-09·2026-10-20) -->
+ 
+ ## Next expansion
+ 
+diff --git a/models/EFDC/source-analysis/efdc_drifters.md b/models/EFDC/source-analysis/efdc_drifters.md
+--- a/models/EFDC/source-analysis/efdc_drifters.md
++++ b/models/EFDC/source-analysis/efdc_drifters.md
+@@ -233,12 +233,12 @@
+ 
+ ## Working Rules
+ 
+-- Particle count: 1000-10000 typical; cost scales linearly.
++- Particle count: 1000-10000 typical; cost scales linearly. <!-- source-needed: 관행 수치·비용 스케일링 근거 필요 (G9b, L4 2026-08-09·2026-10-20) -->
+ - For oil spills, separate groups for surface oil, dispersed droplets, evaporated.
+-- `LA_HORDIF, LA_VERDIF`: typical 0.1-1 m²/s (constant); or use model `AH/AV`.
++- `LA_HORDIF, LA_VERDIF`: typical 0.1-1 m²/s (constant); or use model `AH/AV`. <!-- source-needed: typical 값 범위 근거 필요 (G9b, L4 2026-08-09·2026-10-20) -->
+ - Random-seed reproducibility: not built in; for reproducibility, use `LA_DIFOP=1` (constant) and seed RNG externally.
+ - Output frequency: balance trajectory smoothness vs file size.
+-- For Korean tidal oil spill: particles often re-enter via rebound at coast — verify `BEDGEMOVE` events.
++- For Korean tidal oil spill: particles often re-enter via rebound at coast — verify `BEDGEMOVE` events. <!-- source-needed + experience/ 이관 후보: 반복 관찰형 경험 단언 (절대규칙 #2·#4, L4 2026-08-09·2026-10-20) -->
+ - NetCDF output preferred over binary for analysis.
+ 
+ ## Common Pitfalls
