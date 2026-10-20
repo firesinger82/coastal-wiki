@@ -1,0 +1,31 @@
+---
+file: models/LISFLOOD-FP/raw/source_code/LISFLOOD-FP/makefile
+lines: 160
+sha256: 11c2298463493560db10750aaa20c5f781fa1616ee08b1774cefb805a260c59a
+reader: codex gpt-6.1-sol
+read_date: 2026-10-20
+---
+
+# makefile — 판독 구간 기록
+
+구간은 1행부터 160행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+
+| 1–4 | 설정 파일 포함은 `-include $(CONFIG)` (1)이다. CUDA 컴파일러 변수의 기본 명령은 `NVCC = nvcc` (3)이다. 2·4행은 빈 줄이다. |
+| 5–45 | 공통 컴파일 소스 목록은 `SRCS := \` (5)에서 시작한다. 원문 파일 목록은 `boundary.cpp \` (6), `ch_flow.cpp \` (7), `chkpnt.cpp \` (8), `fp_acc.cpp \` (9), `fp_flow.cpp \` (10), `fp_trent.cpp \` (11), `infevap.cpp \` (12), `input.cpp \` (13), `iterateq.cpp \` (14), `output.cpp \` (15), `pars.cpp \` (16), `por_flow.cpp \` (17), `sgc.cpp \` (18), `util.cpp \` (19), `utility.cpp \` (20), `weir_flow.cpp \` (21), `lisflood2/DataTypes.cpp \` (22), `lisflood2/file_tool.cpp \` (23), `lisflood2/lis2_output.cpp \` (24), `lisflood2/lisflood_processing.cpp \` (25), `lisflood2/sgm_fast.cpp \` (26), `lisflood2/windows_ext.cpp \` (27), `rain/rain.cpp \` (28), `swe/boundary.cpp \` (29), `swe/dg2.cpp \` (30), `swe/dg2new.cpp \` (31), `swe/fields.cpp \` (32), `swe/flux.cpp \` (33), `swe/fv1.cpp \` (34), `swe/hll.cpp \` (35), `swe/input.cpp \` (36), `swe/output.cpp \` (37), `swe/stats.cpp \` (38), `swe/dg2/dg2_output.cpp \` (39), `swe/dg2/fields.cpp \` (40), `swe/dg2/friction.cpp \` (41), `swe/dg2/modifiedvars.cpp \` (42), `swe/dg2/slope_limiter.cpp \` (43), `swe/fv1/modifiedvars.cpp` (44)이다. 마지막 목록 줄 뒤 45행은 빈 줄이다. |
+| 46–52 | 테스트 소스 목록은 `TEST_SRCS := \` (46)에서 시작한다. 원문 파일 목록은 `test/test_lisflood.cpp \` (47), `test/test_dg2.cpp \` (48), `test/test_flux.cpp \` (49), `test/test_fv1.cpp \` (50), `test/test_slope_limiter.cpp` (51)이다. 52행은 빈 줄이다. |
+| 53–86 | CUDA 분기는 `ifdef CUDA` (53)이다. 옵션은 `NVCCFLAGS += -Icuda/common -Icuda -ccbin $(CXX)` (54), `CXXFLAGS += -Icuda/common -Icuda -DCUDA` (55)로 추가한다. 소스 추가는 `SRCS += \` (56)이며 원문 파일 목록은 `cuda/cuda_boundary.cu \` (57), `cuda/cuda_dem.cu \` (58), `cuda/cuda_flow.cu \` (59), `cuda/cuda_geometry.cu \` (60), `cuda/cuda_hll.cu \` (61), `cuda/cuda_max_field.cu \` (62), `cuda/cuda_unifiedallocator.cu \` (63), `cuda/cuda_rain.cu \` (64), `cuda/cuda_sample.cu \` (65), `cuda/cuda_simulate.cu \` (66), `cuda/cuda_solver.cu \` (67), `cuda/cuda_snapshot.cu \` (68), `cuda/cuda_stats.cu \` (69), `cuda/cuda_util.cu \` (70), `cuda/ghostraster.cpp \` (71), `cuda/io.cpp \` (72), `cuda/sample.cpp \` (73), `cuda/stats.cpp \` (74), `cuda/fv1/cuda_fv1_flow.cu \` (75), `cuda/fv1/cuda_fv1_simulate.cu \` (76), `cuda/fv1/cuda_fv1_snapshot.cu \` (77), `cuda/fv1/cuda_fv1_solver.cu \` (78), `cuda/dg2/cuda_dg2_dem.cu \` (79), `cuda/dg2/cuda_dg2_flow.cu \` (80), `cuda/dg2/cuda_dg2_simulate.cu \` (81), `cuda/dg2/cuda_dg2_slope_limit.cu \` (82), `cuda/dg2/cuda_dg2_snapshot.cu \` (83), `cuda/dg2/cuda_dg2_solver.cu` (84)이다. `endif` (85)로 분기를 닫고 86행은 빈 줄이다. |
+| 87–103 | 오브젝트와 의존성 디렉터리는 `OBJDIR := build` (87), `DEPDIR := dep` (88)이다. 오브젝트 경로 변환 매크로(macro)는 `define objs` (90), `$(patsubst %,$(OBJDIR)/%.o,$(basename $(1)))` (91), `endef` (92)이며 의존성 경로 변환은 `define deps` (94), `$(patsubst %,$(DEPDIR)/%.d,$(basename $(1)))` (95), `endef` (96)이다. 의존성 옵션은 `DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$*.d` (98)이다. C++·CUDA 컴파일과 CUDA 의존성 생성 명령 정의는 `COMPILE.cxx = $(CXX) $(DEPFLAGS) $(CXXFLAGS) -c $< -o $@` (100), `COMPILE.cu = $(NVCC) $(NVCCFLAGS) --compiler-options "$(CXXFLAGS)" -dc $< -o $@` (101), `GENDEPS.cu = $(CXX) -x c++ -M $(DEPFLAGS) -I$(CUDA_HOME)/include $(CXXFLAGS) -c $<` (102)이다. 나머지는 빈 줄이다. |
+| 104–110 | 링커 선택 조건은 `ifdef CUDA` (104)이다. 참 분기 정의는 이어지는 `LINK.o = $(NVCC) $(NVCCFLAGS) --linker-options "$(LDFLAGS)" \` (105), `$$^ -o $$@ $(LDLIBS)` (106)이다. `else` (107)에서는 `LINK.o = $(CXX) $(LDFLAGS) $$^ -o $$@ $(LDLIBS)` (108)로 C++ 링커를 선택한다. `endif` (109)로 닫고 110행은 빈 줄이다. |
+| 111–121 | 전체 소스 누적은 `ALLSRCS += $(SRCS)` (111)이다. `# $(1) -- executable` (113), `# $(2) -- source files` (114)는 템플릿 인수 설명 주석이다. `define app` (115) 안에서 `ALLSRCS += $(2)` (116)로 앱별 소스를 누적한다. 규칙·명령은 `$(1): $(call objs,$(2) $(SRCS))` (118), `$(LINK.o)` (119)이며 `endef` (120)로 정의를 닫는다. 나머지는 빈 줄이다. |
+| 122–133 | 앱 규칙 생성 호출은 `$(eval $(call app,lisflood,lisflood.cpp))` (122), `$(eval $(call app,test_lisflood,$(TEST_SRCS)))` (123), `$(eval $(call app,create1DDamBreak,preprocess/create1DDamBreak.cpp))` (124), `$(eval $(call app,createDamBreakObstacle,preprocess/createDamBreakObstacle.cpp))` (125), `$(eval $(call app,createHump,preprocess/createHump.cpp))` (126), `$(eval $(call app,createLakeAtRestCones,preprocess/createLakeAtRestCones.cpp))` (127), `$(eval $(call app,createLakeAtRestBlocks,preprocess/createLakeAtRestBlocks.cpp))` (128), `$(eval $(call app,createRadialDamBreak,preprocess/createRadialDamBreak.cpp))` (129), `$(eval $(call app,checkDynamicRain,preprocess/checkDynamicRain.cpp))` (130), `$(eval $(call app,generateDG2DEM,preprocess/generateDG2DEM.cpp))` (131), `$(eval $(call app,hll_util,preprocess/hll_util.cpp))` (132)이다. `lisflood`, `test_lisflood`, `create1DDamBreak`, `createDamBreakObstacle`, `createHump`, `createLakeAtRestCones`, `createLakeAtRestBlocks`, `createRadialDamBreak`, `checkDynamicRain`, `generateDG2DEM`, `hll_util`을 각각 등록한다. 133행은 빈 줄이다. |
+| 134–148 | 전체 산출 경로 계산은 `ALLOBJS := $(call objs,$(ALLSRCS))` (134), `ALLDEPS := $(call deps,$(ALLSRCS))` (135)이다. 디렉터리 생성 셸 명령은 `$(shell mkdir -p $(dir $(ALLOBJS)) >/dev/null)` (137), `$(shell mkdir -p $(dir $(ALLDEPS)) >/dev/null)` (138)이다. C++ 패턴 규칙·명령은 `$(OBJDIR)/%.o: %.cpp` (140), `$(OBJDIR)/%.o: %.cpp $(DEPDIR)/%.d` (141), `$(COMPILE.cxx)` (142)이다. CUDA 패턴 규칙·명령은 `$(OBJDIR)/%.o: %.cu` (144), `$(OBJDIR)/%.o: %.cu $(DEPDIR)/%.d` (145), `$(GENDEPS.cu)` (146), `$(COMPILE.cu)` (147)이다. 나머지는 빈 줄이다. |
+| 149–160 | 테스트 가상 대상(phony target)과 실행은 `.PHONY: test` (149), `test: test_lisflood` (150), `./$<` (151)이다. 정리 대상과 삭제 명령은 `.PHONY: clean` (153), `clean:` (154), `$(RM) -r $(OBJDIR) $(DEPDIR)` (155)이다. 의존성 파일 보존·빈 규칙·포함은 `.PRECIOUS: $(DEPDIR)/%.d` (157), `$(DEPDIR)/%.d: ;` (158), `-include $(ALLDEPS)` (160)이다. 나머지는 빈 줄이다. 이 판독에서는 빌드·테스트·정리 명령을 실행하지 않았다. |
+
+## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
+
+- 1: `CONFIG` 파일을 `-include $(CONFIG)`로 포함한다. 이 파일에는 `CONFIG` 자체의 기본값 대입이 없다.
+- 98–102·144–147: CUDA 컴파일 명령 `COMPILE.cu`와 의존성 생성 명령 `GENDEPS.cu`는 별도 변수이다. CUDA 패턴 규칙은 의존성 생성 뒤 컴파일을 호출한다.
+- 31: 공통 컴파일 목록에는 `swe/dg2new.cpp`가 포함되어 있다.

@@ -1,0 +1,26 @@
+---
+file: models/LISFLOOD-FP/raw/source_code/LISFLOOD-FP/cuda/acc_nugrid/find_nonuniform_neighbours.cu
+lines: 189
+sha256: d7c2c681d5d1756ae8eaa3c15651d752f34f5e87b97b64925489cdfb297102f4
+reader: codex gpt-6.1-sol
+read_date: 2026-10-20
+---
+
+# find_nonuniform_neighbours.cu — 판독 구간 기록
+
+구간은 1행부터 189행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–41 | 헤더 포함(1), `__global__ void lis::cuda::acc_nugrid::find_nonuniform_neighbours` (3) CUDA 커널(kernel) 정의와 인수(4–12). 전처리 조건 분기는 없다. `int idx = blockIdx.x * blockDim.x + threadIdx.x;` (13), `if (idx >= d_assem_sol.length) return;` (15)로 스레드 인덱스와 범위를 정한다. 수준·활성 인덱스 읽기(17·19). `MortonCode code = act_idx - get_lvl_idx(level);` (21), `MortonCode code_sw = code << (2 * (solver.L - level));` (22), `MortonCode code_ne = code << (2 * (solver.L - level)) ^ (0xFFFFFFFF >> (32 - 2 * (solver.L - level)));` (23)으로 모턴 코드(Morton code)를 구하고, `int x_sw = compact(code_sw);` (25), `int y_sw = compact(code_sw >> 1);` (26), `int x_ne = compact(code_ne);` (30), `int y_ne = compact(code_ne >> 1);` (31)로 끝 좌표를 복원한다. `//if (x_sw == 0 && y_sw == 0) printf("%f\n", d_assem_sol.z0[idx]);` (28)은 진단 출력 주석이다. `int side_len = 1 << (solver.L - level);` (33), `int mesh_dim = 1 << solver.L;` (35)로 한 변과 전체 격자 폭을 구한다. 누적 이웃 시작 위치를 읽고 count=0, previous_nghbr=-5로 시작한다(37–40). |
+| 42–70 | 시작 시 3행 커널 안. 북쪽 탐색 `for (int i = 0; i < side_len; i++)` (43)에서 `bool at_border = ( y_ne == (pars.ysz - 1) \|\| ( y_ne == (mesh_dim - 1) ) );` (45), `int x = x_ne - i;` (47), `bool bc_bound = boundaries.north.bound(x);` (49). 이웃 인덱스는 `index_1D nghbr = (at_border) ? I_NORTH : (y_ne + 1) * mesh_dim + x;` (51), 활성 인덱스는 `index_1D nghbr_check = (nghbr < 0) ? nghbr : d_nghbr_assem_sol.act_idcs[nghbr];` (53), 직전 값 비교는 `bool already_in_list = (nghbr_check == previous_nghbr);` (55). 직전 이웃을 갱신하고(57), `if (!already_in_list \|\| (bc_bound && at_border))` (59)일 때 활성 인덱스를 저장한다(61). 폭 식은 `d_non_uniform_nghbrs.dx[cumu_nghbr_count] = (nghbr < 0) ? pars.dx * (1 << (solver.L - level)) : pars.dx * (1 << (solver.L - d_nghbr_assem_sol.levels[nghbr]));` (62). 방향은 I_NORTH, 누적 위치·개수는 1 증가(63–65). 다음 방향 전에 previous_nghbr=-5(69). |
+| 71–109 | 시작 시 3행 커널 안. 동쪽 탐색 `for (int i = 0; i < side_len; i++)` (72)에서 `bool at_border = ( x_ne == (pars.xsz - 1) \|\| ( x_ne == (mesh_dim - 1) ) );` (74), `int y = y_ne - i;` (76), `bool bc_bound = boundaries.east.bound(y);` (78). 이웃 인덱스는 `index_1D nghbr = (at_border) ? I_EAST : y * mesh_dim + (x_ne + 1);` (80), 활성 인덱스는 `index_1D nghbr_check = (nghbr < 0) ? nghbr : d_nghbr_assem_sol.act_idcs[nghbr];` (82), 직전 비교는 `bool already_in_list = (nghbr_check == previous_nghbr);` (84). 직전 이웃을 갱신한다(86). 진단 블록은 주석이며 조건은 `//if (x_ne == 161 && y_ne == 0)` (88), 로그용 삼항식은 `//		bc_bound ? "YES" : "NO",`<br>`//		already_in_list ? "YES" : "NO",`<br>`//		at_border ? "YES" : "NO",` (103–105). 동쪽 루프는 다음 구간으로 이어진다. |
+| 110–121 | 시작 시 3행 커널·72행 동쪽 루프 안. `if (!already_in_list  \|\| (bc_bound && at_border) )` (110)이면 활성 인덱스를 저장한다(112). 폭 식은 `d_non_uniform_nghbrs.dx[cumu_nghbr_count] = (nghbr < 0) ? pars.dx * (1 << (solver.L - level)) : pars.dx * (1 << (solver.L - d_nghbr_assem_sol.levels[nghbr]));` (113). 방향은 I_EAST, 누적 위치·개수는 1 증가(114–116). 분기·루프 종료(117–118), 이전 이웃을 -5로 되돌린다(120). |
+| 122–150 | 시작 시 3행 커널 안. 남쪽 탐색 `for (int i = 0; i < side_len; i++)` (123)에서 `bool at_border = (y_sw == 0);` (125), `int x = x_sw + i;` (127), `bool bc_bound = boundaries.south.bound(x);` (129). 이웃 인덱스는 `index_1D nghbr = (at_border) ? I_SOUTH : (y_sw - 1) * mesh_dim + x;` (131), 활성 인덱스는 `index_1D nghbr_check = (nghbr < 0) ? nghbr : d_nghbr_assem_sol.act_idcs[nghbr];` (133), 직전 비교는 `bool already_in_list = (nghbr_check == previous_nghbr);` (135). 직전 값을 갱신하고(137), `if (!already_in_list  \|\| (bc_bound && at_border))` (139)이면 활성 인덱스를 저장한다(141). 폭 식은 `d_non_uniform_nghbrs.dx[cumu_nghbr_count] = (nghbr < 0) ? pars.dx * (1 << (solver.L - level)) : pars.dx * (1 << (solver.L - d_nghbr_assem_sol.levels[nghbr]));` (142). 방향은 I_SOUTH, 누적 위치·개수는 1 증가(143–145). 루프 뒤 이전 이웃은 -5(149). |
+| 151–177 | 시작 시 3행 커널 안. 서쪽 탐색 `for (int i = 0; i < side_len; i++)` (152)에서 `bool at_border = (x_sw == 0);` (154), `int y = y_sw + i;` (156), `bool bc_bound = boundaries.west.bound(y);` (158). 이웃 인덱스는 `index_1D nghbr = (at_border) ? I_WEST : y * mesh_dim + (x_sw - 1);` (160), 활성 인덱스는 `index_1D nghbr_check = (nghbr < 0) ? nghbr : d_nghbr_assem_sol.act_idcs[nghbr];` (162), 직전 비교는 `bool already_in_list = (nghbr_check == previous_nghbr);` (164). 직전 값을 갱신하고(166), `if (!already_in_list  \|\| (bc_bound && at_border))` (168)이면 활성 인덱스를 저장한다(170). 폭 식은 `d_non_uniform_nghbrs.dx[cumu_nghbr_count] = (nghbr < 0) ? pars.dx * (1 << (solver.L - level)) : pars.dx * (1 << (solver.L - d_nghbr_assem_sol.levels[nghbr]));` (171). 방향은 I_WEST, 누적 위치·개수는 1 증가(172–174). 루프 종료(176). |
+| 178–189 | 시작 시 3행 커널 안이며 네 방향 루프 밖. 원래 idx를 owner에 보존하고 예정 이웃 수를 읽은 뒤 idx를 누적 이웃 시작 위치로 바꾼다(178–182). `for (int i = 0; i < nghbr_count; i++)` (184)에서 각 이웃의 소유 요소 인덱스와 실제 count를 저장한다(186–187). 루프와 커널 종료(188–189). |
+
+## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
+
+- 23: 북동 끝 모턴 코드 식은 `0xFFFFFFFF`와 32를 사용한다. `level == solver.L`이면 원문 우측 시프트 수 `32 - 2 * (solver.L - level)`는 32이다.
+- 38·65·116·145·174·180–187: 실제 생성 이웃 수 count와 조립 해에 저장된 예정 이웃 수 nghbr_count를 각각 사용한다. 두 수를 비교하는 조건문은 이 커널에 없다.

@@ -252,6 +252,16 @@ Delft3D 487(기계 sweep 실패 471 + 웹 16, 09-22 스냅샷 교체 전 경로)
 - sonnet 표본 30줄(표 22·본문 8): OK 28·부분 2. FroudeCap=10 중첩 예제 서술은 Claude가 2.1 p.71–72에서 확인(노트 맞음). 노트가 반영 전 노트 줄을 현재 줄처럼 인용한 유형(`funwave-user-manual-full.md:232`)은 Claude가 전수 기계 대조로 66곳(64줄)을 찾아 `HASH:models/FUNWAVE/<노트>:줄`(반영 전 노트 줄)로 고쳤다(`[10-18 표본 정정]`). 기록: `compare/FUNWAVE-notes-sample.md`. 고친 뒤 `tools/validate-all.sh` 통과.
 - Claude 정정: 외부 원문 기록에 `Beta_2` 줄이 `b9c035d`부터 있다고 쓴 것을 최초 커밋 `cab9425`로 고쳤다(`b9c035d`는 파일을 `src/`로 옮긴 커밋). 노트와 보고서는 이미 `cab9425`로 적혀 있었다.
 
+## LISFLOOD-FP 판독 (2026-10-20)
+
+기록: `read/LISFLOOD-FP/LISFLOOD-FP/`(코드·빌드), `read/LISFLOOD-FP/LISFLOOD-FP-8.3-package/`(8.3 배포본 문서), `read/LISFLOOD-FP/LISFLOOD-FP/<매뉴얼 이름>/`(매뉴얼 쪽 기록). 대상 목록: `scripts/lisflood-batches.json`(자체 코드 564파일 77,152행, 25작업: 본체 `*.cpp`·`*.h`, `lisflood2/`, `rain/`, `swe/`, `cuda/` 전체, `metal/`), `scripts/lisflood-docbatches.json`(README.md·INSTALL.md·CMake·config·makefile·`*.mk`·Visual Studio 파일·`linuxdep/build.sh`·8.3 배포본 README와 `config.float.cmake`, 45파일 2,519행, 2작업), `scripts/lisflood-pdfjobs.json`(매뉴얼 3종 153쪽, 9작업). 제외: 테스트·예제(`testing/`·`test/`, 다른 모델과 같은 기준), 부속 도구(`preprocess/`·`postprocess/`), Windows 라이브러리(`windep/`·`DLL's/`·`dll_intel/`), 실행 파일·압축본, LICENCE-3RD-PARTY.txt, 8.3 패치 파일(같은 변경을 코드로 읽음).
+
+- 코드 판: 공개 git 저장소가 없다. Zenodo 공식 배포본 8.0·8.1·8.2·8.3을 내려받아 비교했다(`extract/LISFLOOD-FP/external/`, 커밋하지 않음, MD5는 Zenodo 값과 같음). 위키 원자료 코드 559파일은 8.2(10.5281/zenodo.13121102)와 모두 같았다. 헤더 판 번호는 8.1.0이다. 사용자 지시(10-20)로 원자료를 8.3(10.5281/zenodo.13121119, 2026-10-13)으로 바꿨다. 방법은 배포본 README가 안내하는 공식 패치 `lisflood-8.2-to-8.3.patch`를 위키의 8.2 전체 사본에 적용하는 것이다. 8.3 배포본 `source/`는 매뉴얼·Windows 파일·makefile을 뺀 사본이라 통째로 덮어쓰지 않았다. 적용 후 `source/`의 모든 파일이 원자료와 같다(`diff -rq`). 배포본 README·LICENSE·`config.float.cmake`·패치는 `raw/source_code/LISFLOOD-FP-8.3-package/`에 두었다. `models/*/raw`는 git이 추적하지 않는다.
+- 매뉴얼 3종은 서로 다른 판이다(단어 열 유사도 0.26–0.72). `LISFLOOD-FP user manual.pdf`(49쪽, 표지 Code release 6.1.1, 2013-11-25), `LISFLOOD-FP user manual.docx`(판 이력 표 맨 위 5.9), `LISFLOOD-FP user manual +bridge.docx`(2008-04-25 판 본문과 교량 절). docx 두 개는 LibreOffice 24.2.7.2로 PDF로 바꿔(54쪽, 50쪽) 쪽 이미지로 판독했다. docx 기록의 p.N은 변환본 쪽이다.
+- 코드·빌드: Codex `gpt-6.1-sol` 27작업. 8.3 패치 전에 시작한 작업 중 `VersionHistory.h` 하나가 패치 전 판본을 읽어 다시 판독했다. 기계 확인 609기록 전부 통과(1행~끝 구간·sha·행 수, 세션 로그로 전 행 열람 확인). 원문 인용 20,319개 중 불일치 표시 27개는 모두 다른 빌드 파일(CMakeLists.txt·VersionHistory.h 등)의 줄을 인용한 것으로, 그 파일 줄과 맞는다(검사기 오판).
+- 매뉴얼 153쪽: Codex가 300 dpi 쪽 이미지로 판독. 기계 확인 9작업 통과.
+- sonnet 표본 28행(코드 20, 쪽 8): 맞음 28, 부분 0, 틀림 0. 생략 1건(bridge.docx p.6의 "See Neal et al. (2009) for details of implementation and testing.")은 FUNWAVE에서 오류로 센 유형이라 Claude가 보완했다(`[10-20 표본 보완]`). 표본에 오류가 없어 전수 의미 검증은 하지 않았다. 표본 뒤에 끝난 빌드 기록 2행(makefile 5–45, VersionHistory.h 14–24)은 Claude가 원문과 대조했고 맞았다.
+
 ## 노트 반영분 전수 대조와 차이 결론 (2026-10-12)
 
 사용자 지시(10-12): 확인하지 않은 것을 한계로 남기지 말고 해결한 뒤 다음 모델로 간다. 모델 실행은 위키 범위가 아니므로 한계로 적지 않는다.

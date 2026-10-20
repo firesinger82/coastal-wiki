@@ -1,0 +1,29 @@
+---
+file: models/LISFLOOD-FP/raw/source_code/LISFLOOD-FP/cuda/acc_nugrid/update_h.cu
+lines: 301
+sha256: 6fcc5e5cf75abf4ed54619bf6421c010e44e1012e18ec02e0cc7e16edcffa527
+reader: codex gpt-6.1-sol
+read_date: 2026-10-20
+---
+
+# update_h.cu — 판독 구간 기록
+
+구간은 1행부터 301행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–38 | 헤더·algorithm 포함(1–2). `__global__ void lis::cuda::acc_nugrid::update_h` (4)의 CUDA 커널(kernel)은 조립 해(assembled solution), 비균일 이웃·인터페이스, Pars·Solver·Boundaries·PointSources를 값으로 받는다(5–13). 인덱스는 `int idx = blockIdx.x * blockDim.x + threadIdx.x;` (15), 경계는 `if (idx >= d_assem_sol.length) return;` (17). flag 선언에는 초기 대입이 없고(19) q의 초기값은 `NUMERIC_TYPE q = C(0.0);` (20). index는 cumu_nghbr_counts[idx]에서 읽는다(22). 좌표 계산은 주석이며 빈 줄도 포함한다(23–37). 건조 요소 검사 주석(38). 전처리 조건 분기는 없다. |
+| 39–81 | 시작 시 4행 update_h 커널 안. `for (int i = 0; i < d_assem_sol.nghbr_counts[idx]; i++)` (39)로 이웃을 순회한다. 네 독립 조건·부호 대입은 `if (d_non_uniform_nghbrs.dirs[index + i] == I_NORTH) flag = 1.0;` (41)<br>`if (d_non_uniform_nghbrs.dirs[index + i] == I_EAST) flag = -1.0;` (42)<br>`if (d_non_uniform_nghbrs.dirs[index + i] == I_SOUTH) flag = -1.0;` (43)<br>`if (d_non_uniform_nghbrs.dirs[index + i] == I_WEST) flag = 1.0;` (44). 디버그 조건·출력은 주석이다(46–64·68–78). 각 이웃 유량의 누적식은 `q += (flag * d_non_uniform_nghbrs.q[index + i]);` (80). 반복 끝(81). |
+| 82–129 | 시작 시 4행 커널 안이며 39행 반복 밖. 체적 변화·격자 폭·현재 수심·셀 체적은 `NUMERIC_TYPE dV = solver.Tstep * q;` (83)<br>`NUMERIC_TYPE dx = pars.dx * (1 << (solver.L - d_assem_sol.levels[idx]));` (84)<br>`NUMERIC_TYPE H = d_assem_sol.h[idx];` (85)<br>`NUMERIC_TYPE cv = H * (dx * dx);` (86). 88–98행 로그는 주석이다. `if (H > solver.DepthThresh)` (100) 안에서 `if (cv + dV < C(0.0))` (102)일 때 `NUMERIC_TYPE WDweight = -cv / dV; // C(0.5) for improved drying stability` (104)로 건조 보정 가중치를 계산한다. 주석의 C(0.5)는 실행식의 계수가 아니다. `for (int i = 0; i < d_assem_sol.nghbr_counts[idx]; i++)` (105)의 이웃 반복에서 유출 부호에 따른 네 조건·보정식은 `if (d_non_uniform_nghbrs.dirs[index + i] == I_WEST && d_non_uniform_nghbrs.q[index + i] < C(0.0)) d_non_uniform_nghbrs.q[index + i] *= WDweight;` (107)<br>`if (d_non_uniform_nghbrs.dirs[index + i] == I_EAST && d_non_uniform_nghbrs.q[index + i] > C(0.0)) d_non_uniform_nghbrs.q[index + i] *= WDweight;` (108)<br>`if (d_non_uniform_nghbrs.dirs[index + i] == I_SOUTH && d_non_uniform_nghbrs.q[index + i] > C(0.0)) d_non_uniform_nghbrs.q[index + i] *= WDweight;` (109)<br>`if (d_non_uniform_nghbrs.dirs[index + i] == I_NORTH && d_non_uniform_nghbrs.q[index + i] < C(0.0)) d_non_uniform_nghbrs.q[index + i] *= WDweight;` (110). 분기·반복을 닫고(111–113), 주석 처리된 로그·빈 줄·건조 검사 끝 주석을 포함한다(114–129). |
+| 130–186 | 시작 시 4행 커널 안이며 건조 검사 조건 밖. 점 경계조건(boundary condition) 위치 주석·빈 줄(130–135). q와 네 방향 v 누적값은 C(0.0), 네 방향 카운터는 0으로 초기화한다(136–145). `for (int i = 0; i < d_assem_sol.nghbr_counts[idx]; i++)` (147)의 이웃 반복에서 북쪽 분기·계산은 `if (d_non_uniform_nghbrs.dirs[index + i] == I_NORTH) {` (149)<br>`flag = C(1.0);` (150)<br>`v_north += (flag * d_non_uniform_nghbrs.v[index + i]);` (151)<br>`north_counter = north_counter + 1;` (152)<br>`}` (153), 동쪽은 `if (d_non_uniform_nghbrs.dirs[index + i] == I_EAST) {` (154)<br>`flag = -C(1.0);` (155)<br>`v_east += (flag * d_non_uniform_nghbrs.v[index + i]);` (156)<br>`east_counter = east_counter + 1;` (157)<br>`}` (158), 남쪽은 `if (d_non_uniform_nghbrs.dirs[index + i] == I_SOUTH) {` (159)<br>`flag = -C(1.0);` (160)<br>`v_south += (flag * d_non_uniform_nghbrs.v[index + i]);` (161)<br>`south_counter = south_counter + 1;` (162)<br>`}` (163), 서쪽은 `if (d_non_uniform_nghbrs.dirs[index + i] == I_WEST) {` (164)<br>`flag = C(1.0);` (165)<br>`v_west += (flag * d_non_uniform_nghbrs.v[index + i]);` (166)<br>`west_counter = west_counter + 1;` (167)<br>`}` (168). 유량 재누적식은 `q += (flag * d_non_uniform_nghbrs.q[index + i]);` (171). 주석 처리된 디버그 출력·빈 줄을 포함하고 반복을 닫는다(173–186). |
+| 187–240 | 시작 시 4행 커널 안이며 147행 이웃 반복 밖. 방향별 평균은 `NUMERIC_TYPE v_north_sum = v_north/ north_counter;` (189)<br>`NUMERIC_TYPE v_east_sum = v_east / east_counter;` (190)<br>`NUMERIC_TYPE v_south_sum = v_south / south_counter;` (191)<br>`NUMERIC_TYPE v_west_sum = v_west / west_counter;` (192). 대표 속력은 `d_assem_sol.v[idx]= sqrt(pow(getmax(fabs(v_west_sum), fabs(v_east_sum)), 2) + pow(getmax(fabs(v_north_sum), fabs(v_south_sum)), 2));` (194)로 계산한다. 수심 갱신과 음수 제한은 `dV = solver.Tstep * q;` (196)<br>`H += dV / (dx * dx);` (197)<br>`if (H < C(0.0)) H = C(0.0);` (198). 주석 처리된 디버그 출력·수심 강제 0·이전 점 유입원(point source) 처리 블록 및 빈 줄을 포함한다(200–240). 이 주석 블록의 HFIX·HVAR·QFIX·QVAR 조건은 실행되지 않는다. |
+| 241–272 | 시작 시 4행 커널 안. 점 경계조건 주석과 g_idx·src_type 선언(241–243). `if (point_sources.num_srcs)` (245)이면 `for (int i = 0; i < point_sources.num_srcs; i++)` (247)로 유입원을 순회한다. 활성 계층 위치는 `g_idx = get_lvl_idx(solver.L) + point_sources.d_codes[i];` (249), 유형은 d_src_types[i]에서 읽는다(250). 252–270행 디버그 블록은 주석이다. 뒤의 빈 줄까지 포함한다(271–272). |
+| 273–301 | 시작 시 4행 커널·245행 point_sources.num_srcs 참 분기·247행 i 반복 안. `if (d_assem_sol.act_idcs[idx] == g_idx) {` (273)로 셀을 선택한다. `if (src_type == HFIX \|\| src_type == HVAR)` (277) 참이면 `H = point_sources.d_srcs[i] - d_assem_sol.z0[idx];` (279)로 지정 수위에서 지반고를 빼고 `if (H < C(0.0)) H = C(0.0);` (280)으로 제한한다. `else if (src_type == QFIX \|\| src_type == QVAR)` (282)이면 대체 대입은 주석(284)이며 실행식은 `H += point_sources.q_src(solver.Tstep, dx, i); // coverts q to h` (285), 이후 `if (H < C(0.0)) H = C(0.0);` (286)으로 음수를 제한한다. 셀 조건·유형 조건·반복·유입원 조건을 닫는다(290–293). 빈 줄 뒤 H를 h[idx]에 저장하고 커널을 닫는다(294–301). |
+
+## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
+
+- 8·11·14–301: d_non_uniform_itrfaces와 boundaries 인수는 실행 본문에서 참조하지 않는다.
+- 19·41–44·80·149–171: flag 선언에는 초기값이 없다. 방향 처리는 네 독립 if이고 그 외 방향의 기본 분기는 없다. 유량 누적은 이 조건들 뒤에 있다.
+- 142–145·189–192: 방향 카운터는 0에서 시작한다. 네 평균식 앞에 카운터가 0인지 검사하는 조건은 없다.
+- 100–113: 건조 유량 보정의 바깥 조건은 H > solver.DepthThresh이다. 이 조건이 거짓일 때의 유량 보정 분기는 없다.
+- 245–292: 유입원 반복에서 활성 인덱스가 일치해도 break가 없다. 각 일치 항목의 H 대입·가산을 목록 순서로 수행한다.

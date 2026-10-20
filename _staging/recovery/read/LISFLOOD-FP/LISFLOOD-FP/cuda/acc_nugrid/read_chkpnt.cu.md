@@ -1,0 +1,29 @@
+---
+file: models/LISFLOOD-FP/raw/source_code/LISFLOOD-FP/cuda/acc_nugrid/read_chkpnt.cu
+lines: 212
+sha256: 8f0d0dae23a4bbbab58dc317567ff98c9755276b9811eaed44577e4b3593659b
+reader: codex gpt-6.1-sol
+read_date: 2026-10-20
+---
+
+# read_chkpnt.cu — 판독 구간 기록
+
+구간은 1행부터 212행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–35 | 대응 헤더와 VersionHistory.h를 포함한다(1–2). 호스트 함수(host function) 정의는 `__host__ void lis::cuda::acc_nugrid::read_chkpnt` (4)이다. 조립 해(assembled solution)·비균일 이웃·파일명·상태·Pars·Solver 참조, 네 통계 배열 장치 포인터, non_uniform_n, 최세밀 원소 수 상수 참조 및 verbose를 받는다(5–19). 파일·격자 크기·판본·dummy 변수를 선언한다(22–29). 수로 관련 선언은 주석이다(24–25). `LFv = (int(LF_VersionMajor) * 100) + (int(LF_VersionMinor) * 10) + int(LF_VersionInc);` (31)로 현재 모델 판본을 조합한다. 구분 주석과 빈 줄을 포함한다(32–35). 이 파일 전체에는 조건부 전처리 분기가 없다. |
+| 36–69 | 시작 시 4–20행 read_chkpnt 함수 안. 기본 체크포인트(checkpoint) 파일을 먼저 여는 조건은 `if ((check_fp = fopen(filenames.checkpointfilename, "rb")) == NULL) // open file and check it exists` (37)이다. 실패 시 `if (verbose == ON) printf("\nUnable to find default checkpoint file: %s\n", filenames.checkpointfilename);` (40)으로 로그를 제한한다. 같은 실패 분기의 `if (states.checkfile == ON)` (43)일 때 `if ((check_fp = fopen(filenames.loadCheckpointFilename, "rb")) == NULL) // open file and check it exists` (46)으로 대체 파일을 연다. 대체 열기 실패 로그 조건은 `if (verbose == ON) printf("\nUnable to find alternative starting checkpoint file: %s\n", filenames.loadCheckpointFilename);` (49), `else` (51)의 성공 로그 조건은 `if (verbose == ON) printf("\nAlternative checkpoint file opened: %s", filenames.loadCheckpointFilename);` (54)이다. 기본 파일 열기 성공인 `else` (58)에서는 `if (states.checkfile == ON) // let user know program is using newer default checkpoint rather then alternative file` (60)일 때 대체 파일을 사용하지 않았다는 메시지를 출력한다(62–63). 기본 성공 로그 조건은 `if (verbose == ON) printf("\nDefault checkpoint file opened: %s", filenames.checkpointfilename);` (66)이다. 모든 분기 닫기와 빈 줄을 포함한다. |
+| 70–94 | 시작 시 4–20행 read_chkpnt 함수 안이며 파일 열기 분기 밖. 호스트 배열의 크기와 값 초기화 원문은 `NUMERIC_TYPE* h = new NUMERIC_TYPE[d_assem_sol.length]();` (70); `NUMERIC_TYPE* q = new NUMERIC_TYPE[d_non_uniform_nghbrs.length]();` (71); `NUMERIC_TYPE* maxH = new NUMERIC_TYPE[num_finest_elems]();` (73); `NUMERIC_TYPE* totalHtm = new NUMERIC_TYPE[num_finest_elems]();` (74); `NUMERIC_TYPE* maxHtm = new NUMERIC_TYPE[num_finest_elems]();` (75); `NUMERIC_TYPE* initHtm = new NUMERIC_TYPE[num_finest_elems]();` (76)이다. h와 q의 크기는 조립 해·이웃 길이, 네 통계 배열의 크기는 num_finest_elems이다. 바이트 수는 `size_t bytes_sol     = d_assem_sol.length * sizeof(NUMERIC_TYPE);` (78); `size_t bytes_dis     = d_non_uniform_nghbrs.length * sizeof(NUMERIC_TYPE);` (79); `size_t bytes         = num_finest_elems * sizeof(NUMERIC_TYPE);` (80)이다. `if (check_fp == NULL) // no file opened in initial sequence` (85)이면 `if (verbose == ON) printf("\nNo checkpoint file opened: Starting from scratch\n");` (88)로 처음부터 시작한다는 로그를 출력한다. 파일이 열린 `else		 // go ahead and read data if a file was successfully opened` (90)에서 `if (verbose == ON) printf("\nReading checkpoint file\n");` (93)으로 판독 시작 로그를 출력한다. 이 else는 다음 구간까지 이어진다. |
+| 95–121 | 시작 시 4–20행 read_chkpnt 함수·90행 파일 열림 else 안. fread로 정수 checkv를 읽는다(96). `if (feof(check_fp)) {` (97)일 때 `if (verbose == ON) printf("\nUnable to read from checkpoint file (%s) zero size: Starting from scratch\n", filenames.checkpointfilename);` (98)로 빈 파일 로그를 출력한다. `else if (checkv != int(LF_CheckVersion)) {` (100)이면 `if (verbose == ON) printf("\nFile checkpoint version differs from current version: Starting from scratch\n");` (101)로 체크포인트 판본 불일치 로그를 출력한다. `else {` (103)에서는 정수 모델 version을 읽고(107), `if (version != LFv) {` (108)일 때 `if (verbose == ON) printf("\nWARNING: LISFLOOD-FP version differs from current version\n");` (109)로 경고한다. 이어 solver.itrn_time·t·itCount, pars.MassTotal, solver.InitTstep·MinTstep, pars.SaveNo·SaveTotal을 순서대로 읽는다(111–120). itCount는 sizeof(long), SaveNo는 sizeof(int), 나머지는 sizeof(NUMERIC_TYPE)을 사용한다. 이 판본 호환 else는 다음 구간까지 이어진다. |
+| 122–151 | 시작 시 4–20행 read_chkpnt 함수·90행 파일 열림 else·103행 체크포인트 판본 호환 else 안. xchk·ychk 정수를 읽는다(123–124). `if (xchk != pars.xsz \|\| ychk != pars.ysz)` (125)이면 `if (verbose == ON)` (127)일 때 크기 차이를 출력하고(129–131), verbose와 무관하게 exit(0)한다(133). h와 q를 현재 조립 해·이웃 길이만큼 읽는다(137–138). `if (non_uniform_n) {` (140)이면 `NUMERIC_TYPE* n0 = new NUMERIC_TYPE[d_assem_sol.length]();` (141)로 n0를 값 초기화하여 할당한 뒤 fread와 copy_cuda(d_assem_sol.n0, n0, bytes_sol)를 호출한다(142–143). maxH·maxHtm·initHtm을 최세밀 원소 수만큼 읽는다(147–149). `if (checkv > 1) fread(totalHtm, sizeof(NUMERIC_TYPE), num_finest_elems, check_fp);` (150) 조건에서만 totalHtm을 읽는다. |
+| 152–191 | 시작 시 4–20행 read_chkpnt 함수·90행 파일 열림 else·103행 체크포인트 판본 호환 else 안. 수로·마스크(mask)·dummy·이전 통계 판독은 주석이다(152–164). pars.dx·dy·dA 및 tlx·tly·blx·bly를 sizeof(NUMERIC_TYPE)으로 순서대로 읽는다(166–173). 이어진 통계 판독도 주석이다(175–181). 주석 처리된 조건은 `//			if (checkv > 2) {` (183)이고 그 내부 fread와 닫기도 주석이다(184–186). 실제 경과 시간 로그는 `if (verbose == ON) printf("\n - Computation time so far: %.4" NUM_FMT" hrs, Sim time: %.3" NUM_FMT" of %.3" NUM_FMT" secs\n", (solver.itrn_time / C(3600.0)), solver.t, solver.Sim_Time);` (188)이다. 이 식의 시간 변환은 solver.itrn_time / C(3600.0)이다. fclose를 호출한다(189). 판본 호환 else와 파일 열림 else를 닫는다(190–191). |
+| 192–212 | 시작 시 4–20행 read_chkpnt 함수 안이며 85–191행 파일·판본 분기 밖. copy_cuda로 h를 d_assem_sol.h에, q를 d_non_uniform_nghbrs.q에 복사한다(194–195). maxH·totalHtm·maxHtm·initHtm을 각각 대응하는 장치 배열에 복사한다(197–200). h·q와 네 통계 배열을 delete[]로 해제한다(202–208). 반환과 함수 닫기 및 빈 줄을 포함한다(209–212). |
+
+## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
+
+- 29·158·160·176·181: dummy는 선언되지만 관련 fread 문장은 모두 주석이다. 활성 실행문에서 dummy를 사용하지 않는다.
+- 70–80·85–103·194–200: 호스트 배열은 0으로 값 초기화된다. 파일이 없거나 첫 판독에서 EOF이거나 checkv가 맞지 않아도 마지막의 여섯 장치 배열 복사는 실행된다.
+- 140–144·202–208: non_uniform_n 분기에서 n0를 new[]로 할당하여 장치로 복사한다. 이 함수의 해제 목록에는 n0가 없다.
+- 96–103·189–191: fclose는 체크포인트 판본이 맞는 103행 else 안에만 있다. EOF 또는 체크포인트 판본 불일치 분기에는 fclose 호출이 없다.
+- 96–188: fread의 반환 원소 수는 검사하지 않는다. EOF 검사는 checkv를 처음 읽은 직후에만 있다(97).
