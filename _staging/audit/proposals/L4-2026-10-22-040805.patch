@@ -1,0 +1,96 @@
+diff --git a/models/EFDC/source-analysis/efdc_gvc_legacy.md b/models/EFDC/source-analysis/efdc_gvc_legacy.md
+--- a/models/EFDC/source-analysis/efdc_gvc_legacy.md
++++ b/models/EFDC/source-analysis/efdc_gvc_legacy.md
+@@ -4,6 +4,7 @@
+ component: source-analysis/legacy-branch
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "기존 판독 기록: EFDC-GVC 파일·헤더·본문 대조. recovery 재판독 대조: 진입 분기, 직접 호출 순서, GVC 전용 처리, EFDC+ 대응 구현. 모델 실행·수치 오차·물리 타당성·공통 헤더 내부 선언·빌드 프로젝트·라이선스 전문·GVC 입력 매뉴얼 전체 형식은 확인하지 않음."
+ note_author: "Claude Opus 4.8 (1M context)"
+ note_date: 2026-06-18
+diff --git a/models/EFDC/source-analysis/efdc_hydraulic_structures.md b/models/EFDC/source-analysis/efdc_hydraulic_structures.md
+--- a/models/EFDC/source-analysis/efdc_hydraulic_structures.md
++++ b/models/EFDC/source-analysis/efdc_hydraulic_structures.md
+@@ -3,6 +3,7 @@
+ topic: general
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "EFDC source code 직접 분석 (models/EFDC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/efdc_hydraulic_structures.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
+ note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
+ note_date: 2026-04~05 (original) / 2026-05-23 (promote)
+@@ -176,7 +177,7 @@
+ | Sharp-crested rectangular weir | `7`, `HS_XSTYPE=1` | Free flow; Villemonte submerged auto |
+ | V-notch weir | `7`, `HS_XSTYPE=2` | Triangular Q∝H^2.5 |
+ | Trapezoidal weir | `7`, `HS_XSTYPE=3` | Combined rectangular+triangular |
+-| Broad-crested weir | `7`, `HS_XSTYPE=8` | C-coefficient typically 0.55-0.6 |
++| Broad-crested weir | `7`, `HS_XSTYPE=8` | C-coefficient typically 0.55-0.6 `source-needed`(계수 범위 출전 미확보) |
+ | Submerged weir | `11` | Always submerged; uses `HS_COEFF(:,3)` |
+ | Sluice gate | `6` | Auto-detects free/submerged/transition |
+ | Vertical lift gate (controlled) | `6` with rule control | Time-series or WSEL trigger |
+@@ -190,12 +191,12 @@
+ 
+ - For weirs, `WOPEN` is crest length (m); `HOPEN` is invert depth.
+ - Sluice gate `WOPEN×HOPEN` defines opening area; ramp via `RATE` parameter.
+-- Culvert Manning n in `HS_MANN`; typical 0.012-0.018 for concrete, 0.024 for corrugated metal.
++- Culvert Manning n in `HS_MANN`; typical 0.012-0.018 for concrete, 0.024 for corrugated metal. `source-needed`(재질별 typical 값 출전 미확보)
+ - Pumps via operation rules require `QCTRULES.INP` with bit-16 `PARAM`.
+ - Time-series control vs rule control: `QCTLSER.INP` for prescribed schedules; `QCTRULES.INP` for state-dependent.
+ - Navigation locks (`NQCTYP=9`) toggle face masks; set `IL_LCK` for which faces; for full lock simulation, supplement with mass tracking externally.
+ - Verify structure flow in output: `QHS` per structure; sign convention upstream→downstream positive.
+-- For coastal cases (Korean tidal gates): typically `NQCTYP=6` with rule control responding to upstream tide.
++- For coastal cases (Korean tidal gates): typically `NQCTYP=6` with rule control responding to upstream tide. `source-needed`(관행 관찰 — experience/ 이관 후보, 절대규칙 #2)
+ 
+ ## Common Pitfalls
+ 
+diff --git a/models/EFDC/source-analysis/efdc_hydro_core.md b/models/EFDC/source-analysis/efdc_hydro_core.md
+--- a/models/EFDC/source-analysis/efdc_hydro_core.md
++++ b/models/EFDC/source-analysis/efdc_hydro_core.md
+@@ -3,6 +3,7 @@
+ topic: currents
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "EFDC source code 직접 분석 (models/EFDC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/efdc_hydro_core.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
+ note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
+ note_date: 2026-04~05 (original) / 2026-05-23 (promote)
+@@ -113,10 +114,10 @@
+ 
+ ## Working Rules
+ 
+-- 3TL with overly long `NTSTBC` (>100) lets leapfrog computational mode grow — symptom is checkerboard `HP` field; cure is shorter `NTSTBC`.
++- 3TL with overly long `NTSTBC` (>100) lets leapfrog computational mode grow — symptom is checkerboard `HP` field; cure is shorter `NTSTBC`. `source-needed`(임계·증상 출전 미확보)
+ - The PCG tolerance (`RPADJ`-related) defaults work for most cases; tighten only if PCG iteration count is large *and* mass-balance closure is poor.
+ - HDMT는 ISTL=3으로 진입한다. (`hdmt.f90:387` — `ISTL = 3`) 보정 조건은 NCTBC=NTSTBC이다. (`aaefdc.f90:478` — `NCTBC = 1`; `hdmt.f90:1335` — `if( NCTBC == NTSTBC )then`) 재시작 직후가 자동으로 ISTL=2인지는 확인하지 않음. (`hdmt.f90:387` — `ISTL = 3`)
+-- Non-hydrostatic mode requires `KC>=4` for meaningful pressure projection; `KC=2` usually under-resolves.
++- Non-hydrostatic mode requires `KC>=4` for meaningful pressure projection; `KC=2` usually under-resolves. `source-needed`(KC 하한 출전 미확보)
+ - Open BC `LOPENBCDRY` flag (`setopenbc.f90:295-306, etc.`) auto-disables a BC cell when forced elevation falls below `BELV` — important for tide gauges near dry land.
+ 
+ ## Common Pitfalls
+diff --git a/models/EFDC/source-analysis/efdc_ice.md b/models/EFDC/source-analysis/efdc_ice.md
+--- a/models/EFDC/source-analysis/efdc_ice.md
++++ b/models/EFDC/source-analysis/efdc_ice.md
+@@ -3,6 +3,7 @@
+ topic: general
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "EFDC source code 직접 분석 (models/EFDC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/efdc_ice.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
+ note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
+ note_date: 2026-04~05 (original) / 2026-05-23 (promote)
+@@ -149,12 +150,12 @@
+ ## Working Rules
+ 
+ - 문서는 CDICE의 DEFAULT를 0.001로 적는다. (EFDC_Manual.pdf, PDF 51쪽·인쇄 47쪽) 현재 C46A는 CDICE를 읽는다. (`input.f90:2626` — `read(1,*,IOSTAT = ISO) ISICE, NISER, TEMPICE, CDICE, ICETHMX, RICETHK0`; `caltsxy.f90:714` — `! *** SHEAR ON TOP WATER LAYER DUE TO DRAG ON BOTTOM OF ICE (CDICE = 0.001)`; EFDC_Manual.pdf, PDF 51쪽·인쇄 47쪽) 확인한 .f90에서 CDICE=0.001 기본 대입을 찾지 못했다. (`input.f90:2626` — `read(1,*,IOSTAT = ISO) ISICE, NISER, TEMPICE, CDICE, ICETHMX, RICETHK0`; `caltsxy.f90:714` — `! *** SHEAR ON TOP WATER LAYER DUE TO DRAG ON BOTTOM OF ICE (CDICE = 0.001)`; EFDC_Manual.pdf, PDF 51쪽·인쇄 47쪽) caltsxy의 0.001은 주석이다. (`input.f90:2626` — `read(1,*,IOSTAT = ISO) ISICE, NISER, TEMPICE, CDICE, ICETHMX, RICETHK0`; `caltsxy.f90:714` — `! *** SHEAR ON TOP WATER LAYER DUE TO DRAG ON BOTTOM OF ICE (CDICE = 0.001)`; EFDC_Manual.pdf, PDF 51쪽·인쇄 47쪽) 0.005의 근거는 확인하지 않음. (`input.f90:2626` — `read(1,*,IOSTAT = ISO) ISICE, NISER, TEMPICE, CDICE, ICETHMX, RICETHK0`; `caltsxy.f90:714` — `! *** SHEAR ON TOP WATER LAYER DUE TO DRAG ON BOTTOM OF ICE (CDICE = 0.001)`; EFDC_Manual.pdf, PDF 51쪽·인쇄 47쪽) 결론: 표기 차이. C46A의 CDICE=0.001은 문서와 입력 화면에 제시된 기본값이며 계산기는 C46A에서 CDICE를 읽는다. (근거: `_staging/recovery/read/EFDC/manuals/pdfs/EFDC_Manual.pdf/p037-054.md:27` — `(DEFAULT = 0.001)`<br>`models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:2626` — `read(1,*,IOSTAT = ISO) ISICE, NISER, TEMPICE, CDICE, ICETHMX, RICETHK0`<br>`models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/caltsxy.f90:714` — `! *** SHEAR ON TOP WATER LAYER DUE TO DRAG ON BOTTOM OF ICE (CDICE = 0.001)`<br>`models/EFDC/raw/manuals/confluence/spaces/EK/pages/EFDC_Explorer_12_Knowledge_Base/EFDC_Explorer_12_User_Guide/Model_Control_Form/Modules/Temperature/Ice.md:55` — `shows the default values of the ice parameters`<br>`models/EFDC/raw/manuals/refs/EFDC_Parameters_Guide.md:3661` — `(DEFAULT = 0.001)`<br>`models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:2626` — `CDICE`<br>대조 보고서가 인용한 그림: `models/EFDC/raw/manuals/confluence/spaces/EK/pages/EFDC_Explorer_12_Knowledge_Base/EFDC_Explorer_12_User_Guide/Model_Control_Form/Modules/Temperature/Ice.md:61`, `models/EFDC/raw/manuals/confluence/spaces/EK/attachments/2177761281/ice4.png` — `Drag Coefficient for Ice/Water Contact:` — `0.001`; [EFDC-input-cards-vs-code §5 행 1292](../../../_staging/recovery/compare/EFDC-input-cards-vs-code.md:2585)) 결론: 코드 대조 대상 아님. CDICE의 typical 0.001–0.005는 출전이 없는 실무 권고 주장이다. 코드의 입력·항력 계산 위치만 확인했다. (근거: PDF 51쪽 판독 기록 — `_staging/recovery/read/EFDC/manuals/pdfs/EFDC_Manual.pdf/p037-054.md:27` — `(DEFAULT = 0.001)`<br>`models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/input.f90:2626` — `read(1,*,IOSTAT = ISO) ISICE, NISER, TEMPICE, CDICE, ICETHMX, RICETHK0`<br>`models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/caltsxy.f90:714` — `! *** SHEAR ON TOP WATER LAYER DUE TO DRAG ON BOTTOM OF ICE (CDICE = 0.001)`<br>`models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/caltsxy.f90:715` — `TAUICE = -CDICE*SQRT( U(L,KC)*U(L,KC) + V(L,KC)*V(L,KC) )`; [EFDC-input-cards-vs-code §5 행 2437](../../../_staging/recovery/compare/EFDC-input-cards-vs-code.md:2586))
+-- `GAMMAI` (under-ice solar attenuation): 1-3 m⁻¹ for clear ice; higher for snow-covered.
++- `GAMMAI` (under-ice solar attenuation): 1-3 m⁻¹ for clear ice; higher for snow-covered. `source-needed`(값 범위 출전 미확보)
+ - `RICETHK0` (initial ice thickness for `ISICE>=3`): set realistic value to avoid spin-up.
+ - `ICETHMX` (max thickness cap): prevents unphysical accumulation.
+ - For `ISICE=1`, time series must cover entire run period; otherwise extrapolation.
+ - Wave coupling under ice is OFF in code logic; if needed, externally suppress or use `WINDWAVE` flag.
+-- For Korean coast: ice rare; if modeling Yellow Sea winter, `ISICE=1` from observation map.
++- For Korean coast: ice rare; if modeling Yellow Sea winter, `ISICE=1` from observation map. `source-needed`(지역 기후 관찰 출전 미확보 — experience/ 이관 후보)
+ 
+ ## Common Pitfalls
+ 
