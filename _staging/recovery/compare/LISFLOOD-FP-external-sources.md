@@ -190,3 +190,29 @@ $$\Delta t=\frac{\Delta x^{2}}{4}\min\left(\frac{2\,n}{h_{flow}^{5/3}}\left|\fra
 - 노트에 쓸 결론 문장: "bridge판 [16]의 $\Delta x^2/4$는 코드 `fp_flow.cpp:160`의 `C(0.25)`와 같다. Werner & Lambert 식보다 2배 크다는 문장은 외부 문헌 사이의 비교이며 코드 대조 대상이 아니다."
 
 분류별 개수 변화: X 2 → 0. LI2-203은 B, LB1-235는 H.
+
+## 3. 사용자 제공 PDF 대조 (10-21)
+
+사용자가 PDF 두 개를 주었다. Claude가 텍스트를 추출하고, 식은 150 dpi 쪽 이미지(p.979)로 확인했다.
+
+### 3.1 Hunter et al. 2005, *An adaptive time step solution for raster-based storage cell modelling of floodplain inundation*, Adv. Water Resour. 28, 975–991
+
+- p.979 식 (2.7)은 폰 노이만 안정조건 $\Delta t \leqslant \frac{\Delta x^2}{4\alpha}$이다.
+- p.979 식 (2.8)은 $\Delta t = \frac{\Delta x^2}{4}\min\left(\frac{2n}{h_{\rm flow}^{5/3}}\left|\frac{\partial h}{\partial x}\right|^{1/2}, \frac{2n}{h_{\rm flow}^{5/3}}\left|\frac{\partial h}{\partial y}\right|^{1/2}\right)$이다.
+- p.979 원문: "We thus arrive at an expression for the time step similar in form to that used by [29] but larger by a factor of 2. In [29] the time step was set to allow small chequerboard oscillations to decay down to a flat free surface, whereas in this analysis we counter the build up of these oscillations directly, and hence can use a larger time step."
+- p.991 참고문헌 [29]는 "Werner MGF, Lambert MF. Evaluation of modelling approaches for river reach scale inundation modelling. J Hydraulic Res, in press."이다.
+- p.978 원문은 [29]가 "used a LISFLOOD-FP type code with an adaptive time step that was decreased whenever the flow limiter of Eq. (2.1) was invoked"라고 적는다. 식 (2.1)은 $Q_x^{i,j} = \min\left(Q_x^{i,j}, \frac{\Delta x\Delta y\,(h^{i,j}-h^{i-1,j})}{4\Delta t}\right)$이다.
+- 결과: bridge 매뉴얼 p.50의 식 [16]과 `factor of 2` 문단은 Hunter 2005 p.979의 식 (2.8)과 문단을 그대로 옮긴 것이다. 계수 $\Delta x^2/4$도 같다. 이 계수는 코드 `fp_flow.cpp:160`의 `C(0.25)`와 같다.
+- Hunter 2005는 [29]의 시간간격 식이나 계수를 적지 않는다. 따라서 "2배" 비율은 이 PDF로 확인할 수 없다.
+
+### 3.2 Werner 2004, *A comparison of flood extent modelling approaches through constraining uncertainties on gauge data*, HESS 8(6), 1141–1152
+
+- 이 논문은 Werner 단독 논문이다. Werner & Lambert(2007, JHR 45(2), 202–215)와 다른 논문이다.
+- 이 논문은 SOBEK의 1D·2D(fls)·1D-2D 모델을 비교한다. 시간간격 식, `chequerboard`, Lambert 인용이 본문에 없다(텍스트 검색 결과 0건).
+- 결과: 이 PDF는 LB1-235의 판정에 쓸 수 없다.
+
+### 3.3 LB1-235 결론
+
+- 결론은 H 코드 대조 대상 아님으로 유지한다.
+- 확인한 것: 매뉴얼 문장의 출처는 Hunter 2005 p.979이며, 매뉴얼은 그 식과 문장을 바꾸지 않고 옮겼다.
+- 확인하지 않은 것: Werner & Lambert(2007) 원문의 시간간격 계수. 이 비율을 확인하려면 JHR 45(2), 202–215 원문이 필요하다.
