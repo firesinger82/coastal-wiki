@@ -216,3 +216,18 @@ $$\Delta t=\frac{\Delta x^{2}}{4}\min\left(\frac{2\,n}{h_{flow}^{5/3}}\left|\fra
 - 결론은 H 코드 대조 대상 아님으로 유지한다.
 - 확인한 것: 매뉴얼 문장의 출처는 Hunter 2005 p.979이며, 매뉴얼은 그 식과 문장을 바꾸지 않고 옮겼다.
 - 확인하지 않은 것: Werner & Lambert(2007) 원문의 시간간격 계수. 이 비율을 확인하려면 JHR 45(2), 202–215 원문이 필요하다.
+
+### 3.4 Werner & Lambert 2007, *Comparison of modelling approaches used in practical flood extent modelling*, JHR 45(2), 202–215
+
+- 사용자가 준 PDF는 Taylor & Francis 배포본 15쪽(표지 1쪽 포함)이다. 본문은 스캔 이미지이며 OCR 글자층이 있다. Claude가 OCR 글자를 검색하고, LISFLOOD-FP 설명이 있는 206–207쪽은 130 dpi 쪽 이미지로 확인했다.
+- 본문의 식 번호는 (1)–(6)에서 끝난다. LISFLOOD-FP(논문 이름 `lfp`)의 식은 207쪽 식 (6)의 연속식과 Manning형 셀 간 유량식뿐이다.
+- 207쪽 원문: "In the original code a floodplain flow limiter was applied to maintain stability at relatively large time steps, but in application of the code here this limiter was replaced by an adaptive time stepping scheme."
+- 이 논문은 적응 시간간격의 식, 계수, `chequerboard` 서술을 적지 않는다. OCR 검색에서 `chequer`, `oscillat`, `Courant`, `von Neumann`은 0건이다. 기호표(Notation)에도 시간간격 기호가 보이지 않는다.
+- 결과: 출판본에는 Hunter 2005가 비교한 시간간격 식이 없다. Hunter 2005가 인용한 "in press" 판(제목이 *Evaluation of modelling approaches for river reach scale inundation modelling*)에 그 식이 있었는지는 이 PDF로 알 수 없다.
+
+### 3.5 LB1-235 최종
+
+- 결론은 H 코드 대조 대상 아님으로 유지한다.
+- 확인한 것: 매뉴얼의 식 [16]과 `factor of 2` 문단은 Hunter 2005 p.979 식 (2.8)과 문단을 옮긴 것이다. 계수 $\Delta x^2/4$는 코드 `fp_flow.cpp:160`의 `C(0.25)`와 같다.
+- 확인한 것: "2배"의 비교 대상 식은 Werner & Lambert 2007 출판본에 없다. 이 비율은 출판된 문헌으로 검증할 수 없는 주장이다.
+- 이 행은 코드 동작 주장이 아니므로 노트를 바꾸지 않는다.
