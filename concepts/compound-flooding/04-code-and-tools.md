@@ -4,7 +4,7 @@ topic: compound-flooding
 canonical_source: self
 citation_status: verified
 has_source_needed: true
-verification_method: "[[03-analysis-methods]] §6 이 '확률 해석과 모델 강제를 잇는 고리가 비어 있다' 로 남긴 공백을 채운다. 본 노트의 모델 단언은 **전부 본 위키의 verified source-analysis·manual-notes 노트로 소급**한다(절대규칙 #6 — 모델 메커닉은 models/ 소관, 여기는 요약+링크): SFINCS [[sfincs_boundaries_forcing]](sfincs_boundaries.f90·sfincs_discharges.f90·sfincs_meteo.f90·sfincs_spiderweb.f90·sfincs_infiltration.f90 직접 read), LISFLOOD-FP [[lisflood-fp-io-boundary]](input.cpp·pars.cpp·boundary.cpp·infevap.cpp 직접 read), ADCIRC [[adcirc-met-forcing-implementation]]·[[adcirc-tidal-forcing]]·[[17-boundary-and-forcing-inputs]]. **본 세션에서 새로 실측한 것 1건**: LISFLOOD-FP C/C++/CUDA 소스 **전수 623개**(`*.cpp` 83 + `*.h` 388 + `*.cu` 152, 하위 디렉터리 포함 전부)에서 `tidal|harmonic|constituent` 매칭 **0개** — 조석 합성 부재를 '노트에 안 보인다' 가 아니라 수를 세어 확인했다. 계수는 `<!-- count: -->` 지시자로 G10(`tools/validate-counts.sh`)이 glob 실측 재현한다. ★첫 측정에서 `grep -v "^./test"` 가 `testing/` 과 `tests.cpp` 까지 걷어내 616으로 나왔다 — 제외 패턴을 다시 세어 623으로 정정했다(매칭 0은 세 변형 모두 동일). 부재의 반대증거로 Tauranga 시험사례 `testing/UoS/tauranga/preprocess.py` 가 외부 조위계 자료를 읽어 `tauranga.bdy` 를 **직접 생성**함을 확인했다. **한계**: Delft3D·EFDC 의 외력 인터페이스는 대조에 넣지 않았다(§6). 질량수지 회계는 LISFLOOD-FP 만 확인했다."
+verification_method: "[[03-analysis-methods]] §6 이 '확률 해석과 모델 강제를 잇는 고리가 비어 있다' 로 남긴 공백을 채운다. 본 노트의 모델 단언은 **전부 본 위키의 verified source-analysis·manual-notes 노트로 소급**한다(절대규칙 #6 — 모델 메커닉은 models/ 소관, 여기는 요약+링크): SFINCS [[sfincs_boundaries_forcing]](sfincs_boundaries.f90·sfincs_discharges.f90·sfincs_meteo.f90·sfincs_spiderweb.f90·sfincs_infiltration.f90 직접 read), LISFLOOD-FP [[lisflood-fp-io-boundary]](input.cpp·pars.cpp·boundary.cpp·infevap.cpp 직접 read), ADCIRC [[adcirc-met-forcing-implementation]]·[[adcirc-tidal-forcing]]·[[17-boundary-and-forcing-inputs]]. **본 세션에서 새로 실측한 것 1건**: LISFLOOD-FP C/C++/CUDA 소스 **전수 626개**(`*.cpp` 84 + `*.h` 390 + `*.cu` 152, 하위 디렉터리 포함 전부, 2026-10-21 원자료 8.3 교체 뒤 재실측; 교체 전 8.2는 623개)에서 `tidal|harmonic|constituent` 매칭 **0개** — 조석 합성 부재를 '노트에 안 보인다' 가 아니라 수를 세어 확인했다. 계수는 `<!-- count: -->` 지시자로 G10(`tools/validate-counts.sh`)이 glob 실측 재현한다. ★첫 측정에서 `grep -v "^./test"` 가 `testing/` 과 `tests.cpp` 까지 걷어내 616으로 나왔다 — 제외 패턴을 다시 세어 623으로 정정했다(매칭 0은 세 변형 모두 동일). 부재의 반대증거로 Tauranga 시험사례 `testing/UoS/tauranga/preprocess.py` 가 외부 조위계 자료를 읽어 `tauranga.bdy` 를 **직접 생성**함을 확인했다. **한계**: Delft3D·EFDC 의 외력 인터페이스는 대조에 넣지 않았다(§6). 질량수지 회계는 LISFLOOD-FP 만 확인했다."
 note_author: "Claude Opus 5 (1M context)"
 note_date: 2026-09-22
 related:
@@ -38,12 +38,12 @@ ADCIRC 는 해일을 스스로 만든다.**
 
 ### ★ LISFLOOD-FP 에 조석이 없다는 것의 의미
 
-이것은 노트에 안 보여서 내린 추정이 아니라 **센 것**이다. C/C++/CUDA 소스 **전수 623개**에서
+이것은 노트에 안 보여서 내린 추정이 아니라 **센 것**이다. C/C++/CUDA 소스 **전수 626개**에서
 `tidal|harmonic|constituent` 매칭이 **0개**다. 반대증거도 있다 —
 Tauranga 시험사례의 전처리 스크립트가 외부 조위계 자료를 읽어 `tauranga.bdy` 를 직접 만든다.[^lf-notide]
 
-<!-- count: models/LISFLOOD-FP/raw/source_code/LISFLOOD-FP/**/*.cpp = 83 -->
-<!-- count: models/LISFLOOD-FP/raw/source_code/LISFLOOD-FP/**/*.h = 388 -->
+<!-- count: models/LISFLOOD-FP/raw/source_code/LISFLOOD-FP/**/*.cpp = 84 -->
+<!-- count: models/LISFLOOD-FP/raw/source_code/LISFLOOD-FP/**/*.h = 390 -->
 <!-- count: models/LISFLOOD-FP/raw/source_code/LISFLOOD-FP/**/*.cu = 152 -->
 
 그래서 LISFLOOD-FP 로 복합침수를 하면 **조석+해일 합성이 모델 밖에서 일어난다.**
@@ -149,7 +149,7 @@ checkpoint 에도 저장한다.[^lf-mass] 복합침수에서 이것은 진단 �
 [^sf-spw]: [[sfincs_boundaries_forcing]] §4 — "태풍 parametric wind(Holland 류 등 외부 생성 .spw 극좌표 격자)을 읽는 저수준 I/O. **물리 모델(Holland)은 SFINCS 내부에 없음**" (`sfincs_spiderweb.f90` 전반). 바람은 land reduction(Westerink et al. 2008) 포함해 stress 로 변환(`sfincs_meteo.f90:709-740`).
 [^sf-extend]: [[sfincs_boundaries_forcing]] §1.1 — "시계열이 시뮬레이션 구간을 못 덮으면 경고 후 첫/끝 시각을 `t0-1.0` / `t1+1.0` 으로 강제 보정"(`sfincs_boundaries.f90:143-164`).
 [^sf-spinup]: [[sfincs_boundaries_forcing]] §3.3 — "spw 시간범위 밖이면 첫/끝 시점 사용 + **6시간(21600s) ramp** spin-up factor"(`sfincs_meteo.f90:476-494`). 별도로 meteo 전반 spin-up 은 `(t-t_0)/(t_{spinup}-t_0)` ramp(`:1336-1385`), 경계 수위도 `t<tspinup` 구간에 `zini` 와 가중평균 smoothing(`sfincs_boundaries.f90:851-862`).
-[^lf-notide]: 본 세션 실측(2026-09-22, pinned snapshot): `models/LISFLOOD-FP/raw/source_code/LISFLOOD-FP` 하위 `*.cpp`(83)·`*.h`(388)·`*.cu`(152) **전수 623개**에 대해 `grep -ril "tidal\|harmonic\|constituent"` → **0개**. `test/` 디렉터리 6개를 빼도(617개) 결과는 같다. 매칭은 저장소 전체로 넓혔을 때 `testing/UoS/{hilo,tauranga}/*.py` 전·후처리 스크립트와 `test/catch.hpp`(확장자 `.hpp` 라 위 623 집합 밖)에만 존재한다. Tauranga 시험사례 `testing/UoS/tauranga/preprocess.py` 는 외부 `input-data/tide_gauge.txt` 를 읽어(`:18`) `tidal = total − tsunami` 로 분해하고(`:24` 등) `write_bdy_file`(`:203`)로 `tauranga.bdy` 를 생성해 parfile `bdyfile` 로 연결한다(`:356`). 즉 조석은 **모델 밖에서 만들어 주입**된다. 경계 종류 목록 자체는 [[lisflood-fp-io-boundary]] §3(`lisflood.h:177-190`)에 천문조 항목이 없다.
+[^lf-notide]: 본 세션 실측(2026-09-22, pinned snapshot): `models/LISFLOOD-FP/raw/source_code/LISFLOOD-FP` 하위 `*.cpp`(83)·`*.h`(388)·`*.cu`(152) **전수 623개**에 대해 `grep -ril "tidal\|harmonic\|constituent"` → **0개**. 2026-10-21 원자료를 Zenodo 8.3(8.2 + 공식 패치, Metal 경로 추가)으로 바꾼 뒤 `*.cpp` 84·`*.h` 390·`*.cu` 152, 626개로 다시 셌고 매칭은 여전히 0개다. `test/` 디렉터리 6개를 빼도(617개) 결과는 같다. 매칭은 저장소 전체로 넓혔을 때 `testing/UoS/{hilo,tauranga}/*.py` 전·후처리 스크립트와 `test/catch.hpp`(확장자 `.hpp` 라 위 623 집합 밖)에만 존재한다. Tauranga 시험사례 `testing/UoS/tauranga/preprocess.py` 는 외부 `input-data/tide_gauge.txt` 를 읽어(`:18`) `tidal = total − tsunami` 로 분해하고(`:24` 등) `write_bdy_file`(`:203`)로 `tauranga.bdy` 를 생성해 parfile `bdyfile` 로 연결한다(`:356`). 즉 조석은 **모델 밖에서 만들어 주입**된다. 경계 종류 목록 자체는 [[lisflood-fp-io-boundary]] §3(`lisflood.h:177-190`)에 천문조 항목이 없다.
 [^lf-bci]: [[lisflood-fp-io-boundary]] §3 — `ESourceType` enum(`lisflood.h:177-190`): `NONE0`/`FREE1`/`HFIX2`/`HVAR3`/`QFIX4`/`QVAR5`/`FREE6`/`TRIB7`/`RATE8`. `.bci` 라인은 `{N/S/E/W} start finish {TYPE}` 또는 `{P/F} px py {TYPE}`(`input.cpp:1584-1652`). `.bdy` 는 명명 시계열 블록을 `BC_Name`/`Q_Name`/`PS_Name` 과 strcmp 매칭해 연결(`input.cpp:2020-2059`).
 [^lf-noseries]: [[lisflood-fp-io-boundary]] §3 — "bdy 파일 없으면 QVAR/HVAR로 지정됐는데 시계열 없는 경계는 `NONE0`으로 비활성화"(`input.cpp:2100-2116`). 미참조 bdy 시계열은 경고 후 폐기(`:2065-2074`).
 [^lf-mono]: [[lisflood-fp-io-boundary]] §3 — `LoadTimeSeries` 가 시간 단조증가를 강제하고 위반 시 abort(`input.cpp:1905-1909`). 단위는 `seconds/minutes/hours/days` 인식 후 초 환산, **미인식 단위는 경고 후 초로 간주**(`:1920-1932`).
