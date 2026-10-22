@@ -1,0 +1,42 @@
+diff --git a/models/EFDC/source-analysis/efdc_misc_modules.md b/models/EFDC/source-analysis/efdc_misc_modules.md
+--- a/models/EFDC/source-analysis/efdc_misc_modules.md
++++ b/models/EFDC/source-analysis/efdc_misc_modules.md
+@@ -3,6 +3,7 @@
+ topic: efdc
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "models/EFDC/raw/source_code/EFDCPlus_Stable/EFDC/ 직접 read — calstepd.f90(387 dynamic dt) + calvegser.f90(69) + cellmask.f90(358) + negdep.f90(311) + mhkpwr.f90(324) + mod_fields.f90(585) + runcontrol.f90(71) + showval/timelog/tmsr/welcome 헤더 file:line 인용."
+ note_author: "Claude Opus 4.8 (1M context) source-code direct read"
+ note_date: 2026-06-04
+diff --git a/models/EFDC/source-analysis/efdc_rpem_vegetation.md b/models/EFDC/source-analysis/efdc_rpem_vegetation.md
+--- a/models/EFDC/source-analysis/efdc_rpem_vegetation.md
++++ b/models/EFDC/source-analysis/efdc_rpem_vegetation.md
+@@ -3,6 +3,7 @@
+ topic: efdc-rpem-vegetation
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "EFDC+ Stable(12.4, sha 3ed76b6) raw source 직접 read: Eutrophication/mod_rpem.f90(1413) — shoot growth EQ5(:299)·implicit update EQ1(:360-363) file:line 직접 검증. WQ3D dispatch(mod_wq.f90:361). 범위=driver CAL_RPEM + shoot 성장 프로세스(roots/epiphytes/detritus 요약). [[efdc_water_quality]] 는 filename/future-task 로만 언급."
+ note_author: "Claude Opus 4.8 (1M context)"
+ note_date: 2026-07-04
+diff --git a/models/EFDC/source-analysis/efdc_turbulence.md b/models/EFDC/source-analysis/efdc_turbulence.md
+--- a/models/EFDC/source-analysis/efdc_turbulence.md
++++ b/models/EFDC/source-analysis/efdc_turbulence.md
+@@ -3,6 +3,7 @@
+ topic: general
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "EFDC source code 직접 분석 (models/EFDC/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/efdc_turbulence.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시."
+ note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
+ note_date: 2026-04~05 (original) / 2026-05-23 (promote)
+@@ -178,7 +179,7 @@
+ 
+ - AVO·ABO·AVMX·ABMX는 C12 입력값이다. (`input.f90:643` — `read(1,*,IOSTAT = ISO) AHO, AHD, AVO, ABO, AVMX, ABMX, VISMUD, AVCON, ZBRWALL`) 확인한 원문은 1E−5와 0.5를 공통 기본값으로 고정하지 않는다. (`input.f90:643` — `read(1,*,IOSTAT = ISO) AHO, AHD, AVO, ABO, AVMX, ABMX, VISMUD, AVCON, ZBRWALL`) Confluence C12의 수치 행은 카드 예시이다. (`models/EFDC/raw/manuals/confluence/spaces/ECIG/pages/Overview/EFDC_Cards/Card_Image_12.md:41` — `|  | 0 | 0.025 | 0.000001 | 1.00E-07 | 0.000001 | 1.00E-07 | 0 | 1 | 0.002 |`) ‘never set to zero’는 확인한 코드 제약으로 입증하지 못했다. (`input.f90:643` — `read(1,*,IOSTAT = ISO) AHO, AHD, AVO, ABO, AVMX, ABMX, VISMUD, AVCON, ZBRWALL`) 특정 안정성 효과는 실행 결과가 있어야 확인한다. (`calavb.f90:273` — `AVTMP = AVMX*HPI(L)`; `calavb.f90:275` — `AV(L,K) = min(AV(L,K),AVTMP)`)
+ - AVO·ABO·AVMX·ABMX는 C12 입력값이다. (`input.f90:643` — `read(1,*,IOSTAT = ISO) AHO, AHD, AVO, ABO, AVMX, ABMX, VISMUD, AVCON, ZBRWALL`) 확인한 원문은 1E−5와 0.5를 공통 기본값으로 고정하지 않는다. (`input.f90:643` — `read(1,*,IOSTAT = ISO) AHO, AHD, AVO, ABO, AVMX, ABMX, VISMUD, AVCON, ZBRWALL`) AVMX 상한은 선택 경로에서 AVMX/H로 적용한다. (`calavb.f90:273` — `AVTMP = AVMX*HPI(L)`; `calavb.f90:275` — `AV(L,K) = min(AV(L,K),AVTMP)`) 특정 안정성 효과는 실행 결과가 있어야 확인한다. (`calavb.f90:273` — `AVTMP = AVMX*HPI(L)`; `calavb.f90:275` — `AV(L,K) = min(AV(L,K),AVTMP)`)
+-- For GOTM coupling, ensure `gotm_input.nml` is consistent with EFDC vertical resolution; mismatched layer counts crash silently.
++- For GOTM coupling, ensure `gotm_input.nml` is consistent with EFDC vertical resolution; mismatched layer counts crash silently(source-needed: 층수 불일치 시 거동의 소스 라인·재현 근거 미확인 — 2026-08-11 감사 지적 잔존).
+ - `ISTOPT(0)` change between Galperin/Kantha mid-run is non-trivial — close the run, restart cleanly.
+ - MY2.5 dissipation is implicit-in-diagonal; explicit dissipation forms in older theory papers don't apply to this code.
+ 
