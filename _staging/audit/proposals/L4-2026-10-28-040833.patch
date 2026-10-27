@@ -1,0 +1,49 @@
+diff --git a/models/LISFLOOD-FP/source-analysis/lisflood-fp-cuda-gpu.md b/models/LISFLOOD-FP/source-analysis/lisflood-fp-cuda-gpu.md
+--- a/models/LISFLOOD-FP/source-analysis/lisflood-fp-cuda-gpu.md
++++ b/models/LISFLOOD-FP/source-analysis/lisflood-fp-cuda-gpu.md
+@@ -4,6 +4,7 @@
+ component: cuda-gpu
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "cuda/{cuda_simulate.cu, cuda_solver.cu, cuda_hll.cu, cuda_flow.cu, cuda_boundary.cu, ghostraster.cpp} 및 fv1/cuda_fv1_{flow,solver,simulate}.cu, cuda_solver.cuh, cuda_solver.templates.cu, params.h, cuda_atomic.cuh 직접 read 후 file:line 인용; 2026-10-21 LISFLOOD-FP recovery 대조 보고서 반영"
+ last_source_check: "2026-10-21 (recovery 대조 반영)"
+ note_author: "Claude Opus 4.8 (1M context)"
+@@ -90,7 +91,7 @@
+ 
+ **속도 복원**: wet 쪽만 $U=HU/H$ (`cuda_hll.cu:30-44`).
+ 
+-**파속(wave speed) 추정** — Toro 의 two-rarefaction / 정적 추정:
++**파속(wave speed) 추정** — Toro 의 two-rarefaction / 정적 추정: <!-- source-needed: 방법 귀속 — Toro two-rarefaction(TRRS) 문헌 인용 필요 (예: Toro 2001, Shock-Capturing Methods for Free-Surface Shallow Flows) -->
+ $$A=\sqrt{gH},\quad H^\star=\frac{\left[\tfrac12(A_-+A_+)+\tfrac14(U_--U_+)\right]^2}{g}$$
+ (`cuda_hll.cu:46-52`).
+ 
+diff --git a/models/LISFLOOD-FP/source-analysis/lisflood-fp-swe-fv1-dg2.md b/models/LISFLOOD-FP/source-analysis/lisflood-fp-swe-fv1-dg2.md
+--- a/models/LISFLOOD-FP/source-analysis/lisflood-fp-swe-fv1-dg2.md
++++ b/models/LISFLOOD-FP/source-analysis/lisflood-fp-swe-fv1-dg2.md
+@@ -4,6 +4,7 @@
+ component: swe-solver
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "swe/{fv1,dg2,dg2new,hll,flux,fields,boundary}.cpp + hll_include.h + dg2new.h 전수 Read, dispatch는 v8.2:lisflood.cpp:775-792 직접 확인 (2026-06-18); 2026-10-21 LISFLOOD-FP recovery 대조 보고서 반영"
+ last_source_check: "2026-10-21 (recovery 대조 반영)"
+ note_author: "Claude Opus 4.8 (1M context)"
+@@ -238,7 +239,7 @@
+ L_{1x}=-\frac{\sqrt3}{\Delta x}\Big(F_w+F_e-F(G_1)-F(G_2)\Big)
+ $$
+ 
+-(`dg2.cpp:885`). $\sqrt3$ 계수는 Legendre 1차 기저의 정규화에서 나온다.
++(`dg2.cpp:885`). $\sqrt3$ 계수는 Legendre 1차 기저의 정규화에서 나온다. <!-- source-needed: 수학 유래 해설 — DG2 scaled Legendre 기저 논문 인용 필요 (예: LISFLOOD-FP 8.0 DG2 논문/Kesserwani 계열) -->
+ 운동량 슬로프에는 `bed_source_1x`(`:888`)를 더한다. L1y는 y대칭(`dg2.cpp:893`).
+ 
+ ### 4.4 DG2 well-balanced 하상 소스 (`dg2.cpp:948`)
+@@ -315,7 +316,7 @@
+   (`:38-74`).
+ - 공간연산자 `space_operator`(`dg2new.cpp:400`)가 4 면을 명시 계산
+   → `wetting_drying`(`:661`)로 면별 $z^\star$ 보정($\eta-z_{LR}$, `:702-708`,
+-  Audusse 류 양수성 보존) → `HLL_x/y`.
++  Audusse 류 양수성 보존) → `HLL_x/y`. <!-- source-needed: 방법 귀속 — Audusse et al. hydrostatic reconstruction 문헌 인용 필요 -->
+ - well-balanced 소스는 `dg2_operator`(`:503`)에 `SS0/SS1x/SS1y`로 내장
+   ($-gH_0\cdot2\sqrt3\,z_{1x}/\Delta x$ 등, `:528, 541, 555`) — `dg2.cpp`의
+   `bed_source_*`와 같은 식을 벡터로 표현.

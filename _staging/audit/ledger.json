@@ -4352,66 +4352,71 @@
     "source_unavailable": []
   },
   "models/LISFLOOD-FP/source-analysis/lisflood-fp-cuda-gpu.md": {
-    "blob_sha": "e0da0b60a58af8bee4f393b4d3dc03c2565ff7a5",
-    "verdict": "verified-confirmed",
-    "has_source_needed": false,
-    "audited_date": "2026-08-16",
-    "audited_at": "2026-08-16T04:03:27.193174",
-    "n_unsourced": 0,
-    "value_checks": [
-      {
-        "claim_id": "bae928bc1a46",
-        "claim": "블록 크기 16×16=256 @ cuda_solver.cuh:2-4",
-        "source_ref": "raw/source_code/LISFLOOD-FP/cuda/cuda_solver.cuh:2-4 직접 판독",
-        "mismatch": false,
-        "note": "#define 3행 값 그대로 일치"
-      }
-    ],
-    "value_mismatches": 0,
-    "source_unavailable": 0
+    "blob_sha": "90f6c11047573a9d7279950a0269cfc6ca8878f8",
+    "verdict": "INTEGRITY-VIOLATION",
+    "has_source_needed": true,
+    "audited_date": "2026-10-28",
+    "audited_at": "2026-10-28T04:08:33.304011",
+    "n_unsourced": 1,
+    "n_value_mismatches": 0
   },
   "models/LISFLOOD-FP/source-analysis/lisflood-fp-io-boundary.md": {
-    "blob_sha": "b358a02b4241b8f6bfcb9a4667ece999d75603cc",
+    "blob_sha": "06f7660c50882b0caa1d64497bcf336c139cee69",
     "verdict": "verified-confirmed",
     "has_source_needed": false,
-    "audited_date": "2026-08-16",
-    "audited_at": "2026-08-16T04:03:27.193174",
-    "n_unsourced": 0
-  },
-  "models/LISFLOOD-FP/source-analysis/lisflood-fp-lisflood2-driver.md": {
-    "blob_sha": "fbcadbc940b7687ce160ceae222d1d3bbd4923a8",
-    "verdict": "verified-confirmed",
-    "has_source_needed": false,
-    "audited_date": "2026-08-16",
-    "audited_at": "2026-08-16T04:03:27.193174",
-    "n_unsourced": 0
-  },
-  "models/LISFLOOD-FP/source-analysis/lisflood-fp-mwdg2-adaptive-mra.md": {
-    "blob_sha": "5e6cad22d9dafdec1b71b28a9d40711184648c19",
-    "verdict": "verified-confirmed",
-    "has_source_needed": false,
-    "audited_date": "2026-08-16",
-    "audited_at": "2026-08-16T04:03:27.193174",
+    "audited_date": "2026-10-28",
+    "audited_at": "2026-10-28T04:08:33.304011",
     "n_unsourced": 0,
+    "n_value_mismatches": 0,
     "value_checks": [
       {
-        "claim_id": "fd01ae58f3dd",
-        "claim": "★qy 정규화 분모를 qx0 배열로 계산하는 copy-paste 버그 @ get_max_scale_coeffs.cu:23 (+M_BAR=1.5 @ extra_significance.cuh:4)",
-        "source_ref": "raw/source_code/LISFLOOD-FP/cuda/adaptive/mra/get_max_scale_coeffs.cu:23·extra_significance.cuh:4 직접 판독",
-        "mismatch": false,
-        "note": "maxes.qy = get_max_from_array(d_assem_sol.qx0, …) 실재 — 노트 finding 정확; M_BAR C(1.5) 일치"
+        "line": 284,
+        "claim": "기본 DepthThresh는 1e-3이다 (lisflood.cpp:174)",
+        "source_ref": "raw/source_code/LISFLOOD-FP/lisflood.cpp:174",
+        "result": "MATCH",
+        "evidence": "lisflood.cpp:174 `ParSolver.DepthThresh = C(1e-3);` (Claude 직접 대조)",
+        "claim_id": "e12a26777dec447e",
+        "selection_note": "표본 선정: 모집단 전수 미열거(대형 표 노트), ledger 값검증 이력이 없는 파일 우선(io-boundary·lisflood2-driver vc:[], io-boundary-differences 신규) — SKILL V1.1 미검사 claim 우선 규칙"
       }
-    ],
-    "value_mismatches": 0,
-    "source_unavailable": 0
+    ]
   },
-  "models/LISFLOOD-FP/source-analysis/lisflood-fp-swe-fv1-dg2.md": {
-    "blob_sha": "a6f8ce99306e849d54603d7a23cf16d6b9c3b90d",
+  "models/LISFLOOD-FP/source-analysis/lisflood-fp-lisflood2-driver.md": {
+    "blob_sha": "9a68d6fded7dfcfd5b6407b269bb19057d2d7e2f",
     "verdict": "verified-confirmed",
     "has_source_needed": false,
-    "audited_date": "2026-08-16",
-    "audited_at": "2026-08-16T04:03:27.193174",
-    "n_unsourced": 0
+    "audited_date": "2026-10-28",
+    "audited_at": "2026-10-28T04:08:33.304011",
+    "n_unsourced": 0,
+    "n_value_mismatches": 0,
+    "value_checks": [
+      {
+        "line": 60,
+        "claim": "grid_cols_padded = grid_cols + 1 + 64/sizeof(NUMERIC_TYPE), GRID_ALIGN_WIDTH 정렬 (:1531-1532)",
+        "source_ref": "raw/source_code/LISFLOOD-FP/lisflood2/lisflood_processing.cpp:1531-1532",
+        "result": "MATCH",
+        "evidence": "lisflood_processing.cpp:1531 `int grid_cols_padded = grid_cols + 1 + (64 / sizeof(NUMERIC_TYPE));` :1532 GRID_ALIGN_WIDTH 보정 (Claude 직접 대조)",
+        "claim_id": "c4ac551ec0f2018a",
+        "selection_note": "표본 선정: 모집단 전수 미열거(대형 표 노트), ledger 값검증 이력이 없는 파일 우선(io-boundary·lisflood2-driver vc:[], io-boundary-differences 신규) — SKILL V1.1 미검사 claim 우선 규칙"
+      }
+    ]
+  },
+  "models/LISFLOOD-FP/source-analysis/lisflood-fp-mwdg2-adaptive-mra.md": {
+    "blob_sha": "b4e2ee3b946412800994c8474ac9ceb65d04a6b2",
+    "verdict": "verified-confirmed",
+    "has_source_needed": false,
+    "audited_date": "2026-10-28",
+    "audited_at": "2026-10-28T04:08:33.304011",
+    "n_unsourced": 0,
+    "n_value_mismatches": 0
+  },
+  "models/LISFLOOD-FP/source-analysis/lisflood-fp-swe-fv1-dg2.md": {
+    "blob_sha": "103329f6b2818ec84bbc60d261c12d99d2f502ed",
+    "verdict": "INTEGRITY-VIOLATION",
+    "has_source_needed": true,
+    "audited_date": "2026-10-28",
+    "audited_at": "2026-10-28T04:08:33.304011",
+    "n_unsourced": 2,
+    "n_value_mismatches": 0
   },
   "models/LISFLOOD-FP/web-refs/lisflood-fp-official-resources.md": {
     "blob_sha": "3d9091b52cd5816ce5b6d1adee70ba361cb72e6b",
@@ -8018,5 +8023,43 @@
     "value_checks": [],
     "value_mismatches": [],
     "source_unavailable": []
+  },
+  "models/LISFLOOD-FP/source-analysis/lisflood-fp-cpu-gpu-differences.md": {
+    "blob_sha": "50706a0f640564c86d82a515feeef9969faa2f2a",
+    "verdict": "verified-confirmed",
+    "has_source_needed": false,
+    "audited_date": "2026-10-28",
+    "audited_at": "2026-10-28T04:08:33.304011",
+    "n_unsourced": 0,
+    "n_value_mismatches": 0
+  },
+  "models/LISFLOOD-FP/source-analysis/lisflood-fp-io-boundary-differences.md": {
+    "blob_sha": "8ebbf21768a9ff9a074b198b9849160ad5299f01",
+    "verdict": "verified-confirmed",
+    "has_source_needed": false,
+    "audited_date": "2026-10-28",
+    "audited_at": "2026-10-28T04:08:33.304011",
+    "n_unsourced": 0,
+    "n_value_mismatches": 0,
+    "value_checks": [
+      {
+        "line": 250,
+        "claim": "nfp/fpfric 기본값 Params.FPn = C(0.06); fp_acc.cpp 마찰 평균식 fn=0.5*(Manningsn[p0]+Manningsn[p1]) else fn=FPn",
+        "source_ref": "raw/source_code/LISFLOOD-FP/lisflood.cpp:109; fp_acc.cpp:58-59",
+        "result": "MATCH",
+        "evidence": "lisflood.cpp:109 `Params.FPn = C(0.06);` / fp_acc.cpp:58-59 원문 일치 (Claude 직접 대조)",
+        "claim_id": "6e16fb061b3a228c",
+        "selection_note": "표본 선정: 모집단 전수 미열거(대형 표 노트), ledger 값검증 이력이 없는 파일 우선(io-boundary·lisflood2-driver vc:[], io-boundary-differences 신규) — SKILL V1.1 미검사 claim 우선 규칙"
+      }
+    ]
+  },
+  "models/LISFLOOD-FP/source-analysis/lisflood-fp-metal-fv1.md": {
+    "blob_sha": "1291bc0c63990fae8aa3919b1f6d85118ea67bed",
+    "verdict": "verified-confirmed",
+    "has_source_needed": false,
+    "audited_date": "2026-10-28",
+    "audited_at": "2026-10-28T04:08:33.304011",
+    "n_unsourced": 0,
+    "n_value_mismatches": 0
   }
 }
