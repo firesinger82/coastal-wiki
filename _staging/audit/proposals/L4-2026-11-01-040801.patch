@@ -1,0 +1,83 @@
+diff --git a/models/ROMS/manual-notes/roms-wiki-getting-started.md b/models/ROMS/manual-notes/roms-wiki-getting-started.md
+--- a/models/ROMS/manual-notes/roms-wiki-getting-started.md
++++ b/models/ROMS/manual-notes/roms-wiki-getting-started.md
+@@ -3,6 +3,7 @@
+ topic: roms-wiki-getting-started
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ last_source_check: "2026-10-14 (recovery 대조 반영)"
+ verification_method: "models/ROMS/raw/manuals/wiki/markdown/Getting_Started.md (77 줄, _revid=6667_, fetched 2026-05-03 from myroms.org/wiki/Getting_Started) 본문 직접 인용. ROMS 디렉토리 구조 (Compilers·Data·Master·ROMS/Adjoint·Bin·Drivers·External·Functionals·Include·Modules·Nonlinear·Obsolete·Programs·Representer·Tangent·Utility·User) 직접 추출. 2026-10-14 ROMS recovery 대조 보고서 반영."
+ note_author: "Claude Opus 4.7 (1M context)"
+@@ -200,7 +201,7 @@
+ 
+ ## 8. 한국 적용
+ 
+-- **NIFS KOOS-EJS** — 한국 국립수산과학원 동해예측시스템 (ROMS 기반)
++- **NIFS KOOS-EJS** — 한국 국립수산과학원 동해예측시스템 (ROMS 기반) (source-needed — 공식 paper 미큐레이션, [roms-official-resources](../web-refs/roms-official-resources.md) 한국 적용 절 참조)
+ - 관련 경험 자료: [NIFS 다층 수온 추세](../../../experience/nifs-vertical-sst-trends.md). [10-14 전수 검증 정정]
+ 
+ ## 9. 관련 자료
+diff --git a/models/ROMS/source-analysis/roms_4dvar.md b/models/ROMS/source-analysis/roms_4dvar.md
+--- a/models/ROMS/source-analysis/roms_4dvar.md
++++ b/models/ROMS/source-analysis/roms_4dvar.md
+@@ -3,6 +3,7 @@
+ topic: general
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "ROMS source code 직접 분석 (models/ROMS/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/roms_4dvar.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시. §I 추가 (2026-05-28): PR #75 첨부 `multi_scale_B_v1.pdf` (15p) 직접 fetch + 본문 인용 — Matérn correlation eq (1) / weighted sum eq (2) / implicit diffusion eq (3)(4) / Daley length scale 관계 / `s4dvar.in` 7개 신규 parameter (Nscale·Mlap·Bwgt·HdecayMX/MY/IX/IY/FX/FY·HdecayB·NiterCG·NiterCI) / CG+CI 솔버 워크플로 / WC13 results (Fig 1-11). 7개 multiscale_* 파일 algorithm 매핑은 PDF + web-refs §8.1 GitHub API 직접 fetch 기반. §I 재검증 (2026-09-20, snapshot 57aecf5): PR #75 merge(f03bcbb) 후 merged 소스 직접 대조 — 파일 구성(6개, multiscale_driver.h·multiscale_sum_B.h 부재), scale 루프 위치(convolve_multi.h), 가중합 위치(normalization_multi.h), Hdecay 단위(m), I4DVAR 의 ad_convolution 인자 수 불일치(5 vs multi 6) 확인. 2026-10-14 ROMS recovery 대조 보고서 반영."
+ last_source_check: "2026-10-14 (recovery 대조 반영)"
+ note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23 + §I 작성 2026-05-28"
+@@ -412,6 +413,8 @@
+ 
+ ## Working Rules
+ 
++> source-needed — 이 절의 반복 수·비용 감소 비율·내적 비대칭 한계·상관 길이 수치는 modeling-wiki 이식 운영 경험칙으로 출처 미확보다.
++
+ - Run a strong-constraint I4DVAR first, even if your target is weak-constraint — it builds the basic-state trajectory and shakes out observation file mistakes cheaply.
+ - Outer loops typically 1–3; inner loops 10–50 (CG iterations). Cost grows linearly with outer × inner.
+ - Always check the cost-function reduction across outer loops. `J_final / J_initial < 0.5` is normal; > 0.95 means the system is not converging (bad B, bad obs, or trivial increment).
+@@ -420,6 +423,8 @@
+ - For weak-constraint, check that model-error covariance `Q` is non-trivial. Default `Q=B` reduces to strong-constraint in disguise.
+ 
+ ## Common Pitfalls
++
++> source-needed — 이 절에서 file:line 인용이 없는 항목은 출처 미확보다.
+ 
+ - ▢ Forgetting to update the basic-state trajectory between cycles — TLM linearizes about a stale state and innovations diverge.
+ - ▢ ObsErr too small (e.g., reporting RMS instead of representativeness error) — inner loop tries to overfit and explodes.
+diff --git a/models/ROMS/source-analysis/roms_4dvar_drivers.md b/models/ROMS/source-analysis/roms_4dvar_drivers.md
+--- a/models/ROMS/source-analysis/roms_4dvar_drivers.md
++++ b/models/ROMS/source-analysis/roms_4dvar_drivers.md
+@@ -48,7 +48,7 @@
+ - I4D-Var: "primal formulation (model space) strong constraint, incremental 4D-Var where the only errors considered are those for the observations. The model is assumed to be perfect." (`i4dvar_roms.h:13-16`)
+ - 완전 모델 가정은 동역학 모델오차 Q를 배제한다. 초기조건·경계조건·표면강제의 사전 오차 공분산 B를 없애는 가정은 아니다 ([DA1-805](../../../_staging/recovery/compare/roms-da-4dvar-vs-code.md#4-노트-대조와-수정안)).
+ - RBL4D-Var: "dual formulation (observation space), strong or weak constraint 4D-Var where errors may be considered in both model and observations" + "Restricted, B-preconditoned Lanczos (W4D-RBLanczos)" (`rbl4dvar_roms.h:10-16`, `rbl4dvar_roms.h:14`). Gurol et al. 2014 (B-preconditioned dual minimization) 추가 인용(`rbl4dvar_roms.h:41-44`).
+-- R4D-Var: "Indirect Representer Approach (R4D-Var)" dual (`r4dvar_roms.h:11-13`). Weaver-Courtier 류 representer 행렬 기반.
++- R4D-Var: "Indirect Representer Approach (R4D-Var)" dual (`r4dvar_roms.h:11-13`). representer 행렬 기반이다 (Bennett 2002 — [roms_4dvar](roms_4dvar.md) References; 헤더 인용 목록은 Moore et al. 2011 Part I·II, `r4dvar_roms.h:26-39`).
+ - 세 변종 모두 Moore et al. 2011 Part I/II(`i4dvar_roms.h:25-39` 등)을 표준 인용으로 공유.
+ 
+ ### 2.1 알고리즘 phase 분해 (모듈 PUBLIC 목록)
+diff --git a/models/ROMS/source-analysis/roms_adjoint_framework.md b/models/ROMS/source-analysis/roms_adjoint_framework.md
+--- a/models/ROMS/source-analysis/roms_adjoint_framework.md
++++ b/models/ROMS/source-analysis/roms_adjoint_framework.md
+@@ -3,6 +3,7 @@
+ topic: roms
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "models/ROMS/raw/source_code/roms/ROMS/ 직하위 파일 목록: Adjoint/의 .F 65개(ad_*.F 63개와 adsen_*.F 2개), Tangent/의 tl_*.F 54개, Representer/의 rp_*.F 39개. Drivers/의 i4dvar_roms.h·r4dvar_roms.h·rbl4dvar_roms.h·obs_sen_*·array_modes.h·picard_roms.h와 ad_step3d_t.F 헤더를 대조했다. 2026-10-14 ROMS recovery 대조 보고서를 반영했다." # [10-14 전수 검증 정정]
+ last_source_check: "2026-10-14 (recovery 대조 반영)"
+ note_author: "Claude Opus 4.8 (1M context) source-code direct read"
+@@ -63,8 +64,8 @@
+ | **Delft3D-FLOW** | OpenDA 연동용 `flow2d3d_openda` DLL 인터페이스를 제공한다. | [OpenDA 연동 시험 설명](../../Delft3D/raw/source_code/Delft3D/src/third_party_open/openda/tests/doc/README.txt)의 3–7줄과 35–43줄은 DLL 함수로 여러 모델 인스턴스를 순차 진행하는 시험을 설명한다. [10-14 전수 검증 정정] |
+ | **XBeach** | Beach Wizard는 관측 동화 증분으로 바닥 높이를 갱신한다. BMI는 외부 제어 인터페이스를 제공한다. | [beachwizard.F90](../../XBeach/raw/source_code/trunk/src/xbeachlibrary/beachwizard.F90)의 589–603줄에서 `bchwiz`가 1 또는 2이면 `s%zb = s%zb - bw%dassim`을 적용한다. [xbeach_bmi.f90](../../XBeach/raw/source_code/trunk/src/xbeachlibrary/xbeach_bmi.f90)의 43–78줄은 C 바인딩 초기화·시간 진행 함수를 정의한다. [10-14 전수 검증 정정] |
+ | **ADCIRC** | **외부 ensemble**(ASGS, **built-in DA/adjoint 전무**) — Kalman/ensemble surge 는 외부 wrapper | src/ 55 .F 중 adjoint/variational/ensemble 0개(2026-06-10 전수 확인). `thirdparty/wgrib2/Ensemble.c`는 GRIB2 유틸(무관) |
+-| **SWAN** | 외부(없음, native DA 부재) | — |
+-| **EFDC** | 외부(없음) | — |
++| **SWAN** | 외부(없음, native DA 부재) | source-needed — 확인 근거(판독 기록·src 집계) 미연결 |
++| **EFDC** | 외부(없음) | source-needed — 확인 근거 미연결 |
+ 
+ ROMS는 I4DVAR·R4DVAR·RBL4DVAR 변분 자료동화 드라이버를 제공한다 (`Master/roms_kernel.F:153–166`). [10-14 전수 검증 정정]
+ 
