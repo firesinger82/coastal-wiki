@@ -1,0 +1,292 @@
+{
+ "findings": [
+  {
+   "path": "models/ROMS/source-analysis/roms_advection.md",
+   "blob_sha": "4301b096f7b7d9d93ba1410804c34222ad5d1229",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 69,
+   "opinion": 12,
+   "has_source_needed": false,
+   "unsourced": [
+    {
+     "line": 137,
+     "text": "`obc_in / obc_out` ratio of 100–1000 is normal for nesting boundaries.",
+     "reason": "출처 0 — 수치 범위(100–1000) 운영 경험칙 단언. modeling-wiki 이식분",
+     "adversary": "refute 시도: L114–115 RT1-1531 프레이밍은 Decision Guide 표의 default 표현에 한정, Working Rules 미커버. References(Smolarkiewicz·Wu&Zhu)는 이류 기법 문헌으로 비율 수치 미귀속. frontmatter 포괄출처는 소스코드 직독 범위. refute 실패 → confirmed"
+    },
+    {
+     "line": 147,
+     "text": "Mixing schemes between tracers in restart vs new run — Hadvection setup must be consistent or T/S restart drift appears.",
+     "reason": "출처 0 — restart 거동 메커니즘 단언. 노트의 인용 범위(이류 커널·입력 파서)에 restart 경로 분석 없음",
+     "adversary": "refute 시도: 인접 L145–146은 별도 인용(RTN-379)·별도 주제. restart drift 주장을 지지하는 file:line·보고서 행 없음. refute 실패 → confirmed"
+    }
+   ],
+   "proposals": [
+    {
+     "old_string": "citation_status: verified",
+     "new_string": "citation_status: verified\nhas_source_needed: true",
+     "rationale": "G9e: 아래 G9b 공개 패치 적용 시 disclosed 갭 보유 — 플래그 부착(적용은 사람)"
+    },
+    {
+     "old_string": "- `obc_in / obc_out` ratio of 100–1000 is normal for nesting boundaries.",
+     "new_string": "- `obc_in / obc_out` ratio of 100–1000 is normal for nesting boundaries. (source-needed — modeling-wiki 이식 운영 경험칙, 출처 미확보)",
+     "rationale": "G9b 갭 공개 전환 — 출처 확보 전까지 disclosed로 유지"
+    },
+    {
+     "old_string": "- ▢ Mixing schemes between tracers in restart vs new run — Hadvection setup must be consistent or T/S restart drift appears.",
+     "new_string": "- ▢ Mixing schemes between tracers in restart vs new run — Hadvection setup must be consistent or T/S restart drift appears. (source-needed — modeling-wiki 이식 운영 경험칙, 출처 미확보)",
+     "rationale": "G9b 갭 공개 전환(동일)"
+    }
+   ],
+   "value_checks": []
+  },
+  {
+   "path": "models/ROMS/source-analysis/roms_analytical_functionals.md",
+   "blob_sha": "ec6d7fdea42a1a8a8e30232be7cbe25b4434891e",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 120,
+   "opinion": 6,
+   "has_source_needed": false,
+   "unsourced": [],
+   "value_mismatches": [
+    {
+     "line": 51,
+     "text": "ANANAME 인덱스 표(L49–62): idx 2=initial·5=dqdsst·8=hmixcoef/nudgcoef·9/10/12=미사용·11=sponge/ssh·13~23 열 전반·27~33 열 전반·38=wtype 등",
+     "source_ref": "raw/source_code/roms/ROMS/Functionals/*.h grep 'ANANAME(' 전수 (HEAD 57aecf58)",
+     "source_says": "실제 등록: 2=drag·5=diag·8=hmixcoef·sponge·9=humid·10=initial·11=m2clima·12=m2obc·16=nudgcoef·19=perturb·20=psource·23=sediment·26=spinning·27=srflux·28=ssh·30=respiration+sst(중복)·38=dqdsst·39=wtype·48=vegetation — 표 39칸 중 13칸만 일치",
+     "reason": "8-18 감사(claim e3a5ff493818)에서 이미 mismatch 판정된 표가 10-14 갱신에서 미수정. 10-14 갱신은 인접 예시 인용(L64: ana_initial.h:101 ANANAME(10)·ana_perturb.h:125 ANANAME(19))만 정정해 표(2=initial·19=psource·10=—)와 예시가 같은 파일 안에서 상호 모순",
+     "claude_verification": "Adversary 재확인: 코드 판 일치(노트 명시 HEAD 57aecf58 == raw 트리 git log ✓), 단위·정의 차이 없음(동일 배열 동일 매크로), 구판 혼동 아님 — VALUE-MISMATCH 확정"
+    }
+   ],
+   "value_checks": [
+    {
+     "claim_id": "2cb00ba7b2f4",
+     "line": "49-62",
+     "claim": "ANANAME 인덱스 표 전체 — 감사 중 의심 후보 우선 배정(표·인접 예시 상호 모순)",
+     "source_ref": "raw/source_code/roms/ROMS/Functionals/*.h grep 'ANANAME(' 전수 (HEAD 57aecf58)",
+     "mismatch": true,
+     "note": "❌ 상세는 value_mismatches. 부수검증 ✓: '42개 .h'(L19·L256)=실측 42, 예시 인용 5건(L64) 전부 코드 일치"
+    },
+    {
+     "claim_id": "9bd3304cb860",
+     "line": "266-273",
+     "claim": "§사례별 초기장 대조 수치 6건",
+     "source_ref": "ana_grid.h:282; ana_initial.h:660–662,716–722; ana_sediment.h:323–331; initial.F:356,399",
+     "mismatch": false,
+     "note": "전건 직독 일치 ✓ (Esize=300.0_r8, isalt=30.0_r8 @xr≤30000, itemp=10.0_r8, isalt=30.0_r8, bed(ithck)=0.01_r8, IF (nrrec(ng).eq.0))"
+    },
+    {
+     "claim_id": "2f4d0fbc0adc",
+     "line": 281,
+     "claim": "두 differences 파일 배정 행수·결론 분포",
+     "source_ref": "differences-1.md·differences-2.md 행 직접 집계",
+     "mismatch": false,
+     "note": "실측 134+133=267행, A13 B(24+6)=30 C(51+127)=178 D30 E1 F15 — 전부 일치 ✓"
+    }
+   ],
+   "proposals": [
+    {
+     "old_string": "| 1 | biology | 13 | humid | 27 | tclima |\n| 2 | initial | 14 | m2clima | 28 | passive |\n| 3 | btflux | 15 | m2obc | 29 | rain |\n| 4 | cloud | 16 | m3clima | 30 | drag/respiration |\n| 5 | dqdsst | 17 | m3obc | 31 | stflux |\n| 6 | fsobc | 18 | mask | 32 | respiration |\n| 7 | grid | 19 | psource | 33 | tair |\n| 8 | hmixcoef/nudgcoef | 20 | sediment | 34 | tobc |\n| 9 | — | 21 | pair | 35 | vmix |\n| 10 | — | 22 | spinning | 36 | winds |\n| 11 | sponge/ssh | 23 | scope | 37 | wwave |\n| 12 | — | 24 | smflux | 38 | wtype |",
+     "new_string": "| 1 | biology | 14 | m3obc | 27 | srflux |\n| 2 | drag | 15 | mask | 28 | ssh |\n| 3 | btflux | 16 | nudgcoef | 29 | sss |\n| 4 | cloud | 17 | pair | 30 | respiration·sst |\n| 5 | diag | 18 | passive | 31 | stflux |\n| 6 | fsobc | 19 | perturb | 32 | tair |\n| 7 | grid | 20 | psource | 33 | tclima |\n| 8 | hmixcoef·sponge | 21 | rain | 34 | tobc |\n| 9 | humid | 22 | scope | 35 | vmix |\n| 10 | initial | 23 | sediment | 36 | winds |\n| 11 | m2clima | 24 | smflux | 37 | wwave |\n| 12 | m2obc | 25 | specir | 38 | dqdsst |\n| 13 | m3clima | 26 | spinning | 39 | wtype |\n\n`ana_vegetation.h:56`은 `ANANAME(48)`에 등록한다(단 `analytical.F` 포함 목록에 없음 — [RBH-3507]). `ana_respiration.h:43`과 `ana_sst.h:46`은 모두 `ANANAME(30)`에 등록한다. 매핑 출처: `ROMS/Functionals/*.h`의 `ANANAME(` 전수 grep, 코드 판 HEAD `57aecf58`. [11-02 L4 값검증 정정]",
+     "rationale": "VALUE-MISMATCH 정정 — 표를 실제 등록 인덱스로 교체(39칸 중 26칸 불일치), 30번 중복 등록·48 vegetation 특이사항 명기. 인접 예시 인용(L64)과도 정합화"
+    }
+   ]
+  },
+  {
+   "path": "models/ROMS/source-analysis/roms_atmospheric_forcing.md",
+   "blob_sha": "92a5e17a0883ad5a2ba230af63b2ad28f2f49ce9",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 70,
+   "opinion": 14,
+   "has_source_needed": false,
+   "unsourced": [
+    {
+     "line": 196,
+     "text": "▢ Setting `LONGWAVE` and `LONGWAVE_OUT` simultaneously — undefined; choose one.",
+     "reason": "출처 0 + 코드와 모순 — bulk_flux.F는 `# if defined LONGWAVE`(:616) / `# elif defined LONGWAVE_OUT`(:635) / `# else`(:643) 구조라 동시 정의 시 LONGWAVE가 결정론적으로 우선. 'undefined'는 미지지 단언",
+     "adversary": "refute 시도: §D 표가 :616/:635/:643을 인용하나 그 인용 구조 자체가 'undefined' 주장을 반증. checkdefs.F에도 동시 정의 에러 없음(grep). refute 실패 → confirmed"
+    },
+    {
+     "line": 199,
+     "text": "▢ Negative `stflux` interpreted as cooling — sign convention is positive into ocean.",
+     "reason": "출처 0 — 부호 규약 도메인 사실 단언. 노트 내 인용(§D :1276 조립식)은 부호 규약을 명시하지 않음",
+     "adversary": "refute 시도: 섹션·frontmatter 포괄출처에 부호 규약 미포함. 단 코드 직독으로 참임을 확인(set_vbc.F:336–337 'positive means heating the ocean', bulk_flux.F:1210–1213) — 출처는 존재하나 노트에 미인용. refute 실패 → confirmed(인용 보강 제안)"
+    }
+   ],
+   "proposals": [
+    {
+     "old_string": "citation_status: verified",
+     "new_string": "citation_status: verified\nhas_source_needed: false",
+     "rationale": "G9e: 아래 두 패치(출처 보강·정정) 적용 시 잔존 disclosed 갭 없음 — false 명시(적용은 사람)"
+    },
+    {
+     "old_string": "- ▢ Setting `LONGWAVE` and `LONGWAVE_OUT` simultaneously — undefined; choose one.",
+     "new_string": "- ▢ `LONGWAVE`와 `LONGWAVE_OUT`을 동시에 정의하면 `#elif` 구조로 `LONGWAVE` 분기가 우선한다. 하나만 선택한다 (`ROMS/Nonlinear/bulk_flux.F:616, 635, 643`).",
+     "rationale": "'undefined' 단언 정정 — 코드는 # if/# elif/# else 구조로 결정론적(LONGWAVE 우선). 직독 확인분으로 교체"
+    },
+    {
+     "old_string": "- ▢ Negative `stflux` interpreted as cooling — sign convention is positive into ocean.",
+     "new_string": "- ▢ Negative `stflux` interpreted as cooling — sign convention is positive into ocean (`ROMS/Nonlinear/set_vbc.F:336–337` \"positive means heating the ocean\"; `ROMS/Nonlinear/bulk_flux.F:1210–1213`).",
+     "rationale": "출처 보강 — 코드 주석 직독으로 참 확인, 인용만 결여였음"
+    }
+   ],
+   "value_checks": [
+    {
+     "claim_id": "97ace404dc47",
+     "line": 72,
+     "claim": "IterMax=3 고정 + COARE 3.5 기본/COARE_30 복원",
+     "source_ref": "ROMS/Nonlinear/bulk_flux.F:429, 830, 78–79",
+     "mismatch": false,
+     "note": "직독 일치 ✓ (integer, parameter :: IterMax = 3 / 'usually converges within 3 iterations' / 'To recover older COAREv3.0 #define COARE_30')"
+    }
+   ]
+  },
+  {
+   "path": "models/ROMS/source-analysis/roms_baroclinic_3d.md",
+   "blob_sha": "36c23d085351d17b5c9f8f6907dfacfc5f23ff7e",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 73,
+   "opinion": 12,
+   "has_source_needed": false,
+   "unsourced": [
+    {
+     "line": 154,
+     "text": "▢ Setting `theta_s` very high (>10) without proportional vertical resolution — produces unrealistically thin surface layers and timestep restrictions.",
+     "reason": "출처 0 — 임계값(>10)·결과 수치 경험칙 단언",
+     "adversary": "refute 시도: L124의 권고 프레이밍(RTN-407·RI1-1049)은 theta_s≈7 등 Decision Guide 값에 한정, >10 임계·결과 주장 미커버. refute 실패 → confirmed"
+    },
+    {
+     "line": 156,
+     "text": "▢ Choosing `MPDATA` for T/S in long runs without rotation invariance check — known to introduce small spurious cross-frontal mixing.",
+     "reason": "출처 0 — 'known to' 문헌형 단언인데 이 파일 References는 Shchepetkin·Jackett뿐(Smolarkiewicz 미수록)",
+     "adversary": "refute 시도: 소스코드 인용으로 뒷받침 불가(수치 실험 결과 주장), roms_advection.md References의 Smolarkiewicz도 이 특정 주장 미귀속. refute 실패 → confirmed"
+    },
+    {
+     "line": 157,
+     "text": "▢ Linear EOS with realistic forcing — gives unrealistic abyssal stratification; only valid for idealized tests.",
+     "reason": "출처 0 — 도메인 결과 단언. 선형 EOS 식 자체는 L100–106에 sourced이나 '비현실적 심층 성층' 결과는 미지지",
+     "adversary": "refute 시도: 인접 인용(rho_eos.F:699–718)은 식 구현만. refute 실패 → confirmed"
+    }
+   ],
+   "proposals": [
+    {
+     "old_string": "citation_status: verified",
+     "new_string": "citation_status: verified\nhas_source_needed: true",
+     "rationale": "G9e: 아래 G9b 공개 패치 적용 시 disclosed 갭 보유 — 플래그 부착(적용은 사람)"
+    },
+    {
+     "old_string": "## Common Pitfalls\n\n- ▢ Mixing `Vtransform=1` initial conditions with `Vtransform=2` runtime",
+     "new_string": "## Common Pitfalls\n\n> source-needed — 이 절에서 file:line 인용이 없는 항목(theta_s>10 결과·MPDATA cross-frontal mixing·선형 EOS 심층 성층)은 modeling-wiki 이식 경험칙으로 출처 미확보다.\n\n- ▢ Mixing `Vtransform=1` initial conditions with `Vtransform=2` runtime",
+     "rationale": "G9b 갭 공개 전환 — 절 단위 콜아웃(11-01 roms_4dvar 선례 양식)"
+    }
+   ],
+   "value_checks": [
+    {
+     "claim_id": "449dd6241917",
+     "line": "76-77,124",
+     "claim": "hc 분기식 2건 + Vtransform/Vstretching 초기 대입",
+     "source_ref": "ROMS/Utility/set_scoord.F:170–174; ROMS/Modules/mod_scalars.F:4571–4572",
+     "mismatch": false,
+     "note": "직독 일치 ✓ (WET_DRY: hc=MIN(MAX(hmin,0.0_dp),Tcline) / else: hc=MIN(hmin,Tcline) / Vtransform(ng)=1·Vstretching(ng)=1)"
+    }
+   ]
+  },
+  {
+   "path": "models/ROMS/source-analysis/roms_barotropic_2d.md",
+   "blob_sha": "16854566a0934b3e7690834a4f6e50074f2d03a0",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 66,
+   "opinion": 8,
+   "has_source_needed": false,
+   "unsourced": [
+    {
+     "line": 116,
+     "text": "▢ Choosing `Flather` on a closed coast — radiation-condition assumes an open boundary; results in artificial drainage.",
+     "reason": "출처 0 — 전반부(radiation 가정)는 §F 인용으로 커버되나 'artificial drainage' 결과 단언은 미지지 경험칙",
+     "adversary": "refute 시도: §F(u2dbc_im.F:224 등)는 Flather 분기 위치만. 결과 주장 지지 인용·보고서 행 없음. refute 실패 → confirmed"
+    }
+   ],
+   "proposals": [
+    {
+     "old_string": "citation_status: verified",
+     "new_string": "citation_status: verified\nhas_source_needed: true",
+     "rationale": "G9e: 아래 G9b 공개 패치 적용 시 disclosed 갭 보유 — 플래그 부착(적용은 사람)"
+    },
+    {
+     "old_string": "- ▢ Choosing `Flather` on a closed coast — radiation-condition assumes an open boundary; results in artificial drainage.",
+     "new_string": "- ▢ Choosing `Flather` on a closed coast — radiation-condition assumes an open boundary; results in artificial drainage. (source-needed — modeling-wiki 이식 운영 경험칙, 출처 미확보)",
+     "rationale": "G9b 갭 공개 전환"
+    }
+   ],
+   "value_checks": [
+    {
+     "claim_id": "3db442afef9d",
+     "line": "96,82",
+     "claim": "dtfast 정의식 verbatim + non-SOLVE3D ndtfast>1 검사·exit_flag=5",
+     "source_ref": "ROMS/Utility/inp_par.F:640; ROMS/Utility/checkdefs.F:3626, 3631, 3636",
+     "mismatch": false,
+     "note": "직독 일치 ✓ (세 행 모두 verbatim 일치: dtfast 식 / IF (Master.and.(ndtfast(ng).gt.1)) / exit_flag=5)"
+    }
+   ]
+  },
+  {
+   "path": "models/ROMS/source-analysis/roms_analytical_functionals-differences-1.md",
+   "blob_sha": "5bb9794a249b1f49e95878493c65e189db06c60b",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 134,
+   "opinion": 0,
+   "has_source_needed": false,
+   "unsourced": [],
+   "audit_note": "표 134행 전건 문서·코드 원문 인용 쌍 보유. 표 밖 무인용 본문 0(기계 확인). 결론 분포 A13 B24 C51 D30 E1 F15 = 부모 노트 L281 주장과 정합",
+   "value_checks": []
+  },
+  {
+   "path": "models/ROMS/source-analysis/roms_analytical_functionals-differences-2.md",
+   "blob_sha": "a66882f1976b52dbb99897c4904ba6d77ef49b9a",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 133,
+   "opinion": 0,
+   "has_source_needed": false,
+   "unsourced": [],
+   "audit_note": "표 133행 전건 원문 인용 쌍 보유. 표 밖 무인용 본문 0(기계 확인). B6 C127. frontmatter has_source_needed: false 기재는 본 감사 권고와 일치",
+   "value_checks": []
+  },
+  {
+   "path": "models/ROMS/source-analysis/roms_biology-differences-1.md",
+   "blob_sha": "6825c0ce45d2d08dbe9dc1d21c0c78ecea69ae8c",
+   "citation_status": "verified",
+   "dirty": false,
+   "has_real_claims": true,
+   "sourced": 143,
+   "opinion": 0,
+   "has_source_needed": false,
+   "unsourced": [],
+   "audit_note": "표 143행 전건 원문 인용 쌍 보유. 표 밖 무인용 본문 0(기계 확인). E 코드 결함 후보 19행(강함16·중간3) 포함 — 각 행 코드 원문 동봉",
+   "value_checks": [
+    {
+     "claim_id": "3eda4004ec8d",
+     "line": 34,
+     "claim": "FE-018 행 PhyIP == 1.5d0 원문 전사",
+     "source_ref": "User/External/bio_Fennel.in:116–118; ROMS/Nonlinear/Biology/fennel_inp.h:100–101",
+     "mismatch": false,
+     "note": "직독 일치 ✓ (PhyIP == 1.5d0, {1.5d0} 주석, CASE ('PhyIP') load_r)"
+    }
+   ]
+  }
+ ],
+ "run_note": "수동 /coastal-audit --n 8. 값검증 표본: 모집단=슬라이스 sourced 수치·라인번호 단언(접근 가능, raw/source_code/roms HEAD 57aecf58 확인), ledger 미검사 우선 + 감사 중 의심 후보 1건(ANANAME 표) 우선 배정, seed=L4-2026-11-02-manual, 공식 표본 7건(min(3,·) 충족), source_unavailable 0. sourced 수는 인용 마커 포함 행 수 기준(diff 파일은 표 행 수)."
+}

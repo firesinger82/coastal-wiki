@@ -1,0 +1,130 @@
+diff --git a/models/ROMS/source-analysis/roms_advection.md b/models/ROMS/source-analysis/roms_advection.md
+--- a/models/ROMS/source-analysis/roms_advection.md
++++ b/models/ROMS/source-analysis/roms_advection.md
+@@ -3,6 +3,7 @@
+ topic: general
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "ROMS source code 직접 분석 (models/ROMS/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/roms_advection.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시. 2026-10-14 ROMS recovery 대조 보고서 반영."
+ note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
+ last_source_check: "2026-10-14 (recovery 대조 반영)"
+@@ -134,7 +135,7 @@
+ - HSIMT 비용과 r_max 권고는 코드 기본값이 아니다. ([RTN-409](../../../_staging/recovery/compare/roms-theory-numerics-vs-code.md#5-차이-결론))
+ - MPDATA without `TS_MPDATA_LIMIT` can produce ringing in fronts; turn the limiter on for production runs.
+ - 지형별 성능 권고는 코드 선택 사실과 별도 문장으로 적는다. ([RTN-379](../../../_staging/recovery/compare/roms-theory-numerics-vs-code.md#4-노트-대조와-수정안))
+-- `obc_in / obc_out` ratio of 100–1000 is normal for nesting boundaries.
++- `obc_in / obc_out` ratio of 100–1000 is normal for nesting boundaries. (source-needed — modeling-wiki 이식 운영 경험칙, 출처 미확보)
+ - If you see tracer mass drift, check the `Huon/Hvom` correction in `step3d_uv.F:1507-1526` — advection scheme is rarely the cause; barotropic-baroclinic coupling is.
+ 
+ ## Common Pitfalls
+@@ -144,7 +145,7 @@
+ - ▢ Setting `UV_VIS2` and assuming it controls advection — it controls *harmonic mixing*, not the advection stencil.
+ - 공통 기본 경로는 `prsgrd31.h`이다. (`ROMS/Nonlinear/prsgrd.F:24-25`; [RTN-379](../../../_staging/recovery/compare/roms-theory-numerics-vs-code.md#4-노트-대조와-수정안))
+ - ▢ `obc_in < obc_out` (inverted ratio) — boundary leaks rather than nudges.
+-- ▢ Mixing schemes between tracers in restart vs new run — Hadvection setup must be consistent or T/S restart drift appears.
++- ▢ Mixing schemes between tracers in restart vs new run — Hadvection setup must be consistent or T/S restart drift appears. (source-needed — modeling-wiki 이식 운영 경험칙, 출처 미확보)
+ 
+ ## Next expansion
+ 
+diff --git a/models/ROMS/source-analysis/roms_analytical_functionals.md b/models/ROMS/source-analysis/roms_analytical_functionals.md
+--- a/models/ROMS/source-analysis/roms_analytical_functionals.md
++++ b/models/ROMS/source-analysis/roms_analytical_functionals.md
+@@ -48,18 +48,21 @@
+ 
+ | idx | 함수 | idx | 함수 | idx | 함수 |
+ |---|---|---|---|---|---|
+-| 1 | biology | 13 | humid | 27 | tclima |
+-| 2 | initial | 14 | m2clima | 28 | passive |
+-| 3 | btflux | 15 | m2obc | 29 | rain |
+-| 4 | cloud | 16 | m3clima | 30 | drag/respiration |
+-| 5 | dqdsst | 17 | m3obc | 31 | stflux |
+-| 6 | fsobc | 18 | mask | 32 | respiration |
+-| 7 | grid | 19 | psource | 33 | tair |
+-| 8 | hmixcoef/nudgcoef | 20 | sediment | 34 | tobc |
+-| 9 | — | 21 | pair | 35 | vmix |
+-| 10 | — | 22 | spinning | 36 | winds |
+-| 11 | sponge/ssh | 23 | scope | 37 | wwave |
+-| 12 | — | 24 | smflux | 38 | wtype |
++| 1 | biology | 14 | m3obc | 27 | srflux |
++| 2 | drag | 15 | mask | 28 | ssh |
++| 3 | btflux | 16 | nudgcoef | 29 | sss |
++| 4 | cloud | 17 | pair | 30 | respiration·sst |
++| 5 | diag | 18 | passive | 31 | stflux |
++| 6 | fsobc | 19 | perturb | 32 | tair |
++| 7 | grid | 20 | psource | 33 | tclima |
++| 8 | hmixcoef·sponge | 21 | rain | 34 | tobc |
++| 9 | humid | 22 | scope | 35 | vmix |
++| 10 | initial | 23 | sediment | 36 | winds |
++| 11 | m2clima | 24 | smflux | 37 | wwave |
++| 12 | m2obc | 25 | specir | 38 | dqdsst |
++| 13 | m3clima | 26 | spinning | 39 | wtype |
++
++`ana_vegetation.h:56`은 `ANANAME(48)`에 등록한다(단 `analytical.F` 포함 목록에 없음 — [RBH-3507]). `ana_respiration.h:43`과 `ana_sst.h:46`은 모두 `ANANAME(30)`에 등록한다. 매핑 출처: `ROMS/Functionals/*.h`의 `ANANAME(` 전수 grep, 코드 판 HEAD `57aecf58`. [11-02 L4 값검증 정정]
+ 
+ (예: `ROMS/Functionals/ana_initial.h:101` `        ANANAME(10)=MyFile`, `ROMS/Functionals/ana_grid.h:94` `        ANANAME( 7)=MyFile`, `ROMS/Functionals/ana_smflux.h:57` `        ANANAME(24)=MyFile`, `ROMS/Functionals/ana_tobc.h:48` `        ANANAME(34)=MyFile`, `ROMS/Functionals/ana_perturb.h:125` `        ANANAME(19)=MyFile`.) ANANAME 등록은 `Lanafile` 조건을 따른다. [10-14 전수 검증 정정]
+ 비 `DISTRIBUTE`에서는 `IF (Lanafile.and.(tile.eq.0)) THEN`을 요구한다.
+diff --git a/models/ROMS/source-analysis/roms_atmospheric_forcing.md b/models/ROMS/source-analysis/roms_atmospheric_forcing.md
+--- a/models/ROMS/source-analysis/roms_atmospheric_forcing.md
++++ b/models/ROMS/source-analysis/roms_atmospheric_forcing.md
+@@ -3,6 +3,7 @@
+ topic: general
+ canonical_source: self
+ citation_status: verified
++has_source_needed: false
+ verification_method: "ROMS source code 직접 분석 (models/ROMS/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/roms_atmospheric_forcing.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시. 2026-10-14 ROMS recovery 대조 보고서 반영"
+ last_source_check: "2026-10-14 (recovery 대조 반영)"
+ note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
+@@ -193,10 +194,10 @@
+ 
+ ## Common Pitfalls
+ 
+-- ▢ Setting `LONGWAVE` and `LONGWAVE_OUT` simultaneously — undefined; choose one.
++- ▢ `LONGWAVE`와 `LONGWAVE_OUT`을 동시에 정의하면 `#elif` 구조로 `LONGWAVE` 분기가 우선한다. 하나만 선택한다 (`ROMS/Nonlinear/bulk_flux.F:616, 635, 643`).
+ - 기본 NetCDF 변수 `Qair`는 `idQair`를 통해 `Hair`로 읽는다 (`ROMS/Nonlinear/get_data.F:529–539`; `ROMS/Nonlinear/set_data.F:242–250`). [10-14 전수 검증 보완]
+ - ▢ `swrad` unit confusion — must be W/m² (not μmol photons / m² / s for radiation).
+-- ▢ Negative `stflux` interpreted as cooling — sign convention is positive into ocean.
++- ▢ Negative `stflux` interpreted as cooling — sign convention is positive into ocean (`ROMS/Nonlinear/set_vbc.F:336–337` "positive means heating the ocean"; `ROMS/Nonlinear/bulk_flux.F:1210–1213`).
+ - ▢ Expecting warm-layer correction — not implemented; use `COOL_SKIN` only.
+ - CPP 옵션 `WIND_MINUS_CURRENT`는 표면 current를 `Uwind`·`Vwind`에서 뺀다 (`ROMS/Nonlinear/bulk_flux.F:527–547`).
+ - ▢ SOLAR_SOURCE with wrong Jerlov type — heat penetrates too deep / too shallow; calibrate against profiles.
+diff --git a/models/ROMS/source-analysis/roms_baroclinic_3d.md b/models/ROMS/source-analysis/roms_baroclinic_3d.md
+--- a/models/ROMS/source-analysis/roms_baroclinic_3d.md
++++ b/models/ROMS/source-analysis/roms_baroclinic_3d.md
+@@ -3,6 +3,7 @@
+ topic: general
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "ROMS source code 직접 분석 (models/ROMS/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/roms_baroclinic_3d.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시. 2026-10-14 ROMS recovery 대조 보고서 반영."
+ last_source_check: "2026-10-14 (recovery 대조 반영)"
+ note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
+@@ -149,6 +150,8 @@
+ 출처는 [이론·수치 대조 보고서](../../../_staging/recovery/compare/roms-theory-numerics-vs-code.md) §4의 RTN-408과 [도구 대조 보고서](../../../_staging/recovery/compare/roms-tools-guides-vs-code.md) §4의 RTG-1984이다.
+ 
+ ## Common Pitfalls
++
++> source-needed — 이 절에서 file:line 인용이 없는 항목(theta_s>10 결과·MPDATA cross-frontal mixing·선형 EOS 심층 성층)은 modeling-wiki 이식 경험칙으로 출처 미확보다.
+ 
+ - ▢ Mixing `Vtransform=1` initial conditions with `Vtransform=2` runtime — `Hz` mismatches silently corrupt T/S.
+ - ▢ Setting `theta_s` very high (>10) without proportional vertical resolution — produces unrealistically thin surface layers and timestep restrictions.
+diff --git a/models/ROMS/source-analysis/roms_barotropic_2d.md b/models/ROMS/source-analysis/roms_barotropic_2d.md
+--- a/models/ROMS/source-analysis/roms_barotropic_2d.md
++++ b/models/ROMS/source-analysis/roms_barotropic_2d.md
+@@ -3,6 +3,7 @@
+ topic: general
+ canonical_source: self
+ citation_status: verified
++has_source_needed: true
+ verification_method: "ROMS source code 직접 분석 (models/ROMS/raw/source_code/, codex 보조). 본 노트는 _staging/from-modeling-wiki/knowledge/methods/roms_barotropic_2d.md (at commit a9618df^) (modeling-wiki 4-5월 작성) 의 마이그레이션. source-code 라인 인용은 본문 내 file:line 명시. 2026-10-14 ROMS recovery 대조 보고서 반영"
+ last_source_check: "2026-10-14 (recovery 대조 반영)"
+ note_author: "사용자 + codex source-code 분석 (2026-04~05 modeling-wiki) → Claude Opus 4.7 (1M context) 마이그레이션 2026-05-23"
+@@ -113,7 +114,7 @@
+ 
+ ## Common Pitfalls
+ 
+-- ▢ Choosing `Flather` on a closed coast — radiation-condition assumes an open boundary; results in artificial drainage.
++- ▢ Choosing `Flather` on a closed coast — radiation-condition assumes an open boundary; results in artificial drainage. (source-needed — modeling-wiki 이식 운영 경험칙, 출처 미확보)
+ - ▢ Tracer mass loss after restart suggests the mass-flux correction is being short-circuited (e.g., turning off `MASKING` or modifying `Huon` outside `step3d_uv.F`).
+ 
+ ## Next expansion
