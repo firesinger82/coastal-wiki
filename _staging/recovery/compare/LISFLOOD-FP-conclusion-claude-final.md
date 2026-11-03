@@ -14,7 +14,7 @@
 
 ## 2 검증 모델 비교 시험에서 찾은 1행 (11-04)
 
-사용자 지시(11-04)로 `LISFLOOD-FP-conclusion-verify-LB1a.md`와 같은 지시문을 Codex `gpt-6.1-sol`과 `gpt-6.1-terra`로 다시 돌렸다. 세 모델의 결론이 갈린 행을 Claude가 쪽 이미지와 코드로 판정했다. 그중 LB1-136은 전수 검증 결론 A가 틀렸다. 사용자가 B로 고치라고 지시했다. 같은 보 식을 다룬 LV1-220·LT1-164·LT1-406·LB1-386도 같은 근거로 B로 고쳤다(사용자 승인 11-04). Claude가 user manual.pdf p.29·40, user manual.docx p.34·45(변환본), user manual +bridge.docx p.29(변환본)의 쪽 이미지를 열어 식과 계수 문장을 확인했다.
+사용자 지시(11-04)로 `LISFLOOD-FP-conclusion-verify-LB1a.md`와 같은 지시문을 Codex `gpt-6.1-sol`과 `gpt-6.1-terra`로 다시 돌렸다. 세 모델의 결론이 갈린 행을 Claude가 쪽 이미지와 코드로 판정했다. 그중 LB1-136은 전수 검증 결론 A가 틀렸다. 사용자가 B로 고치라고 지시했다. 같은 보 식을 다룬 LV1-220·LT1-164·LT1-406·LB1-386도 같은 근거로 B로 고쳤다(사용자 승인 11-04). Claude가 user manual.pdf p.29·40, user manual.docx p.34·45(변환본), user manual +bridge.docx p.29(변환본)의 쪽 이미지를 열어 식과 계수 문장을 확인했다. 1.4·1.7이 `C·L·H^{1.5}` 꼴의 계수라는 점은 외부 원문으로 확인했다. [hydraulics-and-hydrology] PAGE-61 식 (5.1)은 자유 월류를 `q = m(η − z_crest)^{3/2}`, `m = (2/3)√((2/3)g) ≈ 3.1 ft^{0.5}/s`로 적는다(쪽 이미지 확인). 이 m은 SI 단위에서 1.7049이다. SFINCS 코드도 광정 보에 `cweir = 1.7049`(`sfincs_structures.f90:651`)와 `qstruc = Cd*cweir*h1**1.5`(`:679`)를 쓴다.
 
 | 행 ID | 전수 검증 결론 | 최종 결론 | 근거 | 노트에 쓸 결론 문장 |
 |---|---|---|---|---|
