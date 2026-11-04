@@ -1,0 +1,23 @@
+---
+file: models/Celeris/raw/source_code/Celeris-WebGPU/transect_version/shaders/TriDiag_PCRy.wgsl
+lines: 100
+sha256: 11c980f3bd29500ac18582e7ad74f294f8669e86ef39d51847c8562ca44dac58
+reader: codex gpt-6.1-sol
+read_date: 2026-11-04
+---
+
+# TriDiag_PCRy.wgsl — 판독 구간 기록
+
+구간은 1행부터 100행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–16 | Globals는 격자·단계 p·간격 s를 선언한다(1–6). 바인드 그룹(bind group) 0은 y 계수·현재/보정 상태 입력 텍스처(texture)와 rgba32float 출력 2개를 연결한다(8–15). 원문: `struct Globals {` (1); `width: i32,` (2); `height: i32,` (3); `p: i32,` (4); `s: i32,` (5); `@group(0) @binding(0) var<uniform> globals: Globals;` (8); `@group(0) @binding(1) var coefMaty: texture_2d<f32>;` (10); `@group(0) @binding(2) var current_state: texture_2d<f32>;` (11); `@group(0) @binding(3) var current_stateUVstar: texture_2d<f32>;` (12); `@group(0) @binding(4) var txtemp: texture_storage_2d<rgba32float, write>;` (14); `@group(0) @binding(5) var txtemp2: texture_storage_2d<rgba32float, write>;` (15) |
+| 17–52 | 계산 셰이더(compute shader)는 작업 그룹 16×16이다(17). idx_left의 y 좌표는 `(idx.y - s + height) % height`이다(35). idx_right의 y 좌표는 `(idx.y + s + height) % height`이다(36). 두 좌표의 x 값은 idx.x이다. 경계 반환은 주석이다(30–33). 계수 작업량을 0으로 준비한다(38–51). 원문: `@compute @workgroup_size(16, 16)` (17); `fn main(@builtin(global_invocation_id) id: vec3<u32>) {` (18); `let idx = vec2<i32>(i32(id.x), i32(id.y));` (19); `let CurrentState = textureLoad(current_state, idx, 0);` (20); `let s = (globals.s);` (22); `let width = (globals.width);` (23); `let height = (globals.height);` (24); `//    let zero = vec4<f32>(0.0, 1.0, 0.0, CurrentState.b);` (26); `//    textureStore(txtemp, idx, zero);` (27); `//    textureStore(txtemp2, idx, CurrentState);` (28); `// Return if in imaginary grid points` (30); `//    if (idx.x >= width - 2 \|\| idx.y >= height - 2 \|\| idx.x <= 1 \|\| idx.y <= 1) {` (31); `//        return;` (32); `let idx_left =  vec2<i32>(idx.x, (idx.y - s + height) % height);` (35); `let idx_right = vec2<i32>(idx.x, (idx.y + s + height) % height);` (36); `var aIn = 0.0;` (38); `var bIn = 0.0;` (39); `var cIn = 0.0;` (40); `var dIn = 0.0;` (41); `var aInLeft = 0.0;` (43); `var bInLeft = 0.0;` (44); `var cInLeft = 0.0;` (45); `var dInLeft = 0.0;` (46); `var aInRight = 0.0;` (48); `var bInRight = 0.0;` (49); `var cInRight = 0.0;` (50); `var dInRight = 0.0;` (51) [11-04 전수 검증 정정] |
+| 53–85 | 시작 시 18행 `fn main(@builtin(global_invocation_id) id: vec3<u32>) {` 블록 안. main의 p==0 분기는 coefMaty.g로 계수를 나누고 current_stateUVstar.b를 우변으로 읽어 나눈다(53–69). else는 coefMaty.r/b/a의 축소 결과를 읽는다(71–84). x 해법과 같은 계수 정규화 구조이다. 원문: `if (globals.p == 0) {` (53); `bIn = textureLoad(coefMaty, idx, 0).g;` (55); `bInLeft = textureLoad(coefMaty, idx_left, 0).g;` (56); `bInRight = textureLoad(coefMaty, idx_right, 0).g;` (57); `aIn = textureLoad(coefMaty, idx, 0).r / bIn;` (59); `aInLeft = textureLoad(coefMaty, idx_left, 0).r / bInLeft;` (60); `aInRight = textureLoad(coefMaty, idx_right, 0).r / bInRight;` (61); `cIn = textureLoad(coefMaty, idx, 0).b / bIn;` (63); `cInLeft = textureLoad(coefMaty, idx_left, 0).b / bInLeft;` (64); `cInRight =  textureLoad(coefMaty, idx_right, 0).b / bInRight;` (65); `dIn = textureLoad(current_stateUVstar, idx, 0).b / bIn;` (67); `dInLeft = textureLoad(current_stateUVstar, idx_left, 0).b / bInLeft;` (68); `dInRight = textureLoad(current_stateUVstar, idx_right, 0).b / bInRight;` (69); `} else {` (71); `aIn = textureLoad(coefMaty, idx, 0).r;` (73); `aInLeft = textureLoad(coefMaty, idx_left, 0).r;` (74); `aInRight = textureLoad(coefMaty, idx_right, 0).r;` (75); `cIn = textureLoad(coefMaty, idx, 0).b;` (77); `cInLeft = textureLoad(coefMaty, idx_left, 0).b;` (78); `cInRight = textureLoad(coefMaty, idx_right, 0).b;` (79); `dIn = textureLoad(coefMaty, idx, 0).a;` (81); `dInLeft = textureLoad(coefMaty, idx_left, 0).a;` (82); `dInRight = textureLoad(coefMaty, idx_right, 0).a;` (83) |
+| 86–100 | 시작 시 18행 `fn main(@builtin(global_invocation_id) id: vec3<u32>) {` 블록 안. main은 TriDiag_PCRx.wgsl의 86–89행과 같은 순환 축소식으로 계수와 우변을 구한다(86–89). 현재 상태의 b 성분만 dOut으로 교체해 저장한다(91–95). 끝 빈 줄도 구간에 포함한다(96–99). 원문: `let r = 1.0 / (1.0 - aIn * cInLeft - cIn * aInRight);` (86); `let aOut = -r * aIn * aInLeft;` (87); `let cOut = -r * cIn * cInRight;` (88); `let dOut = r * (dIn - aIn * dInLeft - cIn * dInRight);` (89); `let txtemp_out = vec4<f32>(aOut, 1.0, cOut, dOut);` (91); `let txtemp2_out = vec4<f32>(CurrentState.r, CurrentState.g, dOut, CurrentState.a);` (92); `textureStore(txtemp, idx,  txtemp_out);` (94); `textureStore(txtemp2, idx, txtemp2_out);` (95) |
+
+## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
+
+- 23·30–33: width는 활성 실행식에서 사용하지 않는다. 경계 반환은 주석이다.
+- 59–69·86: 초기 대각 계수와 축소 분모에 대한 영분모 검사 없이 나눗셈을 수행한다.

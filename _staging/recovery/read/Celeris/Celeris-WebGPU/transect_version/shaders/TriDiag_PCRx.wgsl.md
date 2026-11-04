@@ -1,0 +1,23 @@
+---
+file: models/Celeris/raw/source_code/Celeris-WebGPU/transect_version/shaders/TriDiag_PCRx.wgsl
+lines: 97
+sha256: b62109b0b9795e55bc0257b6d1959d24291762f8f904f5891ac692bcad22fb17
+reader: codex gpt-6.1-sol
+read_date: 2026-11-04
+---
+
+# TriDiag_PCRx.wgsl — 판독 구간 기록
+
+구간은 1행부터 97행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–16 | Globals는 격자 크기·PCR 단계 p·간격 s를 선언한다(1–6). 바인드 그룹(bind group) 0은 x 계수·현재 상태·보정 상태 입력 텍스처(texture)와 계수/상태 rgba32float 출력을 연결한다(8–15). PCR은 병렬 순환 축소(parallel cyclic reduction)이다. 원문: `struct Globals {` (1); `width: i32,` (2); `height: i32,` (3); `p: i32,` (4); `s: i32,` (5); `@group(0) @binding(0) var<uniform> globals: Globals;` (8); `@group(0) @binding(1) var coefMatx: texture_2d<f32>;` (10); `@group(0) @binding(2) var current_state: texture_2d<f32>;` (11); `@group(0) @binding(3) var current_stateUVstar: texture_2d<f32>;` (12); `@group(0) @binding(4) var txtemp: texture_storage_2d<rgba32float, write>;` (14); `@group(0) @binding(5) var txtemp2: texture_storage_2d<rgba32float, write>;` (15) |
+| 17–52 | 계산 셰이더(compute shader)는 작업 그룹 16×16이다(17). 왼쪽 x 좌표는 `(idx.x - s + width) % width`이다(35). 오른쪽 x 좌표는 `(idx.x + s + width) % width`이다(36). 두 좌표의 y 값은 idx.y이다. 현재·좌·우 계수와 우변 작업량을 0으로 준비한다(38–51). 경계 반환은 주석이다(30–33). 원문: `@compute @workgroup_size(16, 16)` (17); `fn main(@builtin(global_invocation_id) id: vec3<u32>) {` (18); `let idx = vec2<i32>(i32(id.x), i32(id.y));` (19); `let CurrentState = textureLoad(current_state, idx, 0);` (20); `let s = (globals.s);` (22); `let width = (globals.width);` (23); `let height = (globals.height);` (24); `//   let zero = vec4<f32>(0.0, 1.0, 0.0, CurrentState.g);` (26); `//    textureStore(txtemp, idx, zero);` (27); `//    textureStore(txtemp2, idx, CurrentState);` (28); `// Return if in imaginary grid points` (30); `//    if (idx.x >= width - 2 \|\| idx.y >= height - 2 \|\| idx.x <= 1 \|\| idx.y <= 1) {` (31); `//        return;` (32); `let idx_left =  vec2<i32>((idx.x - s + width) % width, idx.y);` (35); `let idx_right = vec2<i32>((idx.x + s + width) % width, idx.y);` (36); `var aIn = 0.0;` (38); `var bIn = 0.0;` (39); `var cIn = 0.0;` (40); `var dIn = 0.0;` (41); `var aInLeft = 0.0;` (43); `var bInLeft = 0.0;` (44); `var cInLeft = 0.0;` (45); `var dInLeft = 0.0;` (46); `var aInRight = 0.0;` (48); `var bInRight = 0.0;` (49); `var cInRight = 0.0;` (50); `var dInRight = 0.0;` (51) [11-04 전수 검증 정정] |
+| 53–85 | 시작 시 18행 `fn main(@builtin(global_invocation_id) id: vec3<u32>) {` 블록 안. main의 p==0 분기는 대각 계수 g로 r·b 계수와 보정 상태 g 우변을 나누어 정규화한다(53–69). else는 계수 텍스처의 r·b·a에서 이전 축소 결과를 읽는다(71–84). 원문: `if (globals.p == 0) {` (53); `bIn = textureLoad(coefMatx, idx, 0).g;` (55); `bInLeft = textureLoad(coefMatx, idx_left, 0).g;` (56); `bInRight = textureLoad(coefMatx, idx_right, 0).g;` (57); `aIn = textureLoad(coefMatx, idx, 0).r / bIn;` (59); `aInLeft = textureLoad(coefMatx, idx_left, 0).r / bInLeft;` (60); `aInRight = textureLoad(coefMatx, idx_right, 0).r / bInRight;` (61); `cIn = textureLoad(coefMatx, idx, 0).b / bIn;` (63); `cInLeft = textureLoad(coefMatx, idx_left, 0).b / bInLeft;` (64); `cInRight = textureLoad(coefMatx, idx_right, 0).b / bInRight;` (65); `dIn = textureLoad(current_stateUVstar, idx, 0).g / bIn;` (67); `dInLeft = textureLoad(current_stateUVstar, idx_left, 0).g / bInLeft;` (68); `dInRight = textureLoad(current_stateUVstar, idx_right, 0).g / bInRight;` (69); `} else {` (71); `aIn = textureLoad(coefMatx, idx, 0).r;` (73); `aInLeft = textureLoad(coefMatx, idx_left, 0).r;` (74); `aInRight = textureLoad(coefMatx, idx_right, 0).r;` (75); `cIn = textureLoad(coefMatx, idx, 0).b;` (77); `cInLeft = textureLoad(coefMatx, idx_left, 0).b;` (78); `cInRight = textureLoad(coefMatx, idx_right, 0).b;` (79); `dIn = textureLoad(coefMatx, idx, 0).a;` (81); `dInLeft = textureLoad(coefMatx, idx_left, 0).a;` (82); `dInRight = textureLoad(coefMatx, idx_right, 0).a;` (83) |
+| 86–97 | 시작 시 18행 `fn main(@builtin(global_invocation_id) id: vec3<u32>) {` 블록 안. main은 좌·우 계수 결합으로 역수 r과 축소 계수 aOut/cOut·우변 dOut을 구한다(86–89). 대각은 1.0으로 출력하고 현재 상태의 g 성분만 dOut으로 바꾸어 저장한다(91–95). 원문: `let r = 1.0 / (1.0 - aIn * cInLeft - cIn * aInRight);` (86); `let aOut = -r * aIn * aInLeft;` (87); `let cOut = -r * cIn * cInRight;` (88); `let dOut = r * (dIn - aIn * dInLeft - cIn * dInRight);` (89); `let txtemp_out = vec4<f32>(aOut, 1.0, cOut, dOut);` (91); `let txtemp2_out = vec4<f32>(CurrentState.r, dOut, CurrentState.b, CurrentState.a);` (92); `textureStore(txtemp, idx,  txtemp_out);` (94); `textureStore(txtemp2, idx, txtemp2_out);` (95) |
+
+## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
+
+- 24·30–33: height를 지역 변수로 읽지만 활성 실행식에서 사용하지 않는다. 격자 경계 반환은 주석이다.
+- 59–69·86: 초기 대각 계수와 축소 분모를 역수 또는 나눗셈에 사용한다. 0인 경우를 거르는 활성 조건은 없다.

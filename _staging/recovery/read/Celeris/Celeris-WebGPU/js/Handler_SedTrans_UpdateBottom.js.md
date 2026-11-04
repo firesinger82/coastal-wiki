@@ -1,0 +1,22 @@
+---
+file: models/Celeris/raw/source_code/Celeris-WebGPU/js/Handler_SedTrans_UpdateBottom.js
+lines: 135
+sha256: c3b52f3ad44263abdd5f200b7edd53ea8874cd9d6f9c3a5ab874383bbae36739
+reader: codex gpt-6.1-sol
+read_date: 2026-11-04
+---
+
+# Handler_SedTrans_UpdateBottom.js — 판독 구간 기록
+
+구간은 1행부터 135행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–38 | 머리말 주석과 create_SedTrans_UpdateBottom_BindGroupLayout 선언을 포함한다. 계산 셰이더(compute shader)용 바인드 그룹(bind group)의 binding 0은 uniform 버퍼이다. 읽기 텍스처(texture) 1–3은 unfilterable-float·rgba32float이다. 원문(행 순서): `export function create_SedTrans_UpdateBottom_BindGroupLayout(device) {` (3); `return device.createBindGroupLayout({` (4); `entries: [` (5); `binding: 0,` (8); `visibility: GPUShaderStage.COMPUTE, // This buffer is only visible to the compute stage` (9); `buffer: { type: 'uniform' }  // It's a uniform buffer` (10); `},` (11); `binding: 1,` (14); `visibility: GPUShaderStage.COMPUTE,` (15); `texture: {` (16); `sampleType: 'unfilterable-float',` (17); `format: 'rgba32float'` (18); `},` (20); `binding: 2,` (23); `visibility: GPUShaderStage.COMPUTE,` (24); `texture: {` (25); `sampleType: 'unfilterable-float',` (26); `format: 'rgba32float'` (27); `},` (29); `binding: 3,` (32); `visibility: GPUShaderStage.COMPUTE,` (33); `texture: {` (34); `sampleType: 'unfilterable-float',` (35); `format: 'rgba32float'` (36); `},` (38). 7행 주석은 uniform 매개변수 예로 time을 든다. 13·22·31행 주석은 fragment shader의 표본 추출을 설명하지만 실제 visibility는 COMPUTE이다. [11-04 전수 검증 보완] |
+| 39–90 | 시작 시 3행 레이아웃 루틴·4행 호출·5행 entries 배열 안. 읽기 4와 7–8은 unfilterable-float·rgba32float이다. 출력 5–6은 write-only·rgba32float·2d이다. 레이아웃 종료와 빈 줄을 포함한다. 원문(행 순서): `binding: 4,` (41); `visibility: GPUShaderStage.COMPUTE,` (42); `texture: {` (43); `sampleType: 'unfilterable-float',` (44); `format: 'rgba32float'` (45); `},` (47); `binding: 5,` (50); `visibility: GPUShaderStage.COMPUTE,` (51); `storageTexture: {` (52); `access: 'write-only',      // This texture is only for writing data` (53); `format: 'rgba32float',    // Data format: 32-bit floating point values for red, green, blue, and alpha channels` (54); `viewDimension: '2d'       // The texture is a 2D texture` (55); `},` (57); `binding: 6,` (60); `visibility: GPUShaderStage.COMPUTE,` (61); `storageTexture: {` (62); `access: 'write-only',      // This texture is only for writing data` (63); `format: 'rgba32float',    // Data format: 32-bit floating point values for red, green, blue, and alpha channels` (64); `viewDimension: '2d'       // The texture is a 2D texture` (65); `},` (67); `binding: 7,` (70); `visibility: GPUShaderStage.COMPUTE,` (71); `texture: {` (72); `sampleType: 'unfilterable-float',` (73); `format: 'rgba32float'` (74); `},` (76); `binding: 8,` (79); `visibility: GPUShaderStage.COMPUTE,` (80); `texture: {` (81); `sampleType: 'unfilterable-float',` (82); `format: 'rgba32float'` (83); `},` (85). 40·69·78행 주석은 fragment shader의 표본 추출을 설명한다. 49·59행 주석은 계산 셰이더의 결과 쓰기를 설명한다. entries 배열·호출·함수는 각각 86·87·88행에서 닫힌다. [11-04 전수 검증 보완] |
+| 91–135 | createBindGroup이 uniformBuffer, txBottom, txBotChange_Sed, erosion_Sed, depostion_Sed, txtemp_SedTrans_Botttom, txtemp_SedTrans_Change, txHardBottom, txBottomInitial을 binding 0–8에 순서대로 연결한다. 원문(행 순서): `export function create_SedTrans_UpdateBottom_BindGroup(device, uniformBuffer, txBottom, txBotChange_Sed, erosion_Sed, depostion_Sed, txtemp_SedTrans_Botttom, txtemp_SedTrans_Change, txHardBottom, txBottomInitial) {` (91); `return device.createBindGroup({` (92); `layout: create_SedTrans_UpdateBottom_BindGroupLayout(device),` (93); `entries: [` (94); `binding: 0,` (96); `resource: {` (97); `buffer: uniformBuffer` (98); `},` (100); `binding: 1,` (102); `resource: txBottom.createView()` (103); `},` (104); `binding: 2,` (106); `resource: txBotChange_Sed.createView()` (107); `},` (108); `binding: 3,` (110); `resource: erosion_Sed.createView()` (111); `},` (112); `binding: 4,` (114); `resource: depostion_Sed.createView()` (115); `},` (116); `binding: 5,` (118); `resource: txtemp_SedTrans_Botttom.createView()` (119); `},` (120); `binding: 6,` (122); `resource: txtemp_SedTrans_Change.createView()` (123); `},` (124); `binding: 7,` (126); `resource: txHardBottom.createView()` (127); `},` (128); `binding: 8,` (130); `resource: txBottomInitial.createView()` (131); `},` (132). |
+
+## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
+
+- 1·3: 파일 머리말은 Handler_Tridiag.js라고 적지만 공개 루틴 이름은 create_SedTrans_UpdateBottom_BindGroupLayout이다.
+- 91·115·119: 인수와 연결 자원 이름은 depostion_Sed와 txtemp_SedTrans_Botttom으로 표기되어 있다.

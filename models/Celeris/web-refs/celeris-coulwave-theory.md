@@ -4,6 +4,8 @@ model: Celeris
 citation_status: verified
 source: "모드 정의·계수·S/T/E/F/G 항은 소스 직접 read(constants_load_calc.js:36-38, Pass3A/3B/Pass3_COULWAVE.wgsl, Pass3_Bous.wgsl, 2026-06-15). 원논문 서지(권·호·페이지·DOI)는 WebSearch landing-page 확인. 단, 코드↔논문 식 동등성은 '표준형 일치' 수준의 구조 식별이며 각 논문 유도 본문 정독은 아님(명시)."
 note_date: 2026-06-15
+last_source_check: "2026-11-04 (recovery 대조 반영)"
+verification_method: "2026-11-04 Celeris recovery 대조 보고서 반영"
 source_scope: Celeris-WebGPU/js, Celeris-WebGPU/shaders
 ---
 
@@ -36,6 +38,10 @@ NLSW_or_Bous: 0,  // Choose 0 for Non-linear Shallow Water (NLSW),
 근거(소스):
 - 모드 1 `Pass3_Bous.wgsl`는 `Bcoef`(=1/15)·`d_here`·`d2_here`·`d3_here`만 사용, `Bous_alpha`(za) **미참조**(grep 0건) → 정수심 기반 Madsen 형. (`Pass3_Bous.wgsl:272-286`)
 - 모드 2 `Pass3_COULWAVE`는 `za_here`·`eta_here`·속도구배 곱(S,T) 사용 → 순간 총수심·자유표면 의존 완전비선형. (`Pass3_COULWAVE.wgsl:336-372`)
+
+`Accuracy_mode`와 방정식 모드는 독립 설정이다 (`js/constants_load_calc.js:36–39`; `js/main.js:1540–1571`). 모드 2는 단일 기준 고도를 쓰는 COULWAVE 계열이다. `Bous_alpha`의 선언값은 `-0.531`이다 (`js/constants_load_calc.js:38`; `shaders/Pass3A_COULWAVE.wgsl:44`). [11-04 대조 정정]
+
+Tavakkol 2020 p.3 식 (2)–(3)은 모드 1에 대응한다. 모드 1의 젖음·마름 조건과 주기 경계 조건은 `shaders/Pass3_Bous.wgsl:142–149,181–193`에 있다. 구체적인 현재 식 차이는 [Tavakkol 2017 대조 보고서](../../../_staging/recovery/compare/celeris-tavakkol2017-vs-code.md)의 CP1-023·031·055·058에 연결한다. [11-04 대조 정정]
 
 ---
 
@@ -111,9 +117,9 @@ E1 = H·(temp2·∂S/∂x + temp3·∂T/∂x)   ;   E2 = H·(temp2·∂S/∂y + 
 - `F_star/G_star`(`:367-370`) = 분산항의 시간미분 대상 → `Psi2 = (3F*−4F*_old+F*_oldold)/(2dt)` **2차 후방차분(BDF2)** (`:374-378`). 이 F_star만 implicit tridiagonal로 남고 나머지(Fsrc)는 explicit AB.
 - `vort_here = ∂v/∂x − ∂u/∂y` (`Pass3B:199`) — 완전비선형이라 와도 보존항이 명시됨.
 
-### 3.4 여전히 미결(정독 필요)
-- 위 매핑은 **구조 식별**(코드 형태 ↔ 완전비선형 Boussinesq 표준형). `temp2/temp3` 계수가 Wei-Kirby 1995 / Lynett-Wu-Liu 2002의 *어느 식 번호*인지 1:1 대조는 **논문 본문 정독 필요**(미수행). PDF가 repo에 없어(`docs/`엔 Tavakkol/Lynett 논문만) 확보 후 후속.
-- `E = textureLoad(dU_by_dt).x` (`Pass3B:191`)의 정확한 정의(어떤 시간미분인지)는 `dU_by_dt` 생성처 추적 필요.
+### 3.4 외부 식 대조와 E 정의 [11-04 대조 정정]
+- 위 매핑은 코드 형태와 완전비선형 Boussinesq 표준형의 구조 식별이다. COULWAVE 보조항의 계수는 코드 원문을 인용한다. 외부 이론식과의 동일성을 이름만으로 확정하지 않는다 (`shaders/Pass3B_COULWAVE.wgsl:170–200`; [최종 근거 CD2-444](../../../_staging/recovery/compare/Celeris-conclusion-verify-CD2.md)). [11-04 대조 정정]
+- E의 코드 정의는 이미 저장된 eta 시간 우변 `dU_by_dt.x`다 (`shaders/Pass3B_COULWAVE.wgsl:191`; `shaders/Pass3_COULWAVE.wgsl:486–488,521`). 예측 B는 직전 단계 값을 읽는다 (`js/main.js:2663,2679`). 보정 B는 예측 Pass3 값을 읽는다 (`js/main.js:2797,2812`). [11-04 대조 정정]
 
 ---
 
@@ -137,3 +143,15 @@ E1 = H·(temp2·∂S/∂x + temp3·∂T/∂x)   ;   E2 = H·(temp2·∂S/∂y + 
 - Celeris 공식 논문: [`celeris-official-resources.md`](celeris-official-resources.md)
 - 동일 완전비선형 클래스(FUNWAVE): [`../../FUNWAVE/source-analysis/funwave-dispersion-solver.md`](../../FUNWAVE/source-analysis/funwave-dispersion-solver.md)
 - 쇄파(Kennedy eddy-viscosity, 공유): [`../source-analysis/celeris-breaking-boundary.md`](../source-analysis/celeris-breaking-boundary.md)
+
+
+## 문서와 코드 차이 (11-04 대조)
+
+코드는 plynett/plynett.github.io main `ebca435`(2026-07-20)의 Celeris-WebGPU이다. 문서는 같은 커밋의 `docs/`·`README`이다.
+
+코드 인용의 기준 경로는 `models/Celeris/raw/source_code/Celeris-WebGPU/`이다. 결론은 행별 최종 근거의 문장과 인용을 옮긴 AI 정리이다.
+
+| 행 ID | 항목 | 문서 원문 | 코드 원문 | 결론 | 결론 문장 |
+|---|---|---|---|---|---|
+| callflow:RF-022 | E 생산처 | 반영 전 노트 `d8157c80:models/Celeris/web-refs/celeris-coulwave-theory.md:116` 발췌: `` `E = textureLoad(dU_by_dt).x` (`Pass3B:191`) ``. 해당 줄에 E 생산처 설명은 없다(원문 요약). | `shaders/Pass3B_COULWAVE.wgsl:191` `let E = textureLoad(dU_by_dt, idx, 0).x;`<br>`shaders/Pass3_COULWAVE.wgsl:521` `textureStore(dU_by_dt, idx, d_by_dt);`<br>확인한 원문: `d8157c80:models/Celeris/web-refs/celeris-coulwave-theory.md:116`; `shaders/Pass3B_COULWAVE.wgsl:191–195`; `shaders/Pass3_COULWAVE.wgsl:486–488,521`; `js/main.js:2663,2679,2797,2812` | C 문서 누락 | COULWAVE B의 E는 수문 Pass3가 남긴 연속식 우변이다. 읽는 시점은 예측과 보정에서 다르다. ([최종 근거](../../../_staging/recovery/compare/Celeris-conclusion-verify-CP3RF.md)) [11-04 전수 검증 정정] |
+| docs-source:CD2-479 | eta 시간 우변 | 반영 전 노트 `d8157c80:models/Celeris/web-refs/celeris-coulwave-theory.md:116` 발췌: `` `E = textureLoad(dU_by_dt).x` (`Pass3B:191`) ``. 해당 줄에 E 생산처 설명은 없다(원문 요약). | `shaders/Pass3B_COULWAVE.wgsl:191` `     let E = textureLoad(dU_by_dt, idx, 0).x; `<br>`shaders/Pass3_COULWAVE.wgsl:488` `     let d_by_dt = (xflux_west - xflux_here) * globals.one_over_dx + (yflux_south - yflux_here) * globals.one_over_dy + source_term + vorticity_dissipation; `<br>`shaders/Pass3_COULWAVE.wgsl:521` `     textureStore(dU_by_dt, idx, d_by_dt); `<br>`js/main.js:2663` `                     runComputeShader(device, Pass3B_Coulwave_uniformBuffer, Pass3B_Coulwave_uniforms, Pass3B_Coulwave_Pipeline, Pass3B_Coulwave_BindGroup, calc_constants.DispatchX, calc_constants.DispatchY); `<br>`js/main.js:2679` `                     runComputeShader_EncStack(device, commandEncoderStack, Pass3_uniformBuffer, Pass3_uniforms, Pass3_Pipeline_Bous, Pass3_BindGroup, calc_constants.DispatchX, calc_constants.DispatchY); `<br>확인한 원문: `d8157c80:models/Celeris/web-refs/celeris-coulwave-theory.md:116`<br>`shaders/Pass3B_COULWAVE.wgsl:191`<br>`shaders/Pass3_COULWAVE.wgsl:486–488,520–522`<br>`js/main.js:2662–2685,2795–2815` | C 문서 누락 | E의 코드 정의는 이미 저장된 eta 시간 우변 dU_by_dt.x다. ([최종 근거](../../../_staging/recovery/compare/Celeris-conclusion-verify-CD2.md)) [11-04 전수 검증 정정] |

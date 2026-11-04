@@ -1,0 +1,23 @@
+---
+file: models/Celeris/raw/source_code/Celeris-WebGPU/shaders/Pass3A_COULWAVE.wgsl
+lines: 85
+sha256: c33e4249c9937678c8846505c400c09eb30b23ee61d11ae1ea597a395010a004
+reader: codex gpt-6.1-sol
+read_date: 2026-11-04
+---
+
+# Pass3A_COULWAVE.wgsl — 판독 구간 기록
+
+구간은 1행부터 85행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–21 | Globals는 격자 크기·역간격·Bous_alpha·delta를 선언한다. 계산 셰이더(compute shader)의 group 0 binding 0–7에는 상태·바닥·면 속도 입력 텍스처(texture)와 속도·zalpha·uvhuhv 출력이 있다. 원문: `struct Globals {` (1); `width: i32,` (2); `height: i32,` (3); `one_over_dx: f32,` (4); `one_over_dy: f32,` (5); `Bous_alpha: f32,` (6); `delta: f32,` (7); `@group(0) @binding(0) var<uniform> globals: Globals;` (10); `@group(0) @binding(1) var txState: texture_2d<f32>;` (12); `@group(0) @binding(2) var txBottom: texture_2d<f32>;` (13); `@group(0) @binding(3) var txU: texture_2d<f32>;` (14); `@group(0) @binding(4) var txV: texture_2d<f32>;` (15); `@group(0) @binding(5) var txModelVelocities: texture_storage_2d<rgba32float, write>;` (17); `@group(0) @binding(6) var txCW_zalpha: texture_storage_2d<rgba32float, write>;` (18); `@group(0) @binding(7) var txCW_uvhuhv: texture_storage_2d<rgba32float, write>;` (19) |
+| 22–46 | 16×16 작업군에서 ±1 이웃 좌표를 제한한다. 네 면 속도 평균과 중심 수면고·정수심을 읽는다. 전체 수심 하한은 delta이다. 기준 높이 za는 -d+(1+Bous_alpha)*H이다. 원문: `@compute @workgroup_size(16, 16)` (22); `fn main(@builtin(global_invocation_id) id: vec3<u32>) {` (23); `let idx = vec2<i32>(i32(id.x), i32(id.y));` (24); `let rightIdx = min(idx + vec2<i32>(1, 0), vec2<i32>(i32(globals.width)-1, i32(globals.height)-1));` (26); `let upIdx = min(idx + vec2<i32>(0, 1), vec2<i32>(i32(globals.width)-1, i32(globals.height)-1));` (27); `let leftIdx = max(idx + vec2<i32>(-1, 0), vec2<i32>(0, 0));` (28); `let downIdx = max(idx + vec2<i32>(0, -1), vec2<i32>(0, 0));` (29); `var u4 = textureLoad(txU, idx, 0);` (32); `var v4 = textureLoad(txV, idx, 0);` (33); `let u_here = (u4.x + u4.y + u4.z + u4.w) / 4.0;` (34); `let v_here = (v4.x + v4.y + v4.z + v4.w) / 4.0;` (35); `let eta_here = textureLoad(txState, idx, 0).x;` (38); `let d_here = -textureLoad(txBottom, idx, 0).z;` (39); `let H_here = max(globals.delta, eta_here + d_here);` (40); `let za_here = -d_here + ( 1.0 + globals.Bous_alpha ) * H_here;` (44)  누락된 주석 원문: `// let u_here = textureLoad(txState, idx, 0).y / H_here;  //testing whether velocities directly from flux are better.  They are not` (41);`// let v_here = textureLoad(txState, idx, 0).z / H_here;` (42);`//let za_here = d_here * globals.Bous_alpha;` (45). [11-04 전수 검증 보완] |
+| 47–74 | 시작 시 23행 `fn main(@builtin(global_invocation_id) id: vec3<u32>) {` 블록 안. 네 이웃 수면고와 바닥으로 수심 및 za를 같은 방식으로 계산한다. 정수심에 Bous_alpha만 곱하는 대안식은 주석 처리되어 있다. 원문: `let eta_ip1 = textureLoad(txState, rightIdx, 0).x;` (48); `let d_ip1 = -textureLoad(txBottom, rightIdx, 0).z;` (49); `let H_ip1 = max(globals.delta, eta_ip1 + d_ip1);` (50); `let za_ip1 = -d_ip1 + ( 1.0 + globals.Bous_alpha ) * H_ip1;` (51); `let eta_im1 = textureLoad(txState, leftIdx, 0).x;` (55); `let d_im1 = -textureLoad(txBottom, leftIdx, 0).z;` (56); `let H_im1 = max(globals.delta, eta_im1 + d_im1);` (57); `let za_im1 = -d_im1 + ( 1.0 + globals.Bous_alpha ) * H_im1;` (58); `let eta_jp1 = textureLoad(txState, upIdx, 0).x;` (62); `let d_jp1 = -textureLoad(txBottom, upIdx, 0).z;` (63); `let H_jp1 = max(globals.delta, eta_jp1 + d_jp1);` (64); `let za_jp1 = -d_jp1 + ( 1.0 + globals.Bous_alpha ) * H_jp1;` (65); `let eta_jm1 = textureLoad(txState, downIdx, 0).x;` (69); `let d_jm1 = -textureLoad(txBottom, downIdx, 0).z;` (70); `let H_jm1 = max(globals.delta, eta_jm1 + d_jm1);` (71); `let za_jm1 = -d_jm1 + ( 1.0 + globals.Bous_alpha ) * H_jm1;` (72)  누락된 주석 원문: `//let za_ip1 = d_ip1 * globals.Bous_alpha;` (52);`//let za_im1 = d_im1 * globals.Bous_alpha;` (59);`//let za_jp1 = d_jp1 * globals.Bous_alpha;` (66);`//let za_jm1 = d_jm1 * globals.Bous_alpha;` (73). [11-04 전수 검증 보완] |
+| 75–85 | 시작 시 23행 `fn main(@builtin(global_invocation_id) id: vec3<u32>) {` 블록 안. 중심 차분으로 za의 두 방향 기울기를 계산한다. 속도·수면고·수심, za·기울기, 속도·정수심 곱을 세 텍스처에 저장한다. 원문: `let dzadx = 0.5 * (za_ip1 - za_im1) * globals.one_over_dx;` (75); `let dzady = 0.5 * (za_jp1 - za_jm1) * globals.one_over_dy;` (76); `let vel_out = vec4<f32>(u_here, v_here, eta_here, H_here);` (78); `let za_out = vec4<f32>(za_here, dzadx, dzady, 0.0);` (79); `let uvhuhv = vec4<f32>(u_here, v_here, u_here * d_here, v_here * d_here);` (80); `textureStore(txModelVelocities, idx, vel_out);` (82); `textureStore(txCW_zalpha, idx, za_out);` (83); `textureStore(txCW_uvhuhv, idx, uvhuhv);` (84) |
+
+## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
+
+- 39–44·80: H_here에는 delta 하한을 쓰며 uvhuhv의 z·w는 전체 수심 H_here 대신 정수심 d_here에 속도를 곱한다.
+- 41–42: 상태 유량을 전체 수심으로 나눠 속도를 구하는 대체식은 주석 처리되어 있다.

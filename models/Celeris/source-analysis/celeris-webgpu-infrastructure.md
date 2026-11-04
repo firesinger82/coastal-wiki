@@ -2,7 +2,8 @@
 title: "Celeris-WebGPU 인프라·데이터 규약 — 텍스처 상태·바인드그룹·config·진단"
 model: Celeris
 citation_status: verified
-verification_method: "models/Celeris/raw/source_code/Celeris-WebGPU/js/{Create_Textures,Config_Pipelines,Run_Compute_Shader,constants_load_calc,main,Handler_Calc*,Handler_ExtractTimeSeries}.js 직접 read + docs/architecture 대조. 라인 인용 소스 기준. 2026-06-15."
+verification_method: "models/Celeris/raw/source_code/Celeris-WebGPU/js/{Create_Textures,Config_Pipelines,Run_Compute_Shader,constants_load_calc,main,Handler_Calc*,Handler_ExtractTimeSeries}.js 직접 read + docs/architecture 대조. 라인 인용 소스 기준. 2026-06-15. 2026-11-04 Celeris recovery 대조 보고서 반영"
+last_source_check: "2026-11-04 (recovery 대조 반영)"
 note_author: "Claude Opus 4.8 (1M context)"
 note_date: 2026-06-15
 source_scope: Celeris-WebGPU/js, Celeris-WebGPU/shaders
@@ -13,7 +14,12 @@ source_scope: Celeris-WebGPU/js, Celeris-WebGPU/shaders
 
 ## 0. 기본 골격
 
-Celeris-WebGPU는 **빌드 단계 없는** ES6 모듈 + WGSL 컴퓨트 셰이더로, 브라우저 WebGPU 위에서 NLSW/Boussinesq/COULWAVE를 푼다. 거의 모든 상태는 GPU 텍스처이며, CPU 행렬은 사실상 없다. 모든 시뮬레이션 텍스처는 `rgba32float`, `WIDTH × HEIGHT`, usage = `STORAGE_BINDING | COPY_SRC | COPY_DST | RENDER_ATTACHMENT | TEXTURE_BINDING` 로 생성된다 (`js/Create_Textures.js:2-13`). 채널은 항상 4-vector `(r/x, g/y, b/z, a/w)`.
+Celeris-WebGPU는 빌드 단계 없이 JavaScript 모듈과 WGSL 컴퓨트 셰이더를 브라우저에서 로드한다(`ARCHITECTURE.md:3`). 모델 선택값은 NLSW·Boussinesq·COULWAVE 경로를 구분한다(`ARCHITECTURE.md:63–67`). 유체 상태의 시간적분은 GPU 텍스처를 갱신한다(`shaders/Pass3_Bous.wgsl:399–429`). 입력 지형은 CPU의 `bathy2D` 2차원 배열에도 저장한다(`js/File_Loader.js:36–54`). [11-04 전수 검증 정정]
+주요 2D 유체 상태는 `WIDTH × HEIGHT`의 `rgba32float`이다 (`js/Create_Textures.js:2–13`). [11-04 대조 정정]
+COULWAVE 그룹은 3D이다 (`js/Create_Textures.js:54–65`; `js/main.js:515`). [11-04 대조 정정]
+파 성분·시계열·더미 텍스처는 별도 크기이다 (`js/Create_Textures.js:68–71`; `js/main.js:529–536,563–576`). [11-04 대조 정정] [11-04 전수 검증 정정]
+렌더 캐시는 `rgba16float`이다 (`js/Create_Textures.js:15–18`). [11-04 대조 정정]
+위의 `rgba32float` 유체 상태 텍스처는 네 채널 `(r/x, g/y, b/z, a/w)`을 사용한다(`js/Create_Textures.js:2–6`; `shaders/Pass3_Bous.wgsl:392–429`). [11-04 전수 검증 정정]
 
 핵심 헬퍼 (`js/Create_Textures.js`):
 
@@ -22,7 +28,7 @@ Celeris-WebGPU는 **빌드 단계 없는** ES6 모듈 + WGSL 컴퓨트 셰이더
 | `create_2D_Texture` | rgba32float 2D | 모든 시뮬 상태 텍스처 (라인 2) |
 | `create_2D_F16Texture` | rgba16float 2D-array | 렌더 캐시 `txRenderVarsf16` (라인 15) |
 | `create_2D_Image_Texture` | bgra8unorm 2D | 스크린/오버레이 (라인 28) |
-| `create_3D_Image_Texture` | bgra8unorm 3D-array | 샘플 PNG·스카이박스·애니메이션 (라인 41) |
+| `create_3D_Image_Texture` | bgra8unorm 2D 배열 | skybox는 6층 배열에 cube view를 만든다 (`js/Create_Textures.js:41–58`; `js/main.js:556,782`). [11-04 대조 정정] |
 | `create_3D_Data_Texture` | rgba32float 3D | COULWAVE `txCW_groupings` (라인 54) |
 | `create_1D_Texture` | rgba32float 1×W | 파동 입력·시계열 위치/데이터 (라인 68) |
 | `createUniformBuffer` | 기본 256 B | 패스별 uniform (라인 81) |
@@ -40,13 +46,20 @@ Celeris-WebGPU는 **빌드 단계 없는** ES6 모듈 + WGSL 컴퓨트 셰이더
 
 | 텍스처 | r/x | g/y | b/z | a/w | 쓰는 패스 → 읽는 패스 | line |
 |---|---|---|---|---|---|---|
-| `txState` | η (자유수면) | P = hu (x-운동량) | Q = hv (y-운동량) | scalar/tracer | Pass1/2/3·Boundary 읽음, 스텝 끝 `txNewState`→`txState` 복사 | 343 |
+| `txState` | η (자유수면) | P = hu (x-운동량) | Q = hv (y-운동량) | scalar/tracer | Pass1이 면 재구성에 읽는다. Pass2는 면 텍스처에서 플럭스를 계산한다. 스텝 끝에 `txNewState`를 `txState`로 복사한다. | `js/main.js:970,1015,2900` [11-04 대조 정정] |
 | `txNewState` | η (n+1) | P | Q | scalar | Pass3 출력 → 다음 스텝 입력. CalcMeans/CalcWaveHeight가 η 읽음 | 344 |
-| `txstateUVstar` | η | U* | V* | c | bous-그룹 상태 (n). 분산 솔브의 RHS/해 | 347 |
+| `txstateUVstar` | η | U* | V* | c | UVstar는 분산 중간 상태의 시간 이력이다. PCR 최종 해와 구분한다. | `shaders/Pass3_Bous.wgsl:426–429`; `js/main.js:2900–2901` [11-04 대조 정정] |
 | `current_stateUVstar` | η | U* | V* | c | bous-그룹 상태 (n+1) → 스텝 끝 `txstateUVstar`로 복사 | 348 |
 | `txState_Sed` / `txNewState_Sed` | sed 농도 상태 (class별) | — | — | — | 퇴적물 전송 (옵션) | 345-346 |
 
-> NLSW에서는 `*UVstar`가 사실상 통과 복사. Bous/COULWAVE에서는 PCR 솔브 주변의 RHS/해 텍스처.
+> NLSW는 `current_stateUVstar`를 `txNewState`에 복사한다 (`js/Run_Tridiag_Solver.js:37–38`). [11-04 대조 정정]
+> Boussinesq 경로는 `current_stateUVstar`에서 PCR의 초기 우변을 읽는다 (`shaders/TriDiag_PCRx.wgsl:70–72,101–104`; `shaders/TriDiag_PCRy.wgsl:70–72,101–104`). [11-04 대조 정정]
+> COULWAVE 경로는 중간 상태에서 만든 계수 텍스처의 a 채널에서 PCR의 초기 우변을 읽는다 (`shaders/Update_TriDiag_coef_COULWAVE.wgsl:51–52,84–85,114–115`; `shaders/TriDiag_PCRx_COULWAVE.wgsl:72–74,101–107`). [11-04 대조 정정]
+> 각 방향의 PCR 해는 `txtemp2_PCRx` 또는 `txtemp2_PCRy`에 기록한다 (`shaders/TriDiag_PCRx.wgsl:101–104`; `shaders/TriDiag_PCRy.wgsl:101–104`). [11-04 대조 정정]
+> 호스트는 그 해를 `txNewState`로 복사한다 (`js/Run_Tridiag_Solver.js:66,91`). [11-04 대조 정정]
+>
+> 첫 경계의 상태 입력은 `current_stateUVstar`이다 (`js/main.js:1157`). [11-04 대조 정정]
+> 풀이 뒤 경계의 상태 입력은 `txNewState`이다 (`js/main.js:1160`). [11-04 대조 정정]
 
 ### 1b. 지형·마찰·소스
 
@@ -69,7 +82,7 @@ Celeris-WebGPU는 **빌드 단계 없는** ES6 모듈 + WGSL 컴퓨트 셰이더
 | `txU` | 북면 u | 동면 u | 남면 u | 서면 u | 350 |
 | `txV` | 북면 v | 동면 v | 남면 v | 서면 v | 351 |
 | `txC` | 북면 c | 동면 c | 남면 c | 서면 c | 353 |
-| `txHnear` | (현재 미사용) | | | | 352 |
+| `txHnear` | 이웃 북측 수심 | 이웃 동측 수심 | 이웃 남측 수심 | 이웃 서측 수심 | Pass0가 쓰고 Pass2가 읽는다 (`js/main.js:957,1015`; `shaders/Pass0.wgsl:52–57`; `shaders/Pass2.wgsl:70,105`). [11-04 대조 정정] |
 
 > ⚠ x=북면, y=동면. CalcMeans는 셀 평균을 `(x+y+z+w)/4`로 복원 (`shaders/CalcMeans.wgsl:43-46`) — 이 4-면 규약을 그대로 가정한다.
 
@@ -93,6 +106,11 @@ Celeris-WebGPU는 **빌드 단계 없는** ES6 모듈 + WGSL 컴퓨트 셰이더
 | `*_Sed` 변종 | 퇴적물 적분용 | 374-376 |
 
 스텝 끝 시프트: `oldGradients→oldOldGradients`, `predictedGradients→oldGradients` (`js/main.js:2896-2897`).
+
+예측 쇄파·COULWAVE B는 직전 시간 단계의 마지막 Pass3가 남긴 도함수를 읽는다 (`shaders/Pass_Breaking.wgsl:55`; `shaders/Pass3B_COULWAVE.wgsl:191`; `js/main.js:2649–2679`). [11-04 대조 정정]
+첫 시간 단계에는 이전 Pass3 결과가 없다 (`js/main.js:2649–2679,2895–2901`). [11-04 대조 정정]
+보정 호출은 이번 예측 Pass3의 도함수를 읽는다 (`js/main.js:2678–2685,2783–2812`). [11-04 대조 정정]
+Pass2도 이번 쇄파 갱신보다 먼저 `txBreaking`을 읽는다 (`js/main.js:2649–2679`). [11-04 대조 정정]
 
 ### 1f. PCR 삼중대각 솔버 (Bous/COULWAVE)
 
@@ -165,13 +183,18 @@ binding 14개 모두 셰이더의 `@binding(0..13)`와 일치해야 하며, 하�
 
 1. **이전 실행 정리**: `allTextures` 전부 destroy, `allComputePipelines`/`RenderPipeline` clear, device/adapter/context null화 (라인 191-202).
 2. **adapter 요청**: `gpu.requestAdapter({powerPreference:"high-performance"})`, 실패 시 fallback 어댑터 (라인 205-212).
-3. **device 요청**: `adapter.requestDevice({requiredFeatures:[], requiredLimits:{}})` + `device.lost`·`uncapturederror` 핸들러 등록 (라인 215-229).
+3. **device 요청**: `bb99fee`(2026-07-02)는 장치 요청에 `maxTextureDimension2D`를 추가했다 (`bb99fee:js/main.js:248–261`). [11-04 대조 정정]
+   현재 값은 `const requestedMaxTextureDimension2D = adapter.limits?.maxTextureDimension2D || 8192;`로 정한다 (`js/main.js:249`). [11-04 대조 정정]
+   `requiredLimits`는 이 값을 전달한다 (`js/main.js:254–261`). [11-04 대조 정정]
 4. **canvas 컨텍스트 config**: `canvas.getContext('webgpu')`, `swapChainFormat='bgra8unorm'`, `context.configure({device, format, usage: RENDER_ATTACHMENT|COPY_SRC})` (라인 233-244).
-5. **OrderedFunctions** (라인 247): `init_sim_parameters`(config 로드+파생 상수+canvas 크기) → `loadDepthSurface` → `loadWaveData`. 순서 의존.
+5. **OrderedFunctions**: 본판은 adapter/device를 얻은 뒤 `OrderedFunctions`를 호출한다 (`js/main.js:240,254,300`). [11-04 대조 정정]
+   `bb99fee`(2026-07-02)는 `OrderedFunctions`에 type-5 경계 시계열 로딩을 추가했다 (`bb99fee:js/main.js:201–213`). [11-04 대조 정정]
+   현재 함수는 설정·수심·파랑 다음에 선택 경계 시계열을 읽는다 (`js/main.js:201–213`). [11-04 대조 정정]
+   반환 객체는 공통 시간벡터를 포함한다 (`js/main.js:213`; `js/File_Loader.js:453,502–510`). [11-04 대조 정정]
 6. **uniform 버퍼 생성**: 패스별 `createUniformBuffer(device)` ×수십 개 + readback 버퍼(`bytesPerRow` 256배수 정렬) (라인 286-321).
 7. **텍스처 할당**: 1c 섹션의 전 텍스처 (라인 341-456).
 8. **CPU→GPU 복사**: `copyBathyDataToTexture`(txBottom) / `refreshBoundaryWaveTexture`(txWaves) / `copyTSlocsToTexture`(시계열 위치) / `copyInitialConditionDataToTexture`(txState·txstateUVstar) (라인 462-475, `js/Copy_Data_to_Textures.js`). 옵션: 초기수면·마찰·hard bottom·overlay 파일 (라인 478-).
-9. **bind group 생성**: 각 패스 `create_*_BindGroupLayout` + `create_*_BindGroup` (CalcMeans 1097-1098, CalcWaveHeight 1110-1111, ExtractTimeSeries 1183-1184 …) + uniform `DataView` 채움.
+9. **bind group 생성**: bind group은 대응 파이프라인 생성보다 먼저 만든다 (`js/main.js:954–960,1619–1627`). [11-04 대조 정정]
 10. **셰이더 fetch + 파이프라인**: `fetchShader('/shaders/*.wgsl')` (라인 1371- ) → `createComputePipeline(...)` (라인 1408- ).
 11. **루프 진입**: `async function frame()` 정의 (라인 1540) 후 `await frame()` 1회 호출 (라인 2938), 매 프레임 끝 `requestAnimationFrame(frame)` (라인 2933).
 
@@ -188,7 +211,7 @@ binding 14개 모두 셰이더의 `@binding(0..13)`와 일치해야 하며, 하�
 | `WIDTH`/`HEIGHT` | 800/600 | 격자 |
 | `dx`/`dy` | 1.0 | 셀 크기 |
 | `Courant_num` | 0.15 | 목표 Courant (P-C ~0.25, explicit ~0.05) |
-| `timeScheme` | 2 | 0=Euler, 1=AB3 predictor, 2=AB4 pred+corr |
+| `timeScheme` | 2 | 0=Euler, 1=AB3 예측, 2=AB3 예측과 AM4 한 번 보정 (`shaders/Pass3_Bous.wgsl:399–410`; `js/main.js:2757–2815`). [11-04 대조 정정] |
 | `NLSW_or_Bous` | 0 | 0=NLSW, 1=Madsen Bous, 2=COULWAVE |
 | `Bcoef` | 1/15 | 분산 파라미터 (최적값) |
 | `Bous_alpha` | −0.531 | Nwogu 확장 Bous 파라미터 |
@@ -200,6 +223,9 @@ binding 14개 모두 셰이더의 `@binding(0..13)`와 일치해야 하며, 하�
 
 **파생 상수** (`init_sim_parameters`, 라인 404-428):
 - `dt = Courant_num · min(dx,dy) / √(g·base_depth)` (라인 404) — CFL 기반 시간스텝.
+- `afc1fe7`(2026-06-19)은 `if (calc_constants.grid_type == 2)`의 구면 시간간격 분기를 추가했다 (`afc1fe7:js/constants_load_calc.js:413–446`). [11-04 대조 정정]
+- 이 분기는 셀 중심 위도와 `R_earth`를 사용한 최소 물리 간격으로 `dt`를 계산한다 (`js/constants_load_calc.js:472–484`). [11-04 대조 정정]
+- 그 밖의 분기는 기존 직교 시간간격 식을 사용한다 (`js/constants_load_calc.js:485–487`). [11-04 대조 정정]
 - 리미터: `TWO_THETA = 2·Theta` (405), `half_g = g/2` (406).
 - 분산: `Bcoef_g = Bcoef·g` (407).
 - 역격자: `g_over_dx/dy`, `one_over_dx/dy`, `one_over_d2x/d3x`(2·3차), `one_over_d2y/d3y`, `one_over_dxdy` (408-416) — 고차 미분 스텐실용.
@@ -210,26 +236,32 @@ binding 14개 모두 셰이더의 `@binding(0..13)`와 일치해야 하며, 하�
 - 파일쓰기 간격 `n_write_interval`, ship 가우시안 계수 `ship_c1a..c3b` (489-491, 498-502), 퇴적물 fall velocity 등 (508-522).
 - canvas 폭은 256바이트/행 정렬 위해 64의 배수로 올림 (`⌈WIDTH/64⌉·64`) — rgba 4채널이라 256/4=64 (라인 530-538).
 
-> AB pred+corr 계수 자체는 시간적분 셰이더(Pass3) 내부 override constant로 들어가며, JS 측은 위 `dt`·`Bcoef_g`·역격자·`Theta` 등을 uniform으로 공급한다. 적분식은 `celeris-boussinesq-solver`·`celeris-fv-reconstruction` 참조.
+> AB3·AM4 계수는 셰이더 계산식에 직접 적혀 있다 (`shaders/Pass3_Bous.wgsl:399–409`). [11-04 대조 정정]
+> JavaScript는 `dt`와 단계 플래그를 uniform으로 전달한다 ([최종 근거 CD1-1333](../../../_staging/recovery/compare/Celeris-conclusion-verify-CD1h.md); `js/main.js:1083,1095,2672–2673,2806–2807`; `shaders/Pass3_Bous.wgsl:399–409`). [11-04 대조 정정] [11-04 전수 검증 보완]
 
 ---
 
 ## 5. 진단 (diagnostics)
 
-세 컴퓨트 패스 모두 **임시→canonical 복사** 패턴이며, 카운터를 uniform으로 받아 running average를 만든다.
+평균·파고는 매 시간 단계에 갱신한다 (`js/main.js:2865–2872,2915–2925`). [11-04 대조 정정]
+점 시계열 추출은 running average가 아니다 (`shaders/ExtractTimeSeries.wgsl:25–63`). [11-04 대조 정정]
+f16·점 시계열은 프레임마다 계산한다 (`js/main.js:2980,3515`). [11-04 대조 정정]
 
 ### 5a. CalcMeans (`shaders/CalcMeans.wgsl`, `Handler_CalcMeans.js`)
 입력 `txMeans/Means_Speed/Means_Momflux`(이전값) + `txH/U/V/C`(면) + `txBottom` + `txNewState`. 셀 평균 `h,u,v,c = (x+y+z+w)/4` 복원 (라인 43-46), `P=hu`, `Q=hv`, `speed`, `momflux=√(hu²²+hv²²)` 계산. 중앙차분으로 vorticity 산출 (라인 61-73).
 - running mean: `means_new = means·(1−1/n) + state·(1/n)`, `n = n_time_steps_means` (라인 75-78).
 - max 트래킹: u/v/speed/eta_max, hu²/hv²/momflux_max (n>1일 때, 라인 88-97).
 - 출력: `txtemp_Means`(means), `txtemp_Means_Speed`(maxes), `txtemp_Means_Momflux`(mom maxes + |vort| 평균), `txModelVelocities=(u,v,eta,h)` (라인 99-102). 건셀은 `eta=−10·base_depth` placeholder (라인 55-57).
-- 디스패치 후 `txtemp_Means*`→`txMeans*` 복사, `n_time_steps_means`는 매 corrector 스텝 +1 (`js/main.js:2868-2869,2915-2920`).
+- 디스패치 후 `txtemp_Means*`를 `txMeans*`로 복사한다 (`js/main.js:2915–2920`). [11-04 대조 정정]
+- `n_time_steps_means`는 매 시간 단계에 증가한다 (`js/main.js:2865–2872`). [11-04 대조 정정]
 
 ### 5b. CalcWaveHeight (`shaders/CalcWaveHeight.wgsl`, `Handler_CalcWaveHeight.js`)
 입력 `txState`(η_old), `txNewState`(η_new), `txMeans`(η_mean), `txWaveHeight`(이전). η' = η_new − η_mean, `sum_eta2 += η'²` 누적 (n≤1이면 리셋) → `variance = Ση'²/n`, `σ=√variance` (라인 31-37).
 - **H_mean = 2.829·σ** (RMS 파고), **H_sig = 4.000·σ** (유의파고) — Rayleigh 가정 (라인 39-41).
 - 출력 `txtemp_WaveHeight = (Ση'², (H_sig−old)/old 상대변화, H_sig, H_mean)` (라인 42, 75). zero-crossing 분기는 주석처리됨.
-- main.js는 `txstateUVstar`를 binding1(txState)로 넘김 (`js/main.js:1310`), 디스패치 후 `txtemp_WaveHeight`→`txWaveHeight`, `n_time_steps_waveheight` +1 (라인 2126-2127, 2174-2175).
+- main.js는 `txstateUVstar`를 binding1(txState)로 넘긴다 (`js/main.js:1310`). [11-04 대조 정정]
+- 디스패치 후 `txtemp_WaveHeight`를 `txWaveHeight`로 복사한다 (`js/main.js:2924–2931`). [11-04 대조 정정]
+- `n_time_steps_waveheight`는 매 시간 단계에 증가한다 (`js/main.js:2865–2872`). [11-04 대조 정정]
 
 ### 5c. ExtractTimeSeries (`shaders/ExtractTimeSeries.wgsl`, `Handler_ExtractTimeSeries.js`)
 **workgroup_size(1,1)**, 디스패치 폭 = `NumberOfTimeSeries + 1` (`js/main.js:3515`). 1D 텍스처 `txTimeSeries_Data`에 기록:
@@ -237,7 +269,14 @@ binding 14개 모두 셰이더의 `@binding(0..13)`와 일치해야 하며, 하�
 - idx ≥1 = **시계열 프로브**: `txTimeSeries_Locations`에서 격자좌표 읽어 `(time, η, P, Q)` 기록 (라인 55-61).
 - readback: `readToolTipTextureData`가 1D 텍스처를 256B/행 버퍼로 `copyTextureToBuffer` → `mapAsync(READ)` → `timeSeriesData[i].{time,eta,P,Q}`에 push (`js/Time_Series.js:60-128`). `downloadTimeSeriesData`가 위치·시계열을 텍스트로 내보냄 (라인 128-171). 차트는 1초 간격 갱신 (`js/main.js:5488`).
 
+본판은 배열을 동기 초기화하고 epoch로 이전 readback을 버린다 (`js/main.js:3467–3518`; `js/Time_Series.js:60–125`). [11-04 대조 정정]
+transect 판은 `await buffer.mapAsync(GPUMapMode.READ);` 뒤에 배열을 초기화한다 (`transect_version/js/main.js:2151–2173,3404–3406`; `transect_version/js/Time_Series.js:57–112`). [11-04 대조 정정]
+초기화 요청의 반복과 비동기 결과 반영 순서는 E 코드 결함 후보이며 강도는 중간이다 ([최종 근거 CT1-366](../../../_staging/recovery/compare/Celeris-conclusion-verify-CT1c.md)). [11-04 대조 정정]
+본판 type5의 절대 시각 지원은 별도 판 차이다 ([최종 근거 CT1-366](../../../_staging/recovery/compare/Celeris-conclusion-verify-CT1c.md)). [11-04 대조 정정]
+
 ---
 
 ## 부록: 렌더 캐시 패킹
 `shaders/Copytxf32_txf16.wgsl`가 매 프레임 f32 시뮬 텍스처 → `txRenderVarsf16`(3 layer, f16)로 패킹해 렌더 시 full rgba32float 샘플링 압력을 줄인다 (`js/main.js:2980`). 레이어 채널 의미·시각화는 `celeris-render` 참조.
+
+문서와 코드 차이 표는 [celeris-webgpu-infrastructure-differences.md](celeris-webgpu-infrastructure-differences.md)에 있다.

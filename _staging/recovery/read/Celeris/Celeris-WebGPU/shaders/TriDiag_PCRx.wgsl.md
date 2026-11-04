@@ -1,0 +1,24 @@
+---
+file: models/Celeris/raw/source_code/Celeris-WebGPU/shaders/TriDiag_PCRx.wgsl
+lines: 107
+sha256: 0a526250f372ac2e83a8c445f5e179af0a51a4ec872fbe27becf8d8d890cf4e6
+reader: codex gpt-6.1-sol
+read_date: 2026-11-04
+---
+
+# TriDiag_PCRx.wgsl — 판독 구간 기록
+
+구간은 1행부터 107행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–18 | Globals는 격자 크기·현재 반복 p·간격 s·총 반복 P를 가진다. 계수·현재 상태·UVstar 읽기 및 계수·상태 저장 텍스처(texture) 바인딩을 선언한다. 원문: `struct Globals {` (1); `width: i32,` (2); `height: i32,` (3); `p: i32,` (4); `s: i32,` (5); `P: i32,` (7); `@group(0) @binding(0) var<uniform> globals: Globals;` (10); `@group(0) @binding(1) var coefMatx: texture_2d<f32>;` (12); `@group(0) @binding(2) var current_state: texture_2d<f32>;` (13); `@group(0) @binding(3) var current_stateUVstar: texture_2d<f32>;` (14); `@group(0) @binding(4) var txtemp: texture_storage_2d<rgba32float, write>;` (16); `@group(0) @binding(5) var txtemp2: texture_storage_2d<rgba32float, write>;` (17) 6행 주석은 JS가 `s` 뒤에 총 PCR 반복 수 uniform을 이미 쓴다고 설명한다. 이는 주석의 설명이다. 원문: `// CODEX: Total PCR iteration count; JS already writes this uniform after s.` (6). [11-04 전수 검증 보완] |
+| 19–55 | 계산 셰이더(compute shader)의 main을 정의한다. x 방향 ±s 좌표를 width 나머지 연산으로 순환시킨다. 계수 작업 변수는 0으로 초기화한다. 가상 격자 반환 블록은 주석이다. 원문: `@compute @workgroup_size(16, 16)` (19); `fn main(@builtin(global_invocation_id) id: vec3<u32>) {` (20); `let idx = vec2<i32>(i32(id.x), i32(id.y));` (21); `// let CurrentState = textureLoad(current_state, idx, 0);` (23); `let s = (globals.s);` (25); `let width = (globals.width);` (26); `let height = (globals.height);` (27); `//   let zero = vec4<f32>(0.0, 1.0, 0.0, CurrentState.g);` (29); `//    if (idx.x >= width - 2 \|\| idx.y >= height - 2 \|\| idx.x <= 1 \|\| idx.y <= 1) {` (34); `let idx_left =  vec2<i32>((idx.x - s + width) % width, idx.y);` (38); `let idx_right = vec2<i32>((idx.x + s + width) % width, idx.y);` (39); `var aIn = 0.0;` (41); `var bIn = 0.0;` (42); `var cIn = 0.0;` (43); `var dIn = 0.0;` (44); `var aInLeft = 0.0;` (46); `var bInLeft = 0.0;` (47); `var cInLeft = 0.0;` (48); `var dInLeft = 0.0;` (49); `var aInRight = 0.0;` (51); `var bInRight = 0.0;` (52); `var cInRight = 0.0;` (53); `var dInRight = 0.0;` (54) |
+| 56–88 | 시작 시 20행 `fn main(@builtin(global_invocation_id) id: vec3<u32>) {` 블록 안. 병렬 순환 축소(parallel cyclic reduction, PCR)의 첫 반복은 중심 대각 b로 a·c 및 UVstar의 g 성분을 나눈다. 후속 반복은 입력 계수 텍스처의 r·b·a 성분을 읽는다. 원문: `if (globals.p == 0) {` (56); `bIn = textureLoad(coefMatx, idx, 0).g;` (58); `bInLeft = textureLoad(coefMatx, idx_left, 0).g;` (59); `bInRight = textureLoad(coefMatx, idx_right, 0).g;` (60); `aIn = textureLoad(coefMatx, idx, 0).r / bIn;` (62); `aInLeft = textureLoad(coefMatx, idx_left, 0).r / bInLeft;` (63); `aInRight = textureLoad(coefMatx, idx_right, 0).r / bInRight;` (64); `cIn = textureLoad(coefMatx, idx, 0).b / bIn;` (66); `cInLeft = textureLoad(coefMatx, idx_left, 0).b / bInLeft;` (67); `cInRight = textureLoad(coefMatx, idx_right, 0).b / bInRight;` (68); `dIn = textureLoad(current_stateUVstar, idx, 0).g / bIn;` (70); `dInLeft = textureLoad(current_stateUVstar, idx_left, 0).g / bInLeft;` (71); `dInRight = textureLoad(current_stateUVstar, idx_right, 0).g / bInRight;` (72); `} else {` (74); `aIn = textureLoad(coefMatx, idx, 0).r;` (76); `aInLeft = textureLoad(coefMatx, idx_left, 0).r;` (77); `aInRight = textureLoad(coefMatx, idx_right, 0).r;` (78); `cIn = textureLoad(coefMatx, idx, 0).b;` (80); `cInLeft = textureLoad(coefMatx, idx_left, 0).b;` (81); `cInRight = textureLoad(coefMatx, idx_right, 0).b;` (82); `dIn = textureLoad(coefMatx, idx, 0).a;` (84); `dInLeft = textureLoad(coefMatx, idx_left, 0).a;` (85); `dInRight = textureLoad(coefMatx, idx_right, 0).a;` (86) |
+| 89–107 | 시작 시 20행 `fn main(@builtin(global_invocation_id) id: vec3<u32>) {` 블록 안. 이웃 소거 분모의 역수 r로 새 a·c·d를 계산한다. (aOut,1,cOut,dOut)을 매 반복 저장한다. 마지막 반복에서만 현재 상태를 읽어 g 성분을 풀이값으로 교체하여 저장한다. 원문: `let r = 1.0 / (1.0 - aIn * cInLeft - cIn * aInRight);` (89); `let aOut = -r * aIn * aInLeft;` (90); `let cOut = -r * cIn * cInRight;` (91); `let dOut = r * (dIn - aIn * dInLeft - cIn * dInRight);` (92); `let txtemp_out = vec4<f32>(aOut, 1.0, cOut, dOut);` (94); `// let txtemp2_out = vec4<f32>(CurrentState.r, dOut, CurrentState.b, CurrentState.a);` (95); `textureStore(txtemp, idx,  txtemp_out);` (97); `if (globals.p == globals.P - 1) {` (101); `let CurrentState = textureLoad(current_state, idx, 0);` (102); `let txtemp2_out = vec4<f32>(CurrentState.r, dOut, CurrentState.b, CurrentState.a);` (103); `textureStore(txtemp2, idx, txtemp2_out);` (104) 기존 상태 저장문은 주석 처리되어 있다. 원문: `// textureStore(txtemp2, idx, txtemp2_out);` (98). [11-04 전수 검증 보완] |
+
+## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
+
+- 34–36: 가장자리 반환 조건은 주석 처리되어 있다. 실행 좌표는 38–39행 나머지 연산을 사용한다.
+- 62–72·89: bIn·bInLeft·bInRight 및 소거 분모가 나눗셈에 쓰인다. 이 파일에는 이 분모의 0 비교 조건이 없다.
+- 101–104: 상태 저장은 p==P-1 조건 안에 있다. P 값을 설정하는 외부 JavaScript는 이 판독 대상에 포함하지 않았다.

@@ -1,0 +1,43 @@
+# Celeris 판독 기록 sonnet 표본 (11-04)
+
+## 요약
+
+- 표본은 28행이다. 코드 행 20개, PDF 쪽 행 8개이다.
+- 맞음 20행, 부분 8행, 틀림 0행이다.
+- 코드 행 [1]–[20]은 스크립트로 백틱 인용 전부를 원문 해당 행과 글자 단위로 대조했다. 어긋난 인용은 0건이다. 인용 뒤 행 번호도 모두 맞다.
+- 코드 행에서 인용하지 않은 비어 있지 않은 줄은 주석과 닫는 괄호뿐이다. [8]만 구간 맥락 서술에 문제가 있어 부분으로 센다.
+- PDF 행 [21]–[28]은 300 dpi 쪽 이미지를 직접 보고 대조했다. 식, 캡션, 수치는 맞다. 부분 7행은 원문 문장 누락 또는 철자 오기이다.
+- 확인하지 않은 것: [2]의 북·동·남·서 순서는 코드의 `.x`/`.y` 성분 대응을 읽어 추정했고, 함수 `Reconstruct`의 반환 순서 정의는 열어 보지 않았다.
+
+## 행별 판정
+
+| 번호 | 기록:줄 | 원문 구간 또는 쪽 | 판정 | 근거(원문 인용) |
+|---|---|---|---|---|
+| 1 | river.html.md:30 | river.html 681–700 | 맞음 | 인용 18개가 681–700행과 일치한다. 180행 `<body>`, 181행 `<div id="main-container">`, 183행 `<div id="horizontalbar">`가 맞다. 값 10–14가 맞다. |
+| 2 | Pass1_HighOrder.wgsl.md:24 | Pass1_HighOrder.wgsl 306–336 | 맞음 | 인용 25개가 일치한다. 151행 `fn main`이 맞다. `if (h.x < globals.delta) {`에서 h·hu·hv·hc를 0으로 만든다는 서술이 맞다. 누락은 닫는 괄호뿐이다. |
+| 3 | Pass3_NLSW.wgsl.md:17 | Pass3_NLSW.wgsl 96–139 | 맞음 | 인용 35개가 일치한다. `if (idx.x >= globals.width - 2 \|\| idx.y >= globals.height - 2 \|\| idx.x <= 1 \|\| idx.y <= 1) {`와 네 `textureStore` 영벡터가 맞다. 107행 `}`만 빠졌다. |
+| 4 | Handler_Pass2.js.md:18 | Handler_Pass2.js 156–197 | 맞음 | 인용 42개가 일치한다. binding 0 uniformBuffer, 1–8 txH·txU·txV·txBottom·txC·txHnear·txXFlux·txYFlux가 맞다. 199행 이후 binding 9–13은 구간 밖이다. |
+| 5 | load_WebGPUCeleris_output.m.md:15 | load_WebGPUCeleris_output.m 1–22 | 맞음 | 인용 13개가 일치한다. `nt = 496;  % need to change manually`, `fread(fid, [nx, ny], 'float32')`가 맞다. 빠진 것은 `%` 주석 3줄이다. |
+| 6 | Pass3_Bous.wgsl.md:19 | Pass3_Bous.wgsl 181–223 | 맞음 | 인용 31개가 일치한다. 96행 `fn main`, 183–190행 periodic_bc_fix 설정, 192행 `if (near_dry > 0. && periodic_bc_fix < 0)`가 맞다. 빠진 것은 주석 2줄과 닫는 괄호이다. |
+| 7 | File_Loader.js.md:33 | File_Loader.js 677–724 | 맞음 | 인용 27개가 일치한다. `const y = 0.5 - Math.log((1 + sin) / (1 - sin)) / (4 * Math.PI);`, `scaleY`, `offsetY`, `scaleX`, `offsetX` 식이 맞다. 빠진 것은 영어 주석뿐이다. |
+| 8 | fragment_testing.wgsl.md:20 | fragment_testing.wgsl 192–245 | 부분 | 인용 54개가 일치한다. 서술 "174행 `} else if(colorMap_choice == 2) {` 블록 안"이 정확하지 않다. 174행은 turbo 분기이고 191행에서 닫힌다. 192행 `} else if(colorMap_choice == 3) {  // HSV colormap`은 같은 else-if 사슬의 다음 가지이다. 3·4·5번 상수가 `fragment.wgsl` 201–254행과 값이 같다는 서술은 맞다(들여쓰기만 다르다). |
+| 9 | river.html.md:40 | river.html 1061–1103 | 맞음 | 인용 41개가 일치한다. `<input type="number" id="AnimGif_dt-input" name="AnimGif_dtValue">`에 value 속성이 없다는 서술이 맞다. "up to ~100 frames", "up to 256 jpeg images", "only one of these operations"가 맞다. |
+| 10 | transect_version/Pass3_COULWAVE.wgsl.md:21 | Pass3_COULWAVE.wgsl(transect) 238–273 | 맞음 | 인용 30개가 일치한다. 95행 `fn main`, 199행 `if (near_dry > 0.)`가 맞다. u_here·u_ip1·u_im1은 `.x`, du_*는 `.z`이다. y·대각 판독이 `//` 주석이라는 서술이 맞다. |
+| 11 | shaders/Pass3_COULWAVE.wgsl.md:20 | Pass3_COULWAVE.wgsl 236–271 | 맞음 | 인용 29개가 일치한다. 96행 `fn main`, 197행 `if (near_dry > 0. && periodic_bc_fix < 0)`가 맞다. 빠진 것은 236행 주석 `// Coulwave terms fetch`뿐이다. |
+| 12 | Handler_Copytxf32_txf16.js.md:16 | Handler_Copytxf32_txf16.js 81–121 | 맞음 | 인용 41개가 일치한다. binding 0 uniformBuffer, 1–7 txNewState·txBottom·txMeans_Speed·txRenderVarsf16·txMeans_Momflux·txModelVelocities·txMeans가 맞다. |
+| 13 | js/main.js.md:152 | main.js 5160–5200 | 맞음 | 인용 14개가 일치한다. 3822행 `document.addEventListener('DOMContentLoaded', function () {`가 맞다. add_Disturbance=1, chartDataUpdate=1, create_animation=1·2, save_baseline=1이 맞다. 빠진 것은 주석과 닫는 `});`이다. |
+| 14 | transect_version/Pass3_NLSW.wgsl.md:20 | Pass3_NLSW.wgsl(transect) 184–210 | 맞음 | 인용 21개가 일치한다. 205행 `// calculate breaking dissipation - breaking dissipation not added for NLSW model`, 207행 `if(globals.useBreakingModel == 1) {`, 208행 `breaking_B = textureLoad(txBreaking, idx, 0).z;`가 맞다. |
+| 15 | js/Wave_Generator.js.md:16 | Wave_Generator.js 25–43 | 맞음 | 인용 10개가 일치한다. `Number.isFinite(value) && value > 0.0 ? value : fallback`, `finiteOrDefault(degrees, 0.0) * DEG_TO_RAD`가 맞다. 빠진 것은 닫는 괄호뿐이다. |
+| 16 | MC_examples.html.md:36 | MC_examples.html 1033–1059 | 맞음 | 인용 4개가 일치한다. 세 버튼 id와 문구, `data-default="minimized"`(1038행)가 맞다. 빠진 것은 컨테이너·헤더 div, 제목 `Analysis and Statistics`, `<br />`, 주석이다. 구조 요소만 빠졌으므로 맞음으로 센다. |
+| 17 | shaders/Pass3_COULWAVE.wgsl.md:23 | Pass3_COULWAVE.wgsl 349–382 | 맞음 | 인용 24개가 일치한다. `Psi2x = (3.0 * F_star - 4.0 * F_G_star_oldies.y  + F_G_star_oldOldies.y) / globals.dt * 0.5;`, `E_src = (dE1dx + dE2dy);`가 맞다. 349행 주석 `// G source terms`와 닫는 괄호만 빠졌다. |
+| 18 | shaders/Pass0.wgsl.md:17 | Pass0.wgsl 45–60 | 맞음 | 인용 10개가 일치한다. 22행 `fn main`이 맞다. h_vec.x=north, .y=east, .z=south, .w=west 순서가 맞다. 45행 주석 `//    let h_here = in_here.x - B_here;`만 빠졌다. |
+| 19 | js/Handler_Pass3.js.md:18 | Handler_Pass3.js 162–201 | 맞음 | 인용 34개가 일치한다. binding 17–20 모두 `sampleType: 'unfilterable-float'`, `format: 'rgba32float'`이다. 3·4·5행 맥락이 맞다. 빠진 것은 "17th binding: A texture that the fragment shader will sample from." 주석 4줄이다. |
+| 20 | transect_version/Copytxf32_txf16.wgsl.md:16 | Copytxf32_txf16.wgsl 17–35 | 맞음 | 인용 14개가 일치한다. `vec4<f32>(eta, max_eta, bottom, foam)`, `vec4<f32>(u, v, 0.0, vort_mean)`, `textureStore(txRenderVarsf16, idx, 0/1, ...)`가 맞다. |
+| 21 | Tavakkol_2020…/p001-014.md:20 | Tavakkol 2020 p.6 | 부분 | Fig. 3 속성·함수 목록, 캡션 "Fig. 3. Class UML diagram of Celeris Base solvers.", `All the files with the extension of .compute are compute shaders.`가 맞다. 오기: 기록은 TL17Driver 함수를 `solverTriDiagonal()`로 적었으나 그림은 `- solveTriDiagonal ( ) : void`이다. 누락: 원문 "Most of them are located at Assets/Celeris/Scripts/Solver/ Shared folder"의 "Most of them"이 빠져 모든 공통 셰이더가 그 폴더에 있는 것처럼 읽힌다. |
+| 22 | lynett…2026…/p001-013.md:24 | lynett 2026 p.10(04026007-10) | 부분 | Fig. 6 캡션, 3.4배·4.2배, "approximately 10 min", "roughly 5 min", "no less than an hour", 범례 색·선 종류가 맞다. 오기: 기록은 가로축을 `Crossshore Distance (m, FRF)`로 적었으나 그림 가로축은 `Crosshore Distance (m, FRF)`이다(확대 판독). 누락: 예제가 "V-shaped offshore breakwater"라는 문장이 없다. |
+| 23 | Tavakkol_2020…/p001-014.md:18 | Tavakkol 2020 p.4 | 부분 | 식 (5)–(9), `c=\sqrt{gd}`, 140,000행, 네 GameObject, 인용문 `The only scene in Celeris Base is Main.unity ...`가 맞다. 누락: 4.1절의 "each main compute shader includes other compute shaders such as `time_integration.compute`, `tools.compute`"와 "The folder GPGPU contains the rendering shaders and non-solver compute shaders" 문장이 없다. "Unity3D supports C# as its main programming language"도 없다. |
+| 24 | lynett…2026…/p001-013.md:18 | lynett 2026 p.4 | 부분 | Adams–Bashforth 예측식 `23F^n-16F^{n-1}+5F^{n-2}`과 수정식 `9F^{n+1}+19F^n-5F^{n-1}+F^{n-2}`가 맞다. MUSCL·HLL·HLLC 서술이 맞다. 누락: 원문은 "the standard (weakly nonlinear, enhanced Boussinesq) and high-order (fully nonlinear, extended Boussinesq) modes"로 모드와 방정식의 대응을 적는데, 기록에는 이 대응이 없다. "similar in spirit to ... FUNWAVE-TVD and COULWAVE" 문장과, UI에서 방파제·섬·식생 패치를 추가해 수심·거칠기를 갱신하는 문장도 없다. |
+| 25 | lynett…2026…/p001-013.md:19 | lynett 2026 p.5 | 부분 | Fig. 1 캡션 인용이 일치한다. 예측·수정 단계의 Pass 순서와 "고차 모드에 한정" 표기가 맞다. 누락: 그림의 Simulation Control [js] 블록(`Initialize canvas & data structures`, `Load inputs (config, bathy, etc.)`, `Configure Compute and Render Pipelines`)과 Render and Compute Loop(`Store user input and update simulation parameters`, `Compute Block and Render Block`, `Update html canvas with new rendered image`, `Write output as needed`)이 기록에 없다. `Display simulation render on html canvas` 상자도 없다. |
+| 26 | Tavakkol_2017…/p001-011.md:16 | Tavakkol 2017 p.2(인쇄 118) | 부분 | 식 (1)–(6), ψ1·ψ2의 항, B=1/15, kd<3, d=0 조건이 맞다. ψ2의 마지막 항이 `dd_x`인 것도 원문 그대로이다. 누락: "Celeris is implemented in C++ and HLSL, and it is an open-source code ... under the terms of the GNU General Public License" 문장이 없다. "Celeris, to the best of our knowledge, is the first interactive software for simulation of nonlinear, coastal waves"와 "faster than real-time simulation speed on an average user laptop"도 없다. |
+| 27 | lynett…2026…/p001-013.md:25 | lynett 2026 p.11 | 맞음 | Fig. 7 캡션 인용이 일치한다. `Simulated Time (min): 8.3`, `Faster-than-Realtime Ratio: 1.4`, 값 0·2·30, 색 막대 0.63·1.88, `stil` 철자 보존이 맞다. 인용문 `Like any GPU-resident simulation, ...`이 맞다. 빠진 것은 패널 제목(`Add Engineered Design Components` 등)과 각 그림의 주석 라벨이며 판독 내용에는 영향이 없다. |
+| 28 | Tavakkol_2017…/p001-011.md:24 | Tavakkol 2017 p.10(인쇄 126) | 부분 | Fig. 12·13 캡션, 축 눈금(8–22 s·±0.05 m, 8–20 s·±0.1 m), 3.3 h·15 s, 약 25%, 2.32 m, `δ = sΔx/3`, 인용문 `This run-up is generated by the collision of waves wrapping around the island.`가 맞다. 누락: "which confirms that the minmod flux limiter employed in Celeris is doing a good job in imitating the breaking models" 문장이 없다. "The agreement for all cases is very good and comparable to that achieved by Lynett et al. [12], Fuhrman and Madsen [21], and Tonelli and Petti [13]"와 "The run-up on the back face of the island is also captured very well"도 없다. |

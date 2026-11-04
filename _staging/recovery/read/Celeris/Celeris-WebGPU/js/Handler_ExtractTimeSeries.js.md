@@ -1,0 +1,22 @@
+---
+file: models/Celeris/raw/source_code/Celeris-WebGPU/js/Handler_ExtractTimeSeries.js
+lines: 133
+sha256: 0f753b1bf46f9d5e5a2c5039aab7a28731db3fce801ba977af1662af58c8c1b2
+reader: codex gpt-6.1-sol
+read_date: 2026-11-04
+---
+
+# Handler_ExtractTimeSeries.js — 판독 구간 기록
+
+구간은 1행부터 133행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–38 | 머리말과 `create_ExtractTimeSeries_BindGroupLayout` 시작(1–4). 계산 셰이더(compute shader)용 바인드 그룹(bind group)에서 0은 유니폼 버퍼(uniform buffer), 1·2·3은 unfilterable-float rgba32float 입력 텍스처(texture)이다(7–35). 원문: `export function create_ExtractTimeSeries_BindGroupLayout(device) {` (2); `return device.createBindGroupLayout({` (3); `entries: [` (4); `{` (5); `binding: 0,` (7); `visibility: GPUShaderStage.COMPUTE, // This buffer is only visible to the compute stage` (8); `buffer: { type: 'uniform' }  // It's a uniform buffer` (9); `},` (10); `{` (11); `binding: 1,` (13); `visibility: GPUShaderStage.COMPUTE,` (14); `texture: {` (15); `sampleType: 'unfilterable-float',` (16); `format: 'rgba32float'` (17); `}` (18); `},` (19); `{` (20); `binding: 2,` (22); `visibility: GPUShaderStage.COMPUTE,` (23); `texture: {` (24); `sampleType: 'unfilterable-float',` (25); `format: 'rgba32float'` (26); `}` (27); `},` (28); `{` (29); `binding: 3,` (31); `visibility: GPUShaderStage.COMPUTE,` (32); `texture: {` (33); `sampleType: 'unfilterable-float',` (34); `format: 'rgba32float'` (35); `}` (36); `},` (37); `{` (38) 6행 주석은 uniform을 시간 등의 매개변수용으로 설명한다. 12·21·30행 주석은 입력을 fragment shader 표본화용이라고 적지만 실제 visibility는 COMPUTE이다. [11-04 전수 검증 보완] |
+| 39–88 | 시작 시 2행 레이아웃 함수·3행 생성 객체·4행 entries 배열 안. 4·5·6·8은 같은 float 입력이며 7은 write-only rgba32float 2d 출력이다(40–82). 레이아웃 종료와 빈 줄을 포함한다(84–88). 원문: `binding: 4,` (40); `visibility: GPUShaderStage.COMPUTE,` (41); `texture: {` (42); `sampleType: 'unfilterable-float',` (43); `format: 'rgba32float'` (44); `}` (45); `},` (46); `{` (47); `binding: 5,` (49); `visibility: GPUShaderStage.COMPUTE,` (50); `texture: {` (51); `sampleType: 'unfilterable-float',` (52); `format: 'rgba32float'` (53); `}` (54); `},` (55); `{` (56); `binding: 6,` (58); `visibility: GPUShaderStage.COMPUTE,` (59); `texture: {` (60); `sampleType: 'unfilterable-float',` (61); `format: 'rgba32float'` (62); `}` (63); `},` (64); `{` (65); `binding: 7,` (67); `visibility: GPUShaderStage.COMPUTE,` (68); `storageTexture: {` (69); `access: 'write-only',      // This texture is only for writing data` (70); `format: 'rgba32float',    // Data format: 32-bit floating point values for red, green, blue, and alpha channels` (71); `viewDimension: '2d'       // The texture is a 1D texture` (72); `}` (73); `},` (74); `{` (75); `binding: 8,` (77); `visibility: GPUShaderStage.COMPUTE,` (78); `texture: {` (79); `sampleType: 'unfilterable-float',` (80); `format: 'rgba32float'` (81); `}` (82); `}` (83); `]` (84); `});` (85); `}` (86) 구간 시작은 38행에서 열린 binding 4 객체 안이며 이 객체는 46행에서 닫힌다. 39·48·57·76행 주석은 입력을 fragment shader 표본화용이라고 적지만 실제 visibility는 COMPUTE이다. [11-04 전수 검증 보완] |
+| 89–133 | `create_ExtractTimeSeries_BindGroup`는 0에 uniformBuffer, 1..8에 txBottom·txBottomFriction·txContSource·txState·txWaveHeight·txTimeSeries_Locations·txTimeSeries_Data·txMeans_Speed 뷰를 연결한다(89–133). 원문: `export function create_ExtractTimeSeries_BindGroup(device, uniformBuffer, txBottom, txBottomFriction, txContSource, txState, txWaveHeight, txTimeSeries_Locations, txTimeSeries_Data, txMeans_Speed) {` (89); `return device.createBindGroup({` (90); `layout: create_ExtractTimeSeries_BindGroupLayout(device),` (91); `entries: [` (92); `{` (93); `binding: 0,` (94); `resource: {` (95); `buffer: uniformBuffer` (96); `}` (97); `},` (98); `{` (99); `binding: 1,` (100); `resource: txBottom.createView()` (101); `},` (102); `{` (103); `binding: 2,` (104); `resource: txBottomFriction.createView()` (105); `},` (106); `{` (107); `binding: 3,` (108); `resource: txContSource.createView()` (109); `},` (110); `{` (111); `binding: 4,` (112); `resource: txState.createView()` (113); `},` (114); `{` (115); `binding: 5,` (116); `resource: txWaveHeight.createView()` (117); `},` (118); `{` (119); `binding: 6,` (120); `resource: txTimeSeries_Locations.createView()` (121); `},` (122); `{` (123); `binding: 7,` (124); `resource: txTimeSeries_Data.createView()` (125); `},` (126); `{` (127); `binding: 8,` (128); `resource: txMeans_Speed.createView()` (129); `}` (130); `]` (131); `});` (132); `}` (133) |
+
+## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
+
+- 1: 머리말은 Handler_Tridiag.js라고 적혀 있다.
+- 72: 출력 viewDimension 값은 '2d'이지만 같은 행 주석은 1D texture라고 적는다.

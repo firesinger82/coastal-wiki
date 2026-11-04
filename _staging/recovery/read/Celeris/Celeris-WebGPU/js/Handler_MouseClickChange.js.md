@@ -1,0 +1,21 @@
+---
+file: models/Celeris/raw/source_code/Celeris-WebGPU/js/Handler_MouseClickChange.js
+lines: 120
+sha256: 57a1e16dca0ac353ed157b20e46899af93bb8255acfcb6d03892121173293017
+reader: codex gpt-6.1-sol
+read_date: 2026-11-04
+---
+
+# Handler_MouseClickChange.js — 판독 구간 기록
+
+구간은 1행부터 120행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–38 | 머리말과 `create_MouseClickChange_BindGroupLayout` 시작(1–4). 계산 셰이더(compute shader)용 바인드 그룹(bind group)에서 0은 유니폼 버퍼(uniform buffer), 1·2·3은 unfilterable-float rgba32float 입력 텍스처(texture)이다(7–35). 원문: `export function create_MouseClickChange_BindGroupLayout(device) {` (2); `return device.createBindGroupLayout({` (3); `entries: [` (4); `{` (5); `binding: 0,` (7); `visibility: GPUShaderStage.COMPUTE, // This buffer is only visible to the compute stage` (8); `buffer: { type: 'uniform' }  // It's a uniform buffer` (9); `},` (10); `{` (11); `binding: 1,` (13); `visibility: GPUShaderStage.COMPUTE,` (14); `texture: {` (15); `sampleType: 'unfilterable-float',` (16); `format: 'rgba32float'` (17); `}` (18); `},` (19); `{` (20); `binding: 2,` (22); `visibility: GPUShaderStage.COMPUTE,` (23); `texture: {` (24); `sampleType: 'unfilterable-float',` (25); `format: 'rgba32float'` (26); `}` (27); `},` (28); `{` (29); `binding: 3,` (31); `visibility: GPUShaderStage.COMPUTE,` (32); `texture: {` (33); `sampleType: 'unfilterable-float',` (34); `format: 'rgba32float'` (35); `}` (36); `},` (37); `{` (38) 6행 주석은 uniform을 시간 등의 매개변수용으로 설명한다. 12·21·30행 주석은 입력을 fragment shader 표본화용이라고 적지만 실제 visibility는 COMPUTE이다. [11-04 전수 검증 보완] |
+| 39–79 | 시작 시 2행 레이아웃 함수·3행 생성 객체·4행 entries 배열 안. 4·5는 같은 입력 형식이고 6·7은 write-only rgba32float 2d 출력이다(40–74). 레이아웃을 닫는다(76–78). 원문: `binding: 4,` (40); `visibility: GPUShaderStage.COMPUTE,` (41); `texture: {` (42); `sampleType: 'unfilterable-float',` (43); `format: 'rgba32float'` (44); `}` (45); `},` (46); `{` (47); `binding: 5,` (49); `visibility: GPUShaderStage.COMPUTE,` (50); `texture: {` (51); `sampleType: 'unfilterable-float',` (52); `format: 'rgba32float'` (53); `}` (54); `},` (55); `{` (56); `binding: 6,` (58); `visibility: GPUShaderStage.COMPUTE,` (59); `storageTexture: {` (60); `access: 'write-only',      // This texture is only for writing data` (61); `format: 'rgba32float',    // Data format: 32-bit floating point values for red, green, blue, and alpha channels` (62); `viewDimension: '2d'       // The texture is a 2D texture` (63); `}` (64); `},` (65); `{` (66); `binding: 7,` (68); `visibility: GPUShaderStage.COMPUTE,` (69); `storageTexture: {` (70); `access: 'write-only',      // This texture is only for writing data` (71); `format: 'rgba32float',    // Data format: 32-bit floating point values for red, green, blue, and alpha channels` (72); `viewDimension: '2d'       // The texture is a 2D texture` (73); `}` (74); `}` (75); `]` (76); `});` (77); `}` (78) 구간 시작은 38행에서 열린 binding 4 객체 안이며 이 객체는 46행에서 닫힌다. 39·48행 주석은 입력을 fragment shader 표본화용이라고 적지만 실제 visibility는 COMPUTE이다. [11-04 전수 검증 보완] |
+| 80–120 | `create_MouseClickChange_BindGroup`는 0에 uniformBuffer, 1..7에 txBottom·txBottomFriction·txContSource·txState·txDesignComponents·txtemp_MouseClick·txtemp_MouseClick2 뷰를 연결한다(80–120). 원문: `export function create_MouseClickChange_BindGroup(device, uniformBuffer, txBottom, txBottomFriction, txContSource, txState, txDesignComponents, txtemp_MouseClick, txtemp_MouseClick2) {` (80); `return device.createBindGroup({` (81); `layout: create_MouseClickChange_BindGroupLayout(device),` (82); `entries: [` (83); `{` (84); `binding: 0,` (85); `resource: {` (86); `buffer: uniformBuffer` (87); `}` (88); `},` (89); `{` (90); `binding: 1,` (91); `resource: txBottom.createView()` (92); `},` (93); `{` (94); `binding: 2,` (95); `resource: txBottomFriction.createView()` (96); `},` (97); `{` (98); `binding: 3,` (99); `resource: txContSource.createView()` (100); `},` (101); `{` (102); `binding: 4,` (103); `resource: txState.createView()` (104); `},` (105); `{` (106); `binding: 5,` (107); `resource: txDesignComponents.createView()` (108); `},` (109); `{` (110); `binding: 6,` (111); `resource: txtemp_MouseClick.createView()` (112); `},` (113); `{` (114); `binding: 7,` (115); `resource: txtemp_MouseClick2.createView()` (116); `},` (117); `]` (118); `});` (119); `}` (120) |
+
+## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
+
+- 1: 머리말은 Handler_Tridiag.js라고 적혀 있다.

@@ -273,6 +273,22 @@ Delft3D 487(기계 sweep 실패 471 + 웹 16, 09-22 스냅샷 교체 전 경로)
 - 노트 표본(sonnet 30줄, `flow/LISFLOOD-FP-notes-sample.md`): 맞음 28, 부분 2, 틀림 0. 부분 2줄(`lisflood-fp-channel-sgc.md:94`의 잘못 붙은 인용 구간, `lisflood-fp-swe-fv1-dg2.md:310`의 구조체 하나 누락)은 Claude가 원문을 확인하고 고쳤다(`[10-21 표본 정정]`).
 - validate-all: 처음 실패 3종을 고쳐 통과했다. 하나는 docx 판독 기록 링크의 `%20`이다. 하나는 `concepts/compound-flooding/04-code-and-tools.md`의 LISFLOOD-FP 소스 개수다(8.3 교체로 `*.cpp` 83→84, `*.h` 388→390, 합계 623→626, 조석 관련 낱말 매칭은 여전히 0). 나머지 하나는 "p.37 `.max/.mxe`"를 개수 주장으로 읽은 검사기 오판이다(쪽 번호 뒤에 "의"를 붙였다).
 
+## Celeris 판독·대조·노트 반영 (2026-11-04)
+
+기록: `read/Celeris/Celeris-WebGPU/`(코드·문서), 논문 쪽 기록, 전수 검증 `read/Celeris/verify/`. 원자료: `models/Celeris/raw/source_code/Celeris-WebGPU`(git plynett/plynett.github.io, main `ebca435` 2026-07-20, 커밋 319개). 대상 목록: `scripts/celeris-batches.json`(js/, shaders/, transect_version/, html 6개, scripts/*.m), `scripts/celeris-docbatches.json`(docs/architecture·docs/source md), `scripts/celeris-pdfjobs.json`(Tavakkol 2017 11쪽, Tavakkol 2020 14쪽, Lynett 2026 13쪽). 제외: 렌더 전용 셰이더(skybox·duck·model), CelerisAgent, automation, benchmarks, examples, externals. Codex effort는 11-04 사용자 지시로 high다.
+
+- 판독(Codex `gpt-6.1-sol`): 244기록, 코드 46,799행과 문서 3,156행. 기계 확인 통과(구간·sha·행 수·전 행 열람). 원문 인용 31,781개 중 불일치 표시 1개는 검사기 오판(latRad)이다.
+- 표본(sonnet 28행, `flow/Celeris-read-sample.md`): 맞음 20, 부분 8, 틀림 0. 부분이 있어 전수 의미 검증(Codex `gpt-6-astra` 14작업, `read/Celeris/verify/`)을 했다. 정정 136, 보완 788이다.
+- 대조 보고서(Codex `gpt-6.1-sol`): `compare/celeris-{tavakkol2017,tavakkol2020,lynett2026}-vs-code.md`, `compare/celeris-docs-architecture-vs-code.md`(1,400행), `compare/celeris-docs-source-vs-code.md`, `compare/celeris-transect-vs-main.md`(transect_version 사본 대 본판), 흐름 분석 `flow/Celeris-callflow.md`(흐름도 3개). Claude가 결론 누락 0을 기계로 확인했다. 흐름도 3개를 mmdc로 렌더해 상자 file:line을 원문과 대조하고 고쳤다(`## Claude 렌더 확인 (11-04)`).
+- 판 판정(`compare/Celeris-version-verify-{AD1,AD2,AD3,E1,E2}.md`, `gpt-6-astra`): git 이력 319커밋으로 판정했다.
+- 외부 원문(`compare/Celeris-external-sources.md`, sonnet): CP3-017은 2차 문헌 근거로 B다(코드 `dzdt_I` 0.50 대 Kennedy 0.65, delta 2.0 대 δb=1.2). CP3-013은 결론 재검증에서 H가 됐다(외부 정식화의 정의는 코드 대조 대상이 아님).
+- 결론 전수 재검증(`compare/Celeris-conclusion-verify-*.md` 15개, `gpt-6-astra`): 1,906행 전부를 다시 대조했다. 보고서 결론 대비 354행이 바뀌었다. 가장 많은 것은 C→H 183행이다(표시 전용 매개변수, 위키 범위 규칙). Claude가 바뀐 행 약 15개를 열어 보았고 틀린 판정은 없었다.
+- 최종 결론(`assign/Celeris-final-conclusions.tsv`, 1,906행): A 252, B 139, C 724, E 32, F 136, H 581, 일치 42. G와 X는 0이다.
+- 노트 반영: 배정(Codex 9작업, `assign/Celeris-assign-*.tsv`)을 거쳐 1,283행을 노트 18개에 넣었다(`flow/Celeris-notes-apply-{1..10}.md`). 새 파일은 `source-analysis/celeris-transect-version.md`, `source-analysis/celeris-webgpu-infrastructure-differences.md`(infrastructure에 배정된 315행), `manual-notes/celeris-configuration-differences.md`, `manual-notes/celeris-docs-source-differences.md`, `web-refs/celeris-papers-vs-code.md`다. Claude가 1,283행 전부가 지정 노트 표에 한 번씩 있는지 행 ID로 대조했다(누락 0, 중복 0). pipeline-graph 노트의 흐름도 3개를 다시 렌더했고 렌더 확인본과 같다.
+- 추가 줄 전수 대조(`gpt-6-astra` 14작업, `flow/Celeris-notes-verify-{1..14}.md`): 노트 안 태그 기준 정정 458줄, 보완 31줄이다. 정정 대부분은 문서 원문 칸의 설명("기본값 누락" 등)을 원문 인용처럼 백틱으로 적은 것을 고친 것이다. 잘못된 코드 위치 인용 41곳을 바꿨다. 기계 인용 검사(`cc_cel`, 공백 덧댄 백틱 정규화)의 남은 불일치 64개는 모두 검사기 오판이다.
+- 노트 표본(sonnet 30줄, `flow/Celeris-notes-sample.md`): 맞음 29, 부분 1, 틀림 0. 부분 1줄(`celeris-boussinesq-solver.md:125` 인용 없음)과 표본 밖 1줄(CP1-033·034 코드 칸이 인용 대신 설명)을 Claude가 고쳤다(`[11-04 표본 검증 보완]`).
+- validate-all: G8b 1건을 고쳐 통과했다. Tavakkol 2017 Fig. 2의 입력 예시 Windows 경로 인용을 `<logPath>…</logPath>`로 줄였다.
+
 ## 노트 반영분 전수 대조와 차이 결론 (2026-10-12)
 
 사용자 지시(10-12): 확인하지 않은 것을 한계로 남기지 말고 해결한 뒤 다음 모델로 간다. 모델 실행은 위키 범위가 아니므로 한계로 적지 않는다.
@@ -287,4 +303,4 @@ Delft3D 487(기계 sweep 실패 471 + 웹 16, 09-22 스냅샷 교체 전 경로)
 
 1. ~~매뉴얼과 코드 판독 기록 대조~~ — 10-03 완료(`compare/XBeach-manual-vs-code.md`, 노트 반영 `1da8d89`).
 2. ~~XBeach 파일 간 계산 흐름 분석~~ — 10-07 완료(`flow/XBeach-callflow.md`, 노트 반영 `d89cd8b`). 판독 기록 검색은 `wiki_search` `path_class="records"`(`ce7b3ae`).
-3. 다른 10개 모델(SFINCS·EFDC·ADCIRC 완료, ShorelineS 10-12 완료, SWAN 10-13 완료, ROMS 10-14 완료, SWASH 10-15 완료, FUNWAVE 10-18 완료, LISFLOOD-FP 10-21 완료, 나머지 3개 미착수 — 순서 Delft3D·Celeris·CADMAS-SURF — 순서 LISFLOOD-FP·Delft3D·Celeris·CADMAS-SURF): 같은 방식(고정 목록 → 1행/1쪽 판독 → 기계 확인 → 다른 모델 검증).
+3. 다른 10개 모델(SFINCS·EFDC·ADCIRC 완료, ShorelineS 10-12 완료, SWAN 10-13 완료, ROMS 10-14 완료, SWASH 10-15 완료, FUNWAVE 10-18 완료, LISFLOOD-FP 10-21 완료, Celeris 11-04 완료, CADMAS-SURF 진행 중, Delft3D 미착수(범위 미정)): 같은 방식(고정 목록 → 1행/1쪽 판독 → 기계 확인 → 다른 모델 검증).

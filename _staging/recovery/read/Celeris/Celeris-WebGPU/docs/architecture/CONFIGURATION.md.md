@@ -1,0 +1,23 @@
+---
+file: models/Celeris/raw/source_code/Celeris-WebGPU/docs/architecture/CONFIGURATION.md
+lines: 105
+sha256: 81dc447b8ed25068d61e467cbb00aaba2d9d4062fcee9809d6119bf4a92885d2
+reader: codex gpt-6.1-sol
+read_date: 2026-11-04
+---
+
+# CONFIGURATION.md — 판독 구간 기록
+
+구간은 1행부터 105행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–16 | `js/constants_load_calc.js`가 내보내는 평면 객체 `calc_constants`에 예제 `config.json`을 덮어쓰고 파생값을 uniform buffer로 보낸다(3). 순서는 `constants_load_calc.js` 기본값, 예제 선택 시 `loadConfig()`, `init_sim_parameters()` 병합, dispatch·시간 간격·Boussinesq 계수·역격자·경계 반사 인덱스·캔버스·퇴적물·색상 막대 재계산, uniform 갱신이다(9–13). 스키마 검증기는 없으며 알 수 없는 키는 무시될 수 있고 누락 키는 읽는 경로의 JavaScript 기본값을 따른다고 적는다(15). `init_sim_parameters()`는 업로드 또는 예제 설정을 기본값에 병합한다(11). 재계산에는 render 치수와 colorbar layout도 포함된다(12). [11-04 전수 검증 보완] |
+| 17–54 | 격자·시간 키는 `WIDTH`, `HEIGHT`, `dx`, `dy`, `grid_type`, `lat_LL`, `lon_LL`, `lat_UR`, `lon_UR`, `R_earth`, `Courant`, `dt`, `ThreadX`, `ThreadY`, `DispatchX`, `DispatchY`다(19–28). 물리·수치 키는 `NLSW_or_Bous`, `Accuracy_mode`, `timeScheme`, `TWO_THETA`, `Bcoef`, `Bcoef_g`, `Bous_alpha`, `gravity`, `friction`, `isManning`, `useBreakingModel`, `delta`, `epsilon`, `base_depth`다(30–39). 경계·강제 키는 `west_boundary_type`, `east_boundary_type`, `south_boundary_type`, `north_boundary_type`, `BoundaryWidth`, `incident_wave_type`, `incident_wave_H`, `incident_wave_T`, `incident_wave_direction`, `numberOfWaves`, 경계형 `5`의 `ts_west_file`, `ts_east_file`, `ts_south_file`, `ts_north_file` 및 하천 수위·유량 항목이다(41–49). `incident_wave_type == 0`이면 `main.js`가 `H / 2`로 진폭 변환, 도를 라디안으로 변환, `numberOfWaves`를 `1`로 설정하고 `txWaves`를 재업로드한다. `incident_wave_type == 1`이면 `Wave_Generator.js`가 TMA 방향 스펙트럼을 캐시하고 생성 성분 수·`txWaves`를 갱신한다(51). 경계형 `5`는 `eta`, `hu`, `hv`를 읽고 업로드 파일이 대응 `ts_*_file`보다 우선한다. 활성 파일은 동일 시간 벡터를 써야 하며 `grid_type == 2`의 관측 위치는 절대 경위도 도 단위, Cartesian은 모델 x/y다(53). 하천 수위·유량 항목은 flood scenario용이다(49). `incident_wave_type == 0`은 UI 값을 단일 sine-wave 성분으로 취급한다(51). `incident_wave_type == 1`은 같은 파고·주기·방향 control로 스펙트럼을 만든다(51). 경계형 `5` 파일은 측면별 text file이다(53). custom local run의 `Start Here` 패널에서 west/east/south/north 시계열 파일을 직접 업로드할 수 있다(53). [11-04 전수 검증 보완] |
+| 55–80 | 출력 키는 `nestedGridOutput_i0`, `nestedGridOutput_j0`, `nestedGridOutput_i1`, `nestedGridOutput_j1`, `nestedGridOutput_start_time`, `nestedGridOutput_end_time`, `nestedGridOutput_dt`, `nestedGridOutput_max_samples`, `nestedGridOutput_sample_count`, `nestedGridOutput_sample_index`, `nestedGridOutput_trigger`, `nestedGridOutput_active`, `nestedGridOutput_rectangles`다(57–61). 스칼라 사각형의 `four edges`는 경계형 `5`와 호환되는 `eta/hu/hv` 출력이며 기존 설정도 유효하다. 활성 사각형 항목은 `i0`, `j0`, `i1`, `j1`, `start_time`, `end_time`, `dt`, `eta_threshold`, `file_prefix`/`name`을 지정한다. `file_prefix` 생략 시 첫 항목은 `nestedGridOutput_file_prefix`, 이후 숫자 접미사(`gridD`, `gridD2`, `gridD3`)다. 표본 수 상한은 `8192`이며 `dt`를 늘리고 경고한다(63). 퇴적물 키는 `useSedTransModel`, `sedC1_shields`, `sedC1_criticalshields`, `sedC1_erosion`, `sedC1_fallvel`, `sedC1_n`, `sedC1_bedloadMPM`, `sedTurbDispersion`, `sedBreakingDispersionCoef`다(65–70). 표시 키는 `surfaceToPlot`, `colorMap_choice`, `colorVal_min`, `colorVal_max`, `GoogleMapOverlay`, `IsOverlayMapLoaded`, `renderZScale`, `showArrows`, `arrow_scale`, `arrow_density`와 설계 마찰 상수다(72–79). `nestedGridOutput_rectangles`는 선택적인 다중 사각형 출력 명세다(61). `8192` 상한과 출력 `dt` 증가는 각 사각형에 개별 적용된다(63). [11-04 전수 검증 보완] |
+| 81–105 | WGSL별 `Globals`는 `main.js`의 바이트 위치 기반 uniform 작성부와 일치해야 한다. `delta`, `base_depth`·격자 크기·역격자 간격이 여러 구조체에 반복된다(83–85). `init_sim_parameters()`는 `dt`, `DispatchX`/`DispatchY`, PCR 반복 수 `Px`/`Py`, `one_over_d2x`, `one_over_d3x`, `one_over_dxdy`, 경계 인덱스·렌더 비율·퇴적물 계수를 계산한다(89–97). `grid_type == 2`에서 `dx`는 도 단위 `dlon`, `dy`는 `dlat`, 시간 간격은 위도 범위의 최소 구면 물리 간격을 사용한다(91). 파생값은 UI 재계산 때 덮어쓸 수 있다(99). `grid_type == 2`는 현재 `NLSW-only`이며 Boussinesq/COULWAVE·고차 재구성·퇴적물·Cartesian 쇄파 모델을 끈다고 적는다(101). 루트 `config.json`은 무시되고 `examples/`의 설정은 추적되며 `.gitignore` 변경 없이는 수동 루트 설정이 배포·커밋되지 않는다고 적는다(105). 각 `Globals`는 해당 shader에 필요한 값만 선언한다(83). shader에 필드를 추가하면 대응 JavaScript buffer writer도 수정해야 한다(83). 반복 대상 shader는 hydrodynamic·sediment·boundary·render·tridiagonal이다(85). 파생값은 직접 편집하는 용도가 아니다(89). `dt` 입력은 격자 간격·중력·기준 수심·Courant형 설정이다(91). `DispatchX`/`DispatchY`는 격자 크기와 workgroup 크기로 계산한다(92). 경계 인덱스에는 reflection/shift가 포함된다(95). render/canvas 비율과 colorbar 좌표를 계산한다(96). 퇴적물 침강·침식 계수는 설정한 물성에서 계산한다(97). 시나리오 동작이 이상하면 값을 JSON에서 직접 읽는지 로드 후 유도하는지 확인하라고 안내한다(99). `examples/` 설정은 통상적인 시나리오 정의 원천이다(105). [11-04 전수 검증 보완] |
+
+## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
+
+- 15: 문서는 스키마 검증기가 없다고 명시한다. 실제 키 처리 구현은 이 파일의 판독 대상이 아니다.
+- 101: 문서는 `grid_type == 2`의 사용 범위를 `NLSW-only`로 한정한다.

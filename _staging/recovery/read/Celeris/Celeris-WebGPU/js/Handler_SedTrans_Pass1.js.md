@@ -1,0 +1,21 @@
+---
+file: models/Celeris/raw/source_code/Celeris-WebGPU/js/Handler_SedTrans_Pass1.js
+lines: 124
+sha256: 1c115475724db3e82eb26f94733b7847eaf5873a9fe786b9550692c0a5be0e51
+reader: codex gpt-6.1-sol
+read_date: 2026-11-04
+---
+
+# Handler_SedTrans_Pass1.js — 판독 구간 기록
+
+구간은 1행부터 124행까지 빈틈없이 이어진다.
+
+| 구간 | 내용 |
+|---|---|
+| 1–38 | 파일명 주석과 바인드 그룹(bind group) 레이아웃(layout)을 선언한다. 계산 셰이더(compute shader) 전용 uniform 버퍼(buffer)를 binding 0에 둔다. 읽기 텍스처(texture) 1–3은 unfilterable-float·rgba32float이다. 원문(행 순서): `export function create_SedTrans_Pass1_BindGroupLayout(device) {` (3); `return device.createBindGroupLayout({` (4); `entries: [` (5); `binding: 0,` (8); `visibility: GPUShaderStage.COMPUTE, // This buffer is only visible to the compute stage` (9); `buffer: { type: 'uniform' }  // It's a uniform buffer` (10); `},` (11); `binding: 1,` (14); `visibility: GPUShaderStage.COMPUTE,` (15); `texture: {` (16); `sampleType: 'unfilterable-float',` (17); `format: 'rgba32float'` (18); `},` (20); `binding: 2,` (23); `visibility: GPUShaderStage.COMPUTE,` (24); `texture: {` (25); `sampleType: 'unfilterable-float',` (26); `format: 'rgba32float'` (27); `},` (29); `binding: 3,` (32); `visibility: GPUShaderStage.COMPUTE,` (33); `texture: {` (34); `sampleType: 'unfilterable-float',` (35); `format: 'rgba32float'` (36); `},` (38). 7행 주석은 uniform 버퍼의 매개변수 예로 time을 든다. [11-04 전수 검증 보완] |
+| 39–83 | 시작 시 3행 create_SedTrans_Pass1_BindGroupLayout 루틴·4행 createBindGroupLayout 호출·5행 entries 배열 안. 출력 4–7은 write-only·rgba32float·2d 저장 텍스처(storage texture)이다. 레이아웃을 반환하고 빈 줄까지 포함한다. 원문(행 순서): `binding: 4,` (41); `visibility: GPUShaderStage.COMPUTE,` (42); `storageTexture: {` (43); `access: 'write-only',      // This texture is only for writing data` (44); `format: 'rgba32float',    // Data format: 32-bit floating point values for red, green, blue, and alpha channels` (45); `viewDimension: '2d'       // The texture is a 2D texture` (46); `},` (48); `binding: 5,` (51); `visibility: GPUShaderStage.COMPUTE,` (52); `storageTexture: {` (53); `access: 'write-only',      // This texture is only for writing data` (54); `format: 'rgba32float',    // Data format: 32-bit floating point values for red, green, blue, and alpha channels` (55); `viewDimension: '2d'       // The texture is a 2D texture` (56); `},` (58); `binding: 6,` (61); `visibility: GPUShaderStage.COMPUTE,` (62); `storageTexture: {` (63); `access: 'write-only',      // This texture is only for writing data` (64); `format: 'rgba32float',    // Data format: 32-bit floating point values for red, green, blue, and alpha channels` (65); `viewDimension: '2d'       // The texture is a 2D texture` (66); `},` (68); `binding: 7,` (71); `visibility: GPUShaderStage.COMPUTE,` (72); `storageTexture: {` (73); `access: 'write-only',      // This texture is only for writing data` (74); `format: 'rgba32float',    // Data format: 32-bit floating point values for red, green, blue, and alpha channels` (75); `viewDimension: '2d'       // The texture is a 2D texture` (76). 60·70행 주석은 계산 셰이더가 저장 텍스처에 결과를 쓴다고 설명한다. entries 배열은 79행에서 닫힌다. createBindGroupLayout 호출은 80행에서 닫힌다. 함수는 81행에서 닫힌다. [11-04 전수 검증 보완] |
+| 84–124 | create_SedTrans_Pass1_BindGroup은 레이아웃을 새로 호출한다. uniformBuffer, txState_Sed, txBottom, txH, txSed_C1–C4를 binding 0–7에 순서대로 연결한다. 원문(행 순서): `export function create_SedTrans_Pass1_BindGroup(device, uniformBuffer, txState_Sed, txBottom, txH, txSed_C1, txSed_C2, txSed_C3, txSed_C4) {` (84); `return device.createBindGroup({` (85); `layout: create_SedTrans_Pass1_BindGroupLayout(device),` (86); `entries: [` (87); `binding: 0,` (89); `resource: {` (90); `buffer: uniformBuffer` (91); `},` (93); `binding: 1,` (95); `resource: txState_Sed.createView()` (96); `},` (97); `binding: 2,` (99); `resource: txBottom.createView()` (100); `},` (101); `binding: 3,` (103); `resource: txH.createView()` (104); `},` (105); `binding: 4,` (107); `resource: txSed_C1.createView()` (108); `},` (109); `binding: 5,` (111); `resource: txSed_C2.createView()` (112); `},` (113); `binding: 6,` (115); `resource: txSed_C3.createView()` (116); `},` (117); `binding: 7,` (119); `resource: txSed_C4.createView()` (120); `},` (121). |
+
+## 판독 중 확인된 코드 사실 (판단 아님, 후속 검토 대상)
+
+- 13·22·31·40·50·9–76: 여러 자원 주석은 fragment shader를 말하지만 실제 visibility는 GPUShaderStage.COMPUTE이다.
